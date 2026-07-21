@@ -299,7 +299,7 @@ describe("ItemDetailModal", () => {
 		});
 	});
 
-	it("keeps the modal shell stable when an output artwork opens another exact item", async () => {
+	it("keeps output recipes definition scoped even when a live item exists", async () => {
 		const { readControl } = await renderItemDetail();
 		const owner = currentRuntime.items.find((item) => item.item.id === "workshop");
 		const output = currentRuntime.items.find((item) => item.item.id === "water");
@@ -333,12 +333,13 @@ describe("ItemDetailModal", () => {
 			phase: "open",
 			generation: shellGeneration.generation,
 			target: {
-				itemId: output.id,
+				kind: "definition",
+				itemId: "water",
 				tab: "info",
 			},
 		});
-		expect(modal.dataset.runtimeId).toBe(output.id);
-		expect(document.querySelector('[data-ui="ItemInfoTab"]')).not.toBeNull();
+		expect(modal.dataset.runtimeId).toBeUndefined();
+		expect(document.querySelector('[data-ui="ItemDefinitionInfoTab"]')).not.toBeNull();
 	});
 
 	it("keeps the modal shell stable when an output has only configured definition detail", async () => {

@@ -142,7 +142,6 @@ const createStackConfig = ({ boardWidth }: { readonly boardWidth: number }) =>
 		},
 	});
 
-
 describe("setDefaultLineFx", () => {
 	it("persists one exact default without reordering authored lines and makes the owner impure", () => {
 		const result = Effect.runSync(
@@ -484,5 +483,4 @@ describe("setDefaultLineFx", () => {
 		}
 		expect(result.after).toEqual(result.before);
 	});
-
 });

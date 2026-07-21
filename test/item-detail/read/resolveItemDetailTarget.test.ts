@@ -9,7 +9,6 @@ describe("resolveItemDetailTarget", () => {
 		const runtime = lineRunRuntime({});
 		expect(readItemDetailTabs(runtime.items[0])).toEqual([
 			"info",
-			"status",
 			"lines",
 			"queue",
 		]);

@@ -264,7 +264,6 @@ describe("ItemDetailModal", () => {
 			).map((tab) => tab.dataset.tab),
 		).toEqual([
 			"info",
-			"status",
 			"lines",
 			"queue",
 		]);

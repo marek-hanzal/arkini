@@ -32,7 +32,7 @@ vi.mock("~/bridge/item-detail/useResolveItemDetailTarget", () => ({
 						tab: requestedTab,
 						tabs: [
 							"info",
-							"status",
+							"lines",
 						],
 					} as const),
 }));
@@ -173,7 +173,7 @@ describe("ItemDetailProvider", () => {
 		await act(async () => {
 			readControl().openItemDetail({
 				itemId: "runtime:first",
-				tab: "status",
+				tab: "lines",
 			});
 		});
 		expect(readControl().state).toMatchObject({
@@ -181,7 +181,7 @@ describe("ItemDetailProvider", () => {
 			generation: entering.generation,
 			target: {
 				itemId: "runtime:first",
-				tab: "status",
+				tab: "lines",
 				origin,
 			},
 		});

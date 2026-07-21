@@ -8,12 +8,10 @@ const infoTab: readonly ItemDetailTabEnumSchema.Type[] = [
 ];
 const lineOwnerTabs: readonly ItemDetailTabEnumSchema.Type[] = [
 	"info",
-	"status",
 	"lines",
 ];
 const queuedProducerTabs: readonly ItemDetailTabEnumSchema.Type[] = [
 	"info",
-	"status",
 	"lines",
 	"queue",
 ];

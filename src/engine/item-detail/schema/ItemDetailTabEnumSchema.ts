@@ -4,7 +4,6 @@ import { z } from "zod";
 export const ItemDetailTabEnumSchema = z
 	.enum([
 		"info",
-		"status",
 		"lines",
 		"queue",
 	])

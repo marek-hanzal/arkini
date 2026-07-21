@@ -3,12 +3,11 @@ import { useCallback } from "react";
 
 import { useGameEngine } from "~/bridge/game/useGameEngine";
 import { useRuntimeSelector } from "~/bridge/runtime/useRuntimeSelector";
-import { isLineOwnerItem } from "~/engine/line/read/isLineOwnerItem";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 import { isGridRuntimeItem } from "~/engine/runtime/read/isGridRuntimeItem";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { readRuntimeItemPrimaryAssetId } from "~/engine/item/read/readRuntimeItemPrimaryAssetId";
-import { readItemDetailStatusFx } from "~/engine/item-detail/read/readItemDetailStatusFx";
+import { resolveJobRunnableFx } from "~/engine/job/fx/resolveJobRunnableFx";
 
 export namespace useTileActors {
 	export interface Item {
@@ -29,21 +28,23 @@ export const useTileActors = (): ReadonlyArray<useTileActors.Item> => {
 	const game = useGameEngine();
 	const selector = useCallback(
 		(runtime: RuntimeSchema.Type): ReadonlyArray<useTileActors.Item> => {
-			const activeOwnerIds = new Set(runtime.jobs.map((job) => job.ownerItemId));
+			const activeJobs = new Map(
+				runtime.jobs.map((job) => [
+					job.ownerItemId,
+					job,
+				]),
+			);
 			return runtime.items.filter(isGridRuntimeItem).map((item) => {
-				const statusExit =
-					!activeOwnerIds.has(item.id) || !isLineOwnerItem(item.item)
+				const activeJob = activeJobs.get(item.id);
+				const runnableExit =
+					activeJob === undefined || activeJob.remainingMs === 0
 						? undefined
 						: game.read(
-								readItemDetailStatusFx({
-									itemId: item.id,
+								resolveJobRunnableFx({
+									job: activeJob,
 									runtime,
 								}),
 							);
-				const status =
-					statusExit === undefined || Exit.isFailure(statusExit)
-						? undefined
-						: statusExit.value;
 				return {
 					id: item.id,
 					revision: item.revision,
@@ -51,7 +52,10 @@ export const useTileActors = (): ReadonlyArray<useTileActors.Item> => {
 					title: item.item.title,
 					quantity: item.quantity,
 					location: item.location,
-					running: status?.kind === "available" && status.state.kind === "working",
+					running:
+						runnableExit !== undefined &&
+						Exit.isSuccess(runnableExit) &&
+						runnableExit.value,
 					sourceUrl: game.getResourceUrl(
 						readRuntimeItemPrimaryAssetId(runtime, item.item),
 					),

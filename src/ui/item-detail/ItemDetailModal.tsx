@@ -6,13 +6,11 @@ import { useItemDetailIdentity } from "~/bridge/item-detail/useItemDetailIdentit
 import { useItemDetailInfo } from "~/bridge/item-detail/useItemDetailInfo";
 import { useItemDetailLines } from "~/bridge/item-detail/useItemDetailLines";
 import { useItemDetailQueue } from "~/bridge/item-detail/useItemDetailQueue";
-import { useItemDetailStatus } from "~/bridge/item-detail/useItemDetailStatus";
 import { useItemDetailTabs } from "~/bridge/item-detail/useItemDetailTabs";
 import type { ItemDetailTab } from "~/bridge/item-detail/ItemDetailTab";
 import { ItemInfoTab } from "~/ui/item-detail/ItemInfoTab";
 import { ItemLinesTab } from "~/ui/item-detail/ItemLinesTab";
 import { ItemQueueTab } from "~/ui/item-detail/ItemQueueTab";
-import { readItemStatusPresentation, ItemStatusTab } from "~/ui/item-detail/ItemStatusTab";
 import type { ItemDetailState } from "~/ui/item-detail/ItemDetailControl";
 import { useItemDetailControl } from "~/ui/item-detail/useItemDetailControl";
 import { useItemDetailFocus } from "~/ui/item-detail/useItemDetailFocus";
@@ -30,7 +28,6 @@ const transition = {
 
 const tabLabel = {
 	info: "Info",
-	status: "Status",
 	lines: "Lines",
 	queue: "Queue",
 } as const satisfies Record<ItemDetailTab, string>;
@@ -166,25 +163,6 @@ const ItemInfoContent = ({ itemId }: { readonly itemId: string }) => {
 	);
 };
 
-const ItemStatusContent = ({ itemId }: { readonly itemId: string }) => {
-	const itemDetail = useItemDetailControl();
-	const status = useItemDetailStatus(itemId);
-	useEffect(() => {
-		if (status.kind === "available") return;
-		void itemDetail.close();
-	}, [
-		itemDetail,
-		status.kind,
-	]);
-	if (status.kind === "unavailable") return null;
-	return (
-		<ItemStatusTab
-			status={status}
-			presentation={readItemStatusPresentation(status.state)}
-		/>
-	);
-};
-
 const ItemLinesContent = ({ itemId }: { readonly itemId: string }) => {
 	const itemDetail = useItemDetailControl();
 	const lines = useItemDetailLines(itemId);
@@ -222,7 +200,6 @@ const ItemDetailContent = ({
 }) =>
 	match(tab)
 		.with("info", () => <ItemInfoContent itemId={itemId} />)
-		.with("status", () => <ItemStatusContent itemId={itemId} />)
 		.with("lines", () => <ItemLinesContent itemId={itemId} />)
 		.with("queue", () => <ItemQueueContent itemId={itemId} />)
 		.exhaustive();

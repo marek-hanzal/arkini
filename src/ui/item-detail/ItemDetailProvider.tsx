@@ -1,4 +1,5 @@
 import { type PropsWithChildren, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { match } from "ts-pattern";
 
 import { useResolveItemDetailTarget } from "~/bridge/item-detail/useResolveItemDetailTarget";
 import { ItemDetailContext } from "~/ui/item-detail/ItemDetailContext";
@@ -52,34 +53,76 @@ export const ItemDetailProvider = ({ children }: PropsWithChildren) => {
 			});
 			if (resolved.kind === "unavailable") return false;
 			const current = stateRef.current;
+			const existingOrigin = match(current)
+				.with(
+					{
+						phase: "closed",
+					},
+					() => origin,
+				)
+				.with(
+					{
+						phase: "entering",
+					},
+					{
+						phase: "open",
+					},
+					{
+						phase: "exiting",
+					},
+					(state) =>
+						state.target.itemId === resolved.itemId ? state.target.origin : origin,
+				)
+				.exhaustive();
 			const target: ItemDetailTarget = {
 				itemId: resolved.itemId,
 				tab: resolved.tab,
-				origin:
-					current.phase !== "closed" && current.target.itemId === resolved.itemId
-						? current.target.origin
-						: origin,
+				origin: existingOrigin,
 			};
-
-			if (
-				(current.phase === "entering" || current.phase === "open") &&
-				current.target.itemId === target.itemId
-			) {
-				if (current.target.tab === target.tab) return true;
+			const enter = () => {
 				publishState({
-					...current,
+					phase: "entering",
 					target,
+					generation: ++nextGeneration.current,
 				});
 				return true;
-			}
+			};
 
-			if (current.phase === "exiting") resolveExitCompletion(current.generation);
-			publishState({
-				phase: "entering",
-				target,
-				generation: ++nextGeneration.current,
-			});
-			return true;
+			return match(current)
+				.with(
+					{
+						phase: "closed",
+					},
+					() => enter(),
+				)
+				.with(
+					{
+						phase: "entering",
+					},
+					{
+						phase: "open",
+					},
+					(current) => {
+						if (current.target.itemId !== target.itemId) return enter();
+						if (current.target.tab !== target.tab) {
+							publishState({
+								...current,
+								target,
+							});
+						}
+						return true;
+					},
+				)
+				.with(
+					{
+						phase: "exiting",
+					},
+					(current) => {
+						resolveExitCompletion(current.generation);
+						return enter();
+					},
+				)
+				.exhaustive();
 		},
 		[
 			publishState,
@@ -91,32 +134,63 @@ export const ItemDetailProvider = ({ children }: PropsWithChildren) => {
 	const close = useCallback(
 		({ restoreFocus = true } = {}) => {
 			const current = stateRef.current;
-			if (current.phase === "closed") return Promise.resolve();
-			if (current.phase === "exiting") {
-				if (!restoreFocus && current.restoreFocus) {
-					publishState({
-						...current,
-						restoreFocus: false,
-					});
-				}
-				return exitCompletionRef.current?.promise ?? Promise.resolve();
-			}
-			let resolve: () => void = () => undefined;
-			const promise = new Promise<void>((complete) => {
-				resolve = complete;
-			});
-			exitCompletionRef.current = {
-				generation: current.generation,
-				promise,
-				resolve,
+			const beginExit = (
+				state: Extract<
+					ItemDetailState,
+					{
+						phase: "entering" | "open";
+					}
+				>,
+			) => {
+				let resolve: () => void = () => undefined;
+				const promise = new Promise<void>((complete) => {
+					resolve = complete;
+				});
+				exitCompletionRef.current = {
+					generation: state.generation,
+					promise,
+					resolve,
+				};
+				publishState({
+					phase: "exiting",
+					target: state.target,
+					generation: state.generation,
+					restoreFocus,
+				});
+				return promise;
 			};
-			publishState({
-				phase: "exiting",
-				target: current.target,
-				generation: current.generation,
-				restoreFocus,
-			});
-			return promise;
+
+			return match(current)
+				.with(
+					{
+						phase: "closed",
+					},
+					() => Promise.resolve(),
+				)
+				.with(
+					{
+						phase: "entering",
+					},
+					{
+						phase: "open",
+					},
+					(state) => beginExit(state),
+				)
+				.with(
+					{
+						phase: "exiting",
+					},
+					(state) => {
+						if (!restoreFocus && state.restoreFocus) {
+							publishState({
+								...state,
+								restoreFocus: false,
+							});
+						}
+						return exitCompletionRef.current?.promise ?? Promise.resolve();
+					},
+				)
+				.exhaustive();
 		},
 		[
 			publishState,
@@ -125,13 +199,33 @@ export const ItemDetailProvider = ({ children }: PropsWithChildren) => {
 
 	const completeEnter = useCallback(
 		(generation: number) => {
-			const current = stateRef.current;
-			if (current.phase !== "entering" || current.generation !== generation) return;
-			publishState({
-				phase: "open",
-				target: current.target,
-				generation,
-			});
+			match(stateRef.current)
+				.with(
+					{
+						phase: "entering",
+					},
+					(state) => {
+						if (state.generation !== generation) return;
+						publishState({
+							phase: "open",
+							target: state.target,
+							generation,
+						});
+					},
+				)
+				.with(
+					{
+						phase: "closed",
+					},
+					{
+						phase: "open",
+					},
+					{
+						phase: "exiting",
+					},
+					() => undefined,
+				)
+				.exhaustive();
 		},
 		[
 			publishState,
@@ -140,10 +234,30 @@ export const ItemDetailProvider = ({ children }: PropsWithChildren) => {
 
 	const completeExit = useCallback(
 		(generation: number) => {
-			const current = stateRef.current;
-			if (current.phase !== "exiting" || current.generation !== generation) return;
-			publishState(closedState);
-			resolveExitCompletion(generation);
+			match(stateRef.current)
+				.with(
+					{
+						phase: "exiting",
+					},
+					(state) => {
+						if (state.generation !== generation) return;
+						publishState(closedState);
+						resolveExitCompletion(generation);
+					},
+				)
+				.with(
+					{
+						phase: "closed",
+					},
+					{
+						phase: "entering",
+					},
+					{
+						phase: "open",
+					},
+					() => undefined,
+				)
+				.exhaustive();
 		},
 		[
 			publishState,

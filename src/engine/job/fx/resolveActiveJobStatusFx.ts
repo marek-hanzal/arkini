@@ -17,11 +17,12 @@ export const resolveActiveJobStatusFx = Effect.fn("resolveActiveJobStatusFx")(fu
 	job,
 	runtime,
 }: resolveActiveJobStatusFx.Props) {
-	if (job.remainingMs === 0) return "awaiting-output" satisfies JobStatusSchema.Type;
-	return (yield* resolveJobRunnableFx({
+	const runnable = yield* resolveJobRunnableFx({
 		job,
 		runtime,
-	}))
-		? ("running" satisfies JobStatusSchema.Type)
-		: ("paused" satisfies JobStatusSchema.Type);
+	});
+	if (!runnable) return "paused" satisfies JobStatusSchema.Type;
+	return job.remainingMs === 0
+		? ("awaiting-output" satisfies JobStatusSchema.Type)
+		: ("running" satisfies JobStatusSchema.Type);
 });

@@ -1,5 +1,4 @@
 import { motion } from "motion/react";
-import { AboutPortraitAssets } from "~/ui/launcher/AboutPortraitAssets";
 import { useCornerPortraitPeek } from "~/ui/launcher/useCornerPortraitPeek";
 
 const cornerPresentation = {
@@ -37,16 +36,18 @@ export namespace CornerPortraitPeek {
 export const CornerPortraitPeek = ({
 	active,
 	corner,
+	portraitUrls,
 }: {
 	readonly active: boolean;
 	readonly corner: CornerPortraitPeek.Corner;
+	readonly portraitUrls: readonly string[];
 }) => {
-	const { activePortraitIndex, sizePx } = useCornerPortraitPeek(active);
+	const { activePortraitIndex, sizePx } = useCornerPortraitPeek(active, portraitUrls);
 	const presentation = cornerPresentation[corner];
 	const hiddenOffsetPx = sizePx * 1.05;
 	const peekOffsetPx = sizePx * 0.2;
 
-	return AboutPortraitAssets.map((portraitUrl, portraitIndex) => {
+	return portraitUrls.map((portraitUrl, portraitIndex) => {
 		const visible = activePortraitIndex === portraitIndex;
 		const offsetPx = visible ? peekOffsetPx : hiddenOffsetPx;
 

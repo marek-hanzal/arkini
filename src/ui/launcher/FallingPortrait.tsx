@@ -7,15 +7,18 @@ export const FallingPortrait = ({
 	active,
 	containerRef,
 	initialDelayMs,
+	portraitUrls,
 }: {
 	readonly active: boolean;
 	readonly containerRef: RefObject<HTMLDivElement | null>;
 	readonly initialDelayMs: number;
+	readonly portraitUrls: readonly string[];
 }) => {
 	const { appearance, controls } = useFallingPortraitMotion({
 		active,
 		containerRef,
 		initialDelayMs,
+		portraitUrls,
 	});
 
 	return (

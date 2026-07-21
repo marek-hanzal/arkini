@@ -58,9 +58,9 @@ export const validateGameResourcesFx = Effect.fn("validateGameResourcesFx")(func
 		},
 	];
 	for (const role of [
-		"chatGpt",
-		"marek",
-		"sarka",
+		"avatar-01",
+		"avatar-02",
+		"avatar-03",
 	] as const) {
 		const id = config.resources[role];
 		if (id === undefined) continue;

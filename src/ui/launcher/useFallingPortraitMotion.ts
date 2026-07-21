@@ -1,6 +1,5 @@
 import { useAnimationControls } from "motion/react";
 import { type RefObject, useEffect, useState } from "react";
-import { AboutPortraitAssets } from "~/ui/launcher/AboutPortraitAssets";
 
 const randomBetween = (minimum: number, maximum: number) =>
 	minimum + Math.random() * (maximum - minimum);
@@ -8,9 +7,8 @@ const randomBetween = (minimum: number, maximum: number) =>
 const wait = (milliseconds: number) =>
 	new Promise<void>((resolve) => window.setTimeout(resolve, milliseconds));
 
-const pickPortrait = () =>
-	AboutPortraitAssets[Math.floor(Math.random() * AboutPortraitAssets.length)] ??
-	AboutPortraitAssets[0];
+const pickPortrait = (portraitUrls: readonly string[]) =>
+	portraitUrls[Math.floor(Math.random() * portraitUrls.length)] ?? portraitUrls[0] ?? "";
 
 interface FallingPortraitAppearance {
 	readonly blurPx: number;
@@ -19,25 +17,25 @@ interface FallingPortraitAppearance {
 	readonly zIndex: number;
 }
 
-const initialAppearance: FallingPortraitAppearance = {
-	blurPx: 0,
-	portraitUrl: AboutPortraitAssets[0],
-	sizePx: 64,
-	zIndex: 1,
-};
-
 /** Owns one stable falling portrait node and continuously recycles its Motion trajectory. */
 export const useFallingPortraitMotion = ({
 	active,
 	containerRef,
 	initialDelayMs,
+	portraitUrls,
 }: {
 	readonly active: boolean;
 	readonly containerRef: RefObject<HTMLDivElement | null>;
 	readonly initialDelayMs: number;
+	readonly portraitUrls: readonly string[];
 }) => {
 	const controls = useAnimationControls();
-	const [appearance, setAppearance] = useState(initialAppearance);
+	const [appearance, setAppearance] = useState<FallingPortraitAppearance>({
+		blurPx: 0,
+		portraitUrl: portraitUrls[0] ?? "",
+		sizePx: 64,
+		zIndex: 1,
+	});
 
 	useEffect(() => {
 		if (!active) {
@@ -79,7 +77,7 @@ export const useFallingPortraitMotion = ({
 
 				setAppearance({
 					blurPx: (1 - depth) * 1.1,
-					portraitUrl: pickPortrait(),
+					portraitUrl: pickPortrait(portraitUrls),
 					sizePx,
 					zIndex: 1 + Math.round(depth * 8),
 				});
@@ -130,6 +128,7 @@ export const useFallingPortraitMotion = ({
 		containerRef,
 		controls,
 		initialDelayMs,
+		portraitUrls,
 	]);
 
 	return {

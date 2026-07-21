@@ -20,7 +20,13 @@ const corners = [
 ] as const satisfies readonly CornerPortraitPeek.Corner[];
 
 /** Renders the delayed About-page portrait easter egg without replacing its stable DOM pool. */
-export const AboutEasterEgg = ({ active }: { readonly active: boolean }) => {
+export const AboutEasterEgg = ({
+	active,
+	portraitUrls,
+}: {
+	readonly active: boolean;
+	readonly portraitUrls: readonly string[];
+}) => {
 	const containerRef = useRef<HTMLDivElement>(null);
 
 	return (
@@ -36,6 +42,7 @@ export const AboutEasterEgg = ({ active }: { readonly active: boolean }) => {
 					active={active}
 					containerRef={containerRef}
 					initialDelayMs={initialDelayMs}
+					portraitUrls={portraitUrls}
 					key={id}
 				/>
 			))}
@@ -43,6 +50,7 @@ export const AboutEasterEgg = ({ active }: { readonly active: boolean }) => {
 				<CornerPortraitPeek
 					active={active}
 					corner={corner}
+					portraitUrls={portraitUrls}
 					key={corner}
 				/>
 			))}

@@ -11,9 +11,9 @@ import { IdSchema } from "~/engine/common/schema/IdSchema";
 export const ResourceConfigSchema = z
 	.object({
 		hero: IdSchema.describe("The explicit resource ID used by the game splash hero."),
-		chatGpt: IdSchema.optional(),
-		marek: IdSchema.optional(),
-		sarka: IdSchema.optional(),
+		"avatar-01": IdSchema.optional(),
+		"avatar-02": IdSchema.optional(),
+		"avatar-03": IdSchema.optional(),
 	})
 	.strict()
 	.meta({

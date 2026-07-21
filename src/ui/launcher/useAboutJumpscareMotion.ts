@@ -1,6 +1,5 @@
 import { useAnimationControls } from "motion/react";
 import { type RefObject, useEffect, useState } from "react";
-import { AboutPortraitAssets } from "~/ui/launcher/AboutPortraitAssets";
 
 const firstDelayRangeMs = {
 	maximum: 90_000,
@@ -17,20 +16,21 @@ const jumpscareDurationSeconds = 2.4;
 const randomBetween = (minimum: number, maximum: number) =>
 	minimum + Math.random() * (maximum - minimum);
 
-const pickPortrait = () =>
-	AboutPortraitAssets[Math.floor(Math.random() * AboutPortraitAssets.length)] ??
-	AboutPortraitAssets[0];
+const pickPortrait = (portraitUrls: readonly string[]) =>
+	portraitUrls[Math.floor(Math.random() * portraitUrls.length)] ?? portraitUrls[0] ?? "";
 
 /** Recycles one rare fullscreen portrait apparition with bounded random spacing. */
 export const useAboutJumpscareMotion = ({
 	active,
 	containerRef,
+	portraitUrls,
 }: {
 	readonly active: boolean;
 	readonly containerRef: RefObject<HTMLDivElement | null>;
+	readonly portraitUrls: readonly string[];
 }) => {
 	const controls = useAnimationControls();
-	const [portraitUrl, setPortraitUrl] = useState(AboutPortraitAssets[0]);
+	const [portraitUrl, setPortraitUrl] = useState(portraitUrls[0] ?? "");
 
 	useEffect(() => {
 		if (!active) {
@@ -60,7 +60,7 @@ export const useAboutJumpscareMotion = ({
 					(Math.max(bounds.width, bounds.height) / 256) * randomBetween(1.18, 1.42);
 				const startRotation = randomBetween(-8, 8);
 
-				setPortraitUrl(pickPortrait());
+				setPortraitUrl(pickPortrait(portraitUrls));
 				controls.set({
 					filter: "blur(14px)",
 					opacity: 0,
@@ -127,6 +127,7 @@ export const useAboutJumpscareMotion = ({
 		active,
 		containerRef,
 		controls,
+		portraitUrls,
 	]);
 
 	return {

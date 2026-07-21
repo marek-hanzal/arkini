@@ -41,6 +41,50 @@ describe("validateGameResourcesFx", () => {
 		expect(diagnostics).toEqual([]);
 	});
 
+	it("validates only configured optional anonymous avatar roles", () => {
+		const config = GameConfigSchema.parse({
+			...startTestConfig,
+			resources: {
+				...startTestConfig.resources,
+				"avatar-02": "avatar-02",
+			},
+		});
+		const diagnostics = Effect.runSync(
+			validateGameResourcesFx({
+				config,
+				provenance,
+				resources: [
+					{
+						id: "hero",
+						path: "hero.png",
+						mime: "image/png" as const,
+					},
+				],
+			}),
+		);
+
+		expect(diagnostics).toContainEqual(
+			expect.objectContaining({
+				code: "resource:missing",
+				resourceId: "avatar-02",
+				path: [
+					"resources",
+					"avatar-02",
+				],
+			}),
+		);
+		expect(
+			diagnostics.some(
+				(diagnostic) =>
+					diagnostic.code === "resource:missing" &&
+					[
+						"avatar-01",
+						"avatar-03",
+					].includes(diagnostic.resourceId),
+			),
+		).toBe(false);
+	});
+
 	it("reports duplicate and missing exact resource IDs", () => {
 		const diagnostics = Effect.runSync(
 			validateGameResourcesFx({

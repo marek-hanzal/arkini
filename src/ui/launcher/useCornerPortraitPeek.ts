@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from "react";
-import { AboutPortraitAssets } from "~/ui/launcher/AboutPortraitAssets";
 
 const randomBetween = (minimum: number, maximum: number) =>
 	minimum + Math.random() * (maximum - minimum);
@@ -15,7 +14,7 @@ const initialState: CornerPortraitPeekState = {
 };
 
 /** Randomly selects which pre-rendered portrait peeks from one About-page corner. */
-export const useCornerPortraitPeek = (active: boolean) => {
+export const useCornerPortraitPeek = (active: boolean, portraitUrls: readonly string[]) => {
 	const [peek, setPeek] = useState(initialState);
 	const previousPortraitIndexRef = useRef<number | undefined>(undefined);
 
@@ -36,9 +35,9 @@ export const useCornerPortraitPeek = (active: boolean) => {
 				() => {
 					if (disposed) return;
 
-					const candidates = AboutPortraitAssets.map((_, index) => index).filter(
-						(index) => index !== previousPortraitIndexRef.current,
-					);
+					const candidates = portraitUrls
+						.map((_, index) => index)
+						.filter((index) => index !== previousPortraitIndexRef.current);
 					const nextIndex =
 						candidates[Math.floor(Math.random() * candidates.length)] ?? 0;
 					previousPortraitIndexRef.current = nextIndex;
@@ -70,6 +69,7 @@ export const useCornerPortraitPeek = (active: boolean) => {
 		};
 	}, [
 		active,
+		portraitUrls,
 	]);
 
 	return peek;

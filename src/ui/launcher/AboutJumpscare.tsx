@@ -3,11 +3,18 @@ import { useRef } from "react";
 import { useAboutJumpscareMotion } from "~/ui/launcher/useAboutJumpscareMotion";
 
 /** Renders the rare foreground portrait apparition for the About-page easter egg. */
-export const AboutJumpscare = ({ active }: { readonly active: boolean }) => {
+export const AboutJumpscare = ({
+	active,
+	portraitUrls,
+}: {
+	readonly active: boolean;
+	readonly portraitUrls: readonly string[];
+}) => {
 	const containerRef = useRef<HTMLDivElement>(null);
 	const { controls, portraitUrl } = useAboutJumpscareMotion({
 		active,
 		containerRef,
+		portraitUrls,
 	});
 
 	return (

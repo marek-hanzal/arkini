@@ -25,6 +25,24 @@ const slotRegistrationKey = (surface: TileSurface, slot: TileSlot) =>
 const isPointInside = (rect: DOMRect, x: number, y: number) =>
 	x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom;
 
+const isPointInsideSlot = ({
+	lastColumn,
+	lastRow,
+	rect,
+	x,
+	y,
+}: {
+	readonly lastColumn: boolean;
+	readonly lastRow: boolean;
+	readonly rect: DOMRect;
+	readonly x: number;
+	readonly y: number;
+}) =>
+	x >= rect.left &&
+	(lastColumn ? x <= rect.right : x < rect.right) &&
+	y >= rect.top &&
+	(lastRow ? y <= rect.bottom : y < rect.bottom);
+
 /** Owns Canvas-local tile surface registration, measurement, and topmost hit testing. */
 export const useTileGeometry = () => {
 	const surfaces = useRef(new Map<string, TileSurfaceRegistration>());
@@ -164,11 +182,36 @@ export const useTileGeometry = () => {
 		[],
 	);
 
+	const readSurfaceSlotLimits = useCallback((surfaceId: string) => {
+		let maxX = -1;
+		let maxY = -1;
+		for (const registration of slots.current.values()) {
+			if (registration.surface.id !== surfaceId) continue;
+			maxX = Math.max(maxX, registration.slot.x);
+			maxY = Math.max(maxY, registration.slot.y);
+		}
+		return {
+			maxX,
+			maxY,
+		} as const;
+	}, []);
+
 	const resolveInsideSurface = useCallback(
 		(surface: TileSurfaceRegistration, x: number, y: number): TileDropTarget => {
+			const limits = readSurfaceSlotLimits(surface.surface.id);
 			for (const registration of slots.current.values()) {
 				if (registration.surface.id !== surface.surface.id) continue;
-				if (!isPointInside(registration.node.getBoundingClientRect(), x, y)) continue;
+				if (
+					!isPointInsideSlot({
+						lastColumn: registration.slot.x === limits.maxX,
+						lastRow: registration.slot.y === limits.maxY,
+						rect: registration.node.getBoundingClientRect(),
+						x,
+						y,
+					})
+				) {
+					continue;
+				}
 				return registrationTarget(registration);
 			}
 			return {
@@ -177,6 +220,7 @@ export const useTileGeometry = () => {
 			};
 		},
 		[
+			readSurfaceSlotLimits,
 			registrationTarget,
 		],
 	);
@@ -188,11 +232,15 @@ export const useTileGeometry = () => {
 				if (topElement.closest('[data-tile-actor="true"]') !== null) continue;
 				for (const registration of slots.current.values()) {
 					if (
-						registration.node === topElement ||
-						registration.node.contains(topElement)
+						registration.node !== topElement &&
+						!registration.node.contains(topElement)
 					) {
-						return registrationTarget(registration);
+						continue;
 					}
+					const surface = surfaces.current.get(registration.surface.id);
+					return surface === undefined
+						? registrationTarget(registration)
+						: resolveInsideSurface(surface, x, y);
 				}
 				for (const surface of surfaces.current.values()) {
 					if (surface.node === topElement || surface.node.contains(topElement)) {
@@ -204,10 +252,6 @@ export const useTileGeometry = () => {
 				};
 			}
 
-			for (const registration of slots.current.values()) {
-				if (!isPointInside(registration.node.getBoundingClientRect(), x, y)) continue;
-				return registrationTarget(registration);
-			}
 			for (const surface of surfaces.current.values()) {
 				if (!isPointInside(surface.node.getBoundingClientRect(), x, y)) continue;
 				return resolveInsideSurface(surface, x, y);

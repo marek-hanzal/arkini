@@ -55,6 +55,21 @@ const sourceSlot = {
 	x: 0,
 	y: 0,
 } satisfies TileSlot;
+const boardTopRightSlot = {
+	id: "1:0",
+	x: 1,
+	y: 0,
+} satisfies TileSlot;
+const boardBottomLeftSlot = {
+	id: "0:1",
+	x: 0,
+	y: 1,
+} satisfies TileSlot;
+const boardBottomRightSlot = {
+	id: "1:1",
+	x: 1,
+	y: 1,
+} satisfies TileSlot;
 const inventorySlot = {
 	id: "1:0",
 	x: 1,
@@ -84,7 +99,7 @@ const source = {
 	slot: sourceSlot,
 } satisfies TileDragSource;
 
-const Surface = ({
+const SurfaceSlot = ({
 	surface,
 	slot,
 	occupant = null,
@@ -93,23 +108,43 @@ const Surface = ({
 	readonly slot: TileSlot;
 	readonly occupant?: TileIdentity | null;
 }) => {
-	const surfaceRef = useTileSurface(surface);
 	const drop = useTileSlot({
 		surface,
 		slot,
 		occupant,
 	});
+	return createElement("div", {
+		ref: drop.ref,
+		"data-slot": `${surface.kind}:${slot.id}`,
+		"data-over": drop.over ? "true" : "false",
+	});
+};
+
+const Surface = ({
+	surface,
+	slots,
+}: {
+	readonly surface: TileSurface;
+	readonly slots: ReadonlyArray<{
+		readonly slot: TileSlot;
+		readonly occupant?: TileIdentity | null;
+	}>;
+}) => {
+	const surfaceRef = useTileSurface(surface);
 	return createElement(
 		"div",
 		{
 			ref: surfaceRef,
 			"data-surface": surface.kind,
 		},
-		createElement("div", {
-			ref: drop.ref,
-			"data-slot": `${surface.kind}:${slot.id}`,
-			"data-over": drop.over ? "true" : "false",
-		}),
+		...slots.map(({ slot, occupant }) =>
+			createElement(SurfaceSlot, {
+				key: slot.id,
+				surface,
+				slot,
+				occupant,
+			}),
+		),
 	);
 };
 
@@ -135,16 +170,37 @@ const Harness = ({ onSystem }: { readonly onSystem: (system: TileSystem) => void
 		}),
 		createElement(Surface, {
 			surface: boardSurface,
-			slot: sourceSlot,
+			slots: [
+				{
+					slot: sourceSlot,
+				},
+				{
+					slot: boardTopRightSlot,
+				},
+				{
+					slot: boardBottomLeftSlot,
+				},
+				{
+					slot: boardBottomRightSlot,
+				},
+			],
 		}),
 		createElement(Surface, {
 			surface: inventorySurface,
-			slot: inventorySlot,
+			slots: [
+				{
+					slot: inventorySlot,
+				},
+			],
 		}),
 		createElement(Surface, {
 			surface: toolbarSurface,
-			slot: toolbarSlot,
-			occupant: toolbarOccupant,
+			slots: [
+				{
+					slot: toolbarSlot,
+					occupant: toolbarOccupant,
+				},
+			],
 		}),
 	);
 
@@ -154,10 +210,13 @@ beforeEach(() => {
 		value() {
 			const element = this as HTMLElement;
 			if (element.dataset.ui === "TileActorLayer") return rect(0, 0, 500, 200);
-			if (element.dataset.surface === "board") return rect(0, 0, 100, 100);
+			if (element.dataset.surface === "board") return rect(0, 0, 100.5, 99.5);
 			if (element.dataset.surface === "inventory") return rect(180, 0, 160, 120);
 			if (element.dataset.surface === "toolbar") return rect(380, 0, 120, 100);
-			if (element.dataset.slot?.startsWith("board:")) return rect(0, 0, 100, 100);
+			if (element.dataset.slot === "board:0:0") return rect(0, 0, 50.25, 49.75);
+			if (element.dataset.slot === "board:1:0") return rect(50.25, 0, 50.25, 49.75);
+			if (element.dataset.slot === "board:0:1") return rect(0, 49.75, 50.25, 49.75);
+			if (element.dataset.slot === "board:1:1") return rect(50.25, 49.75, 50.25, 49.75);
 			if (element.dataset.slot?.startsWith("inventory:")) return rect(200, 20, 80, 80);
 			if (element.dataset.slot?.startsWith("toolbar:")) return rect(400, 10, 80, 80);
 			return rect(0, 0, 0, 0);
@@ -234,6 +293,32 @@ const startDrag = async (system: TileSystem, x: number, y: number) => {
 };
 
 describe("TileSystemProvider", () => {
+	it("assigns fractional shared seams and outer edges to exactly one Board slot", async () => {
+		const { readSystem } = await renderHarness();
+
+		const seam = await startDrag(readSystem(), 50.25, 49.75);
+		expect(seam).toMatchObject({
+			target: {
+				kind: "slot",
+				surface: boardSurface,
+				slot: boardBottomRightSlot,
+			},
+		});
+		await act(async () => {
+			if (seam !== null) readSystem().settle(seam.source, seam.generation, null);
+			if (seam !== null) readSystem().complete(source.id, seam.generation);
+		});
+
+		const outerEdge = await startDrag(readSystem(), 100.5, 99.5);
+		expect(outerEdge).toMatchObject({
+			target: {
+				kind: "slot",
+				surface: boardSurface,
+				slot: boardBottomRightSlot,
+			},
+		});
+	});
+
 	it("reports a Board source dropped into one inventory slot", async () => {
 		const { readSystem } = await renderHarness();
 		const released = await startDrag(readSystem(), 240, 50);

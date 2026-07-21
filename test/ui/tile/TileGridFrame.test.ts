@@ -85,4 +85,30 @@ describe("TileGridFrame", () => {
 			...html.matchAll(/data-tile-slot-tone="b"/g),
 		]).toHaveLength(6);
 	});
+	it("continues checker parity from an earlier grid row", () => {
+		const html = renderToStaticMarkup(
+			createElement(
+				TileSystemProvider,
+				null,
+				createElement(TileGridFrame, {
+					surface: surfaces[1],
+					width: 2,
+					height: 1,
+					cells: cells.slice(0, 2),
+					toneRowOffset: 1,
+					frameUi: "continued-frame",
+					gridUi: "continued-grid",
+					cellUi: "continued-cell",
+				}),
+			),
+		);
+		const tones = [
+			...html.matchAll(/data-ui="continued-cell"[^>]*data-tile-slot-tone="([ab])"/g),
+		].map((match) => match[1]);
+
+		expect(tones).toEqual([
+			"b",
+			"a",
+		]);
+	});
 });

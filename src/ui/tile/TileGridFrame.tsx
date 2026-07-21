@@ -18,6 +18,7 @@ export namespace TileGridFrame {
 		readonly width: number;
 		readonly height: number;
 		readonly cells: ReadonlyArray<Cell>;
+		readonly toneRowOffset?: number;
 		readonly frameUi: string;
 		readonly gridUi: string;
 		readonly cellUi: string;
@@ -30,6 +31,7 @@ export const TileGridFrame = ({
 	width,
 	height,
 	cells,
+	toneRowOffset = 0,
 	frameUi,
 	gridUi,
 	cellUi,
@@ -63,6 +65,7 @@ export const TileGridFrame = ({
 						x={cell.x}
 						y={cell.y}
 						occupant={cell.occupant}
+						toneRowOffset={toneRowOffset}
 						dataUi={cellUi}
 					/>
 				))}

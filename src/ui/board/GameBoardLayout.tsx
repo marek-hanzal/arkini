@@ -42,7 +42,7 @@ export const GameBoardLayout = () => {
 					style={style}
 				>
 					<Board />
-					<Toolbar />
+					<Toolbar toneRowOffset={board.height} />
 				</div>
 			</div>
 		</div>

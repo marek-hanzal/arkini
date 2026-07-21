@@ -1,8 +1,14 @@
 import { TileGridFrame } from "~/ui/tile/TileGridFrame";
 import { useToolbarView } from "~/ui/toolbar/useToolbarView";
 
+export namespace Toolbar {
+	export interface Props {
+		readonly toneRowOffset: number;
+	}
+}
+
 /** Renders the optional global one-row toolbar through the shared tile-grid surface. */
-export const Toolbar = () => {
+export const Toolbar = ({ toneRowOffset }: Toolbar.Props) => {
 	const view = useToolbarView();
 	if (!view.enabled) return null;
 
@@ -24,6 +30,7 @@ export const Toolbar = () => {
 					width={view.size}
 					height={1}
 					cells={view.cells}
+					toneRowOffset={toneRowOffset}
 					frameUi="ToolbarFrame"
 					gridUi="ToolbarGrid"
 					cellUi="ToolbarCell"

@@ -11,12 +11,20 @@ export namespace TileGridCell {
 		readonly x: number;
 		readonly y: number;
 		readonly occupant: TileIdentity | null;
+		readonly toneRowOffset: number;
 		readonly dataUi: string;
 	}
 }
 
 /** Registers and renders one stable coordinate shared by every tile grid surface. */
-export const TileGridCell = ({ surface, x, y, occupant, dataUi }: TileGridCell.Props) => {
+export const TileGridCell = ({
+	surface,
+	x,
+	y,
+	occupant,
+	toneRowOffset,
+	dataUi,
+}: TileGridCell.Props) => {
 	const slot = useMemo(
 		() => ({
 			id: `${x}:${y}`,
@@ -48,7 +56,7 @@ export const TileGridCell = ({ surface, x, y, occupant, dataUi }: TileGridCell.P
 		slot,
 		occupant: occupantIdentity,
 	});
-	const tone = (x + y) % 2 === 0 ? "a" : "b";
+	const tone = (x + y + toneRowOffset) % 2 === 0 ? "a" : "b";
 
 	return (
 		<div

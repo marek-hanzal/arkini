@@ -36,7 +36,7 @@ const createConfig = (toolbarSize?: number) =>
 			title: "Toolbar UI",
 			board: {
 				width: 3,
-				height: 2,
+				height: 3,
 			},
 			inventory: {
 				width: 1,
@@ -163,8 +163,14 @@ describe("Toolbar", () => {
 		expect(html).toContain('data-tile-grid-surface="toolbar"');
 		expect(html).toContain('data-ui="ToolbarGrid" data-tile-grid="true"');
 		expect(html).toContain('data-tile-surface="toolbar"');
-		expect(html).toContain('data-tile-slot-tone="a"');
-		expect(html).toContain('data-tile-slot-tone="b"');
+		const toolbarTones = [
+			...html.matchAll(/data-ui="ToolbarCell"[^>]*data-tile-slot-tone="([ab])"/g),
+		].map((match) => match[1]);
+		expect(toolbarTones).toEqual([
+			"b",
+			"a",
+			"b",
+		]);
 		expect(html).toContain('data-toolbar-x="1"');
 		expect(html).toContain('data-location-scope="toolbar"');
 		expect(html).toContain('data-item-id="water"');

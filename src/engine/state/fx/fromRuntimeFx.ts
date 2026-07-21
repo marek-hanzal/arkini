@@ -20,5 +20,12 @@ export const fromRuntimeFx = Effect.fn("fromRuntimeFx")(function* ({
 		items,
 		jobs: runtime.jobs,
 		jobQueue: runtime.jobQueue ?? [],
+		...(runtime.defaultLineByOwnerItemId === undefined
+			? {}
+			: {
+					defaultLineByOwnerItemId: {
+						...runtime.defaultLineByOwnerItemId,
+					},
+				}),
 	} satisfies StateSchema.Type;
 });

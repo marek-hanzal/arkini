@@ -27,9 +27,20 @@ export const removeRuntimeItemIdentityFx = Effect.fn("removeRuntimeItemIdentityF
 		);
 	}
 
+	const defaultLineByOwnerItemId = {
+		...(runtime.defaultLineByOwnerItemId ?? {}),
+	};
+	delete defaultLineByOwnerItemId[item.id];
 	return {
 		...runtime,
 		items: runtime.items.filter((candidate) => candidate.id !== item.id),
 		jobQueue: (runtime.jobQueue ?? []).filter((request) => request.ownerItemId !== item.id),
+		...(Object.keys(defaultLineByOwnerItemId).length === 0
+			? {
+					defaultLineByOwnerItemId: undefined,
+				}
+			: {
+					defaultLineByOwnerItemId,
+				}),
 	} satisfies RuntimeSchema.Type;
 });

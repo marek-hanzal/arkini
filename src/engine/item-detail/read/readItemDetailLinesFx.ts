@@ -114,6 +114,7 @@ export namespace readItemDetailLinesFx {
 		readonly effectiveRuntimeMs: TimeSchema.Type;
 		readonly availability: Availability;
 		readonly startMode: "start" | "enqueue";
+		readonly isDefault: boolean;
 		readonly actions: {
 			readonly canAutofill: boolean;
 			readonly canWithdraw: boolean;
@@ -392,11 +393,13 @@ const storedLine = ({
 	line,
 	ownerItemId,
 	runtime,
+	isDefault,
 }: {
 	readonly activeJob: RuntimeSchema.Type["jobs"][number] | undefined;
 	readonly line: LineSchema.Type;
 	readonly ownerItemId: IdSchema.Type;
 	readonly runtime: RuntimeSchema.Type;
+	readonly isDefault: boolean;
 }): readItemDetailLinesFx.Line => ({
 	lineId: line.id,
 	title: line.title,
@@ -408,6 +411,7 @@ const storedLine = ({
 		reason: "stored",
 	},
 	startMode: "start",
+	isDefault,
 	actions: {
 		canAutofill: false,
 		canWithdraw: false,
@@ -438,6 +442,7 @@ export const readItemDetailLinesFx = Effect.fn("readItemDetailLinesFx")(function
 	const owner = runtime.items.find((candidate) => candidate.id === itemId);
 	if (owner === undefined || !isLineOwnerItem(owner.item)) return unavailable;
 	const lines = readLineOwnerLines(owner.item);
+	const defaultLineId = runtime.defaultLineByOwnerItemId?.[owner.id];
 	const ownerHasWork =
 		runtime.jobs.some((job) => job.ownerItemId === owner.id) ||
 		(runtime.jobQueue ?? []).some((request) => request.ownerItemId === owner.id);
@@ -455,6 +460,7 @@ export const readItemDetailLinesFx = Effect.fn("readItemDetailLinesFx")(function
 						line,
 						ownerItemId: owner.id,
 						runtime,
+						isDefault: line.id === defaultLineId,
 					}),
 				);
 			}
@@ -506,6 +512,7 @@ export const readItemDetailLinesFx = Effect.fn("readItemDetailLinesFx")(function
 								: "queue",
 					},
 			startMode: ownerHasWork && start.queue.capacity > 1 ? "enqueue" : "start",
+			isDefault: line.id === defaultLineId,
 			actions: {
 				canAutofill: autofillPlan.entry.length > 0,
 				canWithdraw,
@@ -530,9 +537,16 @@ export const readItemDetailLinesFx = Effect.fn("readItemDetailLinesFx")(function
 		});
 	}
 
+	const ordered =
+		defaultLineId === undefined
+			? projected
+			: [
+					...projected.filter((line) => line.lineId === defaultLineId),
+					...projected.filter((line) => line.lineId !== defaultLineId),
+				];
 	return {
 		kind: "available",
 		itemId: owner.id,
-		line: projected,
+		line: ordered,
 	} satisfies readItemDetailLinesFx.Result;
 });

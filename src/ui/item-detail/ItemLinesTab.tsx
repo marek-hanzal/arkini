@@ -4,6 +4,7 @@ import { match } from "ts-pattern";
 
 import { useAutofillItemDetailLine } from "~/bridge/item-detail/useAutofillItemDetailLine";
 import type { useItemDetailLines } from "~/bridge/item-detail/useItemDetailLines";
+import { useSetDefaultItemDetailLine } from "~/bridge/item-detail/useSetDefaultItemDetailLine";
 import { useStartItemDetailLine } from "~/bridge/item-detail/useStartItemDetailLine";
 import { useWithdrawItemDetailLine } from "~/bridge/item-detail/useWithdrawItemDetailLine";
 import { Button, PrimaryButton } from "~/ui/button/Button";
@@ -393,18 +394,19 @@ const LineRow = ({
 	readonly ownerItemId: string;
 }) => {
 	const autofillLine = useAutofillItemDetailLine();
+	const setDefaultLine = useSetDefaultItemDetailLine();
 	const startLine = useStartItemDetailLine();
 	const withdrawLine = useWithdrawItemDetailLine();
-	const [pendingAction, setPendingAction] = useState<"autofill" | "start" | "withdraw" | null>(
-		null,
-	);
+	const [pendingAction, setPendingAction] = useState<
+		"autofill" | "default" | "start" | "withdraw" | null
+	>(null);
 	const [error, setError] = useState<string | null>(null);
 	const runAction = async ({
 		action,
 		failureMessage,
 		run,
 	}: {
-		readonly action: "autofill" | "start" | "withdraw";
+		readonly action: "autofill" | "default" | "start" | "withdraw";
 		readonly failureMessage: string;
 		readonly run: () => Promise<unknown>;
 	}) => {
@@ -444,6 +446,14 @@ const LineRow = ({
 						>
 							{readiness.label}
 						</span>
+						{line.isDefault ? (
+							<span
+								className="rounded-full border border-accent/35 bg-accent/10 px-2.5 py-1 text-xs font-semibold text-foreground"
+								data-ui="TileLineDefaultBadge"
+							>
+								Default
+							</span>
+						) : null}
 					</div>
 					<p className="mt-2 max-w-3xl text-sm leading-relaxed text-muted">
 						{line.description}
@@ -472,6 +482,29 @@ const LineRow = ({
 						</p>
 					</div>
 					<div className="flex flex-wrap justify-end gap-2">
+						<Button
+							className="min-h-8 px-3 py-1 text-xs"
+							cursorIntent={pendingAction === "default" ? "progress" : undefined}
+							data-ui="TileLineSetDefaultButton"
+							disabled={disabled || line.isDefault || pendingAction !== null}
+							onClick={() =>
+								runAction({
+									action: "default",
+									failureMessage: "Default line could not be changed.",
+									run: () =>
+										setDefaultLine({
+											ownerItemId,
+											lineId: line.lineId,
+										}),
+								})
+							}
+						>
+							{pendingAction === "default"
+								? "Saving…"
+								: line.isDefault
+									? "Default"
+									: "Set default"}
+						</Button>
 						<Button
 							cursorIntent={pendingAction === "autofill" ? "progress" : undefined}
 							disabled={

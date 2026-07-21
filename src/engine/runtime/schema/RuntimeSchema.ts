@@ -3,6 +3,7 @@ import { z } from "zod";
 import { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeIntegerSchema";
 import { JobQueueRequestSchema } from "~/engine/job/schema/JobQueueRequestSchema";
 import { JobSchema } from "~/engine/job/schema/JobSchema";
+import { DefaultLineByOwnerItemIdSchema } from "~/engine/line/schema/DefaultLineByOwnerItemIdSchema";
 import { RuntimeSessionSchema } from "~/engine/session/schema/RuntimeSessionSchema";
 import { RuntimeItemSchema } from "./RuntimeItemSchema";
 
@@ -25,6 +26,9 @@ export const RuntimeSchema = z
 			.array(JobQueueRequestSchema)
 			.optional()
 			.describe("FIFO line-start requests not started yet."),
+		defaultLineByOwnerItemId: DefaultLineByOwnerItemIdSchema.optional().describe(
+			"Save-backed default product line selected for exact live owner identities.",
+		),
 	})
 	.strict()
 	.meta({

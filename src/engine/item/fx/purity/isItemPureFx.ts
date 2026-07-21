@@ -40,6 +40,9 @@ export const isItemPureFx = Effect.fn("isItemPureFx")(function* ({
 	if (item.remainingDurationMs !== undefined) {
 		return false;
 	}
+	if (runtime.defaultLineByOwnerItemId?.[item.id] !== undefined) {
+		return false;
+	}
 
 	const linePurity = yield* Effect.forEach(lines, (line) => {
 		return isLinePureFx({

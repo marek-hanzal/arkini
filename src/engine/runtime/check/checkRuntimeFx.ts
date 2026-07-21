@@ -2,6 +2,7 @@ import { Effect } from "effect";
 
 import { GameConfigFx } from "~/engine/game/context/GameConfigFx";
 import { checkRuntimeInputLocationsFx } from "~/engine/input/check/checkRuntimeInputLocationsFx";
+import { checkRuntimeDefaultLinesFx } from "~/engine/line/check/checkRuntimeDefaultLinesFx";
 import { checkRuntimeJobsFx } from "~/engine/job/check/checkRuntimeJobsFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import type { RuntimeCheckResultSchema } from "~/engine/runtime/schema/check/RuntimeCheckResultSchema";
@@ -36,6 +37,9 @@ export const checkRuntimeFx = Effect.fn("checkRuntimeFx")(function* ({
 	const itemTemporaryDurationIssues = yield* checkRuntimeItemTemporaryDurationsFx({
 		runtime,
 	});
+	const defaultLineIssues = yield* checkRuntimeDefaultLinesFx({
+		runtime,
+	});
 	const inputLocationIssues = yield* checkRuntimeInputLocationsFx({
 		runtime,
 	});
@@ -53,6 +57,7 @@ export const checkRuntimeFx = Effect.fn("checkRuntimeFx")(function* ({
 			...itemIdIssues,
 			...itemQuantityIssues,
 			...itemTemporaryDurationIssues,
+			...defaultLineIssues,
 			...inputLocationIssues,
 			...jobIssues,
 			...locationIssues,

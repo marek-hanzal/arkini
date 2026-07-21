@@ -101,6 +101,7 @@ export namespace useItemDetailLines {
 		readonly effectiveRuntimeMs: number;
 		readonly availability: Availability;
 		readonly startMode: "start" | "enqueue";
+		readonly isDefault: boolean;
 		readonly actions: {
 			readonly canAutofill: boolean;
 			readonly canWithdraw: boolean;
@@ -446,6 +447,7 @@ const sameLine = (left: useItemDetailLines.Line, right: useItemDetailLines.Line)
 	left.baseRuntimeMs === right.baseRuntimeMs &&
 	left.effectiveRuntimeMs === right.effectiveRuntimeMs &&
 	left.startMode === right.startMode &&
+	left.isDefault === right.isDefault &&
 	sameAvailability(left.availability, right.availability) &&
 	left.input.length === right.input.length &&
 	left.input.every(

@@ -341,6 +341,54 @@ describe("ItemDetailModal", () => {
 		expect(document.querySelector('[data-ui="ItemInfoTab"]')).not.toBeNull();
 	});
 
+	it("sets and retains one save-backed default line through the canonical command boundary", async () => {
+		const { readControl } = await renderItemDetail();
+		const owner = currentRuntime.items.find((item) => item.item.id === "workshop");
+		if (owner === undefined) throw new Error("Missing Workshop runtime item.");
+		const run = vi.spyOn(game, "run").mockImplementation((() => {
+			publishRuntime(
+				RuntimeSchema.parse({
+					...currentRuntime,
+					defaultLineByOwnerItemId: {
+						[owner.id]: "line:workshop:water",
+					},
+				}),
+			);
+			return Promise.resolve({
+				ownerItemId: owner.id,
+				lineId: "line:workshop:water",
+			});
+		}) as GameEngine["run"]);
+
+		await act(async () => {
+			readControl().openItemDetail({
+				itemId: owner.id,
+			});
+			await Promise.resolve();
+			await Promise.resolve();
+		});
+		const button = document.querySelector<HTMLButtonElement>(
+			'[data-ui="TileLineSetDefaultButton"]',
+		);
+		if (button === null) throw new Error("Missing Set default button.");
+		expect(button.textContent).toBe("Set default");
+
+		await act(async () => {
+			button.click();
+			await Promise.resolve();
+			await Promise.resolve();
+		});
+
+		expect(run).toHaveBeenCalledTimes(1);
+		expect(document.querySelector('[data-ui="TileLineDefaultBadge"]')?.textContent).toBe(
+			"Default",
+		);
+		expect(
+			document.querySelector<HTMLButtonElement>('[data-ui="TileLineSetDefaultButton"]')
+				?.disabled,
+		).toBe(true);
+	});
+
 	it("counts active work down in the fixed runtime slot without adding a layout row", async () => {
 		const { readControl } = await renderItemDetail();
 		const owner = currentRuntime.items.find((item) => item.item.id === "workshop");

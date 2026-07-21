@@ -21,6 +21,7 @@ import { ItemStackSizeIssueSchema } from "./ItemStackSizeIssueSchema";
 import { ItemTemporaryDurationIssueSchema } from "./ItemTemporaryDurationIssueSchema";
 import { LocationOccupiedIssueSchema } from "./LocationOccupiedIssueSchema";
 import { LocationOutOfBoundsIssueSchema } from "./LocationOutOfBoundsIssueSchema";
+import { DefaultLineIssueSchema } from "~/engine/line/schema/check/DefaultLineIssueSchema";
 import { LineInputClosedIssueSchema } from "~/engine/line/schema/check/LineInputClosedIssueSchema";
 import { LocationScopeIssueSchema } from "./LocationScopeIssueSchema";
 
@@ -48,6 +49,7 @@ export const RuntimeCheckIssueSchema = z
 		InputSlotInvalidIssueSchema,
 		InputSelectorMismatchIssueSchema,
 		InputCapacityExceededIssueSchema,
+		DefaultLineIssueSchema,
 		LineInputClosedIssueSchema,
 		LocationOccupiedIssueSchema,
 		LocationOutOfBoundsIssueSchema,

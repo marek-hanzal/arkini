@@ -2,6 +2,7 @@ import { z } from "zod";
 import { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeIntegerSchema";
 import { JobQueueRequestSchema } from "~/engine/job/schema/JobQueueRequestSchema";
 import { JobSchema } from "~/engine/job/schema/JobSchema";
+import { DefaultLineByOwnerItemIdSchema } from "~/engine/line/schema/DefaultLineByOwnerItemIdSchema";
 import { StateItemSchema } from "./StateItemSchema";
 export const StateSchema = z
 	.object({
@@ -11,6 +12,7 @@ export const StateSchema = z
 		items: z.array(StateItemSchema),
 		jobs: z.array(JobSchema),
 		jobQueue: z.array(JobQueueRequestSchema).optional(),
+		defaultLineByOwnerItemId: DefaultLineByOwnerItemIdSchema.optional(),
 	})
 	.strict()
 	.meta({

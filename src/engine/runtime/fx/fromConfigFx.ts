@@ -7,7 +7,7 @@ import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 export const fromConfigFx = Effect.fn("fromConfigFx")(function* () {
 	const config = yield* GameConfigFx;
 
-	return {
+	const runtime: RuntimeSchema.Type = {
 		currentSpace: config.start.currentSpace,
 		session: {
 			speedMode: "normal" as const,
@@ -15,5 +15,6 @@ export const fromConfigFx = Effect.fn("fromConfigFx")(function* () {
 		items: [],
 		jobs: [],
 		jobQueue: [],
-	} satisfies RuntimeSchema.Type;
+	};
+	return runtime;
 });

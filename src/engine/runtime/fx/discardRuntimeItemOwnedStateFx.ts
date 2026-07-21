@@ -35,12 +35,25 @@ export const discardRuntimeItemOwnedStateFx = Effect.fn("discardRuntimeItemOwned
 		}
 
 		const discardedItemIds = new Set(owned.inputItems.map((item) => item.id));
+		const defaultLineByOwnerItemId = {
+			...(runtime.defaultLineByOwnerItemId ?? {}),
+		};
+		for (const discardedItemId of discardedItemIds) {
+			delete defaultLineByOwnerItemId[discardedItemId];
+		}
 		return {
 			...runtime,
 			items: runtime.items.filter((item) => !discardedItemIds.has(item.id)),
 			jobQueue: (runtime.jobQueue ?? []).filter(
 				(request) => !owned.ownerItemIds.has(request.ownerItemId),
 			),
+			...(Object.keys(defaultLineByOwnerItemId).length === 0
+				? {
+						defaultLineByOwnerItemId: undefined,
+					}
+				: {
+						defaultLineByOwnerItemId,
+					}),
 		} satisfies RuntimeSchema.Type;
 	},
 );

@@ -1,12 +1,14 @@
 import { type PropsWithChildren, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { match } from "ts-pattern";
 
+import { useGameEngine } from "~/bridge/game/useGameEngine";
 import { useResolveItemDetailTarget } from "~/bridge/item-detail/useResolveItemDetailTarget";
 import { ItemDetailContext } from "~/ui/item-detail/ItemDetailContext";
 import type {
 	ItemDetailControl,
 	ItemDetailState,
 	ItemDetailTarget,
+	OpenItemDefinitionDetailProps,
 	OpenItemDetailProps,
 } from "~/ui/item-detail/ItemDetailControl";
 
@@ -22,6 +24,7 @@ const closedState = {
 
 /** Owns one exact Item Detail target and one exhaustive enter/open/exit lifecycle. */
 export const ItemDetailProvider = ({ children }: PropsWithChildren) => {
+	const game = useGameEngine();
 	const resolveTarget = useResolveItemDetailTarget();
 	const [state, setState] = useState<ItemDetailState>(closedState);
 	const stateRef = useRef<ItemDetailState>(state);
@@ -45,39 +48,33 @@ export const ItemDetailProvider = ({ children }: PropsWithChildren) => {
 		completion.resolve();
 	}, []);
 
-	const openItemDetail = useCallback(
-		({ itemId, tab, origin = null }: OpenItemDetailProps) => {
-			const resolved = resolveTarget({
-				itemId,
-				requestedTab: tab,
-			});
-			if (resolved.kind === "unavailable") return false;
+	const readOrigin = useCallback((origin: HTMLElement | null) => {
+		const current = stateRef.current;
+		return match(current)
+			.with(
+				{
+					phase: "closed",
+				},
+				() => origin,
+			)
+			.with(
+				{
+					phase: "entering",
+				},
+				{
+					phase: "open",
+				},
+				{
+					phase: "exiting",
+				},
+				(state) => state.target.origin,
+			)
+			.exhaustive();
+	}, []);
+
+	const openTarget = useCallback(
+		(target: ItemDetailTarget) => {
 			const current = stateRef.current;
-			const existingOrigin = match(current)
-				.with(
-					{
-						phase: "closed",
-					},
-					() => origin,
-				)
-				.with(
-					{
-						phase: "entering",
-					},
-					{
-						phase: "open",
-					},
-					{
-						phase: "exiting",
-					},
-					(state) => state.target.origin,
-				)
-				.exhaustive();
-			const target: ItemDetailTarget = {
-				itemId: resolved.itemId,
-				tab: resolved.tab,
-				origin: existingOrigin,
-			};
 			const enter = () => {
 				publishState({
 					phase: "entering",
@@ -103,6 +100,7 @@ export const ItemDetailProvider = ({ children }: PropsWithChildren) => {
 					},
 					(current) => {
 						if (
+							current.target.kind !== target.kind ||
 							current.target.itemId !== target.itemId ||
 							current.target.tab !== target.tab
 						) {
@@ -128,7 +126,44 @@ export const ItemDetailProvider = ({ children }: PropsWithChildren) => {
 		[
 			publishState,
 			resolveExitCompletion,
+		],
+	);
+
+	const openItemDetail = useCallback(
+		({ itemId, tab, origin = null }: OpenItemDetailProps) => {
+			const resolved = resolveTarget({
+				itemId,
+				requestedTab: tab,
+			});
+			if (resolved.kind === "unavailable") return false;
+			return openTarget({
+				kind: "runtime",
+				itemId: resolved.itemId,
+				tab: resolved.tab,
+				origin: readOrigin(origin),
+			});
+		},
+		[
+			openTarget,
+			readOrigin,
 			resolveTarget,
+		],
+	);
+
+	const openItemDefinitionDetail = useCallback(
+		({ itemId, origin = null }: OpenItemDefinitionDetailProps) => {
+			if (game.config.items[itemId] === undefined) return false;
+			return openTarget({
+				kind: "definition",
+				itemId,
+				tab: "info",
+				origin: readOrigin(origin),
+			});
+		},
+		[
+			game.config.items,
+			openTarget,
+			readOrigin,
 		],
 	);
 
@@ -295,6 +330,7 @@ export const ItemDetailProvider = ({ children }: PropsWithChildren) => {
 			state,
 			isOpen: state.phase !== "closed",
 			openItemDetail,
+			openItemDefinitionDetail,
 			close,
 			completeEnter,
 			completeExit,
@@ -304,6 +340,7 @@ export const ItemDetailProvider = ({ children }: PropsWithChildren) => {
 			completeEnter,
 			completeExit,
 			openItemDetail,
+			openItemDefinitionDetail,
 			state,
 		],
 	);

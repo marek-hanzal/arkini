@@ -341,24 +341,81 @@ describe("ItemDetailModal", () => {
 		expect(document.querySelector('[data-ui="ItemInfoTab"]')).not.toBeNull();
 	});
 
+	it("keeps the modal shell stable when an output has only configured definition detail", async () => {
+		const owner = currentRuntime.items.find((item) => item.item.id === "workshop");
+		if (owner === undefined) throw new Error("Missing Workshop runtime item.");
+		publishRuntime(
+			RuntimeSchema.parse({
+				...currentRuntime,
+				items: currentRuntime.items.filter((item) => item.item.id !== "water"),
+			}),
+		);
+		const { readControl } = await renderItemDetail();
+
+		await act(async () => {
+			readControl().openItemDetail({
+				itemId: owner.id,
+			});
+			await Promise.resolve();
+			await Promise.resolve();
+		});
+		const modal = document.querySelector<HTMLElement>('[data-ui="ItemDetailModal"]');
+		if (modal === null) throw new Error("Missing Item Detail modal.");
+		const outputLink = document.querySelector<HTMLButtonElement>(
+			'[data-ui="TileLineOutputDetailLink"][data-detail-available="true"]',
+		);
+		if (outputLink === null) throw new Error("Missing configured output detail link.");
+
+		await act(async () => {
+			outputLink.click();
+			await Promise.resolve();
+		});
+
+		expect(document.querySelector('[data-ui="ItemDetailModal"]')).toBe(modal);
+		expect(readControl().state).toMatchObject({
+			phase: "open",
+			target: {
+				kind: "definition",
+				itemId: "water",
+				tab: "info",
+			},
+		});
+		expect(modal.dataset.targetKind).toBe("definition");
+		expect(modal.dataset.runtimeId).toBeUndefined();
+		expect(document.querySelector('[data-ui="ItemDefinitionInfoTab"]')).not.toBeNull();
+	});
+
 	it("sets and retains one save-backed default line through the canonical command boundary", async () => {
 		const { readControl } = await renderItemDetail();
 		const owner = currentRuntime.items.find((item) => item.item.id === "workshop");
 		if (owner === undefined) throw new Error("Missing Workshop runtime item.");
-		const run = vi.spyOn(game, "run").mockImplementation((() => {
-			publishRuntime(
-				RuntimeSchema.parse({
-					...currentRuntime,
-					defaultLineByOwnerItemId: {
-						[owner.id]: "line:workshop:water",
-					},
-				}),
-			);
-			return Promise.resolve({
-				ownerItemId: owner.id,
-				lineId: "line:workshop:water",
-			});
-		}) as GameEngine["run"]);
+		const run = vi
+			.spyOn(game, "run")
+			.mockImplementationOnce((() => {
+				publishRuntime(
+					RuntimeSchema.parse({
+						...currentRuntime,
+						defaultLineByOwnerItemId: {
+							[owner.id]: "line:workshop:water",
+						},
+					}),
+				);
+				return Promise.resolve({
+					ownerItemId: owner.id,
+					lineId: "line:workshop:water",
+				});
+			}) as GameEngine["run"])
+			.mockImplementationOnce((() => {
+				publishRuntime(
+					RuntimeSchema.parse({
+						...currentRuntime,
+						defaultLineByOwnerItemId: undefined,
+					}),
+				);
+				return Promise.resolve({
+					ownerItemId: owner.id,
+				});
+			}) as GameEngine["run"]);
 
 		await act(async () => {
 			readControl().openItemDetail({
@@ -383,10 +440,25 @@ describe("ItemDetailModal", () => {
 		expect(document.querySelector('[data-ui="TileLineDefaultBadge"]')?.textContent).toBe(
 			"Default",
 		);
+		const unsetButton = document.querySelector<HTMLButtonElement>(
+			'[data-ui="TileLineSetDefaultButton"]',
+		);
+		if (unsetButton === null) throw new Error("Missing Unset default button.");
+		expect(unsetButton.disabled).toBe(false);
+		expect(unsetButton.textContent).toBe("Unset default");
+
+		await act(async () => {
+			unsetButton.click();
+			await Promise.resolve();
+			await Promise.resolve();
+		});
+
+		expect(run).toHaveBeenCalledTimes(2);
+		expect(document.querySelector('[data-ui="TileLineDefaultBadge"]')).toBeNull();
 		expect(
 			document.querySelector<HTMLButtonElement>('[data-ui="TileLineSetDefaultButton"]')
-				?.disabled,
-		).toBe(true);
+				?.textContent,
+		).toBe("Set default");
 	});
 
 	it("counts active work down in the fixed runtime slot without adding a layout row", async () => {

@@ -28,6 +28,14 @@ export namespace useItemDetailLines {
 		readonly label: string;
 	}
 
+	export interface DetailReference {
+		readonly itemId: string;
+		readonly title: string;
+		readonly sourceUrl: string;
+		readonly compositeUrl?: string;
+		readonly detailItemId?: string;
+	}
+
 	export type Input =
 		| {
 				readonly kind: "materials";
@@ -40,6 +48,7 @@ export namespace useItemDetailLines {
 				readonly availableCapacity: number;
 				readonly ready: boolean;
 				readonly charges?: ChargeCost;
+				readonly detail?: DetailReference;
 		  }
 		| {
 				readonly kind: "deposit";
@@ -50,6 +59,7 @@ export namespace useItemDetailLines {
 				readonly targetTitles: readonly string[];
 				readonly ready: boolean;
 				readonly charges?: ChargeCost;
+				readonly detail?: DetailReference;
 		  }
 		| {
 				readonly kind: "simple";
@@ -65,6 +75,7 @@ export namespace useItemDetailLines {
 		readonly sourceUrl?: string;
 		readonly compositeUrl?: string;
 		readonly detailItemId?: string;
+		readonly definitionItemId?: string;
 	}
 
 	export type OutputRoll =
@@ -155,6 +166,40 @@ const selectorLabel = (
 		)
 		.exhaustive();
 
+const mapDetailReference = ({
+	game,
+	itemId,
+	preferredRuntimeItemIds = [],
+	runtime,
+}: {
+	readonly game: ReturnType<typeof useGameEngine>;
+	readonly itemId: IdSchema.Type;
+	readonly preferredRuntimeItemIds?: readonly IdSchema.Type[];
+	readonly runtime: RuntimeSchema.Type;
+}): useItemDetailLines.DetailReference | undefined => {
+	const configured = game.config.items[itemId];
+	if (configured === undefined) return undefined;
+	const preferred = preferredRuntimeItemIds
+		.map((runtimeItemId) => runtime.items.find((candidate) => candidate.id === runtimeItemId))
+		.find((candidate) => candidate?.item.id === itemId);
+	const live = preferred ?? runtime.items.find((candidate) => candidate.item.id === itemId);
+	return {
+		itemId,
+		title: configured.title,
+		sourceUrl: game.getResourceUrl(readRuntimeItemPrimaryAssetId(runtime, configured)),
+		...(configured.asset.composite === undefined
+			? {}
+			: {
+					compositeUrl: game.getResourceUrl(configured.asset.composite),
+				}),
+		...(live === undefined
+			? {}
+			: {
+					detailItemId: live.id,
+				}),
+	};
+};
+
 const mapOutputItem = ({
 	game,
 	item,
@@ -183,6 +228,7 @@ const mapOutputItem = ({
 						: {
 								compositeUrl: game.getResourceUrl(configured.asset.composite),
 							}),
+					definitionItemId: configured.id,
 				}),
 		...(detailItemId === undefined
 			? {}
@@ -255,10 +301,12 @@ const mapOutputRoll = ({
 		.exhaustive();
 
 const mapInput = ({
+	game,
 	input,
 	items,
 	runtime,
 }: {
+	readonly game: ReturnType<typeof useGameEngine>;
 	readonly input: readItemDetailLinesFx.Input;
 	readonly items: ReturnType<typeof useGameEngine>["config"]["items"];
 	readonly runtime: RuntimeSchema.Type;
@@ -268,32 +316,69 @@ const mapInput = ({
 			{
 				kind: "materials",
 			},
-			(input) => ({
-				...input,
-				selector: selectorLabel(input.selector, items),
-			}),
+			(input) => {
+				const detail =
+					input.selector.type === "item"
+						? mapDetailReference({
+								game,
+								itemId: input.selector.itemId,
+								runtime,
+							})
+						: undefined;
+				return {
+					...input,
+					selector: selectorLabel(input.selector, items),
+					...(detail === undefined
+						? {}
+						: {
+								detail,
+							}),
+				};
+			},
 		)
 		.with(
 			{
 				kind: "deposit",
 			},
-			(input) => ({
-				kind: input.kind,
-				selector: selectorLabel(input.selector, items),
-				distance: input.distance,
-				requiredTargets: input.requiredTargets,
-				readyTargets: input.readyTargets,
-				targetTitles: input.targetItemIds.map(
-					(itemId) =>
-						runtime.items.find((item) => item.id === itemId)?.item.title ?? itemId,
-				),
-				ready: input.ready,
-				...(input.charges === undefined
-					? {}
-					: {
-							charges: input.charges,
-						}),
-			}),
+			(input) => {
+				const firstTarget = input.targetItemIds
+					.map((itemId) => runtime.items.find((item) => item.id === itemId))
+					.find((item) => item !== undefined);
+				const detailItemId =
+					firstTarget?.item.id ??
+					(input.selector.type === "item" ? input.selector.itemId : undefined);
+				const detail =
+					detailItemId === undefined
+						? undefined
+						: mapDetailReference({
+								game,
+								itemId: detailItemId,
+								preferredRuntimeItemIds: input.targetItemIds,
+								runtime,
+							});
+				return {
+					kind: input.kind,
+					selector: selectorLabel(input.selector, items),
+					distance: input.distance,
+					requiredTargets: input.requiredTargets,
+					readyTargets: input.readyTargets,
+					targetTitles: input.targetItemIds.map(
+						(itemId) =>
+							runtime.items.find((item) => item.id === itemId)?.item.title ?? itemId,
+					),
+					ready: input.ready,
+					...(input.charges === undefined
+						? {}
+						: {
+								charges: input.charges,
+							}),
+					...(detail === undefined
+						? {}
+						: {
+								detail,
+							}),
+				};
+			},
 		)
 		.with(
 			{
@@ -316,6 +401,16 @@ const sameCharge = (
 const sameSelector = (left: useItemDetailLines.Selector, right: useItemDetailLines.Selector) =>
 	left.kind === right.kind && left.label === right.label;
 
+const sameDetailReference = (
+	left: useItemDetailLines.DetailReference | undefined,
+	right: useItemDetailLines.DetailReference | undefined,
+) =>
+	left?.itemId === right?.itemId &&
+	left?.title === right?.title &&
+	left?.sourceUrl === right?.sourceUrl &&
+	left?.compositeUrl === right?.compositeUrl &&
+	left?.detailItemId === right?.detailItemId;
+
 const sameStringArray = (left: readonly string[], right: readonly string[]) =>
 	left.length === right.length && left.every((value, index) => value === right[index]);
 
@@ -337,7 +432,8 @@ const sameInput = (left: useItemDetailLines.Input, right: useItemDetailLines.Inp
 					left.missingQuantity === right.missingQuantity &&
 					left.availableCapacity === right.availableCapacity &&
 					left.ready === right.ready &&
-					sameCharge(left.charges, right.charges)
+					sameCharge(left.charges, right.charges) &&
+					sameDetailReference(left.detail, right.detail)
 				);
 			},
 		)
@@ -354,7 +450,8 @@ const sameInput = (left: useItemDetailLines.Input, right: useItemDetailLines.Inp
 					left.readyTargets === right.readyTargets &&
 					sameStringArray(left.targetTitles, right.targetTitles) &&
 					left.ready === right.ready &&
-					sameCharge(left.charges, right.charges)
+					sameCharge(left.charges, right.charges) &&
+					sameDetailReference(left.detail, right.detail)
 				);
 			},
 		)
@@ -383,6 +480,7 @@ const sameOutputItem = (
 	left.sourceUrl === right.sourceUrl &&
 	left.compositeUrl === right.compositeUrl &&
 	left.detailItemId === right.detailItemId &&
+	left.definitionItemId === right.definitionItemId &&
 	sameBounds(left.quantity, right.quantity);
 
 const sameOutputItems = (
@@ -505,6 +603,7 @@ export const useItemDetailLines = (itemId: IdSchema.Type): useItemDetailLines.Pr
 					...line,
 					input: line.input.map((input) =>
 						mapInput({
+							game,
 							input,
 							items: game.config.items,
 							runtime,

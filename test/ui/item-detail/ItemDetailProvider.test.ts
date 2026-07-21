@@ -18,6 +18,18 @@ import { useItemDetailControl } from "~/ui/item-detail/useItemDetailControl";
 	}
 ).IS_REACT_ACT_ENVIRONMENT = true;
 
+vi.mock("~/bridge/game/useGameEngine", () => ({
+	useGameEngine: () => ({
+		config: {
+			items: {
+				"definition:item": {
+					id: "definition:item",
+				},
+			},
+		},
+	}),
+}));
+
 vi.mock("~/bridge/item-detail/useResolveItemDetailTarget", () => ({
 	useResolveItemDetailTarget:
 		() =>

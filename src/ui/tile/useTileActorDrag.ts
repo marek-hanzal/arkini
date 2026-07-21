@@ -28,6 +28,7 @@ export const useTileActorDrag = ({
 	const dropItem = useDropItem();
 	const dragControls = useDragControls();
 	const dragStarted = useRef(false);
+	const suppressClick = useRef(false);
 
 	const onPointerDown = useCallback<PointerEventHandler<HTMLSpanElement>>(
 		(event) => {
@@ -42,6 +43,7 @@ export const useTileActorDrag = ({
 				y: event.clientY - (bounds.top + bounds.height / 2),
 			});
 			dragStarted.current = false;
+			suppressClick.current = false;
 			dragControls.start(event, {
 				distanceThreshold: 6,
 			});
@@ -77,6 +79,7 @@ export const useTileActorDrag = ({
 	const onDragStart = useCallback(
 		(_event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
 			dragStarted.current = true;
+			suppressClick.current = true;
 			startDrag(canonicalSource);
 			startPickupCorrection();
 			moveDrag(canonicalSource, info.point.x, info.point.y);
@@ -174,6 +177,12 @@ export const useTileActorDrag = ({
 		],
 	);
 
+	const consumeClickSuppression = useCallback(() => {
+		const suppressed = suppressClick.current;
+		suppressClick.current = false;
+		return suppressed;
+	}, []);
+
 	useEffect(
 		() => () => {
 			stopPickupCorrection();
@@ -196,5 +205,6 @@ export const useTileActorDrag = ({
 		onDragStart,
 		onDrag,
 		onDragEnd,
+		consumeClickSuppression,
 	};
 };

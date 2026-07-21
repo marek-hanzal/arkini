@@ -1,5 +1,8 @@
 import { motion } from "motion/react";
+import { useCallback, useEffect, useRef } from "react";
+import { match } from "ts-pattern";
 
+import { useStartItemDetailLine } from "~/bridge/item-detail/useStartItemDetailLine";
 import type { useTileActors } from "~/bridge/tile/useTileActors";
 import { CursorClassName } from "~/ui/cursor/CursorSemantic";
 import { useItemDetailControl } from "~/ui/item-detail/useItemDetailControl";
@@ -8,6 +11,8 @@ import { readTileActorCursorSemantic } from "~/ui/tile/readTileActorCursorSemant
 import { useTileActorDrag } from "~/ui/tile/useTileActorDrag";
 import { useTileActorMotion } from "~/ui/tile/useTileActorMotion";
 import { useTileActorPresentation } from "~/ui/tile/useTileActorPresentation";
+
+const primaryActionDelayMs = 320;
 
 export namespace TileActor {
 	export interface Props {
@@ -19,6 +24,7 @@ export namespace TileActor {
 /** Renders one stable runtime-item actor from focused presentation, Motion, and drag owners. */
 export const TileActor = ({ item, live }: TileActor.Props) => {
 	const itemDetail = useItemDetailControl();
+	const startLine = useStartItemDetailLine();
 	const presentation = useTileActorPresentation({
 		item,
 		live,
@@ -33,6 +39,67 @@ export const TileActor = ({ item, live }: TileActor.Props) => {
 		live: interactive,
 		motion: actorMotion,
 	});
+	const pendingPrimaryAction = useRef<ReturnType<typeof setTimeout> | null>(null);
+	const cancelPendingPrimaryAction = useCallback(() => {
+		if (pendingPrimaryAction.current === null) return;
+		clearTimeout(pendingPrimaryAction.current);
+		pendingPrimaryAction.current = null;
+	}, []);
+	const runPrimaryAction = useCallback(
+		(origin: HTMLElement) =>
+			match(item.primaryAction)
+				.with(
+					{
+						kind: "none",
+					},
+					() => undefined,
+				)
+				.with(
+					{
+						kind: "open-lines",
+					},
+					() => {
+						itemDetail.openItemDetail({
+							itemId: item.id,
+							tab: "lines",
+							origin,
+						});
+					},
+				)
+				.with(
+					{
+						kind: "start-default-line",
+					},
+					({ lineId }) => {
+						void startLine({
+							ownerItemId: item.id,
+							lineId,
+						}).catch(() => {
+							itemDetail.openItemDetail({
+								itemId: item.id,
+								tab: "lines",
+								origin,
+							});
+						});
+					},
+				)
+				.exhaustive(),
+		[
+			item.id,
+			item.primaryAction,
+			itemDetail,
+			startLine,
+		],
+	);
+
+	useEffect(() => {
+		if (!interactive) cancelPendingPrimaryAction();
+		return cancelPendingPrimaryAction;
+	}, [
+		cancelPendingPrimaryAction,
+		interactive,
+	]);
+
 	const boardLocation = item.location.scope === "board" ? item.location : null;
 	const visible = actorMotion.visible;
 	const cursor = readTileActorCursorSemantic({
@@ -71,11 +138,34 @@ export const TileActor = ({ item, live }: TileActor.Props) => {
 				item.location.scope === "toolbar" ? item.location.position.x : undefined
 			}
 			data-dragging={presentation.phase === "dragging" ? "true" : "false"}
+			data-primary-action={item.primaryAction.kind}
 			onPointerEnter={() => {
 				if (interactive) presentation.setHovered(true);
 			}}
 			onPointerLeave={() => presentation.setHovered(false)}
+			onClick={(event) => {
+				if (
+					!interactive ||
+					presentation.phase === "dragging" ||
+					drag.consumeClickSuppression()
+				) {
+					cancelPendingPrimaryAction();
+					return;
+				}
+				if (event.detail > 1) {
+					cancelPendingPrimaryAction();
+					return;
+				}
+				if (item.primaryAction.kind === "none") return;
+				const origin = event.currentTarget;
+				cancelPendingPrimaryAction();
+				pendingPrimaryAction.current = setTimeout(() => {
+					pendingPrimaryAction.current = null;
+					runPrimaryAction(origin);
+				}, primaryActionDelayMs);
+			}}
 			onDoubleClick={(event) => {
+				cancelPendingPrimaryAction();
 				if (!interactive || presentation.phase === "dragging") return;
 				event.preventDefault();
 				event.stopPropagation();
@@ -99,8 +189,14 @@ export const TileActor = ({ item, live }: TileActor.Props) => {
 				dragElastic={0}
 				onPointerDown={drag.onPointerDown}
 				onPointerUp={drag.onPointerUp}
-				onPointerCancel={drag.onPointerCancel}
-				onDragStart={drag.onDragStart}
+				onPointerCancel={() => {
+					cancelPendingPrimaryAction();
+					drag.onPointerCancel();
+				}}
+				onDragStart={(event, info) => {
+					cancelPendingPrimaryAction();
+					drag.onDragStart(event, info);
+				}}
 				onDrag={drag.onDrag}
 				onDragEnd={drag.onDragEnd}
 				data-ui="TileActorDragSurface"

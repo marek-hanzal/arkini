@@ -537,16 +537,9 @@ export const readItemDetailLinesFx = Effect.fn("readItemDetailLinesFx")(function
 		});
 	}
 
-	const ordered =
-		defaultLineId === undefined
-			? projected
-			: [
-					...projected.filter((line) => line.lineId === defaultLineId),
-					...projected.filter((line) => line.lineId !== defaultLineId),
-				];
 	return {
 		kind: "available",
 		itemId: owner.id,
-		line: ordered,
+		line: projected,
 	} satisfies readItemDetailLinesFx.Result;
 });

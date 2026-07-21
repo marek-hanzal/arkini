@@ -6,6 +6,7 @@ import { useAutofillItemDetailLine } from "~/bridge/item-detail/useAutofillItemD
 import type { useItemDetailLines } from "~/bridge/item-detail/useItemDetailLines";
 import { useSetDefaultItemDetailLine } from "~/bridge/item-detail/useSetDefaultItemDetailLine";
 import { useStartItemDetailLine } from "~/bridge/item-detail/useStartItemDetailLine";
+import { useUnsetDefaultItemDetailLine } from "~/bridge/item-detail/useUnsetDefaultItemDetailLine";
 import { useWithdrawItemDetailLine } from "~/bridge/item-detail/useWithdrawItemDetailLine";
 import { Button, PrimaryButton } from "~/ui/button/Button";
 import { useItemDetailControl } from "~/ui/item-detail/useItemDetailControl";
@@ -126,7 +127,117 @@ const readinessLabel = (availability: useItemDetailLines.Availability) =>
 		)
 		.exhaustive();
 
-const InputRow = ({ input }: { readonly input: useItemDetailLines.Input }) =>
+interface ItemReferenceButtonProps {
+	readonly compositeUrl?: string;
+	readonly dataUi: "TileLineInputDetailLink" | "TileLineOutputDetailLink";
+	readonly definitionItemId?: string;
+	readonly disabled: boolean;
+	readonly label: string;
+	readonly runtimeItemId?: string;
+	readonly sourceUrl: string;
+}
+
+const ItemReferenceButton = ({
+	compositeUrl,
+	dataUi,
+	definitionItemId,
+	disabled,
+	label,
+	runtimeItemId,
+	sourceUrl,
+}: ItemReferenceButtonProps) => {
+	const itemDetail = useItemDetailControl();
+	const [hovered, setHovered] = useState(false);
+	const canOpen = !disabled && (runtimeItemId !== undefined || definitionItemId !== undefined);
+	return (
+		<motion.button
+			type="button"
+			className="group flex min-w-0 items-center gap-3 text-left outline-none enabled:cursor-pointer disabled:cursor-default"
+			disabled={!canOpen}
+			data-ui={dataUi}
+			data-detail-available={canOpen ? "true" : "false"}
+			aria-label={canOpen ? `Open ${label} detail` : undefined}
+			animate={{
+				scale: hovered && canOpen ? 1.035 : 1,
+			}}
+			onHoverStart={() => setHovered(true)}
+			onHoverEnd={() => setHovered(false)}
+			transition={{
+				duration: 0.14,
+				ease: [
+					0.22,
+					1,
+					0.36,
+					1,
+				],
+			}}
+			onClick={() => {
+				if (runtimeItemId !== undefined) {
+					itemDetail.openItemDetail({
+						itemId: runtimeItemId,
+					});
+					return;
+				}
+				if (definitionItemId !== undefined) {
+					itemDetail.openItemDefinitionDetail({
+						itemId: definitionItemId,
+					});
+				}
+			}}
+		>
+			<span className="relative block size-11 shrink-0 rounded-lg bg-surface/45 ring-1 ring-line/50 transition-[background-color,box-shadow] group-enabled:group-hover:bg-accent/8 group-enabled:group-hover:ring-accent/35 group-enabled:group-focus-visible:ring-2 group-enabled:group-focus-visible:ring-accent">
+				<img
+					className="absolute inset-0 size-full object-contain p-0.5 drop-shadow-[0_0.25rem_0.45rem_color-mix(in_srgb,var(--ak-overlay)_24%,transparent)]"
+					src={sourceUrl}
+					alt=""
+					draggable={false}
+				/>
+				{compositeUrl === undefined ? null : (
+					<img
+						className="absolute inset-0 size-full object-contain p-0.5 drop-shadow-[0_0.25rem_0.45rem_color-mix(in_srgb,var(--ak-overlay)_24%,transparent)]"
+						src={compositeUrl}
+						alt=""
+						draggable={false}
+					/>
+				)}
+			</span>
+			<span className="truncate font-medium text-foreground transition-colors group-enabled:group-hover:text-accent group-enabled:group-focus-visible:text-accent">
+				{label}
+			</span>
+		</motion.button>
+	);
+};
+
+const InputTitle = ({
+	detail,
+	disabled,
+	label,
+}: {
+	readonly detail?: useItemDetailLines.DetailReference;
+	readonly disabled: boolean;
+	readonly label: string;
+}) =>
+	detail === undefined ? (
+		<p className="truncate font-medium text-foreground">{label}</p>
+	) : (
+		<ItemReferenceButton
+			compositeUrl={detail.compositeUrl}
+			dataUi="TileLineInputDetailLink"
+			definitionItemId={detail.itemId}
+			disabled={disabled}
+			label={label}
+			runtimeItemId={detail.detailItemId}
+			sourceUrl={detail.sourceUrl}
+		/>
+	);
+
+const InputRow = ({
+	disabled,
+	input,
+}: {
+	readonly disabled: boolean;
+	readonly input: useItemDetailLines.Input;
+}) =>
 	match(input)
 		.with(
 			{
@@ -139,9 +250,11 @@ const InputRow = ({ input }: { readonly input: useItemDetailLines.Input }) =>
 					data-input-kind="materials"
 				>
 					<div className="min-w-0">
-						<p className="truncate font-medium text-foreground">
-							{selectorLabel(input.selector)}
-						</p>
+						<InputTitle
+							detail={input.detail}
+							disabled={disabled}
+							label={selectorLabel(input.selector)}
+						/>
 						<p className="mt-0.5 text-xs text-muted">
 							{input.mode === "consume" ? "Consumed" : "Reserved"}
 							{input.charges === undefined ? "" : ` · ${chargeLabel(input.charges)}`}
@@ -171,9 +284,11 @@ const InputRow = ({ input }: { readonly input: useItemDetailLines.Input }) =>
 					data-input-kind="deposit"
 				>
 					<div className="min-w-0">
-						<p className="truncate font-medium text-foreground">
-							{selectorLabel(input.selector)}
-						</p>
+						<InputTitle
+							detail={input.detail}
+							disabled={disabled}
+							label={selectorLabel(input.selector)}
+						/>
 						<p className="mt-0.5 text-xs text-muted">
 							Board · {input.distance}
 							{input.charges === undefined ? "" : ` · ${chargeLabel(input.charges)}`}
@@ -215,71 +330,20 @@ const OutputItemVisual = ({
 }: {
 	readonly disabled: boolean;
 	readonly item: useItemDetailLines.OutputItem;
-}) => {
-	const itemDetail = useItemDetailControl();
-	const [hovered, setHovered] = useState(false);
-	const canOpen = !disabled && item.detailItemId !== undefined;
-	const artwork =
-		item.sourceUrl === undefined ? null : (
-			<span className="relative block size-11 shrink-0">
-				<img
-					className="absolute inset-0 size-full object-contain drop-shadow-[0_0.25rem_0.45rem_color-mix(in_srgb,var(--ak-overlay)_24%,transparent)]"
-					src={item.sourceUrl}
-					alt=""
-					draggable={false}
-				/>
-				{item.compositeUrl === undefined ? null : (
-					<img
-						className="absolute inset-0 size-full object-contain drop-shadow-[0_0.25rem_0.45rem_color-mix(in_srgb,var(--ak-overlay)_24%,transparent)]"
-						src={item.compositeUrl}
-						alt=""
-						draggable={false}
-					/>
-				)}
-			</span>
-		);
-	return (
-		<motion.button
-			type="button"
-			className="flex min-w-0 flex-1 items-center gap-3 text-left outline-none disabled:cursor-default"
-			disabled={!canOpen}
-			data-ui="TileLineOutputDetailLink"
-			data-detail-available={canOpen ? "true" : "false"}
-			aria-label={canOpen ? `Open ${item.title} detail` : undefined}
-			animate={{
-				scale: hovered && canOpen ? 1.055 : 1,
-			}}
-			transition={{
-				duration: 0.14,
-				ease: [
-					0.22,
-					1,
-					0.36,
-					1,
-				],
-			}}
-			onHoverStart={() => setHovered(true)}
-			onHoverEnd={() => setHovered(false)}
-			onClick={() => {
-				if (item.detailItemId === undefined) return;
-				itemDetail.openItemDetail({
-					itemId: item.detailItemId,
-				});
-			}}
-		>
-			{artwork}
-			<span
-				className={
-					canOpen
-						? "truncate font-medium text-foreground transition-colors hover:text-accent"
-						: "truncate font-medium text-foreground"
-				}
-			>
-				{item.title}
-			</span>
-		</motion.button>
+}) =>
+	item.sourceUrl === undefined ? (
+		<span className="truncate font-medium text-foreground">{item.title}</span>
+	) : (
+		<ItemReferenceButton
+			compositeUrl={item.compositeUrl}
+			dataUi="TileLineOutputDetailLink"
+			definitionItemId={item.definitionItemId}
+			disabled={disabled}
+			label={item.title}
+			runtimeItemId={item.detailItemId}
+			sourceUrl={item.sourceUrl}
+		/>
 	);
-};
 
 const OutputItems = ({
 	disabled,
@@ -395,6 +459,7 @@ const LineRow = ({
 }) => {
 	const autofillLine = useAutofillItemDetailLine();
 	const setDefaultLine = useSetDefaultItemDetailLine();
+	const unsetDefaultLine = useUnsetDefaultItemDetailLine();
 	const startLine = useStartItemDetailLine();
 	const withdrawLine = useWithdrawItemDetailLine();
 	const [pendingAction, setPendingAction] = useState<
@@ -425,7 +490,7 @@ const LineRow = ({
 	const runtime = runtimePresentation(line);
 	return (
 		<article
-			className={`ak-list-row rounded-xl border-b border-line px-3 py-5 first:pt-3 last:border-b-0 last:pb-5 ${line.activeJob === undefined ? "" : "ak-list-row-active border-l-2 border-l-accent pl-4"}`}
+			className={`ak-list-row rounded-xl border-b border-l-2 border-line px-3 py-5 pl-4 first:pt-3 last:border-b-0 last:pb-5 ${line.activeJob === undefined ? "border-l-line/55" : "ak-list-row-active border-l-success"}`}
 			data-ui="TileLine"
 			data-line-id={line.lineId}
 			data-active={line.activeJob === undefined ? "false" : "true"}
@@ -437,7 +502,7 @@ const LineRow = ({
 							{line.title}
 						</h3>
 						{activeWork === undefined ? null : (
-							<span className="rounded-full border border-accent/40 bg-accent/12 px-2.5 py-1 text-xs font-semibold text-foreground">
+							<span className="rounded-full border border-success/40 bg-success/12 px-2.5 py-1 text-xs font-semibold text-foreground">
 								{activeWork}
 							</span>
 						)}
@@ -486,23 +551,28 @@ const LineRow = ({
 							className="min-h-8 px-3 py-1 text-xs"
 							cursorIntent={pendingAction === "default" ? "progress" : undefined}
 							data-ui="TileLineSetDefaultButton"
-							disabled={disabled || line.isDefault || pendingAction !== null}
+							data-default={line.isDefault ? "true" : "false"}
+							disabled={disabled || pendingAction !== null}
 							onClick={() =>
 								runAction({
 									action: "default",
 									failureMessage: "Default line could not be changed.",
 									run: () =>
-										setDefaultLine({
-											ownerItemId,
-											lineId: line.lineId,
-										}),
+										line.isDefault
+											? unsetDefaultLine({
+													ownerItemId,
+												})
+											: setDefaultLine({
+													ownerItemId,
+													lineId: line.lineId,
+												}),
 								})
 							}
 						>
 							{pendingAction === "default"
 								? "Saving…"
 								: line.isDefault
-									? "Default"
+									? "Unset default"
 									: "Set default"}
 						</Button>
 						<Button
@@ -597,6 +667,7 @@ const LineRow = ({
 							{line.input.map((input, index) => (
 								<InputRow
 									key={`${input.kind}:${index}`}
+									disabled={disabled}
 									input={input}
 								/>
 							))}

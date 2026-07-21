@@ -5,6 +5,7 @@ import { useGameFx } from "~/engine/game/fx/useGameFx";
 import { readItemDetailLinesFx } from "~/engine/item-detail/read/readItemDetailLinesFx";
 import { isItemPureFx } from "~/engine/item/fx/purity/isItemPureFx";
 import { setDefaultLineFx } from "~/engine/line/write/setDefaultLineFx";
+import { unsetDefaultLineFx } from "~/engine/line/write/unsetDefaultLineFx";
 import { checkRuntimeFx } from "~/engine/runtime/check/checkRuntimeFx";
 import { fromStateFx } from "~/engine/runtime/fx/fromStateFx";
 import { removeRuntimeItemIdentityFx } from "~/engine/runtime/fx/removeRuntimeItemIdentityFx";
@@ -82,7 +83,7 @@ const config = GameConfigSchema.parse({
 });
 
 describe("setDefaultLineFx", () => {
-	it("persists one exact default, projects it first, and makes the owner impure", () => {
+	it("persists one exact default without reordering authored lines and makes the owner impure", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {
 				const started = yield* startFx();
@@ -136,11 +137,62 @@ describe("setDefaultLineFx", () => {
 			kind: "available",
 			line: [
 				{
+					lineId: "line:first",
+					isDefault: false,
+				},
+				{
 					lineId: "line:second",
 					isDefault: true,
 				},
+			],
+		});
+	});
+
+	it("unsets the exact default and restores owner purity", () => {
+		const result = Effect.runSync(
+			Effect.gen(function* () {
+				const started = yield* startFx();
+				const owner = started.items[0];
+				if (owner === undefined) throw new Error("Missing producer.");
+				yield* setDefaultLineFx({
+					ownerItemId: owner.id,
+					lineId: "line:second",
+				});
+				yield* unsetDefaultLineFx({
+					ownerItemId: owner.id,
+				});
+				const runtime = yield* readRuntimeFx();
+				const projection = yield* readItemDetailLinesFx({
+					itemId: owner.id,
+					runtime,
+				});
+				const pure = yield* isItemPureFx({
+					item: runtime.items[0]!,
+					runtime,
+				});
+				return {
+					projection,
+					pure,
+					runtime,
+				};
+			}).pipe(
+				useGameFx({
+					config,
+				}),
+			),
+		);
+
+		expect(result.runtime.defaultLineByOwnerItemId).toBeUndefined();
+		expect(result.pure).toBe(true);
+		expect(result.projection).toMatchObject({
+			kind: "available",
+			line: [
 				{
 					lineId: "line:first",
+					isDefault: false,
+				},
+				{
+					lineId: "line:second",
 					isDefault: false,
 				},
 			],

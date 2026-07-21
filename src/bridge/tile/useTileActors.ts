@@ -6,6 +6,7 @@ import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSc
 import { isGridRuntimeItem } from "~/engine/runtime/read/isGridRuntimeItem";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { readRuntimeItemPrimaryAssetId } from "~/engine/item/read/readRuntimeItemPrimaryAssetId";
+import { readRuntimeItemPrimaryAction } from "~/engine/item-detail/read/readRuntimeItemPrimaryAction";
 import { resolveActiveJobStatusFx } from "~/engine/job/fx/resolveActiveJobStatusFx";
 
 export namespace useTileActors {
@@ -19,6 +20,7 @@ export namespace useTileActors {
 		readonly compositeUrl?: string;
 		readonly location: GridLocationSchema.Type;
 		readonly running: boolean;
+		readonly primaryAction: readRuntimeItemPrimaryAction.Result;
 	}
 }
 
@@ -52,6 +54,10 @@ export const useTileActors = (): ReadonlyArray<useTileActors.Item> => {
 					quantity: item.quantity,
 					location: item.location,
 					running: activeJobStatus === "running",
+					primaryAction: readRuntimeItemPrimaryAction({
+						item,
+						runtime,
+					}),
 					sourceUrl: game.getResourceUrl(
 						readRuntimeItemPrimaryAssetId(runtime, item.item),
 					),

@@ -1,10 +1,18 @@
 import type { ItemDetailTab } from "~/bridge/item-detail/ItemDetailTab";
 
-export interface ItemDetailTarget {
-	readonly itemId: string;
-	readonly tab: ItemDetailTab;
-	readonly origin: HTMLElement | null;
-}
+export type ItemDetailTarget =
+	| {
+			readonly kind: "runtime";
+			readonly itemId: string;
+			readonly tab: ItemDetailTab;
+			readonly origin: HTMLElement | null;
+	  }
+	| {
+			readonly kind: "definition";
+			readonly itemId: string;
+			readonly tab: "info";
+			readonly origin: HTMLElement | null;
+	  };
 
 export type ItemDetailState =
 	| {
@@ -37,11 +45,17 @@ export interface OpenItemDetailProps {
 	readonly origin?: HTMLElement | null;
 }
 
+export interface OpenItemDefinitionDetailProps {
+	readonly itemId: string;
+	readonly origin?: HTMLElement | null;
+}
+
 /** Canvas-local owner for one exact capability-tabbed Item Detail modal. */
 export interface ItemDetailControl {
 	readonly state: ItemDetailState;
 	readonly isOpen: boolean;
 	readonly openItemDetail: (props: OpenItemDetailProps) => boolean;
+	readonly openItemDefinitionDetail: (props: OpenItemDefinitionDetailProps) => boolean;
 	readonly close: (props?: CloseItemDetailProps) => Promise<void>;
 	readonly completeEnter: (generation: number) => void;
 	readonly completeExit: (generation: number) => void;

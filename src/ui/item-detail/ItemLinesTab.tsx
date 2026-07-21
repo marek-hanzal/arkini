@@ -1,5 +1,5 @@
 import { motion } from "motion/react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { match } from "ts-pattern";
 
 import { useAutofillItemDetailLine } from "~/bridge/item-detail/useAutofillItemDetailLine";
@@ -11,6 +11,7 @@ import { useWithdrawItemDetailLine } from "~/bridge/item-detail/useWithdrawItemD
 import { Button, PrimaryButton } from "~/ui/button/Button";
 import { useItemDetailControl } from "~/ui/item-detail/useItemDetailControl";
 import { Scrollable } from "~/ui/scrollable/Scrollable";
+import { useFuseSearch } from "~/ui/search/useFuseSearch";
 
 const formatQuantity = ({ min, max }: useItemDetailLines.QuantityBounds) =>
 	min === max ? `${min}` : `${min}–${max}`;
@@ -126,6 +127,152 @@ const readinessLabel = (availability: useItemDetailLines.Availability) =>
 			}),
 		)
 		.exhaustive();
+
+const chargeSearchTerms = (charges: useItemDetailLines.ChargeCost | undefined) =>
+	charges === undefined
+		? []
+		: charges.from === "self"
+			? [
+					"charge",
+					"charges",
+					"owner charge",
+					"self charge",
+				]
+			: [
+					"charge",
+					"charges",
+					"target charge",
+					"deposit charge",
+				];
+
+const inputSearchTerms = (input: useItemDetailLines.Input): readonly string[] =>
+	match(input)
+		.with(
+			{
+				kind: "materials",
+			},
+			(input) => [
+				"input",
+				"materials",
+				input.selector.kind,
+				input.selector.label,
+				selectorLabel(input.selector),
+				input.mode,
+				input.mode === "consume" ? "consumed" : "reserved",
+				"stored",
+				input.ready ? "ready" : "missing inputs",
+				...(input.detail === undefined
+					? []
+					: [
+							input.detail.itemId,
+							input.detail.title,
+						]),
+				...chargeSearchTerms(input.charges),
+			],
+		)
+		.with(
+			{
+				kind: "deposit",
+			},
+			(input) => [
+				"input",
+				"deposit",
+				"board",
+				input.selector.kind,
+				input.selector.label,
+				selectorLabel(input.selector),
+				input.distance,
+				input.ready ? "ready" : "missing inputs",
+				...input.targetTitles,
+				...(input.detail === undefined
+					? []
+					: [
+							input.detail.itemId,
+							input.detail.title,
+						]),
+				...chargeSearchTerms(input.charges),
+			],
+		)
+		.with(
+			{
+				kind: "simple",
+			},
+			(input) => [
+				"input",
+				"owner charge",
+				input.ready ? "ready" : "missing inputs",
+				...chargeSearchTerms(input.charges),
+			],
+		)
+		.exhaustive();
+
+const outputItemSearchTerms = (item: useItemDetailLines.OutputItem) => [
+	"output",
+	item.itemId,
+	item.title,
+];
+
+const outputRollSearchTerms = (roll: useItemDetailLines.OutputRoll): readonly string[] =>
+	match(roll)
+		.with(
+			{
+				kind: "guaranteed",
+			},
+			(roll) => [
+				"guaranteed",
+				...roll.item.flatMap(outputItemSearchTerms),
+			],
+		)
+		.with(
+			{
+				kind: "chance",
+			},
+			(roll) => [
+				"chance",
+				...roll.item.flatMap(outputItemSearchTerms),
+			],
+		)
+		.with(
+			{
+				kind: "weight",
+			},
+			(roll) => [
+				"weighted",
+				"selection",
+				...roll.option.flatMap((option) => option.item.flatMap(outputItemSearchTerms)),
+			],
+		)
+		.exhaustive();
+
+const lineSearchTerms = (line: useItemDetailLines.Line): readonly string[] => [
+	line.lineId,
+	line.title,
+	line.description,
+	readinessLabel(line.availability).label,
+	line.startMode,
+	...(line.isDefault
+		? [
+				"default",
+			]
+		: []),
+	...(line.actions.canAutofill
+		? [
+				"autofill",
+			]
+		: []),
+	...(line.actions.canWithdraw
+		? [
+				"withdraw",
+			]
+		: []),
+	...(line.activeJob === undefined
+		? []
+		: [
+				activeJobLabel(line.activeJob),
+			]),
+	...line.input.flatMap(inputSearchTerms),
+	...line.output.flatMap((set) => set.roll.flatMap(outputRollSearchTerms)),
+];
 
 interface ItemReferenceButtonProps {
 	readonly compositeUrl?: string;
@@ -733,31 +880,80 @@ export const ItemLinesTab = ({
 			readonly kind: "available";
 		}
 	>;
-}) => (
-	<div
-		className="flex min-h-0 flex-1 flex-col"
-		data-ui="ItemLinesTab"
-	>
-		<Scrollable className="flex-1 pr-1">
-			{lines.line.length === 0 ? (
-				<div className="grid min-h-48 place-items-center border border-dashed border-line text-sm text-muted">
-					No product line is currently visible.
-				</div>
-			) : (
-				<div
-					className="ak-list grid gap-1"
-					data-ui="TileLinesList"
-				>
-					{lines.line.map((line) => (
-						<LineRow
-							key={line.lineId}
-							disabled={disabled}
-							line={line}
-							ownerItemId={lines.itemId}
-						/>
-					))}
-				</div>
-			)}
-		</Scrollable>
-	</div>
-);
+}) => {
+	const [query, setQuery] = useState("");
+	const searchCandidates = lines.line.map((line) => ({
+		identity: line.lineId,
+		terms: lineSearchTerms(line),
+	}));
+	const matchingLineIds = useFuseSearch(searchCandidates, query);
+	const lineById = useMemo(
+		() =>
+			new Map(
+				lines.line.map((line) => [
+					line.lineId,
+					line,
+				]),
+			),
+		[
+			lines.line,
+		],
+	);
+	const filteredLines = matchingLineIds.flatMap((lineId) => {
+		const line = lineById.get(lineId);
+		return line === undefined
+			? []
+			: [
+					line,
+				];
+	});
+	const normalizedQuery = query.trim();
+	return (
+		<div
+			className="flex min-h-0 flex-1 flex-col"
+			data-ui="ItemLinesTab"
+		>
+			<div
+				className="mb-3 shrink-0"
+				data-ui="ItemLinesSearch"
+			>
+				<input
+					type="search"
+					value={query}
+					className="w-full rounded-lg border border-line-strong bg-surface px-3 py-2 text-sm text-foreground outline-none placeholder:text-muted focus:border-accent focus:ring-1 focus:ring-accent"
+					placeholder="Search lines…"
+					aria-label="Search visible lines"
+					onChange={(event) => setQuery(event.currentTarget.value)}
+				/>
+			</div>
+			<Scrollable className="flex-1 pr-1">
+				{lines.line.length === 0 ? (
+					<div className="grid min-h-48 place-items-center border border-dashed border-line text-sm text-muted">
+						No product line is currently visible.
+					</div>
+				) : filteredLines.length === 0 ? (
+					<div
+						className="grid min-h-48 place-items-center px-4 text-center text-sm text-muted"
+						data-ui="ItemLinesSearchEmpty"
+					>
+						No visible lines match “{normalizedQuery}”.
+					</div>
+				) : (
+					<div
+						className="ak-list grid gap-1"
+						data-ui="TileLinesList"
+					>
+						{filteredLines.map((line) => (
+							<LineRow
+								key={line.lineId}
+								disabled={disabled}
+								line={line}
+								ownerItemId={lines.itemId}
+							/>
+						))}
+					</div>
+				)}
+			</Scrollable>
+		</div>
+	);
+};

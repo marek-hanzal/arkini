@@ -280,6 +280,28 @@ describe("ItemDetailModal", () => {
 			document.querySelector<HTMLElement>('[data-ui="ItemDetailTabCount"]')?.textContent,
 		).toBe(String(renderedLineCount));
 
+		const linesSearch = document.querySelector<HTMLInputElement>(
+			'[aria-label="Search visible lines"]',
+		);
+		if (linesSearch === null) throw new Error("Missing Lines search input.");
+		const valueSetter = Object.getOwnPropertyDescriptor(
+			HTMLInputElement.prototype,
+			"value",
+		)?.set;
+		if (valueSetter === undefined) throw new Error("Expected native input value setter.");
+		await act(async () => {
+			valueSetter.call(linesSearch, "definitely-no-line");
+			linesSearch.dispatchEvent(
+				new Event("input", {
+					bubbles: true,
+				}),
+			);
+		});
+		expect(document.querySelectorAll('[data-ui="TileLine"]')).toHaveLength(0);
+		expect(
+			document.querySelector<HTMLElement>('[data-ui="ItemDetailTabCount"]')?.textContent,
+		).toBe(String(renderedLineCount));
+
 		const infoTab = document.querySelector<HTMLButtonElement>('[data-tab="info"]');
 		if (infoTab === null) throw new Error("Missing Info tab.");
 		await act(async () => infoTab.click());

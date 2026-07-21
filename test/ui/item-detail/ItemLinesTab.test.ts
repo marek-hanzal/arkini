@@ -166,16 +166,52 @@ afterEach(async () => {
 	document.body.replaceChildren();
 });
 
-const renderLines = async () => {
+const renderLines = async (
+	lines: Extract<
+		useItemDetailLines.Projection,
+		{
+			kind: "available";
+		}
+	> = projection,
+) => {
 	const container = document.createElement("div");
 	document.body.append(container);
 	const root = createRoot(container);
 	roots.push(root);
+	const rerender = async (
+		nextLines: Extract<
+			useItemDetailLines.Projection,
+			{
+				kind: "available";
+			}
+		>,
+	) => {
+		await act(async () => {
+			root.render(
+				createElement(ItemLinesTab, {
+					disabled: false,
+					lines: nextLines,
+				}),
+			);
+		});
+	};
+	await rerender(lines);
+	return {
+		container,
+		rerender,
+	};
+};
+
+const setSearchQuery = async (container: HTMLElement, value: string) => {
+	const search = container.querySelector<HTMLInputElement>('[aria-label="Search visible lines"]');
+	if (search === null) throw new Error("Expected Lines search input.");
+	const valueSetter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")?.set;
+	if (valueSetter === undefined) throw new Error("Expected native input value setter.");
 	await act(async () => {
-		root.render(
-			createElement(ItemLinesTab, {
-				disabled: false,
-				lines: projection,
+		valueSetter.call(search, value);
+		search.dispatchEvent(
+			new Event("input", {
+				bubbles: true,
 			}),
 		);
 	});
@@ -264,5 +300,134 @@ describe("ItemLinesTab", () => {
 		expect(commands.unsetDefault).toHaveBeenCalledWith({
 			ownerItemId: "runtime:producer",
 		});
+	});
+	it("filters authoritative visible lines by semantic facts without indexing volatile numbers", async () => {
+		const advancedInput = {
+			...input,
+			selector: {
+				kind: "tag",
+				label: "knowledge:advanced",
+			},
+			detail: undefined,
+			ready: false,
+		} as const satisfies useItemDetailLines.Input;
+		const advancedOutput = {
+			weight: 1,
+			roll: [
+				{
+					kind: "chance",
+					chance: 0.65,
+					item: [
+						{
+							itemId: "item:plank",
+							title: "Plank",
+							quantity: {
+								min: 1,
+								max: 4,
+							},
+						},
+					],
+				},
+			],
+		} as const satisfies useItemDetailLines.OutputSet;
+		const searchable = {
+			...projection,
+			line: [
+				projection.line[0],
+				{
+					...projection.line[1],
+					title: "Advanced Knowledge",
+					description: "Studies arcane production methods.",
+					availability: {
+						kind: "blocked",
+						reason: "inputs",
+					},
+					startMode: "enqueue",
+					input: [
+						advancedInput,
+					],
+					output: [
+						advancedOutput,
+					],
+				},
+			],
+		} as const satisfies Extract<
+			useItemDetailLines.Projection,
+			{
+				kind: "available";
+			}
+		>;
+		const { container } = await renderLines(searchable);
+
+		expect(container.querySelector('[data-ui="ItemLinesSearch"]')).not.toBeNull();
+		expect(
+			container
+				.querySelector('[data-ui="ItemLinesSearch"]')
+				?.parentElement?.querySelector('[data-ui="Scrollable"]'),
+		).not.toBeNull();
+
+		for (const query of [
+			"arcane",
+			"knowledge advanced",
+			"item:plank",
+			"missing inputs",
+			"enqueue",
+		]) {
+			await setSearchQuery(container, query);
+			expect(
+				Array.from(container.querySelectorAll<HTMLElement>('[data-ui="TileLine"]')).map(
+					(row) => row.dataset.lineId,
+				),
+			).toEqual([
+				"line:second",
+			]);
+		}
+
+		await setSearchQuery(container, "500");
+		expect(container.querySelectorAll('[data-ui="TileLine"]')).toHaveLength(0);
+		expect(container.querySelector('[data-ui="ItemLinesSearchEmpty"]')?.textContent).toContain(
+			"No visible lines match “500”.",
+		);
+
+		await setSearchQuery(container, "");
+		expect(
+			Array.from(container.querySelectorAll<HTMLElement>('[data-ui="TileLine"]')).map(
+				(row) => row.dataset.lineId,
+			),
+		).toEqual([
+			"line:first",
+			"line:second",
+		]);
+	});
+
+	it("resolves searched identities against the latest live line projection", async () => {
+		const { container, rerender } = await renderLines(projection);
+		await setSearchQuery(container, "running");
+		expect(container.querySelectorAll('[data-ui="TileLine"]')).toHaveLength(1);
+		expect(container.textContent).toContain("0.5 s");
+
+		const updated = {
+			...projection,
+			line: projection.line.map((candidate) =>
+				candidate.lineId === "line:second" && candidate.activeJob !== undefined
+					? {
+							...candidate,
+							activeJob: {
+								...candidate.activeJob,
+								remainingMs: 200,
+							},
+						}
+					: candidate,
+			),
+		} as const satisfies Extract<
+			useItemDetailLines.Projection,
+			{
+				kind: "available";
+			}
+		>;
+		await rerender(updated);
+
+		expect(container.querySelectorAll('[data-ui="TileLine"]')).toHaveLength(1);
+		expect(container.textContent).toContain("0.2 s");
 	});
 });

@@ -1,5 +1,4 @@
 import { useHotkey } from "@tanstack/react-hotkeys";
-import Fuse from "fuse.js";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import type { Game } from "~/bridge/game/Game";
@@ -9,6 +8,7 @@ import { useSpawnCheatItemMutation } from "~/bridge/cheat/useSpawnCheatItemMutat
 import { useCheatAvailability } from "~/ui/cheat-availability/useCheatAvailability";
 import { useGameMenuControl } from "~/ui/game-menu/useGameMenuControl";
 import { useItemDetailControl } from "~/ui/item-detail/useItemDetailControl";
+import { useFuseSearch } from "~/ui/search/useFuseSearch";
 
 const maxVisibleResults = 10;
 const errorMessage = (error: unknown) => (error instanceof Error ? error.message : String(error));
@@ -25,34 +25,44 @@ export const CheatItemSpotlight = ({ game }: { readonly game: Game }) => {
 	const [open, setOpen] = useState(false);
 	const [query, setQuery] = useState("");
 	const [selectedIndex, setSelectedIndex] = useState(0);
-	const fuse = useMemo(
+	const searchCandidates = useMemo(
 		() =>
-			new Fuse(catalog, {
-				keys: [
-					"itemId",
-					"title",
-					"categoryId",
-					"tags",
+			catalog.map((item) => ({
+				identity: item.itemId,
+				terms: [
+					item.itemId,
+					item.title,
+					item.categoryId,
+					...item.tags,
 				],
-				threshold: 0.28,
-				ignoreLocation: true,
-			}),
+			})),
 		[
 			catalog,
 		],
 	);
-	const results = useMemo(
+	const matchingItemIds = useFuseSearch(searchCandidates, query);
+	const catalogById = useMemo(
 		() =>
-			(query.trim() === ""
-				? catalog
-				: fuse.search(query.trim()).map((match) => match.item)
-			).slice(0, maxVisibleResults),
+			new Map(
+				catalog.map((item) => [
+					item.itemId,
+					item,
+				]),
+			),
 		[
 			catalog,
-			fuse,
-			query,
 		],
 	);
+	const results = matchingItemIds
+		.flatMap((itemId) => {
+			const item = catalogById.get(itemId);
+			return item === undefined
+				? []
+				: [
+						item,
+					];
+		})
+		.slice(0, maxVisibleResults);
 	const blockedByHigherOwner = gameMenu.isOpen || itemDetail.isOpen;
 	const available = cheatAvailability.available && cheats.enabled && !blockedByHigherOwner;
 

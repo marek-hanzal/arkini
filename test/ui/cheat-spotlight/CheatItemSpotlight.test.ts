@@ -40,7 +40,9 @@ vi.mock("~/bridge/cheat/useCheatItemCatalog", () => ({
 			itemId: "item:beta",
 			title: "Beta",
 			categoryId: "resource",
-			tags: [],
+			tags: [
+				"timber",
+			],
 			sourceResourceId: "beta",
 			sourceUrl: "blob:beta",
 		},
@@ -160,5 +162,58 @@ describe("CheatItemSpotlight", () => {
 			);
 		});
 		expect(container.querySelector('[data-ui="CheatItemSpotlight"]')).toBeNull();
+	});
+	it("searches the authoritative catalog by shared Fuse terms", async () => {
+		const container = document.createElement("div");
+		document.body.append(container);
+		const root = createRoot(container);
+		roots.push(root);
+		const availability = createCheatAvailability();
+		availability.apply(true);
+		await act(async () => {
+			root.render(
+				createElement(
+					CheatAvailabilityProvider,
+					{
+						availability,
+					},
+					createElement(CheatItemSpotlight, {
+						game: {} as Game,
+					}),
+				),
+			);
+		});
+		await act(async () => {
+			document.dispatchEvent(
+				new KeyboardEvent("keydown", {
+					key: "p",
+					code: "KeyP",
+					ctrlKey: true,
+					bubbles: true,
+					cancelable: true,
+				}),
+			);
+			await Promise.resolve();
+		});
+		const input = container.querySelector<HTMLInputElement>('input[type="search"]');
+		if (input === null) throw new Error("Expected Spotlight search input.");
+		const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")?.set;
+		if (setter === undefined) throw new Error("Expected native input setter.");
+		await act(async () => {
+			setter.call(input, "timber");
+			input.dispatchEvent(
+				new Event("input", {
+					bubbles: true,
+				}),
+			);
+		});
+
+		const options = Array.from(
+			container.querySelectorAll<HTMLButtonElement>(
+				'[data-ui="CheatItemSpotlightResults"] button',
+			),
+		);
+		expect(options).toHaveLength(1);
+		expect(options[0]?.textContent).toContain("Beta");
 	});
 });

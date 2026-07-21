@@ -155,11 +155,12 @@ describe("MainMenu", () => {
 		).toBe("");
 		expect(container.querySelector('[data-ui="LauncherHeroShadow"]')).not.toBeNull();
 		const menu = container.querySelector<HTMLElement>('[data-ui="MainMenu"]');
-		expect(menu?.className).toContain("ak-list");
-		expect(play?.className).toContain("ak-list-row-selected");
+		expect(menu?.className).not.toContain("ak-list");
+		expect(play?.className).toContain("bg-accent");
+		expect(play?.className).toContain("text-accent-contrast");
 		expect(
-			Array.from(menu?.querySelectorAll("a, button") ?? []).every((control) =>
-				control.className.includes("ak-list-row-interactive"),
+			Array.from(menu?.querySelectorAll("a, button") ?? []).every(
+				(control) => !control.className.includes("ak-list-row"),
 			),
 		).toBe(true);
 		expect(container.textContent).toContain("Arkpacks");

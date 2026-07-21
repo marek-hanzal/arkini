@@ -61,7 +61,7 @@ export const Settings = ({ exitPending = false, navigationError, onBack }: Setti
 			>
 				<legend className="text-sm font-semibold text-foreground">Theme</legend>
 				<div
-					className="ak-list grid grid-cols-3 gap-1 rounded-xl border border-line bg-surface-raised/65 p-1"
+					className="grid grid-cols-3 gap-1 rounded-xl border border-line bg-surface-raised/65 p-1"
 					role="radiogroup"
 					aria-label="Theme"
 					data-ui="SettingsThemeOptions"
@@ -71,7 +71,15 @@ export const Settings = ({ exitPending = false, navigationError, onBack }: Setti
 						return (
 							<label
 								key={option.value}
-								className={`ak-list-row ak-list-row-interactive relative ${model.blocked ? "ak-list-row-pending cursor-progress" : "cursor-pointer"} ${selected ? "ak-list-row-selected text-accent-contrast" : "text-muted"} rounded-lg px-3 py-2.5 text-center text-sm font-semibold`}
+								className={`relative rounded-lg px-3 py-2.5 text-center text-sm font-semibold transition-colors focus-within:outline-none focus-within:ring-2 focus-within:ring-accent ${
+									model.blocked
+										? selected
+											? "cursor-progress bg-accent text-accent-contrast opacity-60"
+											: "cursor-progress text-muted opacity-60"
+										: selected
+											? "cursor-pointer bg-accent text-accent-contrast hover:bg-accent-hover"
+											: "cursor-pointer text-muted hover:bg-surface"
+								}`}
 								data-selected={selected ? "true" : "false"}
 								data-pending={model.blocked ? "true" : "false"}
 							>
@@ -99,7 +107,7 @@ export const Settings = ({ exitPending = false, navigationError, onBack }: Setti
 			>
 				<legend className="text-sm font-semibold text-foreground">Developer</legend>
 				<label
-					className={`ak-list-row ak-list-row-interactive flex cursor-pointer items-center justify-between gap-4 rounded-lg border border-line bg-surface-raised/65 px-4 py-3 ${model.blocked ? "ak-list-row-pending cursor-progress" : ""}`}
+					className={`ak-list-row ak-list-row-interactive flex cursor-pointer items-center justify-between gap-4 rounded-lg border border-line px-4 py-3 ${model.blocked ? "ak-list-row-pending cursor-progress" : ""}`}
 					data-ui="SettingsCheatAvailability"
 				>
 					<span className="grid gap-1">

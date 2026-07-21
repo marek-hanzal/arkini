@@ -133,6 +133,12 @@ describe("CheatItemSpotlight", () => {
 					?.textContent,
 			).toContain("Beta"),
 		);
+		const selectedOption = container.querySelector<HTMLButtonElement>(
+			'button[data-selected="true"]',
+		);
+		expect(selectedOption?.className).toContain("ak-spotlight-option");
+		expect(selectedOption?.className).not.toContain("ak-list-row");
+		expect(selectedOption?.querySelectorAll(".ak-spotlight-option-secondary")).toHaveLength(2);
 		await act(async () => {
 			input.dispatchEvent(
 				new KeyboardEvent("keydown", {

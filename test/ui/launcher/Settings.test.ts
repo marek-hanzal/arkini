@@ -233,14 +233,15 @@ describe("Settings", () => {
 		const themeOptions = container.querySelector<HTMLElement>(
 			'[data-ui="SettingsThemeOptions"]',
 		);
-		expect(themeOptions?.className).toContain("ak-list");
+		expect(themeOptions?.className).not.toContain("ak-list");
 		const themeRows = Array.from(themeOptions?.querySelectorAll("label") ?? []);
 		expect(themeRows).toHaveLength(3);
-		expect(themeRows.every((row) => row.className.includes("ak-list-row-interactive"))).toBe(
-			true,
+		expect(themeRows.every((row) => !row.className.includes("ak-list-row"))).toBe(true);
+		expect(themeRows.find((row) => row.dataset.selected === "true")?.className).toContain(
+			"bg-accent",
 		);
 		expect(themeRows.find((row) => row.dataset.selected === "true")?.className).toContain(
-			"ak-list-row-selected",
+			"text-accent-contrast",
 		);
 		const light = radios.find(
 			(input) => input instanceof HTMLInputElement && input.value === "light",
@@ -256,8 +257,8 @@ describe("Settings", () => {
 		expect(fieldset).toBeInstanceOf(HTMLFieldSetElement);
 		expect((fieldset as HTMLFieldSetElement).disabled).toBe(true);
 		expect(
-			Array.from(themeOptions?.querySelectorAll("label") ?? []).every((row) =>
-				row.className.includes("ak-list-row-pending"),
+			Array.from(themeOptions?.querySelectorAll("label") ?? []).every(
+				(row) => row.dataset.pending === "true" && row.className.includes("opacity-60"),
 			),
 		).toBe(true);
 

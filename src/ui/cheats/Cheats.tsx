@@ -37,7 +37,7 @@ export const Cheats = ({ game, onBack }: { readonly game: Game; readonly onBack:
 
 				<div className="ak-list grid gap-2">
 					<label
-						className={`ak-list-row ak-list-row-interactive flex cursor-pointer items-center justify-between gap-4 rounded-lg border border-line bg-surface/70 px-4 py-3 ${blocked ? "ak-list-row-pending cursor-progress" : ""}`}
+						className={`ak-list-row ak-list-row-interactive flex cursor-pointer items-center justify-between gap-4 rounded-lg border border-line px-4 py-3 ${blocked ? "ak-list-row-pending cursor-progress" : ""}`}
 						data-ui="CheatsEnabledForGame"
 					>
 						<span className="grid gap-1">
@@ -60,7 +60,7 @@ export const Cheats = ({ game, onBack }: { readonly game: Game; readonly onBack:
 					</label>
 
 					<label
-						className={`ak-list-row flex items-center justify-between gap-4 rounded-lg border border-line bg-surface/70 px-4 py-3 ${!cheats.enabled ? "opacity-60" : "ak-list-row-interactive cursor-pointer"} ${blocked ? "ak-list-row-pending cursor-progress" : ""}`}
+						className={`ak-list-row flex items-center justify-between gap-4 rounded-lg border border-line px-4 py-3 ${!cheats.enabled ? "opacity-60" : "ak-list-row-interactive cursor-pointer"} ${blocked ? "ak-list-row-pending cursor-progress" : ""}`}
 						data-ui="CheatsInstantGameplay"
 					>
 						<span className="grid gap-1">
@@ -107,7 +107,7 @@ export const Cheats = ({ game, onBack }: { readonly game: Game; readonly onBack:
 				</div>
 
 				<Button
-					className="ak-list-row ak-list-row-interactive w-full shadow-none"
+					className="w-full shadow-none"
 					disabled={blocked}
 					onClick={onBack}
 				>

@@ -15,10 +15,10 @@ const ButtonBaseClassName =
 
 const ButtonVariantClassNames = {
 	default:
-		"border border-line bg-surface/75 text-foreground shadow-lg backdrop-blur-md hover:border-line-strong hover:bg-surface-raised active:bg-surface-raised",
+		"border border-line bg-surface/75 text-foreground shadow-lg backdrop-blur-md hover:border-line-strong hover:bg-surface-raised active:bg-surface-raised disabled:hover:border-line disabled:hover:bg-surface/75 disabled:active:bg-surface/75 aria-disabled:hover:border-line aria-disabled:hover:bg-surface/75 aria-disabled:active:bg-surface/75",
 	primary:
-		"bg-accent text-accent-contrast shadow-lg hover:bg-accent-hover active:bg-accent-hover",
-	danger: "bg-danger text-danger-contrast shadow-lg hover:opacity-90 active:opacity-80",
+		"bg-accent text-accent-contrast shadow-lg hover:bg-accent-hover active:bg-accent-hover disabled:hover:bg-accent disabled:active:bg-accent aria-disabled:hover:bg-accent aria-disabled:active:bg-accent",
+	danger: "bg-danger text-danger-contrast shadow-lg hover:opacity-90 active:opacity-80 disabled:hover:opacity-60 disabled:active:opacity-60 aria-disabled:hover:opacity-60 aria-disabled:active:opacity-60",
 } as const;
 
 type ButtonVariant = keyof typeof ButtonVariantClassNames;

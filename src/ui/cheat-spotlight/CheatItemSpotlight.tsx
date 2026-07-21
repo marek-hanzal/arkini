@@ -162,7 +162,7 @@ export const CheatItemSpotlight = ({ game }: { readonly game: Game }) => {
 				/>
 
 				<div
-					className="ak-list grid max-h-[26rem] gap-1 overflow-y-auto"
+					className="grid max-h-[26rem] gap-1 overflow-y-auto"
 					data-ui="CheatItemSpotlightResults"
 				>
 					{results.length === 0 ? (
@@ -174,11 +174,7 @@ export const CheatItemSpotlight = ({ game }: { readonly game: Game }) => {
 							<button
 								type="button"
 								key={item.itemId}
-								className={`ak-list-row ak-list-row-interactive grid grid-cols-[3rem_1fr_auto] items-center gap-3 rounded-lg border px-3 py-2 text-left ${
-									index === selectedIndex
-										? "ak-list-row-selected border-accent/55 bg-accent/10"
-										: "border-transparent"
-								}`}
+								className="ak-spotlight-option grid grid-cols-[3rem_1fr_auto] items-center gap-3 rounded-lg border px-3 py-2 text-left"
 								data-selected={index === selectedIndex ? "true" : undefined}
 								disabled={spawn.isPending}
 								onMouseEnter={() => setSelectedIndex(index)}
@@ -196,11 +192,13 @@ export const CheatItemSpotlight = ({ game }: { readonly game: Game }) => {
 									<span className="block truncate text-sm font-semibold">
 										{item.title}
 									</span>
-									<span className="block truncate text-xs text-muted">
+									<span className="ak-spotlight-option-secondary block truncate text-xs">
 										{item.itemId}
 									</span>
 								</span>
-								<span className="text-xs text-muted">{item.categoryId}</span>
+								<span className="ak-spotlight-option-secondary text-xs">
+									{item.categoryId}
+								</span>
 							</button>
 						))
 					)}

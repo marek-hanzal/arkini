@@ -166,7 +166,10 @@ describe("Button primitives", () => {
 		expect(primaryButton.className).toContain("cursor-pointer");
 		expect(pendingButton.className).toContain("cursor-progress");
 		expect(primaryLink.className).toContain("bg-accent");
+		expect(primaryLink.className).toContain("aria-disabled:hover:bg-accent");
+		expect(pendingButton.className).toContain("disabled:hover:bg-accent");
 		expect(dangerLink.className).toContain("bg-danger");
+		expect(dangerLink.className).toContain("aria-disabled:hover:opacity-60");
 		expect(neutralLink.getAttribute("href")).toBe("/about");
 		expect(neutralButton.type).toBe("button");
 		expect(neutralButton.disabled).toBe(true);

@@ -4,9 +4,11 @@ This file contains durable non-obvious decisions and the exact continuation poin
 
 ## Current implementation task
 
-**Item Detail cut over one authoritative tile interaction model**
+**Save-scoped persisted Cheat runtime**
 
-Status: **Epic #343 and review root #344 are implemented on `main` as the authoritative Item Detail model. Exact live Board, Toolbar, and future Inventory actors open one Canvas-local modal through desktop double-click or the shared programmatic entry. The modal shell, backdrop, focus owner, and close lifecycle stay mounted while keyed `{ itemId, tab }` content changes through Motion; input artwork inside Lines can retarget the same modal to one engine-owned exact live identity when unambiguous or to configured definition-only Info, while recipe output artwork always opens configured definition detail and never invents a runtime target. If the inspected runtime item disappears, the modal retains its last immutable snapshot, clearly marks it unavailable, disables gameplay/tab interactions, and remains manually closable instead of vanishing underneath the player. Item Detail uses finite `lines | queue | info` tabs with useful-first default ordering, no router/URL state, duplicate shells, or React gameplay mirrors. One engine-owned active-job classifier drives Lines and tile cursor presentation for `running | paused | awaiting-output`; unexpected live read failures mark the active Game critical and reach the existing fatal boundary, while explicit stale/unsupported results remain ordinary unavailable data. Lines expose canonical Start/Enqueue, Autofill, Withdraw, save-backed per-owner default-line set/unset without changing authored line order, grouped inputs/outputs, and fixed-layout runtime countdown; a tile single-click does nothing for ordinary items, opens Lines for a line owner without a default, and starts the exact default line after double-click arbitration when one exists. Queue remains a separate focused tab with canonical Clear queue and no cancel/reorder semantics. The old hover toolbar, hovered hotkeys, capability icons/config/resources, Status tab, item Effects inspector, and direct bridge `Effect.runSync` islands are removed. About avatars are optional anonymous package roles `avatar-01/02/03/04/05/06/07`, resolved only through the Arkpack/package owner with graceful 0–7 behavior and no duplicate direct renderer imports. UI tests use deterministic module isolation. Issue #339 is also implemented: shared tile-grid surfaces are edge-to-edge with coordinate-stable alternating slot tones, no internal gap/padding or per-slot border, deterministic half-open seam ownership, and one centralized sharper Tailwind radius scale while circles and intentional pills remain round. Board slot alternation uses a deliberately clearer neutral contrast, while Toolbar keeps the same shared geometry but uses dedicated restrained violet semantic frame/slot tokens so its storage purpose reads separately without becoming visually loud. Toolbar checker parity continues from the Board row count, so its first row always alternates against the Board's final row instead of visually repeating it. Item Detail Lines starts directly with line rows, shows the authoritative visible-line count inside the Lines tab label, and uses one build-time Lucide chevron between the fixed Inputs and Outputs columns; this slice intentionally adds no responsive breakpoint or stacked layout.**
+Status: **Epic #298 is implemented on `main` as one canonical cheat state owned by the exact loaded Game runtime and save. `runtime.cheats` contains persisted `enabled` and `instantGameplay` values; `/settings` mutates Cheat mode while preserving the cached live Game, and `/game/$packageId/cheats` owns the save-scoped Instant gameplay option with native history back to the Board. Effective Instant gameplay is `enabled && instantGameplay` and removes waiting only through bounded canonical fixed-step settlement, preserving command validity, inputs, charges, RNG, placement, lifecycle, rollback, and passive-storage pause semantics. The Canvas-local item Spotlight uses TanStack Hotkeys `Mod+P`, reads an engine-owned compiled catalog, and spawns through one authorized canonical Board placement command. Legacy speed, Nuke, and Cheat-inventory items, runtime session speed, schema/event/UI branches, config entries, tests, and unreferenced assets are removed; the normal Inventory Backpack and GameMenu reset remain intact.**
+
+Recent Item Detail baseline remains one stable Canvas-local modal with finite capability tabs, authoritative live projections, read-only stale retention, exact identity handoffs, and no router ownership. Lines use save-backed default-line state, canonical active-job truth, clickable exact/definition-scoped artwork, fixed Inputs-to-Outputs flow, and live action availability. The optional Sources tab lists exact owned Board producers across all spaces and hands off to their exact `lines` detail without inventing runtime targets.
 
 Review #347 follow-up is complete: passive storage takes precedence over zero-time completion so Inventory/Toolbar jobs remain paused until authoritative Board runnability returns; selecting a default line on a stacked Board owner atomically isolates one exact quantity-1 identity and standard-places the pure remainder with full rollback on placement failure, while clearing the mapping restores purity when no other state remains; Item Detail Lines equality includes live Autofill/Withdraw availability; and recipe output artwork always opens configured definition detail rather than inventing an unrelated exact runtime target. Input artwork opens an exact runtime detail only when the engine projection owns one unambiguous target identity, otherwise it remains definition-scoped or non-navigational.
 
@@ -14,7 +16,7 @@ Item Detail now also exposes an authoritative optional `sources` tab. It lists o
 
 Current contract:
 
-- `/` is the only permitted index page. Every other visible page ends in an explicitly named leaf route; the game screen is `/game/$packageId/board`.
+- `/` is the only permitted index page. Every other visible page ends in an explicitly named leaf route; the game screen is `/game/$packageId/board`, and save-scoped cheat controls live at `/game/$packageId/cheats`.
 - `/game/$packageId` remains a non-visual resource/layout boundary. `/action/load-game/$packageId` owns creation, while leave/reset actions remain named leaves over the inherited singleton resource. Controlled application close is direct native lifecycle work, not a route.
 - TanStack Query owns only the identity and lifetime of one renderer-wide `GameEngineResource` under `["game-engine"]`. Controlled close and HMR join pending creation and re-check exact ownership inside the resource lifecycle lock before disposal. If a successful leave/reset already removed that same singleton, close/HMR treat terminal work as complete; a different replacement resource remains a hard ownership failure. Strict leave/reset also verify ownership before any dispose or save clearing. The resource stores only the first critical lifecycle failure as a private fail-stop guard, not a public state machine.
 - `RootPage` owns only stable application infrastructure and `Canvas + Outlet`. No GameOwner provider, root loading overlay, hidden destination page, transition-name suppression mode, or nested local View Transition remains.
@@ -65,7 +67,7 @@ Responsive viewport contract:
 
 Next action:
 
-> Continue gameplay-driven Item Detail refinement from the current useful-default grammar. Preserve authoritative tab ordering (`lines`, optional `queue`, then `info`) and keep explicit programmatic tab requests supported; do not move default-tab selection into React item-kind checks or restore Status as a redundant tab.
+> Run an independent review pass over the completed #298 Cheat runtime snapshot before beginning another large feature. Verify one persisted truth, game-scoped route lifecycle, bounded Instant settlement, Spotlight authorization/placement, and complete legacy-slice removal without reopening the deleted item-based architecture.
 
 ## Source topology
 
@@ -82,7 +84,7 @@ Next action:
 
 - TanStack Router file routing is generated from `src/@routes` into `src/_route.ts`. Visual components remain standalone, while route modules own only router-specific lifecycle composition over public contracts, never gameplay implementation.
 - TanStack Router uses standard history routing. Development Electron loads the renderer from the Vite HTTP origin for HMR; packaged Electron serves the same renderer from the privileged standard origin `arkini://app/*`.
-- `/` is the one-session startup splash, `/main-menu` is the semantic out-of-game menu, `/arkpacks` contains the shared package selector, `/settings` owns the sole theme control, `/about` contains credits, `/game/$packageId` is the live resource boundary, and `/game/$packageId/board` is the explicit gameplay page. Hash routes, implicit game index pages, and `file://` are not supported application modes.
+- `/` is the one-session startup splash, `/main-menu` is the semantic out-of-game menu, `/arkpacks` contains the shared package selector, `/settings` owns application appearance plus active-Game Cheat mode, `/about` contains credits, `/game/$packageId` is the live resource boundary, `/game/$packageId/board` is gameplay, and `/game/$packageId/cheats` is the exact save-scoped cheat page. Hash routes, implicit game index pages, and `file://` are not supported application modes.
 - Electron main/preload live under `electron/`, own only typed platform capabilities, and may not import renderer/engine roots. Preload exposes only the Arkpack, save, appearance, and controlled-close contracts.
 - One trusted-renderer capability authorizes the Electron window. Development accepts only the exact configured loopback Vite origin and packaged mode ignores development renderer overrides and accepts only `arkini://app/*`; all external navigation/redirects, subframes, webviews, popups, and permissions are denied. Every Arkpack/save/appearance/lifecycle IPC sender must be the registered window's trusted main frame at a trusted parsed URL. Packaged responses carry a restrictive CSP. Development derives the exact HMR WebSocket endpoint from the same parsed loopback URL and adds one per-server Vite nonce for the React Refresh preamble; neither development allowance enters packaged output.
 - Arkpack, save, and appearance persistence use narrow Effect-native object capabilities on both sides of typed IPC. Renderer adaptation from `ipcRenderer.invoke` happens once in domain transport operations; Electron handlers authorize once and run Effect-native `@effect/platform` filesystem operations through `ElectronMainRuntime`. No project-owned persistence classes or no-op close lifecycle remain.
@@ -147,14 +149,14 @@ Next action:
 - Item revision is a runtime-only stale-intent token. Saves omit it and hydration creates fresh revisions for the new session.
 - Jobs and queued requests are not revisioned because commands never target a previously observed mutable job/request shape.
 
-## Runtime session speed
+## Persisted Cheat runtime
 
-- `runtime.session.speedMode` is the single canonical live-session truth: `normal` or `accelerated`.
-- Runtime session state is engine-visible but intentionally absent from `StateSchema`; hydration and a new session always start in `normal`.
-- `toggleSpeedModeFx()` has no item dependency. A speed-cheat item is only a user-facing control and asset projection, never an authorization token or source of truth.
-- Normal mode feeds newly observed wall time into Tick at `1×`; accelerated mode uses `30×`. Both use the same 200 ms fixed-step engine.
-- Toggling first folds elapsed wall time under the old mode, then changes the root state. Pending normal time is never accelerated retroactively.
-- Explicit `runTickRuntimeByFx` input is simulation time and never receives the speed multiplier.
+- `runtime.cheats` is canonical persisted state for the exact loaded Game: `{ enabled, instantGameplay }`. `StateSchema`, save/load, runtime publication, reset, and Game replacement carry one value set; no app preference, route state, React mirror, Query value, or session flag duplicates it.
+- `/settings` exposes Cheat mode only while one cached active Game exists and mutates that Game directly. Navigating there preserves the live Game resource so native history back returns to the same Board instance.
+- `/game/$packageId/cheats` is a named visual child of the exact Game route. It is available only while Cheat mode is enabled, uses native browser history back, and falls back to that package Board when direct navigation or a live disable makes it unavailable.
+- Effective Instant gameplay is `cheats.enabled && cheats.instantGameplay`. It changes duration only and settles through the ordinary fixed-step lifecycle with a bounded 64-step budget; validity, input consumption, charges, RNG, queue rules, placement, rollback, passive-storage pause, completion, and events remain canonical.
+- `Mod+P` is owned by TanStack Hotkeys on the active gameplay Canvas. The Spotlight reads an immutable engine-owned compiled catalog and invokes one public Cheat spawn command that reauthorizes `cheats.enabled` and uses normal Board creation, max-count, stacking, placement, publication, and save behavior.
+- The legacy speed, Nuke, and Cheat-inventory items and all dedicated schema/runtime/UI/event/config/assets are removed. GameMenu reset is the sole destructive reset flow; the ordinary `item:inventory` Backpack remains a real Toolbar-capable item.
 
 
 ## Multi-space board runtime
@@ -241,12 +243,11 @@ Next action:
 - Update `tasks/COVERAGE.md` after every completed slice.
 - Do not repeatedly inspect areas marked **Superseded**, **Rejected**, **Archive-ready**, or **Removed** unless a current task names a concrete unresolved behavior.
 
-## Destructive utilities
+## Destructive reset
 
-- `consumeItemIntoCheatInventoryFx` is the sole cheat-sink write. It requires distinct revised board source and cheat-inventory target identities in the same space, consumes the complete source through ordinary idle-owner removal, preserves the sink, and emits `cheat-inventory:consumed` for presentation feedback. It is not swap or merge.
-- `requestNukeSaveFx()` only emits `nuke-save:requested`; the nuke item is a presentation control, not an engine dependency.
 - Hard reset is route-owned complete replacement: `disposeWithoutSaveFx` → clear the exact package/content-hash save → remove the exact Query resource → redirect to `/game/$packageId/board` → create one fresh `Game` through the normal query factory.
-- Never mutate a running engine back to initial state, add another reset scheduler, expose persistence keys to UI, or represent reset progress as gameplay state.
+- Reset is exposed only through the existing GameMenu destructive flow. No Nuke item, reset event item, hidden equivalent, second scheduler, or gameplay-state progress representation exists.
+- Never mutate a running engine back to initial state, expose persistence keys to UI, or make Cheat mode enable/disable create or remove runtime tool items.
 
 ## Route-owned Game Engine lifecycle
 

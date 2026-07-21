@@ -7,7 +7,7 @@ import { JobSchema } from "~/engine/job/schema/JobSchema";
 import { DefaultLineByOwnerItemIdSchema } from "~/engine/line/schema/DefaultLineByOwnerItemIdSchema";
 import { RuntimeItemSchema } from "./RuntimeItemSchema";
 
-/** Canonical loaded runtime composed of ephemeral session state and live gameplay state. */
+/** Canonical loaded gameplay state for one exact persisted Game. */
 export const RuntimeSchema = z
 	.object({
 		cheats: CheatStateSchema.describe(

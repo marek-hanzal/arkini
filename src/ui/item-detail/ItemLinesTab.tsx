@@ -654,7 +654,7 @@ const LineRow = ({
 				</p>
 			)}
 
-			<div className="mt-4 grid min-w-0 grid-cols-2 gap-x-8 max-[48rem]:grid-cols-1">
+			<div className="mt-4 grid min-w-0 grid-cols-[minmax(0,1fr)_2rem_minmax(0,1fr)] gap-x-4">
 				<section className="min-w-0">
 					<h4 className="border-b border-line pb-2 text-xs font-semibold uppercase tracking-[0.08em] text-muted">
 						Inputs
@@ -674,7 +674,15 @@ const LineRow = ({
 					)}
 				</section>
 
-				<section className="min-w-0 max-[48rem]:mt-4">
+				<div
+					className="grid place-items-center text-muted"
+					aria-hidden="true"
+					data-ui="TileLineFlowChevron"
+				>
+					<span className="icon-[lucide--chevron-right] size-5" />
+				</div>
+
+				<section className="min-w-0">
 					<h4 className="border-b border-line pb-2 text-xs font-semibold uppercase tracking-[0.08em] text-muted">
 						Outputs
 					</h4>
@@ -730,19 +738,6 @@ export const ItemLinesTab = ({
 		className="flex min-h-0 flex-1 flex-col"
 		data-ui="ItemLinesTab"
 	>
-		<div className="mb-4 flex flex-wrap items-baseline justify-between gap-3 border-b border-line pb-3">
-			<div>
-				<h3 className="text-sm font-semibold uppercase tracking-[0.08em] text-muted">
-					Lines
-				</h3>
-				<p className="mt-1 text-sm text-muted">
-					Current visibility, inputs, outputs and effective runtime.
-				</p>
-			</div>
-			<p className="text-sm font-medium text-muted">
-				{lines.line.length} visible line{lines.line.length === 1 ? "" : "s"}
-			</p>
-		</div>
 		<Scrollable className="flex-1 pr-1">
 			{lines.line.length === 0 ? (
 				<div className="grid min-h-48 place-items-center border border-dashed border-line text-sm text-muted">

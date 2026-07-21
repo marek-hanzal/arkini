@@ -275,6 +275,10 @@ describe("ItemDetailModal", () => {
 			"queue",
 			"info",
 		]);
+		const renderedLineCount = document.querySelectorAll('[data-ui="TileLine"]').length;
+		expect(
+			document.querySelector<HTMLElement>('[data-ui="ItemDetailTabCount"]')?.textContent,
+		).toBe(String(renderedLineCount));
 
 		const infoTab = document.querySelector<HTMLButtonElement>('[data-tab="info"]');
 		if (infoTab === null) throw new Error("Missing Info tab.");

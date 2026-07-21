@@ -208,6 +208,25 @@ describe("ItemLinesTab", () => {
 		});
 	});
 
+	it("starts with line content and renders one decorative horizontal flow chevron per line", async () => {
+		await renderLines();
+
+		expect(document.body.textContent).not.toContain(
+			"Current visibility, inputs, outputs and effective runtime.",
+		);
+		expect(document.body.textContent).not.toContain("visible lines");
+		const chevrons = Array.from(
+			document.querySelectorAll<HTMLElement>('[data-ui="TileLineFlowChevron"]'),
+		);
+		expect(chevrons).toHaveLength(projection.line.length);
+		for (const chevron of chevrons) {
+			expect(chevron.getAttribute("aria-hidden")).toBe("true");
+			expect(chevron.querySelector("span")?.className).toContain(
+				"icon-[lucide--chevron-right]",
+			);
+		}
+	});
+
 	it("keeps authored order, toggles default state, and reserves active border geometry", async () => {
 		await renderLines();
 		const rows = Array.from(document.querySelectorAll<HTMLElement>('[data-ui="TileLine"]'));

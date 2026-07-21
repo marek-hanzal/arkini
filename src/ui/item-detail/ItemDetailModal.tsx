@@ -111,11 +111,13 @@ const ItemDetailHeader = ({
 const ItemDetailTabs = ({
 	active,
 	disabled,
+	lineCount,
 	tabs,
 	target,
 }: {
 	readonly active: ItemDetailTab;
 	readonly disabled: boolean;
+	readonly lineCount?: number;
 	readonly tabs: readonly ItemDetailTab[];
 	readonly target: ItemDetailTarget;
 }) => {
@@ -130,7 +132,7 @@ const ItemDetailTabs = ({
 				<button
 					key={tab}
 					type="button"
-					className="shrink-0 cursor-pointer rounded-lg px-3 py-2 text-sm font-medium text-muted transition-colors hover:bg-accent/10 hover:text-foreground aria-selected:bg-accent/15 aria-selected:text-foreground disabled:cursor-not-allowed"
+					className="inline-flex shrink-0 cursor-pointer items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium text-muted transition-colors hover:bg-accent/10 hover:text-foreground aria-selected:bg-accent/15 aria-selected:text-foreground disabled:cursor-not-allowed"
 					aria-selected={tab === active}
 					disabled={disabled}
 					data-tab={tab}
@@ -146,6 +148,14 @@ const ItemDetailTabs = ({
 					}
 				>
 					{tabLabel[tab]}
+					{tab === "lines" && lineCount !== undefined ? (
+						<span
+							className="min-w-5 rounded-full bg-surface-raised/75 px-1.5 py-0.5 text-center text-[0.6875rem] font-semibold tabular-nums text-subtle"
+							data-ui="ItemDetailTabCount"
+						>
+							{lineCount}
+						</span>
+					) : null}
 				</button>
 			))}
 		</nav>
@@ -197,18 +207,12 @@ const ItemInfoContent = ({
 
 const ItemLinesContent = ({
 	disabled,
-	itemId,
+	lines,
 }: {
 	readonly disabled: boolean;
-	readonly itemId: string;
+	readonly lines?: useItemDetailLines.Projection;
 }) => {
-	const liveLines = useItemDetailLines(itemId);
-	const lines = useRetainedItemDetailProjection({
-		available: liveLines.kind === "available",
-		targetKey: itemId,
-		value: liveLines,
-	});
-	if (lines.value?.kind !== "available") {
+	if (lines?.kind !== "available") {
 		return (
 			<div className="grid flex-1 place-items-center text-sm text-muted">
 				Line detail is unavailable.
@@ -217,8 +221,8 @@ const ItemLinesContent = ({
 	}
 	return (
 		<ItemLinesTab
-			disabled={disabled || lines.stale}
-			lines={lines.value}
+			disabled={disabled}
+			lines={lines}
 		/>
 	);
 };
@@ -254,10 +258,12 @@ const ItemQueueContent = ({
 const ItemDetailContent = ({
 	disabled,
 	itemId,
+	lines,
 	tab,
 }: {
 	readonly disabled: boolean;
 	readonly itemId: string;
+	readonly lines?: useItemDetailLines.Projection;
 	readonly tab: ItemDetailTab;
 }) =>
 	match(tab)
@@ -270,7 +276,7 @@ const ItemDetailContent = ({
 		.with("lines", () => (
 			<ItemLinesContent
 				disabled={disabled}
-				itemId={itemId}
+				lines={lines}
 			/>
 		))
 		.with("queue", () => (
@@ -295,6 +301,7 @@ const RuntimeItemDetailScene = ({
 }) => {
 	const itemDetail = useItemDetailControl();
 	const liveIdentity = useItemDetailIdentity(target.itemId);
+	const liveLines = useItemDetailLines(target.itemId);
 	const liveTabs = useItemDetailTabs(target.itemId);
 	const retainedIdentity = useRetainedItemDetailProjection({
 		available: liveIdentity.kind === "available",
@@ -306,9 +313,16 @@ const RuntimeItemDetailScene = ({
 		targetKey: `runtime:${target.itemId}`,
 		value: liveTabs,
 	});
+	const retainedLines = useRetainedItemDetailProjection({
+		available: liveLines.kind === "available",
+		targetKey: `runtime:${target.itemId}`,
+		value: liveLines,
+	});
 	const identity = retainedIdentity.value;
+	const lines = retainedLines.value;
 	const tabs = retainedTabs.value ?? [];
 	const stale = retainedIdentity.stale || retainedTabs.stale;
+	const lineCount = lines?.kind === "available" ? lines.line.length : undefined;
 
 	useEffect(() => {
 		if (stale || liveTabs.includes(target.tab)) return;
@@ -355,6 +369,7 @@ const RuntimeItemDetailScene = ({
 			<ItemDetailTabs
 				active={target.tab}
 				disabled={stale || disabled}
+				lineCount={lineCount}
 				tabs={tabs}
 				target={target}
 			/>
@@ -365,6 +380,7 @@ const RuntimeItemDetailScene = ({
 				<ItemDetailContent
 					disabled={stale || disabled}
 					itemId={target.itemId}
+					lines={lines}
 					tab={target.tab}
 				/>
 			</div>

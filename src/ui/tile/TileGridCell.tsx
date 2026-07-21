@@ -48,11 +48,12 @@ export const TileGridCell = ({ surface, x, y, occupant, dataUi }: TileGridCell.P
 		slot,
 		occupant: occupantIdentity,
 	});
+	const tone = (x + y) % 2 === 0 ? "a" : "b";
 
 	return (
 		<div
 			ref={drop.ref}
-			className="relative min-h-0 min-w-0"
+			className="relative min-h-0 min-w-0 overflow-hidden"
 			style={{
 				gridColumnStart: x + 1,
 				gridRowStart: y + 1,
@@ -61,27 +62,26 @@ export const TileGridCell = ({ surface, x, y, occupant, dataUi }: TileGridCell.P
 			data-ui={dataUi}
 			data-tile-x={x}
 			data-tile-y={y}
+			data-tile-slot-tone={tone}
 			data-board-x={surface.kind === "board" ? x : undefined}
 			data-board-y={surface.kind === "board" ? y : undefined}
 			data-toolbar-x={surface.kind === "toolbar" ? x : undefined}
 			data-drop-over={drop.over ? "true" : "false"}
 		>
 			<motion.span
-				className="pointer-events-none absolute inset-0 rounded-[22%] border"
+				className="pointer-events-none absolute inset-0"
 				initial={false}
 				animate={
 					drop.over
 						? {
-								borderColor: "var(--ak-accent)",
-								backgroundColor:
-									"color-mix(in srgb, var(--ak-accent) 20%, var(--ak-surface-raised))",
-								scale: 1.035,
+								backgroundColor: "var(--ak-tile-grid-slot-hover-surface)",
+								boxShadow: "inset 0 0 0 2px var(--ak-tile-grid-slot-hover-ring)",
+								opacity: 1,
 							}
 						: {
-								borderColor: "color-mix(in srgb, var(--ak-line) 60%, transparent)",
-								backgroundColor:
-									"color-mix(in srgb, var(--ak-surface-raised) 45%, transparent)",
-								scale: 1,
+								backgroundColor: "transparent",
+								boxShadow: "inset 0 0 0 0 transparent",
+								opacity: 0,
 							}
 				}
 				transition={{

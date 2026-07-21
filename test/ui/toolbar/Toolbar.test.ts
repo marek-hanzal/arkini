@@ -161,6 +161,8 @@ describe("Toolbar", () => {
 		expect(html).toContain('data-ui="ToolbarFrame" data-tile-grid-frame="true"');
 		expect(html).toContain('data-ui="ToolbarGrid" data-tile-grid="true"');
 		expect(html).toContain('data-tile-surface="toolbar"');
+		expect(html).toContain('data-tile-slot-tone="a"');
+		expect(html).toContain('data-tile-slot-tone="b"');
 		expect(html).toContain('data-toolbar-x="1"');
 		expect(html).toContain('data-location-scope="toolbar"');
 		expect(html).toContain('data-item-id="water"');

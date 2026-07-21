@@ -42,7 +42,7 @@ export const TileGridFrame = ({
 
 	return (
 		<div
-			className="size-full rounded-[clamp(0.75rem,2.5vmin,1.75rem)] border border-line bg-surface/75"
+			className="size-full rounded-[var(--ak-tile-grid-frame-radius)] border border-line bg-surface/75"
 			data-ui={frameUi}
 			data-tile-grid-frame="true"
 		>

@@ -189,6 +189,18 @@ const publishRuntime = async (next: typeof runtime) => {
 };
 
 describe("Board geometry identity", () => {
+	it("renders one stable coordinate-derived checker pattern", async () => {
+		await renderBoard();
+		const cells = Array.from(document.querySelectorAll<HTMLElement>('[data-ui="BoardCell"]'));
+
+		expect(cells.map((cell) => cell.dataset.tileSlotTone)).toEqual([
+			"a",
+			"b",
+			"b",
+			"a",
+		]);
+	});
+
 	it("publishes geometry only for changed surface or occupant identity", async () => {
 		const readSystem = await renderBoard();
 		const initialVersion = readSystem().geometryVersion;

@@ -23,6 +23,14 @@
 	--background-image-game-shell: var(--ak-game-shell-background);
 	--shadow-board-surface: var(--ak-board-surface-shadow);
 	--shadow-toolbar-surface: var(--ak-toolbar-surface-shadow);
+	--radius-xs: var(--ak-radius-xs);
+	--radius-sm: var(--ak-radius-sm);
+	--radius-md: var(--ak-radius-md);
+	--radius-lg: var(--ak-radius-lg);
+	--radius-xl: var(--ak-radius-xl);
+	--radius-2xl: var(--ak-radius-2xl);
+	--radius-3xl: var(--ak-radius-3xl);
+	--radius-4xl: var(--ak-radius-4xl);
 }
 
 :root {
@@ -51,6 +59,17 @@
 	--ak-overlay: light-dark(#1a1124, #090611);
 	--ak-overlay-foreground: light-dark(#fff9ff, #fff9ff);
 
+	--ak-radius-xs: 0.0625rem;
+	--ak-radius-sm: 0.125rem;
+	--ak-radius-md: 0.1875rem;
+	--ak-radius-lg: 0.25rem;
+	--ak-radius-xl: 0.375rem;
+	--ak-radius-2xl: 0.5rem;
+	--ak-radius-3xl: 0.75rem;
+	--ak-radius-4xl: 1rem;
+	--ak-tile-grid-frame-radius: var(--ak-radius-2xl);
+	--ak-tile-actor-radius: 10%;
+
 	--ak-scrollbar-size: 0.625rem;
 	--ak-scrollbar-track: light-dark(
 		color-mix(in srgb, var(--ak-surface-raised) 72%, transparent),
@@ -73,6 +92,23 @@
 		color-mix(in srgb, var(--ak-line) 58%, transparent)
 	);
 	--ak-scrollbar-corner: var(--ak-scrollbar-track);
+
+	--ak-tile-grid-slot-surface-a: light-dark(
+		color-mix(in srgb, var(--ak-surface) 92%, var(--ak-surface-raised)),
+		color-mix(in srgb, var(--ak-surface) 90%, var(--ak-surface-raised))
+	);
+	--ak-tile-grid-slot-surface-b: light-dark(
+		color-mix(in srgb, var(--ak-surface-raised) 34%, var(--ak-surface)),
+		color-mix(in srgb, var(--ak-surface-raised) 28%, var(--ak-surface))
+	);
+	--ak-tile-grid-slot-hover-surface: light-dark(
+		color-mix(in srgb, var(--ak-accent) 14%, var(--ak-surface-raised)),
+		color-mix(in srgb, var(--ak-accent) 18%, var(--ak-surface-raised))
+	);
+	--ak-tile-grid-slot-hover-ring: light-dark(
+		color-mix(in srgb, var(--ak-accent) 76%, var(--ak-line-strong)),
+		color-mix(in srgb, var(--ak-accent) 82%, var(--ak-line-strong))
+	);
 
 	--ak-list-row-surface-a: light-dark(
 		color-mix(in srgb, var(--ak-surface) 92%, var(--ak-surface-raised)),
@@ -548,13 +584,21 @@ select {
 
 /* The Toolbar scroll owner carries its depth so the frame shadow is not clipped vertically. */
 [data-ui="Toolbar"] {
-	border-radius: clamp(0.75rem, 2.5vmin, 1.75rem);
+	border-radius: var(--ak-tile-grid-frame-radius);
 	box-shadow: var(--ak-toolbar-surface-shadow);
 }
 
 [data-tile-grid="true"] {
-	gap: clamp(1px, 0.45vmin, 6px);
-	padding: clamp(2px, 0.55vmin, 7px);
+	gap: 0;
+	padding: 0;
+}
+
+[data-tile-slot-tone="a"] {
+	background: var(--ak-tile-grid-slot-surface-a);
+}
+
+[data-tile-slot-tone="b"] {
+	background: var(--ak-tile-grid-slot-surface-b);
 }
 
 [data-ui="ToolbarTrack"] {

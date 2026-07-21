@@ -119,7 +119,7 @@ export const TileActorContent = ({
 	onAnimationComplete,
 }: TileActorContent.Props) => (
 	<motion.span
-		className="absolute inset-0 isolate overflow-hidden rounded-[22%] bg-transparent"
+		className="absolute inset-0 isolate overflow-hidden rounded-[var(--ak-tile-actor-radius)] bg-transparent"
 		data-ui="TileActorVisual"
 		data-motion-phase={phase}
 		initial={false}

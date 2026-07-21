@@ -823,5 +823,25 @@ describe("ItemDetailModal", () => {
 		expect(
 			document.querySelector<HTMLButtonElement>('[data-ui="TileLineStartButton"]')?.disabled,
 		).toBe(true);
+
+		const staleSearch = document.querySelector<HTMLInputElement>(
+			'[aria-label="Search visible lines"]',
+		);
+		if (staleSearch === null) throw new Error("Missing retained Lines search input.");
+		expect(staleSearch.disabled).toBe(false);
+		const staleValueSetter = Object.getOwnPropertyDescriptor(
+			HTMLInputElement.prototype,
+			"value",
+		)?.set;
+		if (staleValueSetter === undefined) throw new Error("Expected native input value setter.");
+		await act(async () => {
+			staleValueSetter.call(staleSearch, "definitely-no-line");
+			staleSearch.dispatchEvent(
+				new Event("input", {
+					bubbles: true,
+				}),
+			);
+		});
+		expect(document.querySelector('[data-ui="ItemLinesSearchEmpty"]')).not.toBeNull();
 	});
 });

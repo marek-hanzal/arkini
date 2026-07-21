@@ -75,6 +75,7 @@ describe("TileGridFrame", () => {
 		);
 
 		for (const surface of surfaces) {
+			expect(html).toContain(`data-tile-grid-surface="${surface.kind}"`);
 			expect(html).toContain(`data-tile-surface="${surface.kind}"`);
 		}
 		expect([

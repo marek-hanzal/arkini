@@ -94,12 +94,12 @@
 	--ak-scrollbar-corner: var(--ak-scrollbar-track);
 
 	--ak-tile-grid-slot-surface-a: light-dark(
-		color-mix(in srgb, var(--ak-surface) 92%, var(--ak-surface-raised)),
-		color-mix(in srgb, var(--ak-surface) 90%, var(--ak-surface-raised))
+		color-mix(in srgb, var(--ak-surface) 96%, var(--ak-surface-raised)),
+		color-mix(in srgb, var(--ak-surface) 96%, var(--ak-surface-raised))
 	);
 	--ak-tile-grid-slot-surface-b: light-dark(
-		color-mix(in srgb, var(--ak-surface-raised) 34%, var(--ak-surface)),
-		color-mix(in srgb, var(--ak-surface-raised) 28%, var(--ak-surface))
+		color-mix(in srgb, var(--ak-surface-raised) 68%, var(--ak-surface)),
+		color-mix(in srgb, var(--ak-surface-raised) 68%, var(--ak-surface))
 	);
 	--ak-tile-grid-slot-hover-surface: light-dark(
 		color-mix(in srgb, var(--ak-accent) 14%, var(--ak-surface-raised)),
@@ -108,6 +108,28 @@
 	--ak-tile-grid-slot-hover-ring: light-dark(
 		color-mix(in srgb, var(--ak-accent) 76%, var(--ak-line-strong)),
 		color-mix(in srgb, var(--ak-accent) 82%, var(--ak-line-strong))
+	);
+
+	--ak-toolbar-grid-hue: color-mix(in srgb, var(--ak-info) 52%, var(--ak-accent));
+	--ak-toolbar-grid-frame-surface: color-mix(
+		in srgb,
+		var(--ak-toolbar-grid-hue) 8%,
+		var(--ak-surface)
+	);
+	--ak-toolbar-grid-frame-border: color-mix(
+		in srgb,
+		var(--ak-toolbar-grid-hue) 30%,
+		var(--ak-line)
+	);
+	--ak-toolbar-grid-slot-surface-a: color-mix(
+		in srgb,
+		var(--ak-toolbar-grid-hue) 6%,
+		var(--ak-surface)
+	);
+	--ak-toolbar-grid-slot-surface-b: color-mix(
+		in srgb,
+		var(--ak-toolbar-grid-hue) 13%,
+		var(--ak-surface)
 	);
 
 	--ak-list-row-surface-a: light-dark(
@@ -599,6 +621,19 @@ select {
 
 [data-tile-slot-tone="b"] {
 	background: var(--ak-tile-grid-slot-surface-b);
+}
+
+[data-tile-grid-surface="toolbar"] {
+	border-color: var(--ak-toolbar-grid-frame-border);
+	background: var(--ak-toolbar-grid-frame-surface);
+}
+
+[data-tile-surface="toolbar"] [data-tile-slot-tone="a"] {
+	background: var(--ak-toolbar-grid-slot-surface-a);
+}
+
+[data-tile-surface="toolbar"] [data-tile-slot-tone="b"] {
+	background: var(--ak-toolbar-grid-slot-surface-b);
 }
 
 [data-ui="ToolbarTrack"] {

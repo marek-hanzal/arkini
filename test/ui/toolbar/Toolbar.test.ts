@@ -159,6 +159,7 @@ describe("Toolbar", () => {
 		expect(html).toContain('data-toolbar-enabled="true"');
 		expect(html).toContain('data-ui="BoardFrame" data-tile-grid-frame="true"');
 		expect(html).toContain('data-ui="ToolbarFrame" data-tile-grid-frame="true"');
+		expect(html).toContain('data-tile-grid-surface="toolbar"');
 		expect(html).toContain('data-ui="ToolbarGrid" data-tile-grid="true"');
 		expect(html).toContain('data-tile-surface="toolbar"');
 		expect(html).toContain('data-tile-slot-tone="a"');

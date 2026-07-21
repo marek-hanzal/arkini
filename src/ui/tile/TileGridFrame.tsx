@@ -45,6 +45,7 @@ export const TileGridFrame = ({
 			className="size-full rounded-[var(--ak-tile-grid-frame-radius)] border border-line bg-surface/75"
 			data-ui={frameUi}
 			data-tile-grid-frame="true"
+			data-tile-grid-surface={surface.kind}
 		>
 			<div
 				ref={surfaceRef}

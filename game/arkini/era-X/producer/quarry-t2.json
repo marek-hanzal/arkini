@@ -46,7 +46,7 @@
 									"type": "exists",
 									"query": {
 										"scope": "board",
-										"distance": "near",
+										"distance": "close",
 										"selector": {
 											"type": "item",
 											"itemId": "item:marble-deposit"
@@ -110,7 +110,7 @@
 									"type": "exists",
 									"query": {
 										"scope": "board",
-										"distance": "near",
+										"distance": "close",
 										"selector": {
 											"type": "item",
 											"itemId": "item:marble-deposit"

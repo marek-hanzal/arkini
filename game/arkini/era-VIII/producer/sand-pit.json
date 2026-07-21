@@ -45,7 +45,7 @@
 									"type": "exists",
 									"query": {
 										"scope": "board",
-										"distance": "near",
+										"distance": "close",
 										"selector": {
 											"type": "item",
 											"itemId": "item:sand-deposit"

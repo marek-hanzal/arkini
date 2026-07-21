@@ -106,7 +106,7 @@
 									"type": "exists",
 									"query": {
 										"scope": "board",
-										"distance": "near",
+										"distance": "close",
 										"selector": {
 											"type": "item",
 											"itemId": "producer:glassworks"
@@ -257,7 +257,7 @@
 									"type": "exists",
 									"query": {
 										"scope": "board",
-										"distance": "near",
+										"distance": "close",
 										"selector": {
 											"type": "item",
 											"itemId": "producer:glassworks"

@@ -51,7 +51,7 @@
 									"type": "exists",
 									"query": {
 										"scope": "board",
-										"distance": "near",
+										"distance": "close",
 										"selector": {
 											"type": "item",
 											"itemId": "item:hop-field"
@@ -148,7 +148,7 @@
 									"type": "exists",
 									"query": {
 										"scope": "board",
-										"distance": "near",
+										"distance": "close",
 										"selector": {
 											"type": "item",
 											"itemId": "item:hop-field"
@@ -219,7 +219,7 @@
 									"type": "exists",
 									"query": {
 										"scope": "board",
-										"distance": "near",
+										"distance": "close",
 										"selector": {
 											"type": "item",
 											"itemId": "item:hop-field"

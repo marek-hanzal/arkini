@@ -8,12 +8,14 @@ import { useItemDetailIdentity } from "~/bridge/item-detail/useItemDetailIdentit
 import { useItemDetailInfo } from "~/bridge/item-detail/useItemDetailInfo";
 import { useItemDetailLines } from "~/bridge/item-detail/useItemDetailLines";
 import { useItemDetailQueue } from "~/bridge/item-detail/useItemDetailQueue";
+import { useItemDetailSources } from "~/bridge/item-detail/useItemDetailSources";
 import { useItemDetailTabs } from "~/bridge/item-detail/useItemDetailTabs";
 import { ItemDefinitionInfoTab } from "~/ui/item-detail/ItemDefinitionInfoTab";
 import type { ItemDetailState, ItemDetailTarget } from "~/ui/item-detail/ItemDetailControl";
 import { ItemInfoTab } from "~/ui/item-detail/ItemInfoTab";
 import { ItemLinesTab } from "~/ui/item-detail/ItemLinesTab";
 import { ItemQueueTab } from "~/ui/item-detail/ItemQueueTab";
+import { ItemSourcesTab } from "~/ui/item-detail/ItemSourcesTab";
 import { useItemDetailControl } from "~/ui/item-detail/useItemDetailControl";
 import { useItemDetailFocus } from "~/ui/item-detail/useItemDetailFocus";
 import { useItemDetailMotion } from "~/ui/item-detail/useItemDetailMotion";
@@ -33,6 +35,7 @@ const tabLabel = {
 	info: "Info",
 	lines: "Lines",
 	queue: "Queue",
+	sources: "Sources",
 } as const satisfies Record<ItemDetailTab, string>;
 
 interface HeaderIdentity {
@@ -255,15 +258,39 @@ const ItemQueueContent = ({
 	);
 };
 
+const ItemSourcesContent = ({
+	disabled,
+	sources,
+}: {
+	readonly disabled: boolean;
+	readonly sources?: useItemDetailSources.Projection;
+}) => {
+	if (sources?.kind !== "available" || sources.source.length === 0) {
+		return (
+			<div className="grid flex-1 place-items-center text-sm text-muted">
+				Source detail is unavailable.
+			</div>
+		);
+	}
+	return (
+		<ItemSourcesTab
+			disabled={disabled}
+			sources={sources}
+		/>
+	);
+};
+
 const ItemDetailContent = ({
 	disabled,
 	itemId,
 	lines,
+	sources,
 	tab,
 }: {
 	readonly disabled: boolean;
 	readonly itemId: string;
 	readonly lines?: useItemDetailLines.Projection;
+	readonly sources?: useItemDetailSources.Projection;
 	readonly tab: ItemDetailTab;
 }) =>
 	match(tab)
@@ -285,6 +312,12 @@ const ItemDetailContent = ({
 				itemId={itemId}
 			/>
 		))
+		.with("sources", () => (
+			<ItemSourcesContent
+				disabled={disabled}
+				sources={sources}
+			/>
+		))
 		.exhaustive();
 
 const RuntimeItemDetailScene = ({
@@ -302,7 +335,8 @@ const RuntimeItemDetailScene = ({
 	const itemDetail = useItemDetailControl();
 	const liveIdentity = useItemDetailIdentity(target.itemId);
 	const liveLines = useItemDetailLines(target.itemId);
-	const liveTabs = useItemDetailTabs(target.itemId);
+	const liveSources = useItemDetailSources(target.itemId);
+	const liveTabs = useItemDetailTabs(target.itemId, liveSources);
 	const retainedIdentity = useRetainedItemDetailProjection({
 		available: liveIdentity.kind === "available",
 		targetKey: `runtime:${target.itemId}`,
@@ -318,8 +352,14 @@ const RuntimeItemDetailScene = ({
 		targetKey: `runtime:${target.itemId}`,
 		value: liveLines,
 	});
+	const retainedSources = useRetainedItemDetailProjection({
+		available: liveSources.kind === "available",
+		targetKey: `runtime:${target.itemId}`,
+		value: liveSources,
+	});
 	const identity = retainedIdentity.value;
 	const lines = retainedLines.value;
+	const sources = retainedSources.value;
 	const tabs = retainedTabs.value ?? [];
 	const stale = retainedIdentity.stale || retainedTabs.stale;
 	const lineCount = lines?.kind === "available" ? lines.line.length : undefined;
@@ -381,6 +421,7 @@ const RuntimeItemDetailScene = ({
 					disabled={stale || disabled}
 					itemId={target.itemId}
 					lines={lines}
+					sources={sources}
 					tab={target.tab}
 				/>
 			</div>

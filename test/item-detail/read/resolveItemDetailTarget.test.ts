@@ -4,12 +4,32 @@ import { readItemDetailTabs } from "~/engine/item-detail/read/readItemDetailTabs
 import { resolveItemDetailTarget } from "~/engine/item-detail/read/resolveItemDetailTarget";
 import { lineRunRuntime, lineRunTestConfig } from "~test/line/fx/run/support/lineRunTestRuntime";
 
+const sourceProjection = {
+	kind: "available",
+	itemId: "runtime:workshop",
+	targetDefinitionItemId: "water",
+	source: [
+		{
+			ownerItemId: "runtime:source",
+			ownerDefinitionItemId: "workshop",
+			space: 0,
+			line: [],
+		},
+	],
+} as const;
+
 describe("resolveItemDetailTarget", () => {
 	it("exposes one finite authoritative tab set and validates requested tabs", () => {
 		const runtime = lineRunRuntime({});
 		expect(readItemDetailTabs(runtime.items[0])).toEqual([
 			"lines",
 			"queue",
+			"info",
+		]);
+		expect(readItemDetailTabs(runtime.items[0], sourceProjection)).toEqual([
+			"lines",
+			"queue",
+			"sources",
 			"info",
 		]);
 		expect(
@@ -32,6 +52,18 @@ describe("resolveItemDetailTarget", () => {
 			kind: "available",
 			itemId: "runtime:workshop",
 			tab: "queue",
+		});
+		expect(
+			resolveItemDetailTarget({
+				itemId: "runtime:workshop",
+				requestedTab: "sources",
+				runtime,
+				sources: sourceProjection,
+			}),
+		).toMatchObject({
+			kind: "available",
+			itemId: "runtime:workshop",
+			tab: "sources",
 		});
 	});
 

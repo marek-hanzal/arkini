@@ -6,6 +6,7 @@ export const ItemDetailTabEnumSchema = z
 		"info",
 		"lines",
 		"queue",
+		"sources",
 	])
 	.meta({
 		id: "ItemDetailTabEnumSchema",

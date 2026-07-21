@@ -1,5 +1,6 @@
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { readItemDetailTabs } from "~/engine/item-detail/read/readItemDetailTabs";
+import type { readItemDetailSourcesFx } from "~/engine/item-detail/read/readItemDetailSourcesFx";
 import type { ItemDetailTabEnumSchema } from "~/engine/item-detail/schema/ItemDetailTabEnumSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
@@ -8,6 +9,7 @@ export namespace resolveItemDetailTarget {
 		readonly itemId: IdSchema.Type;
 		readonly requestedTab?: ItemDetailTabEnumSchema.Type;
 		readonly runtime: RuntimeSchema.Type;
+		readonly sources?: readItemDetailSourcesFx.Result;
 	}
 
 	export type Result =
@@ -31,9 +33,10 @@ export const resolveItemDetailTarget = ({
 	itemId,
 	requestedTab,
 	runtime,
+	sources,
 }: resolveItemDetailTarget.Props): resolveItemDetailTarget.Result => {
 	const item = runtime.items.find((candidate) => candidate.id === itemId);
-	const tabs = readItemDetailTabs(item);
+	const tabs = readItemDetailTabs(item, sources);
 	if (item === undefined || tabs.length === 0) return unavailable;
 	const defaultTab = tabs[0];
 	const fallback =

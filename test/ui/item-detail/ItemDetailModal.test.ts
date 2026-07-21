@@ -594,6 +594,137 @@ describe("ItemDetailModal", () => {
 		expect(document.body.textContent).not.toContain("Enqueue");
 	});
 
+	it("shows exact owned sources and hands off through the stable modal shell", async () => {
+		const { readControl } = await renderItemDetail();
+		const owner = currentRuntime.items.find((item) => item.item.id === "workshop");
+		const target = currentRuntime.items.find((item) => item.item.id === "water");
+		if (owner === undefined || target === undefined)
+			throw new Error("Missing source fixtures.");
+
+		await act(async () => {
+			readControl().openItemDetail({
+				itemId: target.id,
+			});
+			await Promise.resolve();
+			await Promise.resolve();
+		});
+
+		const modal = document.querySelector<HTMLElement>('[data-ui="ItemDetailModal"]');
+		if (modal === null) throw new Error("Missing Item Detail modal.");
+		expect(modal.dataset.tab).toBe("sources");
+		expect(
+			Array.from(
+				document.querySelectorAll<HTMLElement>('[data-ui="ItemDetailTabs"] button'),
+			).map((tab) => tab.dataset.tab),
+		).toEqual([
+			"sources",
+			"info",
+		]);
+		expect(document.querySelector('[data-ui="ItemSource"]')?.textContent).toContain("Workshop");
+		expect(document.querySelector('[data-ui="ItemSource"]')?.textContent).toContain("Space 1");
+		expect(document.querySelector('[data-ui="ItemSourceLine"]')?.textContent).toContain(
+			"Water · 1× guaranteed",
+		);
+
+		const openLines = Array.from(document.querySelectorAll<HTMLButtonElement>("button")).find(
+			(button) => button.textContent === "Open Lines",
+		);
+		if (openLines === undefined) throw new Error("Missing Open Lines action.");
+		await act(async () => {
+			openLines.click();
+			await Promise.resolve();
+		});
+
+		expect(document.querySelector('[data-ui="ItemDetailModal"]')).toBe(modal);
+		expect(readControl().state).toMatchObject({
+			phase: "open",
+			target: {
+				kind: "runtime",
+				itemId: owner.id,
+				tab: "lines",
+			},
+		});
+		expect(document.querySelector('[data-ui="ItemLinesTab"]')).not.toBeNull();
+	});
+
+	it("removes Sources live when the last exact Board source disappears", async () => {
+		const { readControl } = await renderItemDetail();
+		const owner = currentRuntime.items.find((item) => item.item.id === "workshop");
+		const target = currentRuntime.items.find((item) => item.item.id === "water");
+		if (owner === undefined || target === undefined)
+			throw new Error("Missing source fixtures.");
+
+		await act(async () => {
+			readControl().openItemDetail({
+				itemId: target.id,
+				tab: "sources",
+			});
+			await Promise.resolve();
+			await Promise.resolve();
+		});
+		const modal = document.querySelector<HTMLElement>('[data-ui="ItemDetailModal"]');
+		if (modal === null) throw new Error("Missing Item Detail modal.");
+
+		await act(async () => {
+			publishRuntime(
+				RuntimeSchema.parse({
+					...currentRuntime,
+					items: currentRuntime.items.filter((item) => item.id !== owner.id),
+				}),
+			);
+			await Promise.resolve();
+			await Promise.resolve();
+		});
+
+		expect(document.querySelector('[data-ui="ItemDetailModal"]')).toBe(modal);
+		expect(modal.dataset.tab).toBe("info");
+		expect(document.querySelector('[data-ui="ItemSource"]')).toBeNull();
+		expect(
+			Array.from(
+				document.querySelectorAll<HTMLElement>('[data-ui="ItemDetailTabs"] button'),
+			).map((tab) => tab.dataset.tab),
+		).toEqual([
+			"info",
+		]);
+	});
+
+	it("retains stale Sources content read-only when the inspected target disappears", async () => {
+		const { readControl } = await renderItemDetail();
+		const target = currentRuntime.items.find((item) => item.item.id === "water");
+		if (target === undefined) throw new Error("Missing target fixture.");
+
+		await act(async () => {
+			readControl().openItemDetail({
+				itemId: target.id,
+				tab: "sources",
+			});
+			await Promise.resolve();
+			await Promise.resolve();
+		});
+		expect(document.querySelector('[data-ui="ItemSource"]')).not.toBeNull();
+
+		await act(async () => {
+			publishRuntime(
+				RuntimeSchema.parse({
+					...currentRuntime,
+					items: currentRuntime.items.filter((item) => item.id !== target.id),
+				}),
+			);
+			await Promise.resolve();
+			await Promise.resolve();
+		});
+
+		expect(document.querySelector('[data-ui="ItemSource"]')).not.toBeNull();
+		const openLines = Array.from(document.querySelectorAll<HTMLButtonElement>("button")).find(
+			(button) => button.textContent === "Open Lines",
+		);
+		expect(openLines?.disabled).toBe(true);
+		expect(
+			document.querySelector<HTMLElement>('[data-ui="ItemDetailContentScene"]')?.dataset
+				.stale,
+		).toBe("true");
+	});
+
 	it("restores focus only to a still-focusable exact origin", async () => {
 		const { readControl } = await renderItemDetail();
 		const owner = currentRuntime.items.find((item) => item.item.id === "workshop");

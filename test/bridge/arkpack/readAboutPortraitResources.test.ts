@@ -8,7 +8,16 @@ const makePayload = ({
 	roles,
 }: {
 	readonly roles: Partial<
-		Record<"avatar-01" | "avatar-02" | "avatar-03" | "avatar-04" | "avatar-05", string>
+		Record<
+			| "avatar-01"
+			| "avatar-02"
+			| "avatar-03"
+			| "avatar-04"
+			| "avatar-05"
+			| "avatar-06"
+			| "avatar-07",
+			string
+		>
 	>;
 }): PayloadSchema.Type => ({
 	config: GameConfigSchema.parse({
@@ -42,6 +51,8 @@ const makePayload = ({
 		"avatar:three",
 		"avatar:four",
 		"avatar:five",
+		"avatar:six",
+		"avatar:seven",
 	].map((id) => ({
 		id,
 		mime: "image/png",
@@ -60,6 +71,8 @@ describe("readAboutPortraitResources", () => {
 				"avatar-03": "avatar:two",
 				"avatar-04": "avatar:five",
 				"avatar-05": "avatar:four",
+				"avatar-06": "avatar:seven",
+				"avatar-07": "avatar:six",
 			},
 		});
 		expect(readAboutPortraitResources(payload).map(({ id }) => id)).toEqual([
@@ -68,6 +81,8 @@ describe("readAboutPortraitResources", () => {
 			"avatar:two",
 			"avatar:five",
 			"avatar:four",
+			"avatar:seven",
+			"avatar:six",
 		]);
 	});
 

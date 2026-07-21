@@ -63,6 +63,8 @@ export const validateGameResourcesFx = Effect.fn("validateGameResourcesFx")(func
 		"avatar-03",
 		"avatar-04",
 		"avatar-05",
+		"avatar-06",
+		"avatar-07",
 	] as const) {
 		const id = config.resources[role];
 		if (id === undefined) continue;

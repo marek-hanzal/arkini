@@ -82,6 +82,8 @@ describe("validateGameResourcesFx", () => {
 						"avatar-03",
 						"avatar-04",
 						"avatar-05",
+						"avatar-06",
+						"avatar-07",
 					].includes(diagnostic.resourceId),
 			),
 		).toBe(false);

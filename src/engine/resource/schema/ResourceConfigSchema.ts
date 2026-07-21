@@ -16,6 +16,8 @@ export const ResourceConfigSchema = z
 		"avatar-03": IdSchema.optional(),
 		"avatar-04": IdSchema.optional(),
 		"avatar-05": IdSchema.optional(),
+		"avatar-06": IdSchema.optional(),
+		"avatar-07": IdSchema.optional(),
 	})
 	.strict()
 	.meta({

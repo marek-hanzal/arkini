@@ -7,6 +7,8 @@ const avatarRoles = [
 	"avatar-03",
 	"avatar-04",
 	"avatar-05",
+	"avatar-06",
+	"avatar-07",
 ] as const;
 
 /** Reads configured About avatar resources in stable anonymous package-role order. */

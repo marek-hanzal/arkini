@@ -130,13 +130,15 @@ describe("About", () => {
 			),
 		).toBe(true);
 	});
-	it("mounts all five package avatars into the shared falling and corner portrait pool", async () => {
+	it("mounts all seven package avatars into the shared falling and corner portrait pool", async () => {
 		portraitState.urls = [
 			"avatar:one",
 			"avatar:two",
 			"avatar:three",
 			"avatar:four",
 			"avatar:five",
+			"avatar:six",
+			"avatar:seven",
 		];
 		const rootRoute = createRootRoute({
 			component: AboutPage,
@@ -164,7 +166,7 @@ describe("About", () => {
 
 		expect(container.querySelectorAll('[data-ui="FallingPortrait"]')).toHaveLength(8);
 		expect(container.querySelectorAll('[data-ui="CornerPortraitPeekPortrait"]')).toHaveLength(
-			20,
+			28,
 		);
 		const imageSources = Array.from(container.querySelectorAll<HTMLImageElement>("img")).map(
 			(image) => image.src,

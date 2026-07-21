@@ -509,7 +509,7 @@ export const readItemDetailLinesFx = Effect.fn("readItemDetailLinesFx")(function
 								? "inputs"
 								: "queue",
 					},
-			startMode: ownerHasWork ? "enqueue" : "start",
+			startMode: ownerHasWork && start.queue.capacity > 1 ? "enqueue" : "start",
 			actions: {
 				canAutofill: autofillPlan.entry.length > 0,
 				canWithdraw,

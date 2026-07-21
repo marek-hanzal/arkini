@@ -371,6 +371,55 @@ describe("ItemDetailModal", () => {
 		);
 	});
 
+	it("keeps an occupied single-slot line labeled Start and disables it", async () => {
+		const { readControl } = await renderItemDetail();
+		const owner = currentRuntime.items.find((item) => item.item.id === "workshop");
+		if (owner === undefined || owner.item.type !== "producer")
+			throw new Error("Missing Workshop producer runtime item.");
+
+		await act(async () => {
+			publishRuntime(
+				RuntimeSchema.parse({
+					...currentRuntime,
+					items: currentRuntime.items.map((item) =>
+						item.id === owner.id && item.item.type === "producer"
+							? {
+									...item,
+									item: {
+										...item.item,
+										maxQueueSize: 1,
+									},
+								}
+							: item,
+					),
+					jobs: [
+						{
+							id: "job:workshop",
+							ownerItemId: owner.id,
+							lineId: "line:workshop:water",
+							durationMs: 1_000,
+							remainingMs: 400,
+						},
+					],
+				}),
+			);
+			readControl().openItemDetail({
+				itemId: owner.id,
+			});
+			await Promise.resolve();
+			await Promise.resolve();
+		});
+
+		const startButton = document.querySelector<HTMLButtonElement>(
+			'[data-ui="TileLineStartButton"]',
+		);
+		if (startButton === null) throw new Error("Missing line Start button.");
+		expect(startButton.dataset.startMode).toBe("start");
+		expect(startButton.textContent).toBe("Start");
+		expect(startButton.disabled).toBe(true);
+		expect(document.body.textContent).not.toContain("Enqueue");
+	});
+
 	it("restores focus only to a still-focusable exact origin", async () => {
 		const { readControl } = await renderItemDetail();
 		const owner = currentRuntime.items.find((item) => item.item.id === "workshop");

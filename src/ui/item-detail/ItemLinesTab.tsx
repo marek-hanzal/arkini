@@ -409,6 +409,8 @@ const LineRow = ({
 						<PrimaryButton
 							className="min-w-24"
 							cursorIntent={pendingAction === "start" ? "progress" : undefined}
+							data-ui="TileLineStartButton"
+							data-start-mode={line.startMode}
 							disabled={line.availability.kind !== "ready" || pendingAction !== null}
 							onClick={() =>
 								runAction({

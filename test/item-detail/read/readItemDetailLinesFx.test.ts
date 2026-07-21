@@ -173,6 +173,50 @@ describe("readItemDetailLinesFx", () => {
 		expect(ready.line[0]?.activeJob?.status).toBe("ready");
 	});
 
+	it("keeps single-slot owners on a disabled Start action while work is active", () => {
+		const base = lineRunRuntime({
+			permit: true,
+			water: [
+				2,
+				1,
+			],
+		});
+		const runtime = {
+			...base,
+			items: base.items.map((item) =>
+				item.id === "runtime:workshop" && item.item.type === "producer"
+					? {
+							...item,
+							item: {
+								...item.item,
+								maxQueueSize: 1,
+							},
+						}
+					: item,
+			),
+			jobs: [
+				{
+					id: "job:workshop",
+					ownerItemId: "runtime:workshop",
+					lineId: "line:workshop:build",
+					durationMs: 1_000,
+					remainingMs: 400,
+				},
+			],
+		} satisfies RuntimeSchema.Type;
+
+		const lines = readLines(runtime);
+		expect(lines.kind).toBe("available");
+		if (lines.kind !== "available") throw new Error("Expected available lines.");
+		expect(lines.line[0]).toMatchObject({
+			availability: {
+				kind: "blocked",
+				reason: "queue",
+			},
+			startMode: "start",
+		});
+	});
+
 	it("groups duplicate drops without flattening guaranteed and chance rolls", () => {
 		const config = GameConfigSchema.parse({
 			version: "1.0",

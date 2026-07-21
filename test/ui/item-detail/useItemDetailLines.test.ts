@@ -99,6 +99,27 @@ const config = GameConfigSchema.parse({
 							mode: "consume",
 						},
 					],
+					output: {
+						set: [
+							{
+								roll: [
+									{
+										type: "guaranteed",
+										drop: [
+											{
+												itemId: "material",
+												quantity: {
+													type: "value",
+													value: 1,
+												},
+												rules: [],
+											},
+										],
+									},
+								],
+							},
+						],
+					},
 					rules: [],
 				},
 			],
@@ -117,7 +138,7 @@ const config = GameConfigSchema.parse({
 				"fuel",
 			],
 			categoryId: "resource",
-			scope: "board",
+			scope: "any",
 			maxStackSize: 10,
 		},
 	},
@@ -158,6 +179,24 @@ if (sourceItem === undefined) throw new Error("Missing source material.");
 const withSource = {
 	...withoutSource,
 	items: [
+		...withoutSource.items,
+		sourceItem,
+	],
+} satisfies RuntimeSchema.Type;
+const withTwoSources = {
+	...withoutSource,
+	items: [
+		{
+			...sourceItem,
+			id: "runtime:material:inventory",
+			location: {
+				scope: "inventory",
+				position: {
+					x: 0,
+					y: 0,
+				},
+			},
+		},
 		...withoutSource.items,
 		sourceItem,
 	],
@@ -204,10 +243,15 @@ const roots: Array<ReturnType<typeof createRoot>> = [];
 
 const Probe = ({ itemId }: { readonly itemId: string }) => {
 	const projection = useItemDetailLines(itemId);
-	const canAutofill =
-		projection.kind === "available" ? projection.line[0]?.actions.canAutofill : undefined;
+	const line = projection.kind === "available" ? projection.line[0] : undefined;
+	const canAutofill = line?.actions.canAutofill;
+	const roll = line?.output[0]?.roll[0];
+	const outputItem = roll?.kind === "guaranteed" ? roll.item[0] : undefined;
 	return createElement("output", {
 		"data-can-autofill": String(canAutofill),
+		"data-output-has-runtime-target": String(
+			outputItem !== undefined && Object.hasOwn(outputItem, "detailItemId"),
+		),
 	});
 };
 
@@ -242,11 +286,17 @@ describe("useItemDetailLines", () => {
 		});
 		const output = container.querySelector("output");
 		expect(output?.dataset.canAutofill).toBe("false");
+		expect(output?.dataset.outputHasRuntimeTarget).toBe("false");
 
 		await act(async () => publishRuntime(withSource));
 		expect(output?.dataset.canAutofill).toBe("true");
+		expect(output?.dataset.outputHasRuntimeTarget).toBe("false");
+
+		await act(async () => publishRuntime(withTwoSources));
+		expect(output?.dataset.outputHasRuntimeTarget).toBe("false");
 
 		await act(async () => publishRuntime(withoutSource));
 		expect(output?.dataset.canAutofill).toBe("false");
+		expect(output?.dataset.outputHasRuntimeTarget).toBe("false");
 	});
 });

@@ -5,7 +5,6 @@ import { useGameEngine } from "~/bridge/game/useGameEngine";
 import { useRuntimeSelector } from "~/bridge/runtime/useRuntimeSelector";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { readRuntimeItemPrimaryAssetId } from "~/engine/item/read/readRuntimeItemPrimaryAssetId";
-import { isGridRuntimeItem } from "~/engine/runtime/read/isGridRuntimeItem";
 import type { InputChargeFromEnumSchema } from "~/engine/input/schema/InputChargeFromEnumSchema";
 import type { InputModeEnumSchema } from "~/engine/input/schema/InputModeEnumSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
@@ -74,7 +73,6 @@ export namespace useItemDetailLines {
 		readonly quantity: QuantityBounds;
 		readonly sourceUrl?: string;
 		readonly compositeUrl?: string;
-		readonly detailItemId?: string;
 		readonly definitionItemId?: string;
 	}
 
@@ -182,7 +180,7 @@ const mapDetailReference = ({
 	const preferred = preferredRuntimeItemIds
 		.map((runtimeItemId) => runtime.items.find((candidate) => candidate.id === runtimeItemId))
 		.find((candidate) => candidate?.item.id === itemId);
-	const live = preferred ?? runtime.items.find((candidate) => candidate.item.id === itemId);
+	const live = preferred;
 	return {
 		itemId,
 		title: configured.title,
@@ -210,9 +208,6 @@ const mapOutputItem = ({
 	readonly runtime: RuntimeSchema.Type;
 }): useItemDetailLines.OutputItem => {
 	const configured = game.config.items[item.itemId];
-	const detailItemId = runtime.items.find(
-		(candidate) => isGridRuntimeItem(candidate) && candidate.item.id === item.itemId,
-	)?.id;
 	return {
 		itemId: item.itemId,
 		title: configured?.title ?? item.itemId,
@@ -229,11 +224,6 @@ const mapOutputItem = ({
 								compositeUrl: game.getResourceUrl(configured.asset.composite),
 							}),
 					definitionItemId: configured.id,
-				}),
-		...(detailItemId === undefined
-			? {}
-			: {
-					detailItemId,
 				}),
 	};
 };
@@ -341,19 +331,26 @@ const mapInput = ({
 				kind: "deposit",
 			},
 			(input) => {
-				const firstTarget = input.targetItemIds
-					.map((itemId) => runtime.items.find((item) => item.id === itemId))
-					.find((item) => item !== undefined);
-				const detailItemId =
-					firstTarget?.item.id ??
-					(input.selector.type === "item" ? input.selector.itemId : undefined);
+				const exactTargetId =
+					input.targetItemIds.length === 1 ? input.targetItemIds[0] : undefined;
+				const exactTarget =
+					exactTargetId === undefined
+						? undefined
+						: runtime.items.find((item) => item.id === exactTargetId);
+				const configuredItemId =
+					input.selector.type === "item" ? input.selector.itemId : exactTarget?.item.id;
 				const detail =
-					detailItemId === undefined
+					configuredItemId === undefined
 						? undefined
 						: mapDetailReference({
 								game,
-								itemId: detailItemId,
-								preferredRuntimeItemIds: input.targetItemIds,
+								itemId: configuredItemId,
+								preferredRuntimeItemIds:
+									exactTargetId === undefined
+										? []
+										: [
+												exactTargetId,
+											],
 								runtime,
 							});
 				return {
@@ -479,7 +476,6 @@ const sameOutputItem = (
 	left.title === right.title &&
 	left.sourceUrl === right.sourceUrl &&
 	left.compositeUrl === right.compositeUrl &&
-	left.detailItemId === right.detailItemId &&
 	left.definitionItemId === right.definitionItemId &&
 	sameBounds(left.quantity, right.quantity);
 

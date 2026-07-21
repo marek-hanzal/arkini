@@ -340,7 +340,6 @@ const OutputItemVisual = ({
 			definitionItemId={item.definitionItemId}
 			disabled={disabled}
 			label={item.title}
-			runtimeItemId={item.detailItemId}
 			sourceUrl={item.sourceUrl}
 		/>
 	);

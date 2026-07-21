@@ -35,19 +35,40 @@ const chargeLabel = (charges: useItemDetailLines.ChargeCost) =>
 
 const activeJobLabel = (activeJob: NonNullable<useItemDetailLines.Line["activeJob"]>) =>
 	match(activeJob.status)
+		.with("running", () => "Running")
+		.with("paused", () => "Paused")
+		.with("ready", () => "Awaiting output")
+		.exhaustive();
+
+const runtimePresentation = ({
+	activeJob,
+	baseRuntimeMs,
+	effectiveRuntimeMs,
+}: Pick<useItemDetailLines.Line, "activeJob" | "baseRuntimeMs" | "effectiveRuntimeMs">) => {
+	if (activeJob === undefined) {
+		return {
+			value: formatDuration(effectiveRuntimeMs),
+			detail:
+				baseRuntimeMs === effectiveRuntimeMs
+					? "Per cycle"
+					: `Base ${formatDuration(baseRuntimeMs)}`,
+		};
+	}
+	return match(activeJob.status)
 		.with("running", () => ({
-			label: "Running",
-			detail: `${formatDuration(activeJob.remainingMs)} remaining of ${formatDuration(activeJob.durationMs)}`,
+			value: formatDuration(activeJob.remainingMs),
+			detail: `Remaining of ${formatDuration(activeJob.durationMs)}`,
 		}))
 		.with("paused", () => ({
-			label: "Paused",
-			detail: `${formatDuration(activeJob.remainingMs)} remaining`,
+			value: formatDuration(activeJob.remainingMs),
+			detail: `Paused · of ${formatDuration(activeJob.durationMs)}`,
 		}))
 		.with("ready", () => ({
-			label: "Awaiting output",
-			detail: "Work is complete and waiting to finalize.",
+			value: "Complete",
+			detail: "Awaiting output",
 		}))
 		.exhaustive();
+};
 
 const readinessLabel = (availability: useItemDetailLines.Availability) =>
 	match(availability)
@@ -299,7 +320,7 @@ const LineRow = ({
 	};
 	const readiness = readinessLabel(line.availability);
 	const activeWork = line.activeJob === undefined ? undefined : activeJobLabel(line.activeJob);
-	const runtimeChanged = line.baseRuntimeMs !== line.effectiveRuntimeMs;
+	const runtime = runtimePresentation(line);
 	return (
 		<article
 			className={`ak-list-row rounded-xl border-b border-line px-3 py-5 first:pt-3 last:border-b-0 last:pb-5 ${line.activeJob === undefined ? "" : "ak-list-row-active border-l-2 border-l-accent pl-4"}`}
@@ -315,7 +336,7 @@ const LineRow = ({
 						</h3>
 						{activeWork === undefined ? null : (
 							<span className="rounded-full border border-accent/40 bg-accent/12 px-2.5 py-1 text-xs font-semibold text-foreground">
-								{activeWork.label}
+								{activeWork}
 							</span>
 						)}
 						<span
@@ -329,18 +350,26 @@ const LineRow = ({
 					</p>
 				</div>
 				<div className="flex shrink-0 flex-col items-end gap-3">
-					<div className="text-right">
+					<div
+						className="grid min-w-32 grid-rows-[1rem_1.5rem_1rem] text-right"
+						data-ui="TileLineRuntime"
+						data-job-status={line.activeJob?.status ?? "idle"}
+					>
 						<p className="text-xs font-medium uppercase tracking-[0.08em] text-muted">
 							Runtime
 						</p>
-						<p className="mt-1 font-semibold text-foreground">
-							{formatDuration(line.effectiveRuntimeMs)}
+						<p
+							className="self-center font-semibold tabular-nums text-foreground"
+							data-ui="TileLineRuntimeValue"
+						>
+							{runtime.value}
 						</p>
-						{runtimeChanged ? (
-							<p className="mt-0.5 text-xs text-muted">
-								Base {formatDuration(line.baseRuntimeMs)}
-							</p>
-						) : null}
+						<p
+							className="self-end text-xs tabular-nums text-muted"
+							data-ui="TileLineRuntimeDetail"
+						>
+							{runtime.detail}
+						</p>
 					</div>
 					<div className="flex flex-wrap justify-end gap-2">
 						<Button
@@ -411,18 +440,6 @@ const LineRow = ({
 				>
 					{error}
 				</p>
-			)}
-
-			{activeWork === undefined ? null : (
-				<div
-					className="mt-4 flex flex-wrap items-baseline justify-between gap-3 border-y border-line/70 py-3 text-sm"
-					data-job-status={line.activeJob?.status}
-				>
-					<span className="font-medium text-foreground">
-						Current work · {activeWork.label}
-					</span>
-					<span className="text-muted">{activeWork.detail}</span>
-				</div>
 			)}
 
 			<div className="mt-4 grid min-w-0 grid-cols-2 gap-x-8 max-[48rem]:grid-cols-1">

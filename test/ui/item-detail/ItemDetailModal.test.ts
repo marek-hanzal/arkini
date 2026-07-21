@@ -292,6 +292,85 @@ describe("ItemDetailModal", () => {
 		});
 	});
 
+	it("counts active work down in the fixed runtime slot without adding a layout row", async () => {
+		const { readControl } = await renderItemDetail();
+		const owner = currentRuntime.items.find((item) => item.item.id === "workshop");
+		if (owner === undefined) throw new Error("Missing Workshop runtime item.");
+
+		await act(async () => {
+			publishRuntime(
+				RuntimeSchema.parse({
+					...currentRuntime,
+					jobs: [
+						{
+							id: "job:workshop",
+							ownerItemId: owner.id,
+							lineId: "line:workshop:water",
+							durationMs: 1_000,
+							remainingMs: 400,
+						},
+					],
+				}),
+			);
+			readControl().openItemDetail({
+				itemId: owner.id,
+			});
+			await Promise.resolve();
+			await Promise.resolve();
+		});
+
+		const runtime = document.querySelector<HTMLElement>('[data-ui="TileLineRuntime"]');
+		if (runtime === null) throw new Error("Missing line runtime slot.");
+		expect(runtime.dataset.jobStatus).toBe("running");
+		expect(document.querySelector('[data-ui="TileLineRuntimeValue"]')?.textContent).toBe(
+			"0.4 s",
+		);
+		expect(document.querySelector('[data-ui="TileLineRuntimeDetail"]')?.textContent).toBe(
+			"Remaining of 1 s",
+		);
+		expect(document.body.textContent).not.toContain("Current work");
+
+		await act(async () => {
+			publishRuntime(
+				RuntimeSchema.parse({
+					...currentRuntime,
+					jobs: currentRuntime.jobs.map((job) => ({
+						...job,
+						remainingMs: 200,
+					})),
+				}),
+			);
+			await Promise.resolve();
+		});
+
+		expect(document.querySelector('[data-ui="TileLineRuntime"]')).toBe(runtime);
+		expect(document.querySelector('[data-ui="TileLineRuntimeValue"]')?.textContent).toBe(
+			"0.2 s",
+		);
+
+		await act(async () => {
+			publishRuntime(
+				RuntimeSchema.parse({
+					...currentRuntime,
+					jobs: currentRuntime.jobs.map((job) => ({
+						...job,
+						remainingMs: 0,
+					})),
+				}),
+			);
+			await Promise.resolve();
+		});
+
+		expect(document.querySelector('[data-ui="TileLineRuntime"]')).toBe(runtime);
+		expect(runtime.dataset.jobStatus).toBe("ready");
+		expect(document.querySelector('[data-ui="TileLineRuntimeValue"]')?.textContent).toBe(
+			"Complete",
+		);
+		expect(document.querySelector('[data-ui="TileLineRuntimeDetail"]')?.textContent).toBe(
+			"Awaiting output",
+		);
+	});
+
 	it("restores focus only to a still-focusable exact origin", async () => {
 		const { readControl } = await renderItemDetail();
 		const owner = currentRuntime.items.find((item) => item.item.id === "workshop");

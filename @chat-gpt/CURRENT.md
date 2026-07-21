@@ -4,9 +4,11 @@ This file contains durable non-obvious decisions and the exact continuation poin
 
 ## Current implementation task
 
-**Failed Game bootstrap recovery**
+**Shared Fuse search for Spotlight and Item Detail Lines**
 
-Status: **Issue #355 is implemented on `main`. Game bootstrap failures no longer expose a generic Retry loop. A verified `GameSaveBootstrapError` presents one destructive `Clean & Exit` action that deletes only its exact package/content-hash save through `recoverFailedGameSaveFx`, removes the failed singleton query, and replaces history with Main Menu without automatically loading the package again. Ordinary bootstrap failures present `Exit to Main Menu`, which routes through `discardFailedGameEngineFx`; that operation removes only the exact idle failed singleton query whose query metadata matches the route package and refuses verified save failures, live resources, pending queries, or replacement ownership. Cleanup/discard errors remain visible with route-loader retry labels, while critical lifecycle failures still escalate to the root fatal boundary. `gameEngineQueryOptions` preserves typed Effect failures at the Promise boundary so verified save errors remain classifiable.**
+Status: **Issue #353 is implemented on `main` at `ea7954c2`. `useFuseSearch` owns one typed Fuse configuration, trimmed-query passthrough, deterministic relevance/tie ordering, and a semantic corpus key so equivalent candidate identities/terms do not rebuild the Fuse index. Cheat Spotlight defines only its authorized catalog terms and resolves returned item IDs against the immutable current catalog. Item Detail Lines defines explicit player-visible semantic terms from the retained authoritative Lines projection, keeps its compact search input outside the scrolling row owner, preserves the total Lines tab count, resolves Fuse result line IDs against the latest live projection, excludes volatile numeric timing/quantity values, and keeps stale read-only Lines locally searchable. No global engine index, hidden-line scan, second catalog, responsive change, or generic search registry was introduced.**
+
+Recent failed Game bootstrap recovery remains complete: verified save-backed failures expose exact-key `Clean & Exit` through `recoverFailedGameSaveFx`; ordinary bootstrap failures expose query-only `Exit to Main Menu` through `discardFailedGameEngineFx`; both replace history with Main Menu and never loop automatically back into loading.
 
 Recent UI styling baseline remains strict semantic ownership: `ak-list` is a plain non-zebra content-row grammar, canonical Button variants own all button states, Settings theme choices own a local segmented-radio grammar, and Cheat Spotlight owns its complete option-state contrast contract.
 

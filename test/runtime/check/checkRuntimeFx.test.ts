@@ -105,6 +105,7 @@ describe("checkRuntimeFx", () => {
 		const runtime = {
 			cheats: {
 				enabled: false,
+				everEnabled: false,
 				instantGameplay: false,
 			},
 			currentSpace: 0,
@@ -196,6 +197,7 @@ describe("checkRuntimeFx", () => {
 		const runtime = {
 			cheats: {
 				enabled: false,
+				everEnabled: false,
 				instantGameplay: false,
 			},
 			currentSpace: 0,
@@ -317,6 +319,7 @@ describe("checkRuntimeFx", () => {
 		const state = StateSchema.parse({
 			cheats: {
 				enabled: false,
+				everEnabled: false,
 				instantGameplay: false,
 			},
 			currentSpace: 0,

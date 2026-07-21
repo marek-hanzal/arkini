@@ -1,6 +1,7 @@
 import { Effect } from "effect";
 import { readAppearanceAccentFx } from "~/bridge/appearance/readAppearanceAccentFx";
 import { readAppearanceThemeFx } from "~/bridge/appearance/readAppearanceThemeFx";
+import { readCheatAvailabilityFx } from "~/bridge/cheat/readCheatAvailabilityFx";
 import { resolveBuiltInArkpackFx } from "~/bridge/arkpack/resolveBuiltInArkpackFx";
 import type { LauncherStartup } from "~/ui/launcher/LauncherStartup";
 import { preloadLauncherHeroFx } from "~/ui/launcher/preloadLauncherHeroFx";
@@ -15,6 +16,7 @@ export const createLauncherStartupFx = Effect.fn("createLauncherStartupFx")(
 			let state: LauncherStartup.State = {
 				type: "loading",
 				appearance: null,
+				cheatsAvailable: null,
 				heroReady: false,
 				splashCompleted: false,
 			};
@@ -46,8 +48,19 @@ export const createLauncherStartupFx = Effect.fn("createLauncherStartupFx")(
 						publish({
 							type: "loading",
 							appearance,
+							cheatsAvailable: state.cheatsAvailable,
 							heroReady: state.heroReady,
 							splashCompleted: state.splashCompleted,
+						}),
+					),
+				),
+			);
+			const cheatAvailabilityFx = readCheatAvailabilityFx().pipe(
+				Effect.tap((cheatsAvailable) =>
+					Effect.sync(() =>
+						publish({
+							...state,
+							cheatsAvailable,
 						}),
 					),
 				),
@@ -86,6 +99,7 @@ export const createLauncherStartupFx = Effect.fn("createLauncherStartupFx")(
 				{
 					appearance: appearanceFx,
 					builtIn: catalogFx,
+					cheatsAvailable: cheatAvailabilityFx,
 					bridge: bridgeReadyFx,
 					hero: heroFx,
 				},
@@ -93,9 +107,10 @@ export const createLauncherStartupFx = Effect.fn("createLauncherStartupFx")(
 					concurrency: "unbounded",
 				},
 			).pipe(
-				Effect.map(({ appearance, builtIn }) => ({
+				Effect.map(({ appearance, builtIn, cheatsAvailable }) => ({
 					appearance,
 					builtInPackageId: builtIn.packageId,
+					cheatsAvailable,
 				})),
 			);
 			const authoritativeBootstrapFx = bootstrapFx ?? defaultBootstrapFx;
@@ -104,6 +119,7 @@ export const createLauncherStartupFx = Effect.fn("createLauncherStartupFx")(
 				publish({
 					type: "loading",
 					appearance: state.appearance,
+					cheatsAvailable: state.cheatsAvailable,
 					heroReady: state.heroReady,
 					splashCompleted: state.splashCompleted,
 				});
@@ -112,6 +128,7 @@ export const createLauncherStartupFx = Effect.fn("createLauncherStartupFx")(
 					type: "ready",
 					appearance: result.appearance,
 					builtInPackageId: result.builtInPackageId,
+					cheatsAvailable: result.cheatsAvailable,
 					heroReady: true,
 					splashCompleted: state.splashCompleted,
 				});
@@ -121,6 +138,7 @@ export const createLauncherStartupFx = Effect.fn("createLauncherStartupFx")(
 						publish({
 							type: "failed",
 							appearance: state.appearance,
+							cheatsAvailable: state.cheatsAvailable,
 							error,
 							heroReady: state.heroReady,
 							splashCompleted: state.splashCompleted,

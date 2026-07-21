@@ -41,6 +41,7 @@ describe("discardRuntimeItemOwnedStateFx", () => {
 		const runtime = {
 			cheats: {
 				enabled: false,
+				everEnabled: false,
 				instantGameplay: false,
 			},
 			currentSpace: 0,
@@ -74,6 +75,7 @@ describe("discardRuntimeItemOwnedStateFx", () => {
 		const runtime = {
 			cheats: {
 				enabled: false,
+				everEnabled: false,
 				instantGameplay: false,
 			},
 			currentSpace: 0,

@@ -15,7 +15,9 @@ import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { ArkiniDesktopApi } from "../../../desktop/ArkiniDesktopApi";
+import { createCheatAvailability } from "~/bridge/cheat/createCheatAvailability";
 import type { Game } from "~/bridge/game/Game";
+import { CheatAvailabilityProvider } from "~/ui/cheat-availability/CheatAvailabilityProvider";
 import { GameMenu } from "~/ui/game-menu/GameMenu";
 import { GameMenuProvider } from "~/ui/game-menu/GameMenuProvider";
 import { gameMenuBackdropViewTransitionName } from "~/ui/navigation/gameMenuBackdropViewTransitionName";
@@ -56,12 +58,14 @@ const gameSnapshots = {
 	disabled: {
 		cheats: {
 			enabled: false,
+			everEnabled: false,
 			instantGameplay: false,
 		},
 	},
 	enabled: {
 		cheats: {
 			enabled: true,
+			everEnabled: true,
 			instantGameplay: false,
 		},
 	},
@@ -153,9 +157,11 @@ afterEach(async () => {
 
 const renderMenu = async ({
 	game = createGame(),
+	cheatsAvailable = false,
 	requestClose = vi.fn(() => new Promise<void>(() => undefined)),
 }: {
 	readonly game?: Game;
+	readonly cheatsAvailable?: boolean;
 	readonly requestClose?: () => Promise<void>;
 } = {}) => {
 	Object.defineProperty(window, "arkini", {
@@ -169,6 +175,8 @@ const renderMenu = async ({
 	const container = document.createElement("div");
 	document.body.append(container);
 	const queryClient = new QueryClient();
+	const cheatAvailability = createCheatAvailability();
+	cheatAvailability.apply(cheatsAvailable);
 	const GamePage = () =>
 		createElement(
 			QueryClientProvider,
@@ -176,19 +184,25 @@ const renderMenu = async ({
 				client: queryClient,
 			},
 			createElement(
-				GameMenuProvider,
-				null,
+				CheatAvailabilityProvider,
+				{
+					availability: cheatAvailability,
+				},
 				createElement(
-					"button",
-					{
-						type: "button",
-						id: "game-surface",
-					},
-					"Game surface",
+					GameMenuProvider,
+					null,
+					createElement(
+						"button",
+						{
+							type: "button",
+							id: "game-surface",
+						},
+						"Game surface",
+					),
+					createElement(GameMenu, {
+						game,
+					}),
 				),
-				createElement(GameMenu, {
-					game,
-				}),
 			),
 		);
 	const rootRoute = createRootRoute({
@@ -372,7 +386,7 @@ describe("GameMenu", () => {
 		]);
 	});
 
-	it("shows the save-scoped Cheats destination only when Cheat mode is enabled", async () => {
+	it("shows the save-scoped Cheats destination only when application Cheat tools are available", async () => {
 		const disabled = await renderMenu({
 			game: createGame(),
 		});
@@ -391,7 +405,8 @@ describe("GameMenu", () => {
 		motionTestRuntime.autoComplete = false;
 
 		const enabled = await renderMenu({
-			game: createGame(Effect.void, true),
+			game: createGame(),
+			cheatsAvailable: true,
 		});
 		await openMenu(enabled.container);
 		await act(async () => buttonByText(enabled.container, "Cheats").click());

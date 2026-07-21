@@ -2,13 +2,13 @@ import { useNavigate, useRouter } from "@tanstack/react-router";
 import { useCallback, useEffect, useRef } from "react";
 
 import { useGameEngine } from "~/bridge/game/useGameEngine";
-import { useGameCheats } from "~/bridge/cheat/useGameCheats";
+import { useCheatAvailability } from "~/ui/cheat-availability/useCheatAvailability";
 import { Cheats } from "~/ui/cheats/Cheats";
 
 /** Composes the save-scoped Cheats page and native history return to the active Board. */
 export const CheatsScreen = () => {
 	const game = useGameEngine();
-	const cheats = useGameCheats(game);
+	const cheatAvailability = useCheatAvailability();
 	const router = useRouter();
 	const navigate = useNavigate();
 	const leavingRef = useRef(false);
@@ -39,12 +39,12 @@ export const CheatsScreen = () => {
 	);
 
 	useEffect(() => {
-		if (!cheats.enabled)
+		if (!cheatAvailability.available)
 			returnToBoard({
 				replace: true,
 			});
 	}, [
-		cheats.enabled,
+		cheatAvailability.available,
 		returnToBoard,
 	]);
 

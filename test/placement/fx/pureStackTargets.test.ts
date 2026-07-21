@@ -65,6 +65,7 @@ describe("pure placement stack targets", () => {
 		const runtime = {
 			cheats: {
 				enabled: false,
+				everEnabled: false,
 				instantGameplay: false,
 			},
 			currentSpace: 0,
@@ -114,6 +115,7 @@ describe("pure placement stack targets", () => {
 		const runtime = {
 			cheats: {
 				enabled: false,
+				everEnabled: false,
 				instantGameplay: false,
 			},
 			currentSpace: 0,
@@ -157,6 +159,7 @@ describe("pure placement stack targets", () => {
 		const runtime = {
 			cheats: {
 				enabled: false,
+				everEnabled: false,
 				instantGameplay: false,
 			},
 			currentSpace: 0,
@@ -207,6 +210,7 @@ describe("pure placement stack targets", () => {
 		const runtime = {
 			cheats: {
 				enabled: false,
+				everEnabled: false,
 				instantGameplay: false,
 			},
 			currentSpace: 0,

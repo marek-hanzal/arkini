@@ -2,7 +2,7 @@ import { motion } from "motion/react";
 import { match } from "ts-pattern";
 
 import type { Game } from "~/bridge/game/Game";
-import { useGameCheats } from "~/bridge/cheat/useGameCheats";
+import { useCheatAvailability } from "~/ui/cheat-availability/useCheatAvailability";
 import { Button, DangerButton, PrimaryButton } from "~/ui/button/Button";
 import type { GameMenuPhase } from "~/ui/game-menu/GameMenuControl";
 import { useGameMenuActions } from "~/ui/game-menu/useGameMenuActions";
@@ -29,7 +29,7 @@ const GameMenuDialog = ({
 	readonly game: Game;
 	readonly phase: Exclude<GameMenuPhase, "closed">;
 }) => {
-	const cheats = useGameCheats(game);
+	const cheatAvailability = useCheatAvailability();
 	const actions = useGameMenuActions({
 		game,
 		phase,
@@ -103,7 +103,7 @@ const GameMenuDialog = ({
 					>
 						Settings
 					</Button>
-					{cheats.enabled ? (
+					{cheatAvailability.available ? (
 						<Button
 							className={`ak-list-row ak-list-row-interactive w-full shadow-none backdrop-blur-none ${actions.pending ? "ak-list-row-pending" : ""}`}
 							cursorIntent={actionCursorIntent}

@@ -4,10 +4,9 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Effect } from "effect";
 import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import type { Game } from "~/bridge/game/Game";
-import { setCheatEnabledFx } from "~/engine/cheat/write/setCheatEnabledFx";
 import { Cheats } from "~/ui/cheats/Cheats";
 import { createTestGameSession } from "~test/bridge/game/createTestGameSession";
 import { createJobTestConfig } from "~test/job/support/jobTestConfig";
@@ -57,11 +56,6 @@ describe("Cheats", () => {
 			},
 		};
 		sessions.push(game);
-		await session.run(
-			setCheatEnabledFx({
-				enabled: true,
-			}),
-		);
 		const container = document.createElement("div");
 		document.body.append(container);
 		const root = createRoot(container);
@@ -81,19 +75,33 @@ describe("Cheats", () => {
 			);
 		});
 
-		const toggle = container.querySelector<HTMLInputElement>(
+		const enable = container.querySelector<HTMLInputElement>(
+			'[data-ui="CheatsEnabledForGame"] input',
+		);
+		const instant = container.querySelector<HTMLInputElement>(
 			'[data-ui="CheatsInstantGameplay"] input',
 		);
-		if (toggle === null) throw new Error("Expected Instant gameplay toggle.");
-		expect(toggle.checked).toBe(false);
-		await act(async () => toggle.click());
-		await act(async () => {
-			await new Promise((resolve) => window.setTimeout(resolve, 0));
-		});
+		if (enable === null || instant === null) throw new Error("Expected Cheat toggles.");
+		expect(enable.checked).toBe(false);
+		expect(instant.disabled).toBe(true);
+
+		await act(async () => enable.click());
+		await vi.waitFor(() => expect(session.getSnapshot().cheats.enabled).toBe(true));
+		expect(session.getSnapshot().cheats.everEnabled).toBe(true);
+		expect(instant.disabled).toBe(false);
+
+		await act(async () => instant.click());
+		await vi.waitFor(() => expect(session.getSnapshot().cheats.instantGameplay).toBe(true));
+		expect(instant.checked).toBe(true);
+
+		await act(async () => enable.click());
+		await vi.waitFor(() => expect(session.getSnapshot().cheats.enabled).toBe(false));
 		expect(session.getSnapshot().cheats).toEqual({
-			enabled: true,
+			enabled: false,
+			everEnabled: true,
 			instantGameplay: true,
 		});
-		expect(toggle.checked).toBe(true);
+		expect(instant.checked).toBe(true);
+		expect(instant.disabled).toBe(true);
 	});
 });

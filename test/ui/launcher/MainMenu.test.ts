@@ -78,6 +78,7 @@ describe("MainMenu", () => {
 				accent: "rose",
 			},
 			builtInPackageId: "canonical-built-in",
+			cheatsAvailable: false,
 			heroReady: true,
 			splashCompleted: true,
 		};

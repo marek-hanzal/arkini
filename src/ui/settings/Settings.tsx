@@ -93,34 +93,32 @@ export const Settings = ({ exitPending = false, navigationError, onBack }: Setti
 				</p>
 			</fieldset>
 
-			{model.cheatMode === null ? null : (
-				<fieldset
-					className="grid gap-3 border-t border-line pt-5"
-					disabled={model.blocked}
+			<fieldset
+				className="grid gap-3 border-t border-line pt-5"
+				disabled={model.blocked}
+			>
+				<legend className="text-sm font-semibold text-foreground">Developer</legend>
+				<label
+					className={`ak-list-row ak-list-row-interactive flex cursor-pointer items-center justify-between gap-4 rounded-lg border border-line bg-surface-raised/65 px-4 py-3 ${model.blocked ? "ak-list-row-pending cursor-progress" : ""}`}
+					data-ui="SettingsCheatAvailability"
 				>
-					<legend className="text-sm font-semibold text-foreground">Game</legend>
-					<label
-						className={`ak-list-row ak-list-row-interactive flex cursor-pointer items-center justify-between gap-4 rounded-lg border border-line bg-surface-raised/65 px-4 py-3 ${model.blocked ? "ak-list-row-pending cursor-progress" : ""}`}
-						data-ui="SettingsCheatMode"
-					>
-						<span className="grid gap-1">
-							<span className="text-sm font-semibold text-foreground">
-								Cheat mode
-							</span>
-							<span className="text-sm leading-5 text-muted">
-								Enables save-specific cheat tools without adding special Board
-								items.
-							</span>
+					<span className="grid gap-1">
+						<span className="text-sm font-semibold text-foreground">Cheat tools</span>
+						<span className="text-sm leading-5 text-muted">
+							Shows the save-specific Cheats page in each Game menu. Every save must
+							enable Cheat mode separately.
 						</span>
-						<input
-							type="checkbox"
-							checked={model.cheatMode}
-							className="size-5 shrink-0 accent-accent"
-							onChange={(event) => model.setCheatMode(event.currentTarget.checked)}
-						/>
-					</label>
-				</fieldset>
-			)}
+					</span>
+					<input
+						type="checkbox"
+						checked={model.cheatToolsAvailable}
+						className="size-5 shrink-0 accent-accent"
+						onChange={(event) =>
+							model.setCheatToolsAvailable(event.currentTarget.checked)
+						}
+					/>
+				</label>
+			</fieldset>
 
 			<div
 				className="min-h-6 text-center text-sm"
@@ -138,9 +136,9 @@ export const Settings = ({ exitPending = false, navigationError, onBack }: Setti
 					)
 					.with(
 						{
-							kind: "saving-cheat-mode",
+							kind: "saving-cheat-tools",
 						},
-						() => <p className="text-accent">Saving Cheat mode…</p>,
+						() => <p className="text-accent">Saving Cheat tools…</p>,
 					)
 					.with(
 						{

@@ -171,6 +171,7 @@ describe("current board space", () => {
 			RuntimeSchema.safeParse({
 				cheats: {
 					enabled: false,
+					everEnabled: false,
 					instantGameplay: false,
 				},
 				items: [],

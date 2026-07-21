@@ -299,6 +299,7 @@ describe("charge-driven completion lifecycle", () => {
 		const state = {
 			cheats: {
 				enabled: false,
+				everEnabled: false,
 				instantGameplay: false,
 			},
 			currentSpace: 0,

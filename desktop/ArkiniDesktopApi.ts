@@ -1,5 +1,6 @@
 import type { AppearanceAccentSchema } from "./appearance/AppearanceAccentSchema";
 import type { AppearanceThemeSchema } from "./appearance/AppearanceThemeSchema";
+import type { CheatAvailabilitySchema } from "./cheat/CheatAvailabilitySchema";
 
 export namespace ArkiniDesktopApi {
 	export const channels = {
@@ -14,6 +15,8 @@ export namespace ArkiniDesktopApi {
 		appearanceWrite: "arkini:appearance:write",
 		appearanceAccentRead: "arkini:appearance:accent:read",
 		appearanceAccentWrite: "arkini:appearance:accent:write",
+		cheatAvailabilityRead: "arkini:cheats:available:read",
+		cheatAvailabilityWrite: "arkini:cheats:available:write",
 		windowVisible: "arkini:lifecycle:window-visible",
 		beforeClose: "arkini:lifecycle:before-close",
 		closeReady: "arkini:lifecycle:close-ready",
@@ -56,6 +59,10 @@ export namespace ArkiniDesktopApi {
 			readonly write: (theme: AppearanceThemeSchema.Type) => Promise<void>;
 			readonly readAccent: () => Promise<AppearanceAccentSchema.Type>;
 			readonly writeAccent: (accent: AppearanceAccentSchema.Type) => Promise<void>;
+		};
+		readonly cheats: {
+			readonly readAvailable: () => Promise<CheatAvailabilitySchema.Type>;
+			readonly writeAvailable: (available: CheatAvailabilitySchema.Type) => Promise<void>;
 		};
 		readonly save: {
 			readonly read: (key: SaveKey) => Promise<Uint8Array | null>;

@@ -199,6 +199,7 @@ describe("releaseOwnerInputsFx existing identity", () => {
 		const state = {
 			cheats: {
 				enabled: false,
+				everEnabled: false,
 				instantGameplay: false,
 			},
 			currentSpace: 0,
@@ -246,6 +247,7 @@ describe("releaseOwnerInputsFx existing identity", () => {
 		const state = {
 			cheats: {
 				enabled: false,
+				everEnabled: false,
 				instantGameplay: false,
 			},
 			currentSpace: 0,
@@ -292,6 +294,7 @@ describe("releaseOwnerInputsFx existing identity", () => {
 		const state = {
 			cheats: {
 				enabled: false,
+				everEnabled: false,
 				instantGameplay: false,
 			},
 			currentSpace: 0,
@@ -355,6 +358,7 @@ describe("releaseOwnerInputsFx existing identity", () => {
 		const state = {
 			cheats: {
 				enabled: false,
+				everEnabled: false,
 				instantGameplay: false,
 			},
 			currentSpace: 0,

@@ -10,6 +10,7 @@ export const fromConfigFx = Effect.fn("fromConfigFx")(function* () {
 	const runtime: RuntimeSchema.Type = {
 		cheats: {
 			enabled: false,
+			everEnabled: false,
 			instantGameplay: false,
 		},
 		currentSpace: config.start.currentSpace,

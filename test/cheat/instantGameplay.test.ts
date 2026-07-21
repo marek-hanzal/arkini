@@ -49,10 +49,12 @@ describe("Instant gameplay", () => {
 		expect(result.enabledRuntime.jobs).toEqual([]);
 		expect(result.enabledRuntime.cheats).toEqual({
 			enabled: true,
+			everEnabled: true,
 			instantGameplay: true,
 		});
 		expect(result.restoredTimingRuntime.cheats).toEqual({
 			enabled: false,
+			everEnabled: true,
 			instantGameplay: true,
 		});
 		expect(result.restoredTimingRuntime.jobs).toHaveLength(1);

@@ -4,7 +4,9 @@ import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import { createCheatAvailability } from "~/bridge/cheat/createCheatAvailability";
 import type { Game } from "~/bridge/game/Game";
+import { CheatAvailabilityProvider } from "~/ui/cheat-availability/CheatAvailabilityProvider";
 import { CheatItemSpotlight } from "~/ui/cheat-spotlight/CheatItemSpotlight";
 
 (
@@ -20,6 +22,7 @@ const state = vi.hoisted(() => ({
 vi.mock("~/bridge/cheat/useGameCheats", () => ({
 	useGameCheats: () => ({
 		enabled: true,
+		everEnabled: true,
 		instantGameplay: false,
 	}),
 }));
@@ -83,11 +86,19 @@ describe("CheatItemSpotlight", () => {
 		document.body.append(container);
 		const root = createRoot(container);
 		roots.push(root);
+		const availability = createCheatAvailability();
+		availability.apply(true);
 		await act(async () => {
 			root.render(
-				createElement(CheatItemSpotlight, {
-					game: {} as Game,
-				}),
+				createElement(
+					CheatAvailabilityProvider,
+					{
+						availability,
+					},
+					createElement(CheatItemSpotlight, {
+						game: {} as Game,
+					}),
+				),
 			);
 		});
 

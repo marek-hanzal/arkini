@@ -28,6 +28,7 @@ describe("createLauncherStartupFx", () => {
 							accent: "blue" as const,
 						},
 						builtInPackageId: "built-in",
+						cheatsAvailable: true,
 					};
 				}),
 			}),
@@ -43,6 +44,7 @@ describe("createLauncherStartupFx", () => {
 				accent: "blue",
 			},
 			builtInPackageId: "built-in",
+			cheatsAvailable: true,
 			heroReady: true,
 			splashCompleted: false,
 		});
@@ -70,6 +72,7 @@ describe("createLauncherStartupFx", () => {
 									accent: "rose" as const,
 								},
 								builtInPackageId: "built-in",
+								cheatsAvailable: false,
 							});
 				}),
 			}),
@@ -79,6 +82,7 @@ describe("createLauncherStartupFx", () => {
 		expect(startup.getSnapshot()).toEqual({
 			type: "failed",
 			appearance: null,
+			cheatsAvailable: null,
 			error: failure,
 			heroReady: false,
 			splashCompleted: false,

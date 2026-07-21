@@ -26,6 +26,7 @@ const owner = {
 const baseRuntime = {
 	cheats: {
 		enabled: false,
+		everEnabled: false,
 		instantGameplay: false,
 	},
 	currentSpace: 0,

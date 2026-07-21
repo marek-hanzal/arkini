@@ -29,6 +29,7 @@ export const validateStartStateFx = Effect.fn("validateStartStateFx")(function* 
 			runtime: {
 				cheats: {
 					enabled: false,
+					everEnabled: false,
 					instantGameplay: false,
 				},
 				currentSpace: config.start.currentSpace,

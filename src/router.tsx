@@ -1,6 +1,6 @@
 import { createRouter } from "@tanstack/react-router";
 import { routeTree } from "~/_route";
-import type { RootPage } from "~/page/RootPage";
+import type { RootContext } from "~/ui/root/RootContext";
 import { resolveRouteViewTransitionTypes } from "~/ui/navigation/resolveRouteViewTransitionTypes";
 
 const supportsTypedViewTransitions = () =>
@@ -8,7 +8,7 @@ const supportsTypedViewTransitions = () =>
 	typeof window.CSS?.supports === "function" &&
 	window.CSS.supports("selector(:active-view-transition-type(arkini))");
 
-export const createArkiniRouter = (context: RootPage.Context) =>
+export const createArkiniRouter = (context: RootContext) =>
 	createRouter({
 		routeTree,
 		context,

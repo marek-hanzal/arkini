@@ -18,6 +18,7 @@ const lineId = "line:forge:run";
 const summarizeRuntime = (runtime: RuntimeSchema.Type) => ({
 	cheats: {
 		enabled: false,
+		everEnabled: false,
 		instantGameplay: false,
 	},
 	currentSpace: 0,

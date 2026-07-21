@@ -42,6 +42,7 @@ describe("fromStateFx job material invariants", () => {
 		const state = {
 			cheats: {
 				enabled: false,
+				everEnabled: false,
 				instantGameplay: false,
 			},
 			currentSpace: 0,
@@ -79,6 +80,7 @@ describe("fromStateFx job material invariants", () => {
 		const state = {
 			cheats: {
 				enabled: false,
+				everEnabled: false,
 				instantGameplay: false,
 			},
 			currentSpace: 0,
@@ -140,6 +142,7 @@ describe("fromStateFx job material invariants", () => {
 		const state = {
 			cheats: {
 				enabled: false,
+				everEnabled: false,
 				instantGameplay: false,
 			},
 			currentSpace: 0,
@@ -194,6 +197,7 @@ describe("fromStateFx job material invariants", () => {
 		const state = {
 			cheats: {
 				enabled: false,
+				everEnabled: false,
 				instantGameplay: false,
 			},
 			currentSpace: 0,
@@ -271,6 +275,7 @@ describe("fromStateFx job material invariants", () => {
 		const state = {
 			cheats: {
 				enabled: false,
+				everEnabled: false,
 				instantGameplay: false,
 			},
 			currentSpace: 0,

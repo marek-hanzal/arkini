@@ -10,7 +10,7 @@ export namespace setCheatEnabledFx {
 	}
 }
 
-/** Atomically changes persisted Cheat mode without altering stored cheat options. */
+/** Atomically changes persisted Cheat mode and permanently records first enablement. */
 export const setCheatEnabledFx = Effect.fn("setCheatEnabledFx")(function* ({
 	enabled,
 }: setCheatEnabledFx.Props) {
@@ -24,6 +24,7 @@ export const setCheatEnabledFx = Effect.fn("setCheatEnabledFx")(function* ({
 		const cheats = {
 			...runtime.cheats,
 			enabled,
+			everEnabled: runtime.cheats.everEnabled || enabled,
 		};
 		return Effect.succeed([
 			cheats,

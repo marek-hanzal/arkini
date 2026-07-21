@@ -12,6 +12,7 @@ describe("planStartFx", () => {
 				const runtime = {
 					cheats: {
 						enabled: false,
+						everEnabled: false,
 						instantGameplay: false,
 					},
 					currentSpace: 0,
@@ -76,6 +77,7 @@ describe("planStartFx", () => {
 				runtime: {
 					cheats: {
 						enabled: false,
+						everEnabled: false,
 						instantGameplay: false,
 					},
 					currentSpace: 0,
@@ -118,6 +120,7 @@ describe("planStartFx", () => {
 					runtime: {
 						cheats: {
 							enabled: false,
+							everEnabled: false,
 							instantGameplay: false,
 						},
 						currentSpace: 0,

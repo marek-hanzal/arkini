@@ -42,6 +42,7 @@ const createStartup = () => {
 	let state: LauncherStartup.State = {
 		type: "loading",
 		appearance: null,
+		cheatsAvailable: null,
 		heroReady: false,
 		splashCompleted: false,
 	};
@@ -81,6 +82,7 @@ const readyState = (): LauncherStartup.State => ({
 		accent: "rose",
 	},
 	builtInPackageId: "canonical-built-in",
+	cheatsAvailable: false,
 	heroReady: true,
 	splashCompleted: false,
 });
@@ -221,6 +223,7 @@ describe("StartupSplash", () => {
 		harness.publish({
 			type: "failed",
 			appearance: null,
+			cheatsAvailable: null,
 			error: new Error("catalog failed"),
 			heroReady: false,
 			splashCompleted: false,

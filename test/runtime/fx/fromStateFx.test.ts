@@ -56,6 +56,7 @@ const config = GameConfigSchema.parse({
 const state = StateSchema.parse({
 	cheats: {
 		enabled: false,
+		everEnabled: false,
 		instantGameplay: false,
 	},
 	currentSpace: 0,
@@ -236,6 +237,7 @@ describe("fromStateFx", () => {
 		const invalidState = StateSchema.parse({
 			cheats: {
 				enabled: false,
+				everEnabled: false,
 				instantGameplay: false,
 			},
 			currentSpace: 0,

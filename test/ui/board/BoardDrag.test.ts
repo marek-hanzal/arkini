@@ -1043,6 +1043,7 @@ describe("Board drag", () => {
 				...currentRuntime,
 				cheats: {
 					enabled: false,
+					everEnabled: false,
 					instantGameplay: false,
 				},
 			});

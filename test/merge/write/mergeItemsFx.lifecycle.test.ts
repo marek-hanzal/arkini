@@ -253,6 +253,7 @@ describe("mergeItemsFx participant lifecycle", () => {
 				const state = {
 					cheats: {
 						enabled: false,
+						everEnabled: false,
 						instantGameplay: false,
 					},
 					currentSpace: 0,
@@ -315,6 +316,7 @@ describe("mergeItemsFx participant lifecycle", () => {
 			const state = {
 				cheats: {
 					enabled: false,
+					everEnabled: false,
 					instantGameplay: false,
 				},
 				currentSpace: 0,
@@ -377,6 +379,7 @@ describe("mergeItemsFx participant lifecycle", () => {
 			const state = {
 				cheats: {
 					enabled: false,
+					everEnabled: false,
 					instantGameplay: false,
 				},
 				currentSpace: 0,
@@ -431,6 +434,7 @@ describe("mergeItemsFx participant lifecycle", () => {
 			const state = {
 				cheats: {
 					enabled: false,
+					everEnabled: false,
 					instantGameplay: false,
 				},
 				currentSpace: 0,
@@ -484,6 +488,7 @@ describe("mergeItemsFx participant lifecycle", () => {
 		const state = {
 			cheats: {
 				enabled: false,
+				everEnabled: false,
 				instantGameplay: false,
 			},
 			currentSpace: 0,
@@ -532,6 +537,7 @@ describe("mergeItemsFx participant lifecycle", () => {
 			const state = {
 				cheats: {
 					enabled: false,
+					everEnabled: false,
 					instantGameplay: false,
 				},
 				currentSpace: 0,
@@ -589,6 +595,7 @@ describe("mergeItemsFx participant lifecycle", () => {
 		const stackedState = {
 			cheats: {
 				enabled: false,
+				everEnabled: false,
 				instantGameplay: false,
 			},
 			currentSpace: 0,

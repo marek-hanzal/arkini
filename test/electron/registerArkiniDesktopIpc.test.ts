@@ -62,6 +62,7 @@ const electronHarness = vi.hoisted(() => {
 vi.mock("electron", () => electronHarness.module);
 
 import { createFilesystemAppearancePreferencesFx } from "../../electron/main/appearance/createFilesystemAppearancePreferencesFx";
+import { createFilesystemCheatPreferencesFx } from "../../electron/main/cheat/createFilesystemCheatPreferencesFx";
 import { registerArkiniDesktopIpcFx } from "../../electron/main/registerArkiniDesktopIpcFx";
 
 const placeholderPackageId = "a".repeat(64);
@@ -88,6 +89,16 @@ const invokeArguments = new Map<string, ReadonlyArray<unknown>>([
 		ArkiniDesktopApi.channels.appearanceAccentWrite,
 		[
 			"rose",
+		],
+	],
+	[
+		ArkiniDesktopApi.channels.cheatAvailabilityRead,
+		[],
+	],
+	[
+		ArkiniDesktopApi.channels.cheatAvailabilityWrite,
+		[
+			false,
 		],
 	],
 	[
@@ -192,9 +203,13 @@ describe("registerArkiniDesktopIpcFx", () => {
 					const appearancePreferences = yield* createFilesystemAppearancePreferencesFx({
 						userDataPath,
 					});
+					const cheatPreferences = yield* createFilesystemCheatPreferencesFx({
+						userDataPath,
+					});
 					yield* registerArkiniDesktopIpcFx({
 						trustedRenderer,
 						appearancePreferences,
+						cheatPreferences,
 					});
 				}).pipe(Effect.provide(NodeContext.layer)),
 			);
@@ -240,6 +255,15 @@ describe("registerArkiniDesktopIpcFx", () => {
 			await expect(
 				invoke(ArkiniDesktopApi.channels.appearanceAccentRead, trustedEvent),
 			).resolves.toBe("blue");
+			await expect(
+				invoke(ArkiniDesktopApi.channels.cheatAvailabilityRead, trustedEvent),
+			).resolves.toBe(false);
+			await expect(
+				invoke(ArkiniDesktopApi.channels.cheatAvailabilityWrite, trustedEvent, true),
+			).resolves.toBeUndefined();
+			await expect(
+				invoke(ArkiniDesktopApi.channels.cheatAvailabilityRead, trustedEvent),
+			).resolves.toBe(true);
 
 			const arkpackBytes = new Uint8Array([
 				1,

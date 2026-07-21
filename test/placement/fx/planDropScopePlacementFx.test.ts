@@ -40,6 +40,7 @@ describe("planDropScopePlacementFx", () => {
 		const runtime = {
 			cheats: {
 				enabled: false,
+				everEnabled: false,
 				instantGameplay: false,
 			},
 			currentSpace: 0,
@@ -103,6 +104,7 @@ describe("planDropScopePlacementFx", () => {
 		const runtime = {
 			cheats: {
 				enabled: false,
+				everEnabled: false,
 				instantGameplay: false,
 			},
 			currentSpace: 0,
@@ -164,6 +166,7 @@ describe("planDropScopePlacementFx", () => {
 		const runtime = {
 			cheats: {
 				enabled: false,
+				everEnabled: false,
 				instantGameplay: false,
 			},
 			currentSpace: 0,

@@ -12,6 +12,7 @@ const config = createJobTestConfig(3);
 const state = {
 	cheats: {
 		enabled: false,
+		everEnabled: false,
 		instantGameplay: false,
 	},
 	currentSpace: 0,

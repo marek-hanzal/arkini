@@ -6,6 +6,7 @@ import type { Game } from "~/bridge/game/Game";
 import { useCheatItemCatalog } from "~/bridge/cheat/useCheatItemCatalog";
 import { useGameCheats } from "~/bridge/cheat/useGameCheats";
 import { useSpawnCheatItemMutation } from "~/bridge/cheat/useSpawnCheatItemMutation";
+import { useCheatAvailability } from "~/ui/cheat-availability/useCheatAvailability";
 import { useGameMenuControl } from "~/ui/game-menu/useGameMenuControl";
 import { useItemDetailControl } from "~/ui/item-detail/useItemDetailControl";
 
@@ -15,6 +16,7 @@ const errorMessage = (error: unknown) => (error instanceof Error ? error.message
 /** Owns the Board-local Cheat item search, keyboard navigation and canonical spawn command. */
 export const CheatItemSpotlight = ({ game }: { readonly game: Game }) => {
 	const cheats = useGameCheats(game);
+	const cheatAvailability = useCheatAvailability();
 	const catalog = useCheatItemCatalog(game);
 	const gameMenu = useGameMenuControl();
 	const itemDetail = useItemDetailControl();
@@ -52,7 +54,7 @@ export const CheatItemSpotlight = ({ game }: { readonly game: Game }) => {
 		],
 	);
 	const blockedByHigherOwner = gameMenu.isOpen || itemDetail.isOpen;
-	const available = cheats.enabled && !blockedByHigherOwner;
+	const available = cheatAvailability.available && cheats.enabled && !blockedByHigherOwner;
 
 	useHotkey(
 		"Mod+P",
@@ -62,15 +64,16 @@ export const CheatItemSpotlight = ({ game }: { readonly game: Game }) => {
 			spawn.reset();
 		},
 		{
-			enabled: cheats.enabled,
+			enabled: cheatAvailability.available && cheats.enabled,
 			preventDefault: true,
 		},
 	);
 
 	useEffect(() => {
-		if (!cheats.enabled || blockedByHigherOwner) setOpen(false);
+		if (!cheatAvailability.available || !cheats.enabled || blockedByHigherOwner) setOpen(false);
 	}, [
 		blockedByHigherOwner,
+		cheatAvailability.available,
 		cheats.enabled,
 	]);
 

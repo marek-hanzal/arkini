@@ -210,6 +210,7 @@ const runtimeItem = ({
 const runtime = {
 	cheats: {
 		enabled: false,
+		everEnabled: false,
 		instantGameplay: false,
 	},
 	currentSpace: 2,

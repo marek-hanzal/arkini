@@ -53,6 +53,7 @@ const blockedOutputState = (includeBlocker = true) =>
 	({
 		cheats: {
 			enabled: false,
+			everEnabled: false,
 			instantGameplay: false,
 		},
 		currentSpace: 0,
@@ -97,6 +98,7 @@ describe("mergeItemsFx atomicity", () => {
 		const state = {
 			cheats: {
 				enabled: false,
+				everEnabled: false,
 				instantGameplay: false,
 			},
 			currentSpace: 0,
@@ -250,6 +252,7 @@ describe("mergeItemsFx atomicity", () => {
 		const state = {
 			cheats: {
 				enabled: false,
+				everEnabled: false,
 				instantGameplay: false,
 			},
 			currentSpace: 0,

@@ -35,6 +35,7 @@ describe("isItemPureFx", () => {
 		const runtime = {
 			cheats: {
 				enabled: false,
+				everEnabled: false,
 				instantGameplay: false,
 			},
 			currentSpace: 0,
@@ -59,6 +60,7 @@ describe("isItemPureFx", () => {
 					runtime: {
 						cheats: {
 							enabled: false,
+							everEnabled: false,
 							instantGameplay: false,
 						},
 						currentSpace: 0,
@@ -76,6 +78,7 @@ describe("isItemPureFx", () => {
 		const runtime = {
 			cheats: {
 				enabled: false,
+				everEnabled: false,
 				instantGameplay: false,
 			},
 			currentSpace: 0,
@@ -108,6 +111,7 @@ describe("isItemPureFx", () => {
 		const activeRuntime = {
 			cheats: {
 				enabled: false,
+				everEnabled: false,
 				instantGameplay: false,
 			},
 			currentSpace: 0,
@@ -127,6 +131,7 @@ describe("isItemPureFx", () => {
 		const queuedRuntime = {
 			cheats: {
 				enabled: false,
+				everEnabled: false,
 				instantGameplay: false,
 			},
 			currentSpace: 0,

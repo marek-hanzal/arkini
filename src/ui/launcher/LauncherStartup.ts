@@ -12,12 +12,14 @@ export namespace LauncherStartup {
 	export interface Result {
 		readonly appearance: Appearance;
 		readonly builtInPackageId: string;
+		readonly cheatsAvailable: boolean;
 	}
 
 	export type State =
 		| {
 				readonly type: "loading";
 				readonly appearance: Appearance | null;
+				readonly cheatsAvailable: boolean | null;
 				readonly heroReady: boolean;
 				readonly splashCompleted: boolean;
 		  }
@@ -25,12 +27,14 @@ export namespace LauncherStartup {
 				readonly type: "ready";
 				readonly appearance: Appearance;
 				readonly builtInPackageId: string;
+				readonly cheatsAvailable: boolean;
 				readonly heroReady: boolean;
 				readonly splashCompleted: boolean;
 		  }
 		| {
 				readonly type: "failed";
 				readonly appearance: Appearance | null;
+				readonly cheatsAvailable: boolean | null;
 				readonly error: unknown;
 				readonly heroReady: boolean;
 				readonly splashCompleted: boolean;

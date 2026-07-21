@@ -38,6 +38,7 @@ const makeState = ({
 	({
 		cheats: {
 			enabled: false,
+			everEnabled: false,
 			instantGameplay: false,
 		},
 		currentSpace: 0,

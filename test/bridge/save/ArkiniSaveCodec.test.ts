@@ -8,6 +8,7 @@ import type { StateSchema } from "~/engine/state/schema/StateSchema";
 const state: StateSchema.Type = {
 	cheats: {
 		enabled: false,
+		everEnabled: false,
 		instantGameplay: false,
 	},
 	currentSpace: 0,

@@ -62,6 +62,7 @@ describe("resolveInputRunFx", () => {
 				runtime: {
 					cheats: {
 						enabled: false,
+						everEnabled: false,
 						instantGameplay: false,
 					},
 					currentSpace: 0,
@@ -88,6 +89,7 @@ describe("resolveInputRunFx", () => {
 		const runtime = {
 			cheats: {
 				enabled: false,
+				everEnabled: false,
 				instantGameplay: false,
 			},
 			currentSpace: 0,
@@ -181,6 +183,7 @@ describe("resolveInputRunFx", () => {
 				runtime: {
 					cheats: {
 						enabled: false,
+						everEnabled: false,
 						instantGameplay: false,
 					},
 					currentSpace: 0,

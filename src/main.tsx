@@ -4,12 +4,14 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { ArkpackCatalogProvider } from "~/bridge/arkpack/ArkpackCatalogProvider";
 import { createArkpackCatalogFx } from "~/bridge/arkpack/createArkpackCatalogFx";
+import { createCheatAvailability } from "~/bridge/cheat/createCheatAvailability";
 import { closeGameEngineResourceFx } from "~/bridge/game/closeGameEngineResourceFx";
 import { releaseGameEngineResourceFx } from "~/bridge/game/releaseGameEngineResourceFx";
 import { waitForGameEngineResource } from "~/bridge/game/waitForGameEngineResource";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import { createArkiniRouter } from "~/router";
 import { AppearanceProvider } from "~/ui/appearance/AppearanceProvider";
+import { CheatAvailabilityProvider } from "~/ui/cheat-availability/CheatAvailabilityProvider";
 import { createLauncherStartupFx } from "~/ui/launcher/createLauncherStartupFx";
 import { LauncherHeroAsset } from "~/ui/launcher/LauncherHeroAsset";
 import { LauncherStartupHydrator } from "~/ui/launcher/LauncherStartupHydrator";
@@ -23,6 +25,7 @@ interface HotData {
 const hotData = import.meta.hot?.data as HotData | undefined;
 const previousGameShutdown = hotData?.gameEngineShutdown ?? Promise.resolve();
 const queryClient = new QueryClient();
+const cheatAvailability = createCheatAvailability();
 
 const rootElement = document.getElementById("root");
 if (!rootElement) {
@@ -36,10 +39,15 @@ const launcherStartup = RendererRuntime.runSync(
 		heroUrl: LauncherHeroAsset.url,
 	}),
 );
+const removeCheatAvailabilityStartupSubscription = launcherStartup.subscribe(() => {
+	const state = launcherStartup.getSnapshot();
+	if (state.cheatsAvailable !== null) cheatAvailability.apply(state.cheatsAvailable);
+});
 void RendererRuntime.runPromise(launcherStartup.startFx).catch(() => {
 	// The startup owner publishes the exact failure for the splash retry UI.
 });
 const router = createArkiniRouter({
+	cheatAvailability,
 	launcherStartup,
 	previousGameShutdown,
 	queryClient,
@@ -61,6 +69,7 @@ const removeBeforeClose = window.arkini.lifecycle.onBeforeClose(async () => {
 
 import.meta.hot?.dispose((data: HotData) => {
 	removeBeforeClose();
+	removeCheatAvailabilityStartupSubscription();
 	data.gameEngineShutdown = waitForGameEngineResource(queryClient).then(async (resource) => {
 		if (resource === null) return;
 		resource.assertUsable();
@@ -84,8 +93,10 @@ createRoot(rootElement).render(
 			<ArkpackCatalogProvider catalog={catalog}>
 				<LauncherStartupProvider startup={launcherStartup}>
 					<AppearanceProvider>
-						<LauncherStartupHydrator />
-						<RouterProvider router={router} />
+						<CheatAvailabilityProvider availability={cheatAvailability}>
+							<LauncherStartupHydrator />
+							<RouterProvider router={router} />
+						</CheatAvailabilityProvider>
 					</AppearanceProvider>
 				</LauncherStartupProvider>
 			</ArkpackCatalogProvider>

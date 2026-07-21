@@ -50,6 +50,11 @@ const api: ArkiniDesktopApi.Api = {
 		writeAccent: (accent) =>
 			ipcRenderer.invoke(ArkiniDesktopApi.channels.appearanceAccentWrite, accent),
 	},
+	cheats: {
+		readAvailable: () => ipcRenderer.invoke(ArkiniDesktopApi.channels.cheatAvailabilityRead),
+		writeAvailable: (available) =>
+			ipcRenderer.invoke(ArkiniDesktopApi.channels.cheatAvailabilityWrite, available),
+	},
 	arkpack: {
 		list: () => ipcRenderer.invoke(ArkiniDesktopApi.channels.arkpackList),
 		read: (packageId) => ipcRenderer.invoke(ArkiniDesktopApi.channels.arkpackRead, packageId),

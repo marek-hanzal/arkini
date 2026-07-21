@@ -46,6 +46,7 @@ describe("checkRuntimeJobsFx", () => {
 		const runtime = {
 			cheats: {
 				enabled: false,
+				everEnabled: false,
 				instantGameplay: false,
 			},
 			currentSpace: 0,
@@ -106,6 +107,7 @@ describe("checkRuntimeJobsFx", () => {
 		const runtime = {
 			cheats: {
 				enabled: false,
+				everEnabled: false,
 				instantGameplay: false,
 			},
 			currentSpace: 0,
@@ -147,6 +149,7 @@ it("reports owned runtime state beneath one consumed job material root", () => {
 	const runtime = {
 		cheats: {
 			enabled: false,
+			everEnabled: false,
 			instantGameplay: false,
 		},
 		currentSpace: 0,

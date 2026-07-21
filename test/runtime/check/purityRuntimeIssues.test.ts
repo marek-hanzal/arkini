@@ -20,6 +20,7 @@ describe("runtime purity invariants", () => {
 		const runtime = {
 			cheats: {
 				enabled: false,
+				everEnabled: false,
 				instantGameplay: false,
 			},
 			currentSpace: 0,
@@ -90,6 +91,7 @@ describe("runtime purity invariants", () => {
 			name: "buffered input",
 			cheats: {
 				enabled: false,
+				everEnabled: false,
 				instantGameplay: false,
 			},
 			currentSpace: 0,
@@ -114,6 +116,7 @@ describe("runtime purity invariants", () => {
 			name: "active job",
 			cheats: {
 				enabled: false,
+				everEnabled: false,
 				instantGameplay: false,
 			},
 			currentSpace: 0,
@@ -133,6 +136,7 @@ describe("runtime purity invariants", () => {
 			name: "queued request",
 			cheats: {
 				enabled: false,
+				everEnabled: false,
 				instantGameplay: false,
 			},
 			currentSpace: 0,
@@ -150,6 +154,7 @@ describe("runtime purity invariants", () => {
 		const runtime = {
 			cheats: {
 				enabled: false,
+				everEnabled: false,
 				instantGameplay: false,
 			},
 			currentSpace: 0,
@@ -190,6 +195,7 @@ describe("runtime purity invariants", () => {
 		const runtime = {
 			cheats: {
 				enabled: false,
+				everEnabled: false,
 				instantGameplay: false,
 			},
 			currentSpace: 0,
@@ -222,6 +228,7 @@ describe("runtime purity invariants", () => {
 		const runtime = {
 			cheats: {
 				enabled: false,
+				everEnabled: false,
 				instantGameplay: false,
 			},
 			currentSpace: 0,

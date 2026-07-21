@@ -262,6 +262,7 @@ export const lineRunRuntime = ({
 	return {
 		cheats: {
 			enabled: false,
+			everEnabled: false,
 			instantGameplay: false,
 		},
 		currentSpace: 0,

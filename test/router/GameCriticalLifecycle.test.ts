@@ -8,6 +8,7 @@ import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { routeTree } from "~/_route";
+import { createCheatAvailability } from "~/bridge/cheat/createCheatAvailability";
 import type { ArkiniDesktopApi } from "../../desktop/ArkiniDesktopApi";
 import { CriticalGameLifecycleError } from "~/bridge/game/CriticalGameLifecycleError";
 import type { Game } from "~/bridge/game/Game";
@@ -34,6 +35,7 @@ const createStartup = (): LauncherStartup => ({
 			accent: "rose",
 		},
 		builtInPackageId: packageId,
+		cheatsAvailable: false,
 		heroReady: true,
 		splashCompleted: true,
 	}),
@@ -109,6 +111,7 @@ const createHarness = ({
 		routeTree,
 		isServer: false,
 		context: {
+			cheatAvailability: createCheatAvailability(),
 			launcherStartup: createStartup(),
 			previousGameShutdown,
 			queryClient,

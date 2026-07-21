@@ -6,6 +6,7 @@ import { Effect } from "effect";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { routeTree } from "~/_route";
+import { createCheatAvailability } from "~/bridge/cheat/createCheatAvailability";
 import type { Game } from "~/bridge/game/Game";
 import { createGameEngineResourceFx } from "~/bridge/game/createGameEngineResourceFx";
 import { getCachedGameEngineResource } from "~/bridge/game/getCachedGameEngineResource";
@@ -22,6 +23,7 @@ const createStartup = (): LauncherStartup => ({
 			accent: "rose",
 		},
 		builtInPackageId: "built-in",
+		cheatsAvailable: false,
 		heroReady: true,
 		splashCompleted: true,
 	}),
@@ -57,14 +59,25 @@ const createGame = (disposeFx: Game["disposeFx"] = Effect.void): Game => ({
 	subscribeEvents: () => () => undefined,
 });
 
-const createHarness = (initialPath: string, game: Game) => {
+const createHarness = (
+	initialPath: string,
+	game: Game,
+	{
+		cheatsAvailable = false,
+	}: {
+		readonly cheatsAvailable?: boolean;
+	} = {},
+) => {
 	const queryClient = new QueryClient();
+	const cheatAvailability = createCheatAvailability();
+	cheatAvailability.apply(cheatsAvailable);
 	const resource = Effect.runSync(createGameEngineResourceFx(game));
 	queryClient.setQueryData(gameEngineQueryKey, resource);
 	const router = createRouter({
 		routeTree,
 		isServer: false,
 		context: {
+			cheatAvailability,
 			launcherStartup: createStartup(),
 			previousGameShutdown: Promise.resolve(),
 			queryClient,
@@ -96,12 +109,25 @@ describe("game route lifecycle", () => {
 			(match) => match.routeId === "/game/$packageId",
 		);
 
-		expect(gameMatch?.loaderData).toBe(game);
-		expect(gameMatch?.context.gameEngine).toBe(game);
+		expect(gameMatch?.loaderData).toBe(resource.game);
+		expect(gameMatch?.context.gameEngine).toBe(resource.game);
 		expect(gameMatch?.context.gameEngineResource).toBe(resource);
 	});
 
-	it("routes launcher navigation through the leaf leave action before mounting launcher UI", async () => {
+	it("gates the save-scoped Cheats route only through application availability", async () => {
+		const game = createGame();
+		const unavailable = createHarness("/game/package-route/cheats", game);
+		await unavailable.router.load();
+		expect(unavailable.router.state.location.pathname).toBe("/game/package-route/board");
+
+		const available = createHarness("/game/package-route/cheats", game, {
+			cheatsAvailable: true,
+		});
+		await available.router.load();
+		expect(available.router.state.location.pathname).toBe("/game/package-route/cheats");
+	});
+
+	it("preserves the cached Game while standalone Settings is open", async () => {
 		vi.useFakeTimers();
 		const dispose = vi.fn();
 		const game = createGame(Effect.sync(dispose));
@@ -112,8 +138,10 @@ describe("game route lifecycle", () => {
 		await loading;
 
 		expect(router.state.location.pathname).toBe("/settings");
-		expect(dispose).toHaveBeenCalledOnce();
-		expect(getCachedGameEngineResource(queryClient)).toBeNull();
+		expect(dispose).not.toHaveBeenCalled();
+		expect(getCachedGameEngineResource(queryClient)?.game.arkpack.packageId).toBe(
+			"package-route",
+		);
 	});
 
 	it("keeps one parent Game while moving from board into its action sibling", async () => {
@@ -121,6 +149,7 @@ describe("game route lifecycle", () => {
 		const dispose = vi.fn();
 		const game = createGame(Effect.sync(dispose));
 		const { queryClient, resource, router } = createHarness("/game/package-route/board", game);
+		const engine = resource.game;
 		await router.load();
 
 		const navigation = router.navigate({
@@ -136,7 +165,7 @@ describe("game route lifecycle", () => {
 		await navigation;
 
 		expect(dispose).toHaveBeenCalledOnce();
-		expect(resource.game).toBe(game);
+		expect(resource.game).toBe(engine);
 		expect(getCachedGameEngineResource(queryClient)).toBeNull();
 		expect(router.state.location.pathname).toBe("/main-menu");
 	});

@@ -62,6 +62,7 @@ describe("checkRuntimeInputLocationsFx", () => {
 			checkFx({
 				cheats: {
 					enabled: false,
+					everEnabled: false,
 					instantGameplay: false,
 				},
 				currentSpace: 0,

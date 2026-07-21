@@ -13,6 +13,7 @@ import {
 import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { createCheatAvailability } from "~/bridge/cheat/createCheatAvailability";
 import type { Game } from "~/bridge/game/Game";
 import type { GameEngine } from "~/bridge/game/GameEngine";
 import type { GameEngineResource } from "~/bridge/game/GameEngineResource";
@@ -21,6 +22,7 @@ import { SettingsPage } from "~/page/settings/SettingsPage";
 import { createTestGameSession } from "~test/bridge/game/createTestGameSession";
 import { createJobTestConfig } from "~test/job/support/jobTestConfig";
 import { AppearanceProvider } from "~/ui/appearance/AppearanceProvider";
+import { CheatAvailabilityProvider } from "~/ui/cheat-availability/CheatAvailabilityProvider";
 
 (
 	globalThis as {
@@ -72,6 +74,8 @@ const renderSettings = async (
 ) => {
 	const deferred = createDeferred();
 	const write = vi.fn(() => deferred.promise);
+	const writeCheatAvailability = vi.fn(() => Promise.resolve());
+	const cheatAvailability = createCheatAvailability();
 	Object.defineProperty(window, "scrollTo", {
 		configurable: true,
 		value: vi.fn(),
@@ -81,6 +85,9 @@ const renderSettings = async (
 		value: {
 			appearance: {
 				write,
+			},
+			cheats: {
+				writeAvailable: writeCheatAvailability,
 			},
 		},
 	});
@@ -146,7 +153,13 @@ const renderSettings = async (
 					{
 						initialTheme: "dark",
 					},
-					createElement(SettingsPage),
+					createElement(
+						CheatAvailabilityProvider,
+						{
+							availability: cheatAvailability,
+						},
+						createElement(SettingsPage),
+					),
 				),
 			),
 	});
@@ -190,6 +203,8 @@ const renderSettings = async (
 		game,
 		router,
 		write,
+		writeCheatAvailability,
+		cheatAvailability,
 	};
 };
 
@@ -281,8 +296,21 @@ describe("Settings", () => {
 		await vi.waitFor(() => expect(router.state.location.pathname).toBe("/main-menu"));
 	});
 
-	it("toggles persisted Cheat mode only when an active Game remains cached", async () => {
-		const { container, game } = await renderSettings(
+	it("toggles application-wide Cheat tools without an active Game", async () => {
+		const { container, writeCheatAvailability, cheatAvailability } = await renderSettings([
+			"/settings",
+		]);
+		const toggle = container.querySelector<HTMLInputElement>(
+			'[data-ui="SettingsCheatAvailability"] input[type="checkbox"]',
+		);
+		if (toggle === null) throw new Error("Expected Cheat tools control.");
+		await act(async () => toggle.click());
+		await vi.waitFor(() => expect(writeCheatAvailability).toHaveBeenCalledWith(true));
+		await vi.waitFor(() => expect(cheatAvailability.getSnapshot()).toBe(true));
+	});
+
+	it("toggles application-wide Cheat tools without mutating the cached Game", async () => {
+		const { container, game, writeCheatAvailability, cheatAvailability } = await renderSettings(
 			[
 				"/game/package:settings/board",
 				"/settings",
@@ -292,13 +320,18 @@ describe("Settings", () => {
 			},
 		);
 		if (game === null) throw new Error("Expected active Game.");
-		const cheatMode = container.querySelector<HTMLInputElement>(
-			'[data-ui="SettingsCheatMode"] input[type="checkbox"]',
+		const toggle = container.querySelector<HTMLInputElement>(
+			'[data-ui="SettingsCheatAvailability"] input[type="checkbox"]',
 		);
-		if (cheatMode === null) throw new Error("Expected Cheat mode control.");
-		expect(cheatMode.checked).toBe(false);
-		await act(async () => cheatMode.click());
-		await vi.waitFor(() => expect(game.getSnapshot().cheats.enabled).toBe(true));
-		await vi.waitFor(() => expect(cheatMode.checked).toBe(true));
+		if (toggle === null) throw new Error("Expected Cheat tools control.");
+		expect(toggle.checked).toBe(false);
+		await act(async () => toggle.click());
+		await vi.waitFor(() => expect(writeCheatAvailability).toHaveBeenCalledWith(true));
+		await vi.waitFor(() => expect(cheatAvailability.getSnapshot()).toBe(true));
+		expect(game.getSnapshot().cheats).toEqual({
+			enabled: false,
+			everEnabled: false,
+			instantGameplay: false,
+		});
 	});
 });

@@ -78,6 +78,7 @@ describe("authored directional merge gameplay", () => {
 					state: {
 						cheats: {
 							enabled: false,
+							everEnabled: false,
 							instantGameplay: false,
 						},
 						currentSpace: 0,
@@ -186,6 +187,7 @@ describe("authored directional merge gameplay", () => {
 					state: {
 						cheats: {
 							enabled: false,
+							everEnabled: false,
 							instantGameplay: false,
 						},
 						currentSpace: 0,

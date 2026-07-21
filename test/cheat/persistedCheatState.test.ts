@@ -27,6 +27,7 @@ describe("persisted cheat state", () => {
 		try {
 			expect(session.getSnapshot().cheats).toEqual({
 				enabled: false,
+				everEnabled: false,
 				instantGameplay: false,
 			});
 			await session.run(
@@ -47,6 +48,7 @@ describe("persisted cheat state", () => {
 		if (saved === undefined) throw new Error("Expected persisted cheat state.");
 		expect(saved.cheats).toEqual({
 			enabled: true,
+			everEnabled: true,
 			instantGameplay: true,
 		});
 		const restored = await createTestGameSession({
@@ -63,6 +65,7 @@ describe("persisted cheat state", () => {
 			);
 			expect(restored.getSnapshot().cheats).toEqual({
 				enabled: false,
+				everEnabled: true,
 				instantGameplay: true,
 			});
 		} finally {

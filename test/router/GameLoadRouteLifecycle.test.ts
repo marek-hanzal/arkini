@@ -14,6 +14,7 @@ vi.mock("~/bridge/game/createGameFx", () => ({
 }));
 
 import { routeTree } from "~/_route";
+import { createCheatAvailability } from "~/bridge/cheat/createCheatAvailability";
 import type { ArkiniDesktopApi } from "../../desktop/ArkiniDesktopApi";
 import type { Game } from "~/bridge/game/Game";
 import { getCachedGameEngineResource } from "~/bridge/game/getCachedGameEngineResource";
@@ -32,6 +33,7 @@ const createStartup = (): LauncherStartup => ({
 			accent: "rose",
 		},
 		builtInPackageId: packageId,
+		cheatsAvailable: false,
 		heroReady: true,
 		splashCompleted: true,
 	}),
@@ -79,6 +81,7 @@ const createHarness = (initialPath: string) => {
 		routeTree,
 		isServer: false,
 		context: {
+			cheatAvailability: createCheatAvailability(),
 			launcherStartup: createStartup(),
 			previousGameShutdown: Promise.resolve(),
 			queryClient,

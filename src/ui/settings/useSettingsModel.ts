@@ -2,10 +2,10 @@ import { useEffect } from "react";
 import { match, P } from "ts-pattern";
 
 import type { AppearanceTheme } from "~/bridge/appearance/AppearanceTheme";
-import { useActiveGameCheats } from "~/bridge/cheat/useActiveGameCheats";
-import { useSetCheatEnabledMutation } from "~/bridge/cheat/useSetCheatEnabledMutation";
 import { useSetAppearanceThemeMutation } from "~/ui/appearance/mutation/useSetAppearanceThemeMutation";
 import { useAppearance } from "~/ui/appearance/useAppearance";
+import { useCheatAvailability } from "~/ui/cheat-availability/useCheatAvailability";
+import { useSetCheatAvailabilityMutation } from "~/ui/cheat-availability/useSetCheatAvailabilityMutation";
 
 export namespace useSettingsModel {
 	export type Status =
@@ -17,25 +17,25 @@ export namespace useSettingsModel {
 				readonly message: string;
 		  }
 		| {
-				readonly kind: "saving-cheat-mode";
+				readonly kind: "saving-cheat-tools";
 		  }
 		| {
 				readonly kind: "saving-theme";
 		  }
 		| {
 				readonly kind: "save-error";
-				readonly label: "Cheat mode" | "Theme";
+				readonly label: "Cheat tools" | "Theme";
 				readonly message: string;
 		  }
 		| {
 				readonly kind: "saved";
-				readonly label: "Cheat mode" | "Theme";
+				readonly label: "Cheat tools" | "Theme";
 		  };
 }
 
 const errorMessage = (error: unknown) => (error instanceof Error ? error.message : String(error));
 
-/** Owns settings mutations and the one Escape lifecycle for the settings surface. */
+/** Owns application settings mutations and the one Escape lifecycle for the settings surface. */
 export const useSettingsModel = ({
 	exitPending,
 	navigationError,
@@ -46,10 +46,10 @@ export const useSettingsModel = ({
 	readonly onBack: () => void;
 }) => {
 	const appearance = useAppearance();
-	const activeGame = useActiveGameCheats();
+	const cheatAvailability = useCheatAvailability();
 	const setTheme = useSetAppearanceThemeMutation();
-	const setCheatEnabled = useSetCheatEnabledMutation(activeGame.game);
-	const blocked = setTheme.isPending || setCheatEnabled.isPending || exitPending;
+	const setCheatAvailability = useSetCheatAvailabilityMutation();
+	const blocked = setTheme.isPending || setCheatAvailability.isPending || exitPending;
 
 	useEffect(() => {
 		const onKeyDown = (event: KeyboardEvent) => {
@@ -65,9 +65,9 @@ export const useSettingsModel = ({
 	]);
 
 	const mutationStatus = match([
-		setCheatEnabled.isPending,
-		setCheatEnabled.isError,
-		setCheatEnabled.isSuccess,
+		setCheatAvailability.isPending,
+		setCheatAvailability.isError,
+		setCheatAvailability.isSuccess,
 		setTheme.isPending,
 		setTheme.isError,
 		setTheme.isSuccess,
@@ -82,7 +82,7 @@ export const useSettingsModel = ({
 				P._,
 			],
 			(): useSettingsModel.Status => ({
-				kind: "saving-cheat-mode",
+				kind: "saving-cheat-tools",
 			}),
 		)
 		.with(
@@ -96,8 +96,8 @@ export const useSettingsModel = ({
 			],
 			(): useSettingsModel.Status => ({
 				kind: "save-error",
-				label: "Cheat mode",
-				message: errorMessage(setCheatEnabled.error),
+				label: "Cheat tools",
+				message: errorMessage(setCheatAvailability.error),
 			}),
 		)
 		.with(
@@ -139,7 +139,7 @@ export const useSettingsModel = ({
 			],
 			(): useSettingsModel.Status => ({
 				kind: "saved",
-				label: "Cheat mode",
+				label: "Cheat tools",
 			}),
 		)
 		.with(
@@ -173,11 +173,11 @@ export const useSettingsModel = ({
 
 	return {
 		blocked,
-		cheatMode: activeGame.cheats?.enabled ?? null,
+		cheatToolsAvailable: cheatAvailability.available,
 		exitPending,
 		status,
 		theme: appearance.theme,
 		selectTheme: (theme: AppearanceTheme) => setTheme.mutate(theme),
-		setCheatMode: (enabled: boolean) => setCheatEnabled.mutate(enabled),
+		setCheatToolsAvailable: (available: boolean) => setCheatAvailability.mutate(available),
 	};
 };

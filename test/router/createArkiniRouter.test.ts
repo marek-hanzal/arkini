@@ -3,6 +3,7 @@ import { QueryClient } from "@tanstack/react-query";
 
 import { Effect } from "effect";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { createCheatAvailability } from "~/bridge/cheat/createCheatAvailability";
 import { createArkiniRouter } from "~/router";
 import type { LauncherStartup } from "~/ui/launcher/LauncherStartup";
 import { resolveRouteViewTransitionTypes } from "~/ui/navigation/resolveRouteViewTransitionTypes";
@@ -15,6 +16,7 @@ const createStartup = (): LauncherStartup => {
 			accent: "rose",
 		},
 		builtInPackageId: "built-in",
+		cheatsAvailable: false,
 		heroReady: true,
 		splashCompleted: true,
 	};
@@ -240,6 +242,7 @@ describe("createArkiniRouter", () => {
 			},
 		});
 		const router = createArkiniRouter({
+			cheatAvailability: createCheatAvailability(),
 			launcherStartup: createStartup(),
 			previousGameShutdown: Promise.resolve(),
 			queryClient: new QueryClient(),
@@ -257,6 +260,7 @@ describe("createArkiniRouter", () => {
 			},
 		});
 		const router = createArkiniRouter({
+			cheatAvailability: createCheatAvailability(),
 			launcherStartup: createStartup(),
 			previousGameShutdown: Promise.resolve(),
 			queryClient: new QueryClient(),
@@ -266,6 +270,7 @@ describe("createArkiniRouter", () => {
 
 	it("falls back to a normal update when the browser API is unavailable", async () => {
 		const router = createArkiniRouter({
+			cheatAvailability: createCheatAvailability(),
 			launcherStartup: createStartup(),
 			previousGameShutdown: Promise.resolve(),
 			queryClient: new QueryClient(),

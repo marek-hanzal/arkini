@@ -3,6 +3,7 @@ import { Effect } from "effect";
 import { ArkiniDesktopApi } from "../../desktop/ArkiniDesktopApi";
 import { createFilesystemArkpackCatalogFx } from "./arkpack/createFilesystemArkpackCatalogFx";
 import type { AppearancePreferences } from "./appearance/AppearancePreferences";
+import type { CheatPreferences } from "./cheat/CheatPreferences";
 import { ElectronMainRuntime } from "./ElectronMainRuntime";
 import { createFilesystemGameSaveFilesFx } from "./save/createFilesystemGameSaveFilesFx";
 import type { TrustedRenderer } from "./security/TrustedRenderer";
@@ -13,12 +14,17 @@ export namespace registerArkiniDesktopIpcFx {
 	export interface Props {
 		readonly trustedRenderer: TrustedRenderer;
 		readonly appearancePreferences: AppearancePreferences;
+		readonly cheatPreferences: CheatPreferences;
 	}
 }
 
 /** Registers the narrow Arkini desktop capabilities exposed through preload. */
 export const registerArkiniDesktopIpcFx = Effect.fn("registerArkiniDesktopIpcFx")(
-	({ trustedRenderer, appearancePreferences }: registerArkiniDesktopIpcFx.Props) =>
+	({
+		trustedRenderer,
+		appearancePreferences,
+		cheatPreferences,
+	}: registerArkiniDesktopIpcFx.Props) =>
 		Effect.gen(function* () {
 			if (registered) return;
 			registered = true;
@@ -73,6 +79,14 @@ export const registerArkiniDesktopIpcFx = Effect.fn("registerArkiniDesktopIpcFx"
 				ipcMain.handle(ArkiniDesktopApi.channels.appearanceAccentWrite, (event, accent) =>
 					runAuthorizedFx(event, appearancePreferences.writeAccentFx(accent)),
 				);
+				ipcMain.handle(ArkiniDesktopApi.channels.cheatAvailabilityRead, (event) =>
+					runAuthorizedFx(event, cheatPreferences.readAvailableFx),
+				);
+				ipcMain.handle(
+					ArkiniDesktopApi.channels.cheatAvailabilityWrite,
+					(event, available) =>
+						runAuthorizedFx(event, cheatPreferences.writeAvailableFx(available)),
+				);
 
 				ipcMain.handle(ArkiniDesktopApi.channels.arkpackList, (event) =>
 					runAuthorizedFx(event, arkpacks.listFx),
@@ -113,6 +127,8 @@ export const registerArkiniDesktopIpcFx = Effect.fn("registerArkiniDesktopIpcFx"
 						ArkiniDesktopApi.channels.appearanceWrite,
 						ArkiniDesktopApi.channels.appearanceAccentRead,
 						ArkiniDesktopApi.channels.appearanceAccentWrite,
+						ArkiniDesktopApi.channels.cheatAvailabilityRead,
+						ArkiniDesktopApi.channels.cheatAvailabilityWrite,
 						ArkiniDesktopApi.channels.arkpackList,
 						ArkiniDesktopApi.channels.arkpackRead,
 						ArkiniDesktopApi.channels.arkpackInstall,

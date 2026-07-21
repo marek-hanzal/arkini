@@ -5,6 +5,7 @@ import { createMemoryHistory, createRouter } from "@tanstack/react-router";
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 import { routeTree } from "~/_route";
+import { createCheatAvailability } from "~/bridge/cheat/createCheatAvailability";
 import type { LauncherStartup } from "~/ui/launcher/LauncherStartup";
 
 const createStartup = (splashCompleted: boolean): LauncherStartup => {
@@ -15,6 +16,7 @@ const createStartup = (splashCompleted: boolean): LauncherStartup => {
 			accent: "rose",
 		},
 		builtInPackageId: "built-in",
+		cheatsAvailable: false,
 		heroReady: true,
 		splashCompleted,
 	};
@@ -32,6 +34,7 @@ const loadRoute = async (path: string, splashCompleted = false) => {
 		routeTree,
 		isServer: false,
 		context: {
+			cheatAvailability: createCheatAvailability(),
 			launcherStartup: createStartup(splashCompleted),
 			previousGameShutdown: Promise.resolve(),
 			queryClient: new QueryClient(),

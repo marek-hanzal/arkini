@@ -7,6 +7,7 @@ import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 const activeRuntime = {
 	cheats: {
 		enabled: false,
+		everEnabled: false,
 		instantGameplay: false,
 	},
 	currentSpace: 0,
@@ -65,6 +66,7 @@ describe("isLineInputClosedFx", () => {
 					runtime: {
 						cheats: {
 							enabled: false,
+							everEnabled: false,
 							instantGameplay: false,
 						},
 						currentSpace: 0,

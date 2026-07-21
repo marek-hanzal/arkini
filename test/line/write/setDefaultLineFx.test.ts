@@ -13,6 +13,7 @@ import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { fromRuntimeFx } from "~/engine/state/fx/fromRuntimeFx";
 import { startFx } from "~/engine/start/write/startFx";
+import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
 
 const line = (id: string, title: string) => ({
 	id,
@@ -81,6 +82,66 @@ const config = GameConfigSchema.parse({
 		},
 	},
 });
+const createStackConfig = ({ boardWidth }: { readonly boardWidth: number }) =>
+	GameConfigSchema.parse({
+		version: "1.0",
+		resources: {
+			hero: "hero",
+		},
+		meta: {
+			id: `game:default-line-stack:${boardWidth}`,
+			title: "Default line stack",
+			board: {
+				width: boardWidth,
+				height: 1,
+			},
+			inventory: {
+				width: 1,
+				height: 1,
+			},
+		},
+		start: {
+			currentSpace: 0,
+		},
+		categories: {},
+		items: {
+			producer: {
+				id: "producer",
+				type: "producer",
+				title: "Producer",
+				description: "Owns one line.",
+				asset: {
+					source: [
+						"asset:producer",
+					],
+				},
+				tags: [],
+				categoryId: "building",
+				scope: "any",
+				maxStackSize: 3,
+				maxQueueSize: 1,
+				lines: [
+					line("line:only", "Only"),
+				],
+			},
+			blocker: {
+				id: "blocker",
+				type: "simple",
+				title: "Blocker",
+				description: "Blocks placement.",
+				asset: {
+					source: [
+						"asset:blocker",
+					],
+				},
+				tags: [],
+				categoryId: "resource",
+				scope: "any",
+				maxStackSize: 1,
+			},
+		},
+	});
+
 
 describe("setDefaultLineFx", () => {
 	it("persists one exact default without reordering authored lines and makes the owner impure", () => {
@@ -278,4 +339,150 @@ describe("setDefaultLineFx", () => {
 		expect(result.items).toEqual([]);
 		expect(result.defaultLineByOwnerItemId).toBeUndefined();
 	});
+	it("atomically isolates one exact stacked owner before selecting its default", () => {
+		const result = Effect.runSync(
+			Effect.gen(function* () {
+				const owner = yield* spawnItemFx({
+					id: "runtime:producer",
+					itemId: "producer",
+					location: {
+						scope: "board",
+						space: 0,
+						position: {
+							x: 0,
+							y: 0,
+						},
+					},
+					quantity: 3,
+				});
+				yield* setDefaultLineFx({
+					ownerItemId: owner.id,
+					lineId: "line:only",
+				});
+				const runtime = yield* readRuntimeFx();
+				const isolated = runtime.items.find((item) => item.id === owner.id);
+				const remainder = runtime.items.find(
+					(item) => item.item.id === "producer" && item.id !== owner.id,
+				);
+				if (isolated === undefined || remainder === undefined) {
+					throw new Error("Expected isolated default owner and pure remainder.");
+				}
+				const selectedPure = yield* isItemPureFx({
+					item: isolated,
+					runtime,
+				});
+				const remainderPure = yield* isItemPureFx({
+					item: remainder,
+					runtime,
+				});
+				yield* unsetDefaultLineFx({
+					ownerItemId: owner.id,
+				});
+				const clearedRuntime = yield* readRuntimeFx();
+				const clearedOwner = clearedRuntime.items.find((item) => item.id === owner.id);
+				if (clearedOwner === undefined) throw new Error("Expected cleared owner.");
+				const clearedPure = yield* isItemPureFx({
+					item: clearedOwner,
+					runtime: clearedRuntime,
+				});
+
+				return {
+					clearedPure,
+					isolated,
+					remainder,
+					remainderPure,
+					runtime,
+					selectedPure,
+				};
+			}).pipe(
+				useGameFx({
+					config: createStackConfig({
+						boardWidth: 2,
+					}),
+				}),
+			),
+		);
+
+		expect(result.runtime.defaultLineByOwnerItemId).toEqual({
+			"runtime:producer": "line:only",
+		});
+		expect(result.isolated).toMatchObject({
+			id: "runtime:producer",
+			quantity: 1,
+		});
+		expect(result.remainder).toMatchObject({
+			location: {
+				scope: "board",
+				space: 0,
+				position: {
+					x: 1,
+					y: 0,
+				},
+			},
+			quantity: 2,
+		});
+		expect(result.selectedPure).toBe(false);
+		expect(result.remainderPure).toBe(true);
+		expect(result.clearedPure).toBe(true);
+	});
+
+	it("rolls back the default mapping and split when the remainder cannot be placed", () => {
+		const result = Effect.runSync(
+			Effect.gen(function* () {
+				yield* spawnItemFx({
+					id: "runtime:producer",
+					itemId: "producer",
+					location: {
+						scope: "board",
+						space: 0,
+						position: {
+							x: 0,
+							y: 0,
+						},
+					},
+					quantity: 2,
+				});
+				yield* spawnItemFx({
+					id: "runtime:blocker",
+					itemId: "blocker",
+					location: {
+						scope: "inventory",
+						position: {
+							x: 0,
+							y: 0,
+						},
+					},
+					quantity: 1,
+				});
+				const before = yield* readRuntimeFx();
+				const selected = yield* Effect.either(
+					setDefaultLineFx({
+						ownerItemId: "runtime:producer",
+						lineId: "line:only",
+					}),
+				);
+
+				return {
+					after: yield* readRuntimeFx(),
+					before,
+					selected,
+				};
+			}).pipe(
+				useGameFx({
+					config: createStackConfig({
+						boardWidth: 1,
+					}),
+				}),
+			),
+		);
+
+		expect(Either.isLeft(result.selected)).toBe(true);
+		if (Either.isLeft(result.selected)) {
+			expect(result.selected.left).toMatchObject({
+				_tag: "PlacementUnavailableError",
+			});
+		}
+		expect(result.after).toEqual(result.before);
+	});
+
 });

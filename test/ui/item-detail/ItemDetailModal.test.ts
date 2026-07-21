@@ -249,7 +249,6 @@ describe("ItemDetailModal", () => {
 		await act(async () => {
 			readControl().openItemDetail({
 				itemId: owner.id,
-				tab: "info",
 				origin,
 			});
 			await Promise.resolve();
@@ -258,22 +257,24 @@ describe("ItemDetailModal", () => {
 		const modal = document.querySelector<HTMLElement>('[data-ui="ItemDetailModal"]');
 		expect(modal).not.toBeNull();
 		expect(modal?.dataset.runtimeId).toBe(owner.id);
+		expect(modal?.dataset.tab).toBe("lines");
+		expect(document.querySelector('[data-ui="ItemLinesTab"]')).not.toBeNull();
 		expect(
 			Array.from(
 				document.querySelectorAll<HTMLElement>('[data-ui="ItemDetailTabs"] button'),
 			).map((tab) => tab.dataset.tab),
 		).toEqual([
-			"info",
 			"lines",
 			"queue",
+			"info",
 		]);
 
-		const linesTab = document.querySelector<HTMLButtonElement>('[data-tab="lines"]');
-		if (linesTab === null) throw new Error("Missing Lines tab.");
-		await act(async () => linesTab.click());
+		const infoTab = document.querySelector<HTMLButtonElement>('[data-tab="info"]');
+		if (infoTab === null) throw new Error("Missing Info tab.");
+		await act(async () => infoTab.click());
 		expect(document.querySelector('[data-ui="ItemDetailModal"]')).toBe(modal);
-		expect(modal?.dataset.tab).toBe("lines");
-		expect(document.querySelector('[data-ui="ItemLinesTab"]')).not.toBeNull();
+		expect(modal?.dataset.tab).toBe("info");
+		expect(document.querySelector('[data-ui="ItemInfoTab"]')).not.toBeNull();
 
 		const queueTab = document.querySelector<HTMLButtonElement>('[data-tab="queue"]');
 		if (queueTab === null) throw new Error("Missing Queue tab.");

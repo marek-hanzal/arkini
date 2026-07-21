@@ -21,7 +21,7 @@ import { useItemDetailControl } from "~/ui/item-detail/useItemDetailControl";
 vi.mock("~/bridge/item-detail/useResolveItemDetailTarget", () => ({
 	useResolveItemDetailTarget:
 		() =>
-		({ itemId, requestedTab }: { itemId: string; requestedTab: string }) =>
+		({ itemId, requestedTab }: { itemId: string; requestedTab?: string }) =>
 			itemId === "runtime:missing"
 				? ({
 						kind: "unavailable",
@@ -29,10 +29,10 @@ vi.mock("~/bridge/item-detail/useResolveItemDetailTarget", () => ({
 				: ({
 						kind: "available",
 						itemId,
-						tab: requestedTab,
+						tab: requestedTab ?? "lines",
 						tabs: [
-							"info",
 							"lines",
+							"info",
 						],
 					} as const),
 }));

@@ -33,7 +33,7 @@ export interface CloseItemDetailProps {
 
 export interface OpenItemDetailProps {
 	readonly itemId: string;
-	readonly tab: ItemDetailTab;
+	readonly tab?: ItemDetailTab;
 	readonly origin?: HTMLElement | null;
 }
 

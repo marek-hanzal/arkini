@@ -8,10 +8,20 @@ describe("resolveItemDetailTarget", () => {
 	it("exposes one finite authoritative tab set and validates requested tabs", () => {
 		const runtime = lineRunRuntime({});
 		expect(readItemDetailTabs(runtime.items[0])).toEqual([
-			"info",
 			"lines",
 			"queue",
+			"info",
 		]);
+		expect(
+			resolveItemDetailTarget({
+				itemId: "runtime:workshop",
+				runtime,
+			}),
+		).toMatchObject({
+			kind: "available",
+			itemId: "runtime:workshop",
+			tab: "lines",
+		});
 		expect(
 			resolveItemDetailTarget({
 				itemId: "runtime:workshop",
@@ -25,7 +35,7 @@ describe("resolveItemDetailTarget", () => {
 		});
 	});
 
-	it("falls back to Info without retargeting and rejects stale identities", () => {
+	it("keeps Info as the unsupported-tab fallback without retargeting and rejects stale identities", () => {
 		const runtime = lineRunRuntime({});
 		const ordinaryRuntime = {
 			...runtime,

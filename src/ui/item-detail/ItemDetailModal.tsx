@@ -239,7 +239,6 @@ const ItemDetailDialog = ({
 		if (tabs.includes(state.target.tab)) return;
 		itemDetail.openItemDetail({
 			itemId: state.target.itemId,
-			tab: "info",
 		});
 	}, [
 		itemDetail,

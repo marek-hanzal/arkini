@@ -7,13 +7,13 @@ const infoTab: readonly ItemDetailTabEnumSchema.Type[] = [
 	"info",
 ];
 const lineOwnerTabs: readonly ItemDetailTabEnumSchema.Type[] = [
-	"info",
 	"lines",
+	"info",
 ];
 const queuedProducerTabs: readonly ItemDetailTabEnumSchema.Type[] = [
-	"info",
 	"lines",
 	"queue",
+	"info",
 ];
 
 /** Classifies the finite Item Detail tabs supported by one exact live runtime item. */

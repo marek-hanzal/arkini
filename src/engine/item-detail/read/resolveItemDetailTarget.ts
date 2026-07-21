@@ -6,7 +6,7 @@ import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 export namespace resolveItemDetailTarget {
 	export interface Props {
 		readonly itemId: IdSchema.Type;
-		readonly requestedTab: ItemDetailTabEnumSchema.Type;
+		readonly requestedTab?: ItemDetailTabEnumSchema.Type;
 		readonly runtime: RuntimeSchema.Type;
 	}
 
@@ -35,12 +35,14 @@ export const resolveItemDetailTarget = ({
 	const item = runtime.items.find((candidate) => candidate.id === itemId);
 	const tabs = readItemDetailTabs(item);
 	if (item === undefined || tabs.length === 0) return unavailable;
-	const fallback = tabs.includes("info") ? "info" : tabs[0];
+	const defaultTab = tabs[0];
+	const fallback =
+		requestedTab === undefined ? defaultTab : tabs.includes("info") ? "info" : defaultTab;
 	if (fallback === undefined) return unavailable;
 	return {
 		kind: "available",
 		itemId: item.id,
-		tab: tabs.includes(requestedTab) ? requestedTab : fallback,
+		tab: requestedTab !== undefined && tabs.includes(requestedTab) ? requestedTab : fallback,
 		tabs,
 	};
 };

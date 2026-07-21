@@ -82,7 +82,6 @@ export const TileActor = ({ item, live }: TileActor.Props) => {
 				presentation.setHovered(false);
 				itemDetail.openItemDetail({
 					itemId: item.id,
-					tab: "info",
 					origin: event.currentTarget,
 				});
 			}}

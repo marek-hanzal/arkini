@@ -33,6 +33,10 @@ const simple = {
 describe("isItemPureFx", () => {
 	it("accepts items that own no line or item state", () => {
 		const runtime = {
+			cheats: {
+				enabled: false,
+				instantGameplay: false,
+			},
 			session: {
 				speedMode: "normal" as const,
 			},
@@ -56,6 +60,10 @@ describe("isItemPureFx", () => {
 				isItemPureFx({
 					item: simple,
 					runtime: {
+						cheats: {
+							enabled: false,
+							instantGameplay: false,
+						},
 						session: {
 							speedMode: "normal" as const,
 						},
@@ -72,6 +80,10 @@ describe("isItemPureFx", () => {
 
 	it("rejects an item when any owned line has buffered input", () => {
 		const runtime = {
+			cheats: {
+				enabled: false,
+				instantGameplay: false,
+			},
 			session: {
 				speedMode: "normal" as const,
 			},
@@ -103,6 +115,10 @@ describe("isItemPureFx", () => {
 
 	it("rejects an item when any owned line has an active or queued run", () => {
 		const activeRuntime = {
+			cheats: {
+				enabled: false,
+				instantGameplay: false,
+			},
 			session: {
 				speedMode: "normal" as const,
 			},
@@ -121,6 +137,10 @@ describe("isItemPureFx", () => {
 			],
 		} satisfies RuntimeSchema.Type;
 		const queuedRuntime = {
+			cheats: {
+				enabled: false,
+				instantGameplay: false,
+			},
 			session: {
 				speedMode: "normal" as const,
 			},

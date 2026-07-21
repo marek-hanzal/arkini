@@ -8,6 +8,10 @@ export const fromConfigFx = Effect.fn("fromConfigFx")(function* () {
 	const config = yield* GameConfigFx;
 
 	const runtime: RuntimeSchema.Type = {
+		cheats: {
+			enabled: false,
+			instantGameplay: false,
+		},
 		currentSpace: config.start.currentSpace,
 		session: {
 			speedMode: "normal" as const,

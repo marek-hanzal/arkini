@@ -63,6 +63,10 @@ describe("pure placement stack targets", () => {
 			location: board(2),
 		});
 		const runtime = {
+			cheats: {
+				enabled: false,
+				instantGameplay: false,
+			},
 			session: {
 				speedMode: "normal" as const,
 			},
@@ -111,6 +115,10 @@ describe("pure placement stack targets", () => {
 			location: inventory(1),
 		});
 		const runtime = {
+			cheats: {
+				enabled: false,
+				instantGameplay: false,
+			},
 			session: {
 				speedMode: "normal" as const,
 			},
@@ -153,6 +161,10 @@ describe("pure placement stack targets", () => {
 			revision: "revision:origin",
 		};
 		const runtime = {
+			cheats: {
+				enabled: false,
+				instantGameplay: false,
+			},
 			session: {
 				speedMode: "normal" as const,
 			},
@@ -202,6 +214,10 @@ describe("pure placement stack targets", () => {
 			location: board(0),
 		});
 		const runtime = {
+			cheats: {
+				enabled: false,
+				instantGameplay: false,
+			},
 			session: {
 				speedMode: "normal" as const,
 			},

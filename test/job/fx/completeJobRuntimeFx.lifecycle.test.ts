@@ -297,6 +297,10 @@ describe("charge-driven completion lifecycle", () => {
 
 	it("preserves one impure buffered input after depleted-owner outputs claim priority", () => {
 		const state = {
+			cheats: {
+				enabled: false,
+				instantGameplay: false,
+			},
 			currentSpace: 0,
 			items: [
 				{

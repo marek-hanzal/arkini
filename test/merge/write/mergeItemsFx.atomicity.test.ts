@@ -51,6 +51,10 @@ const mergeAttemptFx = () =>
 
 const blockedOutputState = (includeBlocker = true) =>
 	({
+		cheats: {
+			enabled: false,
+			instantGameplay: false,
+		},
 		currentSpace: 0,
 		items: [
 			boardItem("source", "source", 0),
@@ -91,6 +95,10 @@ describe("mergeItemsFx atomicity", () => {
 			},
 		});
 		const state = {
+			cheats: {
+				enabled: false,
+				instantGameplay: false,
+			},
 			currentSpace: 0,
 			items: [
 				boardItem("source", "source", 0),
@@ -240,6 +248,10 @@ describe("mergeItemsFx atomicity", () => {
 			},
 		});
 		const state = {
+			cheats: {
+				enabled: false,
+				instantGameplay: false,
+			},
 			currentSpace: 0,
 			items: [
 				boardItem("source", "source", 0),

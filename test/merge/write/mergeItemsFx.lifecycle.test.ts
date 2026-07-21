@@ -251,6 +251,10 @@ describe("mergeItemsFx participant lifecycle", () => {
 								jobId: "job:owner",
 							};
 				const state = {
+					cheats: {
+						enabled: false,
+						instantGameplay: false,
+					},
 					currentSpace: 0,
 					items: [
 						participant === "source"
@@ -309,6 +313,10 @@ describe("mergeItemsFx participant lifecycle", () => {
 			"queued",
 		] as const) {
 			const state = {
+				cheats: {
+					enabled: false,
+					instantGameplay: false,
+				},
 				currentSpace: 0,
 				items: [
 					boardItem("source", 0),
@@ -367,6 +375,10 @@ describe("mergeItemsFx participant lifecycle", () => {
 				targetProducer: true,
 			});
 			const state = {
+				cheats: {
+					enabled: false,
+					instantGameplay: false,
+				},
 				currentSpace: 0,
 				items: [
 					boardItem("source", 0),
@@ -417,6 +429,10 @@ describe("mergeItemsFx participant lifecycle", () => {
 				sourceProducer: true,
 			});
 			const state = {
+				cheats: {
+					enabled: false,
+					instantGameplay: false,
+				},
 				currentSpace: 0,
 				items: [
 					boardItem("source", 0),
@@ -466,6 +482,10 @@ describe("mergeItemsFx participant lifecycle", () => {
 			resultCharges: 2,
 		});
 		const state = {
+			cheats: {
+				enabled: false,
+				instantGameplay: false,
+			},
 			currentSpace: 0,
 			items: [
 				boardItem("source", 0),
@@ -510,6 +530,10 @@ describe("mergeItemsFx participant lifecycle", () => {
 				targetProducer: true,
 			});
 			const state = {
+				cheats: {
+					enabled: false,
+					instantGameplay: false,
+				},
 				currentSpace: 0,
 				items: [
 					boardItem("source", 0),
@@ -563,6 +587,10 @@ describe("mergeItemsFx participant lifecycle", () => {
 			effect: "replace",
 		});
 		const stackedState = {
+			cheats: {
+				enabled: false,
+				instantGameplay: false,
+			},
 			currentSpace: 0,
 			items: [
 				boardItem("source", 0),

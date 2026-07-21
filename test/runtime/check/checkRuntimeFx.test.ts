@@ -103,6 +103,10 @@ const location = (scope: "board" | "inventory", x: number, y: number) => {
 describe("checkRuntimeFx", () => {
 	it("reports readable identity and location invariant violations", () => {
 		const runtime = {
+			cheats: {
+				enabled: false,
+				instantGameplay: false,
+			},
 			session: {
 				speedMode: "normal" as const,
 			},
@@ -193,6 +197,10 @@ describe("checkRuntimeFx", () => {
 
 	it("reports readable stack-size and max-count invariant violations", () => {
 		const runtime = {
+			cheats: {
+				enabled: false,
+				instantGameplay: false,
+			},
 			session: {
 				speedMode: "normal" as const,
 			},
@@ -313,6 +321,10 @@ describe("checkRuntimeFx", () => {
 
 	it("rejects invalid persisted state before it becomes runtime", () => {
 		const state = StateSchema.parse({
+			cheats: {
+				enabled: false,
+				instantGameplay: false,
+			},
 			currentSpace: 0,
 			items: [
 				{

@@ -40,6 +40,10 @@ const consumedRoot = {
 describe("fromStateFx job material invariants", () => {
 	it("accepts the canonical empty consumed root produced by authoritative start", () => {
 		const state = {
+			cheats: {
+				enabled: false,
+				instantGameplay: false,
+			},
 			currentSpace: 0,
 			items: [
 				owner,
@@ -73,6 +77,10 @@ describe("fromStateFx job material invariants", () => {
 			amount: 2,
 		};
 		const state = {
+			cheats: {
+				enabled: false,
+				instantGameplay: false,
+			},
 			currentSpace: 0,
 			items: [
 				owner,
@@ -130,6 +138,10 @@ describe("fromStateFx job material invariants", () => {
 
 	it("rejects persisted consumed roots that still own runtime state", () => {
 		const state = {
+			cheats: {
+				enabled: false,
+				instantGameplay: false,
+			},
 			currentSpace: 0,
 			items: [
 				owner,
@@ -180,6 +192,10 @@ describe("fromStateFx job material invariants", () => {
 	});
 	it("rejects persisted consumed roots with nested owned descendants", () => {
 		const state = {
+			cheats: {
+				enabled: false,
+				instantGameplay: false,
+			},
 			currentSpace: 0,
 			items: [
 				owner,
@@ -253,6 +269,10 @@ describe("fromStateFx job material invariants", () => {
 			remainingMs: 500,
 		};
 		const state = {
+			cheats: {
+				enabled: false,
+				instantGameplay: false,
+			},
 			currentSpace: 0,
 			items: [
 				owner,

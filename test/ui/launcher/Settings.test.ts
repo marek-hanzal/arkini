@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { Effect } from "effect";
 import {
 	createMemoryHistory,
 	createRootRoute,
@@ -12,7 +13,13 @@ import {
 import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import type { Game } from "~/bridge/game/Game";
+import type { GameEngine } from "~/bridge/game/GameEngine";
+import type { GameEngineResource } from "~/bridge/game/GameEngineResource";
+import { gameEngineQueryKey } from "~/bridge/game/gameEngineQueryKey";
 import { SettingsPage } from "~/page/settings/SettingsPage";
+import { createTestGameSession } from "~test/bridge/game/createTestGameSession";
+import { createJobTestConfig } from "~test/job/support/jobTestConfig";
 import { AppearanceProvider } from "~/ui/appearance/AppearanceProvider";
 
 (
@@ -22,11 +29,15 @@ import { AppearanceProvider } from "~/ui/appearance/AppearanceProvider";
 ).IS_REACT_ACT_ENVIRONMENT = true;
 
 const roots: Array<ReturnType<typeof createRoot>> = [];
+const sessions: Game[] = [];
 
 afterEach(async () => {
 	await act(async () => {
 		for (const root of roots.splice(0)) root.unmount();
 	});
+	for (const session of sessions.splice(0)) {
+		await Effect.runPromise(session.disposeWithoutSaveFx);
+	}
 	vi.restoreAllMocks();
 	document.body.replaceChildren();
 	Reflect.deleteProperty(window, "arkini");
@@ -51,7 +62,14 @@ const buttonByText = (container: ParentNode, text: string) => {
 	return button;
 };
 
-const renderSettings = async (initialEntries: ReadonlyArray<string>) => {
+const renderSettings = async (
+	initialEntries: ReadonlyArray<string>,
+	{
+		activeGame = false,
+	}: {
+		readonly activeGame?: boolean;
+	} = {},
+) => {
 	const deferred = createDeferred();
 	const write = vi.fn(() => deferred.promise);
 	Object.defineProperty(window, "scrollTo", {
@@ -73,6 +91,44 @@ const renderSettings = async (initialEntries: ReadonlyArray<string>) => {
 			},
 		},
 	});
+	let game: GameEngine | null = null;
+	if (activeGame) {
+		const config = createJobTestConfig();
+		const session = await createTestGameSession({
+			config,
+			tickIntervalMs: 60_000,
+		});
+		game = {
+			...session,
+			arkpack: {
+				packageId: "package:settings",
+				contentHash: "content:settings",
+				gameId: "game:settings",
+				title: "Settings game",
+				configVersion: "1.0",
+				compressedSize: 0,
+				source: "imported",
+			},
+			config,
+			getResourceUrl: () => "blob:test",
+			readOrThrow: () => {
+				throw new Error("Not used by this test.");
+			},
+			saveKey: {
+				packageId: "package:settings",
+				contentHash: "a".repeat(64),
+			},
+		};
+		sessions.push(game);
+		queryClient.setQueryData(gameEngineQueryKey, {
+			game,
+			assertUsable: () => undefined,
+			markCriticalFailure: () => {
+				throw new Error("Not used by this test.");
+			},
+			withLifecycleLockFx: (effect) => effect,
+		} as GameEngineResource);
+	}
 	const rootRoute = createRootRoute({
 		component: Outlet,
 	});
@@ -131,6 +187,7 @@ const renderSettings = async (initialEntries: ReadonlyArray<string>) => {
 	return {
 		container,
 		deferred,
+		game,
 		router,
 		write,
 	};
@@ -222,5 +279,26 @@ describe("Settings", () => {
 
 		await act(async () => buttonByText(container, "Back").click());
 		await vi.waitFor(() => expect(router.state.location.pathname).toBe("/main-menu"));
+	});
+
+	it("toggles persisted Cheat mode only when an active Game remains cached", async () => {
+		const { container, game } = await renderSettings(
+			[
+				"/game/package:settings/board",
+				"/settings",
+			],
+			{
+				activeGame: true,
+			},
+		);
+		if (game === null) throw new Error("Expected active Game.");
+		const cheatMode = container.querySelector<HTMLInputElement>(
+			'[data-ui="SettingsCheatMode"] input[type="checkbox"]',
+		);
+		if (cheatMode === null) throw new Error("Expected Cheat mode control.");
+		expect(cheatMode.checked).toBe(false);
+		await act(async () => cheatMode.click());
+		await vi.waitFor(() => expect(game.getSnapshot().cheats.enabled).toBe(true));
+		await vi.waitFor(() => expect(cheatMode.checked).toBe(true));
 	});
 });

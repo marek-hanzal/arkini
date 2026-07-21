@@ -5,6 +5,10 @@ import { isLineInputClosedFx } from "~/engine/line/fx/input/isLineInputClosedFx"
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
 const activeRuntime = {
+	cheats: {
+		enabled: false,
+		instantGameplay: false,
+	},
 	session: {
 		speedMode: "normal" as const,
 	},
@@ -62,6 +66,10 @@ describe("isLineInputClosedFx", () => {
 					ownerItemId: "runtime:owner",
 					lineId: "line:run",
 					runtime: {
+						cheats: {
+							enabled: false,
+							instantGameplay: false,
+						},
 						session: {
 							speedMode: "normal" as const,
 						},

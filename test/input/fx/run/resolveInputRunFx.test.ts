@@ -60,6 +60,10 @@ describe("resolveInputRunFx", () => {
 				ownerItemId: owner.id,
 				reservedCharges: new Map(),
 				runtime: {
+					cheats: {
+						enabled: false,
+						instantGameplay: false,
+					},
 					session: {
 						speedMode: "normal" as const,
 					},
@@ -85,6 +89,10 @@ describe("resolveInputRunFx", () => {
 
 	it("plans only materials owned by the exact input slot", () => {
 		const runtime = {
+			cheats: {
+				enabled: false,
+				instantGameplay: false,
+			},
 			session: {
 				speedMode: "normal" as const,
 			},
@@ -177,6 +185,10 @@ describe("resolveInputRunFx", () => {
 				ownerItemId: owner.id,
 				reservedCharges: new Map(),
 				runtime: {
+					cheats: {
+						enabled: false,
+						instantGameplay: false,
+					},
 					session: {
 						speedMode: "normal" as const,
 					},

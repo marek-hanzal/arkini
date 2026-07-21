@@ -10,6 +10,10 @@ describe("planStartFx", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {
 				const runtime = {
+					cheats: {
+						enabled: false,
+						instantGameplay: false,
+					},
 					session: {
 						speedMode: "normal" as const,
 					},
@@ -73,6 +77,10 @@ describe("planStartFx", () => {
 		const result = Effect.runSync(
 			planStartFx({
 				runtime: {
+					cheats: {
+						enabled: false,
+						instantGameplay: false,
+					},
 					session: {
 						speedMode: "normal" as const,
 					},
@@ -114,6 +122,10 @@ describe("planStartFx", () => {
 			Effect.either(
 				planStartFx({
 					runtime: {
+						cheats: {
+							enabled: false,
+							instantGameplay: false,
+						},
 						session: {
 							speedMode: "normal" as const,
 						},

@@ -93,6 +93,35 @@ export const Settings = ({ exitPending = false, navigationError, onBack }: Setti
 				</p>
 			</fieldset>
 
+			{model.cheatMode === null ? null : (
+				<fieldset
+					className="grid gap-3 border-t border-line pt-5"
+					disabled={model.blocked}
+				>
+					<legend className="text-sm font-semibold text-foreground">Game</legend>
+					<label
+						className={`ak-list-row ak-list-row-interactive flex cursor-pointer items-center justify-between gap-4 rounded-lg border border-line bg-surface-raised/65 px-4 py-3 ${model.blocked ? "ak-list-row-pending cursor-progress" : ""}`}
+						data-ui="SettingsCheatMode"
+					>
+						<span className="grid gap-1">
+							<span className="text-sm font-semibold text-foreground">
+								Cheat mode
+							</span>
+							<span className="text-sm leading-5 text-muted">
+								Enables save-specific cheat tools without adding special Board
+								items.
+							</span>
+						</span>
+						<input
+							type="checkbox"
+							checked={model.cheatMode}
+							className="size-5 shrink-0 accent-accent"
+							onChange={(event) => model.setCheatMode(event.currentTarget.checked)}
+						/>
+					</label>
+				</fieldset>
+			)}
+
 			<div
 				className="min-h-6 text-center text-sm"
 				aria-live="polite"
@@ -109,7 +138,13 @@ export const Settings = ({ exitPending = false, navigationError, onBack }: Setti
 					)
 					.with(
 						{
-							kind: "saving",
+							kind: "saving-cheat-mode",
+						},
+						() => <p className="text-accent">Saving Cheat mode…</p>,
+					)
+					.with(
+						{
+							kind: "saving-theme",
 						},
 						() => <p className="text-accent">Saving theme…</p>,
 					)
@@ -117,15 +152,17 @@ export const Settings = ({ exitPending = false, navigationError, onBack }: Setti
 						{
 							kind: "save-error",
 						},
-						({ message }) => (
-							<p className="text-danger">Theme update failed: {message}</p>
+						({ label, message }) => (
+							<p className="text-danger">
+								{label} update failed: {message}
+							</p>
 						),
 					)
 					.with(
 						{
 							kind: "saved",
 						},
-						() => <p className="text-muted">Theme saved.</p>,
+						({ label }) => <p className="text-muted">{label} saved.</p>,
 					)
 					.with(
 						{

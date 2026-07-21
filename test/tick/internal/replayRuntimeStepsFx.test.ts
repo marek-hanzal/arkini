@@ -16,6 +16,10 @@ const ownerItemId = "runtime:forge";
 const lineId = "line:forge:run";
 
 const summarizeRuntime = (runtime: RuntimeSchema.Type) => ({
+	cheats: {
+		enabled: false,
+		instantGameplay: false,
+	},
 	currentSpace: 0,
 	items: runtime.items
 		.map((item) => ({

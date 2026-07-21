@@ -260,6 +260,10 @@ export const lineRunRuntime = ({
 	});
 
 	return {
+		cheats: {
+			enabled: false,
+			instantGameplay: false,
+		},
 		session: {
 			speedMode: "normal" as const,
 		},

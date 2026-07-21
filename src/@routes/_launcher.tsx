@@ -6,7 +6,7 @@ import { resolveLauncherLeaveDestination } from "~/ui/navigation/resolveLauncher
 export const Route = createFileRoute("/_launcher")({
 	beforeLoad: ({ context, location }) => {
 		const resource = getCachedGameEngineResource(context.queryClient);
-		if (resource === null) return;
+		if (resource === null || location.pathname === "/settings") return;
 		throw redirect({
 			to: "/game/$packageId/action/leave",
 			params: {

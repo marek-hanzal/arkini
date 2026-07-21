@@ -76,6 +76,10 @@ describe("authored directional merge gameplay", () => {
 				useGameFx({
 					config,
 					state: {
+						cheats: {
+							enabled: false,
+							instantGameplay: false,
+						},
 						currentSpace: 0,
 						items: [],
 						jobs: [],
@@ -180,6 +184,10 @@ describe("authored directional merge gameplay", () => {
 				useGameFx({
 					config,
 					state: {
+						cheats: {
+							enabled: false,
+							instantGameplay: false,
+						},
 						currentSpace: 0,
 						items: [],
 						jobs: [],

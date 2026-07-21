@@ -39,6 +39,10 @@ const passiveChild = {
 describe("discardRuntimeItemOwnedStateFx", () => {
 	it("discards passive input descendants and queued intents while preserving the root", () => {
 		const runtime = {
+			cheats: {
+				enabled: false,
+				instantGameplay: false,
+			},
 			session: {
 				speedMode: "normal" as const,
 			},
@@ -71,6 +75,10 @@ describe("discardRuntimeItemOwnedStateFx", () => {
 
 	it("rejects committed work anywhere beneath the discarded ownership tree", () => {
 		const runtime = {
+			cheats: {
+				enabled: false,
+				instantGameplay: false,
+			},
 			session: {
 				speedMode: "normal" as const,
 			},

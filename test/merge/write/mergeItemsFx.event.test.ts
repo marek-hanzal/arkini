@@ -31,6 +31,10 @@ describe("mergeItemsFx events", () => {
 				},
 			}),
 			state: {
+				cheats: {
+					enabled: false,
+					instantGameplay: false,
+				},
 				currentSpace: 0,
 				items: [
 					{

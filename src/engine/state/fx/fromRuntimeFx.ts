@@ -16,6 +16,9 @@ export const fromRuntimeFx = Effect.fn("fromRuntimeFx")(function* ({
 		}),
 	);
 	return {
+		cheats: {
+			...runtime.cheats,
+		},
 		currentSpace: runtime.currentSpace,
 		items,
 		jobs: runtime.jobs,

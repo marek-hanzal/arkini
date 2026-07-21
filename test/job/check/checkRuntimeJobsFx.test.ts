@@ -44,6 +44,10 @@ describe("checkRuntimeJobsFx", () => {
 			},
 		} satisfies RuntimeItemSchema.Type;
 		const runtime = {
+			cheats: {
+				enabled: false,
+				instantGameplay: false,
+			},
 			session: {
 				speedMode: "normal" as const,
 			},
@@ -103,6 +107,10 @@ describe("checkRuntimeJobsFx", () => {
 
 	it("accepts a queue-only owner as a first-class runtime state", () => {
 		const runtime = {
+			cheats: {
+				enabled: false,
+				instantGameplay: false,
+			},
 			session: {
 				speedMode: "normal" as const,
 			},
@@ -143,6 +151,10 @@ it("reports owned runtime state beneath one consumed job material root", () => {
 		},
 	} satisfies RuntimeItemSchema.Type;
 	const runtime = {
+		cheats: {
+			enabled: false,
+			instantGameplay: false,
+		},
 		session: {
 			speedMode: "normal" as const,
 		},

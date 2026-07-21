@@ -39,9 +39,23 @@ export const useGameMenuActions = ({
 	const pending = save.isPending || saveAndExit.isPending || menu.routePending;
 	const actionDisabled = phase !== "open" || pending;
 
-	const requestRoute = (destination: "settings" | "main-menu") => {
+	const requestSettings = () => {
 		if (activeRequestRef.current !== null || !menu.beginRouteRequest()) return;
-		activeRequestRef.current = destination;
+		activeRequestRef.current = "settings";
+		setNavigationError(undefined);
+		void navigate({
+			to: "/settings",
+		})
+			.catch(setNavigationError)
+			.finally(() => {
+				activeRequestRef.current = null;
+				menu.completeRouteRequest();
+			});
+	};
+
+	const requestMainMenu = () => {
+		if (activeRequestRef.current !== null || !menu.beginRouteRequest()) return;
+		activeRequestRef.current = "main-menu";
 		setNavigationError(undefined);
 		void navigate({
 			to: "/game/$packageId/action/leave",
@@ -49,7 +63,7 @@ export const useGameMenuActions = ({
 				packageId: game.arkpack.packageId,
 			},
 			search: {
-				destination,
+				destination: "main-menu",
 			},
 		})
 			.catch(setNavigationError)
@@ -190,8 +204,8 @@ export const useGameMenuActions = ({
 		confirmingDestroy,
 		setConfirmingDestroy,
 		close: menu.close,
-		requestSettings: () => requestRoute("settings"),
-		requestMainMenu: () => requestRoute("main-menu"),
+		requestSettings,
+		requestMainMenu,
 		requestSave,
 		requestSaveAndExit,
 		requestHardReset,

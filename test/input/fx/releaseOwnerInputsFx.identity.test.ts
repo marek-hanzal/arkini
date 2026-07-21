@@ -197,6 +197,10 @@ const runRemoveFx = (state: StateSchema.Type) =>
 describe("releaseOwnerInputsFx existing identity", () => {
 	it("preserves one impure buffered root and its passive subtree", () => {
 		const state = {
+			cheats: {
+				enabled: false,
+				instantGameplay: false,
+			},
 			currentSpace: 0,
 			items: [
 				boardOwner,
@@ -240,6 +244,10 @@ describe("releaseOwnerInputsFx existing identity", () => {
 
 	it("allows a pure buffered root to normalize into an existing stack", () => {
 		const state = {
+			cheats: {
+				enabled: false,
+				instantGameplay: false,
+			},
 			currentSpace: 0,
 			items: [
 				boardOwner,
@@ -282,6 +290,10 @@ describe("releaseOwnerInputsFx existing identity", () => {
 
 	it("preserves impure identities across board-first inventory fallback", () => {
 		const state = {
+			cheats: {
+				enabled: false,
+				instantGameplay: false,
+			},
 			currentSpace: 0,
 			items: [
 				boardOwner,
@@ -341,6 +353,10 @@ describe("releaseOwnerInputsFx existing identity", () => {
 
 	it("rolls back the whole removal when one impure root has no exclusive cell", () => {
 		const state = {
+			cheats: {
+				enabled: false,
+				instantGameplay: false,
+			},
 			currentSpace: 0,
 			items: [
 				boardOwner,

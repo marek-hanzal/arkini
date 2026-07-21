@@ -27,6 +27,10 @@ export const validateStartStateFx = Effect.fn("validateStartStateFx")(function* 
 	const result = yield* Effect.either(
 		planStartFx({
 			runtime: {
+				cheats: {
+					enabled: false,
+					instantGameplay: false,
+				},
 				currentSpace: config.start.currentSpace,
 				session: {
 					speedMode: "normal" as const,

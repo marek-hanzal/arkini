@@ -15,6 +15,10 @@ describe("planStartInventoryItemFx", () => {
 					quantity: 4,
 				},
 				runtime: {
+					cheats: {
+						enabled: false,
+						instantGameplay: false,
+					},
 					session: {
 						speedMode: "normal" as const,
 					},
@@ -77,6 +81,10 @@ describe("planStartInventoryItemFx", () => {
 						quantity: 4,
 					},
 					runtime: {
+						cheats: {
+							enabled: false,
+							instantGameplay: false,
+						},
 						session: {
 							speedMode: "normal" as const,
 						},

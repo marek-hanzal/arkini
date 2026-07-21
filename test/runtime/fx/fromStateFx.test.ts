@@ -54,6 +54,10 @@ const config = GameConfigSchema.parse({
 });
 
 const state = StateSchema.parse({
+	cheats: {
+		enabled: false,
+		instantGameplay: false,
+	},
 	currentSpace: 0,
 	items: [
 		{
@@ -230,6 +234,10 @@ describe("fromStateFx", () => {
 
 	it("fails when state references an unknown canonical item", () => {
 		const invalidState = StateSchema.parse({
+			cheats: {
+				enabled: false,
+				instantGameplay: false,
+			},
 			currentSpace: 0,
 			items: state.items.map((item) => {
 				if (item.id !== "runtime:board:tree") {

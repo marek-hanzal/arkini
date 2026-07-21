@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+import { CheatStateSchema } from "~/engine/cheat/schema/CheatStateSchema";
 import { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeIntegerSchema";
 import { JobQueueRequestSchema } from "~/engine/job/schema/JobQueueRequestSchema";
 import { JobSchema } from "~/engine/job/schema/JobSchema";
@@ -10,6 +11,9 @@ import { RuntimeItemSchema } from "./RuntimeItemSchema";
 /** Canonical loaded runtime composed of ephemeral session state and live gameplay state. */
 export const RuntimeSchema = z
 	.object({
+		cheats: CheatStateSchema.describe(
+			"Persisted cheat switches owned by this exact loaded Game.",
+		),
 		currentSpace: NonNegativeIntegerSchema.describe(
 			"The persistent board space currently presented to the player.",
 		),

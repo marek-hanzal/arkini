@@ -6,6 +6,10 @@ import { encodeArkiniSaveFx } from "~/bridge/save/encodeArkiniSaveFx";
 import type { StateSchema } from "~/engine/state/schema/StateSchema";
 
 const state: StateSchema.Type = {
+	cheats: {
+		enabled: false,
+		instantGameplay: false,
+	},
 	currentSpace: 0,
 	items: [],
 	jobs: [],

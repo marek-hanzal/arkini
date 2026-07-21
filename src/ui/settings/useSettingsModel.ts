@@ -2,8 +2,10 @@ import { useEffect } from "react";
 import { match, P } from "ts-pattern";
 
 import type { AppearanceTheme } from "~/bridge/appearance/AppearanceTheme";
-import { useAppearance } from "~/ui/appearance/useAppearance";
+import { useActiveGameCheats } from "~/bridge/cheat/useActiveGameCheats";
+import { useSetCheatEnabledMutation } from "~/bridge/cheat/useSetCheatEnabledMutation";
 import { useSetAppearanceThemeMutation } from "~/ui/appearance/mutation/useSetAppearanceThemeMutation";
+import { useAppearance } from "~/ui/appearance/useAppearance";
 
 export namespace useSettingsModel {
 	export type Status =
@@ -15,20 +17,25 @@ export namespace useSettingsModel {
 				readonly message: string;
 		  }
 		| {
-				readonly kind: "saving";
+				readonly kind: "saving-cheat-mode";
+		  }
+		| {
+				readonly kind: "saving-theme";
 		  }
 		| {
 				readonly kind: "save-error";
+				readonly label: "Cheat mode" | "Theme";
 				readonly message: string;
 		  }
 		| {
 				readonly kind: "saved";
+				readonly label: "Cheat mode" | "Theme";
 		  };
 }
 
 const errorMessage = (error: unknown) => (error instanceof Error ? error.message : String(error));
 
-/** Owns settings mutation interpretation and the one Escape lifecycle for the settings surface. */
+/** Owns settings mutations and the one Escape lifecycle for the settings surface. */
 export const useSettingsModel = ({
 	exitPending,
 	navigationError,
@@ -39,8 +46,10 @@ export const useSettingsModel = ({
 	readonly onBack: () => void;
 }) => {
 	const appearance = useAppearance();
+	const activeGame = useActiveGameCheats();
 	const setTheme = useSetAppearanceThemeMutation();
-	const blocked = setTheme.isPending || exitPending;
+	const setCheatEnabled = useSetCheatEnabledMutation(activeGame.game);
+	const blocked = setTheme.isPending || setCheatEnabled.isPending || exitPending;
 
 	useEffect(() => {
 		const onKeyDown = (event: KeyboardEvent) => {
@@ -56,6 +65,9 @@ export const useSettingsModel = ({
 	]);
 
 	const mutationStatus = match([
+		setCheatEnabled.isPending,
+		setCheatEnabled.isError,
+		setCheatEnabled.isSuccess,
 		setTheme.isPending,
 		setTheme.isError,
 		setTheme.isSuccess,
@@ -65,9 +77,12 @@ export const useSettingsModel = ({
 				true,
 				P._,
 				P._,
+				P._,
+				P._,
+				P._,
 			],
 			(): useSettingsModel.Status => ({
-				kind: "saving",
+				kind: "saving-cheat-mode",
 			}),
 		)
 		.with(
@@ -75,9 +90,41 @@ export const useSettingsModel = ({
 				false,
 				true,
 				P._,
+				P._,
+				P._,
+				P._,
 			],
 			(): useSettingsModel.Status => ({
 				kind: "save-error",
+				label: "Cheat mode",
+				message: errorMessage(setCheatEnabled.error),
+			}),
+		)
+		.with(
+			[
+				false,
+				false,
+				P._,
+				true,
+				P._,
+				P._,
+			],
+			(): useSettingsModel.Status => ({
+				kind: "saving-theme",
+			}),
+		)
+		.with(
+			[
+				false,
+				false,
+				P._,
+				false,
+				true,
+				P._,
+			],
+			(): useSettingsModel.Status => ({
+				kind: "save-error",
+				label: "Theme",
 				message: errorMessage(setTheme.error),
 			}),
 		)
@@ -86,9 +133,13 @@ export const useSettingsModel = ({
 				false,
 				false,
 				true,
+				false,
+				false,
+				P._,
 			],
 			(): useSettingsModel.Status => ({
 				kind: "saved",
+				label: "Cheat mode",
 			}),
 		)
 		.with(
@@ -96,7 +147,17 @@ export const useSettingsModel = ({
 				false,
 				false,
 				false,
+				false,
+				false,
+				true,
 			],
+			(): useSettingsModel.Status => ({
+				kind: "saved",
+				label: "Theme",
+			}),
+		)
+		.with(
+			P._,
 			(): useSettingsModel.Status => ({
 				kind: "idle",
 			}),
@@ -111,10 +172,12 @@ export const useSettingsModel = ({
 				};
 
 	return {
-		theme: appearance.theme,
 		blocked,
+		cheatMode: activeGame.cheats?.enabled ?? null,
 		exitPending,
 		status,
+		theme: appearance.theme,
 		selectTheme: (theme: AppearanceTheme) => setTheme.mutate(theme),
+		setCheatMode: (enabled: boolean) => setCheatEnabled.mutate(enabled),
 	};
 };

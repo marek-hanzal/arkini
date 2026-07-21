@@ -208,6 +208,10 @@ const runtimeItem = ({
 });
 
 const runtime = {
+	cheats: {
+		enabled: false,
+		instantGameplay: false,
+	},
 	currentSpace: 2,
 	session: {
 		speedMode: "normal",

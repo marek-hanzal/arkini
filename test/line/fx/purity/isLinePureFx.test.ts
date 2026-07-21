@@ -24,6 +24,10 @@ const owner = {
 };
 
 const baseRuntime = {
+	cheats: {
+		enabled: false,
+		instantGameplay: false,
+	},
 	session: {
 		speedMode: "normal" as const,
 	},

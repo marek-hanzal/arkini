@@ -1041,6 +1041,10 @@ describe("Board drag", () => {
 		await act(async () => {
 			publishRuntime({
 				...currentRuntime,
+				cheats: {
+					enabled: false,
+					instantGameplay: false,
+				},
 				session: {
 					...currentRuntime.session,
 				},

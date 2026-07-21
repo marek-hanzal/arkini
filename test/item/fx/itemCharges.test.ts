@@ -842,6 +842,10 @@ describe("item charges", () => {
 
 	it("rejects hydrated active-job output reservations that overbook maxCount", () => {
 		const state = StateSchema.parse({
+			cheats: {
+				enabled: false,
+				instantGameplay: false,
+			},
 			currentSpace: 0,
 			items: [
 				{
@@ -896,6 +900,10 @@ describe("item charges", () => {
 
 	it("does not reserve maxCount for queued requests before dispatch", () => {
 		const runtime = {
+			cheats: {
+				enabled: false,
+				instantGameplay: false,
+			},
 			session: {
 				speedMode: "normal" as const,
 			},
@@ -1050,6 +1058,10 @@ describe("item charges", () => {
 
 	it("reports non-canonical persisted charge states", () => {
 		const runtime = {
+			cheats: {
+				enabled: false,
+				instantGameplay: false,
+			},
 			session: {
 				speedMode: "normal" as const,
 			},

@@ -365,6 +365,10 @@ describe("queryFx", () => {
 			},
 		} as const;
 		const runtime = {
+			cheats: {
+				enabled: false,
+				instantGameplay: false,
+			},
 			currentSpace: 0,
 			session: {
 				speedMode: "normal",

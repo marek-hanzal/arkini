@@ -169,6 +169,10 @@ describe("current board space", () => {
 	it("requires currentSpace in runtime and state roots", () => {
 		expect(
 			RuntimeSchema.safeParse({
+				cheats: {
+					enabled: false,
+					instantGameplay: false,
+				},
 				session: {
 					speedMode: "normal",
 				},

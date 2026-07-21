@@ -18,6 +18,10 @@ const board = (x: number) => ({
 describe("runtime purity invariants", () => {
 	it("reports the effective singleton stack limit and buffered closed input", () => {
 		const runtime = {
+			cheats: {
+				enabled: false,
+				instantGameplay: false,
+			},
 			session: {
 				speedMode: "normal" as const,
 			},
@@ -87,6 +91,10 @@ describe("runtime purity invariants", () => {
 	it.each([
 		{
 			name: "buffered input",
+			cheats: {
+				enabled: false,
+				instantGameplay: false,
+			},
 			currentSpace: 0,
 			items: [
 				{
@@ -107,6 +115,10 @@ describe("runtime purity invariants", () => {
 		},
 		{
 			name: "active job",
+			cheats: {
+				enabled: false,
+				instantGameplay: false,
+			},
 			currentSpace: 0,
 			items: [],
 			jobs: [
@@ -122,6 +134,10 @@ describe("runtime purity invariants", () => {
 		},
 		{
 			name: "queued request",
+			cheats: {
+				enabled: false,
+				instantGameplay: false,
+			},
 			currentSpace: 0,
 			items: [],
 			jobs: [],
@@ -135,6 +151,10 @@ describe("runtime purity invariants", () => {
 		},
 	])("rejects an impure producer stack with $name", ({ items, jobs, jobQueue }) => {
 		const runtime = {
+			cheats: {
+				enabled: false,
+				instantGameplay: false,
+			},
 			session: {
 				speedMode: "normal" as const,
 			},
@@ -174,6 +194,10 @@ describe("runtime purity invariants", () => {
 
 	it("keeps a pure producer stack at its configured limit", () => {
 		const runtime = {
+			cheats: {
+				enabled: false,
+				instantGameplay: false,
+			},
 			session: {
 				speedMode: "normal" as const,
 			},
@@ -205,6 +229,10 @@ describe("runtime purity invariants", () => {
 
 	it("allows buffered input on a running positive-capacity line", () => {
 		const runtime = {
+			cheats: {
+				enabled: false,
+				instantGameplay: false,
+			},
 			session: {
 				speedMode: "normal" as const,
 			},

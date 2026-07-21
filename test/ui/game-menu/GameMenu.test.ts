@@ -338,10 +338,8 @@ describe("GameMenu", () => {
 		viewTransitionStartPhases.splice(0);
 
 		await act(async () => buttonByText(container, "Settings").click());
-		await vi.waitFor(() => expect(router.state.location.pathname).toContain("/action/leave"));
-		expect(router.state.location.search).toEqual({
-			destination: "settings",
-		});
+		await vi.waitFor(() => expect(router.state.location.pathname).toBe("/settings"));
+		expect(router.state.location.search).toEqual({});
 		expect(viewTransitionStartPhases).toEqual([
 			"open",
 		]);

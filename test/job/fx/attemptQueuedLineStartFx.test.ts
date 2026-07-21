@@ -47,6 +47,10 @@ const runAttempt = (runtime: RuntimeSchema.Type, ownerItemId = request.ownerItem
 describe("attemptQueuedLineStartFx", () => {
 	it("returns empty when the owner has no live queued request", () => {
 		const runtime = {
+			cheats: {
+				enabled: false,
+				instantGameplay: false,
+			},
 			session: {
 				speedMode: "normal" as const,
 			},
@@ -71,6 +75,10 @@ describe("attemptQueuedLineStartFx", () => {
 
 	it("keeps missing inputs as an explicit retryable block", () => {
 		const runtime = {
+			cheats: {
+				enabled: false,
+				instantGameplay: false,
+			},
 			session: {
 				speedMode: "normal" as const,
 			},
@@ -110,6 +118,10 @@ describe("attemptQueuedLineStartFx", () => {
 			},
 		} satisfies RuntimeItemSchema.Type;
 		const runtime = {
+			cheats: {
+				enabled: false,
+				instantGameplay: false,
+			},
 			session: {
 				speedMode: "normal" as const,
 			},
@@ -139,6 +151,10 @@ describe("attemptQueuedLineStartFx", () => {
 
 	it("propagates a missing owner instead of retrying forever", () => {
 		const runtime = {
+			cheats: {
+				enabled: false,
+				instantGameplay: false,
+			},
 			session: {
 				speedMode: "normal" as const,
 			},
@@ -164,6 +180,10 @@ describe("attemptQueuedLineStartFx", () => {
 			lineId: "line:missing",
 		} satisfies JobQueueRequestSchema.Type;
 		const runtime = {
+			cheats: {
+				enabled: false,
+				instantGameplay: false,
+			},
 			session: {
 				speedMode: "normal" as const,
 			},

@@ -18,6 +18,10 @@ import { createTemporaryLifetimeTestConfig } from "~test/item/temporary/support/
 const config = createTemporaryLifetimeTestConfig();
 
 const summarizeRuntime = (runtime: RuntimeSchema.Type) => ({
+	cheats: {
+		enabled: false,
+		instantGameplay: false,
+	},
 	currentSpace: 0,
 	items: runtime.items
 		.map((item) => ({

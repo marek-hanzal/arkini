@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { CheatStateSchema } from "~/engine/cheat/schema/CheatStateSchema";
 import { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeIntegerSchema";
 import { JobQueueRequestSchema } from "~/engine/job/schema/JobQueueRequestSchema";
 import { JobSchema } from "~/engine/job/schema/JobSchema";
@@ -6,6 +7,7 @@ import { DefaultLineByOwnerItemIdSchema } from "~/engine/line/schema/DefaultLine
 import { StateItemSchema } from "./StateItemSchema";
 export const StateSchema = z
 	.object({
+		cheats: CheatStateSchema.describe("Persisted cheat switches for this exact Game save."),
 		currentSpace: NonNegativeIntegerSchema.describe(
 			"The persistent board space currently presented to the player.",
 		),

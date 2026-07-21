@@ -42,9 +42,6 @@ describe("planDropScopePlacementFx", () => {
 				enabled: false,
 				instantGameplay: false,
 			},
-			session: {
-				speedMode: "normal" as const,
-			},
 			currentSpace: 0,
 			items: [
 				runtimeItem({
@@ -108,9 +105,6 @@ describe("planDropScopePlacementFx", () => {
 				enabled: false,
 				instantGameplay: false,
 			},
-			session: {
-				speedMode: "normal" as const,
-			},
 			currentSpace: 0,
 			items: [
 				runtimeItem({
@@ -171,9 +165,6 @@ describe("planDropScopePlacementFx", () => {
 			cheats: {
 				enabled: false,
 				instantGameplay: false,
-			},
-			session: {
-				speedMode: "normal" as const,
 			},
 			currentSpace: 0,
 			items: [

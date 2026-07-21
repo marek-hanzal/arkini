@@ -22,9 +22,6 @@ describe("runtime purity invariants", () => {
 				enabled: false,
 				instantGameplay: false,
 			},
-			session: {
-				speedMode: "normal" as const,
-			},
 			currentSpace: 0,
 			items: [
 				{
@@ -155,9 +152,6 @@ describe("runtime purity invariants", () => {
 				enabled: false,
 				instantGameplay: false,
 			},
-			session: {
-				speedMode: "normal" as const,
-			},
 			currentSpace: 0,
 			items: [
 				{
@@ -198,9 +192,6 @@ describe("runtime purity invariants", () => {
 				enabled: false,
 				instantGameplay: false,
 			},
-			session: {
-				speedMode: "normal" as const,
-			},
 			currentSpace: 0,
 			items: [
 				{
@@ -232,9 +223,6 @@ describe("runtime purity invariants", () => {
 			cheats: {
 				enabled: false,
 				instantGameplay: false,
-			},
-			session: {
-				speedMode: "normal" as const,
 			},
 			currentSpace: 0,
 			items: [

@@ -9,9 +9,6 @@ const activeRuntime = {
 		enabled: false,
 		instantGameplay: false,
 	},
-	session: {
-		speedMode: "normal" as const,
-	},
 	currentSpace: 0,
 	items: [],
 	jobs: [
@@ -69,9 +66,6 @@ describe("isLineInputClosedFx", () => {
 						cheats: {
 							enabled: false,
 							instantGameplay: false,
-						},
-						session: {
-							speedMode: "normal" as const,
 						},
 						currentSpace: 0,
 						items: [],

@@ -5,7 +5,6 @@ import { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeInte
 import { JobQueueRequestSchema } from "~/engine/job/schema/JobQueueRequestSchema";
 import { JobSchema } from "~/engine/job/schema/JobSchema";
 import { DefaultLineByOwnerItemIdSchema } from "~/engine/line/schema/DefaultLineByOwnerItemIdSchema";
-import { RuntimeSessionSchema } from "~/engine/session/schema/RuntimeSessionSchema";
 import { RuntimeItemSchema } from "./RuntimeItemSchema";
 
 /** Canonical loaded runtime composed of ephemeral session state and live gameplay state. */
@@ -16,9 +15,6 @@ export const RuntimeSchema = z
 		),
 		currentSpace: NonNegativeIntegerSchema.describe(
 			"The persistent board space currently presented to the player.",
-		),
-		session: RuntimeSessionSchema.describe(
-			"Engine-visible ephemeral state for this loaded runtime session.",
 		),
 		items: z
 			.array(RuntimeItemSchema)

@@ -904,9 +904,6 @@ describe("item charges", () => {
 				enabled: false,
 				instantGameplay: false,
 			},
-			session: {
-				speedMode: "normal" as const,
-			},
 			currentSpace: 0,
 			items: [
 				{
@@ -1061,9 +1058,6 @@ describe("item charges", () => {
 			cheats: {
 				enabled: false,
 				instantGameplay: false,
-			},
-			session: {
-				speedMode: "normal" as const,
 			},
 			currentSpace: 0,
 			items: [

@@ -14,9 +14,6 @@ describe("planStartFx", () => {
 						enabled: false,
 						instantGameplay: false,
 					},
-					session: {
-						speedMode: "normal" as const,
-					},
 					currentSpace: 0,
 					items: [],
 					jobs: [],
@@ -81,9 +78,6 @@ describe("planStartFx", () => {
 						enabled: false,
 						instantGameplay: false,
 					},
-					session: {
-						speedMode: "normal" as const,
-					},
 					currentSpace: 0,
 					items: [],
 					jobs: [],
@@ -125,9 +119,6 @@ describe("planStartFx", () => {
 						cheats: {
 							enabled: false,
 							instantGameplay: false,
-						},
-						session: {
-							speedMode: "normal" as const,
 						},
 						currentSpace: 0,
 						items: [],

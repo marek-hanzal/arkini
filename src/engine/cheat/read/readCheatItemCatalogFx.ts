@@ -11,17 +11,11 @@ export interface CheatItemCatalogEntry {
 	readonly sourceResourceId: IdSchema.Type;
 }
 
-const isLegacyCheatItem = (type: string) =>
-	type === "cheat:speed" || type === "cheat:inventory" || type === "nuke";
-
 /** Reads the immutable Board-spawnable item catalog for Cheat Spotlight. */
 export const readCheatItemCatalogFx = Effect.fn("readCheatItemCatalogFx")(function* () {
 	const config = yield* GameConfigFx;
 	return Object.values(config.items)
-		.filter(
-			(item) =>
-				(item.scope === "board" || item.scope === "any") && !isLegacyCheatItem(item.type),
-		)
+		.filter((item) => item.scope === "board" || item.scope === "any")
 		.map(
 			(item): CheatItemCatalogEntry => ({
 				itemId: item.id,

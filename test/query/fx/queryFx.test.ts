@@ -370,9 +370,6 @@ describe("queryFx", () => {
 				instantGameplay: false,
 			},
 			currentSpace: 0,
-			session: {
-				speedMode: "normal",
-			},
 			jobs: [],
 			items: [
 				createTreeRuntimeItem({

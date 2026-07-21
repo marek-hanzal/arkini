@@ -107,9 +107,6 @@ describe("checkRuntimeFx", () => {
 				enabled: false,
 				instantGameplay: false,
 			},
-			session: {
-				speedMode: "normal" as const,
-			},
 			currentSpace: 0,
 			items: [
 				{
@@ -200,9 +197,6 @@ describe("checkRuntimeFx", () => {
 			cheats: {
 				enabled: false,
 				instantGameplay: false,
-			},
-			session: {
-				speedMode: "normal" as const,
 			},
 			currentSpace: 0,
 			items: [

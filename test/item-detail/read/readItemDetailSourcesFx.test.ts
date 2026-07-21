@@ -213,9 +213,6 @@ const runtime = {
 		instantGameplay: false,
 	},
 	currentSpace: 2,
-	session: {
-		speedMode: "normal",
-	},
 	items: [
 		runtimeItem({
 			definition: "target",

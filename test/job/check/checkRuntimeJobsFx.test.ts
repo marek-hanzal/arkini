@@ -48,9 +48,6 @@ describe("checkRuntimeJobsFx", () => {
 				enabled: false,
 				instantGameplay: false,
 			},
-			session: {
-				speedMode: "normal" as const,
-			},
 			currentSpace: 0,
 			items: [
 				invalidOwner,
@@ -111,9 +108,6 @@ describe("checkRuntimeJobsFx", () => {
 				enabled: false,
 				instantGameplay: false,
 			},
-			session: {
-				speedMode: "normal" as const,
-			},
 			currentSpace: 0,
 			items: [
 				owner,
@@ -154,9 +148,6 @@ it("reports owned runtime state beneath one consumed job material root", () => {
 		cheats: {
 			enabled: false,
 			instantGameplay: false,
-		},
-		session: {
-			speedMode: "normal" as const,
 		},
 		currentSpace: 0,
 		items: [

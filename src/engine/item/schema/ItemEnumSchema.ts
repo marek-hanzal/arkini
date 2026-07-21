@@ -37,12 +37,6 @@ export const ItemEnumSchema = z
 		 * An authoring marker for the shared inventory opener.
 		 */
 		"inventory",
-		/**
-		 * An authoring marker for the speed-cheat capability.
-		 */
-		"cheat:speed",
-		"nuke",
-		"cheat:inventory",
 	])
 	.meta({
 		id: "ItemEnumSchema",

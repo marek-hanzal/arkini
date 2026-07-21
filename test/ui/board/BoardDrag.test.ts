@@ -1045,9 +1045,6 @@ describe("Board drag", () => {
 					enabled: false,
 					instantGameplay: false,
 				},
-				session: {
-					...currentRuntime.session,
-				},
 			});
 			await Promise.resolve();
 		});

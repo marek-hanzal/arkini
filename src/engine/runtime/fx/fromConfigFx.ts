@@ -13,9 +13,6 @@ export const fromConfigFx = Effect.fn("fromConfigFx")(function* () {
 			instantGameplay: false,
 		},
 		currentSpace: config.start.currentSpace,
-		session: {
-			speedMode: "normal" as const,
-		},
 		items: [],
 		jobs: [],
 		jobQueue: [],

@@ -67,9 +67,6 @@ describe("pure placement stack targets", () => {
 				enabled: false,
 				instantGameplay: false,
 			},
-			session: {
-				speedMode: "normal" as const,
-			},
 			currentSpace: 0,
 			items: [
 				active,
@@ -119,9 +116,6 @@ describe("pure placement stack targets", () => {
 				enabled: false,
 				instantGameplay: false,
 			},
-			session: {
-				speedMode: "normal" as const,
-			},
 			currentSpace: 0,
 			items: [
 				active,
@@ -164,9 +158,6 @@ describe("pure placement stack targets", () => {
 			cheats: {
 				enabled: false,
 				instantGameplay: false,
-			},
-			session: {
-				speedMode: "normal" as const,
 			},
 			currentSpace: 0,
 			items: [
@@ -217,9 +208,6 @@ describe("pure placement stack targets", () => {
 			cheats: {
 				enabled: false,
 				instantGameplay: false,
-			},
-			session: {
-				speedMode: "normal" as const,
 			},
 			currentSpace: 0,
 			items: [

@@ -26,17 +26,6 @@ export namespace useBoard {
 	}
 }
 
-const readPrimaryAssetId = (
-	runtime: RuntimeSchema.Type,
-	item: RuntimeSchema.Type["items"][number]["item"],
-) => {
-	if (item.type === "cheat:speed") {
-		return item.asset.source[runtime.session.speedMode === "accelerated" ? 0 : 1];
-	}
-
-	return item.asset.source[0];
-};
-
 /** Projects the currently presented board directly from the latest canonical runtime. */
 export const useBoard = (): useBoard.Result => {
 	const game = useGameEngine();
@@ -63,7 +52,7 @@ export const useBoard = (): useBoard.Result => {
 						x: item.location.position.x,
 						y: item.location.position.y,
 						quantity: item.quantity,
-						sourceUrl: game.getResourceUrl(readPrimaryAssetId(runtime, item.item)),
+						sourceUrl: game.getResourceUrl(item.item.asset.source[0]),
 						...(item.item.asset.composite === undefined
 							? {}
 							: {

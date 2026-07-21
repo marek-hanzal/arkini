@@ -43,9 +43,6 @@ describe("discardRuntimeItemOwnedStateFx", () => {
 				enabled: false,
 				instantGameplay: false,
 			},
-			session: {
-				speedMode: "normal" as const,
-			},
 			currentSpace: 0,
 			items: [
 				root,
@@ -78,9 +75,6 @@ describe("discardRuntimeItemOwnedStateFx", () => {
 			cheats: {
 				enabled: false,
 				instantGameplay: false,
-			},
-			session: {
-				speedMode: "normal" as const,
 			},
 			currentSpace: 0,
 			items: [

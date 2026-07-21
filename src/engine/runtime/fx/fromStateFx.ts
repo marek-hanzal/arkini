@@ -20,9 +20,6 @@ export const fromStateFx = Effect.fn("fromStateFx")(function* ({ state }: fromSt
 				...state.cheats,
 			},
 			currentSpace: state.currentSpace,
-			session: {
-				speedMode: "normal" as const,
-			},
 			items,
 			jobs: state.jobs,
 			jobQueue: state.jobQueue ?? [],

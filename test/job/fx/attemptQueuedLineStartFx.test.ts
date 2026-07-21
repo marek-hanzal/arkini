@@ -51,9 +51,6 @@ describe("attemptQueuedLineStartFx", () => {
 				enabled: false,
 				instantGameplay: false,
 			},
-			session: {
-				speedMode: "normal" as const,
-			},
 			currentSpace: 0,
 			items: [
 				owner,
@@ -78,9 +75,6 @@ describe("attemptQueuedLineStartFx", () => {
 			cheats: {
 				enabled: false,
 				instantGameplay: false,
-			},
-			session: {
-				speedMode: "normal" as const,
 			},
 			currentSpace: 0,
 			items: [
@@ -122,9 +116,6 @@ describe("attemptQueuedLineStartFx", () => {
 				enabled: false,
 				instantGameplay: false,
 			},
-			session: {
-				speedMode: "normal" as const,
-			},
 			currentSpace: 0,
 			items: [
 				inventoryOwner,
@@ -155,9 +146,6 @@ describe("attemptQueuedLineStartFx", () => {
 				enabled: false,
 				instantGameplay: false,
 			},
-			session: {
-				speedMode: "normal" as const,
-			},
 			currentSpace: 0,
 			items: [],
 			jobs: [],
@@ -183,9 +171,6 @@ describe("attemptQueuedLineStartFx", () => {
 			cheats: {
 				enabled: false,
 				instantGameplay: false,
-			},
-			session: {
-				speedMode: "normal" as const,
 			},
 			currentSpace: 0,
 			items: [

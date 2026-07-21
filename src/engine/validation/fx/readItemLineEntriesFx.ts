@@ -53,15 +53,7 @@ export const readItemLineEntriesFx = Effect.fn("readItemLineEntriesFx")(function
 		)
 		.with(
 			{
-				type: P.union(
-					"deposit",
-					"simple",
-					"temporary",
-					"inventory",
-					"cheat:speed",
-					"nuke",
-					"cheat:inventory",
-				),
+				type: P.union("deposit", "simple", "temporary", "inventory"),
 			},
 			() => [] as ItemLineEntrySchema.Type[],
 		)

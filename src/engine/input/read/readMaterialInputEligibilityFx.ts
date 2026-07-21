@@ -24,12 +24,9 @@ export const readMaterialInputEligibilityFx = Effect.fn("readMaterialInputEligib
 					{
 						type: P.union(
 							"blueprint",
-							"cheat:inventory",
-							"cheat:speed",
 							"craft",
 							"deposit",
 							"inventory",
-							"nuke",
 							"producer",
 							"simple",
 							"stash",

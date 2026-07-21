@@ -3,12 +3,9 @@ import { Scrollable } from "~/ui/scrollable/Scrollable";
 
 const itemTypeLabel = {
 	blueprint: "Blueprint",
-	"cheat:inventory": "Utility sink",
-	"cheat:speed": "Speed control",
 	craft: "Craft owner",
 	deposit: "Resource deposit",
 	inventory: "Inventory control",
-	nuke: "Reset control",
 	producer: "Producer",
 	simple: "Simple item",
 	stash: "Stash",

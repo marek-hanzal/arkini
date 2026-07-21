@@ -64,9 +64,6 @@ describe("checkRuntimeInputLocationsFx", () => {
 					enabled: false,
 					instantGameplay: false,
 				},
-				session: {
-					speedMode: "normal" as const,
-				},
 				currentSpace: 0,
 				items: [
 					owner,

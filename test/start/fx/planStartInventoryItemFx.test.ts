@@ -19,9 +19,6 @@ describe("planStartInventoryItemFx", () => {
 						enabled: false,
 						instantGameplay: false,
 					},
-					session: {
-						speedMode: "normal" as const,
-					},
 					currentSpace: 0,
 					items: [],
 					jobs: [],
@@ -84,9 +81,6 @@ describe("planStartInventoryItemFx", () => {
 						cheats: {
 							enabled: false,
 							instantGameplay: false,
-						},
-						session: {
-							speedMode: "normal" as const,
 						},
 						currentSpace: 0,
 						items: [],

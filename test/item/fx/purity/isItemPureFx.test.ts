@@ -37,9 +37,6 @@ describe("isItemPureFx", () => {
 				enabled: false,
 				instantGameplay: false,
 			},
-			session: {
-				speedMode: "normal" as const,
-			},
 			currentSpace: 0,
 			items: [
 				producer,
@@ -64,9 +61,6 @@ describe("isItemPureFx", () => {
 							enabled: false,
 							instantGameplay: false,
 						},
-						session: {
-							speedMode: "normal" as const,
-						},
 						currentSpace: 0,
 						items: [
 							simple,
@@ -83,9 +77,6 @@ describe("isItemPureFx", () => {
 			cheats: {
 				enabled: false,
 				instantGameplay: false,
-			},
-			session: {
-				speedMode: "normal" as const,
 			},
 			currentSpace: 0,
 			items: [
@@ -119,9 +110,6 @@ describe("isItemPureFx", () => {
 				enabled: false,
 				instantGameplay: false,
 			},
-			session: {
-				speedMode: "normal" as const,
-			},
 			currentSpace: 0,
 			items: [
 				producer,
@@ -140,9 +128,6 @@ describe("isItemPureFx", () => {
 			cheats: {
 				enabled: false,
 				instantGameplay: false,
-			},
-			session: {
-				speedMode: "normal" as const,
 			},
 			currentSpace: 0,
 			items: [

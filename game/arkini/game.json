@@ -26,24 +26,6 @@
 	"start": {
 		"board": [
 			{
-				"itemId": "item:cheat-speed",
-				"x": 10,
-				"y": 5,
-				"space": 0
-			},
-			{
-				"itemId": "item:nuke",
-				"x": 8,
-				"y": 6,
-				"space": 0
-			},
-			{
-				"itemId": "item:cheat",
-				"x": 9,
-				"y": 6,
-				"space": 0
-			},
-			{
 				"itemId": "item:inventory",
 				"x": 10,
 				"y": 6,

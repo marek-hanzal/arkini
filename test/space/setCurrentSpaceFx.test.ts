@@ -173,9 +173,6 @@ describe("current board space", () => {
 					enabled: false,
 					instantGameplay: false,
 				},
-				session: {
-					speedMode: "normal",
-				},
 				items: [],
 				jobs: [],
 				jobQueue: [],

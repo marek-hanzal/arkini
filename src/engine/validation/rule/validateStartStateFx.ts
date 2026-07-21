@@ -32,9 +32,6 @@ export const validateStartStateFx = Effect.fn("validateStartStateFx")(function* 
 					instantGameplay: false,
 				},
 				currentSpace: config.start.currentSpace,
-				session: {
-					speedMode: "normal" as const,
-				},
 				items: [],
 				jobs: [],
 				jobQueue: [],

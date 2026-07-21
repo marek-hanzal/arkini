@@ -264,9 +264,6 @@ export const lineRunRuntime = ({
 			enabled: false,
 			instantGameplay: false,
 		},
-		session: {
-			speedMode: "normal" as const,
-		},
 		currentSpace: 0,
 		items,
 		jobs: [],

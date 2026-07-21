@@ -130,4 +130,47 @@ describe("About", () => {
 			),
 		).toBe(true);
 	});
+	it("mounts all five package avatars into the shared falling and corner portrait pool", async () => {
+		portraitState.urls = [
+			"avatar:one",
+			"avatar:two",
+			"avatar:three",
+			"avatar:four",
+			"avatar:five",
+		];
+		const rootRoute = createRootRoute({
+			component: AboutPage,
+		});
+		const router = createRouter({
+			routeTree: rootRoute,
+			history: createMemoryHistory({
+				initialEntries: [
+					"/about",
+				],
+			}),
+		});
+		await router.load();
+		const container = document.createElement("div");
+		document.body.append(container);
+		const root = createRoot(container);
+		roots.push(root);
+		await act(async () => {
+			root.render(
+				createElement(RouterProvider, {
+					router,
+				}),
+			);
+		});
+
+		expect(container.querySelectorAll('[data-ui="FallingPortrait"]')).toHaveLength(8);
+		expect(container.querySelectorAll('[data-ui="CornerPortraitPeekPortrait"]')).toHaveLength(
+			20,
+		);
+		const imageSources = Array.from(container.querySelectorAll<HTMLImageElement>("img")).map(
+			(image) => image.src,
+		);
+		for (const avatar of portraitState.urls) {
+			expect(imageSources.some((source) => source.includes(avatar))).toBe(true);
+		}
+	});
 });

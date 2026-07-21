@@ -7,7 +7,9 @@ import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 const makePayload = ({
 	roles,
 }: {
-	readonly roles: Partial<Record<"avatar-01" | "avatar-02" | "avatar-03", string>>;
+	readonly roles: Partial<
+		Record<"avatar-01" | "avatar-02" | "avatar-03" | "avatar-04" | "avatar-05", string>
+	>;
 }): PayloadSchema.Type => ({
 	config: GameConfigSchema.parse({
 		version: "1.0",
@@ -38,6 +40,8 @@ const makePayload = ({
 		"avatar:one",
 		"avatar:two",
 		"avatar:three",
+		"avatar:four",
+		"avatar:five",
 	].map((id) => ({
 		id,
 		mime: "image/png",
@@ -54,12 +58,16 @@ describe("readAboutPortraitResources", () => {
 				"avatar-01": "avatar:three",
 				"avatar-02": "avatar:one",
 				"avatar-03": "avatar:two",
+				"avatar-04": "avatar:five",
+				"avatar-05": "avatar:four",
 			},
 		});
 		expect(readAboutPortraitResources(payload).map(({ id }) => id)).toEqual([
 			"avatar:three",
 			"avatar:one",
 			"avatar:two",
+			"avatar:five",
+			"avatar:four",
 		]);
 	});
 

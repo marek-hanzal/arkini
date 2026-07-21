@@ -3,12 +3,14 @@ type VisualRouteId =
 	| "action"
 	| "arkpacks"
 	| "board"
+	| "cheats"
 	| "main-menu"
 	| "settings"
 	| "startup";
 
 const gameBoardPattern = /^\/game\/[^/]+\/board\/?$/;
 const gameActionPattern = /^\/game\/[^/]+\/action\/[^/]+\/?$/;
+const gameCheatsPattern = /^\/game\/[^/]+\/cheats\/?$/;
 
 const resolveVisualRouteId = (pathname: string): VisualRouteId => {
 	if (pathname === "/") return "startup";
@@ -17,11 +19,12 @@ const resolveVisualRouteId = (pathname: string): VisualRouteId => {
 	if (pathname === "/about") return "about";
 	if (pathname === "/arkpacks") return "arkpacks";
 	if (gameBoardPattern.test(pathname)) return "board";
+	if (gameCheatsPattern.test(pathname)) return "cheats";
 	if (pathname.startsWith("/action/") || gameActionPattern.test(pathname)) return "action";
 	throw new Error(`Missing View Transition classification for route: ${pathname}`);
 };
 
-const isHeroRoute = (route: VisualRouteId) => route !== "board";
+const isHeroRoute = (route: VisualRouteId) => route !== "board" && route !== "cheats";
 
 /** Selects one explicit pair plus one broad scene relationship for every visible route change. */
 export const resolveRouteViewTransitionTypes = ({

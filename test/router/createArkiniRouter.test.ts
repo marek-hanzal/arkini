@@ -167,6 +167,24 @@ describe("createArkiniRouter", () => {
 				],
 			],
 			[
+				"/game/built-in/board",
+				"/game/built-in/cheats",
+				[
+					"arkini-route",
+					"board-to-board",
+					"board-to-cheats",
+				],
+			],
+			[
+				"/game/built-in/cheats",
+				"/game/built-in/board",
+				[
+					"arkini-route",
+					"board-to-board",
+					"cheats-to-board",
+				],
+			],
+			[
 				"/action/load-game/built-in",
 				"/",
 				[

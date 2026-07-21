@@ -52,7 +52,25 @@ const deferred = () => {
 const roots: Array<ReturnType<typeof createRoot>> = [];
 const viewTransitionStartPhases: Array<string | null> = [];
 
-const createGame = (flushSaveFx: Game["flushSaveFx"] = Effect.void): Game => ({
+const gameSnapshots = {
+	disabled: {
+		cheats: {
+			enabled: false,
+			instantGameplay: false,
+		},
+	},
+	enabled: {
+		cheats: {
+			enabled: true,
+			instantGameplay: false,
+		},
+	},
+} as const;
+
+const createGame = (
+	flushSaveFx: Game["flushSaveFx"] = Effect.void,
+	cheatEnabled = false,
+): Game => ({
 	arkpack: {
 		packageId: "package:menu",
 		contentHash: "content:menu",
@@ -71,7 +89,10 @@ const createGame = (flushSaveFx: Game["flushSaveFx"] = Effect.void): Game => ({
 	disposeWithoutSaveFx: Effect.void,
 	flushSaveFx,
 	getResourceUrl: () => "blob:test",
-	getSnapshot: () => ({}) as ReturnType<Game["getSnapshot"]>,
+	getSnapshot: () =>
+		(cheatEnabled ? gameSnapshots.enabled : gameSnapshots.disabled) as ReturnType<
+			Game["getSnapshot"]
+		>,
 	read: testGameRead,
 	run: (() => Promise.reject(new Error("Not used by this test."))) as Game["run"],
 	subscribe: () => () => undefined,
@@ -183,6 +204,11 @@ const renderMenu = async ({
 		path: "/board",
 		component: GamePage,
 	});
+	const cheatsRoute = createRoute({
+		getParentRoute: () => gameRoute,
+		path: "/cheats",
+		component: () => createElement("div", null, "Cheats"),
+	});
 	const resetRoute = createRoute({
 		getParentRoute: () => gameRoute,
 		path: "/action/reset",
@@ -208,6 +234,7 @@ const renderMenu = async ({
 		routeTree: rootRoute.addChildren([
 			gameRoute.addChildren([
 				boardRoute,
+				cheatsRoute,
 				resetRoute,
 				leaveRoute,
 			]),
@@ -343,6 +370,34 @@ describe("GameMenu", () => {
 		expect(viewTransitionStartPhases).toEqual([
 			"open",
 		]);
+	});
+
+	it("shows the save-scoped Cheats destination only when Cheat mode is enabled", async () => {
+		const disabled = await renderMenu({
+			game: createGame(),
+		});
+		await openMenu(disabled.container);
+		expect(
+			Array.from(disabled.container.querySelectorAll("button")).some(
+				(button) => button.textContent === "Cheats",
+			),
+		).toBe(false);
+
+		await act(async () => {
+			for (const root of roots.splice(0)) root.unmount();
+		});
+		document.body.replaceChildren();
+		motionTestRuntime.reset();
+		motionTestRuntime.autoComplete = false;
+
+		const enabled = await renderMenu({
+			game: createGame(Effect.void, true),
+		});
+		await openMenu(enabled.container);
+		await act(async () => buttonByText(enabled.container, "Cheats").click());
+		await vi.waitFor(() =>
+			expect(enabled.router.state.location.pathname).toBe("/game/package%3Amenu/cheats"),
+		);
 	});
 
 	it("runs one explicit save while disabling overlapping menu actions", async () => {

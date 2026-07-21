@@ -8,7 +8,7 @@ import { useSaveAndExitGameMutation } from "~/ui/game-menu/mutation/useSaveAndEx
 import { useSaveGameMutation } from "~/ui/game-menu/mutation/useSaveGameMutation";
 import { useGameMenuControl } from "~/ui/game-menu/useGameMenuControl";
 
-type ActiveRequest = "save" | "save-and-exit" | "hard-reset" | "main-menu" | "settings";
+type ActiveRequest = "save" | "save-and-exit" | "hard-reset" | "main-menu" | "settings" | "cheats";
 
 type NavigationState =
 	| {
@@ -45,6 +45,23 @@ export const useGameMenuActions = ({
 		setNavigationError(undefined);
 		void navigate({
 			to: "/settings",
+		})
+			.catch(setNavigationError)
+			.finally(() => {
+				activeRequestRef.current = null;
+				menu.completeRouteRequest();
+			});
+	};
+
+	const requestCheats = () => {
+		if (activeRequestRef.current !== null || !menu.beginRouteRequest()) return;
+		activeRequestRef.current = "cheats";
+		setNavigationError(undefined);
+		void navigate({
+			to: "/game/$packageId/cheats",
+			params: {
+				packageId: game.arkpack.packageId,
+			},
 		})
 			.catch(setNavigationError)
 			.finally(() => {
@@ -205,6 +222,7 @@ export const useGameMenuActions = ({
 		setConfirmingDestroy,
 		close: menu.close,
 		requestSettings,
+		requestCheats,
 		requestMainMenu,
 		requestSave,
 		requestSaveAndExit,

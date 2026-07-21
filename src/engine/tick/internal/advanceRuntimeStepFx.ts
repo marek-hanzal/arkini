@@ -1,5 +1,6 @@
 import { Effect } from "effect";
 import { isPassiveStorageLocation } from "~/engine/location/read/isPassiveStorageLocation";
+import { isInstantGameplayEnabled } from "~/engine/cheat/read/isInstantGameplayEnabled";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
@@ -87,6 +88,7 @@ export const advanceRuntimeStepFx = Effect.fn("advanceRuntimeStepFx")(function* 
 	stepStart: RuntimeSchema.Type,
 ) {
 	const boundaryStart = yield* dispatchQueueOnlyOwnersFx(stepStart);
+	const instantGameplay = isInstantGameplayEnabled(boundaryStart.runtime);
 	const jobs = sortJobs(boundaryStart.runtime.jobs);
 	const temporaryItems = sortTemporaryItems(boundaryStart.runtime);
 	const runnableByJobId = new Map<IdSchema.Type, boolean>();
@@ -112,7 +114,7 @@ export const advanceRuntimeStepFx = Effect.fn("advanceRuntimeStepFx")(function* 
 		if (liveJob === undefined) continue;
 		draft = replaceJob(draft, {
 			...liveJob,
-			remainingMs: Math.max(0, liveJob.remainingMs - TickStepMs),
+			remainingMs: instantGameplay ? 0 : Math.max(0, liveJob.remainingMs - TickStepMs),
 		});
 	}
 

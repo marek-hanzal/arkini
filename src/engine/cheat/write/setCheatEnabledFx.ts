@@ -2,6 +2,7 @@ import { Effect } from "effect";
 
 import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import { settleInstantGameplayFx } from "~/engine/cheat/write/settleInstantGameplayFx";
 
 export namespace setCheatEnabledFx {
 	export interface Props {
@@ -13,7 +14,7 @@ export namespace setCheatEnabledFx {
 export const setCheatEnabledFx = Effect.fn("setCheatEnabledFx")(function* ({
 	enabled,
 }: setCheatEnabledFx.Props) {
-	return yield* modifyRuntimeFx((runtime) => {
+	const cheats = yield* modifyRuntimeFx((runtime) => {
 		if (runtime.cheats.enabled === enabled) {
 			return Effect.succeed([
 				runtime.cheats,
@@ -32,4 +33,6 @@ export const setCheatEnabledFx = Effect.fn("setCheatEnabledFx")(function* ({
 			} satisfies RuntimeSchema.Type,
 		] as const);
 	});
+	if (enabled && cheats.instantGameplay) yield* settleInstantGameplayFx();
+	return cheats;
 });

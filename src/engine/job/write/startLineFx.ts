@@ -1,5 +1,6 @@
 import { Effect } from "effect";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
+import { settleInstantGameplayFx } from "~/engine/cheat/write/settleInstantGameplayFx";
 import { assertLineStartReadyFx } from "~/engine/job/fx/assertLineStartReadyFx";
 import { createJobQueueRequestFx } from "~/engine/job/fx/createJobQueueRequestFx";
 import { resolveLineStartFx } from "~/engine/job/fx/read/resolveLineStartFx";
@@ -18,7 +19,7 @@ export const startLineFx = Effect.fn("startLineFx")(function* ({
 	ownerItemId,
 	lineId,
 }: startLineFx.Props) {
-	return yield* modifyRuntimeFx((runtime) =>
+	const result = yield* modifyRuntimeFx((runtime) =>
 		Effect.gen(function* () {
 			const hasOwnerWork =
 				runtime.jobs.some((job) => job.ownerItemId === ownerItemId) ||
@@ -77,4 +78,6 @@ export const startLineFx = Effect.fn("startLineFx")(function* ({
 			];
 		}),
 	);
+	yield* settleInstantGameplayFx();
+	return result;
 });

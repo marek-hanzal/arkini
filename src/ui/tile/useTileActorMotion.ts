@@ -15,16 +15,16 @@ import type { useTileActorPresentation } from "~/ui/tile/useTileActorPresentatio
 
 const settleTransition = {
 	type: "spring" as const,
-	stiffness: 560,
-	damping: 38,
-	mass: 0.62,
+	stiffness: 200,
+	damping: 24,
+	mass: 0.68,
 };
 
-const interactionVisualFallbackMs = 1_200;
+const interactionVisualFallbackMs = 2_000;
 
 const pickupTransition = {
 	type: "tween" as const,
-	duration: 0.11,
+	duration: 0.2,
 	ease: [
 		0.22,
 		1,
@@ -50,13 +50,13 @@ export const useTileActorMotion = ({
 	const dragWeightTargetX = useMotionValue(0);
 	const dragWeightTargetY = useMotionValue(0);
 	const dragRotationTarget = useMotionValue(0);
-	const dragWeightX = useSpring(dragWeightTargetX, { stiffness: 720, damping: 48, mass: 0.42 });
-	const dragWeightY = useSpring(dragWeightTargetY, { stiffness: 720, damping: 48, mass: 0.42 });
-	const dragRotation = useSpring(dragRotationTarget, { stiffness: 640, damping: 42, mass: 0.38 });
+	const dragWeightX = useSpring(dragWeightTargetX, { stiffness: 280, damping: 26, mass: 0.52 });
+	const dragWeightY = useSpring(dragWeightTargetY, { stiffness: 280, damping: 26, mass: 0.52 });
+	const dragRotation = useSpring(dragRotationTarget, { stiffness: 250, damping: 25, mass: 0.48 });
 	const neighbourTargetX = useMotionValue(0);
 	const neighbourTargetY = useMotionValue(0);
-	const neighbourX = useSpring(neighbourTargetX, { stiffness: 480, damping: 38, mass: 0.5 });
-	const neighbourY = useSpring(neighbourTargetY, { stiffness: 480, damping: 38, mass: 0.5 });
+	const neighbourX = useSpring(neighbourTargetX, { stiffness: 170, damping: 22, mass: 0.58 });
+	const neighbourY = useSpring(neighbourTargetY, { stiffness: 170, damping: 22, mass: 0.58 });
 	const pickupX = useMotionValue(0);
 	const pickupY = useMotionValue(0);
 	const width = useMotionValue(0);
@@ -109,12 +109,12 @@ export const useTileActorMotion = ({
 				return;
 			}
 			const horizontal =
-				Math.abs(info.velocity.x) > 20 ? -info.velocity.x * 0.005 : -info.delta.x * 0.35;
+				Math.abs(info.velocity.x) > 20 ? -info.velocity.x * 0.006 : -info.delta.x * 0.4;
 			const vertical =
-				Math.abs(info.velocity.y) > 20 ? -info.velocity.y * 0.004 : -info.delta.y * 0.28;
-			dragWeightTargetX.set(Math.max(-8, Math.min(8, horizontal)));
-			dragWeightTargetY.set(Math.max(-6, Math.min(6, vertical)));
-			dragRotationTarget.set(Math.max(-2.5, Math.min(2.5, -horizontal * 0.24)));
+				Math.abs(info.velocity.y) > 20 ? -info.velocity.y * 0.005 : -info.delta.y * 0.32;
+			dragWeightTargetX.set(Math.max(-10, Math.min(10, horizontal)));
+			dragWeightTargetY.set(Math.max(-8, Math.min(8, vertical)));
+			dragRotationTarget.set(Math.max(-3, Math.min(3, -horizontal * 0.26)));
 		},
 		[
 			clearDragWeight,

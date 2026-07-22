@@ -41,59 +41,59 @@ export const TileMotionCueVisual = ({
 	const animation = match(cue.kind)
 		.with("spawn", () => ({
 			initial: {
-				scale: reducedMotion ? 0.94 : 0.78,
+				scale: reducedMotion ? 0.94 : 0.74,
 				opacity: 0,
-				y: reducedMotion ? 0 : 8,
+				y: reducedMotion ? 0 : 10,
 			},
 			animate: {
-				scale: reducedMotion ? [0.94, 1] : [0.78, 1.07, 1],
+				scale: reducedMotion ? [0.94, 1] : [0.74, 1.09, 1],
 				opacity: [0, 1, 1],
-				y: reducedMotion ? 0 : [8, -2, 0],
+				y: reducedMotion ? 0 : [10, -3, 0],
 			},
-			duration: reducedMotion ? 0.14 : 0.34,
+			duration: reducedMotion ? 0.18 : 0.6,
 		}))
 		.with("settle", () => ({
 			initial: {
-				scale: reducedMotion ? 0.98 : 0.94,
-				opacity: 0.72,
-				y: reducedMotion ? 0 : 4,
+				scale: reducedMotion ? 0.98 : 0.92,
+				opacity: 0.66,
+				y: reducedMotion ? 0 : 6,
 			},
 			animate: {
 				scale: 1,
 				opacity: 1,
 				y: 0,
 			},
-			duration: reducedMotion ? 0.12 : 0.22,
+			duration: reducedMotion ? 0.16 : 0.4,
 		}))
 		.with("impact", () => {
-			const peak = reducedMotion ? 1.025 : 1.1 + (cue.strength - 1) * 0.025;
+			const peak = reducedMotion ? 1.03 : 1.12 + (cue.strength - 1) * 0.03;
 			return {
 				initial: false as const,
 				animate: {
 					scale: [1, peak, 1],
 					opacity: 1,
-					y: reducedMotion ? 0 : [0, -2 - cue.strength, 0],
+					y: reducedMotion ? 0 : [0, -3 - cue.strength, 0],
 				},
-				duration: reducedMotion ? 0.12 : 0.26,
+				duration: reducedMotion ? 0.16 : 0.45,
 			};
 		})
 		.with("accept", () => ({
 			initial: false as const,
 			animate: {
-				scale: reducedMotion ? [1, 0.98, 1] : [1, 0.93, 1.035, 1],
+				scale: reducedMotion ? [1, 0.98, 1] : [1, 0.91, 1.05, 1],
 				opacity: 1,
-				y: reducedMotion ? 0 : [0, 3, -1, 0],
+				y: reducedMotion ? 0 : [0, 4, -2, 0],
 			},
-			duration: reducedMotion ? 0.12 : 0.3,
+			duration: reducedMotion ? 0.16 : 0.52,
 		}))
 		.with("exit", () => ({
 			initial: false as const,
 			animate: {
-				scale: reducedMotion ? [1, 0.94] : [1, 1.055, 0.72],
+				scale: reducedMotion ? [1, 0.94] : [1, 1.08, 0.68],
 				opacity: reducedMotion ? [1, 0] : [1, 1, 0],
-				y: reducedMotion ? 0 : [0, -8, -14],
+				y: reducedMotion ? 0 : [0, -10, -18],
 			},
-			duration: reducedMotion ? 0.14 : 0.28,
+			duration: reducedMotion ? 0.18 : 0.5,
 		}))
 		.exhaustive();
 

@@ -94,9 +94,9 @@ export const TileGridCell = ({
 				}
 				transition={{
 					type: "spring",
-					stiffness: 520,
-					damping: 38,
-					mass: 0.55,
+					stiffness: 190,
+					damping: 22,
+					mass: 0.62,
 				}}
 			/>
 		</div>

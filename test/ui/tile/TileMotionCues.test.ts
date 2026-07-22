@@ -274,7 +274,7 @@ describe("tile motion cue lifecycle", () => {
 		await act(async () => root.render(createElement(Capture)));
 		expect(current?.retainedItems).toHaveLength(1);
 
-		await act(async () => vi.advanceTimersByTime(1_200));
+		await act(async () => vi.advanceTimersByTime(2_000));
 
 		expect(current?.cues.size).toBe(0);
 		expect(current?.retainedItems).toEqual([]);

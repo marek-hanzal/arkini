@@ -18,7 +18,7 @@ interface TileMotionCueFallback {
 	readonly timer: ReturnType<typeof setTimeout>;
 }
 
-const cueFallbackMs = 1_200;
+const cueFallbackMs = 2_000;
 
 const emptyState = (): TileMotionCueState => ({
 	nextGeneration: 0,

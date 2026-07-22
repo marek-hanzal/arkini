@@ -88,7 +88,7 @@ export const useTileNeighbourField = () => {
 						reset(registration);
 						continue;
 					}
-					const maximum = Math.min(12, neighbourSize * 0.11);
+					const maximum = Math.min(14, neighbourSize * 0.125);
 					const strength = (1 - distance / radius) * maximum;
 					registration.x.set((deltaX / distance) * strength);
 					registration.y.set((deltaY / distance) * strength);

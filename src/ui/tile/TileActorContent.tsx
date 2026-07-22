@@ -38,7 +38,7 @@ const visualTarget = ({
 				phase: "exiting",
 			},
 			() => ({
-				scale: 0.72,
+				scale: 0.68,
 				opacity: 0,
 				filter:
 					"brightness(1.14) drop-shadow(0 0.4rem 0.55rem color-mix(in srgb, var(--ak-overlay) 18%, transparent))",
@@ -49,7 +49,7 @@ const visualTarget = ({
 				phase: "impact",
 			},
 			() => ({
-				scale: 1.12,
+				scale: 1.14,
 				opacity: 1,
 				filter:
 					"brightness(1.12) drop-shadow(0 0.8rem 1rem color-mix(in srgb, var(--ak-accent) 30%, transparent))",
@@ -82,7 +82,7 @@ const visualTarget = ({
 				phase: "targeted",
 			},
 			() => ({
-				scale: 1.08,
+				scale: 1.1,
 				opacity: 1,
 				filter:
 					"brightness(1.08) drop-shadow(0 0.7rem 0.9rem color-mix(in srgb, var(--ak-accent) 24%, transparent))",
@@ -94,10 +94,10 @@ const visualTarget = ({
 				feedback: "rejected",
 			},
 			() => ({
-				scale: 1.04,
+				scale: 1.055,
 				opacity: 1,
 				filter:
-					"brightness(1.03) drop-shadow(0 0.6rem 0.8rem color-mix(in srgb, var(--ak-danger) 30%, transparent))",
+					"brightness(1.05) drop-shadow(0 0.65rem 0.85rem color-mix(in srgb, var(--ak-danger) 36%, transparent))",
 			}),
 		)
 		.with(
@@ -106,7 +106,7 @@ const visualTarget = ({
 				feedback: "accepted",
 			},
 			() => ({
-				scale: 1.06,
+				scale: 1.08,
 				opacity: 1,
 				filter:
 					"brightness(1.06) drop-shadow(0 0.65rem 0.85rem color-mix(in srgb, var(--ak-accent) 24%, transparent))",
@@ -152,9 +152,9 @@ export const TileActorContent = ({
 			})}
 			transition={{
 				type: "spring",
-				stiffness: phase === "exiting" ? 620 : 520,
-				damping: phase === "exiting" ? 44 : 34,
-				mass: 0.55,
+				stiffness: phase === "exiting" ? 225 : 190,
+				damping: phase === "exiting" ? 25 : 22,
+				mass: 0.62,
 			}}
 			onAnimationComplete={onInteractionAnimationComplete}
 		>

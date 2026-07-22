@@ -4,7 +4,7 @@ import { useGameEngine } from "~/bridge/game/useGameEngine";
 import { useRuntimeSelector } from "~/bridge/runtime/useRuntimeSelector";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { readItemDetailSourcesFx } from "~/engine/item-detail/read/readItemDetailSourcesFx";
-import { readRuntimeItemPrimaryAssetId } from "~/engine/item/read/readRuntimeItemPrimaryAssetId";
+import { readRuntimeItemPrimaryAssetIdFx } from "~/engine/item/read/readRuntimeItemPrimaryAssetIdFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
 export namespace useItemDetailSources {
@@ -135,7 +135,11 @@ export const useItemDetailSources = (itemId: IdSchema.Type): useItemDetailSource
 							ownerItemId: source.ownerItemId,
 							title: configured.title,
 							sourceUrl: game.getResourceUrl(
-								readRuntimeItemPrimaryAssetId(runtime, owner.item),
+								game.readOrThrow(
+									readRuntimeItemPrimaryAssetIdFx({
+										item: owner.item,
+									}),
+								),
 							),
 							...(configured.asset.composite === undefined
 								? {}

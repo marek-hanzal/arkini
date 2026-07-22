@@ -5,7 +5,7 @@ import { useRuntimeSelector } from "~/bridge/runtime/useRuntimeSelector";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 import { isGridRuntimeItem } from "~/engine/runtime/read/isGridRuntimeItem";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
-import { readRuntimeItemPrimaryAssetId } from "~/engine/item/read/readRuntimeItemPrimaryAssetId";
+import { readRuntimeItemPrimaryAssetIdFx } from "~/engine/item/read/readRuntimeItemPrimaryAssetIdFx";
 import { readRuntimeItemPrimaryAction } from "~/engine/item-detail/read/readRuntimeItemPrimaryAction";
 import { resolveActiveJobStatusFx } from "~/engine/job/fx/resolveActiveJobStatusFx";
 import { JobStatusEnumSchema } from "~/engine/job/schema/read/JobStatusEnumSchema";
@@ -60,7 +60,11 @@ export const useTileActors = (): ReadonlyArray<useTileActors.Item> => {
 						runtime,
 					}),
 					sourceUrl: game.getResourceUrl(
-						readRuntimeItemPrimaryAssetId(runtime, item.item),
+						game.readOrThrow(
+							readRuntimeItemPrimaryAssetIdFx({
+								item: item.item,
+							}),
+						),
 					),
 					...(item.item.asset.composite === undefined
 						? {}

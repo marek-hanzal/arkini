@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import { isInstantGameplayEnabled } from "~/engine/cheat/read/isInstantGameplayEnabled";
+import { isInstantGameplayEnabledFx } from "~/engine/cheat/read/isInstantGameplayEnabledFx";
 
 import { reviseRuntimeItemFx } from "~/engine/runtime/fx/reviseRuntimeItemFx";
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
@@ -18,7 +18,7 @@ export namespace advanceTemporaryItemDurationsFx {
 export const advanceTemporaryItemDurationsFx = Effect.fn("advanceTemporaryItemDurationsFx")(
 	function* ({ items, runtime }: advanceTemporaryItemDurationsFx.Props) {
 		let draft = runtime;
-		const instantGameplay = isInstantGameplayEnabled(runtime);
+		const instantGameplay = yield* isInstantGameplayEnabledFx({ runtime });
 
 		for (const snapshotItem of items) {
 			const liveItem = draft.items.find((candidate) => candidate.id === snapshotItem.id);

@@ -4,7 +4,7 @@ import { match } from "ts-pattern";
 import { useGameEngine } from "~/bridge/game/useGameEngine";
 import { useRuntimeSelector } from "~/bridge/runtime/useRuntimeSelector";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import { readRuntimeItemPrimaryAssetId } from "~/engine/item/read/readRuntimeItemPrimaryAssetId";
+import { readRuntimeItemPrimaryAssetIdFx } from "~/engine/item/read/readRuntimeItemPrimaryAssetIdFx";
 import type { InputChargeFromEnumSchema } from "~/engine/input/schema/InputChargeFromEnumSchema";
 import type { InputModeEnumSchema } from "~/engine/input/schema/InputModeEnumSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
@@ -185,7 +185,13 @@ const mapDetailReference = ({
 	return {
 		itemId,
 		title: configured.title,
-		sourceUrl: game.getResourceUrl(readRuntimeItemPrimaryAssetId(runtime, configured)),
+		sourceUrl: game.getResourceUrl(
+			game.readOrThrow(
+				readRuntimeItemPrimaryAssetIdFx({
+					item: configured,
+				}),
+			),
+		),
 		...(configured.asset.composite === undefined
 			? {}
 			: {
@@ -217,7 +223,11 @@ const mapOutputItem = ({
 			? {}
 			: {
 					sourceUrl: game.getResourceUrl(
-						readRuntimeItemPrimaryAssetId(runtime, configured),
+						game.readOrThrow(
+							readRuntimeItemPrimaryAssetIdFx({
+								item: configured,
+							}),
+						),
 					),
 					...(configured.asset.composite === undefined
 						? {}

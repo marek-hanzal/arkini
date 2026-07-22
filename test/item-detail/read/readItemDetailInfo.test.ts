@@ -1,6 +1,7 @@
+import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { readItemDetailIdentity } from "~/engine/item-detail/read/readItemDetailIdentity";
+import { readItemDetailIdentityFx } from "~/engine/item-detail/read/readItemDetailIdentityFx";
 import { readItemDetailInfo } from "~/engine/item-detail/read/readItemDetailInfo";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { lineRunRuntime } from "~test/line/fx/run/support/lineRunTestRuntime";
@@ -46,10 +47,12 @@ describe("tile identity and Info projections", () => {
 		} satisfies RuntimeSchema.Type;
 
 		expect(
-			readItemDetailIdentity({
-				itemId: owner.id,
-				runtime,
-			}),
+			Effect.runSync(
+				readItemDetailIdentityFx({
+					itemId: owner.id,
+					runtime,
+				}),
+			),
 		).toMatchObject({
 			kind: "available",
 			itemId: owner.id,
@@ -91,10 +94,12 @@ describe("tile identity and Info projections", () => {
 	it("returns one unavailable result for a stale runtime identity", () => {
 		const runtime = lineRunRuntime({});
 		expect(
-			readItemDetailIdentity({
-				itemId: "runtime:missing",
-				runtime,
-			}),
+			Effect.runSync(
+				readItemDetailIdentityFx({
+					itemId: "runtime:missing",
+					runtime,
+				}),
+			),
 		).toEqual({
 			kind: "unavailable",
 		});

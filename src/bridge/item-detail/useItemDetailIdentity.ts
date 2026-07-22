@@ -4,7 +4,7 @@ import { useGameEngine } from "~/bridge/game/useGameEngine";
 import { useRuntimeSelector } from "~/bridge/runtime/useRuntimeSelector";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
-import { readItemDetailIdentity } from "~/engine/item-detail/read/readItemDetailIdentity";
+import { readItemDetailIdentityFx } from "~/engine/item-detail/read/readItemDetailIdentityFx";
 
 export namespace useItemDetailIdentity {
 	export type Projection =
@@ -45,10 +45,12 @@ export const useItemDetailIdentity = (itemId: IdSchema.Type): useItemDetailIdent
 	const game = useGameEngine();
 	const selector = useCallback(
 		(runtime: RuntimeSchema.Type): useItemDetailIdentity.Projection => {
-			const identity = readItemDetailIdentity({
-				itemId,
-				runtime,
-			});
+			const identity = game.readOrThrow(
+				readItemDetailIdentityFx({
+					itemId,
+					runtime,
+				}),
+			);
 			if (identity.kind === "unavailable") return unavailable;
 			const subtitle = game.config.categories[identity.categoryId]?.title;
 			return {

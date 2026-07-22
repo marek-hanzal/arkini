@@ -734,6 +734,7 @@ describe("tile motion cue arbitration", () => {
 					item: item("runtime:arbitrated"),
 					phase,
 					feedback: null,
+					forbiddenDrop: false,
 					cue: { generation: 21, kind: "impact", strength: 1 },
 					cueOriginOffset: null,
 					cueTargetOffset: null,

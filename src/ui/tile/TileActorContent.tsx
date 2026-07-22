@@ -12,6 +12,7 @@ export namespace TileActorContent {
 		readonly item: useTileActors.Item;
 		readonly phase: TileActorPhaseSchema.Type;
 		readonly feedback: TileInteractionFeedbackSchema.Type | null;
+		readonly forbiddenDrop: boolean;
 		readonly cue: TileMotionCueSchema.Type | null;
 		readonly cueOriginOffset: { readonly x: number; readonly y: number } | null;
 		readonly cueTargetOffset: { readonly x: number; readonly y: number } | null;
@@ -69,6 +70,7 @@ export const TileActorContent = ({
 	item,
 	phase,
 	feedback,
+	forbiddenDrop,
 	cue,
 	cueOriginOffset,
 	cueTargetOffset,
@@ -107,6 +109,7 @@ export const TileActorContent = ({
 			animate={readTileActorVisualTarget({
 				phase,
 				feedback,
+				forbiddenDrop,
 			})}
 			transition={{
 				type: "spring",

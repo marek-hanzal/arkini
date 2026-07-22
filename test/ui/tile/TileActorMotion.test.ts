@@ -10,6 +10,7 @@ import type { TileDragSource } from "~/ui/tile/TileDragSource";
 import type { TileSurface } from "~/ui/tile/TileSurface";
 import { useTileActorMotion } from "~/ui/tile/useTileActorMotion";
 import type { useTileActorPresentation } from "~/ui/tile/useTileActorPresentation";
+import { motionTestRuntime } from "~test/ui/support/motionReactMock";
 
 const systemState = vi.hoisted(() => ({
 	system: null as TileActorSystem | null,
@@ -24,6 +25,7 @@ vi.mock("~/ui/tile/useTileActorSystem", () => ({
 }));
 
 const roots: Array<ReturnType<typeof createRoot>> = [];
+let capturedMotion: ReturnType<typeof useTileActorMotion> | null = null;
 
 const item = (location: useTileActors.Item["location"]): useTileActors.Item => ({
 	id: "runtime:water",
@@ -85,7 +87,7 @@ const Capture = ({
 	readonly actor: useTileActors.Item;
 	readonly view: useTileActorPresentation.Model;
 }) => {
-	useTileActorMotion({
+	capturedMotion = useTileActorMotion({
 		item: actor,
 		presentation: view,
 		cue: null,
@@ -115,6 +117,7 @@ const renderMotion = async (
 
 beforeEach(() => {
 	vi.useFakeTimers();
+	motionTestRuntime.reset();
 });
 
 afterEach(async () => {
@@ -124,10 +127,62 @@ afterEach(async () => {
 	vi.useRealTimers();
 	vi.restoreAllMocks();
 	systemState.system = null;
+	capturedMotion = null;
 	document.body.replaceChildren();
 });
 
 describe("useTileActorMotion", () => {
+	it("bounds the real actor behind its pointer target through a spring follower", async () => {
+		motionTestRuntime.springLag = true;
+		systemState.system = {
+			geometryVersion: 0,
+			readActorLayerRect: () => null,
+			readActorRect: () => null,
+			readPlacement: () => ({ x: 0, y: 0, width: 100, height: 100 }),
+			complete: () => undefined,
+			registerNeighbourActor: () => () => undefined,
+		} as unknown as TileActorSystem;
+		const location = {
+			scope: "board" as const,
+			space: 0,
+			position: { x: 0, y: 0 },
+		};
+
+		await renderMotion(item(location), presentation(location, 1));
+		if (capturedMotion === null) throw new Error("Tile actor motion was not captured.");
+		capturedMotion.dragX.set(100);
+		capturedMotion.dragY.set(-100);
+
+		expect(capturedMotion.travelX.get()).toBe(72);
+		expect(capturedMotion.travelY.get()).toBe(-76);
+	});
+
+	it("removes spring lag under reduced motion without changing pointer semantics", async () => {
+		motionTestRuntime.springLag = true;
+		motionTestRuntime.reducedMotion = true;
+		systemState.system = {
+			geometryVersion: 0,
+			readActorLayerRect: () => null,
+			readActorRect: () => null,
+			readPlacement: () => ({ x: 0, y: 0, width: 100, height: 100 }),
+			complete: () => undefined,
+			registerNeighbourActor: () => () => undefined,
+		} as unknown as TileActorSystem;
+		const location = {
+			scope: "board" as const,
+			space: 0,
+			position: { x: 0, y: 0 },
+		};
+
+		await renderMotion(item(location), presentation(location, 1));
+		if (capturedMotion === null) throw new Error("Tile actor motion was not captured.");
+		capturedMotion.dragX.set(100);
+		capturedMotion.dragY.set(-100);
+
+		expect(capturedMotion.travelX.get()).toBe(100);
+		expect(capturedMotion.travelY.get()).toBe(-100);
+	});
+
 	it("releases exact position ownership when placement remains unavailable", async () => {
 		const complete = vi.fn();
 		systemState.system = {

@@ -4,6 +4,7 @@ import {
 	useMotionValue,
 	useReducedMotion,
 	useSpring,
+	useTransform,
 } from "motion/react";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { match } from "ts-pattern";
@@ -23,6 +24,11 @@ const settleTransition = {
 };
 
 const interactionCompletionFallbackMs = 2_000;
+const maximumDragLagX = 28;
+const maximumDragLagY = 24;
+
+const clamp = (value: number, minimum: number, maximum: number) =>
+	Math.max(minimum, Math.min(maximum, value));
 
 const deliveryTransition = {
 	type: "tween" as const,
@@ -64,6 +70,20 @@ export const useTileActorMotion = ({
 	const anchorY = useMotionValue(0);
 	const dragX = useMotionValue(0);
 	const dragY = useMotionValue(0);
+	const dragFollowX = useSpring(dragX, { stiffness: 245, damping: 26, mass: 0.64 });
+	const dragFollowY = useSpring(dragY, { stiffness: 245, damping: 26, mass: 0.64 });
+	const boundedDragX = useTransform([dragX, dragFollowX], ([target, follow]) =>
+		target + clamp(follow - target, -maximumDragLagX, maximumDragLagX),
+	);
+	const boundedDragY = useTransform([dragY, dragFollowY], ([target, follow]) =>
+		target + clamp(follow - target, -maximumDragLagY, maximumDragLagY),
+	);
+	const visualDragX = reducedMotion ? dragX : boundedDragX;
+	const visualDragY = reducedMotion ? dragY : boundedDragY;
+	const settleX = useMotionValue(0);
+	const settleY = useMotionValue(0);
+	const travelX = useTransform([visualDragX, settleX], ([drag, settle]) => drag + settle);
+	const travelY = useTransform([visualDragY, settleY], ([drag, settle]) => drag + settle);
 	const dragWeightTargetX = useMotionValue(0);
 	const dragWeightTargetY = useMotionValue(0);
 	const dragRotationTarget = useMotionValue(0);
@@ -272,6 +292,10 @@ export const useTileActorMotion = ({
 			clearDragWeight();
 			dragX.jump(0);
 			dragY.jump(0);
+			dragFollowX.jump(0);
+			dragFollowY.jump(0);
+			settleX.jump(0);
+			settleY.jump(0);
 			pickupX.jump(0);
 			pickupY.jump(0);
 			neighbourTargetX.set(0);
@@ -298,8 +322,12 @@ export const useTileActorMotion = ({
 			const deliveryOffset = cue?.kind === "spawn" ? readDeliveryOriginOffset(placement) : null;
 			anchorX.jump(placement.x);
 			anchorY.jump(placement.y);
-			dragX.jump(deliveryOffset?.x ?? 0);
-			dragY.jump(deliveryOffset?.y ?? 0);
+			dragX.jump(0);
+			dragY.jump(0);
+			dragFollowX.jump(0);
+			dragFollowY.jump(0);
+			settleX.jump(deliveryOffset?.x ?? 0);
+			settleY.jump(deliveryOffset?.y ?? 0);
 			pickupX.jump(0);
 			pickupY.jump(0);
 			width.jump(placement.width);
@@ -311,8 +339,8 @@ export const useTileActorMotion = ({
 			}
 			if (deliveryOffset === null) return;
 			const animations = [
-				animate(dragX, 0, deliveryTransition),
-				animate(dragY, 0, deliveryTransition),
+				animate(settleX, 0, deliveryTransition),
+				animate(settleY, 0, deliveryTransition),
 			];
 			return () => {
 				for (const animation of animations) animation.stop();
@@ -323,17 +351,23 @@ export const useTileActorMotion = ({
 		stopPickupCorrection();
 		const animations: Array<ReturnType<typeof animate>> = [];
 		if (ownsSettlementMotion) {
-			const currentVisualX = anchorX.get() + dragX.get() + pickupX.get();
-			const currentVisualY = anchorY.get() + dragY.get() + pickupY.get();
+			const currentVisualX = anchorX.get() + travelX.get() + pickupX.get();
+			const currentVisualY = anchorY.get() + travelY.get() + pickupY.get();
+			const velocityX = reducedMotion ? 0 : dragFollowX.getVelocity();
+			const velocityY = reducedMotion ? 0 : dragFollowY.getVelocity();
 			anchorX.jump(placement.x);
 			anchorY.jump(placement.y);
-			dragX.jump(currentVisualX - placement.x);
-			dragY.jump(currentVisualY - placement.y);
+			settleX.jump(currentVisualX - placement.x);
+			settleY.jump(currentVisualY - placement.y);
+			dragX.jump(0);
+			dragY.jump(0);
+			dragFollowX.jump(0);
+			dragFollowY.jump(0);
 			pickupX.jump(0);
 			pickupY.jump(0);
 			animations.push(
-				animate(dragX, 0, settleTransition),
-				animate(dragY, 0, settleTransition),
+				animate(settleX, 0, { ...settleTransition, velocity: velocityX }),
+				animate(settleY, 0, { ...settleTransition, velocity: velocityY }),
 			);
 		} else {
 			animations.push(
@@ -341,6 +375,8 @@ export const useTileActorMotion = ({
 				animate(anchorY, placement.y, settleTransition),
 				animate(dragX, 0, settleTransition),
 				animate(dragY, 0, settleTransition),
+				animate(settleX, 0, settleTransition),
+				animate(settleY, 0, settleTransition),
 				animate(pickupX, 0, settleTransition),
 				animate(pickupY, 0, settleTransition),
 			);
@@ -363,6 +399,10 @@ export const useTileActorMotion = ({
 				anchorY.jump(placement.y);
 				dragX.jump(0);
 				dragY.jump(0);
+				dragFollowX.jump(0);
+				dragFollowY.jump(0);
+				settleX.jump(0);
+				settleY.jump(0);
 				pickupX.jump(0);
 				pickupY.jump(0);
 				width.jump(placement.width);
@@ -385,6 +425,8 @@ export const useTileActorMotion = ({
 		clearDragWeight,
 		cue,
 		complete,
+		dragFollowX,
+		dragFollowY,
 		dragX,
 		dragY,
 		geometryVersion,
@@ -401,7 +443,12 @@ export const useTileActorMotion = ({
 		presentation.visualCompletionGeneration,
 		readDeliveryOriginOffset,
 		readPlacement,
+		reducedMotion,
+		settleX,
+		settleY,
 		stopPickupCorrection,
+		travelX,
+		travelY,
 		width,
 	]);
 
@@ -529,6 +576,8 @@ export const useTileActorMotion = ({
 		registerActorNode,
 		dragX,
 		dragY,
+		travelX,
+		travelY,
 		dragWeightX,
 		dragWeightY,
 		dragRotation,

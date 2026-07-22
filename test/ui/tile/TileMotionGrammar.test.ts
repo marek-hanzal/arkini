@@ -9,6 +9,7 @@ describe("tile motion grammar", () => {
 			readTileActorVisualTarget({
 				phase: "dragging",
 				feedback: "accepted",
+				forbiddenDrop: false,
 			}),
 		).toMatchObject({
 			opacity: 1,
@@ -18,6 +19,7 @@ describe("tile motion grammar", () => {
 			readTileActorVisualTarget({
 				phase: "combining",
 				feedback: "accepted",
+				forbiddenDrop: false,
 			}),
 		).toMatchObject({
 			opacity: 1,
@@ -30,6 +32,7 @@ describe("tile motion grammar", () => {
 			readTileActorVisualTarget({
 				phase: "dragging",
 				feedback: "ignored",
+				forbiddenDrop: false,
 			}),
 		).toMatchObject({
 			opacity: 0.76,
@@ -39,11 +42,42 @@ describe("tile motion grammar", () => {
 			readTileActorVisualTarget({
 				phase: "stable",
 				feedback: null,
+				forbiddenDrop: false,
 			}),
 		).toMatchObject({
 			opacity: 1,
-			scale: 1,
+			scale: 0.8,
 		});
+	});
+
+	it("keeps the full slot while the ordinary dragged body follows at restrained opacity", () => {
+		expect(
+			readTileActorVisualTarget({
+				phase: "dragging",
+				feedback: null,
+				forbiddenDrop: false,
+			}),
+		).toMatchObject({
+			opacity: 0.8,
+			scale: 0.9,
+		});
+	});
+
+	it("makes rejected and outside drag targets visibly unavailable", () => {
+		for (const target of [
+			{ feedback: "rejected" as const, forbiddenDrop: false },
+			{ feedback: null, forbiddenDrop: true },
+		]) {
+			expect(
+				readTileActorVisualTarget({
+					phase: "dragging",
+					...target,
+				}),
+			).toMatchObject({
+				opacity: 0.6,
+				scale: 0.8,
+			});
+		}
 	});
 
 	it("measures a delivery from the origin actor center to the target slot center", () => {

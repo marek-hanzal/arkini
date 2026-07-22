@@ -213,7 +213,7 @@ export const TileActor = ({
 			}}
 		>
 			<motion.span
-				className="absolute inset-0 touch-none"
+				className="absolute inset-0 z-10 touch-none"
 				style={{
 					x: actorMotion.dragX,
 					y: actorMotion.dragY,
@@ -236,6 +236,15 @@ export const TileActor = ({
 				onDrag={drag.onDrag}
 				onDragEnd={drag.onDragEnd}
 				data-ui="TileActorDragSurface"
+			/>
+			<motion.span
+				className="pointer-events-none absolute inset-0"
+				style={{
+					x: actorMotion.travelX,
+					y: actorMotion.travelY,
+				}}
+				data-ui="TileActorTravel"
+				data-motion-id={item.id}
 			>
 				<motion.span
 					className="absolute inset-0"
@@ -260,6 +269,7 @@ export const TileActor = ({
 							item={item}
 							phase={presentation.phase}
 							feedback={presentation.feedback}
+							forbiddenDrop={presentation.forbiddenDrop}
 							cue={cue}
 							cueOriginOffset={actorMotion.cueOriginOffset}
 							cueTargetOffset={actorMotion.cueTargetOffset}

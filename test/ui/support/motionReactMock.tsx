@@ -14,6 +14,7 @@ import {
 
 interface MockMotionValue<T> {
 	get: () => T;
+	getVelocity: () => number;
 	set: (value: T) => void;
 	jump: (value: T) => void;
 }
@@ -53,10 +54,12 @@ interface MotionTestCompletion {
 export const motionTestRuntime = {
 	autoComplete: true,
 	reducedMotion: false,
+	springLag: false,
 	completions: [] as Array<MotionTestCompletion>,
 	reset() {
 		this.autoComplete = true;
 		this.reducedMotion = false;
+		this.springLag = false;
 		this.completions.splice(0);
 		activeDragBinding = null;
 		motionOffsetBindings.clear();
@@ -85,19 +88,42 @@ export const motionTestRuntime = {
 
 export const useReducedMotion = () => motionTestRuntime.reducedMotion;
 
-export const useSpring = <T,>(source: MockMotionValue<T>) => source;
-
 export const useMotionValue = <T,>(initial: T): MockMotionValue<T> => {
 	const value = useRef(initial);
 	return useMemo(
 		() => ({
 			get: () => value.current,
+			getVelocity: () => 0,
 			set: (next: T) => {
 				value.current = next;
 			},
 			jump: (next: T) => {
 				value.current = next;
 			},
+		}),
+		[],
+	);
+};
+
+export const useSpring = <T,>(source: MockMotionValue<T>) => {
+	const lagged = useMotionValue(source.get());
+	return motionTestRuntime.springLag ? lagged : source;
+};
+
+export const useTransform = <T,>(
+	sources: ReadonlyArray<MockMotionValue<number>>,
+	transformer: (values: ReadonlyArray<number>) => T,
+): MockMotionValue<T> => {
+	const sourcesRef = useRef(sources);
+	const transformerRef = useRef(transformer);
+	sourcesRef.current = sources;
+	transformerRef.current = transformer;
+	return useMemo(
+		() => ({
+			get: () => transformerRef.current(sourcesRef.current.map((source) => source.get())),
+			getVelocity: () => 0,
+			set: () => undefined,
+			jump: () => undefined,
 		}),
 		[],
 	);

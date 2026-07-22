@@ -5,7 +5,7 @@ import { applyInputMaterialStorePlanFx } from "~/engine/input/fx/applyInputMater
 import { planLineInputAutofillFx } from "~/engine/input/fx/planLineInputAutofillFx";
 import { readItemMaterialInputFx } from "~/engine/input/read/readItemMaterialInputFx";
 import { ItemNotOnGridError } from "~/engine/item/error/ItemNotOnGridError";
-import { isolateStatefulOwnerFx } from "~/engine/item/fx/isolateStatefulOwnerFx";
+import { isolateStatefulOwnerTransitionFx } from "~/engine/item/fx/isolateStatefulOwnerTransitionFx";
 import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
 import { isGridRuntimeItem } from "~/engine/runtime/read/isGridRuntimeItem";
 import { readRuntimeItemByIdFx } from "~/engine/runtime/read/readRuntimeItemByIdFx";
@@ -85,7 +85,7 @@ export const autofillLineInputsFx = Effect.fn("autofillLineInputsFx")(function* 
 				draft = nextDraft;
 			}
 
-			const nextRuntime = yield* isolateStatefulOwnerFx({
+			const isolation = yield* isolateStatefulOwnerTransitionFx({
 				ownerItemId,
 				runtime: draft,
 			});
@@ -94,7 +94,8 @@ export const autofillLineInputsFx = Effect.fn("autofillLineInputsFx")(function* 
 					storedQuantity: plan.storedQuantity,
 					remainingMissingQuantity: plan.remainingMissingQuantity,
 				} satisfies autofillLineInputsFx.Result,
-				nextRuntime,
+				isolation.runtime,
+				isolation.events,
 			] as const;
 		}),
 	);

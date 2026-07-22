@@ -2,6 +2,7 @@ import { Effect } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
+import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
 import { readItemRemainingChargesFx } from "~/engine/item/fx/readItemRemainingChargesFx";
 import { spendItemChargesFx } from "~/engine/item/fx/spendItemChargesFx";
 import type { JobSchema } from "~/engine/job/schema/JobSchema";
@@ -33,13 +34,8 @@ export const applyLineChargePlansFx = Effect.fn("applyLineChargePlansFx")(functi
 	const payerOrder: IdSchema.Type[] = [];
 	for (const input of plan.input) {
 		if (input.charges === undefined) continue;
-		if (!costs.has(input.charges.itemId)) {
-			payerOrder.push(input.charges.itemId);
-		}
-		costs.set(
-			input.charges.itemId,
-			(costs.get(input.charges.itemId) ?? 0) + input.charges.cost,
-		);
+		if (!costs.has(input.charges.itemId)) payerOrder.push(input.charges.itemId);
+		costs.set(input.charges.itemId, (costs.get(input.charges.itemId) ?? 0) + input.charges.cost);
 	}
 
 	const spends: ChargeSpend[] = [];
@@ -50,10 +46,7 @@ export const applyLineChargePlansFx = Effect.fn("applyLineChargePlansFx")(functi
 				`Charge payer ${itemId} resolved without a positive cost.`,
 			);
 		}
-		const item = yield* readRuntimeItemByIdFx({
-			itemId,
-			runtime,
-		});
+		const item = yield* readRuntimeItemByIdFx({ itemId, runtime });
 		const remainingCharges = yield* readItemRemainingChargesFx(item);
 		if (remainingCharges === undefined || remainingCharges < cost) {
 			return yield* Effect.dieMessage(
@@ -74,12 +67,24 @@ export const applyLineChargePlansFx = Effect.fn("applyLineChargePlansFx")(functi
 		...spends.filter(({ depletesIdleItem }) => !depletesIdleItem),
 	];
 
-	return yield* Effect.reduce(orderedSpends, runtime, (draft, spend) => {
-		return spendItemChargesFx({
-			cost: spend.cost,
-			itemId: spend.itemId,
-			job,
-			runtime: draft,
-		});
-	});
+	return yield* Effect.reduce(
+		orderedSpends,
+		{
+			events: [] as GameEventSchema.Type[],
+			runtime,
+		},
+		(state, spend) =>
+			Effect.gen(function* () {
+				const result = yield* spendItemChargesFx({
+					cost: spend.cost,
+					itemId: spend.itemId,
+					job,
+					runtime: state.runtime,
+				});
+				return {
+					events: [...state.events, ...result.events],
+					runtime: result.runtime,
+				};
+			}),
+	);
 });

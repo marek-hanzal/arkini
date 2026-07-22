@@ -3,10 +3,10 @@ import { match } from "ts-pattern";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeIntegerSchema";
+import { applyInputMaterialConsumeRunPlanFx } from "~/engine/input/fx/run/applyInputMaterialConsumeRunPlanFx";
+import { applyInputMaterialReserveRunPlanFx } from "~/engine/input/fx/run/applyInputMaterialReserveRunPlanFx";
 import type { InputRunPlanSchema } from "~/engine/input/schema/run/InputRunPlanSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
-import { applyInputMaterialConsumeRunPlanFx } from "./applyInputMaterialConsumeRunPlanFx";
-import { applyInputMaterialReserveRunPlanFx } from "./applyInputMaterialReserveRunPlanFx";
 
 export namespace applyInputRunPlanFx {
 	export interface Props {
@@ -17,9 +17,14 @@ export namespace applyInputRunPlanFx {
 		plan: InputRunPlanSchema.Type;
 		runtime: RuntimeSchema.Type;
 	}
+
+	export interface Result {
+		readonly consumption: readonly applyInputMaterialConsumeRunPlanFx.Consumption[];
+		readonly runtime: RuntimeSchema.Type;
+	}
 }
 
-/** Dispatches one exact line input operation onto an immutable runtime draft. */
+/** Dispatches one exact line input operation and reports any committed consume identities. */
 export const applyInputRunPlanFx = Effect.fn("applyInputRunPlanFx")(function* ({
 	jobId,
 	ownerItemId,
@@ -33,45 +38,59 @@ export const applyInputRunPlanFx = Effect.fn("applyInputRunPlanFx")(function* ({
 			{
 				type: "simple",
 			},
-			() => Effect.succeed(runtime),
+			() =>
+				Effect.succeed({
+					consumption: [],
+					runtime,
+				} satisfies applyInputRunPlanFx.Result),
 		)
 		.with(
 			{
 				type: "materials",
 				mode: "consume",
 			},
-			(plan) => {
-				return applyInputMaterialConsumeRunPlanFx({
+			(plan) =>
+				applyInputMaterialConsumeRunPlanFx({
 					jobId,
 					ownerItemId,
 					lineId,
 					inputIndex,
 					plan,
 					runtime,
-				});
-			},
+				}),
 		)
 		.with(
 			{
 				type: "materials",
 				mode: "reserve",
 			},
-			(plan) => {
-				return applyInputMaterialReserveRunPlanFx({
+			(plan) =>
+				applyInputMaterialReserveRunPlanFx({
 					jobId,
 					ownerItemId,
 					lineId,
 					inputIndex,
 					plan,
 					runtime,
-				});
-			},
+				}).pipe(
+					Effect.map(
+						(nextRuntime) =>
+							({
+								consumption: [],
+								runtime: nextRuntime,
+							}) satisfies applyInputRunPlanFx.Result,
+					),
+				),
 		)
 		.with(
 			{
 				type: "deposit",
 			},
-			() => Effect.succeed(runtime),
+			() =>
+				Effect.succeed({
+					consumption: [],
+					runtime,
+				} satisfies applyInputRunPlanFx.Result),
 		)
 		.exhaustive();
 });

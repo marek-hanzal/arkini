@@ -83,6 +83,43 @@ describe("completeJobRuntimeFx", () => {
 		expect(result.restored).toEqual(result.immediate);
 	});
 
+	it("reports exact spawned output identities from the committed completion", () => {
+		const result = Effect.runSync(
+			Effect.gen(function* () {
+				const prepared = yield* prepareRandomCompletionRuntimeFx();
+				return yield* attemptJobCompletionFx({
+					jobId: prepared.job.id,
+					runtime: prepared.freeRuntime,
+				}).pipe(
+					Effect.withRandom(
+						Random.fixed([
+							0.01,
+						]),
+					),
+				);
+			}).pipe(
+				useGameFx({
+					config: createRandomCompletionConfig(),
+				}),
+			),
+		);
+
+		if (result.type !== "completed") throw new Error("Expected completed job.");
+		const outputs = result.runtime.items.filter(
+			(item) => item.item.id === "outputA" || item.item.id === "outputB",
+		);
+		expect(outputs).not.toEqual([]);
+		for (const item of outputs) {
+			expect(result.events).toContainEqual({
+				type: "item:spawned",
+				itemId: item.id,
+				canonicalItemId: item.item.id,
+				location: item.location,
+				quantity: item.quantity,
+			});
+		}
+	});
+
 	it("rejects an absent stale job before producing output", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {

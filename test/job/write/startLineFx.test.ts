@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~/engine/game/fx/useGameFx";
 import { storeInputMaterialFx } from "~/engine/input/write/storeInputMaterialFx";
+import { startLineRuntimeFx } from "~/engine/job/fx/startLineRuntimeFx";
 import type { StartLineResultSchema } from "~/engine/job/schema/StartLineResultSchema";
 import { startLineFx } from "~/engine/job/write/startLineFx";
 import { readLineRunFx } from "~/engine/line/fx/run/readLineRunFx";
@@ -103,6 +104,59 @@ describe("startLineFx", () => {
 			expect(restoredItem?.revision).toMatch(/^revision:/);
 			expect(restoredItem?.revision).not.toBe(item.revision);
 		}
+	});
+
+	it("reports exact full and partial consume identities from the accepted input plan", () => {
+		const config = createJobTestConfig();
+		const result = Effect.runSync(
+			Effect.gen(function* () {
+				yield* prepareJobLineFx();
+				const before = yield* readRuntimeFx();
+				const water = before.items.find(
+					(item) => item.item.id === "water" && item.location.scope === "input",
+				);
+				if (water === undefined) throw new Error("Expected buffered water input.");
+				const [job, runtime, events] = yield* startLineRuntimeFx({
+					...startProps,
+					runtime: before,
+				});
+				return { before, events, job, runtime, water };
+			}).pipe(
+				useGameFx({
+					config,
+				}),
+			),
+		);
+
+		const consumed = result.events.find(
+			(event) => event.type === "item:consumed" && event.itemId === result.water.id,
+		);
+		if (consumed?.type !== "item:consumed") throw new Error("Expected consumed item fact.");
+		expect(consumed).toEqual({
+			type: "item:consumed",
+			itemId: result.water.id,
+			consumedItemId: expect.any(String),
+			canonicalItemId: "water",
+			previousLocation: result.water.location,
+			location: {
+				scope: "job",
+				jobId: result.job.id,
+			},
+			previousQuantity: 6,
+			consumedQuantity: 3,
+			quantity: 3,
+		});
+		expect(result.runtime.items.find((item) => item.id === result.water.id)).toMatchObject({
+			quantity: 3,
+			location: result.water.location,
+		});
+		expect(
+			result.runtime.items.find(
+				(item) => item.id === consumed.consumedItemId && item.location.scope === "job",
+			),
+		).toMatchObject({
+			quantity: 3,
+		});
 	});
 
 	it("keeps job-scoped reservations immutable through generic item commands", () => {

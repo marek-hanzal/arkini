@@ -2,7 +2,7 @@ import { Effect } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { ItemNotFoundError } from "~/engine/item/error/ItemNotFoundError";
-import { isolateStatefulOwnerFx } from "~/engine/item/fx/isolateStatefulOwnerFx";
+import { isolateStatefulOwnerTransitionFx } from "~/engine/item/fx/isolateStatefulOwnerTransitionFx";
 import { LineNotFoundError } from "~/engine/line/error/LineNotFoundError";
 import { isLineOwnerItem } from "~/engine/line/read/isLineOwnerItem";
 import { readLineOwnerLines } from "~/engine/line/read/readLineOwnerLines";
@@ -58,7 +58,7 @@ export const setDefaultLineFx = Effect.fn("setDefaultLineFx")(function* ({
 					[ownerItemId]: lineId,
 				},
 			} satisfies RuntimeSchema.Type;
-			const nextRuntime = yield* isolateStatefulOwnerFx({
+			const isolation = yield* isolateStatefulOwnerTransitionFx({
 				ownerItemId,
 				runtime: selectedRuntime,
 			});
@@ -67,7 +67,8 @@ export const setDefaultLineFx = Effect.fn("setDefaultLineFx")(function* ({
 					ownerItemId,
 					lineId,
 				},
-				nextRuntime,
+				isolation.runtime,
+				isolation.events,
 			] as const;
 		}),
 	);

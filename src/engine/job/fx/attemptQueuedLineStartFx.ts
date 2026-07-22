@@ -8,6 +8,7 @@ import type { JobSchema } from "~/engine/job/schema/JobSchema";
 import type { LineRunUnavailableError } from "~/engine/line/error/LineRunUnavailableError";
 import type { PlacementUnavailableError } from "~/engine/placement/error/PlacementUnavailableError";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
 import { startLineRuntimeFx } from "./startLineRuntimeFx";
 
 export namespace attemptQueuedLineStartFx {
@@ -33,6 +34,7 @@ export namespace attemptQueuedLineStartFx {
 		  }
 		| {
 				type: "started";
+				events: readonly GameEventSchema.Type[];
 				job: JobSchema.Type;
 				runtime: RuntimeSchema.Type;
 		  };
@@ -63,9 +65,10 @@ export const attemptQueuedLineStartFx = Effect.fn("attemptQueuedLineStartFx")(fu
 		runtime: withoutRequest,
 	}).pipe(
 		Effect.map(
-			([job, nextRuntime]) =>
+			([job, nextRuntime, events]) =>
 				({
 					type: "started",
+					events,
 					job,
 					runtime: nextRuntime,
 				}) satisfies attemptQueuedLineStartFx.Result,

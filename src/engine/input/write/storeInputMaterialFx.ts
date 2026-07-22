@@ -7,7 +7,7 @@ import { InputMaterialUnavailableError } from "~/engine/input/error/InputMateria
 import { applyInputMaterialStorePlanFx } from "~/engine/input/fx/applyInputMaterialStorePlanFx";
 import { planInputMaterialStoreFx } from "~/engine/input/fx/planInputMaterialStoreFx";
 import type { InputMaterialStoreResultSchema } from "~/engine/input/schema/command/InputMaterialStoreResultSchema";
-import { isolateStatefulOwnerFx } from "~/engine/item/fx/isolateStatefulOwnerFx";
+import { isolateStatefulOwnerTransitionFx } from "~/engine/item/fx/isolateStatefulOwnerTransitionFx";
 import { ItemNotOnGridError } from "~/engine/item/error/ItemNotOnGridError";
 import { LineInputClosedError } from "~/engine/line/error/LineInputClosedError";
 import { isLineInputClosedFx } from "~/engine/line/fx/input/isLineInputClosedFx";
@@ -146,14 +146,15 @@ export const storeInputMaterialFx = Effect.fn("storeInputMaterialFx")(function* 
 				runtime,
 				source,
 			});
-			const nextRuntime = yield* isolateStatefulOwnerFx({
+			const isolation = yield* isolateStatefulOwnerTransitionFx({
 				ownerItemId,
 				runtime: inputRuntime,
 			});
 
 			return [
 				result satisfies InputMaterialStoreResultSchema.Type,
-				nextRuntime,
+				isolation.runtime,
+				isolation.events,
 			] as const;
 		});
 	});

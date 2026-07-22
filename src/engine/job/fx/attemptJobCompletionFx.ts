@@ -1,7 +1,8 @@
 import { Effect } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import { completeJobRuntimeFx } from "~/engine/job/fx/completeJobRuntimeFx";
+import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
+import { completeJobTransitionFx } from "~/engine/job/fx/completeJobTransitionFx";
 import type { PlacementUnavailableError } from "~/engine/placement/error/PlacementUnavailableError";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
@@ -19,6 +20,7 @@ export namespace attemptJobCompletionFx {
 		  }
 		| {
 				type: "completed";
+				events: readonly GameEventSchema.Type[];
 				runtime: RuntimeSchema.Type;
 		  };
 }
@@ -38,15 +40,16 @@ export const attemptJobCompletionFx = Effect.fn("attemptJobCompletionFx")(functi
 	jobId,
 	runtime,
 }: attemptJobCompletionFx.Props) {
-	return yield* completeJobRuntimeFx({
+	return yield* completeJobTransitionFx({
 		jobId,
 		runtime,
 	}).pipe(
 		Effect.map(
-			(nextRuntime) =>
+			(completion) =>
 				({
 					type: "completed",
-					runtime: nextRuntime,
+					events: completion.events,
+					runtime: completion.runtime,
 				}) satisfies attemptJobCompletionFx.Result,
 		),
 		Effect.catchTag("PlacementUnavailableError", (error) => {

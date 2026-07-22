@@ -2,6 +2,7 @@ import { Effect, Either } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~/engine/game/fx/useGameFx";
+import { startLineRuntimeFx } from "~/engine/job/fx/startLineRuntimeFx";
 import { startLineFx } from "~/engine/job/write/startLineFx";
 import { readLineRunFx } from "~/engine/line/fx/run/readLineRunFx";
 import { checkRuntimeFx } from "~/engine/runtime/check/checkRuntimeFx";
@@ -546,6 +547,41 @@ describe("item charges", () => {
 		});
 	});
 
+	it("reports an exact split when one charged stack identity becomes stateful", () => {
+		const result = run(
+			Effect.gen(function* () {
+				const owner = yield* spawnItemFx({
+					id: "runtime:lumberjack",
+					itemId: "producer:lumberjack",
+					location: board(0),
+					quantity: 1,
+				});
+				const tree = yield* spawnItemFx({
+					id: "runtime:tree",
+					itemId: "deposit:tree",
+					location: board(1),
+					quantity: 2,
+				});
+				const [, runtime, events] = yield* startLineRuntimeFx({
+					ownerItemId: owner.id,
+					lineId: "line:lumberjack:work",
+					runtime: yield* readRuntimeFx(),
+				});
+				return { events, runtime, tree };
+			}),
+		);
+
+		expect(result.events).toContainEqual({
+			type: "item:split",
+			itemId: result.tree.id,
+			canonicalItemId: "deposit:tree",
+			location: board(1),
+			previousQuantity: 2,
+			quantity: 1,
+		});
+		expect(result.runtime.items.filter((item) => item.item.id === "deposit:tree")).toHaveLength(2);
+	});
+
 	it("consumes one fully depleted quantity without relocating the pure remainder", () => {
 		const result = run(
 			Effect.gen(function* () {
@@ -581,6 +617,50 @@ describe("item charges", () => {
 			result.runtime.items.filter((item) => item.item.id === "deposit:sapling"),
 		).toHaveLength(1);
 		expect(result.runtime.items.filter((item) => item.item.id === "item:seed")).toHaveLength(1);
+	});
+
+	it("reports one depleted stack quantity without falsely removing the surviving actor", () => {
+		const result = run(
+			Effect.gen(function* () {
+				const owner = yield* spawnItemFx({
+					id: "runtime:lumberjack",
+					itemId: "producer:lumberjack",
+					location: board(0),
+					quantity: 1,
+				});
+				const sapling = yield* spawnItemFx({
+					id: "runtime:sapling",
+					itemId: "deposit:sapling",
+					location: board(1),
+					quantity: 2,
+				});
+				const [, runtime, events] = yield* startLineRuntimeFx({
+					ownerItemId: owner.id,
+					lineId: "line:lumberjack:work",
+					runtime: yield* readRuntimeFx(),
+				});
+				return { events, runtime, sapling };
+			}),
+		);
+
+		expect(result.events).toContainEqual({
+			type: "item:depleted",
+			itemId: result.sapling.id,
+			canonicalItemId: "deposit:sapling",
+			location: board(1),
+			previousQuantity: 2,
+			quantity: 1,
+		});
+		expect(result.events).not.toContainEqual(
+			expect.objectContaining({
+				type: "item:removed",
+				itemId: result.sapling.id,
+			}),
+		);
+		expect(result.runtime.items.find((item) => item.id === result.sapling.id)).toMatchObject({
+			quantity: 1,
+			location: board(1),
+		});
 	});
 
 	it("rolls back the whole start when depletion output cannot be placed", () => {

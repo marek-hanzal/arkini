@@ -1,9 +1,11 @@
 import { Effect } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
+import { readLifecycleItemEventsFx } from "~/engine/event/read/readLifecycleItemEventsFx";
+import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
 import type { PlacementUnavailableError } from "~/engine/placement/error/PlacementUnavailableError";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
-import { completeTemporaryItemExpiryFx } from "./completeTemporaryItemExpiryFx";
+import { completeTemporaryItemExpiryTransitionFx } from "./completeTemporaryItemExpiryTransitionFx";
 
 export namespace attemptTemporaryItemExpiryFx {
 	export interface Props {
@@ -19,6 +21,7 @@ export namespace attemptTemporaryItemExpiryFx {
 		  }
 		| {
 				type: "expired";
+				events: readonly GameEventSchema.Type[];
 				runtime: RuntimeSchema.Type;
 		  };
 }
@@ -33,21 +36,39 @@ const isExpectedExpiryBlock = (error: PlacementUnavailableError) => {
 	}
 };
 
-/** Keeps only expected temporary-output placement failures local to Tick. */
+/** Resolves one ready temporary expiry and keeps only expected delivery failures local. */
 export const attemptTemporaryItemExpiryFx = Effect.fn("attemptTemporaryItemExpiryFx")(function* ({
 	itemId,
 	runtime,
 }: attemptTemporaryItemExpiryFx.Props) {
-	return yield* completeTemporaryItemExpiryFx({
+	return yield* completeTemporaryItemExpiryTransitionFx({
 		itemId,
 		runtime,
 	}).pipe(
-		Effect.map(
-			(nextRuntime) =>
-				({
-					type: "expired",
-					runtime: nextRuntime,
-				}) satisfies attemptTemporaryItemExpiryFx.Result,
+		Effect.flatMap((completion) =>
+			readLifecycleItemEventsFx({
+				outgoing: completion.expiredItem,
+				placement: completion.placement,
+				reason: "expired",
+			}).pipe(
+				Effect.map(
+					(lifecycleEvents) =>
+						({
+							type: "expired",
+							events: [
+								{
+									type: "item:expired",
+									itemId: completion.expiredItem.id,
+									canonicalItemId: completion.expiredItem.item.id,
+									location: completion.expiredItem.location,
+									quantity: completion.expiredItem.quantity,
+								},
+								...lifecycleEvents,
+							],
+							runtime: completion.runtime,
+						}) satisfies attemptTemporaryItemExpiryFx.Result,
+				),
+			),
 		),
 		Effect.catchTag("PlacementUnavailableError", (error) => {
 			if (!isExpectedExpiryBlock(error)) return Effect.fail(error);

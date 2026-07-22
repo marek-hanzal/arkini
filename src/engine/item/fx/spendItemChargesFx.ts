@@ -2,15 +2,19 @@ import { Effect } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
+import { readLifecycleItemEventsFx } from "~/engine/event/read/readLifecycleItemEventsFx";
+import { readOutputPlacementItemEventsFx } from "~/engine/event/read/readOutputPlacementItemEventsFx";
+import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
 import { releaseOwnerInputsFx } from "~/engine/input/fx/releaseOwnerInputsFx";
 import { ItemChargesUnavailableError } from "~/engine/item/error/ItemChargesUnavailableError";
 import { ItemNotOnBoardError } from "~/engine/item/error/ItemNotOnBoardError";
-import { isolateStatefulOwnerFx } from "~/engine/item/fx/isolateStatefulOwnerFx";
+import { isolateStatefulOwnerTransitionFx } from "~/engine/item/fx/isolateStatefulOwnerTransitionFx";
 import { readItemRemainingChargesFx } from "~/engine/item/fx/readItemRemainingChargesFx";
 import type { JobSchema } from "~/engine/job/schema/JobSchema";
 import { makeChargeSpendRandomFx } from "~/engine/job/random/makeChargeSpendRandomFx";
 import { outputFx } from "~/engine/output/fx/outputFx";
 import { applyOutputPlacementFx } from "~/engine/placement/fx/applyOutputPlacementFx";
+import type { OutputPlacementResultSchema } from "~/engine/placement/schema/OutputPlacementResultSchema";
 import { removeRuntimeItemIdentityFx } from "~/engine/runtime/fx/removeRuntimeItemIdentityFx";
 import { reviseRuntimeItemFx } from "~/engine/runtime/fx/reviseRuntimeItemFx";
 import { isBoardRuntimeItem } from "~/engine/runtime/read/isBoardRuntimeItem";
@@ -25,9 +29,14 @@ export namespace spendItemChargesFx {
 		job: JobSchema.Type;
 		runtime: RuntimeSchema.Type;
 	}
+
+	export interface Result {
+		readonly events: readonly GameEventSchema.Type[];
+		readonly runtime: RuntimeSchema.Type;
+	}
 }
 
-/** Pays one exact charge cost and atomically resolves any resulting depletion. */
+/** Pays one exact charge cost and returns the semantic facts of any split or depletion. */
 export const spendItemChargesFx = Effect.fn("spendItemChargesFx")(function* ({
 	cost,
 	itemId,
@@ -73,19 +82,24 @@ export const spendItemChargesFx = Effect.fn("spendItemChargesFx")(function* ({
 				candidate.id === item.id ? chargedItem : candidate,
 			),
 		} satisfies RuntimeSchema.Type;
-
-		return yield* isolateStatefulOwnerFx({
+		const isolation = yield* isolateStatefulOwnerTransitionFx({
 			ownerItemId: item.id,
 			runtime: chargedRuntime,
 		});
+
+		return {
+			events: isolation.events,
+			runtime: isolation.runtime,
+		} satisfies spendItemChargesFx.Result;
 	}
 
+	const resultingQuantity = item.quantity - 1;
 	let draft: RuntimeSchema.Type;
-	if (item.quantity > 1) {
+	if (resultingQuantity > 0) {
 		const remainingStack = yield* reviseRuntimeItemFx({
 			item: {
 				...item,
-				quantity: item.quantity - 1,
+				quantity: resultingQuantity,
 			} satisfies RuntimeItemSchema.Type,
 		});
 		draft = {
@@ -101,6 +115,7 @@ export const spendItemChargesFx = Effect.fn("spendItemChargesFx")(function* ({
 		});
 	}
 
+	let placement: OutputPlacementResultSchema.Type = { drop: [] };
 	if (item.item.charges?.output !== undefined) {
 		const random = yield* makeChargeSpendRandomFx({
 			cost,
@@ -114,20 +129,41 @@ export const spendItemChargesFx = Effect.fn("spendItemChargesFx")(function* ({
 			origin: item.location,
 			output: item.item.charges.output,
 		}).pipe(Effect.withRandom(random));
-		const [, withOutput] = yield* applyOutputPlacementFx({
+		const [outputPlacement, withOutput] = yield* applyOutputPlacementFx({
 			origin: item.location,
 			output,
 			runtime: draft,
 		});
+		placement = outputPlacement;
 		draft = withOutput;
 	}
 
-	if (item.quantity === 1) {
+	if (resultingQuantity === 0) {
 		draft = yield* releaseOwnerInputsFx({
 			owner: item,
 			runtime: draft,
 		});
 	}
 
-	return draft;
+	const depletedEvent = {
+		type: "item:depleted",
+		itemId: item.id,
+		canonicalItemId: item.item.id,
+		location: item.location,
+		previousQuantity: item.quantity,
+		quantity: resultingQuantity,
+	} satisfies GameEventSchema.Type;
+	const lifecycleEvents =
+		resultingQuantity === 0
+			? yield* readLifecycleItemEventsFx({
+					outgoing: item,
+					placement,
+					reason: "depleted",
+				})
+			: yield* readOutputPlacementItemEventsFx(placement);
+
+	return {
+		events: [depletedEvent, ...lifecycleEvents],
+		runtime: draft,
+	} satisfies spendItemChargesFx.Result;
 });

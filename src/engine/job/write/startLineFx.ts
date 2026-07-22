@@ -25,7 +25,7 @@ export const startLineFx = Effect.fn("startLineFx")(function* ({
 				runtime.jobs.some((job) => job.ownerItemId === ownerItemId) ||
 				(runtime.jobQueue ?? []).some((request) => request.ownerItemId === ownerItemId);
 			if (!hasOwnerWork) {
-				const [job, nextRuntime] = yield* startLineRuntimeFx({
+				const [job, nextRuntime, itemEvents] = yield* startLineRuntimeFx({
 					ownerItemId,
 					lineId,
 					runtime,
@@ -44,6 +44,7 @@ export const startLineFx = Effect.fn("startLineFx")(function* ({
 							lineId: job.lineId,
 							source: "explicit",
 						},
+						...itemEvents,
 					],
 				] as const;
 			}

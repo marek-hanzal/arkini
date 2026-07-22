@@ -45,13 +45,16 @@ const dispatchOwnerQueueFx = Effect.fn("dispatchOwnerQueueFx")(function* (
 
 	return {
 		type: "started",
-		event: {
-			type: "job:started",
-			jobId: attempt.job.id,
-			ownerItemId: attempt.job.ownerItemId,
-			lineId: attempt.job.lineId,
-			source: "queue",
-		} satisfies GameEventSchema.Type,
+		events: [
+			{
+				type: "job:started",
+				jobId: attempt.job.id,
+				ownerItemId: attempt.job.ownerItemId,
+				lineId: attempt.job.lineId,
+				source: "queue",
+			} satisfies GameEventSchema.Type,
+			...attempt.events,
+		],
 		runtime: attempt.runtime,
 	} as const;
 });
@@ -74,7 +77,7 @@ const dispatchQueueOnlyOwnersFx = Effect.fn("dispatchQueueOnlyOwnersFx")(functio
 		const dispatched = yield* dispatchOwnerQueueFx(ownerItemId, draft);
 		if (dispatched.type !== "started") continue;
 		draft = dispatched.runtime;
-		events.push(dispatched.event);
+		events.push(...dispatched.events);
 	}
 
 	return {
@@ -139,6 +142,7 @@ export const advanceRuntimeStepFx = Effect.fn("advanceRuntimeStepFx")(function* 
 			ownerItemId: liveJob.ownerItemId,
 			lineId: liveJob.lineId,
 		});
+		events.push(...completion.events);
 		completedOwnerItemIds.push(liveJob.ownerItemId);
 	}
 
@@ -148,7 +152,7 @@ export const advanceRuntimeStepFx = Effect.fn("advanceRuntimeStepFx")(function* 
 		const dispatched = yield* dispatchOwnerQueueFx(ownerItemId, draft);
 		if (dispatched.type !== "started") continue;
 		draft = dispatched.runtime;
-		events.push(dispatched.event);
+		events.push(...dispatched.events);
 	}
 
 	for (const temporaryItem of temporaryItems) {
@@ -160,11 +164,7 @@ export const advanceRuntimeStepFx = Effect.fn("advanceRuntimeStepFx")(function* 
 		});
 		if (expiry.type === "blocked") continue;
 		draft = expiry.runtime;
-		events.push({
-			type: "item:expired",
-			itemId: liveItem.id,
-			canonicalItemId: liveItem.item.id,
-		});
+		events.push(...expiry.events);
 	}
 
 	return {

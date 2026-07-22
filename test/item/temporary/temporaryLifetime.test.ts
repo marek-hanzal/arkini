@@ -108,6 +108,30 @@ describe("temporary item lifetime", () => {
 				type: "item:expired",
 				itemId: "runtime:temporary",
 				canonicalItemId: "temporaryPlain",
+				location: {
+					scope: "board",
+					space: 0,
+					position: {
+						x: 0,
+						y: 0,
+					},
+				},
+				quantity: 1,
+			},
+			{
+				type: "item:removed",
+				itemId: "runtime:temporary",
+				canonicalItemId: "temporaryPlain",
+				location: {
+					scope: "board",
+					space: 0,
+					position: {
+						x: 0,
+						y: 0,
+					},
+				},
+				quantity: 1,
+				reason: "expired",
 			},
 		]);
 	});

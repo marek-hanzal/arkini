@@ -4,9 +4,10 @@ import { assertJobOutputMaxCountFx } from "~/engine/job/fx/assertJobOutputMaxCou
 import { assertLineStartReadyFx } from "~/engine/job/fx/assertLineStartReadyFx";
 import { createJobFx } from "~/engine/job/fx/createJobFx";
 import { resolveLineStartFx } from "~/engine/job/fx/read/resolveLineStartFx";
-import { isolateStatefulOwnerFx } from "~/engine/item/fx/isolateStatefulOwnerFx";
+import { isolateStatefulOwnerTransitionFx } from "~/engine/item/fx/isolateStatefulOwnerTransitionFx";
 import { applyLineRunPlanFx } from "~/engine/line/fx/run/applyLineRunPlanFx";
 import { applyLineChargePlansFx } from "~/engine/line/fx/run/applyLineChargePlansFx";
+import { readLineInputItemEventsFx } from "~/engine/event/read/readLineInputItemEventsFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 export namespace startLineRuntimeFx {
 	export interface Props {
@@ -41,26 +42,28 @@ export const startLineRuntimeFx = Effect.fn("startLineRuntimeFx")(function* ({
 			job,
 		],
 	} satisfies RuntimeSchema.Type;
-	const inputRuntime = yield* applyLineRunPlanFx({
+	const inputTransition = yield* applyLineRunPlanFx({
 		job,
 		plan,
 		runtime: jobRuntime,
 	});
-	const chargedRuntime = yield* applyLineChargePlansFx({
+	const inputEvents = yield* readLineInputItemEventsFx(inputTransition.consumption);
+	const charged = yield* applyLineChargePlansFx({
 		job,
 		plan,
-		runtime: inputRuntime,
+		runtime: inputTransition.runtime,
 	});
 	yield* assertJobOutputMaxCountFx({
 		job,
-		runtime: chargedRuntime,
+		runtime: charged.runtime,
 	});
-	const ownerRuntime = yield* isolateStatefulOwnerFx({
+	const isolation = yield* isolateStatefulOwnerTransitionFx({
 		ownerItemId,
-		runtime: chargedRuntime,
+		runtime: charged.runtime,
 	});
 	return [
 		job,
-		ownerRuntime,
+		isolation.runtime,
+		[...inputEvents, ...charged.events, ...isolation.events],
 	] as const;
 });

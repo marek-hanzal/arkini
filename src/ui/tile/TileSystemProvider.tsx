@@ -4,6 +4,7 @@ import { TileActorLayer } from "~/ui/tile/TileActorLayer";
 import { TileSystemContext, type TileSystem } from "~/ui/tile/TileSystemContext";
 import { useTileGeometry } from "~/ui/tile/useTileGeometry";
 import { useTileInteractionController } from "~/ui/tile/useTileInteractionController";
+import { useTileNeighbourField } from "~/ui/tile/useTileNeighbourField";
 
 /** Composes the focused Canvas-local geometry and interaction owners. */
 export const TileSystemProvider = ({ children }: PropsWithChildren) => {
@@ -11,6 +12,7 @@ export const TileSystemProvider = ({ children }: PropsWithChildren) => {
 	const interaction = useTileInteractionController({
 		resolveTarget: geometry.resolveTarget,
 	});
+	const neighbourField = useTileNeighbourField();
 	const value = useMemo<TileSystem>(
 		() => ({
 			geometryVersion: geometry.geometryVersion,
@@ -19,6 +21,7 @@ export const TileSystemProvider = ({ children }: PropsWithChildren) => {
 			registerSlot: geometry.registerSlot,
 			readPlacement: geometry.readPlacement,
 			...interaction,
+			...neighbourField,
 		}),
 		[
 			geometry.geometryVersion,
@@ -27,6 +30,7 @@ export const TileSystemProvider = ({ children }: PropsWithChildren) => {
 			geometry.registerSlot,
 			geometry.registerSurface,
 			interaction,
+			neighbourField,
 		],
 	);
 

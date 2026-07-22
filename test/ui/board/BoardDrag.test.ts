@@ -360,10 +360,36 @@ describe("Board drag", () => {
 			x: -40,
 			y: -40,
 		});
+		expect(motionTestRuntime.readMotionOffset("TileActorWeight", runtimeId)).toEqual({
+			x: -2.45,
+			y: -1.96,
+		});
+		const yieldedActor = document.querySelector<HTMLElement>(
+			'[data-ui="TileActor"][data-board-x="0"][data-board-y="1"]',
+		);
+		const yieldedRuntimeId = yieldedActor?.dataset.runtimeId;
+		if (yieldedRuntimeId === undefined) throw new Error("Missing neighbour actor identity.");
+		const yieldedOffset = motionTestRuntime.readMotionOffset(
+			"TileActor",
+			yieldedRuntimeId,
+		);
+		expect(yieldedOffset).not.toEqual({
+			x: 0,
+			y: 0,
+		});
 
 		await act(async () => {
 			dragSurface.dispatchEvent(pointerEvent("pointercancel", 217, 117));
 			await Promise.resolve();
+		});
+
+		expect(motionTestRuntime.readMotionOffset("TileActorWeight", runtimeId)).toEqual({
+			x: 0,
+			y: 0,
+		});
+		expect(motionTestRuntime.readMotionOffset("TileActor", yieldedRuntimeId)).toEqual({
+			x: 0,
+			y: 0,
 		});
 	});
 	it("moves the one existing actor through the public atomic drop command", async () => {
@@ -529,6 +555,22 @@ describe("Board drag", () => {
 		expect(
 			target.querySelector<HTMLElement>('[data-ui="TileActorVisual"]')?.dataset.motionScale,
 		).toBe("1.08");
+		expect(motionTestRuntime.readMotionOffset("TileActor", targetId)).toEqual({
+			x: 0,
+			y: 0,
+		});
+		const passiveNeighbour = document.querySelector<HTMLElement>(
+			'[data-ui="TileActor"][data-board-x="0"][data-board-y="1"]',
+		);
+		const passiveNeighbourId = passiveNeighbour?.dataset.runtimeId;
+		if (passiveNeighbourId === undefined)
+			throw new Error("Missing passive neighbour identity.");
+		expect(
+			motionTestRuntime.readMotionOffset("TileActor", passiveNeighbourId),
+		).not.toEqual({
+			x: 0,
+			y: 0,
+		});
 
 		await act(async () => {
 			dragSurface.dispatchEvent(pointerEvent("pointerup", 150, 50));

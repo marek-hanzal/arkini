@@ -1,4 +1,4 @@
-import { animate, useMotionValue } from "motion/react";
+import { animate, type PanInfo, useMotionValue, useReducedMotion, useSpring } from "motion/react";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { match } from "ts-pattern";
 
@@ -33,11 +33,22 @@ export const useTileActorMotion = ({
 	readonly item: useTileActors.Item;
 	readonly presentation: useTileActorPresentation.Model;
 }) => {
-	const { geometryVersion, readPlacement, complete } = useTileActorSystem();
+	const { geometryVersion, readPlacement, complete, registerNeighbourActor } = useTileActorSystem();
+	const reducedMotion = useReducedMotion();
 	const anchorX = useMotionValue(0);
 	const anchorY = useMotionValue(0);
 	const dragX = useMotionValue(0);
 	const dragY = useMotionValue(0);
+	const dragWeightTargetX = useMotionValue(0);
+	const dragWeightTargetY = useMotionValue(0);
+	const dragRotationTarget = useMotionValue(0);
+	const dragWeightX = useSpring(dragWeightTargetX, { stiffness: 720, damping: 48, mass: 0.42 });
+	const dragWeightY = useSpring(dragWeightTargetY, { stiffness: 720, damping: 48, mass: 0.42 });
+	const dragRotation = useSpring(dragRotationTarget, { stiffness: 640, damping: 42, mass: 0.38 });
+	const neighbourTargetX = useMotionValue(0);
+	const neighbourTargetY = useMotionValue(0);
+	const neighbourX = useSpring(neighbourTargetX, { stiffness: 480, damping: 38, mass: 0.5 });
+	const neighbourY = useSpring(neighbourTargetY, { stiffness: 480, damping: 38, mass: 0.5 });
 	const pickupX = useMotionValue(0);
 	const pickupY = useMotionValue(0);
 	const width = useMotionValue(0);
@@ -51,7 +62,59 @@ export const useTileActorMotion = ({
 	const pickupAnimationX = useRef<ReturnType<typeof animate> | null>(null);
 	const pickupAnimationY = useRef<ReturnType<typeof animate> | null>(null);
 	const itemRef = useRef(item);
+	const unregisterNeighbourActor = useRef<(() => void) | null>(null);
 	const [visible, setVisible] = useState(false);
+
+	const registerActorNode = useCallback(
+		(node: HTMLElement | null) => {
+			unregisterNeighbourActor.current?.();
+			unregisterNeighbourActor.current = null;
+			if (node === null) return;
+			unregisterNeighbourActor.current = registerNeighbourActor({
+				itemId: item.id,
+				node,
+				x: neighbourTargetX,
+				y: neighbourTargetY,
+				enabled: !reducedMotion,
+			});
+		},
+		[
+			item.id,
+			neighbourTargetX,
+			neighbourTargetY,
+			reducedMotion,
+			registerNeighbourActor,
+		],
+	);
+
+	const clearDragWeight = useCallback(() => {
+		dragWeightTargetX.set(0);
+		dragWeightTargetY.set(0);
+		dragRotationTarget.set(0);
+	}, [dragRotationTarget, dragWeightTargetX, dragWeightTargetY]);
+
+	const updateDragWeight = useCallback(
+		(info: Pick<PanInfo, "delta" | "velocity">) => {
+			if (reducedMotion) {
+				clearDragWeight();
+				return;
+			}
+			const horizontal =
+				Math.abs(info.velocity.x) > 20 ? -info.velocity.x * 0.005 : -info.delta.x * 0.35;
+			const vertical =
+				Math.abs(info.velocity.y) > 20 ? -info.velocity.y * 0.004 : -info.delta.y * 0.28;
+			dragWeightTargetX.set(Math.max(-8, Math.min(8, horizontal)));
+			dragWeightTargetY.set(Math.max(-6, Math.min(6, vertical)));
+			dragRotationTarget.set(Math.max(-2.5, Math.min(2.5, -horizontal * 0.24)));
+		},
+		[
+			clearDragWeight,
+			dragRotationTarget,
+			dragWeightTargetX,
+			dragWeightTargetY,
+			reducedMotion,
+		],
+	);
 
 	useLayoutEffect(() => {
 		itemRef.current = item;
@@ -217,12 +280,29 @@ export const useTileActorMotion = ({
 		presentation.visualCompletionGeneration,
 	]);
 
+	useEffect(() => {
+		if (reducedMotion) {
+			clearDragWeight();
+			neighbourTargetX.set(0);
+			neighbourTargetY.set(0);
+		}
+	}, [
+		clearDragWeight,
+		neighbourTargetX,
+		neighbourTargetY,
+		reducedMotion,
+	]);
+
 	useEffect(
 		() => () => {
 			localMotionGeneration.current += 1;
 			stopPickupCorrection();
+			clearDragWeight();
+			unregisterNeighbourActor.current?.();
+			unregisterNeighbourActor.current = null;
 		},
 		[
+			clearDragWeight,
 			stopPickupCorrection,
 		],
 	);
@@ -230,8 +310,14 @@ export const useTileActorMotion = ({
 	return {
 		anchorX,
 		anchorY,
+		registerActorNode,
 		dragX,
 		dragY,
+		dragWeightX,
+		dragWeightY,
+		dragRotation,
+		neighbourX,
+		neighbourY,
 		pickupX,
 		pickupY,
 		width,
@@ -240,6 +326,8 @@ export const useTileActorMotion = ({
 		armPickupCorrection,
 		startPickupCorrection,
 		stopPickupCorrection,
+		updateDragWeight,
+		clearDragWeight,
 		onVisualAnimationComplete,
 	};
 };

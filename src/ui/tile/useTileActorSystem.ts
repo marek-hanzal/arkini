@@ -13,6 +13,9 @@ export const useTileActorSystem = () => {
 		settle,
 		complete,
 		cancel,
+		registerNeighbourActor,
+		moveNeighbourField,
+		clearNeighbourField,
 	} = useTileSystemContext();
 	return {
 		active,
@@ -25,5 +28,8 @@ export const useTileActorSystem = () => {
 		settle,
 		complete,
 		cancel,
+		registerNeighbourActor,
+		moveNeighbourField,
+		clearNeighbourField,
 	};
 };

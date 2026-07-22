@@ -117,6 +117,7 @@ export const TileActor = ({ item, live, cue, onCueComplete }: TileActor.Props) =
 
 	return (
 		<motion.button
+			ref={actorMotion.registerActorNode}
 			type="button"
 			className={`absolute left-0 top-0 overflow-visible border-0 bg-transparent p-0 text-inherit outline-none ${CursorClassName[cursor]}`}
 			style={{
@@ -127,14 +128,20 @@ export const TileActor = ({ item, live, cue, onCueComplete }: TileActor.Props) =
 				zIndex: presentation.zIndex,
 				pointerEvents: interactive ? "auto" : "none",
 				visibility: visible ? "visible" : "hidden",
+				x: actorMotion.neighbourX,
+				y: actorMotion.neighbourY,
 			}}
 			aria-label={item.title}
 			data-ui="TileActor"
+			data-motion-id={item.id}
 			data-tile-actor="true"
 			data-item-id={item.itemId}
 			data-runtime-id={item.id}
 			data-runtime-revision={item.revision}
 			data-location-scope={item.location.scope}
+			data-surface-id={presentation.canonicalSource.surface.id}
+			data-live={live ? "true" : "false"}
+			data-motion-phase={presentation.phase}
 			data-board-x={boardLocation?.position.x}
 			data-board-y={boardLocation?.position.y}
 			data-toolbar-x={
@@ -207,24 +214,35 @@ export const TileActor = ({ item, live, cue, onCueComplete }: TileActor.Props) =
 				<motion.span
 					className="absolute inset-0"
 					style={{
-						x: actorMotion.pickupX,
-						y: actorMotion.pickupY,
+						x: actorMotion.dragWeightX,
+						y: actorMotion.dragWeightY,
+						rotate: actorMotion.dragRotation,
 					}}
-					data-ui="TileActorPickup"
+					data-ui="TileActorWeight"
 					data-motion-id={item.id}
 				>
-					<TileActorContent
-						item={item}
-						phase={presentation.phase}
-						feedback={presentation.feedback}
-						cue={cue}
-						onCueComplete={(generation) => onCueComplete(item.id, generation)}
-						onInteractionAnimationComplete={
-							presentation.visualCompletionGeneration === null
-								? undefined
-								: actorMotion.onVisualAnimationComplete
-						}
-					/>
+					<motion.span
+						className="absolute inset-0"
+						style={{
+							x: actorMotion.pickupX,
+							y: actorMotion.pickupY,
+						}}
+						data-ui="TileActorPickup"
+						data-motion-id={item.id}
+					>
+						<TileActorContent
+							item={item}
+							phase={presentation.phase}
+							feedback={presentation.feedback}
+							cue={cue}
+							onCueComplete={(generation) => onCueComplete(item.id, generation)}
+							onInteractionAnimationComplete={
+								presentation.visualCompletionGeneration === null
+									? undefined
+									: actorMotion.onVisualAnimationComplete
+							}
+						/>
+					</motion.span>
 				</motion.span>
 			</motion.span>
 		</motion.button>

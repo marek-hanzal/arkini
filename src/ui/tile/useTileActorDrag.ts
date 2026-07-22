@@ -4,10 +4,14 @@ import { match } from "ts-pattern";
 
 import { useDropItem } from "~/bridge/tile/useDropItem";
 import type { TileDragSource } from "~/ui/tile/TileDragSource";
+import type { TileDropTarget } from "~/ui/tile/TileDropTarget";
 import { useTileActorRetention } from "~/ui/tile/useTileActorRetention";
 import { tileLocationForTarget } from "~/ui/tile/tileLocationForTarget";
 import { useTileActorSystem } from "~/ui/tile/useTileActorSystem";
 import type { useTileActorMotion } from "~/ui/tile/useTileActorMotion";
+
+const targetActorId = (target: TileDropTarget | null) =>
+	target?.kind === "slot" ? (target.occupant?.id ?? null) : null;
 
 /** Owns pointer arbitration, Motion drag controls, command handoff, and failure settlement. */
 export const useTileActorDrag = ({
@@ -19,21 +23,65 @@ export const useTileActorDrag = ({
 	readonly live: boolean;
 	readonly motion: Pick<
 		ReturnType<typeof useTileActorMotion>,
-		"armPickupCorrection" | "startPickupCorrection" | "stopPickupCorrection"
+		| "armPickupCorrection"
+		| "startPickupCorrection"
+		| "stopPickupCorrection"
+		| "updateDragWeight"
+		| "clearDragWeight"
 	>;
 }) => {
-	const { armPickupCorrection, startPickupCorrection, stopPickupCorrection } = motion;
+	const {
+		armPickupCorrection,
+		startPickupCorrection,
+		stopPickupCorrection,
+		updateDragWeight,
+		clearDragWeight,
+	} = motion;
 	const retainActorIds = useTileActorRetention();
-	const { press, startDrag, moveDrag, release, settle, cancel } = useTileActorSystem();
+	const {
+		press,
+		startDrag,
+		moveDrag,
+		release,
+		settle,
+		cancel,
+		moveNeighbourField,
+		clearNeighbourField,
+	} = useTileActorSystem();
 	const dropItem = useDropItem();
 	const dragControls = useDragControls();
 	const dragStarted = useRef(false);
 	const suppressClick = useRef(false);
 
+	const clearTransientDragMotion = useCallback(() => {
+		clearDragWeight();
+		clearNeighbourField();
+	}, [clearDragWeight, clearNeighbourField]);
+
+	const updateTransientDragMotion = useCallback(
+		(info: PanInfo) => {
+			updateDragWeight(info);
+			const target = moveDrag(canonicalSource, info.point.x, info.point.y);
+			moveNeighbourField({
+				sourceItemId: canonicalSource.id,
+				targetItemId: targetActorId(target),
+				x: info.point.x,
+				y: info.point.y,
+			});
+		},
+		[
+			canonicalSource,
+			moveDrag,
+			moveNeighbourField,
+			updateDragWeight,
+		],
+	);
+
 	const onPointerDown = useCallback<PointerEventHandler<HTMLSpanElement>>(
 		(event) => {
 			if (!live || !event.isPrimary || event.button !== 0) return;
 			if (!press(canonicalSource)) return;
+			clearTransientDragMotion();
 			retainActorIds([
 				canonicalSource.id,
 			]);
@@ -49,29 +97,31 @@ export const useTileActorDrag = ({
 			});
 		},
 		[
+			armPickupCorrection,
 			canonicalSource,
+			clearTransientDragMotion,
 			dragControls,
 			live,
-			armPickupCorrection,
 			press,
 			retainActorIds,
 		],
 	);
 
 	const onPointerUp = useCallback(() => {
-		if (!dragStarted.current) cancel(canonicalSource.id);
-	}, [
-		cancel,
-		canonicalSource.id,
-	]);
+		if (dragStarted.current) return;
+		clearTransientDragMotion();
+		cancel(canonicalSource.id);
+	}, [cancel, canonicalSource.id, clearTransientDragMotion]);
 
 	const onPointerCancel = useCallback(() => {
 		stopPickupCorrection();
+		clearTransientDragMotion();
 		dragControls.cancel();
 		cancel(canonicalSource.id);
 	}, [
 		cancel,
 		canonicalSource.id,
+		clearTransientDragMotion,
 		dragControls,
 		stopPickupCorrection,
 	]);
@@ -82,28 +132,26 @@ export const useTileActorDrag = ({
 			suppressClick.current = true;
 			startDrag(canonicalSource);
 			startPickupCorrection();
-			moveDrag(canonicalSource, info.point.x, info.point.y);
+			updateTransientDragMotion(info);
 		},
 		[
 			canonicalSource,
-			startPickupCorrection,
-			moveDrag,
 			startDrag,
+			startPickupCorrection,
+			updateTransientDragMotion,
 		],
 	);
 
 	const onDrag = useCallback(
 		(_event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
-			moveDrag(canonicalSource, info.point.x, info.point.y);
+			updateTransientDragMotion(info);
 		},
-		[
-			canonicalSource,
-			moveDrag,
-		],
+		[updateTransientDragMotion],
 	);
 
 	const onDragEnd = useCallback(
 		async (_event: MouseEvent | TouchEvent | PointerEvent, _info: PanInfo) => {
+			clearTransientDragMotion();
 			const released = release(canonicalSource.id);
 			if (released === null) {
 				dragStarted.current = false;
@@ -170,6 +218,7 @@ export const useTileActorDrag = ({
 		},
 		[
 			canonicalSource.id,
+			clearTransientDragMotion,
 			dropItem,
 			release,
 			retainActorIds,
@@ -186,12 +235,14 @@ export const useTileActorDrag = ({
 	useEffect(
 		() => () => {
 			stopPickupCorrection();
+			clearTransientDragMotion();
 			dragControls.cancel();
 			cancel(canonicalSource.id);
 		},
 		[
 			cancel,
 			canonicalSource.id,
+			clearTransientDragMotion,
 			dragControls,
 			stopPickupCorrection,
 		],

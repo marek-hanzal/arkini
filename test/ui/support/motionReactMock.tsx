@@ -83,6 +83,8 @@ export const motionTestRuntime = {
 
 export const useReducedMotion = () => false;
 
+export const useSpring = <T,>(source: MockMotionValue<T>) => source;
+
 export const useMotionValue = <T,>(initial: T): MockMotionValue<T> => {
 	const value = useRef(initial);
 	return useMemo(

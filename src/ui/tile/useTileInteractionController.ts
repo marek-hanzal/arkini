@@ -211,21 +211,23 @@ export const useTileInteractionController = ({
 	);
 
 	const moveDrag = useCallback(
-		(source: TileDragSource, x: number, y: number) => {
+		(source: TileDragSource, x: number, y: number): TileDropTarget | null => {
 			const current = activeRef.current;
-			if (current?.source.id !== source.id) return;
-			match(current)
+			if (current?.source.id !== source.id) return null;
+			return match(current)
 				.with(
 					{
 						phase: "dragging",
 					},
 					(dragging) => {
 						const target = resolveTarget(x, y);
-						if (sameTarget(dragging.target, target)) return;
-						publishActive({
-							...dragging,
-							target,
-						});
+						if (!sameTarget(dragging.target, target)) {
+							publishActive({
+								...dragging,
+								target,
+							});
+						}
+						return target;
 					},
 				)
 				.with(
@@ -238,7 +240,7 @@ export const useTileInteractionController = ({
 					{
 						phase: "settling",
 					},
-					() => undefined,
+					() => null,
 				)
 				.exhaustive();
 		},

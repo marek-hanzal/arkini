@@ -41,16 +41,19 @@ const actorNode = ({
 	surfaceId = "board:0",
 	live = true,
 	phase = "idle",
+	exiting = false,
 }: {
 	readonly bounds: DOMRect;
 	readonly surfaceId?: string;
 	readonly live?: boolean;
 	readonly phase?: string;
+	readonly exiting?: boolean;
 }) => {
 	const node = document.createElement("button");
 	node.dataset.surfaceId = surfaceId;
 	node.dataset.live = live ? "true" : "false";
 	node.dataset.motionPhase = phase;
+	node.dataset.motionExiting = exiting ? "true" : "false";
 	node.getBoundingClientRect = () => bounds;
 	return node;
 };
@@ -178,7 +181,7 @@ describe("Tile neighbour field", () => {
 		});
 		neighbourField.registerNeighbourActor({
 			itemId: "exiting",
-			node: actorNode({ bounds: rect(-100, 0), phase: "exiting" }),
+			node: actorNode({ bounds: rect(-100, 0), exiting: true }),
 			x: exitingX,
 			y: exitingY,
 			enabled: true,

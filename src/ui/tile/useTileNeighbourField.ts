@@ -67,7 +67,7 @@ export const useTileNeighbourField = () => {
 						!registration.enabled ||
 						registration.node.dataset.live !== "true" ||
 						registration.node.dataset.surfaceId !== sourceSurfaceId ||
-						registration.node.dataset.motionPhase === "exiting"
+						registration.node.dataset.motionExiting === "true"
 					) {
 						reset(registration);
 						continue;

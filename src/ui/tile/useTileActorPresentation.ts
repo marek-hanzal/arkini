@@ -101,19 +101,32 @@ const settlingView = (
 			{
 				kind: DropItemResultKindEnumSchema.enum.Ignored,
 			},
-			(settlement) =>
-				settling.source.id === item.id
-					? {
-							...passive,
-							phase: "settling" as const,
-							feedback: settlement.feedback,
-							positionCompletion: {
-								kind: "location" as const,
-								generation: settling.generation,
-								location: item.location,
-							},
-						}
-					: passive,
+			(settlement) => {
+				if (settling.source.id === item.id) {
+					return {
+						...passive,
+						phase: "settling" as const,
+						feedback: settlement.feedback,
+						positionCompletion: {
+							kind: "location" as const,
+							generation: settling.generation,
+							location: item.location,
+						},
+					};
+				}
+				if (
+					"target" in settlement &&
+					settlement.target.kind === "slot" &&
+					settlement.target.occupant?.id === item.id
+				) {
+					return {
+						...passive,
+						phase: "settling" as const,
+						feedback: settlement.feedback,
+					};
+				}
+				return passive;
+			},
 		)
 		.with(
 			{

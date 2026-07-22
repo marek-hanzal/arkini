@@ -16,6 +16,7 @@ import { ItemDetailModal } from "~/ui/item-detail/ItemDetailModal";
 import { ItemDetailProvider } from "~/ui/item-detail/ItemDetailProvider";
 import { motionTestRuntime } from "~test/ui/support/motionReactMock";
 import { testGameRead, testGameReadOrThrow } from "~test/support/game/testGameRead";
+import { DropItemRejectedReasonEnumSchema } from "~/engine/runtime/schema/command/DropItemRejectedReasonEnumSchema";
 import { DropItemResultKindEnumSchema } from "~/engine/runtime/schema/command/DropItemResultKindEnumSchema";
 
 (
@@ -424,6 +425,34 @@ describe("Board drag", () => {
 		await act(async () => {
 			dragSurface.dispatchEvent(pointerEvent("pointercancel", 217, 117));
 		});
+	});
+
+	it("gives an occupied rejected target its own resistant response", async () => {
+		motionTestRuntime.autoComplete = false;
+		const source = await renderBoard();
+		const target = document.querySelector<HTMLElement>(
+			'[data-ui="TileActor"][data-board-x="1"][data-board-y="0"]',
+		);
+		if (target === null) throw new Error("Missing occupied target actor.");
+		const sourceItemId = source.dataset.runtimeId;
+		const targetItemId = target.dataset.runtimeId;
+		if (sourceItemId === undefined || targetItemId === undefined) {
+			throw new Error("Missing actor identities.");
+		}
+		dropItemState.drop.mockResolvedValue({
+			kind: DropItemResultKindEnumSchema.enum.Reject,
+			reason: DropItemRejectedReasonEnumSchema.enum.Occupied,
+			itemId: sourceItemId,
+			targetItemId,
+		});
+
+		await dragTo(source, 150, 50);
+
+		expect(source.dataset.motionPhase).toBe("settling");
+		expect(target.dataset.motionPhase).toBe("settling");
+		expect(
+			target.querySelector<HTMLElement>('[data-ui="TileActorVisual"]')?.dataset.motionScale,
+		).toBe("1.04");
 	});
 
 	it("moves the one existing actor through the public atomic drop command", async () => {

@@ -41,12 +41,14 @@ export interface TileFailedSettlement extends TileSettlementBase {
 	readonly kind: "failed";
 	readonly feedback: "rejected";
 	readonly outcome: null;
+	readonly target: TileDropTarget;
 }
 
 export interface TileRejectedSettlement extends TileSettlementBase {
 	readonly kind: typeof DropItemResultKindEnumSchema.enum.Reject;
 	readonly feedback: "rejected";
 	readonly outcome: DropOutcome<typeof DropItemResultKindEnumSchema.enum.Reject>;
+	readonly target: TileDropTarget;
 }
 
 export interface TileIgnoredSettlement extends TileSettlementBase {

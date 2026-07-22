@@ -26,6 +26,7 @@ const sameTarget = (left: TileDropTarget | null, right: TileDropTarget | null) =
 
 const settlementForOutcome = (
 	source: TileDragSource,
+	target: TileDropTarget,
 	outcome: useDropItem.Result | null,
 ): TileSettlementState =>
 	match(outcome)
@@ -33,6 +34,7 @@ const settlementForOutcome = (
 			kind: "failed" as const,
 			feedback: "rejected" as const,
 			outcome: null,
+			target,
 			pendingActorIds: [
 				source.id,
 			],
@@ -45,9 +47,10 @@ const settlementForOutcome = (
 				kind: DropItemResultKindEnumSchema.enum.Reject,
 				feedback: "rejected" as const,
 				outcome: rejected,
+				target,
 				pendingActorIds: [
-					source.id,
-				],
+				source.id,
+			],
 			}),
 		)
 		.with(
@@ -310,7 +313,7 @@ export const useTileInteractionController = ({
 							source: awaiting.source,
 							generation: awaiting.generation,
 							phase: "settling",
-							settlement: settlementForOutcome(source, outcome),
+							settlement: settlementForOutcome(source, awaiting.target, outcome),
 						});
 					},
 				)

@@ -77,7 +77,7 @@ export const useTileActorMotion = ({
 		(node: HTMLElement | null) => {
 			unregisterNeighbourActor.current?.();
 			unregisterNeighbourActor.current = null;
-			if (node === null) return;
+			if (node === null || !visible) return;
 			unregisterNeighbourActor.current = registerNeighbourActor({
 				itemId: item.id,
 				node,
@@ -92,6 +92,7 @@ export const useTileActorMotion = ({
 			neighbourTargetY,
 			reducedMotion,
 			registerNeighbourActor,
+			visible,
 		],
 	);
 

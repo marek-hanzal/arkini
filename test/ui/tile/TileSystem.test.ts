@@ -12,6 +12,7 @@ import { TileSystemContext, type TileSystem } from "~/ui/tile/TileSystemContext"
 import { TileSystemProvider } from "~/ui/tile/TileSystemProvider";
 import { useTileSlot } from "~/ui/tile/useTileSlot";
 import { useTileSurface } from "~/ui/tile/useTileSurface";
+import { DropItemRejectedReasonEnumSchema } from "~/engine/runtime/schema/command/DropItemRejectedReasonEnumSchema";
 import { DropItemResultKindEnumSchema } from "~/engine/runtime/schema/command/DropItemResultKindEnumSchema";
 
 vi.mock("~/bridge/tile/useTileActors", () => ({
@@ -418,6 +419,36 @@ describe("TileSystemProvider", () => {
 				kind: "outside",
 			},
 		});
+	});
+
+	it("keeps the rejected target snapshot without making its lifetime block settlement", async () => {
+		const { readSystem } = await renderHarness();
+		const released = await startDrag(readSystem(), 440, 50);
+		if (released === null) throw new Error("Expected a released drag.");
+
+		await act(async () => {
+			readSystem().settle(released.source, released.generation, {
+				kind: DropItemResultKindEnumSchema.enum.Reject,
+				reason: DropItemRejectedReasonEnumSchema.enum.Occupied,
+				itemId: source.id,
+				targetItemId: toolbarOccupant.id,
+			});
+		});
+
+		expect(readSystem().active).toMatchObject({
+			phase: "settling",
+			settlement: {
+				kind: DropItemResultKindEnumSchema.enum.Reject,
+				target: {
+					kind: "slot",
+					occupant: toolbarOccupant,
+				},
+				pendingActorIds: [source.id],
+			},
+		});
+
+		await act(async () => readSystem().complete(source.id, released.generation));
+		expect(readSystem().active).toBeNull();
 	});
 
 	it("keeps one swap generation active until both actor settlements complete", async () => {

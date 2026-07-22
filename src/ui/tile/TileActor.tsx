@@ -153,6 +153,9 @@ export const TileActor = ({ item, live, cue, onCueComplete }: TileActor.Props) =
 			data-surface-id={presentation.canonicalSource.surface.id}
 			data-live={live ? "true" : "false"}
 			data-motion-phase={presentation.phase}
+			data-motion-exiting={
+				presentation.phase === "exiting" || cue?.kind === "exit" ? "true" : "false"
+			}
 			data-board-x={boardLocation?.position.x}
 			data-board-y={boardLocation?.position.y}
 			data-toolbar-x={

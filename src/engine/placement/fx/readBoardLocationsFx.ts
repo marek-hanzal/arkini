@@ -3,6 +3,7 @@ import { Effect } from "effect";
 import type { GridSizeSchema } from "~/engine/grid/schema/GridSizeSchema";
 import type { BoardLocationSchema } from "~/engine/location/schema/BoardLocationSchema";
 import type { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeIntegerSchema";
+import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 
 export namespace readBoardLocationsFx {
 	export interface Props {
@@ -21,7 +22,7 @@ export const readBoardLocationsFx = Effect.fn("readBoardLocationsFx")(function* 
 	for (let y = 0; y < size.height; y += 1) {
 		for (let x = 0; x < size.width; x += 1) {
 			locations.push({
-				scope: "board",
+				scope: LocationScopeEnumSchema.enum.Board,
 				space,
 				position: {
 					x,

@@ -12,6 +12,7 @@ import { TileSystemContext, type TileSystem } from "~/ui/tile/TileSystemContext"
 import { TileSystemProvider } from "~/ui/tile/TileSystemProvider";
 import { useTileSlot } from "~/ui/tile/useTileSlot";
 import { useTileSurface } from "~/ui/tile/useTileSurface";
+import { DropItemResultKindEnumSchema } from "~/engine/runtime/schema/command/DropItemResultKindEnumSchema";
 
 vi.mock("~/bridge/tile/useTileActors", () => ({
 	useTileActors: () => [],
@@ -426,7 +427,7 @@ describe("TileSystemProvider", () => {
 
 		await act(async () => {
 			readSystem().settle(released.source, released.generation, {
-				kind: "swap",
+				kind: DropItemResultKindEnumSchema.enum.Swap,
 				source: {
 					itemId: source.id,
 					revision: "revision:source-swapped",
@@ -456,7 +457,7 @@ describe("TileSystemProvider", () => {
 		expect(readSystem().active).toMatchObject({
 			phase: "settling",
 			settlement: {
-				kind: "swap",
+				kind: DropItemResultKindEnumSchema.enum.Swap,
 				pendingActorIds: [
 					source.id,
 					toolbarOccupant.id,
@@ -470,7 +471,7 @@ describe("TileSystemProvider", () => {
 		expect(readSystem().active).toMatchObject({
 			phase: "settling",
 			settlement: {
-				kind: "swap",
+				kind: DropItemResultKindEnumSchema.enum.Swap,
 				pendingActorIds: [
 					toolbarOccupant.id,
 				],
@@ -497,7 +498,7 @@ describe("TileSystemProvider", () => {
 
 		await act(async () => {
 			readSystem().settle(released.source, released.generation, {
-				kind: "merge",
+				kind: DropItemResultKindEnumSchema.enum.Merge,
 				action: "consume",
 				effect: "keep",
 				source: {
@@ -525,7 +526,7 @@ describe("TileSystemProvider", () => {
 		expect(readSystem().active).toMatchObject({
 			phase: "settling",
 			settlement: {
-				kind: "merge",
+				kind: DropItemResultKindEnumSchema.enum.Merge,
 				stage: "approach",
 				pendingActorIds: [
 					source.id,
@@ -539,7 +540,7 @@ describe("TileSystemProvider", () => {
 		expect(readSystem().active).toMatchObject({
 			phase: "settling",
 			settlement: {
-				kind: "merge",
+				kind: DropItemResultKindEnumSchema.enum.Merge,
 				stage: "resolve",
 				pendingActorIds: [
 					source.id,
@@ -562,7 +563,7 @@ describe("TileSystemProvider", () => {
 
 		await act(async () => {
 			readSystem().settle(released.source, released.generation, {
-				kind: "move",
+				kind: DropItemResultKindEnumSchema.enum.Move,
 				itemId: source.id,
 				revision: "revision:moved",
 				previousLocation: source.location,
@@ -606,7 +607,7 @@ describe("TileSystemProvider", () => {
 
 		await act(async () => {
 			readSystem().settle(released.source, released.generation, {
-				kind: "move",
+				kind: DropItemResultKindEnumSchema.enum.Move,
 				itemId: source.id,
 				revision: movedSource.revision,
 				previousLocation: source.location,

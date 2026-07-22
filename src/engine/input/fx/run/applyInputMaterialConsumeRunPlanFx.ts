@@ -12,6 +12,7 @@ import { reviseRuntimeItemFx } from "~/engine/runtime/fx/reviseRuntimeItemFx";
 import type { InputRuntimeItemSchema } from "~/engine/runtime/schema/InputRuntimeItemSchema";
 import type { JobRuntimeItemSchema } from "~/engine/runtime/schema/JobRuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 
 export namespace applyInputMaterialConsumeRunPlanFx {
 	export interface Props {
@@ -62,7 +63,7 @@ export const applyInputMaterialConsumeRunPlanFx = Effect.fn("applyInputMaterialC
 						runtime: state.runtime,
 					});
 					const location = {
-						scope: "job",
+						scope: LocationScopeEnumSchema.enum.Job,
 						jobId,
 					} satisfies JobLocationSchema.Type;
 

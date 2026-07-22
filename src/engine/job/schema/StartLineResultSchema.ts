@@ -1,17 +1,23 @@
 import { z } from "zod";
+
+import { StartLineResultEnumSchema } from "./StartLineResultEnumSchema";
 import { JobQueueRequestSchema } from "./JobQueueRequestSchema";
 import { JobSchema } from "./JobSchema";
 export const StartLineResultSchema = z
 	.discriminatedUnion("type", [
 		z
 			.object({
-				type: z.literal("started"),
+				type: StartLineResultEnumSchema.extract([
+					StartLineResultEnumSchema.enum.Started,
+				]),
 				job: JobSchema,
 			})
 			.strict(),
 		z
 			.object({
-				type: z.literal("queued"),
+				type: StartLineResultEnumSchema.extract([
+					StartLineResultEnumSchema.enum.Queued,
+				]),
 				request: JobQueueRequestSchema,
 			})
 			.strict(),

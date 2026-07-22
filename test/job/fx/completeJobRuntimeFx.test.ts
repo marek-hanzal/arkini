@@ -12,6 +12,7 @@ import {
 	prepareRandomCompletionRuntimeFx,
 	projectRandomCompletionItems,
 } from "~test/job/support/randomCompletionTestRuntime";
+import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
 
 describe("completeJobRuntimeFx", () => {
 	it("replays one stable completion outcome across blocking, retry and restore", () => {
@@ -111,7 +112,7 @@ describe("completeJobRuntimeFx", () => {
 		expect(outputs).not.toEqual([]);
 		for (const item of outputs) {
 			expect(result.events).toContainEqual({
-				type: "item:spawned",
+				type: GameEventEnumSchema.enum.ItemSpawned,
 				itemId: item.id,
 				canonicalItemId: item.item.id,
 				location: item.location,

@@ -2,6 +2,7 @@ import { Effect } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { GameConfigFx } from "~/engine/game/context/GameConfigFx";
+import { StorageScopeEnumSchema } from "~/engine/scope/schema/StorageScopeEnumSchema";
 
 export interface CheatItemCatalogEntry {
 	readonly itemId: IdSchema.Type;
@@ -15,7 +16,7 @@ export interface CheatItemCatalogEntry {
 export const readCheatItemCatalogFx = Effect.fn("readCheatItemCatalogFx")(function* () {
 	const config = yield* GameConfigFx;
 	return Object.values(config.items)
-		.filter((item) => item.scope === "board" || item.scope === "any")
+		.filter((item) => item.scope === StorageScopeEnumSchema.enum.board || item.scope === StorageScopeEnumSchema.enum.any)
 		.map(
 			(item): CheatItemCatalogEntry => ({
 				itemId: item.id,

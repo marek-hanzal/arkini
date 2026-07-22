@@ -10,6 +10,8 @@ import { assertPlacementMaxCountFx } from "~/engine/placement/fx/assertPlacement
 import { assertPlacementPlanCompleteFx } from "~/engine/placement/fx/assertPlacementPlanCompleteFx";
 import { planBoardPlacementFx } from "~/engine/placement/fx/planBoardPlacementFx";
 import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
+import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
+import { StorageScopeEnumSchema } from "~/engine/scope/schema/StorageScopeEnumSchema";
 
 export namespace spawnCheatItemFx {
 	export interface Props {
@@ -25,7 +27,7 @@ export const spawnCheatItemFx = Effect.fn("spawnCheatItemFx")(function* ({
 	const item = yield* resolveItemFx({
 		itemId,
 	});
-	if (item.scope !== "board" && item.scope !== "any") {
+	if (item.scope !== StorageScopeEnumSchema.enum.board && item.scope !== StorageScopeEnumSchema.enum.any) {
 		return yield* Effect.fail(
 			new CheatItemNotSpawnableError({
 				itemId,
@@ -55,7 +57,7 @@ export const spawnCheatItemFx = Effect.fn("spawnCheatItemFx")(function* ({
 			const plan = yield* planBoardPlacementFx({
 				item,
 				origin: {
-					scope: "board",
+					scope: LocationScopeEnumSchema.enum.Board,
 					space: runtime.currentSpace,
 					position: {
 						x: Math.floor(config.meta.board.width / 2),

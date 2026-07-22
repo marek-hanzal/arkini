@@ -12,6 +12,7 @@ import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { fromRuntimeFx } from "~/engine/state/fx/fromRuntimeFx";
 import { runTickRuntimeByFx } from "~/engine/tick/fx/runTickRuntimeByFx";
+import { StartLineResultEnumSchema } from "~/engine/job/schema/StartLineResultEnumSchema";
 
 const value = (value: number) => ({
 	type: "value" as const,
@@ -237,7 +238,7 @@ const startStashFx = Effect.fn("startStashFx")(function* ({
 		ownerItemId: owner.id,
 		lineId,
 	});
-	if (started.type !== "started") {
+	if (started.type !== StartLineResultEnumSchema.enum.Started) {
 		return yield* Effect.dieMessage(`Expected ${lineId} to start immediately.`);
 	}
 

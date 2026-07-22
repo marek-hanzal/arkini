@@ -13,6 +13,7 @@ import { setCurrentSpaceFx } from "~/engine/space/write/setCurrentSpaceFx";
 import { fromRuntimeFx } from "~/engine/state/fx/fromRuntimeFx";
 import { StateSchema } from "~/engine/state/schema/StateSchema";
 import { boardLocation, multiSpaceTestConfig } from "~test/space/support/multiSpaceTestConfig";
+import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
 
 const startInSpaceTwoConfig = GameConfigSchema.parse({
 	...multiSpaceTestConfig,
@@ -102,7 +103,7 @@ describe("current board space", () => {
 		expect(result.changed).toBe(3);
 		expect(result.transition.events).toEqual([
 			{
-				type: "current-space:changed",
+				type: GameEventEnumSchema.enum.CurrentSpaceChanged,
 				previousSpace: 0,
 				currentSpace: 3,
 			},

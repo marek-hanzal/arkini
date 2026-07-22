@@ -9,6 +9,7 @@ import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { StateSchema } from "~/engine/state/schema/StateSchema";
 import { checkRuntimeFx } from "~/engine/runtime/check/checkRuntimeFx";
+import { RuntimeCheckIssueEnumSchema } from "~/engine/runtime/schema/check/RuntimeCheckIssueEnumSchema";
 
 const config = GameConfigSchema.parse({
 	version: "1.0",
@@ -168,19 +169,19 @@ describe("checkRuntimeFx", () => {
 		expect(result.issues).toEqual([
 			{
 				itemId: "duplicate",
-				type: "item:id:duplicate",
+				type: RuntimeCheckIssueEnumSchema.enum.DuplicateItemId,
 			},
 			{
 				configuredScope: "board",
 				itemId: "wrong-scope",
 				location: location("inventory", 0, 0),
-				type: "location:scope",
+				type: RuntimeCheckIssueEnumSchema.enum.LocationScope,
 			},
 			{
 				itemId: "outside",
 				location: location("board", 2, 0),
 				size: config.meta.board,
-				type: "location:out-of-bounds",
+				type: RuntimeCheckIssueEnumSchema.enum.LocationOutOfBounds,
 			},
 			{
 				itemIds: [
@@ -188,7 +189,7 @@ describe("checkRuntimeFx", () => {
 					"occupied:second",
 				],
 				location: location("board", 1, 1),
-				type: "location:occupied",
+				type: RuntimeCheckIssueEnumSchema.enum.LocationOccupied,
 			},
 		]);
 	});
@@ -235,7 +236,7 @@ describe("checkRuntimeFx", () => {
 				itemId: "limited:first",
 				maxStackSize: 2,
 				quantity: 3,
-				type: "item:stack-size",
+				type: RuntimeCheckIssueEnumSchema.enum.ItemStackSize,
 			},
 			{
 				itemId: "limited",
@@ -248,7 +249,7 @@ describe("checkRuntimeFx", () => {
 				reservedQuantity: 0,
 				maxCount: 3,
 				quantity: 4,
-				type: "item:max-count",
+				type: RuntimeCheckIssueEnumSchema.enum.ItemMaxCount,
 			},
 		]);
 	});
@@ -293,7 +294,7 @@ describe("checkRuntimeFx", () => {
 				result: {
 					issues: [
 						{
-							type: "location:scope",
+							type: RuntimeCheckIssueEnumSchema.enum.LocationScope,
 						},
 					],
 				},
@@ -306,7 +307,7 @@ describe("checkRuntimeFx", () => {
 				result: {
 					issues: [
 						{
-							type: "location:out-of-bounds",
+							type: RuntimeCheckIssueEnumSchema.enum.LocationOutOfBounds,
 						},
 					],
 				},
@@ -352,7 +353,7 @@ describe("checkRuntimeFx", () => {
 				result: {
 					issues: [
 						{
-							type: "location:scope",
+							type: RuntimeCheckIssueEnumSchema.enum.LocationScope,
 						},
 					],
 				},

@@ -2,6 +2,9 @@ import { Effect } from "effect";
 import { isPassiveStorageLocation } from "~/engine/location/read/isPassiveStorageLocation";
 import { isInstantGameplayEnabled } from "~/engine/cheat/read/isInstantGameplayEnabled";
 
+import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
+import { JobStartSourceEnumSchema } from "~/engine/event/schema/JobStartSourceEnumSchema";
+import { StartLineResultEnumSchema } from "~/engine/job/schema/StartLineResultEnumSchema";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
 import { advanceTemporaryItemDurationsFx } from "~/engine/item/temporary/fx/advanceTemporaryItemDurationsFx";
@@ -41,17 +44,17 @@ const dispatchOwnerQueueFx = Effect.fn("dispatchOwnerQueueFx")(function* (
 		ownerItemId,
 		runtime,
 	});
-	if (attempt.type !== "started") return attempt;
+	if (attempt.type !== StartLineResultEnumSchema.enum.Started) return attempt;
 
 	return {
-		type: "started",
+		type: StartLineResultEnumSchema.enum.Started,
 		events: [
 			{
-				type: "job:started",
+				type: GameEventEnumSchema.enum.JobStarted,
 				jobId: attempt.job.id,
 				ownerItemId: attempt.job.ownerItemId,
 				lineId: attempt.job.lineId,
-				source: "queue",
+				source: JobStartSourceEnumSchema.enum.Queue,
 			} satisfies GameEventSchema.Type,
 			...attempt.events,
 		],
@@ -75,7 +78,7 @@ const dispatchQueueOnlyOwnersFx = Effect.fn("dispatchQueueOnlyOwnersFx")(functio
 	const events: GameEventSchema.Type[] = [];
 	for (const ownerItemId of queueOnlyOwnerItemIds) {
 		const dispatched = yield* dispatchOwnerQueueFx(ownerItemId, draft);
-		if (dispatched.type !== "started") continue;
+		if (dispatched.type !== StartLineResultEnumSchema.enum.Started) continue;
 		draft = dispatched.runtime;
 		events.push(...dispatched.events);
 	}
@@ -137,7 +140,7 @@ export const advanceRuntimeStepFx = Effect.fn("advanceRuntimeStepFx")(function* 
 		if (completion.type === "blocked") continue;
 		draft = completion.runtime;
 		events.push({
-			type: "job:completed",
+			type: GameEventEnumSchema.enum.JobCompleted,
 			jobId: liveJob.id,
 			ownerItemId: liveJob.ownerItemId,
 			lineId: liveJob.lineId,
@@ -150,7 +153,7 @@ export const advanceRuntimeStepFx = Effect.fn("advanceRuntimeStepFx")(function* 
 		...new Set(completedOwnerItemIds),
 	].sort((first, second) => first.localeCompare(second))) {
 		const dispatched = yield* dispatchOwnerQueueFx(ownerItemId, draft);
-		if (dispatched.type !== "started") continue;
+		if (dispatched.type !== StartLineResultEnumSchema.enum.Started) continue;
 		draft = dispatched.runtime;
 		events.push(...dispatched.events);
 	}

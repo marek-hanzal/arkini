@@ -3,10 +3,13 @@ import { z } from "zod";
 import { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeIntegerSchema";
 import { PositionSchema } from "~/engine/grid/schema/PositionSchema";
 
+import { LocationScopeEnumSchema } from "./LocationScopeEnumSchema";
 /** One concrete board-space location usable as a spatial gameplay origin. */
 export const BoardLocationSchema = z
 	.object({
-		scope: z.literal("board"),
+		scope: LocationScopeEnumSchema.extract([
+			LocationScopeEnumSchema.enum.Board,
+		]),
 		space: NonNegativeIntegerSchema.describe("The explicit board space containing the item."),
 		position: PositionSchema.describe("The coordinates inside the board space."),
 	})

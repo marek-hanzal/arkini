@@ -4,6 +4,7 @@ import { match } from "ts-pattern";
 import type { GridSizeSchema } from "~/engine/grid/schema/GridSizeSchema";
 import type { BoardLocationSchema } from "~/engine/location/schema/BoardLocationSchema";
 import type { PlacementEnumSchema } from "~/engine/placement/schema/PlacementEnumSchema";
+import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 
 export namespace resolveBoardPlacementOriginFx {
 	export interface Props {
@@ -26,7 +27,7 @@ export const resolveBoardPlacementOriginFx = Effect.fn("resolveBoardPlacementOri
 				Effect.map(
 					(index) =>
 						({
-							scope: "board" as const,
+							scope: LocationScopeEnumSchema.enum.Board,
 							space: origin.space,
 							position: {
 								x: index % size.width,

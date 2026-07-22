@@ -6,6 +6,8 @@ import type { DiagnosticPathSchema } from "../schema/DiagnosticPathSchema";
 import type { GameSourceProvenanceSchema } from "~/engine/source/schema/GameSourceProvenanceSchema";
 import { readItemLineEntriesFx } from "../fx/readItemLineEntriesFx";
 import type { GameDiagnosticsSchema } from "../schema/GameDiagnosticsSchema";
+import { DiagnosticCodeEnumSchema } from "~/engine/validation/schema/DiagnosticCodeEnumSchema";
+import { DiagnosticSeverityEnumSchema } from "~/engine/validation/schema/DiagnosticSeverityEnumSchema";
 
 export namespace validateItemLineIdsFx {
 	export interface Props {
@@ -34,8 +36,8 @@ export const validateItemLineIdsFx = Effect.fn("validateItemLineIdsFx")(function
 			const previousPath = firstById.get(entry.line.id);
 			if (previousPath !== undefined) {
 				diagnostics.push({
-					code: "line:duplicate-id",
-					severity: "error",
+					code: DiagnosticCodeEnumSchema.enum.LineDuplicateId,
+					severity: DiagnosticSeverityEnumSchema.enum.Error,
 					path: lineIdPath,
 					source: provenance.items[ownerItemId],
 					message: `Item ${ownerItemId} owns more than one line with ID ${entry.line.id}.`,

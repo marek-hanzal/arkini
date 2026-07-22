@@ -10,6 +10,7 @@ import type { InputModeEnumSchema } from "~/engine/input/schema/InputModeEnumSch
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import type { SelectorSchema } from "~/engine/selector/schema/SelectorSchema";
 import { readItemDetailLinesFx } from "~/engine/item-detail/read/readItemDetailLinesFx";
+import type { JobStatusEnumSchema } from "~/engine/job/schema/read/JobStatusEnumSchema";
 
 export namespace useItemDetailLines {
 	export interface QuantityBounds {
@@ -118,7 +119,7 @@ export namespace useItemDetailLines {
 		readonly input: readonly Input[];
 		readonly output: readonly OutputSet[];
 		readonly activeJob?: {
-			readonly status: "running" | "paused" | "awaiting-output";
+			readonly status: JobStatusEnumSchema.Type;
 			readonly durationMs: number;
 			readonly remainingMs: number;
 		};

@@ -2,6 +2,7 @@ import { Console, Effect } from "effect";
 
 import type { GameDiagnosticSchema } from "../schema/GameDiagnosticSchema";
 import { formatGameDiagnosticFx } from "./formatGameDiagnosticFx";
+import { DiagnosticSeverityEnumSchema } from "~/engine/validation/schema/DiagnosticSeverityEnumSchema";
 
 /** Renders already-computed diagnostics for Effect CLI commands. */
 export const renderGameDiagnosticsFx = Effect.fn("renderGameDiagnosticsFx")(function* (
@@ -9,7 +10,7 @@ export const renderGameDiagnosticsFx = Effect.fn("renderGameDiagnosticsFx")(func
 ) {
 	for (const diagnostic of diagnostics) {
 		const message = yield* formatGameDiagnosticFx(diagnostic);
-		if (diagnostic.severity === "warning") {
+		if (diagnostic.severity === DiagnosticSeverityEnumSchema.enum.Warning) {
 			yield* Console.warn(message);
 		} else {
 			yield* Console.error(message);

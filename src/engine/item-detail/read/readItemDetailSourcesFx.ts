@@ -4,6 +4,7 @@ import { match } from "ts-pattern";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { readItemDetailLinesFx } from "~/engine/item-detail/read/readItemDetailLinesFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 
 export namespace readItemDetailSourcesFx {
 	export interface Props {
@@ -160,7 +161,7 @@ export const readItemDetailSourcesFx = Effect.fn("readItemDetailSourcesFx")(func
 
 	const source: readItemDetailSourcesFx.Source[] = [];
 	for (const owner of runtime.items) {
-		if (owner.location.scope !== "board") continue;
+		if (owner.location.scope !== LocationScopeEnumSchema.enum.Board) continue;
 		const lines = yield* readItemDetailLinesFx({
 			itemId: owner.id,
 			runtime,

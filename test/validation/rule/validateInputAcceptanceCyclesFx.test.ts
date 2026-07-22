@@ -9,6 +9,7 @@ import {
 	createRootSource,
 	createSimpleItem,
 } from "~test/validation/support/gameValidationTestSource";
+import { DiagnosticCodeEnumSchema } from "~/engine/validation/schema/DiagnosticCodeEnumSchema";
 
 const materials = (selector: SelectorSchema.Type) => [
 	{
@@ -33,7 +34,7 @@ const compileItems = (items: Record<string, unknown>) =>
 	);
 
 const cycleDiagnostics = async (items: Record<string, unknown>) =>
-	(await compileItems(items)).diagnostics.filter(({ code }) => code === "input:acceptance-cycle");
+	(await compileItems(items)).diagnostics.filter(({ code }) => code === DiagnosticCodeEnumSchema.enum.InputAcceptanceCycle);
 
 describe("validateInputAcceptanceCyclesFx", () => {
 	it("rejects a material input self-loop", async () => {
@@ -229,10 +230,10 @@ describe("validateInputAcceptanceCyclesFx", () => {
 				}),
 			]),
 		);
-		const diagnostic = result.diagnostics.find(({ code }) => code === "input:acceptance-cycle");
+		const diagnostic = result.diagnostics.find(({ code }) => code === DiagnosticCodeEnumSchema.enum.InputAcceptanceCycle);
 
 		expect(diagnostic).toMatchObject({
-			code: "input:acceptance-cycle",
+			code: DiagnosticCodeEnumSchema.enum.InputAcceptanceCycle,
 			edges: [
 				{
 					source: "/game/a.json",

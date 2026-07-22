@@ -1,12 +1,19 @@
 import { z } from "zod";
 
+import { DiagnosticCodeEnumSchema } from "~/engine/validation/schema/DiagnosticCodeEnumSchema";
+import { DiagnosticSeverityEnumSchema } from "~/engine/validation/schema/DiagnosticSeverityEnumSchema";
+
 import { BaseDiagnosticSchema } from "./BaseDiagnosticSchema";
 
 export const SchemaReferenceConflictDiagnosticSchema = z
 	.object({
 		...BaseDiagnosticSchema.shape,
-		code: z.literal("source:schema-reference-conflict"),
-		severity: z.literal("error"),
+		code: DiagnosticCodeEnumSchema.extract([
+			DiagnosticCodeEnumSchema.enum.SourceSchemaReferenceConflict,
+		]),
+		severity: DiagnosticSeverityEnumSchema.extract([
+			DiagnosticSeverityEnumSchema.enum.Error,
+		]),
 		values: z.tuple([
 			z.string().min(1),
 			z.string().min(1),

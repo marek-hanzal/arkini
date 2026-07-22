@@ -8,6 +8,7 @@ import {
 	createRootSource,
 	createSimpleItem,
 } from "~test/validation/support/gameValidationTestSource";
+import { DiagnosticCodeEnumSchema } from "~/engine/validation/schema/DiagnosticCodeEnumSchema";
 
 const materialTag = (tag: string): ReadonlyArray<InputSchema.Type> => [
 	{
@@ -34,7 +35,7 @@ const tagDiagnostics = async (items: Record<string, unknown>) =>
 				}),
 			]),
 		)
-	).diagnostics.filter(({ code }) => code === "input:material-tag-empty");
+	).diagnostics.filter(({ code }) => code === DiagnosticCodeEnumSchema.enum.InputMaterialTagEmpty);
 
 describe("validateMaterialTagSelectorsFx", () => {
 	it("rejects a material tag selector with no canonical candidate", async () => {

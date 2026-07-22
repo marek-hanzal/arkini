@@ -1,5 +1,8 @@
 import { Effect } from "effect";
 
+import { DiagnosticCodeEnumSchema } from "~/engine/validation/schema/DiagnosticCodeEnumSchema";
+import { DiagnosticSeverityEnumSchema } from "~/engine/validation/schema/DiagnosticSeverityEnumSchema";
+
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { validateGameConfigFx } from "~/engine/validation/fx/validateGameConfigFx";
 import type { DiagnosticPathSchema } from "~/engine/validation/schema/DiagnosticPathSchema";
@@ -60,8 +63,8 @@ export const compileGameSourcesFx = Effect.fn("compileGameSourcesFx")(function* 
 					: String(segment),
 			) satisfies DiagnosticPathSchema.Type;
 			diagnostics.push({
-				code: "config:schema",
-				severity: "error",
+				code: DiagnosticCodeEnumSchema.enum.ConfigSchema,
+				severity: DiagnosticSeverityEnumSchema.enum.Error,
 				path,
 				source: readSourcePath(path, assembly.provenance),
 				message: issue.message,

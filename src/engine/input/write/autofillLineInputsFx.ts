@@ -9,6 +9,7 @@ import { isolateStatefulOwnerTransitionFx } from "~/engine/item/fx/isolateStatef
 import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
 import { isGridRuntimeItem } from "~/engine/runtime/read/isGridRuntimeItem";
 import { readRuntimeItemByIdFx } from "~/engine/runtime/read/readRuntimeItemByIdFx";
+import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 
 export namespace autofillLineInputsFx {
 	export interface Props {
@@ -70,7 +71,7 @@ export const autofillLineInputsFx = Effect.fn("autofillLineInputsFx")(function* 
 				});
 				const [, nextDraft] = yield* applyInputMaterialStorePlanFx({
 					location: {
-						scope: "input",
+						scope: LocationScopeEnumSchema.enum.Input,
 						ownerItemId,
 						lineId,
 						inputIndex: entry.inputIndex,

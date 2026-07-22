@@ -1,11 +1,15 @@
 import { z } from "zod";
+
+import { RuntimeCheckIssueEnumSchema } from "~/engine/runtime/schema/check/RuntimeCheckIssueEnumSchema";
 import { IdSchema } from "~/engine/common/schema/IdSchema";
 export const JobLineMissingIssueSchema = z
 	.object({
 		jobId: IdSchema,
 		ownerItemId: IdSchema,
 		lineId: IdSchema,
-		type: z.literal("job:line-missing"),
+		type: RuntimeCheckIssueEnumSchema.extract([
+			RuntimeCheckIssueEnumSchema.enum.JobLineMissing,
+		]),
 	})
 	.strict()
 	.meta({

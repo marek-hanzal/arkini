@@ -10,6 +10,7 @@ import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { TickFx } from "~/engine/tick/context/TickFx";
 import { runTickRuntimeByFx } from "~/engine/tick/fx/runTickRuntimeByFx";
 import { createJobTestConfig, prepareJobLineFx } from "~test/job/support/jobTestConfig";
+import { StartLineResultEnumSchema } from "~/engine/job/schema/StartLineResultEnumSchema";
 
 const props = {
 	ownerItemId: "runtime:forge",
@@ -165,8 +166,8 @@ describe("job board and inventory flow", () => {
 			),
 		);
 
-		expect(result.first.type).toBe("started");
-		expect(result.second.type).toBe("queued");
+		expect(result.first.type).toBe(StartLineResultEnumSchema.enum.Started);
+		expect(result.second.type).toBe(StartLineResultEnumSchema.enum.Queued);
 		expect(result.runtime.jobs).toEqual([]);
 		expect(result.runtime.jobQueue).toEqual([]);
 		expect(

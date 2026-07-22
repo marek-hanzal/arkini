@@ -1,10 +1,10 @@
 import { z } from "zod";
 import { JobSchema } from "~/engine/job/schema/JobSchema";
-import { JobStatusSchema } from "./JobStatusSchema";
+import { JobStatusEnumSchema } from "./JobStatusEnumSchema";
 export const JobResolutionSchema = z
 	.object({
 		job: JobSchema,
-		status: JobStatusSchema,
+		status: JobStatusEnumSchema,
 	})
 	.strict()
 	.meta({

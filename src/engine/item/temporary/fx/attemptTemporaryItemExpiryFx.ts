@@ -1,5 +1,7 @@
 import { Effect } from "effect";
 
+import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
+import { ItemRemovedReasonEnumSchema } from "~/engine/event/schema/ItemRemovedReasonEnumSchema";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { readLifecycleItemEventsFx } from "~/engine/event/read/readLifecycleItemEventsFx";
 import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
@@ -49,7 +51,7 @@ export const attemptTemporaryItemExpiryFx = Effect.fn("attemptTemporaryItemExpir
 			readLifecycleItemEventsFx({
 				outgoing: completion.expiredItem,
 				placement: completion.placement,
-				reason: "expired",
+				reason: ItemRemovedReasonEnumSchema.enum.Expired,
 			}).pipe(
 				Effect.map(
 					(lifecycleEvents) =>
@@ -57,7 +59,7 @@ export const attemptTemporaryItemExpiryFx = Effect.fn("attemptTemporaryItemExpir
 							type: "expired",
 							events: [
 								{
-									type: "item:expired",
+									type: GameEventEnumSchema.enum.ItemExpired,
 									itemId: completion.expiredItem.id,
 									canonicalItemId: completion.expiredItem.item.id,
 									location: completion.expiredItem.location,

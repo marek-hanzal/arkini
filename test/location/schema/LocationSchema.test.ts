@@ -1,12 +1,13 @@
 import { describe, expect, it } from "vitest";
 
 import { LocationSchema } from "~/engine/location/schema/LocationSchema";
+import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 
 describe("LocationSchema", () => {
 	it("accepts concrete grid, line-input, consumed-job, and reserved locations", () => {
 		expect(
 			LocationSchema.safeParse({
-				scope: "board",
+				scope: LocationScopeEnumSchema.enum.Board,
 				space: 0,
 				position: {
 					x: 2,
@@ -16,7 +17,7 @@ describe("LocationSchema", () => {
 		).toBe(true);
 		expect(
 			LocationSchema.safeParse({
-				scope: "input",
+				scope: LocationScopeEnumSchema.enum.Input,
 				ownerItemId: "runtime:owner",
 				lineId: "line:owner:work",
 				inputIndex: 0,
@@ -24,13 +25,13 @@ describe("LocationSchema", () => {
 		).toBe(true);
 		expect(
 			LocationSchema.safeParse({
-				scope: "job",
+				scope: LocationScopeEnumSchema.enum.Job,
 				jobId: "job:owner:work",
 			}).success,
 		).toBe(true);
 		expect(
 			LocationSchema.safeParse({
-				scope: "reserved",
+				scope: LocationScopeEnumSchema.enum.Reserved,
 				jobId: "job:owner:work",
 			}).success,
 		).toBe(true);
@@ -39,7 +40,7 @@ describe("LocationSchema", () => {
 	it("rejects abstract or incomplete locations", () => {
 		expect(
 			LocationSchema.safeParse({
-				scope: "board",
+				scope: LocationScopeEnumSchema.enum.Board,
 				position: {
 					x: 2,
 					y: 3,
@@ -57,19 +58,19 @@ describe("LocationSchema", () => {
 		).toBe(false);
 		expect(
 			LocationSchema.safeParse({
-				scope: "input",
+				scope: LocationScopeEnumSchema.enum.Input,
 				ownerItemId: "runtime:owner",
 				lineId: "line:owner:work",
 			}).success,
 		).toBe(false);
 		expect(
 			LocationSchema.safeParse({
-				scope: "input",
+				scope: LocationScopeEnumSchema.enum.Input,
 				ownerItemId: "runtime:owner",
 				lineId: "line:owner:work",
 				inputIndex: 0,
 				returnLocation: {
-					scope: "board",
+					scope: LocationScopeEnumSchema.enum.Board,
 					space: 0,
 					position: {
 						x: 1,
@@ -80,7 +81,7 @@ describe("LocationSchema", () => {
 		).toBe(false);
 		expect(
 			LocationSchema.safeParse({
-				scope: "job",
+				scope: LocationScopeEnumSchema.enum.Job,
 				jobId: "job:owner:work",
 				mode: "reserve",
 			}).success,

@@ -5,6 +5,7 @@ import { useGameFx } from "~/engine/game/fx/useGameFx";
 import { fromStateFx } from "~/engine/runtime/fx/fromStateFx";
 import type { StateSchema } from "~/engine/state/schema/StateSchema";
 import { createJobTestConfig } from "~test/job/support/jobTestConfig";
+import { RuntimeCheckIssueEnumSchema } from "~/engine/runtime/schema/check/RuntimeCheckIssueEnumSchema";
 
 const config = createJobTestConfig();
 const job = {
@@ -186,7 +187,7 @@ describe("fromStateFx job material invariants", () => {
 					issues: expect.arrayContaining([
 						expect.objectContaining({
 							itemId: consumedRoot.id,
-							type: "job:consumed-material-state",
+							type: RuntimeCheckIssueEnumSchema.enum.JobConsumedMaterialState,
 						}),
 					]),
 				},
@@ -256,7 +257,7 @@ describe("fromStateFx job material invariants", () => {
 								"runtime:nested-owner",
 								"runtime:nested-water",
 							]),
-							type: "job:consumed-material-state",
+							type: RuntimeCheckIssueEnumSchema.enum.JobConsumedMaterialState,
 						}),
 					]),
 				},
@@ -332,7 +333,7 @@ describe("fromStateFx job material invariants", () => {
 							ownedJobIds: [
 								childJob.id,
 							],
-							type: "job:consumed-material-state",
+							type: RuntimeCheckIssueEnumSchema.enum.JobConsumedMaterialState,
 						}),
 					]),
 				},

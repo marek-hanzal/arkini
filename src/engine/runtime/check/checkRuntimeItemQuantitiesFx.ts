@@ -7,6 +7,7 @@ import { readReservedJobOutputQuantitiesFx } from "~/engine/job/fx/read/readRese
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import type { ItemMaxCountIssueSchema } from "~/engine/runtime/schema/check/ItemMaxCountIssueSchema";
 import type { ItemStackSizeIssueSchema } from "~/engine/runtime/schema/check/ItemStackSizeIssueSchema";
+import { RuntimeCheckIssueEnumSchema } from "~/engine/runtime/schema/check/RuntimeCheckIssueEnumSchema";
 
 export namespace checkRuntimeItemQuantitiesFx {
 	export interface Props {
@@ -32,7 +33,7 @@ export const checkRuntimeItemQuantitiesFx = Effect.fn("checkRuntimeItemQuantitie
 				itemId: item.id,
 				maxStackSize,
 				quantity: item.quantity,
-				type: "item:stack-size",
+				type: RuntimeCheckIssueEnumSchema.enum.ItemStackSize,
 			});
 		}
 	}
@@ -66,7 +67,7 @@ export const checkRuntimeItemQuantitiesFx = Effect.fn("checkRuntimeItemQuantitie
 			reservedQuantity,
 			maxCount: item.maxCount,
 			quantity,
-			type: "item:max-count",
+			type: RuntimeCheckIssueEnumSchema.enum.ItemMaxCount,
 		});
 	}
 

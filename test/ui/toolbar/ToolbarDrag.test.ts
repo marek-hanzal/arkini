@@ -17,6 +17,7 @@ import { ItemDetailModal } from "~/ui/item-detail/ItemDetailModal";
 import { ItemDetailProvider } from "~/ui/item-detail/ItemDetailProvider";
 import { motionTestRuntime } from "~test/ui/support/motionReactMock";
 import { testGameRead, testGameReadOrThrow } from "~test/support/game/testGameRead";
+import { DropItemResultKindEnumSchema } from "~/engine/runtime/schema/command/DropItemResultKindEnumSchema";
 
 (
 	globalThis as {
@@ -409,7 +410,7 @@ describe("Toolbar drag", () => {
 					}),
 				);
 				return {
-					kind: "move",
+					kind: DropItemResultKindEnumSchema.enum.Move,
 					itemId,
 					revision: firstRevision,
 					previousLocation: board(1, 1),
@@ -432,7 +433,7 @@ describe("Toolbar drag", () => {
 					}),
 				);
 				return {
-					kind: "move",
+					kind: DropItemResultKindEnumSchema.enum.Move,
 					itemId,
 					revision: secondRevision,
 					previousLocation: toolbar(0),
@@ -589,7 +590,7 @@ describe("Toolbar drag", () => {
 				}),
 			);
 			return {
-				kind: "swap",
+				kind: DropItemResultKindEnumSchema.enum.Swap,
 				source: {
 					itemId: sourceId,
 					revision: sourceNextRevision,

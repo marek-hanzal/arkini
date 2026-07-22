@@ -1,11 +1,15 @@
 import { z } from "zod";
 
+import { GameEventEnumSchema } from "./GameEventEnumSchema";
+
 import { IdSchema } from "~/engine/common/schema/IdSchema";
 import { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 
 export const ItemStackedGameEventSchema = z
 	.object({
-		type: z.literal("item:stacked"),
+		type: GameEventEnumSchema.extract([
+			GameEventEnumSchema.enum.ItemStacked,
+		]),
 		itemId: IdSchema,
 		canonicalItemId: IdSchema,
 		location: GridLocationSchema,

@@ -4,6 +4,8 @@ import type { GameSourceProvenanceSchema } from "~/engine/source/schema/GameSour
 import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { collectMaterialInputEdgesFx } from "../fx/collectMaterialInputEdgesFx";
 import type { GameDiagnosticsSchema } from "~/engine/validation/schema/GameDiagnosticsSchema";
+import { DiagnosticCodeEnumSchema } from "~/engine/validation/schema/DiagnosticCodeEnumSchema";
+import { DiagnosticSeverityEnumSchema } from "~/engine/validation/schema/DiagnosticSeverityEnumSchema";
 
 export namespace validateInputAcceptanceCyclesFx {
 	export interface Props {
@@ -34,8 +36,8 @@ export const validateInputAcceptanceCyclesFx = Effect.fn("validateInputAcceptanc
 				if (reported.has(key)) continue;
 				reported.add(key);
 				diagnostics.push({
-					code: "input:acceptance-cycle",
-					severity: "error",
+					code: DiagnosticCodeEnumSchema.enum.InputAcceptanceCycle,
+					severity: DiagnosticSeverityEnumSchema.enum.Error,
 					path: edge.path,
 					source: edge.source,
 					message: `Material input ${edge.ownerItemId} accepts itself.`,
@@ -60,8 +62,8 @@ export const validateInputAcceptanceCyclesFx = Effect.fn("validateInputAcceptanc
 			if (reported.has(key)) continue;
 			reported.add(key);
 			diagnostics.push({
-				code: "input:acceptance-cycle",
-				severity: "error",
+				code: DiagnosticCodeEnumSchema.enum.InputAcceptanceCycle,
+				severity: DiagnosticSeverityEnumSchema.enum.Error,
 				path: edge.path,
 				source: edge.source,
 				message: `Material inputs directly accept each other: ${edge.ownerItemId} ↔ ${edge.acceptedItemId}.`,

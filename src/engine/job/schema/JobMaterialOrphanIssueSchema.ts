@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { RuntimeCheckIssueEnumSchema } from "~/engine/runtime/schema/check/RuntimeCheckIssueEnumSchema";
+
 import { IdSchema } from "~/engine/common/schema/IdSchema";
 import { JobLocationSchema } from "~/engine/location/schema/JobLocationSchema";
 import { ReservedLocationSchema } from "~/engine/location/schema/ReservedLocationSchema";
@@ -12,7 +14,9 @@ export const JobMaterialOrphanIssueSchema = z
 			JobLocationSchema,
 			ReservedLocationSchema,
 		]),
-		type: z.literal("job:material-orphan"),
+		type: RuntimeCheckIssueEnumSchema.extract([
+			RuntimeCheckIssueEnumSchema.enum.JobMaterialOrphan,
+		]),
 	})
 	.strict()
 	.meta({

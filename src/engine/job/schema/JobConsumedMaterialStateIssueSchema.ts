@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { RuntimeCheckIssueEnumSchema } from "~/engine/runtime/schema/check/RuntimeCheckIssueEnumSchema";
+
 import { IdSchema } from "~/engine/common/schema/IdSchema";
 
 export const JobConsumedMaterialStateIssueSchema = z
@@ -9,7 +11,9 @@ export const JobConsumedMaterialStateIssueSchema = z
 		ownedItemIds: z.array(IdSchema),
 		ownedJobIds: z.array(IdSchema),
 		requestIds: z.array(IdSchema),
-		type: z.literal("job:consumed-material-state"),
+		type: RuntimeCheckIssueEnumSchema.extract([
+			RuntimeCheckIssueEnumSchema.enum.JobConsumedMaterialState,
+		]),
 	})
 	.strict()
 	.meta({

@@ -1,6 +1,7 @@
 import { useCallback, useRef, useState } from "react";
 import { match } from "ts-pattern";
 
+import { DropItemResultKindEnumSchema } from "~/bridge/tile/DropItemResultKindEnumSchema";
 import type { useDropItem } from "~/bridge/tile/useDropItem";
 import type { TileDragSource } from "~/ui/tile/TileDragSource";
 import type { TileDropTarget } from "~/ui/tile/TileDropTarget";
@@ -38,10 +39,10 @@ const settlementForOutcome = (
 		}))
 		.with(
 			{
-				kind: "reject",
+				kind: DropItemResultKindEnumSchema.enum.Reject,
 			},
 			(rejected) => ({
-				kind: "reject" as const,
+				kind: DropItemResultKindEnumSchema.enum.Reject,
 				feedback: "rejected" as const,
 				outcome: rejected,
 				pendingActorIds: [
@@ -51,10 +52,10 @@ const settlementForOutcome = (
 		)
 		.with(
 			{
-				kind: "ignored",
+				kind: DropItemResultKindEnumSchema.enum.Ignored,
 			},
 			(ignored) => ({
-				kind: "ignored" as const,
+				kind: DropItemResultKindEnumSchema.enum.Ignored,
 				feedback: "ignored" as const,
 				outcome: ignored,
 				pendingActorIds: [
@@ -64,10 +65,10 @@ const settlementForOutcome = (
 		)
 		.with(
 			{
-				kind: "move",
+				kind: DropItemResultKindEnumSchema.enum.Move,
 			},
 			(moved) => ({
-				kind: "move" as const,
+				kind: DropItemResultKindEnumSchema.enum.Move,
 				feedback: "accepted" as const,
 				outcome: moved,
 				location: moved.location,
@@ -78,10 +79,10 @@ const settlementForOutcome = (
 		)
 		.with(
 			{
-				kind: "swap",
+				kind: DropItemResultKindEnumSchema.enum.Swap,
 			},
 			(swapped) => ({
-				kind: "swap" as const,
+				kind: DropItemResultKindEnumSchema.enum.Swap,
 				feedback: "accepted" as const,
 				outcome: swapped,
 				sourceLocation: swapped.source.location,
@@ -93,10 +94,10 @@ const settlementForOutcome = (
 		)
 		.with(
 			{
-				kind: "merge",
+				kind: DropItemResultKindEnumSchema.enum.Merge,
 			},
 			(merged) => ({
-				kind: "merge" as const,
+				kind: DropItemResultKindEnumSchema.enum.Merge,
 				feedback: "accepted" as const,
 				outcome: merged,
 				stage: "approach" as const,
@@ -346,7 +347,7 @@ export const useTileInteractionController = ({
 						const next = match(settling.settlement)
 							.with(
 								{
-									kind: "merge",
+									kind: DropItemResultKindEnumSchema.enum.Merge,
 									stage: "approach",
 								},
 								(merge) =>
@@ -366,23 +367,23 @@ export const useTileInteractionController = ({
 							)
 							.with(
 								{
-									kind: "merge",
+									kind: DropItemResultKindEnumSchema.enum.Merge,
 									stage: "resolve",
 								},
 								{
 									kind: "failed",
 								},
 								{
-									kind: "reject",
+									kind: DropItemResultKindEnumSchema.enum.Reject,
 								},
 								{
-									kind: "ignored",
+									kind: DropItemResultKindEnumSchema.enum.Ignored,
 								},
 								{
-									kind: "move",
+									kind: DropItemResultKindEnumSchema.enum.Move,
 								},
 								{
-									kind: "swap",
+									kind: DropItemResultKindEnumSchema.enum.Swap,
 								},
 								() => removePendingActor(settling, itemId),
 							)

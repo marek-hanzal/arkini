@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { RuntimeCheckIssueEnumSchema } from "~/engine/runtime/schema/check/RuntimeCheckIssueEnumSchema";
+
 import { IdSchema } from "~/engine/common/schema/IdSchema";
 import { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
 
@@ -12,7 +14,9 @@ export const ItemStackSizeIssueSchema = z
 			"The maximum stack quantity allowed by the item's current runtime state.",
 		),
 		quantity: PositiveIntegerSchema.describe("The current excessive stack quantity."),
-		type: z.literal("item:stack-size"),
+		type: RuntimeCheckIssueEnumSchema.extract([
+			RuntimeCheckIssueEnumSchema.enum.ItemStackSize,
+		]),
 	})
 	.strict()
 	.meta({

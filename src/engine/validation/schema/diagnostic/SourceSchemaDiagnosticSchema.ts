@@ -1,12 +1,19 @@
 import { z } from "zod";
 
+import { DiagnosticCodeEnumSchema } from "~/engine/validation/schema/DiagnosticCodeEnumSchema";
+import { DiagnosticSeverityEnumSchema } from "~/engine/validation/schema/DiagnosticSeverityEnumSchema";
+
 import { BaseDiagnosticSchema } from "./BaseDiagnosticSchema";
 
 export const SourceSchemaDiagnosticSchema = z
 	.object({
 		...BaseDiagnosticSchema.shape,
-		code: z.literal("source:schema-invalid"),
-		severity: z.literal("error"),
+		code: DiagnosticCodeEnumSchema.extract([
+			DiagnosticCodeEnumSchema.enum.SourceSchemaInvalid,
+		]),
+		severity: DiagnosticSeverityEnumSchema.extract([
+			DiagnosticSeverityEnumSchema.enum.Error,
+		]),
 		issueCode: z.string().min(1),
 	})
 	.strict()

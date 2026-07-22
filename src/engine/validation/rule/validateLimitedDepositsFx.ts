@@ -1,4 +1,7 @@
 import { Effect } from "effect";
+
+import { DiagnosticCodeEnumSchema } from "~/engine/validation/schema/DiagnosticCodeEnumSchema";
+import { DiagnosticSeverityEnumSchema } from "~/engine/validation/schema/DiagnosticSeverityEnumSchema";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 
 import type { GameSourceProvenanceSchema } from "~/engine/source/schema/GameSourceProvenanceSchema";
@@ -61,8 +64,8 @@ export const validateLimitedDepositsFx = Effect.fn("validateLimitedDepositsFx")(
 		if (itemCertainty === "guaranteed") continue;
 		if (itemCertainty === "stochastic") {
 			diagnostics.push({
-				code: "deposit:stochastic-softlock",
-				severity: "warning",
+				code: DiagnosticCodeEnumSchema.enum.DepositStochasticSoftlock,
+				severity: DiagnosticSeverityEnumSchema.enum.Warning,
 				path: [
 					"items",
 					itemId,
@@ -74,8 +77,8 @@ export const validateLimitedDepositsFx = Effect.fn("validateLimitedDepositsFx")(
 			continue;
 		}
 		diagnostics.push({
-			code: "deposit:unsustainable",
-			severity: "warning",
+			code: DiagnosticCodeEnumSchema.enum.DepositUnsustainable,
+			severity: DiagnosticSeverityEnumSchema.enum.Warning,
 			path: [
 				"items",
 				itemId,

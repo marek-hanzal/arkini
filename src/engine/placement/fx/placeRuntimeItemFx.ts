@@ -13,6 +13,7 @@ import { reviseRuntimeItemFx } from "~/engine/runtime/fx/reviseRuntimeItemFx";
 import { readRuntimeItemByIdFx } from "~/engine/runtime/read/readRuntimeItemByIdFx";
 import type { GridRuntimeItemSchema } from "~/engine/runtime/schema/GridRuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 
 export namespace placeRuntimeItemFx {
 	export interface Props {
@@ -38,7 +39,7 @@ export const placeRuntimeItemFx = Effect.fn("placeRuntimeItemFx")(function* ({
 		itemId,
 		runtime,
 	});
-	if (item.location.scope === "job") {
+	if (item.location.scope === LocationScopeEnumSchema.enum.Job) {
 		return yield* Effect.fail(
 			new ItemJobScopedError({
 				itemId: item.id,

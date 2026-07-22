@@ -4,6 +4,8 @@ import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import type { GameSourceProvenanceSchema } from "~/engine/source/schema/GameSourceProvenanceSchema";
 import type { GameDiagnosticsSchema } from "~/engine/validation/schema/GameDiagnosticsSchema";
 import { readItemLineEntriesFx } from "../fx/readItemLineEntriesFx";
+import { DiagnosticCodeEnumSchema } from "~/engine/validation/schema/DiagnosticCodeEnumSchema";
+import { DiagnosticSeverityEnumSchema } from "~/engine/validation/schema/DiagnosticSeverityEnumSchema";
 
 export namespace validateLineInputCapacityFx {
 	export interface Props {
@@ -33,8 +35,8 @@ export const validateLineInputCapacityFx = Effect.fn("validateLineInputCapacityF
 					continue;
 				}
 				diagnostics.push({
-					code: "input:capacity-unsupported",
-					severity: "error",
+					code: DiagnosticCodeEnumSchema.enum.InputCapacityUnsupported,
+					severity: DiagnosticSeverityEnumSchema.enum.Error,
 					path: [
 						...path,
 						"input",

@@ -8,6 +8,7 @@ import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { readRuntimeItemPrimaryAssetId } from "~/engine/item/read/readRuntimeItemPrimaryAssetId";
 import { readRuntimeItemPrimaryAction } from "~/engine/item-detail/read/readRuntimeItemPrimaryAction";
 import { resolveActiveJobStatusFx } from "~/engine/job/fx/resolveActiveJobStatusFx";
+import { JobStatusEnumSchema } from "~/engine/job/schema/read/JobStatusEnumSchema";
 
 export namespace useTileActors {
 	export interface Item {
@@ -53,7 +54,7 @@ export const useTileActors = (): ReadonlyArray<useTileActors.Item> => {
 					title: item.item.title,
 					quantity: item.quantity,
 					location: item.location,
-					running: activeJobStatus === "running",
+					running: activeJobStatus === JobStatusEnumSchema.enum.Running,
 					primaryAction: readRuntimeItemPrimaryAction({
 						item,
 						runtime,

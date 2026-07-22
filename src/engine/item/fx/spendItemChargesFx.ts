@@ -1,5 +1,7 @@
 import { Effect } from "effect";
 
+import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
+import { ItemRemovedReasonEnumSchema } from "~/engine/event/schema/ItemRemovedReasonEnumSchema";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
 import { readLifecycleItemEventsFx } from "~/engine/event/read/readLifecycleItemEventsFx";
@@ -146,7 +148,7 @@ export const spendItemChargesFx = Effect.fn("spendItemChargesFx")(function* ({
 	}
 
 	const depletedEvent = {
-		type: "item:depleted",
+		type: GameEventEnumSchema.enum.ItemDepleted,
 		itemId: item.id,
 		canonicalItemId: item.item.id,
 		location: item.location,
@@ -158,7 +160,7 @@ export const spendItemChargesFx = Effect.fn("spendItemChargesFx")(function* ({
 			? yield* readLifecycleItemEventsFx({
 					outgoing: item,
 					placement,
-					reason: "depleted",
+					reason: ItemRemovedReasonEnumSchema.enum.Depleted,
 				})
 			: yield* readOutputPlacementItemEventsFx(placement);
 

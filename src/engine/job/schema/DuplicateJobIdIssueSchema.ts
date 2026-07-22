@@ -1,11 +1,15 @@
 import { z } from "zod";
+
+import { RuntimeCheckIssueEnumSchema } from "~/engine/runtime/schema/check/RuntimeCheckIssueEnumSchema";
 import { IdSchema } from "~/engine/common/schema/IdSchema";
 
 /** Multiple active jobs share one stable identity. */
 export const DuplicateJobIdIssueSchema = z
 	.object({
 		jobId: IdSchema,
-		type: z.literal("job:id:duplicate"),
+		type: RuntimeCheckIssueEnumSchema.extract([
+			RuntimeCheckIssueEnumSchema.enum.DuplicateJobId,
+		]),
 	})
 	.strict()
 	.meta({

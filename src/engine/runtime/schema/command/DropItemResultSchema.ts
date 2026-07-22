@@ -6,10 +6,15 @@ import { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema"
 import { ActionEnumSchema } from "~/engine/merge/schema/ActionEnumSchema";
 import { EffectEnumSchema } from "~/engine/merge/schema/EffectEnumSchema";
 import { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
+import { DropItemIgnoredReasonEnumSchema } from "./DropItemIgnoredReasonEnumSchema";
+import { DropItemRejectedReasonEnumSchema } from "./DropItemRejectedReasonEnumSchema";
+import { DropItemResultKindEnumSchema } from "./DropItemResultKindEnumSchema";
 
 const DropItemMovedResultSchema = z
 	.object({
-		kind: z.literal("move"),
+		kind: DropItemResultKindEnumSchema.extract([
+			DropItemResultKindEnumSchema.enum.Move,
+		]),
 		itemId: IdSchema,
 		revision: RevisionSchema,
 		previousLocation: GridLocationSchema,
@@ -28,7 +33,9 @@ const DropItemSwappedActorSchema = z
 
 const DropItemSwappedResultSchema = z
 	.object({
-		kind: z.literal("swap"),
+		kind: DropItemResultKindEnumSchema.extract([
+			DropItemResultKindEnumSchema.enum.Swap,
+		]),
 		source: DropItemSwappedActorSchema,
 		target: DropItemSwappedActorSchema,
 	})
@@ -46,7 +53,9 @@ const DropItemMergeActorStateSchema = z
 
 const DropItemMergedResultSchema = z
 	.object({
-		kind: z.literal("merge"),
+		kind: DropItemResultKindEnumSchema.extract([
+			DropItemResultKindEnumSchema.enum.Merge,
+		]),
 		action: ActionEnumSchema,
 		effect: EffectEnumSchema,
 		resultCanonicalItemId: IdSchema.optional(),
@@ -73,8 +82,10 @@ const DropItemMergedResultSchema = z
 
 const DropItemIgnoredResultSchema = z
 	.object({
-		kind: z.literal("ignored"),
-		reason: z.literal("same-location"),
+		kind: DropItemResultKindEnumSchema.extract([
+			DropItemResultKindEnumSchema.enum.Ignored,
+		]),
+		reason: DropItemIgnoredReasonEnumSchema,
 		itemId: IdSchema,
 		location: GridLocationSchema,
 	})
@@ -82,16 +93,10 @@ const DropItemIgnoredResultSchema = z
 
 const DropItemRejectedResultSchema = z
 	.object({
-		kind: z.literal("reject"),
-		reason: z.enum([
-			"unsupported-target",
-			"occupied",
-			"blocked",
-			"stale-source",
-			"stale-target",
-			"invalid-source",
-			"invalid-target",
+		kind: DropItemResultKindEnumSchema.extract([
+			DropItemResultKindEnumSchema.enum.Reject,
 		]),
+		reason: DropItemRejectedReasonEnumSchema,
 		itemId: IdSchema,
 		targetItemId: IdSchema.optional(),
 	})

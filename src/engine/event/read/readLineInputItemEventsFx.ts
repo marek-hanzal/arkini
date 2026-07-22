@@ -2,6 +2,7 @@ import { Effect } from "effect";
 
 import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
 import type { applyInputMaterialConsumeRunPlanFx } from "~/engine/input/fx/run/applyInputMaterialConsumeRunPlanFx";
+import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
 
 /** Translates exact accepted input consume transitions into ordered semantic facts. */
 export const readLineInputItemEventsFx = Effect.fn("readLineInputItemEventsFx")(function* (
@@ -10,7 +11,7 @@ export const readLineInputItemEventsFx = Effect.fn("readLineInputItemEventsFx")(
 	return consumption.map(
 		({ sourceItem, consumedItem, remainingQuantity }) =>
 			({
-				type: "item:consumed",
+				type: GameEventEnumSchema.enum.ItemConsumed,
 				itemId: sourceItem.id,
 				consumedItemId: consumedItem.id,
 				canonicalItemId: sourceItem.item.id,

@@ -2,6 +2,7 @@ import { Effect } from "effect";
 
 import type { GridSizeSchema } from "~/engine/grid/schema/GridSizeSchema";
 import type { InventoryLocationSchema } from "~/engine/location/schema/InventoryLocationSchema";
+import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 
 export namespace readInventoryLocationsFx {
 	export interface Props {
@@ -18,7 +19,7 @@ export const readInventoryLocationsFx = Effect.fn("readInventoryLocationsFx")(fu
 	for (let y = 0; y < size.height; y += 1) {
 		for (let x = 0; x < size.width; x += 1) {
 			locations.push({
-				scope: "inventory",
+				scope: LocationScopeEnumSchema.enum.Inventory,
 				position: {
 					x,
 					y,

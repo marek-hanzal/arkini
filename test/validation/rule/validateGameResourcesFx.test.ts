@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { validateGameResourcesFx } from "~/engine/validation/rule/validateGameResourcesFx";
 import { startTestConfig } from "~test/start/fx/support/startTestConfig";
+import { DiagnosticCodeEnumSchema } from "~/engine/validation/schema/DiagnosticCodeEnumSchema";
 
 const provenance = {
 	resources: "game.json",
@@ -65,7 +66,7 @@ describe("validateGameResourcesFx", () => {
 
 		expect(diagnostics).toContainEqual(
 			expect.objectContaining({
-				code: "resource:missing",
+				code: DiagnosticCodeEnumSchema.enum.ResourceMissing,
 				resourceId: "avatar-02",
 				path: [
 					"resources",
@@ -76,7 +77,7 @@ describe("validateGameResourcesFx", () => {
 		expect(
 			diagnostics.some(
 				(diagnostic) =>
-					diagnostic.code === "resource:missing" &&
+					diagnostic.code === DiagnosticCodeEnumSchema.enum.ResourceMissing &&
 					[
 						"avatar-01",
 						"avatar-03",
@@ -112,11 +113,11 @@ describe("validateGameResourcesFx", () => {
 		expect(diagnostics).toEqual(
 			expect.arrayContaining([
 				expect.objectContaining({
-					code: "resource:duplicate",
+					code: DiagnosticCodeEnumSchema.enum.ResourceDuplicate,
 					resourceId: "hero",
 				}),
 				expect.objectContaining({
-					code: "resource:missing",
+					code: DiagnosticCodeEnumSchema.enum.ResourceMissing,
 				}),
 			]),
 		);

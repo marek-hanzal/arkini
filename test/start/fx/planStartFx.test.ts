@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest";
 import { useGameFx } from "~/engine/game/fx/useGameFx";
 import { startTestConfig } from "~test/start/fx/support/startTestConfig";
 import { planStartFx } from "~/engine/start/fx/planStartFx";
+import { RuntimeCheckIssueEnumSchema } from "~/engine/runtime/schema/check/RuntimeCheckIssueEnumSchema";
 
 describe("planStartFx", () => {
 	it("combines board and inventory plans against one evolving draft", () => {
@@ -160,7 +161,7 @@ describe("planStartFx", () => {
 				result: {
 					issues: [
 						expect.objectContaining({
-							type: "location:occupied",
+							type: RuntimeCheckIssueEnumSchema.enum.LocationOccupied,
 						}),
 					],
 				},

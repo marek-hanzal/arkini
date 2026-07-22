@@ -9,6 +9,8 @@ import {
 	createRootSource,
 	createSimpleItem,
 } from "~test/validation/support/gameValidationTestSource";
+import { DiagnosticCodeEnumSchema } from "~/engine/validation/schema/DiagnosticCodeEnumSchema";
+import { DiagnosticRecordEntityEnumSchema } from "~/engine/validation/schema/DiagnosticRecordEntityEnumSchema";
 
 const compileItems = (
 	items: Record<string, unknown>,
@@ -36,8 +38,8 @@ describe("completed config reference validation", () => {
 		expect(result.diagnostics).toEqual(
 			expect.arrayContaining([
 				expect.objectContaining({
-					code: "config:key-id-mismatch",
-					entity: "item",
+					code: DiagnosticCodeEnumSchema.enum.ConfigKeyIdMismatch,
+					entity: DiagnosticRecordEntityEnumSchema.enum.Item,
 					key: "item:key",
 					id: "item:embedded",
 				}),
@@ -67,8 +69,8 @@ describe("completed config reference validation", () => {
 		expect(result.diagnostics).toEqual(
 			expect.arrayContaining([
 				expect.objectContaining({
-					code: "config:key-id-mismatch",
-					entity: "category",
+					code: DiagnosticCodeEnumSchema.enum.ConfigKeyIdMismatch,
+					entity: DiagnosticRecordEntityEnumSchema.enum.Category,
 					key: "category:key",
 					id: "category:embedded",
 				}),
@@ -121,25 +123,25 @@ describe("completed config reference validation", () => {
 			},
 		);
 		const missing = result.diagnostics.filter(
-			({ code }) => code === "config:missing-reference",
+			({ code }) => code === DiagnosticCodeEnumSchema.enum.ConfigMissingReference,
 		);
 
 		expect(missing).toEqual(
 			expect.arrayContaining([
 				expect.objectContaining({
-					reference: "item",
+					reference: DiagnosticRecordEntityEnumSchema.enum.Item,
 					referenceId: "item:missing-start",
 				}),
 				expect.objectContaining({
-					reference: "category",
+					reference: DiagnosticRecordEntityEnumSchema.enum.Category,
 					referenceId: "category:missing",
 				}),
 				expect.objectContaining({
-					reference: "item",
+					reference: DiagnosticRecordEntityEnumSchema.enum.Item,
 					referenceId: "item:missing-input",
 				}),
 				expect.objectContaining({
-					reference: "item",
+					reference: DiagnosticRecordEntityEnumSchema.enum.Item,
 					referenceId: "item:missing-output",
 				}),
 			]),

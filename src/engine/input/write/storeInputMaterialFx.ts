@@ -20,6 +20,7 @@ import { isBoardRuntimeItem } from "~/engine/runtime/read/isBoardRuntimeItem";
 import { isGridRuntimeItem } from "~/engine/runtime/read/isGridRuntimeItem";
 import { CrossSpaceBoardOperationError } from "~/engine/space/error/CrossSpaceBoardOperationError";
 import { readRuntimeItemByIdFx } from "~/engine/runtime/read/readRuntimeItemByIdFx";
+import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 
 export namespace storeInputMaterialFx {
 	export interface Props {
@@ -137,7 +138,7 @@ export const storeInputMaterialFx = Effect.fn("storeInputMaterialFx")(function* 
 
 			const [result, inputRuntime] = yield* applyInputMaterialStorePlanFx({
 				location: {
-					scope: "input",
+					scope: LocationScopeEnumSchema.enum.Input,
 					ownerItemId,
 					lineId,
 					inputIndex,

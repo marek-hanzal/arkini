@@ -1,5 +1,7 @@
 import { Effect } from "effect";
 
+import { RuntimeCheckIssueEnumSchema } from "~/engine/runtime/schema/check/RuntimeCheckIssueEnumSchema";
+
 import { resolveInputMaterialFx } from "~/engine/input/fx/resolveInputMaterialFx";
 import { readInputSlotLocationFx } from "~/engine/input/read/readInputSlotLocationFx";
 import type { InputMaterialSchema } from "~/engine/input/schema/InputMaterialSchema";
@@ -69,7 +71,7 @@ export const checkRuntimeInputLocationsFx = Effect.fn("checkRuntimeInputLocation
 			ownerIssues.push({
 				itemId: item.id,
 				location,
-				type: "input:owner-missing",
+				type: RuntimeCheckIssueEnumSchema.enum.InputOwnerMissing,
 			});
 			continue;
 		}
@@ -82,7 +84,7 @@ export const checkRuntimeInputLocationsFx = Effect.fn("checkRuntimeInputLocation
 			lineIssues.push({
 				itemId: item.id,
 				location,
-				type: "input:line-missing",
+				type: RuntimeCheckIssueEnumSchema.enum.InputLineMissing,
 			});
 			continue;
 		}
@@ -92,7 +94,7 @@ export const checkRuntimeInputLocationsFx = Effect.fn("checkRuntimeInputLocation
 			slotIssues.push({
 				itemId: item.id,
 				location,
-				type: "input:slot-invalid",
+				type: RuntimeCheckIssueEnumSchema.enum.InputSlotInvalid,
 			});
 			continue;
 		}
@@ -107,7 +109,7 @@ export const checkRuntimeInputLocationsFx = Effect.fn("checkRuntimeInputLocation
 			selectorIssues.push({
 				itemId: item.id,
 				location,
-				type: "input:selector-mismatch",
+				type: RuntimeCheckIssueEnumSchema.enum.InputSelectorMismatch,
 			});
 			continue;
 		}
@@ -153,7 +155,7 @@ export const checkRuntimeInputLocationsFx = Effect.fn("checkRuntimeInputLocation
 				lineId: current.location.lineId,
 				inputIndex: current.location.inputIndex,
 				itemIds: items.map((candidate) => candidate.item.id),
-				type: "line:input-closed",
+				type: RuntimeCheckIssueEnumSchema.enum.LineInputClosed,
 			});
 		}
 		const resolution = yield* resolveInputMaterialFx({
@@ -168,7 +170,7 @@ export const checkRuntimeInputLocationsFx = Effect.fn("checkRuntimeInputLocation
 				itemIds: items.map((candidate) => candidate.item.id),
 				storedQuantity,
 				maxStoredQuantity: resolution.maxStoredQuantity,
-				type: "input:capacity-exceeded",
+				type: RuntimeCheckIssueEnumSchema.enum.InputCapacityExceeded,
 			});
 		}
 	}

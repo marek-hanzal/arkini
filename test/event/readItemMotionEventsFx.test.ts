@@ -5,6 +5,8 @@ import { readLifecycleItemEventsFx } from "~/engine/event/read/readLifecycleItem
 import { readOutputPlacementItemEventsFx } from "~/engine/event/read/readOutputPlacementItemEventsFx";
 import type { OutputPlacementResultSchema } from "~/engine/placement/schema/OutputPlacementResultSchema";
 import { createJobTestConfig } from "~test/job/support/jobTestConfig";
+import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
+import { ItemRemovedReasonEnumSchema } from "~/engine/event/schema/ItemRemovedReasonEnumSchema";
 
 const config = createJobTestConfig();
 const board = (x: number) => ({
@@ -74,7 +76,7 @@ describe("item motion event readers", () => {
 
 		expect(Effect.runSync(readOutputPlacementItemEventsFx(placement))).toEqual([
 			{
-				type: "item:stacked",
+				type: GameEventEnumSchema.enum.ItemStacked,
 				itemId: stacked.id,
 				canonicalItemId: "water",
 				location: stacked.location,
@@ -82,7 +84,7 @@ describe("item motion event readers", () => {
 				quantity: 3,
 			},
 			{
-				type: "item:spawned",
+				type: GameEventEnumSchema.enum.ItemSpawned,
 				itemId: spawned.id,
 				canonicalItemId: "water",
 				location: spawned.location,
@@ -128,12 +130,12 @@ describe("item motion event readers", () => {
 				readLifecycleItemEventsFx({
 					outgoing,
 					placement,
-					reason: "lifecycle",
+					reason: ItemRemovedReasonEnumSchema.enum.Lifecycle,
 				}),
 			),
 		).toEqual([
 			{
-				type: "item:replaced",
+				type: GameEventEnumSchema.enum.ItemReplaced,
 				outgoingItemId: outgoing.id,
 				outgoingCanonicalItemId: "tool",
 				outgoingQuantity: outgoing.quantity,

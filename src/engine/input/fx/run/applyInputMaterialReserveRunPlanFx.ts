@@ -11,6 +11,7 @@ import { reviseRuntimeItemFx } from "~/engine/runtime/fx/reviseRuntimeItemFx";
 import type { InputRuntimeItemSchema } from "~/engine/runtime/schema/InputRuntimeItemSchema";
 import type { ReservedRuntimeItemSchema } from "~/engine/runtime/schema/ReservedRuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 
 export namespace applyInputMaterialReserveRunPlanFx {
 	export interface Props {
@@ -44,7 +45,7 @@ export const applyInputMaterialReserveRunPlanFx = Effect.fn("applyInputMaterialR
 					runtime: draft,
 				});
 				const location = {
-					scope: "reserved",
+					scope: LocationScopeEnumSchema.enum.Reserved,
 					jobId,
 				} satisfies ReservedLocationSchema.Type;
 

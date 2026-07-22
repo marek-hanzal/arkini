@@ -8,6 +8,7 @@ import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
 import { runTickRuntimeByFx } from "~/engine/tick/fx/runTickRuntimeByFx";
 import { createJobTestConfig, prepareJobLineFx } from "~test/job/support/jobTestConfig";
 import { createTickFailureTestConfig } from "~test/tick/support/createTickFailureTestConfig";
+import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
 
 const waitFor = async (assertion: () => boolean, timeoutMs = 1_000) => {
 	const startedAt = performance.now();
@@ -26,7 +27,7 @@ const emitCompletedEventFx = (jobId: string) =>
 			runtime,
 			[
 				{
-					type: "job:completed" as const,
+					type: GameEventEnumSchema.enum.JobCompleted,
 					jobId,
 					ownerItemId: "owner:listener",
 					lineId: "line:listener",
@@ -134,7 +135,7 @@ describe("createGameSessionFx", () => {
 							runtime,
 							[
 								{
-									type: "job:completed" as const,
+									type: GameEventEnumSchema.enum.JobCompleted,
 									jobId: "job:event:planned",
 									ownerItemId: "owner:event:planned",
 									lineId: "line:event:planned",
@@ -361,7 +362,7 @@ describe("createGameSessionFx", () => {
 		});
 		let observedStartedJob = false;
 		const unsubscribe = session.subscribeEvents((batch) => {
-			const started = batch.events.find((event) => event.type === "job:started");
+			const started = batch.events.find((event) => event.type === GameEventEnumSchema.enum.JobStarted);
 			if (started !== undefined) {
 				observedStartedJob = session
 					.getSnapshot()
@@ -413,7 +414,7 @@ describe("createGameSessionFx", () => {
 						},
 						[
 							{
-								type: "job:completed" as const,
+								type: GameEventEnumSchema.enum.JobCompleted,
 								jobId: "job:combined",
 								ownerItemId: "owner:combined",
 								lineId: "line:combined",
@@ -464,7 +465,7 @@ describe("createGameSessionFx", () => {
 						},
 						[
 							{
-								type: "job:completed" as const,
+								type: GameEventEnumSchema.enum.JobCompleted,
 								jobId: "job:nested:current",
 								ownerItemId: "owner:nested",
 								lineId: "line:nested",
@@ -586,7 +587,7 @@ describe("createGameSessionFx", () => {
 						},
 						[
 							{
-								type: "job:completed" as const,
+								type: GameEventEnumSchema.enum.JobCompleted,
 								jobId: "job:dispose:pending",
 								ownerItemId: "owner:dispose:pending",
 								lineId: "line:dispose:pending",

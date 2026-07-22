@@ -6,6 +6,8 @@ import {
 	createRootSource,
 	createSimpleItem,
 } from "~test/validation/support/gameValidationTestSource";
+import { DiagnosticCodeEnumSchema } from "~/engine/validation/schema/DiagnosticCodeEnumSchema";
+import { InvalidMergeReasonEnumSchema } from "~/engine/validation/schema/InvalidMergeReasonEnumSchema";
 
 const compileDiagnostics = async (items: Record<string, unknown>) =>
 	(
@@ -56,7 +58,7 @@ const mergeSource = ({
 });
 
 const mergeDiagnostics = async (items: Record<string, unknown>) =>
-	(await compileDiagnostics(items)).filter(({ code }) => code === "merge:invalid");
+	(await compileDiagnostics(items)).filter(({ code }) => code === DiagnosticCodeEnumSchema.enum.MergeInvalid);
 
 describe("validateMergeViabilityFx", () => {
 	it("rejects an exact inventory-only merge target", async () => {
@@ -80,7 +82,7 @@ describe("validateMergeViabilityFx", () => {
 			expect.objectContaining({
 				ownerItemId: source.id,
 				mergeIndex: 0,
-				reason: "target-unavailable",
+				reason: InvalidMergeReasonEnumSchema.enum.TargetUnavailable,
 			}),
 		]);
 	});
@@ -106,7 +108,7 @@ describe("validateMergeViabilityFx", () => {
 			}),
 		).toEqual([
 			expect.objectContaining({
-				reason: "target-unavailable",
+				reason: InvalidMergeReasonEnumSchema.enum.TargetUnavailable,
 			}),
 		]);
 	});
@@ -155,7 +157,7 @@ describe("validateMergeViabilityFx", () => {
 			}),
 		).toEqual([
 			expect.objectContaining({
-				reason: "self-target-unavailable",
+				reason: InvalidMergeReasonEnumSchema.enum.SelfTargetUnavailable,
 			}),
 		]);
 	});
@@ -224,7 +226,7 @@ describe("validateMergeViabilityFx", () => {
 			}),
 		).toEqual([
 			expect.objectContaining({
-				reason: "result-unavailable",
+				reason: InvalidMergeReasonEnumSchema.enum.ResultUnavailable,
 			}),
 		]);
 	});
@@ -266,8 +268,8 @@ describe("validateMergeViabilityFx", () => {
 			[source.id]: source,
 		});
 
-		expect(diagnostics.filter(({ code }) => code === "merge:invalid")).toEqual([]);
-		expect(diagnostics.filter(({ code }) => code === "config:missing-reference")).toEqual(
+		expect(diagnostics.filter(({ code }) => code === DiagnosticCodeEnumSchema.enum.MergeInvalid)).toEqual([]);
+		expect(diagnostics.filter(({ code }) => code === DiagnosticCodeEnumSchema.enum.ConfigMissingReference)).toEqual(
 			expect.arrayContaining([
 				expect.objectContaining({
 					referenceId: "missing:target",

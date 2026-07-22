@@ -5,6 +5,7 @@ import { useGameFx } from "~/engine/game/fx/useGameFx";
 import { readLineStartFx } from "~/engine/job/read/readLineStartFx";
 import { startLineFx } from "~/engine/job/write/startLineFx";
 import { createJobTestConfig, prepareJobLineFx } from "~test/job/support/jobTestConfig";
+import { StartLineResultEnumSchema } from "~/engine/job/schema/StartLineResultEnumSchema";
 
 const props = {
 	ownerItemId: "runtime:forge",
@@ -59,8 +60,8 @@ describe("readLineStartFx", () => {
 			capacity: 1,
 			available: false,
 		});
-		expect(result.started.type).toBe("started");
-		if (result.started.type === "started") {
+		expect(result.started.type).toBe(StartLineResultEnumSchema.enum.Started);
+		if (result.started.type === StartLineResultEnumSchema.enum.Started) {
 			expect(result.resolution.queue.jobs).toEqual([
 				result.started.job,
 			]);

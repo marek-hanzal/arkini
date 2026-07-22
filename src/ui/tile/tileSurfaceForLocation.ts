@@ -2,13 +2,14 @@ import { match } from "ts-pattern";
 
 import type { TileLocation } from "~/bridge/tile/TileLocation";
 import type { TileSurface } from "~/ui/tile/TileSurface";
+import { LocationScopeEnumSchema } from "~/bridge/tile/LocationScopeEnumSchema";
 
 /** Maps one canonical grid location to its presentation surface identity. */
 export const tileSurfaceForLocation = (location: TileLocation): TileSurface =>
 	match(location)
 		.with(
 			{
-				scope: "board",
+				scope: LocationScopeEnumSchema.enum.Board,
 			},
 			(board): TileSurface => ({
 				id: `board:${board.space}`,
@@ -18,7 +19,7 @@ export const tileSurfaceForLocation = (location: TileLocation): TileSurface =>
 		)
 		.with(
 			{
-				scope: "inventory",
+				scope: LocationScopeEnumSchema.enum.Inventory,
 			},
 			(): TileSurface => ({
 				id: "inventory",
@@ -27,7 +28,7 @@ export const tileSurfaceForLocation = (location: TileLocation): TileSurface =>
 		)
 		.with(
 			{
-				scope: "toolbar",
+				scope: LocationScopeEnumSchema.enum.Toolbar,
 			},
 			(): TileSurface => ({
 				id: "toolbar",

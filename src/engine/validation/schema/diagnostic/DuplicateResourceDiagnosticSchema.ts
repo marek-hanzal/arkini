@@ -1,13 +1,20 @@
 import { z } from "zod";
 
+import { DiagnosticCodeEnumSchema } from "~/engine/validation/schema/DiagnosticCodeEnumSchema";
+import { DiagnosticSeverityEnumSchema } from "~/engine/validation/schema/DiagnosticSeverityEnumSchema";
+
 import { IdSchema } from "~/engine/common/schema/IdSchema";
 import { BaseDiagnosticSchema } from "./BaseDiagnosticSchema";
 
 export const DuplicateResourceDiagnosticSchema = z
 	.object({
 		...BaseDiagnosticSchema.shape,
-		code: z.literal("resource:duplicate"),
-		severity: z.literal("error"),
+		code: DiagnosticCodeEnumSchema.extract([
+			DiagnosticCodeEnumSchema.enum.ResourceDuplicate,
+		]),
+		severity: DiagnosticSeverityEnumSchema.extract([
+			DiagnosticSeverityEnumSchema.enum.Error,
+		]),
 		resourceId: IdSchema,
 		sources: z.tuple([
 			z.string().min(1),

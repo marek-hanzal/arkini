@@ -9,6 +9,8 @@ import type { useTileActors } from "~/bridge/tile/useTileActors";
 import { TileMotionCueVisual } from "~/ui/tile/TileMotionCueVisual";
 import { useTileMotionCues } from "~/ui/tile/useTileMotionCues";
 import { motionTestRuntime } from "~test/ui/support/motionReactMock";
+import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
+import { ItemRemovedReasonEnumSchema } from "~/engine/event/schema/ItemRemovedReasonEnumSchema";
 
 (
 	globalThis as {
@@ -99,7 +101,7 @@ describe("tile motion cue lifecycle", () => {
 
 		await dispatch([
 			{
-				type: "item:stacked",
+				type: GameEventEnumSchema.enum.ItemStacked,
 				itemId: "runtime:stack",
 				canonicalItemId: "item:stack",
 				location: liveItems[0].location,
@@ -112,7 +114,7 @@ describe("tile motion cue lifecycle", () => {
 
 		await dispatch([
 			{
-				type: "item:stacked",
+				type: GameEventEnumSchema.enum.ItemStacked,
 				itemId: "runtime:stack",
 				canonicalItemId: "item:stack",
 				location: liveItems[0].location,
@@ -143,12 +145,12 @@ describe("tile motion cue lifecycle", () => {
 		await act(async () => root.render(createElement(Capture)));
 		await dispatch([
 			{
-				type: "item:removed",
+				type: GameEventEnumSchema.enum.ItemRemoved,
 				itemId: "runtime:removed",
 				canonicalItemId: "item:removed",
 				location: liveItems[0].location,
 				quantity: 1,
-				reason: "expired",
+				reason: ItemRemovedReasonEnumSchema.enum.Expired,
 			},
 		]);
 		liveItems = [];
@@ -182,7 +184,7 @@ describe("tile motion cue lifecycle", () => {
 		await act(async () => root.render(createElement(Capture)));
 		await dispatch([
 			{
-				type: "item:replaced",
+				type: GameEventEnumSchema.enum.ItemReplaced,
 				outgoingItemId: "runtime:outgoing",
 				outgoingCanonicalItemId: "item:outgoing",
 				outgoingQuantity: 1,
@@ -222,12 +224,12 @@ describe("tile motion cue lifecycle", () => {
 		await act(async () => root.render(createElement(Capture)));
 		await dispatch([
 			{
-				type: "item:removed",
+				type: GameEventEnumSchema.enum.ItemRemoved,
 				itemId: "runtime:fallback",
 				canonicalItemId: "item:fallback",
 				location: liveItems[0].location,
 				quantity: 1,
-				reason: "lifecycle",
+				reason: ItemRemovedReasonEnumSchema.enum.Lifecycle,
 			},
 		]);
 		liveItems = [];
@@ -255,12 +257,12 @@ describe("tile motion cue lifecycle", () => {
 		await act(async () => root.render(createElement(Capture)));
 		await dispatch([
 			{
-				type: "item:removed",
+				type: GameEventEnumSchema.enum.ItemRemoved,
 				itemId: "runtime:old-game",
 				canonicalItemId: "item:old-game",
 				location: liveItems[0].location,
 				quantity: 1,
-				reason: "lifecycle",
+				reason: ItemRemovedReasonEnumSchema.enum.Lifecycle,
 			},
 		]);
 		expect(current?.retainedItems).toHaveLength(1);
@@ -292,14 +294,14 @@ describe("tile motion cue lifecycle", () => {
 		await act(async () => root.render(createElement(Capture)));
 		await dispatch([
 			{
-				type: "item:spawned",
+				type: GameEventEnumSchema.enum.ItemSpawned,
 				itemId: "runtime:board:old",
 				canonicalItemId: "item:board:old",
 				location: liveItems[0].location,
 				quantity: 1,
 			},
 			{
-				type: "item:spawned",
+				type: GameEventEnumSchema.enum.ItemSpawned,
 				itemId: "runtime:inventory",
 				canonicalItemId: "item:inventory",
 				location: liveItems[2].location,
@@ -308,7 +310,7 @@ describe("tile motion cue lifecycle", () => {
 		]);
 		await dispatch([
 			{
-				type: "current-space:changed",
+				type: GameEventEnumSchema.enum.CurrentSpaceChanged,
 				previousSpace: 0,
 				currentSpace: 1,
 			},

@@ -12,6 +12,7 @@ import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { TickFx } from "~/engine/tick/context/TickFx";
 import { advanceRuntimeStepFx } from "~/engine/tick/internal/advanceRuntimeStepFx";
 import { runTickRuntimeByFx } from "~/engine/tick/fx/runTickRuntimeByFx";
+import { JobStatusEnumSchema } from "~/engine/job/schema/read/JobStatusEnumSchema";
 import { createJobTestConfig, prepareJobLineFx } from "~test/job/support/jobTestConfig";
 import { existsWhen } from "~test/line/fx/support/lineTestRuntime";
 import {
@@ -19,6 +20,7 @@ import {
 	prepareFixedStepRuntimeFx,
 	summarizeFixedStepRuntime,
 } from "~test/tick/support/fixedStepTestRuntime";
+import { StartLineResultEnumSchema } from "~/engine/job/schema/StartLineResultEnumSchema";
 
 const props = {
 	ownerItemId: "runtime:forge",
@@ -185,8 +187,8 @@ describe("runTickRuntimeByFx", () => {
 			),
 		);
 
-		expect(result.first.type).toBe("started");
-		expect(result.second.type).toBe("queued");
+		expect(result.first.type).toBe(StartLineResultEnumSchema.enum.Started);
+		expect(result.second.type).toBe(StartLineResultEnumSchema.enum.Queued);
 		expect(result.runtime.jobs).toEqual([]);
 		expect(result.runtime.jobQueue).toEqual([]);
 		expect(result.runtime.items.filter((item) => item.item.id === "water")).toEqual([]);
@@ -296,13 +298,13 @@ describe("runTickRuntimeByFx", () => {
 		);
 
 		expect(result.paused[0]).toMatchObject({
-			status: "paused",
+			status: JobStatusEnumSchema.enum.Paused,
 			job: {
 				remainingMs: 1_000,
 			},
 		});
 		expect(result.resumed[0]).toMatchObject({
-			status: "running",
+			status: JobStatusEnumSchema.enum.Running,
 			job: {
 				remainingMs: 400,
 			},

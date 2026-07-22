@@ -8,6 +8,7 @@ import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { runTickRuntimeByFx } from "~/engine/tick/fx/runTickRuntimeByFx";
+import { StartLineResultEnumSchema } from "~/engine/job/schema/StartLineResultEnumSchema";
 
 const base = (id: string, scope: "any" | "board" = "board") => ({
 	id,
@@ -188,7 +189,7 @@ const reserveWorkerFx = Effect.fn("reserveWorkerFx")(function* ({
 		ownerItemId: employerId,
 		lineId: "line:employer:run",
 	});
-	if (started.type !== "started") return yield* Effect.dieMessage("Employer did not start.");
+	if (started.type !== StartLineResultEnumSchema.enum.Started) return yield* Effect.dieMessage("Employer did not start.");
 	return started.job;
 });
 

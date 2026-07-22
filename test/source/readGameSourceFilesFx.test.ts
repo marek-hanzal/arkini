@@ -4,6 +4,7 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { readGameSourceFilesFx } from "~/engine/compiler/fx/readGameSourceFilesFx";
+import { DiagnosticCodeEnumSchema } from "~/engine/validation/schema/DiagnosticCodeEnumSchema";
 
 describe("readGameSourceFilesFx", () => {
 	it("collects JSON syntax and fragment-schema diagnostics across files", async () => {
@@ -29,11 +30,11 @@ describe("readGameSourceFilesFx", () => {
 		expect(result.diagnostics).toEqual(
 			expect.arrayContaining([
 				expect.objectContaining({
-					code: "source:json-invalid",
+					code: DiagnosticCodeEnumSchema.enum.SourceJsonInvalid,
 					source: expect.stringContaining("broken.json"),
 				}),
 				expect.objectContaining({
-					code: "source:schema-invalid",
+					code: DiagnosticCodeEnumSchema.enum.SourceSchemaInvalid,
 					source: expect.stringContaining("invalid.json"),
 				}),
 			]),

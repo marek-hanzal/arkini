@@ -8,6 +8,9 @@ import { startLineRuntimeFx } from "~/engine/job/fx/startLineRuntimeFx";
 import type { StartLineResultSchema } from "~/engine/job/schema/StartLineResultSchema";
 import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
+import { JobStartSourceEnumSchema } from "~/engine/event/schema/JobStartSourceEnumSchema";
+import { StartLineResultEnumSchema } from "~/engine/job/schema/StartLineResultEnumSchema";
 export namespace startLineFx {
 	export interface Props {
 		ownerItemId: IdSchema.Type;
@@ -32,17 +35,17 @@ export const startLineFx = Effect.fn("startLineFx")(function* ({
 				});
 				return [
 					{
-						type: "started",
+						type: StartLineResultEnumSchema.enum.Started,
 						job,
 					} satisfies StartLineResultSchema.Type,
 					nextRuntime,
 					[
 						{
-							type: "job:started",
+							type: GameEventEnumSchema.enum.JobStarted,
 							jobId: job.id,
 							ownerItemId: job.ownerItemId,
 							lineId: job.lineId,
-							source: "explicit",
+							source: JobStartSourceEnumSchema.enum.Explicit,
 						},
 						...itemEvents,
 					],
@@ -69,7 +72,7 @@ export const startLineFx = Effect.fn("startLineFx")(function* ({
 			} satisfies RuntimeSchema.Type;
 			return [
 				{
-					type: "queued",
+					type: StartLineResultEnumSchema.enum.Queued,
 					request,
 				} satisfies StartLineResultSchema.Type,
 				nextRuntime,

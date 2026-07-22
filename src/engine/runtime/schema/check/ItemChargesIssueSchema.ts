@@ -1,5 +1,8 @@
 import { z } from "zod";
 
+import { RuntimeCheckIssueEnumSchema } from "~/engine/runtime/schema/check/RuntimeCheckIssueEnumSchema";
+import { ItemChargesIssueReasonEnumSchema } from "./ItemChargesIssueReasonEnumSchema";
+
 import { IdSchema } from "~/engine/common/schema/IdSchema";
 import { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeIntegerSchema";
 import { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
@@ -7,16 +10,13 @@ import { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSch
 /** One live item's persisted charge state violates the canonical charge contract. */
 export const ItemChargesIssueSchema = z
 	.object({
-		type: z.literal("item:charges"),
+		type: RuntimeCheckIssueEnumSchema.extract([
+			RuntimeCheckIssueEnumSchema.enum.ItemCharges,
+		]),
 		itemId: IdSchema,
 		amount: PositiveIntegerSchema.optional(),
 		remainingCharges: NonNegativeIntegerSchema,
-		reason: z.enum([
-			"missing-config",
-			"exceeds-amount",
-			"full-state",
-			"depleted-idle",
-		]),
+		reason: ItemChargesIssueReasonEnumSchema,
 	})
 	.strict()
 	.meta({

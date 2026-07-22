@@ -8,6 +8,7 @@ import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { createJobTestConfig, prepareJobLineFx } from "~test/job/support/jobTestConfig";
+import { StartLineResultEnumSchema } from "~/engine/job/schema/StartLineResultEnumSchema";
 
 const config = createJobTestConfig(2);
 const request = {
@@ -222,8 +223,8 @@ describe("attemptQueuedLineStartFx", () => {
 			),
 		);
 
-		expect(result.type).toBe("started");
-		if (result.type !== "started") throw new Error("Expected the FIFO request to start.");
+		expect(result.type).toBe(StartLineResultEnumSchema.enum.Started);
+		if (result.type !== StartLineResultEnumSchema.enum.Started) throw new Error("Expected the FIFO request to start.");
 		expect(result.job.lineId).toBe(request.lineId);
 		expect(result.runtime.jobQueue).toEqual([
 			expect.objectContaining({

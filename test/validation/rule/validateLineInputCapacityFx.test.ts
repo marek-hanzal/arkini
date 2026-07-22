@@ -9,6 +9,7 @@ import {
 	createRootSource,
 	createSimpleItem,
 } from "~test/validation/support/gameValidationTestSource";
+import { DiagnosticCodeEnumSchema } from "~/engine/validation/schema/DiagnosticCodeEnumSchema";
 
 const bufferedInput = (capacity: number): ReadonlyArray<InputSchema.Type> => [
 	{
@@ -49,7 +50,7 @@ const diagnostics = async (items: Record<string, unknown>) =>
 				}),
 			]),
 		)
-	).diagnostics.filter(({ code }) => code === "input:capacity-unsupported");
+	).diagnostics.filter(({ code }) => code === DiagnosticCodeEnumSchema.enum.InputCapacityUnsupported);
 
 describe("validateLineInputCapacityFx", () => {
 	it("allows positive material capacity on producer lines", async () => {

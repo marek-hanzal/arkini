@@ -2,6 +2,8 @@ import { Effect } from "effect";
 
 import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
 import type { OutputPlacementResultSchema } from "~/engine/placement/schema/OutputPlacementResultSchema";
+import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
+import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 
 /** Translates concrete placement results into exact committed spawn and stack facts. */
 export const readOutputPlacementItemEventsFx = Effect.fn("readOutputPlacementItemEventsFx")(
@@ -9,11 +11,11 @@ export const readOutputPlacementItemEventsFx = Effect.fn("readOutputPlacementIte
 		const events: GameEventSchema.Type[] = [];
 		for (const drop of placement.drop) {
 			for (const stack of drop.placement.stack) {
-				if (stack.item.location.scope === "job" || stack.item.location.scope === "reserved") {
+				if (stack.item.location.scope === LocationScopeEnumSchema.enum.Job || stack.item.location.scope === LocationScopeEnumSchema.enum.Reserved) {
 					continue;
 				}
 				events.push({
-					type: "item:stacked",
+					type: GameEventEnumSchema.enum.ItemStacked,
 					itemId: stack.item.id,
 					canonicalItemId: stack.item.item.id,
 					location: stack.item.location,
@@ -22,9 +24,9 @@ export const readOutputPlacementItemEventsFx = Effect.fn("readOutputPlacementIte
 				});
 			}
 			for (const item of drop.placement.spawn) {
-				if (item.location.scope === "job" || item.location.scope === "reserved") continue;
+				if (item.location.scope === LocationScopeEnumSchema.enum.Job || item.location.scope === LocationScopeEnumSchema.enum.Reserved) continue;
 				events.push({
-					type: "item:spawned",
+					type: GameEventEnumSchema.enum.ItemSpawned,
 					itemId: item.id,
 					canonicalItemId: item.item.id,
 					location: item.location,

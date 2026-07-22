@@ -5,6 +5,8 @@ import type { GameSourceProvenanceSchema } from "~/engine/source/schema/GameSour
 import type { ResourceDescriptorSchema } from "~/engine/resource/schema/ResourceDescriptorSchema";
 import type { DiagnosticPathSchema } from "~/engine/validation/schema/DiagnosticPathSchema";
 import type { GameDiagnosticsSchema } from "~/engine/validation/schema/GameDiagnosticsSchema";
+import { DiagnosticCodeEnumSchema } from "~/engine/validation/schema/DiagnosticCodeEnumSchema";
+import { DiagnosticSeverityEnumSchema } from "~/engine/validation/schema/DiagnosticSeverityEnumSchema";
 
 interface ResourceReference {
 	readonly id: string;
@@ -31,8 +33,8 @@ export const validateGameResourcesFx = Effect.fn("validateGameResourcesFx")(func
 			continue;
 		}
 		diagnostics.push({
-			code: "resource:duplicate",
-			severity: "error",
+			code: DiagnosticCodeEnumSchema.enum.ResourceDuplicate,
+			severity: DiagnosticSeverityEnumSchema.enum.Error,
 			path: [
 				"resources",
 				resource.id,
@@ -111,8 +113,8 @@ export const validateGameResourcesFx = Effect.fn("validateGameResourcesFx")(func
 	for (const reference of references) {
 		if (firstById.has(reference.id)) continue;
 		diagnostics.push({
-			code: "resource:missing",
-			severity: "error",
+			code: DiagnosticCodeEnumSchema.enum.ResourceMissing,
+			severity: DiagnosticSeverityEnumSchema.enum.Error,
 			path: reference.path,
 			source: reference.source,
 			message: `Referenced resource ${reference.id} has no matching PNG file.`,
@@ -122,8 +124,8 @@ export const validateGameResourcesFx = Effect.fn("validateGameResourcesFx")(func
 	for (const resource of firstById.values()) {
 		if (referenced.has(resource.id)) continue;
 		diagnostics.push({
-			code: "resource:unused",
-			severity: "warning",
+			code: DiagnosticCodeEnumSchema.enum.ResourceUnused,
+			severity: DiagnosticSeverityEnumSchema.enum.Warning,
 			path: [
 				"resources",
 				resource.id,

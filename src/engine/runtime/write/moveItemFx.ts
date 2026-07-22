@@ -17,6 +17,7 @@ import { isGridRuntimeItem } from "~/engine/runtime/read/isGridRuntimeItem";
 import type { MoveItemResultSchema } from "~/engine/runtime/schema/command/MoveItemResultSchema";
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 
 export namespace moveItemFx {
 	export interface Props {
@@ -87,8 +88,8 @@ export const moveItemFx = Effect.fn("moveItemFx")(function* ({
 			}
 
 			if (
-				item.location.scope === "board" &&
-				location.scope === "board" &&
+				item.location.scope === LocationScopeEnumSchema.enum.Board &&
+				location.scope === LocationScopeEnumSchema.enum.Board &&
 				item.location.space !== location.space
 			) {
 				return yield* Effect.fail(
@@ -99,8 +100,8 @@ export const moveItemFx = Effect.fn("moveItemFx")(function* ({
 				);
 			}
 			if (
-				(item.location.scope === "inventory" || item.location.scope === "toolbar") &&
-				location.scope === "board" &&
+				(item.location.scope === LocationScopeEnumSchema.enum.Inventory || item.location.scope === LocationScopeEnumSchema.enum.Toolbar) &&
+				location.scope === LocationScopeEnumSchema.enum.Board &&
 				location.space !== runtime.currentSpace
 			) {
 				return yield* Effect.fail(

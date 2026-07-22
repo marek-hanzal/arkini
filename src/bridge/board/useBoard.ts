@@ -3,6 +3,7 @@ import { useCallback } from "react";
 import { useGameEngine } from "~/bridge/game/useGameEngine";
 import { useRuntimeSelector } from "~/bridge/runtime/useRuntimeSelector";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 
 export namespace useBoard {
 	export interface Item {
@@ -37,7 +38,7 @@ export const useBoard = (): useBoard.Result => {
 			title: game.config.meta.title,
 			items: runtime.items.flatMap((item): useBoard.Item[] => {
 				if (
-					item.location.scope !== "board" ||
+					item.location.scope !== LocationScopeEnumSchema.enum.Board ||
 					item.location.space !== runtime.currentSpace
 				) {
 					return [];

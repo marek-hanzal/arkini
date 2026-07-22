@@ -8,6 +8,7 @@ import {
 	inputRuntimeTestConfig,
 	workshopLocation,
 } from "~test/input/support/inputRuntimeTestConfig";
+import { RuntimeCheckIssueEnumSchema } from "~/engine/runtime/schema/check/RuntimeCheckIssueEnumSchema";
 
 const owner = {
 	id: "runtime:workshop",
@@ -99,11 +100,11 @@ describe("checkRuntimeInputLocationsFx", () => {
 
 		expect(result.issues.map((issue) => issue.type)).toEqual(
 			expect.arrayContaining([
-				"input:owner-missing",
-				"input:line-missing",
-				"input:slot-invalid",
-				"input:selector-mismatch",
-				"input:capacity-exceeded",
+				RuntimeCheckIssueEnumSchema.enum.InputOwnerMissing,
+				RuntimeCheckIssueEnumSchema.enum.InputLineMissing,
+				RuntimeCheckIssueEnumSchema.enum.InputSlotInvalid,
+				RuntimeCheckIssueEnumSchema.enum.InputSelectorMismatch,
+				RuntimeCheckIssueEnumSchema.enum.InputCapacityExceeded,
 			]),
 		);
 	});

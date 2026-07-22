@@ -4,6 +4,8 @@ import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import type { GameSourceProvenanceSchema } from "~/engine/source/schema/GameSourceProvenanceSchema";
 import { readItemLineEntriesFx } from "../fx/readItemLineEntriesFx";
 import type { GameDiagnosticsSchema } from "../schema/GameDiagnosticsSchema";
+import { DiagnosticCodeEnumSchema } from "~/engine/validation/schema/DiagnosticCodeEnumSchema";
+import { DiagnosticSeverityEnumSchema } from "~/engine/validation/schema/DiagnosticSeverityEnumSchema";
 
 export namespace validateMaterialTagSelectorsFx {
 	export interface Props {
@@ -32,8 +34,8 @@ export const validateMaterialTagSelectorsFx = Effect.fn("validateMaterialTagSele
 					);
 					if (!matches) {
 						diagnostics.push({
-							code: "input:material-tag-empty",
-							severity: "error",
+							code: DiagnosticCodeEnumSchema.enum.InputMaterialTagEmpty,
+							severity: DiagnosticSeverityEnumSchema.enum.Error,
 							path: [
 								...path,
 								"input",

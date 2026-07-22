@@ -1,18 +1,19 @@
 import { z } from "zod";
 
+import { RuntimeCheckIssueEnumSchema } from "~/engine/runtime/schema/check/RuntimeCheckIssueEnumSchema";
+import { DefaultLineIssueReasonEnumSchema } from "./DefaultLineIssueReasonEnumSchema";
+
 import { IdSchema } from "~/engine/common/schema/IdSchema";
 
 /** One persisted default-line selection no longer belongs to its exact live owner. */
 export const DefaultLineIssueSchema = z
 	.object({
-		type: z.literal("line:default"),
+		type: RuntimeCheckIssueEnumSchema.extract([
+			RuntimeCheckIssueEnumSchema.enum.DefaultLine,
+		]),
 		ownerItemId: IdSchema,
 		lineId: IdSchema,
-		reason: z.enum([
-			"owner-missing",
-			"owner-unsupported",
-			"line-missing",
-		]),
+		reason: DefaultLineIssueReasonEnumSchema,
 	})
 	.strict()
 	.meta({

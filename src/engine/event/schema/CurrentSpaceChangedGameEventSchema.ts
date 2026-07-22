@@ -1,10 +1,14 @@
 import { z } from "zod";
 
+import { GameEventEnumSchema } from "./GameEventEnumSchema";
+
 import { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeIntegerSchema";
 
 export const CurrentSpaceChangedGameEventSchema = z
 	.object({
-		type: z.literal("current-space:changed"),
+		type: GameEventEnumSchema.extract([
+			GameEventEnumSchema.enum.CurrentSpaceChanged,
+		]),
 		previousSpace: NonNegativeIntegerSchema,
 		currentSpace: NonNegativeIntegerSchema,
 	})

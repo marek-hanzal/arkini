@@ -1,12 +1,16 @@
 import { z } from "zod";
 
+import { GameEventEnumSchema } from "./GameEventEnumSchema";
+
 import { IdSchema } from "~/engine/common/schema/IdSchema";
 import { ActionEnumSchema } from "~/engine/merge/schema/ActionEnumSchema";
 import { EffectEnumSchema } from "~/engine/merge/schema/EffectEnumSchema";
 
 export const ItemMergedGameEventSchema = z
 	.object({
-		type: z.literal("item:merged"),
+		type: GameEventEnumSchema.extract([
+			GameEventEnumSchema.enum.ItemMerged,
+		]),
 		sourceItemId: IdSchema,
 		sourceCanonicalItemId: IdSchema,
 		targetItemId: IdSchema,

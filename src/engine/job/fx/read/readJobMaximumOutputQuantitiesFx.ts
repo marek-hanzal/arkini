@@ -6,6 +6,7 @@ import { readItemLineFx } from "~/engine/line/fx/readItemLineFx";
 import { readOutputMaximumQuantitiesFx } from "~/engine/output/fx/readOutputMaximumQuantitiesFx";
 import { readRuntimeItemByIdFx } from "~/engine/runtime/read/readRuntimeItemByIdFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 
 export namespace readJobMaximumOutputQuantitiesFx {
 	export interface Props {
@@ -69,7 +70,7 @@ export const readJobMaximumOutputQuantitiesFx = Effect.fn("readJobMaximumOutputQ
 		}
 
 		for (const item of runtime.items) {
-			if (item.location.scope === "job" && item.location.jobId === job.id) {
+			if (item.location.scope === LocationScopeEnumSchema.enum.Job && item.location.jobId === job.id) {
 				subtractQuantity(quantities, item.item.id, item.quantity);
 			}
 		}

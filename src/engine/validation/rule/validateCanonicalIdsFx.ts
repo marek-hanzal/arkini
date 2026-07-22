@@ -3,6 +3,9 @@ import { Effect } from "effect";
 import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import type { GameSourceProvenanceSchema } from "~/engine/source/schema/GameSourceProvenanceSchema";
 import type { GameDiagnosticsSchema } from "~/engine/validation/schema/GameDiagnosticsSchema";
+import { DiagnosticCodeEnumSchema } from "~/engine/validation/schema/DiagnosticCodeEnumSchema";
+import { DiagnosticSeverityEnumSchema } from "~/engine/validation/schema/DiagnosticSeverityEnumSchema";
+import { DiagnosticRecordEntityEnumSchema } from "~/engine/validation/schema/DiagnosticRecordEntityEnumSchema";
 
 export namespace validateCanonicalIdsFx {
 	export interface Props {
@@ -24,8 +27,8 @@ export const validateCanonicalIdsFx = Effect.fn("validateCanonicalIdsFx")(functi
 		}
 
 		diagnostics.push({
-			code: "config:key-id-mismatch",
-			severity: "error",
+			code: DiagnosticCodeEnumSchema.enum.ConfigKeyIdMismatch,
+			severity: DiagnosticSeverityEnumSchema.enum.Error,
 			path: [
 				"categories",
 				key,
@@ -33,7 +36,7 @@ export const validateCanonicalIdsFx = Effect.fn("validateCanonicalIdsFx")(functi
 			],
 			source: provenance.categories[key],
 			message: `Category record key ${key} differs from embedded ID ${category.id}.`,
-			entity: "category",
+			entity: DiagnosticRecordEntityEnumSchema.enum.Category,
 			key,
 			id: category.id,
 		});
@@ -45,8 +48,8 @@ export const validateCanonicalIdsFx = Effect.fn("validateCanonicalIdsFx")(functi
 		}
 
 		diagnostics.push({
-			code: "config:key-id-mismatch",
-			severity: "error",
+			code: DiagnosticCodeEnumSchema.enum.ConfigKeyIdMismatch,
+			severity: DiagnosticSeverityEnumSchema.enum.Error,
 			path: [
 				"items",
 				key,
@@ -54,7 +57,7 @@ export const validateCanonicalIdsFx = Effect.fn("validateCanonicalIdsFx")(functi
 			],
 			source: provenance.items[key],
 			message: `Item record key ${key} differs from embedded ID ${item.id}.`,
-			entity: "item",
+			entity: DiagnosticRecordEntityEnumSchema.enum.Item,
 			key,
 			id: item.id,
 		});

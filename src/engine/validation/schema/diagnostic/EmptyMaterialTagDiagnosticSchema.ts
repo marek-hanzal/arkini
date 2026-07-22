@@ -1,5 +1,8 @@
 import { z } from "zod";
 
+import { DiagnosticCodeEnumSchema } from "~/engine/validation/schema/DiagnosticCodeEnumSchema";
+import { DiagnosticSeverityEnumSchema } from "~/engine/validation/schema/DiagnosticSeverityEnumSchema";
+
 import { IdSchema } from "~/engine/common/schema/IdSchema";
 import { TagSchema } from "~/engine/tag/schema/TagSchema";
 import { BaseDiagnosticSchema } from "./BaseDiagnosticSchema";
@@ -7,8 +10,12 @@ import { BaseDiagnosticSchema } from "./BaseDiagnosticSchema";
 export const EmptyMaterialTagDiagnosticSchema = z
 	.object({
 		...BaseDiagnosticSchema.shape,
-		code: z.literal("input:material-tag-empty"),
-		severity: z.literal("error"),
+		code: DiagnosticCodeEnumSchema.extract([
+			DiagnosticCodeEnumSchema.enum.InputMaterialTagEmpty,
+		]),
+		severity: DiagnosticSeverityEnumSchema.extract([
+			DiagnosticSeverityEnumSchema.enum.Error,
+		]),
 		ownerItemId: IdSchema,
 		lineId: IdSchema,
 		inputIndex: z.number().int().nonnegative(),

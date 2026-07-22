@@ -1,4 +1,6 @@
 import { z } from "zod";
+
+import { RuntimeCheckIssueEnumSchema } from "~/engine/runtime/schema/check/RuntimeCheckIssueEnumSchema";
 import { IdSchema } from "~/engine/common/schema/IdSchema";
 import { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
 export const JobQueueExceededIssueSchema = z
@@ -7,7 +9,9 @@ export const JobQueueExceededIssueSchema = z
 		jobIds: z.array(IdSchema).min(1),
 		maxQueueSize: PositiveIntegerSchema,
 		queueSize: PositiveIntegerSchema,
-		type: z.literal("job:queue-exceeded"),
+		type: RuntimeCheckIssueEnumSchema.extract([
+			RuntimeCheckIssueEnumSchema.enum.JobQueueExceeded,
+		]),
 	})
 	.strict()
 	.meta({

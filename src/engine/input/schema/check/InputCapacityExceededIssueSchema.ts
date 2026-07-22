@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { RuntimeCheckIssueEnumSchema } from "~/engine/runtime/schema/check/RuntimeCheckIssueEnumSchema";
+
 import { IdSchema } from "~/engine/common/schema/IdSchema";
 import { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeIntegerSchema";
 import { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
@@ -17,7 +19,9 @@ export const InputCapacityExceededIssueSchema = z
 		maxStoredQuantity: PositiveIntegerSchema.describe(
 			"The largest quantity allowed by this input.",
 		),
-		type: z.literal("input:capacity-exceeded"),
+		type: RuntimeCheckIssueEnumSchema.extract([
+			RuntimeCheckIssueEnumSchema.enum.InputCapacityExceeded,
+		]),
 	})
 	.strict()
 	.meta({

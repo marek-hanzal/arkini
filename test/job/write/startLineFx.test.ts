@@ -15,6 +15,8 @@ import { setItemQuantityFx } from "~/engine/runtime/write/setItemQuantityFx";
 import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
 import { fromRuntimeFx } from "~/engine/state/fx/fromRuntimeFx";
 import { createJobTestConfig, prepareJobLineFx } from "~test/job/support/jobTestConfig";
+import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
+import { StartLineResultEnumSchema } from "~/engine/job/schema/StartLineResultEnumSchema";
 
 const startProps = {
 	ownerItemId: "runtime:forge",
@@ -22,7 +24,7 @@ const startProps = {
 };
 
 const readStartedJob = (result: StartLineResultSchema.Type) => {
-	if (result.type !== "started") {
+	if (result.type !== StartLineResultEnumSchema.enum.Started) {
 		throw new Error("Expected an immediately started job.");
 	}
 	return result.job;
@@ -129,11 +131,11 @@ describe("startLineFx", () => {
 		);
 
 		const consumed = result.events.find(
-			(event) => event.type === "item:consumed" && event.itemId === result.water.id,
+			(event) => event.type === GameEventEnumSchema.enum.ItemConsumed && event.itemId === result.water.id,
 		);
-		if (consumed?.type !== "item:consumed") throw new Error("Expected consumed item fact.");
+		if (consumed?.type !== GameEventEnumSchema.enum.ItemConsumed) throw new Error("Expected consumed item fact.");
 		expect(consumed).toEqual({
-			type: "item:consumed",
+			type: GameEventEnumSchema.enum.ItemConsumed,
 			itemId: result.water.id,
 			consumedItemId: expect.any(String),
 			canonicalItemId: "water",
@@ -317,8 +319,8 @@ describe("startLineFx", () => {
 			),
 		);
 
-		expect(result.first.type).toBe("started");
-		expect(result.second.type).toBe("queued");
+		expect(result.first.type).toBe(StartLineResultEnumSchema.enum.Started);
+		expect(result.second.type).toBe(StartLineResultEnumSchema.enum.Queued);
 	});
 
 	it("never starts ahead of an existing blocked FIFO request", () => {
@@ -328,7 +330,7 @@ describe("startLineFx", () => {
 				yield* prepareJobLineFx();
 				yield* startLineFx(startProps);
 				const queued = yield* startLineFx(startProps);
-				if (queued.type !== "queued") throw new Error("Expected queued request.");
+				if (queued.type !== StartLineResultEnumSchema.enum.Queued) throw new Error("Expected queued request.");
 
 				const runtime = yield* readRuntimeFx();
 				const water = runtime.items.find(
@@ -383,11 +385,11 @@ describe("startLineFx", () => {
 			),
 		);
 
-		expect(result.newer.type).toBe("queued");
+		expect(result.newer.type).toBe(StartLineResultEnumSchema.enum.Queued);
 		expect(result.queuedRuntime.jobs).toEqual([]);
 		expect(result.queuedRuntime.jobQueue).toHaveLength(2);
 		expect((result.queuedRuntime.jobQueue ?? [])[0]?.id).toBe(result.queued.request.id);
-		if (result.newer.type === "queued") {
+		if (result.newer.type === StartLineResultEnumSchema.enum.Queued) {
 			expect((result.queuedRuntime.jobQueue ?? [])[1]?.id).toBe(result.newer.request.id);
 			expect(result.afterDispatch.jobs).toHaveLength(1);
 			expect(result.afterDispatch.jobs[0]?.remainingMs).toBe(800);

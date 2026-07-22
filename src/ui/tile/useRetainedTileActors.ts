@@ -1,6 +1,7 @@
 import { useCallback, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { match } from "ts-pattern";
 
+import { DropItemResultKindEnumSchema } from "~/bridge/tile/DropItemResultKindEnumSchema";
 import type { useTileActors } from "~/bridge/tile/useTileActors";
 import type { TileInteractionState } from "~/ui/tile/TileInteractionState";
 
@@ -55,7 +56,7 @@ const protectedActorIds = (active: TileInteractionState | null): ReadonlySet<str
 			{
 				phase: "settling",
 				settlement: {
-					kind: "merge",
+					kind: DropItemResultKindEnumSchema.enum.Merge,
 					stage: "approach",
 				},
 			},

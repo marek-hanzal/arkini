@@ -2,7 +2,7 @@ import { Effect } from "effect";
 
 import { resolveJobRunnableFx } from "~/engine/job/fx/resolveJobRunnableFx";
 import type { JobSchema } from "~/engine/job/schema/JobSchema";
-import type { JobStatusSchema } from "~/engine/job/schema/read/JobStatusSchema";
+import { JobStatusEnumSchema } from "~/engine/job/schema/read/JobStatusEnumSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
 export namespace resolveActiveJobStatusFx {
@@ -21,8 +21,8 @@ export const resolveActiveJobStatusFx = Effect.fn("resolveActiveJobStatusFx")(fu
 		job,
 		runtime,
 	});
-	if (!runnable) return "paused" satisfies JobStatusSchema.Type;
+	if (!runnable) return JobStatusEnumSchema.enum.Paused;
 	return job.remainingMs === 0
-		? ("awaiting-output" satisfies JobStatusSchema.Type)
-		: ("running" satisfies JobStatusSchema.Type);
+		? JobStatusEnumSchema.enum.AwaitingOutput
+		: JobStatusEnumSchema.enum.Running;
 });

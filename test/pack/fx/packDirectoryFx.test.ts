@@ -7,6 +7,7 @@ import { describe, expect, it } from "vitest";
 import { decodeFx } from "~/engine/pack/fx/decodeFx";
 import { packDirectoryFx } from "~/engine/pack/fx/packDirectoryFx";
 import { ArkpackMetadataSchema } from "~/engine/pack/schema/ArkpackMetadataSchema";
+import { DiagnosticCodeEnumSchema } from "~/engine/validation/schema/DiagnosticCodeEnumSchema";
 
 const png = new Uint8Array([
 	0x89,
@@ -173,7 +174,7 @@ describe("packDirectoryFx", () => {
 				_tag: "GameValidationError",
 				diagnostics: expect.arrayContaining([
 					expect.objectContaining({
-						code: "config:schema",
+						code: DiagnosticCodeEnumSchema.enum.ConfigSchema,
 						path: [
 							"start",
 						],
@@ -204,7 +205,7 @@ describe("packDirectoryFx", () => {
 				_tag: "GameValidationError",
 				diagnostics: expect.arrayContaining([
 					expect.objectContaining({
-						code: "source:json-invalid",
+						code: DiagnosticCodeEnumSchema.enum.SourceJsonInvalid,
 					}),
 				]),
 			},

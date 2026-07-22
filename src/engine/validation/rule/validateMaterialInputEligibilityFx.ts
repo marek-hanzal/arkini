@@ -6,6 +6,8 @@ import { selectItemsFx } from "~/engine/selector/fx/selectItemsFx";
 import type { GameSourceProvenanceSchema } from "~/engine/source/schema/GameSourceProvenanceSchema";
 import { readItemLineEntriesFx } from "../fx/readItemLineEntriesFx";
 import type { GameDiagnosticsSchema } from "../schema/GameDiagnosticsSchema";
+import { DiagnosticCodeEnumSchema } from "~/engine/validation/schema/DiagnosticCodeEnumSchema";
+import { DiagnosticSeverityEnumSchema } from "~/engine/validation/schema/DiagnosticSeverityEnumSchema";
 
 export namespace validateMaterialInputEligibilityFx {
 	export interface Props {
@@ -38,8 +40,8 @@ export const validateMaterialInputEligibilityFx = Effect.fn("validateMaterialInp
 					});
 					for (const candidate of eligibility.ineligibleItems) {
 						diagnostics.push({
-							code: "input:material-ineligible",
-							severity: "error",
+							code: DiagnosticCodeEnumSchema.enum.InputMaterialIneligible,
+							severity: DiagnosticSeverityEnumSchema.enum.Error,
 							path: [
 								...path,
 								"input",

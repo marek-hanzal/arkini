@@ -7,6 +7,7 @@ import { CommittedTransitionsFx } from "~/engine/runtime/context/CommittedTransi
 import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
 import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
 import { createJobTestConfig } from "~test/job/support/jobTestConfig";
+import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -100,7 +101,7 @@ describe("committed transition events", () => {
 							},
 							[
 								{
-									type: "job:completed",
+									type: GameEventEnumSchema.enum.JobCompleted,
 									jobId: "job:fake",
 									ownerItemId: "owner:fake",
 									lineId: "line:fake",
@@ -155,7 +156,7 @@ describe("committed transition events", () => {
 							runtime,
 							[
 								{
-									type: "job:completed" as const,
+									type: GameEventEnumSchema.enum.JobCompleted,
 									jobId: "job:event:first",
 									ownerItemId: "owner:event:first",
 									lineId: "line:event:first",
@@ -173,7 +174,7 @@ describe("committed transition events", () => {
 						runtime,
 						[
 							{
-								type: "job:completed",
+								type: GameEventEnumSchema.enum.JobCompleted,
 								jobId: "job:event:second",
 								ownerItemId: "owner:event:second",
 								lineId: "line:event:second",

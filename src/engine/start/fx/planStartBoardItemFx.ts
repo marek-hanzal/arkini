@@ -4,6 +4,7 @@ import { resolveItemFx } from "~/engine/item/fx/resolveItemFx";
 import type { PlacementPlanSchema } from "~/engine/placement/schema/PlacementPlanSchema";
 import { planSpawnPlacementFx } from "~/engine/placement/fx/planSpawnPlacementFx";
 import type { BoardItemSchema } from "~/engine/start/schema/BoardItemSchema";
+import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 
 export namespace planStartBoardItemFx {
 	export interface Props {
@@ -29,7 +30,7 @@ export const planStartBoardItemFx = Effect.fn("planStartBoardItemFx")(function* 
 					x: startItem.x,
 					y: startItem.y,
 				},
-				scope: "board",
+				scope: LocationScopeEnumSchema.enum.Board,
 			},
 		],
 		quantity: 1,

@@ -16,6 +16,7 @@ import { ItemDetailProvider } from "~/ui/item-detail/ItemDetailProvider";
 import { useItemDetailControl } from "~/ui/item-detail/useItemDetailControl";
 import { motionTestRuntime } from "~test/ui/support/motionReactMock";
 import { testGameRead, testGameReadOrThrow } from "~test/support/game/testGameRead";
+import { JobStatusEnumSchema } from "~/engine/job/schema/read/JobStatusEnumSchema";
 
 (
 	globalThis as {
@@ -517,7 +518,7 @@ describe("ItemDetailModal", () => {
 
 		const runtime = document.querySelector<HTMLElement>('[data-ui="TileLineRuntime"]');
 		if (runtime === null) throw new Error("Missing line runtime slot.");
-		expect(runtime.dataset.jobStatus).toBe("running");
+		expect(runtime.dataset.jobStatus).toBe(JobStatusEnumSchema.enum.Running);
 		expect(document.querySelector('[data-ui="TileLineRuntimeValue"]')?.textContent).toBe(
 			"0.4 s",
 		);
@@ -558,7 +559,7 @@ describe("ItemDetailModal", () => {
 		});
 
 		expect(document.querySelector('[data-ui="TileLineRuntime"]')).toBe(runtime);
-		expect(runtime.dataset.jobStatus).toBe("awaiting-output");
+		expect(runtime.dataset.jobStatus).toBe(JobStatusEnumSchema.enum.AwaitingOutput);
 		expect(document.querySelector('[data-ui="TileLineRuntimeValue"]')?.textContent).toBe(
 			"Complete",
 		);

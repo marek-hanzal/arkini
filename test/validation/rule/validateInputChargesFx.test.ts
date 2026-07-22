@@ -7,6 +7,8 @@ import {
 	createRootSource,
 	createSimpleItem,
 } from "~test/validation/support/gameValidationTestSource";
+import { DiagnosticCodeEnumSchema } from "~/engine/validation/schema/DiagnosticCodeEnumSchema";
+import { InvalidInputChargesReasonEnumSchema } from "~/engine/validation/schema/InvalidInputChargesReasonEnumSchema";
 
 const chargeDiagnostics = async (items: Record<string, unknown>) =>
 	(
@@ -17,7 +19,7 @@ const chargeDiagnostics = async (items: Record<string, unknown>) =>
 				}),
 			]),
 		)
-	).diagnostics.filter(({ code }) => code === "input:charges-invalid");
+	).diagnostics.filter(({ code }) => code === DiagnosticCodeEnumSchema.enum.InputChargesInvalid);
 
 const depositInput = ({
 	cost = 1,
@@ -82,7 +84,7 @@ describe("validateInputChargesFx", () => {
 			}),
 		).toEqual([
 			expect.objectContaining({
-				reason: "deposit-missing-target-cost",
+				reason: InvalidInputChargesReasonEnumSchema.enum.DepositMissingTargetCost,
 			}),
 		]);
 	});
@@ -127,11 +129,11 @@ describe("validateInputChargesFx", () => {
 			expect.arrayContaining([
 				expect.objectContaining({
 					ownerItemId: missing.id,
-					reason: "self-missing-charges",
+					reason: InvalidInputChargesReasonEnumSchema.enum.SelfMissingCharges,
 				}),
 				expect.objectContaining({
 					ownerItemId: insufficient.id,
-					reason: "self-insufficient-charges",
+					reason: InvalidInputChargesReasonEnumSchema.enum.SelfInsufficientCharges,
 				}),
 			]),
 		);
@@ -170,7 +172,7 @@ describe("validateInputChargesFx", () => {
 		).toEqual([
 			expect.objectContaining({
 				inputIndex: 1,
-				reason: "self-insufficient-charges",
+				reason: InvalidInputChargesReasonEnumSchema.enum.SelfInsufficientCharges,
 			}),
 		]);
 	});
@@ -221,10 +223,10 @@ describe("validateInputChargesFx", () => {
 		).toEqual(
 			expect.arrayContaining([
 				expect.objectContaining({
-					reason: "target-requires-deposit",
+					reason: InvalidInputChargesReasonEnumSchema.enum.TargetRequiresDeposit,
 				}),
 				expect.objectContaining({
-					reason: "deposit-must-target",
+					reason: InvalidInputChargesReasonEnumSchema.enum.DepositMustTarget,
 				}),
 			]),
 		);
@@ -252,7 +254,7 @@ describe("validateInputChargesFx", () => {
 			}),
 		).toEqual([
 			expect.objectContaining({
-				reason: "target-unavailable",
+				reason: InvalidInputChargesReasonEnumSchema.enum.TargetUnavailable,
 			}),
 		]);
 	});
@@ -281,7 +283,7 @@ describe("validateInputChargesFx", () => {
 			}),
 		).toEqual([
 			expect.objectContaining({
-				reason: "target-unavailable",
+				reason: InvalidInputChargesReasonEnumSchema.enum.TargetUnavailable,
 			}),
 		]);
 	});
@@ -386,7 +388,7 @@ describe("validateInputChargesFx", () => {
 			}),
 		).toEqual([
 			expect.objectContaining({
-				reason: "target-unavailable",
+				reason: InvalidInputChargesReasonEnumSchema.enum.TargetUnavailable,
 			}),
 		]);
 	});
@@ -416,7 +418,7 @@ describe("validateInputChargesFx", () => {
 		).toEqual([
 			expect.objectContaining({
 				inputIndex: 1,
-				reason: "target-insufficient-total-charges",
+				reason: InvalidInputChargesReasonEnumSchema.enum.TargetInsufficientTotalCharges,
 			}),
 		]);
 	});

@@ -6,6 +6,7 @@ import { checkRuntimeFx } from "~/engine/runtime/check/checkRuntimeFx";
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { createJobTestConfig } from "~test/job/support/jobTestConfig";
+import { RuntimeCheckIssueEnumSchema } from "~/engine/runtime/schema/check/RuntimeCheckIssueEnumSchema";
 
 const config = createJobTestConfig(2);
 const owner = {
@@ -91,14 +92,14 @@ describe("checkRuntimeJobsFx", () => {
 
 		expect(result.issues.map((issue) => issue.type)).toEqual(
 			expect.arrayContaining([
-				"job:id:duplicate",
-				"job:owner-missing",
-				"job:owner:multiple-active",
-				"job:owner-not-on-grid",
-				"job:line-missing",
-				"job:queue-exceeded",
-				"job:time-invalid",
-				"job:material-orphan",
+				RuntimeCheckIssueEnumSchema.enum.DuplicateJobId,
+				RuntimeCheckIssueEnumSchema.enum.JobOwnerMissing,
+				RuntimeCheckIssueEnumSchema.enum.JobOwnerMultipleActive,
+				RuntimeCheckIssueEnumSchema.enum.JobOwnerNotOnGrid,
+				RuntimeCheckIssueEnumSchema.enum.JobLineMissing,
+				RuntimeCheckIssueEnumSchema.enum.JobQueueExceeded,
+				RuntimeCheckIssueEnumSchema.enum.JobTimeInvalid,
+				RuntimeCheckIssueEnumSchema.enum.JobMaterialOrphan,
 			]),
 		);
 	});
@@ -191,6 +192,6 @@ it("reports owned runtime state beneath one consumed job material root", () => {
 		],
 		ownedJobIds: [],
 		requestIds: [],
-		type: "job:consumed-material-state",
+		type: RuntimeCheckIssueEnumSchema.enum.JobConsumedMaterialState,
 	});
 });

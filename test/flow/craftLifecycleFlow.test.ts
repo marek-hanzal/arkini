@@ -9,6 +9,7 @@ import { moveItemFx } from "~/engine/runtime/write/moveItemFx";
 import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
 import { runTickRuntimeByFx } from "~/engine/tick/fx/runTickRuntimeByFx";
 import { readArkiniGameConfigSource } from "~test/schema/support/readArkiniGameConfigSource";
+import { StartLineResultEnumSchema } from "~/engine/job/schema/StartLineResultEnumSchema";
 
 describe("authored craft lifecycle", () => {
 	it("pauses a seed craft in inventory and completes it after returning to the board", async () => {
@@ -111,7 +112,7 @@ describe("authored craft lifecycle", () => {
 			),
 		);
 
-		expect(result.started.type).toBe("started");
+		expect(result.started.type).toBe(StartLineResultEnumSchema.enum.Started);
 		expect(Either.isLeft(result.secondStart)).toBe(true);
 		if (Either.isLeft(result.secondStart)) {
 			expect([

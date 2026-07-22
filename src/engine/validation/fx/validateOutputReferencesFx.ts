@@ -6,6 +6,9 @@ import type { OutputSchema } from "~/engine/output/schema/OutputSchema";
 import type { DiagnosticPathSchema } from "../schema/DiagnosticPathSchema";
 import { validateWhenReferenceFx } from "./validateWhenReferenceFx";
 import type { GameDiagnosticsSchema } from "~/engine/validation/schema/GameDiagnosticsSchema";
+import { DiagnosticCodeEnumSchema } from "~/engine/validation/schema/DiagnosticCodeEnumSchema";
+import { DiagnosticSeverityEnumSchema } from "~/engine/validation/schema/DiagnosticSeverityEnumSchema";
+import { DiagnosticRecordEntityEnumSchema } from "~/engine/validation/schema/DiagnosticRecordEntityEnumSchema";
 
 export namespace validateOutputReferencesFx {
 	export interface Props {
@@ -30,15 +33,15 @@ const validateDropFx = Effect.fn("validateOutputDropReferencesFx")(function* ({
 	const diagnostics: GameDiagnosticsSchema.Type = [];
 	if (config.items[drop.itemId] === undefined) {
 		diagnostics.push({
-			code: "config:missing-reference",
-			severity: "error",
+			code: DiagnosticCodeEnumSchema.enum.ConfigMissingReference,
+			severity: DiagnosticSeverityEnumSchema.enum.Error,
 			path: [
 				...path,
 				"itemId",
 			],
 			source,
 			message: `Drop references missing item ${drop.itemId}.`,
-			reference: "item",
+			reference: DiagnosticRecordEntityEnumSchema.enum.Item,
 			referenceId: drop.itemId,
 		});
 	}

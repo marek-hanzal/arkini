@@ -1,17 +1,19 @@
 import { z } from "zod";
 
+import { GameEventEnumSchema } from "./GameEventEnumSchema";
+import { JobStartSourceEnumSchema } from "./JobStartSourceEnumSchema";
+
 import { IdSchema } from "~/engine/common/schema/IdSchema";
 
 export const JobStartedGameEventSchema = z
 	.object({
-		type: z.literal("job:started"),
+		type: GameEventEnumSchema.extract([
+			GameEventEnumSchema.enum.JobStarted,
+		]),
 		jobId: IdSchema,
 		ownerItemId: IdSchema,
 		lineId: IdSchema,
-		source: z.enum([
-			"explicit",
-			"queue",
-		]),
+		source: JobStartSourceEnumSchema,
 	})
 	.strict()
 	.meta({

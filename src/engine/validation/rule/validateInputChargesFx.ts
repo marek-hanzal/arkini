@@ -5,6 +5,10 @@ import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import type { GameSourceProvenanceSchema } from "~/engine/source/schema/GameSourceProvenanceSchema";
 import type { GameDiagnosticsSchema } from "~/engine/validation/schema/GameDiagnosticsSchema";
 import { readItemLineEntriesFx } from "../fx/readItemLineEntriesFx";
+import { DiagnosticCodeEnumSchema } from "~/engine/validation/schema/DiagnosticCodeEnumSchema";
+import { DiagnosticSeverityEnumSchema } from "~/engine/validation/schema/DiagnosticSeverityEnumSchema";
+import { InvalidInputChargesReasonEnumSchema } from "~/engine/validation/schema/InvalidInputChargesReasonEnumSchema";
+import { StorageScopeEnumSchema } from "~/engine/scope/schema/StorageScopeEnumSchema";
 
 export namespace validateInputChargesFx {
 	export interface Props {
@@ -43,15 +47,15 @@ export const validateInputChargesFx = Effect.fn("validateInputChargesFx")(functi
 				];
 				if (input.type === "deposit" && input.charges === undefined) {
 					diagnostics.push({
-						code: "input:charges-invalid",
-						severity: "error",
+						code: DiagnosticCodeEnumSchema.enum.InputChargesInvalid,
+						severity: DiagnosticSeverityEnumSchema.enum.Error,
 						path: diagnosticPath,
 						source: provenance.items[itemId],
 						message: `Deposit input ${inputIndex} of line ${line.id} must author a target charge cost.`,
 						ownerItemId: itemId,
 						lineId: line.id,
 						inputIndex,
-						reason: "deposit-missing-target-cost",
+						reason: InvalidInputChargesReasonEnumSchema.enum.DepositMissingTargetCost,
 					});
 					continue;
 				}
@@ -60,44 +64,44 @@ export const validateInputChargesFx = Effect.fn("validateInputChargesFx")(functi
 				if (input.charges.from === "self") {
 					if (input.type === "deposit") {
 						diagnostics.push({
-							code: "input:charges-invalid",
-							severity: "error",
+							code: DiagnosticCodeEnumSchema.enum.InputChargesInvalid,
+							severity: DiagnosticSeverityEnumSchema.enum.Error,
 							path: diagnosticPath,
 							source: provenance.items[itemId],
 							message: `Deposit input ${inputIndex} of line ${line.id} must charge its target, not its owner.`,
 							ownerItemId: itemId,
 							lineId: line.id,
 							inputIndex,
-							reason: "deposit-must-target",
+							reason: InvalidInputChargesReasonEnumSchema.enum.DepositMustTarget,
 						});
 						continue;
 					}
 					if (item.charges === undefined) {
 						diagnostics.push({
-							code: "input:charges-invalid",
-							severity: "error",
+							code: DiagnosticCodeEnumSchema.enum.InputChargesInvalid,
+							severity: DiagnosticSeverityEnumSchema.enum.Error,
 							path: diagnosticPath,
 							source: provenance.items[itemId],
 							message: `Line ${line.id} charges owner ${itemId}, but the item has no charges.`,
 							ownerItemId: itemId,
 							lineId: line.id,
 							inputIndex,
-							reason: "self-missing-charges",
+							reason: InvalidInputChargesReasonEnumSchema.enum.SelfMissingCharges,
 						});
 						continue;
 					}
 					selfCost += input.charges.cost;
 					if (selfCost > item.charges.amount) {
 						diagnostics.push({
-							code: "input:charges-invalid",
-							severity: "error",
+							code: DiagnosticCodeEnumSchema.enum.InputChargesInvalid,
+							severity: DiagnosticSeverityEnumSchema.enum.Error,
 							path: diagnosticPath,
 							source: provenance.items[itemId],
 							message: `Line ${line.id} costs ${selfCost} total self charges, but ${itemId} has only ${item.charges.amount}.`,
 							ownerItemId: itemId,
 							lineId: line.id,
 							inputIndex,
-							reason: "self-insufficient-charges",
+							reason: InvalidInputChargesReasonEnumSchema.enum.SelfInsufficientCharges,
 						});
 					}
 					continue;
@@ -105,15 +109,15 @@ export const validateInputChargesFx = Effect.fn("validateInputChargesFx")(functi
 
 				if (input.type !== "deposit") {
 					diagnostics.push({
-						code: "input:charges-invalid",
-						severity: "error",
+						code: DiagnosticCodeEnumSchema.enum.InputChargesInvalid,
+						severity: DiagnosticSeverityEnumSchema.enum.Error,
 						path: diagnosticPath,
 						source: provenance.items[itemId],
 						message: `Only deposit inputs may charge an external target; line ${line.id} input ${inputIndex} is ${input.type}.`,
 						ownerItemId: itemId,
 						lineId: line.id,
 						inputIndex,
-						reason: "target-requires-deposit",
+						reason: InvalidInputChargesReasonEnumSchema.enum.TargetRequiresDeposit,
 					});
 					continue;
 				}
@@ -134,22 +138,22 @@ export const validateInputChargesFx = Effect.fn("validateInputChargesFx")(functi
 				});
 				const available = matchedCandidates.some((candidate) => {
 					return (
-						(candidate.scope === "board" || candidate.scope === "any") &&
+						(candidate.scope === StorageScopeEnumSchema.enum.board || candidate.scope === StorageScopeEnumSchema.enum.any) &&
 						candidate.charges !== undefined &&
 						candidate.charges.amount >= targetChargeCost
 					);
 				});
 				if (!available) {
 					diagnostics.push({
-						code: "input:charges-invalid",
-						severity: "error",
+						code: DiagnosticCodeEnumSchema.enum.InputChargesInvalid,
+						severity: DiagnosticSeverityEnumSchema.enum.Error,
 						path: diagnosticPath,
 						source: provenance.items[itemId],
 						message: `Deposit input ${inputIndex} of line ${line.id} cannot match any board-capable item with at least ${input.charges.cost} charges.`,
 						ownerItemId: itemId,
 						lineId: line.id,
 						inputIndex,
-						reason: "target-unavailable",
+						reason: InvalidInputChargesReasonEnumSchema.enum.TargetUnavailable,
 					});
 				}
 			}
@@ -158,7 +162,7 @@ export const validateInputChargesFx = Effect.fn("validateInputChargesFx")(functi
 				const payer = config.items[payerItemId];
 				if (
 					payer === undefined ||
-					(payer.scope !== "board" && payer.scope !== "any") ||
+					(payer.scope !== StorageScopeEnumSchema.enum.board && payer.scope !== StorageScopeEnumSchema.enum.any) ||
 					payer.charges === undefined ||
 					payer.maxCount === undefined
 				) {
@@ -168,8 +172,8 @@ export const validateInputChargesFx = Effect.fn("validateInputChargesFx")(functi
 				if (total.cost <= maximumSupply) continue;
 
 				diagnostics.push({
-					code: "input:charges-invalid",
-					severity: "error",
+					code: DiagnosticCodeEnumSchema.enum.InputChargesInvalid,
+					severity: DiagnosticSeverityEnumSchema.enum.Error,
 					path: [
 						...path,
 						"input",
@@ -181,7 +185,7 @@ export const validateInputChargesFx = Effect.fn("validateInputChargesFx")(functi
 					ownerItemId: itemId,
 					lineId: line.id,
 					inputIndex: total.inputIndex,
-					reason: "target-insufficient-total-charges",
+					reason: InvalidInputChargesReasonEnumSchema.enum.TargetInsufficientTotalCharges,
 				});
 			}
 		}

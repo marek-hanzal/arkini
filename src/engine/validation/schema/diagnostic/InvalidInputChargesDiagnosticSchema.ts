@@ -1,5 +1,9 @@
 import { z } from "zod";
 
+import { DiagnosticCodeEnumSchema } from "~/engine/validation/schema/DiagnosticCodeEnumSchema";
+import { DiagnosticSeverityEnumSchema } from "~/engine/validation/schema/DiagnosticSeverityEnumSchema";
+import { InvalidInputChargesReasonEnumSchema } from "~/engine/validation/schema/InvalidInputChargesReasonEnumSchema";
+
 import { IdSchema } from "~/engine/common/schema/IdSchema";
 import { BaseDiagnosticSchema } from "./BaseDiagnosticSchema";
 
@@ -7,20 +11,16 @@ import { BaseDiagnosticSchema } from "./BaseDiagnosticSchema";
 export const InvalidInputChargesDiagnosticSchema = z
 	.object({
 		...BaseDiagnosticSchema.shape,
-		code: z.literal("input:charges-invalid"),
-		severity: z.literal("error"),
+		code: DiagnosticCodeEnumSchema.extract([
+			DiagnosticCodeEnumSchema.enum.InputChargesInvalid,
+		]),
+		severity: DiagnosticSeverityEnumSchema.extract([
+			DiagnosticSeverityEnumSchema.enum.Error,
+		]),
 		ownerItemId: IdSchema,
 		lineId: IdSchema,
 		inputIndex: z.number().int().nonnegative(),
-		reason: z.enum([
-			"deposit-missing-target-cost",
-			"deposit-must-target",
-			"target-requires-deposit",
-			"self-missing-charges",
-			"self-insufficient-charges",
-			"target-unavailable",
-			"target-insufficient-total-charges",
-		]),
+		reason: InvalidInputChargesReasonEnumSchema,
 	})
 	.strict()
 	.meta({

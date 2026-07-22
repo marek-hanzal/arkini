@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { RuntimeCheckIssueEnumSchema } from "~/engine/runtime/schema/check/RuntimeCheckIssueEnumSchema";
+
 import { IdSchema } from "~/engine/common/schema/IdSchema";
 
 /**
@@ -8,7 +10,9 @@ import { IdSchema } from "~/engine/common/schema/IdSchema";
 export const DuplicateItemIdIssueSchema = z
 	.object({
 		itemId: IdSchema.describe("The duplicated live item identity."),
-		type: z.literal("item:id:duplicate"),
+		type: RuntimeCheckIssueEnumSchema.extract([
+			RuntimeCheckIssueEnumSchema.enum.DuplicateItemId,
+		]),
 	})
 	.strict()
 	.meta({

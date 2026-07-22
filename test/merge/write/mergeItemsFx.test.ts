@@ -9,6 +9,7 @@ import { mergeItemsFx } from "~/engine/merge/write/mergeItemsFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import type { StateSchema } from "~/engine/state/schema/StateSchema";
 import { createMergeTestConfig } from "~test/merge/support/createMergeTestConfig";
+import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
 
 const makeState = ({
 	sourceLocation = {
@@ -154,7 +155,7 @@ describe("mergeItemsFx", () => {
 			if (effect === "replace") expect(target?.item.id).toBe("result");
 
 			expect(result.event).toEqual({
-				type: "item:merged",
+				type: GameEventEnumSchema.enum.ItemMerged,
 				sourceItemId: "runtime:source",
 				sourceCanonicalItemId: "source",
 				targetItemId: "runtime:target",
@@ -265,7 +266,7 @@ describe("mergeItemsFx", () => {
 				}),
 			),
 		);
-		expect(inventorySource.event.type).toBe("item:merged");
+		expect(inventorySource.event.type).toBe(GameEventEnumSchema.enum.ItemMerged);
 
 		const inventoryTarget = Effect.runSync(
 			Effect.gen(function* () {

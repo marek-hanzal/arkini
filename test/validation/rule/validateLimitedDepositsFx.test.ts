@@ -10,6 +10,8 @@ import {
 	createRootSource,
 	createSimpleItem,
 } from "~test/validation/support/gameValidationTestSource";
+import { DiagnosticCodeEnumSchema } from "~/engine/validation/schema/DiagnosticCodeEnumSchema";
+import { DiagnosticSeverityEnumSchema } from "~/engine/validation/schema/DiagnosticSeverityEnumSchema";
 
 const createDeposit = (id: string) =>
 	DepositItemSchema.parse({
@@ -66,8 +68,8 @@ describe("validateLimitedDepositsFx", () => {
 			}),
 		).toEqual([
 			expect.objectContaining({
-				code: "deposit:unsustainable",
-				severity: "warning",
+				code: DiagnosticCodeEnumSchema.enum.DepositUnsustainable,
+				severity: DiagnosticSeverityEnumSchema.enum.Warning,
 				itemId: deposit.id,
 			}),
 		]);
@@ -87,7 +89,7 @@ describe("validateLimitedDepositsFx", () => {
 			}),
 		).toEqual([
 			expect.objectContaining({
-				code: "deposit:unsustainable",
+				code: DiagnosticCodeEnumSchema.enum.DepositUnsustainable,
 			}),
 		]);
 	});
@@ -106,7 +108,7 @@ describe("validateLimitedDepositsFx", () => {
 			}),
 		).toEqual([
 			expect.objectContaining({
-				code: "deposit:stochastic-softlock",
+				code: DiagnosticCodeEnumSchema.enum.DepositStochasticSoftlock,
 			}),
 		]);
 	});

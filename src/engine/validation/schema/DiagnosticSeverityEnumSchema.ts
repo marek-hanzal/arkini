@@ -1,10 +1,10 @@
 import { z } from "zod";
 
 export const DiagnosticSeverityEnumSchema = z
-	.enum([
-		"error",
-		"warning",
-	])
+	.enum({
+		Error: "error",
+		Warning: "warning",
+	})
 	.meta({
 		id: "DiagnosticSeverityEnumSchema",
 		description: "The severity of one completed-game validation diagnostic.",

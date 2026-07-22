@@ -10,6 +10,8 @@ import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import type { StateSchema } from "~/engine/state/schema/StateSchema";
 import { runTickRuntimeByFx } from "~/engine/tick/fx/runTickRuntimeByFx";
+import { RuntimeCheckIssueEnumSchema } from "~/engine/runtime/schema/check/RuntimeCheckIssueEnumSchema";
+import { StartLineResultEnumSchema } from "~/engine/job/schema/StartLineResultEnumSchema";
 
 const output = {
 	set: [
@@ -455,7 +457,7 @@ describe("charge-driven completion lifecycle", () => {
 			}),
 		);
 
-		expect(result.restarted.type).toBe("started");
+		expect(result.restarted.type).toBe(StartLineResultEnumSchema.enum.Started);
 		expect(result.runtime.items.some((item) => item.item.id === "craft:repeatable")).toBe(true);
 		expect(result.runtime.items.filter((item) => item.item.id === "item:gift")).toHaveLength(1);
 	});
@@ -496,8 +498,8 @@ describe("charge-driven completion lifecycle", () => {
 			}),
 		);
 
-		expect(result.started.type).toBe("started");
-		expect(result.activeCheck.issues.some((issue) => issue.type === "item:max-count")).toBe(
+		expect(result.started.type).toBe(StartLineResultEnumSchema.enum.Started);
+		expect(result.activeCheck.issues.some((issue) => issue.type === RuntimeCheckIssueEnumSchema.enum.ItemMaxCount)).toBe(
 			false,
 		);
 		const phoenixes = result.runtime.items.filter(

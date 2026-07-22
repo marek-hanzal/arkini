@@ -12,6 +12,7 @@ import { readEmptyLocationsFx } from "./readEmptyLocationsFx";
 import { readBoardLocationsFx } from "./readBoardLocationsFx";
 import { readInventoryLocationsFx } from "./readInventoryLocationsFx";
 import { readToolbarLocationsFx } from "./readToolbarLocationsFx";
+import { StorageScopeEnumSchema } from "~/engine/scope/schema/StorageScopeEnumSchema";
 
 export namespace readRuntimeItemDropLocationFx {
 	export interface Props {
@@ -55,17 +56,17 @@ export const readRuntimeItemDropLocationFx = Effect.fn("readRuntimeItemDropLocat
 	});
 
 	const location = match(item.item.scope)
-		.with("board", () => orderedBoard[0])
-		.with("inventory", () => emptyInventory[0])
-		.with("toolbar", () => emptyToolbar[0])
-		.with("any", () => orderedBoard[0] ?? emptyInventory[0] ?? emptyToolbar[0])
+		.with(StorageScopeEnumSchema.enum.board, () => orderedBoard[0])
+		.with(StorageScopeEnumSchema.enum.inventory, () => emptyInventory[0])
+		.with(StorageScopeEnumSchema.enum.toolbar, () => emptyToolbar[0])
+		.with(StorageScopeEnumSchema.enum.any, () => orderedBoard[0] ?? emptyInventory[0] ?? emptyToolbar[0])
 		.exhaustive() satisfies GridLocationSchema.Type | undefined;
 	if (location !== undefined) return location;
 
 	const reason =
-		item.item.scope === "board"
+		item.item.scope === StorageScopeEnumSchema.enum.board
 			? "board:full"
-			: item.item.scope === "toolbar"
+			: item.item.scope === StorageScopeEnumSchema.enum.toolbar
 				? "toolbar:full"
 				: "inventory:full";
 	return yield* Effect.fail(

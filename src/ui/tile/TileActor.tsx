@@ -12,6 +12,7 @@ import { useTileActorDrag } from "~/ui/tile/useTileActorDrag";
 import { useTileActorMotion } from "~/ui/tile/useTileActorMotion";
 import type { TileMotionCueSchema } from "~/ui/tile/schema/TileMotionCueSchema";
 import { useTileActorPresentation } from "~/ui/tile/useTileActorPresentation";
+import { LocationScopeEnumSchema } from "~/bridge/tile/LocationScopeEnumSchema";
 
 const primaryActionDelayMs = 320;
 
@@ -103,7 +104,7 @@ export const TileActor = ({ item, live, cue, onCueComplete }: TileActor.Props) =
 		interactive,
 	]);
 
-	const boardLocation = item.location.scope === "board" ? item.location : null;
+	const boardLocation = item.location.scope === LocationScopeEnumSchema.enum.Board ? item.location : null;
 	const visible = actorMotion.visible;
 	const cursor = readTileActorCursorSemantic({
 		feedback: presentation.feedback,
@@ -145,7 +146,7 @@ export const TileActor = ({ item, live, cue, onCueComplete }: TileActor.Props) =
 			data-board-x={boardLocation?.position.x}
 			data-board-y={boardLocation?.position.y}
 			data-toolbar-x={
-				item.location.scope === "toolbar" ? item.location.position.x : undefined
+				item.location.scope === LocationScopeEnumSchema.enum.Toolbar ? item.location.position.x : undefined
 			}
 			data-dragging={presentation.phase === "dragging" ? "true" : "false"}
 			data-primary-action={item.primaryAction.kind}

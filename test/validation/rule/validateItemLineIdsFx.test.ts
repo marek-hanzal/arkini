@@ -7,6 +7,7 @@ import {
 	createProducerItem,
 	createRootSource,
 } from "~test/validation/support/gameValidationTestSource";
+import { DiagnosticCodeEnumSchema } from "~/engine/validation/schema/DiagnosticCodeEnumSchema";
 
 const lineDiagnostics = async (items: Record<string, unknown>) =>
 	(
@@ -17,7 +18,7 @@ const lineDiagnostics = async (items: Record<string, unknown>) =>
 				}),
 			]),
 		)
-	).diagnostics.filter(({ code }) => code === "line:duplicate-id");
+	).diagnostics.filter(({ code }) => code === DiagnosticCodeEnumSchema.enum.LineDuplicateId);
 
 describe("validateItemLineIdsFx", () => {
 	it("rejects duplicate line IDs within one owner", async () => {

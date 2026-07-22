@@ -14,6 +14,10 @@ import { fromRuntimeFx } from "~/engine/state/fx/fromRuntimeFx";
 import { runTickRuntimeByFx } from "~/engine/tick/fx/runTickRuntimeByFx";
 import { advanceRuntimeStepFx } from "~/engine/tick/internal/advanceRuntimeStepFx";
 import { createTemporaryLifetimeTestConfig } from "~test/item/temporary/support/createTemporaryLifetimeTestConfig";
+import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
+import { RuntimeCheckIssueEnumSchema } from "~/engine/runtime/schema/check/RuntimeCheckIssueEnumSchema";
+import { ItemTemporaryDurationIssueReasonEnumSchema } from "~/engine/runtime/schema/check/ItemTemporaryDurationIssueReasonEnumSchema";
+import { ItemRemovedReasonEnumSchema } from "~/engine/event/schema/ItemRemovedReasonEnumSchema";
 
 const config = createTemporaryLifetimeTestConfig();
 
@@ -105,7 +109,7 @@ describe("temporary item lifetime", () => {
 		expect(result.third.runtime.items).toEqual([]);
 		expect(result.third.events).toEqual([
 			{
-				type: "item:expired",
+				type: GameEventEnumSchema.enum.ItemExpired,
 				itemId: "runtime:temporary",
 				canonicalItemId: "temporaryPlain",
 				location: {
@@ -119,7 +123,7 @@ describe("temporary item lifetime", () => {
 				quantity: 1,
 			},
 			{
-				type: "item:removed",
+				type: GameEventEnumSchema.enum.ItemRemoved,
 				itemId: "runtime:temporary",
 				canonicalItemId: "temporaryPlain",
 				location: {
@@ -131,7 +135,7 @@ describe("temporary item lifetime", () => {
 					},
 				},
 				quantity: 1,
-				reason: "expired",
+				reason: ItemRemovedReasonEnumSchema.enum.Expired,
 			},
 		]);
 	});
@@ -454,7 +458,7 @@ describe("temporary item lifetime", () => {
 		expect(result.issues).toEqual(
 			expect.arrayContaining([
 				{
-					type: "item:temporary-duration",
+					type: RuntimeCheckIssueEnumSchema.enum.ItemTemporaryDuration,
 					itemId: "runtime:temporary",
 					durationMs: 600,
 					remainingDurationMs: 600,
@@ -465,7 +469,7 @@ describe("temporary item lifetime", () => {
 							y: 0,
 						},
 					},
-					reason: "not-board",
+					reason: ItemTemporaryDurationIssueReasonEnumSchema.enum.NotBoard,
 				},
 			]),
 		);
@@ -498,7 +502,7 @@ describe("temporary item lifetime", () => {
 
 		expect(result.issues).toEqual([
 			{
-				type: "item:temporary-duration",
+				type: RuntimeCheckIssueEnumSchema.enum.ItemTemporaryDuration,
 				itemId: "runtime:blocker",
 				remainingDurationMs: 400,
 				location: {
@@ -509,7 +513,7 @@ describe("temporary item lifetime", () => {
 						y: 0,
 					},
 				},
-				reason: "unexpected-state",
+				reason: ItemTemporaryDurationIssueReasonEnumSchema.enum.UnexpectedState,
 			},
 		]);
 	});

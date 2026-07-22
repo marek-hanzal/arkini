@@ -1,4 +1,6 @@
 import { Effect } from "effect";
+
+import { RuntimeCheckIssueEnumSchema } from "~/engine/runtime/schema/check/RuntimeCheckIssueEnumSchema";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { DuplicateJobIdIssueSchema } from "~/engine/job/schema/DuplicateJobIdIssueSchema";
 import type { JobLineMissingIssueSchema } from "~/engine/job/schema/JobLineMissingIssueSchema";
@@ -15,6 +17,7 @@ import { isGridRuntimeItem } from "~/engine/runtime/read/isGridRuntimeItem";
 import { isJobRuntimeItem } from "~/engine/runtime/read/isJobRuntimeItem";
 import { readRuntimeItemOwnedStateFx } from "~/engine/runtime/read/readRuntimeItemOwnedStateFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 
 export namespace checkRuntimeJobsFx {
 	export interface Props {
@@ -46,7 +49,7 @@ export const checkRuntimeJobsFx = Effect.fn("checkRuntimeJobsFx")(function* ({
 		if (seenIds.has(entry.id))
 			duplicateIssues.push({
 				jobId: entry.id,
-				type: "job:id:duplicate",
+				type: RuntimeCheckIssueEnumSchema.enum.DuplicateJobId,
 			});
 		else seenIds.add(entry.id);
 
@@ -56,7 +59,7 @@ export const checkRuntimeJobsFx = Effect.fn("checkRuntimeJobsFx")(function* ({
 				jobId: job.id,
 				durationMs: job.durationMs,
 				remainingMs: job.remainingMs,
-				type: "job:time-invalid",
+				type: RuntimeCheckIssueEnumSchema.enum.JobTimeInvalid,
 			});
 		}
 		const owner = runtime.items.find((item) => item.id === entry.ownerItemId);
@@ -64,7 +67,7 @@ export const checkRuntimeJobsFx = Effect.fn("checkRuntimeJobsFx")(function* ({
 			ownerIssues.push({
 				jobId: entry.id,
 				ownerItemId: entry.ownerItemId,
-				type: "job:owner-missing",
+				type: RuntimeCheckIssueEnumSchema.enum.JobOwnerMissing,
 			});
 			continue;
 		}
@@ -73,7 +76,7 @@ export const checkRuntimeJobsFx = Effect.fn("checkRuntimeJobsFx")(function* ({
 				jobId: entry.id,
 				ownerItemId: owner.id,
 				location: owner.location,
-				type: "job:owner-not-on-grid",
+				type: RuntimeCheckIssueEnumSchema.enum.JobOwnerNotOnGrid,
 			});
 		const line = yield* readItemLineFx({
 			item: owner.item,
@@ -84,7 +87,7 @@ export const checkRuntimeJobsFx = Effect.fn("checkRuntimeJobsFx")(function* ({
 				jobId: entry.id,
 				ownerItemId: entry.ownerItemId,
 				lineId: entry.lineId,
-				type: "job:line-missing",
+				type: RuntimeCheckIssueEnumSchema.enum.JobLineMissing,
 			});
 	}
 
@@ -96,7 +99,7 @@ export const checkRuntimeJobsFx = Effect.fn("checkRuntimeJobsFx")(function* ({
 			multipleActiveIssues.push({
 				ownerItemId,
 				jobIds,
-				type: "job:owner:multiple-active",
+				type: RuntimeCheckIssueEnumSchema.enum.JobOwnerMultipleActive,
 			});
 		}
 	}
@@ -117,19 +120,19 @@ export const checkRuntimeJobsFx = Effect.fn("checkRuntimeJobsFx")(function* ({
 				jobIds: ids,
 				maxQueueSize,
 				queueSize: ids.length,
-				type: "job:queue-exceeded",
+				type: RuntimeCheckIssueEnumSchema.enum.JobQueueExceeded,
 			});
 	}
 
 	for (const item of runtime.items) {
-		if (item.location.scope !== "job" && item.location.scope !== "reserved") continue;
+		if (item.location.scope !== LocationScopeEnumSchema.enum.Job && item.location.scope !== LocationScopeEnumSchema.enum.Reserved) continue;
 		const location = item.location;
 		if (!runtime.jobs.some((job) => job.id === location.jobId)) {
 			materialOrphanIssues.push({
 				itemId: item.id,
 				jobId: location.jobId,
 				location,
-				type: "job:material-orphan",
+				type: RuntimeCheckIssueEnumSchema.enum.JobMaterialOrphan,
 			});
 		}
 	}
@@ -156,7 +159,7 @@ export const checkRuntimeJobsFx = Effect.fn("checkRuntimeJobsFx")(function* ({
 			],
 			ownedJobIds: owned.jobs.map((job) => job.id),
 			requestIds: owned.queue.map((request) => request.id),
-			type: "job:consumed-material-state",
+			type: RuntimeCheckIssueEnumSchema.enum.JobConsumedMaterialState,
 		});
 	}
 

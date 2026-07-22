@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { validateStartStateFx } from "~/engine/validation/rule/validateStartStateFx";
 import { startTestConfig } from "~test/start/fx/support/startTestConfig";
+import { DiagnosticCodeEnumSchema } from "~/engine/validation/schema/DiagnosticCodeEnumSchema";
 
 const provenance = {
 	start: "start.json",
@@ -54,7 +55,7 @@ describe("validateStartStateFx", () => {
 
 		expect(diagnostics).toEqual([
 			expect.objectContaining({
-				code: "start:invalid",
+				code: DiagnosticCodeEnumSchema.enum.StartInvalid,
 				failureTag: "RuntimeInvalidError",
 				path: [
 					"start",
@@ -83,7 +84,7 @@ describe("validateStartStateFx", () => {
 		);
 
 		expect(diagnostics[0]).toMatchObject({
-			code: "start:invalid",
+			code: DiagnosticCodeEnumSchema.enum.StartInvalid,
 			failureTag: "StartInventoryUnavailableError",
 		});
 	});

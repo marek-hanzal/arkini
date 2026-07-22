@@ -6,6 +6,7 @@ import { mergeItemsFx } from "~/engine/merge/write/mergeItemsFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import type { StateSchema } from "~/engine/state/schema/StateSchema";
+import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
 
 const config = GameConfigSchema.parse({
 	version: "1.0",
@@ -137,7 +138,7 @@ describe("mergeItemsFx multi-space inventory bridge", () => {
 		);
 
 		expect(result.event).toMatchObject({
-			type: "item:merged",
+			type: GameEventEnumSchema.enum.ItemMerged,
 			action: "use",
 		});
 		expect(

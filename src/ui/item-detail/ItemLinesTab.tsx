@@ -2,6 +2,7 @@ import { motion } from "motion/react";
 import { useMemo, useState } from "react";
 import { match } from "ts-pattern";
 
+import { JobStatusEnumSchema } from "~/bridge/job/JobStatusEnumSchema";
 import { useAutofillItemDetailLine } from "~/bridge/item-detail/useAutofillItemDetailLine";
 import type { useItemDetailLines } from "~/bridge/item-detail/useItemDetailLines";
 import { useSetDefaultItemDetailLine } from "~/bridge/item-detail/useSetDefaultItemDetailLine";
@@ -40,9 +41,9 @@ const chargeLabel = (charges: useItemDetailLines.ChargeCost) =>
 
 const activeJobLabel = (activeJob: NonNullable<useItemDetailLines.Line["activeJob"]>) =>
 	match(activeJob.status)
-		.with("running", () => "Running")
-		.with("paused", () => "Paused")
-		.with("awaiting-output", () => "Awaiting output")
+		.with(JobStatusEnumSchema.enum.Running, () => "Running")
+		.with(JobStatusEnumSchema.enum.Paused, () => "Paused")
+		.with(JobStatusEnumSchema.enum.AwaitingOutput, () => "Awaiting output")
 		.exhaustive();
 
 const runtimePresentation = ({
@@ -60,15 +61,15 @@ const runtimePresentation = ({
 		};
 	}
 	return match(activeJob.status)
-		.with("running", () => ({
+		.with(JobStatusEnumSchema.enum.Running, () => ({
 			value: formatDuration(activeJob.remainingMs),
 			detail: `Remaining of ${formatDuration(activeJob.durationMs)}`,
 		}))
-		.with("paused", () => ({
+		.with(JobStatusEnumSchema.enum.Paused, () => ({
 			value: formatDuration(activeJob.remainingMs),
 			detail: `Paused · of ${formatDuration(activeJob.durationMs)}`,
 		}))
-		.with("awaiting-output", () => ({
+		.with(JobStatusEnumSchema.enum.AwaitingOutput, () => ({
 			value: "Complete",
 			detail: "Awaiting output",
 		}))

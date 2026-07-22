@@ -5,6 +5,7 @@ import type { ItemEnumSchema } from "~/engine/item/schema/ItemEnumSchema";
 import type { LocationSchema } from "~/engine/location/schema/LocationSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import type { StorageScopeEnumSchema } from "~/engine/scope/schema/StorageScopeEnumSchema";
+import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 
 export namespace readItemDetailInfo {
 	export interface Props {
@@ -14,23 +15,23 @@ export namespace readItemDetailInfo {
 
 	export type Location =
 		| {
-				readonly kind: "board";
+				readonly kind: typeof LocationScopeEnumSchema.enum.Board;
 				readonly space: number;
 		  }
 		| {
-				readonly kind: "inventory";
+				readonly kind: typeof LocationScopeEnumSchema.enum.Inventory;
 		  }
 		| {
-				readonly kind: "toolbar";
+				readonly kind: typeof LocationScopeEnumSchema.enum.Toolbar;
 		  }
 		| {
-				readonly kind: "input";
+				readonly kind: typeof LocationScopeEnumSchema.enum.Input;
 		  }
 		| {
-				readonly kind: "job";
+				readonly kind: typeof LocationScopeEnumSchema.enum.Job;
 		  }
 		| {
-				readonly kind: "reserved";
+				readonly kind: typeof LocationScopeEnumSchema.enum.Reserved;
 		  };
 
 	export type Result =
@@ -65,51 +66,51 @@ const readLocation = (location: LocationSchema.Type): readItemDetailInfo.Locatio
 	match(location)
 		.with(
 			{
-				scope: "board",
+				scope: LocationScopeEnumSchema.enum.Board,
 			},
 			({ space }) => ({
-				kind: "board" as const,
+				kind: LocationScopeEnumSchema.enum.Board,
 				space,
 			}),
 		)
 		.with(
 			{
-				scope: "inventory",
+				scope: LocationScopeEnumSchema.enum.Inventory,
 			},
 			() => ({
-				kind: "inventory" as const,
+				kind: LocationScopeEnumSchema.enum.Inventory,
 			}),
 		)
 		.with(
 			{
-				scope: "toolbar",
+				scope: LocationScopeEnumSchema.enum.Toolbar,
 			},
 			() => ({
-				kind: "toolbar" as const,
+				kind: LocationScopeEnumSchema.enum.Toolbar,
 			}),
 		)
 		.with(
 			{
-				scope: "input",
+				scope: LocationScopeEnumSchema.enum.Input,
 			},
 			() => ({
-				kind: "input" as const,
+				kind: LocationScopeEnumSchema.enum.Input,
 			}),
 		)
 		.with(
 			{
-				scope: "job",
+				scope: LocationScopeEnumSchema.enum.Job,
 			},
 			() => ({
-				kind: "job" as const,
+				kind: LocationScopeEnumSchema.enum.Job,
 			}),
 		)
 		.with(
 			{
-				scope: "reserved",
+				scope: LocationScopeEnumSchema.enum.Reserved,
 			},
 			() => ({
-				kind: "reserved" as const,
+				kind: LocationScopeEnumSchema.enum.Reserved,
 			}),
 		)
 		.exhaustive();

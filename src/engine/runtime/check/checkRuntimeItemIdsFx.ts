@@ -2,6 +2,7 @@ import { Effect } from "effect";
 
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import type { DuplicateItemIdIssueSchema } from "~/engine/runtime/schema/check/DuplicateItemIdIssueSchema";
+import { RuntimeCheckIssueEnumSchema } from "~/engine/runtime/schema/check/RuntimeCheckIssueEnumSchema";
 
 export namespace checkRuntimeItemIdsFx {
 	export interface Props {
@@ -29,7 +30,7 @@ export const checkRuntimeItemIdsFx = Effect.fn("checkRuntimeItemIdsFx")(function
 		if (duplicated) {
 			issues.push({
 				itemId: item.id,
-				type: "item:id:duplicate",
+				type: RuntimeCheckIssueEnumSchema.enum.DuplicateItemId,
 			});
 		}
 	}

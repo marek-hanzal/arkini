@@ -7,6 +7,7 @@ import { startFx } from "~/engine/start/write/startFx";
 import { readItemDetailLinesFx } from "~/engine/item-detail/read/readItemDetailLinesFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { lineRunRuntime, lineRunTestConfig } from "~test/line/fx/run/support/lineRunTestRuntime";
+import { JobStatusEnumSchema } from "~/engine/job/schema/read/JobStatusEnumSchema";
 
 const readLines = (runtime: RuntimeSchema.Type, itemId = "runtime:workshop") =>
 	Effect.runSync(
@@ -110,7 +111,7 @@ describe("readItemDetailLinesFx", () => {
 					reason: "stored",
 				},
 				activeJob: {
-					status: "paused",
+					status: JobStatusEnumSchema.enum.Paused,
 					remainingMs: 400,
 				},
 			},
@@ -168,9 +169,9 @@ describe("readItemDetailLinesFx", () => {
 		) {
 			throw new Error("Expected available lines.");
 		}
-		expect(running.line[0]?.activeJob?.status).toBe("running");
-		expect(paused.line[0]?.activeJob?.status).toBe("paused");
-		expect(ready.line[0]?.activeJob?.status).toBe("awaiting-output");
+		expect(running.line[0]?.activeJob?.status).toBe(JobStatusEnumSchema.enum.Running);
+		expect(paused.line[0]?.activeJob?.status).toBe(JobStatusEnumSchema.enum.Paused);
+		expect(ready.line[0]?.activeJob?.status).toBe(JobStatusEnumSchema.enum.AwaitingOutput);
 	});
 
 	it("keeps single-slot owners on a disabled Start action while work is active", () => {

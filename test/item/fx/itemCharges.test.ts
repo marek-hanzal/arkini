@@ -14,6 +14,9 @@ import { fromRuntimeFx } from "~/engine/state/fx/fromRuntimeFx";
 import { StateSchema } from "~/engine/state/schema/StateSchema";
 import { fromStateFx } from "~/engine/runtime/fx/fromStateFx";
 import { runTickRuntimeByFx } from "~/engine/tick/fx/runTickRuntimeByFx";
+import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
+import { RuntimeCheckIssueEnumSchema } from "~/engine/runtime/schema/check/RuntimeCheckIssueEnumSchema";
+import { ItemChargesIssueReasonEnumSchema } from "~/engine/runtime/schema/check/ItemChargesIssueReasonEnumSchema";
 
 const value = (value: number) => ({
 	type: "value" as const,
@@ -572,7 +575,7 @@ describe("item charges", () => {
 		);
 
 		expect(result.events).toContainEqual({
-			type: "item:split",
+			type: GameEventEnumSchema.enum.ItemSplit,
 			itemId: result.tree.id,
 			canonicalItemId: "deposit:tree",
 			location: board(1),
@@ -644,7 +647,7 @@ describe("item charges", () => {
 		);
 
 		expect(result.events).toContainEqual({
-			type: "item:depleted",
+			type: GameEventEnumSchema.enum.ItemDepleted,
 			itemId: result.sapling.id,
 			canonicalItemId: "deposit:sapling",
 			location: board(1),
@@ -653,7 +656,7 @@ describe("item charges", () => {
 		});
 		expect(result.events).not.toContainEqual(
 			expect.objectContaining({
-				type: "item:removed",
+				type: GameEventEnumSchema.enum.ItemRemoved,
 				itemId: result.sapling.id,
 			}),
 		);
@@ -971,7 +974,7 @@ describe("item charges", () => {
 							reservedQuantity: 2,
 							maxCount: 1,
 							quantity: 2,
-							type: "item:max-count",
+							type: RuntimeCheckIssueEnumSchema.enum.ItemMaxCount,
 						},
 					]),
 				},
@@ -1011,7 +1014,7 @@ describe("item charges", () => {
 			}),
 		);
 
-		expect(result.issues.some((issue) => issue.type === "item:max-count")).toBe(false);
+		expect(result.issues.some((issue) => issue.type === RuntimeCheckIssueEnumSchema.enum.ItemMaxCount)).toBe(false);
 	});
 
 	it("blocks a self-depleting job when line and depletion outputs exceed maxCount together", () => {
@@ -1189,19 +1192,19 @@ describe("item charges", () => {
 			expect.arrayContaining([
 				expect.objectContaining({
 					itemId: "runtime:missing-config",
-					reason: "missing-config",
+					reason: ItemChargesIssueReasonEnumSchema.enum.MissingConfig,
 				}),
 				expect.objectContaining({
 					itemId: "runtime:full-state",
-					reason: "full-state",
+					reason: ItemChargesIssueReasonEnumSchema.enum.FullState,
 				}),
 				expect.objectContaining({
 					itemId: "runtime:exceeds",
-					reason: "exceeds-amount",
+					reason: ItemChargesIssueReasonEnumSchema.enum.ExceedsAmount,
 				}),
 				expect.objectContaining({
 					itemId: "runtime:depleted",
-					reason: "depleted-idle",
+					reason: ItemChargesIssueReasonEnumSchema.enum.DepletedIdle,
 				}),
 			]),
 		);

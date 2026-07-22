@@ -4,6 +4,9 @@ import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
 import type { BoardRuntimeItemSchema } from "~/engine/runtime/schema/BoardRuntimeItemSchema";
 import type { OutputPlacementResultSchema } from "~/engine/placement/schema/OutputPlacementResultSchema";
 import { readOutputPlacementItemEventsFx } from "~/engine/event/read/readOutputPlacementItemEventsFx";
+import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
+import { ItemRemovedReasonEnumSchema } from "~/engine/event/schema/ItemRemovedReasonEnumSchema";
+import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 
 const sameLocation = (
 	left: BoardRuntimeItemSchema.Type["location"],
@@ -21,19 +24,19 @@ export const readLifecycleItemEventsFx = Effect.fn("readLifecycleItemEventsFx")(
 }: {
 	readonly outgoing: BoardRuntimeItemSchema.Type;
 	readonly placement: OutputPlacementResultSchema.Type;
-	readonly reason: "depleted" | "expired" | "lifecycle";
+	readonly reason: ItemRemovedReasonEnumSchema.Type;
 }) {
 	const placementEvents = yield* readOutputPlacementItemEventsFx(placement);
 	const replacement = placementEvents.find(
 		(event) =>
-			event.type === "item:spawned" &&
-			event.location.scope === "board" &&
+			event.type === GameEventEnumSchema.enum.ItemSpawned &&
+			event.location.scope === LocationScopeEnumSchema.enum.Board &&
 			sameLocation(outgoing.location, event.location),
 	);
 	const events: GameEventSchema.Type[] = [];
-	if (replacement?.type === "item:spawned") {
+	if (replacement?.type === GameEventEnumSchema.enum.ItemSpawned) {
 		events.push({
-			type: "item:replaced",
+			type: GameEventEnumSchema.enum.ItemReplaced,
 			outgoingItemId: outgoing.id,
 			outgoingCanonicalItemId: outgoing.item.id,
 			outgoingQuantity: outgoing.quantity,
@@ -44,7 +47,7 @@ export const readLifecycleItemEventsFx = Effect.fn("readLifecycleItemEventsFx")(
 		});
 	} else {
 		events.push({
-			type: "item:removed",
+			type: GameEventEnumSchema.enum.ItemRemoved,
 			itemId: outgoing.id,
 			canonicalItemId: outgoing.item.id,
 			location: outgoing.location,
@@ -53,7 +56,7 @@ export const readLifecycleItemEventsFx = Effect.fn("readLifecycleItemEventsFx")(
 		});
 	}
 	for (const event of placementEvents) {
-		if (replacement?.type === "item:spawned" && event === replacement) continue;
+		if (replacement?.type === GameEventEnumSchema.enum.ItemSpawned && event === replacement) continue;
 		events.push(event);
 	}
 	return events;

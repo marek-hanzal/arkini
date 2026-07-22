@@ -7,6 +7,7 @@ import { removeRuntimeItemIdentityFx } from "~/engine/runtime/fx/removeRuntimeIt
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { makeTemporaryExpiryRandomFx } from "~/engine/item/temporary/random/makeTemporaryExpiryRandomFx";
 import type { OutputPlacementResultSchema } from "~/engine/placement/schema/OutputPlacementResultSchema";
+import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 
 export namespace completeTemporaryItemExpiryTransitionFx {
 	export interface Props {
@@ -25,7 +26,7 @@ export const completeTemporaryItemExpiryTransitionFx = Effect.fn("completeTempor
 	if (item.item.type !== "temporary") {
 		return yield* Effect.dieMessage(`Runtime item ${item.id} is not temporary.`);
 	}
-	if (item.location.scope !== "board") {
+	if (item.location.scope !== LocationScopeEnumSchema.enum.Board) {
 		return yield* Effect.dieMessage(`Temporary item ${item.id} is not on the board.`);
 	}
 	if (item.remainingDurationMs !== 0) {

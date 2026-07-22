@@ -14,6 +14,7 @@ import { readRuntimeItemByIdFx } from "~/engine/runtime/read/readRuntimeItemById
 import type { BoardRuntimeItemSchema } from "~/engine/runtime/schema/BoardRuntimeItemSchema";
 import type { GridRuntimeItemSchema } from "~/engine/runtime/schema/GridRuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 
 export namespace planLineInputAutofillFx {
 	export interface Props {
@@ -42,7 +43,7 @@ const candidateRank = ({
 	readonly candidate: GridRuntimeItemSchema.Type;
 	readonly owner: BoardRuntimeItemSchema.Type;
 }) => {
-	if (candidate.location.scope === "board") {
+	if (candidate.location.scope === LocationScopeEnumSchema.enum.Board) {
 		return {
 			surface: 0,
 			distance:
@@ -53,7 +54,7 @@ const candidateRank = ({
 	}
 
 	return {
-		surface: candidate.location.scope === "inventory" ? 1 : 2,
+		surface: candidate.location.scope === LocationScopeEnumSchema.enum.Inventory ? 1 : 2,
 		distance: 0,
 		position: candidate.location.position.y * 10_000 + candidate.location.position.x,
 	};
@@ -123,7 +124,7 @@ export const planLineInputAutofillFx = Effect.fn("planLineInputAutofillFx")(func
 			(candidate): candidate is GridRuntimeItemSchema.Type =>
 				candidate.id !== owner.id &&
 				isGridRuntimeItem(candidate) &&
-				(candidate.location.scope !== "board" ||
+				(candidate.location.scope !== LocationScopeEnumSchema.enum.Board ||
 					candidate.location.space === owner.location.space),
 		)
 		.slice()

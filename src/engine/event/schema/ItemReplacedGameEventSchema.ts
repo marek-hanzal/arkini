@@ -1,11 +1,15 @@
 import { z } from "zod";
 
+import { GameEventEnumSchema } from "./GameEventEnumSchema";
+
 import { IdSchema } from "~/engine/common/schema/IdSchema";
 import { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 
 export const ItemReplacedGameEventSchema = z
 	.object({
-		type: z.literal("item:replaced"),
+		type: GameEventEnumSchema.extract([
+			GameEventEnumSchema.enum.ItemReplaced,
+		]),
 		outgoingItemId: IdSchema,
 		outgoingCanonicalItemId: IdSchema,
 		outgoingQuantity: z.number().int().positive(),

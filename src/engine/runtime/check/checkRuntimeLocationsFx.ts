@@ -1,4 +1,6 @@
 import { Effect } from "effect";
+
+import { RuntimeCheckIssueEnumSchema } from "~/engine/runtime/schema/check/RuntimeCheckIssueEnumSchema";
 import { match } from "ts-pattern";
 
 import { readGridLocationOccupantsFx } from "~/engine/location/read/readGridLocationOccupantsFx";
@@ -8,6 +10,8 @@ import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import type { LocationOccupiedIssueSchema } from "~/engine/runtime/schema/check/LocationOccupiedIssueSchema";
 import type { LocationOutOfBoundsIssueSchema } from "~/engine/runtime/schema/check/LocationOutOfBoundsIssueSchema";
 import type { LocationScopeIssueSchema } from "~/engine/runtime/schema/check/LocationScopeIssueSchema";
+import { StorageScopeEnumSchema } from "~/engine/scope/schema/StorageScopeEnumSchema";
+import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 
 export namespace checkRuntimeLocationsFx {
 	export interface Props {
@@ -34,20 +38,20 @@ export const checkRuntimeLocationsFx = Effect.fn("checkRuntimeLocationsFx")(func
 
 	for (const item of items) {
 		const configuredScope = item.item.scope;
-		const scopeAllowed = configuredScope === "any" || configuredScope === item.location.scope;
+		const scopeAllowed = configuredScope === StorageScopeEnumSchema.enum.any || configuredScope === item.location.scope;
 		if (!scopeAllowed) {
 			scopeIssues.push({
 				configuredScope,
 				itemId: item.id,
 				location: item.location,
-				type: "location:scope",
+				type: RuntimeCheckIssueEnumSchema.enum.LocationScope,
 			});
 		}
 
 		const size = match(item.location.scope)
-			.with("board", () => config.meta.board)
-			.with("inventory", () => config.meta.inventory)
-			.with("toolbar", () => ({
+			.with(LocationScopeEnumSchema.enum.Board, () => config.meta.board)
+			.with(LocationScopeEnumSchema.enum.Inventory, () => config.meta.inventory)
+			.with(LocationScopeEnumSchema.enum.Toolbar, () => ({
 				width: config.meta.toolbarSize ?? 0,
 				height: 1,
 			}))
@@ -59,7 +63,7 @@ export const checkRuntimeLocationsFx = Effect.fn("checkRuntimeLocationsFx")(func
 				itemId: item.id,
 				location: item.location,
 				size,
-				type: "location:out-of-bounds",
+				type: RuntimeCheckIssueEnumSchema.enum.LocationOutOfBounds,
 			});
 		}
 	}
@@ -73,7 +77,7 @@ export const checkRuntimeLocationsFx = Effect.fn("checkRuntimeLocationsFx")(func
 		occupancyIssues.push({
 			itemIds: entry.items.map((item) => item.id),
 			location: entry.location,
-			type: "location:occupied",
+			type: RuntimeCheckIssueEnumSchema.enum.LocationOccupied,
 		});
 	}
 

@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { RuntimeCheckIssueEnumSchema } from "~/engine/runtime/schema/check/RuntimeCheckIssueEnumSchema";
+
 import { IdSchema } from "~/engine/common/schema/IdSchema";
 import { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeIntegerSchema";
 import { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
@@ -24,7 +26,9 @@ export const ItemMaxCountIssueSchema = z
 		quantity: PositiveIntegerSchema.describe(
 			"The excessive committed quantity including live and reserved amounts.",
 		),
-		type: z.literal("item:max-count"),
+		type: RuntimeCheckIssueEnumSchema.extract([
+			RuntimeCheckIssueEnumSchema.enum.ItemMaxCount,
+		]),
 	})
 	.strict()
 	.meta({

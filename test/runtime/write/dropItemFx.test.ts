@@ -6,6 +6,9 @@ import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { dropItemFx } from "~/engine/runtime/write/dropItemFx";
 import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
+import { DropItemResultKindEnumSchema } from "~/engine/runtime/schema/command/DropItemResultKindEnumSchema";
+import { DropItemIgnoredReasonEnumSchema } from "~/engine/runtime/schema/command/DropItemIgnoredReasonEnumSchema";
+import { DropItemRejectedReasonEnumSchema } from "~/engine/runtime/schema/command/DropItemRejectedReasonEnumSchema";
 
 const configInput = {
 	version: "1.0",
@@ -210,7 +213,7 @@ describe("dropItemFx", () => {
 		);
 
 		expect(result.outcome).toMatchObject({
-			kind: "move",
+			kind: DropItemResultKindEnumSchema.enum.Move,
 			itemId: "runtime:water",
 			previousLocation: sourceLocation,
 			location: emptyLocation,
@@ -254,7 +257,7 @@ describe("dropItemFx", () => {
 		);
 
 		expect(result.outcome).toMatchObject({
-			kind: "swap",
+			kind: DropItemResultKindEnumSchema.enum.Swap,
 			source: {
 				itemId: "runtime:water",
 				previousLocation: sourceLocation,
@@ -313,7 +316,7 @@ describe("dropItemFx", () => {
 		);
 
 		expect(result.outcome).toMatchObject({
-			kind: "merge",
+			kind: DropItemResultKindEnumSchema.enum.Merge,
 			action: "consume",
 			effect: "keep",
 			source: {
@@ -373,7 +376,7 @@ describe("dropItemFx", () => {
 		);
 
 		expect(result).toMatchObject({
-			kind: "merge",
+			kind: DropItemResultKindEnumSchema.enum.Merge,
 			source: {
 				itemId: "runtime:water",
 				previousQuantity: 2,
@@ -420,7 +423,7 @@ describe("dropItemFx", () => {
 		);
 
 		expect(result).toMatchObject({
-			kind: "merge",
+			kind: DropItemResultKindEnumSchema.enum.Merge,
 			effect: "replace",
 			resultCanonicalItemId: "mud",
 			source: {
@@ -474,7 +477,7 @@ describe("dropItemFx", () => {
 		);
 
 		expect(result.outcome).toMatchObject({
-			kind: "merge",
+			kind: DropItemResultKindEnumSchema.enum.Merge,
 			effect: "remove",
 			source: {
 				itemId: "runtime:water",
@@ -520,8 +523,8 @@ describe("dropItemFx", () => {
 		);
 
 		expect(result.outcome).toEqual({
-			kind: "ignored",
-			reason: "same-location",
+			kind: DropItemResultKindEnumSchema.enum.Ignored,
+			reason: DropItemIgnoredReasonEnumSchema.enum.SameLocation,
 			itemId: "runtime:water",
 			location: sourceLocation,
 		});
@@ -559,8 +562,8 @@ describe("dropItemFx", () => {
 		);
 
 		expect(result.outcome).toEqual({
-			kind: "reject",
-			reason: "stale-source",
+			kind: DropItemResultKindEnumSchema.enum.Reject,
+			reason: DropItemRejectedReasonEnumSchema.enum.StaleSource,
 			itemId: "runtime:water",
 		});
 		expect(result.runtime.items).toEqual([
@@ -606,8 +609,8 @@ describe("dropItemFx", () => {
 		);
 
 		expect(result.outcome).toEqual({
-			kind: "reject",
-			reason: "stale-target",
+			kind: DropItemResultKindEnumSchema.enum.Reject,
+			reason: DropItemRejectedReasonEnumSchema.enum.StaleTarget,
 			itemId: "runtime:water",
 			targetItemId: "runtime:stone",
 		});

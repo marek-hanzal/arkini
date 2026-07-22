@@ -7,6 +7,10 @@ import type { GameSourceAssemblySchema } from "../schema/GameSourceAssemblySchem
 import type { GameSourceFileSchema } from "~/engine/source/schema/GameSourceFileSchema";
 import type { GameSourceProvenanceSchema } from "~/engine/source/schema/GameSourceProvenanceSchema";
 import type { GameDiagnosticsSchema } from "~/engine/validation/schema/GameDiagnosticsSchema";
+import { DiagnosticCodeEnumSchema } from "~/engine/validation/schema/DiagnosticCodeEnumSchema";
+import { DiagnosticSeverityEnumSchema } from "~/engine/validation/schema/DiagnosticSeverityEnumSchema";
+import { DiagnosticRecordEntityEnumSchema } from "~/engine/validation/schema/DiagnosticRecordEntityEnumSchema";
+import { DiagnosticProviderEnumSchema } from "~/engine/validation/schema/DiagnosticProviderEnumSchema";
 
 /**
  * Assembles parsed source fragments without allowing later files to overwrite
@@ -35,8 +39,8 @@ export const assembleGameSourcesFx = Effect.fn("assembleGameSourcesFx")(function
 				};
 			} else if (provenance.schema.resolved !== resolved) {
 				diagnostics.push({
-					code: "source:schema-reference-conflict",
-					severity: "error",
+					code: DiagnosticCodeEnumSchema.enum.SourceSchemaReferenceConflict,
+					severity: DiagnosticSeverityEnumSchema.enum.Error,
 					path: [
 						"$schema",
 					],
@@ -69,12 +73,7 @@ export const assembleGameSourcesFx = Effect.fn("assembleGameSourcesFx")(function
 			}
 		}
 
-		for (const provider of [
-			"meta",
-			"resources",
-			"start",
-			"version",
-		] as const) {
+		for (const provider of DiagnosticProviderEnumSchema.options) {
 			const providerValue = source.value[provider];
 			if (providerValue === undefined) {
 				continue;
@@ -83,8 +82,8 @@ export const assembleGameSourcesFx = Effect.fn("assembleGameSourcesFx")(function
 			const previousPath = provenance[provider];
 			if (previousPath !== undefined) {
 				diagnostics.push({
-					code: "source:duplicate-provider",
-					severity: "error",
+					code: DiagnosticCodeEnumSchema.enum.SourceDuplicateProvider,
+					severity: DiagnosticSeverityEnumSchema.enum.Error,
 					path: [
 						provider,
 					],
@@ -101,16 +100,16 @@ export const assembleGameSourcesFx = Effect.fn("assembleGameSourcesFx")(function
 
 			provenance[provider] = source.path;
 			switch (provider) {
-				case "meta":
+				case DiagnosticProviderEnumSchema.enum.Meta:
 					value.meta = source.value.meta;
 					break;
-				case "resources":
+				case DiagnosticProviderEnumSchema.enum.Resources:
 					value.resources = source.value.resources;
 					break;
-				case "start":
+				case DiagnosticProviderEnumSchema.enum.Start:
 					value.start = source.value.start;
 					break;
-				case "version":
+				case DiagnosticProviderEnumSchema.enum.Version:
 					value.version = source.value.version;
 					break;
 			}
@@ -123,15 +122,15 @@ export const assembleGameSourcesFx = Effect.fn("assembleGameSourcesFx")(function
 			const previousPath = provenance.categories[key];
 			if (previousPath !== undefined) {
 				diagnostics.push({
-					code: "source:duplicate-record",
-					severity: "error",
+					code: DiagnosticCodeEnumSchema.enum.SourceDuplicateRecord,
+					severity: DiagnosticSeverityEnumSchema.enum.Error,
 					path: [
 						"categories",
 						key,
 					],
 					source: source.path,
 					message: `Category ${key} is provided by more than one source fragment.`,
-					entity: "category",
+					entity: DiagnosticRecordEntityEnumSchema.enum.Category,
 					key,
 					sources: [
 						previousPath,
@@ -151,15 +150,15 @@ export const assembleGameSourcesFx = Effect.fn("assembleGameSourcesFx")(function
 			const previousPath = provenance.items[key];
 			if (previousPath !== undefined) {
 				diagnostics.push({
-					code: "source:duplicate-record",
-					severity: "error",
+					code: DiagnosticCodeEnumSchema.enum.SourceDuplicateRecord,
+					severity: DiagnosticSeverityEnumSchema.enum.Error,
 					path: [
 						"items",
 						key,
 					],
 					source: source.path,
 					message: `Item ${key} is provided by more than one source fragment.`,
-					entity: "item",
+					entity: DiagnosticRecordEntityEnumSchema.enum.Item,
 					key,
 					sources: [
 						previousPath,

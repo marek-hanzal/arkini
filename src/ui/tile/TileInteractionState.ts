@@ -1,3 +1,4 @@
+import { DropItemResultKindEnumSchema } from "~/bridge/tile/DropItemResultKindEnumSchema";
 import type { useDropItem } from "~/bridge/tile/useDropItem";
 import type { TileLocation } from "~/bridge/tile/TileLocation";
 import type { TileDragSource } from "~/ui/tile/TileDragSource";
@@ -43,35 +44,35 @@ export interface TileFailedSettlement extends TileSettlementBase {
 }
 
 export interface TileRejectedSettlement extends TileSettlementBase {
-	readonly kind: "reject";
+	readonly kind: typeof DropItemResultKindEnumSchema.enum.Reject;
 	readonly feedback: "rejected";
-	readonly outcome: DropOutcome<"reject">;
+	readonly outcome: DropOutcome<typeof DropItemResultKindEnumSchema.enum.Reject>;
 }
 
 export interface TileIgnoredSettlement extends TileSettlementBase {
-	readonly kind: "ignored";
+	readonly kind: typeof DropItemResultKindEnumSchema.enum.Ignored;
 	readonly feedback: "ignored";
-	readonly outcome: DropOutcome<"ignored">;
+	readonly outcome: DropOutcome<typeof DropItemResultKindEnumSchema.enum.Ignored>;
 }
 
 export interface TileMovedSettlement extends TileSettlementBase {
-	readonly kind: "move";
+	readonly kind: typeof DropItemResultKindEnumSchema.enum.Move;
 	readonly feedback: "accepted";
-	readonly outcome: DropOutcome<"move">;
+	readonly outcome: DropOutcome<typeof DropItemResultKindEnumSchema.enum.Move>;
 	readonly location: TileLocation;
 }
 
 export interface TileSwappedSettlement extends TileSettlementBase {
-	readonly kind: "swap";
+	readonly kind: typeof DropItemResultKindEnumSchema.enum.Swap;
 	readonly feedback: "accepted";
-	readonly outcome: DropOutcome<"swap">;
+	readonly outcome: DropOutcome<typeof DropItemResultKindEnumSchema.enum.Swap>;
 	readonly sourceLocation: TileLocation;
 }
 
 export interface TileMergeSettlement extends TileSettlementBase {
-	readonly kind: "merge";
+	readonly kind: typeof DropItemResultKindEnumSchema.enum.Merge;
 	readonly feedback: "accepted";
-	readonly outcome: DropOutcome<"merge">;
+	readonly outcome: DropOutcome<typeof DropItemResultKindEnumSchema.enum.Merge>;
 	readonly stage: "approach" | "resolve";
 }
 

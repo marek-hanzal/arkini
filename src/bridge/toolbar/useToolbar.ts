@@ -3,6 +3,7 @@ import { useCallback } from "react";
 import { useGameEngine } from "~/bridge/game/useGameEngine";
 import { useRuntimeSelector } from "~/bridge/runtime/useRuntimeSelector";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 
 export namespace useToolbar {
 	export interface Item {
@@ -25,7 +26,7 @@ export const useToolbar = (): useToolbar.Result => {
 		(runtime: RuntimeSchema.Type): useToolbar.Result => ({
 			size: game.config.meta.toolbarSize ?? 0,
 			items: runtime.items.flatMap((item): useToolbar.Item[] => {
-				if (item.location.scope !== "toolbar") return [];
+				if (item.location.scope !== LocationScopeEnumSchema.enum.Toolbar) return [];
 				return [
 					{
 						id: item.id,

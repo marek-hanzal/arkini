@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { match } from "ts-pattern";
 
+import { DropItemResultKindEnumSchema } from "~/bridge/tile/DropItemResultKindEnumSchema";
 import type { useTileActors } from "~/bridge/tile/useTileActors";
 import type { TileLocation } from "~/bridge/tile/TileLocation";
 import type { TileDragSource } from "~/ui/tile/TileDragSource";
@@ -95,10 +96,10 @@ const settlingView = (
 				kind: "failed",
 			},
 			{
-				kind: "reject",
+				kind: DropItemResultKindEnumSchema.enum.Reject,
 			},
 			{
-				kind: "ignored",
+				kind: DropItemResultKindEnumSchema.enum.Ignored,
 			},
 			(settlement) =>
 				settling.source.id === item.id
@@ -116,7 +117,7 @@ const settlingView = (
 		)
 		.with(
 			{
-				kind: "move",
+				kind: DropItemResultKindEnumSchema.enum.Move,
 			},
 			(settlement) =>
 				settling.source.id === item.id
@@ -135,7 +136,7 @@ const settlingView = (
 		)
 		.with(
 			{
-				kind: "swap",
+				kind: DropItemResultKindEnumSchema.enum.Swap,
 			},
 			(settlement) => {
 				let location: TileLocation | null = null;
@@ -160,7 +161,7 @@ const settlingView = (
 		)
 		.with(
 			{
-				kind: "merge",
+				kind: DropItemResultKindEnumSchema.enum.Merge,
 				stage: "approach",
 			},
 			(settlement) => {
@@ -189,7 +190,7 @@ const settlingView = (
 		)
 		.with(
 			{
-				kind: "merge",
+				kind: DropItemResultKindEnumSchema.enum.Merge,
 				stage: "resolve",
 			},
 			(settlement) => {

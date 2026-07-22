@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { RuntimeCheckIssueEnumSchema } from "~/engine/runtime/schema/check/RuntimeCheckIssueEnumSchema";
+
 import { IdSchema } from "~/engine/common/schema/IdSchema";
 import { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeIntegerSchema";
 
@@ -12,7 +14,9 @@ export const LineInputClosedIssueSchema = z
 		itemIds: z
 			.array(IdSchema)
 			.describe("The buffered runtime items illegally retained by the closed input."),
-		type: z.literal("line:input-closed"),
+		type: RuntimeCheckIssueEnumSchema.extract([
+			RuntimeCheckIssueEnumSchema.enum.LineInputClosed,
+		]),
 	})
 	.strict()
 	.meta({

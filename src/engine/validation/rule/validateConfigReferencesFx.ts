@@ -9,6 +9,9 @@ import { validateLineReferencesFx } from "../fx/validateLineReferencesFx";
 import { validateOutputReferencesFx } from "../fx/validateOutputReferencesFx";
 import { validateSelectorReferenceFx } from "../fx/validateSelectorReferenceFx";
 import type { GameDiagnosticsSchema } from "~/engine/validation/schema/GameDiagnosticsSchema";
+import { DiagnosticCodeEnumSchema } from "~/engine/validation/schema/DiagnosticCodeEnumSchema";
+import { DiagnosticSeverityEnumSchema } from "~/engine/validation/schema/DiagnosticSeverityEnumSchema";
+import { DiagnosticRecordEntityEnumSchema } from "~/engine/validation/schema/DiagnosticRecordEntityEnumSchema";
 
 export namespace validateConfigReferencesFx {
 	export interface Props {
@@ -29,8 +32,8 @@ export const validateConfigReferencesFx = Effect.fn("validateConfigReferencesFx"
 			continue;
 		}
 		diagnostics.push({
-			code: "config:missing-reference",
-			severity: "error",
+			code: DiagnosticCodeEnumSchema.enum.ConfigMissingReference,
+			severity: DiagnosticSeverityEnumSchema.enum.Error,
 			path: [
 				"start",
 				"board",
@@ -39,7 +42,7 @@ export const validateConfigReferencesFx = Effect.fn("validateConfigReferencesFx"
 			],
 			source: provenance.start,
 			message: `Initial board references missing item ${value.itemId}.`,
-			reference: "item",
+			reference: DiagnosticRecordEntityEnumSchema.enum.Item,
 			referenceId: value.itemId,
 		});
 	}
@@ -49,8 +52,8 @@ export const validateConfigReferencesFx = Effect.fn("validateConfigReferencesFx"
 			continue;
 		}
 		diagnostics.push({
-			code: "config:missing-reference",
-			severity: "error",
+			code: DiagnosticCodeEnumSchema.enum.ConfigMissingReference,
+			severity: DiagnosticSeverityEnumSchema.enum.Error,
 			path: [
 				"start",
 				"inventory",
@@ -59,7 +62,7 @@ export const validateConfigReferencesFx = Effect.fn("validateConfigReferencesFx"
 			],
 			source: provenance.start,
 			message: `Initial inventory references missing item ${value.itemId}.`,
-			reference: "item",
+			reference: DiagnosticRecordEntityEnumSchema.enum.Item,
 			referenceId: value.itemId,
 		});
 	}
@@ -68,8 +71,8 @@ export const validateConfigReferencesFx = Effect.fn("validateConfigReferencesFx"
 		const source = provenance.items[itemId];
 		if (config.categories[item.categoryId] === undefined) {
 			diagnostics.push({
-				code: "config:missing-reference",
-				severity: "error",
+				code: DiagnosticCodeEnumSchema.enum.ConfigMissingReference,
+				severity: DiagnosticSeverityEnumSchema.enum.Error,
 				path: [
 					"items",
 					itemId,
@@ -77,7 +80,7 @@ export const validateConfigReferencesFx = Effect.fn("validateConfigReferencesFx"
 				],
 				source,
 				message: `Item ${itemId} references missing category ${item.categoryId}.`,
-				reference: "category",
+				reference: DiagnosticRecordEntityEnumSchema.enum.Category,
 				referenceId: item.categoryId,
 			});
 		}
@@ -108,8 +111,8 @@ export const validateConfigReferencesFx = Effect.fn("validateConfigReferencesFx"
 							return;
 						}
 						diagnostics.push({
-							code: "config:missing-reference",
-							severity: "error",
+							code: DiagnosticCodeEnumSchema.enum.ConfigMissingReference,
+							severity: DiagnosticSeverityEnumSchema.enum.Error,
 							path: [
 								"items",
 								itemId,
@@ -119,7 +122,7 @@ export const validateConfigReferencesFx = Effect.fn("validateConfigReferencesFx"
 							],
 							source,
 							message: `Merge result references missing item ${result}.`,
-							reference: "item",
+							reference: DiagnosticRecordEntityEnumSchema.enum.Item,
 							referenceId: result,
 						});
 					},

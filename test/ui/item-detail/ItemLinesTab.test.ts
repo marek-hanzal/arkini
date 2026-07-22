@@ -6,6 +6,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { useItemDetailLines } from "~/bridge/item-detail/useItemDetailLines";
 import { ItemLinesTab } from "~/ui/item-detail/ItemLinesTab";
+import { JobStatusEnumSchema } from "~/engine/job/schema/read/JobStatusEnumSchema";
 
 (
 	globalThis as {
@@ -126,7 +127,7 @@ const line = ({
 	...(active
 		? {
 				activeJob: {
-					status: "running" as const,
+					status: JobStatusEnumSchema.enum.Running,
 					durationMs: 1_000,
 					remainingMs: 500,
 				},

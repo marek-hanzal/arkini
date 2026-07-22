@@ -1,5 +1,7 @@
 import { Effect } from "effect";
 
+import { StartLineResultEnumSchema } from "~/engine/job/schema/StartLineResultEnumSchema";
+
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { ItemChargesUnavailableError } from "~/engine/item/error/ItemChargesUnavailableError";
 import type { ItemNotOnBoardError } from "~/engine/item/error/ItemNotOnBoardError";
@@ -10,6 +12,7 @@ import type { PlacementUnavailableError } from "~/engine/placement/error/Placeme
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
 import { startLineRuntimeFx } from "./startLineRuntimeFx";
+import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 
 export namespace attemptQueuedLineStartFx {
 	export interface Props {
@@ -33,7 +36,7 @@ export namespace attemptQueuedLineStartFx {
 				runtime: RuntimeSchema.Type;
 		  }
 		| {
-				type: "started";
+				type: typeof StartLineResultEnumSchema.enum.Started;
 				events: readonly GameEventSchema.Type[];
 				job: JobSchema.Type;
 				runtime: RuntimeSchema.Type;
@@ -67,7 +70,7 @@ export const attemptQueuedLineStartFx = Effect.fn("attemptQueuedLineStartFx")(fu
 		Effect.map(
 			([job, nextRuntime, events]) =>
 				({
-					type: "started",
+					type: StartLineResultEnumSchema.enum.Started,
 					events,
 					job,
 					runtime: nextRuntime,
@@ -99,7 +102,7 @@ export const attemptQueuedLineStartFx = Effect.fn("attemptQueuedLineStartFx")(fu
 					runtime,
 				} satisfies attemptQueuedLineStartFx.Result),
 			ItemNotOnBoardError: (error) =>
-				error.location.scope === "inventory" || error.location.scope === "toolbar"
+				error.location.scope === LocationScopeEnumSchema.enum.Inventory || error.location.scope === LocationScopeEnumSchema.enum.Toolbar
 					? Effect.succeed({
 							type: "blocked",
 							error,

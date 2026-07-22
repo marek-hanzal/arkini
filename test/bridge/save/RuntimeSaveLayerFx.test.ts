@@ -8,6 +8,7 @@ import { removeItemFx } from "~/engine/runtime/write/removeItemFx";
 import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
 import type { StateSchema } from "~/engine/state/schema/StateSchema";
 import { createJobTestConfig, prepareJobLineFx } from "~test/job/support/jobTestConfig";
+import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -28,7 +29,7 @@ const emitCompletedEventFx = (jobId: string) =>
 			runtime,
 			[
 				{
-					type: "job:completed" as const,
+					type: GameEventEnumSchema.enum.JobCompleted,
 					jobId,
 					ownerItemId: "owner:save",
 					lineId: "line:save",

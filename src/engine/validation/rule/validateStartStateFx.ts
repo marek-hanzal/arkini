@@ -6,6 +6,8 @@ import type { GameSourceProvenanceSchema } from "~/engine/source/schema/GameSour
 import { planStartFx } from "~/engine/start/fx/planStartFx";
 import type { StartInvalidDiagnosticSchema } from "~/engine/validation/schema/diagnostic/StartInvalidDiagnosticSchema";
 
+import { DiagnosticCodeEnumSchema } from "~/engine/validation/schema/DiagnosticCodeEnumSchema";
+import { DiagnosticSeverityEnumSchema } from "~/engine/validation/schema/DiagnosticSeverityEnumSchema";
 export namespace validateStartStateFx {
 	export interface Props {
 		config: GameConfigSchema.Type;
@@ -51,8 +53,8 @@ export const validateStartStateFx = Effect.fn("validateStartStateFx")(function* 
 	const failureTag = error._tag ?? "start:unknown";
 	return [
 		{
-			code: "start:invalid",
-			severity: "error",
+			code: DiagnosticCodeEnumSchema.enum.StartInvalid,
+			severity: DiagnosticSeverityEnumSchema.enum.Error,
 			path: [
 				"start",
 			],

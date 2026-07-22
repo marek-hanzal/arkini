@@ -9,6 +9,7 @@ import { moveItemFx } from "~/engine/runtime/write/moveItemFx";
 import { removeItemFx } from "~/engine/runtime/write/removeItemFx";
 import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
 import { createJobTestConfig, prepareJobLineFx } from "../../job/support/jobTestConfig";
+import { StartLineResultEnumSchema } from "~/engine/job/schema/StartLineResultEnumSchema";
 
 const startProps = {
 	ownerItemId: "runtime:forge",
@@ -148,8 +149,8 @@ describe("removeItemFx owner lifecycle", () => {
 		expect(Either.isLeft(result.attempt)).toBe(true);
 		if (
 			Either.isLeft(result.attempt) &&
-			result.started.type === "started" &&
-			result.queued.type === "queued"
+			result.started.type === StartLineResultEnumSchema.enum.Started &&
+			result.queued.type === StartLineResultEnumSchema.enum.Queued
 		) {
 			expect(result.attempt.left).toMatchObject({
 				_tag: "JobOwnerBusyError",

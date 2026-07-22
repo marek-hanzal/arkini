@@ -1,5 +1,6 @@
 import { Effect } from "effect";
 
+import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { ItemMergedGameEventSchema } from "~/engine/event/schema/ItemMergedGameEventSchema";
 import { ItemNotOnBoardError } from "~/engine/item/error/ItemNotOnBoardError";
@@ -111,7 +112,7 @@ export const commitMergeItemsFx = Effect.fn("commitMergeItemsFx")(function* ({
 				target,
 			}).pipe(Effect.withRandom(random));
 			const event = {
-				type: "item:merged",
+				type: GameEventEnumSchema.enum.ItemMerged,
 				sourceItemId: source.id,
 				sourceCanonicalItemId: source.item.id,
 				targetItemId: target.id,

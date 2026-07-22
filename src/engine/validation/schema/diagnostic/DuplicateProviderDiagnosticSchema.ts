@@ -1,18 +1,21 @@
 import { z } from "zod";
 
+import { DiagnosticCodeEnumSchema } from "~/engine/validation/schema/DiagnosticCodeEnumSchema";
+import { DiagnosticSeverityEnumSchema } from "~/engine/validation/schema/DiagnosticSeverityEnumSchema";
+import { DiagnosticProviderEnumSchema } from "~/engine/validation/schema/DiagnosticProviderEnumSchema";
+
 import { BaseDiagnosticSchema } from "./BaseDiagnosticSchema";
 
 export const DuplicateProviderDiagnosticSchema = z
 	.object({
 		...BaseDiagnosticSchema.shape,
-		code: z.literal("source:duplicate-provider"),
-		severity: z.literal("error"),
-		provider: z.enum([
-			"meta",
-			"resources",
-			"start",
-			"version",
+		code: DiagnosticCodeEnumSchema.extract([
+			DiagnosticCodeEnumSchema.enum.SourceDuplicateProvider,
 		]),
+		severity: DiagnosticSeverityEnumSchema.extract([
+			DiagnosticSeverityEnumSchema.enum.Error,
+		]),
+		provider: DiagnosticProviderEnumSchema,
 		sources: z.tuple([
 			z.string().min(1),
 			z.string().min(1),

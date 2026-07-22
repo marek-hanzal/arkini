@@ -5,6 +5,7 @@ import { createTestGameSession } from "~test/bridge/game/createTestGameSession";
 import type { GameEventBatchSchema } from "~/engine/event/schema/GameEventBatchSchema";
 import { mergeItemsFx } from "~/engine/merge/write/mergeItemsFx";
 import { createMergeTestConfig } from "~test/merge/support/createMergeTestConfig";
+import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
 
 const waitFor = async (assertion: () => boolean, timeoutMs = 1_000) => {
 	const startedAt = performance.now();
@@ -93,7 +94,7 @@ describe("mergeItemsFx events", () => {
 			await waitFor(() => batches.length === 1);
 
 			expect(event).toEqual({
-				type: "item:merged",
+				type: GameEventEnumSchema.enum.ItemMerged,
 				sourceItemId: "runtime:source",
 				sourceCanonicalItemId: "source",
 				targetItemId: "runtime:target",

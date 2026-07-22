@@ -2,6 +2,9 @@ import { Effect } from "effect";
 
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import type { ItemTemporaryDurationIssueSchema } from "~/engine/runtime/schema/check/ItemTemporaryDurationIssueSchema";
+import { RuntimeCheckIssueEnumSchema } from "~/engine/runtime/schema/check/RuntimeCheckIssueEnumSchema";
+import { ItemTemporaryDurationIssueReasonEnumSchema } from "~/engine/runtime/schema/check/ItemTemporaryDurationIssueReasonEnumSchema";
+import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 
 export namespace checkRuntimeItemTemporaryDurationsFx {
 	export interface Props {
@@ -19,44 +22,44 @@ export const checkRuntimeItemTemporaryDurationsFx = Effect.fn(
 		if (item.item.type !== "temporary") {
 			if (item.remainingDurationMs !== undefined) {
 				issues.push({
-					type: "item:temporary-duration",
+					type: RuntimeCheckIssueEnumSchema.enum.ItemTemporaryDuration,
 					itemId: item.id,
 					remainingDurationMs: item.remainingDurationMs,
 					location: item.location,
-					reason: "unexpected-state",
+					reason: ItemTemporaryDurationIssueReasonEnumSchema.enum.UnexpectedState,
 				});
 			}
 			continue;
 		}
 
-		if (item.location.scope !== "board") {
+		if (item.location.scope !== LocationScopeEnumSchema.enum.Board) {
 			issues.push({
-				type: "item:temporary-duration",
+				type: RuntimeCheckIssueEnumSchema.enum.ItemTemporaryDuration,
 				itemId: item.id,
 				durationMs: item.item.durationMs,
 				remainingDurationMs: item.remainingDurationMs,
 				location: item.location,
-				reason: "not-board",
+				reason: ItemTemporaryDurationIssueReasonEnumSchema.enum.NotBoard,
 			});
 		}
 		if (item.remainingDurationMs === undefined) {
 			issues.push({
-				type: "item:temporary-duration",
+				type: RuntimeCheckIssueEnumSchema.enum.ItemTemporaryDuration,
 				itemId: item.id,
 				durationMs: item.item.durationMs,
 				location: item.location,
-				reason: "missing-state",
+				reason: ItemTemporaryDurationIssueReasonEnumSchema.enum.MissingState,
 			});
 			continue;
 		}
 		if (item.remainingDurationMs > item.item.durationMs) {
 			issues.push({
-				type: "item:temporary-duration",
+				type: RuntimeCheckIssueEnumSchema.enum.ItemTemporaryDuration,
 				itemId: item.id,
 				durationMs: item.item.durationMs,
 				remainingDurationMs: item.remainingDurationMs,
 				location: item.location,
-				reason: "exceeds-duration",
+				reason: ItemTemporaryDurationIssueReasonEnumSchema.enum.ExceedsDuration,
 			});
 		}
 	}

@@ -11,6 +11,7 @@ import { planBoardPlacementFx } from "./planBoardPlacementFx";
 import { planBoardThenStoragePlacementFx } from "./planBoardThenStoragePlacementFx";
 import { planInventoryPlacementFx } from "./planInventoryPlacementFx";
 import { planToolbarPlacementFx } from "./planToolbarPlacementFx";
+import { StorageScopeEnumSchema } from "~/engine/scope/schema/StorageScopeEnumSchema";
 
 export namespace planDropScopePlacementFx {
 	export interface Props {
@@ -31,7 +32,7 @@ export const planDropScopePlacementFx = Effect.fn("planDropScopePlacementFx")(fu
 	runtime,
 }: planDropScopePlacementFx.Props) {
 	return yield* match(item.scope)
-		.with("board", () => {
+		.with(StorageScopeEnumSchema.enum.board, () => {
 			return Effect.gen(function* () {
 				const plan = yield* planBoardPlacementFx({
 					item,
@@ -49,7 +50,7 @@ export const planDropScopePlacementFx = Effect.fn("planDropScopePlacementFx")(fu
 				});
 			});
 		})
-		.with("inventory", () => {
+		.with(StorageScopeEnumSchema.enum.inventory, () => {
 			return Effect.gen(function* () {
 				const plan = yield* planInventoryPlacementFx({
 					item,
@@ -65,7 +66,7 @@ export const planDropScopePlacementFx = Effect.fn("planDropScopePlacementFx")(fu
 				});
 			});
 		})
-		.with("toolbar", () => {
+		.with(StorageScopeEnumSchema.enum.toolbar, () => {
 			return Effect.gen(function* () {
 				const plan = yield* planToolbarPlacementFx({
 					item,
@@ -81,7 +82,7 @@ export const planDropScopePlacementFx = Effect.fn("planDropScopePlacementFx")(fu
 				});
 			});
 		})
-		.with("any", () => {
+		.with(StorageScopeEnumSchema.enum.any, () => {
 			return planBoardThenStoragePlacementFx({
 				drop,
 				item,

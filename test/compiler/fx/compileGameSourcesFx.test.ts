@@ -7,6 +7,9 @@ import {
 	createRootSource,
 	createSimpleItem,
 } from "~test/validation/support/gameValidationTestSource";
+import { DiagnosticCodeEnumSchema } from "~/engine/validation/schema/DiagnosticCodeEnumSchema";
+import { DiagnosticRecordEntityEnumSchema } from "~/engine/validation/schema/DiagnosticRecordEntityEnumSchema";
+import { DiagnosticProviderEnumSchema } from "~/engine/validation/schema/DiagnosticProviderEnumSchema";
 
 const compile = (...sources: GameSourceFileSchema.Type[]) =>
 	Effect.runPromise(compileGameSourcesFx(sources));
@@ -54,7 +57,7 @@ describe("compileGameSourcesFx", () => {
 		expect(result.diagnostics).toEqual(
 			expect.arrayContaining([
 				expect.objectContaining({
-					code: "config:schema",
+					code: DiagnosticCodeEnumSchema.enum.ConfigSchema,
 					path: [
 						"start",
 					],
@@ -84,8 +87,8 @@ describe("compileGameSourcesFx", () => {
 		expect(result.diagnostics).toEqual(
 			expect.arrayContaining([
 				expect.objectContaining({
-					code: "source:duplicate-record",
-					entity: "item",
+					code: DiagnosticCodeEnumSchema.enum.SourceDuplicateRecord,
+					entity: DiagnosticRecordEntityEnumSchema.enum.Item,
 					key: item.id,
 					sources: [
 						"/game/game.json",
@@ -121,8 +124,8 @@ describe("compileGameSourcesFx", () => {
 		expect(result.diagnostics).toEqual(
 			expect.arrayContaining([
 				expect.objectContaining({
-					code: "source:duplicate-provider",
-					provider: "meta",
+					code: DiagnosticCodeEnumSchema.enum.SourceDuplicateProvider,
+					provider: DiagnosticProviderEnumSchema.enum.Meta,
 				}),
 			]),
 		);
@@ -143,7 +146,7 @@ describe("compileGameSourcesFx", () => {
 		expect(result.diagnostics).not.toEqual(
 			expect.arrayContaining([
 				expect.objectContaining({
-					code: "source:schema-reference-conflict",
+					code: DiagnosticCodeEnumSchema.enum.SourceSchemaReferenceConflict,
 				}),
 			]),
 		);
@@ -180,13 +183,13 @@ describe("compileGameSourcesFx", () => {
 		expect(result.diagnostics).toEqual(
 			expect.arrayContaining([
 				expect.objectContaining({
-					code: "config:schema",
+					code: DiagnosticCodeEnumSchema.enum.ConfigSchema,
 					path: [
 						"categories",
 					],
 				}),
 				expect.objectContaining({
-					code: "config:schema",
+					code: DiagnosticCodeEnumSchema.enum.ConfigSchema,
 					path: [
 						"items",
 					],
@@ -226,8 +229,8 @@ describe("compileGameSourcesFx", () => {
 		expect(result.diagnostics).toEqual(
 			expect.arrayContaining([
 				expect.objectContaining({
-					code: "source:duplicate-record",
-					entity: "category",
+					code: DiagnosticCodeEnumSchema.enum.SourceDuplicateRecord,
+					entity: DiagnosticRecordEntityEnumSchema.enum.Category,
 					key: "category:test",
 					sources: [
 						"/game/game.json",
@@ -253,7 +256,7 @@ describe("compileGameSourcesFx", () => {
 		expect(result.diagnostics).toEqual(
 			expect.arrayContaining([
 				expect.objectContaining({
-					code: "source:schema-reference-conflict",
+					code: DiagnosticCodeEnumSchema.enum.SourceSchemaReferenceConflict,
 					sources: [
 						"/game/game.json",
 						"/game/items/a.json",

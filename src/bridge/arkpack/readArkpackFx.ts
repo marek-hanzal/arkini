@@ -6,6 +6,7 @@ import type { GameSourceProvenanceSchema } from "~/engine/source/schema/GameSour
 import { GameValidationError } from "~/engine/validation/error/GameValidationError";
 import { validateGameConfigFx } from "~/engine/validation/fx/validateGameConfigFx";
 import { validateGameResourcesFx } from "~/engine/validation/rule/validateGameResourcesFx";
+import { DiagnosticSeverityEnumSchema } from "~/engine/validation/schema/DiagnosticSeverityEnumSchema";
 
 export namespace readArkpackFx {
 	export interface Props {
@@ -137,7 +138,7 @@ export const readArkpackFx = Effect.fn("readArkpackFx")(function* ({
 			})),
 		})),
 	];
-	const errors = diagnostics.filter(({ severity }) => severity === "error");
+	const errors = diagnostics.filter(({ severity }) => severity === DiagnosticSeverityEnumSchema.enum.Error);
 	if (errors.length > 0) {
 		return yield* Effect.fail(
 			new GameValidationError({

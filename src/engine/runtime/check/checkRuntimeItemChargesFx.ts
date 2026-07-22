@@ -2,6 +2,8 @@ import { Effect } from "effect";
 
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import type { ItemChargesIssueSchema } from "~/engine/runtime/schema/check/ItemChargesIssueSchema";
+import { RuntimeCheckIssueEnumSchema } from "~/engine/runtime/schema/check/RuntimeCheckIssueEnumSchema";
+import { ItemChargesIssueReasonEnumSchema } from "~/engine/runtime/schema/check/ItemChargesIssueReasonEnumSchema";
 
 export namespace checkRuntimeItemChargesFx {
 	export interface Props {
@@ -20,30 +22,30 @@ export const checkRuntimeItemChargesFx = Effect.fn("checkRuntimeItemChargesFx")(
 		const amount = item.item.charges?.amount;
 		if (amount === undefined) {
 			issues.push({
-				type: "item:charges",
+				type: RuntimeCheckIssueEnumSchema.enum.ItemCharges,
 				itemId: item.id,
 				remainingCharges: item.remainingCharges,
-				reason: "missing-config",
+				reason: ItemChargesIssueReasonEnumSchema.enum.MissingConfig,
 			});
 			continue;
 		}
 		if (item.remainingCharges > amount) {
 			issues.push({
-				type: "item:charges",
+				type: RuntimeCheckIssueEnumSchema.enum.ItemCharges,
 				itemId: item.id,
 				amount,
 				remainingCharges: item.remainingCharges,
-				reason: "exceeds-amount",
+				reason: ItemChargesIssueReasonEnumSchema.enum.ExceedsAmount,
 			});
 			continue;
 		}
 		if (item.remainingCharges === amount) {
 			issues.push({
-				type: "item:charges",
+				type: RuntimeCheckIssueEnumSchema.enum.ItemCharges,
 				itemId: item.id,
 				amount,
 				remainingCharges: item.remainingCharges,
-				reason: "full-state",
+				reason: ItemChargesIssueReasonEnumSchema.enum.FullState,
 			});
 			continue;
 		}
@@ -52,11 +54,11 @@ export const checkRuntimeItemChargesFx = Effect.fn("checkRuntimeItemChargesFx")(
 			!runtime.jobs.some((job) => job.ownerItemId === item.id)
 		) {
 			issues.push({
-				type: "item:charges",
+				type: RuntimeCheckIssueEnumSchema.enum.ItemCharges,
 				itemId: item.id,
 				amount,
 				remainingCharges: item.remainingCharges,
-				reason: "depleted-idle",
+				reason: ItemChargesIssueReasonEnumSchema.enum.DepletedIdle,
 			});
 		}
 	}

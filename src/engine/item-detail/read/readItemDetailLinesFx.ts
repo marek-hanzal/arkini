@@ -18,6 +18,8 @@ import type { QuantitySchema } from "~/engine/quantity/schema/QuantitySchema";
 import type { RollSchema } from "~/engine/roll/schema/RollSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import type { SelectorSchema } from "~/engine/selector/schema/SelectorSchema";
+import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
+import { JobStatusEnumSchema } from "~/engine/job/schema/read/JobStatusEnumSchema";
 
 export namespace readItemDetailLinesFx {
 	export interface Props {
@@ -122,7 +124,7 @@ export namespace readItemDetailLinesFx {
 		readonly input: readonly Input[];
 		readonly output: readonly OutputSet[];
 		readonly activeJob?: {
-			readonly status: "running" | "paused" | "awaiting-output";
+			readonly status: JobStatusEnumSchema.Type;
 			readonly durationMs: TimeSchema.Type;
 			readonly remainingMs: TimeSchema.Type;
 		};
@@ -197,7 +199,7 @@ const inputItems = ({
 }) =>
 	runtime.items.filter(
 		(item) =>
-			item.location.scope === "input" &&
+			item.location.scope === LocationScopeEnumSchema.enum.Input &&
 			item.location.ownerItemId === ownerItemId &&
 			item.location.lineId === lineId &&
 			item.location.inputIndex === inputIndex,
@@ -427,7 +429,7 @@ const storedLine = ({
 		? {}
 		: {
 				activeJob: {
-					status: "paused",
+					status: JobStatusEnumSchema.enum.Paused,
 					durationMs: activeJob.durationMs,
 					remainingMs: activeJob.remainingMs,
 				},
@@ -452,7 +454,7 @@ export const readItemDetailLinesFx = Effect.fn("readItemDetailLinesFx")(function
 		const activeJob = runtime.jobs.find(
 			(job) => job.ownerItemId === owner.id && job.lineId === line.id,
 		);
-		if (owner.location.scope !== "board") {
+		if (owner.location.scope !== LocationScopeEnumSchema.enum.Board) {
 			if (line.show || activeJob !== undefined) {
 				projected.push(
 					storedLine({
@@ -482,7 +484,7 @@ export const readItemDetailLinesFx = Effect.fn("readItemDetailLinesFx")(function
 		});
 		const canWithdraw = runtime.items.some(
 			(item) =>
-				item.location.scope === "input" &&
+				item.location.scope === LocationScopeEnumSchema.enum.Input &&
 				item.location.ownerItemId === owner.id &&
 				item.location.lineId === line.id,
 		);
@@ -529,7 +531,7 @@ export const readItemDetailLinesFx = Effect.fn("readItemDetailLinesFx")(function
 				? {}
 				: {
 						activeJob: {
-							status: activeJobStatus ?? "paused",
+							status: activeJobStatus ?? JobStatusEnumSchema.enum.Paused,
 							durationMs: activeJob.durationMs,
 							remainingMs: activeJob.remainingMs,
 						},

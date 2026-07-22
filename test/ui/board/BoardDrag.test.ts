@@ -16,6 +16,7 @@ import { ItemDetailModal } from "~/ui/item-detail/ItemDetailModal";
 import { ItemDetailProvider } from "~/ui/item-detail/ItemDetailProvider";
 import { motionTestRuntime } from "~test/ui/support/motionReactMock";
 import { testGameRead, testGameReadOrThrow } from "~test/support/game/testGameRead";
+import { DropItemResultKindEnumSchema } from "~/engine/runtime/schema/command/DropItemResultKindEnumSchema";
 
 (
 	globalThis as {
@@ -431,7 +432,7 @@ describe("Board drag", () => {
 		const revision = source.dataset.runtimeRevision;
 		if (runtimeId === undefined || revision === undefined) throw new Error("Missing identity.");
 		dropItemState.drop.mockResolvedValue({
-			kind: "move",
+			kind: DropItemResultKindEnumSchema.enum.Move,
 			itemId: runtimeId,
 			revision: "revision:moved",
 			previousLocation: {
@@ -510,10 +511,10 @@ describe("Board drag", () => {
 		const swapOutcome: Extract<
 			dropItemFx.Result,
 			{
-				readonly kind: "swap";
+				readonly kind: typeof DropItemResultKindEnumSchema.enum.Swap;
 			}
 		> = {
-			kind: "swap",
+			kind: DropItemResultKindEnumSchema.enum.Swap,
 			source: {
 				itemId: sourceId,
 				revision: "revision:source-swapped",
@@ -688,10 +689,10 @@ describe("Board drag", () => {
 		const mergeOutcome: Extract<
 			dropItemFx.Result,
 			{
-				readonly kind: "merge";
+				readonly kind: typeof DropItemResultKindEnumSchema.enum.Merge;
 			}
 		> = {
-			kind: "merge",
+			kind: DropItemResultKindEnumSchema.enum.Merge,
 			action: "consume",
 			effect: "keep",
 			source: {
@@ -815,7 +816,7 @@ describe("Board drag", () => {
 					),
 			});
 			return {
-				kind: "merge",
+				kind: DropItemResultKindEnumSchema.enum.Merge,
 				action: "consume",
 				effect: "replace",
 				resultCanonicalItemId: "stone",
@@ -906,7 +907,7 @@ describe("Board drag", () => {
 				),
 			});
 			return {
-				kind: "merge",
+				kind: DropItemResultKindEnumSchema.enum.Merge,
 				action: "consume",
 				effect: "remove",
 				source: {
@@ -1000,7 +1001,7 @@ describe("Board drag", () => {
 					items: currentRuntime.items.filter((item) => item.id !== sourceId),
 				});
 				return {
-					kind: "merge",
+					kind: DropItemResultKindEnumSchema.enum.Merge,
 					action: "consume",
 					effect: "keep",
 					source: {
@@ -1039,7 +1040,7 @@ describe("Board drag", () => {
 					),
 				});
 				return {
-					kind: "move",
+					kind: DropItemResultKindEnumSchema.enum.Move,
 					itemId: targetId,
 					revision: chainedRevision,
 					previousLocation: targetLocation,

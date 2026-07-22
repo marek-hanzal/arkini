@@ -9,9 +9,13 @@ import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
 import { isGridRuntimeItem } from "~/engine/runtime/read/isGridRuntimeItem";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import type { DropItemResultSchema } from "~/engine/runtime/schema/command/DropItemResultSchema";
+import { DropItemIgnoredReasonEnumSchema } from "~/engine/runtime/schema/command/DropItemIgnoredReasonEnumSchema";
+import { DropItemRejectedReasonEnumSchema } from "~/engine/runtime/schema/command/DropItemRejectedReasonEnumSchema";
+import { DropItemResultKindEnumSchema } from "~/engine/runtime/schema/command/DropItemResultKindEnumSchema";
 import type { GridRuntimeItemSchema } from "~/engine/runtime/schema/GridRuntimeItemSchema";
 import { moveItemFx } from "~/engine/runtime/write/moveItemFx";
 import { swapItemsFx } from "~/engine/runtime/write/swapItemsFx";
+import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 
 export namespace dropItemFx {
 	export interface Props {
@@ -37,17 +41,17 @@ export namespace dropItemFx {
 
 type OccupiedDropPreflight =
 	| {
-			readonly kind: "swap";
+			readonly kind: typeof DropItemResultKindEnumSchema.enum.Swap;
 	  }
 	| {
-			readonly kind: "merge";
+			readonly kind: typeof DropItemResultKindEnumSchema.enum.Merge;
 	  }
 	| {
-			readonly kind: "reject";
+			readonly kind: typeof DropItemResultKindEnumSchema.enum.Reject;
 			readonly reason: Extract<
 				dropItemFx.Result,
 				{
-					readonly kind: "reject";
+					readonly kind: typeof DropItemResultKindEnumSchema.enum.Reject;
 				}
 			>["reason"];
 	  };
@@ -71,54 +75,54 @@ const readOccupiedDropPreflightFx = Effect.fn("readOccupiedDropPreflightFx")(fun
 	const source = runtime.items.find((item) => item.id === sourceItemId);
 	if (source === undefined || source.revision !== sourceRevision) {
 		return {
-			kind: "reject",
-			reason: "stale-source",
+			kind: DropItemResultKindEnumSchema.enum.Reject,
+			reason: DropItemRejectedReasonEnumSchema.enum.StaleSource,
 		} satisfies OccupiedDropPreflight;
 	}
 	const target = runtime.items.find((item) => item.id === targetItemId);
 	if (target === undefined || target.revision !== targetRevision) {
 		return {
-			kind: "reject",
-			reason: "stale-target",
+			kind: DropItemResultKindEnumSchema.enum.Reject,
+			reason: DropItemRejectedReasonEnumSchema.enum.StaleTarget,
 		} satisfies OccupiedDropPreflight;
 	}
 	if (!isGridRuntimeItem(source)) {
 		return {
-			kind: "reject",
-			reason: "invalid-source",
+			kind: DropItemResultKindEnumSchema.enum.Reject,
+			reason: DropItemRejectedReasonEnumSchema.enum.InvalidSource,
 		} satisfies OccupiedDropPreflight;
 	}
 	if (!isGridRuntimeItem(target)) {
 		return {
-			kind: "reject",
-			reason: "invalid-target",
+			kind: DropItemResultKindEnumSchema.enum.Reject,
+			reason: DropItemRejectedReasonEnumSchema.enum.InvalidTarget,
 		} satisfies OccupiedDropPreflight;
 	}
 	if (!isSameGridLocation(source.location, sourceLocation)) {
 		return {
-			kind: "reject",
-			reason: "stale-source",
+			kind: DropItemResultKindEnumSchema.enum.Reject,
+			reason: DropItemRejectedReasonEnumSchema.enum.StaleSource,
 		} satisfies OccupiedDropPreflight;
 	}
 	if (!isSameGridLocation(target.location, targetLocation)) {
 		return {
-			kind: "reject",
-			reason: "stale-target",
+			kind: DropItemResultKindEnumSchema.enum.Reject,
+			reason: DropItemRejectedReasonEnumSchema.enum.StaleTarget,
 		} satisfies OccupiedDropPreflight;
 	}
-	if (target.location.scope === "board") {
+	if (target.location.scope === LocationScopeEnumSchema.enum.Board) {
 		const mergeRule = yield* resolveMergeRuleFx({
 			source,
 			target,
 		}).pipe(Effect.option);
 		if (Option.isSome(mergeRule)) {
 			return {
-				kind: "merge",
+				kind: DropItemResultKindEnumSchema.enum.Merge,
 			} satisfies OccupiedDropPreflight;
 		}
 	}
 	return {
-		kind: "swap",
+		kind: DropItemResultKindEnumSchema.enum.Swap,
 	} satisfies OccupiedDropPreflight;
 });
 
@@ -139,8 +143,8 @@ const rejectForItemError = ({
 	readonly sourceItemId: IdSchema.Type;
 	readonly targetItemId: IdSchema.Type;
 }): dropItemFx.Result => ({
-	kind: "reject",
-	reason: errorItemId === targetItemId ? "stale-target" : "stale-source",
+	kind: DropItemResultKindEnumSchema.enum.Reject,
+	reason: errorItemId === targetItemId ? DropItemRejectedReasonEnumSchema.enum.StaleTarget : DropItemRejectedReasonEnumSchema.enum.StaleSource,
 	itemId: sourceItemId,
 	targetItemId,
 });
@@ -154,16 +158,16 @@ export const dropItemFx = Effect.fn("dropItemFx")(function* ({
 }: dropItemFx.Props) {
 	if (target.kind === "unsupported") {
 		return {
-			kind: "reject",
-			reason: "unsupported-target",
+			kind: DropItemResultKindEnumSchema.enum.Reject,
+			reason: DropItemRejectedReasonEnumSchema.enum.UnsupportedTarget,
 			itemId: sourceItemId,
 		} satisfies dropItemFx.Result;
 	}
 
 	if (isSameGridLocation(sourceLocation, target.location)) {
 		return {
-			kind: "ignored",
-			reason: "same-location",
+			kind: DropItemResultKindEnumSchema.enum.Ignored,
+			reason: DropItemIgnoredReasonEnumSchema.enum.SameLocation,
 			itemId: sourceItemId,
 			location: sourceLocation,
 		} satisfies dropItemFx.Result;
@@ -178,7 +182,7 @@ export const dropItemFx = Effect.fn("dropItemFx")(function* ({
 		}).pipe(
 			Effect.map(
 				(result): dropItemFx.Result => ({
-					kind: "move",
+					kind: DropItemResultKindEnumSchema.enum.Move,
 					itemId: result.item.id,
 					revision: result.item.revision,
 					previousLocation: result.previousLocation,
@@ -188,45 +192,45 @@ export const dropItemFx = Effect.fn("dropItemFx")(function* ({
 			Effect.catchTags({
 				LocationOccupiedError: (error) =>
 					Effect.succeed({
-						kind: "reject" as const,
-						reason: "occupied" as const,
+						kind: DropItemResultKindEnumSchema.enum.Reject,
+						reason: DropItemRejectedReasonEnumSchema.enum.Occupied,
 						itemId: sourceItemId,
 						targetItemId: error.itemId,
 					}),
 				ItemNotFoundError: () =>
 					Effect.succeed({
-						kind: "reject" as const,
-						reason: "stale-source" as const,
+						kind: DropItemResultKindEnumSchema.enum.Reject,
+						reason: DropItemRejectedReasonEnumSchema.enum.StaleSource,
 						itemId: sourceItemId,
 					}),
 				RevisionConflictError: () =>
 					Effect.succeed({
-						kind: "reject" as const,
-						reason: "stale-source" as const,
+						kind: DropItemResultKindEnumSchema.enum.Reject,
+						reason: DropItemRejectedReasonEnumSchema.enum.StaleSource,
 						itemId: sourceItemId,
 					}),
 				ItemLocationConflictError: () =>
 					Effect.succeed({
-						kind: "reject" as const,
-						reason: "stale-source" as const,
+						kind: DropItemResultKindEnumSchema.enum.Reject,
+						reason: DropItemRejectedReasonEnumSchema.enum.StaleSource,
 						itemId: sourceItemId,
 					}),
 				ItemNotOnGridError: () =>
 					Effect.succeed({
-						kind: "reject" as const,
-						reason: "invalid-source" as const,
+						kind: DropItemResultKindEnumSchema.enum.Reject,
+						reason: DropItemRejectedReasonEnumSchema.enum.InvalidSource,
 						itemId: sourceItemId,
 					}),
 				CrossSpaceBoardOperationError: () =>
 					Effect.succeed({
-						kind: "reject" as const,
-						reason: "invalid-target" as const,
+						kind: DropItemResultKindEnumSchema.enum.Reject,
+						reason: DropItemRejectedReasonEnumSchema.enum.InvalidTarget,
 						itemId: sourceItemId,
 					}),
 				RuntimeInvalidError: () =>
 					Effect.succeed({
-						kind: "reject" as const,
-						reason: "invalid-target" as const,
+						kind: DropItemResultKindEnumSchema.enum.Reject,
+						reason: DropItemRejectedReasonEnumSchema.enum.InvalidTarget,
 						itemId: sourceItemId,
 					}),
 			}),
@@ -242,15 +246,15 @@ export const dropItemFx = Effect.fn("dropItemFx")(function* ({
 		targetRevision: target.occupant.revision,
 		targetLocation: target.location,
 	});
-	if (preflight.kind === "reject") {
+	if (preflight.kind === DropItemResultKindEnumSchema.enum.Reject) {
 		return {
-			kind: "reject",
+			kind: DropItemResultKindEnumSchema.enum.Reject,
 			reason: preflight.reason,
 			itemId: sourceItemId,
 			targetItemId,
 		} satisfies dropItemFx.Result;
 	}
-	if (preflight.kind === "merge") {
+	if (preflight.kind === DropItemResultKindEnumSchema.enum.Merge) {
 		return yield* commitMergeItemsFx({
 			sourceItemId,
 			sourceRevision,
@@ -259,7 +263,7 @@ export const dropItemFx = Effect.fn("dropItemFx")(function* ({
 		}).pipe(
 			Effect.map(
 				(result): dropItemFx.Result => ({
-					kind: "merge",
+					kind: DropItemResultKindEnumSchema.enum.Merge,
 					action: result.event.action,
 					effect: result.event.effect,
 					resultCanonicalItemId: result.event.resultCanonicalItemId,
@@ -304,37 +308,37 @@ export const dropItemFx = Effect.fn("dropItemFx")(function* ({
 					),
 				ItemNotOnGridError: () =>
 					Effect.succeed({
-						kind: "reject" as const,
-						reason: "invalid-source" as const,
+						kind: DropItemResultKindEnumSchema.enum.Reject,
+						reason: DropItemRejectedReasonEnumSchema.enum.InvalidSource,
 						itemId: sourceItemId,
 						targetItemId,
 					}),
 				ItemNotOnBoardError: () =>
 					Effect.succeed({
-						kind: "reject" as const,
-						reason: "invalid-target" as const,
+						kind: DropItemResultKindEnumSchema.enum.Reject,
+						reason: DropItemRejectedReasonEnumSchema.enum.InvalidTarget,
 						itemId: sourceItemId,
 						targetItemId,
 					}),
 				CrossSpaceBoardOperationError: () =>
 					Effect.succeed({
-						kind: "reject" as const,
-						reason: "invalid-target" as const,
+						kind: DropItemResultKindEnumSchema.enum.Reject,
+						reason: DropItemRejectedReasonEnumSchema.enum.InvalidTarget,
 						itemId: sourceItemId,
 						targetItemId,
 					}),
 				MergeRuleNotFoundError: () =>
 					Effect.succeed({
-						kind: "reject" as const,
-						reason: "invalid-target" as const,
+						kind: DropItemResultKindEnumSchema.enum.Reject,
+						reason: DropItemRejectedReasonEnumSchema.enum.InvalidTarget,
 						itemId: sourceItemId,
 						targetItemId,
 					}),
 			}),
 			Effect.catchAll(() =>
 				Effect.succeed({
-					kind: "reject" as const,
-					reason: "blocked" as const,
+					kind: DropItemResultKindEnumSchema.enum.Reject,
+					reason: DropItemRejectedReasonEnumSchema.enum.Blocked,
 					itemId: sourceItemId,
 					targetItemId,
 				}),
@@ -350,7 +354,7 @@ export const dropItemFx = Effect.fn("dropItemFx")(function* ({
 	}).pipe(
 		Effect.map(
 			(result): dropItemFx.Result => ({
-				kind: "swap",
+				kind: DropItemResultKindEnumSchema.enum.Swap,
 				source: {
 					itemId: result.first.id,
 					revision: result.first.revision,
@@ -384,32 +388,32 @@ export const dropItemFx = Effect.fn("dropItemFx")(function* ({
 				),
 			ItemNotOnGridError: (error) =>
 				Effect.succeed({
-					kind: "reject" as const,
+					kind: DropItemResultKindEnumSchema.enum.Reject,
 					reason:
 						error.itemId === targetItemId
-							? ("invalid-target" as const)
-							: ("invalid-source" as const),
+							? (DropItemRejectedReasonEnumSchema.enum.InvalidTarget)
+							: (DropItemRejectedReasonEnumSchema.enum.InvalidSource),
 					itemId: sourceItemId,
 					targetItemId,
 				}),
 			CrossSpaceBoardOperationError: () =>
 				Effect.succeed({
-					kind: "reject" as const,
-					reason: "invalid-target" as const,
+					kind: DropItemResultKindEnumSchema.enum.Reject,
+					reason: DropItemRejectedReasonEnumSchema.enum.InvalidTarget,
 					itemId: sourceItemId,
 					targetItemId,
 				}),
 			RuntimeInvalidError: () =>
 				Effect.succeed({
-					kind: "reject" as const,
-					reason: "invalid-target" as const,
+					kind: DropItemResultKindEnumSchema.enum.Reject,
+					reason: DropItemRejectedReasonEnumSchema.enum.InvalidTarget,
 					itemId: sourceItemId,
 					targetItemId,
 				}),
 			SwapSameItemError: () =>
 				Effect.succeed({
-					kind: "ignored" as const,
-					reason: "same-location" as const,
+					kind: DropItemResultKindEnumSchema.enum.Ignored,
+					reason: DropItemIgnoredReasonEnumSchema.enum.SameLocation,
 					itemId: sourceItemId,
 					location: sourceLocation,
 				}),

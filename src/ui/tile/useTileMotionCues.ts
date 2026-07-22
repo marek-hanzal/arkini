@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 
-import { useGameEvents } from "~/bridge/event/useGameEvents";
+import { GameEventEnumSchema, useGameEvents } from "~/bridge/event/useGameEvents";
 import { useGameEngine } from "~/bridge/game/useGameEngine";
 import type { useTileActors } from "~/bridge/tile/useTileActors";
 import type { TileMotionCueSchema } from "~/ui/tile/schema/TileMotionCueSchema";
+import { LocationScopeEnumSchema } from "~/bridge/tile/LocationScopeEnumSchema";
 
 interface TileMotionCueState {
 	readonly nextGeneration: number;
@@ -58,7 +59,7 @@ export const useTileMotionCues = ({
 	}, []);
 
 	useGameEvents((batch) => {
-		if (batch.events.some((event) => event.type === "current-space:changed")) {
+		if (batch.events.some((event) => event.type === GameEventEnumSchema.enum.CurrentSpaceChanged)) {
 			onSceneReset();
 		}
 		setState((current) => {
@@ -97,47 +98,47 @@ export const useTileMotionCues = ({
 
 			for (const event of batch.events) {
 				switch (event.type) {
-					case "current-space:changed":
+					case GameEventEnumSchema.enum.CurrentSpaceChanged:
 						for (const itemId of cues.keys()) {
 							const item = liveById.get(itemId) ?? retained.get(itemId);
-							if (item?.location.scope !== "board") continue;
+							if (item?.location.scope !== LocationScopeEnumSchema.enum.Board) continue;
 							cues.delete(itemId);
 							retained.delete(itemId);
 							changed = true;
 						}
 						for (const item of liveItemsRef.current) {
 							if (
-								item.location.scope === "board" &&
+								item.location.scope === LocationScopeEnumSchema.enum.Board &&
 								item.location.space === event.currentSpace
 							) {
 								cue(item.id, "settle", false);
 							}
 						}
 						break;
-					case "item:spawned":
+					case GameEventEnumSchema.enum.ItemSpawned:
 						cue(event.itemId, "spawn", false);
 						break;
-					case "item:stacked":
-					case "item:split":
+					case GameEventEnumSchema.enum.ItemStacked:
+					case GameEventEnumSchema.enum.ItemSplit:
 						cue(event.itemId, "impact", false);
 						break;
-					case "item:depleted":
+					case GameEventEnumSchema.enum.ItemDepleted:
 						if (event.quantity > 0) cue(event.itemId, "impact", false);
 						break;
-					case "item:removed":
+					case GameEventEnumSchema.enum.ItemRemoved:
 						cue(event.itemId, "exit", true);
 						break;
-					case "item:replaced":
+					case GameEventEnumSchema.enum.ItemReplaced:
 						cue(event.outgoingItemId, "exit", true);
 						cue(event.incomingItemId, "spawn", false);
 						break;
-					case "job:started":
+					case GameEventEnumSchema.enum.JobStarted:
 						cue(event.ownerItemId, "accept", false);
 						break;
-					case "item:consumed":
-					case "item:expired":
-					case "item:merged":
-					case "job:completed":
+					case GameEventEnumSchema.enum.ItemConsumed:
+					case GameEventEnumSchema.enum.ItemExpired:
+					case GameEventEnumSchema.enum.ItemMerged:
+					case GameEventEnumSchema.enum.JobCompleted:
 						break;
 				}
 			}

@@ -17,6 +17,10 @@ import { fromRuntimeFx } from "~/engine/state/fx/fromRuntimeFx";
 import { runTickRuntimeByFx } from "~/engine/tick/fx/runTickRuntimeByFx";
 import { StateSchema } from "~/engine/state/schema/StateSchema";
 import { createJobTestConfig, prepareJobLineFx } from "~test/job/support/jobTestConfig";
+import { RuntimeCheckIssueEnumSchema } from "~/engine/runtime/schema/check/RuntimeCheckIssueEnumSchema";
+import { DropItemResultKindEnumSchema } from "~/engine/runtime/schema/command/DropItemResultKindEnumSchema";
+import { DropItemRejectedReasonEnumSchema } from "~/engine/runtime/schema/command/DropItemRejectedReasonEnumSchema";
+import { JobStatusEnumSchema } from "~/engine/job/schema/read/JobStatusEnumSchema";
 
 const configInput = {
 	version: "1.0",
@@ -170,7 +174,7 @@ describe("Toolbar engine", () => {
 						occupant: null,
 					},
 				});
-				if (stored.kind !== "move") throw new Error("Expected toolbar move.");
+				if (stored.kind !== DropItemResultKindEnumSchema.enum.Move) throw new Error("Expected toolbar move.");
 				const restored = yield* dropItemFx({
 					sourceItemId: stored.itemId,
 					sourceRevision: stored.revision,
@@ -190,12 +194,12 @@ describe("Toolbar engine", () => {
 		);
 
 		expect(result.stored).toMatchObject({
-			kind: "move",
+			kind: DropItemResultKindEnumSchema.enum.Move,
 			previousLocation: board(0, 0),
 			location: toolbar(0),
 		});
 		expect(result.restored).toMatchObject({
-			kind: "move",
+			kind: DropItemResultKindEnumSchema.enum.Move,
 			previousLocation: toolbar(0),
 			location: board(2, 1),
 		});
@@ -239,7 +243,7 @@ describe("Toolbar engine", () => {
 		);
 
 		expect(result.outcome).toMatchObject({
-			kind: "swap",
+			kind: DropItemResultKindEnumSchema.enum.Swap,
 			source: {
 				itemId: "runtime:water",
 				location: toolbar(1),
@@ -282,8 +286,8 @@ describe("Toolbar engine", () => {
 		);
 
 		expect(result.outcome).toEqual({
-			kind: "reject",
-			reason: "invalid-target",
+			kind: DropItemResultKindEnumSchema.enum.Reject,
+			reason: DropItemRejectedReasonEnumSchema.enum.InvalidTarget,
 			itemId: "runtime:board-only",
 		});
 		expect(result.runtime.items[0]?.location).toEqual(board(1, 0));
@@ -400,7 +404,7 @@ describe("Toolbar engine", () => {
 		);
 
 		expect(issues).toContainEqual({
-			type: "location:out-of-bounds",
+			type: RuntimeCheckIssueEnumSchema.enum.LocationOutOfBounds,
 			itemId: "runtime:orphaned-toolbar",
 			location: toolbar(0),
 			size: {
@@ -464,7 +468,7 @@ describe("Toolbar engine", () => {
 
 		expect(result.paused).toEqual([
 			expect.objectContaining({
-				status: "paused",
+				status: JobStatusEnumSchema.enum.Paused,
 				job: expect.objectContaining({
 					remainingMs: 600,
 				}),

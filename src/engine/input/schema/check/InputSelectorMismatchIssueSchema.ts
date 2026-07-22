@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { RuntimeCheckIssueEnumSchema } from "~/engine/runtime/schema/check/RuntimeCheckIssueEnumSchema";
+
 import { IdSchema } from "~/engine/common/schema/IdSchema";
 import { InputLocationSchema } from "~/engine/location/schema/InputLocationSchema";
 
@@ -10,7 +12,9 @@ export const InputSelectorMismatchIssueSchema = z
 	.object({
 		itemId: IdSchema.describe("The buffered material rejected by the input selector."),
 		location: InputLocationSchema.describe("The mismatched input location."),
-		type: z.literal("input:selector-mismatch"),
+		type: RuntimeCheckIssueEnumSchema.extract([
+			RuntimeCheckIssueEnumSchema.enum.InputSelectorMismatch,
+		]),
 	})
 	.strict()
 	.meta({

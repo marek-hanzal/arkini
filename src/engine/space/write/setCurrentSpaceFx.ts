@@ -1,5 +1,6 @@
 import { Effect } from "effect";
 
+import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
 import type { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeIntegerSchema";
 import type { CurrentSpaceChangedGameEventSchema } from "~/engine/event/schema/CurrentSpaceChangedGameEventSchema";
 import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
@@ -34,7 +35,7 @@ export const setCurrentSpaceFx = Effect.fn("setCurrentSpaceFx")(function* ({
 			}
 
 			const event = {
-				type: "current-space:changed",
+				type: GameEventEnumSchema.enum.CurrentSpaceChanged,
 				previousSpace: runtime.currentSpace,
 				currentSpace: space,
 			} satisfies CurrentSpaceChangedGameEventSchema.Type;

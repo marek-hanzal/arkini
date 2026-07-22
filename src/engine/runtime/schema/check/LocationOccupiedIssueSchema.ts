@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { RuntimeCheckIssueEnumSchema } from "~/engine/runtime/schema/check/RuntimeCheckIssueEnumSchema";
+
 import { IdSchema } from "~/engine/common/schema/IdSchema";
 import { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 
@@ -13,7 +15,9 @@ export const LocationOccupiedIssueSchema = z
 			.min(2)
 			.describe("The live item identities that own the same location."),
 		location: GridLocationSchema.describe("The concrete location owned more than once."),
-		type: z.literal("location:occupied"),
+		type: RuntimeCheckIssueEnumSchema.extract([
+			RuntimeCheckIssueEnumSchema.enum.LocationOccupied,
+		]),
 	})
 	.strict()
 	.meta({

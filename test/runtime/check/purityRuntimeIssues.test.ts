@@ -5,6 +5,7 @@ import { useGameFx } from "~/engine/game/fx/useGameFx";
 import { checkRuntimeFx } from "~/engine/runtime/check/checkRuntimeFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { purityTestConfig } from "~test/line/support/purityTestConfig";
+import { RuntimeCheckIssueEnumSchema } from "~/engine/runtime/schema/check/RuntimeCheckIssueEnumSchema";
 
 const board = (x: number) => ({
 	scope: "board" as const,
@@ -72,7 +73,7 @@ describe("runtime purity invariants", () => {
 				itemId: "runtime:craft",
 				maxStackSize: 1,
 				quantity: 2,
-				type: "item:stack-size",
+				type: RuntimeCheckIssueEnumSchema.enum.ItemStackSize,
 			},
 			{
 				ownerItemId: "runtime:craft",
@@ -81,7 +82,7 @@ describe("runtime purity invariants", () => {
 				itemIds: [
 					"runtime:material",
 				],
-				type: "line:input-closed",
+				type: RuntimeCheckIssueEnumSchema.enum.LineInputClosed,
 			},
 		]);
 	});
@@ -187,7 +188,7 @@ describe("runtime purity invariants", () => {
 			itemId: "runtime:producer",
 			maxStackSize: 1,
 			quantity: 2,
-			type: "item:stack-size",
+			type: RuntimeCheckIssueEnumSchema.enum.ItemStackSize,
 		});
 	});
 

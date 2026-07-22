@@ -11,6 +11,7 @@ import { removeItemFx } from "~/engine/runtime/write/removeItemFx";
 import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
 import { runTickRuntimeByFx } from "~/engine/tick/fx/runTickRuntimeByFx";
 import { createJobTestConfig, prepareJobLineFx } from "~test/job/support/jobTestConfig";
+import { JobStatusEnumSchema } from "~/engine/job/schema/read/JobStatusEnumSchema";
 
 const ownerItemId = "runtime:forge";
 const lineId = "line:forge:run";
@@ -151,7 +152,7 @@ describe("job owner inventory contract", () => {
 
 		expect(result.paused).toEqual([
 			expect.objectContaining({
-				status: "paused",
+				status: JobStatusEnumSchema.enum.Paused,
 				job: expect.objectContaining({
 					remainingMs: 600,
 				}),
@@ -199,7 +200,7 @@ describe("job owner inventory contract", () => {
 
 		expect(result.paused).toEqual([
 			expect.objectContaining({
-				status: "paused",
+				status: JobStatusEnumSchema.enum.Paused,
 				job: expect.objectContaining({
 					remainingMs: 0,
 				}),

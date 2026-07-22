@@ -1,5 +1,6 @@
 import { Effect } from "effect";
 
+import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { readOutputPlacementItemEventsFx } from "~/engine/event/read/readOutputPlacementItemEventsFx";
 import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
@@ -83,7 +84,7 @@ export const isolateStatefulOwnerTransitionFx = Effect.fn("isolateStatefulOwnerT
 		return {
 			events: [
 				{
-					type: "item:split",
+					type: GameEventEnumSchema.enum.ItemSplit,
 					itemId: owner.id,
 					canonicalItemId: owner.item.id,
 					location: owner.location,

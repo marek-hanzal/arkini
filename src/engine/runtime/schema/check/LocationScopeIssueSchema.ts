@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { RuntimeCheckIssueEnumSchema } from "~/engine/runtime/schema/check/RuntimeCheckIssueEnumSchema";
+
 import { IdSchema } from "~/engine/common/schema/IdSchema";
 import { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 import { StorageScopeEnumSchema } from "~/engine/scope/schema/StorageScopeEnumSchema";
@@ -14,7 +16,9 @@ export const LocationScopeIssueSchema = z
 		),
 		itemId: IdSchema.describe("The live item stored in a forbidden grid."),
 		location: GridLocationSchema.describe("The forbidden concrete item location."),
-		type: z.literal("location:scope"),
+		type: RuntimeCheckIssueEnumSchema.extract([
+			RuntimeCheckIssueEnumSchema.enum.LocationScope,
+		]),
 	})
 	.strict()
 	.meta({

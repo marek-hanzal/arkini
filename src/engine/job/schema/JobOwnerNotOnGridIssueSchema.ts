@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { RuntimeCheckIssueEnumSchema } from "~/engine/runtime/schema/check/RuntimeCheckIssueEnumSchema";
+
 import { IdSchema } from "~/engine/common/schema/IdSchema";
 import { LocationSchema } from "~/engine/location/schema/LocationSchema";
 
@@ -9,7 +11,9 @@ export const JobOwnerNotOnGridIssueSchema = z
 		jobId: IdSchema,
 		ownerItemId: IdSchema,
 		location: LocationSchema,
-		type: z.literal("job:owner-not-on-grid"),
+		type: RuntimeCheckIssueEnumSchema.extract([
+			RuntimeCheckIssueEnumSchema.enum.JobOwnerNotOnGrid,
+		]),
 	})
 	.strict()
 	.meta({

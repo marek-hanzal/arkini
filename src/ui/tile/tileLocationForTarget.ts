@@ -2,6 +2,7 @@ import { match } from "ts-pattern";
 
 import type { TileLocation } from "~/bridge/tile/TileLocation";
 import type { TileDropTarget } from "~/ui/tile/TileDropTarget";
+import { LocationScopeEnumSchema } from "~/bridge/tile/LocationScopeEnumSchema";
 
 /** Converts one concrete supported slot target into the engine grid-location grammar. */
 export const tileLocationForTarget = (target: TileDropTarget): TileLocation | null => {
@@ -12,7 +13,7 @@ export const tileLocationForTarget = (target: TileDropTarget): TileLocation | nu
 				kind: "board",
 			},
 			(surface): TileLocation => ({
-				scope: "board",
+				scope: LocationScopeEnumSchema.enum.Board,
 				space: surface.space,
 				position: {
 					x: target.slot.x,
@@ -25,7 +26,7 @@ export const tileLocationForTarget = (target: TileDropTarget): TileLocation | nu
 				kind: "inventory",
 			},
 			(): TileLocation => ({
-				scope: "inventory",
+				scope: LocationScopeEnumSchema.enum.Inventory,
 				position: {
 					x: target.slot.x,
 					y: target.slot.y,
@@ -37,7 +38,7 @@ export const tileLocationForTarget = (target: TileDropTarget): TileLocation | nu
 				kind: "toolbar",
 			},
 			(): TileLocation => ({
-				scope: "toolbar",
+				scope: LocationScopeEnumSchema.enum.Toolbar,
 				position: {
 					x: target.slot.x,
 					y: target.slot.y,

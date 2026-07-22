@@ -5,6 +5,7 @@ import type { JobQueueRequestSchema } from "~/engine/job/schema/JobQueueRequestS
 import type { JobSchema } from "~/engine/job/schema/JobSchema";
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 
 export namespace readRuntimeItemOwnedStateFx {
 	export interface Props {
@@ -39,7 +40,7 @@ export const readRuntimeItemOwnedStateFx = Effect.fn("readRuntimeItemOwnedStateF
 
 		for (const item of runtime.items) {
 			if (
-				item.location.scope === "input" &&
+				item.location.scope === LocationScopeEnumSchema.enum.Input &&
 				ownerItemIds.has(item.location.ownerItemId) &&
 				!inputItemIds.has(item.id)
 			) {
@@ -58,7 +59,7 @@ export const readRuntimeItemOwnedStateFx = Effect.fn("readRuntimeItemOwnedStateF
 
 		for (const item of runtime.items) {
 			if (
-				(item.location.scope === "job" || item.location.scope === "reserved") &&
+				(item.location.scope === LocationScopeEnumSchema.enum.Job || item.location.scope === LocationScopeEnumSchema.enum.Reserved) &&
 				jobIds.has(item.location.jobId) &&
 				!jobItemIds.has(item.id)
 			) {

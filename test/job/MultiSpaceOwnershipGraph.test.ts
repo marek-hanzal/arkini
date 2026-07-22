@@ -11,6 +11,7 @@ import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { setCurrentSpaceFx } from "~/engine/space/write/setCurrentSpaceFx";
 import { runTickRuntimeByFx } from "~/engine/tick/fx/runTickRuntimeByFx";
 import { createJobTestConfig, prepareJobLineFx } from "~test/job/support/jobTestConfig";
+import { JobStatusEnumSchema } from "~/engine/job/schema/read/JobStatusEnumSchema";
 
 const ownerItemId = "runtime:forge";
 const lineId = "line:forge:run";
@@ -211,7 +212,7 @@ describe("multi-space owner ownership graph", () => {
 
 		expect(result).toEqual([
 			expect.objectContaining({
-				status: "paused",
+				status: JobStatusEnumSchema.enum.Paused,
 				job: expect.objectContaining({
 					remainingMs: 600,
 				}),

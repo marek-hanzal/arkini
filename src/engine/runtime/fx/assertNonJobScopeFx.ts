@@ -2,6 +2,7 @@ import { Effect } from "effect";
 
 import { ItemJobScopedError } from "~/engine/runtime/error/ItemJobScopedError";
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
+import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 
 export namespace assertNonJobScopeFx {
 	export interface Props {
@@ -13,7 +14,7 @@ export namespace assertNonJobScopeFx {
 export const assertNonJobScopeFx = Effect.fn("assertNonJobScopeFx")(function* ({
 	item,
 }: assertNonJobScopeFx.Props) {
-	if (item.location.scope !== "job" && item.location.scope !== "reserved") return;
+	if (item.location.scope !== LocationScopeEnumSchema.enum.Job && item.location.scope !== LocationScopeEnumSchema.enum.Reserved) return;
 
 	return yield* Effect.fail(
 		new ItemJobScopedError({

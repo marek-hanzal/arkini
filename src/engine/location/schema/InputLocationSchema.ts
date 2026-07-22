@@ -3,6 +3,7 @@ import { z } from "zod";
 import { IdSchema } from "~/engine/common/schema/IdSchema";
 import { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeIntegerSchema";
 
+import { LocationScopeEnumSchema } from "./LocationScopeEnumSchema";
 /**
  * One material item currently buffered by a concrete owner line input.
  */
@@ -11,7 +12,9 @@ export const InputLocationSchema = z
 		/**
 		 * Identifies this location as one line-owned input buffer.
 		 */
-		scope: z.literal("input"),
+		scope: LocationScopeEnumSchema.extract([
+			LocationScopeEnumSchema.enum.Input,
+		]),
 		/**
 		 * Runtime identity of the item that owns the input buffer.
 		 */

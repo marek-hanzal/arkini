@@ -1,5 +1,6 @@
 import { Effect } from "effect";
 
+import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
 import { readLifecycleItemEventsFx } from "~/engine/event/read/readLifecycleItemEventsFx";
@@ -15,6 +16,7 @@ import { isBoardRuntimeItem } from "~/engine/runtime/read/isBoardRuntimeItem";
 import { isJobRuntimeItem } from "~/engine/runtime/read/isJobRuntimeItem";
 import { isReservedRuntimeItem } from "~/engine/runtime/read/isReservedRuntimeItem";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import { ItemRemovedReasonEnumSchema } from "~/engine/event/schema/ItemRemovedReasonEnumSchema";
 
 export namespace completeJobTransitionFx {
 	export interface Props {
@@ -84,7 +86,7 @@ export const completeJobTransitionFx = Effect.fn("completeJobTransitionFx")(func
 			? [...(yield* readOutputPlacementItemEventsFx(completion.placement))]
 			: [
 					{
-						type: "item:depleted",
+						type: GameEventEnumSchema.enum.ItemDepleted,
 						itemId: completion.depletedOwner.id,
 						canonicalItemId: completion.depletedOwner.item.id,
 						location: completion.depletedOwner.location,
@@ -94,7 +96,7 @@ export const completeJobTransitionFx = Effect.fn("completeJobTransitionFx")(func
 					...(yield* readLifecycleItemEventsFx({
 						outgoing: completion.depletedOwner,
 						placement: completion.placement,
-						reason: "depleted",
+						reason: ItemRemovedReasonEnumSchema.enum.Depleted,
 					})),
 				];
 	return {

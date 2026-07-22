@@ -1,12 +1,16 @@
 import { z } from "zod";
 
+import { GameEventEnumSchema } from "./GameEventEnumSchema";
+
 import { IdSchema } from "~/engine/common/schema/IdSchema";
 import { InputLocationSchema } from "~/engine/location/schema/InputLocationSchema";
 import { JobLocationSchema } from "~/engine/location/schema/JobLocationSchema";
 
 export const ItemConsumedGameEventSchema = z
 	.object({
-		type: z.literal("item:consumed"),
+		type: GameEventEnumSchema.extract([
+			GameEventEnumSchema.enum.ItemConsumed,
+		]),
 		itemId: IdSchema,
 		consumedItemId: IdSchema,
 		canonicalItemId: IdSchema,

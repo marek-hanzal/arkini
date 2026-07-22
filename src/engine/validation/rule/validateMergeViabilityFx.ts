@@ -4,6 +4,10 @@ import { selectItemsFx } from "~/engine/selector/fx/selectItemsFx";
 import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import type { GameSourceProvenanceSchema } from "~/engine/source/schema/GameSourceProvenanceSchema";
 import type { GameDiagnosticsSchema } from "~/engine/validation/schema/GameDiagnosticsSchema";
+import { DiagnosticCodeEnumSchema } from "~/engine/validation/schema/DiagnosticCodeEnumSchema";
+import { DiagnosticSeverityEnumSchema } from "~/engine/validation/schema/DiagnosticSeverityEnumSchema";
+import { InvalidMergeReasonEnumSchema } from "~/engine/validation/schema/InvalidMergeReasonEnumSchema";
+import { StorageScopeEnumSchema } from "~/engine/scope/schema/StorageScopeEnumSchema";
 
 export namespace validateMergeViabilityFx {
 	export interface Props {
@@ -28,11 +32,11 @@ export const validateMergeViabilityFx = Effect.fn("validateMergeViabilityFx")(fu
 					merge.target.type === "item" &&
 					merge.target.itemId === ownerItemId &&
 					owner.maxCount === 1 &&
-					(owner.scope === "board" || owner.scope === "any");
+					(owner.scope === StorageScopeEnumSchema.enum.board || owner.scope === StorageScopeEnumSchema.enum.any);
 				if (exactSelfTargetUnavailable) {
 					diagnostics.push({
-						code: "merge:invalid",
-						severity: "error",
+						code: DiagnosticCodeEnumSchema.enum.MergeInvalid,
+						severity: DiagnosticSeverityEnumSchema.enum.Error,
 						path: [
 							"items",
 							ownerItemId,
@@ -44,7 +48,7 @@ export const validateMergeViabilityFx = Effect.fn("validateMergeViabilityFx")(fu
 						message: `Merge ${mergeIndex} of item ${ownerItemId} requires a second live identity of itself, but maxCount is 1.`,
 						ownerItemId,
 						mergeIndex,
-						reason: "self-target-unavailable",
+						reason: InvalidMergeReasonEnumSchema.enum.SelfTargetUnavailable,
 					});
 				}
 
@@ -53,12 +57,12 @@ export const validateMergeViabilityFx = Effect.fn("validateMergeViabilityFx")(fu
 					selector: merge.target,
 				});
 				const targetAvailable = matchedTargets.some((candidate) => {
-					return candidate.scope === "board" || candidate.scope === "any";
+					return candidate.scope === StorageScopeEnumSchema.enum.board || candidate.scope === StorageScopeEnumSchema.enum.any;
 				});
 				if (!targetAvailable) {
 					diagnostics.push({
-						code: "merge:invalid",
-						severity: "error",
+						code: DiagnosticCodeEnumSchema.enum.MergeInvalid,
+						severity: DiagnosticSeverityEnumSchema.enum.Error,
 						path: [
 							"items",
 							ownerItemId,
@@ -70,19 +74,19 @@ export const validateMergeViabilityFx = Effect.fn("validateMergeViabilityFx")(fu
 						message: `Merge ${mergeIndex} of item ${ownerItemId} cannot match any board-capable target.`,
 						ownerItemId,
 						mergeIndex,
-						reason: "target-unavailable",
+						reason: InvalidMergeReasonEnumSchema.enum.TargetUnavailable,
 					});
 				}
 			}
 
 			if (merge.effect !== "replace") continue;
 			const result = config.items[merge.result];
-			if (result === undefined || result.scope === "board" || result.scope === "any") {
+			if (result === undefined || result.scope === StorageScopeEnumSchema.enum.board || result.scope === StorageScopeEnumSchema.enum.any) {
 				continue;
 			}
 			diagnostics.push({
-				code: "merge:invalid",
-				severity: "error",
+				code: DiagnosticCodeEnumSchema.enum.MergeInvalid,
+				severity: DiagnosticSeverityEnumSchema.enum.Error,
 				path: [
 					"items",
 					ownerItemId,
@@ -94,7 +98,7 @@ export const validateMergeViabilityFx = Effect.fn("validateMergeViabilityFx")(fu
 				message: `Merge ${mergeIndex} of item ${ownerItemId} replaces its board target with inventory-only item ${merge.result}.`,
 				ownerItemId,
 				mergeIndex,
-				reason: "result-unavailable",
+				reason: InvalidMergeReasonEnumSchema.enum.ResultUnavailable,
 			});
 		}
 	}

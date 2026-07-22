@@ -14,6 +14,8 @@ import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { fromRuntimeFx } from "~/engine/state/fx/fromRuntimeFx";
 import { startFx } from "~/engine/start/write/startFx";
 import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
+import { RuntimeCheckIssueEnumSchema } from "~/engine/runtime/schema/check/RuntimeCheckIssueEnumSchema";
+import { DefaultLineIssueReasonEnumSchema } from "~/engine/line/schema/check/DefaultLineIssueReasonEnumSchema";
 
 const line = (id: string, title: string) => ({
 	id,
@@ -299,16 +301,16 @@ describe("setDefaultLineFx", () => {
 			});
 		}
 		expect(result.checked.issues).toContainEqual({
-			type: "line:default",
+			type: RuntimeCheckIssueEnumSchema.enum.DefaultLine,
 			ownerItemId: expect.any(String),
 			lineId: "line:missing",
-			reason: "line-missing",
+			reason: DefaultLineIssueReasonEnumSchema.enum.LineMissing,
 		});
 		expect(result.checked.issues).toContainEqual({
-			type: "line:default",
+			type: RuntimeCheckIssueEnumSchema.enum.DefaultLine,
 			ownerItemId: "runtime:missing",
 			lineId: "line:first",
-			reason: "owner-missing",
+			reason: DefaultLineIssueReasonEnumSchema.enum.OwnerMissing,
 		});
 	});
 

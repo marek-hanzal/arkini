@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { RuntimeCheckIssueEnumSchema } from "~/engine/runtime/schema/check/RuntimeCheckIssueEnumSchema";
+
 import { IdSchema } from "~/engine/common/schema/IdSchema";
 import { InputLocationSchema } from "~/engine/location/schema/InputLocationSchema";
 
@@ -10,7 +12,9 @@ export const InputOwnerMissingIssueSchema = z
 	.object({
 		itemId: IdSchema.describe("The buffered material with a missing owner."),
 		location: InputLocationSchema.describe("The invalid input location."),
-		type: z.literal("input:owner-missing"),
+		type: RuntimeCheckIssueEnumSchema.extract([
+			RuntimeCheckIssueEnumSchema.enum.InputOwnerMissing,
+		]),
 	})
 	.strict()
 	.meta({

@@ -8,6 +8,7 @@ import { queryBoardFx } from "./queryBoardFx";
 import { queryInventoryFx } from "./queryInventoryFx";
 import { queryToolbarFx } from "./queryToolbarFx";
 import { queryUniverseFx } from "./queryUniverseFx";
+import { QueryScopeEnumSchema } from "~/engine/query/schema/QueryScopeEnumSchema";
 
 export namespace queryFx {
 	export interface Props {
@@ -24,7 +25,7 @@ export const queryFx = Effect.fn("queryFx")(function* (props: queryFx.Props) {
 		.with(
 			{
 				query: {
-					scope: "board",
+					scope: QueryScopeEnumSchema.enum.board,
 				},
 			},
 			({ origin, query }) => {
@@ -37,7 +38,7 @@ export const queryFx = Effect.fn("queryFx")(function* (props: queryFx.Props) {
 		.with(
 			{
 				query: {
-					scope: "inventory",
+					scope: QueryScopeEnumSchema.enum.inventory,
 				},
 			},
 			({ query }) => {
@@ -49,7 +50,7 @@ export const queryFx = Effect.fn("queryFx")(function* (props: queryFx.Props) {
 		.with(
 			{
 				query: {
-					scope: "toolbar",
+					scope: QueryScopeEnumSchema.enum.toolbar,
 				},
 			},
 			({ query }) => {

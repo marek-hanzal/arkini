@@ -5,6 +5,8 @@ import type { DiagnosticPathSchema } from "~/engine/validation/schema/Diagnostic
 import type { GameDiagnosticsSchema } from "~/engine/validation/schema/GameDiagnosticsSchema";
 import { GameSourceFileSchema } from "~/engine/source/schema/GameSourceFileSchema";
 import { GameSourceSchema } from "~/engine/schema/GameSourceSchema";
+import { DiagnosticCodeEnumSchema } from "~/engine/validation/schema/DiagnosticCodeEnumSchema";
+import { DiagnosticSeverityEnumSchema } from "~/engine/validation/schema/DiagnosticSeverityEnumSchema";
 
 export namespace readGameSourceFileFx {
 	export interface Props {
@@ -25,8 +27,8 @@ const parseGameSourceFile = (path: string, source: string): readGameSourceFileFx
 		return {
 			diagnostics: [
 				{
-					code: "source:json-invalid",
-					severity: "error",
+					code: DiagnosticCodeEnumSchema.enum.SourceJsonInvalid,
+					severity: DiagnosticSeverityEnumSchema.enum.Error,
 					path: [],
 					source: path,
 					message: error instanceof Error ? error.message : "Invalid JSON syntax.",
@@ -39,8 +41,8 @@ const parseGameSourceFile = (path: string, source: string): readGameSourceFileFx
 	if (!parsed.success) {
 		return {
 			diagnostics: parsed.error.issues.map((issue) => ({
-				code: "source:schema-invalid",
-				severity: "error",
+				code: DiagnosticCodeEnumSchema.enum.SourceSchemaInvalid,
+				severity: DiagnosticSeverityEnumSchema.enum.Error,
 				path: issue.path.map((segment) =>
 					typeof segment === "string" || typeof segment === "number"
 						? segment

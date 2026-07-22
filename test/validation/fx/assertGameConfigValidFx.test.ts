@@ -8,6 +8,8 @@ import {
 	createRootSource,
 	createSimpleItem,
 } from "~test/validation/support/gameValidationTestSource";
+import { DiagnosticCodeEnumSchema } from "~/engine/validation/schema/DiagnosticCodeEnumSchema";
+import { DiagnosticSeverityEnumSchema } from "~/engine/validation/schema/DiagnosticSeverityEnumSchema";
 
 describe("assertGameConfigValidFx", () => {
 	it("returns a completed config when diagnostics contain only warnings", async () => {
@@ -32,8 +34,8 @@ describe("assertGameConfigValidFx", () => {
 		expect(compilation.diagnostics).toEqual(
 			expect.arrayContaining([
 				expect.objectContaining({
-					code: "deposit:unsustainable",
-					severity: "warning",
+					code: DiagnosticCodeEnumSchema.enum.DepositUnsustainable,
+					severity: DiagnosticSeverityEnumSchema.enum.Warning,
 				}),
 			]),
 		);

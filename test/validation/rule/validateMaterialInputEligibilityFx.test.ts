@@ -8,6 +8,7 @@ import {
 	createRootSource,
 	createSimpleItem,
 } from "~test/validation/support/gameValidationTestSource";
+import { DiagnosticCodeEnumSchema } from "~/engine/validation/schema/DiagnosticCodeEnumSchema";
 
 const temporaryItem = (id: string, tags: string[] = []) => ({
 	...createSimpleItem(id, tags),
@@ -49,7 +50,7 @@ const diagnostics = async (items: Record<string, unknown>) =>
 				}),
 			]),
 		)
-	).diagnostics.filter(({ code }) => code === "input:material-ineligible");
+	).diagnostics.filter(({ code }) => code === DiagnosticCodeEnumSchema.enum.InputMaterialIneligible);
 
 describe("validateMaterialInputEligibilityFx", () => {
 	it("rejects an exact temporary material candidate", async () => {
@@ -124,10 +125,10 @@ describe("validateMaterialInputEligibilityFx", () => {
 		);
 
 		expect(
-			compiled.diagnostics.filter(({ code }) => code === "input:material-ineligible"),
+			compiled.diagnostics.filter(({ code }) => code === DiagnosticCodeEnumSchema.enum.InputMaterialIneligible),
 		).toEqual([]);
 		expect(
-			compiled.diagnostics.filter(({ code }) => code === "config:missing-reference"),
+			compiled.diagnostics.filter(({ code }) => code === DiagnosticCodeEnumSchema.enum.ConfigMissingReference),
 		).toEqual([
 			expect.objectContaining({
 				referenceId: "item:missing",

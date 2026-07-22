@@ -1,9 +1,11 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
+import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
 import { useGameFx } from "~/engine/game/fx/useGameFx";
 import { storeInputMaterialFx } from "~/engine/input/write/storeInputMaterialFx";
 import { startLineFx } from "~/engine/job/write/startLineFx";
+import { RuntimeStoreFx } from "~/engine/runtime/internal/RuntimeStoreFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
@@ -224,9 +226,11 @@ describe("reserved material lifecycle", () => {
 				yield* runTickRuntimeByFx({
 					elapsedMs: 200,
 				});
-				const completed = yield* readRuntimeFx();
+				const store = yield* RuntimeStoreFx;
+				const transition = yield* store.read;
 				return {
-					completed,
+					completed: transition.runtime,
+					events: transition.events,
 					job,
 					reserved,
 				};
@@ -249,6 +253,21 @@ describe("reserved material lifecycle", () => {
 			location: expect.objectContaining({
 				scope: "board",
 			}),
+		});
+		const returnedWorker = result.completed.items.find(
+			(item) => item.id === "runtime:worker",
+		);
+		if (returnedWorker === undefined) throw new Error("Expected returned worker.");
+		expect(result.events).toContainEqual({
+			type: GameEventEnumSchema.enum.ItemPlaced,
+			itemId: returnedWorker.id,
+			canonicalItemId: "producer:worker",
+			previousLocation: {
+				scope: "reserved",
+				jobId: result.job.id,
+			},
+			location: returnedWorker.location,
+			quantity: 1,
 		});
 	});
 
@@ -363,7 +382,8 @@ describe("reserved material lifecycle", () => {
 				yield* runTickRuntimeByFx({
 					elapsedMs: 200,
 				});
-				return yield* readRuntimeFx();
+				const store = yield* RuntimeStoreFx;
+				return yield* store.read;
 			}).pipe(
 				useGameFx({
 					config,
@@ -371,8 +391,18 @@ describe("reserved material lifecycle", () => {
 			),
 		);
 
-		expect(result.items.some((item) => item.id === "runtime:tool:reserved")).toBe(false);
-		expect(result.items.find((item) => item.id === "runtime:tool:stack")?.quantity).toBe(3);
+		expect(result.runtime.items.some((item) => item.id === "runtime:tool:reserved")).toBe(false);
+		expect(result.runtime.items.find((item) => item.id === "runtime:tool:stack")?.quantity).toBe(3);
+		const stack = result.runtime.items.find((item) => item.id === "runtime:tool:stack");
+		if (stack === undefined) throw new Error("Expected normalized tool stack.");
+		expect(result.events).toContainEqual({
+			type: GameEventEnumSchema.enum.ItemStacked,
+			itemId: stack.id,
+			canonicalItemId: "item:tool",
+			location: stack.location,
+			previousQuantity: 2,
+			quantity: 3,
+		});
 	});
 
 	it("keeps the whole completion blocked when an impure reservation has no exclusive cell", () => {

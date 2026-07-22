@@ -3,7 +3,7 @@ import { z } from "zod";
 import { GameEventEnumSchema } from "./GameEventEnumSchema";
 
 import { IdSchema } from "~/engine/common/schema/IdSchema";
-import { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
+import { BoardLocationSchema } from "~/engine/location/schema/BoardLocationSchema";
 
 export const ItemExpiredGameEventSchema = z
 	.object({
@@ -12,7 +12,7 @@ export const ItemExpiredGameEventSchema = z
 		]),
 		itemId: IdSchema,
 		canonicalItemId: IdSchema,
-		location: GridLocationSchema,
+		location: BoardLocationSchema,
 		quantity: z.number().int().positive(),
 	})
 	.strict()

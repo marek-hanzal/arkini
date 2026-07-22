@@ -1,6 +1,7 @@
 import { Effect } from "effect";
 import { match } from "ts-pattern";
 
+import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
 import { EffectEnumSchema } from "~/engine/merge/schema/EffectEnumSchema";
 import { ItemStatefulError } from "~/engine/item/error/ItemStatefulError";
 import { isItemPureFx } from "~/engine/item/fx/purity/isItemPureFx";
@@ -20,6 +21,11 @@ export namespace applyMergeTargetEffectFx {
 		runtime: RuntimeSchema.Type;
 		target: BoardRuntimeItemSchema.Type;
 	}
+
+	export interface Result {
+		readonly events: readonly GameEventSchema.Type[];
+		readonly runtime: RuntimeSchema.Type;
+	}
 }
 
 /** Applies one explicit authored target effect to the selected board item. */
@@ -33,7 +39,11 @@ export const applyMergeTargetEffectFx = Effect.fn("applyMergeTargetEffectFx")(fu
 			{
 				effect: EffectEnumSchema.enum.Keep,
 			},
-			() => Effect.succeed(runtime),
+			() =>
+				Effect.succeed({
+					events: [],
+					runtime,
+				} satisfies applyMergeTargetEffectFx.Result),
 		)
 		.with(
 			{
@@ -59,11 +69,14 @@ export const applyMergeTargetEffectFx = Effect.fn("applyMergeTargetEffectFx")(fu
 						} satisfies BoardRuntimeItemSchema.Type,
 					});
 					return {
-						...runtime,
-						items: runtime.items.map((item) =>
-							item.id === target.id ? remainingTarget : item,
-						),
-					} satisfies RuntimeSchema.Type;
+						events: [],
+						runtime: {
+							...runtime,
+							items: runtime.items.map((item) =>
+								item.id === target.id ? remainingTarget : item,
+							),
+						} satisfies RuntimeSchema.Type,
+					} satisfies applyMergeTargetEffectFx.Result;
 				}),
 		)
 		.with(
@@ -106,11 +119,14 @@ export const applyMergeTargetEffectFx = Effect.fn("applyMergeTargetEffectFx")(fu
 						quantity: 1,
 					});
 					return {
-						...runtime,
-						items: runtime.items.map((item) =>
-							item.id === target.id ? replacedTarget : item,
-						),
-					} satisfies RuntimeSchema.Type;
+						events: [],
+						runtime: {
+							...runtime,
+							items: runtime.items.map((item) =>
+								item.id === target.id ? replacedTarget : item,
+							),
+						} satisfies RuntimeSchema.Type,
+					} satisfies applyMergeTargetEffectFx.Result;
 				}),
 		)
 		.exhaustive();

@@ -1,10 +1,6 @@
 import { Effect } from "effect";
 
-import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
-import { readLifecycleItemEventsFx } from "~/engine/event/read/readLifecycleItemEventsFx";
-import { readOutputPlacementItemEventsFx } from "~/engine/event/read/readOutputPlacementItemEventsFx";
 import type { JobCompletionOwner } from "~/engine/job/completion/JobCompletionContext";
 import { completeLineJobRuntimeFx } from "~/engine/job/completion/fx/completeLineJobRuntimeFx";
 import { ItemNotOnBoardError } from "~/engine/item/error/ItemNotOnBoardError";
@@ -16,7 +12,6 @@ import { isBoardRuntimeItem } from "~/engine/runtime/read/isBoardRuntimeItem";
 import { isJobRuntimeItem } from "~/engine/runtime/read/isJobRuntimeItem";
 import { isReservedRuntimeItem } from "~/engine/runtime/read/isReservedRuntimeItem";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
-import { ItemRemovedReasonEnumSchema } from "~/engine/event/schema/ItemRemovedReasonEnumSchema";
 
 export namespace completeJobTransitionFx {
 	export interface Props {
@@ -81,26 +76,8 @@ export const completeJobTransitionFx = Effect.fn("completeJobTransitionFx")(func
 		reservations,
 		runtime: completionRuntime,
 	}).pipe(Effect.withRandom(random));
-	const itemEvents: GameEventSchema.Type[] =
-		completion.depletedOwner === null
-			? [...(yield* readOutputPlacementItemEventsFx(completion.placement))]
-			: [
-					{
-						type: GameEventEnumSchema.enum.ItemDepleted,
-						itemId: completion.depletedOwner.id,
-						canonicalItemId: completion.depletedOwner.item.id,
-						location: completion.depletedOwner.location,
-						previousQuantity: completion.depletedOwner.quantity,
-						quantity: 0,
-					},
-					...(yield* readLifecycleItemEventsFx({
-						outgoing: completion.depletedOwner,
-						placement: completion.placement,
-						reason: ItemRemovedReasonEnumSchema.enum.Depleted,
-					})),
-				];
 	return {
-		events: itemEvents,
+		events: completion.events,
 		runtime: completion.runtime,
 	};
 });

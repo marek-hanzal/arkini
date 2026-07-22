@@ -7,7 +7,6 @@ import { resolveLineStartFx } from "~/engine/job/fx/read/resolveLineStartFx";
 import { isolateStatefulOwnerTransitionFx } from "~/engine/item/fx/isolateStatefulOwnerTransitionFx";
 import { applyLineRunPlanFx } from "~/engine/line/fx/run/applyLineRunPlanFx";
 import { applyLineChargePlansFx } from "~/engine/line/fx/run/applyLineChargePlansFx";
-import { readLineInputItemEventsFx } from "~/engine/event/read/readLineInputItemEventsFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 export namespace startLineRuntimeFx {
 	export interface Props {
@@ -47,7 +46,6 @@ export const startLineRuntimeFx = Effect.fn("startLineRuntimeFx")(function* ({
 		plan,
 		runtime: jobRuntime,
 	});
-	const inputEvents = yield* readLineInputItemEventsFx(inputTransition.consumption);
 	const charged = yield* applyLineChargePlansFx({
 		job,
 		plan,
@@ -64,6 +62,6 @@ export const startLineRuntimeFx = Effect.fn("startLineRuntimeFx")(function* ({
 	return [
 		job,
 		isolation.runtime,
-		[...inputEvents, ...charged.events, ...isolation.events],
+		[...inputTransition.events, ...charged.events, ...isolation.events],
 	] as const;
 });

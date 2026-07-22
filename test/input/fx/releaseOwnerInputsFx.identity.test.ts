@@ -1,8 +1,10 @@
 import { Effect, Either } from "effect";
 import { describe, expect, it } from "vitest";
 
+import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
 import { useGameFx } from "~/engine/game/fx/useGameFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
+import { RuntimeStoreFx } from "~/engine/runtime/internal/RuntimeStoreFx";
 import { removeItemFx } from "~/engine/runtime/write/removeItemFx";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import type { StateSchema } from "~/engine/state/schema/StateSchema";
@@ -182,10 +184,13 @@ const runRemoveFx = (state: StateSchema.Type) =>
 				revision: owner.revision,
 			}),
 		);
+		const store = yield* RuntimeStoreFx;
+		const transition = yield* store.read;
 		return {
-			after: yield* readRuntimeFx(),
+			after: transition.runtime,
 			attempt,
 			before,
+			events: transition.events,
 		};
 	}).pipe(
 		useGameFx({
@@ -241,6 +246,25 @@ describe("releaseOwnerInputsFx existing identity", () => {
 				ownerItemId: "runtime:worker",
 			},
 		});
+		expect(result.events).toEqual([
+			{
+				type: GameEventEnumSchema.enum.ItemPlaced,
+				itemId: "runtime:worker",
+				canonicalItemId: "worker",
+				previousLocation: {
+					scope: "input",
+					ownerItemId: boardOwner.id,
+					lineId: "line:outer",
+					inputIndex: 0,
+				},
+				location: {
+					scope: "board",
+					space: 2,
+					position: { x: 0, y: 0 },
+				},
+				quantity: 1,
+			},
+		]);
 	});
 
 	it("allows a pure buffered root to normalize into an existing stack", () => {
@@ -288,6 +312,20 @@ describe("releaseOwnerInputsFx existing identity", () => {
 		).toMatchObject({
 			quantity: 5,
 		});
+		expect(result.events).toEqual([
+			{
+				type: GameEventEnumSchema.enum.ItemStacked,
+				itemId: "runtime:material-stack",
+				canonicalItemId: "material",
+				location: {
+					scope: "board",
+					space: 2,
+					position: { x: 1, y: 0 },
+				},
+				previousQuantity: 2,
+				quantity: 5,
+			},
+		]);
 	});
 
 	it("preserves impure identities across board-first inventory fallback", () => {
@@ -413,5 +451,6 @@ describe("releaseOwnerInputsFx existing identity", () => {
 			});
 		}
 		expect(result.after).toEqual(result.before);
+		expect(result.events).toEqual([]);
 	});
 });

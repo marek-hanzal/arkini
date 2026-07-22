@@ -10,7 +10,6 @@ import { TileMotionCueVisual } from "~/ui/tile/TileMotionCueVisual";
 import { useTileMotionCues } from "~/ui/tile/useTileMotionCues";
 import { motionTestRuntime } from "~test/ui/support/motionReactMock";
 import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
-import { ItemRemovedReasonEnumSchema } from "~/engine/event/schema/ItemRemovedReasonEnumSchema";
 
 (
 	globalThis as {
@@ -85,6 +84,39 @@ describe("tile motion cue lifecycle", () => {
 		document.body.replaceChildren();
 	});
 
+	it("maps an existing identity placement to the shared spawn cue", async () => {
+		let current: ReturnType<typeof useTileMotionCues> | null = null;
+		const liveItems = [item("runtime:placed")];
+		const onSceneReset = vi.fn();
+		const Capture = () => {
+			current = useTileMotionCues({ liveItems, onSceneReset });
+			return null;
+		};
+		const container = document.createElement("div");
+		document.body.append(container);
+		const root = createRoot(container);
+		roots.push(root);
+		await act(async () => root.render(createElement(Capture)));
+
+		await dispatch([
+			{
+				type: GameEventEnumSchema.enum.ItemPlaced,
+				itemId: "runtime:placed",
+				canonicalItemId: "item:placed",
+				previousLocation: {
+					scope: "input",
+					ownerItemId: "runtime:owner",
+					lineId: "line:owner",
+					inputIndex: 0,
+				},
+				location: liveItems[0].location,
+				quantity: 1,
+			},
+		]);
+
+		expect(current?.cues.get("runtime:placed")?.kind).toBe("spawn");
+	});
+
 	it("coalesces repeated impacts and ignores stale completion generations", async () => {
 		let current: ReturnType<typeof useTileMotionCues> | null = null;
 		const liveItems = [item("runtime:stack")];
@@ -145,12 +177,11 @@ describe("tile motion cue lifecycle", () => {
 		await act(async () => root.render(createElement(Capture)));
 		await dispatch([
 			{
-				type: GameEventEnumSchema.enum.ItemRemoved,
+				type: GameEventEnumSchema.enum.ItemExpired,
 				itemId: "runtime:removed",
 				canonicalItemId: "item:removed",
 				location: liveItems[0].location,
 				quantity: 1,
-				reason: ItemRemovedReasonEnumSchema.enum.Expired,
 			},
 		]);
 		liveItems = [];
@@ -166,7 +197,7 @@ describe("tile motion cue lifecycle", () => {
 		expect(current?.retainedItems).toEqual([]);
 	});
 
-	it("retains the outgoing replacement actor when the live runtime publishes first", async () => {
+	it("coordinates independent outgoing expiry and incoming spawn when runtime publishes first", async () => {
 		let liveItems = [item("runtime:outgoing")];
 		let current: ReturnType<typeof useTileMotionCues> | null = null;
 		const onSceneReset = vi.fn();
@@ -184,13 +215,21 @@ describe("tile motion cue lifecycle", () => {
 		await act(async () => root.render(createElement(Capture)));
 		await dispatch([
 			{
-				type: GameEventEnumSchema.enum.ItemReplaced,
-				outgoingItemId: "runtime:outgoing",
-				outgoingCanonicalItemId: "item:outgoing",
-				outgoingQuantity: 1,
-				incomingItemId: "runtime:incoming",
-				incomingCanonicalItemId: "item:incoming",
-				incomingQuantity: 1,
+				type: GameEventEnumSchema.enum.ItemExpired,
+				itemId: "runtime:outgoing",
+				canonicalItemId: "item:outgoing",
+				quantity: 1,
+				location: {
+					scope: "board",
+					space: 0,
+					position: { x: 0, y: 0 },
+				},
+			},
+			{
+				type: GameEventEnumSchema.enum.ItemSpawned,
+				itemId: "runtime:incoming",
+				canonicalItemId: "item:incoming",
+				quantity: 1,
 				location: liveItems[0].location,
 			},
 		]);
@@ -201,7 +240,7 @@ describe("tile motion cue lifecycle", () => {
 		expect(current?.retainedItems.map((retained) => retained.id)).toEqual([
 			"runtime:outgoing",
 		]);
-		if (exit === undefined) throw new Error("Missing replacement exit cue.");
+		if (exit === undefined) throw new Error("Missing outgoing exit cue.");
 
 		await act(async () => current?.complete("runtime:outgoing", exit.generation));
 
@@ -224,12 +263,11 @@ describe("tile motion cue lifecycle", () => {
 		await act(async () => root.render(createElement(Capture)));
 		await dispatch([
 			{
-				type: GameEventEnumSchema.enum.ItemRemoved,
+				type: GameEventEnumSchema.enum.ItemExpired,
 				itemId: "runtime:fallback",
 				canonicalItemId: "item:fallback",
 				location: liveItems[0].location,
 				quantity: 1,
-				reason: ItemRemovedReasonEnumSchema.enum.Lifecycle,
 			},
 		]);
 		liveItems = [];
@@ -257,12 +295,11 @@ describe("tile motion cue lifecycle", () => {
 		await act(async () => root.render(createElement(Capture)));
 		await dispatch([
 			{
-				type: GameEventEnumSchema.enum.ItemRemoved,
+				type: GameEventEnumSchema.enum.ItemExpired,
 				itemId: "runtime:old-game",
 				canonicalItemId: "item:old-game",
 				location: liveItems[0].location,
 				quantity: 1,
-				reason: ItemRemovedReasonEnumSchema.enum.Lifecycle,
 			},
 		]);
 		expect(current?.retainedItems).toHaveLength(1);

@@ -1,6 +1,7 @@
 import { Effect } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
+import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
 import { ItemNotOnBoardError } from "~/engine/item/error/ItemNotOnBoardError";
 import { LineNotFoundError } from "~/engine/line/error/LineNotFoundError";
 import { readItemLineFx } from "~/engine/line/fx/readItemLineFx";
@@ -61,12 +62,15 @@ export const withdrawLineInputsFx = Effect.fn("withdrawLineInputsFx")(function* 
 					item.location.lineId === lineId,
 			);
 			let draft = runtime;
+			const events: GameEventSchema.Type[] = [];
 			for (const bufferedItem of bufferedItems) {
-				draft = yield* placeRuntimeItemFx({
+				const placement = yield* placeRuntimeItemFx({
 					itemId: bufferedItem.id,
 					origin: owner.location,
 					runtime: draft,
 				});
+				events.push(...placement.events);
+				draft = placement.runtime;
 			}
 
 			return [
@@ -78,6 +82,7 @@ export const withdrawLineInputsFx = Effect.fn("withdrawLineInputsFx")(function* 
 					),
 				} satisfies withdrawLineInputsFx.Result,
 				draft,
+				events,
 			] as const;
 		}),
 	);

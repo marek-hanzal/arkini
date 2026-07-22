@@ -1,5 +1,8 @@
 import { Effect } from "effect";
 
+import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
+import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
+
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeIntegerSchema";
 import { readInputRunItemFx } from "~/engine/input/read/readInputRunItemFx";
@@ -32,6 +35,7 @@ export namespace applyInputMaterialConsumeRunPlanFx {
 
 	export interface Result {
 		readonly consumption: readonly Consumption[];
+		readonly events: readonly GameEventSchema.Type[];
 		readonly runtime: RuntimeSchema.Type;
 	}
 }
@@ -50,6 +54,7 @@ export const applyInputMaterialConsumeRunPlanFx = Effect.fn("applyInputMaterialC
 			plan.item,
 			{
 				consumption: [] as applyInputMaterialConsumeRunPlanFx.Consumption[],
+				events: [] as GameEventSchema.Type[],
 				runtime,
 			},
 			(state, allocation) =>
@@ -87,6 +92,18 @@ export const applyInputMaterialConsumeRunPlanFx = Effect.fn("applyInputMaterialC
 									remainingQuantity: 0,
 								},
 							],
+							events: [
+								...state.events,
+								{
+									type: GameEventEnumSchema.enum.ItemConsumed,
+									sourceItemId: item.id,
+									canonicalItemId: item.item.id,
+									sourceLocation: item.location,
+									previousQuantity: item.quantity,
+									consumedQuantity: consumedItem.quantity,
+									resultingQuantity: 0,
+								} satisfies GameEventSchema.Type,
+							],
 							runtime: {
 								...discardedRuntime,
 								items: discardedRuntime.items.map((candidate) =>
@@ -117,6 +134,18 @@ export const applyInputMaterialConsumeRunPlanFx = Effect.fn("applyInputMaterialC
 								consumedItem,
 								remainingQuantity: sourceItem.quantity,
 							},
+						],
+						events: [
+							...state.events,
+							{
+								type: GameEventEnumSchema.enum.ItemConsumed,
+								sourceItemId: item.id,
+								canonicalItemId: item.item.id,
+								sourceLocation: item.location,
+								previousQuantity: item.quantity,
+								consumedQuantity: consumedItem.quantity,
+								resultingQuantity: sourceItem.quantity,
+							} satisfies GameEventSchema.Type,
 						],
 						runtime: {
 							...state.runtime,

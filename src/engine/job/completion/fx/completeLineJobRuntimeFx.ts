@@ -1,14 +1,16 @@
 import { Effect } from "effect";
 
-import type { JobCompletionContext } from "~/engine/job/completion/JobCompletionContext";
-import { releaseJobReservationsFx } from "~/engine/job/completion/fx/releaseJobReservationsFx";
-import { makeChargeDepletionRandomFx } from "~/engine/job/random/makeChargeDepletionRandomFx";
+import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
+import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
+import { readOutputPlacementItemEventsFx } from "~/engine/event/read/readOutputPlacementItemEventsFx";
 import { releaseOwnerInputsFx } from "~/engine/input/fx/releaseOwnerInputsFx";
+import type { JobCompletionContext } from "~/engine/job/completion/JobCompletionContext";
+import { makeChargeDepletionRandomFx } from "~/engine/job/random/makeChargeDepletionRandomFx";
 import { outputFx } from "~/engine/output/fx/outputFx";
 import type { OutputResultSchema } from "~/engine/output/schema/OutputResultSchema";
-import type { OutputPlacementResultSchema } from "~/engine/placement/schema/OutputPlacementResultSchema";
 import { applyOutputPlacementFx } from "~/engine/placement/fx/applyOutputPlacementFx";
 import { removeRuntimeItemIdentityFx } from "~/engine/runtime/fx/removeRuntimeItemIdentityFx";
+import { releaseJobReservationsFx } from "./releaseJobReservationsFx";
 
 const emptyOutput = {
 	drop: [],
@@ -16,25 +18,32 @@ const emptyOutput = {
 
 export namespace completeLineJobRuntimeFx {
 	export interface Result {
-		readonly depletedOwner: JobCompletionContext["owner"] | null;
-		readonly placement: OutputPlacementResultSchema.Type;
+		readonly events: readonly GameEventSchema.Type[];
 		readonly runtime: JobCompletionContext["runtime"];
 	}
 }
 
-/** Completes one line job and removes its owner only when the owner is depleted. */
+/** Completes one line job and returns exact semantic facts in commit order. */
 export const completeLineJobRuntimeFx = Effect.fn("completeLineJobRuntimeFx")(function* (
 	context: JobCompletionContext,
 ) {
 	const depleted =
 		context.owner.item.charges !== undefined && context.owner.remainingCharges === 0;
 	let draft = context.runtime;
-	const placementDrop: OutputPlacementResultSchema.Type["drop"] = [];
+	const events: GameEventSchema.Type[] = [];
 
 	if (depleted) {
 		draft = yield* removeRuntimeItemIdentityFx({
 			item: context.owner,
 			runtime: draft,
+		});
+		events.push({
+			type: GameEventEnumSchema.enum.ItemDepleted,
+			itemId: context.owner.id,
+			canonicalItemId: context.owner.item.id,
+			location: context.owner.location,
+			previousQuantity: context.owner.quantity,
+			resultingQuantity: 0,
 		});
 	}
 
@@ -51,7 +60,7 @@ export const completeLineJobRuntimeFx = Effect.fn("completeLineJobRuntimeFx")(fu
 			output: lineOutput,
 			runtime: draft,
 		});
-		placementDrop.push(...placement.drop);
+		events.push(...(yield* readOutputPlacementItemEventsFx(placement)));
 		draft = withLineOutput;
 	}
 
@@ -70,26 +79,29 @@ export const completeLineJobRuntimeFx = Effect.fn("completeLineJobRuntimeFx")(fu
 				output: depletionOutput,
 				runtime: draft,
 			});
-			placementDrop.push(...placement.drop);
+			events.push(...(yield* readOutputPlacementItemEventsFx(placement)));
 			draft = withDepletionOutput;
 		}
 	}
 
 	if (depleted) {
-		draft = yield* releaseOwnerInputsFx({
+		const releasedInputs = yield* releaseOwnerInputsFx({
 			owner: context.owner,
 			runtime: draft,
 		});
+		events.push(...releasedInputs.events);
+		draft = releasedInputs.runtime;
 	}
 
-	const releasedRuntime = yield* releaseJobReservationsFx({
+	const releasedReservations = yield* releaseJobReservationsFx({
 		origin: context.owner.location,
 		reservations: context.reservations,
 		runtime: draft,
 	});
+	events.push(...releasedReservations.events);
+
 	return {
-		depletedOwner: depleted ? context.owner : null,
-		placement: { drop: placementDrop },
-		runtime: releasedRuntime,
+		events,
+		runtime: releasedReservations.runtime,
 	} satisfies completeLineJobRuntimeFx.Result;
 });

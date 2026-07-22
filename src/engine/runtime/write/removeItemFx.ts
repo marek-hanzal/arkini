@@ -52,14 +52,15 @@ export const removeItemFx = Effect.fn("removeItemFx")(function* ({
 				runtime,
 			});
 
-			const nextRuntime = yield* removeRuntimeItemFx({
+			const removal = yield* removeRuntimeItemFx({
 				item,
 				runtime,
 			});
 
 			return [
 				item,
-				nextRuntime,
+				removal.runtime,
+				removal.events,
 			] as const;
 		});
 	});

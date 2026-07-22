@@ -1,10 +1,7 @@
 import { Effect } from "effect";
 
 import { PlacementFailureReasonEnumSchema } from "~/engine/placement/schema/PlacementFailureReasonEnumSchema";
-import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
-import { ItemRemovedReasonEnumSchema } from "~/engine/event/schema/ItemRemovedReasonEnumSchema";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import { readLifecycleItemEventsFx } from "~/engine/event/read/readLifecycleItemEventsFx";
 import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
 import type { PlacementUnavailableError } from "~/engine/placement/error/PlacementUnavailableError";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
@@ -45,34 +42,14 @@ export const attemptTemporaryItemExpiryFx = Effect.fn("attemptTemporaryItemExpir
 	itemId,
 	runtime,
 }: attemptTemporaryItemExpiryFx.Props) {
-	return yield* completeTemporaryItemExpiryTransitionFx({
-		itemId,
-		runtime,
-	}).pipe(
-		Effect.flatMap((completion) =>
-			readLifecycleItemEventsFx({
-				outgoing: completion.expiredItem,
-				placement: completion.placement,
-				reason: ItemRemovedReasonEnumSchema.enum.Expired,
-			}).pipe(
-				Effect.map(
-					(lifecycleEvents) =>
-						({
-							type: "expired",
-							events: [
-								{
-									type: GameEventEnumSchema.enum.ItemExpired,
-									itemId: completion.expiredItem.id,
-									canonicalItemId: completion.expiredItem.item.id,
-									location: completion.expiredItem.location,
-									quantity: completion.expiredItem.quantity,
-								},
-								...lifecycleEvents,
-							],
-							runtime: completion.runtime,
-						}) satisfies attemptTemporaryItemExpiryFx.Result,
-				),
-			),
+	return yield* completeTemporaryItemExpiryTransitionFx({ itemId, runtime }).pipe(
+		Effect.map(
+			(completion) =>
+				({
+					type: "expired",
+					events: completion.events,
+					runtime: completion.runtime,
+				}) satisfies attemptTemporaryItemExpiryFx.Result,
 		),
 		Effect.catchTag("PlacementUnavailableError", (error) => {
 			if (!isExpectedExpiryBlock(error)) return Effect.fail(error);

@@ -1,27 +1,33 @@
 import { Effect } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
+import { readOutputPlacementItemEventsFx } from "~/engine/event/read/readOutputPlacementItemEventsFx";
+import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
+import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
+import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 import { outputFx } from "~/engine/output/fx/outputFx";
 import { applyOutputPlacementFx } from "~/engine/placement/fx/applyOutputPlacementFx";
 import { removeRuntimeItemIdentityFx } from "~/engine/runtime/fx/removeRuntimeItemIdentityFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
-import { makeTemporaryExpiryRandomFx } from "~/engine/item/temporary/random/makeTemporaryExpiryRandomFx";
-import type { OutputPlacementResultSchema } from "~/engine/placement/schema/OutputPlacementResultSchema";
-import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 import { ItemEnumSchema } from "~/engine/item/schema/ItemEnumSchema";
+import { makeTemporaryExpiryRandomFx } from "~/engine/item/temporary/random/makeTemporaryExpiryRandomFx";
 
 export namespace completeTemporaryItemExpiryTransitionFx {
 	export interface Props {
 		itemId: IdSchema.Type;
 		runtime: RuntimeSchema.Type;
 	}
+
+	export interface Result {
+		readonly events: readonly GameEventSchema.Type[];
+		readonly runtime: RuntimeSchema.Type;
+	}
 }
 
-/** Removes one ready temporary item and atomically places its optional expiry output. */
-export const completeTemporaryItemExpiryTransitionFx = Effect.fn("completeTemporaryItemExpiryTransitionFx")(function* ({
-	itemId,
-	runtime,
-}: completeTemporaryItemExpiryTransitionFx.Props) {
+/** Removes one ready temporary item and returns exact expiry and output facts. */
+export const completeTemporaryItemExpiryTransitionFx = Effect.fn(
+	"completeTemporaryItemExpiryTransitionFx",
+)(function* ({ itemId, runtime }: completeTemporaryItemExpiryTransitionFx.Props) {
 	const item = runtime.items.find((candidate) => candidate.id === itemId);
 	if (item === undefined) return yield* Effect.dieMessage(`Temporary item ${itemId} is missing.`);
 	if (item.item.type !== ItemEnumSchema.enum.Temporary) {
@@ -34,34 +40,34 @@ export const completeTemporaryItemExpiryTransitionFx = Effect.fn("completeTempor
 		return yield* Effect.dieMessage(`Temporary item ${item.id} is not ready to expire.`);
 	}
 
+	const expiredEvent = {
+		type: GameEventEnumSchema.enum.ItemExpired,
+		itemId: item.id,
+		canonicalItemId: item.item.id,
+		location: item.location,
+		quantity: item.quantity,
+	} satisfies GameEventSchema.Type;
 	let draft: RuntimeSchema.Type = yield* removeRuntimeItemIdentityFx({
 		item,
 		runtime,
 	});
 	if (item.item.output === undefined) {
 		return {
-			expiredItem: item,
-			placement: { drop: [] },
+			events: [expiredEvent],
 			runtime: draft,
-		};
+		} satisfies completeTemporaryItemExpiryTransitionFx.Result;
 	}
 	const origin = item.location;
 	const configuredOutput = item.item.output;
 
-	const random = yield* makeTemporaryExpiryRandomFx({
-		item,
-	});
+	const random = yield* makeTemporaryExpiryRandomFx({ item });
 	return yield* Effect.gen(function* () {
-		const output = yield* outputFx({
-			origin,
-			output: configuredOutput,
-		});
+		const output = yield* outputFx({ origin, output: configuredOutput });
 		if (output.drop.length === 0) {
 			return {
-				expiredItem: item,
-				placement: { drop: [] } satisfies OutputPlacementResultSchema.Type,
+				events: [expiredEvent],
 				runtime: draft,
-			};
+			} satisfies completeTemporaryItemExpiryTransitionFx.Result;
 		}
 
 		const [placement, withOutput] = yield* applyOutputPlacementFx({
@@ -70,11 +76,11 @@ export const completeTemporaryItemExpiryTransitionFx = Effect.fn("completeTempor
 			runtime: draft,
 		});
 		draft = withOutput;
+		const placementEvents = yield* readOutputPlacementItemEventsFx(placement);
 
 		return {
-			expiredItem: item,
-			placement,
+			events: [expiredEvent, ...placementEvents],
 			runtime: draft,
-		};
+		} satisfies completeTemporaryItemExpiryTransitionFx.Result;
 	}).pipe(Effect.withRandom(random));
 });

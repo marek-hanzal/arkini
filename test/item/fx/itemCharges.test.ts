@@ -622,6 +622,54 @@ describe("item charges", () => {
 		expect(result.runtime.items.filter((item) => item.item.id === "item:seed")).toHaveLength(1);
 	});
 
+	it("reports quantity-one depletion plus ordinary output without inventing replacement", () => {
+		const result = run(
+			Effect.gen(function* () {
+				const owner = yield* spawnItemFx({
+					id: "runtime:lumberjack",
+					itemId: "producer:lumberjack",
+					location: board(0),
+					quantity: 1,
+				});
+				const sapling = yield* spawnItemFx({
+					id: "runtime:sapling",
+					itemId: "deposit:sapling",
+					location: board(1),
+					quantity: 1,
+				});
+				const [, runtime, events] = yield* startLineRuntimeFx({
+					ownerItemId: owner.id,
+					lineId: "line:lumberjack:work",
+					runtime: yield* readRuntimeFx(),
+				});
+				const seed = runtime.items.find((item) => item.item.id === "item:seed");
+				if (seed === undefined) throw new Error("Expected depletion output seed.");
+				return { events, runtime, sapling, seed };
+			}),
+		);
+
+		expect(result.runtime.items.some((item) => item.id === result.sapling.id)).toBe(false);
+		expect(result.events).toEqual(
+			expect.arrayContaining([
+				{
+					type: GameEventEnumSchema.enum.ItemDepleted,
+					itemId: result.sapling.id,
+					canonicalItemId: "deposit:sapling",
+					location: board(1),
+					previousQuantity: 1,
+					resultingQuantity: 0,
+				},
+				{
+					type: GameEventEnumSchema.enum.ItemSpawned,
+					itemId: result.seed.id,
+					canonicalItemId: "item:seed",
+					location: result.seed.location,
+					quantity: 1,
+				},
+			]),
+		);
+	});
+
 	it("reports one depleted stack quantity without falsely removing the surviving actor", () => {
 		const result = run(
 			Effect.gen(function* () {
@@ -652,14 +700,8 @@ describe("item charges", () => {
 			canonicalItemId: "deposit:sapling",
 			location: board(1),
 			previousQuantity: 2,
-			quantity: 1,
+			resultingQuantity: 1,
 		});
-		expect(result.events).not.toContainEqual(
-			expect.objectContaining({
-				type: GameEventEnumSchema.enum.ItemRemoved,
-				itemId: result.sapling.id,
-			}),
-		);
 		expect(result.runtime.items.find((item) => item.id === result.sapling.id)).toMatchObject({
 			quantity: 1,
 			location: board(1),

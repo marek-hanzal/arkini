@@ -3,6 +3,7 @@ import { match } from "ts-pattern";
 
 import { InputModeEnumSchema } from "~/engine/input/schema/InputModeEnumSchema";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
+import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
 import type { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeIntegerSchema";
 import { applyInputMaterialConsumeRunPlanFx } from "~/engine/input/fx/run/applyInputMaterialConsumeRunPlanFx";
 import { applyInputMaterialReserveRunPlanFx } from "~/engine/input/fx/run/applyInputMaterialReserveRunPlanFx";
@@ -22,6 +23,7 @@ export namespace applyInputRunPlanFx {
 
 	export interface Result {
 		readonly consumption: readonly applyInputMaterialConsumeRunPlanFx.Consumption[];
+		readonly events: readonly GameEventSchema.Type[];
 		readonly runtime: RuntimeSchema.Type;
 	}
 }
@@ -43,6 +45,7 @@ export const applyInputRunPlanFx = Effect.fn("applyInputRunPlanFx")(function* ({
 			() =>
 				Effect.succeed({
 					consumption: [],
+					events: [],
 					runtime,
 				} satisfies applyInputRunPlanFx.Result),
 		)
@@ -79,6 +82,7 @@ export const applyInputRunPlanFx = Effect.fn("applyInputRunPlanFx")(function* ({
 						(nextRuntime) =>
 							({
 								consumption: [],
+								events: [],
 								runtime: nextRuntime,
 							}) satisfies applyInputRunPlanFx.Result,
 					),
@@ -91,6 +95,7 @@ export const applyInputRunPlanFx = Effect.fn("applyInputRunPlanFx")(function* ({
 			() =>
 				Effect.succeed({
 					consumption: [],
+					events: [],
 					runtime,
 				} satisfies applyInputRunPlanFx.Result),
 		)

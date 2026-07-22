@@ -1,5 +1,7 @@
 import { Effect } from "effect";
 
+import { readOutputPlacementItemEventsFx } from "~/engine/event/read/readOutputPlacementItemEventsFx";
+import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
 import type { MergeSchema } from "~/engine/merge/schema/MergeSchema";
 import { outputFx } from "~/engine/output/fx/outputFx";
 import { applyOutputPlacementFx } from "~/engine/placement/fx/applyOutputPlacementFx";
@@ -17,6 +19,11 @@ export namespace applyMergeRuntimeFx {
 		source: GridRuntimeItemSchema.Type;
 		target: BoardRuntimeItemSchema.Type;
 	}
+
+	export interface Result {
+		readonly events: readonly GameEventSchema.Type[];
+		readonly runtime: RuntimeSchema.Type;
+	}
 }
 
 /** Applies one resolved directional merge to an immutable candidate runtime. */
@@ -31,26 +38,37 @@ export const applyMergeRuntimeFx = Effect.fn("applyMergeRuntimeFx")(function* ({
 		runtime,
 		source,
 	});
-	let draft = yield* applyMergeTargetEffectFx({
+	const targetEffect = yield* applyMergeTargetEffectFx({
 		rule,
 		runtime: sourceAction.runtime,
 		target,
 	});
-	draft = yield* returnMergeSourceFx({
+	let draft = yield* returnMergeSourceFx({
 		origin: target.location,
 		returnDrop: sourceAction.returnDrop,
-		runtime: draft,
+		runtime: targetEffect.runtime,
 	});
+	const events = [...targetEffect.events];
 
-	if (rule.output === undefined) return draft;
+	if (rule.output === undefined) {
+		return {
+			events,
+			runtime: draft,
+		} satisfies applyMergeRuntimeFx.Result;
+	}
 	const output = yield* outputFx({
 		origin: target.location,
 		output: rule.output,
 	});
-	const [, withOutput] = yield* applyOutputPlacementFx({
+	const [placement, withOutput] = yield* applyOutputPlacementFx({
 		origin: target.location,
 		output,
 		runtime: draft,
 	});
-	return withOutput;
+	events.push(...(yield* readOutputPlacementItemEventsFx(placement)));
+	draft = withOutput;
+	return {
+		events,
+		runtime: draft,
+	} satisfies applyMergeRuntimeFx.Result;
 });

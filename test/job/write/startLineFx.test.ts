@@ -131,22 +131,17 @@ describe("startLineFx", () => {
 		);
 
 		const consumed = result.events.find(
-			(event) => event.type === GameEventEnumSchema.enum.ItemConsumed && event.itemId === result.water.id,
+			(event) => event.type === GameEventEnumSchema.enum.ItemConsumed && event.sourceItemId === result.water.id,
 		);
 		if (consumed?.type !== GameEventEnumSchema.enum.ItemConsumed) throw new Error("Expected consumed item fact.");
 		expect(consumed).toEqual({
 			type: GameEventEnumSchema.enum.ItemConsumed,
-			itemId: result.water.id,
-			consumedItemId: expect.any(String),
+			sourceItemId: result.water.id,
 			canonicalItemId: "water",
-			previousLocation: result.water.location,
-			location: {
-				scope: "job",
-				jobId: result.job.id,
-			},
+			sourceLocation: result.water.location,
 			previousQuantity: 6,
 			consumedQuantity: 3,
-			quantity: 3,
+			resultingQuantity: 3,
 		});
 		expect(result.runtime.items.find((item) => item.id === result.water.id)).toMatchObject({
 			quantity: 3,
@@ -154,10 +149,52 @@ describe("startLineFx", () => {
 		});
 		expect(
 			result.runtime.items.find(
-				(item) => item.id === consumed.consumedItemId && item.location.scope === "job",
+				(item) =>
+					item.item.id === "water" &&
+					item.location.scope === "job" &&
+					item.location.jobId === result.job.id,
 			),
 		).toMatchObject({
 			quantity: 3,
+		});
+	});
+
+	it("reports full consume against the exact source identity that leaves the visible input", () => {
+		const config = createJobTestConfig();
+		const result = Effect.runSync(
+			Effect.gen(function* () {
+				yield* prepareJobLineFx();
+				const before = yield* readRuntimeFx();
+				const water = before.items.find(
+					(item) => item.item.id === "water" && item.location.scope === "input",
+				);
+				if (water === undefined) throw new Error("Expected buffered water input.");
+				const exactRuntime = {
+					...before,
+					items: before.items.map((item) =>
+						item.id === water.id ? { ...item, quantity: 3 } : item,
+					),
+				};
+				const [job, runtime, events] = yield* startLineRuntimeFx({
+					...startProps,
+					runtime: exactRuntime,
+				});
+				return { events, job, runtime, water: { ...water, quantity: 3 } };
+			}).pipe(useGameFx({ config })),
+		);
+
+		expect(result.events).toContainEqual({
+			type: GameEventEnumSchema.enum.ItemConsumed,
+			sourceItemId: result.water.id,
+			canonicalItemId: "water",
+			sourceLocation: result.water.location,
+			previousQuantity: 3,
+			consumedQuantity: 3,
+			resultingQuantity: 0,
+		});
+		expect(result.runtime.items.find((item) => item.id === result.water.id)).toMatchObject({
+			quantity: 3,
+			location: { scope: "job", jobId: result.job.id },
 		});
 	});
 

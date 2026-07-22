@@ -11,12 +11,11 @@ describe("GameEventEnumSchema", () => {
 			GameEventEnumSchema.enum.ItemMerged,
 			GameEventEnumSchema.enum.ItemExpired,
 			GameEventEnumSchema.enum.ItemSpawned,
+			GameEventEnumSchema.enum.ItemPlaced,
 			GameEventEnumSchema.enum.ItemStacked,
 			GameEventEnumSchema.enum.ItemSplit,
 			GameEventEnumSchema.enum.ItemConsumed,
 			GameEventEnumSchema.enum.ItemDepleted,
-			GameEventEnumSchema.enum.ItemRemoved,
-			GameEventEnumSchema.enum.ItemReplaced,
 		]);
 	});
 

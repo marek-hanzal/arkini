@@ -1,10 +1,8 @@
 import { Effect } from "effect";
 
 import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
-import { ItemRemovedReasonEnumSchema } from "~/engine/event/schema/ItemRemovedReasonEnumSchema";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
-import { readLifecycleItemEventsFx } from "~/engine/event/read/readLifecycleItemEventsFx";
 import { readOutputPlacementItemEventsFx } from "~/engine/event/read/readOutputPlacementItemEventsFx";
 import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
 import { releaseOwnerInputsFx } from "~/engine/input/fx/releaseOwnerInputsFx";
@@ -140,11 +138,14 @@ export const spendItemChargesFx = Effect.fn("spendItemChargesFx")(function* ({
 		draft = withOutput;
 	}
 
+	let releasedInputEvents: readonly GameEventSchema.Type[] = [];
 	if (resultingQuantity === 0) {
-		draft = yield* releaseOwnerInputsFx({
+		const releasedInputs = yield* releaseOwnerInputsFx({
 			owner: item,
 			runtime: draft,
 		});
+		releasedInputEvents = releasedInputs.events;
+		draft = releasedInputs.runtime;
 	}
 
 	const depletedEvent = {
@@ -153,19 +154,12 @@ export const spendItemChargesFx = Effect.fn("spendItemChargesFx")(function* ({
 		canonicalItemId: item.item.id,
 		location: item.location,
 		previousQuantity: item.quantity,
-		quantity: resultingQuantity,
+		resultingQuantity,
 	} satisfies GameEventSchema.Type;
-	const lifecycleEvents =
-		resultingQuantity === 0
-			? yield* readLifecycleItemEventsFx({
-					outgoing: item,
-					placement,
-					reason: ItemRemovedReasonEnumSchema.enum.Depleted,
-				})
-			: yield* readOutputPlacementItemEventsFx(placement);
+	const placementEvents = yield* readOutputPlacementItemEventsFx(placement);
 
 	return {
-		events: [depletedEvent, ...lifecycleEvents],
+		events: [depletedEvent, ...placementEvents, ...releasedInputEvents],
 		runtime: draft,
 	} satisfies spendItemChargesFx.Result;
 });

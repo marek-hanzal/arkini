@@ -116,27 +116,33 @@ export const useTileMotionCues = ({
 						}
 						break;
 					case GameEventEnumSchema.enum.ItemSpawned:
+					case GameEventEnumSchema.enum.ItemPlaced:
 						cue(event.itemId, "spawn", false);
 						break;
 					case GameEventEnumSchema.enum.ItemStacked:
 					case GameEventEnumSchema.enum.ItemSplit:
 						cue(event.itemId, "impact", false);
 						break;
-					case GameEventEnumSchema.enum.ItemDepleted:
-						if (event.quantity > 0) cue(event.itemId, "impact", false);
+					case GameEventEnumSchema.enum.ItemConsumed:
+						cue(
+							event.sourceItemId,
+							event.resultingQuantity === 0 ? "exit" : "impact",
+							event.resultingQuantity === 0,
+						);
 						break;
-					case GameEventEnumSchema.enum.ItemRemoved:
+					case GameEventEnumSchema.enum.ItemExpired:
 						cue(event.itemId, "exit", true);
 						break;
-					case GameEventEnumSchema.enum.ItemReplaced:
-						cue(event.outgoingItemId, "exit", true);
-						cue(event.incomingItemId, "spawn", false);
+					case GameEventEnumSchema.enum.ItemDepleted:
+						cue(
+							event.itemId,
+							event.resultingQuantity === 0 ? "exit" : "impact",
+							event.resultingQuantity === 0,
+						);
 						break;
 					case GameEventEnumSchema.enum.JobStarted:
 						cue(event.ownerItemId, "accept", false);
 						break;
-					case GameEventEnumSchema.enum.ItemConsumed:
-					case GameEventEnumSchema.enum.ItemExpired:
 					case GameEventEnumSchema.enum.ItemMerged:
 					case GameEventEnumSchema.enum.JobCompleted:
 						break;

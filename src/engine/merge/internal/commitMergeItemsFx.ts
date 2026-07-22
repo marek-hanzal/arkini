@@ -106,12 +106,13 @@ export const commitMergeItemsFx = Effect.fn("commitMergeItemsFx")(function* ({
 				source,
 				target,
 			});
-			const nextRuntime = yield* applyMergeRuntimeFx({
+			const mergeTransition = yield* applyMergeRuntimeFx({
 				rule: resolved.rule,
 				runtime,
 				source,
 				target,
 			}).pipe(Effect.withRandom(random));
+			const nextRuntime = mergeTransition.runtime;
 			const event = {
 				type: GameEventEnumSchema.enum.ItemMerged,
 				sourceItemId: source.id,
@@ -152,6 +153,7 @@ export const commitMergeItemsFx = Effect.fn("commitMergeItemsFx")(function* ({
 				nextRuntime,
 				[
 					event,
+					...mergeTransition.events,
 				],
 			] as const;
 		}),

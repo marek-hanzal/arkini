@@ -3,7 +3,7 @@ import { Effect } from "effect";
 import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
 import type { OutputPlacementResultSchema } from "~/engine/placement/schema/OutputPlacementResultSchema";
 import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
-import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
+import { isGridRuntimeItem } from "~/engine/runtime/read/isGridRuntimeItem";
 
 /** Translates concrete placement results into exact committed spawn and stack facts. */
 export const readOutputPlacementItemEventsFx = Effect.fn("readOutputPlacementItemEventsFx")(
@@ -11,8 +11,10 @@ export const readOutputPlacementItemEventsFx = Effect.fn("readOutputPlacementIte
 		const events: GameEventSchema.Type[] = [];
 		for (const drop of placement.drop) {
 			for (const stack of drop.placement.stack) {
-				if (stack.item.location.scope === LocationScopeEnumSchema.enum.Job || stack.item.location.scope === LocationScopeEnumSchema.enum.Reserved) {
-					continue;
+				if (!isGridRuntimeItem(stack.item)) {
+					return yield* Effect.dieMessage(
+						`Output placement stacked ${stack.item.id} outside a visible grid scope.`,
+					);
 				}
 				events.push({
 					type: GameEventEnumSchema.enum.ItemStacked,
@@ -24,7 +26,11 @@ export const readOutputPlacementItemEventsFx = Effect.fn("readOutputPlacementIte
 				});
 			}
 			for (const item of drop.placement.spawn) {
-				if (item.location.scope === LocationScopeEnumSchema.enum.Job || item.location.scope === LocationScopeEnumSchema.enum.Reserved) continue;
+				if (!isGridRuntimeItem(item)) {
+					return yield* Effect.dieMessage(
+						`Output placement spawned ${item.id} outside a visible grid scope.`,
+					);
+				}
 				events.push({
 					type: GameEventEnumSchema.enum.ItemSpawned,
 					itemId: item.id,

@@ -1,5 +1,6 @@
 import { Effect } from "effect";
 
+import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
 import type { applyInputMaterialConsumeRunPlanFx } from "~/engine/input/fx/run/applyInputMaterialConsumeRunPlanFx";
 import { applyInputRunPlanFx } from "~/engine/input/fx/run/applyInputRunPlanFx";
 import type { JobSchema } from "~/engine/job/schema/JobSchema";
@@ -15,6 +16,7 @@ export namespace applyLineRunPlanFx {
 
 	export interface Result {
 		readonly consumption: readonly applyInputMaterialConsumeRunPlanFx.Consumption[];
+		readonly events: readonly GameEventSchema.Type[];
 		readonly runtime: RuntimeSchema.Type;
 	}
 }
@@ -29,6 +31,7 @@ export const applyLineRunPlanFx = Effect.fn("applyLineRunPlanFx")(function* ({
 		plan.input,
 		{
 			consumption: [] as applyInputMaterialConsumeRunPlanFx.Consumption[],
+			events: [] as GameEventSchema.Type[],
 			runtime,
 		},
 		(state, input, inputIndex) =>
@@ -42,6 +45,7 @@ export const applyLineRunPlanFx = Effect.fn("applyLineRunPlanFx")(function* ({
 			}).pipe(
 				Effect.map((result) => ({
 					consumption: [...state.consumption, ...result.consumption],
+					events: [...state.events, ...result.events],
 					runtime: result.runtime,
 				})),
 			),

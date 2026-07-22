@@ -9,12 +9,11 @@ export const GameEventEnumSchema = z
 		ItemMerged: "item:merged",
 		ItemExpired: "item:expired",
 		ItemSpawned: "item:spawned",
+		ItemPlaced: "item:placed",
 		ItemStacked: "item:stacked",
 		ItemSplit: "item:split",
 		ItemConsumed: "item:consumed",
 		ItemDepleted: "item:depleted",
-		ItemRemoved: "item:removed",
-		ItemReplaced: "item:replaced",
 	})
 	.meta({
 		id: "GameEventEnumSchema",

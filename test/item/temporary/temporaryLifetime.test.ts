@@ -17,7 +17,6 @@ import { createTemporaryLifetimeTestConfig } from "~test/item/temporary/support/
 import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
 import { RuntimeCheckIssueEnumSchema } from "~/engine/runtime/schema/check/RuntimeCheckIssueEnumSchema";
 import { ItemTemporaryDurationIssueReasonEnumSchema } from "~/engine/runtime/schema/check/ItemTemporaryDurationIssueReasonEnumSchema";
-import { ItemRemovedReasonEnumSchema } from "~/engine/event/schema/ItemRemovedReasonEnumSchema";
 
 const config = createTemporaryLifetimeTestConfig();
 
@@ -122,21 +121,6 @@ describe("temporary item lifetime", () => {
 				},
 				quantity: 1,
 			},
-			{
-				type: GameEventEnumSchema.enum.ItemRemoved,
-				itemId: "runtime:temporary",
-				canonicalItemId: "temporaryPlain",
-				location: {
-					scope: "board",
-					space: 0,
-					position: {
-						x: 0,
-						y: 0,
-					},
-				},
-				quantity: 1,
-				reason: ItemRemovedReasonEnumSchema.enum.Expired,
-			},
 		]);
 	});
 
@@ -199,6 +183,43 @@ describe("temporary item lifetime", () => {
 		expect(result.state?.remainingDurationMs).toBe(400);
 		expect(result.restored?.remainingDurationMs).toBe(400);
 		expect(result.restored?.revision).not.toBe(result.spawned.revision);
+	});
+
+	it("publishes expiry and ordinary same-anchor spawn as separate exact facts", () => {
+		const result = Effect.runSync(
+			Effect.gen(function* () {
+				const temporary = yield* spawnTemporaryFx({
+					itemId: "temporaryOutput",
+					x: 2,
+				});
+				const initial = yield* readRuntimeFx();
+				const first = yield* advanceRuntimeStepFx(initial);
+				const second = yield* advanceRuntimeStepFx(first.runtime);
+				const third = yield* advanceRuntimeStepFx(second.runtime);
+				const output = third.runtime.items.find((item) => item.item.id === "result");
+				if (output === undefined) throw new Error("Expected expiry output.");
+				return { output, temporary, third };
+			}).pipe(useGameFx({ config })),
+		);
+
+		expect(result.third.events).toEqual([
+			{
+				type: GameEventEnumSchema.enum.ItemExpired,
+				itemId: result.temporary.id,
+				canonicalItemId: "temporaryOutput",
+				location: result.temporary.location,
+				quantity: 1,
+			},
+			{
+				type: GameEventEnumSchema.enum.ItemSpawned,
+				itemId: result.output.id,
+				canonicalItemId: "result",
+				location: result.output.location,
+				quantity: 1,
+			},
+		]);
+		expect(result.output.location).toEqual(result.temporary.location);
+		expect(result.output.id).not.toBe(result.temporary.id);
 	});
 
 	it("atomically removes the temporary item and places its expiry output from the released origin", () => {

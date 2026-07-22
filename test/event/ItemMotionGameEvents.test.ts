@@ -1,8 +1,7 @@
 import { describe, expect, it } from "vitest";
 
-import { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
 import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
-import { ItemRemovedReasonEnumSchema } from "~/engine/event/schema/ItemRemovedReasonEnumSchema";
+import { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 
 const location = {
@@ -14,12 +13,27 @@ const location = {
 	},
 };
 
+const inputLocation = {
+	scope: LocationScopeEnumSchema.enum.Input,
+	ownerItemId: "runtime:owner",
+	lineId: "line:owner:run",
+	inputIndex: 0,
+};
+
 describe("item motion game events", () => {
 	it.each([
 		{
 			type: GameEventEnumSchema.enum.ItemSpawned,
 			itemId: "runtime:spawned",
 			canonicalItemId: "water",
+			location,
+			quantity: 1,
+		},
+		{
+			type: GameEventEnumSchema.enum.ItemPlaced,
+			itemId: "runtime:placed",
+			canonicalItemId: "tool",
+			previousLocation: inputLocation,
 			location,
 			quantity: 1,
 		},
@@ -41,22 +55,12 @@ describe("item motion game events", () => {
 		},
 		{
 			type: GameEventEnumSchema.enum.ItemConsumed,
-			itemId: "runtime:input",
-			consumedItemId: "runtime:consumed",
+			sourceItemId: "runtime:input",
 			canonicalItemId: "water",
-			previousLocation: {
-				scope: LocationScopeEnumSchema.enum.Input,
-				ownerItemId: "runtime:owner",
-				lineId: "line:owner:run",
-				inputIndex: 0,
-			},
-			location: {
-				scope: LocationScopeEnumSchema.enum.Job,
-				jobId: "runtime:job",
-			},
+			sourceLocation: inputLocation,
 			previousQuantity: 2,
 			consumedQuantity: 1,
-			quantity: 1,
+			resultingQuantity: 1,
 		},
 		{
 			type: GameEventEnumSchema.enum.ItemExpired,
@@ -71,25 +75,7 @@ describe("item motion game events", () => {
 			canonicalItemId: "tree",
 			location,
 			previousQuantity: 2,
-			quantity: 1,
-		},
-		{
-			type: GameEventEnumSchema.enum.ItemRemoved,
-			itemId: "runtime:removed",
-			canonicalItemId: "water",
-			location,
-			quantity: 1,
-			reason: ItemRemovedReasonEnumSchema.enum.Consumed,
-		},
-		{
-			type: GameEventEnumSchema.enum.ItemReplaced,
-			outgoingItemId: "runtime:old",
-			outgoingCanonicalItemId: "sapling",
-			outgoingQuantity: 1,
-			incomingItemId: "runtime:new",
-			incomingCanonicalItemId: "tree",
-			incomingQuantity: 2,
-			location,
+			resultingQuantity: 1,
 		},
 	])("accepts $type as an exact committed fact", (event) => {
 		expect(GameEventSchema.parse(event)).toEqual(event);

@@ -1,5 +1,6 @@
 import { Effect } from "effect";
 
+import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
 import { ItemNotOnBoardError } from "~/engine/item/error/ItemNotOnBoardError";
 import { placeRuntimeItemFx } from "~/engine/placement/fx/placeRuntimeItemFx";
 import { isBoardRuntimeItem } from "~/engine/runtime/read/isBoardRuntimeItem";
@@ -13,14 +14,16 @@ export namespace releaseOwnerInputsFx {
 		owner: RuntimeItemSchema.Type;
 		runtime: RuntimeSchema.Type;
 	}
+
+	export interface Result {
+		readonly events: readonly GameEventSchema.Type[];
+		readonly runtime: RuntimeSchema.Type;
+	}
 }
 
 /**
- * Detaches one board owner and relocates each direct buffered root through the
- * canonical existing-item placement path from the released owner position.
- *
- * Pure roots may normalize into ordinary stacks and identities. Impure roots
- * preserve their exact runtime identity, state, and passive owned subtree.
+ * Detaches one board owner and returns every direct buffered root through the
+ * canonical existing-item placement path with exact visible placement facts.
  */
 export const releaseOwnerInputsFx = Effect.fn("releaseOwnerInputsFx")(function* ({
 	owner,
@@ -31,7 +34,10 @@ export const releaseOwnerInputsFx = Effect.fn("releaseOwnerInputsFx")(function* 
 			isInputRuntimeItem(item) && item.location.ownerItemId === owner.id,
 	);
 	if (bufferedItems.length === 0) {
-		return runtime;
+		return {
+			events: [],
+			runtime,
+		} satisfies releaseOwnerInputsFx.Result;
 	}
 	if (!isBoardRuntimeItem(owner)) {
 		return yield* Effect.fail(
@@ -42,18 +48,25 @@ export const releaseOwnerInputsFx = Effect.fn("releaseOwnerInputsFx")(function* 
 		);
 	}
 
-	let draft = {
-		...runtime,
-		items: runtime.items.filter((item) => item.id !== owner.id),
-	} satisfies RuntimeSchema.Type;
+	let state: releaseOwnerInputsFx.Result = {
+		events: [],
+		runtime: {
+			...runtime,
+			items: runtime.items.filter((item) => item.id !== owner.id),
+		},
+	};
 
 	for (const bufferedItem of bufferedItems) {
-		draft = yield* placeRuntimeItemFx({
+		const placement = yield* placeRuntimeItemFx({
 			itemId: bufferedItem.id,
 			origin: owner.location,
-			runtime: draft,
+			runtime: state.runtime,
 		});
+		state = {
+			events: [...state.events, ...placement.events],
+			runtime: placement.runtime,
+		};
 	}
 
-	return draft;
+	return state;
 });

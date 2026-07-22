@@ -1,5 +1,6 @@
 import { Effect } from "effect";
 
+import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
 import type { BoardLocationSchema } from "~/engine/location/schema/BoardLocationSchema";
 import { placeRuntimeItemFx } from "~/engine/placement/fx/placeRuntimeItemFx";
 import type { ReservedRuntimeItemSchema } from "~/engine/runtime/schema/ReservedRuntimeItemSchema";
@@ -11,19 +12,36 @@ export namespace releaseJobReservationsFx {
 		reservations: readonly ReservedRuntimeItemSchema.Type[];
 		runtime: RuntimeSchema.Type;
 	}
+
+	export interface Result {
+		readonly events: readonly GameEventSchema.Type[];
+		readonly runtime: RuntimeSchema.Type;
+	}
 }
 
-/** Returns the same reserved runtime instances through canonical existing-item placement. */
+/** Returns the same reserved instances through canonical placement with exact visible facts. */
 export const releaseJobReservationsFx = Effect.fn("releaseJobReservationsFx")(function* ({
 	origin,
 	reservations,
 	runtime,
 }: releaseJobReservationsFx.Props) {
-	return yield* Effect.reduce(reservations, runtime, (draft, reservation) => {
-		return placeRuntimeItemFx({
-			itemId: reservation.id,
-			origin,
-			runtime: draft,
-		});
-	});
+	return yield* Effect.reduce(
+		reservations,
+		{
+			events: [] as GameEventSchema.Type[],
+			runtime,
+		},
+		(state, reservation) =>
+			Effect.gen(function* () {
+				const placement = yield* placeRuntimeItemFx({
+					itemId: reservation.id,
+					origin,
+					runtime: state.runtime,
+				});
+				return {
+					events: [...state.events, ...placement.events],
+					runtime: placement.runtime,
+				};
+			}),
+	);
 });

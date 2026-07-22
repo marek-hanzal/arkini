@@ -1,12 +1,10 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { readLifecycleItemEventsFx } from "~/engine/event/read/readLifecycleItemEventsFx";
 import { readOutputPlacementItemEventsFx } from "~/engine/event/read/readOutputPlacementItemEventsFx";
 import type { OutputPlacementResultSchema } from "~/engine/placement/schema/OutputPlacementResultSchema";
 import { createJobTestConfig } from "~test/job/support/jobTestConfig";
 import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
-import { ItemRemovedReasonEnumSchema } from "~/engine/event/schema/ItemRemovedReasonEnumSchema";
 
 const config = createJobTestConfig();
 const board = (x: number) => ({
@@ -93,13 +91,7 @@ describe("item motion event readers", () => {
 		]);
 	});
 
-	it("collapses one same-anchor spawn into a coherent replacement handoff", () => {
-		const outgoing = item({
-			id: "runtime:outgoing",
-			itemId: "tool",
-			location: board(0),
-			quantity: 1,
-		});
+	it("keeps same-anchor output as an ordinary exact spawn fact", () => {
 		const incoming = item({
 			id: "runtime:incoming",
 			itemId: "water",
@@ -117,32 +109,19 @@ describe("item motion event readers", () => {
 					placement: {
 						remove: [],
 						stack: [],
-						spawn: [
-							incoming,
-						],
+						spawn: [incoming],
 					},
 				},
 			],
 		} satisfies OutputPlacementResultSchema.Type;
 
-		expect(
-			Effect.runSync(
-				readLifecycleItemEventsFx({
-					outgoing,
-					placement,
-					reason: ItemRemovedReasonEnumSchema.enum.Lifecycle,
-				}),
-			),
-		).toEqual([
+		expect(Effect.runSync(readOutputPlacementItemEventsFx(placement))).toEqual([
 			{
-				type: GameEventEnumSchema.enum.ItemReplaced,
-				outgoingItemId: outgoing.id,
-				outgoingCanonicalItemId: "tool",
-				outgoingQuantity: outgoing.quantity,
-				incomingItemId: incoming.id,
-				incomingCanonicalItemId: "water",
-				incomingQuantity: incoming.quantity,
-				location: outgoing.location,
+				type: GameEventEnumSchema.enum.ItemSpawned,
+				itemId: incoming.id,
+				canonicalItemId: "water",
+				location: incoming.location,
+				quantity: incoming.quantity,
 			},
 		]);
 	});

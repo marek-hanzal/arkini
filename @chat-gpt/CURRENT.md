@@ -6,7 +6,7 @@ This file contains durable non-obvious decisions and the exact continuation poin
 
 **Unified tile motion language — GitHub #356**
 
-Status: **#357 exact committed item-change facts are implemented in `fd61e6b2`. The current presentation checkpoint adds one actor-local cue lifecycle over the existing single `TileActorLayer`: exact spawn/impact/accept/exit generations, bounded same-actor coalescing, stale-completion protection, minimal retained exit snapshots, Game/space cleanup, reduced-motion primitives, and separate interaction-versus-autonomous Motion shells. The next slice applies and hardens autonomous spawn/stack/consume/depletion/replacement behavior, then adds weighted drag and local neighbour yielding without pointer-frame React state.**
+Status: **#357 exact committed item-change facts are implemented in `fd61e6b2`; #358 actor-local cue lifecycle is implemented in `e1a906cb`. Autonomous spawn, stack impact, owner acceptance, depletion, removal, expiry replacement, retained outgoing handoff, bounded same-actor burst coalescing, and first-paint cue gating are now integrated through the single `TileActorLayer`. The next slice adds spring-weighted drag and one Canvas-local neighbour-yield calculation with accepted/rejected target priority, then performs cross-surface interruption and teardown hardening.**
 
 Recent failed Game bootstrap recovery remains complete: verified save-backed failures expose exact-key `Clean & Exit` through `recoverFailedGameSaveFx`; ordinary bootstrap failures expose query-only `Exit to Main Menu` through `discardFailedGameEngineFx`; both replace history with Main Menu and never loop automatically back into loading.
 

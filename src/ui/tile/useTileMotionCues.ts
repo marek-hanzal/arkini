@@ -69,6 +69,7 @@ export const useTileMotionCues = (liveItems: ReadonlyArray<useTileActors.Item>) 
 			) => {
 				const existing = cues.get(itemId);
 				if (existing?.kind === "exit" && kind !== "exit") return;
+				if (existing?.kind === "spawn" && kind === "spawn") return;
 				if (retain) {
 					const snapshot = liveById.get(itemId) ?? retained.get(itemId);
 					if (snapshot !== undefined) retained.set(itemId, snapshot);

@@ -5,6 +5,7 @@ import { TileActor } from "~/ui/tile/TileActor";
 import { TileActorRetentionContext } from "~/ui/tile/TileActorRetentionContext";
 import { useRetainedTileActors } from "~/ui/tile/useRetainedTileActors";
 import { useTileActorLayerSystem } from "~/ui/tile/useTileActorLayerSystem";
+import { useTileActorMountGate } from "~/ui/tile/useTileActorMountGate";
 import { useTileMotionCues } from "~/ui/tile/useTileMotionCues";
 
 /** Renders one stable Motion actor per live or explicitly retained presentation identity. */
@@ -16,6 +17,10 @@ export const TileActorLayer = () => {
 		liveItems,
 	});
 	const motionCues = useTileMotionCues(liveItems);
+	const mountedLiveItems = useTileActorMountGate({
+		liveItems,
+		cues: motionCues.cues,
+	});
 	const actors = useMemo(() => {
 		const byId = new Map<
 			string,
@@ -26,11 +31,11 @@ export const TileActorLayer = () => {
 		>();
 		for (const item of motionCues.retainedItems) byId.set(item.id, { item, live: false });
 		for (const item of retention.retainedItems) byId.set(item.id, { item, live: false });
-		for (const item of liveItems) byId.set(item.id, { item, live: true });
+		for (const item of mountedLiveItems) byId.set(item.id, { item, live: true });
 		return [...byId.values()];
 	}, [
-		liveItems,
 		motionCues.retainedItems,
+		mountedLiveItems,
 		retention.retainedItems,
 	]);
 

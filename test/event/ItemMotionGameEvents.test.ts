@@ -85,6 +85,20 @@ describe("item motion game events", () => {
 		expect(GameEventSchema.parse(event)).toEqual(event);
 	});
 
+	it("rejects a stack fact that did not actually increase quantity", () => {
+		expect(() =>
+			GameEventSchema.parse({
+				type: GameEventEnumSchema.enum.ItemStacked,
+				itemId: "runtime:stack",
+				canonicalItemId: "water",
+				originItemId: "runtime:origin",
+				location,
+				previousQuantity: 2,
+				quantity: 2,
+			}),
+		).toThrow();
+	});
+
 	it("rejects presentation vocabulary in engine facts", () => {
 		expect(() =>
 			GameEventSchema.parse({

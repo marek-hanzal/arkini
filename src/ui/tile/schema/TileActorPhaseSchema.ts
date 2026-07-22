@@ -6,6 +6,7 @@ export const TileActorPhaseSchema = z.enum([
 	"hovered",
 	"targeted",
 	"dragging",
+	"combining",
 	"settling",
 	"impact",
 	"exiting",

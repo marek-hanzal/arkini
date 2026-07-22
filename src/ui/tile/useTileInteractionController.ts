@@ -3,6 +3,7 @@ import { match } from "ts-pattern";
 
 import { DropItemResultKindEnumSchema } from "~/bridge/tile/DropItemResultKindEnumSchema";
 import type { useDropItem } from "~/bridge/tile/useDropItem";
+import type { useDropItemPreview } from "~/bridge/tile/useDropItemPreview";
 import type { TileDragSource } from "~/ui/tile/TileDragSource";
 import type { TileDropTarget } from "~/ui/tile/TileDropTarget";
 import type {
@@ -130,8 +131,13 @@ const removePendingActor = (
 
 /** Owns valid transitions for the one Canvas-local tile interaction generation. */
 export const useTileInteractionController = ({
+	readPreview,
 	resolveTarget,
 }: {
+	readonly readPreview: (
+		source: TileDragSource,
+		target: TileDropTarget,
+	) => useDropItemPreview.Result | null;
 	readonly resolveTarget: (x: number, y: number) => TileDropTarget;
 }) => {
 	const nextGeneration = useRef(0);
@@ -192,6 +198,7 @@ export const useTileInteractionController = ({
 							...pressed,
 							phase: "dragging",
 							target: null,
+							previewKind: null,
 						});
 					},
 				)
@@ -226,9 +233,16 @@ export const useTileInteractionController = ({
 					(dragging) => {
 						const target = resolveTarget(x, y);
 						if (!sameTarget(dragging.target, target)) {
+							let previewKind: useDropItemPreview.Result["kind"] | null = null;
+							try {
+								previewKind = readPreview(source, target)?.kind ?? null;
+							} catch (error) {
+								console.error("Tile drop preview failed; using neutral drag feedback.", error);
+							}
 							publishActive({
 								...dragging,
 								target,
+								previewKind,
 							});
 						}
 						return target;
@@ -250,6 +264,7 @@ export const useTileInteractionController = ({
 		},
 		[
 			publishActive,
+			readPreview,
 			resolveTarget,
 		],
 	);

@@ -56,7 +56,7 @@ export const readTileActorCursorSemantic = ({
 		)
 		.with(
 			{
-				phase: P.union("settling", "impact", "targeted", "exiting"),
+				phase: P.union("settling", "impact", "targeted", "combining", "exiting"),
 			},
 			() => "default" as const,
 		)

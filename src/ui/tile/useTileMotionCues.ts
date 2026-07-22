@@ -84,6 +84,8 @@ export const useTileMotionCues = ({
 				itemId: string,
 				kind: TileMotionCueSchema.Type["kind"],
 				retain: boolean,
+				originItemId?: string,
+				deliveryQuantity?: number,
 			) => {
 				const existing = cues.get(itemId);
 				if (existing?.kind === "exit" && kind !== "exit") return;
@@ -93,13 +95,16 @@ export const useTileMotionCues = ({
 					if (snapshot !== undefined) retained.set(itemId, snapshot);
 				}
 				const strength =
-					existing?.kind === kind && (kind === "impact" || kind === "accept")
+					existing?.kind === kind &&
+					(kind === "absorb" || kind === "impact" || kind === "accept")
 						? Math.min(3, existing.strength + 1)
 						: 1;
 				cues.set(itemId, {
 					generation: ++nextGeneration,
 					kind,
 					strength,
+					...(originItemId === undefined ? {} : { originItemId }),
+					...(deliveryQuantity === undefined ? {} : { deliveryQuantity }),
 				});
 				changed = true;
 			};
@@ -121,16 +126,24 @@ export const useTileMotionCues = ({
 						break;
 					case GameEventEnumSchema.enum.ItemSpawned:
 					case GameEventEnumSchema.enum.ItemPlaced:
-						cue(event.itemId, "spawn", false);
+						cue(event.itemId, "spawn", false, event.originItemId);
 						break;
 					case GameEventEnumSchema.enum.ItemStacked:
+						cue(
+							event.itemId,
+							"absorb",
+							false,
+							event.originItemId,
+							event.quantity - event.previousQuantity,
+						);
+						break;
 					case GameEventEnumSchema.enum.ItemSplit:
 						cue(event.itemId, "impact", false);
 						break;
 					case GameEventEnumSchema.enum.ItemConsumed:
 						cue(
 							event.sourceItemId,
-							event.resultingQuantity === 0 ? "exit" : "impact",
+							event.resultingQuantity === 0 ? "consume-exit" : "consume",
 							event.resultingQuantity === 0,
 						);
 						break;

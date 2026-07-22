@@ -157,6 +157,13 @@ export const useTileGeometry = () => {
 		],
 	);
 
+	const readActorLayerRect = useCallback(() => {
+		const layer = actorLayer.current;
+		if (layer === null) return null;
+		const rect = layer.getBoundingClientRect();
+		return rect.width <= 0 || rect.height <= 0 ? null : rect;
+	}, []);
+
 	const readPlacement = useCallback((source: TileDragSource): TileActorPlacement | null => {
 		const layer = actorLayer.current;
 		const registration = slots.current.get(slotRegistrationKey(source.surface, source.slot));
@@ -271,6 +278,7 @@ export const useTileGeometry = () => {
 		registerActorLayer,
 		registerSurface,
 		registerSlot,
+		readActorLayerRect,
 		readPlacement,
 		resolveTarget,
 	};

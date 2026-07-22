@@ -5,6 +5,8 @@ export const useTileActorSystem = () => {
 	const {
 		active,
 		geometryVersion,
+		readActorLayerRect,
+		readActorRect,
 		readPlacement,
 		press,
 		startDrag,
@@ -20,6 +22,8 @@ export const useTileActorSystem = () => {
 	return {
 		active,
 		geometryVersion,
+		readActorLayerRect,
+		readActorRect,
 		readPlacement,
 		press,
 		startDrag,

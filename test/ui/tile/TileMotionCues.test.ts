@@ -115,7 +115,10 @@ describe("tile motion cue lifecycle", () => {
 			},
 		]);
 
-		expect(current?.cues.get("runtime:placed")?.kind).toBe("spawn");
+		expect(current?.cues.get("runtime:placed")).toMatchObject({
+			kind: "spawn",
+			originItemId: "runtime:owner",
+		});
 	});
 
 	it("coalesces repeated impacts and ignores stale completion generations", async () => {
@@ -158,11 +161,71 @@ describe("tile motion cue lifecycle", () => {
 			},
 		]);
 		const second = current?.cues.get("runtime:stack");
-		expect(second).toMatchObject({ kind: "impact", strength: 2 });
+		expect(second).toMatchObject({
+			kind: "absorb",
+			originItemId: "runtime:producer",
+			strength: 2,
+		});
 		expect(second?.generation).not.toBe(first.generation);
 
 		await act(async () => current?.complete("runtime:stack", first.generation));
 		expect(current?.cues.get("runtime:stack")?.generation).toBe(second?.generation);
+	});
+
+	it("uses the shared inward interaction cue for partial and full input consumption", async () => {
+		let liveItems = [item("runtime:input")];
+		let current: ReturnType<typeof useTileMotionCues> | null = null;
+		const Capture = () => {
+			current = useTileMotionCues({ liveItems, onSceneReset: vi.fn() });
+			return null;
+		};
+		const container = document.createElement("div");
+		document.body.append(container);
+		const root = createRoot(container);
+		roots.push(root);
+		await act(async () => root.render(createElement(Capture)));
+
+		await dispatch([
+			{
+				type: GameEventEnumSchema.enum.ItemConsumed,
+				sourceItemId: "runtime:input",
+				canonicalItemId: "item:input",
+				sourceLocation: {
+					scope: "input",
+					ownerItemId: "runtime:producer",
+					lineId: "line:producer",
+					inputIndex: 0,
+				},
+				previousQuantity: 2,
+				consumedQuantity: 1,
+				resultingQuantity: 1,
+			},
+		]);
+		expect(current?.cues.get("runtime:input")?.kind).toBe("consume");
+		expect(current?.retainedItems).toEqual([]);
+
+		await dispatch([
+			{
+				type: GameEventEnumSchema.enum.ItemConsumed,
+				sourceItemId: "runtime:input",
+				canonicalItemId: "item:input",
+				sourceLocation: {
+					scope: "input",
+					ownerItemId: "runtime:producer",
+					lineId: "line:producer",
+					inputIndex: 0,
+				},
+				previousQuantity: 1,
+				consumedQuantity: 1,
+				resultingQuantity: 0,
+			},
+		]);
+		liveItems = [];
+		await act(async () => root.render(createElement(Capture)));
+		expect(current?.cues.get("runtime:input")?.kind).toBe("consume-exit");
+		expect(current?.retainedItems.map((retained) => retained.id)).toEqual([
+			"runtime:input",
+		]);
 	});
 
 	it("retains an outgoing actor only for its owned exit generation", async () => {
@@ -393,7 +456,9 @@ describe("TileMotionCueVisual", () => {
 					TileMotionCueVisual,
 					{
 						cue: { generation: 7, kind: "impact", strength: 2 },
+						deliveryPayload: null,
 						enabled: true,
+						originOffset: null,
 						onComplete: (generation) => completed.push(generation),
 					},
 					createElement("span", null, "tile"),
@@ -408,5 +473,44 @@ describe("TileMotionCueVisual", () => {
 		expect(completed).toEqual([]);
 		await act(async () => motionTestRuntime.finish(0));
 		expect(completed).toEqual([7]);
+	});
+
+	it("renders one truthful incoming stack payload from the recorded origin", async () => {
+		motionTestRuntime.autoComplete = false;
+		const container = document.createElement("div");
+		document.body.append(container);
+		const root = createRoot(container);
+		roots.push(root);
+		await act(async () => {
+			root.render(
+				createElement(
+					TileMotionCueVisual,
+					{
+						cue: {
+							deliveryQuantity: 2,
+							generation: 8,
+							kind: "absorb",
+							originItemId: "runtime:producer",
+							strength: 1,
+						},
+						deliveryPayload: createElement(
+							"span",
+							{ "data-ui": "TestDeliveryPayload" },
+							"incoming",
+						),
+						enabled: true,
+						originOffset: { x: -120, y: 40 },
+						onComplete: vi.fn(),
+					},
+					createElement("span", { "data-ui": "TestTarget" }, "target"),
+				),
+			);
+		});
+
+		expect(document.querySelector('[data-ui="TileMotionDeliveryPayload"]')).not.toBeNull();
+		expect(document.querySelector('[data-ui="TestDeliveryPayload"]')?.textContent).toBe(
+			"incoming",
+		);
+		expect(document.querySelectorAll('[data-ui="TestTarget"]')).toHaveLength(1);
 	});
 });

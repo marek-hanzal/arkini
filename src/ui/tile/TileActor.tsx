@@ -20,7 +20,7 @@ const zIndexForCue = (cue: TileMotionCueSchema.Type | null) => {
 	if (cue === null) return 0;
 	return match(cue.kind)
 		.with("exit", () => 35)
-		.with("impact", "accept", () => 30)
+		.with("absorb", "impact", "accept", "consume", "consume-exit", () => 30)
 		.with("spawn", "settle", () => 15)
 		.exhaustive();
 };
@@ -45,6 +45,7 @@ export const TileActor = ({ item, live, cue, onCueComplete }: TileActor.Props) =
 	const actorMotion = useTileActorMotion({
 		item,
 		presentation,
+		cue,
 	});
 	const interactive = live && actorMotion.visible && !itemDetail.isOpen;
 	const drag = useTileActorDrag({
@@ -154,7 +155,11 @@ export const TileActor = ({ item, live, cue, onCueComplete }: TileActor.Props) =
 			data-live={live ? "true" : "false"}
 			data-motion-phase={presentation.phase}
 			data-motion-exiting={
-				presentation.phase === "exiting" || cue?.kind === "exit" ? "true" : "false"
+				presentation.phase === "exiting" ||
+				cue?.kind === "exit" ||
+				cue?.kind === "consume-exit"
+					? "true"
+					: "false"
 			}
 			data-board-x={boardLocation?.position.x}
 			data-board-y={boardLocation?.position.y}
@@ -249,6 +254,7 @@ export const TileActor = ({ item, live, cue, onCueComplete }: TileActor.Props) =
 							phase={presentation.phase}
 							feedback={presentation.feedback}
 							cue={cue}
+							cueOriginOffset={actorMotion.cueOriginOffset}
 							onCueComplete={(generation) => onCueComplete(item.id, generation)}
 							onInteractionAnimationComplete={
 								presentation.visualCompletionGeneration === null

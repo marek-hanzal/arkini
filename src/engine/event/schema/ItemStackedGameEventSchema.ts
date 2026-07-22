@@ -16,6 +16,9 @@ export const ItemStackedGameEventSchema = z
 		quantity: z.number().int().positive(),
 	})
 	.strict()
+	.refine((event) => event.quantity > event.previousQuantity, {
+		message: "quantity must be greater than previousQuantity",
+	})
 	.meta({
 		id: "ItemStackedGameEventSchema",
 		description:

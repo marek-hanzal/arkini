@@ -1,5 +1,6 @@
 import { DropItemResultKindEnumSchema } from "~/bridge/tile/DropItemResultKindEnumSchema";
 import type { useDropItem } from "~/bridge/tile/useDropItem";
+import type { useDropItemPreview } from "~/bridge/tile/useDropItemPreview";
 import type { TileLocation } from "~/bridge/tile/TileLocation";
 import type { TileDragSource } from "~/ui/tile/TileDragSource";
 import type { TileDropTarget } from "~/ui/tile/TileDropTarget";
@@ -25,11 +26,13 @@ export interface TilePressedInteraction extends TileInteractionBase {
 export interface TileDraggingInteraction extends TileInteractionBase {
 	readonly phase: Extract<TileInteractionPhaseSchema.Type, "dragging">;
 	readonly target: TileDropTarget | null;
+	readonly previewKind: useDropItemPreview.Result["kind"] | null;
 }
 
 export interface TileAwaitingOutcomeInteraction extends TileInteractionBase {
 	readonly phase: Extract<TileInteractionPhaseSchema.Type, "awaiting-outcome">;
 	readonly target: TileDropTarget;
+	readonly previewKind: useDropItemPreview.Result["kind"] | null;
 }
 
 interface TileSettlementBase {

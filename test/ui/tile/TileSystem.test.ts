@@ -19,6 +19,32 @@ vi.mock("~/bridge/tile/useTileActors", () => ({
 	useTileActors: () => [],
 }));
 
+const previewState = vi.hoisted(() => ({
+	occupiedKind: "swap" as "swap" | "merge",
+}));
+
+vi.mock("~/bridge/tile/useDropItemPreview", () => ({
+	useDropItemPreview: () =>
+		(props: {
+			readonly target:
+				| { readonly kind: "unsupported" }
+				| { readonly kind: "slot"; readonly occupant: object | null };
+		}) => {
+			if (props.target.kind === "unsupported") {
+				return {
+					kind: "reject" as const,
+					reason: "unsupported-target" as const,
+				};
+			}
+			return {
+				kind:
+					props.target.occupant === null
+						? ("move" as const)
+						: previewState.occupiedKind,
+			};
+		},
+}));
+
 (
 	globalThis as {
 		IS_REACT_ACT_ENVIRONMENT?: boolean;
@@ -207,6 +233,7 @@ const Harness = ({ onSystem }: { readonly onSystem: (system: TileSystem) => void
 	);
 
 beforeEach(() => {
+	previewState.occupiedKind = "swap";
 	Object.defineProperty(HTMLElement.prototype, "getBoundingClientRect", {
 		configurable: true,
 		value() {
@@ -391,6 +418,22 @@ describe("TileSystemProvider", () => {
 				slot: toolbarSlot,
 				occupant: toolbarOccupant,
 			},
+		});
+	});
+
+	it("publishes the authoritative combine preview only for a mergeable occupied target", async () => {
+		previewState.occupiedKind = "merge";
+		const { readSystem } = await renderHarness();
+		await act(async () => {
+			const system = readSystem();
+			expect(system.press(source)).toBe(true);
+			system.startDrag(source);
+			system.moveDrag(source, 440, 50);
+		});
+
+		expect(readSystem().active).toMatchObject({
+			phase: "dragging",
+			previewKind: DropItemResultKindEnumSchema.enum.Merge,
 		});
 	});
 

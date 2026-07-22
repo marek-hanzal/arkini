@@ -39,6 +39,18 @@ export const useTileNeighbourField = () => {
 		[reset],
 	);
 
+	const readActorRect = useCallback((itemId: string) => {
+		const registration = actors.current.get(itemId);
+		if (registration === undefined) return null;
+		try {
+			const rect = registration.node.getBoundingClientRect();
+			return rect.width <= 0 || rect.height <= 0 ? null : rect;
+		} catch (error) {
+			console.error("Tile actor measurement failed; skipping delivery origin.", error);
+			return null;
+		}
+	}, []);
+
 	const moveNeighbourField = useCallback(
 		({
 			sourceItemId,
@@ -110,6 +122,7 @@ export const useTileNeighbourField = () => {
 	);
 
 	return {
+		readActorRect,
 		registerNeighbourActor,
 		moveNeighbourField,
 		clearNeighbourField,

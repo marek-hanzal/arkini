@@ -11,6 +11,8 @@ import { match } from "ts-pattern";
 import type { useTileActors } from "~/bridge/tile/useTileActors";
 import { isSameTileLocation } from "~/bridge/tile/isSameTileLocation";
 import { useTileActorSystem } from "~/ui/tile/useTileActorSystem";
+import { readTileDeliveryOriginOffset } from "~/ui/tile/readTileDeliveryOriginOffset";
+import type { TileMotionCueSchema } from "~/ui/tile/schema/TileMotionCueSchema";
 import type { useTileActorPresentation } from "~/ui/tile/useTileActorPresentation";
 
 const settleTransition = {
@@ -21,6 +23,12 @@ const settleTransition = {
 };
 
 const interactionVisualFallbackMs = 2_000;
+
+const deliveryTransition = {
+	type: "tween" as const,
+	duration: 0.6,
+	ease: [0.22, 1, 0.36, 1] as const,
+};
 
 const pickupTransition = {
 	type: "tween" as const,
@@ -37,11 +45,20 @@ const pickupTransition = {
 export const useTileActorMotion = ({
 	item,
 	presentation,
+	cue,
 }: {
 	readonly item: useTileActors.Item;
 	readonly presentation: useTileActorPresentation.Model;
+	readonly cue: TileMotionCueSchema.Type | null;
 }) => {
-	const { geometryVersion, readPlacement, complete, registerNeighbourActor } = useTileActorSystem();
+	const {
+		geometryVersion,
+		readActorLayerRect,
+		readActorRect,
+		readPlacement,
+		complete,
+		registerNeighbourActor,
+	} = useTileActorSystem();
 	const reducedMotion = useReducedMotion();
 	const anchorX = useMotionValue(0);
 	const anchorY = useMotionValue(0);
@@ -72,6 +89,11 @@ export const useTileActorMotion = ({
 	const itemRef = useRef(item);
 	const unregisterNeighbourActor = useRef<(() => void) | null>(null);
 	const [visible, setVisible] = useState(false);
+	const [cueOriginOffset, setCueOriginOffset] = useState<{
+		readonly generation: number;
+		readonly x: number;
+		readonly y: number;
+	} | null>(null);
 
 	const registerActorNode = useCallback(
 		(node: HTMLElement | null) => {
@@ -168,6 +190,27 @@ export const useTileActorMotion = ({
 		stopPickupCorrection,
 	]);
 
+	const readDeliveryOriginOffset = useCallback(
+		(placement: NonNullable<ReturnType<typeof readPlacement>>) => {
+			if (
+				reducedMotion ||
+				cue?.originItemId === undefined ||
+				cue.originItemId === item.id
+			) {
+				return null;
+			}
+			const layerRect = readActorLayerRect();
+			const originRect = readActorRect(cue.originItemId);
+			if (layerRect === null || originRect === null) return null;
+			return readTileDeliveryOriginOffset({
+				actorLayerRect: layerRect,
+				originRect,
+				targetPlacement: placement,
+			});
+		},
+		[cue, item.id, readActorLayerRect, readActorRect, reducedMotion],
+	);
+
 	const canCompletePosition = useCallback(
 		() =>
 			match(presentation.positionCompletion)
@@ -224,10 +267,11 @@ export const useTileActorMotion = ({
 
 		const generation = ++localMotionGeneration.current;
 		if (!initialized.current) {
+			const deliveryOffset = cue?.kind === "spawn" ? readDeliveryOriginOffset(placement) : null;
 			anchorX.jump(placement.x);
 			anchorY.jump(placement.y);
-			dragX.jump(0);
-			dragY.jump(0);
+			dragX.jump(deliveryOffset?.x ?? 0);
+			dragY.jump(deliveryOffset?.y ?? 0);
 			pickupX.jump(0);
 			pickupY.jump(0);
 			width.jump(placement.width);
@@ -237,7 +281,14 @@ export const useTileActorMotion = ({
 			if (presentation.positionCompletion.kind !== "none" && canCompletePosition()) {
 				complete(item.id, presentation.positionCompletion.generation);
 			}
-			return;
+			if (deliveryOffset === null) return;
+			const animations = [
+				animate(dragX, 0, deliveryTransition),
+				animate(dragY, 0, deliveryTransition),
+			];
+			return () => {
+				for (const animation of animations) animation.stop();
+			};
 		}
 
 		setVisible(true);
@@ -304,6 +355,7 @@ export const useTileActorMotion = ({
 		anchorY,
 		canCompletePosition,
 		clearDragWeight,
+		cue,
 		complete,
 		dragX,
 		dragY,
@@ -319,9 +371,46 @@ export const useTileActorMotion = ({
 		presentation.placementFrozen,
 		presentation.positionCompletion,
 		presentation.visualCompletionGeneration,
+		readDeliveryOriginOffset,
 		readPlacement,
 		stopPickupCorrection,
 		width,
+	]);
+
+	useLayoutEffect(() => {
+		void geometryVersion;
+		if (cue?.kind !== "absorb") {
+			setCueOriginOffset(null);
+			return;
+		}
+		let placement: ReturnType<typeof readPlacement>;
+		try {
+			placement = readPlacement(presentation.desiredSource);
+		} catch (error) {
+			console.error("Tile delivery measurement failed; using local impact only.", error);
+			setCueOriginOffset(null);
+			return;
+		}
+		if (placement === null) {
+			setCueOriginOffset(null);
+			return;
+		}
+		const offset = readDeliveryOriginOffset(placement);
+		setCueOriginOffset(
+			offset === null
+				? null
+				: {
+					generation: cue.generation,
+					x: offset.x,
+					y: offset.y,
+				},
+		);
+	}, [
+		cue,
+		geometryVersion,
+		presentation.desiredSource,
+		readDeliveryOriginOffset,
+		readPlacement,
 	]);
 
 	const onVisualAnimationComplete = useCallback(() => {
@@ -390,6 +479,10 @@ export const useTileActorMotion = ({
 		width,
 		height,
 		visible,
+		cueOriginOffset:
+			cueOriginOffset === null
+				? null
+				: { x: cueOriginOffset.x, y: cueOriginOffset.y },
 		armPickupCorrection,
 		startPickupCorrection,
 		stopPickupCorrection,

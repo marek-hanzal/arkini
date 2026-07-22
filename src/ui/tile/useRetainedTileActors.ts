@@ -56,6 +56,20 @@ const protectedActorIds = (active: TileInteractionState | null): ReadonlySet<str
 			{
 				phase: "settling",
 				settlement: {
+					kind: DropItemResultKindEnumSchema.enum.StoreInput,
+					stage: "approach",
+				},
+			},
+			({ settlement }) =>
+				new Set([
+					settlement.outcome.source.itemId,
+					settlement.outcome.owner.itemId,
+				]),
+		)
+		.with(
+			{
+				phase: "settling",
+				settlement: {
 					kind: DropItemResultKindEnumSchema.enum.Merge,
 					stage: "approach",
 				},

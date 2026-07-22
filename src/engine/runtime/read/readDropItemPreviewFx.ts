@@ -3,9 +3,11 @@ import { Effect, Option } from "effect";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
+import { resolveDefaultLineInputStoreFx } from "~/engine/input/fx/resolveDefaultLineInputStoreFx";
 import { isSameGridLocation } from "~/engine/location/read/isSameGridLocation";
 import { resolveMergeRuleFx } from "~/engine/merge/fx/resolveMergeRuleFx";
 import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
+import { isBoardRuntimeItem } from "~/engine/runtime/read/isBoardRuntimeItem";
 import { isGridRuntimeItem } from "~/engine/runtime/read/isGridRuntimeItem";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import { DropItemIgnoredReasonEnumSchema } from "~/engine/runtime/schema/command/DropItemIgnoredReasonEnumSchema";
@@ -37,6 +39,12 @@ export namespace readDropItemPreviewFx {
 					| typeof DropItemResultKindEnumSchema.enum.Move
 					| typeof DropItemResultKindEnumSchema.enum.Swap
 					| typeof DropItemResultKindEnumSchema.enum.Merge;
+		  }
+		| {
+				readonly kind: typeof DropItemResultKindEnumSchema.enum.StoreInput;
+				readonly lineId: IdSchema.Type;
+				readonly inputIndex: number;
+				readonly quantity: number;
 		  }
 		| {
 				readonly kind: typeof DropItemResultKindEnumSchema.enum.Ignored;
@@ -98,6 +106,22 @@ export const readDropItemPreviewFx = Effect.fn("readDropItemPreviewFx")(function
 	if (!isSameGridLocation(targetItem.location, target.location)) {
 		return rejected(DropItemRejectedReasonEnumSchema.enum.StaleTarget);
 	}
+	if (
+		isBoardRuntimeItem(source) &&
+		isBoardRuntimeItem(targetItem) &&
+		source.location.space !== targetItem.location.space
+	) {
+		return rejected(DropItemRejectedReasonEnumSchema.enum.InvalidTarget);
+	}
+	const oneBoardItem = isBoardRuntimeItem(source) !== isBoardRuntimeItem(targetItem);
+	const boardItem = isBoardRuntimeItem(source)
+		? source
+		: isBoardRuntimeItem(targetItem)
+			? targetItem
+			: undefined;
+	if (oneBoardItem && boardItem !== undefined && boardItem.location.space !== runtime.currentSpace) {
+		return rejected(DropItemRejectedReasonEnumSchema.enum.InvalidTarget);
+	}
 	if (targetItem.location.scope === LocationScopeEnumSchema.enum.Board) {
 		const mergeRule = yield* resolveMergeRuleFx({
 			source,
@@ -108,6 +132,19 @@ export const readDropItemPreviewFx = Effect.fn("readDropItemPreviewFx")(function
 				kind: DropItemResultKindEnumSchema.enum.Merge,
 			} satisfies readDropItemPreviewFx.Result;
 		}
+	}
+	const inputStore = yield* resolveDefaultLineInputStoreFx({
+		owner: targetItem,
+		runtime,
+		source,
+	});
+	if (inputStore !== undefined) {
+		return {
+			kind: DropItemResultKindEnumSchema.enum.StoreInput,
+			lineId: inputStore.lineId,
+			inputIndex: inputStore.inputIndex,
+			quantity: inputStore.quantity,
+		} satisfies readDropItemPreviewFx.Result;
 	}
 	return {
 		kind: DropItemResultKindEnumSchema.enum.Swap,

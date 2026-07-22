@@ -20,7 +20,7 @@ vi.mock("~/bridge/tile/useTileActors", () => ({
 }));
 
 const previewState = vi.hoisted(() => ({
-	occupiedKind: "swap" as "swap" | "merge",
+	occupiedKind: "swap" as "swap" | "merge" | "store-input",
 }));
 
 vi.mock("~/bridge/tile/useDropItemPreview", () => ({
@@ -553,6 +553,68 @@ describe("TileSystemProvider", () => {
 		});
 
 		await act(async () => {
+			readSystem().complete(toolbarOccupant.id, released.generation);
+		});
+		expect(readSystem().active).toBeNull();
+	});
+
+	it("advances one input-store generation through approach and full source absorption", async () => {
+		previewState.occupiedKind = "store-input";
+		const { readSystem } = await renderHarness();
+		const released = await startDrag(readSystem(), 440, 50);
+		if (released === null) throw new Error("Expected a released drag.");
+		const targetLocation = {
+			scope: "inventory" as const,
+			position: {
+				x: toolbarSlot.x,
+				y: toolbarSlot.y,
+			},
+		};
+
+		await act(async () => {
+			readSystem().settle(released.source, released.generation, {
+				kind: DropItemResultKindEnumSchema.enum.StoreInput,
+				storedQuantity: 1,
+				lineId: "line:target",
+				inputIndex: 0,
+				source: {
+					itemId: source.id,
+					canonicalItemId: "item:source",
+					previousRevision: source.revision,
+					previousLocation: source.location,
+					previousQuantity: 1,
+					current: null,
+				},
+				owner: {
+					itemId: toolbarOccupant.id,
+					revision: toolbarOccupant.revision,
+					location: targetLocation,
+				},
+			});
+		});
+		expect(readSystem().active).toMatchObject({
+			phase: "settling",
+			settlement: {
+				kind: DropItemResultKindEnumSchema.enum.StoreInput,
+				stage: "approach",
+				pendingActorIds: [source.id],
+			},
+		});
+
+		await act(async () => {
+			readSystem().complete(source.id, released.generation);
+		});
+		expect(readSystem().active).toMatchObject({
+			phase: "settling",
+			settlement: {
+				kind: DropItemResultKindEnumSchema.enum.StoreInput,
+				stage: "resolve",
+				pendingActorIds: [source.id, toolbarOccupant.id],
+			},
+		});
+
+		await act(async () => {
+			readSystem().complete(source.id, released.generation);
 			readSystem().complete(toolbarOccupant.id, released.generation);
 		});
 		expect(readSystem().active).toBeNull();

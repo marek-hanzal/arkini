@@ -6,6 +6,7 @@ export const DropItemResultKindEnumSchema = z
 		Move: "move",
 		Swap: "swap",
 		Merge: "merge",
+		StoreInput: "store-input",
 		Ignored: "ignored",
 		Reject: "reject",
 	})

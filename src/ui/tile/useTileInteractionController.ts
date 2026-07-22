@@ -98,6 +98,20 @@ const settlementForOutcome = (
 		)
 		.with(
 			{
+				kind: DropItemResultKindEnumSchema.enum.StoreInput,
+			},
+			(stored) => ({
+				kind: DropItemResultKindEnumSchema.enum.StoreInput,
+				feedback: "accepted" as const,
+				outcome: stored,
+				stage: "approach" as const,
+				pendingActorIds: [
+					source.id,
+				],
+			}),
+		)
+		.with(
+			{
 				kind: DropItemResultKindEnumSchema.enum.Merge,
 			},
 			(merged) => ({
@@ -365,6 +379,26 @@ export const useTileInteractionController = ({
 						const next = match(settling.settlement)
 							.with(
 								{
+									kind: DropItemResultKindEnumSchema.enum.StoreInput,
+									stage: "approach",
+								},
+								(stored) =>
+									itemId === settling.source.id
+										? {
+												...settling,
+												settlement: {
+													...stored,
+													stage: "resolve" as const,
+													pendingActorIds: [
+														stored.outcome.source.itemId,
+														stored.outcome.owner.itemId,
+													],
+												},
+											}
+										: settling,
+							)
+							.with(
+								{
 									kind: DropItemResultKindEnumSchema.enum.Merge,
 									stage: "approach",
 								},
@@ -384,6 +418,10 @@ export const useTileInteractionController = ({
 										: settling,
 							)
 							.with(
+								{
+									kind: DropItemResultKindEnumSchema.enum.StoreInput,
+									stage: "resolve",
+								},
 								{
 									kind: DropItemResultKindEnumSchema.enum.Merge,
 									stage: "resolve",

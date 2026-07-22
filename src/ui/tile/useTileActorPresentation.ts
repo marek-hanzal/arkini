@@ -175,6 +175,74 @@ const settlingView = (
 		)
 		.with(
 			{
+				kind: DropItemResultKindEnumSchema.enum.StoreInput,
+				stage: "approach",
+			},
+			(settlement) => {
+				const targetLocation = settlement.outcome.owner.location;
+				if (settlement.outcome.source.itemId === item.id) {
+					return {
+						...passive,
+						desiredLocation: targetLocation,
+						phase: "combining" as const,
+						feedback: settlement.feedback,
+						positionCompletion: {
+							kind: "always" as const,
+							generation: settling.generation,
+						},
+					};
+				}
+				return settlement.outcome.owner.itemId === item.id
+					? {
+							...passive,
+							phase: "combining" as const,
+							feedback: settlement.feedback,
+						}
+					: passive;
+			},
+		)
+		.with(
+			{
+				kind: DropItemResultKindEnumSchema.enum.StoreInput,
+				stage: "resolve",
+			},
+			(settlement) => {
+				if (!settlement.pendingActorIds.includes(item.id)) return passive;
+				if (settlement.outcome.source.itemId === item.id) {
+					const current = settlement.outcome.source.current;
+					if (current === null) {
+						return {
+							...passive,
+							desiredLocation: settlement.outcome.owner.location,
+							phase: "exiting" as const,
+							feedback: settlement.feedback,
+							visualCompletionGeneration: settling.generation,
+						};
+					}
+					return {
+						...passive,
+						desiredLocation: current.location,
+						phase: "settling" as const,
+						feedback: settlement.feedback,
+						positionCompletion: {
+							kind: "location" as const,
+							generation: settling.generation,
+							location: current.location,
+						},
+					};
+				}
+				return settlement.outcome.owner.itemId === item.id
+					? {
+							...passive,
+							phase: "impact" as const,
+							feedback: settlement.feedback,
+							visualCompletionGeneration: settling.generation,
+						}
+					: passive;
+			},
+		)
+		.with(
+			{
 				kind: DropItemResultKindEnumSchema.enum.Merge,
 				stage: "approach",
 			},
@@ -273,15 +341,16 @@ const interactionView = (
 				phase: "dragging" as const,
 			},
 			(dragging) => {
-				const combines =
-					dragging.previewKind === DropItemResultKindEnumSchema.enum.Merge;
+				const acceptsInteraction =
+					dragging.previewKind === DropItemResultKindEnumSchema.enum.Merge ||
+					dragging.previewKind === DropItemResultKindEnumSchema.enum.StoreInput;
 				const occupied =
 					dragging.target?.kind === "slot" && dragging.target.occupant !== null;
 				if (dragging.source.id === item.id) {
 					return {
 						...passive,
 						phase: "dragging" as const,
-						feedback: combines
+						feedback: acceptsInteraction
 							? ("accepted" as const)
 							: occupied
 								? ("ignored" as const)
@@ -293,7 +362,7 @@ const interactionView = (
 					};
 				}
 				if (
-					combines &&
+					acceptsInteraction &&
 					dragging.target?.kind === "slot" &&
 					dragging.target.occupant?.id === item.id
 				) {
@@ -311,14 +380,15 @@ const interactionView = (
 				phase: "awaiting-outcome",
 			},
 			(awaiting) => {
-				const combines =
-					awaiting.previewKind === DropItemResultKindEnumSchema.enum.Merge;
+				const acceptsInteraction =
+					awaiting.previewKind === DropItemResultKindEnumSchema.enum.Merge ||
+					awaiting.previewKind === DropItemResultKindEnumSchema.enum.StoreInput;
 				const occupied = awaiting.target.kind === "slot" && awaiting.target.occupant !== null;
 				if (awaiting.source.id === item.id) {
 					return {
 						...passive,
 						phase: "dragging" as const,
-						feedback: combines
+						feedback: acceptsInteraction
 							? ("accepted" as const)
 							: occupied
 								? ("ignored" as const)
@@ -330,7 +400,7 @@ const interactionView = (
 					};
 				}
 				if (
-					combines &&
+					acceptsInteraction &&
 					awaiting.target.kind === "slot" &&
 					awaiting.target.occupant?.id === item.id
 				) {

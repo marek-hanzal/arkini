@@ -12,6 +12,7 @@ describe("runtime enum schemas", () => {
 			DropItemResultKindEnumSchema.enum.Move,
 			DropItemResultKindEnumSchema.enum.Swap,
 			DropItemResultKindEnumSchema.enum.Merge,
+			DropItemResultKindEnumSchema.enum.StoreInput,
 			DropItemResultKindEnumSchema.enum.Ignored,
 			DropItemResultKindEnumSchema.enum.Reject,
 		]);

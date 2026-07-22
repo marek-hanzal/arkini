@@ -2,10 +2,13 @@ import { Effect } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
+import { storeInputMaterialFx } from "~/engine/input/write/storeInputMaterialFx";
 import { isSameGridLocation } from "~/engine/location/read/isSameGridLocation";
 import { commitMergeItemsFx } from "~/engine/merge/internal/commitMergeItemsFx";
 import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
 import { readDropItemPreviewFx } from "~/engine/runtime/read/readDropItemPreviewFx";
+import { isGridRuntimeItem } from "~/engine/runtime/read/isGridRuntimeItem";
+import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import type { DropItemResultSchema } from "~/engine/runtime/schema/command/DropItemResultSchema";
 import { DropItemIgnoredReasonEnumSchema } from "~/engine/runtime/schema/command/DropItemIgnoredReasonEnumSchema";
 import { DropItemRejectedReasonEnumSchema } from "~/engine/runtime/schema/command/DropItemRejectedReasonEnumSchema";
@@ -54,7 +57,10 @@ const rejectForItemError = ({
 	readonly targetItemId: IdSchema.Type;
 }): dropItemFx.Result => ({
 	kind: DropItemResultKindEnumSchema.enum.Reject,
-	reason: errorItemId === targetItemId ? DropItemRejectedReasonEnumSchema.enum.StaleTarget : DropItemRejectedReasonEnumSchema.enum.StaleSource,
+	reason:
+		errorItemId === targetItemId
+			? DropItemRejectedReasonEnumSchema.enum.StaleTarget
+			: DropItemRejectedReasonEnumSchema.enum.StaleSource,
 	itemId: sourceItemId,
 	targetItemId,
 });
@@ -236,6 +242,114 @@ export const dropItemFx = Effect.fn("dropItemFx")(function* ({
 						targetItemId,
 					}),
 				MergeRuleNotFoundError: () =>
+					Effect.succeed({
+						kind: DropItemResultKindEnumSchema.enum.Reject,
+						reason: DropItemRejectedReasonEnumSchema.enum.InvalidTarget,
+						itemId: sourceItemId,
+						targetItemId,
+					}),
+			}),
+			Effect.catchAll(() =>
+				Effect.succeed({
+					kind: DropItemResultKindEnumSchema.enum.Reject,
+					reason: DropItemRejectedReasonEnumSchema.enum.Blocked,
+					itemId: sourceItemId,
+					targetItemId,
+				}),
+			),
+		);
+	}
+
+	if (preflight.kind === DropItemResultKindEnumSchema.enum.StoreInput) {
+		return yield* Effect.gen(function* () {
+			const runtimeBefore = yield* readRuntimeFx();
+			const sourceBefore = runtimeBefore.items.find((item) => item.id === sourceItemId);
+			if (sourceBefore === undefined || !isGridRuntimeItem(sourceBefore)) {
+				return {
+					kind: DropItemResultKindEnumSchema.enum.Reject,
+					reason: DropItemRejectedReasonEnumSchema.enum.StaleSource,
+					itemId: sourceItemId,
+					targetItemId,
+				} satisfies dropItemFx.Result;
+			}
+			const stored = yield* storeInputMaterialFx({
+				ownerItemId: targetItemId,
+				ownerItemRevision: target.occupant.revision,
+				expectedOwnerLocation: target.location,
+				lineId: preflight.lineId,
+				inputIndex: preflight.inputIndex,
+				sourceItemId,
+				sourceItemRevision: sourceRevision,
+				expectedSourceLocation: sourceLocation,
+				quantity: preflight.quantity,
+			});
+			const runtimeAfter = yield* readRuntimeFx();
+			const ownerAfter = runtimeAfter.items.find((item) => item.id === targetItemId);
+			if (ownerAfter === undefined || !isGridRuntimeItem(ownerAfter)) {
+				return yield* Effect.dieMessage(
+					`Stored input owner ${targetItemId} lost its grid identity after commit.`,
+				);
+			}
+
+			return {
+				kind: DropItemResultKindEnumSchema.enum.StoreInput,
+				storedQuantity: stored.storedItem.quantity,
+				lineId: preflight.lineId,
+				inputIndex: preflight.inputIndex,
+				source: {
+					itemId: sourceBefore.id,
+					canonicalItemId: sourceBefore.item.id,
+					previousRevision: sourceBefore.revision,
+					previousLocation: sourceBefore.location,
+					previousQuantity: sourceBefore.quantity,
+					current:
+						stored.sourceItem === undefined
+							? null
+							: mergeActorState(stored.sourceItem),
+				},
+				owner: {
+					itemId: ownerAfter.id,
+					revision: ownerAfter.revision,
+					location: ownerAfter.location,
+				},
+			} satisfies dropItemFx.Result;
+		}).pipe(
+			Effect.catchTags({
+				ItemNotFoundError: (error) =>
+					Effect.succeed(
+						rejectForItemError({
+							errorItemId: error.itemId,
+							sourceItemId,
+							targetItemId,
+						}),
+					),
+				RevisionConflictError: (error) =>
+					Effect.succeed(
+						rejectForItemError({
+							errorItemId: error.entityId,
+							sourceItemId,
+							targetItemId,
+						}),
+					),
+				ItemLocationConflictError: (error) =>
+					Effect.succeed(
+						rejectForItemError({
+							errorItemId: error.itemId,
+							sourceItemId,
+							targetItemId,
+						}),
+					),
+				ItemNotOnGridError: (error) =>
+					Effect.succeed({
+						kind: DropItemResultKindEnumSchema.enum.Reject,
+						reason:
+							error.itemId === targetItemId
+								? DropItemRejectedReasonEnumSchema.enum.InvalidTarget
+								: DropItemRejectedReasonEnumSchema.enum.InvalidSource,
+						itemId: sourceItemId,
+						targetItemId,
+					}),
+				CrossSpaceBoardOperationError: () =>
 					Effect.succeed({
 						kind: DropItemResultKindEnumSchema.enum.Reject,
 						reason: DropItemRejectedReasonEnumSchema.enum.InvalidTarget,

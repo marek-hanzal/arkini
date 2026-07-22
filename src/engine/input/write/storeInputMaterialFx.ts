@@ -6,29 +6,35 @@ import type { PositiveIntegerSchema } from "~/engine/common/schema/PositiveInteg
 import { InputMaterialUnavailableError } from "~/engine/input/error/InputMaterialUnavailableError";
 import { applyInputMaterialStorePlanFx } from "~/engine/input/fx/applyInputMaterialStorePlanFx";
 import { planInputMaterialStoreFx } from "~/engine/input/fx/planInputMaterialStoreFx";
-import type { InputMaterialStoreResultSchema } from "~/engine/input/schema/command/InputMaterialStoreResultSchema";
-import { isolateStatefulOwnerTransitionFx } from "~/engine/item/fx/isolateStatefulOwnerTransitionFx";
-import { ItemNotOnGridError } from "~/engine/item/error/ItemNotOnGridError";
-import { LineInputClosedError } from "~/engine/line/error/LineInputClosedError";
-import { isLineInputClosedFx } from "~/engine/line/fx/input/isLineInputClosedFx";
-import { assertRevisionFx } from "~/engine/revision/fx/assertRevisionFx";
-import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
-import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
 import { filterInputSlotItemsFx } from "~/engine/input/read/filterInputSlotItemsFx";
 import { readItemMaterialInputFx } from "~/engine/input/read/readItemMaterialInputFx";
+import type { InputMaterialStoreResultSchema } from "~/engine/input/schema/command/InputMaterialStoreResultSchema";
+import { ItemNotOnGridError } from "~/engine/item/error/ItemNotOnGridError";
+import { isolateStatefulOwnerTransitionFx } from "~/engine/item/fx/isolateStatefulOwnerTransitionFx";
+import { LineInputClosedError } from "~/engine/line/error/LineInputClosedError";
+import { isLineInputClosedFx } from "~/engine/line/fx/input/isLineInputClosedFx";
+import { isSameGridLocation } from "~/engine/location/read/isSameGridLocation";
+import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
+import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
+import { assertRevisionFx } from "~/engine/revision/fx/assertRevisionFx";
+import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
+import { ItemLocationConflictError } from "~/engine/runtime/error/ItemLocationConflictError";
+import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
 import { isBoardRuntimeItem } from "~/engine/runtime/read/isBoardRuntimeItem";
 import { isGridRuntimeItem } from "~/engine/runtime/read/isGridRuntimeItem";
-import { CrossSpaceBoardOperationError } from "~/engine/space/error/CrossSpaceBoardOperationError";
 import { readRuntimeItemByIdFx } from "~/engine/runtime/read/readRuntimeItemByIdFx";
-import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
+import { CrossSpaceBoardOperationError } from "~/engine/space/error/CrossSpaceBoardOperationError";
 
 export namespace storeInputMaterialFx {
 	export interface Props {
 		ownerItemId: IdSchema.Type;
+		ownerItemRevision?: RevisionSchema.Type;
+		expectedOwnerLocation?: GridLocationSchema.Type;
 		lineId: IdSchema.Type;
 		inputIndex: NonNegativeIntegerSchema.Type;
 		sourceItemId: IdSchema.Type;
 		sourceItemRevision: RevisionSchema.Type;
+		expectedSourceLocation?: GridLocationSchema.Type;
 		quantity: PositiveIntegerSchema.Type;
 	}
 }
@@ -38,10 +44,13 @@ export namespace storeInputMaterialFx {
  */
 export const storeInputMaterialFx = Effect.fn("storeInputMaterialFx")(function* ({
 	ownerItemId,
+	ownerItemRevision,
+	expectedOwnerLocation,
 	lineId,
 	inputIndex,
 	sourceItemId,
 	sourceItemRevision,
+	expectedSourceLocation,
 	quantity,
 }: storeInputMaterialFx.Props) {
 	return yield* modifyRuntimeFx((runtime) => {
@@ -50,6 +59,32 @@ export const storeInputMaterialFx = Effect.fn("storeInputMaterialFx")(function* 
 				itemId: ownerItemId,
 				runtime,
 			});
+			if (ownerItemRevision !== undefined) {
+				yield* assertRevisionFx({
+					actualRevision: owner.revision,
+					entityId: owner.id,
+					expectedRevision: ownerItemRevision,
+				});
+			}
+			if (expectedOwnerLocation !== undefined) {
+				if (!isGridRuntimeItem(owner)) {
+					return yield* Effect.fail(
+						new ItemNotOnGridError({
+							itemId: owner.id,
+							location: owner.location,
+						}),
+					);
+				}
+				if (!isSameGridLocation(owner.location, expectedOwnerLocation)) {
+					return yield* Effect.fail(
+						new ItemLocationConflictError({
+							itemId: owner.id,
+							expectedLocation: expectedOwnerLocation,
+							actualLocation: owner.location,
+						}),
+					);
+				}
+			}
 			const source = yield* readRuntimeItemByIdFx({
 				itemId: sourceItemId,
 				runtime,
@@ -68,6 +103,18 @@ export const storeInputMaterialFx = Effect.fn("storeInputMaterialFx")(function* 
 				);
 			}
 			if (
+				expectedSourceLocation !== undefined &&
+				!isSameGridLocation(source.location, expectedSourceLocation)
+			) {
+				return yield* Effect.fail(
+					new ItemLocationConflictError({
+						itemId: source.id,
+						expectedLocation: expectedSourceLocation,
+						actualLocation: source.location,
+					}),
+				);
+			}
+			if (
 				isBoardRuntimeItem(owner) &&
 				isBoardRuntimeItem(source) &&
 				owner.location.space !== source.location.space
@@ -75,6 +122,18 @@ export const storeInputMaterialFx = Effect.fn("storeInputMaterialFx")(function* 
 				return yield* Effect.fail(
 					new CrossSpaceBoardOperationError({
 						fromSpace: source.location.space,
+						toSpace: owner.location.space,
+					}),
+				);
+			}
+			if (
+				isBoardRuntimeItem(owner) &&
+				!isBoardRuntimeItem(source) &&
+				owner.location.space !== runtime.currentSpace
+			) {
+				return yield* Effect.fail(
+					new CrossSpaceBoardOperationError({
+						fromSpace: runtime.currentSpace,
 						toSpace: owner.location.space,
 					}),
 				);

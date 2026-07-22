@@ -74,6 +74,13 @@ export interface TileSwappedSettlement extends TileSettlementBase {
 	readonly sourceLocation: TileLocation;
 }
 
+export interface TileStoreInputSettlement extends TileSettlementBase {
+	readonly kind: typeof DropItemResultKindEnumSchema.enum.StoreInput;
+	readonly feedback: "accepted";
+	readonly outcome: DropOutcome<typeof DropItemResultKindEnumSchema.enum.StoreInput>;
+	readonly stage: "approach" | "resolve";
+}
+
 export interface TileMergeSettlement extends TileSettlementBase {
 	readonly kind: typeof DropItemResultKindEnumSchema.enum.Merge;
 	readonly feedback: "accepted";
@@ -87,6 +94,7 @@ export type TileSettlementState =
 	| TileIgnoredSettlement
 	| TileMovedSettlement
 	| TileSwappedSettlement
+	| TileStoreInputSettlement
 	| TileMergeSettlement;
 
 export interface TileSettlingInteraction extends TileInteractionBase {

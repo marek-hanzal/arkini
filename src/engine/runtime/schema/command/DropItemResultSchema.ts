@@ -74,6 +74,42 @@ const DropItemMergedResultSchema = z
 	})
 	.strict();
 
+const DropItemStoredInputActorStateSchema = z
+	.object({
+		itemId: IdSchema,
+		canonicalItemId: IdSchema,
+		revision: RevisionSchema,
+		location: GridLocationSchema,
+		quantity: PositiveIntegerSchema,
+	})
+	.strict();
+
+const DropItemStoredInputResultSchema = z
+	.object({
+		kind: DropItemResultKindEnumSchema.extract(["StoreInput"]),
+		storedQuantity: PositiveIntegerSchema,
+		lineId: IdSchema,
+		inputIndex: z.number().int().nonnegative(),
+		source: z
+			.object({
+				itemId: IdSchema,
+				canonicalItemId: IdSchema,
+				previousRevision: RevisionSchema,
+				previousLocation: GridLocationSchema,
+				previousQuantity: PositiveIntegerSchema,
+				current: DropItemStoredInputActorStateSchema.nullable(),
+			})
+			.strict(),
+		owner: z
+			.object({
+				itemId: IdSchema,
+				revision: RevisionSchema,
+				location: GridLocationSchema,
+			})
+			.strict(),
+	})
+	.strict();
+
 const DropItemIgnoredResultSchema = z
 	.object({
 		kind: DropItemResultKindEnumSchema.extract(["Ignored"]),
@@ -98,6 +134,7 @@ export const DropItemResultSchema = z
 		DropItemMovedResultSchema,
 		DropItemSwappedResultSchema,
 		DropItemMergedResultSchema,
+		DropItemStoredInputResultSchema,
 		DropItemIgnoredResultSchema,
 		DropItemRejectedResultSchema,
 	])

@@ -76,7 +76,10 @@ export const completeTemporaryItemExpiryTransitionFx = Effect.fn(
 			runtime: draft,
 		});
 		draft = withOutput;
-		const placementEvents = yield* readOutputPlacementItemEventsFx(placement);
+		const placementEvents = yield* readOutputPlacementItemEventsFx({
+			originItemId: item.id,
+			placement,
+		});
 
 		return {
 			events: [expiredEvent, ...placementEvents],

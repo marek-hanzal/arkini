@@ -60,6 +60,7 @@ export const releaseOwnerInputsFx = Effect.fn("releaseOwnerInputsFx")(function* 
 		const placement = yield* placeRuntimeItemFx({
 			itemId: bufferedItem.id,
 			origin: owner.location,
+			originItemId: owner.id,
 			runtime: state.runtime,
 		});
 		state = {

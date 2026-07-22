@@ -80,7 +80,10 @@ export const isolateStatefulOwnerTransitionFx = Effect.fn("isolateStatefulOwnerT
 			},
 			runtime: ownerRuntime,
 		});
-		const placementEvents = yield* readOutputPlacementItemEventsFx(placement);
+		const placementEvents = yield* readOutputPlacementItemEventsFx({
+			originItemId: ownerItemId,
+			placement,
+		});
 
 		return {
 			events: [

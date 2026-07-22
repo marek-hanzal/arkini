@@ -65,7 +65,12 @@ export const applyMergeRuntimeFx = Effect.fn("applyMergeRuntimeFx")(function* ({
 		output,
 		runtime: draft,
 	});
-	events.push(...(yield* readOutputPlacementItemEventsFx(placement)));
+	events.push(
+		...(yield* readOutputPlacementItemEventsFx({
+			originItemId: target.id,
+			placement,
+		})),
+	);
 	draft = withOutput;
 	return {
 		events,

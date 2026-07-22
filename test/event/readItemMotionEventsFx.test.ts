@@ -72,11 +72,17 @@ describe("item motion event readers", () => {
 			],
 		} satisfies OutputPlacementResultSchema.Type;
 
-		expect(Effect.runSync(readOutputPlacementItemEventsFx(placement))).toEqual([
+		expect(Effect.runSync(
+			readOutputPlacementItemEventsFx({
+				originItemId: "runtime:origin",
+				placement,
+			}),
+		)).toEqual([
 			{
 				type: GameEventEnumSchema.enum.ItemStacked,
 				itemId: stacked.id,
 				canonicalItemId: "water",
+				originItemId: "runtime:origin",
 				location: stacked.location,
 				previousQuantity: 1,
 				quantity: 3,
@@ -85,6 +91,7 @@ describe("item motion event readers", () => {
 				type: GameEventEnumSchema.enum.ItemSpawned,
 				itemId: spawned.id,
 				canonicalItemId: "water",
+				originItemId: "runtime:origin",
 				location: spawned.location,
 				quantity: 2,
 			},
@@ -115,11 +122,17 @@ describe("item motion event readers", () => {
 			],
 		} satisfies OutputPlacementResultSchema.Type;
 
-		expect(Effect.runSync(readOutputPlacementItemEventsFx(placement))).toEqual([
+		expect(Effect.runSync(
+			readOutputPlacementItemEventsFx({
+				originItemId: "runtime:origin",
+				placement,
+			}),
+		)).toEqual([
 			{
 				type: GameEventEnumSchema.enum.ItemSpawned,
 				itemId: incoming.id,
 				canonicalItemId: "water",
+				originItemId: "runtime:origin",
 				location: incoming.location,
 				quantity: incoming.quantity,
 			},

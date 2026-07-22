@@ -262,6 +262,7 @@ describe("reserved material lifecycle", () => {
 			type: GameEventEnumSchema.enum.ItemPlaced,
 			itemId: returnedWorker.id,
 			canonicalItemId: "producer:worker",
+			originItemId: "runtime:employer",
 			previousLocation: {
 				scope: "reserved",
 				jobId: result.job.id,
@@ -399,6 +400,7 @@ describe("reserved material lifecycle", () => {
 			type: GameEventEnumSchema.enum.ItemStacked,
 			itemId: stack.id,
 			canonicalItemId: "item:tool",
+			originItemId: "runtime:tool-user",
 			location: stack.location,
 			previousQuantity: 2,
 			quantity: 3,

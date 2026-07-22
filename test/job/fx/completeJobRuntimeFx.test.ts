@@ -115,6 +115,7 @@ describe("completeJobRuntimeFx", () => {
 				type: GameEventEnumSchema.enum.ItemSpawned,
 				itemId: item.id,
 				canonicalItemId: item.item.id,
+				originItemId: "runtime:random-forge",
 				location: item.location,
 				quantity: item.quantity,
 			});

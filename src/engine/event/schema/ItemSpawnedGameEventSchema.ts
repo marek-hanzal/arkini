@@ -10,13 +10,15 @@ export const ItemSpawnedGameEventSchema = z
 		type: GameEventEnumSchema.extract(["ItemSpawned"]),
 		itemId: IdSchema,
 		canonicalItemId: IdSchema,
+		originItemId: IdSchema,
 		location: GridLocationSchema,
 		quantity: z.number().int().positive(),
 	})
 	.strict()
 	.meta({
 		id: "ItemSpawnedGameEventSchema",
-		description: "Transient fact that one exact runtime item identity was committed.",
+		description:
+			"Transient fact that one exact runtime item identity was committed from one exact visible origin identity.",
 	});
 
 export type ItemSpawnedGameEventSchema = typeof ItemSpawnedGameEventSchema;

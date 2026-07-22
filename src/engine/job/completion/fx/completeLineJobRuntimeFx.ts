@@ -60,7 +60,12 @@ export const completeLineJobRuntimeFx = Effect.fn("completeLineJobRuntimeFx")(fu
 			output: lineOutput,
 			runtime: draft,
 		});
-		events.push(...(yield* readOutputPlacementItemEventsFx(placement)));
+		events.push(
+			...(yield* readOutputPlacementItemEventsFx({
+				originItemId: context.owner.id,
+				placement,
+			})),
+		);
 		draft = withLineOutput;
 	}
 
@@ -79,7 +84,12 @@ export const completeLineJobRuntimeFx = Effect.fn("completeLineJobRuntimeFx")(fu
 				output: depletionOutput,
 				runtime: draft,
 			});
-			events.push(...(yield* readOutputPlacementItemEventsFx(placement)));
+			events.push(
+				...(yield* readOutputPlacementItemEventsFx({
+					originItemId: context.owner.id,
+					placement,
+				})),
+			);
 			draft = withDepletionOutput;
 		}
 	}
@@ -95,6 +105,7 @@ export const completeLineJobRuntimeFx = Effect.fn("completeLineJobRuntimeFx")(fu
 
 	const releasedReservations = yield* releaseJobReservationsFx({
 		origin: context.owner.location,
+		originItemId: context.owner.id,
 		reservations: context.reservations,
 		runtime: draft,
 	});

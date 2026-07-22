@@ -663,6 +663,7 @@ describe("item charges", () => {
 					type: GameEventEnumSchema.enum.ItemSpawned,
 					itemId: result.seed.id,
 					canonicalItemId: "item:seed",
+					originItemId: result.sapling.id,
 					location: result.seed.location,
 					quantity: 1,
 				},

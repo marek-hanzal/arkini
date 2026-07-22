@@ -67,6 +67,7 @@ export const withdrawLineInputsFx = Effect.fn("withdrawLineInputsFx")(function* 
 				const placement = yield* placeRuntimeItemFx({
 					itemId: bufferedItem.id,
 					origin: owner.location,
+					originItemId: owner.id,
 					runtime: draft,
 				});
 				events.push(...placement.events);

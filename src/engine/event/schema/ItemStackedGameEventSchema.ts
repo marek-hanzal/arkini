@@ -10,12 +10,17 @@ export const ItemStackedGameEventSchema = z
 		type: GameEventEnumSchema.extract(["ItemStacked"]),
 		itemId: IdSchema,
 		canonicalItemId: IdSchema,
+		originItemId: IdSchema,
 		location: GridLocationSchema,
 		previousQuantity: z.number().int().positive(),
 		quantity: z.number().int().positive(),
 	})
 	.strict()
-	.meta({ id: "ItemStackedGameEventSchema", description: "Transient fact that an existing exact stack grew." });
+	.meta({
+		id: "ItemStackedGameEventSchema",
+		description:
+			"Transient fact that an existing exact stack grew from one exact visible origin identity.",
+	});
 
 export type ItemStackedGameEventSchema = typeof ItemStackedGameEventSchema;
 export namespace ItemStackedGameEventSchema {

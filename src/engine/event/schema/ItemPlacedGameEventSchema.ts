@@ -12,6 +12,7 @@ export const ItemPlacedGameEventSchema = z
 		type: GameEventEnumSchema.extract(["ItemPlaced"]),
 		itemId: IdSchema,
 		canonicalItemId: IdSchema,
+		originItemId: IdSchema,
 		previousLocation: z.union([InputLocationSchema, ReservedLocationSchema]),
 		location: GridLocationSchema,
 		quantity: z.number().int().positive(),
@@ -20,7 +21,7 @@ export const ItemPlacedGameEventSchema = z
 	.meta({
 		id: "ItemPlacedGameEventSchema",
 		description:
-			"Transient fact that one existing exact runtime identity became visible at a canonical grid anchor.",
+			"Transient fact that one existing exact runtime identity became visible from one exact visible origin identity at a canonical grid anchor.",
 	});
 
 export type ItemPlacedGameEventSchema = typeof ItemPlacedGameEventSchema;

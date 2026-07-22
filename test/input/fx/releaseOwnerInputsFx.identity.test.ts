@@ -251,6 +251,7 @@ describe("releaseOwnerInputsFx existing identity", () => {
 				type: GameEventEnumSchema.enum.ItemPlaced,
 				itemId: "runtime:worker",
 				canonicalItemId: "worker",
+				originItemId: boardOwner.id,
 				previousLocation: {
 					scope: "input",
 					ownerItemId: boardOwner.id,
@@ -317,6 +318,7 @@ describe("releaseOwnerInputsFx existing identity", () => {
 				type: GameEventEnumSchema.enum.ItemStacked,
 				itemId: "runtime:material-stack",
 				canonicalItemId: "material",
+				originItemId: boardOwner.id,
 				location: {
 					scope: "board",
 					space: 2,

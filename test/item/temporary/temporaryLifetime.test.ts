@@ -214,6 +214,7 @@ describe("temporary item lifetime", () => {
 				type: GameEventEnumSchema.enum.ItemSpawned,
 				itemId: result.output.id,
 				canonicalItemId: "result",
+				originItemId: result.temporary.id,
 				location: result.output.location,
 				quantity: 1,
 			},

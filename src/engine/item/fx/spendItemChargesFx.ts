@@ -156,7 +156,10 @@ export const spendItemChargesFx = Effect.fn("spendItemChargesFx")(function* ({
 		previousQuantity: item.quantity,
 		resultingQuantity,
 	} satisfies GameEventSchema.Type;
-	const placementEvents = yield* readOutputPlacementItemEventsFx(placement);
+	const placementEvents = yield* readOutputPlacementItemEventsFx({
+		originItemId: item.id,
+		placement,
+	});
 
 	return {
 		events: [depletedEvent, ...placementEvents, ...releasedInputEvents],

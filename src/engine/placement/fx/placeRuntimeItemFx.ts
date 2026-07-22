@@ -23,6 +23,7 @@ export namespace placeRuntimeItemFx {
 	export interface Props {
 		itemId: IdSchema.Type;
 		origin: BoardLocationSchema.Type;
+		originItemId: IdSchema.Type;
 		runtime: RuntimeSchema.Type;
 	}
 
@@ -39,6 +40,7 @@ export namespace placeRuntimeItemFx {
 export const placeRuntimeItemFx = Effect.fn("placeRuntimeItemFx")(function* ({
 	itemId,
 	origin,
+	originItemId,
 	runtime,
 }: placeRuntimeItemFx.Props) {
 	const item = yield* readRuntimeItemByIdFx({
@@ -99,6 +101,7 @@ export const placeRuntimeItemFx = Effect.fn("placeRuntimeItemFx")(function* ({
 				type: GameEventEnumSchema.enum.ItemStacked,
 				itemId: stack.item.id,
 				canonicalItemId: stack.item.item.id,
+				originItemId,
 				location: stack.item.location,
 				previousQuantity: stack.item.quantity - stack.quantity,
 				quantity: stack.item.quantity,
@@ -114,6 +117,7 @@ export const placeRuntimeItemFx = Effect.fn("placeRuntimeItemFx")(function* ({
 				type: GameEventEnumSchema.enum.ItemSpawned,
 				itemId: spawnedItem.id,
 				canonicalItemId: spawnedItem.item.id,
+				originItemId,
 				location: spawnedItem.location,
 				quantity: spawnedItem.quantity,
 			});
@@ -155,6 +159,7 @@ export const placeRuntimeItemFx = Effect.fn("placeRuntimeItemFx")(function* ({
 				type: GameEventEnumSchema.enum.ItemPlaced,
 				itemId: item.id,
 				canonicalItemId: item.item.id,
+				originItemId,
 				previousLocation: item.location,
 				location: placedItem.location,
 				quantity: placedItem.quantity,

@@ -178,6 +178,7 @@ describe("mergeItemsFx events", () => {
 					type: GameEventEnumSchema.enum.ItemSpawned,
 					itemId: output.id,
 					canonicalItemId: "output",
+					originItemId: "runtime:target",
 					location: output.location,
 					quantity: 1,
 				},

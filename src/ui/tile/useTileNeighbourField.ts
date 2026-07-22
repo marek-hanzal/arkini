@@ -56,41 +56,46 @@ export const useTileNeighbourField = () => {
 				clearNeighbourField();
 				return;
 			}
-			const sourceSurfaceId = source.node.dataset.surfaceId;
-			const sourceRect = source.node.getBoundingClientRect();
-			const sourceSize = Math.max(sourceRect.width, sourceRect.height);
-			for (const registration of actors.current.values()) {
-				if (
-					registration.itemId === sourceItemId ||
-					registration.itemId === targetItemId ||
-					!registration.enabled ||
-					registration.node.dataset.live !== "true" ||
-					registration.node.dataset.surfaceId !== sourceSurfaceId ||
-					registration.node.dataset.motionPhase === "exiting"
-				) {
-					reset(registration);
-					continue;
+			try {
+				const sourceSurfaceId = source.node.dataset.surfaceId;
+				const sourceRect = source.node.getBoundingClientRect();
+				const sourceSize = Math.max(sourceRect.width, sourceRect.height);
+				for (const registration of actors.current.values()) {
+					if (
+						registration.itemId === sourceItemId ||
+						registration.itemId === targetItemId ||
+						!registration.enabled ||
+						registration.node.dataset.live !== "true" ||
+						registration.node.dataset.surfaceId !== sourceSurfaceId ||
+						registration.node.dataset.motionPhase === "exiting"
+					) {
+						reset(registration);
+						continue;
+					}
+					const rect = registration.node.getBoundingClientRect();
+					if (rect.width <= 0 || rect.height <= 0) {
+						reset(registration);
+						continue;
+					}
+					const centerX = rect.left + rect.width / 2;
+					const centerY = rect.top + rect.height / 2;
+					const deltaX = centerX - x;
+					const deltaY = centerY - y;
+					const distance = Math.hypot(deltaX, deltaY);
+					const neighbourSize = Math.max(rect.width, rect.height);
+					const radius = Math.max(96, Math.max(sourceSize, neighbourSize) * 2.25);
+					if (distance === 0 || distance >= radius) {
+						reset(registration);
+						continue;
+					}
+					const maximum = Math.min(12, neighbourSize * 0.11);
+					const strength = (1 - distance / radius) * maximum;
+					registration.x.set((deltaX / distance) * strength);
+					registration.y.set((deltaY / distance) * strength);
 				}
-				const rect = registration.node.getBoundingClientRect();
-				if (rect.width <= 0 || rect.height <= 0) {
-					reset(registration);
-					continue;
-				}
-				const centerX = rect.left + rect.width / 2;
-				const centerY = rect.top + rect.height / 2;
-				const deltaX = centerX - x;
-				const deltaY = centerY - y;
-				const distance = Math.hypot(deltaX, deltaY);
-				const neighbourSize = Math.max(rect.width, rect.height);
-				const radius = Math.max(96, Math.max(sourceSize, neighbourSize) * 2.25);
-				if (distance === 0 || distance >= radius) {
-					reset(registration);
-					continue;
-				}
-				const maximum = Math.min(12, neighbourSize * 0.11);
-				const strength = (1 - distance / radius) * maximum;
-				registration.x.set((deltaX / distance) * strength);
-				registration.y.set((deltaY / distance) * strength);
+			} catch (error) {
+				console.error("Tile neighbour measurement failed; clearing displacement.", error);
+				clearNeighbourField();
 			}
 		},
 		[clearNeighbourField, reset],

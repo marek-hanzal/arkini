@@ -8,8 +8,10 @@ export const ItemReplacedGameEventSchema = z
 		type: z.literal("item:replaced"),
 		outgoingItemId: IdSchema,
 		outgoingCanonicalItemId: IdSchema,
+		outgoingQuantity: z.number().int().positive(),
 		incomingItemId: IdSchema,
 		incomingCanonicalItemId: IdSchema,
+		incomingQuantity: z.number().int().positive(),
 		location: GridLocationSchema,
 	})
 	.strict()

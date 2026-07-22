@@ -392,6 +392,39 @@ describe("Board drag", () => {
 			y: 0,
 		});
 	});
+	it("removes cursor lag and neighbour yielding for reduced motion", async () => {
+		motionTestRuntime.reducedMotion = true;
+		const source = await renderBoard();
+		const runtimeId = source.dataset.runtimeId;
+		const dragSurface = source.querySelector<HTMLElement>('[data-ui="TileActorDragSurface"]');
+		const neighbour = document.querySelector<HTMLElement>(
+			'[data-ui="TileActor"][data-board-x="0"][data-board-y="1"]',
+		);
+		const neighbourId = neighbour?.dataset.runtimeId;
+		if (runtimeId === undefined || dragSurface === null || neighbourId === undefined) {
+			throw new Error("Missing reduced-motion actor identity.");
+		}
+
+		await act(async () => {
+			dragSurface.dispatchEvent(pointerEvent("pointerdown", 210, 110));
+			dragSurface.dispatchEvent(pointerEvent("pointermove", 217, 117));
+			await Promise.resolve();
+		});
+
+		expect(motionTestRuntime.readMotionOffset("TileActorWeight", runtimeId)).toEqual({
+			x: 0,
+			y: 0,
+		});
+		expect(motionTestRuntime.readMotionOffset("TileActor", neighbourId)).toEqual({
+			x: 0,
+			y: 0,
+		});
+
+		await act(async () => {
+			dragSurface.dispatchEvent(pointerEvent("pointercancel", 217, 117));
+		});
+	});
+
 	it("moves the one existing actor through the public atomic drop command", async () => {
 		const source = await renderBoard();
 		const runtimeId = source.dataset.runtimeId;
@@ -1095,6 +1128,62 @@ describe("Board drag", () => {
 		expect(document.querySelector(`[data-runtime-id="${runtimeId}"]`)).toBe(source);
 		expect(visual.dataset.motionPhase).toBe("dragging");
 		expect(motionTestRuntime.readDragOffset()).toEqual(dragOffset);
+	});
+
+	it("releases the shared gesture when the dragged actor disappears autonomously", async () => {
+		motionTestRuntime.autoComplete = false;
+		const source = await renderBoard();
+		const sourceId = source.dataset.runtimeId;
+		const dragSurface = source.querySelector<HTMLElement>(
+			'[data-ui="TileActorDragSurface"]',
+		);
+		if (sourceId === undefined || dragSurface === null) {
+			throw new Error("Missing autonomously removed drag actor.");
+		}
+
+		await act(async () => {
+			dragSurface.dispatchEvent(pointerEvent("pointerdown", 250, 150));
+			dragSurface.dispatchEvent(pointerEvent("pointermove", 150, 50));
+		});
+
+		await act(async () => {
+			publishRuntime({
+				...currentRuntime,
+				items: currentRuntime.items.filter((item) => item.id !== sourceId),
+			});
+			await Promise.resolve();
+			await Promise.resolve();
+		});
+
+		expect(document.querySelector(`[data-runtime-id="${sourceId}"]`)).toBeNull();
+
+		await act(async () => {
+			dragSurface.dispatchEvent(pointerEvent("pointerup", 150, 50));
+			await Promise.resolve();
+		});
+		expect(dropItemState.drop).not.toHaveBeenCalled();
+
+		const next = document.querySelector<HTMLElement>(
+			'[data-ui="TileActor"][data-board-x="0"][data-board-y="1"]',
+		);
+		const nextDragSurface = next?.querySelector<HTMLElement>(
+			'[data-ui="TileActorDragSurface"]',
+		);
+		const nextVisual = next?.querySelector<HTMLElement>('[data-ui="TileActorVisual"]');
+		if (nextDragSurface == null || nextVisual == null) {
+			throw new Error("Missing actor for the gesture reuse check.");
+		}
+
+		await act(async () => {
+			nextDragSurface.dispatchEvent(pointerEvent("pointerdown", 50, 150));
+			nextDragSurface.dispatchEvent(pointerEvent("pointermove", 57, 157));
+		});
+
+		expect(nextVisual.dataset.motionPhase).toBe("dragging");
+
+		await act(async () => {
+			nextDragSurface.dispatchEvent(pointerEvent("pointercancel", 57, 157));
+		});
 	});
 
 	it("opens one Item Detail modal from the exact live actor double-click", async () => {

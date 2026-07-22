@@ -52,9 +52,11 @@ interface MotionTestCompletion {
 
 export const motionTestRuntime = {
 	autoComplete: true,
+	reducedMotion: false,
 	completions: [] as Array<MotionTestCompletion>,
 	reset() {
 		this.autoComplete = true;
+		this.reducedMotion = false;
 		this.completions.splice(0);
 		activeDragBinding = null;
 		motionOffsetBindings.clear();
@@ -81,7 +83,7 @@ export const motionTestRuntime = {
 	},
 };
 
-export const useReducedMotion = () => false;
+export const useReducedMotion = () => motionTestRuntime.reducedMotion;
 
 export const useSpring = <T,>(source: MockMotionValue<T>) => source;
 

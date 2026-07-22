@@ -52,6 +52,19 @@ export const TileMotionCueVisual = ({
 			},
 			duration: reducedMotion ? 0.14 : 0.34,
 		}))
+		.with("settle", () => ({
+			initial: {
+				scale: reducedMotion ? 0.98 : 0.94,
+				opacity: 0.72,
+				y: reducedMotion ? 0 : 4,
+			},
+			animate: {
+				scale: 1,
+				opacity: 1,
+				y: 0,
+			},
+			duration: reducedMotion ? 0.12 : 0.22,
+		}))
 		.with("impact", () => {
 			const peak = reducedMotion ? 1.025 : 1.1 + (cue.strength - 1) * 0.025;
 			return {

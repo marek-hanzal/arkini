@@ -4,7 +4,7 @@ import { z } from "zod";
 export const TileMotionCueSchema = z
 	.object({
 		generation: z.number().int().positive(),
-		kind: z.enum(["spawn", "impact", "accept", "exit"]),
+		kind: z.enum(["spawn", "settle", "impact", "accept", "exit"]),
 		strength: z.number().int().min(1).max(3),
 	})
 	.strict();

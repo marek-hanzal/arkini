@@ -82,8 +82,10 @@ describe("item motion game events", () => {
 			type: "item:replaced",
 			outgoingItemId: "runtime:old",
 			outgoingCanonicalItemId: "sapling",
+			outgoingQuantity: 1,
 			incomingItemId: "runtime:new",
 			incomingCanonicalItemId: "tree",
+			incomingQuantity: 2,
 			location,
 		},
 	])("accepts $type as an exact committed fact", (event) => {

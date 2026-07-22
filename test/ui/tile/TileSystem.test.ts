@@ -319,6 +319,22 @@ describe("TileSystemProvider", () => {
 		});
 	});
 
+	it("invalidates an active interaction generation on scene reset", async () => {
+		const { readSystem } = await renderHarness();
+		await act(async () => {
+			const system = readSystem();
+			expect(system.press(source)).toBe(true);
+			system.startDrag(source);
+			system.moveDrag(source, 240, 50);
+		});
+		expect(readSystem().active?.phase).toBe("dragging");
+
+		await act(async () => readSystem().resetInteraction());
+
+		expect(readSystem().active).toBeNull();
+		expect(readSystem().release(source.id)).toBeNull();
+	});
+
 	it("reports a Board source dropped into one inventory slot", async () => {
 		const { readSystem } = await renderHarness();
 		const released = await startDrag(readSystem(), 240, 50);

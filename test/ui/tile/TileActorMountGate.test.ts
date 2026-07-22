@@ -87,6 +87,29 @@ describe("useTileActorMountGate", () => {
 		expect(visible.map((item) => item.id)).toEqual(["runtime:new"]);
 	});
 
+	it("forgets released actor identities before a replacement Game can paint", async () => {
+		let visible: ReadonlyArray<useTileActors.Item> = [];
+		const liveItems = [actor("runtime:shared")];
+		const cues = new Map<string, TileMotionCueSchema.Type>();
+		const Capture = () => {
+			visible = useTileActorMountGate({ liveItems, cues });
+			return null;
+		};
+		const container = document.createElement("div");
+		document.body.append(container);
+		const root = createRoot(container);
+		roots.push(root);
+		await act(async () => root.render(createElement(Capture)));
+		await finishFrame();
+		expect(visible.map((item) => item.id)).toEqual(["runtime:shared"]);
+
+		gameState.game = {};
+		await act(async () => root.render(createElement(Capture)));
+
+		expect(visible).toEqual([]);
+		expect(pendingFrame).not.toBeNull();
+	});
+
 	it("reveals a semantically cued spawn on its first rendered pose", async () => {
 		let visible: ReadonlyArray<useTileActors.Item> = [];
 		const liveItems = [actor("runtime:spawn")];

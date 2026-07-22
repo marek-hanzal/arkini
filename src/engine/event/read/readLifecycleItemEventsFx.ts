@@ -36,8 +36,10 @@ export const readLifecycleItemEventsFx = Effect.fn("readLifecycleItemEventsFx")(
 			type: "item:replaced",
 			outgoingItemId: outgoing.id,
 			outgoingCanonicalItemId: outgoing.item.id,
+			outgoingQuantity: outgoing.quantity,
 			incomingItemId: replacement.itemId,
 			incomingCanonicalItemId: replacement.canonicalItemId,
+			incomingQuantity: replacement.quantity,
 			location: replacement.location,
 		});
 	} else {

@@ -2,7 +2,7 @@
 
 import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { useTileNeighbourField } from "~/ui/tile/useTileNeighbourField";
 
@@ -80,6 +80,7 @@ afterEach(async () => {
 		for (const root of roots.splice(0)) root.unmount();
 	});
 	field = null;
+	vi.restoreAllMocks();
 	document.body.replaceChildren();
 });
 
@@ -210,6 +211,45 @@ describe("Tile neighbour field", () => {
 			expect(target.read()).toBe(0);
 			expect(Number.isFinite(target.read())).toBe(true);
 		}
+	});
+
+	it("clears the field when actor measurement fails", async () => {
+		const neighbourField = await renderField();
+		const consoleError = vi.spyOn(console, "error").mockImplementation(() => undefined);
+		const neighbourX = motionTarget();
+		const neighbourY = motionTarget();
+		const broken = actorNode({ bounds: rect(0, 0) });
+		broken.getBoundingClientRect = () => {
+			throw new Error("measurement failed");
+		};
+		neighbourX.set(6);
+		neighbourY.set(-4);
+		neighbourField.registerNeighbourActor({
+			itemId: "source",
+			node: broken,
+			x: motionTarget(),
+			y: motionTarget(),
+			enabled: true,
+		});
+		neighbourField.registerNeighbourActor({
+			itemId: "neighbour",
+			node: actorNode({ bounds: rect(100, 0) }),
+			x: neighbourX,
+			y: neighbourY,
+			enabled: true,
+		});
+
+		expect(() =>
+			neighbourField.moveNeighbourField({
+				sourceItemId: "source",
+				targetItemId: null,
+				x: 50,
+				y: 50,
+			}),
+		).not.toThrow();
+		expect(neighbourX.read()).toBe(0);
+		expect(neighbourY.read()).toBe(0);
+		expect(consoleError).toHaveBeenCalledOnce();
 	});
 
 	it("returns every registered actor to zero on clear", async () => {

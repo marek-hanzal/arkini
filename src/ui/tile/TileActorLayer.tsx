@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 
 import { useTileActors } from "~/bridge/tile/useTileActors";
 import { TileActor } from "~/ui/tile/TileActor";
@@ -10,13 +10,25 @@ import { useTileMotionCues } from "~/ui/tile/useTileMotionCues";
 
 /** Renders one stable Motion actor per live or explicitly retained presentation identity. */
 export const TileActorLayer = () => {
-	const { active, registerActorLayer } = useTileActorLayerSystem();
+	const {
+		active,
+		registerActorLayer,
+		resetInteraction,
+		clearNeighbourField,
+	} = useTileActorLayerSystem();
+	const resetScene = useCallback(() => {
+		resetInteraction();
+		clearNeighbourField();
+	}, [clearNeighbourField, resetInteraction]);
 	const liveItems = useTileActors();
 	const retention = useRetainedTileActors({
 		active,
 		liveItems,
 	});
-	const motionCues = useTileMotionCues(liveItems);
+	const motionCues = useTileMotionCues({
+		liveItems,
+		onSceneReset: resetScene,
+	});
 	const mountedLiveItems = useTileActorMountGate({
 		liveItems,
 		cues: motionCues.cues,

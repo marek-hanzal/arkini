@@ -39,6 +39,7 @@ export const useTileActorDrag = ({
 	} = motion;
 	const retainActorIds = useTileActorRetention();
 	const {
+		active,
 		press,
 		startDrag,
 		moveDrag,
@@ -51,6 +52,7 @@ export const useTileActorDrag = ({
 	const dropItem = useDropItem();
 	const dragControls = useDragControls();
 	const dragStarted = useRef(false);
+	const pointerOwned = useRef(false);
 	const suppressClick = useRef(false);
 
 	const clearTransientDragMotion = useCallback(() => {
@@ -81,6 +83,7 @@ export const useTileActorDrag = ({
 		(event) => {
 			if (!live || !event.isPrimary || event.button !== 0) return;
 			if (!press(canonicalSource)) return;
+			pointerOwned.current = true;
 			clearTransientDragMotion();
 			retainActorIds([
 				canonicalSource.id,
@@ -108,12 +111,16 @@ export const useTileActorDrag = ({
 	);
 
 	const onPointerUp = useCallback(() => {
+		pointerOwned.current = false;
 		if (dragStarted.current) return;
+		dragStarted.current = false;
 		clearTransientDragMotion();
 		cancel(canonicalSource.id);
 	}, [cancel, canonicalSource.id, clearTransientDragMotion]);
 
 	const onPointerCancel = useCallback(() => {
+		pointerOwned.current = false;
+		dragStarted.current = false;
 		stopPickupCorrection();
 		clearTransientDragMotion();
 		dragControls.cancel();
@@ -151,6 +158,7 @@ export const useTileActorDrag = ({
 
 	const onDragEnd = useCallback(
 		async (_event: MouseEvent | TouchEvent | PointerEvent, _info: PanInfo) => {
+			pointerOwned.current = false;
 			clearTransientDragMotion();
 			const released = release(canonicalSource.id);
 			if (released === null) {
@@ -226,6 +234,25 @@ export const useTileActorDrag = ({
 		],
 	);
 
+	useEffect(() => {
+		if (!pointerOwned.current) return;
+		if (live && active?.source.id === canonicalSource.id) return;
+		pointerOwned.current = false;
+		dragStarted.current = false;
+		stopPickupCorrection();
+		clearTransientDragMotion();
+		dragControls.cancel();
+		cancel(canonicalSource.id);
+	}, [
+		active,
+		cancel,
+		canonicalSource.id,
+		clearTransientDragMotion,
+		dragControls,
+		live,
+		stopPickupCorrection,
+	]);
+
 	const consumeClickSuppression = useCallback(() => {
 		const suppressed = suppressClick.current;
 		suppressClick.current = false;
@@ -234,6 +261,8 @@ export const useTileActorDrag = ({
 
 	useEffect(
 		() => () => {
+			pointerOwned.current = false;
+			dragStarted.current = false;
 			stopPickupCorrection();
 			clearTransientDragMotion();
 			dragControls.cancel();

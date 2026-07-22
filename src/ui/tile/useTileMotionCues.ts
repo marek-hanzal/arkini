@@ -25,7 +25,13 @@ const emptyState = (): TileMotionCueState => ({
 });
 
 /** Translates committed item facts into bounded actor-local cue generations. */
-export const useTileMotionCues = (liveItems: ReadonlyArray<useTileActors.Item>) => {
+export const useTileMotionCues = ({
+	liveItems,
+	onSceneReset,
+}: {
+	readonly liveItems: ReadonlyArray<useTileActors.Item>;
+	readonly onSceneReset: () => void;
+}) => {
 	const game = useGameEngine();
 	const liveItemsRef = useRef(liveItems);
 	const previousLiveItemsRef = useRef(liveItems);
@@ -52,6 +58,9 @@ export const useTileMotionCues = (liveItems: ReadonlyArray<useTileActors.Item>) 
 	}, []);
 
 	useGameEvents((batch) => {
+		if (batch.events.some((event) => event.type === "current-space:changed")) {
+			onSceneReset();
+		}
 		setState((current) => {
 			const cues = new Map(current.cues);
 			const retained = new Map(current.retained);
@@ -95,6 +104,14 @@ export const useTileMotionCues = (liveItems: ReadonlyArray<useTileActors.Item>) 
 							cues.delete(itemId);
 							retained.delete(itemId);
 							changed = true;
+						}
+						for (const item of liveItemsRef.current) {
+							if (
+								item.location.scope === "board" &&
+								item.location.space === event.currentSpace
+							) {
+								cue(item.id, "settle", false);
+							}
 						}
 						break;
 					case "item:spawned":
@@ -148,14 +165,16 @@ export const useTileMotionCues = (liveItems: ReadonlyArray<useTileActors.Item>) 
 		state.cues,
 	]);
 
-	useEffect(() => {
+	useLayoutEffect(() => {
 		if (gameRef.current === game) return;
 		gameRef.current = game;
+		onSceneReset();
 		setState(emptyState());
 		for (const fallback of fallbacks.current.values()) clearTimeout(fallback.timer);
 		fallbacks.current.clear();
 	}, [
 		game,
+		onSceneReset,
 	]);
 
 	useEffect(

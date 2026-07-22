@@ -36,6 +36,7 @@ const roots: Array<ReturnType<typeof createRoot>> = [];
 const item = (
 	id: string,
 	scope: "board" | "inventory" = "board",
+	space = 0,
 ): useTileActors.Item => ({
 	id,
 	revision: `revision:${id}`,
@@ -47,7 +48,7 @@ const item = (
 		scope === "board"
 			? {
 					scope,
-					space: 0,
+					space,
 					position: { x: 0, y: 0 },
 				}
 			: {
@@ -78,14 +79,16 @@ describe("tile motion cue lifecycle", () => {
 		await act(async () => {
 			for (const root of roots.splice(0)) root.unmount();
 		});
+		vi.useRealTimers();
 		document.body.replaceChildren();
 	});
 
 	it("coalesces repeated impacts and ignores stale completion generations", async () => {
 		let current: ReturnType<typeof useTileMotionCues> | null = null;
 		const liveItems = [item("runtime:stack")];
+		const onSceneReset = vi.fn();
 		const Capture = () => {
-			current = useTileMotionCues(liveItems);
+			current = useTileMotionCues({ liveItems, onSceneReset });
 			return null;
 		};
 		const container = document.createElement("div");
@@ -128,8 +131,9 @@ describe("tile motion cue lifecycle", () => {
 	it("retains an outgoing actor only for its owned exit generation", async () => {
 		let liveItems = [item("runtime:removed")];
 		let current: ReturnType<typeof useTileMotionCues> | null = null;
+		const onSceneReset = vi.fn();
 		const Capture = () => {
-			current = useTileMotionCues(liveItems);
+			current = useTileMotionCues({ liveItems, onSceneReset });
 			return null;
 		};
 		const container = document.createElement("div");
@@ -160,11 +164,125 @@ describe("tile motion cue lifecycle", () => {
 		expect(current?.retainedItems).toEqual([]);
 	});
 
-	it("clears only board-owned transient cues when the visible space changes", async () => {
+	it("retains the outgoing replacement actor when the live runtime publishes first", async () => {
+		let liveItems = [item("runtime:outgoing")];
 		let current: ReturnType<typeof useTileMotionCues> | null = null;
-		const liveItems = [item("runtime:board"), item("runtime:inventory", "inventory")];
+		const onSceneReset = vi.fn();
 		const Capture = () => {
-			current = useTileMotionCues(liveItems);
+			current = useTileMotionCues({ liveItems, onSceneReset });
+			return null;
+		};
+		const container = document.createElement("div");
+		document.body.append(container);
+		const root = createRoot(container);
+		roots.push(root);
+		await act(async () => root.render(createElement(Capture)));
+
+		liveItems = [item("runtime:incoming")];
+		await act(async () => root.render(createElement(Capture)));
+		await dispatch([
+			{
+				type: "item:replaced",
+				outgoingItemId: "runtime:outgoing",
+				outgoingCanonicalItemId: "item:outgoing",
+				outgoingQuantity: 1,
+				incomingItemId: "runtime:incoming",
+				incomingCanonicalItemId: "item:incoming",
+				incomingQuantity: 1,
+				location: liveItems[0].location,
+			},
+		]);
+
+		const exit = current?.cues.get("runtime:outgoing");
+		expect(exit?.kind).toBe("exit");
+		expect(current?.cues.get("runtime:incoming")?.kind).toBe("spawn");
+		expect(current?.retainedItems.map((retained) => retained.id)).toEqual([
+			"runtime:outgoing",
+		]);
+		if (exit === undefined) throw new Error("Missing replacement exit cue.");
+
+		await act(async () => current?.complete("runtime:outgoing", exit.generation));
+
+		expect(current?.retainedItems).toEqual([]);
+	});
+
+	it("releases retained exits through the bounded fallback when Motion never completes", async () => {
+		vi.useFakeTimers();
+		let liveItems = [item("runtime:fallback")];
+		let current: ReturnType<typeof useTileMotionCues> | null = null;
+		const onSceneReset = vi.fn();
+		const Capture = () => {
+			current = useTileMotionCues({ liveItems, onSceneReset });
+			return null;
+		};
+		const container = document.createElement("div");
+		document.body.append(container);
+		const root = createRoot(container);
+		roots.push(root);
+		await act(async () => root.render(createElement(Capture)));
+		await dispatch([
+			{
+				type: "item:removed",
+				itemId: "runtime:fallback",
+				canonicalItemId: "item:fallback",
+				location: liveItems[0].location,
+				quantity: 1,
+				reason: "lifecycle",
+			},
+		]);
+		liveItems = [];
+		await act(async () => root.render(createElement(Capture)));
+		expect(current?.retainedItems).toHaveLength(1);
+
+		await act(async () => vi.advanceTimersByTime(1_200));
+
+		expect(current?.cues.size).toBe(0);
+		expect(current?.retainedItems).toEqual([]);
+	});
+
+	it("clears cues, retained actors, and scene interaction when Game identity changes", async () => {
+		const liveItems = [item("runtime:old-game")];
+		let current: ReturnType<typeof useTileMotionCues> | null = null;
+		const onSceneReset = vi.fn();
+		const Capture = () => {
+			current = useTileMotionCues({ liveItems, onSceneReset });
+			return null;
+		};
+		const container = document.createElement("div");
+		document.body.append(container);
+		const root = createRoot(container);
+		roots.push(root);
+		await act(async () => root.render(createElement(Capture)));
+		await dispatch([
+			{
+				type: "item:removed",
+				itemId: "runtime:old-game",
+				canonicalItemId: "item:old-game",
+				location: liveItems[0].location,
+				quantity: 1,
+				reason: "lifecycle",
+			},
+		]);
+		expect(current?.retainedItems).toHaveLength(1);
+
+		eventState.game = {};
+		await act(async () => root.render(createElement(Capture)));
+
+		expect(onSceneReset).toHaveBeenCalledOnce();
+		expect(current?.cues.size).toBe(0);
+		expect(current?.retainedItems).toEqual([]);
+	});
+
+	it("resets the scene and settles only the newly visible board space", async () => {
+		let current: ReturnType<typeof useTileMotionCues> | null = null;
+		const liveItems = [
+			item("runtime:board:old"),
+			item("runtime:board:new", "board", 1),
+			item("runtime:inventory", "inventory"),
+		];
+		const onSceneReset = vi.fn();
+		const Capture = () => {
+			current = useTileMotionCues({ liveItems, onSceneReset });
 			return null;
 		};
 		const container = document.createElement("div");
@@ -175,8 +293,8 @@ describe("tile motion cue lifecycle", () => {
 		await dispatch([
 			{
 				type: "item:spawned",
-				itemId: "runtime:board",
-				canonicalItemId: "item:board",
+				itemId: "runtime:board:old",
+				canonicalItemId: "item:board:old",
 				location: liveItems[0].location,
 				quantity: 1,
 			},
@@ -184,7 +302,7 @@ describe("tile motion cue lifecycle", () => {
 				type: "item:spawned",
 				itemId: "runtime:inventory",
 				canonicalItemId: "item:inventory",
-				location: liveItems[1].location,
+				location: liveItems[2].location,
 				quantity: 1,
 			},
 		]);
@@ -196,7 +314,9 @@ describe("tile motion cue lifecycle", () => {
 			},
 		]);
 
-		expect(current?.cues.has("runtime:board")).toBe(false);
+		expect(onSceneReset).toHaveBeenCalledOnce();
+		expect(current?.cues.has("runtime:board:old")).toBe(false);
+		expect(current?.cues.get("runtime:board:new")?.kind).toBe("settle");
 		expect(current?.cues.get("runtime:inventory")?.kind).toBe("spawn");
 	});
 });

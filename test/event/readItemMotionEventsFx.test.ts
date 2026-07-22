@@ -136,8 +136,10 @@ describe("item motion event readers", () => {
 				type: "item:replaced",
 				outgoingItemId: outgoing.id,
 				outgoingCanonicalItemId: "tool",
+				outgoingQuantity: outgoing.quantity,
 				incomingItemId: incoming.id,
 				incomingCanonicalItemId: "water",
+				incomingQuantity: incoming.quantity,
 				location: outgoing.location,
 			},
 		]);

@@ -342,6 +342,43 @@ const drag = async ({
 };
 
 describe("Toolbar drag", () => {
+	it("reuses weighted drag on Toolbar without displacing Board actors", async () => {
+		await renderGameBoard();
+		const toolbarActor = document.querySelector<HTMLElement>(
+			'[data-ui="TileActor"][data-location-scope="toolbar"]',
+		);
+		const boardActor = document.querySelector<HTMLElement>(
+			'[data-ui="TileActor"][data-location-scope="board"]',
+		);
+		const toolbarId = toolbarActor?.dataset.runtimeId;
+		const boardId = boardActor?.dataset.runtimeId;
+		const dragSurface = toolbarActor?.querySelector<HTMLElement>(
+			'[data-ui="TileActorDragSurface"]',
+		);
+		if (toolbarId === undefined || boardId === undefined || dragSurface == null) {
+			throw new Error("Missing cross-surface actor identity.");
+		}
+
+		await act(async () => {
+			dragSurface.dispatchEvent(pointerEvent("pointerdown", 150, 270));
+			dragSurface.dispatchEvent(pointerEvent("pointermove", 157, 277));
+			await Promise.resolve();
+		});
+
+		expect(motionTestRuntime.readMotionOffset("TileActorWeight", toolbarId)).toEqual({
+			x: -2.45,
+			y: -1.96,
+		});
+		expect(motionTestRuntime.readMotionOffset("TileActor", boardId)).toEqual({
+			x: 0,
+			y: 0,
+		});
+
+		await act(async () => {
+			dragSurface.dispatchEvent(pointerEvent("pointercancel", 157, 277));
+		});
+	});
+
 	it("moves one real actor Board to Toolbar and back through exact slot targets", async () => {
 		await renderGameBoard();
 		const actor = document.querySelector<HTMLElement>(

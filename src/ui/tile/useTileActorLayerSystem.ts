@@ -1,10 +1,17 @@
 import { useTileSystemContext } from "~/ui/tile/useTileSystemContext";
 
-/** Exposes only the actor-layer anchor registration and active presentation generation. */
+/** Exposes actor-layer placement and transient scene lifecycle ownership. */
 export const useTileActorLayerSystem = () => {
-	const { active, registerActorLayer } = useTileSystemContext();
+	const {
+		active,
+		registerActorLayer,
+		resetInteraction,
+		clearNeighbourField,
+	} = useTileSystemContext();
 	return {
 		active,
 		registerActorLayer,
+		resetInteraction,
+		clearNeighbourField,
 	};
 };

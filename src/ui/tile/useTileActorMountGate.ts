@@ -23,7 +23,7 @@ export const useTileActorMountGate = ({
 		liveItems,
 	]);
 
-	useEffect(() => {
+	useLayoutEffect(() => {
 		if (gameRef.current === game) return;
 		gameRef.current = game;
 		setReleasedIds(new Set());

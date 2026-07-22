@@ -1,4 +1,10 @@
-import { animate, type PanInfo, useMotionValue, useReducedMotion, useSpring } from "motion/react";
+import {
+	animate,
+	type PanInfo,
+	useMotionValue,
+	useReducedMotion,
+	useSpring,
+} from "motion/react";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { match } from "ts-pattern";
 
@@ -13,6 +19,8 @@ const settleTransition = {
 	damping: 38,
 	mass: 0.62,
 };
+
+const interactionVisualFallbackMs = 1_200;
 
 const pickupTransition = {
 	type: "tween" as const,
@@ -145,11 +153,17 @@ export const useTileActorMotion = ({
 
 	const startPickupCorrection = useCallback(() => {
 		stopPickupCorrection();
+		if (reducedMotion) {
+			pickupX.jump(pickupTarget.current.x);
+			pickupY.jump(pickupTarget.current.y);
+			return;
+		}
 		pickupAnimationX.current = animate(pickupX, pickupTarget.current.x, pickupTransition);
 		pickupAnimationY.current = animate(pickupY, pickupTarget.current.y, pickupTransition);
 	}, [
 		pickupX,
 		pickupY,
+		reducedMotion,
 		stopPickupCorrection,
 	]);
 
@@ -183,7 +197,22 @@ export const useTileActorMotion = ({
 	useLayoutEffect(() => {
 		void geometryVersion;
 		if (presentation.placementFrozen) return;
-		const placement = readPlacement(presentation.desiredSource);
+		let placement: ReturnType<typeof readPlacement>;
+		try {
+			placement = readPlacement(presentation.desiredSource);
+		} catch (error) {
+			console.error("Tile placement measurement failed; keeping its last stable pose.", error);
+			stopPickupCorrection();
+			clearDragWeight();
+			dragX.jump(0);
+			dragY.jump(0);
+			pickupX.jump(0);
+			pickupY.jump(0);
+			neighbourTargetX.set(0);
+			neighbourTargetY.set(0);
+			setVisible(initialized.current);
+			return;
+		}
 		const ownsSettlementMotion =
 			presentation.positionCompletion.kind !== "none" ||
 			presentation.visualCompletionGeneration !== null;
@@ -240,25 +269,48 @@ export const useTileActorMotion = ({
 			animate(width, placement.width, settleTransition),
 			animate(height, placement.height, settleTransition),
 		);
-		void Promise.all(animations).then(() => {
-			if (localMotionGeneration.current !== generation) return;
-			if (presentation.positionCompletion.kind !== "none" && canCompletePosition()) {
-				complete(item.id, presentation.positionCompletion.generation);
-			}
-		});
+		void Promise.all(animations)
+			.then(() => {
+				if (localMotionGeneration.current !== generation) return;
+				if (presentation.positionCompletion.kind !== "none" && canCompletePosition()) {
+					complete(item.id, presentation.positionCompletion.generation);
+				}
+			})
+			.catch((error: unknown) => {
+				if (localMotionGeneration.current !== generation) return;
+				console.error("Tile actor motion failed; converging to its live placement.", error);
+				anchorX.jump(placement.x);
+				anchorY.jump(placement.y);
+				dragX.jump(0);
+				dragY.jump(0);
+				pickupX.jump(0);
+				pickupY.jump(0);
+				width.jump(placement.width);
+				height.jump(placement.height);
+				setVisible(true);
+				if (presentation.positionCompletion.kind !== "none" && canCompletePosition()) {
+					complete(item.id, presentation.positionCompletion.generation);
+				}
+			});
 		return () => {
+			if (localMotionGeneration.current === generation) {
+				localMotionGeneration.current += 1;
+			}
 			for (const animation of animations) animation.stop();
 		};
 	}, [
 		anchorX,
 		anchorY,
 		canCompletePosition,
+		clearDragWeight,
 		complete,
 		dragX,
 		dragY,
 		geometryVersion,
 		height,
 		item.id,
+		neighbourTargetX,
+		neighbourTargetY,
 		pickupX,
 		pickupY,
 		presentation.desiredSource,
@@ -274,6 +326,20 @@ export const useTileActorMotion = ({
 	const onVisualAnimationComplete = useCallback(() => {
 		if (presentation.visualCompletionGeneration === null) return;
 		complete(item.id, presentation.visualCompletionGeneration);
+	}, [
+		complete,
+		item.id,
+		presentation.visualCompletionGeneration,
+	]);
+
+	useEffect(() => {
+		const generation = presentation.visualCompletionGeneration;
+		if (generation === null) return;
+		const fallback = setTimeout(
+			() => complete(item.id, generation),
+			interactionVisualFallbackMs,
+		);
+		return () => clearTimeout(fallback);
 	}, [
 		complete,
 		item.id,

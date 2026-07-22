@@ -409,6 +409,12 @@ export const useTileInteractionController = ({
 		],
 	);
 
+	const resetInteraction = useCallback(() => {
+		if (activeRef.current === null) return;
+		nextGeneration.current += 1;
+		publishActive(null);
+	}, [publishActive]);
+
 	const cancel = useCallback(
 		(itemId: string) => {
 			const current = activeRef.current;
@@ -448,5 +454,6 @@ export const useTileInteractionController = ({
 		settle,
 		complete,
 		cancel,
+		resetInteraction,
 	};
 };

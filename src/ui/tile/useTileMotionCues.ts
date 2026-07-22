@@ -14,6 +14,7 @@ interface TileMotionCueState {
 	readonly liveItems: ReadonlyArray<useTileActors.Item>;
 	readonly nextGeneration: number;
 	readonly cues: ReadonlyMap<string, TileMotionCueSchema.Type>;
+	readonly followUps: ReadonlyMap<string, TileMotionCueSchema.Type>;
 	readonly retained: ReadonlyMap<string, useTileActors.Item>;
 }
 
@@ -29,8 +30,55 @@ const emptyState = (): TileMotionCueState => ({
 	liveItems: [],
 	nextGeneration: 0,
 	cues: new Map(),
+	followUps: new Map(),
 	retained: new Map(),
 });
+
+const isTerminalCue = (kind: TileMotionCueSchema.Type["kind"]) =>
+	kind === "exit" || kind === "consume-exit";
+
+const isStrengthCue = (kind: TileMotionCueSchema.Type["kind"]) =>
+	kind === "absorb" || kind === "impact" || kind === "accept";
+
+const cuePriority = (kind: TileMotionCueSchema.Type["kind"]) => {
+	switch (kind) {
+		case "exit":
+		case "consume-exit":
+			return 100;
+		case "spawn":
+			return 90;
+		case "consume":
+			return 50;
+		case "absorb":
+			return 40;
+		case "accept":
+			return 30;
+		case "impact":
+			return 20;
+		case "settle":
+			return 10;
+	}
+};
+
+const coalesceCue = (
+	existing: TileMotionCueSchema.Type,
+	incoming: TileMotionCueSchema.Type,
+): TileMotionCueSchema.Type => ({
+	...incoming,
+	strength:
+		existing.kind === incoming.kind && isStrengthCue(incoming.kind)
+			? Math.min(3, existing.strength + 1)
+			: incoming.strength,
+});
+
+const resolveFollowUp = (
+	existing: TileMotionCueSchema.Type | undefined,
+	incoming: TileMotionCueSchema.Type,
+) => {
+	if (existing === undefined) return incoming;
+	if (existing.kind === incoming.kind) return coalesceCue(existing, incoming);
+	return cuePriority(incoming.kind) >= cuePriority(existing.kind) ? incoming : existing;
+};
 
 const applyTransition = (
 	current: TileMotionCueState,
@@ -41,6 +89,7 @@ const applyTransition = (
 		return current;
 	}
 	const cues = new Map(current.cues);
+	const followUps = new Map(current.followUps);
 	const retained = new Map(current.retained);
 	const liveById = new Map([
 		...(transition.previousItems ?? []).map((item) => [item.id, item] as const),
@@ -59,36 +108,62 @@ const applyTransition = (
 		targetItemId?: string,
 		previousQuantity?: number,
 	) => {
-		const existing = cues.get(itemId);
-		if (existing?.kind === "exit" && kind !== "exit") return;
-		if (existing?.kind === "spawn" && kind === "spawn") return;
 		if (retain) {
 			const snapshot = liveById.get(itemId) ?? retained.get(itemId);
 			if (snapshot !== undefined) retained.set(itemId, snapshot);
 		}
-		const strength =
-			existing?.kind === kind &&
-			(kind === "absorb" || kind === "impact" || kind === "accept")
-				? Math.min(3, existing.strength + 1)
-				: 1;
-		cues.set(itemId, {
+		const incoming: TileMotionCueSchema.Type = {
 			generation: ++nextGeneration,
 			kind,
-			strength,
+			strength: 1,
 			...(originItemId === undefined ? {} : { originItemId }),
 			...(deliveryQuantity === undefined ? {} : { deliveryQuantity }),
 			...(targetItemId === undefined ? {} : { targetItemId }),
 			...(previousQuantity === undefined ? {} : { previousQuantity }),
-		});
+		};
+		const existing = cues.get(itemId);
+		if (existing === undefined) {
+			cues.set(itemId, incoming);
+			return;
+		}
+		if (isTerminalCue(existing.kind)) return;
+		if (isTerminalCue(incoming.kind)) {
+			cues.set(itemId, incoming);
+			followUps.delete(itemId);
+			return;
+		}
+		if (existing.kind === "spawn") {
+			if (incoming.kind === "spawn" || incoming.kind === "settle") return;
+			followUps.set(itemId, resolveFollowUp(followUps.get(itemId), incoming));
+			return;
+		}
+		if (incoming.kind === "spawn") {
+			cues.set(itemId, incoming);
+			if (existing.kind !== "settle") {
+				followUps.set(itemId, resolveFollowUp(followUps.get(itemId), existing));
+			}
+			return;
+		}
+		if (existing.kind === incoming.kind) {
+			cues.set(itemId, coalesceCue(existing, incoming));
+			return;
+		}
+		if (incoming.kind === "settle") return;
+		if (existing.kind === "settle") {
+			cues.set(itemId, incoming);
+			return;
+		}
+		followUps.set(itemId, resolveFollowUp(followUps.get(itemId), incoming));
 	};
 
 	for (const event of transition.events) {
 		switch (event.type) {
 			case GameEventEnumSchema.enum.CurrentSpaceChanged:
-				for (const itemId of cues.keys()) {
+				for (const itemId of new Set([...cues.keys(), ...followUps.keys()])) {
 					const item = liveById.get(itemId) ?? retained.get(itemId);
 					if (item?.location.scope !== LocationScopeEnumSchema.enum.Board) continue;
 					cues.delete(itemId);
+					followUps.delete(itemId);
 					retained.delete(itemId);
 				}
 				settleSpace = event.currentSpace;
@@ -147,7 +222,8 @@ const applyTransition = (
 			if (
 				item.location.scope !== LocationScopeEnumSchema.enum.Board ||
 				item.location.space !== settleSpace ||
-				cues.has(item.id)
+				cues.has(item.id) ||
+				followUps.has(item.id)
 			) {
 				continue;
 			}
@@ -164,6 +240,7 @@ const applyTransition = (
 		liveItems: transition.liveItems,
 		nextGeneration,
 		cues,
+		followUps,
 		retained,
 	};
 };
@@ -181,21 +258,47 @@ export const useTileMotionCues = ({
 	const sourceRef = useRef(source);
 	const fallbacks = useRef(new Map<string, TileMotionCueFallback>());
 	const [state, setState] = useState<TileMotionCueState>(() => stateFromSource(source));
+	const stateRef = useRef(state);
+	useLayoutEffect(() => {
+		stateRef.current = state;
+	}, [state]);
 
 	const complete = useCallback((itemId: string, generation: number) => {
 		setState((current) => {
 			if (current.cues.get(itemId)?.generation !== generation) return current;
 			const cues = new Map(current.cues);
+			const followUps = new Map(current.followUps);
 			const retained = new Map(current.retained);
-			cues.delete(itemId);
-			retained.delete(itemId);
+			const followUp = followUps.get(itemId);
+			followUps.delete(itemId);
+			if (followUp === undefined) {
+				cues.delete(itemId);
+				retained.delete(itemId);
+			} else {
+				cues.set(itemId, followUp);
+			}
 			return {
 				...current,
 				cues,
+				followUps,
 				retained,
 			};
 		});
 	}, []);
+
+	const start = useCallback(
+		(itemId: string, generation: number) => {
+			if (stateRef.current.cues.get(itemId)?.generation !== generation) return;
+			const existing = fallbacks.current.get(itemId);
+			if (existing?.generation === generation) return;
+			if (existing !== undefined) clearTimeout(existing.timer);
+			fallbacks.current.set(itemId, {
+				generation,
+				timer: setTimeout(() => complete(itemId, generation), cueFallbackMs),
+			});
+		},
+		[complete],
+	);
 
 	useLayoutEffect(() => {
 		if (sourceRef.current !== source) {
@@ -226,14 +329,15 @@ export const useTileMotionCues = ({
 			clearTimeout(fallback.timer);
 			fallbacks.current.delete(itemId);
 		}
+		const renderedIds = new Set([
+			...state.liveItems.map((item) => item.id),
+			...state.retained.keys(),
+		]);
 		for (const [itemId, cue] of state.cues) {
-			if (fallbacks.current.get(itemId)?.generation === cue.generation) continue;
-			fallbacks.current.set(itemId, {
-				generation: cue.generation,
-				timer: setTimeout(() => complete(itemId, cue.generation), cueFallbackMs),
-			});
+			if (renderedIds.has(itemId)) continue;
+			start(itemId, cue.generation);
 		}
-	}, [complete, state.cues]);
+	}, [start, state.cues, state.liveItems, state.retained]);
 
 	useEffect(
 		() => () => {
@@ -247,6 +351,7 @@ export const useTileMotionCues = ({
 		liveItems: state.liveItems,
 		cues: state.cues,
 		retainedItems: [...state.retained.values()],
+		start,
 		complete,
 	};
 };

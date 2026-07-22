@@ -7,6 +7,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { readTileActorTransitionFx } from "~/bridge/tile/readTileActorTransitionFx";
 import type { useTileActors } from "~/bridge/tile/useTileActors";
 import type { TileActorTransitionSource } from "~/bridge/tile/useTileActorTransitionSource";
+import { TileActorContent } from "~/ui/tile/TileActorContent";
 import { TileMotionCueVisual } from "~/ui/tile/TileMotionCueVisual";
 import { useTileMotionCues } from "~/ui/tile/useTileMotionCues";
 import { motionTestRuntime } from "~test/ui/support/motionReactMock";
@@ -369,6 +370,124 @@ describe("tile motion cue lifecycle", () => {
 		]);
 	});
 
+	it("preserves spawn first paint and promotes one bounded follow-up", async () => {
+		const liveItems = [item("runtime:new")];
+		eventState.liveItems = [];
+		let current: ReturnType<typeof useTileMotionCues> | null = null;
+		const Capture = () => {
+			current = useTileMotionCues({ onSceneReset: vi.fn() });
+			return null;
+		};
+		const container = document.createElement("div");
+		document.body.append(container);
+		const root = createRoot(container);
+		roots.push(root);
+		await act(async () => root.render(createElement(Capture)));
+
+		await dispatch(
+			[
+				{
+					type: GameEventEnumSchema.enum.ItemSpawned,
+					itemId: "runtime:new",
+					canonicalItemId: "item:new",
+					originItemId: "runtime:origin",
+					location: liveItems[0].location,
+					quantity: 1,
+				},
+				{
+					type: GameEventEnumSchema.enum.ItemSplit,
+					itemId: "runtime:new",
+					canonicalItemId: "item:new",
+					location: liveItems[0].location,
+					previousQuantity: 2,
+					quantity: 1,
+				},
+			],
+			liveItems,
+		);
+
+		const spawn = current?.cues.get("runtime:new");
+		expect(spawn?.kind).toBe("spawn");
+		if (spawn === undefined) throw new Error("Missing spawn cue.");
+		await act(async () => current?.complete("runtime:new", spawn.generation));
+		expect(current?.cues.get("runtime:new")?.kind).toBe("impact");
+	});
+
+	it("orders impact before a stronger same-actor accept follow-up", async () => {
+		const liveItems = [item("runtime:receiver")];
+		eventState.liveItems = liveItems;
+		let current: ReturnType<typeof useTileMotionCues> | null = null;
+		const Capture = () => {
+			current = useTileMotionCues({ onSceneReset: vi.fn() });
+			return null;
+		};
+		const container = document.createElement("div");
+		document.body.append(container);
+		const root = createRoot(container);
+		roots.push(root);
+		await act(async () => root.render(createElement(Capture)));
+
+		await dispatch([
+			{
+				type: GameEventEnumSchema.enum.ItemSplit,
+				itemId: "runtime:receiver",
+				canonicalItemId: "item:receiver",
+				location: liveItems[0].location,
+				previousQuantity: 2,
+				quantity: 1,
+			},
+			{
+				type: GameEventEnumSchema.enum.JobStarted,
+				jobId: "runtime:job",
+				ownerItemId: "runtime:receiver",
+				lineId: "line:receiver",
+				source: "explicit",
+			},
+		]);
+
+		const impact = current?.cues.get("runtime:receiver");
+		expect(impact?.kind).toBe("impact");
+		if (impact === undefined) throw new Error("Missing impact cue.");
+		await act(async () => current?.complete("runtime:receiver", impact.generation));
+		expect(current?.cues.get("runtime:receiver")?.kind).toBe("accept");
+	});
+
+	it("arms fallback only after a visible cue actually starts", async () => {
+		vi.useFakeTimers();
+		const liveItems = [item("runtime:deferred")];
+		eventState.liveItems = liveItems;
+		let current: ReturnType<typeof useTileMotionCues> | null = null;
+		const Capture = () => {
+			current = useTileMotionCues({ onSceneReset: vi.fn() });
+			return null;
+		};
+		const container = document.createElement("div");
+		document.body.append(container);
+		const root = createRoot(container);
+		roots.push(root);
+		await act(async () => root.render(createElement(Capture)));
+
+		await dispatch([
+			{
+				type: GameEventEnumSchema.enum.ItemSplit,
+				itemId: "runtime:deferred",
+				canonicalItemId: "item:deferred",
+				location: liveItems[0].location,
+				previousQuantity: 2,
+				quantity: 1,
+			},
+		]);
+		const cue = current?.cues.get("runtime:deferred");
+		if (cue === undefined) throw new Error("Missing deferred cue.");
+
+		await act(async () => vi.advanceTimersByTimeAsync(2_100));
+		expect(current?.cues.get("runtime:deferred")?.generation).toBe(cue.generation);
+
+		await act(async () => current?.start("runtime:deferred", cue.generation));
+		await act(async () => vi.advanceTimersByTimeAsync(2_100));
+		expect(current?.cues.has("runtime:deferred")).toBe(false);
+	});
+
 	it("retains an outgoing actor only for its owned exit generation", async () => {
 		let liveItems = [item("runtime:removed")];
 		let current: ReturnType<typeof useTileMotionCues> | null = null;
@@ -487,6 +606,9 @@ describe("tile motion cue lifecycle", () => {
 		);
 		liveItems = [];
 		expect(current?.retainedItems).toHaveLength(1);
+		const exit = current?.cues.get("runtime:fallback");
+		if (exit === undefined) throw new Error("Missing fallback exit cue.");
+		await act(async () => current?.start("runtime:fallback", exit.generation));
 
 		await act(async () => vi.advanceTimersByTime(2_000));
 
@@ -587,6 +709,79 @@ describe("tile motion cue lifecycle", () => {
 	});
 });
 
+describe("tile motion cue arbitration", () => {
+	beforeEach(() => motionTestRuntime.reset());
+
+	afterEach(async () => {
+		await act(async () => {
+			for (const root of roots.splice(0)) root.unmount();
+		});
+		document.body.replaceChildren();
+	});
+
+	const renderContent = async (
+		phase: "hovered" | "dragging" | "exiting",
+		onStart: ReturnType<typeof vi.fn>,
+		onComplete: ReturnType<typeof vi.fn>,
+	) => {
+		const container = document.createElement("div");
+		document.body.append(container);
+		const root = createRoot(container);
+		roots.push(root);
+		await act(async () => {
+			root.render(
+				createElement(TileActorContent, {
+					item: item("runtime:arbitrated"),
+					phase,
+					feedback: null,
+					cue: { generation: 21, kind: "impact", strength: 1 },
+					cueOriginOffset: null,
+					cueTargetOffset: null,
+					onCueStart: onStart,
+					onCueComplete: onComplete,
+				}),
+			);
+		});
+	};
+
+	it("plays authoritative feedback over ordinary hover", async () => {
+		const onStart = vi.fn();
+		const onComplete = vi.fn();
+		await renderContent("hovered", onStart, onComplete);
+
+		expect(onStart).toHaveBeenCalledWith(21);
+		expect(
+			document.querySelector('[data-ui="TileMotionCueVisual"]')?.getAttribute(
+				"data-motion-cue",
+			),
+		).toBe("impact");
+		expect(onComplete).not.toHaveBeenCalled();
+	});
+
+	it("defers feedback while gesture settlement owns the actor", async () => {
+		const onStart = vi.fn();
+		const onComplete = vi.fn();
+		await renderContent("dragging", onStart, onComplete);
+
+		expect(onStart).not.toHaveBeenCalled();
+		expect(onComplete).not.toHaveBeenCalled();
+		expect(
+			document.querySelector('[data-ui="TileMotionCueVisual"]')?.getAttribute(
+				"data-motion-cue",
+			),
+		).toBeNull();
+	});
+
+	it("intentionally discards non-terminal feedback after interaction exit owns lifetime", async () => {
+		const onStart = vi.fn();
+		const onComplete = vi.fn();
+		await renderContent("exiting", onStart, onComplete);
+
+		expect(onStart).not.toHaveBeenCalled();
+		expect(onComplete).toHaveBeenCalledWith(21);
+	});
+});
+
 describe("TileMotionCueVisual", () => {
 	beforeEach(() => motionTestRuntime.reset());
 
@@ -611,10 +806,11 @@ describe("TileMotionCueVisual", () => {
 					{
 						cue: { generation: 7, kind: "impact", strength: 2 },
 						deliveryPayload: null,
-						enabled: true,
+						mode: "play",
 						originOffset: null,
 						targetOffset: null,
 						transferPayload: null,
+						onStart: vi.fn(),
 						onComplete: (generation) => completed.push(generation),
 					},
 					createElement("span", null, "tile"),
@@ -654,10 +850,11 @@ describe("TileMotionCueVisual", () => {
 							{ "data-ui": "TestDeliveryPayload" },
 							"incoming",
 						),
-						enabled: true,
+						mode: "play",
 						originOffset: { x: -120, y: 40 },
 						targetOffset: null,
 						transferPayload: null,
+						onStart: vi.fn(),
 						onComplete: vi.fn(),
 					},
 					createElement("span", { "data-ui": "TestTarget" }, "target"),
@@ -691,7 +888,7 @@ describe("TileMotionCueVisual", () => {
 							targetItemId: "runtime:owner",
 						},
 						deliveryPayload: null,
-						enabled: true,
+						mode: "play",
 						originOffset: null,
 						targetOffset: { x: 120, y: 0 },
 						transferPayload: createElement(
@@ -699,6 +896,7 @@ describe("TileMotionCueVisual", () => {
 							{ "data-ui": "TestPreviousQuantity" },
 							"2",
 						),
+						onStart: vi.fn(),
 						onComplete: vi.fn(),
 					},
 					createElement("span", { "data-ui": "TestCurrentQuantity" }, "1"),

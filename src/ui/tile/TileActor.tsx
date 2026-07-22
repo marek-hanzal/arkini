@@ -30,12 +30,19 @@ export namespace TileActor {
 		readonly item: useTileActors.Item;
 		readonly live: boolean;
 		readonly cue: TileMotionCueSchema.Type | null;
+		readonly onCueStart: (itemId: string, generation: number) => void;
 		readonly onCueComplete: (itemId: string, generation: number) => void;
 	}
 }
 
 /** Renders one stable runtime-item actor from focused presentation, Motion, and drag owners. */
-export const TileActor = ({ item, live, cue, onCueComplete }: TileActor.Props) => {
+export const TileActor = ({
+	item,
+	live,
+	cue,
+	onCueStart,
+	onCueComplete,
+}: TileActor.Props) => {
 	const itemDetail = useItemDetailControl();
 	const startLine = useStartItemDetailLine();
 	const presentation = useTileActorPresentation({
@@ -256,6 +263,7 @@ export const TileActor = ({ item, live, cue, onCueComplete }: TileActor.Props) =
 							cue={cue}
 							cueOriginOffset={actorMotion.cueOriginOffset}
 							cueTargetOffset={actorMotion.cueTargetOffset}
+							onCueStart={(generation) => onCueStart(item.id, generation)}
 							onCueComplete={(generation) => onCueComplete(item.id, generation)}
 							onInteractionAnimationComplete={
 								presentation.visualCompletionGeneration === null

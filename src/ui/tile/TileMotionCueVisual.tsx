@@ -5,9 +5,11 @@ import { match } from "ts-pattern";
 import type { TileMotionCueSchema } from "~/ui/tile/schema/TileMotionCueSchema";
 
 export namespace TileMotionCueVisual {
+	export type Mode = "play" | "defer" | "discard";
+
 	export interface Props extends PropsWithChildren {
 		readonly cue: TileMotionCueSchema.Type | null;
-		readonly enabled: boolean;
+		readonly mode: Mode;
 		readonly originOffset: {
 			readonly x: number;
 			readonly y: number;
@@ -18,6 +20,7 @@ export namespace TileMotionCueVisual {
 		} | null;
 		readonly deliveryPayload: ReactNode | null;
 		readonly transferPayload: ReactNode | null;
+		readonly onStart: (generation: number) => void;
 		readonly onComplete: (generation: number) => void;
 	}
 }
@@ -26,21 +29,26 @@ export namespace TileMotionCueVisual {
 export const TileMotionCueVisual = ({
 	children,
 	cue,
-	enabled,
+	mode,
 	originOffset,
 	targetOffset,
 	deliveryPayload,
 	transferPayload,
+	onStart,
 	onComplete,
 }: TileMotionCueVisual.Props) => {
 	const reducedMotion = useReducedMotion();
 
 	useEffect(() => {
-		if (cue === null || enabled) return;
-		onComplete(cue.generation);
-	}, [cue, enabled, onComplete]);
+		if (cue === null) return;
+		if (mode === "play") {
+			onStart(cue.generation);
+			return;
+		}
+		if (mode === "discard") onComplete(cue.generation);
+	}, [cue, mode, onComplete, onStart]);
 
-	if (cue === null || !enabled) {
+	if (cue === null || mode !== "play") {
 		return (
 			<span className="absolute inset-0" data-ui="TileMotionCueVisual">
 				{children}

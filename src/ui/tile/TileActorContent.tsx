@@ -1,4 +1,5 @@
 import { motion } from "motion/react";
+import { match, P } from "ts-pattern";
 import type { useTileActors } from "~/bridge/tile/useTileActors";
 import type { TileActorPhaseSchema } from "~/ui/tile/schema/TileActorPhaseSchema";
 import type { TileInteractionFeedbackSchema } from "~/ui/tile/schema/TileInteractionFeedbackSchema";
@@ -14,6 +15,7 @@ export namespace TileActorContent {
 		readonly cue: TileMotionCueSchema.Type | null;
 		readonly cueOriginOffset: { readonly x: number; readonly y: number } | null;
 		readonly cueTargetOffset: { readonly x: number; readonly y: number } | null;
+		readonly onCueStart: (generation: number) => void;
 		readonly onCueComplete: (generation: number) => void;
 		readonly onInteractionAnimationComplete?: () => void;
 	}
@@ -70,13 +72,31 @@ export const TileActorContent = ({
 	cue,
 	cueOriginOffset,
 	cueTargetOffset,
+	onCueStart,
 	onCueComplete,
 	onInteractionAnimationComplete,
 }: TileActorContent.Props) => {
-	const cueEnabled =
-		cue?.kind === "exit" || cue?.kind === "consume-exit"
-			? phase !== "exiting"
-			: phase === "stable";
+	const cueMode: TileMotionCueVisual.Mode =
+		cue === null
+			? "defer"
+			: match({ phase, kind: cue.kind })
+					.with(
+						{ phase: "exiting" },
+						() => "discard" as const,
+					)
+					.with(
+						{ kind: P.union("exit", "consume-exit") },
+						() => "play" as const,
+					)
+					.with(
+						{ phase: P.union("stable", "hovered", "targeted") },
+						() => "play" as const,
+					)
+					.with(
+						{ phase: P.union("dragging", "combining", "settling", "impact") },
+						() => "defer" as const,
+					)
+					.exhaustive();
 
 	return (
 		<motion.span
@@ -110,9 +130,10 @@ export const TileActorContent = ({
 						<TileActorFace item={item} quantity={cue.previousQuantity} />
 					) : null
 				}
-				enabled={cueEnabled}
+				mode={cueMode}
 				originOffset={cueOriginOffset}
 				targetOffset={cueTargetOffset}
+				onStart={onCueStart}
 				onComplete={onCueComplete}
 			>
 				<TileActorFace item={item} quantity={item.quantity} />

@@ -1,10 +1,30 @@
-import { useCallback, useMemo } from "react";
+import { useCallback, useEffect, useMemo } from "react";
+import { match } from "ts-pattern";
 
 import { TileActor } from "~/ui/tile/TileActor";
 import { TileActorRetentionContext } from "~/ui/tile/TileActorRetentionContext";
 import { useRetainedTileActors } from "~/ui/tile/useRetainedTileActors";
 import { useTileActorLayerSystem } from "~/ui/tile/useTileActorLayerSystem";
 import { useTileMotionCues } from "~/ui/tile/useTileMotionCues";
+
+const interactionActorIds = (
+	active: ReturnType<typeof useTileActorLayerSystem>["active"],
+): ReadonlySet<string> =>
+	match(active)
+		.with(null, () => new Set<string>())
+		.with({ phase: "pressed" }, ({ source }) => new Set([source.id]))
+		.with({ phase: "dragging" }, ({ source, target }) => {
+			const ids = new Set([source.id]);
+			if (target?.kind === "slot" && target.occupant !== null) ids.add(target.occupant.id);
+			return ids;
+		})
+		.with({ phase: "awaiting-outcome" }, ({ source, target }) => {
+			const ids = new Set([source.id]);
+			if (target.kind === "slot" && target.occupant !== null) ids.add(target.occupant.id);
+			return ids;
+		})
+		.with({ phase: "settling" }, ({ settlement }) => new Set(settlement.pendingActorIds))
+		.exhaustive();
 
 /** Renders one stable Motion actor per live or explicitly retained presentation identity. */
 export const TileActorLayer = () => {
@@ -22,6 +42,18 @@ export const TileActorLayer = () => {
 		onSceneReset: resetScene,
 	});
 	const liveItems = motionCues.liveItems;
+	useEffect(() => {
+		const protectedIds = interactionActorIds(active);
+		for (const [itemId, cue] of motionCues.cues) {
+			if (
+				(cue.kind === "exit" || cue.kind === "consume-exit") &&
+				protectedIds.has(itemId)
+			) {
+				resetScene();
+				return;
+			}
+		}
+	}, [active, motionCues.cues, resetScene]);
 	const retention = useRetainedTileActors({
 		active,
 		liveItems,
@@ -57,6 +89,7 @@ export const TileActorLayer = () => {
 						item={item}
 						live={live}
 						cue={motionCues.cues.get(item.id) ?? null}
+						onCueStart={motionCues.start}
 						onCueComplete={motionCues.complete}
 					/>
 				))}

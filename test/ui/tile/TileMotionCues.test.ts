@@ -4,8 +4,9 @@ import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { GameEventBatchSchema } from "~/engine/event/schema/GameEventBatchSchema";
+import type { readTileActorTransitionFx } from "~/bridge/tile/readTileActorTransitionFx";
 import type { useTileActors } from "~/bridge/tile/useTileActors";
+import type { TileActorTransitionSource } from "~/bridge/tile/useTileActorTransitionSource";
 import { TileMotionCueVisual } from "~/ui/tile/TileMotionCueVisual";
 import { useTileMotionCues } from "~/ui/tile/useTileMotionCues";
 import { motionTestRuntime } from "~test/ui/support/motionReactMock";
@@ -18,18 +19,37 @@ import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
 ).IS_REACT_ACT_ENVIRONMENT = true;
 
 const eventState = vi.hoisted(() => ({
-	listener: null as ((batch: GameEventBatchSchema.Type) => void) | null,
-	game: {} as object,
+	listener: null as ((transition: readTileActorTransitionFx.Result) => void) | null,
+	sequence: 0,
+	liveItems: [] as ReadonlyArray<useTileActors.Item>,
+	source: null as TileActorTransitionSource | null,
 }));
 
-vi.mock("motion/react", async () => import("~test/ui/support/motionReactMock"));
-vi.mock("~/bridge/event/useGameEvents", () => ({
-	useGameEvents: (listener: (batch: GameEventBatchSchema.Type) => void) => {
-		eventState.listener = listener;
+const createTransitionSource = (
+	initialEvents: readTileActorTransitionFx.Result["events"] = [],
+): TileActorTransitionSource => ({
+	get initial() {
+		return {
+			sequence: eventState.sequence,
+			previousItems: null,
+			liveItems: eventState.liveItems,
+			events: initialEvents,
+		};
 	},
-}));
-vi.mock("~/bridge/game/useGameEngine", () => ({
-	useGameEngine: () => eventState.game,
+	subscribe: (listener) => {
+		eventState.listener = listener;
+		return () => {
+			if (eventState.listener === listener) eventState.listener = null;
+		};
+	},
+});
+
+vi.mock("motion/react", async () => import("~test/ui/support/motionReactMock"));
+vi.mock("~/bridge/tile/useTileActorTransitionSource", () => ({
+	useTileActorTransitionSource: () => {
+		if (eventState.source === null) throw new Error("Missing tile transition source.");
+		return eventState.source;
+	},
 }));
 
 const roots: Array<ReturnType<typeof createRoot>> = [];
@@ -60,11 +80,21 @@ const item = (
 	primaryAction: { kind: "none" },
 });
 
-const dispatch = async (events: GameEventBatchSchema.Type["events"]) => {
+const dispatch = async (
+	events: readTileActorTransitionFx.Result["events"],
+	nextLiveItems = eventState.liveItems,
+) => {
 	const listener = eventState.listener;
-	if (listener === null) throw new Error("Missing game event listener.");
+	if (listener === null) throw new Error("Missing committed-transition listener.");
+	const previousItems = eventState.liveItems;
+	eventState.liveItems = nextLiveItems;
 	await act(async () => {
-		listener({ events });
+		listener({
+			sequence: ++eventState.sequence,
+			previousItems,
+			liveItems: nextLiveItems,
+			events,
+		});
 		await Promise.resolve();
 	});
 };
@@ -72,7 +102,9 @@ const dispatch = async (events: GameEventBatchSchema.Type["events"]) => {
 describe("tile motion cue lifecycle", () => {
 	beforeEach(() => {
 		eventState.listener = null;
-		eventState.game = {};
+		eventState.sequence = 0;
+		eventState.liveItems = [];
+		eventState.source = createTransitionSource();
 		motionTestRuntime.reset();
 	});
 
@@ -84,12 +116,47 @@ describe("tile motion cue lifecycle", () => {
 		document.body.replaceChildren();
 	});
 
+	it("projects the captured current transition with its spawn cue before the first paint", async () => {
+		const liveItems = [item("runtime:initial-spawn")];
+		eventState.liveItems = liveItems;
+		eventState.source = createTransitionSource([
+			{
+				type: GameEventEnumSchema.enum.ItemSpawned,
+				itemId: "runtime:initial-spawn",
+				canonicalItemId: "item:initial-spawn",
+				originItemId: "runtime:origin",
+				location: liveItems[0].location,
+				quantity: 1,
+			},
+		]);
+		let current: ReturnType<typeof useTileMotionCues> | null = null;
+		const Capture = () => {
+			current = useTileMotionCues({ onSceneReset: vi.fn() });
+			return null;
+		};
+		const container = document.createElement("div");
+		document.body.append(container);
+		const root = createRoot(container);
+		roots.push(root);
+
+		await act(async () => root.render(createElement(Capture)));
+
+		expect(current?.liveItems.map((candidate) => candidate.id)).toEqual([
+			"runtime:initial-spawn",
+		]);
+		expect(current?.cues.get("runtime:initial-spawn")).toMatchObject({
+			kind: "spawn",
+			originItemId: "runtime:origin",
+		});
+	});
+
 	it("maps an existing identity placement to the shared spawn cue", async () => {
 		let current: ReturnType<typeof useTileMotionCues> | null = null;
 		const liveItems = [item("runtime:placed")];
 		const onSceneReset = vi.fn();
 		const Capture = () => {
-			current = useTileMotionCues({ liveItems, onSceneReset });
+			eventState.liveItems = liveItems;
+			current = useTileMotionCues({ onSceneReset });
 			return null;
 		};
 		const container = document.createElement("div");
@@ -126,7 +193,8 @@ describe("tile motion cue lifecycle", () => {
 		const liveItems = [item("runtime:stack")];
 		const onSceneReset = vi.fn();
 		const Capture = () => {
-			current = useTileMotionCues({ liveItems, onSceneReset });
+			eventState.liveItems = liveItems;
+			current = useTileMotionCues({ onSceneReset });
 			return null;
 		};
 		const container = document.createElement("div");
@@ -176,7 +244,8 @@ describe("tile motion cue lifecycle", () => {
 		let liveItems = [item("runtime:input")];
 		let current: ReturnType<typeof useTileMotionCues> | null = null;
 		const Capture = () => {
-			current = useTileMotionCues({ liveItems, onSceneReset: vi.fn() });
+			eventState.liveItems = liveItems;
+			current = useTileMotionCues({ onSceneReset: vi.fn() });
 			return null;
 		};
 		const container = document.createElement("div");
@@ -219,9 +288,8 @@ describe("tile motion cue lifecycle", () => {
 				consumedQuantity: 1,
 				resultingQuantity: 0,
 			},
-		]);
+		], []);
 		liveItems = [];
-		await act(async () => root.render(createElement(Capture)));
 		expect(current?.cues.get("runtime:input")?.kind).toBe("consume-exit");
 		expect(current?.retainedItems.map((retained) => retained.id)).toEqual([
 			"runtime:input",
@@ -233,7 +301,8 @@ describe("tile motion cue lifecycle", () => {
 		let current: ReturnType<typeof useTileMotionCues> | null = null;
 		const onSceneReset = vi.fn();
 		const Capture = () => {
-			current = useTileMotionCues({ liveItems, onSceneReset });
+			eventState.liveItems = liveItems;
+			current = useTileMotionCues({ onSceneReset });
 			return null;
 		};
 		const container = document.createElement("div");
@@ -241,17 +310,19 @@ describe("tile motion cue lifecycle", () => {
 		const root = createRoot(container);
 		roots.push(root);
 		await act(async () => root.render(createElement(Capture)));
-		await dispatch([
-			{
-				type: GameEventEnumSchema.enum.ItemExpired,
-				itemId: "runtime:removed",
-				canonicalItemId: "item:removed",
-				location: liveItems[0].location,
-				quantity: 1,
-			},
-		]);
+		await dispatch(
+			[
+				{
+					type: GameEventEnumSchema.enum.ItemExpired,
+					itemId: "runtime:removed",
+					canonicalItemId: "item:removed",
+					location: liveItems[0].location,
+					quantity: 1,
+				},
+			],
+			[],
+		);
 		liveItems = [];
-		await act(async () => root.render(createElement(Capture)));
 
 		const exit = current?.cues.get("runtime:removed");
 		expect(exit?.kind).toBe("exit");
@@ -268,7 +339,8 @@ describe("tile motion cue lifecycle", () => {
 		let current: ReturnType<typeof useTileMotionCues> | null = null;
 		const onSceneReset = vi.fn();
 		const Capture = () => {
-			current = useTileMotionCues({ liveItems, onSceneReset });
+			eventState.liveItems = liveItems;
+			current = useTileMotionCues({ onSceneReset });
 			return null;
 		};
 		const container = document.createElement("div");
@@ -278,7 +350,6 @@ describe("tile motion cue lifecycle", () => {
 		await act(async () => root.render(createElement(Capture)));
 
 		liveItems = [item("runtime:incoming")];
-		await act(async () => root.render(createElement(Capture)));
 		await dispatch([
 			{
 				type: GameEventEnumSchema.enum.ItemExpired,
@@ -299,7 +370,7 @@ describe("tile motion cue lifecycle", () => {
 				quantity: 1,
 				location: liveItems[0].location,
 			},
-		]);
+		], liveItems);
 
 		const exit = current?.cues.get("runtime:outgoing");
 		expect(exit?.kind).toBe("exit");
@@ -320,7 +391,8 @@ describe("tile motion cue lifecycle", () => {
 		let current: ReturnType<typeof useTileMotionCues> | null = null;
 		const onSceneReset = vi.fn();
 		const Capture = () => {
-			current = useTileMotionCues({ liveItems, onSceneReset });
+			eventState.liveItems = liveItems;
+			current = useTileMotionCues({ onSceneReset });
 			return null;
 		};
 		const container = document.createElement("div");
@@ -328,17 +400,19 @@ describe("tile motion cue lifecycle", () => {
 		const root = createRoot(container);
 		roots.push(root);
 		await act(async () => root.render(createElement(Capture)));
-		await dispatch([
-			{
-				type: GameEventEnumSchema.enum.ItemExpired,
-				itemId: "runtime:fallback",
-				canonicalItemId: "item:fallback",
-				location: liveItems[0].location,
-				quantity: 1,
-			},
-		]);
+		await dispatch(
+			[
+				{
+					type: GameEventEnumSchema.enum.ItemExpired,
+					itemId: "runtime:fallback",
+					canonicalItemId: "item:fallback",
+					location: liveItems[0].location,
+					quantity: 1,
+				},
+			],
+			[],
+		);
 		liveItems = [];
-		await act(async () => root.render(createElement(Capture)));
 		expect(current?.retainedItems).toHaveLength(1);
 
 		await act(async () => vi.advanceTimersByTime(2_000));
@@ -348,11 +422,12 @@ describe("tile motion cue lifecycle", () => {
 	});
 
 	it("clears cues, retained actors, and scene interaction when Game identity changes", async () => {
-		const liveItems = [item("runtime:old-game")];
+		let liveItems = [item("runtime:old-game")];
 		let current: ReturnType<typeof useTileMotionCues> | null = null;
 		const onSceneReset = vi.fn();
 		const Capture = () => {
-			current = useTileMotionCues({ liveItems, onSceneReset });
+			eventState.liveItems = liveItems;
+			current = useTileMotionCues({ onSceneReset });
 			return null;
 		};
 		const container = document.createElement("div");
@@ -371,7 +446,9 @@ describe("tile motion cue lifecycle", () => {
 		]);
 		expect(current?.retainedItems).toHaveLength(1);
 
-		eventState.game = {};
+		liveItems = [];
+		eventState.liveItems = liveItems;
+		eventState.source = createTransitionSource();
 		await act(async () => root.render(createElement(Capture)));
 
 		expect(onSceneReset).toHaveBeenCalledOnce();
@@ -387,7 +464,8 @@ describe("tile motion cue lifecycle", () => {
 		];
 		const onSceneReset = vi.fn();
 		const Capture = () => {
-			current = useTileMotionCues({ liveItems, onSceneReset });
+			eventState.liveItems = liveItems;
+			current = useTileMotionCues({ onSceneReset });
 			return null;
 		};
 		const container = document.createElement("div");
@@ -418,13 +496,16 @@ describe("tile motion cue lifecycle", () => {
 			item("runtime:board:new", "board", 1),
 			item("runtime:inventory", "inventory"),
 		];
-		await dispatch([
-			{
-				type: GameEventEnumSchema.enum.CurrentSpaceChanged,
-				previousSpace: 0,
-				currentSpace: 1,
-			},
-		]);
+		await dispatch(
+			[
+				{
+					type: GameEventEnumSchema.enum.CurrentSpaceChanged,
+					previousSpace: 0,
+					currentSpace: 1,
+				},
+			],
+			liveItems,
+		);
 
 		expect(onSceneReset).toHaveBeenCalledOnce();
 		expect(current?.cues.has("runtime:board:old")).toBe(false);

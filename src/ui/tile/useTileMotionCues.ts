@@ -1,16 +1,20 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 
-import { GameEventEnumSchema, useGameEvents } from "~/bridge/event/useGameEvents";
-import { useGameEngine } from "~/bridge/game/useGameEngine";
-import type { useTileActors } from "~/bridge/tile/useTileActors";
-import type { TileMotionCueSchema } from "~/ui/tile/schema/TileMotionCueSchema";
 import { LocationScopeEnumSchema } from "~/bridge/tile/LocationScopeEnumSchema";
+import type { useTileActors } from "~/bridge/tile/useTileActors";
+import {
+	type TileActorTransitionSource,
+	useTileActorTransitionSource,
+} from "~/bridge/tile/useTileActorTransitionSource";
+import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
+import type { TileMotionCueSchema } from "~/ui/tile/schema/TileMotionCueSchema";
 
 interface TileMotionCueState {
+	readonly sequence: number;
+	readonly liveItems: ReadonlyArray<useTileActors.Item>;
 	readonly nextGeneration: number;
 	readonly cues: ReadonlyMap<string, TileMotionCueSchema.Type>;
 	readonly retained: ReadonlyMap<string, useTileActors.Item>;
-	readonly pendingBoardSettleSpace: number | null;
 }
 
 interface TileMotionCueFallback {
@@ -21,33 +25,148 @@ interface TileMotionCueFallback {
 const cueFallbackMs = 2_000;
 
 const emptyState = (): TileMotionCueState => ({
+	sequence: -1,
+	liveItems: [],
 	nextGeneration: 0,
 	cues: new Map(),
 	retained: new Map(),
-	pendingBoardSettleSpace: null,
 });
 
-/** Translates committed item facts into bounded actor-local cue generations. */
+const applyTransition = (
+	current: TileMotionCueState,
+	transition: TileActorTransitionSource["initial"],
+): TileMotionCueState => {
+	if (transition.sequence <= current.sequence) return current;
+	const cues = new Map(current.cues);
+	const retained = new Map(current.retained);
+	const liveById = new Map([
+		...(transition.previousItems ?? []).map((item) => [item.id, item] as const),
+		...transition.liveItems.map((item) => [item.id, item] as const),
+		...retained.entries(),
+	]);
+	let nextGeneration = current.nextGeneration;
+	let settleSpace: number | null = null;
+
+	const cue = (
+		itemId: string,
+		kind: TileMotionCueSchema.Type["kind"],
+		retain: boolean,
+		originItemId?: string,
+		deliveryQuantity?: number,
+	) => {
+		const existing = cues.get(itemId);
+		if (existing?.kind === "exit" && kind !== "exit") return;
+		if (existing?.kind === "spawn" && kind === "spawn") return;
+		if (retain) {
+			const snapshot = liveById.get(itemId) ?? retained.get(itemId);
+			if (snapshot !== undefined) retained.set(itemId, snapshot);
+		}
+		const strength =
+			existing?.kind === kind &&
+			(kind === "absorb" || kind === "impact" || kind === "accept")
+				? Math.min(3, existing.strength + 1)
+				: 1;
+		cues.set(itemId, {
+			generation: ++nextGeneration,
+			kind,
+			strength,
+			...(originItemId === undefined ? {} : { originItemId }),
+			...(deliveryQuantity === undefined ? {} : { deliveryQuantity }),
+		});
+	};
+
+	for (const event of transition.events) {
+		switch (event.type) {
+			case GameEventEnumSchema.enum.CurrentSpaceChanged:
+				for (const itemId of cues.keys()) {
+					const item = liveById.get(itemId) ?? retained.get(itemId);
+					if (item?.location.scope !== LocationScopeEnumSchema.enum.Board) continue;
+					cues.delete(itemId);
+					retained.delete(itemId);
+				}
+				settleSpace = event.currentSpace;
+				break;
+			case GameEventEnumSchema.enum.ItemSpawned:
+			case GameEventEnumSchema.enum.ItemPlaced:
+				cue(event.itemId, "spawn", false, event.originItemId);
+				break;
+			case GameEventEnumSchema.enum.ItemStacked:
+				cue(
+					event.itemId,
+					"absorb",
+					false,
+					event.originItemId,
+					event.quantity - event.previousQuantity,
+				);
+				break;
+			case GameEventEnumSchema.enum.ItemSplit:
+				cue(event.itemId, "impact", false);
+				break;
+			case GameEventEnumSchema.enum.ItemConsumed:
+				cue(
+					event.sourceItemId,
+					event.resultingQuantity === 0 ? "consume-exit" : "consume",
+					event.resultingQuantity === 0,
+				);
+				break;
+			case GameEventEnumSchema.enum.ItemExpired:
+				cue(event.itemId, "exit", true);
+				break;
+			case GameEventEnumSchema.enum.ItemDepleted:
+				cue(
+					event.itemId,
+					event.resultingQuantity === 0 ? "exit" : "impact",
+					event.resultingQuantity === 0,
+				);
+				break;
+			case GameEventEnumSchema.enum.JobStarted:
+				cue(event.ownerItemId, "accept", false);
+				break;
+			case GameEventEnumSchema.enum.ItemMerged:
+			case GameEventEnumSchema.enum.JobCompleted:
+				break;
+		}
+	}
+
+	if (settleSpace !== null) {
+		for (const item of transition.liveItems) {
+			if (
+				item.location.scope !== LocationScopeEnumSchema.enum.Board ||
+				item.location.space !== settleSpace ||
+				cues.has(item.id)
+			) {
+				continue;
+			}
+			cues.set(item.id, {
+				generation: ++nextGeneration,
+				kind: "settle",
+				strength: 1,
+			});
+		}
+	}
+
+	return {
+		sequence: transition.sequence,
+		liveItems: transition.liveItems,
+		nextGeneration,
+		cues,
+		retained,
+	};
+};
+
+const stateFromSource = (source: TileActorTransitionSource) =>
+	applyTransition(emptyState(), source.initial);
+
+/** Translates exact ordered committed transitions into bounded actor-local cue generations. */
 export const useTileMotionCues = ({
-	liveItems,
 	onSceneReset,
 }: {
-	readonly liveItems: ReadonlyArray<useTileActors.Item>;
 	readonly onSceneReset: () => void;
 }) => {
-	const game = useGameEngine();
-	const liveItemsRef = useRef(liveItems);
-	const previousLiveItemsRef = useRef(liveItems);
+	const source = useTileActorTransitionSource();
+	const sourceRef = useRef(source);
 	const fallbacks = useRef(new Map<string, TileMotionCueFallback>());
-	const gameRef = useRef(game);
-	const [state, setState] = useState<TileMotionCueState>(emptyState);
-
-	useLayoutEffect(() => {
-		previousLiveItemsRef.current = liveItemsRef.current;
-		liveItemsRef.current = liveItems;
-	}, [
-		liveItems,
-	]);
+	const [state, setState] = useState<TileMotionCueState>(() => stateFromSource(source));
 
 	const complete = useCallback((itemId: string, generation: number) => {
 		setState((current) => {
@@ -57,153 +176,34 @@ export const useTileMotionCues = ({
 			cues.delete(itemId);
 			retained.delete(itemId);
 			return {
-				nextGeneration: current.nextGeneration,
+				...current,
 				cues,
 				retained,
-				pendingBoardSettleSpace: current.pendingBoardSettleSpace,
 			};
 		});
 	}, []);
 
-	useGameEvents((batch) => {
-		if (batch.events.some((event) => event.type === GameEventEnumSchema.enum.CurrentSpaceChanged)) {
-			onSceneReset();
-		}
-		setState((current) => {
-			const cues = new Map(current.cues);
-			const retained = new Map(current.retained);
-			const liveById = new Map([
-				...previousLiveItemsRef.current.map((item) => [item.id, item] as const),
-				...liveItemsRef.current.map((item) => [item.id, item] as const),
-			]);
-			let changed = false;
-			let nextGeneration = current.nextGeneration;
-			let pendingBoardSettleSpace = current.pendingBoardSettleSpace;
-
-			const cue = (
-				itemId: string,
-				kind: TileMotionCueSchema.Type["kind"],
-				retain: boolean,
-				originItemId?: string,
-				deliveryQuantity?: number,
-			) => {
-				const existing = cues.get(itemId);
-				if (existing?.kind === "exit" && kind !== "exit") return;
-				if (existing?.kind === "spawn" && kind === "spawn") return;
-				if (retain) {
-					const snapshot = liveById.get(itemId) ?? retained.get(itemId);
-					if (snapshot !== undefined) retained.set(itemId, snapshot);
-				}
-				const strength =
-					existing?.kind === kind &&
-					(kind === "absorb" || kind === "impact" || kind === "accept")
-						? Math.min(3, existing.strength + 1)
-						: 1;
-				cues.set(itemId, {
-					generation: ++nextGeneration,
-					kind,
-					strength,
-					...(originItemId === undefined ? {} : { originItemId }),
-					...(deliveryQuantity === undefined ? {} : { deliveryQuantity }),
-				});
-				changed = true;
-			};
-
-			for (const event of batch.events) {
-				switch (event.type) {
-					case GameEventEnumSchema.enum.CurrentSpaceChanged:
-						for (const itemId of cues.keys()) {
-							const item = liveById.get(itemId) ?? retained.get(itemId);
-							if (item?.location.scope !== LocationScopeEnumSchema.enum.Board) continue;
-							cues.delete(itemId);
-							retained.delete(itemId);
-							changed = true;
-						}
-						if (pendingBoardSettleSpace !== event.currentSpace) {
-							pendingBoardSettleSpace = event.currentSpace;
-							changed = true;
-						}
-						break;
-					case GameEventEnumSchema.enum.ItemSpawned:
-					case GameEventEnumSchema.enum.ItemPlaced:
-						cue(event.itemId, "spawn", false, event.originItemId);
-						break;
-					case GameEventEnumSchema.enum.ItemStacked:
-						cue(
-							event.itemId,
-							"absorb",
-							false,
-							event.originItemId,
-							event.quantity - event.previousQuantity,
-						);
-						break;
-					case GameEventEnumSchema.enum.ItemSplit:
-						cue(event.itemId, "impact", false);
-						break;
-					case GameEventEnumSchema.enum.ItemConsumed:
-						cue(
-							event.sourceItemId,
-							event.resultingQuantity === 0 ? "consume-exit" : "consume",
-							event.resultingQuantity === 0,
-						);
-						break;
-					case GameEventEnumSchema.enum.ItemExpired:
-						cue(event.itemId, "exit", true);
-						break;
-					case GameEventEnumSchema.enum.ItemDepleted:
-						cue(
-							event.itemId,
-							event.resultingQuantity === 0 ? "exit" : "impact",
-							event.resultingQuantity === 0,
-						);
-						break;
-					case GameEventEnumSchema.enum.JobStarted:
-						cue(event.ownerItemId, "accept", false);
-						break;
-					case GameEventEnumSchema.enum.ItemMerged:
-					case GameEventEnumSchema.enum.JobCompleted:
-						break;
-				}
-			}
-
-			return changed
-				? { nextGeneration, cues, retained, pendingBoardSettleSpace }
-				: current;
-		});
-	});
-
 	useLayoutEffect(() => {
-		if (state.pendingBoardSettleSpace === null) return;
-		setState((current) => {
-			const space = current.pendingBoardSettleSpace;
-			if (space === null) return current;
-			const cues = new Map(current.cues);
-			let nextGeneration = current.nextGeneration;
-			for (const item of liveItems) {
-				if (
-					item.location.scope !== LocationScopeEnumSchema.enum.Board ||
-					item.location.space !== space ||
-					cues.has(item.id)
-				) {
-					continue;
-				}
-				cues.set(item.id, {
-					generation: ++nextGeneration,
-					kind: "settle",
-					strength: 1,
-				});
+		if (sourceRef.current !== source) {
+			sourceRef.current = source;
+			onSceneReset();
+			setState(stateFromSource(source));
+			for (const fallback of fallbacks.current.values()) clearTimeout(fallback.timer);
+			fallbacks.current.clear();
+		}
+
+		return source.subscribe((transition) => {
+			if (sourceRef.current !== source) return;
+			if (
+				transition.events.some(
+					(event) => event.type === GameEventEnumSchema.enum.CurrentSpaceChanged,
+				)
+			) {
+				onSceneReset();
 			}
-			return {
-				nextGeneration,
-				cues,
-				retained: current.retained,
-				pendingBoardSettleSpace: null,
-			};
+			setState((current) => applyTransition(current, transition));
 		});
-	}, [
-		liveItems,
-		state.pendingBoardSettleSpace,
-	]);
+	}, [onSceneReset, source]);
 
 	useEffect(() => {
 		for (const [itemId, fallback] of fallbacks.current) {
@@ -219,22 +219,7 @@ export const useTileMotionCues = ({
 				timer: setTimeout(() => complete(itemId, cue.generation), cueFallbackMs),
 			});
 		}
-	}, [
-		complete,
-		state.cues,
-	]);
-
-	useLayoutEffect(() => {
-		if (gameRef.current === game) return;
-		gameRef.current = game;
-		onSceneReset();
-		setState(emptyState());
-		for (const fallback of fallbacks.current.values()) clearTimeout(fallback.timer);
-		fallbacks.current.clear();
-	}, [
-		game,
-		onSceneReset,
-	]);
+	}, [complete, state.cues]);
 
 	useEffect(
 		() => () => {
@@ -245,6 +230,7 @@ export const useTileMotionCues = ({
 	);
 
 	return {
+		liveItems: state.liveItems,
 		cues: state.cues,
 		retainedItems: [...state.retained.values()],
 		complete,

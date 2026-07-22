@@ -1,82 +1,21 @@
 import { useCallback } from "react";
 
 import { useGameEngine } from "~/bridge/game/useGameEngine";
+import type { TileActorItem } from "~/bridge/tile/TileActorItem";
+import { readTileActorsFx } from "~/bridge/tile/readTileActorsFx";
 import { useRuntimeSelector } from "~/bridge/runtime/useRuntimeSelector";
-import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
-import { isGridRuntimeItem } from "~/engine/runtime/read/isGridRuntimeItem";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
-import { readRuntimeItemPrimaryAssetIdFx } from "~/engine/item/read/readRuntimeItemPrimaryAssetIdFx";
-import { readRuntimeItemPrimaryAction } from "~/engine/item-detail/read/readRuntimeItemPrimaryAction";
-import { resolveActiveJobStatusFx } from "~/engine/job/fx/resolveActiveJobStatusFx";
-import { JobStatusEnumSchema } from "~/engine/job/schema/read/JobStatusEnumSchema";
 
 export namespace useTileActors {
-	export interface Item {
-		readonly id: string;
-		readonly revision: string;
-		readonly itemId: string;
-		readonly title: string;
-		readonly quantity: number;
-		readonly sourceUrl: string;
-		readonly compositeUrl?: string;
-		readonly location: GridLocationSchema.Type;
-		readonly running: boolean;
-		readonly primaryAction: readRuntimeItemPrimaryAction.Result;
-	}
+	export type Item = TileActorItem;
 }
 
-/** Projects every live grid item for the one Canvas-wide stable actor layer. */
+/** Projects every live grid item for ordinary consumers outside transition choreography. */
 export const useTileActors = (): ReadonlyArray<useTileActors.Item> => {
 	const game = useGameEngine();
 	const selector = useCallback(
-		(runtime: RuntimeSchema.Type): ReadonlyArray<useTileActors.Item> => {
-			const activeJobs = new Map(
-				runtime.jobs.map((job) => [
-					job.ownerItemId,
-					job,
-				]),
-			);
-			return runtime.items.filter(isGridRuntimeItem).map((item) => {
-				const activeJob = activeJobs.get(item.id);
-				const activeJobStatus =
-					activeJob === undefined
-						? undefined
-						: game.readOrThrow(
-								resolveActiveJobStatusFx({
-									job: activeJob,
-									runtime,
-								}),
-							);
-				return {
-					id: item.id,
-					revision: item.revision,
-					itemId: item.item.id,
-					title: item.item.title,
-					quantity: item.quantity,
-					location: item.location,
-					running: activeJobStatus === JobStatusEnumSchema.enum.Running,
-					primaryAction: readRuntimeItemPrimaryAction({
-						item,
-						runtime,
-					}),
-					sourceUrl: game.getResourceUrl(
-						game.readOrThrow(
-							readRuntimeItemPrimaryAssetIdFx({
-								item: item.item,
-							}),
-						),
-					),
-					...(item.item.asset.composite === undefined
-						? {}
-						: {
-								compositeUrl: game.getResourceUrl(item.item.asset.composite),
-							}),
-				};
-			});
-		},
-		[
-			game,
-		],
+		(runtime: RuntimeSchema.Type) => game.readOrThrow(readTileActorsFx({ game, runtime })),
+		[game],
 	);
 
 	return useRuntimeSelector(selector);

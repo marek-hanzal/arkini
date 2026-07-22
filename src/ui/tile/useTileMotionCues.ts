@@ -56,6 +56,8 @@ const applyTransition = (
 		retain: boolean,
 		originItemId?: string,
 		deliveryQuantity?: number,
+		targetItemId?: string,
+		previousQuantity?: number,
 	) => {
 		const existing = cues.get(itemId);
 		if (existing?.kind === "exit" && kind !== "exit") return;
@@ -75,6 +77,8 @@ const applyTransition = (
 			strength,
 			...(originItemId === undefined ? {} : { originItemId }),
 			...(deliveryQuantity === undefined ? {} : { deliveryQuantity }),
+			...(targetItemId === undefined ? {} : { targetItemId }),
+			...(previousQuantity === undefined ? {} : { previousQuantity }),
 		});
 	};
 
@@ -106,11 +110,18 @@ const applyTransition = (
 				cue(event.itemId, "impact", false);
 				break;
 			case GameEventEnumSchema.enum.ItemConsumed:
+				break;
+			case GameEventEnumSchema.enum.ItemInputStored:
 				cue(
 					event.sourceItemId,
 					event.resultingQuantity === 0 ? "consume-exit" : "consume",
 					event.resultingQuantity === 0,
+					undefined,
+					undefined,
+					event.ownerItemId,
+					event.previousQuantity,
 				);
+				cue(event.ownerItemId, "accept", false);
 				break;
 			case GameEventEnumSchema.enum.ItemExpired:
 				cue(event.itemId, "exit", true);

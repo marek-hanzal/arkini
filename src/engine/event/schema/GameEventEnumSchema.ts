@@ -13,6 +13,7 @@ export const GameEventEnumSchema = z
 		ItemStacked: "item:stacked",
 		ItemSplit: "item:split",
 		ItemConsumed: "item:consumed",
+		ItemInputStored: "item:input-stored",
 		ItemDepleted: "item:depleted",
 	})
 	.meta({

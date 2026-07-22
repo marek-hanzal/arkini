@@ -15,6 +15,7 @@ describe("GameEventEnumSchema", () => {
 			GameEventEnumSchema.enum.ItemStacked,
 			GameEventEnumSchema.enum.ItemSplit,
 			GameEventEnumSchema.enum.ItemConsumed,
+			GameEventEnumSchema.enum.ItemInputStored,
 			GameEventEnumSchema.enum.ItemDepleted,
 		]);
 	});

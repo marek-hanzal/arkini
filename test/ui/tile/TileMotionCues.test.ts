@@ -58,12 +58,13 @@ const item = (
 	id: string,
 	scope: "board" | "inventory" = "board",
 	space = 0,
+	quantity = 1,
 ): useTileActors.Item => ({
 	id,
 	revision: `revision:${id}`,
 	itemId: `item:${id}`,
 	title: id,
-	quantity: 1,
+	quantity,
 	sourceUrl: `asset://${id}`,
 	location:
 		scope === "board"
@@ -262,11 +263,11 @@ describe("tile motion cue lifecycle", () => {
 		expect(current?.cues.get("runtime:stack")?.generation).toBe(second?.generation);
 	});
 
-	it("uses the shared inward interaction cue for partial and full input consumption", async () => {
-		let liveItems = [item("runtime:input")];
+	it("keeps hidden input consumption out of the visible actor grammar", async () => {
+		const liveItems = [item("runtime:input")];
+		eventState.liveItems = liveItems;
 		let current: ReturnType<typeof useTileMotionCues> | null = null;
 		const Capture = () => {
-			eventState.liveItems = liveItems;
 			current = useTileMotionCues({ onSceneReset: vi.fn() });
 			return null;
 		};
@@ -292,29 +293,79 @@ describe("tile motion cue lifecycle", () => {
 				resultingQuantity: 1,
 			},
 		]);
-		expect(current?.cues.get("runtime:input")?.kind).toBe("consume");
-		expect(current?.retainedItems).toEqual([]);
 
-		await dispatch([
-			{
-				type: GameEventEnumSchema.enum.ItemConsumed,
-				sourceItemId: "runtime:input",
-				canonicalItemId: "item:input",
-				sourceLocation: {
-					scope: "input",
-					ownerItemId: "runtime:producer",
-					lineId: "line:producer",
+		expect(current?.cues.size).toBe(0);
+		expect(current?.retainedItems).toEqual([]);
+	});
+
+	it("pairs partial and full Autofill transfers with their exact receiver", async () => {
+		let liveItems = [item("runtime:source", "board", 0, 2), item("runtime:owner")];
+		eventState.liveItems = liveItems;
+		let current: ReturnType<typeof useTileMotionCues> | null = null;
+		const Capture = () => {
+			current = useTileMotionCues({ onSceneReset: vi.fn() });
+			return null;
+		};
+		const container = document.createElement("div");
+		document.body.append(container);
+		const root = createRoot(container);
+		roots.push(root);
+		await act(async () => root.render(createElement(Capture)));
+
+		liveItems = [item("runtime:source", "board", 0, 1), item("runtime:owner")];
+		await dispatch(
+			[
+				{
+					type: GameEventEnumSchema.enum.ItemInputStored,
+					sourceItemId: "runtime:source",
+					canonicalItemId: "item:source",
+					previousSourceLocation: item("runtime:source").location,
+					previousQuantity: 2,
+					storedQuantity: 1,
+					resultingQuantity: 1,
+					ownerItemId: "runtime:owner",
+					lineId: "line:owner",
 					inputIndex: 0,
 				},
-				previousQuantity: 1,
-				consumedQuantity: 1,
-				resultingQuantity: 0,
-			},
-		], []);
-		liveItems = [];
-		expect(current?.cues.get("runtime:input")?.kind).toBe("consume-exit");
+			],
+			liveItems,
+		);
+
+		expect(current?.cues.get("runtime:source")).toMatchObject({
+			kind: "consume",
+			targetItemId: "runtime:owner",
+			previousQuantity: 2,
+		});
+		expect(current?.cues.get("runtime:owner")).toMatchObject({
+			kind: "accept",
+		});
+		expect(current?.retainedItems).toEqual([]);
+
+		await dispatch(
+			[
+				{
+					type: GameEventEnumSchema.enum.ItemInputStored,
+					sourceItemId: "runtime:source",
+					canonicalItemId: "item:source",
+					previousSourceLocation: liveItems[0].location,
+					previousQuantity: 1,
+					storedQuantity: 1,
+					resultingQuantity: 0,
+					ownerItemId: "runtime:owner",
+					lineId: "line:owner",
+					inputIndex: 0,
+				},
+			],
+			[item("runtime:owner")],
+		);
+		liveItems = [item("runtime:owner")];
+
+		expect(current?.cues.get("runtime:source")).toMatchObject({
+			kind: "consume-exit",
+			targetItemId: "runtime:owner",
+		});
 		expect(current?.retainedItems.map((retained) => retained.id)).toEqual([
-			"runtime:input",
+			"runtime:source",
 		]);
 	});
 
@@ -562,6 +613,8 @@ describe("TileMotionCueVisual", () => {
 						deliveryPayload: null,
 						enabled: true,
 						originOffset: null,
+						targetOffset: null,
+						transferPayload: null,
 						onComplete: (generation) => completed.push(generation),
 					},
 					createElement("span", null, "tile"),
@@ -603,6 +656,8 @@ describe("TileMotionCueVisual", () => {
 						),
 						enabled: true,
 						originOffset: { x: -120, y: 40 },
+						targetOffset: null,
+						transferPayload: null,
 						onComplete: vi.fn(),
 					},
 					createElement("span", { "data-ui": "TestTarget" }, "target"),
@@ -616,4 +671,48 @@ describe("TileMotionCueVisual", () => {
 		);
 		expect(document.querySelectorAll('[data-ui="TestTarget"]')).toHaveLength(1);
 	});
+
+	it("renders one actor-local partial transfer face without a second stable identity", async () => {
+		motionTestRuntime.autoComplete = false;
+		const container = document.createElement("div");
+		document.body.append(container);
+		const root = createRoot(container);
+		roots.push(root);
+		await act(async () => {
+			root.render(
+				createElement(
+					TileMotionCueVisual,
+					{
+						cue: {
+							generation: 9,
+							kind: "consume",
+							previousQuantity: 2,
+							strength: 1,
+							targetItemId: "runtime:owner",
+						},
+						deliveryPayload: null,
+						enabled: true,
+						originOffset: null,
+						targetOffset: { x: 120, y: 0 },
+						transferPayload: createElement(
+							"span",
+							{ "data-ui": "TestPreviousQuantity" },
+							"2",
+						),
+						onComplete: vi.fn(),
+					},
+					createElement("span", { "data-ui": "TestCurrentQuantity" }, "1"),
+				),
+			);
+		});
+
+		expect(
+			document.querySelector('[data-ui="TileMotionCueVisual"]')?.getAttribute(
+				"data-motion-cue",
+			),
+		).toBe("consume");
+		expect(document.querySelectorAll('[data-ui="TestPreviousQuantity"]')).toHaveLength(1);
+		expect(document.querySelectorAll('[data-ui="TestCurrentQuantity"]')).toHaveLength(1);
+	});
+
 });

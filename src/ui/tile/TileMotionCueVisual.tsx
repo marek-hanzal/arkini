@@ -12,7 +12,12 @@ export namespace TileMotionCueVisual {
 			readonly x: number;
 			readonly y: number;
 		} | null;
+		readonly targetOffset: {
+			readonly x: number;
+			readonly y: number;
+		} | null;
 		readonly deliveryPayload: ReactNode | null;
+		readonly transferPayload: ReactNode | null;
 		readonly onComplete: (generation: number) => void;
 	}
 }
@@ -23,7 +28,9 @@ export const TileMotionCueVisual = ({
 	cue,
 	enabled,
 	originOffset,
+	targetOffset,
 	deliveryPayload,
+	transferPayload,
 	onComplete,
 }: TileMotionCueVisual.Props) => {
 	const reducedMotion = useReducedMotion();
@@ -38,6 +45,67 @@ export const TileMotionCueVisual = ({
 			<span className="absolute inset-0" data-ui="TileMotionCueVisual">
 				{children}
 			</span>
+		);
+	}
+
+	if (cue.kind === "consume" || cue.kind === "consume-exit") {
+		const exits = cue.kind === "consume-exit";
+		const duration = reducedMotion ? 0.2 : 0.66;
+		const reachX = targetOffset?.x ?? 0;
+		const reachY = targetOffset?.y ?? (exits ? -12 : 4);
+		const travelX = exits ? [0, reachX * 0.72, reachX] : [0, reachX * 0.78, 0];
+		const travelY = exits ? [0, reachY * 0.72, reachY] : [0, reachY * 0.78, 0];
+		return (
+			<motion.span
+				key={cue.generation}
+				className="absolute inset-0"
+				data-ui="TileMotionCueVisual"
+				data-motion-cue={cue.kind}
+				data-motion-cue-generation={cue.generation}
+				data-motion-cue-strength={cue.strength}
+				initial={false}
+				animate={{
+					x: reducedMotion ? 0 : travelX,
+					y: reducedMotion ? 0 : travelY,
+					scale: exits
+						? reducedMotion
+							? [1, 0.9]
+							: [1, 0.82, 0.58]
+						: reducedMotion
+							? [1, 0.96, 1]
+							: [1, 0.78, 0.9, 1],
+					opacity: exits
+						? reducedMotion
+							? [1, 0]
+							: [1, 1, 0]
+						: 1,
+				}}
+				transition={{ duration, ease: [0.22, 1, 0.36, 1] }}
+				onAnimationComplete={() => onComplete(cue.generation)}
+			>
+				{transferPayload === null || exits ? (
+					children
+				) : (
+					<>
+						<motion.span
+							className="absolute inset-0"
+							initial={false}
+							animate={{ opacity: reducedMotion ? [0, 1] : [0, 0, 1, 1] }}
+							transition={{ duration }}
+						>
+							{children}
+						</motion.span>
+						<motion.span
+							className="absolute inset-0"
+							initial={false}
+							animate={{ opacity: reducedMotion ? [1, 0] : [1, 1, 0, 0] }}
+							transition={{ duration }}
+						>
+							{transferPayload}
+						</motion.span>
+					</>
+				)}
+			</motion.span>
 		);
 	}
 
@@ -138,24 +206,6 @@ export const TileMotionCueVisual = ({
 				y: reducedMotion ? 0 : [0, 3, -2, 0],
 			},
 			duration: reducedMotion ? 0.18 : 0.58,
-		}))
-		.with("consume", () => ({
-			initial: false as const,
-			animate: {
-				scale: reducedMotion ? [1, 0.96, 1] : [1, 0.75, 1],
-				opacity: reducedMotion ? 1 : [1, 0.82, 1],
-				y: reducedMotion ? 0 : [0, 4, 0],
-			},
-			duration: reducedMotion ? 0.18 : 0.58,
-		}))
-		.with("consume-exit", () => ({
-			initial: false as const,
-			animate: {
-				scale: reducedMotion ? [1, 0.9] : [1, 0.75, 0.66],
-				opacity: reducedMotion ? [1, 0] : [1, 1, 0],
-				y: reducedMotion ? 0 : [0, 4, -12],
-			},
-			duration: reducedMotion ? 0.2 : 0.58,
 		}))
 		.with("exit", () => ({
 			initial: false as const,

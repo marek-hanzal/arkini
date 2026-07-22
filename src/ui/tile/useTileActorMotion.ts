@@ -94,6 +94,11 @@ export const useTileActorMotion = ({
 		readonly x: number;
 		readonly y: number;
 	} | null>(null);
+	const [cueTargetOffset, setCueTargetOffset] = useState<{
+		readonly generation: number;
+		readonly x: number;
+		readonly y: number;
+	} | null>(null);
 
 	const registerActorNode = useCallback(
 		(node: HTMLElement | null) => {
@@ -189,6 +194,23 @@ export const useTileActorMotion = ({
 		reducedMotion,
 		stopPickupCorrection,
 	]);
+
+	const readCueTargetOffset = useCallback(() => {
+		if (
+			reducedMotion ||
+			cue?.targetItemId === undefined ||
+			cue.targetItemId === item.id
+		) {
+			return null;
+		}
+		const sourceRect = readActorRect(item.id);
+		const targetRect = readActorRect(cue.targetItemId);
+		if (sourceRect === null || targetRect === null) return null;
+		return {
+			x: targetRect.left + targetRect.width / 2 - (sourceRect.left + sourceRect.width / 2),
+			y: targetRect.top + targetRect.height / 2 - (sourceRect.top + sourceRect.height / 2),
+		};
+	}, [cue, item.id, readActorRect, reducedMotion]);
 
 	const readDeliveryOriginOffset = useCallback(
 		(placement: NonNullable<ReturnType<typeof readPlacement>>) => {
@@ -385,6 +407,24 @@ export const useTileActorMotion = ({
 
 	useLayoutEffect(() => {
 		void geometryVersion;
+		if (cue?.kind !== "consume" && cue?.kind !== "consume-exit") {
+			setCueTargetOffset(null);
+			return;
+		}
+		const offset = readCueTargetOffset();
+		setCueTargetOffset(
+			offset === null
+				? null
+				: {
+					generation: cue.generation,
+					x: offset.x,
+					y: offset.y,
+				},
+		);
+	}, [cue, geometryVersion, readCueTargetOffset]);
+
+	useLayoutEffect(() => {
+		void geometryVersion;
 		if (cue?.kind !== "absorb") {
 			setCueOriginOffset(null);
 			return;
@@ -503,6 +543,10 @@ export const useTileActorMotion = ({
 			cueOriginOffset === null
 				? null
 				: { x: cueOriginOffset.x, y: cueOriginOffset.y },
+		cueTargetOffset:
+			cueTargetOffset === null || cueTargetOffset.generation !== cue?.generation
+				? null
+				: { x: cueTargetOffset.x, y: cueTargetOffset.y },
 		armPickupCorrection,
 		startPickupCorrection,
 		stopPickupCorrection,

@@ -3,6 +3,7 @@ import { z } from "zod";
 import { CurrentSpaceChangedGameEventSchema } from "./CurrentSpaceChangedGameEventSchema";
 import { JobCompletedGameEventSchema } from "./JobCompletedGameEventSchema";
 import { JobStartedGameEventSchema } from "./JobStartedGameEventSchema";
+import { ItemInputStoredGameEventSchema } from "./ItemInputStoredGameEventSchema";
 import { ItemMergedGameEventSchema } from "./ItemMergedGameEventSchema";
 import { ItemExpiredGameEventSchema } from "./ItemExpiredGameEventSchema";
 import { ItemSpawnedGameEventSchema } from "./ItemSpawnedGameEventSchema";
@@ -23,6 +24,7 @@ export const GameEventSchema = z.discriminatedUnion("type", [
 	ItemStackedGameEventSchema,
 	ItemSplitGameEventSchema,
 	ItemConsumedGameEventSchema,
+	ItemInputStoredGameEventSchema,
 	ItemDepletedGameEventSchema,
 ]);
 

@@ -67,6 +67,18 @@ describe("item motion game events", () => {
 			resultingQuantity: 1,
 		},
 		{
+			type: GameEventEnumSchema.enum.ItemInputStored,
+			sourceItemId: "runtime:visible-source",
+			canonicalItemId: "water",
+			previousSourceLocation: location,
+			previousQuantity: 2,
+			storedQuantity: 1,
+			resultingQuantity: 1,
+			ownerItemId: "runtime:owner",
+			lineId: "line:owner:run",
+			inputIndex: 0,
+		},
+		{
 			type: GameEventEnumSchema.enum.ItemExpired,
 			itemId: "runtime:temporary",
 			canonicalItemId: "temporary",

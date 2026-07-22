@@ -1,6 +1,8 @@
 import { Effect } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
+import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
+import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
 import { applyInputMaterialStorePlanFx } from "~/engine/input/fx/applyInputMaterialStorePlanFx";
 import { planLineInputAutofillFx } from "~/engine/input/fx/planLineInputAutofillFx";
 import { readItemMaterialInputFx } from "~/engine/input/read/readItemMaterialInputFx";
@@ -50,6 +52,7 @@ export const autofillLineInputsFx = Effect.fn("autofillLineInputsFx")(function* 
 				runtime,
 			});
 			let draft = runtime;
+			const events: GameEventSchema.Type[] = [];
 			for (const entry of plan.entry) {
 				const source = yield* readRuntimeItemByIdFx({
 					itemId: entry.sourceItemId,
@@ -69,7 +72,7 @@ export const autofillLineInputsFx = Effect.fn("autofillLineInputsFx")(function* 
 					lineId,
 					ownerItemId,
 				});
-				const [, nextDraft] = yield* applyInputMaterialStorePlanFx({
+				const [stored, nextDraft] = yield* applyInputMaterialStorePlanFx({
 					location: {
 						scope: LocationScopeEnumSchema.enum.Input,
 						ownerItemId,
@@ -83,6 +86,18 @@ export const autofillLineInputsFx = Effect.fn("autofillLineInputsFx")(function* 
 					runtime: draft,
 					source,
 				});
+				events.push({
+					type: GameEventEnumSchema.enum.ItemInputStored,
+					sourceItemId: source.id,
+					canonicalItemId: source.item.id,
+					previousSourceLocation: source.location,
+					previousQuantity: source.quantity,
+					storedQuantity: stored.storedItem.quantity,
+					resultingQuantity: stored.sourceItem?.quantity ?? 0,
+					ownerItemId,
+					lineId,
+					inputIndex: entry.inputIndex,
+				} satisfies GameEventSchema.Type);
 				draft = nextDraft;
 			}
 
@@ -96,7 +111,10 @@ export const autofillLineInputsFx = Effect.fn("autofillLineInputsFx")(function* 
 					remainingMissingQuantity: plan.remainingMissingQuantity,
 				} satisfies autofillLineInputsFx.Result,
 				isolation.runtime,
-				isolation.events,
+				[
+					...events,
+					...isolation.events,
+				],
 			] as const;
 		}),
 	);

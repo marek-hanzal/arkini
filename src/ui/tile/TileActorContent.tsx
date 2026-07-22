@@ -13,6 +13,7 @@ export namespace TileActorContent {
 		readonly feedback: TileInteractionFeedbackSchema.Type | null;
 		readonly cue: TileMotionCueSchema.Type | null;
 		readonly cueOriginOffset: { readonly x: number; readonly y: number } | null;
+		readonly cueTargetOffset: { readonly x: number; readonly y: number } | null;
 		readonly onCueComplete: (generation: number) => void;
 		readonly onInteractionAnimationComplete?: () => void;
 	}
@@ -68,6 +69,7 @@ export const TileActorContent = ({
 	feedback,
 	cue,
 	cueOriginOffset,
+	cueTargetOffset,
 	onCueComplete,
 	onInteractionAnimationComplete,
 }: TileActorContent.Props) => {
@@ -101,8 +103,16 @@ export const TileActorContent = ({
 						<TileActorFace item={item} quantity={cue.deliveryQuantity} />
 					) : null
 				}
+				transferPayload={
+					cue?.kind === "consume" &&
+					cue.previousQuantity !== undefined &&
+					cue.previousQuantity !== item.quantity ? (
+						<TileActorFace item={item} quantity={cue.previousQuantity} />
+					) : null
+				}
 				enabled={cueEnabled}
 				originOffset={cueOriginOffset}
+				targetOffset={cueTargetOffset}
 				onComplete={onCueComplete}
 			>
 				<TileActorFace item={item} quantity={item.quantity} />

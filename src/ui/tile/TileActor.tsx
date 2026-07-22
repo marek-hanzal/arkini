@@ -255,6 +255,7 @@ export const TileActor = ({ item, live, cue, onCueComplete }: TileActor.Props) =
 							feedback={presentation.feedback}
 							cue={cue}
 							cueOriginOffset={actorMotion.cueOriginOffset}
+							cueTargetOffset={actorMotion.cueTargetOffset}
 							onCueComplete={(generation) => onCueComplete(item.id, generation)}
 							onInteractionAnimationComplete={
 								presentation.visualCompletionGeneration === null

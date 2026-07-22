@@ -15,6 +15,8 @@ export const TileMotionCueSchema = z
 			"exit",
 		]),
 		originItemId: z.string().min(1).optional(),
+		targetItemId: z.string().min(1).optional(),
+		previousQuantity: z.number().int().positive().optional(),
 		deliveryQuantity: z.number().int().positive().optional(),
 		strength: z.number().int().min(1).max(3),
 	})

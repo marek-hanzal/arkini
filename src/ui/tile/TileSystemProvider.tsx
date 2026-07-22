@@ -1,6 +1,7 @@
 import { type PropsWithChildren, useCallback, useMemo } from "react";
 
 import { useDropItemPreview } from "~/bridge/tile/useDropItemPreview";
+import { useDropItemPreviewSequence } from "~/bridge/tile/useDropItemPreviewSequence";
 import { TileActorLayer } from "~/ui/tile/TileActorLayer";
 import type { TileDragSource } from "~/ui/tile/TileDragSource";
 import type { TileDropTarget } from "~/ui/tile/TileDropTarget";
@@ -14,6 +15,7 @@ import { tileLocationForTarget } from "~/ui/tile/tileLocationForTarget";
 export const TileSystemProvider = ({ children }: PropsWithChildren) => {
 	const geometry = useTileGeometry();
 	const dropItemPreview = useDropItemPreview();
+	const readPreviewSequence = useDropItemPreviewSequence();
 	const readPreview = useCallback(
 		(source: TileDragSource, target: TileDropTarget) => {
 			const location = tileLocationForTarget(target);
@@ -43,7 +45,11 @@ export const TileSystemProvider = ({ children }: PropsWithChildren) => {
 		readPreview,
 		resolveTarget: geometry.resolveTarget,
 	});
-	const neighbourField = useTileNeighbourField();
+	const neighbourField = useTileNeighbourField({
+		readPreview,
+		readPreviewSequence,
+		refreshActivePreview: interaction.refreshActivePreview,
+	});
 	const value = useMemo<TileSystem>(
 		() => ({
 			geometryVersion: geometry.geometryVersion,

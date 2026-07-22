@@ -3,6 +3,7 @@ import { useCallback, useEffect, useRef } from "react";
 import { match } from "ts-pattern";
 
 import { useStartItemDetailLine } from "~/bridge/item-detail/useStartItemDetailLine";
+import { LocationScopeEnumSchema } from "~/bridge/tile/LocationScopeEnumSchema";
 import type { useTileActors } from "~/bridge/tile/useTileActors";
 import { CursorClassName } from "~/ui/cursor/CursorSemantic";
 import { useItemDetailControl } from "~/ui/item-detail/useItemDetailControl";
@@ -12,7 +13,6 @@ import { useTileActorDrag } from "~/ui/tile/useTileActorDrag";
 import { useTileActorMotion } from "~/ui/tile/useTileActorMotion";
 import type { TileMotionCueSchema } from "~/ui/tile/schema/TileMotionCueSchema";
 import { useTileActorPresentation } from "~/ui/tile/useTileActorPresentation";
-import { LocationScopeEnumSchema } from "~/bridge/tile/LocationScopeEnumSchema";
 
 const primaryActionDelayMs = 320;
 
@@ -136,7 +136,6 @@ export const TileActor = ({
 
 	return (
 		<motion.button
-			ref={actorMotion.registerActorNode}
 			type="button"
 			className={`absolute left-0 top-0 overflow-visible border-0 bg-transparent p-0 text-inherit outline-none ${CursorClassName[cursor]}`}
 			style={{
@@ -265,22 +264,37 @@ export const TileActor = ({
 						data-ui="TileActorPickup"
 						data-motion-id={item.id}
 					>
-						<TileActorContent
-							item={item}
-							phase={presentation.phase}
-							feedback={presentation.feedback}
-							forbiddenDrop={presentation.forbiddenDrop}
-							cue={cue}
-							cueOriginOffset={actorMotion.cueOriginOffset}
-							cueTargetOffset={actorMotion.cueTargetOffset}
-							onCueStart={(generation) => onCueStart(item.id, generation)}
-							onCueComplete={(generation) => onCueComplete(item.id, generation)}
-							onInteractionAnimationComplete={
-								presentation.visualCompletionGeneration === null
-									? undefined
-									: actorMotion.onVisualAnimationComplete
-							}
-						/>
+						<motion.span
+							className="absolute inset-0"
+							style={{ scale: actorMotion.neighbourScale }}
+							data-ui="TileActorNeighbourEmphasis"
+							data-motion-id={item.id}
+						>
+							<TileActorContent
+								item={item}
+								registerActorNode={actorMotion.registerActorNode}
+								surfaceId={presentation.canonicalSource.surface.id}
+								live={live}
+								exiting={
+									presentation.phase === "exiting" ||
+									cue?.kind === "exit" ||
+									cue?.kind === "consume-exit"
+								}
+								phase={presentation.phase}
+								feedback={presentation.feedback}
+								forbiddenDrop={presentation.forbiddenDrop}
+								cue={cue}
+								cueOriginOffset={actorMotion.cueOriginOffset}
+								cueTargetOffset={actorMotion.cueTargetOffset}
+								onCueStart={(generation) => onCueStart(item.id, generation)}
+								onCueComplete={(generation) => onCueComplete(item.id, generation)}
+								onInteractionAnimationComplete={
+									presentation.visualCompletionGeneration === null
+										? undefined
+										: actorMotion.onVisualAnimationComplete
+								}
+							/>
+						</motion.span>
 					</motion.span>
 				</motion.span>
 			</motion.span>

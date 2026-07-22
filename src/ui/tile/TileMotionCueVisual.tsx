@@ -8,6 +8,10 @@ export namespace TileMotionCueVisual {
 	export type Mode = "play" | "defer" | "discard";
 
 	export interface Props extends PropsWithChildren {
+		readonly registerActorNode: (node: HTMLSpanElement | null) => void;
+		readonly surfaceId: string;
+		readonly live: boolean;
+		readonly exiting: boolean;
 		readonly cue: TileMotionCueSchema.Type | null;
 		readonly mode: Mode;
 		readonly originOffset: {
@@ -28,6 +32,10 @@ export namespace TileMotionCueVisual {
 /** Owns the autonomous cue transform nested inside the actor interaction visual. */
 export const TileMotionCueVisual = ({
 	children,
+	registerActorNode,
+	surfaceId,
+	live,
+	exiting,
 	cue,
 	mode,
 	originOffset,
@@ -50,7 +58,14 @@ export const TileMotionCueVisual = ({
 
 	if (cue === null || mode !== "play") {
 		return (
-			<span className="absolute inset-0" data-ui="TileMotionCueVisual">
+			<span
+				ref={registerActorNode}
+				className="absolute inset-0"
+				data-ui="TileMotionCueVisual"
+				data-surface-id={surfaceId}
+				data-live={live ? "true" : "false"}
+				data-motion-exiting={exiting ? "true" : "false"}
+			>
 				{children}
 			</span>
 		);
@@ -65,12 +80,16 @@ export const TileMotionCueVisual = ({
 		const travelY = exits ? [0, reachY * 0.72, reachY] : [0, reachY * 0.78, 0];
 		return (
 			<motion.span
+				ref={registerActorNode}
 				key={cue.generation}
 				className="absolute inset-0"
 				data-ui="TileMotionCueVisual"
 				data-motion-cue={cue.kind}
 				data-motion-cue-generation={cue.generation}
 				data-motion-cue-strength={cue.strength}
+				data-surface-id={surfaceId}
+				data-live={live ? "true" : "false"}
+				data-motion-exiting={exiting ? "true" : "false"}
 				initial={false}
 				animate={{
 					x: reducedMotion ? 0 : travelX,
@@ -122,12 +141,16 @@ export const TileMotionCueVisual = ({
 		const duration = reducedMotion ? 0.18 : 0.6;
 		return (
 			<span
+				ref={registerActorNode}
 				key={cue.generation}
 				className="absolute inset-0"
 				data-ui="TileMotionCueVisual"
 				data-motion-cue={cue.kind}
 				data-motion-cue-generation={cue.generation}
 				data-motion-cue-strength={cue.strength}
+				data-surface-id={surfaceId}
+				data-live={live ? "true" : "false"}
+				data-motion-exiting={exiting ? "true" : "false"}
 			>
 				<motion.span
 					className="absolute inset-0"
@@ -228,12 +251,16 @@ export const TileMotionCueVisual = ({
 
 	return (
 		<motion.span
+			ref={registerActorNode}
 			key={cue.generation}
 			className="absolute inset-0"
 			data-ui="TileMotionCueVisual"
 			data-motion-cue={cue.kind}
 			data-motion-cue-generation={cue.generation}
 			data-motion-cue-strength={cue.strength}
+			data-surface-id={surfaceId}
+			data-live={live ? "true" : "false"}
+			data-motion-exiting={exiting ? "true" : "false"}
 			initial={animation.initial}
 			animate={animation.animate}
 			transition={{

@@ -236,7 +236,14 @@ export const useTileInteractionController = ({
 	);
 
 	const moveDrag = useCallback(
-		(source: TileDragSource, x: number, y: number): TileDropTarget | null => {
+		(
+			source: TileDragSource,
+			x: number,
+			y: number,
+		): {
+			readonly target: TileDropTarget;
+			readonly previewKind: useDropItemPreview.Result["kind"] | null;
+		} | null => {
 			const current = activeRef.current;
 			if (current?.source.id !== source.id) return null;
 			return match(current)
@@ -246,8 +253,9 @@ export const useTileInteractionController = ({
 					},
 					(dragging) => {
 						const target = resolveTarget(x, y);
+						let previewKind = dragging.previewKind;
 						if (!sameTarget(dragging.target, target)) {
-							let previewKind: useDropItemPreview.Result["kind"] | null = null;
+							previewKind = null;
 							try {
 								previewKind = readPreview(source, target)?.kind ?? null;
 							} catch (error) {
@@ -259,7 +267,10 @@ export const useTileInteractionController = ({
 								previewKind,
 							});
 						}
-						return target;
+						return {
+							target,
+							previewKind,
+						};
 					},
 				)
 				.with(
@@ -282,6 +293,35 @@ export const useTileInteractionController = ({
 			resolveTarget,
 		],
 	);
+
+	const refreshActivePreview = useCallback(() => {
+		const current = activeRef.current;
+		if (
+			current === null ||
+			(current.phase !== "dragging" && current.phase !== "awaiting-outcome") ||
+			current.target === null
+		) {
+			return null;
+		}
+		let previewKind: useDropItemPreview.Result["kind"] | null = null;
+		try {
+			previewKind = readPreview(current.source, current.target)?.kind ?? null;
+		} catch (error) {
+			console.error("Tile drop preview refresh failed; using neutral drag feedback.", error);
+		}
+		if (previewKind !== current.previewKind) {
+			publishActive({
+				...current,
+				previewKind,
+			});
+		}
+		return {
+			sourceItemId: current.source.id,
+			targetItemId:
+				current.target.kind === "slot" ? (current.target.occupant?.id ?? null) : null,
+			previewKind,
+		};
+	}, [publishActive, readPreview]);
 
 	const release = useCallback(
 		(itemId: string) => {
@@ -507,6 +547,7 @@ export const useTileInteractionController = ({
 		press,
 		startDrag,
 		moveDrag,
+		refreshActivePreview,
 		release,
 		settle,
 		complete,

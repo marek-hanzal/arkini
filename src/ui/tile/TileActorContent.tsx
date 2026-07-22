@@ -1,5 +1,6 @@
 import { motion } from "motion/react";
 import { match, P } from "ts-pattern";
+
 import type { useTileActors } from "~/bridge/tile/useTileActors";
 import type { TileActorPhaseSchema } from "~/ui/tile/schema/TileActorPhaseSchema";
 import type { TileInteractionFeedbackSchema } from "~/ui/tile/schema/TileInteractionFeedbackSchema";
@@ -10,6 +11,10 @@ import { readTileActorVisualTarget } from "~/ui/tile/readTileActorVisualTarget";
 export namespace TileActorContent {
 	export interface Props {
 		readonly item: useTileActors.Item;
+		readonly registerActorNode: (node: HTMLSpanElement | null) => void;
+		readonly surfaceId: string;
+		readonly live: boolean;
+		readonly exiting: boolean;
 		readonly phase: TileActorPhaseSchema.Type;
 		readonly feedback: TileInteractionFeedbackSchema.Type | null;
 		readonly forbiddenDrop: boolean;
@@ -68,6 +73,10 @@ const TileActorFace = ({
 /** Renders the exact live tile content inside independent interaction and cue shells. */
 export const TileActorContent = ({
 	item,
+	registerActorNode,
+	surfaceId,
+	live,
+	exiting,
 	phase,
 	feedback,
 	forbiddenDrop,
@@ -120,6 +129,10 @@ export const TileActorContent = ({
 			onAnimationComplete={onInteractionAnimationComplete}
 		>
 			<TileMotionCueVisual
+				registerActorNode={registerActorNode}
+				surfaceId={surfaceId}
+				live={live}
+				exiting={exiting}
 				cue={cue}
 				deliveryPayload={
 					cue?.kind === "absorb" && cue.deliveryQuantity !== undefined ? (

@@ -7,17 +7,17 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { GameEngine } from "~/bridge/game/GameEngine";
 import { useGameFx } from "~/engine/game/fx/useGameFx";
+import { DropItemResultKindEnumSchema } from "~/engine/runtime/schema/command/DropItemResultKindEnumSchema";
 import { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import type { dropItemFx } from "~/engine/runtime/write/dropItemFx";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { startFx } from "~/engine/start/write/startFx";
 import { GameBoardLayout } from "~/ui/board/GameBoardLayout";
-import { TileSystemProvider } from "~/ui/tile/TileSystemProvider";
 import { ItemDetailModal } from "~/ui/item-detail/ItemDetailModal";
 import { ItemDetailProvider } from "~/ui/item-detail/ItemDetailProvider";
-import { motionTestRuntime } from "~test/ui/support/motionReactMock";
+import { TileSystemProvider } from "~/ui/tile/TileSystemProvider";
 import { testGameRead, testGameReadOrThrow } from "~test/support/game/testGameRead";
-import { DropItemResultKindEnumSchema } from "~/engine/runtime/schema/command/DropItemResultKindEnumSchema";
+import { motionTestRuntime } from "~test/ui/support/motionReactMock";
 
 (
 	globalThis as {
@@ -234,6 +234,46 @@ beforeEach(() => {
 			if (element.dataset.ui === "BoardGrid") return rect(0, 0, 200, 200);
 			if (element.dataset.ui === "ToolbarGrid") return rect(0, 220, 200, 100);
 			if (element.dataset.ui === "TileActorLayer") return rect(0, 0, 200, 320);
+			if (element.dataset.ui === "TileMotionCueVisual") {
+				const actor = element.closest<HTMLElement>('[data-ui="TileActor"]');
+				const runtimeId = actor?.dataset.runtimeId;
+				const visual = actor?.querySelector<HTMLElement>('[data-ui="TileActorVisual"]');
+				const scale = Number(visual?.dataset.motionScale ?? 0.8);
+				if (runtimeId !== undefined && Number.isFinite(scale)) {
+					const travel = motionTestRuntime.readMotionOffset("TileActorTravel", runtimeId) ?? {
+						x: 0,
+						y: 0,
+					};
+					const weight = motionTestRuntime.readMotionOffset("TileActorWeight", runtimeId) ?? {
+						x: 0,
+						y: 0,
+					};
+					const pickup = motionTestRuntime.readMotionOffset("TileActorPickup", runtimeId) ?? {
+						x: 0,
+						y: 0,
+					};
+					const neighbour = motionTestRuntime.readMotionOffset("TileActor", runtimeId) ?? {
+						x: 0,
+						y: 0,
+					};
+					const size = 100 * scale;
+					const base =
+						actor?.dataset.locationScope === "toolbar"
+							? { x: Number(actor.dataset.toolbarX) * 100, y: 220 }
+							: {
+								x: Number(actor?.dataset.boardX) * 100,
+								y: Number(actor?.dataset.boardY) * 100,
+							};
+					if (Number.isFinite(base.x) && Number.isFinite(base.y)) {
+						return rect(
+							base.x + (100 - size) / 2 + travel.x + weight.x + pickup.x + neighbour.x,
+							base.y + (100 - size) / 2 + travel.y + weight.y + pickup.y + neighbour.y,
+							size,
+							size,
+						);
+					}
+				}
+			}
 			if (element.dataset.ui === "TileActorDragSurface") {
 				const actor = element.closest<HTMLElement>('[data-ui="TileActor"]');
 				if (actor?.dataset.locationScope === "toolbar") {

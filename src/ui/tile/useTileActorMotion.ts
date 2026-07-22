@@ -64,6 +64,8 @@ export const useTileActorMotion = ({
 		readPlacement,
 		complete,
 		registerNeighbourActor,
+		beginNeighbourTravel,
+		setNeighbourTravelTarget,
 	} = useTileActorSystem();
 	const reducedMotion = useReducedMotion();
 	const anchorX = useMotionValue(0);
@@ -94,6 +96,12 @@ export const useTileActorMotion = ({
 	const neighbourTargetY = useMotionValue(0);
 	const neighbourX = useSpring(neighbourTargetX, { stiffness: 170, damping: 22, mass: 0.58 });
 	const neighbourY = useSpring(neighbourTargetY, { stiffness: 170, damping: 22, mass: 0.58 });
+	const neighbourScaleTarget = useMotionValue(1);
+	const neighbourScale = useSpring(neighbourScaleTarget, {
+		stiffness: 190,
+		damping: 23,
+		mass: 0.56,
+	});
 	const pickupX = useMotionValue(0);
 	const pickupY = useMotionValue(0);
 	const width = useMotionValue(0);
@@ -108,6 +116,8 @@ export const useTileActorMotion = ({
 	const pickupAnimationY = useRef<ReturnType<typeof animate> | null>(null);
 	const itemRef = useRef(item);
 	const unregisterNeighbourActor = useRef<(() => void) | null>(null);
+	const neighbourTravelOwners = useRef(0);
+	const stopNeighbourTravel = useRef<(() => void) | null>(null);
 	const [visible, setVisible] = useState(false);
 	const [cueOriginOffset, setCueOriginOffset] = useState<{
 		readonly generation: number;
@@ -128,20 +138,51 @@ export const useTileActorMotion = ({
 			unregisterNeighbourActor.current = registerNeighbourActor({
 				itemId: item.id,
 				node,
+				source: presentation.canonicalSource,
 				x: neighbourTargetX,
 				y: neighbourTargetY,
+				appliedX: neighbourX,
+				appliedY: neighbourY,
+				scale: neighbourScaleTarget,
+				appliedScale: neighbourScale,
+				canonicalWidth: width,
+				canonicalHeight: height,
 				enabled: !reducedMotion,
 			});
 		},
 		[
+			height,
 			item.id,
+			neighbourX,
+			neighbourScale,
+			neighbourScaleTarget,
 			neighbourTargetX,
+			neighbourY,
 			neighbourTargetY,
+			presentation.canonicalSource,
 			reducedMotion,
 			registerNeighbourActor,
 			visible,
+			width,
 		],
 	);
+
+	const retainNeighbourTravel = useCallback(() => {
+		if (reducedMotion) return () => undefined;
+		neighbourTravelOwners.current += 1;
+		if (neighbourTravelOwners.current === 1) {
+			stopNeighbourTravel.current = beginNeighbourTravel(item.id);
+		}
+		let active = true;
+		return () => {
+			if (!active) return;
+			active = false;
+			neighbourTravelOwners.current = Math.max(0, neighbourTravelOwners.current - 1);
+			if (neighbourTravelOwners.current !== 0) return;
+			stopNeighbourTravel.current?.();
+			stopNeighbourTravel.current = null;
+		};
+	}, [beginNeighbourTravel, item.id, reducedMotion]);
 
 	const clearDragWeight = useCallback(() => {
 		dragWeightTargetX.set(0);
@@ -300,6 +341,7 @@ export const useTileActorMotion = ({
 			pickupY.jump(0);
 			neighbourTargetX.set(0);
 			neighbourTargetY.set(0);
+			neighbourScaleTarget.set(1);
 			setVisible(initialized.current);
 			if (presentation.positionCompletion.kind !== "none" && canCompletePosition()) {
 				complete(item.id, presentation.positionCompletion.generation);
@@ -320,6 +362,10 @@ export const useTileActorMotion = ({
 		const generation = ++localMotionGeneration.current;
 		if (!initialized.current) {
 			const deliveryOffset = cue?.kind === "spawn" ? readDeliveryOriginOffset(placement) : null;
+			const releaseTravel =
+				deliveryOffset === null || Math.hypot(deliveryOffset.x, deliveryOffset.y) < 0.5
+					? null
+					: retainNeighbourTravel();
 			anchorX.jump(placement.x);
 			anchorY.jump(placement.y);
 			dragX.jump(0);
@@ -342,17 +388,23 @@ export const useTileActorMotion = ({
 				animate(settleX, 0, deliveryTransition),
 				animate(settleY, 0, deliveryTransition),
 			];
+			void Promise.all(animations).finally(() => releaseTravel?.());
 			return () => {
 				for (const animation of animations) animation.stop();
+				releaseTravel?.();
 			};
 		}
 
 		setVisible(true);
 		stopPickupCorrection();
 		const animations: Array<ReturnType<typeof animate>> = [];
+		let releaseTravel: (() => void) | null = null;
 		if (ownsSettlementMotion) {
 			const currentVisualX = anchorX.get() + travelX.get() + pickupX.get();
 			const currentVisualY = anchorY.get() + travelY.get() + pickupY.get();
+			if (Math.hypot(currentVisualX - placement.x, currentVisualY - placement.y) >= 0.5) {
+				releaseTravel = retainNeighbourTravel();
+			}
 			const velocityX = reducedMotion ? 0 : dragFollowX.getVelocity();
 			const velocityY = reducedMotion ? 0 : dragFollowY.getVelocity();
 			anchorX.jump(placement.x);
@@ -370,6 +422,9 @@ export const useTileActorMotion = ({
 				animate(settleY, 0, { ...settleTransition, velocity: velocityY }),
 			);
 		} else {
+			if (Math.hypot(anchorX.get() - placement.x, anchorY.get() - placement.y) >= 0.5) {
+				releaseTravel = retainNeighbourTravel();
+			}
 			animations.push(
 				animate(anchorX, placement.x, settleTransition),
 				animate(anchorY, placement.y, settleTransition),
@@ -411,12 +466,14 @@ export const useTileActorMotion = ({
 				if (presentation.positionCompletion.kind !== "none" && canCompletePosition()) {
 					complete(item.id, presentation.positionCompletion.generation);
 				}
-			});
+			})
+			.finally(() => releaseTravel?.());
 		return () => {
 			if (localMotionGeneration.current === generation) {
 				localMotionGeneration.current += 1;
 			}
 			for (const animation of animations) animation.stop();
+			releaseTravel?.();
 		};
 	}, [
 		anchorX,
@@ -432,6 +489,7 @@ export const useTileActorMotion = ({
 		geometryVersion,
 		height,
 		item.id,
+		neighbourScaleTarget,
 		neighbourTargetX,
 		neighbourTargetY,
 		pickupX,
@@ -444,6 +502,7 @@ export const useTileActorMotion = ({
 		readDeliveryOriginOffset,
 		readPlacement,
 		reducedMotion,
+		retainNeighbourTravel,
 		settleX,
 		settleY,
 		stopPickupCorrection,
@@ -506,6 +565,46 @@ export const useTileActorMotion = ({
 		readPlacement,
 	]);
 
+	useLayoutEffect(() => {
+		if (!visible || presentation.phase !== "dragging") return;
+		return retainNeighbourTravel();
+	}, [presentation.phase, retainNeighbourTravel, visible]);
+
+	useEffect(() => {
+		if (
+			!visible ||
+			cueTargetOffset === null ||
+			(cue?.kind !== "consume" && cue?.kind !== "consume-exit") ||
+			(presentation.phase !== "stable" &&
+				presentation.phase !== "hovered" &&
+				presentation.phase !== "targeted")
+		) {
+			return;
+		}
+		const releaseTarget = setNeighbourTravelTarget(
+			item.id,
+			cue.targetItemId === undefined
+				? null
+				: {
+						itemId: cue.targetItemId,
+						feedback: "accepted",
+					},
+		);
+		const releaseTravel = retainNeighbourTravel();
+		return () => {
+			releaseTravel();
+			releaseTarget();
+		};
+	}, [
+		cue,
+		cueTargetOffset,
+		item.id,
+		presentation.phase,
+		retainNeighbourTravel,
+		setNeighbourTravelTarget,
+		visible,
+	]);
+
 	const onVisualAnimationComplete = useCallback(() => {
 		if (presentation.visualCompletionGeneration === null) return;
 		complete(item.id, presentation.visualCompletionGeneration);
@@ -548,11 +647,13 @@ export const useTileActorMotion = ({
 			clearDragWeight();
 			neighbourTargetX.set(0);
 			neighbourTargetY.set(0);
+			neighbourScaleTarget.set(1);
 		}
 	}, [
 		clearDragWeight,
 		neighbourTargetX,
 		neighbourTargetY,
+		neighbourScaleTarget,
 		reducedMotion,
 	]);
 
@@ -561,6 +662,9 @@ export const useTileActorMotion = ({
 			localMotionGeneration.current += 1;
 			stopPickupCorrection();
 			clearDragWeight();
+			neighbourTravelOwners.current = 0;
+			stopNeighbourTravel.current?.();
+			stopNeighbourTravel.current = null;
 			unregisterNeighbourActor.current?.();
 			unregisterNeighbourActor.current = null;
 		},
@@ -583,6 +687,7 @@ export const useTileActorMotion = ({
 		dragRotation,
 		neighbourX,
 		neighbourY,
+		neighbourScale,
 		pickupX,
 		pickupY,
 		width,

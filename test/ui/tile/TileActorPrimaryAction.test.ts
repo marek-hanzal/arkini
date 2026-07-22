@@ -195,6 +195,11 @@ beforeEach(() => {
 			const element = this as HTMLElement;
 			if (element.dataset.ui === "BoardGrid") return rect(0, 0, 200, 100);
 			if (element.dataset.ui === "TileActorLayer") return rect(0, 0, 200, 100);
+			if (element.dataset.ui === "TileMotionCueVisual") {
+				const actor = element.closest<HTMLElement>('[data-ui="TileActor"]');
+				const x = Number(actor?.dataset.boardX);
+				if (Number.isFinite(x)) return rect(x * 100 + 10, 10, 80, 80);
+			}
 			if (element.dataset.ui === "BoardCell") {
 				return rect(Number(element.dataset.boardX) * 100, 0, 100, 100);
 			}

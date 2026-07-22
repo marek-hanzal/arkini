@@ -80,6 +80,19 @@ describe("tile motion grammar", () => {
 		}
 	});
 
+	it("makes the exact rejected target resist instead of yielding", () => {
+		expect(
+			readTileActorVisualTarget({
+				phase: "targeted",
+				feedback: "rejected",
+				forbiddenDrop: false,
+			}),
+		).toMatchObject({
+			opacity: 1,
+			scale: 0.78,
+		});
+	});
+
 	it("measures a delivery from the origin actor center to the target slot center", () => {
 		expect(
 			readTileDeliveryOriginOffset({

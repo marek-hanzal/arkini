@@ -4,6 +4,8 @@ import { act, createElement, useContext, useEffect } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import { DropItemRejectedReasonEnumSchema } from "~/engine/runtime/schema/command/DropItemRejectedReasonEnumSchema";
+import { DropItemResultKindEnumSchema } from "~/engine/runtime/schema/command/DropItemResultKindEnumSchema";
 import type { TileDragSource } from "~/ui/tile/TileDragSource";
 import type { TileIdentity } from "~/ui/tile/TileIdentity";
 import type { TileSlot } from "~/ui/tile/TileSlot";
@@ -12,8 +14,6 @@ import { TileSystemContext, type TileSystem } from "~/ui/tile/TileSystemContext"
 import { TileSystemProvider } from "~/ui/tile/TileSystemProvider";
 import { useTileSlot } from "~/ui/tile/useTileSlot";
 import { useTileSurface } from "~/ui/tile/useTileSurface";
-import { DropItemRejectedReasonEnumSchema } from "~/engine/runtime/schema/command/DropItemRejectedReasonEnumSchema";
-import { DropItemResultKindEnumSchema } from "~/engine/runtime/schema/command/DropItemResultKindEnumSchema";
 
 vi.mock("~/bridge/tile/useTileActors", () => ({
 	useTileActors: () => [],
@@ -21,6 +21,20 @@ vi.mock("~/bridge/tile/useTileActors", () => ({
 
 const previewState = vi.hoisted(() => ({
 	occupiedKind: "swap" as "swap" | "merge" | "store-input",
+}));
+
+vi.mock("~/bridge/tile/useDropItemPreviewSequence", () => ({
+	useDropItemPreviewSequence: () => () => 0,
+}));
+
+vi.mock("~/ui/tile/useTileMotionCues", () => ({
+	useTileMotionCues: () => ({
+		liveItems: [],
+		cues: new Map(),
+		retainedItems: [],
+		start: vi.fn(),
+		complete: vi.fn(),
+	}),
 }));
 
 vi.mock("~/bridge/tile/useDropItemPreview", () => ({
@@ -434,6 +448,49 @@ describe("TileSystemProvider", () => {
 		expect(readSystem().active).toMatchObject({
 			phase: "dragging",
 			previewKind: DropItemResultKindEnumSchema.enum.Merge,
+		});
+	});
+
+	it("refreshes an active target preview after authoritative facts change", async () => {
+		previewState.occupiedKind = "store-input";
+		const { readSystem } = await renderHarness();
+		await act(async () => {
+			const system = readSystem();
+			expect(system.press(source)).toBe(true);
+			system.startDrag(source);
+			system.moveDrag(source, 440, 50);
+		});
+		expect(readSystem().active).toMatchObject({
+			phase: "dragging",
+			previewKind: DropItemResultKindEnumSchema.enum.StoreInput,
+		});
+
+		previewState.occupiedKind = "swap";
+		await act(async () => {
+			readSystem().refreshActivePreview();
+		});
+		expect(readSystem().active).toMatchObject({
+			phase: "dragging",
+			previewKind: DropItemResultKindEnumSchema.enum.Swap,
+		});
+	});
+
+	it("refreshes a pending target preview while the command still revalidates", async () => {
+		previewState.occupiedKind = "store-input";
+		const { readSystem } = await renderHarness();
+		await startDrag(readSystem(), 440, 50);
+		expect(readSystem().active).toMatchObject({
+			phase: "awaiting-outcome",
+			previewKind: DropItemResultKindEnumSchema.enum.StoreInput,
+		});
+
+		previewState.occupiedKind = "swap";
+		await act(async () => {
+			readSystem().refreshActivePreview();
+		});
+		expect(readSystem().active).toMatchObject({
+			phase: "awaiting-outcome",
+			previewKind: DropItemResultKindEnumSchema.enum.Swap,
 		});
 	});
 

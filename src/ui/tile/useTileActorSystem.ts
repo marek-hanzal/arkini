@@ -16,7 +16,9 @@ export const useTileActorSystem = () => {
 		complete,
 		cancel,
 		registerNeighbourActor,
-		moveNeighbourField,
+		beginNeighbourTravel,
+		setNeighbourTravelTarget,
+		setNeighbourSemanticSource,
 		clearNeighbourField,
 	} = useTileSystemContext();
 	return {
@@ -33,7 +35,9 @@ export const useTileActorSystem = () => {
 		complete,
 		cancel,
 		registerNeighbourActor,
-		moveNeighbourField,
+		beginNeighbourTravel,
+		setNeighbourTravelTarget,
+		setNeighbourSemanticSource,
 		clearNeighbourField,
 	};
 };

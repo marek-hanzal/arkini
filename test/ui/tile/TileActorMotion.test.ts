@@ -5,7 +5,7 @@ import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { useTileActors } from "~/bridge/tile/useTileActors";
-import type { TileActorSystem } from "~/ui/tile/TileSystemContext";
+import type { TileSystem } from "~/ui/tile/TileSystemContext";
 import type { TileDragSource } from "~/ui/tile/TileDragSource";
 import type { TileSurface } from "~/ui/tile/TileSurface";
 import { useTileActorMotion } from "~/ui/tile/useTileActorMotion";
@@ -13,7 +13,7 @@ import type { useTileActorPresentation } from "~/ui/tile/useTileActorPresentatio
 import { motionTestRuntime } from "~test/ui/support/motionReactMock";
 
 const systemState = vi.hoisted(() => ({
-	system: null as TileActorSystem | null,
+	system: null as TileSystem | null,
 }));
 
 vi.mock("motion/react", async () => import("~test/ui/support/motionReactMock"));
@@ -141,7 +141,8 @@ describe("useTileActorMotion", () => {
 			readPlacement: () => ({ x: 0, y: 0, width: 100, height: 100 }),
 			complete: () => undefined,
 			registerNeighbourActor: () => () => undefined,
-		} as unknown as TileActorSystem;
+			beginNeighbourTravel: () => () => undefined,
+		} as unknown as TileSystem;
 		const location = {
 			scope: "board" as const,
 			space: 0,
@@ -167,7 +168,8 @@ describe("useTileActorMotion", () => {
 			readPlacement: () => ({ x: 0, y: 0, width: 100, height: 100 }),
 			complete: () => undefined,
 			registerNeighbourActor: () => () => undefined,
-		} as unknown as TileActorSystem;
+			beginNeighbourTravel: () => () => undefined,
+		} as unknown as TileSystem;
 		const location = {
 			scope: "board" as const,
 			space: 0,
@@ -183,6 +185,97 @@ describe("useTileActorMotion", () => {
 		expect(capturedMotion.travelY.get()).toBe(-100);
 	});
 
+	it("owns crowd travel for real spatial settlement and releases the exact mover", async () => {
+		const beginNeighbourTravel = vi.fn();
+		const endNeighbourTravel = vi.fn();
+		beginNeighbourTravel.mockReturnValue(endNeighbourTravel);
+		let placement = { x: 0, y: 0, width: 100, height: 100 };
+		systemState.system = {
+			geometryVersion: 0,
+			readActorLayerRect: () => null,
+			readActorRect: () => null,
+			readPlacement: () => placement,
+			complete: () => undefined,
+			registerNeighbourActor: () => () => undefined,
+			beginNeighbourTravel,
+		} as unknown as TileSystem;
+		const currentLocation = {
+			scope: "board" as const,
+			space: 0,
+			position: { x: 0, y: 0 },
+		};
+		const targetLocation = {
+			scope: "board" as const,
+			space: 0,
+			position: { x: 1, y: 0 },
+		};
+		const rendered = await renderMotion(item(currentLocation), presentation(currentLocation, 1));
+
+		placement = { x: 100, y: 0, width: 100, height: 100 };
+		await rendered.rerender(presentation(targetLocation, 2));
+		await act(async () => undefined);
+
+		expect(beginNeighbourTravel).toHaveBeenCalledOnce();
+		expect(beginNeighbourTravel).toHaveBeenCalledWith("runtime:water");
+		expect(endNeighbourTravel).toHaveBeenCalledOnce();
+	});
+
+	it("does not create crowd travel for unchanged semantic placement", async () => {
+		const beginNeighbourTravel = vi.fn(() => vi.fn());
+		systemState.system = {
+			geometryVersion: 0,
+			readActorLayerRect: () => null,
+			readActorRect: () => null,
+			readPlacement: () => ({ x: 0, y: 0, width: 100, height: 100 }),
+			complete: () => undefined,
+			registerNeighbourActor: () => () => undefined,
+			beginNeighbourTravel,
+		} as unknown as TileSystem;
+		const location = {
+			scope: "board" as const,
+			space: 0,
+			position: { x: 0, y: 0 },
+		};
+		const rendered = await renderMotion(item(location), presentation(location, 1));
+
+		await rendered.rerender(presentation(location, 2));
+		await act(async () => undefined);
+
+		expect(beginNeighbourTravel).not.toHaveBeenCalled();
+	});
+
+	it("does not register crowd travel under reduced motion", async () => {
+		motionTestRuntime.reducedMotion = true;
+		const beginNeighbourTravel = vi.fn(() => vi.fn());
+		let placement = { x: 0, y: 0, width: 100, height: 100 };
+		systemState.system = {
+			geometryVersion: 0,
+			readActorLayerRect: () => null,
+			readActorRect: () => null,
+			readPlacement: () => placement,
+			complete: () => undefined,
+			registerNeighbourActor: () => () => undefined,
+			beginNeighbourTravel,
+		} as unknown as TileSystem;
+		const currentLocation = {
+			scope: "board" as const,
+			space: 0,
+			position: { x: 0, y: 0 },
+		};
+		const targetLocation = {
+			scope: "board" as const,
+			space: 0,
+			position: { x: 1, y: 0 },
+		};
+		const rendered = await renderMotion(item(currentLocation), presentation(currentLocation, 1));
+
+		placement = { x: 100, y: 0, width: 100, height: 100 };
+		await rendered.rerender(presentation(targetLocation, 2));
+		await act(async () => undefined);
+
+		expect(beginNeighbourTravel).not.toHaveBeenCalled();
+	});
+
 	it("releases exact position ownership when placement remains unavailable", async () => {
 		const complete = vi.fn();
 		systemState.system = {
@@ -192,7 +285,8 @@ describe("useTileActorMotion", () => {
 			readPlacement: () => null,
 			complete,
 			registerNeighbourActor: () => () => undefined,
-		} as unknown as TileActorSystem;
+			beginNeighbourTravel: () => () => undefined,
+		} as unknown as TileSystem;
 		const currentLocation = {
 			scope: "board" as const,
 			space: 0,
@@ -235,7 +329,8 @@ describe("useTileActorMotion", () => {
 			},
 			complete,
 			registerNeighbourActor: () => () => undefined,
-		} as unknown as TileActorSystem;
+			beginNeighbourTravel: () => () => undefined,
+		} as unknown as TileSystem;
 		const location = {
 			scope: "inventory" as const,
 			position: { x: 1, y: 0 },

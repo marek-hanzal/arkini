@@ -1,5 +1,6 @@
 import { match, P } from "ts-pattern";
 
+import { TileActorBaseScale } from "~/ui/tile/TileActorBaseScale";
 import type { TileActorPhaseSchema } from "~/ui/tile/schema/TileActorPhaseSchema";
 import type { TileInteractionFeedbackSchema } from "~/ui/tile/schema/TileInteractionFeedbackSchema";
 
@@ -18,7 +19,7 @@ export namespace readTileActorVisualTarget {
 }
 
 const settledVisualTarget = {
-	scale: 0.8,
+	scale: TileActorBaseScale,
 	opacity: 1,
 	filter:
 		"brightness(1) drop-shadow(0 0.45rem 0.65rem color-mix(in srgb, var(--ak-overlay) 34%, transparent))",
@@ -128,6 +129,18 @@ export const readTileActorVisualTarget = ({
 				opacity: 1,
 				filter:
 					"brightness(1.08) drop-shadow(0 0.65rem 0.9rem color-mix(in srgb, var(--ak-accent) 30%, transparent))",
+			}),
+		)
+		.with(
+			{
+				phase: "targeted",
+				feedback: "rejected",
+			},
+			() => ({
+				scale: 0.78,
+				opacity: 1,
+				filter:
+					"brightness(0.96) drop-shadow(0 0.55rem 0.75rem color-mix(in srgb, var(--ak-danger) 28%, transparent))",
 			}),
 		)
 		.with(

@@ -6,18 +6,18 @@ import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { GameEngine } from "~/bridge/game/GameEngine";
-import type { dropItemFx } from "~/engine/runtime/write/dropItemFx";
 import { useGameFx } from "~/engine/game/fx/useGameFx";
+import { DropItemRejectedReasonEnumSchema } from "~/engine/runtime/schema/command/DropItemRejectedReasonEnumSchema";
+import { DropItemResultKindEnumSchema } from "~/engine/runtime/schema/command/DropItemResultKindEnumSchema";
+import type { dropItemFx } from "~/engine/runtime/write/dropItemFx";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { startFx } from "~/engine/start/write/startFx";
 import { Board } from "~/ui/board/Board";
-import { TileSystemProvider } from "~/ui/tile/TileSystemProvider";
 import { ItemDetailModal } from "~/ui/item-detail/ItemDetailModal";
 import { ItemDetailProvider } from "~/ui/item-detail/ItemDetailProvider";
-import { motionTestRuntime } from "~test/ui/support/motionReactMock";
+import { TileSystemProvider } from "~/ui/tile/TileSystemProvider";
 import { testGameRead, testGameReadOrThrow } from "~test/support/game/testGameRead";
-import { DropItemRejectedReasonEnumSchema } from "~/engine/runtime/schema/command/DropItemRejectedReasonEnumSchema";
-import { DropItemResultKindEnumSchema } from "~/engine/runtime/schema/command/DropItemResultKindEnumSchema";
+import { motionTestRuntime } from "~test/ui/support/motionReactMock";
 
 (
 	globalThis as {
@@ -256,6 +256,44 @@ beforeEach(() => {
 			const element = this as HTMLElement;
 			if (element.dataset.ui === "BoardGrid") return rect(0, 0, 300, 200);
 			if (element.dataset.ui === "TileActorLayer") return rect(0, 0, 300, 200);
+			if (element.dataset.ui === "TileMotionCueVisual") {
+				const actor = element.closest<HTMLElement>('[data-ui="TileActor"]');
+				const runtimeId = actor?.dataset.runtimeId;
+				const boardX = Number(actor?.dataset.boardX);
+				const boardY = Number(actor?.dataset.boardY);
+				const visual = actor?.querySelector<HTMLElement>('[data-ui="TileActorVisual"]');
+				const scale = Number(visual?.dataset.motionScale ?? 0.8);
+				if (
+					runtimeId !== undefined &&
+					Number.isFinite(boardX) &&
+					Number.isFinite(boardY) &&
+					Number.isFinite(scale)
+				) {
+					const travel = motionTestRuntime.readMotionOffset("TileActorTravel", runtimeId) ?? {
+						x: 0,
+						y: 0,
+					};
+					const weight = motionTestRuntime.readMotionOffset("TileActorWeight", runtimeId) ?? {
+						x: 0,
+						y: 0,
+					};
+					const pickup = motionTestRuntime.readMotionOffset("TileActorPickup", runtimeId) ?? {
+						x: 0,
+						y: 0,
+					};
+					const neighbour = motionTestRuntime.readMotionOffset("TileActor", runtimeId) ?? {
+						x: 0,
+						y: 0,
+					};
+					const size = 100 * scale;
+					return rect(
+						boardX * 100 + (100 - size) / 2 + travel.x + weight.x + pickup.x + neighbour.x,
+						boardY * 100 + (100 - size) / 2 + travel.y + weight.y + pickup.y + neighbour.y,
+						size,
+						size,
+					);
+				}
+			}
 			if (element.dataset.ui === "TileActorDragSurface") {
 				const actor = element.closest<HTMLElement>('[data-ui="TileActor"]');
 				const x = Number(actor?.dataset.boardX);
@@ -452,7 +490,7 @@ describe("Board drag", () => {
 		expect(target.dataset.motionPhase).toBe("settling");
 		expect(
 			target.querySelector<HTMLElement>('[data-ui="TileActorVisual"]')?.dataset.motionScale,
-		).toBe("1.04");
+		).toBe("0.84");
 	});
 
 	it("moves the one existing actor through the public atomic drop command", async () => {
@@ -617,7 +655,7 @@ describe("Board drag", () => {
 		});
 		expect(
 			target.querySelector<HTMLElement>('[data-ui="TileActorVisual"]')?.dataset.motionScale,
-		).toBe("1.08");
+		).toBe("0.8");
 		expect(motionTestRuntime.readMotionOffset("TileActor", targetId)).toEqual({
 			x: 0,
 			y: 0,

@@ -5,13 +5,13 @@ import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { readTileActorTransitionFx } from "~/bridge/tile/readTileActorTransitionFx";
-import type { useTileActors } from "~/bridge/tile/useTileActors";
 import type { TileActorTransitionSource } from "~/bridge/tile/useTileActorTransitionSource";
+import type { useTileActors } from "~/bridge/tile/useTileActors";
+import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
 import { TileActorContent } from "~/ui/tile/TileActorContent";
 import { TileMotionCueVisual } from "~/ui/tile/TileMotionCueVisual";
 import { useTileMotionCues } from "~/ui/tile/useTileMotionCues";
 import { motionTestRuntime } from "~test/ui/support/motionReactMock";
-import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
 
 (
 	globalThis as {
@@ -732,6 +732,10 @@ describe("tile motion cue arbitration", () => {
 			root.render(
 				createElement(TileActorContent, {
 					item: item("runtime:arbitrated"),
+					registerActorNode: () => undefined,
+					surfaceId: "board:0",
+					live: true,
+					exiting: phase === "exiting",
 					phase,
 					feedback: null,
 					forbiddenDrop: false,
@@ -805,6 +809,10 @@ describe("TileMotionCueVisual", () => {
 				createElement(
 					TileMotionCueVisual,
 					{
+						registerActorNode: () => undefined,
+						surfaceId: "board:0",
+						live: true,
+						exiting: false,
 						cue: { generation: 7, kind: "impact", strength: 2 },
 						deliveryPayload: null,
 						mode: "play",
@@ -839,6 +847,10 @@ describe("TileMotionCueVisual", () => {
 				createElement(
 					TileMotionCueVisual,
 					{
+						registerActorNode: () => undefined,
+						surfaceId: "board:0",
+						live: true,
+						exiting: false,
 						cue: {
 							deliveryQuantity: 2,
 							generation: 8,
@@ -881,6 +893,10 @@ describe("TileMotionCueVisual", () => {
 				createElement(
 					TileMotionCueVisual,
 					{
+						registerActorNode: () => undefined,
+						surfaceId: "board:0",
+						live: true,
+						exiting: false,
 						cue: {
 							generation: 9,
 							kind: "consume",

@@ -192,13 +192,7 @@ const settlingView = (
 						},
 					};
 				}
-				return settlement.outcome.owner.itemId === item.id
-					? {
-							...passive,
-							phase: "combining" as const,
-							feedback: settlement.feedback,
-						}
-					: passive;
+				return passive;
 			},
 		)
 		.with(
@@ -341,9 +335,11 @@ const interactionView = (
 				phase: "dragging" as const,
 			},
 			(dragging) => {
-				const acceptsInteraction =
-					dragging.previewKind === DropItemResultKindEnumSchema.enum.Merge ||
+				const previewsMerge =
+					dragging.previewKind === DropItemResultKindEnumSchema.enum.Merge;
+				const previewsInputStore =
 					dragging.previewKind === DropItemResultKindEnumSchema.enum.StoreInput;
+				const acceptsInteraction = previewsMerge || previewsInputStore;
 				const occupied =
 					dragging.target?.kind === "slot" && dragging.target.occupant !== null;
 				if (dragging.source.id === item.id) {
@@ -352,25 +348,33 @@ const interactionView = (
 						phase: "dragging" as const,
 						feedback: acceptsInteraction
 							? ("accepted" as const)
-							: occupied
-								? ("ignored" as const)
-								: dragging.previewKind === DropItemResultKindEnumSchema.enum.Reject
-									? ("rejected" as const)
+							: dragging.previewKind === DropItemResultKindEnumSchema.enum.Reject
+								? ("rejected" as const)
+								: occupied
+									? ("ignored" as const)
 									: null,
 						forbiddenDrop: dragging.target?.kind !== "slot",
 						placementFrozen: true,
 					};
 				}
 				if (
-					acceptsInteraction &&
 					dragging.target?.kind === "slot" &&
 					dragging.target.occupant?.id === item.id
 				) {
-					return {
-						...passive,
-						phase: "combining" as const,
-						feedback: "accepted" as const,
-					};
+					if (acceptsInteraction) {
+						return {
+							...passive,
+							phase: previewsMerge ? ("combining" as const) : ("targeted" as const),
+							feedback: "accepted" as const,
+						};
+					}
+					if (dragging.previewKind === DropItemResultKindEnumSchema.enum.Reject) {
+						return {
+							...passive,
+							phase: "targeted" as const,
+							feedback: "rejected" as const,
+						};
+					}
 				}
 				return passive;
 			},
@@ -380,9 +384,11 @@ const interactionView = (
 				phase: "awaiting-outcome",
 			},
 			(awaiting) => {
-				const acceptsInteraction =
-					awaiting.previewKind === DropItemResultKindEnumSchema.enum.Merge ||
+				const previewsMerge =
+					awaiting.previewKind === DropItemResultKindEnumSchema.enum.Merge;
+				const previewsInputStore =
 					awaiting.previewKind === DropItemResultKindEnumSchema.enum.StoreInput;
+				const acceptsInteraction = previewsMerge || previewsInputStore;
 				const occupied = awaiting.target.kind === "slot" && awaiting.target.occupant !== null;
 				if (awaiting.source.id === item.id) {
 					return {
@@ -390,26 +396,35 @@ const interactionView = (
 						phase: "dragging" as const,
 						feedback: acceptsInteraction
 							? ("accepted" as const)
-							: occupied
-								? ("ignored" as const)
-								: awaiting.previewKind === DropItemResultKindEnumSchema.enum.Reject
-									? ("rejected" as const)
+							: awaiting.previewKind === DropItemResultKindEnumSchema.enum.Reject
+								? ("rejected" as const)
+								: occupied
+									? ("ignored" as const)
 									: null,
 						forbiddenDrop: awaiting.target.kind !== "slot",
 						placementFrozen: true,
 					};
 				}
 				if (
-					acceptsInteraction &&
 					awaiting.target.kind === "slot" &&
 					awaiting.target.occupant?.id === item.id
 				) {
-					return {
-						...passive,
-						phase: "combining" as const,
-						feedback: "accepted" as const,
-						placementFrozen: true,
-					};
+					if (acceptsInteraction) {
+						return {
+							...passive,
+							phase: previewsMerge ? ("combining" as const) : ("targeted" as const),
+							feedback: "accepted" as const,
+							placementFrozen: true,
+						};
+					}
+					if (awaiting.previewKind === DropItemResultKindEnumSchema.enum.Reject) {
+						return {
+							...passive,
+							phase: "targeted" as const,
+							feedback: "rejected" as const,
+							placementFrozen: true,
+						};
+					}
 				}
 				return passive;
 			},

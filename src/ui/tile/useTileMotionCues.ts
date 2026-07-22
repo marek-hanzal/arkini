@@ -10,6 +10,7 @@ interface TileMotionCueState {
 	readonly nextGeneration: number;
 	readonly cues: ReadonlyMap<string, TileMotionCueSchema.Type>;
 	readonly retained: ReadonlyMap<string, useTileActors.Item>;
+	readonly pendingBoardSettleSpace: number | null;
 }
 
 interface TileMotionCueFallback {
@@ -23,6 +24,7 @@ const emptyState = (): TileMotionCueState => ({
 	nextGeneration: 0,
 	cues: new Map(),
 	retained: new Map(),
+	pendingBoardSettleSpace: null,
 });
 
 /** Translates committed item facts into bounded actor-local cue generations. */
@@ -54,7 +56,12 @@ export const useTileMotionCues = ({
 			const retained = new Map(current.retained);
 			cues.delete(itemId);
 			retained.delete(itemId);
-			return { nextGeneration: current.nextGeneration, cues, retained };
+			return {
+				nextGeneration: current.nextGeneration,
+				cues,
+				retained,
+				pendingBoardSettleSpace: current.pendingBoardSettleSpace,
+			};
 		});
 	}, []);
 
@@ -71,6 +78,7 @@ export const useTileMotionCues = ({
 			]);
 			let changed = false;
 			let nextGeneration = current.nextGeneration;
+			let pendingBoardSettleSpace = current.pendingBoardSettleSpace;
 
 			const cue = (
 				itemId: string,
@@ -106,13 +114,9 @@ export const useTileMotionCues = ({
 							retained.delete(itemId);
 							changed = true;
 						}
-						for (const item of liveItemsRef.current) {
-							if (
-								item.location.scope === LocationScopeEnumSchema.enum.Board &&
-								item.location.space === event.currentSpace
-							) {
-								cue(item.id, "settle", false);
-							}
+						if (pendingBoardSettleSpace !== event.currentSpace) {
+							pendingBoardSettleSpace = event.currentSpace;
+							changed = true;
 						}
 						break;
 					case GameEventEnumSchema.enum.ItemSpawned:
@@ -149,9 +153,44 @@ export const useTileMotionCues = ({
 				}
 			}
 
-			return changed ? { nextGeneration, cues, retained } : current;
+			return changed
+				? { nextGeneration, cues, retained, pendingBoardSettleSpace }
+				: current;
 		});
 	});
+
+	useLayoutEffect(() => {
+		if (state.pendingBoardSettleSpace === null) return;
+		setState((current) => {
+			const space = current.pendingBoardSettleSpace;
+			if (space === null) return current;
+			const cues = new Map(current.cues);
+			let nextGeneration = current.nextGeneration;
+			for (const item of liveItems) {
+				if (
+					item.location.scope !== LocationScopeEnumSchema.enum.Board ||
+					item.location.space !== space ||
+					cues.has(item.id)
+				) {
+					continue;
+				}
+				cues.set(item.id, {
+					generation: ++nextGeneration,
+					kind: "settle",
+					strength: 1,
+				});
+			}
+			return {
+				nextGeneration,
+				cues,
+				retained: current.retained,
+				pendingBoardSettleSpace: null,
+			};
+		});
+	}, [
+		liveItems,
+		state.pendingBoardSettleSpace,
+	]);
 
 	useEffect(() => {
 		for (const [itemId, fallback] of fallbacks.current) {

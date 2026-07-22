@@ -314,9 +314,8 @@ describe("tile motion cue lifecycle", () => {
 
 	it("resets the scene and settles only the newly visible board space", async () => {
 		let current: ReturnType<typeof useTileMotionCues> | null = null;
-		const liveItems = [
+		let liveItems = [
 			item("runtime:board:old"),
-			item("runtime:board:new", "board", 1),
 			item("runtime:inventory", "inventory"),
 		];
 		const onSceneReset = vi.fn();
@@ -341,10 +340,15 @@ describe("tile motion cue lifecycle", () => {
 				type: GameEventEnumSchema.enum.ItemSpawned,
 				itemId: "runtime:inventory",
 				canonicalItemId: "item:inventory",
-				location: liveItems[2].location,
+				location: liveItems[1].location,
 				quantity: 1,
 			},
 		]);
+		liveItems = [
+			item("runtime:board:old"),
+			item("runtime:board:new", "board", 1),
+			item("runtime:inventory", "inventory"),
+		];
 		await dispatch([
 			{
 				type: GameEventEnumSchema.enum.CurrentSpaceChanged,

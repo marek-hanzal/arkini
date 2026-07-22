@@ -16,6 +16,15 @@ import { LocationScopeEnumSchema } from "~/bridge/tile/LocationScopeEnumSchema";
 
 const primaryActionDelayMs = 320;
 
+const zIndexForCue = (cue: TileMotionCueSchema.Type | null) => {
+	if (cue === null) return 0;
+	return match(cue.kind)
+		.with("exit", () => 35)
+		.with("impact", "accept", () => 30)
+		.with("spawn", "settle", () => 15)
+		.exhaustive();
+};
+
 export namespace TileActor {
 	export interface Props {
 		readonly item: useTileActors.Item;
@@ -106,6 +115,7 @@ export const TileActor = ({ item, live, cue, onCueComplete }: TileActor.Props) =
 
 	const boardLocation = item.location.scope === LocationScopeEnumSchema.enum.Board ? item.location : null;
 	const visible = actorMotion.visible;
+	const zIndex = Math.max(presentation.zIndex, zIndexForCue(cue));
 	const cursor = readTileActorCursorSemantic({
 		feedback: presentation.feedback,
 		forbiddenDrop: presentation.forbiddenDrop,
@@ -126,7 +136,7 @@ export const TileActor = ({ item, live, cue, onCueComplete }: TileActor.Props) =
 				top: actorMotion.anchorY,
 				width: actorMotion.width,
 				height: actorMotion.height,
-				zIndex: presentation.zIndex,
+				zIndex,
 				pointerEvents: interactive ? "auto" : "none",
 				visibility: visible ? "visible" : "hidden",
 				x: actorMotion.neighbourX,

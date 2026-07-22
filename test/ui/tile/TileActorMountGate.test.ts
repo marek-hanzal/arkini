@@ -69,9 +69,9 @@ describe("useTileActorMountGate", () => {
 		document.body.replaceChildren();
 	});
 
-	it("holds an uncued actor until the next paint opportunity", async () => {
+	it("shows the initial snapshot immediately and gates later uncued additions", async () => {
 		let visible: ReadonlyArray<useTileActors.Item> = [];
-		const liveItems = [actor("runtime:new")];
+		let liveItems = [actor("runtime:existing")];
 		const cues = new Map<string, TileMotionCueSchema.Type>();
 		const Capture = () => {
 			visible = useTileActorMountGate({ liveItems, cues });
@@ -82,14 +82,21 @@ describe("useTileActorMountGate", () => {
 		const root = createRoot(container);
 		roots.push(root);
 		await act(async () => root.render(createElement(Capture)));
-		expect(visible).toEqual([]);
+		expect(visible.map((item) => item.id)).toEqual(["runtime:existing"]);
+		expect(pendingFrame).toBeNull();
+
+		liveItems = [actor("runtime:existing"), actor("runtime:new")];
+		await act(async () => root.render(createElement(Capture)));
+
+		expect(visible.map((item) => item.id)).toEqual(["runtime:existing"]);
+		expect(pendingFrame).not.toBeNull();
 		await finishFrame();
-		expect(visible.map((item) => item.id)).toEqual(["runtime:new"]);
+		expect(visible.map((item) => item.id)).toEqual(["runtime:existing", "runtime:new"]);
 	});
 
-	it("forgets released actor identities before a replacement Game can paint", async () => {
+	it("prunes released identities after they leave the live actor set", async () => {
 		let visible: ReadonlyArray<useTileActors.Item> = [];
-		const liveItems = [actor("runtime:shared")];
+		let liveItems = [actor("runtime:reused")];
 		const cues = new Map<string, TileMotionCueSchema.Type>();
 		const Capture = () => {
 			visible = useTileActorMountGate({ liveItems, cues });
@@ -100,19 +107,46 @@ describe("useTileActorMountGate", () => {
 		const root = createRoot(container);
 		roots.push(root);
 		await act(async () => root.render(createElement(Capture)));
-		await finishFrame();
-		expect(visible.map((item) => item.id)).toEqual(["runtime:shared"]);
+		expect(visible.map((item) => item.id)).toEqual(["runtime:reused"]);
 
-		gameState.game = {};
+		liveItems = [];
 		await act(async () => root.render(createElement(Capture)));
+		expect(visible).toEqual([]);
 
+		liveItems = [actor("runtime:reused")];
+		await act(async () => root.render(createElement(Capture)));
 		expect(visible).toEqual([]);
 		expect(pendingFrame).not.toBeNull();
+		await finishFrame();
+		expect(visible.map((item) => item.id)).toEqual(["runtime:reused"]);
+	});
+
+	it("releases a replacement Game snapshot immediately", async () => {
+		let visible: ReadonlyArray<useTileActors.Item> = [];
+		let liveItems = [actor("runtime:old")];
+		const cues = new Map<string, TileMotionCueSchema.Type>();
+		const Capture = () => {
+			visible = useTileActorMountGate({ liveItems, cues });
+			return null;
+		};
+		const container = document.createElement("div");
+		document.body.append(container);
+		const root = createRoot(container);
+		roots.push(root);
+		await act(async () => root.render(createElement(Capture)));
+		expect(visible.map((item) => item.id)).toEqual(["runtime:old"]);
+
+		gameState.game = {};
+		liveItems = [actor("runtime:new-game")];
+		await act(async () => root.render(createElement(Capture)));
+
+		expect(visible.map((item) => item.id)).toEqual(["runtime:new-game"]);
+		expect(pendingFrame).toBeNull();
 	});
 
 	it("reveals a semantically cued spawn on its first rendered pose", async () => {
 		let visible: ReadonlyArray<useTileActors.Item> = [];
-		const liveItems = [actor("runtime:spawn")];
+		let liveItems: ReadonlyArray<useTileActors.Item> = [];
 		const cues = new Map<string, TileMotionCueSchema.Type>([
 			[
 				"runtime:spawn",
@@ -131,6 +165,10 @@ describe("useTileActorMountGate", () => {
 		document.body.append(container);
 		const root = createRoot(container);
 		roots.push(root);
+		await act(async () => root.render(createElement(Capture)));
+		expect(visible).toEqual([]);
+
+		liveItems = [actor("runtime:spawn")];
 		await act(async () => root.render(createElement(Capture)));
 		expect(visible.map((item) => item.id)).toEqual(["runtime:spawn"]);
 		expect(pendingFrame).toBeNull();

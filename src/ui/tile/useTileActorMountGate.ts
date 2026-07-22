@@ -4,7 +4,7 @@ import { useGameEngine } from "~/bridge/game/useGameEngine";
 import type { useTileActors } from "~/bridge/tile/useTileActors";
 import type { TileMotionCueSchema } from "~/ui/tile/schema/TileMotionCueSchema";
 
-/** Delays uncued first mounts by one frame so committed spawn cues own the first painted pose. */
+/** Delays newly added uncued actors by one frame so committed spawn cues own their first painted pose. */
 export const useTileActorMountGate = ({
 	liveItems,
 	cues,
@@ -15,10 +15,17 @@ export const useTileActorMountGate = ({
 	const game = useGameEngine();
 	const gameRef = useRef(game);
 	const liveIdsRef = useRef(new Set(liveItems.map((item) => item.id)));
-	const [releasedIds, setReleasedIds] = useState<ReadonlySet<string>>(() => new Set());
+	const [releasedIds, setReleasedIds] = useState<ReadonlySet<string>>(() =>
+		new Set(liveItems.map((item) => item.id)),
+	);
 
 	useLayoutEffect(() => {
-		liveIdsRef.current = new Set(liveItems.map((item) => item.id));
+		const liveIds = new Set(liveItems.map((item) => item.id));
+		liveIdsRef.current = liveIds;
+		setReleasedIds((current) => {
+			const next = new Set([...current].filter((itemId) => liveIds.has(itemId)));
+			return next.size === current.size ? current : next;
+		});
 	}, [
 		liveItems,
 	]);
@@ -26,7 +33,7 @@ export const useTileActorMountGate = ({
 	useLayoutEffect(() => {
 		if (gameRef.current === game) return;
 		gameRef.current = game;
-		setReleasedIds(new Set());
+		setReleasedIds(new Set(liveIdsRef.current));
 	}, [
 		game,
 	]);

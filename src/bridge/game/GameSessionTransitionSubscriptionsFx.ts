@@ -2,6 +2,7 @@ import { Effect, ExecutionStrategy, Exit, Scope, Stream } from "effect";
 
 import { invokeExternalCallbackFx } from "~/engine/common/fx/invokeExternalCallbackFx";
 import type { GameEventBatchSchema } from "~/engine/event/schema/GameEventBatchSchema";
+import type { CommittedTransitionSchema } from "~/engine/runtime/schema/CommittedTransitionSchema";
 import { CommittedTransitionsFx } from "~/engine/runtime/context/CommittedTransitionsFx";
 
 export interface GameSessionTransitionSubscriptionCleanup {
@@ -12,6 +13,9 @@ export interface GameSessionTransitionSubscriptionCleanup {
 export interface GameSessionTransitionSubscriptions {
 	readonly subscribe: (
 		listener: () => void | PromiseLike<void>,
+	) => Effect.Effect<GameSessionTransitionSubscriptionCleanup>;
+	readonly subscribeTransitions: (
+		listener: (transition: CommittedTransitionSchema.Type) => void | PromiseLike<void>,
 	) => Effect.Effect<GameSessionTransitionSubscriptionCleanup>;
 	readonly subscribeEvents: (
 		listener: (batch: GameEventBatchSchema.Type) => void | PromiseLike<void>,
@@ -62,6 +66,34 @@ export const GameSessionTransitionSubscriptionsFx = Effect.gen(function* () {
 			};
 		});
 
+	const subscribeTransitions = (
+		listener: (transition: CommittedTransitionSchema.Type) => void | PromiseLike<void>,
+	) =>
+		Effect.gen(function* () {
+			const listenerScope = yield* makeListenerScopeFx;
+			const subscription = yield* committedTransitions.subscribe.pipe(
+				Scope.extend(listenerScope),
+			);
+			const delivery = Stream.make(subscription.current).pipe(
+				Stream.concat(subscription.changes),
+				Stream.runForEach((transition) =>
+					invokeExternalCallbackFx({
+						callback: listener,
+						failureMessage:
+							"Arkini committed-transition listener failed; its subscription remains active.",
+						value: transition,
+					}),
+				),
+			);
+
+			yield* Effect.forkIn(delivery, listenerScope);
+
+			return {
+				shutdown: subscription.shutdown,
+				release: Scope.close(listenerScope, Exit.void),
+			};
+		});
+
 	const subscribeEvents = (
 		listener: (batch: GameEventBatchSchema.Type) => void | PromiseLike<void>,
 	) =>
@@ -97,6 +129,7 @@ export const GameSessionTransitionSubscriptionsFx = Effect.gen(function* () {
 
 	return {
 		subscribe,
+		subscribeTransitions,
 		subscribeEvents,
 	} satisfies GameSessionTransitionSubscriptions;
 });

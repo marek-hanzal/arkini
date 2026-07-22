@@ -12,6 +12,8 @@ export interface CommittedTransitionSubscription {
 }
 
 export interface CommittedTransitionsFxService {
+	/** Latest exact canonical committed transition. */
+	readonly read: Effect.Effect<CommittedTransitionSchema.Type>;
 	/**
 	 * Opens one scoped subscription without a gap between the current value and
 	 * subsequent commits.

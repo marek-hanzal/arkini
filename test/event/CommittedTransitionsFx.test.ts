@@ -58,7 +58,11 @@ describe("committed transition events", () => {
 			),
 		);
 
+		expect(current.sequence).toBe(0);
+		expect(current.previousRuntime).toBeNull();
 		expect(current.runtime.items).toEqual([]);
+		expect(next.sequence).toBe(1);
+		expect(next.previousRuntime).toBe(current.runtime);
 		expect(next.runtime.items.some((item) => item.id === itemId)).toBe(true);
 	});
 

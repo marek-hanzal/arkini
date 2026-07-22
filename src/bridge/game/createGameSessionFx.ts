@@ -9,6 +9,7 @@ import { RuntimeSaveFx } from "~/bridge/save/RuntimeSaveFx";
 import { RuntimeSaveLayerFx } from "~/bridge/save/RuntimeSaveLayerFx";
 import { GameLoopFx } from "~/engine/game/context/GameLoopFx";
 import { GameSessionLayerFx } from "~/engine/game/layer/GameSessionLayerFx";
+import { readCommittedTransitionFx } from "~/engine/runtime/read/readCommittedTransitionFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import type { StateSchema } from "~/engine/state/schema/StateSchema";
@@ -202,10 +203,13 @@ export const createGameSessionFx = Effect.fn("createGameSessionFx")(
 				disposeWithoutSaveFx: disposeWithSaveModeFx("discard"),
 				flushSaveFx,
 				getSnapshot: () => managed.runSync(readRuntimeFx()),
+				getTransitionSnapshot: () => managed.runSync(readCommittedTransitionFx()),
 				read: (effect) => managed.runSyncExit(effect),
 				run: (effect) => runCommand(ensureRunningFx.pipe(Effect.zipRight(effect))),
 				subscribe: (listener) =>
 					openSubscription(transitionSubscriptions.subscribe(listener)),
+				subscribeTransitions: (listener) =>
+					openSubscription(transitionSubscriptions.subscribeTransitions(listener)),
 				subscribeEvents: (listener) =>
 					openSubscription(transitionSubscriptions.subscribeEvents(listener)),
 			} satisfies GameSession;

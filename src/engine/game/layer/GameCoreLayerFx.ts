@@ -33,6 +33,8 @@ export const GameCoreLayerFx = ({ config, state }: GameCoreLayerFx.Props) => {
 		).pipe(
 			Effect.map(
 				(runtime): CommittedTransitionSchema.Type => ({
+					sequence: 0,
+					previousRuntime: null,
 					runtime,
 					events: [],
 				}),
@@ -53,6 +55,7 @@ export const GameCoreLayerFx = ({ config, state }: GameCoreLayerFx.Props) => {
 		CommittedTransitionsFx,
 		RuntimeStoreFx.pipe(
 			Effect.map((store) => ({
+				read: store.read,
 				subscribe: store.subscribe,
 			})),
 		),

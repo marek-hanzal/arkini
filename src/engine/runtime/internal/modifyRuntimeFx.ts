@@ -52,6 +52,8 @@ export const modifyRuntimeFx = <Result, Error, Requirements>(
 						nextRuntime === transition.runtime && emittedEvents.length === 0
 							? transition
 							: {
+									sequence: transition.sequence + 1,
+									previousRuntime: transition.runtime,
 									runtime: nextRuntime,
 									events: [
 										...emittedEvents,

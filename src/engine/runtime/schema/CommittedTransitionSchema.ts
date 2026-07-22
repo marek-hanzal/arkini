@@ -5,6 +5,8 @@ import { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
 export const CommittedTransitionSchema = z
 	.object({
+		sequence: z.number().int().nonnegative(),
+		previousRuntime: RuntimeSchema.nullable(),
 		runtime: RuntimeSchema,
 		events: z.array(GameEventSchema),
 	})
@@ -12,7 +14,7 @@ export const CommittedTransitionSchema = z
 	.meta({
 		id: "CommittedTransitionSchema",
 		description:
-			"One atomically committed gameplay runtime snapshot with transient metadata describing that exact transition.",
+			"One sequenced atomically committed gameplay runtime snapshot with its bounded previous runtime and transient metadata describing that exact transition.",
 	});
 
 export type CommittedTransitionSchema = typeof CommittedTransitionSchema;

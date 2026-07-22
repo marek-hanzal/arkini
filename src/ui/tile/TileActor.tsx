@@ -10,6 +10,7 @@ import { TileActorContent } from "~/ui/tile/TileActorContent";
 import { readTileActorCursorSemantic } from "~/ui/tile/readTileActorCursorSemantic";
 import { useTileActorDrag } from "~/ui/tile/useTileActorDrag";
 import { useTileActorMotion } from "~/ui/tile/useTileActorMotion";
+import type { TileMotionCueSchema } from "~/ui/tile/schema/TileMotionCueSchema";
 import { useTileActorPresentation } from "~/ui/tile/useTileActorPresentation";
 
 const primaryActionDelayMs = 320;
@@ -18,11 +19,13 @@ export namespace TileActor {
 	export interface Props {
 		readonly item: useTileActors.Item;
 		readonly live: boolean;
+		readonly cue: TileMotionCueSchema.Type | null;
+		readonly onCueComplete: (itemId: string, generation: number) => void;
 	}
 }
 
 /** Renders one stable runtime-item actor from focused presentation, Motion, and drag owners. */
-export const TileActor = ({ item, live }: TileActor.Props) => {
+export const TileActor = ({ item, live, cue, onCueComplete }: TileActor.Props) => {
 	const itemDetail = useItemDetailControl();
 	const startLine = useStartItemDetailLine();
 	const presentation = useTileActorPresentation({
@@ -214,7 +217,9 @@ export const TileActor = ({ item, live }: TileActor.Props) => {
 						item={item}
 						phase={presentation.phase}
 						feedback={presentation.feedback}
-						onAnimationComplete={
+						cue={cue}
+						onCueComplete={(generation) => onCueComplete(item.id, generation)}
+						onInteractionAnimationComplete={
 							presentation.visualCompletionGeneration === null
 								? undefined
 								: actorMotion.onVisualAnimationComplete

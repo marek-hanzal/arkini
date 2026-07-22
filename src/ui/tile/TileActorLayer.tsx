@@ -1,8 +1,11 @@
+import { useMemo } from "react";
+
 import { useTileActors } from "~/bridge/tile/useTileActors";
 import { TileActor } from "~/ui/tile/TileActor";
 import { TileActorRetentionContext } from "~/ui/tile/TileActorRetentionContext";
 import { useRetainedTileActors } from "~/ui/tile/useRetainedTileActors";
 import { useTileActorLayerSystem } from "~/ui/tile/useTileActorLayerSystem";
+import { useTileMotionCues } from "~/ui/tile/useTileMotionCues";
 
 /** Renders one stable Motion actor per live or explicitly retained presentation identity. */
 export const TileActorLayer = () => {
@@ -12,23 +15,24 @@ export const TileActorLayer = () => {
 		active,
 		liveItems,
 	});
-
-	const actors = [
-		...liveItems.map(
-			(item) =>
-				({
-					item,
-					live: true,
-				}) as const,
-		),
-		...retention.retainedItems.map(
-			(item) =>
-				({
-					item,
-					live: false,
-				}) as const,
-		),
-	];
+	const motionCues = useTileMotionCues(liveItems);
+	const actors = useMemo(() => {
+		const byId = new Map<
+			string,
+			{
+				readonly item: (typeof liveItems)[number];
+				readonly live: boolean;
+			}
+		>();
+		for (const item of motionCues.retainedItems) byId.set(item.id, { item, live: false });
+		for (const item of retention.retainedItems) byId.set(item.id, { item, live: false });
+		for (const item of liveItems) byId.set(item.id, { item, live: true });
+		return [...byId.values()];
+	}, [
+		liveItems,
+		motionCues.retainedItems,
+		retention.retainedItems,
+	]);
 
 	return (
 		<div
@@ -42,6 +46,8 @@ export const TileActorLayer = () => {
 						key={item.id}
 						item={item}
 						live={live}
+						cue={motionCues.cues.get(item.id) ?? null}
+						onCueComplete={motionCues.complete}
 					/>
 				))}
 			</TileActorRetentionContext.Provider>

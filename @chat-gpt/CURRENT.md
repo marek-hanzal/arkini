@@ -4,9 +4,9 @@ This file contains durable non-obvious decisions and the exact continuation poin
 
 ## Current implementation task
 
-**Shared Fuse search for Spotlight and Item Detail Lines**
+**Unified tile motion language — GitHub #356**
 
-Status: **Issue #353 is implemented on `main` at `ea7954c2`. `useFuseSearch` owns one typed Fuse configuration, trimmed-query passthrough, deterministic relevance/tie ordering, and a semantic corpus key so equivalent candidate identities/terms do not rebuild the Fuse index. Cheat Spotlight defines only its authorized catalog terms and resolves returned item IDs against the immutable current catalog. Item Detail Lines defines explicit player-visible semantic terms from the retained authoritative Lines projection, keeps its compact search input outside the scrolling row owner, preserves the total Lines tab count, resolves Fuse result line IDs against the latest live projection, excludes volatile numeric timing/quantity values, and keeps stale read-only Lines locally searchable. No global engine index, hidden-line scan, second catalog, responsive change, or generic search registry was introduced.**
+Status: **#357 exact committed item-change facts are implemented in `fd61e6b2`. The current presentation checkpoint adds one actor-local cue lifecycle over the existing single `TileActorLayer`: exact spawn/impact/accept/exit generations, bounded same-actor coalescing, stale-completion protection, minimal retained exit snapshots, Game/space cleanup, reduced-motion primitives, and separate interaction-versus-autonomous Motion shells. The next slice applies and hardens autonomous spawn/stack/consume/depletion/replacement behavior, then adds weighted drag and local neighbour yielding without pointer-frame React state.**
 
 Recent failed Game bootstrap recovery remains complete: verified save-backed failures expose exact-key `Clean & Exit` through `recoverFailedGameSaveFx`; ordinary bootstrap failures expose query-only `Exit to Main Menu` through `discardFailedGameEngineFx`; both replace history with Main Menu and never loop automatically back into loading.
 

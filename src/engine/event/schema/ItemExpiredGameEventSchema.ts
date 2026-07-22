@@ -7,9 +7,7 @@ import { BoardLocationSchema } from "~/engine/location/schema/BoardLocationSchem
 
 export const ItemExpiredGameEventSchema = z
 	.object({
-		type: GameEventEnumSchema.extract([
-			GameEventEnumSchema.enum.ItemExpired,
-		]),
+		type: GameEventEnumSchema.extract(["ItemExpired"]),
 		itemId: IdSchema,
 		canonicalItemId: IdSchema,
 		location: BoardLocationSchema,

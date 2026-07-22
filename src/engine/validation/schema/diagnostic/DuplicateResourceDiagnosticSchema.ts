@@ -9,12 +9,8 @@ import { BaseDiagnosticSchema } from "./BaseDiagnosticSchema";
 export const DuplicateResourceDiagnosticSchema = z
 	.object({
 		...BaseDiagnosticSchema.shape,
-		code: DiagnosticCodeEnumSchema.extract([
-			DiagnosticCodeEnumSchema.enum.ResourceDuplicate,
-		]),
-		severity: DiagnosticSeverityEnumSchema.extract([
-			DiagnosticSeverityEnumSchema.enum.Error,
-		]),
+		code: DiagnosticCodeEnumSchema.extract(["ResourceDuplicate"]),
+		severity: DiagnosticSeverityEnumSchema.extract(["Error"]),
 		resourceId: IdSchema,
 		sources: z.tuple([
 			z.string().min(1),

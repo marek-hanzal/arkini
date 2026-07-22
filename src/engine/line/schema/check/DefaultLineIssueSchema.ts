@@ -8,9 +8,7 @@ import { IdSchema } from "~/engine/common/schema/IdSchema";
 /** One persisted default-line selection no longer belongs to its exact live owner. */
 export const DefaultLineIssueSchema = z
 	.object({
-		type: RuntimeCheckIssueEnumSchema.extract([
-			RuntimeCheckIssueEnumSchema.enum.DefaultLine,
-		]),
+		type: RuntimeCheckIssueEnumSchema.extract(["DefaultLine"]),
 		ownerItemId: IdSchema,
 		lineId: IdSchema,
 		reason: DefaultLineIssueReasonEnumSchema,

@@ -10,12 +10,8 @@ import { BaseDiagnosticSchema } from "./BaseDiagnosticSchema";
 export const UnsupportedInputCapacityDiagnosticSchema = z
 	.object({
 		...BaseDiagnosticSchema.shape,
-		code: DiagnosticCodeEnumSchema.extract([
-			DiagnosticCodeEnumSchema.enum.InputCapacityUnsupported,
-		]),
-		severity: DiagnosticSeverityEnumSchema.extract([
-			DiagnosticSeverityEnumSchema.enum.Error,
-		]),
+		code: DiagnosticCodeEnumSchema.extract(["InputCapacityUnsupported"]),
+		severity: DiagnosticSeverityEnumSchema.extract(["Error"]),
 		ownerItemId: IdSchema,
 		lineId: IdSchema,
 		inputIndex: z.number().int().nonnegative(),

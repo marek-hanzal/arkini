@@ -7,9 +7,7 @@ import { QueryScopeEnumSchema } from "./QueryScopeEnumSchema";
 export const QueryToolbarSchema = z
 	.object({
 		...BaseQuerySchema.shape,
-		scope: QueryScopeEnumSchema.extract([
-			QueryScopeEnumSchema.enum.Toolbar,
-		]).describe("Identifies this query as a toolbar-only query."),
+		scope: QueryScopeEnumSchema.extract(["Toolbar"]).describe("Identifies this query as a toolbar-only query."),
 	})
 	.strict()
 	.meta({

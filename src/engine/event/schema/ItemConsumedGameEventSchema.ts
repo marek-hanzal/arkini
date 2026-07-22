@@ -7,9 +7,7 @@ import { GameEventEnumSchema } from "./GameEventEnumSchema";
 /** One accepted input allocation changed one exact visible source identity. */
 export const ItemConsumedGameEventSchema = z
 	.object({
-		type: GameEventEnumSchema.extract([
-			GameEventEnumSchema.enum.ItemConsumed,
-		]),
+		type: GameEventEnumSchema.extract(["ItemConsumed"]),
 		sourceItemId: IdSchema,
 		canonicalItemId: IdSchema,
 		sourceLocation: InputLocationSchema,

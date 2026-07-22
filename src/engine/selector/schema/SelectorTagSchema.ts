@@ -14,9 +14,7 @@ export const SelectorTagSchema = z
 		/**
 		 * Identifies this selector as an item-tag selector.
 		 */
-		type: SelectorEnumSchema.extract([
-			SelectorEnumSchema.enum.Tag,
-		]).describe("Identifies this selector as an item-tag selector."),
+		type: SelectorEnumSchema.extract(["Tag"]).describe("Identifies this selector as an item-tag selector."),
 		/**
 		 * Semantic tag shared by every canonical item selected by this selector.
 		 */

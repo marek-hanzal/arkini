@@ -12,9 +12,7 @@ export const InputOwnerMissingIssueSchema = z
 	.object({
 		itemId: IdSchema.describe("The buffered material with a missing owner."),
 		location: InputLocationSchema.describe("The invalid input location."),
-		type: RuntimeCheckIssueEnumSchema.extract([
-			RuntimeCheckIssueEnumSchema.enum.InputOwnerMissing,
-		]),
+		type: RuntimeCheckIssueEnumSchema.extract(["InputOwnerMissing"]),
 	})
 	.strict()
 	.meta({

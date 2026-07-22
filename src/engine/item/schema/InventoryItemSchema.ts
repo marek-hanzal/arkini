@@ -12,12 +12,8 @@ import { ItemEnumSchema } from "./ItemEnumSchema";
 export const InventoryItemSchema = z
 	.object({
 		...BaseItemSchema.shape,
-		type: ItemEnumSchema.extract([
-			ItemEnumSchema.enum.Inventory,
-		]).describe("Identifies this item as the shared inventory opener."),
-		scope: StorageScopeEnumSchema.extract([
-			StorageScopeEnumSchema.enum.Board,
-		])
+		type: ItemEnumSchema.extract(["Inventory"]).describe("Identifies this item as the shared inventory opener."),
+		scope: StorageScopeEnumSchema.extract(["Board"])
 			.default(StorageScopeEnumSchema.enum.Board)
 			.describe("Keeps the inventory opener on the board."),
 		maxCount: PositiveIntegerSchema.max(1)

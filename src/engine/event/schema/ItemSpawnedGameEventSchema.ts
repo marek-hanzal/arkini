@@ -7,9 +7,7 @@ import { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema"
 
 export const ItemSpawnedGameEventSchema = z
 	.object({
-		type: GameEventEnumSchema.extract([
-			GameEventEnumSchema.enum.ItemSpawned,
-		]),
+		type: GameEventEnumSchema.extract(["ItemSpawned"]),
 		itemId: IdSchema,
 		canonicalItemId: IdSchema,
 		location: GridLocationSchema,

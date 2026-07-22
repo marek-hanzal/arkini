@@ -9,9 +9,7 @@ import { GameEventEnumSchema } from "./GameEventEnumSchema";
 /** One existing exact runtime identity became visible at a canonical grid anchor. */
 export const ItemPlacedGameEventSchema = z
 	.object({
-		type: GameEventEnumSchema.extract([
-			GameEventEnumSchema.enum.ItemPlaced,
-		]),
+		type: GameEventEnumSchema.extract(["ItemPlaced"]),
 		itemId: IdSchema,
 		canonicalItemId: IdSchema,
 		previousLocation: z.union([InputLocationSchema, ReservedLocationSchema]),

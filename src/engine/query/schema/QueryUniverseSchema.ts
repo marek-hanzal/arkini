@@ -12,9 +12,7 @@ import { QueryScopeEnumSchema } from "./QueryScopeEnumSchema";
 export const QueryUniverseSchema = z
 	.object({
 		...BaseQuerySchema.shape,
-		scope: QueryScopeEnumSchema.extract([
-			QueryScopeEnumSchema.enum.Universe,
-		]).describe("Searches every board space plus both passive storage surfaces."),
+		scope: QueryScopeEnumSchema.extract(["Universe"]).describe("Searches every board space plus both passive storage surfaces."),
 	})
 	.strict()
 	.meta({

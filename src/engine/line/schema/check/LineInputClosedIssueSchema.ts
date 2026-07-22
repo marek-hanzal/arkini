@@ -14,9 +14,7 @@ export const LineInputClosedIssueSchema = z
 		itemIds: z
 			.array(IdSchema)
 			.describe("The buffered runtime items illegally retained by the closed input."),
-		type: RuntimeCheckIssueEnumSchema.extract([
-			RuntimeCheckIssueEnumSchema.enum.LineInputClosed,
-		]),
+		type: RuntimeCheckIssueEnumSchema.extract(["LineInputClosed"]),
 	})
 	.strict()
 	.meta({

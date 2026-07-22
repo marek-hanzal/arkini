@@ -21,9 +21,7 @@ export const ProducerItemSchema = z
 		/**
 		 * Identifies this item as a producer with one or more product lines.
 		 */
-		type: ItemEnumSchema.extract([
-			ItemEnumSchema.enum.Producer,
-		]),
+		type: ItemEnumSchema.extract(["Producer"]),
 		/**
 		 * One or more product lines provided by this producer.
 		 */

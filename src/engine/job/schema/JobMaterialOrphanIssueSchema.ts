@@ -14,9 +14,7 @@ export const JobMaterialOrphanIssueSchema = z
 			JobLocationSchema,
 			ReservedLocationSchema,
 		]),
-		type: RuntimeCheckIssueEnumSchema.extract([
-			RuntimeCheckIssueEnumSchema.enum.JobMaterialOrphan,
-		]),
+		type: RuntimeCheckIssueEnumSchema.extract(["JobMaterialOrphan"]),
 	})
 	.strict()
 	.meta({

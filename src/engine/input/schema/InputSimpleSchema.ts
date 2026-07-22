@@ -15,9 +15,7 @@ export const InputSimpleSchema = z
 		/**
 		 * Identifies this input as having no consumable resource requirement.
 		 */
-		type: InputEnumSchema.extract([
-			InputEnumSchema.enum.Simple,
-		]).describe("Identifies this input as having no consumable resource requirement."),
+		type: InputEnumSchema.extract(["Simple"]).describe("Identifies this input as having no consumable resource requirement."),
 	})
 	.strict()
 	.meta({

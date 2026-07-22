@@ -6,9 +6,7 @@ export const JobOwnerMissingIssueSchema = z
 	.object({
 		jobId: IdSchema,
 		ownerItemId: IdSchema,
-		type: RuntimeCheckIssueEnumSchema.extract([
-			RuntimeCheckIssueEnumSchema.enum.JobOwnerMissing,
-		]),
+		type: RuntimeCheckIssueEnumSchema.extract(["JobOwnerMissing"]),
 	})
 	.strict()
 	.meta({

@@ -15,9 +15,7 @@ export const MergeRemoveSchema = z
 		/**
 		 * Identifies this merge as one that removes its selected target.
 		 */
-		effect: EffectEnumSchema.extract([
-			EffectEnumSchema.enum.Remove,
-		]).describe("Identifies this merge as one that removes its selected target."),
+		effect: EffectEnumSchema.extract(["Remove"]).describe("Identifies this merge as one that removes its selected target."),
 	})
 	.strict()
 	.meta({

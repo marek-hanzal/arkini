@@ -11,12 +11,8 @@ import { BaseDiagnosticSchema } from "./BaseDiagnosticSchema";
 export const InvalidInputChargesDiagnosticSchema = z
 	.object({
 		...BaseDiagnosticSchema.shape,
-		code: DiagnosticCodeEnumSchema.extract([
-			DiagnosticCodeEnumSchema.enum.InputChargesInvalid,
-		]),
-		severity: DiagnosticSeverityEnumSchema.extract([
-			DiagnosticSeverityEnumSchema.enum.Error,
-		]),
+		code: DiagnosticCodeEnumSchema.extract(["InputChargesInvalid"]),
+		severity: DiagnosticSeverityEnumSchema.extract(["Error"]),
 		ownerItemId: IdSchema,
 		lineId: IdSchema,
 		inputIndex: z.number().int().nonnegative(),

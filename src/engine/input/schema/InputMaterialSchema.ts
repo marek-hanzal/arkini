@@ -22,9 +22,7 @@ export const InputMaterialSchema = z
 		/**
 		 * Identifies this input as a directly delivered material item.
 		 */
-		type: InputEnumSchema.extract([
-			InputEnumSchema.enum.Materials,
-		]).describe("Identifies this input as a directly delivered material item."),
+		type: InputEnumSchema.extract(["Materials"]).describe("Identifies this input as a directly delivered material item."),
 		/**
 		 * Item or tag matching strategy for materials accepted by this input.
 		 */

@@ -7,9 +7,7 @@ import { LocationScopeEnumSchema } from "./LocationScopeEnumSchema";
 /** One concrete board-space location usable as a spatial gameplay origin. */
 export const BoardLocationSchema = z
 	.object({
-		scope: LocationScopeEnumSchema.extract([
-			LocationScopeEnumSchema.enum.Board,
-		]),
+		scope: LocationScopeEnumSchema.extract(["Board"]),
 		space: NonNegativeIntegerSchema.describe("The explicit board space containing the item."),
 		position: PositionSchema.describe("The coordinates inside the board space."),
 	})

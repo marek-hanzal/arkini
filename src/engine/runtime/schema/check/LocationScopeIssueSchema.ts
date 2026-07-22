@@ -16,9 +16,7 @@ export const LocationScopeIssueSchema = z
 		),
 		itemId: IdSchema.describe("The live item stored in a forbidden grid."),
 		location: GridLocationSchema.describe("The forbidden concrete item location."),
-		type: RuntimeCheckIssueEnumSchema.extract([
-			RuntimeCheckIssueEnumSchema.enum.LocationScope,
-		]),
+		type: RuntimeCheckIssueEnumSchema.extract(["LocationScope"]),
 	})
 	.strict()
 	.meta({

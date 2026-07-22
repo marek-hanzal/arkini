@@ -9,9 +9,7 @@ import { RuleEnumSchema } from "./RuleEnumSchema";
 export const RuleDisableResultSchema = z
 	.object({
 		...BaseRuleResultSchema.shape,
-		type: RuleEnumSchema.extract([
-			RuleEnumSchema.enum.Disable,
-		]).describe("Identifies this result as an evaluated selected-drop disable rule."),
+		type: RuleEnumSchema.extract(["Disable"]).describe("Identifies this result as an evaluated selected-drop disable rule."),
 	})
 	.strict()
 	.meta({

@@ -9,9 +9,7 @@ import { RuleEnumSchema } from "./RuleEnumSchema";
 export const RuleShowResultSchema = z
 	.object({
 		...BaseRuleResultSchema.shape,
-		type: RuleEnumSchema.extract([
-			RuleEnumSchema.enum.Show,
-		]).describe("Identifies this result as an evaluated product-line show rule."),
+		type: RuleEnumSchema.extract(["Show"]).describe("Identifies this result as an evaluated product-line show rule."),
 	})
 	.strict()
 	.meta({

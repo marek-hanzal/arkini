@@ -12,9 +12,7 @@ export const InputSimpleRunPlanSchema = z
 		/**
 		 * Identifies this plan as one simple input.
 		 */
-		type: InputEnumSchema.extract([
-			InputEnumSchema.enum.Simple,
-		]),
+		type: InputEnumSchema.extract(["Simple"]),
 		charges: InputChargeRunPlanSchema.optional().describe(
 			"The optional exact charge payment attached to this simple input.",
 		),

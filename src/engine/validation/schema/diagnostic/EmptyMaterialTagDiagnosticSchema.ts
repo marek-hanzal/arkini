@@ -10,12 +10,8 @@ import { BaseDiagnosticSchema } from "./BaseDiagnosticSchema";
 export const EmptyMaterialTagDiagnosticSchema = z
 	.object({
 		...BaseDiagnosticSchema.shape,
-		code: DiagnosticCodeEnumSchema.extract([
-			DiagnosticCodeEnumSchema.enum.InputMaterialTagEmpty,
-		]),
-		severity: DiagnosticSeverityEnumSchema.extract([
-			DiagnosticSeverityEnumSchema.enum.Error,
-		]),
+		code: DiagnosticCodeEnumSchema.extract(["InputMaterialTagEmpty"]),
+		severity: DiagnosticSeverityEnumSchema.extract(["Error"]),
 		ownerItemId: IdSchema,
 		lineId: IdSchema,
 		inputIndex: z.number().int().nonnegative(),

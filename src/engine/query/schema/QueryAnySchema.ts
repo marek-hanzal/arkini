@@ -15,9 +15,7 @@ export const QueryAnySchema = z
 		/**
 		 * Identifies this query as one that searches the origin-space board, shared inventory, and toolbar.
 		 */
-		scope: QueryScopeEnumSchema.extract([
-			QueryScopeEnumSchema.enum.Any,
-		]).describe(
+		scope: QueryScopeEnumSchema.extract(["Any"]).describe(
 			"Identifies this query as one that searches the origin-space board, shared inventory, and toolbar.",
 		),
 	})

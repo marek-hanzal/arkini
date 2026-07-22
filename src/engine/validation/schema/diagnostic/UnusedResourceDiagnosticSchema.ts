@@ -9,12 +9,8 @@ import { BaseDiagnosticSchema } from "./BaseDiagnosticSchema";
 export const UnusedResourceDiagnosticSchema = z
 	.object({
 		...BaseDiagnosticSchema.shape,
-		code: DiagnosticCodeEnumSchema.extract([
-			DiagnosticCodeEnumSchema.enum.ResourceUnused,
-		]),
-		severity: DiagnosticSeverityEnumSchema.extract([
-			DiagnosticSeverityEnumSchema.enum.Warning,
-		]),
+		code: DiagnosticCodeEnumSchema.extract(["ResourceUnused"]),
+		severity: DiagnosticSeverityEnumSchema.extract(["Warning"]),
 		resourceId: IdSchema,
 	})
 	.strict()

@@ -16,9 +16,7 @@ export const RuleDisableSchema = z
 		/**
 		 * Identifies this rule as a disable veto for the line.
 		 */
-		type: RuleEnumSchema.extract([
-			RuleEnumSchema.enum.Disable,
-		]).describe("Identifies this rule as a disable veto for the product line."),
+		type: RuleEnumSchema.extract(["Disable"]).describe("Identifies this rule as a disable veto for the product line."),
 	})
 	.strict()
 	.meta({

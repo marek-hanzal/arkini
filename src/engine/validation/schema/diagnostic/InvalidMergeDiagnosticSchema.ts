@@ -11,12 +11,8 @@ import { BaseDiagnosticSchema } from "./BaseDiagnosticSchema";
 export const InvalidMergeDiagnosticSchema = z
 	.object({
 		...BaseDiagnosticSchema.shape,
-		code: DiagnosticCodeEnumSchema.extract([
-			DiagnosticCodeEnumSchema.enum.MergeInvalid,
-		]),
-		severity: DiagnosticSeverityEnumSchema.extract([
-			DiagnosticSeverityEnumSchema.enum.Error,
-		]),
+		code: DiagnosticCodeEnumSchema.extract(["MergeInvalid"]),
+		severity: DiagnosticSeverityEnumSchema.extract(["Error"]),
 		ownerItemId: IdSchema,
 		mergeIndex: z.number().int().nonnegative(),
 		reason: InvalidMergeReasonEnumSchema,

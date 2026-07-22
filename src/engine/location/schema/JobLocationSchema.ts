@@ -7,9 +7,7 @@ import { LocationScopeEnumSchema } from "./LocationScopeEnumSchema";
 export const JobLocationSchema = z
 	.object({
 		/** Identifies this consumed root as owned by one active job. */
-		scope: LocationScopeEnumSchema.extract([
-			LocationScopeEnumSchema.enum.Job,
-		]),
+		scope: LocationScopeEnumSchema.extract(["Job"]),
 		/** Stable identity of the active job consuming this material. */
 		jobId: IdSchema.describe("The active job consuming this material root."),
 	})

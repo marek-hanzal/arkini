@@ -12,9 +12,7 @@ export const InputLocationSchema = z
 		/**
 		 * Identifies this location as one line-owned input buffer.
 		 */
-		scope: LocationScopeEnumSchema.extract([
-			LocationScopeEnumSchema.enum.Input,
-		]),
+		scope: LocationScopeEnumSchema.extract(["Input"]),
 		/**
 		 * Runtime identity of the item that owns the input buffer.
 		 */

@@ -11,9 +11,7 @@ export const JobConsumedMaterialStateIssueSchema = z
 		ownedItemIds: z.array(IdSchema),
 		ownedJobIds: z.array(IdSchema),
 		requestIds: z.array(IdSchema),
-		type: RuntimeCheckIssueEnumSchema.extract([
-			RuntimeCheckIssueEnumSchema.enum.JobConsumedMaterialState,
-		]),
+		type: RuntimeCheckIssueEnumSchema.extract(["JobConsumedMaterialState"]),
 	})
 	.strict()
 	.meta({

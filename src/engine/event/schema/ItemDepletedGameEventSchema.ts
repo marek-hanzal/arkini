@@ -7,9 +7,7 @@ import { GameEventEnumSchema } from "./GameEventEnumSchema";
 /** One exact charged item committed its final charge spend. */
 export const ItemDepletedGameEventSchema = z
 	.object({
-		type: GameEventEnumSchema.extract([
-			GameEventEnumSchema.enum.ItemDepleted,
-		]),
+		type: GameEventEnumSchema.extract(["ItemDepleted"]),
 		itemId: IdSchema,
 		canonicalItemId: IdSchema,
 		location: BoardLocationSchema,

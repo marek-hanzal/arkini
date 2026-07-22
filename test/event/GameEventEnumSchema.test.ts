@@ -19,6 +19,12 @@ describe("GameEventEnumSchema", () => {
 		]);
 	});
 
+	it("extracts variants by stable member names", () => {
+		expect(GameEventEnumSchema.extract(["ItemSpawned"]).options).toEqual([
+			GameEventEnumSchema.enum.ItemSpawned,
+		]);
+	});
+
 	it("rejects values outside the owned vocabulary", () => {
 		expect(GameEventEnumSchema.safeParse("item:changed").success).toBe(false);
 	});

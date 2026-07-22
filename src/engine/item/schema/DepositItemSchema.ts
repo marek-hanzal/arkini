@@ -7,9 +7,7 @@ import { ItemEnumSchema } from "./ItemEnumSchema";
 export const DepositItemSchema = z
 	.object({
 		...BaseItemSchema.shape,
-		type: ItemEnumSchema.extract([
-			ItemEnumSchema.enum.Deposit,
-		]),
+		type: ItemEnumSchema.extract(["Deposit"]),
 	})
 	.strict()
 	.meta({

@@ -9,9 +9,7 @@ import { RuleEnumSchema } from "./RuleEnumSchema";
 export const RuleDisableResultSchema = z
 	.object({
 		...BaseRuleResultSchema.shape,
-		type: RuleEnumSchema.extract([
-			RuleEnumSchema.enum.Disable,
-		]).describe("Identifies this result as an evaluated product-line disable rule."),
+		type: RuleEnumSchema.extract(["Disable"]).describe("Identifies this result as an evaluated product-line disable rule."),
 	})
 	.strict()
 	.meta({

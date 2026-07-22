@@ -10,12 +10,8 @@ import { BaseDiagnosticSchema } from "./BaseDiagnosticSchema";
 export const MissingReferenceDiagnosticSchema = z
 	.object({
 		...BaseDiagnosticSchema.shape,
-		code: DiagnosticCodeEnumSchema.extract([
-			DiagnosticCodeEnumSchema.enum.ConfigMissingReference,
-		]),
-		severity: DiagnosticSeverityEnumSchema.extract([
-			DiagnosticSeverityEnumSchema.enum.Error,
-		]),
+		code: DiagnosticCodeEnumSchema.extract(["ConfigMissingReference"]),
+		severity: DiagnosticSeverityEnumSchema.extract(["Error"]),
 		reference: DiagnosticRecordEntityEnumSchema,
 		referenceId: IdSchema,
 	})

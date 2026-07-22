@@ -10,9 +10,7 @@ import { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSch
 /** One live item's persisted charge state violates the canonical charge contract. */
 export const ItemChargesIssueSchema = z
 	.object({
-		type: RuntimeCheckIssueEnumSchema.extract([
-			RuntimeCheckIssueEnumSchema.enum.ItemCharges,
-		]),
+		type: RuntimeCheckIssueEnumSchema.extract(["ItemCharges"]),
 		itemId: IdSchema,
 		amount: PositiveIntegerSchema.optional(),
 		remainingCharges: NonNegativeIntegerSchema,

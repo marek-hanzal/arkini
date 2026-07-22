@@ -7,9 +7,7 @@ import { LocationScopeEnumSchema } from "./LocationScopeEnumSchema";
 export const ReservedLocationSchema = z
 	.object({
 		/** Identifies this item as unavailable while retained by an active job. */
-		scope: LocationScopeEnumSchema.extract([
-			LocationScopeEnumSchema.enum.Reserved,
-		]),
+		scope: LocationScopeEnumSchema.extract(["Reserved"]),
 		/** Stable identity of the active job retaining this item. */
 		jobId: IdSchema.describe("The active job retaining this runtime item."),
 	})

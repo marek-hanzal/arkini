@@ -15,9 +15,7 @@ import { ItemEnumSchema } from "./ItemEnumSchema";
 export const BlueprintItemSchema = z
 	.object({
 		...BaseItemSchema.shape,
-		type: ItemEnumSchema.extract([
-			ItemEnumSchema.enum.Blueprint,
-		]),
+		type: ItemEnumSchema.extract(["Blueprint"]),
 		line: LineSchema.describe("The one product line owned by this blueprint."),
 	})
 	.strict()

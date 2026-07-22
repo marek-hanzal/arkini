@@ -15,9 +15,7 @@ export const LocationOccupiedIssueSchema = z
 			.min(2)
 			.describe("The live item identities that own the same location."),
 		location: GridLocationSchema.describe("The concrete location owned more than once."),
-		type: RuntimeCheckIssueEnumSchema.extract([
-			RuntimeCheckIssueEnumSchema.enum.LocationOccupied,
-		]),
+		type: RuntimeCheckIssueEnumSchema.extract(["LocationOccupied"]),
 	})
 	.strict()
 	.meta({

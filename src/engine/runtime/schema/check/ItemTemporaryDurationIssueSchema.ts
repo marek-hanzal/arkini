@@ -10,9 +10,7 @@ import { LocationSchema } from "~/engine/location/schema/LocationSchema";
 /** One live item violates the canonical temporary-lifetime contract. */
 export const ItemTemporaryDurationIssueSchema = z
 	.object({
-		type: RuntimeCheckIssueEnumSchema.extract([
-			RuntimeCheckIssueEnumSchema.enum.ItemTemporaryDuration,
-		]),
+		type: RuntimeCheckIssueEnumSchema.extract(["ItemTemporaryDuration"]),
 		itemId: IdSchema,
 		durationMs: TimeSchema.optional(),
 		remainingDurationMs: TimeSchema.optional(),

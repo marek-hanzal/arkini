@@ -6,9 +6,7 @@ import { InputEnumSchema } from "~/engine/input/schema/InputEnumSchema";
 /** Current readiness of one external charged-item input. */
 export const InputDepositResolutionSchema = z
 	.object({
-		type: InputEnumSchema.extract([
-			InputEnumSchema.enum.Deposit,
-		]),
+		type: InputEnumSchema.extract(["Deposit"]),
 		ready: z.boolean().describe("Whether one matching board target can pay the authored cost."),
 		targetItemId: IdSchema.optional().describe(
 			"The selected runtime target identity, omitted while no matching charged target is ready.",

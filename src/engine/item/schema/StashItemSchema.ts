@@ -13,9 +13,7 @@ import { ItemEnumSchema } from "./ItemEnumSchema";
 export const StashItemSchema = z
 	.object({
 		...BaseItemSchema.shape,
-		type: ItemEnumSchema.extract([
-			ItemEnumSchema.enum.Stash,
-		]),
+		type: ItemEnumSchema.extract(["Stash"]),
 		line: LineSchema.describe("The one product line owned by this stash."),
 	})
 	.strict()

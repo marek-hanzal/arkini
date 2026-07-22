@@ -7,9 +7,7 @@ export const JobLineMissingIssueSchema = z
 		jobId: IdSchema,
 		ownerItemId: IdSchema,
 		lineId: IdSchema,
-		type: RuntimeCheckIssueEnumSchema.extract([
-			RuntimeCheckIssueEnumSchema.enum.JobLineMissing,
-		]),
+		type: RuntimeCheckIssueEnumSchema.extract(["JobLineMissing"]),
 	})
 	.strict()
 	.meta({

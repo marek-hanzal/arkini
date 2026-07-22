@@ -9,9 +9,7 @@ export const JobQueueExceededIssueSchema = z
 		jobIds: z.array(IdSchema).min(1),
 		maxQueueSize: PositiveIntegerSchema,
 		queueSize: PositiveIntegerSchema,
-		type: RuntimeCheckIssueEnumSchema.extract([
-			RuntimeCheckIssueEnumSchema.enum.JobQueueExceeded,
-		]),
+		type: RuntimeCheckIssueEnumSchema.extract(["JobQueueExceeded"]),
 	})
 	.strict()
 	.meta({

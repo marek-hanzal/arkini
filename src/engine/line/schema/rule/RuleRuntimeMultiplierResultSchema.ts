@@ -11,9 +11,7 @@ import { RuleEnumSchema } from "./RuleEnumSchema";
 export const RuleRuntimeMultiplierResultSchema = z
 	.object({
 		...BaseRuleResultSchema.shape,
-		type: RuleEnumSchema.extract([
-			RuleEnumSchema.enum.RuntimeMultiplier,
-		]).describe("Identifies this result as an evaluated product-line runtime multiplier rule."),
+		type: RuleEnumSchema.extract(["RuntimeMultiplier"]).describe("Identifies this result as an evaluated product-line runtime multiplier rule."),
 		multiplier: PositiveNumberSchema.describe(
 			"The runtime multiplier contributed when this evaluated rule is active.",
 		),

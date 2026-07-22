@@ -14,9 +14,7 @@ export const QueryBoardSchema = z
 		/**
 		 * Identifies this query as a board-only query.
 		 */
-		scope: QueryScopeEnumSchema.extract([
-			QueryScopeEnumSchema.enum.Board,
-		]).describe("Identifies this query as a board-only query."),
+		scope: QueryScopeEnumSchema.extract(["Board"]).describe("Identifies this query as a board-only query."),
 		/**
 		 * Chebyshev distance rule from the query origin to a matching item.
 		 *

@@ -10,9 +10,7 @@ export const InputSimpleResolutionSchema = z
 		/**
 		 * Identifies this resolution as one simple input.
 		 */
-		type: InputEnumSchema.extract([
-			InputEnumSchema.enum.Simple,
-		]),
+		type: InputEnumSchema.extract(["Simple"]),
 		/**
 		 * Simple inputs own no material operation but may still require an authored charge payment.
 		 */

@@ -12,9 +12,7 @@ import { DropItemResultKindEnumSchema } from "./DropItemResultKindEnumSchema";
 
 const DropItemMovedResultSchema = z
 	.object({
-		kind: DropItemResultKindEnumSchema.extract([
-			DropItemResultKindEnumSchema.enum.Move,
-		]),
+		kind: DropItemResultKindEnumSchema.extract(["Move"]),
 		itemId: IdSchema,
 		revision: RevisionSchema,
 		previousLocation: GridLocationSchema,
@@ -33,9 +31,7 @@ const DropItemSwappedActorSchema = z
 
 const DropItemSwappedResultSchema = z
 	.object({
-		kind: DropItemResultKindEnumSchema.extract([
-			DropItemResultKindEnumSchema.enum.Swap,
-		]),
+		kind: DropItemResultKindEnumSchema.extract(["Swap"]),
 		source: DropItemSwappedActorSchema,
 		target: DropItemSwappedActorSchema,
 	})
@@ -53,9 +49,7 @@ const DropItemMergeActorStateSchema = z
 
 const DropItemMergedResultSchema = z
 	.object({
-		kind: DropItemResultKindEnumSchema.extract([
-			DropItemResultKindEnumSchema.enum.Merge,
-		]),
+		kind: DropItemResultKindEnumSchema.extract(["Merge"]),
 		action: ActionEnumSchema,
 		effect: EffectEnumSchema,
 		resultCanonicalItemId: IdSchema.optional(),
@@ -82,9 +76,7 @@ const DropItemMergedResultSchema = z
 
 const DropItemIgnoredResultSchema = z
 	.object({
-		kind: DropItemResultKindEnumSchema.extract([
-			DropItemResultKindEnumSchema.enum.Ignored,
-		]),
+		kind: DropItemResultKindEnumSchema.extract(["Ignored"]),
 		reason: DropItemIgnoredReasonEnumSchema,
 		itemId: IdSchema,
 		location: GridLocationSchema,
@@ -93,9 +85,7 @@ const DropItemIgnoredResultSchema = z
 
 const DropItemRejectedResultSchema = z
 	.object({
-		kind: DropItemResultKindEnumSchema.extract([
-			DropItemResultKindEnumSchema.enum.Reject,
-		]),
+		kind: DropItemResultKindEnumSchema.extract(["Reject"]),
 		reason: DropItemRejectedReasonEnumSchema,
 		itemId: IdSchema,
 		targetItemId: IdSchema.optional(),

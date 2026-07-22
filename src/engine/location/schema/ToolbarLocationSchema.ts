@@ -6,9 +6,7 @@ import { LocationScopeEnumSchema } from "./LocationScopeEnumSchema";
 /** One concrete location in the universe-wide passive toolbar. */
 export const ToolbarLocationSchema = z
 	.object({
-		scope: LocationScopeEnumSchema.extract([
-			LocationScopeEnumSchema.enum.Toolbar,
-		]),
+		scope: LocationScopeEnumSchema.extract(["Toolbar"]),
 		position: PositionSchema.describe("The coordinates inside the one-row toolbar."),
 	})
 	.strict()

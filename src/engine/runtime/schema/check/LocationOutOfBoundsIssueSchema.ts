@@ -14,9 +14,7 @@ export const LocationOutOfBoundsIssueSchema = z
 		itemId: IdSchema.describe("The live item outside its grid bounds."),
 		location: GridLocationSchema.describe("The invalid concrete item location."),
 		size: GridBoundsSchema.describe("The configured bounds of the targeted grid."),
-		type: RuntimeCheckIssueEnumSchema.extract([
-			RuntimeCheckIssueEnumSchema.enum.LocationOutOfBounds,
-		]),
+		type: RuntimeCheckIssueEnumSchema.extract(["LocationOutOfBounds"]),
 	})
 	.strict()
 	.meta({

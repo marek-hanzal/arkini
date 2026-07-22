@@ -14,9 +14,7 @@ import { ItemEnumSchema } from "./ItemEnumSchema";
 export const CraftItemSchema = z
 	.object({
 		...BaseItemSchema.shape,
-		type: ItemEnumSchema.extract([
-			ItemEnumSchema.enum.Craft,
-		]),
+		type: ItemEnumSchema.extract(["Craft"]),
 		/**
 		 * The one product line owned by this craft.
 		 */

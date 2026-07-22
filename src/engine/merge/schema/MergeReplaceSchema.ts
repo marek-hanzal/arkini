@@ -14,9 +14,7 @@ export const MergeReplaceSchema = z
 		/**
 		 * Identifies this merge as one that replaces its selected target.
 		 */
-		effect: EffectEnumSchema.extract([
-			EffectEnumSchema.enum.Replace,
-		]).describe("Identifies this merge as one that replaces its selected target."),
+		effect: EffectEnumSchema.extract(["Replace"]).describe("Identifies this merge as one that replaces its selected target."),
 		/**
 		 * Canonical item that replaces the selected target.
 		 */

@@ -12,9 +12,7 @@ export const InputSlotInvalidIssueSchema = z
 	.object({
 		itemId: IdSchema.describe("The buffered material with an invalid input position."),
 		location: InputLocationSchema.describe("The invalid input location."),
-		type: RuntimeCheckIssueEnumSchema.extract([
-			RuntimeCheckIssueEnumSchema.enum.InputSlotInvalid,
-		]),
+		type: RuntimeCheckIssueEnumSchema.extract(["InputSlotInvalid"]),
 	})
 	.strict()
 	.meta({

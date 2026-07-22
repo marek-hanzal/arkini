@@ -150,6 +150,28 @@ describe("tile motion cue lifecycle", () => {
 		});
 	});
 
+	it("does not rerender the actor layer for an empty transition with the same live projection", async () => {
+		const liveItems = [item("runtime:stable")];
+		eventState.liveItems = liveItems;
+		eventState.source = createTransitionSource();
+		let renders = 0;
+		const Capture = () => {
+			renders += 1;
+			useTileMotionCues({ onSceneReset: vi.fn() });
+			return null;
+		};
+		const container = document.createElement("div");
+		document.body.append(container);
+		const root = createRoot(container);
+		roots.push(root);
+
+		await act(async () => root.render(createElement(Capture)));
+		expect(renders).toBe(1);
+
+		await dispatch([], liveItems);
+		expect(renders).toBe(1);
+	});
+
 	it("maps an existing identity placement to the shared spawn cue", async () => {
 		let current: ReturnType<typeof useTileMotionCues> | null = null;
 		const liveItems = [item("runtime:placed")];

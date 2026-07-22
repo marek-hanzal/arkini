@@ -37,6 +37,9 @@ const applyTransition = (
 	transition: TileActorTransitionSource["initial"],
 ): TileMotionCueState => {
 	if (transition.sequence <= current.sequence) return current;
+	if (transition.events.length === 0 && transition.liveItems === current.liveItems) {
+		return current;
+	}
 	const cues = new Map(current.cues);
 	const retained = new Map(current.retained);
 	const liveById = new Map([

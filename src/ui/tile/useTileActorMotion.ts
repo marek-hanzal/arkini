@@ -22,7 +22,7 @@ const settleTransition = {
 	mass: 0.68,
 };
 
-const interactionVisualFallbackMs = 2_000;
+const interactionCompletionFallbackMs = 2_000;
 
 const deliveryTransition = {
 	type: "tween" as const,
@@ -255,6 +255,9 @@ export const useTileActorMotion = ({
 			neighbourTargetX.set(0);
 			neighbourTargetY.set(0);
 			setVisible(initialized.current);
+			if (presentation.positionCompletion.kind !== "none" && canCompletePosition()) {
+				complete(item.id, presentation.positionCompletion.generation);
+			}
 			return;
 		}
 		const ownsSettlementMotion =
@@ -262,6 +265,9 @@ export const useTileActorMotion = ({
 			presentation.visualCompletionGeneration !== null;
 		if (placement === null) {
 			if (!ownsSettlementMotion && presentation.phase !== "targeted") setVisible(false);
+			if (presentation.positionCompletion.kind !== "none" && canCompletePosition()) {
+				complete(item.id, presentation.positionCompletion.generation);
+			}
 			return;
 		}
 
@@ -427,13 +433,27 @@ export const useTileActorMotion = ({
 		if (generation === null) return;
 		const fallback = setTimeout(
 			() => complete(item.id, generation),
-			interactionVisualFallbackMs,
+			interactionCompletionFallbackMs,
 		);
 		return () => clearTimeout(fallback);
 	}, [
 		complete,
 		item.id,
 		presentation.visualCompletionGeneration,
+	]);
+
+	useEffect(() => {
+		const completion = presentation.positionCompletion;
+		if (completion.kind === "none") return;
+		const fallback = setTimeout(
+			() => complete(item.id, completion.generation),
+			interactionCompletionFallbackMs,
+		);
+		return () => clearTimeout(fallback);
+	}, [
+		complete,
+		item.id,
+		presentation.positionCompletion,
 	]);
 
 	useEffect(() => {

@@ -1,11 +1,11 @@
 import { Effect } from "effect";
 
 import { isInstantGameplayEnabledFx } from "~/engine/cheat/read/isInstantGameplayEnabledFx";
-
 import { reviseRuntimeItemFx } from "~/engine/runtime/fx/reviseRuntimeItemFx";
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { TickStepMs } from "~/engine/tick/TickStepMs";
+import { ItemEnumSchema } from "~/engine/item/schema/ItemEnumSchema";
 
 export namespace advanceTemporaryItemDurationsFx {
 	export interface Props {
@@ -24,7 +24,7 @@ export const advanceTemporaryItemDurationsFx = Effect.fn("advanceTemporaryItemDu
 			const liveItem = draft.items.find((candidate) => candidate.id === snapshotItem.id);
 			if (
 				liveItem === undefined ||
-				liveItem.item.type !== "temporary" ||
+				liveItem.item.type !== ItemEnumSchema.enum.Temporary ||
 				liveItem.remainingDurationMs === undefined ||
 				liveItem.remainingDurationMs === 0
 			) {

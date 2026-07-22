@@ -1,17 +1,19 @@
 import { Effect } from "effect";
 
+import { EffectEnumSchema } from "~/engine/merge/schema/EffectEnumSchema";
 import { DiagnosticCodeEnumSchema } from "~/engine/validation/schema/DiagnosticCodeEnumSchema";
 import { DiagnosticSeverityEnumSchema } from "~/engine/validation/schema/DiagnosticSeverityEnumSchema";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
-
 import type { GameSourceProvenanceSchema } from "~/engine/source/schema/GameSourceProvenanceSchema";
 import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
+import type { GameDiagnosticsSchema } from "~/engine/validation/schema/GameDiagnosticsSchema";
+import { ItemEnumSchema } from "~/engine/item/schema/ItemEnumSchema";
+
 import { readItemOutputEntriesFx } from "../fx/readItemOutputEntriesFx";
 import {
 	readOutputRecreationCertaintyFx,
 	type OutputRecreationCertainty,
 } from "../fx/readOutputRecreationCertaintyFx";
-import type { GameDiagnosticsSchema } from "~/engine/validation/schema/GameDiagnosticsSchema";
 
 export namespace validateLimitedDepositsFx {
 	export interface Props {
@@ -37,7 +39,7 @@ export const validateLimitedDepositsFx = Effect.fn("validateLimitedDepositsFx")(
 	const certainty = new Map<IdSchema.Type, OutputRecreationCertainty>();
 	for (const [itemId, item] of Object.entries(config.items)) {
 		for (const merge of item.merge ?? []) {
-			if (merge.effect === "replace") {
+			if (merge.effect === EffectEnumSchema.enum.Replace) {
 				certainty.set(merge.result, "guaranteed");
 			}
 		}
@@ -47,7 +49,7 @@ export const validateLimitedDepositsFx = Effect.fn("validateLimitedDepositsFx")(
 		});
 		for (const { output } of outputs) {
 			for (const depositId of Object.keys(config.items)) {
-				if (config.items[depositId]?.type !== "deposit") continue;
+				if (config.items[depositId]?.type !== ItemEnumSchema.enum.Deposit) continue;
 				const outputCertainty = yield* readOutputRecreationCertaintyFx(output, depositId);
 				certainty.set(
 					depositId,
@@ -59,7 +61,7 @@ export const validateLimitedDepositsFx = Effect.fn("validateLimitedDepositsFx")(
 
 	const diagnostics: GameDiagnosticsSchema.Type = [];
 	for (const [itemId, item] of Object.entries(config.items)) {
-		if (item.type !== "deposit" || item.charges === undefined) continue;
+		if (item.type !== ItemEnumSchema.enum.Deposit || item.charges === undefined) continue;
 		const itemCertainty = certainty.get(itemId) ?? "none";
 		if (itemCertainty === "guaranteed") continue;
 		if (itemCertainty === "stochastic") {

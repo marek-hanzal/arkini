@@ -3,9 +3,12 @@ import { Effect } from "effect";
 import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import type { GameSourceProvenanceSchema } from "~/engine/source/schema/GameSourceProvenanceSchema";
 import type { GameDiagnosticsSchema } from "~/engine/validation/schema/GameDiagnosticsSchema";
-import { readItemLineEntriesFx } from "../fx/readItemLineEntriesFx";
 import { DiagnosticCodeEnumSchema } from "~/engine/validation/schema/DiagnosticCodeEnumSchema";
 import { DiagnosticSeverityEnumSchema } from "~/engine/validation/schema/DiagnosticSeverityEnumSchema";
+import { InputEnumSchema } from "~/engine/input/schema/InputEnumSchema";
+import { ItemEnumSchema } from "~/engine/item/schema/ItemEnumSchema";
+
+import { readItemLineEntriesFx } from "../fx/readItemLineEntriesFx";
 
 export namespace validateLineInputCapacityFx {
 	export interface Props {
@@ -22,7 +25,7 @@ export const validateLineInputCapacityFx = Effect.fn("validateLineInputCapacityF
 	const diagnostics: GameDiagnosticsSchema.Type = [];
 
 	for (const [itemId, item] of Object.entries(config.items)) {
-		if (item.type === "producer") {
+		if (item.type === ItemEnumSchema.enum.Producer) {
 			continue;
 		}
 		const lines = yield* readItemLineEntriesFx({
@@ -31,7 +34,7 @@ export const validateLineInputCapacityFx = Effect.fn("validateLineInputCapacityF
 		});
 		for (const { line, path } of lines) {
 			for (const [inputIndex, input] of line.input.entries()) {
-				if (input.type !== "materials" || input.capacity === 0) {
+				if (input.type !== InputEnumSchema.enum.Materials || input.capacity === 0) {
 					continue;
 				}
 				diagnostics.push({

@@ -1,6 +1,8 @@
 import { z } from "zod";
+
 import { LineSchema } from "~/engine/line/schema/LineSchema";
 import { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
+
 import { BaseItemSchema } from "./BaseItemSchema";
 import { ItemEnumSchema } from "./ItemEnumSchema";
 
@@ -20,7 +22,7 @@ export const ProducerItemSchema = z
 		 * Identifies this item as a producer with one or more product lines.
 		 */
 		type: ItemEnumSchema.extract([
-			"producer",
+			ItemEnumSchema.enum.Producer,
 		]),
 		/**
 		 * One or more product lines provided by this producer.

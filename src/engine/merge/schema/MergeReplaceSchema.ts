@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import { IdSchema } from "~/engine/common/schema/IdSchema";
+
 import { BaseMergeSchema } from "./BaseMergeSchema";
 import { EffectEnumSchema } from "./EffectEnumSchema";
 
@@ -14,7 +15,7 @@ export const MergeReplaceSchema = z
 		 * Identifies this merge as one that replaces its selected target.
 		 */
 		effect: EffectEnumSchema.extract([
-			"replace",
+			EffectEnumSchema.enum.Replace,
 		]).describe("Identifies this merge as one that replaces its selected target."),
 		/**
 		 * Canonical item that replaces the selected target.

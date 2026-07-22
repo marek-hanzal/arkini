@@ -1,6 +1,7 @@
 import { Effect } from "effect";
 import { match } from "ts-pattern";
 
+import { EffectEnumSchema } from "~/engine/merge/schema/EffectEnumSchema";
 import { ItemStatefulError } from "~/engine/item/error/ItemStatefulError";
 import { isItemPureFx } from "~/engine/item/fx/purity/isItemPureFx";
 import { resolveItemFx } from "~/engine/item/fx/resolveItemFx";
@@ -30,13 +31,13 @@ export const applyMergeTargetEffectFx = Effect.fn("applyMergeTargetEffectFx")(fu
 	return yield* match(rule)
 		.with(
 			{
-				effect: "keep",
+				effect: EffectEnumSchema.enum.Keep,
 			},
 			() => Effect.succeed(runtime),
 		)
 		.with(
 			{
-				effect: "remove",
+				effect: EffectEnumSchema.enum.Remove,
 			},
 			() =>
 				Effect.gen(function* () {
@@ -67,7 +68,7 @@ export const applyMergeTargetEffectFx = Effect.fn("applyMergeTargetEffectFx")(fu
 		)
 		.with(
 			{
-				effect: "replace",
+				effect: EffectEnumSchema.enum.Replace,
 			},
 			({ result }) =>
 				Effect.gen(function* () {

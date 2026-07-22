@@ -3,6 +3,8 @@ import { match } from "ts-pattern";
 
 import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import type { LineSchema } from "~/engine/line/schema/LineSchema";
+import { InputEnumSchema } from "~/engine/input/schema/InputEnumSchema";
+
 import type { DiagnosticPathSchema } from "../schema/DiagnosticPathSchema";
 import { validateSelectorReferenceFx } from "./validateSelectorReferenceFx";
 import { validateWhenReferenceFx } from "./validateWhenReferenceFx";
@@ -27,13 +29,13 @@ export const validateLineReferencesFx = Effect.fn("validateLineReferencesFx")(fu
 		match(input)
 			.with(
 				{
-					type: "simple",
+					type: InputEnumSchema.enum.Simple,
 				},
 				() => Effect.succeed([]),
 			)
 			.with(
 				{
-					type: "materials",
+					type: InputEnumSchema.enum.Materials,
 				},
 				({ selector }) =>
 					validateSelectorReferenceFx({
@@ -50,7 +52,7 @@ export const validateLineReferencesFx = Effect.fn("validateLineReferencesFx")(fu
 			)
 			.with(
 				{
-					type: "deposit",
+					type: InputEnumSchema.enum.Deposit,
 				},
 				({ query }) =>
 					validateSelectorReferenceFx({

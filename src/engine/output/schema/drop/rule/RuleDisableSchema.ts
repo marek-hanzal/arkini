@@ -16,7 +16,7 @@ export const RuleDisableSchema = z
 		 * Identifies this rule as a disable veto for the selected drop.
 		 */
 		type: RuleEnumSchema.extract([
-			"disable",
+			RuleEnumSchema.enum.Disable,
 		]).describe("Identifies this rule as a disable veto for the selected drop."),
 	})
 	.strict()

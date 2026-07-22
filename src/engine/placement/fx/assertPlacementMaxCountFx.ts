@@ -1,5 +1,6 @@
 import { Effect } from "effect";
 
+import { PlacementFailureReasonEnumSchema } from "~/engine/placement/schema/PlacementFailureReasonEnumSchema";
 import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import { readReservedJobOutputQuantityFx } from "~/engine/job/fx/read/readReservedJobOutputQuantityFx";
 import type { DropResultSchema } from "~/engine/output/schema/DropResultSchema";
@@ -43,7 +44,7 @@ export const assertPlacementMaxCountFx = Effect.fn("assertPlacementMaxCountFx")(
 			itemId: drop.itemId,
 			placement: drop.placement,
 			quantity: drop.quantity,
-			reason: "item:max-count",
+			reason: PlacementFailureReasonEnumSchema.enum.ItemMaxCount,
 			remainingQuantity: excessQuantity,
 		}),
 	);

@@ -1,7 +1,8 @@
 import { z } from "zod";
 
-import { BaseRollSchema } from "./BaseRollSchema";
 import { QuantitySchema } from "~/engine/quantity/schema/QuantitySchema";
+
+import { BaseRollSchema } from "./BaseRollSchema";
 import { RollEnumSchema } from "./RollEnumSchema";
 import { DropWeightSchema } from "./DropWeightSchema";
 
@@ -12,7 +13,7 @@ export const RollWeightSchema = z
 	.object({
 		...BaseRollSchema.shape,
 		type: RollEnumSchema.extract([
-			"weight",
+			RollEnumSchema.enum.Weight,
 		]),
 		/**
 		 * Number of independent weighted selections made by this roll.

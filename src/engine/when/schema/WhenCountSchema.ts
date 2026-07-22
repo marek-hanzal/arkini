@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeIntegerSchema";
+
 import { BaseWhenSchema } from "./BaseWhenSchema";
 import { WhenEnumSchema } from "./WhenEnumSchema";
 
@@ -14,7 +15,7 @@ export const WhenCountSchema = z
 		 * Identifies this condition as an exact item-query quantity check.
 		 */
 		type: WhenEnumSchema.extract([
-			"count",
+			WhenEnumSchema.enum.Count,
 		]).describe("Identifies this condition as an exact item-query quantity check."),
 		/**
 		 * Exact item quantity that the query must return.

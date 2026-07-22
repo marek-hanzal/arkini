@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import { PositiveNumberSchema } from "~/engine/common/schema/PositiveNumberSchema";
+
 import { BaseRuleSchema } from "./BaseRuleSchema";
 import { RuleEnumSchema } from "./RuleEnumSchema";
 
@@ -17,7 +18,7 @@ export const RuleRuntimeMultiplierSchema = z
 		 * Identifies this rule as a product-line runtime multiplier.
 		 */
 		type: RuleEnumSchema.extract([
-			"runtime:multiplier",
+			RuleEnumSchema.enum.RuntimeMultiplier,
 		]).describe("Identifies this rule as a product-line runtime multiplier."),
 		/**
 		 * Positive factor multiplied into this line's runtime.

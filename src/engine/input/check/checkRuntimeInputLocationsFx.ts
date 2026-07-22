@@ -1,7 +1,6 @@
 import { Effect } from "effect";
 
 import { RuntimeCheckIssueEnumSchema } from "~/engine/runtime/schema/check/RuntimeCheckIssueEnumSchema";
-
 import { resolveInputMaterialFx } from "~/engine/input/fx/resolveInputMaterialFx";
 import { readInputSlotLocationFx } from "~/engine/input/read/readInputSlotLocationFx";
 import type { InputMaterialSchema } from "~/engine/input/schema/InputMaterialSchema";
@@ -17,6 +16,7 @@ import { readItemLineFx } from "~/engine/line/fx/readItemLineFx";
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { selectItemsFx } from "~/engine/selector/fx/selectItemsFx";
+import { InputEnumSchema } from "~/engine/input/schema/InputEnumSchema";
 
 export namespace checkRuntimeInputLocationsFx {
 	export interface Props {
@@ -90,7 +90,7 @@ export const checkRuntimeInputLocationsFx = Effect.fn("checkRuntimeInputLocation
 		}
 
 		const input = line.input[location.inputIndex];
-		if (input === undefined || input.type !== "materials") {
+		if (input === undefined || input.type !== InputEnumSchema.enum.Materials) {
 			slotIssues.push({
 				itemId: item.id,
 				location,

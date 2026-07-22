@@ -1,6 +1,7 @@
 import { Effect } from "effect";
 import { match } from "ts-pattern";
 
+import type { DistanceEnumSchema } from "~/engine/distance/schema/DistanceEnumSchema";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { TimeSchema } from "~/engine/common/schema/TimeSchema";
 import type { InputChargeFromEnumSchema } from "~/engine/input/schema/InputChargeFromEnumSchema";
@@ -20,6 +21,9 @@ import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import type { SelectorSchema } from "~/engine/selector/schema/SelectorSchema";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 import { JobStatusEnumSchema } from "~/engine/job/schema/read/JobStatusEnumSchema";
+import { InputEnumSchema } from "~/engine/input/schema/InputEnumSchema";
+import { RollEnumSchema } from "~/engine/roll/schema/RollEnumSchema";
+import { SelectorEnumSchema } from "~/engine/selector/schema/SelectorEnumSchema";
 
 export namespace readItemDetailLinesFx {
 	export interface Props {
@@ -53,7 +57,7 @@ export namespace readItemDetailLinesFx {
 	export interface DepositInput {
 		readonly kind: "deposit";
 		readonly selector: SelectorSchema.Type;
-		readonly distance: "close" | "near" | "far";
+		readonly distance: DistanceEnumSchema.Type;
 		readonly requiredTargets: number;
 		readonly readyTargets: number;
 		readonly targetItemIds: readonly IdSchema.Type[];
@@ -171,13 +175,13 @@ const selectorKey = (selector: SelectorSchema.Type) =>
 	match(selector)
 		.with(
 			{
-				type: "item",
+				type: SelectorEnumSchema.enum.Item,
 			},
 			({ itemId }) => `item:${itemId}`,
 		)
 		.with(
 			{
-				type: "tag",
+				type: SelectorEnumSchema.enum.Tag,
 			},
 			({ tag }) => `tag:${tag}`,
 		)
@@ -227,12 +231,12 @@ const readInputs = ({
 		match(input)
 			.with(
 				{
-					type: "materials",
+					type: InputEnumSchema.enum.Materials,
 				},
 				(input) => {
 					const required = quantityBounds(input.quantity);
 					const storedQuantity =
-						resolution?.type === "materials"
+						resolution?.type === InputEnumSchema.enum.Materials
 							? resolution.storedQuantity
 							: inputItems({
 									inputIndex,
@@ -241,7 +245,7 @@ const readInputs = ({
 									runtime,
 								}).reduce((total, item) => total + item.quantity, 0);
 					const maxStoredQuantity =
-						resolution?.type === "materials"
+						resolution?.type === InputEnumSchema.enum.Materials
 							? resolution.maxStoredQuantity
 							: required.max + input.capacity;
 					const missingQuantity = Math.max(0, required.min - storedQuantity);
@@ -273,13 +277,13 @@ const readInputs = ({
 			)
 			.with(
 				{
-					type: "deposit",
+					type: InputEnumSchema.enum.Deposit,
 				},
 				(input) => {
 					const key = `${selectorKey(input.query.selector)}:${input.query.distance}:${chargeKey(input.charges)}`;
 					const previous = deposits.get(key);
 					const targetItemId =
-						resolution?.type === "deposit" ? resolution.targetItemId : undefined;
+						resolution?.type === InputEnumSchema.enum.Deposit ? resolution.targetItemId : undefined;
 					deposits.set(key, {
 						kind: "deposit",
 						selector: input.query.selector,
@@ -304,7 +308,7 @@ const readInputs = ({
 			)
 			.with(
 				{
-					type: "simple",
+					type: InputEnumSchema.enum.Simple,
 				},
 				(input) => {
 					if (input.charges === undefined) return;
@@ -352,7 +356,7 @@ const readRoll = (roll: RollSchema.Type): readItemDetailLinesFx.OutputRoll =>
 	match(roll)
 		.with(
 			{
-				type: "guaranteed",
+				type: RollEnumSchema.enum.Guaranteed,
 			},
 			({ drop }) => ({
 				kind: "guaranteed" as const,
@@ -361,7 +365,7 @@ const readRoll = (roll: RollSchema.Type): readItemDetailLinesFx.OutputRoll =>
 		)
 		.with(
 			{
-				type: "chance",
+				type: RollEnumSchema.enum.Chance,
 			},
 			({ chance, drop }) => ({
 				kind: "chance" as const,
@@ -371,7 +375,7 @@ const readRoll = (roll: RollSchema.Type): readItemDetailLinesFx.OutputRoll =>
 		)
 		.with(
 			{
-				type: "weight",
+				type: RollEnumSchema.enum.Weight,
 			},
 			({ quantity, drop }) => ({
 				kind: "weight" as const,

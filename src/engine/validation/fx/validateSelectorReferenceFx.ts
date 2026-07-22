@@ -1,14 +1,16 @@
 import { Effect } from "effect";
 import { match } from "ts-pattern";
 
+import { SelectorEnumSchema } from "~/engine/selector/schema/SelectorEnumSchema";
 import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import type { SelectorSchema } from "~/engine/selector/schema/SelectorSchema";
-import type { DiagnosticPathSchema } from "../schema/DiagnosticPathSchema";
-import type { GameDiagnosticSchema } from "../schema/GameDiagnosticSchema";
 import type { GameDiagnosticsSchema } from "~/engine/validation/schema/GameDiagnosticsSchema";
 import { DiagnosticCodeEnumSchema } from "~/engine/validation/schema/DiagnosticCodeEnumSchema";
 import { DiagnosticSeverityEnumSchema } from "~/engine/validation/schema/DiagnosticSeverityEnumSchema";
 import { DiagnosticRecordEntityEnumSchema } from "~/engine/validation/schema/DiagnosticRecordEntityEnumSchema";
+
+import type { DiagnosticPathSchema } from "../schema/DiagnosticPathSchema";
+import type { GameDiagnosticSchema } from "../schema/GameDiagnosticSchema";
 
 export namespace validateSelectorReferenceFx {
 	export interface Props {
@@ -29,13 +31,13 @@ export const validateSelectorReferenceFx = Effect.fn("validateSelectorReferenceF
 	return match(selector)
 		.with(
 			{
-				type: "tag",
+				type: SelectorEnumSchema.enum.Tag,
 			},
 			() => [] as GameDiagnosticsSchema.Type,
 		)
 		.with(
 			{
-				type: "item",
+				type: SelectorEnumSchema.enum.Item,
 			},
 			({ itemId }) => {
 				if (config.items[itemId] !== undefined) {

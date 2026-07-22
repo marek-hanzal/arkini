@@ -4,16 +4,10 @@ import { z } from "zod";
  * Discriminates the strategy used to select game items.
  */
 export const SelectorEnumSchema = z
-	.enum([
-		/**
-		 * Selects one specific item by its stable item ID.
-		 */
-		"item",
-		/**
-		 * Selects every item classified with one semantic tag.
-		 */
-		"tag",
-	])
+	.enum({
+		Item: "item",
+		Tag: "tag",
+	})
 	.meta({
 		id: "SelectorEnumSchema",
 		description: "The strategy used to select game items.",

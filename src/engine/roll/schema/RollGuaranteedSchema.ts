@@ -1,7 +1,8 @@
 import { z } from "zod";
 
-import { BaseRollSchema } from "./BaseRollSchema";
 import { DropSchema } from "~/engine/output/schema/DropSchema";
+
+import { BaseRollSchema } from "./BaseRollSchema";
 import { RollEnumSchema } from "./RollEnumSchema";
 
 /**
@@ -11,7 +12,7 @@ export const RollGuaranteedSchema = z
 	.object({
 		...BaseRollSchema.shape,
 		type: RollEnumSchema.extract([
-			"guaranteed",
+			RollEnumSchema.enum.Guaranteed,
 		]),
 		/**
 		 * One or more items emitted when this roll succeeds.

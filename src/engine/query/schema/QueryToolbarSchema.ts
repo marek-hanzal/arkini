@@ -8,7 +8,7 @@ export const QueryToolbarSchema = z
 	.object({
 		...BaseQuerySchema.shape,
 		scope: QueryScopeEnumSchema.extract([
-			"toolbar",
+			QueryScopeEnumSchema.enum.Toolbar,
 		]).describe("Identifies this query as a toolbar-only query."),
 	})
 	.strict()

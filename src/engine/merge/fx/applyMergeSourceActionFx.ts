@@ -3,13 +3,14 @@ import { Effect } from "effect";
 import { ItemStatefulError } from "~/engine/item/error/ItemStatefulError";
 import { isItemPureFx } from "~/engine/item/fx/purity/isItemPureFx";
 import { assertOwnerIdleFx } from "~/engine/job/fx/assertOwnerIdleFx";
-import type { ActionEnumSchema } from "~/engine/merge/schema/ActionEnumSchema";
+import { ActionEnumSchema } from "~/engine/merge/schema/ActionEnumSchema";
 import type { DropResultSchema } from "~/engine/output/schema/DropResultSchema";
 import { discardRuntimeItemOwnedStateFx } from "~/engine/runtime/fx/discardRuntimeItemOwnedStateFx";
 import { removeRuntimeItemIdentityFx } from "~/engine/runtime/fx/removeRuntimeItemIdentityFx";
 import { reviseRuntimeItemFx } from "~/engine/runtime/fx/reviseRuntimeItemFx";
 import type { GridRuntimeItemSchema } from "~/engine/runtime/schema/GridRuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import { PlacementEnumSchema } from "~/engine/placement/schema/PlacementEnumSchema";
 
 export namespace applyMergeSourceActionFx {
 	export interface Props {
@@ -35,7 +36,7 @@ export const applyMergeSourceActionFx = Effect.fn("applyMergeSourceActionFx")(fu
 		runtime,
 	});
 
-	if (action === "use") {
+	if (action === ActionEnumSchema.enum.Use) {
 		const pure = yield* isItemPureFx({
 			item: source,
 			runtime,
@@ -63,7 +64,7 @@ export const applyMergeSourceActionFx = Effect.fn("applyMergeSourceActionFx")(fu
 		};
 	} else {
 		const withoutOwnedState =
-			action === "consume"
+			action === ActionEnumSchema.enum.Consume
 				? yield* discardRuntimeItemOwnedStateFx({
 						ownerItemId: source.id,
 						runtime,
@@ -77,10 +78,10 @@ export const applyMergeSourceActionFx = Effect.fn("applyMergeSourceActionFx")(fu
 
 	return {
 		returnDrop:
-			action === "use"
+			action === ActionEnumSchema.enum.Use
 				? {
 						itemId: source.item.id,
-						placement: "drop",
+						placement: PlacementEnumSchema.enum.Drop,
 						quantity: 1,
 					}
 				: undefined,

@@ -12,6 +12,7 @@ import { createRuntimeItemFx } from "~/engine/runtime/fx/createRuntimeItemFx";
 import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
 import { isGridRuntimeItem } from "~/engine/runtime/read/isGridRuntimeItem";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import { PlacementEnumSchema } from "~/engine/placement/schema/PlacementEnumSchema";
 
 export namespace spawnItemFx {
 	export interface Props {
@@ -74,7 +75,7 @@ export const spawnItemFx = Effect.fn("spawnItemFx")(function* ({
 			yield* assertPlacementMaxCountFx({
 				drop: {
 					itemId,
-					placement: "drop",
+					placement: PlacementEnumSchema.enum.Drop,
 					quantity,
 				},
 				item,

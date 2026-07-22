@@ -1,5 +1,6 @@
 import { Effect } from "effect";
 
+import { InputChargeFromEnumSchema } from "~/engine/input/schema/InputChargeFromEnumSchema";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { InputChargeSchema } from "~/engine/input/schema/InputChargeSchema";
 import type { InputChargeRunPlanSchema } from "~/engine/input/schema/run/InputChargeRunPlanSchema";
@@ -36,7 +37,7 @@ export const resolveInputChargeRunFx = Effect.fn("resolveInputChargeRunFx")(func
 		} satisfies resolveInputChargeRunFx.Result;
 	}
 
-	const itemId = charges.from === "self" ? ownerItemId : targetItemId;
+	const itemId = charges.from === InputChargeFromEnumSchema.enum.Self ? ownerItemId : targetItemId;
 	if (itemId === undefined) {
 		return {
 			ready: false,

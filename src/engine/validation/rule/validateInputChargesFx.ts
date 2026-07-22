@@ -1,14 +1,18 @@
 import { Effect } from "effect";
 
+import { InputChargeFromEnumSchema } from "~/engine/input/schema/InputChargeFromEnumSchema";
 import { selectItemsFx } from "~/engine/selector/fx/selectItemsFx";
 import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import type { GameSourceProvenanceSchema } from "~/engine/source/schema/GameSourceProvenanceSchema";
 import type { GameDiagnosticsSchema } from "~/engine/validation/schema/GameDiagnosticsSchema";
-import { readItemLineEntriesFx } from "../fx/readItemLineEntriesFx";
 import { DiagnosticCodeEnumSchema } from "~/engine/validation/schema/DiagnosticCodeEnumSchema";
 import { DiagnosticSeverityEnumSchema } from "~/engine/validation/schema/DiagnosticSeverityEnumSchema";
 import { InvalidInputChargesReasonEnumSchema } from "~/engine/validation/schema/InvalidInputChargesReasonEnumSchema";
 import { StorageScopeEnumSchema } from "~/engine/scope/schema/StorageScopeEnumSchema";
+import { InputEnumSchema } from "~/engine/input/schema/InputEnumSchema";
+import { SelectorEnumSchema } from "~/engine/selector/schema/SelectorEnumSchema";
+
+import { readItemLineEntriesFx } from "../fx/readItemLineEntriesFx";
 
 export namespace validateInputChargesFx {
 	export interface Props {
@@ -45,7 +49,7 @@ export const validateInputChargesFx = Effect.fn("validateInputChargesFx")(functi
 					inputIndex,
 					"charges",
 				];
-				if (input.type === "deposit" && input.charges === undefined) {
+				if (input.type === InputEnumSchema.enum.Deposit && input.charges === undefined) {
 					diagnostics.push({
 						code: DiagnosticCodeEnumSchema.enum.InputChargesInvalid,
 						severity: DiagnosticSeverityEnumSchema.enum.Error,
@@ -61,8 +65,8 @@ export const validateInputChargesFx = Effect.fn("validateInputChargesFx")(functi
 				}
 				if (input.charges === undefined) continue;
 
-				if (input.charges.from === "self") {
-					if (input.type === "deposit") {
+				if (input.charges.from === InputChargeFromEnumSchema.enum.Self) {
+					if (input.type === InputEnumSchema.enum.Deposit) {
 						diagnostics.push({
 							code: DiagnosticCodeEnumSchema.enum.InputChargesInvalid,
 							severity: DiagnosticSeverityEnumSchema.enum.Error,
@@ -107,7 +111,7 @@ export const validateInputChargesFx = Effect.fn("validateInputChargesFx")(functi
 					continue;
 				}
 
-				if (input.type !== "deposit") {
+				if (input.type !== InputEnumSchema.enum.Deposit) {
 					diagnostics.push({
 						code: DiagnosticCodeEnumSchema.enum.InputChargesInvalid,
 						severity: DiagnosticSeverityEnumSchema.enum.Error,
@@ -122,7 +126,7 @@ export const validateInputChargesFx = Effect.fn("validateInputChargesFx")(functi
 					continue;
 				}
 
-				if (input.query.selector.type === "item") {
+				if (input.query.selector.type === SelectorEnumSchema.enum.Item) {
 					const payerItemId = input.query.selector.itemId;
 					const current = exactTargetCosts.get(payerItemId);
 					exactTargetCosts.set(payerItemId, {
@@ -138,7 +142,7 @@ export const validateInputChargesFx = Effect.fn("validateInputChargesFx")(functi
 				});
 				const available = matchedCandidates.some((candidate) => {
 					return (
-						(candidate.scope === StorageScopeEnumSchema.enum.board || candidate.scope === StorageScopeEnumSchema.enum.any) &&
+						(candidate.scope === StorageScopeEnumSchema.enum.Board || candidate.scope === StorageScopeEnumSchema.enum.Any) &&
 						candidate.charges !== undefined &&
 						candidate.charges.amount >= targetChargeCost
 					);
@@ -162,7 +166,7 @@ export const validateInputChargesFx = Effect.fn("validateInputChargesFx")(functi
 				const payer = config.items[payerItemId];
 				if (
 					payer === undefined ||
-					(payer.scope !== StorageScopeEnumSchema.enum.board && payer.scope !== StorageScopeEnumSchema.enum.any) ||
+					(payer.scope !== StorageScopeEnumSchema.enum.Board && payer.scope !== StorageScopeEnumSchema.enum.Any) ||
 					payer.charges === undefined ||
 					payer.maxCount === undefined
 				) {

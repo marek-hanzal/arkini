@@ -2,10 +2,13 @@ import { Effect } from "effect";
 
 import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import type { GameSourceProvenanceSchema } from "~/engine/source/schema/GameSourceProvenanceSchema";
-import { readItemLineEntriesFx } from "../fx/readItemLineEntriesFx";
-import type { GameDiagnosticsSchema } from "../schema/GameDiagnosticsSchema";
 import { DiagnosticCodeEnumSchema } from "~/engine/validation/schema/DiagnosticCodeEnumSchema";
 import { DiagnosticSeverityEnumSchema } from "~/engine/validation/schema/DiagnosticSeverityEnumSchema";
+import { InputEnumSchema } from "~/engine/input/schema/InputEnumSchema";
+import { SelectorEnumSchema } from "~/engine/selector/schema/SelectorEnumSchema";
+
+import { readItemLineEntriesFx } from "../fx/readItemLineEntriesFx";
+import type { GameDiagnosticsSchema } from "../schema/GameDiagnosticsSchema";
 
 export namespace validateMaterialTagSelectorsFx {
 	export interface Props {
@@ -25,7 +28,7 @@ export const validateMaterialTagSelectorsFx = Effect.fn("validateMaterialTagSele
 			});
 			for (const { line, path } of entries) {
 				for (const [inputIndex, input] of line.input.entries()) {
-					if (input.type !== "materials" || input.selector.type !== "tag") {
+					if (input.type !== InputEnumSchema.enum.Materials || input.selector.type !== SelectorEnumSchema.enum.Tag) {
 						continue;
 					}
 					const tag = input.selector.tag;

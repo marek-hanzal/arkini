@@ -8,7 +8,7 @@ export const DepositItemSchema = z
 	.object({
 		...BaseItemSchema.shape,
 		type: ItemEnumSchema.extract([
-			"deposit",
+			ItemEnumSchema.enum.Deposit,
 		]),
 	})
 	.strict()

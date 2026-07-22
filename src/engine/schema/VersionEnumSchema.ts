@@ -4,9 +4,9 @@ import { z } from "zod";
  * Versions of the top-level game configuration format supported by the game.
  */
 export const VersionEnumSchema = z
-	.enum([
-		"1.0",
-	])
+	.enum({
+		V1: "1.0",
+	})
 	.meta({
 		id: "VersionEnumSchema",
 		description: "The supported game configuration format version.",

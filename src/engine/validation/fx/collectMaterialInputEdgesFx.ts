@@ -1,8 +1,11 @@
 import { Effect } from "effect";
 import { match } from "ts-pattern";
 
+import { SelectorEnumSchema } from "~/engine/selector/schema/SelectorEnumSchema";
 import type { GameSourceProvenanceSchema } from "~/engine/source/schema/GameSourceProvenanceSchema";
 import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
+import { InputEnumSchema } from "~/engine/input/schema/InputEnumSchema";
+
 import type { MaterialInputEdgeSchema } from "../schema/MaterialInputEdgeSchema";
 import { readItemLineEntriesFx } from "./readItemLineEntriesFx";
 
@@ -28,14 +31,14 @@ export const collectMaterialInputEdgesFx = Effect.fn("collectMaterialInputEdgesF
 
 		for (const { line, path } of lines) {
 			for (const [inputIndex, input] of line.input.entries()) {
-				if (input.type !== "materials") {
+				if (input.type !== InputEnumSchema.enum.Materials) {
 					continue;
 				}
 
 				const acceptedItemIds = match(input.selector)
 					.with(
 						{
-							type: "item",
+							type: SelectorEnumSchema.enum.Item,
 						},
 						({ itemId }) =>
 							config.items[itemId] === undefined
@@ -46,7 +49,7 @@ export const collectMaterialInputEdgesFx = Effect.fn("collectMaterialInputEdgesF
 					)
 					.with(
 						{
-							type: "tag",
+							type: SelectorEnumSchema.enum.Tag,
 						},
 						({ tag }) =>
 							Object.entries(config.items)

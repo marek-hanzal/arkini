@@ -1,8 +1,9 @@
 import { z } from "zod";
 
+import { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
+
 import { BaseQuantitySchema } from "./BaseQuantitySchema";
 import { QuantityEnumSchema } from "./QuantityEnumSchema";
-import { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
 
 /**
  * An inclusive range from which a positive item quantity is selected.
@@ -11,7 +12,7 @@ export const QuantityRangeSchema = z
 	.object({
 		...BaseQuantitySchema.shape,
 		type: QuantityEnumSchema.extract([
-			"range",
+			QuantityEnumSchema.enum.Range,
 		]),
 		/**
 		 * The smallest quantity that can be selected from this range.

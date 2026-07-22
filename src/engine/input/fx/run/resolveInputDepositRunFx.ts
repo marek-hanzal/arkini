@@ -9,6 +9,8 @@ import { RuntimeFx } from "~/engine/runtime/context/RuntimeFx";
 import { isBoardRuntimeItem } from "~/engine/runtime/read/isBoardRuntimeItem";
 import { readRuntimeItemByIdFx } from "~/engine/runtime/read/readRuntimeItemByIdFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import { InputEnumSchema } from "~/engine/input/schema/InputEnumSchema";
+
 import { resolveInputChargeRunFx } from "./resolveInputChargeRunFx";
 
 export namespace resolveInputDepositRunFx {
@@ -105,12 +107,12 @@ export const resolveInputDepositRunFx = Effect.fn("resolveInputDepositRunFx")(fu
 
 		return {
 			resolution: {
-				type: "deposit",
+				type: InputEnumSchema.enum.Deposit,
 				ready: true,
 				targetItemId: target.id,
 			},
 			plan: {
-				type: "deposit",
+				type: InputEnumSchema.enum.Deposit,
 				charges: charges.plan,
 			},
 		} satisfies InputRunResolutionSchema.Type;
@@ -118,7 +120,7 @@ export const resolveInputDepositRunFx = Effect.fn("resolveInputDepositRunFx")(fu
 
 	return {
 		resolution: {
-			type: "deposit",
+			type: InputEnumSchema.enum.Deposit,
 			ready: false,
 		},
 		plan: undefined,

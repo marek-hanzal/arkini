@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import { QueryBoardSchema } from "~/engine/query/schema/QueryBoardSchema";
+
 import { BaseInputSchema } from "./BaseInputSchema";
 import { InputEnumSchema } from "./InputEnumSchema";
 
@@ -17,7 +18,7 @@ export const InputDepositSchema = z
 		 * Identifies this input as one external charged-item target on the board.
 		 */
 		type: InputEnumSchema.extract([
-			"deposit",
+			InputEnumSchema.enum.Deposit,
 		]).describe("Identifies this input as one external charged-item target on the board."),
 		/**
 		 * Board query used to select one charged target for this input.

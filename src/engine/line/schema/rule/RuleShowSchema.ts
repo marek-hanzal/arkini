@@ -13,7 +13,7 @@ export const RuleShowSchema = z
 		 * Identifies this rule as a conditional request to show the line.
 		 */
 		type: RuleEnumSchema.extract([
-			"show",
+			RuleEnumSchema.enum.Show,
 		]).describe("Identifies this rule as a request to show the product line."),
 	})
 	.strict()

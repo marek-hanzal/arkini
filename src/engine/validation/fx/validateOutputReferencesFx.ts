@@ -3,12 +3,14 @@ import { Effect } from "effect";
 import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import type { DropSchema } from "~/engine/output/schema/DropSchema";
 import type { OutputSchema } from "~/engine/output/schema/OutputSchema";
-import type { DiagnosticPathSchema } from "../schema/DiagnosticPathSchema";
-import { validateWhenReferenceFx } from "./validateWhenReferenceFx";
 import type { GameDiagnosticsSchema } from "~/engine/validation/schema/GameDiagnosticsSchema";
 import { DiagnosticCodeEnumSchema } from "~/engine/validation/schema/DiagnosticCodeEnumSchema";
 import { DiagnosticSeverityEnumSchema } from "~/engine/validation/schema/DiagnosticSeverityEnumSchema";
 import { DiagnosticRecordEntityEnumSchema } from "~/engine/validation/schema/DiagnosticRecordEntityEnumSchema";
+import { RollEnumSchema } from "~/engine/roll/schema/RollEnumSchema";
+
+import type { DiagnosticPathSchema } from "../schema/DiagnosticPathSchema";
+import { validateWhenReferenceFx } from "./validateWhenReferenceFx";
 
 export namespace validateOutputReferencesFx {
 	export interface Props {
@@ -80,7 +82,7 @@ export const validateOutputReferencesFx = Effect.fn("validateOutputReferencesFx"
 
 	for (const [setIndex, set] of output.set.entries()) {
 		for (const [rollIndex, roll] of set.roll.entries()) {
-			if (roll.type === "guaranteed" || roll.type === "chance") {
+			if (roll.type === RollEnumSchema.enum.Guaranteed || roll.type === RollEnumSchema.enum.Chance) {
 				for (const [dropIndex, drop] of roll.drop.entries()) {
 					diagnostics.push(
 						...(yield* validateDropFx({

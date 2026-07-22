@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import { LineSchema } from "~/engine/line/schema/LineSchema";
+
 import { BaseItemSchema } from "./BaseItemSchema";
 import { ItemEnumSchema } from "./ItemEnumSchema";
 
@@ -15,7 +16,7 @@ export const BlueprintItemSchema = z
 	.object({
 		...BaseItemSchema.shape,
 		type: ItemEnumSchema.extract([
-			"blueprint",
+			ItemEnumSchema.enum.Blueprint,
 		]),
 		line: LineSchema.describe("The one product line owned by this blueprint."),
 	})

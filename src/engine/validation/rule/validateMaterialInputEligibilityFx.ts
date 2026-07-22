@@ -4,10 +4,12 @@ import { readMaterialInputEligibilityFx } from "~/engine/input/read/readMaterial
 import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { selectItemsFx } from "~/engine/selector/fx/selectItemsFx";
 import type { GameSourceProvenanceSchema } from "~/engine/source/schema/GameSourceProvenanceSchema";
-import { readItemLineEntriesFx } from "../fx/readItemLineEntriesFx";
-import type { GameDiagnosticsSchema } from "../schema/GameDiagnosticsSchema";
 import { DiagnosticCodeEnumSchema } from "~/engine/validation/schema/DiagnosticCodeEnumSchema";
 import { DiagnosticSeverityEnumSchema } from "~/engine/validation/schema/DiagnosticSeverityEnumSchema";
+import { InputEnumSchema } from "~/engine/input/schema/InputEnumSchema";
+
+import { readItemLineEntriesFx } from "../fx/readItemLineEntriesFx";
+import type { GameDiagnosticsSchema } from "../schema/GameDiagnosticsSchema";
 
 export namespace validateMaterialInputEligibilityFx {
 	export interface Props {
@@ -29,7 +31,7 @@ export const validateMaterialInputEligibilityFx = Effect.fn("validateMaterialInp
 			});
 			for (const { line, path } of entries) {
 				for (const [inputIndex, input] of line.input.entries()) {
-					if (input.type !== "materials") continue;
+					if (input.type !== InputEnumSchema.enum.Materials) continue;
 
 					const matchedItems = yield* selectItemsFx({
 						items: canonicalItems,

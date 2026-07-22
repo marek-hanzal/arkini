@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { match } from "ts-pattern";
 
-import type { DistanceEnumSchema } from "~/engine/distance/schema/DistanceEnumSchema";
+import { DistanceEnumSchema } from "~/engine/distance/schema/DistanceEnumSchema";
 import type { PositionSchema } from "~/engine/grid/schema/PositionSchema";
 
 export namespace distanceFx {
@@ -28,13 +28,13 @@ export const distanceFx = Effect.fn("distanceFx")(function* ({
 	const value = Math.max(width, height);
 
 	return match(distance)
-		.with("close", () => {
+		.with(DistanceEnumSchema.enum.Close, () => {
 			return value === 1;
 		})
-		.with("near", () => {
+		.with(DistanceEnumSchema.enum.Near, () => {
 			return value === 2;
 		})
-		.with("far", () => {
+		.with(DistanceEnumSchema.enum.Far, () => {
 			return value > 0;
 		})
 		.exhaustive();

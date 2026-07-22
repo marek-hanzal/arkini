@@ -8,10 +8,10 @@ import { StorageScopeEnumSchema } from "~/engine/scope/schema/StorageScopeEnumSc
  * `universe` is query reach only and is never a valid item storage scope.
  */
 export const QueryScopeEnumSchema = z
-	.enum([
-		...StorageScopeEnumSchema.options,
-		"universe",
-	])
+	.enum({
+		...StorageScopeEnumSchema.enum,
+		Universe: "universe",
+	})
 	.meta({
 		id: "QueryScopeEnumSchema",
 		description:

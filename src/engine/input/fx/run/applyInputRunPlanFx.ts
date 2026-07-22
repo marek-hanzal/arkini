@@ -1,12 +1,14 @@
 import { Effect } from "effect";
 import { match } from "ts-pattern";
 
+import { InputModeEnumSchema } from "~/engine/input/schema/InputModeEnumSchema";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeIntegerSchema";
 import { applyInputMaterialConsumeRunPlanFx } from "~/engine/input/fx/run/applyInputMaterialConsumeRunPlanFx";
 import { applyInputMaterialReserveRunPlanFx } from "~/engine/input/fx/run/applyInputMaterialReserveRunPlanFx";
 import type { InputRunPlanSchema } from "~/engine/input/schema/run/InputRunPlanSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import { InputEnumSchema } from "~/engine/input/schema/InputEnumSchema";
 
 export namespace applyInputRunPlanFx {
 	export interface Props {
@@ -36,7 +38,7 @@ export const applyInputRunPlanFx = Effect.fn("applyInputRunPlanFx")(function* ({
 	return yield* match(plan)
 		.with(
 			{
-				type: "simple",
+				type: InputEnumSchema.enum.Simple,
 			},
 			() =>
 				Effect.succeed({
@@ -46,8 +48,8 @@ export const applyInputRunPlanFx = Effect.fn("applyInputRunPlanFx")(function* ({
 		)
 		.with(
 			{
-				type: "materials",
-				mode: "consume",
+				type: InputEnumSchema.enum.Materials,
+				mode: InputModeEnumSchema.enum.Consume,
 			},
 			(plan) =>
 				applyInputMaterialConsumeRunPlanFx({
@@ -61,8 +63,8 @@ export const applyInputRunPlanFx = Effect.fn("applyInputRunPlanFx")(function* ({
 		)
 		.with(
 			{
-				type: "materials",
-				mode: "reserve",
+				type: InputEnumSchema.enum.Materials,
+				mode: InputModeEnumSchema.enum.Reserve,
 			},
 			(plan) =>
 				applyInputMaterialReserveRunPlanFx({
@@ -84,7 +86,7 @@ export const applyInputRunPlanFx = Effect.fn("applyInputRunPlanFx")(function* ({
 		)
 		.with(
 			{
-				type: "deposit",
+				type: InputEnumSchema.enum.Deposit,
 			},
 			() =>
 				Effect.succeed({

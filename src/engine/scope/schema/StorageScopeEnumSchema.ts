@@ -4,24 +4,12 @@ import { z } from "zod";
  * Where one canonical item may physically exist in grid state.
  */
 export const StorageScopeEnumSchema = z
-	.enum([
-		/**
-		 * The item may exist only on a board.
-		 */
-		"board",
-		/**
-		 * The item may exist only in the shared inventory.
-		 */
-		"inventory",
-		/**
-		 * The item may exist only in the shared toolbar.
-		 */
-		"toolbar",
-		/**
-		 * The item may exist on a board or in either passive storage surface.
-		 */
-		"any",
-	])
+	.enum({
+		Board: "board",
+		Inventory: "inventory",
+		Toolbar: "toolbar",
+		Any: "any",
+	})
 	.meta({
 		id: "StorageScopeEnumSchema",
 		description: "Where one canonical item may physically exist in grid state.",

@@ -2,6 +2,7 @@ import { Effect, Random } from "effect";
 
 import type { MergeSchema } from "~/engine/merge/schema/MergeSchema";
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
+import { EffectEnumSchema } from "~/engine/merge/schema/EffectEnumSchema";
 
 /** Bump only when intentionally changing directional-merge random compatibility. */
 export const MergeRandomVersion = 1;
@@ -22,7 +23,7 @@ export const makeMergeRandomFx = Effect.fn("makeMergeRandomFx")(function* ({
 	source: RuntimeItemSchema.Type;
 	target: RuntimeItemSchema.Type;
 }) {
-	const result = rule.effect === "replace" ? rule.result : "none";
+	const result = rule.effect === EffectEnumSchema.enum.Replace ? rule.result : "none";
 
 	return Random.make(
 		[

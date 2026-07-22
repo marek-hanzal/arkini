@@ -1,8 +1,9 @@
 import { z } from "zod";
 
+import { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
+
 import { BaseQuantitySchema } from "./BaseQuantitySchema";
 import { QuantityEnumSchema } from "./QuantityEnumSchema";
-import { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
 
 /**
  * A fixed positive quantity emitted by an item drop.
@@ -11,7 +12,7 @@ export const QuantityValueSchema = z
 	.object({
 		...BaseQuantitySchema.shape,
 		type: QuantityEnumSchema.extract([
-			"value",
+			QuantityEnumSchema.enum.Value,
 		]),
 		/**
 		 * Fixed number of items emitted by the drop.

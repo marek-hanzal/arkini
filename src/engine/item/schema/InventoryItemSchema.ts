@@ -2,6 +2,7 @@ import { z } from "zod";
 
 import { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
 import { StorageScopeEnumSchema } from "~/engine/scope/schema/StorageScopeEnumSchema";
+
 import { BaseItemSchema } from "./BaseItemSchema";
 import { ItemEnumSchema } from "./ItemEnumSchema";
 
@@ -12,12 +13,12 @@ export const InventoryItemSchema = z
 	.object({
 		...BaseItemSchema.shape,
 		type: ItemEnumSchema.extract([
-			"inventory",
+			ItemEnumSchema.enum.Inventory,
 		]).describe("Identifies this item as the shared inventory opener."),
 		scope: StorageScopeEnumSchema.extract([
-			"board",
+			StorageScopeEnumSchema.enum.Board,
 		])
-			.default("board")
+			.default(StorageScopeEnumSchema.enum.Board)
 			.describe("Keeps the inventory opener on the board."),
 		maxCount: PositiveIntegerSchema.max(1)
 			.default(1)

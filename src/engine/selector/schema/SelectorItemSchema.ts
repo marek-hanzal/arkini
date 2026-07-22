@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import { IdSchema } from "~/engine/common/schema/IdSchema";
+
 import { BaseSelectorSchema } from "./BaseSelectorSchema";
 import { SelectorEnumSchema } from "./SelectorEnumSchema";
 
@@ -14,7 +15,7 @@ export const SelectorItemSchema = z
 		 * Identifies this selector as a direct item-ID selector.
 		 */
 		type: SelectorEnumSchema.extract([
-			"item",
+			SelectorEnumSchema.enum.Item,
 		]).describe("Identifies this selector as a direct item-ID selector."),
 		/**
 		 * Stable ID of the one canonical item selected by this selector.

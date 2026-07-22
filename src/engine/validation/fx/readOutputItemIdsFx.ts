@@ -1,6 +1,8 @@
 import { Effect } from "effect";
 
 import type { OutputSchema } from "~/engine/output/schema/OutputSchema";
+import { RollEnumSchema } from "~/engine/roll/schema/RollEnumSchema";
+
 import type { OutputItemIdsSchema } from "../schema/OutputItemIdsSchema";
 
 /** Reads every canonical item ID that any branch of one output may emit. */
@@ -10,7 +12,7 @@ export const readOutputItemIdsFx = Effect.fn("readOutputItemIdsFx")(function* (
 	const itemIds: OutputItemIdsSchema.Type = [];
 	for (const set of output.set) {
 		for (const roll of set.roll) {
-			if (roll.type === "guaranteed" || roll.type === "chance") {
+			if (roll.type === RollEnumSchema.enum.Guaranteed || roll.type === RollEnumSchema.enum.Chance) {
 				itemIds.push(...roll.drop.map(({ itemId }) => itemId));
 				continue;
 			}

@@ -1,8 +1,10 @@
 import { Effect } from "effect";
 import { match } from "ts-pattern";
 
+import { RuleEnumSchema } from "~/engine/output/schema/drop/rule/RuleEnumSchema";
 import type { RuleSchema } from "~/engine/output/schema/drop/rule/RuleSchema";
 import type { BoardLocationSchema } from "~/engine/location/schema/BoardLocationSchema";
+
 import { dropRuleDisableFx } from "./dropRuleDisableFx";
 import { dropRuleEnableFx } from "./dropRuleEnableFx";
 
@@ -20,7 +22,7 @@ export const dropRuleFx = Effect.fn("dropRuleFx")(function* ({ origin, rule }: d
 	return yield* match(rule)
 		.with(
 			{
-				type: "enable",
+				type: RuleEnumSchema.enum.Enable,
 			},
 			(rule) => {
 				return dropRuleEnableFx({
@@ -31,7 +33,7 @@ export const dropRuleFx = Effect.fn("dropRuleFx")(function* ({ origin, rule }: d
 		)
 		.with(
 			{
-				type: "disable",
+				type: RuleEnumSchema.enum.Disable,
 			},
 			(rule) => {
 				return dropRuleDisableFx({

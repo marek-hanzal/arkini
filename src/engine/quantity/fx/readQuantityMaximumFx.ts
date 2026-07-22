@@ -1,6 +1,7 @@
 import { Effect } from "effect";
 import { match } from "ts-pattern";
 
+import { QuantityEnumSchema } from "~/engine/quantity/schema/QuantityEnumSchema";
 import type { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
 import type { QuantitySchema } from "~/engine/quantity/schema/QuantitySchema";
 
@@ -17,13 +18,13 @@ export const readQuantityMaximumFx = Effect.fn("readQuantityMaximumFx")(function
 	return match(quantity)
 		.with(
 			{
-				type: "value",
+				type: QuantityEnumSchema.enum.Value,
 			},
 			({ value }) => value,
 		)
 		.with(
 			{
-				type: "range",
+				type: QuantityEnumSchema.enum.Range,
 			},
 			({ max }) => max,
 		)

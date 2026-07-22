@@ -1,8 +1,7 @@
 import { Effect } from "effect";
-
-import { RuntimeCheckIssueEnumSchema } from "~/engine/runtime/schema/check/RuntimeCheckIssueEnumSchema";
 import { match } from "ts-pattern";
 
+import { RuntimeCheckIssueEnumSchema } from "~/engine/runtime/schema/check/RuntimeCheckIssueEnumSchema";
 import { readGridLocationOccupantsFx } from "~/engine/location/read/readGridLocationOccupantsFx";
 import { isGridRuntimeItem } from "~/engine/runtime/read/isGridRuntimeItem";
 import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
@@ -38,7 +37,7 @@ export const checkRuntimeLocationsFx = Effect.fn("checkRuntimeLocationsFx")(func
 
 	for (const item of items) {
 		const configuredScope = item.item.scope;
-		const scopeAllowed = configuredScope === StorageScopeEnumSchema.enum.any || configuredScope === item.location.scope;
+		const scopeAllowed = configuredScope === StorageScopeEnumSchema.enum.Any || configuredScope === item.location.scope;
 		if (!scopeAllowed) {
 			scopeIssues.push({
 				configuredScope,

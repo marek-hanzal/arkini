@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeIntegerSchema";
+
 import { BaseWhenSchema } from "./BaseWhenSchema";
 import { WhenEnumSchema } from "./WhenEnumSchema";
 
@@ -15,7 +16,7 @@ export const WhenRangeSchema = z
 		 * Identifies this condition as an inclusive item-query quantity range check.
 		 */
 		type: WhenEnumSchema.extract([
-			"range",
+			WhenEnumSchema.enum.Range,
 		]).describe("Identifies this condition as an inclusive item-query quantity range check."),
 		/**
 		 * Smallest item quantity accepted by this condition.

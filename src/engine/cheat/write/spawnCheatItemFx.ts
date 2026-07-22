@@ -12,6 +12,8 @@ import { planBoardPlacementFx } from "~/engine/placement/fx/planBoardPlacementFx
 import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 import { StorageScopeEnumSchema } from "~/engine/scope/schema/StorageScopeEnumSchema";
+import { PlacementEnumSchema } from "~/engine/placement/schema/PlacementEnumSchema";
+import { PlacementFailureReasonEnumSchema } from "~/engine/placement/schema/PlacementFailureReasonEnumSchema";
 
 export namespace spawnCheatItemFx {
 	export interface Props {
@@ -27,7 +29,7 @@ export const spawnCheatItemFx = Effect.fn("spawnCheatItemFx")(function* ({
 	const item = yield* resolveItemFx({
 		itemId,
 	});
-	if (item.scope !== StorageScopeEnumSchema.enum.board && item.scope !== StorageScopeEnumSchema.enum.any) {
+	if (item.scope !== StorageScopeEnumSchema.enum.Board && item.scope !== StorageScopeEnumSchema.enum.Any) {
 		return yield* Effect.fail(
 			new CheatItemNotSpawnableError({
 				itemId,
@@ -36,7 +38,7 @@ export const spawnCheatItemFx = Effect.fn("spawnCheatItemFx")(function* ({
 	}
 	const drop = {
 		itemId,
-		placement: "drop" as const,
+		placement: PlacementEnumSchema.enum.Drop,
 		quantity: 1 as const,
 	};
 
@@ -64,7 +66,7 @@ export const spawnCheatItemFx = Effect.fn("spawnCheatItemFx")(function* ({
 						y: Math.floor(config.meta.board.height / 2),
 					},
 				},
-				placement: "drop",
+				placement: PlacementEnumSchema.enum.Drop,
 				quantity: 1,
 				runtime,
 			});
@@ -72,7 +74,7 @@ export const spawnCheatItemFx = Effect.fn("spawnCheatItemFx")(function* ({
 				drop,
 				plan,
 				quantity: 1,
-				reason: "board:full",
+				reason: PlacementFailureReasonEnumSchema.enum.BoardFull,
 			});
 			const [result, nextRuntime] = yield* applyPlacementPlanFx({
 				plan,

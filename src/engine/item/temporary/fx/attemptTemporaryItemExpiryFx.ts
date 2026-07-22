@@ -1,5 +1,6 @@
 import { Effect } from "effect";
 
+import { PlacementFailureReasonEnumSchema } from "~/engine/placement/schema/PlacementFailureReasonEnumSchema";
 import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
 import { ItemRemovedReasonEnumSchema } from "~/engine/event/schema/ItemRemovedReasonEnumSchema";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
@@ -7,6 +8,7 @@ import { readLifecycleItemEventsFx } from "~/engine/event/read/readLifecycleItem
 import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
 import type { PlacementUnavailableError } from "~/engine/placement/error/PlacementUnavailableError";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+
 import { completeTemporaryItemExpiryTransitionFx } from "./completeTemporaryItemExpiryTransitionFx";
 
 export namespace attemptTemporaryItemExpiryFx {
@@ -30,10 +32,10 @@ export namespace attemptTemporaryItemExpiryFx {
 
 const isExpectedExpiryBlock = (error: PlacementUnavailableError) => {
 	switch (error.reason) {
-		case "board:full":
-		case "inventory:full":
-		case "toolbar:full":
-		case "item:max-count":
+		case PlacementFailureReasonEnumSchema.enum.BoardFull:
+		case PlacementFailureReasonEnumSchema.enum.InventoryFull:
+		case PlacementFailureReasonEnumSchema.enum.ToolbarFull:
+		case PlacementFailureReasonEnumSchema.enum.ItemMaxCount:
 			return true;
 	}
 };

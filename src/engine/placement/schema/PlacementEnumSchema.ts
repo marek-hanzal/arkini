@@ -7,18 +7,10 @@ import { z } from "zod";
  * independently from the emitted item's storage scope.
  */
 export const PlacementEnumSchema = z
-	.enum([
-		/**
-		 * Places the drop at the nearest allowed board location from its source,
-		 * ordered by Manhattan distance.
-		 */
-		"drop",
-		/**
-		 * Chooses one random board position as the origin, then uses the same
-		 * nearest-first board placement as a standard drop.
-		 */
-		"random",
-	])
+	.enum({
+		Drop: "drop",
+		Random: "random",
+	})
 	.meta({
 		id: "PlacementEnumSchema",
 		description:

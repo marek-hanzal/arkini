@@ -5,6 +5,7 @@ import type { ItemTemporaryDurationIssueSchema } from "~/engine/runtime/schema/c
 import { RuntimeCheckIssueEnumSchema } from "~/engine/runtime/schema/check/RuntimeCheckIssueEnumSchema";
 import { ItemTemporaryDurationIssueReasonEnumSchema } from "~/engine/runtime/schema/check/ItemTemporaryDurationIssueReasonEnumSchema";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
+import { ItemEnumSchema } from "~/engine/item/schema/ItemEnumSchema";
 
 export namespace checkRuntimeItemTemporaryDurationsFx {
 	export interface Props {
@@ -19,7 +20,7 @@ export const checkRuntimeItemTemporaryDurationsFx = Effect.fn(
 	const issues: ItemTemporaryDurationIssueSchema.Type[] = [];
 
 	for (const item of runtime.items) {
-		if (item.item.type !== "temporary") {
+		if (item.item.type !== ItemEnumSchema.enum.Temporary) {
 			if (item.remainingDurationMs !== undefined) {
 				issues.push({
 					type: RuntimeCheckIssueEnumSchema.enum.ItemTemporaryDuration,

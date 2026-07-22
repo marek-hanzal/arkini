@@ -1,9 +1,10 @@
 import { z } from "zod";
 
-import { BaseRollSchema } from "./BaseRollSchema";
 import { DropSchema } from "~/engine/output/schema/DropSchema";
-import { RollEnumSchema } from "./RollEnumSchema";
 import { ChanceSchema } from "~/engine/common/schema/ChanceSchema";
+
+import { BaseRollSchema } from "./BaseRollSchema";
+import { RollEnumSchema } from "./RollEnumSchema";
 
 /**
  * An output roll that will provide its output according to a probability.
@@ -12,7 +13,7 @@ export const RollChanceSchema = z
 	.object({
 		...BaseRollSchema.shape,
 		type: RollEnumSchema.extract([
-			"chance",
+			RollEnumSchema.enum.Chance,
 		]),
 		/**
 		 * Probability that this roll provides its output, from 0 to 1 inclusive.

@@ -4,6 +4,7 @@ import { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSch
 import { TimeSchema } from "~/engine/common/schema/TimeSchema";
 import { OutputSchema } from "~/engine/output/schema/OutputSchema";
 import { StorageScopeEnumSchema } from "~/engine/scope/schema/StorageScopeEnumSchema";
+
 import { BaseItemSchema } from "./BaseItemSchema";
 import { ItemEnumSchema } from "./ItemEnumSchema";
 
@@ -21,15 +22,15 @@ export const TemporaryItemSchema = z
 		 * Identifies this item as a temporary board item.
 		 */
 		type: ItemEnumSchema.extract([
-			"temporary",
+			ItemEnumSchema.enum.Temporary,
 		]).describe("Identifies this item as a temporary board item."),
 		/**
 		 * Temporary items are always stored on the board.
 		 */
 		scope: StorageScopeEnumSchema.extract([
-			"board",
+			StorageScopeEnumSchema.enum.Board,
 		])
-			.default("board")
+			.default(StorageScopeEnumSchema.enum.Board)
 			.describe("Restricts temporary items to board storage."),
 		/**
 		 * Temporary item instances never stack because each owns its lifetime.

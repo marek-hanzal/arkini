@@ -1,5 +1,6 @@
 import { Effect } from "effect";
 
+import { PlacementFailureReasonEnumSchema } from "~/engine/placement/schema/PlacementFailureReasonEnumSchema";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
 import { completeJobTransitionFx } from "~/engine/job/fx/completeJobTransitionFx";
@@ -27,10 +28,10 @@ export namespace attemptJobCompletionFx {
 
 const isExpectedCompletionBlock = (error: PlacementUnavailableError) => {
 	switch (error.reason) {
-		case "board:full":
-		case "inventory:full":
-		case "toolbar:full":
-		case "item:max-count":
+		case PlacementFailureReasonEnumSchema.enum.BoardFull:
+		case PlacementFailureReasonEnumSchema.enum.InventoryFull:
+		case PlacementFailureReasonEnumSchema.enum.ToolbarFull:
+		case PlacementFailureReasonEnumSchema.enum.ItemMaxCount:
 			return true;
 	}
 };

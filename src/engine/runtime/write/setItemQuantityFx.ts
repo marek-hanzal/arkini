@@ -13,6 +13,7 @@ import { reviseRuntimeItemFx } from "~/engine/runtime/fx/reviseRuntimeItemFx";
 import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import { PlacementEnumSchema } from "~/engine/placement/schema/PlacementEnumSchema";
 
 export namespace setItemQuantityFx {
 	export interface Props {
@@ -74,7 +75,7 @@ export const setItemQuantityFx = Effect.fn("setItemQuantityFx")(function* ({
 			yield* assertPlacementMaxCountFx({
 				drop: {
 					itemId: item.item.id,
-					placement: "drop",
+					placement: PlacementEnumSchema.enum.Drop,
 					quantity,
 				},
 				item: item.item,

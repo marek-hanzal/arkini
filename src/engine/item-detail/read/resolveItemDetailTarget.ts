@@ -1,7 +1,7 @@
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { readItemDetailTabs } from "~/engine/item-detail/read/readItemDetailTabs";
 import type { readItemDetailSourcesFx } from "~/engine/item-detail/read/readItemDetailSourcesFx";
-import type { ItemDetailTabEnumSchema } from "~/engine/item-detail/schema/ItemDetailTabEnumSchema";
+import { ItemDetailTabEnumSchema } from "~/engine/item-detail/schema/ItemDetailTabEnumSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
 export namespace resolveItemDetailTarget {
@@ -40,7 +40,7 @@ export const resolveItemDetailTarget = ({
 	if (item === undefined || tabs.length === 0) return unavailable;
 	const defaultTab = tabs[0];
 	const fallback =
-		requestedTab === undefined ? defaultTab : tabs.includes("info") ? "info" : defaultTab;
+		requestedTab === undefined ? defaultTab : tabs.includes(ItemDetailTabEnumSchema.enum.Info) ? ItemDetailTabEnumSchema.enum.Info : defaultTab;
 	if (fallback === undefined) return unavailable;
 	return {
 		kind: "available",

@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import { DistanceEnumSchema } from "~/engine/distance/schema/DistanceEnumSchema";
+
 import { QueryScopeEnumSchema } from "./QueryScopeEnumSchema";
 import { BaseQuerySchema } from "./BaseQuerySchema";
 
@@ -14,7 +15,7 @@ export const QueryBoardSchema = z
 		 * Identifies this query as a board-only query.
 		 */
 		scope: QueryScopeEnumSchema.extract([
-			"board",
+			QueryScopeEnumSchema.enum.Board,
 		]).describe("Identifies this query as a board-only query."),
 		/**
 		 * Chebyshev distance rule from the query origin to a matching item.

@@ -4,6 +4,7 @@ import { match, P } from "ts-pattern";
 import { isLinePureFx } from "~/engine/line/fx/purity/isLinePureFx";
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import { ItemEnumSchema } from "~/engine/item/schema/ItemEnumSchema";
 
 export namespace isItemPureFx {
 	export interface Props {
@@ -20,13 +21,13 @@ export const isItemPureFx = Effect.fn("isItemPureFx")(function* ({
 	const lines = match(item.item)
 		.with(
 			{
-				type: "producer",
+				type: ItemEnumSchema.enum.Producer,
 			},
 			({ lines }) => lines,
 		)
 		.with(
 			{
-				type: P.union("blueprint", "craft", "stash"),
+				type: P.union(ItemEnumSchema.enum.Blueprint, ItemEnumSchema.enum.Craft, ItemEnumSchema.enum.Stash),
 			},
 			({ line }) => [
 				line,

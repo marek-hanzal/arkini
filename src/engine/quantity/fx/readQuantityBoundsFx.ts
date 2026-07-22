@@ -1,6 +1,7 @@
 import { Effect } from "effect";
 import { match } from "ts-pattern";
 
+import { QuantityEnumSchema } from "~/engine/quantity/schema/QuantityEnumSchema";
 import type { QuantitySchema } from "~/engine/quantity/schema/QuantitySchema";
 import type { QuantityBoundsSchema } from "~/engine/quantity/schema/QuantityBoundsSchema";
 
@@ -19,7 +20,7 @@ export const readQuantityBoundsFx = Effect.fn("readQuantityBoundsFx")(function* 
 	return match(quantity)
 		.with(
 			{
-				type: "value",
+				type: QuantityEnumSchema.enum.Value,
 			},
 			({ value }) => {
 				return {
@@ -30,7 +31,7 @@ export const readQuantityBoundsFx = Effect.fn("readQuantityBoundsFx")(function* 
 		)
 		.with(
 			{
-				type: "range",
+				type: QuantityEnumSchema.enum.Range,
 			},
 			({ min, max }) => {
 				return {

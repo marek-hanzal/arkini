@@ -2,6 +2,8 @@ import { Effect } from "effect";
 import { match } from "ts-pattern";
 
 import type { RollSchema } from "~/engine/roll/schema/RollSchema";
+import { RollEnumSchema } from "~/engine/roll/schema/RollEnumSchema";
+
 import { rollChanceFx } from "./rollChanceFx";
 import { rollGuaranteedFx } from "./rollGuaranteedFx";
 import { rollWeightFx } from "./rollWeightFx";
@@ -19,7 +21,7 @@ export const rollFx = Effect.fn("rollFx")(function* ({ roll }: rollFx.Props) {
 	return yield* match(roll)
 		.with(
 			{
-				type: "guaranteed",
+				type: RollEnumSchema.enum.Guaranteed,
 			},
 			(roll) => {
 				return rollGuaranteedFx({
@@ -29,7 +31,7 @@ export const rollFx = Effect.fn("rollFx")(function* ({ roll }: rollFx.Props) {
 		)
 		.with(
 			{
-				type: "chance",
+				type: RollEnumSchema.enum.Chance,
 			},
 			(roll) => {
 				return rollChanceFx({
@@ -39,7 +41,7 @@ export const rollFx = Effect.fn("rollFx")(function* ({ roll }: rollFx.Props) {
 		)
 		.with(
 			{
-				type: "weight",
+				type: RollEnumSchema.enum.Weight,
 			},
 			(roll) => {
 				return rollWeightFx({

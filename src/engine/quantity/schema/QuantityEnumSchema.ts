@@ -4,16 +4,10 @@ import { z } from "zod";
  * Discriminates the way a drop quantity is determined.
  */
 export const QuantityEnumSchema = z
-	.enum([
-		/**
-		 * A fixed quantity value emitted by the drop.
-		 */
-		"value",
-		/**
-		 * An inclusive range from which the emitted quantity is selected.
-		 */
-		"range",
-	])
+	.enum({
+		Value: "value",
+		Range: "range",
+	})
 	.meta({
 		id: "QuantityEnumSchema",
 		description: "The way a drop quantity is determined.",

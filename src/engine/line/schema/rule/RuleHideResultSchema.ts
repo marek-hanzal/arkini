@@ -10,7 +10,7 @@ export const RuleHideResultSchema = z
 	.object({
 		...BaseRuleResultSchema.shape,
 		type: RuleEnumSchema.extract([
-			"hide",
+			RuleEnumSchema.enum.Hide,
 		]).describe("Identifies this result as an evaluated product-line hide rule."),
 	})
 	.strict()

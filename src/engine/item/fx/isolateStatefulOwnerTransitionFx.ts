@@ -1,5 +1,6 @@
 import { Effect } from "effect";
 
+import { PlacementEnumSchema } from "~/engine/placement/schema/PlacementEnumSchema";
 import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { readOutputPlacementItemEventsFx } from "~/engine/event/read/readOutputPlacementItemEventsFx";
@@ -73,7 +74,7 @@ export const isolateStatefulOwnerTransitionFx = Effect.fn("isolateStatefulOwnerT
 					{
 						itemId: owner.item.id,
 						quantity: owner.quantity - 1,
-						placement: "drop",
+						placement: PlacementEnumSchema.enum.Drop,
 					},
 				],
 			},

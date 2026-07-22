@@ -1,4 +1,5 @@
 import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
+import { ItemEnumSchema } from "~/engine/item/schema/ItemEnumSchema";
 import type { JobSchema } from "~/engine/job/schema/JobSchema";
 import type { LineSchema } from "~/engine/line/schema/LineSchema";
 import type { BoardRuntimeItemSchema } from "~/engine/runtime/schema/BoardRuntimeItemSchema";
@@ -8,7 +9,11 @@ import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 export type JobCompletionItem = Extract<
 	ItemSchema.Type,
 	{
-		readonly type: "producer" | "craft" | "blueprint" | "stash";
+		readonly type:
+			| typeof ItemEnumSchema.enum.Blueprint
+			| typeof ItemEnumSchema.enum.Craft
+			| typeof ItemEnumSchema.enum.Producer
+			| typeof ItemEnumSchema.enum.Stash;
 	}
 >;
 

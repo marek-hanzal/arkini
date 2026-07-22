@@ -1,7 +1,9 @@
 import { Effect } from "effect";
 import { match } from "ts-pattern";
 
+import { QuantityEnumSchema } from "~/engine/quantity/schema/QuantityEnumSchema";
 import type { QuantitySchema } from "~/engine/quantity/schema/QuantitySchema";
+
 import { rollQuantityRangeFx } from "./rollQuantityRangeFx";
 import { rollQuantityValueFx } from "./rollQuantityValueFx";
 
@@ -20,7 +22,7 @@ export const rollQuantityFx = Effect.fn("rollQuantityFx")(function* ({
 	return yield* match(quantity)
 		.with(
 			{
-				type: "value",
+				type: QuantityEnumSchema.enum.Value,
 			},
 			(quantity) => {
 				return rollQuantityValueFx({
@@ -30,7 +32,7 @@ export const rollQuantityFx = Effect.fn("rollQuantityFx")(function* ({
 		)
 		.with(
 			{
-				type: "range",
+				type: QuantityEnumSchema.enum.Range,
 			},
 			(quantity) => {
 				return rollQuantityRangeFx({

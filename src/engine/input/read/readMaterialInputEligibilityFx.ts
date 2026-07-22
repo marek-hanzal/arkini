@@ -2,6 +2,7 @@ import { Effect } from "effect";
 import { match, P } from "ts-pattern";
 
 import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
+import { ItemEnumSchema } from "~/engine/item/schema/ItemEnumSchema";
 
 export namespace readMaterialInputEligibilityFx {
 	export interface Props {
@@ -16,20 +17,20 @@ export const readMaterialInputEligibilityFx = Effect.fn("readMaterialInputEligib
 			return match(item)
 				.with(
 					{
-						type: "temporary",
+						type: ItemEnumSchema.enum.Temporary,
 					},
 					() => false,
 				)
 				.with(
 					{
 						type: P.union(
-							"blueprint",
-							"craft",
-							"deposit",
-							"inventory",
-							"producer",
-							"simple",
-							"stash",
+							ItemEnumSchema.enum.Blueprint,
+							ItemEnumSchema.enum.Craft,
+							ItemEnumSchema.enum.Deposit,
+							ItemEnumSchema.enum.Inventory,
+							ItemEnumSchema.enum.Producer,
+							ItemEnumSchema.enum.Simple,
+							ItemEnumSchema.enum.Stash,
 						),
 					},
 					() => true,

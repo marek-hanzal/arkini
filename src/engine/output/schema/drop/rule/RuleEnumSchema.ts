@@ -4,16 +4,10 @@ import { z } from "zod";
  * Discriminates the rules evaluated after a roll selects a drop.
  */
 export const RuleEnumSchema = z
-	.enum([
-		/**
-		 * Enables the selected drop only when the rule's conditions pass.
-		 */
-		"enable",
-		/**
-		 * Disables the selected drop when the rule's conditions pass.
-		 */
-		"disable",
-	])
+	.enum({
+		Enable: "enable",
+		Disable: "disable",
+	})
 	.meta({
 		id: "DropRuleEnumSchema",
 		description: "The kind of availability rule evaluated for a selected drop.",

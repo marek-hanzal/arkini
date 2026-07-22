@@ -13,7 +13,7 @@ export const SimpleItemSchema = z
 		 * Identifies this item as a simple stackable item.
 		 */
 		type: ItemEnumSchema.extract([
-			"simple",
+			ItemEnumSchema.enum.Simple,
 		]),
 	})
 	.strict()

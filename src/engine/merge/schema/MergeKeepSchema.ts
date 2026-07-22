@@ -16,7 +16,7 @@ export const MergeKeepSchema = z
 		 * Identifies this merge as one that leaves its selected target unchanged.
 		 */
 		effect: EffectEnumSchema.extract([
-			"keep",
+			EffectEnumSchema.enum.Keep,
 		]).describe("Identifies this merge as one that keeps its selected target unchanged."),
 	})
 	.strict()

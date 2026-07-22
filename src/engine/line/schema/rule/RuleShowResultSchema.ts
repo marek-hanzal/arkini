@@ -10,7 +10,7 @@ export const RuleShowResultSchema = z
 	.object({
 		...BaseRuleResultSchema.shape,
 		type: RuleEnumSchema.extract([
-			"show",
+			RuleEnumSchema.enum.Show,
 		]).describe("Identifies this result as an evaluated product-line show rule."),
 	})
 	.strict()

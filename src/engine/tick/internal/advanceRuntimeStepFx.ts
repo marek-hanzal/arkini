@@ -1,7 +1,7 @@
 import { Effect } from "effect";
+
 import { isPassiveStorageLocation } from "~/engine/location/read/isPassiveStorageLocation";
 import { isInstantGameplayEnabledFx } from "~/engine/cheat/read/isInstantGameplayEnabledFx";
-
 import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
 import { JobStartSourceEnumSchema } from "~/engine/event/schema/JobStartSourceEnumSchema";
 import { StartLineResultEnumSchema } from "~/engine/job/schema/StartLineResultEnumSchema";
@@ -15,6 +15,7 @@ import { resolveJobRunnableFx } from "~/engine/job/fx/resolveJobRunnableFx";
 import type { JobSchema } from "~/engine/job/schema/JobSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { TickStepMs } from "~/engine/tick/TickStepMs";
+import { ItemEnumSchema } from "~/engine/item/schema/ItemEnumSchema";
 
 export interface RuntimeStepResult {
 	readonly events: readonly GameEventSchema.Type[];
@@ -28,7 +29,7 @@ const sortJobs = (jobs: readonly JobSchema.Type[]) =>
 
 const sortTemporaryItems = (runtime: RuntimeSchema.Type) =>
 	runtime.items
-		.filter((item) => item.item.type === "temporary")
+		.filter((item) => item.item.type === ItemEnumSchema.enum.Temporary)
 		.sort((first, second) => first.id.localeCompare(second.id));
 
 const replaceJob = (runtime: RuntimeSchema.Type, job: JobSchema.Type): RuntimeSchema.Type => ({
@@ -162,7 +163,7 @@ export const advanceRuntimeStepFx = Effect.fn("advanceRuntimeStepFx")(function* 
 
 	for (const temporaryItem of temporaryItems) {
 		const liveItem = draft.items.find((candidate) => candidate.id === temporaryItem.id);
-		if (liveItem?.item.type !== "temporary" || liveItem.remainingDurationMs !== 0) continue;
+		if (liveItem?.item.type !== ItemEnumSchema.enum.Temporary || liveItem.remainingDurationMs !== 0) continue;
 		const expiry = yield* attemptTemporaryItemExpiryFx({
 			itemId: liveItem.id,
 			runtime: draft,

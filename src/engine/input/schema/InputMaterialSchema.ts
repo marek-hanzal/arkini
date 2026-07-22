@@ -3,6 +3,7 @@ import { z } from "zod";
 import { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeIntegerSchema";
 import { QuantitySchema } from "~/engine/quantity/schema/QuantitySchema";
 import { SelectorSchema } from "~/engine/selector/schema/SelectorSchema";
+
 import { BaseInputSchema } from "./BaseInputSchema";
 import { InputEnumSchema } from "./InputEnumSchema";
 import { InputModeEnumSchema } from "./InputModeEnumSchema";
@@ -22,7 +23,7 @@ export const InputMaterialSchema = z
 		 * Identifies this input as a directly delivered material item.
 		 */
 		type: InputEnumSchema.extract([
-			"materials",
+			InputEnumSchema.enum.Materials,
 		]).describe("Identifies this input as a directly delivered material item."),
 		/**
 		 * Item or tag matching strategy for materials accepted by this input.
@@ -38,7 +39,7 @@ export const InputMaterialSchema = z
 		 * discards passive owned state when the job starts and its committed root when
 		 * the job completes. Started jobs are not cancellable.
 		 */
-		mode: InputModeEnumSchema.default("consume").describe(
+		mode: InputModeEnumSchema.default(InputModeEnumSchema.enum.Consume).describe(
 			"Whether this input is consumed or reserved; defaults to consume.",
 		),
 		/**

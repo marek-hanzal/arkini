@@ -3,15 +3,17 @@ import { match } from "ts-pattern";
 
 import type { GameSourceProvenanceSchema } from "~/engine/source/schema/GameSourceProvenanceSchema";
 import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
+import type { GameDiagnosticsSchema } from "~/engine/validation/schema/GameDiagnosticsSchema";
+import { DiagnosticCodeEnumSchema } from "~/engine/validation/schema/DiagnosticCodeEnumSchema";
+import { DiagnosticSeverityEnumSchema } from "~/engine/validation/schema/DiagnosticSeverityEnumSchema";
+import { DiagnosticRecordEntityEnumSchema } from "~/engine/validation/schema/DiagnosticRecordEntityEnumSchema";
+import { EffectEnumSchema } from "~/engine/merge/schema/EffectEnumSchema";
+
 import { readItemLineEntriesFx } from "../fx/readItemLineEntriesFx";
 import { readItemOutputEntriesFx } from "../fx/readItemOutputEntriesFx";
 import { validateLineReferencesFx } from "../fx/validateLineReferencesFx";
 import { validateOutputReferencesFx } from "../fx/validateOutputReferencesFx";
 import { validateSelectorReferenceFx } from "../fx/validateSelectorReferenceFx";
-import type { GameDiagnosticsSchema } from "~/engine/validation/schema/GameDiagnosticsSchema";
-import { DiagnosticCodeEnumSchema } from "~/engine/validation/schema/DiagnosticCodeEnumSchema";
-import { DiagnosticSeverityEnumSchema } from "~/engine/validation/schema/DiagnosticSeverityEnumSchema";
-import { DiagnosticRecordEntityEnumSchema } from "~/engine/validation/schema/DiagnosticRecordEntityEnumSchema";
 
 export namespace validateConfigReferencesFx {
 	export interface Props {
@@ -104,7 +106,7 @@ export const validateConfigReferencesFx = Effect.fn("validateConfigReferencesFx"
 			match(merge)
 				.with(
 					{
-						effect: "replace",
+						effect: EffectEnumSchema.enum.Replace,
 					},
 					({ result }) => {
 						if (config.items[result] !== undefined) {
@@ -129,13 +131,13 @@ export const validateConfigReferencesFx = Effect.fn("validateConfigReferencesFx"
 				)
 				.with(
 					{
-						effect: "keep",
+						effect: EffectEnumSchema.enum.Keep,
 					},
 					() => undefined,
 				)
 				.with(
 					{
-						effect: "remove",
+						effect: EffectEnumSchema.enum.Remove,
 					},
 					() => undefined,
 				)

@@ -13,7 +13,7 @@ export const QueryUniverseSchema = z
 	.object({
 		...BaseQuerySchema.shape,
 		scope: QueryScopeEnumSchema.extract([
-			"universe",
+			QueryScopeEnumSchema.enum.Universe,
 		]).describe("Searches every board space plus both passive storage surfaces."),
 	})
 	.strict()

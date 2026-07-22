@@ -1,8 +1,9 @@
 import { z } from "zod";
 
+import { LineSchema } from "~/engine/line/schema/LineSchema";
+
 import { BaseItemSchema } from "./BaseItemSchema";
 import { ItemEnumSchema } from "./ItemEnumSchema";
-import { LineSchema } from "~/engine/line/schema/LineSchema";
 
 /**
  * An item configuration that provides one craft product line.
@@ -14,7 +15,7 @@ export const CraftItemSchema = z
 	.object({
 		...BaseItemSchema.shape,
 		type: ItemEnumSchema.extract([
-			"craft",
+			ItemEnumSchema.enum.Craft,
 		]),
 		/**
 		 * The one product line owned by this craft.

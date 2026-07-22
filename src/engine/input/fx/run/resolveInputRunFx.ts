@@ -6,6 +6,8 @@ import type { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativ
 import { isInputRuntimeItem } from "~/engine/runtime/read/isInputRuntimeItem";
 import type { InputSchema } from "~/engine/input/schema/InputSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import { InputEnumSchema } from "~/engine/input/schema/InputEnumSchema";
+
 import { resolveInputMaterialRunFx } from "./resolveInputMaterialRunFx";
 import { resolveInputSimpleRunFx } from "./resolveInputSimpleRunFx";
 import { resolveInputDepositRunFx } from "./resolveInputDepositRunFx";
@@ -45,7 +47,7 @@ export const resolveInputRunFx = Effect.fn("resolveInputRunFx")(function* ({
 	return yield* match(input)
 		.with(
 			{
-				type: "simple",
+				type: InputEnumSchema.enum.Simple,
 			},
 			(input) => {
 				return resolveInputSimpleRunFx({
@@ -58,7 +60,7 @@ export const resolveInputRunFx = Effect.fn("resolveInputRunFx")(function* ({
 		)
 		.with(
 			{
-				type: "materials",
+				type: InputEnumSchema.enum.Materials,
 			},
 			(input) => {
 				return resolveInputMaterialRunFx({
@@ -72,7 +74,7 @@ export const resolveInputRunFx = Effect.fn("resolveInputRunFx")(function* ({
 		)
 		.with(
 			{
-				type: "deposit",
+				type: InputEnumSchema.enum.Deposit,
 			},
 			(input) => {
 				return resolveInputDepositRunFx({

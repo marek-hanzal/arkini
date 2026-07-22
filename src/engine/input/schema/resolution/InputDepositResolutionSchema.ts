@@ -7,7 +7,7 @@ import { InputEnumSchema } from "~/engine/input/schema/InputEnumSchema";
 export const InputDepositResolutionSchema = z
 	.object({
 		type: InputEnumSchema.extract([
-			"deposit",
+			InputEnumSchema.enum.Deposit,
 		]),
 		ready: z.boolean().describe("Whether one matching board target can pay the authored cost."),
 		targetItemId: IdSchema.optional().describe(

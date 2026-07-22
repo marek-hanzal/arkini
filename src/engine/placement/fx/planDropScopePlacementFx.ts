@@ -1,17 +1,19 @@
 import { Effect } from "effect";
 import { match } from "ts-pattern";
 
+import { PlacementFailureReasonEnumSchema } from "~/engine/placement/schema/PlacementFailureReasonEnumSchema";
 import type { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
 import type { BoardLocationSchema } from "~/engine/location/schema/BoardLocationSchema";
 import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import type { DropResultSchema } from "~/engine/output/schema/DropResultSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import { StorageScopeEnumSchema } from "~/engine/scope/schema/StorageScopeEnumSchema";
+
 import { assertPlacementPlanCompleteFx } from "./assertPlacementPlanCompleteFx";
 import { planBoardPlacementFx } from "./planBoardPlacementFx";
 import { planBoardThenStoragePlacementFx } from "./planBoardThenStoragePlacementFx";
 import { planInventoryPlacementFx } from "./planInventoryPlacementFx";
 import { planToolbarPlacementFx } from "./planToolbarPlacementFx";
-import { StorageScopeEnumSchema } from "~/engine/scope/schema/StorageScopeEnumSchema";
 
 export namespace planDropScopePlacementFx {
 	export interface Props {
@@ -32,7 +34,7 @@ export const planDropScopePlacementFx = Effect.fn("planDropScopePlacementFx")(fu
 	runtime,
 }: planDropScopePlacementFx.Props) {
 	return yield* match(item.scope)
-		.with(StorageScopeEnumSchema.enum.board, () => {
+		.with(StorageScopeEnumSchema.enum.Board, () => {
 			return Effect.gen(function* () {
 				const plan = yield* planBoardPlacementFx({
 					item,
@@ -46,11 +48,11 @@ export const planDropScopePlacementFx = Effect.fn("planDropScopePlacementFx")(fu
 					drop,
 					plan,
 					quantity,
-					reason: "board:full",
+					reason: PlacementFailureReasonEnumSchema.enum.BoardFull,
 				});
 			});
 		})
-		.with(StorageScopeEnumSchema.enum.inventory, () => {
+		.with(StorageScopeEnumSchema.enum.Inventory, () => {
 			return Effect.gen(function* () {
 				const plan = yield* planInventoryPlacementFx({
 					item,
@@ -62,11 +64,11 @@ export const planDropScopePlacementFx = Effect.fn("planDropScopePlacementFx")(fu
 					drop,
 					plan,
 					quantity,
-					reason: "inventory:full",
+					reason: PlacementFailureReasonEnumSchema.enum.InventoryFull,
 				});
 			});
 		})
-		.with(StorageScopeEnumSchema.enum.toolbar, () => {
+		.with(StorageScopeEnumSchema.enum.Toolbar, () => {
 			return Effect.gen(function* () {
 				const plan = yield* planToolbarPlacementFx({
 					item,
@@ -78,11 +80,11 @@ export const planDropScopePlacementFx = Effect.fn("planDropScopePlacementFx")(fu
 					drop,
 					plan,
 					quantity,
-					reason: "toolbar:full",
+					reason: PlacementFailureReasonEnumSchema.enum.ToolbarFull,
 				});
 			});
 		})
-		.with(StorageScopeEnumSchema.enum.any, () => {
+		.with(StorageScopeEnumSchema.enum.Any, () => {
 			return planBoardThenStoragePlacementFx({
 				drop,
 				item,

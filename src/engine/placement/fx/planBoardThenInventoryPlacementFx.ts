@@ -5,6 +5,8 @@ import type { BoardLocationSchema } from "~/engine/location/schema/BoardLocation
 import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import type { DropResultSchema } from "~/engine/output/schema/DropResultSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import { PlacementFailureReasonEnumSchema } from "~/engine/placement/schema/PlacementFailureReasonEnumSchema";
+
 import { assertPlacementPlanCompleteFx } from "./assertPlacementPlanCompleteFx";
 import { mergePlacementPlansFx } from "./mergePlacementPlansFx";
 import { planBoardPlacementFx } from "./planBoardPlacementFx";
@@ -55,7 +57,7 @@ export const planBoardThenInventoryPlacementFx = Effect.fn("planBoardThenInvento
 			drop,
 			plan,
 			quantity,
-			reason: "inventory:full",
+			reason: PlacementFailureReasonEnumSchema.enum.InventoryFull,
 		});
 	},
 );

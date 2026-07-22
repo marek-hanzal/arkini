@@ -2,10 +2,10 @@ import { z } from "zod";
 
 /** Selects the runtime item whose charges pay one input cost. */
 export const InputChargeFromEnumSchema = z
-	.enum([
-		"self",
-		"target",
-	])
+	.enum({
+		Self: "self",
+		Target: "target",
+	})
 	.meta({
 		id: "InputChargeFromEnumSchema",
 		description:

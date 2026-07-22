@@ -3,6 +3,8 @@ import { match, P } from "ts-pattern";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
+import { ItemEnumSchema } from "~/engine/item/schema/ItemEnumSchema";
+
 import type { ItemLineEntrySchema } from "../schema/ItemLineEntrySchema";
 
 export namespace readItemLineEntriesFx {
@@ -20,7 +22,7 @@ export const readItemLineEntriesFx = Effect.fn("readItemLineEntriesFx")(function
 	return match(item)
 		.with(
 			{
-				type: "producer",
+				type: ItemEnumSchema.enum.Producer,
 			},
 			({ lines }) =>
 				lines.map(
@@ -38,7 +40,7 @@ export const readItemLineEntriesFx = Effect.fn("readItemLineEntriesFx")(function
 		)
 		.with(
 			{
-				type: P.union("blueprint", "craft", "stash"),
+				type: P.union(ItemEnumSchema.enum.Blueprint, ItemEnumSchema.enum.Craft, ItemEnumSchema.enum.Stash),
 			},
 			({ line }) => [
 				{
@@ -53,7 +55,7 @@ export const readItemLineEntriesFx = Effect.fn("readItemLineEntriesFx")(function
 		)
 		.with(
 			{
-				type: P.union("deposit", "simple", "temporary", "inventory"),
+				type: P.union(ItemEnumSchema.enum.Deposit, ItemEnumSchema.enum.Simple, ItemEnumSchema.enum.Temporary, ItemEnumSchema.enum.Inventory),
 			},
 			() => [] as ItemLineEntrySchema.Type[],
 		)

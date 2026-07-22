@@ -15,6 +15,7 @@ import type { BoardRuntimeItemSchema } from "~/engine/runtime/schema/BoardRuntim
 import type { GridRuntimeItemSchema } from "~/engine/runtime/schema/GridRuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
+import { InputEnumSchema } from "~/engine/input/schema/InputEnumSchema";
 
 export namespace planLineInputAutofillFx {
 	export interface Props {
@@ -139,7 +140,7 @@ export const planLineInputAutofillFx = Effect.fn("planLineInputAutofillFx")(func
 	let remainingMissingQuantity = 0;
 
 	for (const [inputIndex, input] of line.input.entries()) {
-		if (input.type !== "materials") continue;
+		if (input.type !== InputEnumSchema.enum.Materials) continue;
 
 		const storedItems = yield* filterInputSlotItemsFx({
 			inputIndex,

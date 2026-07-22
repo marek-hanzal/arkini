@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import { LineSchema } from "~/engine/line/schema/LineSchema";
+
 import { BaseItemSchema } from "./BaseItemSchema";
 import { ItemEnumSchema } from "./ItemEnumSchema";
 
@@ -13,7 +14,7 @@ export const StashItemSchema = z
 	.object({
 		...BaseItemSchema.shape,
 		type: ItemEnumSchema.extract([
-			"stash",
+			ItemEnumSchema.enum.Stash,
 		]),
 		line: LineSchema.describe("The one product line owned by this stash."),
 	})

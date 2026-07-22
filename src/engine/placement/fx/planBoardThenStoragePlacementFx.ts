@@ -1,11 +1,13 @@
 import { Effect } from "effect";
 
+import { PlacementFailureReasonEnumSchema } from "~/engine/placement/schema/PlacementFailureReasonEnumSchema";
 import type { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
 import { GameConfigFx } from "~/engine/game/context/GameConfigFx";
 import type { BoardLocationSchema } from "~/engine/location/schema/BoardLocationSchema";
 import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import type { DropResultSchema } from "~/engine/output/schema/DropResultSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+
 import { assertPlacementPlanCompleteFx } from "./assertPlacementPlanCompleteFx";
 import { mergePlacementPlansFx } from "./mergePlacementPlansFx";
 import { planBoardPlacementFx } from "./planBoardPlacementFx";
@@ -69,7 +71,7 @@ export const planBoardThenStoragePlacementFx = Effect.fn("planBoardThenStoragePl
 				drop,
 				plan,
 				quantity,
-				reason: "inventory:full",
+				reason: PlacementFailureReasonEnumSchema.enum.InventoryFull,
 			});
 		}
 
@@ -89,7 +91,7 @@ export const planBoardThenStoragePlacementFx = Effect.fn("planBoardThenStoragePl
 			drop,
 			plan,
 			quantity,
-			reason: "toolbar:full",
+			reason: PlacementFailureReasonEnumSchema.enum.ToolbarFull,
 		});
 	},
 );

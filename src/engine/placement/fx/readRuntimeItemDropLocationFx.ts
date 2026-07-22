@@ -1,18 +1,21 @@
 import { Effect } from "effect";
 import { match } from "ts-pattern";
 
+import { PlacementEnumSchema } from "~/engine/placement/schema/PlacementEnumSchema";
+import { PlacementFailureReasonEnumSchema } from "~/engine/placement/schema/PlacementFailureReasonEnumSchema";
 import { GameConfigFx } from "~/engine/game/context/GameConfigFx";
 import type { BoardLocationSchema } from "~/engine/location/schema/BoardLocationSchema";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 import { PlacementUnavailableError } from "~/engine/placement/error/PlacementUnavailableError";
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import { StorageScopeEnumSchema } from "~/engine/scope/schema/StorageScopeEnumSchema";
+
 import { orderBoardLocationsFx } from "./orderBoardLocationsFx";
 import { readEmptyLocationsFx } from "./readEmptyLocationsFx";
 import { readBoardLocationsFx } from "./readBoardLocationsFx";
 import { readInventoryLocationsFx } from "./readInventoryLocationsFx";
 import { readToolbarLocationsFx } from "./readToolbarLocationsFx";
-import { StorageScopeEnumSchema } from "~/engine/scope/schema/StorageScopeEnumSchema";
 
 export namespace readRuntimeItemDropLocationFx {
 	export interface Props {
@@ -56,23 +59,23 @@ export const readRuntimeItemDropLocationFx = Effect.fn("readRuntimeItemDropLocat
 	});
 
 	const location = match(item.item.scope)
-		.with(StorageScopeEnumSchema.enum.board, () => orderedBoard[0])
-		.with(StorageScopeEnumSchema.enum.inventory, () => emptyInventory[0])
-		.with(StorageScopeEnumSchema.enum.toolbar, () => emptyToolbar[0])
-		.with(StorageScopeEnumSchema.enum.any, () => orderedBoard[0] ?? emptyInventory[0] ?? emptyToolbar[0])
+		.with(StorageScopeEnumSchema.enum.Board, () => orderedBoard[0])
+		.with(StorageScopeEnumSchema.enum.Inventory, () => emptyInventory[0])
+		.with(StorageScopeEnumSchema.enum.Toolbar, () => emptyToolbar[0])
+		.with(StorageScopeEnumSchema.enum.Any, () => orderedBoard[0] ?? emptyInventory[0] ?? emptyToolbar[0])
 		.exhaustive() satisfies GridLocationSchema.Type | undefined;
 	if (location !== undefined) return location;
 
 	const reason =
-		item.item.scope === StorageScopeEnumSchema.enum.board
-			? "board:full"
-			: item.item.scope === StorageScopeEnumSchema.enum.toolbar
-				? "toolbar:full"
-				: "inventory:full";
+		item.item.scope === StorageScopeEnumSchema.enum.Board
+			? PlacementFailureReasonEnumSchema.enum.BoardFull
+			: item.item.scope === StorageScopeEnumSchema.enum.Toolbar
+				? PlacementFailureReasonEnumSchema.enum.ToolbarFull
+				: PlacementFailureReasonEnumSchema.enum.InventoryFull;
 	return yield* Effect.fail(
 		new PlacementUnavailableError({
 			itemId: item.item.id,
-			placement: "drop",
+			placement: PlacementEnumSchema.enum.Drop,
 			quantity: item.quantity,
 			reason,
 			remainingQuantity: item.quantity,

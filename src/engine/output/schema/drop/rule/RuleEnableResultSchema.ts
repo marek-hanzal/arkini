@@ -10,7 +10,7 @@ export const RuleEnableResultSchema = z
 	.object({
 		...BaseRuleResultSchema.shape,
 		type: RuleEnumSchema.extract([
-			"enable",
+			RuleEnumSchema.enum.Enable,
 		]).describe("Identifies this result as an evaluated selected-drop enable rule."),
 	})
 	.strict()

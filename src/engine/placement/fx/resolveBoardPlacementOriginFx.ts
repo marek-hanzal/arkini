@@ -3,7 +3,7 @@ import { match } from "ts-pattern";
 
 import type { GridSizeSchema } from "~/engine/grid/schema/GridSizeSchema";
 import type { BoardLocationSchema } from "~/engine/location/schema/BoardLocationSchema";
-import type { PlacementEnumSchema } from "~/engine/placement/schema/PlacementEnumSchema";
+import { PlacementEnumSchema } from "~/engine/placement/schema/PlacementEnumSchema";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 
 export namespace resolveBoardPlacementOriginFx {
@@ -21,8 +21,8 @@ export const resolveBoardPlacementOriginFx = Effect.fn("resolveBoardPlacementOri
 	size,
 }: resolveBoardPlacementOriginFx.Props) {
 	return yield* match(placement)
-		.with("drop", () => Effect.succeed(origin))
-		.with("random", () =>
+		.with(PlacementEnumSchema.enum.Drop, () => Effect.succeed(origin))
+		.with(PlacementEnumSchema.enum.Random, () =>
 			Random.nextIntBetween(0, size.width * size.height).pipe(
 				Effect.map(
 					(index) =>

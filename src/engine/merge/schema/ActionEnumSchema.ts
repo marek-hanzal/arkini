@@ -4,16 +4,10 @@ import { z } from "zod";
  * Discriminates what happens to a source item after it initiates a merge.
  */
 export const ActionEnumSchema = z
-	.enum([
-		/**
-		 * Uses one source quantity, then returns it through standard placement.
-		 */
-		"use",
-		/**
-		 * Consumes the source item after it changes its target.
-		 */
-		"consume",
-	])
+	.enum({
+		Use: "use",
+		Consume: "consume",
+	})
 	.meta({
 		id: "ActionEnumSchema",
 		description: "The action applied to a source item after it initiates a merge.",

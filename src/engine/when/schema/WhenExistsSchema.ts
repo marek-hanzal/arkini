@@ -13,7 +13,7 @@ export const WhenExistsSchema = z
 		 * Identifies this condition as an item-query existence check.
 		 */
 		type: WhenEnumSchema.extract([
-			"exists",
+			WhenEnumSchema.enum.Exists,
 		]).describe("Identifies this condition as an item-query existence check."),
 	})
 	.strict()

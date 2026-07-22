@@ -3,6 +3,7 @@ import { Effect } from "effect";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { DropSchema } from "~/engine/output/schema/DropSchema";
 import type { OutputSchema } from "~/engine/output/schema/OutputSchema";
+import { RollEnumSchema } from "~/engine/roll/schema/RollEnumSchema";
 
 export type OutputRecreationCertainty = "guaranteed" | "stochastic" | "none";
 
@@ -26,10 +27,10 @@ export const readOutputRecreationCertaintyFx = Effect.fn("readOutputRecreationCe
 	function* (output: OutputSchema.Type, itemId: IdSchema.Type) {
 		const sets = output.set.map((set) => {
 			const rolls = set.roll.map((roll): OutputRecreationCertainty => {
-				if (roll.type === "guaranteed") {
+				if (roll.type === RollEnumSchema.enum.Guaranteed) {
 					return readDropCertainty(roll.drop, itemId);
 				}
-				if (roll.type === "chance") {
+				if (roll.type === RollEnumSchema.enum.Chance) {
 					if (roll.chance === 0) return "none";
 					const drop = readDropCertainty(roll.drop, itemId);
 					if (drop === "none") return "none";

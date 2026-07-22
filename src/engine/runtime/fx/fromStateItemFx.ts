@@ -4,6 +4,7 @@ import { resolveItemFx } from "~/engine/item/fx/resolveItemFx";
 import { createRevisionFx } from "~/engine/revision/fx/createRevisionFx";
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
 import type { StateItemSchema } from "~/engine/state/schema/StateItemSchema";
+import { ItemEnumSchema } from "~/engine/item/schema/ItemEnumSchema";
 
 export namespace fromStateItemFx {
 	export interface Props {
@@ -31,7 +32,7 @@ export const fromStateItemFx = Effect.fn("fromStateItemFx")(function* ({
 		quantity: state.quantity,
 		remainingCharges: state.remainingCharges,
 		remainingDurationMs:
-			state.remainingDurationMs ?? (item.type === "temporary" ? item.durationMs : undefined),
+			state.remainingDurationMs ?? (item.type === ItemEnumSchema.enum.Temporary ? item.durationMs : undefined),
 		revision: yield* createRevisionFx(),
 	} satisfies RuntimeItemSchema.Type;
 });

@@ -2,8 +2,9 @@ import { z } from "zod";
 
 import { QuantitySchema } from "~/engine/quantity/schema/QuantitySchema";
 import { IdSchema } from "~/engine/common/schema/IdSchema";
-import { RuleSchema } from "./drop/rule/RuleSchema";
 import { PlacementEnumSchema } from "~/engine/placement/schema/PlacementEnumSchema";
+
+import { RuleSchema } from "./drop/rule/RuleSchema";
 
 /**
  * A quantity of a canonical game item emitted by a successful roll.
@@ -29,7 +30,7 @@ export const DropSchema = z
 		 * If the board cannot accept the emitted items, their item scope determines
 		 * whether the remainder may be placed in inventory.
 		 */
-		placement: PlacementEnumSchema.default("drop").describe(
+		placement: PlacementEnumSchema.default(PlacementEnumSchema.enum.Drop).describe(
 			"The board-placement strategy for this drop; defaults to a local Manhattan-distance drop and does not control scope-based inventory fallback.",
 		),
 		/**

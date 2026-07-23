@@ -69,6 +69,26 @@ export const validateConfigReferencesFx = Effect.fn("validateConfigReferencesFx"
 		});
 	}
 
+	for (const [index, value] of config.start.toolbar.entries()) {
+		if (config.items[value.itemId] !== undefined) {
+			continue;
+		}
+		diagnostics.push({
+			code: DiagnosticCodeEnumSchema.enum.ConfigMissingReference,
+			severity: DiagnosticSeverityEnumSchema.enum.Error,
+			path: [
+				"start",
+				"toolbar",
+				index,
+				"itemId",
+			],
+			source: provenance.start,
+			message: `Initial toolbar references missing item ${value.itemId}.`,
+			reference: DiagnosticRecordEntityEnumSchema.enum.Item,
+			referenceId: value.itemId,
+		});
+	}
+
 	for (const [itemId, item] of Object.entries(config.items)) {
 		const source = provenance.items[itemId];
 		if (config.categories[item.categoryId] === undefined) {

@@ -42,6 +42,7 @@ export const startTestConfig = GameConfigSchema.parse({
 			width: 2,
 			height: 1,
 		},
+		toolbarSize: 2,
 	},
 	start: {
 		currentSpace: 0,
@@ -59,6 +60,7 @@ export const startTestConfig = GameConfigSchema.parse({
 				quantity: 4,
 			},
 		],
+		toolbar: [],
 	},
 	categories: {},
 	items: {
@@ -77,5 +79,18 @@ export const startTestConfig = GameConfigSchema.parse({
 			maxStackSize: 2,
 			scope: "inventory",
 		}),
+		backpack: {
+			id: "backpack",
+			type: "inventory",
+			title: "Backpack",
+			description: "Backpack",
+			asset: {
+				source: [
+					"asset:backpack",
+				],
+			},
+			tags: [],
+			categoryId: "resource",
+		},
 	},
 });

@@ -7,6 +7,7 @@ import { startLineFx } from "~/engine/job/write/startLineFx";
 import { checkRuntimeLocationsFx } from "~/engine/runtime/check/checkRuntimeLocationsFx";
 import { planDropScopePlacementFx } from "~/engine/placement/fx/planDropScopePlacementFx";
 import { fromStateFx } from "~/engine/runtime/fx/fromStateFx";
+import { readDropItemPreviewFx } from "~/engine/runtime/read/readDropItemPreviewFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import { dropItemFx } from "~/engine/runtime/write/dropItemFx";
 import { moveItemFx } from "~/engine/runtime/write/moveItemFx";
@@ -89,6 +90,34 @@ const configInput = {
 			categoryId: "resource",
 			scope: "board",
 			maxStackSize: 1,
+		},
+		inventoryOnly: {
+			id: "inventoryOnly",
+			type: "simple",
+			title: "Inventory only",
+			description: "Inventory only",
+			asset: {
+				source: [
+					"asset:inventory-only",
+				],
+			},
+			tags: [],
+			categoryId: "resource",
+			scope: "inventory",
+			maxStackSize: 1,
+		},
+		backpack: {
+			id: "backpack",
+			type: "inventory",
+			title: "Backpack",
+			description: "Backpack",
+			asset: {
+				source: [
+					"asset:backpack",
+				],
+			},
+			tags: [],
+			categoryId: "resource",
 		},
 	},
 } as const;
@@ -174,7 +203,8 @@ describe("Toolbar engine", () => {
 						occupant: null,
 					},
 				});
-				if (stored.kind !== DropItemResultKindEnumSchema.enum.Move) throw new Error("Expected toolbar move.");
+				if (stored.kind !== DropItemResultKindEnumSchema.enum.Move)
+					throw new Error("Expected toolbar move.");
 				const restored = yield* dropItemFx({
 					sourceItemId: stored.itemId,
 					sourceRevision: stored.revision,
@@ -291,6 +321,204 @@ describe("Toolbar engine", () => {
 			itemId: "runtime:board-only",
 		});
 		expect(result.runtime.items[0]?.location).toEqual(board(1, 0));
+	});
+
+	it("moves the inventory opener between Board and Toolbar but rejects Inventory", () => {
+		const result = run(
+			Effect.gen(function* () {
+				const source = yield* spawnItemFx({
+					id: "runtime:backpack",
+					itemId: "backpack",
+					location: board(0, 0),
+					quantity: 1,
+				});
+				const storePreview = yield* readDropItemPreviewFx({
+					sourceItemId: source.id,
+					sourceRevision: source.revision,
+					sourceLocation: source.location,
+					target: {
+						kind: "slot",
+						location: toolbar(1),
+						occupant: null,
+					},
+				});
+				const stored = yield* dropItemFx({
+					sourceItemId: source.id,
+					sourceRevision: source.revision,
+					sourceLocation: source.location,
+					target: {
+						kind: "slot",
+						location: toolbar(1),
+						occupant: null,
+					},
+				});
+				if (stored.kind !== DropItemResultKindEnumSchema.enum.Move) {
+					throw new Error("Expected Backpack toolbar move.");
+				}
+				const inventoryLocation = {
+					scope: "inventory" as const,
+					position: {
+						x: 0,
+						y: 0,
+					},
+				};
+				const preview = yield* readDropItemPreviewFx({
+					sourceItemId: stored.itemId,
+					sourceRevision: stored.revision,
+					sourceLocation: stored.location,
+					target: {
+						kind: "slot",
+						location: inventoryLocation,
+						occupant: null,
+					},
+				});
+				const rejected = yield* dropItemFx({
+					sourceItemId: stored.itemId,
+					sourceRevision: stored.revision,
+					sourceLocation: stored.location,
+					target: {
+						kind: "slot",
+						location: inventoryLocation,
+						occupant: null,
+					},
+				});
+				const afterRejected = yield* readRuntimeFx();
+				const restored = yield* dropItemFx({
+					sourceItemId: stored.itemId,
+					sourceRevision: stored.revision,
+					sourceLocation: stored.location,
+					target: {
+						kind: "slot",
+						location: board(2, 1),
+						occupant: null,
+					},
+				});
+
+				return {
+					afterRejected,
+					preview,
+					rejected,
+					restored,
+					runtime: yield* readRuntimeFx(),
+					stored,
+					storePreview,
+				};
+			}),
+		);
+
+		expect(result.storePreview).toEqual({
+			kind: DropItemResultKindEnumSchema.enum.Move,
+		});
+		expect(result.preview).toEqual({
+			kind: DropItemResultKindEnumSchema.enum.Reject,
+			reason: DropItemRejectedReasonEnumSchema.enum.InvalidTarget,
+		});
+		expect(result.rejected).toEqual({
+			kind: DropItemResultKindEnumSchema.enum.Reject,
+			reason: DropItemRejectedReasonEnumSchema.enum.InvalidTarget,
+			itemId: "runtime:backpack",
+		});
+		expect(result.afterRejected.items).toEqual([
+			expect.objectContaining({
+				id: "runtime:backpack",
+				location: toolbar(1),
+				revision: result.stored.revision,
+			}),
+		]);
+		expect(result.restored).toMatchObject({
+			kind: DropItemResultKindEnumSchema.enum.Move,
+			previousLocation: toolbar(1),
+			location: board(2, 1),
+		});
+		expect(result.runtime.items).toEqual([
+			expect.objectContaining({
+				id: "runtime:backpack",
+				location: board(2, 1),
+			}),
+		]);
+	});
+
+	it("rejects occupied-swap previews when either resulting scope is ineligible", () => {
+		const sourceRejected = run(
+			Effect.gen(function* () {
+				const backpack = yield* spawnItemFx({
+					id: "runtime:backpack",
+					itemId: "backpack",
+					location: board(0, 0),
+					quantity: 1,
+				});
+				const target = yield* spawnItemFx({
+					id: "runtime:water",
+					itemId: "water",
+					location: {
+						scope: "inventory",
+						position: {
+							x: 0,
+							y: 0,
+						},
+					},
+					quantity: 1,
+				});
+				return yield* readDropItemPreviewFx({
+					sourceItemId: backpack.id,
+					sourceRevision: backpack.revision,
+					sourceLocation: backpack.location,
+					target: {
+						kind: "slot",
+						location: target.location,
+						occupant: {
+							itemId: target.id,
+							revision: target.revision,
+						},
+					},
+				});
+			}),
+		);
+		const targetRejected = run(
+			Effect.gen(function* () {
+				const source = yield* spawnItemFx({
+					id: "runtime:water",
+					itemId: "water",
+					location: toolbar(0),
+					quantity: 1,
+				});
+				const target = yield* spawnItemFx({
+					id: "runtime:inventory-only",
+					itemId: "inventoryOnly",
+					location: {
+						scope: "inventory",
+						position: {
+							x: 0,
+							y: 0,
+						},
+					},
+					quantity: 1,
+				});
+				return yield* readDropItemPreviewFx({
+					sourceItemId: source.id,
+					sourceRevision: source.revision,
+					sourceLocation: source.location,
+					target: {
+						kind: "slot",
+						location: target.location,
+						occupant: {
+							itemId: target.id,
+							revision: target.revision,
+						},
+					},
+				});
+			}),
+		);
+
+		for (const preview of [
+			sourceRejected,
+			targetRejected,
+		]) {
+			expect(preview).toEqual({
+				kind: DropItemResultKindEnumSchema.enum.Reject,
+				reason: DropItemRejectedReasonEnumSchema.enum.InvalidTarget,
+			});
+		}
 	});
 
 	it("uses toolbar as the final standard placement surface for any-scope output", () => {

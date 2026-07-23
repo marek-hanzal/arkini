@@ -241,6 +241,7 @@ describe("startFx", () => {
 			width: 7,
 			height: 7,
 		});
+		expect(config.meta.toolbarSize).toBe(13);
 
 		const result = Effect.runSync(
 			Effect.gen(function* () {
@@ -274,7 +275,7 @@ describe("startFx", () => {
 			),
 		);
 
-		expect(result.runtime.items).toHaveLength(12);
+		expect(result.runtime.items).toHaveLength(9);
 		expect(result.queriedEdgeItem).toBe(result.edgeItem);
 		expect(result.edgeItem.location).toEqual({
 			space: 0,
@@ -308,8 +309,22 @@ describe("startFx", () => {
 					},
 					quantity: 1,
 				}),
+				expect.objectContaining({
+					item: config.items["item:inventory"],
+					location: {
+						position: {
+							x: 12,
+							y: 0,
+						},
+						scope: "toolbar",
+					},
+					quantity: 1,
+				}),
 			]),
 		);
+		expect(
+			result.runtime.items.filter((item) => item.item.id === "item:inventory"),
+		).toHaveLength(1);
 	});
 
 	it("serializes concurrent start attempts against one empty runtime", async () => {

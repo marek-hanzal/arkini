@@ -18,6 +18,7 @@ const compileItems = (
 		currentSpace: 0,
 		board: [],
 		inventory: [],
+		toolbar: [],
 	},
 ) =>
 	Effect.runPromise(
@@ -120,6 +121,7 @@ describe("completed config reference validation", () => {
 					},
 				],
 				inventory: [],
+				toolbar: [],
 			},
 		);
 		const missing = result.diagnostics.filter(

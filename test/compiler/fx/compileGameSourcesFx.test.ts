@@ -29,6 +29,42 @@ describe("compileGameSourcesFx", () => {
 		expect(result.diagnostics).toEqual([]);
 	});
 
+	it("reports an unknown exact toolbar start item at its source path", async () => {
+		const result = await compile(
+			createRootSource({
+				start: {
+					currentSpace: 0,
+					board: [],
+					inventory: [],
+					toolbar: [
+						{
+							itemId: "item:missing",
+							position: {
+								x: 0,
+								y: 0,
+							},
+						},
+					],
+				},
+			}),
+		);
+
+		expect(result.diagnostics).toEqual(
+			expect.arrayContaining([
+				expect.objectContaining({
+					code: DiagnosticCodeEnumSchema.enum.ConfigMissingReference,
+					path: [
+						"start",
+						"toolbar",
+						0,
+						"itemId",
+					],
+					source: "/game/game.json",
+				}),
+			]),
+		);
+	});
+
 	it("reports missing completed root fields instead of packing a fragment", async () => {
 		const result = await compile(
 			GameSourceFileSchema.parse({

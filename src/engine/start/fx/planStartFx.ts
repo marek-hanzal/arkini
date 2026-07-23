@@ -6,6 +6,7 @@ import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import type { StartSchema } from "~/engine/start/schema/StartSchema";
 import { planStartBoardItemFx } from "./planStartBoardItemFx";
 import { planStartInventoryItemFx } from "./planStartInventoryItemFx";
+import { planStartToolbarItemFx } from "./planStartToolbarItemFx";
 
 export namespace planStartFx {
 	export interface Props {
@@ -62,10 +63,25 @@ export const planStartFx = Effect.fn("planStartFx")(function* ({
 			} satisfies PlanningState;
 		});
 	});
+	const toolbar = yield* Effect.reduce(start.toolbar, inventory, (state, item) => {
+		return Effect.gen(function* () {
+			const plan = yield* planStartToolbarItemFx({
+				item,
+			});
+			const [, draft] = yield* applyPlacementPlanFx({
+				plan,
+				runtime: state.draft,
+			});
 
-	yield* assertRuntimeFx({
-		runtime: inventory.draft,
+			return {
+				draft,
+			} satisfies PlanningState;
+		});
 	});
 
-	return inventory.draft;
+	yield* assertRuntimeFx({
+		runtime: toolbar.draft,
+	});
+
+	return toolbar.draft;
 });

@@ -37,7 +37,7 @@ export const GameConfigSchema = z
 		 * Board and inventory contents created for a new game.
 		 */
 		start: StartSchema.describe(
-			"The initial board and inventory contents created for a new game.",
+			"The initial board, inventory, and toolbar contents created for a new game.",
 		),
 		/**
 		 * Canonical UI-facing categories keyed by their stable identifier.

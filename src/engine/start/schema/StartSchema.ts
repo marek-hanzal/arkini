@@ -4,9 +4,10 @@ import { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeInte
 
 import { BoardItemSchema } from "./BoardItemSchema";
 import { InventoryItemSchema } from "./InventoryItemSchema";
+import { ToolbarItemSchema } from "./ToolbarItemSchema";
 
 /**
- * Defines the board and inventory contents used when a new game starts.
+ * Defines the board, inventory, and toolbar contents used when a new game starts.
  */
 export const StartSchema = z
 	.object({
@@ -27,11 +28,19 @@ export const StartSchema = z
 			.array(InventoryItemSchema)
 			.default([])
 			.describe("The item quantities added to inventory when a new game starts."),
+		/**
+		 * Items placed at explicit initial toolbar slots.
+		 */
+		toolbar: z
+			.array(ToolbarItemSchema)
+			.default([])
+			.describe("The items placed at explicit slots when a new game starts."),
 	})
 	.strict()
 	.meta({
 		id: "StartSchema",
-		description: "The initial board placements and inventory contents for a new game.",
+		description:
+			"The initial board placements, inventory contents, and toolbar placements for a new game.",
 	});
 
 export type StartSchema = typeof StartSchema;

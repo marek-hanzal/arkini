@@ -6,16 +6,20 @@ import { StorageScopeEnumSchema } from "~/engine/scope/schema/StorageScopeEnumSc
 import { BaseItemSchema } from "./BaseItemSchema";
 import { ItemEnumSchema } from "./ItemEnumSchema";
 
-/**
- * A singleton board-item authoring contract for a future shared inventory opener.
- */
+/** A singleton Board/Toolbar item that opens the shared inventory surface. */
 export const InventoryItemSchema = z
 	.object({
 		...BaseItemSchema.shape,
-		type: ItemEnumSchema.extract(["Inventory"]).describe("Identifies this item as the shared inventory opener."),
-		scope: StorageScopeEnumSchema.extract(["Board"])
+		type: ItemEnumSchema.extract([
+			"Inventory",
+		]).describe("Identifies this item as the shared inventory opener."),
+		scope: StorageScopeEnumSchema.extract([
+			"Board",
+		])
 			.default(StorageScopeEnumSchema.enum.Board)
-			.describe("Keeps the inventory opener on the board."),
+			.describe(
+				"Uses Board for automatic placement; the inventory item type also permits an exact Toolbar location.",
+			),
 		maxCount: PositiveIntegerSchema.max(1)
 			.default(1)
 			.describe("Allows exactly one inventory opener in game state."),
@@ -26,8 +30,7 @@ export const InventoryItemSchema = z
 	.strict()
 	.meta({
 		id: "InventoryItemSchema",
-		description:
-			"A singleton board-item authoring contract for a future shared inventory opener.",
+		description: "A singleton Board/Toolbar item that opens the shared inventory surface.",
 	});
 
 export type InventoryItemSchema = typeof InventoryItemSchema;

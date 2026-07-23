@@ -98,6 +98,7 @@ describe("planStartFx", () => {
 							quantity: 3,
 						},
 					],
+					toolbar: [],
 				},
 			}).pipe(
 				useGameFx({
@@ -112,6 +113,56 @@ describe("planStartFx", () => {
 			2,
 		]);
 		expect(result.items.reduce((sum, item) => sum + item.quantity, 0)).toBe(5);
+	});
+
+	it("materializes one exact eligible toolbar item", () => {
+		const result = Effect.runSync(
+			planStartFx({
+				runtime: {
+					cheats: {
+						enabled: false,
+						everEnabled: false,
+						instantGameplay: false,
+					},
+					currentSpace: 0,
+					items: [],
+					jobs: [],
+					jobQueue: [],
+				},
+				start: {
+					currentSpace: 0,
+					board: [],
+					inventory: [],
+					toolbar: [
+						{
+							itemId: "backpack",
+							position: {
+								x: 1,
+								y: 0,
+							},
+						},
+					],
+				},
+			}).pipe(
+				useGameFx({
+					config: startTestConfig,
+				}),
+			),
+		);
+
+		expect(result.items).toEqual([
+			expect.objectContaining({
+				item: startTestConfig.items.backpack,
+				location: {
+					position: {
+						x: 1,
+						y: 0,
+					},
+					scope: "toolbar",
+				},
+				quantity: 1,
+			}),
+		]);
 	});
 
 	it("rejects conflicting exact board locations", () => {
@@ -145,6 +196,66 @@ describe("planStartFx", () => {
 							},
 						],
 						inventory: [],
+						toolbar: [],
+					},
+				}),
+			).pipe(
+				useGameFx({
+					config: startTestConfig,
+				}),
+			),
+		);
+
+		expect(Either.isLeft(result)).toBe(true);
+		if (Either.isLeft(result)) {
+			expect(result.left).toMatchObject({
+				_tag: "RuntimeInvalidError",
+				result: {
+					issues: [
+						expect.objectContaining({
+							type: RuntimeCheckIssueEnumSchema.enum.LocationOccupied,
+						}),
+					],
+				},
+			});
+		}
+	});
+
+	it("rejects two eligible start items claiming the same exact toolbar slot", () => {
+		const result = Effect.runSync(
+			Effect.either(
+				planStartFx({
+					runtime: {
+						cheats: {
+							enabled: false,
+							everEnabled: false,
+							instantGameplay: false,
+						},
+						currentSpace: 0,
+						items: [],
+						jobs: [],
+						jobQueue: [],
+					},
+					start: {
+						currentSpace: 0,
+						board: [],
+						inventory: [],
+						toolbar: [
+							{
+								itemId: "backpack",
+								position: {
+									x: 0,
+									y: 0,
+								},
+							},
+							{
+								itemId: "log",
+								position: {
+									x: 0,
+									y: 0,
+								},
+							},
+						],
 					},
 				}),
 			).pipe(

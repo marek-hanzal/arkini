@@ -1,6 +1,7 @@
 import { Effect } from "effect";
 import { match } from "ts-pattern";
 
+import { isItemLocationScopeAllowed } from "~/engine/location/read/isItemLocationScopeAllowed";
 import { RuntimeCheckIssueEnumSchema } from "~/engine/runtime/schema/check/RuntimeCheckIssueEnumSchema";
 import { readGridLocationOccupantsFx } from "~/engine/location/read/readGridLocationOccupantsFx";
 import { isGridRuntimeItem } from "~/engine/runtime/read/isGridRuntimeItem";
@@ -9,7 +10,6 @@ import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import type { LocationOccupiedIssueSchema } from "~/engine/runtime/schema/check/LocationOccupiedIssueSchema";
 import type { LocationOutOfBoundsIssueSchema } from "~/engine/runtime/schema/check/LocationOutOfBoundsIssueSchema";
 import type { LocationScopeIssueSchema } from "~/engine/runtime/schema/check/LocationScopeIssueSchema";
-import { StorageScopeEnumSchema } from "~/engine/scope/schema/StorageScopeEnumSchema";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 
 export namespace checkRuntimeLocationsFx {
@@ -37,7 +37,7 @@ export const checkRuntimeLocationsFx = Effect.fn("checkRuntimeLocationsFx")(func
 
 	for (const item of items) {
 		const configuredScope = item.item.scope;
-		const scopeAllowed = configuredScope === StorageScopeEnumSchema.enum.Any || configuredScope === item.location.scope;
+		const scopeAllowed = isItemLocationScopeAllowed(item.item, item.location.scope);
 		if (!scopeAllowed) {
 			scopeIssues.push({
 				configuredScope,

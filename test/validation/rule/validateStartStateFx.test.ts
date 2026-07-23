@@ -88,4 +88,126 @@ describe("validateStartStateFx", () => {
 			failureTag: "StartInventoryUnavailableError",
 		});
 	});
+
+	it.each([
+		{
+			name: "undefined toolbar",
+			meta: {
+				...startTestConfig.meta,
+				toolbarSize: undefined,
+			},
+			toolbar: [
+				{
+					itemId: "backpack",
+					position: {
+						x: 0,
+						y: 0,
+					},
+				},
+			],
+		},
+		{
+			name: "disabled toolbar",
+			meta: {
+				...startTestConfig.meta,
+				toolbarSize: 0,
+			},
+			toolbar: [
+				{
+					itemId: "backpack",
+					position: {
+						x: 0,
+						y: 0,
+					},
+				},
+			],
+		},
+		{
+			name: "out-of-range toolbar slot",
+			meta: startTestConfig.meta,
+			toolbar: [
+				{
+					itemId: "backpack",
+					position: {
+						x: 2,
+						y: 0,
+					},
+				},
+			],
+		},
+		{
+			name: "non-zero toolbar row",
+			meta: startTestConfig.meta,
+			toolbar: [
+				{
+					itemId: "backpack",
+					position: {
+						x: 0,
+						y: 1,
+					},
+				},
+			],
+		},
+		{
+			name: "non-toolbar item",
+			meta: startTestConfig.meta,
+			toolbar: [
+				{
+					itemId: "tree",
+					position: {
+						x: 0,
+						y: 0,
+					},
+				},
+			],
+		},
+		{
+			name: "duplicate toolbar slot",
+			meta: startTestConfig.meta,
+			toolbar: [
+				{
+					itemId: "backpack",
+					position: {
+						x: 0,
+						y: 0,
+					},
+				},
+				{
+					itemId: "log",
+					position: {
+						x: 0,
+						y: 0,
+					},
+				},
+			],
+		},
+	])("rejects $name through canonical start validation", ({ meta, toolbar }) => {
+		const config = GameConfigSchema.parse({
+			...startTestConfig,
+			meta,
+			start: {
+				currentSpace: 0,
+				board: [],
+				inventory: [],
+				toolbar,
+			},
+		});
+		const diagnostics = Effect.runSync(
+			validateStartStateFx({
+				config,
+				provenance,
+			}),
+		);
+
+		expect(diagnostics).toEqual([
+			expect.objectContaining({
+				code: DiagnosticCodeEnumSchema.enum.StartInvalid,
+				failureTag: "RuntimeInvalidError",
+				path: [
+					"start",
+				],
+				source: "start.json",
+			}),
+		]);
+	});
 });

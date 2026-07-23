@@ -102,6 +102,7 @@ export const createRootSource = ({
 		currentSpace: 0,
 		board: [],
 		inventory: [],
+		toolbar: [],
 	},
 }: {
 	path?: string;

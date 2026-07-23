@@ -2,6 +2,7 @@ import { Effect, Option } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
+import { isItemLocationScopeAllowed } from "~/engine/location/read/isItemLocationScopeAllowed";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 import { resolveDefaultLineInputStoreFx } from "~/engine/input/fx/resolveDefaultLineInputStoreFx";
 import { isSameGridLocation } from "~/engine/location/read/isSameGridLocation";
@@ -89,6 +90,9 @@ export const readDropItemPreviewFx = Effect.fn("readDropItemPreviewFx")(function
 		return rejected(DropItemRejectedReasonEnumSchema.enum.StaleSource);
 	}
 	if (target.occupant === null) {
+		if (!isItemLocationScopeAllowed(source.item, target.location.scope)) {
+			return rejected(DropItemRejectedReasonEnumSchema.enum.InvalidTarget);
+		}
 		return {
 			kind: DropItemResultKindEnumSchema.enum.Move,
 		} satisfies readDropItemPreviewFx.Result;
@@ -148,6 +152,12 @@ export const readDropItemPreviewFx = Effect.fn("readDropItemPreviewFx")(function
 			inputIndex: inputStore.inputIndex,
 			quantity: inputStore.quantity,
 		} satisfies readDropItemPreviewFx.Result;
+	}
+	if (
+		!isItemLocationScopeAllowed(source.item, targetItem.location.scope) ||
+		!isItemLocationScopeAllowed(targetItem.item, source.location.scope)
+	) {
+		return rejected(DropItemRejectedReasonEnumSchema.enum.InvalidTarget);
 	}
 	return {
 		kind: DropItemResultKindEnumSchema.enum.Swap,

@@ -26,12 +26,6 @@
 	"start": {
 		"board": [
 			{
-				"itemId": "item:inventory",
-				"x": 10,
-				"y": 6,
-				"space": 0
-			},
-			{
 				"itemId": "item:tree",
 				"x": 1,
 				"y": 0,
@@ -78,6 +72,15 @@
 			{
 				"itemId": "item:magnifying-glass",
 				"quantity": 1
+			}
+		],
+		"toolbar": [
+			{
+				"itemId": "item:inventory",
+				"position": {
+					"x": 12,
+					"y": 0
+				}
 			}
 		],
 		"currentSpace": 0

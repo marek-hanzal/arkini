@@ -19,7 +19,7 @@ const item = {
 };
 
 describe("InventoryItemSchema", () => {
-	it("fixes inventory openers to one board-only singleton", () => {
+	it("fixes inventory openers to one Board-default singleton", () => {
 		expect(InventoryItemSchema.parse(item)).toMatchObject({
 			maxCount: 1,
 			maxStackSize: 1,

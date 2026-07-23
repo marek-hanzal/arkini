@@ -20,7 +20,9 @@ export const resolveLineRuntimeFx = Effect.fn("resolveLineRuntimeFx")(function* 
 	rules,
 }: resolveLineRuntimeFx.Props) {
 	const multiplier = rules.reduce((value, rule) => {
-		return rule.type === RuleEnumSchema.enum.RuntimeMultiplier && rule.active ? value * rule.multiplier : value;
+		return rule.type === RuleEnumSchema.enum.RuntimeMultiplier && rule.active
+			? value * rule.multiplier
+			: value;
 	}, 1);
 
 	return Math.ceil(line.runtimeMs * multiplier) satisfies TimeSchema.Type;

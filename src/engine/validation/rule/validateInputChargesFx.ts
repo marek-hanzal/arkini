@@ -105,7 +105,8 @@ export const validateInputChargesFx = Effect.fn("validateInputChargesFx")(functi
 							ownerItemId: itemId,
 							lineId: line.id,
 							inputIndex,
-							reason: InvalidInputChargesReasonEnumSchema.enum.SelfInsufficientCharges,
+							reason: InvalidInputChargesReasonEnumSchema.enum
+								.SelfInsufficientCharges,
 						});
 					}
 					continue;
@@ -142,7 +143,8 @@ export const validateInputChargesFx = Effect.fn("validateInputChargesFx")(functi
 				});
 				const available = matchedCandidates.some((candidate) => {
 					return (
-						(candidate.scope === StorageScopeEnumSchema.enum.Board || candidate.scope === StorageScopeEnumSchema.enum.Any) &&
+						(candidate.scope === StorageScopeEnumSchema.enum.Board ||
+							candidate.scope === StorageScopeEnumSchema.enum.Any) &&
 						candidate.charges !== undefined &&
 						candidate.charges.amount >= targetChargeCost
 					);
@@ -166,7 +168,8 @@ export const validateInputChargesFx = Effect.fn("validateInputChargesFx")(functi
 				const payer = config.items[payerItemId];
 				if (
 					payer === undefined ||
-					(payer.scope !== StorageScopeEnumSchema.enum.Board && payer.scope !== StorageScopeEnumSchema.enum.Any) ||
+					(payer.scope !== StorageScopeEnumSchema.enum.Board &&
+						payer.scope !== StorageScopeEnumSchema.enum.Any) ||
 					payer.charges === undefined ||
 					payer.maxCount === undefined
 				) {

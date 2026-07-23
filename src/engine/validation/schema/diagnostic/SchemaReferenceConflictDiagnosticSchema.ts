@@ -8,8 +8,12 @@ import { BaseDiagnosticSchema } from "./BaseDiagnosticSchema";
 export const SchemaReferenceConflictDiagnosticSchema = z
 	.object({
 		...BaseDiagnosticSchema.shape,
-		code: DiagnosticCodeEnumSchema.extract(["SourceSchemaReferenceConflict"]),
-		severity: DiagnosticSeverityEnumSchema.extract(["Error"]),
+		code: DiagnosticCodeEnumSchema.extract([
+			"SourceSchemaReferenceConflict",
+		]),
+		severity: DiagnosticSeverityEnumSchema.extract([
+			"Error",
+		]),
 		values: z.tuple([
 			z.string().min(1),
 			z.string().min(1),

@@ -72,12 +72,14 @@ describe("item motion event readers", () => {
 			],
 		} satisfies OutputPlacementResultSchema.Type;
 
-		expect(Effect.runSync(
-			readOutputPlacementItemEventsFx({
-				originItemId: "runtime:origin",
-				placement,
-			}),
-		)).toEqual([
+		expect(
+			Effect.runSync(
+				readOutputPlacementItemEventsFx({
+					originItemId: "runtime:origin",
+					placement,
+				}),
+			),
+		).toEqual([
 			{
 				type: GameEventEnumSchema.enum.ItemStacked,
 				itemId: stacked.id,
@@ -116,18 +118,22 @@ describe("item motion event readers", () => {
 					placement: {
 						remove: [],
 						stack: [],
-						spawn: [incoming],
+						spawn: [
+							incoming,
+						],
 					},
 				},
 			],
 		} satisfies OutputPlacementResultSchema.Type;
 
-		expect(Effect.runSync(
-			readOutputPlacementItemEventsFx({
-				originItemId: "runtime:origin",
-				placement,
-			}),
-		)).toEqual([
+		expect(
+			Effect.runSync(
+				readOutputPlacementItemEventsFx({
+					originItemId: "runtime:origin",
+					placement,
+				}),
+			),
+		).toEqual([
 			{
 				type: GameEventEnumSchema.enum.ItemSpawned,
 				itemId: incoming.id,

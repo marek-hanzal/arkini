@@ -11,7 +11,9 @@ import { QuantityEnumSchema } from "./QuantityEnumSchema";
 export const QuantityRangeSchema = z
 	.object({
 		...BaseQuantitySchema.shape,
-		type: QuantityEnumSchema.extract(["Range"]),
+		type: QuantityEnumSchema.extract([
+			"Range",
+		]),
 		/**
 		 * The smallest quantity that can be selected from this range.
 		 */

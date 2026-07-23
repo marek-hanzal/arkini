@@ -16,7 +16,11 @@ export interface CheatItemCatalogEntry {
 export const readCheatItemCatalogFx = Effect.fn("readCheatItemCatalogFx")(function* () {
 	const config = yield* GameConfigFx;
 	return Object.values(config.items)
-		.filter((item) => item.scope === StorageScopeEnumSchema.enum.Board || item.scope === StorageScopeEnumSchema.enum.Any)
+		.filter(
+			(item) =>
+				item.scope === StorageScopeEnumSchema.enum.Board ||
+				item.scope === StorageScopeEnumSchema.enum.Any,
+		)
 		.map(
 			(item): CheatItemCatalogEntry => ({
 				itemId: item.id,

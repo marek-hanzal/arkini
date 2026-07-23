@@ -9,8 +9,12 @@ import { BaseDiagnosticSchema } from "./BaseDiagnosticSchema";
 export const LimitedDepositWarningDiagnosticSchema = z
 	.object({
 		...BaseDiagnosticSchema.shape,
-		code: DiagnosticCodeEnumSchema.extract(["DepositUnsustainable"]),
-		severity: DiagnosticSeverityEnumSchema.extract(["Warning"]),
+		code: DiagnosticCodeEnumSchema.extract([
+			"DepositUnsustainable",
+		]),
+		severity: DiagnosticSeverityEnumSchema.extract([
+			"Warning",
+		]),
 		itemId: IdSchema,
 	})
 	.strict()

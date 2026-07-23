@@ -1,75 +1,36 @@
-# Arkini LLM workspace
+# Arkini LLM instructions
 
-This directory is the private working-memory area for the primary implementation model.
+This directory contains narrowly scoped, durable instructions for implementation and review. It is not a project-status surface.
 
-## Implementation reading order
+## Reading order
 
-Before changing code, read:
+Before changing the repository, read the canonical contracts that own the affected area:
 
-1. `../README.md`
-2. `../ARCHITECTURE.md`
-3. `../CODE_GUIDE.md`
-4. `../CONFIG.md` when touching authoring/compiler/validation
-5. `../GAME.MD` when touching gameplay semantics
-6. `CURRENT.md`
-7. `tasks/README.md`
-8. the one numbered task named by `CURRENT.md`
+1. [`../README.md`](../README.md)
+2. [`../ARCHITECTURE.md`](../ARCHITECTURE.md)
+3. [`../CODE_GUIDE.md`](../CODE_GUIDE.md)
+4. [`../CONFIG.md`](../CONFIG.md) for authoring, compiler, schema, validation, or packing work
+5. [`../GAME.MD`](../GAME.MD) for gameplay semantics
 
-Do not begin with archived reviews. They explain history, not the current contract.
+Use [GitHub Issues](https://github.com/marek-hanzal/arkini/issues) as the only active backlog and continuation map. Do not create a local roadmap, current-status file, handoff queue, or replacement planning surface.
 
-## Review reading order
-
-Independent implementation reviews start with [`REVIEW_CODEBOOK.md`](REVIEW_CODEBOOK.md) and follow its authority, scope, validation, evidence, GitHub, and reporting protocol. The local numbered implementation queue is not a review backlog and must not manufacture review work.
-
-## Active files
+## Durable local surface
 
 ```text
-README.md           This index and maintenance policy.
-REVIEW_CODEBOOK.md  Authoritative operating manual for independent implementation reviews.
-CURRENT.md          Compact durable project memory and non-obvious decisions.
-tasks/README.md Ordered task queue and continuation protocol.
-tasks/COVERAGE.md Historical behavior coverage and pruning map.
-tasks/NN-*.md Numbered vertical slices; read only the current task unless planning dependencies.
-archive/        Historical reviews, plans, handoffs, and superseded notes.
+README.md           This instruction and ownership index.
+REVIEW_CODEBOOK.md  Authoritative protocol for independent implementation reviews.
+tasks/              Temporary historical-migration evidence; never an active queue.
+archive/            Temporary non-authoritative archaeology pending migration closeout.
 ```
 
-The active surface must stay short. When a decision becomes canonical, merge it into the owning root document or `CURRENT.md`; do not leave another competing dated note in the root.
-
-## Archive policy
-
-Move a note to `archive/` when it is:
-
-- a completed review;
-- a superseded design;
-- an implementation plan whose work is finished;
-- a historical task queue;
-- based on removed paths or architecture;
-- useful only for archaeology.
-
-Archived documents may contain obsolete terminology. Never treat an archived snippet as authoritative without checking active documentation and source.
-
-## Repository workflow
-
-The repository is exchanged as ZIP snapshots containing `.git`.
-
-- Confirm `.git` before work.
-- Continue from the provided snapshot rather than recreating history.
-- Commit coherent work as it progresses.
-- Never include `node_modules` in a delivered ZIP.
-- Deliver a fresh ZIP and SHA-256 after completing repository work.
-- Store project-specific notes here, not in random root scratch files.
-
-GitHub Issues are the active work tracker. Every root work item, simple or complex, uses `epic` + `chat-gpt`. Independently actionable child work uses `task` + `chat-gpt`; the root links every child and every child links back to its root.
+When an architecture or gameplay decision becomes canonical, put it in the owning root document and cover executable behavior in source and tests. Work status, dependencies, review findings, and follow-up tasks belong in GitHub Issues.
 
 ## Review discipline
 
-[`REVIEW_CODEBOOK.md`](REVIEW_CODEBOOK.md) is the authoritative protocol for independent Arkini reviews. In particular:
+Independent implementation reviews follow [`REVIEW_CODEBOOK.md`](REVIEW_CODEBOOK.md). Review findings and review history live in GitHub Issues, not another Markdown backlog.
 
-- review passes are read-only and do not create repository commits or modified ZIPs unless explicitly requested;
-- findings and review history live in GitHub Issues, not a second active Markdown backlog under `@chat-gpt`;
-- every review root uses `epic` + `chat-gpt` + `review`, and each independently actionable child uses `task` + `chat-gpt` + `review` + `P1|P2`;
-- roots and children link bidirectionally;
-- a clean review is recorded and closed instead of manufacturing refactors;
-- stable architecture is protected as deliberately as defects are reported.
+## Historical oracle policy
 
-The codebook owns the full review invariants, evidence standard, validation matrix, false-positive checks, and issue workflow. Do not duplicate it into `CURRENT.md` or the numbered implementation queue.
+Historical files may explain prior player-visible behavior, UX, copy, edge cases, animation or audio intent, and useful test scenarios. They never override root documentation, active source, tests, or current GitHub issue decisions, and they are never an architectural donor.
+
+The temporary migration evidence under [`tasks/`](tasks/README.md), [`archive/`](archive/README.md), and [`../src/_archive`](../src/_archive/README.md) exists only while [#263](https://github.com/marek-hanzal/arkini/issues/263), [#264](https://github.com/marek-hanzal/arkini/issues/264), and [#265](https://github.com/marek-hanzal/arkini/issues/265) finish parity classification and historical-source retirement. Git history is the durable archive.

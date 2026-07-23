@@ -18,7 +18,9 @@ export namespace advanceTemporaryItemDurationsFx {
 export const advanceTemporaryItemDurationsFx = Effect.fn("advanceTemporaryItemDurationsFx")(
 	function* ({ items, runtime }: advanceTemporaryItemDurationsFx.Props) {
 		let draft = runtime;
-		const instantGameplay = yield* isInstantGameplayEnabledFx({ runtime });
+		const instantGameplay = yield* isInstantGameplayEnabledFx({
+			runtime,
+		});
 
 		for (const snapshotItem of items) {
 			const liveItem = draft.items.find((candidate) => candidate.id === snapshotItem.id);

@@ -12,7 +12,9 @@ export const SimpleItemSchema = z
 		/**
 		 * Identifies this item as a simple stackable item.
 		 */
-		type: ItemEnumSchema.extract(["Simple"]),
+		type: ItemEnumSchema.extract([
+			"Simple",
+		]),
 	})
 	.strict()
 	.meta({

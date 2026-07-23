@@ -15,7 +15,9 @@ export const InputMaterialRunPlanSchema = z
 		/**
 		 * Identifies this plan as one material input.
 		 */
-		type: InputEnumSchema.extract(["Materials"]),
+		type: InputEnumSchema.extract([
+			"Materials",
+		]),
 		/**
 		 * Whether the allocated material is consumed or reserved by the run.
 		 */

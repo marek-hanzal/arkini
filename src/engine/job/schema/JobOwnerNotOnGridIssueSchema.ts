@@ -11,7 +11,9 @@ export const JobOwnerNotOnGridIssueSchema = z
 		jobId: IdSchema,
 		ownerItemId: IdSchema,
 		location: LocationSchema,
-		type: RuntimeCheckIssueEnumSchema.extract(["JobOwnerNotOnGrid"]),
+		type: RuntimeCheckIssueEnumSchema.extract([
+			"JobOwnerNotOnGrid",
+		]),
 	})
 	.strict()
 	.meta({

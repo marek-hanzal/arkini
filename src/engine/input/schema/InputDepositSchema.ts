@@ -17,7 +17,9 @@ export const InputDepositSchema = z
 		/**
 		 * Identifies this input as one external charged-item target on the board.
 		 */
-		type: InputEnumSchema.extract(["Deposit"]).describe("Identifies this input as one external charged-item target on the board."),
+		type: InputEnumSchema.extract([
+			"Deposit",
+		]).describe("Identifies this input as one external charged-item target on the board."),
 		/**
 		 * Board query used to select one charged target for this input.
 		 */

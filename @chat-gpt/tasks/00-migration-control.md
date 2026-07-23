@@ -1,29 +1,16 @@
-# 00 — Migration control surface
+# Frozen historical-migration guardrails
 
-**Status:** Done
+This file is temporary migration evidence, not an active protocol or task.
 
-## Goal
+Current work is owned by [#263](https://github.com/marek-hanzal/arkini/issues/263), [#264](https://github.com/marek-hanzal/arkini/issues/264), and [#265](https://github.com/marek-hanzal/arkini/issues/265).
 
-Create the durable handoff system used while behavior is recovered from the historical implementation.
+Until the historical tree is retired:
 
-## Completed work
+- never port a historical directory one-to-one;
+- never claim a feature exists because its schema validates;
+- consult historical source only for player-visible behavior, UX, copy, edge cases, animation or audio intent, or useful test scenarios explicitly named by a current GitHub issue;
+- treat current runtime, session, Tick, placement, input, queue, compiler, save, bridge, and UI ownership as canonical unless a reproduced defect proves otherwise;
+- put accepted behavior in active source, tests, and the owning root document;
+- use Git history for completed plans and archaeology.
 
-- ordered numbered task queue;
-- task handoff template and status rules;
-- historical coverage and supersession map;
-- local historical-source README markers;
-- explicit behavioral-oracle policy;
-- first safe historical deletion of standalone superseded tooling;
-- `CURRENT.md` pointer to task 01.
-
-## Permanent rules
-
-- Never port a historical directory one-to-one.
-- Never claim a feature exists because its schema validates.
-- Every completed slice updates coverage and removes obsolete historical material.
-- Current runtime, session, Tick, placement, input, queue, compiler, and save architecture are stable foundations, not migration candidates.
-- Named project operations use Effect and the mandatory `*Fx` suffix.
-
-## Closeout
-
-This file remains active only as the migration protocol. It may move to the archive after task 18 removes the historical tree and the queue is no longer needed.
+Delete this file with the remaining temporary `tasks/` surface after #265 and the final #266 reconciliation.

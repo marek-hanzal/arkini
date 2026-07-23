@@ -1,17 +1,17 @@
 # Arkini gameplay contract
 
-This document describes gameplay semantics implemented by the current engine and explicitly marked authoring capabilities that are not runtime-backed yet. It does not describe historical systems, speculative wish lists, or UI-specific animation details.
+This document describes gameplay semantics implemented by the current engine and the exact boundary between authored data, runtime behavior, and presentation controls. It does not describe historical systems, speculative wish lists, or UI-specific animation details.
 
 Configuration owns concrete content and balance. This document owns the interpretation of current mechanics and the boundary between executable behavior and schema-only intent.
 
 ## 1. Game shape
 
-Arkini is a client-only, offline merge and production game played across multiple isolated board spaces and one shared inventory.
+Arkini is a client-only, offline merge and production game played across multiple isolated Board spaces and two global passive-storage surfaces: Inventory and an optional Toolbar.
 
-The current engine lets callers create and move items, navigate persistent board spaces, store line materials, start and queue product lines, advance deterministic jobs, execute directional merges, resolve configured outputs, and place resulting quantities through one shared policy. Remaining schema-only utility capabilities are listed later in this document.
+The current engine lets callers create and move items, navigate persistent Board spaces, store line materials, start and queue product lines, advance deterministic jobs, execute directional merges, resolve configured outputs, and place resulting quantities through one shared policy. Utility controls cross the runtime, session, storage, and presentation boundaries described later in this document.
 
-Every board space uses the board size from game metadata; the shared inventory uses its own configured size. They are not fixed engine constants.
-The bundled Arkini package currently authors a `13 × 9` board and keeps the shared inventory at `7 × 7`.
+Every Board space uses the Board size from game metadata; Inventory uses its configured grid size and Toolbar uses its optional one-row slot count. They are not fixed engine constants.
+The bundled Arkini package currently authors a `13 × 9` Board, a `7 × 7` Inventory, and a 13-slot Toolbar.
 
 ## 2. Items and locations
 
@@ -19,32 +19,35 @@ Every live item is a runtime instance of one canonical configured item.
 
 Configured storage scope determines whether the item may occupy:
 
-- board;
-- inventory;
-- either grid.
+- Board;
+- Inventory;
+- Toolbar;
+- any of those three grids.
+
+The singleton Inventory opener is the deliberate exception: its authored Board scope controls automatic placement, while the live opener may occupy Board or Toolbar but never Inventory.
 
 Runtime may additionally place material representations into:
 
 - a specific owner line-input slot;
 - a consumed job material or live reserved material.
 
-Input and job locations are ownership states. They are not visible storage grids and cannot be manipulated as normal board/inventory items.
+Input and job locations are ownership states. They are not visible storage grids and cannot be manipulated as normal grid items.
 
-## 3. Board and inventory
+## 3. Board, Inventory, and Toolbar
 
-Every board space is an active spatial surface. Board cells are identified by mandatory `space + x + y`, and equal coordinates in different spaces never collide. All spaces continue simulating together; `currentSpace` only selects the presented board and the destination of explicit inventory-to-board placement.
+Every Board space is an active spatial surface. Board cells are identified by mandatory `space + x + y`, and equal coordinates in different spaces never collide. All spaces continue simulating together; `currentSpace` only selects the presented Board and the destination of explicit passive-storage-to-Board placement.
 
-Spatial mechanics never cross directly between boards. Placement, distance, merge, charges, outputs, and release stay inside their origin space. The shared inventory is the only bridge between spaces.
+Spatial mechanics never cross directly between Boards. Placement, distance, merge, charges, outputs, and release stay inside their origin space. The global Inventory and Toolbar are the only bridges between spaces.
 
-Inventory is passive storage:
+Inventory and Toolbar are passive storage:
 
-- active and ready jobs pause while their owner is in inventory;
-- queued work does not dispatch while the owner is in inventory;
-- board-origin rules cannot use inventory coordinates;
+- active and ready jobs pause while their owner is on either surface;
+- queued work does not dispatch while the owner is on either surface;
+- Board-origin rules cannot use passive-storage coordinates;
 - new input, job, queue, or other identity-bound state cannot be attached there;
 - returning the same owner to the board resumes normal evaluation.
 
-Moving an item to inventory is not item removal. Instance state, jobs, queue requests, buffered inputs, and remaining time stay attached to the same owner.
+Moving an item to Inventory or Toolbar is not item removal. Instance state, jobs, queue requests, buffered inputs, and remaining time stay attached to the same owner.
 
 ## 4. Stacks
 
@@ -251,13 +254,13 @@ All runtime-executed output and relocation use the shared placement policy, incl
 - direct drop/output commands;
 - initial placement planning where applicable.
 
-Materialized drops respect configured storage scope, max count, purity and stack size, board/inventory capacity, authored `drop` or `random` board strategy, and origin-based ordering. Existing-item placement uses the same scope and spatial policy: pure items may normalize through ordinary stack placement, while impure items preserve identity and require one exclusive cell. When an allowed board-first placement cannot fit fully on the board, the remainder may continue into inventory.
+Materialized drops respect configured storage scope, max count, purity and stack size, Board/Inventory/Toolbar capacity, authored `drop` or `random` Board strategy, and origin-based ordering. Existing-item placement uses the same scope and spatial policy: pure items may normalize through ordinary stack placement, while impure items preserve identity and require one exclusive cell. When an `any` placement cannot fit fully on the Board, the remainder continues through Inventory and then Toolbar.
 
 Partial placement is forbidden. The owning gameplay mutation rolls back if the complete quantity cannot be placed.
 
-## 16. Authored capabilities not fully runtime-backed
+## 16. Capability implementation boundaries
 
-The completed configuration accepts more item semantics than the current command surface executes. This is intentional migration state, not permission to pretend the behavior exists.
+The completed configuration and current command surface agree on the following non-trivial capability boundaries. Schema presence alone still never proves behavior without an owned command or Tick path and focused tests.
 
 ### Merge
 
@@ -277,7 +280,7 @@ Temporary items are board-only, non-stackable identities with fixed-step `remain
 
 Speed mode is runtime-backed as root session state. `toggleSpeedModeFx()` switches `runtime.session.speedMode` directly between `normal` and `accelerated`; it does not require, mutate, or derive truth from a speed-cheat item. Newly observed wall-clock time is fed into the same fixed-step engine at `1×` or `30×`. Explicit simulation advancement remains unscaled.
 
-The authored speed-cheat item is only the player-facing control and asset projection for that global mode. Its first asset represents accelerated mode and its second asset represents normal mode. Cheat inventory is a board sink backed by one atomic consume command and a committed removal-feedback event. Nuke activation emits an explicit confirmation request; confirmed deletion is performed by the renderer session and Electron storage boundary and never by deleting every live runtime item. The inventory opener remains presentation-only.
+The authored speed-cheat item is only the player-facing control and asset projection for that global mode. Its first asset represents accelerated mode and its second asset represents normal mode. Cheat inventory is a Board sink backed by one atomic consume command and a committed removal-feedback event. Nuke activation emits an explicit confirmation request; confirmed deletion is performed by the renderer session and Electron storage boundary and never by deleting every live runtime item. The singleton Inventory opener has one canonical `open-inventory` primary action and opens the shared non-modal surface without inventing gameplay state.
 
 A capability is runtime-backed only when it has an owned command or Tick path and behavioral tests. Schema presence alone is not implementation.
 
@@ -306,7 +309,7 @@ This is valid provided that:
 - new engine events may redirect or supersede presentation;
 - a new subscriber does not replay historical engine events merely because another surface is still animating them.
 
-## 19. Hard exclusions and pending work
+## 19. Hard exclusions and extension rule
 
 Hard exclusions without a deliberate new design:
 
@@ -315,12 +318,8 @@ Hard exclusions without a deliberate new design:
 - reverse reservation history;
 - partial output placement;
 - queue overtaking;
-- inventory job progression;
+- passive-storage job progression;
 - gameplay state reconstructed from UI animation or transient events;
 - consumer mutation of committed runtime snapshots as an API feature.
 
-Pending capabilities must be implemented through canonical engine boundaries rather than UI patches:
-
-- directional merge execution;
-- deposit capacity and depletion;
-- utility-item commands.
+New capabilities must be implemented through canonical engine boundaries rather than UI patches. Directional merge stays an atomic engine command, deposit capacity and depletion compose ordinary input/charge/isolation/output contracts, temporary lifetime belongs to Tick, and utility controls cross only their explicitly owned runtime, session, storage, and presentation boundaries.

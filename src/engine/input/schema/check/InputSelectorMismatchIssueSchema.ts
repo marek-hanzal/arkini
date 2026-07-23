@@ -12,7 +12,9 @@ export const InputSelectorMismatchIssueSchema = z
 	.object({
 		itemId: IdSchema.describe("The buffered material rejected by the input selector."),
 		location: InputLocationSchema.describe("The mismatched input location."),
-		type: RuntimeCheckIssueEnumSchema.extract(["InputSelectorMismatch"]),
+		type: RuntimeCheckIssueEnumSchema.extract([
+			"InputSelectorMismatch",
+		]),
 	})
 	.strict()
 	.meta({

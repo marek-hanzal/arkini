@@ -14,7 +14,9 @@ export const WhenCountSchema = z
 		/**
 		 * Identifies this condition as an exact item-query quantity check.
 		 */
-		type: WhenEnumSchema.extract(["Count"]).describe("Identifies this condition as an exact item-query quantity check."),
+		type: WhenEnumSchema.extract([
+			"Count",
+		]).describe("Identifies this condition as an exact item-query quantity check."),
 		/**
 		 * Exact item quantity that the query must return.
 		 */

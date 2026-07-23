@@ -8,7 +8,9 @@ import { DiagnosticSeverityEnumSchema } from "~/engine/validation/schema/Diagnos
 export const assertGameConfigValidFx = Effect.fn("assertGameConfigValidFx")(function* (
 	result: GameCompilationResultSchema.Type,
 ) {
-	const errors = result.diagnostics.filter(({ severity }) => severity === DiagnosticSeverityEnumSchema.enum.Error);
+	const errors = result.diagnostics.filter(
+		({ severity }) => severity === DiagnosticSeverityEnumSchema.enum.Error,
+	);
 	if (errors.length > 0 || result.config === undefined) {
 		return yield* Effect.fail(
 			new GameValidationError({

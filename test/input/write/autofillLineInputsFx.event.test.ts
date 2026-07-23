@@ -43,7 +43,10 @@ describe("autofillLineInputsFx events", () => {
 						itemId: "water",
 						location: {
 							scope: "inventory",
-							position: { x: 0, y: 0 },
+							position: {
+								x: 0,
+								y: 0,
+							},
 						},
 						quantity: 2,
 					});
@@ -51,7 +54,10 @@ describe("autofillLineInputsFx events", () => {
 					const transitions = yield* CommittedTransitionsFx;
 					const subscription = yield* transitions.subscribe;
 					const nextFiber = yield* subscription.changes.pipe(Stream.runHead, Effect.fork);
-					yield* autofillLineInputsFx({ ownerItemId, lineId });
+					yield* autofillLineInputsFx({
+						ownerItemId,
+						lineId,
+					});
 					return Option.getOrThrow(yield* Fiber.join(nextFiber));
 				}),
 			).pipe(
@@ -92,7 +98,10 @@ describe("autofillLineInputsFx events", () => {
 				canonicalItemId: "water",
 				previousSourceLocation: {
 					scope: "inventory",
-					position: { x: 0, y: 0 },
+					position: {
+						x: 0,
+						y: 0,
+					},
 				},
 				previousQuantity: 2,
 				storedQuantity: 1,

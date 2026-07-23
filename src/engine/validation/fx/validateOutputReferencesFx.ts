@@ -82,7 +82,10 @@ export const validateOutputReferencesFx = Effect.fn("validateOutputReferencesFx"
 
 	for (const [setIndex, set] of output.set.entries()) {
 		for (const [rollIndex, roll] of set.roll.entries()) {
-			if (roll.type === RollEnumSchema.enum.Guaranteed || roll.type === RollEnumSchema.enum.Chance) {
+			if (
+				roll.type === RollEnumSchema.enum.Guaranteed ||
+				roll.type === RollEnumSchema.enum.Chance
+			) {
 				for (const [dropIndex, drop] of roll.drop.entries()) {
 					diagnostics.push(
 						...(yield* validateDropFx({

@@ -9,8 +9,12 @@ import { BaseDiagnosticSchema } from "./BaseDiagnosticSchema";
 export const StartInvalidDiagnosticSchema = z
 	.object({
 		...BaseDiagnosticSchema.shape,
-		code: DiagnosticCodeEnumSchema.extract(["StartInvalid"]),
-		severity: DiagnosticSeverityEnumSchema.extract(["Error"]),
+		code: DiagnosticCodeEnumSchema.extract([
+			"StartInvalid",
+		]),
+		severity: DiagnosticSeverityEnumSchema.extract([
+			"Error",
+		]),
 		failureTag: IdSchema,
 	})
 	.strict()

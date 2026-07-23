@@ -29,7 +29,11 @@ export const readItemLineFx = Effect.fn("readItemLineFx")(function* ({
 		)
 		.with(
 			{
-				type: P.union(ItemEnumSchema.enum.Blueprint, ItemEnumSchema.enum.Craft, ItemEnumSchema.enum.Stash),
+				type: P.union(
+					ItemEnumSchema.enum.Blueprint,
+					ItemEnumSchema.enum.Craft,
+					ItemEnumSchema.enum.Stash,
+				),
 			},
 			({ line }) => (line.id === lineId ? line : undefined),
 		)

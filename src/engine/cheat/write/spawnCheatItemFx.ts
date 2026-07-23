@@ -29,7 +29,10 @@ export const spawnCheatItemFx = Effect.fn("spawnCheatItemFx")(function* ({
 	const item = yield* resolveItemFx({
 		itemId,
 	});
-	if (item.scope !== StorageScopeEnumSchema.enum.Board && item.scope !== StorageScopeEnumSchema.enum.Any) {
+	if (
+		item.scope !== StorageScopeEnumSchema.enum.Board &&
+		item.scope !== StorageScopeEnumSchema.enum.Any
+	) {
 		return yield* Effect.fail(
 			new CheatItemNotSpawnableError({
 				itemId,

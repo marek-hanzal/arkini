@@ -14,7 +14,9 @@ export const QueryInventorySchema = z
 		/**
 		 * Identifies this query as an inventory-only query.
 		 */
-		scope: QueryScopeEnumSchema.extract(["Inventory"]).describe("Identifies this query as an inventory-only query."),
+		scope: QueryScopeEnumSchema.extract([
+			"Inventory",
+		]).describe("Identifies this query as an inventory-only query."),
 	})
 	.strict()
 	.meta({

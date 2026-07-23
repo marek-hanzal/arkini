@@ -15,7 +15,9 @@ export const RuleEnableSchema = z
 		/**
 		 * Identifies this rule as an enable gate for the line.
 		 */
-		type: RuleEnumSchema.extract(["Enable"]).describe("Identifies this rule as an enable gate for the product line."),
+		type: RuleEnumSchema.extract([
+			"Enable",
+		]).describe("Identifies this rule as an enable gate for the product line."),
 	})
 	.strict()
 	.meta({

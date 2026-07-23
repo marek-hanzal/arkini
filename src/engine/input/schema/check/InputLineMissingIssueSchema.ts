@@ -12,7 +12,9 @@ export const InputLineMissingIssueSchema = z
 	.object({
 		itemId: IdSchema.describe("The buffered material with a missing owner line."),
 		location: InputLocationSchema.describe("The invalid input location."),
-		type: RuntimeCheckIssueEnumSchema.extract(["InputLineMissing"]),
+		type: RuntimeCheckIssueEnumSchema.extract([
+			"InputLineMissing",
+		]),
 	})
 	.strict()
 	.meta({

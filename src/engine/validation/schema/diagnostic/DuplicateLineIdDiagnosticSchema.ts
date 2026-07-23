@@ -10,8 +10,12 @@ import { BaseDiagnosticSchema } from "./BaseDiagnosticSchema";
 export const DuplicateLineIdDiagnosticSchema = z
 	.object({
 		...BaseDiagnosticSchema.shape,
-		code: DiagnosticCodeEnumSchema.extract(["LineDuplicateId"]),
-		severity: DiagnosticSeverityEnumSchema.extract(["Error"]),
+		code: DiagnosticCodeEnumSchema.extract([
+			"LineDuplicateId",
+		]),
+		severity: DiagnosticSeverityEnumSchema.extract([
+			"Error",
+		]),
 		ownerItemId: IdSchema,
 		lineId: IdSchema,
 		paths: z.tuple([

@@ -198,8 +198,16 @@ describe("temporary item lifetime", () => {
 				const third = yield* advanceRuntimeStepFx(second.runtime);
 				const output = third.runtime.items.find((item) => item.item.id === "result");
 				if (output === undefined) throw new Error("Expected expiry output.");
-				return { output, temporary, third };
-			}).pipe(useGameFx({ config })),
+				return {
+					output,
+					temporary,
+					third,
+				};
+			}).pipe(
+				useGameFx({
+					config,
+				}),
+			),
 		);
 
 		expect(result.third.events).toEqual([

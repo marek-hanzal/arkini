@@ -59,7 +59,8 @@ export const readRuntimeItemOwnedStateFx = Effect.fn("readRuntimeItemOwnedStateF
 
 		for (const item of runtime.items) {
 			if (
-				(item.location.scope === LocationScopeEnumSchema.enum.Job || item.location.scope === LocationScopeEnumSchema.enum.Reserved) &&
+				(item.location.scope === LocationScopeEnumSchema.enum.Job ||
+					item.location.scope === LocationScopeEnumSchema.enum.Reserved) &&
 				jobIds.has(item.location.jobId) &&
 				!jobItemIds.has(item.id)
 			) {

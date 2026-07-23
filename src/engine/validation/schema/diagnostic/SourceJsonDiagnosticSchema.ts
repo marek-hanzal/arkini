@@ -8,8 +8,12 @@ import { BaseDiagnosticSchema } from "./BaseDiagnosticSchema";
 export const SourceJsonDiagnosticSchema = z
 	.object({
 		...BaseDiagnosticSchema.shape,
-		code: DiagnosticCodeEnumSchema.extract(["SourceJsonInvalid"]),
-		severity: DiagnosticSeverityEnumSchema.extract(["Error"]),
+		code: DiagnosticCodeEnumSchema.extract([
+			"SourceJsonInvalid",
+		]),
+		severity: DiagnosticSeverityEnumSchema.extract([
+			"Error",
+		]),
 	})
 	.strict()
 	.meta({

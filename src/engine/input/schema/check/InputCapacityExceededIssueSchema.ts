@@ -19,7 +19,9 @@ export const InputCapacityExceededIssueSchema = z
 		maxStoredQuantity: PositiveIntegerSchema.describe(
 			"The largest quantity allowed by this input.",
 		),
-		type: RuntimeCheckIssueEnumSchema.extract(["InputCapacityExceeded"]),
+		type: RuntimeCheckIssueEnumSchema.extract([
+			"InputCapacityExceeded",
+		]),
 	})
 	.strict()
 	.meta({

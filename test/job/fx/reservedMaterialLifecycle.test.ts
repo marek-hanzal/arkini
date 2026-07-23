@@ -191,7 +191,8 @@ const reserveWorkerFx = Effect.fn("reserveWorkerFx")(function* ({
 		ownerItemId: employerId,
 		lineId: "line:employer:run",
 	});
-	if (started.type !== StartLineResultEnumSchema.enum.Started) return yield* Effect.dieMessage("Employer did not start.");
+	if (started.type !== StartLineResultEnumSchema.enum.Started)
+		return yield* Effect.dieMessage("Employer did not start.");
 	return started.job;
 });
 
@@ -254,9 +255,7 @@ describe("reserved material lifecycle", () => {
 				scope: "board",
 			}),
 		});
-		const returnedWorker = result.completed.items.find(
-			(item) => item.id === "runtime:worker",
-		);
+		const returnedWorker = result.completed.items.find((item) => item.id === "runtime:worker");
 		if (returnedWorker === undefined) throw new Error("Expected returned worker.");
 		expect(result.events).toContainEqual({
 			type: GameEventEnumSchema.enum.ItemPlaced,
@@ -392,8 +391,12 @@ describe("reserved material lifecycle", () => {
 			),
 		);
 
-		expect(result.runtime.items.some((item) => item.id === "runtime:tool:reserved")).toBe(false);
-		expect(result.runtime.items.find((item) => item.id === "runtime:tool:stack")?.quantity).toBe(3);
+		expect(result.runtime.items.some((item) => item.id === "runtime:tool:reserved")).toBe(
+			false,
+		);
+		expect(
+			result.runtime.items.find((item) => item.id === "runtime:tool:stack")?.quantity,
+		).toBe(3);
 		const stack = result.runtime.items.find((item) => item.id === "runtime:tool:stack");
 		if (stack === undefined) throw new Error("Expected normalized tool stack.");
 		expect(result.events).toContainEqual({

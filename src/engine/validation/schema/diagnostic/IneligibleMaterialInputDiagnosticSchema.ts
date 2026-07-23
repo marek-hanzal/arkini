@@ -10,8 +10,12 @@ import { BaseDiagnosticSchema } from "./BaseDiagnosticSchema";
 export const IneligibleMaterialInputDiagnosticSchema = z
 	.object({
 		...BaseDiagnosticSchema.shape,
-		code: DiagnosticCodeEnumSchema.extract(["InputMaterialIneligible"]),
-		severity: DiagnosticSeverityEnumSchema.extract(["Error"]),
+		code: DiagnosticCodeEnumSchema.extract([
+			"InputMaterialIneligible",
+		]),
+		severity: DiagnosticSeverityEnumSchema.extract([
+			"Error",
+		]),
 		ownerItemId: IdSchema,
 		lineId: IdSchema,
 		inputIndex: z.number().int().nonnegative(),

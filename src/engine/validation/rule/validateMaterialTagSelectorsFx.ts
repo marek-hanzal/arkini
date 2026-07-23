@@ -28,7 +28,10 @@ export const validateMaterialTagSelectorsFx = Effect.fn("validateMaterialTagSele
 			});
 			for (const { line, path } of entries) {
 				for (const [inputIndex, input] of line.input.entries()) {
-					if (input.type !== InputEnumSchema.enum.Materials || input.selector.type !== SelectorEnumSchema.enum.Tag) {
+					if (
+						input.type !== InputEnumSchema.enum.Materials ||
+						input.selector.type !== SelectorEnumSchema.enum.Tag
+					) {
 						continue;
 					}
 					const tag = input.selector.tag;

@@ -6,7 +6,9 @@ import { IdSchema } from "~/engine/common/schema/IdSchema";
 
 export const JobCompletedGameEventSchema = z
 	.object({
-		type: GameEventEnumSchema.extract(["JobCompleted"]),
+		type: GameEventEnumSchema.extract([
+			"JobCompleted",
+		]),
 		jobId: IdSchema,
 		ownerItemId: IdSchema,
 		lineId: IdSchema,

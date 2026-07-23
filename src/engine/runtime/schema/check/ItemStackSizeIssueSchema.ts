@@ -14,7 +14,9 @@ export const ItemStackSizeIssueSchema = z
 			"The maximum stack quantity allowed by the item's current runtime state.",
 		),
 		quantity: PositiveIntegerSchema.describe("The current excessive stack quantity."),
-		type: RuntimeCheckIssueEnumSchema.extract(["ItemStackSize"]),
+		type: RuntimeCheckIssueEnumSchema.extract([
+			"ItemStackSize",
+		]),
 	})
 	.strict()
 	.meta({

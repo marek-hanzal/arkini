@@ -9,7 +9,8 @@ export const InvalidMergeReasonEnumSchema = z
 	})
 	.meta({
 		id: "InvalidMergeReasonEnumSchema",
-		description: "Why one authored merge rule cannot participate in the board runtime topology.",
+		description:
+			"Why one authored merge rule cannot participate in the board runtime topology.",
 	});
 
 export type InvalidMergeReasonEnumSchema = typeof InvalidMergeReasonEnumSchema;

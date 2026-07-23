@@ -68,9 +68,9 @@ Fragments should stay small and domain-oriented. Organize content by era and ite
 The completed game config contains:
 
 ```text
-meta        Game ID, title, board size, inventory size.
+meta        Game ID, title, Board size, Inventory size, optional Toolbar size.
 resources   Explicit non-item resource roles used by the shell.
-start       Initial explicit-space board coordinates, inventory quantities, and current space.
+start       Initial Board coordinates, Inventory quantities, Toolbar slots, and current Board space.
 categories  UI-facing category records keyed by stable ID.
 version     Configuration schema version.
 items       Canonical item records keyed by stable ID.
@@ -130,27 +130,31 @@ An item storage scope declares where the item may physically live:
 ```text
 board
 inventory
+toolbar
 any
 ```
+
+The singleton Inventory opener is the deliberate exception: its authored Board scope controls automatic placement, while its exact live location may be Board or Toolbar but never Inventory.
 
 Query reach is a separate contract:
 
 ```text
-board     → origin-space board, with distance
-inventory → shared inventory
-any       → origin-space board plus shared inventory
-universe  → every board space plus shared inventory
+board     → origin-space Board, with distance
+inventory → shared Inventory
+toolbar   → shared Toolbar
+any       → origin-space Board plus Inventory and Toolbar
+universe  → every Board space plus Inventory and Toolbar
 ```
 
-`universe` is never an item storage scope. Runtime locations additionally include line-input and job scopes; those are live ownership states, not authoring storage choices.
+`universe` is never an item storage scope. Runtime locations additionally include line-input, reserved-material, and consumed-job scopes; those are live ownership states, not authoring storage choices.
 
 ### Board spaces
 
 Every authored start-board item has a mandatory non-negative `space` beside its coordinates. There is no default or compatibility fallback. `start.currentSpace` is also mandatory and becomes persistent root navigation state.
 
-Board occupancy and every spatial rule use `space + x + y`. Placement, distance, charges, merge, and outputs remain inside the origin space; allowed scope fallback may use the one universe-wide inventory but never another board space. Inventory is the only cross-space bridge. An explicit inventory interaction may target an off-screen board identity, but direct board-to-board transport and production across spaces remain forbidden.
+Board occupancy and every spatial rule use `space + x + y`. Placement, distance, charges, merge, and outputs remain inside the origin space; `any` scope fallback may continue through the global Inventory and then Toolbar but never another Board space. Those passive surfaces are the only cross-space bridges. An explicit passive-storage interaction may target an off-screen Board identity, but direct Board-to-Board transport and production across spaces remain forbidden.
 
-Attached ownership state has no historical or independent space. Moving an owner through inventory carries its buffered inputs, active job, consumed roots, reservations, and queue. Local `board` or `any` dependencies are re-evaluated against the destination space; `universe` dependencies remain visible. Completion and release always derive their origin from the owner's current board location.
+Attached ownership state has no historical or independent space. Moving an owner through Inventory or Toolbar carries its buffered inputs, active job, consumed roots, reservations, and queue. Local `board` or `any` dependencies are re-evaluated against the destination space; `universe` dependencies remain visible. Completion and release always derive their origin from the owner's current Board location.
 
 ### Stacking
 
@@ -281,7 +285,7 @@ Schema support and runtime support are different facts.
 
 - `cheat:inventory` is a board sink. `consumeItemIntoCheatInventoryFx` consumes one complete revised board identity through ordinary owner removal, preserves the sink, and emits committed feedback.
 - `nuke` is a presentation control. `requestNukeSaveFx()` requests explicit confirmation; confirmed deletion belongs to the renderer session and Electron storage boundary and never to gameplay runtime mutation.
-- `inventory` remains a presentation-only opener until renderer and interaction tasks wire it.
+- `inventory` is the singleton Board/Toolbar opener. Its canonical primary action opens the shared non-modal Inventory surface, and its actor uses the same cross-surface drop contract as every other live tile.
 
 A capability becomes implemented only when it has a canonical command/path and focused behavioral tests. Schema presence alone is not behavior.
 

@@ -100,7 +100,8 @@ export const moveItemFx = Effect.fn("moveItemFx")(function* ({
 				);
 			}
 			if (
-				(item.location.scope === LocationScopeEnumSchema.enum.Inventory || item.location.scope === LocationScopeEnumSchema.enum.Toolbar) &&
+				(item.location.scope === LocationScopeEnumSchema.enum.Inventory ||
+					item.location.scope === LocationScopeEnumSchema.enum.Toolbar) &&
 				location.scope === LocationScopeEnumSchema.enum.Board &&
 				location.space !== runtime.currentSpace
 			) {

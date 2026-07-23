@@ -12,7 +12,10 @@ export const readOutputItemIdsFx = Effect.fn("readOutputItemIdsFx")(function* (
 	const itemIds: OutputItemIdsSchema.Type = [];
 	for (const set of output.set) {
 		for (const roll of set.roll) {
-			if (roll.type === RollEnumSchema.enum.Guaranteed || roll.type === RollEnumSchema.enum.Chance) {
+			if (
+				roll.type === RollEnumSchema.enum.Guaranteed ||
+				roll.type === RollEnumSchema.enum.Chance
+			) {
 				itemIds.push(...roll.drop.map(({ itemId }) => itemId));
 				continue;
 			}

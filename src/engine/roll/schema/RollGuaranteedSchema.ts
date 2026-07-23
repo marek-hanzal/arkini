@@ -11,7 +11,9 @@ import { RollEnumSchema } from "./RollEnumSchema";
 export const RollGuaranteedSchema = z
 	.object({
 		...BaseRollSchema.shape,
-		type: RollEnumSchema.extract(["Guaranteed"]),
+		type: RollEnumSchema.extract([
+			"Guaranteed",
+		]),
 		/**
 		 * One or more items emitted when this roll succeeds.
 		 */

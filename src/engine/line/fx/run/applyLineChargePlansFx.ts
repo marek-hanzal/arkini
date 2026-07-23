@@ -35,7 +35,10 @@ export const applyLineChargePlansFx = Effect.fn("applyLineChargePlansFx")(functi
 	for (const input of plan.input) {
 		if (input.charges === undefined) continue;
 		if (!costs.has(input.charges.itemId)) payerOrder.push(input.charges.itemId);
-		costs.set(input.charges.itemId, (costs.get(input.charges.itemId) ?? 0) + input.charges.cost);
+		costs.set(
+			input.charges.itemId,
+			(costs.get(input.charges.itemId) ?? 0) + input.charges.cost,
+		);
 	}
 
 	const spends: ChargeSpend[] = [];
@@ -46,7 +49,10 @@ export const applyLineChargePlansFx = Effect.fn("applyLineChargePlansFx")(functi
 				`Charge payer ${itemId} resolved without a positive cost.`,
 			);
 		}
-		const item = yield* readRuntimeItemByIdFx({ itemId, runtime });
+		const item = yield* readRuntimeItemByIdFx({
+			itemId,
+			runtime,
+		});
 		const remainingCharges = yield* readItemRemainingChargesFx(item);
 		if (remainingCharges === undefined || remainingCharges < cost) {
 			return yield* Effect.dieMessage(
@@ -82,7 +88,10 @@ export const applyLineChargePlansFx = Effect.fn("applyLineChargePlansFx")(functi
 					runtime: state.runtime,
 				});
 				return {
-					events: [...state.events, ...result.events],
+					events: [
+						...state.events,
+						...result.events,
+					],
 					runtime: result.runtime,
 				};
 			}),

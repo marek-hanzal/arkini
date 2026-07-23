@@ -12,7 +12,9 @@ export const RuleShowSchema = z
 		/**
 		 * Identifies this rule as a conditional request to show the line.
 		 */
-		type: RuleEnumSchema.extract(["Show"]).describe("Identifies this rule as a request to show the product line."),
+		type: RuleEnumSchema.extract([
+			"Show",
+		]).describe("Identifies this rule as a request to show the product line."),
 	})
 	.strict()
 	.meta({

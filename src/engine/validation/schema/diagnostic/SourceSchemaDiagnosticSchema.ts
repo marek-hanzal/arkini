@@ -8,8 +8,12 @@ import { BaseDiagnosticSchema } from "./BaseDiagnosticSchema";
 export const SourceSchemaDiagnosticSchema = z
 	.object({
 		...BaseDiagnosticSchema.shape,
-		code: DiagnosticCodeEnumSchema.extract(["SourceSchemaInvalid"]),
-		severity: DiagnosticSeverityEnumSchema.extract(["Error"]),
+		code: DiagnosticCodeEnumSchema.extract([
+			"SourceSchemaInvalid",
+		]),
+		severity: DiagnosticSeverityEnumSchema.extract([
+			"Error",
+		]),
 		issueCode: z.string().min(1),
 	})
 	.strict()

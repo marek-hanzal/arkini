@@ -15,7 +15,9 @@ export const WhenRangeSchema = z
 		/**
 		 * Identifies this condition as an inclusive item-query quantity range check.
 		 */
-		type: WhenEnumSchema.extract(["Range"]).describe("Identifies this condition as an inclusive item-query quantity range check."),
+		type: WhenEnumSchema.extract([
+			"Range",
+		]).describe("Identifies this condition as an inclusive item-query quantity range check."),
 		/**
 		 * Smallest item quantity accepted by this condition.
 		 */

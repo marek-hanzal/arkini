@@ -499,9 +499,11 @@ describe("charge-driven completion lifecycle", () => {
 		);
 
 		expect(result.started.type).toBe(StartLineResultEnumSchema.enum.Started);
-		expect(result.activeCheck.issues.some((issue) => issue.type === RuntimeCheckIssueEnumSchema.enum.ItemMaxCount)).toBe(
-			false,
-		);
+		expect(
+			result.activeCheck.issues.some(
+				(issue) => issue.type === RuntimeCheckIssueEnumSchema.enum.ItemMaxCount,
+			),
+		).toBe(false);
 		const phoenixes = result.runtime.items.filter(
 			(item) => item.item.id === "producer:phoenix",
 		);

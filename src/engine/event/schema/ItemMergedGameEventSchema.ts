@@ -8,7 +8,9 @@ import { EffectEnumSchema } from "~/engine/merge/schema/EffectEnumSchema";
 
 export const ItemMergedGameEventSchema = z
 	.object({
-		type: GameEventEnumSchema.extract(["ItemMerged"]),
+		type: GameEventEnumSchema.extract([
+			"ItemMerged",
+		]),
 		sourceItemId: IdSchema,
 		sourceCanonicalItemId: IdSchema,
 		targetItemId: IdSchema,

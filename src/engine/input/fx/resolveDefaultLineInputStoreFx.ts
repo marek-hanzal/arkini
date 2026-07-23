@@ -29,11 +29,7 @@ export namespace resolveDefaultLineInputStoreFx {
 /** Resolves the first open material input on one exact save-backed default line. */
 export const resolveDefaultLineInputStoreFx = Effect.fn("resolveDefaultLineInputStoreFx")(
 	function* ({ owner, runtime, source }: resolveDefaultLineInputStoreFx.Props) {
-		if (
-			owner.id === source.id ||
-			!isBoardRuntimeItem(owner) ||
-			!isLineOwnerItem(owner.item)
-		)
+		if (owner.id === source.id || !isBoardRuntimeItem(owner) || !isLineOwnerItem(owner.item))
 			return undefined;
 		const lineId = runtime.defaultLineByOwnerItemId?.[owner.id];
 		if (lineId === undefined) return undefined;

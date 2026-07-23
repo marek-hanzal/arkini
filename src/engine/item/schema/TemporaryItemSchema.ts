@@ -21,11 +21,15 @@ export const TemporaryItemSchema = z
 		/**
 		 * Identifies this item as a temporary board item.
 		 */
-		type: ItemEnumSchema.extract(["Temporary"]).describe("Identifies this item as a temporary board item."),
+		type: ItemEnumSchema.extract([
+			"Temporary",
+		]).describe("Identifies this item as a temporary board item."),
 		/**
 		 * Temporary items are always stored on the board.
 		 */
-		scope: StorageScopeEnumSchema.extract(["Board"])
+		scope: StorageScopeEnumSchema.extract([
+			"Board",
+		])
 			.default(StorageScopeEnumSchema.enum.Board)
 			.describe("Restricts temporary items to board storage."),
 		/**

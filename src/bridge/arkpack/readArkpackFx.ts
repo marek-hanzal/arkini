@@ -138,7 +138,9 @@ export const readArkpackFx = Effect.fn("readArkpackFx")(function* ({
 			})),
 		})),
 	];
-	const errors = diagnostics.filter(({ severity }) => severity === DiagnosticSeverityEnumSchema.enum.Error);
+	const errors = diagnostics.filter(
+		({ severity }) => severity === DiagnosticSeverityEnumSchema.enum.Error,
+	);
 	if (errors.length > 0) {
 		return yield* Effect.fail(
 			new GameValidationError({

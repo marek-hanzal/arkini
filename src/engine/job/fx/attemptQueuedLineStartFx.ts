@@ -102,7 +102,8 @@ export const attemptQueuedLineStartFx = Effect.fn("attemptQueuedLineStartFx")(fu
 					runtime,
 				} satisfies attemptQueuedLineStartFx.Result),
 			ItemNotOnBoardError: (error) =>
-				error.location.scope === LocationScopeEnumSchema.enum.Inventory || error.location.scope === LocationScopeEnumSchema.enum.Toolbar
+				error.location.scope === LocationScopeEnumSchema.enum.Inventory ||
+				error.location.scope === LocationScopeEnumSchema.enum.Toolbar
 					? Effect.succeed({
 							type: "blocked",
 							error,

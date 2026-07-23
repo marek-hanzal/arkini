@@ -283,7 +283,9 @@ const readInputs = ({
 					const key = `${selectorKey(input.query.selector)}:${input.query.distance}:${chargeKey(input.charges)}`;
 					const previous = deposits.get(key);
 					const targetItemId =
-						resolution?.type === InputEnumSchema.enum.Deposit ? resolution.targetItemId : undefined;
+						resolution?.type === InputEnumSchema.enum.Deposit
+							? resolution.targetItemId
+							: undefined;
 					deposits.set(key, {
 						kind: "deposit",
 						selector: input.query.selector,

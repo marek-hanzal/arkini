@@ -122,7 +122,13 @@ describe("startLineFx", () => {
 					...startProps,
 					runtime: before,
 				});
-				return { before, events, job, runtime, water };
+				return {
+					before,
+					events,
+					job,
+					runtime,
+					water,
+				};
 			}).pipe(
 				useGameFx({
 					config,
@@ -131,9 +137,12 @@ describe("startLineFx", () => {
 		);
 
 		const consumed = result.events.find(
-			(event) => event.type === GameEventEnumSchema.enum.ItemConsumed && event.sourceItemId === result.water.id,
+			(event) =>
+				event.type === GameEventEnumSchema.enum.ItemConsumed &&
+				event.sourceItemId === result.water.id,
 		);
-		if (consumed?.type !== GameEventEnumSchema.enum.ItemConsumed) throw new Error("Expected consumed item fact.");
+		if (consumed?.type !== GameEventEnumSchema.enum.ItemConsumed)
+			throw new Error("Expected consumed item fact.");
 		expect(consumed).toEqual({
 			type: GameEventEnumSchema.enum.ItemConsumed,
 			sourceItemId: result.water.id,
@@ -172,15 +181,32 @@ describe("startLineFx", () => {
 				const exactRuntime = {
 					...before,
 					items: before.items.map((item) =>
-						item.id === water.id ? { ...item, quantity: 3 } : item,
+						item.id === water.id
+							? {
+									...item,
+									quantity: 3,
+								}
+							: item,
 					),
 				};
 				const [job, runtime, events] = yield* startLineRuntimeFx({
 					...startProps,
 					runtime: exactRuntime,
 				});
-				return { events, job, runtime, water: { ...water, quantity: 3 } };
-			}).pipe(useGameFx({ config })),
+				return {
+					events,
+					job,
+					runtime,
+					water: {
+						...water,
+						quantity: 3,
+					},
+				};
+			}).pipe(
+				useGameFx({
+					config,
+				}),
+			),
 		);
 
 		expect(result.events).toContainEqual({
@@ -194,7 +220,10 @@ describe("startLineFx", () => {
 		});
 		expect(result.runtime.items.find((item) => item.id === result.water.id)).toMatchObject({
 			quantity: 3,
-			location: { scope: "job", jobId: result.job.id },
+			location: {
+				scope: "job",
+				jobId: result.job.id,
+			},
 		});
 	});
 
@@ -367,7 +396,8 @@ describe("startLineFx", () => {
 				yield* prepareJobLineFx();
 				yield* startLineFx(startProps);
 				const queued = yield* startLineFx(startProps);
-				if (queued.type !== StartLineResultEnumSchema.enum.Queued) throw new Error("Expected queued request.");
+				if (queued.type !== StartLineResultEnumSchema.enum.Queued)
+					throw new Error("Expected queued request.");
 
 				const runtime = yield* readRuntimeFx();
 				const water = runtime.items.find(

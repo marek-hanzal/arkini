@@ -9,8 +9,12 @@ import { BaseDiagnosticSchema } from "./BaseDiagnosticSchema";
 export const MissingResourceDiagnosticSchema = z
 	.object({
 		...BaseDiagnosticSchema.shape,
-		code: DiagnosticCodeEnumSchema.extract(["ResourceMissing"]),
-		severity: DiagnosticSeverityEnumSchema.extract(["Error"]),
+		code: DiagnosticCodeEnumSchema.extract([
+			"ResourceMissing",
+		]),
+		severity: DiagnosticSeverityEnumSchema.extract([
+			"Error",
+		]),
 		resourceId: IdSchema,
 	})
 	.strict()

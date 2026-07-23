@@ -122,7 +122,9 @@ export const commitMergeItemsFx = Effect.fn("commitMergeItemsFx")(function* ({
 				action: resolved.rule.action,
 				effect: resolved.rule.effect,
 				resultCanonicalItemId:
-					resolved.rule.effect === EffectEnumSchema.enum.Replace ? resolved.rule.result : undefined,
+					resolved.rule.effect === EffectEnumSchema.enum.Replace
+						? resolved.rule.result
+						: undefined,
 			} satisfies ItemMergedGameEventSchema.Type;
 			const sourceAfter = nextRuntime.items.find(
 				(item): item is GridRuntimeItemSchema.Type =>

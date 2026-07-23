@@ -6,7 +6,9 @@ import { LocationScopeEnumSchema } from "./LocationScopeEnumSchema";
 /** One concrete location in the universe-wide passive inventory. */
 export const InventoryLocationSchema = z
 	.object({
-		scope: LocationScopeEnumSchema.extract(["Inventory"]),
+		scope: LocationScopeEnumSchema.extract([
+			"Inventory",
+		]),
 		position: PositionSchema.describe("The coordinates inside the inventory."),
 	})
 	.strict()

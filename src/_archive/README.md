@@ -1,41 +1,11 @@
 # Historical implementation oracle
 
-This directory is outside every active source root.
+This directory is outside every active source, test, formatter, bundler, and Dependency Cruiser root. Active code and tests may never import from it.
 
-It is intentionally excluded from:
+The tree is not production code and is not an architectural template. It may contain obsolete imports, types, tests, terminology, and rejected designs.
 
-- source and test TypeScript compilation;
-- Vitest discovery;
-- Vite bundling;
-- Dependency Cruiser roots;
-- Biome formatting.
+Consult an exact historical area only when a current GitHub issue explicitly requires parity evidence from it. [`@chat-gpt/tasks/COVERAGE.md`](../../@chat-gpt/tasks/COVERAGE.md) records the remaining owners; [#263](https://github.com/marek-hanzal/arkini/issues/263) and [#264](https://github.com/marek-hanzal/arkini/issues/264) own the final classification and pruning work.
 
-Active code and tests may never import from `src/_archive`. Dependency Cruiser enforces that boundary. Files here may contain obsolete imports, types, tests, and architecture because they are retained only as a behavioral and presentation oracle.
+Allowed oracle value is limited to player-visible behavior, UX and copy, edge cases and test scenarios, animation or audio intent, and information required by public engine reads. Do not copy historical save topology, timestamp scheduling, action buses, runtime mirrors, config compiler conventions, UI-owned gameplay decisions, or directory structure.
 
-This tree is not production code and is not an architectural template.
-
-Use it only to recover deliberately selected:
-
-- player-visible behavior;
-- UX and copy;
-- edge cases and test scenarios;
-- animation/audio intent;
-- information the renderer needs from public engine reads.
-
-Do not copy its save model, timestamp scheduler, action bus, runtime adapter/store mirrors, bridge-owned domain logic, config compiler conventions, or directory topology.
-
-## Before reading a directory
-
-1. Read `@chat-gpt/tasks/COVERAGE.md`.
-2. Confirm that the current numbered task names the directory.
-3. Read the local README when present.
-4. Ignore code already marked superseded unless a concrete missing behavior points back to it.
-
-## Cleanup
-
-Historical source is removed after each vertical slice captures its remaining behavior in current code/tests/docs. Git retains archaeology.
-
-Already removed as fully superseded and dependency-independent:
-
-- historical CLI/compiler/audit tooling;
-- historical UI layer-system audit.
+[#265](https://github.com/marek-hanzal/arkini/issues/265) owns final removal of this tree. Git history retains archaeology.

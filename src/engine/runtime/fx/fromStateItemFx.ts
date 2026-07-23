@@ -32,7 +32,8 @@ export const fromStateItemFx = Effect.fn("fromStateItemFx")(function* ({
 		quantity: state.quantity,
 		remainingCharges: state.remainingCharges,
 		remainingDurationMs:
-			state.remainingDurationMs ?? (item.type === ItemEnumSchema.enum.Temporary ? item.durationMs : undefined),
+			state.remainingDurationMs ??
+			(item.type === ItemEnumSchema.enum.Temporary ? item.durationMs : undefined),
 		revision: yield* createRevisionFx(),
 	} satisfies RuntimeItemSchema.Type;
 });

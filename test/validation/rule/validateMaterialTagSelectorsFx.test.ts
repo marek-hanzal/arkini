@@ -35,7 +35,9 @@ const tagDiagnostics = async (items: Record<string, unknown>) =>
 				}),
 			]),
 		)
-	).diagnostics.filter(({ code }) => code === DiagnosticCodeEnumSchema.enum.InputMaterialTagEmpty);
+	).diagnostics.filter(
+		({ code }) => code === DiagnosticCodeEnumSchema.enum.InputMaterialTagEmpty,
+	);
 
 describe("validateMaterialTagSelectorsFx", () => {
 	it("rejects a material tag selector with no canonical candidate", async () => {

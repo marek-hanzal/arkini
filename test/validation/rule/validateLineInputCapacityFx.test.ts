@@ -50,7 +50,9 @@ const diagnostics = async (items: Record<string, unknown>) =>
 				}),
 			]),
 		)
-	).diagnostics.filter(({ code }) => code === DiagnosticCodeEnumSchema.enum.InputCapacityUnsupported);
+	).diagnostics.filter(
+		({ code }) => code === DiagnosticCodeEnumSchema.enum.InputCapacityUnsupported,
+	);
 
 describe("validateLineInputCapacityFx", () => {
 	it("allows positive material capacity on producer lines", async () => {

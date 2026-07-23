@@ -48,7 +48,9 @@ export const applyMergeRuntimeFx = Effect.fn("applyMergeRuntimeFx")(function* ({
 		returnDrop: sourceAction.returnDrop,
 		runtime: targetEffect.runtime,
 	});
-	const events = [...targetEffect.events];
+	const events = [
+		...targetEffect.events,
+	];
 
 	if (rule.output === undefined) {
 		return {

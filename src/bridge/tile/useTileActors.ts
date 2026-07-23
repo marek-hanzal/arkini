@@ -14,8 +14,16 @@ export namespace useTileActors {
 export const useTileActors = (): ReadonlyArray<useTileActors.Item> => {
 	const game = useGameEngine();
 	const selector = useCallback(
-		(runtime: RuntimeSchema.Type) => game.readOrThrow(readTileActorsFx({ game, runtime })),
-		[game],
+		(runtime: RuntimeSchema.Type) =>
+			game.readOrThrow(
+				readTileActorsFx({
+					game,
+					runtime,
+				}),
+			),
+		[
+			game,
+		],
 	);
 
 	return useRuntimeSelector(selector);

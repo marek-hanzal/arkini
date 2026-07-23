@@ -9,7 +9,9 @@ export const JobOwnerMultipleActiveIssueSchema = z
 	.object({
 		ownerItemId: IdSchema,
 		jobIds: z.array(IdSchema).min(2),
-		type: RuntimeCheckIssueEnumSchema.extract(["JobOwnerMultipleActive"]),
+		type: RuntimeCheckIssueEnumSchema.extract([
+			"JobOwnerMultipleActive",
+		]),
 	})
 	.strict()
 	.meta({

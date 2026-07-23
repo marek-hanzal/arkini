@@ -70,7 +70,10 @@ export const readJobMaximumOutputQuantitiesFx = Effect.fn("readJobMaximumOutputQ
 		}
 
 		for (const item of runtime.items) {
-			if (item.location.scope === LocationScopeEnumSchema.enum.Job && item.location.jobId === job.id) {
+			if (
+				item.location.scope === LocationScopeEnumSchema.enum.Job &&
+				item.location.jobId === job.id
+			) {
 				subtractQuantity(quantities, item.item.id, item.quantity);
 			}
 		}

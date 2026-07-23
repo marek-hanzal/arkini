@@ -43,7 +43,10 @@ export const releaseJobReservationsFx = Effect.fn("releaseJobReservationsFx")(fu
 					runtime: state.runtime,
 				});
 				return {
-					events: [...state.events, ...placement.events],
+					events: [
+						...state.events,
+						...placement.events,
+					],
 					runtime: placement.runtime,
 				};
 			}),

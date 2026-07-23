@@ -5,4 +5,5 @@ import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeE
 /** Narrows one runtime item to a live item temporarily retained by a job. */
 export const isReservedRuntimeItem = (
 	item: RuntimeItemSchema.Type,
-): item is ReservedRuntimeItemSchema.Type => item.location.scope === LocationScopeEnumSchema.enum.Reserved;
+): item is ReservedRuntimeItemSchema.Type =>
+	item.location.scope === LocationScopeEnumSchema.enum.Reserved;

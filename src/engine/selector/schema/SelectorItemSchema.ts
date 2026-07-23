@@ -14,7 +14,9 @@ export const SelectorItemSchema = z
 		/**
 		 * Identifies this selector as a direct item-ID selector.
 		 */
-		type: SelectorEnumSchema.extract(["Item"]).describe("Identifies this selector as a direct item-ID selector."),
+		type: SelectorEnumSchema.extract([
+			"Item",
+		]).describe("Identifies this selector as a direct item-ID selector."),
 		/**
 		 * Stable ID of the one canonical item selected by this selector.
 		 */

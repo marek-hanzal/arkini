@@ -14,6 +14,8 @@ export const useDropItemPreview = () => {
 	return useCallback(
 		(props: useDropItemPreview.Props): useDropItemPreview.Result =>
 			game.readOrThrow(readDropItemPreviewFx(props)),
-		[game],
+		[
+			game,
+		],
 	);
 };

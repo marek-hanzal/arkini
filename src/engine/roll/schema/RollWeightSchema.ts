@@ -12,7 +12,9 @@ import { DropWeightSchema } from "./DropWeightSchema";
 export const RollWeightSchema = z
 	.object({
 		...BaseRollSchema.shape,
-		type: RollEnumSchema.extract(["Weight"]),
+		type: RollEnumSchema.extract([
+			"Weight",
+		]),
 		/**
 		 * Number of independent weighted selections made by this roll.
 		 *

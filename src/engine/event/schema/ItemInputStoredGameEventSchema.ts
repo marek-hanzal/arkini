@@ -7,7 +7,9 @@ import { GameEventEnumSchema } from "./GameEventEnumSchema";
 /** One autonomous input store changed one exact visible source identity. */
 export const ItemInputStoredGameEventSchema = z
 	.object({
-		type: GameEventEnumSchema.extract(["ItemInputStored"]),
+		type: GameEventEnumSchema.extract([
+			"ItemInputStored",
+		]),
 		sourceItemId: IdSchema,
 		canonicalItemId: IdSchema,
 		previousSourceLocation: GridLocationSchema,

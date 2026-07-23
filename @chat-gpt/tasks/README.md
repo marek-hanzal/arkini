@@ -1,109 +1,20 @@
-# Ordered implementation queue
+# Temporary migration evidence
 
-This directory is the active handoff surface for continuing the game from the historical implementation.
+This directory is not an implementation queue. GitHub Issues are the only active backlog and continuation map.
 
-## Current task
+Only two temporary evidence files remain:
 
-**Current implementation task: [`10-engine-read-models.md`](10-engine-read-models.md)**
+- [`00-migration-control.md`](00-migration-control.md) records the frozen behavioral-oracle guardrails;
+- [`COVERAGE.md`](COVERAGE.md) identifies the narrow historical areas that still have an explicit GitHub owner.
 
-Tasks 00–09 are complete. A new thread must:
+## GitHub ownership
 
-1. read the root documentation in the order defined by `@chat-gpt/README.md`;
-2. read `@chat-gpt/CURRENT.md`;
-3. read only the current numbered task and the relevant rows in [`COVERAGE.md`](COVERAGE.md);
-4. inspect the referenced historical source as a behavioral oracle;
-5. design the behavior in the current engine grammar instead of copying historical topology.
+- [#259](https://github.com/marek-hanzal/arkini/issues/259) owns the remaining historical audio intent.
+- [#263](https://github.com/marek-hanzal/arkini/issues/263) owns parity proof and migration closeout.
+- [#264](https://github.com/marek-hanzal/arkini/issues/264) owns the concrete parity audit and pruning pass.
+- [#265](https://github.com/marek-hanzal/arkini/issues/265) owns final retirement of `src/_archive`.
+- [#266](https://github.com/marek-hanzal/arkini/issues/266) owns retirement of this temporary documentation surface.
 
-Do not read every queued task before starting. The queue is an ordered backlog, not a mandatory context dump.
+The removed Item Detail plan was replaced by completed implementation [#343](https://github.com/marek-hanzal/arkini/issues/343) and completed review/correction root [#344](https://github.com/marek-hanzal/arkini/issues/344), not by the abandoned #248–#253 tree. The removed presentation plan mapped to closed-not-planned #254, the removed audio plan maps to #259, and the removed parity/final-removal plans map to #263–#265. The former read-model, interaction, renderer, and debug plans were obsolete local buckets rather than replacement issues.
 
-Tasks 10–13 are implemented as vertical UI slices rather than four isolated horizontal phases. A concrete page/component need drives the smallest engine-owned read/command addition, its agreement tests, and the thin UI consumer in the same slice. Task 10 remains the current coverage owner until its read-model obligations are satisfied; the TanStack Router root now selects bundled or persistent local arkpacks, `/game/$packageId` owns one stable route-scoped `Game` resource, `/game/$packageId/board` is the explicit gameplay leaf, and the first read-only board/headless-tile slice remains the active vertical foundation.
-
-## Queue
-
-| # | Task | Status | Depends on |
-| ---: | --- | --- | --- |
-| 00 | [`Migration control surface`](00-migration-control.md) | **Done** | — |
-| 01 | [`Craft lifecycle`](../archive/tasks/01-craft-lifecycle.md) | **Done** | 00 |
-| 02 | [`Blueprint lifecycle`](../archive/tasks/02-blueprint-lifecycle.md) | **Done** | 01 |
-| 03 | [`Stash lifecycle`](../archive/tasks/03-stash-lifecycle.md) | **Done** | 01–02 |
-| 04 | [`Item charges and deposit inputs`](../archive/tasks/04-deposit-capacity.md) | **Done** | 03 |
-| 05 | [`Directional merge execution`](../archive/tasks/05-merge-execution.md) | **Done** | 04 |
-| 06 | [`Temporary item lifetime`](../archive/tasks/06-temporary-lifetime.md) | **Done** | 05 |
-| 07 | [`Speed cheat`](../archive/tasks/07-speed-cheat.md) | **Done** | 06 |
-| 08 | [`Multi-space board runtime`](../archive/tasks/08-multi-space-board-runtime.md) | **Done** | 07 |
-| 09 | [`Destructive utility items`](../archive/tasks/09-destructive-utilities.md) | **Done** | 08 |
-| 10 | [`Engine-owned read models`](10-engine-read-models.md) | **In progress** | 01–09 |
-| 11 | [`Player interaction contract`](11-player-interaction.md) | Queued | 05, 10 |
-| 12 | [`Renderer shell, board, and inventory`](12-renderer-board-inventory.md) | Queued | 11 |
-| 13 | [`Detail and line controls`](13-detail-line-ui.md) | Queued | 10, 12 |
-| 14 | [`Presentation events and animations`](14-presentation-animations.md) | Queued | 11–13 |
-| 15 | [`Audio`](15-audio.md) | Queued | 14 |
-| 16 | [`Debug and explain tooling`](16-debug-explain.md) | Queued | 10–15 |
-| 17 | [`Behavioral parity and historical pruning`](17-parity-pruning.md) | Queued | 01–16 |
-| 18 | [`Final historical source removal`](18-final-historical-source-removal.md) | Queued | 17 |
-
-## Status transitions
-
-Use only these statuses:
-
-- **Ready** — next task with no unresolved dependency;
-- **In progress** — currently owned by one implementation thread;
-- **Blocked** — requires an explicit product or architecture decision;
-- **Queued** — ordered work not started yet;
-- **Done** — implementation, tests, documentation, and historical cleanup completed.
-
-When starting a task:
-
-1. mark it **In progress** here;
-2. update `@chat-gpt/CURRENT.md` with the exact next action;
-3. record newly accepted decisions in the task file;
-4. do not create another competing plan document.
-
-When closing a task:
-
-1. satisfy its acceptance criteria and required tests;
-2. update [`COVERAGE.md`](COVERAGE.md);
-3. delete historical source that has no remaining oracle value;
-4. update or remove local `src/_archive/**/README.md` markers;
-5. move the completed task file to `@chat-gpt/archive/tasks/`;
-6. promote the next task to **Ready** and update `CURRENT.md`.
-
-## Migration rule
-
-The historical implementation is a **behavioral oracle**, never an architectural donor.
-
-Preserve deliberately selected:
-
-- player-visible behavior;
-- product decisions;
-- edge cases;
-- animation and audio intent;
-- useful test scenarios;
-- UI information requirements.
-
-Do not copy by default:
-
-- save topology;
-- runtime mirrors;
-- action bus or adapter layers;
-- wall-clock job scheduling;
-- old directory structure;
-- UI-owned gameplay decisions;
-- previous compiler conventions;
-- subsystem-specific state maps.
-
-Every feature is rebuilt as one vertical slice through the current grammar:
-
-```text
-schema or capability decision
-→ validation
-→ resolver
-→ planner
-→ apply
-→ command or Tick lifecycle
-→ runtime invariant
-→ event
-→ engine-owned read model
-→ flow test
-→ thin presentation adapter
-```
+Do not add task files here. Retire this directory when #265 completes and #266 performs its final documentation check.

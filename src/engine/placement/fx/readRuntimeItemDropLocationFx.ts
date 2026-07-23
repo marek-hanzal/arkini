@@ -62,7 +62,10 @@ export const readRuntimeItemDropLocationFx = Effect.fn("readRuntimeItemDropLocat
 		.with(StorageScopeEnumSchema.enum.Board, () => orderedBoard[0])
 		.with(StorageScopeEnumSchema.enum.Inventory, () => emptyInventory[0])
 		.with(StorageScopeEnumSchema.enum.Toolbar, () => emptyToolbar[0])
-		.with(StorageScopeEnumSchema.enum.Any, () => orderedBoard[0] ?? emptyInventory[0] ?? emptyToolbar[0])
+		.with(
+			StorageScopeEnumSchema.enum.Any,
+			() => orderedBoard[0] ?? emptyInventory[0] ?? emptyToolbar[0],
+		)
 		.exhaustive() satisfies GridLocationSchema.Type | undefined;
 	if (location !== undefined) return location;
 

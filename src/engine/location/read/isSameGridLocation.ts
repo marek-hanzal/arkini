@@ -10,5 +10,9 @@ export const isSameGridLocation = (
 	if (left.position.x !== right.position.x || left.position.y !== right.position.y) {
 		return false;
 	}
-	return left.scope !== LocationScopeEnumSchema.enum.Board || right.scope !== LocationScopeEnumSchema.enum.Board || left.space === right.space;
+	return (
+		left.scope !== LocationScopeEnumSchema.enum.Board ||
+		right.scope !== LocationScopeEnumSchema.enum.Board ||
+		left.space === right.space
+	);
 };

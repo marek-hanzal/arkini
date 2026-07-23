@@ -185,7 +185,6 @@ const run = <A, E, R>(effect: Effect.Effect<A, E, R>, gameConfig: GameConfigSche
 		) as Effect.Effect<A, E, never>,
 	);
 
-
 describe("readDropItemPreviewFx", () => {
 	it("reports move for one live source over an empty slot without mutating runtime", () => {
 		const result = run(
@@ -206,7 +205,10 @@ describe("readDropItemPreviewFx", () => {
 						occupant: null,
 					},
 				});
-				return { preview, runtime: yield* readRuntimeFx() };
+				return {
+					preview,
+					runtime: yield* readRuntimeFx(),
+				};
 			}),
 		);
 
@@ -239,15 +241,22 @@ describe("readDropItemPreviewFx", () => {
 						target: {
 							kind: "slot",
 							location: occupiedLocation,
-							occupant: { itemId: target.id, revision: target.revision },
+							occupant: {
+								itemId: target.id,
+								revision: target.revision,
+							},
 						},
 					});
 				}),
 				gameConfig,
 			);
 
-		expect(preview(config)).toEqual({ kind: DropItemResultKindEnumSchema.enum.Swap });
-		expect(preview(mergeConfig)).toEqual({ kind: DropItemResultKindEnumSchema.enum.Merge });
+		expect(preview(config)).toEqual({
+			kind: DropItemResultKindEnumSchema.enum.Swap,
+		});
+		expect(preview(mergeConfig)).toEqual({
+			kind: DropItemResultKindEnumSchema.enum.Merge,
+		});
 	});
 
 	it("rejects a stale source before advertising an empty-slot move", () => {
@@ -263,7 +272,11 @@ describe("readDropItemPreviewFx", () => {
 					sourceItemId: source.id,
 					sourceRevision: "revision:stale",
 					sourceLocation,
-					target: { kind: "slot", location: emptyLocation, occupant: null },
+					target: {
+						kind: "slot",
+						location: emptyLocation,
+						occupant: null,
+					},
 				});
 			}),
 		);

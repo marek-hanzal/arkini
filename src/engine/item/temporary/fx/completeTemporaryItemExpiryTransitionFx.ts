@@ -53,19 +53,28 @@ export const completeTemporaryItemExpiryTransitionFx = Effect.fn(
 	});
 	if (item.item.output === undefined) {
 		return {
-			events: [expiredEvent],
+			events: [
+				expiredEvent,
+			],
 			runtime: draft,
 		} satisfies completeTemporaryItemExpiryTransitionFx.Result;
 	}
 	const origin = item.location;
 	const configuredOutput = item.item.output;
 
-	const random = yield* makeTemporaryExpiryRandomFx({ item });
+	const random = yield* makeTemporaryExpiryRandomFx({
+		item,
+	});
 	return yield* Effect.gen(function* () {
-		const output = yield* outputFx({ origin, output: configuredOutput });
+		const output = yield* outputFx({
+			origin,
+			output: configuredOutput,
+		});
 		if (output.drop.length === 0) {
 			return {
-				events: [expiredEvent],
+				events: [
+					expiredEvent,
+				],
 				runtime: draft,
 			} satisfies completeTemporaryItemExpiryTransitionFx.Result;
 		}
@@ -82,7 +91,10 @@ export const completeTemporaryItemExpiryTransitionFx = Effect.fn(
 		});
 
 		return {
-			events: [expiredEvent, ...placementEvents],
+			events: [
+				expiredEvent,
+				...placementEvents,
+			],
 			runtime: draft,
 		} satisfies completeTemporaryItemExpiryTransitionFx.Result;
 	}).pipe(Effect.withRandom(random));

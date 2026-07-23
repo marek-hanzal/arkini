@@ -38,7 +38,8 @@ export const readItemDetailQueue = ({
 	runtime,
 }: readItemDetailQueue.Props): readItemDetailQueue.Result => {
 	const owner = runtime.items.find((candidate) => candidate.id === itemId);
-	if (owner?.item.type !== ItemEnumSchema.enum.Producer || owner.item.maxQueueSize <= 1) return unavailable;
+	if (owner?.item.type !== ItemEnumSchema.enum.Producer || owner.item.maxQueueSize <= 1)
+		return unavailable;
 	const lineById = new Map(
 		readLineOwnerLines(owner.item).map((line) => [
 			line.id,

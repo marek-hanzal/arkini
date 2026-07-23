@@ -75,7 +75,8 @@ const setupFx = ({ quantity }: { readonly quantity: number }) =>
 		const runtime = yield* readRuntimeFx();
 		const owner = runtime.items.find((item) => item.id === "runtime:workshop");
 		const source = runtime.items.find((item) => item.id === "runtime:water");
-		if (owner === undefined || source === undefined) throw new Error("Missing drop setup items.");
+		if (owner === undefined || source === undefined)
+			throw new Error("Missing drop setup items.");
 		if (owner.location.scope === "input" || source.location.scope === "input") {
 			throw new Error("Expected visible grid setup items.");
 		}
@@ -105,7 +106,9 @@ const previewFx = ({
 		sourceItemId: "runtime:water",
 		sourceRevision,
 		sourceLocation: sourceLocation(1),
-		target: targetFor({ revision: ownerRevision }),
+		target: targetFor({
+			revision: ownerRevision,
+		}),
 	});
 
 const dropFx = ({
@@ -119,14 +122,18 @@ const dropFx = ({
 		sourceItemId: "runtime:water",
 		sourceRevision,
 		sourceLocation: sourceLocation(1),
-		target: targetFor({ revision: ownerRevision }),
+		target: targetFor({
+			revision: ownerRevision,
+		}),
 	});
 
 describe("dropItemFx default-line input storage", () => {
 	it("previews and commits a full visible source store before swap", () => {
 		const result = run(
 			Effect.gen(function* () {
-				const { owner, source } = yield* setupFx({ quantity: 2 });
+				const { owner, source } = yield* setupFx({
+					quantity: 2,
+				});
 				const preview = yield* previewFx({
 					ownerRevision: owner.revision,
 					sourceRevision: source.revision,
@@ -177,7 +184,9 @@ describe("dropItemFx default-line input storage", () => {
 	it("reports one partial store and keeps the same visible source identity", () => {
 		const result = run(
 			Effect.gen(function* () {
-				const { owner, source } = yield* setupFx({ quantity: 7 });
+				const { owner, source } = yield* setupFx({
+					quantity: 7,
+				});
 				const outcome = yield* dropFx({
 					ownerRevision: owner.revision,
 					sourceRevision: source.revision,
@@ -236,7 +245,10 @@ describe("dropItemFx default-line input storage", () => {
 					ownerRevision: owner.revision,
 					sourceRevision: source.revision,
 				});
-				return { outcome, preview };
+				return {
+					outcome,
+					preview,
+				};
 			}),
 		);
 
@@ -249,7 +261,9 @@ describe("dropItemFx default-line input storage", () => {
 	it("falls back to swap when the selected input has no remaining capacity", () => {
 		const result = run(
 			Effect.gen(function* () {
-				const { owner, source } = yield* setupFx({ quantity: 5 });
+				const { owner, source } = yield* setupFx({
+					quantity: 5,
+				});
 				yield* storeInputMaterialFx({
 					ownerItemId: owner.id,
 					lineId,
@@ -271,7 +285,9 @@ describe("dropItemFx default-line input storage", () => {
 					sourceItemId: extra.id,
 					sourceRevision: extra.revision,
 					sourceLocation: sourceLocation(1),
-					target: targetFor({ revision: currentOwner.revision }),
+					target: targetFor({
+						revision: currentOwner.revision,
+					}),
 				});
 			}),
 		);
@@ -284,7 +300,9 @@ describe("dropItemFx default-line input storage", () => {
 	it("keeps authored merge precedence over default-line input storage", () => {
 		const result = run(
 			Effect.gen(function* () {
-				const { owner, source } = yield* setupFx({ quantity: 1 });
+				const { owner, source } = yield* setupFx({
+					quantity: 1,
+				});
 				return yield* previewFx({
 					ownerRevision: owner.revision,
 					sourceRevision: source.revision,

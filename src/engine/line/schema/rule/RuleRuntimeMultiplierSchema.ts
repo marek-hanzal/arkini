@@ -17,7 +17,9 @@ export const RuleRuntimeMultiplierSchema = z
 		/**
 		 * Identifies this rule as a product-line runtime multiplier.
 		 */
-		type: RuleEnumSchema.extract(["RuntimeMultiplier"]).describe("Identifies this rule as a product-line runtime multiplier."),
+		type: RuleEnumSchema.extract([
+			"RuntimeMultiplier",
+		]).describe("Identifies this rule as a product-line runtime multiplier."),
 		/**
 		 * Positive factor multiplied into this line's runtime.
 		 */

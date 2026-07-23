@@ -7,7 +7,9 @@ import { IdSchema } from "~/engine/common/schema/IdSchema";
 export const DuplicateJobIdIssueSchema = z
 	.object({
 		jobId: IdSchema,
-		type: RuntimeCheckIssueEnumSchema.extract(["DuplicateJobId"]),
+		type: RuntimeCheckIssueEnumSchema.extract([
+			"DuplicateJobId",
+		]),
 	})
 	.strict()
 	.meta({

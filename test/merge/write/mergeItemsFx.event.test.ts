@@ -121,26 +121,46 @@ describe("mergeItemsFx events", () => {
 		const session = await createTestGameSession({
 			config: createMergeTestConfig({
 				rule: {
-					target: { type: "item", itemId: "target" },
+					target: {
+						type: "item",
+						itemId: "target",
+					},
 					action: "consume",
 					effect: "keep",
 					output: guaranteedMergeOutput(),
 				},
 			}),
 			state: {
-				cheats: { enabled: false, everEnabled: false, instantGameplay: false },
+				cheats: {
+					enabled: false,
+					everEnabled: false,
+					instantGameplay: false,
+				},
 				currentSpace: 0,
 				items: [
 					{
 						id: "runtime:source",
 						itemId: "source",
-						location: { scope: "inventory", position: { x: 0, y: 0 } },
+						location: {
+							scope: "inventory",
+							position: {
+								x: 0,
+								y: 0,
+							},
+						},
 						quantity: 1,
 					},
 					{
 						id: "runtime:target",
 						itemId: "target",
-						location: { scope: "board", space: 0, position: { x: 1, y: 0 } },
+						location: {
+							scope: "board",
+							space: 0,
+							position: {
+								x: 1,
+								y: 0,
+							},
+						},
 						quantity: 1,
 					},
 				],
@@ -188,5 +208,4 @@ describe("mergeItemsFx events", () => {
 			await Effect.runPromise(session.disposeFx);
 		}
 	});
-
 });

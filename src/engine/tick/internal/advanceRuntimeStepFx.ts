@@ -163,7 +163,11 @@ export const advanceRuntimeStepFx = Effect.fn("advanceRuntimeStepFx")(function* 
 
 	for (const temporaryItem of temporaryItems) {
 		const liveItem = draft.items.find((candidate) => candidate.id === temporaryItem.id);
-		if (liveItem?.item.type !== ItemEnumSchema.enum.Temporary || liveItem.remainingDurationMs !== 0) continue;
+		if (
+			liveItem?.item.type !== ItemEnumSchema.enum.Temporary ||
+			liveItem.remainingDurationMs !== 0
+		)
+			continue;
 		const expiry = yield* attemptTemporaryItemExpiryFx({
 			itemId: liveItem.id,
 			runtime: draft,

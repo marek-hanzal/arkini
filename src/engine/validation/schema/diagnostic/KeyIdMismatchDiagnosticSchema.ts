@@ -10,8 +10,12 @@ import { BaseDiagnosticSchema } from "./BaseDiagnosticSchema";
 export const KeyIdMismatchDiagnosticSchema = z
 	.object({
 		...BaseDiagnosticSchema.shape,
-		code: DiagnosticCodeEnumSchema.extract(["ConfigKeyIdMismatch"]),
-		severity: DiagnosticSeverityEnumSchema.extract(["Error"]),
+		code: DiagnosticCodeEnumSchema.extract([
+			"ConfigKeyIdMismatch",
+		]),
+		severity: DiagnosticSeverityEnumSchema.extract([
+			"Error",
+		]),
 		entity: DiagnosticRecordEntityEnumSchema,
 		key: IdSchema,
 		id: IdSchema,

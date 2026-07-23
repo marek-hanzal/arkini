@@ -42,7 +42,10 @@ export const attemptTemporaryItemExpiryFx = Effect.fn("attemptTemporaryItemExpir
 	itemId,
 	runtime,
 }: attemptTemporaryItemExpiryFx.Props) {
-	return yield* completeTemporaryItemExpiryTransitionFx({ itemId, runtime }).pipe(
+	return yield* completeTemporaryItemExpiryTransitionFx({
+		itemId,
+		runtime,
+	}).pipe(
 		Effect.map(
 			(completion) =>
 				({

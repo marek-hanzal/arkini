@@ -224,7 +224,8 @@ describe("attemptQueuedLineStartFx", () => {
 		);
 
 		expect(result.type).toBe(StartLineResultEnumSchema.enum.Started);
-		if (result.type !== StartLineResultEnumSchema.enum.Started) throw new Error("Expected the FIFO request to start.");
+		if (result.type !== StartLineResultEnumSchema.enum.Started)
+			throw new Error("Expected the FIFO request to start.");
 		expect(result.job.lineId).toBe(request.lineId);
 		expect(result.runtime.jobQueue).toEqual([
 			expect.objectContaining({

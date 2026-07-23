@@ -14,7 +14,9 @@ export const InputMaterialResolutionSchema = z
 		/**
 		 * Identifies this resolution as one material input.
 		 */
-		type: InputEnumSchema.extract(["Materials"]),
+		type: InputEnumSchema.extract([
+			"Materials",
+		]),
 		/**
 		 * Whether the resolved material is consumed or reserved by a line run.
 		 */

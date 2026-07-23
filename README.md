@@ -4,7 +4,7 @@
   <img src="game/arkini/resources/hero.png" alt="Arkini logo with winged unicorns and magical machinery" width="100%" />
 </p>
 
-Arkini is a client-only, offline merge and production game built around a deterministic, data-driven engine. The current runtime slice fully backs production lines, jobs, queueing, output rolls, placement, state, save, and session boundaries; several authored item capabilities remain schema-only and are listed explicitly in [`CONFIG.md`](CONFIG.md) and [`GAME.MD`](GAME.MD). The repository is intentionally maintained with an LLM as the primary implementer, so documentation is part of the correctness boundary rather than decorative prose that slowly becomes compost.
+Arkini is a client-only, offline merge and production game built around a deterministic, data-driven engine. The current runtime slice backs production lines, jobs, queueing, output rolls, placement, directional merge, finite lifetime and charges, utility controls, state, save, and session boundaries. [`CONFIG.md`](CONFIG.md) and [`GAME.MD`](GAME.MD) define the exact authoring and gameplay contracts. The repository is intentionally maintained with an LLM as the primary implementer, so documentation is part of the correctness boundary rather than decorative prose that slowly becomes compost.
 
 **Product direction:** Marek
 
@@ -16,7 +16,7 @@ The engine, compiler, validator, binary packer, deterministic Tick model, runtim
 
 The client uses [TanStack Router](https://tanstack.com/router/latest/docs/overview) file-based routing. `/` owns a one-renderer-session startup splash and authoritative launcher bootstrap; `/main-menu`, `/arkpacks`, `/settings`, and `/about` are explicit launcher leaves. `/game/$packageId` is a non-visual resource boundary and `/game/$packageId/board` is the explicit gameplay page; every blocking leave/reset/exit operation is its own `action/*` leaf with a loader-owned lifecycle and standalone Hero pending page; recoverable bootstrap errors stay local while critical leave/reset/ownership failures replace the renderer through one root fatal boundary. Official Arkini and validated imported packages share one root-owned catalog backed by Electron storage. [TanStack Query](https://tanstack.com/query/latest/docs/framework/react/installation) owns only the stable identity and lifetime of the renderer-wide singleton `GameEngineResource` under `["game-engine"]`; canonical gameplay state remains inside `GameSession`, UI reads the parent route loader through `useGameEngine()`, and no `useQuery()` gameplay mirror exists.
 
-The selected game currently renders full canonical Board and Toolbar slot and hit geometry through one Canvas-wide [Motion for React](https://motion.dev/docs/react) actor layer with one DOM actor per runtime item. Each centered inner tile body rests at scale `0.8`; pointer targets drive the real actor through bounded Motion springs while exact engine preflight distinguishes authored merge, default-line input acceptance, ordinary placement or swap, and rejection before the final command revalidates atomically. Runtime snapshots and their ordered semantic events reach tile presentation as one committed transition and each transient batch is claimed once per live `GameSession`. Exact committed facts drive spawn and delivery, stack absorption, full and partial input storage, job start and completion, expiry, and depletion signatures, while every visibly travelling actor drives the bounded local non-recursive crowd field from its actual rendered body. The actor system is storage-surface agnostic, but the active Inventory UI and cross-surface Board ↔ Inventory ↔ Toolbar flow remain [open work](https://github.com/marek-hanzal/arkini/issues/308); compatible stack/split drop behavior is tracked separately in [#304](https://github.com/marek-hanzal/arkini/issues/304). Future choreography belongs here only when the engine publishes a corresponding exact semantic fact.
+The selected game renders canonical Board, Inventory, and Toolbar slot and hit geometry through one Canvas-wide [Motion for React](https://motion.dev/docs/react) actor layer with one DOM actor per runtime item. The Inventory is one non-modal Canvas-local surface, the optional Toolbar is one passive row, and the same actor identity moves across all three surfaces without a clone. Each centered inner tile body rests at scale `0.8`; pointer targets drive the real actor through bounded Motion springs while exact engine preflight distinguishes authored merge, default-line input acceptance, compatible stack transfer, ordinary placement or swap, ignore, and rejection before the final command revalidates atomically. Runtime snapshots and their ordered semantic events reach tile presentation as one committed transition and each transient batch is claimed once per live `GameSession`. Exact committed facts drive spawn and delivery, stack absorption, full and partial input storage, job start and completion, expiry, and depletion signatures, while every visibly travelling actor drives the bounded local non-recursive crowd field from its actual rendered body. Future choreography belongs here only when the engine publishes a corresponding exact semantic fact.
 
 The canonical runtime architecture is considered stable. Do not redesign it without a concrete requirement or reproduced defect.
 
@@ -31,8 +31,9 @@ The active documentation surface is deliberately small. Read it in this order:
 3. [`CODE_GUIDE.md`](CODE_GUIDE.md) — mandatory code grammar and review rules.
 4. [`CONFIG.md`](CONFIG.md) — game authoring, compiler, validation, schema, and packing.
 5. [`GAME.MD`](GAME.MD) — implemented gameplay semantics.
-6. [`@chat-gpt/README.md`](@chat-gpt/README.md) — LLM working-memory index and archive policy.
-7. [`@chat-gpt/tasks/README.md`](@chat-gpt/tasks/README.md) — ordered behavior-recovery queue when continuing from historical code.
+6. [`@chat-gpt/README.md`](@chat-gpt/README.md) — durable LLM instructions and historical-oracle policy.
+
+GitHub Issues are the only active backlog and continuation map. No repository Markdown file may act as a second current-status queue.
 
 When documentation and implementation disagree, stop and resolve the contradiction. Do not quietly choose whichever version makes the current task easier.
 
@@ -114,7 +115,7 @@ query/        Runtime item queries.
 runtime/      Canonical runtime, committed-transition store and write boundary.
 session/      Engine-visible ephemeral root state and session commands.
 schema/       Completed game configuration root and JSON Schema generation.
-start/        Initial board/inventory planning.
+start/        Initial Board, Inventory, and Toolbar planning.
 state/        Serializable state conversion.
 tick/         Clock adapter and deterministic fixed-step advancement.
 bridge/       Live arkpack/game/session/runtime/save/event projections and adapters; never a second gameplay store.
@@ -277,6 +278,6 @@ The compiler, validator, tests, and packer must never assemble different version
 - Preserve `.git` in every shared repository snapshot.
 - Never include `node_modules` in delivered ZIP files.
 - Commit coherent slices instead of one giant cleanup blob.
-- Keep active documentation current; move historical decisions and completed reviews under [`@chat-gpt/archive/`](@chat-gpt/archive/).
+- Keep active documentation current; track work in GitHub Issues and use Git history for completed plans and superseded decisions.
 - Do not cite archived documents as current contracts.
 - Avoid architecture work without a concrete problem. Refactoring for the emotional satisfaction of moving boxes is still moving boxes.

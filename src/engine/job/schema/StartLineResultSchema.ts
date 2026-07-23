@@ -7,13 +7,17 @@ export const StartLineResultSchema = z
 	.discriminatedUnion("type", [
 		z
 			.object({
-				type: StartLineResultEnumSchema.extract(["Started"]),
+				type: StartLineResultEnumSchema.extract([
+					"Started",
+				]),
 				job: JobSchema,
 			})
 			.strict(),
 		z
 			.object({
-				type: StartLineResultEnumSchema.extract(["Queued"]),
+				type: StartLineResultEnumSchema.extract([
+					"Queued",
+				]),
 				request: JobQueueRequestSchema,
 			})
 			.strict(),

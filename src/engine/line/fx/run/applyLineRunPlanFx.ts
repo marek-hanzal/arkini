@@ -44,8 +44,14 @@ export const applyLineRunPlanFx = Effect.fn("applyLineRunPlanFx")(function* ({
 				runtime: state.runtime,
 			}).pipe(
 				Effect.map((result) => ({
-					consumption: [...state.consumption, ...result.consumption],
-					events: [...state.events, ...result.events],
+					consumption: [
+						...state.consumption,
+						...result.consumption,
+					],
+					events: [
+						...state.events,
+						...result.events,
+					],
 					runtime: result.runtime,
 				})),
 			),

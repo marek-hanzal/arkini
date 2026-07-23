@@ -5,7 +5,9 @@ import { IdSchema } from "~/engine/common/schema/IdSchema";
 import { TimeSchema } from "~/engine/common/schema/TimeSchema";
 export const JobTimeInvalidIssueSchema = z
 	.object({
-		type: RuntimeCheckIssueEnumSchema.extract(["JobTimeInvalid"]),
+		type: RuntimeCheckIssueEnumSchema.extract([
+			"JobTimeInvalid",
+		]),
 		jobId: IdSchema,
 		durationMs: TimeSchema,
 		remainingMs: z.number(),

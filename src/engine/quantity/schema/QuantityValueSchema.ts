@@ -11,7 +11,9 @@ import { QuantityEnumSchema } from "./QuantityEnumSchema";
 export const QuantityValueSchema = z
 	.object({
 		...BaseQuantitySchema.shape,
-		type: QuantityEnumSchema.extract(["Value"]),
+		type: QuantityEnumSchema.extract([
+			"Value",
+		]),
 		/**
 		 * Fixed number of items emitted by the drop.
 		 */

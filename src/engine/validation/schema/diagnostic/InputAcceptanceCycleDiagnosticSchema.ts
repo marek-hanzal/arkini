@@ -10,8 +10,12 @@ import { InputAcceptanceCycleEdgeSchema } from "./InputAcceptanceCycleEdgeSchema
 export const InputAcceptanceCycleDiagnosticSchema = z
 	.object({
 		...BaseDiagnosticSchema.shape,
-		code: DiagnosticCodeEnumSchema.extract(["InputAcceptanceCycle"]),
-		severity: DiagnosticSeverityEnumSchema.extract(["Error"]),
+		code: DiagnosticCodeEnumSchema.extract([
+			"InputAcceptanceCycle",
+		]),
+		severity: DiagnosticSeverityEnumSchema.extract([
+			"Error",
+		]),
 		cycle: z.array(IdSchema).min(2),
 		edges: z.array(InputAcceptanceCycleEdgeSchema).min(1),
 	})

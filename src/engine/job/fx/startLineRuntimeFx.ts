@@ -62,6 +62,10 @@ export const startLineRuntimeFx = Effect.fn("startLineRuntimeFx")(function* ({
 	return [
 		job,
 		isolation.runtime,
-		[...inputTransition.events, ...charged.events, ...isolation.events],
+		[
+			...inputTransition.events,
+			...charged.events,
+			...isolation.events,
+		],
 	] as const;
 });

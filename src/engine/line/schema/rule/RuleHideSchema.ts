@@ -15,7 +15,9 @@ export const RuleHideSchema = z
 		/**
 		 * Identifies this rule as a request to hide the line.
 		 */
-		type: RuleEnumSchema.extract(["Hide"]).describe("Identifies this rule as a request to hide the product line."),
+		type: RuleEnumSchema.extract([
+			"Hide",
+		]).describe("Identifies this rule as a request to hide the product line."),
 	})
 	.strict()
 	.meta({

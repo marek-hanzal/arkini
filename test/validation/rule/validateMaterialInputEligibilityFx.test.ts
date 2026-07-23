@@ -50,7 +50,9 @@ const diagnostics = async (items: Record<string, unknown>) =>
 				}),
 			]),
 		)
-	).diagnostics.filter(({ code }) => code === DiagnosticCodeEnumSchema.enum.InputMaterialIneligible);
+	).diagnostics.filter(
+		({ code }) => code === DiagnosticCodeEnumSchema.enum.InputMaterialIneligible,
+	);
 
 describe("validateMaterialInputEligibilityFx", () => {
 	it("rejects an exact temporary material candidate", async () => {
@@ -125,10 +127,14 @@ describe("validateMaterialInputEligibilityFx", () => {
 		);
 
 		expect(
-			compiled.diagnostics.filter(({ code }) => code === DiagnosticCodeEnumSchema.enum.InputMaterialIneligible),
+			compiled.diagnostics.filter(
+				({ code }) => code === DiagnosticCodeEnumSchema.enum.InputMaterialIneligible,
+			),
 		).toEqual([]);
 		expect(
-			compiled.diagnostics.filter(({ code }) => code === DiagnosticCodeEnumSchema.enum.ConfigMissingReference),
+			compiled.diagnostics.filter(
+				({ code }) => code === DiagnosticCodeEnumSchema.enum.ConfigMissingReference,
+			),
 		).toEqual([
 			expect.objectContaining({
 				referenceId: "item:missing",

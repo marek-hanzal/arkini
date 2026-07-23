@@ -829,7 +829,7 @@ Do not:
 - claim a race was reproduced when it was only implied;
 - treat archived documentation as authority;
 - preserve stale local task queues after GitHub owns the backlog;
-- use `@chat-gpt/CURRENT.md` as a continuation or backlog source;
+- use a local current-status file as a continuation or backlog source;
 - reopen settled decisions without new evidence;
 - confuse visual completion with lifecycle success;
 - let route teardown or native close cut an exit transition short;

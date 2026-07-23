@@ -34,7 +34,9 @@ const compileItems = (items: Record<string, unknown>) =>
 	);
 
 const cycleDiagnostics = async (items: Record<string, unknown>) =>
-	(await compileItems(items)).diagnostics.filter(({ code }) => code === DiagnosticCodeEnumSchema.enum.InputAcceptanceCycle);
+	(await compileItems(items)).diagnostics.filter(
+		({ code }) => code === DiagnosticCodeEnumSchema.enum.InputAcceptanceCycle,
+	);
 
 describe("validateInputAcceptanceCyclesFx", () => {
 	it("rejects a material input self-loop", async () => {
@@ -230,7 +232,9 @@ describe("validateInputAcceptanceCyclesFx", () => {
 				}),
 			]),
 		);
-		const diagnostic = result.diagnostics.find(({ code }) => code === DiagnosticCodeEnumSchema.enum.InputAcceptanceCycle);
+		const diagnostic = result.diagnostics.find(
+			({ code }) => code === DiagnosticCodeEnumSchema.enum.InputAcceptanceCycle,
+		);
 
 		expect(diagnostic).toMatchObject({
 			code: DiagnosticCodeEnumSchema.enum.InputAcceptanceCycle,

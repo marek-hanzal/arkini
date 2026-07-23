@@ -64,7 +64,10 @@ export const releaseOwnerInputsFx = Effect.fn("releaseOwnerInputsFx")(function* 
 			runtime: state.runtime,
 		});
 		state = {
-			events: [...state.events, ...placement.events],
+			events: [
+				...state.events,
+				...placement.events,
+			],
 			runtime: placement.runtime,
 		};
 	}

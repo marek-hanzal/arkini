@@ -37,7 +37,8 @@ export const resolveInputChargeRunFx = Effect.fn("resolveInputChargeRunFx")(func
 		} satisfies resolveInputChargeRunFx.Result;
 	}
 
-	const itemId = charges.from === InputChargeFromEnumSchema.enum.Self ? ownerItemId : targetItemId;
+	const itemId =
+		charges.from === InputChargeFromEnumSchema.enum.Self ? ownerItemId : targetItemId;
 	if (itemId === undefined) {
 		return {
 			ready: false,

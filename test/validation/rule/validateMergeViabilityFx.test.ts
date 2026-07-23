@@ -58,7 +58,9 @@ const mergeSource = ({
 });
 
 const mergeDiagnostics = async (items: Record<string, unknown>) =>
-	(await compileDiagnostics(items)).filter(({ code }) => code === DiagnosticCodeEnumSchema.enum.MergeInvalid);
+	(await compileDiagnostics(items)).filter(
+		({ code }) => code === DiagnosticCodeEnumSchema.enum.MergeInvalid,
+	);
 
 describe("validateMergeViabilityFx", () => {
 	it("rejects an exact inventory-only merge target", async () => {
@@ -268,8 +270,14 @@ describe("validateMergeViabilityFx", () => {
 			[source.id]: source,
 		});
 
-		expect(diagnostics.filter(({ code }) => code === DiagnosticCodeEnumSchema.enum.MergeInvalid)).toEqual([]);
-		expect(diagnostics.filter(({ code }) => code === DiagnosticCodeEnumSchema.enum.ConfigMissingReference)).toEqual(
+		expect(
+			diagnostics.filter(({ code }) => code === DiagnosticCodeEnumSchema.enum.MergeInvalid),
+		).toEqual([]);
+		expect(
+			diagnostics.filter(
+				({ code }) => code === DiagnosticCodeEnumSchema.enum.ConfigMissingReference,
+			),
+		).toEqual(
 			expect.arrayContaining([
 				expect.objectContaining({
 					referenceId: "missing:target",

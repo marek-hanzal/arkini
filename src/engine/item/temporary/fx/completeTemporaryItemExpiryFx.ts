@@ -12,9 +12,9 @@ export namespace completeTemporaryItemExpiryFx {
 }
 
 /** Removes one ready temporary item and returns only the committed runtime. */
-export const completeTemporaryItemExpiryFx = Effect.fn("completeTemporaryItemExpiryFx")(
-	function* (props: completeTemporaryItemExpiryFx.Props) {
-		const transition = yield* completeTemporaryItemExpiryTransitionFx(props);
-		return transition.runtime;
-	},
-);
+export const completeTemporaryItemExpiryFx = Effect.fn("completeTemporaryItemExpiryFx")(function* (
+	props: completeTemporaryItemExpiryFx.Props,
+) {
+	const transition = yield* completeTemporaryItemExpiryTransitionFx(props);
+	return transition.runtime;
+});

@@ -5,4 +5,5 @@ import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeE
 /** Narrows one live runtime item to an item occupying board space. */
 export const isBoardRuntimeItem = (
 	item: RuntimeItemSchema.Type,
-): item is BoardRuntimeItemSchema.Type => item.location.scope === LocationScopeEnumSchema.enum.Board;
+): item is BoardRuntimeItemSchema.Type =>
+	item.location.scope === LocationScopeEnumSchema.enum.Board;

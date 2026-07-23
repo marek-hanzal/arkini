@@ -14,7 +14,11 @@ export namespace assertNonJobScopeFx {
 export const assertNonJobScopeFx = Effect.fn("assertNonJobScopeFx")(function* ({
 	item,
 }: assertNonJobScopeFx.Props) {
-	if (item.location.scope !== LocationScopeEnumSchema.enum.Job && item.location.scope !== LocationScopeEnumSchema.enum.Reserved) return;
+	if (
+		item.location.scope !== LocationScopeEnumSchema.enum.Job &&
+		item.location.scope !== LocationScopeEnumSchema.enum.Reserved
+	)
+		return;
 
 	return yield* Effect.fail(
 		new ItemJobScopedError({

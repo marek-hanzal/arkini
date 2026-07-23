@@ -6,7 +6,9 @@ import { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeInte
 
 export const CurrentSpaceChangedGameEventSchema = z
 	.object({
-		type: GameEventEnumSchema.extract(["CurrentSpaceChanged"]),
+		type: GameEventEnumSchema.extract([
+			"CurrentSpaceChanged",
+		]),
 		previousSpace: NonNegativeIntegerSchema,
 		currentSpace: NonNegativeIntegerSchema,
 	})

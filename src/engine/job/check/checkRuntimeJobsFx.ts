@@ -125,7 +125,11 @@ export const checkRuntimeJobsFx = Effect.fn("checkRuntimeJobsFx")(function* ({
 	}
 
 	for (const item of runtime.items) {
-		if (item.location.scope !== LocationScopeEnumSchema.enum.Job && item.location.scope !== LocationScopeEnumSchema.enum.Reserved) continue;
+		if (
+			item.location.scope !== LocationScopeEnumSchema.enum.Job &&
+			item.location.scope !== LocationScopeEnumSchema.enum.Reserved
+		)
+			continue;
 		const location = item.location;
 		if (!runtime.jobs.some((job) => job.id === location.jobId)) {
 			materialOrphanIssues.push({

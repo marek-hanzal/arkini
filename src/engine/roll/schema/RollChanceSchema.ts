@@ -12,7 +12,9 @@ import { RollEnumSchema } from "./RollEnumSchema";
 export const RollChanceSchema = z
 	.object({
 		...BaseRollSchema.shape,
-		type: RollEnumSchema.extract(["Chance"]),
+		type: RollEnumSchema.extract([
+			"Chance",
+		]),
 		/**
 		 * Probability that this roll provides its output, from 0 to 1 inclusive.
 		 */

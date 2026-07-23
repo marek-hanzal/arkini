@@ -26,7 +26,9 @@ export const ItemMaxCountIssueSchema = z
 		quantity: PositiveIntegerSchema.describe(
 			"The excessive committed quantity including live and reserved amounts.",
 		),
-		type: RuntimeCheckIssueEnumSchema.extract(["ItemMaxCount"]),
+		type: RuntimeCheckIssueEnumSchema.extract([
+			"ItemMaxCount",
+		]),
 	})
 	.strict()
 	.meta({

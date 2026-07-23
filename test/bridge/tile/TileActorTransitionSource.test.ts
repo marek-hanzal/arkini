@@ -57,17 +57,18 @@ const transition = (
 	sequence: number,
 	liveItems: ReadonlyArray<TileActorItem>,
 	previousItems: ReadonlyArray<TileActorItem> | null = null,
+	events: readTileActorTransitionFx.Result["events"] = [],
 ): TestTransition =>
 	({
 		sequence,
 		previousRuntime: null,
 		runtime: {},
-		events: [],
+		events,
 		projected: {
 			sequence,
 			previousItems,
 			liveItems,
-			events: [],
+			events,
 		},
 	}) as unknown as TestTransition;
 
@@ -80,8 +81,14 @@ const renderSource = async (initial: TestTransition) => {
 	let current = initial;
 	let listener: ((transition: CommittedTransitionSchema.Type) => void | PromiseLike<void>) | null =
 		null;
+	let claimedSequence = -1;
 	const game = {
 		getTransitionSnapshot: () => current,
+		claimTilePresentationTransition: (sequence: number) => {
+			if (sequence <= claimedSequence) return false;
+			claimedSequence = sequence;
+			return true;
+		},
 		subscribeTransitions: (
 			next: (transition: CommittedTransitionSchema.Type) => void | PromiseLike<void>,
 		) => {
@@ -95,17 +102,22 @@ const renderSource = async (initial: TestTransition) => {
 	} as unknown as GameEngine;
 	gameState.game = game;
 
-	const container = document.createElement("div");
-	document.body.append(container);
-	const root = createRoot(container);
-	roots.push(root);
-	await act(async () => {
-		root.render(createElement(Capture));
-	});
-	if (captured === null) throw new Error("Tile transition source was not captured.");
-	const source = captured;
+	const mountSource = async () => {
+		captured = null;
+		const container = document.createElement("div");
+		document.body.append(container);
+		const root = createRoot(container);
+		roots.push(root);
+		await act(async () => {
+			root.render(createElement(Capture));
+		});
+		if (captured === null) throw new Error("Tile transition source was not captured.");
+		return captured;
+	};
+	const source = await mountSource();
 	return {
 		source,
+		mountAgain: mountSource,
 		emit: (next: TestTransition) => {
 			current = next;
 			listener?.(next);
@@ -132,7 +144,8 @@ describe("useTileActorTransitionSource", () => {
 		});
 
 		try {
-			expect(received[0]).toBe(source.initial);
+			expect(received[0]?.liveItems).toBe(source.initial.liveItems);
+			expect(received[0]?.events).toEqual([]);
 			const unchanged = item();
 			emit(transition(1, [unchanged], [item()]));
 			expect(received[1]?.previousItems).toBe(source.initial.liveItems);
@@ -156,6 +169,34 @@ describe("useTileActorTransitionSource", () => {
 		} finally {
 			unsubscribe();
 		}
+	});
+
+
+	it("delivers one late current transition once and hydrates a remount without replay", async () => {
+		const outgoing = item({ id: "runtime:expired" });
+		const expired = transition(1, [], [outgoing], [
+			{
+				type: "item:expired",
+				itemId: outgoing.id,
+				canonicalItemId: outgoing.itemId,
+				location: outgoing.location as Extract<TileActorItem["location"], { scope: "board" }>,
+				quantity: outgoing.quantity,
+			},
+		]);
+		const { source, mountAgain } = await renderSource(expired);
+
+		expect(source.initial.events).toEqual([]);
+		expect(source.initial.previousItems).toBeNull();
+		const first = source.claimCurrent();
+		expect(first.events).toHaveLength(1);
+		expect(first.previousItems?.[0]).toBe(outgoing);
+
+		const remounted = await mountAgain();
+		expect(remounted.initial.events).toEqual([]);
+		expect(remounted.initial.previousItems).toBeNull();
+		const replay = remounted.claimCurrent();
+		expect(replay.events).toEqual([]);
+		expect(replay.previousItems).toBeNull();
 	});
 
 	it("refreshes projection identity for location, running, artwork, and primary-action changes", async () => {

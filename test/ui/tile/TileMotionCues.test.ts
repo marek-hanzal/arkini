@@ -28,22 +28,31 @@ const eventState = vi.hoisted(() => ({
 
 const createTransitionSource = (
 	initialEvents: readTileActorTransitionFx.Result["events"] = [],
-): TileActorTransitionSource => ({
-	get initial() {
-		return {
-			sequence: eventState.sequence,
-			previousItems: null,
-			liveItems: eventState.liveItems,
-			events: initialEvents,
-		};
-	},
-	subscribe: (listener) => {
-		eventState.listener = listener;
-		return () => {
-			if (eventState.listener === listener) eventState.listener = null;
-		};
-	},
-});
+): TileActorTransitionSource => {
+	let claimed = false;
+	const current = (events: readTileActorTransitionFx.Result["events"]) => ({
+		sequence: eventState.sequence,
+		previousItems: null,
+		liveItems: eventState.liveItems,
+		events,
+	});
+	return {
+		get initial() {
+			return current([]);
+		},
+		claimCurrent: () => {
+			const transition = current(claimed ? [] : initialEvents);
+			claimed = true;
+			return transition;
+		},
+		subscribe: (listener) => {
+			eventState.listener = listener;
+			return () => {
+				if (eventState.listener === listener) eventState.listener = null;
+			};
+		},
+	};
+};
 
 vi.mock("motion/react", async () => import("~test/ui/support/motionReactMock"));
 vi.mock("~/bridge/tile/useTileActorTransitionSource", () => ({
@@ -150,6 +159,47 @@ describe("tile motion cue lifecycle", () => {
 			kind: "spawn",
 			originItemId: "runtime:origin",
 		});
+	});
+
+
+	it("hydrates a remounted owner without replaying the already claimed current cue", async () => {
+		const liveItems = [item("runtime:remount-spawn")];
+		eventState.liveItems = liveItems;
+		eventState.source = createTransitionSource([
+			{
+				type: GameEventEnumSchema.enum.ItemSpawned,
+				itemId: "runtime:remount-spawn",
+				canonicalItemId: "item:remount-spawn",
+				originItemId: "runtime:origin",
+				location: liveItems[0].location,
+				quantity: 1,
+			},
+		]);
+		let current: ReturnType<typeof useTileMotionCues> | null = null;
+		const Capture = () => {
+			current = useTileMotionCues({ onSceneReset: vi.fn() });
+			return null;
+		};
+		const firstContainer = document.createElement("div");
+		document.body.append(firstContainer);
+		const firstRoot = createRoot(firstContainer);
+		roots.push(firstRoot);
+		await act(async () => firstRoot.render(createElement(Capture)));
+		expect(current?.cues.get("runtime:remount-spawn")?.kind).toBe("spawn");
+
+		await act(async () => firstRoot.unmount());
+		roots.splice(roots.indexOf(firstRoot), 1);
+		current = null;
+
+		const secondContainer = document.createElement("div");
+		document.body.append(secondContainer);
+		const secondRoot = createRoot(secondContainer);
+		roots.push(secondRoot);
+		await act(async () => secondRoot.render(createElement(Capture)));
+
+		expect(current?.liveItems).toBe(liveItems);
+		expect(current?.cues.size).toBe(0);
+		expect(current?.retainedItems).toEqual([]);
 	});
 
 	it("does not rerender the actor layer for an empty transition with the same live projection", async () => {

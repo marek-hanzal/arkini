@@ -245,8 +245,11 @@ const applyTransition = (
 	};
 };
 
-const stateFromSource = (source: TileActorTransitionSource) =>
-	applyTransition(emptyState(), source.initial);
+const stateFromSource = (source: TileActorTransitionSource): TileMotionCueState => ({
+	...emptyState(),
+	sequence: source.initial.sequence - 1,
+	liveItems: source.initial.liveItems,
+});
 
 /** Translates exact ordered committed transitions into bounded actor-local cue generations. */
 export const useTileMotionCues = ({
@@ -308,6 +311,8 @@ export const useTileMotionCues = ({
 			for (const fallback of fallbacks.current.values()) clearTimeout(fallback.timer);
 			fallbacks.current.clear();
 		}
+
+		setState((current) => applyTransition(current, source.claimCurrent()));
 
 		return source.subscribe((transition) => {
 			if (sourceRef.current !== source) return;

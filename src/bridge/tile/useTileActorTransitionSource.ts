@@ -7,6 +7,7 @@ import { readTileActorTransitionFx } from "~/bridge/tile/readTileActorTransition
 
 export interface TileActorTransitionSource {
 	readonly initial: readTileActorTransitionFx.Result;
+	readonly claimCurrent: () => readTileActorTransitionFx.Result;
 	readonly subscribe: (
 		listener: (transition: readTileActorTransitionFx.Result) => void | PromiseLike<void>,
 	) => () => void;
@@ -59,28 +60,39 @@ export const useTileActorTransitionSource = (): TileActorTransitionSource => {
 	return useMemo(() => {
 		const read = (transition: ReturnType<typeof game.getTransitionSnapshot>) =>
 			game.readOrThrow(readTileActorTransitionFx({ game, transition }));
-		let latest = read(game.getTransitionSnapshot());
+		const current = read(game.getTransitionSnapshot());
+		let latest: readTileActorTransitionFx.Result = {
+			...current,
+			previousItems: null,
+			events: [],
+		};
+		let deliveredSequence = current.sequence - 1;
 
 		const project = (transition: ReturnType<typeof game.getTransitionSnapshot>) => {
-			if (transition.sequence <= latest.sequence) return latest;
+			if (transition.sequence <= deliveredSequence) return latest;
 			const projected = read(transition);
-			const previousItems =
-				transition.sequence === latest.sequence + 1
+			const deliverEvents = game.claimTilePresentationTransition(transition.sequence);
+			const previousItems = deliverEvents
+				? transition.sequence === latest.sequence + 1
 					? latest.liveItems
 					: projected.previousItems === null
 						? null
-						: stabilizeItems(latest.liveItems, projected.previousItems);
+						: stabilizeItems(latest.liveItems, projected.previousItems)
+				: null;
 			const liveItems = stabilizeItems(latest.liveItems, projected.liveItems);
+			deliveredSequence = transition.sequence;
 			latest = {
 				...projected,
 				previousItems,
 				liveItems,
+				events: deliverEvents ? projected.events : [],
 			};
 			return latest;
 		};
 
 		return {
 			initial: latest,
+			claimCurrent: () => project(game.getTransitionSnapshot()),
 			subscribe: (listener) =>
 				game.subscribeTransitions((transition) => listener(project(transition))),
 		};

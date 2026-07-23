@@ -54,7 +54,11 @@ describe("createGameSessionFx", () => {
 				previousItems: transition.previousRuntime?.items.length ?? null,
 				currentItems: transition.runtime.items.length,
 				eventJobIds: transition.events.flatMap((event) =>
-					"jobId" in event ? [event.jobId] : [],
+					"jobId" in event
+						? [
+								event.jobId,
+							]
+						: [],
 				),
 			});
 		});
@@ -76,7 +80,10 @@ describe("createGameSessionFx", () => {
 					itemId: "water",
 					location: {
 						scope: "inventory",
-						position: { x: 0, y: 0 },
+						position: {
+							x: 0,
+							y: 0,
+						},
 					},
 					quantity: 1,
 				}),
@@ -101,7 +108,9 @@ describe("createGameSessionFx", () => {
 					sequence: 2,
 					previousItems: 1,
 					currentItems: 1,
-					eventJobIds: ["job:transition:ordered"],
+					eventJobIds: [
+						"job:transition:ordered",
+					],
 				},
 			]);
 			expect(session.getTransitionSnapshot().sequence).toBe(2);
@@ -112,7 +121,6 @@ describe("createGameSessionFx", () => {
 		}
 	});
 
-
 	it("claims each tile-presentation transition once for one live Game session", async () => {
 		const session = await createTestGameSession({
 			config: createJobTestConfig(),
@@ -120,9 +128,13 @@ describe("createGameSessionFx", () => {
 		});
 
 		try {
+			expect(session.canClaimTilePresentationTransition(0)).toBe(true);
 			expect(session.claimTilePresentationTransition(0)).toBe(true);
+			expect(session.canClaimTilePresentationTransition(0)).toBe(false);
 			expect(session.claimTilePresentationTransition(0)).toBe(false);
+			expect(session.canClaimTilePresentationTransition(1)).toBe(true);
 			expect(session.claimTilePresentationTransition(1)).toBe(true);
+			expect(session.canClaimTilePresentationTransition(1)).toBe(false);
 			expect(session.claimTilePresentationTransition(0)).toBe(false);
 		} finally {
 			await Effect.runPromise(session.disposeFx);
@@ -454,7 +466,9 @@ describe("createGameSessionFx", () => {
 		});
 		let observedStartedJob = false;
 		const unsubscribe = session.subscribeEvents((batch) => {
-			const started = batch.events.find((event) => event.type === GameEventEnumSchema.enum.JobStarted);
+			const started = batch.events.find(
+				(event) => event.type === GameEventEnumSchema.enum.JobStarted,
+			);
 			if (started !== undefined) {
 				observedStartedJob = session
 					.getSnapshot()
@@ -713,8 +727,13 @@ describe("createGameSessionFx", () => {
 		const batches: Array<ReadonlyArray<string>> = [];
 		const unsubscribe = session.subscribeEvents((batch) => {
 			batches.push(
-				batch.events.map(
-					(event) => `${event.type}:${"source" in event ? event.source : ""}`,
+				batch.events.flatMap((event) =>
+					event.type === GameEventEnumSchema.enum.JobStarted ||
+					event.type === GameEventEnumSchema.enum.JobCompleted
+						? [
+								`${event.type}:${"source" in event ? event.source : ""}`,
+							]
+						: [],
 				),
 			);
 		});

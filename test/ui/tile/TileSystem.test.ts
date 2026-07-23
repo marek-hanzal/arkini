@@ -1,19 +1,22 @@
 // @vitest-environment jsdom
 
-import { act, createElement, useContext, useEffect } from "react";
+import { act, createElement, useEffect, useMemo, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { DropItemRejectedReasonEnumSchema } from "~/engine/runtime/schema/command/DropItemRejectedReasonEnumSchema";
 import { DropItemResultKindEnumSchema } from "~/engine/runtime/schema/command/DropItemResultKindEnumSchema";
+import { useTileActorInteraction } from "~/ui/tile/useTileActorInteraction";
 import type { TileDragSource } from "~/ui/tile/TileDragSource";
 import type { TileIdentity } from "~/ui/tile/TileIdentity";
 import type { TileSlot } from "~/ui/tile/TileSlot";
 import type { TileSurface } from "~/ui/tile/TileSurface";
-import { TileSystemContext, type TileSystem } from "~/ui/tile/TileSystemContext";
+import type { TileSystem } from "~/ui/tile/TileSystem";
 import { TileSystemProvider } from "~/ui/tile/TileSystemProvider";
 import { useTileSlot } from "~/ui/tile/useTileSlot";
 import { useTileSurface } from "~/ui/tile/useTileSurface";
+import { useTileInteractionState } from "~/ui/tile/useTileInteractionState";
+import { useTileSystemApiContext } from "~/ui/tile/useTileSystemApiContext";
 
 vi.mock("~/bridge/tile/useTileActors", () => ({
 	useTileActors: () => [],
@@ -21,6 +24,7 @@ vi.mock("~/bridge/tile/useTileActors", () => ({
 
 const previewState = vi.hoisted(() => ({
 	occupiedKind: "swap" as "swap" | "merge" | "store-input",
+	observedRevisions: [] as string[],
 }));
 
 vi.mock("~/bridge/tile/useDropItemPreviewSequence", () => ({
@@ -38,11 +42,19 @@ vi.mock("~/ui/tile/useTileMotionCues", () => ({
 }));
 
 vi.mock("~/bridge/tile/useDropItemPreview", () => ({
-	useDropItemPreview: () =>
+	useDropItemPreview:
+		() =>
 		(props: {
 			readonly target:
-				| { readonly kind: "unsupported" }
-				| { readonly kind: "slot"; readonly occupant: object | null };
+				| {
+						readonly kind: "unsupported";
+				  }
+				| {
+						readonly kind: "slot";
+						readonly occupant: {
+							readonly revision: string;
+						} | null;
+				  };
 		}) => {
 			if (props.target.kind === "unsupported") {
 				return {
@@ -50,11 +62,12 @@ vi.mock("~/bridge/tile/useDropItemPreview", () => ({
 					reason: "unsupported-target" as const,
 				};
 			}
+			if (props.target.occupant !== null) {
+				previewState.observedRevisions.push(props.target.occupant.revision);
+			}
 			return {
 				kind:
-					props.target.occupant === null
-						? ("move" as const)
-						: previewState.occupiedKind,
+					props.target.occupant === null ? ("move" as const) : previewState.occupiedKind,
 			};
 		},
 }));
@@ -66,6 +79,9 @@ vi.mock("~/bridge/tile/useDropItemPreview", () => ({
 ).IS_REACT_ACT_ENVIRONMENT = true;
 
 const roots: Array<ReturnType<typeof createRoot>> = [];
+const actorRenderCounts = new Map<string, number>();
+const slotRenderCounts = new Map<string, number>();
+let updateToolbarRevision: ((revision: string) => void) | null = null;
 
 const rect = (left: number, top: number, width: number, height: number): DOMRect => ({
 	left,
@@ -150,6 +166,8 @@ const SurfaceSlot = ({
 	readonly slot: TileSlot;
 	readonly occupant?: TileIdentity | null;
 }) => {
+	const renderKey = `${surface.id}:${slot.id}`;
+	slotRenderCounts.set(renderKey, (slotRenderCounts.get(renderKey) ?? 0) + 1);
 	const drop = useTileSlot({
 		surface,
 		slot,
@@ -190,9 +208,50 @@ const Surface = ({
 	);
 };
 
+const MutableToolbarSurface = () => {
+	const [revision, setRevision] = useState(toolbarOccupant.revision);
+	useEffect(() => {
+		updateToolbarRevision = setRevision;
+		return () => {
+			updateToolbarRevision = null;
+		};
+	}, []);
+	return createElement(Surface, {
+		surface: toolbarSurface,
+		slots: [
+			{
+				slot: toolbarSlot,
+				occupant: {
+					...toolbarOccupant,
+					revision,
+				},
+			},
+		],
+	});
+};
+
+const ActorSelectionCapture = ({ itemId }: { readonly itemId: string }) => {
+	const active = useTileActorInteraction(itemId);
+	actorRenderCounts.set(itemId, (actorRenderCounts.get(itemId) ?? 0) + 1);
+	return createElement("span", {
+		"data-actor-selection": itemId,
+		"data-active-phase": active?.phase,
+	});
+};
+
 const Capture = ({ onSystem }: { readonly onSystem: (system: TileSystem) => void }) => {
-	const system = useContext(TileSystemContext);
-	if (system === null) throw new Error("Missing TileSystemProvider.");
+	const api = useTileSystemApiContext();
+	const active = useTileInteractionState();
+	const system = useMemo<TileSystem>(
+		() => ({
+			...api,
+			active,
+		}),
+		[
+			active,
+			api,
+		],
+	);
 	useEffect(
 		() => onSystem(system),
 		[
@@ -209,6 +268,15 @@ const Harness = ({ onSystem }: { readonly onSystem: (system: TileSystem) => void
 		null,
 		createElement(Capture, {
 			onSystem,
+		}),
+		createElement(ActorSelectionCapture, {
+			itemId: source.id,
+		}),
+		createElement(ActorSelectionCapture, {
+			itemId: toolbarOccupant.id,
+		}),
+		createElement(ActorSelectionCapture, {
+			itemId: "runtime:unrelated",
 		}),
 		createElement(Surface, {
 			surface: boardSurface,
@@ -235,19 +303,14 @@ const Harness = ({ onSystem }: { readonly onSystem: (system: TileSystem) => void
 				},
 			],
 		}),
-		createElement(Surface, {
-			surface: toolbarSurface,
-			slots: [
-				{
-					slot: toolbarSlot,
-					occupant: toolbarOccupant,
-				},
-			],
-		}),
+		createElement(MutableToolbarSurface),
 	);
 
 beforeEach(() => {
 	previewState.occupiedKind = "swap";
+	previewState.observedRevisions.splice(0);
+	actorRenderCounts.clear();
+	slotRenderCounts.clear();
 	Object.defineProperty(HTMLElement.prototype, "getBoundingClientRect", {
 		configurable: true,
 		value() {
@@ -336,6 +399,135 @@ const startDrag = async (system: TileSystem, x: number, y: number) => {
 };
 
 describe("TileSystemProvider", () => {
+	it("rerenders only the dragged actor and exact previous/new targets at logical boundaries", async () => {
+		const { readSystem } = await renderHarness();
+		const initialActors = new Map(actorRenderCounts);
+		const initialSlots = new Map(slotRenderCounts);
+		const readActorRenders = (itemId: string) => actorRenderCounts.get(itemId) ?? 0;
+		const readSlotRenders = (surface: TileSurface, slot: TileSlot) =>
+			slotRenderCounts.get(`${surface.id}:${slot.id}`) ?? 0;
+
+		await act(async () => {
+			const system = readSystem();
+			expect(system.press(source)).toBe(true);
+			system.startDrag(source);
+			system.moveDrag(source, 240, 50);
+		});
+
+		expect(readActorRenders(source.id)).toBeGreaterThan(initialActors.get(source.id) ?? 0);
+		expect(readActorRenders(toolbarOccupant.id)).toBe(initialActors.get(toolbarOccupant.id));
+		expect(readActorRenders("runtime:unrelated")).toBe(initialActors.get("runtime:unrelated"));
+		expect(readSlotRenders(inventorySurface, inventorySlot)).toBe(
+			(initialSlots.get(`${inventorySurface.id}:${inventorySlot.id}`) ?? 0) + 1,
+		);
+		expect(readSlotRenders(toolbarSurface, toolbarSlot)).toBe(
+			initialSlots.get(`${toolbarSurface.id}:${toolbarSlot.id}`),
+		);
+
+		const insideTargetActors = new Map(actorRenderCounts);
+		const insideTargetSlots = new Map(slotRenderCounts);
+		await act(async () => {
+			readSystem().moveDrag(source, 250, 60);
+		});
+		expect(actorRenderCounts).toEqual(insideTargetActors);
+		expect(slotRenderCounts).toEqual(insideTargetSlots);
+
+		await act(async () => {
+			readSystem().moveDrag(source, 440, 50);
+		});
+		expect(readActorRenders(source.id)).toBe((insideTargetActors.get(source.id) ?? 0) + 1);
+		expect(readActorRenders(toolbarOccupant.id)).toBe(
+			(insideTargetActors.get(toolbarOccupant.id) ?? 0) + 1,
+		);
+		expect(readActorRenders("runtime:unrelated")).toBe(
+			insideTargetActors.get("runtime:unrelated"),
+		);
+		expect(readSlotRenders(inventorySurface, inventorySlot)).toBe(
+			(insideTargetSlots.get(`${inventorySurface.id}:${inventorySlot.id}`) ?? 0) + 1,
+		);
+		expect(readSlotRenders(toolbarSurface, toolbarSlot)).toBe(
+			(insideTargetSlots.get(`${toolbarSurface.id}:${toolbarSlot.id}`) ?? 0) + 1,
+		);
+		expect(readSlotRenders(boardSurface, sourceSlot)).toBe(
+			insideTargetSlots.get(`${boardSurface.id}:${sourceSlot.id}`),
+		);
+	});
+
+	it("refreshes same-node occupant truth without publishing global geometry", async () => {
+		const { readSystem } = await renderHarness();
+		await act(async () => {
+			const system = readSystem();
+			expect(system.press(source)).toBe(true);
+			system.startDrag(source);
+			system.moveDrag(source, 440, 50);
+		});
+		expect(readSystem().active).toMatchObject({
+			phase: "dragging",
+			target: {
+				kind: "slot",
+				occupant: toolbarOccupant,
+			},
+		});
+
+		const geometryVersion = readSystem().geometryVersion;
+		const actorsBeforeRevision = new Map(actorRenderCounts);
+		const slotsBeforeRevision = new Map(slotRenderCounts);
+		previewState.observedRevisions.splice(0);
+		await act(async () => {
+			updateToolbarRevision?.("revision:toolbar-updated");
+		});
+
+		expect(readSystem().geometryVersion).toBe(geometryVersion);
+		expect(readSystem().active).toMatchObject({
+			phase: "dragging",
+			target: {
+				kind: "slot",
+				occupant: {
+					id: toolbarOccupant.id,
+					revision: "revision:toolbar-updated",
+				},
+			},
+		});
+		expect(previewState.observedRevisions).toEqual([
+			"revision:toolbar-updated",
+		]);
+		expect(actorRenderCounts.get(source.id)).toBe(
+			(actorsBeforeRevision.get(source.id) ?? 0) + 1,
+		);
+		expect(actorRenderCounts.get(toolbarOccupant.id)).toBe(
+			(actorsBeforeRevision.get(toolbarOccupant.id) ?? 0) + 1,
+		);
+		expect(actorRenderCounts.get("runtime:unrelated")).toBe(
+			actorsBeforeRevision.get("runtime:unrelated"),
+		);
+		for (const [slotKey, renders] of slotsBeforeRevision) {
+			if (slotKey === `${toolbarSurface.id}:${toolbarSlot.id}`) continue;
+			expect(slotRenderCounts.get(slotKey), slotKey).toBe(renders);
+		}
+	});
+
+	it("keeps the exact released target frozen while its command outcome is pending", async () => {
+		const { readSystem } = await renderHarness();
+		const released = await startDrag(readSystem(), 440, 50);
+		if (released === null) throw new Error("Expected a released drag.");
+		const geometryVersion = readSystem().geometryVersion;
+		previewState.observedRevisions.splice(0);
+
+		await act(async () => {
+			updateToolbarRevision?.("revision:toolbar-after-release");
+		});
+
+		expect(readSystem().geometryVersion).toBe(geometryVersion);
+		expect(readSystem().active).toMatchObject({
+			phase: "awaiting-outcome",
+			target: {
+				kind: "slot",
+				occupant: toolbarOccupant,
+			},
+		});
+		expect(previewState.observedRevisions).toEqual([]);
+	});
+
 	it("assigns fractional shared seams and outer edges to exactly one Board slot", async () => {
 		const { readSystem } = await renderHarness();
 
@@ -543,7 +735,9 @@ describe("TileSystemProvider", () => {
 					kind: "slot",
 					occupant: toolbarOccupant,
 				},
-				pendingActorIds: [source.id],
+				pendingActorIds: [
+					source.id,
+				],
 			},
 		});
 
@@ -654,9 +848,15 @@ describe("TileSystemProvider", () => {
 			settlement: {
 				kind: DropItemResultKindEnumSchema.enum.StoreInput,
 				stage: "approach",
-				pendingActorIds: [source.id],
+				pendingActorIds: [
+					source.id,
+				],
 			},
 		});
+		expect(
+			document.querySelector<HTMLElement>(`[data-actor-selection="${toolbarOccupant.id}"]`)
+				?.dataset.activePhase,
+		).toBe("settling");
 
 		await act(async () => {
 			readSystem().complete(source.id, released.generation);
@@ -666,7 +866,10 @@ describe("TileSystemProvider", () => {
 			settlement: {
 				kind: DropItemResultKindEnumSchema.enum.StoreInput,
 				stage: "resolve",
-				pendingActorIds: [source.id, toolbarOccupant.id],
+				pendingActorIds: [
+					source.id,
+					toolbarOccupant.id,
+				],
 			},
 		});
 
@@ -726,6 +929,10 @@ describe("TileSystemProvider", () => {
 				],
 			},
 		});
+		expect(
+			document.querySelector<HTMLElement>(`[data-actor-selection="${toolbarOccupant.id}"]`)
+				?.dataset.activePhase,
+		).toBe("settling");
 
 		await act(async () => {
 			readSystem().complete(source.id, released.generation);

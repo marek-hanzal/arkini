@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 
 import { Effect } from "effect";
-import { act, createElement, useContext, useEffect } from "react";
+import { act, createElement, useEffect } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -10,8 +10,9 @@ import { useGameFx } from "~/engine/game/fx/useGameFx";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { startFx } from "~/engine/start/write/startFx";
 import { Board } from "~/ui/board/Board";
-import { TileSystemContext, type TileSystem } from "~/ui/tile/TileSystemContext";
+import type { TileSystemApi } from "~/ui/tile/TileSystemApiContext";
 import { TileSystemProvider } from "~/ui/tile/TileSystemProvider";
+import { useTileSystemApiContext } from "~/ui/tile/useTileSystemApiContext";
 import { testGameRead, testGameReadOrThrow } from "~test/support/game/testGameRead";
 
 (
@@ -34,8 +35,16 @@ vi.mock("~/bridge/game/useGameEngine", () => ({
 	},
 }));
 
-vi.mock("~/bridge/tile/useTileActors", () => ({
-	useTileActors: () => [],
+vi.mock("~/ui/tile/useTileMotionCues", () => ({
+	useTileMotionCues: () => ({
+		liveItems: [],
+		cues: new Map(),
+		retainedItems: [],
+		morphPreviousItems: new Map(),
+		start: vi.fn(),
+		contact: vi.fn(),
+		complete: vi.fn(),
+	}),
 }));
 
 const config = GameConfigSchema.parse({
@@ -94,6 +103,7 @@ const runtime = Effect.runSync(
 	),
 );
 let currentRuntime = runtime;
+let claimedTilePresentationSequence = -1;
 const runtimeListeners = new Set<() => void>();
 const game = {
 	arkpack: {
@@ -111,10 +121,32 @@ const game = {
 		contentHash: "0".repeat(64),
 	},
 	getSnapshot: () => currentRuntime,
+	getTransitionSnapshot: () => ({
+		sequence: 0,
+		previousRuntime: null,
+		runtime: currentRuntime,
+		events: [],
+	}),
+	canClaimTilePresentationTransition: (sequence: number) =>
+		sequence > claimedTilePresentationSequence,
+	claimTilePresentationTransition: (sequence: number) => {
+		if (sequence <= claimedTilePresentationSequence) return false;
+		claimedTilePresentationSequence = sequence;
+		return true;
+	},
 	getResourceUrl: (resourceId: string) => `resource:${resourceId}`,
 	subscribe: (listener: () => void) => {
 		runtimeListeners.add(listener);
 		return () => runtimeListeners.delete(listener);
+	},
+	subscribeTransitions: (listener) => {
+		void listener({
+			sequence: 0,
+			previousRuntime: null,
+			runtime: currentRuntime,
+			events: [],
+		});
+		return () => undefined;
 	},
 	subscribeEvents: () => () => undefined,
 	read: testGameRead,
@@ -127,9 +159,8 @@ const game = {
 
 const roots: Array<ReturnType<typeof createRoot>> = [];
 
-const Capture = ({ onSystem }: { readonly onSystem: (system: TileSystem) => void }) => {
-	const system = useContext(TileSystemContext);
-	if (system === null) throw new Error("Missing TileSystemProvider.");
+const Capture = ({ onSystem }: { readonly onSystem: (system: TileSystemApi) => void }) => {
+	const system = useTileSystemApiContext();
 	useEffect(
 		() => onSystem(system),
 		[
@@ -142,6 +173,7 @@ const Capture = ({ onSystem }: { readonly onSystem: (system: TileSystem) => void
 
 beforeEach(() => {
 	currentRuntime = runtime;
+	claimedTilePresentationSequence = -1;
 	runtimeListeners.clear();
 	gameEngineState.game = game;
 });
@@ -155,7 +187,7 @@ afterEach(async () => {
 });
 
 const renderBoard = async () => {
-	let currentSystem: TileSystem | null = null;
+	let currentSystem: TileSystemApi | null = null;
 	const container = document.createElement("div");
 	document.body.append(container);
 	const root = createRoot(container);
@@ -202,7 +234,7 @@ describe("Board geometry identity", () => {
 		]);
 	});
 
-	it("publishes geometry only for changed surface or occupant identity", async () => {
+	it("publishes geometry only for layout truth, not same-node occupant metadata", async () => {
 		const readSystem = await renderBoard();
 		const initialVersion = readSystem().geometryVersion;
 
@@ -228,7 +260,7 @@ describe("Board geometry identity", () => {
 			})),
 		});
 		const occupantChangedVersion = readSystem().geometryVersion;
-		expect(occupantChangedVersion).toBe(initialVersion + 2);
+		expect(occupantChangedVersion).toBe(initialVersion);
 
 		await publishRuntime({
 			...currentRuntime,

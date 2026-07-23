@@ -205,6 +205,8 @@ export const createGameSessionFx = Effect.fn("createGameSessionFx")(
 				flushSaveFx,
 				getSnapshot: () => managed.runSync(readRuntimeFx()),
 				getTransitionSnapshot: () => managed.runSync(readCommittedTransitionFx()),
+				canClaimTilePresentationTransition: (sequence) =>
+					sequence > MutableRef.get(lastTilePresentationSequence),
 				claimTilePresentationTransition: (sequence) => {
 					const previous = MutableRef.get(lastTilePresentationSequence);
 					if (sequence <= previous) return false;

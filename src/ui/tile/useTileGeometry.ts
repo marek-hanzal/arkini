@@ -19,6 +19,10 @@ interface TileSlotRegistration {
 	readonly node: HTMLElement;
 }
 
+export namespace useTileGeometry {
+	export type SlotRegistrationChange = "none" | "semantic" | "geometry";
+}
+
 const slotRegistrationKey = (surface: TileSurface, slot: TileSlot) =>
 	`${surface.id}\u0000${slot.id}`;
 
@@ -128,16 +132,34 @@ export const useTileGeometry = () => {
 				readonly occupant: TileIdentity | null;
 			},
 			node: HTMLElement | null,
-		) => {
+		): useTileGeometry.SlotRegistrationChange => {
 			const key = slotRegistrationKey(registration.surface, registration.slot);
 			const previous = slots.current.get(key);
-			if (
+			const samePlacement =
 				previous?.node === node &&
+				previous.surface.id === registration.surface.id &&
+				previous.surface.kind === registration.surface.kind &&
+				(previous.surface.kind !== "board" ||
+					(registration.surface.kind === "board" &&
+						previous.surface.space === registration.surface.space)) &&
+				previous.slot.id === registration.slot.id &&
+				previous.slot.x === registration.slot.x &&
+				previous.slot.y === registration.slot.y;
+			if (
+				samePlacement &&
 				previous.occupant?.id === registration.occupant?.id &&
 				previous.occupant?.revision === registration.occupant?.revision
 			) {
-				return;
+				return "none";
 			}
+			if (samePlacement && previous !== undefined && node !== null) {
+				slots.current.set(key, {
+					...registration,
+					node,
+				});
+				return "semantic";
+			}
+			if (previous === undefined && node === null) return "none";
 			if (previous !== undefined && previous.node !== node) unobserve(previous.node);
 			if (node === null) {
 				slots.current.delete(key);
@@ -149,6 +171,7 @@ export const useTileGeometry = () => {
 				if (previous?.node !== node) observe(node);
 			}
 			publishGeometry();
+			return "geometry";
 		},
 		[
 			observe,

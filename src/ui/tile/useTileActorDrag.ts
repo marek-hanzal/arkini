@@ -7,6 +7,7 @@ import { useDropItem } from "~/bridge/tile/useDropItem";
 import type { useDropItemPreview } from "~/bridge/tile/useDropItemPreview";
 import type { TileDragSource } from "~/ui/tile/TileDragSource";
 import type { TileDropTarget } from "~/ui/tile/TileDropTarget";
+import { useTileActorInteraction } from "~/ui/tile/useTileActorInteraction";
 import { useTileActorRetention } from "~/ui/tile/useTileActorRetention";
 import { tileLocationForTarget } from "~/ui/tile/tileLocationForTarget";
 import { useTileActorSystem } from "~/ui/tile/useTileActorSystem";
@@ -105,8 +106,8 @@ export const useTileActorDrag = ({
 	readonly pointer: useTileActorPointerMotion.Control;
 }) => {
 	const retainActorIds = useTileActorRetention();
+	const active = useTileActorInteraction(canonicalSource.id);
 	const {
-		active,
 		press,
 		startDrag,
 		moveDrag,

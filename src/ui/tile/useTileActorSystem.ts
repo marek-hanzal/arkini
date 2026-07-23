@@ -1,9 +1,8 @@
-import { useTileSystemContext } from "~/ui/tile/useTileSystemContext";
+import { useTileSystemApiContext } from "~/ui/tile/useTileSystemApiContext";
 
 /** Exposes only actor-owned interaction commands and placement measurement. */
 export const useTileActorSystem = () => {
 	const {
-		active,
 		geometryVersion,
 		readActorLayerRect,
 		readActorRect,
@@ -22,9 +21,8 @@ export const useTileActorSystem = () => {
 		setNeighbourTravelTarget,
 		setNeighbourSemanticSource,
 		clearNeighbourField,
-	} = useTileSystemContext();
+	} = useTileSystemApiContext();
 	return {
-		active,
 		geometryVersion,
 		readActorLayerRect,
 		readActorRect,

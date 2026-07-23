@@ -99,6 +99,7 @@ const createGame = (toolbarSize?: number, stored = false): GameEngine => {
 				})),
 			})
 		: initialRuntime;
+	let claimedTilePresentationSequence = -1;
 	return {
 		arkpack: {
 			packageId: "test-package",
@@ -115,8 +116,30 @@ const createGame = (toolbarSize?: number, stored = false): GameEngine => {
 			contentHash: "0".repeat(64),
 		},
 		getSnapshot: () => runtime,
+		getTransitionSnapshot: () => ({
+			sequence: 0,
+			previousRuntime: null,
+			runtime,
+			events: [],
+		}),
+		canClaimTilePresentationTransition: (sequence: number) =>
+			sequence > claimedTilePresentationSequence,
+		claimTilePresentationTransition: (sequence: number) => {
+			if (sequence <= claimedTilePresentationSequence) return false;
+			claimedTilePresentationSequence = sequence;
+			return true;
+		},
 		getResourceUrl: (resourceId: string) => `resource:${resourceId}`,
 		subscribe: () => () => undefined,
+		subscribeTransitions: (listener) => {
+			void listener({
+				sequence: 0,
+				previousRuntime: null,
+				runtime,
+				events: [],
+			});
+			return () => undefined;
+		},
 		subscribeEvents: () => () => undefined,
 		read: testGameRead,
 		readOrThrow: testGameReadOrThrow,

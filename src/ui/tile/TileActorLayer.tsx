@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo } from "react";
+import { memo, useCallback, useEffect, useMemo } from "react";
 import { match } from "ts-pattern";
 
 import { TileActor } from "~/ui/tile/TileActor";
@@ -55,7 +55,7 @@ const interactionActorIds = (
 		.exhaustive();
 
 /** Renders one stable Motion actor per live or explicitly retained presentation identity. */
-export const TileActorLayer = () => {
+const TileActorLayerComponent = () => {
 	const { active, registerActorLayer, resetInteraction, clearNeighbourField } =
 		useTileActorLayerSystem();
 	const resetScene = useCallback(() => {
@@ -147,3 +147,6 @@ export const TileActorLayer = () => {
 		</div>
 	);
 };
+
+/** Provider-level interaction publications may not wake this whole actor collection. */
+export const TileActorLayer = memo(TileActorLayerComponent);

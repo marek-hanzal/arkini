@@ -10,6 +10,7 @@ export namespace readTileActorTransitionFx {
 	export interface Props {
 		readonly game: GameEngine;
 		readonly transition: CommittedTransitionSchema.Type;
+		readonly includePreviousItems: boolean;
 	}
 
 	export interface Result {
@@ -24,12 +25,19 @@ export namespace readTileActorTransitionFx {
 export const readTileActorTransitionFx = Effect.fn("readTileActorTransitionFx")(function* ({
 	game,
 	transition,
+	includePreviousItems,
 }: readTileActorTransitionFx.Props) {
 	const previousItems =
-		transition.previousRuntime === null
+		!includePreviousItems || transition.previousRuntime === null
 			? null
-			: yield* readTileActorsFx({ game, runtime: transition.previousRuntime });
-	const liveItems = yield* readTileActorsFx({ game, runtime: transition.runtime });
+			: yield* readTileActorsFx({
+					game,
+					runtime: transition.previousRuntime,
+				});
+	const liveItems = yield* readTileActorsFx({
+		game,
+		runtime: transition.runtime,
+	});
 
 	return {
 		sequence: transition.sequence,

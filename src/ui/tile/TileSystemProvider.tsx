@@ -5,7 +5,11 @@ import { useDropItemPreviewSequence } from "~/bridge/tile/useDropItemPreviewSequ
 import { TileActorLayer } from "~/ui/tile/TileActorLayer";
 import type { TileDragSource } from "~/ui/tile/TileDragSource";
 import type { TileDropTarget } from "~/ui/tile/TileDropTarget";
-import { TileSystemContext, type TileSystem } from "~/ui/tile/TileSystemContext";
+import {
+	TileInteractionContext,
+	type TileInteractionSubscription,
+} from "~/ui/tile/TileInteractionContext";
+import { TileSystemApiContext, type TileSystemApi } from "~/ui/tile/TileSystemApiContext";
 import { useTileGeometry } from "~/ui/tile/useTileGeometry";
 import { useTileInteractionController } from "~/ui/tile/useTileInteractionController";
 import { useTileNeighbourField } from "~/ui/tile/useTileNeighbourField";
@@ -25,21 +29,25 @@ export const TileSystemProvider = ({ children }: PropsWithChildren) => {
 				sourceLocation: source.location,
 				target:
 					location === null || target.kind !== "slot"
-						? { kind: "unsupported" }
+						? {
+								kind: "unsupported",
+							}
 						: {
-							kind: "slot",
-							location,
-							occupant:
-								target.occupant === null
-									? null
-									: {
-										itemId: target.occupant.id,
-										revision: target.occupant.revision,
-									},
+								kind: "slot",
+								location,
+								occupant:
+									target.occupant === null
+										? null
+										: {
+												itemId: target.occupant.id,
+												revision: target.occupant.revision,
+											},
 							},
 			});
 		},
-		[dropItemPreview],
+		[
+			dropItemPreview,
+		],
 	);
 	const interaction = useTileInteractionController({
 		readPreview,
@@ -50,7 +58,7 @@ export const TileSystemProvider = ({ children }: PropsWithChildren) => {
 		readPreviewSequence,
 		refreshActivePreview: interaction.refreshActivePreview,
 	});
-	const value = useMemo<TileSystem>(
+	const api = useMemo<TileSystemApi>(
 		() => ({
 			geometryVersion: geometry.geometryVersion,
 			registerActorLayer: geometry.registerActorLayer,
@@ -58,8 +66,25 @@ export const TileSystemProvider = ({ children }: PropsWithChildren) => {
 			registerSlot: geometry.registerSlot,
 			readActorLayerRect: geometry.readActorLayerRect,
 			readPlacement: geometry.readPlacement,
-			...interaction,
-			...neighbourField,
+			press: interaction.press,
+			startDrag: interaction.startDrag,
+			moveDrag: interaction.moveDrag,
+			refreshActivePreview: interaction.refreshActivePreview,
+			refreshSlotTarget: interaction.refreshSlotTarget,
+			release: interaction.release,
+			settle: interaction.settle,
+			complete: interaction.complete,
+			cancel: interaction.cancel,
+			resetInteraction: interaction.resetInteraction,
+			readActorRect: neighbourField.readActorRect,
+			readActorSource: neighbourField.readActorSource,
+			registerNeighbourActor: neighbourField.registerNeighbourActor,
+			updateNeighbourActor: neighbourField.updateNeighbourActor,
+			beginNeighbourTravel: neighbourField.beginNeighbourTravel,
+			setNeighbourTravelTarget: neighbourField.setNeighbourTravelTarget,
+			setNeighbourSemanticSource: neighbourField.setNeighbourSemanticSource,
+			refreshNeighbourField: neighbourField.refreshNeighbourField,
+			clearNeighbourField: neighbourField.clearNeighbourField,
 		}),
 		[
 			geometry.geometryVersion,
@@ -68,15 +93,43 @@ export const TileSystemProvider = ({ children }: PropsWithChildren) => {
 			geometry.registerActorLayer,
 			geometry.registerSlot,
 			geometry.registerSurface,
-			interaction,
-			neighbourField,
+			interaction.cancel,
+			interaction.complete,
+			interaction.moveDrag,
+			interaction.press,
+			interaction.refreshActivePreview,
+			interaction.refreshSlotTarget,
+			interaction.release,
+			interaction.resetInteraction,
+			interaction.settle,
+			interaction.startDrag,
+			neighbourField.beginNeighbourTravel,
+			neighbourField.clearNeighbourField,
+			neighbourField.readActorRect,
+			neighbourField.readActorSource,
+			neighbourField.refreshNeighbourField,
+			neighbourField.registerNeighbourActor,
+			neighbourField.setNeighbourSemanticSource,
+			neighbourField.setNeighbourTravelTarget,
+			neighbourField.updateNeighbourActor,
 		],
 	);
-
+	const selection = useMemo<TileInteractionSubscription>(
+		() => ({
+			readActive: interaction.readActive,
+			subscribeActive: interaction.subscribeActive,
+		}),
+		[
+			interaction.readActive,
+			interaction.subscribeActive,
+		],
+	);
 	return (
-		<TileSystemContext.Provider value={value}>
-			{children}
-			<TileActorLayer />
-		</TileSystemContext.Provider>
+		<TileSystemApiContext.Provider value={api}>
+			<TileInteractionContext.Provider value={selection}>
+				{children}
+				<TileActorLayer />
+			</TileInteractionContext.Provider>
+		</TileSystemApiContext.Provider>
 	);
 };

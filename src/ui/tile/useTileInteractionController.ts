@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useRef } from "react";
 import { match } from "ts-pattern";
 
 import { DropItemResultKindEnumSchema } from "~/bridge/tile/DropItemResultKindEnumSchema";
@@ -50,8 +50,8 @@ const settlementForOutcome = (
 				outcome: rejected,
 				target,
 				pendingActorIds: [
-				source.id,
-			],
+					source.id,
+				],
 			}),
 		)
 		.with(
@@ -156,11 +156,16 @@ export const useTileInteractionController = ({
 }) => {
 	const nextGeneration = useRef(0);
 	const activeRef = useRef<TileInteractionState | null>(null);
-	const [active, setActive] = useState<TileInteractionState | null>(null);
+	const activeListeners = useRef(new Set<() => void>());
 
 	const publishActive = useCallback((next: TileInteractionState | null) => {
 		activeRef.current = next;
-		setActive(next);
+		for (const listener of activeListeners.current) listener();
+	}, []);
+	const readActive = useCallback(() => activeRef.current, []);
+	const subscribeActive = useCallback((listener: () => void) => {
+		activeListeners.current.add(listener);
+		return () => activeListeners.current.delete(listener);
 	}, []);
 
 	const press = useCallback(
@@ -259,7 +264,10 @@ export const useTileInteractionController = ({
 							try {
 								previewKind = readPreview(source, target)?.kind ?? null;
 							} catch (error) {
-								console.error("Tile drop preview failed; using neutral drag feedback.", error);
+								console.error(
+									"Tile drop preview failed; using neutral drag feedback.",
+									error,
+								);
 							}
 							publishActive({
 								...dragging,
@@ -321,7 +329,50 @@ export const useTileInteractionController = ({
 				current.target.kind === "slot" ? (current.target.occupant?.id ?? null) : null,
 			previewKind,
 		};
-	}, [publishActive, readPreview]);
+	}, [
+		publishActive,
+		readPreview,
+	]);
+
+	const refreshSlotTarget = useCallback(
+		(
+			target: Extract<
+				TileDropTarget,
+				{
+					readonly kind: "slot";
+				}
+			>,
+		) => {
+			const current = activeRef.current;
+			if (
+				current?.phase !== "dragging" ||
+				current.target?.kind !== "slot" ||
+				current.target.surface.id !== target.surface.id ||
+				current.target.slot.id !== target.slot.id ||
+				sameTarget(current.target, target)
+			) {
+				return;
+			}
+			let previewKind: useDropItemPreview.Result["kind"] | null = null;
+			try {
+				previewKind = readPreview(current.source, target)?.kind ?? null;
+			} catch (error) {
+				console.error(
+					"Tile drop preview target refresh failed; using neutral drag feedback.",
+					error,
+				);
+			}
+			publishActive({
+				...current,
+				target,
+				previewKind,
+			});
+		},
+		[
+			publishActive,
+			readPreview,
+		],
+	);
 
 	const release = useCallback(
 		(itemId: string) => {
@@ -510,7 +561,9 @@ export const useTileInteractionController = ({
 		if (activeRef.current === null) return;
 		nextGeneration.current += 1;
 		publishActive(null);
-	}, [publishActive]);
+	}, [
+		publishActive,
+	]);
 
 	const cancel = useCallback(
 		(itemId: string) => {
@@ -543,11 +596,16 @@ export const useTileInteractionController = ({
 	);
 
 	return {
-		active,
+		get active() {
+			return activeRef.current;
+		},
+		readActive,
+		subscribeActive,
 		press,
 		startDrag,
 		moveDrag,
 		refreshActivePreview,
+		refreshSlotTarget,
 		release,
 		settle,
 		complete,

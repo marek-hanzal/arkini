@@ -4,7 +4,7 @@ import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { TileSystem } from "~/ui/tile/TileSystemContext";
+import type { TileSystem } from "~/ui/tile/TileSystem";
 import type { TileDragSource } from "~/ui/tile/TileDragSource";
 import { useTileActorNeighbourMotion } from "~/ui/tile/useTileActorNeighbourMotion";
 import { motionTestRuntime, useMotionValue } from "~test/ui/support/motionReactMock";

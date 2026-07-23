@@ -17,6 +17,11 @@ const gameState = vi.hoisted(() => ({
 	game: null as GameEngine | null,
 }));
 
+const projectionState = vi.hoisted(() => ({
+	includePreviousItems: [] as boolean[],
+	failureSequence: null as number | null,
+}));
+
 vi.mock("~/bridge/game/useGameEngine", () => ({
 	useGameEngine: () => {
 		if (gameState.game === null) throw new Error("Missing test Game Engine.");
@@ -25,8 +30,22 @@ vi.mock("~/bridge/game/useGameEngine", () => ({
 }));
 
 vi.mock("~/bridge/tile/readTileActorTransitionFx", () => ({
-	readTileActorTransitionFx: ({ transition }: { readonly transition: TestTransition }) =>
-		transition.projected,
+	readTileActorTransitionFx: ({
+		transition,
+		includePreviousItems,
+	}: {
+		readonly transition: TestTransition;
+		readonly includePreviousItems: boolean;
+	}) => {
+		projectionState.includePreviousItems.push(includePreviousItems);
+		if (projectionState.failureSequence === transition.sequence) {
+			throw new Error("Projection failed.");
+		}
+		return {
+			...transition.projected,
+			previousItems: includePreviousItems ? transition.projected.previousItems : null,
+		};
+	},
 }));
 
 type TestTransition = CommittedTransitionSchema.Type & {
@@ -56,6 +75,19 @@ const item = (overrides: Partial<TileActorItem> = {}): TileActorItem => ({
 		kind: "none",
 	},
 	...overrides,
+});
+
+const expiryEvent = (outgoing: TileActorItem) => ({
+	type: "item:expired" as const,
+	itemId: outgoing.id,
+	canonicalItemId: outgoing.itemId,
+	location: outgoing.location as Extract<
+		TileActorItem["location"],
+		{
+			scope: "board";
+		}
+	>,
+	quantity: outgoing.quantity,
 });
 
 const transition = (
@@ -104,6 +136,7 @@ const renderSource = async (initial: TestTransition) => {
 				if (listener === next) listener = null;
 			};
 		},
+		canClaimTilePresentationTransition: (sequence: number) => sequence > claimedSequence,
 		readOrThrow: (effect: unknown) => effect,
 	} as unknown as GameEngine;
 	gameState.game = game;
@@ -137,6 +170,8 @@ afterEach(async () => {
 	});
 	captured = null;
 	gameState.game = null;
+	projectionState.includePreviousItems.length = 0;
+	projectionState.failureSequence = null;
 	document.body.replaceChildren();
 });
 
@@ -154,6 +189,11 @@ describe("useTileActorTransitionSource", () => {
 		});
 
 		try {
+			expect(projectionState.includePreviousItems).toEqual([
+				false,
+				false,
+			]);
+			projectionState.includePreviousItems.length = 0;
 			expect(received[0]?.liveItems).toBe(source.initial.liveItems);
 			expect(received[0]?.events).toEqual([]);
 			const unchanged = item();
@@ -207,6 +247,90 @@ describe("useTileActorTransitionSource", () => {
 			);
 			expect(received[3]?.liveItems).toBe(received[2]?.liveItems);
 			expect(received[3]?.liveItems[0]).toBe(changed);
+			expect(projectionState.includePreviousItems).toEqual([
+				false,
+				false,
+				false,
+			]);
+		} finally {
+			unsubscribe();
+		}
+	});
+
+	it("projects an exact previous world when a sequence gap prevents live-actor reuse", async () => {
+		const first = item();
+		const { source, emit } = await renderSource(
+			transition(0, [
+				first,
+			]),
+		);
+		const received: readTileActorTransitionFx.Result[] = [];
+		const unsubscribe = source.subscribe((next) => {
+			received.push(next);
+		});
+
+		try {
+			projectionState.includePreviousItems.length = 0;
+			const outgoing = item({
+				id: "runtime:expired",
+			});
+			emit(
+				transition(
+					2,
+					[],
+					[
+						outgoing,
+					],
+					[
+						expiryEvent(outgoing),
+					],
+				),
+			);
+
+			expect(projectionState.includePreviousItems).toEqual([
+				true,
+			]);
+			expect(received[1]?.previousItems?.[0]).toBe(outgoing);
+			expect(received[1]?.events).toHaveLength(1);
+		} finally {
+			unsubscribe();
+		}
+	});
+
+	it("does not consume a transition claim when its live projection fails", async () => {
+		const outgoing = item({
+			id: "runtime:expired",
+		});
+		const { source, emit } = await renderSource(
+			transition(0, [
+				outgoing,
+			]),
+		);
+		const received: readTileActorTransitionFx.Result[] = [];
+		const unsubscribe = source.subscribe((next) => {
+			received.push(next);
+		});
+		const expired = transition(
+			1,
+			[],
+			[
+				outgoing,
+			],
+			[
+				expiryEvent(outgoing),
+			],
+		);
+
+		try {
+			projectionState.failureSequence = expired.sequence;
+			expect(() => emit(expired)).toThrow("Projection failed.");
+			expect(received).toHaveLength(1);
+
+			projectionState.failureSequence = null;
+			emit(expired);
+			expect(received).toHaveLength(2);
+			expect(received[1]?.events).toHaveLength(1);
+			expect(received[1]?.previousItems?.[0]).toBe(outgoing);
 		} finally {
 			unsubscribe();
 		}
@@ -223,32 +347,39 @@ describe("useTileActorTransitionSource", () => {
 				outgoing,
 			],
 			[
-				{
-					type: "item:expired",
-					itemId: outgoing.id,
-					canonicalItemId: outgoing.itemId,
-					location: outgoing.location as Extract<
-						TileActorItem["location"],
-						{
-							scope: "board";
-						}
-					>,
-					quantity: outgoing.quantity,
-				},
+				expiryEvent(outgoing),
 			],
 		);
 		const { source, mountAgain } = await renderSource(expired);
 
+		expect(projectionState.includePreviousItems).toEqual([
+			false,
+		]);
 		expect(source.initial.events).toEqual([]);
 		expect(source.initial.previousItems).toBeNull();
 		const first = source.claimCurrent();
+		expect(projectionState.includePreviousItems).toEqual([
+			false,
+			true,
+		]);
 		expect(first.events).toHaveLength(1);
 		expect(first.previousItems?.[0]).toBe(outgoing);
 
 		const remounted = await mountAgain();
+		expect(projectionState.includePreviousItems).toEqual([
+			false,
+			true,
+			false,
+		]);
 		expect(remounted.initial.events).toEqual([]);
 		expect(remounted.initial.previousItems).toBeNull();
 		const replay = remounted.claimCurrent();
+		expect(projectionState.includePreviousItems).toEqual([
+			false,
+			true,
+			false,
+			false,
+		]);
 		expect(replay.events).toEqual([]);
 		expect(replay.previousItems).toBeNull();
 	});

@@ -1,10 +1,10 @@
-import { useTileSystemContext } from "~/ui/tile/useTileSystemContext";
+import { useTileSystemApiContext } from "~/ui/tile/useTileSystemApiContext";
 
 /** Exposes only slot registration and the active interaction needed for hover feedback. */
 export const useTileSlotSystem = () => {
-	const { active, registerSlot } = useTileSystemContext();
+	const { refreshSlotTarget, registerSlot } = useTileSystemApiContext();
 	return {
-		active,
+		refreshSlotTarget,
 		registerSlot,
 	};
 };

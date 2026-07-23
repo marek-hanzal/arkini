@@ -166,6 +166,8 @@ const game = {
 	},
 	getSnapshot: () => currentRuntime,
 	getTransitionSnapshot: () => currentTransition,
+	canClaimTilePresentationTransition: (sequence: number) =>
+		sequence > claimedTilePresentationSequence,
 	claimTilePresentationTransition: (sequence: number) => {
 		if (sequence <= claimedTilePresentationSequence) return false;
 		claimedTilePresentationSequence = sequence;

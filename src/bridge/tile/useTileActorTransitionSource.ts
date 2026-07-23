@@ -67,14 +67,18 @@ export const useTileActorTransitionSource = (): TileActorTransitionSource => {
 	const game = useGameEngine();
 
 	return useMemo(() => {
-		const read = (transition: ReturnType<typeof game.getTransitionSnapshot>) =>
+		const read = (
+			transition: ReturnType<typeof game.getTransitionSnapshot>,
+			includePreviousItems: boolean,
+		) =>
 			game.readOrThrow(
 				readTileActorTransitionFx({
 					game,
 					transition,
+					includePreviousItems,
 				}),
 			);
-		const current = read(game.getTransitionSnapshot());
+		const current = read(game.getTransitionSnapshot(), false);
 		let latest: readTileActorTransitionFx.Result = {
 			...current,
 			previousItems: null,
@@ -84,10 +88,18 @@ export const useTileActorTransitionSource = (): TileActorTransitionSource => {
 
 		const project = (transition: ReturnType<typeof game.getTransitionSnapshot>) => {
 			if (transition.sequence <= deliveredSequence) return latest;
-			const projected = read(transition);
-			const deliverEvents = game.claimTilePresentationTransition(transition.sequence);
-			const previousItems = deliverEvents
-				? transition.sequence === latest.sequence + 1
+			const isSequential = transition.sequence === latest.sequence + 1;
+			const canDeliverTransition = game.canClaimTilePresentationTransition(
+				transition.sequence,
+			);
+			const projected = read(
+				transition,
+				canDeliverTransition && !isSequential && transition.events.length > 0,
+			);
+			const deliverTransition =
+				canDeliverTransition && game.claimTilePresentationTransition(transition.sequence);
+			const previousItems = deliverTransition
+				? isSequential
 					? latest.liveItems
 					: projected.previousItems === null
 						? null
@@ -99,7 +111,7 @@ export const useTileActorTransitionSource = (): TileActorTransitionSource => {
 				...projected,
 				previousItems,
 				liveItems,
-				events: deliverEvents ? projected.events : [],
+				events: deliverTransition ? projected.events : [],
 			};
 			return latest;
 		};

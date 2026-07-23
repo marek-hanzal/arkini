@@ -1,8 +1,8 @@
-import { useTileSystemContext } from "~/ui/tile/useTileSystemContext";
+import { useTileSystemApiContext } from "~/ui/tile/useTileSystemApiContext";
 
 /** Exposes only Canvas surface registration. */
 export const useTileSurfaceSystem = () => {
-	const { registerSurface } = useTileSystemContext();
+	const { registerSurface } = useTileSystemApiContext();
 	return {
 		registerSurface,
 	};

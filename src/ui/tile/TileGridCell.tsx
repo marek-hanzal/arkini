@@ -1,5 +1,5 @@
 import { motion } from "motion/react";
-import { useMemo } from "react";
+import { memo, useMemo } from "react";
 
 import type { TileIdentity } from "~/ui/tile/TileIdentity";
 import type { TileSurface } from "~/ui/tile/TileSurface";
@@ -17,7 +17,7 @@ export namespace TileGridCell {
 }
 
 /** Registers and renders one stable coordinate shared by every tile grid surface. */
-export const TileGridCell = ({
+const TileGridCellComponent = ({
 	surface,
 	x,
 	y,
@@ -102,3 +102,29 @@ export const TileGridCell = ({
 		</div>
 	);
 };
+
+const sameOccupant = (
+	left: TileGridCell.Props["occupant"],
+	right: TileGridCell.Props["occupant"],
+) =>
+	left === right ||
+	(left !== null && right !== null && left.id === right.id && left.revision === right.revision);
+
+const sameSurface = (left: TileGridCell.Props["surface"], right: TileGridCell.Props["surface"]) =>
+	left === right ||
+	(left.id === right.id &&
+		left.kind === right.kind &&
+		(left.kind !== "board" || (right.kind === "board" && left.space === right.space)));
+
+/** Runtime snapshots may rebuild the grid, but only semantically changed slots render again. */
+export const TileGridCell = memo(
+	TileGridCellComponent,
+	(previous, next) =>
+		previous.x === next.x &&
+		previous.y === next.y &&
+		previous.toneRowOffset === next.toneRowOffset &&
+		previous.dataUi === next.dataUi &&
+		sameSurface(previous.surface, next.surface) &&
+		sameOccupant(previous.occupant, next.occupant),
+);
+TileGridCell.displayName = "TileGridCell";

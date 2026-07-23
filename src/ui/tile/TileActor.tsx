@@ -1,5 +1,5 @@
 import { motion } from "motion/react";
-import { useCallback, useEffect, useRef } from "react";
+import { memo, useCallback, useEffect, useRef } from "react";
 import { match } from "ts-pattern";
 
 import { useStartItemDetailLine } from "~/bridge/item-detail/useStartItemDetailLine";
@@ -50,7 +50,7 @@ export namespace TileActor {
 }
 
 /** Renders one stable runtime-item actor from focused presentation, Motion, and drag owners. */
-export const TileActor = ({
+const TileActorComponent = ({
 	item,
 	live,
 	cue,
@@ -338,3 +338,6 @@ export const TileActor = ({
 		</motion.button>
 	);
 };
+
+/** Exact props form the complete safe bailout boundary for one actor identity. */
+export const TileActor = memo(TileActorComponent);

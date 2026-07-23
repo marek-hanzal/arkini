@@ -5,7 +5,7 @@ import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { useTileActors } from "~/bridge/tile/useTileActors";
-import type { TileSystem } from "~/ui/tile/TileSystemContext";
+import type { TileSystem } from "~/ui/tile/TileSystem";
 import type { TileDragSource } from "~/ui/tile/TileDragSource";
 import type { TileSurface } from "~/ui/tile/TileSurface";
 import type { TileMotionCueSchema } from "~/ui/tile/schema/TileMotionCueSchema";

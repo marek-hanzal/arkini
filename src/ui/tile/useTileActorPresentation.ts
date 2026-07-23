@@ -10,7 +10,7 @@ import type { TileActorPhaseSchema } from "~/ui/tile/schema/TileActorPhaseSchema
 import type { TileInteractionFeedbackSchema } from "~/ui/tile/schema/TileInteractionFeedbackSchema";
 import { tileSlotForLocation } from "~/ui/tile/tileSlotForLocation";
 import { tileSurfaceForLocation } from "~/ui/tile/tileSurfaceForLocation";
-import { useTileActorSystem } from "~/ui/tile/useTileActorSystem";
+import { useTileActorInteraction } from "~/ui/tile/useTileActorInteraction";
 
 export namespace useTileActorPresentation {
 	export type PositionCompletion =
@@ -357,10 +357,7 @@ const interactionView = (
 						placementFrozen: true,
 					};
 				}
-				if (
-					dragging.target?.kind === "slot" &&
-					dragging.target.occupant?.id === item.id
-				) {
+				if (dragging.target?.kind === "slot" && dragging.target.occupant?.id === item.id) {
 					if (acceptsInteraction) {
 						return {
 							...passive,
@@ -389,7 +386,8 @@ const interactionView = (
 				const previewsInputStore =
 					awaiting.previewKind === DropItemResultKindEnumSchema.enum.StoreInput;
 				const acceptsInteraction = previewsMerge || previewsInputStore;
-				const occupied = awaiting.target.kind === "slot" && awaiting.target.occupant !== null;
+				const occupied =
+					awaiting.target.kind === "slot" && awaiting.target.occupant !== null;
 				if (awaiting.source.id === item.id) {
 					return {
 						...passive,
@@ -405,10 +403,7 @@ const interactionView = (
 						placementFrozen: true,
 					};
 				}
-				if (
-					awaiting.target.kind === "slot" &&
-					awaiting.target.occupant?.id === item.id
-				) {
+				if (awaiting.target.kind === "slot" && awaiting.target.occupant?.id === item.id) {
 					if (acceptsInteraction) {
 						return {
 							...passive,
@@ -445,7 +440,7 @@ export const useTileActorPresentation = ({
 	readonly item: useTileActors.Item;
 	readonly live: boolean;
 }): useTileActorPresentation.Model => {
-	const { active } = useTileActorSystem();
+	const active = useTileActorInteraction(item.id);
 	const [hovered, setHovered] = useState(false);
 	const canonicalSource = useMemo(
 		() => actorSource(item, item.location),

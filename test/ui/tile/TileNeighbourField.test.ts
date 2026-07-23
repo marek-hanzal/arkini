@@ -157,7 +157,7 @@ const register = (
 		readonly source?: TileDragSource;
 	} = {},
 ) => {
-	neighbourField.registerNeighbourActor({
+	const unregister = neighbourField.registerNeighbourActor({
 		itemId,
 		node,
 		source,
@@ -175,6 +175,7 @@ const register = (
 		x,
 		y,
 		scale,
+		unregister,
 	};
 };
 
@@ -197,6 +198,83 @@ afterEach(async () => {
 });
 
 describe("Tile neighbour field", () => {
+	it("follows the exact rendered body through movement, same-id replacement, and removal", async () => {
+		const neighbourField = await renderField();
+		let visualBounds = rect(120, 30);
+		const shell = actorNode({
+			bounds: rect(100, 10),
+		});
+		const visual = actorNode({
+			bounds: () => visualBounds,
+		});
+		visual.dataset.ui = "TileMotionCueVisual";
+		shell.append(visual);
+		const original = register(neighbourField, "target", shell);
+		const poses: Array<DOMRect | null> = [];
+		const release = neighbourField.followActorPose("target", (pose) => {
+			poses.push(pose?.bounds ?? null);
+		});
+
+		expect(poses.at(-1)?.left).toBe(120);
+
+		visualBounds = rect(165, 42);
+		neighbourField.refreshNeighbourField();
+		expect(poses.at(-1)?.left).toBe(165);
+		expect(poses.at(-1)?.top).toBe(42);
+
+		const replacementNode = actorNode({
+			bounds: rect(240, 55),
+		});
+		original.unregister();
+		const replacement = register(neighbourField, "target", replacementNode, {
+			source: {
+				...dragSource("target", {
+					x: 2,
+					y: 0,
+				}),
+				revision: "revision:target:replacement",
+			},
+		});
+		await act(async () => Promise.resolve());
+		expect(poses.at(-1)?.left).toBe(240);
+		expect(poses).not.toContain(null);
+
+		replacement.unregister();
+		await act(async () => Promise.resolve());
+		expect(poses.at(-1)).toBeNull();
+		release();
+	});
+
+	it("keeps a newer same-target follower alive when a stale subscription releases", async () => {
+		const neighbourField = await renderField();
+		register(
+			neighbourField,
+			"target",
+			actorNode({
+				bounds: rect(80, 0),
+			}),
+		);
+		const stale = vi.fn();
+		const current = vi.fn();
+		const releaseStale = neighbourField.followActorPose("target", stale);
+		const releaseCurrent = neighbourField.followActorPose("target", current);
+
+		releaseStale();
+		neighbourField.refreshNeighbourField();
+
+		expect(stale).toHaveBeenCalledTimes(2);
+		expect(current).toHaveBeenCalledTimes(2);
+
+		neighbourField.clearNeighbourField();
+		expect(current).toHaveBeenCalledTimes(2);
+		expect(vi.getTimerCount()).toBe(0);
+		await act(async () => {
+			await vi.advanceTimersByTimeAsync(32);
+		});
+		expect(current).toHaveBeenCalledTimes(2);
+		releaseCurrent();
+	});
+
 	it("updates actor metadata without replacing its DOM registration", async () => {
 		const neighbourField = await renderField();
 		const sourceNode = actorNode({

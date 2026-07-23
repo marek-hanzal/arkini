@@ -11,11 +11,13 @@ const interactionCompletionFallbackMs = 2_000;
 export const useTileActorMotionCompletion = ({
 	item,
 	positionCompletion,
+	positionFallbackEnabled,
 	visualCompletionGeneration,
 	complete,
 }: {
 	readonly item: useTileActors.Item;
 	readonly positionCompletion: useTileActorPresentation.PositionCompletion;
+	readonly positionFallbackEnabled: boolean;
 	readonly visualCompletionGeneration: number | null;
 	readonly complete: (itemId: string, generation: number) => void;
 }) => {
@@ -97,7 +99,7 @@ export const useTileActorMotionCompletion = ({
 	]);
 
 	useEffect(() => {
-		if (positionCompletion.kind === "none") return;
+		if (positionCompletion.kind === "none" || !positionFallbackEnabled) return;
 		const generation = positionCompletion.generation;
 		const fallback = setTimeout(() => {
 			const current = positionCompletionRef.current;
@@ -107,6 +109,7 @@ export const useTileActorMotionCompletion = ({
 		return () => clearTimeout(fallback);
 	}, [
 		complete,
+		positionFallbackEnabled,
 		positionCompletion,
 	]);
 

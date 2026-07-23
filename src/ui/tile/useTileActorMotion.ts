@@ -1,4 +1,4 @@
-import { animate, useMotionValue } from "motion/react";
+import { animate, useMotionValue, useSpring, useTransform } from "motion/react";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 
 import type { useTileActors } from "~/bridge/tile/useTileActors";
@@ -13,12 +13,19 @@ import { useTileActorMotionCompletion } from "~/ui/tile/useTileActorMotionComple
 import { useTileActorNeighbourMotion } from "~/ui/tile/useTileActorNeighbourMotion";
 import { useTileActorPointerMotion } from "~/ui/tile/useTileActorPointerMotion";
 import type { useTileActorPresentation } from "~/ui/tile/useTileActorPresentation";
+import type { TileActorPose } from "~/ui/tile/useTileNeighbourField";
 
 const settleTransition = {
 	type: "spring" as const,
 	stiffness: 200,
 	damping: 24,
 	mass: 0.68,
+};
+
+const followTransition = {
+	stiffness: 260,
+	damping: 28,
+	mass: 0.62,
 };
 
 interface ResolvedSpatialTarget {
@@ -35,6 +42,14 @@ interface ActiveSpatialMotion {
 	readonly animations: ReadonlyArray<ReturnType<typeof animate>>;
 	readonly spawnDeliveryGeneration: number | null;
 	releaseTravel: (() => void) | null;
+}
+
+interface ActiveTargetFollow {
+	readonly token: useTileActorPresentation.FollowTarget;
+	mode: "live" | "fallback" | "completed";
+	lastTargetSource: TileDragSource | null;
+	refreshPose: () => void;
+	retargetFallback: () => void;
 }
 
 interface SpawnDeliveryState {
@@ -90,6 +105,7 @@ export const useTileActorMotion = ({
 		readActorLayerRect,
 		readActorRect,
 		readPlacement,
+		followActorPose,
 		complete,
 		setNeighbourTravelTarget,
 	} = useTileActorSystem();
@@ -97,6 +113,24 @@ export const useTileActorMotion = ({
 	const anchorY = useMotionValue(0);
 	const settleX = useMotionValue(0);
 	const settleY = useMotionValue(0);
+	const followTargetX = useMotionValue(0);
+	const followTargetY = useMotionValue(0);
+	const followX = useSpring(followTargetX, followTransition);
+	const followY = useSpring(followTargetY, followTransition);
+	const travelX = useTransform(
+		[
+			settleX,
+			followX,
+		],
+		([settlement, follow]: ReadonlyArray<number>) => (settlement ?? 0) + (follow ?? 0),
+	);
+	const travelY = useTransform(
+		[
+			settleY,
+			followY,
+		],
+		([settlement, follow]: ReadonlyArray<number>) => (settlement ?? 0) + (follow ?? 0),
+	);
 	const pointer = useTileActorPointerMotion();
 	const width = useMotionValue(0);
 	const height = useMotionValue(0);
@@ -121,6 +155,7 @@ export const useTileActorMotion = ({
 	const localMotionGeneration = useRef(0);
 	const resolvedSpatialTarget = useRef<ResolvedSpatialTarget | null>(null);
 	const activeSpatialMotion = useRef<ActiveSpatialMotion | null>(null);
+	const activeTargetFollow = useRef<ActiveTargetFollow | null>(null);
 	const cueRef = useRef(cue);
 	cueRef.current = cue;
 	const releaseSnapshot = useRef<useTileActorPointerMotion.ReleaseSnapshot | null>(null);
@@ -179,13 +214,6 @@ export const useTileActorMotion = ({
 		],
 	);
 
-	const { completePosition, onVisualAnimationComplete } = useTileActorMotionCompletion({
-		item,
-		positionCompletion: presentation.positionCompletion,
-		visualCompletionGeneration: presentation.visualCompletionGeneration,
-		complete,
-	});
-
 	const stopActiveSpatialMotion = useCallback(() => {
 		const active = activeSpatialMotion.current;
 		if (active === null) return;
@@ -194,6 +222,232 @@ export const useTileActorMotion = ({
 		active.releaseTravel?.();
 		active.releaseTravel = null;
 	}, []);
+
+	const { completePosition, onVisualAnimationComplete } = useTileActorMotionCompletion({
+		item,
+		positionCompletion: presentation.positionCompletion,
+		positionFallbackEnabled: presentation.followTarget === null,
+		visualCompletionGeneration: presentation.visualCompletionGeneration,
+		complete,
+	});
+
+	useLayoutEffect(() => {
+		const token = presentation.followTarget;
+		if (token === null || token.sourceItemId !== item.id) {
+			followTargetX.set(0);
+			followTargetY.set(0);
+			return;
+		}
+		const active: ActiveTargetFollow = {
+			token,
+			mode: "live",
+			lastTargetSource: null,
+			refreshPose: () => undefined,
+			retargetFallback: () => undefined,
+		};
+		activeTargetFollow.current = active;
+		const releaseFollowTravel = retainNeighbourTravel();
+		let followTravelReleased = false;
+		const releaseFollowTravelOnce = () => {
+			if (followTravelReleased) return;
+			followTravelReleased = true;
+			releaseFollowTravel();
+		};
+
+		const readExpectedFallback = () => {
+			const fallback = resolvedSpatialTarget.current;
+			if (
+				fallback?.positionCompletion.kind !== "always" ||
+				fallback.positionCompletion.generation !== token.interactionGeneration
+			) {
+				return null;
+			}
+			return fallback;
+		};
+		const completeFollow = () => {
+			if (activeTargetFollow.current !== active || active.mode === "completed") return;
+			active.mode = "completed";
+			releaseFollowTravelOnce();
+			completePosition(token.interactionGeneration);
+		};
+		const foldCurrentFollow = () => {
+			const offsetX = followX.get();
+			const offsetY = followY.get();
+			settleX.jump(settleX.get() + offsetX);
+			settleY.jump(settleY.get() + offsetY);
+			followTargetX.jump(0);
+			followTargetY.jump(0);
+			followX.jump(0);
+			followY.jump(0);
+		};
+		const beginTerminalFallback = () => {
+			if (activeTargetFollow.current !== active || active.mode === "completed") return;
+			active.mode = "fallback";
+			const currentVisualX = anchorX.get() + settleX.get() + followX.get();
+			const currentVisualY = anchorY.get() + settleY.get() + followY.get();
+			const velocityX = settleX.getVelocity() + followX.getVelocity();
+			const velocityY = settleY.getVelocity() + followY.getVelocity();
+			let terminalPlacement: ReturnType<typeof readPlacement> = null;
+			for (const source of [
+				active.lastTargetSource,
+				presentation.desiredSource,
+			]) {
+				if (source === null) continue;
+				try {
+					terminalPlacement = readPlacement(source);
+				} catch (error) {
+					console.error(
+						"Tile live-target fallback placement failed; trying its terminal outcome.",
+						error,
+					);
+				}
+				if (terminalPlacement !== null) break;
+			}
+			terminalPlacement ??= readExpectedFallback();
+			stopActiveSpatialMotion();
+			followTargetX.jump(0);
+			followTargetY.jump(0);
+			followX.jump(0);
+			followY.jump(0);
+			if (terminalPlacement === null) {
+				settleX.jump(currentVisualX - anchorX.get());
+				settleY.jump(currentVisualY - anchorY.get());
+				completeFollow();
+				return;
+			}
+			anchorX.jump(terminalPlacement.x);
+			anchorY.jump(terminalPlacement.y);
+			settleX.jump(currentVisualX - terminalPlacement.x);
+			settleY.jump(currentVisualY - terminalPlacement.y);
+			const generation = ++localMotionGeneration.current;
+			const animations = [
+				animate(settleX, 0, {
+					...settleTransition,
+					velocity: velocityX,
+				}),
+				animate(settleY, 0, {
+					...settleTransition,
+					velocity: velocityY,
+				}),
+				animate(width, terminalPlacement.width, settleTransition),
+				animate(height, terminalPlacement.height, settleTransition),
+			];
+			const spatialMotion: ActiveSpatialMotion = {
+				generation,
+				animations,
+				spawnDeliveryGeneration: null,
+				releaseTravel: null,
+			};
+			activeSpatialMotion.current = spatialMotion;
+			void Promise.all(animations)
+				.then(() => {
+					if (
+						localMotionGeneration.current !== generation ||
+						activeTargetFollow.current !== active ||
+						active.mode !== "fallback"
+					) {
+						return;
+					}
+					completeFollow();
+				})
+				.catch((error: unknown) => {
+					if (
+						localMotionGeneration.current !== generation ||
+						activeTargetFollow.current !== active
+					) {
+						return;
+					}
+					console.error(
+						"Tile actor live-target fallback failed; converging locally.",
+						error,
+					);
+					settleX.jump(0);
+					settleY.jump(0);
+					completeFollow();
+				})
+				.finally(() => {
+					spatialMotion.releaseTravel?.();
+					spatialMotion.releaseTravel = null;
+					if (activeSpatialMotion.current === spatialMotion) {
+						activeSpatialMotion.current = null;
+						setSpatialMotionSettledVersion((current) => current + 1);
+					}
+				});
+		};
+		active.retargetFallback = beginTerminalFallback;
+		let latestPose: TileActorPose | null = null;
+		let hasPose = false;
+		active.refreshPose = () => {
+			if (activeTargetFollow.current !== active || active.mode !== "live") return;
+			const fallback = readExpectedFallback();
+			if (fallback === null || !hasPose) return;
+			if (latestPose === null) {
+				beginTerminalFallback();
+				return;
+			}
+			active.lastTargetSource = latestPose.source;
+			let layer: ReturnType<typeof readActorLayerRect>;
+			try {
+				layer = readActorLayerRect();
+			} catch (error) {
+				console.error(
+					"Tile actor layer measurement failed while following a live target.",
+					error,
+				);
+				layer = null;
+			}
+			if (layer === null) {
+				beginTerminalFallback();
+				return;
+			}
+			const targetX =
+				latestPose.bounds.left -
+				layer.left +
+				(latestPose.bounds.width - fallback.width) / 2;
+			const targetY =
+				latestPose.bounds.top -
+				layer.top +
+				(latestPose.bounds.height - fallback.height) / 2;
+			followTargetX.set(targetX - fallback.x);
+			followTargetY.set(targetY - fallback.y);
+			const visualX = anchorX.get() + settleX.get() + followX.get();
+			const visualY = anchorY.get() + settleY.get() + followY.get();
+			if (Math.hypot(visualX - targetX, visualY - targetY) <= 0.75) {
+				completeFollow();
+			}
+		};
+		const release = followActorPose(token.targetItemId, (pose) => {
+			latestPose = pose;
+			hasPose = true;
+			active.refreshPose();
+		});
+
+		return () => {
+			if (activeTargetFollow.current !== active) return;
+			activeTargetFollow.current = null;
+			release();
+			stopActiveSpatialMotion();
+			foldCurrentFollow();
+			releaseFollowTravelOnce();
+		};
+	}, [
+		anchorX,
+		anchorY,
+		completePosition,
+		followActorPose,
+		followTargetX,
+		followTargetY,
+		followX,
+		followY,
+		item.id,
+		presentation.followTarget,
+		readActorLayerRect,
+		readPlacement,
+		retainNeighbourTravel,
+		settleX,
+		settleY,
+		stopActiveSpatialMotion,
+	]);
 
 	const publishSpawnDeliveryState = useCallback((next: SpawnDeliveryState) => {
 		spawnDeliveryStateRef.current = next;
@@ -220,6 +474,32 @@ export const useTileActorMotion = ({
 	useLayoutEffect(() => {
 		void geometryVersion;
 		if (presentation.placementFrozen) return;
+		const followsLiveTarget =
+			presentation.followTarget !== null &&
+			presentation.positionCompletion.kind === "always" &&
+			presentation.followTarget.interactionGeneration ===
+				presentation.positionCompletion.generation;
+		const liveFollow = activeTargetFollow.current;
+		if (
+			followsLiveTarget &&
+			liveFollow?.token.interactionGeneration ===
+				presentation.followTarget?.interactionGeneration &&
+			liveFollow.mode === "fallback"
+		) {
+			liveFollow.retargetFallback();
+			return;
+		}
+		const refreshLiveTargetPose = () => {
+			if (!followsLiveTarget) return;
+			const current = activeTargetFollow.current;
+			if (
+				current?.token.interactionGeneration !==
+				presentation.followTarget?.interactionGeneration
+			) {
+				return;
+			}
+			current.refreshPose();
+		};
 		const preserveOnlyCurrentIntent = () => {
 			const previousTarget = resolvedSpatialTarget.current;
 			if (
@@ -246,7 +526,7 @@ export const useTileActorMotion = ({
 			);
 			preserveOnlyCurrentIntent();
 			setVisible(initialized.current);
-			completePosition();
+			if (!followsLiveTarget) completePosition();
 			return;
 		}
 		const ownsSettlementMotion =
@@ -255,7 +535,7 @@ export const useTileActorMotion = ({
 		if (placement === null) {
 			preserveOnlyCurrentIntent();
 			if (!ownsSettlementMotion && presentation.phase !== "targeted") setVisible(false);
-			completePosition();
+			if (!followsLiveTarget) completePosition();
 			return;
 		}
 
@@ -265,7 +545,10 @@ export const useTileActorMotion = ({
 			positionCompletion: presentation.positionCompletion,
 		};
 		const previousTarget = resolvedSpatialTarget.current;
-		if (previousTarget !== null && isSameSpatialTarget(previousTarget, target)) return;
+		if (previousTarget !== null && isSameSpatialTarget(previousTarget, target)) {
+			refreshLiveTargetPose();
+			return;
+		}
 		resolvedSpatialTarget.current = target;
 		stopActiveSpatialMotion();
 		const generation = ++localMotionGeneration.current;
@@ -284,7 +567,8 @@ export const useTileActorMotion = ({
 			height.jump(placement.height);
 			initialized.current = true;
 			setVisible(true);
-			completePosition();
+			if (followsLiveTarget) refreshLiveTargetPose();
+			else completePosition();
 			publishSpawnDeliveryState({
 				generation: currentCue.generation,
 				timing: null,
@@ -322,7 +606,8 @@ export const useTileActorMotion = ({
 			height.jump(placement.height);
 			initialized.current = true;
 			setVisible(true);
-			completePosition();
+			if (followsLiveTarget) refreshLiveTargetPose();
+			else completePosition();
 			if (
 				!ownsSpawnDelivery ||
 				deliveryOffset === null ||
@@ -390,8 +675,8 @@ export const useTileActorMotion = ({
 		let releaseTravel: (() => void) | null = null;
 		const pendingSpawnDelivery = spawnDeliveryStateRef.current;
 		if (ownsSettlementMotion) {
-			const currentVisualX = anchorX.get() + settleX.get();
-			const currentVisualY = anchorY.get() + settleY.get();
+			const currentVisualX = anchorX.get() + settleX.get() + followX.get();
+			const currentVisualY = anchorY.get() + settleY.get() + followY.get();
 			if (Math.hypot(currentVisualX - placement.x, currentVisualY - placement.y) >= 0.5) {
 				releaseTravel = retainNeighbourTravel();
 			}
@@ -408,8 +693,8 @@ export const useTileActorMotion = ({
 			const velocityY = snapshot?.settlementVelocity.y ?? settleY.getVelocity();
 			anchorX.jump(placement.x);
 			anchorY.jump(placement.y);
-			settleX.jump(currentVisualX - placement.x);
-			settleY.jump(currentVisualY - placement.y);
+			settleX.jump(currentVisualX - placement.x - followX.get());
+			settleY.jump(currentVisualY - placement.y - followY.get());
 			animations.push(
 				animate(settleX, 0, {
 					...settleTransition,
@@ -448,7 +733,8 @@ export const useTileActorMotion = ({
 		void Promise.all(animations)
 			.then(() => {
 				if (localMotionGeneration.current !== generation) return;
-				completePosition();
+				if (followsLiveTarget) refreshLiveTargetPose();
+				else completePosition();
 				if (active.spawnDeliveryGeneration !== null) {
 					armSpawnDelivery(active.spawnDeliveryGeneration, generation);
 				}
@@ -464,7 +750,8 @@ export const useTileActorMotion = ({
 				width.jump(placement.width);
 				height.jump(placement.height);
 				setVisible(true);
-				completePosition();
+				if (followsLiveTarget) refreshLiveTargetPose();
+				else completePosition();
 				if (active.spawnDeliveryGeneration !== null) {
 					armSpawnDelivery(active.spawnDeliveryGeneration, generation);
 				}
@@ -484,8 +771,11 @@ export const useTileActorMotion = ({
 		completePosition,
 		geometryVersion,
 		height,
+		followX,
+		followY,
 		presentation.canonicalSource,
 		presentation.desiredSource,
+		presentation.followTarget,
 		presentation.phase,
 		presentation.placementFrozen,
 		presentation.positionCompletion,
@@ -662,8 +952,8 @@ export const useTileActorMotion = ({
 			visible,
 		},
 		travel: {
-			x: settleX,
-			y: settleY,
+			x: travelX,
+			y: travelY,
 			spawnDeliveryTiming:
 				spawnDeliveryState !== null &&
 				cue?.kind === "spawn" &&

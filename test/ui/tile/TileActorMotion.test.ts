@@ -11,6 +11,7 @@ import type { TileSurface } from "~/ui/tile/TileSurface";
 import type { TileMotionCueSchema } from "~/ui/tile/schema/TileMotionCueSchema";
 import { useTileActorMotion } from "~/ui/tile/useTileActorMotion";
 import type { useTileActorPresentation } from "~/ui/tile/useTileActorPresentation";
+import type { TileActorPose } from "~/ui/tile/useTileNeighbourField";
 import { motionTestRuntime } from "~test/ui/support/motionReactMock";
 
 const systemState = vi.hoisted(() => ({
@@ -78,6 +79,7 @@ const presentation = (
 ): useTileActorPresentation.Model => ({
 	canonicalSource: source(location),
 	desiredSource: source(location),
+	followTarget: null,
 	phase: "settling",
 	feedback: null,
 	forbiddenDrop: false,
@@ -91,6 +93,32 @@ const presentation = (
 	visualCompletionGeneration: null,
 	hovered: false,
 	setHovered: () => undefined,
+});
+
+const followingPresentation = ({
+	sourceLocation,
+	fallbackLocation,
+	generation,
+	targetItemId = "runtime:target",
+}: {
+	readonly sourceLocation: useTileActors.Item["location"];
+	readonly fallbackLocation: useTileActors.Item["location"];
+	readonly generation: number;
+	readonly targetItemId?: string;
+}): useTileActorPresentation.Model => ({
+	...presentation(sourceLocation, generation),
+	desiredSource: source(fallbackLocation),
+	followTarget: {
+		interactionGeneration: generation,
+		stage: "approach",
+		sourceItemId: "runtime:water",
+		targetItemId,
+	},
+	phase: "combining",
+	positionCompletion: {
+		kind: "always",
+		generation,
+	},
 });
 
 const Capture = ({
@@ -163,6 +191,367 @@ afterEach(async () => {
 });
 
 describe("useTileActorMotion", () => {
+	it("follows the latest exact target pose once and folds contact into a frozen exit", async () => {
+		motionTestRuntime.autoCompleteImperativeAnimations = false;
+		motionTestRuntime.deferImperativeValueWrites = true;
+		motionTestRuntime.springLag = true;
+		let follower: ((pose: TileActorPose | null) => void) | null = null;
+		const complete = vi.fn();
+		const endNeighbourTravel = vi.fn();
+		const beginNeighbourTravel = vi.fn(() => endNeighbourTravel);
+		const sourceLocation = {
+			scope: "board" as const,
+			space: 0,
+			position: {
+				x: 0,
+				y: 0,
+			},
+		};
+		const fallbackLocation = {
+			scope: "board" as const,
+			space: 0,
+			position: {
+				x: 1,
+				y: 0,
+			},
+		};
+		systemState.system = {
+			geometryVersion: 0,
+			readActorLayerRect: () => ({
+				left: 10,
+				top: 20,
+				width: 800,
+				height: 600,
+			}),
+			readActorRect: () => null,
+			readPlacement: (candidate: TileDragSource) => ({
+				x: candidate.location.position.x * 100,
+				y: candidate.location.position.y * 100,
+				width: 100,
+				height: 100,
+			}),
+			followActorPose: (_itemId: string, listener: (pose: TileActorPose | null) => void) => {
+				follower = listener;
+				return () => {
+					if (follower === listener) follower = null;
+				};
+			},
+			complete,
+			registerNeighbourActor: () => () => undefined,
+			beginNeighbourTravel,
+		} as unknown as TileSystem;
+		const initialView = {
+			...presentation(sourceLocation, 1),
+			positionCompletion: {
+				kind: "none" as const,
+			},
+		};
+		const rendered = await renderMotion(item(sourceLocation), initialView);
+		const anchorIdentity = capturedMotion?.placement.anchor.x;
+
+		await rendered.rerender(
+			followingPresentation({
+				sourceLocation,
+				fallbackLocation,
+				generation: 7,
+			}),
+		);
+		const approachAnimations = [
+			...motionTestRuntime.imperativeAnimations,
+		];
+		const approachFollower = follower as ((pose: TileActorPose | null) => void) | null;
+		if (approachFollower === null) throw new Error("Missing live target follower.");
+		const targetSource = {
+			...source(fallbackLocation),
+			id: "runtime:target",
+			revision: "revision:target",
+		};
+		const targetPose = (left: number): TileActorPose => ({
+			bounds: {
+				left,
+				top: 20,
+				right: left + 100,
+				bottom: 120,
+				x: left,
+				y: 20,
+				width: 100,
+				height: 100,
+				toJSON: () => ({}),
+			},
+			source: targetSource,
+		});
+
+		await act(async () => {
+			approachFollower(targetPose(200));
+			await vi.advanceTimersByTimeAsync(2_100);
+		});
+		expect(complete).not.toHaveBeenCalled();
+		expect(beginNeighbourTravel).toHaveBeenCalledOnce();
+		expect(endNeighbourTravel).not.toHaveBeenCalled();
+
+		await act(async () => {
+			for (const animation of approachAnimations) animation.finish();
+			await Promise.resolve();
+		});
+		expect(complete).not.toHaveBeenCalled();
+
+		await act(async () => {
+			approachFollower(targetPose(270));
+			motionTestRuntime.flushSprings();
+			approachFollower(targetPose(270));
+			approachFollower(targetPose(270));
+		});
+		expect(complete).toHaveBeenCalledTimes(1);
+		expect(complete).toHaveBeenCalledWith("runtime:water", 7);
+		expect(endNeighbourTravel).toHaveBeenCalledOnce();
+		expect(capturedMotion?.placement.anchor.x.get()).toBe(100);
+		expect(capturedMotion?.travel.x.get()).toBe(160);
+		const contactX =
+			(capturedMotion?.placement.anchor.x.get() ?? 0) + (capturedMotion?.travel.x.get() ?? 0);
+
+		await rendered.rerender({
+			...presentation(sourceLocation, 7),
+			desiredSource: source(fallbackLocation),
+			followTarget: null,
+			phase: "exiting",
+			placementFrozen: true,
+			positionCompletion: {
+				kind: "none",
+			},
+			visualCompletionGeneration: 7,
+		});
+		expect(capturedMotion?.placement.anchor.x).toBe(anchorIdentity);
+		expect(
+			(capturedMotion?.placement.anchor.x.get() ?? 0) + (capturedMotion?.travel.x.get() ?? 0),
+		).toBe(contactX);
+
+		await act(async () => {
+			approachFollower(targetPose(400));
+			motionTestRuntime.flushSprings();
+		});
+		expect(complete).toHaveBeenCalledTimes(1);
+		expect(
+			(capturedMotion?.placement.anchor.x.get() ?? 0) + (capturedMotion?.travel.x.get() ?? 0),
+		).toBe(contactX);
+
+		const nextAnimationStart = motionTestRuntime.imperativeAnimations.length;
+		await rendered.rerender(
+			followingPresentation({
+				sourceLocation,
+				fallbackLocation,
+				generation: 8,
+				targetItemId: "runtime:next-target",
+			}),
+		);
+		const nextFollower = follower as ((pose: TileActorPose | null) => void) | null;
+		if (nextFollower === null || nextFollower === approachFollower) {
+			throw new Error("Missing replacement live target follower.");
+		}
+		await act(async () => {
+			approachFollower(targetPose(400));
+			motionTestRuntime.flushSprings();
+			for (const animation of motionTestRuntime.imperativeAnimations.slice(
+				nextAnimationStart,
+			)) {
+				animation.finish();
+			}
+			await Promise.resolve();
+		});
+		expect(complete).toHaveBeenCalledTimes(1);
+
+		const nextTargetPose = {
+			...targetPose(220),
+			source: {
+				...targetSource,
+				id: "runtime:next-target",
+				revision: "revision:next-target",
+			},
+		};
+		await act(async () => {
+			nextFollower(nextTargetPose);
+			motionTestRuntime.flushSprings();
+			nextFollower(nextTargetPose);
+		});
+		expect(complete).toHaveBeenCalledTimes(2);
+		expect(complete).toHaveBeenLastCalledWith("runtime:water", 8);
+		expect(beginNeighbourTravel).toHaveBeenCalledTimes(2);
+		expect(endNeighbourTravel).toHaveBeenCalledTimes(2);
+	});
+
+	it.each([
+		{
+			surfaceGone: false,
+			terminalX: 320,
+			label: "latest exact slot",
+		},
+		{
+			surfaceGone: true,
+			terminalX: 100,
+			label: "outcome fallback",
+		},
+	])("settles a removed live target to the $label without a disappearance jump", async ({
+		surfaceGone: removeSurface,
+		terminalX,
+	}) => {
+		motionTestRuntime.autoCompleteImperativeAnimations = false;
+		motionTestRuntime.deferImperativeValueWrites = true;
+		motionTestRuntime.springLag = true;
+		let follower: ((pose: TileActorPose | null) => void) | null = null;
+		let surfaceGone = false;
+		let geometryVersion = 0;
+		let placementOffset = 0;
+		const complete = vi.fn();
+		const sourceLocation = {
+			scope: "board" as const,
+			space: 0,
+			position: {
+				x: 0,
+				y: 0,
+			},
+		};
+		const fallbackLocation = {
+			scope: "board" as const,
+			space: 0,
+			position: {
+				x: 1,
+				y: 0,
+			},
+		};
+		const latestTargetLocation = {
+			scope: "board" as const,
+			space: 0,
+			position: {
+				x: 3,
+				y: 0,
+			},
+		};
+		systemState.system = {
+			get geometryVersion() {
+				return geometryVersion;
+			},
+			readActorLayerRect: () => ({
+				left: 10,
+				top: 20,
+				width: 800,
+				height: 600,
+			}),
+			readActorRect: () => null,
+			readPlacement: (candidate: TileDragSource) =>
+				surfaceGone
+					? null
+					: {
+							x: candidate.location.position.x * 100 + placementOffset,
+							y: candidate.location.position.y * 100,
+							width: 100,
+							height: 100,
+						},
+			followActorPose: (_itemId: string, listener: (pose: TileActorPose | null) => void) => {
+				follower = listener;
+				return () => {
+					if (follower === listener) follower = null;
+				};
+			},
+			complete,
+			registerNeighbourActor: () => () => undefined,
+			beginNeighbourTravel: () => () => undefined,
+		} as unknown as TileSystem;
+		const rendered = await renderMotion(item(sourceLocation), {
+			...presentation(sourceLocation, 1),
+			positionCompletion: {
+				kind: "none",
+			},
+		});
+		const followView = followingPresentation({
+			sourceLocation,
+			fallbackLocation,
+			generation: 11,
+		});
+		await rendered.rerender(followView);
+		const approachAnimations = [
+			...motionTestRuntime.imperativeAnimations,
+		];
+		const approachFollower = follower as ((pose: TileActorPose | null) => void) | null;
+		if (approachFollower === null) throw new Error("Missing live target follower.");
+		const targetPose: TileActorPose = {
+			bounds: {
+				left: 310,
+				top: 20,
+				right: 410,
+				bottom: 120,
+				x: 310,
+				y: 20,
+				width: 100,
+				height: 100,
+				toJSON: () => ({}),
+			},
+			source: {
+				...source(latestTargetLocation),
+				id: "runtime:target",
+				revision: "revision:target:moved",
+			},
+		};
+
+		await act(async () => {
+			approachFollower(targetPose);
+			for (const animation of approachAnimations) animation.finish();
+			await Promise.resolve();
+		});
+		expect(complete).not.toHaveBeenCalled();
+		await act(async () => {
+			motionTestRuntime.flushSprings();
+		});
+		expect(
+			(capturedMotion?.placement.anchor.x.get() ?? 0) + (capturedMotion?.travel.x.get() ?? 0),
+		).toBe(300);
+		expect(complete).not.toHaveBeenCalled();
+
+		surfaceGone = removeSurface;
+		if (surfaceGone) {
+			geometryVersion += 1;
+			await rendered.rerender(followView);
+			expect(complete).not.toHaveBeenCalled();
+		}
+		const fallbackAnimationStart = motionTestRuntime.imperativeAnimations.length;
+		await act(async () => {
+			approachFollower(null);
+		});
+		const fallbackAnimations =
+			motionTestRuntime.imperativeAnimations.slice(fallbackAnimationStart);
+		expect(fallbackAnimations).toHaveLength(4);
+		expect(
+			(capturedMotion?.placement.anchor.x.get() ?? 0) + (capturedMotion?.travel.x.get() ?? 0),
+		).toBe(300);
+		expect(complete).not.toHaveBeenCalled();
+
+		placementOffset = 20;
+		geometryVersion += 1;
+		const retargetedFallbackStart = motionTestRuntime.imperativeAnimations.length;
+		await rendered.rerender(followView);
+		const retargetedFallbackAnimations =
+			motionTestRuntime.imperativeAnimations.slice(retargetedFallbackStart);
+		expect(retargetedFallbackAnimations).toHaveLength(4);
+		expect(fallbackAnimations.every((animation) => animation.stopped())).toBe(true);
+		expect(
+			(capturedMotion?.placement.anchor.x.get() ?? 0) + (capturedMotion?.travel.x.get() ?? 0),
+		).toBe(300);
+
+		await act(async () => {
+			for (const animation of fallbackAnimations) animation.finish();
+			await Promise.resolve();
+		});
+		expect(complete).not.toHaveBeenCalled();
+
+		await act(async () => {
+			for (const animation of retargetedFallbackAnimations) animation.finish();
+			await Promise.resolve();
+		});
+		expect(complete).toHaveBeenCalledOnce();
+		expect(complete).toHaveBeenCalledWith("runtime:water", 11);
+		expect(
+			(capturedMotion?.placement.anchor.x.get() ?? 0) + (capturedMotion?.travel.x.get() ?? 0),
+		).toBe(terminalX);
+	});
+
 	it("arms one spawn Enter only after the latest retargeted delivery controls finish", async () => {
 		motionTestRuntime.autoCompleteImperativeAnimations = false;
 		let geometryVersion = 0;

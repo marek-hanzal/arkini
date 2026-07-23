@@ -26,6 +26,15 @@ interface TileNeighbourActorRegistration {
 	enabled: boolean;
 }
 
+export interface TileActorPose {
+	readonly bounds: DOMRect;
+	readonly source: TileDragSource;
+}
+
+interface TileActorPoseFollower {
+	readonly listener: (pose: TileActorPose | null) => void;
+}
+
 interface TileNeighbourMover {
 	readonly generation: number;
 }
@@ -135,6 +144,8 @@ export const useTileNeighbourField = ({
 	const candidateKindByMover = useRef(
 		new Map<string, ReadonlyMap<string, TileNeighbourCandidateKind>>(),
 	);
+	const poseFollowersByActor = useRef(new Map<string, Set<TileActorPoseFollower>>());
+	const pendingMissingPoseByActor = useRef(new Map<string, symbol>());
 	const nextMoverGeneration = useRef(0);
 	const previewSequence = useRef<number | null>(null);
 	const scheduledFrame = useRef<{
@@ -175,6 +186,64 @@ export const useTileNeighbourField = ({
 			registration.appliedScale.get(),
 		);
 	}, []);
+
+	const readRenderedActorPose = useCallback(
+		(registration: TileNeighbourActorRegistration): TileActorPose | null => {
+			if (
+				!registration.enabled ||
+				registration.node.dataset.live !== "true" ||
+				registration.node.dataset.motionExiting === "true"
+			) {
+				return null;
+			}
+			const firstChild = registration.node.firstElementChild;
+			const visualBody =
+				firstChild instanceof HTMLElement && firstChild.dataset.ui === "TileMotionCueVisual"
+					? firstChild
+					: registration.node;
+			const bounds = visualBody.getBoundingClientRect();
+			if (bounds.width <= 0 || bounds.height <= 0) return null;
+			return {
+				bounds,
+				source: registration.source,
+			};
+		},
+		[],
+	);
+
+	const publishActorPose = useCallback(
+		(itemId: string) => {
+			const followers = poseFollowersByActor.current.get(itemId);
+			if (followers === undefined) return;
+			const registration = actors.current.get(itemId);
+			if (registration === undefined && pendingMissingPoseByActor.current.has(itemId)) return;
+			let pose: TileActorPose | null = null;
+			try {
+				pose = registration === undefined ? null : readRenderedActorPose(registration);
+			} catch (error) {
+				console.error(
+					"Tile actor pose measurement failed; using its terminal fallback.",
+					error,
+				);
+			}
+			for (const follower of followers) {
+				try {
+					follower.listener(pose);
+				} catch (error) {
+					console.error("Tile actor pose follower failed; ignoring this frame.", error);
+				}
+			}
+		},
+		[
+			readRenderedActorPose,
+		],
+	);
+
+	const publishActorPoses = useCallback(() => {
+		for (const itemId of poseFollowersByActor.current.keys()) publishActorPose(itemId);
+	}, [
+		publishActorPose,
+	]);
 
 	const recomputeSemanticCandidates = useCallback(
 		(itemId: string) => {
@@ -276,6 +345,7 @@ export const useTileNeighbourField = ({
 	const refreshNeighbourField = useCallback(() => {
 		try {
 			refreshSemanticCandidates();
+			publishActorPoses();
 			const moverIds = new Set(movers.current.keys());
 			const liveMovers: Array<{
 				readonly itemId: string;
@@ -452,6 +522,7 @@ export const useTileNeighbourField = ({
 			for (const registration of actors.current.values()) reset(registration);
 		}
 	}, [
+		publishActorPoses,
 		readStableActorRect,
 		refreshSemanticCandidates,
 		reset,
@@ -461,7 +532,9 @@ export const useTileNeighbourField = ({
 	const scheduleNeighbourFrame = useCallback(() => {
 		if (
 			scheduledFrame.current !== null ||
-			(movers.current.size === 0 && semanticSourceByMover.current.size === 0)
+			(movers.current.size === 0 &&
+				semanticSourceByMover.current.size === 0 &&
+				poseFollowersByActor.current.size === 0)
 		) {
 			return;
 		}
@@ -488,6 +561,8 @@ export const useTileNeighbourField = ({
 
 	const clearNeighbourField = useCallback(() => {
 		cancelScheduledFrame();
+		poseFollowersByActor.current.clear();
+		pendingMissingPoseByActor.current.clear();
 		movers.current.clear();
 		targetByMover.current.clear();
 		semanticSourceByMover.current.clear();
@@ -503,20 +578,35 @@ export const useTileNeighbourField = ({
 			const previous = actors.current.get(registration.itemId);
 			if (previous !== undefined && previous !== registration) reset(previous);
 			actors.current.set(registration.itemId, registration);
+			pendingMissingPoseByActor.current.delete(registration.itemId);
+			publishActorPose(registration.itemId);
 			recomputeAllSemanticCandidates();
-			if (movers.current.size > 0) {
+			if (movers.current.size > 0 || poseFollowersByActor.current.size > 0) {
 				refreshNeighbourField();
 				scheduleNeighbourFrame();
 			}
 			return () => {
 				if (actors.current.get(registration.itemId) !== registration) return;
 				reset(registration);
+				const missingToken = Symbol("tile-actor-missing-pose");
+				pendingMissingPoseByActor.current.set(registration.itemId, missingToken);
 				actors.current.delete(registration.itemId);
 				recomputeAllSemanticCandidates();
 				refreshNeighbourField();
+				queueMicrotask(() => {
+					if (
+						pendingMissingPoseByActor.current.get(registration.itemId) !== missingToken
+					) {
+						return;
+					}
+					pendingMissingPoseByActor.current.delete(registration.itemId);
+					if (actors.current.has(registration.itemId)) return;
+					refreshNeighbourField();
+				});
 			};
 		},
 		[
+			publishActorPose,
 			recomputeAllSemanticCandidates,
 			refreshNeighbourField,
 			reset,
@@ -539,13 +629,20 @@ export const useTileNeighbourField = ({
 			registration.source = source;
 			registration.enabled = enabled;
 			if (!enabled) reset(registration);
+			publishActorPose(itemId);
 			recomputeAllSemanticCandidates();
 			refreshNeighbourField();
-			if (enabled && (movers.current.size > 0 || semanticSourceByMover.current.size > 0)) {
+			if (
+				enabled &&
+				(movers.current.size > 0 ||
+					semanticSourceByMover.current.size > 0 ||
+					poseFollowersByActor.current.size > 0)
+			) {
 				scheduleNeighbourFrame();
 			}
 		},
 		[
+			publishActorPose,
 			recomputeAllSemanticCandidates,
 			refreshNeighbourField,
 			reset,
@@ -570,6 +667,40 @@ export const useTileNeighbourField = ({
 		[],
 	);
 
+	const followActorPose = useCallback(
+		(itemId: string, listener: (pose: TileActorPose | null) => void) => {
+			const follower = {
+				listener,
+			};
+			const followers =
+				poseFollowersByActor.current.get(itemId) ?? new Set<TileActorPoseFollower>();
+			followers.add(follower);
+			poseFollowersByActor.current.set(itemId, followers);
+			publishActorPose(itemId);
+			scheduleNeighbourFrame();
+			let active = true;
+			return () => {
+				if (!active) return;
+				active = false;
+				const current = poseFollowersByActor.current.get(itemId);
+				if (current === undefined || !current.delete(follower)) return;
+				if (current.size === 0) poseFollowersByActor.current.delete(itemId);
+				if (
+					movers.current.size === 0 &&
+					semanticSourceByMover.current.size === 0 &&
+					poseFollowersByActor.current.size === 0
+				) {
+					cancelScheduledFrame();
+				}
+			};
+		},
+		[
+			cancelScheduledFrame,
+			publishActorPose,
+			scheduleNeighbourFrame,
+		],
+	);
+
 	const beginNeighbourTravel = useCallback(
 		(itemId: string) => {
 			const mover = {
@@ -587,7 +718,11 @@ export const useTileNeighbourField = ({
 				const target = targetByMover.current.get(itemId);
 				if (target !== undefined) scheduleOrphanedTargetCleanup(itemId, target);
 				refreshNeighbourField();
-				if (movers.current.size === 0 && semanticSourceByMover.current.size === 0) {
+				if (
+					movers.current.size === 0 &&
+					semanticSourceByMover.current.size === 0 &&
+					poseFollowersByActor.current.size === 0
+				) {
 					cancelScheduledFrame();
 				}
 			};
@@ -628,7 +763,9 @@ export const useTileNeighbourField = ({
 				semanticSourceByMover.current.delete(itemId);
 				candidateKindByMover.current.delete(itemId);
 				refreshNeighbourField();
-				if (movers.current.size === 0) cancelScheduledFrame();
+				if (movers.current.size === 0 && poseFollowersByActor.current.size === 0) {
+					cancelScheduledFrame();
+				}
 				return;
 			}
 			if (source === null) {
@@ -644,7 +781,11 @@ export const useTileNeighbourField = ({
 			refreshNeighbourField();
 			if (source !== null) {
 				scheduleNeighbourFrame();
-			} else if (movers.current.size === 0 && semanticSourceByMover.current.size === 0) {
+			} else if (
+				movers.current.size === 0 &&
+				semanticSourceByMover.current.size === 0 &&
+				poseFollowersByActor.current.size === 0
+			) {
 				cancelScheduledFrame();
 			}
 		},
@@ -671,6 +812,7 @@ export const useTileNeighbourField = ({
 	return {
 		readActorRect,
 		readActorSource,
+		followActorPose,
 		registerNeighbourActor,
 		updateNeighbourActor,
 		beginNeighbourTravel,

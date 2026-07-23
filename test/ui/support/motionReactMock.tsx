@@ -43,6 +43,10 @@ interface MockDragControls {
 let activeDragBinding: MockDragBinding | null = null;
 const motionOffsetBindings = new Map<string, MockDragBinding>();
 const motionScaleBindings = new Map<string, MockMotionValue<number>>();
+const springBindings = new Set<{
+	readonly source: MockMotionValue<unknown>;
+	readonly lagged: MockMotionValue<unknown>;
+}>();
 
 interface MockAnimationControls extends PromiseLike<void> {
 	stop: () => void;
@@ -60,18 +64,24 @@ interface MotionTestCompletion {
 export const motionTestRuntime = {
 	autoComplete: true,
 	springLag: false,
+	deferImperativeValueWrites: false,
 	completions: [] as Array<MotionTestCompletion>,
 	imperativeAnimations: [] as Array<MockImperativeAnimation>,
 	autoCompleteImperativeAnimations: true,
 	reset() {
 		this.autoComplete = true;
 		this.springLag = false;
+		this.deferImperativeValueWrites = false;
 		this.completions.splice(0);
 		this.imperativeAnimations.splice(0);
 		this.autoCompleteImperativeAnimations = true;
 		activeDragBinding = null;
 		motionOffsetBindings.clear();
 		motionScaleBindings.clear();
+		springBindings.clear();
+	},
+	flushSprings() {
+		for (const binding of springBindings) binding.lagged.jump(binding.source.get());
 	},
 	readMotionOffset(ui: string, runtimeId: string) {
 		const binding = motionOffsetBindings.get(`${ui}:${runtimeId}`);
@@ -130,6 +140,17 @@ export const useMotionValue = <T,>(initial: T): MockMotionValue<T> => {
 
 export const useSpring = <T,>(source: MockMotionValue<T>) => {
 	const lagged = useMotionValue(source.get());
+	const binding = useMemo(
+		() => ({
+			source: source as MockMotionValue<unknown>,
+			lagged: lagged as MockMotionValue<unknown>,
+		}),
+		[
+			lagged,
+			source,
+		],
+	);
+	springBindings.add(binding);
 	return motionTestRuntime.springLag ? lagged : source;
 };
 
@@ -153,7 +174,7 @@ export const useTransform = <T,>(
 };
 
 export const animate = <T,>(value: MockMotionValue<T>, target: T): MockAnimationControls => {
-	value.set(target);
+	if (!motionTestRuntime.deferImperativeValueWrites) value.set(target);
 	let stopped = false;
 	let finish: () => void = () => undefined;
 	const finished = motionTestRuntime.autoCompleteImperativeAnimations
@@ -162,7 +183,10 @@ export const animate = <T,>(value: MockMotionValue<T>, target: T): MockAnimation
 				finish = resolve;
 			});
 	motionTestRuntime.imperativeAnimations.push({
-		finish: () => finish(),
+		finish: () => {
+			if (motionTestRuntime.deferImperativeValueWrites && !stopped) value.set(target);
+			finish();
+		},
 		stopped: () => stopped,
 	});
 	return {

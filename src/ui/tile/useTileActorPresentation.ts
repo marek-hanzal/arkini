@@ -27,9 +27,17 @@ export namespace useTileActorPresentation {
 				readonly location: TileLocation;
 		  };
 
+	export interface FollowTarget {
+		readonly interactionGeneration: number;
+		readonly stage: "approach";
+		readonly sourceItemId: string;
+		readonly targetItemId: string;
+	}
+
 	export interface Model {
 		readonly canonicalSource: TileDragSource;
 		readonly desiredSource: TileDragSource;
+		readonly followTarget: FollowTarget | null;
 		readonly phase: TileActorPhaseSchema.Type;
 		readonly feedback: TileInteractionFeedbackSchema.Type | null;
 		readonly forbiddenDrop: boolean;
@@ -44,6 +52,7 @@ export namespace useTileActorPresentation {
 
 interface TileActorPresentationView {
 	readonly desiredLocation: TileLocation;
+	readonly followTarget: useTileActorPresentation.FollowTarget | null;
 	readonly phase: TileActorPhaseSchema.Type;
 	readonly feedback: TileInteractionFeedbackSchema.Type | null;
 	readonly forbiddenDrop: boolean;
@@ -76,6 +85,7 @@ const passiveView = (
 	hovered: boolean,
 ): TileActorPresentationView => ({
 	desiredLocation: item.location,
+	followTarget: null,
 	phase: live && hovered ? "hovered" : "stable",
 	feedback: null,
 	forbiddenDrop: false,
@@ -184,6 +194,12 @@ const settlingView = (
 					return {
 						...passive,
 						desiredLocation: targetLocation,
+						followTarget: {
+							interactionGeneration: settling.generation,
+							stage: "approach" as const,
+							sourceItemId: settlement.outcome.source.itemId,
+							targetItemId: settlement.outcome.owner.itemId,
+						},
 						phase: "combining" as const,
 						feedback: settlement.feedback,
 						positionCompletion: {
@@ -210,6 +226,7 @@ const settlingView = (
 							desiredLocation: settlement.outcome.owner.location,
 							phase: "exiting" as const,
 							feedback: settlement.feedback,
+							placementFrozen: true,
 							visualCompletionGeneration: settling.generation,
 						};
 					}
@@ -245,9 +262,18 @@ const settlingView = (
 					settlement.outcome.target.current?.location ??
 					settlement.outcome.target.previousLocation;
 				if (settlement.outcome.source.itemId === item.id) {
+					const targetItemId =
+						settlement.outcome.target.current?.itemId ??
+						settlement.outcome.target.itemId;
 					return {
 						...passive,
 						desiredLocation: targetLocation,
+						followTarget: {
+							interactionGeneration: settling.generation,
+							stage: "approach" as const,
+							sourceItemId: settlement.outcome.source.itemId,
+							targetItemId,
+						},
 						phase: "combining" as const,
 						feedback: settlement.feedback,
 						positionCompletion: {
@@ -283,6 +309,7 @@ const settlingView = (
 							desiredLocation: targetLocation,
 							phase: "exiting" as const,
 							feedback: settlement.feedback,
+							placementFrozen: true,
 							visualCompletionGeneration: settling.generation,
 						};
 					}
@@ -468,6 +495,7 @@ export const useTileActorPresentation = ({
 	return {
 		canonicalSource,
 		desiredSource,
+		followTarget: view.followTarget,
 		phase: view.phase,
 		feedback: view.feedback,
 		forbiddenDrop: view.forbiddenDrop,

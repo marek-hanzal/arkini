@@ -8,7 +8,6 @@ import { commitMergeItemsFx } from "~/engine/merge/internal/commitMergeItemsFx";
 import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
 import { readDropItemPreviewFx } from "~/engine/runtime/read/readDropItemPreviewFx";
 import { isGridRuntimeItem } from "~/engine/runtime/read/isGridRuntimeItem";
-import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import type { DropItemResultSchema } from "~/engine/runtime/schema/command/DropItemResultSchema";
 import { DropItemIgnoredReasonEnumSchema } from "~/engine/runtime/schema/command/DropItemIgnoredReasonEnumSchema";
 import { DropItemRejectedReasonEnumSchema } from "~/engine/runtime/schema/command/DropItemRejectedReasonEnumSchema";
@@ -262,16 +261,6 @@ export const dropItemFx = Effect.fn("dropItemFx")(function* ({
 
 	if (preflight.kind === DropItemResultKindEnumSchema.enum.StoreInput) {
 		return yield* Effect.gen(function* () {
-			const runtimeBefore = yield* readRuntimeFx();
-			const sourceBefore = runtimeBefore.items.find((item) => item.id === sourceItemId);
-			if (sourceBefore === undefined || !isGridRuntimeItem(sourceBefore)) {
-				return {
-					kind: DropItemResultKindEnumSchema.enum.Reject,
-					reason: DropItemRejectedReasonEnumSchema.enum.StaleSource,
-					itemId: sourceItemId,
-					targetItemId,
-				} satisfies dropItemFx.Result;
-			}
 			const stored = yield* storeInputMaterialFx({
 				ownerItemId: targetItemId,
 				ownerItemRevision: target.occupant.revision,
@@ -283,13 +272,6 @@ export const dropItemFx = Effect.fn("dropItemFx")(function* ({
 				expectedSourceLocation: sourceLocation,
 				quantity: preflight.quantity,
 			});
-			const runtimeAfter = yield* readRuntimeFx();
-			const ownerAfter = runtimeAfter.items.find((item) => item.id === targetItemId);
-			if (ownerAfter === undefined || !isGridRuntimeItem(ownerAfter)) {
-				return yield* Effect.dieMessage(
-					`Stored input owner ${targetItemId} lost its grid identity after commit.`,
-				);
-			}
 
 			return {
 				kind: DropItemResultKindEnumSchema.enum.StoreInput,
@@ -297,20 +279,20 @@ export const dropItemFx = Effect.fn("dropItemFx")(function* ({
 				lineId: preflight.lineId,
 				inputIndex: preflight.inputIndex,
 				source: {
-					itemId: sourceBefore.id,
-					canonicalItemId: sourceBefore.item.id,
-					previousRevision: sourceBefore.revision,
-					previousLocation: sourceBefore.location,
-					previousQuantity: sourceBefore.quantity,
+					itemId: stored.sourceBefore.id,
+					canonicalItemId: stored.sourceBefore.item.id,
+					previousRevision: stored.sourceBefore.revision,
+					previousLocation: stored.sourceBefore.location,
+					previousQuantity: stored.sourceBefore.quantity,
 					current:
 						stored.sourceItem === undefined
 							? null
 							: mergeActorState(stored.sourceItem),
 				},
 				owner: {
-					itemId: ownerAfter.id,
-					revision: ownerAfter.revision,
-					location: ownerAfter.location,
+					itemId: stored.ownerItem.id,
+					revision: stored.ownerItem.revision,
+					location: stored.ownerItem.location,
 				},
 			} satisfies dropItemFx.Result;
 		}).pipe(

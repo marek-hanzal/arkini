@@ -130,7 +130,7 @@ describe("input state owner isolation", () => {
 			Effect.gen(function* () {
 				yield* spawnOwnerFx(2);
 				yield* spawnSourceFx(1);
-				yield* storeFx(1);
+				const stored = yield* storeFx(1);
 				const runtime = yield* readRuntimeFx();
 				const owner = runtime.items.find((item) => item.id === "runtime:workshop");
 				const remainder = runtime.items.find(
@@ -141,6 +141,7 @@ describe("input state owner isolation", () => {
 				}
 
 				return {
+					stored,
 					owner,
 					ownerPure: yield* isItemPureFx({
 						item: owner,
@@ -160,6 +161,12 @@ describe("input state owner isolation", () => {
 			),
 		);
 
+		expect(result.stored.sourceBefore).toMatchObject({
+			id: "runtime:water",
+			location: sourceLocation(1),
+			quantity: 1,
+		});
+		expect(result.stored.ownerItem).toEqual(result.owner);
 		expect(result.owner).toMatchObject({
 			id: "runtime:workshop",
 			location: workshopLocation,

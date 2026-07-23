@@ -210,9 +210,22 @@ export const storeInputMaterialFx = Effect.fn("storeInputMaterialFx")(function* 
 				ownerItemId,
 				runtime: inputRuntime,
 			});
+			const ownerItem = yield* readRuntimeItemByIdFx({
+				itemId: ownerItemId,
+				runtime: isolation.runtime,
+			});
+			if (!isGridRuntimeItem(ownerItem)) {
+				return yield* Effect.dieMessage(
+					`Stored input owner ${ownerItemId} lost its grid identity before commit.`,
+				);
+			}
 
 			return [
-				result satisfies InputMaterialStoreResultSchema.Type,
+				{
+					...result,
+					sourceBefore: source,
+					ownerItem,
+				} satisfies InputMaterialStoreResultSchema.Type,
 				isolation.runtime,
 				isolation.events,
 			] as const;

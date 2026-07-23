@@ -9,6 +9,18 @@ import { InputRuntimeItemSchema } from "~/engine/runtime/schema/InputRuntimeItem
 export const InputMaterialStoreResultSchema = z
 	.object({
 		/**
+		 * Exact visible source state used by the accepted mutation.
+		 */
+		sourceBefore: GridRuntimeItemSchema.describe(
+			"The exact visible source state used by the accepted mutation.",
+		),
+		/**
+		 * Exact final grid owner state committed by the mutation, including isolation.
+		 */
+		ownerItem: GridRuntimeItemSchema.describe(
+			"The exact final grid owner state committed by the mutation, including isolation.",
+		),
+		/**
 		 * Material item now owned by the target input slot.
 		 */
 		storedItem: InputRuntimeItemSchema.describe(

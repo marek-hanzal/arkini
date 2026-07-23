@@ -105,6 +105,15 @@ describe("storeInputMaterialFx", () => {
 			),
 		);
 
+		expect(result.stored.sourceBefore).toMatchObject({
+			id: "runtime:water",
+			location: sourceLocation(1),
+			quantity: 2,
+		});
+		expect(result.stored.ownerItem).toMatchObject({
+			id: "runtime:workshop",
+			location: workshopLocation,
+		});
 		expect(result.stored.sourceItem).toBeUndefined();
 		expect(result.stored.storedItem.id).toBe("runtime:water");
 		expect(result.item.location).toEqual({
@@ -186,6 +195,11 @@ describe("storeInputMaterialFx", () => {
 			),
 		);
 
+		expect(result.stored.sourceBefore).toMatchObject({
+			id: "runtime:water",
+			location: sourceLocation(1),
+			quantity: 5,
+		});
 		expect(result.source).toMatchObject({
 			id: "runtime:water",
 			location: sourceLocation(1),

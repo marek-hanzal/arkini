@@ -15,7 +15,7 @@ const config = GameConfigSchema.parse({
 		id: "game:item-primary-action",
 		title: "Item primary action",
 		board: {
-			width: 2,
+			width: 3,
 			height: 1,
 		},
 		inventory: {
@@ -36,6 +36,12 @@ const config = GameConfigSchema.parse({
 				itemId: "resource",
 				space: 0,
 				x: 1,
+				y: 0,
+			},
+			{
+				itemId: "satchel-control",
+				space: 0,
+				x: 2,
 				y: 0,
 			},
 		],
@@ -87,6 +93,19 @@ const config = GameConfigSchema.parse({
 			scope: "any",
 			maxStackSize: 10,
 		},
+		"satchel-control": {
+			id: "satchel-control",
+			type: "inventory",
+			title: "Satchel",
+			description: "Opens the shared inventory.",
+			asset: {
+				source: [
+					"asset:satchel",
+				],
+			},
+			tags: [],
+			categoryId: "utility",
+		},
 	},
 });
 
@@ -100,7 +119,10 @@ const runtime = Effect.runSync(
 
 const producer = runtime.items.find((item) => item.item.id === "producer");
 const resource = runtime.items.find((item) => item.item.id === "resource");
-if (producer === undefined || resource === undefined) throw new Error("Missing fixtures.");
+const inventoryOpener = runtime.items.find((item) => item.item.id === "satchel-control");
+if (producer === undefined || resource === undefined || inventoryOpener === undefined) {
+	throw new Error("Missing fixtures.");
+}
 
 describe("readRuntimeItemPrimaryActionFx", () => {
 	it("does nothing for ordinary items and opens Lines for owners without a default", () => {
@@ -123,6 +145,38 @@ describe("readRuntimeItemPrimaryActionFx", () => {
 			),
 		).toEqual({
 			kind: "open-lines",
+		});
+	});
+
+	it("opens Inventory by canonical item type from either Board or Toolbar", () => {
+		expect(
+			Effect.runSync(
+				readRuntimeItemPrimaryActionFx({
+					item: inventoryOpener,
+					runtime,
+				}),
+			),
+		).toEqual({
+			kind: "open-inventory",
+		});
+		expect(
+			Effect.runSync(
+				readRuntimeItemPrimaryActionFx({
+					item: {
+						...inventoryOpener,
+						location: {
+							scope: "toolbar",
+							position: {
+								x: 0,
+								y: 0,
+							},
+						},
+					},
+					runtime,
+				}),
+			),
+		).toEqual({
+			kind: "open-inventory",
 		});
 	});
 

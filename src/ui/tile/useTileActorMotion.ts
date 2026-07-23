@@ -533,8 +533,14 @@ export const useTileActorMotion = ({
 			presentation.positionCompletion.kind !== "none" ||
 			!isSameDestination(presentation.desiredSource, presentation.canonicalSource);
 		if (placement === null) {
-			preserveOnlyCurrentIntent();
-			if (!ownsSettlementMotion && presentation.phase !== "targeted") setVisible(false);
+			if (!ownsSettlementMotion && !followsLiveTarget && presentation.phase !== "targeted") {
+				resolvedSpatialTarget.current = null;
+				localMotionGeneration.current += 1;
+				stopActiveSpatialMotion();
+				setVisible(false);
+			} else {
+				preserveOnlyCurrentIntent();
+			}
 			if (!followsLiveTarget) completePosition();
 			return;
 		}

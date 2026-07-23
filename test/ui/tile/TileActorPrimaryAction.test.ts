@@ -12,7 +12,9 @@ import type { CommittedTransitionSchema } from "~/engine/runtime/schema/Committe
 import { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { startFx } from "~/engine/start/write/startFx";
-import { Board } from "~/ui/board/Board";
+import { GameBoardLayout } from "~/ui/board/GameBoardLayout";
+import { InventoryHost } from "~/ui/inventory/InventoryHost";
+import { InventoryProvider } from "~/ui/inventory/InventoryProvider";
 import { ItemDetailModal } from "~/ui/item-detail/ItemDetailModal";
 import { ItemDetailProvider } from "~/ui/item-detail/ItemDetailProvider";
 import { TileSystemProvider } from "~/ui/tile/TileSystemProvider";
@@ -49,13 +51,14 @@ const config = GameConfigSchema.parse({
 		id: "game:tile-primary-action",
 		title: "Tile primary action",
 		board: {
-			width: 2,
+			width: 3,
 			height: 1,
 		},
 		inventory: {
 			width: 1,
 			height: 1,
 		},
+		toolbarSize: 1,
 	},
 	start: {
 		currentSpace: 0,
@@ -70,6 +73,12 @@ const config = GameConfigSchema.parse({
 				itemId: "resource",
 				space: 0,
 				x: 1,
+				y: 0,
+			},
+			{
+				itemId: "satchel-control",
+				space: 0,
+				x: 2,
 				y: 0,
 			},
 		],
@@ -120,6 +129,19 @@ const config = GameConfigSchema.parse({
 			categoryId: "resource",
 			scope: "any",
 			maxStackSize: 10,
+		},
+		"satchel-control": {
+			id: "satchel-control",
+			type: "inventory",
+			title: "Satchel",
+			description: "Opens the shared inventory.",
+			asset: {
+				source: [
+					"asset:satchel",
+				],
+			},
+			tags: [],
+			categoryId: "utility",
 		},
 	},
 });
@@ -245,22 +267,32 @@ beforeEach(() => {
 		configurable: true,
 		value() {
 			const element = this as HTMLElement;
-			if (element.dataset.ui === "BoardGrid") return rect(0, 0, 200, 100);
-			if (element.dataset.ui === "TileActorLayer") return rect(0, 0, 200, 100);
+			if (element.dataset.ui === "BoardGrid") return rect(0, 0, 300, 100);
+			if (element.dataset.ui === "ToolbarGrid") return rect(0, 100, 100, 100);
+			if (element.dataset.ui === "TileActorLayer") return rect(0, 0, 300, 200);
 			if (
 				element.dataset.ui === "TileMotionCueVisual" ||
 				element.dataset.ui === "TileActorVisual"
 			) {
 				const actor = element.closest<HTMLElement>('[data-ui="TileActor"]');
-				const x = Number(actor?.dataset.boardX);
-				if (Number.isFinite(x)) return rect(x * 100 + 10, 10, 80, 80);
+				const boardX = Number(actor?.dataset.boardX);
+				if (Number.isFinite(boardX)) return rect(boardX * 100 + 10, 10, 80, 80);
+				const toolbarX = Number(actor?.dataset.toolbarX);
+				if (Number.isFinite(toolbarX)) {
+					return rect(toolbarX * 100 + 10, 110, 80, 80);
+				}
 			}
 			if (element.dataset.ui === "BoardCell") {
 				return rect(Number(element.dataset.boardX) * 100, 0, 100, 100);
 			}
+			if (element.dataset.ui === "ToolbarCell") {
+				return rect(Number(element.dataset.toolbarX) * 100, 100, 100, 100);
+			}
 			if (element.dataset.ui === "TileActorDragSurface") {
 				const actor = element.closest<HTMLElement>('[data-ui="TileActor"]');
-				return rect(Number(actor?.dataset.boardX) * 100, 0, 100, 100);
+				const boardX = Number(actor?.dataset.boardX);
+				if (Number.isFinite(boardX)) return rect(boardX * 100, 0, 100, 100);
+				return rect(Number(actor?.dataset.toolbarX) * 100, 100, 100, 100);
 			}
 			return rect(0, 0, 0, 0);
 		},
@@ -286,8 +318,17 @@ const renderBoard = async () => {
 			createElement(
 				ItemDetailProvider,
 				null,
-				createElement(TileSystemProvider, null, createElement(Board)),
-				createElement(ItemDetailModal),
+				createElement(
+					InventoryProvider,
+					null,
+					createElement(
+						TileSystemProvider,
+						null,
+						createElement(GameBoardLayout),
+						createElement(InventoryHost),
+					),
+					createElement(ItemDetailModal),
+				),
 			),
 		);
 		await Promise.resolve();
@@ -299,8 +340,14 @@ const renderBoard = async () => {
 	const resource = document.querySelector<HTMLButtonElement>(
 		'[data-ui="TileActor"][data-item-id="resource"]',
 	);
-	if (producer === null || resource === null) throw new Error("Missing tile actors.");
+	const inventoryOpener = document.querySelector<HTMLButtonElement>(
+		'[data-ui="TileActor"][data-item-id="satchel-control"]',
+	);
+	if (producer === null || resource === null || inventoryOpener === null) {
+		throw new Error("Missing tile actors.");
+	}
 	return {
+		inventoryOpener,
 		producer,
 		resource,
 	};
@@ -331,6 +378,25 @@ const doubleClick = (actor: HTMLElement) =>
 		}),
 	);
 
+const pointerEvent = (type: string, x: number, y: number) => {
+	const event = new MouseEvent(type, {
+		bubbles: true,
+		button: 0,
+		cancelable: true,
+		clientX: x,
+		clientY: y,
+	});
+	Object.defineProperties(event, {
+		isPrimary: {
+			value: true,
+		},
+		pointerId: {
+			value: 1,
+		},
+	});
+	return event;
+};
+
 const finishPrimaryActionDelay = async () => {
 	await act(async () => {
 		vi.advanceTimersByTime(321);
@@ -340,6 +406,95 @@ const finishPrimaryActionDelay = async () => {
 };
 
 describe("TileActor primary action", () => {
+	it("opens Inventory from the Board without mutating runtime location", async () => {
+		const { inventoryOpener } = await renderBoard();
+		const runtimeBefore = currentRuntime;
+		vi.useFakeTimers();
+
+		expect(inventoryOpener.dataset.primaryAction).toBe("open-inventory");
+		expect(inventoryOpener.dataset.locationScope).toBe("board");
+		await act(async () => click(inventoryOpener));
+		await finishPrimaryActionDelay();
+
+		expect(document.querySelector('[data-ui="InventoryHost"]')).not.toBeNull();
+		expect(currentRuntime).toBe(runtimeBefore);
+		expect(runCommand).not.toHaveBeenCalled();
+	});
+
+	it("cancels the delayed Inventory action when the actor starts dragging", async () => {
+		const { inventoryOpener } = await renderBoard();
+		const dragSurface = inventoryOpener.querySelector<HTMLElement>(
+			'[data-ui="TileActorDragSurface"]',
+		);
+		if (dragSurface === null) throw new Error("Missing inventory opener drag surface.");
+		vi.useFakeTimers();
+
+		await act(async () => {
+			click(inventoryOpener);
+			dragSurface.dispatchEvent(pointerEvent("pointerdown", 250, 50));
+			dragSurface.dispatchEvent(pointerEvent("pointermove", 260, 60));
+			dragSurface.dispatchEvent(pointerEvent("pointercancel", 260, 60));
+			await Promise.resolve();
+		});
+		await finishPrimaryActionDelay();
+
+		expect(document.querySelector('[data-ui="InventoryHost"]')).toBeNull();
+		expect(runCommand).not.toHaveBeenCalled();
+	});
+
+	it("cancels a stale Board click after movement and opens from the exact Toolbar revision", async () => {
+		const { inventoryOpener } = await renderBoard();
+		const opener = currentRuntime.items.find((item) => item.item.type === "inventory");
+		if (opener === undefined) throw new Error("Missing inventory opener.");
+		vi.useFakeTimers();
+
+		await act(async () => click(inventoryOpener));
+		const movedRuntime = RuntimeSchema.parse({
+			...currentRuntime,
+			items: currentRuntime.items.map((item) =>
+				item.id === opener.id
+					? {
+							...item,
+							revision: "revision:satchel:toolbar",
+							location: {
+								scope: "toolbar",
+								position: {
+									x: 0,
+									y: 0,
+								},
+							},
+						}
+					: item,
+			),
+		});
+		await act(async () => {
+			publishRuntime(movedRuntime);
+			await Promise.resolve();
+			await Promise.resolve();
+		});
+		await finishPrimaryActionDelay();
+		expect(document.querySelector('[data-ui="InventoryHost"]')).toBeNull();
+
+		const toolbarOpener = document.querySelector<HTMLButtonElement>(
+			'[data-ui="TileActor"][data-item-id="satchel-control"][data-location-scope="toolbar"]',
+		);
+		if (toolbarOpener === null) throw new Error("Missing Toolbar inventory opener.");
+		expect(toolbarOpener.dataset.runtimeRevision).toBe("revision:satchel:toolbar");
+		await act(async () => click(toolbarOpener));
+		await finishPrimaryActionDelay();
+
+		expect(document.querySelector('[data-ui="InventoryHost"]')).not.toBeNull();
+		expect(currentRuntime).toBe(movedRuntime);
+		expect(currentRuntime.items.find((item) => item.id === opener.id)?.location).toEqual({
+			scope: "toolbar",
+			position: {
+				x: 0,
+				y: 0,
+			},
+		});
+		expect(runCommand).not.toHaveBeenCalled();
+	});
+
 	it("opens Lines for a line owner without a default and ignores ordinary items", async () => {
 		const { producer, resource } = await renderBoard();
 		vi.useFakeTimers();
@@ -415,5 +570,34 @@ describe("TileActor primary action", () => {
 		expect(
 			document.querySelector<HTMLElement>('[data-ui="ItemDetailModal"]')?.dataset.tab,
 		).toBe("lines");
+	});
+
+	it("keeps Inventory closed when its delayed single-click becomes a double-click", async () => {
+		const { inventoryOpener } = await renderBoard();
+		const dragSurface = inventoryOpener.querySelector<HTMLElement>(
+			'[data-ui="TileActorDragSurface"]',
+		);
+		if (dragSurface === null) throw new Error("Missing inventory opener drag surface.");
+		vi.useFakeTimers();
+
+		await act(async () => {
+			click(inventoryOpener, 1);
+			vi.advanceTimersByTime(319);
+			dragSurface.dispatchEvent(pointerEvent("pointerdown", 250, 50));
+			vi.advanceTimersByTime(2);
+		});
+		expect(document.querySelector('[data-ui="InventoryHost"]')).toBeNull();
+
+		await act(async () => {
+			dragSurface.dispatchEvent(pointerEvent("pointerup", 250, 50));
+			click(inventoryOpener, 2);
+			doubleClick(inventoryOpener);
+			await Promise.resolve();
+		});
+		await finishPrimaryActionDelay();
+
+		expect(document.querySelector('[data-ui="InventoryHost"]')).toBeNull();
+		expect(document.querySelector('[data-ui="ItemDetailModal"]')).not.toBeNull();
+		expect(runCommand).not.toHaveBeenCalled();
 	});
 });

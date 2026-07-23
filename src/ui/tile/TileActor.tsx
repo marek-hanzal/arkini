@@ -1,20 +1,31 @@
 import { motion } from "motion/react";
-import { memo, useCallback, useEffect, useRef } from "react";
+import { memo, useCallback, useContext, useEffect, useRef } from "react";
 import { match } from "ts-pattern";
 
 import { useStartItemDetailLine } from "~/bridge/item-detail/useStartItemDetailLine";
+import { isSameTileLocation } from "~/bridge/tile/isSameTileLocation";
 import { LocationScopeEnumSchema } from "~/bridge/tile/LocationScopeEnumSchema";
 import type { useTileActors } from "~/bridge/tile/useTileActors";
 import { CursorClassName } from "~/ui/cursor/CursorSemantic";
+import type { InventoryControl } from "~/ui/inventory/InventoryControl";
+import { InventoryContext } from "~/ui/inventory/InventoryContext";
 import { useItemDetailControl } from "~/ui/item-detail/useItemDetailControl";
 import { TileActorContent } from "~/ui/tile/TileActorContent";
 import { readTileActorCursorSemantic } from "~/ui/tile/readTileActorCursorSemantic";
 import { useTileActorDrag } from "~/ui/tile/useTileActorDrag";
 import { useTileActorMotion } from "~/ui/tile/useTileActorMotion";
 import type { TileMotionCueSchema } from "~/ui/tile/schema/TileMotionCueSchema";
+import { readTileActorStackingZIndex } from "~/ui/tile/TileActorStacking";
 import { useTileActorPresentation } from "~/ui/tile/useTileActorPresentation";
 
 const primaryActionDelayMs = 320;
+
+const unavailableInventoryControl = {
+	open: () => false,
+} satisfies Pick<InventoryControl, "open">;
+
+const primaryActionKey = (action: useTileActors.Item["primaryAction"]) =>
+	action.kind === "start-default-line" ? `${action.kind}:${action.lineId}` : action.kind;
 
 const zIndexForCue = (cue: TileMotionCueSchema.Type | null) => {
 	if (cue === null) return 0;
@@ -66,6 +77,7 @@ const TileActorComponent = ({
 	onCueComplete,
 }: TileActor.Props) => {
 	const itemDetail = useItemDetailControl();
+	const inventory = useContext(InventoryContext) ?? unavailableInventoryControl;
 	const startLine = useStartItemDetailLine();
 	const presentation = useTileActorPresentation({
 		item,
@@ -84,6 +96,8 @@ const TileActorComponent = ({
 		pointer: actorMotion.pointer.commands,
 	});
 	const pendingPrimaryAction = useRef<ReturnType<typeof setTimeout> | null>(null);
+	const latestItem = useRef(item);
+	latestItem.current = item;
 	const cancelPendingPrimaryAction = useCallback(() => {
 		if (pendingPrimaryAction.current === null) return;
 		clearTimeout(pendingPrimaryAction.current);
@@ -112,6 +126,16 @@ const TileActorComponent = ({
 				)
 				.with(
 					{
+						kind: "open-inventory",
+					},
+					() => {
+						inventory.open({
+							origin,
+						});
+					},
+				)
+				.with(
+					{
 						kind: "start-default-line",
 					},
 					({ lineId }) => {
@@ -129,6 +153,7 @@ const TileActorComponent = ({
 				)
 				.exhaustive(),
 		[
+			inventory,
 			item.id,
 			item.primaryAction,
 			itemDetail,
@@ -142,12 +167,19 @@ const TileActorComponent = ({
 	}, [
 		cancelPendingPrimaryAction,
 		interactive,
+		item.location,
+		item.primaryAction,
+		item.revision,
 	]);
 
 	const boardLocation =
 		item.location.scope === LocationScopeEnumSchema.enum.Board ? item.location : null;
 	const visible = actorMotion.placement.visible;
-	const zIndex = Math.max(presentation.zIndex, zIndexForCue(cue));
+	const zIndex = readTileActorStackingZIndex({
+		location: presentation.desiredSource.location,
+		phase: presentation.phase,
+		localZIndex: Math.max(presentation.zIndex, zIndexForCue(cue)),
+	});
 	const cursor = readTileActorCursorSemantic({
 		feedback: presentation.feedback,
 		forbiddenDrop: presentation.forbiddenDrop,
@@ -219,9 +251,20 @@ const TileActorComponent = ({
 				}
 				if (item.primaryAction.kind === "none") return;
 				const origin = event.currentTarget;
+				const scheduledItem = item;
+				const scheduledActionKey = primaryActionKey(scheduledItem.primaryAction);
 				cancelPendingPrimaryAction();
 				pendingPrimaryAction.current = setTimeout(() => {
 					pendingPrimaryAction.current = null;
+					const currentItem = latestItem.current;
+					if (
+						currentItem.id !== scheduledItem.id ||
+						currentItem.revision !== scheduledItem.revision ||
+						!isSameTileLocation(currentItem.location, scheduledItem.location) ||
+						primaryActionKey(currentItem.primaryAction) !== scheduledActionKey
+					) {
+						return;
+					}
 					runPrimaryAction(origin);
 				}, primaryActionDelayMs);
 			}}
@@ -248,7 +291,10 @@ const TileActorComponent = ({
 				dragListener={false}
 				dragMomentum={false}
 				dragElastic={0}
-				onPointerDown={drag.onPointerDown}
+				onPointerDown={(event) => {
+					cancelPendingPrimaryAction();
+					drag.onPointerDown(event);
+				}}
 				onPointerUp={drag.onPointerUp}
 				onPointerCancel={() => {
 					cancelPendingPrimaryAction();

@@ -150,8 +150,9 @@ const renderSource = async (initial: TestTransition) => {
 		await act(async () => {
 			root.render(createElement(Capture));
 		});
-		if (captured === null) throw new Error("Tile transition source was not captured.");
-		return captured;
+		const result = captured as TileActorTransitionSource | null;
+		if (result === null) throw new Error("Tile transition source was not captured.");
+		return result;
 	};
 	const source = await mountSource();
 	return {
@@ -465,6 +466,51 @@ describe("useTileActorTransitionSource", () => {
 
 			expect(received[1]?.liveItems[0]).toBe(awaitingOutput);
 			expect(received[1]?.liveItems[0]).not.toBe(paused);
+		} finally {
+			unsubscribe();
+		}
+	});
+
+	it("stabilizes equal open-inventory actions and refreshes when their kind changes", async () => {
+		const first = item({
+			primaryAction: {
+				kind: "open-inventory",
+			},
+		});
+		const { source, emit } = await renderSource(
+			transition(0, [
+				first,
+			]),
+		);
+		const received: readTileActorTransitionFx.Result[] = [];
+		const unsubscribe = source.subscribe((next) => {
+			received.push(next);
+		});
+
+		try {
+			emit(
+				transition(1, [
+					item({
+						primaryAction: {
+							kind: "open-inventory",
+						},
+					}),
+				]),
+			);
+			expect(received[1]?.liveItems[0]).toBe(first);
+
+			const changed = item({
+				primaryAction: {
+					kind: "open-lines",
+				},
+			});
+			emit(
+				transition(2, [
+					changed,
+				]),
+			);
+			expect(received[2]?.liveItems[0]).toBe(changed);
+			expect(received[2]?.liveItems[0]).not.toBe(first);
 		} finally {
 			unsubscribe();
 		}

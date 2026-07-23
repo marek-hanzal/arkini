@@ -104,7 +104,7 @@ export const useTileGeometry = () => {
 	const registerSurface = useCallback(
 		(surface: TileSurface, node: HTMLElement | null) => {
 			const previous = surfaces.current.get(surface.id);
-			if (previous?.node === node) return;
+			if (previous?.node === node) return false;
 			if (previous !== undefined) unobserve(previous.node);
 			if (node === null) {
 				surfaces.current.delete(surface.id);
@@ -116,6 +116,7 @@ export const useTileGeometry = () => {
 				observe(node);
 			}
 			publishGeometry();
+			return node === null && previous !== undefined;
 		},
 		[
 			observe,

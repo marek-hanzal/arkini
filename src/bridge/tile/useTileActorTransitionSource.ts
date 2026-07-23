@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { match } from "ts-pattern";
 
 import { useGameEngine } from "~/bridge/game/useGameEngine";
 import type { TileActorItem } from "~/bridge/tile/TileActorItem";
@@ -17,9 +18,32 @@ const isSamePrimaryAction = (
 	left: TileActorItem["primaryAction"],
 	right: TileActorItem["primaryAction"],
 ) =>
-	left.kind === right.kind &&
-	(left.kind !== "start-default-line" ||
-		(right.kind === "start-default-line" && left.lineId === right.lineId));
+	match(left)
+		.with(
+			{
+				kind: "none",
+			},
+			() => right.kind === "none",
+		)
+		.with(
+			{
+				kind: "open-lines",
+			},
+			() => right.kind === "open-lines",
+		)
+		.with(
+			{
+				kind: "open-inventory",
+			},
+			() => right.kind === "open-inventory",
+		)
+		.with(
+			{
+				kind: "start-default-line",
+			},
+			({ lineId }) => right.kind === "start-default-line" && right.lineId === lineId,
+		)
+		.exhaustive();
 
 const isSameTileActorItem = (left: TileActorItem, right: TileActorItem) =>
 	left.id === right.id &&

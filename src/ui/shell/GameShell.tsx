@@ -4,6 +4,9 @@ import { useGameEngine } from "~/bridge/game/useGameEngine";
 import { GameMenu } from "~/ui/game-menu/GameMenu";
 import { CheatItemSpotlight } from "~/ui/cheat-spotlight/CheatItemSpotlight";
 import { GameMenuProvider } from "~/ui/game-menu/GameMenuProvider";
+import { InventoryHigherOwnerGuard } from "~/ui/inventory/InventoryHigherOwnerGuard";
+import { InventoryHost } from "~/ui/inventory/InventoryHost";
+import { InventoryProvider } from "~/ui/inventory/InventoryProvider";
 import { ItemDetailHigherOwnerGuard } from "~/ui/item-detail/ItemDetailHigherOwnerGuard";
 import { ItemDetailModal } from "~/ui/item-detail/ItemDetailModal";
 import { ItemDetailProvider } from "~/ui/item-detail/ItemDetailProvider";
@@ -21,18 +24,24 @@ export function GameShell({ children }: PropsWithChildren) {
 		>
 			<GameMenuProvider>
 				<ItemDetailProvider>
-					<ItemDetailHigherOwnerGuard />
-					<div
-						className="relative size-full min-h-0 min-w-0"
-						data-ui="TileScene"
-						style={{
-							viewTransitionName: gameBoardViewTransitionName,
-						}}
-					>
-						<TileSystemProvider>{children}</TileSystemProvider>
-					</div>
-					<ItemDetailModal />
-					<CheatItemSpotlight game={gameEngine} />
+					<InventoryProvider>
+						<ItemDetailHigherOwnerGuard />
+						<InventoryHigherOwnerGuard />
+						<div
+							className="relative isolate z-0 size-full min-h-0 min-w-0"
+							data-ui="TileScene"
+							style={{
+								viewTransitionName: gameBoardViewTransitionName,
+							}}
+						>
+							<TileSystemProvider>
+								{children}
+								<InventoryHost />
+							</TileSystemProvider>
+						</div>
+						<ItemDetailModal />
+						<CheatItemSpotlight game={gameEngine} />
+					</InventoryProvider>
 				</ItemDetailProvider>
 				<GameMenu game={gameEngine} />
 			</GameMenuProvider>

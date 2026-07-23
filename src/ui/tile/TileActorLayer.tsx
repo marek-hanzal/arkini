@@ -105,7 +105,7 @@ const TileActorLayerComponent = () => {
 	return (
 		<div
 			ref={registerActorLayer}
-			className="pointer-events-none absolute inset-0 z-10 overflow-visible"
+			className="pointer-events-none absolute inset-0 overflow-visible"
 			data-ui="TileActorLayer"
 		>
 			<TileActorRetentionContext.Provider value={retention.retainActorIds}>

@@ -58,11 +58,36 @@ export const TileSystemProvider = ({ children }: PropsWithChildren) => {
 		readPreviewSequence,
 		refreshActivePreview: interaction.refreshActivePreview,
 	});
+	const registerSurface = useCallback(
+		(
+			surface: Parameters<typeof geometry.registerSurface>[0],
+			node: Parameters<typeof geometry.registerSurface>[1],
+		) => {
+			const unregistered = geometry.registerSurface(surface, node);
+			const active = interaction.readActive();
+			if (
+				!unregistered ||
+				active === null ||
+				(active.phase !== "pressed" && active.phase !== "dragging")
+			) {
+				return unregistered;
+			}
+			interaction.resetInteraction();
+			neighbourField.clearNeighbourField();
+			return unregistered;
+		},
+		[
+			geometry.registerSurface,
+			interaction.readActive,
+			interaction.resetInteraction,
+			neighbourField.clearNeighbourField,
+		],
+	);
 	const api = useMemo<TileSystemApi>(
 		() => ({
 			geometryVersion: geometry.geometryVersion,
 			registerActorLayer: geometry.registerActorLayer,
-			registerSurface: geometry.registerSurface,
+			registerSurface,
 			registerSlot: geometry.registerSlot,
 			readActorLayerRect: geometry.readActorLayerRect,
 			readPlacement: geometry.readPlacement,
@@ -93,7 +118,6 @@ export const TileSystemProvider = ({ children }: PropsWithChildren) => {
 			geometry.readPlacement,
 			geometry.registerActorLayer,
 			geometry.registerSlot,
-			geometry.registerSurface,
 			interaction.cancel,
 			interaction.complete,
 			interaction.moveDrag,
@@ -114,6 +138,7 @@ export const TileSystemProvider = ({ children }: PropsWithChildren) => {
 			neighbourField.setNeighbourSemanticSource,
 			neighbourField.setNeighbourTravelTarget,
 			neighbourField.updateNeighbourActor,
+			registerSurface,
 		],
 	);
 	const selection = useMemo<TileInteractionSubscription>(

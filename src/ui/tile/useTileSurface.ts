@@ -7,7 +7,9 @@ import { useTileSurfaceSystem } from "~/ui/tile/useTileSurfaceSystem";
 export const useTileSurface = (surface: TileSurface) => {
 	const { registerSurface } = useTileSurfaceSystem();
 	return useCallback(
-		(node: HTMLElement | null) => registerSurface(surface, node),
+		(node: HTMLElement | null) => {
+			registerSurface(surface, node);
+		},
 		[
 			registerSurface,
 			surface,

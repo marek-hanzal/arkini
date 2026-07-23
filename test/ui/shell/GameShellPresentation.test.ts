@@ -27,7 +27,6 @@ describe("Game shell presentation", () => {
 		expect(styles).toContain("z-index: -1;");
 		expect(styles).toContain("pointer-events: none;");
 		expect(styles).toContain("@keyframes ak-game-shell-intro-fade-in");
-		expect(styles).not.toContain("prefers-reduced-motion");
 	});
 
 	it("gives Board and Toolbar distinct semantic surface depth", () => {

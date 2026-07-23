@@ -1,5 +1,6 @@
 import { Effect } from "effect";
 
+import { ItemEnumSchema } from "~/engine/item/schema/ItemEnumSchema";
 import { isLineOwnerItem } from "~/engine/line/read/isLineOwnerItem";
 import { readLineOwnerLines } from "~/engine/line/read/readLineOwnerLines";
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
@@ -12,6 +13,9 @@ export namespace readRuntimeItemPrimaryActionFx {
 		  }
 		| {
 				readonly kind: "open-lines";
+		  }
+		| {
+				readonly kind: "open-inventory";
 		  }
 		| {
 				readonly kind: "start-default-line";
@@ -27,6 +31,11 @@ export namespace readRuntimeItemPrimaryActionFx {
 /** Resolves the canonical single-click action of one exact live item. */
 export const readRuntimeItemPrimaryActionFx = Effect.fn("readRuntimeItemPrimaryActionFx")(
 	function* ({ item, runtime }: readRuntimeItemPrimaryActionFx.Props) {
+		if (item.item.type === ItemEnumSchema.enum.Inventory) {
+			return {
+				kind: "open-inventory" as const,
+			} satisfies readRuntimeItemPrimaryActionFx.Result;
+		}
 		if (!isLineOwnerItem(item.item)) {
 			return {
 				kind: "none" as const,

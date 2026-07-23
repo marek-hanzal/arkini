@@ -7,7 +7,6 @@ import { isSameGridLocation } from "~/engine/location/read/isSameGridLocation";
 import { commitMergeItemsFx } from "~/engine/merge/internal/commitMergeItemsFx";
 import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
 import { readDropItemPreviewFx } from "~/engine/runtime/read/readDropItemPreviewFx";
-import { isGridRuntimeItem } from "~/engine/runtime/read/isGridRuntimeItem";
 import type { DropItemResultSchema } from "~/engine/runtime/schema/command/DropItemResultSchema";
 import { DropItemIgnoredReasonEnumSchema } from "~/engine/runtime/schema/command/DropItemIgnoredReasonEnumSchema";
 import { DropItemRejectedReasonEnumSchema } from "~/engine/runtime/schema/command/DropItemRejectedReasonEnumSchema";
@@ -152,7 +151,8 @@ export const dropItemFx = Effect.fn("dropItemFx")(function* ({
 		);
 	}
 
-	const targetItemId = target.occupant.itemId;
+	const targetOccupant = target.occupant;
+	const targetItemId = targetOccupant.itemId;
 	const preflight = yield* readDropItemPreviewFx({
 		sourceItemId,
 		sourceRevision,
@@ -172,7 +172,7 @@ export const dropItemFx = Effect.fn("dropItemFx")(function* ({
 			sourceItemId,
 			sourceRevision,
 			targetItemId,
-			targetRevision: target.occupant.revision,
+			targetRevision: targetOccupant.revision,
 		}).pipe(
 			Effect.map(
 				(result): dropItemFx.Result => ({
@@ -263,7 +263,7 @@ export const dropItemFx = Effect.fn("dropItemFx")(function* ({
 		return yield* Effect.gen(function* () {
 			const stored = yield* storeInputMaterialFx({
 				ownerItemId: targetItemId,
-				ownerItemRevision: target.occupant.revision,
+				ownerItemRevision: targetOccupant.revision,
 				expectedOwnerLocation: target.location,
 				lineId: preflight.lineId,
 				inputIndex: preflight.inputIndex,
@@ -285,9 +285,7 @@ export const dropItemFx = Effect.fn("dropItemFx")(function* ({
 					previousLocation: stored.sourceBefore.location,
 					previousQuantity: stored.sourceBefore.quantity,
 					current:
-						stored.sourceItem === undefined
-							? null
-							: mergeActorState(stored.sourceItem),
+						stored.sourceItem === undefined ? null : mergeActorState(stored.sourceItem),
 				},
 				owner: {
 					itemId: stored.ownerItem.id,
@@ -401,8 +399,8 @@ export const dropItemFx = Effect.fn("dropItemFx")(function* ({
 					kind: DropItemResultKindEnumSchema.enum.Reject,
 					reason:
 						error.itemId === targetItemId
-							? (DropItemRejectedReasonEnumSchema.enum.InvalidTarget)
-							: (DropItemRejectedReasonEnumSchema.enum.InvalidSource),
+							? DropItemRejectedReasonEnumSchema.enum.InvalidTarget
+							: DropItemRejectedReasonEnumSchema.enum.InvalidSource,
 					itemId: sourceItemId,
 					targetItemId,
 				}),

@@ -56,9 +56,7 @@ export namespace readDropItemPreviewFx {
 		  };
 }
 
-const rejected = (
-	reason: DropItemRejectedReasonEnumSchema.Type,
-): readDropItemPreviewFx.Result => ({
+const rejected = (reason: DropItemRejectedReasonEnumSchema.Type): readDropItemPreviewFx.Result => ({
 	kind: DropItemResultKindEnumSchema.enum.Reject,
 	reason,
 });
@@ -96,8 +94,9 @@ export const readDropItemPreviewFx = Effect.fn("readDropItemPreviewFx")(function
 		} satisfies readDropItemPreviewFx.Result;
 	}
 
-	const targetItem = runtime.items.find((item) => item.id === target.occupant.itemId);
-	if (targetItem === undefined || targetItem.revision !== target.occupant.revision) {
+	const targetOccupant = target.occupant;
+	const targetItem = runtime.items.find((item) => item.id === targetOccupant.itemId);
+	if (targetItem === undefined || targetItem.revision !== targetOccupant.revision) {
 		return rejected(DropItemRejectedReasonEnumSchema.enum.StaleTarget);
 	}
 	if (!isGridRuntimeItem(targetItem)) {
@@ -119,7 +118,11 @@ export const readDropItemPreviewFx = Effect.fn("readDropItemPreviewFx")(function
 		: isBoardRuntimeItem(targetItem)
 			? targetItem
 			: undefined;
-	if (oneBoardItem && boardItem !== undefined && boardItem.location.space !== runtime.currentSpace) {
+	if (
+		oneBoardItem &&
+		boardItem !== undefined &&
+		boardItem.location.space !== runtime.currentSpace
+	) {
 		return rejected(DropItemRejectedReasonEnumSchema.enum.InvalidTarget);
 	}
 	if (targetItem.location.scope === LocationScopeEnumSchema.enum.Board) {

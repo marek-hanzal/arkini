@@ -17,6 +17,8 @@ export namespace applyInputMaterialStorePlanFx {
 		runtime: RuntimeSchema.Type;
 		source: GridRuntimeItemSchema.Type;
 	}
+
+	export type Result = Pick<InputMaterialStoreResultSchema.Type, "sourceItem" | "storedItem">;
 }
 
 /**
@@ -42,7 +44,7 @@ export const applyInputMaterialStorePlanFx = Effect.fn("applyInputMaterialStoreP
 			}),
 		} satisfies RuntimeSchema.Type;
 
-		const result: InputMaterialStoreResultSchema.Type = {
+		const result: applyInputMaterialStorePlanFx.Result = {
 			storedItem,
 		};
 
@@ -74,7 +76,7 @@ export const applyInputMaterialStorePlanFx = Effect.fn("applyInputMaterialStoreP
 		],
 	} satisfies RuntimeSchema.Type;
 
-	const result: InputMaterialStoreResultSchema.Type = {
+	const result: applyInputMaterialStorePlanFx.Result = {
 		sourceItem,
 		storedItem,
 	};

@@ -19,6 +19,9 @@ interface MockMotionValue<T> {
 	jump: (value: T) => void;
 }
 
+const isMockMotionValue = (value: unknown): value is MockMotionValue<number> =>
+	typeof value === "object" && value !== null && "get" in value;
+
 interface MockDragBinding {
 	readonly node: HTMLElement;
 	readonly x: MockMotionValue<number>;
@@ -424,13 +427,7 @@ const createMotionComponent = <TElement extends ElementType>(element: TElement) 
 
 		useEffect(() => {
 			const scale = motionStyle?.scale;
-			if (
-				ui === null ||
-				runtimeId === null ||
-				scale === undefined ||
-				typeof scale !== "object" ||
-				typeof scale.get !== "function"
-			) {
+			if (ui === null || runtimeId === null || !isMockMotionValue(scale)) {
 				return;
 			}
 			const key = `${ui}:${runtimeId}`;

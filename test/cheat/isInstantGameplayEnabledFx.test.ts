@@ -14,6 +14,7 @@ describe("isInstantGameplayEnabledFx", () => {
 						...runtime,
 						cheats: {
 							enabled: true,
+							everEnabled: true,
 							instantGameplay: true,
 						},
 					},
@@ -27,6 +28,7 @@ describe("isInstantGameplayEnabledFx", () => {
 						...runtime,
 						cheats: {
 							enabled: false,
+							everEnabled: false,
 							instantGameplay: true,
 						},
 					},

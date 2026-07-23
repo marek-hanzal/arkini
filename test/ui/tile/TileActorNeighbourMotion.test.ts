@@ -118,7 +118,9 @@ afterEach(async () => {
 describe("useTileActorNeighbourMotion", () => {
 	it("keeps one stable node registration while updating actor metadata", async () => {
 		const unregister = vi.fn();
-		const registerNeighbourActor = vi.fn(() => unregister);
+		const registerNeighbourActor = vi.fn<TileSystem["registerNeighbourActor"]>(
+			() => unregister,
+		);
 		const updateNeighbourActor = vi.fn();
 		systemState.system = {
 			registerNeighbourActor,
@@ -207,7 +209,9 @@ describe("useTileActorNeighbourMotion", () => {
 	it("unregisters the node, stops travel, and resets values on teardown", async () => {
 		const unregister = vi.fn();
 		const stopTravel = vi.fn();
-		const registerNeighbourActor = vi.fn(() => unregister);
+		const registerNeighbourActor = vi.fn<TileSystem["registerNeighbourActor"]>(
+			() => unregister,
+		);
 		systemState.system = {
 			registerNeighbourActor,
 			updateNeighbourActor: vi.fn(),

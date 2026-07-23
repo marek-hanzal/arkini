@@ -2,7 +2,7 @@
 
 This document is mandatory. It is not a collection of optional style preferences.
 
-Engine paths are relative to `src/engine` unless written explicitly. `src/bridge/<domain>/<operation>` is the only legal React-to-engine connection. Reusable presentation and transient interaction code lives under `src/ui`; route-level visual composition lives under `src/page`; TanStack Router registration plus `beforeLoad`/loader/redirect/context orchestration lives under `src/@routes`. `electron/` is the explicit main/preload platform boundary and may not import renderer or engine roots; renderer code may not import Electron. `src/_archive` is historical reference only and may never be imported by active code or tests.
+Engine paths are relative to `src/engine` unless written explicitly. `src/bridge/<domain>/<operation>` is the only legal React-to-engine connection. Reusable presentation and transient interaction code lives under `src/ui`; route-level visual composition lives under `src/page`; TanStack Router registration plus `beforeLoad`/loader/redirect/context orchestration lives under `src/@routes`. `electron/` is the explicit main/preload platform boundary and may not import renderer or engine roots; renderer code may not import Electron.
 
 ## 1. The `*Fx` rule is absolute
 

@@ -20,8 +20,6 @@ The selected game renders canonical Board, Inventory, and Toolbar slot and hit g
 
 The canonical runtime architecture is considered stable. Do not redesign it without a concrete requirement or reproduced defect.
 
-The historical implementation under [`src/_archive`](src/_archive) is reference-only and outside every active TypeScript, test, formatter, bundler, and Dependency Cruiser root. It is not importable from active code and is not a source of current architecture, naming, runtime, configuration, time, save, or UI decisions.
-
 ## Read this first
 
 The active documentation surface is deliberately small. Read it in this order:
@@ -31,8 +29,6 @@ The active documentation surface is deliberately small. Read it in this order:
 3. [`CODE_GUIDE.md`](CODE_GUIDE.md) — mandatory code grammar and review rules.
 4. [`CONFIG.md`](CONFIG.md) — game authoring, compiler, validation, schema, and packing.
 5. [`GAME.MD`](GAME.MD) — implemented gameplay semantics.
-6. [`@chat-gpt/README.md`](@chat-gpt/README.md) — durable LLM instructions and historical-oracle policy.
-
 GitHub Issues are the only active backlog and continuation map. No repository Markdown file may act as a second current-status queue.
 
 When documentation and implementation disagree, stop and resolve the contradiction. Do not quietly choose whichever version makes the current task easier.
@@ -61,8 +57,6 @@ src/@routes
 Renderer dependencies form an explicit DAG: `@routes → {page, ui, bridge}`, `page → ui`, `ui → bridge`, and `bridge → engine`. [Route modules](src/@routes) may orchestrate public bridge lifecycle Effects but never import the engine directly; lower layers never import route registration. [`electron/`](electron) is a sibling platform boundary and may not import the renderer or engine roots. [`src/router.tsx`](src/router.tsx) creates the router from the [generated tree](src/_route.ts) and [`src/main.tsx`](src/main.tsx) is the sole renderer entrypoint.
 
 Documentation may abbreviate engine-owned paths such as `runtime/`, `tick/`, and `placement/`; they mean the corresponding directory under [`src/engine`](src/engine). Presentation-owned paths are written explicitly.
-
-[`src/_archive`](src/_archive) is historical reference only. It is intentionally excluded from active tooling and may never be imported by active source, CLI, or tests.
 
 ## Architecture in one screen
 

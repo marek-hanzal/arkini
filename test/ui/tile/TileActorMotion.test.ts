@@ -572,7 +572,7 @@ describe("useTileActorMotion", () => {
 				width: 800,
 				height: 600,
 			}),
-			readActorRect: (itemId) =>
+			readActorRect: (itemId: string) =>
 				itemId === "runtime:producer"
 					? {
 							left: 0,
@@ -657,7 +657,7 @@ describe("useTileActorMotion", () => {
 				width: 800,
 				height: 600,
 			}),
-			readActorRect: (itemId) =>
+			readActorRect: (itemId: string) =>
 				itemId === "runtime:producer"
 					? {
 							left: 0,

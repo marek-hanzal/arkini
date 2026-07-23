@@ -13,6 +13,7 @@ import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { startFx } from "~/engine/start/write/startFx";
 import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
+import { createTestGameTransitionFields } from "~test/support/game/createTestGameTransitionFields";
 import { testGameRead, testGameReadOrThrow } from "~test/support/game/testGameRead";
 
 (
@@ -224,7 +225,7 @@ const game = {
 		packageId: "test-package",
 		contentHash: "0".repeat(64),
 	},
-	getSnapshot: () => currentRuntime,
+	...createTestGameTransitionFields(() => currentRuntime),
 	getResourceUrl: (resourceId: string) => `resource:${resourceId}`,
 	subscribe: (listener: () => void) => {
 		listeners.add(listener);

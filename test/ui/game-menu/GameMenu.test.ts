@@ -23,6 +23,7 @@ import { GameMenuProvider } from "~/ui/game-menu/GameMenuProvider";
 import { gameMenuBackdropViewTransitionName } from "~/ui/navigation/gameMenuBackdropViewTransitionName";
 import { gameMenuDialogViewTransitionName } from "~/ui/navigation/gameMenuDialogViewTransitionName";
 import { testArkpackConfig } from "~test/bridge/arkpack/support/createTestArkpack";
+import { createTestGameTransitionFields } from "~test/support/game/createTestGameTransitionFields";
 import { motionTestRuntime } from "~test/ui/support/motionReactMock";
 import { testGameRead } from "~test/support/game/testGameRead";
 
@@ -93,10 +94,12 @@ const createGame = (
 	disposeWithoutSaveFx: Effect.void,
 	flushSaveFx,
 	getResourceUrl: () => "blob:test",
-	getSnapshot: () =>
-		(cheatEnabled ? gameSnapshots.enabled : gameSnapshots.disabled) as ReturnType<
-			Game["getSnapshot"]
-		>,
+	...createTestGameTransitionFields(
+		() =>
+			(cheatEnabled ? gameSnapshots.enabled : gameSnapshots.disabled) as ReturnType<
+				Game["getSnapshot"]
+			>,
+	),
 	read: testGameRead,
 	run: (() => Promise.reject(new Error("Not used by this test."))) as Game["run"],
 	subscribe: () => () => undefined,

@@ -11,6 +11,7 @@ import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
 import { TileActorContent } from "~/ui/tile/TileActorContent";
 import { TileMotionCueVisual } from "~/ui/tile/TileMotionCueVisual";
 import { readTileDeliveryTiming } from "~/ui/tile/readTileDeliveryTiming";
+import type { TileMotionCueSchema } from "~/ui/tile/schema/TileMotionCueSchema";
 import { useTileMotionCues } from "~/ui/tile/useTileMotionCues";
 import { motionTestRuntime } from "~test/ui/support/motionReactMock";
 
@@ -65,40 +66,58 @@ vi.mock("~/bridge/tile/useTileActorTransitionSource", () => ({
 
 const roots: Array<ReturnType<typeof createRoot>> = [];
 
-const item = (
+type BoardItem = useTileActors.Item & {
+	readonly location: Extract<
+		useTileActors.Item["location"],
+		{
+			readonly scope: "board";
+		}
+	>;
+};
+
+function item(id: string, scope?: "board", space?: number, quantity?: number): BoardItem;
+function item(
+	id: string,
+	scope: "inventory",
+	space?: number,
+	quantity?: number,
+): useTileActors.Item;
+function item(
 	id: string,
 	scope: "board" | "inventory" = "board",
 	space = 0,
 	quantity = 1,
-): useTileActors.Item => ({
-	id,
-	revision: `revision:${id}`,
-	itemId: `item:${id}`,
-	title: id,
-	quantity,
-	sourceUrl: `asset://${id}`,
-	location:
-		scope === "board"
-			? {
-					scope,
-					space,
-					position: {
-						x: 0,
-						y: 0,
+): useTileActors.Item {
+	return {
+		id,
+		revision: `revision:${id}`,
+		itemId: `item:${id}`,
+		title: id,
+		quantity,
+		sourceUrl: `asset://${id}`,
+		location:
+			scope === "board"
+				? {
+						scope,
+						space,
+						position: {
+							x: 0,
+							y: 0,
+						},
+					}
+				: {
+						scope,
+						position: {
+							x: 0,
+							y: 0,
+						},
 					},
-				}
-			: {
-					scope,
-					position: {
-						x: 0,
-						y: 0,
-					},
-				},
-	running: false,
-	primaryAction: {
-		kind: "none",
-	},
-});
+		running: false,
+		primaryAction: {
+			kind: "none",
+		},
+	};
+}
 
 const dispatch = async (
 	events: readTileActorTransitionFx.Result["events"],
@@ -151,7 +170,7 @@ describe("tile motion cue lifecycle", () => {
 				quantity: 1,
 			},
 		]);
-		let current: ReturnType<typeof useTileMotionCues> | null = null;
+		let current = null as ReturnType<typeof useTileMotionCues> | null;
 		const Capture = () => {
 			current = useTileMotionCues({
 				onSceneReset: vi.fn(),
@@ -189,7 +208,7 @@ describe("tile motion cue lifecycle", () => {
 				quantity: 1,
 			},
 		]);
-		let current: ReturnType<typeof useTileMotionCues> | null = null;
+		let current = null as ReturnType<typeof useTileMotionCues> | null;
 		const Capture = () => {
 			current = useTileMotionCues({
 				onSceneReset: vi.fn(),
@@ -205,7 +224,7 @@ describe("tile motion cue lifecycle", () => {
 
 		await act(async () => firstRoot.unmount());
 		roots.splice(roots.indexOf(firstRoot), 1);
-		current = null;
+		current = null as ReturnType<typeof useTileMotionCues> | null;
 
 		const secondContainer = document.createElement("div");
 		document.body.append(secondContainer);
@@ -245,7 +264,7 @@ describe("tile motion cue lifecycle", () => {
 	});
 
 	it("maps an existing identity placement to the shared spawn cue", async () => {
-		let current: ReturnType<typeof useTileMotionCues> | null = null;
+		let current = null as ReturnType<typeof useTileMotionCues> | null;
 		const liveItems = [
 			item("runtime:placed"),
 		];
@@ -287,7 +306,7 @@ describe("tile motion cue lifecycle", () => {
 	});
 
 	it("coalesces repeated impacts and ignores stale completion generations", async () => {
-		let current: ReturnType<typeof useTileMotionCues> | null = null;
+		let current = null as ReturnType<typeof useTileMotionCues> | null;
 		const liveItems = [
 			item("runtime:stack"),
 		];
@@ -343,7 +362,7 @@ describe("tile motion cue lifecycle", () => {
 	});
 
 	it("keeps the oldest unpresented stack quantity through rapid additions", async () => {
-		let current: ReturnType<typeof useTileMotionCues> | null = null;
+		let current = null as ReturnType<typeof useTileMotionCues> | null;
 		eventState.liveItems = [
 			item("runtime:stack", "board", 0, 1),
 		];
@@ -422,7 +441,7 @@ describe("tile motion cue lifecycle", () => {
 	});
 
 	it("serializes rapid stack deliveries from independent origins", async () => {
-		let current: ReturnType<typeof useTileMotionCues> | null = null;
+		let current = null as ReturnType<typeof useTileMotionCues> | null;
 		eventState.liveItems = [
 			item("runtime:stack", "board", 0, 1),
 		];
@@ -505,7 +524,7 @@ describe("tile motion cue lifecycle", () => {
 		eventState.liveItems = [
 			charged,
 		];
-		let current: ReturnType<typeof useTileMotionCues> | null = null;
+		let current = null as ReturnType<typeof useTileMotionCues> | null;
 		const Capture = () => {
 			current = useTileMotionCues({
 				onSceneReset: vi.fn(),
@@ -541,7 +560,7 @@ describe("tile motion cue lifecycle", () => {
 		eventState.liveItems = [
 			charged,
 		];
-		let current: ReturnType<typeof useTileMotionCues> | null = null;
+		let current = null as ReturnType<typeof useTileMotionCues> | null;
 		const Capture = () => {
 			current = useTileMotionCues({
 				onSceneReset: vi.fn(),
@@ -598,7 +617,7 @@ describe("tile motion cue lifecycle", () => {
 		eventState.liveItems = [
 			running,
 		];
-		let current: ReturnType<typeof useTileMotionCues> | null = null;
+		let current = null as ReturnType<typeof useTileMotionCues> | null;
 		const Capture = () => {
 			current = useTileMotionCues({
 				onSceneReset: vi.fn(),
@@ -646,7 +665,7 @@ describe("tile motion cue lifecycle", () => {
 		eventState.liveItems = [
 			absent,
 		];
-		let current: ReturnType<typeof useTileMotionCues> | null = null;
+		let current = null as ReturnType<typeof useTileMotionCues> | null;
 		const Capture = () => {
 			current = useTileMotionCues({
 				onSceneReset: vi.fn(),
@@ -723,7 +742,7 @@ describe("tile motion cue lifecycle", () => {
 		eventState.liveItems = [
 			targetA,
 		];
-		let current: ReturnType<typeof useTileMotionCues> | null = null;
+		let current = null as ReturnType<typeof useTileMotionCues> | null;
 		const Capture = () => {
 			current = useTileMotionCues({
 				onSceneReset: vi.fn(),
@@ -804,7 +823,7 @@ describe("tile motion cue lifecycle", () => {
 		eventState.liveItems = [
 			target,
 		];
-		let current: ReturnType<typeof useTileMotionCues> | null = null;
+		let current = null as ReturnType<typeof useTileMotionCues> | null;
 		const Capture = () => {
 			current = useTileMotionCues({
 				onSceneReset: vi.fn(),
@@ -879,7 +898,7 @@ describe("tile motion cue lifecycle", () => {
 		eventState.liveItems = [
 			targetA,
 		];
-		let current: ReturnType<typeof useTileMotionCues> | null = null;
+		let current = null as ReturnType<typeof useTileMotionCues> | null;
 		const Capture = () => {
 			current = useTileMotionCues({
 				onSceneReset: vi.fn(),
@@ -931,7 +950,7 @@ describe("tile motion cue lifecycle", () => {
 			item("runtime:input"),
 		];
 		eventState.liveItems = liveItems;
-		let current: ReturnType<typeof useTileMotionCues> | null = null;
+		let current = null as ReturnType<typeof useTileMotionCues> | null;
 		const Capture = () => {
 			current = useTileMotionCues({
 				onSceneReset: vi.fn(),
@@ -971,7 +990,7 @@ describe("tile motion cue lifecycle", () => {
 			item("runtime:owner"),
 		];
 		eventState.liveItems = liveItems;
-		let current: ReturnType<typeof useTileMotionCues> | null = null;
+		let current = null as ReturnType<typeof useTileMotionCues> | null;
 		const Capture = () => {
 			current = useTileMotionCues({
 				onSceneReset: vi.fn(),
@@ -1053,7 +1072,7 @@ describe("tile motion cue lifecycle", () => {
 			item("runtime:new"),
 		];
 		eventState.liveItems = [];
-		let current: ReturnType<typeof useTileMotionCues> | null = null;
+		let current = null as ReturnType<typeof useTileMotionCues> | null;
 		const Capture = () => {
 			current = useTileMotionCues({
 				onSceneReset: vi.fn(),
@@ -1100,7 +1119,7 @@ describe("tile motion cue lifecycle", () => {
 			item("runtime:receiver"),
 		];
 		eventState.liveItems = liveItems;
-		let current: ReturnType<typeof useTileMotionCues> | null = null;
+		let current = null as ReturnType<typeof useTileMotionCues> | null;
 		const Capture = () => {
 			current = useTileMotionCues({
 				onSceneReset: vi.fn(),
@@ -1144,7 +1163,7 @@ describe("tile motion cue lifecycle", () => {
 			item("runtime:deferred"),
 		];
 		eventState.liveItems = liveItems;
-		let current: ReturnType<typeof useTileMotionCues> | null = null;
+		let current = null as ReturnType<typeof useTileMotionCues> | null;
 		const Capture = () => {
 			current = useTileMotionCues({
 				onSceneReset: vi.fn(),
@@ -1182,7 +1201,7 @@ describe("tile motion cue lifecycle", () => {
 		let liveItems = [
 			item("runtime:removed"),
 		];
-		let current: ReturnType<typeof useTileMotionCues> | null = null;
+		let current = null as ReturnType<typeof useTileMotionCues> | null;
 		const onSceneReset = vi.fn();
 		const Capture = () => {
 			eventState.liveItems = liveItems;
@@ -1225,7 +1244,7 @@ describe("tile motion cue lifecycle", () => {
 		eventState.liveItems = [
 			removed,
 		];
-		let current: ReturnType<typeof useTileMotionCues> | null = null;
+		let current = null as ReturnType<typeof useTileMotionCues> | null;
 		const Capture = () => {
 			current = useTileMotionCues({
 				onSceneReset: vi.fn(),
@@ -1267,7 +1286,7 @@ describe("tile motion cue lifecycle", () => {
 			item("runtime:deplete-survives", "board", 0, 2),
 			item("runtime:deplete-exits"),
 		];
-		let current: ReturnType<typeof useTileMotionCues> | null = null;
+		let current = null as ReturnType<typeof useTileMotionCues> | null;
 		const Capture = () => {
 			eventState.liveItems = liveItems;
 			current = useTileMotionCues({
@@ -1321,7 +1340,7 @@ describe("tile motion cue lifecycle", () => {
 			item("runtime:completed-owner"),
 			item("runtime:spent-owner"),
 		];
-		let current: ReturnType<typeof useTileMotionCues> | null = null;
+		let current = null as ReturnType<typeof useTileMotionCues> | null;
 		const Capture = () => {
 			eventState.liveItems = liveItems;
 			current = useTileMotionCues({
@@ -1384,7 +1403,7 @@ describe("tile motion cue lifecycle", () => {
 			unrelated,
 		];
 		eventState.liveItems = liveItems;
-		let current: ReturnType<typeof useTileMotionCues> | null = null;
+		let current = null as ReturnType<typeof useTileMotionCues> | null;
 		const Capture = () => {
 			current = useTileMotionCues({
 				onSceneReset: vi.fn(),
@@ -1489,7 +1508,7 @@ describe("tile motion cue lifecycle", () => {
 		eventState.liveItems = [
 			producer,
 		];
-		let current: ReturnType<typeof useTileMotionCues> | null = null;
+		let current = null as ReturnType<typeof useTileMotionCues> | null;
 		const Capture = () => {
 			current = useTileMotionCues({
 				onSceneReset: vi.fn(),
@@ -1562,7 +1581,7 @@ describe("tile motion cue lifecycle", () => {
 		eventState.liveItems = [
 			producer,
 		];
-		let current: ReturnType<typeof useTileMotionCues> | null = null;
+		let current = null as ReturnType<typeof useTileMotionCues> | null;
 		const Capture = () => {
 			current = useTileMotionCues({
 				onSceneReset: vi.fn(),
@@ -1645,7 +1664,7 @@ describe("tile motion cue lifecycle", () => {
 		eventState.liveItems = [
 			producer,
 		];
-		let current: ReturnType<typeof useTileMotionCues> | null = null;
+		let current = null as ReturnType<typeof useTileMotionCues> | null;
 		const Capture = () => {
 			current = useTileMotionCues({
 				onSceneReset: vi.fn(),
@@ -1736,7 +1755,7 @@ describe("tile motion cue lifecycle", () => {
 			producer,
 			item("runtime:stacked", "board", 0, 1),
 		];
-		let current: ReturnType<typeof useTileMotionCues> | null = null;
+		let current = null as ReturnType<typeof useTileMotionCues> | null;
 		const Capture = () => {
 			current = useTileMotionCues({
 				onSceneReset: vi.fn(),
@@ -1818,7 +1837,7 @@ describe("tile motion cue lifecycle", () => {
 		let liveItems = [
 			item("runtime:outgoing"),
 		];
-		let current: ReturnType<typeof useTileMotionCues> | null = null;
+		let current = null as ReturnType<typeof useTileMotionCues> | null;
 		const onSceneReset = vi.fn();
 		const Capture = () => {
 			eventState.liveItems = liveItems;
@@ -1882,7 +1901,7 @@ describe("tile motion cue lifecycle", () => {
 		let liveItems = [
 			item("runtime:fallback"),
 		];
-		let current: ReturnType<typeof useTileMotionCues> | null = null;
+		let current = null as ReturnType<typeof useTileMotionCues> | null;
 		const onSceneReset = vi.fn();
 		const Capture = () => {
 			eventState.liveItems = liveItems;
@@ -1924,7 +1943,7 @@ describe("tile motion cue lifecycle", () => {
 		let liveItems = [
 			item("runtime:old-game"),
 		];
-		let current: ReturnType<typeof useTileMotionCues> | null = null;
+		let current = null as ReturnType<typeof useTileMotionCues> | null;
 		const onSceneReset = vi.fn();
 		const Capture = () => {
 			eventState.liveItems = liveItems;
@@ -1960,7 +1979,7 @@ describe("tile motion cue lifecycle", () => {
 	});
 
 	it("resets the scene and settles only the newly visible board space", async () => {
-		let current: ReturnType<typeof useTileMotionCues> | null = null;
+		let current = null as ReturnType<typeof useTileMotionCues> | null;
 		let liveItems = [
 			item("runtime:board:old"),
 			item("runtime:inventory", "inventory"),
@@ -2031,8 +2050,8 @@ describe("tile motion cue arbitration", () => {
 
 	const renderContent = async (
 		phase: "hovered" | "dragging" | "exiting",
-		onStart: ReturnType<typeof vi.fn>,
-		onComplete: ReturnType<typeof vi.fn>,
+		onStart: TileActorContent.Props["onCueStart"],
+		onComplete: TileActorContent.Props["onCueComplete"],
 	) => {
 		const container = document.createElement("div");
 		document.body.append(container);
@@ -2042,6 +2061,7 @@ describe("tile motion cue arbitration", () => {
 			root.render(
 				createElement(TileActorContent, {
 					item: item("runtime:arbitrated"),
+					registerActorNode: vi.fn(),
 					surfaceId: "board:0",
 					live: true,
 					exiting: phase === "exiting",
@@ -2115,6 +2135,7 @@ describe("tile motion cue arbitration", () => {
 				root.render(
 					createElement(TileActorContent, {
 						item: item("runtime:stack", "board", 0, 2),
+						registerActorNode: vi.fn(),
 						surfaceId: "board:0",
 						live: true,
 						exiting: false,
@@ -2204,6 +2225,7 @@ describe("tile motion cue arbitration", () => {
 				root.render(
 					createElement(TileActorContent, {
 						item: storedItem,
+						registerActorNode: vi.fn(),
 						surfaceId: "board:0",
 						live: true,
 						exiting: false,
@@ -2295,6 +2317,7 @@ describe("tile motion cue arbitration", () => {
 				root.render(
 					createElement(TileActorContent, {
 						item: committedItem,
+						registerActorNode: vi.fn(),
 						morphPreviousItem: previousItem,
 						surfaceId: "board:0",
 						live: true,
@@ -2361,6 +2384,7 @@ describe("tile motion cue arbitration", () => {
 				root.render(
 					createElement(TileActorContent, {
 						item: stackedItem,
+						registerActorNode: vi.fn(),
 						surfaceId: "board:0",
 						live: true,
 						exiting: false,
@@ -2430,6 +2454,7 @@ describe("tile motion cue arbitration", () => {
 			root.render(
 				createElement(TileActorContent, {
 					item: item("runtime:fallback", "board", 0, 2),
+					registerActorNode: vi.fn(),
 					surfaceId: "board:0",
 					live: true,
 					exiting: false,
@@ -2548,9 +2573,12 @@ describe("TileMotionCueVisual", () => {
 						mode: "play",
 						originOffset: null,
 						targetOffset: null,
+						spawnDeliveryTiming: null,
 						transferPayload: null,
 						onStart: vi.fn(),
-						onComplete: (generation) => completed.push(generation),
+						onComplete: (generation) => {
+							completed.push(generation);
+						},
 					},
 					createElement("span", null, "tile"),
 				),
@@ -2598,6 +2626,7 @@ describe("TileMotionCueVisual", () => {
 							x: 200,
 							y: 0,
 						},
+						spawnDeliveryTiming: null,
 						transferPayload: null,
 						onStart: vi.fn(),
 						onComplete: vi.fn(),
@@ -2656,6 +2685,7 @@ describe("TileMotionCueVisual", () => {
 						mode: "play",
 						originOffset,
 						targetOffset: null,
+						spawnDeliveryTiming: null,
 						transferPayload: null,
 						onStart: vi.fn(),
 						onComplete,
@@ -2735,6 +2765,7 @@ describe("TileMotionCueVisual", () => {
 							mode: "play",
 							originOffset,
 							targetOffset: null,
+							spawnDeliveryTiming: null,
 							transferPayload: null,
 							onStart: vi.fn(),
 							onComplete,
@@ -2789,6 +2820,7 @@ describe("TileMotionCueVisual", () => {
 							mode: "play",
 							originOffset: null,
 							targetOffset: null,
+							spawnDeliveryTiming: null,
 							transferPayload: null,
 							onStart: vi.fn(),
 							onComplete: vi.fn(),
@@ -2850,6 +2882,7 @@ describe("TileMotionCueVisual", () => {
 							x: 120,
 							y: 0,
 						},
+						spawnDeliveryTiming: null,
 						transferPayload: createElement(
 							"span",
 							{

@@ -170,7 +170,9 @@ describe("mergeItemsFx events", () => {
 			tickIntervalMs: 60_000,
 		});
 		const batches: GameEventBatchSchema.Type[] = [];
-		const unsubscribe = session.subscribeEvents((batch) => batches.push(batch));
+		const unsubscribe = session.subscribeEvents((batch) => {
+			batches.push(batch);
+		});
 
 		try {
 			const before = session.getSnapshot();

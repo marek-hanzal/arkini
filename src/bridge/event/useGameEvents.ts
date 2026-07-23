@@ -5,9 +5,13 @@ import type { GameEventBatchSchema } from "~/engine/event/schema/GameEventBatchS
 
 export { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
 
+export namespace useGameEvents {
+	export type Batch = GameEventBatchSchema.Type;
+}
+
 /** Subscribes one React presentation coordinator to committed transient event batches. */
 export const useGameEvents = (
-	listener: (batch: GameEventBatchSchema.Type) => void | PromiseLike<void>,
+	listener: (batch: useGameEvents.Batch) => void | PromiseLike<void>,
 ) => {
 	const game = useGameEngine();
 	const listenerRef = useRef(listener);

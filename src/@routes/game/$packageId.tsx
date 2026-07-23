@@ -1,6 +1,14 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 
 import { getCachedGameEngineResource } from "~/bridge/game/getCachedGameEngineResource";
+import { GameAudio } from "~/ui/audio/GameAudio";
+
+const GameRoute = () => (
+	<>
+		<GameAudio />
+		<Outlet />
+	</>
+);
 
 export const Route = createFileRoute("/game/$packageId")({
 	beforeLoad: ({ context, params }) => {
@@ -21,5 +29,5 @@ export const Route = createFileRoute("/game/$packageId")({
 	loader: ({ context }) => context.gameEngine,
 	staleTime: Number.POSITIVE_INFINITY,
 	gcTime: 0,
-	component: Outlet,
+	component: GameRoute,
 });

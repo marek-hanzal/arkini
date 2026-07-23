@@ -163,4 +163,59 @@ describe("useTileActorPointerMotion", () => {
 		expect(pointer.values.physical.y.get()).toBe(0);
 		expect(pointer.values.physical.rotation.get()).toBe(0);
 	});
+
+	it("hands the exact pointer pose to a terminal cue without resetting it", async () => {
+		motionTestRuntime.autoCompleteImperativeAnimations = false;
+		const pointer = await renderPointerMotion();
+		pointer.commands.armPickup({
+			x: -12,
+			y: 7,
+		});
+		pointer.commands.startPickup();
+		pointer.values.direct.x.set(48);
+		pointer.values.direct.y.set(12);
+		pointer.commands.updateResponse({
+			delta: {
+				x: 7,
+				y: 3,
+			},
+			velocity: {
+				x: 500,
+				y: 180,
+			},
+		});
+		const before = {
+			direct: {
+				x: pointer.values.direct.x.get(),
+				y: pointer.values.direct.y.get(),
+			},
+			pickup: {
+				x: pointer.values.pickup.x.get(),
+				y: pointer.values.pickup.y.get(),
+			},
+			physical: {
+				x: pointer.values.physical.x.get(),
+				y: pointer.values.physical.y.get(),
+				rotation: pointer.values.physical.rotation.get(),
+			},
+		};
+
+		pointer.commands.handoffToTerminalCue();
+
+		expect({
+			direct: {
+				x: pointer.values.direct.x.get(),
+				y: pointer.values.direct.y.get(),
+			},
+			pickup: {
+				x: pointer.values.pickup.x.get(),
+				y: pointer.values.pickup.y.get(),
+			},
+			physical: {
+				x: pointer.values.physical.x.get(),
+				y: pointer.values.physical.y.get(),
+				rotation: pointer.values.physical.rotation.get(),
+			},
+		}).toEqual(before);
+	});
 });

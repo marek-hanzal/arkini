@@ -6,6 +6,7 @@ import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { GameEngine } from "~/bridge/game/GameEngine";
+import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
 import { useGameFx } from "~/engine/game/fx/useGameFx";
 import { RuntimeFx } from "~/engine/runtime/context/RuntimeFx";
 import { DropItemRejectedReasonEnumSchema } from "~/engine/runtime/schema/command/DropItemRejectedReasonEnumSchema";
@@ -206,14 +207,17 @@ let currentTransition: CommittedTransitionSchema.Type = {
 	runtime: currentRuntime,
 	events: [],
 };
-const publishRuntime = (next: typeof runtime) => {
+const publishRuntime = (
+	next: typeof runtime,
+	events: CommittedTransitionSchema.Type["events"] = [],
+) => {
 	const previousRuntime = currentRuntime;
 	currentRuntime = next;
 	currentTransition = {
 		sequence: ++transitionSequence,
 		previousRuntime,
 		runtime: next,
-		events: [],
+		events,
 	};
 	for (const listener of runtimeListeners) listener();
 	for (const listener of transitionListeners) void listener(currentTransition);
@@ -1302,36 +1306,95 @@ describe("Board drag", () => {
 		expect(motionTestRuntime.readDragOffset()).toEqual(dragOffset);
 	});
 
-	it("releases the shared gesture when the dragged actor disappears autonomously", async () => {
+	it("hands an autonomously removed drag pose to its terminal cue before releasing it", async () => {
 		motionTestRuntime.autoComplete = false;
 		const source = await renderBoard();
 		const sourceId = source.dataset.runtimeId;
 		const dragSurface = source.querySelector<HTMLElement>('[data-ui="TileActorDragSurface"]');
-		if (sourceId === undefined || dragSurface === null) {
+		const cueVisual = source.querySelector<HTMLElement>('[data-ui="TileMotionCueVisual"]');
+		if (sourceId === undefined || dragSurface === null || cueVisual === null) {
 			throw new Error("Missing autonomously removed drag actor.");
 		}
 
 		await act(async () => {
 			dragSurface.dispatchEvent(pointerEvent("pointerdown", 250, 150));
-			dragSurface.dispatchEvent(pointerEvent("pointermove", 150, 50));
+			dragSurface.dispatchEvent(pointerEvent("pointermove", 298, 162));
+		});
+		motionTestRuntime.writeMotionOffset("TileActorPointer", sourceId, {
+			x: 48,
+			y: 12,
+		});
+		const pointerOffset = motionTestRuntime.readMotionOffset("TileActorPointer", sourceId);
+		const responseOffset = motionTestRuntime.readMotionOffset(
+			"TileActorPhysicalResponse",
+			sourceId,
+		);
+		expect(pointerOffset).toEqual({
+			x: 48,
+			y: 12,
+		});
+		expect(responseOffset).not.toEqual({
+			x: 0,
+			y: 0,
 		});
 
 		await act(async () => {
-			publishRuntime({
-				...currentRuntime,
-				items: currentRuntime.items.filter((item) => item.id !== sourceId),
-			});
+			const sourceItem = currentRuntime.items.find((item) => item.id === sourceId);
+			if (sourceItem?.location.scope !== "board")
+				throw new Error("Missing autonomously removed Board item.");
+			publishRuntime(
+				{
+					...currentRuntime,
+					items: currentRuntime.items.filter((item) => item.id !== sourceId),
+				},
+				[
+					{
+						type: GameEventEnumSchema.enum.ItemDepleted,
+						itemId: sourceId,
+						canonicalItemId: sourceItem.item.id,
+						location: sourceItem.location,
+						previousQuantity: sourceItem.quantity,
+						resultingQuantity: 0,
+					},
+				],
+			);
 			await Promise.resolve();
 			await Promise.resolve();
 		});
 
-		expect(document.querySelector(`[data-runtime-id="${sourceId}"]`)).toBeNull();
+		const retained = document.querySelector<HTMLElement>(`[data-runtime-id="${sourceId}"]`);
+		expect(retained).toBe(source);
+		expect(retained?.dataset.live).toBe("false");
+		expect(
+			retained
+				?.querySelector('[data-ui="TileMotionCueVisual"]')
+				?.getAttribute("data-motion-cue"),
+		).toBe("deplete-exit");
+		expect(motionTestRuntime.readMotionOffset("TileActorPointer", sourceId)).toEqual(
+			pointerOffset,
+		);
+		expect(motionTestRuntime.readMotionOffset("TileActorPhysicalResponse", sourceId)).toEqual(
+			responseOffset,
+		);
 
 		await act(async () => {
-			dragSurface.dispatchEvent(pointerEvent("pointerup", 150, 50));
+			dragSurface.dispatchEvent(pointerEvent("pointerup", 298, 162));
+			dragSurface.dispatchEvent(pointerEvent("pointercancel", 298, 162));
 			await Promise.resolve();
 		});
 		expect(dropItemState.drop).not.toHaveBeenCalled();
+		expect(motionTestRuntime.readMotionOffset("TileActorPointer", sourceId)).toEqual(
+			pointerOffset,
+		);
+		expect(motionTestRuntime.readMotionOffset("TileActorPhysicalResponse", sourceId)).toEqual(
+			responseOffset,
+		);
+
+		await act(async () => {
+			motionTestRuntime.finish(motionTestRuntime.completions.length - 1);
+			await Promise.resolve();
+		});
+		expect(document.querySelector(`[data-runtime-id="${sourceId}"]`)).toBeNull();
 
 		const next = document.querySelector<HTMLElement>(
 			'[data-ui="TileActor"][data-board-x="0"][data-board-y="1"]',
@@ -1354,6 +1417,100 @@ describe("Board drag", () => {
 		await act(async () => {
 			nextDragSurface.dispatchEvent(pointerEvent("pointercancel", 57, 157));
 		});
+	});
+
+	it("keeps a live drag source owned when its terminal target exits", async () => {
+		motionTestRuntime.autoComplete = false;
+		const source = await renderBoard();
+		const sourceId = source.dataset.runtimeId;
+		const sourceVisual = source.querySelector<HTMLElement>('[data-ui="TileActorVisual"]');
+		const dragSurface = source.querySelector<HTMLElement>('[data-ui="TileActorDragSurface"]');
+		const target = document.querySelector<HTMLElement>(
+			'[data-ui="TileActor"][data-board-x="0"][data-board-y="1"]',
+		);
+		const targetId = target?.dataset.runtimeId;
+		if (
+			sourceId === undefined ||
+			sourceVisual === null ||
+			dragSurface === null ||
+			target === null ||
+			targetId === undefined
+		) {
+			throw new Error("Missing terminal-target drag actors.");
+		}
+
+		await act(async () => {
+			dragSurface.dispatchEvent(pointerEvent("pointerdown", 250, 150));
+			dragSurface.dispatchEvent(pointerEvent("pointermove", 50, 150));
+		});
+		motionTestRuntime.writeMotionOffset("TileActorPointer", sourceId, {
+			x: -200,
+			y: 0,
+		});
+		expect(sourceVisual.dataset.motionPhase).toBe("dragging");
+		expect(target.dataset.motionPhase).toBe("combining");
+
+		await act(async () => {
+			const targetItem = currentRuntime.items.find((item) => item.id === targetId);
+			if (targetItem === undefined) throw new Error("Missing terminal target item.");
+			publishRuntime(
+				{
+					...currentRuntime,
+					items: currentRuntime.items.filter((item) => item.id !== targetId),
+				},
+				[
+					{
+						type: GameEventEnumSchema.enum.ItemExplicitlyRemoved,
+						itemId: targetId,
+						canonicalItemId: targetItem.item.id,
+						location: targetItem.location,
+						quantity: targetItem.quantity,
+					},
+				],
+			);
+			await Promise.resolve();
+			await Promise.resolve();
+		});
+
+		expect(document.querySelector(`[data-runtime-id="${sourceId}"]`)).toBe(source);
+		expect(sourceVisual.dataset.motionPhase).toBe("dragging");
+		expect(motionTestRuntime.readMotionOffset("TileActorPointer", sourceId)).toEqual({
+			x: -200,
+			y: 0,
+		});
+		expect(document.querySelector(`[data-runtime-id="${targetId}"]`)).toBe(target);
+		expect(target.dataset.live).toBe("false");
+		expect(
+			target
+				.querySelector('[data-ui="TileMotionCueVisual"]')
+				?.getAttribute("data-motion-cue"),
+		).toBe("exit");
+
+		await act(async () => {
+			dragSurface.dispatchEvent(pointerEvent("pointermove", 150, 150));
+		});
+		motionTestRuntime.writeMotionOffset("TileActorPointer", sourceId, {
+			x: -100,
+			y: 0,
+		});
+		expect(sourceVisual.dataset.motionPhase).toBe("dragging");
+
+		await act(async () => {
+			dragSurface.dispatchEvent(pointerEvent("pointercancel", 150, 150));
+			await Promise.resolve();
+		});
+		expect(dropItemState.drop).not.toHaveBeenCalled();
+		expect(sourceVisual.dataset.motionPhase).not.toBe("dragging");
+		expect(motionTestRuntime.readMotionOffset("TileActorPointer", sourceId)).toEqual({
+			x: 0,
+			y: 0,
+		});
+
+		await act(async () => {
+			motionTestRuntime.finish(...motionTestRuntime.completions.map((_, index) => index));
+			await Promise.resolve();
+		});
+		expect(document.querySelector(`[data-runtime-id="${targetId}"]`)).toBeNull();
 	});
 
 	it("opens one Item Detail modal from the exact live actor double-click", async () => {

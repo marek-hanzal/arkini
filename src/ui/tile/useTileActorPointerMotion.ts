@@ -63,6 +63,8 @@ export namespace useTileActorPointerMotion {
 		readonly startPickup: () => void;
 		readonly updateResponse: (info: Pick<PanInfo, "delta" | "velocity">) => void;
 		readonly cancel: () => void;
+		/** Releases gesture ownership while preserving the exact terminal-cue pose. */
+		readonly handoffToTerminalCue: () => void;
 		readonly release: (interactionGeneration: number) => ReleaseSnapshot;
 		readonly resetAfterHandoff: (pointerGeneration: number) => boolean;
 	}
@@ -147,6 +149,15 @@ export const useTileActorPointerMotion = () => {
 		resetPointerTranslation,
 	]);
 
+	const handoffToTerminalCue = useCallback(() => {
+		pointerGeneration.current += 1;
+		stopPickup();
+		physical.commands.freeze();
+	}, [
+		physical.commands,
+		stopPickup,
+	]);
+
 	const release = useCallback(
 		(interactionGeneration: number): useTileActorPointerMotion.ReleaseSnapshot => {
 			const direct = {
@@ -224,6 +235,7 @@ export const useTileActorPointerMotion = () => {
 			startPickup,
 			updateResponse: physical.commands.update,
 			cancel,
+			handoffToTerminalCue,
 			release,
 			resetAfterHandoff,
 		}),
@@ -231,6 +243,7 @@ export const useTileActorPointerMotion = () => {
 			armPickup,
 			cancel,
 			disarmPickup,
+			handoffToTerminalCue,
 			physical.commands.update,
 			release,
 			resetAfterHandoff,

@@ -95,6 +95,27 @@ export const useTileActorPhysicalResponse = () => {
 		targetY,
 	]);
 
+	const freeze = useCallback(() => {
+		stopReturnAnimations();
+		const frozenX = x.get();
+		const frozenY = y.get();
+		const frozenRotation = rotation.get();
+		targetX.jump(frozenX);
+		targetY.jump(frozenY);
+		targetRotation.jump(frozenRotation);
+		x.jump(frozenX);
+		y.jump(frozenY);
+		rotation.jump(frozenRotation);
+	}, [
+		rotation,
+		stopReturnAnimations,
+		targetRotation,
+		targetX,
+		targetY,
+		x,
+		y,
+	]);
+
 	const update = useCallback(
 		(info: Pick<PanInfo, "delta" | "velocity">) => {
 			const response = readTileDragElasticResponse(info);
@@ -158,11 +179,13 @@ export const useTileActorPhysicalResponse = () => {
 		() => ({
 			update,
 			release,
+			freeze,
 			cancel,
 			readSnapshot,
 		}),
 		[
 			cancel,
+			freeze,
 			readSnapshot,
 			release,
 			update,

@@ -37,6 +37,12 @@ const zIndexForCue = (cue: TileMotionCueSchema.Type | null) => {
 		.exhaustive();
 };
 
+const isTerminalCue = (cue: TileMotionCueSchema.Type | null) =>
+	cue?.kind === "exit" ||
+	cue?.kind === "consume-exit" ||
+	cue?.kind === "deplete-exit" ||
+	cue?.kind === "expiry";
+
 export namespace TileActor {
 	export interface Props {
 		readonly item: useTileActors.Item;
@@ -74,6 +80,7 @@ const TileActorComponent = ({
 	const drag = useTileActorDrag({
 		canonicalSource: presentation.canonicalSource,
 		live: interactive,
+		terminalCueActive: isTerminalCue(cue),
 		pointer: actorMotion.pointer.commands,
 	});
 	const pendingPrimaryAction = useRef<ReturnType<typeof setTimeout> | null>(null);

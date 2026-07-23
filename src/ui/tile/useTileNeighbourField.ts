@@ -161,7 +161,12 @@ export const useTileNeighbourField = ({
 	}, []);
 
 	const readStableActorRect = useCallback((registration: TileNeighbourActorRegistration) => {
-		const bounds = registration.node.getBoundingClientRect();
+		const firstChild = registration.node.firstElementChild;
+		const visualBody =
+			firstChild instanceof HTMLElement && firstChild.dataset.ui === "TileMotionCueVisual"
+				? firstChild
+				: registration.node;
+		const bounds = visualBody.getBoundingClientRect();
 		if (bounds.width <= 0 || bounds.height <= 0) return null;
 		return translatedRect(
 			bounds,

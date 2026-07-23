@@ -7,50 +7,29 @@ import { useRetainedTileActors } from "~/ui/tile/useRetainedTileActors";
 import { useTileActorLayerSystem } from "~/ui/tile/useTileActorLayerSystem";
 import { useTileMotionCues } from "~/ui/tile/useTileMotionCues";
 
-const interactionActorIds = (
+const terminalCueInterruptsInteraction = (
 	active: ReturnType<typeof useTileActorLayerSystem>["active"],
-): ReadonlySet<string> =>
+	itemId: string,
+): boolean =>
 	match(active)
-		.with(null, () => new Set<string>())
+		.with(null, () => false)
 		.with(
 			{
 				phase: "pressed",
 			},
-			({ source }) =>
-				new Set([
-					source.id,
-				]),
-		)
-		.with(
 			{
 				phase: "dragging",
 			},
-			({ source, target }) => {
-				const ids = new Set([
-					source.id,
-				]);
-				if (target?.kind === "slot" && target.occupant !== null)
-					ids.add(target.occupant.id);
-				return ids;
-			},
-		)
-		.with(
 			{
 				phase: "awaiting-outcome",
 			},
-			({ source, target }) => {
-				const ids = new Set([
-					source.id,
-				]);
-				if (target.kind === "slot" && target.occupant !== null) ids.add(target.occupant.id);
-				return ids;
-			},
+			({ source }) => source.id === itemId,
 		)
 		.with(
 			{
 				phase: "settling",
 			},
-			({ settlement }) => new Set(settlement.pendingActorIds),
+			({ settlement }) => settlement.pendingActorIds.includes(itemId),
 		)
 		.exhaustive();
 
@@ -70,14 +49,13 @@ const TileActorLayerComponent = () => {
 	});
 	const liveItems = motionCues.liveItems;
 	useEffect(() => {
-		const protectedIds = interactionActorIds(active);
 		for (const [itemId, cue] of motionCues.cues) {
 			if (
 				(cue.kind === "exit" ||
 					cue.kind === "consume-exit" ||
 					cue.kind === "deplete-exit" ||
 					cue.kind === "expiry") &&
-				protectedIds.has(itemId)
+				terminalCueInterruptsInteraction(active, itemId)
 			) {
 				resetScene();
 				return;

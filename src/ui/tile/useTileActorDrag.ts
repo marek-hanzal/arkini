@@ -99,10 +99,12 @@ const targetForOutcome = (target: TileDropTarget, outcome: useDropItem.Result | 
 export const useTileActorDrag = ({
 	canonicalSource,
 	live,
+	terminalCueActive,
 	pointer,
 }: {
 	readonly canonicalSource: TileDragSource;
 	readonly live: boolean;
+	readonly terminalCueActive: boolean;
 	readonly pointer: useTileActorPointerMotion.Control;
 }) => {
 	const retainActorIds = useTileActorRetention();
@@ -193,8 +195,9 @@ export const useTileActorDrag = ({
 	);
 
 	const onPointerUp = useCallback(() => {
-		pointerOwned.current = false;
+		if (!pointerOwned.current) return;
 		if (dragStarted.current) return;
+		pointerOwned.current = false;
 		dragStarted.current = false;
 		pointer.disarmPickup();
 		clearTransientDragMotion();
@@ -207,6 +210,7 @@ export const useTileActorDrag = ({
 	]);
 
 	const onPointerCancel = useCallback(() => {
+		if (!pointerOwned.current) return;
 		pointerOwned.current = false;
 		dragStarted.current = false;
 		pointer.cancel();
@@ -223,6 +227,7 @@ export const useTileActorDrag = ({
 
 	const onDragStart = useCallback(
 		(_event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
+			if (!pointerOwned.current) return;
 			dragStarted.current = true;
 			suppressClick.current = true;
 			startDrag(canonicalSource);
@@ -241,6 +246,7 @@ export const useTileActorDrag = ({
 
 	const onDrag = useCallback(
 		(_event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
+			if (!pointerOwned.current) return;
 			updateTransientDragMotion(info);
 		},
 		[
@@ -250,6 +256,7 @@ export const useTileActorDrag = ({
 
 	const onDragEnd = useCallback(
 		async (_event: MouseEvent | TouchEvent | PointerEvent, _info: PanInfo) => {
+			if (!pointerOwned.current) return;
 			pointerOwned.current = false;
 			const released = release(canonicalSource.id);
 			if (released === null) {
@@ -340,7 +347,8 @@ export const useTileActorDrag = ({
 		if (live && active?.source.id === canonicalSource.id) return;
 		pointerOwned.current = false;
 		dragStarted.current = false;
-		pointer.cancel();
+		if (terminalCueActive) pointer.handoffToTerminalCue();
+		else pointer.cancel();
 		clearTransientDragMotion();
 		dragControls.cancel();
 		cancel(canonicalSource.id);
@@ -352,6 +360,7 @@ export const useTileActorDrag = ({
 		dragControls,
 		live,
 		pointer,
+		terminalCueActive,
 	]);
 
 	const consumeClickSuppression = useCallback(() => {

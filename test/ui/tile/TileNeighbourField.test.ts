@@ -287,6 +287,44 @@ describe("Tile neighbour field", () => {
 		endTravel();
 	});
 
+	it("follows a travelling cue body instead of its static interaction shell", async () => {
+		const neighbourField = await renderField();
+		const sourceNode = actorNode({
+			bounds: rect(0, 0),
+		});
+		let cueBounds = rect(320, 0);
+		const cueBody = document.createElement("span");
+		cueBody.dataset.ui = "TileMotionCueVisual";
+		cueBody.getBoundingClientRect = () => cueBounds;
+		sourceNode.append(cueBody);
+		register(neighbourField, "source", sourceNode);
+		const nearShell = register(
+			neighbourField,
+			"near-shell",
+			actorNode({
+				bounds: rect(80, 0),
+			}),
+		);
+		const nearBody = register(
+			neighbourField,
+			"near-body",
+			actorNode({
+				bounds: rect(400, 0),
+			}),
+		);
+		const endTravel = neighbourField.beginNeighbourTravel("source");
+
+		expect(nearShell.x.read()).toBe(0);
+		expect(nearBody.x.read()).toBeGreaterThan(0);
+
+		cueBounds = rect(0, 0);
+		neighbourField.refreshNeighbourField();
+		expect(nearShell.x.read()).toBeGreaterThan(0);
+		expect(nearBody.x.read()).toBe(0);
+
+		endTravel();
+	});
+
 	it("suppresses direct targets, other surfaces, exiting actors, and zero vectors", async () => {
 		const neighbourField = await renderField();
 		register(

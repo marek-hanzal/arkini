@@ -111,12 +111,6 @@ beforeEach(() => {
 		configurable: true,
 		value: vi.fn(),
 	});
-	Object.defineProperty(window, "matchMedia", {
-		configurable: true,
-		value: vi.fn(() => ({
-			matches: true,
-		})),
-	});
 	Object.defineProperty(document, "getAnimations", {
 		configurable: true,
 		value: vi.fn(() => []),

@@ -248,6 +248,13 @@ describe("releaseOwnerInputsFx existing identity", () => {
 		});
 		expect(result.events).toEqual([
 			{
+				type: GameEventEnumSchema.enum.ItemExplicitlyRemoved,
+				itemId: boardOwner.id,
+				canonicalItemId: boardOwner.itemId,
+				location: boardOwner.location,
+				quantity: boardOwner.quantity,
+			},
+			{
 				type: GameEventEnumSchema.enum.ItemPlaced,
 				itemId: "runtime:worker",
 				canonicalItemId: "worker",
@@ -261,7 +268,10 @@ describe("releaseOwnerInputsFx existing identity", () => {
 				location: {
 					scope: "board",
 					space: 2,
-					position: { x: 0, y: 0 },
+					position: {
+						x: 0,
+						y: 0,
+					},
 				},
 				quantity: 1,
 			},
@@ -315,6 +325,13 @@ describe("releaseOwnerInputsFx existing identity", () => {
 		});
 		expect(result.events).toEqual([
 			{
+				type: GameEventEnumSchema.enum.ItemExplicitlyRemoved,
+				itemId: boardOwner.id,
+				canonicalItemId: boardOwner.itemId,
+				location: boardOwner.location,
+				quantity: boardOwner.quantity,
+			},
+			{
 				type: GameEventEnumSchema.enum.ItemStacked,
 				itemId: "runtime:material-stack",
 				canonicalItemId: "material",
@@ -322,7 +339,10 @@ describe("releaseOwnerInputsFx existing identity", () => {
 				location: {
 					scope: "board",
 					space: 2,
-					position: { x: 1, y: 0 },
+					position: {
+						x: 1,
+						y: 0,
+					},
 				},
 				previousQuantity: 2,
 				quantity: 5,

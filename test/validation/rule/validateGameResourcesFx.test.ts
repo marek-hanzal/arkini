@@ -218,6 +218,7 @@ describe("validateGameResourcesFx", () => {
 					"asset:tree",
 					"asset:log",
 					"asset:lens",
+					"asset:backpack",
 					"blueprint",
 				].map((id) => ({
 					id,

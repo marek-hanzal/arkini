@@ -6,6 +6,7 @@ import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { GameEngine } from "~/bridge/game/GameEngine";
+import { GameConfigFx } from "~/engine/game/context/GameConfigFx";
 import { useGameFx } from "~/engine/game/fx/useGameFx";
 import { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
@@ -15,7 +16,7 @@ import { ItemDetailModal } from "~/ui/item-detail/ItemDetailModal";
 import { ItemDetailProvider } from "~/ui/item-detail/ItemDetailProvider";
 import { useItemDetailControl } from "~/ui/item-detail/useItemDetailControl";
 import { motionTestRuntime } from "~test/ui/support/motionReactMock";
-import { testGameRead, testGameReadOrThrow } from "~test/support/game/testGameRead";
+import { testGameRead } from "~test/support/game/testGameRead";
 import { JobStatusEnumSchema } from "~/engine/job/schema/read/JobStatusEnumSchema";
 
 (
@@ -151,11 +152,16 @@ const initialRuntime = Effect.runSync(
 	),
 );
 let currentRuntime = initialRuntime;
+let claimedTilePresentationSequence = -1;
 const runtimeListeners = new Set<() => void>();
 const publishRuntime = (runtime: RuntimeSchema.Type) => {
 	currentRuntime = runtime;
 	for (const listener of runtimeListeners) listener();
 };
+
+const readOrThrowWithConfig = <Result, Error>(
+	effect: Effect.Effect<Result, Error, GameConfigFx>,
+): Result => Effect.runSync(effect.pipe(Effect.provideService(GameConfigFx, config)));
 
 const game = {
 	arkpack: {
@@ -173,14 +179,36 @@ const game = {
 		contentHash: "0".repeat(64),
 	},
 	getSnapshot: () => currentRuntime,
+	getTransitionSnapshot: () => ({
+		sequence: 0,
+		previousRuntime: null,
+		runtime: currentRuntime,
+		events: [],
+	}),
+	canClaimTilePresentationTransition: (sequence: number) =>
+		sequence > claimedTilePresentationSequence,
+	claimTilePresentationTransition: (sequence: number) => {
+		if (sequence <= claimedTilePresentationSequence) return false;
+		claimedTilePresentationSequence = sequence;
+		return true;
+	},
 	getResourceUrl: (resourceId: string) => `resource:${resourceId}`,
 	subscribe: (listener: () => void) => {
 		runtimeListeners.add(listener);
 		return () => runtimeListeners.delete(listener);
 	},
+	subscribeTransitions: (listener) => {
+		void listener({
+			sequence: 0,
+			previousRuntime: null,
+			runtime: currentRuntime,
+			events: [],
+		});
+		return () => undefined;
+	},
 	subscribeEvents: () => () => undefined,
 	read: testGameRead,
-	readOrThrow: testGameReadOrThrow,
+	readOrThrow: readOrThrowWithConfig as GameEngine["readOrThrow"],
 	run: (() => Promise.reject(new Error("Not used by this test."))) as GameEngine["run"],
 	disposeFx: Effect.void,
 	disposeWithoutSaveFx: Effect.void,
@@ -204,6 +232,7 @@ const Probe = ({ onControl }: { readonly onControl: (control: ItemDetailControl)
 beforeEach(() => {
 	motionTestRuntime.reset();
 	currentRuntime = initialRuntime;
+	claimedTilePresentationSequence = -1;
 	runtimeListeners.clear();
 	gameEngineState.game = game;
 });
@@ -367,6 +396,32 @@ describe("ItemDetailModal", () => {
 		});
 		expect(modal.dataset.runtimeId).toBeUndefined();
 		expect(document.querySelector('[data-ui="ItemDefinitionInfoTab"]')).not.toBeNull();
+		expect(
+			Array.from(
+				document.querySelectorAll<HTMLElement>('[data-ui="ItemDetailTabs"] button'),
+			).map((tab) => tab.dataset.tab),
+		).toEqual([
+			"info",
+			"sources",
+		]);
+
+		const sourcesTab = document.querySelector<HTMLButtonElement>('[data-tab="sources"]');
+		if (sourcesTab === null) throw new Error("Missing definition Sources tab.");
+		await act(async () => {
+			sourcesTab.click();
+			await Promise.resolve();
+		});
+		expect(readControl().state).toMatchObject({
+			phase: "open",
+			generation: shellGeneration.generation,
+			target: {
+				kind: "definition",
+				itemId: "water",
+				tab: "sources",
+			},
+		});
+		expect(modal.dataset.runtimeId).toBeUndefined();
+		expect(document.querySelector('[data-ui="ItemSource"]')?.textContent).toContain("Workshop");
 	});
 
 	it("keeps the modal shell stable when an output has only configured definition detail", async () => {
@@ -411,6 +466,16 @@ describe("ItemDetailModal", () => {
 		expect(modal.dataset.targetKind).toBe("definition");
 		expect(modal.dataset.runtimeId).toBeUndefined();
 		expect(document.querySelector('[data-ui="ItemDefinitionInfoTab"]')).not.toBeNull();
+		const sourcesTab = document.querySelector<HTMLButtonElement>('[data-tab="sources"]');
+		if (sourcesTab === null) {
+			throw new Error("Missing Sources for configured output without a live target.");
+		}
+		await act(async () => {
+			sourcesTab.click();
+			await Promise.resolve();
+		});
+		expect(modal.dataset.tab).toBe("sources");
+		expect(document.querySelector('[data-ui="ItemSource"]')?.textContent).toContain("Workshop");
 	});
 
 	it("sets and retains one save-backed default line through the canonical command boundary", async () => {
@@ -634,15 +699,22 @@ describe("ItemDetailModal", () => {
 
 		const modal = document.querySelector<HTMLElement>('[data-ui="ItemDetailModal"]');
 		if (modal === null) throw new Error("Missing Item Detail modal.");
-		expect(modal.dataset.tab).toBe("sources");
+		expect(modal.dataset.tab).toBe("info");
 		expect(
 			Array.from(
 				document.querySelectorAll<HTMLElement>('[data-ui="ItemDetailTabs"] button'),
 			).map((tab) => tab.dataset.tab),
 		).toEqual([
-			"sources",
 			"info",
+			"sources",
 		]);
+		const sourcesTab = document.querySelector<HTMLButtonElement>('[data-tab="sources"]');
+		if (sourcesTab === null) throw new Error("Missing Sources tab.");
+		await act(async () => {
+			sourcesTab.click();
+			await Promise.resolve();
+		});
+		expect(modal.dataset.tab).toBe("sources");
 		expect(document.querySelector('[data-ui="ItemSource"]')?.textContent).toContain("Workshop");
 		expect(document.querySelector('[data-ui="ItemSource"]')?.textContent).toContain("Space 1");
 		expect(document.querySelector('[data-ui="ItemSourceLine"]')?.textContent).toContain(
@@ -709,6 +781,42 @@ describe("ItemDetailModal", () => {
 		).toEqual([
 			"info",
 		]);
+	});
+
+	it("falls back to Info when configured definition Sources disappear live", async () => {
+		const { readControl } = await renderItemDetail();
+		const owner = currentRuntime.items.find((item) => item.item.id === "workshop");
+		if (owner === undefined) throw new Error("Missing source fixture.");
+
+		await act(async () => {
+			readControl().openItemDefinitionDetail({
+				itemId: "water",
+				tab: "sources",
+			});
+			await Promise.resolve();
+			await Promise.resolve();
+		});
+		const modal = document.querySelector<HTMLElement>('[data-ui="ItemDetailModal"]');
+		if (modal === null) throw new Error("Missing Item Detail modal.");
+		expect(modal.dataset.targetKind).toBe("definition");
+		expect(modal.dataset.tab).toBe("sources");
+
+		await act(async () => {
+			publishRuntime(
+				RuntimeSchema.parse({
+					...currentRuntime,
+					items: currentRuntime.items.filter((item) => item.id !== owner.id),
+				}),
+			);
+			await Promise.resolve();
+			await Promise.resolve();
+		});
+
+		expect(document.querySelector('[data-ui="ItemDetailModal"]')).toBe(modal);
+		expect(modal.dataset.targetKind).toBe("definition");
+		expect(modal.dataset.tab).toBe("info");
+		expect(document.querySelector('[data-ui="ItemDefinitionInfoTab"]')).not.toBeNull();
+		expect(document.querySelector('[data-tab="sources"]')).toBeNull();
 	});
 
 	it("retains stale Sources content read-only when the inspected target disappears", async () => {

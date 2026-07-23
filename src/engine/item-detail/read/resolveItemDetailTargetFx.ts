@@ -1,10 +1,12 @@
+import { Effect } from "effect";
+
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import { readItemDetailTabs } from "~/engine/item-detail/read/readItemDetailTabs";
+import { readItemDetailTabsFx } from "~/engine/item-detail/read/readItemDetailTabsFx";
 import type { readItemDetailSourcesFx } from "~/engine/item-detail/read/readItemDetailSourcesFx";
 import { ItemDetailTabEnumSchema } from "~/engine/item-detail/schema/ItemDetailTabEnumSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
-export namespace resolveItemDetailTarget {
+export namespace resolveItemDetailTargetFx {
 	export interface Props {
 		readonly itemId: IdSchema.Type;
 		readonly requestedTab?: ItemDetailTabEnumSchema.Type;
@@ -26,26 +28,36 @@ export namespace resolveItemDetailTarget {
 
 const unavailable = {
 	kind: "unavailable",
-} as const satisfies resolveItemDetailTarget.Result;
+} as const satisfies resolveItemDetailTargetFx.Result;
 
 /** Validates one exact Item Detail target and deterministically resolves its active tab. */
-export const resolveItemDetailTarget = ({
+export const resolveItemDetailTargetFx = Effect.fn("resolveItemDetailTargetFx")(function* ({
 	itemId,
 	requestedTab,
 	runtime,
 	sources,
-}: resolveItemDetailTarget.Props): resolveItemDetailTarget.Result => {
+}: resolveItemDetailTargetFx.Props) {
 	const item = runtime.items.find((candidate) => candidate.id === itemId);
-	const tabs = readItemDetailTabs(item, sources);
+	const tabs = yield* readItemDetailTabsFx({
+		target: {
+			kind: "runtime",
+			item,
+		},
+		sources,
+	});
 	if (item === undefined || tabs.length === 0) return unavailable;
 	const defaultTab = tabs[0];
 	const fallback =
-		requestedTab === undefined ? defaultTab : tabs.includes(ItemDetailTabEnumSchema.enum.Info) ? ItemDetailTabEnumSchema.enum.Info : defaultTab;
+		requestedTab === undefined
+			? defaultTab
+			: tabs.includes(ItemDetailTabEnumSchema.enum.Info)
+				? ItemDetailTabEnumSchema.enum.Info
+				: defaultTab;
 	if (fallback === undefined) return unavailable;
 	return {
 		kind: "available",
 		itemId: item.id,
 		tab: requestedTab !== undefined && tabs.includes(requestedTab) ? requestedTab : fallback,
 		tabs,
-	};
-};
+	} satisfies resolveItemDetailTargetFx.Result;
+});

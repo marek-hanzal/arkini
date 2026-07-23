@@ -1,4 +1,4 @@
-import { motion, useReducedMotion } from "motion/react";
+import { motion } from "motion/react";
 import { type PropsWithChildren, type ReactNode, useEffect } from "react";
 import { match } from "ts-pattern";
 
@@ -57,12 +57,8 @@ export const TileMotionCueVisual = ({
 	onContact,
 	onComplete,
 }: TileMotionCueVisual.Props) => {
-	const reducedMotion = useReducedMotion();
 	const absorbDeliveryTiming =
-		cue?.kind === "absorb" &&
-		originOffset !== null &&
-		!reducedMotion &&
-		deliveryPayload !== null
+		cue?.kind === "absorb" && originOffset !== null && deliveryPayload !== null
 			? readTileDeliveryTiming({
 					offset: originOffset,
 				})
@@ -117,9 +113,9 @@ export const TileMotionCueVisual = ({
 				data-motion-exiting={exiting ? "true" : "false"}
 				initial={false}
 				animate={{
-					scale: reducedMotion ? 0.94 : 0.74,
-					opacity: reducedMotion ? 0.6 : 0.35,
-					y: reducedMotion ? 0 : 10,
+					scale: 0.74,
+					opacity: 0.35,
+					y: 10,
 				}}
 			>
 				{children}
@@ -190,7 +186,7 @@ export const TileMotionCueVisual = ({
 	}
 
 	if (cue.kind === "morph") {
-		const duration = morphPayload === null ? 0 : reducedMotion ? 0.2 : 0.54;
+		const duration = morphPayload === null ? 0 : 0.54;
 		return (
 			<motion.span
 				key={cue.generation}
@@ -207,18 +203,12 @@ export const TileMotionCueVisual = ({
 					scale:
 						morphPayload === null
 							? 1
-							: reducedMotion
-								? [
-										1,
-										0.98,
-										1,
-									]
-								: [
-										1,
-										0.9,
-										1.06,
-										1,
-									],
+							: [
+									1,
+									0.9,
+									1.06,
+									1,
+								],
 					opacity: 1,
 				}}
 				transition={{
@@ -245,33 +235,24 @@ export const TileMotionCueVisual = ({
 								scale: 1,
 							}}
 							animate={{
-								opacity: reducedMotion
-									? [
-											1,
-											0,
-										]
-									: [
-											1,
-											1,
-											0,
-										],
-								scale: reducedMotion
-									? 1
-									: [
-											1,
-											0.96,
-											1.02,
-										],
+								opacity: [
+									1,
+									1,
+									0,
+								],
+								scale: [
+									1,
+									0.96,
+									1.02,
+								],
 							}}
 							transition={{
 								duration,
-								times: reducedMotion
-									? undefined
-									: [
-											0,
-											0.42,
-											0.68,
-										],
+								times: [
+									0,
+									0.42,
+									0.68,
+								],
 							}}
 						>
 							{morphPayload}
@@ -281,36 +262,27 @@ export const TileMotionCueVisual = ({
 							data-ui="TileMotionMorphCurrent"
 							initial={{
 								opacity: 0,
-								scale: reducedMotion ? 1 : 0.94,
+								scale: 0.94,
 							}}
 							animate={{
-								opacity: reducedMotion
-									? [
-											0,
-											1,
-										]
-									: [
-											0,
-											0,
-											1,
-										],
-								scale: reducedMotion
-									? 1
-									: [
-											0.94,
-											0.94,
-											1,
-										],
+								opacity: [
+									0,
+									0,
+									1,
+								],
+								scale: [
+									0.94,
+									0.94,
+									1,
+								],
 							}}
 							transition={{
 								duration,
-								times: reducedMotion
-									? undefined
-									: [
-											0,
-											0.42,
-											0.68,
-										],
+								times: [
+									0,
+									0.42,
+									0.68,
+								],
 							}}
 						>
 							{children}
@@ -323,7 +295,7 @@ export const TileMotionCueVisual = ({
 
 	if (cue.kind === "consume" || cue.kind === "consume-exit") {
 		const exits = cue.kind === "consume-exit";
-		const duration = reducedMotion ? 0.2 : 0.66;
+		const duration = 0.66;
 		const reachX = targetOffset?.x ?? 0;
 		const reachY = targetOffset?.y ?? (exits ? -12 : 4);
 		const travelX = exits
@@ -362,53 +334,35 @@ export const TileMotionCueVisual = ({
 				data-motion-exiting={exiting ? "true" : "false"}
 				initial={false}
 				animate={{
-					x: reducedMotion ? 0 : travelX,
-					y: reducedMotion ? 0 : travelY,
+					x: travelX,
+					y: travelY,
 					scale: exits
-						? reducedMotion
-							? [
-									1,
-									0.9,
-								]
-							: [
-									1,
-									0.82,
-									0.58,
-								]
-						: reducedMotion
-							? [
-									1,
-									0.96,
-									1,
-								]
-							: [
-									1,
-									0.78,
-									0.9,
-									1,
-								],
+						? [
+								1,
+								0.82,
+								0.58,
+							]
+						: [
+								1,
+								0.78,
+								0.9,
+								1,
+							],
 					opacity: exits
-						? reducedMotion
-							? [
-									1,
-									0,
-								]
-							: [
-									1,
-									1,
-									0,
-								]
+						? [
+								1,
+								1,
+								0,
+							]
 						: 1,
 				}}
 				transition={{
 					duration,
-					times: reducedMotion
-						? undefined
-						: [
-								0,
-								0.5,
-								1,
-							],
+					times: [
+						0,
+						0.5,
+						1,
+					],
 					ease: [
 						0.22,
 						1,
@@ -427,28 +381,21 @@ export const TileMotionCueVisual = ({
 							data-ui="TileMotionTransferCurrent"
 							initial={false}
 							animate={{
-								opacity: reducedMotion
-									? [
-											0,
-											1,
-										]
-									: [
-											0,
-											0,
-											1,
-											1,
-										],
+								opacity: [
+									0,
+									0,
+									1,
+									1,
+								],
 							}}
 							transition={{
 								duration,
-								times: reducedMotion
-									? undefined
-									: [
-											0,
-											0.5,
-											0.5,
-											1,
-										],
+								times: [
+									0,
+									0.5,
+									0.5,
+									1,
+								],
 							}}
 						>
 							{children}
@@ -458,28 +405,21 @@ export const TileMotionCueVisual = ({
 							data-ui="TileMotionTransferPrevious"
 							initial={false}
 							animate={{
-								opacity: reducedMotion
-									? [
-											1,
-											0,
-										]
-									: [
-											1,
-											1,
-											0,
-											0,
-										],
+								opacity: [
+									1,
+									1,
+									0,
+									0,
+								],
 							}}
 							transition={{
 								duration,
-								times: reducedMotion
-									? undefined
-									: [
-											0,
-											0.5,
-											0.5,
-											1,
-										],
+								times: [
+									0,
+									0.5,
+									0.5,
+									1,
+								],
 							}}
 						>
 							{transferPayload}
@@ -491,12 +431,12 @@ export const TileMotionCueVisual = ({
 	}
 
 	if (cue.kind === "absorb") {
-		const rebound = reducedMotion ? 1.03 : 1.08 + (cue.strength - 1) * 0.02;
+		const rebound = 1.08 + (cue.strength - 1) * 0.02;
 		const deliveryTiming = absorbDeliveryTiming;
 		const contactDelay = deliveryTiming?.contactDelay ?? 0;
-		const contactDuration = reducedMotion ? 0.18 : deliveryTiming === null ? 0.6 : 0.36;
+		const contactDuration = deliveryTiming === null ? 0.6 : 0.36;
 		const impactResponse =
-			originOffset === null || reducedMotion
+			originOffset === null
 				? null
 				: readTileDirectionalImpactResponse({
 						// Cue geometry is target-to-origin; impact response consumes origin-to-target.
@@ -546,18 +486,12 @@ export const TileMotionCueVisual = ({
 									],
 								}
 							: {
-									scale: reducedMotion
-										? [
-												1,
-												0.96,
-												1,
-											]
-										: [
-												1,
-												0.75,
-												rebound,
-												1,
-											],
+									scale: [
+										1,
+										0.75,
+										rebound,
+										1,
+									],
 								}),
 						opacity: 1,
 					}}
@@ -623,7 +557,7 @@ export const TileMotionCueVisual = ({
 				y: 0,
 			},
 		});
-		const duration = reducedMotion ? 0.2 : 0.6;
+		const duration = 0.6;
 		const releaseTime = tileProducerEmissionReleaseDelay / duration;
 		return (
 			<motion.span
@@ -634,74 +568,52 @@ export const TileMotionCueVisual = ({
 				data-motion-cue-generation={cue.generation}
 				data-motion-cue-strength={cue.strength}
 				data-motion-emission-direction={`${response.direction.x},${response.direction.y}`}
-				data-motion-emission-release-delay={
-					reducedMotion ? 0 : tileProducerEmissionReleaseDelay
-				}
+				data-motion-emission-release-delay={tileProducerEmissionReleaseDelay}
 				data-motion-emission-duration={duration}
 				data-surface-id={surfaceId}
 				data-live={live ? "true" : "false"}
 				data-motion-exiting={exiting ? "true" : "false"}
 				initial={false}
 				animate={{
-					scaleX: reducedMotion
-						? [
-								1,
-								0.97,
-								1.03,
-								1,
-							]
-						: [
-								1,
-								response.anticipation.scaleX,
-								response.anticipation.scaleX,
-								1.03,
-								1,
-							],
-					scaleY: reducedMotion
-						? [
-								1,
-								0.97,
-								1.03,
-								1,
-							]
-						: [
-								1,
-								response.anticipation.scaleY,
-								response.anticipation.scaleY,
-								1.03,
-								1,
-							],
-					x: reducedMotion
-						? 0
-						: [
-								0,
-								0,
-								response.recoil.x,
-								response.hop.x,
-								0,
-							],
-					y: reducedMotion
-						? 0
-						: [
-								0,
-								0,
-								response.recoil.y,
-								response.hop.y,
-								0,
-							],
+					scaleX: [
+						1,
+						response.anticipation.scaleX,
+						response.anticipation.scaleX,
+						1.03,
+						1,
+					],
+					scaleY: [
+						1,
+						response.anticipation.scaleY,
+						response.anticipation.scaleY,
+						1.03,
+						1,
+					],
+					x: [
+						0,
+						0,
+						response.recoil.x,
+						response.hop.x,
+						0,
+					],
+					y: [
+						0,
+						0,
+						response.recoil.y,
+						response.hop.y,
+						0,
+					],
 					opacity: 1,
 				}}
 				transition={{
 					duration,
-					times: reducedMotion
-						? undefined
-						: [
-								0,
-								releaseTime * 0.55,
-								releaseTime,
-								0.68,
-								1,
-							],
+					times: [
+						0,
+						releaseTime * 0.55,
+						releaseTime,
+						0.68,
+						1,
+					],
 					ease: [
 						0.22,
 						1,
@@ -719,56 +631,44 @@ export const TileMotionCueVisual = ({
 	const animation = match(cue.kind)
 		.with("spawn", () => ({
 			initial: {
-				scale: reducedMotion ? 0.94 : 0.74,
-				opacity: reducedMotion ? 0.6 : 0.35,
-				y: reducedMotion ? 0 : 10,
+				scale: 0.74,
+				opacity: 0.35,
+				y: 10,
 			},
 			animate: {
-				scale: reducedMotion
-					? [
-							0.94,
-							1,
-						]
-					: [
-							0.74,
-							1.09,
-							1,
-						],
-				opacity: reducedMotion
-					? [
-							0.6,
-							1,
-						]
-					: [
-							0.35,
-							1,
-							1,
-						],
-				y: reducedMotion
-					? 0
-					: [
-							10,
-							-3,
-							0,
-						],
+				scale: [
+					0.74,
+					1.09,
+					1,
+				],
+				opacity: [
+					0.35,
+					1,
+					1,
+				],
+				y: [
+					10,
+					-3,
+					0,
+				],
 			},
-			duration: reducedMotion ? 0.18 : spawnDeliveryTiming === null ? 0.6 : 0.36,
+			duration: spawnDeliveryTiming === null ? 0.6 : 0.36,
 		}))
 		.with("settle", () => ({
 			initial: {
-				scale: reducedMotion ? 0.98 : 0.92,
+				scale: 0.92,
 				opacity: 0.66,
-				y: reducedMotion ? 0 : 6,
+				y: 6,
 			},
 			animate: {
 				scale: 1,
 				opacity: 1,
 				y: 0,
 			},
-			duration: reducedMotion ? 0.16 : 0.4,
+			duration: 0.4,
 		}))
 		.with("impact", () => {
-			const peak = reducedMotion ? 1.03 : 1.12 + (cue.strength - 1) * 0.03;
+			const peak = 1.12 + (cue.strength - 1) * 0.03;
 			return {
 				initial: false as const,
 				animate: {
@@ -778,120 +678,87 @@ export const TileMotionCueVisual = ({
 						1,
 					],
 					opacity: 1,
-					y: reducedMotion
-						? 0
-						: [
-								0,
-								-3 - cue.strength,
-								0,
-							],
+					y: [
+						0,
+						-3 - cue.strength,
+						0,
+					],
 				},
-				duration: reducedMotion ? 0.16 : 0.45,
+				duration: 0.45,
 			};
 		})
 		.with("accept", () => ({
 			initial: false as const,
 			animate: {
-				scale: reducedMotion
-					? [
-							1,
-							0.96,
-							1,
-						]
-					: [
-							1,
-							0.75,
-							1.04,
-							1,
-						],
+				scale: [
+					1,
+					0.75,
+					1.04,
+					1,
+				],
 				opacity: 1,
-				y: reducedMotion
-					? 0
-					: [
-							0,
-							3,
-							-2,
-							0,
-						],
+				y: [
+					0,
+					3,
+					-2,
+					0,
+				],
 			},
-			duration: reducedMotion ? 0.18 : 0.58,
+			duration: 0.58,
 		}))
 		.with("complete", () => {
-			const release = reducedMotion ? 1.03 : 1.1 + (cue.strength - 1) * 0.02;
+			const release = 1.1 + (cue.strength - 1) * 0.02;
 			return {
 				initial: false as const,
 				animate: {
-					scale: reducedMotion
-						? [
-								1,
-								0.97,
-								1.03,
-								1,
-							]
-						: [
-								1,
-								0.88,
-								release,
-								1,
-							],
+					scale: [
+						1,
+						0.88,
+						release,
+						1,
+					],
 					opacity: 1,
-					y: reducedMotion
-						? 0
-						: [
-								0,
-								2,
-								-4,
-								0,
-							],
+					y: [
+						0,
+						2,
+						-4,
+						0,
+					],
 				},
-				duration: reducedMotion ? 0.2 : 0.68,
+				duration: 0.68,
 			};
 		})
 		.with("charge", () => ({
 			initial: false as const,
 			animate: {
-				scaleX: reducedMotion
-					? [
-							1,
-							0.97,
-							1,
-						]
-					: [
-							1,
-							0.95,
-							0.99,
-							1,
-						],
-				scaleY: reducedMotion
-					? [
-							1,
-							0.97,
-							1,
-						]
-					: [
-							1,
-							0.89,
-							0.98,
-							1,
-						],
+				scaleX: [
+					1,
+					0.95,
+					0.99,
+					1,
+				],
+				scaleY: [
+					1,
+					0.89,
+					0.98,
+					1,
+				],
 				opacity: 1,
-				rotate: reducedMotion
-					? 0
-					: [
-							0,
-							-1.8,
-							0.8,
-							0,
-						],
+				rotate: [
+					0,
+					-1.8,
+					0.8,
+					0,
+				],
 			},
-			duration: reducedMotion ? 0.14 : 0.3,
+			duration: 0.3,
 		}))
 		.with("pause", () => ({
 			initial: false as const,
 			animate: {
 				scale: [
 					1,
-					reducedMotion ? 0.98 : 0.94,
+					0.94,
 					1,
 				],
 				opacity: [
@@ -901,14 +768,14 @@ export const TileMotionCueVisual = ({
 				],
 				y: 0,
 			},
-			duration: reducedMotion ? 0.16 : 0.3,
+			duration: 0.3,
 		}))
 		.with("resume", () => ({
 			initial: false as const,
 			animate: {
 				scale: [
 					1,
-					reducedMotion ? 1.02 : 1.05,
+					1.05,
 					1,
 				],
 				opacity: [
@@ -918,150 +785,95 @@ export const TileMotionCueVisual = ({
 				],
 				y: 0,
 			},
-			duration: reducedMotion ? 0.16 : 0.32,
+			duration: 0.32,
 		}))
 		.with("deplete", () => ({
 			initial: false as const,
 			animate: {
-				scale: reducedMotion
-					? [
-							1,
-							0.97,
-							1,
-						]
-					: [
-							1,
-							0.9,
-							0.98,
-							1,
-						],
+				scale: [
+					1,
+					0.9,
+					0.98,
+					1,
+				],
 				opacity: 1,
-				y: reducedMotion
-					? 0
-					: [
-							0,
-							2,
-							0,
-						],
-				rotate: reducedMotion
-					? 0
-					: [
-							0,
-							-1.5,
-							1,
-							0,
-						],
+				y: [
+					0,
+					2,
+					0,
+				],
+				rotate: [
+					0,
+					-1.5,
+					1,
+					0,
+				],
 			},
-			duration: reducedMotion ? 0.16 : 0.38,
+			duration: 0.38,
 		}))
 		.with("deplete-exit", () => ({
 			initial: false as const,
 			animate: {
-				scale: reducedMotion
-					? [
-							1,
-							0.86,
-						]
-					: [
-							1,
-							0.96,
-							0.54,
-						],
-				scaleY: reducedMotion
-					? [
-							1,
-							0.7,
-						]
-					: [
-							1,
-							0.84,
-							0.22,
-						],
-				opacity: reducedMotion
-					? [
-							1,
-							0,
-						]
-					: [
-							1,
-							1,
-							0,
-						],
-				y: reducedMotion
-					? [
-							0,
-							8,
-						]
-					: [
-							0,
-							5,
-							20,
-						],
+				scale: [
+					1,
+					0.96,
+					0.54,
+				],
+				scaleY: [
+					1,
+					0.84,
+					0.22,
+				],
+				opacity: [
+					1,
+					1,
+					0,
+				],
+				y: [
+					0,
+					5,
+					20,
+				],
 			},
-			duration: reducedMotion ? 0.2 : 0.62,
+			duration: 0.62,
 		}))
 		.with("expiry", () => ({
 			initial: false as const,
 			animate: {
-				scale: reducedMotion
-					? [
-							1,
-							0.9,
-						]
-					: [
-							1,
-							0.97,
-							0.78,
-						],
-				opacity: reducedMotion
-					? [
-							1,
-							0,
-						]
-					: [
-							1,
-							0.78,
-							0,
-						],
-				y: reducedMotion
-					? [
-							0,
-							-8,
-						]
-					: [
-							0,
-							-7,
-							-26,
-						],
+				scale: [
+					1,
+					0.97,
+					0.78,
+				],
+				opacity: [
+					1,
+					0.78,
+					0,
+				],
+				y: [
+					0,
+					-7,
+					-26,
+				],
 			},
-			duration: reducedMotion ? 0.2 : 0.72,
+			duration: 0.72,
 		}))
 		.with("exit", () => ({
 			initial: false as const,
 			animate: {
-				scale: reducedMotion
-					? [
-							1,
-							0.9,
-						]
-					: [
-							1,
-							0.96,
-							0.68,
-						],
-				opacity: reducedMotion
-					? [
-							1,
-							0,
-						]
-					: [
-							1,
-							1,
-							0,
-						],
+				scale: [
+					1,
+					0.96,
+					0.68,
+				],
+				opacity: [
+					1,
+					1,
+					0,
+				],
 				y: 0,
 			},
-			duration: reducedMotion ? 0.18 : 0.46,
+			duration: 0.46,
 		}))
 		.exhaustive();
 

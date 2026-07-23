@@ -1,4 +1,3 @@
-import { useReducedMotion } from "motion/react";
 import { useLayoutEffect, useState } from "react";
 
 import type { TileDragSource } from "~/ui/tile/TileDragSource";
@@ -61,12 +60,11 @@ export const useTileActorCueGeometry = ({
 }: useTileActorCueGeometry.Props): useTileActorCueGeometry.Result => {
 	const { geometryVersion, readActorLayerRect, readActorRect, readActorSource, readPlacement } =
 		useTileActorSystem();
-	const reducedMotion = useReducedMotion();
 	const [state, setState] = useState<CueGeometryState>(null);
 
 	useLayoutEffect(() => {
 		void geometryVersion;
-		if (reducedMotion || cue === null) {
+		if (cue === null) {
 			publishGeometry(setState, null);
 			return;
 		}
@@ -195,7 +193,6 @@ export const useTileActorCueGeometry = ({
 		readActorRect,
 		readActorSource,
 		readPlacement,
-		reducedMotion,
 	]);
 
 	const current =

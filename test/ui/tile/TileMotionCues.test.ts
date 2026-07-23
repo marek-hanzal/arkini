@@ -2421,51 +2421,40 @@ describe("tile motion cue arbitration", () => {
 	});
 
 	it("commits pending stack quantity immediately without travel geometry or full motion", async () => {
-		for (const reducedMotion of [
-			false,
-			true,
-		]) {
-			motionTestRuntime.reducedMotion = reducedMotion;
-			const onContact = vi.fn();
-			const container = document.createElement("div");
-			document.body.append(container);
-			const root = createRoot(container);
-			roots.push(root);
-			await act(async () => {
-				root.render(
-					createElement(TileActorContent, {
-						item: item(`runtime:fallback:${reducedMotion}`, "board", 0, 2),
-						surfaceId: "board:0",
-						live: true,
-						exiting: false,
-						phase: "hovered",
-						feedback: null,
-						forbiddenDrop: false,
-						cue: {
-							generation: reducedMotion ? 26 : 25,
-							kind: "absorb",
-							originItemId: "runtime:missing",
-							previousQuantity: 1,
-							deliveryQuantity: 1,
-							strength: 1,
-						},
-						cueOriginOffset: reducedMotion
-							? {
-									x: -120,
-									y: 0,
-								}
-							: null,
-						cueTargetOffset: null,
-						spawnDeliveryTiming: null,
-						spawnDeliveryReady: true,
-						onCueStart: vi.fn(),
-						onCueContact: onContact,
-						onCueComplete: vi.fn(),
-					}),
-				);
-			});
-			expect(onContact).toHaveBeenCalledOnce();
-		}
+		const onContact = vi.fn();
+		const container = document.createElement("div");
+		document.body.append(container);
+		const root = createRoot(container);
+		roots.push(root);
+		await act(async () => {
+			root.render(
+				createElement(TileActorContent, {
+					item: item("runtime:fallback", "board", 0, 2),
+					surfaceId: "board:0",
+					live: true,
+					exiting: false,
+					phase: "hovered",
+					feedback: null,
+					forbiddenDrop: false,
+					cue: {
+						generation: 25,
+						kind: "absorb",
+						originItemId: "runtime:missing",
+						previousQuantity: 1,
+						deliveryQuantity: 1,
+						strength: 1,
+					},
+					cueOriginOffset: null,
+					cueTargetOffset: null,
+					spawnDeliveryTiming: null,
+					spawnDeliveryReady: true,
+					onCueStart: vi.fn(),
+					onCueContact: onContact,
+					onCueComplete: vi.fn(),
+				}),
+			);
+		});
+		expect(onContact).toHaveBeenCalledOnce();
 	});
 });
 
@@ -2711,7 +2700,7 @@ describe("TileMotionCueVisual", () => {
 		expect(onComplete).toHaveBeenCalledWith(8);
 	});
 
-	it("keeps local and reduced absorb feedback immediate without a spatial payload", async () => {
+	it("keeps local absorb feedback immediate without a spatial payload", async () => {
 		const renderAbsorb = async ({
 			generation,
 			originOffset,
@@ -2770,19 +2759,6 @@ describe("TileMotionCueVisual", () => {
 		expect(local.target?.getAttribute("data-motion-contact-delay")).toBe("0");
 		expect(local.target?.getAttribute("data-motion-scale")).toBe("1,0.75,1.08,1");
 		expect(local.onComplete).toHaveBeenCalledWith(9);
-
-		motionTestRuntime.reducedMotion = true;
-		const reduced = await renderAbsorb({
-			generation: 10,
-			originOffset: {
-				x: -240,
-				y: 80,
-			},
-		});
-		expect(reduced.payload).toBeNull();
-		expect(reduced.target?.getAttribute("data-motion-contact-delay")).toBe("0");
-		expect(reduced.target?.getAttribute("data-motion-scale")).toBe("1,0.96,1");
-		expect(reduced.onComplete).toHaveBeenCalledWith(10);
 	});
 
 	it("keeps completion, depletion, and expiry physically distinct", async () => {

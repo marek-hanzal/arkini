@@ -8,6 +8,16 @@ import { readRuntimeItemPrimaryAssetIdFx } from "~/engine/item/read/readRuntimeI
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
 export namespace useItemDetailSources {
+	export type Target =
+		| {
+				readonly kind: "runtime";
+				readonly itemId: IdSchema.Type;
+		  }
+		| {
+				readonly kind: "definition";
+				readonly itemId: IdSchema.Type;
+		  };
+
 	export type OutputFact = readItemDetailSourcesFx.OutputFact;
 
 	export interface Line {
@@ -106,14 +116,20 @@ const sameProjection = (
 	);
 };
 
-/** Projects exact owned Board sources that visibly produce one inspected live item. */
-export const useItemDetailSources = (itemId: IdSchema.Type): useItemDetailSources.Projection => {
+/** Projects exact owned Board sources that visibly produce one inspected runtime or definition item. */
+export const useItemDetailSources = (
+	target: useItemDetailSources.Target,
+): useItemDetailSources.Projection => {
 	const game = useGameEngine();
+	const { itemId, kind } = target;
 	const selector = useCallback(
 		(runtime: RuntimeSchema.Type): useItemDetailSources.Projection => {
 			const projection = game.readOrThrow(
 				readItemDetailSourcesFx({
-					itemId,
+					target: {
+						kind,
+						itemId,
+					},
 					runtime,
 				}),
 			);
@@ -158,6 +174,7 @@ export const useItemDetailSources = (itemId: IdSchema.Type): useItemDetailSource
 		[
 			game,
 			itemId,
+			kind,
 		],
 	);
 	return useRuntimeSelector(selector, sameProjection);

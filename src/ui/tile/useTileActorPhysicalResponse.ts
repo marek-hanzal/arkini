@@ -1,4 +1,4 @@
-import { animate, type PanInfo, useMotionValue, useReducedMotion, useSpring } from "motion/react";
+import { animate, type PanInfo, useMotionValue, useSpring } from "motion/react";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 
 import { readTileDragElasticResponse } from "~/ui/tile/readTileDragElasticResponse";
@@ -47,7 +47,6 @@ export namespace useTileActorPhysicalResponse {
  * direct pointer translation, or transient travel.
  */
 export const useTileActorPhysicalResponse = () => {
-	const reducedMotion = useReducedMotion();
 	const targetX = useMotionValue(0);
 	const targetY = useMotionValue(0);
 	const targetRotation = useMotionValue(0);
@@ -98,10 +97,6 @@ export const useTileActorPhysicalResponse = () => {
 
 	const update = useCallback(
 		(info: Pick<PanInfo, "delta" | "velocity">) => {
-			if (reducedMotion) {
-				cancel();
-				return;
-			}
 			const response = readTileDragElasticResponse(info);
 			stopReturnAnimations();
 			targetX.jump(response.x);
@@ -117,8 +112,6 @@ export const useTileActorPhysicalResponse = () => {
 			}, responseReturnDelayMs);
 		},
 		[
-			cancel,
-			reducedMotion,
 			stopReturnAnimations,
 			targetRotation,
 			targetX,
@@ -127,17 +120,6 @@ export const useTileActorPhysicalResponse = () => {
 	);
 
 	const readSnapshot = useCallback((): useTileActorPhysicalResponse.Snapshot => {
-		if (reducedMotion) {
-			return {
-				x: 0,
-				y: 0,
-				rotation: 0,
-				velocity: {
-					x: 0,
-					y: 0,
-				},
-			};
-		}
 		return {
 			x: x.get(),
 			y: y.get(),
@@ -148,17 +130,9 @@ export const useTileActorPhysicalResponse = () => {
 			},
 		};
 	}, [
-		reducedMotion,
 		rotation,
 		x,
 		y,
-	]);
-
-	useEffect(() => {
-		if (reducedMotion) cancel();
-	}, [
-		cancel,
-		reducedMotion,
 	]);
 
 	useEffect(

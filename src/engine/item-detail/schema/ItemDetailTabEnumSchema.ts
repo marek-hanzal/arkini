@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-/** Finite player-facing tabs that one live item may expose in Item Detail. */
+/** Finite player-facing tabs that one runtime or configured definition may expose. */
 export const ItemDetailTabEnumSchema = z
 	.enum({
 		Info: "info",
@@ -10,7 +10,8 @@ export const ItemDetailTabEnumSchema = z
 	})
 	.meta({
 		id: "ItemDetailTabEnumSchema",
-		description: "The finite player-facing tabs available in Item Detail for one live item.",
+		description:
+			"The finite player-facing tabs available in Item Detail for one runtime or configured definition.",
 	});
 
 export type ItemDetailTabEnumSchema = typeof ItemDetailTabEnumSchema;

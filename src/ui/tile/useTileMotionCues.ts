@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
-import { useReducedMotion } from "motion/react";
 
 import { GameEventEnumSchema } from "~/bridge/event/useGameEvents";
 import { JobStatusEnumSchema } from "~/bridge/job/JobStatusEnumSchema";
@@ -607,7 +606,6 @@ const stateFromSource = (source: TileActorTransitionSource): TileMotionCueState 
 /** Translates exact ordered committed transitions into bounded actor-local cue generations. */
 export const useTileMotionCues = ({ onSceneReset }: { readonly onSceneReset: () => void }) => {
 	const source = useTileActorTransitionSource();
-	const reducedMotion = useReducedMotion();
 	const sourceRef = useRef(source);
 	const fallbacks = useRef(new Map<string, TileMotionCueFallback>());
 	const emissionReleases = useRef(new Map<string, TileProducerEmissionRelease>());
@@ -746,10 +744,7 @@ export const useTileMotionCues = ({ onSceneReset }: { readonly onSceneReset: () 
 							: current;
 					});
 				};
-				const timer = setTimeout(
-					release,
-					reducedMotion ? 0 : tileProducerEmissionReleaseDelay * 1_000,
-				);
+				const timer = setTimeout(release, tileProducerEmissionReleaseDelay * 1_000);
 				emissionReleases.current.set(emissionId, {
 					producerItemId: itemId,
 					producerGeneration: generation,
@@ -766,7 +761,6 @@ export const useTileMotionCues = ({ onSceneReset }: { readonly onSceneReset: () 
 		},
 		[
 			complete,
-			reducedMotion,
 		],
 	);
 

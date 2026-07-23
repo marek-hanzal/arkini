@@ -16,12 +16,7 @@ import { useTileActorCueGeometry } from "~/ui/tile/useTileActorCueGeometry";
 ).IS_REACT_ACT_ENVIRONMENT = true;
 
 const runtimeState = vi.hoisted(() => ({
-	reducedMotion: false,
 	system: null as TileSystem | null,
-}));
-
-vi.mock("motion/react", () => ({
-	useReducedMotion: () => runtimeState.reducedMotion,
 }));
 vi.mock("~/ui/tile/useTileActorSystem", () => ({
 	useTileActorSystem: () => {
@@ -105,7 +100,6 @@ const renderGeometry = async (cue: TileMotionCueSchema.Type | null) => {
 };
 
 beforeEach(() => {
-	runtimeState.reducedMotion = false;
 	runtimeState.system = null;
 	current = null;
 	snapshots = [];
@@ -395,7 +389,7 @@ describe("useTileActorCueGeometry", () => {
 		).toBe(true);
 	});
 
-	it("degrades failed and reduced-motion geometry locally", async () => {
+	it("degrades failed geometry locally", async () => {
 		const readActorRect = vi.fn(() => {
 			throw new Error("measurement failed");
 		});
@@ -418,16 +412,5 @@ describe("useTileActorCueGeometry", () => {
 			"Tile cue geometry measurement failed; using local feedback only.",
 			expect.any(Error),
 		);
-
-		runtimeState.reducedMotion = true;
-		readActorRect.mockClear();
-		await renderGeometry({
-			generation: 10,
-			kind: "absorb",
-			originItemId: "runtime:origin",
-			strength: 1,
-		});
-		expect(current?.originOffset).toBeNull();
-		expect(readActorRect).not.toHaveBeenCalled();
 	});
 });

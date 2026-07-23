@@ -49,6 +49,21 @@ vi.mock("~/bridge/item-detail/useResolveItemDetailTarget", () => ({
 					} as const),
 }));
 
+vi.mock("~/bridge/item-detail/useResolveItemDefinitionDetailTarget", () => ({
+	useResolveItemDefinitionDetailTarget:
+		() =>
+		({ itemId, requestedTab }: { itemId: string; requestedTab?: "info" | "sources" }) =>
+			itemId === "definition:item"
+				? ({
+						kind: "available",
+						itemId,
+						tab: requestedTab ?? "info",
+					} as const)
+				: ({
+						kind: "unavailable",
+					} as const),
+}));
+
 const roots: Array<ReturnType<typeof createRoot>> = [];
 
 afterEach(async () => {
@@ -256,6 +271,47 @@ describe("ItemDetailProvider", () => {
 			phase: "closed",
 		});
 	});
+
+	it("keeps configured definition Info default and accepts an explicit Sources request", async () => {
+		const { readControl } = await renderProvider();
+		await act(async () => {
+			expect(
+				readControl().openItemDefinitionDetail({
+					itemId: "definition:item",
+				}),
+			).toBe(true);
+		});
+		const entering = readControl().state;
+		expect(entering).toMatchObject({
+			phase: "entering",
+			target: {
+				kind: "definition",
+				itemId: "definition:item",
+				tab: "info",
+			},
+		});
+		if (entering.phase !== "entering") throw new Error("Expected entering definition.");
+		await act(async () => readControl().completeEnter(entering.generation));
+
+		await act(async () => {
+			expect(
+				readControl().openItemDefinitionDetail({
+					itemId: "definition:item",
+					tab: "sources",
+				}),
+			).toBe(true);
+		});
+		expect(readControl().state).toMatchObject({
+			phase: "open",
+			generation: entering.generation,
+			target: {
+				kind: "definition",
+				itemId: "definition:item",
+				tab: "sources",
+			},
+		});
+	});
+
 	it("yields interaction ownership to the higher-priority game menu", async () => {
 		const { readGameMenu, readItemDetail } = await renderGuardedProvider();
 		await act(async () => {

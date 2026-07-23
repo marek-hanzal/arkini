@@ -59,14 +59,12 @@ interface MotionTestCompletion {
 
 export const motionTestRuntime = {
 	autoComplete: true,
-	reducedMotion: false,
 	springLag: false,
 	completions: [] as Array<MotionTestCompletion>,
 	imperativeAnimations: [] as Array<MockImperativeAnimation>,
 	autoCompleteImperativeAnimations: true,
 	reset() {
 		this.autoComplete = true;
-		this.reducedMotion = false;
 		this.springLag = false;
 		this.completions.splice(0);
 		this.imperativeAnimations.splice(0);
@@ -84,6 +82,19 @@ export const motionTestRuntime = {
 					y: binding.y.get(),
 				};
 	},
+	writeMotionOffset(
+		ui: string,
+		runtimeId: string,
+		offset: {
+			readonly x: number;
+			readonly y: number;
+		},
+	) {
+		const binding = motionOffsetBindings.get(`${ui}:${runtimeId}`);
+		if (binding === undefined) throw new Error(`Missing motion binding ${ui}:${runtimeId}.`);
+		binding.x.jump(offset.x);
+		binding.y.jump(offset.y);
+	},
 	readDragOffset() {
 		return activeDragBinding === null
 			? null
@@ -99,8 +110,6 @@ export const motionTestRuntime = {
 		for (const index of indexes) this.completions[index]?.complete();
 	},
 };
-
-export const useReducedMotion = () => motionTestRuntime.reducedMotion;
 
 export const useMotionValue = <T,>(initial: T): MockMotionValue<T> => {
 	const value = useRef(initial);

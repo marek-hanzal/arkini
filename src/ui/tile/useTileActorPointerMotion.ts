@@ -1,4 +1,4 @@
-import { animate, type PanInfo, useMotionValue, useReducedMotion } from "motion/react";
+import { animate, type PanInfo, useMotionValue } from "motion/react";
 import { useCallback, useEffect, useMemo, useRef } from "react";
 
 import { useTileActorPhysicalResponse } from "~/ui/tile/useTileActorPhysicalResponse";
@@ -58,6 +58,8 @@ export namespace useTileActorPointerMotion {
 
 	export interface Control {
 		readonly armPickup: (offset: Vector) => void;
+		/** Ends an unstarted press without interrupting an already-settling physical shell. */
+		readonly disarmPickup: () => void;
 		readonly startPickup: () => void;
 		readonly updateResponse: (info: Pick<PanInfo, "delta" | "velocity">) => void;
 		readonly cancel: () => void;
@@ -71,7 +73,6 @@ export namespace useTileActorPointerMotion {
  * physical-response owner through one focused drag-facing contract.
  */
 export const useTileActorPointerMotion = () => {
-	const reducedMotion = useReducedMotion();
 	const directX = useMotionValue(0);
 	const directY = useMotionValue(0);
 	const pickupX = useMotionValue(0);
@@ -111,22 +112,22 @@ export const useTileActorPointerMotion = () => {
 		(offset: useTileActorPointerMotion.Vector) => {
 			pointerGeneration.current += 1;
 			resetPointerTranslation();
-			physical.commands.cancel();
 			pickupTarget.current = offset;
 		},
 		[
-			physical.commands,
 			resetPointerTranslation,
 		],
 	);
 
+	const disarmPickup = useCallback(() => {
+		pointerGeneration.current += 1;
+		resetPointerTranslation();
+	}, [
+		resetPointerTranslation,
+	]);
+
 	const startPickup = useCallback(() => {
 		stopPickup();
-		if (reducedMotion) {
-			pickupX.jump(pickupTarget.current.x);
-			pickupY.jump(pickupTarget.current.y);
-			return;
-		}
 		pickupAnimations.current = [
 			animate(pickupX, pickupTarget.current.x, pickupTransition),
 			animate(pickupY, pickupTarget.current.y, pickupTransition),
@@ -134,7 +135,6 @@ export const useTileActorPointerMotion = () => {
 	}, [
 		pickupX,
 		pickupY,
-		reducedMotion,
 		stopPickup,
 	]);
 
@@ -162,15 +162,10 @@ export const useTileActorPointerMotion = () => {
 				x: direct.x + pickup.x,
 				y: direct.y + pickup.y,
 			};
-			const settlementVelocity = reducedMotion
-				? {
-						x: 0,
-						y: 0,
-					}
-				: boundVelocity(
-						directX.getVelocity() + pickupX.getVelocity(),
-						directY.getVelocity() + pickupY.getVelocity(),
-					);
+			const settlementVelocity = boundVelocity(
+				directX.getVelocity() + pickupX.getVelocity(),
+				directY.getVelocity() + pickupY.getVelocity(),
+			);
 			const snapshot = {
 				interactionGeneration,
 				pointerGeneration: pointerGeneration.current,
@@ -198,7 +193,6 @@ export const useTileActorPointerMotion = () => {
 			physical.commands,
 			pickupX,
 			pickupY,
-			reducedMotion,
 		],
 	);
 
@@ -226,6 +220,7 @@ export const useTileActorPointerMotion = () => {
 	const commands = useMemo<useTileActorPointerMotion.Control>(
 		() => ({
 			armPickup,
+			disarmPickup,
 			startPickup,
 			updateResponse: physical.commands.update,
 			cancel,
@@ -235,6 +230,7 @@ export const useTileActorPointerMotion = () => {
 		[
 			armPickup,
 			cancel,
+			disarmPickup,
 			physical.commands.update,
 			release,
 			resetAfterHandoff,

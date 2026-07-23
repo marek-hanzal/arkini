@@ -147,6 +147,7 @@ const ItemDetailTabs = ({
 								})
 							: itemDetail.openItemDefinitionDetail({
 									itemId: target.itemId,
+									tab: tab === "sources" ? tab : "info",
 								})
 					}
 				>
@@ -335,8 +336,17 @@ const RuntimeItemDetailScene = ({
 	const itemDetail = useItemDetailControl();
 	const liveIdentity = useItemDetailIdentity(target.itemId);
 	const liveLines = useItemDetailLines(target.itemId);
-	const liveSources = useItemDetailSources(target.itemId);
-	const liveTabs = useItemDetailTabs(target.itemId, liveSources);
+	const liveSources = useItemDetailSources({
+		kind: "runtime",
+		itemId: target.itemId,
+	});
+	const liveTabs = useItemDetailTabs(
+		{
+			kind: "runtime",
+			itemId: target.itemId,
+		},
+		liveSources,
+	);
 	const retainedIdentity = useRetainedItemDetailProjection({
 		available: liveIdentity.kind === "available",
 		targetKey: `runtime:${target.itemId}`,
@@ -442,7 +452,29 @@ const DefinitionItemDetailScene = ({
 	>;
 }) => {
 	const definition = useItemDefinitionDetail(target.itemId);
+	const sources = useItemDetailSources({
+		kind: "definition",
+		itemId: target.itemId,
+	});
+	const tabs = useItemDetailTabs(
+		{
+			kind: "definition",
+			itemId: target.itemId,
+		},
+		sources,
+	);
 	const itemDetail = useItemDetailControl();
+	useEffect(() => {
+		if (tabs.includes(target.tab)) return;
+		itemDetail.openItemDefinitionDetail({
+			itemId: target.itemId,
+		});
+	}, [
+		itemDetail,
+		tabs,
+		target.itemId,
+		target.tab,
+	]);
 	if (definition.kind === "unavailable") {
 		return (
 			<header className="flex items-center justify-between border-b border-line pb-3">
@@ -474,15 +506,20 @@ const DefinitionItemDetailScene = ({
 				stale={false}
 			/>
 			<ItemDetailTabs
-				active="info"
+				active={target.tab}
 				disabled={disabled}
-				tabs={[
-					"info",
-				]}
+				tabs={tabs}
 				target={target}
 			/>
 			<div className="flex min-h-0 flex-1 overflow-hidden pt-4">
-				<ItemDefinitionInfoTab definition={definition} />
+				{target.tab === "info" ? (
+					<ItemDefinitionInfoTab definition={definition} />
+				) : (
+					<ItemSourcesContent
+						disabled={disabled}
+						sources={sources}
+					/>
+				)}
 			</div>
 		</div>
 	);

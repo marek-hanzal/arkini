@@ -1,4 +1,4 @@
-import { animate, useMotionValue, useReducedMotion } from "motion/react";
+import { animate, useMotionValue } from "motion/react";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 
 import type { useTileActors } from "~/bridge/tile/useTileActors";
@@ -28,7 +28,6 @@ interface ResolvedSpatialTarget {
 	readonly height: number;
 	readonly destination: TileDragSource;
 	readonly positionCompletion: useTileActorPresentation.PositionCompletion;
-	readonly reducedMotion: boolean;
 }
 
 interface ActiveSpatialMotion {
@@ -65,7 +64,6 @@ const isSameSpatialTarget = (left: ResolvedSpatialTarget, right: ResolvedSpatial
 	left.y === right.y &&
 	left.width === right.width &&
 	left.height === right.height &&
-	left.reducedMotion === right.reducedMotion &&
 	isSameDestination(left.destination, right.destination) &&
 	isSamePositionCompletion(left.positionCompletion, right.positionCompletion);
 
@@ -73,9 +71,7 @@ const isSameSpatialIntent = (
 	target: ResolvedSpatialTarget,
 	destination: TileDragSource,
 	positionCompletion: useTileActorPresentation.PositionCompletion,
-	reducedMotion: boolean,
 ) =>
-	target.reducedMotion === reducedMotion &&
 	isSameDestination(target.destination, destination) &&
 	isSamePositionCompletion(target.positionCompletion, positionCompletion);
 
@@ -97,7 +93,6 @@ export const useTileActorMotion = ({
 		complete,
 		setNeighbourTravelTarget,
 	} = useTileActorSystem();
-	const reducedMotion = useReducedMotion();
 	const anchorX = useMotionValue(0);
 	const anchorY = useMotionValue(0);
 	const settleX = useMotionValue(0);
@@ -160,11 +155,7 @@ export const useTileActorMotion = ({
 	const readDeliveryOriginOffset = useCallback(
 		(placement: NonNullable<ReturnType<typeof readPlacement>>) => {
 			const currentCue = cueRef.current;
-			if (
-				reducedMotion ||
-				currentCue?.originItemId === undefined ||
-				currentCue.originItemId === item.id
-			) {
+			if (currentCue?.originItemId === undefined || currentCue.originItemId === item.id) {
 				return null;
 			}
 			const layerRect = readActorLayerRect();
@@ -185,7 +176,6 @@ export const useTileActorMotion = ({
 			item.id,
 			readActorLayerRect,
 			readActorRect,
-			reducedMotion,
 		],
 	);
 
@@ -227,17 +217,6 @@ export const useTileActorMotion = ({
 		],
 	);
 
-	const armPendingSpawnDelivery = useCallback(() => {
-		const current = spawnDeliveryStateRef.current;
-		if (current === null || current.ready) return;
-		publishSpawnDeliveryState({
-			...current,
-			ready: true,
-		});
-	}, [
-		publishSpawnDeliveryState,
-	]);
-
 	useLayoutEffect(() => {
 		void geometryVersion;
 		if (presentation.placementFrozen) return;
@@ -249,7 +228,6 @@ export const useTileActorMotion = ({
 					previousTarget,
 					presentation.desiredSource,
 					presentation.positionCompletion,
-					reducedMotion === true,
 				)
 			) {
 				return;
@@ -285,7 +263,6 @@ export const useTileActorMotion = ({
 			...placement,
 			destination: presentation.desiredSource,
 			positionCompletion: presentation.positionCompletion,
-			reducedMotion: reducedMotion === true,
 		};
 		const previousTarget = resolvedSpatialTarget.current;
 		if (previousTarget !== null && isSameSpatialTarget(previousTarget, target)) return;
@@ -322,7 +299,6 @@ export const useTileActorMotion = ({
 			const ownsSpawnDelivery =
 				spawnGeneration !== null &&
 				deliveryOffset !== null &&
-				!reducedMotion &&
 				Math.hypot(deliveryOffset.x, deliveryOffset.y) >= 0.5;
 			const releaseTravel = ownsSpawnDelivery ? retainNeighbourTravel() : null;
 			const deliveryTiming =
@@ -410,18 +386,6 @@ export const useTileActorMotion = ({
 		}
 
 		setVisible(true);
-		if (reducedMotion) {
-			anchorX.jump(placement.x);
-			anchorY.jump(placement.y);
-			releaseSnapshot.current = null;
-			settleX.jump(0);
-			settleY.jump(0);
-			width.jump(placement.width);
-			height.jump(placement.height);
-			completePosition();
-			armPendingSpawnDelivery();
-			return;
-		}
 		const animations: Array<ReturnType<typeof animate>> = [];
 		let releaseTravel: (() => void) | null = null;
 		const pendingSpawnDelivery = spawnDeliveryStateRef.current;
@@ -440,12 +404,8 @@ export const useTileActorMotion = ({
 					? releaseSnapshot.current
 					: null;
 			if (snapshot !== null) releaseSnapshot.current = null;
-			const velocityX = reducedMotion
-				? 0
-				: (snapshot?.settlementVelocity.x ?? settleX.getVelocity());
-			const velocityY = reducedMotion
-				? 0
-				: (snapshot?.settlementVelocity.y ?? settleY.getVelocity());
+			const velocityX = snapshot?.settlementVelocity.x ?? settleX.getVelocity();
+			const velocityY = snapshot?.settlementVelocity.y ?? settleY.getVelocity();
 			anchorX.jump(placement.x);
 			anchorY.jump(placement.y);
 			settleX.jump(currentVisualX - placement.x);
@@ -520,7 +480,6 @@ export const useTileActorMotion = ({
 	}, [
 		anchorX,
 		anchorY,
-		armPendingSpawnDelivery,
 		armSpawnDelivery,
 		completePosition,
 		geometryVersion,
@@ -532,7 +491,6 @@ export const useTileActorMotion = ({
 		presentation.positionCompletion,
 		readDeliveryOriginOffset,
 		readPlacement,
-		reducedMotion,
 		retainNeighbourTravel,
 		publishSpawnDeliveryState,
 		settleX,
@@ -567,11 +525,7 @@ export const useTileActorMotion = ({
 			placement = null;
 		}
 		const deliveryOffset = placement === null ? null : readDeliveryOriginOffset(placement);
-		if (
-			deliveryOffset === null ||
-			reducedMotion ||
-			Math.hypot(deliveryOffset.x, deliveryOffset.y) < 0.5
-		) {
+		if (deliveryOffset === null || Math.hypot(deliveryOffset.x, deliveryOffset.y) < 0.5) {
 			publishSpawnDeliveryState({
 				generation: cue.generation,
 				timing: null,
@@ -636,7 +590,6 @@ export const useTileActorMotion = ({
 		publishSpawnDeliveryState,
 		readDeliveryOriginOffset,
 		readPlacement,
-		reducedMotion,
 		retainNeighbourTravel,
 		settleX,
 		settleY,

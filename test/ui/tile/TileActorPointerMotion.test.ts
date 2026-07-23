@@ -98,35 +98,36 @@ describe("useTileActorPointerMotion", () => {
 		expect(pointer.values.direct.x.get()).toBe(75);
 	});
 
-	it("preserves pickup semantics but hands zero velocity to reduced motion", async () => {
-		motionTestRuntime.reducedMotion = true;
+	it("preserves a settling physical pose when a newer pickup is armed", async () => {
 		const pointer = await renderPointerMotion();
 		pointer.commands.armPickup({
-			x: -30,
+			x: 0,
+			y: 0,
+		});
+		const released = pointer.commands.release(1);
+		pointer.values.physical.x.jump(4.864);
+		pointer.values.physical.y.jump(-2.25);
+		pointer.values.physical.rotation.jump(-1.311);
+
+		pointer.commands.armPickup({
+			x: -20,
 			y: 10,
 		});
-		pointer.commands.startPickup();
-		pointer.values.direct.x.set(50);
 
-		expect(pointer.commands.release(3)).toMatchObject({
-			pickup: {
-				x: -30,
-				y: 10,
-			},
-			handoffOffset: {
-				x: 20,
-				y: 10,
-			},
-			physical: {
-				x: 0,
-				y: 0,
-				rotation: 0,
-			},
-			settlementVelocity: {
-				x: 0,
-				y: 0,
-			},
-		});
+		expect(pointer.commands.resetAfterHandoff(released.pointerGeneration)).toBe(false);
+		expect(pointer.values.direct.x.get()).toBe(0);
+		expect(pointer.values.direct.y.get()).toBe(0);
+		expect(pointer.values.pickup.x.get()).toBe(0);
+		expect(pointer.values.pickup.y.get()).toBe(0);
+		expect(pointer.values.physical.x.get()).toBe(4.864);
+		expect(pointer.values.physical.y.get()).toBe(-2.25);
+		expect(pointer.values.physical.rotation.get()).toBe(-1.311);
+
+		pointer.commands.disarmPickup();
+
+		expect(pointer.values.physical.x.get()).toBe(4.864);
+		expect(pointer.values.physical.y.get()).toBe(-2.25);
+		expect(pointer.values.physical.rotation.get()).toBe(-1.311);
 	});
 
 	it("cancels pointer, pickup, and physical response together", async () => {
@@ -138,6 +139,19 @@ describe("useTileActorPointerMotion", () => {
 		pointer.commands.startPickup();
 		pointer.values.direct.x.set(30);
 		pointer.values.direct.y.set(20);
+		pointer.commands.updateResponse({
+			delta: {
+				x: 7,
+				y: 7,
+			},
+			velocity: {
+				x: 0,
+				y: 0,
+			},
+		});
+
+		expect(pointer.values.physical.x.get()).not.toBe(0);
+		expect(pointer.values.physical.y.get()).not.toBe(0);
 
 		pointer.commands.cancel();
 

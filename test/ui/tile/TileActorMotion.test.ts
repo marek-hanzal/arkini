@@ -627,43 +627,6 @@ describe("useTileActorMotion", () => {
 		expect(capturedMotion.travel.y.get()).toBe(0);
 	});
 
-	it("keeps reduced-motion pointer translation direct", async () => {
-		motionTestRuntime.springLag = true;
-		motionTestRuntime.reducedMotion = true;
-		systemState.system = {
-			geometryVersion: 0,
-			readActorLayerRect: () => null,
-			readActorRect: () => null,
-			readPlacement: () => ({
-				x: 0,
-				y: 0,
-				width: 100,
-				height: 100,
-			}),
-			complete: () => undefined,
-			registerNeighbourActor: () => () => undefined,
-			beginNeighbourTravel: () => () => undefined,
-		} as unknown as TileSystem;
-		const location = {
-			scope: "board" as const,
-			space: 0,
-			position: {
-				x: 0,
-				y: 0,
-			},
-		};
-
-		await renderMotion(item(location), presentation(location, 1));
-		if (capturedMotion === null) throw new Error("Tile actor motion was not captured.");
-		capturedMotion.pointer.values.direct.x.set(100);
-		capturedMotion.pointer.values.direct.y.set(-100);
-
-		expect(capturedMotion.pointer.values.direct.x.get()).toBe(100);
-		expect(capturedMotion.pointer.values.direct.y.get()).toBe(-100);
-		expect(capturedMotion.pointer.values.physical.x.get()).toBe(0);
-		expect(capturedMotion.pointer.values.physical.y.get()).toBe(0);
-	});
-
 	it("hands released pointer translation to travel without changing the visible offset", async () => {
 		systemState.system = {
 			geometryVersion: 0,
@@ -802,57 +765,6 @@ describe("useTileActorMotion", () => {
 		const rendered = await renderMotion(item(location), presentation(location, 1));
 
 		await rendered.rerender(presentation(location, 2));
-		await act(async () => undefined);
-
-		expect(beginNeighbourTravel).not.toHaveBeenCalled();
-	});
-
-	it("does not register crowd travel under reduced motion", async () => {
-		motionTestRuntime.reducedMotion = true;
-		const beginNeighbourTravel = vi.fn(() => vi.fn());
-		let placement = {
-			x: 0,
-			y: 0,
-			width: 100,
-			height: 100,
-		};
-		systemState.system = {
-			geometryVersion: 0,
-			readActorLayerRect: () => null,
-			readActorRect: () => null,
-			readPlacement: () => placement,
-			complete: () => undefined,
-			registerNeighbourActor: () => () => undefined,
-			beginNeighbourTravel,
-		} as unknown as TileSystem;
-		const currentLocation = {
-			scope: "board" as const,
-			space: 0,
-			position: {
-				x: 0,
-				y: 0,
-			},
-		};
-		const targetLocation = {
-			scope: "board" as const,
-			space: 0,
-			position: {
-				x: 1,
-				y: 0,
-			},
-		};
-		const rendered = await renderMotion(
-			item(currentLocation),
-			presentation(currentLocation, 1),
-		);
-
-		placement = {
-			x: 100,
-			y: 0,
-			width: 100,
-			height: 100,
-		};
-		await rendered.rerender(presentation(targetLocation, 2));
 		await act(async () => undefined);
 
 		expect(beginNeighbourTravel).not.toHaveBeenCalled();

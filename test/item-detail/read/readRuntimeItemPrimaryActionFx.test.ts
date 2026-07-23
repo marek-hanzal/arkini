@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~/engine/game/fx/useGameFx";
-import { readRuntimeItemPrimaryAction } from "~/engine/item-detail/read/readRuntimeItemPrimaryAction";
+import { readRuntimeItemPrimaryActionFx } from "~/engine/item-detail/read/readRuntimeItemPrimaryActionFx";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { startFx } from "~/engine/start/write/startFx";
 
@@ -102,21 +102,25 @@ const producer = runtime.items.find((item) => item.item.id === "producer");
 const resource = runtime.items.find((item) => item.item.id === "resource");
 if (producer === undefined || resource === undefined) throw new Error("Missing fixtures.");
 
-describe("readRuntimeItemPrimaryAction", () => {
+describe("readRuntimeItemPrimaryActionFx", () => {
 	it("does nothing for ordinary items and opens Lines for owners without a default", () => {
 		expect(
-			readRuntimeItemPrimaryAction({
-				item: resource,
-				runtime,
-			}),
+			Effect.runSync(
+				readRuntimeItemPrimaryActionFx({
+					item: resource,
+					runtime,
+				}),
+			),
 		).toEqual({
 			kind: "none",
 		});
 		expect(
-			readRuntimeItemPrimaryAction({
-				item: producer,
-				runtime,
-			}),
+			Effect.runSync(
+				readRuntimeItemPrimaryActionFx({
+					item: producer,
+					runtime,
+				}),
+			),
 		).toEqual({
 			kind: "open-lines",
 		});
@@ -124,29 +128,33 @@ describe("readRuntimeItemPrimaryAction", () => {
 
 	it("starts only a valid save-backed default line", () => {
 		expect(
-			readRuntimeItemPrimaryAction({
-				item: producer,
-				runtime: {
-					...runtime,
-					defaultLineByOwnerItemId: {
-						[producer.id]: "line:produce",
+			Effect.runSync(
+				readRuntimeItemPrimaryActionFx({
+					item: producer,
+					runtime: {
+						...runtime,
+						defaultLineByOwnerItemId: {
+							[producer.id]: "line:produce",
+						},
 					},
-				},
-			}),
+				}),
+			),
 		).toEqual({
 			kind: "start-default-line",
 			lineId: "line:produce",
 		});
 		expect(
-			readRuntimeItemPrimaryAction({
-				item: producer,
-				runtime: {
-					...runtime,
-					defaultLineByOwnerItemId: {
-						[producer.id]: "line:missing",
+			Effect.runSync(
+				readRuntimeItemPrimaryActionFx({
+					item: producer,
+					runtime: {
+						...runtime,
+						defaultLineByOwnerItemId: {
+							[producer.id]: "line:missing",
+						},
 					},
-				},
-			}),
+				}),
+			),
 		).toEqual({
 			kind: "open-lines",
 		});

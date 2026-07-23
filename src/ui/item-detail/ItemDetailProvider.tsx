@@ -1,7 +1,7 @@
 import { type PropsWithChildren, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { match } from "ts-pattern";
 
-import { useGameEngine } from "~/bridge/game/useGameEngine";
+import { useResolveItemDefinitionDetailTarget } from "~/bridge/item-detail/useResolveItemDefinitionDetailTarget";
 import { useResolveItemDetailTarget } from "~/bridge/item-detail/useResolveItemDetailTarget";
 import { ItemDetailContext } from "~/ui/item-detail/ItemDetailContext";
 import type {
@@ -24,7 +24,7 @@ const closedState = {
 
 /** Owns one exact Item Detail target and one exhaustive enter/open/exit lifecycle. */
 export const ItemDetailProvider = ({ children }: PropsWithChildren) => {
-	const game = useGameEngine();
+	const resolveDefinitionTarget = useResolveItemDefinitionDetailTarget();
 	const resolveTarget = useResolveItemDetailTarget();
 	const [state, setState] = useState<ItemDetailState>(closedState);
 	const stateRef = useRef<ItemDetailState>(state);
@@ -151,19 +151,23 @@ export const ItemDetailProvider = ({ children }: PropsWithChildren) => {
 	);
 
 	const openItemDefinitionDetail = useCallback(
-		({ itemId, origin = null }: OpenItemDefinitionDetailProps) => {
-			if (game.config.items[itemId] === undefined) return false;
+		({ itemId, origin = null, tab }: OpenItemDefinitionDetailProps) => {
+			const resolved = resolveDefinitionTarget({
+				itemId,
+				requestedTab: tab,
+			});
+			if (resolved.kind === "unavailable") return false;
 			return openTarget({
 				kind: "definition",
-				itemId,
-				tab: "info",
+				itemId: resolved.itemId,
+				tab: resolved.tab,
 				origin: readOrigin(origin),
 			});
 		},
 		[
-			game.config.items,
 			openTarget,
 			readOrigin,
+			resolveDefinitionTarget,
 		],
 	);
 

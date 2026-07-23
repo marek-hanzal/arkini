@@ -36,15 +36,17 @@ export const readItemDetailIdentityFx = Effect.fn("readItemDetailIdentityFx")(fu
 	const item = runtime.items.find((candidate) => candidate.id === itemId);
 	if (item === undefined) return unavailable;
 	return {
-		kind: "available",
+		kind: "available" as const,
 		itemId: item.id,
 		title: item.item.title,
 		categoryId: item.item.categoryId,
-		sourceResourceId: yield* readRuntimeItemPrimaryAssetIdFx({ item: item.item }),
+		sourceResourceId: yield* readRuntimeItemPrimaryAssetIdFx({
+			item: item.item,
+		}),
 		...(item.item.asset.composite === undefined
 			? {}
 			: {
 					compositeResourceId: item.item.asset.composite,
 				}),
-	};
+	} satisfies readItemDetailIdentityFx.Result;
 });

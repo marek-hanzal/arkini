@@ -701,7 +701,7 @@ describe("Tile neighbour field", () => {
 		expect(staleTarget.x.read()).toBeLessThan(0);
 	});
 
-	it("disables semantic crowd work for a reduced-motion source", async () => {
+	it("disables semantic crowd work for an inactive source", async () => {
 		const neighbourField = await renderField();
 		previewKindByTarget.set("candidate", DropItemResultKindEnumSchema.enum.StoreInput);
 		register(

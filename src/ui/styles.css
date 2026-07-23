@@ -548,13 +548,6 @@ select {
 	opacity: 0.6;
 }
 
-@media (prefers-reduced-motion: reduce) {
-	.ak-list-row,
-	.ak-spotlight-option {
-		transition-duration: 0.01ms;
-	}
-}
-
 [data-ui="GameShell"] {
 	background-color: var(--ak-canvas);
 	isolation: isolate;
@@ -607,18 +600,6 @@ select {
 
 	50% {
 		opacity: 0.9;
-	}
-}
-
-@media (prefers-reduced-motion: reduce) {
-	[data-ui="GameShell"]::before,
-	[data-ui="GameShell"]::after {
-		animation: none;
-		opacity: 1;
-	}
-
-	[data-ui="GameShell"]::before {
-		opacity: 0.44;
 	}
 }
 
@@ -1086,15 +1067,6 @@ select {
 ::view-transition-new(arkini-game-menu-dialog) {
 	animation: none;
 	opacity: 0;
-}
-
-@media (prefers-reduced-motion: reduce) {
-	::view-transition-group(*),
-	::view-transition-old(*),
-	::view-transition-new(*) {
-		animation-duration: 1ms !important;
-		animation-delay: 0ms !important;
-	}
 }
 
 [data-ui="ItemDetailModal"] {

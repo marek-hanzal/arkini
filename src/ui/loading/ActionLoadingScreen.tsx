@@ -43,9 +43,6 @@ export const ActionLoadingScreen = ({
 	readonly label: string;
 }) => {
 	const [progress, setProgress] = useState(completed ? 100 : initialProgress);
-	const reducedMotion =
-		typeof window.matchMedia === "function" &&
-		window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 	useEffect(() => {
 		if (completed) {
@@ -53,7 +50,6 @@ export const ActionLoadingScreen = ({
 			return;
 		}
 		setProgress(initialProgress);
-		if (reducedMotion) return;
 		const timers = pendingStages.map((stage) =>
 			window.setTimeout(
 				() => setProgress(stage.progress),
@@ -65,7 +61,6 @@ export const ActionLoadingScreen = ({
 		};
 	}, [
 		completed,
-		reducedMotion,
 	]);
 
 	return (
@@ -92,7 +87,7 @@ export const ActionLoadingScreen = ({
 					aria-valuenow={progress}
 				>
 					<div
-						className="size-full origin-left rounded-full bg-accent transition-transform ease-out motion-reduce:transition-none"
+						className="size-full origin-left rounded-full bg-accent transition-transform ease-out"
 						data-ui="ActionLoadingScreenProgressFill"
 						style={{
 							transform: `scaleX(${progress / 100})`,

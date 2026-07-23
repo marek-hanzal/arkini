@@ -1,20 +1,38 @@
+import { Effect } from "effect";
+
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
 import { ItemDetailTabEnumSchema } from "~/engine/item-detail/schema/ItemDetailTabEnumSchema";
 import { isLineOwnerItem } from "~/engine/line/read/isLineOwnerItem";
 import { ItemEnumSchema } from "~/engine/item/schema/ItemEnumSchema";
 
-type ItemDetailSourcesAvailability =
-	| {
-			readonly kind: "available";
-			readonly source: readonly unknown[];
-	  }
-	| {
-			readonly kind: "unavailable";
-	  };
+export namespace readItemDetailTabsFx {
+	export type SourcesAvailability =
+		| {
+				readonly kind: "available";
+				readonly source: readonly unknown[];
+		  }
+		| {
+				readonly kind: "unavailable";
+		  };
+
+	export type Target =
+		| {
+				readonly kind: "runtime";
+				readonly item: RuntimeItemSchema.Type | undefined;
+		  }
+		| {
+				readonly kind: "definition";
+		  };
+
+	export interface Props {
+		readonly target: Target;
+		readonly sources?: SourcesAvailability;
+	}
+}
 
 const withSources = (
 	tabs: readonly ItemDetailTabEnumSchema.Type[],
-	sources: ItemDetailSourcesAvailability | undefined,
+	sources: readItemDetailTabsFx.SourcesAvailability | undefined,
 ): readonly ItemDetailTabEnumSchema.Type[] => {
 	if (sources?.kind !== "available" || sources.source?.length === 0) return tabs;
 	const infoIndex = tabs.indexOf(ItemDetailTabEnumSchema.enum.Info);
@@ -24,9 +42,9 @@ const withSources = (
 				ItemDetailTabEnumSchema.enum.Sources,
 			]
 		: [
-				...tabs.slice(0, infoIndex),
+				...tabs.slice(0, infoIndex + 1),
 				ItemDetailTabEnumSchema.enum.Sources,
-				...tabs.slice(infoIndex),
+				...tabs.slice(infoIndex + 1),
 			];
 };
 
@@ -44,17 +62,18 @@ const queuedProducerTabs: readonly ItemDetailTabEnumSchema.Type[] = [
 	ItemDetailTabEnumSchema.enum.Info,
 ];
 
-/** Classifies the finite Item Detail tabs supported by one exact live runtime item. */
-export const readItemDetailTabs = (
-	item: RuntimeItemSchema.Type | undefined,
-	sources?: ItemDetailSourcesAvailability,
-): readonly ItemDetailTabEnumSchema.Type[] => {
-	if (item === undefined) return noTabs;
-	if (!isLineOwnerItem(item.item)) return withSources(infoTab, sources);
+/** Classifies the finite Item Detail tabs supported by one exact runtime or definition target. */
+export const readItemDetailTabsFx = Effect.fn("readItemDetailTabsFx")(function* ({
+	sources,
+	target,
+}: readItemDetailTabsFx.Props) {
+	if (target.kind === "definition") return withSources(infoTab, sources);
+	if (target.item === undefined) return noTabs;
+	if (!isLineOwnerItem(target.item.item)) return withSources(infoTab, sources);
 	return withSources(
-		item.item.type === ItemEnumSchema.enum.Producer && item.item.maxQueueSize > 1
+		target.item.item.type === ItemEnumSchema.enum.Producer && target.item.item.maxQueueSize > 1
 			? queuedProducerTabs
 			: lineOwnerTabs,
 		sources,
 	);
-};
+});

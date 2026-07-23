@@ -1,4 +1,4 @@
-import type { readRuntimeItemPrimaryAction } from "~/engine/item-detail/read/readRuntimeItemPrimaryAction";
+import type { readRuntimeItemPrimaryActionFx } from "~/engine/item-detail/read/readRuntimeItemPrimaryActionFx";
 import type { JobStatusEnumSchema } from "~/engine/job/schema/read/JobStatusEnumSchema";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 
@@ -14,5 +14,5 @@ export interface TileActorItem {
 	readonly location: GridLocationSchema.Type;
 	readonly jobStatus?: JobStatusEnumSchema.Type;
 	readonly running: boolean;
-	readonly primaryAction: readRuntimeItemPrimaryAction.Result;
+	readonly primaryAction: readRuntimeItemPrimaryActionFx.Result;
 }

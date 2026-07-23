@@ -535,36 +535,35 @@ describe("Board drag", () => {
 			motionTestRuntime.readMotionScale("TileActorNeighbourEmphasis", compatibleRuntimeId),
 		).toBe(1);
 	});
-	it("removes cursor lag and neighbour yielding for reduced motion", async () => {
-		motionTestRuntime.reducedMotion = true;
+
+	it("preserves a settling physical shell through a press released before drag starts", async () => {
 		const source = await renderBoard();
 		const runtimeId = source.dataset.runtimeId;
 		const dragSurface = source.querySelector<HTMLElement>('[data-ui="TileActorDragSurface"]');
-		const neighbour = document.querySelector<HTMLElement>(
-			'[data-ui="TileActor"][data-board-x="0"][data-board-y="1"]',
-		);
-		const neighbourId = neighbour?.dataset.runtimeId;
-		if (runtimeId === undefined || dragSurface === null || neighbourId === undefined) {
-			throw new Error("Missing reduced-motion actor identity.");
-		}
+		if (runtimeId === undefined || dragSurface === null)
+			throw new Error("Missing draggable actor identity.");
+		motionTestRuntime.writeMotionOffset("TileActorPhysicalResponse", runtimeId, {
+			x: 4.864,
+			y: -2.25,
+		});
 
 		await act(async () => {
-			dragSurface.dispatchEvent(pointerEvent("pointerdown", 210, 110));
-			dragSurface.dispatchEvent(pointerEvent("pointermove", 217, 117));
+			dragSurface.dispatchEvent(pointerEvent("pointerdown", 250, 150));
+			dragSurface.dispatchEvent(pointerEvent("pointerup", 250, 150));
 			await Promise.resolve();
 		});
 
+		expect(motionTestRuntime.readDragOffset()).toEqual({
+			x: 0,
+			y: 0,
+		});
+		expect(motionTestRuntime.readMotionOffset("TileActorPickup", runtimeId)).toEqual({
+			x: 0,
+			y: 0,
+		});
 		expect(motionTestRuntime.readMotionOffset("TileActorPhysicalResponse", runtimeId)).toEqual({
-			x: 0,
-			y: 0,
-		});
-		expect(motionTestRuntime.readMotionOffset("TileActor", neighbourId)).toEqual({
-			x: 0,
-			y: 0,
-		});
-
-		await act(async () => {
-			dragSurface.dispatchEvent(pointerEvent("pointercancel", 217, 117));
+			x: 4.864,
+			y: -2.25,
 		});
 	});
 

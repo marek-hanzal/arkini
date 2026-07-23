@@ -204,54 +204,6 @@ describe("useTileActorNeighbourMotion", () => {
 		expect(stopTravel).toHaveBeenCalledOnce();
 	});
 
-	it("clears response and active leases under reduced motion, then starts cleanly", async () => {
-		const stopTravel = vi.fn();
-		const beginNeighbourTravel = vi.fn(() => stopTravel);
-		const updateNeighbourActor = vi.fn();
-		const registerNeighbourActor = vi.fn(() => vi.fn());
-		systemState.system = {
-			registerNeighbourActor,
-			updateNeighbourActor,
-			beginNeighbourTravel,
-		} as unknown as TileSystem;
-		const rendered = await renderNeighbourMotion();
-		const node = document.createElement("span");
-		await act(async () => rendered.motion.registerActorNode(node));
-		const registration = registerNeighbourActor.mock.calls[0]?.[0];
-		if (registration === undefined) throw new Error("Missing actor registration.");
-		registration.x.set(8);
-		registration.y.set(-6);
-		registration.scale.set(1.12);
-		rendered.motion.retainTravel();
-
-		motionTestRuntime.reducedMotion = true;
-		const reduced = await rendered.rerender({
-			actorSource: source("revision:1"),
-			visible: true,
-		});
-		expect(stopTravel).toHaveBeenCalledOnce();
-		expect(reduced.values.x.get()).toBe(0);
-		expect(reduced.values.y.get()).toBe(0);
-		expect(reduced.values.scale.get()).toBe(1);
-		expect(updateNeighbourActor).toHaveBeenLastCalledWith({
-			itemId: "runtime:actor",
-			source: source("revision:1"),
-			enabled: false,
-		});
-		const releaseReduced = reduced.retainTravel();
-		expect(beginNeighbourTravel).toHaveBeenCalledOnce();
-		releaseReduced();
-
-		motionTestRuntime.reducedMotion = false;
-		const restored = await rendered.rerender({
-			actorSource: source("revision:1"),
-			visible: true,
-		});
-		const releaseRestored = restored.retainTravel();
-		expect(beginNeighbourTravel).toHaveBeenCalledTimes(2);
-		releaseRestored();
-	});
-
 	it("unregisters the node, stops travel, and resets values on teardown", async () => {
 		const unregister = vi.fn();
 		const stopTravel = vi.fn();

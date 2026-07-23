@@ -10,7 +10,7 @@ export type ItemDetailTarget =
 	| {
 			readonly kind: "definition";
 			readonly itemId: string;
-			readonly tab: "info";
+			readonly tab: Extract<ItemDetailTab, "info" | "sources">;
 			readonly origin: HTMLElement | null;
 	  };
 
@@ -47,6 +47,7 @@ export interface OpenItemDetailProps {
 
 export interface OpenItemDefinitionDetailProps {
 	readonly itemId: string;
+	readonly tab?: Extract<ItemDetailTab, "info" | "sources">;
 	readonly origin?: HTMLElement | null;
 }
 

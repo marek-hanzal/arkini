@@ -208,11 +208,9 @@ const mapDetailReference = ({
 const mapOutputItem = ({
 	game,
 	item,
-	runtime,
 }: {
 	readonly game: ReturnType<typeof useGameEngine>;
 	readonly item: readItemDetailLinesFx.OutputItem;
-	readonly runtime: RuntimeSchema.Type;
 }): useItemDetailLines.OutputItem => {
 	const configured = game.config.items[item.itemId];
 	return {
@@ -242,11 +240,9 @@ const mapOutputItem = ({
 const mapOutputRoll = ({
 	game,
 	roll,
-	runtime,
 }: {
 	readonly game: ReturnType<typeof useGameEngine>;
 	readonly roll: readItemDetailLinesFx.OutputRoll;
-	readonly runtime: RuntimeSchema.Type;
 }): useItemDetailLines.OutputRoll =>
 	match(roll)
 		.with(
@@ -259,7 +255,6 @@ const mapOutputRoll = ({
 					mapOutputItem({
 						game,
 						item: entry,
-						runtime,
 					}),
 				),
 			}),
@@ -275,7 +270,6 @@ const mapOutputRoll = ({
 					mapOutputItem({
 						game,
 						item: entry,
-						runtime,
 					}),
 				),
 			}),
@@ -293,7 +287,6 @@ const mapOutputRoll = ({
 						mapOutputItem({
 							game,
 							item: entry,
-							runtime,
 						}),
 					),
 				})),
@@ -624,7 +617,6 @@ export const useItemDetailLines = (itemId: IdSchema.Type): useItemDetailLines.Pr
 							mapOutputRoll({
 								game,
 								roll,
-								runtime,
 							}),
 						),
 					})),

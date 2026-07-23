@@ -49,12 +49,6 @@ const progressValue = (container: ParentNode) =>
 
 beforeEach(() => {
 	vi.useFakeTimers();
-	Object.defineProperty(window, "matchMedia", {
-		configurable: true,
-		value: vi.fn(() => ({
-			matches: false,
-		})),
-	});
 });
 
 afterEach(async () => {
@@ -107,15 +101,5 @@ describe("ActionLoadingScreen", () => {
 
 		await act(async () => vi.advanceTimersByTime(defaultLoadingMinimumDurationMs));
 		expect(progressValue(container)).toBe(100);
-	});
-
-	it("keeps a stable initial frame when reduced motion is requested", async () => {
-		vi.mocked(window.matchMedia).mockReturnValue({
-			matches: true,
-		} as MediaQueryList);
-		const { container } = await renderScreen();
-
-		await act(async () => vi.advanceTimersByTime(defaultLoadingMinimumDurationMs * 2));
-		expect(progressValue(container)).toBe(12);
 	});
 });

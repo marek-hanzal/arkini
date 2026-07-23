@@ -1,4 +1,4 @@
-import { type MotionValue, useMotionValue, useReducedMotion, useSpring } from "motion/react";
+import { type MotionValue, useMotionValue, useSpring } from "motion/react";
 import { useCallback, useEffect, useLayoutEffect, useRef } from "react";
 
 import type { TileDragSource } from "~/ui/tile/TileDragSource";
@@ -59,7 +59,6 @@ export const useTileActorNeighbourMotion = ({
 }: useTileActorNeighbourMotion.Props) => {
 	const { registerNeighbourActor, updateNeighbourActor, beginNeighbourTravel } =
 		useTileActorSystem();
-	const reducedMotion = useReducedMotion();
 	const targetX = useMotionValue(0);
 	const targetY = useMotionValue(0);
 	const x = useSpring(targetX, neighbourPositionTransition);
@@ -70,11 +69,10 @@ export const useTileActorNeighbourMotion = ({
 	const registrationRef = useRef<ActiveRegistration | null>(null);
 	const travelOwners = useRef(new Set<symbol>());
 	const stopTravel = useRef<(() => void) | null>(null);
-	const reducedMotionRef = useRef(reducedMotion);
 	const metadataRef = useRef<ActorMetadata>({
 		itemId,
 		source,
-		enabled: visible && !reducedMotion,
+		enabled: visible,
 	});
 	const sizeRef = useRef({
 		width: canonicalWidth,
@@ -88,9 +86,8 @@ export const useTileActorNeighbourMotion = ({
 	metadataRef.current = {
 		itemId,
 		source,
-		enabled: visible && !reducedMotion,
+		enabled: visible,
 	};
-	reducedMotionRef.current = reducedMotion;
 	sizeRef.current = {
 		width: canonicalWidth,
 		height: canonicalHeight,
@@ -169,7 +166,6 @@ export const useTileActorNeighbourMotion = ({
 
 	const retainTravel = useCallback(() => {
 		const metadata = metadataRef.current;
-		if (reducedMotionRef.current) return () => undefined;
 		const token = Symbol("tile-neighbour-travel");
 		travelOwners.current.add(token);
 		if (travelOwners.current.size === 1) {
@@ -207,7 +203,6 @@ export const useTileActorNeighbourMotion = ({
 		clearRegistration,
 		clearTravel,
 		itemId,
-		reducedMotion,
 		registerActorNode,
 		registerNeighbourActor,
 		source,
@@ -216,12 +211,11 @@ export const useTileActorNeighbourMotion = ({
 	]);
 
 	useLayoutEffect(() => {
-		if (visible && !reducedMotion) return;
+		if (visible) return;
 		clearTravel();
 		resetValues();
 	}, [
 		clearTravel,
-		reducedMotion,
 		resetValues,
 		visible,
 	]);

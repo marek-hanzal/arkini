@@ -196,7 +196,7 @@ export const useTileActorDrag = ({
 		pointerOwned.current = false;
 		if (dragStarted.current) return;
 		dragStarted.current = false;
-		pointer.cancel();
+		pointer.disarmPickup();
 		clearTransientDragMotion();
 		cancel(canonicalSource.id);
 	}, [

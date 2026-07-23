@@ -29,14 +29,14 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: 24.18.0
+          node-version: 22.16.0
           cache: npm
           cache-dependency-path: package-lock.json
 
       - name: Verify pinned Node and npm toolchain
         run: |
-          test "$(node --version)" = "v24.18.0"
-          test "$(npm --version)" = "11.16.0"
+          test "$(node --version)" = "v22.16.0"
+          test "$(npm --version)" = "10.9.2"
 
       - name: Use tag version for release artifacts
         if: startsWith(github.ref, 'refs/tags/')

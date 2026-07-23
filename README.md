@@ -123,7 +123,8 @@ Do not introduce generic junk drawers such as `shared`, `utils`, `helpers`, or `
 
 ## Installation
 
-The repository pins Node `24.18.0` and npm `11.16.0` through `.nvmrc`, `engines`, `packageManager`, the lockfile, and GitHub Actions. Use the pinned toolchain rather than letting local and CI package resolution quietly diverge.
+The repository pins Node `22.16.0` and npm `10.9.2` through `.nvmrc`, `engines`, `packageManager`, the lockfile, and GitHub Actions. Use the pinned toolchain rather than letting local and CI package resolution quietly diverge.
+`npm-run-all2` is intentionally pinned to `8.0.4`: version 9 raises its Node floor above this shared local/CI/sandbox runtime, while version 8 keeps the same `run-p` / `run-s` script interface.
 
 The repository uses npm and commits `package-lock.json`.
 

@@ -89,7 +89,10 @@ const travelTargetForPreview = (
 	previewKind: useDropItemPreview.Result["kind"] | null,
 ): TileNeighbourTravelTarget | null => {
 	if (itemId === null) return null;
-	if (previewKind === DropItemResultKindEnumSchema.enum.Merge) {
+	if (
+		previewKind === DropItemResultKindEnumSchema.enum.Merge ||
+		previewKind === DropItemResultKindEnumSchema.enum.Stack
+	) {
 		return {
 			itemId,
 			feedback: "merge",
@@ -272,7 +275,8 @@ export const useTileNeighbourField = ({
 					);
 				}
 				const candidateKind =
-					preview?.kind === DropItemResultKindEnumSchema.enum.Merge
+					preview?.kind === DropItemResultKindEnumSchema.enum.Merge ||
+					preview?.kind === DropItemResultKindEnumSchema.enum.Stack
 						? "merge"
 						: preview?.kind === DropItemResultKindEnumSchema.enum.StoreInput
 							? "accepted"

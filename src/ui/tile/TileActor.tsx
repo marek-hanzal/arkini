@@ -309,6 +309,7 @@ const TileActorComponent = ({
 							>
 								<TileActorContent
 									item={item}
+									quantityOverride={presentation.quantityOverride}
 									registerActorNode={actorMotion.neighbour.registerActorNode}
 									surfaceId={presentation.canonicalSource.surface.id}
 									live={live}

@@ -35,6 +35,7 @@ const ownsActor = (active: TileInteractionState | null, itemId: string) =>
 				settlement.pendingActorIds.includes(itemId) ||
 				(settlement.kind === "store-input" && settlement.outcome.owner.itemId === itemId) ||
 				(settlement.kind === "merge" && settlement.outcome.target.itemId === itemId) ||
+				(settlement.kind === "stack" && settlement.outcome.target.itemId === itemId) ||
 				("target" in settlement &&
 					settlement.target.kind === "slot" &&
 					settlement.target.occupant?.id === itemId),

@@ -45,6 +45,7 @@ export namespace useTileActorPresentation {
 		readonly placementFrozen: boolean;
 		readonly positionCompletion: PositionCompletion;
 		readonly visualCompletionGeneration: number | null;
+		readonly quantityOverride: number | null;
 		readonly hovered: boolean;
 		readonly setHovered: (hovered: boolean) => void;
 	}
@@ -59,6 +60,7 @@ interface TileActorPresentationView {
 	readonly placementFrozen: boolean;
 	readonly positionCompletion: useTileActorPresentation.PositionCompletion;
 	readonly visualCompletionGeneration: number | null;
+	readonly quantityOverride: number | null;
 }
 
 const actorSource = (item: useTileActors.Item, location: TileLocation): TileDragSource => ({
@@ -94,6 +96,7 @@ const passiveView = (
 		kind: "none",
 	},
 	visualCompletionGeneration: null,
+	quantityOverride: null,
 });
 
 const settlingView = (
@@ -336,6 +339,85 @@ const settlingView = (
 				};
 			},
 		)
+		.with(
+			{
+				kind: DropItemResultKindEnumSchema.enum.Stack,
+				stage: "approach",
+			},
+			(settlement) => {
+				const targetLocation = settlement.outcome.target.current.location;
+				if (settlement.outcome.source.itemId === item.id) {
+					return {
+						...passive,
+						desiredLocation: targetLocation,
+						followTarget: {
+							interactionGeneration: settling.generation,
+							stage: "approach" as const,
+							sourceItemId: settlement.outcome.source.itemId,
+							targetItemId: settlement.outcome.target.itemId,
+						},
+						phase: "combining" as const,
+						feedback: settlement.feedback,
+						positionCompletion: {
+							kind: "always" as const,
+							generation: settling.generation,
+						},
+						quantityOverride: settlement.outcome.source.previousQuantity,
+					};
+				}
+				return settlement.outcome.target.itemId === item.id
+					? {
+							...passive,
+							phase: "combining" as const,
+							feedback: settlement.feedback,
+							quantityOverride: settlement.outcome.target.previousQuantity,
+						}
+					: passive;
+			},
+		)
+		.with(
+			{
+				kind: DropItemResultKindEnumSchema.enum.Stack,
+				stage: "resolve",
+			},
+			(settlement) => {
+				if (!settlement.pendingActorIds.includes(item.id)) return passive;
+				const targetLocation = settlement.outcome.target.current.location;
+				if (settlement.outcome.source.itemId === item.id) {
+					const current = settlement.outcome.source.current;
+					if (current === null) {
+						return {
+							...passive,
+							desiredLocation: targetLocation,
+							phase: "exiting" as const,
+							feedback: settlement.feedback,
+							placementFrozen: true,
+							visualCompletionGeneration: settling.generation,
+						};
+					}
+					return {
+						...passive,
+						desiredLocation: current.location,
+						phase: "settling" as const,
+						feedback: settlement.feedback,
+						positionCompletion: {
+							kind: "location" as const,
+							generation: settling.generation,
+							location: current.location,
+						},
+					};
+				}
+				return settlement.outcome.target.itemId === item.id
+					? {
+							...passive,
+							desiredLocation: targetLocation,
+							phase: "impact" as const,
+							feedback: settlement.feedback,
+							visualCompletionGeneration: settling.generation,
+						}
+					: passive;
+			},
+		)
 		.exhaustive();
 
 const interactionView = (
@@ -364,9 +446,12 @@ const interactionView = (
 			(dragging) => {
 				const previewsMerge =
 					dragging.previewKind === DropItemResultKindEnumSchema.enum.Merge;
+				const previewsStack =
+					dragging.previewKind === DropItemResultKindEnumSchema.enum.Stack;
 				const previewsInputStore =
 					dragging.previewKind === DropItemResultKindEnumSchema.enum.StoreInput;
-				const acceptsInteraction = previewsMerge || previewsInputStore;
+				const previewsCombine = previewsMerge || previewsStack;
+				const acceptsInteraction = previewsCombine || previewsInputStore;
 				const occupied =
 					dragging.target?.kind === "slot" && dragging.target.occupant !== null;
 				if (dragging.source.id === item.id) {
@@ -388,7 +473,7 @@ const interactionView = (
 					if (acceptsInteraction) {
 						return {
 							...passive,
-							phase: previewsMerge ? ("combining" as const) : ("targeted" as const),
+							phase: previewsCombine ? ("combining" as const) : ("targeted" as const),
 							feedback: "accepted" as const,
 						};
 					}
@@ -410,9 +495,12 @@ const interactionView = (
 			(awaiting) => {
 				const previewsMerge =
 					awaiting.previewKind === DropItemResultKindEnumSchema.enum.Merge;
+				const previewsStack =
+					awaiting.previewKind === DropItemResultKindEnumSchema.enum.Stack;
 				const previewsInputStore =
 					awaiting.previewKind === DropItemResultKindEnumSchema.enum.StoreInput;
-				const acceptsInteraction = previewsMerge || previewsInputStore;
+				const previewsCombine = previewsMerge || previewsStack;
+				const acceptsInteraction = previewsCombine || previewsInputStore;
 				const occupied =
 					awaiting.target.kind === "slot" && awaiting.target.occupant !== null;
 				if (awaiting.source.id === item.id) {
@@ -434,7 +522,7 @@ const interactionView = (
 					if (acceptsInteraction) {
 						return {
 							...passive,
-							phase: previewsMerge ? ("combining" as const) : ("targeted" as const),
+							phase: previewsCombine ? ("combining" as const) : ("targeted" as const),
 							feedback: "accepted" as const,
 							placementFrozen: true,
 						};
@@ -503,6 +591,7 @@ export const useTileActorPresentation = ({
 		placementFrozen: view.placementFrozen,
 		positionCompletion: view.positionCompletion,
 		visualCompletionGeneration: view.visualCompletionGeneration,
+		quantityOverride: view.quantityOverride,
 		hovered,
 		setHovered,
 	};

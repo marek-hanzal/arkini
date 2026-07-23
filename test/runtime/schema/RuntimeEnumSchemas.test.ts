@@ -5,14 +5,15 @@ import { DropItemResultKindEnumSchema } from "~/engine/runtime/schema/command/Dr
 
 describe("runtime enum schemas", () => {
 	it("owns reusable runtime issue and drop-result vocabularies", () => {
-		expect(RuntimeCheckIssueEnumSchema.parse(RuntimeCheckIssueEnumSchema.enum.ItemCharges)).toBe(
-			RuntimeCheckIssueEnumSchema.enum.ItemCharges,
-		);
+		expect(
+			RuntimeCheckIssueEnumSchema.parse(RuntimeCheckIssueEnumSchema.enum.ItemCharges),
+		).toBe(RuntimeCheckIssueEnumSchema.enum.ItemCharges);
 		expect(DropItemResultKindEnumSchema.options).toEqual([
 			DropItemResultKindEnumSchema.enum.Move,
 			DropItemResultKindEnumSchema.enum.Swap,
 			DropItemResultKindEnumSchema.enum.Merge,
 			DropItemResultKindEnumSchema.enum.StoreInput,
+			DropItemResultKindEnumSchema.enum.Stack,
 			DropItemResultKindEnumSchema.enum.Ignored,
 			DropItemResultKindEnumSchema.enum.Reject,
 		]);

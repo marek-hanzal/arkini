@@ -12,6 +12,7 @@ import type { readTileDeliveryTiming } from "~/ui/tile/readTileDeliveryTiming";
 export namespace TileActorContent {
 	export interface Props {
 		readonly item: useTileActors.Item;
+		readonly quantityOverride?: number | null;
 		readonly registerActorNode: (node: HTMLSpanElement | null) => void;
 		readonly surfaceId: string;
 		readonly live: boolean;
@@ -84,6 +85,7 @@ const TileActorFace = ({
 /** Renders the exact live tile content inside independent interaction and cue shells. */
 export const TileActorContent = ({
 	item,
+	quantityOverride = null,
 	registerActorNode,
 	surfaceId,
 	live,
@@ -103,9 +105,10 @@ export const TileActorContent = ({
 	onInteractionAnimationComplete,
 }: TileActorContent.Props) => {
 	const presentedQuantity =
-		cue?.kind === "absorb" && cue.resultingQuantity !== undefined
+		quantityOverride ??
+		(cue?.kind === "absorb" && cue.resultingQuantity !== undefined
 			? cue.resultingQuantity
-			: item.quantity;
+			: item.quantity);
 	const cueMode: TileMotionCueVisual.Mode =
 		cue === null
 			? "defer"

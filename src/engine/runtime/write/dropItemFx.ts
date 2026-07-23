@@ -6,6 +6,7 @@ import { storeInputMaterialFx } from "~/engine/input/write/storeInputMaterialFx"
 import { isSameGridLocation } from "~/engine/location/read/isSameGridLocation";
 import { commitMergeItemsFx } from "~/engine/merge/internal/commitMergeItemsFx";
 import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
+import { readDropItemStackRejectedReasonFx } from "~/engine/runtime/read/readDropItemStackRejectedReasonFx";
 import { readDropItemPreviewFx } from "~/engine/runtime/read/readDropItemPreviewFx";
 import type { DropItemResultSchema } from "~/engine/runtime/schema/command/DropItemResultSchema";
 import { DropItemIgnoredReasonEnumSchema } from "~/engine/runtime/schema/command/DropItemIgnoredReasonEnumSchema";
@@ -13,6 +14,7 @@ import { DropItemRejectedReasonEnumSchema } from "~/engine/runtime/schema/comman
 import { DropItemResultKindEnumSchema } from "~/engine/runtime/schema/command/DropItemResultKindEnumSchema";
 import type { GridRuntimeItemSchema } from "~/engine/runtime/schema/GridRuntimeItemSchema";
 import { moveItemFx } from "~/engine/runtime/write/moveItemFx";
+import { stackItemsFx } from "~/engine/runtime/write/stackItemsFx";
 import { swapItemsFx } from "~/engine/runtime/write/swapItemsFx";
 
 export namespace dropItemFx {
@@ -37,7 +39,7 @@ export namespace dropItemFx {
 	export type Result = DropItemResultSchema.Type;
 }
 
-const mergeActorState = (item: GridRuntimeItemSchema.Type) => ({
+const actorState = (item: GridRuntimeItemSchema.Type) => ({
 	itemId: item.id,
 	canonicalItemId: item.item.id,
 	revision: item.revision,
@@ -188,7 +190,7 @@ export const dropItemFx = Effect.fn("dropItemFx")(function* ({
 						current:
 							result.sourceAfter === undefined
 								? null
-								: mergeActorState(result.sourceAfter),
+								: actorState(result.sourceAfter),
 					},
 					target: {
 						itemId: result.targetBefore.id,
@@ -198,7 +200,7 @@ export const dropItemFx = Effect.fn("dropItemFx")(function* ({
 						current:
 							result.targetAfter === undefined
 								? null
-								: mergeActorState(result.targetAfter),
+								: actorState(result.targetAfter),
 					},
 				}),
 			),
@@ -284,8 +286,7 @@ export const dropItemFx = Effect.fn("dropItemFx")(function* ({
 					previousRevision: stored.sourceBefore.revision,
 					previousLocation: stored.sourceBefore.location,
 					previousQuantity: stored.sourceBefore.quantity,
-					current:
-						stored.sourceItem === undefined ? null : mergeActorState(stored.sourceItem),
+					current: stored.sourceItem === undefined ? null : actorState(stored.sourceItem),
 				},
 				owner: {
 					itemId: stored.ownerItem.id,
@@ -337,6 +338,63 @@ export const dropItemFx = Effect.fn("dropItemFx")(function* ({
 						targetItemId,
 					}),
 			}),
+			Effect.catchAll(() =>
+				Effect.succeed({
+					kind: DropItemResultKindEnumSchema.enum.Reject,
+					reason: DropItemRejectedReasonEnumSchema.enum.Blocked,
+					itemId: sourceItemId,
+					targetItemId,
+				}),
+			),
+		);
+	}
+
+	if (preflight.kind === DropItemResultKindEnumSchema.enum.Stack) {
+		return yield* stackItemsFx({
+			sourceItemId,
+			sourceRevision,
+			sourceLocation,
+			targetItemId,
+			targetRevision: targetOccupant.revision,
+			targetLocation: target.location,
+		}).pipe(
+			Effect.map(
+				(result): dropItemFx.Result => ({
+					kind: DropItemResultKindEnumSchema.enum.Stack,
+					transferredQuantity: result.transferredQuantity,
+					source: {
+						itemId: result.sourceBefore.id,
+						canonicalItemId: result.sourceBefore.item.id,
+						previousRevision: result.sourceBefore.revision,
+						previousLocation: result.sourceBefore.location,
+						previousQuantity: result.sourceBefore.quantity,
+						current:
+							result.sourceAfter === undefined
+								? null
+								: actorState(result.sourceAfter),
+					},
+					target: {
+						itemId: result.targetBefore.id,
+						canonicalItemId: result.targetBefore.item.id,
+						previousRevision: result.targetBefore.revision,
+						previousLocation: result.targetBefore.location,
+						previousQuantity: result.targetBefore.quantity,
+						current: actorState(result.targetAfter),
+					},
+				}),
+			),
+			Effect.catchTag("StackItemsUnavailableError", (error) =>
+				readDropItemStackRejectedReasonFx({
+					reason: error.reason,
+				}).pipe(
+					Effect.map((reason) => ({
+						kind: DropItemResultKindEnumSchema.enum.Reject,
+						reason,
+						itemId: sourceItemId,
+						targetItemId,
+					})),
+				),
+			),
 			Effect.catchAll(() =>
 				Effect.succeed({
 					kind: DropItemResultKindEnumSchema.enum.Reject,

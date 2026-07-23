@@ -63,6 +63,7 @@ vi.mock("~/ui/tile/useTileActorPresentation", () => ({
 				kind: "none" as const,
 			},
 			visualCompletionGeneration: null,
+			quantityOverride: null,
 			hovered: false,
 			setHovered: vi.fn(),
 		};

@@ -124,6 +124,20 @@ const settlementForOutcome = (
 				],
 			}),
 		)
+		.with(
+			{
+				kind: DropItemResultKindEnumSchema.enum.Stack,
+			},
+			(stacked) => ({
+				kind: DropItemResultKindEnumSchema.enum.Stack,
+				feedback: "accepted" as const,
+				outcome: stacked,
+				stage: "approach" as const,
+				pendingActorIds: [
+					source.id,
+				],
+			}),
+		)
 		.exhaustive();
 
 const removePendingActor = (
@@ -510,11 +524,35 @@ export const useTileInteractionController = ({
 							)
 							.with(
 								{
+									kind: DropItemResultKindEnumSchema.enum.Stack,
+									stage: "approach",
+								},
+								(stack) =>
+									itemId === settling.source.id
+										? {
+												...settling,
+												settlement: {
+													...stack,
+													stage: "resolve" as const,
+													pendingActorIds: [
+														stack.outcome.source.itemId,
+														stack.outcome.target.itemId,
+													],
+												},
+											}
+										: settling,
+							)
+							.with(
+								{
 									kind: DropItemResultKindEnumSchema.enum.StoreInput,
 									stage: "resolve",
 								},
 								{
 									kind: DropItemResultKindEnumSchema.enum.Merge,
+									stage: "resolve",
+								},
+								{
+									kind: DropItemResultKindEnumSchema.enum.Stack,
 									stage: "resolve",
 								},
 								{

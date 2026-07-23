@@ -88,6 +88,13 @@ export interface TileMergeSettlement extends TileSettlementBase {
 	readonly stage: "approach" | "resolve";
 }
 
+export interface TileStackSettlement extends TileSettlementBase {
+	readonly kind: typeof DropItemResultKindEnumSchema.enum.Stack;
+	readonly feedback: "accepted";
+	readonly outcome: DropOutcome<typeof DropItemResultKindEnumSchema.enum.Stack>;
+	readonly stage: "approach" | "resolve";
+}
+
 export type TileSettlementState =
 	| TileFailedSettlement
 	| TileRejectedSettlement
@@ -95,7 +102,8 @@ export type TileSettlementState =
 	| TileMovedSettlement
 	| TileSwappedSettlement
 	| TileStoreInputSettlement
-	| TileMergeSettlement;
+	| TileMergeSettlement
+	| TileStackSettlement;
 
 export interface TileSettlingInteraction extends TileInteractionBase {
 	readonly phase: Extract<TileInteractionPhaseSchema.Type, "settling">;

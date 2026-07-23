@@ -10,6 +10,8 @@ import { resolveMergeRuleFx } from "~/engine/merge/fx/resolveMergeRuleFx";
 import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
 import { isBoardRuntimeItem } from "~/engine/runtime/read/isBoardRuntimeItem";
 import { isGridRuntimeItem } from "~/engine/runtime/read/isGridRuntimeItem";
+import { readDropItemStackRejectedReasonFx } from "~/engine/runtime/read/readDropItemStackRejectedReasonFx";
+import { readItemStackResolutionFx } from "~/engine/runtime/read/readItemStackResolutionFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import { DropItemIgnoredReasonEnumSchema } from "~/engine/runtime/schema/command/DropItemIgnoredReasonEnumSchema";
 import { DropItemRejectedReasonEnumSchema } from "~/engine/runtime/schema/command/DropItemRejectedReasonEnumSchema";
@@ -39,7 +41,8 @@ export namespace readDropItemPreviewFx {
 				readonly kind:
 					| typeof DropItemResultKindEnumSchema.enum.Move
 					| typeof DropItemResultKindEnumSchema.enum.Swap
-					| typeof DropItemResultKindEnumSchema.enum.Merge;
+					| typeof DropItemResultKindEnumSchema.enum.Merge
+					| typeof DropItemResultKindEnumSchema.enum.Stack;
 		  }
 		| {
 				readonly kind: typeof DropItemResultKindEnumSchema.enum.StoreInput;
@@ -152,6 +155,27 @@ export const readDropItemPreviewFx = Effect.fn("readDropItemPreviewFx")(function
 			inputIndex: inputStore.inputIndex,
 			quantity: inputStore.quantity,
 		} satisfies readDropItemPreviewFx.Result;
+	}
+	const stackResolution = yield* readItemStackResolutionFx({
+		runtime,
+		sourceItemId,
+		sourceRevision,
+		sourceLocation,
+		targetItemId: targetItem.id,
+		targetRevision: targetOccupant.revision,
+		targetLocation: target.location,
+	});
+	if (stackResolution.kind === "available") {
+		return {
+			kind: DropItemResultKindEnumSchema.enum.Stack,
+		} satisfies readDropItemPreviewFx.Result;
+	}
+	if (stackResolution.kind === "blocked") {
+		return rejected(
+			yield* readDropItemStackRejectedReasonFx({
+				reason: stackResolution.reason,
+			}),
+		);
 	}
 	if (
 		!isItemLocationScopeAllowed(source.item, targetItem.location.scope) ||

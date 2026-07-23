@@ -68,21 +68,32 @@ const source = {
 	},
 };
 
-const Capture = () => {
+const Capture = ({
+	item = actor,
+	live = false,
+}: {
+	readonly item?: useTileActors.Item;
+	readonly live?: boolean;
+}) => {
 	captured = useTileActorPresentation({
-		item: actor,
-		live: false,
+		item,
+		live,
 	});
 	return null;
 };
 
-const renderPresentation = async () => {
+const renderPresentation = async (item: useTileActors.Item = actor, live = false) => {
 	const container = document.createElement("div");
 	document.body.append(container);
 	const root = createRoot(container);
 	roots.push(root);
 	await act(async () => {
-		root.render(createElement(Capture));
+		root.render(
+			createElement(Capture, {
+				item,
+				live,
+			}),
+		);
 	});
 	if (captured === null) throw new Error("Presentation was not captured.");
 	return captured;
@@ -267,5 +278,172 @@ describe("Tile actor presentation live targets", () => {
 		expect(presentation.followTarget).toBeNull();
 		expect(presentation.phase).toBe("exiting");
 		expect(presentation.placementFrozen).toBe(true);
+	});
+});
+
+describe("Tile actor presentation stack settlement", () => {
+	const targetActor = {
+		...actor,
+		id: "runtime:target",
+		revision: "revision:target-current",
+		itemId: actor.itemId,
+		title: "Target",
+		quantity: 10,
+		location: targetLocation,
+	} satisfies useTileActors.Item;
+	const sourceCurrent = {
+		...actor,
+		revision: "revision:source-current",
+		quantity: 3,
+	};
+	const outcome = (current: typeof sourceCurrent | null) => ({
+		kind: DropItemResultKindEnumSchema.enum.Stack,
+		transferredQuantity: 2,
+		source: {
+			itemId: actor.id,
+			canonicalItemId: actor.itemId,
+			previousRevision: actor.revision,
+			previousLocation: sourceLocation,
+			previousQuantity: 5,
+			current:
+				current === null
+					? null
+					: {
+							itemId: current.id,
+							canonicalItemId: current.itemId,
+							revision: current.revision,
+							location: current.location,
+							quantity: current.quantity,
+						},
+		},
+		target: {
+			itemId: targetActor.id,
+			canonicalItemId: targetActor.itemId,
+			previousRevision: "revision:target-previous",
+			previousLocation: targetLocation,
+			previousQuantity: 8,
+			current: {
+				itemId: targetActor.id,
+				canonicalItemId: targetActor.itemId,
+				revision: targetActor.revision,
+				location: targetActor.location,
+				quantity: targetActor.quantity,
+			},
+		},
+	});
+
+	it("holds both previous quantities while the source follows the exact target", async () => {
+		interactionState.active = {
+			source,
+			generation: 7,
+			phase: "settling",
+			settlement: {
+				kind: DropItemResultKindEnumSchema.enum.Stack,
+				stage: "approach",
+				feedback: "accepted",
+				pendingActorIds: [
+					actor.id,
+				],
+				outcome: outcome(sourceCurrent),
+			},
+		};
+
+		const sourcePresentation = await renderPresentation(sourceCurrent, true);
+		const targetPresentation = await renderPresentation(targetActor, true);
+
+		expect(sourcePresentation).toMatchObject({
+			followTarget: {
+				interactionGeneration: 7,
+				stage: "approach",
+				sourceItemId: actor.id,
+				targetItemId: targetActor.id,
+			},
+			phase: "combining",
+			quantityOverride: 5,
+			positionCompletion: {
+				kind: "always",
+				generation: 7,
+			},
+		});
+		expect(targetPresentation).toMatchObject({
+			followTarget: null,
+			phase: "combining",
+			quantityOverride: 8,
+		});
+	});
+
+	it("boomerangs a partial source and impacts the target with current quantities after contact", async () => {
+		interactionState.active = {
+			source,
+			generation: 8,
+			phase: "settling",
+			settlement: {
+				kind: DropItemResultKindEnumSchema.enum.Stack,
+				stage: "resolve",
+				feedback: "accepted",
+				pendingActorIds: [
+					actor.id,
+					targetActor.id,
+				],
+				outcome: outcome(sourceCurrent),
+			},
+		};
+
+		const sourcePresentation = await renderPresentation(sourceCurrent, true);
+		const targetPresentation = await renderPresentation(targetActor, true);
+
+		expect(sourcePresentation).toMatchObject({
+			followTarget: null,
+			phase: "settling",
+			quantityOverride: null,
+			desiredSource: {
+				location: sourceLocation,
+			},
+			positionCompletion: {
+				kind: "location",
+				generation: 8,
+				location: sourceLocation,
+			},
+		});
+		expect(targetPresentation).toMatchObject({
+			followTarget: null,
+			phase: "impact",
+			quantityOverride: null,
+			desiredSource: {
+				location: targetLocation,
+			},
+			visualCompletionGeneration: 8,
+		});
+	});
+
+	it("freezes a fully consumed source at the target for its exit", async () => {
+		interactionState.active = {
+			source,
+			generation: 9,
+			phase: "settling",
+			settlement: {
+				kind: DropItemResultKindEnumSchema.enum.Stack,
+				stage: "resolve",
+				feedback: "accepted",
+				pendingActorIds: [
+					actor.id,
+					targetActor.id,
+				],
+				outcome: outcome(null),
+			},
+		};
+
+		const presentation = await renderPresentation(actor);
+
+		expect(presentation).toMatchObject({
+			followTarget: null,
+			phase: "exiting",
+			placementFrozen: true,
+			quantityOverride: null,
+			desiredSource: {
+				location: targetLocation,
+			},
+			visualCompletionGeneration: 9,
+		});
 	});
 });

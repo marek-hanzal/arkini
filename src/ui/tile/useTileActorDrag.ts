@@ -18,7 +18,10 @@ const targetForPreview = (
 	previewKind: useDropItemPreview.Result["kind"] | null,
 ) => {
 	if (target.kind !== "slot" || target.occupant === null) return null;
-	if (previewKind === DropItemResultKindEnumSchema.enum.Merge) {
+	if (
+		previewKind === DropItemResultKindEnumSchema.enum.Merge ||
+		previewKind === DropItemResultKindEnumSchema.enum.Stack
+	) {
 		return {
 			itemId: target.occupant.id,
 			feedback: "merge" as const,
@@ -72,6 +75,15 @@ const targetForOutcome = (target: TileDropTarget, outcome: useDropItem.Result | 
 			},
 			(merged) => ({
 				itemId: merged.target.itemId,
+				feedback: "merge" as const,
+			}),
+		)
+		.with(
+			{
+				kind: DropItemResultKindEnumSchema.enum.Stack,
+			},
+			(stacked) => ({
+				itemId: stacked.target.itemId,
 				feedback: "merge" as const,
 			}),
 		)

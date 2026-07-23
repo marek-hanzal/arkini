@@ -23,7 +23,7 @@ vi.mock("~/bridge/tile/useTileActors", () => ({
 }));
 
 const previewState = vi.hoisted(() => ({
-	occupiedKind: "swap" as "swap" | "merge" | "store-input",
+	occupiedKind: "swap" as "swap" | "merge" | "stack" | "store-input",
 	observedRevisions: [] as string[],
 }));
 
@@ -951,6 +951,99 @@ describe("TileSystemProvider", () => {
 
 		await act(async () => {
 			readSystem().complete(source.id, released.generation);
+			readSystem().complete(toolbarOccupant.id, released.generation);
+		});
+		expect(readSystem().active).toBeNull();
+	});
+
+	it("advances one stack generation, ignores stale completion, and clears both resolve actors", async () => {
+		previewState.occupiedKind = "stack";
+		const { readSystem } = await renderHarness();
+		const released = await startDrag(readSystem(), 440, 50);
+		if (released === null) throw new Error("Expected a released drag.");
+		const targetLocation = {
+			scope: "inventory" as const,
+			position: {
+				x: toolbarSlot.x,
+				y: toolbarSlot.y,
+			},
+		};
+
+		await act(async () => {
+			readSystem().settle(released.source, released.generation, {
+				kind: DropItemResultKindEnumSchema.enum.Stack,
+				transferredQuantity: 1,
+				source: {
+					itemId: source.id,
+					canonicalItemId: "item:shared",
+					previousRevision: source.revision,
+					previousLocation: source.location,
+					previousQuantity: 2,
+					current: {
+						itemId: source.id,
+						canonicalItemId: "item:shared",
+						revision: "revision:source-current",
+						location: source.location,
+						quantity: 1,
+					},
+				},
+				target: {
+					itemId: toolbarOccupant.id,
+					canonicalItemId: "item:shared",
+					previousRevision: toolbarOccupant.revision,
+					previousLocation: targetLocation,
+					previousQuantity: 9,
+					current: {
+						itemId: toolbarOccupant.id,
+						canonicalItemId: "item:shared",
+						revision: "revision:target-current",
+						location: targetLocation,
+						quantity: 10,
+					},
+				},
+			});
+			readSystem().complete(source.id, released.generation - 1);
+		});
+		expect(readSystem().active).toMatchObject({
+			phase: "settling",
+			settlement: {
+				kind: DropItemResultKindEnumSchema.enum.Stack,
+				stage: "approach",
+				pendingActorIds: [
+					source.id,
+				],
+			},
+		});
+
+		await act(async () => {
+			readSystem().complete(source.id, released.generation);
+		});
+		expect(readSystem().active).toMatchObject({
+			phase: "settling",
+			settlement: {
+				kind: DropItemResultKindEnumSchema.enum.Stack,
+				stage: "resolve",
+				pendingActorIds: [
+					source.id,
+					toolbarOccupant.id,
+				],
+			},
+		});
+
+		await act(async () => {
+			readSystem().complete(source.id, released.generation);
+		});
+		expect(readSystem().active).toMatchObject({
+			settlement: {
+				kind: DropItemResultKindEnumSchema.enum.Stack,
+				stage: "resolve",
+				pendingActorIds: [
+					toolbarOccupant.id,
+				],
+			},
+		});
+
+		await act(async () => {
 			readSystem().complete(toolbarOccupant.id, released.generation);
 		});
 		expect(readSystem().active).toBeNull();

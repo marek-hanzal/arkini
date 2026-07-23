@@ -91,6 +91,7 @@ const presentation = (
 		location,
 	},
 	visualCompletionGeneration: null,
+	quantityOverride: null,
 	hovered: false,
 	setHovered: () => undefined,
 });

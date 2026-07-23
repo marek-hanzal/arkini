@@ -42,9 +42,15 @@ interface MockDragControls {
 
 let activeDragBinding: MockDragBinding | null = null;
 const motionOffsetBindings = new Map<string, MockDragBinding>();
+const motionScaleBindings = new Map<string, MockMotionValue<number>>();
 
 interface MockAnimationControls extends PromiseLike<void> {
 	stop: () => void;
+}
+
+interface MockImperativeAnimation {
+	readonly finish: () => void;
+	readonly stopped: () => boolean;
 }
 
 interface MotionTestCompletion {
@@ -56,13 +62,18 @@ export const motionTestRuntime = {
 	reducedMotion: false,
 	springLag: false,
 	completions: [] as Array<MotionTestCompletion>,
+	imperativeAnimations: [] as Array<MockImperativeAnimation>,
+	autoCompleteImperativeAnimations: true,
 	reset() {
 		this.autoComplete = true;
 		this.reducedMotion = false;
 		this.springLag = false;
 		this.completions.splice(0);
+		this.imperativeAnimations.splice(0);
+		this.autoCompleteImperativeAnimations = true;
 		activeDragBinding = null;
 		motionOffsetBindings.clear();
+		motionScaleBindings.clear();
 	},
 	readMotionOffset(ui: string, runtimeId: string) {
 		const binding = motionOffsetBindings.get(`${ui}:${runtimeId}`);
@@ -80,6 +91,9 @@ export const motionTestRuntime = {
 					x: activeDragBinding.x.get(),
 					y: activeDragBinding.y.get(),
 				};
+	},
+	readMotionScale(ui: string, runtimeId: string) {
+		return motionScaleBindings.get(`${ui}:${runtimeId}`)?.get() ?? null;
 	},
 	finish(...indexes: ReadonlyArray<number>) {
 		for (const index of indexes) this.completions[index]?.complete();
@@ -131,10 +145,22 @@ export const useTransform = <T,>(
 
 export const animate = <T,>(value: MockMotionValue<T>, target: T): MockAnimationControls => {
 	value.set(target);
-	const finished = Promise.resolve();
+	let stopped = false;
+	let finish: () => void = () => undefined;
+	const finished = motionTestRuntime.autoCompleteImperativeAnimations
+		? Promise.resolve()
+		: new Promise<void>((resolve) => {
+				finish = resolve;
+			});
+	motionTestRuntime.imperativeAnimations.push({
+		finish: () => finish(),
+		stopped: () => stopped,
+	});
 	return {
 		then: finished.then.bind(finished),
-		stop: () => undefined,
+		stop: () => {
+			stopped = true;
+		},
 	};
 };
 
@@ -251,7 +277,7 @@ const createMotionComponent = <TElement extends ElementType>(element: TElement) 
 		{
 			animate: animateTarget,
 			initial: _initial,
-			transition: _transition,
+			transition,
 			drag: _drag,
 			dragControls,
 			dragListener: _dragListener,
@@ -310,11 +336,28 @@ const createMotionComponent = <TElement extends ElementType>(element: TElement) 
 			typeof animateTarget === "object" && animateTarget !== null && "scale" in animateTarget
 				? String(animateTarget.scale)
 				: undefined;
+		const motionScaleX =
+			typeof animateTarget === "object" && animateTarget !== null && "scaleX" in animateTarget
+				? String(animateTarget.scaleX)
+				: undefined;
+		const motionScaleY =
+			typeof animateTarget === "object" && animateTarget !== null && "scaleY" in animateTarget
+				? String(animateTarget.scaleY)
+				: undefined;
+		const motionRotate =
+			typeof animateTarget === "object" && animateTarget !== null && "rotate" in animateTarget
+				? String(animateTarget.rotate)
+				: undefined;
+		const motionTimes =
+			typeof transition === "object" && transition !== null && "times" in transition
+				? String(transition.times)
+				: undefined;
 
 		const motionStyle = style as
 			| (CSSProperties & {
 					readonly x?: MockMotionValue<number>;
 					readonly y?: MockMotionValue<number>;
+					readonly scale?: MockMotionValue<number>;
 			  })
 			| undefined;
 		const ui = typeof props["data-ui"] === "string" ? props["data-ui"] : null;
@@ -346,11 +389,37 @@ const createMotionComponent = <TElement extends ElementType>(element: TElement) 
 			ui,
 		]);
 
+		useEffect(() => {
+			const scale = motionStyle?.scale;
+			if (
+				ui === null ||
+				runtimeId === null ||
+				scale === undefined ||
+				typeof scale !== "object" ||
+				typeof scale.get !== "function"
+			) {
+				return;
+			}
+			const key = `${ui}:${runtimeId}`;
+			motionScaleBindings.set(key, scale);
+			return () => {
+				if (motionScaleBindings.get(key) === scale) motionScaleBindings.delete(key);
+			};
+		}, [
+			motionStyle?.scale,
+			runtimeId,
+			ui,
+		]);
+
 		return createElement(element, {
 			...props,
 			ref,
 			style: readStyle(style),
 			"data-motion-scale": motionScale,
+			"data-motion-scale-x": motionScaleX,
+			"data-motion-scale-y": motionScaleY,
+			"data-motion-rotate": motionRotate,
+			"data-motion-times": motionTimes,
 			onPointerDown: (event: ReactPointerEvent<HTMLElement>) => {
 				if (
 					typeof dragControls === "object" &&

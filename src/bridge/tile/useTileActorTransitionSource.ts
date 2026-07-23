@@ -29,6 +29,7 @@ const isSameTileActorItem = (left: TileActorItem, right: TileActorItem) =>
 	left.quantity === right.quantity &&
 	left.sourceUrl === right.sourceUrl &&
 	left.compositeUrl === right.compositeUrl &&
+	left.jobStatus === right.jobStatus &&
 	left.running === right.running &&
 	isSameTileLocation(left.location, right.location) &&
 	isSamePrimaryAction(left.primaryAction, right.primaryAction);
@@ -39,7 +40,15 @@ const stabilizeItems = (
 ): ReadonlyArray<TileActorItem> => {
 	if (previous === null) return projected;
 	if (previous.length === 0) return projected.length === 0 ? previous : projected;
-	const previousById = new Map(previous.map((item) => [item.id, item] as const));
+	const previousById = new Map(
+		previous.map(
+			(item) =>
+				[
+					item.id,
+					item,
+				] as const,
+		),
+	);
 	let changed = previous.length !== projected.length;
 	const stable = projected.map((item, index) => {
 		const candidate = previousById.get(item.id);
@@ -59,7 +68,12 @@ export const useTileActorTransitionSource = (): TileActorTransitionSource => {
 
 	return useMemo(() => {
 		const read = (transition: ReturnType<typeof game.getTransitionSnapshot>) =>
-			game.readOrThrow(readTileActorTransitionFx({ game, transition }));
+			game.readOrThrow(
+				readTileActorTransitionFx({
+					game,
+					transition,
+				}),
+			);
 		const current = read(game.getTransitionSnapshot());
 		let latest: readTileActorTransitionFx.Result = {
 			...current,
@@ -96,5 +110,7 @@ export const useTileActorTransitionSource = (): TileActorTransitionSource => {
 			subscribe: (listener) =>
 				game.subscribeTransitions((transition) => listener(project(transition))),
 		};
-	}, [game]);
+	}, [
+		game,
+	]);
 };

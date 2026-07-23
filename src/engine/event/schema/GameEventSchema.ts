@@ -11,7 +11,9 @@ import { ItemPlacedGameEventSchema } from "./ItemPlacedGameEventSchema";
 import { ItemStackedGameEventSchema } from "./ItemStackedGameEventSchema";
 import { ItemSplitGameEventSchema } from "./ItemSplitGameEventSchema";
 import { ItemConsumedGameEventSchema } from "./ItemConsumedGameEventSchema";
+import { ItemChargeSpentGameEventSchema } from "./ItemChargeSpentGameEventSchema";
 import { ItemDepletedGameEventSchema } from "./ItemDepletedGameEventSchema";
+import { ItemExplicitlyRemovedGameEventSchema } from "./ItemExplicitlyRemovedGameEventSchema";
 
 export const GameEventSchema = z.discriminatedUnion("type", [
 	CurrentSpaceChangedGameEventSchema,
@@ -25,7 +27,9 @@ export const GameEventSchema = z.discriminatedUnion("type", [
 	ItemSplitGameEventSchema,
 	ItemConsumedGameEventSchema,
 	ItemInputStoredGameEventSchema,
+	ItemChargeSpentGameEventSchema,
 	ItemDepletedGameEventSchema,
+	ItemExplicitlyRemovedGameEventSchema,
 ]);
 
 export type GameEventSchema = typeof GameEventSchema;

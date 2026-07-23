@@ -46,10 +46,15 @@ const item = (overrides: Partial<TileActorItem> = {}): TileActorItem => ({
 	location: {
 		scope: "board",
 		space: 0,
-		position: { x: 0, y: 0 },
+		position: {
+			x: 0,
+			y: 0,
+		},
 	},
 	running: false,
-	primaryAction: { kind: "none" },
+	primaryAction: {
+		kind: "none",
+	},
 	...overrides,
 });
 
@@ -79,8 +84,9 @@ const Capture = () => {
 
 const renderSource = async (initial: TestTransition) => {
 	let current = initial;
-	let listener: ((transition: CommittedTransitionSchema.Type) => void | PromiseLike<void>) | null =
-		null;
+	let listener:
+		| ((transition: CommittedTransitionSchema.Type) => void | PromiseLike<void>)
+		| null = null;
 	let claimedSequence = -1;
 	const game = {
 		getTransitionSnapshot: () => current,
@@ -137,7 +143,11 @@ afterEach(async () => {
 describe("useTileActorTransitionSource", () => {
 	it("preserves actor and array identities across semantically unchanged Tick publications", async () => {
 		const first = item();
-		const { source, emit } = await renderSource(transition(0, [first]));
+		const { source, emit } = await renderSource(
+			transition(0, [
+				first,
+			]),
+		);
 		const received: readTileActorTransitionFx.Result[] = [];
 		const unsubscribe = source.subscribe((next) => {
 			received.push(next);
@@ -147,7 +157,17 @@ describe("useTileActorTransitionSource", () => {
 			expect(received[0]?.liveItems).toBe(source.initial.liveItems);
 			expect(received[0]?.events).toEqual([]);
 			const unchanged = item();
-			emit(transition(1, [unchanged], [item()]));
+			emit(
+				transition(
+					1,
+					[
+						unchanged,
+					],
+					[
+						item(),
+					],
+				),
+			);
 			expect(received[1]?.previousItems).toBe(source.initial.liveItems);
 			expect(received[1]?.liveItems).toBe(source.initial.liveItems);
 			expect(received[1]?.liveItems[0]).toBe(first);
@@ -156,13 +176,34 @@ describe("useTileActorTransitionSource", () => {
 				revision: "revision:water:2",
 				quantity: 2,
 			});
-			emit(transition(2, [changed], [unchanged]));
+			emit(
+				transition(
+					2,
+					[
+						changed,
+					],
+					[
+						unchanged,
+					],
+				),
+			);
 			expect(received[2]?.previousItems).toBe(received[1]?.liveItems);
 			expect(received[2]?.liveItems).not.toBe(received[1]?.liveItems);
 			expect(received[2]?.liveItems[0]).toBe(changed);
 
 			emit(
-				transition(3, [item({ revision: "revision:water:2", quantity: 2 })], [changed]),
+				transition(
+					3,
+					[
+						item({
+							revision: "revision:water:2",
+							quantity: 2,
+						}),
+					],
+					[
+						changed,
+					],
+				),
 			);
 			expect(received[3]?.liveItems).toBe(received[2]?.liveItems);
 			expect(received[3]?.liveItems[0]).toBe(changed);
@@ -171,18 +212,31 @@ describe("useTileActorTransitionSource", () => {
 		}
 	});
 
-
 	it("delivers one late current transition once and hydrates a remount without replay", async () => {
-		const outgoing = item({ id: "runtime:expired" });
-		const expired = transition(1, [], [outgoing], [
-			{
-				type: "item:expired",
-				itemId: outgoing.id,
-				canonicalItemId: outgoing.itemId,
-				location: outgoing.location as Extract<TileActorItem["location"], { scope: "board" }>,
-				quantity: outgoing.quantity,
-			},
-		]);
+		const outgoing = item({
+			id: "runtime:expired",
+		});
+		const expired = transition(
+			1,
+			[],
+			[
+				outgoing,
+			],
+			[
+				{
+					type: "item:expired",
+					itemId: outgoing.id,
+					canonicalItemId: outgoing.itemId,
+					location: outgoing.location as Extract<
+						TileActorItem["location"],
+						{
+							scope: "board";
+						}
+					>,
+					quantity: outgoing.quantity,
+				},
+			],
+		);
 		const { source, mountAgain } = await renderSource(expired);
 
 		expect(source.initial.events).toEqual([]);
@@ -199,9 +253,13 @@ describe("useTileActorTransitionSource", () => {
 		expect(replay.previousItems).toBeNull();
 	});
 
-	it("refreshes projection identity for location, running, artwork, and primary-action changes", async () => {
+	it("refreshes projection identity for location, job status, artwork, and primary-action changes", async () => {
 		const first = item();
-		const { source, emit } = await renderSource(transition(0, [first]));
+		const { source, emit } = await renderSource(
+			transition(0, [
+				first,
+			]),
+		);
 		const received: readTileActorTransitionFx.Result[] = [];
 		const unsubscribe = source.subscribe((next) => {
 			received.push(next);
@@ -211,8 +269,12 @@ describe("useTileActorTransitionSource", () => {
 			const changed = item({
 				location: {
 					scope: "inventory",
-					position: { x: 1, y: 0 },
+					position: {
+						x: 1,
+						y: 0,
+					},
 				},
+				jobStatus: "running",
 				running: true,
 				sourceUrl: "arkini://water-v2",
 				compositeUrl: "arkini://water-composite",
@@ -221,10 +283,57 @@ describe("useTileActorTransitionSource", () => {
 					lineId: "line:water",
 				},
 			});
-			emit(transition(1, [changed], [first]));
+			emit(
+				transition(
+					1,
+					[
+						changed,
+					],
+					[
+						first,
+					],
+				),
+			);
 
 			expect(received[1]?.liveItems[0]).toBe(changed);
 			expect(received[1]?.liveItems[0]).not.toBe(first);
+		} finally {
+			unsubscribe();
+		}
+	});
+
+	it("does not collapse distinct non-running job statuses", async () => {
+		const paused = item({
+			jobStatus: "paused",
+		});
+		const { source, emit } = await renderSource(
+			transition(0, [
+				paused,
+			]),
+		);
+		const received: readTileActorTransitionFx.Result[] = [];
+		const unsubscribe = source.subscribe((next) => {
+			received.push(next);
+		});
+
+		try {
+			const awaitingOutput = item({
+				jobStatus: "awaiting-output",
+			});
+			emit(
+				transition(
+					1,
+					[
+						awaitingOutput,
+					],
+					[
+						paused,
+					],
+				),
+			);
+
+			expect(received[1]?.liveItems[0]).toBe(awaitingOutput);
+			expect(received[1]?.liveItems[0]).not.toBe(paused);
 		} finally {
 			unsubscribe();
 		}

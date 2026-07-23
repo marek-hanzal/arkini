@@ -9,6 +9,17 @@ import { TileSystemProvider } from "~/ui/tile/TileSystemProvider";
 vi.mock("~/bridge/tile/useTileActors", () => ({
 	useTileActors: () => [],
 }));
+vi.mock("~/bridge/tile/useDropItemPreview", () => ({
+	useDropItemPreview: () => () => {
+		throw new Error("Static grid-frame rendering must not read a gameplay drop preview.");
+	},
+}));
+vi.mock("~/bridge/tile/useDropItemPreviewSequence", () => ({
+	useDropItemPreviewSequence: () => () => 0,
+}));
+vi.mock("~/ui/tile/TileActorLayer", () => ({
+	TileActorLayer: () => null,
+}));
 
 const surfaces = [
 	{

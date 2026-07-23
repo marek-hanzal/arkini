@@ -7,7 +7,9 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { GameEngine } from "~/bridge/game/GameEngine";
 import { useGameFx } from "~/engine/game/fx/useGameFx";
+import { RuntimeFx } from "~/engine/runtime/context/RuntimeFx";
 import { DropItemResultKindEnumSchema } from "~/engine/runtime/schema/command/DropItemResultKindEnumSchema";
+import type { CommittedTransitionSchema } from "~/engine/runtime/schema/CommittedTransitionSchema";
 import { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import type { dropItemFx } from "~/engine/runtime/write/dropItemFx";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
@@ -16,7 +18,6 @@ import { GameBoardLayout } from "~/ui/board/GameBoardLayout";
 import { ItemDetailModal } from "~/ui/item-detail/ItemDetailModal";
 import { ItemDetailProvider } from "~/ui/item-detail/ItemDetailProvider";
 import { TileSystemProvider } from "~/ui/tile/TileSystemProvider";
-import { testGameRead, testGameReadOrThrow } from "~test/support/game/testGameRead";
 import { motionTestRuntime } from "~test/ui/support/motionReactMock";
 
 (
@@ -48,6 +49,9 @@ vi.mock("~/bridge/tile/useDropItem", () => ({
 
 const roots: Array<ReturnType<typeof createRoot>> = [];
 const runtimeListeners = new Set<() => void>();
+const transitionListeners = new Set<
+	(transition: CommittedTransitionSchema.Type) => void | PromiseLike<void>
+>();
 
 const rect = (left: number, top: number, width: number, height: number): DOMRect => ({
 	left,
@@ -185,11 +189,31 @@ const roundTripRuntime = RuntimeSchema.parse({
 	),
 });
 let currentRuntime = roundTripRuntime;
+let transitionSequence = 0;
+let claimedTilePresentationSequence = -1;
+let currentTransition: CommittedTransitionSchema.Type = {
+	sequence: transitionSequence,
+	previousRuntime: null,
+	runtime: currentRuntime,
+	events: [],
+};
 
 const publishRuntime = (next: RuntimeSchema.Type) => {
+	const previousRuntime = currentRuntime;
 	currentRuntime = next;
+	currentTransition = {
+		sequence: ++transitionSequence,
+		previousRuntime,
+		runtime: next,
+		events: [],
+	};
 	for (const listener of runtimeListeners) listener();
+	for (const listener of transitionListeners) void listener(currentTransition);
 };
+const provideCurrentRuntime = (effect: Effect.Effect<unknown, unknown, RuntimeFx>) =>
+	Effect.provideService(effect, RuntimeFx, {
+		read: Effect.sync(() => currentRuntime),
+	});
 
 const game = {
 	arkpack: {
@@ -207,14 +231,31 @@ const game = {
 		contentHash: "0".repeat(64),
 	},
 	getSnapshot: () => currentRuntime,
+	getTransitionSnapshot: () => currentTransition,
+	claimTilePresentationTransition: (sequence: number) => {
+		if (sequence <= claimedTilePresentationSequence) return false;
+		claimedTilePresentationSequence = sequence;
+		return true;
+	},
 	getResourceUrl: (resourceId: string) => `resource:${resourceId}`,
 	subscribe: (listener: () => void) => {
 		runtimeListeners.add(listener);
 		return () => runtimeListeners.delete(listener);
 	},
+	subscribeTransitions: (listener) => {
+		transitionListeners.add(listener);
+		void listener(currentTransition);
+		return () => transitionListeners.delete(listener);
+	},
 	subscribeEvents: () => () => undefined,
-	read: testGameRead,
-	readOrThrow: testGameReadOrThrow,
+	read: ((effect) =>
+		Effect.runSyncExit(
+			provideCurrentRuntime(effect as Effect.Effect<unknown, unknown, RuntimeFx>),
+		)) as GameEngine["read"],
+	readOrThrow: ((effect) =>
+		Effect.runSync(
+			provideCurrentRuntime(effect as Effect.Effect<unknown, unknown, RuntimeFx>),
+		)) as GameEngine["readOrThrow"],
 	run: (() => Promise.reject(new Error("Not used by this test."))) as GameEngine["run"],
 	disposeFx: Effect.void,
 	disposeWithoutSaveFx: Effect.void,
@@ -224,7 +265,16 @@ const game = {
 beforeEach(() => {
 	motionTestRuntime.reset();
 	currentRuntime = roundTripRuntime;
+	transitionSequence = 0;
+	claimedTilePresentationSequence = -1;
+	currentTransition = {
+		sequence: transitionSequence,
+		previousRuntime: null,
+		runtime: currentRuntime,
+		events: [],
+	};
 	runtimeListeners.clear();
+	transitionListeners.clear();
 	gameEngineState.game = game;
 	dropItemState.drop.mockReset();
 	Object.defineProperty(HTMLElement.prototype, "getBoundingClientRect", {
@@ -234,40 +284,77 @@ beforeEach(() => {
 			if (element.dataset.ui === "BoardGrid") return rect(0, 0, 200, 200);
 			if (element.dataset.ui === "ToolbarGrid") return rect(0, 220, 200, 100);
 			if (element.dataset.ui === "TileActorLayer") return rect(0, 0, 200, 320);
-			if (element.dataset.ui === "TileMotionCueVisual") {
+			if (
+				element.dataset.ui === "TileMotionCueVisual" ||
+				element.dataset.ui === "TileActorVisual"
+			) {
 				const actor = element.closest<HTMLElement>('[data-ui="TileActor"]');
 				const runtimeId = actor?.dataset.runtimeId;
 				const visual = actor?.querySelector<HTMLElement>('[data-ui="TileActorVisual"]');
 				const scale = Number(visual?.dataset.motionScale ?? 0.8);
 				if (runtimeId !== undefined && Number.isFinite(scale)) {
-					const travel = motionTestRuntime.readMotionOffset("TileActorTravel", runtimeId) ?? {
+					const travel = motionTestRuntime.readMotionOffset(
+						"TileActorTravel",
+						runtimeId,
+					) ?? {
 						x: 0,
 						y: 0,
 					};
-					const weight = motionTestRuntime.readMotionOffset("TileActorWeight", runtimeId) ?? {
+					const pointer = motionTestRuntime.readMotionOffset(
+						"TileActorPointer",
+						runtimeId,
+					) ?? {
 						x: 0,
 						y: 0,
 					};
-					const pickup = motionTestRuntime.readMotionOffset("TileActorPickup", runtimeId) ?? {
+					const response = motionTestRuntime.readMotionOffset(
+						"TileActorPhysicalResponse",
+						runtimeId,
+					) ?? {
 						x: 0,
 						y: 0,
 					};
-					const neighbour = motionTestRuntime.readMotionOffset("TileActor", runtimeId) ?? {
+					const pickup = motionTestRuntime.readMotionOffset(
+						"TileActorPickup",
+						runtimeId,
+					) ?? {
+						x: 0,
+						y: 0,
+					};
+					const neighbour = motionTestRuntime.readMotionOffset(
+						"TileActor",
+						runtimeId,
+					) ?? {
 						x: 0,
 						y: 0,
 					};
 					const size = 100 * scale;
 					const base =
 						actor?.dataset.locationScope === "toolbar"
-							? { x: Number(actor.dataset.toolbarX) * 100, y: 220 }
+							? {
+									x: Number(actor.dataset.toolbarX) * 100,
+									y: 220,
+								}
 							: {
-								x: Number(actor?.dataset.boardX) * 100,
-								y: Number(actor?.dataset.boardY) * 100,
-							};
+									x: Number(actor?.dataset.boardX) * 100,
+									y: Number(actor?.dataset.boardY) * 100,
+								};
 					if (Number.isFinite(base.x) && Number.isFinite(base.y)) {
 						return rect(
-							base.x + (100 - size) / 2 + travel.x + weight.x + pickup.x + neighbour.x,
-							base.y + (100 - size) / 2 + travel.y + weight.y + pickup.y + neighbour.y,
+							base.x +
+								(100 - size) / 2 +
+								travel.x +
+								pointer.x +
+								response.x +
+								pickup.x +
+								neighbour.x,
+							base.y +
+								(100 - size) / 2 +
+								travel.y +
+								pointer.y +
+								response.y +
+								pickup.y +
+								neighbour.y,
 							size,
 							size,
 						);
@@ -406,9 +493,9 @@ describe("Toolbar drag", () => {
 			await Promise.resolve();
 		});
 
-		expect(motionTestRuntime.readMotionOffset("TileActorWeight", toolbarId)).toEqual({
-			x: -2.45,
-			y: -1.96,
+		expect(motionTestRuntime.readMotionOffset("TileActorPhysicalResponse", toolbarId)).toEqual({
+			x: -1.4,
+			y: -1.12,
 		});
 		expect(motionTestRuntime.readMotionOffset("TileActor", boardId)).toEqual({
 			x: 0,
@@ -537,17 +624,19 @@ describe("Toolbar drag", () => {
 	});
 
 	it("keeps the toolbar surface and actor stable while the active Board space changes", async () => {
-		currentRuntime = RuntimeSchema.parse({
-			...initialRuntime,
-			items: initialRuntime.items.map((item) =>
-				item.item.id === "water"
-					? {
-							...item,
-							location: toolbar(0),
-						}
-					: item,
-			),
-		});
+		publishRuntime(
+			RuntimeSchema.parse({
+				...initialRuntime,
+				items: initialRuntime.items.map((item) =>
+					item.item.id === "water"
+						? {
+								...item,
+								location: toolbar(0),
+							}
+						: item,
+				),
+			}),
+		);
 		await renderGameBoard();
 		const toolbarGrid = document.querySelector<HTMLElement>('[data-ui="ToolbarGrid"]');
 		const actor = document.querySelector<HTMLElement>(
@@ -577,13 +666,15 @@ describe("Toolbar drag", () => {
 	});
 
 	it("reorders occupied toolbar slots through the same swap target contract", async () => {
-		currentRuntime = RuntimeSchema.parse({
-			...initialRuntime,
-			items: initialRuntime.items.map((item) => ({
-				...item,
-				location: item.item.id === "water" ? toolbar(0) : toolbar(1),
-			})),
-		});
+		publishRuntime(
+			RuntimeSchema.parse({
+				...initialRuntime,
+				items: initialRuntime.items.map((item) => ({
+					...item,
+					location: item.item.id === "water" ? toolbar(0) : toolbar(1),
+				})),
+			}),
+		);
 		await renderGameBoard();
 		const source = document.querySelector<HTMLElement>(
 			'[data-ui="TileActor"][data-item-id="water"]',

@@ -21,11 +21,15 @@ const zIndexForCue = (cue: TileMotionCueSchema.Type | null) => {
 	return match(cue.kind)
 		.with("exit", "consume-exit", "deplete-exit", "expiry", () => 35)
 		.with(
+			"morph",
 			"absorb",
 			"impact",
 			"accept",
 			"consume",
 			"complete",
+			"charge",
+			"pause",
+			"resume",
 			"deplete",
 			() => 30,
 		)
@@ -38,7 +42,9 @@ export namespace TileActor {
 		readonly item: useTileActors.Item;
 		readonly live: boolean;
 		readonly cue: TileMotionCueSchema.Type | null;
+		readonly morphPreviousItem: useTileActors.Item | null;
 		readonly onCueStart: (itemId: string, generation: number) => void;
+		readonly onCueContact: (itemId: string, generation: number) => void;
 		readonly onCueComplete: (itemId: string, generation: number) => void;
 	}
 }
@@ -48,7 +54,9 @@ export const TileActor = ({
 	item,
 	live,
 	cue,
+	morphPreviousItem,
 	onCueStart,
+	onCueContact,
 	onCueComplete,
 }: TileActor.Props) => {
 	const itemDetail = useItemDetailControl();
@@ -62,11 +70,11 @@ export const TileActor = ({
 		presentation,
 		cue,
 	});
-	const interactive = live && actorMotion.visible && !itemDetail.isOpen;
+	const interactive = live && actorMotion.placement.visible && !itemDetail.isOpen;
 	const drag = useTileActorDrag({
 		canonicalSource: presentation.canonicalSource,
 		live: interactive,
-		motion: actorMotion,
+		pointer: actorMotion.pointer.commands,
 	});
 	const pendingPrimaryAction = useRef<ReturnType<typeof setTimeout> | null>(null);
 	const cancelPendingPrimaryAction = useCallback(() => {
@@ -129,8 +137,9 @@ export const TileActor = ({
 		interactive,
 	]);
 
-	const boardLocation = item.location.scope === LocationScopeEnumSchema.enum.Board ? item.location : null;
-	const visible = actorMotion.visible;
+	const boardLocation =
+		item.location.scope === LocationScopeEnumSchema.enum.Board ? item.location : null;
+	const visible = actorMotion.placement.visible;
 	const zIndex = Math.max(presentation.zIndex, zIndexForCue(cue));
 	const cursor = readTileActorCursorSemantic({
 		feedback: presentation.feedback,
@@ -147,15 +156,15 @@ export const TileActor = ({
 			type="button"
 			className={`absolute left-0 top-0 overflow-visible border-0 bg-transparent p-0 text-inherit outline-none ${CursorClassName[cursor]}`}
 			style={{
-				left: actorMotion.anchorX,
-				top: actorMotion.anchorY,
-				width: actorMotion.width,
-				height: actorMotion.height,
+				left: actorMotion.placement.anchor.x,
+				top: actorMotion.placement.anchor.y,
+				width: actorMotion.placement.width,
+				height: actorMotion.placement.height,
 				zIndex,
 				pointerEvents: interactive ? "auto" : "none",
 				visibility: visible ? "visible" : "hidden",
-				x: actorMotion.neighbourX,
-				y: actorMotion.neighbourY,
+				x: actorMotion.neighbour.values.x,
+				y: actorMotion.neighbour.values.y,
 			}}
 			aria-label={item.title}
 			data-ui="TileActor"
@@ -178,7 +187,9 @@ export const TileActor = ({
 			data-board-x={boardLocation?.position.x}
 			data-board-y={boardLocation?.position.y}
 			data-toolbar-x={
-				item.location.scope === LocationScopeEnumSchema.enum.Toolbar ? item.location.position.x : undefined
+				item.location.scope === LocationScopeEnumSchema.enum.Toolbar
+					? item.location.position.x
+					: undefined
 			}
 			data-dragging={presentation.phase === "dragging" ? "true" : "false"}
 			data-primary-action={item.primaryAction.kind}
@@ -222,8 +233,8 @@ export const TileActor = ({
 			<motion.span
 				className="absolute inset-0 z-10 touch-none"
 				style={{
-					x: actorMotion.dragX,
-					y: actorMotion.dragY,
+					x: actorMotion.pointer.values.direct.x,
+					y: actorMotion.pointer.values.direct.y,
 				}}
 				drag={interactive}
 				dragControls={drag.dragControls}
@@ -247,8 +258,8 @@ export const TileActor = ({
 			<motion.span
 				className="pointer-events-none absolute inset-0"
 				style={{
-					x: actorMotion.travelX,
-					y: actorMotion.travelY,
+					x: actorMotion.travel.x,
+					y: actorMotion.travel.y,
 				}}
 				data-ui="TileActorTravel"
 				data-motion-id={item.id}
@@ -256,52 +267,70 @@ export const TileActor = ({
 				<motion.span
 					className="absolute inset-0"
 					style={{
-						x: actorMotion.dragWeightX,
-						y: actorMotion.dragWeightY,
-						rotate: actorMotion.dragRotation,
+						x: actorMotion.pointer.values.direct.x,
+						y: actorMotion.pointer.values.direct.y,
 					}}
-					data-ui="TileActorWeight"
+					data-ui="TileActorPointer"
 					data-motion-id={item.id}
 				>
 					<motion.span
 						className="absolute inset-0"
 						style={{
-							x: actorMotion.pickupX,
-							y: actorMotion.pickupY,
+							x: actorMotion.pointer.values.physical.x,
+							y: actorMotion.pointer.values.physical.y,
+							rotate: actorMotion.pointer.values.physical.rotation,
 						}}
-						data-ui="TileActorPickup"
+						data-ui="TileActorPhysicalResponse"
 						data-motion-id={item.id}
 					>
 						<motion.span
 							className="absolute inset-0"
-							style={{ scale: actorMotion.neighbourScale }}
-							data-ui="TileActorNeighbourEmphasis"
+							style={{
+								x: actorMotion.pointer.values.pickup.x,
+								y: actorMotion.pointer.values.pickup.y,
+							}}
+							data-ui="TileActorPickup"
 							data-motion-id={item.id}
 						>
-							<TileActorContent
-								item={item}
-								registerActorNode={actorMotion.registerActorNode}
-								surfaceId={presentation.canonicalSource.surface.id}
-								live={live}
-								exiting={
-									presentation.phase === "exiting" ||
-									cue?.kind === "exit" ||
-									cue?.kind === "consume-exit"
-								}
-								phase={presentation.phase}
-								feedback={presentation.feedback}
-								forbiddenDrop={presentation.forbiddenDrop}
-								cue={cue}
-								cueOriginOffset={actorMotion.cueOriginOffset}
-								cueTargetOffset={actorMotion.cueTargetOffset}
-								onCueStart={(generation) => onCueStart(item.id, generation)}
-								onCueComplete={(generation) => onCueComplete(item.id, generation)}
-								onInteractionAnimationComplete={
-									presentation.visualCompletionGeneration === null
-										? undefined
-										: actorMotion.onVisualAnimationComplete
-								}
-							/>
+							<motion.span
+								className="absolute inset-0"
+								style={{
+									scale: actorMotion.neighbour.values.scale,
+								}}
+								data-ui="TileActorNeighbourEmphasis"
+								data-motion-id={item.id}
+							>
+								<TileActorContent
+									item={item}
+									registerActorNode={actorMotion.neighbour.registerActorNode}
+									surfaceId={presentation.canonicalSource.surface.id}
+									live={live}
+									exiting={
+										presentation.phase === "exiting" ||
+										cue?.kind === "exit" ||
+										cue?.kind === "consume-exit"
+									}
+									phase={presentation.phase}
+									feedback={presentation.feedback}
+									forbiddenDrop={presentation.forbiddenDrop}
+									cue={cue}
+									morphPreviousItem={morphPreviousItem}
+									cueOriginOffset={actorMotion.cueGeometry.originOffset}
+									cueTargetOffset={actorMotion.cueGeometry.targetOffset}
+									spawnDeliveryTiming={actorMotion.travel.spawnDeliveryTiming}
+									spawnDeliveryReady={actorMotion.travel.spawnDeliveryReady}
+									onCueStart={(generation) => onCueStart(item.id, generation)}
+									onCueContact={(generation) => onCueContact(item.id, generation)}
+									onCueComplete={(generation) =>
+										onCueComplete(item.id, generation)
+									}
+									onInteractionAnimationComplete={
+										presentation.visualCompletionGeneration === null
+											? undefined
+											: actorMotion.completion.onVisualComplete
+									}
+								/>
+							</motion.span>
 						</motion.span>
 					</motion.span>
 				</motion.span>

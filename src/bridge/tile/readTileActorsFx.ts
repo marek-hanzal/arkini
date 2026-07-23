@@ -21,7 +21,12 @@ export const readTileActorsFx = Effect.fn("readTileActorsFx")(function* ({
 	game,
 	runtime,
 }: readTileActorsFx.Props) {
-	const activeJobs = new Map(runtime.jobs.map((job) => [job.ownerItemId, job]));
+	const activeJobs = new Map(
+		runtime.jobs.map((job) => [
+			job.ownerItemId,
+			job,
+		]),
+	);
 
 	return yield* Effect.forEach(runtime.items.filter(isGridRuntimeItem), (item) =>
 		Effect.gen(function* () {
@@ -44,8 +49,16 @@ export const readTileActorsFx = Effect.fn("readTileActorsFx")(function* ({
 				title: item.item.title,
 				quantity: item.quantity,
 				location: item.location,
+				...(activeJobStatus === undefined
+					? {}
+					: {
+							jobStatus: activeJobStatus,
+						}),
 				running: activeJobStatus === JobStatusEnumSchema.enum.Running,
-				primaryAction: readRuntimeItemPrimaryAction({ item, runtime }),
+				primaryAction: readRuntimeItemPrimaryAction({
+					item,
+					runtime,
+				}),
 				sourceUrl: game.getResourceUrl(primaryAssetId),
 				...(item.item.asset.composite === undefined
 					? {}

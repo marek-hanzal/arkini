@@ -7,6 +7,7 @@ import type { TileInteractionFeedbackSchema } from "~/ui/tile/schema/TileInterac
 import type { TileMotionCueSchema } from "~/ui/tile/schema/TileMotionCueSchema";
 import { TileMotionCueVisual } from "~/ui/tile/TileMotionCueVisual";
 import { readTileActorVisualTarget } from "~/ui/tile/readTileActorVisualTarget";
+import type { readTileDeliveryTiming } from "~/ui/tile/readTileDeliveryTiming";
 
 export namespace TileActorContent {
 	export interface Props {
@@ -19,9 +20,19 @@ export namespace TileActorContent {
 		readonly feedback: TileInteractionFeedbackSchema.Type | null;
 		readonly forbiddenDrop: boolean;
 		readonly cue: TileMotionCueSchema.Type | null;
-		readonly cueOriginOffset: { readonly x: number; readonly y: number } | null;
-		readonly cueTargetOffset: { readonly x: number; readonly y: number } | null;
+		readonly morphPreviousItem?: useTileActors.Item | null;
+		readonly cueOriginOffset: {
+			readonly x: number;
+			readonly y: number;
+		} | null;
+		readonly cueTargetOffset: {
+			readonly x: number;
+			readonly y: number;
+		} | null;
+		readonly spawnDeliveryTiming: readTileDeliveryTiming.Result | null;
+		readonly spawnDeliveryReady: boolean;
 		readonly onCueStart: (generation: number) => void;
+		readonly onCueContact?: (generation: number) => void;
 		readonly onCueComplete: (generation: number) => void;
 		readonly onInteractionAnimationComplete?: () => void;
 	}
@@ -81,52 +92,76 @@ export const TileActorContent = ({
 	feedback,
 	forbiddenDrop,
 	cue,
+	morphPreviousItem = null,
 	cueOriginOffset,
 	cueTargetOffset,
+	spawnDeliveryTiming,
+	spawnDeliveryReady,
 	onCueStart,
+	onCueContact,
 	onCueComplete,
 	onInteractionAnimationComplete,
 }: TileActorContent.Props) => {
+	const presentedQuantity =
+		cue?.kind === "absorb" && cue.resultingQuantity !== undefined
+			? cue.resultingQuantity
+			: item.quantity;
 	const cueMode: TileMotionCueVisual.Mode =
 		cue === null
 			? "defer"
-			: match({ phase, kind: cue.kind })
-					.with(
-						{ phase: "exiting" },
-						() => "discard" as const,
-					)
-					.with(
-						{
-							kind: P.union(
-								"exit",
-								"consume-exit",
-								"deplete-exit",
-								"expiry",
-							),
-						},
-						() => "play" as const,
-					)
-					.with(
-						{ phase: P.union("stable", "hovered", "targeted") },
-						() => "play" as const,
-					)
-					.with(
-						{ phase: P.union("dragging", "combining", "settling", "impact") },
-						() => "defer" as const,
-					)
-					.exhaustive();
+			: (cue.kind === "spawn" || cue.kind === "absorb") &&
+					cue.producerEmissionId !== undefined &&
+					cue.producerEmissionReleased !== true
+				? "defer"
+				: cue.kind === "spawn" && !spawnDeliveryReady
+					? "defer"
+					: match({
+							phase,
+							kind: cue.kind,
+						})
+							.with(
+								{
+									phase: "exiting",
+								},
+								() => "discard" as const,
+							)
+							.with(
+								{
+									kind: P.union("exit", "consume-exit", "deplete-exit", "expiry"),
+								},
+								() => "play" as const,
+							)
+							.with(
+								{
+									phase: P.union("stable", "hovered", "targeted"),
+								},
+								() => "play" as const,
+							)
+							.with(
+								{
+									phase: P.union("dragging", "combining", "settling", "impact"),
+								},
+								() => "defer" as const,
+							)
+							.exhaustive();
 
 	return (
 		<motion.span
+			ref={registerActorNode}
 			className="absolute inset-0 isolate overflow-visible rounded-[var(--ak-tile-actor-radius)] bg-transparent"
 			data-ui="TileActorVisual"
 			data-motion-phase={phase}
+			data-surface-id={surfaceId}
+			data-live={live ? "true" : "false"}
+			data-motion-exiting={exiting ? "true" : "false"}
 			initial={false}
-			animate={readTileActorVisualTarget({
-				phase,
-				feedback,
-				forbiddenDrop,
-			})}
+			animate={{
+				...readTileActorVisualTarget({
+					phase,
+					feedback,
+					forbiddenDrop,
+				}),
+			}}
 			transition={{
 				type: "spring",
 				stiffness: phase === "exiting" ? 225 : 190,
@@ -136,30 +171,60 @@ export const TileActorContent = ({
 			onAnimationComplete={onInteractionAnimationComplete}
 		>
 			<TileMotionCueVisual
-				registerActorNode={registerActorNode}
 				surfaceId={surfaceId}
 				live={live}
 				exiting={exiting}
 				cue={cue}
 				deliveryPayload={
 					cue?.kind === "absorb" && cue.deliveryQuantity !== undefined ? (
-						<TileActorFace item={item} quantity={cue.deliveryQuantity} />
+						<TileActorFace
+							item={item}
+							quantity={cue.deliveryQuantity}
+						/>
+					) : null
+				}
+				preContactPayload={
+					cue?.kind === "absorb" &&
+					cue.previousQuantity !== undefined &&
+					cue.previousQuantity !== presentedQuantity &&
+					cue.deliveryContacted !== true ? (
+						<TileActorFace
+							item={item}
+							quantity={cue.previousQuantity}
+						/>
+					) : null
+				}
+				morphPayload={
+					cue?.kind === "morph" && morphPreviousItem !== null ? (
+						<TileActorFace
+							item={morphPreviousItem}
+							quantity={morphPreviousItem.quantity}
+						/>
 					) : null
 				}
 				transferPayload={
 					cue?.kind === "consume" &&
 					cue.previousQuantity !== undefined &&
 					cue.previousQuantity !== item.quantity ? (
-						<TileActorFace item={item} quantity={cue.previousQuantity} />
+						<TileActorFace
+							item={item}
+							quantity={cue.previousQuantity}
+						/>
 					) : null
 				}
 				mode={cueMode}
 				originOffset={cueOriginOffset}
 				targetOffset={cueTargetOffset}
+				spawnDeliveryTiming={spawnDeliveryTiming}
+				spawnDeliveryReady={spawnDeliveryReady}
 				onStart={onCueStart}
+				onContact={onCueContact}
 				onComplete={onCueComplete}
 			>
-				<TileActorFace item={item} quantity={item.quantity} />
+				<TileActorFace
+					item={item}
+					quantity={presentedQuantity}
+				/>
 			</TileMotionCueVisual>
 		</motion.span>
 	);

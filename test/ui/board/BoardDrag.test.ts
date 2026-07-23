@@ -7,7 +7,9 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { GameEngine } from "~/bridge/game/GameEngine";
 import { useGameFx } from "~/engine/game/fx/useGameFx";
+import { RuntimeFx } from "~/engine/runtime/context/RuntimeFx";
 import { DropItemRejectedReasonEnumSchema } from "~/engine/runtime/schema/command/DropItemRejectedReasonEnumSchema";
+import type { CommittedTransitionSchema } from "~/engine/runtime/schema/CommittedTransitionSchema";
 import { DropItemResultKindEnumSchema } from "~/engine/runtime/schema/command/DropItemResultKindEnumSchema";
 import type { dropItemFx } from "~/engine/runtime/write/dropItemFx";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
@@ -16,7 +18,6 @@ import { Board } from "~/ui/board/Board";
 import { ItemDetailModal } from "~/ui/item-detail/ItemDetailModal";
 import { ItemDetailProvider } from "~/ui/item-detail/ItemDetailProvider";
 import { TileSystemProvider } from "~/ui/tile/TileSystemProvider";
-import { testGameRead, testGameReadOrThrow } from "~test/support/game/testGameRead";
 import { motionTestRuntime } from "~test/ui/support/motionReactMock";
 
 (
@@ -194,10 +195,33 @@ const runtime = Effect.runSync(
 );
 let currentRuntime = runtime;
 const runtimeListeners = new Set<() => void>();
-const publishRuntime = (next: typeof runtime) => {
-	currentRuntime = next;
-	for (const listener of runtimeListeners) listener();
+const transitionListeners = new Set<
+	(transition: CommittedTransitionSchema.Type) => void | PromiseLike<void>
+>();
+let transitionSequence = 0;
+let claimedTilePresentationSequence = -1;
+let currentTransition: CommittedTransitionSchema.Type = {
+	sequence: transitionSequence,
+	previousRuntime: null,
+	runtime: currentRuntime,
+	events: [],
 };
+const publishRuntime = (next: typeof runtime) => {
+	const previousRuntime = currentRuntime;
+	currentRuntime = next;
+	currentTransition = {
+		sequence: ++transitionSequence,
+		previousRuntime,
+		runtime: next,
+		events: [],
+	};
+	for (const listener of runtimeListeners) listener();
+	for (const listener of transitionListeners) void listener(currentTransition);
+};
+const provideCurrentRuntime = (effect: Effect.Effect<unknown, unknown, RuntimeFx>) =>
+	Effect.provideService(effect, RuntimeFx, {
+		read: Effect.sync(() => currentRuntime),
+	});
 const game = {
 	arkpack: {
 		packageId: "test-package",
@@ -214,14 +238,31 @@ const game = {
 		contentHash: "0".repeat(64),
 	},
 	getSnapshot: () => currentRuntime,
+	getTransitionSnapshot: () => currentTransition,
+	claimTilePresentationTransition: (sequence: number) => {
+		if (sequence <= claimedTilePresentationSequence) return false;
+		claimedTilePresentationSequence = sequence;
+		return true;
+	},
 	getResourceUrl: (resourceId: string) => `resource:${resourceId}`,
 	subscribe: (listener: () => void) => {
 		runtimeListeners.add(listener);
 		return () => runtimeListeners.delete(listener);
 	},
+	subscribeTransitions: (listener) => {
+		transitionListeners.add(listener);
+		void listener(currentTransition);
+		return () => transitionListeners.delete(listener);
+	},
 	subscribeEvents: () => () => undefined,
-	read: testGameRead,
-	readOrThrow: testGameReadOrThrow,
+	read: ((effect) =>
+		Effect.runSyncExit(
+			provideCurrentRuntime(effect as Effect.Effect<unknown, unknown, RuntimeFx>),
+		)) as GameEngine["read"],
+	readOrThrow: ((effect) =>
+		Effect.runSync(
+			provideCurrentRuntime(effect as Effect.Effect<unknown, unknown, RuntimeFx>),
+		)) as GameEngine["readOrThrow"],
 	run: (() => Promise.reject(new Error("Not used by this test."))) as GameEngine["run"],
 	disposeFx: Effect.void,
 	disposeWithoutSaveFx: Effect.void,
@@ -231,7 +272,16 @@ const game = {
 beforeEach(() => {
 	motionTestRuntime.reset();
 	currentRuntime = runtime;
+	transitionSequence = 0;
+	claimedTilePresentationSequence = -1;
+	currentTransition = {
+		sequence: transitionSequence,
+		previousRuntime: null,
+		runtime: currentRuntime,
+		events: [],
+	};
 	runtimeListeners.clear();
+	transitionListeners.clear();
 	gameEngineState.game = game;
 	dropItemState.drop.mockReset();
 	Object.defineProperty(document.documentElement, "clientWidth", {
@@ -256,7 +306,10 @@ beforeEach(() => {
 			const element = this as HTMLElement;
 			if (element.dataset.ui === "BoardGrid") return rect(0, 0, 300, 200);
 			if (element.dataset.ui === "TileActorLayer") return rect(0, 0, 300, 200);
-			if (element.dataset.ui === "TileMotionCueVisual") {
+			if (
+				element.dataset.ui === "TileMotionCueVisual" ||
+				element.dataset.ui === "TileActorVisual"
+			) {
 				const actor = element.closest<HTMLElement>('[data-ui="TileActor"]');
 				const runtimeId = actor?.dataset.runtimeId;
 				const boardX = Number(actor?.dataset.boardX);
@@ -269,26 +322,57 @@ beforeEach(() => {
 					Number.isFinite(boardY) &&
 					Number.isFinite(scale)
 				) {
-					const travel = motionTestRuntime.readMotionOffset("TileActorTravel", runtimeId) ?? {
+					const travel = motionTestRuntime.readMotionOffset(
+						"TileActorTravel",
+						runtimeId,
+					) ?? {
 						x: 0,
 						y: 0,
 					};
-					const weight = motionTestRuntime.readMotionOffset("TileActorWeight", runtimeId) ?? {
+					const pointer = motionTestRuntime.readMotionOffset(
+						"TileActorPointer",
+						runtimeId,
+					) ?? {
 						x: 0,
 						y: 0,
 					};
-					const pickup = motionTestRuntime.readMotionOffset("TileActorPickup", runtimeId) ?? {
+					const response = motionTestRuntime.readMotionOffset(
+						"TileActorPhysicalResponse",
+						runtimeId,
+					) ?? {
 						x: 0,
 						y: 0,
 					};
-					const neighbour = motionTestRuntime.readMotionOffset("TileActor", runtimeId) ?? {
+					const pickup = motionTestRuntime.readMotionOffset(
+						"TileActorPickup",
+						runtimeId,
+					) ?? {
+						x: 0,
+						y: 0,
+					};
+					const neighbour = motionTestRuntime.readMotionOffset(
+						"TileActor",
+						runtimeId,
+					) ?? {
 						x: 0,
 						y: 0,
 					};
 					const size = 100 * scale;
 					return rect(
-						boardX * 100 + (100 - size) / 2 + travel.x + weight.x + pickup.x + neighbour.x,
-						boardY * 100 + (100 - size) / 2 + travel.y + weight.y + pickup.y + neighbour.y,
+						boardX * 100 +
+							(100 - size) / 2 +
+							travel.x +
+							pointer.x +
+							response.x +
+							pickup.x +
+							neighbour.x,
+						boardY * 100 +
+							(100 - size) / 2 +
+							travel.y +
+							pointer.y +
+							response.y +
+							pickup.y +
+							neighbour.y,
 						size,
 						size,
 					);
@@ -400,20 +484,29 @@ describe("Board drag", () => {
 			x: -40,
 			y: -40,
 		});
-		expect(motionTestRuntime.readMotionOffset("TileActorWeight", runtimeId)).toEqual({
-			x: -2.45,
-			y: -1.96,
+		expect(motionTestRuntime.readMotionOffset("TileActorPhysicalResponse", runtimeId)).toEqual({
+			x: -1.4,
+			y: -1.12,
 		});
-		const yieldedActor = document.querySelector<HTMLElement>(
+		const compatibleActor = document.querySelector<HTMLElement>(
 			'[data-ui="TileActor"][data-board-x="0"][data-board-y="1"]',
 		);
-		const yieldedRuntimeId = yieldedActor?.dataset.runtimeId;
-		if (yieldedRuntimeId === undefined) throw new Error("Missing neighbour actor identity.");
-		const yieldedOffset = motionTestRuntime.readMotionOffset(
-			"TileActor",
-			yieldedRuntimeId,
+		const compatibleRuntimeId = compatibleActor?.dataset.runtimeId;
+		const incompatibleActor = document.querySelector<HTMLElement>(
+			'[data-ui="TileActor"][data-board-x="1"][data-board-y="0"]',
 		);
-		expect(yieldedOffset).not.toEqual({
+		const incompatibleRuntimeId = incompatibleActor?.dataset.runtimeId;
+		if (compatibleRuntimeId === undefined || incompatibleRuntimeId === undefined) {
+			throw new Error("Missing neighbour actor identity.");
+		}
+		expect(motionTestRuntime.readMotionOffset("TileActor", compatibleRuntimeId)).toEqual({
+			x: 0,
+			y: 0,
+		});
+		expect(
+			motionTestRuntime.readMotionScale("TileActorNeighbourEmphasis", compatibleRuntimeId),
+		).toBeGreaterThan(1);
+		expect(motionTestRuntime.readMotionOffset("TileActor", incompatibleRuntimeId)).not.toEqual({
 			x: 0,
 			y: 0,
 		});
@@ -421,16 +514,24 @@ describe("Board drag", () => {
 		await act(async () => {
 			dragSurface.dispatchEvent(pointerEvent("pointercancel", 217, 117));
 			await Promise.resolve();
+			await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
 		});
 
-		expect(motionTestRuntime.readMotionOffset("TileActorWeight", runtimeId)).toEqual({
+		expect(motionTestRuntime.readMotionOffset("TileActorPhysicalResponse", runtimeId)).toEqual({
 			x: 0,
 			y: 0,
 		});
-		expect(motionTestRuntime.readMotionOffset("TileActor", yieldedRuntimeId)).toEqual({
+		expect(motionTestRuntime.readMotionOffset("TileActor", compatibleRuntimeId)).toEqual({
 			x: 0,
 			y: 0,
 		});
+		expect(motionTestRuntime.readMotionOffset("TileActor", incompatibleRuntimeId)).toEqual({
+			x: 0,
+			y: 0,
+		});
+		expect(
+			motionTestRuntime.readMotionScale("TileActorNeighbourEmphasis", compatibleRuntimeId),
+		).toBe(1);
 	});
 	it("removes cursor lag and neighbour yielding for reduced motion", async () => {
 		motionTestRuntime.reducedMotion = true;
@@ -451,7 +552,7 @@ describe("Board drag", () => {
 			await Promise.resolve();
 		});
 
-		expect(motionTestRuntime.readMotionOffset("TileActorWeight", runtimeId)).toEqual({
+		expect(motionTestRuntime.readMotionOffset("TileActorPhysicalResponse", runtimeId)).toEqual({
 			x: 0,
 			y: 0,
 		});
@@ -467,6 +568,7 @@ describe("Board drag", () => {
 
 	it("gives an occupied rejected target its own resistant response", async () => {
 		motionTestRuntime.autoComplete = false;
+		motionTestRuntime.autoCompleteImperativeAnimations = false;
 		const source = await renderBoard();
 		const target = document.querySelector<HTMLElement>(
 			'[data-ui="TileActor"][data-board-x="1"][data-board-y="0"]',
@@ -656,22 +758,23 @@ describe("Board drag", () => {
 		expect(
 			target.querySelector<HTMLElement>('[data-ui="TileActorVisual"]')?.dataset.motionScale,
 		).toBe("0.8");
-		expect(motionTestRuntime.readMotionOffset("TileActor", targetId)).toEqual({
+		expect(motionTestRuntime.readMotionOffset("TileActor", targetId)).not.toEqual({
 			x: 0,
 			y: 0,
 		});
-		const passiveNeighbour = document.querySelector<HTMLElement>(
+		const compatibleNeighbour = document.querySelector<HTMLElement>(
 			'[data-ui="TileActor"][data-board-x="0"][data-board-y="1"]',
 		);
-		const passiveNeighbourId = passiveNeighbour?.dataset.runtimeId;
-		if (passiveNeighbourId === undefined)
-			throw new Error("Missing passive neighbour identity.");
-		expect(
-			motionTestRuntime.readMotionOffset("TileActor", passiveNeighbourId),
-		).not.toEqual({
+		const compatibleNeighbourId = compatibleNeighbour?.dataset.runtimeId;
+		if (compatibleNeighbourId === undefined)
+			throw new Error("Missing compatible neighbour identity.");
+		expect(motionTestRuntime.readMotionOffset("TileActor", compatibleNeighbourId)).toEqual({
 			x: 0,
 			y: 0,
 		});
+		expect(
+			motionTestRuntime.readMotionScale("TileActorNeighbourEmphasis", compatibleNeighbourId),
+		).toBeGreaterThan(1);
 
 		await act(async () => {
 			dragSurface.dispatchEvent(pointerEvent("pointerup", 150, 50));
@@ -1202,9 +1305,7 @@ describe("Board drag", () => {
 		motionTestRuntime.autoComplete = false;
 		const source = await renderBoard();
 		const sourceId = source.dataset.runtimeId;
-		const dragSurface = source.querySelector<HTMLElement>(
-			'[data-ui="TileActorDragSurface"]',
-		);
+		const dragSurface = source.querySelector<HTMLElement>('[data-ui="TileActorDragSurface"]');
 		if (sourceId === undefined || dragSurface === null) {
 			throw new Error("Missing autonomously removed drag actor.");
 		}

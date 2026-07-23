@@ -65,8 +65,14 @@ describe("tile motion grammar", () => {
 
 	it("makes rejected and outside drag targets visibly unavailable", () => {
 		for (const target of [
-			{ feedback: "rejected" as const, forbiddenDrop: false },
-			{ feedback: null, forbiddenDrop: true },
+			{
+				feedback: "rejected" as const,
+				forbiddenDrop: false,
+			},
+			{
+				feedback: null,
+				forbiddenDrop: true,
+			},
 		]) {
 			expect(
 				readTileActorVisualTarget({
@@ -117,7 +123,44 @@ describe("tile motion grammar", () => {
 			}),
 		).toEqual({
 			x: -230,
-			y: -140,
+			y: -150,
+		});
+	});
+
+	it("anchors producer emission at a bounded directional mouth without changing ordinary delivery", () => {
+		const geometry = {
+			actorLayerRect: {
+				left: 0,
+				top: 0,
+				width: 800,
+				height: 600,
+			},
+			originRect: {
+				left: 0,
+				top: 0,
+				width: 100,
+				height: 100,
+			},
+			targetPlacement: {
+				x: 200,
+				y: 0,
+				width: 100,
+				height: 100,
+			},
+		};
+
+		expect(readTileDeliveryOriginOffset(geometry)).toEqual({
+			x: -200,
+			y: 0,
+		});
+		expect(
+			readTileDeliveryOriginOffset({
+				...geometry,
+				originAnchor: "directional-edge",
+			}),
+		).toEqual({
+			x: -161,
+			y: 0,
 		});
 	});
 });

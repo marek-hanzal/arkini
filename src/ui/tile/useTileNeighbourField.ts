@@ -14,7 +14,7 @@ interface TileNeighbourMotionValue {
 interface TileNeighbourActorRegistration {
 	readonly itemId: string;
 	readonly node: HTMLElement;
-	readonly source: TileDragSource;
+	source: TileDragSource;
 	readonly x: TileNeighbourMotionValue;
 	readonly y: TileNeighbourMotionValue;
 	readonly appliedX: TileNeighbourMotionValue;
@@ -23,7 +23,7 @@ interface TileNeighbourActorRegistration {
 	readonly appliedScale: TileNeighbourMotionValue;
 	readonly canonicalWidth: TileNeighbourMotionValue;
 	readonly canonicalHeight: TileNeighbourMotionValue;
-	readonly enabled: boolean;
+	enabled: boolean;
 }
 
 interface TileNeighbourMover {
@@ -41,12 +41,7 @@ const combinedDisplacementLimit = 18;
 const acceptedCandidateScaleLimit = 0.96;
 const acceptingTargetScaleLimit = 0.96;
 
-const translatedRect = (
-	bounds: DOMRect,
-	x: number,
-	y: number,
-	scale: number,
-): DOMRect => {
+const translatedRect = (bounds: DOMRect, x: number, y: number, scale: number): DOMRect => {
 	const safeScale = Number.isFinite(scale) && scale > 0.01 ? scale : 1;
 	const width = bounds.width / safeScale;
 	const height = bounds.height / safeScale;
@@ -75,10 +70,7 @@ const scaleMultiplierForAbsoluteTarget = (
 	const canonicalWidth = registration.canonicalWidth.get();
 	const canonicalHeight = registration.canonicalHeight.get();
 	if (canonicalWidth <= 0 || canonicalHeight <= 0) return 1;
-	const currentScale = Math.max(
-		bounds.width / canonicalWidth,
-		bounds.height / canonicalHeight,
-	);
+	const currentScale = Math.max(bounds.width / canonicalWidth, bounds.height / canonicalHeight);
 	if (!Number.isFinite(currentScale) || currentScale <= 0.01) return 1;
 	return Math.max(1, targetScale / currentScale);
 };
@@ -89,20 +81,27 @@ const travelTargetForPreview = (
 ): TileNeighbourTravelTarget | null => {
 	if (itemId === null) return null;
 	if (previewKind === DropItemResultKindEnumSchema.enum.Merge) {
-		return { itemId, feedback: "merge" };
+		return {
+			itemId,
+			feedback: "merge",
+		};
 	}
 	if (previewKind === DropItemResultKindEnumSchema.enum.StoreInput) {
-		return { itemId, feedback: "accepted" };
+		return {
+			itemId,
+			feedback: "accepted",
+		};
 	}
 	if (previewKind === DropItemResultKindEnumSchema.enum.Reject) {
-		return { itemId, feedback: "rejected" };
+		return {
+			itemId,
+			feedback: "rejected",
+		};
 	}
 	return null;
 };
 
-const targetForCandidate = (
-	registration: TileNeighbourActorRegistration,
-): TileDropTarget => ({
+const targetForCandidate = (registration: TileNeighbourActorRegistration): TileDropTarget => ({
 	kind: "slot",
 	surface: registration.source.surface,
 	slot: registration.source.slot,
@@ -161,19 +160,16 @@ export const useTileNeighbourField = ({
 		clearTimeout(scheduled.handle);
 	}, []);
 
-	const readStableActorRect = useCallback(
-		(registration: TileNeighbourActorRegistration) => {
-			const bounds = registration.node.getBoundingClientRect();
-			if (bounds.width <= 0 || bounds.height <= 0) return null;
-			return translatedRect(
-				bounds,
-				registration.appliedX.get(),
-				registration.appliedY.get(),
-				registration.appliedScale.get(),
-			);
-		},
-		[],
-	);
+	const readStableActorRect = useCallback((registration: TileNeighbourActorRegistration) => {
+		const bounds = registration.node.getBoundingClientRect();
+		if (bounds.width <= 0 || bounds.height <= 0) return null;
+		return translatedRect(
+			bounds,
+			registration.appliedX.get(),
+			registration.appliedY.get(),
+			registration.appliedScale.get(),
+		);
+	}, []);
 
 	const recomputeSemanticCandidates = useCallback(
 		(itemId: string) => {
@@ -213,14 +209,18 @@ export const useTileNeighbourField = ({
 			}
 			candidateKindByMover.current.set(itemId, candidates);
 		},
-		[readPreview],
+		[
+			readPreview,
+		],
 	);
 
 	const recomputeAllSemanticCandidates = useCallback(() => {
 		for (const itemId of semanticSourceByMover.current.keys()) {
 			recomputeSemanticCandidates(itemId);
 		}
-	}, [recomputeSemanticCandidates]);
+	}, [
+		recomputeSemanticCandidates,
+	]);
 
 	const refreshSemanticCandidates = useCallback(() => {
 		if (semanticSourceByMover.current.size === 0) return;
@@ -243,7 +243,11 @@ export const useTileNeighbourField = ({
 			}
 		}
 		recomputeAllSemanticCandidates();
-	}, [readPreviewSequence, recomputeAllSemanticCandidates, refreshActivePreview]);
+	}, [
+		readPreviewSequence,
+		recomputeAllSemanticCandidates,
+		refreshActivePreview,
+	]);
 
 	const refreshNeighbourFieldRef = useRef<() => void>(() => undefined);
 
@@ -298,6 +302,10 @@ export const useTileNeighbourField = ({
 					target: targetByMover.current.get(itemId) ?? null,
 				});
 			}
+			if (liveMovers.length === 0) {
+				for (const registration of actors.current.values()) reset(registration);
+				return;
+			}
 
 			const directTargets = new Map<
 				string,
@@ -317,7 +325,10 @@ export const useTileNeighbourField = ({
 							: "rejected";
 				directTargets.set(mover.target.itemId, {
 					feedback,
-					movers: [...(previous?.movers ?? []), mover],
+					movers: [
+						...(previous?.movers ?? []),
+						mover,
+					],
 				});
 			}
 
@@ -351,7 +362,10 @@ export const useTileNeighbourField = ({
 							if (mover.semantic || mover.surfaceId !== surfaceId) continue;
 							const sourceCenterX = mover.bounds.left + mover.bounds.width / 2;
 							const sourceCenterY = mover.bounds.top + mover.bounds.height / 2;
-							const distance = Math.hypot(centerX - sourceCenterX, centerY - sourceCenterY);
+							const distance = Math.hypot(
+								centerX - sourceCenterX,
+								centerY - sourceCenterY,
+							);
 							const sourceSize = Math.max(mover.bounds.width, mover.bounds.height);
 							const radius = Math.max(48, Math.max(sourceSize, neighbourSize) * 1.25);
 							if (distance >= radius) continue;
@@ -359,8 +373,7 @@ export const useTileNeighbourField = ({
 							targetScale = Math.max(
 								targetScale ?? TileActorBaseScale,
 								TileActorBaseScale +
-									progress *
-										(acceptingTargetScaleLimit - TileActorBaseScale),
+									progress * (acceptingTargetScaleLimit - TileActorBaseScale),
 							);
 						}
 					}
@@ -385,10 +398,7 @@ export const useTileNeighbourField = ({
 					const deltaY = centerY - sourceCenterY;
 					const distance = Math.hypot(deltaX, deltaY);
 					const sourceSize = Math.max(mover.bounds.width, mover.bounds.height);
-					const ordinaryRadius = Math.max(
-						96,
-						Math.max(sourceSize, neighbourSize) * 2.25,
-					);
+					const ordinaryRadius = Math.max(96, Math.max(sourceSize, neighbourSize) * 2.25);
 					const candidateKind = mover.semantic
 						? mover.candidateKinds.get(registration.itemId)
 						: undefined;
@@ -402,8 +412,7 @@ export const useTileNeighbourField = ({
 							compatibilityScale = Math.max(
 								compatibilityScale,
 								TileActorBaseScale +
-									progress *
-										(acceptedCandidateScaleLimit - TileActorBaseScale),
+									progress * (acceptedCandidateScaleLimit - TileActorBaseScale),
 							);
 						}
 						continue;
@@ -412,8 +421,7 @@ export const useTileNeighbourField = ({
 					const maximum = Math.min(16, neighbourSize * 0.16);
 					const semanticMultiplier =
 						candidateKind === "incompatible" || candidateKind === "rejected" ? 1.3 : 1;
-					const strength =
-						(1 - distance / ordinaryRadius) * maximum * semanticMultiplier;
+					const strength = (1 - distance / ordinaryRadius) * maximum * semanticMultiplier;
 					displacementX += (deltaX / distance) * strength;
 					displacementY += (deltaY / distance) * strength;
 				}
@@ -438,7 +446,11 @@ export const useTileNeighbourField = ({
 			candidateKindByMover.current.clear();
 			for (const registration of actors.current.values()) reset(registration);
 		}
-	}, [readStableActorRect, refreshSemanticCandidates, reset]);
+	}, [
+		readStableActorRect,
+		refreshSemanticCandidates,
+		reset,
+	]);
 	refreshNeighbourFieldRef.current = refreshNeighbourField;
 
 	const scheduleNeighbourFrame = useCallback(() => {
@@ -464,7 +476,9 @@ export const useTileNeighbourField = ({
 			kind: "timeout",
 			handle: setTimeout(run, 16) as unknown as number,
 		};
-	}, [refreshNeighbourField]);
+	}, [
+		refreshNeighbourField,
+	]);
 	scheduleFrameRef.current = scheduleNeighbourFrame;
 
 	const clearNeighbourField = useCallback(() => {
@@ -474,7 +488,10 @@ export const useTileNeighbourField = ({
 		semanticSourceByMover.current.clear();
 		candidateKindByMover.current.clear();
 		for (const registration of actors.current.values()) reset(registration);
-	}, [cancelScheduledFrame, reset]);
+	}, [
+		cancelScheduledFrame,
+		reset,
+	]);
 
 	const registerNeighbourActor = useCallback(
 		(registration: TileNeighbourActorRegistration) => {
@@ -502,6 +519,35 @@ export const useTileNeighbourField = ({
 		],
 	);
 
+	const updateNeighbourActor = useCallback(
+		({
+			itemId,
+			source,
+			enabled,
+		}: {
+			readonly itemId: string;
+			readonly source: TileDragSource;
+			readonly enabled: boolean;
+		}) => {
+			const registration = actors.current.get(itemId);
+			if (registration === undefined) return;
+			registration.source = source;
+			registration.enabled = enabled;
+			if (!enabled) reset(registration);
+			recomputeAllSemanticCandidates();
+			refreshNeighbourField();
+			if (enabled && (movers.current.size > 0 || semanticSourceByMover.current.size > 0)) {
+				scheduleNeighbourFrame();
+			}
+		},
+		[
+			recomputeAllSemanticCandidates,
+			refreshNeighbourField,
+			reset,
+			scheduleNeighbourFrame,
+		],
+	);
+
 	const readActorRect = useCallback((itemId: string) => {
 		const registration = actors.current.get(itemId);
 		if (registration === undefined) return null;
@@ -513,6 +559,11 @@ export const useTileNeighbourField = ({
 			return null;
 		}
 	}, []);
+
+	const readActorSource = useCallback(
+		(itemId: string) => actors.current.get(itemId)?.source ?? null,
+		[],
+	);
 
 	const beginNeighbourTravel = useCallback(
 		(itemId: string) => {
@@ -560,7 +611,10 @@ export const useTileNeighbourField = ({
 				refreshNeighbourField();
 			};
 		},
-		[refreshNeighbourField, scheduleOrphanedTargetCleanup],
+		[
+			refreshNeighbourField,
+			scheduleOrphanedTargetCleanup,
+		],
 	);
 
 	const setNeighbourSemanticSource = useCallback(
@@ -604,12 +658,16 @@ export const useTileNeighbourField = ({
 			clearNeighbourField();
 			actors.current.clear();
 		},
-		[clearNeighbourField],
+		[
+			clearNeighbourField,
+		],
 	);
 
 	return {
 		readActorRect,
+		readActorSource,
 		registerNeighbourActor,
+		updateNeighbourActor,
 		beginNeighbourTravel,
 		setNeighbourTravelTarget,
 		setNeighbourSemanticSource,

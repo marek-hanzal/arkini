@@ -7,6 +7,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { GameEngine } from "~/bridge/game/GameEngine";
 import { useGameFx } from "~/engine/game/fx/useGameFx";
+import { RuntimeFx } from "~/engine/runtime/context/RuntimeFx";
+import type { CommittedTransitionSchema } from "~/engine/runtime/schema/CommittedTransitionSchema";
 import { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { startFx } from "~/engine/start/write/startFx";
@@ -15,7 +17,6 @@ import { ItemDetailModal } from "~/ui/item-detail/ItemDetailModal";
 import { ItemDetailProvider } from "~/ui/item-detail/ItemDetailProvider";
 import { TileSystemProvider } from "~/ui/tile/TileSystemProvider";
 import { motionTestRuntime } from "~test/ui/support/motionReactMock";
-import { testGameRead, testGameReadOrThrow } from "~test/support/game/testGameRead";
 
 (
 	globalThis as {
@@ -132,7 +133,22 @@ const initialRuntime = Effect.runSync(
 );
 let currentRuntime = initialRuntime;
 const listeners = new Set<() => void>();
+const transitionListeners = new Set<
+	(transition: CommittedTransitionSchema.Type) => void | PromiseLike<void>
+>();
+let transitionSequence = 0;
+let claimedTilePresentationSequence = -1;
+let currentTransition: CommittedTransitionSchema.Type = {
+	sequence: transitionSequence,
+	previousRuntime: null,
+	runtime: currentRuntime,
+	events: [],
+};
 const runCommand = vi.fn(() => Promise.resolve({}));
+const provideCurrentRuntime = (effect: Effect.Effect<unknown, unknown, RuntimeFx>) =>
+	Effect.provideService(effect, RuntimeFx, {
+		read: Effect.sync(() => currentRuntime),
+	});
 const game = {
 	arkpack: {
 		packageId: "test-package",
@@ -149,14 +165,31 @@ const game = {
 		contentHash: "0".repeat(64),
 	},
 	getSnapshot: () => currentRuntime,
+	getTransitionSnapshot: () => currentTransition,
+	claimTilePresentationTransition: (sequence: number) => {
+		if (sequence <= claimedTilePresentationSequence) return false;
+		claimedTilePresentationSequence = sequence;
+		return true;
+	},
 	getResourceUrl: (resourceId: string) => `resource:${resourceId}`,
 	subscribe: (listener: () => void) => {
 		listeners.add(listener);
 		return () => listeners.delete(listener);
 	},
+	subscribeTransitions: (listener) => {
+		transitionListeners.add(listener);
+		void listener(currentTransition);
+		return () => transitionListeners.delete(listener);
+	},
 	subscribeEvents: () => () => undefined,
-	read: testGameRead,
-	readOrThrow: testGameReadOrThrow,
+	read: ((effect) =>
+		Effect.runSyncExit(
+			provideCurrentRuntime(effect as Effect.Effect<unknown, unknown, RuntimeFx>),
+		)) as GameEngine["read"],
+	readOrThrow: ((effect) =>
+		Effect.runSync(
+			provideCurrentRuntime(effect as Effect.Effect<unknown, unknown, RuntimeFx>),
+		)) as GameEngine["readOrThrow"],
 	run: runCommand as GameEngine["run"],
 	disposeFx: Effect.void,
 	disposeWithoutSaveFx: Effect.void,
@@ -178,14 +211,31 @@ const rect = (left: number, top: number, width: number, height: number): DOMRect
 });
 
 const publishRuntime = (runtime: RuntimeSchema.Type) => {
+	const previousRuntime = currentRuntime;
 	currentRuntime = runtime;
+	currentTransition = {
+		sequence: ++transitionSequence,
+		previousRuntime,
+		runtime,
+		events: [],
+	};
 	for (const listener of listeners) listener();
+	for (const listener of transitionListeners) void listener(currentTransition);
 };
 
 beforeEach(() => {
 	motionTestRuntime.reset();
 	currentRuntime = initialRuntime;
+	transitionSequence = 0;
+	claimedTilePresentationSequence = -1;
+	currentTransition = {
+		sequence: transitionSequence,
+		previousRuntime: null,
+		runtime: currentRuntime,
+		events: [],
+	};
 	listeners.clear();
+	transitionListeners.clear();
 	runCommand.mockReset();
 	runCommand.mockResolvedValue({});
 	gameEngineState.game = game;
@@ -195,7 +245,10 @@ beforeEach(() => {
 			const element = this as HTMLElement;
 			if (element.dataset.ui === "BoardGrid") return rect(0, 0, 200, 100);
 			if (element.dataset.ui === "TileActorLayer") return rect(0, 0, 200, 100);
-			if (element.dataset.ui === "TileMotionCueVisual") {
+			if (
+				element.dataset.ui === "TileMotionCueVisual" ||
+				element.dataset.ui === "TileActorVisual"
+			) {
 				const actor = element.closest<HTMLElement>('[data-ui="TileActor"]');
 				const x = Number(actor?.dataset.boardX);
 				if (Number.isFinite(x)) return rect(x * 100 + 10, 10, 80, 80);

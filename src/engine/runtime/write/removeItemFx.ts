@@ -1,6 +1,8 @@
 import { Array, Effect, Option, pipe } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
+import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
+import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
 import { ItemNotFoundError } from "~/engine/item/error/ItemNotFoundError";
 import { assertOwnerIdleFx } from "~/engine/job/fx/assertOwnerIdleFx";
 import { assertRevisionFx } from "~/engine/revision/fx/assertRevisionFx";
@@ -52,6 +54,13 @@ export const removeItemFx = Effect.fn("removeItemFx")(function* ({
 				runtime,
 			});
 
+			const explicitlyRemovedEvent = {
+				type: GameEventEnumSchema.enum.ItemExplicitlyRemoved,
+				itemId: item.id,
+				canonicalItemId: item.item.id,
+				location: item.location,
+				quantity: item.quantity,
+			} satisfies GameEventSchema.Type;
 			const removal = yield* removeRuntimeItemFx({
 				item,
 				runtime,
@@ -60,7 +69,10 @@ export const removeItemFx = Effect.fn("removeItemFx")(function* ({
 			return [
 				item,
 				removal.runtime,
-				removal.events,
+				[
+					explicitlyRemovedEvent,
+					...removal.events,
+				],
 			] as const;
 		});
 	});

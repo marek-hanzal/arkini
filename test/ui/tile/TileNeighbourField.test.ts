@@ -62,7 +62,13 @@ const actorNode = ({
 
 const dragSource = (
 	itemId: string,
-	position: { readonly x: number; readonly y: number } = { x: 0, y: 0 },
+	position: {
+		readonly x: number;
+		readonly y: number;
+	} = {
+		x: 0,
+		y: 0,
+	},
 ): TileDragSource => ({
 	id: itemId,
 	revision: `revision:${itemId}`,
@@ -95,7 +101,11 @@ const readPreview = (
 ): useDropItemPreview.Result | null => {
 	const targetId = target.kind === "slot" ? target.occupant?.id : undefined;
 	const kind = targetId === undefined ? undefined : previewKindByTarget.get(targetId);
-	return kind === undefined ? null : ({ kind } as useDropItemPreview.Result);
+	return kind === undefined
+		? null
+		: ({
+				kind,
+			} as useDropItemPreview.Result);
 };
 
 const Capture = () => {
@@ -161,7 +171,11 @@ const register = (
 		canonicalHeight,
 		enabled,
 	});
-	return { x, y, scale };
+	return {
+		x,
+		y,
+		scale,
+	};
 };
 
 beforeEach(() => {
@@ -183,28 +197,76 @@ afterEach(async () => {
 });
 
 describe("Tile neighbour field", () => {
+	it("updates actor metadata without replacing its DOM registration", async () => {
+		const neighbourField = await renderField();
+		const sourceNode = actorNode({
+			bounds: rect(0, 0),
+		});
+		register(neighbourField, "source", sourceNode);
+		const neighbour = register(
+			neighbourField,
+			"neighbour",
+			actorNode({
+				bounds: rect(80, 0),
+			}),
+		);
+		const endTravel = neighbourField.beginNeighbourTravel("source");
+
+		expect(neighbour.x.read()).toBeGreaterThan(0);
+
+		neighbourField.updateNeighbourActor({
+			itemId: "source",
+			source: dragSource("source", {
+				x: 1,
+				y: 0,
+			}),
+			enabled: false,
+		});
+		expect(neighbour.x.read()).toBe(0);
+
+		neighbourField.updateNeighbourActor({
+			itemId: "source",
+			source: dragSource("source", {
+				x: 1,
+				y: 0,
+			}),
+			enabled: true,
+		});
+		expect(neighbour.x.read()).toBeGreaterThan(0);
+
+		endTravel();
+	});
+
 	it("pushes nearby actors from the travelling body's actual current center", async () => {
 		const neighbourField = await renderField();
 		let sourceBounds = rect(0, 0);
 		const source = register(
 			neighbourField,
 			"source",
-			actorNode({ bounds: () => sourceBounds }),
+			actorNode({
+				bounds: () => sourceBounds,
+			}),
 		);
 		const right = register(
 			neighbourField,
 			"right",
-			actorNode({ bounds: rect(80, 0) }),
+			actorNode({
+				bounds: rect(80, 0),
+			}),
 		);
 		const left = register(
 			neighbourField,
 			"left",
-			actorNode({ bounds: rect(-80, 0) }),
+			actorNode({
+				bounds: rect(-80, 0),
+			}),
 		);
 		const far = register(
 			neighbourField,
 			"far",
-			actorNode({ bounds: rect(400, 0) }),
+			actorNode({
+				bounds: rect(400, 0),
+			}),
 		);
 
 		const endTravel = neighbourField.beginNeighbourTravel("source");
@@ -227,32 +289,51 @@ describe("Tile neighbour field", () => {
 
 	it("suppresses direct targets, other surfaces, exiting actors, and zero vectors", async () => {
 		const neighbourField = await renderField();
-		register(neighbourField, "source", actorNode({ bounds: rect(0, 0) }));
+		register(
+			neighbourField,
+			"source",
+			actorNode({
+				bounds: rect(0, 0),
+			}),
+		);
 		const direct = register(
 			neighbourField,
 			"direct",
-			actorNode({ bounds: rect(80, 0) }),
+			actorNode({
+				bounds: rect(80, 0),
+			}),
 		);
 		const otherSurface = register(
 			neighbourField,
 			"other-surface",
-			actorNode({ bounds: rect(80, 0), surfaceId: "toolbar" }),
+			actorNode({
+				bounds: rect(80, 0),
+				surfaceId: "toolbar",
+			}),
 			{
 				source: {
 					...dragSource("other-surface"),
-					surface: { id: "toolbar", kind: "toolbar" },
+					surface: {
+						id: "toolbar",
+						kind: "toolbar",
+					},
 				},
 			},
 		);
 		const exiting = register(
 			neighbourField,
 			"exiting",
-			actorNode({ bounds: rect(-80, 0), exiting: true }),
+			actorNode({
+				bounds: rect(-80, 0),
+				exiting: true,
+			}),
 		);
 		const coincident = register(
 			neighbourField,
 			"coincident",
-			actorNode({ bounds: rect(0, 0) }),
+			actorNode({
+				bounds: rect(0, 0),
+			}),
 		);
 
 		neighbourField.setNeighbourTravelTarget("source", {
@@ -261,7 +342,12 @@ describe("Tile neighbour field", () => {
 		});
 		neighbourField.beginNeighbourTravel("source");
 
-		for (const target of [direct, otherSurface, exiting, coincident]) {
+		for (const target of [
+			direct,
+			otherSurface,
+			exiting,
+			coincident,
+		]) {
 			expect(target.x.read()).toBe(0);
 			expect(target.y.read()).toBe(0);
 			expect(Number.isFinite(target.x.read())).toBe(true);
@@ -273,17 +359,23 @@ describe("Tile neighbour field", () => {
 		const sourceA = register(
 			neighbourField,
 			"source-a",
-			actorNode({ bounds: rect(0, 0) }),
+			actorNode({
+				bounds: rect(0, 0),
+			}),
 		);
 		const sourceB = register(
 			neighbourField,
 			"source-b",
-			actorNode({ bounds: rect(30, 0) }),
+			actorNode({
+				bounds: rect(30, 0),
+			}),
 		);
 		const neighbour = register(
 			neighbourField,
 			"neighbour",
-			actorNode({ bounds: rect(80, 0) }),
+			actorNode({
+				bounds: rect(80, 0),
+			}),
 		);
 
 		const endA = neighbourField.beginNeighbourTravel("source-a");
@@ -302,7 +394,13 @@ describe("Tile neighbour field", () => {
 
 	it("does not recursively feed applied displacement or compatibility scale into geometry", async () => {
 		const neighbourField = await renderField();
-		register(neighbourField, "source", actorNode({ bounds: rect(0, 0) }));
+		register(
+			neighbourField,
+			"source",
+			actorNode({
+				bounds: rect(0, 0),
+			}),
+		);
 		const neighbourX = motionTarget();
 		const neighbourY = motionTarget();
 		const neighbourScale = motionTarget(1);
@@ -337,16 +435,26 @@ describe("Tile neighbour field", () => {
 		const neighbourField = await renderField();
 		previewKindByTarget.set("compatible", DropItemResultKindEnumSchema.enum.StoreInput);
 		previewKindByTarget.set("incompatible", DropItemResultKindEnumSchema.enum.Swap);
-		register(neighbourField, "source", actorNode({ bounds: rect(0, 0) }));
+		register(
+			neighbourField,
+			"source",
+			actorNode({
+				bounds: rect(0, 0),
+			}),
+		);
 		const compatible = register(
 			neighbourField,
 			"compatible",
-			actorNode({ bounds: rect(80, 0) }),
+			actorNode({
+				bounds: rect(80, 0),
+			}),
 		);
 		const incompatible = register(
 			neighbourField,
 			"incompatible",
-			actorNode({ bounds: rect(-80, 0) }),
+			actorNode({
+				bounds: rect(-80, 0),
+			}),
 		);
 
 		neighbourField.setNeighbourSemanticSource("source", dragSource("source"));
@@ -361,11 +469,19 @@ describe("Tile neighbour field", () => {
 	it("invalidates cached drag candidates after a committed transition", async () => {
 		const neighbourField = await renderField();
 		previewKindByTarget.set("candidate", DropItemResultKindEnumSchema.enum.StoreInput);
-		register(neighbourField, "source", actorNode({ bounds: rect(0, 0) }));
+		register(
+			neighbourField,
+			"source",
+			actorNode({
+				bounds: rect(0, 0),
+			}),
+		);
 		const candidate = register(
 			neighbourField,
 			"candidate",
-			actorNode({ bounds: rect(80, 0) }),
+			actorNode({
+				bounds: rect(80, 0),
+			}),
 		);
 		neighbourField.setNeighbourSemanticSource("source", dragSource("source"));
 		neighbourField.setNeighbourTravelTarget("source", {
@@ -393,11 +509,19 @@ describe("Tile neighbour field", () => {
 	it("caps candidate growth at the absolute visual-body limit", async () => {
 		const neighbourField = await renderField();
 		previewKindByTarget.set("candidate", DropItemResultKindEnumSchema.enum.StoreInput);
-		register(neighbourField, "source", actorNode({ bounds: rect(0, 0) }));
+		register(
+			neighbourField,
+			"source",
+			actorNode({
+				bounds: rect(0, 0),
+			}),
+		);
 		const candidate = register(
 			neighbourField,
 			"candidate",
-			actorNode({ bounds: rect(-5, 0, 90, 90) }),
+			actorNode({
+				bounds: rect(-5, 0, 90, 90),
+			}),
 		);
 		neighbourField.setNeighbourSemanticSource("source", dragSource("source"));
 		neighbourField.beginNeighbourTravel("source");
@@ -408,15 +532,26 @@ describe("Tile neighbour field", () => {
 
 	it("leaves merge and rejected direct-target scale to their interaction owner", async () => {
 		const neighbourField = await renderField();
-		register(neighbourField, "source", actorNode({ bounds: rect(0, 0) }));
+		register(
+			neighbourField,
+			"source",
+			actorNode({
+				bounds: rect(0, 0),
+			}),
+		);
 		const target = register(
 			neighbourField,
 			"target",
-			actorNode({ bounds: rect(80, 0, 75, 75) }),
+			actorNode({
+				bounds: rect(80, 0, 75, 75),
+			}),
 		);
 		const endTravel = neighbourField.beginNeighbourTravel("source");
 
-		for (const feedback of ["merge", "rejected"] as const) {
+		for (const feedback of [
+			"merge",
+			"rejected",
+		] as const) {
 			const releaseTarget = neighbourField.setNeighbourTravelTarget("source", {
 				itemId: "target",
 				feedback,
@@ -435,12 +570,16 @@ describe("Tile neighbour field", () => {
 		register(
 			neighbourField,
 			"source",
-			actorNode({ bounds: () => sourceBounds }),
+			actorNode({
+				bounds: () => sourceBounds,
+			}),
 		);
 		const target = register(
 			neighbourField,
 			"target",
-			actorNode({ bounds: rect(80, 0) }),
+			actorNode({
+				bounds: rect(80, 0),
+			}),
 		);
 		neighbourField.setNeighbourTravelTarget("source", {
 			itemId: "target",
@@ -458,11 +597,19 @@ describe("Tile neighbour field", () => {
 
 	it("leaves active-drag direct-target scale to the interaction owner", async () => {
 		const neighbourField = await renderField();
-		register(neighbourField, "source", actorNode({ bounds: rect(0, 0) }));
+		register(
+			neighbourField,
+			"source",
+			actorNode({
+				bounds: rect(0, 0),
+			}),
+		);
 		const target = register(
 			neighbourField,
 			"target",
-			actorNode({ bounds: rect(80, 0) }),
+			actorNode({
+				bounds: rect(80, 0),
+			}),
 		);
 		neighbourField.setNeighbourSemanticSource("source", dragSource("source"));
 		neighbourField.setNeighbourTravelTarget("source", {
@@ -481,11 +628,19 @@ describe("Tile neighbour field", () => {
 
 	it("preserves the exact target across a same-commit mover handoff", async () => {
 		const neighbourField = await renderField();
-		register(neighbourField, "source", actorNode({ bounds: rect(0, 0) }));
+		register(
+			neighbourField,
+			"source",
+			actorNode({
+				bounds: rect(0, 0),
+			}),
+		);
 		const target = register(
 			neighbourField,
 			"target",
-			actorNode({ bounds: rect(80, 0) }),
+			actorNode({
+				bounds: rect(80, 0),
+			}),
 		);
 		neighbourField.setNeighbourTravelTarget("source", {
 			itemId: "target",
@@ -507,16 +662,26 @@ describe("Tile neighbour field", () => {
 
 	it("does not let stale target cleanup clear a newer mover target", async () => {
 		const neighbourField = await renderField();
-		register(neighbourField, "source", actorNode({ bounds: rect(0, 0) }));
+		register(
+			neighbourField,
+			"source",
+			actorNode({
+				bounds: rect(0, 0),
+			}),
+		);
 		const staleTarget = register(
 			neighbourField,
 			"stale-target",
-			actorNode({ bounds: rect(-80, 0) }),
+			actorNode({
+				bounds: rect(-80, 0),
+			}),
 		);
 		const currentTarget = register(
 			neighbourField,
 			"current-target",
-			actorNode({ bounds: rect(80, 0) }),
+			actorNode({
+				bounds: rect(80, 0),
+			}),
 		);
 		const releaseStaleTarget = neighbourField.setNeighbourTravelTarget("source", {
 			itemId: "stale-target",
@@ -539,13 +704,22 @@ describe("Tile neighbour field", () => {
 	it("disables semantic crowd work for a reduced-motion source", async () => {
 		const neighbourField = await renderField();
 		previewKindByTarget.set("candidate", DropItemResultKindEnumSchema.enum.StoreInput);
-		register(neighbourField, "source", actorNode({ bounds: rect(0, 0) }), {
-			enabled: false,
-		});
+		register(
+			neighbourField,
+			"source",
+			actorNode({
+				bounds: rect(0, 0),
+			}),
+			{
+				enabled: false,
+			},
+		);
 		const candidate = register(
 			neighbourField,
 			"candidate",
-			actorNode({ bounds: rect(80, 0) }),
+			actorNode({
+				bounds: rect(80, 0),
+			}),
 		);
 
 		neighbourField.setNeighbourSemanticSource("source", dragSource("source"));
@@ -558,7 +732,9 @@ describe("Tile neighbour field", () => {
 	it("clears every displacement and scale when actor measurement fails", async () => {
 		const neighbourField = await renderField();
 		const consoleError = vi.spyOn(console, "error").mockImplementation(() => undefined);
-		const broken = actorNode({ bounds: rect(0, 0) });
+		const broken = actorNode({
+			bounds: rect(0, 0),
+		});
 		broken.getBoundingClientRect = () => {
 			throw new Error("measurement failed");
 		};
@@ -566,7 +742,9 @@ describe("Tile neighbour field", () => {
 		const neighbour = register(
 			neighbourField,
 			"neighbour",
-			actorNode({ bounds: rect(80, 0) }),
+			actorNode({
+				bounds: rect(80, 0),
+			}),
 			{
 				x: motionTarget(6),
 				y: motionTarget(-4),
@@ -584,11 +762,19 @@ describe("Tile neighbour field", () => {
 	it("clears movers, targets, candidates, and every actor on scene reset", async () => {
 		const neighbourField = await renderField();
 		previewKindByTarget.set("neighbour", DropItemResultKindEnumSchema.enum.StoreInput);
-		register(neighbourField, "source", actorNode({ bounds: rect(0, 0) }));
+		register(
+			neighbourField,
+			"source",
+			actorNode({
+				bounds: rect(0, 0),
+			}),
+		);
 		const neighbour = register(
 			neighbourField,
 			"neighbour",
-			actorNode({ bounds: rect(80, 0) }),
+			actorNode({
+				bounds: rect(80, 0),
+			}),
 		);
 		neighbourField.setNeighbourSemanticSource("source", dragSource("source"));
 		neighbourField.beginNeighbourTravel("source");

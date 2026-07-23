@@ -87,8 +87,25 @@ export const spendItemChargesFx = Effect.fn("spendItemChargesFx")(function* ({
 			runtime: chargedRuntime,
 		});
 
+		const chargeSpentEvents =
+			nextRemainingCharges === 0
+				? []
+				: [
+						{
+							type: GameEventEnumSchema.enum.ItemChargeSpent,
+							itemId: item.id,
+							canonicalItemId: item.item.id,
+							location: item.location,
+							previousCharges: remainingCharges,
+							resultingCharges: nextRemainingCharges,
+						} satisfies GameEventSchema.Type,
+					];
+
 		return {
-			events: isolation.events,
+			events: [
+				...chargeSpentEvents,
+				...isolation.events,
+			],
 			runtime: isolation.runtime,
 		} satisfies spendItemChargesFx.Result;
 	}
@@ -115,7 +132,9 @@ export const spendItemChargesFx = Effect.fn("spendItemChargesFx")(function* ({
 		});
 	}
 
-	let placement: OutputPlacementResultSchema.Type = { drop: [] };
+	let placement: OutputPlacementResultSchema.Type = {
+		drop: [],
+	};
 	if (item.item.charges?.output !== undefined) {
 		const random = yield* makeChargeSpendRandomFx({
 			cost,
@@ -162,7 +181,11 @@ export const spendItemChargesFx = Effect.fn("spendItemChargesFx")(function* ({
 	});
 
 	return {
-		events: [depletedEvent, ...placementEvents, ...releasedInputEvents],
+		events: [
+			depletedEvent,
+			...placementEvents,
+			...releasedInputEvents,
+		],
 		runtime: draft,
 	} satisfies spendItemChargesFx.Result;
 });

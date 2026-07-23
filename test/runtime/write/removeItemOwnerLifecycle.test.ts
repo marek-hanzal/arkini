@@ -1,10 +1,12 @@
 import { Effect, Either } from "effect";
 import { describe, expect, it } from "vitest";
 
+import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
 import { useGameFx } from "~/engine/game/fx/useGameFx";
 import { storeInputMaterialFx } from "~/engine/input/write/storeInputMaterialFx";
 import { startLineFx } from "~/engine/job/write/startLineFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
+import { readCommittedTransitionFx } from "~/engine/runtime/read/readCommittedTransitionFx";
 import { moveItemFx } from "~/engine/runtime/write/moveItemFx";
 import { removeItemFx } from "~/engine/runtime/write/removeItemFx";
 import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
@@ -174,10 +176,12 @@ describe("removeItemFx owner lifecycle", () => {
 					itemId: owner.id,
 					revision: owner.revision,
 				});
+				const transition = yield* readCommittedTransitionFx();
 				const runtime = yield* readRuntimeFx();
 				return {
 					removed,
 					runtime,
+					transition,
 				};
 			}).pipe(
 				useGameFx({
@@ -187,6 +191,26 @@ describe("removeItemFx owner lifecycle", () => {
 		);
 
 		expect(result.removed.id).toBe(startProps.ownerItemId);
+		expect(result.transition.events[0]).toEqual({
+			type: GameEventEnumSchema.enum.ItemExplicitlyRemoved,
+			itemId: startProps.ownerItemId,
+			canonicalItemId: "forge",
+			location: {
+				scope: "board",
+				space: 0,
+				position: {
+					x: 0,
+					y: 0,
+				},
+			},
+			quantity: 1,
+		});
+		expect(result.transition.events.slice(1)).not.toHaveLength(0);
+		expect(
+			result.transition.events
+				.slice(1)
+				.some((event) => event.type === GameEventEnumSchema.enum.ItemExplicitlyRemoved),
+		).toBe(false);
 		expect(result.runtime.items.some((item) => item.id === startProps.ownerItemId)).toBe(false);
 		expect(result.runtime.items.some((item) => item.location.scope === "input")).toBe(false);
 		expect(

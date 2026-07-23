@@ -52,7 +52,6 @@ describe("item motion game events", () => {
 			type: GameEventEnumSchema.enum.ItemSplit,
 			itemId: "runtime:split",
 			canonicalItemId: "water",
-			originItemId: "runtime:origin",
 			location,
 			previousQuantity: 2,
 			quantity: 1,

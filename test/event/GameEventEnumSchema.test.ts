@@ -16,12 +16,18 @@ describe("GameEventEnumSchema", () => {
 			GameEventEnumSchema.enum.ItemSplit,
 			GameEventEnumSchema.enum.ItemConsumed,
 			GameEventEnumSchema.enum.ItemInputStored,
+			GameEventEnumSchema.enum.ItemChargeSpent,
 			GameEventEnumSchema.enum.ItemDepleted,
+			GameEventEnumSchema.enum.ItemExplicitlyRemoved,
 		]);
 	});
 
 	it("extracts variants by stable member names", () => {
-		expect(GameEventEnumSchema.extract(["ItemSpawned"]).options).toEqual([
+		expect(
+			GameEventEnumSchema.extract([
+				"ItemSpawned",
+			]).options,
+		).toEqual([
 			GameEventEnumSchema.enum.ItemSpawned,
 		]);
 	});

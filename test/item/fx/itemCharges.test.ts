@@ -7,6 +7,7 @@ import { startLineFx } from "~/engine/job/write/startLineFx";
 import { readLineRunFx } from "~/engine/line/fx/run/readLineRunFx";
 import { checkRuntimeFx } from "~/engine/runtime/check/checkRuntimeFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
+import { readCommittedTransitionFx } from "~/engine/runtime/read/readCommittedTransitionFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
@@ -485,6 +486,7 @@ describe("item charges", () => {
 					ownerItemId: shrine.id,
 					lineId: "line:shrine:pray",
 				});
+				const firstStart = yield* readCommittedTransitionFx();
 				let current = yield* readRuntimeFx();
 				expect(current.items.find((item) => item.id === shrine.id)?.remainingCharges).toBe(
 					1,
@@ -496,6 +498,7 @@ describe("item charges", () => {
 					ownerItemId: shrine.id,
 					lineId: "line:shrine:pray",
 				});
+				const finalStart = yield* readCommittedTransitionFx();
 				current = yield* readRuntimeFx();
 				expect(current.items.find((item) => item.id === shrine.id)?.remainingCharges).toBe(
 					0,
@@ -503,13 +506,47 @@ describe("item charges", () => {
 				yield* runTickRuntimeByFx({
 					elapsedMs: 200,
 				});
-				return yield* readRuntimeFx();
+				return {
+					finalCompletion: yield* readCommittedTransitionFx(),
+					finalStart,
+					firstStart,
+					runtime: yield* readRuntimeFx(),
+				};
 			}),
 		);
 
-		expect(runtime.items.some((item) => item.id === "runtime:shrine")).toBe(false);
-		expect(runtime.items.filter((item) => item.item.id === "item:gift")).toHaveLength(2);
-		expect(runtime.items.filter((item) => item.item.id === "item:dust")).toHaveLength(1);
+		expect(runtime.firstStart.events).toContainEqual({
+			type: GameEventEnumSchema.enum.ItemChargeSpent,
+			itemId: "runtime:shrine",
+			canonicalItemId: "producer:shrine",
+			location: board(0),
+			previousCharges: 2,
+			resultingCharges: 1,
+		});
+		expect(
+			runtime.finalStart.events.some(
+				(event) =>
+					event.type === GameEventEnumSchema.enum.ItemChargeSpent ||
+					event.type === GameEventEnumSchema.enum.ItemDepleted,
+			),
+		).toBe(false);
+		expect(
+			runtime.finalCompletion.events.filter(
+				(event) => event.type === GameEventEnumSchema.enum.ItemDepleted,
+			),
+		).toHaveLength(1);
+		expect(
+			runtime.finalCompletion.events.some(
+				(event) => event.type === GameEventEnumSchema.enum.ItemChargeSpent,
+			),
+		).toBe(false);
+		expect(runtime.runtime.items.some((item) => item.id === "runtime:shrine")).toBe(false);
+		expect(runtime.runtime.items.filter((item) => item.item.id === "item:gift")).toHaveLength(
+			2,
+		);
+		expect(runtime.runtime.items.filter((item) => item.item.id === "item:dust")).toHaveLength(
+			1,
+		);
 	});
 
 	it("isolates one partially spent target from a pure charged stack", () => {
@@ -570,10 +607,30 @@ describe("item charges", () => {
 					lineId: "line:lumberjack:work",
 					runtime: yield* readRuntimeFx(),
 				});
-				return { events, runtime, tree };
+				return {
+					events,
+					runtime,
+					tree,
+				};
 			}),
 		);
 
+		const chargeSpentIndex = result.events.findIndex(
+			(event) => event.type === GameEventEnumSchema.enum.ItemChargeSpent,
+		);
+		const splitIndex = result.events.findIndex(
+			(event) => event.type === GameEventEnumSchema.enum.ItemSplit,
+		);
+		expect(result.events[chargeSpentIndex]).toEqual({
+			type: GameEventEnumSchema.enum.ItemChargeSpent,
+			itemId: result.tree.id,
+			canonicalItemId: "deposit:tree",
+			location: board(1),
+			previousCharges: 2,
+			resultingCharges: 1,
+		});
+		expect(chargeSpentIndex).toBeGreaterThanOrEqual(0);
+		expect(splitIndex).toBeGreaterThan(chargeSpentIndex);
 		expect(result.events).toContainEqual({
 			type: GameEventEnumSchema.enum.ItemSplit,
 			itemId: result.tree.id,
@@ -582,7 +639,9 @@ describe("item charges", () => {
 			previousQuantity: 2,
 			quantity: 1,
 		});
-		expect(result.runtime.items.filter((item) => item.item.id === "deposit:tree")).toHaveLength(2);
+		expect(result.runtime.items.filter((item) => item.item.id === "deposit:tree")).toHaveLength(
+			2,
+		);
 	});
 
 	it("consumes one fully depleted quantity without relocating the pure remainder", () => {
@@ -644,11 +703,19 @@ describe("item charges", () => {
 				});
 				const seed = runtime.items.find((item) => item.item.id === "item:seed");
 				if (seed === undefined) throw new Error("Expected depletion output seed.");
-				return { events, runtime, sapling, seed };
+				return {
+					events,
+					runtime,
+					sapling,
+					seed,
+				};
 			}),
 		);
 
 		expect(result.runtime.items.some((item) => item.id === result.sapling.id)).toBe(false);
+		expect(
+			result.events.some((event) => event.type === GameEventEnumSchema.enum.ItemChargeSpent),
+		).toBe(false);
 		expect(result.events).toEqual(
 			expect.arrayContaining([
 				{
@@ -691,7 +758,11 @@ describe("item charges", () => {
 					lineId: "line:lumberjack:work",
 					runtime: yield* readRuntimeFx(),
 				});
-				return { events, runtime, sapling };
+				return {
+					events,
+					runtime,
+					sapling,
+				};
 			}),
 		);
 
@@ -1057,7 +1128,11 @@ describe("item charges", () => {
 			}),
 		);
 
-		expect(result.issues.some((issue) => issue.type === RuntimeCheckIssueEnumSchema.enum.ItemMaxCount)).toBe(false);
+		expect(
+			result.issues.some(
+				(issue) => issue.type === RuntimeCheckIssueEnumSchema.enum.ItemMaxCount,
+			),
+		).toBe(false);
 	});
 
 	it("blocks a self-depleting job when line and depletion outputs exceed maxCount together", () => {

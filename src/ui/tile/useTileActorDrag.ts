@@ -10,7 +10,7 @@ import type { TileDropTarget } from "~/ui/tile/TileDropTarget";
 import { useTileActorRetention } from "~/ui/tile/useTileActorRetention";
 import { tileLocationForTarget } from "~/ui/tile/tileLocationForTarget";
 import { useTileActorSystem } from "~/ui/tile/useTileActorSystem";
-import type { useTileActorMotion } from "~/ui/tile/useTileActorMotion";
+import type { useTileActorPointerMotion } from "~/ui/tile/useTileActorPointerMotion";
 
 const targetForPreview = (
 	target: TileDropTarget,
@@ -40,51 +40,56 @@ const targetForPreview = (
 
 type TileActorTravelTarget = ReturnType<typeof targetForPreview>;
 
-const sameTravelTarget = (
-	left: TileActorTravelTarget,
-	right: TileActorTravelTarget,
-) =>
+const sameTravelTarget = (left: TileActorTravelTarget, right: TileActorTravelTarget) =>
 	left === null || right === null
 		? left === right
 		: left.itemId === right.itemId && left.feedback === right.feedback;
 
 const rejectedTarget = (target: TileDropTarget) =>
-	target.kind === "slot" &&
-	target.occupant !== null
+	target.kind === "slot" && target.occupant !== null
 		? {
 				itemId: target.occupant.id,
 				feedback: "rejected" as const,
 			}
 		: null;
 
-const targetForOutcome = (
-	target: TileDropTarget,
-	outcome: useDropItem.Result | null,
-) =>
+const targetForOutcome = (target: TileDropTarget, outcome: useDropItem.Result | null) =>
 	match(outcome)
 		.with(null, () => rejectedTarget(target))
 		.with(
-			{ kind: DropItemResultKindEnumSchema.enum.StoreInput },
+			{
+				kind: DropItemResultKindEnumSchema.enum.StoreInput,
+			},
 			(stored) => ({
 				itemId: stored.owner.itemId,
 				feedback: "accepted" as const,
 			}),
 		)
 		.with(
-			{ kind: DropItemResultKindEnumSchema.enum.Merge },
+			{
+				kind: DropItemResultKindEnumSchema.enum.Merge,
+			},
 			(merged) => ({
 				itemId: merged.target.itemId,
 				feedback: "merge" as const,
 			}),
 		)
 		.with(
-			{ kind: DropItemResultKindEnumSchema.enum.Reject },
+			{
+				kind: DropItemResultKindEnumSchema.enum.Reject,
+			},
 			() => rejectedTarget(target),
 		)
 		.with(
-			{ kind: DropItemResultKindEnumSchema.enum.Ignored },
-			{ kind: DropItemResultKindEnumSchema.enum.Move },
-			{ kind: DropItemResultKindEnumSchema.enum.Swap },
+			{
+				kind: DropItemResultKindEnumSchema.enum.Ignored,
+			},
+			{
+				kind: DropItemResultKindEnumSchema.enum.Move,
+			},
+			{
+				kind: DropItemResultKindEnumSchema.enum.Swap,
+			},
 			() => null,
 		)
 		.exhaustive();
@@ -93,26 +98,12 @@ const targetForOutcome = (
 export const useTileActorDrag = ({
 	canonicalSource,
 	live,
-	motion,
+	pointer,
 }: {
 	readonly canonicalSource: TileDragSource;
 	readonly live: boolean;
-	readonly motion: Pick<
-		ReturnType<typeof useTileActorMotion>,
-		| "armPickupCorrection"
-		| "startPickupCorrection"
-		| "stopPickupCorrection"
-		| "updateDragWeight"
-		| "clearDragWeight"
-	>;
+	readonly pointer: useTileActorPointerMotion.Control;
 }) => {
-	const {
-		armPickupCorrection,
-		startPickupCorrection,
-		stopPickupCorrection,
-		updateDragWeight,
-		clearDragWeight,
-	} = motion;
 	const retainActorIds = useTileActorRetention();
 	const {
 		active,
@@ -138,27 +129,24 @@ export const useTileActorDrag = ({
 			travelTarget.current = next;
 			setNeighbourTravelTarget(canonicalSource.id, next);
 		},
-		[canonicalSource.id, setNeighbourTravelTarget],
+		[
+			canonicalSource.id,
+			setNeighbourTravelTarget,
+		],
 	);
 
 	const clearTransientDragMotion = useCallback(() => {
-		clearDragWeight();
 		updateNeighbourTravelTarget(null);
 		setNeighbourSemanticSource(canonicalSource.id, null);
 	}, [
 		canonicalSource.id,
-		clearDragWeight,
 		setNeighbourSemanticSource,
 		updateNeighbourTravelTarget,
 	]);
 
-	const releaseDragWeight = useCallback(() => {
-		clearDragWeight();
-	}, [clearDragWeight]);
-
 	const updateTransientDragMotion = useCallback(
 		(info: PanInfo) => {
-			updateDragWeight(info);
+			pointer.updateResponse(info);
 			const movement = moveDrag(canonicalSource, info.point.x, info.point.y);
 			updateNeighbourTravelTarget(
 				movement === null ? null : targetForPreview(movement.target, movement.previewKind),
@@ -167,7 +155,7 @@ export const useTileActorDrag = ({
 		[
 			canonicalSource,
 			moveDrag,
-			updateDragWeight,
+			pointer,
 			updateNeighbourTravelTarget,
 		],
 	);
@@ -182,7 +170,7 @@ export const useTileActorDrag = ({
 				canonicalSource.id,
 			]);
 			const bounds = event.currentTarget.getBoundingClientRect();
-			armPickupCorrection({
+			pointer.armPickup({
 				x: event.clientX - (bounds.left + bounds.width / 2),
 				y: event.clientY - (bounds.top + bounds.height / 2),
 			});
@@ -193,11 +181,11 @@ export const useTileActorDrag = ({
 			});
 		},
 		[
-			armPickupCorrection,
 			canonicalSource,
 			clearTransientDragMotion,
 			dragControls,
 			live,
+			pointer,
 			press,
 			retainActorIds,
 		],
@@ -207,14 +195,20 @@ export const useTileActorDrag = ({
 		pointerOwned.current = false;
 		if (dragStarted.current) return;
 		dragStarted.current = false;
+		pointer.cancel();
 		clearTransientDragMotion();
 		cancel(canonicalSource.id);
-	}, [cancel, canonicalSource.id, clearTransientDragMotion]);
+	}, [
+		cancel,
+		canonicalSource.id,
+		clearTransientDragMotion,
+		pointer,
+	]);
 
 	const onPointerCancel = useCallback(() => {
 		pointerOwned.current = false;
 		dragStarted.current = false;
-		stopPickupCorrection();
+		pointer.cancel();
 		clearTransientDragMotion();
 		dragControls.cancel();
 		cancel(canonicalSource.id);
@@ -223,7 +217,7 @@ export const useTileActorDrag = ({
 		canonicalSource.id,
 		clearTransientDragMotion,
 		dragControls,
-		stopPickupCorrection,
+		pointer,
 	]);
 
 	const onDragStart = useCallback(
@@ -232,14 +226,14 @@ export const useTileActorDrag = ({
 			suppressClick.current = true;
 			startDrag(canonicalSource);
 			setNeighbourSemanticSource(canonicalSource.id, canonicalSource);
-			startPickupCorrection();
+			pointer.startPickup();
 			updateTransientDragMotion(info);
 		},
 		[
 			canonicalSource,
+			pointer,
 			setNeighbourSemanticSource,
 			startDrag,
-			startPickupCorrection,
 			updateTransientDragMotion,
 		],
 	);
@@ -248,20 +242,23 @@ export const useTileActorDrag = ({
 		(_event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
 			updateTransientDragMotion(info);
 		},
-		[updateTransientDragMotion],
+		[
+			updateTransientDragMotion,
+		],
 	);
 
 	const onDragEnd = useCallback(
 		async (_event: MouseEvent | TouchEvent | PointerEvent, _info: PanInfo) => {
 			pointerOwned.current = false;
-			releaseDragWeight();
 			const released = release(canonicalSource.id);
 			if (released === null) {
 				dragStarted.current = false;
+				pointer.cancel();
 				setNeighbourSemanticSource(canonicalSource.id, null);
 				updateNeighbourTravelTarget(null);
 				return;
 			}
+			pointer.release(released.generation);
 			retainActorIds([
 				released.source.id,
 				...(released.target.kind === "slot" && released.target.occupant !== null
@@ -328,8 +325,8 @@ export const useTileActorDrag = ({
 		[
 			canonicalSource.id,
 			dropItem,
+			pointer,
 			release,
-			releaseDragWeight,
 			retainActorIds,
 			setNeighbourSemanticSource,
 			settle,
@@ -342,7 +339,7 @@ export const useTileActorDrag = ({
 		if (live && active?.source.id === canonicalSource.id) return;
 		pointerOwned.current = false;
 		dragStarted.current = false;
-		stopPickupCorrection();
+		pointer.cancel();
 		clearTransientDragMotion();
 		dragControls.cancel();
 		cancel(canonicalSource.id);
@@ -353,7 +350,7 @@ export const useTileActorDrag = ({
 		clearTransientDragMotion,
 		dragControls,
 		live,
-		stopPickupCorrection,
+		pointer,
 	]);
 
 	const consumeClickSuppression = useCallback(() => {
@@ -366,7 +363,7 @@ export const useTileActorDrag = ({
 		() => () => {
 			pointerOwned.current = false;
 			dragStarted.current = false;
-			stopPickupCorrection();
+			pointer.cancel();
 			clearTransientDragMotion();
 			dragControls.cancel();
 			cancel(canonicalSource.id);
@@ -376,7 +373,7 @@ export const useTileActorDrag = ({
 			canonicalSource.id,
 			clearTransientDragMotion,
 			dragControls,
-			stopPickupCorrection,
+			pointer,
 		],
 	);
 

@@ -8,7 +8,7 @@ Until the historical tree is retired:
 
 - never port a historical directory one-to-one;
 - never claim a feature exists because its schema validates;
-- consult historical source only for player-visible behavior, UX, copy, edge cases, animation or audio intent, or useful test scenarios explicitly named by a current GitHub issue;
+- consult historical source only for player-visible behavior, UX, copy, edge cases, animation intent, or useful test scenarios explicitly named by a current GitHub issue;
 - treat current runtime, session, Tick, placement, input, queue, compiler, save, bridge, and UI ownership as canonical unless a reproduced defect proves otherwise;
 - put accepted behavior in active source, tests, and the owning root document;
 - use Git history for completed plans and archaeology.

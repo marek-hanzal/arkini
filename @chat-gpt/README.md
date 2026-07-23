@@ -31,6 +31,6 @@ Independent implementation reviews follow [`REVIEW_CODEBOOK.md`](REVIEW_CODEBOOK
 
 ## Historical oracle policy
 
-Historical files may explain prior player-visible behavior, UX, copy, edge cases, animation or audio intent, and useful test scenarios. They never override root documentation, active source, tests, or current GitHub issue decisions, and they are never an architectural donor.
+Historical files may explain prior player-visible behavior, UX, copy, edge cases, animation intent, and useful test scenarios. They never override root documentation, active source, tests, or current GitHub issue decisions, and they are never an architectural donor. Historical audio is explicitly rejected; [#259](https://github.com/marek-hanzal/arkini/issues/259) owns a greenfield design.
 
 The temporary migration evidence under [`tasks/`](tasks/README.md), [`archive/`](archive/README.md), and [`../src/_archive`](../src/_archive/README.md) exists only while [#263](https://github.com/marek-hanzal/arkini/issues/263), [#264](https://github.com/marek-hanzal/arkini/issues/264), and [#265](https://github.com/marek-hanzal/arkini/issues/265) finish parity classification and historical-source retirement. Git history is the durable archive.

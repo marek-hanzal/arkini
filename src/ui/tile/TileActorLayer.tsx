@@ -46,7 +46,12 @@ export const TileActorLayer = () => {
 		const protectedIds = interactionActorIds(active);
 		for (const [itemId, cue] of motionCues.cues) {
 			if (
-				(cue.kind === "exit" || cue.kind === "consume-exit") &&
+				(
+					cue.kind === "exit" ||
+					cue.kind === "consume-exit" ||
+					cue.kind === "deplete-exit" ||
+					cue.kind === "expiry"
+				) &&
 				protectedIds.has(itemId)
 			) {
 				resetScene();

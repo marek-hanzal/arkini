@@ -19,8 +19,16 @@ const primaryActionDelayMs = 320;
 const zIndexForCue = (cue: TileMotionCueSchema.Type | null) => {
 	if (cue === null) return 0;
 	return match(cue.kind)
-		.with("exit", () => 35)
-		.with("absorb", "impact", "accept", "consume", "consume-exit", () => 30)
+		.with("exit", "consume-exit", "deplete-exit", "expiry", () => 35)
+		.with(
+			"absorb",
+			"impact",
+			"accept",
+			"consume",
+			"complete",
+			"deplete",
+			() => 30,
+		)
 		.with("spawn", "settle", () => 15)
 		.exhaustive();
 };

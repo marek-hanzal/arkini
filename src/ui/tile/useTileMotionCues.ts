@@ -35,15 +35,24 @@ const emptyState = (): TileMotionCueState => ({
 });
 
 const isTerminalCue = (kind: TileMotionCueSchema.Type["kind"]) =>
-	kind === "exit" || kind === "consume-exit";
+	kind === "exit" ||
+	kind === "consume-exit" ||
+	kind === "deplete-exit" ||
+	kind === "expiry";
 
 const isStrengthCue = (kind: TileMotionCueSchema.Type["kind"]) =>
-	kind === "absorb" || kind === "impact" || kind === "accept";
+	kind === "absorb" ||
+	kind === "impact" ||
+	kind === "accept" ||
+	kind === "complete" ||
+	kind === "deplete";
 
 const cuePriority = (kind: TileMotionCueSchema.Type["kind"]) => {
 	switch (kind) {
 		case "exit":
 		case "consume-exit":
+		case "deplete-exit":
+		case "expiry":
 			return 100;
 		case "spawn":
 			return 90;
@@ -51,8 +60,12 @@ const cuePriority = (kind: TileMotionCueSchema.Type["kind"]) => {
 			return 50;
 		case "absorb":
 			return 40;
+		case "complete":
+			return 35;
 		case "accept":
 			return 30;
+		case "deplete":
+			return 25;
 		case "impact":
 			return 20;
 		case "settle":
@@ -199,20 +212,22 @@ const applyTransition = (
 				cue(event.ownerItemId, "accept", false);
 				break;
 			case GameEventEnumSchema.enum.ItemExpired:
-				cue(event.itemId, "exit", true);
+				cue(event.itemId, "expiry", true);
 				break;
 			case GameEventEnumSchema.enum.ItemDepleted:
 				cue(
 					event.itemId,
-					event.resultingQuantity === 0 ? "exit" : "impact",
+					event.resultingQuantity === 0 ? "deplete-exit" : "deplete",
 					event.resultingQuantity === 0,
 				);
 				break;
 			case GameEventEnumSchema.enum.JobStarted:
 				cue(event.ownerItemId, "accept", false);
 				break;
-			case GameEventEnumSchema.enum.ItemMerged:
 			case GameEventEnumSchema.enum.JobCompleted:
+				cue(event.ownerItemId, "complete", false);
+				break;
+			case GameEventEnumSchema.enum.ItemMerged:
 				break;
 		}
 	}

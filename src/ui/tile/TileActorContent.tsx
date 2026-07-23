@@ -96,7 +96,14 @@ export const TileActorContent = ({
 						() => "discard" as const,
 					)
 					.with(
-						{ kind: P.union("exit", "consume-exit") },
+						{
+							kind: P.union(
+								"exit",
+								"consume-exit",
+								"deplete-exit",
+								"expiry",
+							),
+						},
 						() => "play" as const,
 					)
 					.with(

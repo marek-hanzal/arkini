@@ -238,14 +238,55 @@ export const TileMotionCueVisual = ({
 			},
 			duration: reducedMotion ? 0.18 : 0.58,
 		}))
+		.with("complete", () => {
+			const release = reducedMotion ? 1.03 : 1.1 + (cue.strength - 1) * 0.02;
+			return {
+				initial: false as const,
+				animate: {
+					scale: reducedMotion ? [1, 0.97, 1.03, 1] : [1, 0.88, release, 1],
+					opacity: 1,
+					y: reducedMotion ? 0 : [0, 2, -4, 0],
+				},
+				duration: reducedMotion ? 0.2 : 0.68,
+			};
+		})
+		.with("deplete", () => ({
+			initial: false as const,
+			animate: {
+				scale: reducedMotion ? [1, 0.97, 1] : [1, 0.9, 0.98, 1],
+				opacity: 1,
+				y: reducedMotion ? 0 : [0, 2, 0],
+				rotate: reducedMotion ? 0 : [0, -1.5, 1, 0],
+			},
+			duration: reducedMotion ? 0.16 : 0.38,
+		}))
+		.with("deplete-exit", () => ({
+			initial: false as const,
+			animate: {
+				scale: reducedMotion ? [1, 0.86] : [1, 0.96, 0.54],
+				scaleY: reducedMotion ? [1, 0.7] : [1, 0.84, 0.22],
+				opacity: reducedMotion ? [1, 0] : [1, 1, 0],
+				y: reducedMotion ? [0, 8] : [0, 5, 20],
+			},
+			duration: reducedMotion ? 0.2 : 0.62,
+		}))
+		.with("expiry", () => ({
+			initial: false as const,
+			animate: {
+				scale: reducedMotion ? [1, 0.9] : [1, 0.97, 0.78],
+				opacity: reducedMotion ? [1, 0] : [1, 0.78, 0],
+				y: reducedMotion ? [0, -8] : [0, -7, -26],
+			},
+			duration: reducedMotion ? 0.2 : 0.72,
+		}))
 		.with("exit", () => ({
 			initial: false as const,
 			animate: {
-				scale: reducedMotion ? [1, 0.94] : [1, 1.08, 0.68],
+				scale: reducedMotion ? [1, 0.9] : [1, 0.96, 0.68],
 				opacity: reducedMotion ? [1, 0] : [1, 1, 0],
-				y: reducedMotion ? 0 : [0, -10, -18],
+				y: 0,
 			},
-			duration: reducedMotion ? 0.18 : 0.5,
+			duration: reducedMotion ? 0.18 : 0.46,
 		}))
 		.exhaustive();
 

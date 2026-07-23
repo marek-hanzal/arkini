@@ -567,13 +567,108 @@ describe("tile motion cue lifecycle", () => {
 		liveItems = [];
 
 		const exit = current?.cues.get("runtime:removed");
-		expect(exit?.kind).toBe("exit");
+		expect(exit?.kind).toBe("expiry");
 		expect(current?.retainedItems.map((retained) => retained.id)).toEqual([
 			"runtime:removed",
 		]);
 		if (exit === undefined) throw new Error("Missing exit cue.");
 		await act(async () => current?.complete("runtime:removed", exit.generation));
 		expect(current?.retainedItems).toEqual([]);
+	});
+
+	it("uses distinct surviving and terminal depletion cues", async () => {
+		let liveItems = [
+			item("runtime:deplete-survives", "board", 0, 2),
+			item("runtime:deplete-exits"),
+		];
+		let current: ReturnType<typeof useTileMotionCues> | null = null;
+		const Capture = () => {
+			eventState.liveItems = liveItems;
+			current = useTileMotionCues({ onSceneReset: vi.fn() });
+			return null;
+		};
+		const container = document.createElement("div");
+		document.body.append(container);
+		const root = createRoot(container);
+		roots.push(root);
+		await act(async () => root.render(createElement(Capture)));
+
+		const surviving = item("runtime:deplete-survives", "board", 0, 1);
+		await dispatch(
+			[
+				{
+					type: GameEventEnumSchema.enum.ItemDepleted,
+					itemId: "runtime:deplete-survives",
+					canonicalItemId: "item:deplete-survives",
+					location: liveItems[0].location,
+					previousQuantity: 2,
+					resultingQuantity: 1,
+				},
+				{
+					type: GameEventEnumSchema.enum.ItemDepleted,
+					itemId: "runtime:deplete-exits",
+					canonicalItemId: "item:deplete-exits",
+					location: liveItems[1].location,
+					previousQuantity: 1,
+					resultingQuantity: 0,
+				},
+			],
+			[surviving],
+		);
+		liveItems = [surviving];
+
+		expect(current?.cues.get("runtime:deplete-survives")?.kind).toBe("deplete");
+		expect(current?.cues.get("runtime:deplete-exits")?.kind).toBe(
+			"deplete-exit",
+		);
+		expect(current?.retainedItems.map((candidate) => candidate.id)).toEqual([
+			"runtime:deplete-exits",
+		]);
+	});
+
+	it("pulses a surviving owner on job completion and lets terminal depletion win", async () => {
+		let liveItems = [item("runtime:completed-owner"), item("runtime:spent-owner")];
+		let current: ReturnType<typeof useTileMotionCues> | null = null;
+		const Capture = () => {
+			eventState.liveItems = liveItems;
+			current = useTileMotionCues({ onSceneReset: vi.fn() });
+			return null;
+		};
+		const container = document.createElement("div");
+		document.body.append(container);
+		const root = createRoot(container);
+		roots.push(root);
+		await act(async () => root.render(createElement(Capture)));
+
+		await dispatch(
+			[
+				{
+					type: GameEventEnumSchema.enum.JobCompleted,
+					jobId: "job:completed",
+					ownerItemId: "runtime:completed-owner",
+					lineId: "line:completed",
+				},
+				{
+					type: GameEventEnumSchema.enum.JobCompleted,
+					jobId: "job:spent",
+					ownerItemId: "runtime:spent-owner",
+					lineId: "line:spent",
+				},
+				{
+					type: GameEventEnumSchema.enum.ItemDepleted,
+					itemId: "runtime:spent-owner",
+					canonicalItemId: "item:spent-owner",
+					location: liveItems[1].location,
+					previousQuantity: 1,
+					resultingQuantity: 0,
+				},
+			],
+			[item("runtime:completed-owner")],
+		);
+		liveItems = [item("runtime:completed-owner")];
+
+		expect(current?.cues.get("runtime:completed-owner")?.kind).toBe("complete");
+		expect(current?.cues.get("runtime:spent-owner")?.kind).toBe("deplete-exit");
 	});
 
 	it("coordinates independent outgoing expiry and incoming spawn when runtime publishes first", async () => {
@@ -615,7 +710,7 @@ describe("tile motion cue lifecycle", () => {
 		], liveItems);
 
 		const exit = current?.cues.get("runtime:outgoing");
-		expect(exit?.kind).toBe("exit");
+		expect(exit?.kind).toBe("expiry");
 		expect(current?.cues.get("runtime:incoming")?.kind).toBe("spawn");
 		expect(current?.retainedItems.map((retained) => retained.id)).toEqual([
 			"runtime:outgoing",
@@ -930,6 +1025,64 @@ describe("TileMotionCueVisual", () => {
 			"incoming",
 		);
 		expect(document.querySelectorAll('[data-ui="TestTarget"]')).toHaveLength(1);
+	});
+
+	it("keeps completion, depletion, and expiry physically distinct", async () => {
+		motionTestRuntime.autoComplete = false;
+		const container = document.createElement("div");
+		document.body.append(container);
+		const root = createRoot(container);
+		roots.push(root);
+
+		const renderCue = async (
+			kind: "complete" | "deplete" | "deplete-exit" | "expiry",
+			generation: number,
+		) => {
+			await act(async () => {
+				root.render(
+					createElement(
+						TileMotionCueVisual,
+						{
+							registerActorNode: () => undefined,
+							surfaceId: "board:0",
+							live: kind !== "deplete-exit" && kind !== "expiry",
+							exiting: kind === "deplete-exit" || kind === "expiry",
+							cue: { generation, kind, strength: 1 },
+							deliveryPayload: null,
+							mode: "play",
+							originOffset: null,
+							targetOffset: null,
+							transferPayload: null,
+							onStart: vi.fn(),
+							onComplete: vi.fn(),
+						},
+						createElement("span", null, kind),
+					),
+				);
+			});
+			const visual = document.querySelector('[data-ui="TileMotionCueVisual"]');
+			return {
+				kind: visual?.getAttribute("data-motion-cue"),
+				scale: visual?.getAttribute("data-motion-scale"),
+			};
+		};
+
+		expect(await renderCue("complete", 30)).toEqual({
+			kind: "complete",
+			scale: "1,0.88,1.1,1",
+		});
+		expect(await renderCue("deplete", 31)).toEqual({
+			kind: "deplete",
+			scale: "1,0.9,0.98,1",
+		});
+		expect(await renderCue("deplete-exit", 32)).toEqual({
+			kind: "deplete-exit",
+			scale: "1,0.96,0.54",
+		});
+		expect(await renderCue("expiry", 33)).toEqual({
+			kind: "expiry",
+			scale: "1,0.97,0.78",
+		});
 	});
 
 	it("renders one actor-local partial transfer face without a second stable identity", async () => {

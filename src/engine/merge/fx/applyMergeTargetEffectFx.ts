@@ -1,14 +1,17 @@
 import { Effect } from "effect";
 import { match } from "ts-pattern";
 
+import { readOutputPlacementItemEventsFx } from "~/engine/event/read/readOutputPlacementItemEventsFx";
 import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
+import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
 import { EffectEnumSchema } from "~/engine/merge/schema/EffectEnumSchema";
 import { ItemStatefulError } from "~/engine/item/error/ItemStatefulError";
 import { isItemPureFx } from "~/engine/item/fx/purity/isItemPureFx";
 import { resolveItemFx } from "~/engine/item/fx/resolveItemFx";
 import { assertOwnerIdleFx } from "~/engine/job/fx/assertOwnerIdleFx";
-import { MergeTargetStackedError } from "~/engine/merge/error/MergeTargetStackedError";
 import type { MergeSchema } from "~/engine/merge/schema/MergeSchema";
+import { applyOutputPlacementFx } from "~/engine/placement/fx/applyOutputPlacementFx";
+import { PlacementEnumSchema } from "~/engine/placement/schema/PlacementEnumSchema";
 import { createRuntimeItemFx } from "~/engine/runtime/fx/createRuntimeItemFx";
 import { removeRuntimeItemFx } from "~/engine/runtime/fx/removeRuntimeItemFx";
 import { reviseRuntimeItemFx } from "~/engine/runtime/fx/reviseRuntimeItemFx";
@@ -89,14 +92,6 @@ export const applyMergeTargetEffectFx = Effect.fn("applyMergeTargetEffectFx")(fu
 						ownerItemId: target.id,
 						runtime,
 					});
-					if (target.quantity !== 1) {
-						return yield* Effect.fail(
-							new MergeTargetStackedError({
-								targetItemId: target.id,
-								quantity: target.quantity,
-							}),
-						);
-					}
 					const pure = yield* isItemPureFx({
 						item: target,
 						runtime,
@@ -118,14 +113,49 @@ export const applyMergeTargetEffectFx = Effect.fn("applyMergeTargetEffectFx")(fu
 						location: target.location,
 						quantity: 1,
 					});
+					const replacedRuntime = {
+						...runtime,
+						items: runtime.items.map((item) =>
+							item.id === target.id ? replacedTarget : item,
+						),
+					} satisfies RuntimeSchema.Type;
+					if (target.quantity === 1) {
+						return {
+							events: [],
+							runtime: replacedRuntime,
+						} satisfies applyMergeTargetEffectFx.Result;
+					}
+
+					const [placement, placedRuntime] = yield* applyOutputPlacementFx({
+						origin: target.location,
+						output: {
+							drop: [
+								{
+									itemId: target.item.id,
+									placement: PlacementEnumSchema.enum.Drop,
+									quantity: target.quantity - 1,
+								},
+							],
+						},
+						runtime: replacedRuntime,
+					});
+					const placementEvents = yield* readOutputPlacementItemEventsFx({
+						originItemId: target.id,
+						placement,
+					});
 					return {
-						events: [],
-						runtime: {
-							...runtime,
-							items: runtime.items.map((item) =>
-								item.id === target.id ? replacedTarget : item,
-							),
-						} satisfies RuntimeSchema.Type,
+						events: [
+							{
+								type: GameEventEnumSchema.enum.ItemSplit,
+								itemId: target.id,
+								canonicalItemId: target.item.id,
+								location: target.location,
+								previousQuantity: target.quantity,
+								quantity: 1,
+							},
+							...placementEvents,
+						],
+						runtime: placedRuntime,
 					} satisfies applyMergeTargetEffectFx.Result;
 				}),
 		)

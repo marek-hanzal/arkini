@@ -117,6 +117,113 @@ describe("mergeItemsFx events", () => {
 			await Effect.runPromise(session.disposeFx);
 		}
 	});
+
+	it("publishes the isolated target remainder after the stacked merge outcome", async () => {
+		const session = await createTestGameSession({
+			config: createMergeTestConfig({
+				rule: {
+					target: {
+						type: "item",
+						itemId: "target",
+					},
+					action: "consume",
+					effect: "replace",
+					result: "result",
+				},
+			}),
+			state: {
+				cheats: {
+					enabled: false,
+					everEnabled: false,
+					instantGameplay: false,
+				},
+				currentSpace: 0,
+				items: [
+					{
+						id: "runtime:source",
+						itemId: "source",
+						location: {
+							scope: "inventory",
+							position: {
+								x: 0,
+								y: 0,
+							},
+						},
+						quantity: 2,
+					},
+					{
+						id: "runtime:target",
+						itemId: "target",
+						location: {
+							scope: "board",
+							space: 0,
+							position: {
+								x: 1,
+								y: 0,
+							},
+						},
+						quantity: 2,
+					},
+				],
+				jobs: [],
+				jobQueue: [],
+			},
+			tickIntervalMs: 60_000,
+		});
+		const batches: GameEventBatchSchema.Type[] = [];
+		const unsubscribe = session.subscribeEvents((batch) => {
+			batches.push(batch);
+		});
+
+		try {
+			const before = session.getSnapshot();
+			const source = before.items.find((item) => item.id === "runtime:source");
+			const target = before.items.find((item) => item.id === "runtime:target");
+			if (source === undefined || target === undefined) {
+				throw new Error("Expected merge participants.");
+			}
+
+			const event = await session.run(
+				mergeItemsFx({
+					sourceItemId: source.id,
+					sourceRevision: source.revision,
+					targetItemId: target.id,
+					targetRevision: target.revision,
+				}),
+			);
+			await waitFor(() => batches.length === 1);
+			const targetRemainder = session
+				.getSnapshot()
+				.items.find((item) => item.item.id === "target");
+			if (targetRemainder === undefined) {
+				throw new Error("Expected isolated target remainder.");
+			}
+
+			expect(batches[0]?.events).toEqual([
+				event,
+				{
+					type: GameEventEnumSchema.enum.ItemSplit,
+					itemId: "runtime:target",
+					canonicalItemId: "target",
+					location: target.location,
+					previousQuantity: 2,
+					quantity: 1,
+				},
+				{
+					type: GameEventEnumSchema.enum.ItemSpawned,
+					itemId: targetRemainder.id,
+					canonicalItemId: "target",
+					originItemId: "runtime:target",
+					location: targetRemainder.location,
+					quantity: 1,
+				},
+			]);
+		} finally {
+			unsubscribe();
+			await Effect.runPromise(session.disposeFx);
+		}
+	});
+
 	it("publishes exact merge output placement facts after the merge outcome", async () => {
 		const session = await createTestGameSession({
 			config: createMergeTestConfig({

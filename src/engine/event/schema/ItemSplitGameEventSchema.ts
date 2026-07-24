@@ -20,7 +20,7 @@ export const ItemSplitGameEventSchema = z
 	.meta({
 		id: "ItemSplitGameEventSchema",
 		description:
-			"Transient fact that one exact stack identity retained one stateful item while its pure remainder was placed separately.",
+			"Transient fact that one exact stack identity retained one item while its pure remainder was placed separately.",
 	});
 
 export type ItemSplitGameEventSchema = typeof ItemSplitGameEventSchema;

@@ -167,6 +167,58 @@ describe("mergeItemsFx", () => {
 		});
 	}
 
+	it("isolates a stacked replacement target through standard placement", () => {
+		const result = Effect.runSync(
+			runMergeFx().pipe(
+				useGameFx({
+					config: createMergeTestConfig({
+						rule: {
+							target: {
+								type: "item",
+								itemId: "target",
+							},
+							action: "consume",
+							effect: "replace",
+							result: "result",
+						},
+					}),
+					state: makeState({
+						sourceQuantity: 2,
+						targetQuantity: 2,
+					}),
+				}),
+			),
+		);
+
+		expect(result.after.items.find((item) => item.id === "runtime:source")).toMatchObject({
+			item: {
+				id: "source",
+			},
+			location: result.before.items.find((item) => item.id === "runtime:source")?.location,
+			quantity: 1,
+		});
+		expect(result.after.items.find((item) => item.id === "runtime:target")).toMatchObject({
+			item: {
+				id: "result",
+			},
+			location: result.before.items.find((item) => item.id === "runtime:target")?.location,
+			quantity: 1,
+		});
+
+		const targetRemainder = result.after.items.find((item) => item.item.id === "target");
+		expect(targetRemainder).toMatchObject({
+			location: {
+				scope: "board",
+				space: 0,
+			},
+			quantity: 1,
+		});
+		expect(targetRemainder?.id).not.toBe("runtime:target");
+		expect(targetRemainder?.location).not.toEqual(
+			result.before.items.find((item) => item.id === "runtime:target")?.location,
+		);
+	});
+
 	it("uses the first source-owned matching selector and never synthesizes the reverse direction", () => {
 		const config = createMergeTestConfig({
 			targetTags: [

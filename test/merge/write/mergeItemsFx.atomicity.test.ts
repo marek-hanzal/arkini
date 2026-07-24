@@ -81,6 +81,77 @@ const blockedOutputState = (includeBlocker = true) =>
 	}) satisfies StateSchema.Type;
 
 describe("mergeItemsFx atomicity", () => {
+	it("rolls back both stacks when an isolated replacement remainder cannot fit", () => {
+		const config = createMergeTestConfig({
+			board: {
+				width: 2,
+				height: 1,
+			},
+			inventory: {
+				width: 1,
+				height: 1,
+			},
+			rule: {
+				target: {
+					type: "item",
+					itemId: "target",
+				},
+				action: "consume",
+				effect: "replace",
+				result: "result",
+			},
+		});
+		const state = {
+			cheats: {
+				enabled: false,
+				everEnabled: false,
+				instantGameplay: false,
+			},
+			currentSpace: 0,
+			items: [
+				{
+					...boardItem("source", "source", 0),
+					quantity: 2,
+				},
+				{
+					...boardItem("target", "target", 1),
+					quantity: 2,
+				},
+				{
+					id: "runtime:blocker",
+					itemId: "blocker",
+					location: {
+						scope: "inventory" as const,
+						position: {
+							x: 0,
+							y: 0,
+						},
+					},
+					quantity: 1,
+				},
+			],
+			jobs: [],
+		} satisfies StateSchema.Type;
+		const result = Effect.runSync(
+			mergeAttemptFx().pipe(
+				useGameFx({
+					config,
+					state,
+				}),
+			),
+		);
+
+		expect(Either.isLeft(result.attempt)).toBe(true);
+		if (Either.isLeft(result.attempt)) {
+			expect(result.attempt.left).toMatchObject({
+				_tag: "PlacementUnavailableError",
+				itemId: "target",
+				remainingQuantity: 1,
+			});
+		}
+		expect(result.after).toEqual(result.before);
+	});
+
 	it("rolls back target replacement when a used source cannot return through maxCount", () => {
 		const config = createMergeTestConfig({
 			sourceMaxCount: 1,

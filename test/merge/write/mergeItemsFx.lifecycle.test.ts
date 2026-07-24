@@ -525,7 +525,7 @@ describe("mergeItemsFx participant lifecycle", () => {
 		expect(replaced?.revision).not.toBe(beforeTarget?.revision);
 	});
 
-	it("rejects replacing stateful or stacked targets but remove releases buffered inputs", () => {
+	it("rejects replacing stateful targets but remove releases buffered inputs", () => {
 		for (const effect of [
 			"replace",
 			"remove",
@@ -588,47 +588,5 @@ describe("mergeItemsFx participant lifecycle", () => {
 				});
 			}
 		}
-
-		const stackedConfig = createLifecycleConfig({
-			effect: "replace",
-		});
-		const stackedState = {
-			cheats: {
-				enabled: false,
-				everEnabled: false,
-				instantGameplay: false,
-			},
-			currentSpace: 0,
-			items: [
-				boardItem("source", 0),
-				{
-					...boardItem("target", 1),
-					quantity: 2,
-				},
-			],
-			jobs: [],
-		} satisfies StateSchema.Type;
-		const stacked = Effect.runSync(
-			attemptMergeFx().pipe(
-				useGameFx({
-					config: GameConfigSchema.parse({
-						...stackedConfig,
-						items: {
-							...stackedConfig.items,
-							target: {
-								...stackedConfig.items.target,
-								maxStackSize: 2,
-							},
-						},
-					}),
-					state: stackedState,
-				}),
-			),
-		);
-		expect(Either.isLeft(stacked.attempt)).toBe(true);
-		if (Either.isLeft(stacked.attempt)) {
-			expect(stacked.attempt.left._tag).toBe("MergeTargetStackedError");
-		}
-		expect(stacked.after).toEqual(stacked.before);
 	});
 });

@@ -544,6 +544,77 @@ describe("dropItemFx", () => {
 		});
 	});
 
+	it("merges one quantity from both stacks and places the target remainder", () => {
+		const result = run(
+			Effect.gen(function* () {
+				const source = yield* spawnItemFx({
+					id: "runtime:water",
+					itemId: "water",
+					location: sourceLocation,
+					quantity: 2,
+				});
+				const target = yield* spawnItemFx({
+					id: "runtime:stone",
+					itemId: "stone",
+					location: occupiedLocation,
+					quantity: 2,
+				});
+				const outcome = yield* dropItemFx({
+					sourceItemId: source.id,
+					sourceRevision: source.revision,
+					sourceLocation,
+					target: {
+						kind: "slot",
+						location: occupiedLocation,
+						occupant: {
+							itemId: target.id,
+							revision: target.revision,
+						},
+					},
+				});
+				return {
+					outcome,
+					runtime: yield* readRuntimeFx(),
+				};
+			}),
+			replaceMergeConfig,
+		);
+
+		expect(result.outcome).toMatchObject({
+			kind: DropItemResultKindEnumSchema.enum.Merge,
+			effect: "replace",
+			source: {
+				itemId: "runtime:water",
+				previousQuantity: 2,
+				current: {
+					itemId: "runtime:water",
+					canonicalItemId: "water",
+					location: sourceLocation,
+					quantity: 1,
+				},
+			},
+			target: {
+				itemId: "runtime:stone",
+				previousQuantity: 2,
+				current: {
+					itemId: "runtime:stone",
+					canonicalItemId: "mud",
+					location: occupiedLocation,
+					quantity: 1,
+				},
+			},
+		});
+		const targetRemainder = result.runtime.items.find((item) => item.item.id === "stone");
+		expect(targetRemainder).toMatchObject({
+			location: {
+				scope: "board",
+				space: 0,
+			},
+			quantity: 1,
+		});
+		expect(targetRemainder?.id).not.toBe("runtime:stone");
+	});
+
 	it("reports both actor identities as removed when merge consumes and removes them", () => {
 		const result = run(
 			Effect.gen(function* () {

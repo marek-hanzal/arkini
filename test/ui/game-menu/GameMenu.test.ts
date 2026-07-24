@@ -14,7 +14,7 @@ import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { ArkiniDesktopApi } from "../../../desktop/ArkiniDesktopApi";
+import type { ArkiniElectronApi } from "../../../electron/contract/ArkiniElectronApi";
 import { createCheatAvailability } from "~/bridge/cheat/createCheatAvailability";
 import type { Game } from "~/bridge/game/Game";
 import { CheatAvailabilityProvider } from "~/ui/cheat-availability/CheatAvailabilityProvider";
@@ -171,7 +171,7 @@ const renderMenu = async ({
 			lifecycle: {
 				requestClose,
 			},
-		} as unknown as ArkiniDesktopApi.Api,
+		} as unknown as ArkiniElectronApi.Api,
 	});
 	const container = document.createElement("div");
 	document.body.append(container);

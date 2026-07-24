@@ -5,8 +5,8 @@ import { randomBytes } from "node:crypto";
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { defineConfig } from "electron-vite";
-import { createRendererDevelopmentContentSecurityPolicy } from "./desktop/security/RendererContentSecurityPolicy";
-import { RendererDevelopmentServer } from "./desktop/security/RendererDevelopmentUrl";
+import { createRendererDevelopmentContentSecurityPolicy } from "./electron/security/RendererContentSecurityPolicy";
+import { RendererDevelopmentServer } from "./electron/security/RendererDevelopmentUrl";
 
 export default defineConfig(({ command }) => {
 	const developmentCspNonce =

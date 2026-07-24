@@ -13,7 +13,7 @@ import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { ArkiniDesktopApi } from "../../../desktop/ArkiniDesktopApi";
+import type { ArkiniElectronApi } from "../../../electron/contract/ArkiniElectronApi";
 import type { LauncherStartup } from "~/ui/launcher/LauncherStartup";
 import { LauncherStartupContext } from "~/ui/launcher/LauncherStartupContext";
 import { StartupSplash } from "~/ui/launcher/StartupSplash";
@@ -110,7 +110,7 @@ const renderSplash = async (startup: LauncherStartup) => {
 			lifecycle: {
 				waitUntilVisible: () => visible.promise,
 			},
-		} as unknown as ArkiniDesktopApi.Api,
+		} as unknown as ArkiniElectronApi.Api,
 	});
 	const Root = () =>
 		createElement(

@@ -1,5 +1,5 @@
 import type { Effect } from "effect";
-import type { CheatAvailabilitySchema } from "../../../desktop/cheat/CheatAvailabilitySchema";
+import type { CheatAvailabilitySchema } from "../../contract/cheat/CheatAvailabilitySchema";
 
 /** Effect-native main-process capability for application-wide cheat-tool availability. */
 export interface CheatPreferences {

@@ -1,6 +1,6 @@
 import { app, BrowserWindow, ipcMain, nativeTheme, type IpcMainInvokeEvent } from "electron";
 import { Effect } from "effect";
-import { ArkiniDesktopApi } from "../../desktop/ArkiniDesktopApi";
+import { ArkiniElectronApi } from "../contract/ArkiniElectronApi";
 import { createFilesystemArkpackCatalogFx } from "./arkpack/createFilesystemArkpackCatalogFx";
 import type { AppearancePreferences } from "./appearance/AppearancePreferences";
 import type { CheatPreferences } from "./cheat/CheatPreferences";
@@ -11,7 +11,7 @@ import type { TrustedRenderer } from "./security/TrustedRenderer";
 
 let registered = false;
 
-export namespace registerArkiniDesktopIpcFx {
+export namespace registerArkiniElectronIpcFx {
 	export interface Props {
 		readonly trustedRenderer: TrustedRenderer;
 		readonly appearancePreferences: AppearancePreferences;
@@ -20,14 +20,14 @@ export namespace registerArkiniDesktopIpcFx {
 	}
 }
 
-/** Registers the narrow Arkini desktop capabilities exposed through preload. */
-export const registerArkiniDesktopIpcFx = Effect.fn("registerArkiniDesktopIpcFx")(
+/** Registers the narrow Arkini Electron capabilities exposed through preload. */
+export const registerArkiniElectronIpcFx = Effect.fn("registerArkiniElectronIpcFx")(
 	({
 		trustedRenderer,
 		appearancePreferences,
 		cheatPreferences,
 		launcherPreferences,
-	}: registerArkiniDesktopIpcFx.Props) =>
+	}: registerArkiniElectronIpcFx.Props) =>
 		Effect.gen(function* () {
 			if (registered) return;
 			registered = true;
@@ -57,13 +57,13 @@ export const registerArkiniDesktopIpcFx = Effect.fn("registerArkiniDesktopIpcFx"
 					);
 
 				nativeTheme.on("updated", synchronizeWindowBackgrounds);
-				ipcMain.handle(ArkiniDesktopApi.channels.appearanceRead, (event) =>
+				ipcMain.handle(ArkiniElectronApi.channels.appearanceRead, (event) =>
 					runAuthorizedFx(
 						event,
 						Effect.sync(() => nativeTheme.themeSource),
 					),
 				);
-				ipcMain.handle(ArkiniDesktopApi.channels.appearanceWrite, (event, theme) =>
+				ipcMain.handle(ArkiniElectronApi.channels.appearanceWrite, (event, theme) =>
 					runAuthorizedFx(
 						event,
 						appearancePreferences.writeThemeFx(theme).pipe(
@@ -76,79 +76,79 @@ export const registerArkiniDesktopIpcFx = Effect.fn("registerArkiniDesktopIpcFx"
 						),
 					),
 				);
-				ipcMain.handle(ArkiniDesktopApi.channels.appearanceAccentRead, (event) =>
+				ipcMain.handle(ArkiniElectronApi.channels.appearanceAccentRead, (event) =>
 					runAuthorizedFx(event, appearancePreferences.readAccentFx),
 				);
-				ipcMain.handle(ArkiniDesktopApi.channels.appearanceAccentWrite, (event, accent) =>
+				ipcMain.handle(ArkiniElectronApi.channels.appearanceAccentWrite, (event, accent) =>
 					runAuthorizedFx(event, appearancePreferences.writeAccentFx(accent)),
 				);
-				ipcMain.handle(ArkiniDesktopApi.channels.cheatAvailabilityRead, (event) =>
+				ipcMain.handle(ArkiniElectronApi.channels.cheatAvailabilityRead, (event) =>
 					runAuthorizedFx(event, cheatPreferences.readAvailableFx),
 				);
 				ipcMain.handle(
-					ArkiniDesktopApi.channels.cheatAvailabilityWrite,
+					ArkiniElectronApi.channels.cheatAvailabilityWrite,
 					(event, available) =>
 						runAuthorizedFx(event, cheatPreferences.writeAvailableFx(available)),
 				);
-				ipcMain.handle(ArkiniDesktopApi.channels.launcherLastPackageIdRead, (event) =>
+				ipcMain.handle(ArkiniElectronApi.channels.launcherLastPackageIdRead, (event) =>
 					runAuthorizedFx(event, launcherPreferences.readLastPackageIdFx),
 				);
 				ipcMain.handle(
-					ArkiniDesktopApi.channels.launcherLastPackageIdWrite,
+					ArkiniElectronApi.channels.launcherLastPackageIdWrite,
 					(event, packageId) =>
 						runAuthorizedFx(event, launcherPreferences.writeLastPackageIdFx(packageId)),
 				);
 
-				ipcMain.handle(ArkiniDesktopApi.channels.arkpackList, (event) =>
+				ipcMain.handle(ArkiniElectronApi.channels.arkpackList, (event) =>
 					runAuthorizedFx(event, arkpacks.listFx),
 				);
-				ipcMain.handle(ArkiniDesktopApi.channels.arkpackRead, (event, packageId: string) =>
+				ipcMain.handle(ArkiniElectronApi.channels.arkpackRead, (event, packageId: string) =>
 					runAuthorizedFx(event, arkpacks.readFx(packageId)),
 				);
 				ipcMain.handle(
-					ArkiniDesktopApi.channels.arkpackInstall,
-					(event, record: ArkiniDesktopApi.ArkpackRecord) =>
+					ArkiniElectronApi.channels.arkpackInstall,
+					(event, record: ArkiniElectronApi.ArkpackRecord) =>
 						runAuthorizedFx(event, arkpacks.installFx(record)),
 				);
 				ipcMain.handle(
-					ArkiniDesktopApi.channels.arkpackRemove,
+					ArkiniElectronApi.channels.arkpackRemove,
 					(event, packageId: string) =>
 						runAuthorizedFx(event, arkpacks.removeFx(packageId)),
 				);
 				ipcMain.handle(
-					ArkiniDesktopApi.channels.saveRead,
-					(event, key: ArkiniDesktopApi.SaveKey) =>
+					ArkiniElectronApi.channels.saveRead,
+					(event, key: ArkiniElectronApi.SaveKey) =>
 						runAuthorizedFx(event, saves.readFx(key)),
 				);
 				ipcMain.handle(
-					ArkiniDesktopApi.channels.saveWrite,
-					(event, key: ArkiniDesktopApi.SaveKey, bytes: Uint8Array) =>
+					ArkiniElectronApi.channels.saveWrite,
+					(event, key: ArkiniElectronApi.SaveKey, bytes: Uint8Array) =>
 						runAuthorizedFx(event, saves.writeFx(key, bytes)),
 				);
 				ipcMain.handle(
-					ArkiniDesktopApi.channels.saveClear,
-					(event, key: ArkiniDesktopApi.SaveKey) =>
+					ArkiniElectronApi.channels.saveClear,
+					(event, key: ArkiniElectronApi.SaveKey) =>
 						runAuthorizedFx(event, saves.clearFx(key)),
 				);
 
 				const cleanup = () => {
 					nativeTheme.removeListener("updated", synchronizeWindowBackgrounds);
 					for (const channel of [
-						ArkiniDesktopApi.channels.appearanceRead,
-						ArkiniDesktopApi.channels.appearanceWrite,
-						ArkiniDesktopApi.channels.appearanceAccentRead,
-						ArkiniDesktopApi.channels.appearanceAccentWrite,
-						ArkiniDesktopApi.channels.cheatAvailabilityRead,
-						ArkiniDesktopApi.channels.cheatAvailabilityWrite,
-						ArkiniDesktopApi.channels.launcherLastPackageIdRead,
-						ArkiniDesktopApi.channels.launcherLastPackageIdWrite,
-						ArkiniDesktopApi.channels.arkpackList,
-						ArkiniDesktopApi.channels.arkpackRead,
-						ArkiniDesktopApi.channels.arkpackInstall,
-						ArkiniDesktopApi.channels.arkpackRemove,
-						ArkiniDesktopApi.channels.saveRead,
-						ArkiniDesktopApi.channels.saveWrite,
-						ArkiniDesktopApi.channels.saveClear,
+						ArkiniElectronApi.channels.appearanceRead,
+						ArkiniElectronApi.channels.appearanceWrite,
+						ArkiniElectronApi.channels.appearanceAccentRead,
+						ArkiniElectronApi.channels.appearanceAccentWrite,
+						ArkiniElectronApi.channels.cheatAvailabilityRead,
+						ArkiniElectronApi.channels.cheatAvailabilityWrite,
+						ArkiniElectronApi.channels.launcherLastPackageIdRead,
+						ArkiniElectronApi.channels.launcherLastPackageIdWrite,
+						ArkiniElectronApi.channels.arkpackList,
+						ArkiniElectronApi.channels.arkpackRead,
+						ArkiniElectronApi.channels.arkpackInstall,
+						ArkiniElectronApi.channels.arkpackRemove,
+						ArkiniElectronApi.channels.saveRead,
+						ArkiniElectronApi.channels.saveWrite,
+						ArkiniElectronApi.channels.saveClear,
 					]) {
 						ipcMain.removeHandler(channel);
 					}

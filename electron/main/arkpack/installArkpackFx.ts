@@ -2,7 +2,7 @@ import { FileSystem } from "@effect/platform";
 import { Effect, Exit } from "effect";
 import { createHash, randomUUID } from "node:crypto";
 import { join } from "node:path";
-import type { ArkiniDesktopApi } from "../../../desktop/ArkiniDesktopApi";
+import type { ArkiniElectronApi } from "../../contract/ArkiniElectronApi";
 import { parseInstalledArkpackDescriptorFx } from "./parseInstalledArkpackDescriptorFx";
 import { readInstalledArkpackFx } from "./readInstalledArkpackFx";
 import { writeSyncedArkpackFileFx } from "./writeSyncedArkpackFileFx";
@@ -11,7 +11,7 @@ export namespace installArkpackFx {
 	export interface Props {
 		readonly root: string;
 		readonly fileSystem: FileSystem.FileSystem;
-		readonly record: ArkiniDesktopApi.ArkpackRecord;
+		readonly record: ArkiniElectronApi.ArkpackRecord;
 	}
 }
 

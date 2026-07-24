@@ -1,7 +1,7 @@
 import { FileSystem } from "@effect/platform";
 import { Effect } from "effect";
 import { join } from "node:path";
-import { AppearanceThemeSchema } from "../../../desktop/appearance/AppearanceThemeSchema";
+import { AppearanceThemeSchema } from "../../contract/appearance/AppearanceThemeSchema";
 import { ElectronMainError } from "../ElectronMainError";
 
 export namespace writeAppearanceThemeFx {

@@ -2,8 +2,8 @@ import { describe, expect, it } from "vitest";
 import {
 	createRendererDevelopmentContentSecurityPolicy,
 	RendererContentSecurityPolicy,
-} from "../../desktop/security/RendererContentSecurityPolicy";
-import { parseRendererDevelopmentUrl } from "../../desktop/security/RendererDevelopmentUrl";
+} from "../../electron/security/RendererContentSecurityPolicy";
+import { parseRendererDevelopmentUrl } from "../../electron/security/RendererDevelopmentUrl";
 
 describe("RendererContentSecurityPolicy", () => {
 	it("allows the exact URL-derived HMR endpoint and one Vite development nonce", () => {

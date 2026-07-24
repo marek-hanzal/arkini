@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import { AppearanceThemeSchema } from "../../../desktop/appearance/AppearanceThemeSchema";
+import { AppearanceThemeSchema } from "../../../electron/contract/appearance/AppearanceThemeSchema";
 import { AppearanceThemeError } from "~/bridge/appearance/AppearanceThemeError";
 
 /** Reads the Electron-owned appearance preference and validates the preload boundary. */

@@ -10,7 +10,7 @@ export namespace AppearanceProvider {
 	}
 }
 
-/** Owns the one renderer appearance snapshot hydrated from desktop preferences. */
+/** Owns the one renderer appearance snapshot hydrated from Electron preferences. */
 export const AppearanceProvider = ({
 	children,
 	initialTheme = "dark",

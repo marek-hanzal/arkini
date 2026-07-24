@@ -139,15 +139,18 @@ const boundaryRules = [
 	},
 
 	{
-		name: "renderer-no-electron-imports",
+		name: "renderer-only-imports-electron-contract",
 		comment:
-			"Renderer, engine, bridge, page, and routes stay independent from Electron and its platform source root.",
+			"Renderer code may consume the pure Electron transport contract through bridge domains, but never Electron runtime adapters or the Electron package.",
 		severity: "error",
 		from: {
 			path: "^(?:src/(?:engine|bridge|ui|page|@routes)|src/(?:main|router|_route)\\.tsx?)(?:/|$)",
 		},
 		to: {
 			path: "^(?:electron(?:/|$)|node_modules/electron(?:/|$))",
+			pathNot: [
+				"^electron/contract(?:/|$)",
+			],
 		},
 	},
 	{
@@ -156,7 +159,7 @@ const boundaryRules = [
 			"Application code consumes authored Game resources only through validated arkpacks, never through direct source-tree imports.",
 		severity: "error",
 		from: {
-			path: "^(?:src|electron|desktop|cli)(?:/|$)",
+			path: "^(?:src|electron|cli)(?:/|$)",
 		},
 		to: {
 			path: "^game/[^/]+/(?:assets|resources)(?:/|$)",
@@ -187,27 +190,30 @@ const boundaryRules = [
 		},
 	},
 	{
-		name: "desktop-contract-only-through-bridge-or-electron",
+		name: "electron-contract-only-through-bridge-or-electron",
 		comment:
-			"The shared desktop contract is consumed only by the renderer bridge and Electron platform adapters, never by engine, UI, pages, routes, or CLI.",
+			"The shared Electron contract is consumed only by renderer bridge domains and Electron platform adapters, never by engine, UI, pages, routes, renderer entrypoints, or CLI.",
 		severity: "error",
 		from: {
 			path: "^(?:src/(?:engine|ui|page|@routes)|src/(?:main|router|_route)\\.tsx?|cli)(?:/|$)",
 		},
 		to: {
-			path: "^desktop(?:/|$)",
+			path: "^electron/contract(?:/|$)",
 		},
 	},
 	{
-		name: "desktop-contract-is-pure",
+		name: "electron-contract-is-pure",
 		comment:
-			"The shared desktop contract contains types and channel names only; it never imports renderer, engine, Electron, or CLI implementation code.",
+			"The shared Electron contract contains schemas, transport types, and channel names only; it never imports renderer, engine, Electron runtime, or CLI implementation code.",
 		severity: "error",
 		from: {
-			path: "^desktop(?:/|$)",
+			path: "^electron/contract(?:/|$)",
 		},
 		to: {
 			path: "^(?:src|electron|cli)(?:/|$)|^node_modules/electron(?:/|$)",
+			pathNot: [
+				"^electron/contract(?:/|$)",
+			],
 		},
 	},
 	{
@@ -216,7 +222,7 @@ const boundaryRules = [
 			"Production and tooling code never import test support; tests may depend on active code, never the reverse.",
 		severity: "error",
 		from: {
-			path: "^(?:src/(?:engine|bridge|ui|page|@routes)|src/(?:main|router|_route)\\.tsx?|electron|desktop|cli)(?:/|$)",
+			path: "^(?:src/(?:engine|bridge|ui|page|@routes)|src/(?:main|router|_route)\\.tsx?|electron|cli)(?:/|$)",
 		},
 		to: {
 			path: "^test(?:/|$)",
@@ -228,7 +234,7 @@ const boundaryRules = [
 			"The historical tree is a read-only oracle outside every active source root and may never be imported by production, CLI, or tests.",
 		severity: "error",
 		from: {
-			path: "^(?:src/(?:engine|bridge|ui|page|@routes)|src/(?:main|router|_route)\\.tsx?|electron|desktop|cli|test)(?:/|$)",
+			path: "^(?:src/(?:engine|bridge|ui|page|@routes)|src/(?:main|router|_route)\\.tsx?|electron|cli|test)(?:/|$)",
 		},
 		to: {
 			path: "^src/_archive(?:/|$)",
@@ -278,7 +284,7 @@ module.exports = {
 				"Active production source must not import devDependencies unless the import is type-only or test-only.",
 			severity: "error",
 			from: {
-				path: "^(?:src/(?:engine|bridge|ui|page|@routes)|src/(?:main|router|_route)\\.tsx?|electron|desktop)(?:/|$)",
+				path: "^(?:src/(?:engine|bridge|ui|page|@routes)|src/(?:main|router|_route)\\.tsx?|electron)(?:/|$)",
 				pathNot: [
 					"[.](?:spec|test)[.](?:js|mjs|cjs|jsx|ts|mts|cts|tsx)$",
 				],
@@ -302,7 +308,7 @@ module.exports = {
 				"Production code must not import tests or fixtures. Tests may depend on production, never the reverse.",
 			severity: "error",
 			from: {
-				path: "^(?:src/(?:engine|bridge|ui|page|@routes)|src/(?:main|router|_route)\\.tsx?|electron|desktop|cli)(?:/|$)",
+				path: "^(?:src/(?:engine|bridge|ui|page|@routes)|src/(?:main|router|_route)\\.tsx?|electron|cli)(?:/|$)",
 				pathNot: [
 					"[.](?:spec|test)[.](?:js|mjs|cjs|jsx|ts|mts|cts|tsx)$",
 				],

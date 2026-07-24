@@ -3,7 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { Effect } from "effect";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { RendererContentSecurityPolicy } from "../../desktop/security/RendererContentSecurityPolicy";
+import { RendererContentSecurityPolicy } from "../../electron/security/RendererContentSecurityPolicy";
 
 const netFetch = vi.hoisted(() => vi.fn());
 

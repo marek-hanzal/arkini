@@ -24,7 +24,7 @@
 		]
 	},
 	"include": [
-		"desktop",
+		"electron/contract",
 		"cli",
 		"src/engine",
 		"src/bridge",

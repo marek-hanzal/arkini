@@ -1,7 +1,7 @@
 import { FileSystem } from "@effect/platform";
 import { Effect } from "effect";
 import { join } from "node:path";
-import { AppearanceAccentSchema } from "../../../desktop/appearance/AppearanceAccentSchema";
+import { AppearanceAccentSchema } from "../../contract/appearance/AppearanceAccentSchema";
 import { ElectronMainError } from "../ElectronMainError";
 
 export namespace readAppearanceAccentFx {

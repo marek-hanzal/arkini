@@ -1,3 +1,3 @@
-import type { AppearanceThemeSchema } from "../../../desktop/appearance/AppearanceThemeSchema";
+import type { AppearanceThemeSchema } from "../../../electron/contract/appearance/AppearanceThemeSchema";
 
 export type AppearanceTheme = AppearanceThemeSchema.Type;

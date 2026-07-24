@@ -1,14 +1,14 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { ArkiniDesktopApi } from "../../desktop/ArkiniDesktopApi";
-import { ArkiniDesktopApi as ArkiniDesktopContract } from "../../desktop/ArkiniDesktopApi";
+import type { ArkiniElectronApi } from "../../electron/contract/ArkiniElectronApi";
+import { ArkiniElectronApi as ArkiniElectronContract } from "../../electron/contract/ArkiniElectronApi";
 
 const electron = vi.hoisted(() => {
 	const handlers = new Map<string, (...args: Array<unknown>) => unknown>();
-	let exposed: ArkiniDesktopApi.Api | undefined;
+	let exposed: ArkiniElectronApi.Api | undefined;
 	return {
 		handlers,
 		contextBridge: {
-			exposeInMainWorld: vi.fn((_name: string, api: ArkiniDesktopApi.Api) => {
+			exposeInMainWorld: vi.fn((_name: string, api: ArkiniElectronApi.Api) => {
 				exposed = api;
 			}),
 		},
@@ -42,13 +42,13 @@ const loadPreload = async () => {
 };
 
 const requestBeforeClose = async () => {
-	const handler = electron.handlers.get(ArkiniDesktopContract.channels.beforeClose);
+	const handler = electron.handlers.get(ArkiniElectronContract.channels.beforeClose);
 	if (handler === undefined) throw new Error("Expected before-close listener registration.");
 	await handler();
 };
 
 const reportWindowVisible = () => {
-	const handler = electron.handlers.get(ArkiniDesktopContract.channels.windowVisible);
+	const handler = electron.handlers.get(ArkiniElectronContract.channels.windowVisible);
 	if (handler === undefined) throw new Error("Expected window-visible listener registration.");
 	handler();
 };
@@ -88,11 +88,11 @@ describe("Electron preload lifecycle", () => {
 		await expect(api.launcher.writeLastPackageId("package:next")).resolves.toBeUndefined();
 		expect(electron.ipcRenderer.invoke).toHaveBeenNthCalledWith(
 			1,
-			ArkiniDesktopContract.channels.launcherLastPackageIdRead,
+			ArkiniElectronContract.channels.launcherLastPackageIdRead,
 		);
 		expect(electron.ipcRenderer.invoke).toHaveBeenNthCalledWith(
 			2,
-			ArkiniDesktopContract.channels.launcherLastPackageIdWrite,
+			ArkiniElectronContract.channels.launcherLastPackageIdWrite,
 			"package:next",
 		);
 	});
@@ -105,7 +105,7 @@ describe("Electron preload lifecycle", () => {
 		expect(second).toBe(first);
 		expect(electron.ipcRenderer.send).toHaveBeenCalledTimes(1);
 		expect(electron.ipcRenderer.send).toHaveBeenCalledWith(
-			ArkiniDesktopContract.channels.requestClose,
+			ArkiniElectronContract.channels.requestClose,
 		);
 	});
 
@@ -118,7 +118,7 @@ describe("Electron preload lifecycle", () => {
 		await requestBeforeClose();
 		await expect(first).rejects.toBe(failure);
 		expect(electron.ipcRenderer.send).toHaveBeenCalledWith(
-			ArkiniDesktopContract.channels.closeFailed,
+			ArkiniElectronContract.channels.closeFailed,
 			"Error: save failed",
 		);
 
@@ -126,7 +126,7 @@ describe("Electron preload lifecycle", () => {
 		expect(retry).not.toBe(first);
 		expect(electron.ipcRenderer.send).toHaveBeenCalledTimes(3);
 		expect(electron.ipcRenderer.send).toHaveBeenLastCalledWith(
-			ArkiniDesktopContract.channels.requestClose,
+			ArkiniElectronContract.channels.requestClose,
 		);
 	});
 
@@ -148,7 +148,7 @@ describe("Electron preload lifecycle", () => {
 			"presentation",
 		]);
 		expect(electron.ipcRenderer.send).toHaveBeenLastCalledWith(
-			ArkiniDesktopContract.channels.closeReady,
+			ArkiniElectronContract.channels.closeReady,
 		);
 	});
 });

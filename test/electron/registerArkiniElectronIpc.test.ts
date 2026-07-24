@@ -6,7 +6,7 @@ import { join } from "node:path";
 import type { IpcMainInvokeEvent, WebContents, WebFrameMain } from "electron";
 import { Effect } from "effect";
 import { describe, expect, it, vi } from "vitest";
-import { ArkiniDesktopApi } from "../../desktop/ArkiniDesktopApi";
+import { ArkiniElectronApi } from "../../electron/contract/ArkiniElectronApi";
 import { ElectronMainError } from "../../electron/main/ElectronMainError";
 import type { TrustedRenderer } from "../../electron/main/security/TrustedRenderer";
 
@@ -64,7 +64,7 @@ vi.mock("electron", () => electronHarness.module);
 import { createFilesystemAppearancePreferencesFx } from "../../electron/main/appearance/createFilesystemAppearancePreferencesFx";
 import { createFilesystemCheatPreferencesFx } from "../../electron/main/cheat/createFilesystemCheatPreferencesFx";
 import { createFilesystemLauncherPreferencesFx } from "../../electron/main/launcher/createFilesystemLauncherPreferencesFx";
-import { registerArkiniDesktopIpcFx } from "../../electron/main/registerArkiniDesktopIpcFx";
+import { registerArkiniElectronIpcFx } from "../../electron/main/registerArkiniElectronIpcFx";
 
 const placeholderPackageId = "a".repeat(64);
 const saveKey = {
@@ -73,57 +73,57 @@ const saveKey = {
 } as const;
 const invokeArguments = new Map<string, ReadonlyArray<unknown>>([
 	[
-		ArkiniDesktopApi.channels.appearanceRead,
+		ArkiniElectronApi.channels.appearanceRead,
 		[],
 	],
 	[
-		ArkiniDesktopApi.channels.appearanceWrite,
+		ArkiniElectronApi.channels.appearanceWrite,
 		[
 			"dark",
 		],
 	],
 	[
-		ArkiniDesktopApi.channels.appearanceAccentRead,
+		ArkiniElectronApi.channels.appearanceAccentRead,
 		[],
 	],
 	[
-		ArkiniDesktopApi.channels.appearanceAccentWrite,
+		ArkiniElectronApi.channels.appearanceAccentWrite,
 		[
 			"rose",
 		],
 	],
 	[
-		ArkiniDesktopApi.channels.cheatAvailabilityRead,
+		ArkiniElectronApi.channels.cheatAvailabilityRead,
 		[],
 	],
 	[
-		ArkiniDesktopApi.channels.cheatAvailabilityWrite,
+		ArkiniElectronApi.channels.cheatAvailabilityWrite,
 		[
 			false,
 		],
 	],
 	[
-		ArkiniDesktopApi.channels.launcherLastPackageIdRead,
+		ArkiniElectronApi.channels.launcherLastPackageIdRead,
 		[],
 	],
 	[
-		ArkiniDesktopApi.channels.launcherLastPackageIdWrite,
+		ArkiniElectronApi.channels.launcherLastPackageIdWrite,
 		[
 			"arkini",
 		],
 	],
 	[
-		ArkiniDesktopApi.channels.arkpackList,
+		ArkiniElectronApi.channels.arkpackList,
 		[],
 	],
 	[
-		ArkiniDesktopApi.channels.arkpackRead,
+		ArkiniElectronApi.channels.arkpackRead,
 		[
 			placeholderPackageId,
 		],
 	],
 	[
-		ArkiniDesktopApi.channels.arkpackInstall,
+		ArkiniElectronApi.channels.arkpackInstall,
 		[
 			{
 				descriptor: {
@@ -144,26 +144,26 @@ const invokeArguments = new Map<string, ReadonlyArray<unknown>>([
 		],
 	],
 	[
-		ArkiniDesktopApi.channels.arkpackRemove,
+		ArkiniElectronApi.channels.arkpackRemove,
 		[
 			placeholderPackageId,
 		],
 	],
 	[
-		ArkiniDesktopApi.channels.saveRead,
+		ArkiniElectronApi.channels.saveRead,
 		[
 			saveKey,
 		],
 	],
 	[
-		ArkiniDesktopApi.channels.saveWrite,
+		ArkiniElectronApi.channels.saveWrite,
 		[
 			saveKey,
 			new Uint8Array(),
 		],
 	],
 	[
-		ArkiniDesktopApi.channels.saveClear,
+		ArkiniElectronApi.channels.saveClear,
 		[
 			saveKey,
 		],
@@ -191,8 +191,8 @@ const invoke = (channel: string, event: IpcMainInvokeEvent, ...args: ReadonlyArr
 	return handler?.(event, ...args);
 };
 
-describe("registerArkiniDesktopIpcFx", () => {
-	it("rejects every untrusted sender and preserves every trusted desktop capability", async () => {
+describe("registerArkiniElectronIpcFx", () => {
+	it("rejects every untrusted sender and preserves every trusted Electron capability", async () => {
 		const userDataPath = await mkdtemp(join(tmpdir(), "arkini-ipc-"));
 		electronHarness.userDataPath.value = userDataPath;
 		const assertTrustedIpcSenderFx = vi.fn((event: IpcMainInvokeEvent) =>
@@ -224,7 +224,7 @@ describe("registerArkiniDesktopIpcFx", () => {
 					const launcherPreferences = yield* createFilesystemLauncherPreferencesFx({
 						userDataPath,
 					});
-					yield* registerArkiniDesktopIpcFx({
+					yield* registerArkiniElectronIpcFx({
 						trustedRenderer,
 						appearancePreferences,
 						cheatPreferences,
@@ -246,17 +246,17 @@ describe("registerArkiniDesktopIpcFx", () => {
 
 			const trustedEvent = createInvokeEvent("arkini://app/game/arkini");
 			await expect(
-				invoke(ArkiniDesktopApi.channels.appearanceRead, trustedEvent),
+				invoke(ArkiniElectronApi.channels.appearanceRead, trustedEvent),
 			).resolves.toBe("dark");
 			await expect(
-				invoke(ArkiniDesktopApi.channels.appearanceWrite, trustedEvent, "light"),
+				invoke(ArkiniElectronApi.channels.appearanceWrite, trustedEvent, "light"),
 			).resolves.toBeUndefined();
 			await expect(
-				invoke(ArkiniDesktopApi.channels.appearanceRead, trustedEvent),
+				invoke(ArkiniElectronApi.channels.appearanceRead, trustedEvent),
 			).resolves.toBe("light");
 			expect(electronHarness.module.nativeTheme.themeSource).toBe("light");
 			await expect(
-				invoke(ArkiniDesktopApi.channels.appearanceWrite, trustedEvent, "system"),
+				invoke(ArkiniElectronApi.channels.appearanceWrite, trustedEvent, "system"),
 			).resolves.toBeUndefined();
 			expect(electronHarness.module.nativeTheme.themeSource).toBe("system");
 			electronHarness.module.nativeTheme.shouldUseDarkColors = false;
@@ -266,35 +266,35 @@ describe("registerArkiniDesktopIpcFx", () => {
 			electronHarness.nativeThemeListeners.get("updated")?.();
 			expect(electronHarness.setBackgroundColor).toHaveBeenLastCalledWith("#090711");
 			await expect(
-				invoke(ArkiniDesktopApi.channels.appearanceAccentRead, trustedEvent),
+				invoke(ArkiniElectronApi.channels.appearanceAccentRead, trustedEvent),
 			).resolves.toBe("rose");
 			await expect(
-				invoke(ArkiniDesktopApi.channels.appearanceAccentWrite, trustedEvent, "blue"),
+				invoke(ArkiniElectronApi.channels.appearanceAccentWrite, trustedEvent, "blue"),
 			).resolves.toBeUndefined();
 			await expect(
-				invoke(ArkiniDesktopApi.channels.appearanceAccentRead, trustedEvent),
+				invoke(ArkiniElectronApi.channels.appearanceAccentRead, trustedEvent),
 			).resolves.toBe("blue");
 			await expect(
-				invoke(ArkiniDesktopApi.channels.cheatAvailabilityRead, trustedEvent),
+				invoke(ArkiniElectronApi.channels.cheatAvailabilityRead, trustedEvent),
 			).resolves.toBe(false);
 			await expect(
-				invoke(ArkiniDesktopApi.channels.cheatAvailabilityWrite, trustedEvent, true),
+				invoke(ArkiniElectronApi.channels.cheatAvailabilityWrite, trustedEvent, true),
 			).resolves.toBeUndefined();
 			await expect(
-				invoke(ArkiniDesktopApi.channels.cheatAvailabilityRead, trustedEvent),
+				invoke(ArkiniElectronApi.channels.cheatAvailabilityRead, trustedEvent),
 			).resolves.toBe(true);
 			await expect(
-				invoke(ArkiniDesktopApi.channels.launcherLastPackageIdRead, trustedEvent),
+				invoke(ArkiniElectronApi.channels.launcherLastPackageIdRead, trustedEvent),
 			).resolves.toBeNull();
 			await expect(
 				invoke(
-					ArkiniDesktopApi.channels.launcherLastPackageIdWrite,
+					ArkiniElectronApi.channels.launcherLastPackageIdWrite,
 					trustedEvent,
 					"package:last",
 				),
 			).resolves.toBeUndefined();
 			await expect(
-				invoke(ArkiniDesktopApi.channels.launcherLastPackageIdRead, trustedEvent),
+				invoke(ArkiniElectronApi.channels.launcherLastPackageIdRead, trustedEvent),
 			).resolves.toBe("package:last");
 
 			const arkpackBytes = new Uint8Array([
@@ -304,7 +304,7 @@ describe("registerArkiniDesktopIpcFx", () => {
 				4,
 			]);
 			const packageId = createHash("sha256").update(arkpackBytes).digest("hex");
-			const record: ArkiniDesktopApi.ArkpackRecord = {
+			const record: ArkiniElectronApi.ArkpackRecord = {
 				descriptor: {
 					packageId,
 					contentHash: packageId,
@@ -321,21 +321,21 @@ describe("registerArkiniDesktopIpcFx", () => {
 				bytes: arkpackBytes,
 			};
 			await expect(
-				invoke(ArkiniDesktopApi.channels.arkpackInstall, trustedEvent, record),
+				invoke(ArkiniElectronApi.channels.arkpackInstall, trustedEvent, record),
 			).resolves.toBeUndefined();
 			await expect(
-				invoke(ArkiniDesktopApi.channels.arkpackList, trustedEvent),
+				invoke(ArkiniElectronApi.channels.arkpackList, trustedEvent),
 			).resolves.toEqual([
 				record.descriptor,
 			]);
 			await expect(
-				invoke(ArkiniDesktopApi.channels.arkpackRead, trustedEvent, packageId),
+				invoke(ArkiniElectronApi.channels.arkpackRead, trustedEvent, packageId),
 			).resolves.toEqual(record);
 			await expect(
-				invoke(ArkiniDesktopApi.channels.arkpackRemove, trustedEvent, packageId),
+				invoke(ArkiniElectronApi.channels.arkpackRemove, trustedEvent, packageId),
 			).resolves.toBeUndefined();
 			await expect(
-				invoke(ArkiniDesktopApi.channels.arkpackRead, trustedEvent, packageId),
+				invoke(ArkiniElectronApi.channels.arkpackRead, trustedEvent, packageId),
 			).resolves.toBeNull();
 
 			const saveBytes = new Uint8Array([
@@ -344,16 +344,16 @@ describe("registerArkiniDesktopIpcFx", () => {
 				7,
 			]);
 			await expect(
-				invoke(ArkiniDesktopApi.channels.saveWrite, trustedEvent, saveKey, saveBytes),
+				invoke(ArkiniElectronApi.channels.saveWrite, trustedEvent, saveKey, saveBytes),
 			).resolves.toBeUndefined();
 			await expect(
-				invoke(ArkiniDesktopApi.channels.saveRead, trustedEvent, saveKey),
+				invoke(ArkiniElectronApi.channels.saveRead, trustedEvent, saveKey),
 			).resolves.toEqual(saveBytes);
 			await expect(
-				invoke(ArkiniDesktopApi.channels.saveClear, trustedEvent, saveKey),
+				invoke(ArkiniElectronApi.channels.saveClear, trustedEvent, saveKey),
 			).resolves.toBeUndefined();
 			await expect(
-				invoke(ArkiniDesktopApi.channels.saveRead, trustedEvent, saveKey),
+				invoke(ArkiniElectronApi.channels.saveRead, trustedEvent, saveKey),
 			).resolves.toBeNull();
 		} finally {
 			electronHarness.appListeners.get("will-quit")?.();

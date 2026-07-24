@@ -1,6 +1,6 @@
 import type { BrowserWindow, IpcMain, IpcMainEvent } from "electron";
 import { Effect } from "effect";
-import { ArkiniDesktopApi } from "../../desktop/ArkiniDesktopApi";
+import { ArkiniElectronApi } from "../contract/ArkiniElectronApi";
 import type { TrustedRenderer } from "./security/TrustedRenderer";
 
 type ControlledCloseIpc = Pick<IpcMain, "on" | "removeListener">;
@@ -21,13 +21,13 @@ export const registerControlledWindowCloseFx = Effect.fn("registerControlledWind
 			let closeRequested = false;
 
 			const removeResponseListeners = () => {
-				ipc.removeListener(ArkiniDesktopApi.channels.closeReady, onCloseReady);
-				ipc.removeListener(ArkiniDesktopApi.channels.closeFailed, onCloseFailed);
+				ipc.removeListener(ArkiniElectronApi.channels.closeReady, onCloseReady);
+				ipc.removeListener(ArkiniElectronApi.channels.closeFailed, onCloseFailed);
 			};
 			const removeAllListeners = () => {
 				removeResponseListeners();
-				ipc.removeListener(ArkiniDesktopApi.channels.requestClose, onRequestClose);
-				ipc.removeListener(ArkiniDesktopApi.channels.forceClose, onForceClose);
+				ipc.removeListener(ArkiniElectronApi.channels.requestClose, onRequestClose);
+				ipc.removeListener(ArkiniElectronApi.channels.forceClose, onForceClose);
 			};
 			const ownsTrustedWindow = (event: IpcMainEvent) =>
 				trustedRenderer.isTrustedIpcSender(event) &&
@@ -58,16 +58,16 @@ export const registerControlledWindowCloseFx = Effect.fn("registerControlledWind
 				if (!window.isDestroyed()) window.close();
 			};
 
-			ipc.on(ArkiniDesktopApi.channels.requestClose, onRequestClose);
-			ipc.on(ArkiniDesktopApi.channels.forceClose, onForceClose);
+			ipc.on(ArkiniElectronApi.channels.requestClose, onRequestClose);
+			ipc.on(ArkiniElectronApi.channels.forceClose, onForceClose);
 			window.on("close", (event) => {
 				if (closeAllowed || window.webContents.isDestroyed()) return;
 				event.preventDefault();
 				if (closeRequested) return;
 				closeRequested = true;
-				ipc.on(ArkiniDesktopApi.channels.closeReady, onCloseReady);
-				ipc.on(ArkiniDesktopApi.channels.closeFailed, onCloseFailed);
-				window.webContents.send(ArkiniDesktopApi.channels.beforeClose);
+				ipc.on(ArkiniElectronApi.channels.closeReady, onCloseReady);
+				ipc.on(ArkiniElectronApi.channels.closeFailed, onCloseFailed);
+				window.webContents.send(ArkiniElectronApi.channels.beforeClose);
 			});
 			window.webContents.once("render-process-gone", () => {
 				closeAllowed = true;

@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
 	parseRendererDevelopmentUrl,
 	RendererDevelopmentServer,
-} from "../../desktop/security/RendererDevelopmentUrl";
+} from "../../electron/security/RendererDevelopmentUrl";
 
 describe("RendererDevelopmentUrl", () => {
 	it("derives the exact HTTP and HMR endpoints from one configured URL", () => {

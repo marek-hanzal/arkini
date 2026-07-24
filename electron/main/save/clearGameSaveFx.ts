@@ -1,14 +1,14 @@
 import { FileSystem } from "@effect/platform";
 import { Effect } from "effect";
 import { join } from "node:path";
-import type { ArkiniDesktopApi } from "../../../desktop/ArkiniDesktopApi";
+import type { ArkiniElectronApi } from "../../contract/ArkiniElectronApi";
 import { assertGameSaveKeyFx } from "./assertGameSaveKeyFx";
 
 export namespace clearGameSaveFx {
 	export interface Props {
 		readonly root: string;
 		readonly fileSystem: FileSystem.FileSystem;
-		readonly key: ArkiniDesktopApi.SaveKey;
+		readonly key: ArkiniElectronApi.SaveKey;
 	}
 }
 

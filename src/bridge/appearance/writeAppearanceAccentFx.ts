@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import { AppearanceAccentSchema } from "../../../desktop/appearance/AppearanceAccentSchema";
+import { AppearanceAccentSchema } from "../../../electron/contract/appearance/AppearanceAccentSchema";
 import { AppearanceAccentError } from "~/bridge/appearance/AppearanceAccentError";
 
 /** Persists one validated accent palette through the trusted Electron preload boundary. */

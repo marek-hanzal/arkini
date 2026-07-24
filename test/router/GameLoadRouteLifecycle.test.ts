@@ -15,7 +15,7 @@ vi.mock("~/bridge/game/createGameFx", () => ({
 
 import { routeTree } from "~/_route";
 import { createCheatAvailability } from "~/bridge/cheat/createCheatAvailability";
-import type { ArkiniDesktopApi } from "../../desktop/ArkiniDesktopApi";
+import type { ArkiniElectronApi } from "../../electron/contract/ArkiniElectronApi";
 import type { Game } from "~/bridge/game/Game";
 import { GameSaveBootstrapError } from "~/bridge/game/GameSaveBootstrapError";
 import { gameEngineQueryKey } from "~/bridge/game/gameEngineQueryKey";
@@ -163,7 +163,7 @@ beforeEach(() => {
 				read: vi.fn(() => Promise.resolve(null)),
 				write: vi.fn(() => Promise.resolve()),
 			},
-		} as unknown as ArkiniDesktopApi.Api,
+		} as unknown as ArkiniElectronApi.Api,
 	});
 });
 

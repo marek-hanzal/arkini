@@ -1,7 +1,7 @@
 import { FileSystem } from "@effect/platform";
 import { Effect, Option } from "effect";
 import { join } from "node:path";
-import type { ArkiniDesktopApi } from "../../../desktop/ArkiniDesktopApi";
+import type { ArkiniElectronApi } from "../../contract/ArkiniElectronApi";
 import { parseInstalledArkpackDescriptorFx } from "./parseInstalledArkpackDescriptorFx";
 
 const packageIdPattern = /^[a-f0-9]{64}$/;
@@ -48,5 +48,5 @@ export const listInstalledArkpacksFx = Effect.fn("listInstalledArkpacksFx")(func
 			(left, right) =>
 				(right.importedAtMs ?? 0) - (left.importedAtMs ?? 0) ||
 				left.packageId.localeCompare(right.packageId),
-		) satisfies ReadonlyArray<ArkiniDesktopApi.ArkpackDescriptor>;
+		) satisfies ReadonlyArray<ArkiniElectronApi.ArkpackDescriptor>;
 });

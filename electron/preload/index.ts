@@ -1,5 +1,5 @@
 import { contextBridge, ipcRenderer } from "electron";
-import { ArkiniDesktopApi } from "../../desktop/ArkiniDesktopApi";
+import { ArkiniElectronApi } from "../contract/ArkiniElectronApi";
 
 const beforeCloseListeners = new Set<() => Promise<void>>();
 const beforeCloseReadyListeners = new Set<() => Promise<void>>();
@@ -18,13 +18,13 @@ const visiblePromise = new Promise<number>((resolve) => {
 	resolveVisible = resolve;
 });
 
-ipcRenderer.on(ArkiniDesktopApi.channels.windowVisible, () => {
+ipcRenderer.on(ArkiniElectronApi.channels.windowVisible, () => {
 	if (visibleAtMs !== undefined) return;
 	visibleAtMs = performance.now();
 	resolveVisible(visibleAtMs);
 });
 
-ipcRenderer.on(ArkiniDesktopApi.channels.beforeClose, async () => {
+ipcRenderer.on(ArkiniElectronApi.channels.beforeClose, async () => {
 	if (closing) return;
 	closing = true;
 	try {
@@ -32,46 +32,46 @@ ipcRenderer.on(ArkiniDesktopApi.channels.beforeClose, async () => {
 		await Promise.all(Array.from(beforeCloseReadyListeners, (listener) => listener()));
 		requestedClose?.resolve();
 		requestedClose = undefined;
-		ipcRenderer.send(ArkiniDesktopApi.channels.closeReady);
+		ipcRenderer.send(ArkiniElectronApi.channels.closeReady);
 	} catch (error) {
 		closing = false;
 		for (const listener of Array.from(closeFailedListeners)) listener(error);
-		ipcRenderer.send(ArkiniDesktopApi.channels.closeFailed, String(error));
+		ipcRenderer.send(ArkiniElectronApi.channels.closeFailed, String(error));
 		requestedClose?.reject(error);
 		requestedClose = undefined;
 	}
 });
 
-const api: ArkiniDesktopApi.Api = {
+const api: ArkiniElectronApi.Api = {
 	appearance: {
-		read: () => ipcRenderer.invoke(ArkiniDesktopApi.channels.appearanceRead),
-		write: (theme) => ipcRenderer.invoke(ArkiniDesktopApi.channels.appearanceWrite, theme),
-		readAccent: () => ipcRenderer.invoke(ArkiniDesktopApi.channels.appearanceAccentRead),
+		read: () => ipcRenderer.invoke(ArkiniElectronApi.channels.appearanceRead),
+		write: (theme) => ipcRenderer.invoke(ArkiniElectronApi.channels.appearanceWrite, theme),
+		readAccent: () => ipcRenderer.invoke(ArkiniElectronApi.channels.appearanceAccentRead),
 		writeAccent: (accent) =>
-			ipcRenderer.invoke(ArkiniDesktopApi.channels.appearanceAccentWrite, accent),
+			ipcRenderer.invoke(ArkiniElectronApi.channels.appearanceAccentWrite, accent),
 	},
 	cheats: {
-		readAvailable: () => ipcRenderer.invoke(ArkiniDesktopApi.channels.cheatAvailabilityRead),
+		readAvailable: () => ipcRenderer.invoke(ArkiniElectronApi.channels.cheatAvailabilityRead),
 		writeAvailable: (available) =>
-			ipcRenderer.invoke(ArkiniDesktopApi.channels.cheatAvailabilityWrite, available),
+			ipcRenderer.invoke(ArkiniElectronApi.channels.cheatAvailabilityWrite, available),
 	},
 	launcher: {
 		readLastPackageId: () =>
-			ipcRenderer.invoke(ArkiniDesktopApi.channels.launcherLastPackageIdRead),
+			ipcRenderer.invoke(ArkiniElectronApi.channels.launcherLastPackageIdRead),
 		writeLastPackageId: (packageId) =>
-			ipcRenderer.invoke(ArkiniDesktopApi.channels.launcherLastPackageIdWrite, packageId),
+			ipcRenderer.invoke(ArkiniElectronApi.channels.launcherLastPackageIdWrite, packageId),
 	},
 	arkpack: {
-		list: () => ipcRenderer.invoke(ArkiniDesktopApi.channels.arkpackList),
-		read: (packageId) => ipcRenderer.invoke(ArkiniDesktopApi.channels.arkpackRead, packageId),
-		install: (record) => ipcRenderer.invoke(ArkiniDesktopApi.channels.arkpackInstall, record),
+		list: () => ipcRenderer.invoke(ArkiniElectronApi.channels.arkpackList),
+		read: (packageId) => ipcRenderer.invoke(ArkiniElectronApi.channels.arkpackRead, packageId),
+		install: (record) => ipcRenderer.invoke(ArkiniElectronApi.channels.arkpackInstall, record),
 		remove: (packageId) =>
-			ipcRenderer.invoke(ArkiniDesktopApi.channels.arkpackRemove, packageId),
+			ipcRenderer.invoke(ArkiniElectronApi.channels.arkpackRemove, packageId),
 	},
 	save: {
-		read: (key) => ipcRenderer.invoke(ArkiniDesktopApi.channels.saveRead, key),
-		write: (key, bytes) => ipcRenderer.invoke(ArkiniDesktopApi.channels.saveWrite, key, bytes),
-		clear: (key) => ipcRenderer.invoke(ArkiniDesktopApi.channels.saveClear, key),
+		read: (key) => ipcRenderer.invoke(ArkiniElectronApi.channels.saveRead, key),
+		write: (key, bytes) => ipcRenderer.invoke(ArkiniElectronApi.channels.saveWrite, key, bytes),
+		clear: (key) => ipcRenderer.invoke(ArkiniElectronApi.channels.saveClear, key),
 	},
 	lifecycle: {
 		waitUntilVisible: () => visiblePromise,
@@ -100,10 +100,10 @@ const api: ArkiniDesktopApi.Api = {
 				resolve: resolveRequest,
 				reject: rejectRequest,
 			};
-			ipcRenderer.send(ArkiniDesktopApi.channels.requestClose);
+			ipcRenderer.send(ArkiniElectronApi.channels.requestClose);
 			return promise;
 		},
-		forceClose: () => ipcRenderer.send(ArkiniDesktopApi.channels.forceClose),
+		forceClose: () => ipcRenderer.send(ArkiniElectronApi.channels.forceClose),
 	},
 };
 

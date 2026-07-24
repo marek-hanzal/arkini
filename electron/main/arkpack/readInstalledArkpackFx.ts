@@ -1,7 +1,7 @@
 import { FileSystem } from "@effect/platform";
 import { Effect } from "effect";
 import { join } from "node:path";
-import type { ArkiniDesktopApi } from "../../../desktop/ArkiniDesktopApi";
+import type { ArkiniElectronApi } from "../../contract/ArkiniElectronApi";
 import { assertImportedArkpackPackageIdFx } from "./assertImportedArkpackPackageIdFx";
 import { parseInstalledArkpackDescriptorFx } from "./parseInstalledArkpackDescriptorFx";
 
@@ -48,5 +48,5 @@ export const readInstalledArkpackFx = Effect.fn("readInstalledArkpackFx")(functi
 	return {
 		descriptor,
 		bytes: Uint8Array.from(bytes),
-	} satisfies ArkiniDesktopApi.ArkpackRecord;
+	} satisfies ArkiniElectronApi.ArkpackRecord;
 });

@@ -1,3 +1,3 @@
-import type { AppearanceAccentSchema } from "../../../desktop/appearance/AppearanceAccentSchema";
+import type { AppearanceAccentSchema } from "../../../electron/contract/appearance/AppearanceAccentSchema";
 
 export type AppearanceAccent = AppearanceAccentSchema.Type;

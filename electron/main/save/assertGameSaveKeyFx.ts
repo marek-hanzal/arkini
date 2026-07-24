@@ -1,12 +1,12 @@
 import { Effect } from "effect";
-import type { ArkiniDesktopApi } from "../../../desktop/ArkiniDesktopApi";
+import type { ArkiniElectronApi } from "../../contract/ArkiniElectronApi";
 
 const hashPattern = /^[a-f0-9]{64}$/;
 const packagePattern = /^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$/;
 
 /** Validates one exact package/hash save identity before filesystem use. */
 export const assertGameSaveKeyFx = Effect.fn("assertGameSaveKeyFx")(
-	(key: ArkiniDesktopApi.SaveKey) =>
+	(key: ArkiniElectronApi.SaveKey) =>
 		packagePattern.test(key.packageId) && hashPattern.test(key.contentHash)
 			? Effect.succeed(key)
 			: Effect.fail(new Error("Invalid Arkini save identity.")),

@@ -1,5 +1,5 @@
 import type { Effect } from "effect";
-import type { LastPackageIdSchema } from "../../../desktop/launcher/LastPackageIdSchema";
+import type { LastPackageIdSchema } from "../../contract/launcher/LastPackageIdSchema";
 
 /** Effect-native main-process capability for application-wide launcher preferences. */
 export interface LauncherPreferences {

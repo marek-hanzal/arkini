@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import { CheatAvailabilitySchema } from "../../../desktop/cheat/CheatAvailabilitySchema";
+import { CheatAvailabilitySchema } from "../../../electron/contract/cheat/CheatAvailabilitySchema";
 
 /** Persists one application-wide cheat-tool availability value. */
 export const writeCheatAvailabilityFx = Effect.fn("writeCheatAvailabilityFx")(

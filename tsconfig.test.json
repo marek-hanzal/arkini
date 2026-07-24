@@ -11,7 +11,7 @@
 		}
 	},
 	"include": [
-		"desktop",
+		"electron/contract",
 		"src/engine",
 		"src/bridge",
 		"src/ui",

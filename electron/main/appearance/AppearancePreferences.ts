@@ -1,6 +1,6 @@
 import type { Effect } from "effect";
-import type { AppearanceAccentSchema } from "../../../desktop/appearance/AppearanceAccentSchema";
-import type { AppearanceThemeSchema } from "../../../desktop/appearance/AppearanceThemeSchema";
+import type { AppearanceAccentSchema } from "../../contract/appearance/AppearanceAccentSchema";
+import type { AppearanceThemeSchema } from "../../contract/appearance/AppearanceThemeSchema";
 
 /** Effect-native main-process capability for Arkini appearance preferences. */
 export interface AppearancePreferences {

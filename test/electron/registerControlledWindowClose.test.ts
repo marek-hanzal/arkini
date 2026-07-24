@@ -1,7 +1,7 @@
 import type { BrowserWindow, IpcMain, IpcMainEvent, WebFrameMain } from "electron";
 import { Effect } from "effect";
 import { describe, expect, it, vi } from "vitest";
-import { ArkiniDesktopApi } from "../../desktop/ArkiniDesktopApi";
+import { ArkiniElectronApi } from "../../electron/contract/ArkiniElectronApi";
 import { registerControlledWindowCloseFx } from "../../electron/main/registerControlledWindowCloseFx";
 import type { TrustedRenderer } from "../../electron/main/security/TrustedRenderer";
 
@@ -105,10 +105,10 @@ describe("registerControlledWindowCloseFx", () => {
 		const preventDefault = harness.requestClose();
 
 		expect(preventDefault).toHaveBeenCalledOnce();
-		expect(harness.send).toHaveBeenCalledWith(ArkiniDesktopApi.channels.beforeClose);
+		expect(harness.send).toHaveBeenCalledWith(ArkiniElectronApi.channels.beforeClose);
 		expect(harness.close).not.toHaveBeenCalled();
 
-		harness.emitIpc(ArkiniDesktopApi.channels.closeReady);
+		harness.emitIpc(ArkiniElectronApi.channels.closeReady);
 		expect(harness.close).toHaveBeenCalledOnce();
 		const recursiveClose = harness.requestClose();
 		expect(recursiveClose).not.toHaveBeenCalled();
@@ -118,7 +118,7 @@ describe("registerControlledWindowCloseFx", () => {
 		const consoleError = vi.spyOn(console, "error").mockImplementation(() => undefined);
 		const harness = createHarness();
 		harness.requestClose();
-		harness.emitIpc(ArkiniDesktopApi.channels.closeFailed, "disk full");
+		harness.emitIpc(ArkiniElectronApi.channels.closeFailed, "disk full");
 
 		expect(harness.close).not.toHaveBeenCalled();
 		expect(consoleError).toHaveBeenCalledWith(
@@ -128,25 +128,25 @@ describe("registerControlledWindowCloseFx", () => {
 
 		harness.requestClose();
 		expect(harness.send).toHaveBeenCalledTimes(2);
-		harness.emitIpc(ArkiniDesktopApi.channels.closeReady);
+		harness.emitIpc(ArkiniElectronApi.channels.closeReady);
 		expect(harness.close).toHaveBeenCalledOnce();
 	});
 	it("routes an explicit renderer retry through the same guarded close handshake", () => {
 		const harness = createHarness();
-		harness.emitIpc(ArkiniDesktopApi.channels.requestClose);
+		harness.emitIpc(ArkiniElectronApi.channels.requestClose);
 		expect(harness.close).toHaveBeenCalledOnce();
 
 		const preventDefault = harness.requestClose();
 		expect(preventDefault).toHaveBeenCalledOnce();
-		expect(harness.send).toHaveBeenCalledWith(ArkiniDesktopApi.channels.beforeClose);
+		expect(harness.send).toHaveBeenCalledWith(ArkiniElectronApi.channels.beforeClose);
 	});
 
 	it("allows an explicit force-close decision without another save acknowledgement", () => {
 		const harness = createHarness();
 		harness.requestClose();
-		harness.emitIpc(ArkiniDesktopApi.channels.closeFailed, "disk full");
+		harness.emitIpc(ArkiniElectronApi.channels.closeFailed, "disk full");
 
-		harness.emitIpc(ArkiniDesktopApi.channels.forceClose);
+		harness.emitIpc(ArkiniElectronApi.channels.forceClose);
 		expect(harness.close).toHaveBeenCalledOnce();
 		const preventDefault = harness.requestClose();
 		expect(preventDefault).not.toHaveBeenCalled();
@@ -156,9 +156,9 @@ describe("registerControlledWindowCloseFx", () => {
 		const harness = createHarness();
 		harness.setMainFrameUrl("https://example.com/");
 
-		harness.emitIpc(ArkiniDesktopApi.channels.requestClose);
-		harness.emitIpc(ArkiniDesktopApi.channels.forceClose);
-		harness.emitIpc(ArkiniDesktopApi.channels.closeReady);
+		harness.emitIpc(ArkiniElectronApi.channels.requestClose);
+		harness.emitIpc(ArkiniElectronApi.channels.forceClose);
+		harness.emitIpc(ArkiniElectronApi.channels.closeReady);
 
 		expect(harness.close).not.toHaveBeenCalled();
 	});

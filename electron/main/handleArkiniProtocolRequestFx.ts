@@ -1,7 +1,7 @@
 import { net } from "electron";
 import { pathToFileURL } from "node:url";
 import { Effect } from "effect";
-import { RendererContentSecurityPolicy } from "../../desktop/security/RendererContentSecurityPolicy";
+import { RendererContentSecurityPolicy } from "../security/RendererContentSecurityPolicy";
 import { ArkiniProtocolError } from "../protocol/ArkiniProtocolError";
 import { readArkiniProtocolFilePathFx } from "../protocol/readArkiniProtocolFilePathFx";
 

@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 import { describe, expect, it, vi } from "vitest";
-import { ArkiniDesktopApi } from "../../desktop/ArkiniDesktopApi";
+import { ArkiniElectronApi } from "../../electron/contract/ArkiniElectronApi";
 import { showMainWindowFx } from "../../electron/main/showMainWindowFx";
 
 describe("showMainWindowFx", () => {
@@ -19,7 +19,7 @@ describe("showMainWindowFx", () => {
 
 		expect(order).toEqual([
 			"show",
-			ArkiniDesktopApi.channels.windowVisible,
+			ArkiniElectronApi.channels.windowVisible,
 		]);
 	});
 });

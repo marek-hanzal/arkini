@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import type { LastPackageIdSchema } from "../../../desktop/launcher/LastPackageIdSchema";
+import type { LastPackageIdSchema } from "../../../electron/contract/launcher/LastPackageIdSchema";
 import { LastPackageIdError } from "~/bridge/launcher/LastPackageIdError";
 
 /** Persists one successfully bootstrapped Game package for the next launcher session. */

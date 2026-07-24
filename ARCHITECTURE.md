@@ -2,11 +2,11 @@
 
 This document is the canonical technical architecture. It describes the implemented engine, not an aspirational rewrite.
 
-Engine paths are relative to `src/engine` unless written explicitly. `src/bridge` is the only legal connection from React to public engine contracts and mirrors concrete domains as `bridge/<domain>/<operation>`. Reusable presentation and transient interaction code lives under `src/ui`; route-level visual composition lives under `src/page`; TanStack Router registration and route lifecycle orchestration live under `src/@routes`. Renderer dependencies form the DAG `@routes → {page, ui, bridge}`, `page → ui`, `ui → bridge`, and `bridge → engine`; routes may call public bridge Effects but never import the engine directly. `electron/` owns only Electron main/preload/protocol concerns and may not import renderer or engine roots. The renderer may not import Electron.
+Engine paths are relative to `src/engine` unless written explicitly. `src/bridge` is the only legal connection from React to public engine contracts and mirrors concrete domains as `bridge/<domain>/<operation>`. Reusable presentation and transient interaction code lives under `src/ui`; route-level visual composition lives under `src/page`; TanStack Router registration and route lifecycle orchestration live under `src/@routes`. Renderer dependencies form the DAG `@routes → {page, ui, bridge}`, `page → ui`, `ui → bridge`, and `bridge → engine`; routes may call public bridge Effects but never import the engine directly. `electron/` owns the complete Electron platform: its pure transport contract, security policy, main/preload adapters, protocol, and build verification. Renderer bridge domains may import `electron/contract`; no renderer code imports Electron runtime modules or the Electron package.
 
 Enforcement is deliberately split by contract: Dependency Cruiser owns stable import boundaries; focused tests own runtime, lifecycle, security, persistence, UI, compiler, CLI, and packaging behavior; generated-output tests inspect real renderer/release artifacts; TypeScript and Zod own type/schema validity. Project grammar such as same-name `*Fx`, object + factory composition, one `IdSchema`, and semantic token usage lives in `CODE_GUIDE.md` plus review. The repository does not maintain source-text recurrence tests or a custom AST style policy system.
 
-## 0. Desktop host boundary
+## 0. Electron host boundary
 
 Electron is a thin sibling platform adapter, not another application or another game owner.
 
@@ -28,7 +28,10 @@ project CLI process
 `RendererRuntime` is retained through `import.meta.hot.data`, so Vite HMR reuses the same process root instead of creating another runtime island. Each live `Game` owns exactly one child session `ManagedRuntime` containing its engine services, Scope, Tick Fibers, subscriptions, and command runtime. Active source may re-enter these declared roots, but may not call direct `Effect.run*` helpers or create additional `ManagedRuntime` instances. Runtime behavior is protected by focused lifecycle tests; the same-named `*Fx` grammar is maintained through `CODE_GUIDE.md` and review rather than source-text policy tests.
 
 ```text
-electron/main + electron/preload
+electron/contract ← src/bridge
+→ the only pure cross-process transport seam
+
+electron/main + electron/preload + electron/security
 → BrowserWindow, custom protocol, controlled close, typed Arkpack/save filesystem capabilities
 
 src/@routes → src/page / src/ui / src/bridge → src/engine
@@ -58,7 +61,7 @@ Packaged protocol responses set the production Content Security Policy. Developm
 
 Every production desktop build explicitly composes `packOfficialGameFx → buildDesktopOutputFx`; the generated official Arkpack is therefore available before Vite imports it, even in a fresh checkout. Local packaged preview composes clean → build once → stage → `electron-builder --dir` → launch the exact `release/mac-arm64/Arkini.app`. Release delivery composes clean → build once → stage → invoke `electron-builder` once for DMG/ZIP → stream SHA-256 values once → verify artifact and unpacked-app structure. The standalone verify command deliberately re-streams artifacts because it validates downloads or later changes; the combined package operation never rehashes files it just hashed. CI runs format, type, and source-validation gates before this same package command, then runs Dependency Cruiser and permanent tests against the generated package inputs. Fresh checkouts never require stale ignored output, and no top-level build, preview, or package operation packs the official game more than once.
 
-Main/preload do not own game state, package semantics, save codec semantics, or Tick. Renderer domains do not import Electron or Node platform APIs. The shared `desktop/ArkiniDesktopApi.ts` contract exposes only concrete Arkpack bytes/metadata, opaque save bytes, theme/accent preferences, and controlled-close signals. Physical paths are derived exclusively in Electron main; the renderer cannot request arbitrary filesystem access.
+Main/preload do not own game state, package semantics, save codec semantics, or Tick. Renderer domains do not import Electron or Node platform APIs. The shared `electron/contract/ArkiniElectronApi.ts` contract exposes only concrete Arkpack bytes/metadata, opaque save bytes, theme/accent preferences, and controlled-close signals. Physical paths are derived exclusively in Electron main; the renderer cannot request arbitrary filesystem access.
 
 ## 1. Core model
 

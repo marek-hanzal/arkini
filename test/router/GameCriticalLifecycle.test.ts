@@ -9,7 +9,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { routeTree } from "~/_route";
 import { createCheatAvailability } from "~/bridge/cheat/createCheatAvailability";
-import type { ArkiniDesktopApi } from "../../desktop/ArkiniDesktopApi";
+import type { ArkiniElectronApi } from "../../electron/contract/ArkiniElectronApi";
 import { CriticalGameLifecycleError } from "~/bridge/game/CriticalGameLifecycleError";
 import type { Game } from "~/bridge/game/Game";
 import { createGameEngineResourceFx } from "~/bridge/game/createGameEngineResourceFx";
@@ -84,7 +84,7 @@ const createGame = ({
 	subscribeEvents: () => () => undefined,
 });
 
-const installDesktopApi = (clear: () => Promise<void> = () => Promise.resolve()) => {
+const installElectronApi = (clear: () => Promise<void> = () => Promise.resolve()) => {
 	const forceClose = vi.fn();
 	Object.defineProperty(window, "arkini", {
 		configurable: true,
@@ -97,7 +97,7 @@ const installDesktopApi = (clear: () => Promise<void> = () => Promise.resolve())
 			lifecycle: {
 				forceClose,
 			},
-		} as unknown as ArkiniDesktopApi.Api,
+		} as unknown as ArkiniElectronApi.Api,
 	});
 	return forceClose;
 };
@@ -161,7 +161,7 @@ beforeEach(() => {
 	vi.useFakeTimers();
 	vi.spyOn(console, "error").mockImplementation(() => undefined);
 	vi.spyOn(console, "warn").mockImplementation(() => undefined);
-	installDesktopApi();
+	installElectronApi();
 });
 
 afterEach(async () => {
@@ -221,7 +221,7 @@ describe("critical Game route lifecycle", () => {
 	});
 
 	it("ends the renderer when reset clears the spent Game but cannot clear its exact save", async () => {
-		installDesktopApi(() => Promise.reject(new Error("clear failed")));
+		installElectronApi(() => Promise.reject(new Error("clear failed")));
 		const discard = vi.fn();
 		const { resource, router } = createHarness({
 			initialPath: `/game/${packageId}/action/reset`,
@@ -252,7 +252,7 @@ describe("critical Game route lifecycle", () => {
 	});
 
 	it("uses the trusted force-close action without exposing in-process recovery", async () => {
-		const forceClose = installDesktopApi();
+		const forceClose = installElectronApi();
 		const { router } = createHarness({
 			initialPath: "/main-menu",
 			previousGameShutdown: Promise.reject(new Error("fatal")),

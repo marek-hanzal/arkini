@@ -1,7 +1,7 @@
 import { FileSystem } from "@effect/platform";
 import { Effect } from "effect";
 import { join } from "node:path";
-import { LastPackageIdSchema } from "../../../desktop/launcher/LastPackageIdSchema";
+import { LastPackageIdSchema } from "../../contract/launcher/LastPackageIdSchema";
 import { ElectronMainError } from "../ElectronMainError";
 
 export namespace writeLastPackageIdFx {

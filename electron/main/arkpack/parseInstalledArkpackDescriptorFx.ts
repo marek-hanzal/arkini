@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import type { ArkiniDesktopApi } from "../../../desktop/ArkiniDesktopApi";
+import type { ArkiniElectronApi } from "../../contract/ArkiniElectronApi";
 import { assertImportedArkpackPackageIdFx } from "./assertImportedArkpackPackageIdFx";
 import { parseArkpackTrustFx } from "./parseArkpackTrustFx";
 
@@ -16,7 +16,7 @@ export const parseInstalledArkpackDescriptorFx = Effect.fn("parseInstalledArkpac
 		if (typeof value !== "object" || value === null) {
 			return yield* Effect.fail(new Error("Invalid Arkpack metadata."));
 		}
-		const descriptor = value as Partial<ArkiniDesktopApi.ArkpackDescriptor>;
+		const descriptor = value as Partial<ArkiniElectronApi.ArkpackDescriptor>;
 		const trust = yield* parseArkpackTrustFx({
 			value: descriptor.trust,
 		});
@@ -40,6 +40,6 @@ export const parseInstalledArkpackDescriptorFx = Effect.fn("parseInstalledArkpac
 				type: "external",
 				reason: "unsigned",
 			},
-		} as ArkiniDesktopApi.ArkpackDescriptor;
+		} as ArkiniElectronApi.ArkpackDescriptor;
 	},
 );

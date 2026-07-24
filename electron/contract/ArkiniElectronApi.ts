@@ -3,7 +3,7 @@ import type { AppearanceThemeSchema } from "./appearance/AppearanceThemeSchema";
 import type { CheatAvailabilitySchema } from "./cheat/CheatAvailabilitySchema";
 import type { LastPackageIdSchema } from "./launcher/LastPackageIdSchema";
 
-export namespace ArkiniDesktopApi {
+export namespace ArkiniElectronApi {
 	export const channels = {
 		arkpackList: "arkini:arkpack:list",
 		arkpackRead: "arkini:arkpack:read",
@@ -103,6 +103,6 @@ export namespace ArkiniDesktopApi {
 
 declare global {
 	interface Window {
-		readonly arkini: ArkiniDesktopApi.Api;
+		readonly arkini: ArkiniElectronApi.Api;
 	}
 }

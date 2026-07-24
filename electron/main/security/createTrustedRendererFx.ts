@@ -12,7 +12,7 @@ import { Effect } from "effect";
 import {
 	parseRendererDevelopmentUrl,
 	RendererDevelopmentServer,
-} from "../../../desktop/security/RendererDevelopmentUrl";
+} from "../../security/RendererDevelopmentUrl";
 import { ElectronMainError } from "../ElectronMainError";
 import type { TrustedRenderer } from "./TrustedRenderer";
 

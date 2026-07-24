@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 import { match, P } from "ts-pattern";
-import type { ArkiniDesktopApi } from "../../../desktop/ArkiniDesktopApi";
+import type { ArkiniElectronApi } from "../../contract/ArkiniElectronApi";
 
 export namespace parseArkpackTrustFx {
 	export interface Props {
@@ -67,7 +67,7 @@ export const parseArkpackTrustFx = Effect.fn("parseArkpackTrustFx")(
 						}) as const,
 				)
 				.otherwise(() => undefined) satisfies
-				| ArkiniDesktopApi.ArkpackDescriptor["trust"]
+				| ArkiniElectronApi.ArkpackDescriptor["trust"]
 				| undefined,
 		),
 );

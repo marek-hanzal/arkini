@@ -3,7 +3,7 @@ import { fileURLToPath } from "node:url";
 import { Effect } from "effect";
 import { createMainWindowFx } from "./createMainWindowFx";
 import { ElectronMainRuntime } from "./ElectronMainRuntime";
-import { registerArkiniDesktopIpcFx } from "./registerArkiniDesktopIpcFx";
+import { registerArkiniElectronIpcFx } from "./registerArkiniElectronIpcFx";
 import { registerArkiniProtocolFx } from "./registerArkiniProtocolFx";
 import { registerWindowLifecycleFx } from "./registerWindowLifecycleFx";
 import { createFilesystemAppearancePreferencesFx } from "./appearance/createFilesystemAppearancePreferencesFx";
@@ -49,7 +49,7 @@ export const electronMainFx = Effect.fn("electronMainFx")(function* () {
 		developmentRendererUrl: process.env.ELECTRON_RENDERER_URL,
 	});
 	yield* registerArkiniProtocolFx(rendererRoot);
-	yield* registerArkiniDesktopIpcFx({
+	yield* registerArkiniElectronIpcFx({
 		trustedRenderer,
 		appearancePreferences,
 		cheatPreferences,

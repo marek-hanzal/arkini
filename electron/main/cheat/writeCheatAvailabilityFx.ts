@@ -1,7 +1,7 @@
 import { FileSystem } from "@effect/platform";
 import { Effect } from "effect";
 import { join } from "node:path";
-import { CheatAvailabilitySchema } from "../../../desktop/cheat/CheatAvailabilitySchema";
+import { CheatAvailabilitySchema } from "../../contract/cheat/CheatAvailabilitySchema";
 import { ElectronMainError } from "../ElectronMainError";
 
 export namespace writeCheatAvailabilityFx {

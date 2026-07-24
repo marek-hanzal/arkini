@@ -52,11 +52,11 @@ export const applyInputMaterialConsumeRunPlanFx = Effect.fn("applyInputMaterialC
 	}: applyInputMaterialConsumeRunPlanFx.Props) {
 		return yield* Effect.reduce(
 			plan.item,
-			{
+			() => ({
 				consumption: [] as applyInputMaterialConsumeRunPlanFx.Consumption[],
 				events: [] as GameEventSchema.Type[],
 				runtime,
-			},
+			}),
 			(state, allocation) =>
 				Effect.gen(function* () {
 					const item = yield* readInputRunItemFx({

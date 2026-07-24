@@ -34,7 +34,7 @@ describe("Arkini save codec", () => {
 		} as unknown as StateSchema.Type;
 
 		expect(() =>
-			Effect.runSync(Effect.either(encodeArkiniSaveFx(invalidCanonicalState))),
+			Effect.runSync(Effect.result(encodeArkiniSaveFx(invalidCanonicalState))),
 		).toThrow();
 	});
 
@@ -58,7 +58,7 @@ describe("Arkini save codec", () => {
 		},
 	])("rejects unsupported or malformed envelopes", async (value) => {
 		const result = await Effect.runPromise(
-			Effect.either(
+			Effect.result(
 				decodeArkiniSaveFx(
 					encode(value, {
 						ignoreUndefined: true,
@@ -67,8 +67,8 @@ describe("Arkini save codec", () => {
 			),
 		);
 		expect(result).toMatchObject({
-			_tag: "Left",
-			left: {
+			_tag: "Failure",
+			failure: {
 				_tag: "ArkiniSaveDecodeError",
 			},
 		});

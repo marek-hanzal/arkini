@@ -25,7 +25,7 @@ export const selectDropWeightFx = Effect.fn("selectDropWeightFx")(function* ({
 			},
 		] as const;
 	});
-	const selectedWeight = yield* Random.nextRange(0, totalWeight);
+	const selectedWeight = yield* Random.nextBetween(0, totalWeight);
 
 	return pipe(
 		weightedDrop,

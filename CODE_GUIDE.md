@@ -92,51 +92,47 @@ Arkini-owned reusable capabilities use readonly objects created by explicit Effe
 
 External and framework constructors remain valid where their API requires them. Effect declaration forms such as `Data.TaggedError`, `Context.Tag`, and framework-owned classes are not project composition abstractions. Do not mechanically replace constructor injection with Layers or generic services unless a real scoped capability exists.
 
-### TanStack asynchronous boundaries
+### Asynchronous UI and Game lifecycle boundaries
 
-TanStack Query may own the transient lifecycle of asynchronous UI commands and the stable identity/lifetime of the renderer-wide singleton live Game resource. It never owns canonical gameplay state, runtime reads, persistence truth, catalog truth, or domain lifecycle semantics.
-
-The live Game resource is the narrow exception to ordinary mutation-only use:
+React never owns canonical gameplay state, runtime reads, persistence truth, catalog truth, or domain lifecycle semantics. React-visible asynchronous commands use feature-owned Effect Atoms. A standalone operation may expose its `Atom.fn` `AsyncResult` directly. A surface that must synchronously exclude sibling commands or survive an allowed React remount exposes one domain-specific writable command Atom backed by a private `Atom.fn` runner and one tagged state; React must not reconstruct that ownership with refs, local booleans, or result-identity effects. The renderer-wide live Game is owned by one scoped Effect service in `RendererRuntime`:
 
 ```text
-gameEngineQueryOptions(packageId)
-→ one canonical Query key ["game-engine"] for the renderer
-→ packageId is creation data, never cache identity
-→ queryFn is the sole Game creation boundary
-→ infinite stale/GC time, retry disabled, structural sharing disabled
+GameEngineResourceFx
+→ one explicit renderer-process state machine
+→ one lifecycle semaphore
+→ scoped acquisition leases
+→ exact adoption, replacement, release, reset and failed-save recovery
 
 /action/load-game/$packageId loader
-→ ensureQueryData(...)
-→ register the pending singleton before transition-delayed bootstrap starts
+→ acquire a scoped lease
+→ keep provisional ownership through the complete action hold
+→ adopt that exact lease before its Scope closes
 
 /game/$packageId beforeLoad
-→ read the exact published singleton
+→ read the exact adopted resource
 → expose the exact Game/resource through inherited route context
 
-/game/$packageId loader
-→ expose the same Game to React
-
 useGameEngine
-→ typed useLoaderData adapter
-→ never useQuery for gameplay
+→ typed inherited-route-context adapter
+→ never create or mirror gameplay state
+
+PlayableGameRoute
+→ mount GameAudio and CheatItemSpawnProvider only for Board/Cheats pages
+→ never mount gameplay observers around leave/reset/exit action routes
 ```
 
-Query owns object identity and same-key single-flight only. `GameSession` remains the canonical runtime/save owner, and explicit named route operations dispose/reset the resource and remove the singleton entry only when it still contains that exact resource. Controlled close and HMR join a pending singleton creation instead of treating an unpublished engine as absent. Do not invalidate broad Query prefixes as a lifecycle command, add observers merely to keep the engine alive, or allow UI components to create/reload the Game.
+`GameEngineResourceFx` owns renderer-wide object identity and same-package single-flight only. `GameSession` remains the canonical runtime/save owner. Explicit named route operations release or reset the exact adopted resource, while native controlled close atomically claims pending acquisition and joins any terminal operation already finalizing that resource. Acquisition, destructive cleanup, save recovery, and service shutdown continue under the service Scope even if an individual route caller is interrupted. Application state is not handed off or preserved across HMR. Do not add React providers, component effects, cache entries, WeakMaps, module locals, or UI observers as competing Game lifecycle owners, and never allow UI components to create/reload the Game.
 
 Ordinary asynchronous UI commands stay standalone in their owning UI domain:
 
 ```text
-saveGameMutationOptions
-→ complete stable mutation key
-→ direct connection to the native Game Fx
-→ retry/meta/error configuration
-
-useSaveGameMutation
-→ obtain only the required route capability
-→ useMutation(saveGameMutationOptions(...))
+saveGameAtom(exact Game)
+→ Atom.fn command
+→ game.runFx(RuntimeSaveFx.flush)
+→ AsyncResult consumed by the owning UI
 ```
 
-Blocking lifecycle commands are not mutations mounted in UI. They are explicit `action/*` leaf route loaders that consume inherited TanStack Router context; their pending/error pages only render presentation. Do not create a central mutation-key object, mutation registry, generic mutation factory, callback-injection adapter, lifecycle mutation manager, or project-specific wrappers around `useIsMutating` / `useMutationState`. Keep navigation, menu visibility, and other caller-specific success behavior at the composition site unless the route itself is the lifecycle boundary.
+`Atom.fn` owns Effect execution, cancellation, typed failures, defects, and interruption. A writable command authority may project that runner into one tagged domain state, but the runner's `AsyncResult`, a React ref, and a local action owner may not become additional public truths. Registry-owned authorities use keep-alive only when their command must survive React remounts; Game-bound commands remain subscription-scoped so leaving the owning screen interrupts them. Blocking lifecycle commands are not component-mounted Atoms. They are explicit `action/*` leaf route loaders that consume inherited TanStack Router context; their pending/error pages only render presentation. Do not create a central command-key object, generic command factory, callback-injection adapter, lifecycle command manager, or project-specific wrappers around Atom hooks. Keep navigation, menu visibility, and other caller-specific success behavior at the composition site unless the route itself is the lifecycle boundary.
 
 ### Enforcement strategy
 

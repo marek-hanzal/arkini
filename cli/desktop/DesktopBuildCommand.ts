@@ -1,4 +1,4 @@
-import { Command } from "@effect/cli";
+import { Command } from "effect/unstable/cli";
 import { buildDesktopFx } from "./buildDesktopFx";
 
 export const DesktopBuildCommand = Command.make("build", {}, () => buildDesktopFx()).pipe(

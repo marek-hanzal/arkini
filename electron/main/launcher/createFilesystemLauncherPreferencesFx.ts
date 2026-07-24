@@ -1,9 +1,9 @@
-import { FileSystem } from "@effect/platform";
+import { FileSystem } from "effect";
 import { Effect } from "effect";
 import { join } from "node:path";
 import type { LauncherPreferences } from "./LauncherPreferences";
 import { readLastPackageIdFx } from "./readLastPackageIdFx";
-import { writeLastPackageIdFx } from "./writeLastPackageIdFx";
+import { writeLastPackageIdFx as writeLastPackageIdFileFx } from "./writeLastPackageIdFx";
 
 export namespace createFilesystemLauncherPreferencesFx {
 	export interface Props {
@@ -21,16 +21,20 @@ export const createFilesystemLauncherPreferencesFx = Effect.fn(
 }: createFilesystemLauncherPreferencesFx.Props) {
 	const fileSystem = providedFileSystem ?? (yield* FileSystem.FileSystem);
 	const root = join(userDataPath, "arkini", "preferences");
+	const writeLastPackageIdFx: LauncherPreferences["writeLastPackageIdFx"] = Effect.fn(
+		"FilesystemLauncherPreferences.writeLastPackageIdFx",
+	)((packageId) =>
+		writeLastPackageIdFileFx({
+			root,
+			fileSystem,
+			packageId,
+		}),
+	);
 	return {
 		readLastPackageIdFx: readLastPackageIdFx({
 			root,
 			fileSystem,
 		}),
-		writeLastPackageIdFx: (packageId) =>
-			writeLastPackageIdFx({
-				root,
-				fileSystem,
-				packageId,
-			}),
+		writeLastPackageIdFx,
 	} satisfies LauncherPreferences;
 });

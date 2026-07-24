@@ -1,6 +1,5 @@
 // @vitest-environment jsdom
 
-import { QueryClient } from "@tanstack/react-query";
 import { createMemoryHistory, createRouter, RouterProvider } from "@tanstack/react-router";
 import { Effect } from "effect";
 import { act, createElement } from "react";
@@ -8,14 +7,16 @@ import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { routeTree } from "~/_route";
-import { createCheatAvailability } from "~/bridge/cheat/createCheatAvailability";
+import { CriticalGameLifecycleError } from "~/bridge/game/CriticalGameLifecycleError";
 import type { Game } from "~/bridge/game/Game";
 import { createGameEngineResourceFx } from "~/bridge/game/createGameEngineResourceFx";
-import { gameEngineQueryKey } from "~/bridge/game/gameEngineQueryKey";
-import { getCachedGameEngineResourceFx } from "~/bridge/game/getCachedGameEngineResourceFx";
-import type { LauncherStartup } from "~/ui/launcher/LauncherStartup";
+import { readCurrentGameEngineResourceFx } from "~/bridge/game/readCurrentGameEngineResourceFx";
 import { testArkpackConfig } from "~test/bridge/arkpack/support/createTestArkpack";
-import { createTestGameTransitionFields } from "~test/support/game/createTestGameTransitionFields";
+import { makeTestGameTransitionFieldsFx } from "~test/support/game/makeTestGameTransitionFieldsFx";
+import {
+	adoptTestGameEngineResourceFx,
+	createTestRendererRuntime,
+} from "~test/support/createTestRendererRuntime";
 import { testGameRead } from "~test/support/game/testGameRead";
 
 (
@@ -26,9 +27,7 @@ import { testGameRead } from "~test/support/game/testGameRead";
 
 const packageId = "package-exit";
 const roots: Array<ReturnType<typeof createRoot>> = [];
-
-const getCachedGameEngineResource = (queryClient: QueryClient) =>
-	Effect.runSync(getCachedGameEngineResourceFx(queryClient));
+const runtimes: Array<ReturnType<typeof createTestRendererRuntime>["rendererRuntime"]> = [];
 
 const deferred = () => {
 	let resolve!: () => void;
@@ -40,23 +39,6 @@ const deferred = () => {
 		resolve,
 	};
 };
-
-const createStartup = (): LauncherStartup => ({
-	getHeroUrl: () => "/hero.png",
-	getSnapshot: () => ({
-		type: "ready",
-		appearanceReady: true,
-		builtInPackageId: packageId,
-		heroReady: true,
-		splashCompleted: true,
-	}),
-	consumeHydrationFx: () => Effect.succeed(false),
-	startFx: Effect.void,
-	retryFx: Effect.void,
-	completeSplashFx: Effect.void,
-	disposeFx: Effect.void,
-	subscribe: () => () => undefined,
-});
 
 const createGame = (disposeFx: Game["disposeFx"]): Game => ({
 	arkpack: {
@@ -77,7 +59,7 @@ const createGame = (disposeFx: Game["disposeFx"]): Game => ({
 	disposeWithoutSaveFx: Effect.void,
 	flushSaveFx: Effect.void,
 	getResourceUrl: () => "blob:test",
-	...createTestGameTransitionFields(() => ({}) as ReturnType<Game["getSnapshot"]>),
+	...Effect.runSync(makeTestGameTransitionFieldsFx({} as ReturnType<Game["getSnapshot"]>)),
 	read: testGameRead,
 	run: (() => Promise.reject(new Error("Not used by this test."))) as Game["run"],
 	saveKey: {
@@ -88,18 +70,23 @@ const createGame = (disposeFx: Game["disposeFx"]): Game => ({
 	subscribeEvents: () => () => undefined,
 });
 
-const createHarness = (game: Game) => {
-	const queryClient = new QueryClient();
-	const resource = Effect.runSync(createGameEngineResourceFx(game));
-	queryClient.setQueryData(gameEngineQueryKey, resource);
+const createHarness = async (game: Game) => {
+	const { rendererRuntime } = createTestRendererRuntime({
+		createResourceFx: () => createGameEngineResourceFx(game),
+	});
+	runtimes.push(rendererRuntime);
+	const usesFakeTimers = vi.isFakeTimers();
+	if (usesFakeTimers) vi.useRealTimers();
+	const resource = await rendererRuntime
+		.runPromise(adoptTestGameEngineResourceFx(packageId))
+		.finally(() => {
+			if (usesFakeTimers) vi.useFakeTimers();
+		});
 	const router = createRouter({
 		routeTree,
 		isServer: false,
 		context: {
-			cheatAvailability: createCheatAvailability(),
-			launcherStartup: createStartup(),
-			previousGameShutdown: Promise.resolve(),
-			queryClient,
+			rendererRuntime,
 		},
 		history: createMemoryHistory({
 			initialEntries: [
@@ -108,13 +95,13 @@ const createHarness = (game: Game) => {
 		}),
 	});
 	return {
-		queryClient,
+		rendererRuntime,
 		resource,
 		router,
 	};
 };
 
-const renderRouter = async (router: ReturnType<typeof createHarness>["router"]) => {
+const renderRouter = async (router: Awaited<ReturnType<typeof createHarness>>["router"]) => {
 	const container = document.createElement("div");
 	document.body.append(container);
 	const root = createRoot(container);
@@ -147,6 +134,7 @@ afterEach(async () => {
 		for (const root of roots.splice(0)) root.unmount();
 	});
 	vi.useRealTimers();
+	for (const runtime of runtimes.splice(0)) await runtime.dispose();
 	vi.restoreAllMocks();
 	document.body.replaceChildren();
 });
@@ -161,7 +149,7 @@ describe("game exit action route", () => {
 				await gate.promise;
 			}),
 		);
-		const { queryClient, router } = createHarness(game);
+		const { rendererRuntime, router } = await createHarness(game);
 		const loading = router.load();
 		const container = await renderRouter(router);
 
@@ -178,7 +166,7 @@ describe("game exit action route", () => {
 		});
 
 		expect(dispose).toHaveBeenCalledOnce();
-		expect(getCachedGameEngineResource(queryClient)).toBeNull();
+		expect(rendererRuntime.runSync(readCurrentGameEngineResourceFx())).toBeNull();
 		expect(router.state.location.pathname).toBe(`/game/${packageId}/action/exit`);
 		expect(progressValue(container)).toBe(100);
 		expect(container.querySelectorAll("button")).toHaveLength(0);
@@ -186,7 +174,9 @@ describe("game exit action route", () => {
 
 	it("logs failed finalization but still completes without recovery UI", async () => {
 		const failure = new Error("disk full");
-		const { queryClient, resource, router } = createHarness(createGame(Effect.fail(failure)));
+		const { rendererRuntime, resource, router } = await createHarness(
+			createGame(Effect.fail(failure)),
+		);
 		const loading = router.load();
 		const container = await renderRouter(router);
 
@@ -195,7 +185,7 @@ describe("game exit action route", () => {
 			await loading;
 		});
 
-		expect(getCachedGameEngineResource(queryClient)).toBe(resource);
+		expect(rendererRuntime.runSync(readCurrentGameEngineResourceFx())).toBe(resource);
 		expect(progressValue(container)).toBe(100);
 		expect(container.textContent).not.toContain("Retry");
 		expect(container.textContent).not.toContain("Force");
@@ -204,8 +194,11 @@ describe("game exit action route", () => {
 			"Arkini controlled close finalization failed; closing anyway.",
 		);
 		const loggedCause = vi.mocked(console.error).mock.calls[0]?.[1];
-		expect(loggedCause).toBeInstanceOf(Error);
-		expect((loggedCause as Error).message).toBe(failure.message);
+		expect(loggedCause).toBeInstanceOf(CriticalGameLifecycleError);
+		expect(loggedCause).toMatchObject({
+			operation: "game-leave",
+			cause: failure,
+		});
 	});
 
 	it("uses a retained fail-stop resource for the terminal close attempt", async () => {
@@ -217,9 +210,10 @@ describe("game exit action route", () => {
 				return disposeAttempts === 1 ? Effect.fail(firstFailure) : Effect.void;
 			}),
 		);
-		const { queryClient, resource, router } = createHarness(game);
+		const { rendererRuntime, resource, router } = await createHarness(game);
 		router.history.replace(`/game/${packageId}/action/leave?destination=main-menu`);
 		const leaving = router.load();
+		await vi.advanceTimersByTimeAsync(0);
 		await vi.advanceTimersByTimeAsync(2_500);
 		await leaving;
 		expect(() => resource.assertUsable()).toThrow();
@@ -232,11 +226,12 @@ describe("game exit action route", () => {
 			},
 			replace: true,
 		});
+		await vi.advanceTimersByTimeAsync(0);
 		await vi.advanceTimersByTimeAsync(2_500);
 		await exiting;
 
 		expect(disposeAttempts).toBe(2);
-		expect(getCachedGameEngineResource(queryClient)).toBeNull();
+		expect(rendererRuntime.runSync(readCurrentGameEngineResourceFx())).toBeNull();
 		expect(router.state.location.pathname).toBe(`/game/${packageId}/action/exit`);
 	});
 });

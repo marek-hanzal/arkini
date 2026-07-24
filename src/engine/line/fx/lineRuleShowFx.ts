@@ -19,12 +19,18 @@ export const lineRuleShowFx = Effect.fn("lineRuleShowFx")(function* ({
 	origin,
 	rule,
 }: lineRuleShowFx.Props) {
-	const active = yield* Effect.every(rule.when, (when) => {
-		return whenFx({
-			origin,
-			when,
-		});
-	});
+	let active = true;
+	for (const when of rule.when) {
+		if (
+			!(yield* whenFx({
+				origin,
+				when,
+			}))
+		) {
+			active = false;
+			break;
+		}
+	}
 
 	return {
 		active,

@@ -1,4 +1,4 @@
-import { Effect, Either } from "effect";
+import { Effect, Result } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~/engine/game/fx/useGameFx";
@@ -66,7 +66,7 @@ const runMergeFx = () =>
 		const source = before.items.find((item) => item.id === "runtime:source");
 		const target = before.items.find((item) => item.id === "runtime:target");
 		if (source === undefined || target === undefined) {
-			return yield* Effect.dieMessage("Expected merge participants.");
+			return yield* Effect.die(new Error("Expected merge participants."));
 		}
 		const event = yield* mergeItemsFx({
 			sourceItemId: source.id,
@@ -255,9 +255,9 @@ describe("mergeItemsFx", () => {
 					(item) => item.id === "runtime:source",
 				);
 				if (reverseSource === undefined || reverseTarget === undefined) {
-					return yield* Effect.dieMessage("Expected reverse participants.");
+					return yield* Effect.die(new Error("Expected reverse participants."));
 				}
-				const reverse = yield* Effect.either(
+				const reverse = yield* Effect.result(
 					mergeItemsFx({
 						sourceItemId: reverseSource.id,
 						sourceRevision: reverseSource.revision,
@@ -281,9 +281,9 @@ describe("mergeItemsFx", () => {
 		expect(
 			result.forward.after.items.find((item) => item.id === "runtime:target")?.item.id,
 		).toBe("target");
-		expect(Either.isLeft(result.reverse)).toBe(true);
-		if (Either.isLeft(result.reverse)) {
-			expect(result.reverse.left).toMatchObject({
+		expect(Result.isFailure(result.reverse)).toBe(true);
+		if (Result.isFailure(result.reverse)) {
+			expect(result.reverse.failure).toMatchObject({
 				_tag: "MergeRuleNotFoundError",
 				sourceItemId: "runtime:target",
 				targetItemId: "runtime:source",
@@ -326,9 +326,9 @@ describe("mergeItemsFx", () => {
 				const source = runtime.items.find((item) => item.id === "runtime:source");
 				const target = runtime.items.find((item) => item.id === "runtime:target");
 				if (source === undefined || target === undefined) {
-					return yield* Effect.dieMessage("Expected participants.");
+					return yield* Effect.die(new Error("Expected participants."));
 				}
-				return yield* Effect.either(
+				return yield* Effect.result(
 					mergeItemsFx({
 						sourceItemId: source.id,
 						sourceRevision: source.revision,
@@ -351,9 +351,9 @@ describe("mergeItemsFx", () => {
 				}),
 			),
 		);
-		expect(Either.isLeft(inventoryTarget)).toBe(true);
-		if (Either.isLeft(inventoryTarget)) {
-			expect(inventoryTarget.left).toMatchObject({
+		expect(Result.isFailure(inventoryTarget)).toBe(true);
+		if (Result.isFailure(inventoryTarget)) {
+			expect(inventoryTarget.failure).toMatchObject({
 				_tag: "ItemNotOnBoardError",
 				itemId: "runtime:target",
 			});
@@ -377,9 +377,9 @@ describe("mergeItemsFx", () => {
 				const source = runtime.items.find((item) => item.id === "runtime:source");
 				const target = runtime.items.find((item) => item.id === "runtime:target");
 				if (source === undefined || target === undefined) {
-					return yield* Effect.dieMessage("Expected participants.");
+					return yield* Effect.die(new Error("Expected participants."));
 				}
-				const same = yield* Effect.either(
+				const same = yield* Effect.result(
 					mergeItemsFx({
 						sourceItemId: source.id,
 						sourceRevision: source.revision,
@@ -387,7 +387,7 @@ describe("mergeItemsFx", () => {
 						targetRevision: source.revision,
 					}),
 				);
-				const staleSource = yield* Effect.either(
+				const staleSource = yield* Effect.result(
 					mergeItemsFx({
 						sourceItemId: source.id,
 						sourceRevision: "revision:stale",
@@ -395,7 +395,7 @@ describe("mergeItemsFx", () => {
 						targetRevision: target.revision,
 					}),
 				);
-				const staleTarget = yield* Effect.either(
+				const staleTarget = yield* Effect.result(
 					mergeItemsFx({
 						sourceItemId: source.id,
 						sourceRevision: source.revision,
@@ -418,14 +418,15 @@ describe("mergeItemsFx", () => {
 			),
 		);
 
-		expect(Either.isLeft(result.same)).toBe(true);
-		if (Either.isLeft(result.same)) expect(result.same.left._tag).toBe("MergeSameItemError");
-		expect(Either.isLeft(result.staleSource)).toBe(true);
-		if (Either.isLeft(result.staleSource))
-			expect(result.staleSource.left._tag).toBe("RevisionConflictError");
-		expect(Either.isLeft(result.staleTarget)).toBe(true);
-		if (Either.isLeft(result.staleTarget))
-			expect(result.staleTarget.left._tag).toBe("RevisionConflictError");
+		expect(Result.isFailure(result.same)).toBe(true);
+		if (Result.isFailure(result.same))
+			expect(result.same.failure._tag).toBe("MergeSameItemError");
+		expect(Result.isFailure(result.staleSource)).toBe(true);
+		if (Result.isFailure(result.staleSource))
+			expect(result.staleSource.failure._tag).toBe("RevisionConflictError");
+		expect(Result.isFailure(result.staleTarget)).toBe(true);
+		if (Result.isFailure(result.staleTarget))
+			expect(result.staleTarget.failure._tag).toBe("RevisionConflictError");
 		expect(result.after).toEqual(result.before);
 	});
 });

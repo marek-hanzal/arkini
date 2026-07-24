@@ -1,4 +1,5 @@
 import { Effect } from "effect";
+import type { ArkpackDescriptor } from "~/bridge/arkpack/Arkpack";
 import type { ArkpackStorage } from "~/bridge/arkpack/ArkpackStorage";
 import { invokeArkpackTransportFx } from "~/bridge/arkpack/invokeArkpackTransportFx";
 
@@ -13,7 +14,7 @@ export const createArkpackStorageFx = Effect.fn("createArkpackStorageFx")(
 	({ api = window.arkini.arkpack }: createArkpackStorageFx.Props = {}) =>
 		Effect.succeed({
 			listFx: invokeArkpackTransportFx("list", () => api.list()),
-			readFx: (packageId) =>
+			readFx: Effect.fn("ArkpackStorage.readFx")((packageId: string) =>
 				invokeArkpackTransportFx("read", () => api.read(packageId)).pipe(
 					Effect.map((record) =>
 						record === null
@@ -24,17 +25,21 @@ export const createArkpackStorageFx = Effect.fn("createArkpackStorageFx")(
 								},
 					),
 				),
-			removeFx: (packageId) =>
+			),
+			removeFx: Effect.fn("ArkpackStorage.removeFx")((packageId: string) =>
 				invokeArkpackTransportFx("remove", () => api.remove(packageId)),
-			writeFx: (descriptor, bytes) =>
-				invokeArkpackTransportFx("install", () =>
-					api.install({
-						descriptor: {
-							...descriptor,
-							source: "imported",
-						},
-						bytes: new Uint8Array(bytes.slice(0)),
-					}),
-				),
+			),
+			writeFx: Effect.fn("ArkpackStorage.writeFx")(
+				(descriptor: ArkpackDescriptor, bytes: ArrayBuffer) =>
+					invokeArkpackTransportFx("install", () =>
+						api.install({
+							descriptor: {
+								...descriptor,
+								source: "imported",
+							},
+							bytes: new Uint8Array(bytes.slice(0)),
+						}),
+					),
+			),
 		} satisfies ArkpackStorage),
 );

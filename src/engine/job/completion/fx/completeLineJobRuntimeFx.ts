@@ -70,14 +70,14 @@ export const completeLineJobRuntimeFx = Effect.fn("completeLineJobRuntimeFx")(fu
 	}
 
 	if (depleted && context.owner.item.charges?.output !== undefined) {
-		const random = yield* makeChargeDepletionRandomFx({
+		const depletionOutput = yield* makeChargeDepletionRandomFx({
 			itemId: context.owner.id,
 			job: context.job,
+			program: outputFx({
+				origin: context.owner.location,
+				output: context.owner.item.charges.output,
+			}),
 		});
-		const depletionOutput = yield* outputFx({
-			origin: context.owner.location,
-			output: context.owner.item.charges.output,
-		}).pipe(Effect.withRandom(random));
 		if (depletionOutput.drop.length > 0) {
 			const [placement, withDepletionOutput] = yield* applyOutputPlacementFx({
 				origin: context.owner.location,

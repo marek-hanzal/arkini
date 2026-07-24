@@ -16,6 +16,7 @@ import { ItemDetailModal } from "~/ui/item-detail/ItemDetailModal";
 import { ItemDetailProvider } from "~/ui/item-detail/ItemDetailProvider";
 import { useItemDetailControl } from "~/ui/item-detail/useItemDetailControl";
 import { motionTestRuntime } from "~test/ui/support/motionReactMock";
+import { makeTestGameTransitionFieldsFx } from "~test/support/game/makeTestGameTransitionFieldsFx";
 import { testGameRead } from "~test/support/game/testGameRead";
 import { JobStatusEnumSchema } from "~/engine/job/schema/read/JobStatusEnumSchema";
 
@@ -153,8 +154,10 @@ const initialRuntime = Effect.runSync(
 );
 let currentRuntime = initialRuntime;
 const runtimeListeners = new Set<() => void>();
+const transitionAtomFields = Effect.runSync(makeTestGameTransitionFieldsFx(currentRuntime));
 const publishRuntime = (runtime: RuntimeSchema.Type) => {
 	currentRuntime = runtime;
+	Effect.runSync(transitionAtomFields.publishRuntimeFx(runtime));
 	for (const listener of runtimeListeners) listener();
 };
 
@@ -182,6 +185,7 @@ const game = {
 		contentHash: "0".repeat(64),
 	},
 	getSnapshot: () => currentRuntime,
+	committedTransitionAtom: transitionAtomFields.committedTransitionAtom,
 	getTransitionSnapshot: () => ({
 		sequence: 0,
 		previousRuntime: null,
@@ -205,6 +209,7 @@ const game = {
 	subscribeEvents: () => () => undefined,
 	read: testGameRead,
 	readOrThrow: readOrThrowWithConfig as GameEngine["readOrThrow"],
+	runFx: transitionAtomFields.runFx,
 	run: (() => Promise.reject(new Error("Not used by this test."))) as GameEngine["run"],
 	disposeFx: Effect.void,
 	disposeWithoutSaveFx: Effect.void,
@@ -238,6 +243,7 @@ const Probe = ({ onControl }: { readonly onControl: (control: ItemDetailControl)
 beforeEach(() => {
 	motionTestRuntime.reset();
 	currentRuntime = initialRuntime;
+	Effect.runSync(transitionAtomFields.resetRuntimeFx(currentRuntime));
 	runtimeListeners.clear();
 	gameEngineState.game = game;
 });
@@ -496,33 +502,35 @@ describe("ItemDetailModal", () => {
 		const { readControl } = await renderItemDetail();
 		const owner = currentRuntime.items.find((item) => item.item.id === "workshop");
 		if (owner === undefined) throw new Error("Missing Workshop runtime item.");
-		const run = vi
-			.spyOn(game, "run")
-			.mockImplementationOnce((() => {
-				publishRuntime(
-					RuntimeSchema.parse({
-						...currentRuntime,
-						defaultLineByOwnerItemId: {
-							[owner.id]: "line:workshop:water",
-						},
-					}),
-				);
-				return Promise.resolve({
-					ownerItemId: owner.id,
-					lineId: "line:workshop:water",
-				});
-			}) as GameEngine["run"])
-			.mockImplementationOnce((() => {
-				publishRuntime(
-					RuntimeSchema.parse({
-						...currentRuntime,
-						defaultLineByOwnerItemId: undefined,
-					}),
-				);
-				return Promise.resolve({
-					ownerItemId: owner.id,
-				});
-			}) as GameEngine["run"]);
+		const runFx = vi
+			.spyOn(game, "runFx")
+			.mockImplementationOnce((() =>
+				Effect.sync(() => {
+					publishRuntime(
+						RuntimeSchema.parse({
+							...currentRuntime,
+							defaultLineByOwnerItemId: {
+								[owner.id]: "line:workshop:water",
+							},
+						}),
+					);
+					return {
+						ownerItemId: owner.id,
+						lineId: "line:workshop:water",
+					};
+				})) as GameEngine["runFx"])
+			.mockImplementationOnce((() =>
+				Effect.sync(() => {
+					publishRuntime(
+						RuntimeSchema.parse({
+							...currentRuntime,
+							defaultLineByOwnerItemId: undefined,
+						}),
+					);
+					return {
+						ownerItemId: owner.id,
+					};
+				})) as GameEngine["runFx"]);
 
 		await act(async () => {
 			openItemDetail(readControl(), {
@@ -543,7 +551,7 @@ describe("ItemDetailModal", () => {
 			await Promise.resolve();
 		});
 
-		expect(run).toHaveBeenCalledTimes(1);
+		expect(runFx).toHaveBeenCalledTimes(1);
 		expect(document.querySelector('[data-ui="TileLineDefaultBadge"]')?.textContent).toBe(
 			"Default",
 		);
@@ -560,7 +568,7 @@ describe("ItemDetailModal", () => {
 			await Promise.resolve();
 		});
 
-		expect(run).toHaveBeenCalledTimes(2);
+		expect(runFx).toHaveBeenCalledTimes(2);
 		expect(document.querySelector('[data-ui="TileLineDefaultBadge"]')).toBeNull();
 		expect(
 			document.querySelector<HTMLButtonElement>('[data-ui="TileLineSetDefaultButton"]')
@@ -576,9 +584,11 @@ describe("ItemDetailModal", () => {
 		const pendingRun = new Promise<never>((_resolve, reject) => {
 			rejectRun = reject;
 		});
-		const run = vi
-			.spyOn(game, "run")
-			.mockImplementationOnce((() => pendingRun) as GameEngine["run"]);
+		const runFx = vi.spyOn(game, "runFx").mockImplementationOnce((() =>
+			Effect.tryPromise({
+				try: () => pendingRun,
+				catch: (cause) => cause,
+			})) as GameEngine["runFx"]);
 
 		await act(async () => {
 			openItemDetail(readControl(), {
@@ -598,7 +608,7 @@ describe("ItemDetailModal", () => {
 		});
 		expect(setDefault.disabled).toBe(true);
 		expect(setDefault.textContent).toBe("Saving…");
-		expect(run).toHaveBeenCalledTimes(1);
+		expect(runFx).toHaveBeenCalledTimes(1);
 
 		const infoTab = document.querySelector<HTMLButtonElement>('[data-tab="info"]');
 		if (infoTab === null) throw new Error("Missing Info tab.");
@@ -625,7 +635,7 @@ describe("ItemDetailModal", () => {
 			visibleDefault.click();
 			await Promise.resolve();
 		});
-		expect(run).toHaveBeenCalledTimes(1);
+		expect(runFx).toHaveBeenCalledTimes(1);
 
 		await act(async () => {
 			rejectRun?.(new Error("Deferred default failure."));

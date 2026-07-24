@@ -1,4 +1,4 @@
-import { Command } from "@effect/cli";
+import { Command } from "effect/unstable/cli";
 import { createDesktopChecksumsFx } from "./createDesktopChecksumsFx";
 
 export const DesktopChecksumsCommand = Command.make("checksums", {}, () =>

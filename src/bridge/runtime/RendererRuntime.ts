@@ -1,18 +1,31 @@
-import { Layer, ManagedRuntime } from "effect";
+import { Effect, Layer, ManagedRuntime } from "effect";
 
-const makeRendererRuntime = () => ManagedRuntime.make(Layer.empty);
+import { acquireGameEngineResourceFx } from "~/bridge/game/acquireGameEngineResourceFx";
+import { GameEngineResourceLayer } from "~/bridge/game/createGameEngineResourceServiceFx";
+import { RendererAtomRegistryLayer } from "~/bridge/reactivity/RendererAtomRegistry";
+import type { GameSaveStorage } from "~/bridge/save/GameSaveStorage";
+import { deleteGameSaveFx } from "~/bridge/save/deleteGameSaveFx";
 
-type RendererRuntime = ReturnType<typeof makeRendererRuntime>;
-
-interface HotData {
-	rendererRuntime?: RendererRuntime;
-}
-
-const hotData = (import.meta.hot?.data ?? {}) as HotData;
-
-/** One process-lifetime Effect root for renderer bridge and shell programs. */
-export const RendererRuntime = hotData.rendererRuntime ?? makeRendererRuntime();
-
-if (import.meta.hot !== undefined) {
-	hotData.rendererRuntime = RendererRuntime;
-}
+/**
+ * One process-lifetime Effect root for renderer bridge and shell programs.
+ *
+ * TODO(#397): Move this process-owned root to stable runtime APIs without duplicating
+ * the renderer registry or game-resource service authority.
+ */
+export const RendererRuntime = ManagedRuntime.make(
+	Layer.mergeAll(
+		RendererAtomRegistryLayer,
+		GameEngineResourceLayer({
+			clearSaveFx: Effect.fn("RendererRuntime.clearSaveFx")((key: GameSaveStorage.Key) =>
+				deleteGameSaveFx({
+					key,
+				}),
+			),
+			createResourceFx: Effect.fn("RendererRuntime.createResourceFx")((packageId: string) =>
+				acquireGameEngineResourceFx({
+					packageId,
+				}),
+			),
+		}),
+	),
+);

@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 
-import { Effect } from "effect";
+import { Cause, Effect, Exit, Option } from "effect";
 import { act, createElement, useEffect } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
@@ -89,7 +89,7 @@ const close = (control: ItemDetailControl, props?: Parameters<ItemDetailControl[
 const runPendingAction = (
 	control: ItemDetailControl,
 	props: Parameters<ItemDetailControl["runPendingActionFx"]>[0],
-) => Effect.runPromise(control.runPendingActionFx(props));
+) => Effect.runPromiseExit(control.runPendingActionFx(props));
 
 afterEach(async () => {
 	await act(async () => {
@@ -313,13 +313,18 @@ describe("ItemDetailProvider", () => {
 		const firstFailure = new Promise<never>((_resolve, reject) => {
 			rejectFirst = reject;
 		});
-		let firstOutcome: Promise<unknown> | undefined;
+		let firstOutcome: ReturnType<typeof runPendingAction> | undefined;
+		let firstExit: Exit.Exit<unknown, unknown> | undefined;
+		const firstError = new Error("First deferred failure.");
 		await act(async () => {
 			firstOutcome = runPendingAction(readControl(), {
 				key: "line:runtime:first",
 				action: "default",
 				failureMessage: "First action failed.",
-				run: () => firstFailure,
+				run: Effect.tryPromise({
+					try: () => firstFailure,
+					catch: (cause) => cause,
+				}),
 			});
 			expect(
 				openItemDetail(readControl(), {
@@ -327,9 +332,14 @@ describe("ItemDetailProvider", () => {
 					tab: "info",
 				}),
 			).toBe(false);
-			rejectFirst?.(new Error("First deferred failure."));
-			await firstOutcome;
+			rejectFirst?.(firstError);
+			firstExit = await firstOutcome;
 		});
+		expect(firstExit).toBeDefined();
+		if (firstExit === undefined || Exit.isSuccess(firstExit)) {
+			throw new Error("Expected first action failure.");
+		}
+		expect(Cause.findErrorOption(firstExit.cause)).toEqual(Option.some(firstError));
 		expect(readControl().readActionError("line:runtime:first")).toBe("First deferred failure.");
 
 		await act(async () => {
@@ -344,19 +354,29 @@ describe("ItemDetailProvider", () => {
 		const secondFailure = new Promise<never>((_resolve, reject) => {
 			rejectSecond = reject;
 		});
-		let secondOutcome: Promise<unknown> | undefined;
+		let secondOutcome: ReturnType<typeof runPendingAction> | undefined;
+		let secondExit: Exit.Exit<unknown, unknown> | undefined;
+		const secondError = new Error("Late failure after close.");
 		await act(async () => {
 			secondOutcome = runPendingAction(readControl(), {
 				key: "line:runtime:second",
 				action: "start",
 				failureMessage: "Second action failed.",
-				run: () => secondFailure,
+				run: Effect.tryPromise({
+					try: () => secondFailure,
+					catch: (cause) => cause,
+				}),
 			});
 			await close(readControl());
 			expect(readControl().state.phase).toBe("open");
-			rejectSecond?.(new Error("Late failure after close."));
-			await secondOutcome;
+			rejectSecond?.(secondError);
+			secondExit = await secondOutcome;
 		});
+		expect(secondExit).toBeDefined();
+		if (secondExit === undefined || Exit.isSuccess(secondExit)) {
+			throw new Error("Expected second action failure.");
+		}
+		expect(Cause.findErrorOption(secondExit.cause)).toEqual(Option.some(secondError));
 		expect(readControl().readActionError("line:runtime:second")).toBe(
 			"Late failure after close.",
 		);
@@ -456,7 +476,7 @@ describe("ItemDetailProvider", () => {
 				key: "line:runtime:first",
 				action: "start",
 				failureMessage: "Start failed.",
-				run: () => run,
+				run: Effect.promise(() => run),
 			});
 		});
 

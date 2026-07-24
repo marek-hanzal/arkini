@@ -1,4 +1,4 @@
-import { Effect, Either } from "effect";
+import { Effect, Result } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~/engine/game/fx/useGameFx";
@@ -149,7 +149,7 @@ describe("fromStateFx", () => {
 
 	it("uses the central item-not-found error for an empty runtime cell", () => {
 		const result = Effect.runSync(
-			Effect.either(
+			Effect.result(
 				getItemAtFx({
 					location: {
 						scope: "inventory",
@@ -166,9 +166,9 @@ describe("fromStateFx", () => {
 			),
 		);
 
-		expect(Either.isLeft(result)).toBe(true);
-		if (Either.isLeft(result)) {
-			expect(result.left).toMatchObject({
+		expect(Result.isFailure(result)).toBe(true);
+		if (Result.isFailure(result)) {
+			expect(result.failure).toMatchObject({
 				_tag: "ItemNotFoundError",
 				location: {
 					scope: "inventory",
@@ -255,7 +255,7 @@ describe("fromStateFx", () => {
 			jobs: [],
 		});
 		const result = Effect.runSync(
-			Effect.either(
+			Effect.result(
 				fromStateFx({
 					state: invalidState,
 				}).pipe(
@@ -266,9 +266,9 @@ describe("fromStateFx", () => {
 			),
 		);
 
-		expect(Either.isLeft(result)).toBe(true);
-		if (Either.isLeft(result)) {
-			expect(result.left).toMatchObject({
+		expect(Result.isFailure(result)).toBe(true);
+		if (Result.isFailure(result)) {
+			expect(result.failure).toMatchObject({
 				_tag: "ItemNotFoundError",
 				itemId: "missing",
 			});

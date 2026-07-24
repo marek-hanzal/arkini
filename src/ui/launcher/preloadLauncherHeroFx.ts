@@ -1,78 +1,53 @@
 import { Effect } from "effect";
 
-interface RetainedLauncherHero {
-	readonly image: HTMLImageElement;
-	readonly url: string;
-	decoded: boolean;
-	pending: Promise<void> | undefined;
-}
-
-let retainedLauncherHero: RetainedLauncherHero | undefined;
-
-const createRetainedLauncherHero = (url: string): RetainedLauncherHero => {
-	const image = new Image();
-	image.decoding = "sync";
-	image.fetchPriority = "high";
-	image.loading = "eager";
-	image.src = url;
-	return {
-		image,
-		url,
-		decoded: false,
-		pending: undefined,
-	};
-};
-
-const waitForLauncherHeroLoad = async (image: HTMLImageElement) => {
-	if (image.complete && image.naturalWidth > 0) return;
-	await new Promise<void>((resolve, reject) => {
-		image.addEventListener("load", () => resolve(), {
-			once: true,
-		});
-		image.addEventListener(
-			"error",
-			() => reject(new Error("Arkini Hero artwork failed to load.")),
-			{
-				once: true,
-			},
-		);
-	});
-};
-
 export namespace preloadLauncherHeroFx {
 	export interface Props {
 		readonly url: string;
 	}
 }
 
-/** Loads, decodes, and retains the launcher Hero for the complete renderer session. */
+/** Loads and decodes one launcher Hero with interruptible DOM listener cleanup. */
 export const preloadLauncherHeroFx = Effect.fn("preloadLauncherHeroFx")(
 	({ url }: preloadLauncherHeroFx.Props) =>
-		Effect.tryPromise({
-			try: async () => {
-				const retained =
-					retainedLauncherHero?.url === url
-						? retainedLauncherHero
-						: createRetainedLauncherHero(url);
-				retainedLauncherHero = retained;
-				if (retained.decoded) return;
-				retained.pending ??= (async () => {
-					await waitForLauncherHeroLoad(retained.image);
-					if (retained.image.naturalWidth <= 0) {
-						throw new Error("Arkini Hero artwork failed to load.");
-					}
-					await retained.image.decode();
-					retained.decoded = true;
-				})()
-					.catch((cause) => {
-						if (retainedLauncherHero === retained) retainedLauncherHero = undefined;
-						throw cause;
-					})
-					.finally(() => {
-						retained.pending = undefined;
-					});
-				await retained.pending;
-			},
-			catch: (cause) => cause,
+		Effect.gen(function* () {
+			const image = yield* Effect.sync(() => {
+				const next = new Image();
+				next.decoding = "sync";
+				next.fetchPriority = "high";
+				next.loading = "eager";
+				return next;
+			});
+			yield* Effect.callback<void, Error>((resume) => {
+				const onLoad = () => {
+					image.removeEventListener("load", onLoad);
+					image.removeEventListener("error", onError);
+					resume(
+						image.naturalWidth > 0
+							? Effect.void
+							: Effect.fail(new Error("Arkini Hero artwork failed to load.")),
+					);
+				};
+				const onError = () => {
+					image.removeEventListener("load", onLoad);
+					image.removeEventListener("error", onError);
+					resume(Effect.fail(new Error("Arkini Hero artwork failed to load.")));
+				};
+				image.addEventListener("load", onLoad, {
+					once: true,
+				});
+				image.addEventListener("error", onError, {
+					once: true,
+				});
+				image.src = url;
+				if (image.complete && image.naturalWidth > 0) onLoad();
+				return Effect.sync(() => {
+					image.removeEventListener("load", onLoad);
+					image.removeEventListener("error", onError);
+				});
+			});
+			yield* Effect.tryPromise({
+				try: (_signal) => image.decode(),
+				catch: (cause) => cause,
+			});
 		}),
 );

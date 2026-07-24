@@ -1,4 +1,5 @@
-import { Effect, Either, Random } from "effect";
+import { makeFixedRandomFx } from "~test/support/makeFixedRandomFx";
+import { Effect, Result, Random } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~/engine/game/fx/useGameFx";
@@ -695,7 +696,7 @@ describe("craft job completion", () => {
 					quantity: 1,
 				});
 				const before = yield* readRuntimeFx();
-				const attempt = yield* Effect.either(
+				const attempt = yield* Effect.result(
 					startLineFx({
 						ownerItemId: owner.id,
 						lineId: "line:craft:drop",
@@ -713,9 +714,9 @@ describe("craft job completion", () => {
 			),
 		);
 
-		expect(Either.isLeft(result.attempt)).toBe(true);
-		if (Either.isLeft(result.attempt)) {
-			expect(result.attempt.left).toMatchObject({
+		expect(Result.isFailure(result.attempt)).toBe(true);
+		if (Result.isFailure(result.attempt)) {
+			expect(result.attempt.failure).toMatchObject({
 				_tag: "PlacementUnavailableError",
 			});
 		}
@@ -915,8 +916,9 @@ describe("craft job completion", () => {
 					jobId: job.id,
 					runtime: fullRuntime,
 				}).pipe(
-					Effect.withRandom(
-						Random.fixed([
+					Effect.provideServiceEffect(
+						Random.Random,
+						makeFixedRandomFx([
 							0.01,
 						]),
 					),
@@ -925,8 +927,9 @@ describe("craft job completion", () => {
 					jobId: job.id,
 					runtime: freeRuntime,
 				}).pipe(
-					Effect.withRandom(
-						Random.fixed([
+					Effect.provideServiceEffect(
+						Random.Random,
+						makeFixedRandomFx([
 							0.01,
 						]),
 					),
@@ -935,8 +938,9 @@ describe("craft job completion", () => {
 					jobId: job.id,
 					runtime: freeRuntime,
 				}).pipe(
-					Effect.withRandom(
-						Random.fixed([
+					Effect.provideServiceEffect(
+						Random.Random,
+						makeFixedRandomFx([
 							0.99,
 						]),
 					),

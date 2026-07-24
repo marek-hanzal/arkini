@@ -1,4 +1,4 @@
-import { Command, Options } from "@effect/cli";
+import { Command, Flag } from "effect/unstable/cli";
 import { Console, Effect } from "effect";
 
 import { writeArkpackKeyPairFx } from "~/engine/pack/fx/writeArkpackKeyPairFx";
@@ -32,16 +32,16 @@ const runArkpackKeygenFx = Effect.fn("runArkpackKeygenFx")(function* ({
 export const ArkpackKeygenCommand = Command.make(
 	"keygen",
 	{
-		force: Options.boolean("force").pipe(
-			Options.withDescription("Allow replacing the exact requested key outputs."),
+		force: Flag.boolean("force").pipe(
+			Flag.withDescription("Allow replacing the exact requested key outputs."),
 		),
-		privateKeyOutput: Options.text("private-key-output").pipe(
-			Options.withDefault(".arkini/arkpack-private.pem"),
-			Options.withDescription("Destination for the private PKCS8 PEM."),
+		privateKeyOutput: Flag.string("private-key-output").pipe(
+			Flag.withDefault(".arkini/arkpack-private.pem"),
+			Flag.withDescription("Destination for the private PKCS8 PEM."),
 		),
-		publicKeyOutput: Options.text("public-key-output").pipe(
-			Options.withDefault(".arkini/arkpack-public.pem"),
-			Options.withDescription("Destination for the public SPKI PEM."),
+		publicKeyOutput: Flag.string("public-key-output").pipe(
+			Flag.withDefault(".arkini/arkpack-public.pem"),
+			Flag.withDescription("Destination for the public SPKI PEM."),
 		),
 	},
 	({ force, privateKeyOutput, publicKeyOutput }) =>
@@ -49,7 +49,7 @@ export const ArkpackKeygenCommand = Command.make(
 			force,
 			privateKeyOutput,
 			publicKeyOutput,
-		}).pipe(Effect.catchAll(handleArkpackInputErrorFx)),
+		}).pipe(Effect.catch(handleArkpackInputErrorFx)),
 ).pipe(
 	Command.withDescription(
 		"Generate an Ed25519 PKCS8/SPKI key pair without printing private material.",

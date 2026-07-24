@@ -33,7 +33,7 @@ const owner = {
 
 const runAttempt = (runtime: RuntimeSchema.Type, ownerItemId = request.ownerItemId) =>
 	Effect.runSync(
-		Effect.either(
+		Effect.result(
 			attemptQueuedLineStartFx({
 				ownerItemId,
 				runtime,
@@ -64,12 +64,12 @@ describe("attemptQueuedLineStartFx", () => {
 		const result = runAttempt(runtime);
 
 		expect(result).toMatchObject({
-			_tag: "Right",
-			right: {
+			_tag: "Success",
+			success: {
 				type: "empty",
 			},
 		});
-		if (result._tag === "Right") expect(result.right.runtime).toBe(runtime);
+		if (result._tag === "Success") expect(result.success.runtime).toBe(runtime);
 	});
 
 	it("keeps missing inputs as an explicit retryable block", () => {
@@ -92,15 +92,15 @@ describe("attemptQueuedLineStartFx", () => {
 		const result = runAttempt(runtime);
 
 		expect(result).toMatchObject({
-			_tag: "Right",
-			right: {
+			_tag: "Success",
+			success: {
 				type: "blocked",
 				error: {
 					_tag: "LineRunUnavailableError",
 				},
 			},
 		});
-		if (result._tag === "Right") expect(result.right.runtime).toBe(runtime);
+		if (result._tag === "Success") expect(result.success.runtime).toBe(runtime);
 	});
 
 	it("keeps an inventory owner as an explicit retryable block", () => {
@@ -133,15 +133,15 @@ describe("attemptQueuedLineStartFx", () => {
 		const result = runAttempt(runtime);
 
 		expect(result).toMatchObject({
-			_tag: "Right",
-			right: {
+			_tag: "Success",
+			success: {
 				type: "blocked",
 				error: {
 					_tag: "ItemNotOnBoardError",
 				},
 			},
 		});
-		if (result._tag === "Right") expect(result.right.runtime).toBe(runtime);
+		if (result._tag === "Success") expect(result.success.runtime).toBe(runtime);
 	});
 
 	it("propagates a missing owner instead of retrying forever", () => {
@@ -160,8 +160,8 @@ describe("attemptQueuedLineStartFx", () => {
 		} satisfies RuntimeSchema.Type;
 
 		expect(runAttempt(runtime)).toMatchObject({
-			_tag: "Left",
-			left: {
+			_tag: "Failure",
+			failure: {
 				_tag: "ItemNotFoundError",
 			},
 		});
@@ -189,8 +189,8 @@ describe("attemptQueuedLineStartFx", () => {
 		} satisfies RuntimeSchema.Type;
 
 		expect(runAttempt(runtime)).toMatchObject({
-			_tag: "Left",
-			left: {
+			_tag: "Failure",
+			failure: {
 				_tag: "LineNotFoundError",
 			},
 		});

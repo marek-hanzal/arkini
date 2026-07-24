@@ -1,4 +1,4 @@
-import { Effect, Either } from "effect";
+import { Effect, Result } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~/engine/game/fx/useGameFx";
@@ -241,16 +241,16 @@ describe("startLineFx", () => {
 					);
 				});
 				if (reserved === undefined) {
-					return yield* Effect.dieMessage("Expected one reserved runtime item.");
+					return yield* Effect.die(new Error("Expected one reserved runtime item."));
 				}
 
-				const removed = yield* Effect.either(
+				const removed = yield* Effect.result(
 					removeItemFx({
 						itemId: reserved.id,
 						revision: reserved.revision,
 					}),
 				);
-				const quantity = yield* Effect.either(
+				const quantity = yield* Effect.result(
 					setItemQuantityFx({
 						itemId: reserved.id,
 						quantity: reserved.quantity + 1,
@@ -274,17 +274,17 @@ describe("startLineFx", () => {
 			),
 		);
 
-		expect(Either.isLeft(result.removed)).toBe(true);
-		if (Either.isLeft(result.removed)) {
-			expect(result.removed.left).toMatchObject({
+		expect(Result.isFailure(result.removed)).toBe(true);
+		if (Result.isFailure(result.removed)) {
+			expect(result.removed.failure).toMatchObject({
 				_tag: "ItemJobScopedError",
 				itemId: result.reserved.id,
 				jobId: readStartedJob(result.started).id,
 			});
 		}
-		expect(Either.isLeft(result.quantity)).toBe(true);
-		if (Either.isLeft(result.quantity)) {
-			expect(result.quantity.left).toMatchObject({
+		expect(Result.isFailure(result.quantity)).toBe(true);
+		if (Result.isFailure(result.quantity)) {
+			expect(result.quantity.failure).toMatchObject({
 				_tag: "ItemJobScopedError",
 				itemId: result.reserved.id,
 				jobId: readStartedJob(result.started).id,
@@ -300,8 +300,8 @@ describe("startLineFx", () => {
 				yield* prepareJobLineFx();
 				const attempts = yield* Effect.all(
 					[
-						Effect.either(startLineFx(startProps)),
-						Effect.either(startLineFx(startProps)),
+						Effect.result(startLineFx(startProps)),
+						Effect.result(startLineFx(startProps)),
 					],
 					{
 						concurrency: "unbounded",
@@ -319,10 +319,10 @@ describe("startLineFx", () => {
 			),
 		);
 
-		expect(result.attempts.filter(Either.isRight)).toHaveLength(1);
-		expect(result.attempts.filter(Either.isLeft)).toHaveLength(1);
-		const failure = result.attempts.find(Either.isLeft);
-		expect(failure && Either.isLeft(failure) ? failure.left : undefined).toMatchObject({
+		expect(result.attempts.filter(Result.isSuccess)).toHaveLength(1);
+		expect(result.attempts.filter(Result.isFailure)).toHaveLength(1);
+		const failure = result.attempts.find(Result.isFailure);
+		expect(failure && Result.isFailure(failure) ? failure.failure : undefined).toMatchObject({
 			_tag: "JobQueueFullError",
 			maxQueueSize: 1,
 		});
@@ -336,8 +336,8 @@ describe("startLineFx", () => {
 				yield* prepareJobLineFx();
 				const attempts = yield* Effect.all(
 					[
-						Effect.either(startLineFx(startProps)),
-						Effect.either(startLineFx(startProps)),
+						Effect.result(startLineFx(startProps)),
+						Effect.result(startLineFx(startProps)),
 					],
 					{
 						concurrency: "unbounded",
@@ -355,7 +355,7 @@ describe("startLineFx", () => {
 			),
 		);
 
-		expect(result.attempts.every(Either.isRight)).toBe(true);
+		expect(result.attempts.every(Result.isSuccess)).toBe(true);
 		expect(result.runtime.jobs).toHaveLength(1);
 		expect(result.runtime.jobQueue).toHaveLength(1);
 		expect(result.runtime.items.find((item) => item.item.id === "water")).toMatchObject({
@@ -482,7 +482,7 @@ describe("startLineFx", () => {
 					},
 					quantity: 1,
 				});
-				const attempt = yield* Effect.either(startLineFx(startProps));
+				const attempt = yield* Effect.result(startLineFx(startProps));
 				const runtime = yield* readRuntimeFx();
 				return {
 					attempt,
@@ -495,9 +495,9 @@ describe("startLineFx", () => {
 			),
 		);
 
-		expect(Either.isLeft(result.attempt)).toBe(true);
-		if (Either.isLeft(result.attempt)) {
-			expect(result.attempt.left).toMatchObject({
+		expect(Result.isFailure(result.attempt)).toBe(true);
+		if (Result.isFailure(result.attempt)) {
+			expect(result.attempt.failure).toMatchObject({
 				_tag: "LineRunUnavailableError",
 				ownerItemId: startProps.ownerItemId,
 				lineId: startProps.lineId,
@@ -526,7 +526,7 @@ describe("startLineFx", () => {
 					},
 					quantity: 1,
 				});
-				const store = yield* Effect.either(
+				const store = yield* Effect.result(
 					storeInputMaterialFx({
 						ownerItemId: startProps.ownerItemId,
 						lineId: startProps.lineId,
@@ -544,6 +544,6 @@ describe("startLineFx", () => {
 			),
 		);
 
-		expect(Either.isRight(result)).toBe(true);
+		expect(Result.isSuccess(result)).toBe(true);
 	});
 });

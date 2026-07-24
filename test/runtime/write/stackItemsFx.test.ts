@@ -1,4 +1,4 @@
-import { Effect, Either } from "effect";
+import { Effect, Result } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~/engine/game/fx/useGameFx";
@@ -162,7 +162,7 @@ describe("stackItemsFx", () => {
 					quantity: 10,
 				});
 				const before = yield* readRuntimeFx();
-				const stacked = yield* Effect.either(
+				const stacked = yield* Effect.result(
 					stackItemsFx({
 						sourceItemId: source.id,
 						sourceRevision: source.revision,
@@ -185,9 +185,9 @@ describe("stackItemsFx", () => {
 			),
 		);
 
-		expect(Either.isLeft(result.stacked)).toBe(true);
-		if (Either.isLeft(result.stacked)) {
-			expect(result.stacked.left).toMatchObject({
+		expect(Result.isFailure(result.stacked)).toBe(true);
+		if (Result.isFailure(result.stacked)) {
+			expect(result.stacked.failure).toMatchObject({
 				_tag: "StackItemsUnavailableError",
 				reason: "target-full",
 				sourceItemId: "runtime:source",
@@ -229,7 +229,7 @@ describe("stackItemsFx", () => {
 					lineId: "line:producer:zero",
 				});
 				const before = yield* readRuntimeFx();
-				const stacked = yield* Effect.either(
+				const stacked = yield* Effect.result(
 					stackItemsFx({
 						sourceItemId: source.id,
 						sourceRevision: source.revision,
@@ -252,9 +252,9 @@ describe("stackItemsFx", () => {
 			),
 		);
 
-		expect(Either.isLeft(result.stacked)).toBe(true);
-		if (Either.isLeft(result.stacked)) {
-			expect(result.stacked.left).toMatchObject({
+		expect(Result.isFailure(result.stacked)).toBe(true);
+		if (Result.isFailure(result.stacked)) {
+			expect(result.stacked.failure).toMatchObject({
 				_tag: "StackItemsUnavailableError",
 				reason,
 			});
@@ -277,7 +277,7 @@ describe("stackItemsFx", () => {
 					location: board(1),
 					quantity: 5,
 				});
-				const staleRevision = yield* Effect.either(
+				const staleRevision = yield* Effect.result(
 					stackItemsFx({
 						sourceItemId: source.id,
 						sourceRevision: "revision:stale",
@@ -288,7 +288,7 @@ describe("stackItemsFx", () => {
 					}),
 				);
 				const beforeLocationMismatch = yield* readRuntimeFx();
-				const staleLocation = yield* Effect.either(
+				const staleLocation = yield* Effect.result(
 					stackItemsFx({
 						sourceItemId: source.id,
 						sourceRevision: source.revision,
@@ -312,16 +312,16 @@ describe("stackItemsFx", () => {
 			),
 		);
 
-		expect(Either.isLeft(result.staleRevision)).toBe(true);
-		if (Either.isLeft(result.staleRevision)) {
-			expect(result.staleRevision.left).toMatchObject({
+		expect(Result.isFailure(result.staleRevision)).toBe(true);
+		if (Result.isFailure(result.staleRevision)) {
+			expect(result.staleRevision.failure).toMatchObject({
 				_tag: "StackItemsUnavailableError",
 				reason: "stale-source-revision",
 			});
 		}
-		expect(Either.isLeft(result.staleLocation)).toBe(true);
-		if (Either.isLeft(result.staleLocation)) {
-			expect(result.staleLocation.left).toMatchObject({
+		expect(Result.isFailure(result.staleLocation)).toBe(true);
+		if (Result.isFailure(result.staleLocation)) {
+			expect(result.staleLocation.failure).toMatchObject({
 				_tag: "StackItemsUnavailableError",
 				reason: "stale-target-location",
 			});
@@ -345,7 +345,7 @@ describe("stackItemsFx", () => {
 					quantity: 5,
 				});
 				const before = yield* readRuntimeFx();
-				const stacked = yield* Effect.either(
+				const stacked = yield* Effect.result(
 					stackItemsFx({
 						sourceItemId: source.id,
 						sourceRevision: source.revision,
@@ -368,9 +368,9 @@ describe("stackItemsFx", () => {
 			),
 		);
 
-		expect(Either.isLeft(result.stacked)).toBe(true);
-		if (Either.isLeft(result.stacked)) {
-			expect(result.stacked.left).toMatchObject({
+		expect(Result.isFailure(result.stacked)).toBe(true);
+		if (Result.isFailure(result.stacked)) {
+			expect(result.stacked.failure).toMatchObject({
 				_tag: "StackItemsUnavailableError",
 				reason: "cross-space",
 			});
@@ -401,7 +401,7 @@ describe("stackItemsFx", () => {
 				});
 				const attempts = yield* Effect.all(
 					[
-						Effect.either(
+						Effect.result(
 							stackItemsFx({
 								sourceItemId: firstSource.id,
 								sourceRevision: firstSource.revision,
@@ -411,7 +411,7 @@ describe("stackItemsFx", () => {
 								targetLocation: target.location,
 							}),
 						),
-						Effect.either(
+						Effect.result(
 							stackItemsFx({
 								sourceItemId: secondSource.id,
 								sourceRevision: secondSource.revision,
@@ -438,10 +438,10 @@ describe("stackItemsFx", () => {
 			),
 		);
 
-		expect(result.attempts.filter(Either.isRight)).toHaveLength(1);
-		expect(result.attempts.filter(Either.isLeft)).toHaveLength(1);
-		const failure = result.attempts.find(Either.isLeft);
-		expect(failure?.left).toMatchObject({
+		expect(result.attempts.filter(Result.isSuccess)).toHaveLength(1);
+		expect(result.attempts.filter(Result.isFailure)).toHaveLength(1);
+		const failure = result.attempts.find(Result.isFailure);
+		expect(failure?.failure).toMatchObject({
 			_tag: "StackItemsUnavailableError",
 			reason: "stale-target-revision",
 		});

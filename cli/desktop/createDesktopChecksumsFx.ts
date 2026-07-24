@@ -1,4 +1,4 @@
-import { FileSystem } from "@effect/platform";
+import { FileSystem } from "effect";
 import { basename, join } from "node:path";
 import { Effect } from "effect";
 import { DesktopMacArtifacts } from "./DesktopMacArtifacts";

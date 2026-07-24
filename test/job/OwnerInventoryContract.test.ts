@@ -1,4 +1,4 @@
-import { Effect, Either } from "effect";
+import { Effect, Result } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~/engine/game/fx/useGameFx";
@@ -86,7 +86,7 @@ describe("job owner inventory contract", () => {
 				yield* prepareJobLineFx();
 				yield* moveOwnerFx("inventory");
 				const before = yield* readRuntimeFx();
-				const started = yield* Effect.either(
+				const started = yield* Effect.result(
 					startLineFx({
 						ownerItemId,
 						lineId,
@@ -104,9 +104,9 @@ describe("job owner inventory contract", () => {
 			),
 		);
 
-		expect(Either.isLeft(result.started)).toBe(true);
-		if (Either.isLeft(result.started)) {
-			expect(result.started.left).toMatchObject({
+		expect(Result.isFailure(result.started)).toBe(true);
+		if (Result.isFailure(result.started)) {
+			expect(result.started.failure).toMatchObject({
 				_tag: "ItemNotOnBoardError",
 				itemId: ownerItemId,
 				location: {

@@ -1,5 +1,5 @@
-import { FileSystem, Path } from "@effect/platform";
-import { NodeContext } from "@effect/platform-node";
+import { FileSystem, Path } from "effect";
+import { NodeServices } from "@effect/platform-node";
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
@@ -23,7 +23,7 @@ describe("readGameSourceFilesFx", () => {
 				return yield* readGameSourceFilesFx({
 					input,
 				});
-			}).pipe(Effect.provide(NodeContext.layer), Effect.scoped),
+			}).pipe(Effect.provide(NodeServices.layer), Effect.scoped),
 		);
 
 		expect(result.sources).toEqual([]);

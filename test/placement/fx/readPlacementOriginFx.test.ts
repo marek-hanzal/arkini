@@ -1,4 +1,4 @@
-import { Effect, Either } from "effect";
+import { Effect, Result } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~/engine/game/fx/useGameFx";
@@ -20,7 +20,7 @@ describe("readPlacementOriginFx", () => {
 					location: inventoryLocation(0),
 					quantity: 1,
 				});
-				return yield* Effect.either(
+				return yield* Effect.result(
 					readPlacementOriginFx({
 						originItemId: "runtime:inventory-origin",
 						runtime: yield* readRuntimeFx(),
@@ -33,9 +33,9 @@ describe("readPlacementOriginFx", () => {
 			),
 		);
 
-		expect(Either.isLeft(result)).toBe(true);
-		if (Either.isLeft(result)) {
-			expect(result.left).toMatchObject({
+		expect(Result.isFailure(result)).toBe(true);
+		if (Result.isFailure(result)) {
+			expect(result.failure).toMatchObject({
 				_tag: "ItemNotOnBoardError",
 				itemId: "runtime:inventory-origin",
 				location: inventoryLocation(0),

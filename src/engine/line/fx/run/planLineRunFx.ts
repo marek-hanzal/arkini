@@ -1,4 +1,4 @@
-import { Array, Effect, Option } from "effect";
+import { Effect } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { TimeSchema } from "~/engine/common/schema/TimeSchema";
@@ -33,9 +33,15 @@ export const planLineRunFx = Effect.fn("planLineRunFx")(function* ({
 		return undefined;
 	}
 
-	const inputPlans = Array.filterMap(input, ({ plan }) => Option.fromNullable(plan));
+	const inputPlans: LineRunPlanSchema.Type["input"][number][] = [];
+	for (const { plan } of input) {
+		if (plan === undefined) {
+			return undefined;
+		}
+		inputPlans.push(plan);
+	}
 	const [firstInputPlan, ...remainingInputPlans] = inputPlans;
-	if (inputPlans.length !== input.length || firstInputPlan === undefined) {
+	if (firstInputPlan === undefined) {
 		return undefined;
 	}
 	const plannedInputs = [

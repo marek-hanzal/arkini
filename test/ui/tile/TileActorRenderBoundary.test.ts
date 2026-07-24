@@ -14,9 +14,15 @@ const renderState = vi.hoisted(() => ({
 	counts: new Map<string, number>(),
 }));
 
-vi.mock("~/bridge/item-detail/useStartItemDetailLine", () => ({
-	useStartItemDetailLine: () => vi.fn(),
-}));
+vi.mock("~/bridge/item-detail/useStartItemDetailLine", async () => {
+	const AsyncResult = await import("effect/unstable/reactivity/AsyncResult");
+	return {
+		useStartItemDetailLine: () => ({
+			result: AsyncResult.initial(),
+			start: vi.fn(),
+		}),
+	};
+});
 
 vi.mock("~/ui/item-detail/useItemDetailControl", () => ({
 	useItemDetailControl: () => ({

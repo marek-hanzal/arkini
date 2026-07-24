@@ -1,4 +1,4 @@
-import { Path } from "@effect/platform";
+import { Path } from "effect";
 import { Effect } from "effect";
 
 import { collectSourceFilesFx } from "~/engine/source/fx/collectSourceFilesFx";

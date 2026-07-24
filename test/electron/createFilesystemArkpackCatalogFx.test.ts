@@ -1,4 +1,4 @@
-import { NodeContext } from "@effect/platform-node";
+import { NodeServices } from "@effect/platform-node";
 import { Effect } from "effect";
 import { createHash } from "node:crypto";
 import { access, mkdtemp, rm, unlink } from "node:fs/promises";
@@ -34,7 +34,7 @@ const createCatalog = () =>
 	Effect.runPromise(
 		createFilesystemArkpackCatalogFx({
 			userDataPath: root,
-		}).pipe(Effect.provide(NodeContext.layer)),
+		}).pipe(Effect.provide(NodeServices.layer)),
 	);
 
 beforeEach(async () => {

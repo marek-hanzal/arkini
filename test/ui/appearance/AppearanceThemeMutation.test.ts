@@ -1,39 +1,37 @@
-import { QueryClient } from "@tanstack/react-query";
-import { describe, expect, it, vi } from "vitest";
+import { scheduleTask } from "@effect/atom-react";
+import { Cause, Effect, Exit, Option } from "effect";
+import * as AsyncResult from "effect/unstable/reactivity/AsyncResult";
+import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
+import { afterEach, describe, expect, it, vi } from "vitest";
+
+import { AppearanceAtom } from "~/bridge/appearance/AppearanceAtom";
 import type { AppearanceTheme } from "~/bridge/appearance/AppearanceTheme";
-import type { AppearanceContext } from "~/ui/appearance/AppearanceContext";
-import { setAppearanceThemeMutationOptions } from "~/ui/appearance/mutation/setAppearanceThemeMutationOptions";
+import { AppearanceThemeError } from "~/bridge/appearance/AppearanceThemeError";
+import { setAppearanceThemeAtom } from "~/bridge/appearance/setAppearanceThemeAtom";
 
-const executeMutation = async (
-	options: ReturnType<typeof setAppearanceThemeMutationOptions>,
-	theme: AppearanceTheme,
-) => {
-	if (options.mutationFn === undefined) throw new Error("Expected a mutation function.");
-	return options.mutationFn(theme, {
-		client: new QueryClient(),
-		meta: options.meta,
-		mutationKey: options.mutationKey,
-	});
-};
+const registries: AtomRegistry.AtomRegistry[] = [];
 
-const createAppearance = () => {
-	let theme: AppearanceTheme = "dark";
-	const applyTheme = vi.fn((nextTheme: AppearanceTheme) => {
-		theme = nextTheme;
+afterEach(() => {
+	for (const registry of registries.splice(0)) registry.dispose();
+	vi.restoreAllMocks();
+	Reflect.deleteProperty(globalThis, "window");
+});
+
+const makeRegistry = () => {
+	const registry = AtomRegistry.make({
+		initialValues: [
+			[
+				AppearanceAtom,
+				{
+					theme: "dark" as const,
+					accent: "rose" as const,
+				},
+			],
+		],
+		scheduleTask,
 	});
-	const appearance: AppearanceContext.Value = {
-		get theme() {
-			return theme;
-		},
-		accent: "rose",
-		applyTheme,
-		hydrate: () => undefined,
-	};
-	return {
-		appearance,
-		applyTheme,
-		getTheme: () => theme,
-	};
+	registries.push(registry);
+	return registry;
 };
 
 const installDesktopAppearance = (write: (theme: AppearanceTheme) => Promise<void>) => {
@@ -49,45 +47,98 @@ const installDesktopAppearance = (write: (theme: AppearanceTheme) => Promise<voi
 	});
 };
 
-describe("setAppearanceThemeMutationOptions", () => {
-	it("owns immediate application, durable persistence, and active-value no-op", async () => {
-		const write = vi.fn(() => Promise.resolve());
+const runThemeCommand = (registry: AtomRegistry.AtomRegistry, theme: AppearanceTheme) => {
+	registry.set(setAppearanceThemeAtom, theme);
+	return Effect.runPromiseExit(
+		AtomRegistry.getResult(registry, setAppearanceThemeAtom, {
+			suspendOnWaiting: true,
+		}),
+	);
+};
+
+describe("setAppearanceThemeAtom", () => {
+	it("applies immediately, persists once and no-ops the active value", async () => {
+		let resolveWrite: () => void = () => undefined;
+		const write = vi.fn(
+			() =>
+				new Promise<void>((resolve) => {
+					resolveWrite = resolve;
+				}),
+		);
 		installDesktopAppearance(write);
-		const { appearance, applyTheme, getTheme } = createAppearance();
-		const options = setAppearanceThemeMutationOptions(appearance);
+		const registry = makeRegistry();
+		const completed = runThemeCommand(registry, "light");
 
-		expect(options.mutationKey).toEqual([
-			"appearance",
-			"theme",
-		]);
-		expect(options.retry).toBe(false);
-		await executeMutation(options, "system");
-		expect(getTheme()).toBe("system");
-		expect(applyTheme).toHaveBeenCalledWith("system");
-		expect(write).toHaveBeenCalledOnce();
-		expect(write).toHaveBeenCalledWith("system");
+		expect(registry.get(AppearanceAtom).theme).toBe("light");
+		expect(registry.get(setAppearanceThemeAtom).waiting).toBe(true);
+		await vi.waitFor(() => expect(write).toHaveBeenCalledWith("light"));
+		resolveWrite();
+		expect(await completed).toEqual(Exit.succeed(undefined));
+		expect(AsyncResult.isSuccess(registry.get(setAppearanceThemeAtom))).toBe(true);
 
-		await executeMutation(options, "system");
+		expect(await runThemeCommand(registry, "light")).toEqual(Exit.succeed(undefined));
 		expect(write).toHaveBeenCalledOnce();
-		Reflect.deleteProperty(globalThis, "window");
 	});
 
-	it("rolls the renderer back and preserves the persistence failure", async () => {
-		const failure = new Error("theme write failed");
-		installDesktopAppearance(() => Promise.reject(failure));
-		const { appearance, applyTheme, getTheme } = createAppearance();
-		const options = setAppearanceThemeMutationOptions(appearance);
+	it("rolls back its optimistic value and preserves the typed persistence failure", async () => {
+		const persistenceFailure = new Error("theme write failed");
+		installDesktopAppearance(() => Promise.reject(persistenceFailure));
+		const registry = makeRegistry();
 
-		await expect(executeMutation(options, "light")).rejects.toBeDefined();
-		expect(getTheme()).toBe("dark");
-		expect(applyTheme.mock.calls).toEqual([
+		const exit = await runThemeCommand(registry, "light");
+
+		expect(Exit.isFailure(exit)).toBe(true);
+		if (Exit.isSuccess(exit)) throw new Error("Expected theme write failure.");
+		const failure = Cause.findErrorOption(exit.cause);
+		expect(Option.isSome(failure)).toBe(true);
+		if (Option.isNone(failure)) throw new Error("Expected typed theme failure.");
+		expect(failure.value).toBeInstanceOf(AppearanceThemeError);
+		expect(failure.value.cause).toBe(persistenceFailure);
+		expect(registry.get(AppearanceAtom).theme).toBe("dark");
+	});
+
+	it("serializes writes so an older completion cannot overwrite a newer theme", async () => {
+		let persisted: AppearanceTheme = "dark";
+		const completions = new Map<AppearanceTheme, () => void>();
+		const write = vi.fn(
+			(theme: AppearanceTheme) =>
+				new Promise<void>((resolve) => {
+					completions.set(theme, () => {
+						persisted = theme;
+						resolve();
+					});
+				}),
+		);
+		installDesktopAppearance(write);
+		const registry = makeRegistry();
+		registry.mount(setAppearanceThemeAtom);
+
+		registry.set(setAppearanceThemeAtom, "light");
+		expect(registry.get(AppearanceAtom).theme).toBe("light");
+		registry.set(setAppearanceThemeAtom, "system");
+		expect(registry.get(AppearanceAtom).theme).toBe("system");
+		await vi.waitFor(() => expect(write).toHaveBeenCalledOnce());
+		expect(write.mock.calls).toEqual([
 			[
 				"light",
 			],
-			[
-				"dark",
-			],
 		]);
-		Reflect.deleteProperty(globalThis, "window");
+
+		completions.get("light")?.();
+		await vi.waitFor(() => expect(write).toHaveBeenCalledTimes(2));
+		expect(write.mock.calls[1]).toEqual([
+			"system",
+		]);
+		expect(persisted).toBe("light");
+
+		completions.get("system")?.();
+		const exit = await Effect.runPromiseExit(
+			AtomRegistry.getResult(registry, setAppearanceThemeAtom, {
+				suspendOnWaiting: true,
+			}),
+		);
+		expect(exit).toEqual(Exit.succeed(undefined));
+		expect(registry.get(AppearanceAtom).theme).toBe("system");
+		expect(persisted).toBe("system");
 	});
 });

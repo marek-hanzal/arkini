@@ -91,11 +91,11 @@ describe("resolveBuiltInArkpackFx", () => {
 	it.each(invalidCatalogs)("rejects catalogs without exact signed Arkini", async ({
 		arkpacks,
 	}) => {
-		const result = await Effect.runPromise(Effect.either(resolveBuiltInArkpackFx(arkpacks)));
-		expect(result._tag).toBe("Left");
-		if (result._tag === "Left") {
-			expect(result.left).toBeInstanceOf(BuiltInArkpackResolutionError);
-			expect(result.left).toMatchObject({
+		const result = await Effect.runPromise(Effect.result(resolveBuiltInArkpackFx(arkpacks)));
+		expect(result._tag).toBe("Failure");
+		if (result._tag === "Failure") {
+			expect(result.failure).toBeInstanceOf(BuiltInArkpackResolutionError);
+			expect(result.failure).toMatchObject({
 				packageId: ArkiniArkpack.packageId,
 				matchingCount: expect.any(Number),
 			});

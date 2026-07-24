@@ -1,4 +1,4 @@
-import { Effect, Either } from "effect";
+import { Effect, Result } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~/engine/game/fx/useGameFx";
@@ -223,7 +223,7 @@ describe("pure placement stack targets", () => {
 		} satisfies RuntimeSchema.Type;
 
 		const result = Effect.runSync(
-			Effect.either(
+			Effect.result(
 				applyPlacementPlanFx({
 					plan: {
 						remove: [],
@@ -240,9 +240,9 @@ describe("pure placement stack targets", () => {
 			),
 		);
 
-		expect(Either.isLeft(result)).toBe(true);
-		if (Either.isLeft(result)) {
-			expect(result.left).toMatchObject({
+		expect(Result.isFailure(result)).toBe(true);
+		if (Result.isFailure(result)) {
+			expect(result.failure).toMatchObject({
 				_tag: "ItemStatefulError",
 				itemId: active.id,
 			});

@@ -41,5 +41,5 @@ export const useToolbar = (): useToolbar.Result => {
 			game,
 		],
 	);
-	return useRuntimeSelector(selector);
+	return useRuntimeSelector(game, selector);
 };

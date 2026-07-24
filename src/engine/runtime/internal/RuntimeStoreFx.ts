@@ -1,15 +1,15 @@
-import { Context, type Effect, type Scope, type Stream } from "effect";
+import { Context, type Effect, type Stream, type SubscriptionRef } from "effect";
 
 import type { CommittedTransitionSchema } from "~/engine/runtime/schema/CommittedTransitionSchema";
 
-export interface RuntimeStoreSubscription {
-	readonly current: CommittedTransitionSchema.Type;
-	readonly changes: Stream.Stream<CommittedTransitionSchema.Type>;
-	readonly shutdown: Effect.Effect<void>;
-}
-
 export interface RuntimeStoreFxService {
+	/** Authoritative transition reference. Gameplay code must mutate through `modifyEffect`. */
+	readonly ref: SubscriptionRef.SubscriptionRef<CommittedTransitionSchema.Type>;
 	readonly read: Effect.Effect<CommittedTransitionSchema.Type>;
+	/** Synchronous snapshot reserved for explicitly synchronous bridge boundaries. */
+	readonly readUnsafe: () => CommittedTransitionSchema.Type;
+	/** Replays the latest transition, then every later commit in order. */
+	readonly changes: Stream.Stream<CommittedTransitionSchema.Type>;
 	readonly modifyEffect: <Result, Error, Requirements>(
 		update: (transition: CommittedTransitionSchema.Type) => Effect.Effect<
 			readonly [
@@ -20,13 +20,11 @@ export interface RuntimeStoreFxService {
 			Requirements
 		>,
 	) => Effect.Effect<Result, Error, Requirements>;
-	readonly subscribe: Effect.Effect<RuntimeStoreSubscription, never, Scope.Scope>;
 }
 
 /** Internal mutable transition store used only by dedicated runtime services. */
-export class RuntimeStoreFx extends Context.Tag("RuntimeStoreFx")<
-	RuntimeStoreFx,
-	RuntimeStoreFxService
->() {
+export class RuntimeStoreFx extends Context.Service<RuntimeStoreFx, RuntimeStoreFxService>()(
+	"RuntimeStoreFx",
+) {
 	//
 }

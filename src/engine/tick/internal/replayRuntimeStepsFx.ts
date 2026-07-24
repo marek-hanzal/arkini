@@ -32,8 +32,8 @@ export const replayRuntimeStepsFx = Effect.fn("replayRuntimeStepsFx")(function* 
 	runtime,
 }: replayRuntimeStepsFx.Props) {
 	if (elapsedMs % TickStepMs !== 0) {
-		return yield* Effect.dieMessage(
-			`Tick advancement ${elapsedMs}ms is not divisible by ${TickStepMs}ms.`,
+		return yield* Effect.die(
+			new Error(`Tick advancement ${elapsedMs}ms is not divisible by ${TickStepMs}ms.`),
 		);
 	}
 

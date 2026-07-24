@@ -1,4 +1,4 @@
-import { NodeContext } from "@effect/platform-node";
+import { NodeServices } from "@effect/platform-node";
 import { Effect } from "effect";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -39,7 +39,7 @@ describe("previewDesktopMacFx", () => {
 	});
 
 	it("builds, creates and launches the exact unpacked macOS app", async () => {
-		await Effect.runPromise(previewDesktopMacFx().pipe(Effect.provide(NodeContext.layer)));
+		await Effect.runPromise(previewDesktopMacFx().pipe(Effect.provide(NodeServices.layer)));
 
 		expect(state.calls).toEqual([
 			"clean",
@@ -54,7 +54,7 @@ describe("previewDesktopMacFx", () => {
 		state.failAt = "unpacked:arm64";
 
 		await expect(
-			Effect.runPromise(previewDesktopMacFx().pipe(Effect.provide(NodeContext.layer))),
+			Effect.runPromise(previewDesktopMacFx().pipe(Effect.provide(NodeServices.layer))),
 		).rejects.toThrow("failed:unpacked:arm64");
 		expect(state.calls).toEqual([
 			"clean",

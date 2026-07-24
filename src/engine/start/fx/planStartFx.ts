@@ -32,52 +32,64 @@ export const planStartFx = Effect.fn("planStartFx")(function* ({
 			currentSpace: start.currentSpace,
 		},
 	};
-	const board = yield* Effect.reduce(start.board, initialState, (state, item) => {
-		return Effect.gen(function* () {
-			const plan = yield* planStartBoardItemFx({
-				item,
-			});
-			const [, draft] = yield* applyPlacementPlanFx({
-				plan,
-				runtime: state.draft,
-			});
+	const board = yield* Effect.reduce(
+		start.board,
+		() => initialState,
+		(state, item) => {
+			return Effect.gen(function* () {
+				const plan = yield* planStartBoardItemFx({
+					item,
+				});
+				const [, draft] = yield* applyPlacementPlanFx({
+					plan,
+					runtime: state.draft,
+				});
 
-			return {
-				draft,
-			} satisfies PlanningState;
-		});
-	});
-	const inventory = yield* Effect.reduce(start.inventory, board, (state, item) => {
-		return Effect.gen(function* () {
-			const plan = yield* planStartInventoryItemFx({
-				item,
-				runtime: state.draft,
+				return {
+					draft,
+				} satisfies PlanningState;
 			});
-			const [, draft] = yield* applyPlacementPlanFx({
-				plan,
-				runtime: state.draft,
-			});
+		},
+	);
+	const inventory = yield* Effect.reduce(
+		start.inventory,
+		() => board,
+		(state, item) => {
+			return Effect.gen(function* () {
+				const plan = yield* planStartInventoryItemFx({
+					item,
+					runtime: state.draft,
+				});
+				const [, draft] = yield* applyPlacementPlanFx({
+					plan,
+					runtime: state.draft,
+				});
 
-			return {
-				draft,
-			} satisfies PlanningState;
-		});
-	});
-	const toolbar = yield* Effect.reduce(start.toolbar, inventory, (state, item) => {
-		return Effect.gen(function* () {
-			const plan = yield* planStartToolbarItemFx({
-				item,
+				return {
+					draft,
+				} satisfies PlanningState;
 			});
-			const [, draft] = yield* applyPlacementPlanFx({
-				plan,
-				runtime: state.draft,
-			});
+		},
+	);
+	const toolbar = yield* Effect.reduce(
+		start.toolbar,
+		() => inventory,
+		(state, item) => {
+			return Effect.gen(function* () {
+				const plan = yield* planStartToolbarItemFx({
+					item,
+				});
+				const [, draft] = yield* applyPlacementPlanFx({
+					plan,
+					runtime: state.draft,
+				});
 
-			return {
-				draft,
-			} satisfies PlanningState;
-		});
-	});
+				return {
+					draft,
+				} satisfies PlanningState;
+			});
+		},
+	);
 
 	yield* assertRuntimeFx({
 		runtime: toolbar.draft,

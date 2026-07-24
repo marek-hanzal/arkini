@@ -25,13 +25,14 @@ export namespace dropFx {
  * replacement candidate.
  */
 export const dropFx = Effect.fn("dropFx")(function* ({ drop, origin }: dropFx.Props) {
-	const enabled = yield* Effect.every(drop.rules, (rule) => {
-		return dropRuleFx({
+	let enabled = true;
+	for (const rule of drop.rules) {
+		const ruleEnabled = yield* dropRuleFx({
 			origin,
 			rule,
 		}).pipe(
-			Effect.map((result) => {
-				return match(result)
+			Effect.map((result) =>
+				match(result)
 					.with(
 						{
 							type: RuleEnumSchema.enum.Enable,
@@ -44,10 +45,14 @@ export const dropFx = Effect.fn("dropFx")(function* ({ drop, origin }: dropFx.Pr
 						},
 						({ active }) => !active,
 					)
-					.exhaustive();
-			}),
+					.exhaustive(),
+			),
 		);
-	});
+		if (!ruleEnabled) {
+			enabled = false;
+			break;
+		}
+	}
 	if (!enabled) {
 		return undefined;
 	}

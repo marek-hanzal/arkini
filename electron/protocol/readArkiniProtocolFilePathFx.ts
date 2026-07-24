@@ -53,7 +53,7 @@ export const readArkiniProtocolFilePathFx = Effect.fn("readArkiniProtocolFilePat
 			const exists = yield* Effect.tryPromise({
 				try: () => access(requestedPath).then(() => true),
 				catch: (cause) => cause,
-			}).pipe(Effect.catchAll(() => Effect.succeed(false)));
+			}).pipe(Effect.catch(() => Effect.succeed(false)));
 			if (exists) return requestedPath;
 			if (extname(relativeRequestPath)) {
 				return yield* Effect.fail(

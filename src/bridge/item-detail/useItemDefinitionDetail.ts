@@ -117,5 +117,5 @@ export const useItemDefinitionDetail = (
 			itemId,
 		],
 	);
-	return useRuntimeSelector(selector, sameProjection);
+	return useRuntimeSelector(game, selector, sameProjection);
 };

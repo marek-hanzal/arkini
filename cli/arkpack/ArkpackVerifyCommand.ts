@@ -1,4 +1,4 @@
-import { Args, Command, Options } from "@effect/cli";
+import { Argument, Command, Flag } from "effect/unstable/cli";
 import { Console, Effect } from "effect";
 
 import { readArkpackTrustedKeysFx } from "~/engine/pack/fx/readArkpackTrustedKeysFx";
@@ -32,19 +32,17 @@ const runArkpackVerifyFx = Effect.fn("runArkpackVerifyFx")(function* ({
 export const ArkpackVerifyCommand = Command.make(
 	"verify",
 	{
-		arkpack: Args.file({
-			name: "arkpack",
-		}),
-		trustedKeys: Options.text("trusted-keys").pipe(
-			Options.withDefault("game/arkini.arkpack.keys.json"),
-			Options.withDescription("Explicit trusted-public-key registry JSON path."),
+		arkpack: Argument.file("arkpack"),
+		trustedKeys: Flag.string("trusted-keys").pipe(
+			Flag.withDefault("game/arkini.arkpack.keys.json"),
+			Flag.withDescription("Explicit trusted-public-key registry JSON path."),
 		),
 	},
 	({ arkpack, trustedKeys }) =>
 		runArkpackVerifyFx({
 			arkpackPath: arkpack,
 			trustedKeysPath: trustedKeys,
-		}).pipe(Effect.catchAll(handleArkpackInputErrorFx)),
+		}).pipe(Effect.catch(handleArkpackInputErrorFx)),
 ).pipe(
 	Command.withDescription(
 		"Verify one Arkpack and print its explicit official, external, or invalid trust.",

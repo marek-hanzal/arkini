@@ -34,59 +34,63 @@ export const applyInputMaterialReserveRunPlanFx = Effect.fn("applyInputMaterialR
 		plan,
 		runtime,
 	}: applyInputMaterialReserveRunPlanFx.Props) {
-		return yield* Effect.reduce(plan.item, runtime, (draft, allocation) => {
-			return Effect.gen(function* () {
-				const item = yield* readInputRunItemFx({
-					ownerItemId,
-					lineId,
-					inputIndex,
-					itemId: allocation.itemId,
-					plannedQuantity: allocation.quantity,
-					runtime: draft,
-				});
-				const location = {
-					scope: LocationScopeEnumSchema.enum.Reserved,
-					jobId,
-				} satisfies ReservedLocationSchema.Type;
+		return yield* Effect.reduce(
+			plan.item,
+			() => runtime,
+			(draft, allocation) => {
+				return Effect.gen(function* () {
+					const item = yield* readInputRunItemFx({
+						ownerItemId,
+						lineId,
+						inputIndex,
+						itemId: allocation.itemId,
+						plannedQuantity: allocation.quantity,
+						runtime: draft,
+					});
+					const location = {
+						scope: LocationScopeEnumSchema.enum.Reserved,
+						jobId,
+					} satisfies ReservedLocationSchema.Type;
 
-				if (allocation.quantity === item.quantity) {
-					const reservedItem = yield* reviseRuntimeItemFx({
+					if (allocation.quantity === item.quantity) {
+						const reservedItem = yield* reviseRuntimeItemFx({
+							item: {
+								...item,
+								location,
+							} satisfies ReservedRuntimeItemSchema.Type,
+						});
+						return {
+							...draft,
+							items: draft.items.map((candidate) => {
+								return candidate.id === item.id ? reservedItem : candidate;
+							}),
+						} satisfies RuntimeSchema.Type;
+					}
+
+					const sourceItem = yield* reviseRuntimeItemFx({
 						item: {
 							...item,
-							location,
-						} satisfies ReservedRuntimeItemSchema.Type,
+							quantity: item.quantity - allocation.quantity,
+						} satisfies InputRuntimeItemSchema.Type,
 					});
+					const reservedItem = yield* createRuntimeItemFx({
+						id: yield* createRuntimeItemIdFx(),
+						item: item.item,
+						location,
+						quantity: allocation.quantity,
+					});
+
 					return {
 						...draft,
-						items: draft.items.map((candidate) => {
-							return candidate.id === item.id ? reservedItem : candidate;
-						}),
+						items: [
+							...draft.items.map((candidate) => {
+								return candidate.id === item.id ? sourceItem : candidate;
+							}),
+							reservedItem,
+						],
 					} satisfies RuntimeSchema.Type;
-				}
-
-				const sourceItem = yield* reviseRuntimeItemFx({
-					item: {
-						...item,
-						quantity: item.quantity - allocation.quantity,
-					} satisfies InputRuntimeItemSchema.Type,
 				});
-				const reservedItem = yield* createRuntimeItemFx({
-					id: yield* createRuntimeItemIdFx(),
-					item: item.item,
-					location,
-					quantity: allocation.quantity,
-				});
-
-				return {
-					...draft,
-					items: [
-						...draft.items.map((candidate) => {
-							return candidate.id === item.id ? sourceItem : candidate;
-						}),
-						reservedItem,
-					],
-				} satisfies RuntimeSchema.Type;
-			});
-		});
+			},
+		);
 	},
 );

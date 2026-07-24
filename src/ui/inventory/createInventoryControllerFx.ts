@@ -37,23 +37,27 @@ export const createInventoryControllerFx = Effect.fn("createInventoryControllerF
 				listeners.add(listener);
 				return () => listeners.delete(listener);
 			},
-			openFx: ({ origin = null }: OpenInventoryProps = {}) =>
-				Effect.sync(() => {
-					if (snapshot.phase === "open") return false;
-					restoreOrigin = null;
-					publish({
-						phase: "open",
-						origin,
-					});
-					return true;
-				}),
-			closeFx: ({ restoreFocus = true }: CloseInventoryProps = {}) =>
-				Effect.sync(() => {
-					if (snapshot.phase === "closed") return false;
-					restoreOrigin = restoreFocus ? snapshot.origin : null;
-					publish(closedState);
-					return true;
-				}),
+			openFx: Effect.fn("InventoryController.openFx")(
+				({ origin = null }: OpenInventoryProps = {}) =>
+					Effect.sync(() => {
+						if (snapshot.phase === "open") return false;
+						restoreOrigin = null;
+						publish({
+							phase: "open",
+							origin,
+						});
+						return true;
+					}),
+			),
+			closeFx: Effect.fn("InventoryController.closeFx")(
+				({ restoreFocus = true }: CloseInventoryProps = {}) =>
+					Effect.sync(() => {
+						if (snapshot.phase === "closed") return false;
+						restoreOrigin = restoreFocus ? snapshot.origin : null;
+						publish(closedState);
+						return true;
+					}),
+			),
 			takeRestoreOriginFx: Effect.sync(() => {
 				const origin = restoreOrigin;
 				restoreOrigin = null;

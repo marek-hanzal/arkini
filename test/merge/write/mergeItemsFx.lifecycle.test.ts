@@ -1,4 +1,4 @@
-import { Effect, Either } from "effect";
+import { Effect, Result } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~/engine/game/fx/useGameFx";
@@ -210,9 +210,9 @@ const attemptMergeFx = () =>
 		const source = before.items.find((item) => item.id === "runtime:source");
 		const target = before.items.find((item) => item.id === "runtime:target");
 		if (source === undefined || target === undefined) {
-			return yield* Effect.dieMessage("Expected merge participants.");
+			return yield* Effect.die(new Error("Expected merge participants."));
 		}
-		const attempt = yield* Effect.either(
+		const attempt = yield* Effect.result(
 			mergeItemsFx({
 				sourceItemId: source.id,
 				sourceRevision: source.revision,
@@ -294,9 +294,9 @@ describe("mergeItemsFx participant lifecycle", () => {
 					),
 				);
 
-				expect(Either.isLeft(result.attempt)).toBe(true);
-				if (Either.isLeft(result.attempt)) {
-					expect(result.attempt.left._tag).toBe(
+				expect(Result.isFailure(result.attempt)).toBe(true);
+				if (Result.isFailure(result.attempt)) {
+					expect(result.attempt.failure._tag).toBe(
 						participant === "source" ? "ItemNotOnGridError" : "ItemNotOnBoardError",
 					);
 				}
@@ -355,9 +355,9 @@ describe("mergeItemsFx participant lifecycle", () => {
 					}),
 				),
 			);
-			expect(Either.isLeft(result.attempt)).toBe(true);
-			if (Either.isLeft(result.attempt)) {
-				expect(result.attempt.left).toMatchObject({
+			expect(Result.isFailure(result.attempt)).toBe(true);
+			if (Result.isFailure(result.attempt)) {
+				expect(result.attempt.failure).toMatchObject({
 					_tag: "JobOwnerBusyError",
 					ownerItemId: "runtime:source",
 				});
@@ -407,15 +407,15 @@ describe("mergeItemsFx participant lifecycle", () => {
 			);
 
 			if (effect === "keep") {
-				expect(Either.isRight(result.attempt)).toBe(true);
+				expect(Result.isSuccess(result.attempt)).toBe(true);
 				expect(result.after.jobs).toEqual(result.before.jobs);
 				expect(
 					result.after.items.find((item) => item.id === "runtime:target")?.item.id,
 				).toBe("target");
 			} else {
-				expect(Either.isLeft(result.attempt)).toBe(true);
-				if (Either.isLeft(result.attempt)) {
-					expect(result.attempt.left._tag).toBe("JobOwnerBusyError");
+				expect(Result.isFailure(result.attempt)).toBe(true);
+				if (Result.isFailure(result.attempt)) {
+					expect(result.attempt.failure._tag).toBe("JobOwnerBusyError");
 				}
 				expect(result.after).toEqual(result.before);
 			}
@@ -465,13 +465,13 @@ describe("mergeItemsFx participant lifecycle", () => {
 			);
 
 			if (action === "use") {
-				expect(Either.isLeft(result.attempt)).toBe(true);
-				if (Either.isLeft(result.attempt)) {
-					expect(result.attempt.left._tag).toBe("ItemStatefulError");
+				expect(Result.isFailure(result.attempt)).toBe(true);
+				if (Result.isFailure(result.attempt)) {
+					expect(result.attempt.failure._tag).toBe("ItemStatefulError");
 				}
 				expect(result.after).toEqual(result.before);
 			} else {
-				expect(Either.isRight(result.attempt)).toBe(true);
+				expect(Result.isSuccess(result.attempt)).toBe(true);
 				expect(result.after.items.some((item) => item.id === "runtime:source")).toBe(false);
 				expect(
 					result.after.items.some((item) => item.id === "runtime:source:material"),
@@ -507,7 +507,7 @@ describe("mergeItemsFx participant lifecycle", () => {
 			),
 		);
 
-		expect(Either.isRight(result.attempt)).toBe(true);
+		expect(Result.isSuccess(result.attempt)).toBe(true);
 		const beforeTarget = result.before.items.find((item) => item.id === "runtime:target");
 		const replaced = result.after.items.find((item) => item.id === "runtime:target");
 		expect(replaced).toMatchObject({
@@ -569,13 +569,13 @@ describe("mergeItemsFx participant lifecycle", () => {
 			);
 
 			if (effect === "replace") {
-				expect(Either.isLeft(result.attempt)).toBe(true);
-				if (Either.isLeft(result.attempt)) {
-					expect(result.attempt.left._tag).toBe("ItemStatefulError");
+				expect(Result.isFailure(result.attempt)).toBe(true);
+				if (Result.isFailure(result.attempt)) {
+					expect(result.attempt.failure._tag).toBe("ItemStatefulError");
 				}
 				expect(result.after).toEqual(result.before);
 			} else {
-				expect(Either.isRight(result.attempt)).toBe(true);
+				expect(Result.isSuccess(result.attempt)).toBe(true);
 				expect(result.after.items.some((item) => item.id === "runtime:target")).toBe(false);
 				const released = result.after.items.find(
 					(item) => item.id === "runtime:target:material",

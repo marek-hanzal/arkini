@@ -12,9 +12,15 @@ export namespace createGameSaveStorageFx {
 export const createGameSaveStorageFx = Effect.fn("createGameSaveStorageFx")(
 	({ api = window.arkini.save }: createGameSaveStorageFx.Props = {}) =>
 		Effect.succeed({
-			readFx: (key) => invokeGameSaveTransportFx("read", () => api.read(key)),
-			clearFx: (key) => invokeGameSaveTransportFx("clear", () => api.clear(key)),
-			writeFx: (key, bytes) =>
-				invokeGameSaveTransportFx("write", () => api.write(key, bytes)),
+			readFx: Effect.fn("GameSaveStorage.readFx")((key: GameSaveStorage.Key) =>
+				invokeGameSaveTransportFx("read", () => api.read(key)),
+			),
+			clearFx: Effect.fn("GameSaveStorage.clearFx")((key: GameSaveStorage.Key) =>
+				invokeGameSaveTransportFx("clear", () => api.clear(key)),
+			),
+			writeFx: Effect.fn("GameSaveStorage.writeFx")(
+				(key: GameSaveStorage.Key, bytes: Uint8Array) =>
+					invokeGameSaveTransportFx("write", () => api.write(key, bytes)),
+			),
 		} satisfies GameSaveStorage),
 );

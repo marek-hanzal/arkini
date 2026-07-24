@@ -14,6 +14,6 @@ export interface RuntimeFxService {
  *
  * All mutations are owned by dedicated atomic runtime commands.
  */
-export class RuntimeFx extends Context.Tag("RuntimeFx")<RuntimeFx, RuntimeFxService>() {
+export class RuntimeFx extends Context.Service<RuntimeFx, RuntimeFxService>()("RuntimeFx") {
 	//
 }

@@ -46,7 +46,7 @@ export const readJobMaximumOutputQuantitiesFx = Effect.fn("readJobMaximumOutputQ
 			lineId: job.lineId,
 		});
 		if (line === undefined) {
-			return yield* Effect.dieMessage(`Job ${job.id} line ${job.lineId} is missing.`);
+			return yield* Effect.die(new Error(`Job ${job.id} line ${job.lineId} is missing.`));
 		}
 
 		const quantities = new Map<IdSchema.Type, number>();

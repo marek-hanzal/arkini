@@ -248,7 +248,7 @@ describe("RuntimeSaveLayerFx", () => {
 				write: () =>
 					Effect.sync(() => {
 						writes += 1;
-					}).pipe(Effect.zipRight(Effect.fail(new Error("save failed")))),
+					}).pipe(Effect.andThen(Effect.fail(new Error("save failed")))),
 			},
 		});
 
@@ -311,7 +311,7 @@ describe("RuntimeSaveLayerFx", () => {
 				write: () =>
 					Effect.sync(() => {
 						writes += 1;
-					}).pipe(Effect.zipRight(Effect.fail(new Error("save failed")))),
+					}).pipe(Effect.andThen(Effect.fail(new Error("save failed")))),
 			},
 		});
 
@@ -479,7 +479,7 @@ describe("RuntimeSaveLayerFx", () => {
 		const command = session
 			.run(
 				Effect.sleep("50 millis").pipe(
-					Effect.zipRight(
+					Effect.andThen(
 						spawnItemFx({
 							id: "runtime:save:late-command",
 							itemId: "water",
@@ -535,8 +535,8 @@ describe("RuntimeSaveLayerFx", () => {
 		const command = session
 			.run(
 				Deferred.succeed(commandStarted, undefined).pipe(
-					Effect.zipRight(Deferred.await(releaseCommand)),
-					Effect.zipRight(
+					Effect.andThen(Deferred.await(releaseCommand)),
+					Effect.andThen(
 						spawnItemFx({
 							id: "runtime:save:command-during-flush",
 							itemId: "water",

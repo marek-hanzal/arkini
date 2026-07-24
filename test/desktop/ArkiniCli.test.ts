@@ -20,20 +20,38 @@ const runCli = (...args: ReadonlyArray<string>) =>
 
 describe("Arkini Effect CLI", () => {
 	it("exposes one discoverable game and desktop command tree", () => {
-		const result = runCli("--help");
-		const output = stripAnsi(`${result.stdout}${result.stderr}`);
+		const root = runCli("--help");
+		const rootOutput = stripAnsi(`${root.stdout}${root.stderr}`);
+		expect(root.status).toBe(0);
+		expect(rootOutput).toContain("arkpack");
+		expect(rootOutput).toContain("game");
+		expect(rootOutput).toContain("desktop");
 
-		expect(result.status).toBe(0);
-		expect(output).toContain("game validate");
-		expect(output).toContain("game schema");
-		expect(output).toContain("desktop build");
-		expect(output).toContain("desktop clean");
-		expect(output).toContain("desktop stage");
-		expect(output).toContain("desktop package [--arch arm64]");
-		expect(output).toContain("desktop preview-macos");
-		expect(output).toContain("desktop checksums");
-		expect(output).toContain("desktop verify");
-		expect(output).not.toContain("desktop desktop");
+		const game = runCli("game", "--help");
+		const gameOutput = stripAnsi(`${game.stdout}${game.stderr}`);
+		expect(game.status).toBe(0);
+		expect(gameOutput).toContain("pack");
+		expect(gameOutput).toContain("pack-demo");
+		expect(gameOutput).toContain("schema");
+		expect(gameOutput).toContain("validate");
+
+		const desktop = runCli("desktop", "--help");
+		const desktopOutput = stripAnsi(`${desktop.stdout}${desktop.stderr}`);
+		expect(desktop.status).toBe(0);
+		expect(desktopOutput).toContain("build");
+		expect(desktopOutput).toContain("clean");
+		expect(desktopOutput).toContain("stage");
+		expect(desktopOutput).toContain("package");
+		expect(desktopOutput).toContain("preview-macos");
+		expect(desktopOutput).toContain("checksums");
+		expect(desktopOutput).toContain("verify");
+		expect(desktopOutput).not.toContain("desktop desktop");
+
+		const desktopPackage = runCli("desktop", "package", "--help");
+		const desktopPackageOutput = stripAnsi(`${desktopPackage.stdout}${desktopPackage.stderr}`);
+		expect(desktopPackage.status).toBe(0);
+		expect(desktopPackageOutput).toContain("--arch");
+		expect(desktopPackageOutput).toContain("choices: arm64");
 	});
 
 	it("rejects unsupported package architecture with a deterministic non-zero exit", () => {

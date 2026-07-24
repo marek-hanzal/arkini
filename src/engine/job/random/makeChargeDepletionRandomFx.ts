@@ -4,17 +4,25 @@ import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { JobSchema } from "~/engine/job/schema/JobSchema";
 
 /** Bump only when intentionally changing charge-depletion random compatibility. */
-export const ChargeDepletionRandomVersion = 1;
+export const ChargeDepletionRandomVersion = 2;
 
-/** Creates one deterministic random stream for one charged item depletion. */
-export const makeChargeDepletionRandomFx = Effect.fn("makeChargeDepletionRandomFx")(function* ({
+/** Runs the owned program with deterministic random for one charged item depletion. */
+export const makeChargeDepletionRandomFx = Effect.fn("makeChargeDepletionRandomFx")(function* <
+	Result,
+	Error,
+	Requirements,
+>({
 	itemId,
 	job,
+	program,
 }: {
 	itemId: IdSchema.Type;
 	job: JobSchema.Type;
+	program: Effect.Effect<Result, Error, Requirements>;
 }) {
-	return Random.make(
-		`arkini:charge-depletion:v${ChargeDepletionRandomVersion}:${job.id}:${itemId}`,
+	return yield* program.pipe(
+		Random.withSeed(
+			`arkini:charge-depletion:v${ChargeDepletionRandomVersion}:${job.id}:${itemId}`,
+		),
 	);
 });

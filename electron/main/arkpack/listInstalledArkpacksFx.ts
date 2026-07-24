@@ -1,4 +1,4 @@
-import { FileSystem } from "@effect/platform";
+import { FileSystem } from "effect";
 import { Effect, Option } from "effect";
 import { join } from "node:path";
 import type { ArkiniElectronApi } from "../../contract/ArkiniElectronApi";
@@ -39,7 +39,7 @@ export const listInstalledArkpacksFx = Effect.fn("listInstalledArkpacksFx")(func
 					expectedPackageId: entry,
 				}),
 			);
-		}).pipe(Effect.catchAll(() => Effect.succeed(Option.none())));
+		}).pipe(Effect.catch(() => Effect.succeed(Option.none())));
 	});
 	return candidates
 		.filter(Option.isSome)

@@ -37,7 +37,7 @@ export const handleArkiniProtocolRequestFx = Effect.fn("handleArkiniProtocolRequ
 				requestUrl: request.url,
 				rendererRoot,
 			}).pipe(
-				Effect.catchAll((error) =>
+				Effect.catch((error) =>
 					Effect.succeed(
 						withProductionContentSecurityPolicy(
 							new Response(error.message, {

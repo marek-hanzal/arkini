@@ -1,4 +1,4 @@
-import { Effect, Either } from "effect";
+import { Effect, Result } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
@@ -127,7 +127,7 @@ describe("removeItemFx owner lifecycle", () => {
 				});
 				const queued = yield* startLineFx(startProps);
 				const before = yield* readRuntimeFx();
-				const attempt = yield* Effect.either(
+				const attempt = yield* Effect.result(
 					removeItemFx({
 						itemId: owner.id,
 						revision: owner.revision,
@@ -148,13 +148,13 @@ describe("removeItemFx owner lifecycle", () => {
 			),
 		);
 
-		expect(Either.isLeft(result.attempt)).toBe(true);
+		expect(Result.isFailure(result.attempt)).toBe(true);
 		if (
-			Either.isLeft(result.attempt) &&
+			Result.isFailure(result.attempt) &&
 			result.started.type === StartLineResultEnumSchema.enum.Started &&
 			result.queued.type === StartLineResultEnumSchema.enum.Queued
 		) {
-			expect(result.attempt.left).toMatchObject({
+			expect(result.attempt.failure).toMatchObject({
 				_tag: "JobOwnerBusyError",
 				ownerItemId: startProps.ownerItemId,
 				jobIds: [
@@ -247,7 +247,7 @@ describe("removeItemFx owner lifecycle", () => {
 					revision: owner.revision,
 				});
 				const before = yield* readRuntimeFx();
-				const attempt = yield* Effect.either(
+				const attempt = yield* Effect.result(
 					removeItemFx({
 						itemId: owner.id,
 						revision: moved.item.revision,
@@ -265,9 +265,9 @@ describe("removeItemFx owner lifecycle", () => {
 			),
 		);
 
-		expect(Either.isLeft(result.attempt)).toBe(true);
-		if (Either.isLeft(result.attempt)) {
-			expect(result.attempt.left).toMatchObject({
+		expect(Result.isFailure(result.attempt)).toBe(true);
+		if (Result.isFailure(result.attempt)) {
+			expect(result.attempt.failure).toMatchObject({
 				_tag: "ItemNotOnBoardError",
 			});
 		}
@@ -342,7 +342,7 @@ describe("removeItemFx owner lifecycle", () => {
 					});
 				}
 				const before = yield* readRuntimeFx();
-				const attempt = yield* Effect.either(
+				const attempt = yield* Effect.result(
 					removeItemFx({
 						itemId: owner.id,
 						revision: owner.revision,
@@ -361,9 +361,9 @@ describe("removeItemFx owner lifecycle", () => {
 			),
 		);
 
-		expect(Either.isLeft(result.attempt)).toBe(true);
-		if (Either.isLeft(result.attempt)) {
-			expect(result.attempt.left).toMatchObject({
+		expect(Result.isFailure(result.attempt)).toBe(true);
+		if (Result.isFailure(result.attempt)) {
+			expect(result.attempt.failure).toMatchObject({
 				_tag: "PlacementUnavailableError",
 			});
 		}

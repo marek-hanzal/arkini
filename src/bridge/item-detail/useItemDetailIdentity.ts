@@ -75,5 +75,5 @@ export const useItemDetailIdentity = (itemId: IdSchema.Type): useItemDetailIdent
 			itemId,
 		],
 	);
-	return useRuntimeSelector(selector, sameProjection);
+	return useRuntimeSelector(game, selector, sameProjection);
 };

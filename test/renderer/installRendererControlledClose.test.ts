@@ -1,25 +1,38 @@
 // @vitest-environment jsdom
 
-import { QueryClient } from "@tanstack/react-query";
-import { Effect } from "effect";
+import { Deferred, Effect, Exit, Scope } from "effect";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import { acquireGameEngineLeaseFx } from "~/bridge/game/acquireGameEngineLeaseFx";
+import { toCriticalGameLifecycleError } from "~/bridge/game/CriticalGameLifecycleError";
 import type { GameEngineResource } from "~/bridge/game/GameEngineResource";
-import { gameEngineQueryKey } from "~/bridge/game/gameEngineQueryKey";
 import { installRendererControlledCloseFx } from "~/installRendererControlledCloseFx";
 import type { ArkiniRouter } from "~/router";
 import { actionLoadingCompletionHoldMs } from "~/ui/loading/actionLoadingCompletionHoldMs";
+import {
+	adoptTestGameEngineResourceFx,
+	createTestRendererRuntime,
+} from "~test/support/createTestRendererRuntime";
 
 type CloseListener = () => Promise<void>;
 
-const createResource = (packageId: string) =>
-	({
-		game: {
-			arkpack: {
-				packageId,
-			},
+const createResource = (packageId: string): GameEngineResource => ({
+	game: {
+		arkpack: {
+			packageId,
 		},
-	}) as GameEngineResource;
+		disposeFx: Effect.void,
+		disposeWithoutSaveFx: Effect.void,
+	} as unknown as GameEngineResource["game"],
+	assertUsable: () => undefined,
+	markCriticalFailure: (operation, cause) =>
+		toCriticalGameLifecycleError({
+			operation,
+			cause,
+		}),
+});
+
+const runtimes: Array<ReturnType<typeof createTestRendererRuntime>["rendererRuntime"]> = [];
 
 const createLifecycle = () => {
 	let beforeClose: CloseListener | undefined;
@@ -80,22 +93,29 @@ beforeEach(() => {
 	vi.useFakeTimers();
 });
 
-afterEach(() => {
+afterEach(async () => {
 	vi.useRealTimers();
+	for (const runtime of runtimes.splice(0)) await runtime.dispose();
 	vi.restoreAllMocks();
 });
 
 describe("installRendererControlledClose", () => {
 	it("replace-navigates an active Game and waits for its painted completion hold", async () => {
-		const queryClient = new QueryClient();
-		queryClient.setQueryData(gameEngineQueryKey, createResource("package:close"));
+		const resource = createResource("package:close");
+		const { rendererRuntime } = createTestRendererRuntime({
+			createResourceFx: () => Effect.succeed(resource),
+		});
+		runtimes.push(rendererRuntime);
+		vi.useRealTimers();
+		await rendererRuntime.runPromise(adoptTestGameEngineResourceFx("package:close"));
+		vi.useFakeTimers();
 		const lifecycle = createLifecycle();
 		const router = createRouter();
 		const frames = frameHarness();
-		const remove = Effect.runSync(
+		const remove = rendererRuntime.runSync(
 			installRendererControlledCloseFx({
 				lifecycle: lifecycle.lifecycle,
-				queryClient,
+				rendererRuntime,
 				router: router.router,
 			}),
 		);
@@ -134,13 +154,17 @@ describe("installRendererControlledClose", () => {
 	});
 
 	it("closes directly when no current or pending Game exists", async () => {
+		const { rendererRuntime } = createTestRendererRuntime({
+			createResourceFx: () => Effect.never,
+		});
+		runtimes.push(rendererRuntime);
 		const lifecycle = createLifecycle();
 		const router = createRouter();
 		const frames = frameHarness();
-		Effect.runSync(
+		const remove = rendererRuntime.runSync(
 			installRendererControlledCloseFx({
 				lifecycle: lifecycle.lifecycle,
-				queryClient: new QueryClient(),
+				rendererRuntime,
 				router: router.router,
 			}),
 		);
@@ -150,34 +174,39 @@ describe("installRendererControlledClose", () => {
 
 		expect(router.navigate).not.toHaveBeenCalled();
 		expect(frames.requestAnimationFrame).not.toHaveBeenCalled();
+		remove();
 	});
 
 	it("joins pending singleton creation before selecting the exact exit route", async () => {
-		const queryClient = new QueryClient();
+		vi.useRealTimers();
 		const resource = createResource("package:pending");
-		let resolveResource!: (value: GameEngineResource) => void;
-		const creation = queryClient.fetchQuery({
-			queryKey: gameEngineQueryKey,
-			queryFn: () =>
-				new Promise<GameEngineResource>((resolve) => {
-					resolveResource = resolve;
-				}),
+		const creation = Effect.runSync(Deferred.make<GameEngineResource>());
+		const createResourceFx = vi.fn(() => Deferred.await(creation));
+		const { rendererRuntime } = createTestRendererRuntime({
+			createResourceFx,
 		});
+		runtimes.push(rendererRuntime);
+		const scope = Effect.runSync(Scope.make());
+		const acquisition = rendererRuntime.runPromise(
+			acquireGameEngineLeaseFx({
+				packageId: "package:pending",
+			}).pipe(Effect.provideService(Scope.Scope, scope)),
+		);
 		const lifecycle = createLifecycle();
 		const router = createRouter();
-		Effect.runSync(
+		const remove = rendererRuntime.runSync(
 			installRendererControlledCloseFx({
 				lifecycle: lifecycle.lifecycle,
-				queryClient,
+				rendererRuntime,
 				router: router.router,
 			}),
 		);
 
 		const beforeClose = lifecycle.readBeforeClose()();
-		await Promise.resolve();
+		await vi.waitFor(() => expect(createResourceFx).toHaveBeenCalledOnce());
 		expect(router.navigate).not.toHaveBeenCalled();
-		resolveResource(resource);
-		await creation;
+		Effect.runSync(Deferred.succeed(creation, resource));
+		await acquisition;
 		await beforeClose;
 
 		expect(router.navigate).toHaveBeenCalledWith({
@@ -187,5 +216,7 @@ describe("installRendererControlledClose", () => {
 			},
 			replace: true,
 		});
+		await Effect.runPromise(Scope.close(scope, Exit.void));
+		remove();
 	});
 });

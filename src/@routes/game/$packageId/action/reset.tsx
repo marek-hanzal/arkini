@@ -1,17 +1,15 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 
 import { resetGameEngineResourceFx } from "~/bridge/game/resetGameEngineResourceFx";
-import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import { ActionPendingPage } from "~/page/action/ActionPendingPage";
 import { runActionRouteFx } from "~/page/action/runActionRouteFx";
 
 export const Route = createFileRoute("/game/$packageId/action/reset")({
 	loader: async ({ context, params }) => {
 		try {
-			await RendererRuntime.runPromise(
+			await context.rendererRuntime.runPromise(
 				runActionRouteFx(
 					resetGameEngineResourceFx({
-						queryClient: context.queryClient,
 						resource: context.gameEngineResource,
 					}),
 				),

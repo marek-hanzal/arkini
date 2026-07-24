@@ -1,5 +1,6 @@
 import { useCallback } from "react";
 
+import { useGameEngine } from "~/bridge/game/useGameEngine";
 import { useRuntimeSelector } from "~/bridge/runtime/useRuntimeSelector";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { readItemDetailQueue } from "~/engine/item-detail/read/readItemDetailQueue";
@@ -37,6 +38,7 @@ const sameProjection = (
 
 /** Projects the authoritative FIFO queue for one exact Item Detail target. */
 export const useItemDetailQueue = (itemId: IdSchema.Type): useItemDetailQueue.Projection => {
+	const game = useGameEngine();
 	const selector = useCallback(
 		(runtime: RuntimeSchema.Type) =>
 			readItemDetailQueue({
@@ -47,5 +49,5 @@ export const useItemDetailQueue = (itemId: IdSchema.Type): useItemDetailQueue.Pr
 			itemId,
 		],
 	);
-	return useRuntimeSelector(selector, sameProjection);
+	return useRuntimeSelector(game, selector, sameProjection);
 };

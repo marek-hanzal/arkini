@@ -1,4 +1,5 @@
 import { useNavigate, useRouter } from "@tanstack/react-router";
+import { Effect } from "effect";
 import { useCallback, useEffect } from "react";
 
 import { useGameEngine } from "~/bridge/game/useGameEngine";
@@ -14,28 +15,37 @@ export const CheatsScreen = () => {
 	const navigate = useNavigate();
 	const model = useCheatsModel(game);
 
-	const returnToBoard = useCallback(
+	const returnToBoardFx = useCallback(
 		({ replace = false }: { readonly replace?: boolean } = {}) => {
-			if (!model.beginExit()) return;
 			if (!replace && router.history.canGoBack()) {
-				router.history.back();
-				return;
+				return Effect.try({
+					try: () => router.history.back(),
+					catch: (error) => error,
+				});
 			}
-			void navigate({
-				to: "/game/$packageId/board",
-				params: {
-					packageId: game.arkpack.packageId,
-				},
-				replace: true,
-			}).finally(() => {
-				model.completeExit();
-			});
+			return Effect.tryPromise({
+				try: () =>
+					navigate({
+						to: "/game/$packageId/board",
+						params: {
+							packageId: game.arkpack.packageId,
+						},
+						replace: true,
+					}),
+				catch: (error) => error,
+			}).pipe(Effect.asVoid);
 		},
 		[
 			game.arkpack.packageId,
-			model,
 			navigate,
 			router,
+		],
+	);
+	const returnToBoard = useCallback(
+		(options?: { readonly replace?: boolean }) => model.requestExit(returnToBoardFx(options)),
+		[
+			model,
+			returnToBoardFx,
 		],
 	);
 

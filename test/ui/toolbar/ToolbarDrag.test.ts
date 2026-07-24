@@ -18,6 +18,7 @@ import { GameBoardLayout } from "~/ui/board/GameBoardLayout";
 import { ItemDetailModal } from "~/ui/item-detail/ItemDetailModal";
 import { ItemDetailProvider } from "~/ui/item-detail/ItemDetailProvider";
 import { TileSystemProvider } from "~/ui/tile/TileSystemProvider";
+import { makeTestGameTransitionFieldsFx } from "~test/support/game/makeTestGameTransitionFieldsFx";
 
 (
 	globalThis as {
@@ -42,9 +43,13 @@ vi.mock("~/bridge/game/useGameEngine", () => ({
 	},
 }));
 
-vi.mock("~/bridge/tile/useDropItem", () => ({
-	useDropItem: () => dropItemState.drop,
-}));
+vi.mock("~/bridge/tile/dropItemAtom", async () => {
+	const { makeDropItemTestAtom } = await import("~test/ui/tile/support/makeDropItemTestAtom");
+	const commandAtom = makeDropItemTestAtom(dropItemState.drop);
+	return {
+		dropItemAtom: () => commandAtom,
+	};
+});
 
 const roots: Array<ReturnType<typeof createRoot>> = [];
 const runtimeListeners = new Set<() => void>();
@@ -195,6 +200,7 @@ let currentTransition: CommittedTransitionSchema.Type = {
 	runtime: currentRuntime,
 	events: [],
 };
+const transitionAtomFields = Effect.runSync(makeTestGameTransitionFieldsFx(currentRuntime));
 
 const publishRuntime = (next: RuntimeSchema.Type) => {
 	const previousRuntime = currentRuntime;
@@ -205,6 +211,7 @@ const publishRuntime = (next: RuntimeSchema.Type) => {
 		runtime: next,
 		events: [],
 	};
+	Effect.runSync(transitionAtomFields.publishRuntimeFx(next));
 	for (const listener of runtimeListeners) listener();
 	for (const listener of transitionListeners) void listener(currentTransition);
 };
@@ -234,6 +241,7 @@ const game = {
 	},
 	getSnapshot: () => currentRuntime,
 	getTransitionSnapshot: () => currentTransition,
+	committedTransitionAtom: transitionAtomFields.committedTransitionAtom,
 	getResourceUrl: (resourceId: string) => `resource:${resourceId}`,
 	subscribe: (listener: () => void) => {
 		runtimeListeners.add(listener);
@@ -253,6 +261,7 @@ const game = {
 		Effect.runSync(
 			provideCurrentRuntime(effect as Effect.Effect<unknown, unknown, RuntimeFx>),
 		)) as GameEngine["readOrThrow"],
+	runFx: transitionAtomFields.runFx,
 	run: (() => Promise.reject(new Error("Not used by this test."))) as GameEngine["run"],
 	disposeFx: Effect.void,
 	disposeWithoutSaveFx: Effect.void,
@@ -268,6 +277,7 @@ beforeEach(() => {
 		runtime: currentRuntime,
 		events: [],
 	};
+	Effect.runSync(transitionAtomFields.resetRuntimeFx(currentRuntime));
 	runtimeListeners.clear();
 	transitionListeners.clear();
 	gameEngineState.game = game;

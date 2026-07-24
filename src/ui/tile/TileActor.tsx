@@ -1,6 +1,7 @@
 import { Effect } from "effect";
+import * as AsyncResult from "effect/unstable/reactivity/AsyncResult";
 import { motion } from "motion/react";
-import { memo, useCallback, useContext, useMemo } from "react";
+import { memo, useCallback, useContext, useEffect, useMemo, useRef } from "react";
 import { match } from "ts-pattern";
 
 import { useStartItemDetailLine } from "~/bridge/item-detail/useStartItemDetailLine";
@@ -11,6 +12,7 @@ import { CursorClassName } from "~/ui/cursor/CursorSemantic";
 import type { InventoryControl } from "~/ui/inventory/InventoryControl";
 import { InventoryContext } from "~/ui/inventory/InventoryContext";
 import { useItemDetailControl } from "~/ui/item-detail/useItemDetailControl";
+import { readSettledAsyncResultError } from "~/ui/reactivity/readSettledAsyncResultError";
 import { TileActorContent } from "~/ui/tile/TileActorContent";
 import { readTileActorCursorSemantic } from "~/ui/tile/readTileActorCursorSemantic";
 import { readTileActorStackingZIndex } from "~/ui/tile/TileActorStacking";
@@ -32,7 +34,25 @@ export namespace TileActor {
 const TileActorComponent = ({ item }: TileActor.Props) => {
 	const itemDetail = useItemDetailControl();
 	const inventory = useContext(InventoryContext) ?? unavailableInventoryControl;
-	const startLine = useStartItemDetailLine();
+	const startLineCommandKey = useMemo(
+		() =>
+			JSON.stringify([
+				"tile-start-default-line",
+				item.id,
+				item.primaryAction.kind === "start-default-line" ? item.primaryAction.lineId : null,
+			]),
+		[
+			item.id,
+			item.primaryAction,
+		],
+	);
+	const startLine = useStartItemDetailLine({
+		commandKey: startLineCommandKey,
+	});
+	const startLineError = readSettledAsyncResultError(startLine.result);
+	const startLinePending = useRef(false);
+	const startLineOrigin = useRef<HTMLElement | null>(null);
+	const handledStartLineFailure = useRef<unknown>(undefined);
 	const presentation = useTileActorPresentation({
 		item,
 	});
@@ -51,6 +71,51 @@ const TileActorComponent = ({ item }: TileActor.Props) => {
 		live: interactive,
 	});
 
+	const openLines = useCallback(
+		(origin: HTMLElement | null) => {
+			RendererRuntime.runSync(
+				itemDetail.openItemDetailFx({
+					itemId: item.id,
+					tab: "lines",
+					origin,
+				}),
+			);
+		},
+		[
+			item.id,
+			itemDetail,
+		],
+	);
+
+	useEffect(() => {
+		startLinePending.current = false;
+		startLineOrigin.current = null;
+		handledStartLineFailure.current = undefined;
+	}, [
+		startLineCommandKey,
+	]);
+
+	useEffect(() => {
+		if (startLine.result.waiting) return;
+		if (!AsyncResult.isInitial(startLine.result)) {
+			startLinePending.current = false;
+		}
+		if (AsyncResult.isSuccess(startLine.result)) {
+			startLineOrigin.current = null;
+		}
+		if (startLineError === undefined || handledStartLineFailure.current === startLine.result) {
+			return;
+		}
+		handledStartLineFailure.current = startLine.result;
+		const origin = startLineOrigin.current;
+		startLineOrigin.current = null;
+		openLines(origin);
+	}, [
+		openLines,
+		startLine.result,
+		startLineError,
+	]);
+
 	const runPrimaryAction = useCallback(
 		(origin: HTMLElement) =>
 			match(item.primaryAction)
@@ -64,15 +129,7 @@ const TileActorComponent = ({ item }: TileActor.Props) => {
 					{
 						kind: "open-lines",
 					},
-					() => {
-						RendererRuntime.runSync(
-							itemDetail.openItemDetailFx({
-								itemId: item.id,
-								tab: "lines",
-								origin,
-							}),
-						);
-					},
+					() => openLines(origin),
 				)
 				.with(
 					{
@@ -91,17 +148,15 @@ const TileActorComponent = ({ item }: TileActor.Props) => {
 						kind: "start-default-line",
 					},
 					({ lineId }) => {
-						void startLine({
+						if (item.running || startLine.result.waiting || startLinePending.current) {
+							openLines(origin);
+							return;
+						}
+						startLinePending.current = true;
+						startLineOrigin.current = origin;
+						startLine.start({
 							ownerItemId: item.id,
 							lineId,
-						}).catch(() => {
-							RendererRuntime.runSync(
-								itemDetail.openItemDetailFx({
-									itemId: item.id,
-									tab: "lines",
-									origin,
-								}),
-							);
 						});
 					},
 				)
@@ -110,7 +165,8 @@ const TileActorComponent = ({ item }: TileActor.Props) => {
 			inventory,
 			item.id,
 			item.primaryAction,
-			itemDetail,
+			item.running,
+			openLines,
 			startLine,
 		],
 	);
@@ -128,7 +184,9 @@ const TileActorComponent = ({ item }: TileActor.Props) => {
 		forbiddenDrop: presentation.forbiddenDrop,
 		live: interactive,
 		phase: presentation.phase,
-		running: item.running,
+		running:
+			item.running ||
+			(item.primaryAction.kind === "start-default-line" && startLine.result.waiting),
 		visible,
 	});
 

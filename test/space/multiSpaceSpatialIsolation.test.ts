@@ -1,4 +1,5 @@
-import { Effect, Either, Random } from "effect";
+import { makeFixedRandomFx } from "~test/support/makeFixedRandomFx";
+import { Effect, Result, Random } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~/engine/game/fx/useGameFx";
@@ -103,7 +104,7 @@ describe("multi-space spatial isolation", () => {
 					quantity: 1,
 				});
 				if (origin.location.scope !== "board") {
-					return yield* Effect.dieMessage("Expected board origin.");
+					return yield* Effect.die(new Error("Expected board origin."));
 				}
 
 				const board = yield* queryFx({
@@ -240,9 +241,10 @@ describe("multi-space spatial isolation", () => {
 				});
 				return yield* readRuntimeFx();
 			}).pipe(
-				Effect.withRandom(
-					Random.fixed([
-						2,
+				Effect.provideServiceEffect(
+					Random.Random,
+					makeFixedRandomFx([
+						0.75,
 					]),
 				),
 				useTestGame,
@@ -330,14 +332,14 @@ describe("multi-space spatial isolation", () => {
 				});
 
 				const before = yield* readRuntimeFx();
-				const moved = yield* Effect.either(
+				const moved = yield* Effect.result(
 					moveItemFx({
 						itemId: movable.id,
 						revision: movable.revision,
 						location: boardLocation(1, 0),
 					}),
 				);
-				const swapped = yield* Effect.either(
+				const swapped = yield* Effect.result(
 					swapItemsFx({
 						firstItemId: movable.id,
 						firstItemRevision: movable.revision,
@@ -345,7 +347,7 @@ describe("multi-space spatial isolation", () => {
 						secondItemRevision: remote.revision,
 					}),
 				);
-				const inventorySwapped = yield* Effect.either(
+				const inventorySwapped = yield* Effect.result(
 					swapItemsFx({
 						firstItemId: inventory.id,
 						firstItemRevision: inventory.revision,
@@ -353,7 +355,7 @@ describe("multi-space spatial isolation", () => {
 						secondItemRevision: remote.revision,
 					}),
 				);
-				const merged = yield* Effect.either(
+				const merged = yield* Effect.result(
 					mergeItemsFx({
 						sourceItemId: source.id,
 						sourceRevision: source.revision,
@@ -361,7 +363,7 @@ describe("multi-space spatial isolation", () => {
 						targetRevision: target.revision,
 					}),
 				);
-				const stored = yield* Effect.either(
+				const stored = yield* Effect.result(
 					storeInputMaterialFx({
 						ownerItemId: owner.id,
 						lineId: "line:workshop:material",
@@ -385,33 +387,33 @@ describe("multi-space spatial isolation", () => {
 			}).pipe(useTestGame),
 		);
 
-		expect(Either.isLeft(result.moved)).toBe(true);
-		if (Either.isLeft(result.moved)) {
-			expect(result.moved.left).toMatchObject({
+		expect(Result.isFailure(result.moved)).toBe(true);
+		if (Result.isFailure(result.moved)) {
+			expect(result.moved.failure).toMatchObject({
 				_tag: "CrossSpaceBoardOperationError",
 			});
 		}
-		expect(Either.isLeft(result.swapped)).toBe(true);
-		if (Either.isLeft(result.swapped)) {
-			expect(result.swapped.left).toMatchObject({
+		expect(Result.isFailure(result.swapped)).toBe(true);
+		if (Result.isFailure(result.swapped)) {
+			expect(result.swapped.failure).toMatchObject({
 				_tag: "CrossSpaceBoardOperationError",
 			});
 		}
-		expect(Either.isLeft(result.inventorySwapped)).toBe(true);
-		if (Either.isLeft(result.inventorySwapped)) {
-			expect(result.inventorySwapped.left).toMatchObject({
+		expect(Result.isFailure(result.inventorySwapped)).toBe(true);
+		if (Result.isFailure(result.inventorySwapped)) {
+			expect(result.inventorySwapped.failure).toMatchObject({
 				_tag: "CrossSpaceBoardOperationError",
 			});
 		}
-		expect(Either.isLeft(result.merged)).toBe(true);
-		if (Either.isLeft(result.merged)) {
-			expect(result.merged.left).toMatchObject({
+		expect(Result.isFailure(result.merged)).toBe(true);
+		if (Result.isFailure(result.merged)) {
+			expect(result.merged.failure).toMatchObject({
 				_tag: "CrossSpaceBoardOperationError",
 			});
 		}
-		expect(Either.isLeft(result.stored)).toBe(true);
-		if (Either.isLeft(result.stored)) {
-			expect(result.stored.left).toMatchObject({
+		expect(Result.isFailure(result.stored)).toBe(true);
+		if (Result.isFailure(result.stored)) {
+			expect(result.stored.failure).toMatchObject({
 				_tag: "CrossSpaceBoardOperationError",
 			});
 		}
@@ -432,7 +434,7 @@ describe("multi-space spatial isolation", () => {
 					revision: item.revision,
 					location: inventoryLocation(0),
 				});
-				const early = yield* Effect.either(
+				const early = yield* Effect.result(
 					moveItemFx({
 						itemId: item.id,
 						revision: stored.item.revision,
@@ -454,9 +456,9 @@ describe("multi-space spatial isolation", () => {
 			}).pipe(useTestGame),
 		);
 
-		expect(Either.isLeft(result.early)).toBe(true);
-		if (Either.isLeft(result.early)) {
-			expect(result.early.left).toMatchObject({
+		expect(Result.isFailure(result.early)).toBe(true);
+		if (Result.isFailure(result.early)) {
+			expect(result.early.failure).toMatchObject({
 				_tag: "CrossSpaceBoardOperationError",
 			});
 		}

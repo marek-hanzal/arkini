@@ -1,42 +1,25 @@
-import { QueryClient } from "@tanstack/react-query";
 // @vitest-environment jsdom
 
 import { createMemoryHistory, createRouter } from "@tanstack/react-router";
 import { Effect } from "effect";
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it } from "vitest";
 import { routeTree } from "~/_route";
-import { createCheatAvailability } from "~/bridge/cheat/createCheatAvailability";
-import type { LauncherStartup } from "~/ui/launcher/LauncherStartup";
+import { LauncherSplashCompletedAtom } from "~/ui/launcher/LauncherSplashCompletedAtom";
+import { createTestRendererRuntime } from "~test/support/createTestRendererRuntime";
 
-const createStartup = (splashCompleted: boolean): LauncherStartup => {
-	const state: LauncherStartup.State = {
-		type: "ready",
-		appearanceReady: true,
-		builtInPackageId: "built-in",
-		heroReady: true,
-		splashCompleted,
-	};
-	return {
-		getSnapshot: () => state,
-		getHeroUrl: () => "/hero.png",
-		consumeHydrationFx: () => Effect.succeed(false),
-		startFx: Effect.void,
-		retryFx: Effect.void,
-		completeSplashFx: Effect.void,
-		disposeFx: Effect.void,
-		subscribe: () => () => undefined,
-	};
-};
+const runtimeHarnesses: Array<ReturnType<typeof createTestRendererRuntime>> = [];
 
 const loadRoute = async (path: string, splashCompleted = false) => {
+	const runtimeHarness = createTestRendererRuntime({
+		createResourceFx: () => Effect.never,
+	});
+	runtimeHarnesses.push(runtimeHarness);
+	runtimeHarness.atomRegistry.set(LauncherSplashCompletedAtom, splashCompleted);
 	const router = createRouter({
 		routeTree,
 		isServer: false,
 		context: {
-			cheatAvailability: createCheatAvailability(),
-			launcherStartup: createStartup(splashCompleted),
-			previousGameShutdown: Promise.resolve(),
-			queryClient: new QueryClient(),
+			rendererRuntime: runtimeHarness.rendererRuntime,
 		},
 		history: createMemoryHistory({
 			initialEntries: [
@@ -47,6 +30,13 @@ const loadRoute = async (path: string, splashCompleted = false) => {
 	await router.load();
 	return router;
 };
+
+afterEach(async () => {
+	for (const runtimeHarness of runtimeHarnesses.splice(0)) {
+		await runtimeHarness.rendererRuntime.dispose();
+		runtimeHarness.atomRegistry.dispose();
+	}
+});
 
 describe("launcher routes", () => {
 	it("redirects later renderer-session visits from root to the semantic main menu", async () => {

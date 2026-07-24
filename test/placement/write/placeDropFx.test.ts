@@ -1,4 +1,5 @@
-import { Effect, Either, Random } from "effect";
+import { makeFixedRandomFx } from "~test/support/makeFixedRandomFx";
+import { Effect, Result, Random } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~/engine/game/fx/useGameFx";
@@ -197,7 +198,7 @@ describe("placeDropFx", () => {
 					});
 				}
 				const before = yield* readRuntimeFx();
-				const placement = yield* Effect.either(
+				const placement = yield* Effect.result(
 					placeDropFx({
 						drop: configuredDrop({
 							itemId: "log",
@@ -221,9 +222,9 @@ describe("placeDropFx", () => {
 			),
 		);
 
-		expect(Either.isLeft(result.placement)).toBe(true);
-		if (Either.isLeft(result.placement)) {
-			expect(result.placement.left).toMatchObject({
+		expect(Result.isFailure(result.placement)).toBe(true);
+		if (Result.isFailure(result.placement)) {
+			expect(result.placement.failure).toMatchObject({
 				_tag: "PlacementUnavailableError",
 				itemId: "log",
 				reason: "inventory:full",
@@ -249,7 +250,7 @@ describe("placeDropFx", () => {
 					quantity: 2,
 				});
 
-				return yield* Effect.either(
+				return yield* Effect.result(
 					placeDropFx({
 						drop: configuredDrop({
 							itemId: "limited",
@@ -266,9 +267,9 @@ describe("placeDropFx", () => {
 			),
 		);
 
-		expect(Either.isLeft(result)).toBe(true);
-		if (Either.isLeft(result)) {
-			expect(result.left).toMatchObject({
+		expect(Result.isFailure(result)).toBe(true);
+		if (Result.isFailure(result)) {
+			expect(result.failure).toMatchObject({
 				_tag: "PlacementUnavailableError",
 				itemId: "limited",
 				reason: "item:max-count",
@@ -295,9 +296,10 @@ describe("placeDropFx", () => {
 					originItemId: "runtime:origin",
 				});
 			}).pipe(
-				Effect.withRandom(
-					Random.fixed([
-						2,
+				Effect.provideServiceEffect(
+					Random.Random,
+					makeFixedRandomFx([
+						0.5,
 					]),
 				),
 				useGameFx({
@@ -346,9 +348,10 @@ describe("placeDropFx", () => {
 					placement,
 				};
 			}).pipe(
-				Effect.withRandom(
-					Random.fixed([
-						2,
+				Effect.provideServiceEffect(
+					Random.Random,
+					makeFixedRandomFx([
+						0.5,
 						0.75,
 					]),
 				),
@@ -402,9 +405,10 @@ describe("placeDropFx", () => {
 					originItemId: "runtime:origin",
 				});
 			}).pipe(
-				Effect.withRandom(
-					Random.fixed([
-						3,
+				Effect.provideServiceEffect(
+					Random.Random,
+					makeFixedRandomFx([
+						0.75,
 					]),
 				),
 				useGameFx({
@@ -494,13 +498,13 @@ describe("placeDropFx", () => {
 				});
 				const attempts = yield* Effect.all(
 					[
-						Effect.either(
+						Effect.result(
 							placeDropFx({
 								drop,
 								originItemId: "runtime:origin",
 							}),
 						),
-						Effect.either(
+						Effect.result(
 							placeDropFx({
 								drop,
 								originItemId: "runtime:origin",
@@ -524,8 +528,8 @@ describe("placeDropFx", () => {
 			),
 		);
 
-		expect(result.attempts.filter(Either.isRight)).toHaveLength(1);
-		expect(result.attempts.filter(Either.isLeft)).toHaveLength(1);
+		expect(result.attempts.filter(Result.isSuccess)).toHaveLength(1);
+		expect(result.attempts.filter(Result.isFailure)).toHaveLength(1);
 		expect(result.runtime.items.filter((item) => item.item.id === "board-only")).toHaveLength(
 			1,
 		);

@@ -1,5 +1,6 @@
 // @vitest-environment jsdom
 
+import { Effect } from "effect";
 import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -58,10 +59,12 @@ vi.mock("~/ui/cheats/useCheatsModel", async () => {
 			);
 			return {
 				blocked,
-				beginExit: () => !state.blocked,
-				completeExit: vi.fn(),
 				enabled: true,
 				instantGameplay: false,
+				requestExit: (runFx: import("effect").Effect.Effect<void, unknown>) => {
+					if (state.blocked) return;
+					void Effect.runPromise(runFx);
+				},
 				status: {
 					kind: "idle" as const,
 				},

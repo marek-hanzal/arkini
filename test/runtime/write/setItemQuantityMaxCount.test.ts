@@ -1,4 +1,4 @@
-import { Effect, Either } from "effect";
+import { Effect, Result } from "effect";
 import { describe, expect, it } from "vitest";
 import { createTestGameSession } from "~test/bridge/game/createTestGameSession";
 
@@ -258,7 +258,7 @@ describe("setItemQuantityFx maxCount replacement", () => {
 					itemId: updated.id,
 					quantity: 3,
 					revision: updated.revision,
-				}).pipe(Effect.either);
+				}).pipe(Effect.result);
 
 				return {
 					rejected,
@@ -269,9 +269,9 @@ describe("setItemQuantityFx maxCount replacement", () => {
 		);
 
 		expect(result.updated.quantity).toBe(2);
-		expect(Either.isLeft(result.rejected)).toBe(true);
-		if (Either.isLeft(result.rejected)) {
-			expect(result.rejected.left).toMatchObject({
+		expect(Result.isFailure(result.rejected)).toBe(true);
+		if (Result.isFailure(result.rejected)) {
+			expect(result.rejected.failure).toMatchObject({
 				_tag: "PlacementUnavailableError",
 				itemId: "limited",
 				quantity: 3,

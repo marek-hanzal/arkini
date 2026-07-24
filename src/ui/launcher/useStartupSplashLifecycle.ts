@@ -1,9 +1,13 @@
+import { useAtomSet, useAtomValue } from "@effect/atom-react";
 import { useNavigate } from "@tanstack/react-router";
-import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { Cause } from "effect";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { match, P } from "ts-pattern";
 
-import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
-import { useLauncherStartup } from "~/ui/launcher/useLauncherStartup";
+import { completeLauncherSplashAtom } from "~/ui/launcher/completeLauncherSplashAtom";
+import { LauncherStartupAtom } from "~/ui/launcher/LauncherStartupAtom";
+import { LauncherVisualReadyAtom } from "~/ui/launcher/LauncherVisualReadyAtom";
+import { retryLauncherStartupAtom } from "~/ui/launcher/retryLauncherStartupAtom";
 
 const blackHoldMs = 500;
 const minimumSplashMs = 5_000;
@@ -38,21 +42,20 @@ export namespace useStartupSplashLifecycle {
 		  };
 }
 
-const messageFromError = (error: unknown) =>
-	error instanceof Error ? error.message : String(error);
-
 /** Owns native visibility timing, startup completion, Escape, retry, and navigation. */
 export const useStartupSplashLifecycle = () => {
-	const startup = useLauncherStartup();
-	const state = useSyncExternalStore(startup.subscribe, startup.getSnapshot, startup.getSnapshot);
+	const startup = useAtomValue(LauncherStartupAtom);
+	const visualReady = useAtomValue(LauncherVisualReadyAtom);
+	const completeSplash = useAtomSet(completeLauncherSplashAtom);
+	const retryStartup = useAtomSet(retryLauncherStartupAtom);
 	const navigate = useNavigate();
 	const [visibleAtMs, setVisibleAtMs] = useState<number | null>(null);
 	const [blackHoldComplete, setBlackHoldComplete] = useState(false);
 	const [minimumSplashComplete, setMinimumSplashComplete] = useState(false);
 	const [navigationError, setNavigationError] = useState<unknown | null>(null);
 	const navigationStartedRef = useRef(false);
-	const visualReady = state.appearanceReady && state.heroReady;
-	const canContinue = state.type === "ready" && blackHoldComplete && visualReady;
+	const canContinue =
+		startup._tag === "Success" && !startup.waiting && blackHoldComplete && visualReady;
 
 	useEffect(() => {
 		let active = true;
@@ -90,21 +93,21 @@ export const useStartupSplashLifecycle = () => {
 		if (!canContinue || navigationStartedRef.current) return;
 		navigationStartedRef.current = true;
 		setNavigationError(null);
-		void RendererRuntime.runPromise(startup.completeSplashFx)
-			.then(() =>
-				navigate({
-					to: "/main-menu",
-					replace: true,
-				}),
-			)
+		void navigate({
+			to: "/main-menu",
+			replace: true,
+		})
+			.then(() => {
+				completeSplash();
+			})
 			.catch((error) => {
 				navigationStartedRef.current = false;
 				setNavigationError(error);
 			});
 	}, [
 		canContinue,
+		completeSplash,
 		navigate,
-		startup,
 	]);
 
 	useEffect(() => {
@@ -133,63 +136,75 @@ export const useStartupSplashLifecycle = () => {
 			complete();
 			return;
 		}
-		void RendererRuntime.runPromise(startup.retryFx).catch(() => undefined);
+		retryStartup();
 	}, [
 		complete,
 		navigationError,
-		startup,
+		retryStartup,
 	]);
 
 	const content: useStartupSplashLifecycle.Content =
 		navigationError === null
-			? match(state)
-					.with(
-						{
-							type: "loading",
-						},
-						(): useStartupSplashLifecycle.Content => ({
-							kind: "loading",
-						}),
-					)
-					.with(
-						{
-							type: "failed",
-						},
-						({ error }): useStartupSplashLifecycle.Content => ({
-							kind: "failure",
-							message: messageFromError(error),
-						}),
-					)
-					.with(
-						{
-							type: "ready",
-						},
-						(): useStartupSplashLifecycle.Content =>
-							match(minimumSplashComplete)
-								.with(true, () => ({
-									kind: "empty" as const,
-								}))
-								.with(false, () => ({
-									kind: "prompt" as const,
-								}))
-								.exhaustive(),
-					)
-					.exhaustive()
+			? startup.waiting
+				? {
+						kind: "loading",
+					}
+				: match(startup)
+						.with(
+							{
+								_tag: "Initial",
+							},
+							(): useStartupSplashLifecycle.Content => ({
+								kind: "loading",
+							}),
+						)
+						.with(
+							{
+								_tag: "Failure",
+							},
+							({ cause }): useStartupSplashLifecycle.Content => {
+								const error = Cause.squash(cause);
+								return {
+									kind: "failure",
+									message: error instanceof Error ? error.message : String(error),
+								};
+							},
+						)
+						.with(
+							{
+								_tag: "Success",
+							},
+							(): useStartupSplashLifecycle.Content =>
+								match(minimumSplashComplete)
+									.with(true, () => ({
+										kind: "empty" as const,
+									}))
+									.with(false, () => ({
+										kind: "prompt" as const,
+									}))
+									.exhaustive(),
+						)
+						.exhaustive()
 			: {
 					kind: "failure",
-					message: messageFromError(navigationError),
+					message:
+						navigationError instanceof Error
+							? navigationError.message
+							: String(navigationError),
 				};
 
 	const view = match([
 		blackHoldComplete,
 		visualReady,
-		state,
+		startup.waiting,
+		startup,
 	] as const)
 		.with(
 			[
 				false,
 				P._,
 				P._,
+				P._,
 			],
 			(): useStartupSplashLifecycle.View => ({
 				kind: "black",
@@ -199,15 +214,23 @@ export const useStartupSplashLifecycle = () => {
 			[
 				true,
 				false,
+				true,
+				P._,
+			],
+			[
+				true,
+				false,
+				false,
 				{
-					type: "loading",
+					_tag: "Initial",
 				},
 			],
 			[
 				true,
 				false,
+				false,
 				{
-					type: "ready",
+					_tag: "Success",
 				},
 			],
 			(): useStartupSplashLifecycle.View => ({
@@ -218,19 +241,24 @@ export const useStartupSplashLifecycle = () => {
 			[
 				true,
 				false,
+				false,
 				{
-					type: "failed",
+					_tag: "Failure",
 				},
 			],
-			([, , failed]): useStartupSplashLifecycle.View => ({
-				kind: "failure",
-				message: messageFromError(failed.error),
-			}),
+			([, , , failed]): useStartupSplashLifecycle.View => {
+				const error = Cause.squash(failed.cause);
+				return {
+					kind: "failure",
+					message: error instanceof Error ? error.message : String(error),
+				};
+			},
 		)
 		.with(
 			[
 				true,
 				true,
+				P._,
 				P._,
 			],
 			(): useStartupSplashLifecycle.View => ({

@@ -55,8 +55,10 @@ export const GameCoreLayerFx = ({ config, state }: GameCoreLayerFx.Props) => {
 		CommittedTransitionsFx,
 		RuntimeStoreFx.pipe(
 			Effect.map((store) => ({
+				changes: store.changes,
 				read: store.read,
-				subscribe: store.subscribe,
+				readUnsafe: store.readUnsafe,
+				ref: store.ref,
 			})),
 		),
 	).pipe(Layer.provide(runtimeStoreLayer));

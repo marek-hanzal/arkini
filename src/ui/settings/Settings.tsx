@@ -1,3 +1,4 @@
+import type { Effect } from "effect";
 import { match } from "ts-pattern";
 
 import type { AppearanceTheme } from "~/bridge/appearance/AppearanceTheme";
@@ -24,25 +25,14 @@ const ThemeOptions: ReadonlyArray<{
 
 export namespace Settings {
 	export interface Props {
-		readonly action: useSettingsModel.ActionControl;
-		readonly exitPending?: boolean;
-		readonly navigationError?: unknown;
-		readonly onBack: () => void;
+		readonly onBackFx: Effect.Effect<void, unknown>;
 	}
 }
 
 /** Renders the reusable authoritative application settings content. */
-export const Settings = ({
-	action,
-	exitPending = false,
-	navigationError,
-	onBack,
-}: Settings.Props) => {
+export const Settings = ({ onBackFx }: Settings.Props) => {
 	const model = useSettingsModel({
-		action,
-		exitPending,
-		navigationError,
-		onBack,
+		onBackFx,
 	});
 
 	return (
@@ -190,7 +180,7 @@ export const Settings = ({
 				className="mx-auto"
 				cursorIntent={model.blocked ? "progress" : undefined}
 				disabled={model.blocked}
-				onClick={onBack}
+				onClick={model.goBack}
 			>
 				{model.exitPending ? "Returning…" : "Back"}
 			</PrimaryButton>

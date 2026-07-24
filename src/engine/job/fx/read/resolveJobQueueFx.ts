@@ -18,8 +18,10 @@ export const resolveJobQueueFx = Effect.fn("resolveJobQueueFx")(function* ({
 		item: owner.item,
 	});
 	if (capacity === undefined)
-		return yield* Effect.dieMessage(
-			`Runtime item ${owner.id} owns a line but does not define job queue capacity.`,
+		return yield* Effect.die(
+			new Error(
+				`Runtime item ${owner.id} owns a line but does not define job queue capacity.`,
+			),
 		);
 	const jobs = yield* filterOwnerJobsFx({
 		jobs: runtime.jobs,

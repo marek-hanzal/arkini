@@ -1,4 +1,4 @@
-import { NodeContext } from "@effect/platform-node";
+import { NodeServices } from "@effect/platform-node";
 import { createHash } from "node:crypto";
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -230,7 +230,7 @@ describe("registerArkiniElectronIpcFx", () => {
 						cheatPreferences,
 						launcherPreferences,
 					});
-				}).pipe(Effect.provide(NodeContext.layer)),
+				}).pipe(Effect.provide(NodeServices.layer)),
 			);
 			expect(Array.from(electronHarness.handlers.keys()).sort()).toEqual(
 				Array.from(invokeArguments.keys()).sort(),

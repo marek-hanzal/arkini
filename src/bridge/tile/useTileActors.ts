@@ -26,5 +26,5 @@ export const useTileActors = (): ReadonlyArray<useTileActors.Item> => {
 		],
 	);
 
-	return useRuntimeSelector(selector);
+	return useRuntimeSelector(game, selector);
 };

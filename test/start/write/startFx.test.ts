@@ -1,4 +1,4 @@
-import { Effect, Either } from "effect";
+import { Effect, Result } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~/engine/game/fx/useGameFx";
@@ -121,7 +121,7 @@ describe("startFx", () => {
 					quantity: 1,
 				});
 				const before = yield* readRuntimeFx();
-				const started = yield* Effect.either(startFx());
+				const started = yield* Effect.result(startFx());
 				const after = yield* readRuntimeFx();
 
 				return {
@@ -136,9 +136,9 @@ describe("startFx", () => {
 			),
 		);
 
-		expect(Either.isLeft(result.started)).toBe(true);
-		if (Either.isLeft(result.started)) {
-			expect(result.started.left).toMatchObject({
+		expect(Result.isFailure(result.started)).toBe(true);
+		if (Result.isFailure(result.started)) {
+			expect(result.started.failure).toMatchObject({
 				_tag: "RuntimeNotEmptyError",
 				itemCount: 1,
 			});
@@ -170,7 +170,7 @@ describe("startFx", () => {
 		});
 		const result = Effect.runSync(
 			Effect.gen(function* () {
-				const started = yield* Effect.either(startFx());
+				const started = yield* Effect.result(startFx());
 				const runtime = yield* readRuntimeFx();
 
 				return {
@@ -184,9 +184,9 @@ describe("startFx", () => {
 			),
 		);
 
-		expect(Either.isLeft(result.started)).toBe(true);
-		if (Either.isLeft(result.started)) {
-			expect(result.started.left).toMatchObject({
+		expect(Result.isFailure(result.started)).toBe(true);
+		if (Result.isFailure(result.started)) {
+			expect(result.started.failure).toMatchObject({
 				_tag: "RuntimeInvalidError",
 			});
 		}
@@ -206,7 +206,7 @@ describe("startFx", () => {
 		});
 		const result = Effect.runSync(
 			Effect.gen(function* () {
-				const started = yield* Effect.either(startFx());
+				const started = yield* Effect.result(startFx());
 				const runtime = yield* readRuntimeFx();
 
 				return {
@@ -220,9 +220,9 @@ describe("startFx", () => {
 			),
 		);
 
-		expect(Either.isLeft(result.started)).toBe(true);
-		if (Either.isLeft(result.started)) {
-			expect(result.started.left).toMatchObject({
+		expect(Result.isFailure(result.started)).toBe(true);
+		if (Result.isFailure(result.started)) {
+			expect(result.started.failure).toMatchObject({
 				_tag: "StartInventoryUnavailableError",
 				itemId: "log",
 				remainingQuantity: 1,
@@ -332,8 +332,8 @@ describe("startFx", () => {
 			Effect.gen(function* () {
 				const attempts = yield* Effect.all(
 					[
-						Effect.either(startFx()),
-						Effect.either(startFx()),
+						Effect.result(startFx()),
+						Effect.result(startFx()),
 					],
 					{
 						concurrency: "unbounded",
@@ -352,8 +352,8 @@ describe("startFx", () => {
 			),
 		);
 
-		expect(result.attempts.filter(Either.isRight)).toHaveLength(1);
-		expect(result.attempts.filter(Either.isLeft)).toHaveLength(1);
+		expect(result.attempts.filter(Result.isSuccess)).toHaveLength(1);
+		expect(result.attempts.filter(Result.isFailure)).toHaveLength(1);
 		expect(result.runtime.items).toHaveLength(3);
 	});
 });

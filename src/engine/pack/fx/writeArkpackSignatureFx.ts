@@ -1,4 +1,4 @@
-import { FileSystem, Path } from "@effect/platform";
+import { FileSystem, Path } from "effect";
 import { Effect } from "effect";
 
 import type { ArkpackSignatureSchema } from "~/engine/pack/schema/ArkpackSignatureSchema";

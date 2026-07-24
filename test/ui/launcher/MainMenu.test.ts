@@ -1,21 +1,23 @@
 // @vitest-environment jsdom
 
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { RegistryContext, scheduleTask } from "@effect/atom-react";
 import {
 	createMemoryHistory,
 	createRootRoute,
 	createRouter,
 	RouterProvider,
 } from "@tanstack/react-router";
-import { Effect } from "effect";
+import { Effect, SubscriptionRef } from "effect";
+import * as AsyncResult from "effect/unstable/reactivity/AsyncResult";
+import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { ArkpackCatalog } from "~/bridge/arkpack/ArkpackCatalog";
-import { ArkpackCatalogContext } from "~/bridge/arkpack/ArkpackCatalogContext";
-import type { LauncherStartup } from "~/ui/launcher/LauncherStartup";
-import { LauncherStartupContext } from "~/ui/launcher/LauncherStartupContext";
+import { ArkpackCatalogOwnerAtom } from "~/bridge/arkpack/ArkpackCatalogOwnerAtom";
 import { MainMenuPage } from "~/page/launcher/MainMenuPage";
+import { LauncherStartupAtom } from "~/ui/launcher/LauncherStartupAtom";
+import { LauncherStartupConfigAtom } from "~/ui/launcher/LauncherStartupConfigAtom";
 
 (
 	globalThis as {
@@ -24,11 +26,13 @@ import { MainMenuPage } from "~/page/launcher/MainMenuPage";
 ).IS_REACT_ACT_ENVIRONMENT = true;
 
 const roots: Array<ReturnType<typeof createRoot>> = [];
+const registries: AtomRegistry.AtomRegistry[] = [];
 
 afterEach(async () => {
 	await act(async () => {
 		for (const root of roots.splice(0)) root.unmount();
 	});
+	for (const registry of registries.splice(0)) registry.dispose();
 	vi.restoreAllMocks();
 	document.body.replaceChildren();
 });
@@ -82,48 +86,40 @@ describe("MainMenu", () => {
 			],
 		};
 		const catalog: ArkpackCatalog = {
-			getSnapshot: () => catalogState,
+			state: Effect.runSync(SubscriptionRef.make<ArkpackCatalog.State>(catalogState)),
 			refreshFx: Effect.void,
 			importFileFx: () => Effect.die("unused"),
 			removeFx: () => Effect.die("unused"),
-			subscribe: () => () => undefined,
 		};
-		const startupState: LauncherStartup.State = {
-			type: "ready",
-			appearanceReady: true,
-			builtInPackageId: "arkini",
-			heroReady: true,
-			splashCompleted: true,
-		};
-		const startup: LauncherStartup = {
-			getSnapshot: () => startupState,
-			getHeroUrl: () => "/hero.png",
-			consumeHydrationFx: () => Effect.succeed(false),
-			startFx: Effect.void,
-			retryFx: Effect.void,
-			completeSplashFx: Effect.void,
-			disposeFx: Effect.void,
-			subscribe: () => () => undefined,
-		};
+		const registry = AtomRegistry.make({
+			defaultIdleTTL: 400,
+			scheduleTask,
+		});
+		registries.push(registry);
+		registry.set(ArkpackCatalogOwnerAtom, catalog);
+		registry.set(LauncherStartupConfigAtom, {
+			heroUrl: "/hero.png",
+			bootstrapFx: Effect.succeed({
+				appearance: {
+					theme: "dark" as const,
+					accent: "rose" as const,
+				},
+				builtInPackageId: "arkini",
+				cheatsAvailable: false,
+			}),
+		});
+		registry.mount(LauncherStartupAtom);
+		await vi.waitFor(() => {
+			const startup = registry.get(LauncherStartupAtom);
+			expect(AsyncResult.isSuccess(startup) && !startup.waiting).toBe(true);
+		});
 		const App = () =>
 			createElement(
-				QueryClientProvider,
+				RegistryContext.Provider,
 				{
-					client: new QueryClient(),
+					value: registry,
 				},
-				createElement(
-					ArkpackCatalogContext.Provider,
-					{
-						value: catalog,
-					},
-					createElement(
-						LauncherStartupContext.Provider,
-						{
-							value: startup,
-						},
-						createElement(MainMenuPage),
-					),
-				),
+				createElement(MainMenuPage),
 			);
 		const rootRoute = createRootRoute({
 			component: App,
@@ -189,10 +185,11 @@ describe("MainMenu", () => {
 		if (!(exit instanceof HTMLButtonElement)) throw new Error("Expected Exit button.");
 		await act(async () => {
 			exit.click();
-			await vi.waitFor(() => expect(exit.disabled).toBe(true));
+			exit.click();
+			await Promise.resolve();
 		});
-		await act(async () => exit.click());
 		expect(requestClose).toHaveBeenCalledOnce();
+		await vi.waitFor(() => expect(exit.disabled).toBe(true));
 		await act(async () => {
 			resolveClose?.();
 			await Promise.resolve();

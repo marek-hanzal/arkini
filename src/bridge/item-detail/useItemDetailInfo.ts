@@ -111,5 +111,5 @@ export const useItemDetailInfo = (itemId: IdSchema.Type): useItemDetailInfo.Proj
 			itemId,
 		],
 	);
-	return useRuntimeSelector(selector, sameProjection);
+	return useRuntimeSelector(game, selector, sameProjection);
 };

@@ -1,4 +1,4 @@
-import { Effect, Either } from "effect";
+import { Effect, Result } from "effect";
 import { describe, expect, it } from "vitest";
 import { createTestGameSession } from "~test/bridge/game/createTestGameSession";
 
@@ -221,7 +221,7 @@ describe("line start state owner isolation", () => {
 					quantity: 1,
 				});
 				const before = yield* readRuntimeFx();
-				const started = yield* Effect.either(
+				const started = yield* Effect.result(
 					startLineFx({
 						ownerItemId: "runtime:producer",
 						lineId: "line:producer",
@@ -240,9 +240,9 @@ describe("line start state owner isolation", () => {
 			),
 		);
 
-		expect(Either.isLeft(result.started)).toBe(true);
-		if (Either.isLeft(result.started)) {
-			expect(result.started.left).toMatchObject({
+		expect(Result.isFailure(result.started)).toBe(true);
+		if (Result.isFailure(result.started)) {
+			expect(result.started.failure).toMatchObject({
 				_tag: "PlacementUnavailableError",
 				itemId: "producer",
 				reason: "inventory:full",
@@ -327,7 +327,7 @@ describe("line start state owner isolation", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {
 				yield* spawnOwnerFx(1);
-				const started = yield* Effect.either(
+				const started = yield* Effect.result(
 					startLineFx({
 						ownerItemId: "runtime:producer",
 						lineId: "line:producer:limited",
@@ -345,9 +345,9 @@ describe("line start state owner isolation", () => {
 			),
 		);
 
-		expect(Either.isLeft(result.started)).toBe(true);
-		if (Either.isLeft(result.started)) {
-			expect(result.started.left).toMatchObject({
+		expect(Result.isFailure(result.started)).toBe(true);
+		if (Result.isFailure(result.started)) {
+			expect(result.started.failure).toMatchObject({
 				_tag: "JobOutputMaxCountError",
 				itemId: "limited",
 				reservedQuantity: 5,

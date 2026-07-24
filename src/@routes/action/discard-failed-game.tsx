@@ -6,7 +6,6 @@ import {
 } from "@tanstack/react-router";
 
 import { discardFailedGameEngineFx } from "~/bridge/game/discardFailedGameEngineFx";
-import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import { ActionPendingPage } from "~/page/action/ActionPendingPage";
 import { runActionRouteFx } from "~/page/action/runActionRouteFx";
 import { ActionErrorPage } from "~/ui/action/ActionErrorPage";
@@ -16,13 +15,8 @@ export const Route = createFileRoute("/action/discard-failed-game")({
 	validateSearch: FailedGameDiscardSearchSchema,
 	loaderDeps: ({ search }) => search,
 	loader: async ({ context, deps }) => {
-		await RendererRuntime.runPromise(
-			runActionRouteFx(
-				discardFailedGameEngineFx({
-					packageId: deps.packageId,
-					queryClient: context.queryClient,
-				}),
-			),
+		await context.rendererRuntime.runPromise(
+			runActionRouteFx(discardFailedGameEngineFx(deps.packageId)),
 		);
 		throw redirect({
 			to: "/main-menu",
@@ -40,7 +34,7 @@ function DiscardFailedGameErrorPage(props: ErrorComponentProps) {
 	return (
 		<ActionErrorPage
 			{...props}
-			description="Arkini could not discard the exact failed Game query. No save was deleted and no replacement Game was removed."
+			description="Arkini could not discard the exact failed Game bootstrap state. No save was deleted and no replacement Game was removed."
 			reset={() => {
 				void router.invalidate().catch(() => undefined);
 			}}

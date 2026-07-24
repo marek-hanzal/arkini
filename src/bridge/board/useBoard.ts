@@ -68,5 +68,5 @@ export const useBoard = (): useBoard.Result => {
 		],
 	);
 
-	return useRuntimeSelector(selector);
+	return useRuntimeSelector(game, selector);
 };

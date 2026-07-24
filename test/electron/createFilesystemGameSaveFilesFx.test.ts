@@ -1,5 +1,5 @@
-import { FileSystem } from "@effect/platform";
-import { NodeContext } from "@effect/platform-node";
+import { FileSystem } from "effect";
+import { NodeServices } from "@effect/platform-node";
 import { Effect } from "effect";
 import { access, mkdtemp, readFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -25,7 +25,7 @@ const createRepository = () =>
 	Effect.runPromise(
 		createFilesystemGameSaveFilesFx({
 			userDataPath: root,
-		}).pipe(Effect.provide(NodeContext.layer)),
+		}).pipe(Effect.provide(NodeServices.layer)),
 	);
 
 beforeEach(async () => {
@@ -134,7 +134,7 @@ describe("createFilesystemGameSaveFilesFx", () => {
 						rename: () => Effect.die(new Error("rename failed")),
 					},
 				});
-			}).pipe(Effect.provide(NodeContext.layer)),
+			}).pipe(Effect.provide(NodeServices.layer)),
 		);
 		await expect(
 			Effect.runPromise(

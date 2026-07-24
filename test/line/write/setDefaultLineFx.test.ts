@@ -1,4 +1,4 @@
-import { Effect, Either } from "effect";
+import { Effect, Result } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~/engine/game/fx/useGameFx";
@@ -267,7 +267,7 @@ describe("setDefaultLineFx", () => {
 				const runtime = yield* startFx();
 				const owner = runtime.items[0];
 				if (owner === undefined) throw new Error("Missing producer.");
-				const rejected = yield* Effect.either(
+				const rejected = yield* Effect.result(
 					setDefaultLineFx({
 						ownerItemId: owner.id,
 						lineId: "line:missing",
@@ -293,9 +293,9 @@ describe("setDefaultLineFx", () => {
 			),
 		);
 
-		expect(Either.isLeft(result.rejected)).toBe(true);
-		if (Either.isLeft(result.rejected)) {
-			expect(result.rejected.left).toMatchObject({
+		expect(Result.isFailure(result.rejected)).toBe(true);
+		if (Result.isFailure(result.rejected)) {
+			expect(result.rejected.failure).toMatchObject({
 				_tag: "LineNotFoundError",
 				lineId: "line:missing",
 			});
@@ -456,7 +456,7 @@ describe("setDefaultLineFx", () => {
 					quantity: 1,
 				});
 				const before = yield* readRuntimeFx();
-				const selected = yield* Effect.either(
+				const selected = yield* Effect.result(
 					setDefaultLineFx({
 						ownerItemId: "runtime:producer",
 						lineId: "line:only",
@@ -477,9 +477,9 @@ describe("setDefaultLineFx", () => {
 			),
 		);
 
-		expect(Either.isLeft(result.selected)).toBe(true);
-		if (Either.isLeft(result.selected)) {
-			expect(result.selected.left).toMatchObject({
+		expect(Result.isFailure(result.selected)).toBe(true);
+		if (Result.isFailure(result.selected)) {
+			expect(result.selected.failure).toMatchObject({
 				_tag: "PlacementUnavailableError",
 			});
 		}

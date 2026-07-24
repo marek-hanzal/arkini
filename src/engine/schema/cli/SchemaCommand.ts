@@ -1,4 +1,4 @@
-import { Command, Options } from "@effect/cli";
+import { Command, Flag } from "effect/unstable/cli";
 import { Console, Effect } from "effect";
 import { writeGameJsonSchemaFx } from "~/engine/schema/fx/writeGameJsonSchemaFx";
 
@@ -27,9 +27,9 @@ export const SchemaCommand = ({ output }: SchemaCommand.Props) =>
 	Command.make(
 		"schema",
 		{
-			output: Options.text("output").pipe(
-				Options.withDefault(output),
-				Options.withDescription("Destination where the generated JSON Schema is written."),
+			output: Flag.string("output").pipe(
+				Flag.withDefault(output),
+				Flag.withDescription("Destination where the generated JSON Schema is written."),
 			),
 		},
 		({ output }) =>

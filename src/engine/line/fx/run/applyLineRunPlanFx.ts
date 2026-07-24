@@ -29,11 +29,11 @@ export const applyLineRunPlanFx = Effect.fn("applyLineRunPlanFx")(function* ({
 }: applyLineRunPlanFx.Props) {
 	return yield* Effect.reduce(
 		plan.input,
-		{
+		() => ({
 			consumption: [] as applyInputMaterialConsumeRunPlanFx.Consumption[],
 			events: [] as GameEventSchema.Type[],
 			runtime,
-		},
+		}),
 		(state, input, inputIndex) =>
 			applyInputRunPlanFx({
 				jobId: job.id,

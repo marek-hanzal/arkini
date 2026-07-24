@@ -1,4 +1,4 @@
-import { Effect, Either } from "effect";
+import { Effect, Result } from "effect";
 
 import { GameConfigFx } from "~/engine/game/context/GameConfigFx";
 import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
@@ -26,7 +26,7 @@ export const validateStartStateFx = Effect.fn("validateStartStateFx")(function* 
 	config,
 	provenance,
 }: validateStartStateFx.Props) {
-	const result = yield* Effect.either(
+	const result = yield* Effect.result(
 		planStartFx({
 			runtime: {
 				cheats: {
@@ -43,11 +43,11 @@ export const validateStartStateFx = Effect.fn("validateStartStateFx")(function* 
 		}).pipe(Effect.provideService(GameConfigFx, config)),
 	);
 
-	if (Either.isRight(result)) {
+	if (Result.isSuccess(result)) {
 		return [];
 	}
 
-	const error = result.left as {
+	const error = result.failure as {
 		readonly _tag?: string;
 	};
 	const failureTag = error._tag ?? "start:unknown";

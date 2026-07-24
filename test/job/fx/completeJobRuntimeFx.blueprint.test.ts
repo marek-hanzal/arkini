@@ -1,4 +1,4 @@
-import { Effect, Either } from "effect";
+import { Effect, Result } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~/engine/game/fx/useGameFx";
@@ -590,7 +590,7 @@ describe("blueprint job completion", () => {
 				const secondStart = yield* startLineFx({
 					ownerItemId: second.id,
 					lineId: "line:blueprint:plain",
-				}).pipe(Effect.either);
+				}).pipe(Effect.result);
 				const placement = yield* placeDropFx({
 					originItemId: second.id,
 					drop: {
@@ -602,7 +602,7 @@ describe("blueprint job completion", () => {
 						placement: "drop",
 						rules: [],
 					},
-				}).pipe(Effect.either);
+				}).pipe(Effect.result);
 				const spawned = yield* spawnItemFx({
 					id: "runtime:forbidden-target",
 					itemId: "item:target",
@@ -615,7 +615,7 @@ describe("blueprint job completion", () => {
 						},
 					},
 					quantity: 1,
-				}).pipe(Effect.either);
+				}).pipe(Effect.result);
 				return {
 					secondStart,
 					placement,
@@ -625,24 +625,24 @@ describe("blueprint job completion", () => {
 			}),
 		);
 
-		expect(Either.isLeft(result.secondStart)).toBe(true);
-		if (Either.isLeft(result.secondStart)) {
-			expect(result.secondStart.left).toMatchObject({
+		expect(Result.isFailure(result.secondStart)).toBe(true);
+		if (Result.isFailure(result.secondStart)) {
+			expect(result.secondStart.failure).toMatchObject({
 				_tag: "JobOutputMaxCountError",
 				itemId: "item:target",
 				maxCount: 1,
 			});
 		}
-		expect(Either.isLeft(result.placement)).toBe(true);
-		if (Either.isLeft(result.placement)) {
-			expect(result.placement.left).toMatchObject({
+		expect(Result.isFailure(result.placement)).toBe(true);
+		if (Result.isFailure(result.placement)) {
+			expect(result.placement.failure).toMatchObject({
 				_tag: "PlacementUnavailableError",
 				reason: "item:max-count",
 			});
 		}
-		expect(Either.isLeft(result.spawned)).toBe(true);
-		if (Either.isLeft(result.spawned)) {
-			expect(result.spawned.left).toMatchObject({
+		expect(Result.isFailure(result.spawned)).toBe(true);
+		if (Result.isFailure(result.spawned)) {
+			expect(result.spawned.failure).toMatchObject({
 				_tag: "PlacementUnavailableError",
 				reason: "item:max-count",
 			});
@@ -681,7 +681,7 @@ describe("blueprint job completion", () => {
 					itemId: byproduct.id,
 					quantity: 2,
 					revision: byproduct.revision,
-				}).pipe(Effect.either);
+				}).pipe(Effect.result);
 				return {
 					updated,
 					runtime: yield* readRuntimeFx(),
@@ -689,9 +689,9 @@ describe("blueprint job completion", () => {
 			}),
 		);
 
-		expect(Either.isLeft(result.updated)).toBe(true);
-		if (Either.isLeft(result.updated)) {
-			expect(result.updated.left).toMatchObject({
+		expect(Result.isFailure(result.updated)).toBe(true);
+		if (Result.isFailure(result.updated)) {
+			expect(result.updated.failure).toMatchObject({
 				_tag: "PlacementUnavailableError",
 				reason: "item:max-count",
 			});
@@ -757,7 +757,7 @@ describe("blueprint job completion", () => {
 				const started = yield* startLineFx({
 					ownerItemId: owner.id,
 					lineId: "line:blueprint:range",
-				}).pipe(Effect.either);
+				}).pipe(Effect.result);
 				return {
 					started,
 					runtime: yield* readRuntimeFx(),
@@ -765,9 +765,9 @@ describe("blueprint job completion", () => {
 			}),
 		);
 
-		expect(Either.isLeft(result.started)).toBe(true);
-		if (Either.isLeft(result.started)) {
-			expect(result.started.left).toMatchObject({
+		expect(Result.isFailure(result.started)).toBe(true);
+		if (Result.isFailure(result.started)) {
+			expect(result.started.failure).toMatchObject({
 				_tag: "JobOutputMaxCountError",
 				itemId: "item:limited",
 				reservedQuantity: 5,

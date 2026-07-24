@@ -31,18 +31,20 @@ export const invokeExternalCallbackFx = Effect.fn("invokeExternalCallbackFx")(fu
 		Effect.flatMap((result) => {
 			if (!isPromiseLike(result)) return Effect.void;
 
-			return Effect.promise(() => Promise.resolve(result)).pipe(
-				Effect.catchAllCause((cause) =>
+			return Effect.promise((_signal) => Promise.resolve(result)).pipe(
+				Effect.catchCause((cause) =>
 					reportExternalCallbackFailureFx({
 						failureMessage,
 						cause,
 					}),
 				),
-				Effect.forkDaemon,
+				Effect.forkChild({
+					startImmediately: true,
+				}),
 				Effect.asVoid,
 			);
 		}),
-		Effect.catchAllCause((cause) =>
+		Effect.catchCause((cause) =>
 			reportExternalCallbackFailureFx({
 				failureMessage,
 				cause,

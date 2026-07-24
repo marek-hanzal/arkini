@@ -1,4 +1,4 @@
-import { Effect, Fiber, Option, Stream } from "effect";
+import { Deferred, Effect, Fiber, Stream } from "effect";
 import { describe, expect, it } from "vitest";
 import { createTestGameSession } from "~test/bridge/game/createTestGameSession";
 
@@ -22,13 +22,19 @@ const waitFor = async (assertion: () => boolean, timeoutMs = 1_000) => {
 };
 
 describe("committed transition events", () => {
-	it("opens an atomic current-plus-tail subscription without replaying current", async () => {
+	it("replays the current transition and then every later commit", async () => {
 		const [current, next, itemId] = await Effect.runPromise(
 			Effect.scoped(
 				Effect.gen(function* () {
 					const transitions = yield* CommittedTransitionsFx;
-					const subscription = yield* transitions.subscribe;
-					const nextFiber = yield* subscription.changes.pipe(Stream.runHead, Effect.fork);
+					const replaySeen = yield* Deferred.make<void>();
+					const transitionsFiber = yield* transitions.changes.pipe(
+						Stream.tap(() => Deferred.succeed(replaySeen, undefined)),
+						Stream.take(2),
+						Stream.runCollect,
+						Effect.forkChild,
+					);
+					yield* Deferred.await(replaySeen);
 					const item = yield* spawnItemFx({
 						id: "runtime:subscription:first-tail",
 						itemId: "water",
@@ -41,10 +47,15 @@ describe("committed transition events", () => {
 						},
 						quantity: 1,
 					});
-					const next = Option.getOrThrow(yield* Fiber.join(nextFiber));
+					const [current, next] = Array.from(yield* Fiber.join(transitionsFiber));
+					if (current === undefined || next === undefined) {
+						return yield* Effect.die(
+							"Expected current replay and one committed transition.",
+						);
+					}
 
 					return [
-						subscription.current,
+						current,
 						next,
 						item.id,
 					] as const;

@@ -1,4 +1,4 @@
-import { FileSystem } from "@effect/platform";
+import { FileSystem } from "effect";
 import { createHash } from "node:crypto";
 import { Effect, Stream } from "effect";
 import { describe, expect, it } from "vitest";

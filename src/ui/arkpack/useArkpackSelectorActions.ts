@@ -1,6 +1,9 @@
+import { useAtomSet } from "@effect/atom-react";
 import { useNavigate } from "@tanstack/react-router";
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import { importArkpackFileAtom } from "~/bridge/arkpack/importArkpackFileAtom";
+import { removeArkpackAtom } from "~/bridge/arkpack/removeArkpackAtom";
 import { useArkpacks } from "~/bridge/arkpack/useArkpacks";
 import { useExclusiveAction } from "~/ui/action/useExclusiveAction";
 
@@ -9,7 +12,17 @@ type ActiveAction = BusyAction | "exit";
 
 /** Owns Arkpack import, removal, exit navigation, mounted guards, and Escape lifecycle. */
 export const useArkpackSelectorActions = () => {
-	const { state, importFile, remove } = useArkpacks();
+	const { state } = useArkpacks();
+	// TODO(#397): Revalidate stable promise-mode ownership, rejection, and interruption
+	// semantics; keep it only while this mounted selector owns the complete async action.
+	// Promise-mode command results are atom-wide, so the selector claims one exclusive action
+	// before invoking either setter and never overlaps awaited import/remove calls.
+	const importFile = useAtomSet(importArkpackFileAtom, {
+		mode: "promise",
+	});
+	const remove = useAtomSet(removeArkpackAtom, {
+		mode: "promise",
+	});
 	const navigate = useNavigate();
 	const inputRef = useRef<HTMLInputElement>(null);
 	const mountedRef = useRef(false);

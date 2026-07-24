@@ -29,15 +29,16 @@ export const completeTemporaryItemExpiryTransitionFx = Effect.fn(
 	"completeTemporaryItemExpiryTransitionFx",
 )(function* ({ itemId, runtime }: completeTemporaryItemExpiryTransitionFx.Props) {
 	const item = runtime.items.find((candidate) => candidate.id === itemId);
-	if (item === undefined) return yield* Effect.dieMessage(`Temporary item ${itemId} is missing.`);
+	if (item === undefined)
+		return yield* Effect.die(new Error(`Temporary item ${itemId} is missing.`));
 	if (item.item.type !== ItemEnumSchema.enum.Temporary) {
-		return yield* Effect.dieMessage(`Runtime item ${item.id} is not temporary.`);
+		return yield* Effect.die(new Error(`Runtime item ${item.id} is not temporary.`));
 	}
 	if (item.location.scope !== LocationScopeEnumSchema.enum.Board) {
-		return yield* Effect.dieMessage(`Temporary item ${item.id} is not on the board.`);
+		return yield* Effect.die(new Error(`Temporary item ${item.id} is not on the board.`));
 	}
 	if (item.remainingDurationMs !== 0) {
-		return yield* Effect.dieMessage(`Temporary item ${item.id} is not ready to expire.`);
+		return yield* Effect.die(new Error(`Temporary item ${item.id} is not ready to expire.`));
 	}
 
 	const expiredEvent = {
@@ -62,40 +63,40 @@ export const completeTemporaryItemExpiryTransitionFx = Effect.fn(
 	const origin = item.location;
 	const configuredOutput = item.item.output;
 
-	const random = yield* makeTemporaryExpiryRandomFx({
+	return yield* makeTemporaryExpiryRandomFx({
 		item,
-	});
-	return yield* Effect.gen(function* () {
-		const output = yield* outputFx({
-			origin,
-			output: configuredOutput,
-		});
-		if (output.drop.length === 0) {
+		program: Effect.gen(function* () {
+			const output = yield* outputFx({
+				origin,
+				output: configuredOutput,
+			});
+			if (output.drop.length === 0) {
+				return {
+					events: [
+						expiredEvent,
+					],
+					runtime: draft,
+				} satisfies completeTemporaryItemExpiryTransitionFx.Result;
+			}
+
+			const [placement, withOutput] = yield* applyOutputPlacementFx({
+				origin,
+				output,
+				runtime: draft,
+			});
+			draft = withOutput;
+			const placementEvents = yield* readOutputPlacementItemEventsFx({
+				originItemId: item.id,
+				placement,
+			});
+
 			return {
 				events: [
 					expiredEvent,
+					...placementEvents,
 				],
 				runtime: draft,
 			} satisfies completeTemporaryItemExpiryTransitionFx.Result;
-		}
-
-		const [placement, withOutput] = yield* applyOutputPlacementFx({
-			origin,
-			output,
-			runtime: draft,
-		});
-		draft = withOutput;
-		const placementEvents = yield* readOutputPlacementItemEventsFx({
-			originItemId: item.id,
-			placement,
-		});
-
-		return {
-			events: [
-				expiredEvent,
-				...placementEvents,
-			],
-			runtime: draft,
-		} satisfies completeTemporaryItemExpiryTransitionFx.Result;
-	}).pipe(Effect.withRandom(random));
+		}),
+	});
 });

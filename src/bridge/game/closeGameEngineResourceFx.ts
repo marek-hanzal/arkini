@@ -1,43 +1,12 @@
-import type { QueryClient } from "@tanstack/react-query";
 import { Effect } from "effect";
 
 import type { GameEngineResource } from "~/bridge/game/GameEngineResource";
-import { releaseGameEngineResourceFx } from "~/bridge/game/releaseGameEngineResourceFx";
+import { GameEngineResourceFx } from "~/bridge/game/GameEngineResourceFx";
 
-export type CloseGameEngineResourceResult =
-	| {
-			readonly type: "saved";
-	  }
-	| {
-			readonly type: "finalization-failed";
-			readonly cause: unknown;
-	  };
+export type CloseGameEngineResourceResult = GameEngineResourceFx.CloseResult;
 
-export namespace closeGameEngineResourceFx {
-	export interface Props {
-		readonly queryClient: QueryClient;
-		readonly resource: GameEngineResource;
-	}
-}
-
-/** Attempts one final save/disposal for native close and never blocks application exit. */
+/** Attempts final save/disposal for native close and never blocks application exit. */
 export const closeGameEngineResourceFx = Effect.fn("closeGameEngineResourceFx")(
-	({ queryClient, resource }: closeGameEngineResourceFx.Props) =>
-		releaseGameEngineResourceFx({
-			allowAlreadyFinalized: true,
-			queryClient,
-			resource,
-		}).pipe(
-			Effect.match({
-				onFailure: (cause) =>
-					({
-						type: "finalization-failed",
-						cause,
-					}) satisfies CloseGameEngineResourceResult,
-				onSuccess: () =>
-					({
-						type: "saved",
-					}) satisfies CloseGameEngineResourceResult,
-			}),
-		),
+	(resource: GameEngineResource) =>
+		GameEngineResourceFx.pipe(Effect.flatMap((service) => service.closeFx(resource))),
 );

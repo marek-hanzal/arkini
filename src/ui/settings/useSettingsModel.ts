@@ -1,21 +1,14 @@
-import { useEffect } from "react";
-import { match, P } from "ts-pattern";
+import { useAtom, useAtomValue } from "@effect/atom-react";
+import type { Effect } from "effect";
+import { useCallback, useEffect } from "react";
+import { match } from "ts-pattern";
 
+import { AppearanceAtom } from "~/bridge/appearance/AppearanceAtom";
 import type { AppearanceTheme } from "~/bridge/appearance/AppearanceTheme";
-import { useSetAppearanceThemeMutation } from "~/ui/appearance/mutation/useSetAppearanceThemeMutation";
-import { useAppearance } from "~/ui/appearance/useAppearance";
 import { useCheatAvailability } from "~/ui/cheat-availability/useCheatAvailability";
-import { useSetCheatAvailabilityMutation } from "~/ui/cheat-availability/useSetCheatAvailabilityMutation";
+import { SettingsCommandAtom } from "~/ui/settings/SettingsCommandAtom";
 
 export namespace useSettingsModel {
-	export type Action = "cheat-tools" | "theme" | "exit";
-
-	export interface ActionControl {
-		readonly active: Action | null;
-		readonly claim: (action: Action) => boolean;
-		readonly release: (action: Action) => void;
-	}
-
 	export type Status =
 		| {
 				readonly kind: "idle";
@@ -43,137 +36,105 @@ export namespace useSettingsModel {
 
 const errorMessage = (error: unknown) => (error instanceof Error ? error.message : String(error));
 
-/** Owns application settings mutations and the one Escape lifecycle for the settings surface. */
+/** Owns application settings commands and the one Escape lifecycle for the settings surface. */
 export const useSettingsModel = ({
-	action,
-	exitPending,
-	navigationError,
-	onBack,
+	onBackFx,
 }: {
-	readonly action: useSettingsModel.ActionControl;
-	readonly exitPending: boolean;
-	readonly navigationError: unknown;
-	readonly onBack: () => void;
+	readonly onBackFx: Effect.Effect<void, unknown>;
 }) => {
-	const appearance = useAppearance();
+	const appearance = useAtomValue(AppearanceAtom);
 	const cheatAvailability = useCheatAvailability();
-	const setTheme = useSetAppearanceThemeMutation();
-	const setCheatAvailability = useSetCheatAvailabilityMutation();
-	const { active, claim, release } = action;
-	const blocked = active !== null || exitPending;
+	const [commandState, runCommand] = useAtom(SettingsCommandAtom);
+	const blocked = commandState.kind === "pending";
+	const exitPending = commandState.kind === "pending" && commandState.action === "exit";
+	const goBack = useCallback(() => {
+		runCommand({
+			action: "exit",
+			runFx: onBackFx,
+		});
+	}, [
+		onBackFx,
+		runCommand,
+	]);
 
 	useEffect(() => {
 		const onKeyDown = (event: KeyboardEvent) => {
 			if (event.key !== "Escape" || blocked) return;
 			event.preventDefault();
-			onBack();
+			goBack();
 		};
 		window.addEventListener("keydown", onKeyDown);
 		return () => window.removeEventListener("keydown", onKeyDown);
 	}, [
 		blocked,
-		onBack,
+		goBack,
 	]);
 
-	const mutationStatus = match([
-		active,
-		setCheatAvailability.isError,
-		setCheatAvailability.isSuccess,
-		setTheme.isError,
-		setTheme.isSuccess,
-	] as const)
+	const status = match(commandState)
 		.with(
-			[
-				"cheat-tools",
-				P._,
-				P._,
-				P._,
-				P._,
-			],
+			{
+				kind: "pending",
+				action: "cheat-tools",
+			},
 			(): useSettingsModel.Status => ({
 				kind: "saving-cheat-tools",
 			}),
 		)
 		.with(
-			[
-				null,
-				true,
-				P._,
-				P._,
-				P._,
-			],
-			(): useSettingsModel.Status => ({
-				kind: "save-error",
-				label: "Cheat tools",
-				message: errorMessage(setCheatAvailability.error),
-			}),
-		)
-		.with(
-			[
-				"theme",
-				P._,
-				P._,
-				P._,
-				P._,
-			],
+			{
+				kind: "pending",
+				action: "theme",
+			},
 			(): useSettingsModel.Status => ({
 				kind: "saving-theme",
 			}),
 		)
 		.with(
-			[
-				null,
-				false,
-				P._,
-				true,
-				P._,
-			],
+			{
+				kind: "pending",
+				action: "exit",
+			},
 			(): useSettingsModel.Status => ({
+				kind: "idle",
+			}),
+		)
+		.with(
+			{
 				kind: "save-error",
-				label: "Theme",
-				message: errorMessage(setTheme.error),
+			},
+			({ error, label }): useSettingsModel.Status => ({
+				kind: "save-error",
+				label,
+				message: errorMessage(error),
 			}),
 		)
 		.with(
-			[
-				null,
-				false,
-				true,
-				P._,
-				P._,
-			],
-			(): useSettingsModel.Status => ({
+			{
 				kind: "saved",
-				label: "Cheat tools",
-			}),
-		)
-		.with(
-			[
-				null,
-				false,
-				false,
-				false,
-				true,
-			],
-			(): useSettingsModel.Status => ({
+			},
+			({ label }): useSettingsModel.Status => ({
 				kind: "saved",
-				label: "Theme",
+				label,
 			}),
 		)
 		.with(
-			P._,
+			{
+				kind: "navigation-error",
+			},
+			({ error }): useSettingsModel.Status => ({
+				kind: "navigation-error",
+				message: errorMessage(error),
+			}),
+		)
+		.with(
+			{
+				kind: "idle",
+			},
 			(): useSettingsModel.Status => ({
 				kind: "idle",
 			}),
 		)
 		.exhaustive();
-	const status: useSettingsModel.Status =
-		navigationError === undefined
-			? mutationStatus
-			: {
-					kind: "navigation-error",
-					message: errorMessage(navigationError),
-				};
 
 	return {
 		blocked,
@@ -181,18 +142,17 @@ export const useSettingsModel = ({
 		exitPending,
 		status,
 		theme: appearance.theme,
+		goBack,
 		selectTheme: (theme: AppearanceTheme) => {
-			if (!claim("theme")) return;
-			setCheatAvailability.reset();
-			setTheme.mutate(theme, {
-				onSettled: () => release("theme"),
+			runCommand({
+				action: "theme",
+				theme,
 			});
 		},
 		setCheatToolsAvailable: (available: boolean) => {
-			if (!claim("cheat-tools")) return;
-			setTheme.reset();
-			setCheatAvailability.mutate(available, {
-				onSettled: () => release("cheat-tools"),
+			runCommand({
+				action: "cheat-tools",
+				available,
 			});
 		},
 	};

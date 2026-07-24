@@ -1,4 +1,4 @@
-import { Effect, Either } from "effect";
+import { Effect, Result } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~/engine/game/fx/useGameFx";
@@ -841,7 +841,7 @@ describe("item charges", () => {
 					quantity: 1,
 				});
 				const before = yield* readRuntimeFx();
-				const attempt = yield* Effect.either(
+				const attempt = yield* Effect.result(
 					startLineFx({
 						ownerItemId: owner.id,
 						lineId: "line:lumberjack:work",
@@ -855,7 +855,7 @@ describe("item charges", () => {
 			}),
 		);
 
-		expect(Either.isLeft(result.attempt)).toBe(true);
+		expect(Result.isFailure(result.attempt)).toBe(true);
 		expect(result.after).toEqual(result.before);
 	});
 
@@ -1065,16 +1065,16 @@ describe("item charges", () => {
 			],
 		});
 		const result = run(
-			Effect.either(
+			Effect.result(
 				fromStateFx({
 					state,
 				}),
 			),
 		);
 
-		expect(Either.isLeft(result)).toBe(true);
-		if (Either.isLeft(result)) {
-			expect(result.left).toMatchObject({
+		expect(Result.isFailure(result)).toBe(true);
+		if (Result.isFailure(result)) {
+			expect(result.failure).toMatchObject({
 				_tag: "RuntimeInvalidError",
 				result: {
 					issues: expect.arrayContaining([
@@ -1145,7 +1145,7 @@ describe("item charges", () => {
 					quantity: 1,
 				});
 				const before = yield* readRuntimeFx();
-				const attempt = yield* Effect.either(
+				const attempt = yield* Effect.result(
 					startLineFx({
 						ownerItemId: owner.id,
 						lineId: "line:capped-shrine:work",
@@ -1160,7 +1160,7 @@ describe("item charges", () => {
 		);
 
 		expect(result.attempt).toEqual(
-			Either.left(
+			Result.fail(
 				expect.objectContaining({
 					_tag: "JobOutputMaxCountError",
 					itemId: "item:capped-gift",
@@ -1192,7 +1192,7 @@ describe("item charges", () => {
 					quantity: 1,
 				});
 				const before = yield* readRuntimeFx();
-				const attempt = yield* Effect.either(
+				const attempt = yield* Effect.result(
 					startLineFx({
 						ownerItemId: owner.id,
 						lineId: "line:capped-lumberjack:work",
@@ -1207,7 +1207,7 @@ describe("item charges", () => {
 		);
 
 		expect(result.attempt).toEqual(
-			Either.left(
+			Result.fail(
 				expect.objectContaining({
 					_tag: "PlacementUnavailableError",
 					reason: "item:max-count",

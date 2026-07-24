@@ -120,7 +120,7 @@ describe("readArkpackFx", () => {
 		);
 
 		const result = await Effect.runPromise(
-			Effect.either(
+			Effect.result(
 				readArkpackFx({
 					bytes: new Uint8Array(gzipSync(encoded)),
 					signature: {
@@ -131,7 +131,9 @@ describe("readArkpackFx", () => {
 			),
 		);
 
-		expect(result._tag).toBe("Left");
-		if (result._tag === "Left") expect(result.left).toBeInstanceOf(GameValidationError);
+		expect(result._tag).toBe("Failure");
+		if (result._tag === "Failure") {
+			expect(result.failure).toBeInstanceOf(GameValidationError);
+		}
 	});
 });

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { DropItemResultKindEnumSchema } from "~/bridge/tile/DropItemResultKindEnumSchema";
-import type { useDropItem } from "~/bridge/tile/useDropItem";
+import type { dropItemAtom } from "~/bridge/tile/dropItemAtom";
 import type { useDropItemPreview } from "~/bridge/tile/useDropItemPreview";
 
 const sourceLocation = {
@@ -58,7 +58,7 @@ describe("public tile stack contracts", () => {
 					quantity: 10,
 				},
 			},
-		} satisfies useDropItem.Result;
+		} satisfies dropItemAtom.Result;
 
 		expect(preview.kind).toBe("stack");
 		expect(outcome).toMatchObject({

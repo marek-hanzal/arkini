@@ -1,4 +1,4 @@
-import { Effect, Either } from "effect";
+import { Effect, Result } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~/engine/game/fx/useGameFx";
@@ -66,7 +66,7 @@ describe("storeInputMaterialFx closed line inputs", () => {
 					itemId: "runtime:material",
 				});
 				const before = yield* readRuntimeFx();
-				const stored = yield* Effect.either(
+				const stored = yield* Effect.result(
 					storeInputMaterialFx({
 						ownerItemId: "runtime:producer",
 						lineId: "line:producer:zero",
@@ -90,9 +90,9 @@ describe("storeInputMaterialFx closed line inputs", () => {
 			),
 		);
 
-		expect(Either.isLeft(result.stored)).toBe(true);
-		if (Either.isLeft(result.stored)) {
-			expect(result.stored.left).toMatchObject({
+		expect(Result.isFailure(result.stored)).toBe(true);
+		if (Result.isFailure(result.stored)) {
+			expect(result.stored.failure).toMatchObject({
 				_tag: "LineInputClosedError",
 				ownerItemId: "runtime:producer",
 				lineId: "line:producer:zero",

@@ -1,5 +1,5 @@
-import { Command } from "@effect/platform";
 import { Effect } from "effect";
+import { ChildProcess, ChildProcessSpawner } from "effect/unstable/process";
 import { DesktopPackagingError } from "./DesktopPackagingError";
 
 export namespace openMacAppFx {
@@ -8,9 +8,9 @@ export namespace openMacAppFx {
 	}
 }
 
-export const openMacAppFx = Effect.fn("openMacAppFx")(({ appPath }: openMacAppFx.Props) => {
+export const openMacAppFx = Effect.fn("openMacAppFx")(function* ({ appPath }: openMacAppFx.Props) {
 	if (process.platform !== "darwin") {
-		return Effect.fail(
+		return yield* Effect.fail(
 			new DesktopPackagingError({
 				operation: "launch the unpacked macOS application",
 				cause: new Error("The macOS preview command can only run on macOS."),
@@ -18,27 +18,38 @@ export const openMacAppFx = Effect.fn("openMacAppFx")(({ appPath }: openMacAppFx
 		);
 	}
 
-	return Command.make("open", appPath).pipe(
-		Command.stdin("inherit"),
-		Command.stdout("inherit"),
-		Command.stderr("inherit"),
-		Command.exitCode,
-		Effect.mapError(
-			(cause) =>
-				new DesktopPackagingError({
-					operation: "launch the unpacked macOS application",
-					cause,
-				}),
-		),
-		Effect.flatMap((exitCode) =>
-			exitCode === 0
-				? Effect.void
-				: Effect.fail(
-						new DesktopPackagingError({
-							operation: "launch the unpacked macOS application",
-							cause: new Error(`open exited with code ${exitCode}.`),
-						}),
-					),
-		),
-	);
+	const childProcessSpawner = yield* ChildProcessSpawner.ChildProcessSpawner;
+	return yield* childProcessSpawner
+		.exitCode(
+			ChildProcess.make(
+				"open",
+				[
+					appPath,
+				],
+				{
+					stdin: "inherit",
+					stdout: "inherit",
+					stderr: "inherit",
+				},
+			),
+		)
+		.pipe(
+			Effect.mapError(
+				(cause) =>
+					new DesktopPackagingError({
+						operation: "launch the unpacked macOS application",
+						cause,
+					}),
+			),
+			Effect.flatMap((exitCode) =>
+				exitCode === 0
+					? Effect.void
+					: Effect.fail(
+							new DesktopPackagingError({
+								operation: "launch the unpacked macOS application",
+								cause: new Error(`open exited with code ${exitCode}.`),
+							}),
+						),
+			),
+		);
 });

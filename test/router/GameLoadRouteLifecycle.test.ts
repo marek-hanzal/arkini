@@ -1,53 +1,29 @@
 // @vitest-environment jsdom
 
-import { QueryClient } from "@tanstack/react-query";
 import { createMemoryHistory, createRouter, RouterProvider } from "@tanstack/react-router";
 import { Effect } from "effect";
 import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-const createGameFxMock = vi.hoisted(() => vi.fn());
-
-vi.mock("~/bridge/game/createGameFx", () => ({
-	createGameFx: createGameFxMock,
-}));
-
 import { routeTree } from "~/_route";
-import { createCheatAvailability } from "~/bridge/cheat/createCheatAvailability";
 import type { ArkiniElectronApi } from "../../electron/contract/ArkiniElectronApi";
 import type { Game } from "~/bridge/game/Game";
+import { createGameEngineResourceFx } from "~/bridge/game/createGameEngineResourceFx";
 import { GameSaveBootstrapError } from "~/bridge/game/GameSaveBootstrapError";
-import { gameEngineQueryKey } from "~/bridge/game/gameEngineQueryKey";
-import { getCachedGameEngineResourceFx } from "~/bridge/game/getCachedGameEngineResourceFx";
-import type { LauncherStartup } from "~/ui/launcher/LauncherStartup";
+import { readCurrentGameEngineResourceFx } from "~/bridge/game/readCurrentGameEngineResourceFx";
+import type { GameSaveStorage } from "~/bridge/save/GameSaveStorage";
 import { testArkpackConfig } from "~test/bridge/arkpack/support/createTestArkpack";
-import { createTestGameTransitionFields } from "~test/support/game/createTestGameTransitionFields";
+import { makeTestGameTransitionFieldsFx } from "~test/support/game/makeTestGameTransitionFieldsFx";
+import { createTestRendererRuntime } from "~test/support/createTestRendererRuntime";
 import { testGameRead } from "~test/support/game/testGameRead";
 
 const packageId = "package-route-load";
 
-const getCachedGameEngineResource = (queryClient: QueryClient) =>
-	Effect.runSync(getCachedGameEngineResourceFx(queryClient));
 const roots: Array<ReturnType<typeof createRoot>> = [];
-const clearSaveMock = vi.fn(() => Promise.resolve());
-
-const createStartup = (): LauncherStartup => ({
-	getHeroUrl: () => "/hero.png",
-	getSnapshot: () => ({
-		type: "ready",
-		appearanceReady: true,
-		builtInPackageId: packageId,
-		heroReady: true,
-		splashCompleted: true,
-	}),
-	consumeHydrationFx: () => Effect.succeed(false),
-	startFx: Effect.void,
-	retryFx: Effect.void,
-	completeSplashFx: Effect.void,
-	disposeFx: Effect.void,
-	subscribe: () => () => undefined,
-});
+const runtimes: Array<ReturnType<typeof createTestRendererRuntime>["rendererRuntime"]> = [];
+const createGameFxMock = vi.fn();
+const clearSaveMock = vi.fn((_key: GameSaveStorage.Key) => Promise.resolve());
 
 const createGame = ({
 	createdPackageId = packageId,
@@ -74,7 +50,7 @@ const createGame = ({
 	disposeWithoutSaveFx,
 	flushSaveFx: Effect.void,
 	getResourceUrl: () => "blob:test",
-	...createTestGameTransitionFields(() => ({}) as ReturnType<Game["getSnapshot"]>),
+	...Effect.runSync(makeTestGameTransitionFieldsFx({} as ReturnType<Game["getSnapshot"]>)),
 	read: testGameRead,
 	run: (() => Promise.reject(new Error("Not used by this test."))) as Game["run"],
 	saveKey: {
@@ -86,15 +62,23 @@ const createGame = ({
 });
 
 const createHarness = (initialPath: string) => {
-	const queryClient = new QueryClient();
+	const { rendererRuntime } = createTestRendererRuntime({
+		clearSaveFx: (key) =>
+			Effect.tryPromise({
+				try: () => clearSaveMock(key),
+				catch: (cause) => cause,
+			}),
+		createResourceFx: (selectedPackageId) =>
+			(createGameFxMock(selectedPackageId) as Effect.Effect<Game, unknown>).pipe(
+				Effect.flatMap(createGameEngineResourceFx),
+			),
+	});
+	runtimes.push(rendererRuntime);
 	const router = createRouter({
 		routeTree,
 		isServer: false,
 		context: {
-			cheatAvailability: createCheatAvailability(),
-			launcherStartup: createStartup(),
-			previousGameShutdown: Promise.resolve(),
-			queryClient,
+			rendererRuntime,
 		},
 		history: createMemoryHistory({
 			initialEntries: [
@@ -103,13 +87,14 @@ const createHarness = (initialPath: string) => {
 		}),
 	});
 	return {
-		queryClient,
+		rendererRuntime,
 		router,
 	};
 };
 
 const loadRoute = async (router: ReturnType<typeof createHarness>["router"]) => {
 	const loading = router.load();
+	await vi.waitFor(() => expect(createGameFxMock).toHaveBeenCalled());
 	await vi.advanceTimersByTimeAsync(2_500);
 	await loading;
 };
@@ -135,10 +120,20 @@ const clickControl = async (container: HTMLElement, label: string) => {
 	if (control === undefined) throw new Error(`Missing control: ${label}`);
 	await act(async () => {
 		control.click();
-		await Promise.resolve();
+		await vi.advanceTimersByTimeAsync(0);
 		await vi.advanceTimersByTimeAsync(2_500);
 		await Promise.resolve();
 	});
+};
+
+const waitForEffectSettlement = async (assertion: () => void) => {
+	const usesFakeTimers = vi.isFakeTimers();
+	if (usesFakeTimers) vi.useRealTimers();
+	try {
+		await vi.waitFor(assertion);
+	} finally {
+		if (usesFakeTimers) vi.useFakeTimers();
+	}
 };
 
 beforeEach(() => {
@@ -172,6 +167,7 @@ afterEach(async () => {
 		for (const root of roots.splice(0)) root.unmount();
 	});
 	vi.useRealTimers();
+	for (const runtime of runtimes.splice(0)) await runtime.dispose();
 	vi.restoreAllMocks();
 	document.body.replaceChildren();
 });
@@ -180,63 +176,39 @@ describe("game load action lifecycle", () => {
 	it("creates one stable Game before redirecting the explicit load action to Board", async () => {
 		const game = createGame();
 		createGameFxMock.mockReturnValue(Effect.succeed(game));
-		const { queryClient, router } = createHarness(`/action/load-game/${packageId}`);
+		const { rendererRuntime, router } = createHarness(`/action/load-game/${packageId}`);
 
 		await loadRoute(router);
 
 		expect(createGameFxMock).toHaveBeenCalledOnce();
 		expect(router.state.location.pathname).toBe(`/game/${packageId}/board`);
-		expect(getCachedGameEngineResource(queryClient)?.game.arkpack).toBe(game.arkpack);
+		expect(rendererRuntime.runSync(readCurrentGameEngineResourceFx())?.game.arkpack).toBe(
+			game.arkpack,
+		);
 	});
 
 	it("repairs a direct Board entry through the same explicit load action", async () => {
 		const game = createGame();
 		createGameFxMock.mockReturnValue(Effect.succeed(game));
-		const { queryClient, router } = createHarness(`/game/${packageId}/board`);
+		const { rendererRuntime, router } = createHarness(`/game/${packageId}/board`);
 
 		await loadRoute(router);
 
 		expect(createGameFxMock).toHaveBeenCalledOnce();
 		expect(router.state.location.pathname).toBe(`/game/${packageId}/board`);
-		expect(getCachedGameEngineResource(queryClient)?.game.arkpack).toBe(game.arkpack);
+		expect(rendererRuntime.runSync(readCurrentGameEngineResourceFx())?.game.arkpack).toBe(
+			game.arkpack,
+		);
 	});
 
 	it("cancels an unfinished route-owned creation when navigation leaves the load action", async () => {
-		createGameFxMock.mockReturnValue(Effect.never);
-		const { queryClient, router } = createHarness(`/action/load-game/${packageId}`);
+		const interrupted = vi.fn();
+		createGameFxMock.mockReturnValue(
+			Effect.never.pipe(Effect.onInterrupt(() => Effect.sync(interrupted))),
+		);
+		const { rendererRuntime, router } = createHarness(`/action/load-game/${packageId}`);
 		const loading = router.load();
 		await vi.waitFor(() => expect(createGameFxMock).toHaveBeenCalledOnce());
-
-		await act(async () => {
-			await router.navigate({
-				to: "/main-menu",
-				replace: true,
-			});
-		});
-		await loading;
-
-		expect(router.state.location.pathname).toBe("/main-menu");
-		await vi.waitFor(() =>
-			expect(queryClient.getQueryState(gameEngineQueryKey)).toBeUndefined(),
-		);
-		expect(getCachedGameEngineResource(queryClient)).toBeNull();
-	});
-
-	it("keeps a completed Game provisional and discards it when the load action leaves during its hold", async () => {
-		const discard = vi.fn();
-		createGameFxMock.mockReturnValue(
-			Effect.succeed(
-				createGame({
-					disposeWithoutSaveFx: Effect.sync(discard),
-				}),
-			),
-		);
-		const { queryClient, router } = createHarness(`/action/load-game/${packageId}`);
-		const loading = router.load();
-		await vi.waitFor(() =>
-			expect(queryClient.getQueryState(gameEngineQueryKey)?.data).toBeDefined(),
-		);
-		expect(getCachedGameEngineResource(queryClient)).toBeNull();
 
 		await act(async () => {
 			const navigation = router.navigate({
@@ -250,11 +222,38 @@ describe("game load action lifecycle", () => {
 		await loading;
 
 		expect(router.state.location.pathname).toBe("/main-menu");
-		await vi.waitFor(() => expect(discard).toHaveBeenCalledOnce());
-		await vi.waitFor(() =>
-			expect(queryClient.getQueryState(gameEngineQueryKey)).toBeUndefined(),
+		await waitForEffectSettlement(() => expect(interrupted).toHaveBeenCalledOnce());
+		expect(rendererRuntime.runSync(readCurrentGameEngineResourceFx())).toBeNull();
+	});
+
+	it("keeps a completed Game provisional and discards it when the load action leaves during its hold", async () => {
+		const discard = vi.fn();
+		createGameFxMock.mockReturnValue(
+			Effect.succeed(
+				createGame({
+					disposeWithoutSaveFx: Effect.sync(discard),
+				}),
+			),
 		);
-		expect(getCachedGameEngineResource(queryClient)).toBeNull();
+		const { rendererRuntime, router } = createHarness(`/action/load-game/${packageId}`);
+		const loading = router.load();
+		await vi.waitFor(() => expect(createGameFxMock).toHaveBeenCalledOnce());
+		expect(rendererRuntime.runSync(readCurrentGameEngineResourceFx())).toBeNull();
+
+		await act(async () => {
+			const navigation = router.navigate({
+				to: "/main-menu",
+				replace: true,
+			});
+			await Promise.resolve();
+			await vi.advanceTimersByTimeAsync(2_500);
+			await navigation;
+		});
+		await loading;
+
+		expect(router.state.location.pathname).toBe("/main-menu");
+		await waitForEffectSettlement(() => expect(discard).toHaveBeenCalledOnce());
+		expect(rendererRuntime.runSync(readCurrentGameEngineResourceFx())).toBeNull();
 	});
 
 	it("replaces a pending different-package creation without joining or poisoning either resource", async () => {
@@ -266,7 +265,7 @@ describe("game load action lifecycle", () => {
 				}),
 			),
 		);
-		const { queryClient, router } = createHarness(`/action/load-game/${packageId}`);
+		const { rendererRuntime, router } = createHarness(`/action/load-game/${packageId}`);
 		const firstLoading = router.load();
 		await vi.waitFor(() => expect(createGameFxMock).toHaveBeenCalledOnce());
 
@@ -279,6 +278,7 @@ describe("game load action lifecycle", () => {
 				replace: true,
 			});
 			await Promise.resolve();
+			await vi.waitFor(() => expect(createGameFxMock).toHaveBeenCalledTimes(2));
 			await vi.advanceTimersByTimeAsync(2_500);
 			await navigation;
 		});
@@ -286,14 +286,14 @@ describe("game load action lifecycle", () => {
 
 		expect(createGameFxMock).toHaveBeenCalledTimes(2);
 		expect(router.state.location.pathname).toBe(`/game/${nextPackageId}/board`);
-		expect(getCachedGameEngineResource(queryClient)?.game.arkpack.packageId).toBe(
-			nextPackageId,
-		);
+		expect(
+			rendererRuntime.runSync(readCurrentGameEngineResourceFx())?.game.arkpack.packageId,
+		).toBe(nextPackageId);
 	});
 
-	it("discards an ordinary failed query and exits without deleting a save", async () => {
+	it("discards an ordinary failed bootstrap and exits without deleting a save", async () => {
 		createGameFxMock.mockReturnValue(Effect.fail(new Error("bootstrap failed")));
-		const { queryClient, router } = createHarness(`/action/load-game/${packageId}`);
+		const { rendererRuntime, router } = createHarness(`/action/load-game/${packageId}`);
 
 		await loadRoute(router);
 		const container = await renderRouter(router);
@@ -310,8 +310,8 @@ describe("game load action lifecycle", () => {
 
 		await clickControl(container, "Exit to Main Menu");
 
-		expect(router.state.location.pathname).toBe("/main-menu");
-		expect(queryClient.getQueryState(gameEngineQueryKey)).toBeUndefined();
+		await vi.waitFor(() => expect(router.state.location.pathname).toBe("/main-menu"));
+		expect(rendererRuntime.runSync(readCurrentGameEngineResourceFx())).toBeNull();
 		expect(clearSaveMock).not.toHaveBeenCalled();
 		await act(async () => {
 			router.history.back();
@@ -333,7 +333,7 @@ describe("game load action lifecycle", () => {
 				}),
 			),
 		);
-		const { queryClient, router } = createHarness(`/action/load-game/${packageId}`);
+		const { rendererRuntime, router } = createHarness(`/action/load-game/${packageId}`);
 
 		await loadRoute(router);
 		const container = await renderRouter(router);
@@ -350,10 +350,10 @@ describe("game load action lifecycle", () => {
 		const createCallsBeforeCleanup = createGameFxMock.mock.calls.length;
 		await clickControl(container, "Clean & Exit");
 
-		expect(clearSaveMock).toHaveBeenCalledOnce();
+		await vi.waitFor(() => expect(clearSaveMock).toHaveBeenCalledOnce());
 		expect(clearSaveMock).toHaveBeenCalledWith(saveKey);
-		expect(queryClient.getQueryState(gameEngineQueryKey)).toBeUndefined();
-		expect(router.state.location.pathname).toBe("/main-menu");
+		expect(rendererRuntime.runSync(readCurrentGameEngineResourceFx())).toBeNull();
+		await vi.waitFor(() => expect(router.state.location.pathname).toBe("/main-menu"));
 		expect(createGameFxMock).toHaveBeenCalledTimes(createCallsBeforeCleanup);
 		await act(async () => {
 			router.history.back();
@@ -370,12 +370,17 @@ describe("game load action lifecycle", () => {
 					packageId,
 				},
 			});
+			await vi.waitFor(() =>
+				expect(createGameFxMock).toHaveBeenCalledTimes(createCallsBeforeCleanup + 1),
+			);
 			await vi.advanceTimersByTimeAsync(2_500);
 			await navigation;
 		});
 
 		expect(router.state.location.pathname).toBe(`/game/${packageId}/board`);
-		expect(getCachedGameEngineResource(queryClient)?.game.arkpack).toBe(game.arkpack);
+		expect(rendererRuntime.runSync(readCurrentGameEngineResourceFx())?.game.arkpack).toBe(
+			game.arkpack,
+		);
 		expect(createGameFxMock).toHaveBeenCalledTimes(createCallsBeforeCleanup + 1);
 	});
 
@@ -393,19 +398,19 @@ describe("game load action lifecycle", () => {
 			),
 		);
 		clearSaveMock.mockRejectedValueOnce(new Error("disk refused cleanup"));
-		const { queryClient, router } = createHarness(`/action/load-game/${packageId}`);
+		const { rendererRuntime, router } = createHarness(`/action/load-game/${packageId}`);
 
 		await loadRoute(router);
 		const container = await renderRouter(router);
 		const createCallsBeforeCleanup = createGameFxMock.mock.calls.length;
 		await clickControl(container, "Clean & Exit");
 
-		expect(router.state.location.pathname).toBe("/action/recover-game-save");
-		expect(container.textContent).toContain("Save recovery failed");
-		expect(container.textContent).toContain("Retry cleanup");
-		expect(queryClient.getQueryState(gameEngineQueryKey)?.error).toBeInstanceOf(
-			GameSaveBootstrapError,
-		);
+		await vi.waitFor(() => {
+			expect(router.state.location.pathname).toBe("/action/recover-game-save");
+			expect(container.textContent).toContain("Save recovery failed");
+			expect(container.textContent).toContain("Retry cleanup");
+		});
+		expect(rendererRuntime.runSync(readCurrentGameEngineResourceFx())).toBeNull();
 		expect(createGameFxMock).toHaveBeenCalledTimes(createCallsBeforeCleanup);
 	});
 

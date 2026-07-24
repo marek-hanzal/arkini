@@ -4,40 +4,32 @@ import { toCriticalGameLifecycleError } from "~/bridge/game/CriticalGameLifecycl
 import type { Game } from "~/bridge/game/Game";
 import type { GameEngineResource } from "~/bridge/game/GameEngineResource";
 import { createGameEngineResourceFx } from "~/bridge/game/createGameEngineResourceFx";
-import { createGameFx } from "~/bridge/game/createGameFx";
+import { createGameFx as createGameFromPackageFx } from "~/bridge/game/createGameFx";
+import { readExactCauseFailure } from "~/bridge/game/readExactCauseFailure";
 import { writeLastPackageIdFx } from "~/bridge/launcher/writeLastPackageIdFx";
 
 export namespace acquireGameEngineResourceFx {
 	export interface Props {
-		readonly awaitPreviousShutdown: Promise<void>;
-		readonly beforeCreate?: (signal: AbortSignal) => Promise<void>;
-		readonly create?: (packageId: string, signal: AbortSignal) => Promise<Game>;
+		readonly beforeCreateFx?: Effect.Effect<void, unknown>;
+		readonly createGameFx?: (packageId: string) => Effect.Effect<Game, unknown>;
 		readonly packageId: string;
-		readonly rememberPackage?: (packageId: string) => Promise<void>;
-		readonly signal: AbortSignal;
+		readonly rememberPackageFx?: (packageId: string) => Effect.Effect<void, unknown>;
 	}
 }
-
-const checkAcquisitionSignalFx = Effect.fn("checkAcquisitionSignalFx")((signal: AbortSignal) =>
-	Effect.try({
-		try: () => signal.throwIfAborted(),
-		catch: (cause) => cause,
-	}),
-);
 
 const discardFailedAcquisitionFx = Effect.fn("discardFailedAcquisitionFx")(
 	(game: Game, acquisitionCause: Cause.Cause<unknown>): Effect.Effect<never, unknown> =>
 		Effect.exit(game.disposeWithoutSaveFx).pipe(
-			Effect.flatMap((disposeExit) =>
-				Exit.isFailure(disposeExit)
-					? Effect.fail(
-							toCriticalGameLifecycleError({
-								operation: "engine-ownership",
-								cause: Cause.squash(disposeExit.cause),
-							}),
-						)
-					: Effect.failCause(acquisitionCause),
-			),
+			Effect.flatMap((disposeExit) => {
+				if (Exit.isSuccess(disposeExit)) return Effect.failCause(acquisitionCause);
+				const failure = readExactCauseFailure(disposeExit.cause);
+				return Effect.fail(
+					toCriticalGameLifecycleError({
+						operation: "engine-ownership",
+						cause: failure._tag === "Some" ? failure.value : disposeExit.cause,
+					}),
+				);
+			}),
 		),
 );
 
@@ -47,62 +39,22 @@ const discardFailedAcquisitionFx = Effect.fn("discardFailedAcquisitionFx")(
  */
 export const acquireGameEngineResourceFx = Effect.fn("acquireGameEngineResourceFx")(
 	({
-		awaitPreviousShutdown,
-		beforeCreate,
-		create,
+		beforeCreateFx = Effect.void,
+		createGameFx = (packageId) =>
+			createGameFromPackageFx({
+				packageId,
+			}),
 		packageId,
-		rememberPackage,
-		signal,
-	}: acquireGameEngineResourceFx.Props) => {
-		const awaitPreviousShutdownFx = Effect.tryPromise({
-			try: () => awaitPreviousShutdown,
-			catch: (cause) =>
-				toCriticalGameLifecycleError({
-					operation: "hmr-handoff",
-					cause,
-				}),
-		});
-		const beforeCreateFx =
-			beforeCreate === undefined
-				? Effect.void
-				: Effect.tryPromise({
-						try: () => beforeCreate(signal),
-						catch: (cause) => cause,
-					});
-		const createSelectedGameFx =
-			create === undefined
-				? createGameFx({
-						packageId,
-					})
-				: Effect.uninterruptible(
-						Effect.tryPromise({
-							try: () => create(packageId, signal),
-							catch: (cause) => cause,
-						}),
-					);
-
-		return awaitPreviousShutdownFx.pipe(
-			Effect.zipRight(checkAcquisitionSignalFx(signal)),
-			Effect.zipRight(beforeCreateFx),
-			Effect.zipRight(checkAcquisitionSignalFx(signal)),
-			Effect.zipRight(
+		rememberPackageFx = writeLastPackageIdFx,
+	}: acquireGameEngineResourceFx.Props) =>
+		beforeCreateFx.pipe(
+			Effect.andThen(
 				Effect.uninterruptibleMask((restore) =>
 					Effect.gen(function* () {
-						const game =
-							create === undefined
-								? yield* restore(createSelectedGameFx)
-								: yield* createSelectedGameFx;
-						const rememberPackageFx =
-							rememberPackage === undefined
-								? writeLastPackageIdFx(packageId)
-								: Effect.tryPromise({
-										try: () => rememberPackage(packageId),
-										catch: (cause) => cause,
-									});
+						const game = yield* restore(createGameFx(packageId));
 						const adoptionExit = yield* Effect.exit(
 							restore(
 								Effect.gen(function* () {
-									yield* checkAcquisitionSignalFx(signal);
 									if (game.arkpack.packageId !== packageId) {
 										return yield* Effect.fail(
 											toCriticalGameLifecycleError({
@@ -113,10 +65,9 @@ export const acquireGameEngineResourceFx = Effect.fn("acquireGameEngineResourceF
 											}),
 										);
 									}
-									yield* rememberPackageFx.pipe(
-										Effect.catchAll(() => Effect.void),
+									yield* rememberPackageFx(packageId).pipe(
+										Effect.catch(() => Effect.void),
 									);
-									yield* checkAcquisitionSignalFx(signal);
 									return yield* createGameEngineResourceFx(game);
 								}),
 							),
@@ -128,6 +79,5 @@ export const acquireGameEngineResourceFx = Effect.fn("acquireGameEngineResourceF
 					}),
 				),
 			),
-		) satisfies Effect.Effect<GameEngineResource, unknown>;
-	},
+		) satisfies Effect.Effect<GameEngineResource, unknown>,
 );

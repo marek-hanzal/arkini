@@ -52,8 +52,10 @@ export const isolateStatefulOwnerTransitionFx = Effect.fn("isolateStatefulOwnerT
 			runtime,
 		});
 		if (pure) {
-			return yield* Effect.dieMessage(
-				`Owner ${owner.id} must own identity-bound state before it can be isolated.`,
+			return yield* Effect.die(
+				new Error(
+					`Owner ${owner.id} must own identity-bound state before it can be isolated.`,
+				),
 			);
 		}
 

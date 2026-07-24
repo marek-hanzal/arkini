@@ -1,4 +1,4 @@
-import { Effect, Either } from "effect";
+import { Effect, Result } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~/engine/game/fx/useGameFx";
@@ -108,7 +108,7 @@ describe("blocked job completion", () => {
 				});
 				delete (config.items as Record<string, unknown>).inventoryOutput;
 				const before = yield* readRuntimeFx();
-				const attempt = yield* Effect.either(
+				const attempt = yield* Effect.result(
 					runTickRuntimeByFx({
 						elapsedMs: 200,
 					}),
@@ -126,9 +126,9 @@ describe("blocked job completion", () => {
 			),
 		);
 
-		expect(Either.isLeft(result.attempt)).toBe(true);
-		if (Either.isRight(result.attempt)) throw new Error("Expected Tick failure.");
-		expect(result.attempt.left).toMatchObject({
+		expect(Result.isFailure(result.attempt)).toBe(true);
+		if (Result.isSuccess(result.attempt)) throw new Error("Expected Tick failure.");
+		expect(result.attempt.failure).toMatchObject({
 			_tag: "ItemNotFoundError",
 			itemId: "inventoryOutput",
 		});

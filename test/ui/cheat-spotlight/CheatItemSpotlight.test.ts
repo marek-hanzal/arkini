@@ -1,12 +1,14 @@
 // @vitest-environment jsdom
 
+import { RegistryContext, scheduleTask } from "@effect/atom-react";
+import { Effect } from "effect";
+import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { createCheatAvailability } from "~/bridge/cheat/createCheatAvailability";
+import { CheatAvailabilityAtom } from "~/bridge/cheat/CheatAvailabilityAtom";
 import type { Game } from "~/bridge/game/Game";
-import { CheatAvailabilityProvider } from "~/ui/cheat-availability/CheatAvailabilityProvider";
 import { CheatItemSpotlight } from "~/ui/cheat-spotlight/CheatItemSpotlight";
 import { CheatItemSpawnProvider } from "~/ui/cheat-spotlight/CheatItemSpawnProvider";
 
@@ -17,14 +19,11 @@ import { CheatItemSpawnProvider } from "~/ui/cheat-spotlight/CheatItemSpawnProvi
 ).IS_REACT_ACT_ENVIRONMENT = true;
 
 const state = vi.hoisted(() => ({
-	pending: false,
-	listeners: new Set<() => void>(),
-	reset: vi.fn(),
+	complete: undefined as (() => void) | undefined,
+	interrupted: vi.fn(),
+	mode: "success" as "pending" | "success",
+	run: vi.fn(),
 	spawn: vi.fn(),
-	publishPending: (pending: boolean) => {
-		state.pending = pending;
-		for (const listener of state.listeners) listener();
-	},
 }));
 
 vi.mock("~/bridge/cheat/useGameCheats", () => ({
@@ -56,24 +55,13 @@ vi.mock("~/bridge/cheat/useCheatItemCatalog", () => ({
 		},
 	],
 }));
-vi.mock("~/bridge/cheat/useSpawnCheatItemMutation", async () => {
-	const { useSyncExternalStore } = await import("react");
+vi.mock("~/engine/cheat/write/spawnCheatItemFx", async () => {
+	const { Effect } = await import("effect");
 	return {
-		useSpawnCheatItemMutation: () => ({
-			isPending: useSyncExternalStore(
-				(listener) => {
-					state.listeners.add(listener);
-					return () => state.listeners.delete(listener);
-				},
-				() => state.pending,
-				() => state.pending,
-			),
-			isError: false,
-			isSuccess: false,
-			error: null,
-			mutate: state.spawn,
-			reset: state.reset,
-		}),
+		spawnCheatItemFx: ({ itemId }: { readonly itemId: string }) => {
+			state.spawn(itemId);
+			return Effect.void;
+		},
 	};
 });
 vi.mock("~/ui/game-menu/useGameMenuControl", () => ({
@@ -88,6 +76,32 @@ vi.mock("~/ui/item-detail/useItemDetailControl", () => ({
 }));
 
 const roots: Array<ReturnType<typeof createRoot>> = [];
+const registries: AtomRegistry.AtomRegistry[] = [];
+let registry: AtomRegistry.AtomRegistry;
+
+const makeRegistry = () => {
+	const next = AtomRegistry.make({
+		scheduleTask,
+	});
+	registries.push(next);
+	return next;
+};
+
+const createGame = (): Game =>
+	({
+		runFx: ((effect: Effect.Effect<unknown, unknown>) => {
+			state.run(effect);
+			if (state.mode === "success") return effect;
+			return Effect.callback<void>((resume) => {
+				state.complete = () => {
+					state.complete = undefined;
+					state.mode = "success";
+					resume(Effect.void);
+				};
+				return Effect.sync(state.interrupted);
+			}).pipe(Effect.andThen(effect));
+		}) as Game["runFx"],
+	}) as Game;
 
 const SpotlightUnderTest = ({
 	game,
@@ -97,20 +111,29 @@ const SpotlightUnderTest = ({
 	readonly onBeforeOpen?: () => void;
 }) =>
 	createElement(
-		CheatItemSpawnProvider,
+		RegistryContext.Provider,
 		{
-			game,
+			value: registry,
 		},
-		createElement(CheatItemSpotlight, {
-			game,
-			onBeforeOpen,
-		}),
+		createElement(
+			CheatItemSpawnProvider,
+			{
+				game,
+			},
+			createElement(CheatItemSpotlight, {
+				game,
+				onBeforeOpen,
+			}),
+		),
 	);
 
 beforeEach(() => {
-	state.pending = false;
-	state.listeners.clear();
-	state.reset.mockReset();
+	registry = makeRegistry();
+	registry.set(CheatAvailabilityAtom, true);
+	state.complete = undefined;
+	state.interrupted.mockReset();
+	state.mode = "success";
+	state.run.mockReset();
 	state.spawn.mockReset();
 });
 
@@ -118,6 +141,7 @@ afterEach(async () => {
 	await act(async () => {
 		for (const root of roots.splice(0)) root.unmount();
 	});
+	for (const current of registries.splice(0)) current.dispose();
 	document.body.replaceChildren();
 });
 
@@ -127,23 +151,15 @@ describe("CheatItemSpotlight", () => {
 		document.body.append(container);
 		const root = createRoot(container);
 		roots.push(root);
-		const availability = createCheatAvailability();
-		availability.apply(true);
 		const onBeforeOpen = vi.fn(() => {
 			expect(container.querySelector('[data-ui="CheatItemSpotlight"]')).toBeNull();
 		});
 		await act(async () => {
 			root.render(
-				createElement(
-					CheatAvailabilityProvider,
-					{
-						availability,
-					},
-					createElement(SpotlightUnderTest, {
-						game: {} as Game,
-						onBeforeOpen,
-					}),
-				),
+				createElement(SpotlightUnderTest, {
+					game: createGame(),
+					onBeforeOpen,
+				}),
 			);
 		});
 		const origin = document.createElement("button");
@@ -221,12 +237,7 @@ describe("CheatItemSpotlight", () => {
 				}),
 			);
 		});
-		expect(state.spawn).toHaveBeenCalledWith(
-			"item:beta",
-			expect.objectContaining({
-				onSettled: expect.any(Function),
-			}),
-		);
+		expect(state.spawn).toHaveBeenCalledWith("item:beta");
 
 		selectedOption?.focus();
 		await act(async () => {
@@ -247,19 +258,11 @@ describe("CheatItemSpotlight", () => {
 		document.body.append(container);
 		const root = createRoot(container);
 		roots.push(root);
-		const availability = createCheatAvailability();
-		availability.apply(true);
 		await act(async () => {
 			root.render(
-				createElement(
-					CheatAvailabilityProvider,
-					{
-						availability,
-					},
-					createElement(SpotlightUnderTest, {
-						game: {} as Game,
-					}),
-				),
+				createElement(SpotlightUnderTest, {
+					game: createGame(),
+				}),
 			);
 		});
 		await act(async () => {
@@ -298,19 +301,11 @@ describe("CheatItemSpotlight", () => {
 		document.body.append(container);
 		const root = createRoot(container);
 		roots.push(root);
-		const availability = createCheatAvailability();
-		availability.apply(true);
 		await act(async () => {
 			root.render(
-				createElement(
-					CheatAvailabilityProvider,
-					{
-						availability,
-					},
-					createElement(SpotlightUnderTest, {
-						game: {} as Game,
-					}),
-				),
+				createElement(SpotlightUnderTest, {
+					game: createGame(),
+				}),
 			);
 		});
 		const toggle = async () => {
@@ -329,22 +324,31 @@ describe("CheatItemSpotlight", () => {
 		};
 
 		await toggle();
-		expect(state.reset).toHaveBeenCalledTimes(1);
-		await act(async () => state.publishPending(true));
+		state.mode = "pending";
+		const spawnInput = container.querySelector<HTMLInputElement>('input[type="search"]');
+		if (spawnInput === null) throw new Error("Expected Spotlight search input.");
+		await act(async () => {
+			spawnInput.dispatchEvent(
+				new KeyboardEvent("keydown", {
+					key: "Enter",
+					bubbles: true,
+					cancelable: true,
+				}),
+			);
+		});
 		const pendingInput = container.querySelector<HTMLInputElement>('input[type="search"]');
 		if (pendingInput === null) throw new Error("Expected pending Spotlight search input.");
 		expect(pendingInput.readOnly).toBe(true);
 		expect(pendingInput.className).toContain("cursor-progress");
+		expect(container.textContent).toContain("Spawning…");
 
 		await toggle();
 		expect(container.querySelector('[data-ui="CheatItemSpotlight"]')).toBeNull();
-		expect(state.reset).toHaveBeenCalledTimes(1);
 
 		await toggle();
 		const reopenedInput = container.querySelector<HTMLInputElement>('input[type="search"]');
 		if (reopenedInput === null) throw new Error("Expected reopened Spotlight search input.");
 		expect(reopenedInput.readOnly).toBe(true);
-		expect(state.reset).toHaveBeenCalledTimes(1);
 		await vi.waitFor(() => expect(document.activeElement).toBe(reopenedInput));
 
 		const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")?.set;
@@ -358,7 +362,6 @@ describe("CheatItemSpotlight", () => {
 			);
 		});
 		expect(reopenedInput.value).toBe("");
-		expect(state.reset).toHaveBeenCalledTimes(1);
 		expect(
 			Array.from(container.querySelectorAll<HTMLButtonElement>("button")).every(
 				(button) => button.disabled,
@@ -366,30 +369,33 @@ describe("CheatItemSpotlight", () => {
 		).toBe(true);
 
 		await toggle();
-		await act(async () => state.publishPending(false));
+		const complete = state.complete;
+		if (complete === undefined) throw new Error("Expected pending spawn completion.");
+		await act(async () => {
+			complete();
+			await Promise.resolve();
+		});
 		await toggle();
-		expect(state.reset).toHaveBeenCalledTimes(1);
 		expect(container.querySelector<HTMLInputElement>('input[type="search"]')?.readOnly).toBe(
 			false,
 		);
+		expect(container.textContent).toContain("Item spawned.");
 
 		await toggle();
 		await toggle();
-		expect(state.reset).toHaveBeenCalledTimes(2);
+		expect(container.textContent).toContain("Enter spawn");
 	});
 	it("retains spawn admission while the Board-local Spotlight unmounts and remounts", async () => {
 		const container = document.createElement("div");
 		document.body.append(container);
 		const root = createRoot(container);
 		roots.push(root);
-		const availability = createCheatAvailability();
-		availability.apply(true);
-		const game = {} as Game;
+		const game = createGame();
 		const renderTree = (showSpotlight: boolean) =>
 			createElement(
-				CheatAvailabilityProvider,
+				RegistryContext.Provider,
 				{
-					availability,
+					value: registry,
 				},
 				createElement(
 					CheatItemSpawnProvider,
@@ -420,6 +426,7 @@ describe("CheatItemSpotlight", () => {
 		};
 
 		await toggle();
+		state.mode = "pending";
 		const input = container.querySelector<HTMLInputElement>('input[type="search"]');
 		if (input === null) throw new Error("Expected Spotlight input.");
 		await act(async () => {
@@ -455,19 +462,11 @@ describe("CheatItemSpotlight", () => {
 		document.body.append(container);
 		const root = createRoot(container);
 		roots.push(root);
-		const availability = createCheatAvailability();
-		availability.apply(true);
 		await act(async () => {
 			root.render(
-				createElement(
-					CheatAvailabilityProvider,
-					{
-						availability,
-					},
-					createElement(SpotlightUnderTest, {
-						game: {} as Game,
-					}),
-				),
+				createElement(SpotlightUnderTest, {
+					game: createGame(),
+				}),
 			);
 		});
 		await act(async () => {

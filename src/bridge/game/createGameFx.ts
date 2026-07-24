@@ -122,9 +122,9 @@ export const createGameFx = Effect.fn("createGameFx")(function* ({
 			...liveSession,
 			arkpack: loaded.descriptor,
 			config: loaded.payload.config,
-			disposeFx: liveSession.disposeFx.pipe(Effect.zipRight(releaseResourcesFx)),
+			disposeFx: liveSession.disposeFx.pipe(Effect.andThen(releaseResourcesFx)),
 			disposeWithoutSaveFx: liveSession.disposeWithoutSaveFx.pipe(
-				Effect.zipRight(releaseResourcesFx),
+				Effect.andThen(releaseResourcesFx),
 			),
 			saveKey,
 			getResourceUrl: (resourceId) => {

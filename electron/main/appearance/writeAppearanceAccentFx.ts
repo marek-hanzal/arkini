@@ -1,4 +1,4 @@
-import { FileSystem } from "@effect/platform";
+import { FileSystem } from "effect";
 import { Effect } from "effect";
 import { join } from "node:path";
 import { AppearanceAccentSchema } from "../../contract/appearance/AppearanceAccentSchema";
@@ -33,8 +33,8 @@ export const writeAppearanceAccentFx = Effect.fn("writeAppearanceAccentFx")(func
 			recursive: true,
 		})
 		.pipe(
-			Effect.zipRight(fileSystem.writeFileString(pending, validAccent)),
-			Effect.zipRight(
+			Effect.andThen(fileSystem.writeFileString(pending, validAccent)),
+			Effect.andThen(
 				fileSystem.rename(pending, current).pipe(
 					Effect.ensuring(
 						fileSystem

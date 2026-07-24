@@ -74,21 +74,22 @@ export const createTrustedRendererFx = Effect.fn("createTrustedRendererFx")(
 						isTrustedUrl(frame.url)
 					);
 				};
-				const assertTrustedIpcSenderFx: TrustedRenderer["assertTrustedIpcSenderFx"] = (
-					event,
-				) =>
-					isTrustedIpcSender(event)
-						? Effect.void
-						: Effect.fail(
-								new ElectronMainError({
-									operation: "authorize privileged IPC from the Arkini renderer",
-									cause: {
-										senderId: event.sender.id,
-										senderFrameUrl: event.senderFrame?.url ?? null,
-									},
-								}),
-							);
-				const registerWindowFx: TrustedRenderer["registerWindowFx"] = (window) =>
+				const assertTrustedIpcSenderFx: TrustedRenderer["assertTrustedIpcSenderFx"] =
+					Effect.fn("TrustedRenderer.assertTrustedIpcSenderFx")(function* (event) {
+						if (isTrustedIpcSender(event)) return;
+						return yield* Effect.fail(
+							new ElectronMainError({
+								operation: "authorize privileged IPC from the Arkini renderer",
+								cause: {
+									senderId: event.sender.id,
+									senderFrameUrl: event.senderFrame?.url ?? null,
+								},
+							}),
+						);
+					});
+				const registerWindowFx: TrustedRenderer["registerWindowFx"] = Effect.fn(
+					"TrustedRenderer.registerWindowFx",
+				)((window) =>
 					Effect.sync(() => {
 						const { webContents } = window;
 						const { session } = webContents;
@@ -145,7 +146,8 @@ export const createTrustedRendererFx = Effect.fn("createTrustedRendererFx")(
 							session.setPermissionCheckHandler(null);
 							session.setPermissionRequestHandler(null);
 						});
-					});
+					}),
+				);
 
 				return {
 					developmentRendererUrl,

@@ -17,6 +17,7 @@ import { ItemInfoTab } from "~/ui/item-detail/ItemInfoTab";
 import { ItemLinesTab } from "~/ui/item-detail/ItemLinesTab";
 import { ItemQueueTab } from "~/ui/item-detail/ItemQueueTab";
 import { ItemSourcesTab } from "~/ui/item-detail/ItemSourcesTab";
+import { useCloseItemDetail } from "~/ui/item-detail/useCloseItemDetail";
 import { useItemDetailControl } from "~/ui/item-detail/useItemDetailControl";
 import { useItemDetailFocus } from "~/ui/item-detail/useItemDetailFocus";
 import { useItemDetailMotion } from "~/ui/item-detail/useItemDetailMotion";
@@ -77,7 +78,7 @@ const ItemDetailHeader = ({
 	readonly identity: HeaderIdentity;
 	readonly stale: boolean;
 }) => {
-	const itemDetail = useItemDetailControl();
+	const closeItemDetail = useCloseItemDetail();
 	return (
 		<header className="flex min-w-0 items-center justify-between gap-4 border-b border-line pb-3">
 			<div className="flex min-w-0 items-center gap-3">
@@ -104,7 +105,7 @@ const ItemDetailHeader = ({
 				className="grid size-9 shrink-0 cursor-pointer place-items-center rounded-lg border border-line bg-surface text-lg leading-none text-muted transition-colors hover:bg-accent/15 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent disabled:cursor-not-allowed"
 				aria-label="Close item detail"
 				disabled={disabled}
-				onClick={() => void RendererRuntime.runPromise(itemDetail.closeFx())}
+				onClick={() => closeItemDetail()}
 			>
 				×
 			</button>
@@ -337,6 +338,7 @@ const RuntimeItemDetailScene = ({
 	>;
 }) => {
 	const itemDetail = useItemDetailControl();
+	const closeItemDetail = useCloseItemDetail();
 	const liveIdentity = useItemDetailIdentity(target.itemId);
 	const liveLines = useItemDetailLines(target.itemId);
 	const liveSources = useItemDetailSources({
@@ -415,7 +417,7 @@ const RuntimeItemDetailScene = ({
 					<button
 						type="button"
 						className="grid size-9 cursor-pointer place-items-center border border-line bg-surface text-lg text-muted"
-						onClick={() => void RendererRuntime.runPromise(itemDetail.closeFx())}
+						onClick={() => closeItemDetail()}
 					>
 						×
 					</button>
@@ -469,6 +471,7 @@ const DefinitionItemDetailScene = ({
 		sources,
 	);
 	const itemDetail = useItemDetailControl();
+	const closeItemDetail = useCloseItemDetail();
 	useEffect(() => {
 		if (tabs.includes(target.tab)) return;
 		RendererRuntime.runSync(
@@ -494,7 +497,7 @@ const DefinitionItemDetailScene = ({
 				<button
 					type="button"
 					className="grid size-9 cursor-pointer place-items-center border border-line bg-surface text-lg text-muted"
-					onClick={() => void RendererRuntime.runPromise(itemDetail.closeFx())}
+					onClick={() => closeItemDetail()}
 				>
 					×
 				</button>
@@ -542,7 +545,7 @@ const ItemDetailDialog = ({
 		}
 	>;
 }) => {
-	const itemDetail = useItemDetailControl();
+	const closeItemDetail = useCloseItemDetail();
 	const motionState = useItemDetailMotion({
 		state,
 	});
@@ -567,7 +570,7 @@ const ItemDetailDialog = ({
 			transition={transition}
 			onPointerDown={(event) => {
 				if (event.target !== event.currentTarget || state.phase === "exiting") return;
-				void RendererRuntime.runPromise(itemDetail.closeFx());
+				closeItemDetail();
 			}}
 		>
 			<motion.div

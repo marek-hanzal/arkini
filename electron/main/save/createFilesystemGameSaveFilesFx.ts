@@ -1,4 +1,4 @@
-import { FileSystem } from "@effect/platform";
+import { FileSystem } from "effect";
 import { Effect } from "effect";
 import { join } from "node:path";
 import { clearGameSaveFx } from "./clearGameSaveFx";
@@ -21,26 +21,34 @@ export const createFilesystemGameSaveFilesFx = Effect.fn("createFilesystemGameSa
 	}: createFilesystemGameSaveFilesFx.Props) {
 		const fileSystem = providedFileSystem ?? (yield* FileSystem.FileSystem);
 		const root = join(userDataPath, "arkini", "saves");
-		return {
-			readFx: (key) =>
-				readGameSaveFx({
-					root,
-					fileSystem,
-					key,
-				}),
-			writeFx: (key, bytes) =>
+		const readFx: GameSaveFiles["readFx"] = Effect.fn("FilesystemGameSaveFiles.readFx")((key) =>
+			readGameSaveFx({
+				root,
+				fileSystem,
+				key,
+			}),
+		);
+		const writeFx: GameSaveFiles["writeFx"] = Effect.fn("FilesystemGameSaveFiles.writeFx")(
+			(key, bytes) =>
 				writeGameSaveFx({
 					root,
 					fileSystem,
 					key,
 					bytes,
 				}),
-			clearFx: (key) =>
+		);
+		const clearFx: GameSaveFiles["clearFx"] = Effect.fn("FilesystemGameSaveFiles.clearFx")(
+			(key) =>
 				clearGameSaveFx({
 					root,
 					fileSystem,
 					key,
 				}),
+		);
+		return {
+			readFx,
+			writeFx,
+			clearFx,
 		} satisfies GameSaveFiles;
 	},
 );

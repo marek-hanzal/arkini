@@ -1,17 +1,15 @@
-import { Effect, ExecutionStrategy, Exit, Scope, Stream } from "effect";
+import { Deferred, Effect, Exit, Scope, Stream } from "effect";
 
 import { invokeExternalCallbackFx } from "~/engine/common/fx/invokeExternalCallbackFx";
 import type { GameEventBatchSchema } from "~/engine/event/schema/GameEventBatchSchema";
-import type { CommittedTransitionSchema } from "~/engine/runtime/schema/CommittedTransitionSchema";
 import {
-	type CommittedTransitionSubscription,
 	CommittedTransitionsFx,
 	type CommittedTransitionsFxService,
 } from "~/engine/runtime/context/CommittedTransitionsFx";
+import type { CommittedTransitionSchema } from "~/engine/runtime/schema/CommittedTransitionSchema";
 
 export interface GameSessionTransitionSubscriptionCleanup {
-	readonly shutdown: Effect.Effect<void>;
-	readonly release: Effect.Effect<void>;
+	readonly close: Effect.Effect<void>;
 }
 
 export interface GameSessionTransitionSubscriptions {
@@ -29,7 +27,9 @@ export interface GameSessionTransitionSubscriptions {
 namespace openGameSessionTransitionSubscriptionFx {
 	export interface Props {
 		readonly committedTransitions: CommittedTransitionsFxService;
-		readonly delivery: (subscription: CommittedTransitionSubscription) => Effect.Effect<void>;
+		readonly delivery: (
+			changes: Stream.Stream<CommittedTransitionSchema.Type>,
+		) => Effect.Effect<void>;
 		readonly sessionScope: Scope.Scope;
 	}
 }
@@ -42,19 +42,25 @@ const openGameSessionTransitionSubscriptionFx = Effect.fn(
 	delivery,
 	sessionScope,
 }: openGameSessionTransitionSubscriptionFx.Props) {
-	const listenerScope = yield* Scope.fork(sessionScope, ExecutionStrategy.sequential);
-	const subscription = yield* committedTransitions.subscribe.pipe(Scope.extend(listenerScope));
-	yield* Effect.forkIn(delivery(subscription), listenerScope);
+	const listenerScope = yield* Scope.fork(sessionScope, "sequential");
+	const replaySeen = yield* Deferred.make<void>();
+	const changes = committedTransitions.changes.pipe(
+		Stream.tap(() => Deferred.succeed(replaySeen, undefined)),
+	);
+	yield* Effect.forkIn(delivery(changes), listenerScope, {
+		startImmediately: true,
+	});
+	// Do not return registration until the replay has linearized this listener.
+	yield* Deferred.await(replaySeen);
 
 	return {
-		shutdown: subscription.shutdown,
-		release: Scope.close(listenerScope, Exit.void),
+		close: Scope.close(listenerScope, Exit.void),
 	} satisfies GameSessionTransitionSubscriptionCleanup;
 });
 
 /**
- * Opens listener-specific committed-transition subscriptions. Each registration
- * atomically captures its own current transition and receives only later commits.
+ * Opens listener-specific replaying committed-transition streams. Scope closure
+ * interrupts the owned delivery fiber and releases its PubSub subscription.
  */
 export const createGameSessionTransitionSubscriptionsFx = Effect.fn(
 	"createGameSessionTransitionSubscriptionsFx",
@@ -67,17 +73,11 @@ export const createGameSessionTransitionSubscriptionsFx = Effect.fn(
 			openGameSessionTransitionSubscriptionFx({
 				committedTransitions,
 				sessionScope,
-				delivery: (subscription) =>
-					subscription.changes.pipe(
-						Stream.mapAccum(
-							subscription.current.runtime,
-							(previousRuntime, transition) =>
-								[
-									transition.runtime,
-									transition.runtime !== previousRuntime,
-								] as const,
-						),
-						Stream.filter((runtimeChanged) => runtimeChanged),
+				delivery: (changes) =>
+					changes.pipe(
+						Stream.map((transition) => transition.runtime),
+						Stream.changesWith(Object.is),
+						Stream.drop(1),
 						Stream.runForEach(() =>
 							invokeExternalCallbackFx({
 								callback: listener,
@@ -95,9 +95,8 @@ export const createGameSessionTransitionSubscriptionsFx = Effect.fn(
 			openGameSessionTransitionSubscriptionFx({
 				committedTransitions,
 				sessionScope,
-				delivery: (subscription) =>
-					Stream.make(subscription.current).pipe(
-						Stream.concat(subscription.changes),
+				delivery: (changes) =>
+					changes.pipe(
 						Stream.runForEach((transition) =>
 							invokeExternalCallbackFx({
 								callback: listener,
@@ -115,8 +114,11 @@ export const createGameSessionTransitionSubscriptionsFx = Effect.fn(
 			openGameSessionTransitionSubscriptionFx({
 				committedTransitions,
 				sessionScope,
-				delivery: (subscription) =>
-					subscription.changes.pipe(
+				delivery: (changes) =>
+					changes.pipe(
+						// A replay may contain transient facts committed before this listener
+						// linearized. Only later transitions are live event deliveries.
+						Stream.drop(1),
 						Stream.filter((transition) => transition.events.length > 0),
 						Stream.map(
 							(transition): GameEventBatchSchema.Type => ({

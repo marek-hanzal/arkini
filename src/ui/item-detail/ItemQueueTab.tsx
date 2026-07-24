@@ -1,9 +1,9 @@
 import { useClearItemDetailQueue } from "~/bridge/item-detail/useClearItemDetailQueue";
 import type { useItemDetailQueue } from "~/bridge/item-detail/useItemDetailQueue";
-import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import { Button } from "~/ui/button/Button";
 import { Scrollable } from "~/ui/scrollable/Scrollable";
 import { useItemDetailControl } from "~/ui/item-detail/useItemDetailControl";
+import { readSettledAsyncResultError } from "~/ui/reactivity/readSettledAsyncResultError";
 
 /** Renders authoritative queued intents without treating active work as cancellable. */
 export const ItemQueueTab = ({
@@ -19,11 +19,15 @@ export const ItemQueueTab = ({
 	>;
 }) => {
 	const itemDetail = useItemDetailControl();
-	const clearQueue = useClearItemDetailQueue();
 	const pendingKey = JSON.stringify([
 		"queue",
 		queue.itemId,
 	]);
+	const clearQueue = useClearItemDetailQueue({
+		pendingKey,
+		pendingOwner: itemDetail,
+	});
+	readSettledAsyncResultError(clearQueue.result);
 	const pending = itemDetail.readPendingAction(pendingKey) === "clear-queue";
 	const error = itemDetail.readActionError(pendingKey);
 	const used = queue.activeCount + queue.request.length;
@@ -41,19 +45,11 @@ export const ItemQueueTab = ({
 					type="button"
 					disabled={disabled || queue.request.length === 0 || pending}
 					cursorIntent={pending ? "progress" : undefined}
-					onClick={() => {
-						void RendererRuntime.runPromise(
-							itemDetail.runPendingActionFx({
-								key: pendingKey,
-								action: "clear-queue",
-								failureMessage: "Queue could not be cleared.",
-								run: () =>
-									clearQueue({
-										ownerItemId: queue.itemId,
-									}),
-							}),
-						);
-					}}
+					onClick={() =>
+						clearQueue.run({
+							ownerItemId: queue.itemId,
+						})
+					}
 				>
 					{pending ? "Clearing…" : "Clear queue"}
 				</Button>

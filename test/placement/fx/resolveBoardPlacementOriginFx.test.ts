@@ -1,3 +1,4 @@
+import { makeFixedRandomFx } from "~test/support/makeFixedRandomFx";
 import { Effect, Random } from "effect";
 import { describe, expect, it } from "vitest";
 
@@ -29,8 +30,9 @@ describe("resolveBoardPlacementOriginFx", () => {
 					origin,
 				};
 			}).pipe(
-				Effect.withRandom(
-					Random.fixed([
+				Effect.provideServiceEffect(
+					Random.Random,
+					makeFixedRandomFx([
 						0.75,
 					]),
 				),
@@ -75,9 +77,10 @@ describe("resolveBoardPlacementOriginFx", () => {
 					origin,
 				};
 			}).pipe(
-				Effect.withRandom(
-					Random.fixed([
-						5,
+				Effect.provideServiceEffect(
+					Random.Random,
+					makeFixedRandomFx([
+						0.625,
 						0.75,
 					]),
 				),

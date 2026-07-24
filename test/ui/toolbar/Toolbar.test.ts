@@ -11,6 +11,7 @@ import { startFx } from "~/engine/start/write/startFx";
 import { GameBoardLayout } from "~/ui/board/GameBoardLayout";
 import { TileSystemProvider } from "~/ui/tile/TileSystemProvider";
 import { ItemDetailProvider } from "~/ui/item-detail/ItemDetailProvider";
+import { makeTestGameTransitionFieldsFx } from "~test/support/game/makeTestGameTransitionFieldsFx";
 import { testGameRead, testGameReadOrThrow } from "~test/support/game/testGameRead";
 
 const gameEngineState = vi.hoisted(() => ({
@@ -118,13 +119,7 @@ const createGame = (toolbarSize?: number, stored = false): GameEngine => {
 			packageId: "test-package",
 			contentHash: "0".repeat(64),
 		},
-		getSnapshot: () => runtime,
-		getTransitionSnapshot: () => ({
-			sequence: 0,
-			previousRuntime: null,
-			runtime,
-			events: [],
-		}),
+		...Effect.runSync(makeTestGameTransitionFieldsFx(runtime)),
 		getResourceUrl: (resourceId: string) => `resource:${resourceId}`,
 		subscribe: () => () => undefined,
 		subscribeTransitions: (listener) => {

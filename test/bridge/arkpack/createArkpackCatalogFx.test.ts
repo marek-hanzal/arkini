@@ -1,4 +1,4 @@
-import { Deferred, Effect } from "effect";
+import { Deferred, Effect, Stream, SubscriptionRef } from "effect";
 import { describe, expect, it, vi } from "vitest";
 import type { ArkpackDescriptor } from "~/bridge/arkpack/Arkpack";
 import { createArkpackCatalogFx } from "~/bridge/arkpack/createArkpackCatalogFx";
@@ -56,13 +56,11 @@ describe("createArkpackCatalogFx", () => {
 					}),
 			}),
 		);
-		const observed: string[] = [];
-		catalog.subscribe(() => {
-			observed.push(catalog.getSnapshot().type);
-		});
-
+		const observed = Effect.runPromise(
+			SubscriptionRef.changes(catalog.state).pipe(Stream.take(6), Stream.runCollect),
+		);
 		await Effect.runPromise(catalog.refreshFx);
-		expect(catalog.getSnapshot()).toEqual({
+		expect(Effect.runSync(SubscriptionRef.get(catalog.state))).toEqual({
 			type: "ready",
 			arkpacks: [
 				builtIn,
@@ -71,7 +69,7 @@ describe("createArkpackCatalogFx", () => {
 
 		const descriptor = await Effect.runPromise(catalog.importFileFx({} as File));
 		expect(descriptor).toBe(imported);
-		expect(catalog.getSnapshot()).toEqual({
+		expect(Effect.runSync(SubscriptionRef.get(catalog.state))).toEqual({
 			type: "ready",
 			arkpacks: [
 				builtIn,
@@ -80,14 +78,14 @@ describe("createArkpackCatalogFx", () => {
 		});
 
 		await Effect.runPromise(catalog.removeFx(imported.packageId));
-		expect(catalog.getSnapshot()).toEqual({
+		expect(Effect.runSync(SubscriptionRef.get(catalog.state))).toEqual({
 			type: "ready",
 			arkpacks: [
 				builtIn,
 			],
 		});
 		expect(list).toHaveBeenCalledTimes(3);
-		expect(observed).toEqual([
+		expect((await observed).map((state) => state.type)).toEqual([
 			"loading",
 			"ready",
 			"loading",
@@ -104,12 +102,19 @@ describe("createArkpackCatalogFx", () => {
 				listFx: Effect.fail(failure),
 			}),
 		);
+		const observed = Effect.runPromise(
+			SubscriptionRef.changes(catalog.state).pipe(Stream.take(2), Stream.runCollect),
+		);
 
 		await expect(Effect.runPromise(catalog.refreshFx)).rejects.toThrow("catalog unavailable");
-		const snapshot = catalog.getSnapshot();
+		const snapshot = Effect.runSync(SubscriptionRef.get(catalog.state));
 		expect(snapshot.type).toBe("failed");
 		if (snapshot.type !== "failed") throw new Error("Expected failed catalog snapshot.");
 		expect(snapshot.error).toBe(failure);
+		expect((await observed).map((state) => state.type)).toEqual([
+			"loading",
+			"failed",
+		]);
 	});
 
 	it("publishes loading before import and remove operations complete", async () => {
@@ -125,7 +130,7 @@ describe("createArkpackCatalogFx", () => {
 				listFx: Effect.sync(() => descriptors),
 				importFileFx: () =>
 					Deferred.succeed(importStarted, undefined).pipe(
-						Effect.zipRight(Deferred.await(finishImport)),
+						Effect.andThen(Deferred.await(finishImport)),
 						Effect.tap(() =>
 							Effect.sync(() => {
 								descriptors = [
@@ -138,7 +143,7 @@ describe("createArkpackCatalogFx", () => {
 					),
 				removeFx: () =>
 					Deferred.succeed(removeStarted, undefined).pipe(
-						Effect.zipRight(Deferred.await(finishRemove)),
+						Effect.andThen(Deferred.await(finishRemove)),
 						Effect.tap(() =>
 							Effect.sync(() => {
 								descriptors = [
@@ -153,12 +158,12 @@ describe("createArkpackCatalogFx", () => {
 
 		const importing = Effect.runPromise(catalog.importFileFx({} as File));
 		await Effect.runPromise(Deferred.await(importStarted));
-		expect(catalog.getSnapshot()).toEqual({
+		expect(Effect.runSync(SubscriptionRef.get(catalog.state))).toEqual({
 			type: "loading",
 		});
 		Effect.runSync(Deferred.succeed(finishImport, undefined));
 		await expect(importing).resolves.toBe(imported);
-		expect(catalog.getSnapshot()).toEqual({
+		expect(Effect.runSync(SubscriptionRef.get(catalog.state))).toEqual({
 			type: "ready",
 			arkpacks: [
 				builtIn,
@@ -168,12 +173,92 @@ describe("createArkpackCatalogFx", () => {
 
 		const removing = Effect.runPromise(catalog.removeFx(imported.packageId));
 		await Effect.runPromise(Deferred.await(removeStarted));
-		expect(catalog.getSnapshot()).toEqual({
+		expect(Effect.runSync(SubscriptionRef.get(catalog.state))).toEqual({
 			type: "loading",
 		});
 		Effect.runSync(Deferred.succeed(finishRemove, undefined));
 		await expect(removing).resolves.toBeUndefined();
-		expect(catalog.getSnapshot()).toEqual({
+		expect(Effect.runSync(SubscriptionRef.get(catalog.state))).toEqual({
+			type: "ready",
+			arkpacks: [
+				builtIn,
+			],
+		});
+	});
+
+	it("serializes concurrent refresh, import, and remove without reordering catalog truth", async () => {
+		let descriptors: ReadonlyArray<ArkpackDescriptor> = [
+			builtIn,
+		];
+		let listAttempt = 0;
+		const firstListStarted = Effect.runSync(Deferred.make<void>());
+		const releaseFirstList = Effect.runSync(Deferred.make<void>());
+		const order: string[] = [];
+		const catalog = Effect.runSync(
+			createArkpackCatalogFx({
+				listFx: Effect.gen(function* () {
+					listAttempt += 1;
+					order.push(`list:${listAttempt}`);
+					if (listAttempt === 1) {
+						yield* Deferred.succeed(firstListStarted, undefined);
+						yield* Deferred.await(releaseFirstList);
+					}
+					return descriptors;
+				}),
+				importFileFx: () =>
+					Effect.sync(() => {
+						order.push("import");
+						descriptors = [
+							builtIn,
+							imported,
+						];
+						return imported;
+					}),
+				removeFx: () =>
+					Effect.sync(() => {
+						order.push("remove");
+						descriptors = [
+							builtIn,
+						];
+					}),
+			}),
+		);
+		const observed = Effect.runPromise(
+			SubscriptionRef.changes(catalog.state).pipe(Stream.take(6), Stream.runCollect),
+		);
+
+		const refreshing = Effect.runPromise(catalog.refreshFx);
+		await Effect.runPromise(Deferred.await(firstListStarted));
+		const importing = Effect.runPromise(catalog.importFileFx({} as File));
+		const removing = Effect.runPromise(catalog.removeFx(imported.packageId));
+		await Promise.resolve();
+		expect(order).toEqual([
+			"list:1",
+		]);
+
+		Effect.runSync(Deferred.succeed(releaseFirstList, undefined));
+		await Promise.all([
+			refreshing,
+			importing,
+			removing,
+		]);
+
+		expect(order).toEqual([
+			"list:1",
+			"import",
+			"list:2",
+			"remove",
+			"list:3",
+		]);
+		expect((await observed).map((state) => state.type)).toEqual([
+			"loading",
+			"ready",
+			"loading",
+			"ready",
+			"loading",
+			"ready",
+		]);
+		expect(Effect.runSync(SubscriptionRef.get(catalog.state))).toEqual({
 			type: "ready",
 			arkpacks: [
 				builtIn,

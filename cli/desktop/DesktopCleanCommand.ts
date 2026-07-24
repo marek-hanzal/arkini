@@ -1,4 +1,4 @@
-import { Command } from "@effect/cli";
+import { Command } from "effect/unstable/cli";
 import { cleanDesktopPackagingFx } from "./cleanDesktopPackagingFx";
 
 export const DesktopCleanCommand = Command.make("clean", {}, () => cleanDesktopPackagingFx()).pipe(

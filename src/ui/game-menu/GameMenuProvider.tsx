@@ -27,17 +27,16 @@ export const GameMenuProvider = ({ children }: PropsWithChildren) => {
 		],
 	);
 	const close = useCallback(
-		() => RendererRuntime.runSync(controller.closeFx),
+		() => RendererRuntime.runPromise(controller.closeFx()),
 		[
 			controller,
 		],
 	);
-	const toggle = useCallback(
-		() => RendererRuntime.runSync(controller.toggleFx),
-		[
-			controller,
-		],
-	);
+	const toggle = useCallback(() => {
+		void RendererRuntime.runFork(controller.toggleFx);
+	}, [
+		controller,
+	]);
 	const beginAction = useCallback(
 		(action: GameMenuAction) => RendererRuntime.runSync(controller.beginActionFx(action)),
 		[
@@ -72,7 +71,7 @@ export const GameMenuProvider = ({ children }: PropsWithChildren) => {
 				return;
 			}
 			event.preventDefault();
-			RendererRuntime.runSync(controller.toggleFx);
+			void RendererRuntime.runFork(controller.toggleFx);
 		};
 		window.addEventListener("keydown", onKeyDown);
 		return () => window.removeEventListener("keydown", onKeyDown);

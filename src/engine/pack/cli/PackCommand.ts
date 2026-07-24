@@ -1,4 +1,4 @@
-import { Args, Command } from "@effect/cli";
+import { Argument, Command } from "effect/unstable/cli";
 import { Console, Effect } from "effect";
 
 import { packDirectoryFx } from "~/engine/pack/fx/packDirectoryFx";
@@ -31,7 +31,7 @@ const runPackCommandFx = Effect.fn("runPackCommandFx")(function* ({
 		metadata,
 	}).pipe(
 		Effect.catchTag("GameValidationError", (error) =>
-			renderGameDiagnosticsFx(error.diagnostics).pipe(Effect.zipRight(Effect.fail(error))),
+			renderGameDiagnosticsFx(error.diagnostics).pipe(Effect.andThen(Effect.fail(error))),
 		),
 	);
 	yield* renderGameDiagnosticsFx(result.diagnostics);
@@ -50,9 +50,7 @@ export const PackCommand = ({ input, name = "pack", metadata }: PackCommand.Prop
 	Command.make(
 		name,
 		{
-			input: Args.directory({
-				name: "input",
-			}).pipe(Args.withDefault(input)),
+			input: Argument.directory("input").pipe(Argument.withDefault(input)),
 		},
 		({ input }) =>
 			runPackCommandFx({

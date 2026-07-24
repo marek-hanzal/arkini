@@ -25,7 +25,7 @@ describe("GameMenuController", () => {
 			activeAction: "settings",
 		});
 
-		void RendererRuntime.runSync(controller.closeFx);
+		RendererRuntime.runSync(controller.closeFx());
 		expect(controller.getSnapshot().phase).toBe("open");
 		RendererRuntime.runSync(controller.toggleFx);
 		expect(controller.getSnapshot().phase).toBe("open");
@@ -40,21 +40,29 @@ describe("GameMenuController", () => {
 		RendererRuntime.runSync(controller.openFx);
 		RendererRuntime.runSync(controller.completeEnterFx);
 
-		const first = RendererRuntime.runSync(controller.closeFx);
-		const second = RendererRuntime.runSync(controller.closeFx);
-		let completed = false;
+		const first = RendererRuntime.runPromise(controller.closeFx());
+		const second = RendererRuntime.runPromise(controller.closeFx());
+		let firstCompleted = false;
+		let secondCompleted = false;
 		void first.then(() => {
-			completed = true;
+			firstCompleted = true;
+		});
+		void second.then(() => {
+			secondCompleted = true;
 		});
 
-		expect(second).toBe(first);
 		expect(controller.getSnapshot().phase).toBe("exiting");
 		await Promise.resolve();
-		expect(completed).toBe(false);
+		expect(firstCompleted).toBe(false);
+		expect(secondCompleted).toBe(false);
 
 		RendererRuntime.runSync(controller.completeExitFx);
-		await first;
-		expect(completed).toBe(true);
+		await Promise.all([
+			first,
+			second,
+		]);
+		expect(firstCompleted).toBe(true);
+		expect(secondCompleted).toBe(true);
 		expect(controller.getSnapshot()).toEqual({
 			phase: "closed",
 			activeAction: null,
@@ -65,7 +73,7 @@ describe("GameMenuController", () => {
 		const controller = RendererRuntime.runSync(createGameMenuControllerFx());
 		RendererRuntime.runSync(controller.openFx);
 		RendererRuntime.runSync(controller.completeEnterFx);
-		const completion = RendererRuntime.runSync(controller.closeFx);
+		const completion = RendererRuntime.runPromise(controller.closeFx());
 
 		RendererRuntime.runSync(controller.resetFx);
 

@@ -1,14 +1,25 @@
+import { useAtom } from "@effect/atom-react";
+import { Cause, Option } from "effect";
+import * as AsyncResult from "effect/unstable/reactivity/AsyncResult";
 import { type PanInfo, useDragControls, useMotionValue } from "motion/react";
 import { type PointerEventHandler, useCallback, useEffect, useRef } from "react";
 import { match } from "ts-pattern";
 
-import { useDropItem } from "~/bridge/tile/useDropItem";
+import { useGameEngine } from "~/bridge/game/useGameEngine";
+import { readExactCauseFailure } from "~/bridge/game/readExactCauseFailure";
+import { dropItemAtom } from "~/bridge/tile/dropItemAtom";
 import type { TileDragSource } from "~/ui/tile/TileDragSource";
 import { tileLocationForTarget } from "~/ui/tile/tileLocationForTarget";
 import { useTileActorInteraction } from "~/ui/tile/useTileActorInteraction";
 import { useTileActorSystem } from "~/ui/tile/useTileActorSystem";
 
-/** Owns direct pointer dragging and authoritative drop dispatch without a post-drop lifecycle. */
+const reportDropFailure = (cause: Cause.Cause<unknown>) => {
+	if (Cause.hasInterruptsOnly(cause)) return;
+	const failure = readExactCauseFailure(cause);
+	console.error("Tile drop failed.", Option.isSome(failure) ? failure.value : cause);
+};
+
+/** Owns direct pointer dragging and one authoritative drop outcome through settlement. */
 export const useTileActorDrag = ({
 	canonicalSource,
 	live,
@@ -16,13 +27,20 @@ export const useTileActorDrag = ({
 	readonly canonicalSource: TileDragSource;
 	readonly live: boolean;
 }) => {
+	const game = useGameEngine();
 	const active = useTileActorInteraction(canonicalSource.id);
 	const { press, startDrag, moveDrag, release, completeDrop, cancel } = useTileActorSystem();
-	const dropItem = useDropItem();
+	const commandAtom = dropItemAtom(game);
+	const [dropResult, dropItem] = useAtom(commandAtom);
 	const dragControls = useDragControls();
 	const x = useMotionValue(0);
 	const y = useMotionValue(0);
 	const dragStarted = useRef(false);
+	const dropOwned = useRef<{
+		readonly generation: number;
+		readonly resultBeforeCommand: typeof dropResult;
+		readonly source: TileDragSource;
+	} | null>(null);
 	const pointerOwned = useRef(false);
 	const suppressClick = useRef(false);
 
@@ -116,7 +134,7 @@ export const useTileActorDrag = ({
 	);
 
 	const onDragEnd = useCallback(
-		async (_event: MouseEvent | TouchEvent | PointerEvent, _info: PanInfo) => {
+		(_event: MouseEvent | TouchEvent | PointerEvent, _info: PanInfo) => {
 			if (!pointerOwned.current) return;
 			pointerOwned.current = false;
 			dragStarted.current = false;
@@ -162,28 +180,45 @@ export const useTileActorDrag = ({
 					}),
 				)
 				.exhaustive();
-			try {
-				await dropItem({
-					sourceItemId: released.source.id,
-					sourceRevision: released.source.revision,
-					sourceLocation: released.source.location,
-					target,
-				});
-			} catch (error) {
-				console.error("Tile drop failed.", error);
-			} finally {
-				completeDrop(released.source, released.generation);
-			}
+			dropOwned.current = {
+				generation: released.generation,
+				resultBeforeCommand: dropResult,
+				source: released.source,
+			};
+			dropItem({
+				sourceItemId: released.source.id,
+				sourceRevision: released.source.revision,
+				sourceLocation: released.source.location,
+				target,
+			});
 		},
 		[
 			cancel,
 			canonicalSource.id,
+			dropResult,
 			dropItem,
 			release,
 			resetOffset,
-			completeDrop,
 		],
 	);
+
+	useEffect(() => {
+		const owned = dropOwned.current;
+		if (
+			owned === null ||
+			dropResult === owned.resultBeforeCommand ||
+			dropResult.waiting ||
+			AsyncResult.isInitial(dropResult)
+		) {
+			return;
+		}
+		dropOwned.current = null;
+		if (AsyncResult.isFailure(dropResult)) reportDropFailure(dropResult.cause);
+		completeDrop(owned.source, owned.generation);
+	}, [
+		completeDrop,
+		dropResult,
+	]);
 
 	useEffect(() => {
 		if (!pointerOwned.current) return;
@@ -207,6 +242,18 @@ export const useTileActorDrag = ({
 		suppressClick.current = false;
 		return suppressed;
 	}, []);
+
+	useEffect(
+		() => () => {
+			const owned = dropOwned.current;
+			dropOwned.current = null;
+			if (owned !== null) completeDrop(owned.source, owned.generation);
+		},
+		[
+			commandAtom,
+			completeDrop,
+		],
+	);
 
 	useEffect(
 		() => () => {

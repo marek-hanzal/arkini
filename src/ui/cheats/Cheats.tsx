@@ -109,6 +109,14 @@ export const Cheats = ({
 						},
 						() => null,
 					)
+					.with(
+						{
+							kind: "navigation-error",
+						},
+						({ error }) => (
+							<p className="text-danger">Navigation failed: {errorMessage(error)}</p>
+						),
+					)
 					.exhaustive()}
 			</div>
 

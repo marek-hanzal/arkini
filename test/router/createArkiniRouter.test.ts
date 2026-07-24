@@ -1,36 +1,24 @@
-import { QueryClient } from "@tanstack/react-query";
 // @vitest-environment jsdom
 
 import { Effect } from "effect";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { createCheatAvailability } from "~/bridge/cheat/createCheatAvailability";
 import { createArkiniRouter } from "~/router";
-import type { LauncherStartup } from "~/ui/launcher/LauncherStartup";
+import { createTestRendererRuntime } from "~test/support/createTestRendererRuntime";
 import { resolveRouteViewTransitionTypes } from "~/ui/navigation/resolveRouteViewTransitionTypes";
-
-const createStartup = (): LauncherStartup => {
-	const state: LauncherStartup.State = {
-		type: "ready",
-		appearanceReady: true,
-		builtInPackageId: "built-in",
-		heroReady: true,
-		splashCompleted: true,
-	};
-
-	return {
-		getSnapshot: () => state,
-		getHeroUrl: () => "/hero.png",
-		consumeHydrationFx: () => Effect.succeed(false),
-		startFx: Effect.void,
-		retryFx: Effect.void,
-		completeSplashFx: Effect.void,
-		disposeFx: Effect.void,
-		subscribe: () => () => undefined,
-	};
-};
 
 const originalStartViewTransition = document.startViewTransition;
 const originalCss = window.CSS;
+const runtimes: Array<ReturnType<typeof createTestRendererRuntime>["rendererRuntime"]> = [];
+
+const createRouter = () => {
+	const { rendererRuntime } = createTestRendererRuntime({
+		createResourceFx: () => Effect.never,
+	});
+	runtimes.push(rendererRuntime);
+	return createArkiniRouter({
+		rendererRuntime,
+	});
+};
 
 const resolveTypes = (fromPathname: string | undefined, toPathname: string) =>
 	resolveRouteViewTransitionTypes({
@@ -45,7 +33,8 @@ const resolveTypes = (fromPathname: string | undefined, toPathname: string) =>
 		},
 	});
 
-afterEach(() => {
+afterEach(async () => {
+	for (const runtime of runtimes.splice(0)) await runtime.dispose();
 	vi.restoreAllMocks();
 	if (originalCss === undefined) {
 		Reflect.deleteProperty(window, "CSS");
@@ -258,12 +247,7 @@ describe("createArkiniRouter", () => {
 				supports: vi.fn(() => true),
 			},
 		});
-		const router = createArkiniRouter({
-			cheatAvailability: createCheatAvailability(),
-			launcherStartup: createStartup(),
-			previousGameShutdown: Promise.resolve(),
-			queryClient: new QueryClient(),
-		});
+		const router = createRouter();
 		expect(router.options.defaultViewTransition).toEqual({
 			types: resolveRouteViewTransitionTypes,
 		});
@@ -276,22 +260,12 @@ describe("createArkiniRouter", () => {
 				supports: vi.fn(() => false),
 			},
 		});
-		const router = createArkiniRouter({
-			cheatAvailability: createCheatAvailability(),
-			launcherStartup: createStartup(),
-			previousGameShutdown: Promise.resolve(),
-			queryClient: new QueryClient(),
-		});
+		const router = createRouter();
 		expect(router.options.defaultViewTransition).toBe(false);
 	});
 
 	it("falls back to a normal update when the browser API is unavailable", async () => {
-		const router = createArkiniRouter({
-			cheatAvailability: createCheatAvailability(),
-			launcherStartup: createStartup(),
-			previousGameShutdown: Promise.resolve(),
-			queryClient: new QueryClient(),
-		});
+		const router = createRouter();
 		const update = vi.fn(async () => undefined);
 
 		Reflect.deleteProperty(document, "startViewTransition");

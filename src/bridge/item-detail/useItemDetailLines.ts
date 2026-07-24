@@ -628,5 +628,5 @@ export const useItemDetailLines = (itemId: IdSchema.Type): useItemDetailLines.Pr
 			itemId,
 		],
 	);
-	return useRuntimeSelector(selector, sameProjection);
+	return useRuntimeSelector(game, selector, sameProjection);
 };

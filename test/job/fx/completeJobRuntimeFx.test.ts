@@ -1,3 +1,4 @@
+import { makeFixedRandomFx } from "~test/support/makeFixedRandomFx";
 import { Effect, Random } from "effect";
 import { describe, expect, it } from "vitest";
 
@@ -23,8 +24,9 @@ describe("completeJobRuntimeFx", () => {
 					jobId: prepared.job.id,
 					runtime: prepared.freeRuntime,
 				}).pipe(
-					Effect.withRandom(
-						Random.fixed([
+					Effect.provideServiceEffect(
+						Random.Random,
+						makeFixedRandomFx([
 							0.01,
 						]),
 					),
@@ -33,8 +35,9 @@ describe("completeJobRuntimeFx", () => {
 					jobId: prepared.job.id,
 					runtime: prepared.fullRuntime,
 				}).pipe(
-					Effect.withRandom(
-						Random.fixed([
+					Effect.provideServiceEffect(
+						Random.Random,
+						makeFixedRandomFx([
 							0.01,
 						]),
 					),
@@ -43,8 +46,9 @@ describe("completeJobRuntimeFx", () => {
 					jobId: prepared.job.id,
 					runtime: prepared.freeRuntime,
 				}).pipe(
-					Effect.withRandom(
-						Random.fixed([
+					Effect.provideServiceEffect(
+						Random.Random,
+						makeFixedRandomFx([
 							0.99,
 						]),
 					),
@@ -58,8 +62,9 @@ describe("completeJobRuntimeFx", () => {
 					jobId: restoredJob.id,
 					runtime: restoredRuntime,
 				}).pipe(
-					Effect.withRandom(
-						Random.fixed([
+					Effect.provideServiceEffect(
+						Random.Random,
+						makeFixedRandomFx([
 							0.5,
 						]),
 					),
@@ -92,8 +97,9 @@ describe("completeJobRuntimeFx", () => {
 					jobId: prepared.job.id,
 					runtime: prepared.freeRuntime,
 				}).pipe(
-					Effect.withRandom(
-						Random.fixed([
+					Effect.provideServiceEffect(
+						Random.Random,
+						makeFixedRandomFx([
 							0.01,
 						]),
 					),
@@ -126,7 +132,7 @@ describe("completeJobRuntimeFx", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {
 				const prepared = yield* prepareRandomCompletionRuntimeFx();
-				return yield* Effect.either(
+				return yield* Effect.result(
 					completeJobRuntimeFx({
 						jobId: prepared.job.id,
 						runtime: {
@@ -143,8 +149,8 @@ describe("completeJobRuntimeFx", () => {
 		);
 
 		expect(result).toMatchObject({
-			_tag: "Left",
-			left: {
+			_tag: "Failure",
+			failure: {
 				_tag: "JobNotFoundError",
 			},
 		});
@@ -158,7 +164,7 @@ describe("completeJobRuntimeFx", () => {
 					...prepared.job,
 					remainingMs: 200,
 				} satisfies JobSchema.Type;
-				return yield* Effect.either(
+				return yield* Effect.result(
 					attemptJobCompletionFx({
 						jobId: runningJob.id,
 						runtime: {
@@ -177,8 +183,8 @@ describe("completeJobRuntimeFx", () => {
 		);
 
 		expect(result).toMatchObject({
-			_tag: "Left",
-			left: {
+			_tag: "Failure",
+			failure: {
 				_tag: "JobNotReadyError",
 				remainingMs: 200,
 			},
@@ -199,14 +205,14 @@ describe("completeJobRuntimeFx", () => {
 		} satisfies JobSchema.Type;
 		const readStream = (job: JobSchema.Type) =>
 			Effect.runSync(
-				Effect.gen(function* () {
-					const random = yield* makeJobCompletionRandomFx(job);
-					return yield* Effect.all([
+				makeJobCompletionRandomFx({
+					job,
+					program: Effect.all([
 						Random.next,
 						Random.next,
 						Random.next,
 						Random.next,
-					]).pipe(Effect.withRandom(random));
+					]),
 				}),
 			);
 

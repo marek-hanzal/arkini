@@ -1,4 +1,4 @@
-import { Effect, Either } from "effect";
+import { Effect, Result } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
@@ -176,9 +176,9 @@ const runRemoveFx = (state: StateSchema.Type) =>
 		const before = yield* readRuntimeFx();
 		const owner = before.items.find((item) => item.id === boardOwner.id);
 		if (owner === undefined) {
-			return yield* Effect.dieMessage("Expected outer owner.");
+			return yield* Effect.die(new Error("Expected outer owner."));
 		}
-		const attempt = yield* Effect.either(
+		const attempt = yield* Effect.result(
 			removeItemFx({
 				itemId: owner.id,
 				revision: owner.revision,
@@ -227,7 +227,7 @@ describe("releaseOwnerInputsFx existing identity", () => {
 		} satisfies StateSchema.Type;
 		const result = Effect.runSync(runRemoveFx(state));
 
-		expect(Either.isRight(result.attempt)).toBe(true);
+		expect(Result.isSuccess(result.attempt)).toBe(true);
 		const worker = result.after.items.find((item) => item.id === "runtime:worker");
 		expect(worker).toMatchObject({
 			remainingCharges: 1,
@@ -314,7 +314,7 @@ describe("releaseOwnerInputsFx existing identity", () => {
 		} satisfies StateSchema.Type;
 		const result = Effect.runSync(runRemoveFx(state));
 
-		expect(Either.isRight(result.attempt)).toBe(true);
+		expect(Result.isSuccess(result.attempt)).toBe(true);
 		expect(result.after.items.some((item) => item.id === "runtime:buffered-material")).toBe(
 			false,
 		);
@@ -390,7 +390,7 @@ describe("releaseOwnerInputsFx existing identity", () => {
 		} satisfies StateSchema.Type;
 		const result = Effect.runSync(runRemoveFx(state));
 
-		expect(Either.isRight(result.attempt)).toBe(true);
+		expect(Result.isSuccess(result.attempt)).toBe(true);
 		expect(result.after.items.find((item) => item.id === "runtime:worker:a")).toMatchObject({
 			remainingCharges: 1,
 			location: {
@@ -466,9 +466,9 @@ describe("releaseOwnerInputsFx existing identity", () => {
 		} satisfies StateSchema.Type;
 		const result = Effect.runSync(runRemoveFx(state));
 
-		expect(Either.isLeft(result.attempt)).toBe(true);
-		if (Either.isLeft(result.attempt)) {
-			expect(result.attempt.left).toMatchObject({
+		expect(Result.isFailure(result.attempt)).toBe(true);
+		if (Result.isFailure(result.attempt)) {
+			expect(result.attempt.failure).toMatchObject({
 				_tag: "PlacementUnavailableError",
 			});
 		}

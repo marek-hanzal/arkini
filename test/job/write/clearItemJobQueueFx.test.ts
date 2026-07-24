@@ -125,7 +125,7 @@ describe("clearItemJobQueueFx", () => {
 				const before = yield* readRuntimeFx();
 				const owner = before.items.find((item) => item.id === "runtime:forge:primary");
 				if (owner === undefined) {
-					return yield* Effect.dieMessage("Expected queue owner.");
+					return yield* Effect.die(new Error("Expected queue owner."));
 				}
 
 				yield* clearItemJobQueueFx({

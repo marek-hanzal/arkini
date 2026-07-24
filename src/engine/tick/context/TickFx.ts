@@ -12,6 +12,6 @@ export interface TickFxService {
 }
 
 /** Owns one failure-safe, at-most-once simulation-time budget for a game session. */
-export class TickFx extends Context.Tag("TickFx")<TickFx, TickFxService>() {
+export class TickFx extends Context.Service<TickFx, TickFxService>()("TickFx") {
 	//
 }

@@ -1,7 +1,5 @@
-import { FileSystem } from "@effect/platform";
-import { SystemError } from "@effect/platform/Error";
-import { NodeContext } from "@effect/platform-node";
-import { Effect } from "effect";
+import { NodeServices } from "@effect/platform-node";
+import { Effect, FileSystem, PlatformError } from "effect";
 import { access, mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -17,7 +15,7 @@ const createPreferences = () =>
 	Effect.runPromise(
 		createFilesystemCheatPreferencesFx({
 			userDataPath: root,
-		}).pipe(Effect.provide(NodeContext.layer)),
+		}).pipe(Effect.provide(NodeServices.layer)),
 	);
 
 beforeEach(async () => {
@@ -67,8 +65,8 @@ describe("createFilesystemCheatPreferencesFx", () => {
 						...fileSystem,
 						rename: () =>
 							Effect.fail(
-								new SystemError({
-									reason: "Unknown",
+								PlatformError.systemError({
+									_tag: "Unknown",
 									module: "FileSystem",
 									method: "rename",
 									description: "rename failed",
@@ -76,7 +74,7 @@ describe("createFilesystemCheatPreferencesFx", () => {
 							),
 					},
 				});
-			}).pipe(Effect.provide(NodeContext.layer)),
+			}).pipe(Effect.provide(NodeServices.layer)),
 		);
 
 		await expect(Effect.runPromise(failing.writeAvailableFx(true))).rejects.toThrow(

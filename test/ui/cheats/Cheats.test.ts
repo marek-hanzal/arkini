@@ -1,7 +1,8 @@
 // @vitest-environment jsdom
 
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { RegistryContext, scheduleTask } from "@effect/atom-react";
 import { Effect } from "effect";
+import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
@@ -20,6 +21,15 @@ import { createJobTestConfig } from "~test/job/support/jobTestConfig";
 
 const roots: Array<ReturnType<typeof createRoot>> = [];
 const sessions: Game[] = [];
+const registries: AtomRegistry.AtomRegistry[] = [];
+
+const makeRegistry = () => {
+	const registry = AtomRegistry.make({
+		scheduleTask,
+	});
+	registries.push(registry);
+	return registry;
+};
 
 const CheatsHarness = ({
 	game,
@@ -31,7 +41,12 @@ const CheatsHarness = ({
 	const model = useCheatsModel(game);
 	return createElement(Cheats, {
 		model,
-		onBack: () => onExit(model.beginExit()),
+		onBack: () =>
+			model.requestExit(
+				Effect.sync(() => {
+					onExit(true);
+				}),
+			),
 	});
 };
 
@@ -49,7 +64,11 @@ const CheatsAdmissionHarness = ({
 			type: "button",
 			onClick: () => {
 				model.setEnabled(true);
-				onExit(model.beginExit());
+				model.requestExit(
+					Effect.sync(() => {
+						onExit(true);
+					}),
+				);
 			},
 		},
 		"Mutate and exit",
@@ -63,6 +82,7 @@ afterEach(async () => {
 	for (const session of sessions.splice(0)) {
 		await Effect.runPromise(session.disposeWithoutSaveFx);
 	}
+	for (const registry of registries.splice(0)) registry.dispose();
 	document.body.replaceChildren();
 });
 
@@ -100,12 +120,13 @@ describe("Cheats", () => {
 		document.body.append(container);
 		const root = createRoot(container);
 		roots.push(root);
+		const registry = makeRegistry();
 		await act(async () => {
 			root.render(
 				createElement(
-					QueryClientProvider,
+					RegistryContext.Provider,
 					{
-						client: new QueryClient(),
+						value: registry,
 					},
 					createElement(CheatsHarness, {
 						game,
@@ -180,12 +201,13 @@ describe("Cheats", () => {
 		document.body.append(container);
 		const root = createRoot(container);
 		roots.push(root);
+		const registry = makeRegistry();
 		await act(async () => {
 			root.render(
 				createElement(
-					QueryClientProvider,
+					RegistryContext.Provider,
 					{
-						client: new QueryClient(),
+						value: registry,
 					},
 					createElement(CheatsAdmissionHarness, {
 						game,
@@ -199,6 +221,6 @@ describe("Cheats", () => {
 
 		await act(async () => command.click());
 
-		expect(onExit).toHaveBeenCalledWith(false);
+		expect(onExit).not.toHaveBeenCalled();
 	});
 });

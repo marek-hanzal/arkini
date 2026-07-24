@@ -1,23 +1,23 @@
-import { useSyncExternalStore } from "react";
+import { useAtom, useAtomValue } from "@effect/atom-react";
+import { Cause } from "effect";
+import * as AsyncResult from "effect/unstable/reactivity/AsyncResult";
+
 import { ArkiniArkpack } from "~/bridge/arkpack/ArkiniArkpack";
 import { useArkpacks } from "~/bridge/arkpack/useArkpacks";
 import { Button, ButtonLink, PrimaryButton, PrimaryButtonLink } from "~/ui/button/Button";
-import { useExitApplicationMutation } from "~/ui/launcher/mutation/useExitApplicationMutation";
-import { useLauncherStartup } from "~/ui/launcher/useLauncherStartup";
+import { LauncherStartupAtom } from "~/ui/launcher/LauncherStartupAtom";
+import { MainMenuExitCommandAtom } from "~/ui/launcher/MainMenuExitCommandAtom";
 
 /** Renders the semantic out-of-game launcher actions over authoritative startup state. */
 export const MainMenu = () => {
 	const { state: catalogState } = useArkpacks();
-	const startup = useLauncherStartup();
-	const startupState = useSyncExternalStore(
-		startup.subscribe,
-		startup.getSnapshot,
-		startup.getSnapshot,
-	);
-	const exit = useExitApplicationMutation();
+	const startup = useAtomValue(LauncherStartupAtom);
+	const [exitState, requestExit] = useAtom(MainMenuExitCommandAtom);
+	const exitPending = exitState.kind === "pending";
 	const builtInAvailable =
-		startupState.type === "ready" &&
-		startupState.builtInPackageId === ArkiniArkpack.packageId &&
+		AsyncResult.isSuccess(startup) &&
+		!startup.waiting &&
+		startup.value.builtInPackageId === ArkiniArkpack.packageId &&
 		catalogState.type === "ready" &&
 		catalogState.arkpacks.some(
 			(arkpack) =>
@@ -48,13 +48,15 @@ export const MainMenu = () => {
 				<PrimaryButton
 					className="rounded-xl"
 					cursorIntent={
-						catalogState.type === "failed" || startupState.type === "failed"
+						catalogState.type === "failed" ||
+						(AsyncResult.isFailure(startup) && !startup.waiting)
 							? "not-allowed"
 							: "progress"
 					}
 					disabled
 				>
-					{catalogState.type === "failed" || startupState.type === "failed"
+					{catalogState.type === "failed" ||
+					(AsyncResult.isFailure(startup) && !startup.waiting)
 						? "Play unavailable"
 						: "Preparing Play…"}
 				</PrimaryButton>
@@ -79,22 +81,26 @@ export const MainMenu = () => {
 			</ButtonLink>
 			<Button
 				className="rounded-xl"
-				cursorIntent={exit.isPending ? "progress" : undefined}
-				disabled={exit.isPending}
-				onClick={() => exit.mutate()}
+				cursorIntent={exitPending ? "progress" : undefined}
+				disabled={exitPending}
+				onClick={() => requestExit(undefined)}
 			>
-				{exit.isPending ? "Exiting…" : "Exit"}
+				{exitPending ? "Exiting…" : "Exit"}
 			</Button>
 			{catalogState.type === "failed" ? (
 				<p className="text-center text-sm text-danger">
 					Catalog failed: {String(catalogState.error)}
 				</p>
-			) : startupState.type === "failed" ? (
+			) : AsyncResult.isFailure(startup) && !startup.waiting ? (
 				<p className="text-center text-sm text-danger">
-					Startup failed: {String(startupState.error)}
+					Startup failed: {String(Cause.squash(startup.cause))}
 				</p>
-			) : exit.isError ? (
-				<p className="text-center text-sm text-danger">Exit failed: {String(exit.error)}</p>
+			) : exitState.kind === "error" ? (
+				<p className="text-center text-sm text-danger">
+					Exit failed: {String(exitState.error)}
+				</p>
+			) : exitState.kind === "requested" ? (
+				<p className="text-center text-sm text-muted">Exit requested.</p>
 			) : null}
 		</nav>
 	);

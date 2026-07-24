@@ -21,7 +21,7 @@ export const packDemoGameFx = Effect.fn("packDemoGameFx")(function* ({
 		},
 	}).pipe(
 		Effect.catchTag("GameValidationError", (error) =>
-			renderGameDiagnosticsFx(error.diagnostics).pipe(Effect.zipRight(Effect.fail(error))),
+			renderGameDiagnosticsFx(error.diagnostics).pipe(Effect.andThen(Effect.fail(error))),
 		),
 	);
 	yield* renderGameDiagnosticsFx(packed.diagnostics);

@@ -1,4 +1,4 @@
-import { Command } from "@effect/cli";
+import { Command } from "effect/unstable/cli";
 import { PackCommand } from "~/engine/pack/cli/PackCommand";
 import { SchemaCommand } from "~/engine/schema/cli/SchemaCommand";
 import { ValidateCommand } from "~/engine/validation/cli/ValidateCommand";

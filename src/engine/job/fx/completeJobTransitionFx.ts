@@ -41,7 +41,7 @@ export const completeJobTransitionFx = Effect.fn("completeJobTransitionFx")(func
 		);
 
 	const owner = runtime.items.find((item) => item.id === job.ownerItemId);
-	if (owner === undefined) return yield* Effect.dieMessage(`Job ${job.id} owner is missing.`);
+	if (owner === undefined) return yield* Effect.die(new Error(`Job ${job.id} owner is missing.`));
 	if (!isBoardRuntimeItem(owner))
 		return yield* Effect.fail(
 			new ItemNotOnBoardError({
@@ -54,7 +54,7 @@ export const completeJobTransitionFx = Effect.fn("completeJobTransitionFx")(func
 		lineId: job.lineId,
 	});
 	if (line === undefined)
-		return yield* Effect.dieMessage(`Job ${job.id} line ${job.lineId} is missing.`);
+		return yield* Effect.die(new Error(`Job ${job.id} line ${job.lineId} is missing.`));
 	const consumedItems = runtime.items
 		.filter(isJobRuntimeItem)
 		.filter((item) => item.location.jobId === job.id);
@@ -67,15 +67,16 @@ export const completeJobTransitionFx = Effect.fn("completeJobTransitionFx")(func
 		items: runtime.items.filter((item) => !consumedItemIds.has(item.id)),
 		jobs: runtime.jobs.filter((candidate) => candidate.id !== job.id),
 	} satisfies RuntimeSchema.Type;
-	const random = yield* makeJobCompletionRandomFx(job);
-
-	const completion = yield* completeLineJobRuntimeFx({
+	const completion = yield* makeJobCompletionRandomFx({
 		job,
-		line,
-		owner: owner as JobCompletionOwner,
-		reservations,
-		runtime: completionRuntime,
-	}).pipe(Effect.withRandom(random));
+		program: completeLineJobRuntimeFx({
+			job,
+			line,
+			owner: owner as JobCompletionOwner,
+			reservations,
+			runtime: completionRuntime,
+		}),
+	});
 	return {
 		events: completion.events,
 		runtime: completion.runtime,

@@ -13,7 +13,7 @@ import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { startFx } from "~/engine/start/write/startFx";
 import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
-import { createTestGameTransitionFields } from "~test/support/game/createTestGameTransitionFields";
+import { makeTestGameTransitionFieldsFx } from "~test/support/game/makeTestGameTransitionFieldsFx";
 import { testGameRead, testGameReadOrThrow } from "~test/support/game/testGameRead";
 
 (
@@ -205,8 +205,10 @@ const withTwoSources = {
 
 let currentRuntime: RuntimeSchema.Type = withoutSource;
 const listeners = new Set<() => void>();
+const transitionFields = Effect.runSync(makeTestGameTransitionFieldsFx(currentRuntime));
 const publishRuntime = (runtime: RuntimeSchema.Type) => {
 	currentRuntime = runtime;
+	Effect.runSync(transitionFields.publishRuntimeFx(runtime));
 	for (const listener of listeners) listener();
 };
 
@@ -229,7 +231,7 @@ const game = {
 		packageId: "test-package",
 		contentHash: "0".repeat(64),
 	},
-	...createTestGameTransitionFields(() => currentRuntime),
+	...transitionFields,
 	getResourceUrl: (resourceId: string) => `resource:${resourceId}`,
 	subscribe: (listener: () => void) => {
 		listeners.add(listener);
@@ -262,6 +264,7 @@ const Probe = ({ itemId }: { readonly itemId: string }) => {
 
 beforeEach(() => {
 	currentRuntime = withoutSource;
+	Effect.runSync(transitionFields.resetRuntimeFx(currentRuntime));
 	listeners.clear();
 	gameEngineState.game = game;
 });

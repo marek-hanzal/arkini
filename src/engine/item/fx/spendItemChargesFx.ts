@@ -136,18 +136,18 @@ export const spendItemChargesFx = Effect.fn("spendItemChargesFx")(function* ({
 		drop: [],
 	};
 	if (item.item.charges?.output !== undefined) {
-		const random = yield* makeChargeSpendRandomFx({
+		const output = yield* makeChargeSpendRandomFx({
 			cost,
 			itemId: item.id,
 			lineId: job.lineId,
 			ownerItemId: job.ownerItemId,
+			program: outputFx({
+				origin: item.location,
+				output: item.item.charges.output,
+			}),
 			quantity: item.quantity,
 			remainingCharges,
 		});
-		const output = yield* outputFx({
-			origin: item.location,
-			output: item.item.charges.output,
-		}).pipe(Effect.withRandom(random));
 		const [outputPlacement, withOutput] = yield* applyOutputPlacementFx({
 			origin: item.location,
 			output,

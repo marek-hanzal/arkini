@@ -1,14 +1,12 @@
-import { type CSSProperties, use, useSyncExternalStore } from "react";
-import { LauncherHeroAsset } from "~/ui/launcher/LauncherHeroAsset";
-import { LauncherStartupContext } from "~/ui/launcher/LauncherStartupContext";
+import { useAtomValue } from "@effect/atom-react";
+import type { CSSProperties } from "react";
+import { LauncherHeroUrlAtom } from "~/ui/launcher/LauncherHeroUrlAtom";
 import { launcherHeroArtworkViewTransitionName } from "~/ui/navigation/launcherHeroArtworkViewTransitionName";
 import { launcherHeroShadowViewTransitionName } from "~/ui/navigation/launcherHeroShadowViewTransitionName";
 
 const heroAspectRatio = "1535 / 1024";
 const compactWidth = "var(--ak-compact-hero-width)";
 const fullWidth = "var(--ak-full-hero-width)";
-const subscribeToFallback = () => () => undefined;
-const readFallbackUrl = () => LauncherHeroAsset.url;
 
 export namespace LauncherHero {
 	export interface Props {
@@ -19,12 +17,7 @@ export namespace LauncherHero {
 
 /** Renders the launcher-owned Hero URL as independently named native transition layers. */
 export const LauncherHero = ({ compact = false, style }: LauncherHero.Props) => {
-	const startup = use(LauncherStartupContext);
-	const heroUrl = useSyncExternalStore(
-		startup?.subscribe ?? subscribeToFallback,
-		startup?.getHeroUrl ?? readFallbackUrl,
-		startup?.getHeroUrl ?? readFallbackUrl,
-	);
+	const heroUrl = useAtomValue(LauncherHeroUrlAtom);
 
 	return (
 		<div

@@ -30,10 +30,10 @@ export const releaseJobReservationsFx = Effect.fn("releaseJobReservationsFx")(fu
 }: releaseJobReservationsFx.Props) {
 	return yield* Effect.reduce(
 		reservations,
-		{
+		() => ({
 			events: [] as GameEventSchema.Type[],
 			runtime,
-		},
+		}),
 		(state, reservation) =>
 			Effect.gen(function* () {
 				const placement = yield* placeRuntimeItemFx({

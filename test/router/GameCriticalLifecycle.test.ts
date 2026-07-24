@@ -1,6 +1,5 @@
 // @vitest-environment jsdom
 
-import { QueryClient } from "@tanstack/react-query";
 import { createMemoryHistory, createRouter, RouterProvider } from "@tanstack/react-router";
 import { Effect } from "effect";
 import { act, createElement } from "react";
@@ -8,15 +7,16 @@ import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { routeTree } from "~/_route";
-import { createCheatAvailability } from "~/bridge/cheat/createCheatAvailability";
 import type { ArkiniElectronApi } from "../../electron/contract/ArkiniElectronApi";
 import { CriticalGameLifecycleError } from "~/bridge/game/CriticalGameLifecycleError";
 import type { Game } from "~/bridge/game/Game";
 import { createGameEngineResourceFx } from "~/bridge/game/createGameEngineResourceFx";
-import { gameEngineQueryKey } from "~/bridge/game/gameEngineQueryKey";
-import type { LauncherStartup } from "~/ui/launcher/LauncherStartup";
 import { testArkpackConfig } from "~test/bridge/arkpack/support/createTestArkpack";
-import { createTestGameTransitionFields } from "~test/support/game/createTestGameTransitionFields";
+import { makeTestGameTransitionFieldsFx } from "~test/support/game/makeTestGameTransitionFieldsFx";
+import {
+	adoptTestGameEngineResourceFx,
+	createTestRendererRuntime,
+} from "~test/support/createTestRendererRuntime";
 import { testGameRead } from "~test/support/game/testGameRead";
 
 (
@@ -27,23 +27,7 @@ import { testGameRead } from "~test/support/game/testGameRead";
 
 const packageId = "package-critical";
 const roots: Array<ReturnType<typeof createRoot>> = [];
-
-const createStartup = (): LauncherStartup => ({
-	getHeroUrl: () => "/hero.png",
-	getSnapshot: () => ({
-		type: "ready",
-		appearanceReady: true,
-		builtInPackageId: packageId,
-		heroReady: true,
-		splashCompleted: true,
-	}),
-	consumeHydrationFx: () => Effect.succeed(false),
-	startFx: Effect.void,
-	retryFx: Effect.void,
-	completeSplashFx: Effect.void,
-	disposeFx: Effect.void,
-	subscribe: () => () => undefined,
-});
+const runtimes: Array<ReturnType<typeof createTestRendererRuntime>["rendererRuntime"]> = [];
 
 const createGame = ({
 	disposeFx = Effect.void,
@@ -70,7 +54,7 @@ const createGame = ({
 	disposeWithoutSaveFx,
 	flushSaveFx: Effect.void,
 	getResourceUrl: () => "blob:test",
-	...createTestGameTransitionFields(() => ({}) as ReturnType<Game["getSnapshot"]>),
+	...Effect.runSync(makeTestGameTransitionFieldsFx({} as ReturnType<Game["getSnapshot"]>)),
 	read: testGameRead,
 	run: (() => Promise.reject(new Error("Not used by this test."))) as Game["run"],
 	saveKey: {
@@ -99,26 +83,36 @@ const installElectronApi = (clear: () => Promise<void> = () => Promise.resolve()
 	return forceClose;
 };
 
-const createHarness = ({
+const createHarness = async ({
 	initialPath,
 	game,
-	previousGameShutdown = Promise.resolve(),
 }: {
 	readonly initialPath: string;
 	readonly game?: Game;
-	readonly previousGameShutdown?: Promise<void>;
 }) => {
-	const queryClient = new QueryClient();
-	const resource = game === undefined ? null : Effect.runSync(createGameEngineResourceFx(game));
-	if (resource !== null) queryClient.setQueryData(gameEngineQueryKey, resource);
+	const { rendererRuntime } = createTestRendererRuntime({
+		clearSaveFx: (key) =>
+			Effect.tryPromise({
+				try: () => window.arkini.save.clear(key),
+				catch: (cause) => cause,
+			}),
+		createResourceFx: () =>
+			game === undefined ? Effect.never : createGameEngineResourceFx(game),
+	});
+	runtimes.push(rendererRuntime);
+	const usesFakeTimers = vi.isFakeTimers();
+	if (usesFakeTimers) vi.useRealTimers();
+	const resource = await (game === undefined
+		? Promise.resolve(null)
+		: rendererRuntime.runPromise(adoptTestGameEngineResourceFx(packageId))
+	).finally(() => {
+		if (usesFakeTimers) vi.useFakeTimers();
+	});
 	const router = createRouter({
 		routeTree,
 		isServer: false,
 		context: {
-			cheatAvailability: createCheatAvailability(),
-			launcherStartup: createStartup(),
-			previousGameShutdown,
-			queryClient,
+			rendererRuntime,
 		},
 		history: createMemoryHistory({
 			initialEntries: [
@@ -127,19 +121,21 @@ const createHarness = ({
 		}),
 	});
 	return {
-		queryClient,
 		resource,
 		router,
 	};
 };
 
-const loadWithMinimum = async (router: ReturnType<typeof createHarness>["router"]) => {
+type TestRouter = Awaited<ReturnType<typeof createHarness>>["router"];
+
+const loadWithMinimum = async (router: TestRouter) => {
 	const loading = router.load();
+	await vi.advanceTimersByTimeAsync(0);
 	await vi.advanceTimersByTimeAsync(2_500);
 	await loading;
 };
 
-const renderRouter = async (router: ReturnType<typeof createHarness>["router"]) => {
+const renderRouter = async (router: TestRouter) => {
 	const container = document.createElement("div");
 	document.body.append(container);
 	const root = createRoot(container);
@@ -166,6 +162,7 @@ afterEach(async () => {
 		for (const root of roots.splice(0)) root.unmount();
 	});
 	vi.useRealTimers();
+	for (const runtime of runtimes.splice(0)) await runtime.dispose();
 	vi.restoreAllMocks();
 	document.body.replaceChildren();
 });
@@ -173,7 +170,7 @@ afterEach(async () => {
 describe("critical Game route lifecycle", () => {
 	it("ends the renderer after failed leave and never republishes the frozen Game", async () => {
 		const failure = new Error("disk full");
-		const { resource, router } = createHarness({
+		const { resource, router } = await createHarness({
 			initialPath: `/game/${packageId}/action/leave?destination=main-menu`,
 			game: createGame({
 				disposeFx: Effect.fail(failure),
@@ -203,7 +200,7 @@ describe("critical Game route lifecycle", () => {
 	});
 
 	it("ends the renderer when destructive reset disposal fails", async () => {
-		const { resource, router } = createHarness({
+		const { resource, router } = await createHarness({
 			initialPath: `/game/${packageId}/action/reset`,
 			game: createGame({
 				disposeWithoutSaveFx: Effect.fail(new Error("discard failed")),
@@ -220,7 +217,7 @@ describe("critical Game route lifecycle", () => {
 	it("ends the renderer when reset clears the spent Game but cannot clear its exact save", async () => {
 		installElectronApi(() => Promise.reject(new Error("clear failed")));
 		const discard = vi.fn();
-		const { resource, router } = createHarness({
+		const { resource, router } = await createHarness({
 			initialPath: `/game/${packageId}/action/reset`,
 			game: createGame({
 				disposeWithoutSaveFx: Effect.sync(discard),
@@ -233,35 +230,5 @@ describe("critical Game route lifecycle", () => {
 		expect(
 			(await renderRouter(router)).querySelector('[data-ui="RootFatalErrorPage"]'),
 		).not.toBeNull();
-	});
-
-	it("routes a rejected HMR ownership handoff directly to the root fatal boundary", async () => {
-		const { router } = createHarness({
-			initialPath: "/main-menu",
-			previousGameShutdown: Promise.reject(new Error("previous shutdown failed")),
-		});
-
-		await router.load();
-		expect(router.state.matches[0]?.error).toBeInstanceOf(CriticalGameLifecycleError);
-		expect(
-			(await renderRouter(router)).querySelector('[data-ui="RootFatalErrorPage"]'),
-		).not.toBeNull();
-	});
-
-	it("uses the trusted force-close action without exposing in-process recovery", async () => {
-		const forceClose = installElectronApi();
-		const { router } = createHarness({
-			initialPath: "/main-menu",
-			previousGameShutdown: Promise.reject(new Error("fatal")),
-		});
-		await router.load();
-		const container = await renderRouter(router);
-		const close = [
-			...container.querySelectorAll("button"),
-		].find((button) => button.textContent === "Close Arkini");
-
-		await act(async () => close?.click());
-		expect(forceClose).toHaveBeenCalledOnce();
-		expect(container.querySelectorAll("button")).toHaveLength(1);
 	});
 });

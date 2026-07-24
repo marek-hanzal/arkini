@@ -1,4 +1,4 @@
-import { Effect, Either } from "effect";
+import { Effect, Result } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { discardRuntimeItemOwnedStateFx } from "~/engine/runtime/fx/discardRuntimeItemOwnedStateFx";
@@ -105,7 +105,7 @@ describe("discardRuntimeItemOwnedStateFx", () => {
 			jobQueue: [],
 		} satisfies RuntimeSchema.Type;
 		const result = Effect.runSync(
-			Effect.either(
+			Effect.result(
 				discardRuntimeItemOwnedStateFx({
 					ownerItemId: root.id,
 					runtime,
@@ -113,9 +113,9 @@ describe("discardRuntimeItemOwnedStateFx", () => {
 			),
 		);
 
-		expect(Either.isLeft(result)).toBe(true);
-		if (Either.isLeft(result)) {
-			expect(result.left).toMatchObject({
+		expect(Result.isFailure(result)).toBe(true);
+		if (Result.isFailure(result)) {
+			expect(result.failure).toMatchObject({
 				_tag: "JobOwnerBusyError",
 				ownerItemId: root.id,
 				jobIds: [

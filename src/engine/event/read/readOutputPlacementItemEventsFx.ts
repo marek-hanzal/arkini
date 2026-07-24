@@ -20,8 +20,10 @@ export const readOutputPlacementItemEventsFx = Effect.fn("readOutputPlacementIte
 		for (const drop of placement.drop) {
 			for (const stack of drop.placement.stack) {
 				if (!isGridRuntimeItem(stack.item)) {
-					return yield* Effect.dieMessage(
-						`Output placement stacked ${stack.item.id} outside a visible grid scope.`,
+					return yield* Effect.die(
+						new Error(
+							`Output placement stacked ${stack.item.id} outside a visible grid scope.`,
+						),
 					);
 				}
 				events.push({
@@ -36,8 +38,10 @@ export const readOutputPlacementItemEventsFx = Effect.fn("readOutputPlacementIte
 			}
 			for (const item of drop.placement.spawn) {
 				if (!isGridRuntimeItem(item)) {
-					return yield* Effect.dieMessage(
-						`Output placement spawned ${item.id} outside a visible grid scope.`,
+					return yield* Effect.die(
+						new Error(
+							`Output placement spawned ${item.id} outside a visible grid scope.`,
+						),
 					);
 				}
 				events.push({

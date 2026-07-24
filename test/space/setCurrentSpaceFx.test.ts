@@ -1,4 +1,4 @@
-import { Effect, Either, Fiber, Option, Stream } from "effect";
+import { Deferred, Effect, Fiber, Option, Result, Stream } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~/engine/game/fx/useGameFx";
@@ -28,7 +28,7 @@ describe("current board space", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {
 				const initial = yield* readRuntimeFx();
-				const invalid = yield* Effect.either(
+				const invalid = yield* Effect.result(
 					setCurrentSpaceFx({
 						space: -1,
 					}),
@@ -46,9 +46,9 @@ describe("current board space", () => {
 		);
 
 		expect(result.initial.currentSpace).toBe(2);
-		expect(Either.isLeft(result.invalid)).toBe(true);
-		if (Either.isLeft(result.invalid)) {
-			expect(result.invalid.left).toMatchObject({
+		expect(Result.isFailure(result.invalid)).toBe(true);
+		if (Result.isFailure(result.invalid)) {
+			expect(result.invalid.failure).toMatchObject({
 				_tag: "SpaceInvalidError",
 				space: -1,
 			});
@@ -61,27 +61,33 @@ describe("current board space", () => {
 			Effect.scoped(
 				Effect.gen(function* () {
 					const transitions = yield* CommittedTransitionsFx;
-					const changedSubscription = yield* transitions.subscribe;
-					const changedFiber = yield* changedSubscription.changes.pipe(
+					const changedReplaySeen = yield* Deferred.make<void>();
+					const changedFiber = yield* transitions.changes.pipe(
+						Stream.tap(() => Deferred.succeed(changedReplaySeen, undefined)),
+						Stream.drop(1),
 						Stream.runHead,
-						Effect.fork,
+						Effect.forkChild,
 					);
+					yield* Deferred.await(changedReplaySeen);
 					const changed = yield* setCurrentSpaceFx({
 						space: 3,
 					});
 					const transition = Option.getOrThrow(yield* Fiber.join(changedFiber));
 
-					const noOpSubscription = yield* transitions.subscribe;
-					const noOpFiber = yield* noOpSubscription.changes.pipe(
+					const noOpReplaySeen = yield* Deferred.make<void>();
+					const noOpFiber = yield* transitions.changes.pipe(
+						Stream.tap(() => Deferred.succeed(noOpReplaySeen, undefined)),
+						Stream.drop(1),
 						Stream.runHead,
-						Effect.fork,
+						Effect.forkChild,
 					);
+					yield* Deferred.await(noOpReplaySeen);
 					const beforeNoOp = yield* readRuntimeFx();
 					const noOp = yield* setCurrentSpaceFx({
 						space: 3,
 					});
 					const afterNoOp = yield* readRuntimeFx();
-					const published = yield* Fiber.poll(noOpFiber);
+					const published = Option.fromNullishOr(noOpFiber.pollUnsafe());
 					yield* Fiber.interrupt(noOpFiber);
 
 					return {

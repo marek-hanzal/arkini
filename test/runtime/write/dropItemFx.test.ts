@@ -1,4 +1,4 @@
-import { Effect, Either } from "effect";
+import { Effect, Result } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~/engine/game/fx/useGameFx";
@@ -319,7 +319,7 @@ describe("dropItemFx", () => {
 					location: occupiedLocation,
 					quantity: 1,
 				});
-				return yield* Effect.either(
+				return yield* Effect.result(
 					dropItemFx({
 						sourceItemId: source.id,
 						sourceRevision: source.revision,
@@ -338,9 +338,9 @@ describe("dropItemFx", () => {
 			invalidMergeResultScopeConfig,
 		);
 
-		expect(Either.isLeft(result)).toBe(true);
-		if (Either.isLeft(result)) {
-			expect(result.left).toMatchObject({
+		expect(Result.isFailure(result)).toBe(true);
+		if (Result.isFailure(result)) {
+			expect(result.failure).toMatchObject({
 				_tag: "RuntimeInvalidError",
 			});
 		}

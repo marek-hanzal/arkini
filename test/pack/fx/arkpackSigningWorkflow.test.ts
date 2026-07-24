@@ -1,4 +1,4 @@
-import { NodeContext } from "@effect/platform-node";
+import { NodeServices } from "@effect/platform-node";
 import { Effect } from "effect";
 import { mkdtemp, readFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -52,7 +52,7 @@ describe("Arkpack signing workflow", () => {
 		});
 		const arkpackPath = join(root, "workflow.game.arkpack");
 		const untrustedKey = await Effect.runPromise(
-			Effect.either(
+			Effect.result(
 				packSignedDirectoryFx({
 					input: "game/demo",
 					keyId,
@@ -66,13 +66,13 @@ describe("Arkpack signing workflow", () => {
 						formatVersion: 1,
 						keys: [],
 					},
-				}).pipe(Effect.provide(NodeContext.layer)),
+				}).pipe(Effect.provide(NodeServices.layer)),
 			),
 		);
-		expect(untrustedKey._tag).toBe("Left");
-		if (untrustedKey._tag === "Left") {
-			expect(untrustedKey.left).toBeInstanceOf(ArkpackSigningError);
-			expect(untrustedKey.left).toMatchObject({
+		expect(untrustedKey._tag).toBe("Failure");
+		if (untrustedKey._tag === "Failure") {
+			expect(untrustedKey.failure).toBeInstanceOf(ArkpackSigningError);
+			expect(untrustedKey.failure).toMatchObject({
 				reason: "untrusted-key-id",
 				keyId,
 			});
@@ -89,7 +89,7 @@ describe("Arkpack signing workflow", () => {
 				output: arkpackPath,
 				privateKey: pair.privateKey,
 				trustedKeys,
-			}).pipe(Effect.provide(NodeContext.layer)),
+			}).pipe(Effect.provide(NodeServices.layer)),
 		);
 		const bytes = new Uint8Array(await readFile(arkpackPath));
 		const signature = JSON.parse(await readFile(result.signaturePath, "utf8")) as unknown;
@@ -99,7 +99,7 @@ describe("Arkpack signing workflow", () => {
 				verifyArkpackFileFx({
 					arkpackPath,
 					trustedKeys,
-				}).pipe(Effect.provide(NodeContext.layer)),
+				}).pipe(Effect.provide(NodeServices.layer)),
 			),
 		).resolves.toMatchObject({
 			trust: {
@@ -128,7 +128,7 @@ describe("Arkpack signing workflow", () => {
 		const mutated = bytes.slice();
 		mutated[mutated.byteLength - 1] = (mutated[mutated.byteLength - 1] ?? 0) ^ 1;
 		const mismatchedTrust = await Effect.runPromise(
-			Effect.either(
+			Effect.result(
 				readArkpackFx({
 					bytes: mutated,
 					signature: {
@@ -140,9 +140,9 @@ describe("Arkpack signing workflow", () => {
 				}),
 			),
 		);
-		expect(mismatchedTrust._tag).toBe("Left");
-		if (mismatchedTrust._tag === "Left") {
-			expect(mismatchedTrust.left).toMatchObject({
+		expect(mismatchedTrust._tag).toBe("Failure");
+		if (mismatchedTrust._tag === "Failure") {
+			expect(mismatchedTrust.failure).toMatchObject({
 				_tag: "ArkpackTrustMismatchError",
 				expectedKeyId: keyId,
 				actualTrust: {

@@ -27,7 +27,7 @@ export namespace readArkpackFx {
 	}
 }
 
-const decompress = (bytes: Uint8Array) =>
+const decompressArkpackFx = Effect.fn("decompressArkpackFx")((bytes: Uint8Array) =>
 	Effect.tryPromise({
 		try: async () => {
 			if (bytes.byteLength > ArkpackLimits.maxCompressedBytes) {
@@ -64,7 +64,8 @@ const decompress = (bytes: Uint8Array) =>
 			return output;
 		},
 		catch: (cause) => cause,
-	});
+	}),
+);
 
 const createPackProvenance = (
 	gameId: string,
@@ -118,7 +119,7 @@ export const readArkpackFx = Effect.fn("readArkpackFx")(function* ({
 		trust: verification.trust,
 	});
 	const contentHash = verification.contentHash;
-	const payload = yield* decodeFx(yield* decompress(bytes));
+	const payload = yield* decodeFx(yield* decompressArkpackFx(bytes));
 	for (const resource of payload.resources) {
 		if (resource.mime !== "image/png") {
 			return yield* Effect.fail(

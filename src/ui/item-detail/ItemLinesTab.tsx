@@ -6,12 +6,13 @@ import { JobStatusEnumSchema } from "~/bridge/job/JobStatusEnumSchema";
 import { useAutofillItemDetailLine } from "~/bridge/item-detail/useAutofillItemDetailLine";
 import type { useItemDetailLines } from "~/bridge/item-detail/useItemDetailLines";
 import { useSetDefaultItemDetailLine } from "~/bridge/item-detail/useSetDefaultItemDetailLine";
-import { useStartItemDetailLine } from "~/bridge/item-detail/useStartItemDetailLine";
+import { useStartPendingItemDetailLine } from "~/bridge/item-detail/useStartItemDetailLine";
 import { useUnsetDefaultItemDetailLine } from "~/bridge/item-detail/useUnsetDefaultItemDetailLine";
 import { useWithdrawItemDetailLine } from "~/bridge/item-detail/useWithdrawItemDetailLine";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import { Button, PrimaryButton } from "~/ui/button/Button";
 import { useItemDetailControl } from "~/ui/item-detail/useItemDetailControl";
+import { readSettledAsyncResultError } from "~/ui/reactivity/readSettledAsyncResultError";
 import { Scrollable } from "~/ui/scrollable/Scrollable";
 import { useFuseSearch } from "~/ui/search/useFuseSearch";
 
@@ -610,36 +611,27 @@ const LineRow = ({
 	readonly ownerItemId: string;
 }) => {
 	const itemDetail = useItemDetailControl();
-	const autofillLine = useAutofillItemDetailLine();
-	const setDefaultLine = useSetDefaultItemDetailLine();
-	const unsetDefaultLine = useUnsetDefaultItemDetailLine();
-	const startLine = useStartItemDetailLine();
-	const withdrawLine = useWithdrawItemDetailLine();
 	const pendingKey = JSON.stringify([
 		"line",
 		ownerItemId,
 		line.lineId,
 	]);
+	const pendingOptions = {
+		pendingKey,
+		pendingOwner: itemDetail,
+	} as const;
+	const autofillLine = useAutofillItemDetailLine(pendingOptions);
+	const setDefaultLine = useSetDefaultItemDetailLine(pendingOptions);
+	const unsetDefaultLine = useUnsetDefaultItemDetailLine(pendingOptions);
+	const startLine = useStartPendingItemDetailLine(pendingOptions);
+	const withdrawLine = useWithdrawItemDetailLine(pendingOptions);
+	readSettledAsyncResultError(autofillLine.result);
+	readSettledAsyncResultError(setDefaultLine.result);
+	readSettledAsyncResultError(unsetDefaultLine.result);
+	readSettledAsyncResultError(startLine.result);
+	readSettledAsyncResultError(withdrawLine.result);
 	const pendingAction = itemDetail.readPendingAction(pendingKey);
 	const error = itemDetail.readActionError(pendingKey);
-	const runAction = ({
-		action,
-		failureMessage,
-		run,
-	}: {
-		readonly action: "autofill" | "default" | "start" | "withdraw";
-		readonly failureMessage: string;
-		readonly run: () => Promise<unknown>;
-	}) => {
-		void RendererRuntime.runPromise(
-			itemDetail.runPendingActionFx({
-				key: pendingKey,
-				action,
-				failureMessage,
-				run,
-			}),
-		);
-	};
 	const readiness = readinessLabel(line.availability);
 	const activeWork = line.activeJob === undefined ? undefined : activeJobLabel(line.activeJob);
 	const runtime = runtimePresentation(line);
@@ -708,21 +700,18 @@ const LineRow = ({
 							data-ui="TileLineSetDefaultButton"
 							data-default={line.isDefault ? "true" : "false"}
 							disabled={disabled || pendingAction !== null}
-							onClick={() =>
-								runAction({
-									action: "default",
-									failureMessage: "Default line could not be changed.",
-									run: () =>
-										line.isDefault
-											? unsetDefaultLine({
-													ownerItemId,
-												})
-											: setDefaultLine({
-													ownerItemId,
-													lineId: line.lineId,
-												}),
-								})
-							}
+							onClick={() => {
+								if (line.isDefault) {
+									unsetDefaultLine.run({
+										ownerItemId,
+									});
+									return;
+								}
+								setDefaultLine.run({
+									ownerItemId,
+									lineId: line.lineId,
+								});
+							}}
 						>
 							{pendingAction === "default"
 								? "Saving…"
@@ -736,14 +725,9 @@ const LineRow = ({
 								disabled || !line.actions.canAutofill || pendingAction !== null
 							}
 							onClick={() =>
-								runAction({
-									action: "autofill",
-									failureMessage: "Inputs could not be autofilled.",
-									run: () =>
-										autofillLine({
-											ownerItemId,
-											lineId: line.lineId,
-										}),
+								autofillLine.run({
+									ownerItemId,
+									lineId: line.lineId,
 								})
 							}
 						>
@@ -755,14 +739,9 @@ const LineRow = ({
 								disabled || !line.actions.canWithdraw || pendingAction !== null
 							}
 							onClick={() =>
-								runAction({
-									action: "withdraw",
-									failureMessage: "Inputs could not be withdrawn.",
-									run: () =>
-										withdrawLine({
-											ownerItemId,
-											lineId: line.lineId,
-										}),
+								withdrawLine.run({
+									ownerItemId,
+									lineId: line.lineId,
 								})
 							}
 						>
@@ -779,14 +758,9 @@ const LineRow = ({
 								pendingAction !== null
 							}
 							onClick={() =>
-								runAction({
-									action: "start",
-									failureMessage: "Work could not be started.",
-									run: () =>
-										startLine({
-											ownerItemId,
-											lineId: line.lineId,
-										}),
+								startLine.start({
+									ownerItemId,
+									lineId: line.lineId,
 								})
 							}
 						>

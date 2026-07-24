@@ -6,7 +6,6 @@ import {
 } from "@tanstack/react-router";
 
 import { recoverFailedGameSaveFx } from "~/bridge/game/recoverFailedGameSaveFx";
-import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import { ActionErrorPage } from "~/ui/action/ActionErrorPage";
 import { ActionPendingPage } from "~/page/action/ActionPendingPage";
 import { runActionRouteFx } from "~/page/action/runActionRouteFx";
@@ -16,13 +15,8 @@ export const Route = createFileRoute("/action/recover-game-save")({
 	validateSearch: GameSaveRecoverySearchSchema,
 	loaderDeps: ({ search }) => search,
 	loader: async ({ context, deps }) => {
-		await RendererRuntime.runPromise(
-			runActionRouteFx(
-				recoverFailedGameSaveFx({
-					packageId: deps.packageId,
-					queryClient: context.queryClient,
-				}),
-			),
+		await context.rendererRuntime.runPromise(
+			runActionRouteFx(recoverFailedGameSaveFx(deps.packageId)),
 		);
 		throw redirect({
 			to: "/main-menu",

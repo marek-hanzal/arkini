@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { RegistryContext } from "@effect/atom-react";
 import {
 	createMemoryHistory,
 	createRootRoute,
@@ -15,15 +15,15 @@ import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { ArkiniElectronApi } from "../../../electron/contract/ArkiniElectronApi";
-import { createCheatAvailability } from "~/bridge/cheat/createCheatAvailability";
+import { CheatAvailabilityAtom } from "~/bridge/cheat/CheatAvailabilityAtom";
 import type { Game } from "~/bridge/game/Game";
-import { CheatAvailabilityProvider } from "~/ui/cheat-availability/CheatAvailabilityProvider";
+import { RendererAtomRegistry } from "~/bridge/reactivity/RendererAtomRegistry";
 import { GameMenu } from "~/ui/game-menu/GameMenu";
 import { GameMenuProvider } from "~/ui/game-menu/GameMenuProvider";
 import { gameMenuBackdropViewTransitionName } from "~/ui/navigation/gameMenuBackdropViewTransitionName";
 import { gameMenuDialogViewTransitionName } from "~/ui/navigation/gameMenuDialogViewTransitionName";
 import { testArkpackConfig } from "~test/bridge/arkpack/support/createTestArkpack";
-import { createTestGameTransitionFields } from "~test/support/game/createTestGameTransitionFields";
+import { makeTestGameTransitionFieldsFx } from "~test/support/game/makeTestGameTransitionFieldsFx";
 import { motionTestRuntime } from "~test/ui/support/motionReactMock";
 import { testGameRead } from "~test/support/game/testGameRead";
 
@@ -98,13 +98,15 @@ const createGame = (
 	disposeWithoutSaveFx: Effect.void,
 	flushSaveFx,
 	getResourceUrl: () => "blob:test",
-	...createTestGameTransitionFields(
-		() =>
+	...Effect.runSync(
+		makeTestGameTransitionFieldsFx(
 			(cheatEnabled ? gameSnapshots.enabled : gameSnapshots.disabled) as ReturnType<
 				Game["getSnapshot"]
 			>,
+		),
 	),
 	read: testGameRead,
+	runFx: ((_effect) => flushSaveFx) as Game["runFx"],
 	run: (() => Promise.reject(new Error("Not used by this test."))) as Game["run"],
 	subscribe: () => () => undefined,
 	subscribeEvents: () => () => undefined,
@@ -175,9 +177,7 @@ const renderMenu = async ({
 	});
 	const container = document.createElement("div");
 	document.body.append(container);
-	const queryClient = new QueryClient();
-	const cheatAvailability = createCheatAvailability();
-	cheatAvailability.apply(cheatsAvailable);
+	RendererAtomRegistry.set(CheatAvailabilityAtom, cheatsAvailable);
 	let menuMounted = true;
 	const menuMountListeners = new Set<() => void>();
 	const setMenuMounted = (mounted: boolean) => {
@@ -202,28 +202,22 @@ const renderMenu = async ({
 	};
 	const GamePage = () =>
 		createElement(
-			QueryClientProvider,
+			RegistryContext.Provider,
 			{
-				client: queryClient,
+				value: RendererAtomRegistry,
 			},
 			createElement(
-				CheatAvailabilityProvider,
-				{
-					availability: cheatAvailability,
-				},
+				GameMenuProvider,
+				null,
 				createElement(
-					GameMenuProvider,
-					null,
-					createElement(
-						"button",
-						{
-							type: "button",
-							id: "game-surface",
-						},
-						"Game surface",
-					),
-					createElement(GameMenuMount),
+					"button",
+					{
+						type: "button",
+						id: "game-surface",
+					},
+					"Game surface",
 				),
+				createElement(GameMenuMount),
 			),
 		);
 	const rootRoute = createRootRoute({
@@ -476,34 +470,26 @@ describe("GameMenu", () => {
 		await vi.waitFor(() => expect(container.textContent).toContain("Saved."));
 	});
 
-	it("retains save admission across a dialog remount until the original mutation settles", async () => {
-		const gate = deferred();
-		const flush = vi.fn(() => gate.promise);
-		const game = createGame(fromPromiseFx(flush));
+	it("interrupts an owned save and releases its admission when the dialog is disposed", async () => {
+		const interrupted = vi.fn();
+		const game = createGame(
+			Effect.never.pipe(Effect.onInterrupt(() => Effect.sync(interrupted))),
+		);
 		const { container, setMenuMounted } = await renderMenu({
 			game,
 		});
 		await openMenu(container);
 
 		await act(async () => buttonByText(container, "Save").click());
-		expect(flush).toHaveBeenCalledOnce();
+		await vi.waitFor(() => expect(buttonByText(container, "Save").disabled).toBe(true));
 
 		await act(async () => setMenuMounted(false));
 		expect(container.querySelector('[data-ui="GameMenu"]')).toBeNull();
+		await vi.waitFor(() => expect(interrupted).toHaveBeenCalledOnce());
 		await act(async () => setMenuMounted(true));
 		expect(container.querySelector('[data-phase="open"]')).not.toBeNull();
-		expect(buttonByText(container, "Save").disabled).toBe(true);
-		expect(buttonByText(container, "Return to game").disabled).toBe(true);
-
-		await pressEscape();
-		expect(container.querySelector('[data-phase="open"]')).not.toBeNull();
-
-		await act(async () => {
-			gate.resolve();
-			await gate.promise;
-		});
 		await vi.waitFor(() => expect(buttonByText(container, "Save").disabled).toBe(false));
-		expect(flush).toHaveBeenCalledOnce();
+		expect(buttonByText(container, "Return to game").disabled).toBe(false);
 	});
 
 	it("keeps the menu open when the native close request fails", async () => {

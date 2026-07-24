@@ -1,4 +1,4 @@
-import { Effect, Fiber, Option, Stream } from "effect";
+import { Deferred, Effect, Fiber, Option, Stream } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
@@ -52,8 +52,14 @@ describe("autofillLineInputsFx events", () => {
 					});
 
 					const transitions = yield* CommittedTransitionsFx;
-					const subscription = yield* transitions.subscribe;
-					const nextFiber = yield* subscription.changes.pipe(Stream.runHead, Effect.fork);
+					const replaySeen = yield* Deferred.make<void>();
+					const nextFiber = yield* transitions.changes.pipe(
+						Stream.tap(() => Deferred.succeed(replaySeen, undefined)),
+						Stream.drop(1),
+						Stream.runHead,
+						Effect.forkChild,
+					);
+					yield* Deferred.await(replaySeen);
 					yield* autofillLineInputsFx({
 						ownerItemId,
 						lineId,

@@ -1,7 +1,7 @@
 import { chmod, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
-import { NodeContext } from "@effect/platform-node";
+import { NodeServices } from "@effect/platform-node";
 import { Effect } from "effect";
 import { afterEach, describe, expect, it } from "vitest";
 import { createUnpackedMacAppFx } from "../../cli/desktop/createUnpackedMacAppFx";
@@ -58,7 +58,7 @@ fs.writeFileSync(process.env.ARKINI_TEST_BUILDER_ARGS, JSON.stringify(process.ar
 			const appPath = await Effect.runPromise(
 				createUnpackedMacAppFx({
 					arch: "arm64",
-				}).pipe(Effect.provide(NodeContext.layer)),
+				}).pipe(Effect.provide(NodeServices.layer)),
 			);
 
 			expect(appPath).toBe(resolve("release/mac-arm64/Arkini.app"));

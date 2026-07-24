@@ -1,8 +1,8 @@
+import { useAtom } from "@effect/atom-react";
 import { type PropsWithChildren, useMemo } from "react";
 
-import { useSpawnCheatItemMutation } from "~/bridge/cheat/useSpawnCheatItemMutation";
 import type { Game } from "~/bridge/game/Game";
-import { useExclusiveAction } from "~/ui/action/useExclusiveAction";
+import { CheatItemSpawnCommandAtom } from "~/ui/cheat-spotlight/CheatItemSpawnCommandAtom";
 import {
 	CheatItemSpawnContext,
 	type CheatItemSpawnControl,
@@ -15,30 +15,30 @@ export const CheatItemSpawnProvider = ({
 }: PropsWithChildren<{
 	readonly game: Game;
 }>) => {
-	const spawn = useSpawnCheatItemMutation(game);
-	const action = useExclusiveAction<"spawn">();
-	const pending = action.active !== null || spawn.isPending;
+	const commandAtom = CheatItemSpawnCommandAtom(game);
+	const [state, runCommand] = useAtom(commandAtom);
+	const pending = state.kind === "pending";
+
 	const control = useMemo<CheatItemSpawnControl>(
 		() => ({
-			error: spawn.error,
-			isError: spawn.isError,
-			isSuccess: spawn.isSuccess,
 			pending,
 			request: (itemId) => {
-				if (spawn.isPending || !action.claim("spawn")) return false;
-				spawn.mutate(itemId, {
-					onSettled: () => action.release("spawn"),
+				runCommand({
+					kind: "spawn",
+					itemId,
 				});
-				return true;
 			},
 			reset: () => {
-				if (action.getSnapshot() === null && !spawn.isPending) spawn.reset();
+				runCommand({
+					kind: "reset",
+				});
 			},
+			state,
 		}),
 		[
-			action,
 			pending,
-			spawn,
+			runCommand,
+			state,
 		],
 	);
 

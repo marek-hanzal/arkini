@@ -6,6 +6,6 @@ export interface GameLoopFxService {
 }
 
 /** Lifecycle control for the one production Tick loop owned by a game session. */
-export class GameLoopFx extends Context.Tag("GameLoopFx")<GameLoopFx, GameLoopFxService>() {
+export class GameLoopFx extends Context.Service<GameLoopFx, GameLoopFxService>()("GameLoopFx") {
 	//
 }

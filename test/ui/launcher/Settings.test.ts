@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Effect } from "effect";
+import { RegistryContext } from "@effect/atom-react";
+import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 import {
 	createMemoryHistory,
 	createRootRoute,
@@ -13,16 +13,19 @@ import {
 import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { createCheatAvailability } from "~/bridge/cheat/createCheatAvailability";
+import { AppearanceAtom } from "~/bridge/appearance/AppearanceAtom";
+import { CheatAvailabilityAtom } from "~/bridge/cheat/CheatAvailabilityAtom";
 import type { Game } from "~/bridge/game/Game";
 import type { GameEngine } from "~/bridge/game/GameEngine";
-import type { GameEngineResource } from "~/bridge/game/GameEngineResource";
-import { gameEngineQueryKey } from "~/bridge/game/gameEngineQueryKey";
+import { createGameEngineResourceFx } from "~/bridge/game/createGameEngineResourceFx";
 import { SettingsPage } from "~/page/settings/SettingsPage";
 import { createTestGameSession } from "~test/bridge/game/createTestGameSession";
 import { createJobTestConfig } from "~test/job/support/jobTestConfig";
-import { AppearanceProvider } from "~/ui/appearance/AppearanceProvider";
-import { CheatAvailabilityProvider } from "~/ui/cheat-availability/CheatAvailabilityProvider";
+import {
+	adoptTestGameEngineResourceFx,
+	createTestRendererRuntime,
+} from "~test/support/createTestRendererRuntime";
+import { AppearanceDataset } from "~/ui/appearance/AppearanceDataset";
 
 (
 	globalThis as {
@@ -31,15 +34,18 @@ import { CheatAvailabilityProvider } from "~/ui/cheat-availability/CheatAvailabi
 ).IS_REACT_ACT_ENVIRONMENT = true;
 
 const roots: Array<ReturnType<typeof createRoot>> = [];
-const sessions: Game[] = [];
+const registries: Array<ReturnType<typeof AtomRegistry.make>> = [];
+const runtimeHarnesses: Array<ReturnType<typeof createTestRendererRuntime>> = [];
 
 afterEach(async () => {
 	await act(async () => {
 		for (const root of roots.splice(0)) root.unmount();
 	});
-	for (const session of sessions.splice(0)) {
-		await Effect.runPromise(session.disposeWithoutSaveFx);
+	for (const runtimeHarness of runtimeHarnesses.splice(0)) {
+		await runtimeHarness.rendererRuntime.dispose();
+		runtimeHarness.atomRegistry.dispose();
 	}
+	for (const registry of registries.splice(0)) registry.dispose();
 	vi.restoreAllMocks();
 	document.body.replaceChildren();
 	Reflect.deleteProperty(window, "arkini");
@@ -47,11 +53,14 @@ afterEach(async () => {
 
 const createDeferred = () => {
 	let resolve: () => void = () => undefined;
-	const promise = new Promise<void>((complete) => {
+	let reject: (error: unknown) => void = () => undefined;
+	const promise = new Promise<void>((complete, fail) => {
 		resolve = complete;
+		reject = fail;
 	});
 	return {
 		promise,
+		reject,
 		resolve,
 	};
 };
@@ -75,7 +84,18 @@ const renderSettings = async (
 	const deferred = createDeferred();
 	const write = vi.fn(() => deferred.promise);
 	const writeCheatAvailability = vi.fn(() => Promise.resolve());
-	const cheatAvailability = createCheatAvailability();
+	const registry = AtomRegistry.make({
+		initialValues: [
+			[
+				AppearanceAtom,
+				{
+					theme: "dark",
+					accent: "rose",
+				},
+			],
+		],
+	});
+	registries.push(registry);
 	Object.defineProperty(window, "scrollTo", {
 		configurable: true,
 		value: vi.fn(),
@@ -91,13 +111,6 @@ const renderSettings = async (
 			},
 		},
 	});
-	const queryClient = new QueryClient({
-		defaultOptions: {
-			mutations: {
-				retry: false,
-			},
-		},
-	});
 	let game: GameEngine | null = null;
 	if (activeGame) {
 		const config = createJobTestConfig();
@@ -105,7 +118,7 @@ const renderSettings = async (
 			config,
 			tickIntervalMs: 60_000,
 		});
-		game = {
+		const createdGame: Game = {
 			...session,
 			arkpack: {
 				packageId: "package:settings",
@@ -122,23 +135,20 @@ const renderSettings = async (
 			},
 			config,
 			getResourceUrl: () => "blob:test",
-			readOrThrow: () => {
-				throw new Error("Not used by this test.");
-			},
 			saveKey: {
 				packageId: "package:settings",
 				contentHash: "a".repeat(64),
 			},
 		};
-		sessions.push(game);
-		queryClient.setQueryData(gameEngineQueryKey, {
-			game,
-			assertUsable: () => undefined,
-			markCriticalFailure: () => {
-				throw new Error("Not used by this test.");
-			},
-			withLifecycleLockFx: (effect) => effect,
-		} as GameEngineResource);
+		const runtimeHarness = createTestRendererRuntime({
+			createResourceFx: () => createGameEngineResourceFx(createdGame),
+		});
+		runtimeHarnesses.push(runtimeHarness);
+		game = (
+			await runtimeHarness.rendererRuntime.runPromise(
+				adoptTestGameEngineResourceFx(createdGame.arkpack.packageId),
+			)
+		).game;
 	}
 	const rootRoute = createRootRoute({
 		component: Outlet,
@@ -148,23 +158,12 @@ const renderSettings = async (
 		path: "/settings",
 		component: () =>
 			createElement(
-				QueryClientProvider,
+				RegistryContext.Provider,
 				{
-					client: queryClient,
+					value: registry,
 				},
-				createElement(
-					AppearanceProvider,
-					{
-						initialTheme: "dark",
-					},
-					createElement(
-						CheatAvailabilityProvider,
-						{
-							availability: cheatAvailability,
-						},
-						createElement(SettingsPage),
-					),
-				),
+				createElement(AppearanceDataset),
+				createElement(SettingsPage),
 			),
 	});
 	const mainMenuRoute = createRoute({
@@ -205,10 +204,11 @@ const renderSettings = async (
 		container,
 		deferred,
 		game,
+		root,
 		router,
 		write,
 		writeCheatAvailability,
-		cheatAvailability,
+		registry,
 	};
 };
 
@@ -326,7 +326,7 @@ describe("Settings", () => {
 	});
 
 	it("toggles application-wide Cheat tools without an active Game", async () => {
-		const { container, writeCheatAvailability, cheatAvailability } = await renderSettings([
+		const { container, writeCheatAvailability, registry } = await renderSettings([
 			"/settings",
 		]);
 		const toggle = container.querySelector<HTMLInputElement>(
@@ -335,7 +335,7 @@ describe("Settings", () => {
 		if (toggle === null) throw new Error("Expected Cheat tools control.");
 		await act(async () => toggle.click());
 		await vi.waitFor(() => expect(writeCheatAvailability).toHaveBeenCalledWith(true));
-		await vi.waitFor(() => expect(cheatAvailability.getSnapshot()).toBe(true));
+		await vi.waitFor(() => expect(registry.get(CheatAvailabilityAtom)).toBe(true));
 	});
 
 	it("admits only one settings mutation before React publishes the pending render", async () => {
@@ -388,8 +388,102 @@ describe("Settings", () => {
 		await vi.waitFor(() => expect(router.state.location.pathname).toBe("/main-menu"));
 	});
 
-	it("toggles application-wide Cheat tools without mutating the cached Game", async () => {
-		const { container, game, writeCheatAvailability, cheatAvailability } = await renderSettings(
+	it("releases the command authority after a failed write", async () => {
+		const { container, deferred, writeCheatAvailability } = await renderSettings([
+			"/settings",
+		]);
+		const light = Array.from(
+			container.querySelectorAll<HTMLInputElement>('input[name="appearance-theme"]'),
+		).find((input) => input.value === "light");
+		if (light === undefined) throw new Error("Expected Light theme control.");
+
+		await act(async () => light.click());
+		await act(async () => deferred.reject(new Error("theme write rejected")));
+		await vi.waitFor(() => expect(container.textContent).toContain("Theme update failed:"));
+
+		const toggle = container.querySelector<HTMLInputElement>(
+			'[data-ui="SettingsCheatAvailability"] input[type="checkbox"]',
+		);
+		if (toggle === null) throw new Error("Expected Cheat tools control.");
+		expect(toggle.matches(":disabled")).toBe(false);
+		await act(async () => toggle.click());
+		await vi.waitFor(() => expect(writeCheatAvailability).toHaveBeenCalledOnce());
+	});
+
+	it("keeps one pending command authoritative across a React remount", async () => {
+		const { container, deferred, registry, root, router, write, writeCheatAvailability } =
+			await renderSettings([
+				"/main-menu",
+				"/settings",
+			]);
+		const light = Array.from(
+			container.querySelectorAll<HTMLInputElement>('input[name="appearance-theme"]'),
+		).find((input) => input.value === "light");
+		if (light === undefined) throw new Error("Expected Light theme control.");
+
+		await act(async () => light.click());
+		expect(write).toHaveBeenCalledOnce();
+		expect(container.textContent).toContain("Saving theme…");
+
+		await act(async () => root.unmount());
+		roots.splice(roots.indexOf(root), 1);
+		const remountedRoot = createRoot(container);
+		roots.push(remountedRoot);
+		await act(async () => {
+			remountedRoot.render(
+				createElement(RouterProvider, {
+					router,
+				}),
+			);
+		});
+
+		expect(container.textContent).toContain("Saving theme…");
+		const toggle = container.querySelector<HTMLInputElement>(
+			'[data-ui="SettingsCheatAvailability"] input[type="checkbox"]',
+		);
+		const back = buttonByText(container, "Back");
+		if (toggle === null) throw new Error("Expected Cheat tools control.");
+		expect(toggle.matches(":disabled")).toBe(true);
+		expect(back.disabled).toBe(true);
+		expect(registry.get(AppearanceAtom).theme).toBe("light");
+
+		await act(async () => {
+			toggle.click();
+			back.click();
+		});
+		expect(writeCheatAvailability).not.toHaveBeenCalled();
+		expect(router.state.location.pathname).toBe("/settings");
+		expect(registry.get(AppearanceAtom).theme).toBe("light");
+
+		await act(async () => deferred.resolve());
+		await vi.waitFor(() => expect(container.textContent).toContain("Theme saved."));
+		expect(back.disabled).toBe(false);
+		await act(async () => toggle.click());
+		await vi.waitFor(() => expect(writeCheatAvailability).toHaveBeenCalledOnce());
+	});
+
+	it("allows registry disposal before React cleans up a pending settings command", async () => {
+		const { container, registry, root, write } = await renderSettings([
+			"/settings",
+		]);
+		const light = Array.from(
+			container.querySelectorAll<HTMLInputElement>('input[name="appearance-theme"]'),
+		).find((input) => input.value === "light");
+		if (light === undefined) throw new Error("Expected Light theme control.");
+
+		await act(async () => light.click());
+		expect(write).toHaveBeenCalledOnce();
+
+		registry.dispose();
+		registries.splice(registries.indexOf(registry), 1);
+		await act(async () => root.unmount());
+		roots.splice(roots.indexOf(root), 1);
+
+		expect(registry.getNodes().size).toBe(0);
+	});
+
+	it("toggles application-wide Cheat tools without mutating the current Game", async () => {
+		const { container, game, writeCheatAvailability, registry } = await renderSettings(
 			[
 				"/game/package:settings/board",
 				"/settings",
@@ -406,7 +500,7 @@ describe("Settings", () => {
 		expect(toggle.checked).toBe(false);
 		await act(async () => toggle.click());
 		await vi.waitFor(() => expect(writeCheatAvailability).toHaveBeenCalledWith(true));
-		await vi.waitFor(() => expect(cheatAvailability.getSnapshot()).toBe(true));
+		await vi.waitFor(() => expect(registry.get(CheatAvailabilityAtom)).toBe(true));
 		expect(game.getSnapshot().cheats).toEqual({
 			enabled: false,
 			everEnabled: false,

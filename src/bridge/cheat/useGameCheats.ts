@@ -1,20 +1,11 @@
-import { useCallback, useSyncExternalStore } from "react";
+import { useCallback } from "react";
 
 import type { Game } from "~/bridge/game/Game";
+import { useRuntimeSelector } from "~/bridge/runtime/useRuntimeSelector";
+import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
 /** Subscribes to the persisted cheat state of one exact route-scoped Game. */
 export const useGameCheats = (game: Game) => {
-	const subscribe = useCallback(
-		(listener: () => void) => game.subscribe(listener),
-		[
-			game,
-		],
-	);
-	const read = useCallback(
-		() => game.getSnapshot().cheats,
-		[
-			game,
-		],
-	);
-	return useSyncExternalStore(subscribe, read, read);
+	const selector = useCallback((runtime: RuntimeSchema.Type) => runtime.cheats, []);
+	return useRuntimeSelector(game, selector);
 };

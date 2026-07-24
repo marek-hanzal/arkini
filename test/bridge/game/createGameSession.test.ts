@@ -1,4 +1,5 @@
 import { Deferred, Effect } from "effect";
+import * as Atom from "effect/unstable/reactivity/Atom";
 import { describe, expect, it } from "vitest";
 import { createTestGameSession } from "~test/bridge/game/createTestGameSession";
 
@@ -37,6 +38,19 @@ const emitCompletedEventFx = (jobId: string) =>
 	);
 
 describe("createGameSessionFx", () => {
+	it("exposes its authoritative committed transition source as truly read-only", async () => {
+		const session = await createTestGameSession({
+			config: createJobTestConfig(),
+			tickIntervalMs: 60_000,
+		});
+
+		try {
+			expect(Atom.isWritable(session.committedTransitionAtom)).toBe(false);
+		} finally {
+			await Effect.runPromise(session.disposeFx);
+		}
+	});
+
 	it("replays one exact current committed transition and then every later commit in order", async () => {
 		const session = await createTestGameSession({
 			config: createJobTestConfig(),
@@ -303,6 +317,7 @@ describe("createGameSessionFx", () => {
 			tickIntervalMs: 60_000,
 		});
 		const jobIds: string[] = [];
+		const afterSubscribeDelivered = Effect.runSync(Deferred.make<void>());
 
 		try {
 			await session.run(emitCompletedEventFx("job:event:before-subscribe"));
@@ -316,14 +331,16 @@ describe("createGameSessionFx", () => {
 							: [],
 					),
 				);
+				if (jobIds.includes("job:event:after-subscribe")) {
+					Effect.runSync(Deferred.succeed(afterSubscribeDelivered, undefined));
+				}
 			});
 
 			try {
-				await new Promise((resolve) => setTimeout(resolve, 20));
 				expect(jobIds).toEqual([]);
 
 				await session.run(emitCompletedEventFx("job:event:after-subscribe"));
-				await waitFor(() => jobIds.length === 1);
+				await Effect.runPromise(Deferred.await(afterSubscribeDelivered));
 				expect(jobIds).toEqual([
 					"job:event:after-subscribe",
 				]);
@@ -585,13 +602,18 @@ describe("createGameSessionFx", () => {
 		const unsubscribe = session.subscribeEvents(() => {
 			notifications += 1;
 		});
+		const healthyDelivered = Effect.runSync(Deferred.make<void>());
+		const unsubscribeHealthy = session.subscribeEvents(() => {
+			Effect.runSync(Deferred.succeed(healthyDelivered, undefined));
+		});
 
 		try {
 			unsubscribe();
 			await session.run(emitCompletedEventFx("job:after-unsubscribe"));
-			await new Promise((resolve) => setTimeout(resolve, 20));
+			await Effect.runPromise(Deferred.await(healthyDelivered));
 			expect(notifications).toBe(0);
 		} finally {
+			unsubscribeHealthy();
 			await Effect.runPromise(session.disposeFx);
 		}
 	});
@@ -665,7 +687,7 @@ describe("createGameSessionFx", () => {
 		const pending = session.run(
 			modifyRuntimeFx((runtime) =>
 				Deferred.succeed(planningEntered, undefined).pipe(
-					Effect.zipRight(Deferred.await(planningGate)),
+					Effect.andThen(Deferred.await(planningGate)),
 					Effect.as([
 						undefined,
 						{

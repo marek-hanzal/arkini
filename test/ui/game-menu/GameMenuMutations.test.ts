@@ -1,15 +1,33 @@
-import { QueryClient } from "@tanstack/react-query";
-import { Effect } from "effect";
-import { describe, expect, it, vi } from "vitest";
+import { scheduleTask } from "@effect/atom-react";
+import { Cause, Deferred, Effect, Exit, Option } from "effect";
+import * as Atom from "effect/unstable/reactivity/Atom";
+import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import type { Game } from "~/bridge/game/Game";
-import { saveAndExitGameMutationOptions } from "~/ui/game-menu/mutation/saveAndExitGameMutationOptions";
-import { saveGameMutationOptions } from "~/ui/game-menu/mutation/saveGameMutationOptions";
+import { requestApplicationCloseAtom } from "~/bridge/lifecycle/requestApplicationCloseAtom";
+import { saveGameAtom } from "~/bridge/save/saveGameAtom";
 import { testArkpackConfig } from "~test/bridge/arkpack/support/createTestArkpack";
-import { createTestGameTransitionFields } from "~test/support/game/createTestGameTransitionFields";
+import { makeTestGameTransitionFieldsFx } from "~test/support/game/makeTestGameTransitionFieldsFx";
 import { testGameRead } from "~test/support/game/testGameRead";
 
-const createGame = (flushSaveFx: Game["flushSaveFx"] = Effect.void): Game => ({
+const registries: AtomRegistry.AtomRegistry[] = [];
+
+afterEach(() => {
+	for (const registry of registries.splice(0)) registry.dispose();
+	vi.restoreAllMocks();
+	Reflect.deleteProperty(globalThis, "window");
+});
+
+const makeRegistry = () => {
+	const registry = AtomRegistry.make({
+		scheduleTask,
+	});
+	registries.push(registry);
+	return registry;
+};
+
+const createGame = (explicitSaveFx: Effect.Effect<void, unknown> = Effect.void): Game => ({
 	arkpack: {
 		packageId: "package:menu",
 		contentHash: "content:menu",
@@ -30,47 +48,117 @@ const createGame = (flushSaveFx: Game["flushSaveFx"] = Effect.void): Game => ({
 	},
 	disposeFx: Effect.void,
 	disposeWithoutSaveFx: Effect.void,
-	flushSaveFx,
+	flushSaveFx: Effect.die("Lifecycle flushSaveFx must not own an explicit UI save."),
 	getResourceUrl: () => "blob:test",
-	...createTestGameTransitionFields(() => ({}) as ReturnType<Game["getSnapshot"]>),
+	...Effect.runSync(makeTestGameTransitionFieldsFx({} as ReturnType<Game["getSnapshot"]>)),
 	read: testGameRead,
+	runFx: ((_effect) => explicitSaveFx) as Game["runFx"],
 	run: (() => Promise.reject(new Error("Not used by this test."))) as Game["run"],
 	subscribe: () => () => undefined,
 	subscribeEvents: () => () => undefined,
 });
 
-const executeMutation = async (
-	options:
-		| ReturnType<typeof saveGameMutationOptions>
-		| ReturnType<typeof saveAndExitGameMutationOptions>,
+const runCommand = <Value, Error, Input>(
+	registry: AtomRegistry.AtomRegistry,
+	atom: Atom.AtomResultFn<Input, Value, Error>,
+	input: Input,
 ) => {
-	if (options.mutationFn === undefined) throw new Error("Expected a mutation function.");
-	return options.mutationFn(undefined, {
-		client: new QueryClient(),
-		meta: options.meta,
-		mutationKey: options.mutationKey,
-	});
+	registry.set(atom, input);
+	return Effect.runPromiseExit(
+		AtomRegistry.getResult(registry, atom, {
+			suspendOnWaiting: true,
+		}),
+	);
 };
 
-describe("game menu mutation options", () => {
-	it("owns the complete explicit save contract and exact game identity", async () => {
-		const flush = vi.fn();
-		const game = createGame(Effect.sync(flush));
-		const options = saveGameMutationOptions(game);
+describe("game menu command atoms", () => {
+	it("runs an explicit save through the exact live Game command runtime", async () => {
+		const save = vi.fn();
+		const game = createGame(Effect.sync(save));
+		const registry = makeRegistry();
 
-		expect(options.mutationKey).toEqual([
-			"game",
-			"save",
-			game.saveKey.packageId,
-			game.saveKey.contentHash,
-		]);
-		expect(options.retry).toBe(false);
-		await executeMutation(options);
-		expect(flush).toHaveBeenCalledOnce();
+		const exit = await runCommand(registry, saveGameAtom(game), undefined);
+
+		expect(exit).toEqual(Exit.succeed(undefined));
+		expect(save).toHaveBeenCalledOnce();
 	});
 
-	it("owns the trusted native save-and-exit request for the exact game", async () => {
-		const requestClose = vi.fn(() => Promise.reject(new Error("close rejected")));
+	it("keeps distinct command atoms for exact Game object identities", () => {
+		const gameA = createGame();
+		const gameB = createGame();
+
+		expect(saveGameAtom(gameA)).toBe(saveGameAtom(gameA));
+		expect(saveGameAtom(gameA)).not.toBe(saveGameAtom(gameB));
+	});
+
+	it("preserves the explicit save typed failure", async () => {
+		const failure = {
+			_tag: "ExplicitSaveFailure",
+		} as const;
+		const game = createGame(Effect.fail(failure));
+		const registry = makeRegistry();
+
+		const exit = await runCommand(registry, saveGameAtom(game), undefined);
+
+		expect(Exit.isFailure(exit)).toBe(true);
+		if (Exit.isSuccess(exit)) throw new Error("Expected explicit save failure.");
+		expect(Cause.findErrorOption(exit.cause)).toEqual(Option.some(failure));
+	});
+
+	it("interrupts the running save Effect when its registry owner is disposed", async () => {
+		const entered = Effect.runSync(Deferred.make<void>());
+		const interrupted = Effect.runSync(Deferred.make<void>());
+		const game = createGame(
+			Deferred.succeed(entered, undefined).pipe(
+				Effect.andThen(Effect.never),
+				Effect.onInterrupt(() =>
+					Deferred.succeed(interrupted, undefined).pipe(Effect.asVoid),
+				),
+			),
+		);
+		const registry = makeRegistry();
+		const atom = saveGameAtom(game);
+		const unmount = registry.mount(atom);
+		registry.set(atom, undefined);
+		await Effect.runPromise(Deferred.await(entered));
+
+		unmount();
+		await Effect.runPromise(Deferred.await(interrupted));
+
+		expect(registry.getNodes().has(atom)).toBe(false);
+	});
+
+	it("replaces one Game command owner without leaking its save into the next Game", async () => {
+		const firstEntered = Effect.runSync(Deferred.make<void>());
+		const firstInterrupted = Effect.runSync(Deferred.make<void>());
+		const secondSave = vi.fn();
+		const firstGame = createGame(
+			Deferred.succeed(firstEntered, undefined).pipe(
+				Effect.andThen(Effect.never),
+				Effect.onInterrupt(() =>
+					Deferred.succeed(firstInterrupted, undefined).pipe(Effect.asVoid),
+				),
+			),
+		);
+		const secondGame = createGame(Effect.sync(secondSave));
+		const registry = makeRegistry();
+		const firstAtom = saveGameAtom(firstGame);
+		const unmountFirst = registry.mount(firstAtom);
+		registry.set(firstAtom, undefined);
+		await Effect.runPromise(Deferred.await(firstEntered));
+
+		unmountFirst();
+		await Effect.runPromise(Deferred.await(firstInterrupted));
+		const secondExit = await runCommand(registry, saveGameAtom(secondGame), undefined);
+
+		expect(secondExit).toEqual(Exit.succeed(undefined));
+		expect(secondSave).toHaveBeenCalledOnce();
+		expect(saveGameAtom(firstGame)).not.toBe(saveGameAtom(secondGame));
+	});
+
+	it("requests only the native close handshake and preserves its failure", async () => {
+		const closeFailure = new Error("close rejected");
+		const requestClose = vi.fn(() => Promise.reject(closeFailure));
 		Object.defineProperty(globalThis, "window", {
 			configurable: true,
 			value: {
@@ -81,17 +169,13 @@ describe("game menu mutation options", () => {
 				},
 			},
 		});
-		const game = createGame();
-		const options = saveAndExitGameMutationOptions(game);
+		const registry = makeRegistry();
 
-		expect(options.mutationKey).toEqual([
-			"game",
-			"save-and-exit",
-			game.saveKey.packageId,
-			game.saveKey.contentHash,
-		]);
-		await expect(executeMutation(options)).rejects.toThrow("close rejected");
+		const exit = await runCommand(registry, requestApplicationCloseAtom, undefined);
+
+		expect(Exit.isFailure(exit)).toBe(true);
+		if (Exit.isSuccess(exit)) throw new Error("Expected native close failure.");
+		expect(Cause.findErrorOption(exit.cause)).toEqual(Option.some(closeFailure));
 		expect(requestClose).toHaveBeenCalledOnce();
-		Reflect.deleteProperty(globalThis, "window");
 	});
 });

@@ -64,7 +64,7 @@ export const createGameAudioSynthFx = Effect.fn("createGameAudioSynthFx")(
 					},
 					catch: (cause) => cause,
 				}).pipe(
-					Effect.catchAll((cause) => {
+					Effect.catch((cause) => {
 						if (nextContext === null) return Effect.fail(cause);
 						const provisionalContext = nextContext;
 						const provisionalOutput = nextOutput;
@@ -85,8 +85,8 @@ export const createGameAudioSynthFx = Effect.fn("createGameAudioSynthFx")(
 							},
 							catch: (cleanupCause) => cleanupCause,
 						}).pipe(
-							Effect.catchAll(() => Effect.void),
-							Effect.zipRight(Effect.fail(cause)),
+							Effect.catch(() => Effect.void),
+							Effect.andThen(Effect.fail(cause)),
 						);
 					}),
 				);
@@ -104,7 +104,9 @@ export const createGameAudioSynthFx = Effect.fn("createGameAudioSynthFx")(
 				}),
 			);
 
-			const playFx: createGameAudioSynthFx.Result["playFx"] = (cues) =>
+			const playFx: createGameAudioSynthFx.Result["playFx"] = Effect.fn(
+				"GameAudioSynth.playFx",
+			)((cues) =>
 				Effect.suspend(() => {
 					const activeContext = context;
 					const activeOutput = output;
@@ -204,7 +206,8 @@ export const createGameAudioSynthFx = Effect.fn("createGameAudioSynthFx")(
 							}),
 						),
 					);
-				});
+				}),
+			);
 
 			const closeFx = Effect.tryPromise({
 				try: async () => {

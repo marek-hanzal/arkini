@@ -72,15 +72,15 @@ describe("loadArkpackFx official package", () => {
 		);
 
 		const result = await Effect.runPromise(
-			Effect.either(
+			Effect.result(
 				loadArkpackFx({
 					packageId: ArkiniArkpack.packageId,
 				}),
 			),
 		);
-		expect(result._tag).toBe("Left");
-		if (result._tag === "Left") {
-			expect(result.left).toMatchObject({
+		expect(result._tag).toBe("Failure");
+		if (result._tag === "Failure") {
+			expect(result.failure).toMatchObject({
 				_tag: "ArkpackLoadError",
 				operation: "fetch-signature",
 				packageId: "arkini",

@@ -57,5 +57,5 @@ export const useItemDetailTabs = (
 			sources,
 		],
 	);
-	return useRuntimeSelector(selector, sameTabs);
+	return useRuntimeSelector(game, selector, sameTabs);
 };

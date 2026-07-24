@@ -1,3 +1,4 @@
+import { makeFixedRandomFx } from "~test/support/makeFixedRandomFx";
 import { Effect, Random } from "effect";
 import { describe, expect, it } from "vitest";
 
@@ -185,8 +186,9 @@ describe("outputFx", () => {
 					},
 				});
 			}).pipe(
-				Effect.withRandom(
-					Random.fixed([
+				Effect.provideServiceEffect(
+					Random.Random,
+					makeFixedRandomFx([
 						0.75,
 					]),
 				),
@@ -258,9 +260,10 @@ describe("outputFx", () => {
 					},
 				});
 			}).pipe(
-				Effect.withRandom(
-					Random.fixed([
-						4,
+				Effect.provideServiceEffect(
+					Random.Random,
+					makeFixedRandomFx([
+						0.75,
 					]),
 				),
 				useGameFx({
@@ -317,8 +320,9 @@ describe("outputFx", () => {
 					output,
 				};
 			}).pipe(
-				Effect.withRandom(
-					Random.fixed([
+				Effect.provideServiceEffect(
+					Random.Random,
+					makeFixedRandomFx([
 						0.75,
 						0.25,
 					]),

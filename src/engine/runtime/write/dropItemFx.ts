@@ -123,8 +123,8 @@ export const dropItemFx = Effect.fn("dropItemFx")(function* ({
 
 	if (target.occupant === null) {
 		if (preflight.kind !== DropItemResultKindEnumSchema.enum.Move) {
-			return yield* Effect.dieMessage(
-				`Empty-slot drop preview unexpectedly resolved as "${preflight.kind}".`,
+			return yield* Effect.die(
+				new Error(`Empty-slot drop preview unexpectedly resolved as "${preflight.kind}".`),
 			);
 		}
 		return yield* moveItemFx({
@@ -484,8 +484,8 @@ export const dropItemFx = Effect.fn("dropItemFx")(function* ({
 	}
 
 	if (preflight.kind !== DropItemResultKindEnumSchema.enum.Swap) {
-		return yield* Effect.dieMessage(
-			`Occupied drop preview unexpectedly resolved as "${preflight.kind}".`,
+		return yield* Effect.die(
+			new Error(`Occupied drop preview unexpectedly resolved as "${preflight.kind}".`),
 		);
 	}
 

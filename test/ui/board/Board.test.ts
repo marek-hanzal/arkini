@@ -10,6 +10,7 @@ import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { Board } from "~/ui/board/Board";
 import { TileSystemProvider } from "~/ui/tile/TileSystemProvider";
 import { ItemDetailProvider } from "~/ui/item-detail/ItemDetailProvider";
+import { makeTestGameTransitionFieldsFx } from "~test/support/game/makeTestGameTransitionFieldsFx";
 import { testGameRead, testGameReadOrThrow } from "~test/support/game/testGameRead";
 
 const gameEngineState = vi.hoisted(() => ({
@@ -79,6 +80,7 @@ const runtime = Effect.runSync(
 		}),
 	),
 );
+const transitionFields = Effect.runSync(makeTestGameTransitionFieldsFx(runtime));
 
 const unavailableRun: GameEngine["run"] = () => Promise.reject(new Error("Not used by this test."));
 
@@ -101,13 +103,7 @@ const game = {
 		packageId: "test-package",
 		contentHash: "0".repeat(64),
 	},
-	getSnapshot: () => runtime,
-	getTransitionSnapshot: () => ({
-		sequence: 0,
-		previousRuntime: null,
-		runtime,
-		events: [],
-	}),
+	...transitionFields,
 	getResourceUrl: (resourceId: string) => `resource:${resourceId}`,
 	subscribe: () => () => undefined,
 	subscribeTransitions: (listener) => {
@@ -244,13 +240,7 @@ describe("Board", () => {
 		const desktopGame = {
 			...game,
 			config: desktopConfig,
-			getSnapshot: () => desktopRuntime,
-			getTransitionSnapshot: () => ({
-				sequence: 0,
-				previousRuntime: null,
-				runtime: desktopRuntime,
-				events: [],
-			}),
+			...Effect.runSync(makeTestGameTransitionFieldsFx(desktopRuntime)),
 		} satisfies GameEngine;
 		gameEngineState.game = desktopGame;
 		const html = renderToStaticMarkup(

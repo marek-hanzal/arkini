@@ -1,29 +1,9 @@
-import { useLayoutEffect, useSyncExternalStore } from "react";
-import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
-import { useAppearance } from "~/ui/appearance/useAppearance";
-import { useCheatAvailability } from "~/ui/cheat-availability/useCheatAvailability";
-import { useLauncherStartup } from "~/ui/launcher/useLauncherStartup";
+import { useAtomValue } from "@effect/atom-react";
+import { LauncherStartupAtom } from "~/ui/launcher/LauncherStartupAtom";
 
-/** Transfers persisted startup preferences to their live owners exactly once. */
+/** Mounts the one keep-alive launcher bootstrap at the renderer root. */
 export const LauncherStartupHydrator = () => {
-	const startup = useLauncherStartup();
-	const state = useSyncExternalStore(startup.subscribe, startup.getSnapshot, startup.getSnapshot);
-	const { hydrate } = useAppearance();
-	const cheatAvailability = useCheatAvailability();
-
-	useLayoutEffect(() => {
-		RendererRuntime.runSync(
-			startup.consumeHydrationFx(({ appearance, cheatsAvailable }) => {
-				if (appearance !== undefined) hydrate(appearance);
-				if (cheatsAvailable !== undefined) cheatAvailability.apply(cheatsAvailable);
-			}),
-		);
-	}, [
-		cheatAvailability.apply,
-		hydrate,
-		startup,
-		state,
-	]);
+	useAtomValue(LauncherStartupAtom);
 
 	return null;
 };

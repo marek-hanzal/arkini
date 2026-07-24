@@ -1,4 +1,4 @@
-import { NodeContext } from "@effect/platform-node";
+import { NodeServices } from "@effect/platform-node";
 import { Effect } from "effect";
 import { describe, expect, it, vi } from "vitest";
 
@@ -24,7 +24,7 @@ describe("buildDesktopFx", () => {
 		await Effect.runPromise(
 			buildDesktopFx({
 				gameDirectory: "game/arkini",
-			}).pipe(Effect.provide(NodeContext.layer)),
+			}).pipe(Effect.provide(NodeServices.layer)),
 		);
 
 		expect(calls).toEqual([

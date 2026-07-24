@@ -1,4 +1,4 @@
-import { Command } from "@effect/cli";
+import { Command } from "effect/unstable/cli";
 
 import { ArkpackKeygenCommand } from "./ArkpackKeygenCommand";
 import { ArkpackOfficialPackCommand } from "./ArkpackOfficialPackCommand";

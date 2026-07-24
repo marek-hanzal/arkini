@@ -1,4 +1,4 @@
-import { Effect, Either } from "effect";
+import { Effect, Result } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~/engine/game/fx/useGameFx";
@@ -208,7 +208,7 @@ describe("consume material lifecycle", () => {
 					lineId: "line:converter:run",
 				});
 				if (started.type !== StartLineResultEnumSchema.enum.Started) {
-					return yield* Effect.dieMessage("Expected the converter job to start.");
+					return yield* Effect.die(new Error("Expected the converter job to start."));
 				}
 				const running = yield* readRuntimeFx();
 				yield* runTickRuntimeByFx({
@@ -259,7 +259,7 @@ describe("consume material lifecycle", () => {
 					quantity: 1,
 				});
 				const before = yield* readRuntimeFx();
-				const attempt = yield* Effect.either(
+				const attempt = yield* Effect.result(
 					startLineFx({
 						ownerItemId: converter.id,
 						lineId: "line:converter:run",
@@ -278,7 +278,7 @@ describe("consume material lifecycle", () => {
 		);
 
 		expect(result.attempt).toEqual(
-			Either.left(
+			Result.fail(
 				expect.objectContaining({
 					_tag: "JobOutputMaxCountError",
 					itemId: "item:product",

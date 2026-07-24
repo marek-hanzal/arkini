@@ -1,6 +1,6 @@
 import { promisify } from "node:util";
 import { gzip } from "node:zlib";
-import { FileSystem, Path } from "@effect/platform";
+import { FileSystem, Path } from "effect";
 import { Effect } from "effect";
 
 import { compileGameDirectoryFx } from "~/engine/compiler/fx/compileGameDirectoryFx";

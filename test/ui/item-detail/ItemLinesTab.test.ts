@@ -23,31 +23,49 @@ const control = vi.hoisted(() => ({
 	runPendingActionFx: vi.fn(),
 }));
 const commands = vi.hoisted(() => ({
-	autofill: vi.fn(() => Promise.resolve()),
-	setDefault: vi.fn(() => Promise.resolve()),
-	start: vi.fn(() => Promise.resolve()),
-	unsetDefault: vi.fn(() => Promise.resolve()),
-	withdraw: vi.fn(() => Promise.resolve()),
+	autofill: vi.fn(),
+	setDefault: vi.fn(),
+	start: vi.fn(),
+	unsetDefault: vi.fn(),
+	withdraw: vi.fn(),
 }));
 
 vi.mock("motion/react", async () => import("~test/ui/support/motionReactMock"));
 vi.mock("~/ui/item-detail/useItemDetailControl", () => ({
 	useItemDetailControl: () => control,
 }));
+vi.mock("~/ui/reactivity/readSettledAsyncResultError", () => ({
+	readSettledAsyncResultError: () => undefined,
+}));
 vi.mock("~/bridge/item-detail/useAutofillItemDetailLine", () => ({
-	useAutofillItemDetailLine: () => commands.autofill,
+	useAutofillItemDetailLine: () => ({
+		result: undefined,
+		run: commands.autofill,
+	}),
 }));
 vi.mock("~/bridge/item-detail/useSetDefaultItemDetailLine", () => ({
-	useSetDefaultItemDetailLine: () => commands.setDefault,
+	useSetDefaultItemDetailLine: () => ({
+		result: undefined,
+		run: commands.setDefault,
+	}),
 }));
 vi.mock("~/bridge/item-detail/useStartItemDetailLine", () => ({
-	useStartItemDetailLine: () => commands.start,
+	useStartPendingItemDetailLine: () => ({
+		result: undefined,
+		start: commands.start,
+	}),
 }));
 vi.mock("~/bridge/item-detail/useUnsetDefaultItemDetailLine", () => ({
-	useUnsetDefaultItemDetailLine: () => commands.unsetDefault,
+	useUnsetDefaultItemDetailLine: () => ({
+		result: undefined,
+		run: commands.unsetDefault,
+	}),
 }));
 vi.mock("~/bridge/item-detail/useWithdrawItemDetailLine", () => ({
-	useWithdrawItemDetailLine: () => commands.withdraw,
+	useWithdrawItemDetailLine: () => ({
+		result: undefined,
+		run: commands.withdraw,
+	}),
 }));
 
 const roots: Array<ReturnType<typeof createRoot>> = [];
@@ -162,12 +180,8 @@ beforeEach(() => {
 	control.readPendingAction.mockReturnValue(null);
 	control.openItemDetailFx.mockReturnValue(Effect.succeed(true));
 	control.openItemDefinitionDetailFx.mockReturnValue(Effect.succeed(true));
-	control.runPendingActionFx.mockImplementation(
-		({ run }: { readonly run: () => Promise<unknown> }) => Effect.promise(run),
-	);
 	for (const value of Object.values(commands)) {
 		value.mockReset();
-		value.mockResolvedValue(undefined);
 	}
 });
 

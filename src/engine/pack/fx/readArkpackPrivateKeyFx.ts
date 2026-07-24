@@ -1,4 +1,4 @@
-import { FileSystem } from "@effect/platform";
+import { FileSystem } from "effect";
 import { Effect } from "effect";
 
 import { ArkpackInputError } from "~/engine/pack/error/ArkpackInputError";

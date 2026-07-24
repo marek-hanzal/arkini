@@ -1,5 +1,5 @@
-import { Command } from "@effect/platform";
 import { Effect } from "effect";
+import { ChildProcess, ChildProcessSpawner } from "effect/unstable/process";
 import { DesktopPackagingError } from "./DesktopPackagingError";
 
 export namespace packageDesktopMacArtifactsFx {
@@ -8,21 +8,30 @@ export namespace packageDesktopMacArtifactsFx {
 	}
 }
 
-export const packageDesktopMacArtifactsFx = Effect.fn("packageDesktopMacArtifactsFx")(
-	({ arch }: packageDesktopMacArtifactsFx.Props) =>
-		Command.make(
-			"electron-builder",
-			"--config",
-			"electron-builder.yml",
-			"--mac",
-			`--${arch}`,
-			"--publish",
-			"never",
-		).pipe(
-			Command.stdin("inherit"),
-			Command.stdout("inherit"),
-			Command.stderr("inherit"),
-			Command.exitCode,
+export const packageDesktopMacArtifactsFx = Effect.fn("packageDesktopMacArtifactsFx")(function* ({
+	arch,
+}: packageDesktopMacArtifactsFx.Props) {
+	const childProcessSpawner = yield* ChildProcessSpawner.ChildProcessSpawner;
+	return yield* childProcessSpawner
+		.exitCode(
+			ChildProcess.make(
+				"electron-builder",
+				[
+					"--config",
+					"electron-builder.yml",
+					"--mac",
+					`--${arch}`,
+					"--publish",
+					"never",
+				],
+				{
+					stdin: "inherit",
+					stdout: "inherit",
+					stderr: "inherit",
+				},
+			),
+		)
+		.pipe(
 			Effect.mapError(
 				(cause) =>
 					new DesktopPackagingError({
@@ -40,5 +49,5 @@ export const packageDesktopMacArtifactsFx = Effect.fn("packageDesktopMacArtifact
 							}),
 						),
 			),
-		),
-);
+		);
+});

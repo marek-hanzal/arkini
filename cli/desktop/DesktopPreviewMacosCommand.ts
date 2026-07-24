@@ -1,4 +1,4 @@
-import { Command } from "@effect/cli";
+import { Command } from "effect/unstable/cli";
 import { previewDesktopMacFx } from "./previewDesktopMacFx";
 
 export const DesktopPreviewMacosCommand = Command.make("preview-macos", {}, () =>

@@ -3,18 +3,22 @@ import { Effect, Random } from "effect";
 import type { JobSchema } from "~/engine/job/schema/JobSchema";
 
 /** Bump only when intentionally changing completion random compatibility. */
-export const JobCompletionRandomVersion = 1;
+export const JobCompletionRandomVersion = 2;
 
 /**
- * Creates the deterministic random stream owned by one stable job completion.
+ * Runs the owned program with the deterministic random stream for one stable job completion.
  *
  * Retries, blocked delivery and state restore must replay the same random
  * choices. Wall-clock state is deliberately excluded.
  */
-export const makeJobCompletionRandomFx = Effect.fn("makeJobCompletionRandomFx")(function* (
-	job: JobSchema.Type,
-) {
-	return Random.make(
-		`arkini:job-completion:v${JobCompletionRandomVersion}:${job.id}:${job.ownerItemId}:${job.lineId}`,
+export const makeJobCompletionRandomFx = Effect.fn("makeJobCompletionRandomFx")(function* <
+	Result,
+	Error,
+	Requirements,
+>({ job, program }: { job: JobSchema.Type; program: Effect.Effect<Result, Error, Requirements> }) {
+	return yield* program.pipe(
+		Random.withSeed(
+			`arkini:job-completion:v${JobCompletionRandomVersion}:${job.id}:${job.ownerItemId}:${job.lineId}`,
+		),
 	);
 });

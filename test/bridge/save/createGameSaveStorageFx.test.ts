@@ -28,7 +28,7 @@ describe("createGameSaveStorageFx", () => {
 		);
 		expect(Exit.isFailure(exit)).toBe(true);
 		if (Exit.isSuccess(exit)) throw new Error("Expected storage failure.");
-		const failure = Cause.failureOption(exit.cause);
+		const failure = Cause.findErrorOption(exit.cause);
 		expect(Option.isSome(failure)).toBe(true);
 		if (Option.isNone(failure)) throw new Error("Expected typed storage failure.");
 		expect(failure.value).toEqual(

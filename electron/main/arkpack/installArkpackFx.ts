@@ -1,4 +1,4 @@
-import { FileSystem } from "@effect/platform";
+import { FileSystem } from "effect";
 import { Effect, Exit } from "effect";
 import { createHash, randomUUID } from "node:crypto";
 import { join } from "node:path";

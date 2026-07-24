@@ -1,4 +1,4 @@
-import { Effect, Either } from "effect";
+import { Effect, Result } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { RuntimeFx } from "~/engine/runtime/context/RuntimeFx";
@@ -49,7 +49,7 @@ describe("placeOutputFx", () => {
 					});
 				}
 				const before = yield* readRuntimeFx();
-				const placement = yield* Effect.either(
+				const placement = yield* Effect.result(
 					placeOutputFx({
 						originItemId: "runtime:origin",
 						output: configuredOutput([
@@ -80,9 +80,9 @@ describe("placeOutputFx", () => {
 			),
 		);
 
-		expect(Either.isLeft(result.placement)).toBe(true);
-		if (Either.isLeft(result.placement)) {
-			expect(result.placement.left).toMatchObject({
+		expect(Result.isFailure(result.placement)).toBe(true);
+		if (Result.isFailure(result.placement)) {
+			expect(result.placement.failure).toMatchObject({
 				_tag: "PlacementUnavailableError",
 				reason: "board:full",
 			});

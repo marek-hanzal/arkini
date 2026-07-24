@@ -61,7 +61,7 @@ export const prepareLauncherHeroFx = Effect.fn("prepareLauncherHeroFx")(
 					),
 				),
 			),
-			Effect.catchAll(() =>
+			Effect.catch(() =>
 				preloadLauncherHeroFx({
 					url: fallbackUrl,
 				}).pipe(

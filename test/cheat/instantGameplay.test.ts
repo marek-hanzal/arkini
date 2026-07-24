@@ -1,4 +1,4 @@
-import { Effect, Either } from "effect";
+import { Effect, Result } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { setCheatEnabledFx } from "~/engine/cheat/write/setCheatEnabledFx";
@@ -71,7 +71,7 @@ describe("Instant gameplay", () => {
 					enabled: true,
 				});
 				const before = yield* readRuntimeFx();
-				const attempt = yield* Effect.either(startLineFx(startProps));
+				const attempt = yield* Effect.result(startLineFx(startProps));
 				const after = yield* readRuntimeFx();
 				return {
 					after,
@@ -85,7 +85,7 @@ describe("Instant gameplay", () => {
 			),
 		);
 
-		expect(Either.isLeft(result.attempt)).toBe(true);
+		expect(Result.isFailure(result.attempt)).toBe(true);
 		expect(result.after).toEqual(result.before);
 	});
 });

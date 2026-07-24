@@ -1,3 +1,4 @@
+import { useAtom } from "@effect/atom-react";
 import { Effect } from "effect";
 import {
 	type PropsWithChildren,
@@ -18,12 +19,15 @@ import type {
 	OpenItemDefinitionDetailProps,
 	OpenItemDetailProps,
 } from "~/ui/item-detail/ItemDetailControl";
+import { readSettledAsyncResultError } from "~/ui/reactivity/readSettledAsyncResultError";
 
 /** Owns one exact Item Detail target and one exhaustive enter/open/exit lifecycle. */
 export const ItemDetailProvider = ({ children }: PropsWithChildren) => {
 	const resolveDefinitionTarget = useResolveItemDefinitionDetailTarget();
 	const resolveTarget = useResolveItemDetailTarget();
 	const [controller] = useState(() => RendererRuntime.runSync(createItemDetailControllerFx()));
+	const [closeResult, close] = useAtom(controller.closeAtom);
+	readSettledAsyncResultError(closeResult);
 	const snapshot = useSyncExternalStore(
 		controller.subscribe,
 		controller.getSnapshot,
@@ -79,13 +83,14 @@ export const ItemDetailProvider = ({ children }: PropsWithChildren) => {
 			event.preventDefault();
 			event.stopPropagation();
 			if (current.phase !== "exiting") {
-				void RendererRuntime.runPromise(controller.closeFx());
+				close(undefined);
 			}
 		};
 		window.addEventListener("keydown", onKeyDown, true);
 		return () => window.removeEventListener("keydown", onKeyDown, true);
 	}, [
 		controller,
+		close,
 	]);
 
 	useEffect(
@@ -107,6 +112,7 @@ export const ItemDetailProvider = ({ children }: PropsWithChildren) => {
 			runPendingActionFx: controller.runPendingActionFx,
 			openItemDetailFx,
 			openItemDefinitionDetailFx,
+			closeAtom: controller.closeAtom,
 			closeFx: controller.closeFx,
 			completeEnterFx: controller.completeEnterFx,
 			completeExitFx: controller.completeExitFx,

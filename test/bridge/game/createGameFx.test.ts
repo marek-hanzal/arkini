@@ -294,7 +294,7 @@ describe("createGameFx", () => {
 		);
 		expect(Exit.isFailure(exit)).toBe(true);
 		if (Exit.isSuccess(exit)) throw new Error("Expected invalid save failure.");
-		const failure = Cause.failureOption(exit.cause);
+		const failure = Cause.findErrorOption(exit.cause);
 		expect(Option.isSome(failure)).toBe(true);
 		if (Option.isNone(failure)) throw new Error("Expected typed save failure.");
 		expect(failure.value).toBeInstanceOf(GameSaveBootstrapError);
@@ -325,7 +325,7 @@ describe("createGameFx", () => {
 		);
 		expect(Exit.isFailure(exit)).toBe(true);
 		if (Exit.isSuccess(exit)) throw new Error("Expected package validation failure.");
-		const failure = Cause.failureOption(exit.cause);
+		const failure = Cause.findErrorOption(exit.cause);
 		expect(Option.isSome(failure)).toBe(true);
 		if (Option.isNone(failure)) throw new Error("Expected package failure.");
 		expect(failure.value).not.toBeInstanceOf(GameSaveBootstrapError);

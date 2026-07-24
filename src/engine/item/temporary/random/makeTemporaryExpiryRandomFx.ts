@@ -3,20 +3,28 @@ import { Effect, Random } from "effect";
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
 
 /** Bump only when intentionally changing temporary-expiry random compatibility. */
-export const TemporaryExpiryRandomVersion = 1;
+export const TemporaryExpiryRandomVersion = 2;
 
-/** Creates one deterministic random stream from one temporary runtime identity. */
-export const makeTemporaryExpiryRandomFx = Effect.fn("makeTemporaryExpiryRandomFx")(function* ({
+/** Runs the owned program with deterministic random from one temporary runtime identity. */
+export const makeTemporaryExpiryRandomFx = Effect.fn("makeTemporaryExpiryRandomFx")(function* <
+	Result,
+	Error,
+	Requirements,
+>({
 	item,
+	program,
 }: {
 	item: RuntimeItemSchema.Type;
+	program: Effect.Effect<Result, Error, Requirements>;
 }) {
-	return Random.make(
-		[
-			"arkini:temporary-expiry",
-			`v${TemporaryExpiryRandomVersion}`,
-			item.id,
-			item.item.id,
-		].join(":"),
+	return yield* program.pipe(
+		Random.withSeed(
+			[
+				"arkini:temporary-expiry",
+				`v${TemporaryExpiryRandomVersion}`,
+				item.id,
+				item.item.id,
+			].join(":"),
+		),
 	);
 });

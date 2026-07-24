@@ -1,4 +1,4 @@
-import { Array, Effect, Option } from "effect";
+import { Effect } from "effect";
 
 import type { OutputResultSchema } from "~/engine/output/schema/OutputResultSchema";
 import type { OutputSchema } from "~/engine/output/schema/OutputSchema";
@@ -32,6 +32,8 @@ export const outputFx = Effect.fn("outputFx")(function* ({ origin, output }: out
 	});
 
 	return {
-		drop: Array.filterMap(results, Option.fromNullable),
+		drop: results.filter((result): result is NonNullable<typeof result> => {
+			return result !== undefined;
+		}),
 	} satisfies OutputResultSchema.Type;
 });

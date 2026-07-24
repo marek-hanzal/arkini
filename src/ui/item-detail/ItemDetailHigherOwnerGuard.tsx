@@ -1,13 +1,14 @@
 import { useEffect } from "react";
 
-import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import { useGameMenuControl } from "~/ui/game-menu/useGameMenuControl";
+import { useCloseItemDetail } from "~/ui/item-detail/useCloseItemDetail";
 import { useItemDetailControl } from "~/ui/item-detail/useItemDetailControl";
 
 /** Disposes Item Detail when the higher-priority game menu takes interaction ownership. */
 export const ItemDetailHigherOwnerGuard = () => {
 	const gameMenu = useGameMenuControl();
 	const itemDetail = useItemDetailControl();
+	const closeItemDetail = useCloseItemDetail();
 
 	useEffect(() => {
 		if (gameMenu.phase === "closed" || gameMenu.phase === "exiting" || !itemDetail.isOpen) {
@@ -17,14 +18,12 @@ export const ItemDetailHigherOwnerGuard = () => {
 			void gameMenu.close();
 			return;
 		}
-		void RendererRuntime.runPromise(
-			itemDetail.closeFx({
-				restoreFocus: false,
-			}),
-		);
+		closeItemDetail({
+			restoreFocus: false,
+		});
 	}, [
+		closeItemDetail,
 		gameMenu.phase,
-		itemDetail.closeFx,
 		itemDetail.hasPendingActions,
 		itemDetail.isOpen,
 	]);

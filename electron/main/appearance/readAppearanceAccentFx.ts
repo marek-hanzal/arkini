@@ -1,4 +1,4 @@
-import { FileSystem } from "@effect/platform";
+import { FileSystem } from "effect";
 import { Effect } from "effect";
 import { join } from "node:path";
 import { AppearanceAccentSchema } from "../../contract/appearance/AppearanceAccentSchema";
@@ -20,7 +20,7 @@ export const readAppearanceAccentFx = Effect.fn("readAppearanceAccentFx")(functi
 	const stored = yield* fileSystem.readFileString(path).pipe(
 		Effect.map((value): string | null => value),
 		Effect.catchIf(
-			(cause) => cause._tag === "SystemError" && cause.reason === "NotFound",
+			(cause) => cause.reason._tag === "NotFound",
 			() => Effect.succeed(null),
 		),
 		Effect.mapError(

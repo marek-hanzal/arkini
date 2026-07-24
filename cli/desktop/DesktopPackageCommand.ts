@@ -1,13 +1,11 @@
-import { Command, Options } from "@effect/cli";
+import { Command, Flag } from "effect/unstable/cli";
 import { packageDesktopMacFx } from "./packageDesktopMacFx";
 
-const architecture = Options.choice("arch", [
+const architecture = Flag.choice("arch", [
 	"arm64",
 ] as const).pipe(
-	Options.withDefault("arm64"),
-	Options.withDescription(
-		"Target macOS architecture. The current milestone supports arm64 only.",
-	),
+	Flag.withDefault("arm64"),
+	Flag.withDescription("Target macOS architecture. The current milestone supports arm64 only."),
 );
 
 export const DesktopPackageCommand = Command.make(

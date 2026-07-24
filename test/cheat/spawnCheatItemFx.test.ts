@@ -1,4 +1,4 @@
-import { Effect, Either } from "effect";
+import { Effect, Result } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { readCheatItemCatalogFx } from "~/engine/cheat/read/readCheatItemCatalogFx";
@@ -14,7 +14,7 @@ describe("Cheat item spawning", () => {
 			Effect.gen(function* () {
 				const catalog = yield* readCheatItemCatalogFx();
 				const before = yield* readRuntimeFx();
-				const disabled = yield* Effect.either(
+				const disabled = yield* Effect.result(
 					spawnCheatItemFx({
 						itemId: "water",
 					}),
@@ -47,9 +47,9 @@ describe("Cheat item spawning", () => {
 			"tool",
 			"water",
 		]);
-		expect(Either.isLeft(result.disabled)).toBe(true);
-		if (Either.isLeft(result.disabled)) {
-			expect(result.disabled.left).toMatchObject({
+		expect(Result.isFailure(result.disabled)).toBe(true);
+		if (Result.isFailure(result.disabled)) {
+			expect(result.disabled.failure).toMatchObject({
 				_tag: "CheatModeDisabledError",
 				command: "spawn-item",
 			});

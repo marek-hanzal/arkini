@@ -2,8 +2,7 @@ export type CriticalGameLifecycleOperation =
 	| "engine-ownership"
 	| "game-read"
 	| "game-leave"
-	| "game-reset"
-	| "hmr-handoff";
+	| "game-reset";
 
 const causeMessage = (cause: unknown) => (cause instanceof Error ? cause.message : String(cause));
 

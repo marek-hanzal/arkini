@@ -1,3 +1,4 @@
+import { makeFixedRandomFx } from "~test/support/makeFixedRandomFx";
 import { Effect, Random } from "effect";
 import { describe, expect, it } from "vitest";
 
@@ -41,8 +42,9 @@ describe("selectRollSetFx", () => {
 					second,
 				],
 			}).pipe(
-				Effect.withRandom(
-					Random.fixed([
+				Effect.provideServiceEffect(
+					Random.Random,
+					makeFixedRandomFx([
 						0.75,
 					]),
 				),
@@ -64,8 +66,9 @@ describe("selectRollSetFx", () => {
 					last,
 				],
 			}).pipe(
-				Effect.withRandom(
-					Random.fixed([
+				Effect.provideServiceEffect(
+					Random.Random,
+					makeFixedRandomFx([
 						0.5,
 					]),
 				),
@@ -85,8 +88,9 @@ describe("selectRollSetFx", () => {
 					rare,
 				],
 			}).pipe(
-				Effect.withRandom(
-					Random.fixed([
+				Effect.provideServiceEffect(
+					Random.Random,
+					makeFixedRandomFx([
 						0.9,
 					]),
 				),
@@ -112,8 +116,9 @@ describe("selectRollSetFx", () => {
 					selected,
 				};
 			}).pipe(
-				Effect.withRandom(
-					Random.fixed([
+				Effect.provideServiceEffect(
+					Random.Random,
+					makeFixedRandomFx([
 						0.5,
 					]),
 				),

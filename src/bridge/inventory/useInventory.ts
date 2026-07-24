@@ -44,5 +44,5 @@ export const useInventory = (): useInventory.Result => {
 		],
 	);
 
-	return useRuntimeSelector(selector);
+	return useRuntimeSelector(game, selector);
 };

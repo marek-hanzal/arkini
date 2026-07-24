@@ -45,8 +45,8 @@ export const applyLineChargePlansFx = Effect.fn("applyLineChargePlansFx")(functi
 	for (const itemId of payerOrder) {
 		const cost = costs.get(itemId);
 		if (cost === undefined || cost <= 0) {
-			return yield* Effect.dieMessage(
-				`Charge payer ${itemId} resolved without a positive cost.`,
+			return yield* Effect.die(
+				new Error(`Charge payer ${itemId} resolved without a positive cost.`),
 			);
 		}
 		const item = yield* readRuntimeItemByIdFx({
@@ -55,8 +55,10 @@ export const applyLineChargePlansFx = Effect.fn("applyLineChargePlansFx")(functi
 		});
 		const remainingCharges = yield* readItemRemainingChargesFx(item);
 		if (remainingCharges === undefined || remainingCharges < cost) {
-			return yield* Effect.dieMessage(
-				`Charge payer ${itemId} was applied without sufficient resolved charges.`,
+			return yield* Effect.die(
+				new Error(
+					`Charge payer ${itemId} was applied without sufficient resolved charges.`,
+				),
 			);
 		}
 		spends.push({
@@ -75,10 +77,10 @@ export const applyLineChargePlansFx = Effect.fn("applyLineChargePlansFx")(functi
 
 	return yield* Effect.reduce(
 		orderedSpends,
-		{
+		() => ({
 			events: [] as GameEventSchema.Type[],
 			runtime,
-		},
+		}),
 		(state, spend) =>
 			Effect.gen(function* () {
 				const result = yield* spendItemChargesFx({

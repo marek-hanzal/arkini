@@ -1,6 +1,6 @@
 import { gunzipSync } from "node:zlib";
-import { FileSystem, Path } from "@effect/platform";
-import { NodeContext } from "@effect/platform-node";
+import { FileSystem, Path } from "effect";
+import { NodeServices } from "@effect/platform-node";
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
@@ -95,7 +95,7 @@ describe("packDirectoryFx", () => {
 					metadata,
 					staleSignatureExists: yield* fileSystem.exists(staleSignature),
 				} as const;
-			}).pipe(Effect.provide(NodeContext.layer), Effect.scoped),
+			}).pipe(Effect.provide(NodeServices.layer), Effect.scoped),
 		);
 
 		expect(packed.result).toMatchObject({
@@ -164,17 +164,17 @@ describe("packDirectoryFx", () => {
 					}),
 				);
 
-				return yield* Effect.either(
+				return yield* Effect.result(
 					packDirectoryFx({
 						input,
 					}),
 				);
-			}).pipe(Effect.provide(NodeContext.layer), Effect.scoped),
+			}).pipe(Effect.provide(NodeServices.layer), Effect.scoped),
 		);
 
 		expect(result).toMatchObject({
-			_tag: "Left",
-			left: {
+			_tag: "Failure",
+			failure: {
 				_tag: "GameValidationError",
 				diagnostics: expect.arrayContaining([
 					expect.objectContaining({
@@ -195,17 +195,17 @@ describe("packDirectoryFx", () => {
 				const input = yield* fileSystem.makeTempDirectoryScoped();
 				yield* fileSystem.writeFileString(path.join(input, "broken.json"), "{ nope");
 
-				return yield* Effect.either(
+				return yield* Effect.result(
 					packDirectoryFx({
 						input,
 					}),
 				);
-			}).pipe(Effect.provide(NodeContext.layer), Effect.scoped),
+			}).pipe(Effect.provide(NodeServices.layer), Effect.scoped),
 		);
 
 		expect(result).toMatchObject({
-			_tag: "Left",
-			left: {
+			_tag: "Failure",
+			failure: {
 				_tag: "GameValidationError",
 				diagnostics: expect.arrayContaining([
 					expect.objectContaining({

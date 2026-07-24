@@ -24,10 +24,10 @@ export const applyOutputPlacementFx = Effect.fn("applyOutputPlacementFx")(functi
 }: applyOutputPlacementFx.Props) {
 	const placement = yield* Effect.reduce(
 		output.drop,
-		{
+		() => ({
 			draft: runtime,
 			results: [] as DropPlacementResultSchema.Type[],
-		},
+		}),
 		(state, drop) => {
 			return Effect.gen(function* () {
 				const plan = yield* planDropPlacementFx({

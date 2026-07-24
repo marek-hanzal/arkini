@@ -14,5 +14,5 @@ export namespace rollQuantityRangeFx {
 export const rollQuantityRangeFx = Effect.fn("rollQuantityRangeFx")(function* ({
 	quantity,
 }: rollQuantityRangeFx.Props) {
-	return yield* Random.nextIntBetween(quantity.min, quantity.max + 1);
+	return yield* Random.nextIntBetween(quantity.min, quantity.max);
 });

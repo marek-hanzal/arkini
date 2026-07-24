@@ -59,8 +59,10 @@ export const placeRuntimeItemFx = Effect.fn("placeRuntimeItemFx")(function* ({
 		item.location.scope !== LocationScopeEnumSchema.enum.Input &&
 		item.location.scope !== LocationScopeEnumSchema.enum.Reserved
 	) {
-		return yield* Effect.dieMessage(
-			`Existing-item placement only accepts input or reserved items; ${item.id} is ${item.location.scope}.`,
+		return yield* Effect.die(
+			new Error(
+				`Existing-item placement only accepts input or reserved items; ${item.id} is ${item.location.scope}.`,
+			),
 		);
 	}
 	yield* assertOwnerIdleFx({
@@ -93,8 +95,10 @@ export const placeRuntimeItemFx = Effect.fn("placeRuntimeItemFx")(function* ({
 		const events: GameEventSchema.Type[] = [];
 		for (const stack of placement.stack) {
 			if (!isGridRuntimeItem(stack.item)) {
-				return yield* Effect.dieMessage(
-					`Existing-item placement stacked ${stack.item.id} outside a visible grid scope.`,
+				return yield* Effect.die(
+					new Error(
+						`Existing-item placement stacked ${stack.item.id} outside a visible grid scope.`,
+					),
 				);
 			}
 			events.push({
@@ -109,8 +113,10 @@ export const placeRuntimeItemFx = Effect.fn("placeRuntimeItemFx")(function* ({
 		}
 		for (const spawnedItem of placement.spawn) {
 			if (!isGridRuntimeItem(spawnedItem)) {
-				return yield* Effect.dieMessage(
-					`Existing-item placement spawned ${spawnedItem.id} outside a visible grid scope.`,
+				return yield* Effect.die(
+					new Error(
+						`Existing-item placement spawned ${spawnedItem.id} outside a visible grid scope.`,
+					),
 				);
 			}
 			events.push({

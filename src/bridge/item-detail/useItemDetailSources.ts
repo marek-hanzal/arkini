@@ -177,5 +177,5 @@ export const useItemDetailSources = (
 			kind,
 		],
 	);
-	return useRuntimeSelector(selector, sameProjection);
+	return useRuntimeSelector(game, selector, sameProjection);
 };

@@ -8,9 +8,8 @@ export interface RuntimeSaveFxService {
 }
 
 /** UI/session save coordinator. Gameplay code never depends on this service. */
-export class RuntimeSaveFx extends Context.Tag("RuntimeSaveFx")<
-	RuntimeSaveFx,
-	RuntimeSaveFxService
->() {
+export class RuntimeSaveFx extends Context.Service<RuntimeSaveFx, RuntimeSaveFxService>()(
+	"RuntimeSaveFx",
+) {
 	//
 }

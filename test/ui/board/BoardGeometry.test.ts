@@ -14,6 +14,7 @@ import { ItemDetailProvider } from "~/ui/item-detail/ItemDetailProvider";
 import type { TileSystemApi } from "~/ui/tile/TileSystemApiContext";
 import { TileSystemProvider } from "~/ui/tile/TileSystemProvider";
 import { useTileSystemApiContext } from "~/ui/tile/useTileSystemApiContext";
+import { makeTestGameTransitionFieldsFx } from "~test/support/game/makeTestGameTransitionFieldsFx";
 import { testGameRead, testGameReadOrThrow } from "~test/support/game/testGameRead";
 
 (
@@ -92,6 +93,7 @@ const runtime = Effect.runSync(
 	),
 );
 let currentRuntime = runtime;
+const transitionAtomFields = Effect.runSync(makeTestGameTransitionFieldsFx(currentRuntime));
 const runtimeListeners = new Set<() => void>();
 const game = {
 	arkpack: {
@@ -113,6 +115,7 @@ const game = {
 		contentHash: "0".repeat(64),
 	},
 	getSnapshot: () => currentRuntime,
+	committedTransitionAtom: transitionAtomFields.committedTransitionAtom,
 	getTransitionSnapshot: () => ({
 		sequence: 0,
 		previousRuntime: null,
@@ -136,6 +139,7 @@ const game = {
 	subscribeEvents: () => () => undefined,
 	read: testGameRead,
 	readOrThrow: testGameReadOrThrow,
+	runFx: transitionAtomFields.runFx,
 	run: (() => Promise.reject(new Error("Not used by this test."))) as GameEngine["run"],
 	disposeFx: Effect.void,
 	disposeWithoutSaveFx: Effect.void,
@@ -158,6 +162,7 @@ const Capture = ({ onSystem }: { readonly onSystem: (system: TileSystemApi) => v
 
 beforeEach(() => {
 	currentRuntime = runtime;
+	Effect.runSync(transitionAtomFields.resetRuntimeFx(currentRuntime));
 	runtimeListeners.clear();
 	gameEngineState.game = game;
 });
@@ -204,6 +209,7 @@ const renderBoard = async () => {
 const publishRuntime = async (next: typeof runtime) => {
 	await act(async () => {
 		currentRuntime = next;
+		Effect.runSync(transitionAtomFields.publishRuntimeFx(next));
 		for (const listener of runtimeListeners) listener();
 		await Promise.resolve();
 	});

@@ -1,4 +1,4 @@
-import { FileSystem } from "@effect/platform";
+import { FileSystem } from "effect";
 import { Effect } from "effect";
 import { join } from "node:path";
 import { CheatAvailabilitySchema } from "../../contract/cheat/CheatAvailabilitySchema";
@@ -33,8 +33,8 @@ export const writeCheatAvailabilityFx = Effect.fn("writeCheatAvailabilityFx")(fu
 			recursive: true,
 		})
 		.pipe(
-			Effect.zipRight(fileSystem.writeFileString(pending, String(validAvailable))),
-			Effect.zipRight(
+			Effect.andThen(fileSystem.writeFileString(pending, String(validAvailable))),
+			Effect.andThen(
 				fileSystem.rename(pending, current).pipe(
 					Effect.ensuring(
 						fileSystem

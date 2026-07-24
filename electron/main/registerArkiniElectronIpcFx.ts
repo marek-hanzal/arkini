@@ -53,7 +53,7 @@ export const registerArkiniElectronIpcFx = Effect.fn("registerArkiniElectronIpcF
 					ElectronMainRuntime.runPromise(
 						trustedRenderer
 							.assertTrustedIpcSenderFx(event)
-							.pipe(Effect.zipRight(operation)),
+							.pipe(Effect.andThen(operation)),
 					);
 
 				nativeTheme.on("updated", synchronizeWindowBackgrounds);

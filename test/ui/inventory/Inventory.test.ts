@@ -12,6 +12,8 @@ import { Inventory } from "~/ui/inventory/Inventory";
 import { InventoryProvider } from "~/ui/inventory/InventoryProvider";
 import { useInventoryView } from "~/ui/inventory/useInventoryView";
 import { TileSystemProvider } from "~/ui/tile/TileSystemProvider";
+import { makeTestGameTransitionFieldsFx } from "~test/support/game/makeTestGameTransitionFieldsFx";
+import { testGameRead, testGameReadOrThrow } from "~test/support/game/testGameRead";
 
 const gameEngineState = vi.hoisted(() => ({
 	game: undefined as GameEngine | undefined,
@@ -134,10 +136,35 @@ const runtime = Effect.runSync(
 );
 
 const game = {
+	arkpack: {
+		packageId: "test-package",
+		contentHash: "test-hash",
+		gameId: config.meta.id,
+		title: config.meta.title,
+		configVersion: config.version,
+		compressedSize: 0,
+		trust: {
+			type: "external",
+			reason: "unsigned",
+		} as const,
+		source: "imported" as const,
+	},
 	config,
-	getSnapshot: () => runtime,
+	saveKey: {
+		packageId: "test-package",
+		contentHash: "0".repeat(64),
+	},
+	...Effect.runSync(makeTestGameTransitionFieldsFx(runtime)),
+	getResourceUrl: (resourceId: string) => `resource:${resourceId}`,
 	subscribe: () => () => undefined,
-} as unknown as GameEngine;
+	subscribeEvents: () => () => undefined,
+	read: testGameRead,
+	readOrThrow: testGameReadOrThrow,
+	run: (() => Promise.reject(new Error("Not used by this test."))) as GameEngine["run"],
+	disposeFx: Effect.void,
+	disposeWithoutSaveFx: Effect.void,
+	flushSaveFx: Effect.void,
+} satisfies GameEngine;
 
 describe("Inventory", () => {
 	it("projects only canonical Inventory occupants into exact row-major configured cells", () => {

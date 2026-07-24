@@ -1,4 +1,4 @@
-import { Args, Command, Options } from "@effect/cli";
+import { Argument, Command, Flag } from "effect/unstable/cli";
 import { Console, Effect } from "effect";
 
 import { readArkpackPrivateKeyFx } from "~/engine/pack/fx/readArkpackPrivateKeyFx";
@@ -34,15 +34,13 @@ const runArkpackSignFx = Effect.fn("runArkpackSignFx")(function* ({
 export const ArkpackSignCommand = Command.make(
 	"sign",
 	{
-		arkpack: Args.file({
-			name: "arkpack",
-		}),
-		keyId: Options.text("key-id").pipe(
-			Options.withDescription("Trusted registry key identity stored in the sidecar."),
+		arkpack: Argument.file("arkpack"),
+		keyId: Flag.string("key-id").pipe(
+			Flag.withDescription("Trusted registry key identity stored in the sidecar."),
 		),
-		privateKeyPath: Options.text("private-key").pipe(
-			Options.withDefault(".arkini/arkpack-private.pem"),
-			Options.withDescription(
+		privateKeyPath: Flag.string("private-key").pipe(
+			Flag.withDefault(".arkini/arkpack-private.pem"),
+			Flag.withDescription(
 				"Local private PKCS8 PEM path; ARKINI_ARKPACK_PRIVATE_KEY takes precedence in CI.",
 			),
 		),
@@ -52,7 +50,7 @@ export const ArkpackSignCommand = Command.make(
 			arkpackPath: arkpack,
 			keyId,
 			privateKeyPath,
-		}).pipe(Effect.catchAll(handleArkpackInputErrorFx)),
+		}).pipe(Effect.catch(handleArkpackInputErrorFx)),
 ).pipe(
 	Command.withDescription("Sign exact final Arkpack bytes into the canonical detached sidecar."),
 );

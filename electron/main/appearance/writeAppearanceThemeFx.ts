@@ -1,4 +1,4 @@
-import { FileSystem } from "@effect/platform";
+import { FileSystem } from "effect";
 import { Effect } from "effect";
 import { join } from "node:path";
 import { AppearanceThemeSchema } from "../../contract/appearance/AppearanceThemeSchema";
@@ -33,8 +33,8 @@ export const writeAppearanceThemeFx = Effect.fn("writeAppearanceThemeFx")(functi
 			recursive: true,
 		})
 		.pipe(
-			Effect.zipRight(fileSystem.writeFileString(pending, validTheme)),
-			Effect.zipRight(
+			Effect.andThen(fileSystem.writeFileString(pending, validTheme)),
+			Effect.andThen(
 				fileSystem.rename(pending, current).pipe(
 					Effect.ensuring(
 						fileSystem

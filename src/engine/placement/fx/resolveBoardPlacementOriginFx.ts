@@ -23,7 +23,9 @@ export const resolveBoardPlacementOriginFx = Effect.fn("resolveBoardPlacementOri
 	return yield* match(placement)
 		.with(PlacementEnumSchema.enum.Drop, () => Effect.succeed(origin))
 		.with(PlacementEnumSchema.enum.Random, () =>
-			Random.nextIntBetween(0, size.width * size.height).pipe(
+			Random.nextIntBetween(0, size.width * size.height, {
+				halfOpen: true,
+			}).pipe(
 				Effect.map(
 					(index) =>
 						({

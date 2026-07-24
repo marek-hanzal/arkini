@@ -1,4 +1,4 @@
-import { Effect, Either } from "effect";
+import { Effect, Result } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~/engine/game/fx/useGameFx";
@@ -163,7 +163,7 @@ describe("runtime commands", () => {
 					location: boardA,
 					quantity: 1,
 				});
-				const swapped = yield* Effect.either(
+				const swapped = yield* Effect.result(
 					swapItemsFx({
 						firstItemId: item.id,
 						firstItemRevision: item.revision,
@@ -184,9 +184,9 @@ describe("runtime commands", () => {
 			),
 		);
 
-		expect(Either.isLeft(result.swapped)).toBe(true);
-		if (Either.isLeft(result.swapped)) {
-			expect(result.swapped.left).toMatchObject({
+		expect(Result.isFailure(result.swapped)).toBe(true);
+		if (Result.isFailure(result.swapped)) {
+			expect(result.swapped.failure).toMatchObject({
 				_tag: "SwapSameItemError",
 				itemId: "runtime:log",
 			});
@@ -212,7 +212,7 @@ describe("runtime commands", () => {
 					quantity: 1,
 				});
 
-				const duplicate = yield* Effect.either(
+				const duplicate = yield* Effect.result(
 					spawnItemFx({
 						id: "runtime:log",
 						itemId: "log",
@@ -220,7 +220,7 @@ describe("runtime commands", () => {
 						quantity: 1,
 					}),
 				);
-				const occupied = yield* Effect.either(
+				const occupied = yield* Effect.result(
 					moveItemFx({
 						itemId: "runtime:log",
 						location: boardB,
@@ -249,16 +249,16 @@ describe("runtime commands", () => {
 			),
 		);
 
-		expect(Either.isLeft(result.duplicate)).toBe(true);
-		if (Either.isLeft(result.duplicate)) {
-			expect(result.duplicate.left).toMatchObject({
+		expect(Result.isFailure(result.duplicate)).toBe(true);
+		if (Result.isFailure(result.duplicate)) {
+			expect(result.duplicate.failure).toMatchObject({
 				_tag: "ItemAlreadyExistsError",
 				itemId: "runtime:log",
 			});
 		}
-		expect(Either.isLeft(result.occupied)).toBe(true);
-		if (Either.isLeft(result.occupied)) {
-			expect(result.occupied.left).toMatchObject({
+		expect(Result.isFailure(result.occupied)).toBe(true);
+		if (Result.isFailure(result.occupied)) {
+			expect(result.occupied.failure).toMatchObject({
 				_tag: "LocationOccupiedError",
 				itemId: "runtime:stone",
 				location: boardB,
@@ -273,7 +273,7 @@ describe("runtime commands", () => {
 			Effect.gen(function* () {
 				const attempts = yield* Effect.all(
 					[
-						Effect.either(
+						Effect.result(
 							spawnItemFx({
 								id: "runtime:log",
 								itemId: "log",
@@ -281,7 +281,7 @@ describe("runtime commands", () => {
 								quantity: 1,
 							}),
 						),
-						Effect.either(
+						Effect.result(
 							spawnItemFx({
 								id: "runtime:stone",
 								itemId: "stone",
@@ -307,8 +307,8 @@ describe("runtime commands", () => {
 			),
 		);
 
-		expect(result.attempts.filter(Either.isRight)).toHaveLength(1);
-		expect(result.attempts.filter(Either.isLeft)).toHaveLength(1);
+		expect(result.attempts.filter(Result.isSuccess)).toHaveLength(1);
+		expect(result.attempts.filter(Result.isFailure)).toHaveLength(1);
 		expect(result.runtime.items).toHaveLength(1);
 		expect(result.runtime.items[0]?.location).toEqual(boardA);
 	});
@@ -338,14 +338,14 @@ describe("runtime commands", () => {
 				});
 				const attempts = yield* Effect.all(
 					[
-						Effect.either(
+						Effect.result(
 							moveItemFx({
 								itemId: "runtime:log",
 								location: target,
 								revision: logItem.revision,
 							}),
 						),
-						Effect.either(
+						Effect.result(
 							moveItemFx({
 								itemId: "runtime:stone",
 								location: target,
@@ -370,8 +370,8 @@ describe("runtime commands", () => {
 			),
 		);
 
-		expect(result.attempts.filter(Either.isRight)).toHaveLength(1);
-		expect(result.attempts.filter(Either.isLeft)).toHaveLength(1);
+		expect(result.attempts.filter(Result.isSuccess)).toHaveLength(1);
+		expect(result.attempts.filter(Result.isFailure)).toHaveLength(1);
 		expect(result.runtime.items.filter((item) => item.location.scope === "board")).toHaveLength(
 			2,
 		);
@@ -397,14 +397,14 @@ describe("runtime commands", () => {
 				});
 				const attempts = yield* Effect.all(
 					[
-						Effect.either(
+						Effect.result(
 							setItemQuantityFx({
 								itemId: item.id,
 								quantity: 2,
 								revision: item.revision,
 							}),
 						),
-						Effect.either(
+						Effect.result(
 							setItemQuantityFx({
 								itemId: item.id,
 								quantity: 3,
@@ -429,16 +429,16 @@ describe("runtime commands", () => {
 			),
 		);
 
-		expect(result.attempts.filter(Either.isRight)).toHaveLength(1);
-		expect(result.attempts.filter(Either.isLeft)).toHaveLength(1);
+		expect(result.attempts.filter(Result.isSuccess)).toHaveLength(1);
+		expect(result.attempts.filter(Result.isFailure)).toHaveLength(1);
 		expect(result.runtime.items[0]?.quantity).toSatisfy((quantity: number) => {
 			return quantity === 2 || quantity === 3;
 		});
-		const conflict = result.attempts.find(Either.isLeft);
-		if (conflict === undefined || Either.isRight(conflict)) {
+		const conflict = result.attempts.find(Result.isFailure);
+		if (conflict === undefined || Result.isSuccess(conflict)) {
 			throw new Error("Expected one stale quantity revision conflict.");
 		}
-		expect(conflict.left).toMatchObject({
+		expect(conflict.failure).toMatchObject({
 			_tag: "RevisionConflictError",
 			entityId: "runtime:log",
 			expectedRevision: expect.stringMatching(/^revision:/),
@@ -456,13 +456,13 @@ describe("runtime commands", () => {
 				});
 				const attempts = yield* Effect.all(
 					[
-						Effect.either(
+						Effect.result(
 							removeItemFx({
 								itemId: "runtime:log",
 								revision: logItem.revision,
 							}),
 						),
-						Effect.either(
+						Effect.result(
 							removeItemFx({
 								itemId: "runtime:log",
 								revision: logItem.revision,
@@ -486,8 +486,8 @@ describe("runtime commands", () => {
 			),
 		);
 
-		expect(result.attempts.filter(Either.isRight)).toHaveLength(1);
-		expect(result.attempts.filter(Either.isLeft)).toHaveLength(1);
+		expect(result.attempts.filter(Result.isSuccess)).toHaveLength(1);
+		expect(result.attempts.filter(Result.isFailure)).toHaveLength(1);
 		expect(result.runtime.items).toEqual([]);
 	});
 });

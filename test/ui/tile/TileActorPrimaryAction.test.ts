@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 
-import { Effect } from "effect";
+import { Deferred, Effect } from "effect";
 import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -18,6 +18,7 @@ import { InventoryProvider } from "~/ui/inventory/InventoryProvider";
 import { ItemDetailModal } from "~/ui/item-detail/ItemDetailModal";
 import { ItemDetailProvider } from "~/ui/item-detail/ItemDetailProvider";
 import { TileSystemProvider } from "~/ui/tile/TileSystemProvider";
+import { makeTestGameTransitionFieldsFx } from "~test/support/game/makeTestGameTransitionFieldsFx";
 
 (
 	globalThis as {
@@ -37,9 +38,13 @@ vi.mock("~/bridge/game/useGameEngine", () => ({
 		return current;
 	},
 }));
-vi.mock("~/bridge/tile/useDropItem", () => ({
-	useDropItem: () => vi.fn(),
-}));
+vi.mock("~/bridge/tile/dropItemAtom", async () => {
+	const { makeDropItemTestAtom } = await import("~test/ui/tile/support/makeDropItemTestAtom");
+	const commandAtom = makeDropItemTestAtom(() => Promise.reject(new Error("unused")));
+	return {
+		dropItemAtom: () => commandAtom,
+	};
+});
 
 const config = GameConfigSchema.parse({
 	version: "1.0",
@@ -164,7 +169,11 @@ let currentTransition: CommittedTransitionSchema.Type = {
 	runtime: currentRuntime,
 	events: [],
 };
-const runCommand = vi.fn(() => Promise.resolve({}));
+const transitionAtomFields = Effect.runSync(makeTestGameTransitionFieldsFx(currentRuntime));
+const runCommand = vi.fn(
+	(_effect: Effect.Effect<unknown, unknown>): Effect.Effect<unknown, unknown> =>
+		Effect.succeed({}),
+);
 const provideCurrentRuntime = (effect: Effect.Effect<unknown, unknown, RuntimeFx>) =>
 	Effect.provideService(effect, RuntimeFx, {
 		read: Effect.sync(() => currentRuntime),
@@ -190,6 +199,7 @@ const game = {
 	},
 	getSnapshot: () => currentRuntime,
 	getTransitionSnapshot: () => currentTransition,
+	committedTransitionAtom: transitionAtomFields.committedTransitionAtom,
 	getResourceUrl: (resourceId: string) => `resource:${resourceId}`,
 	subscribe: (listener: () => void) => {
 		listeners.add(listener);
@@ -209,7 +219,8 @@ const game = {
 		Effect.runSync(
 			provideCurrentRuntime(effect as Effect.Effect<unknown, unknown, RuntimeFx>),
 		)) as GameEngine["readOrThrow"],
-	run: runCommand as GameEngine["run"],
+	runFx: runCommand as unknown as GameEngine["runFx"],
+	run: (() => Promise.reject(new Error("Not used by this test."))) as GameEngine["run"],
 	disposeFx: Effect.void,
 	disposeWithoutSaveFx: Effect.void,
 	flushSaveFx: Effect.void,
@@ -238,6 +249,7 @@ const publishRuntime = (runtime: RuntimeSchema.Type) => {
 		runtime,
 		events: [],
 	};
+	Effect.runSync(transitionAtomFields.publishRuntimeFx(runtime));
 	for (const listener of listeners) listener();
 	for (const listener of transitionListeners) void listener(currentTransition);
 };
@@ -251,10 +263,11 @@ beforeEach(() => {
 		runtime: currentRuntime,
 		events: [],
 	};
+	Effect.runSync(transitionAtomFields.resetRuntimeFx(currentRuntime));
 	listeners.clear();
 	transitionListeners.clear();
 	runCommand.mockReset();
-	runCommand.mockResolvedValue({});
+	runCommand.mockReturnValue(Effect.succeed({}));
 	gameEngineState.game = game;
 	Object.defineProperty(HTMLElement.prototype, "getBoundingClientRect", {
 		configurable: true,
@@ -414,7 +427,7 @@ describe("TileActor primary action", () => {
 		expect(runCommand).toHaveBeenCalledTimes(1);
 		expect(document.querySelector('[data-ui="ItemDetailModal"]')).toBeNull();
 
-		runCommand.mockRejectedValueOnce(new Error("Missing inputs"));
+		runCommand.mockReturnValueOnce(Effect.fail(new Error("Missing inputs")));
 		await act(async () => {
 			click(producer);
 			await Promise.resolve();
@@ -424,6 +437,69 @@ describe("TileActor primary action", () => {
 		expect(
 			document.querySelector<HTMLElement>('[data-ui="ItemDetailModal"]')?.dataset.tab,
 		).toBe("lines");
+	});
+
+	it("publishes progress immediately while the default-line start settles", async () => {
+		const owner = initialRuntime.items.find((item) => item.item.id === "producer");
+		if (owner === undefined) throw new Error("Missing producer runtime item.");
+		publishRuntime(
+			RuntimeSchema.parse({
+				...initialRuntime,
+				defaultLineByOwnerItemId: {
+					[owner.id]: "line:produce",
+				},
+			}),
+		);
+		const gate = Effect.runSync(Deferred.make<void>());
+		runCommand.mockReturnValueOnce(Deferred.await(gate));
+		const { producer } = await renderBoard();
+
+		await act(async () => {
+			click(producer);
+			await Promise.resolve();
+		});
+
+		expect(runCommand).toHaveBeenCalledOnce();
+		expect(producer.className).toContain("cursor-progress");
+		expect(document.querySelector('[data-ui="ItemDetailModal"]')).toBeNull();
+
+		await act(async () => {
+			Effect.runSync(Deferred.succeed(gate, undefined));
+			await Promise.resolve();
+		});
+		await vi.waitFor(() => expect(producer.className).toContain("cursor-grab"));
+	});
+
+	it("opens Lines on a second same-tick click without starting a duplicate command", async () => {
+		const owner = initialRuntime.items.find((item) => item.item.id === "producer");
+		if (owner === undefined) throw new Error("Missing producer runtime item.");
+		publishRuntime(
+			RuntimeSchema.parse({
+				...initialRuntime,
+				defaultLineByOwnerItemId: {
+					[owner.id]: "line:produce",
+				},
+			}),
+		);
+		const gate = Effect.runSync(Deferred.make<void>());
+		runCommand.mockReturnValueOnce(Deferred.await(gate));
+		const { producer } = await renderBoard();
+
+		await act(async () => {
+			click(producer);
+			click(producer);
+			await Promise.resolve();
+		});
+
+		expect(runCommand).toHaveBeenCalledOnce();
+		expect(
+			document.querySelector<HTMLElement>('[data-ui="ItemDetailModal"]')?.dataset.tab,
+		).toBe("lines");
+
+		await act(async () => {
+			Effect.runSync(Deferred.succeed(gate, undefined));
+			await Promise.resolve();
+		});
 	});
 
 	it("opens Item Detail on Shift+click without starting the default line", async () => {

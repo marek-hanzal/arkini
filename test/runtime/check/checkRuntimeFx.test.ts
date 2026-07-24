@@ -1,4 +1,4 @@
-import { Effect, Either } from "effect";
+import { Effect, Result } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~/engine/game/fx/useGameFx";
@@ -257,7 +257,7 @@ describe("checkRuntimeFx", () => {
 	it("rejects invalid command candidates atomically", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {
-				const wrongScope = yield* Effect.either(
+				const wrongScope = yield* Effect.result(
 					spawnItemFx({
 						id: "wrong-scope",
 						itemId: "board",
@@ -265,7 +265,7 @@ describe("checkRuntimeFx", () => {
 						quantity: 1,
 					}),
 				);
-				const outside = yield* Effect.either(
+				const outside = yield* Effect.result(
 					spawnItemFx({
 						id: "outside",
 						itemId: "any",
@@ -287,9 +287,9 @@ describe("checkRuntimeFx", () => {
 			),
 		);
 
-		expect(Either.isLeft(result.wrongScope)).toBe(true);
-		if (Either.isLeft(result.wrongScope)) {
-			expect(result.wrongScope.left).toMatchObject({
+		expect(Result.isFailure(result.wrongScope)).toBe(true);
+		if (Result.isFailure(result.wrongScope)) {
+			expect(result.wrongScope.failure).toMatchObject({
 				_tag: "RuntimeInvalidError",
 				result: {
 					issues: [
@@ -300,9 +300,9 @@ describe("checkRuntimeFx", () => {
 				},
 			});
 		}
-		expect(Either.isLeft(result.outside)).toBe(true);
-		if (Either.isLeft(result.outside)) {
-			expect(result.outside.left).toMatchObject({
+		expect(Result.isFailure(result.outside)).toBe(true);
+		if (Result.isFailure(result.outside)) {
+			expect(result.outside.failure).toMatchObject({
 				_tag: "RuntimeInvalidError",
 				result: {
 					issues: [
@@ -335,7 +335,7 @@ describe("checkRuntimeFx", () => {
 			jobs: [],
 		});
 		const result = Effect.runSync(
-			Effect.either(
+			Effect.result(
 				fromStateFx({
 					state,
 				}),
@@ -346,9 +346,9 @@ describe("checkRuntimeFx", () => {
 			),
 		);
 
-		expect(Either.isLeft(result)).toBe(true);
-		if (Either.isLeft(result)) {
-			expect(result.left).toMatchObject({
+		expect(Result.isFailure(result)).toBe(true);
+		if (Result.isFailure(result)) {
+			expect(result.failure).toMatchObject({
 				_tag: "RuntimeInvalidError",
 				result: {
 					issues: [

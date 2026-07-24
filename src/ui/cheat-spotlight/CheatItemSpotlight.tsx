@@ -49,6 +49,7 @@ export const CheatItemSpotlight = ({
 	const gameMenu = useGameMenuControl();
 	const itemDetail = useItemDetailControl();
 	const spawn = useCheatItemSpawn();
+	const spawnError = spawn.state.kind === "error" ? spawn.state.error : undefined;
 	const dialogRef = useRef<HTMLElement>(null);
 	const inputRef = useRef<HTMLInputElement>(null);
 	const originRef = useRef<HTMLElement | null>(null);
@@ -176,8 +177,9 @@ export const CheatItemSpotlight = ({
 	if (!open) return null;
 
 	const selected = results[selectedIndex];
-	const requestSpawn = (itemId = selected?.itemId) =>
-		itemId === undefined ? false : spawn.request(itemId);
+	const requestSpawn = (itemId = selected?.itemId) => {
+		if (itemId !== undefined) spawn.request(itemId);
+	};
 	const keepFocusInside = (event: ReactKeyboardEvent<HTMLElement>) => {
 		if (event.key === "Escape") {
 			event.preventDefault();
@@ -320,9 +322,9 @@ export const CheatItemSpotlight = ({
 				>
 					{spawn.pending ? (
 						<p className="text-accent">Spawning…</p>
-					) : spawn.isError ? (
-						<p className="text-danger">Spawn failed: {errorMessage(spawn.error)}</p>
-					) : spawn.isSuccess ? (
+					) : spawnError !== undefined ? (
+						<p className="text-danger">Spawn failed: {errorMessage(spawnError)}</p>
+					) : spawn.state.kind === "success" ? (
 						<p className="text-muted">Item spawned.</p>
 					) : (
 						<p className="text-muted">↑↓ select · Enter spawn · Esc close</p>

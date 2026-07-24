@@ -22,7 +22,7 @@ export const GameLoopLayerFx = ({
 	onTickError = defaultOnTickError,
 }: GameLoopLayerFx.Props = {}) => {
 	const advance = runTickRuntimeFx().pipe(
-		Effect.catchAllCause((cause) =>
+		Effect.catchCause((cause) =>
 			invokeExternalCallbackFx({
 				callback: onTickError,
 				failureMessage: "Arkini tick error callback failed; the Tick loop remains active.",
@@ -31,11 +31,13 @@ export const GameLoopLayerFx = ({
 		),
 	);
 
-	return Layer.scoped(
+	return Layer.effect(
 		GameLoopFx,
 		advance.pipe(
 			Effect.repeat(Schedule.spaced(Duration.millis(Math.max(1, intervalMs)))),
-			Effect.forkScoped,
+			Effect.forkScoped({
+				startImmediately: true,
+			}),
 			Effect.map((fiber) => ({
 				stop: Fiber.interrupt(fiber).pipe(Effect.asVoid),
 			})),

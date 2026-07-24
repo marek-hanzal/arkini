@@ -1,4 +1,4 @@
-import { Effect, Either } from "effect";
+import { Effect, Result } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~/engine/game/fx/useGameFx";
@@ -193,7 +193,7 @@ describe("input state owner isolation", () => {
 				yield* spawnSourceFx(2);
 				yield* fillRemainingCapacityFx();
 				const before = yield* readRuntimeFx();
-				const stored = yield* Effect.either(storeFx(1));
+				const stored = yield* Effect.result(storeFx(1));
 
 				return {
 					after: yield* readRuntimeFx(),
@@ -207,9 +207,9 @@ describe("input state owner isolation", () => {
 			),
 		);
 
-		expect(Either.isLeft(result.stored)).toBe(true);
-		if (Either.isLeft(result.stored)) {
-			expect(result.stored.left).toMatchObject({
+		expect(Result.isFailure(result.stored)).toBe(true);
+		if (Result.isFailure(result.stored)) {
+			expect(result.stored.failure).toMatchObject({
 				_tag: "PlacementUnavailableError",
 				itemId: "workshop",
 				reason: "inventory:full",
@@ -224,7 +224,7 @@ describe("input state owner isolation", () => {
 				yield* spawnOwnerFx(1, "inventory");
 				yield* spawnSourceFx(1);
 				const before = yield* readRuntimeFx();
-				const stored = yield* Effect.either(storeFx(1));
+				const stored = yield* Effect.result(storeFx(1));
 
 				return {
 					after: yield* readRuntimeFx(),
@@ -238,9 +238,9 @@ describe("input state owner isolation", () => {
 			),
 		);
 
-		expect(Either.isLeft(result.stored)).toBe(true);
-		if (Either.isLeft(result.stored)) {
-			expect(result.stored.left).toMatchObject({
+		expect(Result.isFailure(result.stored)).toBe(true);
+		if (Result.isFailure(result.stored)) {
+			expect(result.stored.failure).toMatchObject({
 				_tag: "ItemNotOnBoardError",
 				itemId: "runtime:workshop",
 				location: {

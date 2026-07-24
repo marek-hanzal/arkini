@@ -16,7 +16,7 @@ const mergeLiveItemsFx = (sourceItemId: string, targetItemId: string) =>
 		const source = runtime.items.find((item) => item.id === sourceItemId);
 		const target = runtime.items.find((item) => item.id === targetItemId);
 		if (source === undefined || target === undefined) {
-			return yield* Effect.dieMessage("Expected live authored merge participants.");
+			return yield* Effect.die(new Error("Expected live authored merge participants."));
 		}
 
 		return yield* mergeItemsFx({

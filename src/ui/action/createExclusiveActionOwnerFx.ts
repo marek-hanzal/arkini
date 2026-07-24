@@ -21,17 +21,19 @@ export const createExclusiveActionOwnerFx = Effect.fn("createExclusiveActionOwne
 			};
 
 			return {
-				claimFx: (action) =>
+				claimFx: Effect.fn("ExclusiveActionOwner.claimFx")((action: Action) =>
 					Effect.sync(() => {
 						if (active !== null) return false;
 						publish(action);
 						return true;
 					}),
+				),
 				getSnapshot: () => active,
-				releaseFx: (action) =>
+				releaseFx: Effect.fn("ExclusiveActionOwner.releaseFx")((action: Action) =>
 					Effect.sync(() => {
 						if (active === action) publish(null);
 					}),
+				),
 				subscribe: (listener) => {
 					listeners.add(listener);
 					return () => listeners.delete(listener);

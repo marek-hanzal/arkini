@@ -1,4 +1,4 @@
-import { Effect, Either } from "effect";
+import { Effect, Result } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~/engine/game/fx/useGameFx";
@@ -239,7 +239,7 @@ const startStashFx = Effect.fn("startStashFx")(function* ({
 		lineId,
 	});
 	if (started.type !== StartLineResultEnumSchema.enum.Started) {
-		return yield* Effect.dieMessage(`Expected ${lineId} to start immediately.`);
+		return yield* Effect.die(new Error(`Expected ${lineId} to start immediately.`));
 	}
 
 	return {
@@ -260,7 +260,7 @@ describe("stash line completion", () => {
 					elapsedMs: 200,
 				});
 				const runtime = yield* readRuntimeFx();
-				const repeated = yield* Effect.either(
+				const repeated = yield* Effect.result(
 					completeJobRuntimeFx({
 						jobId: started.job.id,
 						runtime,
@@ -278,9 +278,9 @@ describe("stash line completion", () => {
 			false,
 		);
 		expect(result.runtime.items.filter((item) => item.item.id === "item:coin")).toHaveLength(1);
-		expect(Either.isLeft(result.repeated)).toBe(true);
-		if (Either.isLeft(result.repeated)) {
-			expect(result.repeated.left).toMatchObject({
+		expect(Result.isFailure(result.repeated)).toBe(true);
+		if (Result.isFailure(result.repeated)) {
+			expect(result.repeated.failure).toMatchObject({
 				_tag: "JobNotFoundError",
 			});
 		}

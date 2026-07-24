@@ -1,4 +1,4 @@
-import { Effect, Either } from "effect";
+import { Effect, Result } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { assertPlacementPlanCompleteFx } from "~/engine/placement/fx/assertPlacementPlanCompleteFx";
@@ -24,7 +24,7 @@ const plan = (quantity: number) =>
 
 const assert = (quantity: number) =>
 	Effect.runSync(
-		Effect.either(
+		Effect.result(
 			assertPlacementPlanCompleteFx({
 				drop,
 				plan: plan(quantity),
@@ -36,13 +36,13 @@ const assert = (quantity: number) =>
 
 describe("assertPlacementPlanCompleteFx", () => {
 	it("accepts an exact placement quantity", () => {
-		expect(Either.isRight(assert(2))).toBe(true);
+		expect(Result.isSuccess(assert(2))).toBe(true);
 	});
 
 	it("reports partial placement as unavailable capacity", () => {
 		expect(assert(1)).toMatchObject({
-			_tag: "Left",
-			left: {
+			_tag: "Failure",
+			failure: {
 				_tag: "PlacementUnavailableError",
 				remainingQuantity: 1,
 			},
@@ -51,8 +51,8 @@ describe("assertPlacementPlanCompleteFx", () => {
 
 	it("reports over-placement as an invalid planner result", () => {
 		expect(assert(3)).toMatchObject({
-			_tag: "Left",
-			left: {
+			_tag: "Failure",
+			failure: {
 				_tag: "PlacementPlanInvalidError",
 				requestedQuantity: 2,
 				placedQuantity: 3,

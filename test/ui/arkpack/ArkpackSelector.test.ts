@@ -1,5 +1,6 @@
 // @vitest-environment jsdom
 
+import { RegistryContext, scheduleTask } from "@effect/atom-react";
 import {
 	createMemoryHistory,
 	createRootRoute,
@@ -7,13 +8,14 @@ import {
 	createRouter,
 	RouterProvider,
 } from "@tanstack/react-router";
-import { Effect } from "effect";
+import { Effect, SubscriptionRef } from "effect";
+import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { ArkpackDescriptor } from "~/bridge/arkpack/Arkpack";
 import type { ArkpackCatalog } from "~/bridge/arkpack/ArkpackCatalog";
-import { ArkpackCatalogContext } from "~/bridge/arkpack/ArkpackCatalogContext";
+import { ArkpackCatalogOwnerAtom } from "~/bridge/arkpack/ArkpackCatalogOwnerAtom";
 import { ArkpackSelectorPage } from "~/page/arkpack/ArkpackSelectorPage";
 
 (
@@ -23,16 +25,24 @@ import { ArkpackSelectorPage } from "~/page/arkpack/ArkpackSelectorPage";
 ).IS_REACT_ACT_ENVIRONMENT = true;
 
 const roots: Array<ReturnType<typeof createRoot>> = [];
+const registries: AtomRegistry.AtomRegistry[] = [];
 
 afterEach(async () => {
 	await act(async () => {
 		for (const root of roots.splice(0)) root.unmount();
 	});
+	for (const registry of registries.splice(0)) registry.dispose();
 	vi.restoreAllMocks();
 	document.body.replaceChildren();
 });
 
 const renderSelector = async (catalog: ArkpackCatalog) => {
+	const registry = AtomRegistry.make({
+		defaultIdleTTL: 400,
+		scheduleTask,
+	});
+	registries.push(registry);
+	registry.set(ArkpackCatalogOwnerAtom, catalog);
 	Object.defineProperty(window, "scrollTo", {
 		configurable: true,
 		value: vi.fn(),
@@ -43,9 +53,9 @@ const renderSelector = async (catalog: ArkpackCatalog) => {
 		path: "/arkpacks",
 		component: () =>
 			createElement(
-				ArkpackCatalogContext.Provider,
+				RegistryContext.Provider,
 				{
-					value: catalog,
+					value: registry,
 				},
 				createElement(ArkpackSelectorPage),
 			),
@@ -130,20 +140,25 @@ describe("ArkpackSelector", () => {
 			],
 		};
 		const catalog: ArkpackCatalog = {
-			getSnapshot: () => catalogState,
+			state: Effect.runSync(SubscriptionRef.make<ArkpackCatalog.State>(catalogState)),
 			refreshFx: Effect.void,
 			importFileFx: () => Effect.die("unused"),
 			removeFx: () => Effect.die("unused"),
-			subscribe: () => () => undefined,
 		};
+		const registry = AtomRegistry.make({
+			defaultIdleTTL: 400,
+			scheduleTask,
+		});
+		registries.push(registry);
+		registry.set(ArkpackCatalogOwnerAtom, catalog);
 		const arkpacksRoute = createRoute({
 			getParentRoute: () => rootRoute,
 			path: "/arkpacks",
 			component: () =>
 				createElement(
-					ArkpackCatalogContext.Provider,
+					RegistryContext.Provider,
 					{
-						value: catalog,
+						value: registry,
 					},
 					createElement(ArkpackSelectorPage),
 				),
@@ -247,11 +262,10 @@ describe("ArkpackSelector", () => {
 			],
 		};
 		const catalog: ArkpackCatalog = {
-			getSnapshot: () => catalogState,
+			state: Effect.runSync(SubscriptionRef.make<ArkpackCatalog.State>(catalogState)),
 			refreshFx: Effect.void,
 			importFileFx,
 			removeFx,
-			subscribe: () => () => undefined,
 		};
 		const { container, router } = await renderSelector(catalog);
 		const removeButton = container.querySelector<HTMLButtonElement>("button");
@@ -342,11 +356,10 @@ describe("ArkpackSelector", () => {
 			],
 		};
 		const catalog: ArkpackCatalog = {
-			getSnapshot: () => catalogState,
+			state: Effect.runSync(SubscriptionRef.make<ArkpackCatalog.State>(catalogState)),
 			refreshFx: Effect.void,
 			importFileFx,
 			removeFx,
-			subscribe: () => () => undefined,
 		};
 		const { container, router } = await renderSelector(catalog);
 		const removeButton = container.querySelector<HTMLButtonElement>("button");
@@ -433,11 +446,10 @@ describe("ArkpackSelector", () => {
 			],
 		};
 		const catalog: ArkpackCatalog = {
-			getSnapshot: () => catalogState,
+			state: Effect.runSync(SubscriptionRef.make<ArkpackCatalog.State>(catalogState)),
 			refreshFx: Effect.void,
 			importFileFx: () => Effect.die("Unexpected import."),
 			removeFx,
-			subscribe: () => () => undefined,
 		};
 		const { container } = await renderSelector(catalog);
 		const removeButton = container.querySelector<HTMLButtonElement>("button");
@@ -451,7 +463,7 @@ describe("ArkpackSelector", () => {
 		});
 
 		expect(removeFx).toHaveBeenCalledTimes(1);
-		expect(container.textContent).toContain("removal rejected");
+		await vi.waitFor(() => expect(container.textContent).toContain("removal rejected"));
 		expect(removeButton.disabled).toBe(false);
 
 		await act(async () => {
@@ -486,11 +498,10 @@ describe("ArkpackSelector", () => {
 			],
 		};
 		const catalog: ArkpackCatalog = {
-			getSnapshot: () => catalogState,
+			state: Effect.runSync(SubscriptionRef.make<ArkpackCatalog.State>(catalogState)),
 			refreshFx: Effect.void,
 			importFileFx,
 			removeFx: () => Effect.die("Unexpected removal."),
-			subscribe: () => () => undefined,
 		};
 		const { container, router } = await renderSelector(catalog);
 		const navigate = vi
@@ -527,8 +538,8 @@ describe("ArkpackSelector", () => {
 		});
 
 		expect(importFileFx).toHaveBeenCalledTimes(1);
-		expect(navigate).toHaveBeenCalledTimes(1);
-		expect(container.textContent).toContain("load navigation rejected");
+		await vi.waitFor(() => expect(navigate).toHaveBeenCalledTimes(1));
+		await vi.waitFor(() => expect(container.textContent).toContain("load navigation rejected"));
 		expect(fileInput.disabled).toBe(false);
 		expect(router.state.location.pathname).toBe("/arkpacks");
 

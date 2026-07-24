@@ -1,11 +1,14 @@
+import { useAtom } from "@effect/atom-react";
 import { useNavigate } from "@tanstack/react-router";
-import type { Game } from "~/bridge/game/Game";
-import { useState } from "react";
+import { Exit, Option } from "effect";
+import { useEffect, useState } from "react";
 import { match, P } from "ts-pattern";
+import * as AsyncResult from "effect/unstable/reactivity/AsyncResult";
 
+import type { Game } from "~/bridge/game/Game";
+import { readExactCauseFailure } from "~/bridge/game/readExactCauseFailure";
 import type { GameMenuPhase } from "~/ui/game-menu/GameMenuControl";
-import { useSaveAndExitGameMutation } from "~/ui/game-menu/mutation/useSaveAndExitGameMutation";
-import { useSaveGameMutation } from "~/ui/game-menu/mutation/useSaveGameMutation";
+import { gameMenuCommandAtom } from "~/ui/game-menu/gameMenuCommandAtom";
 import { useGameMenuControl } from "~/ui/game-menu/useGameMenuControl";
 
 type NavigationState =
@@ -19,7 +22,7 @@ type NavigationState =
 
 const errorMessage = (error: unknown) => (error instanceof Error ? error.message : String(error));
 
-/** Owns GameMenu mutations, route requests, destructive confirmation, and status projection. */
+/** Owns GameMenu commands, route requests, destructive confirmation, and status projection. */
 export const useGameMenuActions = ({
 	game,
 	phase,
@@ -29,12 +32,56 @@ export const useGameMenuActions = ({
 }) => {
 	const menu = useGameMenuControl();
 	const navigate = useNavigate();
-	const save = useSaveGameMutation(game);
-	const saveAndExit = useSaveAndExitGameMutation(game);
+	const commandAtom = gameMenuCommandAtom(game);
+	const [commandResult, runCommand] = useAtom(commandAtom);
 	const [confirmingDestroy, setConfirmingDestroy] = useState(false);
 	const [navigationError, setNavigationError] = useState<unknown>();
-	const pending = menu.activeAction !== null || save.isPending || saveAndExit.isPending;
+	const savePending = menu.activeAction === "save";
+	const saveAndExitPending = menu.activeAction === "save-and-exit";
+	const pending = menu.activeAction !== null || commandResult.waiting;
 	const actionDisabled = phase !== "open" || pending;
+	const settledCommand =
+		AsyncResult.isSuccess(commandResult) && !commandResult.waiting
+			? commandResult.value
+			: undefined;
+	const commandFailure = (() => {
+		if (settledCommand === undefined || Exit.isSuccess(settledCommand.exit)) return undefined;
+		const failure = readExactCauseFailure(settledCommand.exit.cause);
+		return {
+			command: settledCommand.command,
+			error: Option.isSome(failure) ? failure.value : settledCommand.exit.cause,
+		};
+	})();
+	const successfulCommand =
+		settledCommand !== undefined && Exit.isSuccess(settledCommand.exit)
+			? settledCommand.command
+			: undefined;
+
+	useEffect(
+		() => () => {
+			menu.completeAction("save");
+			menu.completeAction("save-and-exit");
+		},
+		[
+			commandAtom,
+			menu.completeAction,
+		],
+	);
+
+	useEffect(() => {
+		if (
+			(menu.activeAction !== "save" && menu.activeAction !== "save-and-exit") ||
+			commandResult.waiting ||
+			AsyncResult.isInitial(commandResult)
+		) {
+			return;
+		}
+		menu.completeAction(menu.activeAction);
+	}, [
+		commandResult,
+		menu.activeAction,
+		menu.completeAction,
+	]);
 
 	const requestSettings = () => {
 		if (!menu.beginAction("settings")) return;
@@ -83,18 +130,12 @@ export const useGameMenuActions = ({
 
 	const requestSave = () => {
 		if (!menu.beginAction("save")) return;
-		void save.mutateAsync().then(
-			() => menu.completeAction("save"),
-			() => menu.completeAction("save"),
-		);
+		runCommand("save");
 	};
 
 	const requestSaveAndExit = () => {
 		if (!menu.beginAction("save-and-exit")) return;
-		void saveAndExit.mutateAsync().then(
-			() => menu.completeAction("save-and-exit"),
-			() => menu.completeAction("save-and-exit"),
-		);
+		runCommand("save-and-exit");
 	};
 
 	const requestHardReset = () => {
@@ -122,14 +163,18 @@ export const useGameMenuActions = ({
 					error: navigationError,
 				};
 	const status = match([
-		saveAndExit.status,
-		save.status,
+		saveAndExitPending,
+		savePending,
+		commandFailure,
 		navigation,
 		menu.routePending,
+		successfulCommand,
 	] as const)
 		.with(
 			[
-				"pending",
+				true,
+				P._,
+				P._,
 				P._,
 				P._,
 				P._,
@@ -138,8 +183,10 @@ export const useGameMenuActions = ({
 		)
 		.with(
 			[
+				false,
+				true,
 				P._,
-				"pending",
+				P._,
 				P._,
 				P._,
 			],
@@ -147,52 +194,65 @@ export const useGameMenuActions = ({
 		)
 		.with(
 			[
-				"error",
+				false,
+				false,
+				P.not(undefined),
 				P._,
 				P._,
 				P._,
 			],
-			() => `Save and exit failed: ${errorMessage(saveAndExit.error)}`,
+			([, , failure]) =>
+				`${failure.command === "save-and-exit" ? "Save and exit" : "Save"} failed: ${errorMessage(failure.error)}`,
 		)
 		.with(
 			[
-				P._,
-				"error",
-				P._,
-				P._,
-			],
-			() => `Save failed: ${errorMessage(save.error)}`,
-		)
-		.with(
-			[
-				P._,
-				P._,
+				false,
+				false,
+				undefined,
 				{
 					kind: "error",
 				},
 				P._,
+				P._,
 			],
-			([, , failed]) => `Navigation failed: ${errorMessage(failed.error)}`,
+			([, , , failed]) => `Navigation failed: ${errorMessage(failed.error)}`,
 		)
 		.with(
 			[
-				P._,
-				P._,
+				false,
+				false,
+				undefined,
 				{
 					kind: "idle",
 				},
 				true,
+				P._,
 			],
 			() => "Opening action page…",
 		)
 		.with(
 			[
-				P._,
-				"success",
+				false,
+				false,
+				undefined,
 				{
 					kind: "idle",
 				},
 				false,
+				"save-and-exit",
+			],
+			() => "Save and exit requested.",
+		)
+		.with(
+			[
+				false,
+				false,
+				undefined,
+				{
+					kind: "idle",
+				},
+				false,
+				"save",
 			],
 			() => "Saved.",
 		)

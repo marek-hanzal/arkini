@@ -1,3 +1,4 @@
+import { makeFixedRandomFx } from "~test/support/makeFixedRandomFx";
 import { Effect, Random } from "effect";
 import { describe, expect, it } from "vitest";
 
@@ -323,10 +324,11 @@ describe("dropFx", () => {
 					rejected,
 				};
 			}).pipe(
-				Effect.withRandom(
-					Random.fixed([
-						2,
-						4,
+				Effect.provideServiceEffect(
+					Random.Random,
+					makeFixedRandomFx([
+						0,
+						0.75,
 					]),
 				),
 				useGameFx({

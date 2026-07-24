@@ -1,4 +1,4 @@
-import { Command } from "@effect/cli";
+import { Command } from "effect/unstable/cli";
 import { verifyDesktopArtifactsFx } from "./verifyDesktopArtifactsFx";
 
 export const DesktopVerifyCommand = Command.make("verify", {}, () =>

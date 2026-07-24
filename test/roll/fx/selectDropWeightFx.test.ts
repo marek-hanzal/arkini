@@ -1,3 +1,4 @@
+import { makeFixedRandomFx } from "~test/support/makeFixedRandomFx";
 import { Effect, Random } from "effect";
 import { describe, expect, it } from "vitest";
 
@@ -34,8 +35,9 @@ describe("selectDropWeightFx", () => {
 					last,
 				],
 			}).pipe(
-				Effect.withRandom(
-					Random.fixed([
+				Effect.provideServiceEffect(
+					Random.Random,
+					makeFixedRandomFx([
 						0.5,
 					]),
 				),
@@ -55,8 +57,9 @@ describe("selectDropWeightFx", () => {
 					rare,
 				],
 			}).pipe(
-				Effect.withRandom(
-					Random.fixed([
+				Effect.provideServiceEffect(
+					Random.Random,
+					makeFixedRandomFx([
 						0.9,
 					]),
 				),

@@ -1,4 +1,4 @@
-import type { Effect } from "effect";
+import type { Effect, SubscriptionRef } from "effect";
 import type { ArkpackDescriptor } from "~/bridge/arkpack/Arkpack";
 
 export namespace ArkpackCatalog {
@@ -24,9 +24,8 @@ export namespace ArkpackCatalog {
 
 /** Stable renderer owner of one shared Arkpack catalog request state. */
 export interface ArkpackCatalog {
-	readonly getSnapshot: () => ArkpackCatalog.State;
+	readonly state: SubscriptionRef.SubscriptionRef<ArkpackCatalog.State>;
 	readonly refreshFx: Effect.Effect<void, unknown>;
 	readonly importFileFx: (file: File) => Effect.Effect<ArkpackDescriptor, unknown>;
 	readonly removeFx: (packageId: string) => Effect.Effect<void, unknown>;
-	readonly subscribe: (listener: () => void | PromiseLike<void>) => () => void;
 }

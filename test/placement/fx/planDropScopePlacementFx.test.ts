@@ -1,4 +1,4 @@
-import { Effect, Either } from "effect";
+import { Effect, Result } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { GameConfigFx } from "~/engine/game/context/GameConfigFx";
@@ -68,7 +68,7 @@ describe("planDropScopePlacementFx", () => {
 		} satisfies RuntimeSchema.Type;
 
 		const result = run(
-			Effect.either(
+			Effect.result(
 				planDropScopePlacementFx({
 					drop: {
 						itemId: "board-only",
@@ -90,9 +90,9 @@ describe("planDropScopePlacementFx", () => {
 			),
 		);
 
-		expect(Either.isLeft(result)).toBe(true);
-		if (Either.isLeft(result)) {
-			expect(result.left).toMatchObject({
+		expect(Result.isFailure(result)).toBe(true);
+		if (Result.isFailure(result)) {
+			expect(result.failure).toMatchObject({
 				_tag: "PlacementUnavailableError",
 				reason: "board:full",
 				remainingQuantity: 1,

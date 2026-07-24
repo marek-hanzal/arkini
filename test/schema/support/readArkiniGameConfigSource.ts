@@ -1,4 +1,4 @@
-import { NodeContext } from "@effect/platform-node";
+import { NodeServices } from "@effect/platform-node";
 import { fileURLToPath } from "node:url";
 import { Effect } from "effect";
 
@@ -16,7 +16,7 @@ const readGameConfigSource = (input: string) =>
 			});
 
 			return yield* assertGameConfigValidFx(result);
-		}).pipe(Effect.provide(NodeContext.layer)),
+		}).pipe(Effect.provide(NodeServices.layer)),
 	);
 
 /** Reads the current Arkini authoring directory through the production completed-game compiler. */

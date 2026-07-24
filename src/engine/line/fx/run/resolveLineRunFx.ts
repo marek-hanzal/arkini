@@ -105,7 +105,7 @@ export const resolveLineRunFx = Effect.fn("resolveLineRunFx")(function* ({
 	}
 	const [firstInput, ...remainingInputs] = resolvedInputs;
 	if (firstInput === undefined) {
-		return yield* Effect.dieMessage("LineSchema unexpectedly resolved without an input.");
+		return yield* Effect.die(new Error("LineSchema unexpectedly resolved without an input."));
 	}
 	const input = [
 		firstInput,

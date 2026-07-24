@@ -1,4 +1,4 @@
-import { NodeContext } from "@effect/platform-node";
+import { NodeServices } from "@effect/platform-node";
 import { Effect } from "effect";
 import { describe, expect, it, vi } from "vitest";
 
@@ -32,7 +32,7 @@ describe("packageDesktopMacFx", () => {
 		await Effect.runPromise(
 			packageDesktopMacFx({
 				arch: "arm64",
-			}).pipe(Effect.provide(NodeContext.layer)),
+			}).pipe(Effect.provide(NodeServices.layer)),
 		);
 
 		expect(calls).toEqual([

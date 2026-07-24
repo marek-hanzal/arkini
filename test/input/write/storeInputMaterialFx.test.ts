@@ -1,4 +1,4 @@
-import { Effect, Either } from "effect";
+import { Effect, Result } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~/engine/game/fx/useGameFx";
@@ -140,7 +140,7 @@ describe("storeInputMaterialFx", () => {
 					itemId: "runtime:water",
 				});
 
-				return yield* Effect.either(
+				return yield* Effect.result(
 					moveItemFx({
 						itemId: "runtime:water",
 						location: sourceLocation(2),
@@ -154,9 +154,9 @@ describe("storeInputMaterialFx", () => {
 			),
 		);
 
-		expect(Either.isLeft(moved)).toBe(true);
-		if (Either.isLeft(moved)) {
-			expect(moved.left).toMatchObject({
+		expect(Result.isFailure(moved)).toBe(true);
+		if (Result.isFailure(moved)) {
+			expect(moved.failure).toMatchObject({
 				_tag: "ItemNotOnGridError",
 				itemId: "runtime:water",
 			});
@@ -267,7 +267,7 @@ describe("storeInputMaterialFx", () => {
 					itemId: "stone",
 					quantity: 2,
 				});
-				const stored = yield* Effect.either(
+				const stored = yield* Effect.result(
 					storeFx({
 						quantity: 2,
 						sourceItemId: "runtime:stone",
@@ -286,9 +286,9 @@ describe("storeInputMaterialFx", () => {
 			),
 		);
 
-		expect(Either.isLeft(result.stored)).toBe(true);
-		if (Either.isLeft(result.stored)) {
-			expect(result.stored.left).toMatchObject({
+		expect(Result.isFailure(result.stored)).toBe(true);
+		if (Result.isFailure(result.stored)) {
+			expect(result.stored.failure).toMatchObject({
 				_tag: "InputMaterialUnavailableError",
 				sourceItemId: "runtime:stone",
 			});
@@ -310,7 +310,7 @@ describe("storeInputMaterialFx", () => {
 				});
 				const attempts = yield* Effect.all(
 					[
-						Effect.either(
+						Effect.result(
 							storeInputMaterialFx({
 								ownerItemId: "runtime:workshop",
 								lineId: "line:workshop:build",
@@ -320,7 +320,7 @@ describe("storeInputMaterialFx", () => {
 								quantity: 1,
 							}),
 						),
-						Effect.either(
+						Effect.result(
 							storeInputMaterialFx({
 								ownerItemId: "runtime:workshop",
 								lineId: "line:workshop:build",
@@ -354,8 +354,8 @@ describe("storeInputMaterialFx", () => {
 			),
 		);
 
-		expect(result.attempts.filter(Either.isRight)).toHaveLength(1);
-		expect(result.attempts.filter(Either.isLeft)).toHaveLength(1);
+		expect(result.attempts.filter(Result.isSuccess)).toHaveLength(1);
+		expect(result.attempts.filter(Result.isFailure)).toHaveLength(1);
 		expect(result.buffered.reduce((total, item) => total + item.quantity, 0)).toBe(1);
 		expect(
 			result.runtime.items.some((item) => {
@@ -366,11 +366,11 @@ describe("storeInputMaterialFx", () => {
 				);
 			}),
 		).toBe(true);
-		const conflict = result.attempts.find(Either.isLeft);
-		if (conflict === undefined || Either.isRight(conflict)) {
+		const conflict = result.attempts.find(Result.isFailure);
+		if (conflict === undefined || Result.isSuccess(conflict)) {
 			throw new Error("Expected one stale input delivery conflict.");
 		}
-		expect(conflict.left).toMatchObject({
+		expect(conflict.failure).toMatchObject({
 			_tag: "RevisionConflictError",
 			entityId: "runtime:water",
 		});

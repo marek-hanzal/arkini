@@ -1,4 +1,4 @@
-import { Effect, Either } from "effect";
+import { Effect, Result } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~/engine/game/fx/useGameFx";
@@ -51,7 +51,7 @@ describe("setItemQuantityFx purity", () => {
 					itemId: craft.id,
 				});
 				const before = yield* readRuntimeFx();
-				const quantity = yield* Effect.either(
+				const quantity = yield* Effect.result(
 					setItemQuantityFx({
 						itemId: activeCraft.id,
 						quantity: 2,
@@ -72,9 +72,9 @@ describe("setItemQuantityFx purity", () => {
 			),
 		);
 
-		expect(Either.isLeft(result.quantity)).toBe(true);
-		if (Either.isLeft(result.quantity)) {
-			expect(result.quantity.left).toMatchObject({
+		expect(Result.isFailure(result.quantity)).toBe(true);
+		if (Result.isFailure(result.quantity)) {
+			expect(result.quantity.failure).toMatchObject({
 				_tag: "ItemStatefulError",
 				itemId: "runtime:craft",
 			});

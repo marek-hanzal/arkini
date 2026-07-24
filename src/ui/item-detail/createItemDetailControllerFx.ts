@@ -1,4 +1,5 @@
 import { Deferred, Effect } from "effect";
+import * as Atom from "effect/unstable/reactivity/Atom";
 import { match } from "ts-pattern";
 
 import type {
@@ -19,12 +20,15 @@ export interface ItemDetailController {
 	readonly subscribe: (listener: () => void) => () => void;
 	readonly readOrigin: (origin: HTMLElement | null) => HTMLElement | null;
 	readonly openTargetFx: (target: ItemDetailTarget) => Effect.Effect<boolean>;
+	readonly closeAtom: Atom.AtomResultFn<CloseItemDetailProps | undefined, void, never>;
 	readonly closeFx: (props?: CloseItemDetailProps) => Effect.Effect<void>;
 	readonly completeEnterFx: (generation: number) => Effect.Effect<void>;
 	readonly completeExitFx: (generation: number) => Effect.Effect<void>;
 	readonly readActionError: (key: string) => string | null;
 	readonly readPendingAction: (key: string) => ItemDetailPendingAction | null;
-	readonly runPendingActionFx: (props: RunItemDetailPendingActionProps) => Effect.Effect<unknown>;
+	readonly runPendingActionFx: <Result, Failure>(
+		props: RunItemDetailPendingActionProps<Result, Failure>,
+	) => Effect.Effect<Result | void, Failure>;
 	readonly resetFx: Effect.Effect<void>;
 }
 
@@ -32,6 +36,10 @@ export namespace ItemDetailController {
 	export interface Snapshot {
 		readonly state: ItemDetailState;
 		readonly pendingActions: ReadonlyMap<string, ItemDetailPendingAction>;
+		/**
+		 * Presentation-only failure messages retained across tab remounts for the
+		 * same target. Command settlement remains owned by each command Atom.
+		 */
 		readonly actionErrors: ReadonlyMap<string, string>;
 	}
 }
@@ -102,18 +110,20 @@ export const createItemDetailControllerFx = Effect.fn("createItemDetailControlle
 			});
 		};
 
-		const resolveExitCompletionFx = (generation?: number) =>
-			Effect.gen(function* () {
-				const completion = exitCompletion;
-				if (
-					completion === undefined ||
-					(generation !== undefined && completion.generation !== generation)
-				) {
-					return;
-				}
-				exitCompletion = undefined;
-				yield* Deferred.succeed(completion.deferred, undefined);
-			});
+		const resolveExitCompletionFx = Effect.fn("ItemDetailController.resolveExitCompletionFx")(
+			(generation?: number) =>
+				Effect.gen(function* () {
+					const completion = exitCompletion;
+					if (
+						completion === undefined ||
+						(generation !== undefined && completion.generation !== generation)
+					) {
+						return;
+					}
+					exitCompletion = undefined;
+					yield* Deferred.succeed(completion.deferred, undefined);
+				}),
+		);
 
 		const enter = (target: ItemDetailTarget) => {
 			publishState(
@@ -129,146 +139,165 @@ export const createItemDetailControllerFx = Effect.fn("createItemDetailControlle
 			return true;
 		};
 
-		const openTargetFx = (target: ItemDetailTarget) =>
-			Effect.gen(function* () {
-				const current = snapshot.state;
-				if (current.phase === "closed") return enter(target);
-				if (snapshot.pendingActions.size > 0 && !sameTarget(current.target, target)) {
-					return false;
-				}
-				if (current.phase === "exiting") {
-					yield* resolveExitCompletionFx(current.generation);
-					return enter(target);
-				}
-				if (sameTarget(current.target, target)) return true;
-				publishState(
-					{
-						...current,
-						target,
-					},
-					{
-						clearActionErrors: !sameActionOutcomeTarget(current.target, target),
-					},
-				);
-				return true;
-			});
-
-		const closeFx = ({ restoreFocus = true }: CloseItemDetailProps = {}) =>
-			Effect.gen(function* () {
-				const current = snapshot.state;
-				if (current.phase === "closed") return;
-				if (snapshot.pendingActions.size > 0) return;
-				if (current.phase === "exiting") {
-					if (!restoreFocus && current.restoreFocus) {
-						publishState({
+		const openTargetFx = Effect.fn("ItemDetailController.openTargetFx")(
+			(target: ItemDetailTarget) =>
+				Effect.gen(function* () {
+					const current = snapshot.state;
+					if (current.phase === "closed") return enter(target);
+					if (snapshot.pendingActions.size > 0 && !sameTarget(current.target, target)) {
+						return false;
+					}
+					if (current.phase === "exiting") {
+						yield* resolveExitCompletionFx(current.generation);
+						return enter(target);
+					}
+					if (sameTarget(current.target, target)) return true;
+					publishState(
+						{
 							...current,
-							restoreFocus: false,
-						});
-					}
-					if (exitCompletion !== undefined) {
-						yield* Deferred.await(exitCompletion.deferred);
-					}
-					return;
-				}
+							target,
+						},
+						{
+							clearActionErrors: !sameActionOutcomeTarget(current.target, target),
+						},
+					);
+					return true;
+				}),
+		);
 
-				const deferred = yield* Deferred.make<void>();
-				exitCompletion = {
-					generation: current.generation,
-					deferred,
-				};
-				publishState(
-					{
-						phase: "exiting",
-						target: current.target,
+		const closeFx = Effect.fn("ItemDetailController.closeFx")(
+			({ restoreFocus = true }: CloseItemDetailProps = {}) =>
+				Effect.gen(function* () {
+					const current = snapshot.state;
+					if (current.phase === "closed") return;
+					if (snapshot.pendingActions.size > 0) return;
+					if (current.phase === "exiting") {
+						if (!restoreFocus && current.restoreFocus) {
+							publishState({
+								...current,
+								restoreFocus: false,
+							});
+						}
+						if (exitCompletion !== undefined) {
+							yield* Deferred.await(exitCompletion.deferred);
+						}
+						return;
+					}
+
+					const deferred = yield* Deferred.make<void>();
+					exitCompletion = {
 						generation: current.generation,
-						restoreFocus,
-					},
-					{
-						clearActionErrors: true,
-					},
-				);
-				yield* Deferred.await(deferred);
-			});
+						deferred,
+					};
+					publishState(
+						{
+							phase: "exiting",
+							target: current.target,
+							generation: current.generation,
+							restoreFocus,
+						},
+						{
+							clearActionErrors: true,
+						},
+					);
+					yield* Deferred.await(deferred);
+				}),
+		);
 
-		const completeEnterFx = (generation: number) =>
-			Effect.sync(() => {
-				const current = snapshot.state;
-				if (current.phase !== "entering" || current.generation !== generation) return;
-				publishState({
-					phase: "open",
-					target: current.target,
-					generation,
-				});
-			});
+		// TODO(#397): Revalidate stable concurrent-command pending settlement before
+		// removing the close command's scheduling yield.
+		const closeAtom = Atom.fn(
+			(props: CloseItemDetailProps | undefined) =>
+				Effect.yieldNow.pipe(Effect.andThen(closeFx(props))),
+			{
+				concurrent: true,
+			},
+		).pipe(Atom.setIdleTTL(0));
 
-		const completeExitFx = (generation: number) =>
-			Effect.gen(function* () {
-				const current = snapshot.state;
-				if (current.phase !== "exiting" || current.generation !== generation) return;
-				publishState(closedState);
-				yield* resolveExitCompletionFx(generation);
-			});
+		const completeEnterFx = Effect.fn("ItemDetailController.completeEnterFx")(
+			(generation: number) =>
+				Effect.sync(() => {
+					const current = snapshot.state;
+					if (current.phase !== "entering" || current.generation !== generation) return;
+					publishState({
+						phase: "open",
+						target: current.target,
+						generation,
+					});
+				}),
+		);
 
-		const runPendingActionFx = ({
-			key,
-			action,
-			failureMessage,
-			run,
-		}: RunItemDetailPendingActionProps) =>
-			Effect.suspend(() => {
-				if (
-					snapshot.state.phase === "closed" ||
-					snapshot.state.phase === "exiting" ||
-					snapshot.pendingActions.has(key)
-				) {
-					return Effect.void;
-				}
-				const outcomeScope = actionOutcomeScope(snapshot.state);
-				const pendingActions = new Map(snapshot.pendingActions);
-				pendingActions.set(key, action);
-				const actionErrors = new Map(snapshot.actionErrors);
-				actionErrors.delete(key);
-				publish({
-					...snapshot,
-					pendingActions,
-					actionErrors,
-				});
+		const completeExitFx = Effect.fn("ItemDetailController.completeExitFx")(
+			(generation: number) =>
+				Effect.gen(function* () {
+					const current = snapshot.state;
+					if (current.phase !== "exiting" || current.generation !== generation) return;
+					publishState(closedState);
+					yield* resolveExitCompletionFx(generation);
+				}),
+		);
 
-				return Effect.tryPromise({
-					try: run,
-					catch: (cause) => cause,
-				}).pipe(
-					Effect.catchAll((cause) =>
-						Effect.sync(() => {
-							if (
-								outcomeScope !== undefined &&
-								actionOutcomeScope(snapshot.state) === outcomeScope
-							) {
-								const nextErrors = new Map(snapshot.actionErrors);
-								nextErrors.set(
-									key,
-									cause instanceof Error ? cause.message : failureMessage,
-								);
+		const runPendingActionFx: ItemDetailController["runPendingActionFx"] = Effect.fn(
+			"ItemDetailController.runPendingActionFx",
+		)(
+			<Result, Failure>({
+				key,
+				action,
+				failureMessage,
+				run,
+			}: RunItemDetailPendingActionProps<Result, Failure>) =>
+				Effect.suspend((): Effect.Effect<Result | void, Failure> => {
+					if (
+						snapshot.state.phase === "closed" ||
+						snapshot.state.phase === "exiting" ||
+						snapshot.pendingActions.has(key)
+					) {
+						return Effect.void;
+					}
+					const outcomeScope = actionOutcomeScope(snapshot.state);
+					const pendingActions = new Map(snapshot.pendingActions);
+					pendingActions.set(key, action);
+					const actionErrors = new Map(snapshot.actionErrors);
+					actionErrors.delete(key);
+					publish({
+						...snapshot,
+						pendingActions,
+						actionErrors,
+					});
+
+					return run.pipe(
+						Effect.tapError((error) =>
+							Effect.sync(() => {
+								if (
+									outcomeScope !== undefined &&
+									actionOutcomeScope(snapshot.state) === outcomeScope
+								) {
+									const nextErrors = new Map(snapshot.actionErrors);
+									nextErrors.set(
+										key,
+										error instanceof Error ? error.message : failureMessage,
+									);
+									publish({
+										...snapshot,
+										actionErrors: nextErrors,
+									});
+								}
+							}),
+						),
+						Effect.ensuring(
+							Effect.sync(() => {
+								if (snapshot.pendingActions.get(key) !== action) return;
+								const nextPending = new Map(snapshot.pendingActions);
+								nextPending.delete(key);
 								publish({
 									...snapshot,
-									actionErrors: nextErrors,
+									pendingActions: nextPending,
 								});
-							}
-						}),
-					),
-					Effect.ensuring(
-						Effect.sync(() => {
-							if (snapshot.pendingActions.get(key) !== action) return;
-							const nextPending = new Map(snapshot.pendingActions);
-							nextPending.delete(key);
-							publish({
-								...snapshot,
-								pendingActions: nextPending,
-							});
-						}),
-					),
-				);
-			});
+							}),
+						),
+					);
+				}),
+		);
 
 		return {
 			getSnapshot: () => snapshot,
@@ -279,6 +308,7 @@ export const createItemDetailControllerFx = Effect.fn("createItemDetailControlle
 			readOrigin: (origin) =>
 				snapshot.state.phase === "closed" ? origin : snapshot.state.target.origin,
 			openTargetFx,
+			closeAtom,
 			closeFx,
 			completeEnterFx,
 			completeExitFx,

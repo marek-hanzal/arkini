@@ -8,7 +8,7 @@ export const runActionRouteFx = Effect.fn("runActionRouteFx")(
 	<Result, Error, Requirements>(action: Effect.Effect<Result, Error, Requirements>) =>
 		Effect.all(
 			[
-				waitForActiveViewTransitionFx().pipe(Effect.zipRight(action)),
+				waitForActiveViewTransitionFx().pipe(Effect.andThen(action)),
 				Effect.promise(
 					() =>
 						new Promise<void>((resolve) => {

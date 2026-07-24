@@ -215,7 +215,7 @@ describe("Arkpack Ed25519 trust", () => {
 			],
 		};
 		const malformedKey = await Effect.runPromise(
-			Effect.either(
+			Effect.result(
 				verifyArkpackTrustFx({
 					bytes,
 					signature,
@@ -238,10 +238,10 @@ describe("Arkpack Ed25519 trust", () => {
 			reason: "invalid-signature",
 			keyId,
 		});
-		expect(malformedKey._tag).toBe("Left");
-		if (malformedKey._tag === "Left") {
-			expect(malformedKey.left).toBeInstanceOf(ArkpackCryptoError);
-			expect(malformedKey.left.operation).toBe("import-public-key");
+		expect(malformedKey._tag).toBe("Failure");
+		if (malformedKey._tag === "Failure") {
+			expect(malformedKey.failure).toBeInstanceOf(ArkpackCryptoError);
+			expect(malformedKey.failure.operation).toBe("import-public-key");
 		}
 	});
 });

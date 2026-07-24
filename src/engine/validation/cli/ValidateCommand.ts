@@ -1,4 +1,4 @@
-import { Args, Command } from "@effect/cli";
+import { Argument, Command } from "effect/unstable/cli";
 import { Console, Effect } from "effect";
 
 import { compileGameDirectoryFx } from "~/engine/compiler/fx/compileGameDirectoryFx";
@@ -27,9 +27,7 @@ export const ValidateCommand = ({ input }: ValidateCommand.Props) =>
 	Command.make(
 		"validate",
 		{
-			input: Args.directory({
-				name: "input",
-			}).pipe(Args.withDefault(input)),
+			input: Argument.directory("input").pipe(Argument.withDefault(input)),
 		},
 		({ input }) =>
 			runValidateCommandFx({

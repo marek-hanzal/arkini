@@ -178,7 +178,9 @@ const reserveWorkerFx = Effect.fn("reserveWorkerFx")(function* ({
 }) {
 	const runtime = yield* readRuntimeFx();
 	const worker = runtime.items.find((item) => item.id === workerId);
-	if (worker === undefined) return yield* Effect.dieMessage("Worker is missing.");
+	if (worker === undefined) {
+		return yield* Effect.die(new Error("Worker is missing."));
+	}
 	yield* storeInputMaterialFx({
 		ownerItemId: employerId,
 		lineId: "line:employer:run",
@@ -192,7 +194,7 @@ const reserveWorkerFx = Effect.fn("reserveWorkerFx")(function* ({
 		lineId: "line:employer:run",
 	});
 	if (started.type !== StartLineResultEnumSchema.enum.Started)
-		return yield* Effect.dieMessage("Employer did not start.");
+		return yield* Effect.die(new Error("Employer did not start."));
 	return started.job;
 });
 

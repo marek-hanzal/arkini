@@ -1,4 +1,4 @@
-import { Effect, Either } from "effect";
+import { Effect, Result } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~/engine/game/fx/useGameFx";
@@ -32,9 +32,9 @@ const mergeAttemptFx = () =>
 		const source = before.items.find((item) => item.id === "runtime:source");
 		const target = before.items.find((item) => item.id === "runtime:target");
 		if (source === undefined || target === undefined) {
-			return yield* Effect.dieMessage("Expected merge participants.");
+			return yield* Effect.die(new Error("Expected merge participants."));
 		}
-		const attempt = yield* Effect.either(
+		const attempt = yield* Effect.result(
 			mergeItemsFx({
 				sourceItemId: source.id,
 				sourceRevision: source.revision,
@@ -141,9 +141,9 @@ describe("mergeItemsFx atomicity", () => {
 			),
 		);
 
-		expect(Either.isLeft(result.attempt)).toBe(true);
-		if (Either.isLeft(result.attempt)) {
-			expect(result.attempt.left).toMatchObject({
+		expect(Result.isFailure(result.attempt)).toBe(true);
+		if (Result.isFailure(result.attempt)) {
+			expect(result.attempt.failure).toMatchObject({
 				_tag: "PlacementUnavailableError",
 				itemId: "target",
 				remainingQuantity: 1,
@@ -188,9 +188,9 @@ describe("mergeItemsFx atomicity", () => {
 			),
 		);
 
-		expect(Either.isLeft(result.attempt)).toBe(true);
-		if (Either.isLeft(result.attempt)) {
-			expect(result.attempt.left).toMatchObject({
+		expect(Result.isFailure(result.attempt)).toBe(true);
+		if (Result.isFailure(result.attempt)) {
+			expect(result.attempt.failure).toMatchObject({
 				_tag: "PlacementUnavailableError",
 				itemId: "source",
 				reason: "item:max-count",
@@ -231,9 +231,9 @@ describe("mergeItemsFx atomicity", () => {
 			),
 		);
 
-		expect(Either.isLeft(result.attempt)).toBe(true);
-		if (Either.isLeft(result.attempt)) {
-			expect(result.attempt.left).toMatchObject({
+		expect(Result.isFailure(result.attempt)).toBe(true);
+		if (Result.isFailure(result.attempt)) {
+			expect(result.attempt.failure).toMatchObject({
 				_tag: "PlacementUnavailableError",
 				itemId: "output",
 				remainingQuantity: 1,
@@ -265,17 +265,20 @@ describe("mergeItemsFx atomicity", () => {
 		const afterRetry = Effect.runSync(
 			Effect.gen(function* () {
 				const blocked = yield* mergeAttemptFx();
-				if (Either.isRight(blocked.attempt)) {
-					return yield* Effect.dieMessage("Expected the first merge to be blocked.");
+				if (Result.isSuccess(blocked.attempt)) {
+					return yield* Effect.die(new Error("Expected the first merge to be blocked."));
 				}
 				const blocker = blocked.after.items.find((item) => item.id === "runtime:blocker");
-				if (blocker === undefined) return yield* Effect.dieMessage("Expected blocker.");
+				if (blocker === undefined) {
+					return yield* Effect.die(new Error("Expected blocker."));
+				}
 				yield* removeItemFx({
 					itemId: blocker.id,
 					revision: blocker.revision,
 				});
 				const retry = yield* mergeAttemptFx();
-				if (Either.isLeft(retry.attempt)) return yield* Effect.fail(retry.attempt.left);
+				if (Result.isFailure(retry.attempt))
+					return yield* Effect.fail(retry.attempt.failure);
 				return retry.after;
 			}).pipe(
 				useGameFx({
@@ -287,7 +290,8 @@ describe("mergeItemsFx atomicity", () => {
 		const firstTry = Effect.runSync(
 			Effect.gen(function* () {
 				const result = yield* mergeAttemptFx();
-				if (Either.isLeft(result.attempt)) return yield* Effect.fail(result.attempt.left);
+				if (Result.isFailure(result.attempt))
+					return yield* Effect.fail(result.attempt.failure);
 				return result.after;
 			}).pipe(
 				useGameFx({
@@ -342,7 +346,7 @@ describe("mergeItemsFx atomicity", () => {
 			),
 		);
 
-		expect(Either.isRight(result.attempt)).toBe(true);
+		expect(Result.isSuccess(result.attempt)).toBe(true);
 		expect(
 			result.after.items
 				.filter((item) => item.item.id === "source")

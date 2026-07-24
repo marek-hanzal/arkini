@@ -1,4 +1,4 @@
-import { Command } from "@effect/cli";
+import { Command } from "effect/unstable/cli";
 import { DesktopBuildCommand } from "./DesktopBuildCommand";
 import { DesktopChecksumsCommand } from "./DesktopChecksumsCommand";
 import { DesktopCleanCommand } from "./DesktopCleanCommand";

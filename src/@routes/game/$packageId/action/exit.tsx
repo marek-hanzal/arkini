@@ -1,7 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 
 import { closeGameEngineResourceFx } from "~/bridge/game/closeGameEngineResourceFx";
-import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import { ActionPendingPage } from "~/page/action/ActionPendingPage";
 import { runActionRouteFx } from "~/page/action/runActionRouteFx";
 
@@ -16,13 +15,8 @@ const GameExitCompletedPage = () => (
 
 export const Route = createFileRoute("/game/$packageId/action/exit")({
 	loader: async ({ context }) => {
-		const result = await RendererRuntime.runPromise(
-			runActionRouteFx(
-				closeGameEngineResourceFx({
-					queryClient: context.queryClient,
-					resource: context.gameEngineResource,
-				}),
-			),
+		const result = await context.rendererRuntime.runPromise(
+			runActionRouteFx(closeGameEngineResourceFx(context.gameEngineResource)),
 		);
 		if (result.type === "finalization-failed") {
 			console.error(

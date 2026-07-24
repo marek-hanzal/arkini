@@ -1,4 +1,4 @@
-import { Effect, Either } from "effect";
+import { Effect, Result } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~/engine/game/fx/useGameFx";
@@ -54,7 +54,7 @@ describe("authored craft lifecycle", () => {
 					ownerItemId: seed.id,
 					lineId: "line:seed:grow",
 				});
-				const secondStart = yield* Effect.either(
+				const secondStart = yield* Effect.result(
 					startLineFx({
 						ownerItemId: seed.id,
 						lineId: "line:seed:grow",
@@ -113,12 +113,12 @@ describe("authored craft lifecycle", () => {
 		);
 
 		expect(result.started.type).toBe(StartLineResultEnumSchema.enum.Started);
-		expect(Either.isLeft(result.secondStart)).toBe(true);
-		if (Either.isLeft(result.secondStart)) {
+		expect(Result.isFailure(result.secondStart)).toBe(true);
+		if (Result.isFailure(result.secondStart)) {
 			expect([
 				"JobQueueFullError",
 				"LineRunUnavailableError",
-			]).toContain(result.secondStart.left._tag);
+			]).toContain(result.secondStart.failure._tag);
 		}
 		expect(result.paused.jobs).toEqual([
 			expect.objectContaining({

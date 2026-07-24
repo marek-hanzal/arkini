@@ -5,19 +5,25 @@ import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchem
 import { EffectEnumSchema } from "~/engine/merge/schema/EffectEnumSchema";
 
 /** Bump only when intentionally changing directional-merge random compatibility. */
-export const MergeRandomVersion = 1;
+export const MergeRandomVersion = 2;
 
 const readRemainingChargesSeed = (item: RuntimeItemSchema.Type) => {
 	return item.remainingCharges ?? item.item.charges?.amount ?? "full";
 };
 
-/** Creates one deterministic random stream from stable selected merge facts. */
-export const makeMergeRandomFx = Effect.fn("makeMergeRandomFx")(function* ({
+/** Runs the owned program with deterministic random from stable selected merge facts. */
+export const makeMergeRandomFx = Effect.fn("makeMergeRandomFx")(function* <
+	Result,
+	Error,
+	Requirements,
+>({
+	program,
 	rule,
 	ruleIndex,
 	source,
 	target,
 }: {
+	program: Effect.Effect<Result, Error, Requirements>;
 	rule: MergeSchema.Type;
 	ruleIndex: number;
 	source: RuntimeItemSchema.Type;
@@ -25,22 +31,24 @@ export const makeMergeRandomFx = Effect.fn("makeMergeRandomFx")(function* ({
 }) {
 	const result = rule.effect === EffectEnumSchema.enum.Replace ? rule.result : "none";
 
-	return Random.make(
-		[
-			"arkini:merge",
-			`v${MergeRandomVersion}`,
-			source.id,
-			source.item.id,
-			source.quantity,
-			readRemainingChargesSeed(source),
-			target.id,
-			target.item.id,
-			target.quantity,
-			readRemainingChargesSeed(target),
-			ruleIndex,
-			rule.action,
-			rule.effect,
-			result,
-		].join(":"),
+	return yield* program.pipe(
+		Random.withSeed(
+			[
+				"arkini:merge",
+				`v${MergeRandomVersion}`,
+				source.id,
+				source.item.id,
+				source.quantity,
+				readRemainingChargesSeed(source),
+				target.id,
+				target.item.id,
+				target.quantity,
+				readRemainingChargesSeed(target),
+				ruleIndex,
+				rule.action,
+				rule.effect,
+				result,
+			].join(":"),
+		),
 	);
 });

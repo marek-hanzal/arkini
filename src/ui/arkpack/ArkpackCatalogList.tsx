@@ -48,7 +48,26 @@ export const ArkpackCatalogList = ({ state, onRemove }: ArkpackCatalogList.Props
 										{arkpack.title}
 									</h2>
 									<span className="rounded-full bg-surface-raised px-2 py-0.5 text-[0.65rem] font-semibold uppercase tracking-wider text-muted">
-										{arkpack.source === "built-in" ? "Official" : "Local"}
+										{match(arkpack.trust)
+											.with(
+												{
+													type: "official",
+												},
+												() => "Official",
+											)
+											.with(
+												{
+													type: "external",
+												},
+												() => "External",
+											)
+											.with(
+												{
+													type: "invalid",
+												},
+												() => "Invalid",
+											)
+											.exhaustive()}
 									</span>
 								</div>
 								<p className="mt-1 truncate text-xs text-subtle">
@@ -65,16 +84,52 @@ export const ArkpackCatalogList = ({ state, onRemove }: ArkpackCatalogList.Props
 										Remove
 									</DangerButton>
 								) : null}
-								<PrimaryButtonLink
-									to="/action/load-game/$packageId"
-									preload={false}
-									params={{
-										packageId: arkpack.packageId,
-									}}
-									className="min-h-0 px-4 py-2 text-sm shadow-none"
-								>
-									Play
-								</PrimaryButtonLink>
+								{match(arkpack.trust)
+									.with(
+										{
+											type: "official",
+										},
+										() => (
+											<PrimaryButtonLink
+												to="/action/load-game/$packageId"
+												preload={false}
+												params={{
+													packageId: arkpack.packageId,
+												}}
+												className="min-h-0 px-4 py-2 text-sm shadow-none"
+											>
+												Play
+											</PrimaryButtonLink>
+										),
+									)
+									.with(
+										{
+											type: "external",
+										},
+										() => (
+											<PrimaryButtonLink
+												to="/action/load-game/$packageId"
+												preload={false}
+												params={{
+													packageId: arkpack.packageId,
+												}}
+												className="min-h-0 px-4 py-2 text-sm shadow-none"
+											>
+												Play
+											</PrimaryButtonLink>
+										),
+									)
+									.with(
+										{
+											type: "invalid",
+										},
+										() => (
+											<span className="px-4 py-2 text-sm font-semibold text-danger">
+												Unavailable
+											</span>
+										),
+									)
+									.exhaustive()}
 							</div>
 						</article>
 					))}

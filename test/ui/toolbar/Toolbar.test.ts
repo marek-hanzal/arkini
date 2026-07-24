@@ -108,6 +108,10 @@ const createGame = (toolbarSize?: number, stored = false): GameEngine => {
 			title: config.meta.title,
 			configVersion: config.version,
 			compressedSize: 0,
+			trust: {
+				type: "external",
+				reason: "unsigned",
+			} as const,
 			source: "imported" as const,
 		},
 		config,

@@ -21,6 +21,10 @@ const descriptor = {
 	title: "Test",
 	configVersion: "1.0",
 	compressedSize: 3,
+	trust: {
+		type: "external",
+		reason: "unsigned",
+	} as const,
 	source: "imported" as const,
 	filename: "test.arkpack",
 	importedAtMs: 1,
@@ -109,5 +113,31 @@ describe("createFilesystemArkpackCatalogFx", () => {
 		await expect(Effect.runPromise(catalog.readFx("../escape"))).rejects.toThrow(
 			"Invalid imported Arkpack",
 		);
+	});
+
+	it("never trusts an imported descriptor without a persisted signature", async () => {
+		const catalog = await createCatalog();
+		await Effect.runPromise(
+			catalog.installFx({
+				descriptor: {
+					...descriptor,
+					trust: {
+						type: "official",
+						keyId: "forged-official",
+					},
+				},
+				bytes: packageBytes,
+			}),
+		);
+
+		expect(await Effect.runPromise(catalog.listFx)).toEqual([
+			{
+				...descriptor,
+				trust: {
+					type: "external",
+					reason: "unsigned",
+				},
+			},
+		]);
 	});
 });

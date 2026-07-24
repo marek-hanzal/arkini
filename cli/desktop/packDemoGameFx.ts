@@ -1,21 +1,23 @@
 import { Console, Effect } from "effect";
+
 import { packDirectoryFx } from "~/engine/pack/fx/packDirectoryFx";
 import { renderGameDiagnosticsFx } from "~/engine/validation/fx/renderGameDiagnosticsFx";
 
-export namespace packOfficialGameFx {
+export namespace packDemoGameFx {
 	export interface Props {
 		readonly gameDirectory?: string;
 	}
 }
 
-export const packOfficialGameFx = Effect.fn("packOfficialGameFx")(function* ({
-	gameDirectory = "game/arkini",
-}: packOfficialGameFx.Props = {}) {
+/** Packs the deliberately unsigned bundled demo for external-trust integration testing. */
+export const packDemoGameFx = Effect.fn("packDemoGameFx")(function* ({
+	gameDirectory = "game/demo",
+}: packDemoGameFx.Props = {}) {
 	const packed = yield* packDirectoryFx({
 		input: gameDirectory,
 		metadata: {
-			output: "game/arkini.game.arkpack.metadata.json",
-			packageId: "arkini",
+			output: "game/demo.game.arkpack.metadata.json",
+			packageId: "demo",
 		},
 	}).pipe(
 		Effect.catchTag("GameValidationError", (error) =>
@@ -23,5 +25,5 @@ export const packOfficialGameFx = Effect.fn("packOfficialGameFx")(function* ({
 		),
 	);
 	yield* renderGameDiagnosticsFx(packed.diagnostics);
-	yield* Console.log(`Packed ${packed.output} for the desktop build.`);
+	yield* Console.log(`Packed unsigned ${packed.output} for the desktop build.`);
 });

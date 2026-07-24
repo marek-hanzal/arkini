@@ -1,6 +1,7 @@
 import { Effect } from "effect";
 
 import type { ArkpackStorage } from "~/bridge/arkpack/ArkpackStorage";
+import { ArkiniTrustedKeys } from "~/bridge/arkpack/ArkiniTrustedKeys";
 import { createArkpackStorageFx } from "~/bridge/arkpack/createArkpackStorageFx";
 import { readArkpackFx } from "~/bridge/arkpack/readArkpackFx";
 
@@ -25,6 +26,9 @@ export const importArkpackFx = Effect.fn("importArkpackFx")(function* ({
 			bytes,
 			filename,
 			importedAtMs,
+			signature: {
+				trustedKeys: ArkiniTrustedKeys,
+			},
 			source: "imported",
 		});
 		yield* storage.writeFx(loaded.descriptor, bytes.slice().buffer);

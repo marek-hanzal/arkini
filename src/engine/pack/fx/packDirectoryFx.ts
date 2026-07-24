@@ -4,6 +4,8 @@ import { FileSystem, Path } from "@effect/platform";
 import { Effect } from "effect";
 
 import { compileGameDirectoryFx } from "~/engine/compiler/fx/compileGameDirectoryFx";
+import { readArkpackContentHashFx } from "~/engine/pack/fx/readArkpackContentHashFx";
+import { readArkpackSignaturePathFx } from "~/engine/pack/fx/readArkpackSignaturePathFx";
 import { assertGameConfigValidFx } from "~/engine/validation/fx/assertGameConfigValidFx";
 import { encodeFx } from "./encodeFx";
 import { ArkpackMetadataSchema } from "~/engine/pack/schema/ArkpackMetadataSchema";
@@ -21,9 +23,6 @@ export namespace packDirectoryFx {
 		};
 	}
 }
-
-const toHex = (bytes: ArrayBuffer) =>
-	Array.from(new Uint8Array(bytes), (byte) => byte.toString(16).padStart(2, "0")).join("");
 
 export const packDirectoryFx = Effect.fn("packDirectoryFx")(function* ({
 	input,
@@ -46,9 +45,7 @@ export const packDirectoryFx = Effect.fn("packDirectoryFx")(function* ({
 		resources: pngAssets,
 	});
 	const compressed = yield* Effect.promise(async () => new Uint8Array(await gzipAsync(bytes)));
-	const contentHash = yield* Effect.promise(async () =>
-		toHex(await crypto.subtle.digest("SHA-256", compressed.slice().buffer)),
-	);
+	const contentHash = yield* readArkpackContentHashFx(compressed);
 	const outputPath = path.resolve(
 		output ??
 			path.join(
@@ -61,6 +58,9 @@ export const packDirectoryFx = Effect.fn("packDirectoryFx")(function* ({
 		recursive: true,
 	});
 	yield* fileSystem.writeFile(outputPath, compressed);
+	yield* fileSystem.remove(yield* readArkpackSignaturePathFx(outputPath), {
+		force: true,
+	});
 
 	const metadataRecord =
 		metadata === undefined

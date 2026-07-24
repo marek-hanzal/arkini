@@ -1,4 +1,5 @@
 import type { PayloadSchema } from "~/engine/pack/schema/PayloadSchema";
+import type { ArkpackTrustSchema } from "~/engine/pack/schema/ArkpackTrustSchema";
 
 export type ArkpackSource = "built-in" | "imported";
 
@@ -10,6 +11,7 @@ export interface ArkpackDescriptor {
 	readonly title: string;
 	readonly configVersion: string;
 	readonly compressedSize: number;
+	readonly trust: ArkpackTrustSchema.Type;
 	readonly source: ArkpackSource;
 	readonly filename?: string;
 	readonly importedAtMs?: number;

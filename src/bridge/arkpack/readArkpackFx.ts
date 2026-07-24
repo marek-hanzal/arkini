@@ -1,7 +1,10 @@
 import { Effect } from "effect";
 
 import { ArkpackLimits } from "~/bridge/arkpack/ArkpackLimits";
+import { assertExpectedArkpackTrustFx } from "~/bridge/arkpack/assertExpectedArkpackTrustFx";
 import { decodeFx } from "~/engine/pack/fx/decodeFx";
+import { verifyArkpackTrustFx } from "~/engine/pack/fx/verifyArkpackTrustFx";
+import type { ArkpackTrustedKeysSchema } from "~/engine/pack/schema/ArkpackTrustedKeysSchema";
 import type { GameSourceProvenanceSchema } from "~/engine/source/schema/GameSourceProvenanceSchema";
 import { GameValidationError } from "~/engine/validation/error/GameValidationError";
 import { validateGameConfigFx } from "~/engine/validation/fx/validateGameConfigFx";
@@ -14,18 +17,15 @@ export namespace readArkpackFx {
 		filename?: string;
 		importedAtMs?: number;
 		packageId?: string;
+		signature: {
+			/** Official key identity required by trusted bundled content. */
+			readonly expectedKeyId?: string;
+			readonly metadata?: unknown;
+			readonly trustedKeys: ArkpackTrustedKeysSchema.Type;
+		};
 		source: "built-in" | "imported";
 	}
 }
-
-const toHex = (bytes: ArrayBuffer) =>
-	Array.from(new Uint8Array(bytes), (byte) => byte.toString(16).padStart(2, "0")).join("");
-
-const readContentHash = (bytes: Uint8Array) =>
-	Effect.tryPromise({
-		try: async () => toHex(await crypto.subtle.digest("SHA-256", bytes.slice().buffer)),
-		catch: (cause) => cause,
-	});
 
 const decompress = (bytes: Uint8Array) =>
 	Effect.tryPromise({
@@ -98,6 +98,7 @@ export const readArkpackFx = Effect.fn("readArkpackFx")(function* ({
 	filename,
 	importedAtMs,
 	packageId,
+	signature,
 	source,
 }: readArkpackFx.Props) {
 	if (bytes.byteLength > ArkpackLimits.maxCompressedBytes) {
@@ -107,7 +108,16 @@ export const readArkpackFx = Effect.fn("readArkpackFx")(function* ({
 			),
 		);
 	}
-	const contentHash = yield* readContentHash(bytes);
+	const verification = yield* verifyArkpackTrustFx({
+		bytes,
+		signature: signature.metadata,
+		trustedKeys: signature.trustedKeys,
+	});
+	yield* assertExpectedArkpackTrustFx({
+		expectedKeyId: signature.expectedKeyId,
+		trust: verification.trust,
+	});
+	const contentHash = verification.contentHash;
 	const payload = yield* decodeFx(yield* decompress(bytes));
 	for (const resource of payload.resources) {
 		if (resource.mime !== "image/png") {
@@ -157,6 +167,7 @@ export const readArkpackFx = Effect.fn("readArkpackFx")(function* ({
 			title: payload.config.meta.title,
 			configVersion: payload.config.version,
 			compressedSize: bytes.byteLength,
+			trust: verification.trust,
 			source,
 			...(filename === undefined
 				? {}

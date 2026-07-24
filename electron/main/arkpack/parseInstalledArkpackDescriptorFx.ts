@@ -1,6 +1,7 @@
 import { Effect } from "effect";
 import type { ArkiniDesktopApi } from "../../../desktop/ArkiniDesktopApi";
 import { assertImportedArkpackPackageIdFx } from "./assertImportedArkpackPackageIdFx";
+import { parseArkpackTrustFx } from "./parseArkpackTrustFx";
 
 export namespace parseInstalledArkpackDescriptorFx {
 	export interface Props {
@@ -16,6 +17,9 @@ export const parseInstalledArkpackDescriptorFx = Effect.fn("parseInstalledArkpac
 			return yield* Effect.fail(new Error("Invalid Arkpack metadata."));
 		}
 		const descriptor = value as Partial<ArkiniDesktopApi.ArkpackDescriptor>;
+		const trust = yield* parseArkpackTrustFx({
+			value: descriptor.trust,
+		});
 		yield* assertImportedArkpackPackageIdFx(descriptor.packageId ?? "");
 		if (
 			(expectedPackageId !== undefined && descriptor.packageId !== expectedPackageId) ||
@@ -24,10 +28,18 @@ export const parseInstalledArkpackDescriptorFx = Effect.fn("parseInstalledArkpac
 			typeof descriptor.title !== "string" ||
 			typeof descriptor.configVersion !== "string" ||
 			typeof descriptor.compressedSize !== "number" ||
+			trust === undefined ||
 			descriptor.source !== "imported"
 		) {
 			return yield* Effect.fail(new Error("Invalid Arkpack metadata."));
 		}
-		return descriptor as ArkiniDesktopApi.ArkpackDescriptor;
+		return {
+			...descriptor,
+			// Imported storage contains no detached signature, so persisted trust is never proof.
+			trust: {
+				type: "external",
+				reason: "unsigned",
+			},
+		} as ArkiniDesktopApi.ArkpackDescriptor;
 	},
 );

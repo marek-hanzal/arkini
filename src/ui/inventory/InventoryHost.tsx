@@ -1,6 +1,6 @@
 import { Inventory } from "~/ui/inventory/Inventory";
 import { useInventoryControl } from "~/ui/inventory/useInventoryControl";
-import { tileInventoryOverlayZIndex } from "~/ui/tile/TileActorStacking";
+import { tileInventoryOverlayZIndex } from "~/ui/tile/readTileActorStackingZIndexFx";
 
 /** Mounts the Inventory surface only while open without blocking the rest of the tile scene. */
 export const InventoryHost = () => {

@@ -5,6 +5,8 @@ import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import type { Game } from "~/bridge/game/Game";
+import { RendererLifecycleOwnerAtom } from "~/bridge/lifecycle/RendererLifecycleOwnerAtom";
+import { createRendererLifecycleFx } from "~/bridge/lifecycle/createRendererLifecycleFx";
 import { requestApplicationCloseAtom } from "~/bridge/lifecycle/requestApplicationCloseAtom";
 import { saveGameAtom } from "~/bridge/save/saveGameAtom";
 import { testArkpackConfig } from "~test/bridge/arkpack/support/createTestArkpack";
@@ -159,23 +161,31 @@ describe("game menu command atoms", () => {
 	it("requests only the native close handshake and preserves its failure", async () => {
 		const closeFailure = new Error("close rejected");
 		const requestClose = vi.fn(() => Promise.reject(closeFailure));
-		Object.defineProperty(globalThis, "window", {
-			configurable: true,
-			value: {
-				arkini: {
-					lifecycle: {
-						requestClose,
-					},
-				},
-			},
-		});
 		const registry = makeRegistry();
+		registry.set(
+			RendererLifecycleOwnerAtom,
+			Effect.runSync(
+				createRendererLifecycleFx({
+					forceClose: () => undefined,
+					requestClose,
+					waitUntilVisible: () => Promise.resolve(0),
+				}),
+			),
+		);
 
 		const exit = await runCommand(registry, requestApplicationCloseAtom, undefined);
 
 		expect(Exit.isFailure(exit)).toBe(true);
 		if (Exit.isSuccess(exit)) throw new Error("Expected native close failure.");
-		expect(Cause.findErrorOption(exit.cause)).toEqual(Option.some(closeFailure));
+		expect(Cause.findErrorOption(exit.cause)).toEqual(
+			Option.some(
+				expect.objectContaining({
+					_tag: "RendererLifecycleError",
+					cause: closeFailure,
+					operation: "request-close",
+				}),
+			),
+		);
 		expect(requestClose).toHaveBeenCalledOnce();
 	});
 });

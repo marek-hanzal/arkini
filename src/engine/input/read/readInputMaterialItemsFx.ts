@@ -1,9 +1,9 @@
-import { Effect } from "effect";
+import { Array, Effect } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeIntegerSchema";
 import { getItemsFx } from "~/engine/runtime/read/getItemsFx";
-import { isInputRuntimeItem } from "~/engine/runtime/read/isInputRuntimeItem";
+import { isInputRuntimeItemFx } from "~/engine/runtime/read/isInputRuntimeItemFx";
 
 export namespace readInputMaterialItemsFx {
 	export interface Props {
@@ -22,8 +22,9 @@ export const readInputMaterialItemsFx = Effect.fn("readInputMaterialItemsFx")(fu
 	inputIndex,
 }: readInputMaterialItemsFx.Props) {
 	const items = yield* getItemsFx();
+	const inputItems = Array.getSomes(yield* Effect.forEach(items, isInputRuntimeItemFx));
 
-	return items.filter(isInputRuntimeItem).filter((item) => {
+	return inputItems.filter((item) => {
 		return (
 			item.location.ownerItemId === ownerItemId &&
 			item.location.lineId === lineId &&

@@ -1,4 +1,4 @@
-import { Effect } from "effect";
+import { Effect, Option } from "effect";
 
 import { PlacementEnumSchema } from "~/engine/placement/schema/PlacementEnumSchema";
 import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
@@ -9,7 +9,7 @@ import { ItemNotOnBoardError } from "~/engine/item/error/ItemNotOnBoardError";
 import { isItemPureFx } from "~/engine/item/fx/purity/isItemPureFx";
 import { applyOutputPlacementFx } from "~/engine/placement/fx/applyOutputPlacementFx";
 import { reviseRuntimeItemFx } from "~/engine/runtime/fx/reviseRuntimeItemFx";
-import { isBoardRuntimeItem } from "~/engine/runtime/read/isBoardRuntimeItem";
+import { isBoardRuntimeItemFx } from "~/engine/runtime/read/isBoardRuntimeItemFx";
 import { readRuntimeItemByIdFx } from "~/engine/runtime/read/readRuntimeItemByIdFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
@@ -28,15 +28,16 @@ export namespace isolateStatefulOwnerTransitionFx {
 /** Keeps one state-owning board identity and reports the exact placement of its pure remainder. */
 export const isolateStatefulOwnerTransitionFx = Effect.fn("isolateStatefulOwnerTransitionFx")(
 	function* ({ ownerItemId, runtime }: isolateStatefulOwnerTransitionFx.Props) {
-		const owner = yield* readRuntimeItemByIdFx({
+		const runtimeOwner = yield* readRuntimeItemByIdFx({
 			itemId: ownerItemId,
 			runtime,
 		});
-		if (!isBoardRuntimeItem(owner)) {
+		const owner = Option.getOrUndefined(yield* isBoardRuntimeItemFx(runtimeOwner));
+		if (owner === undefined) {
 			return yield* Effect.fail(
 				new ItemNotOnBoardError({
-					itemId: owner.id,
-					location: owner.location,
+					itemId: runtimeOwner.id,
+					location: runtimeOwner.location,
 				}),
 			);
 		}

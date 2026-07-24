@@ -7,6 +7,8 @@ import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { ArkpackCatalog } from "~/bridge/arkpack/ArkpackCatalog";
 import { ArkpackCatalogOwnerAtom } from "~/bridge/arkpack/ArkpackCatalogOwnerAtom";
+import { createRendererLifecycleFx } from "~/bridge/lifecycle/createRendererLifecycleFx";
+import { RendererLifecycleOwnerAtom } from "~/bridge/lifecycle/RendererLifecycleOwnerAtom";
 import { LauncherAppearanceReadyAtom } from "~/ui/launcher/LauncherAppearanceReadyAtom";
 import { LauncherHeroReadyAtom } from "~/ui/launcher/LauncherHeroReadyAtom";
 import { LauncherHeroUrlAtom } from "~/ui/launcher/LauncherHeroUrlAtom";
@@ -110,6 +112,13 @@ const catalog: ArkpackCatalog = {
 	importFileFx: () => Effect.die("unused"),
 	removeFx: () => Effect.die("unused"),
 };
+const lifecycle = Effect.runSync(
+	createRendererLifecycleFx({
+		forceClose: () => undefined,
+		requestClose: () => Promise.resolve(),
+		waitUntilVisible: () => Promise.resolve(performance.now()),
+	}),
+);
 
 beforeEach(() => {
 	harness.lastPackageId = "package:last";
@@ -119,10 +128,6 @@ beforeEach(() => {
 	harness.preloadPromise = undefined;
 	harness.preloadedUrls.length = 0;
 	vi.restoreAllMocks();
-	Object.defineProperty(window, "arkini", {
-		configurable: true,
-		value: {},
-	});
 });
 
 describe("LauncherHeroAtom", () => {
@@ -136,6 +141,7 @@ describe("LauncherHeroAtom", () => {
 			refreshFx: Effect.never,
 		};
 		registry.set(ArkpackCatalogOwnerAtom, loadingCatalog);
+		registry.set(RendererLifecycleOwnerAtom, lifecycle);
 		registry.set(LauncherStartupConfigAtom, {
 			heroUrl: "/hero.png",
 		});
@@ -160,6 +166,7 @@ describe("LauncherHeroAtom", () => {
 			.mockReturnValue("blob:package-hero");
 		const revokeObjectUrl = vi.spyOn(URL, "revokeObjectURL");
 		registry.set(ArkpackCatalogOwnerAtom, catalog);
+		registry.set(RendererLifecycleOwnerAtom, lifecycle);
 		registry.set(LauncherStartupConfigAtom, {
 			heroUrl: "/hero.png",
 		});
@@ -205,6 +212,7 @@ describe("LauncherHeroAtom", () => {
 		harness.loadFailure = new Error("package removed");
 		const createObjectUrl = vi.spyOn(URL, "createObjectURL");
 		registry.set(ArkpackCatalogOwnerAtom, catalog);
+		registry.set(RendererLifecycleOwnerAtom, lifecycle);
 		registry.set(LauncherStartupConfigAtom, {
 			heroUrl: "/hero.png",
 		});
@@ -235,6 +243,7 @@ describe("LauncherHeroAtom", () => {
 		vi.spyOn(URL, "createObjectURL").mockReturnValue("blob:pending-package-hero");
 		const revokeObjectUrl = vi.spyOn(URL, "revokeObjectURL");
 		registry.set(ArkpackCatalogOwnerAtom, catalog);
+		registry.set(RendererLifecycleOwnerAtom, lifecycle);
 		registry.set(LauncherStartupConfigAtom, {
 			heroUrl: "/hero.png",
 		});

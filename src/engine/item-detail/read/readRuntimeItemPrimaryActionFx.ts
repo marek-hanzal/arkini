@@ -1,8 +1,8 @@
-import { Effect } from "effect";
+import { Effect, Option } from "effect";
 
 import { ItemEnumSchema } from "~/engine/item/schema/ItemEnumSchema";
-import { isLineOwnerItem } from "~/engine/line/read/isLineOwnerItem";
-import { readLineOwnerLines } from "~/engine/line/read/readLineOwnerLines";
+import { isLineOwnerItemFx } from "~/engine/line/read/isLineOwnerItemFx";
+import { readLineOwnerLinesFx } from "~/engine/line/read/readLineOwnerLinesFx";
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
@@ -36,7 +36,8 @@ export const readRuntimeItemPrimaryActionFx = Effect.fn("readRuntimeItemPrimaryA
 				kind: "open-inventory" as const,
 			} satisfies readRuntimeItemPrimaryActionFx.Result;
 		}
-		if (!isLineOwnerItem(item.item)) {
+		const lineOwnerItem = Option.getOrUndefined(yield* isLineOwnerItemFx(item.item));
+		if (lineOwnerItem === undefined) {
 			return {
 				kind: "none" as const,
 			} satisfies readRuntimeItemPrimaryActionFx.Result;
@@ -44,7 +45,7 @@ export const readRuntimeItemPrimaryActionFx = Effect.fn("readRuntimeItemPrimaryA
 		const defaultLineId = runtime.defaultLineByOwnerItemId?.[item.id];
 		if (
 			defaultLineId !== undefined &&
-			readLineOwnerLines(item.item).some((line) => line.id === defaultLineId)
+			(yield* readLineOwnerLinesFx(lineOwnerItem)).some((line) => line.id === defaultLineId)
 		) {
 			return {
 				kind: "start-default-line" as const,

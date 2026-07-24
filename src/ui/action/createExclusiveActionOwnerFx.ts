@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-export interface ExclusiveActionOwner<Action extends string> {
+interface ExclusiveActionOwner<Action extends string> {
 	readonly claimFx: (action: Action) => Effect.Effect<boolean>;
 	readonly getSnapshot: () => Action | null;
 	readonly releaseFx: (action: Action) => Effect.Effect<void>;

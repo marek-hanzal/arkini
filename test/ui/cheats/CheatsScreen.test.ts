@@ -14,6 +14,7 @@ import { CheatsScreen } from "~/ui/cheats/CheatsScreen";
 ).IS_REACT_ACT_ENVIRONMENT = true;
 
 const state = vi.hoisted(() => ({
+	available: true,
 	back: vi.fn(),
 	blocked: true,
 	listeners: new Set<() => void>(),
@@ -40,11 +41,24 @@ vi.mock("~/bridge/game/useGameEngine", () => ({
 		},
 	}),
 }));
-vi.mock("~/ui/cheat-availability/useCheatAvailability", () => ({
-	useCheatAvailability: () => ({
-		available: true,
-	}),
-}));
+vi.mock("~/ui/cheat-availability/useCheatAvailability", async () => {
+	const { useSyncExternalStore } = await import("react");
+	return {
+		useCheatAvailability: () => {
+			const available = useSyncExternalStore(
+				(listener) => {
+					state.listeners.add(listener);
+					return () => state.listeners.delete(listener);
+				},
+				() => state.available,
+				() => state.available,
+			);
+			return {
+				available,
+			};
+		},
+	};
+});
 vi.mock("~/ui/cheats/useCheatsModel", async () => {
 	const { useSyncExternalStore } = await import("react");
 	return {
@@ -63,7 +77,10 @@ vi.mock("~/ui/cheats/useCheatsModel", async () => {
 				instantGameplay: false,
 				requestExit: (runFx: import("effect").Effect.Effect<void, unknown>) => {
 					if (state.blocked) return;
-					void Effect.runPromise(runFx);
+					state.publishBlocked(true);
+					void Effect.runPromise(runFx)
+						.catch(() => undefined)
+						.finally(() => state.publishBlocked(false));
 				},
 				status: {
 					kind: "idle" as const,
@@ -102,6 +119,7 @@ vi.mock("~/ui/cheats/Cheats", async () => {
 const roots: Array<ReturnType<typeof createRoot>> = [];
 
 beforeEach(() => {
+	state.available = true;
 	state.back.mockReset();
 	state.blocked = true;
 	state.listeners.clear();
@@ -149,5 +167,36 @@ describe("CheatsScreen", () => {
 		});
 		expect(state.back).toHaveBeenCalledOnce();
 		expect(state.navigate).not.toHaveBeenCalled();
+	});
+
+	it("requests exactly one replacement exit when unavailable navigation rejects", async () => {
+		state.available = false;
+		state.blocked = false;
+		state.navigate.mockRejectedValueOnce(new Error("board navigation failed"));
+		const container = document.createElement("div");
+		document.body.append(container);
+		const root = createRoot(container);
+		roots.push(root);
+
+		await act(async () => {
+			root.render(createElement(CheatsScreen));
+			await Promise.resolve();
+		});
+		await vi.waitFor(() => expect(state.navigate).toHaveBeenCalledOnce());
+		await act(async () => {
+			await Promise.resolve();
+			await Promise.resolve();
+			root.render(createElement(CheatsScreen));
+		});
+
+		expect(state.navigate).toHaveBeenCalledOnce();
+		expect(state.navigate).toHaveBeenCalledWith({
+			to: "/game/$packageId/board",
+			params: {
+				packageId: "package:cheats",
+			},
+			replace: true,
+		});
+		expect(state.back).not.toHaveBeenCalled();
 	});
 });

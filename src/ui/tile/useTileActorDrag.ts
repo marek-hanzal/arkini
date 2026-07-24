@@ -1,5 +1,5 @@
 import { useAtom } from "@effect/atom-react";
-import { Cause, Option } from "effect";
+import { Cause, Effect, Option } from "effect";
 import * as AsyncResult from "effect/unstable/reactivity/AsyncResult";
 import { type PanInfo, useDragControls, useMotionValue } from "motion/react";
 import { type PointerEventHandler, useCallback, useEffect, useRef } from "react";
@@ -9,15 +9,9 @@ import { useGameEngine } from "~/bridge/game/useGameEngine";
 import { readExactCauseFailure } from "~/bridge/game/readExactCauseFailure";
 import { dropItemAtom } from "~/bridge/tile/dropItemAtom";
 import type { TileDragSource } from "~/ui/tile/TileDragSource";
-import { tileLocationForTarget } from "~/ui/tile/tileLocationForTarget";
+import { tileLocationForTargetFx } from "~/ui/tile/tileLocationForTargetFx";
 import { useTileActorInteraction } from "~/ui/tile/useTileActorInteraction";
 import { useTileActorSystem } from "~/ui/tile/useTileActorSystem";
-
-const reportDropFailure = (cause: Cause.Cause<unknown>) => {
-	if (Cause.hasInterruptsOnly(cause)) return;
-	const failure = readExactCauseFailure(cause);
-	console.error("Tile drop failed.", Option.isSome(failure) ? failure.value : cause);
-};
 
 /** Owns direct pointer dragging and one authoritative drop outcome through settlement. */
 export const useTileActorDrag = ({
@@ -150,7 +144,7 @@ export const useTileActorDrag = ({
 						kind: "slot",
 					},
 					(slot) => {
-						const location = tileLocationForTarget(slot);
+						const location = Effect.runSync(tileLocationForTargetFx(slot));
 						return location === null
 							? {
 									kind: "unsupported" as const,
@@ -213,7 +207,13 @@ export const useTileActorDrag = ({
 			return;
 		}
 		dropOwned.current = null;
-		if (AsyncResult.isFailure(dropResult)) reportDropFailure(dropResult.cause);
+		if (AsyncResult.isFailure(dropResult) && !Cause.hasInterruptsOnly(dropResult.cause)) {
+			const failure = readExactCauseFailure(dropResult.cause);
+			console.error(
+				"Tile drop failed.",
+				Option.isSome(failure) ? failure.value : dropResult.cause,
+			);
+		}
 		completeDrop(owned.source, owned.generation);
 	}, [
 		completeDrop,

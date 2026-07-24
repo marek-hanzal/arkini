@@ -10,6 +10,8 @@ import { ArkiniArkpack } from "~/bridge/arkpack/ArkiniArkpack";
 import { ArkpackCatalogAtom } from "~/bridge/arkpack/ArkpackCatalogAtom";
 import { ArkpackCatalogOwnerAtom } from "~/bridge/arkpack/ArkpackCatalogOwnerAtom";
 import { createArkpackCatalogFx } from "~/bridge/arkpack/createArkpackCatalogFx";
+import { createRendererLifecycleFx } from "~/bridge/lifecycle/createRendererLifecycleFx";
+import { RendererLifecycleOwnerAtom } from "~/bridge/lifecycle/RendererLifecycleOwnerAtom";
 import { LauncherStartupAtom } from "~/ui/launcher/LauncherStartupAtom";
 import { LauncherStartupConfigAtom } from "~/ui/launcher/LauncherStartupConfigAtom";
 
@@ -35,15 +37,10 @@ const registries: AtomRegistry.AtomRegistry[] = [];
 
 afterEach(() => {
 	for (const registry of registries.splice(0)) registry.dispose();
-	Reflect.deleteProperty(window, "arkini");
 });
 
 describe("Launcher catalog integration", () => {
 	it("drives launcher bootstrap and the Arkpacks projection from one configured owner", async () => {
-		Object.defineProperty(window, "arkini", {
-			configurable: true,
-			value: {},
-		});
 		const list = vi.fn(() => [
 			ArkiniArkpack.descriptor,
 		]);
@@ -58,6 +55,16 @@ describe("Launcher catalog integration", () => {
 		});
 		registries.push(registry);
 		registry.set(ArkpackCatalogOwnerAtom, catalog);
+		registry.set(
+			RendererLifecycleOwnerAtom,
+			Effect.runSync(
+				createRendererLifecycleFx({
+					forceClose: () => undefined,
+					requestClose: () => Promise.resolve(),
+					waitUntilVisible: () => Promise.resolve(performance.now()),
+				}),
+			),
+		);
 		registry.set(LauncherStartupConfigAtom, {
 			heroUrl: "/hero.png",
 		});

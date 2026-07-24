@@ -1,14 +1,14 @@
-import { Effect } from "effect";
+import { Effect, Option } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { isItemPureFx } from "~/engine/item/fx/purity/isItemPureFx";
-import { isSameGridLocation } from "~/engine/location/read/isSameGridLocation";
+import { isSameGridLocationFx } from "~/engine/location/read/isSameGridLocationFx";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 import type { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
 import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
 import { StackItemsUnavailableError } from "~/engine/runtime/error/StackItemsUnavailableError";
-import { isBoardRuntimeItem } from "~/engine/runtime/read/isBoardRuntimeItem";
-import { isGridRuntimeItem } from "~/engine/runtime/read/isGridRuntimeItem";
+import { isBoardRuntimeItemFx } from "~/engine/runtime/read/isBoardRuntimeItemFx";
+import { isGridRuntimeItemFx } from "~/engine/runtime/read/isGridRuntimeItemFx";
 import type { GridRuntimeItemSchema } from "~/engine/runtime/schema/GridRuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
@@ -72,43 +72,57 @@ export const readItemStackResolutionFx = Effect.fn("readItemStackResolutionFx")(
 		return blocked(StackItemsUnavailableError.Reason.SameItem);
 	}
 
-	const source = runtime.items.find((item) => item.id === sourceItemId);
-	if (source === undefined) {
+	const runtimeSource = runtime.items.find((item) => item.id === sourceItemId);
+	if (runtimeSource === undefined) {
 		return blocked(StackItemsUnavailableError.Reason.SourceNotFound);
 	}
-	const target = runtime.items.find((item) => item.id === targetItemId);
-	if (target === undefined) {
+	const runtimeTarget = runtime.items.find((item) => item.id === targetItemId);
+	if (runtimeTarget === undefined) {
 		return blocked(StackItemsUnavailableError.Reason.TargetNotFound);
 	}
-	if (source.revision !== sourceRevision) {
+	if (runtimeSource.revision !== sourceRevision) {
 		return blocked(StackItemsUnavailableError.Reason.StaleSourceRevision);
 	}
-	if (target.revision !== targetRevision) {
+	if (runtimeTarget.revision !== targetRevision) {
 		return blocked(StackItemsUnavailableError.Reason.StaleTargetRevision);
 	}
-	if (!isGridRuntimeItem(source)) {
+	const source = Option.getOrUndefined(yield* isGridRuntimeItemFx(runtimeSource));
+	if (source === undefined) {
 		return blocked(StackItemsUnavailableError.Reason.SourceNotOnGrid);
 	}
-	if (!isGridRuntimeItem(target)) {
+	const target = Option.getOrUndefined(yield* isGridRuntimeItemFx(runtimeTarget));
+	if (target === undefined) {
 		return blocked(StackItemsUnavailableError.Reason.TargetNotOnGrid);
 	}
-	if (!isSameGridLocation(source.location, sourceLocation)) {
+	if (
+		!(yield* isSameGridLocationFx({
+			left: source.location,
+			right: sourceLocation,
+		}))
+	) {
 		return blocked(StackItemsUnavailableError.Reason.StaleSourceLocation);
 	}
-	if (!isSameGridLocation(target.location, targetLocation)) {
+	if (
+		!(yield* isSameGridLocationFx({
+			left: target.location,
+			right: targetLocation,
+		}))
+	) {
 		return blocked(StackItemsUnavailableError.Reason.StaleTargetLocation);
 	}
 
+	const boardSource = Option.getOrUndefined(yield* isBoardRuntimeItemFx(source));
+	const boardTarget = Option.getOrUndefined(yield* isBoardRuntimeItemFx(target));
 	if (
-		isBoardRuntimeItem(source) &&
-		isBoardRuntimeItem(target) &&
-		source.location.space !== target.location.space
+		boardSource !== undefined &&
+		boardTarget !== undefined &&
+		boardSource.location.space !== boardTarget.location.space
 	) {
 		return blocked(StackItemsUnavailableError.Reason.CrossSpace);
 	}
-	const sourceOnBoard = isBoardRuntimeItem(source);
-	const targetOnBoard = isBoardRuntimeItem(target);
-	const boardItem = sourceOnBoard ? source : targetOnBoard ? target : undefined;
+	const sourceOnBoard = boardSource !== undefined;
+	const targetOnBoard = boardTarget !== undefined;
+	const boardItem = boardSource ?? boardTarget;
 	if (
 		sourceOnBoard !== targetOnBoard &&
 		boardItem !== undefined &&

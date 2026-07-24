@@ -5,6 +5,8 @@ import { resolveBuiltInArkpackFx } from "~/bridge/arkpack/resolveBuiltInArkpackF
 import { readAppearanceAccentFx } from "~/bridge/appearance/readAppearanceAccentFx";
 import { readAppearanceThemeFx } from "~/bridge/appearance/readAppearanceThemeFx";
 import { readCheatAvailabilityFx } from "~/bridge/cheat/readCheatAvailabilityFx";
+import { RendererLifecycleOwnerAtom } from "~/bridge/lifecycle/RendererLifecycleOwnerAtom";
+import { RendererLifecycleUnavailableError } from "~/bridge/lifecycle/RendererLifecycleUnavailableError";
 import { RendererAtomRuntime } from "~/bridge/reactivity/RendererAtomRegistry";
 import { applyLauncherAppearanceHydrationFx } from "~/ui/launcher/applyLauncherAppearanceHydrationFx";
 import { applyLauncherCheatAvailabilityHydrationFx } from "~/ui/launcher/applyLauncherCheatAvailabilityHydrationFx";
@@ -47,23 +49,19 @@ export const LauncherStartupAtom = RendererAtomRuntime.atom((get) => {
 				: Effect.fail(new Error("Arkpack catalog did not publish a ready snapshot.")),
 		),
 	);
-	const bridgeReadyFx = Effect.try({
-		try: () => {
-			if (window.arkini === undefined) {
-				throw new Error("Arkini Electron preload API is unavailable.");
-			}
-		},
-		catch: (cause) => cause,
-	});
+	const lifecycleReadyFx =
+		get(RendererLifecycleOwnerAtom) === undefined
+			? Effect.fail(new RendererLifecycleUnavailableError())
+			: Effect.void;
 	const defaultBootstrapFx = Effect.all(
 		{
 			appearance: appearanceFx,
 			builtIn: catalogFx,
 			cheatsAvailable: cheatAvailabilityFx,
-			bridge: bridgeReadyFx,
 			hero: Atom.getResult(LauncherHeroAtom, {
 				suspendOnWaiting: true,
 			}),
+			lifecycle: lifecycleReadyFx,
 		},
 		{
 			concurrency: "unbounded",

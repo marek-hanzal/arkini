@@ -8,8 +8,8 @@ import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
 import { reviseRuntimeItemFx } from "~/engine/runtime/fx/reviseRuntimeItemFx";
 import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
 import { SwapSameItemError } from "~/engine/runtime/error/SwapSameItemError";
-import { isBoardRuntimeItem } from "~/engine/runtime/read/isBoardRuntimeItem";
-import { isGridRuntimeItem } from "~/engine/runtime/read/isGridRuntimeItem";
+import { isBoardRuntimeItemFx } from "~/engine/runtime/read/isBoardRuntimeItemFx";
+import { isGridRuntimeItemFx } from "~/engine/runtime/read/isGridRuntimeItemFx";
 import { CrossSpaceBoardOperationError } from "~/engine/space/error/CrossSpaceBoardOperationError";
 import type { SwapItemsResultSchema } from "~/engine/runtime/schema/command/SwapItemsResultSchema";
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
@@ -43,23 +43,24 @@ export const swapItemsFx = Effect.fn("swapItemsFx")(function* ({
 
 	return yield* modifyRuntimeFx((runtime) => {
 		return Effect.gen(function* () {
-			const findItem = (itemId: IdSchema.Type) => {
-				return pipe(
-					runtime.items,
-					Array.findFirst((candidate) => candidate.id === itemId),
-					Option.getOrUndefined,
-				);
-			};
-			const first = findItem(firstItemId);
-			if (first === undefined) {
+			const runtimeFirst = pipe(
+				runtime.items,
+				Array.findFirst((candidate) => candidate.id === firstItemId),
+				Option.getOrUndefined,
+			);
+			if (runtimeFirst === undefined) {
 				return yield* Effect.fail(
 					new ItemNotFoundError({
 						itemId: firstItemId,
 					}),
 				);
 			}
-			const second = findItem(secondItemId);
-			if (second === undefined) {
+			const runtimeSecond = pipe(
+				runtime.items,
+				Array.findFirst((candidate) => candidate.id === secondItemId),
+				Option.getOrUndefined,
+			);
+			if (runtimeSecond === undefined) {
 				return yield* Effect.fail(
 					new ItemNotFoundError({
 						itemId: secondItemId,
@@ -67,46 +68,50 @@ export const swapItemsFx = Effect.fn("swapItemsFx")(function* ({
 				);
 			}
 			yield* assertRevisionFx({
-				actualRevision: first.revision,
-				entityId: first.id,
+				actualRevision: runtimeFirst.revision,
+				entityId: runtimeFirst.id,
 				expectedRevision: firstItemRevision,
 			});
 			yield* assertRevisionFx({
-				actualRevision: second.revision,
-				entityId: second.id,
+				actualRevision: runtimeSecond.revision,
+				entityId: runtimeSecond.id,
 				expectedRevision: secondItemRevision,
 			});
-			if (!isGridRuntimeItem(first)) {
+			const first = Option.getOrUndefined(yield* isGridRuntimeItemFx(runtimeFirst));
+			if (first === undefined) {
 				return yield* Effect.fail(
 					new ItemNotOnGridError({
 						itemId: firstItemId,
-						location: first.location,
+						location: runtimeFirst.location,
 					}),
 				);
 			}
-			if (!isGridRuntimeItem(second)) {
+			const second = Option.getOrUndefined(yield* isGridRuntimeItemFx(runtimeSecond));
+			if (second === undefined) {
 				return yield* Effect.fail(
 					new ItemNotOnGridError({
 						itemId: secondItemId,
-						location: second.location,
+						location: runtimeSecond.location,
 					}),
 				);
 			}
+			const boardFirst = Option.getOrUndefined(yield* isBoardRuntimeItemFx(first));
+			const boardSecond = Option.getOrUndefined(yield* isBoardRuntimeItemFx(second));
 			if (
-				isBoardRuntimeItem(first) &&
-				isBoardRuntimeItem(second) &&
-				first.location.space !== second.location.space
+				boardFirst !== undefined &&
+				boardSecond !== undefined &&
+				boardFirst.location.space !== boardSecond.location.space
 			) {
 				return yield* Effect.fail(
 					new CrossSpaceBoardOperationError({
-						fromSpace: first.location.space,
-						toSpace: second.location.space,
+						fromSpace: boardFirst.location.space,
+						toSpace: boardSecond.location.space,
 					}),
 				);
 			}
-			const firstOnBoard = isBoardRuntimeItem(first);
-			const secondOnBoard = isBoardRuntimeItem(second);
-			const boardItem = firstOnBoard ? first : secondOnBoard ? second : undefined;
+			const firstOnBoard = boardFirst !== undefined;
+			const secondOnBoard = boardSecond !== undefined;
+			const boardItem = boardFirst ?? boardSecond;
 			if (
 				firstOnBoard !== secondOnBoard &&
 				boardItem !== undefined &&

@@ -34,14 +34,14 @@ export namespace useSettingsModel {
 		  };
 }
 
-const errorMessage = (error: unknown) => (error instanceof Error ? error.message : String(error));
-
 /** Owns application settings commands and the one Escape lifecycle for the settings surface. */
 export const useSettingsModel = ({
 	onBackFx,
 }: {
 	readonly onBackFx: Effect.Effect<void, unknown>;
 }) => {
+	const errorMessage = (error: unknown) =>
+		error instanceof Error ? error.message : String(error);
 	const appearance = useAtomValue(AppearanceAtom);
 	const cheatAvailability = useCheatAvailability();
 	const [commandState, runCommand] = useAtom(SettingsCommandAtom);

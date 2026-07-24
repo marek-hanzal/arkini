@@ -31,7 +31,7 @@
 		"test:shard:9": "vitest run --no-color --shard=9/10",
 		"test:shard:10": "vitest run --no-color --shard=10/10",
 		"test:shards": "run-s test:shard:*",
-		"dc": "depcruise src/engine src/bridge src/ui src/page src/@routes src/main.tsx src/router.tsx src/_route.ts electron electron.vite.config.ts cli test --output-type err-long",
+		"dc": "depcruise src/engine src/bridge src/ui src/page src/@routes src/main.tsx src/createArkiniRouterFx.tsx src/_route.ts electron electron.vite.config.ts cli test --output-type err-long",
 		"check": "run-s format:check typecheck game:validate build dc test:shards",
 		"format": "biome format --write .",
 		"format:check": "biome format .",

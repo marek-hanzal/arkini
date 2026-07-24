@@ -1,7 +1,6 @@
 import { Effect } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import type { JobQueueRequestSchema } from "~/engine/job/schema/JobQueueRequestSchema";
 import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
 import { readRuntimeItemByIdFx } from "~/engine/runtime/read/readRuntimeItemByIdFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
@@ -10,8 +9,6 @@ export namespace clearItemJobQueueFx {
 	export interface Props {
 		ownerItemId: IdSchema.Type;
 	}
-
-	export type Result = ReadonlyArray<JobQueueRequestSchema.Type>;
 }
 
 /** Atomically removes every pending line-start request owned by one live item. */

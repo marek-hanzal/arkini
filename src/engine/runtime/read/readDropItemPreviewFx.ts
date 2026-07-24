@@ -4,14 +4,14 @@ import { match } from "ts-pattern";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { GameConfigFx } from "~/engine/game/context/GameConfigFx";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
-import { isItemLocationScopeAllowed } from "~/engine/location/read/isItemLocationScopeAllowed";
+import { isItemLocationScopeAllowedFx } from "~/engine/location/read/isItemLocationScopeAllowedFx";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 import { resolveDefaultLineInputStoreFx } from "~/engine/input/fx/resolveDefaultLineInputStoreFx";
-import { isSameGridLocation } from "~/engine/location/read/isSameGridLocation";
+import { isSameGridLocationFx } from "~/engine/location/read/isSameGridLocationFx";
 import { resolveMergeRuleFx } from "~/engine/merge/fx/resolveMergeRuleFx";
 import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
-import { isBoardRuntimeItem } from "~/engine/runtime/read/isBoardRuntimeItem";
-import { isGridRuntimeItem } from "~/engine/runtime/read/isGridRuntimeItem";
+import { isBoardRuntimeItemFx } from "~/engine/runtime/read/isBoardRuntimeItemFx";
+import { isGridRuntimeItemFx } from "~/engine/runtime/read/isGridRuntimeItemFx";
 import { readDropItemStackRejectedReasonFx } from "~/engine/runtime/read/readDropItemStackRejectedReasonFx";
 import { readItemStackResolutionFx } from "~/engine/runtime/read/readItemStackResolutionFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
@@ -77,25 +77,41 @@ export const readDropItemPreviewFx = Effect.fn("readDropItemPreviewFx")(function
 	if (target.kind === "unsupported") {
 		return rejected(DropItemRejectedReasonEnumSchema.enum.UnsupportedTarget);
 	}
-	if (isSameGridLocation(sourceLocation, target.location)) {
+	if (
+		yield* isSameGridLocationFx({
+			left: sourceLocation,
+			right: target.location,
+		})
+	) {
 		return {
 			kind: DropItemResultKindEnumSchema.enum.Ignored,
 			reason: DropItemIgnoredReasonEnumSchema.enum.SameLocation,
 		} satisfies readDropItemPreviewFx.Result;
 	}
 	const runtime = yield* readRuntimeFx();
-	const source = runtime.items.find((item) => item.id === sourceItemId);
-	if (source === undefined || source.revision !== sourceRevision) {
+	const runtimeSource = runtime.items.find((item) => item.id === sourceItemId);
+	if (runtimeSource === undefined || runtimeSource.revision !== sourceRevision) {
 		return rejected(DropItemRejectedReasonEnumSchema.enum.StaleSource);
 	}
-	if (!isGridRuntimeItem(source)) {
+	const source = Option.getOrUndefined(yield* isGridRuntimeItemFx(runtimeSource));
+	if (source === undefined) {
 		return rejected(DropItemRejectedReasonEnumSchema.enum.InvalidSource);
 	}
-	if (!isSameGridLocation(source.location, sourceLocation)) {
+	if (
+		!(yield* isSameGridLocationFx({
+			left: source.location,
+			right: sourceLocation,
+		}))
+	) {
 		return rejected(DropItemRejectedReasonEnumSchema.enum.StaleSource);
 	}
 	if (target.occupant === null) {
-		if (!isItemLocationScopeAllowed(source.item, target.location.scope)) {
+		if (
+			!(yield* isItemLocationScopeAllowedFx({
+				item: source.item,
+				locationScope: target.location.scope,
+			}))
+		) {
 			return rejected(DropItemRejectedReasonEnumSchema.enum.InvalidTarget);
 		}
 		const config = yield* GameConfigFx;
@@ -119,29 +135,33 @@ export const readDropItemPreviewFx = Effect.fn("readDropItemPreviewFx")(function
 	}
 
 	const targetOccupant = target.occupant;
-	const targetItem = runtime.items.find((item) => item.id === targetOccupant.itemId);
-	if (targetItem === undefined || targetItem.revision !== targetOccupant.revision) {
+	const runtimeTargetItem = runtime.items.find((item) => item.id === targetOccupant.itemId);
+	if (runtimeTargetItem === undefined || runtimeTargetItem.revision !== targetOccupant.revision) {
 		return rejected(DropItemRejectedReasonEnumSchema.enum.StaleTarget);
 	}
-	if (!isGridRuntimeItem(targetItem)) {
+	const targetItem = Option.getOrUndefined(yield* isGridRuntimeItemFx(runtimeTargetItem));
+	if (targetItem === undefined) {
 		return rejected(DropItemRejectedReasonEnumSchema.enum.InvalidTarget);
 	}
-	if (!isSameGridLocation(targetItem.location, target.location)) {
+	if (
+		!(yield* isSameGridLocationFx({
+			left: targetItem.location,
+			right: target.location,
+		}))
+	) {
 		return rejected(DropItemRejectedReasonEnumSchema.enum.StaleTarget);
 	}
+	const boardSource = Option.getOrUndefined(yield* isBoardRuntimeItemFx(source));
+	const boardTarget = Option.getOrUndefined(yield* isBoardRuntimeItemFx(targetItem));
 	if (
-		isBoardRuntimeItem(source) &&
-		isBoardRuntimeItem(targetItem) &&
-		source.location.space !== targetItem.location.space
+		boardSource !== undefined &&
+		boardTarget !== undefined &&
+		boardSource.location.space !== boardTarget.location.space
 	) {
 		return rejected(DropItemRejectedReasonEnumSchema.enum.InvalidTarget);
 	}
-	const oneBoardItem = isBoardRuntimeItem(source) !== isBoardRuntimeItem(targetItem);
-	const boardItem = isBoardRuntimeItem(source)
-		? source
-		: isBoardRuntimeItem(targetItem)
-			? targetItem
-			: undefined;
+	const oneBoardItem = (boardSource === undefined) !== (boardTarget === undefined);
+	const boardItem = boardSource ?? boardTarget;
 	if (
 		oneBoardItem &&
 		boardItem !== undefined &&
@@ -194,10 +214,15 @@ export const readDropItemPreviewFx = Effect.fn("readDropItemPreviewFx")(function
 			}),
 		);
 	}
-	if (
-		!isItemLocationScopeAllowed(source.item, targetItem.location.scope) ||
-		!isItemLocationScopeAllowed(targetItem.item, source.location.scope)
-	) {
+	const sourceScopeAllowed = yield* isItemLocationScopeAllowedFx({
+		item: source.item,
+		locationScope: targetItem.location.scope,
+	});
+	const targetScopeAllowed = yield* isItemLocationScopeAllowedFx({
+		item: targetItem.item,
+		locationScope: source.location.scope,
+	});
+	if (!sourceScopeAllowed || !targetScopeAllowed) {
 		return rejected(DropItemRejectedReasonEnumSchema.enum.InvalidTarget);
 	}
 	return {

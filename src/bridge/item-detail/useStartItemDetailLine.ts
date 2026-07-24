@@ -3,14 +3,12 @@ import { Effect } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
 import { useMemo } from "react";
 
-import type { Game } from "~/bridge/game/Game";
 import { useGameEngine } from "~/bridge/game/useGameEngine";
+import { createStartItemDetailLineAtomFx } from "~/bridge/item-detail/createStartItemDetailLineAtomFx";
 import type { ItemDetailPendingActionOwner } from "~/bridge/item-detail/ItemDetailPendingActionOwner";
 import { startLineFx } from "~/engine/job/write/startLineFx";
 
 export namespace useStartItemDetailLine {
-	export type Props = startLineFx.Props;
-
 	export interface Options {
 		/**
 		 * Stable identity for one Tile command result. It prevents unrelated Tile
@@ -29,21 +27,6 @@ export namespace useStartPendingItemDetailLine {
 	}
 }
 
-// TODO(#397): Revalidate both stable concurrent-command pending settlement boundaries in
-// this file before removing their scheduling yields.
-const createStartItemDetailLineAtom = (game: Game) =>
-	Atom.fn(
-		(command: useStartItemDetailLine.Props) =>
-			Effect.yieldNow.pipe(Effect.andThen(game.runFx(startLineFx(command)))),
-		{
-			concurrent: true,
-		},
-	).pipe(Atom.setIdleTTL(0));
-
-type StartItemDetailLineAtom = ReturnType<typeof createStartItemDetailLineAtom>;
-export type StartItemDetailLineAsyncResult =
-	StartItemDetailLineAtom extends Atom.Atom<infer Result> ? Result : never;
-
 /**
  * Owns one raw Tile start command and its isolated AsyncResult.
  *
@@ -53,7 +36,7 @@ export type StartItemDetailLineAsyncResult =
 export const useStartItemDetailLine = ({ commandKey }: useStartItemDetailLine.Options) => {
 	const game = useGameEngine();
 	const commandAtom = useMemo(
-		() => createStartItemDetailLineAtom(game),
+		() => Effect.runSync(createStartItemDetailLineAtomFx(game)),
 		[
 			commandKey,
 			game,

@@ -5,7 +5,7 @@ import { ItemNotFoundError } from "~/engine/item/error/ItemNotFoundError";
 import { ItemLocationConflictError } from "~/engine/runtime/error/ItemLocationConflictError";
 import { ItemNotOnGridError } from "~/engine/item/error/ItemNotOnGridError";
 import { readGridLocationOccupantsFx } from "~/engine/location/read/readGridLocationOccupantsFx";
-import { isSameGridLocation } from "~/engine/location/read/isSameGridLocation";
+import { isSameGridLocationFx } from "~/engine/location/read/isSameGridLocationFx";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 import { assertRevisionFx } from "~/engine/revision/fx/assertRevisionFx";
 import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
@@ -13,7 +13,7 @@ import { LocationOccupiedError } from "~/engine/runtime/error/LocationOccupiedEr
 import { CrossSpaceBoardOperationError } from "~/engine/space/error/CrossSpaceBoardOperationError";
 import { reviseRuntimeItemFx } from "~/engine/runtime/fx/reviseRuntimeItemFx";
 import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
-import { isGridRuntimeItem } from "~/engine/runtime/read/isGridRuntimeItem";
+import { isGridRuntimeItemFx } from "~/engine/runtime/read/isGridRuntimeItemFx";
 import type { MoveItemResultSchema } from "~/engine/runtime/schema/command/MoveItemResultSchema";
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
@@ -39,12 +39,12 @@ export const moveItemFx = Effect.fn("moveItemFx")(function* ({
 }: moveItemFx.Props) {
 	return yield* modifyRuntimeFx((runtime) => {
 		return Effect.gen(function* () {
-			const item = pipe(
+			const runtimeItem = pipe(
 				runtime.items,
 				Array.findFirst((candidate) => candidate.id === itemId),
 				Option.getOrUndefined,
 			);
-			if (item === undefined) {
+			if (runtimeItem === undefined) {
 				return yield* Effect.fail(
 					new ItemNotFoundError({
 						itemId,
@@ -52,22 +52,26 @@ export const moveItemFx = Effect.fn("moveItemFx")(function* ({
 				);
 			}
 			yield* assertRevisionFx({
-				actualRevision: item.revision,
-				entityId: item.id,
+				actualRevision: runtimeItem.revision,
+				entityId: runtimeItem.id,
 				expectedRevision: revision,
 			});
-			if (!isGridRuntimeItem(item)) {
+			const item = Option.getOrUndefined(yield* isGridRuntimeItemFx(runtimeItem));
+			if (item === undefined) {
 				return yield* Effect.fail(
 					new ItemNotOnGridError({
 						itemId,
-						location: item.location,
+						location: runtimeItem.location,
 					}),
 				);
 			}
 
 			if (
 				expectedLocation !== undefined &&
-				!isSameGridLocation(item.location, expectedLocation)
+				!(yield* isSameGridLocationFx({
+					left: item.location,
+					right: expectedLocation,
+				}))
 			) {
 				return yield* Effect.fail(
 					new ItemLocationConflictError({
@@ -77,7 +81,12 @@ export const moveItemFx = Effect.fn("moveItemFx")(function* ({
 					}),
 				);
 			}
-			if (isSameGridLocation(item.location, location)) {
+			if (
+				yield* isSameGridLocationFx({
+					left: item.location,
+					right: location,
+				})
+			) {
 				return [
 					{
 						item,
@@ -113,10 +122,11 @@ export const moveItemFx = Effect.fn("moveItemFx")(function* ({
 				);
 			}
 
+			const gridItems = Array.getSomes(
+				yield* Effect.forEach(runtime.items, isGridRuntimeItemFx),
+			);
 			const [occupants] = yield* readGridLocationOccupantsFx({
-				items: runtime.items
-					.filter(isGridRuntimeItem)
-					.filter((candidate) => candidate.id !== itemId),
+				items: gridItems.filter((candidate) => candidate.id !== itemId),
 				locations: [
 					location,
 				],

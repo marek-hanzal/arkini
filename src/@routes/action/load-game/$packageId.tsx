@@ -19,27 +19,23 @@ const loadGameRouteFx = Effect.fn("loadGameRouteFx")((packageId: string) =>
 	),
 );
 
-const redirectToOwnedGame = (ownedPackageId: string, requestedPackageId: string): never => {
-	throw redirect({
-		to: "/game/$packageId/action/leave",
-		params: {
-			packageId: ownedPackageId,
-		},
-		search: {
-			destination: "game",
-			packageId: requestedPackageId,
-		},
-		replace: true,
-	});
-};
-
 export const Route = createFileRoute("/action/load-game/$packageId")({
 	beforeLoad: ({ context, params }) => {
 		const resource = context.rendererRuntime.runSync(readCurrentGameEngineResourceFx());
 		if (resource === null) return;
 		resource.assertUsable();
 		if (resource.game.arkpack.packageId === params.packageId) return;
-		return redirectToOwnedGame(resource.game.arkpack.packageId, params.packageId);
+		throw redirect({
+			to: "/game/$packageId/action/leave",
+			params: {
+				packageId: resource.game.arkpack.packageId,
+			},
+			search: {
+				destination: "game",
+				packageId: params.packageId,
+			},
+			replace: true,
+		});
 	},
 	loader: async ({ abortController, context, params }) => {
 		const completed = await context.rendererRuntime.runPromiseExit(
@@ -61,7 +57,17 @@ export const Route = createFileRoute("/action/load-game/$packageId")({
 		}
 		const resource = completed.value;
 		if (resource.game.arkpack.packageId !== params.packageId) {
-			return redirectToOwnedGame(resource.game.arkpack.packageId, params.packageId);
+			throw redirect({
+				to: "/game/$packageId/action/leave",
+				params: {
+					packageId: resource.game.arkpack.packageId,
+				},
+				search: {
+					destination: "game",
+					packageId: params.packageId,
+				},
+				replace: true,
+			});
 		}
 		resource.assertUsable();
 		throw redirect({

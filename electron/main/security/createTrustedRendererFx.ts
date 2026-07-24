@@ -8,10 +8,8 @@ import type {
 	WebContentsWillRedirectEventParams,
 } from "electron";
 import { Effect } from "effect";
-import {
-	parseRendererDevelopmentUrl,
-	RendererDevelopmentServer,
-} from "../../security/RendererDevelopmentUrl";
+import { RendererDevelopmentServer } from "../../security/RendererDevelopmentUrl";
+import { parseRendererDevelopmentUrlFx } from "../../security/parseRendererDevelopmentUrlFx";
 import { ElectronMainError } from "../ElectronMainError";
 import type { TrustedRenderer } from "./TrustedRenderer";
 
@@ -22,145 +20,158 @@ export namespace createTrustedRendererFx {
 	}
 }
 
-const readDevelopmentRendererUrl = ({
-	isPackaged,
-	developmentRendererUrl,
-}: createTrustedRendererFx.Props) => {
-	if (isPackaged || developmentRendererUrl === undefined) return undefined;
-	const parsed = parseRendererDevelopmentUrl(developmentRendererUrl);
-	if (parsed.origin !== RendererDevelopmentServer.origin) {
-		throw new Error(
-			`Electron development renderer must use ${RendererDevelopmentServer.origin}.`,
-		);
-	}
-	return parsed.href;
-};
-
 export const createTrustedRendererFx = Effect.fn("createTrustedRendererFx")(
 	(props: createTrustedRendererFx.Props) =>
-		Effect.try({
-			try: (): TrustedRenderer => {
-				const developmentRendererUrl = readDevelopmentRendererUrl(props);
-				const trustedOrigin = new URL(developmentRendererUrl ?? "arkini://app/");
-				const trustedWebContents = new Map<number, WebContents>();
-				const isTrustedUrl = (candidate: string) => {
-					try {
-						const parsed = new URL(candidate);
-						if (parsed.username !== "" || parsed.password !== "") return false;
-						if (developmentRendererUrl !== undefined) {
+		Effect.gen(function* () {
+			const developmentRendererUrl =
+				props.isPackaged || props.developmentRendererUrl === undefined
+					? undefined
+					: (yield* parseRendererDevelopmentUrlFx(props.developmentRendererUrl)).href;
+			if (
+				developmentRendererUrl !== undefined &&
+				new URL(developmentRendererUrl).origin !== RendererDevelopmentServer.origin
+			) {
+				return yield* Effect.fail(
+					new Error(
+						`Electron development renderer must use ${RendererDevelopmentServer.origin}.`,
+					),
+				);
+			}
+			return yield* Effect.try({
+				try: (): TrustedRenderer => {
+					const trustedOrigin = new URL(developmentRendererUrl ?? "arkini://app/");
+					const trustedWebContents = new Map<number, WebContents>();
+					const isTrustedUrl = (candidate: string) => {
+						try {
+							const parsed = new URL(candidate);
+							if (parsed.username !== "" || parsed.password !== "") return false;
+							if (developmentRendererUrl !== undefined) {
+								return (
+									(parsed.protocol === "http:" || parsed.protocol === "https:") &&
+									parsed.origin === trustedOrigin.origin
+								);
+							}
 							return (
-								(parsed.protocol === "http:" || parsed.protocol === "https:") &&
+								parsed.protocol === "arkini:" &&
+								parsed.hostname === "app" &&
+								parsed.port === "" &&
 								parsed.origin === trustedOrigin.origin
 							);
+						} catch {
+							return false;
 						}
+					};
+					const isTrustedIpcSender = (event: IpcMainEvent | IpcMainInvokeEvent) => {
+						const expected = trustedWebContents.get(event.sender.id);
+						const frame = event.senderFrame;
 						return (
-							parsed.protocol === "arkini:" &&
-							parsed.hostname === "app" &&
-							parsed.port === "" &&
-							parsed.origin === trustedOrigin.origin
+							expected === event.sender &&
+							!event.sender.isDestroyed() &&
+							frame !== null &&
+							frame === event.sender.mainFrame &&
+							isTrustedUrl(frame.url)
 						);
-					} catch {
-						return false;
-					}
-				};
-				const isTrustedIpcSender = (event: IpcMainEvent | IpcMainInvokeEvent) => {
-					const expected = trustedWebContents.get(event.sender.id);
-					const frame = event.senderFrame;
-					return (
-						expected === event.sender &&
-						!event.sender.isDestroyed() &&
-						frame !== null &&
-						frame === event.sender.mainFrame &&
-						isTrustedUrl(frame.url)
-					);
-				};
-				const assertTrustedIpcSenderFx: TrustedRenderer["assertTrustedIpcSenderFx"] =
-					Effect.fn("TrustedRenderer.assertTrustedIpcSenderFx")(function* (event) {
-						if (isTrustedIpcSender(event)) return;
-						return yield* Effect.fail(
-							new ElectronMainError({
-								operation: "authorize privileged IPC from the Arkini renderer",
-								cause: {
-									senderId: event.sender.id,
-									senderFrameUrl: event.senderFrame?.url ?? null,
+					};
+					const assertTrustedIpcSenderFx: TrustedRenderer["assertTrustedIpcSenderFx"] =
+						Effect.fn("TrustedRenderer.assertTrustedIpcSenderFx")(function* (event) {
+							if (isTrustedIpcSender(event)) return;
+							return yield* Effect.fail(
+								new ElectronMainError({
+									operation: "authorize privileged IPC from the Arkini renderer",
+									cause: {
+										senderId: event.sender.id,
+										senderFrameUrl: event.senderFrame?.url ?? null,
+									},
+								}),
+							);
+						});
+					const registerWindowFx: TrustedRenderer["registerWindowFx"] = Effect.fn(
+						"TrustedRenderer.registerWindowFx",
+					)((window) =>
+						Effect.sync(() => {
+							const { webContents } = window;
+							const { session } = webContents;
+							trustedWebContents.set(webContents.id, webContents);
+
+							const preventUntrustedMainFrameNavigation = (
+								event: Event<
+									| WebContentsWillNavigateEventParams
+									| WebContentsWillRedirectEventParams
+								>,
+							) => {
+								if (!event.isMainFrame || !isTrustedUrl(event.url))
+									event.preventDefault();
+							};
+							const preventSubframeOrUntrustedNavigation = (
+								event: Event<WebContentsWillFrameNavigateEventParams>,
+							) => {
+								if (!event.isMainFrame || !isTrustedUrl(event.url))
+									event.preventDefault();
+							};
+							const preventWebview = (event: Event) => event.preventDefault();
+
+							webContents.setWindowOpenHandler(() => ({
+								action: "deny",
+							}));
+							webContents.on("will-navigate", preventUntrustedMainFrameNavigation);
+							webContents.on("will-redirect", preventUntrustedMainFrameNavigation);
+							webContents.on(
+								"will-frame-navigate",
+								preventSubframeOrUntrustedNavigation,
+							);
+							webContents.on("will-attach-webview", preventWebview);
+							session.setPermissionCheckHandler(() => false);
+							session.setPermissionRequestHandler(
+								(_contents, _permission, callback) => {
+									callback(false);
 								},
-							}),
-						);
-					});
-				const registerWindowFx: TrustedRenderer["registerWindowFx"] = Effect.fn(
-					"TrustedRenderer.registerWindowFx",
-				)((window) =>
-					Effect.sync(() => {
-						const { webContents } = window;
-						const { session } = webContents;
-						trustedWebContents.set(webContents.id, webContents);
+							);
 
-						const preventUntrustedMainFrameNavigation = (
-							event: Event<
-								| WebContentsWillNavigateEventParams
-								| WebContentsWillRedirectEventParams
-							>,
-						) => {
-							if (!event.isMainFrame || !isTrustedUrl(event.url))
-								event.preventDefault();
-						};
-						const preventSubframeOrUntrustedNavigation = (
-							event: Event<WebContentsWillFrameNavigateEventParams>,
-						) => {
-							if (!event.isMainFrame || !isTrustedUrl(event.url))
-								event.preventDefault();
-						};
-						const preventWebview = (event: Event) => event.preventDefault();
+							window.once("closed", () => {
+								if (trustedWebContents.get(webContents.id) === webContents) {
+									trustedWebContents.delete(webContents.id);
+								}
+								if (!webContents.isDestroyed()) {
+									webContents.removeListener(
+										"will-navigate",
+										preventUntrustedMainFrameNavigation,
+									);
+									webContents.removeListener(
+										"will-redirect",
+										preventUntrustedMainFrameNavigation,
+									);
+									webContents.removeListener(
+										"will-frame-navigate",
+										preventSubframeOrUntrustedNavigation,
+									);
+									webContents.removeListener(
+										"will-attach-webview",
+										preventWebview,
+									);
+								}
+								session.setPermissionCheckHandler(null);
+								session.setPermissionRequestHandler(null);
+							});
+						}),
+					);
 
-						webContents.setWindowOpenHandler(() => ({
-							action: "deny",
-						}));
-						webContents.on("will-navigate", preventUntrustedMainFrameNavigation);
-						webContents.on("will-redirect", preventUntrustedMainFrameNavigation);
-						webContents.on("will-frame-navigate", preventSubframeOrUntrustedNavigation);
-						webContents.on("will-attach-webview", preventWebview);
-						session.setPermissionCheckHandler(() => false);
-						session.setPermissionRequestHandler((_contents, _permission, callback) => {
-							callback(false);
-						});
-
-						window.once("closed", () => {
-							if (trustedWebContents.get(webContents.id) === webContents) {
-								trustedWebContents.delete(webContents.id);
-							}
-							if (!webContents.isDestroyed()) {
-								webContents.removeListener(
-									"will-navigate",
-									preventUntrustedMainFrameNavigation,
-								);
-								webContents.removeListener(
-									"will-redirect",
-									preventUntrustedMainFrameNavigation,
-								);
-								webContents.removeListener(
-									"will-frame-navigate",
-									preventSubframeOrUntrustedNavigation,
-								);
-								webContents.removeListener("will-attach-webview", preventWebview);
-							}
-							session.setPermissionCheckHandler(null);
-							session.setPermissionRequestHandler(null);
-						});
+					return {
+						developmentRendererUrl,
+						isTrustedUrl,
+						isTrustedIpcSender,
+						assertTrustedIpcSenderFx,
+						registerWindowFx,
+					};
+				},
+				catch: (cause) => cause,
+			});
+		}).pipe(
+			Effect.mapError(
+				(cause) =>
+					new ElectronMainError({
+						operation: "configure the trusted Arkini renderer origin",
+						cause,
 					}),
-				);
-
-				return {
-					developmentRendererUrl,
-					isTrustedUrl,
-					isTrustedIpcSender,
-					assertTrustedIpcSenderFx,
-					registerWindowFx,
-				};
-			},
-			catch: (cause) =>
-				new ElectronMainError({
-					operation: "configure the trusted Arkini renderer origin",
-					cause,
-				}),
-		}),
+			),
+		),
 );

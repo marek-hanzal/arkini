@@ -14,9 +14,10 @@ import { act, createElement, useSyncExternalStore } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { ArkiniElectronApi } from "../../../electron/contract/ArkiniElectronApi";
 import { CheatAvailabilityAtom } from "~/bridge/cheat/CheatAvailabilityAtom";
 import type { Game } from "~/bridge/game/Game";
+import { createRendererLifecycleFx } from "~/bridge/lifecycle/createRendererLifecycleFx";
+import { RendererLifecycleOwnerAtom } from "~/bridge/lifecycle/RendererLifecycleOwnerAtom";
 import { RendererAtomRegistry } from "~/bridge/reactivity/RendererAtomRegistry";
 import { GameMenu } from "~/ui/game-menu/GameMenu";
 import { GameMenuProvider } from "~/ui/game-menu/GameMenuProvider";
@@ -167,17 +168,19 @@ const renderMenu = async ({
 	readonly cheatsAvailable?: boolean;
 	readonly requestClose?: () => Promise<void>;
 } = {}) => {
-	Object.defineProperty(window, "arkini", {
-		configurable: true,
-		value: {
-			lifecycle: {
-				requestClose,
-			},
-		} as unknown as ArkiniElectronApi.Api,
-	});
 	const container = document.createElement("div");
 	document.body.append(container);
 	RendererAtomRegistry.set(CheatAvailabilityAtom, cheatsAvailable);
+	RendererAtomRegistry.set(
+		RendererLifecycleOwnerAtom,
+		Effect.runSync(
+			createRendererLifecycleFx({
+				forceClose: () => undefined,
+				requestClose,
+				waitUntilVisible: () => Promise.resolve(performance.now()),
+			}),
+		),
+	);
 	let menuMounted = true;
 	const menuMountListeners = new Set<() => void>();
 	const setMenuMounted = (mounted: boolean) => {
@@ -500,7 +503,9 @@ describe("GameMenu", () => {
 
 		await act(async () => buttonByText(container, "Save and exit").click());
 		await vi.waitFor(() =>
-			expect(container.textContent).toContain("Save and exit failed: disk full"),
+			expect(container.textContent).toContain(
+				"Save and exit failed: Renderer lifecycle failed during request-close: disk full",
+			),
 		);
 		expect(router.state.location.pathname).toBe("/game/package:menu/board");
 	});

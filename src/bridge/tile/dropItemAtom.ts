@@ -1,6 +1,7 @@
+import { Effect } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
 
-import { makeExactGameAtomFamily } from "~/bridge/game/makeExactGameAtomFamily";
+import { makeExactGameAtomFamilyFx } from "~/bridge/game/makeExactGameAtomFamilyFx";
 import { dropItemFx } from "~/engine/runtime/write/dropItemFx";
 
 export namespace dropItemAtom {
@@ -9,8 +10,10 @@ export namespace dropItemAtom {
 }
 
 /** Runs one atomic item drop through one exact live Game command runtime. */
-export const dropItemAtom = makeExactGameAtomFamily((game) =>
-	Atom.fn((props: dropItemAtom.Props) => game.runFx(dropItemFx(props)), {
-		concurrent: false,
-	}).pipe(Atom.setIdleTTL(0)),
+export const dropItemAtom = Effect.runSync(
+	makeExactGameAtomFamilyFx((game) =>
+		Atom.fn((props: dropItemAtom.Props) => game.runFx(dropItemFx(props)), {
+			concurrent: false,
+		}).pipe(Atom.setIdleTTL(0)),
+	),
 );

@@ -1,4 +1,4 @@
-import { Effect } from "effect";
+import { Effect, Option } from "effect";
 
 import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
@@ -17,7 +17,7 @@ import { applyOutputPlacementFx } from "~/engine/placement/fx/applyOutputPlaceme
 import type { OutputPlacementResultSchema } from "~/engine/placement/schema/OutputPlacementResultSchema";
 import { removeRuntimeItemIdentityFx } from "~/engine/runtime/fx/removeRuntimeItemIdentityFx";
 import { reviseRuntimeItemFx } from "~/engine/runtime/fx/reviseRuntimeItemFx";
-import { isBoardRuntimeItem } from "~/engine/runtime/read/isBoardRuntimeItem";
+import { isBoardRuntimeItemFx } from "~/engine/runtime/read/isBoardRuntimeItemFx";
 import { readRuntimeItemByIdFx } from "~/engine/runtime/read/readRuntimeItemByIdFx";
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
@@ -43,15 +43,16 @@ export const spendItemChargesFx = Effect.fn("spendItemChargesFx")(function* ({
 	job,
 	runtime,
 }: spendItemChargesFx.Props) {
-	const item = yield* readRuntimeItemByIdFx({
+	const runtimeItem = yield* readRuntimeItemByIdFx({
 		itemId,
 		runtime,
 	});
-	if (!isBoardRuntimeItem(item)) {
+	const item = Option.getOrUndefined(yield* isBoardRuntimeItemFx(runtimeItem));
+	if (item === undefined) {
 		return yield* Effect.fail(
 			new ItemNotOnBoardError({
-				itemId: item.id,
-				location: item.location,
+				itemId: runtimeItem.id,
+				location: runtimeItem.location,
 			}),
 		);
 	}

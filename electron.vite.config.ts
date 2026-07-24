@@ -5,8 +5,9 @@ import { randomBytes } from "node:crypto";
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { defineConfig } from "electron-vite";
-import { createRendererDevelopmentContentSecurityPolicy } from "./electron/security/RendererContentSecurityPolicy";
+import { Effect } from "effect";
 import { RendererDevelopmentServer } from "./electron/security/RendererDevelopmentUrl";
+import { createRendererDevelopmentContentSecurityPolicyFx } from "./electron/security/createRendererDevelopmentContentSecurityPolicyFx";
 
 export default defineConfig(({ command }) => {
 	const developmentCspNonce =
@@ -44,11 +45,12 @@ export default defineConfig(({ command }) => {
 					developmentCspNonce === undefined
 						? undefined
 						: {
-								"Content-Security-Policy":
-									createRendererDevelopmentContentSecurityPolicy({
+								"Content-Security-Policy": Effect.runSync(
+									createRendererDevelopmentContentSecurityPolicyFx({
 										developmentUrl: RendererDevelopmentServer,
 										nonce: developmentCspNonce,
 									}),
+								),
 							},
 			},
 			html:

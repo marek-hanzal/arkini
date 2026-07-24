@@ -1,9 +1,18 @@
-import { Effect } from "effect";
+import { Effect, Option } from "effect";
 
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
 import { ItemDetailTabEnumSchema } from "~/engine/item-detail/schema/ItemDetailTabEnumSchema";
-import { isLineOwnerItem } from "~/engine/line/read/isLineOwnerItem";
+import { isLineOwnerItemFx } from "~/engine/line/read/isLineOwnerItemFx";
 import { ItemEnumSchema } from "~/engine/item/schema/ItemEnumSchema";
+
+type ItemDetailTabsTarget =
+	| {
+			readonly kind: "runtime";
+			readonly item: RuntimeItemSchema.Type | undefined;
+	  }
+	| {
+			readonly kind: "definition";
+	  };
 
 export namespace readItemDetailTabsFx {
 	export type SourcesAvailability =
@@ -15,17 +24,8 @@ export namespace readItemDetailTabsFx {
 				readonly kind: "unavailable";
 		  };
 
-	export type Target =
-		| {
-				readonly kind: "runtime";
-				readonly item: RuntimeItemSchema.Type | undefined;
-		  }
-		| {
-				readonly kind: "definition";
-		  };
-
 	export interface Props {
-		readonly target: Target;
+		readonly target: ItemDetailTabsTarget;
 		readonly sources?: SourcesAvailability;
 	}
 }
@@ -69,9 +69,10 @@ export const readItemDetailTabsFx = Effect.fn("readItemDetailTabsFx")(function* 
 }: readItemDetailTabsFx.Props) {
 	if (target.kind === "definition") return withSources(infoTab, sources);
 	if (target.item === undefined) return noTabs;
-	if (!isLineOwnerItem(target.item.item)) return withSources(infoTab, sources);
+	const lineOwnerItem = Option.getOrUndefined(yield* isLineOwnerItemFx(target.item.item));
+	if (lineOwnerItem === undefined) return withSources(infoTab, sources);
 	return withSources(
-		target.item.item.type === ItemEnumSchema.enum.Producer && target.item.item.maxQueueSize > 1
+		lineOwnerItem.type === ItemEnumSchema.enum.Producer && lineOwnerItem.maxQueueSize > 1
 			? queuedProducerTabs
 			: lineOwnerTabs,
 		sources,

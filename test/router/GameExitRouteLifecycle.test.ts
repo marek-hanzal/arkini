@@ -185,7 +185,6 @@ describe("game exit action route", () => {
 			await loading;
 		});
 
-		expect(rendererRuntime.runSync(readCurrentGameEngineResourceFx())).toBe(resource);
 		expect(progressValue(container)).toBe(100);
 		expect(container.textContent).not.toContain("Retry");
 		expect(container.textContent).not.toContain("Force");
@@ -199,9 +198,14 @@ describe("game exit action route", () => {
 			operation: "game-leave",
 			cause: failure,
 		});
+		const currentFailure = rendererRuntime.runSync(
+			readCurrentGameEngineResourceFx().pipe(Effect.flip),
+		);
+		expect(currentFailure).toBe(loggedCause);
+		expect(() => resource.assertUsable()).toThrow(loggedCause);
 	});
 
-	it("uses a retained fail-stop resource for the terminal close attempt", async () => {
+	it("joins the retained fail-stop finalization for the terminal close attempt", async () => {
 		let disposeAttempts = 0;
 		const firstFailure = new Error("ordinary leave failed");
 		const game = createGame(
@@ -218,6 +222,9 @@ describe("game exit action route", () => {
 		await leaving;
 		expect(() => resource.assertUsable()).toThrow();
 		expect(disposeAttempts).toBe(1);
+		const firstLifecycleFailure = rendererRuntime.runSync(
+			readCurrentGameEngineResourceFx().pipe(Effect.flip),
+		);
 
 		const exiting = router.navigate({
 			to: "/game/$packageId/action/exit",
@@ -230,8 +237,11 @@ describe("game exit action route", () => {
 		await vi.advanceTimersByTimeAsync(2_500);
 		await exiting;
 
-		expect(disposeAttempts).toBe(2);
-		expect(rendererRuntime.runSync(readCurrentGameEngineResourceFx())).toBeNull();
+		expect(disposeAttempts).toBe(1);
+		const terminalLifecycleFailure = rendererRuntime.runSync(
+			readCurrentGameEngineResourceFx().pipe(Effect.flip),
+		);
+		expect(terminalLifecycleFailure).toBe(firstLifecycleFailure);
 		expect(router.state.location.pathname).toBe(`/game/${packageId}/action/exit`);
 	});
 });

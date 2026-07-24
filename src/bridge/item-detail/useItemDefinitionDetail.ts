@@ -35,38 +35,35 @@ const unavailable = {
 	kind: "unavailable",
 } as const satisfies useItemDefinitionDetail.Projection;
 
-const sameTags = (left: readonly string[], right: readonly string[]) =>
-	left.length === right.length && left.every((tag, index) => tag === right[index]);
-
-const sameProjection = (
-	left: useItemDefinitionDetail.Projection,
-	right: useItemDefinitionDetail.Projection,
-) => {
-	if (left.kind !== right.kind) return false;
-	if (left.kind === "unavailable" || right.kind === "unavailable") return true;
-	return (
-		left.itemId === right.itemId &&
-		left.title === right.title &&
-		left.subtitle === right.subtitle &&
-		left.sourceUrl === right.sourceUrl &&
-		left.compositeUrl === right.compositeUrl &&
-		left.description === right.description &&
-		left.itemType === right.itemType &&
-		left.categoryTitle === right.categoryTitle &&
-		sameTags(left.tags, right.tags) &&
-		left.storageScope === right.storageScope &&
-		left.maxStackSize === right.maxStackSize &&
-		left.ownedQuantity === right.ownedQuantity &&
-		left.maxCount === right.maxCount &&
-		left.totalCharges === right.totalCharges
-	);
-};
-
 /** Projects authored Item Detail facts for a configured item that has no required live instance. */
 export const useItemDefinitionDetail = (
 	itemId: IdSchema.Type,
 ): useItemDefinitionDetail.Projection => {
 	const game = useGameEngine();
+	const isEqual = useCallback(
+		(left: useItemDefinitionDetail.Projection, right: useItemDefinitionDetail.Projection) => {
+			if (left.kind !== right.kind) return false;
+			if (left.kind === "unavailable" || right.kind === "unavailable") return true;
+			return (
+				left.itemId === right.itemId &&
+				left.title === right.title &&
+				left.subtitle === right.subtitle &&
+				left.sourceUrl === right.sourceUrl &&
+				left.compositeUrl === right.compositeUrl &&
+				left.description === right.description &&
+				left.itemType === right.itemType &&
+				left.categoryTitle === right.categoryTitle &&
+				left.tags.length === right.tags.length &&
+				left.tags.every((tag, index) => tag === right.tags[index]) &&
+				left.storageScope === right.storageScope &&
+				left.maxStackSize === right.maxStackSize &&
+				left.ownedQuantity === right.ownedQuantity &&
+				left.maxCount === right.maxCount &&
+				left.totalCharges === right.totalCharges
+			);
+		},
+		[],
+	);
 	const selector = useCallback(
 		(runtime: RuntimeSchema.Type): useItemDefinitionDetail.Projection => {
 			const item = game.config.items[itemId];
@@ -117,5 +114,5 @@ export const useItemDefinitionDetail = (
 			itemId,
 		],
 	);
-	return useRuntimeSelector(game, selector, sameProjection);
+	return useRuntimeSelector(game, selector, isEqual);
 };

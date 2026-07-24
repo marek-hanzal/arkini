@@ -5,12 +5,12 @@ import { match } from "ts-pattern";
 import { setCheatEnabledAtom } from "~/bridge/cheat/setCheatEnabledAtom";
 import { setInstantGameplayAtom } from "~/bridge/cheat/setInstantGameplayAtom";
 import type { Game } from "~/bridge/game/Game";
-import { makeExactGameAtomFamily } from "~/bridge/game/makeExactGameAtomFamily";
+import { makeExactGameAtomFamilyFx } from "~/bridge/game/makeExactGameAtomFamilyFx";
 import { readExactCauseFailure } from "~/bridge/game/readExactCauseFailure";
 
-export namespace updateGameCheatsAtom {
-	export type Action = "cheat-mode" | "instant-gameplay" | "exit";
+type UpdateGameCheatsAction = "cheat-mode" | "instant-gameplay" | "exit";
 
+export namespace updateGameCheatsAtom {
 	export type Command =
 		| {
 				readonly action: "cheat-mode";
@@ -31,16 +31,16 @@ export namespace updateGameCheatsAtom {
 		  }
 		| {
 				readonly kind: "pending";
-				readonly action: Action;
+				readonly action: UpdateGameCheatsAction;
 		  }
 		| {
 				readonly kind: "error";
-				readonly action: Action;
+				readonly action: UpdateGameCheatsAction;
 				readonly error: unknown;
 		  }
 		| {
 				readonly kind: "saved";
-				readonly action: Exclude<Action, "exit">;
+				readonly action: Exclude<UpdateGameCheatsAction, "exit">;
 		  };
 }
 
@@ -51,75 +51,79 @@ export namespace updateGameCheatsAtom {
  * TODO(#397): Revalidate stable writable-authority admission and both settlement yields;
  * the registry remains the sole pending/result truth.
  */
-export const updateGameCheatsAtom = makeExactGameAtomFamily((game: Game) => {
-	const stateAtom = Atom.make<updateGameCheatsAtom.State>({
-		kind: "idle",
-	}).pipe(Atom.setIdleTTL(0));
-	const runnerAtom = Atom.fn(
-		(command: updateGameCheatsAtom.Command, get) =>
-			Effect.gen(function* () {
-				const commandFx = match(command)
-					.with(
-						{
-							action: "cheat-mode",
-						},
-						({ enabled }) => get.setResult(setCheatEnabledAtom(game), enabled),
-					)
-					.with(
-						{
-							action: "instant-gameplay",
-						},
-						({ enabled }) => get.setResult(setInstantGameplayAtom(game), enabled),
-					)
-					.with(
-						{
-							action: "exit",
-						},
-						({ runFx }) => runFx.pipe(Effect.andThen(Effect.yieldNow)),
-					)
-					.exhaustive();
-				const exit = yield* Effect.exit(commandFx.pipe(Effect.andThen(Effect.yieldNow)));
-				if (Exit.isFailure(exit)) {
-					if (Cause.hasInterruptsOnly(exit.cause)) {
-						return yield* Effect.failCause(exit.cause);
-					}
-					const failure = readExactCauseFailure(exit.cause);
-					yield* Atom.set(stateAtom, {
-						kind: "error",
-						action: command.action,
-						error: Option.isSome(failure) ? failure.value : exit.cause,
-					});
-					return;
-				}
-				yield* Atom.set(
-					stateAtom,
-					command.action === "exit"
-						? {
-								kind: "idle",
-							}
-						: {
-								kind: "saved",
-								action: command.action,
+export const updateGameCheatsAtom = Effect.runSync(
+	makeExactGameAtomFamilyFx((game: Game) => {
+		const stateAtom = Atom.make<updateGameCheatsAtom.State>({
+			kind: "idle",
+		}).pipe(Atom.setIdleTTL(0));
+		const runnerAtom = Atom.fn(
+			(command: updateGameCheatsAtom.Command, get) =>
+				Effect.gen(function* () {
+					const commandFx = match(command)
+						.with(
+							{
+								action: "cheat-mode",
 							},
-				);
-			}),
-		{
-			concurrent: true,
-		},
-	).pipe(Atom.setIdleTTL(0));
+							({ enabled }) => get.setResult(setCheatEnabledAtom(game), enabled),
+						)
+						.with(
+							{
+								action: "instant-gameplay",
+							},
+							({ enabled }) => get.setResult(setInstantGameplayAtom(game), enabled),
+						)
+						.with(
+							{
+								action: "exit",
+							},
+							({ runFx }) => runFx.pipe(Effect.andThen(Effect.yieldNow)),
+						)
+						.exhaustive();
+					const exit = yield* Effect.exit(
+						commandFx.pipe(Effect.andThen(Effect.yieldNow)),
+					);
+					if (Exit.isFailure(exit)) {
+						if (Cause.hasInterruptsOnly(exit.cause)) {
+							return yield* Effect.failCause(exit.cause);
+						}
+						const failure = readExactCauseFailure(exit.cause);
+						yield* Atom.set(stateAtom, {
+							kind: "error",
+							action: command.action,
+							error: Option.isSome(failure) ? failure.value : exit.cause,
+						});
+						return;
+					}
+					yield* Atom.set(
+						stateAtom,
+						command.action === "exit"
+							? {
+									kind: "idle",
+								}
+							: {
+									kind: "saved",
+									action: command.action,
+								},
+					);
+				}),
+			{
+				concurrent: true,
+			},
+		).pipe(Atom.setIdleTTL(0));
 
-	return Atom.writable(
-		(get) => {
-			get(runnerAtom);
-			return get(stateAtom);
-		},
-		(context, command: updateGameCheatsAtom.Command) => {
-			if (context.get(stateAtom).kind === "pending") return;
-			context.set(stateAtom, {
-				kind: "pending",
-				action: command.action,
-			});
-			context.set(runnerAtom, command);
-		},
-	).pipe(Atom.setIdleTTL(0));
-});
+		return Atom.writable(
+			(get) => {
+				get(runnerAtom);
+				return get(stateAtom);
+			},
+			(context, command: updateGameCheatsAtom.Command) => {
+				if (context.get(stateAtom).kind === "pending") return;
+				context.set(stateAtom, {
+					kind: "pending",
+					action: command.action,
+				});
+				context.set(runnerAtom, command);
+			},
+		).pipe(Atom.setIdleTTL(0));
+	}),
+);

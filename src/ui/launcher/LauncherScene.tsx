@@ -19,15 +19,15 @@ const contentSlotClassNames = {
 	"fixed-hero": "flex size-full min-h-0 min-w-0 flex-col items-center justify-start",
 } as const;
 
-export namespace LauncherScene {
-	export type Layout = keyof typeof layoutClassNames;
+type LauncherSceneLayout = keyof typeof layoutClassNames;
 
+export namespace LauncherScene {
 	export interface Props extends PropsWithChildren {
 		readonly className?: string;
 		readonly compactHero?: boolean;
 		readonly dataUi: string;
 		readonly foregroundOverlay?: ReactNode;
-		readonly layout?: Layout;
+		readonly layout?: LauncherSceneLayout;
 		readonly overlay?: ReactNode;
 	}
 }

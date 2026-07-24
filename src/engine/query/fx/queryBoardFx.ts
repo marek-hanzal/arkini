@@ -1,10 +1,10 @@
-import { Effect } from "effect";
+import { Array, Effect } from "effect";
 
 import { distanceFx } from "~/engine/distance/fx/distanceFx";
 import type { BoardLocationSchema } from "~/engine/location/schema/BoardLocationSchema";
 import type { QueryBoardSchema } from "~/engine/query/schema/QueryBoardSchema";
 import { getItemsFx } from "~/engine/runtime/read/getItemsFx";
-import { isBoardRuntimeItem } from "~/engine/runtime/read/isBoardRuntimeItem";
+import { isBoardRuntimeItemFx } from "~/engine/runtime/read/isBoardRuntimeItemFx";
 import { queryItemsFx } from "./queryItemsFx";
 
 export namespace queryBoardFx {
@@ -22,14 +22,16 @@ export const queryBoardFx = Effect.fn("queryBoardFx")(function* ({
 	query,
 }: queryBoardFx.Props) {
 	const items = yield* getItemsFx();
+	const boardItems = Array.getSomes(yield* Effect.forEach(items, isBoardRuntimeItemFx));
 	const selected = yield* queryItemsFx({
-		items: items
-			.filter(isBoardRuntimeItem)
-			.filter((item) => item.location.space === origin.space),
+		items: boardItems.filter((item) => item.location.space === origin.space),
 		selector: query.selector,
 	});
+	const selectedBoardItems = Array.getSomes(
+		yield* Effect.forEach(selected, isBoardRuntimeItemFx),
+	);
 
-	return yield* Effect.filter(selected.filter(isBoardRuntimeItem), (item) => {
+	return yield* Effect.filter(selectedBoardItems, (item) => {
 		return distanceFx({
 			distance: query.distance,
 			item: item.location.position,

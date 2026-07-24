@@ -5,7 +5,7 @@ import { readArkpackPrivateKeyFx } from "~/engine/pack/fx/readArkpackPrivateKeyF
 import { signArkpackFileFx } from "~/engine/pack/fx/signArkpackFileFx";
 import { handleArkpackInputErrorFx } from "./handleArkpackInputErrorFx";
 
-export namespace runArkpackSignFx {
+namespace runArkpackSignFx {
 	export interface Props {
 		readonly arkpackPath: string;
 		readonly keyId: string;

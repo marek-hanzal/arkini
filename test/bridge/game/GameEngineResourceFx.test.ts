@@ -3,11 +3,11 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { CriticalGameLifecycleError } from "~/bridge/game/CriticalGameLifecycleError";
 import type { Game } from "~/bridge/game/Game";
+import { GameEngineResourceLayer } from "~/bridge/game/GameEngineResourceLayer";
 import type { GameEngineResource } from "~/bridge/game/GameEngineResource";
 import { GameEngineResourceFx, type GameEngineLease } from "~/bridge/game/GameEngineResourceFx";
 import { GameSaveBootstrapError } from "~/bridge/game/GameSaveBootstrapError";
 import { createGameEngineResourceFx } from "~/bridge/game/createGameEngineResourceFx";
-import { GameEngineResourceLayer } from "~/bridge/game/createGameEngineResourceServiceFx";
 import { testArkpackConfig } from "~test/bridge/arkpack/support/createTestArkpack";
 import { makeTestGameTransitionFieldsFx } from "~test/support/game/makeTestGameTransitionFieldsFx";
 import { testGameRead } from "~test/support/game/testGameRead";
@@ -662,7 +662,8 @@ describe("GameEngineResourceFx", () => {
 				Effect.andThen(Effect.fail(releaseFailure)),
 			),
 		});
-		const failedHarness = createHarness(() => Effect.succeed(failedResource));
+		const createFailedResourceFx = vi.fn(() => Effect.succeed(failedResource));
+		const failedHarness = createHarness(createFailedResourceFx);
 		const failedOwner = failedHarness.startLease("package:failed");
 		await failedHarness.adopt(await failedOwner.promise);
 		const failedFirst = failedHarness.release(failedResource);
@@ -684,8 +685,23 @@ describe("GameEngineResourceFx", () => {
 			cause: releaseFailure,
 		});
 		expect(failedDispose).toHaveBeenCalledOnce();
-		expect(await failedHarness.current()).toBe(failedResource);
+		await expect(failedHarness.current()).rejects.toBe(firstFailure);
 		expect(() => failedResource.assertUsable()).toThrow(firstFailure);
+		await expect(failedHarness.claimForClose()).resolves.toBe(failedResource);
+		await expect(failedHarness.release(failedResource)).rejects.toBe(firstFailure);
+		await expect(failedHarness.reset(failedResource)).rejects.toBe(firstFailure);
+		const failedSamePackage = failedHarness.startLease("package:failed");
+		const failedOtherPackage = failedHarness.startLease("package:next");
+		await expect(failedSamePackage.promise).rejects.toBe(firstFailure);
+		await expect(failedOtherPackage.promise).rejects.toBe(firstFailure);
+		await expect(failedHarness.close(failedResource)).resolves.toEqual({
+			type: "finalization-failed",
+			cause: firstFailure,
+		});
+		expect(failedDispose).toHaveBeenCalledOnce();
+		expect(createFailedResourceFx).toHaveBeenCalledOnce();
+		await failedSamePackage.close();
+		await failedOtherPackage.close();
 		await failedOwner.close();
 	});
 
@@ -817,7 +833,7 @@ describe("GameEngineResourceFx", () => {
 		await owner.close();
 	});
 
-	it("uses the resource save key for reset and keeps failed cleanup retryable", async () => {
+	it("permanently fail-stops after reset cleanup fails", async () => {
 		const discard = vi.fn();
 		const resource = makeResource({
 			packageId: "package:reset",
@@ -825,15 +841,12 @@ describe("GameEngineResourceFx", () => {
 		});
 		const clearFailure = new Error("clear failed");
 		const clearedKeys: Array<Game["saveKey"]> = [];
-		let clearAttempts = 0;
-		const harness = createHarness(
-			() => Effect.succeed(resource),
-			(key) =>
-				Effect.suspend(() => {
-					clearedKeys.push(key);
-					clearAttempts += 1;
-					return clearAttempts === 1 ? Effect.fail(clearFailure) : Effect.void;
-				}),
+		const createResourceFx = vi.fn(() => Effect.succeed(resource));
+		const harness = createHarness(createResourceFx, (key) =>
+			Effect.suspend(() => {
+				clearedKeys.push(key);
+				return Effect.fail(clearFailure);
+			}),
 		);
 		const owner = harness.startLease("package:reset");
 		await harness.adopt(await owner.promise);
@@ -847,16 +860,29 @@ describe("GameEngineResourceFx", () => {
 			operation: "game-reset",
 			cause: clearFailure,
 		});
-		expect(await harness.current()).toBe(resource);
+		await expect(harness.current()).rejects.toBe(firstFailure);
 		expect(() => resource.assertUsable()).toThrow(firstFailure);
+		await expect(harness.claimForClose()).resolves.toBe(resource);
 
-		await expect(harness.reset(resource)).resolves.toBeUndefined();
-		expect(discard).toHaveBeenCalledTimes(2);
+		await expect(harness.reset(resource)).rejects.toBe(firstFailure);
+		await expect(harness.release(resource)).rejects.toBe(firstFailure);
+		await expect(harness.recoverFailedSave("package:reset")).rejects.toBe(firstFailure);
+		await expect(harness.discardFailed("package:reset")).rejects.toBe(firstFailure);
+		const samePackage = harness.startLease("package:reset");
+		const otherPackage = harness.startLease("package:other");
+		await expect(samePackage.promise).rejects.toBe(firstFailure);
+		await expect(otherPackage.promise).rejects.toBe(firstFailure);
+		await expect(harness.close(resource)).resolves.toEqual({
+			type: "finalization-failed",
+			cause: firstFailure,
+		});
+		expect(discard).toHaveBeenCalledOnce();
 		expect(clearedKeys).toEqual([
 			resource.game.saveKey,
-			resource.game.saveKey,
 		]);
-		expect(await harness.current()).toBeNull();
+		expect(createResourceFx).toHaveBeenCalledOnce();
+		await samePackage.close();
+		await otherPackage.close();
 		await owner.close();
 	});
 

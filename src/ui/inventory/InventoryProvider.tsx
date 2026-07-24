@@ -14,17 +14,16 @@ const focusableSelector = [
 	'[tabindex]:not([tabindex="-1"])',
 ].join(",");
 
-const canRestoreFocus = (element: HTMLElement) =>
-	element.isConnected &&
-	element.matches(focusableSelector) &&
-	element.getAttribute("aria-disabled") !== "true" &&
-	element.closest("[hidden], [inert]") === null &&
-	element.style.display !== "none" &&
-	element.style.visibility !== "hidden" &&
-	element.style.pointerEvents !== "none";
-
 /** Owns the idempotent open/close lifecycle of one non-modal Inventory surface. */
 export const InventoryProvider = ({ children }: PropsWithChildren) => {
+	const canRestoreFocus = (element: HTMLElement) =>
+		element.isConnected &&
+		element.matches(focusableSelector) &&
+		element.getAttribute("aria-disabled") !== "true" &&
+		element.closest("[hidden], [inert]") === null &&
+		element.style.display !== "none" &&
+		element.style.visibility !== "hidden" &&
+		element.style.pointerEvents !== "none";
 	const [controller] = useState(() => RendererRuntime.runSync(createInventoryControllerFx()));
 	const state = useSyncExternalStore(
 		controller.subscribe,

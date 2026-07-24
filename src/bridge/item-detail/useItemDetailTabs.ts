@@ -23,17 +23,17 @@ export namespace useItemDetailTabs {
 		  };
 }
 
-const sameTabs = (
-	left: readonly useItemDetailTabs.Tab[],
-	right: readonly useItemDetailTabs.Tab[],
-) => left.length === right.length && left.every((tab, index) => tab === right[index]);
-
 export const useItemDetailTabs = (
 	target: useItemDetailTabs.Target,
 	sources: useItemDetailSources.Projection,
 ): readonly useItemDetailTabs.Tab[] => {
 	const game = useGameEngine();
 	const { itemId, kind } = target;
+	const isEqual = useCallback(
+		(left: readonly useItemDetailTabs.Tab[], right: readonly useItemDetailTabs.Tab[]) =>
+			left.length === right.length && left.every((tab, index) => tab === right[index]),
+		[],
+	);
 	const selector = useCallback(
 		(runtime: RuntimeSchema.Type) =>
 			game.readOrThrow(
@@ -57,5 +57,5 @@ export const useItemDetailTabs = (
 			sources,
 		],
 	);
-	return useRuntimeSelector(game, selector, sameTabs);
+	return useRuntimeSelector(game, selector, isEqual);
 };

@@ -25,24 +25,23 @@ const unavailable = {
 	kind: "unavailable",
 } as const satisfies useItemDetailIdentity.Projection;
 
-const sameProjection = (
-	left: useItemDetailIdentity.Projection,
-	right: useItemDetailIdentity.Projection,
-) => {
-	if (left.kind !== right.kind) return false;
-	if (left.kind === "unavailable" || right.kind === "unavailable") return true;
-	return (
-		left.itemId === right.itemId &&
-		left.title === right.title &&
-		left.subtitle === right.subtitle &&
-		left.sourceUrl === right.sourceUrl &&
-		left.compositeUrl === right.compositeUrl
-	);
-};
-
 /** Resolves the shared live identity rendered by the shared Item Detail header. */
 export const useItemDetailIdentity = (itemId: IdSchema.Type): useItemDetailIdentity.Projection => {
 	const game = useGameEngine();
+	const isEqual = useCallback(
+		(left: useItemDetailIdentity.Projection, right: useItemDetailIdentity.Projection) => {
+			if (left.kind !== right.kind) return false;
+			if (left.kind === "unavailable" || right.kind === "unavailable") return true;
+			return (
+				left.itemId === right.itemId &&
+				left.title === right.title &&
+				left.subtitle === right.subtitle &&
+				left.sourceUrl === right.sourceUrl &&
+				left.compositeUrl === right.compositeUrl
+			);
+		},
+		[],
+	);
 	const selector = useCallback(
 		(runtime: RuntimeSchema.Type): useItemDetailIdentity.Projection => {
 			const identity = game.readOrThrow(
@@ -75,5 +74,5 @@ export const useItemDetailIdentity = (itemId: IdSchema.Type): useItemDetailIdent
 			itemId,
 		],
 	);
-	return useRuntimeSelector(game, selector, sameProjection);
+	return useRuntimeSelector(game, selector, isEqual);
 };

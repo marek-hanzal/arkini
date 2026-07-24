@@ -1,9 +1,12 @@
 import { useAtomSet, useAtomValue } from "@effect/atom-react";
 import { useNavigate } from "@tanstack/react-router";
-import { Cause } from "effect";
+import { Cause, Effect, Fiber } from "effect";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { match, P } from "ts-pattern";
 
+import { RendererLifecycleOwnerAtom } from "~/bridge/lifecycle/RendererLifecycleOwnerAtom";
+import { RendererLifecycleUnavailableError } from "~/bridge/lifecycle/RendererLifecycleUnavailableError";
+import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import { completeLauncherSplashAtom } from "~/ui/launcher/completeLauncherSplashAtom";
 import { LauncherStartupAtom } from "~/ui/launcher/LauncherStartupAtom";
 import { LauncherVisualReadyAtom } from "~/ui/launcher/LauncherVisualReadyAtom";
@@ -46,29 +49,40 @@ export namespace useStartupSplashLifecycle {
 export const useStartupSplashLifecycle = () => {
 	const startup = useAtomValue(LauncherStartupAtom);
 	const visualReady = useAtomValue(LauncherVisualReadyAtom);
+	const lifecycle = useAtomValue(RendererLifecycleOwnerAtom);
 	const completeSplash = useAtomSet(completeLauncherSplashAtom);
 	const retryStartup = useAtomSet(retryLauncherStartupAtom);
 	const navigate = useNavigate();
 	const [visibleAtMs, setVisibleAtMs] = useState<number | null>(null);
 	const [blackHoldComplete, setBlackHoldComplete] = useState(false);
 	const [minimumSplashComplete, setMinimumSplashComplete] = useState(false);
+	const [visibilityError, setVisibilityError] = useState<unknown | null>(null);
+	const [visibilityAttempt, setVisibilityAttempt] = useState(0);
 	const [navigationError, setNavigationError] = useState<unknown | null>(null);
 	const navigationStartedRef = useRef(false);
 	const canContinue =
 		startup._tag === "Success" && !startup.waiting && blackHoldComplete && visualReady;
 
 	useEffect(() => {
-		let active = true;
-		void window.arkini.lifecycle
-			.waitUntilVisible()
-			.then((nextVisibleAtMs) => {
-				if (active) setVisibleAtMs(nextVisibleAtMs);
-			})
-			.catch(() => undefined);
+		if (lifecycle === undefined) {
+			setVisibilityError(new RendererLifecycleUnavailableError());
+			return;
+		}
+		const fiber = RendererRuntime.runFork(
+			lifecycle.waitUntilVisibleFx.pipe(
+				Effect.match({
+					onFailure: (error) => setVisibilityError(error),
+					onSuccess: (nextVisibleAtMs) => setVisibleAtMs(nextVisibleAtMs),
+				}),
+			),
+		);
 		return () => {
-			active = false;
+			void RendererRuntime.runFork(Fiber.interrupt(fiber));
 		};
-	}, []);
+	}, [
+		lifecycle,
+		visibilityAttempt,
+	]);
 
 	useEffect(() => {
 		if (visibleAtMs === null) return;
@@ -132,6 +146,11 @@ export const useStartupSplashLifecycle = () => {
 	]);
 
 	const retry = useCallback(() => {
+		if (visibilityError !== null) {
+			setVisibilityError(null);
+			setVisibilityAttempt((attempt) => attempt + 1);
+			return;
+		}
 		if (navigationError !== null) {
 			complete();
 			return;
@@ -141,10 +160,12 @@ export const useStartupSplashLifecycle = () => {
 		complete,
 		navigationError,
 		retryStartup,
+		visibilityError,
 	]);
 
+	const lifecycleError = visibilityError ?? navigationError;
 	const content: useStartupSplashLifecycle.Content =
-		navigationError === null
+		lifecycleError === null
 			? startup.waiting
 				? {
 						kind: "loading",
@@ -188,85 +209,94 @@ export const useStartupSplashLifecycle = () => {
 			: {
 					kind: "failure",
 					message:
-						navigationError instanceof Error
-							? navigationError.message
-							: String(navigationError),
+						lifecycleError instanceof Error
+							? lifecycleError.message
+							: String(lifecycleError),
 				};
 
-	const view = match([
-		blackHoldComplete,
-		visualReady,
-		startup.waiting,
-		startup,
-	] as const)
-		.with(
-			[
-				false,
-				P._,
-				P._,
-				P._,
-			],
-			(): useStartupSplashLifecycle.View => ({
-				kind: "black",
-			}),
-		)
-		.with(
-			[
-				true,
-				false,
-				true,
-				P._,
-			],
-			[
-				true,
-				false,
-				false,
-				{
-					_tag: "Initial",
-				},
-			],
-			[
-				true,
-				false,
-				false,
-				{
-					_tag: "Success",
-				},
-			],
-			(): useStartupSplashLifecycle.View => ({
-				kind: "black",
-			}),
-		)
-		.with(
-			[
-				true,
-				false,
-				false,
-				{
-					_tag: "Failure",
-				},
-			],
-			([, , , failed]): useStartupSplashLifecycle.View => {
-				const error = Cause.squash(failed.cause);
-				return {
+	const view: useStartupSplashLifecycle.View =
+		visibilityError === null
+			? match([
+					blackHoldComplete,
+					visualReady,
+					startup.waiting,
+					startup,
+				] as const)
+					.with(
+						[
+							false,
+							P._,
+							P._,
+							P._,
+						],
+						(): useStartupSplashLifecycle.View => ({
+							kind: "black",
+						}),
+					)
+					.with(
+						[
+							true,
+							false,
+							true,
+							P._,
+						],
+						[
+							true,
+							false,
+							false,
+							{
+								_tag: "Initial",
+							},
+						],
+						[
+							true,
+							false,
+							false,
+							{
+								_tag: "Success",
+							},
+						],
+						(): useStartupSplashLifecycle.View => ({
+							kind: "black",
+						}),
+					)
+					.with(
+						[
+							true,
+							false,
+							false,
+							{
+								_tag: "Failure",
+							},
+						],
+						([, , , failed]): useStartupSplashLifecycle.View => {
+							const error = Cause.squash(failed.cause);
+							return {
+								kind: "failure",
+								message: error instanceof Error ? error.message : String(error),
+							};
+						},
+					)
+					.with(
+						[
+							true,
+							true,
+							P._,
+							P._,
+						],
+						(): useStartupSplashLifecycle.View => ({
+							kind: "scene",
+							content,
+						}),
+					)
+					.exhaustive()
+			: {
 					kind: "failure",
-					message: error instanceof Error ? error.message : String(error),
+					message:
+						visibilityError instanceof Error
+							? visibilityError.message
+							: String(visibilityError),
 				};
-			},
-		)
-		.with(
-			[
-				true,
-				true,
-				P._,
-				P._,
-			],
-			(): useStartupSplashLifecycle.View => ({
-				kind: "scene",
-				content,
-			}),
-		)
-		.exhaustive();
 
 	return {
 		view,

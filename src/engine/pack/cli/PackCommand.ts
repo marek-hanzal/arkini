@@ -15,7 +15,7 @@ export namespace PackCommand {
 	}
 }
 
-export namespace runPackCommandFx {
+namespace runPackCommandFx {
 	export interface Props {
 		readonly input: string;
 		readonly metadata?: PackCommand.Props["metadata"];

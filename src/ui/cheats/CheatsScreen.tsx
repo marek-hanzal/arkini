@@ -1,6 +1,6 @@
 import { useNavigate, useRouter } from "@tanstack/react-router";
 import { Effect } from "effect";
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useRef } from "react";
 
 import { useGameEngine } from "~/bridge/game/useGameEngine";
 import { useCheatAvailability } from "~/ui/cheat-availability/useCheatAvailability";
@@ -14,6 +14,7 @@ export const CheatsScreen = () => {
 	const router = useRouter();
 	const navigate = useNavigate();
 	const model = useCheatsModel(game);
+	const unavailableExitRequestedRef = useRef(false);
 
 	const returnToBoardFx = useCallback(
 		({ replace = false }: { readonly replace?: boolean } = {}) => {
@@ -44,16 +45,21 @@ export const CheatsScreen = () => {
 	const returnToBoard = useCallback(
 		(options?: { readonly replace?: boolean }) => model.requestExit(returnToBoardFx(options)),
 		[
-			model,
+			model.requestExit,
 			returnToBoardFx,
 		],
 	);
 
 	useEffect(() => {
-		if (!cheatAvailability.available)
-			returnToBoard({
-				replace: true,
-			});
+		if (cheatAvailability.available) {
+			unavailableExitRequestedRef.current = false;
+			return;
+		}
+		if (unavailableExitRequestedRef.current) return;
+		unavailableExitRequestedRef.current = true;
+		returnToBoard({
+			replace: true,
+		});
 	}, [
 		cheatAvailability.available,
 		returnToBoard,

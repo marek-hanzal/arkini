@@ -16,15 +16,6 @@ const focusableSelector = [
 	'[tabindex]:not([tabindex="-1"])',
 ].join(",");
 
-const canRestoreFocus = (element: HTMLElement) =>
-	element.isConnected &&
-	element.matches(focusableSelector) &&
-	!element.hidden &&
-	element.closest("[inert]") === null &&
-	element.style.display !== "none" &&
-	element.style.visibility !== "hidden" &&
-	element.style.pointerEvents !== "none";
-
 /** Owns Item Detail focus entry, containment, and exact actor restoration. */
 export const useItemDetailFocus = ({
 	phase,
@@ -58,7 +49,16 @@ export const useItemDetailFocus = ({
 		return () => {
 			if (!restoreFocusRef.current) return;
 			const latestOrigin = originRef.current;
-			if (latestOrigin !== null && canRestoreFocus(latestOrigin)) {
+			if (
+				latestOrigin !== null &&
+				latestOrigin.isConnected &&
+				latestOrigin.matches(focusableSelector) &&
+				!latestOrigin.hidden &&
+				latestOrigin.closest("[inert]") === null &&
+				latestOrigin.style.display !== "none" &&
+				latestOrigin.style.visibility !== "hidden" &&
+				latestOrigin.style.pointerEvents !== "none"
+			) {
 				latestOrigin.focus();
 				return;
 			}

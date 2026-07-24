@@ -1,4 +1,4 @@
-import { Effect } from "effect";
+import { Array, Effect } from "effect";
 
 import type { GameEngine } from "~/bridge/game/GameEngine";
 import type { TileActorItem } from "~/bridge/tile/TileActorItem";
@@ -6,7 +6,7 @@ import { readRuntimeItemPrimaryAssetIdFx } from "~/engine/item/read/readRuntimeI
 import { readRuntimeItemPrimaryActionFx } from "~/engine/item-detail/read/readRuntimeItemPrimaryActionFx";
 import { resolveActiveJobStatusFx } from "~/engine/job/fx/resolveActiveJobStatusFx";
 import { JobStatusEnumSchema } from "~/engine/job/schema/read/JobStatusEnumSchema";
-import { isGridRuntimeItem } from "~/engine/runtime/read/isGridRuntimeItem";
+import { isGridRuntimeItemFx } from "~/engine/runtime/read/isGridRuntimeItemFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
 export namespace readTileActorsFx {
@@ -27,8 +27,9 @@ export const readTileActorsFx = Effect.fn("readTileActorsFx")(function* ({
 			job,
 		]),
 	);
+	const gridItems = Array.getSomes(yield* Effect.forEach(runtime.items, isGridRuntimeItemFx));
 
-	return yield* Effect.forEach(runtime.items.filter(isGridRuntimeItem), (item) =>
+	return yield* Effect.forEach(gridItems, (item) =>
 		Effect.gen(function* () {
 			const activeJob = activeJobs.get(item.id);
 			const activeJobStatus =

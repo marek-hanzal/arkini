@@ -1,13 +1,13 @@
-import { Effect } from "effect";
+import { Effect, Option } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { planInputMaterialStoreFx } from "~/engine/input/fx/planInputMaterialStoreFx";
 import { filterInputSlotItemsFx } from "~/engine/input/read/filterInputSlotItemsFx";
 import { InputEnumSchema } from "~/engine/input/schema/InputEnumSchema";
 import { isLineInputClosedFx } from "~/engine/line/fx/input/isLineInputClosedFx";
-import { isLineOwnerItem } from "~/engine/line/read/isLineOwnerItem";
-import { readLineOwnerLines } from "~/engine/line/read/readLineOwnerLines";
-import { isBoardRuntimeItem } from "~/engine/runtime/read/isBoardRuntimeItem";
+import { isLineOwnerItemFx } from "~/engine/line/read/isLineOwnerItemFx";
+import { readLineOwnerLinesFx } from "~/engine/line/read/readLineOwnerLinesFx";
+import { isBoardRuntimeItemFx } from "~/engine/runtime/read/isBoardRuntimeItemFx";
 import type { GridRuntimeItemSchema } from "~/engine/runtime/schema/GridRuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
@@ -29,18 +29,26 @@ export namespace resolveDefaultLineInputStoreFx {
 /** Resolves the first open material input on one exact save-backed default line. */
 export const resolveDefaultLineInputStoreFx = Effect.fn("resolveDefaultLineInputStoreFx")(
 	function* ({ owner, runtime, source }: resolveDefaultLineInputStoreFx.Props) {
-		if (owner.id === source.id || !isBoardRuntimeItem(owner) || !isLineOwnerItem(owner.item))
-			return undefined;
-		const lineId = runtime.defaultLineByOwnerItemId?.[owner.id];
+		const lineOwnerItem = owner.item;
+		if (owner.id === source.id) return undefined;
+		const narrowedLineOwnerItem = Option.getOrUndefined(
+			yield* isLineOwnerItemFx(lineOwnerItem),
+		);
+		if (narrowedLineOwnerItem === undefined) return undefined;
+		const boardOwner = Option.getOrUndefined(yield* isBoardRuntimeItemFx(owner));
+		if (boardOwner === undefined) return undefined;
+		const lineId = runtime.defaultLineByOwnerItemId?.[boardOwner.id];
 		if (lineId === undefined) return undefined;
-		const line = readLineOwnerLines(owner.item).find((candidate) => candidate.id === lineId);
+		const line = (yield* readLineOwnerLinesFx(narrowedLineOwnerItem)).find(
+			(candidate) => candidate.id === lineId,
+		);
 		if (line === undefined) return undefined;
 
 		for (const [inputIndex, input] of line.input.entries()) {
 			if (input.type !== InputEnumSchema.enum.Materials) continue;
 			const closed = yield* isLineInputClosedFx({
 				input,
-				ownerItemId: owner.id,
+				ownerItemId: boardOwner.id,
 				lineId,
 				runtime,
 			});
@@ -49,7 +57,7 @@ export const resolveDefaultLineInputStoreFx = Effect.fn("resolveDefaultLineInput
 				inputIndex,
 				items: runtime.items,
 				lineId,
-				ownerItemId: owner.id,
+				ownerItemId: boardOwner.id,
 			});
 			const plan = yield* planInputMaterialStoreFx({
 				input,
@@ -59,7 +67,7 @@ export const resolveDefaultLineInputStoreFx = Effect.fn("resolveDefaultLineInput
 			});
 			if (plan === undefined) continue;
 			return {
-				ownerItemId: owner.id,
+				ownerItemId: boardOwner.id,
 				lineId,
 				inputIndex,
 				quantity: plan.quantity,

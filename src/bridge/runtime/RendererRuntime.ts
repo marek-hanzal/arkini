@@ -1,7 +1,7 @@
 import { Effect, Layer, ManagedRuntime } from "effect";
 
 import { acquireGameEngineResourceFx } from "~/bridge/game/acquireGameEngineResourceFx";
-import { GameEngineResourceLayer } from "~/bridge/game/createGameEngineResourceServiceFx";
+import { GameEngineResourceLayer } from "~/bridge/game/GameEngineResourceLayer";
 import { RendererAtomRegistryLayer } from "~/bridge/reactivity/RendererAtomRegistry";
 import type { GameSaveStorage } from "~/bridge/save/GameSaveStorage";
 import { deleteGameSaveFx } from "~/bridge/save/deleteGameSaveFx";

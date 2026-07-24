@@ -1,7 +1,8 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
+import { Effect } from "effect";
 
 import { readCurrentGameEngineResourceFx } from "~/bridge/game/readCurrentGameEngineResourceFx";
-import { resolveLauncherLeaveDestination } from "~/ui/navigation/resolveLauncherLeaveDestination";
+import { resolveLauncherLeaveDestinationFx } from "~/ui/navigation/resolveLauncherLeaveDestinationFx";
 
 export const Route = createFileRoute("/_launcher")({
 	beforeLoad: ({ context, location }) => {
@@ -12,7 +13,7 @@ export const Route = createFileRoute("/_launcher")({
 			params: {
 				packageId: resource.game.arkpack.packageId,
 			},
-			search: resolveLauncherLeaveDestination(location.pathname),
+			search: Effect.runSync(resolveLauncherLeaveDestinationFx(location.pathname)),
 			replace: true,
 		});
 	},

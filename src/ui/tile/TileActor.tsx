@@ -14,8 +14,8 @@ import { InventoryContext } from "~/ui/inventory/InventoryContext";
 import { useItemDetailControl } from "~/ui/item-detail/useItemDetailControl";
 import { readSettledAsyncResultError } from "~/ui/reactivity/readSettledAsyncResultError";
 import { TileActorContent } from "~/ui/tile/TileActorContent";
-import { readTileActorCursorSemantic } from "~/ui/tile/readTileActorCursorSemantic";
-import { readTileActorStackingZIndex } from "~/ui/tile/TileActorStacking";
+import { readTileActorCursorSemanticFx } from "~/ui/tile/readTileActorCursorSemanticFx";
+import { readTileActorStackingZIndexFx } from "~/ui/tile/readTileActorStackingZIndexFx";
 import { useTileActorDrag } from "~/ui/tile/useTileActorDrag";
 import { useTileActorPresentation } from "~/ui/tile/useTileActorPresentation";
 import { useTileActorSystem } from "~/ui/tile/useTileActorSystem";
@@ -174,21 +174,25 @@ const TileActorComponent = ({ item }: TileActor.Props) => {
 	const visible = placement !== null;
 	const boardLocation =
 		item.location.scope === LocationScopeEnumSchema.enum.Board ? item.location : null;
-	const zIndex = readTileActorStackingZIndex({
-		location: item.location,
-		phase: presentation.phase,
-		localZIndex: presentation.zIndex,
-	});
-	const cursor = readTileActorCursorSemantic({
-		feedback: presentation.feedback,
-		forbiddenDrop: presentation.forbiddenDrop,
-		live: interactive,
-		phase: presentation.phase,
-		running:
-			item.running ||
-			(item.primaryAction.kind === "start-default-line" && startLine.result.waiting),
-		visible,
-	});
+	const zIndex = Effect.runSync(
+		readTileActorStackingZIndexFx({
+			location: item.location,
+			phase: presentation.phase,
+			localZIndex: presentation.zIndex,
+		}),
+	);
+	const cursor = Effect.runSync(
+		readTileActorCursorSemanticFx({
+			feedback: presentation.feedback,
+			forbiddenDrop: presentation.forbiddenDrop,
+			live: interactive,
+			phase: presentation.phase,
+			running:
+				item.running ||
+				(item.primaryAction.kind === "start-default-line" && startLine.result.waiting),
+			visible,
+		}),
+	);
 
 	return (
 		<motion.button

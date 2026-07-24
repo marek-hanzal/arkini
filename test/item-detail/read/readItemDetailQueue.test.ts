@@ -1,6 +1,7 @@
+import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { readItemDetailQueue } from "~/engine/item-detail/read/readItemDetailQueue";
+import { readItemDetailQueueFx } from "~/engine/item-detail/read/readItemDetailQueueFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { lineRunRuntime } from "~test/line/fx/run/support/lineRunTestRuntime";
 
@@ -28,10 +29,12 @@ describe("readItemDetailQueue", () => {
 		} satisfies RuntimeSchema.Type;
 
 		expect(
-			readItemDetailQueue({
-				itemId: "runtime:workshop",
-				runtime,
-			}),
+			Effect.runSync(
+				readItemDetailQueueFx({
+					itemId: "runtime:workshop",
+					runtime,
+				}),
+			),
 		).toEqual({
 			kind: "available",
 			itemId: "runtime:workshop",
@@ -50,10 +53,12 @@ describe("readItemDetailQueue", () => {
 	it("is unavailable for stale and non-queue owners", () => {
 		const runtime = lineRunRuntime({});
 		expect(
-			readItemDetailQueue({
-				itemId: "runtime:missing",
-				runtime,
-			}),
+			Effect.runSync(
+				readItemDetailQueueFx({
+					itemId: "runtime:missing",
+					runtime,
+				}),
+			),
 		).toEqual({
 			kind: "unavailable",
 		});

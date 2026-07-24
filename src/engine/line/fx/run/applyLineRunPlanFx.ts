@@ -13,12 +13,6 @@ export namespace applyLineRunPlanFx {
 		plan: LineRunPlanSchema.Type;
 		runtime: RuntimeSchema.Type;
 	}
-
-	export interface Result {
-		readonly consumption: readonly applyInputMaterialConsumeRunPlanFx.Consumption[];
-		readonly events: readonly GameEventSchema.Type[];
-		readonly runtime: RuntimeSchema.Type;
-	}
 }
 
 /** Applies every exact input operation prepared for one active job. */

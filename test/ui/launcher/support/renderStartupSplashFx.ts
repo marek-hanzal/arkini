@@ -13,9 +13,10 @@ import { Effect } from "effect";
 import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
-import type { ArkiniElectronApi } from "../../../../electron/contract/ArkiniElectronApi";
 import type { ArkpackCatalog } from "~/bridge/arkpack/ArkpackCatalog";
 import { ArkpackCatalogOwnerAtom } from "~/bridge/arkpack/ArkpackCatalogOwnerAtom";
+import { RendererLifecycleOwnerAtom } from "~/bridge/lifecycle/RendererLifecycleOwnerAtom";
+import { createRendererLifecycleFx } from "~/bridge/lifecycle/createRendererLifecycleFx";
 import type { LauncherStartup } from "~/ui/launcher/LauncherStartup";
 import { LauncherStartupConfigAtom } from "~/ui/launcher/LauncherStartupConfigAtom";
 import { StartupSplash } from "~/ui/launcher/StartupSplash";
@@ -35,19 +36,21 @@ export const renderStartupSplashFx = Effect.fn("renderStartupSplashFx")(
 			const visible = new Promise<number>((resolve) => {
 				resolveVisible = resolve;
 			});
-			Object.defineProperty(window, "arkini", {
-				configurable: true,
-				value: {
-					lifecycle: {
-						waitUntilVisible: () => visible,
-					},
-				} as unknown as ArkiniElectronApi.Api,
-			});
 			const registry = AtomRegistry.make({
 				defaultIdleTTL: 400,
 				scheduleTask,
 			});
 			registry.set(ArkpackCatalogOwnerAtom, catalog);
+			registry.set(
+				RendererLifecycleOwnerAtom,
+				Effect.runSync(
+					createRendererLifecycleFx({
+						forceClose: () => undefined,
+						requestClose: () => Promise.resolve(),
+						waitUntilVisible: () => visible,
+					}),
+				),
+			);
 			registry.set(LauncherStartupConfigAtom, {
 				bootstrapFx,
 				heroUrl: "/hero.png",

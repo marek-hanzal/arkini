@@ -18,7 +18,6 @@ import { useItemDetailControl } from "~/ui/item-detail/useItemDetailControl";
 import { useFuseSearch } from "~/ui/search/useFuseSearch";
 
 const maxVisibleResults = 10;
-const errorMessage = (error: unknown) => (error instanceof Error ? error.message : String(error));
 const focusableSelector = [
 	"button:not([disabled])",
 	"[href]",
@@ -27,13 +26,6 @@ const focusableSelector = [
 	"textarea:not([disabled])",
 	'[tabindex]:not([tabindex="-1"])',
 ].join(",");
-const canRestoreFocus = (element: HTMLElement) =>
-	element.isConnected &&
-	!element.hidden &&
-	element.closest("[hidden], [inert]") === null &&
-	element.style.display !== "none" &&
-	element.style.visibility !== "hidden" &&
-	element.style.pointerEvents !== "none";
 
 /** Owns the Board-local Cheat item search, keyboard navigation and canonical spawn command. */
 export const CheatItemSpotlight = ({
@@ -43,6 +35,8 @@ export const CheatItemSpotlight = ({
 	readonly game: Game;
 	readonly onBeforeOpen?: () => void;
 }) => {
+	const errorMessage = (error: unknown) =>
+		error instanceof Error ? error.message : String(error);
 	const cheats = useGameCheats(game);
 	const cheatAvailability = useCheatAvailability();
 	const catalog = useCheatItemCatalog(game);
@@ -151,6 +145,13 @@ export const CheatItemSpotlight = ({
 
 	useEffect(() => {
 		if (!open) return;
+		const canRestoreFocus = (element: HTMLElement) =>
+			element.isConnected &&
+			!element.hidden &&
+			element.closest("[hidden], [inert]") === null &&
+			element.style.display !== "none" &&
+			element.style.visibility !== "hidden" &&
+			element.style.pointerEvents !== "none";
 		setQuery("");
 		setSelectedIndex(0);
 		queueMicrotask(() => (inputRef.current ?? dialogRef.current)?.focus());

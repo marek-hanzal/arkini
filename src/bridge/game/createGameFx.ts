@@ -110,11 +110,7 @@ export const createGameFx = Effect.fn("createGameFx")(function* ({
 			}
 		});
 		if (state === undefined) {
-			yield* Effect.tryPromise({
-				try: () =>
-					session?.run(startFx()) ?? Promise.reject(new Error("Game session missing.")),
-				catch: (cause) => cause,
-			});
+			yield* session.runFx(startFx());
 		}
 
 		const liveSession = session;

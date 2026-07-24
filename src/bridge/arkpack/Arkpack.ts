@@ -1,7 +1,6 @@
-import type { PayloadSchema } from "~/engine/pack/schema/PayloadSchema";
 import type { ArkpackTrustSchema } from "~/engine/pack/schema/ArkpackTrustSchema";
 
-export type ArkpackSource = "built-in" | "imported";
+type ArkpackSource = "built-in" | "imported";
 
 /** Stable metadata used by the package catalog without reading package payload bytes. */
 export interface ArkpackDescriptor {
@@ -15,10 +14,4 @@ export interface ArkpackDescriptor {
 	readonly source: ArkpackSource;
 	readonly filename?: string;
 	readonly importedAtMs?: number;
-}
-
-/** One fully validated package ready to create a live game. */
-export interface LoadedArkpack {
-	readonly descriptor: ArkpackDescriptor;
-	readonly payload: PayloadSchema.Type;
 }

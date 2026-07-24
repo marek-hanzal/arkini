@@ -6,7 +6,7 @@ import type { BoardRuntimeItemSchema } from "~/engine/runtime/schema/BoardRuntim
 import type { ReservedRuntimeItemSchema } from "~/engine/runtime/schema/ReservedRuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
-export type JobCompletionItem = Extract<
+type JobCompletionItem = Extract<
 	ItemSchema.Type,
 	{
 		readonly type:

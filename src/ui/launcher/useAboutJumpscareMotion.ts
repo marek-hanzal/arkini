@@ -13,12 +13,6 @@ const repeatDelayRangeMs = {
 
 const jumpscareDurationSeconds = 2.4;
 
-const randomBetween = (minimum: number, maximum: number) =>
-	minimum + Math.random() * (maximum - minimum);
-
-const pickPortrait = (portraitUrls: readonly string[]) =>
-	portraitUrls[Math.floor(Math.random() * portraitUrls.length)] ?? portraitUrls[0] ?? "";
-
 /** Recycles one rare fullscreen portrait apparition with bounded random spacing. */
 export const useAboutJumpscareMotion = ({
 	active,
@@ -33,6 +27,10 @@ export const useAboutJumpscareMotion = ({
 	const [portraitUrl, setPortraitUrl] = useState(portraitUrls[0] ?? "");
 
 	useEffect(() => {
+		const randomBetween = (minimum: number, maximum: number) =>
+			minimum + Math.random() * (maximum - minimum);
+		const pickPortrait = (urls: readonly string[]) =>
+			urls[Math.floor(Math.random() * urls.length)] ?? urls[0] ?? "";
 		if (!active) {
 			controls.stop();
 			controls.set({

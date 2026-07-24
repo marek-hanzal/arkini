@@ -20,8 +20,6 @@ type NavigationState =
 			readonly error: unknown;
 	  };
 
-const errorMessage = (error: unknown) => (error instanceof Error ? error.message : String(error));
-
 /** Owns GameMenu commands, route requests, destructive confirmation, and status projection. */
 export const useGameMenuActions = ({
 	game,
@@ -30,6 +28,8 @@ export const useGameMenuActions = ({
 	readonly game: Game;
 	readonly phase: Exclude<GameMenuPhase, "closed">;
 }) => {
+	const errorMessage = (error: unknown) =>
+		error instanceof Error ? error.message : String(error);
 	const menu = useGameMenuControl();
 	const navigate = useNavigate();
 	const commandAtom = gameMenuCommandAtom(game);

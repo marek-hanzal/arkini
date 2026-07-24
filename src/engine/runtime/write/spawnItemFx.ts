@@ -10,7 +10,7 @@ import { ItemAlreadyExistsError } from "~/engine/runtime/error/ItemAlreadyExists
 import { LocationOccupiedError } from "~/engine/runtime/error/LocationOccupiedError";
 import { createRuntimeItemFx } from "~/engine/runtime/fx/createRuntimeItemFx";
 import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
-import { isGridRuntimeItem } from "~/engine/runtime/read/isGridRuntimeItem";
+import { isGridRuntimeItemFx } from "~/engine/runtime/read/isGridRuntimeItemFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { PlacementEnumSchema } from "~/engine/placement/schema/PlacementEnumSchema";
 
@@ -56,8 +56,11 @@ export const spawnItemFx = Effect.fn("spawnItemFx")(function* ({
 				);
 			}
 
+			const gridItems = Array.getSomes(
+				yield* Effect.forEach(runtime.items, isGridRuntimeItemFx),
+			);
 			const [occupants] = yield* readGridLocationOccupantsFx({
-				items: runtime.items.filter(isGridRuntimeItem),
+				items: gridItems,
 				locations: [
 					location,
 				],

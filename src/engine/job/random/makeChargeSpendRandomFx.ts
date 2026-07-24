@@ -4,7 +4,7 @@ import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
 
 /** Bump only when intentionally changing immediate charge-depletion random compatibility. */
-export const ChargeSpendRandomVersion = 2;
+const ChargeSpendRandomVersion = 2;
 
 /**
  * Runs the owned program with deterministic random for depletion resolved during one line start.

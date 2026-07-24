@@ -7,9 +7,9 @@ import { setAppearanceThemeAtom } from "~/bridge/appearance/setAppearanceThemeAt
 import { setCheatAvailabilityAtom } from "~/bridge/cheat/setCheatAvailabilityAtom";
 import { readExactCauseFailure } from "~/bridge/game/readExactCauseFailure";
 
-export namespace SettingsCommandAtom {
-	export type Action = "cheat-tools" | "theme" | "exit";
+type SettingsCommandAction = "cheat-tools" | "theme" | "exit";
 
+export namespace SettingsCommandAtom {
 	export type Command =
 		| {
 				readonly action: "cheat-tools";
@@ -30,7 +30,7 @@ export namespace SettingsCommandAtom {
 		  }
 		| {
 				readonly kind: "pending";
-				readonly action: Action;
+				readonly action: SettingsCommandAction;
 		  }
 		| {
 				readonly kind: "navigation-error";
@@ -50,15 +50,6 @@ export namespace SettingsCommandAtom {
 const SettingsCommandStateAtom = Atom.make<SettingsCommandAtom.State>({
 	kind: "idle",
 }).pipe(Atom.keepAlive);
-
-const settingsCommandLabel = (
-	command: Exclude<
-		SettingsCommandAtom.Command,
-		{
-			readonly action: "exit";
-		}
-	>,
-) => (command.action === "cheat-tools" ? "Cheat tools" : "Theme");
 
 /**
  * Runs the one command admitted synchronously by SettingsCommandAtom.
@@ -103,7 +94,7 @@ const SettingsCommandRunnerAtom = Atom.fn(
 							}
 						: {
 								kind: "save-error",
-								label: settingsCommandLabel(command),
+								label: command.action === "cheat-tools" ? "Cheat tools" : "Theme",
 								error,
 							},
 				);
@@ -117,7 +108,7 @@ const SettingsCommandRunnerAtom = Atom.fn(
 						}
 					: {
 							kind: "saved",
-							label: settingsCommandLabel(command),
+							label: command.action === "cheat-tools" ? "Cheat tools" : "Theme",
 						},
 			);
 		}),

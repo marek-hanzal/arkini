@@ -12,6 +12,7 @@ const spotlight = readSource("src/ui/cheat-spotlight/CheatItemSpotlight.tsx");
 const board = readSource("src/ui/board/Board.tsx");
 const toolbar = readSource("src/ui/toolbar/Toolbar.tsx");
 const lines = readSource("src/ui/item-detail/ItemLinesTab.tsx");
+const lineRow = readSource("src/ui/item-detail/ItemLineRow.tsx");
 const sources = readSource("src/ui/item-detail/ItemSourcesTab.tsx");
 const catalog = readSource("src/ui/arkpack/ArkpackCatalogList.tsx");
 
@@ -43,7 +44,7 @@ describe("semantic list-row presentation", () => {
 
 	it("keeps list rows on genuine content while buttons, segmented options, and Spotlight own their states", () => {
 		expect(lines).toContain('className="ak-list grid gap-1"');
-		expect(lines).toContain("ak-list-row rounded-xl");
+		expect(lineRow).toContain("ak-list-row rounded-xl");
 		expect(sources).toContain('className="ak-list grid gap-1"');
 		expect(sources).toContain("ak-list-row border-b");
 		expect(catalog).toContain('data-ui="ArkpackCatalogList"');

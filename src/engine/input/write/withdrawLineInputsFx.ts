@@ -1,4 +1,4 @@
-import { Effect } from "effect";
+import { Array, Effect, Option } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
@@ -7,8 +7,8 @@ import { LineNotFoundError } from "~/engine/line/error/LineNotFoundError";
 import { readItemLineFx } from "~/engine/line/fx/readItemLineFx";
 import { placeRuntimeItemFx } from "~/engine/placement/fx/placeRuntimeItemFx";
 import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
-import { isBoardRuntimeItem } from "~/engine/runtime/read/isBoardRuntimeItem";
-import { isInputRuntimeItem } from "~/engine/runtime/read/isInputRuntimeItem";
+import { isBoardRuntimeItemFx } from "~/engine/runtime/read/isBoardRuntimeItemFx";
+import { isInputRuntimeItemFx } from "~/engine/runtime/read/isInputRuntimeItemFx";
 import { readRuntimeItemByIdFx } from "~/engine/runtime/read/readRuntimeItemByIdFx";
 
 export namespace withdrawLineInputsFx {
@@ -30,15 +30,16 @@ export const withdrawLineInputsFx = Effect.fn("withdrawLineInputsFx")(function* 
 }: withdrawLineInputsFx.Props) {
 	return yield* modifyRuntimeFx((runtime) =>
 		Effect.gen(function* () {
-			const owner = yield* readRuntimeItemByIdFx({
+			const runtimeOwner = yield* readRuntimeItemByIdFx({
 				itemId: ownerItemId,
 				runtime,
 			});
-			if (!isBoardRuntimeItem(owner)) {
+			const owner = Option.getOrUndefined(yield* isBoardRuntimeItemFx(runtimeOwner));
+			if (owner === undefined) {
 				return yield* Effect.fail(
 					new ItemNotOnBoardError({
-						itemId: owner.id,
-						location: owner.location,
+						itemId: runtimeOwner.id,
+						location: runtimeOwner.location,
 					}),
 				);
 			}
@@ -55,11 +56,11 @@ export const withdrawLineInputsFx = Effect.fn("withdrawLineInputsFx")(function* 
 				);
 			}
 
-			const bufferedItems = runtime.items.filter(
+			const bufferedItems = Array.getSomes(
+				yield* Effect.forEach(runtime.items, isInputRuntimeItemFx),
+			).filter(
 				(item) =>
-					isInputRuntimeItem(item) &&
-					item.location.ownerItemId === ownerItemId &&
-					item.location.lineId === lineId,
+					item.location.ownerItemId === ownerItemId && item.location.lineId === lineId,
 			);
 			let draft = runtime;
 			const events: GameEventSchema.Type[] = [];

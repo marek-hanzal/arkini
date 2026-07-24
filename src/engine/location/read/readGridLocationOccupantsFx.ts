@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import { isSameGridLocation } from "~/engine/location/read/isSameGridLocation";
+import { isSameGridLocationFx } from "~/engine/location/read/isSameGridLocationFx";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 import type { GridRuntimeItemSchema } from "~/engine/runtime/schema/GridRuntimeItemSchema";
 
@@ -16,14 +16,43 @@ export const readGridLocationOccupantsFx = Effect.fn("readGridLocationOccupantsF
 	items,
 	locations,
 }: readGridLocationOccupantsFx.Props) {
-	const uniqueLocations = locations.filter((location, index) => {
-		return (
-			locations.findIndex((candidate) => isSameGridLocation(candidate, location)) === index
-		);
-	});
+	const uniqueLocations: GridLocationSchema.Type[] = [];
+	for (const location of locations) {
+		let duplicate = false;
+		for (const candidate of uniqueLocations) {
+			if (
+				yield* isSameGridLocationFx({
+					left: candidate,
+					right: location,
+				})
+			) {
+				duplicate = true;
+				break;
+			}
+		}
+		if (!duplicate) uniqueLocations.push(location);
+	}
 
-	return uniqueLocations.map((location) => ({
-		location,
-		items: items.filter((item) => isSameGridLocation(item.location, location)),
-	}));
+	const occupants: {
+		readonly location: GridLocationSchema.Type;
+		readonly items: GridRuntimeItemSchema.Type[];
+	}[] = [];
+	for (const location of uniqueLocations) {
+		const locationItems: GridRuntimeItemSchema.Type[] = [];
+		for (const item of items) {
+			if (
+				yield* isSameGridLocationFx({
+					left: item.location,
+					right: location,
+				})
+			) {
+				locationItems.push(item);
+			}
+		}
+		occupants.push({
+			location,
+			items: locationItems,
+		});
+	}
+	return occupants;
 });

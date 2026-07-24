@@ -6,21 +6,21 @@ import { RuntimeFx } from "~/engine/runtime/context/RuntimeFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { RuntimeStoreFx } from "./RuntimeStoreFx";
 
-export namespace modifyRuntimeFx {
-	export type UpdateResult<Result> =
-		| readonly [
-				Result,
-				RuntimeSchema.Type,
-		  ]
-		| readonly [
-				Result,
-				RuntimeSchema.Type,
-				readonly GameEventSchema.Type[],
-		  ];
+type RuntimeUpdateResult<Result> =
+	| readonly [
+			Result,
+			RuntimeSchema.Type,
+	  ]
+	| readonly [
+			Result,
+			RuntimeSchema.Type,
+			readonly GameEventSchema.Type[],
+	  ];
 
+export namespace modifyRuntimeFx {
 	export type Update<Result, Error, Requirements> = (
 		runtime: RuntimeSchema.Type,
-	) => Effect.Effect<UpdateResult<Result>, Error, Requirements>;
+	) => Effect.Effect<RuntimeUpdateResult<Result>, Error, Requirements>;
 }
 
 /**

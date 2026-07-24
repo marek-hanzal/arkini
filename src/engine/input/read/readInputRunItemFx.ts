@@ -1,10 +1,10 @@
-import { Effect } from "effect";
+import { Effect, Option } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeIntegerSchema";
 import type { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
 import { InputRunPlanInvalidError } from "~/engine/input/error/InputRunPlanInvalidError";
-import { isInputRuntimeItem } from "~/engine/runtime/read/isInputRuntimeItem";
+import { isInputRuntimeItemFx } from "~/engine/runtime/read/isInputRuntimeItemFx";
 import { readRuntimeItemByIdFx } from "~/engine/runtime/read/readRuntimeItemByIdFx";
 import type { InputRuntimeItemSchema } from "~/engine/runtime/schema/InputRuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
@@ -29,16 +29,17 @@ export const readInputRunItemFx = Effect.fn("readInputRunItemFx")(function* ({
 	plannedQuantity,
 	runtime,
 }: readInputRunItemFx.Props) {
-	const item = yield* readRuntimeItemByIdFx({
+	const runtimeItem = yield* readRuntimeItemByIdFx({
 		itemId,
 		runtime,
 	});
+	const item = Option.getOrUndefined(yield* isInputRuntimeItemFx(runtimeItem));
 	const validLocation =
-		isInputRuntimeItem(item) &&
+		item !== undefined &&
 		item.location.ownerItemId === ownerItemId &&
 		item.location.lineId === lineId &&
 		item.location.inputIndex === inputIndex;
-	if (!validLocation || item.quantity < plannedQuantity) {
+	if (!validLocation || item === undefined || item.quantity < plannedQuantity) {
 		return yield* Effect.fail(
 			new InputRunPlanInvalidError({
 				ownerItemId,
@@ -46,7 +47,7 @@ export const readInputRunItemFx = Effect.fn("readInputRunItemFx")(function* ({
 				inputIndex,
 				itemId,
 				plannedQuantity,
-				availableQuantity: item.quantity,
+				availableQuantity: runtimeItem.quantity,
 			}),
 		);
 	}

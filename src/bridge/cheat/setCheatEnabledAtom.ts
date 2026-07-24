@@ -1,19 +1,22 @@
+import { Effect } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
 
-import { makeExactGameAtomFamily } from "~/bridge/game/makeExactGameAtomFamily";
+import { makeExactGameAtomFamilyFx } from "~/bridge/game/makeExactGameAtomFamilyFx";
 import { setCheatEnabledFx } from "~/engine/cheat/write/setCheatEnabledFx";
 
 /** Returns the Cheat-mode command owned exclusively by one exact live Game. */
-export const setCheatEnabledAtom = makeExactGameAtomFamily((game) =>
-	Atom.fn(
-		(enabled: boolean) =>
-			game.runFx(
-				setCheatEnabledFx({
-					enabled,
-				}),
-			),
-		{
-			concurrent: false,
-		},
-	).pipe(Atom.setIdleTTL(0)),
+export const setCheatEnabledAtom = Effect.runSync(
+	makeExactGameAtomFamilyFx((game) =>
+		Atom.fn(
+			(enabled: boolean) =>
+				game.runFx(
+					setCheatEnabledFx({
+						enabled,
+					}),
+				),
+			{
+				concurrent: false,
+			},
+		).pipe(Atom.setIdleTTL(0)),
+	),
 );

@@ -1,7 +1,8 @@
+import { Effect } from "effect";
 import type { PropsWithChildren, ReactNode } from "react";
 import { twMerge } from "tailwind-merge";
 import { LauncherScene } from "~/ui/launcher/LauncherScene";
-import { mainPagePanelViewTransitionName } from "~/ui/navigation/mainPagePanelViewTransitionName";
+import { mainPagePanelViewTransitionNameFx } from "~/ui/navigation/mainPagePanelViewTransitionNameFx";
 
 const panelModeClassNames = {
 	compact: "max-h-full w-full max-w-sm",
@@ -15,17 +16,17 @@ const panelContentModeClassNames = {
 	viewport: "size-full overflow-hidden p-[var(--ak-panel-padding)]",
 } as const;
 
-export namespace MainPageLayout {
-	export type Page = "about" | "arkpacks" | "main-menu" | "settings";
-	export type PanelMode = keyof typeof panelModeClassNames;
+type MainPage = "about" | "arkpacks" | "main-menu" | "settings";
+type MainPagePanelMode = keyof typeof panelModeClassNames;
 
+export namespace MainPageLayout {
 	export interface Props extends PropsWithChildren {
 		readonly foregroundOverlay?: ReactNode;
 		readonly labelledBy?: string;
 		readonly overlay?: ReactNode;
-		readonly page: Page;
+		readonly page: MainPage;
 		readonly panelClassName?: string;
-		readonly panelMode?: PanelMode;
+		readonly panelMode?: MainPagePanelMode;
 	}
 }
 
@@ -57,7 +58,7 @@ export const MainPageLayout = ({
 			data-ui="MainPagePanel"
 			tabIndex={-1}
 			style={{
-				viewTransitionName: mainPagePanelViewTransitionName(page),
+				viewTransitionName: Effect.runSync(mainPagePanelViewTransitionNameFx(page)),
 			}}
 		>
 			<div

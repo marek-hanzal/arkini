@@ -5,39 +5,6 @@ import { ActionPendingPage } from "~/page/action/ActionPendingPage";
 import { runActionRouteFx } from "~/page/action/runActionRouteFx";
 import { GameLeaveDestinationSchema } from "~/ui/navigation/GameLeaveDestinationSchema";
 
-const redirectToDestination = (destination: GameLeaveDestinationSchema.Type): never => {
-	switch (destination.destination) {
-		case "about":
-			throw redirect({
-				to: "/about",
-				replace: true,
-			});
-		case "arkpacks":
-			throw redirect({
-				to: "/arkpacks",
-				replace: true,
-			});
-		case "main-menu":
-			throw redirect({
-				to: "/main-menu",
-				replace: true,
-			});
-		case "settings":
-			throw redirect({
-				to: "/settings",
-				replace: true,
-			});
-		case "game":
-			throw redirect({
-				to: "/action/load-game/$packageId",
-				params: {
-					packageId: destination.packageId,
-				},
-				replace: true,
-			});
-	}
-};
-
 export const Route = createFileRoute("/game/$packageId/action/leave")({
 	validateSearch: GameLeaveDestinationSchema,
 	loaderDeps: ({ search }) => search,
@@ -53,7 +20,36 @@ export const Route = createFileRoute("/game/$packageId/action/leave")({
 		} catch (cause) {
 			throw context.gameEngineResource.markCriticalFailure("game-leave", cause);
 		}
-		redirectToDestination(deps);
+		switch (deps.destination) {
+			case "about":
+				throw redirect({
+					to: "/about",
+					replace: true,
+				});
+			case "arkpacks":
+				throw redirect({
+					to: "/arkpacks",
+					replace: true,
+				});
+			case "main-menu":
+				throw redirect({
+					to: "/main-menu",
+					replace: true,
+				});
+			case "settings":
+				throw redirect({
+					to: "/settings",
+					replace: true,
+				});
+			case "game":
+				throw redirect({
+					to: "/action/load-game/$packageId",
+					params: {
+						packageId: deps.packageId,
+					},
+					replace: true,
+				});
+		}
 	},
 	pendingMs: 0,
 	pendingMinMs: 2_500,

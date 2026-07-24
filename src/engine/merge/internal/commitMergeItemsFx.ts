@@ -1,4 +1,4 @@
-import { Effect } from "effect";
+import { Effect, Option } from "effect";
 
 import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
@@ -9,11 +9,12 @@ import { applyMergeRuntimeFx } from "~/engine/merge/fx/applyMergeRuntimeFx";
 import { resolveMergeRuleFx } from "~/engine/merge/fx/resolveMergeRuleFx";
 import { makeMergeRandomFx } from "~/engine/merge/random/makeMergeRandomFx";
 import { MergeSameItemError } from "~/engine/merge/error/MergeSameItemError";
+import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 import { assertRevisionFx } from "~/engine/revision/fx/assertRevisionFx";
 import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
 import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
-import { isBoardRuntimeItem } from "~/engine/runtime/read/isBoardRuntimeItem";
-import { isGridRuntimeItem } from "~/engine/runtime/read/isGridRuntimeItem";
+import { isBoardRuntimeItemFx } from "~/engine/runtime/read/isBoardRuntimeItemFx";
+import { isGridRuntimeItemFx } from "~/engine/runtime/read/isGridRuntimeItemFx";
 import { readRuntimeItemByIdFx } from "~/engine/runtime/read/readRuntimeItemByIdFx";
 import type { GridRuntimeItemSchema } from "~/engine/runtime/schema/GridRuntimeItemSchema";
 import { CrossSpaceBoardOperationError } from "~/engine/space/error/CrossSpaceBoardOperationError";
@@ -53,44 +54,47 @@ export const commitMergeItemsFx = Effect.fn("commitMergeItemsFx")(function* ({
 
 	return yield* modifyRuntimeFx((runtime) =>
 		Effect.gen(function* () {
-			const source = yield* readRuntimeItemByIdFx({
+			const runtimeSource = yield* readRuntimeItemByIdFx({
 				itemId: sourceItemId,
 				runtime,
 			});
-			const target = yield* readRuntimeItemByIdFx({
+			const runtimeTarget = yield* readRuntimeItemByIdFx({
 				itemId: targetItemId,
 				runtime,
 			});
 			yield* assertRevisionFx({
-				actualRevision: source.revision,
-				entityId: source.id,
+				actualRevision: runtimeSource.revision,
+				entityId: runtimeSource.id,
 				expectedRevision: sourceRevision,
 			});
 			yield* assertRevisionFx({
-				actualRevision: target.revision,
-				entityId: target.id,
+				actualRevision: runtimeTarget.revision,
+				entityId: runtimeTarget.id,
 				expectedRevision: targetRevision,
 			});
-			if (!isGridRuntimeItem(source)) {
+			const source = Option.getOrUndefined(yield* isGridRuntimeItemFx(runtimeSource));
+			if (source === undefined) {
 				return yield* Effect.fail(
 					new ItemNotOnGridError({
-						itemId: source.id,
-						location: source.location,
+						itemId: runtimeSource.id,
+						location: runtimeSource.location,
 					}),
 				);
 			}
-			if (!isBoardRuntimeItem(target)) {
+			const target = Option.getOrUndefined(yield* isBoardRuntimeItemFx(runtimeTarget));
+			if (target === undefined) {
 				return yield* Effect.fail(
 					new ItemNotOnBoardError({
-						itemId: target.id,
-						location: target.location,
+						itemId: runtimeTarget.id,
+						location: runtimeTarget.location,
 					}),
 				);
 			}
-			if (isBoardRuntimeItem(source) && source.location.space !== target.location.space) {
+			const boardSource = Option.getOrUndefined(yield* isBoardRuntimeItemFx(source));
+			if (boardSource !== undefined && boardSource.location.space !== target.location.space) {
 				return yield* Effect.fail(
 					new CrossSpaceBoardOperationError({
-						fromSpace: source.location.space,
+						fromSpace: boardSource.location.space,
 						toSpace: target.location.space,
 					}),
 				);
@@ -128,11 +132,17 @@ export const commitMergeItemsFx = Effect.fn("commitMergeItemsFx")(function* ({
 			} satisfies ItemMergedGameEventSchema.Type;
 			const sourceAfter = nextRuntime.items.find(
 				(item): item is GridRuntimeItemSchema.Type =>
-					item.id === source.id && isGridRuntimeItem(item),
+					item.id === source.id &&
+					(item.location.scope === LocationScopeEnumSchema.enum.Board ||
+						item.location.scope === LocationScopeEnumSchema.enum.Inventory ||
+						item.location.scope === LocationScopeEnumSchema.enum.Toolbar),
 			);
 			const targetAfter = nextRuntime.items.find(
 				(item): item is GridRuntimeItemSchema.Type =>
-					item.id === target.id && isGridRuntimeItem(item),
+					item.id === target.id &&
+					(item.location.scope === LocationScopeEnumSchema.enum.Board ||
+						item.location.scope === LocationScopeEnumSchema.enum.Inventory ||
+						item.location.scope === LocationScopeEnumSchema.enum.Toolbar),
 			);
 			const result = {
 				event,

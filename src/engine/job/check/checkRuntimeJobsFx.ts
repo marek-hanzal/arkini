@@ -1,4 +1,4 @@
-import { Effect } from "effect";
+import { Array, Effect, Option } from "effect";
 
 import { RuntimeCheckIssueEnumSchema } from "~/engine/runtime/schema/check/RuntimeCheckIssueEnumSchema";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
@@ -13,8 +13,8 @@ import type { JobMaterialOrphanIssueSchema } from "~/engine/job/schema/JobMateri
 import type { JobTimeInvalidIssueSchema } from "~/engine/job/schema/JobTimeInvalidIssueSchema";
 import { readItemQueueSizeFx } from "~/engine/job/read/readItemQueueSizeFx";
 import { readItemLineFx } from "~/engine/line/fx/readItemLineFx";
-import { isGridRuntimeItem } from "~/engine/runtime/read/isGridRuntimeItem";
-import { isJobRuntimeItem } from "~/engine/runtime/read/isJobRuntimeItem";
+import { isGridRuntimeItemFx } from "~/engine/runtime/read/isGridRuntimeItemFx";
+import { isJobRuntimeItemFx } from "~/engine/runtime/read/isJobRuntimeItemFx";
 import { readRuntimeItemOwnedStateFx } from "~/engine/runtime/read/readRuntimeItemOwnedStateFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
@@ -71,7 +71,7 @@ export const checkRuntimeJobsFx = Effect.fn("checkRuntimeJobsFx")(function* ({
 			});
 			continue;
 		}
-		if (!isGridRuntimeItem(owner))
+		if (Option.isNone(yield* isGridRuntimeItemFx(owner)))
 			ownerGridIssues.push({
 				jobId: entry.id,
 				ownerItemId: owner.id,
@@ -141,7 +141,8 @@ export const checkRuntimeJobsFx = Effect.fn("checkRuntimeJobsFx")(function* ({
 		}
 	}
 
-	for (const item of runtime.items.filter(isJobRuntimeItem)) {
+	const consumedItems = Array.getSomes(yield* Effect.forEach(runtime.items, isJobRuntimeItemFx));
+	for (const item of consumedItems) {
 		const owned = yield* readRuntimeItemOwnedStateFx({
 			ownerItemId: item.id,
 			runtime,

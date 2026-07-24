@@ -1,4 +1,5 @@
 import { Effect } from "effect";
+import { ElectronMainError } from "../ElectronMainError";
 
 const packageIdPattern = /^[a-f0-9]{64}$/;
 
@@ -6,6 +7,11 @@ const packageIdPattern = /^[a-f0-9]{64}$/;
 export const assertImportedArkpackPackageIdFx = Effect.fn("assertImportedArkpackPackageIdFx")(
 	function* (packageId: string) {
 		if (packageIdPattern.test(packageId)) return packageId;
-		return yield* Effect.fail(new Error("Invalid imported Arkpack package identity."));
+		return yield* Effect.fail(
+			new ElectronMainError({
+				operation: "Invalid imported Arkpack package identity",
+				cause: packageId,
+			}),
+		);
 	},
 );

@@ -1,6 +1,6 @@
 import { Effect, Exit } from "effect";
 import { loadArkpackFx } from "~/bridge/arkpack/loadArkpackFx";
-import { readHeroResource } from "~/bridge/arkpack/readHeroResource";
+import { readHeroResourceFx } from "~/bridge/arkpack/readHeroResourceFx";
 import { readLastPackageIdFx } from "~/bridge/launcher/readLastPackageIdFx";
 import { preloadLauncherHeroFx } from "~/ui/launcher/preloadLauncherHeroFx";
 
@@ -29,10 +29,10 @@ export const prepareLauncherHeroFx = Effect.fn("prepareLauncherHeroFx")(
 			const loaded = yield* loadArkpackFx({
 				packageId,
 			});
+			const resource = yield* readHeroResourceFx(loaded.payload);
 			return yield* Effect.try({
-				try: () => {
-					const resource = readHeroResource(loaded.payload);
-					return {
+				try: () =>
+					({
 						owned: true,
 						url: URL.createObjectURL(
 							new Blob(
@@ -44,8 +44,7 @@ export const prepareLauncherHeroFx = Effect.fn("prepareLauncherHeroFx")(
 								},
 							),
 						),
-					} satisfies prepareLauncherHeroFx.Result;
-				},
+					}) satisfies prepareLauncherHeroFx.Result,
 				catch: (cause) => cause,
 			});
 		}).pipe(

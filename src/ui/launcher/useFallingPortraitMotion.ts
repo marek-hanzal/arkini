@@ -1,15 +1,6 @@
 import { useAnimationControls } from "motion/react";
 import { type RefObject, useEffect, useState } from "react";
 
-const randomBetween = (minimum: number, maximum: number) =>
-	minimum + Math.random() * (maximum - minimum);
-
-const wait = (milliseconds: number) =>
-	new Promise<void>((resolve) => window.setTimeout(resolve, milliseconds));
-
-const pickPortrait = (portraitUrls: readonly string[]) =>
-	portraitUrls[Math.floor(Math.random() * portraitUrls.length)] ?? portraitUrls[0] ?? "";
-
 interface FallingPortraitAppearance {
 	readonly blurPx: number;
 	readonly portraitUrl: string;
@@ -38,6 +29,12 @@ export const useFallingPortraitMotion = ({
 	});
 
 	useEffect(() => {
+		const randomBetween = (minimum: number, maximum: number) =>
+			minimum + Math.random() * (maximum - minimum);
+		const wait = (milliseconds: number) =>
+			new Promise<void>((resolve) => window.setTimeout(resolve, milliseconds));
+		const pickPortrait = (urls: readonly string[]) =>
+			urls[Math.floor(Math.random() * urls.length)] ?? urls[0] ?? "";
 		if (!active) {
 			controls.stop();
 			controls.set({

@@ -90,28 +90,27 @@ const TileGridCellComponent = ({
 	);
 };
 
-const sameOccupant = (
-	left: TileGridCell.Props["occupant"],
-	right: TileGridCell.Props["occupant"],
-) =>
-	left === right ||
-	(left !== null && right !== null && left.id === right.id && left.revision === right.revision);
-
-const sameSurface = (left: TileGridCell.Props["surface"], right: TileGridCell.Props["surface"]) =>
-	left === right ||
-	(left.id === right.id &&
-		left.kind === right.kind &&
-		(left.kind !== "board" || (right.kind === "board" && left.space === right.space)));
-
 /** Runtime snapshots may rebuild the grid, but only semantically changed slots render again. */
-export const TileGridCell = memo(
-	TileGridCellComponent,
-	(previous, next) =>
+export const TileGridCell = memo(TileGridCellComponent, (previous, next) => {
+	const sameOccupant =
+		previous.occupant === next.occupant ||
+		(previous.occupant !== null &&
+			next.occupant !== null &&
+			previous.occupant.id === next.occupant.id &&
+			previous.occupant.revision === next.occupant.revision);
+	const sameSurface =
+		previous.surface === next.surface ||
+		(previous.surface.id === next.surface.id &&
+			previous.surface.kind === next.surface.kind &&
+			(previous.surface.kind !== "board" ||
+				(next.surface.kind === "board" && previous.surface.space === next.surface.space)));
+	return (
 		previous.x === next.x &&
 		previous.y === next.y &&
 		previous.toneRowOffset === next.toneRowOffset &&
 		previous.dataUi === next.dataUi &&
-		sameSurface(previous.surface, next.surface) &&
-		sameOccupant(previous.occupant, next.occupant),
-);
+		sameSurface &&
+		sameOccupant
+	);
+});
 TileGridCell.displayName = "TileGridCell";

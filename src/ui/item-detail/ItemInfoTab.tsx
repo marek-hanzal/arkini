@@ -38,63 +38,6 @@ const storageScopeLabel = {
 	string
 >;
 
-const readLocationLabel = (
-	location: Extract<
-		useItemDetailInfo.Projection,
-		{
-			readonly kind: "available";
-		}
-	>["location"],
-) =>
-	match(location)
-		.with(
-			{
-				kind: "board",
-			},
-			({ space }) => `Board · Space ${space + 1}`,
-		)
-		.with(
-			{
-				kind: "inventory",
-			},
-			() => "Inventory",
-		)
-		.with(
-			{
-				kind: "toolbar",
-			},
-			() => "Toolbar",
-		)
-		.with(
-			{
-				kind: "input",
-			},
-			() => "Stored line input",
-		)
-		.with(
-			{
-				kind: "job",
-			},
-			() => "Consumed by active work",
-		)
-		.with(
-			{
-				kind: "reserved",
-			},
-			() => "Reserved by active work",
-		)
-		.exhaustive();
-
-const readTagLabel = (tag: string) => {
-	const era = /^era:(.+)$/u.exec(tag);
-	if (era?.[1] !== undefined) return `Era ${era[1]}`;
-	return tag
-		.replaceAll(":", " ")
-		.replaceAll("-", " ")
-		.replaceAll("_", " ")
-		.replace(/\b\p{L}/gu, (letter) => letter.toUpperCase());
-};
-
 const InfoFact = ({ label, value }: { readonly label: string; readonly value: string }) => (
 	<div
 		className="grid min-w-0 gap-1 border-b border-line/70 py-3 last:border-b-0"
@@ -107,6 +50,73 @@ const InfoFact = ({ label, value }: { readonly label: string; readonly value: st
 		</dd>
 	</div>
 );
+
+const LocationInfoFact = ({
+	location,
+}: {
+	readonly location: Extract<
+		useItemDetailInfo.Projection,
+		{
+			readonly kind: "available";
+		}
+	>["location"];
+}) => (
+	<InfoFact
+		label="Location"
+		value={match(location)
+			.with(
+				{
+					kind: "board",
+				},
+				({ space }) => `Board · Space ${space + 1}`,
+			)
+			.with(
+				{
+					kind: "inventory",
+				},
+				() => "Inventory",
+			)
+			.with(
+				{
+					kind: "toolbar",
+				},
+				() => "Toolbar",
+			)
+			.with(
+				{
+					kind: "input",
+				},
+				() => "Stored line input",
+			)
+			.with(
+				{
+					kind: "job",
+				},
+				() => "Consumed by active work",
+			)
+			.with(
+				{
+					kind: "reserved",
+				},
+				() => "Reserved by active work",
+			)
+			.exhaustive()}
+	/>
+);
+
+const TagLabel = ({ tag }: { readonly tag: string }) => {
+	const era = /^era:(.+)$/u.exec(tag);
+	if (era?.[1] !== undefined) return <>Era {era[1]}</>;
+	return (
+		<>
+			{tag
+				.replaceAll(":", " ")
+				.replaceAll("-", " ")
+				.replaceAll("_", " ")
+				.replace(/\b\p{L}/gu, (letter) => letter.toUpperCase())}
+		</>
+	);
+};
 
 /** Renders the broad first-pass item facts shared by every canonical item definition. */
 export const ItemInfoTab = ({
@@ -149,10 +159,7 @@ export const ItemInfoTab = ({
 					label="Type"
 					value={itemTypeLabel[info.itemType]}
 				/>
-				<InfoFact
-					label="Location"
-					value={readLocationLabel(info.location)}
-				/>
+				<LocationInfoFact location={info.location} />
 				<InfoFact
 					label="Storage"
 					value={storageScopeLabel[info.storageScope]}
@@ -194,7 +201,7 @@ export const ItemInfoTab = ({
 							key={tag}
 							className="rounded-full border border-line bg-surface px-3 py-1 text-xs font-medium text-muted"
 						>
-							{readTagLabel(tag)}
+							<TagLabel tag={tag} />
 						</span>
 					))}
 				</div>

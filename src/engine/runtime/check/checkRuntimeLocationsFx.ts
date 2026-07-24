@@ -1,10 +1,10 @@
-import { Effect } from "effect";
+import { Array, Effect } from "effect";
 import { match } from "ts-pattern";
 
-import { isItemLocationScopeAllowed } from "~/engine/location/read/isItemLocationScopeAllowed";
+import { isItemLocationScopeAllowedFx } from "~/engine/location/read/isItemLocationScopeAllowedFx";
 import { RuntimeCheckIssueEnumSchema } from "~/engine/runtime/schema/check/RuntimeCheckIssueEnumSchema";
 import { readGridLocationOccupantsFx } from "~/engine/location/read/readGridLocationOccupantsFx";
-import { isGridRuntimeItem } from "~/engine/runtime/read/isGridRuntimeItem";
+import { isGridRuntimeItemFx } from "~/engine/runtime/read/isGridRuntimeItemFx";
 import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import type { LocationOccupiedIssueSchema } from "~/engine/runtime/schema/check/LocationOccupiedIssueSchema";
@@ -30,14 +30,17 @@ export const checkRuntimeLocationsFx = Effect.fn("checkRuntimeLocationsFx")(func
 	config,
 	runtime,
 }: checkRuntimeLocationsFx.Props) {
-	const items = runtime.items.filter(isGridRuntimeItem);
+	const items = Array.getSomes(yield* Effect.forEach(runtime.items, isGridRuntimeItemFx));
 	const scopeIssues: LocationScopeIssueSchema.Type[] = [];
 	const boundsIssues: LocationOutOfBoundsIssueSchema.Type[] = [];
 	const occupancyIssues: LocationOccupiedIssueSchema.Type[] = [];
 
 	for (const item of items) {
 		const configuredScope = item.item.scope;
-		const scopeAllowed = isItemLocationScopeAllowed(item.item, item.location.scope);
+		const scopeAllowed = yield* isItemLocationScopeAllowedFx({
+			item: item.item,
+			locationScope: item.location.scope,
+		});
 		if (!scopeAllowed) {
 			scopeIssues.push({
 				configuredScope,

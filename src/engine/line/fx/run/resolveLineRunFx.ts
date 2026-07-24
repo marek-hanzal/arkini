@@ -1,4 +1,4 @@
-import { Effect } from "effect";
+import { Effect, Option } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { resolveInputRunFx } from "~/engine/input/fx/run/resolveInputRunFx";
@@ -9,7 +9,7 @@ import { lineRulesFx } from "~/engine/line/fx/lineRulesFx";
 import { readItemLineFx } from "~/engine/line/fx/readItemLineFx";
 import type { LineRunResolutionSchema } from "~/engine/line/schema/run/LineRunResolutionSchema";
 import { RuntimeFx } from "~/engine/runtime/context/RuntimeFx";
-import { isBoardRuntimeItem } from "~/engine/runtime/read/isBoardRuntimeItem";
+import { isBoardRuntimeItemFx } from "~/engine/runtime/read/isBoardRuntimeItemFx";
 import { readRuntimeItemByIdFx } from "~/engine/runtime/read/readRuntimeItemByIdFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { planLineRunFx } from "./planLineRunFx";
@@ -36,15 +36,16 @@ export const resolveLineRunFx = Effect.fn("resolveLineRunFx")(function* ({
 	ownerItemId,
 	runtime,
 }: resolveLineRunFx.Props) {
-	const owner = yield* readRuntimeItemByIdFx({
+	const runtimeOwner = yield* readRuntimeItemByIdFx({
 		itemId: ownerItemId,
 		runtime,
 	});
-	if (!isBoardRuntimeItem(owner)) {
+	const owner = Option.getOrUndefined(yield* isBoardRuntimeItemFx(runtimeOwner));
+	if (owner === undefined) {
 		return yield* Effect.fail(
 			new ItemNotOnBoardError({
 				itemId: ownerItemId,
-				location: owner.location,
+				location: runtimeOwner.location,
 			}),
 		);
 	}

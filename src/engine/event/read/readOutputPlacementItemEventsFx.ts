@@ -1,10 +1,10 @@
-import { Effect } from "effect";
+import { Effect, Option } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
 import type { OutputPlacementResultSchema } from "~/engine/placement/schema/OutputPlacementResultSchema";
 import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
-import { isGridRuntimeItem } from "~/engine/runtime/read/isGridRuntimeItem";
+import { isGridRuntimeItemFx } from "~/engine/runtime/read/isGridRuntimeItemFx";
 
 export namespace readOutputPlacementItemEventsFx {
 	export interface Props {
@@ -19,7 +19,8 @@ export const readOutputPlacementItemEventsFx = Effect.fn("readOutputPlacementIte
 		const events: GameEventSchema.Type[] = [];
 		for (const drop of placement.drop) {
 			for (const stack of drop.placement.stack) {
-				if (!isGridRuntimeItem(stack.item)) {
+				const stackedItem = Option.getOrUndefined(yield* isGridRuntimeItemFx(stack.item));
+				if (stackedItem === undefined) {
 					return yield* Effect.die(
 						new Error(
 							`Output placement stacked ${stack.item.id} outside a visible grid scope.`,
@@ -28,19 +29,20 @@ export const readOutputPlacementItemEventsFx = Effect.fn("readOutputPlacementIte
 				}
 				events.push({
 					type: GameEventEnumSchema.enum.ItemStacked,
-					itemId: stack.item.id,
-					canonicalItemId: stack.item.item.id,
+					itemId: stackedItem.id,
+					canonicalItemId: stackedItem.item.id,
 					originItemId,
-					location: stack.item.location,
-					previousQuantity: stack.item.quantity - stack.quantity,
-					quantity: stack.item.quantity,
+					location: stackedItem.location,
+					previousQuantity: stackedItem.quantity - stack.quantity,
+					quantity: stackedItem.quantity,
 				});
 			}
-			for (const item of drop.placement.spawn) {
-				if (!isGridRuntimeItem(item)) {
+			for (const runtimeItem of drop.placement.spawn) {
+				const item = Option.getOrUndefined(yield* isGridRuntimeItemFx(runtimeItem));
+				if (item === undefined) {
 					return yield* Effect.die(
 						new Error(
-							`Output placement spawned ${item.id} outside a visible grid scope.`,
+							`Output placement spawned ${runtimeItem.id} outside a visible grid scope.`,
 						),
 					);
 				}

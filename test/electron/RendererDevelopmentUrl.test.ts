@@ -1,8 +1,7 @@
+import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
-import {
-	parseRendererDevelopmentUrl,
-	RendererDevelopmentServer,
-} from "../../electron/security/RendererDevelopmentUrl";
+import { RendererDevelopmentServer } from "../../electron/security/RendererDevelopmentUrl";
+import { parseRendererDevelopmentUrlFx } from "../../electron/security/parseRendererDevelopmentUrlFx";
 
 describe("RendererDevelopmentUrl", () => {
 	it("derives the exact HTTP and HMR endpoints from one configured URL", () => {
@@ -16,10 +15,12 @@ describe("RendererDevelopmentUrl", () => {
 	});
 
 	it("accepts only credential-free loopback HTTP roots", () => {
-		expect(parseRendererDevelopmentUrl("http://localhost:5173/").origin).toBe(
+		expect(Effect.runSync(parseRendererDevelopmentUrlFx("http://localhost:5173/")).origin).toBe(
 			"http://localhost:5173",
 		);
-		expect(parseRendererDevelopmentUrl("http://[::1]:5173/").origin).toBe("http://[::1]:5173");
+		expect(Effect.runSync(parseRendererDevelopmentUrlFx("http://[::1]:5173/")).origin).toBe(
+			"http://[::1]:5173",
+		);
 
 		for (const value of [
 			"https://127.0.0.1:4040/",
@@ -30,7 +31,7 @@ describe("RendererDevelopmentUrl", () => {
 			"http://127.0.0.1:4040/?token=x",
 			"http://127.0.0.1:4040/#fragment",
 		]) {
-			expect(() => parseRendererDevelopmentUrl(value)).toThrow(
+			expect(() => Effect.runSync(parseRendererDevelopmentUrlFx(value))).toThrow(
 				"credential-free loopback HTTP origin",
 			);
 		}

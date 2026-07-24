@@ -1,10 +1,11 @@
+import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import type { TileLocation } from "~/bridge/tile/TileLocation";
 import {
-	readTileActorStackingZIndex,
+	readTileActorStackingZIndexFx,
 	tileInventoryOverlayZIndex,
-} from "~/ui/tile/TileActorStacking";
+} from "~/ui/tile/readTileActorStackingZIndexFx";
 
 const board = {
 	scope: "board",
@@ -33,14 +34,16 @@ const toolbar = {
 
 const zIndex = (
 	location: TileLocation,
-	phase: Parameters<typeof readTileActorStackingZIndex>[0]["phase"],
+	phase: Parameters<typeof readTileActorStackingZIndexFx>[0]["phase"],
 	localZIndex: number,
 ) =>
-	readTileActorStackingZIndex({
-		location,
-		phase,
-		localZIndex,
-	});
+	Effect.runSync(
+		readTileActorStackingZIndexFx({
+			location,
+			phase,
+			localZIndex,
+		}),
+	);
 
 describe("TileActor stacking", () => {
 	it("occludes passive Board and Toolbar actors while keeping Inventory actors above its panel", () => {

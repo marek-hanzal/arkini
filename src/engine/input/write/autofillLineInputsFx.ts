@@ -1,4 +1,4 @@
-import { Effect } from "effect";
+import { Effect, Option } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
@@ -9,7 +9,7 @@ import { readItemMaterialInputFx } from "~/engine/input/read/readItemMaterialInp
 import { ItemNotOnGridError } from "~/engine/item/error/ItemNotOnGridError";
 import { isolateStatefulOwnerTransitionFx } from "~/engine/item/fx/isolateStatefulOwnerTransitionFx";
 import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
-import { isGridRuntimeItem } from "~/engine/runtime/read/isGridRuntimeItem";
+import { isGridRuntimeItemFx } from "~/engine/runtime/read/isGridRuntimeItemFx";
 import { readRuntimeItemByIdFx } from "~/engine/runtime/read/readRuntimeItemByIdFx";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 
@@ -54,15 +54,16 @@ export const autofillLineInputsFx = Effect.fn("autofillLineInputsFx")(function* 
 			let draft = runtime;
 			const events: GameEventSchema.Type[] = [];
 			for (const entry of plan.entry) {
-				const source = yield* readRuntimeItemByIdFx({
+				const runtimeSource = yield* readRuntimeItemByIdFx({
 					itemId: entry.sourceItemId,
 					runtime: draft,
 				});
-				if (!isGridRuntimeItem(source)) {
+				const source = Option.getOrUndefined(yield* isGridRuntimeItemFx(runtimeSource));
+				if (source === undefined) {
 					return yield* Effect.fail(
 						new ItemNotOnGridError({
-							itemId: source.id,
-							location: source.location,
+							itemId: runtimeSource.id,
+							location: runtimeSource.location,
 						}),
 					);
 				}

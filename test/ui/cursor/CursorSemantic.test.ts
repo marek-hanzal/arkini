@@ -1,27 +1,34 @@
+import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { readControlCursorSemantic } from "~/ui/cursor/readControlCursorSemantic";
-import { readTileActorCursorSemantic } from "~/ui/tile/readTileActorCursorSemantic";
+import { readControlCursorSemanticFx } from "~/ui/cursor/readControlCursorSemanticFx";
+import { readTileActorCursorSemanticFx } from "~/ui/tile/readTileActorCursorSemanticFx";
 
 describe("semantic cursor resolvers", () => {
 	it("keeps shared control pending and disabled meanings explicit", () => {
-		expect(readControlCursorSemantic({})).toBe("pointer");
+		expect(Effect.runSync(readControlCursorSemanticFx({}))).toBe("pointer");
 		expect(
-			readControlCursorSemantic({
-				disabled: true,
-			}),
+			Effect.runSync(
+				readControlCursorSemanticFx({
+					disabled: true,
+				}),
+			),
 		).toBe("not-allowed");
 		expect(
-			readControlCursorSemantic({
-				disabled: true,
-				intent: "progress",
-			}),
+			Effect.runSync(
+				readControlCursorSemanticFx({
+					disabled: true,
+					intent: "progress",
+				}),
+			),
 		).toBe("progress");
 		expect(
-			readControlCursorSemantic({
-				ariaDisabled: true,
-				intent: "wait",
-			}),
+			Effect.runSync(
+				readControlCursorSemanticFx({
+					ariaDisabled: true,
+					intent: "wait",
+				}),
+			),
 		).toBe("wait");
 	});
 
@@ -34,50 +41,64 @@ describe("semantic cursor resolvers", () => {
 			running: false,
 			visible: true,
 		};
-		expect(readTileActorCursorSemantic(base)).toBe("grab");
+		expect(Effect.runSync(readTileActorCursorSemanticFx(base))).toBe("grab");
 		expect(
-			readTileActorCursorSemantic({
-				...base,
-				phase: "dragging",
-			}),
+			Effect.runSync(
+				readTileActorCursorSemanticFx({
+					...base,
+					phase: "dragging",
+				}),
+			),
 		).toBe("grabbing");
 		expect(
-			readTileActorCursorSemantic({
-				...base,
-				forbiddenDrop: true,
-				phase: "dragging",
-			}),
+			Effect.runSync(
+				readTileActorCursorSemanticFx({
+					...base,
+					forbiddenDrop: true,
+					phase: "dragging",
+				}),
+			),
 		).toBe("not-allowed");
 		expect(
-			readTileActorCursorSemantic({
-				...base,
-				running: true,
-			}),
+			Effect.runSync(
+				readTileActorCursorSemanticFx({
+					...base,
+					running: true,
+				}),
+			),
 		).toBe("progress");
 		expect(
-			readTileActorCursorSemantic({
-				...base,
-				feedback: "rejected",
-				phase: "targeted",
-			}),
+			Effect.runSync(
+				readTileActorCursorSemanticFx({
+					...base,
+					feedback: "rejected",
+					phase: "targeted",
+				}),
+			),
 		).toBe("not-allowed");
 		expect(
-			readTileActorCursorSemantic({
-				...base,
-				phase: "targeted",
-			}),
+			Effect.runSync(
+				readTileActorCursorSemanticFx({
+					...base,
+					phase: "targeted",
+				}),
+			),
 		).toBe("default");
 		expect(
-			readTileActorCursorSemantic({
-				...base,
-				live: false,
-			}),
+			Effect.runSync(
+				readTileActorCursorSemanticFx({
+					...base,
+					live: false,
+				}),
+			),
 		).toBe("default");
 		expect(
-			readTileActorCursorSemantic({
-				...base,
-				visible: false,
-			}),
+			Effect.runSync(
+				readTileActorCursorSemanticFx({
+					...base,
+					visible: false,
+				}),
+			),
 		).toBe("default");
 	});
 });

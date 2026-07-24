@@ -1,9 +1,21 @@
-import { Effect, Semaphore, SubscriptionRef } from "effect";
+import { Cause, Effect, Semaphore, SubscriptionRef } from "effect";
 import type { ArkpackCatalog } from "~/bridge/arkpack/ArkpackCatalog";
 import { importArkpackFileFx } from "~/bridge/arkpack/importArkpackFileFx";
 import { listArkpacksFx } from "~/bridge/arkpack/listArkpacksFx";
 import { publishArkpackCatalogStateFx } from "~/bridge/arkpack/publishArkpackCatalogStateFx";
 import { removeArkpackFx } from "~/bridge/arkpack/removeArkpackFx";
+
+const publishArkpackCatalogFailureFx = (
+	state: SubscriptionRef.SubscriptionRef<ArkpackCatalog.State>,
+	cause: Cause.Cause<unknown>,
+) =>
+	publishArkpackCatalogStateFx({
+		state,
+		next: {
+			type: "failed",
+			error: Cause.squash(cause),
+		},
+	});
 
 /** Creates one shared catalog owner over authoritative Arkpack storage operations. */
 export const createArkpackCatalogFx = Effect.fn("createArkpackCatalogFx")(
@@ -47,15 +59,7 @@ export const createArkpackCatalogFx = Effect.fn("createArkpackCatalogFx")(
 						},
 					});
 				}).pipe(
-					Effect.tapError((error) =>
-						publishArkpackCatalogStateFx({
-							state,
-							next: {
-								type: "failed",
-								error,
-							},
-						}),
-					),
+					Effect.tapCause((cause) => publishArkpackCatalogFailureFx(state, cause)),
 					Effect.uninterruptible,
 				),
 			);
@@ -83,14 +87,8 @@ export const createArkpackCatalogFx = Effect.fn("createArkpackCatalogFx")(
 							});
 							return imported;
 						}).pipe(
-							Effect.tapError((error) =>
-								publishArkpackCatalogStateFx({
-									state,
-									next: {
-										type: "failed",
-										error,
-									},
-								}),
+							Effect.tapCause((cause) =>
+								publishArkpackCatalogFailureFx(state, cause),
 							),
 							Effect.uninterruptible,
 						),
@@ -116,14 +114,8 @@ export const createArkpackCatalogFx = Effect.fn("createArkpackCatalogFx")(
 							});
 							return removed;
 						}).pipe(
-							Effect.tapError((error) =>
-								publishArkpackCatalogStateFx({
-									state,
-									next: {
-										type: "failed",
-										error,
-									},
-								}),
+							Effect.tapCause((cause) =>
+								publishArkpackCatalogFailureFx(state, cause),
 							),
 							Effect.uninterruptible,
 						),

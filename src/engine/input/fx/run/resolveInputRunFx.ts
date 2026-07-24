@@ -1,9 +1,9 @@
-import { Effect } from "effect";
+import { Array, Effect } from "effect";
 import { match } from "ts-pattern";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeIntegerSchema";
-import { isInputRuntimeItem } from "~/engine/runtime/read/isInputRuntimeItem";
+import { isInputRuntimeItemFx } from "~/engine/runtime/read/isInputRuntimeItemFx";
 import type { InputSchema } from "~/engine/input/schema/InputSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { InputEnumSchema } from "~/engine/input/schema/InputEnumSchema";
@@ -34,15 +34,15 @@ export const resolveInputRunFx = Effect.fn("resolveInputRunFx")(function* ({
 	reservedCharges,
 	runtime,
 }: resolveInputRunFx.Props) {
-	const readMaterialItems = () => {
-		return runtime.items.filter(isInputRuntimeItem).filter((item) => {
-			return (
-				item.location.ownerItemId === ownerItemId &&
-				item.location.lineId === lineId &&
-				item.location.inputIndex === inputIndex
-			);
-		});
-	};
+	const materialItems = Array.getSomes(
+		yield* Effect.forEach(runtime.items, isInputRuntimeItemFx),
+	).filter((item) => {
+		return (
+			item.location.ownerItemId === ownerItemId &&
+			item.location.lineId === lineId &&
+			item.location.inputIndex === inputIndex
+		);
+	});
 
 	return yield* match(input)
 		.with(
@@ -68,7 +68,7 @@ export const resolveInputRunFx = Effect.fn("resolveInputRunFx")(function* ({
 					ownerItemId,
 					reservedCharges,
 					runtime,
-					items: readMaterialItems(),
+					items: materialItems,
 				});
 			},
 		)

@@ -1,8 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 
-const randomBetween = (minimum: number, maximum: number) =>
-	minimum + Math.random() * (maximum - minimum);
-
 interface CornerPortraitPeekState {
 	readonly activePortraitIndex: number | undefined;
 	readonly sizePx: number;
@@ -19,6 +16,8 @@ export const useCornerPortraitPeek = (active: boolean, portraitUrls: readonly st
 	const previousPortraitIndexRef = useRef<number | undefined>(undefined);
 
 	useEffect(() => {
+		const randomBetween = (minimum: number, maximum: number) =>
+			minimum + Math.random() * (maximum - minimum);
 		if (!active) {
 			setPeek((current) => ({
 				...current,

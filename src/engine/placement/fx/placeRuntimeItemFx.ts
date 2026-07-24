@@ -1,4 +1,4 @@
-import { Effect } from "effect";
+import { Effect, Option } from "effect";
 
 import { PlacementEnumSchema } from "~/engine/placement/schema/PlacementEnumSchema";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
@@ -11,7 +11,7 @@ import type { BoardLocationSchema } from "~/engine/location/schema/BoardLocation
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 import { ItemJobScopedError } from "~/engine/runtime/error/ItemJobScopedError";
 import { reviseRuntimeItemFx } from "~/engine/runtime/fx/reviseRuntimeItemFx";
-import { isGridRuntimeItem } from "~/engine/runtime/read/isGridRuntimeItem";
+import { isGridRuntimeItemFx } from "~/engine/runtime/read/isGridRuntimeItemFx";
 import { readRuntimeItemByIdFx } from "~/engine/runtime/read/readRuntimeItemByIdFx";
 import type { GridRuntimeItemSchema } from "~/engine/runtime/schema/GridRuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
@@ -94,7 +94,8 @@ export const placeRuntimeItemFx = Effect.fn("placeRuntimeItemFx")(function* ({
 		});
 		const events: GameEventSchema.Type[] = [];
 		for (const stack of placement.stack) {
-			if (!isGridRuntimeItem(stack.item)) {
+			const stackedItem = Option.getOrUndefined(yield* isGridRuntimeItemFx(stack.item));
+			if (stackedItem === undefined) {
 				return yield* Effect.die(
 					new Error(
 						`Existing-item placement stacked ${stack.item.id} outside a visible grid scope.`,
@@ -103,19 +104,22 @@ export const placeRuntimeItemFx = Effect.fn("placeRuntimeItemFx")(function* ({
 			}
 			events.push({
 				type: GameEventEnumSchema.enum.ItemStacked,
-				itemId: stack.item.id,
-				canonicalItemId: stack.item.item.id,
+				itemId: stackedItem.id,
+				canonicalItemId: stackedItem.item.id,
 				originItemId,
-				location: stack.item.location,
-				previousQuantity: stack.item.quantity - stack.quantity,
-				quantity: stack.item.quantity,
+				location: stackedItem.location,
+				previousQuantity: stackedItem.quantity - stack.quantity,
+				quantity: stackedItem.quantity,
 			});
 		}
-		for (const spawnedItem of placement.spawn) {
-			if (!isGridRuntimeItem(spawnedItem)) {
+		for (const runtimeSpawnedItem of placement.spawn) {
+			const spawnedItem = Option.getOrUndefined(
+				yield* isGridRuntimeItemFx(runtimeSpawnedItem),
+			);
+			if (spawnedItem === undefined) {
 				return yield* Effect.die(
 					new Error(
-						`Existing-item placement spawned ${spawnedItem.id} outside a visible grid scope.`,
+						`Existing-item placement spawned ${runtimeSpawnedItem.id} outside a visible grid scope.`,
 					),
 				);
 			}

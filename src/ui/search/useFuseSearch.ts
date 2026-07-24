@@ -10,22 +10,17 @@ interface FuseDocument<Identity extends string> extends FuseSearchCandidate<Iden
 	readonly order: number;
 }
 
-const serializeCandidates = <Identity extends string>(
-	candidates: readonly FuseSearchCandidate<Identity>[],
-) =>
-	JSON.stringify(
-		candidates.map(({ identity, terms }) => [
-			identity,
-			terms,
-		]),
-	);
-
 /** Searches explicit authorized presentation terms while retaining a stable Fuse corpus by identity. */
 export const useFuseSearch = <Identity extends string>(
 	candidates: readonly FuseSearchCandidate<Identity>[],
 	query: string,
 ): readonly Identity[] => {
-	const corpusKey = serializeCandidates(candidates);
+	const corpusKey = JSON.stringify(
+		candidates.map(({ identity, terms }) => [
+			identity,
+			terms,
+		]),
+	);
 	const documents = useMemo<readonly FuseDocument<Identity>[]>(
 		() =>
 			candidates.map((candidate, order) => ({

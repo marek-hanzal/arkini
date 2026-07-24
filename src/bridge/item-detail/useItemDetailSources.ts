@@ -51,77 +51,86 @@ const unavailable = {
 	kind: "unavailable",
 } as const satisfies useItemDetailSources.Projection;
 
-const sameQuantity = (
-	left: readItemDetailSourcesFx.QuantityBounds,
-	right: readItemDetailSourcesFx.QuantityBounds,
-) => left.min === right.min && left.max === right.max;
-
-const sameOutputFact = (
-	left: useItemDetailSources.OutputFact,
-	right: useItemDetailSources.OutputFact,
-) => {
-	if (
-		left.kind !== right.kind ||
-		!sameQuantity(left.quantity, right.quantity) ||
-		left.setWeight !== right.setWeight ||
-		left.totalSetWeight !== right.totalSetWeight
-	) {
-		return false;
-	}
-	if (left.kind === "guaranteed" || right.kind === "guaranteed") return true;
-	if (left.kind === "chance" && right.kind === "chance") return left.chance === right.chance;
-	return (
-		left.kind === "weight" &&
-		right.kind === "weight" &&
-		left.optionWeight === right.optionWeight &&
-		left.totalOptionWeight === right.totalOptionWeight &&
-		sameQuantity(left.selections, right.selections)
-	);
-};
-
-const sameLine = (left: useItemDetailSources.Line, right: useItemDetailSources.Line) =>
-	left.lineId === right.lineId &&
-	left.title === right.title &&
-	left.output.length === right.output.length &&
-	left.output.every(
-		(output, index) =>
-			right.output[index] !== undefined && sameOutputFact(output, right.output[index]),
-	);
-
-const sameSource = (left: useItemDetailSources.Source, right: useItemDetailSources.Source) =>
-	left.ownerItemId === right.ownerItemId &&
-	left.title === right.title &&
-	left.sourceUrl === right.sourceUrl &&
-	left.compositeUrl === right.compositeUrl &&
-	left.space === right.space &&
-	left.line.length === right.line.length &&
-	left.line.every(
-		(line, index) => right.line[index] !== undefined && sameLine(line, right.line[index]),
-	);
-
-const sameProjection = (
-	left: useItemDetailSources.Projection,
-	right: useItemDetailSources.Projection,
-) => {
-	if (left.kind !== right.kind) return false;
-	if (left.kind === "unavailable" || right.kind === "unavailable") return true;
-	return (
-		left.itemId === right.itemId &&
-		left.targetTitle === right.targetTitle &&
-		left.source.length === right.source.length &&
-		left.source.every(
-			(source, index) =>
-				right.source[index] !== undefined && sameSource(source, right.source[index]),
-		)
-	);
-};
-
 /** Projects exact owned Board sources that visibly produce one inspected runtime or definition item. */
 export const useItemDetailSources = (
 	target: useItemDetailSources.Target,
 ): useItemDetailSources.Projection => {
 	const game = useGameEngine();
 	const { itemId, kind } = target;
+	const isEqual = useCallback(
+		(left: useItemDetailSources.Projection, right: useItemDetailSources.Projection) => {
+			if (left.kind !== right.kind) return false;
+			if (left.kind === "unavailable" || right.kind === "unavailable") return true;
+			const sameQuantity = (
+				leftQuantity: readItemDetailSourcesFx.QuantityBounds,
+				rightQuantity: readItemDetailSourcesFx.QuantityBounds,
+			) => leftQuantity.min === rightQuantity.min && leftQuantity.max === rightQuantity.max;
+			const sameOutputFact = (
+				leftOutput: useItemDetailSources.OutputFact,
+				rightOutput: useItemDetailSources.OutputFact,
+			) => {
+				if (
+					leftOutput.kind !== rightOutput.kind ||
+					!sameQuantity(leftOutput.quantity, rightOutput.quantity) ||
+					leftOutput.setWeight !== rightOutput.setWeight ||
+					leftOutput.totalSetWeight !== rightOutput.totalSetWeight
+				) {
+					return false;
+				}
+				if (leftOutput.kind === "guaranteed" || rightOutput.kind === "guaranteed") {
+					return true;
+				}
+				if (leftOutput.kind === "chance" && rightOutput.kind === "chance") {
+					return leftOutput.chance === rightOutput.chance;
+				}
+				return (
+					leftOutput.kind === "weight" &&
+					rightOutput.kind === "weight" &&
+					leftOutput.optionWeight === rightOutput.optionWeight &&
+					leftOutput.totalOptionWeight === rightOutput.totalOptionWeight &&
+					sameQuantity(leftOutput.selections, rightOutput.selections)
+				);
+			};
+			const sameLine = (
+				leftLine: useItemDetailSources.Line,
+				rightLine: useItemDetailSources.Line,
+			) =>
+				leftLine.lineId === rightLine.lineId &&
+				leftLine.title === rightLine.title &&
+				leftLine.output.length === rightLine.output.length &&
+				leftLine.output.every(
+					(output, index) =>
+						rightLine.output[index] !== undefined &&
+						sameOutputFact(output, rightLine.output[index]),
+				);
+			const sameSource = (
+				leftSource: useItemDetailSources.Source,
+				rightSource: useItemDetailSources.Source,
+			) =>
+				leftSource.ownerItemId === rightSource.ownerItemId &&
+				leftSource.title === rightSource.title &&
+				leftSource.sourceUrl === rightSource.sourceUrl &&
+				leftSource.compositeUrl === rightSource.compositeUrl &&
+				leftSource.space === rightSource.space &&
+				leftSource.line.length === rightSource.line.length &&
+				leftSource.line.every(
+					(line, index) =>
+						rightSource.line[index] !== undefined &&
+						sameLine(line, rightSource.line[index]),
+				);
+			return (
+				left.itemId === right.itemId &&
+				left.targetTitle === right.targetTitle &&
+				left.source.length === right.source.length &&
+				left.source.every(
+					(source, index) =>
+						right.source[index] !== undefined &&
+						sameSource(source, right.source[index]),
+				)
+			);
+		},
+		[],
+	);
 	const selector = useCallback(
 		(runtime: RuntimeSchema.Type): useItemDetailSources.Projection => {
 			const projection = game.readOrThrow(
@@ -177,5 +186,5 @@ export const useItemDetailSources = (
 			kind,
 		],
 	);
-	return useRuntimeSelector(game, selector, sameProjection);
+	return useRuntimeSelector(game, selector, isEqual);
 };

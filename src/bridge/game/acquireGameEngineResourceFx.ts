@@ -1,6 +1,6 @@
 import { Cause, Effect, Exit } from "effect";
 
-import { toCriticalGameLifecycleError } from "~/bridge/game/CriticalGameLifecycleError";
+import { CriticalGameLifecycleError } from "~/bridge/game/CriticalGameLifecycleError";
 import type { Game } from "~/bridge/game/Game";
 import type { GameEngineResource } from "~/bridge/game/GameEngineResource";
 import { createGameEngineResourceFx } from "~/bridge/game/createGameEngineResourceFx";
@@ -23,11 +23,14 @@ const discardFailedAcquisitionFx = Effect.fn("discardFailedAcquisitionFx")(
 			Effect.flatMap((disposeExit) => {
 				if (Exit.isSuccess(disposeExit)) return Effect.failCause(acquisitionCause);
 				const failure = readExactCauseFailure(disposeExit.cause);
+				const cause = failure._tag === "Some" ? failure.value : disposeExit.cause;
 				return Effect.fail(
-					toCriticalGameLifecycleError({
-						operation: "engine-ownership",
-						cause: failure._tag === "Some" ? failure.value : disposeExit.cause,
-					}),
+					cause instanceof CriticalGameLifecycleError
+						? cause
+						: new CriticalGameLifecycleError({
+								operation: "engine-ownership",
+								cause,
+							}),
 				);
 			}),
 		),
@@ -57,7 +60,7 @@ export const acquireGameEngineResourceFx = Effect.fn("acquireGameEngineResourceF
 								Effect.gen(function* () {
 									if (game.arkpack.packageId !== packageId) {
 										return yield* Effect.fail(
-											toCriticalGameLifecycleError({
+											new CriticalGameLifecycleError({
 												operation: "engine-ownership",
 												cause: new Error(
 													`Game Engine creation returned package ${game.arkpack.packageId} for requested package ${packageId}.`,

@@ -4,8 +4,6 @@ export type CriticalGameLifecycleOperation =
 	| "game-leave"
 	| "game-reset";
 
-const causeMessage = (cause: unknown) => (cause instanceof Error ? cause.message : String(cause));
-
 /** Ends the current renderer run after one critical Game Engine ownership failure. */
 export class CriticalGameLifecycleError extends Error {
 	readonly operation: CriticalGameLifecycleOperation;
@@ -18,7 +16,9 @@ export class CriticalGameLifecycleError extends Error {
 		readonly cause: unknown;
 	}) {
 		super(
-			`Critical Game Engine lifecycle failure during ${operation}: ${causeMessage(cause)}`,
+			`Critical Game Engine lifecycle failure during ${operation}: ${
+				cause instanceof Error ? cause.message : String(cause)
+			}`,
 			{
 				cause,
 			},
@@ -27,18 +27,3 @@ export class CriticalGameLifecycleError extends Error {
 		this.operation = operation;
 	}
 }
-
-/** Preserves the first fatal lifecycle error instead of wrapping it repeatedly. */
-export const toCriticalGameLifecycleError = ({
-	operation,
-	cause,
-}: {
-	readonly operation: CriticalGameLifecycleOperation;
-	readonly cause: unknown;
-}): CriticalGameLifecycleError =>
-	cause instanceof CriticalGameLifecycleError
-		? cause
-		: new CriticalGameLifecycleError({
-				operation,
-				cause,
-			});

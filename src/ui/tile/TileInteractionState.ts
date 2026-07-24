@@ -8,17 +8,17 @@ interface TileInteractionBase {
 	readonly generation: number;
 }
 
-export interface TilePressedInteraction extends TileInteractionBase {
+interface TilePressedInteraction extends TileInteractionBase {
 	readonly phase: Extract<TileInteractionPhaseSchema.Type, "pressed">;
 }
 
-export interface TileDraggingInteraction extends TileInteractionBase {
+interface TileDraggingInteraction extends TileInteractionBase {
 	readonly phase: Extract<TileInteractionPhaseSchema.Type, "dragging">;
 	readonly target: TileDropTarget | null;
 	readonly previewKind: useDropItemPreview.Result["kind"] | null;
 }
 
-export interface TileAwaitingOutcomeInteraction extends TileInteractionBase {
+interface TileAwaitingOutcomeInteraction extends TileInteractionBase {
 	readonly phase: Extract<TileInteractionPhaseSchema.Type, "awaiting-outcome">;
 	readonly target: TileDropTarget;
 	readonly previewKind: useDropItemPreview.Result["kind"] | null;

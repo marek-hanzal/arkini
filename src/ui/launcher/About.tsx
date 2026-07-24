@@ -4,10 +4,10 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useExclusiveAction } from "~/ui/action/useExclusiveAction";
 import { PrimaryButton } from "~/ui/button/Button";
 
-const errorMessage = (error: unknown) => (error instanceof Error ? error.message : String(error));
-
 /** Renders project and authorship credits for the normalized About page. */
 export const About = () => {
+	const errorMessage = (error: unknown) =>
+		error instanceof Error ? error.message : String(error);
 	const navigate = useNavigate();
 	const mountedRef = useRef(false);
 	const [navigationError, setNavigationError] = useState<unknown>();

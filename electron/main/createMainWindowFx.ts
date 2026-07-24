@@ -1,6 +1,6 @@
 import { BrowserWindow, ipcMain, screen } from "electron";
 import { fileURLToPath } from "node:url";
-import { Effect } from "effect";
+import { Effect, Exit } from "effect";
 import { calculateInitialWindowBoundsFx } from "./calculateInitialWindowBoundsFx";
 import { ElectronMainError } from "./ElectronMainError";
 import { registerControlledWindowCloseFx } from "./registerControlledWindowCloseFx";
@@ -33,34 +33,47 @@ export const createMainWindowFx = Effect.fn("createMainWindowFx")(
 				},
 			});
 
-			yield* trustedRenderer.registerWindowFx(window);
-			yield* registerFullscreenShortcutsFx(window);
-			yield* registerControlledWindowCloseFx({
-				window,
-				ipc: ipcMain,
-				trustedRenderer,
-			});
-			window.once("ready-to-show", () => {
+			const onReadyToShow = () => {
 				ElectronMainRuntime.runSync(showMainWindowFx(window));
-			});
+			};
 
-			yield* Effect.tryPromise({
-				try: async () => {
-					if (trustedRenderer.developmentRendererUrl !== undefined) {
-						await window.loadURL(trustedRenderer.developmentRendererUrl);
-						window.webContents.openDevTools({
-							mode: "detach",
-						});
-					} else {
-						await window.loadURL("arkini://app/");
-					}
-				},
-				catch: (cause) =>
-					new ElectronMainError({
-						operation: "load the Arkini renderer",
-						cause,
-					}),
-			});
-			return window;
+			return yield* Effect.gen(function* () {
+				yield* trustedRenderer.registerWindowFx(window);
+				yield* registerFullscreenShortcutsFx(window);
+				yield* registerControlledWindowCloseFx({
+					window,
+					ipc: ipcMain,
+					trustedRenderer,
+				});
+				window.once("ready-to-show", onReadyToShow);
+
+				yield* Effect.tryPromise({
+					try: async () => {
+						if (trustedRenderer.developmentRendererUrl !== undefined) {
+							await window.loadURL(trustedRenderer.developmentRendererUrl);
+							window.webContents.openDevTools({
+								mode: "detach",
+							});
+						} else {
+							await window.loadURL("arkini://app/");
+						}
+					},
+					catch: (cause) =>
+						new ElectronMainError({
+							operation: "load the Arkini renderer",
+							cause,
+						}),
+				});
+				return window;
+			}).pipe(
+				Effect.onExit((exit) =>
+					Exit.isSuccess(exit)
+						? Effect.void
+						: Effect.sync(() => {
+								window.removeListener("ready-to-show", onReadyToShow);
+								if (!window.isDestroyed()) window.destroy();
+							}),
+				),
+			);
 		}),
 );

@@ -6,8 +6,8 @@ import { resolveItemFx } from "~/engine/item/fx/resolveItemFx";
 import { RuntimeFx } from "~/engine/runtime/context/RuntimeFx";
 import { lineRulesFx } from "~/engine/line/fx/lineRulesFx";
 import { resolveLineShowFx } from "~/engine/line/fx/run/resolveLineShowFx";
-import { isLineOwnerItem } from "~/engine/line/read/isLineOwnerItem";
-import { readLineOwnerLines } from "~/engine/line/read/readLineOwnerLines";
+import { isLineOwnerItemFx } from "~/engine/line/read/isLineOwnerItemFx";
+import { readLineOwnerLinesFx } from "~/engine/line/read/readLineOwnerLinesFx";
 import { RuleEnumSchema } from "~/engine/line/schema/rule/RuleEnumSchema";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 import type { DropSchema } from "~/engine/output/schema/DropSchema";
@@ -248,13 +248,12 @@ export const readItemDetailSourcesFx = Effect.fn("readItemDetailSourcesFx")(func
 	const activeLine = new Set(runtime.jobs.map((job) => `${job.ownerItemId}\u0000${job.lineId}`));
 	const source: OrderedSource[] = [];
 	for (const owner of runtime.items) {
-		if (
-			owner.location.scope !== LocationScopeEnumSchema.enum.Board ||
-			!isLineOwnerItem(owner.item)
-		) {
+		if (owner.location.scope !== LocationScopeEnumSchema.enum.Board) {
 			continue;
 		}
-		const lines = readLineOwnerLines(owner.item);
+		const ownerItem = Option.getOrUndefined(yield* isLineOwnerItemFx(owner.item));
+		if (ownerItem === undefined) continue;
+		const lines = yield* readLineOwnerLinesFx(ownerItem);
 		const matchingLines: readItemDetailSourcesFx.Line[] = [];
 		for (const line of lines) {
 			const output = readMatchingFacts({

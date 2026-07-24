@@ -1,14 +1,13 @@
-import { Effect } from "effect";
+import { Array, Effect } from "effect";
 
 import { RuntimeFx } from "~/engine/runtime/context/RuntimeFx";
-import { isBoardRuntimeItem } from "~/engine/runtime/read/isBoardRuntimeItem";
+import { isBoardRuntimeItemFx } from "~/engine/runtime/read/isBoardRuntimeItemFx";
 
 /** Reads the board items currently presented to the player. */
 export const readCurrentSpaceBoardItemsFx = Effect.fn("readCurrentSpaceBoardItemsFx")(function* () {
 	const runtimeFx = yield* RuntimeFx;
 	const runtime = yield* runtimeFx.read;
+	const boardItems = Array.getSomes(yield* Effect.forEach(runtime.items, isBoardRuntimeItemFx));
 
-	return runtime.items
-		.filter(isBoardRuntimeItem)
-		.filter((item) => item.location.space === runtime.currentSpace);
+	return boardItems.filter((item) => item.location.space === runtime.currentSpace);
 });

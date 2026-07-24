@@ -1,4 +1,4 @@
-import { Effect } from "effect";
+import { Effect, Option } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { planInputMaterialStoreFx } from "~/engine/input/fx/planInputMaterialStoreFx";
@@ -8,8 +8,7 @@ import { ItemNotOnBoardError } from "~/engine/item/error/ItemNotOnBoardError";
 import { LineNotFoundError } from "~/engine/line/error/LineNotFoundError";
 import { isLineInputClosedFx } from "~/engine/line/fx/input/isLineInputClosedFx";
 import { readItemLineFx } from "~/engine/line/fx/readItemLineFx";
-import { isBoardRuntimeItem } from "~/engine/runtime/read/isBoardRuntimeItem";
-import { isGridRuntimeItem } from "~/engine/runtime/read/isGridRuntimeItem";
+import { isBoardRuntimeItemFx } from "~/engine/runtime/read/isBoardRuntimeItemFx";
 import { readRuntimeItemByIdFx } from "~/engine/runtime/read/readRuntimeItemByIdFx";
 import type { BoardRuntimeItemSchema } from "~/engine/runtime/schema/BoardRuntimeItemSchema";
 import type { GridRuntimeItemSchema } from "~/engine/runtime/schema/GridRuntimeItemSchema";
@@ -94,15 +93,16 @@ export const planLineInputAutofillFx = Effect.fn("planLineInputAutofillFx")(func
 	lineId,
 	runtime,
 }: planLineInputAutofillFx.Props) {
-	const owner = yield* readRuntimeItemByIdFx({
+	const runtimeOwner = yield* readRuntimeItemByIdFx({
 		itemId: ownerItemId,
 		runtime,
 	});
-	if (!isBoardRuntimeItem(owner)) {
+	const owner = Option.getOrUndefined(yield* isBoardRuntimeItemFx(runtimeOwner));
+	if (owner === undefined) {
 		return yield* Effect.fail(
 			new ItemNotOnBoardError({
-				itemId: owner.id,
-				location: owner.location,
+				itemId: runtimeOwner.id,
+				location: runtimeOwner.location,
 			}),
 		);
 	}
@@ -124,7 +124,9 @@ export const planLineInputAutofillFx = Effect.fn("planLineInputAutofillFx")(func
 		.filter(
 			(candidate): candidate is GridRuntimeItemSchema.Type =>
 				candidate.id !== owner.id &&
-				isGridRuntimeItem(candidate) &&
+				(candidate.location.scope === LocationScopeEnumSchema.enum.Board ||
+					candidate.location.scope === LocationScopeEnumSchema.enum.Inventory ||
+					candidate.location.scope === LocationScopeEnumSchema.enum.Toolbar) &&
 				(candidate.location.scope !== LocationScopeEnumSchema.enum.Board ||
 					candidate.location.space === owner.location.space),
 		)

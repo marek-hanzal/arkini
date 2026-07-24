@@ -1,4 +1,4 @@
-import { Effect } from "effect";
+import { Array, Effect, Option } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { InputDepositSchema } from "~/engine/input/schema/InputDepositSchema";
@@ -6,7 +6,7 @@ import type { InputRunResolutionSchema } from "~/engine/input/schema/run/InputRu
 import { ItemNotOnBoardError } from "~/engine/item/error/ItemNotOnBoardError";
 import { queryFx } from "~/engine/query/fx/queryFx";
 import { RuntimeFx } from "~/engine/runtime/context/RuntimeFx";
-import { isBoardRuntimeItem } from "~/engine/runtime/read/isBoardRuntimeItem";
+import { isBoardRuntimeItemFx } from "~/engine/runtime/read/isBoardRuntimeItemFx";
 import { readRuntimeItemByIdFx } from "~/engine/runtime/read/readRuntimeItemByIdFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { InputEnumSchema } from "~/engine/input/schema/InputEnumSchema";
@@ -68,15 +68,16 @@ export const resolveInputDepositRunFx = Effect.fn("resolveInputDepositRunFx")(fu
 	reservedCharges,
 	runtime,
 }: resolveInputDepositRunFx.Props) {
-	const owner = yield* readRuntimeItemByIdFx({
+	const runtimeOwner = yield* readRuntimeItemByIdFx({
 		itemId: ownerItemId,
 		runtime,
 	});
-	if (!isBoardRuntimeItem(owner)) {
+	const owner = Option.getOrUndefined(yield* isBoardRuntimeItemFx(runtimeOwner));
+	if (owner === undefined) {
 		return yield* Effect.fail(
 			new ItemNotOnBoardError({
-				itemId: owner.id,
-				location: owner.location,
+				itemId: runtimeOwner.id,
+				location: runtimeOwner.location,
 			}),
 		);
 	}
@@ -89,9 +90,9 @@ export const resolveInputDepositRunFx = Effect.fn("resolveInputDepositRunFx")(fu
 			read: Effect.succeed(runtime),
 		}),
 	);
-	const boardCandidates = candidates
-		.filter(isBoardRuntimeItem)
-		.sort((left, right) => compareTarget(owner.location.position, left, right));
+	const boardCandidates = Array.getSomes(
+		yield* Effect.forEach(candidates, isBoardRuntimeItemFx),
+	).sort((left, right) => compareTarget(owner.location.position, left, right));
 
 	for (const target of boardCandidates) {
 		const charges = yield* resolveInputChargeRunFx({

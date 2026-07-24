@@ -15,6 +15,8 @@ import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { ArkpackCatalog } from "~/bridge/arkpack/ArkpackCatalog";
 import { ArkpackCatalogOwnerAtom } from "~/bridge/arkpack/ArkpackCatalogOwnerAtom";
+import { RendererLifecycleOwnerAtom } from "~/bridge/lifecycle/RendererLifecycleOwnerAtom";
+import { createRendererLifecycleFx } from "~/bridge/lifecycle/createRendererLifecycleFx";
 import { MainMenuPage } from "~/page/launcher/MainMenuPage";
 import { LauncherStartupAtom } from "~/ui/launcher/LauncherStartupAtom";
 import { LauncherStartupConfigAtom } from "~/ui/launcher/LauncherStartupConfigAtom";
@@ -46,14 +48,6 @@ describe("MainMenu", () => {
 					resolveClose = resolve;
 				}),
 		);
-		Object.defineProperty(window, "arkini", {
-			configurable: true,
-			value: {
-				lifecycle: {
-					requestClose,
-				},
-			},
-		});
 		const catalogState = {
 			type: "ready" as const,
 			arkpacks: [
@@ -97,6 +91,16 @@ describe("MainMenu", () => {
 		});
 		registries.push(registry);
 		registry.set(ArkpackCatalogOwnerAtom, catalog);
+		registry.set(
+			RendererLifecycleOwnerAtom,
+			Effect.runSync(
+				createRendererLifecycleFx({
+					forceClose: () => undefined,
+					requestClose,
+					waitUntilVisible: () => Promise.resolve(performance.now()),
+				}),
+			),
+		);
 		registry.set(LauncherStartupConfigAtom, {
 			heroUrl: "/hero.png",
 			bootstrapFx: Effect.succeed({

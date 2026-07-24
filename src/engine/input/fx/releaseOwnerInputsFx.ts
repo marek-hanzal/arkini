@@ -1,10 +1,10 @@
-import { Effect } from "effect";
+import { Effect, Option } from "effect";
 
 import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
 import { ItemNotOnBoardError } from "~/engine/item/error/ItemNotOnBoardError";
+import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 import { placeRuntimeItemFx } from "~/engine/placement/fx/placeRuntimeItemFx";
-import { isBoardRuntimeItem } from "~/engine/runtime/read/isBoardRuntimeItem";
-import { isInputRuntimeItem } from "~/engine/runtime/read/isInputRuntimeItem";
+import { isBoardRuntimeItemFx } from "~/engine/runtime/read/isBoardRuntimeItemFx";
 import type { InputRuntimeItemSchema } from "~/engine/runtime/schema/InputRuntimeItemSchema";
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
@@ -31,7 +31,8 @@ export const releaseOwnerInputsFx = Effect.fn("releaseOwnerInputsFx")(function* 
 }: releaseOwnerInputsFx.Props) {
 	const bufferedItems = runtime.items.filter(
 		(item): item is InputRuntimeItemSchema.Type =>
-			isInputRuntimeItem(item) && item.location.ownerItemId === owner.id,
+			item.location.scope === LocationScopeEnumSchema.enum.Input &&
+			item.location.ownerItemId === owner.id,
 	);
 	if (bufferedItems.length === 0) {
 		return {
@@ -39,7 +40,8 @@ export const releaseOwnerInputsFx = Effect.fn("releaseOwnerInputsFx")(function* 
 			runtime,
 		} satisfies releaseOwnerInputsFx.Result;
 	}
-	if (!isBoardRuntimeItem(owner)) {
+	const boardOwner = Option.getOrUndefined(yield* isBoardRuntimeItemFx(owner));
+	if (boardOwner === undefined) {
 		return yield* Effect.fail(
 			new ItemNotOnBoardError({
 				itemId: owner.id,
@@ -59,8 +61,8 @@ export const releaseOwnerInputsFx = Effect.fn("releaseOwnerInputsFx")(function* 
 	for (const bufferedItem of bufferedItems) {
 		const placement = yield* placeRuntimeItemFx({
 			itemId: bufferedItem.id,
-			origin: owner.location,
-			originItemId: owner.id,
+			origin: boardOwner.location,
+			originItemId: boardOwner.id,
 			runtime: state.runtime,
 		});
 		state = {

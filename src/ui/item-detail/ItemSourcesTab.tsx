@@ -6,41 +6,6 @@ import { Button } from "~/ui/button/Button";
 import { Scrollable } from "~/ui/scrollable/Scrollable";
 import { useItemDetailControl } from "~/ui/item-detail/useItemDetailControl";
 
-const formatQuantity = ({ min, max }: { readonly min: number; readonly max: number }) =>
-	min === max ? `${min}×` : `${min}–${max}×`;
-
-const formatSelections = ({ min, max }: { readonly min: number; readonly max: number }) =>
-	min === max ? `${min} selection${min === 1 ? "" : "s"}` : `${min}–${max} selections`;
-
-const formatOutputFact = (fact: useItemDetailSources.OutputFact) => {
-	const quantity = formatQuantity(fact.quantity);
-	const alternative =
-		fact.totalSetWeight === fact.setWeight
-			? ""
-			: ` · alternative weight ${fact.setWeight}/${fact.totalSetWeight}`;
-	return match(fact)
-		.with(
-			{
-				kind: "guaranteed",
-			},
-			() => `${quantity} guaranteed${alternative}`,
-		)
-		.with(
-			{
-				kind: "chance",
-			},
-			({ chance }) => `${quantity} · ${Math.round(chance * 100)}% chance${alternative}`,
-		)
-		.with(
-			{
-				kind: "weight",
-			},
-			({ optionWeight, selections, totalOptionWeight }) =>
-				`${quantity} · weight ${optionWeight}/${totalOptionWeight} · ${formatSelections(selections)}${alternative}`,
-		)
-		.exhaustive();
-};
-
 const SourceArtwork = ({
 	compositeUrl,
 	sourceUrl,
@@ -76,6 +41,38 @@ const SourceRow = ({
 	readonly targetTitle: string;
 }) => {
 	const itemDetail = useItemDetailControl();
+	const formatQuantity = ({ min, max }: { readonly min: number; readonly max: number }) =>
+		min === max ? `${min}×` : `${min}–${max}×`;
+	const formatSelections = ({ min, max }: { readonly min: number; readonly max: number }) =>
+		min === max ? `${min} selection${min === 1 ? "" : "s"}` : `${min}–${max} selections`;
+	const formatOutputFact = (fact: useItemDetailSources.OutputFact) => {
+		const quantity = formatQuantity(fact.quantity);
+		const alternative =
+			fact.totalSetWeight === fact.setWeight
+				? ""
+				: ` · alternative weight ${fact.setWeight}/${fact.totalSetWeight}`;
+		return match(fact)
+			.with(
+				{
+					kind: "guaranteed",
+				},
+				() => `${quantity} guaranteed${alternative}`,
+			)
+			.with(
+				{
+					kind: "chance",
+				},
+				({ chance }) => `${quantity} · ${Math.round(chance * 100)}% chance${alternative}`,
+			)
+			.with(
+				{
+					kind: "weight",
+				},
+				({ optionWeight, selections, totalOptionWeight }) =>
+					`${quantity} · weight ${optionWeight}/${totalOptionWeight} · ${formatSelections(selections)}${alternative}`,
+			)
+			.exhaustive();
+	};
 	return (
 		<article
 			className="ak-list-row border-b border-line px-3 py-4 last:border-b-0"

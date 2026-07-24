@@ -6,19 +6,6 @@ import type { TileDragSource } from "~/ui/tile/TileDragSource";
 import type { TileDropTarget } from "~/ui/tile/TileDropTarget";
 import type { TileInteractionState } from "~/ui/tile/TileInteractionState";
 
-const sameTarget = (left: TileDropTarget | null, right: TileDropTarget | null) => {
-	if (left === null || right === null) return left === right;
-	if (left.kind !== right.kind) return false;
-	if (left.kind === "outside" || right.kind === "outside") return true;
-	if (left.surface.id !== right.surface.id) return false;
-	if (left.kind === "surface" || right.kind === "surface") return true;
-	return (
-		left.slot.id === right.slot.id &&
-		left.occupant?.id === right.occupant?.id &&
-		left.occupant?.revision === right.occupant?.revision
-	);
-};
-
 /** Owns valid transitions for the one Canvas-local tile interaction generation. */
 export const useTileInteractionController = ({
 	readPreview,
@@ -30,6 +17,18 @@ export const useTileInteractionController = ({
 	) => useDropItemPreview.Result | null;
 	readonly resolveTarget: (x: number, y: number) => TileDropTarget;
 }) => {
+	const sameTarget = (left: TileDropTarget | null, right: TileDropTarget | null) => {
+		if (left === null || right === null) return left === right;
+		if (left.kind !== right.kind) return false;
+		if (left.kind === "outside" || right.kind === "outside") return true;
+		if (left.surface.id !== right.surface.id) return false;
+		if (left.kind === "surface" || right.kind === "surface") return true;
+		return (
+			left.slot.id === right.slot.id &&
+			left.occupant?.id === right.occupant?.id &&
+			left.occupant?.revision === right.occupant?.revision
+		);
+	};
 	const nextGeneration = useRef(0);
 	const activeRef = useRef<TileInteractionState | null>(null);
 	const activeListeners = useRef(new Set<() => void>());

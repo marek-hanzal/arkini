@@ -1,8 +1,8 @@
-import { Effect } from "effect";
+import { Array, Effect } from "effect";
 
 import { readGridLocationOccupantsFx } from "~/engine/location/read/readGridLocationOccupantsFx";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
-import { isGridRuntimeItem } from "~/engine/runtime/read/isGridRuntimeItem";
+import { isGridRuntimeItemFx } from "~/engine/runtime/read/isGridRuntimeItemFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
 export namespace readEmptyLocationsFx {
@@ -17,8 +17,9 @@ export const readEmptyLocationsFx = Effect.fn("readEmptyLocationsFx")(function* 
 	locations,
 	runtime,
 }: readEmptyLocationsFx.Props) {
+	const gridItems = Array.getSomes(yield* Effect.forEach(runtime.items, isGridRuntimeItemFx));
 	const occupants = yield* readGridLocationOccupantsFx({
-		items: runtime.items.filter(isGridRuntimeItem),
+		items: gridItems,
 		locations,
 	});
 

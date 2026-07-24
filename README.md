@@ -55,7 +55,7 @@ src/@routes
 → TanStack Router registration plus route-owned beforeLoad/loader/redirect/context orchestration through public bridge and UI contracts; generated hierarchy lives in src/_route.ts
 ```
 
-Renderer dependencies form an explicit DAG: `@routes → {page, ui, bridge}`, `page → ui`, `ui → bridge`, and `bridge → engine`. [Route modules](src/@routes) may orchestrate public bridge lifecycle Effects but never import the engine directly; lower layers never import route registration. [`electron/`](electron) owns the complete Electron platform and may not import the renderer or engine roots; renderer bridge domains consume only its pure [`electron/contract`](electron/contract) transport seam. [`src/router.tsx`](src/router.tsx) creates the router from the [generated tree](src/_route.ts) and [`src/main.tsx`](src/main.tsx) is the sole renderer entrypoint.
+Renderer dependencies form an explicit DAG: `@routes → {page, ui, bridge}`, `page → ui`, `ui → bridge`, and `bridge → engine`. [Route modules](src/@routes) may orchestrate public bridge lifecycle Effects but never import the engine directly; lower layers never import route registration. [`electron/`](electron) owns the complete Electron platform and may not import the renderer or engine roots; renderer bridge domains consume only its pure [`electron/contract`](electron/contract) transport seam. [`src/createArkiniRouterFx.tsx`](src/createArkiniRouterFx.tsx) creates the router from the [generated tree](src/_route.ts) and [`src/main.tsx`](src/main.tsx) is the sole renderer entrypoint.
 
 Documentation may abbreviate engine-owned paths such as `runtime/`, `tick/`, and `placement/`; they mean the corresponding directory under [`src/engine`](src/engine). Presentation-owned paths are written explicitly.
 

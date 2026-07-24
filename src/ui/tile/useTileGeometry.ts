@@ -23,32 +23,29 @@ export namespace useTileGeometry {
 	export type SlotRegistrationChange = "none" | "semantic" | "geometry";
 }
 
-const slotRegistrationKey = (surface: TileSurface, slot: TileSlot) =>
-	`${surface.id}\u0000${slot.id}`;
-
-const isPointInside = (rect: DOMRect, x: number, y: number) =>
-	x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom;
-
-const isPointInsideSlot = ({
-	lastColumn,
-	lastRow,
-	rect,
-	x,
-	y,
-}: {
-	readonly lastColumn: boolean;
-	readonly lastRow: boolean;
-	readonly rect: DOMRect;
-	readonly x: number;
-	readonly y: number;
-}) =>
-	x >= rect.left &&
-	(lastColumn ? x <= rect.right : x < rect.right) &&
-	y >= rect.top &&
-	(lastRow ? y <= rect.bottom : y < rect.bottom);
-
 /** Owns Canvas-local tile surface registration, measurement, and topmost hit testing. */
 export const useTileGeometry = () => {
+	const slotRegistrationKey = (surface: TileSurface, slot: TileSlot) =>
+		`${surface.id}\u0000${slot.id}`;
+	const isPointInside = (rect: DOMRect, x: number, y: number) =>
+		x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom;
+	const isPointInsideSlot = ({
+		lastColumn,
+		lastRow,
+		rect,
+		x,
+		y,
+	}: {
+		readonly lastColumn: boolean;
+		readonly lastRow: boolean;
+		readonly rect: DOMRect;
+		readonly x: number;
+		readonly y: number;
+	}) =>
+		x >= rect.left &&
+		(lastColumn ? x <= rect.right : x < rect.right) &&
+		y >= rect.top &&
+		(lastRow ? y <= rect.bottom : y < rect.bottom);
 	const surfaces = useRef(new Map<string, TileSurfaceRegistration>());
 	const slots = useRef(new Map<string, TileSlotRegistration>());
 	const actorLayer = useRef<HTMLElement | null>(null);

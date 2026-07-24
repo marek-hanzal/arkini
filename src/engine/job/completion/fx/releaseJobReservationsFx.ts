@@ -14,11 +14,6 @@ export namespace releaseJobReservationsFx {
 		reservations: readonly ReservedRuntimeItemSchema.Type[];
 		runtime: RuntimeSchema.Type;
 	}
-
-	export interface Result {
-		readonly events: readonly GameEventSchema.Type[];
-		readonly runtime: RuntimeSchema.Type;
-	}
 }
 
 /** Returns the same reserved instances through canonical placement with exact visible facts. */

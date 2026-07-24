@@ -1,4 +1,4 @@
-import { Deferred, Effect, Stream, SubscriptionRef } from "effect";
+import { Cause, Deferred, Effect, Exit, Stream, SubscriptionRef } from "effect";
 import { describe, expect, it, vi } from "vitest";
 import type { ArkpackDescriptor } from "~/bridge/arkpack/Arkpack";
 import { createArkpackCatalogFx } from "~/bridge/arkpack/createArkpackCatalogFx";
@@ -115,6 +115,51 @@ describe("createArkpackCatalogFx", () => {
 			"loading",
 			"failed",
 		]);
+	});
+
+	it("settles a malformed import defect and permits an exact retry", async () => {
+		let descriptors: ReadonlyArray<ArkpackDescriptor> = [
+			builtIn,
+		];
+		let attempts = 0;
+		const malformed = new Error("Invalid pack: magic header mismatch.");
+		const catalog = Effect.runSync(
+			createArkpackCatalogFx({
+				listFx: Effect.sync(() => descriptors),
+				importFileFx: () =>
+					Effect.suspend(() => {
+						attempts += 1;
+						if (attempts === 1) return Effect.die(malformed);
+						descriptors = [
+							builtIn,
+							imported,
+						];
+						return Effect.succeed(imported);
+					}),
+			}),
+		);
+
+		const first = await Effect.runPromiseExit(catalog.importFileFx({} as File));
+		expect(Exit.isFailure(first)).toBe(true);
+		if (Exit.isFailure(first)) {
+			expect(Cause.hasDies(first.cause)).toBe(true);
+			expect(Cause.squash(first.cause)).toBe(malformed);
+		}
+		expect(Effect.runSync(SubscriptionRef.get(catalog.state))).toEqual({
+			type: "failed",
+			error: malformed,
+		});
+
+		await expect(catalog.importFileFx({} as File).pipe(Effect.runPromise)).resolves.toBe(
+			imported,
+		);
+		expect(Effect.runSync(SubscriptionRef.get(catalog.state))).toEqual({
+			type: "ready",
+			arkpacks: [
+				builtIn,
+				imported,
+			],
+		});
 	});
 
 	it("publishes loading before import and remove operations complete", async () => {

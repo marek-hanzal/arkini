@@ -4,7 +4,7 @@ import { Console, Effect } from "effect";
 import { writeArkpackKeyPairFx } from "~/engine/pack/fx/writeArkpackKeyPairFx";
 import { handleArkpackInputErrorFx } from "./handleArkpackInputErrorFx";
 
-export namespace runArkpackKeygenFx {
+namespace runArkpackKeygenFx {
 	export interface Props {
 		readonly force: boolean;
 		readonly privateKeyOutput: string;

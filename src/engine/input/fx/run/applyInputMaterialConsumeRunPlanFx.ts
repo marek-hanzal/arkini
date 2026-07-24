@@ -32,12 +32,6 @@ export namespace applyInputMaterialConsumeRunPlanFx {
 		readonly consumedItem: JobRuntimeItemSchema.Type;
 		readonly remainingQuantity: NonNegativeIntegerSchema.Type;
 	}
-
-	export interface Result {
-		readonly consumption: readonly Consumption[];
-		readonly events: readonly GameEventSchema.Type[];
-		readonly runtime: RuntimeSchema.Type;
-	}
 }
 
 /** Commits exact consume allocations to one job and returns their source-to-job identities. */

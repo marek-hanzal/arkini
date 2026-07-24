@@ -3,7 +3,7 @@ import { Effect, Random } from "effect";
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
 
 /** Bump only when intentionally changing temporary-expiry random compatibility. */
-export const TemporaryExpiryRandomVersion = 2;
+const TemporaryExpiryRandomVersion = 2;
 
 /** Runs the owned program with deterministic random from one temporary runtime identity. */
 export const makeTemporaryExpiryRandomFx = Effect.fn("makeTemporaryExpiryRandomFx")(function* <

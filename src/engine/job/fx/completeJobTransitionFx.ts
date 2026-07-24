@@ -1,6 +1,7 @@
-import { Effect } from "effect";
+import { Array, Effect, Option } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
+import { ItemEnumSchema } from "~/engine/item/schema/ItemEnumSchema";
 import type { JobCompletionOwner } from "~/engine/job/completion/JobCompletionContext";
 import { completeLineJobRuntimeFx } from "~/engine/job/completion/fx/completeLineJobRuntimeFx";
 import { ItemNotOnBoardError } from "~/engine/item/error/ItemNotOnBoardError";
@@ -8,9 +9,9 @@ import { JobNotFoundError } from "~/engine/job/error/JobNotFoundError";
 import { JobNotReadyError } from "~/engine/job/error/JobNotReadyError";
 import { makeJobCompletionRandomFx } from "~/engine/job/random/makeJobCompletionRandomFx";
 import { readItemLineFx } from "~/engine/line/fx/readItemLineFx";
-import { isBoardRuntimeItem } from "~/engine/runtime/read/isBoardRuntimeItem";
-import { isJobRuntimeItem } from "~/engine/runtime/read/isJobRuntimeItem";
-import { isReservedRuntimeItem } from "~/engine/runtime/read/isReservedRuntimeItem";
+import { isBoardRuntimeItemFx } from "~/engine/runtime/read/isBoardRuntimeItemFx";
+import { isJobRuntimeItemFx } from "~/engine/runtime/read/isJobRuntimeItemFx";
+import { isReservedRuntimeItemFx } from "~/engine/runtime/read/isReservedRuntimeItemFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
 export namespace completeJobTransitionFx {
@@ -40,13 +41,15 @@ export const completeJobTransitionFx = Effect.fn("completeJobTransitionFx")(func
 			}),
 		);
 
-	const owner = runtime.items.find((item) => item.id === job.ownerItemId);
-	if (owner === undefined) return yield* Effect.die(new Error(`Job ${job.id} owner is missing.`));
-	if (!isBoardRuntimeItem(owner))
+	const runtimeOwner = runtime.items.find((item) => item.id === job.ownerItemId);
+	if (runtimeOwner === undefined)
+		return yield* Effect.die(new Error(`Job ${job.id} owner is missing.`));
+	const owner = Option.getOrUndefined(yield* isBoardRuntimeItemFx(runtimeOwner));
+	if (owner === undefined)
 		return yield* Effect.fail(
 			new ItemNotOnBoardError({
-				itemId: owner.id,
-				location: owner.location,
+				itemId: runtimeOwner.id,
+				location: runtimeOwner.location,
 			}),
 		);
 	const line = yield* readItemLineFx({
@@ -55,12 +58,26 @@ export const completeJobTransitionFx = Effect.fn("completeJobTransitionFx")(func
 	});
 	if (line === undefined)
 		return yield* Effect.die(new Error(`Job ${job.id} line ${job.lineId} is missing.`));
-	const consumedItems = runtime.items
-		.filter(isJobRuntimeItem)
-		.filter((item) => item.location.jobId === job.id);
-	const reservations = runtime.items
-		.filter(isReservedRuntimeItem)
-		.filter((item) => item.location.jobId === job.id);
+	if (
+		owner.item.type !== ItemEnumSchema.enum.Blueprint &&
+		owner.item.type !== ItemEnumSchema.enum.Craft &&
+		owner.item.type !== ItemEnumSchema.enum.Producer &&
+		owner.item.type !== ItemEnumSchema.enum.Stash
+	) {
+		return yield* Effect.die(
+			new Error(`Job ${job.id} owner ${owner.id} does not expose a product line.`),
+		);
+	}
+	const consumedItems = Array.getSomes(
+		yield* Effect.forEach(runtime.items, isJobRuntimeItemFx),
+	).filter((item) => item.location.jobId === job.id);
+	const reservations = Array.getSomes(
+		yield* Effect.forEach(runtime.items, isReservedRuntimeItemFx),
+	).filter((item) => item.location.jobId === job.id);
+	const completionOwner = {
+		...owner,
+		item: owner.item,
+	} satisfies JobCompletionOwner;
 	const consumedItemIds = new Set(consumedItems.map((item) => item.id));
 	const completionRuntime = {
 		...runtime,
@@ -72,7 +89,7 @@ export const completeJobTransitionFx = Effect.fn("completeJobTransitionFx")(func
 		program: completeLineJobRuntimeFx({
 			job,
 			line,
-			owner: owner as JobCompletionOwner,
+			owner: completionOwner,
 			reservations,
 			runtime: completionRuntime,
 		}),

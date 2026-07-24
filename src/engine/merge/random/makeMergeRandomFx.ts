@@ -5,7 +5,7 @@ import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchem
 import { EffectEnumSchema } from "~/engine/merge/schema/EffectEnumSchema";
 
 /** Bump only when intentionally changing directional-merge random compatibility. */
-export const MergeRandomVersion = 2;
+const MergeRandomVersion = 2;
 
 const readRemainingChargesSeed = (item: RuntimeItemSchema.Type) => {
 	return item.remainingCharges ?? item.item.charges?.amount ?? "full";

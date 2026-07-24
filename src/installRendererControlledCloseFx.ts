@@ -2,7 +2,7 @@ import { Effect, Exit, Option } from "effect";
 
 import { claimGameEngineResourceForCloseFx } from "~/bridge/game/claimGameEngineResourceForCloseFx";
 import { readExactCauseFailure } from "~/bridge/game/readExactCauseFailure";
-import type { ArkiniRouter } from "~/router";
+import type { ArkiniRouter } from "~/createArkiniRouterFx";
 import { waitForActionLoadingCompletionFrameFx } from "~/ui/loading/waitForActionLoadingCompletionFrameFx";
 import type { RootContext } from "~/ui/root/RootContext";
 

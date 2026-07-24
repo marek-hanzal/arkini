@@ -2,9 +2,9 @@
 
 import { Effect } from "effect";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { createArkiniRouter } from "~/router";
+import { createArkiniRouterFx } from "~/createArkiniRouterFx";
 import { createTestRendererRuntime } from "~test/support/createTestRendererRuntime";
-import { resolveRouteViewTransitionTypes } from "~/ui/navigation/resolveRouteViewTransitionTypes";
+import { resolveRouteViewTransitionTypesFx } from "~/ui/navigation/resolveRouteViewTransitionTypesFx";
 
 const originalStartViewTransition = document.startViewTransition;
 const originalCss = window.CSS;
@@ -15,23 +15,27 @@ const createRouter = () => {
 		createResourceFx: () => Effect.never,
 	});
 	runtimes.push(rendererRuntime);
-	return createArkiniRouter({
-		rendererRuntime,
-	});
+	return Effect.runSync(
+		createArkiniRouterFx({
+			rendererRuntime,
+		}),
+	);
 };
 
 const resolveTypes = (fromPathname: string | undefined, toPathname: string) =>
-	resolveRouteViewTransitionTypes({
-		fromLocation:
-			fromPathname === undefined
-				? undefined
-				: {
-						pathname: fromPathname,
-					},
-		toLocation: {
-			pathname: toPathname,
-		},
-	});
+	Effect.runSync(
+		resolveRouteViewTransitionTypesFx({
+			fromLocation:
+				fromPathname === undefined
+					? undefined
+					: {
+							pathname: fromPathname,
+						},
+			toLocation: {
+				pathname: toPathname,
+			},
+		}),
+	);
 
 afterEach(async () => {
 	for (const runtime of runtimes.splice(0)) await runtime.dispose();
@@ -55,7 +59,7 @@ afterEach(async () => {
 	});
 });
 
-describe("createArkiniRouter", () => {
+describe("createArkiniRouterFx", () => {
 	it("assigns one explicit native transition family to every visible route pair", () => {
 		const pairs = [
 			[
@@ -249,7 +253,7 @@ describe("createArkiniRouter", () => {
 		});
 		const router = createRouter();
 		expect(router.options.defaultViewTransition).toEqual({
-			types: resolveRouteViewTransitionTypes,
+			types: expect.any(Function),
 		});
 	});
 

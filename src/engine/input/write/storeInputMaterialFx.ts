@@ -1,4 +1,4 @@
-import { Effect } from "effect";
+import { Effect, Option } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeIntegerSchema";
@@ -13,15 +13,15 @@ import { ItemNotOnGridError } from "~/engine/item/error/ItemNotOnGridError";
 import { isolateStatefulOwnerTransitionFx } from "~/engine/item/fx/isolateStatefulOwnerTransitionFx";
 import { LineInputClosedError } from "~/engine/line/error/LineInputClosedError";
 import { isLineInputClosedFx } from "~/engine/line/fx/input/isLineInputClosedFx";
-import { isSameGridLocation } from "~/engine/location/read/isSameGridLocation";
+import { isSameGridLocationFx } from "~/engine/location/read/isSameGridLocationFx";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 import { assertRevisionFx } from "~/engine/revision/fx/assertRevisionFx";
 import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
 import { ItemLocationConflictError } from "~/engine/runtime/error/ItemLocationConflictError";
 import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
-import { isBoardRuntimeItem } from "~/engine/runtime/read/isBoardRuntimeItem";
-import { isGridRuntimeItem } from "~/engine/runtime/read/isGridRuntimeItem";
+import { isBoardRuntimeItemFx } from "~/engine/runtime/read/isBoardRuntimeItemFx";
+import { isGridRuntimeItemFx } from "~/engine/runtime/read/isGridRuntimeItemFx";
 import { readRuntimeItemByIdFx } from "~/engine/runtime/read/readRuntimeItemByIdFx";
 import { CrossSpaceBoardOperationError } from "~/engine/space/error/CrossSpaceBoardOperationError";
 
@@ -66,8 +66,9 @@ export const storeInputMaterialFx = Effect.fn("storeInputMaterialFx")(function* 
 					expectedRevision: ownerItemRevision,
 				});
 			}
+			const gridOwner = Option.getOrUndefined(yield* isGridRuntimeItemFx(owner));
 			if (expectedOwnerLocation !== undefined) {
-				if (!isGridRuntimeItem(owner)) {
+				if (gridOwner === undefined) {
 					return yield* Effect.fail(
 						new ItemNotOnGridError({
 							itemId: owner.id,
@@ -75,36 +76,45 @@ export const storeInputMaterialFx = Effect.fn("storeInputMaterialFx")(function* 
 						}),
 					);
 				}
-				if (!isSameGridLocation(owner.location, expectedOwnerLocation)) {
+				if (
+					!(yield* isSameGridLocationFx({
+						left: gridOwner.location,
+						right: expectedOwnerLocation,
+					}))
+				) {
 					return yield* Effect.fail(
 						new ItemLocationConflictError({
 							itemId: owner.id,
 							expectedLocation: expectedOwnerLocation,
-							actualLocation: owner.location,
+							actualLocation: gridOwner.location,
 						}),
 					);
 				}
 			}
-			const source = yield* readRuntimeItemByIdFx({
+			const runtimeSource = yield* readRuntimeItemByIdFx({
 				itemId: sourceItemId,
 				runtime,
 			});
 			yield* assertRevisionFx({
-				actualRevision: source.revision,
-				entityId: source.id,
+				actualRevision: runtimeSource.revision,
+				entityId: runtimeSource.id,
 				expectedRevision: sourceItemRevision,
 			});
-			if (!isGridRuntimeItem(source)) {
+			const source = Option.getOrUndefined(yield* isGridRuntimeItemFx(runtimeSource));
+			if (source === undefined) {
 				return yield* Effect.fail(
 					new ItemNotOnGridError({
 						itemId: sourceItemId,
-						location: source.location,
+						location: runtimeSource.location,
 					}),
 				);
 			}
 			if (
 				expectedSourceLocation !== undefined &&
-				!isSameGridLocation(source.location, expectedSourceLocation)
+				!(yield* isSameGridLocationFx({
+					left: source.location,
+					right: expectedSourceLocation,
+				}))
 			) {
 				return yield* Effect.fail(
 					new ItemLocationConflictError({
@@ -114,27 +124,29 @@ export const storeInputMaterialFx = Effect.fn("storeInputMaterialFx")(function* 
 					}),
 				);
 			}
+			const boardOwner = Option.getOrUndefined(yield* isBoardRuntimeItemFx(owner));
+			const boardSource = Option.getOrUndefined(yield* isBoardRuntimeItemFx(source));
 			if (
-				isBoardRuntimeItem(owner) &&
-				isBoardRuntimeItem(source) &&
-				owner.location.space !== source.location.space
+				boardOwner !== undefined &&
+				boardSource !== undefined &&
+				boardOwner.location.space !== boardSource.location.space
 			) {
 				return yield* Effect.fail(
 					new CrossSpaceBoardOperationError({
-						fromSpace: source.location.space,
-						toSpace: owner.location.space,
+						fromSpace: boardSource.location.space,
+						toSpace: boardOwner.location.space,
 					}),
 				);
 			}
 			if (
-				isBoardRuntimeItem(owner) &&
-				!isBoardRuntimeItem(source) &&
-				owner.location.space !== runtime.currentSpace
+				boardOwner !== undefined &&
+				boardSource === undefined &&
+				boardOwner.location.space !== runtime.currentSpace
 			) {
 				return yield* Effect.fail(
 					new CrossSpaceBoardOperationError({
 						fromSpace: runtime.currentSpace,
-						toSpace: owner.location.space,
+						toSpace: boardOwner.location.space,
 					}),
 				);
 			}
@@ -210,11 +222,12 @@ export const storeInputMaterialFx = Effect.fn("storeInputMaterialFx")(function* 
 				ownerItemId,
 				runtime: inputRuntime,
 			});
-			const ownerItem = yield* readRuntimeItemByIdFx({
+			const runtimeOwnerItem = yield* readRuntimeItemByIdFx({
 				itemId: ownerItemId,
 				runtime: isolation.runtime,
 			});
-			if (!isGridRuntimeItem(ownerItem)) {
+			const ownerItem = Option.getOrUndefined(yield* isGridRuntimeItemFx(runtimeOwnerItem));
+			if (ownerItem === undefined) {
 				return yield* Effect.die(
 					new Error(
 						`Stored input owner ${ownerItemId} lost its grid identity before commit.`,

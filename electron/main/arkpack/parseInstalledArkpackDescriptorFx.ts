@@ -1,5 +1,6 @@
 import { Effect } from "effect";
 import type { ArkiniElectronApi } from "../../contract/ArkiniElectronApi";
+import { ElectronMainError } from "../ElectronMainError";
 import { assertImportedArkpackPackageIdFx } from "./assertImportedArkpackPackageIdFx";
 import { parseArkpackTrustFx } from "./parseArkpackTrustFx";
 
@@ -14,7 +15,12 @@ export namespace parseInstalledArkpackDescriptorFx {
 export const parseInstalledArkpackDescriptorFx = Effect.fn("parseInstalledArkpackDescriptorFx")(
 	function* ({ value, expectedPackageId }: parseInstalledArkpackDescriptorFx.Props) {
 		if (typeof value !== "object" || value === null) {
-			return yield* Effect.fail(new Error("Invalid Arkpack metadata."));
+			return yield* Effect.fail(
+				new ElectronMainError({
+					operation: "parse installed Arkpack descriptor",
+					cause: value,
+				}),
+			);
 		}
 		const descriptor = value as Partial<ArkiniElectronApi.ArkpackDescriptor>;
 		const trust = yield* parseArkpackTrustFx({
@@ -31,7 +37,12 @@ export const parseInstalledArkpackDescriptorFx = Effect.fn("parseInstalledArkpac
 			trust === undefined ||
 			descriptor.source !== "imported"
 		) {
-			return yield* Effect.fail(new Error("Invalid Arkpack metadata."));
+			return yield* Effect.fail(
+				new ElectronMainError({
+					operation: "parse installed Arkpack descriptor",
+					cause: value,
+				}),
+			);
 		}
 		return {
 			...descriptor,

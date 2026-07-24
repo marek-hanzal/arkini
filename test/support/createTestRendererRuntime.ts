@@ -4,8 +4,8 @@ import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 
 import { acquireGameEngineLeaseFx } from "~/bridge/game/acquireGameEngineLeaseFx";
 import { adoptGameEngineLeaseFx } from "~/bridge/game/adoptGameEngineLeaseFx";
+import { GameEngineResourceLayer } from "~/bridge/game/GameEngineResourceLayer";
 import type { GameEngineResource } from "~/bridge/game/GameEngineResource";
-import { GameEngineResourceLayer } from "~/bridge/game/createGameEngineResourceServiceFx";
 
 export interface TestRendererRuntimeProps {
 	readonly clearSaveFx?: Parameters<typeof GameEngineResourceLayer>[0]["clearSaveFx"];

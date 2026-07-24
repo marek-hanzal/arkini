@@ -1,3 +1,4 @@
+import { Effect } from "effect";
 import { type PropsWithChildren, useCallback, useLayoutEffect, useMemo } from "react";
 
 import { useDropItemPreview } from "~/bridge/tile/useDropItemPreview";
@@ -11,7 +12,7 @@ import {
 import { TileSystemApiContext, type TileSystemApi } from "~/ui/tile/TileSystemApiContext";
 import { useTileGeometry } from "~/ui/tile/useTileGeometry";
 import { useTileInteractionController } from "~/ui/tile/useTileInteractionController";
-import { tileLocationForTarget } from "~/ui/tile/tileLocationForTarget";
+import { tileLocationForTargetFx } from "~/ui/tile/tileLocationForTargetFx";
 
 export namespace TileSystemProvider {
 	export interface Props extends PropsWithChildren {
@@ -28,7 +29,7 @@ export const TileSystemProvider = ({
 	const dropItemPreview = useDropItemPreview();
 	const readPreview = useCallback(
 		(source: TileDragSource, target: TileDropTarget) => {
-			const location = tileLocationForTarget(target);
+			const location = Effect.runSync(tileLocationForTargetFx(target));
 			return dropItemPreview({
 				sourceItemId: source.id,
 				sourceRevision: source.revision,

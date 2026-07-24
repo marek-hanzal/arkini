@@ -4,7 +4,7 @@ import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { JobSchema } from "~/engine/job/schema/JobSchema";
 
 /** Bump only when intentionally changing charge-depletion random compatibility. */
-export const ChargeDepletionRandomVersion = 2;
+const ChargeDepletionRandomVersion = 2;
 
 /** Runs the owned program with deterministic random for one charged item depletion. */
 export const makeChargeDepletionRandomFx = Effect.fn("makeChargeDepletionRandomFx")(function* <

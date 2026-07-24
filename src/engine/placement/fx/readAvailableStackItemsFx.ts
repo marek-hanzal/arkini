@@ -1,10 +1,10 @@
-import { Effect } from "effect";
+import { Array, Effect } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { isItemPureFx } from "~/engine/item/fx/purity/isItemPureFx";
 import { readGridLocationOccupantsFx } from "~/engine/location/read/readGridLocationOccupantsFx";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
-import { isGridRuntimeItem } from "~/engine/runtime/read/isGridRuntimeItem";
+import { isGridRuntimeItemFx } from "~/engine/runtime/read/isGridRuntimeItemFx";
 import type { GridRuntimeItemSchema } from "~/engine/runtime/schema/GridRuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
@@ -22,8 +22,9 @@ export const readAvailableStackItemsFx = Effect.fn("readAvailableStackItemsFx")(
 	locations,
 	runtime,
 }: readAvailableStackItemsFx.Props) {
+	const gridItems = Array.getSomes(yield* Effect.forEach(runtime.items, isGridRuntimeItemFx));
 	const occupants = yield* readGridLocationOccupantsFx({
-		items: runtime.items.filter(isGridRuntimeItem),
+		items: gridItems,
 		locations,
 	});
 	const candidates = occupants

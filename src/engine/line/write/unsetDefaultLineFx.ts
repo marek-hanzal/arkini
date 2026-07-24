@@ -1,8 +1,8 @@
-import { Effect } from "effect";
+import { Effect, Option } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { ItemNotFoundError } from "~/engine/item/error/ItemNotFoundError";
-import { isLineOwnerItem } from "~/engine/line/read/isLineOwnerItem";
+import { isLineOwnerItemFx } from "~/engine/line/read/isLineOwnerItemFx";
 import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
@@ -19,7 +19,11 @@ export const unsetDefaultLineFx = Effect.fn("unsetDefaultLineFx")(function* ({
 	return yield* modifyRuntimeFx((runtime) =>
 		Effect.gen(function* () {
 			const owner = runtime.items.find((item) => item.id === ownerItemId);
-			if (owner === undefined || !isLineOwnerItem(owner.item)) {
+			const ownerItem =
+				owner === undefined
+					? undefined
+					: Option.getOrUndefined(yield* isLineOwnerItemFx(owner.item));
+			if (ownerItem === undefined) {
 				return yield* Effect.fail(
 					new ItemNotFoundError({
 						itemId: ownerItemId,

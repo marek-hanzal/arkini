@@ -1,553 +1,75 @@
-import { Effect } from "effect";
-import { match } from "ts-pattern";
+import { Effect, Option } from "effect";
 
-import type { DistanceEnumSchema } from "~/engine/distance/schema/DistanceEnumSchema";
-import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import type { TimeSchema } from "~/engine/common/schema/TimeSchema";
-import type { InputChargeFromEnumSchema } from "~/engine/input/schema/InputChargeFromEnumSchema";
-import type { InputModeEnumSchema } from "~/engine/input/schema/InputModeEnumSchema";
-import { planLineInputAutofillFx } from "~/engine/input/fx/planLineInputAutofillFx";
-import type { InputRunResolutionSchema } from "~/engine/input/schema/run/InputRunResolutionSchema";
-import type { InputSchema } from "~/engine/input/schema/InputSchema";
-import { isLineOwnerItem } from "~/engine/line/read/isLineOwnerItem";
-import { readLineOwnerLines } from "~/engine/line/read/readLineOwnerLines";
-import { resolveLineStartFx } from "~/engine/job/fx/read/resolveLineStartFx";
-import { resolveActiveJobStatusFx } from "~/engine/job/fx/resolveActiveJobStatusFx";
-import type { LineSchema } from "~/engine/line/schema/LineSchema";
-import type { DropSchema } from "~/engine/output/schema/DropSchema";
-import type { QuantitySchema } from "~/engine/quantity/schema/QuantitySchema";
-import type { RollSchema } from "~/engine/roll/schema/RollSchema";
-import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
-import type { SelectorSchema } from "~/engine/selector/schema/SelectorSchema";
+import type { ItemDetailLines } from "~/engine/item-detail/read/ItemDetailLines";
+import { readBoardItemDetailLineFx } from "~/engine/item-detail/read/readBoardItemDetailLineFx";
+import { readStoredItemDetailLineFx } from "~/engine/item-detail/read/readStoredItemDetailLineFx";
+import { isLineOwnerItemFx } from "~/engine/line/read/isLineOwnerItemFx";
+import { readLineOwnerLinesFx } from "~/engine/line/read/readLineOwnerLinesFx";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
-import { JobStatusEnumSchema } from "~/engine/job/schema/read/JobStatusEnumSchema";
-import { InputEnumSchema } from "~/engine/input/schema/InputEnumSchema";
-import { RollEnumSchema } from "~/engine/roll/schema/RollEnumSchema";
-import { SelectorEnumSchema } from "~/engine/selector/schema/SelectorEnumSchema";
 
+/** Public operation-owned aliases for the stable Item Detail Lines contract. */
 export namespace readItemDetailLinesFx {
-	export interface Props {
-		readonly itemId: IdSchema.Type;
-		readonly runtime: RuntimeSchema.Type;
-	}
-
-	export interface QuantityBounds {
-		readonly min: number;
-		readonly max: number;
-	}
-
-	export interface ChargeCost {
-		readonly cost: number;
-		readonly from: InputChargeFromEnumSchema.Type;
-	}
-
-	export interface MaterialInput {
-		readonly kind: "materials";
-		readonly selector: SelectorSchema.Type;
-		readonly mode: InputModeEnumSchema.Type;
-		readonly required: QuantityBounds;
-		readonly storedQuantity: number;
-		readonly maxStoredQuantity: number;
-		readonly missingQuantity: number;
-		readonly availableCapacity: number;
-		readonly ready: boolean;
-		readonly charges?: ChargeCost;
-	}
-
-	export interface DepositInput {
-		readonly kind: "deposit";
-		readonly selector: SelectorSchema.Type;
-		readonly distance: DistanceEnumSchema.Type;
-		readonly requiredTargets: number;
-		readonly readyTargets: number;
-		readonly targetItemIds: readonly IdSchema.Type[];
-		readonly ready: boolean;
-		readonly charges?: ChargeCost;
-	}
-
-	export interface SimpleInput {
-		readonly kind: "simple";
-		readonly count: number;
-		readonly ready: boolean;
-		readonly charges: ChargeCost;
-	}
-
-	export type Input = MaterialInput | DepositInput | SimpleInput;
-
-	export interface OutputItem {
-		readonly itemId: IdSchema.Type;
-		readonly quantity: QuantityBounds;
-	}
-
-	export type OutputRoll =
-		| {
-				readonly kind: "guaranteed";
-				readonly item: readonly OutputItem[];
-		  }
-		| {
-				readonly kind: "chance";
-				readonly chance: number;
-				readonly item: readonly OutputItem[];
-		  }
-		| {
-				readonly kind: "weight";
-				readonly selections: QuantityBounds;
-				readonly option: readonly {
-					readonly weight: number;
-					readonly item: readonly OutputItem[];
-				}[];
-		  };
-
-	export interface OutputSet {
-		readonly weight: number;
-		readonly roll: readonly OutputRoll[];
-	}
-
-	export type Availability =
-		| {
-				readonly kind: "ready";
-		  }
-		| {
-				readonly kind: "blocked";
-				readonly reason: "disabled" | "inputs" | "queue" | "stored";
-		  };
-
-	export interface Line {
-		readonly lineId: IdSchema.Type;
-		readonly title: string;
-		readonly description: string;
-		readonly baseRuntimeMs: TimeSchema.Type;
-		readonly effectiveRuntimeMs: TimeSchema.Type;
-		readonly availability: Availability;
-		readonly startMode: "start" | "enqueue";
-		readonly isDefault: boolean;
-		readonly actions: {
-			readonly canAutofill: boolean;
-			readonly canWithdraw: boolean;
-		};
-		readonly input: readonly Input[];
-		readonly output: readonly OutputSet[];
-		readonly activeJob?: {
-			readonly status: JobStatusEnumSchema.Type;
-			readonly durationMs: TimeSchema.Type;
-			readonly remainingMs: TimeSchema.Type;
-		};
-	}
-
-	export type Result =
-		| {
-				readonly kind: "available";
-				readonly itemId: IdSchema.Type;
-				readonly line: readonly Line[];
-		  }
-		| {
-				readonly kind: "unavailable";
-		  };
+	export type Props = ItemDetailLines.Props;
+	export type Input = ItemDetailLines.Input;
+	export type OutputItem = ItemDetailLines.OutputItem;
+	export type OutputRoll = ItemDetailLines.OutputRoll;
+	export type Availability = ItemDetailLines.Availability;
+	export type Result = ItemDetailLines.Result;
 }
 
 const unavailable = {
 	kind: "unavailable",
-} as const satisfies readItemDetailLinesFx.Result;
-
-const quantityBounds = (quantity: QuantitySchema.Type): readItemDetailLinesFx.QuantityBounds =>
-	match(quantity)
-		.with(
-			{
-				type: "value",
-			},
-			({ value }) => ({
-				min: value,
-				max: value,
-			}),
-		)
-		.with(
-			{
-				type: "range",
-			},
-			({ min, max }) => ({
-				min,
-				max,
-			}),
-		)
-		.exhaustive();
-
-const selectorKey = (selector: SelectorSchema.Type) =>
-	match(selector)
-		.with(
-			{
-				type: SelectorEnumSchema.enum.Item,
-			},
-			({ itemId }) => `item:${itemId}`,
-		)
-		.with(
-			{
-				type: SelectorEnumSchema.enum.Tag,
-			},
-			({ tag }) => `tag:${tag}`,
-		)
-		.exhaustive();
-
-const chargeKey = (charges: InputSchema.Type["charges"]) =>
-	charges === undefined ? "none" : `${charges.from}:${charges.cost}`;
-
-const inputItems = ({
-	inputIndex,
-	lineId,
-	ownerItemId,
-	runtime,
-}: {
-	readonly inputIndex: number;
-	readonly lineId: IdSchema.Type;
-	readonly ownerItemId: IdSchema.Type;
-	readonly runtime: RuntimeSchema.Type;
-}) =>
-	runtime.items.filter(
-		(item) =>
-			item.location.scope === LocationScopeEnumSchema.enum.Input &&
-			item.location.ownerItemId === ownerItemId &&
-			item.location.lineId === lineId &&
-			item.location.inputIndex === inputIndex,
-	);
-
-const readInputs = ({
-	configured,
-	lineId,
-	ownerItemId,
-	resolved,
-	runtime,
-}: {
-	readonly configured: readonly InputSchema.Type[];
-	readonly lineId: IdSchema.Type;
-	readonly ownerItemId: IdSchema.Type;
-	readonly resolved?: readonly InputRunResolutionSchema.Type[];
-	readonly runtime: RuntimeSchema.Type;
-}): readonly readItemDetailLinesFx.Input[] => {
-	const materials = new Map<string, readItemDetailLinesFx.MaterialInput>();
-	const deposits = new Map<string, readItemDetailLinesFx.DepositInput>();
-	const simple = new Map<string, readItemDetailLinesFx.SimpleInput>();
-
-	for (const [inputIndex, input] of configured.entries()) {
-		const resolution = resolved?.[inputIndex]?.resolution;
-		match(input)
-			.with(
-				{
-					type: InputEnumSchema.enum.Materials,
-				},
-				(input) => {
-					const required = quantityBounds(input.quantity);
-					const storedQuantity =
-						resolution?.type === InputEnumSchema.enum.Materials
-							? resolution.storedQuantity
-							: inputItems({
-									inputIndex,
-									lineId,
-									ownerItemId,
-									runtime,
-								}).reduce((total, item) => total + item.quantity, 0);
-					const maxStoredQuantity =
-						resolution?.type === InputEnumSchema.enum.Materials
-							? resolution.maxStoredQuantity
-							: required.max + input.capacity;
-					const missingQuantity = Math.max(0, required.min - storedQuantity);
-					const availableCapacity = Math.max(0, maxStoredQuantity - storedQuantity);
-					const key = `${selectorKey(input.selector)}:${input.mode}:${chargeKey(input.charges)}`;
-					const previous = materials.get(key);
-					materials.set(key, {
-						kind: "materials",
-						selector: input.selector,
-						mode: input.mode,
-						required: {
-							min: (previous?.required.min ?? 0) + required.min,
-							max: (previous?.required.max ?? 0) + required.max,
-						},
-						storedQuantity: (previous?.storedQuantity ?? 0) + storedQuantity,
-						maxStoredQuantity: (previous?.maxStoredQuantity ?? 0) + maxStoredQuantity,
-						missingQuantity: (previous?.missingQuantity ?? 0) + missingQuantity,
-						availableCapacity: (previous?.availableCapacity ?? 0) + availableCapacity,
-						ready:
-							(previous?.ready ?? true) &&
-							(resolution?.ready ?? storedQuantity >= required.min),
-						...(input.charges === undefined
-							? {}
-							: {
-									charges: input.charges,
-								}),
-					});
-				},
-			)
-			.with(
-				{
-					type: InputEnumSchema.enum.Deposit,
-				},
-				(input) => {
-					const key = `${selectorKey(input.query.selector)}:${input.query.distance}:${chargeKey(input.charges)}`;
-					const previous = deposits.get(key);
-					const targetItemId =
-						resolution?.type === InputEnumSchema.enum.Deposit
-							? resolution.targetItemId
-							: undefined;
-					deposits.set(key, {
-						kind: "deposit",
-						selector: input.query.selector,
-						distance: input.query.distance,
-						requiredTargets: (previous?.requiredTargets ?? 0) + 1,
-						readyTargets: (previous?.readyTargets ?? 0) + (resolution?.ready ? 1 : 0),
-						targetItemIds:
-							targetItemId === undefined
-								? (previous?.targetItemIds ?? [])
-								: [
-										...(previous?.targetItemIds ?? []),
-										targetItemId,
-									],
-						ready: (previous?.ready ?? true) && (resolution?.ready ?? false),
-						...(input.charges === undefined
-							? {}
-							: {
-									charges: input.charges,
-								}),
-					});
-				},
-			)
-			.with(
-				{
-					type: InputEnumSchema.enum.Simple,
-				},
-				(input) => {
-					if (input.charges === undefined) return;
-					const key = chargeKey(input.charges);
-					const previous = simple.get(key);
-					simple.set(key, {
-						kind: "simple",
-						count: (previous?.count ?? 0) + 1,
-						ready: (previous?.ready ?? true) && (resolution?.ready ?? false),
-						charges: input.charges,
-					});
-				},
-			)
-			.exhaustive();
-	}
-
-	return [
-		...materials.values(),
-		...deposits.values(),
-		...simple.values(),
-	];
-};
-
-const groupDrops = (
-	drops: readonly DropSchema.Type[],
-): readonly readItemDetailLinesFx.OutputItem[] => {
-	const grouped = new Map<IdSchema.Type, readItemDetailLinesFx.OutputItem>();
-	for (const drop of drops) {
-		const bounds = quantityBounds(drop.quantity);
-		const previous = grouped.get(drop.itemId);
-		grouped.set(drop.itemId, {
-			itemId: drop.itemId,
-			quantity: {
-				min: (previous?.quantity.min ?? 0) + bounds.min,
-				max: (previous?.quantity.max ?? 0) + bounds.max,
-			},
-		});
-	}
-	return [
-		...grouped.values(),
-	];
-};
-
-const readRoll = (roll: RollSchema.Type): readItemDetailLinesFx.OutputRoll =>
-	match(roll)
-		.with(
-			{
-				type: RollEnumSchema.enum.Guaranteed,
-			},
-			({ drop }) => ({
-				kind: "guaranteed" as const,
-				item: groupDrops(drop),
-			}),
-		)
-		.with(
-			{
-				type: RollEnumSchema.enum.Chance,
-			},
-			({ chance, drop }) => ({
-				kind: "chance" as const,
-				chance,
-				item: groupDrops(drop),
-			}),
-		)
-		.with(
-			{
-				type: RollEnumSchema.enum.Weight,
-			},
-			({ quantity, drop }) => ({
-				kind: "weight" as const,
-				selections: quantityBounds(quantity),
-				option: drop.map((candidate) => ({
-					weight: candidate.weight,
-					item: groupDrops(candidate.drop),
-				})),
-			}),
-		)
-		.exhaustive();
-
-const readOutput = (line: LineSchema.Type): readonly readItemDetailLinesFx.OutputSet[] =>
-	line.output?.set.map((set) => ({
-		weight: set.weight ?? 1,
-		roll: set.roll.map(readRoll),
-	})) ?? [];
-
-const storedLine = ({
-	activeJob,
-	line,
-	ownerItemId,
-	runtime,
-	isDefault,
-}: {
-	readonly activeJob: RuntimeSchema.Type["jobs"][number] | undefined;
-	readonly line: LineSchema.Type;
-	readonly ownerItemId: IdSchema.Type;
-	readonly runtime: RuntimeSchema.Type;
-	readonly isDefault: boolean;
-}): readItemDetailLinesFx.Line => ({
-	lineId: line.id,
-	title: line.title,
-	description: line.description,
-	baseRuntimeMs: line.runtimeMs,
-	effectiveRuntimeMs: line.runtimeMs,
-	availability: {
-		kind: "blocked",
-		reason: "stored",
-	},
-	startMode: "start",
-	isDefault,
-	actions: {
-		canAutofill: false,
-		canWithdraw: false,
-	},
-	input: readInputs({
-		configured: line.input,
-		lineId: line.id,
-		ownerItemId,
-		runtime,
-	}),
-	output: readOutput(line),
-	...(activeJob === undefined
-		? {}
-		: {
-				activeJob: {
-					status: JobStatusEnumSchema.enum.Paused,
-					durationMs: activeJob.durationMs,
-					remainingMs: activeJob.remainingMs,
-				},
-			}),
-});
+} as const satisfies ItemDetailLines.Result;
 
 /** Projects the visible read-only product lines of one exact live line owner. */
 export const readItemDetailLinesFx = Effect.fn("readItemDetailLinesFx")(function* ({
 	itemId,
 	runtime,
-}: readItemDetailLinesFx.Props) {
+}: ItemDetailLines.Props) {
 	const owner = runtime.items.find((candidate) => candidate.id === itemId);
-	if (owner === undefined || !isLineOwnerItem(owner.item)) return unavailable;
-	const lines = readLineOwnerLines(owner.item);
+	if (owner === undefined) return unavailable;
+	const ownerItem = Option.getOrUndefined(yield* isLineOwnerItemFx(owner.item));
+	if (ownerItem === undefined) return unavailable;
+
+	const lines = yield* readLineOwnerLinesFx(ownerItem);
 	const defaultLineId = runtime.defaultLineByOwnerItemId?.[owner.id];
 	const ownerHasWork =
 		runtime.jobs.some((job) => job.ownerItemId === owner.id) ||
 		(runtime.jobQueue ?? []).some((request) => request.ownerItemId === owner.id);
-	const projected: readItemDetailLinesFx.Line[] = [];
+	const projected: ItemDetailLines.Line[] = [];
 
 	for (const line of lines) {
 		const activeJob = runtime.jobs.find(
 			(job) => job.ownerItemId === owner.id && job.lineId === line.id,
 		);
 		if (owner.location.scope !== LocationScopeEnumSchema.enum.Board) {
-			if (line.show || activeJob !== undefined) {
-				projected.push(
-					storedLine({
-						activeJob,
-						line,
-						ownerItemId: owner.id,
-						runtime,
-						isDefault: line.id === defaultLineId,
-					}),
-				);
-			}
+			if (!line.show && activeJob === undefined) continue;
+			projected.push(
+				yield* readStoredItemDetailLineFx({
+					activeJob,
+					line,
+					ownerItemId: owner.id,
+					runtime,
+					isDefault: line.id === defaultLineId,
+				}),
+			);
 			continue;
 		}
 
-		const start = yield* resolveLineStartFx({
-			lineId: line.id,
+		const boardLine = yield* readBoardItemDetailLineFx({
+			activeJob,
+			defaultLineId,
+			line,
+			ownerHasWork,
 			ownerItemId: owner.id,
 			runtime,
 		});
-		const resolution = start.run;
-		if (!resolution.show && activeJob === undefined) continue;
-		const allInputsReady = resolution.input.every((input) => input.resolution.ready);
-		const autofillPlan = yield* planLineInputAutofillFx({
-			ownerItemId: owner.id,
-			lineId: line.id,
-			runtime,
-		});
-		const canWithdraw = runtime.items.some(
-			(item) =>
-				item.location.scope === LocationScopeEnumSchema.enum.Input &&
-				item.location.ownerItemId === owner.id &&
-				item.location.lineId === line.id,
-		);
-		const activeJobStatus =
-			activeJob === undefined
-				? undefined
-				: yield* resolveActiveJobStatusFx({
-						job: activeJob,
-						runtime,
-					});
-		projected.push({
-			lineId: line.id,
-			title: line.title,
-			description: line.description,
-			baseRuntimeMs: line.runtimeMs,
-			effectiveRuntimeMs: resolution.runtimeMs,
-			availability: start.ready
-				? {
-						kind: "ready",
-					}
-				: {
-						kind: "blocked",
-						reason: !resolution.enable
-							? "disabled"
-							: !allInputsReady
-								? "inputs"
-								: "queue",
-					},
-			startMode: ownerHasWork && start.queue.capacity > 1 ? "enqueue" : "start",
-			isDefault: line.id === defaultLineId,
-			actions: {
-				canAutofill: autofillPlan.entry.length > 0,
-				canWithdraw,
-			},
-			input: readInputs({
-				configured: line.input,
-				lineId: line.id,
-				ownerItemId: owner.id,
-				resolved: resolution.input,
-				runtime,
-			}),
-			output: readOutput(line),
-			...(activeJob === undefined
-				? {}
-				: {
-						activeJob: {
-							status: activeJobStatus ?? JobStatusEnumSchema.enum.Paused,
-							durationMs: activeJob.durationMs,
-							remainingMs: activeJob.remainingMs,
-						},
-					}),
-		});
+		if (boardLine !== undefined) projected.push(boardLine);
 	}
 
 	return {
 		kind: "available",
 		itemId: owner.id,
 		line: projected,
-	} satisfies readItemDetailLinesFx.Result;
+	} satisfies ItemDetailLines.Result;
 });

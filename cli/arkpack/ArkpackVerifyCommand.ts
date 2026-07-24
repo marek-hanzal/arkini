@@ -5,7 +5,7 @@ import { readArkpackTrustedKeysFx } from "~/engine/pack/fx/readArkpackTrustedKey
 import { verifyArkpackFileFx } from "~/engine/pack/fx/verifyArkpackFileFx";
 import { handleArkpackInputErrorFx } from "./handleArkpackInputErrorFx";
 
-export namespace runArkpackVerifyFx {
+namespace runArkpackVerifyFx {
 	export interface Props {
 		readonly arkpackPath: string;
 		readonly trustedKeysPath: string;

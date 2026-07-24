@@ -32,7 +32,7 @@
 		"src/page",
 		"src/@routes",
 		"src/main.tsx",
-		"src/router.tsx",
+		"src/createArkiniRouterFx.tsx",
 		"src/_route.ts"
 	]
 }

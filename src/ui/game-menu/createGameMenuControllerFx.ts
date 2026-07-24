@@ -6,7 +6,7 @@ interface ExitCompletion {
 	readonly deferred: Deferred.Deferred<void>;
 }
 
-export interface GameMenuController {
+interface GameMenuController {
 	readonly getSnapshot: () => GameMenuController.Snapshot;
 	readonly subscribe: (listener: () => void) => () => void;
 	readonly openFx: Effect.Effect<void>;
@@ -19,7 +19,7 @@ export interface GameMenuController {
 	readonly resetFx: Effect.Effect<void>;
 }
 
-export namespace GameMenuController {
+namespace GameMenuController {
 	export interface Snapshot {
 		readonly phase: GameMenuPhase;
 		readonly activeAction: GameMenuAction | null;

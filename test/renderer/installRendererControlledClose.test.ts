@@ -4,10 +4,10 @@ import { Deferred, Effect, Exit, Scope } from "effect";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { acquireGameEngineLeaseFx } from "~/bridge/game/acquireGameEngineLeaseFx";
-import { toCriticalGameLifecycleError } from "~/bridge/game/CriticalGameLifecycleError";
+import { CriticalGameLifecycleError } from "~/bridge/game/CriticalGameLifecycleError";
 import type { GameEngineResource } from "~/bridge/game/GameEngineResource";
 import { installRendererControlledCloseFx } from "~/installRendererControlledCloseFx";
-import type { ArkiniRouter } from "~/router";
+import type { ArkiniRouter } from "~/createArkiniRouterFx";
 import { actionLoadingCompletionHoldMs } from "~/ui/loading/actionLoadingCompletionHoldMs";
 import {
 	adoptTestGameEngineResourceFx,
@@ -26,10 +26,12 @@ const createResource = (packageId: string): GameEngineResource => ({
 	} as unknown as GameEngineResource["game"],
 	assertUsable: () => undefined,
 	markCriticalFailure: (operation, cause) =>
-		toCriticalGameLifecycleError({
-			operation,
-			cause,
-		}),
+		cause instanceof CriticalGameLifecycleError
+			? cause
+			: new CriticalGameLifecycleError({
+					operation,
+					cause,
+				}),
 });
 
 const runtimes: Array<ReturnType<typeof createTestRendererRuntime>["rendererRuntime"]> = [];

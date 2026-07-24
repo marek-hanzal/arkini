@@ -4,15 +4,15 @@ import { ArkpackLimits } from "~/bridge/arkpack/ArkpackLimits";
 import type { ArkpackStorage } from "~/bridge/arkpack/ArkpackStorage";
 import { importArkpackFx } from "~/bridge/arkpack/importArkpackFx";
 
-export namespace importArkpackFileFx {
-	export interface FileInput {
-		readonly name: string;
-		readonly size: number;
-		readonly arrayBuffer: () => Promise<ArrayBuffer>;
-	}
+interface ArkpackFileInput {
+	readonly name: string;
+	readonly size: number;
+	readonly arrayBuffer: () => Promise<ArrayBuffer>;
+}
 
+export namespace importArkpackFileFx {
 	export interface Props {
-		readonly file: FileInput;
+		readonly file: ArkpackFileInput;
 		readonly storage?: ArkpackStorage;
 	}
 }

@@ -12,7 +12,7 @@ export interface GameSessionTransitionSubscriptionCleanup {
 	readonly close: Effect.Effect<void>;
 }
 
-export interface GameSessionTransitionSubscriptions {
+interface GameSessionTransitionSubscriptions {
 	readonly subscribe: (
 		listener: () => void | PromiseLike<void>,
 	) => Effect.Effect<GameSessionTransitionSubscriptionCleanup>;

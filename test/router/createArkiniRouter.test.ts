@@ -23,9 +23,11 @@ const createStartup = (): LauncherStartup => {
 
 	return {
 		getSnapshot: () => state,
+		getHeroUrl: () => "/hero.png",
 		startFx: Effect.void,
 		retryFx: Effect.void,
 		completeSplashFx: Effect.void,
+		disposeFx: Effect.void,
 		subscribe: () => () => undefined,
 	};
 };

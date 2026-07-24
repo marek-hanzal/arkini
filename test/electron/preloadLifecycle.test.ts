@@ -78,6 +78,25 @@ describe("Electron preload lifecycle", () => {
 		expect(await api.lifecycle.waitUntilVisible()).toBe(visibleAtMs);
 	});
 
+	it("routes the global last package preference through its narrow IPC channels", async () => {
+		electron.ipcRenderer.invoke
+			.mockResolvedValueOnce("package:last")
+			.mockResolvedValueOnce(undefined);
+		const api = await loadPreload();
+
+		await expect(api.launcher.readLastPackageId()).resolves.toBe("package:last");
+		await expect(api.launcher.writeLastPackageId("package:next")).resolves.toBeUndefined();
+		expect(electron.ipcRenderer.invoke).toHaveBeenNthCalledWith(
+			1,
+			ArkiniDesktopContract.channels.launcherLastPackageIdRead,
+		);
+		expect(electron.ipcRenderer.invoke).toHaveBeenNthCalledWith(
+			2,
+			ArkiniDesktopContract.channels.launcherLastPackageIdWrite,
+			"package:next",
+		);
+	});
+
 	it("shares one pending native close request", async () => {
 		const api = await loadPreload();
 		const first = api.lifecycle.requestClose();

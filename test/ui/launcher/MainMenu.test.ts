@@ -101,9 +101,11 @@ describe("MainMenu", () => {
 		};
 		const startup: LauncherStartup = {
 			getSnapshot: () => startupState,
+			getHeroUrl: () => "/hero.png",
 			startFx: Effect.void,
 			retryFx: Effect.void,
 			completeSplashFx: Effect.void,
+			disposeFx: Effect.void,
 			subscribe: () => () => undefined,
 		};
 		const App = () =>

@@ -145,9 +145,16 @@ describe("fresh checkout desktop delivery inputs", () => {
 			);
 			const renderer = await stat(join(workspace, "out/renderer/index.html"));
 			expect(renderer.isFile()).toBe(true);
+			expect(await readFile(join(workspace, "public/hero.png"))).toEqual(
+				await readFile(join(workspace, "game/arkini/resources/hero.png")),
+			);
+			expect(await readFile(join(workspace, "out/renderer/hero.png"))).toEqual(
+				await readFile(join(workspace, "public/hero.png")),
+			);
 			const rendererAssets = await readdir(join(workspace, "out/renderer/assets"), {
 				recursive: true,
 			});
+			expect(rendererAssets.filter((path) => /^hero-.+[.]png$/.test(path))).toEqual([]);
 			const emittedSignatures = rendererAssets.filter((path) => path.endsWith(".sig"));
 			expect(emittedSignatures).toHaveLength(1);
 			expect(

@@ -50,8 +50,10 @@ export namespace LauncherStartup {
 /** One renderer-session startup owner for bootstrap, retry and splash completion. */
 export interface LauncherStartup {
 	readonly getSnapshot: () => LauncherStartup.State;
+	readonly getHeroUrl: () => string;
 	readonly startFx: Effect.Effect<void, unknown>;
 	readonly retryFx: Effect.Effect<void, unknown>;
 	readonly completeSplashFx: Effect.Effect<void>;
+	readonly disposeFx: Effect.Effect<void>;
 	readonly subscribe: (listener: () => void | PromiseLike<void>) => () => void;
 }

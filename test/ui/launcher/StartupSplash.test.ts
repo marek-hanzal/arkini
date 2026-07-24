@@ -59,9 +59,11 @@ const createStartup = () => {
 	const retry = vi.fn();
 	const startup: LauncherStartup = {
 		getSnapshot: () => state,
+		getHeroUrl: () => "/hero.png",
 		startFx: Effect.void,
 		retryFx: Effect.sync(retry),
 		completeSplashFx: Effect.sync(complete),
+		disposeFx: Effect.void,
 		subscribe: (listener) => {
 			listeners.add(listener);
 			return () => listeners.delete(listener);

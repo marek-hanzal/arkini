@@ -1,6 +1,4 @@
-import LauncherHeroUrl from "../../../game/arkini/resources/hero.png?url";
-
-/** Bundled Hero artwork shared by startup, launcher, and game-loading screens. */
+/** Application-shell fallback shown until package-owned Hero artwork is ready. */
 export const LauncherHeroAsset = {
-	url: LauncherHeroUrl,
+	url: "/hero.png",
 } as const;

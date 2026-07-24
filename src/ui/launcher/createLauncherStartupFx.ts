@@ -4,7 +4,7 @@ import { readAppearanceThemeFx } from "~/bridge/appearance/readAppearanceThemeFx
 import { readCheatAvailabilityFx } from "~/bridge/cheat/readCheatAvailabilityFx";
 import { resolveBuiltInArkpackFx } from "~/bridge/arkpack/resolveBuiltInArkpackFx";
 import type { LauncherStartup } from "~/ui/launcher/LauncherStartup";
-import { preloadLauncherHeroFx } from "~/ui/launcher/preloadLauncherHeroFx";
+import { prepareLauncherHeroFx } from "~/ui/launcher/prepareLauncherHeroFx";
 
 /** Creates the one renderer-session startup bootstrap and splash completion owner. */
 export const createLauncherStartupFx = Effect.fn("createLauncherStartupFx")(
@@ -13,6 +13,8 @@ export const createLauncherStartupFx = Effect.fn("createLauncherStartupFx")(
 			const listeners = new Set<() => void | PromiseLike<void>>();
 			const lock = yield* Effect.makeSemaphore(1);
 			let started = false;
+			let currentHeroUrl = heroUrl;
+			let ownedHeroUrl: string | undefined;
 			let state: LauncherStartup.State = {
 				type: "loading",
 				appearance: null,
@@ -65,16 +67,21 @@ export const createLauncherStartupFx = Effect.fn("createLauncherStartupFx")(
 					),
 				),
 			);
-			const heroFx = preloadLauncherHeroFx({
-				url: heroUrl,
+			const heroFx = prepareLauncherHeroFx({
+				fallbackUrl: heroUrl,
 			}).pipe(
-				Effect.tap(() =>
-					Effect.sync(() =>
+				Effect.tap((candidate) =>
+					Effect.sync(() => {
+						if (ownedHeroUrl !== undefined && ownedHeroUrl !== candidate.url) {
+							URL.revokeObjectURL(ownedHeroUrl);
+						}
+						ownedHeroUrl = candidate.owned ? candidate.url : undefined;
+						currentHeroUrl = candidate.url;
 						publish({
 							...state,
 							heroReady: true,
-						}),
-					),
+						});
+					}),
 				),
 			);
 			const catalogFx = catalog.refreshFx.pipe(
@@ -149,6 +156,7 @@ export const createLauncherStartupFx = Effect.fn("createLauncherStartupFx")(
 
 			return {
 				getSnapshot: () => state,
+				getHeroUrl: () => currentHeroUrl,
 				startFx: lock.withPermits(1)(
 					Effect.gen(function* () {
 						if (started) return;
@@ -163,6 +171,11 @@ export const createLauncherStartupFx = Effect.fn("createLauncherStartupFx")(
 						...state,
 						splashCompleted: true,
 					});
+				}),
+				disposeFx: Effect.sync(() => {
+					if (ownedHeroUrl !== undefined) URL.revokeObjectURL(ownedHeroUrl);
+					ownedHeroUrl = undefined;
+					currentHeroUrl = heroUrl;
 				}),
 				subscribe: (listener) => {
 					listeners.add(listener);

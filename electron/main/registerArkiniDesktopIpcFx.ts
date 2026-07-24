@@ -5,6 +5,7 @@ import { createFilesystemArkpackCatalogFx } from "./arkpack/createFilesystemArkp
 import type { AppearancePreferences } from "./appearance/AppearancePreferences";
 import type { CheatPreferences } from "./cheat/CheatPreferences";
 import { ElectronMainRuntime } from "./ElectronMainRuntime";
+import type { LauncherPreferences } from "./launcher/LauncherPreferences";
 import { createFilesystemGameSaveFilesFx } from "./save/createFilesystemGameSaveFilesFx";
 import type { TrustedRenderer } from "./security/TrustedRenderer";
 
@@ -15,6 +16,7 @@ export namespace registerArkiniDesktopIpcFx {
 		readonly trustedRenderer: TrustedRenderer;
 		readonly appearancePreferences: AppearancePreferences;
 		readonly cheatPreferences: CheatPreferences;
+		readonly launcherPreferences: LauncherPreferences;
 	}
 }
 
@@ -24,6 +26,7 @@ export const registerArkiniDesktopIpcFx = Effect.fn("registerArkiniDesktopIpcFx"
 		trustedRenderer,
 		appearancePreferences,
 		cheatPreferences,
+		launcherPreferences,
 	}: registerArkiniDesktopIpcFx.Props) =>
 		Effect.gen(function* () {
 			if (registered) return;
@@ -87,6 +90,14 @@ export const registerArkiniDesktopIpcFx = Effect.fn("registerArkiniDesktopIpcFx"
 					(event, available) =>
 						runAuthorizedFx(event, cheatPreferences.writeAvailableFx(available)),
 				);
+				ipcMain.handle(ArkiniDesktopApi.channels.launcherLastPackageIdRead, (event) =>
+					runAuthorizedFx(event, launcherPreferences.readLastPackageIdFx),
+				);
+				ipcMain.handle(
+					ArkiniDesktopApi.channels.launcherLastPackageIdWrite,
+					(event, packageId) =>
+						runAuthorizedFx(event, launcherPreferences.writeLastPackageIdFx(packageId)),
+				);
 
 				ipcMain.handle(ArkiniDesktopApi.channels.arkpackList, (event) =>
 					runAuthorizedFx(event, arkpacks.listFx),
@@ -129,6 +140,8 @@ export const registerArkiniDesktopIpcFx = Effect.fn("registerArkiniDesktopIpcFx"
 						ArkiniDesktopApi.channels.appearanceAccentWrite,
 						ArkiniDesktopApi.channels.cheatAvailabilityRead,
 						ArkiniDesktopApi.channels.cheatAvailabilityWrite,
+						ArkiniDesktopApi.channels.launcherLastPackageIdRead,
+						ArkiniDesktopApi.channels.launcherLastPackageIdWrite,
 						ArkiniDesktopApi.channels.arkpackList,
 						ArkiniDesktopApi.channels.arkpackRead,
 						ArkiniDesktopApi.channels.arkpackInstall,

@@ -151,6 +151,18 @@ const boundaryRules = [
 		},
 	},
 	{
+		name: "active-code-no-unpacked-game-resource-imports",
+		comment:
+			"Application code consumes authored Game resources only through validated arkpacks, never through direct source-tree imports.",
+		severity: "error",
+		from: {
+			path: "^(?:src|electron|desktop|cli)(?:/|$)",
+		},
+		to: {
+			path: "^game/[^/]+/(?:assets|resources)(?:/|$)",
+		},
+	},
+	{
 		name: "cli-no-electron-runtime-imports",
 		comment:
 			"CLI tooling may reuse explicit Electron build verification, but never Electron main/preload runtime adapters.",

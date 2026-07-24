@@ -17,6 +17,7 @@ import { createTestGameTransitionFields } from "~test/support/game/createTestGam
 import { testGameRead } from "~test/support/game/testGameRead";
 
 const createStartup = (): LauncherStartup => ({
+	getHeroUrl: () => "/hero.png",
 	getSnapshot: () => ({
 		type: "ready",
 		appearance: {
@@ -31,6 +32,7 @@ const createStartup = (): LauncherStartup => ({
 	startFx: Effect.void,
 	retryFx: Effect.void,
 	completeSplashFx: Effect.void,
+	disposeFx: Effect.void,
 	subscribe: () => () => undefined,
 });
 

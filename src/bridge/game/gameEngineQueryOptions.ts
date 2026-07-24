@@ -6,6 +6,7 @@ import type { Game } from "~/bridge/game/Game";
 import { createGameEngineResourceFx } from "~/bridge/game/createGameEngineResourceFx";
 import { createGameFx } from "~/bridge/game/createGameFx";
 import { gameEngineQueryKey } from "~/bridge/game/gameEngineQueryKey";
+import { writeLastPackageIdFx } from "~/bridge/launcher/writeLastPackageIdFx";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 
 export namespace gameEngineQueryOptions {
@@ -14,6 +15,7 @@ export namespace gameEngineQueryOptions {
 		readonly awaitPreviousShutdown?: Promise<void>;
 		readonly beforeCreate?: () => Promise<void>;
 		readonly create?: (packageId: string) => Promise<Game>;
+		readonly rememberPackage?: (packageId: string) => Promise<void>;
 	}
 }
 
@@ -33,6 +35,8 @@ export const gameEngineQueryOptions = ({
 		if (Option.isSome(failure)) throw failure.value;
 		throw Cause.squash(exit.cause);
 	},
+	rememberPackage = (selectedPackageId) =>
+		RendererRuntime.runPromise(writeLastPackageIdFx(selectedPackageId)),
 }: gameEngineQueryOptions.Props) =>
 	queryOptions({
 		queryKey: gameEngineQueryKey,
@@ -59,6 +63,7 @@ export const gameEngineQueryOptions = ({
 					),
 				});
 			}
+			await rememberPackage(packageId).catch(() => undefined);
 			return RendererRuntime.runPromise(createGameEngineResourceFx(game));
 		},
 		gcTime: Number.POSITIVE_INFINITY,

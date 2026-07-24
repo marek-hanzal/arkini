@@ -33,7 +33,7 @@ export default defineConfig(({ command }) => {
 		},
 		renderer: {
 			root: ".",
-			publicDir: false,
+			publicDir: "public",
 			base: process.env.VITE_BASE ?? "/",
 			clearScreen: false,
 			server: {

@@ -63,6 +63,7 @@ vi.mock("electron", () => electronHarness.module);
 
 import { createFilesystemAppearancePreferencesFx } from "../../electron/main/appearance/createFilesystemAppearancePreferencesFx";
 import { createFilesystemCheatPreferencesFx } from "../../electron/main/cheat/createFilesystemCheatPreferencesFx";
+import { createFilesystemLauncherPreferencesFx } from "../../electron/main/launcher/createFilesystemLauncherPreferencesFx";
 import { registerArkiniDesktopIpcFx } from "../../electron/main/registerArkiniDesktopIpcFx";
 
 const placeholderPackageId = "a".repeat(64);
@@ -99,6 +100,16 @@ const invokeArguments = new Map<string, ReadonlyArray<unknown>>([
 		ArkiniDesktopApi.channels.cheatAvailabilityWrite,
 		[
 			false,
+		],
+	],
+	[
+		ArkiniDesktopApi.channels.launcherLastPackageIdRead,
+		[],
+	],
+	[
+		ArkiniDesktopApi.channels.launcherLastPackageIdWrite,
+		[
+			"arkini",
 		],
 	],
 	[
@@ -210,10 +221,14 @@ describe("registerArkiniDesktopIpcFx", () => {
 					const cheatPreferences = yield* createFilesystemCheatPreferencesFx({
 						userDataPath,
 					});
+					const launcherPreferences = yield* createFilesystemLauncherPreferencesFx({
+						userDataPath,
+					});
 					yield* registerArkiniDesktopIpcFx({
 						trustedRenderer,
 						appearancePreferences,
 						cheatPreferences,
+						launcherPreferences,
 					});
 				}).pipe(Effect.provide(NodeContext.layer)),
 			);
@@ -268,6 +283,19 @@ describe("registerArkiniDesktopIpcFx", () => {
 			await expect(
 				invoke(ArkiniDesktopApi.channels.cheatAvailabilityRead, trustedEvent),
 			).resolves.toBe(true);
+			await expect(
+				invoke(ArkiniDesktopApi.channels.launcherLastPackageIdRead, trustedEvent),
+			).resolves.toBeNull();
+			await expect(
+				invoke(
+					ArkiniDesktopApi.channels.launcherLastPackageIdWrite,
+					trustedEvent,
+					"package:last",
+				),
+			).resolves.toBeUndefined();
+			await expect(
+				invoke(ArkiniDesktopApi.channels.launcherLastPackageIdRead, trustedEvent),
+			).resolves.toBe("package:last");
 
 			const arkpackBytes = new Uint8Array([
 				1,

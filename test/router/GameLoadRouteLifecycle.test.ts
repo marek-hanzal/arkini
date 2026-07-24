@@ -30,6 +30,7 @@ const roots: Array<ReturnType<typeof createRoot>> = [];
 const clearSaveMock = vi.fn(() => Promise.resolve());
 
 const createStartup = (): LauncherStartup => ({
+	getHeroUrl: () => "/hero.png",
 	getSnapshot: () => ({
 		type: "ready",
 		appearance: {
@@ -44,6 +45,7 @@ const createStartup = (): LauncherStartup => ({
 	startFx: Effect.void,
 	retryFx: Effect.void,
 	completeSplashFx: Effect.void,
+	disposeFx: Effect.void,
 	subscribe: () => () => undefined,
 });
 

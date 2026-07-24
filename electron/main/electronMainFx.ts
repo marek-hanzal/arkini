@@ -8,6 +8,7 @@ import { registerArkiniProtocolFx } from "./registerArkiniProtocolFx";
 import { registerWindowLifecycleFx } from "./registerWindowLifecycleFx";
 import { createFilesystemAppearancePreferencesFx } from "./appearance/createFilesystemAppearancePreferencesFx";
 import { createFilesystemCheatPreferencesFx } from "./cheat/createFilesystemCheatPreferencesFx";
+import { createFilesystemLauncherPreferencesFx } from "./launcher/createFilesystemLauncherPreferencesFx";
 import { createTrustedRendererFx } from "./security/createTrustedRendererFx";
 
 export const electronMainFx = Effect.fn("electronMainFx")(function* () {
@@ -34,6 +35,9 @@ export const electronMainFx = Effect.fn("electronMainFx")(function* () {
 	const cheatPreferences = yield* createFilesystemCheatPreferencesFx({
 		userDataPath: app.getPath("userData"),
 	});
+	const launcherPreferences = yield* createFilesystemLauncherPreferencesFx({
+		userDataPath: app.getPath("userData"),
+	});
 	const appearanceTheme = yield* appearancePreferences.readThemeFx;
 	yield* Effect.sync(() => {
 		nativeTheme.themeSource = appearanceTheme;
@@ -49,6 +53,7 @@ export const electronMainFx = Effect.fn("electronMainFx")(function* () {
 		trustedRenderer,
 		appearancePreferences,
 		cheatPreferences,
+		launcherPreferences,
 	});
 	yield* createMainWindowFx({
 		trustedRenderer,

@@ -70,6 +70,7 @@ const removeBeforeClose = window.arkini.lifecycle.onBeforeClose(async () => {
 import.meta.hot?.dispose((data: HotData) => {
 	removeBeforeClose();
 	removeCheatAvailabilityStartupSubscription();
+	RendererRuntime.runSync(launcherStartup.disposeFx);
 	data.gameEngineShutdown = waitForGameEngineResource(queryClient).then(async (resource) => {
 		if (resource === null) return;
 		resource.assertUsable();

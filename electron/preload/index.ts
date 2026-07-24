@@ -55,6 +55,12 @@ const api: ArkiniDesktopApi.Api = {
 		writeAvailable: (available) =>
 			ipcRenderer.invoke(ArkiniDesktopApi.channels.cheatAvailabilityWrite, available),
 	},
+	launcher: {
+		readLastPackageId: () =>
+			ipcRenderer.invoke(ArkiniDesktopApi.channels.launcherLastPackageIdRead),
+		writeLastPackageId: (packageId) =>
+			ipcRenderer.invoke(ArkiniDesktopApi.channels.launcherLastPackageIdWrite, packageId),
+	},
 	arkpack: {
 		list: () => ipcRenderer.invoke(ArkiniDesktopApi.channels.arkpackList),
 		read: (packageId) => ipcRenderer.invoke(ArkiniDesktopApi.channels.arkpackRead, packageId),

@@ -62,10 +62,12 @@ describe("gameEngineQueryOptions", () => {
 	it("deduplicates repeated route acquisition through one renderer-wide query slot", async () => {
 		const game = createGame();
 		const create = vi.fn(async () => game);
+		const rememberPackage = vi.fn(() => Promise.resolve());
 		const client = createClient();
 		const options = gameEngineQueryOptions({
 			packageId: "package:test",
 			create,
+			rememberPackage,
 		});
 
 		const first = await client.ensureQueryData(options);
@@ -78,6 +80,8 @@ describe("gameEngineQueryOptions", () => {
 		expect(first.game.arkpack).toBe(game.arkpack);
 		expect(second).toBe(first);
 		expect(create).toHaveBeenCalledOnce();
+		expect(rememberPackage).toHaveBeenCalledOnce();
+		expect(rememberPackage).toHaveBeenCalledWith("package:test");
 		expect(getCachedGameEngineResource(client)).toBe(first);
 	});
 
@@ -146,22 +150,40 @@ describe("gameEngineQueryOptions", () => {
 		await acquisition;
 	});
 
+	it("does not block a valid Game when remembering lastPackageId fails", async () => {
+		const game = createGame();
+		const client = createClient();
+		const resource = await client.ensureQueryData(
+			gameEngineQueryOptions({
+				packageId: "package:test",
+				create: async () => game,
+				rememberPackage: () => Promise.reject(new Error("preference unavailable")),
+			}),
+		);
+
+		expect(resource.game.arkpack).toBe(game.arkpack);
+		expect(getCachedGameEngineResource(client)).toBe(resource);
+	});
+
 	it("discards a contract-breaking Game returned for another package", async () => {
 		const discard = vi.fn();
 		const client = createClient();
 		const game = createGame("package:wrong", {
 			disposeWithoutSaveFx: Effect.sync(discard),
 		});
+		const rememberPackage = vi.fn(() => Promise.resolve());
 
 		const acquisition = client.ensureQueryData(
 			gameEngineQueryOptions({
 				packageId: "package:expected",
 				create: async () => game,
+				rememberPackage,
 			}),
 		);
 		await expect(acquisition).rejects.toBeInstanceOf(CriticalGameLifecycleError);
 		await expect(acquisition).rejects.toThrow("returned package package:wrong");
 		expect(discard).toHaveBeenCalledOnce();
+		expect(rememberPackage).not.toHaveBeenCalled();
 		expect(getCachedGameEngineResource(client)).toBeNull();
 	});
 

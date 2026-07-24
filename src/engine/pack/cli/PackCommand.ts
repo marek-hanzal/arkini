@@ -7,6 +7,7 @@ import { renderGameDiagnosticsFx } from "~/engine/validation/fx/renderGameDiagno
 export namespace PackCommand {
 	export interface Props {
 		input: string;
+		name?: string;
 		metadata?: {
 			readonly output: string;
 			readonly packageId: string;
@@ -17,9 +18,9 @@ export namespace PackCommand {
 /**
  * CLI command that packs one game source directory into an Arkini binary package.
  */
-export const PackCommand = ({ input, metadata }: PackCommand.Props) =>
+export const PackCommand = ({ input, name = "pack", metadata }: PackCommand.Props) =>
 	Command.make(
-		"pack",
+		name,
 		{
 			input: Args.directory({
 				name: "input",

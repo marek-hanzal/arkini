@@ -122,6 +122,10 @@ const invokeArguments = new Map<string, ReadonlyArray<unknown>>([
 					title: "Arkini",
 					configVersion: "1",
 					compressedSize: 0,
+					trust: {
+						type: "external",
+						reason: "unsigned",
+					} as const,
 					source: "imported",
 				},
 				bytes: new Uint8Array(),
@@ -280,6 +284,10 @@ describe("registerArkiniDesktopIpcFx", () => {
 					title: "Arkini test",
 					configVersion: "1",
 					compressedSize: arkpackBytes.byteLength,
+					trust: {
+						type: "external",
+						reason: "unsigned",
+					} as const,
 					source: "imported",
 				},
 				bytes: arkpackBytes,

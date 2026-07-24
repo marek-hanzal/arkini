@@ -20,7 +20,10 @@ export const MainMenu = () => {
 		builtInPackageId !== undefined &&
 		catalogState.type === "ready" &&
 		catalogState.arkpacks.some(
-			(arkpack) => arkpack.source === "built-in" && arkpack.packageId === builtInPackageId,
+			(arkpack) =>
+				arkpack.source === "built-in" &&
+				arkpack.trust.type === "official" &&
+				arkpack.packageId === builtInPackageId,
 		);
 
 	return (

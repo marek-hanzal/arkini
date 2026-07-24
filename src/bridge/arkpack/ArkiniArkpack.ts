@@ -1,7 +1,8 @@
 import ArkiniGamePackMetadata from "../../../game/arkini.game.arkpack.metadata.json";
+import ArkiniGamePackSignatureUrl from "../../../game/arkini.game.arkpack.sig?url";
 import ArkiniGamePackUrl from "../../../game/arkini.game.arkpack?url";
 
-import type { ArkpackDescriptor } from "~/bridge/arkpack/Arkpack";
+import type { BuiltInArkpack } from "~/bridge/arkpack/BuiltInArkpack";
 import { ArkpackMetadataSchema } from "~/engine/pack/schema/ArkpackMetadataSchema";
 
 const metadata = ArkpackMetadataSchema.parse(ArkiniGamePackMetadata);
@@ -10,6 +11,7 @@ const metadata = ArkpackMetadataSchema.parse(ArkiniGamePackMetadata);
 export const ArkiniArkpack = {
 	packageId: metadata.packageId,
 	url: ArkiniGamePackUrl,
+	signatureUrl: ArkiniGamePackSignatureUrl,
 	descriptor: {
 		packageId: metadata.packageId,
 		contentHash: metadata.contentHash,
@@ -17,6 +19,10 @@ export const ArkiniArkpack = {
 		title: metadata.title,
 		configVersion: metadata.configVersion,
 		compressedSize: metadata.compressedSize,
+		trust: {
+			type: "official",
+			keyId: "arkini-official-2026-01",
+		},
 		source: "built-in",
-	} satisfies ArkpackDescriptor,
-} as const;
+	},
+} as const satisfies BuiltInArkpack;

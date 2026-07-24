@@ -73,6 +73,8 @@ describe("packDirectoryFx", () => {
 				);
 				yield* fileSystem.writeFile(path.join(assets, "hero.png"), png);
 				yield* fileSystem.writeFile(path.join(assets, "item-log.png"), png);
+				const staleSignature = path.join(directory, "arkini.game.arkpack.sig");
+				yield* fileSystem.writeFileString(staleSignature, "stale");
 
 				const result = yield* packDirectoryFx({
 					input,
@@ -91,6 +93,7 @@ describe("packDirectoryFx", () => {
 					result,
 					payload,
 					metadata,
+					staleSignatureExists: yield* fileSystem.exists(staleSignature),
 				} as const;
 			}).pipe(Effect.provide(NodeContext.layer), Effect.scoped),
 		);
@@ -99,6 +102,7 @@ describe("packDirectoryFx", () => {
 			json: 2,
 			png: 2,
 		});
+		expect(packed.staleSignatureExists).toBe(false);
 		expect(packed.metadata).toEqual({
 			namespace: "arkini",
 			format: 1,

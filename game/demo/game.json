@@ -1,0 +1,44 @@
+{
+	"$schema": "../schema.json",
+	"meta": {
+		"id": "demo",
+		"title": "Arkini Trust Demo",
+		"board": {
+			"width": 4,
+			"height": 3
+		},
+		"inventory": {
+			"width": 2,
+			"height": 2
+		}
+	},
+	"resources": {
+		"hero": "item-double-tree"
+	},
+	"start": {
+		"board": [
+			{
+				"itemId": "item:water",
+				"x": 0,
+				"y": 1,
+				"space": 0
+			},
+			{
+				"itemId": "item:tree",
+				"x": 1,
+				"y": 1,
+				"space": 0
+			}
+		],
+		"inventory": [],
+		"toolbar": [],
+		"currentSpace": 0
+	},
+	"categories": {
+		"demo": {
+			"id": "demo",
+			"title": "Demo"
+		}
+	},
+	"version": "1.0"
+}

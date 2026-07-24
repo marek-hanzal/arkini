@@ -10,6 +10,10 @@ const builtIn: ArkpackDescriptor = {
 	title: "Arkini",
 	configVersion: "1",
 	compressedSize: 1,
+	trust: {
+		type: "official",
+		keyId: "test-official",
+	} as const,
 	source: "built-in",
 };
 
@@ -20,6 +24,10 @@ const imported: ArkpackDescriptor = {
 	title: "Imported",
 	configVersion: "1",
 	compressedSize: 2,
+	trust: {
+		type: "external",
+		reason: "unsigned",
+	} as const,
 	source: "imported",
 };
 

@@ -60,6 +60,10 @@ const createGame = ({
 		title: testArkpackConfig.meta.title,
 		configVersion: testArkpackConfig.version,
 		compressedSize: 0,
+		trust: {
+			type: "external",
+			reason: "unsigned",
+		} as const,
 		source: "imported",
 	},
 	config: testArkpackConfig,

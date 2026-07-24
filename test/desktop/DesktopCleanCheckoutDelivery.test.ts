@@ -1,5 +1,5 @@
 import { execFile } from "node:child_process";
-import { copyFile, mkdir, mkdtemp, rm, stat, symlink } from "node:fs/promises";
+import { copyFile, mkdir, mkdtemp, readFile, rm, stat, symlink } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { promisify } from "node:util";
@@ -37,7 +37,15 @@ const copyTrackedWorkspace = async (target: string) => {
 	await symlink(resolve("node_modules"), join(target, "node_modules"), "dir");
 };
 
-const runNpmScript = async (cwd: string, script: string) => {
+const readOfficialPrivateKey = async () =>
+	process.env.ARKINI_ARKPACK_PRIVATE_KEY ??
+	(await readFile(resolve(".arkini/arkpack-private.pem"), "utf8"));
+
+const runNpmScript = async (
+	cwd: string,
+	script: string,
+	environment: NodeJS.ProcessEnv = process.env,
+) => {
 	await execFileAsync(
 		npmExecutable,
 		[
@@ -46,7 +54,7 @@ const runNpmScript = async (cwd: string, script: string) => {
 		],
 		{
 			cwd,
-			env: process.env,
+			env: environment,
 			maxBuffer: 32 * 1024 * 1024,
 		},
 	);
@@ -56,14 +64,30 @@ describe("fresh checkout desktop delivery inputs", () => {
 	it("builds from a clean checkout before dependency analysis consumes generated inputs", async () => {
 		const workspace = await mkdtemp(join(tmpdir(), "arkini-clean-delivery-"));
 		try {
+			const privateKey = await readOfficialPrivateKey();
 			await copyTrackedWorkspace(workspace);
 			await expect(stat(join(workspace, "game/arkini.game.arkpack"))).rejects.toMatchObject({
 				code: "ENOENT",
 			});
+			await expect(stat(join(workspace, ".arkini"))).rejects.toMatchObject({
+				code: "ENOENT",
+			});
 
-			await runNpmScript(workspace, "build");
+			await runNpmScript(workspace, "build", {
+				...process.env,
+				ARKINI_ARKPACK_PRIVATE_KEY: privateKey,
+			});
 			const packed = await stat(join(workspace, "game/arkini.game.arkpack"));
 			expect(packed.isFile()).toBe(true);
+			const signature = await stat(join(workspace, "game/arkini.game.arkpack.sig"));
+			expect(signature.isFile()).toBe(true);
+			const demo = await stat(join(workspace, "game/demo.game.arkpack"));
+			expect(demo.isFile()).toBe(true);
+			await expect(stat(join(workspace, "game/demo.game.arkpack.sig"))).rejects.toMatchObject(
+				{
+					code: "ENOENT",
+				},
+			);
 			const renderer = await stat(join(workspace, "out/renderer/index.html"));
 			expect(renderer.isFile()).toBe(true);
 			await runNpmScript(workspace, "dc");

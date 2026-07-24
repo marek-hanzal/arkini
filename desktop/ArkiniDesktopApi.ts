@@ -32,6 +32,20 @@ export namespace ArkiniDesktopApi {
 		readonly title: string;
 		readonly configVersion: string;
 		readonly compressedSize: number;
+		readonly trust:
+			| {
+					readonly type: "official";
+					readonly keyId: string;
+			  }
+			| {
+					readonly type: "external";
+					readonly reason: "unsigned" | "unknown-key";
+			  }
+			| {
+					readonly type: "invalid";
+					readonly reason: "malformed-signature" | "invalid-signature" | "hash-mismatch";
+					readonly keyId?: string;
+			  };
 		readonly source: "imported";
 		readonly filename?: string;
 		readonly importedAtMs?: number;

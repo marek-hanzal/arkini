@@ -1,4 +1,5 @@
 *.local
+.arkini/
 .DS_Store
 .env
 .env.*
@@ -9,7 +10,8 @@
 bun.lock
 bun.lockb
 dist
-game/arkini.game.arkpack
+game/*.game.arkpack
+game/*.game.arkpack.sig
 game/schema.json
 node_modules
 out

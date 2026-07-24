@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import type { ArkiniDesktopApi } from "../../../desktop/ArkiniDesktopApi";
 
 const hashPattern = /^[a-f0-9]{64}$/;
-const packagePattern = /^(?:arkini|[a-f0-9]{64})$/;
+const packagePattern = /^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$/;
 
 /** Validates one exact package/hash save identity before filesystem use. */
 export const assertGameSaveKeyFx = Effect.fn("assertGameSaveKeyFx")(

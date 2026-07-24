@@ -16,6 +16,10 @@ const second = {
 	packageId: "arkini",
 	contentHash: "b".repeat(64),
 };
+const demo = {
+	packageId: "demo",
+	contentHash: "c".repeat(64),
+};
 
 const createRepository = () =>
 	Effect.runPromise(
@@ -78,6 +82,34 @@ describe("createFilesystemGameSaveFilesFx", () => {
 				4,
 			]),
 		);
+	});
+
+	it("persists saves for safe stable built-in package identities", async () => {
+		const repository = await createRepository();
+		const bytes = new Uint8Array([
+			7,
+			8,
+			9,
+		]);
+
+		await Effect.runPromise(repository.writeFx(demo, bytes));
+		expect(await Effect.runPromise(repository.readFx(demo))).toEqual(bytes);
+		expect(
+			new Uint8Array(
+				await readFile(
+					join(
+						root,
+						"arkini",
+						"saves",
+						demo.packageId,
+						demo.contentHash,
+						"current.arksave",
+					),
+				),
+			),
+		).toEqual(bytes);
+		await Effect.runPromise(repository.clearFx(demo));
+		expect(await Effect.runPromise(repository.readFx(demo))).toBeNull();
 	});
 
 	it("preserves the previous current save when atomic replacement fails", async () => {

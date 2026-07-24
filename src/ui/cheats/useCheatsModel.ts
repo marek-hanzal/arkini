@@ -2,10 +2,8 @@ import { match } from "ts-pattern";
 
 import type { Game } from "~/bridge/game/Game";
 import { useGameCheats } from "~/bridge/cheat/useGameCheats";
-import {
-	useSetGameCheatsMutation,
-	type useSetGameCheatsMutation as SetGameCheatsMutation,
-} from "~/bridge/cheat/useSetGameCheatsMutation";
+import { useSetCheatEnabledMutation } from "~/bridge/cheat/useSetCheatEnabledMutation";
+import { useSetInstantGameplayMutation } from "~/bridge/cheat/useSetInstantGameplayMutation";
 import { useExclusiveAction } from "~/ui/action/useExclusiveAction";
 
 export namespace useCheatsModel {
@@ -32,15 +30,16 @@ export namespace useCheatsModel {
 		readonly enabled: boolean;
 		readonly instantGameplay: boolean;
 		readonly status: Status;
+		readonly beginExit: () => boolean;
+		readonly completeExit: () => void;
 		readonly setEnabled: (enabled: boolean) => void;
 		readonly setInstantGameplay: (enabled: boolean) => void;
 	}
 }
 
-type CheatsAction = SetGameCheatsMutation.Action;
-type CheatsCommand = SetGameCheatsMutation.Command;
+type CheatsAction = "cheat-mode" | "instant-gameplay" | "exit";
 
-const actionLabel = (action: CheatsAction) =>
+const actionLabel = (action: Exclude<CheatsAction, "exit">) =>
 	match(action)
 		.with("cheat-mode", () => "Cheat mode" as const)
 		.with("instant-gameplay", () => "Instant gameplay" as const)
@@ -50,50 +49,60 @@ const actionLabel = (action: CheatsAction) =>
 export const useCheatsModel = (game: Game): useCheatsModel.Model => {
 	const cheats = useGameCheats(game);
 	const { active, claim, release } = useExclusiveAction<CheatsAction>();
-	const update = useSetGameCheatsMutation(game);
-	const settledAction = update.variables?.action;
+	const setCheatEnabled = useSetCheatEnabledMutation(game);
+	const setInstantGameplay = useSetInstantGameplayMutation(game);
 	let status: useCheatsModel.Status = {
 		kind: "idle",
 	};
-	if (active !== null) {
+	if (active === "cheat-mode" || active === "instant-gameplay") {
 		status = {
 			kind: "pending",
 			label: actionLabel(active),
 		};
-	} else if (update.isError && settledAction !== undefined) {
+	} else if (setCheatEnabled.isError) {
 		status = {
 			kind: "error",
-			error: update.error,
-			label: actionLabel(settledAction),
+			error: setCheatEnabled.error,
+			label: "Cheat mode",
 		};
-	} else if (update.isSuccess && settledAction !== undefined) {
+	} else if (setInstantGameplay.isError) {
+		status = {
+			kind: "error",
+			error: setInstantGameplay.error,
+			label: "Instant gameplay",
+		};
+	} else if (setCheatEnabled.isSuccess) {
 		status = {
 			kind: "success",
-			label: actionLabel(settledAction),
+			label: "Cheat mode",
+		};
+	} else if (setInstantGameplay.isSuccess) {
+		status = {
+			kind: "success",
+			label: "Instant gameplay",
 		};
 	}
-
-	const mutate = (command: CheatsCommand) => {
-		if (!claim(command.action)) return;
-		update.mutate(command, {
-			onSettled: () => release(command.action),
-		});
-	};
 
 	return {
 		blocked: active !== null,
 		enabled: cheats.enabled,
 		instantGameplay: cheats.instantGameplay,
 		status,
-		setEnabled: (enabled) =>
-			mutate({
-				action: "cheat-mode",
-				enabled,
-			}),
-		setInstantGameplay: (enabled) =>
-			mutate({
-				action: "instant-gameplay",
-				enabled,
-			}),
+		beginExit: () => claim("exit"),
+		completeExit: () => release("exit"),
+		setEnabled: (enabled) => {
+			if (!claim("cheat-mode")) return;
+			setInstantGameplay.reset();
+			setCheatEnabled.mutate(enabled, {
+				onSettled: () => release("cheat-mode"),
+			});
+		},
+		setInstantGameplay: (enabled) => {
+			if (!claim("instant-gameplay")) return;
+			setCheatEnabled.reset();
+			setInstantGameplay.mutate(enabled, {
+				onSettled: () => release("instant-gameplay"),
+			});
+		},
 	};
 };

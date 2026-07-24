@@ -58,6 +58,8 @@ vi.mock("~/ui/cheats/useCheatsModel", async () => {
 			);
 			return {
 				blocked,
+				beginExit: () => !state.blocked,
+				completeExit: vi.fn(),
 				enabled: true,
 				instantGameplay: false,
 				status: {

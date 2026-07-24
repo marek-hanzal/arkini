@@ -20,7 +20,7 @@ const createStartup = (): LauncherStartup => {
 	return {
 		getSnapshot: () => state,
 		getHeroUrl: () => "/hero.png",
-		consumeHydration: () => false,
+		consumeHydrationFx: () => Effect.succeed(false),
 		startFx: Effect.void,
 		retryFx: Effect.void,
 		completeSplashFx: Effect.void,

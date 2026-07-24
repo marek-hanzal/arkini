@@ -46,19 +46,15 @@ export const registerArkiniElectronIpcFx = Effect.fn("registerArkiniElectronIpcF
 						window.setBackgroundColor(color);
 					}
 				};
-				const authorizeIpcOperationFx = Effect.fn("authorizeIpcOperationFx")(
-					<Value, Error>(
-						event: IpcMainInvokeEvent,
-						operation: Effect.Effect<Value, Error>,
-					) =>
-						trustedRenderer
-							.assertTrustedIpcSenderFx(event)
-							.pipe(Effect.zipRight(operation)),
-				);
 				const runAuthorized = <Value, Error>(
 					event: IpcMainInvokeEvent,
 					operation: Effect.Effect<Value, Error>,
-				) => ElectronMainRuntime.runPromise(authorizeIpcOperationFx(event, operation));
+				) =>
+					ElectronMainRuntime.runPromise(
+						trustedRenderer
+							.assertTrustedIpcSenderFx(event)
+							.pipe(Effect.zipRight(operation)),
+					);
 
 				nativeTheme.on("updated", synchronizeWindowBackgrounds);
 				ipcMain.handle(ArkiniElectronApi.channels.appearanceRead, (event) =>

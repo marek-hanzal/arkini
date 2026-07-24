@@ -128,7 +128,9 @@ describe("createLauncherStartupFx package Hero", () => {
 		const start = Effect.runPromise(startup.startFx).catch(() => undefined);
 
 		await vi.waitFor(() => {
-			startup.consumeHydration((pending) => Object.assign(hydration, pending));
+			Effect.runSync(
+				startup.consumeHydrationFx((pending) => Object.assign(hydration, pending)),
+			);
 			expect(hydration).toEqual({
 				appearance: {
 					theme: "dark",

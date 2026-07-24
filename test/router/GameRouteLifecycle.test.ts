@@ -9,12 +9,15 @@ import { routeTree } from "~/_route";
 import { createCheatAvailability } from "~/bridge/cheat/createCheatAvailability";
 import type { Game } from "~/bridge/game/Game";
 import { createGameEngineResourceFx } from "~/bridge/game/createGameEngineResourceFx";
-import { getCachedGameEngineResource } from "~/bridge/game/getCachedGameEngineResource";
+import { getCachedGameEngineResourceFx } from "~/bridge/game/getCachedGameEngineResourceFx";
 import { gameEngineQueryKey } from "~/bridge/game/gameEngineQueryKey";
 import type { LauncherStartup } from "~/ui/launcher/LauncherStartup";
 import { testArkpackConfig } from "~test/bridge/arkpack/support/createTestArkpack";
 import { createTestGameTransitionFields } from "~test/support/game/createTestGameTransitionFields";
 import { testGameRead } from "~test/support/game/testGameRead";
+
+const getCachedGameEngineResource = (queryClient: QueryClient) =>
+	Effect.runSync(getCachedGameEngineResourceFx(queryClient));
 
 const createStartup = (): LauncherStartup => ({
 	getHeroUrl: () => "/hero.png",
@@ -25,7 +28,7 @@ const createStartup = (): LauncherStartup => ({
 		heroReady: true,
 		splashCompleted: true,
 	}),
-	consumeHydration: () => false,
+	consumeHydrationFx: () => Effect.succeed(false),
 	startFx: Effect.void,
 	retryFx: Effect.void,
 	completeSplashFx: Effect.void,

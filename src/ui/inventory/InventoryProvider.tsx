@@ -1,6 +1,7 @@
 import { type PropsWithChildren, useEffect, useMemo, useState, useSyncExternalStore } from "react";
 
-import { createInventoryController } from "~/ui/inventory/createInventoryController";
+import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
+import { createInventoryControllerFx } from "~/ui/inventory/createInventoryControllerFx";
 import { InventoryContext } from "~/ui/inventory/InventoryContext";
 import type { InventoryControl } from "~/ui/inventory/InventoryControl";
 
@@ -24,7 +25,7 @@ const canRestoreFocus = (element: HTMLElement) =>
 
 /** Owns the idempotent open/close lifecycle of one non-modal Inventory surface. */
 export const InventoryProvider = ({ children }: PropsWithChildren) => {
-	const [controller] = useState(createInventoryController);
+	const [controller] = useState(() => RendererRuntime.runSync(createInventoryControllerFx()));
 	const state = useSyncExternalStore(
 		controller.subscribe,
 		controller.getSnapshot,
@@ -33,7 +34,7 @@ export const InventoryProvider = ({ children }: PropsWithChildren) => {
 
 	useEffect(() => {
 		if (state.phase !== "closed") return;
-		const origin = controller.takeRestoreOrigin();
+		const origin = RendererRuntime.runSync(controller.takeRestoreOriginFx);
 		if (origin !== null && canRestoreFocus(origin)) origin.focus();
 	}, [
 		controller,
@@ -51,7 +52,7 @@ export const InventoryProvider = ({ children }: PropsWithChildren) => {
 			}
 			event.preventDefault();
 			event.stopPropagation();
-			controller.close();
+			RendererRuntime.runSync(controller.closeFx());
 		};
 		document.addEventListener("keydown", onKeyDown);
 		return () => document.removeEventListener("keydown", onKeyDown);
@@ -61,7 +62,7 @@ export const InventoryProvider = ({ children }: PropsWithChildren) => {
 
 	useEffect(
 		() => () => {
-			controller.reset();
+			RendererRuntime.runSync(controller.resetFx);
 		},
 		[
 			controller,
@@ -72,8 +73,8 @@ export const InventoryProvider = ({ children }: PropsWithChildren) => {
 		() => ({
 			state,
 			isOpen: state.phase === "open",
-			open: controller.open,
-			close: controller.close,
+			openFx: controller.openFx,
+			closeFx: controller.closeFx,
 		}),
 		[
 			controller,

@@ -45,7 +45,7 @@ describe("createLauncherStartupFx", () => {
 			splashCompleted: false,
 		});
 		const consume = vi.fn();
-		expect(startup.consumeHydration(consume)).toBe(true);
+		expect(Effect.runSync(startup.consumeHydrationFx(consume))).toBe(true);
 		expect(consume).toHaveBeenCalledWith({
 			appearance: {
 				theme: "light",
@@ -54,7 +54,7 @@ describe("createLauncherStartupFx", () => {
 			cheatsAvailable: true,
 		});
 		expect(startup.getSnapshot().appearanceReady).toBe(true);
-		expect(startup.consumeHydration(consume)).toBe(false);
+		expect(Effect.runSync(startup.consumeHydrationFx(consume))).toBe(false);
 
 		Effect.runSync(startup.completeSplashFx);
 		expect(startup.getSnapshot().splashCompleted).toBe(true);
@@ -154,16 +154,18 @@ describe("createLauncherStartupFx", () => {
 
 		await Effect.runPromise(startup.startFx);
 		expect(
-			startup.consumeHydration(({ appearance, cheatsAvailable }) => {
-				if (appearance !== undefined) liveTheme = appearance.theme;
-				if (cheatsAvailable !== undefined) liveCheatsAvailable = cheatsAvailable;
-			}),
+			Effect.runSync(
+				startup.consumeHydrationFx(({ appearance, cheatsAvailable }) => {
+					if (appearance !== undefined) liveTheme = appearance.theme;
+					if (cheatsAvailable !== undefined) liveCheatsAvailable = cheatsAvailable;
+				}),
+			),
 		).toBe(true);
 		liveTheme = "dark";
 		liveCheatsAvailable = false;
 
 		await Effect.runPromise(startup.retryFx);
-		expect(startup.consumeHydration(() => undefined)).toBe(false);
+		expect(Effect.runSync(startup.consumeHydrationFx(() => undefined))).toBe(false);
 		expect(liveTheme).toBe("dark");
 		expect(liveCheatsAvailable).toBe(false);
 		expect(startup.getSnapshot().appearanceReady).toBe(true);

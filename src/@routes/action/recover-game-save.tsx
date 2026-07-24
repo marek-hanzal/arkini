@@ -9,15 +9,15 @@ import { recoverFailedGameSaveFx } from "~/bridge/game/recoverFailedGameSaveFx";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import { ActionErrorPage } from "~/ui/action/ActionErrorPage";
 import { ActionPendingPage } from "~/page/action/ActionPendingPage";
-import { runActionRoute } from "~/page/action/runActionRoute";
+import { runActionRouteFx } from "~/page/action/runActionRouteFx";
 import { GameSaveRecoverySearchSchema } from "~/ui/navigation/GameSaveRecoverySearchSchema";
 
 export const Route = createFileRoute("/action/recover-game-save")({
 	validateSearch: GameSaveRecoverySearchSchema,
 	loaderDeps: ({ search }) => search,
 	loader: async ({ context, deps }) => {
-		await runActionRoute(() =>
-			RendererRuntime.runPromise(
+		await RendererRuntime.runPromise(
+			runActionRouteFx(
 				recoverFailedGameSaveFx({
 					packageId: deps.packageId,
 					queryClient: context.queryClient,

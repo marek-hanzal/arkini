@@ -98,7 +98,7 @@ describe("MainMenu", () => {
 		const startup: LauncherStartup = {
 			getSnapshot: () => startupState,
 			getHeroUrl: () => "/hero.png",
-			consumeHydration: () => false,
+			consumeHydrationFx: () => Effect.succeed(false),
 			startFx: Effect.void,
 			retryFx: Effect.void,
 			completeSplashFx: Effect.void,

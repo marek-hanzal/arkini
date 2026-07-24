@@ -11,9 +11,8 @@ import {
 import type { Game } from "~/bridge/game/Game";
 import { useCheatItemCatalog } from "~/bridge/cheat/useCheatItemCatalog";
 import { useGameCheats } from "~/bridge/cheat/useGameCheats";
-import { useSpawnCheatItemMutation } from "~/bridge/cheat/useSpawnCheatItemMutation";
-import { useExclusiveAction } from "~/ui/action/useExclusiveAction";
 import { useCheatAvailability } from "~/ui/cheat-availability/useCheatAvailability";
+import { useCheatItemSpawn } from "~/ui/cheat-spotlight/useCheatItemSpawn";
 import { useGameMenuControl } from "~/ui/game-menu/useGameMenuControl";
 import { useItemDetailControl } from "~/ui/item-detail/useItemDetailControl";
 import { useFuseSearch } from "~/ui/search/useFuseSearch";
@@ -49,8 +48,7 @@ export const CheatItemSpotlight = ({
 	const catalog = useCheatItemCatalog(game);
 	const gameMenu = useGameMenuControl();
 	const itemDetail = useItemDetailControl();
-	const spawn = useSpawnCheatItemMutation(game);
-	const spawnAction = useExclusiveAction<"spawn">();
+	const spawn = useCheatItemSpawn();
 	const dialogRef = useRef<HTMLElement>(null);
 	const inputRef = useRef<HTMLInputElement>(null);
 	const originRef = useRef<HTMLElement | null>(null);
@@ -99,18 +97,14 @@ export const CheatItemSpotlight = ({
 		.slice(0, maxVisibleResults);
 	const blockedByHigherOwner = gameMenu.isOpen || itemDetail.isOpen;
 	const available = cheatAvailability.available && cheats.enabled && !blockedByHigherOwner;
-	const spawnPending = spawnAction.active !== null || spawn.isPending;
 	const closeSpotlight = useCallback(
 		(restoreFocus = true) => {
-			if (spawnAction.getSnapshot() !== null || spawn.isPending) {
-				preserveSpawnOutcomeRef.current = true;
-			}
+			if (spawn.pending) preserveSpawnOutcomeRef.current = true;
 			restoreFocusRef.current = restoreFocus;
 			setOpen(false);
 		},
 		[
-			spawn.isPending,
-			spawnAction.getSnapshot,
+			spawn.pending,
 		],
 	);
 
@@ -128,7 +122,7 @@ export const CheatItemSpotlight = ({
 			onBeforeOpen?.();
 			if (preserveSpawnOutcomeRef.current) {
 				preserveSpawnOutcomeRef.current = false;
-			} else if (spawnAction.getSnapshot() === null && !spawn.isPending) {
+			} else if (!spawn.pending) {
 				spawn.reset();
 			}
 			setOpen(true);
@@ -182,12 +176,8 @@ export const CheatItemSpotlight = ({
 	if (!open) return null;
 
 	const selected = results[selectedIndex];
-	const requestSpawn = (itemId = selected?.itemId) => {
-		if (itemId === undefined || spawn.isPending || !spawnAction.claim("spawn")) return;
-		spawn.mutate(itemId, {
-			onSettled: () => spawnAction.release("spawn"),
-		});
-	};
+	const requestSpawn = (itemId = selected?.itemId) =>
+		itemId === undefined ? false : spawn.request(itemId);
 	const keepFocusInside = (event: ReactKeyboardEvent<HTMLElement>) => {
 		if (event.key === "Escape") {
 			event.preventDefault();
@@ -246,12 +236,12 @@ export const CheatItemSpotlight = ({
 					ref={inputRef}
 					type="search"
 					value={query}
-					className={`w-full rounded-lg border border-line-strong bg-surface px-4 py-3 text-base text-foreground outline-none focus:border-accent ${spawnPending ? "cursor-progress" : ""}`}
+					className={`w-full rounded-lg border border-line-strong bg-surface px-4 py-3 text-base text-foreground outline-none focus:border-accent ${spawn.pending ? "cursor-progress" : ""}`}
 					placeholder="Search item title or ID…"
 					aria-label="Search items to spawn"
-					readOnly={spawnPending}
+					readOnly={spawn.pending}
 					onChange={(event) => {
-						if (spawnPending) return;
+						if (spawn.pending) return;
 						setQuery(event.currentTarget.value);
 						setSelectedIndex(0);
 						spawn.reset();
@@ -295,7 +285,7 @@ export const CheatItemSpotlight = ({
 								key={item.itemId}
 								className="ak-spotlight-option grid grid-cols-[3rem_1fr_auto] items-center gap-3 rounded-lg border px-3 py-2 text-left"
 								data-selected={index === selectedIndex ? "true" : undefined}
-								disabled={spawnPending}
+								disabled={spawn.pending}
 								onMouseEnter={() => setSelectedIndex(index)}
 								onClick={() => {
 									setSelectedIndex(index);
@@ -328,7 +318,7 @@ export const CheatItemSpotlight = ({
 					aria-live="polite"
 					data-ui="CheatItemSpotlightStatus"
 				>
-					{spawnPending ? (
+					{spawn.pending ? (
 						<p className="text-accent">Spawning…</p>
 					) : spawn.isError ? (
 						<p className="text-danger">Spawn failed: {errorMessage(spawn.error)}</p>

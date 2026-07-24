@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { match } from "ts-pattern";
 
+import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import type { ItemDetailState } from "~/ui/item-detail/ItemDetailControl";
 import { useItemDetailControl } from "~/ui/item-detail/useItemDetailControl";
 
@@ -44,7 +45,7 @@ export const useItemDetailMotion = ({
 				},
 				({ generation }) => {
 					completedPhaseRef.current = state.phase;
-					itemDetail.completeEnter(generation);
+					RendererRuntime.runSync(itemDetail.completeEnterFx(generation));
 				},
 			)
 			.with(
@@ -59,7 +60,7 @@ export const useItemDetailMotion = ({
 				},
 				({ generation }) => {
 					completedPhaseRef.current = state.phase;
-					itemDetail.completeExit(generation);
+					RendererRuntime.runSync(itemDetail.completeExitFx(generation));
 				},
 			)
 			.exhaustive();

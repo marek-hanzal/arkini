@@ -1,28 +1,78 @@
-import { type PropsWithChildren, useEffect, useMemo, useState, useSyncExternalStore } from "react";
+import {
+	type PropsWithChildren,
+	useCallback,
+	useEffect,
+	useMemo,
+	useState,
+	useSyncExternalStore,
+} from "react";
 
-import { createGameMenuController } from "~/ui/game-menu/createGameMenuController";
+import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
+import { createGameMenuControllerFx } from "~/ui/game-menu/createGameMenuControllerFx";
 import { GameMenuContext } from "~/ui/game-menu/GameMenuContext";
-import type { GameMenuControl } from "~/ui/game-menu/GameMenuControl";
+import { type GameMenuAction, type GameMenuControl } from "~/ui/game-menu/GameMenuControl";
 
 /** Provides the one synchronous external Game Menu lifecycle owner to the active game shell. */
 export const GameMenuProvider = ({ children }: PropsWithChildren) => {
-	const [controller] = useState(createGameMenuController);
+	const [controller] = useState(() => RendererRuntime.runSync(createGameMenuControllerFx()));
 	const snapshot = useSyncExternalStore(
 		controller.subscribe,
 		controller.getSnapshot,
 		controller.getSnapshot,
+	);
+	const open = useCallback(
+		() => RendererRuntime.runSync(controller.openFx),
+		[
+			controller,
+		],
+	);
+	const close = useCallback(
+		() => RendererRuntime.runSync(controller.closeFx),
+		[
+			controller,
+		],
+	);
+	const toggle = useCallback(
+		() => RendererRuntime.runSync(controller.toggleFx),
+		[
+			controller,
+		],
+	);
+	const beginAction = useCallback(
+		(action: GameMenuAction) => RendererRuntime.runSync(controller.beginActionFx(action)),
+		[
+			controller,
+		],
+	);
+	const completeAction = useCallback(
+		(action: GameMenuAction) => RendererRuntime.runSync(controller.completeActionFx(action)),
+		[
+			controller,
+		],
+	);
+	const completeEnter = useCallback(
+		() => RendererRuntime.runSync(controller.completeEnterFx),
+		[
+			controller,
+		],
+	);
+	const completeExit = useCallback(
+		() => RendererRuntime.runSync(controller.completeExitFx),
+		[
+			controller,
+		],
 	);
 
 	useEffect(() => {
 		const onKeyDown = (event: KeyboardEvent) => {
 			if (event.key !== "Escape" || event.defaultPrevented) return;
 			const current = controller.getSnapshot();
-			if (current.routePending || current.phase === "exiting") {
+			if (current.activeAction !== null || current.phase === "exiting") {
 				event.preventDefault();
 				return;
 			}
 			event.preventDefault();
-			controller.toggle();
+			RendererRuntime.runSync(controller.toggleFx);
 		};
 		window.addEventListener("keydown", onKeyDown);
 		return () => window.removeEventListener("keydown", onKeyDown);
@@ -32,7 +82,7 @@ export const GameMenuProvider = ({ children }: PropsWithChildren) => {
 
 	useEffect(
 		() => () => {
-			controller.reset();
+			RendererRuntime.runSync(controller.resetFx);
 		},
 		[
 			controller,
@@ -43,18 +93,29 @@ export const GameMenuProvider = ({ children }: PropsWithChildren) => {
 		() => ({
 			phase: snapshot.phase,
 			isOpen: snapshot.phase !== "closed",
-			routePending: snapshot.routePending,
-			open: controller.open,
-			close: controller.close,
-			toggle: controller.toggle,
-			beginRouteRequest: controller.beginRouteRequest,
-			completeRouteRequest: controller.completeRouteRequest,
-			completeEnter: controller.completeEnter,
-			completeExit: controller.completeExit,
+			activeAction: snapshot.activeAction,
+			routePending:
+				snapshot.activeAction === "settings" ||
+				snapshot.activeAction === "cheats" ||
+				snapshot.activeAction === "main-menu" ||
+				snapshot.activeAction === "hard-reset",
+			open,
+			close,
+			toggle,
+			beginAction,
+			completeAction,
+			completeEnter,
+			completeExit,
 		}),
 		[
-			controller,
+			beginAction,
+			close,
+			completeAction,
+			completeEnter,
+			completeExit,
+			open,
 			snapshot,
+			toggle,
 		],
 	);
 

@@ -1,6 +1,7 @@
 import { match } from "ts-pattern";
 
 import type { useItemDetailSources } from "~/bridge/item-detail/useItemDetailSources";
+import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import { Button } from "~/ui/button/Button";
 import { Scrollable } from "~/ui/scrollable/Scrollable";
 import { useItemDetailControl } from "~/ui/item-detail/useItemDetailControl";
@@ -98,10 +99,12 @@ const SourceRow = ({
 					className="shrink-0"
 					disabled={disabled}
 					onClick={() =>
-						itemDetail.openItemDetail({
-							itemId: source.ownerItemId,
-							tab: "lines",
-						})
+						RendererRuntime.runSync(
+							itemDetail.openItemDetailFx({
+								itemId: source.ownerItemId,
+								tab: "lines",
+							}),
+						)
 					}
 				>
 					Open Lines

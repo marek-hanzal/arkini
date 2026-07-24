@@ -10,7 +10,7 @@ import {
 	RouterProvider,
 } from "@tanstack/react-router";
 import { Effect } from "effect";
-import { act, createElement } from "react";
+import { act, createElement, useSyncExternalStore } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -178,6 +178,28 @@ const renderMenu = async ({
 	const queryClient = new QueryClient();
 	const cheatAvailability = createCheatAvailability();
 	cheatAvailability.apply(cheatsAvailable);
+	let menuMounted = true;
+	const menuMountListeners = new Set<() => void>();
+	const setMenuMounted = (mounted: boolean) => {
+		if (menuMounted === mounted) return;
+		menuMounted = mounted;
+		for (const listener of Array.from(menuMountListeners)) listener();
+	};
+	const GameMenuMount = () => {
+		const mounted = useSyncExternalStore(
+			(listener) => {
+				menuMountListeners.add(listener);
+				return () => menuMountListeners.delete(listener);
+			},
+			() => menuMounted,
+			() => menuMounted,
+		);
+		return mounted
+			? createElement(GameMenu, {
+					game,
+				})
+			: null;
+	};
 	const GamePage = () =>
 		createElement(
 			QueryClientProvider,
@@ -200,9 +222,7 @@ const renderMenu = async ({
 						},
 						"Game surface",
 					),
-					createElement(GameMenu, {
-						game,
-					}),
+					createElement(GameMenuMount),
 				),
 			),
 		);
@@ -276,6 +296,7 @@ const renderMenu = async ({
 	return {
 		container,
 		router,
+		setMenuMounted,
 	};
 };
 
@@ -426,12 +447,22 @@ describe("GameMenu", () => {
 		});
 		await openMenu(container);
 		const save = buttonByText(container, "Save");
+		const returnToGame = buttonByText(container, "Return to game");
 
 		await act(async () => {
 			save.click();
 			save.click();
+			returnToGame.click();
+			window.dispatchEvent(
+				new KeyboardEvent("keydown", {
+					key: "Escape",
+					bubbles: true,
+					cancelable: true,
+				}),
+			);
 		});
 		expect(flush).toHaveBeenCalledOnce();
+		expect(container.querySelector('[data-phase="open"]')).not.toBeNull();
 		await vi.waitFor(() =>
 			expect(buttonByText(container, "Save and exit").disabled).toBe(true),
 		);
@@ -443,6 +474,36 @@ describe("GameMenu", () => {
 			await gate.promise;
 		});
 		await vi.waitFor(() => expect(container.textContent).toContain("Saved."));
+	});
+
+	it("retains save admission across a dialog remount until the original mutation settles", async () => {
+		const gate = deferred();
+		const flush = vi.fn(() => gate.promise);
+		const game = createGame(fromPromiseFx(flush));
+		const { container, setMenuMounted } = await renderMenu({
+			game,
+		});
+		await openMenu(container);
+
+		await act(async () => buttonByText(container, "Save").click());
+		expect(flush).toHaveBeenCalledOnce();
+
+		await act(async () => setMenuMounted(false));
+		expect(container.querySelector('[data-ui="GameMenu"]')).toBeNull();
+		await act(async () => setMenuMounted(true));
+		expect(container.querySelector('[data-phase="open"]')).not.toBeNull();
+		expect(buttonByText(container, "Save").disabled).toBe(true);
+		expect(buttonByText(container, "Return to game").disabled).toBe(true);
+
+		await pressEscape();
+		expect(container.querySelector('[data-phase="open"]')).not.toBeNull();
+
+		await act(async () => {
+			gate.resolve();
+			await gate.promise;
+		});
+		await vi.waitFor(() => expect(buttonByText(container, "Save").disabled).toBe(false));
+		expect(flush).toHaveBeenCalledOnce();
 	});
 
 	it("keeps the menu open when the native close request fails", async () => {

@@ -213,6 +213,16 @@ const game = {
 
 const roots: Array<ReturnType<typeof createRoot>> = [];
 
+const openItemDetail = (
+	control: ItemDetailControl,
+	props: Parameters<ItemDetailControl["openItemDetailFx"]>[0],
+) => Effect.runSync(control.openItemDetailFx(props));
+
+const openItemDefinitionDetail = (
+	control: ItemDetailControl,
+	props: Parameters<ItemDetailControl["openItemDefinitionDetailFx"]>[0],
+) => Effect.runSync(control.openItemDefinitionDetailFx(props));
+
 const Probe = ({ onControl }: { readonly onControl: (control: ItemDetailControl) => void }) => {
 	const control = useItemDetailControl();
 	useEffect(
@@ -279,7 +289,7 @@ describe("ItemDetailModal", () => {
 		document.body.append(origin);
 
 		await act(async () => {
-			readControl().openItemDetail({
+			openItemDetail(readControl(), {
 				itemId: owner.id,
 				origin,
 			});
@@ -364,7 +374,7 @@ describe("ItemDetailModal", () => {
 			throw new Error("Missing detail fixtures.");
 
 		await act(async () => {
-			readControl().openItemDetail({
+			openItemDetail(readControl(), {
 				itemId: owner.id,
 			});
 			await Promise.resolve();
@@ -440,7 +450,7 @@ describe("ItemDetailModal", () => {
 		const { readControl } = await renderItemDetail();
 
 		await act(async () => {
-			readControl().openItemDetail({
+			openItemDetail(readControl(), {
 				itemId: owner.id,
 			});
 			await Promise.resolve();
@@ -515,7 +525,7 @@ describe("ItemDetailModal", () => {
 			}) as GameEngine["run"]);
 
 		await act(async () => {
-			readControl().openItemDetail({
+			openItemDetail(readControl(), {
 				itemId: owner.id,
 			});
 			await Promise.resolve();
@@ -558,7 +568,7 @@ describe("ItemDetailModal", () => {
 		).toBe("Set default");
 	});
 
-	it("retains pending and failure ownership across keyed tab remounts", async () => {
+	it("keeps the command-owning tab visible until pending work settles", async () => {
 		const { readControl } = await renderItemDetail();
 		const owner = currentRuntime.items.find((item) => item.item.id === "workshop");
 		if (owner === undefined) throw new Error("Missing Workshop runtime item.");
@@ -571,7 +581,7 @@ describe("ItemDetailModal", () => {
 			.mockImplementationOnce((() => pendingRun) as GameEngine["run"]);
 
 		await act(async () => {
-			readControl().openItemDetail({
+			openItemDetail(readControl(), {
 				itemId: owner.id,
 			});
 			await Promise.resolve();
@@ -595,19 +605,24 @@ describe("ItemDetailModal", () => {
 		await act(async () => infoTab.click());
 		const linesTab = document.querySelector<HTMLButtonElement>('[data-tab="lines"]');
 		if (linesTab === null) throw new Error("Missing Lines tab.");
-		await act(async () => linesTab.click());
+		expect(infoTab.getAttribute("aria-selected")).toBe("false");
+		expect(readControl().state).toMatchObject({
+			target: {
+				tab: "lines",
+			},
+		});
 
-		const remountedDefault = document.querySelector<HTMLButtonElement>(
+		const visibleDefault = document.querySelector<HTMLButtonElement>(
 			'[data-ui="TileLineSetDefaultButton"]',
 		);
-		if (remountedDefault === null) throw new Error("Missing remounted Set default button.");
-		expect(remountedDefault).not.toBe(setDefault);
-		expect(remountedDefault.disabled).toBe(true);
-		expect(remountedDefault.textContent).toBe("Saving…");
-		expect(remountedDefault.className).toContain("cursor-progress");
+		if (visibleDefault === null) throw new Error("Missing visible Set default button.");
+		expect(visibleDefault).toBe(setDefault);
+		expect(visibleDefault.disabled).toBe(true);
+		expect(visibleDefault.textContent).toBe("Saving…");
+		expect(visibleDefault.className).toContain("cursor-progress");
 
 		await act(async () => {
-			remountedDefault.click();
+			visibleDefault.click();
 			await Promise.resolve();
 		});
 		expect(run).toHaveBeenCalledTimes(1);
@@ -646,7 +661,7 @@ describe("ItemDetailModal", () => {
 					],
 				}),
 			);
-			readControl().openItemDetail({
+			openItemDetail(readControl(), {
 				itemId: owner.id,
 			});
 			await Promise.resolve();
@@ -737,7 +752,7 @@ describe("ItemDetailModal", () => {
 					],
 				}),
 			);
-			readControl().openItemDetail({
+			openItemDetail(readControl(), {
 				itemId: owner.id,
 			});
 			await Promise.resolve();
@@ -762,7 +777,7 @@ describe("ItemDetailModal", () => {
 			throw new Error("Missing source fixtures.");
 
 		await act(async () => {
-			readControl().openItemDetail({
+			openItemDetail(readControl(), {
 				itemId: target.id,
 			});
 			await Promise.resolve();
@@ -822,7 +837,7 @@ describe("ItemDetailModal", () => {
 			throw new Error("Missing source fixtures.");
 
 		await act(async () => {
-			readControl().openItemDetail({
+			openItemDetail(readControl(), {
 				itemId: target.id,
 				tab: "sources",
 			});
@@ -861,7 +876,7 @@ describe("ItemDetailModal", () => {
 		if (owner === undefined) throw new Error("Missing source fixture.");
 
 		await act(async () => {
-			readControl().openItemDefinitionDetail({
+			openItemDefinitionDetail(readControl(), {
 				itemId: "water",
 				tab: "sources",
 			});
@@ -897,7 +912,7 @@ describe("ItemDetailModal", () => {
 		if (target === undefined) throw new Error("Missing target fixture.");
 
 		await act(async () => {
-			readControl().openItemDetail({
+			openItemDetail(readControl(), {
 				itemId: target.id,
 				tab: "sources",
 			});
@@ -940,7 +955,7 @@ describe("ItemDetailModal", () => {
 		document.body.append(origin);
 
 		await act(async () => {
-			readControl().openItemDetail({
+			openItemDetail(readControl(), {
 				itemId: owner.id,
 				tab: "info",
 				origin,
@@ -969,7 +984,7 @@ describe("ItemDetailModal", () => {
 		if (owner === undefined) throw new Error("Missing Workshop runtime item.");
 
 		await act(async () => {
-			readControl().openItemDetail({
+			openItemDetail(readControl(), {
 				itemId: owner.id,
 			});
 			await Promise.resolve();

@@ -1,5 +1,6 @@
 // @vitest-environment jsdom
 
+import { Effect } from "effect";
 import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -15,11 +16,11 @@ import { JobStatusEnumSchema } from "~/engine/job/schema/read/JobStatusEnumSchem
 ).IS_REACT_ACT_ENVIRONMENT = true;
 
 const control = vi.hoisted(() => ({
-	openItemDetail: vi.fn(),
-	openItemDefinitionDetail: vi.fn(),
+	openItemDetailFx: vi.fn(),
+	openItemDefinitionDetailFx: vi.fn(),
 	readActionError: vi.fn(() => null),
 	readPendingAction: vi.fn(() => null),
-	runPendingAction: vi.fn(({ run }: { readonly run: () => Promise<unknown> }) => run()),
+	runPendingActionFx: vi.fn(),
 }));
 const commands = vi.hoisted(() => ({
 	autofill: vi.fn(() => Promise.resolve()),
@@ -159,8 +160,10 @@ beforeEach(() => {
 	for (const value of Object.values(control)) value.mockReset();
 	control.readActionError.mockReturnValue(null);
 	control.readPendingAction.mockReturnValue(null);
-	control.runPendingAction.mockImplementation(
-		({ run }: { readonly run: () => Promise<unknown> }) => run(),
+	control.openItemDetailFx.mockReturnValue(Effect.succeed(true));
+	control.openItemDefinitionDetailFx.mockReturnValue(Effect.succeed(true));
+	control.runPendingActionFx.mockImplementation(
+		({ run }: { readonly run: () => Promise<unknown> }) => Effect.promise(run),
 	);
 	for (const value of Object.values(commands)) {
 		value.mockReset();
@@ -243,12 +246,12 @@ describe("ItemLinesTab", () => {
 		expect(outputLink.className).toContain("enabled:cursor-pointer");
 
 		await act(async () => inputLink.click());
-		expect(control.openItemDetail).toHaveBeenCalledWith({
+		expect(control.openItemDetailFx).toHaveBeenCalledWith({
 			itemId: "runtime:tree",
 		});
 
 		await act(async () => outputLink.click());
-		expect(control.openItemDefinitionDetail).toHaveBeenCalledWith({
+		expect(control.openItemDefinitionDetailFx).toHaveBeenCalledWith({
 			itemId: "log",
 		});
 	});

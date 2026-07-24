@@ -6,13 +6,16 @@ import { CriticalGameLifecycleError } from "~/bridge/game/CriticalGameLifecycleE
 import type { Game } from "~/bridge/game/Game";
 import { closeGameEngineResourceFx } from "~/bridge/game/closeGameEngineResourceFx";
 import { createGameEngineResourceFx } from "~/bridge/game/createGameEngineResourceFx";
-import { getCachedGameEngineResource } from "~/bridge/game/getCachedGameEngineResource";
+import { getCachedGameEngineResourceFx } from "~/bridge/game/getCachedGameEngineResourceFx";
 import { gameEngineQueryKey } from "~/bridge/game/gameEngineQueryKey";
 import { releaseGameEngineResourceFx } from "~/bridge/game/releaseGameEngineResourceFx";
 import { resetGameEngineResourceFx } from "~/bridge/game/resetGameEngineResourceFx";
 import { testArkpackConfig } from "~test/bridge/arkpack/support/createTestArkpack";
 import { createTestGameTransitionFields } from "~test/support/game/createTestGameTransitionFields";
 import { testGameRead } from "~test/support/game/testGameRead";
+
+const getCachedGameEngineResource = (queryClient: QueryClient) =>
+	Effect.runSync(getCachedGameEngineResourceFx(queryClient));
 
 const createDeferred = () => {
 	let resolve!: () => void;

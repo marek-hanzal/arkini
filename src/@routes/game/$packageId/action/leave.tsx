@@ -3,7 +3,7 @@ import { createFileRoute, redirect } from "@tanstack/react-router";
 import { releaseGameEngineResourceFx } from "~/bridge/game/releaseGameEngineResourceFx";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import { ActionPendingPage } from "~/page/action/ActionPendingPage";
-import { runActionRoute } from "~/page/action/runActionRoute";
+import { runActionRouteFx } from "~/page/action/runActionRouteFx";
 import { GameLeaveDestinationSchema } from "~/ui/navigation/GameLeaveDestinationSchema";
 
 const redirectToDestination = (destination: GameLeaveDestinationSchema.Type): never => {
@@ -44,8 +44,8 @@ export const Route = createFileRoute("/game/$packageId/action/leave")({
 	loaderDeps: ({ search }) => search,
 	loader: async ({ context, deps }) => {
 		try {
-			await runActionRoute(() =>
-				RendererRuntime.runPromise(
+			await RendererRuntime.runPromise(
+				runActionRouteFx(
 					releaseGameEngineResourceFx({
 						queryClient: context.queryClient,
 						resource: context.gameEngineResource,

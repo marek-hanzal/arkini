@@ -6,9 +6,16 @@ import { useSetAppearanceThemeMutation } from "~/ui/appearance/mutation/useSetAp
 import { useAppearance } from "~/ui/appearance/useAppearance";
 import { useCheatAvailability } from "~/ui/cheat-availability/useCheatAvailability";
 import { useSetCheatAvailabilityMutation } from "~/ui/cheat-availability/useSetCheatAvailabilityMutation";
-import { useExclusiveAction } from "~/ui/action/useExclusiveAction";
 
 export namespace useSettingsModel {
+	export type Action = "cheat-tools" | "theme" | "exit";
+
+	export interface ActionControl {
+		readonly active: Action | null;
+		readonly claim: (action: Action) => boolean;
+		readonly release: (action: Action) => void;
+	}
+
 	export type Status =
 		| {
 				readonly kind: "idle";
@@ -36,14 +43,14 @@ export namespace useSettingsModel {
 
 const errorMessage = (error: unknown) => (error instanceof Error ? error.message : String(error));
 
-type SettingsAction = "cheat-tools" | "theme";
-
 /** Owns application settings mutations and the one Escape lifecycle for the settings surface. */
 export const useSettingsModel = ({
+	action,
 	exitPending,
 	navigationError,
 	onBack,
 }: {
+	readonly action: useSettingsModel.ActionControl;
 	readonly exitPending: boolean;
 	readonly navigationError: unknown;
 	readonly onBack: () => void;
@@ -52,7 +59,7 @@ export const useSettingsModel = ({
 	const cheatAvailability = useCheatAvailability();
 	const setTheme = useSetAppearanceThemeMutation();
 	const setCheatAvailability = useSetCheatAvailabilityMutation();
-	const { active, claim, release } = useExclusiveAction<SettingsAction>();
+	const { active, claim, release } = action;
 	const blocked = active !== null || exitPending;
 
 	useEffect(() => {

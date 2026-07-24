@@ -1,5 +1,6 @@
 import { useClearItemDetailQueue } from "~/bridge/item-detail/useClearItemDetailQueue";
 import type { useItemDetailQueue } from "~/bridge/item-detail/useItemDetailQueue";
+import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import { Button } from "~/ui/button/Button";
 import { Scrollable } from "~/ui/scrollable/Scrollable";
 import { useItemDetailControl } from "~/ui/item-detail/useItemDetailControl";
@@ -41,15 +42,17 @@ export const ItemQueueTab = ({
 					disabled={disabled || queue.request.length === 0 || pending}
 					cursorIntent={pending ? "progress" : undefined}
 					onClick={() => {
-						void itemDetail.runPendingAction({
-							key: pendingKey,
-							action: "clear-queue",
-							failureMessage: "Queue could not be cleared.",
-							run: () =>
-								clearQueue({
-									ownerItemId: queue.itemId,
-								}),
-						});
+						void RendererRuntime.runPromise(
+							itemDetail.runPendingActionFx({
+								key: pendingKey,
+								action: "clear-queue",
+								failureMessage: "Queue could not be cleared.",
+								run: () =>
+									clearQueue({
+										ownerItemId: queue.itemId,
+									}),
+							}),
+						);
 					}}
 				>
 					{pending ? "Clearing…" : "Clear queue"}

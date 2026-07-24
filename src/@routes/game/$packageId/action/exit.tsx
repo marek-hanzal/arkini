@@ -3,7 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { closeGameEngineResourceFx } from "~/bridge/game/closeGameEngineResourceFx";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import { ActionPendingPage } from "~/page/action/ActionPendingPage";
-import { runActionRoute } from "~/page/action/runActionRoute";
+import { runActionRouteFx } from "~/page/action/runActionRouteFx";
 
 const label = "Saving and exiting Arkini…";
 
@@ -16,8 +16,8 @@ const GameExitCompletedPage = () => (
 
 export const Route = createFileRoute("/game/$packageId/action/exit")({
 	loader: async ({ context }) => {
-		const result = await runActionRoute(() =>
-			RendererRuntime.runPromise(
+		const result = await RendererRuntime.runPromise(
+			runActionRouteFx(
 				closeGameEngineResourceFx({
 					queryClient: context.queryClient,
 					resource: context.gameEngineResource,

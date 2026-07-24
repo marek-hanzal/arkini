@@ -1,7 +1,8 @@
 // @vitest-environment jsdom
 
+import { Effect } from "effect";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { waitForActiveViewTransition } from "~/ui/navigation/waitForActiveViewTransition";
+import { waitForActiveViewTransitionFx } from "~/ui/navigation/waitForActiveViewTransitionFx";
 
 const originalActiveViewTransition = Object.getOwnPropertyDescriptor(
 	document,
@@ -45,7 +46,7 @@ describe("waitForActiveViewTransition", () => {
 		});
 
 		let completed = false;
-		const waiting = waitForActiveViewTransition().then(() => {
+		const waiting = Effect.runPromise(waitForActiveViewTransitionFx()).then(() => {
 			completed = true;
 		});
 		expect(frameCallbacks).toHaveLength(1);
@@ -71,7 +72,7 @@ describe("waitForActiveViewTransition", () => {
 		});
 
 		let completed = false;
-		const waiting = waitForActiveViewTransition().then(() => {
+		const waiting = Effect.runPromise(waitForActiveViewTransitionFx()).then(() => {
 			completed = true;
 		});
 		for (let frame = 0; frame < 3; frame += 1) {

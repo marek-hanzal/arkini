@@ -4,7 +4,7 @@ import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
 import { completeJobTransitionFx } from "~/engine/job/fx/completeJobTransitionFx";
 import type { PlacementUnavailableError } from "~/engine/placement/error/PlacementUnavailableError";
-import { isExpectedPlacementDeliveryBlock } from "~/engine/placement/read/isExpectedPlacementDeliveryBlock";
+import { isExpectedPlacementDeliveryBlockFx } from "~/engine/placement/read/isExpectedPlacementDeliveryBlockFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
 export namespace attemptJobCompletionFx {
@@ -43,16 +43,18 @@ export const attemptJobCompletionFx = Effect.fn("attemptJobCompletionFx")(functi
 					runtime: completion.runtime,
 				}) satisfies attemptJobCompletionFx.Result,
 		),
-		Effect.catchTag("PlacementUnavailableError", (error) => {
-			if (!isExpectedPlacementDeliveryBlock(error.reason)) {
-				return Effect.fail(error);
-			}
-
-			return Effect.succeed({
-				type: "blocked",
-				error,
-				runtime,
-			} satisfies attemptJobCompletionFx.Result);
-		}),
+		Effect.catchTag("PlacementUnavailableError", (error) =>
+			isExpectedPlacementDeliveryBlockFx(error.reason).pipe(
+				Effect.flatMap((expected) =>
+					expected
+						? Effect.succeed({
+								type: "blocked",
+								error,
+								runtime,
+							} satisfies attemptJobCompletionFx.Result)
+						: Effect.fail(error),
+				),
+			),
+		),
 	);
 });

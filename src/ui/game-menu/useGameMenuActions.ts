@@ -3,13 +3,10 @@ import type { Game } from "~/bridge/game/Game";
 import { useState } from "react";
 import { match, P } from "ts-pattern";
 
-import { useExclusiveAction } from "~/ui/action/useExclusiveAction";
 import type { GameMenuPhase } from "~/ui/game-menu/GameMenuControl";
 import { useSaveAndExitGameMutation } from "~/ui/game-menu/mutation/useSaveAndExitGameMutation";
 import { useSaveGameMutation } from "~/ui/game-menu/mutation/useSaveGameMutation";
 import { useGameMenuControl } from "~/ui/game-menu/useGameMenuControl";
-
-type ActiveRequest = "save" | "save-and-exit" | "hard-reset" | "main-menu" | "settings" | "cheats";
 
 type NavigationState =
 	| {
@@ -36,34 +33,23 @@ export const useGameMenuActions = ({
 	const saveAndExit = useSaveAndExitGameMutation(game);
 	const [confirmingDestroy, setConfirmingDestroy] = useState(false);
 	const [navigationError, setNavigationError] = useState<unknown>();
-	const request = useExclusiveAction<ActiveRequest>();
-	const pending =
-		request.active !== null || save.isPending || saveAndExit.isPending || menu.routePending;
+	const pending = menu.activeAction !== null || save.isPending || saveAndExit.isPending;
 	const actionDisabled = phase !== "open" || pending;
 
 	const requestSettings = () => {
-		if (!request.claim("settings")) return;
-		if (!menu.beginRouteRequest()) {
-			request.release("settings");
-			return;
-		}
+		if (!menu.beginAction("settings")) return;
 		setNavigationError(undefined);
 		void navigate({
 			to: "/settings",
 		})
 			.catch(setNavigationError)
 			.finally(() => {
-				request.release("settings");
-				menu.completeRouteRequest();
+				menu.completeAction("settings");
 			});
 	};
 
 	const requestCheats = () => {
-		if (!request.claim("cheats")) return;
-		if (!menu.beginRouteRequest()) {
-			request.release("cheats");
-			return;
-		}
+		if (!menu.beginAction("cheats")) return;
 		setNavigationError(undefined);
 		void navigate({
 			to: "/game/$packageId/cheats",
@@ -73,17 +59,12 @@ export const useGameMenuActions = ({
 		})
 			.catch(setNavigationError)
 			.finally(() => {
-				request.release("cheats");
-				menu.completeRouteRequest();
+				menu.completeAction("cheats");
 			});
 	};
 
 	const requestMainMenu = () => {
-		if (!request.claim("main-menu")) return;
-		if (!menu.beginRouteRequest()) {
-			request.release("main-menu");
-			return;
-		}
+		if (!menu.beginAction("main-menu")) return;
 		setNavigationError(undefined);
 		void navigate({
 			to: "/game/$packageId/action/leave",
@@ -96,35 +77,28 @@ export const useGameMenuActions = ({
 		})
 			.catch(setNavigationError)
 			.finally(() => {
-				request.release("main-menu");
-				menu.completeRouteRequest();
+				menu.completeAction("main-menu");
 			});
 	};
 
 	const requestSave = () => {
-		if (phase !== "open" || menu.routePending || !request.claim("save")) return;
-		save.mutate(undefined, {
-			onSettled: () => {
-				request.release("save");
-			},
-		});
+		if (!menu.beginAction("save")) return;
+		void save.mutateAsync().then(
+			() => menu.completeAction("save"),
+			() => menu.completeAction("save"),
+		);
 	};
 
 	const requestSaveAndExit = () => {
-		if (phase !== "open" || menu.routePending || !request.claim("save-and-exit")) return;
-		saveAndExit.mutate(undefined, {
-			onSettled: () => {
-				request.release("save-and-exit");
-			},
-		});
+		if (!menu.beginAction("save-and-exit")) return;
+		void saveAndExit.mutateAsync().then(
+			() => menu.completeAction("save-and-exit"),
+			() => menu.completeAction("save-and-exit"),
+		);
 	};
 
 	const requestHardReset = () => {
-		if (!request.claim("hard-reset")) return;
-		if (!menu.beginRouteRequest()) {
-			request.release("hard-reset");
-			return;
-		}
+		if (!menu.beginAction("hard-reset")) return;
 		setNavigationError(undefined);
 		void navigate({
 			to: "/game/$packageId/action/reset",
@@ -134,8 +108,7 @@ export const useGameMenuActions = ({
 		})
 			.catch(setNavigationError)
 			.finally(() => {
-				request.release("hard-reset");
-				menu.completeRouteRequest();
+				menu.completeAction("hard-reset");
 			});
 	};
 

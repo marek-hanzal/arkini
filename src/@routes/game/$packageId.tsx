@@ -1,18 +1,30 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
+import { QueryClientProvider } from "@tanstack/react-query";
 
-import { getCachedGameEngineResource } from "~/bridge/game/getCachedGameEngineResource";
+import { getCachedGameEngineResourceFx } from "~/bridge/game/getCachedGameEngineResourceFx";
+import { useGameEngine } from "~/bridge/game/useGameEngine";
+import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import { GameAudio } from "~/ui/audio/GameAudio";
+import { CheatItemSpawnProvider } from "~/ui/cheat-spotlight/CheatItemSpawnProvider";
 
-const GameRoute = () => (
-	<>
-		<GameAudio />
-		<Outlet />
-	</>
-);
+const GameRoute = () => {
+	const game = useGameEngine();
+	const { queryClient } = Route.useRouteContext();
+	return (
+		<QueryClientProvider client={queryClient}>
+			<CheatItemSpawnProvider game={game}>
+				<GameAudio />
+				<Outlet />
+			</CheatItemSpawnProvider>
+		</QueryClientProvider>
+	);
+};
 
 export const Route = createFileRoute("/game/$packageId")({
 	beforeLoad: ({ context, location, params }) => {
-		const resource = getCachedGameEngineResource(context.queryClient);
+		const resource = RendererRuntime.runSync(
+			getCachedGameEngineResourceFx(context.queryClient),
+		);
 		if (resource === null || resource.game.arkpack.packageId !== params.packageId) {
 			throw redirect({
 				to: "/action/load-game/$packageId",

@@ -37,7 +37,7 @@ const createStartup = (): LauncherStartup => ({
 		heroReady: true,
 		splashCompleted: true,
 	}),
-	consumeHydration: () => false,
+	consumeHydrationFx: () => Effect.succeed(false),
 	startFx: Effect.void,
 	retryFx: Effect.void,
 	completeSplashFx: Effect.void,

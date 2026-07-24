@@ -2,7 +2,7 @@ import type { QueryClient } from "@tanstack/react-query";
 import { Effect } from "effect";
 
 import type { GameEngineResource } from "~/bridge/game/GameEngineResource";
-import { getCachedGameEngineResource } from "~/bridge/game/getCachedGameEngineResource";
+import { getCachedGameEngineResourceFx } from "~/bridge/game/getCachedGameEngineResourceFx";
 import { removeGameEngineResource } from "~/bridge/game/removeGameEngineResource";
 
 export namespace releaseGameEngineResourceFx {
@@ -18,17 +18,17 @@ export namespace releaseGameEngineResourceFx {
 export const releaseGameEngineResourceFx = Effect.fn("releaseGameEngineResourceFx")(
 	({ allowAlreadyFinalized = false, queryClient, resource }: releaseGameEngineResourceFx.Props) =>
 		resource.withLifecycleLockFx(
-			Effect.suspend(() => {
-				const currentResource = getCachedGameEngineResource(queryClient);
-				if (currentResource === null && allowAlreadyFinalized) return Effect.void;
+			Effect.gen(function* () {
+				const currentResource = yield* getCachedGameEngineResourceFx(queryClient);
+				if (currentResource === null && allowAlreadyFinalized) return;
 				if (currentResource !== resource) {
-					return Effect.fail(
+					return yield* Effect.fail(
 						new Error(
 							"Game Engine cleanup cannot remove a different or missing singleton resource.",
 						),
 					);
 				}
-				return resource.game.disposeFx.pipe(
+				return yield* resource.game.disposeFx.pipe(
 					Effect.tap(() =>
 						Effect.sync(() =>
 							removeGameEngineResource({

@@ -21,11 +21,40 @@ import { createJobTestConfig } from "~test/job/support/jobTestConfig";
 const roots: Array<ReturnType<typeof createRoot>> = [];
 const sessions: Game[] = [];
 
-const CheatsHarness = ({ game }: { readonly game: Game }) =>
-	createElement(Cheats, {
-		model: useCheatsModel(game),
-		onBack: () => undefined,
+const CheatsHarness = ({
+	game,
+	onExit = () => undefined,
+}: {
+	readonly game: Game;
+	readonly onExit?: (admitted: boolean) => void;
+}) => {
+	const model = useCheatsModel(game);
+	return createElement(Cheats, {
+		model,
+		onBack: () => onExit(model.beginExit()),
 	});
+};
+
+const CheatsAdmissionHarness = ({
+	game,
+	onExit,
+}: {
+	readonly game: Game;
+	readonly onExit: (admitted: boolean) => void;
+}) => {
+	const model = useCheatsModel(game);
+	return createElement(
+		"button",
+		{
+			type: "button",
+			onClick: () => {
+				model.setEnabled(true);
+				onExit(model.beginExit());
+			},
+		},
+		"Mutate and exit",
+	);
+};
 
 afterEach(async () => {
 	await act(async () => {
@@ -115,5 +144,61 @@ describe("Cheats", () => {
 		});
 		expect(instant.checked).toBe(true);
 		expect(instant.disabled).toBe(true);
+	});
+
+	it("blocks same-tick Back admission after a Cheat command claims the surface", async () => {
+		const config = createJobTestConfig();
+		const session = await createTestGameSession({
+			config,
+			tickIntervalMs: 60_000,
+		});
+		const game: Game = {
+			...session,
+			arkpack: {
+				packageId: "package:cheats-race",
+				contentHash: "content:cheats-race",
+				gameId: "game:cheats-race",
+				title: "Cheats race game",
+				configVersion: "1.0",
+				compressedSize: 0,
+				trust: {
+					type: "external",
+					reason: "unsigned",
+				} as const,
+				source: "imported",
+			},
+			config,
+			getResourceUrl: () => "blob:test",
+			saveKey: {
+				packageId: "package:cheats-race",
+				contentHash: "d".repeat(64),
+			},
+		};
+		sessions.push(game);
+		const onExit = vi.fn();
+		const container = document.createElement("div");
+		document.body.append(container);
+		const root = createRoot(container);
+		roots.push(root);
+		await act(async () => {
+			root.render(
+				createElement(
+					QueryClientProvider,
+					{
+						client: new QueryClient(),
+					},
+					createElement(CheatsAdmissionHarness, {
+						game,
+						onExit,
+					}),
+				),
+			);
+		});
+		const command = container.querySelector<HTMLButtonElement>("button");
+		if (command === null) throw new Error("Expected Cheats admission control.");
+
+		await act(async () => command.click());
+
+		expect(onExit).toHaveBeenCalledWith(false);
 	});
 });

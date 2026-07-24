@@ -1,5 +1,5 @@
 import { useNavigate, useRouter } from "@tanstack/react-router";
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect } from "react";
 
 import { useGameEngine } from "~/bridge/game/useGameEngine";
 import { useCheatAvailability } from "~/ui/cheat-availability/useCheatAvailability";
@@ -12,13 +12,11 @@ export const CheatsScreen = () => {
 	const cheatAvailability = useCheatAvailability();
 	const router = useRouter();
 	const navigate = useNavigate();
-	const leavingRef = useRef(false);
 	const model = useCheatsModel(game);
 
 	const returnToBoard = useCallback(
 		({ replace = false }: { readonly replace?: boolean } = {}) => {
-			if (model.blocked || leavingRef.current) return;
-			leavingRef.current = true;
+			if (!model.beginExit()) return;
 			if (!replace && router.history.canGoBack()) {
 				router.history.back();
 				return;
@@ -30,12 +28,12 @@ export const CheatsScreen = () => {
 				},
 				replace: true,
 			}).finally(() => {
-				leavingRef.current = false;
+				model.completeExit();
 			});
 		},
 		[
 			game.arkpack.packageId,
-			model.blocked,
+			model,
 			navigate,
 			router,
 		],

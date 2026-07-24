@@ -10,6 +10,7 @@ import { useItemDetailLines } from "~/bridge/item-detail/useItemDetailLines";
 import { useItemDetailQueue } from "~/bridge/item-detail/useItemDetailQueue";
 import { useItemDetailSources } from "~/bridge/item-detail/useItemDetailSources";
 import { useItemDetailTabs } from "~/bridge/item-detail/useItemDetailTabs";
+import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import { ItemDefinitionInfoTab } from "~/ui/item-detail/ItemDefinitionInfoTab";
 import type { ItemDetailState, ItemDetailTarget } from "~/ui/item-detail/ItemDetailControl";
 import { ItemInfoTab } from "~/ui/item-detail/ItemInfoTab";
@@ -103,7 +104,7 @@ const ItemDetailHeader = ({
 				className="grid size-9 shrink-0 cursor-pointer place-items-center rounded-lg border border-line bg-surface text-lg leading-none text-muted transition-colors hover:bg-accent/15 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent disabled:cursor-not-allowed"
 				aria-label="Close item detail"
 				disabled={disabled}
-				onClick={() => void itemDetail.close()}
+				onClick={() => void RendererRuntime.runPromise(itemDetail.closeFx())}
 			>
 				×
 			</button>
@@ -140,15 +141,17 @@ const ItemDetailTabs = ({
 					disabled={disabled}
 					data-tab={tab}
 					onClick={() =>
-						target.kind === "runtime"
-							? itemDetail.openItemDetail({
-									itemId: target.itemId,
-									tab,
-								})
-							: itemDetail.openItemDefinitionDetail({
-									itemId: target.itemId,
-									tab: tab === "sources" ? tab : "info",
-								})
+						RendererRuntime.runSync(
+							target.kind === "runtime"
+								? itemDetail.openItemDetailFx({
+										itemId: target.itemId,
+										tab,
+									})
+								: itemDetail.openItemDefinitionDetailFx({
+										itemId: target.itemId,
+										tab: tab === "sources" ? tab : "info",
+									}),
+						)
 					}
 				>
 					{tabLabel[tab]}
@@ -376,9 +379,11 @@ const RuntimeItemDetailScene = ({
 
 	useEffect(() => {
 		if (stale || liveTabs.includes(target.tab)) return;
-		itemDetail.openItemDetail({
-			itemId: target.itemId,
-		});
+		RendererRuntime.runSync(
+			itemDetail.openItemDetailFx({
+				itemId: target.itemId,
+			}),
+		);
 	}, [
 		itemDetail,
 		liveTabs,
@@ -410,7 +415,7 @@ const RuntimeItemDetailScene = ({
 					<button
 						type="button"
 						className="grid size-9 cursor-pointer place-items-center border border-line bg-surface text-lg text-muted"
-						onClick={() => void itemDetail.close()}
+						onClick={() => void RendererRuntime.runPromise(itemDetail.closeFx())}
 					>
 						×
 					</button>
@@ -466,9 +471,11 @@ const DefinitionItemDetailScene = ({
 	const itemDetail = useItemDetailControl();
 	useEffect(() => {
 		if (tabs.includes(target.tab)) return;
-		itemDetail.openItemDefinitionDetail({
-			itemId: target.itemId,
-		});
+		RendererRuntime.runSync(
+			itemDetail.openItemDefinitionDetailFx({
+				itemId: target.itemId,
+			}),
+		);
 	}, [
 		itemDetail,
 		tabs,
@@ -487,7 +494,7 @@ const DefinitionItemDetailScene = ({
 				<button
 					type="button"
 					className="grid size-9 cursor-pointer place-items-center border border-line bg-surface text-lg text-muted"
-					onClick={() => void itemDetail.close()}
+					onClick={() => void RendererRuntime.runPromise(itemDetail.closeFx())}
 				>
 					×
 				</button>
@@ -560,7 +567,7 @@ const ItemDetailDialog = ({
 			transition={transition}
 			onPointerDown={(event) => {
 				if (event.target !== event.currentTarget || state.phase === "exiting") return;
-				void itemDetail.close();
+				void RendererRuntime.runPromise(itemDetail.closeFx());
 			}}
 		>
 			<motion.div

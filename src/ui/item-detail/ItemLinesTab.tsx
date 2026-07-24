@@ -9,6 +9,7 @@ import { useSetDefaultItemDetailLine } from "~/bridge/item-detail/useSetDefaultI
 import { useStartItemDetailLine } from "~/bridge/item-detail/useStartItemDetailLine";
 import { useUnsetDefaultItemDetailLine } from "~/bridge/item-detail/useUnsetDefaultItemDetailLine";
 import { useWithdrawItemDetailLine } from "~/bridge/item-detail/useWithdrawItemDetailLine";
+import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import { Button, PrimaryButton } from "~/ui/button/Button";
 import { useItemDetailControl } from "~/ui/item-detail/useItemDetailControl";
 import { Scrollable } from "~/ui/scrollable/Scrollable";
@@ -321,15 +322,19 @@ const ItemReferenceButton = ({
 			}}
 			onClick={() => {
 				if (runtimeItemId !== undefined) {
-					itemDetail.openItemDetail({
-						itemId: runtimeItemId,
-					});
+					RendererRuntime.runSync(
+						itemDetail.openItemDetailFx({
+							itemId: runtimeItemId,
+						}),
+					);
 					return;
 				}
 				if (definitionItemId !== undefined) {
-					itemDetail.openItemDefinitionDetail({
-						itemId: definitionItemId,
-					});
+					RendererRuntime.runSync(
+						itemDetail.openItemDefinitionDetailFx({
+							itemId: definitionItemId,
+						}),
+					);
 				}
 			}}
 		>
@@ -626,12 +631,14 @@ const LineRow = ({
 		readonly failureMessage: string;
 		readonly run: () => Promise<unknown>;
 	}) => {
-		void itemDetail.runPendingAction({
-			key: pendingKey,
-			action,
-			failureMessage,
-			run,
-		});
+		void RendererRuntime.runPromise(
+			itemDetail.runPendingActionFx({
+				key: pendingKey,
+				action,
+				failureMessage,
+				run,
+			}),
+		);
 	};
 	const readiness = readinessLabel(line.availability);
 	const activeWork = line.activeJob === undefined ? undefined : activeJobLabel(line.activeJob);

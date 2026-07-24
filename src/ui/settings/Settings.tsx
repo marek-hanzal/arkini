@@ -24,6 +24,7 @@ const ThemeOptions: ReadonlyArray<{
 
 export namespace Settings {
 	export interface Props {
+		readonly action: useSettingsModel.ActionControl;
 		readonly exitPending?: boolean;
 		readonly navigationError?: unknown;
 		readonly onBack: () => void;
@@ -31,8 +32,14 @@ export namespace Settings {
 }
 
 /** Renders the reusable authoritative application settings content. */
-export const Settings = ({ exitPending = false, navigationError, onBack }: Settings.Props) => {
+export const Settings = ({
+	action,
+	exitPending = false,
+	navigationError,
+	onBack,
+}: Settings.Props) => {
 	const model = useSettingsModel({
+		action,
 		exitPending,
 		navigationError,
 		onBack,

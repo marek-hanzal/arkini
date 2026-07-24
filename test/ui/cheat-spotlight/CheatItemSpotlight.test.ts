@@ -8,6 +8,7 @@ import { createCheatAvailability } from "~/bridge/cheat/createCheatAvailability"
 import type { Game } from "~/bridge/game/Game";
 import { CheatAvailabilityProvider } from "~/ui/cheat-availability/CheatAvailabilityProvider";
 import { CheatItemSpotlight } from "~/ui/cheat-spotlight/CheatItemSpotlight";
+import { CheatItemSpawnProvider } from "~/ui/cheat-spotlight/CheatItemSpawnProvider";
 
 (
 	globalThis as {
@@ -88,6 +89,24 @@ vi.mock("~/ui/item-detail/useItemDetailControl", () => ({
 
 const roots: Array<ReturnType<typeof createRoot>> = [];
 
+const SpotlightUnderTest = ({
+	game,
+	onBeforeOpen,
+}: {
+	readonly game: Game;
+	readonly onBeforeOpen?: () => void;
+}) =>
+	createElement(
+		CheatItemSpawnProvider,
+		{
+			game,
+		},
+		createElement(CheatItemSpotlight, {
+			game,
+			onBeforeOpen,
+		}),
+	);
+
 beforeEach(() => {
 	state.pending = false;
 	state.listeners.clear();
@@ -120,7 +139,7 @@ describe("CheatItemSpotlight", () => {
 					{
 						availability,
 					},
-					createElement(CheatItemSpotlight, {
+					createElement(SpotlightUnderTest, {
 						game: {} as Game,
 						onBeforeOpen,
 					}),
@@ -237,7 +256,7 @@ describe("CheatItemSpotlight", () => {
 					{
 						availability,
 					},
-					createElement(CheatItemSpotlight, {
+					createElement(SpotlightUnderTest, {
 						game: {} as Game,
 					}),
 				),
@@ -288,7 +307,7 @@ describe("CheatItemSpotlight", () => {
 					{
 						availability,
 					},
-					createElement(CheatItemSpotlight, {
+					createElement(SpotlightUnderTest, {
 						game: {} as Game,
 					}),
 				),
@@ -358,6 +377,79 @@ describe("CheatItemSpotlight", () => {
 		await toggle();
 		expect(state.reset).toHaveBeenCalledTimes(2);
 	});
+	it("retains spawn admission while the Board-local Spotlight unmounts and remounts", async () => {
+		const container = document.createElement("div");
+		document.body.append(container);
+		const root = createRoot(container);
+		roots.push(root);
+		const availability = createCheatAvailability();
+		availability.apply(true);
+		const game = {} as Game;
+		const renderTree = (showSpotlight: boolean) =>
+			createElement(
+				CheatAvailabilityProvider,
+				{
+					availability,
+				},
+				createElement(
+					CheatItemSpawnProvider,
+					{
+						game,
+					},
+					showSpotlight
+						? createElement(CheatItemSpotlight, {
+								game,
+							})
+						: null,
+				),
+			);
+		await act(async () => root.render(renderTree(true)));
+		const toggle = async () => {
+			await act(async () => {
+				document.dispatchEvent(
+					new KeyboardEvent("keydown", {
+						key: "p",
+						code: "KeyP",
+						ctrlKey: true,
+						bubbles: true,
+						cancelable: true,
+					}),
+				);
+				await Promise.resolve();
+			});
+		};
+
+		await toggle();
+		const input = container.querySelector<HTMLInputElement>('input[type="search"]');
+		if (input === null) throw new Error("Expected Spotlight input.");
+		await act(async () => {
+			input.dispatchEvent(
+				new KeyboardEvent("keydown", {
+					key: "Enter",
+					bubbles: true,
+					cancelable: true,
+				}),
+			);
+		});
+		expect(state.spawn).toHaveBeenCalledOnce();
+
+		await act(async () => root.render(renderTree(false)));
+		await act(async () => root.render(renderTree(true)));
+		await toggle();
+		const remounted = container.querySelector<HTMLInputElement>('input[type="search"]');
+		if (remounted === null) throw new Error("Expected remounted Spotlight input.");
+		expect(remounted.readOnly).toBe(true);
+		await act(async () => {
+			remounted.dispatchEvent(
+				new KeyboardEvent("keydown", {
+					key: "Enter",
+					bubbles: true,
+					cancelable: true,
+				}),
+			);
+		});
+		expect(state.spawn).toHaveBeenCalledOnce();
+	});
 	it("searches the authoritative catalog by shared Fuse terms", async () => {
 		const container = document.createElement("div");
 		document.body.append(container);
@@ -372,7 +464,7 @@ describe("CheatItemSpotlight", () => {
 					{
 						availability,
 					},
-					createElement(CheatItemSpotlight, {
+					createElement(SpotlightUnderTest, {
 						game: {} as Game,
 					}),
 				),

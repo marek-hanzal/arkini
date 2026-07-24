@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 
+import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import { TileGridFrame } from "~/ui/tile/TileGridFrame";
 import { useInventoryControl } from "~/ui/inventory/useInventoryControl";
 import { useInventoryView } from "~/ui/inventory/useInventoryView";
@@ -32,7 +33,7 @@ export const Inventory = () => {
 					type="button"
 					className="grid size-9 shrink-0 cursor-pointer place-items-center rounded-lg border border-line bg-surface text-lg leading-none text-muted transition-colors hover:bg-accent/15 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
 					aria-label="Close inventory"
-					onClick={() => control.close()}
+					onClick={() => RendererRuntime.runSync(control.closeFx())}
 				>
 					×
 				</button>

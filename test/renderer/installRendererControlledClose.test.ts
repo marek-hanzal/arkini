@@ -1,13 +1,14 @@
 // @vitest-environment jsdom
 
 import { QueryClient } from "@tanstack/react-query";
+import { Effect } from "effect";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { GameEngineResource } from "~/bridge/game/GameEngineResource";
 import { gameEngineQueryKey } from "~/bridge/game/gameEngineQueryKey";
-import { installRendererControlledClose } from "~/installRendererControlledClose";
+import { installRendererControlledCloseFx } from "~/installRendererControlledCloseFx";
 import type { ArkiniRouter } from "~/router";
-import { actionLoadingCompletionHoldMs } from "~/ui/loading/waitForActionLoadingCompletionFrame";
+import { actionLoadingCompletionHoldMs } from "~/ui/loading/actionLoadingCompletionHoldMs";
 
 type CloseListener = () => Promise<void>;
 
@@ -91,11 +92,13 @@ describe("installRendererControlledClose", () => {
 		const lifecycle = createLifecycle();
 		const router = createRouter();
 		const frames = frameHarness();
-		const remove = installRendererControlledClose({
-			lifecycle: lifecycle.lifecycle,
-			queryClient,
-			router: router.router,
-		});
+		const remove = Effect.runSync(
+			installRendererControlledCloseFx({
+				lifecycle: lifecycle.lifecycle,
+				queryClient,
+				router: router.router,
+			}),
+		);
 
 		await lifecycle.readBeforeClose()();
 		expect(router.navigate).toHaveBeenCalledWith({
@@ -134,11 +137,13 @@ describe("installRendererControlledClose", () => {
 		const lifecycle = createLifecycle();
 		const router = createRouter();
 		const frames = frameHarness();
-		installRendererControlledClose({
-			lifecycle: lifecycle.lifecycle,
-			queryClient: new QueryClient(),
-			router: router.router,
-		});
+		Effect.runSync(
+			installRendererControlledCloseFx({
+				lifecycle: lifecycle.lifecycle,
+				queryClient: new QueryClient(),
+				router: router.router,
+			}),
+		);
 
 		await lifecycle.readBeforeClose()();
 		await lifecycle.readBeforeCloseReady()();
@@ -160,11 +165,13 @@ describe("installRendererControlledClose", () => {
 		});
 		const lifecycle = createLifecycle();
 		const router = createRouter();
-		installRendererControlledClose({
-			lifecycle: lifecycle.lifecycle,
-			queryClient,
-			router: router.router,
-		});
+		Effect.runSync(
+			installRendererControlledCloseFx({
+				lifecycle: lifecycle.lifecycle,
+				queryClient,
+				router: router.router,
+			}),
+		);
 
 		const beforeClose = lifecycle.readBeforeClose()();
 		await Promise.resolve();

@@ -363,6 +363,31 @@ describe("Settings", () => {
 		await vi.waitFor(() => expect(writeCheatAvailability).toHaveBeenCalledOnce());
 	});
 
+	it("blocks same-tick Back admission until the settings mutation settles", async () => {
+		const { container, deferred, router, write } = await renderSettings([
+			"/main-menu",
+			"/settings",
+		]);
+		const light = Array.from(
+			container.querySelectorAll<HTMLInputElement>('input[name="appearance-theme"]'),
+		).find((input) => input.value === "light");
+		const back = buttonByText(container, "Back");
+		if (light === undefined) throw new Error("Expected Light theme control.");
+
+		await act(async () => {
+			light.click();
+			back.click();
+		});
+
+		expect(write).toHaveBeenCalledOnce();
+		expect(router.state.location.pathname).toBe("/settings");
+
+		await act(async () => deferred.resolve());
+		await vi.waitFor(() => expect(back.disabled).toBe(false));
+		await act(async () => back.click());
+		await vi.waitFor(() => expect(router.state.location.pathname).toBe("/main-menu"));
+	});
+
 	it("toggles application-wide Cheat tools without mutating the cached Game", async () => {
 		const { container, game, writeCheatAvailability, cheatAvailability } = await renderSettings(
 			[

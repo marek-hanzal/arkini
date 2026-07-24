@@ -1,5 +1,6 @@
 // @vitest-environment jsdom
 
+import { Effect } from "effect";
 import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
@@ -20,7 +21,7 @@ vi.mock("~/bridge/item-detail/useStartItemDetailLine", () => ({
 vi.mock("~/ui/item-detail/useItemDetailControl", () => ({
 	useItemDetailControl: () => ({
 		isOpen: false,
-		openItemDetail: vi.fn(),
+		openItemDetailFx: vi.fn(() => Effect.succeed(true)),
 	}),
 }));
 

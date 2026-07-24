@@ -19,13 +19,16 @@ import type { ArkiniElectronApi } from "../../electron/contract/ArkiniElectronAp
 import type { Game } from "~/bridge/game/Game";
 import { GameSaveBootstrapError } from "~/bridge/game/GameSaveBootstrapError";
 import { gameEngineQueryKey } from "~/bridge/game/gameEngineQueryKey";
-import { getCachedGameEngineResource } from "~/bridge/game/getCachedGameEngineResource";
+import { getCachedGameEngineResourceFx } from "~/bridge/game/getCachedGameEngineResourceFx";
 import type { LauncherStartup } from "~/ui/launcher/LauncherStartup";
 import { testArkpackConfig } from "~test/bridge/arkpack/support/createTestArkpack";
 import { createTestGameTransitionFields } from "~test/support/game/createTestGameTransitionFields";
 import { testGameRead } from "~test/support/game/testGameRead";
 
 const packageId = "package-route-load";
+
+const getCachedGameEngineResource = (queryClient: QueryClient) =>
+	Effect.runSync(getCachedGameEngineResourceFx(queryClient));
 const roots: Array<ReturnType<typeof createRoot>> = [];
 const clearSaveMock = vi.fn(() => Promise.resolve());
 
@@ -38,7 +41,7 @@ const createStartup = (): LauncherStartup => ({
 		heroReady: true,
 		splashCompleted: true,
 	}),
-	consumeHydration: () => false,
+	consumeHydrationFx: () => Effect.succeed(false),
 	startFx: Effect.void,
 	retryFx: Effect.void,
 	completeSplashFx: Effect.void,

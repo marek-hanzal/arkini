@@ -1,5 +1,6 @@
 // @vitest-environment jsdom
 
+import { Effect } from "effect";
 import { act, createElement, useEffect } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
@@ -23,6 +24,16 @@ vi.mock("~/ui/inventory/Inventory", () => ({
 	Inventory: "inventory-surface",
 }));
 const roots: Array<ReturnType<typeof createRoot>> = [];
+
+const openInventory = (
+	control: InventoryControl,
+	props?: Parameters<InventoryControl["openFx"]>[0],
+) => Effect.runSync(control.openFx(props));
+
+const closeInventory = (
+	control: InventoryControl,
+	props?: Parameters<InventoryControl["closeFx"]>[0],
+) => Effect.runSync(control.closeFx(props));
 
 afterEach(async () => {
 	await act(async () => {
@@ -145,13 +156,13 @@ describe("InventoryProvider", () => {
 		expect(readControl().state).toEqual({
 			phase: "closed",
 		});
-		expect(readControl().close()).toBe(false);
+		expect(closeInventory(readControl())).toBe(false);
 		expect(container.querySelector('[data-ui="InventoryHost"]')).toBeNull();
 		expect(container.querySelectorAll("tile-actor-layer")).toHaveLength(1);
 
 		await act(async () => {
 			expect(
-				readControl().open({
+				openInventory(readControl(), {
 					origin,
 				}),
 			).toBe(true);
@@ -169,7 +180,7 @@ describe("InventoryProvider", () => {
 
 		await act(async () => {
 			expect(
-				readControl().open({
+				openInventory(readControl(), {
 					origin: null,
 				}),
 			).toBe(false);
@@ -209,7 +220,7 @@ describe("InventoryProvider", () => {
 
 		await act(async () => {
 			expect(
-				readControl().open({
+				openInventory(readControl(), {
 					origin: disconnectedOrigin,
 				}),
 			).toBe(true);
@@ -218,7 +229,7 @@ describe("InventoryProvider", () => {
 		expect(document.activeElement).toBe(fallback);
 
 		await act(async () => {
-			expect(readControl().close()).toBe(true);
+			expect(closeInventory(readControl())).toBe(true);
 		});
 
 		expect(document.activeElement).not.toBe(disconnectedOrigin);
@@ -226,17 +237,17 @@ describe("InventoryProvider", () => {
 
 		await act(async () => {
 			expect(
-				readControl().open({
+				openInventory(readControl(), {
 					origin: unfocusableOrigin,
 				}),
 			).toBe(true);
 		});
 		fallback.focus();
 		await act(async () => {
-			expect(readControl().close()).toBe(true);
+			expect(closeInventory(readControl())).toBe(true);
 		});
 		expect(document.activeElement).toBe(fallback);
-		expect(readControl().close()).toBe(false);
+		expect(closeInventory(readControl())).toBe(false);
 	});
 
 	it("yields ownership to Game Menu without restoring focus under the modal", async () => {
@@ -248,7 +259,7 @@ describe("InventoryProvider", () => {
 
 		origin.focus();
 		await act(async () => {
-			readControl().open({
+			openInventory(readControl(), {
 				origin,
 			});
 		});

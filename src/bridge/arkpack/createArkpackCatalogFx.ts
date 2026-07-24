@@ -15,8 +15,8 @@ export const createArkpackCatalogFx = Effect.fn("createArkpackCatalogFx")(
 				type: "loading",
 			};
 
-			const publishArkpackCatalogStateFx = Effect.fn("publishArkpackCatalogStateFx")(
-				function* (next: ArkpackCatalog.State) {
+			const publishStateFx = (next: ArkpackCatalog.State) =>
+				Effect.gen(function* () {
 					state = next;
 					for (const listener of Array.from(listeners)) {
 						yield* invokeExternalCallbackFx({
@@ -26,8 +26,7 @@ export const createArkpackCatalogFx = Effect.fn("createArkpackCatalogFx")(
 							value: undefined,
 						});
 					}
-				},
-			);
+				});
 
 			const list = props.listFx ?? listArkpacksFx();
 			const importFile =
@@ -43,58 +42,73 @@ export const createArkpackCatalogFx = Effect.fn("createArkpackCatalogFx")(
 						packageId,
 					}));
 
-			const refreshArkpackCatalogFx = Effect.fn("refreshArkpackCatalogFx")(() =>
+			const refreshFx = lock.withPermits(1)(
 				Effect.gen(function* () {
-					yield* publishArkpackCatalogStateFx({
+					yield* publishStateFx({
 						type: "loading",
 					});
 					const arkpacks = yield* list;
-					yield* publishArkpackCatalogStateFx({
+					yield* publishStateFx({
 						type: "ready",
 						arkpacks,
 					});
 				}).pipe(
 					Effect.tapError((error) =>
-						publishArkpackCatalogStateFx({
+						publishStateFx({
 							type: "failed",
 							error: Cause.originalError(error),
 						}),
 					),
 				),
 			);
-			const refreshFx = lock.withPermits(1)(refreshArkpackCatalogFx());
-
-			const mutateAndRefreshFx = Effect.fn("mutateAndRefreshFx")(function* <Value>(
-				operation: Effect.Effect<Value, unknown>,
-			) {
-				return yield* lock.withPermits(1)(
-					Effect.gen(function* () {
-						yield* publishArkpackCatalogStateFx({
-							type: "loading",
-						});
-						const value = yield* operation;
-						const arkpacks = yield* list;
-						yield* publishArkpackCatalogStateFx({
-							type: "ready",
-							arkpacks,
-						});
-						return value;
-					}).pipe(
-						Effect.tapError((error) =>
-							publishArkpackCatalogStateFx({
-								type: "failed",
-								error: Cause.originalError(error),
-							}),
-						),
-					),
-				);
-			});
 
 			return {
 				getSnapshot: () => state,
 				refreshFx,
-				importFileFx: (file) => mutateAndRefreshFx(importFile(file)),
-				removeFx: (packageId) => mutateAndRefreshFx(remove(packageId)),
+				importFileFx: (file) =>
+					lock.withPermits(1)(
+						Effect.gen(function* () {
+							yield* publishStateFx({
+								type: "loading",
+							});
+							const imported = yield* importFile(file);
+							const arkpacks = yield* list;
+							yield* publishStateFx({
+								type: "ready",
+								arkpacks,
+							});
+							return imported;
+						}).pipe(
+							Effect.tapError((error) =>
+								publishStateFx({
+									type: "failed",
+									error: Cause.originalError(error),
+								}),
+							),
+						),
+					),
+				removeFx: (packageId) =>
+					lock.withPermits(1)(
+						Effect.gen(function* () {
+							yield* publishStateFx({
+								type: "loading",
+							});
+							const removed = yield* remove(packageId);
+							const arkpacks = yield* list;
+							yield* publishStateFx({
+								type: "ready",
+								arkpacks,
+							});
+							return removed;
+						}).pipe(
+							Effect.tapError((error) =>
+								publishStateFx({
+									type: "failed",
+									error: Cause.originalError(error),
+								}),
+							),
+						),
+					),
 				subscribe: (listener) => {
 					listeners.add(listener);
 					return () => listeners.delete(listener);

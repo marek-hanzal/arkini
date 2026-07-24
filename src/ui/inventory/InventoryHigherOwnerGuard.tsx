@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 
+import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import { useGameMenuControl } from "~/ui/game-menu/useGameMenuControl";
 import { useInventoryControl } from "~/ui/inventory/useInventoryControl";
 
@@ -10,12 +11,14 @@ export const InventoryHigherOwnerGuard = () => {
 
 	useEffect(() => {
 		if (gameMenu.phase === "closed" || !inventory.isOpen) return;
-		inventory.close({
-			restoreFocus: false,
-		});
+		RendererRuntime.runSync(
+			inventory.closeFx({
+				restoreFocus: false,
+			}),
+		);
 	}, [
 		gameMenu.phase,
-		inventory.close,
+		inventory.closeFx,
 		inventory.isOpen,
 	]);
 

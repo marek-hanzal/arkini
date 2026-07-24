@@ -15,45 +15,39 @@ export namespace prepareLauncherHeroFx {
 	}
 }
 
-const resolvePreferredHeroFx = Effect.fn("resolvePreferredLauncherHeroFx")(function* ({
-	fallbackUrl,
-}: prepareLauncherHeroFx.Props) {
-	const packageId = yield* readLastPackageIdFx();
-	if (packageId === null) {
-		return {
-			owned: false,
-			url: fallbackUrl,
-		} satisfies prepareLauncherHeroFx.Result;
-	}
-	const loaded = yield* loadArkpackFx({
-		packageId,
-	});
-	return yield* Effect.try({
-		try: () => {
-			const resource = readHeroResource(loaded.payload);
-			return {
-				owned: true,
-				url: URL.createObjectURL(
-					new Blob(
-						[
-							resource.bytes.slice().buffer,
-						],
-						{
-							type: resource.mime,
-						},
-					),
-				),
-			} satisfies prepareLauncherHeroFx.Result;
-		},
-		catch: (cause) => cause,
-	});
-});
-
 /** Resolves and decodes the preferred package Hero, degrading any failure to the shell fallback. */
 export const prepareLauncherHeroFx = Effect.fn("prepareLauncherHeroFx")(
 	({ fallbackUrl }: prepareLauncherHeroFx.Props) =>
-		resolvePreferredHeroFx({
-			fallbackUrl,
+		Effect.gen(function* () {
+			const packageId = yield* readLastPackageIdFx();
+			if (packageId === null) {
+				return {
+					owned: false,
+					url: fallbackUrl,
+				} satisfies prepareLauncherHeroFx.Result;
+			}
+			const loaded = yield* loadArkpackFx({
+				packageId,
+			});
+			return yield* Effect.try({
+				try: () => {
+					const resource = readHeroResource(loaded.payload);
+					return {
+						owned: true,
+						url: URL.createObjectURL(
+							new Blob(
+								[
+									resource.bytes.slice().buffer,
+								],
+								{
+									type: resource.mime,
+								},
+							),
+						),
+					} satisfies prepareLauncherHeroFx.Result;
+				},
+				catch: (cause) => cause,
+			});
 		}).pipe(
 			Effect.flatMap((candidate) =>
 				preloadLauncherHeroFx({

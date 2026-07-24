@@ -8,7 +8,7 @@ import {
 import { discardFailedGameEngineFx } from "~/bridge/game/discardFailedGameEngineFx";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import { ActionPendingPage } from "~/page/action/ActionPendingPage";
-import { runActionRoute } from "~/page/action/runActionRoute";
+import { runActionRouteFx } from "~/page/action/runActionRouteFx";
 import { ActionErrorPage } from "~/ui/action/ActionErrorPage";
 import { FailedGameDiscardSearchSchema } from "~/ui/navigation/FailedGameDiscardSearchSchema";
 
@@ -16,8 +16,8 @@ export const Route = createFileRoute("/action/discard-failed-game")({
 	validateSearch: FailedGameDiscardSearchSchema,
 	loaderDeps: ({ search }) => search,
 	loader: async ({ context, deps }) => {
-		await runActionRoute(() =>
-			RendererRuntime.runPromise(
+		await RendererRuntime.runPromise(
+			runActionRouteFx(
 				discardFailedGameEngineFx({
 					packageId: deps.packageId,
 					queryClient: context.queryClient,

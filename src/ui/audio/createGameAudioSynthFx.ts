@@ -36,27 +36,6 @@ export const createGameAudioSynthFx = Effect.fn("createGameAudioSynthFx")(
 			let output: GainNode | null = null;
 			let scheduledThroughSeconds = 0;
 
-			const closeProvisionalContextFx = Effect.fn("closeProvisionalContextFx")(
-				(provisionalContext: AudioContext, provisionalOutput: GainNode | null) =>
-					Effect.tryPromise({
-						try: async () => {
-							try {
-								provisionalOutput?.disconnect();
-							} catch {
-								// Context closure below remains the authoritative resource cleanup.
-							}
-							try {
-								if (provisionalContext.state !== "closed") {
-									await provisionalContext.close();
-								}
-							} catch {
-								// Preserve the initialization failure that made this context unusable.
-							}
-						},
-						catch: (cause) => cause,
-					}),
-			);
-
 			const ensureContextFx = Effect.suspend(() => {
 				if (disposed) return Effect.succeed(null);
 				if (context !== null && output !== null) {
@@ -87,7 +66,25 @@ export const createGameAudioSynthFx = Effect.fn("createGameAudioSynthFx")(
 				}).pipe(
 					Effect.catchAll((cause) => {
 						if (nextContext === null) return Effect.fail(cause);
-						return closeProvisionalContextFx(nextContext, nextOutput).pipe(
+						const provisionalContext = nextContext;
+						const provisionalOutput = nextOutput;
+						return Effect.tryPromise({
+							try: async () => {
+								try {
+									provisionalOutput?.disconnect();
+								} catch {
+									// Context closure below remains the authoritative resource cleanup.
+								}
+								try {
+									if (provisionalContext.state !== "closed") {
+										await provisionalContext.close();
+									}
+								} catch {
+									// Preserve the initialization failure that made this context unusable.
+								}
+							},
+							catch: (cleanupCause) => cleanupCause,
+						}).pipe(
 							Effect.catchAll(() => Effect.void),
 							Effect.zipRight(Effect.fail(cause)),
 						);

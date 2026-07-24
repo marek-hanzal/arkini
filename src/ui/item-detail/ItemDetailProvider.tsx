@@ -1,3 +1,4 @@
+import { Effect } from "effect";
 import {
 	type PropsWithChildren,
 	useCallback,
@@ -9,7 +10,8 @@ import {
 
 import { useResolveItemDefinitionDetailTarget } from "~/bridge/item-detail/useResolveItemDefinitionDetailTarget";
 import { useResolveItemDetailTarget } from "~/bridge/item-detail/useResolveItemDetailTarget";
-import { createItemDetailController } from "~/ui/item-detail/createItemDetailController";
+import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
+import { createItemDetailControllerFx } from "~/ui/item-detail/createItemDetailControllerFx";
 import { ItemDetailContext } from "~/ui/item-detail/ItemDetailContext";
 import type {
 	ItemDetailControl,
@@ -21,47 +23,49 @@ import type {
 export const ItemDetailProvider = ({ children }: PropsWithChildren) => {
 	const resolveDefinitionTarget = useResolveItemDefinitionDetailTarget();
 	const resolveTarget = useResolveItemDetailTarget();
-	const [controller] = useState(createItemDetailController);
+	const [controller] = useState(() => RendererRuntime.runSync(createItemDetailControllerFx()));
 	const snapshot = useSyncExternalStore(
 		controller.subscribe,
 		controller.getSnapshot,
 		controller.getSnapshot,
 	);
 
-	const openItemDetail = useCallback(
-		({ itemId, tab, origin = null }: OpenItemDetailProps) => {
-			const resolved = resolveTarget({
-				itemId,
-				requestedTab: tab,
-			});
-			if (resolved.kind === "unavailable") return false;
-			return controller.openTarget({
-				kind: "runtime",
-				itemId: resolved.itemId,
-				tab: resolved.tab,
-				origin: controller.readOrigin(origin),
-			});
-		},
+	const openItemDetailFx = useCallback(
+		({ itemId, tab, origin = null }: OpenItemDetailProps) =>
+			Effect.suspend(() => {
+				const resolved = resolveTarget({
+					itemId,
+					requestedTab: tab,
+				});
+				if (resolved.kind === "unavailable") return Effect.succeed(false);
+				return controller.openTargetFx({
+					kind: "runtime",
+					itemId: resolved.itemId,
+					tab: resolved.tab,
+					origin: controller.readOrigin(origin),
+				});
+			}),
 		[
 			controller,
 			resolveTarget,
 		],
 	);
 
-	const openItemDefinitionDetail = useCallback(
-		({ itemId, origin = null, tab }: OpenItemDefinitionDetailProps) => {
-			const resolved = resolveDefinitionTarget({
-				itemId,
-				requestedTab: tab,
-			});
-			if (resolved.kind === "unavailable") return false;
-			return controller.openTarget({
-				kind: "definition",
-				itemId: resolved.itemId,
-				tab: resolved.tab,
-				origin: controller.readOrigin(origin),
-			});
-		},
+	const openItemDefinitionDetailFx = useCallback(
+		({ itemId, origin = null, tab }: OpenItemDefinitionDetailProps) =>
+			Effect.suspend(() => {
+				const resolved = resolveDefinitionTarget({
+					itemId,
+					requestedTab: tab,
+				});
+				if (resolved.kind === "unavailable") return Effect.succeed(false);
+				return controller.openTargetFx({
+					kind: "definition",
+					itemId: resolved.itemId,
+					tab: resolved.tab,
+					origin: controller.readOrigin(origin),
+				});
+			}),
 		[
 			controller,
 			resolveDefinitionTarget,
@@ -74,7 +78,9 @@ export const ItemDetailProvider = ({ children }: PropsWithChildren) => {
 			if (event.key !== "Escape" || current.phase === "closed") return;
 			event.preventDefault();
 			event.stopPropagation();
-			if (current.phase !== "exiting") void controller.close();
+			if (current.phase !== "exiting") {
+				void RendererRuntime.runPromise(controller.closeFx());
+			}
 		};
 		window.addEventListener("keydown", onKeyDown, true);
 		return () => window.removeEventListener("keydown", onKeyDown, true);
@@ -84,7 +90,7 @@ export const ItemDetailProvider = ({ children }: PropsWithChildren) => {
 
 	useEffect(
 		() => () => {
-			controller.reset();
+			RendererRuntime.runSync(controller.resetFx);
 		},
 		[
 			controller,
@@ -95,19 +101,20 @@ export const ItemDetailProvider = ({ children }: PropsWithChildren) => {
 		() => ({
 			state: snapshot.state,
 			isOpen: snapshot.state.phase !== "closed",
+			hasPendingActions: snapshot.pendingActions.size > 0,
 			readActionError: controller.readActionError,
 			readPendingAction: controller.readPendingAction,
-			runPendingAction: controller.runPendingAction,
-			openItemDetail,
-			openItemDefinitionDetail,
-			close: controller.close,
-			completeEnter: controller.completeEnter,
-			completeExit: controller.completeExit,
+			runPendingActionFx: controller.runPendingActionFx,
+			openItemDetailFx,
+			openItemDefinitionDetailFx,
+			closeFx: controller.closeFx,
+			completeEnterFx: controller.completeEnterFx,
+			completeExitFx: controller.completeExitFx,
 		}),
 		[
 			controller,
-			openItemDefinitionDetail,
-			openItemDetail,
+			openItemDefinitionDetailFx,
+			openItemDetailFx,
 			snapshot,
 		],
 	);

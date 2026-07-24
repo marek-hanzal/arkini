@@ -1,3 +1,5 @@
+import type { Effect } from "effect";
+
 import type { ItemDetailTab } from "~/bridge/item-detail/ItemDetailTab";
 
 export type ItemDetailTarget =
@@ -64,12 +66,15 @@ export interface RunItemDetailPendingActionProps {
 export interface ItemDetailControl {
 	readonly state: ItemDetailState;
 	readonly isOpen: boolean;
+	readonly hasPendingActions: boolean;
 	readonly readActionError: (key: string) => string | null;
 	readonly readPendingAction: (key: string) => ItemDetailPendingAction | null;
-	readonly runPendingAction: (props: RunItemDetailPendingActionProps) => Promise<unknown>;
-	readonly openItemDetail: (props: OpenItemDetailProps) => boolean;
-	readonly openItemDefinitionDetail: (props: OpenItemDefinitionDetailProps) => boolean;
-	readonly close: (props?: CloseItemDetailProps) => Promise<void>;
-	readonly completeEnter: (generation: number) => void;
-	readonly completeExit: (generation: number) => void;
+	readonly runPendingActionFx: (props: RunItemDetailPendingActionProps) => Effect.Effect<unknown>;
+	readonly openItemDetailFx: (props: OpenItemDetailProps) => Effect.Effect<boolean>;
+	readonly openItemDefinitionDetailFx: (
+		props: OpenItemDefinitionDetailProps,
+	) => Effect.Effect<boolean>;
+	readonly closeFx: (props?: CloseItemDetailProps) => Effect.Effect<void>;
+	readonly completeEnterFx: (generation: number) => Effect.Effect<void>;
+	readonly completeExitFx: (generation: number) => Effect.Effect<void>;
 }

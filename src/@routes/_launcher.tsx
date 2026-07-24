@@ -1,11 +1,14 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 
-import { getCachedGameEngineResource } from "~/bridge/game/getCachedGameEngineResource";
+import { getCachedGameEngineResourceFx } from "~/bridge/game/getCachedGameEngineResourceFx";
+import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import { resolveLauncherLeaveDestination } from "~/ui/navigation/resolveLauncherLeaveDestination";
 
 export const Route = createFileRoute("/_launcher")({
 	beforeLoad: ({ context, location }) => {
-		const resource = getCachedGameEngineResource(context.queryClient);
+		const resource = RendererRuntime.runSync(
+			getCachedGameEngineResourceFx(context.queryClient),
+		);
 		if (resource === null || location.pathname === "/settings") return;
 		throw redirect({
 			to: "/game/$packageId/action/leave",

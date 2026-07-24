@@ -1,14 +1,15 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { RouterProvider } from "@tanstack/react-router";
+import { Cause, Effect, Exit, Option } from "effect";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { ArkpackCatalogProvider } from "~/bridge/arkpack/ArkpackCatalogProvider";
 import { createArkpackCatalogFx } from "~/bridge/arkpack/createArkpackCatalogFx";
 import { createCheatAvailability } from "~/bridge/cheat/createCheatAvailability";
 import { releaseGameEngineResourceFx } from "~/bridge/game/releaseGameEngineResourceFx";
-import { waitForGameEngineResource } from "~/bridge/game/waitForGameEngineResource";
+import { waitForGameEngineResourceFx } from "~/bridge/game/waitForGameEngineResourceFx";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
-import { installRendererControlledClose } from "~/installRendererControlledClose";
+import { installRendererControlledCloseFx } from "~/installRendererControlledCloseFx";
 import { createArkiniRouter } from "~/router";
 import { AppearanceProvider } from "~/ui/appearance/AppearanceProvider";
 import { CheatAvailabilityProvider } from "~/ui/cheat-availability/CheatAvailabilityProvider";
@@ -28,6 +29,16 @@ const previousGameShutdown = hotData?.gameEngineShutdown ?? Promise.resolve();
 const previousLauncherStartupShutdown = hotData?.launcherStartupShutdown ?? Promise.resolve();
 const queryClient = new QueryClient();
 const cheatAvailability = createCheatAvailability();
+
+const runRendererEffect = async <Value, Error>(
+	effect: Effect.Effect<Value, Error>,
+): Promise<Value> => {
+	const exit = await RendererRuntime.runPromiseExit(effect);
+	if (Exit.isSuccess(exit)) return exit.value;
+	const failure = Cause.failureOption(exit.cause);
+	if (Option.isSome(failure)) throw failure.value;
+	throw Cause.squash(exit.cause);
+};
 
 const rootElement = document.getElementById("root");
 if (!rootElement) {
@@ -52,30 +63,41 @@ const router = createArkiniRouter({
 	queryClient,
 });
 
-const removeControlledClose = installRendererControlledClose({
-	lifecycle: window.arkini.lifecycle,
-	queryClient,
-	router,
-});
+const removeControlledClose = RendererRuntime.runSync(
+	installRendererControlledCloseFx({
+		lifecycle: window.arkini.lifecycle,
+		queryClient,
+		router,
+	}),
+);
 
 import.meta.hot?.dispose((data: HotData) => {
 	removeControlledClose();
 	data.launcherStartupShutdown = RendererRuntime.runPromise(launcherStartup.disposeFx);
-	data.gameEngineShutdown = waitForGameEngineResource(queryClient).then(async (resource) => {
-		if (resource === null) return;
-		resource.assertUsable();
-		try {
-			await RendererRuntime.runPromise(
-				releaseGameEngineResourceFx({
-					allowAlreadyFinalized: true,
-					queryClient,
-					resource,
-				}),
-			);
-		} catch (cause) {
-			throw resource.markCriticalFailure("hmr-handoff", cause);
-		}
-	});
+	data.gameEngineShutdown = runRendererEffect(
+		waitForGameEngineResourceFx(queryClient).pipe(
+			Effect.flatMap((resource) => {
+				if (resource === null) return Effect.void;
+				return Effect.try({
+					try: () => resource.assertUsable(),
+					catch: (cause) => cause,
+				}).pipe(
+					Effect.zipRight(
+						releaseGameEngineResourceFx({
+							allowAlreadyFinalized: true,
+							queryClient,
+							resource,
+						}),
+					),
+					Effect.catchAllCause((cause) =>
+						Effect.fail(
+							resource.markCriticalFailure("hmr-handoff", Cause.squash(cause)),
+						),
+					),
+				);
+			}),
+		),
+	);
 });
 
 createRoot(rootElement).render(

@@ -1,4 +1,5 @@
 import { useLayoutEffect, useSyncExternalStore } from "react";
+import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import { useAppearance } from "~/ui/appearance/useAppearance";
 import { useCheatAvailability } from "~/ui/cheat-availability/useCheatAvailability";
 import { useLauncherStartup } from "~/ui/launcher/useLauncherStartup";
@@ -11,10 +12,12 @@ export const LauncherStartupHydrator = () => {
 	const cheatAvailability = useCheatAvailability();
 
 	useLayoutEffect(() => {
-		startup.consumeHydration(({ appearance, cheatsAvailable }) => {
-			if (appearance !== undefined) hydrate(appearance);
-			if (cheatsAvailable !== undefined) cheatAvailability.apply(cheatsAvailable);
-		});
+		RendererRuntime.runSync(
+			startup.consumeHydrationFx(({ appearance, cheatsAvailable }) => {
+				if (appearance !== undefined) hydrate(appearance);
+				if (cheatsAvailable !== undefined) cheatAvailability.apply(cheatsAvailable);
+			}),
+		);
 	}, [
 		cheatAvailability.apply,
 		hydrate,

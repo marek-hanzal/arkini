@@ -1,14 +1,14 @@
 import { QueryClient } from "@tanstack/react-query";
-import { Effect } from "effect";
+import { Cause, Effect, Exit, Option } from "effect";
 import { describe, expect, it, vi } from "vitest";
 
 import { CriticalGameLifecycleError } from "~/bridge/game/CriticalGameLifecycleError";
 import type { Game } from "~/bridge/game/Game";
-import { acquireGameEngineResource } from "~/bridge/game/acquireGameEngineResource";
-import { getCachedGameEngineResource } from "~/bridge/game/getCachedGameEngineResource";
+import { acquireGameEngineLeaseFx } from "~/bridge/game/acquireGameEngineLeaseFx";
+import { getCachedGameEngineResourceFx } from "~/bridge/game/getCachedGameEngineResourceFx";
 import { gameEngineQueryKey } from "~/bridge/game/gameEngineQueryKey";
 import { gameEngineQueryOptions } from "~/bridge/game/gameEngineQueryOptions";
-import { waitForGameEngineResource } from "~/bridge/game/waitForGameEngineResource";
+import { waitForGameEngineResourceFx } from "~/bridge/game/waitForGameEngineResourceFx";
 import { testArkpackConfig } from "~test/bridge/arkpack/support/createTestArkpack";
 import { createTestGameTransitionFields } from "~test/support/game/createTestGameTransitionFields";
 import { testGameRead } from "~test/support/game/testGameRead";
@@ -58,6 +58,23 @@ const createClient = () =>
 			},
 		},
 	});
+
+const runFx = async <Value, Error>(effect: Effect.Effect<Value, Error>): Promise<Value> => {
+	const exit = await Effect.runPromiseExit(effect);
+	if (Exit.isSuccess(exit)) return exit.value;
+	const failure = Cause.failureOption(exit.cause);
+	if (Option.isSome(failure)) throw failure.value;
+	throw Cause.squash(exit.cause);
+};
+
+const acquireGameEngineResource = (props: acquireGameEngineLeaseFx.Props) =>
+	runFx(acquireGameEngineLeaseFx(props));
+
+const getCachedGameEngineResource = (queryClient: QueryClient) =>
+	Effect.runSync(getCachedGameEngineResourceFx(queryClient));
+
+const waitForGameEngineResource = (queryClient: QueryClient) =>
+	runFx(waitForGameEngineResourceFx(queryClient));
 
 describe("gameEngineQueryOptions", () => {
 	it("deduplicates repeated route acquisition through one renderer-wide query slot", async () => {
@@ -243,6 +260,53 @@ describe("gameEngineQueryOptions", () => {
 		expect(getCachedGameEngineResource(client)).toBeNull();
 	});
 
+	it("keeps a non-abort critical cleanup failure as the sole owner for every successor", async () => {
+		const disposalFailure = new Error("contract-violating Game disposal failed");
+		const wrongGame = createGame("package:wrong", {
+			disposeWithoutSaveFx: Effect.fail(disposalFailure),
+		});
+		const create = vi.fn(async () => wrongGame);
+		const client = createClient();
+		const firstFailure = await acquireGameEngineResource({
+			packageId: "package:expected",
+			queryClient: client,
+			create,
+			rememberPackage: () => Promise.resolve(),
+		}).then(
+			() => undefined,
+			(cause: unknown) => cause,
+		);
+
+		expect(firstFailure).toBeInstanceOf(CriticalGameLifecycleError);
+		expect(firstFailure).toMatchObject({
+			operation: "engine-ownership",
+		});
+		expect(firstFailure).toHaveProperty(
+			"message",
+			expect.stringContaining(disposalFailure.message),
+		);
+
+		for (const packageId of [
+			"package:expected",
+			"package:different",
+		]) {
+			const successorFailure = await acquireGameEngineResource({
+				packageId,
+				queryClient: client,
+				create,
+				rememberPackage: () => Promise.resolve(),
+			}).then(
+				() => undefined,
+				(cause: unknown) => cause,
+			);
+			expect(successorFailure).toBeInstanceOf(CriticalGameLifecycleError);
+			expect(Cause.originalError(successorFailure)).toBe(Cause.originalError(firstFailure));
+		}
+
+		expect(create).toHaveBeenCalledOnce();
+		expect(getCachedGameEngineResource(client)).toBeNull();
+	});
+
 	it("cancels and fully discards a different-package acquisition before creating its successor", async () => {
 		let resolveFirst!: (game: Game) => void;
 		const firstCreation = new Promise<Game>((resolve) => {
@@ -281,7 +345,7 @@ describe("gameEngineQueryOptions", () => {
 		});
 		const secondLease = await second;
 		expect(getCachedGameEngineResource(client)).toBeNull();
-		const secondResource = secondLease.adopt();
+		const secondResource = Effect.runSync(secondLease.adoptFx);
 
 		expect(discardFirst).toHaveBeenCalledOnce();
 		expect(create).toHaveBeenCalledTimes(2);

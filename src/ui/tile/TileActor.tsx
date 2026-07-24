@@ -1,8 +1,10 @@
+import { Effect } from "effect";
 import { motion } from "motion/react";
 import { memo, useCallback, useContext, useMemo } from "react";
 import { match } from "ts-pattern";
 
 import { useStartItemDetailLine } from "~/bridge/item-detail/useStartItemDetailLine";
+import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import { LocationScopeEnumSchema } from "~/bridge/tile/LocationScopeEnumSchema";
 import type { useTileActors } from "~/bridge/tile/useTileActors";
 import { CursorClassName } from "~/ui/cursor/CursorSemantic";
@@ -17,8 +19,8 @@ import { useTileActorPresentation } from "~/ui/tile/useTileActorPresentation";
 import { useTileActorSystem } from "~/ui/tile/useTileActorSystem";
 
 const unavailableInventoryControl = {
-	open: () => false,
-} satisfies Pick<InventoryControl, "open">;
+	openFx: () => Effect.succeed(false),
+} satisfies Pick<InventoryControl, "openFx">;
 
 export namespace TileActor {
 	export interface Props {
@@ -63,11 +65,13 @@ const TileActorComponent = ({ item }: TileActor.Props) => {
 						kind: "open-lines",
 					},
 					() => {
-						itemDetail.openItemDetail({
-							itemId: item.id,
-							tab: "lines",
-							origin,
-						});
+						RendererRuntime.runSync(
+							itemDetail.openItemDetailFx({
+								itemId: item.id,
+								tab: "lines",
+								origin,
+							}),
+						);
 					},
 				)
 				.with(
@@ -75,9 +79,11 @@ const TileActorComponent = ({ item }: TileActor.Props) => {
 						kind: "open-inventory",
 					},
 					() => {
-						inventory.open({
-							origin,
-						});
+						RendererRuntime.runSync(
+							inventory.openFx({
+								origin,
+							}),
+						);
 					},
 				)
 				.with(
@@ -89,11 +95,13 @@ const TileActorComponent = ({ item }: TileActor.Props) => {
 							ownerItemId: item.id,
 							lineId,
 						}).catch(() => {
-							itemDetail.openItemDetail({
-								itemId: item.id,
-								tab: "lines",
-								origin,
-							});
+							RendererRuntime.runSync(
+								itemDetail.openItemDetailFx({
+									itemId: item.id,
+									tab: "lines",
+									origin,
+								}),
+							);
 						});
 					},
 				)
@@ -178,10 +186,12 @@ const TileActorComponent = ({ item }: TileActor.Props) => {
 				}
 				if (event.shiftKey) {
 					event.preventDefault();
-					itemDetail.openItemDetail({
-						itemId: item.id,
-						origin: event.currentTarget,
-					});
+					RendererRuntime.runSync(
+						itemDetail.openItemDetailFx({
+							itemId: item.id,
+							origin: event.currentTarget,
+						}),
+					);
 					return;
 				}
 				if (item.primaryAction.kind === "none") return;

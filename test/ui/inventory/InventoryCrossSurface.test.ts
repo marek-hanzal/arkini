@@ -50,6 +50,16 @@ vi.mock("~/bridge/tile/useDropItem", () => ({
 }));
 
 const roots: Array<ReturnType<typeof createRoot>> = [];
+
+const openInventory = (
+	control: InventoryControl,
+	props?: Parameters<InventoryControl["openFx"]>[0],
+) => Effect.runSync(control.openFx(props));
+
+const closeInventory = (
+	control: InventoryControl,
+	props?: Parameters<InventoryControl["closeFx"]>[0],
+) => Effect.runSync(control.closeFx(props));
 const runtimeListeners = new Set<() => void>();
 const transitionListeners = new Set<
 	(transition: CommittedTransitionSchema.Type) => void | PromiseLike<void>
@@ -517,7 +527,7 @@ const renderScene = async () => {
 		return control;
 	};
 	await act(async () => {
-		readControl().open();
+		openInventory(readControl());
 		await Promise.resolve();
 	});
 	return {
@@ -892,7 +902,7 @@ describe("Inventory cross-surface tile scene", () => {
 		expect(actor.dataset.phase).toBe("dragging");
 
 		await act(async () => {
-			readControl().close({
+			closeInventory(readControl(), {
 				restoreFocus: false,
 			});
 			await Promise.resolve();
@@ -905,7 +915,7 @@ describe("Inventory cross-surface tile scene", () => {
 		expect(actor.style.visibility).toBe("hidden");
 
 		await act(async () => {
-			readControl().open();
+			openInventory(readControl());
 			await Promise.resolve();
 		});
 
@@ -1044,7 +1054,7 @@ describe("Inventory cross-surface tile scene", () => {
 		expect(actor.dataset.phase).toBe("dragging");
 
 		await act(async () => {
-			readControl().close({
+			closeInventory(readControl(), {
 				restoreFocus: false,
 			});
 			await Promise.resolve();
@@ -1084,7 +1094,7 @@ describe("Inventory cross-surface tile scene", () => {
 		expect(actor.dataset.toolbarX).toBe("1");
 
 		await act(async () => {
-			readControl().open();
+			openInventory(readControl());
 			await Promise.resolve();
 		});
 		expect(actorByRuntimeId(item.id)).toBe(actor);

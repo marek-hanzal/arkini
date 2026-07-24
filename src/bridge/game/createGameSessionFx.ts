@@ -84,15 +84,13 @@ export const createGameSessionFx = Effect.fn("createGameSessionFx")(
 							save: save.write,
 						}).pipe(Layer.provide(sessionLayer));
 			const managed = ManagedRuntime.make(Layer.merge(sessionLayer, saveLayer));
-			const runManagedFx = Effect.fn("runManagedFx")(
-				<Result, Error>(
-					effect: Effect.Effect<Result, Error, GameSessionServices>,
-				): Effect.Effect<Result, unknown> =>
-					Effect.tryPromise({
-						try: () => managed.runPromise(effect),
-						catch: (cause) => cause,
-					}),
-			);
+			const runManagedFx = <Result, Error>(
+				effect: Effect.Effect<Result, Error, GameSessionServices>,
+			): Effect.Effect<Result, unknown> =>
+				Effect.tryPromise({
+					try: () => managed.runPromise(effect),
+					catch: (cause) => cause,
+				});
 			const sessionScope = yield* runManagedFx(Scope.make());
 			const transitionSubscriptions = yield* runManagedFx(
 				createGameSessionTransitionSubscriptionsFx().pipe(Scope.extend(sessionScope)),
@@ -151,36 +149,32 @@ export const createGameSessionFx = Effect.fn("createGameSessionFx")(
 				}),
 			);
 
-			const disposeWithSaveModeFx = Effect.fn("disposeWithSaveModeFx")(
-				(saveMode: "flush" | "discard") =>
-					Effect.uninterruptibleMask((restore) =>
-						Effect.gen(function* () {
-							const claim = yield* claimDisposeFx;
-							if (claim.type === "complete") return;
-							if (claim.type === "await") {
-								return yield* restore(Deferred.await(claim.result));
-							}
+			const disposeWithSaveModeFx = (saveMode: "flush" | "discard") =>
+				Effect.uninterruptibleMask((restore) =>
+					Effect.gen(function* () {
+						const claim = yield* claimDisposeFx;
+						if (claim.type === "complete") return;
+						if (claim.type === "await") {
+							return yield* restore(Deferred.await(claim.result));
+						}
 
-							const attempt = stopGameLoopFx.pipe(
-								Effect.zipRight(stopCommandsFx),
-								Effect.zipRight(
-									saveMode === "discard" ? discardSaveFx : flushSaveFx,
-								),
-								Effect.zipRight(releaseSessionFx),
-							);
-							const exit = yield* Effect.exit(attempt);
-							yield* lifecycleLock.withPermits(1)(
-								Effect.sync(() => {
-									MutableRef.set(lifecycle, {
-										type: Exit.isSuccess(exit) ? "disposed" : "frozen",
-									});
-								}),
-							);
-							yield* Deferred.done(claim.result, exit);
-							if (Exit.isFailure(exit)) return yield* Effect.failCause(exit.cause);
-						}),
-					),
-			);
+						const attempt = stopGameLoopFx.pipe(
+							Effect.zipRight(stopCommandsFx),
+							Effect.zipRight(saveMode === "discard" ? discardSaveFx : flushSaveFx),
+							Effect.zipRight(releaseSessionFx),
+						);
+						const exit = yield* Effect.exit(attempt);
+						yield* lifecycleLock.withPermits(1)(
+							Effect.sync(() => {
+								MutableRef.set(lifecycle, {
+									type: Exit.isSuccess(exit) ? "disposed" : "frozen",
+								});
+							}),
+						);
+						yield* Deferred.done(claim.result, exit);
+						if (Exit.isFailure(exit)) return yield* Effect.failCause(exit.cause);
+					}),
+				);
 
 			const ensureRunningFx = Effect.suspend(() => {
 				const current = MutableRef.get(lifecycle);

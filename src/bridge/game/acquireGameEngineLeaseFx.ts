@@ -1,13 +1,9 @@
 import type { QueryClient } from "@tanstack/react-query";
+import { Effect } from "effect";
 
 import { CriticalGameLifecycleError } from "~/bridge/game/CriticalGameLifecycleError";
-import {
-	claimGameEngineAcquisitionOwner,
-	type GameEngineAcquisitionConsumer,
-	type GameEngineAcquisitionOwner,
-	readGameEngineAcquisitionOwner,
-	releaseGameEngineAcquisitionOwner,
-} from "~/bridge/game/GameEngineAcquisitionOwnership";
+import { gameEngineAcquisitionOwners } from "~/bridge/game/gameEngineAcquisitionOwners";
+import type { GameEngineAcquisitionOwner } from "~/bridge/game/GameEngineAcquisitionOwner";
 import type { GameEngineResource } from "~/bridge/game/GameEngineResource";
 import { gameEngineQueryKey } from "~/bridge/game/gameEngineQueryKey";
 import { gameEngineQueryOptions } from "~/bridge/game/gameEngineQueryOptions";
@@ -15,15 +11,28 @@ import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 
 export interface GameEngineAcquisition {
 	readonly resource: GameEngineResource;
-	readonly adopt: () => GameEngineResource;
+	readonly adoptFx: Effect.Effect<GameEngineResource, unknown>;
 }
 
-export namespace acquireGameEngineResource {
+export namespace acquireGameEngineLeaseFx {
 	export interface Props extends gameEngineQueryOptions.Props {
 		readonly queryClient: QueryClient;
 		readonly signal?: AbortSignal;
 	}
 }
+
+const readOwner = (queryClient: QueryClient): GameEngineAcquisitionOwner | undefined =>
+	gameEngineAcquisitionOwners.get(queryClient);
+
+const claimOwner = (queryClient: QueryClient, owner: GameEngineAcquisitionOwner): void => {
+	gameEngineAcquisitionOwners.set(queryClient, owner);
+};
+
+const releaseOwner = (queryClient: QueryClient, owner: GameEngineAcquisitionOwner): boolean => {
+	if (gameEngineAcquisitionOwners.get(queryClient) !== owner) return false;
+	gameEngineAcquisitionOwners.delete(queryClient);
+	return true;
+};
 
 const readQueryResource = (queryClient: QueryClient): GameEngineResource | null =>
 	queryClient.getQueryData<GameEngineResource>(gameEngineQueryKey) ?? null;
@@ -32,9 +41,17 @@ const abortReason = (signal: AbortSignal): unknown =>
 	signal.reason ?? new DOMException("Game Engine acquisition was aborted.", "AbortError");
 
 const finalizeOwner = (owner: GameEngineAcquisitionOwner) => {
-	releaseGameEngineAcquisitionOwner(owner.queryClient, owner);
+	releaseOwner(owner.queryClient, owner);
 	for (const consumer of owner.consumers) consumer.removeAbortListener();
 	owner.consumers.clear();
+};
+
+const observeOwnerFailure = (owner: GameEngineAcquisitionOwner, cause: unknown) => {
+	if (cause instanceof CriticalGameLifecycleError) {
+		owner.criticalFailure ??= cause;
+		return;
+	}
+	if (!owner.controller.signal.aborted) finalizeOwner(owner);
 };
 
 const discardPublishedResource = async (
@@ -57,6 +74,7 @@ const discardPublishedResource = async (
 };
 
 const cancelOwner = (owner: GameEngineAcquisitionOwner): Promise<void> => {
+	if (owner.criticalFailure !== undefined) return Promise.reject(owner.criticalFailure);
 	if (owner.adopted) return Promise.resolve();
 	if (owner.cancelling !== undefined) return owner.cancelling;
 	owner.controller.abort(
@@ -101,7 +119,10 @@ const cancelOwner = (owner: GameEngineAcquisitionOwner): Promise<void> => {
 				finalizeOwner(owner);
 			}
 		}
-		if (criticalFailure !== undefined) throw criticalFailure;
+		if (criticalFailure !== undefined) {
+			owner.criticalFailure ??= criticalFailure;
+			throw owner.criticalFailure;
+		}
 	})();
 	return owner.cancelling;
 };
@@ -109,7 +130,7 @@ const cancelOwner = (owner: GameEngineAcquisitionOwner): Promise<void> => {
 const registerConsumer = (
 	owner: GameEngineAcquisitionOwner,
 	signal: AbortSignal | undefined,
-): GameEngineAcquisitionConsumer => {
+): GameEngineAcquisitionOwner.Consumer => {
 	let removeAbortListener: () => void = () => undefined;
 	const abort =
 		signal === undefined
@@ -131,7 +152,7 @@ const registerConsumer = (
 	const consumer = {
 		abort,
 		removeAbortListener,
-	} satisfies GameEngineAcquisitionConsumer;
+	} satisfies GameEngineAcquisitionOwner.Consumer;
 	owner.consumers.add(consumer);
 	return consumer;
 };
@@ -142,26 +163,36 @@ const leaseOwner = async (
 ): Promise<GameEngineAcquisition> => {
 	signal?.throwIfAborted();
 	const consumer = registerConsumer(owner, signal);
-	const resource = await Promise.race([
-		owner.result,
-		consumer.abort,
-	]);
+	let resource: GameEngineResource;
+	try {
+		resource = await Promise.race([
+			owner.result,
+			consumer.abort,
+		]);
+	} catch (cause) {
+		observeOwnerFailure(owner, cause);
+		throw cause;
+	}
 	return {
 		resource,
-		adopt: () => {
-			signal?.throwIfAborted();
-			if (owner.cancelling !== undefined) throw abortReason(owner.controller.signal);
-			if (readQueryResource(owner.queryClient) !== resource) {
-				throw new Error(
-					"Game Engine acquisition can only adopt its exact singleton resource.",
-				);
-			}
-			if (readGameEngineAcquisitionOwner(owner.queryClient) === owner) {
-				owner.adopted = true;
-				finalizeOwner(owner);
-			}
-			return resource;
-		},
+		adoptFx: Effect.try({
+			try: () => {
+				signal?.throwIfAborted();
+				if (owner.criticalFailure !== undefined) throw owner.criticalFailure;
+				if (owner.cancelling !== undefined) throw abortReason(owner.controller.signal);
+				if (readQueryResource(owner.queryClient) !== resource) {
+					throw new Error(
+						"Game Engine acquisition can only adopt its exact singleton resource.",
+					);
+				}
+				if (readOwner(owner.queryClient) === owner) {
+					owner.adopted = true;
+					finalizeOwner(owner);
+				}
+				return resource;
+			},
+			catch: (cause) => cause,
+		}),
 	};
 };
 
@@ -171,28 +202,32 @@ const leasePublishedResource = (
 	signal: AbortSignal | undefined,
 ): GameEngineAcquisition => ({
 	resource,
-	adopt: () => {
-		signal?.throwIfAborted();
-		if (readQueryResource(queryClient) !== resource) {
-			throw new Error("Game Engine acquisition lost its published singleton resource.");
-		}
-		return resource;
-	},
+	adoptFx: Effect.try({
+		try: () => {
+			signal?.throwIfAborted();
+			if (readQueryResource(queryClient) !== resource) {
+				throw new Error("Game Engine acquisition lost its published singleton resource.");
+			}
+			return resource;
+		},
+		catch: (cause) => cause,
+	}),
 });
 
 /** Claims the singleton creation slot and keeps the result provisional until its route adopts it. */
-export const acquireGameEngineResource = async ({
+const acquireGameEngineLease = async ({
 	queryClient,
 	signal,
 	...options
-}: acquireGameEngineResource.Props): Promise<GameEngineAcquisition> => {
+}: acquireGameEngineLeaseFx.Props): Promise<GameEngineAcquisition> => {
 	signal?.throwIfAborted();
-	const current = readGameEngineAcquisitionOwner(queryClient);
+	const current = readOwner(queryClient);
 	if (current !== undefined) {
+		if (current.criticalFailure !== undefined) throw current.criticalFailure;
 		if (current.cancelling !== undefined) {
 			await current.cancelling;
 			signal?.throwIfAborted();
-			return acquireGameEngineResource({
+			return acquireGameEngineLease({
 				...options,
 				queryClient,
 				signal,
@@ -201,7 +236,7 @@ export const acquireGameEngineResource = async ({
 		if (current.packageId === options.packageId) return leaseOwner(current, signal);
 		await cancelOwner(current);
 		signal?.throwIfAborted();
-		return acquireGameEngineResource({
+		return acquireGameEngineLease({
 			...options,
 			queryClient,
 			signal,
@@ -238,30 +273,21 @@ export const acquireGameEngineResource = async ({
 		cancelling: undefined,
 		controller,
 		consumers: new Set(),
+		criticalFailure: undefined,
 		packageId: options.packageId,
 		queryClient,
 		result,
 	} satisfies GameEngineAcquisitionOwner;
-	claimGameEngineAcquisitionOwner(queryClient, owner);
-	void result.catch(() => {
-		if (!controller.signal.aborted) finalizeOwner(owner);
-	});
+	claimOwner(queryClient, owner);
+	void result.catch((cause) => observeOwnerFailure(owner, cause));
 	return leaseOwner(owner, signal);
 };
 
-/** Transfers a pending route acquisition to a native-close or HMR lifecycle owner. */
-export const adoptPendingGameEngineResource = (
-	queryClient: QueryClient,
-	resource: GameEngineResource,
-): GameEngineResource => {
-	const owner = readGameEngineAcquisitionOwner(queryClient);
-	if (
-		owner !== undefined &&
-		owner.cancelling === undefined &&
-		readQueryResource(queryClient) === resource
-	) {
-		owner.adopted = true;
-		finalizeOwner(owner);
-	}
-	return resource;
-};
+/** Acquires one route-owned renderer Game Engine lease. */
+export const acquireGameEngineLeaseFx = Effect.fn("acquireGameEngineLeaseFx")(
+	(props: acquireGameEngineLeaseFx.Props) =>
+		Effect.tryPromise({
+			try: () => acquireGameEngineLease(props),
+			catch: (cause) => cause,
+		}),
+);

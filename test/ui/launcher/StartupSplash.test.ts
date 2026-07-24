@@ -59,7 +59,7 @@ const createStartup = () => {
 	const startup: LauncherStartup = {
 		getSnapshot: () => state,
 		getHeroUrl: () => "/hero.png",
-		consumeHydration: () => false,
+		consumeHydrationFx: () => Effect.succeed(false),
 		startFx: Effect.void,
 		retryFx: Effect.sync(retry),
 		completeSplashFx: Effect.sync(complete),

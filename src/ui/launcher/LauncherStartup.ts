@@ -54,7 +54,9 @@ export namespace LauncherStartup {
 export interface LauncherStartup {
 	readonly getSnapshot: () => LauncherStartup.State;
 	readonly getHeroUrl: () => string;
-	readonly consumeHydration: (consume: (hydration: LauncherStartup.Hydration) => void) => boolean;
+	readonly consumeHydrationFx: (
+		consume: (hydration: LauncherStartup.Hydration) => void,
+	) => Effect.Effect<boolean>;
 	readonly startFx: Effect.Effect<void, unknown>;
 	readonly retryFx: Effect.Effect<void, unknown>;
 	readonly completeSplashFx: Effect.Effect<void>;

@@ -1,3 +1,5 @@
+import type { Effect } from "effect";
+
 export type InventoryState =
 	| {
 			readonly phase: "closed";
@@ -19,6 +21,6 @@ export interface CloseInventoryProps {
 export interface InventoryControl {
 	readonly state: InventoryState;
 	readonly isOpen: boolean;
-	readonly open: (props?: OpenInventoryProps) => boolean;
-	readonly close: (props?: CloseInventoryProps) => boolean;
+	readonly openFx: (props?: OpenInventoryProps) => Effect.Effect<boolean>;
+	readonly closeFx: (props?: CloseInventoryProps) => Effect.Effect<boolean>;
 }

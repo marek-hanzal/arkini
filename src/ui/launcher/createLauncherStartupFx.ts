@@ -175,42 +175,44 @@ export const createLauncherStartupFx = Effect.fn("createLauncherStartupFx")(
 					),
 				),
 			);
-			const runAttemptFx = Effect.fn("runLauncherStartupAttemptFx")(function* (
-				initial: boolean,
-			) {
-				const fiber = yield* lock.withPermits(1)(
-					Effect.gen(function* () {
-						if (disposed) {
-							return yield* Effect.fail(new Error("Launcher startup is disposed."));
-						}
-						if (activeFiber !== undefined) {
-							const activeExit = yield* Fiber.poll(activeFiber);
-							if (Option.isNone(activeExit)) return activeFiber;
-							activeFiber = undefined;
-						}
-						if (initial && started) return undefined;
-						if (initial) started = true;
-						activeFiber = yield* Effect.forkDaemon(executeFx);
-						return activeFiber;
-					}),
-				);
-				if (fiber === undefined) return;
-				return yield* Fiber.join(fiber).pipe(
-					Effect.ensuring(
-						Fiber.poll(fiber).pipe(
-							Effect.flatMap((exit) =>
-								Option.isSome(exit)
-									? lock.withPermits(1)(
-											Effect.sync(() => {
-												if (activeFiber === fiber) activeFiber = undefined;
-											}),
-										)
-									: Effect.void,
+			const runAttemptFx = (initial: boolean) =>
+				Effect.gen(function* () {
+					const fiber = yield* lock.withPermits(1)(
+						Effect.gen(function* () {
+							if (disposed) {
+								return yield* Effect.fail(
+									new Error("Launcher startup is disposed."),
+								);
+							}
+							if (activeFiber !== undefined) {
+								const activeExit = yield* Fiber.poll(activeFiber);
+								if (Option.isNone(activeExit)) return activeFiber;
+								activeFiber = undefined;
+							}
+							if (initial && started) return undefined;
+							if (initial) started = true;
+							activeFiber = yield* Effect.forkDaemon(executeFx);
+							return activeFiber;
+						}),
+					);
+					if (fiber === undefined) return;
+					return yield* Fiber.join(fiber).pipe(
+						Effect.ensuring(
+							Fiber.poll(fiber).pipe(
+								Effect.flatMap((exit) =>
+									Option.isSome(exit)
+										? lock.withPermits(1)(
+												Effect.sync(() => {
+													if (activeFiber === fiber)
+														activeFiber = undefined;
+												}),
+											)
+										: Effect.void,
+								),
 							),
 						),
-					),
-				);
-			});
+					);
+				});
 			const disposeFx = Effect.uninterruptible(
 				lock.withPermits(1)(
 					Effect.gen(function* () {
@@ -232,43 +234,45 @@ export const createLauncherStartupFx = Effect.fn("createLauncherStartupFx")(
 			return {
 				getSnapshot: () => state,
 				getHeroUrl: () => currentHeroUrl,
-				consumeHydration: (consume) => {
-					if (
-						disposed ||
-						(pendingAppearance === undefined && pendingCheatsAvailable === undefined)
-					) {
-						return false;
-					}
-					const appearance = pendingAppearance;
-					const cheatsAvailable = pendingCheatsAvailable;
-					pendingAppearance = undefined;
-					pendingCheatsAvailable = undefined;
-					try {
-						consume({
-							...(appearance === undefined
-								? {}
-								: {
-										appearance,
-									}),
-							...(cheatsAvailable === undefined
-								? {}
-								: {
-										cheatsAvailable,
-									}),
-						});
-					} catch (error) {
-						pendingAppearance = appearance;
-						pendingCheatsAvailable = cheatsAvailable;
-						throw error;
-					}
-					if (appearance !== undefined) {
-						publish({
-							...state,
-							appearanceReady: true,
-						});
-					}
-					return true;
-				},
+				consumeHydrationFx: (consume) =>
+					Effect.sync(() => {
+						if (
+							disposed ||
+							(pendingAppearance === undefined &&
+								pendingCheatsAvailable === undefined)
+						) {
+							return false;
+						}
+						const appearance = pendingAppearance;
+						const cheatsAvailable = pendingCheatsAvailable;
+						pendingAppearance = undefined;
+						pendingCheatsAvailable = undefined;
+						try {
+							consume({
+								...(appearance === undefined
+									? {}
+									: {
+											appearance,
+										}),
+								...(cheatsAvailable === undefined
+									? {}
+									: {
+											cheatsAvailable,
+										}),
+							});
+						} catch (error) {
+							pendingAppearance = appearance;
+							pendingCheatsAvailable = cheatsAvailable;
+							throw error;
+						}
+						if (appearance !== undefined) {
+							publish({
+								...state,
+								appearanceReady: true,
+							});
+						}
+						return true;
+					}),
 				startFx: runAttemptFx(true),
 				retryFx: runAttemptFx(false),
 				completeSplashFx: Effect.sync(() => {

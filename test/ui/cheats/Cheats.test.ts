@@ -8,6 +8,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import type { Game } from "~/bridge/game/Game";
 import { Cheats } from "~/ui/cheats/Cheats";
+import { useCheatsModel } from "~/ui/cheats/useCheatsModel";
 import { createTestGameSession } from "~test/bridge/game/createTestGameSession";
 import { createJobTestConfig } from "~test/job/support/jobTestConfig";
 
@@ -19,6 +20,12 @@ import { createJobTestConfig } from "~test/job/support/jobTestConfig";
 
 const roots: Array<ReturnType<typeof createRoot>> = [];
 const sessions: Game[] = [];
+
+const CheatsHarness = ({ game }: { readonly game: Game }) =>
+	createElement(Cheats, {
+		model: useCheatsModel(game),
+		onBack: () => undefined,
+	});
 
 afterEach(async () => {
 	await act(async () => {
@@ -71,9 +78,8 @@ describe("Cheats", () => {
 					{
 						client: new QueryClient(),
 					},
-					createElement(Cheats, {
+					createElement(CheatsHarness, {
 						game,
-						onBack: () => undefined,
 					}),
 				),
 			);
@@ -93,10 +99,12 @@ describe("Cheats", () => {
 		await vi.waitFor(() => expect(session.getSnapshot().cheats.enabled).toBe(true));
 		expect(session.getSnapshot().cheats.everEnabled).toBe(true);
 		expect(instant.disabled).toBe(false);
+		expect(container.textContent).toContain("Cheat mode saved.");
 
 		await act(async () => instant.click());
 		await vi.waitFor(() => expect(session.getSnapshot().cheats.instantGameplay).toBe(true));
 		expect(instant.checked).toBe(true);
+		expect(container.textContent).toContain("Instant gameplay saved.");
 
 		await act(async () => enable.click());
 		await vi.waitFor(() => expect(session.getSnapshot().cheats.enabled).toBe(false));

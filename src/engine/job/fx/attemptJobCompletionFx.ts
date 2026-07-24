@@ -1,10 +1,10 @@
 import { Effect } from "effect";
 
-import { PlacementFailureReasonEnumSchema } from "~/engine/placement/schema/PlacementFailureReasonEnumSchema";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
 import { completeJobTransitionFx } from "~/engine/job/fx/completeJobTransitionFx";
 import type { PlacementUnavailableError } from "~/engine/placement/error/PlacementUnavailableError";
+import { isExpectedPlacementDeliveryBlock } from "~/engine/placement/read/isExpectedPlacementDeliveryBlock";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
 export namespace attemptJobCompletionFx {
@@ -26,16 +26,6 @@ export namespace attemptJobCompletionFx {
 		  };
 }
 
-const isExpectedCompletionBlock = (error: PlacementUnavailableError) => {
-	switch (error.reason) {
-		case PlacementFailureReasonEnumSchema.enum.BoardFull:
-		case PlacementFailureReasonEnumSchema.enum.InventoryFull:
-		case PlacementFailureReasonEnumSchema.enum.ToolbarFull:
-		case PlacementFailureReasonEnumSchema.enum.ItemMaxCount:
-			return true;
-	}
-};
-
 /** Resolves one live ready job and keeps only expected delivery failures local. */
 export const attemptJobCompletionFx = Effect.fn("attemptJobCompletionFx")(function* ({
 	jobId,
@@ -54,7 +44,7 @@ export const attemptJobCompletionFx = Effect.fn("attemptJobCompletionFx")(functi
 				}) satisfies attemptJobCompletionFx.Result,
 		),
 		Effect.catchTag("PlacementUnavailableError", (error) => {
-			if (!isExpectedCompletionBlock(error)) {
+			if (!isExpectedPlacementDeliveryBlock(error.reason)) {
 				return Effect.fail(error);
 			}
 

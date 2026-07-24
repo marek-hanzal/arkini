@@ -65,6 +65,19 @@ const rejectForItemError = ({
 	targetItemId,
 });
 
+const rejectBlocked = ({
+	sourceItemId,
+	targetItemId,
+}: {
+	readonly sourceItemId: IdSchema.Type;
+	readonly targetItemId: IdSchema.Type;
+}): dropItemFx.Result => ({
+	kind: DropItemResultKindEnumSchema.enum.Reject,
+	reason: DropItemRejectedReasonEnumSchema.enum.Blocked,
+	itemId: sourceItemId,
+	targetItemId,
+});
+
 /** Resolves one requested item drop through the current atomic runtime command path. */
 export const dropItemFx = Effect.fn("dropItemFx")(function* ({
 	sourceItemId,
@@ -89,7 +102,31 @@ export const dropItemFx = Effect.fn("dropItemFx")(function* ({
 		} satisfies dropItemFx.Result;
 	}
 
+	const preflight = yield* readDropItemPreviewFx({
+		sourceItemId,
+		sourceRevision,
+		sourceLocation,
+		target,
+	});
+	if (preflight.kind === DropItemResultKindEnumSchema.enum.Reject) {
+		return {
+			kind: DropItemResultKindEnumSchema.enum.Reject,
+			reason: preflight.reason,
+			itemId: sourceItemId,
+			...(target.occupant === null
+				? {}
+				: {
+						targetItemId: target.occupant.itemId,
+					}),
+		} satisfies dropItemFx.Result;
+	}
+
 	if (target.occupant === null) {
+		if (preflight.kind !== DropItemResultKindEnumSchema.enum.Move) {
+			return yield* Effect.dieMessage(
+				`Empty-slot drop preview unexpectedly resolved as "${preflight.kind}".`,
+			);
+		}
 		return yield* moveItemFx({
 			itemId: sourceItemId,
 			revision: sourceRevision,
@@ -143,32 +180,12 @@ export const dropItemFx = Effect.fn("dropItemFx")(function* ({
 						reason: DropItemRejectedReasonEnumSchema.enum.InvalidTarget,
 						itemId: sourceItemId,
 					}),
-				RuntimeInvalidError: () =>
-					Effect.succeed({
-						kind: DropItemResultKindEnumSchema.enum.Reject,
-						reason: DropItemRejectedReasonEnumSchema.enum.InvalidTarget,
-						itemId: sourceItemId,
-					}),
 			}),
 		);
 	}
 
 	const targetOccupant = target.occupant;
 	const targetItemId = targetOccupant.itemId;
-	const preflight = yield* readDropItemPreviewFx({
-		sourceItemId,
-		sourceRevision,
-		sourceLocation,
-		target,
-	});
-	if (preflight.kind === DropItemResultKindEnumSchema.enum.Reject) {
-		return {
-			kind: DropItemResultKindEnumSchema.enum.Reject,
-			reason: preflight.reason,
-			itemId: sourceItemId,
-			targetItemId,
-		} satisfies dropItemFx.Result;
-	}
 	if (preflight.kind === DropItemResultKindEnumSchema.enum.Merge) {
 		return yield* commitMergeItemsFx({
 			sourceItemId,
@@ -250,14 +267,43 @@ export const dropItemFx = Effect.fn("dropItemFx")(function* ({
 						targetItemId,
 					}),
 			}),
-			Effect.catchAll(() =>
-				Effect.succeed({
-					kind: DropItemResultKindEnumSchema.enum.Reject,
-					reason: DropItemRejectedReasonEnumSchema.enum.Blocked,
-					itemId: sourceItemId,
-					targetItemId,
-				}),
-			),
+			Effect.catchTags({
+				ItemStatefulError: () =>
+					Effect.succeed(
+						rejectBlocked({
+							sourceItemId,
+							targetItemId,
+						}),
+					),
+				PlacementUnavailableError: () =>
+					Effect.succeed(
+						rejectBlocked({
+							sourceItemId,
+							targetItemId,
+						}),
+					),
+				JobOwnerBusyError: () =>
+					Effect.succeed(
+						rejectBlocked({
+							sourceItemId,
+							targetItemId,
+						}),
+					),
+				ItemJobScopedError: () =>
+					Effect.succeed(
+						rejectBlocked({
+							sourceItemId,
+							targetItemId,
+						}),
+					),
+				MergeSameItemError: () =>
+					Effect.succeed(
+						rejectBlocked({
+							sourceItemId,
+							targetItemId,
+						}),
+					),
+			}),
 		);
 	}
 
@@ -338,14 +384,36 @@ export const dropItemFx = Effect.fn("dropItemFx")(function* ({
 						targetItemId,
 					}),
 			}),
-			Effect.catchAll(() =>
-				Effect.succeed({
-					kind: DropItemResultKindEnumSchema.enum.Reject,
-					reason: DropItemRejectedReasonEnumSchema.enum.Blocked,
-					itemId: sourceItemId,
-					targetItemId,
-				}),
-			),
+			Effect.catchTags({
+				ItemStatefulError: () =>
+					Effect.succeed(
+						rejectBlocked({
+							sourceItemId,
+							targetItemId,
+						}),
+					),
+				PlacementUnavailableError: () =>
+					Effect.succeed(
+						rejectBlocked({
+							sourceItemId,
+							targetItemId,
+						}),
+					),
+				InputMaterialUnavailableError: () =>
+					Effect.succeed(
+						rejectBlocked({
+							sourceItemId,
+							targetItemId,
+						}),
+					),
+				LineInputClosedError: () =>
+					Effect.succeed(
+						rejectBlocked({
+							sourceItemId,
+							targetItemId,
+						}),
+					),
+			}),
 		);
 	}
 
@@ -395,14 +463,23 @@ export const dropItemFx = Effect.fn("dropItemFx")(function* ({
 					})),
 				),
 			),
-			Effect.catchAll(() =>
-				Effect.succeed({
-					kind: DropItemResultKindEnumSchema.enum.Reject,
-					reason: DropItemRejectedReasonEnumSchema.enum.Blocked,
-					itemId: sourceItemId,
-					targetItemId,
-				}),
-			),
+			Effect.catchTags({
+				ItemNotFoundError: (error) =>
+					Effect.succeed(
+						rejectForItemError({
+							errorItemId: error.itemId,
+							sourceItemId,
+							targetItemId,
+						}),
+					),
+				JobOwnerBusyError: () =>
+					Effect.succeed(
+						rejectBlocked({
+							sourceItemId,
+							targetItemId,
+						}),
+					),
+			}),
 		);
 	}
 
@@ -463,13 +540,6 @@ export const dropItemFx = Effect.fn("dropItemFx")(function* ({
 					targetItemId,
 				}),
 			CrossSpaceBoardOperationError: () =>
-				Effect.succeed({
-					kind: DropItemResultKindEnumSchema.enum.Reject,
-					reason: DropItemRejectedReasonEnumSchema.enum.InvalidTarget,
-					itemId: sourceItemId,
-					targetItemId,
-				}),
-			RuntimeInvalidError: () =>
 				Effect.succeed({
 					kind: DropItemResultKindEnumSchema.enum.Reject,
 					reason: DropItemRejectedReasonEnumSchema.enum.InvalidTarget,

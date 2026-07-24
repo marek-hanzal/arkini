@@ -31,41 +31,39 @@ export namespace modifyRuntimeFx {
  * before one committed transition atomically replaces the previous runtime
  * together with the transient events describing that exact mutation.
  */
-export const modifyRuntimeFx = <Result, Error, Requirements>(
+export const modifyRuntimeFx = Effect.fn("modifyRuntimeFx")(function* <Result, Error, Requirements>(
 	update: modifyRuntimeFx.Update<Result, Error, Requirements>,
-) => {
-	return Effect.gen(function* () {
-		const store = yield* RuntimeStoreFx;
+) {
+	const store = yield* RuntimeStoreFx;
 
-		return yield* store.modifyEffect((transition) => {
-			return update(transition.runtime).pipe(
-				Effect.provideService(RuntimeFx, {
-					read: Effect.succeed(transition.runtime),
-				}),
-				Effect.tap(([, nextRuntime]) => {
-					return assertRuntimeFx({
-						runtime: nextRuntime,
-					});
-				}),
-				Effect.map(([result, nextRuntime, emittedEvents = []]) => {
-					const nextTransition =
-						nextRuntime === transition.runtime && emittedEvents.length === 0
-							? transition
-							: {
-									sequence: transition.sequence + 1,
-									previousRuntime: transition.runtime,
-									runtime: nextRuntime,
-									events: [
-										...emittedEvents,
-									],
-								};
+	return yield* store.modifyEffect((transition) => {
+		return update(transition.runtime).pipe(
+			Effect.provideService(RuntimeFx, {
+				read: Effect.succeed(transition.runtime),
+			}),
+			Effect.tap(([, nextRuntime]) => {
+				return assertRuntimeFx({
+					runtime: nextRuntime,
+				});
+			}),
+			Effect.map(([result, nextRuntime, emittedEvents = []]) => {
+				const nextTransition =
+					nextRuntime === transition.runtime && emittedEvents.length === 0
+						? transition
+						: {
+								sequence: transition.sequence + 1,
+								previousRuntime: transition.runtime,
+								runtime: nextRuntime,
+								events: [
+									...emittedEvents,
+								],
+							};
 
-					return [
-						result,
-						nextTransition,
-					] as const;
-				}),
-			);
-		});
+				return [
+					result,
+					nextTransition,
+				] as const;
+			}),
+		);
 	});
-};
+});

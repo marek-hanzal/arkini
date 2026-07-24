@@ -1,9 +1,9 @@
 import { Effect } from "effect";
 
-import { PlacementFailureReasonEnumSchema } from "~/engine/placement/schema/PlacementFailureReasonEnumSchema";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
 import type { PlacementUnavailableError } from "~/engine/placement/error/PlacementUnavailableError";
+import { isExpectedPlacementDeliveryBlock } from "~/engine/placement/read/isExpectedPlacementDeliveryBlock";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
 import { completeTemporaryItemExpiryTransitionFx } from "./completeTemporaryItemExpiryTransitionFx";
@@ -27,16 +27,6 @@ export namespace attemptTemporaryItemExpiryFx {
 		  };
 }
 
-const isExpectedExpiryBlock = (error: PlacementUnavailableError) => {
-	switch (error.reason) {
-		case PlacementFailureReasonEnumSchema.enum.BoardFull:
-		case PlacementFailureReasonEnumSchema.enum.InventoryFull:
-		case PlacementFailureReasonEnumSchema.enum.ToolbarFull:
-		case PlacementFailureReasonEnumSchema.enum.ItemMaxCount:
-			return true;
-	}
-};
-
 /** Resolves one ready temporary expiry and keeps only expected delivery failures local. */
 export const attemptTemporaryItemExpiryFx = Effect.fn("attemptTemporaryItemExpiryFx")(function* ({
 	itemId,
@@ -55,7 +45,7 @@ export const attemptTemporaryItemExpiryFx = Effect.fn("attemptTemporaryItemExpir
 				}) satisfies attemptTemporaryItemExpiryFx.Result,
 		),
 		Effect.catchTag("PlacementUnavailableError", (error) => {
-			if (!isExpectedExpiryBlock(error)) return Effect.fail(error);
+			if (!isExpectedPlacementDeliveryBlock(error.reason)) return Effect.fail(error);
 			return Effect.succeed({
 				type: "blocked",
 				error,

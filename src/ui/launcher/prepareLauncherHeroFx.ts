@@ -1,4 +1,4 @@
-import { Effect } from "effect";
+import { Effect, Exit } from "effect";
 import { loadArkpackFx } from "~/bridge/arkpack/loadArkpackFx";
 import { readHeroResource } from "~/bridge/arkpack/readHeroResource";
 import { readLastPackageIdFx } from "~/bridge/launcher/readLastPackageIdFx";
@@ -60,8 +60,8 @@ export const prepareLauncherHeroFx = Effect.fn("prepareLauncherHeroFx")(
 					url: candidate.url,
 				}).pipe(
 					Effect.as(candidate),
-					Effect.tapError(() =>
-						candidate.owned
+					Effect.onExit((exit) =>
+						Exit.isFailure(exit) && candidate.owned
 							? Effect.sync(() => URL.revokeObjectURL(candidate.url))
 							: Effect.void,
 					),

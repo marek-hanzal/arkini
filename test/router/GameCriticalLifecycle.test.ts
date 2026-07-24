@@ -32,15 +32,12 @@ const createStartup = (): LauncherStartup => ({
 	getHeroUrl: () => "/hero.png",
 	getSnapshot: () => ({
 		type: "ready",
-		appearance: {
-			theme: "dark",
-			accent: "rose",
-		},
+		appearanceReady: true,
 		builtInPackageId: packageId,
-		cheatsAvailable: false,
 		heroReady: true,
 		splashCompleted: true,
 	}),
+	consumeHydration: () => false,
 	startFx: Effect.void,
 	retryFx: Effect.void,
 	completeSplashFx: Effect.void,

@@ -1,6 +1,7 @@
 import { useNavigate } from "@tanstack/react-router";
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import { useExclusiveAction } from "~/ui/action/useExclusiveAction";
 import { PrimaryButton } from "~/ui/button/Button";
 
 const errorMessage = (error: unknown) => (error instanceof Error ? error.message : String(error));
@@ -9,9 +10,9 @@ const errorMessage = (error: unknown) => (error instanceof Error ? error.message
 export const About = () => {
 	const navigate = useNavigate();
 	const mountedRef = useRef(false);
-	const exitPendingRef = useRef(false);
-	const [exitPending, setExitPending] = useState(false);
 	const [navigationError, setNavigationError] = useState<unknown>();
+	const { active, claim, release } = useExclusiveAction<"exit">();
+	const exitPending = active === "exit";
 
 	useEffect(() => {
 		mountedRef.current = true;
@@ -21,22 +22,23 @@ export const About = () => {
 	}, []);
 
 	const requestMainMenu = useCallback(() => {
-		if (exitPendingRef.current) return;
-		exitPendingRef.current = true;
-		setExitPending(true);
+		if (!claim("exit")) return;
 		setNavigationError(undefined);
-		void navigate({
-			to: "/main-menu",
-		})
-			.catch((error) => {
+		void (async () => {
+			try {
+				await navigate({
+					to: "/main-menu",
+				});
+			} catch (error) {
 				if (mountedRef.current) setNavigationError(error);
-			})
-			.finally(() => {
-				exitPendingRef.current = false;
-				if (mountedRef.current) setExitPending(false);
-			});
+			} finally {
+				release("exit");
+			}
+		})();
 	}, [
+		claim,
 		navigate,
+		release,
 	]);
 
 	useEffect(() => {

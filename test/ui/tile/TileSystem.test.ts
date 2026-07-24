@@ -574,6 +574,41 @@ describe("TileSystemProvider", () => {
 	it.each([
 		"pressed",
 		"dragging",
+	] as const)("cancels a %s interaction without wedging the next press", async (phase) => {
+		const { readSystem } = await renderHarness();
+		await act(async () => {
+			const system = readSystem();
+			expect(system.press(source)).toBe(true);
+			if (phase === "dragging") system.startDrag(source);
+			system.cancel(source.id);
+		});
+
+		expect(readSystem().active).toBeNull();
+		await act(async () => {
+			expect(readSystem().press(source)).toBe(true);
+			readSystem().cancel(source.id);
+		});
+		expect(readSystem().active).toBeNull();
+	});
+
+	it("preserves an awaiting drop when its actor cleanup requests cancellation", async () => {
+		const { readSystem } = await renderHarness();
+		const released = await startDrag(readSystem(), 240, 50);
+		if (released === null) throw new Error("Expected a released drag.");
+
+		await act(async () => readSystem().cancel(source.id));
+
+		expect(readSystem().active).toMatchObject({
+			phase: "awaiting-outcome",
+			generation: released.generation,
+		});
+		await act(async () => readSystem().completeDrop(released.source, released.generation));
+		expect(readSystem().active).toBeNull();
+	});
+
+	it.each([
+		"pressed",
+		"dragging",
 	] as const)("invalidates a %s interaction when a higher owner blocks the scene", async (phase) => {
 		const { readSystem, setInteractionBlocked } = await renderHarness();
 		await act(async () => {

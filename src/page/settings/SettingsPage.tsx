@@ -1,5 +1,6 @@
 import { useNavigate, useRouter } from "@tanstack/react-router";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useExclusiveAction } from "~/ui/action/useExclusiveAction";
 import { MainPageLayout } from "~/ui/main-page/MainPageLayout";
 import { Settings } from "~/ui/settings/Settings";
 
@@ -8,9 +9,9 @@ export const SettingsPage = () => {
 	const router = useRouter();
 	const navigate = useNavigate();
 	const mountedRef = useRef(false);
-	const exitPendingRef = useRef(false);
-	const [exitPending, setExitPending] = useState(false);
 	const [navigationError, setNavigationError] = useState<unknown>();
+	const { active, claim, release } = useExclusiveAction<"exit">();
+	const exitPending = active === "exit";
 
 	useEffect(() => {
 		mountedRef.current = true;
@@ -20,27 +21,33 @@ export const SettingsPage = () => {
 	}, []);
 
 	const goBack = useCallback(() => {
-		if (exitPendingRef.current) return;
-		exitPendingRef.current = true;
-		setExitPending(true);
+		if (!claim("exit")) return;
 		setNavigationError(undefined);
 		if (router.history.canGoBack()) {
-			router.history.back();
+			try {
+				router.history.back();
+			} catch (error) {
+				if (mountedRef.current) setNavigationError(error);
+				release("exit");
+			}
 			return;
 		}
-		void navigate({
-			to: "/main-menu",
-			replace: true,
-		})
-			.catch((error) => {
+		void (async () => {
+			try {
+				await navigate({
+					to: "/main-menu",
+					replace: true,
+				});
+			} catch (error) {
 				if (mountedRef.current) setNavigationError(error);
-			})
-			.finally(() => {
-				exitPendingRef.current = false;
-				if (mountedRef.current) setExitPending(false);
-			});
+			} finally {
+				release("exit");
+			}
+		})();
 	}, [
+		claim,
 		navigate,
+		release,
 		router,
 	]);
 

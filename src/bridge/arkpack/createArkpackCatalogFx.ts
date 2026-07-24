@@ -1,8 +1,9 @@
-import { Effect } from "effect";
+import { Cause, Effect } from "effect";
 import type { ArkpackCatalog } from "~/bridge/arkpack/ArkpackCatalog";
 import { importArkpackFileFx } from "~/bridge/arkpack/importArkpackFileFx";
 import { listArkpacksFx } from "~/bridge/arkpack/listArkpacksFx";
 import { removeArkpackFx } from "~/bridge/arkpack/removeArkpackFx";
+import { invokeExternalCallbackFx } from "~/engine/common/fx/invokeExternalCallbackFx";
 
 /** Creates one shared catalog owner over authoritative Arkpack storage operations. */
 export const createArkpackCatalogFx = Effect.fn("createArkpackCatalogFx")(
@@ -14,18 +15,19 @@ export const createArkpackCatalogFx = Effect.fn("createArkpackCatalogFx")(
 				type: "loading",
 			};
 
-			const publish = (next: ArkpackCatalog.State) => {
-				state = next;
-				for (const listener of Array.from(listeners)) {
-					try {
-						const result = listener();
-						if (result !== undefined)
-							void Promise.resolve(result).catch(() => undefined);
-					} catch {
-						// Catalog observers cannot stop persistent catalog work.
+			const publishArkpackCatalogStateFx = Effect.fn("publishArkpackCatalogStateFx")(
+				function* (next: ArkpackCatalog.State) {
+					state = next;
+					for (const listener of Array.from(listeners)) {
+						yield* invokeExternalCallbackFx({
+							callback: listener,
+							failureMessage:
+								"Arkini catalog observer failed; persistent catalog work remains active.",
+							value: undefined,
+						});
 					}
-				}
-			};
+				},
+			);
 
 			const list = props.listFx ?? listArkpacksFx();
 			const importFile =
@@ -41,54 +43,52 @@ export const createArkpackCatalogFx = Effect.fn("createArkpackCatalogFx")(
 						packageId,
 					}));
 
-			const refreshFx = lock.withPermits(1)(
+			const refreshArkpackCatalogFx = Effect.fn("refreshArkpackCatalogFx")(() =>
 				Effect.gen(function* () {
-					publish({
+					yield* publishArkpackCatalogStateFx({
 						type: "loading",
 					});
 					const arkpacks = yield* list;
-					publish({
+					yield* publishArkpackCatalogStateFx({
 						type: "ready",
 						arkpacks,
 					});
 				}).pipe(
 					Effect.tapError((error) =>
-						Effect.sync(() =>
-							publish({
-								type: "failed",
-								error,
-							}),
-						),
+						publishArkpackCatalogStateFx({
+							type: "failed",
+							error: Cause.originalError(error),
+						}),
 					),
 				),
 			);
+			const refreshFx = lock.withPermits(1)(refreshArkpackCatalogFx());
 
-			const mutateAndRefreshFx = <Value>(
+			const mutateAndRefreshFx = Effect.fn("mutateAndRefreshFx")(function* <Value>(
 				operation: Effect.Effect<Value, unknown>,
-			): Effect.Effect<Value, unknown> =>
-				lock.withPermits(1)(
+			) {
+				return yield* lock.withPermits(1)(
 					Effect.gen(function* () {
-						publish({
+						yield* publishArkpackCatalogStateFx({
 							type: "loading",
 						});
 						const value = yield* operation;
 						const arkpacks = yield* list;
-						publish({
+						yield* publishArkpackCatalogStateFx({
 							type: "ready",
 							arkpacks,
 						});
 						return value;
 					}).pipe(
 						Effect.tapError((error) =>
-							Effect.sync(() =>
-								publish({
-									type: "failed",
-									error,
-								}),
-							),
+							publishArkpackCatalogStateFx({
+								type: "failed",
+								error: Cause.originalError(error),
+							}),
 						),
 					),
 				);
+			});
 
 			return {
 				getSnapshot: () => state,

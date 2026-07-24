@@ -289,6 +289,9 @@ export const useTileInteractionController = ({
 					{
 						phase: "dragging",
 					},
+					() => publishActive(null),
+				)
+				.with(
 					{
 						phase: "awaiting-outcome",
 					},

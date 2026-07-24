@@ -4,6 +4,7 @@ import { describe, expect, it, vi } from "vitest";
 
 import { CriticalGameLifecycleError } from "~/bridge/game/CriticalGameLifecycleError";
 import type { Game } from "~/bridge/game/Game";
+import { acquireGameEngineResource } from "~/bridge/game/acquireGameEngineResource";
 import { getCachedGameEngineResource } from "~/bridge/game/getCachedGameEngineResource";
 import { gameEngineQueryKey } from "~/bridge/game/gameEngineQueryKey";
 import { gameEngineQueryOptions } from "~/bridge/game/gameEngineQueryOptions";
@@ -126,6 +127,167 @@ describe("gameEngineQueryOptions", () => {
 
 		expect(await joined).toBe(await acquisition);
 		expect(create).toHaveBeenCalledOnce();
+	});
+
+	it("lets controlled close adopt a provisional route result before that route aborts", async () => {
+		let resolveCreate!: (game: Game) => void;
+		const creation = new Promise<Game>((resolve) => {
+			resolveCreate = resolve;
+		});
+		const discard = vi.fn();
+		const game = createGame("package:close-pending", {
+			disposeWithoutSaveFx: Effect.sync(discard),
+		});
+		const client = createClient();
+		const controller = new AbortController();
+		const acquisition = acquireGameEngineResource({
+			packageId: "package:close-pending",
+			queryClient: client,
+			signal: controller.signal,
+			create: () => creation,
+			rememberPackage: () => Promise.resolve(),
+		});
+		const joined = waitForGameEngineResource(client);
+		resolveCreate(game);
+
+		const resource = await joined;
+		expect(resource).not.toBeNull();
+		await acquisition;
+		controller.abort();
+
+		expect(discard).not.toHaveBeenCalled();
+		expect(getCachedGameEngineResource(client)).toBe(resource);
+	});
+
+	it("discards a late-created provisional Game after its route owner aborts", async () => {
+		let resolveCreate!: (game: Game) => void;
+		const creation = new Promise<Game>((resolve) => {
+			resolveCreate = resolve;
+		});
+		const discard = vi.fn();
+		const game = createGame("package:aborted", {
+			disposeWithoutSaveFx: Effect.sync(discard),
+		});
+		const create = vi.fn(() => creation);
+		const client = createClient();
+		const controller = new AbortController();
+		const acquisition = acquireGameEngineResource({
+			packageId: "package:aborted",
+			queryClient: client,
+			signal: controller.signal,
+			create,
+			rememberPackage: () => Promise.resolve(),
+		});
+		await vi.waitFor(() => expect(create).toHaveBeenCalledOnce());
+
+		controller.abort();
+		resolveCreate(game);
+
+		await expect(acquisition).rejects.toMatchObject({
+			name: "AbortError",
+		});
+		await vi.waitFor(() => expect(discard).toHaveBeenCalledOnce());
+		await vi.waitFor(() => expect(client.getQueryState(gameEngineQueryKey)).toBeUndefined());
+		expect(getCachedGameEngineResource(client)).toBeNull();
+	});
+
+	it("keeps a failed abort cleanup fatal and blocks every successor acquisition", async () => {
+		let resolveCreate!: (game: Game) => void;
+		const creation = new Promise<Game>((resolve) => {
+			resolveCreate = resolve;
+		});
+		const disposalFailure = new Error("provisional disposal failed");
+		const firstGame = createGame("package:first", {
+			disposeWithoutSaveFx: Effect.fail(disposalFailure),
+		});
+		const secondGame = createGame("package:second");
+		const create = vi.fn((selectedPackageId: string) =>
+			selectedPackageId === "package:first" ? creation : Promise.resolve(secondGame),
+		);
+		const client = createClient();
+		const controller = new AbortController();
+		const first = acquireGameEngineResource({
+			packageId: "package:first",
+			queryClient: client,
+			signal: controller.signal,
+			create,
+			rememberPackage: () => Promise.resolve(),
+		});
+		await vi.waitFor(() =>
+			expect(create).toHaveBeenCalledWith("package:first", expect.anything()),
+		);
+
+		controller.abort();
+		resolveCreate(firstGame);
+		await expect(first).rejects.toMatchObject({
+			name: "AbortError",
+		});
+		await vi.waitFor(() =>
+			expect(client.getQueryState(gameEngineQueryKey)?.error).toBeInstanceOf(
+				CriticalGameLifecycleError,
+			),
+		);
+
+		const successor = acquireGameEngineResource({
+			packageId: "package:second",
+			queryClient: client,
+			create,
+			rememberPackage: () => Promise.resolve(),
+		});
+		await expect(successor).rejects.toBeInstanceOf(CriticalGameLifecycleError);
+		await expect(successor).rejects.toMatchObject({
+			operation: "engine-ownership",
+		});
+		await expect(successor).rejects.toThrow("provisional disposal failed");
+		expect(create).toHaveBeenCalledOnce();
+		expect(getCachedGameEngineResource(client)).toBeNull();
+	});
+
+	it("cancels and fully discards a different-package acquisition before creating its successor", async () => {
+		let resolveFirst!: (game: Game) => void;
+		const firstCreation = new Promise<Game>((resolve) => {
+			resolveFirst = resolve;
+		});
+		const discardFirst = vi.fn();
+		const firstGame = createGame("package:first", {
+			disposeWithoutSaveFx: Effect.sync(discardFirst),
+		});
+		const secondGame = createGame("package:second");
+		const create = vi.fn((selectedPackageId: string) =>
+			selectedPackageId === "package:first" ? firstCreation : Promise.resolve(secondGame),
+		);
+		const client = createClient();
+		const first = acquireGameEngineResource({
+			packageId: "package:first",
+			queryClient: client,
+			create,
+			rememberPackage: () => Promise.resolve(),
+		});
+		await vi.waitFor(() =>
+			expect(create).toHaveBeenCalledWith("package:first", expect.anything()),
+		);
+
+		const second = acquireGameEngineResource({
+			packageId: "package:second",
+			queryClient: client,
+			create,
+			rememberPackage: () => Promise.resolve(),
+		});
+		expect(create).toHaveBeenCalledOnce();
+		resolveFirst(firstGame);
+
+		await expect(first).rejects.toMatchObject({
+			name: "AbortError",
+		});
+		const secondLease = await second;
+		expect(getCachedGameEngineResource(client)).toBeNull();
+		const secondResource = secondLease.adopt();
+
+		expect(discardFirst).toHaveBeenCalledOnce();
+		expect(create).toHaveBeenCalledTimes(2);
+		expect(create).toHaveBeenLastCalledWith("package:second", expect.anything());
+		expect(secondResource.game.arkpack.packageId).toBe("package:second");
+		expect(getCachedGameEngineResource(client)).toBe(secondResource);
 	});
 
 	it("treats a failed pending creation as no live resource", async () => {

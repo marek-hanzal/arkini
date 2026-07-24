@@ -11,6 +11,17 @@ export namespace ValidateCommand {
 	}
 }
 
+const runValidateCommandFx = Effect.fn("runValidateCommandFx")(function* ({
+	input,
+}: ValidateCommand.Props) {
+	const result = yield* compileGameDirectoryFx({
+		input,
+	});
+	yield* renderGameDiagnosticsFx(result.diagnostics);
+	yield* assertGameConfigValidFx(result);
+	yield* Console.log(`Validated ${input}.`);
+});
+
 /** CLI command that runs the production completed-game compiler and validators. */
 export const ValidateCommand = ({ input }: ValidateCommand.Props) =>
 	Command.make(
@@ -21,13 +32,8 @@ export const ValidateCommand = ({ input }: ValidateCommand.Props) =>
 			}).pipe(Args.withDefault(input)),
 		},
 		({ input }) =>
-			Effect.gen(function* () {
-				const result = yield* compileGameDirectoryFx({
-					input,
-				});
-				yield* renderGameDiagnosticsFx(result.diagnostics);
-				yield* assertGameConfigValidFx(result);
-				yield* Console.log(`Validated ${input}.`);
+			runValidateCommandFx({
+				input,
 			}),
 	).pipe(
 		Command.withDescription(

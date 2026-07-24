@@ -1,4 +1,4 @@
-import { Effect } from "effect";
+import { Effect, Either } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~/engine/game/fx/useGameFx";
@@ -151,6 +151,21 @@ const replaceMergeConfig = GameConfigSchema.parse({
 	},
 });
 
+const invalidMergeResultScopeConfig = GameConfigSchema.parse({
+	...replaceMergeConfig,
+	meta: {
+		...replaceMergeConfig.meta,
+		id: "game:drop-item-invalid-merge-result-scope",
+	},
+	items: {
+		...replaceMergeConfig.items,
+		mud: {
+			...replaceMergeConfig.items.mud,
+			scope: "inventory",
+		},
+	},
+});
+
 const sourceLocation = {
 	scope: "board" as const,
 	space: 0,
@@ -289,6 +304,48 @@ describe("readDropItemPreviewFx", () => {
 });
 
 describe("dropItemFx", () => {
+	it("surfaces authored merge invariant failures instead of reporting a product rejection", () => {
+		const result = run(
+			Effect.gen(function* () {
+				const source = yield* spawnItemFx({
+					id: "runtime:water",
+					itemId: "water",
+					location: sourceLocation,
+					quantity: 1,
+				});
+				const target = yield* spawnItemFx({
+					id: "runtime:stone",
+					itemId: "stone",
+					location: occupiedLocation,
+					quantity: 1,
+				});
+				return yield* Effect.either(
+					dropItemFx({
+						sourceItemId: source.id,
+						sourceRevision: source.revision,
+						sourceLocation,
+						target: {
+							kind: "slot",
+							location: occupiedLocation,
+							occupant: {
+								itemId: target.id,
+								revision: target.revision,
+							},
+						},
+					}),
+				);
+			}),
+			invalidMergeResultScopeConfig,
+		);
+
+		expect(Either.isLeft(result)).toBe(true);
+		if (Either.isLeft(result)) {
+			expect(result.left).toMatchObject({
+				_tag: "RuntimeInvalidError",
+			});
+		}
+	});
+
 	it("moves one exact source to an empty slot and returns explicit identities", () => {
 		const result = run(
 			Effect.gen(function* () {

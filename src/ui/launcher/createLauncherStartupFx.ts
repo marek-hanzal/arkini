@@ -1,4 +1,4 @@
-import { Effect } from "effect";
+import { Effect, Fiber, Option } from "effect";
 import { readAppearanceAccentFx } from "~/bridge/appearance/readAppearanceAccentFx";
 import { readAppearanceThemeFx } from "~/bridge/appearance/readAppearanceThemeFx";
 import { readCheatAvailabilityFx } from "~/bridge/cheat/readCheatAvailabilityFx";
@@ -8,22 +8,28 @@ import { prepareLauncherHeroFx } from "~/ui/launcher/prepareLauncherHeroFx";
 
 /** Creates the one renderer-session startup bootstrap and splash completion owner. */
 export const createLauncherStartupFx = Effect.fn("createLauncherStartupFx")(
-	({ catalog, heroUrl, bootstrapFx }: LauncherStartup.Props) =>
+	({ awaitPreviousShutdown, catalog, heroUrl, bootstrapFx }: LauncherStartup.Props) =>
 		Effect.gen(function* () {
 			const listeners = new Set<() => void | PromiseLike<void>>();
 			const lock = yield* Effect.makeSemaphore(1);
 			let started = false;
+			let disposed = false;
+			let activeFiber: Fiber.RuntimeFiber<void, unknown> | undefined;
 			let currentHeroUrl = heroUrl;
 			let ownedHeroUrl: string | undefined;
+			let appearanceHydrationQueued = false;
+			let cheatHydrationQueued = false;
+			let pendingAppearance: LauncherStartup.Appearance | undefined;
+			let pendingCheatsAvailable: boolean | undefined;
 			let state: LauncherStartup.State = {
 				type: "loading",
-				appearance: null,
-				cheatsAvailable: null,
+				appearanceReady: false,
 				heroReady: false,
 				splashCompleted: false,
 			};
 
 			const publish = (next: LauncherStartup.State) => {
+				if (disposed) return;
 				state = next;
 				for (const listener of Array.from(listeners)) {
 					try {
@@ -35,6 +41,22 @@ export const createLauncherStartupFx = Effect.fn("createLauncherStartupFx")(
 					}
 				}
 			};
+			const queueAppearanceHydration = (appearance: LauncherStartup.Appearance) => {
+				if (appearanceHydrationQueued) return;
+				appearanceHydrationQueued = true;
+				pendingAppearance = appearance;
+				publish({
+					...state,
+				});
+			};
+			const queueCheatHydration = (cheatsAvailable: boolean) => {
+				if (cheatHydrationQueued) return;
+				cheatHydrationQueued = true;
+				pendingCheatsAvailable = cheatsAvailable;
+				publish({
+					...state,
+				});
+			};
 
 			const appearanceFx = Effect.all(
 				{
@@ -45,43 +67,36 @@ export const createLauncherStartupFx = Effect.fn("createLauncherStartupFx")(
 					concurrency: "unbounded",
 				},
 			).pipe(
-				Effect.tap((appearance) =>
-					Effect.sync(() =>
-						publish({
-							type: "loading",
-							appearance,
-							cheatsAvailable: state.cheatsAvailable,
-							heroReady: state.heroReady,
-							splashCompleted: state.splashCompleted,
-						}),
-					),
-				),
+				Effect.tap((appearance) => Effect.sync(() => queueAppearanceHydration(appearance))),
 			);
 			const cheatAvailabilityFx = readCheatAvailabilityFx().pipe(
 				Effect.tap((cheatsAvailable) =>
-					Effect.sync(() =>
-						publish({
-							...state,
-							cheatsAvailable,
-						}),
-					),
+					Effect.sync(() => queueCheatHydration(cheatsAvailable)),
 				),
 			);
-			const heroFx = prepareLauncherHeroFx({
-				fallbackUrl: heroUrl,
-			}).pipe(
-				Effect.tap((candidate) =>
-					Effect.sync(() => {
-						if (ownedHeroUrl !== undefined && ownedHeroUrl !== candidate.url) {
-							URL.revokeObjectURL(ownedHeroUrl);
-						}
-						ownedHeroUrl = candidate.owned ? candidate.url : undefined;
-						currentHeroUrl = candidate.url;
-						publish({
-							...state,
-							heroReady: true,
-						});
+			const heroFx = Effect.uninterruptibleMask((restore) =>
+				restore(
+					prepareLauncherHeroFx({
+						fallbackUrl: heroUrl,
 					}),
+				).pipe(
+					Effect.flatMap((candidate) =>
+						Effect.sync(() => {
+							if (disposed) {
+								if (candidate.owned) URL.revokeObjectURL(candidate.url);
+								return;
+							}
+							if (ownedHeroUrl !== undefined && ownedHeroUrl !== candidate.url) {
+								URL.revokeObjectURL(ownedHeroUrl);
+							}
+							ownedHeroUrl = candidate.owned ? candidate.url : undefined;
+							currentHeroUrl = candidate.url;
+							publish({
+								...state,
+								heroReady: true,
+							});
+						}),
+					),
 				),
 			);
 			const catalogFx = catalog.refreshFx.pipe(
@@ -121,21 +136,29 @@ export const createLauncherStartupFx = Effect.fn("createLauncherStartupFx")(
 				})),
 			);
 			const authoritativeBootstrapFx = bootstrapFx ?? defaultBootstrapFx;
+			const awaitPreviousShutdownFx =
+				awaitPreviousShutdown === undefined
+					? Effect.void
+					: Effect.tryPromise({
+							try: () => awaitPreviousShutdown,
+							catch: (cause) => cause,
+						});
 
 			const executeFx = Effect.gen(function* () {
 				publish({
 					type: "loading",
-					appearance: state.appearance,
-					cheatsAvailable: state.cheatsAvailable,
+					appearanceReady: state.appearanceReady,
 					heroReady: state.heroReady,
 					splashCompleted: state.splashCompleted,
 				});
+				yield* awaitPreviousShutdownFx;
 				const result = yield* authoritativeBootstrapFx;
+				queueAppearanceHydration(result.appearance);
+				queueCheatHydration(result.cheatsAvailable);
 				publish({
 					type: "ready",
-					appearance: result.appearance,
+					appearanceReady: state.appearanceReady,
 					builtInPackageId: result.builtInPackageId,
-					cheatsAvailable: result.cheatsAvailable,
 					heroReady: true,
 					splashCompleted: state.splashCompleted,
 				});
@@ -144,8 +167,7 @@ export const createLauncherStartupFx = Effect.fn("createLauncherStartupFx")(
 					Effect.sync(() =>
 						publish({
 							type: "failed",
-							appearance: state.appearance,
-							cheatsAvailable: state.cheatsAvailable,
+							appearanceReady: state.appearanceReady,
 							error,
 							heroReady: state.heroReady,
 							splashCompleted: state.splashCompleted,
@@ -153,31 +175,112 @@ export const createLauncherStartupFx = Effect.fn("createLauncherStartupFx")(
 					),
 				),
 			);
+			const runAttemptFx = Effect.fn("runLauncherStartupAttemptFx")(function* (
+				initial: boolean,
+			) {
+				const fiber = yield* lock.withPermits(1)(
+					Effect.gen(function* () {
+						if (disposed) {
+							return yield* Effect.fail(new Error("Launcher startup is disposed."));
+						}
+						if (activeFiber !== undefined) {
+							const activeExit = yield* Fiber.poll(activeFiber);
+							if (Option.isNone(activeExit)) return activeFiber;
+							activeFiber = undefined;
+						}
+						if (initial && started) return undefined;
+						if (initial) started = true;
+						activeFiber = yield* Effect.forkDaemon(executeFx);
+						return activeFiber;
+					}),
+				);
+				if (fiber === undefined) return;
+				return yield* Fiber.join(fiber).pipe(
+					Effect.ensuring(
+						Fiber.poll(fiber).pipe(
+							Effect.flatMap((exit) =>
+								Option.isSome(exit)
+									? lock.withPermits(1)(
+											Effect.sync(() => {
+												if (activeFiber === fiber) activeFiber = undefined;
+											}),
+										)
+									: Effect.void,
+							),
+						),
+					),
+				);
+			});
+			const disposeFx = Effect.uninterruptible(
+				lock.withPermits(1)(
+					Effect.gen(function* () {
+						if (disposed) return;
+						disposed = true;
+						const fiber = activeFiber;
+						activeFiber = undefined;
+						if (fiber !== undefined) yield* Fiber.interrupt(fiber);
+						if (ownedHeroUrl !== undefined) URL.revokeObjectURL(ownedHeroUrl);
+						ownedHeroUrl = undefined;
+						pendingAppearance = undefined;
+						pendingCheatsAvailable = undefined;
+						currentHeroUrl = heroUrl;
+						listeners.clear();
+					}),
+				),
+			);
 
 			return {
 				getSnapshot: () => state,
 				getHeroUrl: () => currentHeroUrl,
-				startFx: lock.withPermits(1)(
-					Effect.gen(function* () {
-						if (started) return;
-						started = true;
-						yield* executeFx;
-					}),
-				),
-				retryFx: lock.withPermits(1)(executeFx),
+				consumeHydration: (consume) => {
+					if (
+						disposed ||
+						(pendingAppearance === undefined && pendingCheatsAvailable === undefined)
+					) {
+						return false;
+					}
+					const appearance = pendingAppearance;
+					const cheatsAvailable = pendingCheatsAvailable;
+					pendingAppearance = undefined;
+					pendingCheatsAvailable = undefined;
+					try {
+						consume({
+							...(appearance === undefined
+								? {}
+								: {
+										appearance,
+									}),
+							...(cheatsAvailable === undefined
+								? {}
+								: {
+										cheatsAvailable,
+									}),
+						});
+					} catch (error) {
+						pendingAppearance = appearance;
+						pendingCheatsAvailable = cheatsAvailable;
+						throw error;
+					}
+					if (appearance !== undefined) {
+						publish({
+							...state,
+							appearanceReady: true,
+						});
+					}
+					return true;
+				},
+				startFx: runAttemptFx(true),
+				retryFx: runAttemptFx(false),
 				completeSplashFx: Effect.sync(() => {
-					if (state.splashCompleted) return;
+					if (disposed || state.splashCompleted) return;
 					publish({
 						...state,
 						splashCompleted: true,
 					});
 				}),
-				disposeFx: Effect.sync(() => {
-					if (ownedHeroUrl !== undefined) URL.revokeObjectURL(ownedHeroUrl);
-					ownedHeroUrl = undefined;
-					currentHeroUrl = heroUrl;
-				}),
+				disposeFx,
 				subscribe: (listener) => {
+					if (disposed) return () => undefined;
 					listeners.add(listener);
 					return () => listeners.delete(listener);
 				},

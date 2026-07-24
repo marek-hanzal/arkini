@@ -11,12 +11,8 @@ import { resolveRouteViewTransitionTypes } from "~/ui/navigation/resolveRouteVie
 const createStartup = (): LauncherStartup => {
 	const state: LauncherStartup.State = {
 		type: "ready",
-		appearance: {
-			theme: "dark",
-			accent: "rose",
-		},
+		appearanceReady: true,
 		builtInPackageId: "built-in",
-		cheatsAvailable: false,
 		heroReady: true,
 		splashCompleted: true,
 	};
@@ -24,6 +20,7 @@ const createStartup = (): LauncherStartup => {
 	return {
 		getSnapshot: () => state,
 		getHeroUrl: () => "/hero.png",
+		consumeHydration: () => false,
 		startFx: Effect.void,
 		retryFx: Effect.void,
 		completeSplashFx: Effect.void,

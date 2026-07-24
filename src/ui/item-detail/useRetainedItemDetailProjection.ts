@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useLayoutEffect, useRef } from "react";
 
 /** Retains the last authoritative projection for one exact target after that target disappears. */
 export const useRetainedItemDetailProjection = <Value>({
@@ -17,15 +17,21 @@ export const useRetainedItemDetailProjection = <Value>({
 		  }
 		| undefined
 	>(undefined);
-	if (retained.current?.targetKey !== targetKey) retained.current = undefined;
-	if (available) {
+	useLayoutEffect(() => {
+		if (!available) return;
 		retained.current = {
 			targetKey,
 			value,
 		};
-	}
+	}, [
+		available,
+		targetKey,
+		value,
+	]);
+	const committed =
+		retained.current?.targetKey === targetKey ? retained.current.value : undefined;
 	return {
-		value: available ? value : retained.current?.value,
+		value: available ? value : committed,
 		stale: !available,
 	};
 };

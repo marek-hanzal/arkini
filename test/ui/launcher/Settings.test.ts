@@ -301,6 +301,30 @@ describe("Settings", () => {
 		await vi.waitFor(() => expect(router.state.location.pathname).toBe("/main-menu"));
 	});
 
+	it("deduplicates same-tick exits and releases the action after rejected navigation", async () => {
+		const { container, router } = await renderSettings([
+			"/settings",
+		]);
+		const navigate = vi
+			.spyOn(router, "navigate")
+			.mockRejectedValueOnce(new Error("settings navigation rejected"));
+		const button = buttonByText(container, "Back");
+
+		await act(async () => {
+			button.click();
+			button.click();
+			await Promise.resolve();
+		});
+
+		expect(navigate).toHaveBeenCalledTimes(1);
+		expect(container.textContent).toContain("Navigation failed: settings navigation rejected");
+		expect(button.disabled).toBe(false);
+
+		await act(async () => button.click());
+		await vi.waitFor(() => expect(router.state.location.pathname).toBe("/main-menu"));
+		expect(navigate).toHaveBeenCalledTimes(2);
+	});
+
 	it("toggles application-wide Cheat tools without an active Game", async () => {
 		const { container, writeCheatAvailability, cheatAvailability } = await renderSettings([
 			"/settings",
@@ -312,6 +336,31 @@ describe("Settings", () => {
 		await act(async () => toggle.click());
 		await vi.waitFor(() => expect(writeCheatAvailability).toHaveBeenCalledWith(true));
 		await vi.waitFor(() => expect(cheatAvailability.getSnapshot()).toBe(true));
+	});
+
+	it("admits only one settings mutation before React publishes the pending render", async () => {
+		const { container, deferred, write, writeCheatAvailability } = await renderSettings([
+			"/settings",
+		]);
+		const light = Array.from(
+			container.querySelectorAll<HTMLInputElement>('input[name="appearance-theme"]'),
+		).find((input) => input.value === "light");
+		const toggle = container.querySelector<HTMLInputElement>(
+			'[data-ui="SettingsCheatAvailability"] input[type="checkbox"]',
+		);
+		if (light === undefined || toggle === null) throw new Error("Expected settings controls.");
+
+		await act(async () => {
+			light.click();
+			toggle.click();
+		});
+		expect(write).toHaveBeenCalledOnce();
+		expect(writeCheatAvailability).not.toHaveBeenCalled();
+
+		await act(async () => deferred.resolve());
+		await vi.waitFor(() => expect(container.textContent).toContain("Theme saved."));
+		await act(async () => toggle.click());
+		await vi.waitFor(() => expect(writeCheatAvailability).toHaveBeenCalledOnce());
 	});
 
 	it("toggles application-wide Cheat tools without mutating the cached Game", async () => {

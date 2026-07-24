@@ -6,6 +6,7 @@ import { useSetAppearanceThemeMutation } from "~/ui/appearance/mutation/useSetAp
 import { useAppearance } from "~/ui/appearance/useAppearance";
 import { useCheatAvailability } from "~/ui/cheat-availability/useCheatAvailability";
 import { useSetCheatAvailabilityMutation } from "~/ui/cheat-availability/useSetCheatAvailabilityMutation";
+import { useExclusiveAction } from "~/ui/action/useExclusiveAction";
 
 export namespace useSettingsModel {
 	export type Status =
@@ -35,6 +36,8 @@ export namespace useSettingsModel {
 
 const errorMessage = (error: unknown) => (error instanceof Error ? error.message : String(error));
 
+type SettingsAction = "cheat-tools" | "theme";
+
 /** Owns application settings mutations and the one Escape lifecycle for the settings surface. */
 export const useSettingsModel = ({
 	exitPending,
@@ -49,7 +52,8 @@ export const useSettingsModel = ({
 	const cheatAvailability = useCheatAvailability();
 	const setTheme = useSetAppearanceThemeMutation();
 	const setCheatAvailability = useSetCheatAvailabilityMutation();
-	const blocked = setTheme.isPending || setCheatAvailability.isPending || exitPending;
+	const { active, claim, release } = useExclusiveAction<SettingsAction>();
+	const blocked = active !== null || exitPending;
 
 	useEffect(() => {
 		const onKeyDown = (event: KeyboardEvent) => {
@@ -65,17 +69,15 @@ export const useSettingsModel = ({
 	]);
 
 	const mutationStatus = match([
-		setCheatAvailability.isPending,
+		active,
 		setCheatAvailability.isError,
 		setCheatAvailability.isSuccess,
-		setTheme.isPending,
 		setTheme.isError,
 		setTheme.isSuccess,
 	] as const)
 		.with(
 			[
-				true,
-				P._,
+				"cheat-tools",
 				P._,
 				P._,
 				P._,
@@ -87,9 +89,8 @@ export const useSettingsModel = ({
 		)
 		.with(
 			[
-				false,
+				null,
 				true,
-				P._,
 				P._,
 				P._,
 				P._,
@@ -102,10 +103,9 @@ export const useSettingsModel = ({
 		)
 		.with(
 			[
-				false,
-				false,
+				"theme",
 				P._,
-				true,
+				P._,
 				P._,
 				P._,
 			],
@@ -115,10 +115,9 @@ export const useSettingsModel = ({
 		)
 		.with(
 			[
-				false,
+				null,
 				false,
 				P._,
-				false,
 				true,
 				P._,
 			],
@@ -130,11 +129,10 @@ export const useSettingsModel = ({
 		)
 		.with(
 			[
-				false,
+				null,
 				false,
 				true,
-				false,
-				false,
+				P._,
 				P._,
 			],
 			(): useSettingsModel.Status => ({
@@ -144,8 +142,7 @@ export const useSettingsModel = ({
 		)
 		.with(
 			[
-				false,
-				false,
+				null,
 				false,
 				false,
 				false,
@@ -177,7 +174,19 @@ export const useSettingsModel = ({
 		exitPending,
 		status,
 		theme: appearance.theme,
-		selectTheme: (theme: AppearanceTheme) => setTheme.mutate(theme),
-		setCheatToolsAvailable: (available: boolean) => setCheatAvailability.mutate(available),
+		selectTheme: (theme: AppearanceTheme) => {
+			if (!claim("theme")) return;
+			setCheatAvailability.reset();
+			setTheme.mutate(theme, {
+				onSettled: () => release("theme"),
+			});
+		},
+		setCheatToolsAvailable: (available: boolean) => {
+			if (!claim("cheat-tools")) return;
+			setTheme.reset();
+			setCheatAvailability.mutate(available, {
+				onSettled: () => release("cheat-tools"),
+			});
+		},
 	};
 };

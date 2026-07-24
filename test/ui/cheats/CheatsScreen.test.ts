@@ -44,16 +44,10 @@ vi.mock("~/ui/cheat-availability/useCheatAvailability", () => ({
 		available: true,
 	}),
 }));
-vi.mock("~/ui/cheats/Cheats", async () => {
-	const { createElement, useEffect, useSyncExternalStore } = await import("react");
+vi.mock("~/ui/cheats/useCheatsModel", async () => {
+	const { useSyncExternalStore } = await import("react");
 	return {
-		Cheats: ({
-			onBack,
-			onBlockedChange,
-		}: {
-			readonly onBack: () => void;
-			readonly onBlockedChange?: (blocked: boolean) => void;
-		}) => {
+		useCheatsModel: () => {
 			const blocked = useSyncExternalStore(
 				(listener) => {
 					state.listeners.add(listener);
@@ -62,16 +56,35 @@ vi.mock("~/ui/cheats/Cheats", async () => {
 				() => state.blocked,
 				() => state.blocked,
 			);
-			useEffect(() => {
-				onBlockedChange?.(blocked);
-			}, [
+			return {
 				blocked,
-				onBlockedChange,
-			]);
+				enabled: true,
+				instantGameplay: false,
+				status: {
+					kind: "idle" as const,
+				},
+				setEnabled: vi.fn(),
+				setInstantGameplay: vi.fn(),
+			};
+		},
+	};
+});
+vi.mock("~/ui/cheats/Cheats", async () => {
+	const { createElement } = await import("react");
+	return {
+		Cheats: ({
+			model,
+			onBack,
+		}: {
+			readonly model: {
+				readonly blocked: boolean;
+			};
+			readonly onBack: () => void;
+		}) => {
 			return createElement(
 				"button",
 				{
-					disabled: blocked,
+					disabled: model.blocked,
 					onClick: onBack,
 					type: "button",
 				},

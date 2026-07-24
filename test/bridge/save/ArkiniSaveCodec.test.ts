@@ -27,6 +27,17 @@ describe("Arkini save codec", () => {
 		});
 	});
 
+	it("keeps canonical-state encoder failures in the defect channel", () => {
+		const invalidCanonicalState = {
+			...state,
+			currentSpace: 1n,
+		} as unknown as StateSchema.Type;
+
+		expect(() =>
+			Effect.runSync(Effect.either(encodeArkiniSaveFx(invalidCanonicalState))),
+		).toThrow();
+	});
+
 	it.each([
 		{
 			namespace: "other",

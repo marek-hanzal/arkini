@@ -75,19 +75,22 @@ export const createTrustedRendererFx = Effect.fn("createTrustedRendererFx")(
 						isTrustedUrl(frame.url)
 					);
 				};
-				const assertTrustedIpcSenderFx = (event: IpcMainEvent | IpcMainInvokeEvent) =>
-					isTrustedIpcSender(event)
-						? Effect.void
-						: Effect.fail(
-								new ElectronMainError({
-									operation: "authorize privileged IPC from the Arkini renderer",
-									cause: {
-										senderId: event.sender.id,
-										senderFrameUrl: event.senderFrame?.url ?? null,
-									},
-								}),
-							);
-				const registerWindowFx = (window: BrowserWindow) =>
+				const assertTrustedIpcSenderFx = Effect.fn("assertTrustedIpcSenderFx")(
+					(event: IpcMainEvent | IpcMainInvokeEvent) =>
+						isTrustedIpcSender(event)
+							? Effect.void
+							: Effect.fail(
+									new ElectronMainError({
+										operation:
+											"authorize privileged IPC from the Arkini renderer",
+										cause: {
+											senderId: event.sender.id,
+											senderFrameUrl: event.senderFrame?.url ?? null,
+										},
+									}),
+								),
+				);
+				const registerWindowFx = Effect.fn("registerWindowFx")((window: BrowserWindow) =>
 					Effect.sync(() => {
 						const { webContents } = window;
 						const { session } = webContents;
@@ -144,7 +147,8 @@ export const createTrustedRendererFx = Effect.fn("createTrustedRendererFx")(
 							session.setPermissionCheckHandler(null);
 							session.setPermissionRequestHandler(null);
 						});
-					});
+					}),
+				);
 
 				return {
 					developmentRendererUrl,

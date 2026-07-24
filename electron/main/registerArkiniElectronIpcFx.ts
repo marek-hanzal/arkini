@@ -46,25 +46,29 @@ export const registerArkiniElectronIpcFx = Effect.fn("registerArkiniElectronIpcF
 						window.setBackgroundColor(color);
 					}
 				};
-				const runAuthorizedFx = <Value, Error>(
-					event: IpcMainInvokeEvent,
-					operation: Effect.Effect<Value, Error>,
-				) =>
-					ElectronMainRuntime.runPromise(
+				const authorizeIpcOperationFx = Effect.fn("authorizeIpcOperationFx")(
+					<Value, Error>(
+						event: IpcMainInvokeEvent,
+						operation: Effect.Effect<Value, Error>,
+					) =>
 						trustedRenderer
 							.assertTrustedIpcSenderFx(event)
 							.pipe(Effect.zipRight(operation)),
-					);
+				);
+				const runAuthorized = <Value, Error>(
+					event: IpcMainInvokeEvent,
+					operation: Effect.Effect<Value, Error>,
+				) => ElectronMainRuntime.runPromise(authorizeIpcOperationFx(event, operation));
 
 				nativeTheme.on("updated", synchronizeWindowBackgrounds);
 				ipcMain.handle(ArkiniElectronApi.channels.appearanceRead, (event) =>
-					runAuthorizedFx(
+					runAuthorized(
 						event,
 						Effect.sync(() => nativeTheme.themeSource),
 					),
 				);
 				ipcMain.handle(ArkiniElectronApi.channels.appearanceWrite, (event, theme) =>
-					runAuthorizedFx(
+					runAuthorized(
 						event,
 						appearancePreferences.writeThemeFx(theme).pipe(
 							Effect.tap(() =>
@@ -77,58 +81,58 @@ export const registerArkiniElectronIpcFx = Effect.fn("registerArkiniElectronIpcF
 					),
 				);
 				ipcMain.handle(ArkiniElectronApi.channels.appearanceAccentRead, (event) =>
-					runAuthorizedFx(event, appearancePreferences.readAccentFx),
+					runAuthorized(event, appearancePreferences.readAccentFx),
 				);
 				ipcMain.handle(ArkiniElectronApi.channels.appearanceAccentWrite, (event, accent) =>
-					runAuthorizedFx(event, appearancePreferences.writeAccentFx(accent)),
+					runAuthorized(event, appearancePreferences.writeAccentFx(accent)),
 				);
 				ipcMain.handle(ArkiniElectronApi.channels.cheatAvailabilityRead, (event) =>
-					runAuthorizedFx(event, cheatPreferences.readAvailableFx),
+					runAuthorized(event, cheatPreferences.readAvailableFx),
 				);
 				ipcMain.handle(
 					ArkiniElectronApi.channels.cheatAvailabilityWrite,
 					(event, available) =>
-						runAuthorizedFx(event, cheatPreferences.writeAvailableFx(available)),
+						runAuthorized(event, cheatPreferences.writeAvailableFx(available)),
 				);
 				ipcMain.handle(ArkiniElectronApi.channels.launcherLastPackageIdRead, (event) =>
-					runAuthorizedFx(event, launcherPreferences.readLastPackageIdFx),
+					runAuthorized(event, launcherPreferences.readLastPackageIdFx),
 				);
 				ipcMain.handle(
 					ArkiniElectronApi.channels.launcherLastPackageIdWrite,
 					(event, packageId) =>
-						runAuthorizedFx(event, launcherPreferences.writeLastPackageIdFx(packageId)),
+						runAuthorized(event, launcherPreferences.writeLastPackageIdFx(packageId)),
 				);
 
 				ipcMain.handle(ArkiniElectronApi.channels.arkpackList, (event) =>
-					runAuthorizedFx(event, arkpacks.listFx),
+					runAuthorized(event, arkpacks.listFx),
 				);
 				ipcMain.handle(ArkiniElectronApi.channels.arkpackRead, (event, packageId: string) =>
-					runAuthorizedFx(event, arkpacks.readFx(packageId)),
+					runAuthorized(event, arkpacks.readFx(packageId)),
 				);
 				ipcMain.handle(
 					ArkiniElectronApi.channels.arkpackInstall,
 					(event, record: ArkiniElectronApi.ArkpackRecord) =>
-						runAuthorizedFx(event, arkpacks.installFx(record)),
+						runAuthorized(event, arkpacks.installFx(record)),
 				);
 				ipcMain.handle(
 					ArkiniElectronApi.channels.arkpackRemove,
 					(event, packageId: string) =>
-						runAuthorizedFx(event, arkpacks.removeFx(packageId)),
+						runAuthorized(event, arkpacks.removeFx(packageId)),
 				);
 				ipcMain.handle(
 					ArkiniElectronApi.channels.saveRead,
 					(event, key: ArkiniElectronApi.SaveKey) =>
-						runAuthorizedFx(event, saves.readFx(key)),
+						runAuthorized(event, saves.readFx(key)),
 				);
 				ipcMain.handle(
 					ArkiniElectronApi.channels.saveWrite,
 					(event, key: ArkiniElectronApi.SaveKey, bytes: Uint8Array) =>
-						runAuthorizedFx(event, saves.writeFx(key, bytes)),
+						runAuthorized(event, saves.writeFx(key, bytes)),
 				);
 				ipcMain.handle(
 					ArkiniElectronApi.channels.saveClear,
 					(event, key: ArkiniElectronApi.SaveKey) =>
-						runAuthorizedFx(event, saves.clearFx(key)),
+						runAuthorized(event, saves.clearFx(key)),
 				);
 
 				const cleanup = () => {

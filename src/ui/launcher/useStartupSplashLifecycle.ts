@@ -49,8 +49,9 @@ export const useStartupSplashLifecycle = () => {
 	const [visibleAtMs, setVisibleAtMs] = useState<number | null>(null);
 	const [blackHoldComplete, setBlackHoldComplete] = useState(false);
 	const [minimumSplashComplete, setMinimumSplashComplete] = useState(false);
+	const [navigationError, setNavigationError] = useState<unknown | null>(null);
 	const navigationStartedRef = useRef(false);
-	const visualReady = state.appearance !== null && state.heroReady;
+	const visualReady = state.appearanceReady && state.heroReady;
 	const canContinue = state.type === "ready" && blackHoldComplete && visualReady;
 
 	useEffect(() => {
@@ -88,6 +89,7 @@ export const useStartupSplashLifecycle = () => {
 	const complete = useCallback(() => {
 		if (!canContinue || navigationStartedRef.current) return;
 		navigationStartedRef.current = true;
+		setNavigationError(null);
 		void RendererRuntime.runPromise(startup.completeSplashFx)
 			.then(() =>
 				navigate({
@@ -95,8 +97,9 @@ export const useStartupSplashLifecycle = () => {
 					replace: true,
 				}),
 			)
-			.catch(() => {
+			.catch((error) => {
 				navigationStartedRef.current = false;
+				setNavigationError(error);
 			});
 	}, [
 		canContinue,
@@ -126,44 +129,56 @@ export const useStartupSplashLifecycle = () => {
 	]);
 
 	const retry = useCallback(() => {
+		if (navigationError !== null) {
+			complete();
+			return;
+		}
 		void RendererRuntime.runPromise(startup.retryFx).catch(() => undefined);
 	}, [
+		complete,
+		navigationError,
 		startup,
 	]);
 
-	const content = match(state)
-		.with(
-			{
-				type: "loading",
-			},
-			(): useStartupSplashLifecycle.Content => ({
-				kind: "loading",
-			}),
-		)
-		.with(
-			{
-				type: "failed",
-			},
-			({ error }): useStartupSplashLifecycle.Content => ({
-				kind: "failure",
-				message: messageFromError(error),
-			}),
-		)
-		.with(
-			{
-				type: "ready",
-			},
-			(): useStartupSplashLifecycle.Content =>
-				match(minimumSplashComplete)
-					.with(true, () => ({
-						kind: "empty" as const,
-					}))
-					.with(false, () => ({
-						kind: "prompt" as const,
-					}))
-					.exhaustive(),
-		)
-		.exhaustive();
+	const content: useStartupSplashLifecycle.Content =
+		navigationError === null
+			? match(state)
+					.with(
+						{
+							type: "loading",
+						},
+						(): useStartupSplashLifecycle.Content => ({
+							kind: "loading",
+						}),
+					)
+					.with(
+						{
+							type: "failed",
+						},
+						({ error }): useStartupSplashLifecycle.Content => ({
+							kind: "failure",
+							message: messageFromError(error),
+						}),
+					)
+					.with(
+						{
+							type: "ready",
+						},
+						(): useStartupSplashLifecycle.Content =>
+							match(minimumSplashComplete)
+								.with(true, () => ({
+									kind: "empty" as const,
+								}))
+								.with(false, () => ({
+									kind: "prompt" as const,
+								}))
+								.exhaustive(),
+					)
+					.exhaustive()
+			: {
+					kind: "failure",
+					message: messageFromError(navigationError),
+				};
 
 	const view = match([
 		blackHoldComplete,

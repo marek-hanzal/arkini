@@ -20,10 +20,12 @@ import "~/ui/styles.css";
 
 interface HotData {
 	gameEngineShutdown?: Promise<void>;
+	launcherStartupShutdown?: Promise<void>;
 }
 
 const hotData = import.meta.hot?.data as HotData | undefined;
 const previousGameShutdown = hotData?.gameEngineShutdown ?? Promise.resolve();
+const previousLauncherStartupShutdown = hotData?.launcherStartupShutdown ?? Promise.resolve();
 const queryClient = new QueryClient();
 const cheatAvailability = createCheatAvailability();
 
@@ -35,14 +37,11 @@ if (!rootElement) {
 const catalog = RendererRuntime.runSync(createArkpackCatalogFx());
 const launcherStartup = RendererRuntime.runSync(
 	createLauncherStartupFx({
+		awaitPreviousShutdown: previousLauncherStartupShutdown,
 		catalog,
 		heroUrl: LauncherHeroAsset.url,
 	}),
 );
-const removeCheatAvailabilityStartupSubscription = launcherStartup.subscribe(() => {
-	const state = launcherStartup.getSnapshot();
-	if (state.cheatsAvailable !== null) cheatAvailability.apply(state.cheatsAvailable);
-});
 void RendererRuntime.runPromise(launcherStartup.startFx).catch(() => {
 	// The startup owner publishes the exact failure for the splash retry UI.
 });
@@ -61,8 +60,7 @@ const removeControlledClose = installRendererControlledClose({
 
 import.meta.hot?.dispose((data: HotData) => {
 	removeControlledClose();
-	removeCheatAvailabilityStartupSubscription();
-	RendererRuntime.runSync(launcherStartup.disposeFx);
+	data.launcherStartupShutdown = RendererRuntime.runPromise(launcherStartup.disposeFx);
 	data.gameEngineShutdown = waitForGameEngineResource(queryClient).then(async (resource) => {
 		if (resource === null) return;
 		resource.assertUsable();

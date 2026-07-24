@@ -15,32 +15,35 @@ export namespace LauncherStartup {
 		readonly cheatsAvailable: boolean;
 	}
 
+	export interface Hydration {
+		readonly appearance?: Appearance;
+		readonly cheatsAvailable?: boolean;
+	}
+
 	export type State =
 		| {
 				readonly type: "loading";
-				readonly appearance: Appearance | null;
-				readonly cheatsAvailable: boolean | null;
+				readonly appearanceReady: boolean;
 				readonly heroReady: boolean;
 				readonly splashCompleted: boolean;
 		  }
 		| {
 				readonly type: "ready";
-				readonly appearance: Appearance;
+				readonly appearanceReady: boolean;
 				readonly builtInPackageId: string;
-				readonly cheatsAvailable: boolean;
 				readonly heroReady: boolean;
 				readonly splashCompleted: boolean;
 		  }
 		| {
 				readonly type: "failed";
-				readonly appearance: Appearance | null;
-				readonly cheatsAvailable: boolean | null;
+				readonly appearanceReady: boolean;
 				readonly error: unknown;
 				readonly heroReady: boolean;
 				readonly splashCompleted: boolean;
 		  };
 
 	export interface Props {
+		readonly awaitPreviousShutdown?: Promise<void>;
 		readonly catalog: ArkpackCatalog;
 		readonly heroUrl: string;
 		readonly bootstrapFx?: Effect.Effect<Result, unknown>;
@@ -51,6 +54,7 @@ export namespace LauncherStartup {
 export interface LauncherStartup {
 	readonly getSnapshot: () => LauncherStartup.State;
 	readonly getHeroUrl: () => string;
+	readonly consumeHydration: (consume: (hydration: LauncherStartup.Hydration) => void) => boolean;
 	readonly startFx: Effect.Effect<void, unknown>;
 	readonly retryFx: Effect.Effect<void, unknown>;
 	readonly completeSplashFx: Effect.Effect<void>;

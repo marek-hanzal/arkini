@@ -1,9 +1,10 @@
 import { useNavigate, useRouter } from "@tanstack/react-router";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef } from "react";
 
 import { useGameEngine } from "~/bridge/game/useGameEngine";
 import { useCheatAvailability } from "~/ui/cheat-availability/useCheatAvailability";
 import { Cheats } from "~/ui/cheats/Cheats";
+import { useCheatsModel } from "~/ui/cheats/useCheatsModel";
 
 /** Composes the save-scoped Cheats page and native history return to the active Board. */
 export const CheatsScreen = () => {
@@ -12,11 +13,11 @@ export const CheatsScreen = () => {
 	const router = useRouter();
 	const navigate = useNavigate();
 	const leavingRef = useRef(false);
-	const [blocked, setBlocked] = useState(false);
+	const model = useCheatsModel(game);
 
 	const returnToBoard = useCallback(
 		({ replace = false }: { readonly replace?: boolean } = {}) => {
-			if (blocked || leavingRef.current) return;
+			if (model.blocked || leavingRef.current) return;
 			leavingRef.current = true;
 			if (!replace && router.history.canGoBack()) {
 				router.history.back();
@@ -33,8 +34,8 @@ export const CheatsScreen = () => {
 			});
 		},
 		[
-			blocked,
 			game.arkpack.packageId,
+			model.blocked,
 			navigate,
 			router,
 		],
@@ -64,9 +65,8 @@ export const CheatsScreen = () => {
 
 	return (
 		<Cheats
-			game={game}
+			model={model}
 			onBack={() => returnToBoard()}
-			onBlockedChange={setBlocked}
 		/>
 	);
 };

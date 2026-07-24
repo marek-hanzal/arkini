@@ -12,6 +12,7 @@ import type { Game } from "~/bridge/game/Game";
 import { useCheatItemCatalog } from "~/bridge/cheat/useCheatItemCatalog";
 import { useGameCheats } from "~/bridge/cheat/useGameCheats";
 import { useSpawnCheatItemMutation } from "~/bridge/cheat/useSpawnCheatItemMutation";
+import { useExclusiveAction } from "~/ui/action/useExclusiveAction";
 import { useCheatAvailability } from "~/ui/cheat-availability/useCheatAvailability";
 import { useGameMenuControl } from "~/ui/game-menu/useGameMenuControl";
 import { useItemDetailControl } from "~/ui/item-detail/useItemDetailControl";
@@ -49,12 +50,12 @@ export const CheatItemSpotlight = ({
 	const gameMenu = useGameMenuControl();
 	const itemDetail = useItemDetailControl();
 	const spawn = useSpawnCheatItemMutation(game);
+	const spawnAction = useExclusiveAction<"spawn">();
 	const dialogRef = useRef<HTMLElement>(null);
 	const inputRef = useRef<HTMLInputElement>(null);
 	const originRef = useRef<HTMLElement | null>(null);
 	const preserveSpawnOutcomeRef = useRef(false);
 	const restoreFocusRef = useRef(true);
-	const spawnPendingRef = useRef(spawn.isPending);
 	const [open, setOpen] = useState(false);
 	const [query, setQuery] = useState("");
 	const [selectedIndex, setSelectedIndex] = useState(0);
@@ -98,12 +99,20 @@ export const CheatItemSpotlight = ({
 		.slice(0, maxVisibleResults);
 	const blockedByHigherOwner = gameMenu.isOpen || itemDetail.isOpen;
 	const available = cheatAvailability.available && cheats.enabled && !blockedByHigherOwner;
-	spawnPendingRef.current = spawn.isPending;
-	const closeSpotlight = useCallback((restoreFocus = true) => {
-		if (spawnPendingRef.current) preserveSpawnOutcomeRef.current = true;
-		restoreFocusRef.current = restoreFocus;
-		setOpen(false);
-	}, []);
+	const spawnPending = spawnAction.active !== null || spawn.isPending;
+	const closeSpotlight = useCallback(
+		(restoreFocus = true) => {
+			if (spawnAction.getSnapshot() !== null || spawn.isPending) {
+				preserveSpawnOutcomeRef.current = true;
+			}
+			restoreFocusRef.current = restoreFocus;
+			setOpen(false);
+		},
+		[
+			spawn.isPending,
+			spawnAction.getSnapshot,
+		],
+	);
 
 	useHotkey(
 		"Mod+P",
@@ -119,7 +128,7 @@ export const CheatItemSpotlight = ({
 			onBeforeOpen?.();
 			if (preserveSpawnOutcomeRef.current) {
 				preserveSpawnOutcomeRef.current = false;
-			} else if (!spawn.isPending) {
+			} else if (spawnAction.getSnapshot() === null && !spawn.isPending) {
 				spawn.reset();
 			}
 			setOpen(true);
@@ -173,9 +182,11 @@ export const CheatItemSpotlight = ({
 	if (!open) return null;
 
 	const selected = results[selectedIndex];
-	const requestSpawn = () => {
-		if (selected === undefined || spawn.isPending) return;
-		spawn.mutate(selected.itemId);
+	const requestSpawn = (itemId = selected?.itemId) => {
+		if (itemId === undefined || spawn.isPending || !spawnAction.claim("spawn")) return;
+		spawn.mutate(itemId, {
+			onSettled: () => spawnAction.release("spawn"),
+		});
 	};
 	const keepFocusInside = (event: ReactKeyboardEvent<HTMLElement>) => {
 		if (event.key === "Escape") {
@@ -235,12 +246,12 @@ export const CheatItemSpotlight = ({
 					ref={inputRef}
 					type="search"
 					value={query}
-					className={`w-full rounded-lg border border-line-strong bg-surface px-4 py-3 text-base text-foreground outline-none focus:border-accent ${spawn.isPending ? "cursor-progress" : ""}`}
+					className={`w-full rounded-lg border border-line-strong bg-surface px-4 py-3 text-base text-foreground outline-none focus:border-accent ${spawnPending ? "cursor-progress" : ""}`}
 					placeholder="Search item title or ID…"
 					aria-label="Search items to spawn"
-					readOnly={spawn.isPending}
+					readOnly={spawnPending}
 					onChange={(event) => {
-						if (spawn.isPending) return;
+						if (spawnPending) return;
 						setQuery(event.currentTarget.value);
 						setSelectedIndex(0);
 						spawn.reset();
@@ -284,11 +295,11 @@ export const CheatItemSpotlight = ({
 								key={item.itemId}
 								className="ak-spotlight-option grid grid-cols-[3rem_1fr_auto] items-center gap-3 rounded-lg border px-3 py-2 text-left"
 								data-selected={index === selectedIndex ? "true" : undefined}
-								disabled={spawn.isPending}
+								disabled={spawnPending}
 								onMouseEnter={() => setSelectedIndex(index)}
 								onClick={() => {
 									setSelectedIndex(index);
-									spawn.mutate(item.itemId);
+									requestSpawn(item.itemId);
 								}}
 							>
 								<img
@@ -317,7 +328,7 @@ export const CheatItemSpotlight = ({
 					aria-live="polite"
 					data-ui="CheatItemSpotlightStatus"
 				>
-					{spawn.isPending ? (
+					{spawnPending ? (
 						<p className="text-accent">Spawning…</p>
 					) : spawn.isError ? (
 						<p className="text-danger">Spawn failed: {errorMessage(spawn.error)}</p>

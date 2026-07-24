@@ -1,4 +1,4 @@
-import { type PropsWithChildren, useLayoutEffect, useRef } from "react";
+import type { PropsWithChildren } from "react";
 
 import { useGameEngine } from "~/bridge/game/useGameEngine";
 import { CheatItemSpotlight } from "~/ui/cheat-spotlight/CheatItemSpotlight";
@@ -15,26 +15,14 @@ import { gameBoardViewTransitionName } from "~/ui/navigation/gameBoardViewTransi
 import { TileSystemProvider } from "~/ui/tile/TileSystemProvider";
 import { useTileSystemApiContext } from "~/ui/tile/useTileSystemApiContext";
 
-const noTileInteraction = () => undefined;
-
-const TileInteractionResetBridge = ({
-	resetRef,
-}: {
-	readonly resetRef: {
-		current: () => void;
-	};
-}) => {
+const CheatItemSpotlightHost = ({ game }: { readonly game: ReturnType<typeof useGameEngine> }) => {
 	const { resetInteraction } = useTileSystemApiContext();
-	useLayoutEffect(() => {
-		resetRef.current = resetInteraction;
-		return () => {
-			if (resetRef.current === resetInteraction) resetRef.current = noTileInteraction;
-		};
-	}, [
-		resetInteraction,
-		resetRef,
-	]);
-	return null;
+	return (
+		<CheatItemSpotlight
+			game={game}
+			onBeforeOpen={resetInteraction}
+		/>
+	);
 };
 
 const GameShellLayers = ({
@@ -44,7 +32,6 @@ const GameShellLayers = ({
 	readonly game: ReturnType<typeof useGameEngine>;
 }>) => {
 	const gameMenu = useGameMenuControl();
-	const resetTileInteractionRef = useRef<() => void>(noTileInteraction);
 
 	return (
 		<>
@@ -60,16 +47,12 @@ const GameShellLayers = ({
 						}}
 					>
 						<TileSystemProvider interactionBlocked={gameMenu.isOpen}>
-							<TileInteractionResetBridge resetRef={resetTileInteractionRef} />
 							{children}
 							<InventoryHost />
+							<CheatItemSpotlightHost game={game} />
 						</TileSystemProvider>
 					</div>
 					<ItemDetailModal />
-					<CheatItemSpotlight
-						game={game}
-						onBeforeOpen={() => resetTileInteractionRef.current()}
-					/>
 				</InventoryProvider>
 			</ItemDetailProvider>
 			<GameMenu game={game} />

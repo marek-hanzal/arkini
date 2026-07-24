@@ -3,6 +3,7 @@
 import {
 	createMemoryHistory,
 	createRootRoute,
+	createRoute,
 	createRouter,
 	RouterProvider,
 } from "@tanstack/react-router";
@@ -174,5 +175,61 @@ describe("About", () => {
 		for (const avatar of portraitState.urls) {
 			expect(imageSources.some((source) => source.includes(avatar))).toBe(true);
 		}
+	});
+
+	it("deduplicates same-tick exits and releases the action after rejected navigation", async () => {
+		const rootRoute = createRootRoute();
+		const aboutRoute = createRoute({
+			getParentRoute: () => rootRoute,
+			path: "/about",
+			component: AboutPage,
+		});
+		const mainMenuRoute = createRoute({
+			getParentRoute: () => rootRoute,
+			path: "/main-menu",
+			component: () => createElement("p", null, "Main menu destination"),
+		});
+		const router = createRouter({
+			routeTree: rootRoute.addChildren([
+				aboutRoute,
+				mainMenuRoute,
+			]),
+			history: createMemoryHistory({
+				initialEntries: [
+					"/about",
+				],
+			}),
+		});
+		await router.load();
+		const container = document.createElement("div");
+		document.body.append(container);
+		const root = createRoot(container);
+		roots.push(root);
+		await act(async () => {
+			root.render(
+				createElement(RouterProvider, {
+					router,
+				}),
+			);
+		});
+		const navigate = vi
+			.spyOn(router, "navigate")
+			.mockRejectedValueOnce(new Error("about navigation rejected"));
+		const button = container.querySelector<HTMLButtonElement>("button");
+		if (button === null) throw new Error("Missing About return action.");
+
+		await act(async () => {
+			button.click();
+			button.click();
+			await Promise.resolve();
+		});
+
+		expect(navigate).toHaveBeenCalledTimes(1);
+		expect(container.textContent).toContain("Navigation failed: about navigation rejected");
+		expect(button.disabled).toBe(false);
+
+		await act(async () => button.click());
+		await vi.waitFor(() => expect(router.state.location.pathname).toBe("/main-menu"));
+		expect(navigate).toHaveBeenCalledTimes(2);
 	});
 });

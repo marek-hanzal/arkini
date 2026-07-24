@@ -13,8 +13,10 @@ const isPromiseLike = (value: unknown): value is PromiseLike<unknown> =>
 		? "then" in value && typeof value.then === "function"
 		: false;
 
-const reportFailureFx = (failureMessage: string) => (cause: unknown) =>
-	Effect.logError(failureMessage, cause);
+const reportExternalCallbackFailureFx = Effect.fn("reportExternalCallbackFailureFx")(
+	({ failureMessage, cause }: { readonly failureMessage: string; readonly cause: unknown }) =>
+		Effect.logError(failureMessage, cause),
+);
 
 /**
  * Runs one external callback without allowing synchronous defects or rejected
@@ -30,11 +32,21 @@ export const invokeExternalCallbackFx = Effect.fn("invokeExternalCallbackFx")(fu
 			if (!isPromiseLike(result)) return Effect.void;
 
 			return Effect.promise(() => Promise.resolve(result)).pipe(
-				Effect.catchAllCause(reportFailureFx(failureMessage)),
+				Effect.catchAllCause((cause) =>
+					reportExternalCallbackFailureFx({
+						failureMessage,
+						cause,
+					}),
+				),
 				Effect.forkDaemon,
 				Effect.asVoid,
 			);
 		}),
-		Effect.catchAllCause(reportFailureFx(failureMessage)),
+		Effect.catchAllCause((cause) =>
+			reportExternalCallbackFailureFx({
+				failureMessage,
+				cause,
+			}),
+		),
 	);
 });

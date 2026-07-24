@@ -272,6 +272,66 @@ describe("ItemDetailProvider", () => {
 		});
 	});
 
+	it("retains action errors across tabs but evicts them across target and exit lifecycles", async () => {
+		const { readControl } = await renderProvider();
+		await act(async () => {
+			readControl().openItemDetail({
+				itemId: "runtime:first",
+				tab: "lines",
+			});
+		});
+		const entering = readControl().state;
+		if (entering.phase !== "entering") throw new Error("Expected entering state.");
+		await act(async () => readControl().completeEnter(entering.generation));
+
+		let rejectFirst: ((cause: Error) => void) | undefined;
+		const firstFailure = new Promise<never>((_resolve, reject) => {
+			rejectFirst = reject;
+		});
+		let firstOutcome: Promise<unknown> | undefined;
+		await act(async () => {
+			firstOutcome = readControl().runPendingAction({
+				key: "line:runtime:first",
+				action: "default",
+				failureMessage: "First action failed.",
+				run: () => firstFailure,
+			});
+			readControl().openItemDetail({
+				itemId: "runtime:first",
+				tab: "info",
+			});
+			rejectFirst?.(new Error("First deferred failure."));
+			await firstOutcome;
+		});
+		expect(readControl().readActionError("line:runtime:first")).toBe("First deferred failure.");
+
+		await act(async () => {
+			readControl().openItemDetail({
+				itemId: "runtime:second",
+				tab: "lines",
+			});
+		});
+		expect(readControl().readActionError("line:runtime:first")).toBeNull();
+
+		let rejectSecond: ((cause: Error) => void) | undefined;
+		const secondFailure = new Promise<never>((_resolve, reject) => {
+			rejectSecond = reject;
+		});
+		let secondOutcome: Promise<unknown> | undefined;
+		await act(async () => {
+			secondOutcome = readControl().runPendingAction({
+				key: "line:runtime:second",
+				action: "start",
+				failureMessage: "Second action failed.",
+				run: () => secondFailure,
+			});
+			void readControl().close();
+			rejectSecond?.(new Error("Late failure after close."));
+			await secondOutcome;
+		});
+		expect(readControl().readActionError("line:runtime:second")).toBeNull();
+	});
+
 	it("keeps configured definition Info default and accepts an explicit Sources request", async () => {
 		const { readControl } = await renderProvider();
 		await act(async () => {

@@ -202,7 +202,12 @@ describe("CheatItemSpotlight", () => {
 				}),
 			);
 		});
-		expect(state.spawn).toHaveBeenCalledWith("item:beta");
+		expect(state.spawn).toHaveBeenCalledWith(
+			"item:beta",
+			expect.objectContaining({
+				onSettled: expect.any(Function),
+			}),
+		);
 
 		selectedOption?.focus();
 		await act(async () => {
@@ -217,6 +222,57 @@ describe("CheatItemSpotlight", () => {
 		expect(container.querySelector('[data-ui="CheatItemSpotlight"]')).toBeNull();
 		expect(document.activeElement).toBe(origin);
 		expect(container.querySelector('[role="dialog"][aria-modal="true"]')).toBeNull();
+	});
+	it("admits only one spawn across same-tick keyboard and pointer actions", async () => {
+		const container = document.createElement("div");
+		document.body.append(container);
+		const root = createRoot(container);
+		roots.push(root);
+		const availability = createCheatAvailability();
+		availability.apply(true);
+		await act(async () => {
+			root.render(
+				createElement(
+					CheatAvailabilityProvider,
+					{
+						availability,
+					},
+					createElement(CheatItemSpotlight, {
+						game: {} as Game,
+					}),
+				),
+			);
+		});
+		await act(async () => {
+			document.dispatchEvent(
+				new KeyboardEvent("keydown", {
+					key: "p",
+					code: "KeyP",
+					ctrlKey: true,
+					bubbles: true,
+					cancelable: true,
+				}),
+			);
+			await Promise.resolve();
+		});
+		const input = container.querySelector<HTMLInputElement>('input[type="search"]');
+		const selected = container.querySelector<HTMLButtonElement>(
+			'[data-ui="CheatItemSpotlightResults"] button[data-selected="true"]',
+		);
+		if (input === null || selected === null) throw new Error("Expected Spotlight controls.");
+
+		await act(async () => {
+			input.dispatchEvent(
+				new KeyboardEvent("keydown", {
+					key: "Enter",
+					bubbles: true,
+					cancelable: true,
+				}),
+			);
+			selected.click();
+		});
+
+		expect(state.spawn).toHaveBeenCalledOnce();
 	});
 	it("retains pending spawn ownership across close, reopen and query attempts", async () => {
 		const container = document.createElement("div");

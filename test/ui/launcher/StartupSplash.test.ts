@@ -41,8 +41,7 @@ const createStartup = () => {
 	const listeners = new Set<() => void>();
 	let state: LauncherStartup.State = {
 		type: "loading",
-		appearance: null,
-		cheatsAvailable: null,
+		appearanceReady: false,
 		heroReady: false,
 		splashCompleted: false,
 	};
@@ -60,6 +59,7 @@ const createStartup = () => {
 	const startup: LauncherStartup = {
 		getSnapshot: () => state,
 		getHeroUrl: () => "/hero.png",
+		consumeHydration: () => false,
 		startFx: Effect.void,
 		retryFx: Effect.sync(retry),
 		completeSplashFx: Effect.sync(complete),
@@ -79,12 +79,8 @@ const createStartup = () => {
 
 const readyState = (): LauncherStartup.State => ({
 	type: "ready",
-	appearance: {
-		theme: "dark",
-		accent: "rose",
-	},
+	appearanceReady: true,
 	builtInPackageId: "canonical-built-in",
-	cheatsAvailable: false,
 	heroReady: true,
 	splashCompleted: false,
 });
@@ -220,12 +216,32 @@ describe("StartupSplash", () => {
 		await vi.waitFor(() => expect(router.state.location.pathname).toBe("/main-menu"));
 	});
 
+	it("shows a rejected navigation and retries it without leaving the splash stuck", async () => {
+		const harness = createStartup();
+		harness.publish(readyState());
+		const { container, router, visible } = await renderSplash(harness.startup);
+		const navigationFailure = new Error("main menu route failed");
+		vi.spyOn(router, "navigate").mockRejectedValueOnce(navigationFailure);
+		await act(async () => visible.resolve(performance.now()));
+		await act(async () => vi.advanceTimersByTime(5_000));
+
+		await vi.waitFor(() => expect(container.textContent).toContain(navigationFailure.message));
+		expect(router.state.location.pathname).toBe("/");
+		const retry = Array.from(container.querySelectorAll("button")).find(
+			(button) => button.textContent === "Retry",
+		);
+		if (!(retry instanceof HTMLButtonElement)) throw new Error("Retry button missing.");
+		await act(async () => retry.click());
+
+		await vi.waitFor(() => expect(router.state.location.pathname).toBe("/main-menu"));
+		expect(harness.complete).toHaveBeenCalledTimes(2);
+	});
+
 	it("keeps startup failures on the same page and retries through the owner", async () => {
 		const harness = createStartup();
 		harness.publish({
 			type: "failed",
-			appearance: null,
-			cheatsAvailable: null,
+			appearanceReady: false,
 			error: new Error("catalog failed"),
 			heroReady: false,
 			splashCompleted: false,

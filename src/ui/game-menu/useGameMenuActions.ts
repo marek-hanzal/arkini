@@ -1,8 +1,9 @@
 import { useNavigate } from "@tanstack/react-router";
 import type { Game } from "~/bridge/game/Game";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { match, P } from "ts-pattern";
 
+import { useExclusiveAction } from "~/ui/action/useExclusiveAction";
 import type { GameMenuPhase } from "~/ui/game-menu/GameMenuControl";
 import { useSaveAndExitGameMutation } from "~/ui/game-menu/mutation/useSaveAndExitGameMutation";
 import { useSaveGameMutation } from "~/ui/game-menu/mutation/useSaveGameMutation";
@@ -35,27 +36,34 @@ export const useGameMenuActions = ({
 	const saveAndExit = useSaveAndExitGameMutation(game);
 	const [confirmingDestroy, setConfirmingDestroy] = useState(false);
 	const [navigationError, setNavigationError] = useState<unknown>();
-	const activeRequestRef = useRef<ActiveRequest | null>(null);
-	const pending = save.isPending || saveAndExit.isPending || menu.routePending;
+	const request = useExclusiveAction<ActiveRequest>();
+	const pending =
+		request.active !== null || save.isPending || saveAndExit.isPending || menu.routePending;
 	const actionDisabled = phase !== "open" || pending;
 
 	const requestSettings = () => {
-		if (activeRequestRef.current !== null || !menu.beginRouteRequest()) return;
-		activeRequestRef.current = "settings";
+		if (!request.claim("settings")) return;
+		if (!menu.beginRouteRequest()) {
+			request.release("settings");
+			return;
+		}
 		setNavigationError(undefined);
 		void navigate({
 			to: "/settings",
 		})
 			.catch(setNavigationError)
 			.finally(() => {
-				activeRequestRef.current = null;
+				request.release("settings");
 				menu.completeRouteRequest();
 			});
 	};
 
 	const requestCheats = () => {
-		if (activeRequestRef.current !== null || !menu.beginRouteRequest()) return;
-		activeRequestRef.current = "cheats";
+		if (!request.claim("cheats")) return;
+		if (!menu.beginRouteRequest()) {
+			request.release("cheats");
+			return;
+		}
 		setNavigationError(undefined);
 		void navigate({
 			to: "/game/$packageId/cheats",
@@ -65,14 +73,17 @@ export const useGameMenuActions = ({
 		})
 			.catch(setNavigationError)
 			.finally(() => {
-				activeRequestRef.current = null;
+				request.release("cheats");
 				menu.completeRouteRequest();
 			});
 	};
 
 	const requestMainMenu = () => {
-		if (activeRequestRef.current !== null || !menu.beginRouteRequest()) return;
-		activeRequestRef.current = "main-menu";
+		if (!request.claim("main-menu")) return;
+		if (!menu.beginRouteRequest()) {
+			request.release("main-menu");
+			return;
+		}
 		setNavigationError(undefined);
 		void navigate({
 			to: "/game/$packageId/action/leave",
@@ -85,34 +96,35 @@ export const useGameMenuActions = ({
 		})
 			.catch(setNavigationError)
 			.finally(() => {
-				activeRequestRef.current = null;
+				request.release("main-menu");
 				menu.completeRouteRequest();
 			});
 	};
 
 	const requestSave = () => {
-		if (phase !== "open" || menu.routePending || activeRequestRef.current !== null) return;
-		activeRequestRef.current = "save";
+		if (phase !== "open" || menu.routePending || !request.claim("save")) return;
 		save.mutate(undefined, {
 			onSettled: () => {
-				activeRequestRef.current = null;
+				request.release("save");
 			},
 		});
 	};
 
 	const requestSaveAndExit = () => {
-		if (phase !== "open" || menu.routePending || activeRequestRef.current !== null) return;
-		activeRequestRef.current = "save-and-exit";
+		if (phase !== "open" || menu.routePending || !request.claim("save-and-exit")) return;
 		saveAndExit.mutate(undefined, {
 			onSettled: () => {
-				activeRequestRef.current = null;
+				request.release("save-and-exit");
 			},
 		});
 	};
 
 	const requestHardReset = () => {
-		if (activeRequestRef.current !== null || !menu.beginRouteRequest()) return;
-		activeRequestRef.current = "hard-reset";
+		if (!request.claim("hard-reset")) return;
+		if (!menu.beginRouteRequest()) {
+			request.release("hard-reset");
+			return;
+		}
 		setNavigationError(undefined);
 		void navigate({
 			to: "/game/$packageId/action/reset",
@@ -122,7 +134,7 @@ export const useGameMenuActions = ({
 		})
 			.catch(setNavigationError)
 			.finally(() => {
-				activeRequestRef.current = null;
+				request.release("hard-reset");
 				menu.completeRouteRequest();
 			});
 	};

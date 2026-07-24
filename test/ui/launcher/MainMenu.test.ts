@@ -90,18 +90,15 @@ describe("MainMenu", () => {
 		};
 		const startupState: LauncherStartup.State = {
 			type: "ready",
-			appearance: {
-				theme: "dark",
-				accent: "rose",
-			},
+			appearanceReady: true,
 			builtInPackageId: "arkini",
-			cheatsAvailable: false,
 			heroReady: true,
 			splashCompleted: true,
 		};
 		const startup: LauncherStartup = {
 			getSnapshot: () => startupState,
 			getHeroUrl: () => "/hero.png",
+			consumeHydration: () => false,
 			startFx: Effect.void,
 			retryFx: Effect.void,
 			completeSplashFx: Effect.void,

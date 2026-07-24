@@ -3,8 +3,8 @@ import { Deferred, Effect, Exit, FiberSet, Layer, ManagedRuntime, MutableRef, Sc
 import type { GameSession, GameSessionServices } from "~/bridge/game/GameSession";
 import {
 	type GameSessionTransitionSubscriptionCleanup,
-	GameSessionTransitionSubscriptionsFx,
-} from "~/bridge/game/GameSessionTransitionSubscriptionsFx";
+	createGameSessionTransitionSubscriptionsFx,
+} from "~/bridge/game/createGameSessionTransitionSubscriptionsFx";
 import { RuntimeSaveFx } from "~/bridge/save/RuntimeSaveFx";
 import { RuntimeSaveLayerFx } from "~/bridge/save/RuntimeSaveLayerFx";
 import { GameLoopFx } from "~/engine/game/context/GameLoopFx";
@@ -84,19 +84,22 @@ export const createGameSessionFx = Effect.fn("createGameSessionFx")(
 							save: save.write,
 						}).pipe(Layer.provide(sessionLayer));
 			const managed = ManagedRuntime.make(Layer.merge(sessionLayer, saveLayer));
-			const runManagedFx = <Result, Error>(
-				effect: Effect.Effect<Result, Error, GameSessionServices>,
-			): Effect.Effect<Result, unknown> =>
-				Effect.tryPromise({
-					try: () => managed.runPromise(effect),
-					catch: (cause) => cause,
-				});
+			const runManagedFx = Effect.fn("runManagedFx")(
+				<Result, Error>(
+					effect: Effect.Effect<Result, Error, GameSessionServices>,
+				): Effect.Effect<Result, unknown> =>
+					Effect.tryPromise({
+						try: () => managed.runPromise(effect),
+						catch: (cause) => cause,
+					}),
+			);
 			const sessionScope = yield* runManagedFx(Scope.make());
 			const transitionSubscriptions = yield* runManagedFx(
-				GameSessionTransitionSubscriptionsFx.pipe(Scope.extend(sessionScope)),
+				createGameSessionTransitionSubscriptionsFx().pipe(Scope.extend(sessionScope)),
 			);
+			const commandScope = yield* runManagedFx(Scope.make());
 			const runCommand = yield* runManagedFx(
-				FiberSet.makeRuntimePromise<GameSessionServices>().pipe(Scope.extend(sessionScope)),
+				FiberSet.makeRuntimePromise<GameSessionServices>().pipe(Scope.extend(commandScope)),
 			);
 			const lifecycle = MutableRef.make<SessionLifecycle>({
 				type: "running",
@@ -112,6 +115,7 @@ export const createGameSessionFx = Effect.fn("createGameSessionFx")(
 			const stopGameLoopFx = runManagedFx(
 				GameLoopFx.pipe(Effect.flatMap((service) => service.stop)),
 			);
+			const stopCommandsFx = runManagedFx(Scope.close(commandScope, Exit.void));
 			const releaseSessionFx = runManagedFx(Scope.close(sessionScope, Exit.void)).pipe(
 				Effect.zipRight(
 					Effect.tryPromise({
@@ -147,31 +151,36 @@ export const createGameSessionFx = Effect.fn("createGameSessionFx")(
 				}),
 			);
 
-			const disposeWithSaveModeFx = (saveMode: "flush" | "discard") =>
-				Effect.uninterruptibleMask((restore) =>
-					Effect.gen(function* () {
-						const claim = yield* claimDisposeFx;
-						if (claim.type === "complete") return;
-						if (claim.type === "await") {
-							return yield* restore(Deferred.await(claim.result));
-						}
+			const disposeWithSaveModeFx = Effect.fn("disposeWithSaveModeFx")(
+				(saveMode: "flush" | "discard") =>
+					Effect.uninterruptibleMask((restore) =>
+						Effect.gen(function* () {
+							const claim = yield* claimDisposeFx;
+							if (claim.type === "complete") return;
+							if (claim.type === "await") {
+								return yield* restore(Deferred.await(claim.result));
+							}
 
-						const attempt = stopGameLoopFx.pipe(
-							Effect.zipRight(saveMode === "discard" ? discardSaveFx : flushSaveFx),
-							Effect.zipRight(releaseSessionFx),
-						);
-						const exit = yield* Effect.exit(attempt);
-						yield* lifecycleLock.withPermits(1)(
-							Effect.sync(() => {
-								MutableRef.set(lifecycle, {
-									type: Exit.isSuccess(exit) ? "disposed" : "frozen",
-								});
-							}),
-						);
-						yield* Deferred.done(claim.result, exit);
-						if (Exit.isFailure(exit)) return yield* Effect.failCause(exit.cause);
-					}),
-				);
+							const attempt = stopGameLoopFx.pipe(
+								Effect.zipRight(stopCommandsFx),
+								Effect.zipRight(
+									saveMode === "discard" ? discardSaveFx : flushSaveFx,
+								),
+								Effect.zipRight(releaseSessionFx),
+							);
+							const exit = yield* Effect.exit(attempt);
+							yield* lifecycleLock.withPermits(1)(
+								Effect.sync(() => {
+									MutableRef.set(lifecycle, {
+										type: Exit.isSuccess(exit) ? "disposed" : "frozen",
+									});
+								}),
+							);
+							yield* Deferred.done(claim.result, exit);
+							if (Exit.isFailure(exit)) return yield* Effect.failCause(exit.cause);
+						}),
+					),
+			);
 
 			const ensureRunningFx = Effect.suspend(() => {
 				const current = MutableRef.get(lifecycle);
@@ -205,7 +214,10 @@ export const createGameSessionFx = Effect.fn("createGameSessionFx")(
 				getSnapshot: () => managed.runSync(readRuntimeFx()),
 				getTransitionSnapshot: () => managed.runSync(readCommittedTransitionFx()),
 				read: (effect) => managed.runSyncExit(effect),
-				run: (effect) => runCommand(ensureRunningFx.pipe(Effect.zipRight(effect))),
+				run: async (effect) => {
+					await managed.runPromise(ensureRunningFx);
+					return runCommand(ensureRunningFx.pipe(Effect.zipRight(effect)));
+				},
 				subscribe: (listener) =>
 					openSubscription(transitionSubscriptions.subscribe(listener)),
 				subscribeTransitions: (listener) =>

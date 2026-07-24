@@ -1,16 +1,8 @@
-import { type PropsWithChildren, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { type PropsWithChildren, useEffect, useMemo, useState, useSyncExternalStore } from "react";
 
+import { createInventoryController } from "~/ui/inventory/createInventoryController";
 import { InventoryContext } from "~/ui/inventory/InventoryContext";
-import type {
-	CloseInventoryProps,
-	InventoryControl,
-	InventoryState,
-	OpenInventoryProps,
-} from "~/ui/inventory/InventoryControl";
-
-const closedState = {
-	phase: "closed",
-} as const satisfies InventoryState;
+import type { InventoryControl } from "~/ui/inventory/InventoryControl";
 
 const focusableSelector = [
 	"button:not([disabled])",
@@ -32,49 +24,19 @@ const canRestoreFocus = (element: HTMLElement) =>
 
 /** Owns the idempotent open/close lifecycle of one non-modal Inventory surface. */
 export const InventoryProvider = ({ children }: PropsWithChildren) => {
-	const [state, setState] = useState<InventoryState>(closedState);
-	const stateRef = useRef<InventoryState>(state);
-	const restoreOriginRef = useRef<HTMLElement | null>(null);
-
-	const publishState = useCallback((next: InventoryState) => {
-		stateRef.current = next;
-		setState(next);
-	}, []);
-
-	const open = useCallback(
-		({ origin = null }: OpenInventoryProps = {}) => {
-			if (stateRef.current.phase === "open") return false;
-			restoreOriginRef.current = null;
-			publishState({
-				phase: "open",
-				origin,
-			});
-			return true;
-		},
-		[
-			publishState,
-		],
-	);
-
-	const close = useCallback(
-		({ restoreFocus = true }: CloseInventoryProps = {}) => {
-			const current = stateRef.current;
-			if (current.phase === "closed") return false;
-			restoreOriginRef.current = restoreFocus ? current.origin : null;
-			publishState(closedState);
-			return true;
-		},
-		[
-			publishState,
-		],
+	const [controller] = useState(createInventoryController);
+	const state = useSyncExternalStore(
+		controller.subscribe,
+		controller.getSnapshot,
+		controller.getSnapshot,
 	);
 
 	useEffect(() => {
 		if (state.phase !== "closed") return;
-		const origin = restoreOriginRef.current;
-		restoreOriginRef.current = null;
+		const origin = controller.takeRestoreOrigin();
 		if (origin !== null && canRestoreFocus(origin)) origin.focus();
 	}, [
+		controller,
 		state.phase,
 	]);
 
@@ -83,38 +45,38 @@ export const InventoryProvider = ({ children }: PropsWithChildren) => {
 			if (
 				event.key !== "Escape" ||
 				event.defaultPrevented ||
-				stateRef.current.phase === "closed"
+				controller.getSnapshot().phase === "closed"
 			) {
 				return;
 			}
 			event.preventDefault();
 			event.stopPropagation();
-			close();
+			controller.close();
 		};
 		document.addEventListener("keydown", onKeyDown);
 		return () => document.removeEventListener("keydown", onKeyDown);
 	}, [
-		close,
+		controller,
 	]);
 
 	useEffect(
 		() => () => {
-			stateRef.current = closedState;
-			restoreOriginRef.current = null;
+			controller.reset();
 		},
-		[],
+		[
+			controller,
+		],
 	);
 
 	const control = useMemo<InventoryControl>(
 		() => ({
 			state,
 			isOpen: state.phase === "open",
-			open,
-			close,
+			open: controller.open,
+			close: controller.close,
 		}),
 		[
-			close,
-			open,
+			controller,
 			state,
 		],
 	);

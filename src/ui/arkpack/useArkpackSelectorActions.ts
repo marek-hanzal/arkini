@@ -2,8 +2,10 @@ import { useNavigate } from "@tanstack/react-router";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { useArkpacks } from "~/bridge/arkpack/useArkpacks";
+import { useExclusiveAction } from "~/ui/action/useExclusiveAction";
 
 type BusyAction = "import" | "remove";
+type ActiveAction = BusyAction | "exit";
 
 /** Owns Arkpack import, removal, exit navigation, mounted guards, and Escape lifecycle. */
 export const useArkpackSelectorActions = () => {
@@ -11,11 +13,11 @@ export const useArkpackSelectorActions = () => {
 	const navigate = useNavigate();
 	const inputRef = useRef<HTMLInputElement>(null);
 	const mountedRef = useRef(false);
-	const busyRef = useRef<BusyAction | null>(null);
-	const exitPendingRef = useRef(false);
-	const [busyAction, setBusyAction] = useState<BusyAction | null>(null);
-	const [exitPending, setExitPending] = useState(false);
 	const [actionError, setActionError] = useState<unknown>();
+	const { active, claim, release } = useExclusiveAction<ActiveAction>();
+	const busyAction: BusyAction | null =
+		active === "import" || active === "remove" ? active : null;
+	const exitPending = active === "exit";
 
 	useEffect(() => {
 		mountedRef.current = true;
@@ -25,22 +27,23 @@ export const useArkpackSelectorActions = () => {
 	}, []);
 
 	const requestMainMenu = useCallback(() => {
-		if (busyRef.current !== null || exitPendingRef.current || state.type === "loading") return;
-		exitPendingRef.current = true;
-		setExitPending(true);
+		if (state.type === "loading" || !claim("exit")) return;
 		setActionError(undefined);
-		void navigate({
-			to: "/main-menu",
-		})
-			.catch((error) => {
+		void (async () => {
+			try {
+				await navigate({
+					to: "/main-menu",
+				});
+			} catch (error) {
 				if (mountedRef.current) setActionError(error);
-			})
-			.finally(() => {
-				exitPendingRef.current = false;
-				if (mountedRef.current) setExitPending(false);
-			});
+			} finally {
+				release("exit");
+			}
+		})();
 	}, [
+		claim,
 		navigate,
+		release,
 		state.type,
 	]);
 
@@ -58,16 +61,9 @@ export const useArkpackSelectorActions = () => {
 
 	const upload = useCallback(
 		async (file: File | undefined) => {
-			if (
-				file === undefined ||
-				busyRef.current !== null ||
-				exitPendingRef.current ||
-				state.type === "loading"
-			) {
+			if (file === undefined || state.type === "loading" || !claim("import")) {
 				return;
 			}
-			busyRef.current = "import";
-			setBusyAction("import");
 			setActionError(undefined);
 			try {
 				const arkpack = await importFile(file);
@@ -80,38 +76,38 @@ export const useArkpackSelectorActions = () => {
 			} catch (error) {
 				if (mountedRef.current) setActionError(error);
 			} finally {
-				busyRef.current = null;
+				release("import");
 				if (mountedRef.current) {
-					setBusyAction(null);
 					if (inputRef.current !== null) inputRef.current.value = "";
 				}
 			}
 		},
 		[
+			claim,
 			importFile,
 			navigate,
+			release,
 			state.type,
 		],
 	);
 
 	const removeArkpack = useCallback(
 		(packageId: string) => {
-			if (busyRef.current !== null || exitPendingRef.current || state.type === "loading") {
-				return;
-			}
-			busyRef.current = "remove";
-			setBusyAction("remove");
+			if (state.type === "loading" || !claim("remove")) return;
 			setActionError(undefined);
-			void remove(packageId)
-				.catch((error) => {
+			void (async () => {
+				try {
+					await remove(packageId);
+				} catch (error) {
 					if (mountedRef.current) setActionError(error);
-				})
-				.finally(() => {
-					busyRef.current = null;
-					if (mountedRef.current) setBusyAction(null);
-				});
+				} finally {
+					release("remove");
+				}
+			})();
 		},
 		[
+			claim,
+			release,
 			remove,
 			state.type,
 		],

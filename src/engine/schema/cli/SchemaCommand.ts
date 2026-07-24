@@ -11,6 +11,15 @@ export namespace SchemaCommand {
 	}
 }
 
+const runSchemaCommandFx = Effect.fn("runSchemaCommandFx")(function* ({
+	output,
+}: SchemaCommand.Props) {
+	yield* writeGameJsonSchemaFx({
+		output,
+	});
+	yield* Console.log(`Generated ${output}.`);
+});
+
 /**
  * CLI command that generates the JSON Schema for game-configuration authoring.
  */
@@ -24,10 +33,7 @@ export const SchemaCommand = ({ output }: SchemaCommand.Props) =>
 			),
 		},
 		({ output }) =>
-			Effect.gen(function* () {
-				yield* writeGameJsonSchemaFx({
-					output,
-				});
-				yield* Console.log(`Generated ${output}.`);
+			runSchemaCommandFx({
+				output,
 			}),
 	).pipe(Command.withDescription("Generate the current game configuration JSON Schema."));

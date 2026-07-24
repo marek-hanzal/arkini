@@ -1,6 +1,8 @@
 import { Effect, Option } from "effect";
+import { match } from "ts-pattern";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
+import { GameConfigFx } from "~/engine/game/context/GameConfigFx";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 import { isItemLocationScopeAllowed } from "~/engine/location/read/isItemLocationScopeAllowed";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
@@ -94,6 +96,21 @@ export const readDropItemPreviewFx = Effect.fn("readDropItemPreviewFx")(function
 	}
 	if (target.occupant === null) {
 		if (!isItemLocationScopeAllowed(source.item, target.location.scope)) {
+			return rejected(DropItemRejectedReasonEnumSchema.enum.InvalidTarget);
+		}
+		const config = yield* GameConfigFx;
+		const targetSize = match(target.location.scope)
+			.with(LocationScopeEnumSchema.enum.Board, () => config.meta.board)
+			.with(LocationScopeEnumSchema.enum.Inventory, () => config.meta.inventory)
+			.with(LocationScopeEnumSchema.enum.Toolbar, () => ({
+				width: config.meta.toolbarSize ?? 0,
+				height: 1,
+			}))
+			.exhaustive();
+		if (
+			target.location.position.x >= targetSize.width ||
+			target.location.position.y >= targetSize.height
+		) {
 			return rejected(DropItemRejectedReasonEnumSchema.enum.InvalidTarget);
 		}
 		return {

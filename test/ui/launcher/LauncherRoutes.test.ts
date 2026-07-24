@@ -11,18 +11,15 @@ import type { LauncherStartup } from "~/ui/launcher/LauncherStartup";
 const createStartup = (splashCompleted: boolean): LauncherStartup => {
 	const state: LauncherStartup.State = {
 		type: "ready",
-		appearance: {
-			theme: "dark",
-			accent: "rose",
-		},
+		appearanceReady: true,
 		builtInPackageId: "built-in",
-		cheatsAvailable: false,
 		heroReady: true,
 		splashCompleted,
 	};
 	return {
 		getSnapshot: () => state,
 		getHeroUrl: () => "/hero.png",
+		consumeHydration: () => false,
 		startFx: Effect.void,
 		retryFx: Effect.void,
 		completeSplashFx: Effect.void,

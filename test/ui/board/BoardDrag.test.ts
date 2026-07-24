@@ -364,6 +364,74 @@ const dragTo = async (source: HTMLElement, x: number, y: number) => {
 };
 
 describe("Board drag", () => {
+	it.each([
+		{
+			label: "ordinary click release",
+			cancelPointer: (source: HTMLElement) => {
+				source.dispatchEvent(pointerEvent("pointerup", 250, 150));
+				source.dispatchEvent(
+					new MouseEvent("click", {
+						bubbles: true,
+						button: 0,
+						cancelable: true,
+					}),
+				);
+			},
+		},
+		{
+			label: "pointer cancellation",
+			cancelPointer: (source: HTMLElement) => {
+				source.dispatchEvent(pointerEvent("pointercancel", 250, 150));
+			},
+		},
+	])("starts the next drag after $label", async ({ cancelPointer }) => {
+		const source = await renderBoard();
+		dropItemState.drop.mockRejectedValueOnce(new Error("Expected test drop failure."));
+
+		await act(async () => {
+			source.dispatchEvent(pointerEvent("pointerdown", 250, 150));
+			cancelPointer(source);
+			source.dispatchEvent(pointerEvent("pointerdown", 250, 150));
+			source.dispatchEvent(pointerEvent("pointermove", 50, 50));
+			source.dispatchEvent(pointerEvent("pointerup", 50, 50));
+			await Promise.resolve();
+			await Promise.resolve();
+		});
+
+		expect(dropItemState.drop).toHaveBeenCalledOnce();
+	});
+
+	it("starts another actor drag after the pressed actor unmounts", async () => {
+		const source = await renderBoard();
+		const target = document.querySelector<HTMLElement>(
+			'[data-ui="TileActor"][data-board-x="1"][data-board-y="0"]',
+		);
+		if (target === null) throw new Error("Missing next draggable actor.");
+		const sourceId = source.dataset.runtimeId;
+		if (sourceId === undefined) throw new Error("Missing source runtime identity.");
+		dropItemState.drop.mockRejectedValueOnce(new Error("Expected test drop failure."));
+
+		await act(async () => {
+			source.dispatchEvent(pointerEvent("pointerdown", 250, 150));
+			publishRuntime({
+				...currentRuntime,
+				items: currentRuntime.items.filter((item) => item.id !== sourceId),
+			});
+			await Promise.resolve();
+		});
+		expect(document.querySelector(`[data-runtime-id="${sourceId}"]`)).toBeNull();
+
+		await act(async () => {
+			target.dispatchEvent(pointerEvent("pointerdown", 150, 50));
+			target.dispatchEvent(pointerEvent("pointermove", 50, 50));
+			target.dispatchEvent(pointerEvent("pointerup", 50, 50));
+			await Promise.resolve();
+			await Promise.resolve();
+		});
+
+		expect(dropItemState.drop).toHaveBeenCalledOnce();
+	});
+
 	it("moves the one existing actor through the public atomic drop command", async () => {
 		const source = await renderBoard();
 		const runtimeId = source.dataset.runtimeId;

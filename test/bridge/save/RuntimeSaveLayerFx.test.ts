@@ -1,4 +1,4 @@
-import { Effect } from "effect";
+import { Deferred, Effect } from "effect";
 import { describe, expect, it } from "vitest";
 import { createTestGameSession } from "~test/bridge/game/createTestGameSession";
 
@@ -503,6 +503,71 @@ describe("RuntimeSaveLayerFx", () => {
 		await Effect.runPromise(session.disposeFx);
 
 		expect(await command).toBe("interrupted");
+		expect(saves).toHaveLength(1);
+		expect(saves[0]?.items).toHaveLength(0);
+	});
+
+	it("closes command admission before starting a slow final save", async () => {
+		const saves: StateSchema.Type[] = [];
+		const commandStarted = Effect.runSync(Deferred.make<void>());
+		const releaseCommand = Effect.runSync(Deferred.make<void>());
+		let markSaveStarted: (() => void) | undefined;
+		let releaseSave: (() => void) | undefined;
+		const saveStarted = new Promise<void>((resolve) => {
+			markSaveStarted = resolve;
+		});
+		const saveGate = new Promise<void>((resolve) => {
+			releaseSave = resolve;
+		});
+		const session = await createTestGameSession({
+			config: createJobTestConfig(),
+			tickIntervalMs: 60_000,
+			save: {
+				debounceMs: 60_000,
+				write: (state) =>
+					Effect.promise(async () => {
+						saves.push(state);
+						markSaveStarted?.();
+						await saveGate;
+					}),
+			},
+		});
+		const command = session
+			.run(
+				Deferred.succeed(commandStarted, undefined).pipe(
+					Effect.zipRight(Deferred.await(releaseCommand)),
+					Effect.zipRight(
+						spawnItemFx({
+							id: "runtime:save:command-during-flush",
+							itemId: "water",
+							location: {
+								scope: "inventory",
+								position: {
+									x: 0,
+									y: 0,
+								},
+							},
+							quantity: 1,
+						}),
+					),
+				),
+			)
+			.then(
+				() => "completed" as const,
+				() => "interrupted" as const,
+			);
+		await Effect.runPromise(Deferred.await(commandStarted));
+
+		const dispose = Effect.runPromise(session.disposeFx);
+		await saveStarted;
+		Effect.runSync(Deferred.succeed(releaseCommand, undefined));
+		try {
+			expect(await command).toBe("interrupted");
+		} finally {
+			releaseSave?.();
+			await dispose;
+		}
+
 		expect(saves).toHaveLength(1);
 		expect(saves[0]?.items).toHaveLength(0);
 	});

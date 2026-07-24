@@ -33,15 +33,12 @@ const createStartup = (): LauncherStartup => ({
 	getHeroUrl: () => "/hero.png",
 	getSnapshot: () => ({
 		type: "ready",
-		appearance: {
-			theme: "dark",
-			accent: "rose",
-		},
+		appearanceReady: true,
 		builtInPackageId: packageId,
-		cheatsAvailable: false,
 		heroReady: true,
 		splashCompleted: true,
 	}),
+	consumeHydration: () => false,
 	startFx: Effect.void,
 	retryFx: Effect.void,
 	completeSplashFx: Effect.void,
@@ -200,6 +197,97 @@ describe("game load action lifecycle", () => {
 		expect(router.state.location.pathname).toBe(`/game/${packageId}/board`);
 		expect(getCachedGameEngineResource(queryClient)?.game.arkpack).toBe(game.arkpack);
 	});
+
+	it("cancels an unfinished route-owned creation when navigation leaves the load action", async () => {
+		createGameFxMock.mockReturnValue(Effect.never);
+		const { queryClient, router } = createHarness(`/action/load-game/${packageId}`);
+		const loading = router.load();
+		await vi.waitFor(() => expect(createGameFxMock).toHaveBeenCalledOnce());
+
+		await act(async () => {
+			await router.navigate({
+				to: "/main-menu",
+				replace: true,
+			});
+		});
+		await loading;
+
+		expect(router.state.location.pathname).toBe("/main-menu");
+		await vi.waitFor(() =>
+			expect(queryClient.getQueryState(gameEngineQueryKey)).toBeUndefined(),
+		);
+		expect(getCachedGameEngineResource(queryClient)).toBeNull();
+	});
+
+	it("keeps a completed Game provisional and discards it when the load action leaves during its hold", async () => {
+		const discard = vi.fn();
+		createGameFxMock.mockReturnValue(
+			Effect.succeed(
+				createGame({
+					disposeWithoutSaveFx: Effect.sync(discard),
+				}),
+			),
+		);
+		const { queryClient, router } = createHarness(`/action/load-game/${packageId}`);
+		const loading = router.load();
+		await vi.waitFor(() =>
+			expect(queryClient.getQueryState(gameEngineQueryKey)?.data).toBeDefined(),
+		);
+		expect(getCachedGameEngineResource(queryClient)).toBeNull();
+
+		await act(async () => {
+			const navigation = router.navigate({
+				to: "/main-menu",
+				replace: true,
+			});
+			await Promise.resolve();
+			await vi.advanceTimersByTimeAsync(2_500);
+			await navigation;
+		});
+		await loading;
+
+		expect(router.state.location.pathname).toBe("/main-menu");
+		await vi.waitFor(() => expect(discard).toHaveBeenCalledOnce());
+		await vi.waitFor(() =>
+			expect(queryClient.getQueryState(gameEngineQueryKey)).toBeUndefined(),
+		);
+		expect(getCachedGameEngineResource(queryClient)).toBeNull();
+	});
+
+	it("replaces a pending different-package creation without joining or poisoning either resource", async () => {
+		const nextPackageId = "package-route-load-next";
+		createGameFxMock.mockReturnValueOnce(Effect.never).mockReturnValueOnce(
+			Effect.succeed(
+				createGame({
+					createdPackageId: nextPackageId,
+				}),
+			),
+		);
+		const { queryClient, router } = createHarness(`/action/load-game/${packageId}`);
+		const firstLoading = router.load();
+		await vi.waitFor(() => expect(createGameFxMock).toHaveBeenCalledOnce());
+
+		await act(async () => {
+			const navigation = router.navigate({
+				to: "/action/load-game/$packageId",
+				params: {
+					packageId: nextPackageId,
+				},
+				replace: true,
+			});
+			await Promise.resolve();
+			await vi.advanceTimersByTimeAsync(2_500);
+			await navigation;
+		});
+		await firstLoading;
+
+		expect(createGameFxMock).toHaveBeenCalledTimes(2);
+		expect(router.state.location.pathname).toBe(`/game/${nextPackageId}/board`);
+		expect(getCachedGameEngineResource(queryClient)?.game.arkpack.packageId).toBe(
+			nextPackageId,
+		);
+	});
+
 	it("discards an ordinary failed query and exits without deleting a save", async () => {
 		createGameFxMock.mockReturnValue(Effect.fail(new Error("bootstrap failed")));
 		const { queryClient, router } = createHarness(`/action/load-game/${packageId}`);

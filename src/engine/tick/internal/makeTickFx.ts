@@ -10,8 +10,9 @@ interface ElapsedObservation {
 	readonly observedAtMs: number;
 }
 
-const resumeExitFx = <Error>(exit: Exit.Exit<void, Error>) =>
-	Exit.isSuccess(exit) ? Effect.succeed(undefined) : Effect.failCause(exit.cause);
+const resumeExitFx = Effect.fn("resumeExitFx")(<Error>(exit: Exit.Exit<void, Error>) =>
+	Exit.isSuccess(exit) ? Effect.succeed(undefined) : Effect.failCause(exit.cause),
+);
 
 /** Builds the transient Tick service owned by one game core layer. */
 export const makeTickFx = Effect.fn("makeTickFx")(function* () {
@@ -23,43 +24,46 @@ export const makeTickFx = Effect.fn("makeTickFx")(function* () {
 		}),
 	);
 
-	const advanceObserved = <Error, Requirements>(
-		observe: (state: TickSchema.Type) => Effect.Effect<ElapsedObservation>,
-		apply: (elapsedMs: number) => Effect.Effect<void, Error, Requirements>,
-	) =>
-		Effect.uninterruptible(
-			SynchronizedRef.modifyEffect(store, (state) =>
-				Effect.gen(function* () {
-					const observation = yield* observe(state);
-					const next = TickSchema.parse({
-						observedAtMs: Math.max(state.observedAtMs, observation.observedAtMs),
-						pendingElapsedMs: state.pendingElapsedMs + observation.elapsedMs,
-					});
-					const applicableElapsedMs =
-						next.pendingElapsedMs - (next.pendingElapsedMs % TickStepMs);
-					if (applicableElapsedMs === 0) {
+	const advanceObservedFx = Effect.fn("advanceObservedFx")(
+		<Error, Requirements>(
+			observe: (state: TickSchema.Type) => Effect.Effect<ElapsedObservation>,
+			apply: (elapsedMs: number) => Effect.Effect<void, Error, Requirements>,
+		) =>
+			Effect.uninterruptible(
+				SynchronizedRef.modifyEffect(store, (state) =>
+					Effect.gen(function* () {
+						const observation = yield* observe(state);
+						const next = TickSchema.parse({
+							observedAtMs: Math.max(state.observedAtMs, observation.observedAtMs),
+							pendingElapsedMs: state.pendingElapsedMs + observation.elapsedMs,
+						});
+						const applicableElapsedMs =
+							next.pendingElapsedMs - (next.pendingElapsedMs % TickStepMs);
+						if (applicableElapsedMs === 0) {
+							return [
+								Exit.void,
+								next,
+							] as const;
+						}
+						const exit = yield* Effect.exit(apply(applicableElapsedMs));
 						return [
-							Exit.void,
-							next,
+							exit,
+							Exit.isSuccess(exit)
+								? {
+										...next,
+										pendingElapsedMs:
+											next.pendingElapsedMs - applicableElapsedMs,
+									}
+								: next,
 						] as const;
-					}
-					const exit = yield* Effect.exit(apply(applicableElapsedMs));
-					return [
-						exit,
-						Exit.isSuccess(exit)
-							? {
-									...next,
-									pendingElapsedMs: next.pendingElapsedMs - applicableElapsedMs,
-								}
-							: next,
-					] as const;
-				}),
-			).pipe(Effect.flatMap(resumeExitFx)),
-		);
+					}),
+				).pipe(Effect.flatMap(resumeExitFx)),
+			),
+	);
 
 	return {
 		read: SynchronizedRef.get(store),
-		advanceRuntime: advanceObserved(
+		advanceRuntime: advanceObservedFx(
 			(state) =>
 				Effect.gen(function* () {
 					const nowMs = yield* Clock.currentTimeMillis;
@@ -74,7 +78,7 @@ export const makeTickFx = Effect.fn("makeTickFx")(function* () {
 				}),
 		),
 		advanceRuntimeBy: (elapsedMs) =>
-			advanceObserved(
+			advanceObservedFx(
 				() =>
 					Clock.currentTimeMillis.pipe(
 						Effect.map((nowMs) => ({

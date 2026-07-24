@@ -1,6 +1,7 @@
 import path from "node:path";
 
 import { Effect } from "effect";
+import { match } from "ts-pattern";
 
 import type { GameSourceSchema } from "~/engine/schema/GameSourceSchema";
 import type { GameSourceAssemblySchema } from "../schema/GameSourceAssemblySchema";
@@ -99,20 +100,20 @@ export const assembleGameSourcesFx = Effect.fn("assembleGameSourcesFx")(function
 			}
 
 			provenance[provider] = source.path;
-			switch (provider) {
-				case DiagnosticProviderEnumSchema.enum.Meta:
+			match(provider)
+				.with(DiagnosticProviderEnumSchema.enum.Meta, () => {
 					value.meta = source.value.meta;
-					break;
-				case DiagnosticProviderEnumSchema.enum.Resources:
+				})
+				.with(DiagnosticProviderEnumSchema.enum.Resources, () => {
 					value.resources = source.value.resources;
-					break;
-				case DiagnosticProviderEnumSchema.enum.Start:
+				})
+				.with(DiagnosticProviderEnumSchema.enum.Start, () => {
 					value.start = source.value.start;
-					break;
-				case DiagnosticProviderEnumSchema.enum.Version:
+				})
+				.with(DiagnosticProviderEnumSchema.enum.Version, () => {
 					value.version = source.value.version;
-					break;
-			}
+				})
+				.exhaustive();
 		}
 
 		const categories =

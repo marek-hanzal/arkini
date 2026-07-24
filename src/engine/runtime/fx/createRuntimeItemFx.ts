@@ -29,28 +29,26 @@ export namespace createRuntimeItemFx {
 /**
  * Creates one fully hydrated runtime item with its initial revision.
  */
-export const createRuntimeItemFx = <Location extends LocationSchema.Type>({
+export const createRuntimeItemFx = Effect.fn("createRuntimeItemFx")(function* <
+	Location extends LocationSchema.Type,
+>({
 	id,
 	item,
 	location,
 	quantity,
 	remainingCharges,
 	remainingDurationMs,
-}: createRuntimeItemFx.Props<Location>) => {
-	return createRevisionFx().pipe(
-		Effect.map((revision) => {
-			return {
-				id,
-				item,
-				location,
-				quantity,
-				remainingCharges,
-				remainingDurationMs:
-					remainingDurationMs ??
-					(item.type === ItemEnumSchema.enum.Temporary ? item.durationMs : undefined),
-				revision,
-			} satisfies createRuntimeItemFx.Result<Location>;
-		}),
-		Effect.withSpan("createRuntimeItemFx"),
-	);
-};
+}: createRuntimeItemFx.Props<Location>) {
+	const revision = yield* createRevisionFx();
+	return {
+		id,
+		item,
+		location,
+		quantity,
+		remainingCharges,
+		remainingDurationMs:
+			remainingDurationMs ??
+			(item.type === ItemEnumSchema.enum.Temporary ? item.durationMs : undefined),
+		revision,
+	} satisfies createRuntimeItemFx.Result<Location>;
+});

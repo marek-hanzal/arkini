@@ -1,184 +1,31 @@
-import { type PropsWithChildren, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { match } from "ts-pattern";
+import {
+	type PropsWithChildren,
+	useCallback,
+	useEffect,
+	useMemo,
+	useState,
+	useSyncExternalStore,
+} from "react";
 
 import { useResolveItemDefinitionDetailTarget } from "~/bridge/item-detail/useResolveItemDefinitionDetailTarget";
 import { useResolveItemDetailTarget } from "~/bridge/item-detail/useResolveItemDetailTarget";
+import { createItemDetailController } from "~/ui/item-detail/createItemDetailController";
 import { ItemDetailContext } from "~/ui/item-detail/ItemDetailContext";
 import type {
 	ItemDetailControl,
-	ItemDetailPendingAction,
-	ItemDetailState,
-	ItemDetailTarget,
 	OpenItemDefinitionDetailProps,
 	OpenItemDetailProps,
-	RunItemDetailPendingActionProps,
 } from "~/ui/item-detail/ItemDetailControl";
-
-interface ExitCompletion {
-	readonly generation: number;
-	readonly promise: Promise<void>;
-	readonly resolve: () => void;
-}
-
-const closedState = {
-	phase: "closed",
-} as const satisfies ItemDetailState;
 
 /** Owns one exact Item Detail target and one exhaustive enter/open/exit lifecycle. */
 export const ItemDetailProvider = ({ children }: PropsWithChildren) => {
 	const resolveDefinitionTarget = useResolveItemDefinitionDetailTarget();
 	const resolveTarget = useResolveItemDetailTarget();
-	const [state, setState] = useState<ItemDetailState>(closedState);
-	const stateRef = useRef<ItemDetailState>(state);
-	const [pendingActions, setPendingActions] = useState<
-		ReadonlyMap<string, ItemDetailPendingAction>
-	>(() => new Map());
-	const pendingActionsRef = useRef(new Map<string, ItemDetailPendingAction>());
-	const [actionErrors, setActionErrors] = useState<ReadonlyMap<string, string>>(() => new Map());
-	const actionErrorsRef = useRef(new Map<string, string>());
-	const nextGeneration = useRef(0);
-	const exitCompletionRef = useRef<ExitCompletion | undefined>(undefined);
-
-	const publishState = useCallback((next: ItemDetailState) => {
-		stateRef.current = next;
-		setState(next);
-	}, []);
-	const publishPendingActions = useCallback(() => {
-		setPendingActions(new Map(pendingActionsRef.current));
-	}, []);
-	const readPendingAction = useCallback(
-		(key: string) => pendingActions.get(key) ?? null,
-		[
-			pendingActions,
-		],
-	);
-	const publishActionErrors = useCallback(() => {
-		setActionErrors(new Map(actionErrorsRef.current));
-	}, []);
-	const readActionError = useCallback(
-		(key: string) => actionErrors.get(key) ?? null,
-		[
-			actionErrors,
-		],
-	);
-	const runPendingAction = useCallback(
-		async ({ key, action, failureMessage, run }: RunItemDetailPendingActionProps) => {
-			if (pendingActionsRef.current.has(key)) return;
-			if (actionErrorsRef.current.delete(key)) publishActionErrors();
-			pendingActionsRef.current.set(key, action);
-			publishPendingActions();
-			try {
-				return await run();
-			} catch (cause) {
-				actionErrorsRef.current.set(
-					key,
-					cause instanceof Error ? cause.message : failureMessage,
-				);
-				publishActionErrors();
-			} finally {
-				if (pendingActionsRef.current.get(key) === action) {
-					pendingActionsRef.current.delete(key);
-					publishPendingActions();
-				}
-			}
-		},
-		[
-			publishActionErrors,
-			publishPendingActions,
-		],
-	);
-
-	const resolveExitCompletion = useCallback((generation?: number) => {
-		const completion = exitCompletionRef.current;
-		if (
-			completion === undefined ||
-			(generation !== undefined && completion.generation !== generation)
-		) {
-			return;
-		}
-		exitCompletionRef.current = undefined;
-		completion.resolve();
-	}, []);
-
-	const readOrigin = useCallback((origin: HTMLElement | null) => {
-		const current = stateRef.current;
-		return match(current)
-			.with(
-				{
-					phase: "closed",
-				},
-				() => origin,
-			)
-			.with(
-				{
-					phase: "entering",
-				},
-				{
-					phase: "open",
-				},
-				{
-					phase: "exiting",
-				},
-				(state) => state.target.origin,
-			)
-			.exhaustive();
-	}, []);
-
-	const openTarget = useCallback(
-		(target: ItemDetailTarget) => {
-			const current = stateRef.current;
-			const enter = () => {
-				publishState({
-					phase: "entering",
-					target,
-					generation: ++nextGeneration.current,
-				});
-				return true;
-			};
-
-			return match(current)
-				.with(
-					{
-						phase: "closed",
-					},
-					() => enter(),
-				)
-				.with(
-					{
-						phase: "entering",
-					},
-					{
-						phase: "open",
-					},
-					(current) => {
-						if (
-							current.target.kind !== target.kind ||
-							current.target.itemId !== target.itemId ||
-							current.target.tab !== target.tab
-						) {
-							publishState({
-								...current,
-								target,
-							});
-						}
-						return true;
-					},
-				)
-				.with(
-					{
-						phase: "exiting",
-					},
-					(current) => {
-						resolveExitCompletion(current.generation);
-						return enter();
-					},
-				)
-				.exhaustive();
-		},
-		[
-			publishState,
-			resolveExitCompletion,
-		],
+	const [controller] = useState(createItemDetailController);
+	const snapshot = useSyncExternalStore(
+		controller.subscribe,
+		controller.getSnapshot,
+		controller.getSnapshot,
 	);
 
 	const openItemDetail = useCallback(
@@ -188,16 +35,15 @@ export const ItemDetailProvider = ({ children }: PropsWithChildren) => {
 				requestedTab: tab,
 			});
 			if (resolved.kind === "unavailable") return false;
-			return openTarget({
+			return controller.openTarget({
 				kind: "runtime",
 				itemId: resolved.itemId,
 				tab: resolved.tab,
-				origin: readOrigin(origin),
+				origin: controller.readOrigin(origin),
 			});
 		},
 		[
-			openTarget,
-			readOrigin,
+			controller,
 			resolveTarget,
 		],
 	);
@@ -209,203 +55,60 @@ export const ItemDetailProvider = ({ children }: PropsWithChildren) => {
 				requestedTab: tab,
 			});
 			if (resolved.kind === "unavailable") return false;
-			return openTarget({
+			return controller.openTarget({
 				kind: "definition",
 				itemId: resolved.itemId,
 				tab: resolved.tab,
-				origin: readOrigin(origin),
+				origin: controller.readOrigin(origin),
 			});
 		},
 		[
-			openTarget,
-			readOrigin,
+			controller,
 			resolveDefinitionTarget,
-		],
-	);
-
-	const close = useCallback(
-		({ restoreFocus = true } = {}) => {
-			const current = stateRef.current;
-			const beginExit = (
-				state: Extract<
-					ItemDetailState,
-					{
-						phase: "entering" | "open";
-					}
-				>,
-			) => {
-				let resolve: () => void = () => undefined;
-				const promise = new Promise<void>((complete) => {
-					resolve = complete;
-				});
-				exitCompletionRef.current = {
-					generation: state.generation,
-					promise,
-					resolve,
-				};
-				publishState({
-					phase: "exiting",
-					target: state.target,
-					generation: state.generation,
-					restoreFocus,
-				});
-				return promise;
-			};
-
-			return match(current)
-				.with(
-					{
-						phase: "closed",
-					},
-					() => Promise.resolve(),
-				)
-				.with(
-					{
-						phase: "entering",
-					},
-					{
-						phase: "open",
-					},
-					(state) => beginExit(state),
-				)
-				.with(
-					{
-						phase: "exiting",
-					},
-					(state) => {
-						if (!restoreFocus && state.restoreFocus) {
-							publishState({
-								...state,
-								restoreFocus: false,
-							});
-						}
-						return exitCompletionRef.current?.promise ?? Promise.resolve();
-					},
-				)
-				.exhaustive();
-		},
-		[
-			publishState,
-		],
-	);
-
-	const completeEnter = useCallback(
-		(generation: number) => {
-			match(stateRef.current)
-				.with(
-					{
-						phase: "entering",
-					},
-					(state) => {
-						if (state.generation !== generation) return;
-						publishState({
-							phase: "open",
-							target: state.target,
-							generation,
-						});
-					},
-				)
-				.with(
-					{
-						phase: "closed",
-					},
-					{
-						phase: "open",
-					},
-					{
-						phase: "exiting",
-					},
-					() => undefined,
-				)
-				.exhaustive();
-		},
-		[
-			publishState,
-		],
-	);
-
-	const completeExit = useCallback(
-		(generation: number) => {
-			match(stateRef.current)
-				.with(
-					{
-						phase: "exiting",
-					},
-					(state) => {
-						if (state.generation !== generation) return;
-						publishState(closedState);
-						resolveExitCompletion(generation);
-					},
-				)
-				.with(
-					{
-						phase: "closed",
-					},
-					{
-						phase: "entering",
-					},
-					{
-						phase: "open",
-					},
-					() => undefined,
-				)
-				.exhaustive();
-		},
-		[
-			publishState,
-			resolveExitCompletion,
 		],
 	);
 
 	useEffect(() => {
 		const onKeyDown = (event: KeyboardEvent) => {
-			const current = stateRef.current;
+			const current = controller.getSnapshot().state;
 			if (event.key !== "Escape" || current.phase === "closed") return;
 			event.preventDefault();
 			event.stopPropagation();
-			if (current.phase !== "exiting") void close();
+			if (current.phase !== "exiting") void controller.close();
 		};
 		window.addEventListener("keydown", onKeyDown, true);
 		return () => window.removeEventListener("keydown", onKeyDown, true);
 	}, [
-		close,
+		controller,
 	]);
 
 	useEffect(
 		() => () => {
-			resolveExitCompletion();
-			stateRef.current = closedState;
-			actionErrorsRef.current.clear();
-			pendingActionsRef.current.clear();
+			controller.reset();
 		},
 		[
-			resolveExitCompletion,
+			controller,
 		],
 	);
 
 	const control = useMemo<ItemDetailControl>(
 		() => ({
-			state,
-			isOpen: state.phase !== "closed",
-			readActionError,
-			readPendingAction,
-			runPendingAction,
+			state: snapshot.state,
+			isOpen: snapshot.state.phase !== "closed",
+			readActionError: controller.readActionError,
+			readPendingAction: controller.readPendingAction,
+			runPendingAction: controller.runPendingAction,
 			openItemDetail,
 			openItemDefinitionDetail,
-			close,
-			completeEnter,
-			completeExit,
+			close: controller.close,
+			completeEnter: controller.completeEnter,
+			completeExit: controller.completeExit,
 		}),
 		[
-			close,
-			completeEnter,
-			completeExit,
-			openItemDetail,
+			controller,
 			openItemDefinitionDetail,
-			readActionError,
-			readPendingAction,
-			runPendingAction,
-			state,
+			openItemDetail,
+			snapshot,
 		],
 	);
 

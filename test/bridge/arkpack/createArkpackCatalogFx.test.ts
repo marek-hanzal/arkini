@@ -106,10 +106,10 @@ describe("createArkpackCatalogFx", () => {
 		);
 
 		await expect(Effect.runPromise(catalog.refreshFx)).rejects.toThrow("catalog unavailable");
-		expect(catalog.getSnapshot()).toEqual({
-			type: "failed",
-			error: failure,
-		});
+		const snapshot = catalog.getSnapshot();
+		expect(snapshot.type).toBe("failed");
+		if (snapshot.type !== "failed") throw new Error("Expected failed catalog snapshot.");
+		expect(snapshot.error).toBe(failure);
 	});
 
 	it("publishes loading before import and remove operations complete", async () => {

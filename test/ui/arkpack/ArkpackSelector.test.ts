@@ -407,4 +407,144 @@ describe("ArkpackSelector", () => {
 		});
 		expect(router.state.location.pathname).toBe("/action/load-game/package%3Aimported");
 	});
+
+	it("releases removal ownership after a rejected mutation so the action can retry", async () => {
+		const removeFx = vi
+			.fn<ArkpackCatalog["removeFx"]>()
+			.mockReturnValueOnce(Effect.fail(new Error("removal rejected")))
+			.mockReturnValue(Effect.void);
+		const catalogState = {
+			type: "ready" as const,
+			arkpacks: [
+				{
+					packageId: "package:local",
+					contentHash: "b".repeat(64),
+					gameId: "local",
+					title: "Local package",
+					configVersion: "1",
+					compressedSize: 1,
+					trust: {
+						type: "external",
+						reason: "unsigned",
+					} as const,
+					source: "imported" as const,
+					filename: "local.arkpack",
+				},
+			],
+		};
+		const catalog: ArkpackCatalog = {
+			getSnapshot: () => catalogState,
+			refreshFx: Effect.void,
+			importFileFx: () => Effect.die("Unexpected import."),
+			removeFx,
+			subscribe: () => () => undefined,
+		};
+		const { container } = await renderSelector(catalog);
+		const removeButton = container.querySelector<HTMLButtonElement>("button");
+		if (removeButton === null) throw new Error("Missing Remove action.");
+
+		await act(async () => {
+			removeButton.click();
+			removeButton.click();
+			await Promise.resolve();
+			await Promise.resolve();
+		});
+
+		expect(removeFx).toHaveBeenCalledTimes(1);
+		expect(container.textContent).toContain("removal rejected");
+		expect(removeButton.disabled).toBe(false);
+
+		await act(async () => {
+			removeButton.click();
+			await Promise.resolve();
+			await Promise.resolve();
+		});
+		expect(removeFx).toHaveBeenCalledTimes(2);
+		expect(removeButton.disabled).toBe(false);
+	});
+
+	it("deduplicates import and releases it after rejected destination navigation", async () => {
+		const imported: ArkpackDescriptor = {
+			packageId: "package:imported",
+			contentHash: "c".repeat(64),
+			gameId: "imported",
+			title: "Imported package",
+			configVersion: "1",
+			compressedSize: 1,
+			trust: {
+				type: "external",
+				reason: "unsigned",
+			},
+			source: "imported",
+			filename: "imported.arkpack",
+		};
+		const importFileFx = vi.fn(() => Effect.succeed(imported));
+		const catalogState = {
+			type: "ready" as const,
+			arkpacks: [
+				imported,
+			],
+		};
+		const catalog: ArkpackCatalog = {
+			getSnapshot: () => catalogState,
+			refreshFx: Effect.void,
+			importFileFx,
+			removeFx: () => Effect.die("Unexpected removal."),
+			subscribe: () => () => undefined,
+		};
+		const { container, router } = await renderSelector(catalog);
+		const navigate = vi
+			.spyOn(router, "navigate")
+			.mockRejectedValueOnce(new Error("load navigation rejected"));
+		const fileInput = container.querySelector<HTMLInputElement>('input[type="file"]');
+		if (fileInput === null) throw new Error("Missing Arkpack file input.");
+		const file = new File(
+			[
+				"package",
+			],
+			"imported.arkpack",
+		);
+		Object.defineProperty(fileInput, "files", {
+			configurable: true,
+			value: [
+				file,
+			],
+		});
+
+		await act(async () => {
+			fileInput.dispatchEvent(
+				new Event("change", {
+					bubbles: true,
+				}),
+			);
+			fileInput.dispatchEvent(
+				new Event("change", {
+					bubbles: true,
+				}),
+			);
+			await Promise.resolve();
+			await Promise.resolve();
+		});
+
+		expect(importFileFx).toHaveBeenCalledTimes(1);
+		expect(navigate).toHaveBeenCalledTimes(1);
+		expect(container.textContent).toContain("load navigation rejected");
+		expect(fileInput.disabled).toBe(false);
+		expect(router.state.location.pathname).toBe("/arkpacks");
+
+		await act(async () => {
+			fileInput.dispatchEvent(
+				new Event("change", {
+					bubbles: true,
+				}),
+			);
+			await Promise.resolve();
+			await Promise.resolve();
+		});
+		await vi.waitFor(() =>
+			expect(router.state.location.pathname).toBe("/action/load-game/package%3Aimported"),
+		);
+		expect(importFileFx).toHaveBeenCalledTimes(2);
+		expect(navigate).toHaveBeenCalledTimes(2);
+	});
 });

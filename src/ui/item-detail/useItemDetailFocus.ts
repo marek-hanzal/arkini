@@ -1,4 +1,9 @@
-import { type KeyboardEvent as ReactKeyboardEvent, useEffect, useRef } from "react";
+import {
+	type KeyboardEvent as ReactKeyboardEvent,
+	useEffect,
+	useLayoutEffect,
+	useRef,
+} from "react";
 
 import type { ItemDetailState } from "~/ui/item-detail/ItemDetailControl";
 
@@ -40,8 +45,13 @@ export const useItemDetailFocus = ({
 	const dialogRef = useRef<HTMLDivElement>(null);
 	const originRef = useRef(origin);
 	const restoreFocusRef = useRef(restoreFocus);
-	originRef.current = origin;
-	restoreFocusRef.current = restoreFocus;
+	useLayoutEffect(() => {
+		originRef.current = origin;
+		restoreFocusRef.current = restoreFocus;
+	}, [
+		origin,
+		restoreFocus,
+	]);
 
 	useEffect(() => {
 		dialogRef.current?.focus();

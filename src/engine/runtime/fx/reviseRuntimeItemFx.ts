@@ -12,16 +12,12 @@ export namespace reviseRuntimeItemFx {
 /**
  * Assigns a fresh revision to one already mutated runtime item value.
  */
-export const reviseRuntimeItemFx = <Item extends RuntimeItemSchema.Type>({
-	item,
-}: reviseRuntimeItemFx.Props<Item>) => {
-	return createRevisionFx().pipe(
-		Effect.map((revision) => {
-			return {
-				...item,
-				revision,
-			} as Item;
-		}),
-		Effect.withSpan("reviseRuntimeItemFx"),
-	);
-};
+export const reviseRuntimeItemFx = Effect.fn("reviseRuntimeItemFx")(function* <
+	Item extends RuntimeItemSchema.Type,
+>({ item }: reviseRuntimeItemFx.Props<Item>) {
+	const revision = yield* createRevisionFx();
+	return {
+		...item,
+		revision,
+	} as Item;
+});

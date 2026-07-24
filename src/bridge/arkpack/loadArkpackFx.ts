@@ -1,7 +1,11 @@
 import { Effect } from "effect";
+import { match } from "ts-pattern";
 
+import type { ArkpackTrustSchema } from "~/engine/pack/schema/ArkpackTrustSchema";
+import type { BuiltInArkpack } from "~/bridge/arkpack/BuiltInArkpack";
+import { BuiltInArkpacks } from "~/bridge/arkpack/BuiltInArkpacks";
 import type { ArkpackStorage } from "~/bridge/arkpack/ArkpackStorage";
-import { ArkiniArkpack } from "~/bridge/arkpack/ArkiniArkpack";
+import { ArkiniTrustedKeys } from "~/bridge/arkpack/ArkiniTrustedKeys";
 import { createArkpackStorageFx } from "~/bridge/arkpack/createArkpackStorageFx";
 import { readArkpackFx } from "~/bridge/arkpack/readArkpackFx";
 
@@ -12,40 +16,116 @@ export namespace loadArkpackFx {
 	}
 }
 
-const fetchArkiniBytes = Effect.tryPromise({
-	try: async () => {
-		const response = await fetch(ArkiniArkpack.url);
-		if (!response.ok) {
-			throw new Error(
-				`Unable to load bundled Arkini pack: ${response.status} ${response.statusText}.`,
-			);
-		}
-		return new Uint8Array(await response.arrayBuffer());
-	},
-	catch: (cause) => cause,
-});
+const fetchBuiltInBytesFx = (arkpack: BuiltInArkpack) =>
+	Effect.tryPromise({
+		try: async () => {
+			const response = await fetch(arkpack.url);
+			if (!response.ok) {
+				throw new Error(
+					`Unable to load bundled ${arkpack.packageId} pack: ${response.status} ${response.statusText}.`,
+				);
+			}
+			return new Uint8Array(await response.arrayBuffer());
+		},
+		catch: (cause) => cause,
+	});
 
-/** Loads and revalidates the official Arkini or a persisted package binary before game bootstrap. */
+const fetchBuiltInSignatureFx = (arkpack: BuiltInArkpack) => {
+	if (arkpack.signatureUrl === undefined) return Effect.succeed(undefined);
+	const signatureUrl = arkpack.signatureUrl;
+	return Effect.tryPromise({
+		try: async () => {
+			const response = await fetch(signatureUrl);
+			if (!response.ok) {
+				throw new Error(
+					`Unable to load bundled ${arkpack.packageId} signature: ${response.status} ${response.statusText}.`,
+				);
+			}
+			const source = await response.text();
+			try {
+				return JSON.parse(source) as unknown;
+			} catch {
+				return source;
+			}
+		},
+		catch: (cause) => cause,
+	});
+};
+
+const hasExpectedTrust = (actual: ArkpackTrustSchema.Type, expected: ArkpackTrustSchema.Type) =>
+	match([
+		actual,
+		expected,
+	] as const)
+		.with(
+			[
+				{
+					type: "official",
+				},
+				{
+					type: "official",
+				},
+			],
+			([actualTrust, expectedTrust]) => actualTrust.keyId === expectedTrust.keyId,
+		)
+		.with(
+			[
+				{
+					type: "external",
+				},
+				{
+					type: "external",
+				},
+			],
+			([actualTrust, expectedTrust]) => actualTrust.reason === expectedTrust.reason,
+		)
+		.with(
+			[
+				{
+					type: "invalid",
+				},
+				{
+					type: "invalid",
+				},
+			],
+			([actualTrust, expectedTrust]) =>
+				actualTrust.reason === expectedTrust.reason &&
+				actualTrust.keyId === expectedTrust.keyId,
+		)
+		.otherwise(() => false);
+
+/** Loads and revalidates a bundled or persisted package binary before game bootstrap. */
 export const loadArkpackFx = Effect.fn("loadArkpackFx")(function* ({
 	packageId,
 	storage: providedStorage,
 }: loadArkpackFx.Props) {
-	if (packageId === ArkiniArkpack.packageId) {
+	const builtIn = BuiltInArkpacks.find((arkpack) => arkpack.packageId === packageId);
+	if (builtIn !== undefined) {
+		const expected = builtIn.descriptor;
 		const loaded = yield* readArkpackFx({
-			bytes: yield* fetchArkiniBytes,
+			bytes: yield* fetchBuiltInBytesFx(builtIn),
+			...(expected.trust.type === "official"
+				? {
+						expectedOfficialKeyId: expected.trust.keyId,
+					}
+				: {}),
 			packageId,
+			signature: yield* fetchBuiltInSignatureFx(builtIn),
 			source: "built-in",
+			trustedKeys: ArkiniTrustedKeys,
 		});
-		const expected = ArkiniArkpack.descriptor;
 		if (
 			loaded.descriptor.contentHash !== expected.contentHash ||
 			loaded.descriptor.gameId !== expected.gameId ||
 			loaded.descriptor.title !== expected.title ||
 			loaded.descriptor.configVersion !== expected.configVersion ||
-			loaded.descriptor.compressedSize !== expected.compressedSize
+			loaded.descriptor.compressedSize !== expected.compressedSize ||
+			!hasExpectedTrust(loaded.descriptor.trust, expected.trust)
 		) {
 			return yield* Effect.fail(
-				new Error("Bundled Arkini metadata does not match its exact package binary."),
+				new Error(
+					`Bundled ${builtIn.packageId} metadata does not match its exact package binary.`,
+				),
 			);
 		}
 		return loaded;
@@ -62,6 +142,7 @@ export const loadArkpackFx = Effect.fn("loadArkpackFx")(function* ({
 			filename: record.descriptor.filename,
 			importedAtMs: record.descriptor.importedAtMs,
 			source: "imported",
+			trustedKeys: ArkiniTrustedKeys,
 		});
 		if (loaded.descriptor.contentHash !== packageId) {
 			return yield* Effect.fail(

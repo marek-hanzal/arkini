@@ -13,6 +13,14 @@ export const GameCommand = Command.make("game")
 					packageId: "arkini",
 				},
 			}),
+			PackCommand({
+				input: "game/demo",
+				name: "pack-demo",
+				metadata: {
+					output: "game/demo.game.arkpack.metadata.json",
+					packageId: "demo",
+				},
+			}),
 			SchemaCommand({
 				output: "game/schema.json",
 			}),

@@ -1,0 +1,67 @@
+{
+	"$schema": "../../schema.json",
+	"items": {
+		"item:water": {
+			"id": "item:water",
+			"type": "simple",
+			"title": "Water",
+			"description": "Drag this water onto the tree to merge both items.",
+			"asset": {
+				"source": [
+					"item-water"
+				]
+			},
+			"tags": [
+				"demo"
+			],
+			"categoryId": "demo",
+			"scope": "any",
+			"maxStackSize": 8,
+			"merge": [
+				{
+					"target": {
+						"type": "item",
+						"itemId": "item:tree"
+					},
+					"action": "consume",
+					"effect": "replace",
+					"result": "item:double-tree"
+				}
+			]
+		},
+		"item:tree": {
+			"id": "item:tree",
+			"type": "simple",
+			"title": "Tree",
+			"description": "The receiving item for the demo merge.",
+			"asset": {
+				"source": [
+					"item-tree"
+				]
+			},
+			"tags": [
+				"demo"
+			],
+			"categoryId": "demo",
+			"scope": "any",
+			"maxStackSize": 8
+		},
+		"item:double-tree": {
+			"id": "item:double-tree",
+			"type": "simple",
+			"title": "Double Tree",
+			"description": "The deterministic result of the demo merge.",
+			"asset": {
+				"source": [
+					"item-double-tree"
+				]
+			},
+			"tags": [
+				"demo"
+			],
+			"categoryId": "demo",
+			"scope": "any",
+			"maxStackSize": 8
+		}
+	}
+}

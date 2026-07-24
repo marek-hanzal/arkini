@@ -10,6 +10,16 @@ const descriptor = (packageId: string, source: ArkpackDescriptor["source"]): Ark
 	title: packageId,
 	configVersion: "1",
 	compressedSize: 1,
+	trust:
+		source === "built-in"
+			? {
+					type: "official",
+					keyId: `${packageId}-key`,
+				}
+			: {
+					type: "external",
+					reason: "unsigned",
+				},
 	source,
 });
 
@@ -28,23 +38,31 @@ const invalidCatalogs: ReadonlyArray<{
 ];
 
 describe("resolveBuiltInArkpackFx", () => {
-	it("returns the only built-in package without hardcoding its identity", async () => {
+	it("returns the only official built-in package without hardcoding its identity", async () => {
 		const builtIn = descriptor("official", "built-in");
+		const demo: ArkpackDescriptor = {
+			...descriptor("demo", "built-in"),
+			trust: {
+				type: "external",
+				reason: "unsigned",
+			},
+		};
 		await expect(
 			Effect.runPromise(
 				resolveBuiltInArkpackFx([
 					descriptor("imported", "imported"),
+					demo,
 					builtIn,
 				]),
 			),
 		).resolves.toBe(builtIn);
 	});
 
-	it.each(invalidCatalogs)("rejects catalogs without exactly one built-in package", async ({
+	it.each(invalidCatalogs)("rejects catalogs without exactly one official package", async ({
 		arkpacks,
 	}) => {
 		await expect(Effect.runPromise(resolveBuiltInArkpackFx(arkpacks))).rejects.toThrow(
-			"exactly one built-in package",
+			"exactly one official built-in package",
 		);
 	});
 });

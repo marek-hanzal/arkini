@@ -2,6 +2,7 @@ import { Effect } from "effect";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { ArkiniArkpack } from "~/bridge/arkpack/ArkiniArkpack";
 import type { ArkpackStorage } from "~/bridge/arkpack/ArkpackStorage";
+import { DemoArkpack } from "~/bridge/arkpack/DemoArkpack";
 import { listArkpacksFx } from "~/bridge/arkpack/listArkpacksFx";
 
 const imported = {
@@ -11,6 +12,10 @@ const imported = {
 	title: "Local package",
 	configVersion: "1.0",
 	compressedSize: 128,
+	trust: {
+		type: "external",
+		reason: "unsigned",
+	} as const,
 	source: "imported" as const,
 	filename: "local.arkpack",
 	importedAtMs: 1,
@@ -21,7 +26,7 @@ afterEach(() => {
 });
 
 describe("listArkpacksFx", () => {
-	it("lists official and imported metadata without reading either package payload", async () => {
+	it("lists signed and unsigned bundled metadata before imports without reading payloads", async () => {
 		const fetch = vi.fn();
 		const list = vi.fn();
 		const read = vi.fn();
@@ -50,6 +55,7 @@ describe("listArkpacksFx", () => {
 			),
 		).resolves.toEqual([
 			ArkiniArkpack.descriptor,
+			DemoArkpack.descriptor,
 			imported,
 		]);
 		expect(fetch).not.toHaveBeenCalled();

@@ -2,6 +2,8 @@ import { Effect } from "effect";
 
 import { ArkpackLimits } from "~/bridge/arkpack/ArkpackLimits";
 import { decodeFx } from "~/engine/pack/fx/decodeFx";
+import { verifyArkpackTrustFx } from "~/engine/pack/fx/verifyArkpackTrustFx";
+import type { ArkpackTrustedKeysSchema } from "~/engine/pack/schema/ArkpackTrustedKeysSchema";
 import type { GameSourceProvenanceSchema } from "~/engine/source/schema/GameSourceProvenanceSchema";
 import { GameValidationError } from "~/engine/validation/error/GameValidationError";
 import { validateGameConfigFx } from "~/engine/validation/fx/validateGameConfigFx";
@@ -13,19 +15,13 @@ export namespace readArkpackFx {
 		bytes: Uint8Array;
 		filename?: string;
 		importedAtMs?: number;
+		expectedOfficialKeyId?: string;
 		packageId?: string;
+		signature?: unknown;
 		source: "built-in" | "imported";
+		trustedKeys: ArkpackTrustedKeysSchema.Type;
 	}
 }
-
-const toHex = (bytes: ArrayBuffer) =>
-	Array.from(new Uint8Array(bytes), (byte) => byte.toString(16).padStart(2, "0")).join("");
-
-const readContentHash = (bytes: Uint8Array) =>
-	Effect.tryPromise({
-		try: async () => toHex(await crypto.subtle.digest("SHA-256", bytes.slice().buffer)),
-		catch: (cause) => cause,
-	});
 
 const decompress = (bytes: Uint8Array) =>
 	Effect.tryPromise({
@@ -95,10 +91,13 @@ const createPackProvenance = (
 /** Decodes, schema-validates and semantically validates one compressed arkpack binary. */
 export const readArkpackFx = Effect.fn("readArkpackFx")(function* ({
 	bytes,
+	expectedOfficialKeyId,
 	filename,
 	importedAtMs,
 	packageId,
+	signature,
 	source,
+	trustedKeys,
 }: readArkpackFx.Props) {
 	if (bytes.byteLength > ArkpackLimits.maxCompressedBytes) {
 		return yield* Effect.fail(
@@ -107,7 +106,23 @@ export const readArkpackFx = Effect.fn("readArkpackFx")(function* ({
 			),
 		);
 	}
-	const contentHash = yield* readContentHash(bytes);
+	const verification = yield* verifyArkpackTrustFx({
+		bytes,
+		signature,
+		trustedKeys,
+	});
+	if (
+		expectedOfficialKeyId !== undefined &&
+		(verification.trust.type !== "official" ||
+			verification.trust.keyId !== expectedOfficialKeyId)
+	) {
+		return yield* Effect.fail(
+			new Error(
+				`Arkpack expected official signature ${expectedOfficialKeyId}, received ${verification.trust.type}.`,
+			),
+		);
+	}
+	const contentHash = verification.contentHash;
 	const payload = yield* decodeFx(yield* decompress(bytes));
 	for (const resource of payload.resources) {
 		if (resource.mime !== "image/png") {
@@ -157,6 +172,7 @@ export const readArkpackFx = Effect.fn("readArkpackFx")(function* ({
 			title: payload.config.meta.title,
 			configVersion: payload.config.version,
 			compressedSize: bytes.byteLength,
+			trust: verification.trust,
 			source,
 			...(filename === undefined
 				? {}

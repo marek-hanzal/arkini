@@ -48,6 +48,10 @@ describe("ArkpackSelector", () => {
 					title: "Arkini",
 					configVersion: "1",
 					compressedSize: 1,
+					trust: {
+						type: "official",
+						keyId: "test-official",
+					} as const,
 					source: "built-in" as const,
 				},
 				{
@@ -57,6 +61,10 @@ describe("ArkpackSelector", () => {
 					title: "Local package",
 					configVersion: "1",
 					compressedSize: 1,
+					trust: {
+						type: "external",
+						reason: "unsigned",
+					} as const,
 					source: "imported" as const,
 					filename: "local.arkpack",
 				},
@@ -135,6 +143,8 @@ describe("ArkpackSelector", () => {
 			catalogList?.querySelectorAll<HTMLElement>('[data-ui="ArkpackCatalogRow"]') ?? [],
 		);
 		expect(catalogRows).toHaveLength(2);
+		expect(catalogRows[0]?.textContent).toContain("Official");
+		expect(catalogRows[1]?.textContent).toContain("External");
 		expect(catalogRows.every((row) => row.className.includes("ak-list-row"))).toBe(true);
 		expect(catalogRows.every((row) => !row.className.includes("ak-list-row-interactive"))).toBe(
 			true,

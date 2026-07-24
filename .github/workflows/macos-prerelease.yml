@@ -19,6 +19,7 @@ jobs:
     runs-on: macos-15
     timeout-minutes: 60
     env:
+      ARKINI_ARKPACK_PRIVATE_KEY: ${{ secrets.ARKINI_ARKPACK_PRIVATE_KEY }}
       CSC_IDENTITY_AUTO_DISCOVERY: "false"
     steps:
       - name: Check out repository
@@ -30,8 +31,6 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: 22.16.0
-          cache: npm
-          cache-dependency-path: package-lock.json
 
       - name: Verify pinned Node and npm toolchain
         run: |
@@ -43,7 +42,7 @@ jobs:
         run: npm version --no-git-tag-version "${GITHUB_REF_NAME#v}"
 
       - name: Install dependencies
-        run: npm ci
+        run: npm install
 
       - name: Run source repository gates
         run: |
@@ -51,7 +50,7 @@ jobs:
           npm run typecheck
           npm run game:validate
 
-      - name: Package unsigned macOS arm64 application
+      - name: Package unsigned macOS arm64 application with signed official game content
         run: npm run package:mac
 
       - name: Verify dependency graph and permanent tests against packaged build inputs

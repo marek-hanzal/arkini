@@ -14,6 +14,11 @@ import {
 	testArkpackConfig,
 } from "~test/bridge/arkpack/support/createTestArkpack";
 
+const trustedKeys = {
+	formatVersion: 1 as const,
+	keys: [],
+};
+
 const createStorages = async () => {
 	const bytes = createTestArkpack();
 	const loaded = await Effect.runPromise(
@@ -21,6 +26,7 @@ const createStorages = async () => {
 			bytes,
 			filename: "bridge.arkpack",
 			source: "imported",
+			trustedKeys,
 		}),
 	);
 	const record = {

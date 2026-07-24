@@ -29,6 +29,7 @@ The active documentation surface is deliberately small. Read it in this order:
 3. [`CODE_GUIDE.md`](CODE_GUIDE.md) — mandatory code grammar and review rules.
 4. [`CONFIG.md`](CONFIG.md) — game authoring, compiler, validation, schema, and packing.
 5. [`GAME.MD`](GAME.MD) — implemented gameplay semantics.
+6. [`ARKPACK_SIGNING.md`](ARKPACK_SIGNING.md) — package-authorship, key handling, and trust-state contract.
 GitHub Issues are the only active backlog and continuation map. No repository Markdown file may act as a second current-status queue.
 
 When documentation and implementation disagree, stop and resolve the contradiction. Do not quietly choose whichever version makes the current task easier.
@@ -122,16 +123,14 @@ Do not introduce generic junk drawers such as `shared`, `utils`, `helpers`, or `
 
 ## Installation
 
-The repository pins Node `22.16.0` and npm `10.9.2` through [`.nvmrc`](.nvmrc), [`package.json`](package.json) `engines` and `packageManager`, the lockfile, and [GitHub Actions](.github/workflows). Use the pinned toolchain rather than letting local and CI package resolution quietly diverge.
+The repository pins Node `22.16.0` and npm `10.9.2` through [`.nvmrc`](.nvmrc), [`package.json`](package.json) `engines` and `packageManager`, and [GitHub Actions](.github/workflows). Use the pinned toolchain rather than letting local and CI package resolution quietly diverge.
 `npm-run-all2` is intentionally pinned to `8.0.4`: version 9 raises its Node floor above this shared local/CI/sandbox runtime, while version 8 keeps the same `run-p` / `run-s` script interface.
 
-The repository uses npm and commits `package-lock.json`.
+The repository uses npm without a committed lockfile.
 
 ```bash
-npm ci
+npm install
 ```
-
-Use `npm install` only when intentionally changing dependencies and updating the lockfile.
 
 Project tooling has one canonical [Effect](https://effect.website/) [CLI entrypoint](cli/arkini.ts):
 
@@ -157,7 +156,7 @@ It runs:
 Biome format check
 → source, test, and Electron TypeScript checks
 → game configuration validation
-→ production Electron build (packs the official game once)
+→ production Electron build (signs official Arkini and packs the unsigned demo once)
 → Dependency Cruiser architecture rules against generated build inputs
 → all ten deterministic Vitest shards
 ```
@@ -171,11 +170,11 @@ npm run preview
 npm run preview:macos
 ```
 
-Arkini is an [Electron](https://www.electronjs.org/docs/latest/)-only product. `npm run dev` starts Electron with a [Vite](https://vite.dev/guide/)-powered renderer and HMR. `npm run build` first generates the official Arkpack and then produces the production Electron build, so it works from a fresh checkout. `npm run preview` starts an existing production build without repacking or rebuilding it. `npm run preview:macos` is the packaged local preview: it cleans old package output, performs the same one-time pack/build stages, creates `release/mac-arm64/Arkini.app` with `electron-builder --dir`, prints that exact path, and launches the resulting bundle. There is no standalone web target, web persistence fallback, or alternate renderer startup path.
+Arkini is an [Electron](https://www.electronjs.org/docs/latest/)-only product. `npm run dev` starts Electron with a [Vite](https://vite.dev/guide/)-powered renderer and HMR. `npm run build` signs and verifies official Arkini, packs the deliberately unsigned demo, and then produces the production Electron build, so a production private key must be available through ignored `.arkini/arkpack-private.pem` or `ARKINI_ARKPACK_PRIVATE_KEY`. `npm run preview` starts an existing production build without repacking or rebuilding it. `npm run preview:macos` is the packaged local preview: it cleans old package output, performs the same one-time pack/build stages, creates `release/mac-arm64/Arkini.app` with `electron-builder --dir`, prints that exact path, and launches the resulting bundle. There is no standalone web target, web persistence fallback, or alternate renderer startup path.
 
 Appearance is renderer-owned and exposed through semantic Tailwind color utilities backed by one CSS token palette. `/settings` is the only theme-control surface and offers `system`, `light`, and `dark`; `system` follows later operating-system appearance changes, while explicit light/dark selections override them. The complete standalone TanStack mutation applies the selected theme immediately, persists it through the authoritative Effect/desktop capability, rolls back on failure, and treats the active value as a no-op. The accent remains a separately persisted semantic palette used by the launcher and game. Missing or malformed preferences resolve to dark and rose. Electron persists both values atomically under `userData/arkini/preferences`, applies the theme through `nativeTheme`, and exposes no browser-storage settings path.
 
-`npm install` and `npm ci` run Electron's official `install-electron` binary through the project `postinstall`, so the matching native executable is prepared during dependency installation rather than during application startup. Closing the last Electron window quits the application and also terminates the owning `electron-vite` command and renderer development server.
+`npm install` runs Electron's official `install-electron` binary through the project `postinstall`, so the matching native executable is prepared during dependency installation rather than during application startup. Closing the last Electron window quits the application and also terminates the owning `electron-vite` command and renderer development server.
 
 The main window opens centered at 75% of the active monitor work area. `F11` and `Alt+Enter` toggle native fullscreen. One [root renderer canvas](src/ui/canvas/Canvas.tsx) owns the exact viewport, hides document scrollbars, and requires game/UI content to fit the available window rather than expanding it; the board continuously uses the largest rectangle that preserves its authored aspect ratio.
 
@@ -239,9 +238,10 @@ When a chained runner fails to exit cleanly, run the affected shard independentl
 
 The launcher treats `.arkpack` as the playable package boundary:
 
-- official Arkini is listed from the generated [`game/arkini.game.arkpack.metadata.json`](game/arkini.game.arkpack.metadata.json) sidecar, so launcher refresh never fetches, hashes, decompresses, or decodes its bundled payload; exact startup still reads the binary and verifies that the fully validated descriptor matches the sidecar;
+- official Arkini is listed from generated metadata without reading payload bytes; exact startup reads its binary and detached signature, verifies Ed25519 against the committed public registry before decode, and fails closed unless the expected official key is established;
+- the bundled [`game/demo`](game/demo) package is deliberately unsigned and labeled external, proving that bundled delivery does not imply official authorship;
 - imported binaries are addressed by their exact SHA-256 identity and persist under `<userData>/arkini/arkpacks/<packageId>/package.arkpack`; derived `descriptor.json` metadata is rebuildable and catalog listing never reads payload bytes;
-- exact package load reads one selected binary and revalidates its hash, config, resources, and identity before a game starts;
+- exact package load verifies trust over raw bytes before decode, then revalidates hash, config, resources, and identity before a game starts;
 - renderer import rejects files above the compressed package limit before `File.arrayBuffer()` allocates them, while the binary reader keeps the same guard for non-File callers;
 - gameplay saves use the minimal MessagePack envelope `{ namespace: "arkini", format: 1, state }` and persist atomically under `<userData>/arkini/saves/<packageId>/<contentHash>/current.arksave`;
 - `pending.arksave` is temporary write state. A failed replacement leaves the previous successful `current.arksave` intact;
@@ -259,11 +259,18 @@ The default game source directory is [`game/arkini`](game/arkini).
 npm run game:schema
 npm run game:validate
 npm run game:pack
+npm run game:pack:demo
+npm run game:pack:official
 ```
 
 - `game:schema` writes the authoring JSON Schema to [`game/schema.json`](game/schema.json).
 - `game:validate` runs the canonical compiler and all diagnostics.
-- `game:pack`, implemented by the [pack command](src/engine/pack/cli/PackCommand.ts), validates the same completed config, reads PNG resources, encodes MessagePack, compresses it with gzip, and writes `game/arkini.game.arkpack` plus its tracked metadata sidecar. `dev` prepares the same generated input before the development server starts. The canonical desktop build operation owns [`packOfficialGameFx`](cli/desktop/packOfficialGameFx.ts) → [`buildDesktopOutputFx`](cli/desktop/buildDesktopOutputFx.ts), so `build`, `preview:macos`, and `package:mac` each generate the ignored binary exactly once before any renderer build that imports it. The local `check` order builds before Dependency Cruiser, and the macOS delivery workflow packages before Dependency Cruiser, so fresh checkouts never depend on stale generated output.
+- `game:pack`, implemented by the [pack command](src/engine/pack/cli/PackCommand.ts), remains an explicit unsigned authoring operation: it validates the completed config, reads PNG resources, encodes MessagePack, compresses it with gzip, and writes the binary plus tracked metadata.
+- `game:pack:demo` packs the merge-only demo without a signature.
+- `game:pack:official` packs final Arkini bytes, signs them with Ed25519, writes the detached `.sig`, and verifies the result against the committed public registry.
+- The canonical desktop build owns signed official packing, unsigned demo packing, then [`buildDesktopOutputFx`](cli/desktop/buildDesktopOutputFx.ts). `build`, `preview:macos`, and `package:mac` generate both ignored binaries exactly once before the renderer imports them. The local `check` order builds before Dependency Cruiser, and the macOS delivery workflow packages before Dependency Cruiser, so fresh checkouts never depend on stale generated output.
+
+[`ARKPACK_SIGNING.md`](ARKPACK_SIGNING.md) is the complete threat model, CLI, private-key, CI-secret, trust-state, and rotation contract.
 
 The compiler, validator, tests, and packer must never assemble different versions of the game configuration.
 

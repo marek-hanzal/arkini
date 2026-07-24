@@ -8,6 +8,10 @@ vi.mock("../../cli/desktop/packOfficialGameFx", () => ({
 	packOfficialGameFx: ({ gameDirectory }: { readonly gameDirectory: string }) =>
 		Effect.sync(() => calls.push(`pack:${gameDirectory}`)),
 }));
+vi.mock("../../cli/desktop/packDemoGameFx", () => ({
+	packDemoGameFx: ({ gameDirectory }: { readonly gameDirectory: string }) =>
+		Effect.sync(() => calls.push(`pack:${gameDirectory}`)),
+}));
 vi.mock("../../cli/desktop/buildDesktopOutputFx", () => ({
 	buildDesktopOutputFx: () => Effect.sync(() => calls.push("build-output")),
 }));
@@ -15,7 +19,7 @@ vi.mock("../../cli/desktop/buildDesktopOutputFx", () => ({
 import { buildDesktopFx } from "../../cli/desktop/buildDesktopFx";
 
 describe("buildDesktopFx", () => {
-	it("packs the official game before building Electron output", async () => {
+	it("packs the signed official game and unsigned demo before building Electron output", async () => {
 		calls.length = 0;
 		await Effect.runPromise(
 			buildDesktopFx({
@@ -25,6 +29,7 @@ describe("buildDesktopFx", () => {
 
 		expect(calls).toEqual([
 			"pack:game/arkini",
+			"pack:game/demo",
 			"build-output",
 		]);
 	});

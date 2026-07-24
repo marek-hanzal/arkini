@@ -9,6 +9,10 @@ const descriptor = {
 	title: "Test",
 	configVersion: "1.0" as const,
 	compressedSize: 3,
+	trust: {
+		type: "external",
+		reason: "unsigned",
+	} as const,
 	source: "imported" as const,
 	filename: "test.arkpack",
 	importedAtMs: 1,

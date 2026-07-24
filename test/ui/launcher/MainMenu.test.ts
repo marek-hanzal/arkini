@@ -60,6 +60,10 @@ describe("MainMenu", () => {
 					title: "Arkini",
 					configVersion: "1",
 					compressedSize: 1,
+					trust: {
+						type: "official",
+						keyId: "test-official",
+					} as const,
 					source: "built-in" as const,
 				},
 			],

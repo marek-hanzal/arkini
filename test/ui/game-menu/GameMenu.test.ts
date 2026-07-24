@@ -83,6 +83,10 @@ const createGame = (
 		title: "Menu game",
 		configVersion: "1.0",
 		compressedSize: 0,
+		trust: {
+			type: "external",
+			reason: "unsigned",
+		} as const,
 		source: "imported",
 	},
 	config: testArkpackConfig,

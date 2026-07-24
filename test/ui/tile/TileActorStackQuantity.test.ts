@@ -2,29 +2,20 @@
 
 import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it } from "vitest";
 
 import type { useTileActors } from "~/bridge/tile/useTileActors";
-import type { TileActorPhaseSchema } from "~/ui/tile/schema/TileActorPhaseSchema";
 import { TileActorContent } from "~/ui/tile/TileActorContent";
-
-vi.mock("motion/react", async () => import("~test/ui/support/motionReactMock"));
-
-(
-	globalThis as {
-		IS_REACT_ACT_ENVIRONMENT?: boolean;
-	}
-).IS_REACT_ACT_ENVIRONMENT = true;
 
 const roots: Array<ReturnType<typeof createRoot>> = [];
 
-const item = (id: string, quantity: number): useTileActors.Item => ({
-	id,
-	revision: `revision:${id}`,
-	itemId: "item:shared",
-	title: id,
+const item = (quantity: number): useTileActors.Item => ({
+	id: "runtime:stack",
+	revision: "revision:stack",
+	itemId: "item:stack",
+	title: "Stack",
 	quantity,
-	sourceUrl: `arkini://${id}`,
+	sourceUrl: "arkini://stack",
 	location: {
 		scope: "board",
 		space: 0,
@@ -39,30 +30,6 @@ const item = (id: string, quantity: number): useTileActors.Item => ({
 	},
 });
 
-const content = (
-	current: useTileActors.Item,
-	quantityOverride: number | null,
-	phase: TileActorPhaseSchema.Type,
-) =>
-	createElement(TileActorContent, {
-		item: current,
-		quantityOverride,
-		registerActorNode: () => undefined,
-		surfaceId: "board:0",
-		live: true,
-		exiting: false,
-		phase,
-		feedback: "accepted",
-		forbiddenDrop: false,
-		cue: null,
-		cueOriginOffset: null,
-		cueTargetOffset: null,
-		spawnDeliveryTiming: null,
-		spawnDeliveryReady: true,
-		onCueStart: () => undefined,
-		onCueComplete: () => undefined,
-	});
-
 afterEach(async () => {
 	await act(async () => {
 		for (const root of roots.splice(0)) root.unmount();
@@ -71,41 +38,28 @@ afterEach(async () => {
 });
 
 describe("Tile actor stack quantities", () => {
-	it.each([
-		{
-			name: "partial source",
-			current: item("runtime:source", 3),
-			previousQuantity: 5,
-			resolvePhase: "settling" as const,
-		},
-		{
-			name: "target",
-			current: item("runtime:target", 10),
-			previousQuantity: 8,
-			resolvePhase: "impact" as const,
-		},
-	])("keeps the $name quantity stable until contact and reveals the canonical result after it", async ({
-		current,
-		previousQuantity,
-		resolvePhase,
-	}) => {
+	it("renders the current canonical quantity immediately", async () => {
 		const container = document.createElement("div");
 		document.body.append(container);
 		const root = createRoot(container);
 		roots.push(root);
 
 		await act(async () => {
-			root.render(content(current, previousQuantity, "combining"));
+			root.render(
+				createElement(TileActorContent, {
+					item: item(3),
+					surfaceId: "board:0",
+					phase: "stable",
+					feedback: null,
+					forbiddenDrop: false,
+				}),
+			);
 		});
-		expect(
-			container.querySelector<HTMLElement>('[data-ui="TileActorFace"]')?.dataset.tileQuantity,
-		).toBe(String(previousQuantity));
 
-		await act(async () => {
-			root.render(content(current, null, resolvePhase));
-		});
 		expect(
-			container.querySelector<HTMLElement>('[data-ui="TileActorFace"]')?.dataset.tileQuantity,
-		).toBe(String(current.quantity));
+			container.querySelector<HTMLElement>('[data-ui="TileActorVisual"]')?.dataset
+				.tileQuantity,
+		).toBe("3");
+		expect(container.querySelector('[data-ui="TileActorQuantity"]')?.textContent).toBe("3");
 	});
 });

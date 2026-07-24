@@ -5,10 +5,10 @@ import { createRoot } from "react-dom/client";
 import { ArkpackCatalogProvider } from "~/bridge/arkpack/ArkpackCatalogProvider";
 import { createArkpackCatalogFx } from "~/bridge/arkpack/createArkpackCatalogFx";
 import { createCheatAvailability } from "~/bridge/cheat/createCheatAvailability";
-import { closeGameEngineResourceFx } from "~/bridge/game/closeGameEngineResourceFx";
 import { releaseGameEngineResourceFx } from "~/bridge/game/releaseGameEngineResourceFx";
 import { waitForGameEngineResource } from "~/bridge/game/waitForGameEngineResource";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
+import { installRendererControlledClose } from "~/installRendererControlledClose";
 import { createArkiniRouter } from "~/router";
 import { AppearanceProvider } from "~/ui/appearance/AppearanceProvider";
 import { CheatAvailabilityProvider } from "~/ui/cheat-availability/CheatAvailabilityProvider";
@@ -53,22 +53,14 @@ const router = createArkiniRouter({
 	queryClient,
 });
 
-const removeBeforeClose = window.arkini.lifecycle.onBeforeClose(async () => {
-	const resource = await waitForGameEngineResource(queryClient);
-	if (resource === null) return;
-	const result = await RendererRuntime.runPromise(
-		closeGameEngineResourceFx({
-			queryClient,
-			resource,
-		}),
-	);
-	if (result.type === "finalization-failed") {
-		console.error("Arkini controlled close finalization failed; closing anyway.", result.cause);
-	}
+const removeControlledClose = installRendererControlledClose({
+	lifecycle: window.arkini.lifecycle,
+	queryClient,
+	router,
 });
 
 import.meta.hot?.dispose((data: HotData) => {
-	removeBeforeClose();
+	removeControlledClose();
 	removeCheatAvailabilityStartupSubscription();
 	RendererRuntime.runSync(launcherStartup.disposeFx);
 	data.gameEngineShutdown = waitForGameEngineResource(queryClient).then(async (resource) => {

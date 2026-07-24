@@ -100,7 +100,7 @@ const createHarness = () => {
 };
 
 describe("registerControlledWindowCloseFx", () => {
-	it("allows the window to close only after the renderer confirms a successful final flush", () => {
+	it("allows the window to close only after the renderer confirms completed shutdown", () => {
 		const harness = createHarness();
 		const preventDefault = harness.requestClose();
 
@@ -114,7 +114,7 @@ describe("registerControlledWindowCloseFx", () => {
 		expect(recursiveClose).not.toHaveBeenCalled();
 	});
 
-	it("keeps the window open after a failed final save and permits an explicit retry", () => {
+	it("keeps the window open after failed renderer choreography and permits an explicit retry", () => {
 		const consoleError = vi.spyOn(console, "error").mockImplementation(() => undefined);
 		const harness = createHarness();
 		harness.requestClose();
@@ -122,7 +122,7 @@ describe("registerControlledWindowCloseFx", () => {
 
 		expect(harness.close).not.toHaveBeenCalled();
 		expect(consoleError).toHaveBeenCalledWith(
-			"Arkini renderer refused to close after a failed final save:",
+			"Arkini renderer controlled-close orchestration failed:",
 			"disk full",
 		);
 

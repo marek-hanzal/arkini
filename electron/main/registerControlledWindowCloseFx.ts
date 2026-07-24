@@ -13,7 +13,7 @@ export namespace registerControlledWindowCloseFx {
 	}
 }
 
-/** Waits for one best-effort renderer final-save attempt before allowing the window to close. */
+/** Holds native close until the renderer completes its trusted shutdown choreography. */
 export const registerControlledWindowCloseFx = Effect.fn("registerControlledWindowCloseFx")(
 	({ window, ipc, trustedRenderer }: registerControlledWindowCloseFx.Props) =>
 		Effect.sync(() => {
@@ -42,10 +42,7 @@ export const registerControlledWindowCloseFx = Effect.fn("registerControlledWind
 				if (!ownsTrustedWindow(event)) return;
 				closeRequested = false;
 				removeResponseListeners();
-				console.error(
-					"Arkini renderer refused to close after a failed final save:",
-					message,
-				);
+				console.error("Arkini renderer controlled-close orchestration failed:", message);
 			};
 			const onRequestClose = (event: IpcMainEvent) => {
 				if (!ownsTrustedWindow(event) || window.isDestroyed()) return;

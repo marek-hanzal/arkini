@@ -1,15 +1,11 @@
 import { z } from "zod";
 
-/** Exhaustive visual roles rendered by one Motion tile actor. */
+/** Exhaustive immediate interaction roles rendered by one tile actor. */
 export const TileActorPhaseSchema = z.enum([
 	"stable",
 	"hovered",
 	"targeted",
 	"dragging",
-	"combining",
-	"settling",
-	"impact",
-	"exiting",
 ]);
 
 export type TileActorPhaseSchema = typeof TileActorPhaseSchema;

@@ -51,21 +51,13 @@ describe("TileActor stacking", () => {
 		expect(zIndex(inventory, "hovered", 20)).toBeGreaterThan(tileInventoryOverlayZIndex);
 	});
 
-	it("lifts cross-surface travel above the Inventory panel regardless of its source scope", () => {
+	it("lifts direct dragging above the Inventory panel regardless of its source scope", () => {
 		for (const location of [
 			board,
 			inventory,
 			toolbar,
 		]) {
-			for (const phase of [
-				"dragging",
-				"combining",
-				"settling",
-				"impact",
-				"exiting",
-			] as const) {
-				expect(zIndex(location, phase, 0)).toBeGreaterThan(tileInventoryOverlayZIndex);
-			}
+			expect(zIndex(location, "dragging", 0)).toBeGreaterThan(tileInventoryOverlayZIndex);
 		}
 	});
 });

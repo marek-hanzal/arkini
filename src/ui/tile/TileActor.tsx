@@ -1,5 +1,5 @@
 import { motion } from "motion/react";
-import { memo, useCallback, useContext, useEffect, useRef } from "react";
+import { memo, useCallback, useContext, useEffect, useMemo, useRef } from "react";
 import { match } from "ts-pattern";
 
 import { useStartItemDetailLine } from "~/bridge/item-detail/useStartItemDetailLine";
@@ -12,11 +12,10 @@ import { InventoryContext } from "~/ui/inventory/InventoryContext";
 import { useItemDetailControl } from "~/ui/item-detail/useItemDetailControl";
 import { TileActorContent } from "~/ui/tile/TileActorContent";
 import { readTileActorCursorSemantic } from "~/ui/tile/readTileActorCursorSemantic";
-import { useTileActorDrag } from "~/ui/tile/useTileActorDrag";
-import { useTileActorMotion } from "~/ui/tile/useTileActorMotion";
-import type { TileMotionCueSchema } from "~/ui/tile/schema/TileMotionCueSchema";
 import { readTileActorStackingZIndex } from "~/ui/tile/TileActorStacking";
+import { useTileActorDrag } from "~/ui/tile/useTileActorDrag";
 import { useTileActorPresentation } from "~/ui/tile/useTileActorPresentation";
+import { useTileActorSystem } from "~/ui/tile/useTileActorSystem";
 
 const primaryActionDelayMs = 320;
 
@@ -27,82 +26,44 @@ const unavailableInventoryControl = {
 const primaryActionKey = (action: useTileActors.Item["primaryAction"]) =>
 	action.kind === "start-default-line" ? `${action.kind}:${action.lineId}` : action.kind;
 
-const zIndexForCue = (cue: TileMotionCueSchema.Type | null) => {
-	if (cue === null) return 0;
-	return match(cue.kind)
-		.with("exit", "consume-exit", "deplete-exit", "expiry", () => 35)
-		.with(
-			"morph",
-			"absorb",
-			"impact",
-			"accept",
-			"consume",
-			"complete",
-			"charge",
-			"pause",
-			"resume",
-			"deplete",
-			() => 30,
-		)
-		.with("spawn", "settle", () => 15)
-		.exhaustive();
-};
-
-const isTerminalCue = (cue: TileMotionCueSchema.Type | null) =>
-	cue?.kind === "exit" ||
-	cue?.kind === "consume-exit" ||
-	cue?.kind === "deplete-exit" ||
-	cue?.kind === "expiry";
-
 export namespace TileActor {
 	export interface Props {
 		readonly item: useTileActors.Item;
-		readonly live: boolean;
-		readonly cue: TileMotionCueSchema.Type | null;
-		readonly morphPreviousItem: useTileActors.Item | null;
-		readonly onCueStart: (itemId: string, generation: number) => void;
-		readonly onCueContact: (itemId: string, generation: number) => void;
-		readonly onCueComplete: (itemId: string, generation: number) => void;
 	}
 }
 
-/** Renders one stable runtime-item actor from focused presentation, Motion, and drag owners. */
-const TileActorComponent = ({
-	item,
-	live,
-	cue,
-	morphPreviousItem,
-	onCueStart,
-	onCueContact,
-	onCueComplete,
-}: TileActor.Props) => {
+/** Renders one current tile actor with direct dragging and no animation lifecycle. */
+const TileActorComponent = ({ item }: TileActor.Props) => {
 	const itemDetail = useItemDetailControl();
 	const inventory = useContext(InventoryContext) ?? unavailableInventoryControl;
 	const startLine = useStartItemDetailLine();
 	const presentation = useTileActorPresentation({
 		item,
-		live,
 	});
-	const actorMotion = useTileActorMotion({
-		item,
-		presentation,
-		cue,
-	});
-	const interactive = live && actorMotion.placement.visible && !itemDetail.isOpen;
+	const { geometryVersion, readPlacement } = useTileActorSystem();
+	const placement = useMemo(
+		() => readPlacement(presentation.canonicalSource),
+		[
+			geometryVersion,
+			presentation.canonicalSource,
+			readPlacement,
+		],
+	);
+	const interactive = placement !== null && !itemDetail.isOpen;
 	const drag = useTileActorDrag({
 		canonicalSource: presentation.canonicalSource,
 		live: interactive,
-		terminalCueActive: isTerminalCue(cue),
-		pointer: actorMotion.pointer.commands,
 	});
 	const pendingPrimaryAction = useRef<ReturnType<typeof setTimeout> | null>(null);
 	const latestItem = useRef(item);
 	latestItem.current = item;
+
 	const cancelPendingPrimaryAction = useCallback(() => {
 		if (pendingPrimaryAction.current === null) return;
 		clearTimeout(pendingPrimaryAction.current);
 		pendingPrimaryAction.current = null;
 	}, []);
+
 	const runPrimaryAction = useCallback(
 		(origin: HTMLElement) =>
 			match(item.primaryAction)
@@ -172,13 +133,13 @@ const TileActorComponent = ({
 		item.revision,
 	]);
 
+	const visible = placement !== null;
 	const boardLocation =
 		item.location.scope === LocationScopeEnumSchema.enum.Board ? item.location : null;
-	const visible = actorMotion.placement.visible;
 	const zIndex = readTileActorStackingZIndex({
-		location: presentation.desiredSource.location,
+		location: item.location,
 		phase: presentation.phase,
-		localZIndex: Math.max(presentation.zIndex, zIndexForCue(cue)),
+		localZIndex: presentation.zIndex,
 	});
 	const cursor = readTileActorCursorSemantic({
 		feedback: presentation.feedback,
@@ -193,36 +154,32 @@ const TileActorComponent = ({
 	return (
 		<motion.button
 			type="button"
-			className={`absolute left-0 top-0 overflow-visible border-0 bg-transparent p-0 text-inherit outline-none ${CursorClassName[cursor]}`}
+			className={`absolute left-0 top-0 touch-none overflow-visible border-0 bg-transparent p-0 text-inherit outline-none ${CursorClassName[cursor]}`}
 			style={{
-				left: actorMotion.placement.anchor.x,
-				top: actorMotion.placement.anchor.y,
-				width: actorMotion.placement.width,
-				height: actorMotion.placement.height,
+				left: placement?.x ?? 0,
+				top: placement?.y ?? 0,
+				width: placement?.width ?? 0,
+				height: placement?.height ?? 0,
 				zIndex,
 				pointerEvents: interactive ? "auto" : "none",
 				visibility: visible ? "visible" : "hidden",
-				x: actorMotion.neighbour.values.x,
-				y: actorMotion.neighbour.values.y,
+				x: drag.x,
+				y: drag.y,
 			}}
+			drag={interactive}
+			dragControls={drag.dragControls}
+			dragListener={false}
+			dragMomentum={false}
+			dragElastic={0}
 			aria-label={item.title}
 			data-ui="TileActor"
-			data-motion-id={item.id}
 			data-tile-actor="true"
 			data-item-id={item.itemId}
 			data-runtime-id={item.id}
 			data-runtime-revision={item.revision}
 			data-location-scope={item.location.scope}
 			data-surface-id={presentation.canonicalSource.surface.id}
-			data-live={live ? "true" : "false"}
-			data-motion-phase={presentation.phase}
-			data-motion-exiting={
-				presentation.phase === "exiting" ||
-				cue?.kind === "exit" ||
-				cue?.kind === "consume-exit"
-					? "true"
-					: "false"
-			}
+			data-phase={presentation.phase}
 			data-board-x={boardLocation?.position.x}
 			data-board-y={boardLocation?.position.y}
 			data-toolbar-x={
@@ -236,6 +193,21 @@ const TileActorComponent = ({
 				if (interactive) presentation.setHovered(true);
 			}}
 			onPointerLeave={() => presentation.setHovered(false)}
+			onPointerDown={(event) => {
+				cancelPendingPrimaryAction();
+				drag.onPointerDown(event);
+			}}
+			onPointerUp={drag.onPointerUp}
+			onPointerCancel={() => {
+				cancelPendingPrimaryAction();
+				drag.onPointerCancel();
+			}}
+			onDragStart={(event, info) => {
+				cancelPendingPrimaryAction();
+				drag.onDragStart(event, info);
+			}}
+			onDrag={drag.onDrag}
+			onDragEnd={drag.onDragEnd}
 			onClick={(event) => {
 				if (
 					!interactive ||
@@ -280,118 +252,16 @@ const TileActorComponent = ({
 				});
 			}}
 		>
-			<motion.span
-				className="absolute inset-0 z-10 touch-none"
-				style={{
-					x: actorMotion.pointer.values.direct.x,
-					y: actorMotion.pointer.values.direct.y,
-				}}
-				drag={interactive}
-				dragControls={drag.dragControls}
-				dragListener={false}
-				dragMomentum={false}
-				dragElastic={0}
-				onPointerDown={(event) => {
-					cancelPendingPrimaryAction();
-					drag.onPointerDown(event);
-				}}
-				onPointerUp={drag.onPointerUp}
-				onPointerCancel={() => {
-					cancelPendingPrimaryAction();
-					drag.onPointerCancel();
-				}}
-				onDragStart={(event, info) => {
-					cancelPendingPrimaryAction();
-					drag.onDragStart(event, info);
-				}}
-				onDrag={drag.onDrag}
-				onDragEnd={drag.onDragEnd}
-				data-ui="TileActorDragSurface"
+			<TileActorContent
+				item={item}
+				surfaceId={presentation.canonicalSource.surface.id}
+				phase={presentation.phase}
+				feedback={presentation.feedback}
+				forbiddenDrop={presentation.forbiddenDrop}
 			/>
-			<motion.span
-				className="pointer-events-none absolute inset-0"
-				style={{
-					x: actorMotion.travel.x,
-					y: actorMotion.travel.y,
-				}}
-				data-ui="TileActorTravel"
-				data-motion-id={item.id}
-			>
-				<motion.span
-					className="absolute inset-0"
-					style={{
-						x: actorMotion.pointer.values.direct.x,
-						y: actorMotion.pointer.values.direct.y,
-					}}
-					data-ui="TileActorPointer"
-					data-motion-id={item.id}
-				>
-					<motion.span
-						className="absolute inset-0"
-						style={{
-							x: actorMotion.pointer.values.physical.x,
-							y: actorMotion.pointer.values.physical.y,
-							rotate: actorMotion.pointer.values.physical.rotation,
-						}}
-						data-ui="TileActorPhysicalResponse"
-						data-motion-id={item.id}
-					>
-						<motion.span
-							className="absolute inset-0"
-							style={{
-								x: actorMotion.pointer.values.pickup.x,
-								y: actorMotion.pointer.values.pickup.y,
-							}}
-							data-ui="TileActorPickup"
-							data-motion-id={item.id}
-						>
-							<motion.span
-								className="absolute inset-0"
-								style={{
-									scale: actorMotion.neighbour.values.scale,
-								}}
-								data-ui="TileActorNeighbourEmphasis"
-								data-motion-id={item.id}
-							>
-								<TileActorContent
-									item={item}
-									quantityOverride={presentation.quantityOverride}
-									registerActorNode={actorMotion.neighbour.registerActorNode}
-									surfaceId={presentation.canonicalSource.surface.id}
-									live={live}
-									exiting={
-										presentation.phase === "exiting" ||
-										cue?.kind === "exit" ||
-										cue?.kind === "consume-exit"
-									}
-									phase={presentation.phase}
-									feedback={presentation.feedback}
-									forbiddenDrop={presentation.forbiddenDrop}
-									cue={cue}
-									morphPreviousItem={morphPreviousItem}
-									cueOriginOffset={actorMotion.cueGeometry.originOffset}
-									cueTargetOffset={actorMotion.cueGeometry.targetOffset}
-									spawnDeliveryTiming={actorMotion.travel.spawnDeliveryTiming}
-									spawnDeliveryReady={actorMotion.travel.spawnDeliveryReady}
-									onCueStart={(generation) => onCueStart(item.id, generation)}
-									onCueContact={(generation) => onCueContact(item.id, generation)}
-									onCueComplete={(generation) =>
-										onCueComplete(item.id, generation)
-									}
-									onInteractionAnimationComplete={
-										presentation.visualCompletionGeneration === null
-											? undefined
-											: actorMotion.completion.onVisualComplete
-									}
-								/>
-							</motion.span>
-						</motion.span>
-					</motion.span>
-				</motion.span>
-			</motion.span>
 		</motion.button>
 	);
 };
 
-/** Exact props form the complete safe bailout boundary for one actor identity. */
+/** Exact item props form the safe bailout boundary for one actor identity. */
 export const TileActor = memo(TileActorComponent);

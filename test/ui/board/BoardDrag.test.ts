@@ -6,10 +6,8 @@ import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { GameEngine } from "~/bridge/game/GameEngine";
-import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
 import { useGameFx } from "~/engine/game/fx/useGameFx";
 import { RuntimeFx } from "~/engine/runtime/context/RuntimeFx";
-import { DropItemRejectedReasonEnumSchema } from "~/engine/runtime/schema/command/DropItemRejectedReasonEnumSchema";
 import type { CommittedTransitionSchema } from "~/engine/runtime/schema/CommittedTransitionSchema";
 import { DropItemResultKindEnumSchema } from "~/engine/runtime/schema/command/DropItemResultKindEnumSchema";
 import type { dropItemFx } from "~/engine/runtime/write/dropItemFx";
@@ -19,7 +17,6 @@ import { Board } from "~/ui/board/Board";
 import { ItemDetailModal } from "~/ui/item-detail/ItemDetailModal";
 import { ItemDetailProvider } from "~/ui/item-detail/ItemDetailProvider";
 import { TileSystemProvider } from "~/ui/tile/TileSystemProvider";
-import { motionTestRuntime } from "~test/ui/support/motionReactMock";
 
 (
 	globalThis as {
@@ -61,12 +58,6 @@ const rect = (left: number, top: number, width: number, height: number): DOMRect
 	y: top,
 	toJSON: () => ({}),
 });
-
-const expectArtworkOnlyVisual = (visual: HTMLElement) => {
-	expect(visual.classList).toContain("bg-transparent");
-	expect(visual.classList).not.toContain("bg-surface-raised/95");
-	expect(visual.classList).not.toContain("border");
-};
 
 const pointerEvent = (type: string, x: number, y: number) => {
 	const event = new MouseEvent(type, {
@@ -200,7 +191,6 @@ const transitionListeners = new Set<
 	(transition: CommittedTransitionSchema.Type) => void | PromiseLike<void>
 >();
 let transitionSequence = 0;
-let claimedTilePresentationSequence = -1;
 let currentTransition: CommittedTransitionSchema.Type = {
 	sequence: transitionSequence,
 	previousRuntime: null,
@@ -247,13 +237,6 @@ const game = {
 	},
 	getSnapshot: () => currentRuntime,
 	getTransitionSnapshot: () => currentTransition,
-	canClaimTilePresentationTransition: (sequence: number) =>
-		sequence > claimedTilePresentationSequence,
-	claimTilePresentationTransition: (sequence: number) => {
-		if (sequence <= claimedTilePresentationSequence) return false;
-		claimedTilePresentationSequence = sequence;
-		return true;
-	},
 	getResourceUrl: (resourceId: string) => `resource:${resourceId}`,
 	subscribe: (listener: () => void) => {
 		runtimeListeners.add(listener);
@@ -280,10 +263,8 @@ const game = {
 } satisfies GameEngine;
 
 beforeEach(() => {
-	motionTestRuntime.reset();
 	currentRuntime = runtime;
 	transitionSequence = 0;
-	claimedTilePresentationSequence = -1;
 	currentTransition = {
 		sequence: transitionSequence,
 		previousRuntime: null,
@@ -316,85 +297,6 @@ beforeEach(() => {
 			const element = this as HTMLElement;
 			if (element.dataset.ui === "BoardGrid") return rect(0, 0, 300, 200);
 			if (element.dataset.ui === "TileActorLayer") return rect(0, 0, 300, 200);
-			if (
-				element.dataset.ui === "TileMotionCueVisual" ||
-				element.dataset.ui === "TileActorVisual"
-			) {
-				const actor = element.closest<HTMLElement>('[data-ui="TileActor"]');
-				const runtimeId = actor?.dataset.runtimeId;
-				const boardX = Number(actor?.dataset.boardX);
-				const boardY = Number(actor?.dataset.boardY);
-				const visual = actor?.querySelector<HTMLElement>('[data-ui="TileActorVisual"]');
-				const scale = Number(visual?.dataset.motionScale ?? 0.8);
-				if (
-					runtimeId !== undefined &&
-					Number.isFinite(boardX) &&
-					Number.isFinite(boardY) &&
-					Number.isFinite(scale)
-				) {
-					const travel = motionTestRuntime.readMotionOffset(
-						"TileActorTravel",
-						runtimeId,
-					) ?? {
-						x: 0,
-						y: 0,
-					};
-					const pointer = motionTestRuntime.readMotionOffset(
-						"TileActorPointer",
-						runtimeId,
-					) ?? {
-						x: 0,
-						y: 0,
-					};
-					const response = motionTestRuntime.readMotionOffset(
-						"TileActorPhysicalResponse",
-						runtimeId,
-					) ?? {
-						x: 0,
-						y: 0,
-					};
-					const pickup = motionTestRuntime.readMotionOffset(
-						"TileActorPickup",
-						runtimeId,
-					) ?? {
-						x: 0,
-						y: 0,
-					};
-					const neighbour = motionTestRuntime.readMotionOffset(
-						"TileActor",
-						runtimeId,
-					) ?? {
-						x: 0,
-						y: 0,
-					};
-					const size = 100 * scale;
-					return rect(
-						boardX * 100 +
-							(100 - size) / 2 +
-							travel.x +
-							pointer.x +
-							response.x +
-							pickup.x +
-							neighbour.x,
-						boardY * 100 +
-							(100 - size) / 2 +
-							travel.y +
-							pointer.y +
-							response.y +
-							pickup.y +
-							neighbour.y,
-						size,
-						size,
-					);
-				}
-			}
-			if (element.dataset.ui === "TileActorDragSurface") {
-				const actor = element.closest<HTMLElement>('[data-ui="TileActor"]');
-				const x = Number(actor?.dataset.boardX);
-				const y = Number(actor?.dataset.boardY);
-				if (Number.isFinite(x) && Number.isFinite(y))
-					return rect(x * 100, y * 100, 100, 100);
-			}
 			const x = Number(element.dataset.boardX);
 			const y = Number(element.dataset.boardY);
 			if (Number.isFinite(x) && Number.isFinite(y)) return rect(x * 100, y * 100, 100, 100);
@@ -452,158 +354,16 @@ const renderBoard = async () => {
 };
 
 const dragTo = async (source: HTMLElement, x: number, y: number) => {
-	const dragSurface = source.querySelector<HTMLElement>('[data-ui="TileActorDragSurface"]');
-	if (dragSurface === null) throw new Error("Missing drag surface.");
 	await act(async () => {
-		dragSurface.dispatchEvent(pointerEvent("pointerdown", 250, 150));
-		dragSurface.dispatchEvent(pointerEvent("pointermove", x, y));
-		dragSurface.dispatchEvent(pointerEvent("pointerup", x, y));
+		source.dispatchEvent(pointerEvent("pointerdown", 250, 150));
+		source.dispatchEvent(pointerEvent("pointermove", x, y));
+		source.dispatchEvent(pointerEvent("pointerup", x, y));
 		await Promise.resolve();
 		await Promise.resolve();
 	});
 };
 
 describe("Board drag", () => {
-	it("animates an off-center pickup toward the pointer instead of snapping on press", async () => {
-		const source = await renderBoard();
-		const runtimeId = source.dataset.runtimeId;
-		const dragSurface = source.querySelector<HTMLElement>('[data-ui="TileActorDragSurface"]');
-		if (runtimeId === undefined || dragSurface === null)
-			throw new Error("Missing draggable actor identity.");
-
-		await act(async () => {
-			dragSurface.dispatchEvent(pointerEvent("pointerdown", 210, 110));
-			await Promise.resolve();
-		});
-
-		expect(motionTestRuntime.readDragOffset()).toEqual({
-			x: 0,
-			y: 0,
-		});
-		expect(motionTestRuntime.readMotionOffset("TileActorPickup", runtimeId)).toEqual({
-			x: 0,
-			y: 0,
-		});
-
-		await act(async () => {
-			dragSurface.dispatchEvent(pointerEvent("pointermove", 217, 117));
-			await Promise.resolve();
-		});
-
-		expect(motionTestRuntime.readMotionOffset("TileActorPickup", runtimeId)).toEqual({
-			x: -40,
-			y: -40,
-		});
-		expect(motionTestRuntime.readMotionOffset("TileActorPhysicalResponse", runtimeId)).toEqual({
-			x: -1.4,
-			y: -1.12,
-		});
-		const compatibleActor = document.querySelector<HTMLElement>(
-			'[data-ui="TileActor"][data-board-x="0"][data-board-y="1"]',
-		);
-		const compatibleRuntimeId = compatibleActor?.dataset.runtimeId;
-		const incompatibleActor = document.querySelector<HTMLElement>(
-			'[data-ui="TileActor"][data-board-x="1"][data-board-y="0"]',
-		);
-		const incompatibleRuntimeId = incompatibleActor?.dataset.runtimeId;
-		if (compatibleRuntimeId === undefined || incompatibleRuntimeId === undefined) {
-			throw new Error("Missing neighbour actor identity.");
-		}
-		expect(motionTestRuntime.readMotionOffset("TileActor", compatibleRuntimeId)).toEqual({
-			x: 0,
-			y: 0,
-		});
-		expect(
-			motionTestRuntime.readMotionScale("TileActorNeighbourEmphasis", compatibleRuntimeId),
-		).toBeGreaterThan(1);
-		expect(motionTestRuntime.readMotionOffset("TileActor", incompatibleRuntimeId)).not.toEqual({
-			x: 0,
-			y: 0,
-		});
-
-		await act(async () => {
-			dragSurface.dispatchEvent(pointerEvent("pointercancel", 217, 117));
-			await Promise.resolve();
-			await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
-		});
-
-		expect(motionTestRuntime.readMotionOffset("TileActorPhysicalResponse", runtimeId)).toEqual({
-			x: 0,
-			y: 0,
-		});
-		expect(motionTestRuntime.readMotionOffset("TileActor", compatibleRuntimeId)).toEqual({
-			x: 0,
-			y: 0,
-		});
-		expect(motionTestRuntime.readMotionOffset("TileActor", incompatibleRuntimeId)).toEqual({
-			x: 0,
-			y: 0,
-		});
-		expect(
-			motionTestRuntime.readMotionScale("TileActorNeighbourEmphasis", compatibleRuntimeId),
-		).toBe(1);
-	});
-
-	it("preserves a settling physical shell through a press released before drag starts", async () => {
-		const source = await renderBoard();
-		const runtimeId = source.dataset.runtimeId;
-		const dragSurface = source.querySelector<HTMLElement>('[data-ui="TileActorDragSurface"]');
-		if (runtimeId === undefined || dragSurface === null)
-			throw new Error("Missing draggable actor identity.");
-		motionTestRuntime.writeMotionOffset("TileActorPhysicalResponse", runtimeId, {
-			x: 4.864,
-			y: -2.25,
-		});
-
-		await act(async () => {
-			dragSurface.dispatchEvent(pointerEvent("pointerdown", 250, 150));
-			dragSurface.dispatchEvent(pointerEvent("pointerup", 250, 150));
-			await Promise.resolve();
-		});
-
-		expect(motionTestRuntime.readDragOffset()).toEqual({
-			x: 0,
-			y: 0,
-		});
-		expect(motionTestRuntime.readMotionOffset("TileActorPickup", runtimeId)).toEqual({
-			x: 0,
-			y: 0,
-		});
-		expect(motionTestRuntime.readMotionOffset("TileActorPhysicalResponse", runtimeId)).toEqual({
-			x: 4.864,
-			y: -2.25,
-		});
-	});
-
-	it("gives an occupied rejected target its own resistant response", async () => {
-		motionTestRuntime.autoComplete = false;
-		motionTestRuntime.autoCompleteImperativeAnimations = false;
-		const source = await renderBoard();
-		const target = document.querySelector<HTMLElement>(
-			'[data-ui="TileActor"][data-board-x="1"][data-board-y="0"]',
-		);
-		if (target === null) throw new Error("Missing occupied target actor.");
-		const sourceItemId = source.dataset.runtimeId;
-		const targetItemId = target.dataset.runtimeId;
-		if (sourceItemId === undefined || targetItemId === undefined) {
-			throw new Error("Missing actor identities.");
-		}
-		dropItemState.drop.mockResolvedValue({
-			kind: DropItemResultKindEnumSchema.enum.Reject,
-			reason: DropItemRejectedReasonEnumSchema.enum.Occupied,
-			itemId: sourceItemId,
-			targetItemId,
-		});
-
-		await dragTo(source, 150, 50);
-
-		expect(source.dataset.motionPhase).toBe("settling");
-		expect(target.dataset.motionPhase).toBe("settling");
-		expect(
-			target.querySelector<HTMLElement>('[data-ui="TileActorVisual"]')?.dataset.motionScale,
-		).toBe("0.84");
-	});
-
 	it("moves the one existing actor through the public atomic drop command", async () => {
 		const source = await renderBoard();
 		const runtimeId = source.dataset.runtimeId;
@@ -758,35 +518,15 @@ describe("Board drag", () => {
 			return swapOutcome;
 		});
 
-		const dragSurface = source.querySelector<HTMLElement>('[data-ui="TileActorDragSurface"]');
-		if (dragSurface === null) throw new Error("Missing drag surface.");
 		await act(async () => {
-			dragSurface.dispatchEvent(pointerEvent("pointerdown", 250, 150));
-			dragSurface.dispatchEvent(pointerEvent("pointermove", 150, 50));
+			source.dispatchEvent(pointerEvent("pointerdown", 250, 150));
+			source.dispatchEvent(pointerEvent("pointermove", 150, 50));
 		});
-		expect(
-			target.querySelector<HTMLElement>('[data-ui="TileActorVisual"]')?.dataset.motionScale,
-		).toBe("0.8");
-		expect(motionTestRuntime.readMotionOffset("TileActor", targetId)).not.toEqual({
-			x: 0,
-			y: 0,
-		});
-		const compatibleNeighbour = document.querySelector<HTMLElement>(
-			'[data-ui="TileActor"][data-board-x="0"][data-board-y="1"]',
-		);
-		const compatibleNeighbourId = compatibleNeighbour?.dataset.runtimeId;
-		if (compatibleNeighbourId === undefined)
-			throw new Error("Missing compatible neighbour identity.");
-		expect(motionTestRuntime.readMotionOffset("TileActor", compatibleNeighbourId)).toEqual({
-			x: 0,
-			y: 0,
-		});
-		expect(
-			motionTestRuntime.readMotionScale("TileActorNeighbourEmphasis", compatibleNeighbourId),
-		).toBeGreaterThan(1);
+		expect(source.dataset.phase).toBe("dragging");
+		expect(target.dataset.phase).toBe("targeted");
 
 		await act(async () => {
-			dragSurface.dispatchEvent(pointerEvent("pointerup", 150, 50));
+			source.dispatchEvent(pointerEvent("pointerup", 150, 50));
 			await Promise.resolve();
 			await Promise.resolve();
 		});
@@ -830,121 +570,7 @@ describe("Board drag", () => {
 		expect(document.querySelector('[data-ui="TileDragGhost"]')).toBeNull();
 	});
 
-	it("retains a consumed source actor through merge approach and exits it after target impact", async () => {
-		motionTestRuntime.autoComplete = false;
-		const source = await renderBoard();
-		const target = document.querySelector<HTMLElement>(
-			'[data-ui="TileActor"][data-board-x="0"][data-board-y="1"]',
-		);
-		if (target === null) throw new Error("Missing merge target actor.");
-		const sourceId = source.dataset.runtimeId;
-		const sourceRevision = source.dataset.runtimeRevision;
-		const targetId = target.dataset.runtimeId;
-		const targetRevision = target.dataset.runtimeRevision;
-		if (
-			sourceId === undefined ||
-			sourceRevision === undefined ||
-			targetId === undefined ||
-			targetRevision === undefined
-		) {
-			throw new Error("Missing merge identities.");
-		}
-		const sourceLocation = {
-			scope: "board" as const,
-			space: 0,
-			position: {
-				x: 2,
-				y: 1,
-			},
-		};
-		const targetLocation = {
-			scope: "board" as const,
-			space: 0,
-			position: {
-				x: 0,
-				y: 1,
-			},
-		};
-		const mergeOutcome: Extract<
-			dropItemFx.Result,
-			{
-				readonly kind: typeof DropItemResultKindEnumSchema.enum.Merge;
-			}
-		> = {
-			kind: DropItemResultKindEnumSchema.enum.Merge,
-			action: "consume",
-			effect: "keep",
-			source: {
-				itemId: sourceId,
-				previousRevision: sourceRevision,
-				previousLocation: sourceLocation,
-				previousQuantity: 1,
-				current: null,
-			},
-			target: {
-				itemId: targetId,
-				previousRevision: targetRevision,
-				previousLocation: targetLocation,
-				previousQuantity: 1,
-				current: {
-					itemId: targetId,
-					canonicalItemId: "tree",
-					revision: targetRevision,
-					location: targetLocation,
-					quantity: 1,
-				},
-			},
-		};
-		dropItemState.drop.mockImplementation(async () => {
-			publishRuntime({
-				...currentRuntime,
-				items: currentRuntime.items.filter((item) => item.id !== sourceId),
-			});
-			return mergeOutcome;
-		});
-
-		await dragTo(source, 50, 150);
-
-		expect(dropItemState.drop).toHaveBeenCalledWith({
-			sourceItemId: sourceId,
-			sourceRevision,
-			sourceLocation,
-			target: {
-				kind: "slot",
-				location: targetLocation,
-				occupant: {
-					itemId: targetId,
-					revision: targetRevision,
-				},
-			},
-		});
-		expect(document.querySelector(`[data-runtime-id="${sourceId}"]`)).toBe(source);
-		expect(document.querySelector(`[data-runtime-id="${targetId}"]`)).toBe(target);
-		const sourceVisual = source.querySelector<HTMLElement>('[data-ui="TileActorVisual"]');
-		const targetVisual = target.querySelector<HTMLElement>('[data-ui="TileActorVisual"]');
-		if (sourceVisual === null || targetVisual === null)
-			throw new Error("Missing merge visuals.");
-		expect(sourceVisual.dataset.motionPhase).toBe("exiting");
-		expect(targetVisual.dataset.motionPhase).toBe("impact");
-		expectArtworkOnlyVisual(sourceVisual);
-		expectArtworkOnlyVisual(targetVisual);
-
-		await act(async () => {
-			motionTestRuntime.finish(
-				...motionTestRuntime.completions.map((_completion, index) => index),
-			);
-			await Promise.resolve();
-		});
-
-		expect(document.querySelector(`[data-runtime-id="${sourceId}"]`)).toBeNull();
-		expect(document.querySelector(`[data-runtime-id="${targetId}"]`)).toBe(target);
-		expect(
-			target.querySelector<HTMLElement>('[data-ui="TileActorVisual"]')?.dataset.motionPhase,
-		).toBe("stable");
-	});
-
 	it("reuses the exact target actor identity when a merge replaces its canonical item", async () => {
-		motionTestRuntime.autoComplete = false;
 		const source = await renderBoard();
 		const target = document.querySelector<HTMLElement>(
 			'[data-ui="TileActor"][data-board-x="0"][data-board-y="1"]',
@@ -1027,271 +653,25 @@ describe("Board drag", () => {
 		expect(document.querySelector(`[data-runtime-id="${targetId}"]`)).toBe(target);
 		expect(target.querySelector('[data-ui="TileActorTitle"]')?.textContent).toBe("Stone");
 		expect(target.dataset.runtimeRevision).toBe(replacedRevision);
-		expect(
-			target.querySelector<HTMLElement>('[data-ui="TileActorVisual"]')?.dataset.motionPhase,
-		).toBe("impact");
-
-		await act(async () => {
-			motionTestRuntime.finish(
-				...motionTestRuntime.completions.map((_completion, index) => index),
-			);
-			await Promise.resolve();
-		});
-
 		expect(document.querySelector(`[data-runtime-id="${sourceId}"]`)).toBeNull();
 		expect(document.querySelector(`[data-runtime-id="${targetId}"]`)).toBe(target);
 		expect(target.querySelector('[data-ui="TileActorTitle"]')?.textContent).toBe("Stone");
 	});
 
-	it("keeps both removed merge actors alive only through their owned exit generation", async () => {
-		motionTestRuntime.autoComplete = false;
-		const source = await renderBoard();
-		const target = document.querySelector<HTMLElement>(
-			'[data-ui="TileActor"][data-board-x="0"][data-board-y="1"]',
-		);
-		if (target === null) throw new Error("Missing removal target actor.");
-		const sourceId = source.dataset.runtimeId;
-		const sourceRevision = source.dataset.runtimeRevision;
-		const targetId = target.dataset.runtimeId;
-		const targetRevision = target.dataset.runtimeRevision;
-		if (
-			sourceId === undefined ||
-			sourceRevision === undefined ||
-			targetId === undefined ||
-			targetRevision === undefined
-		) {
-			throw new Error("Missing removal identities.");
-		}
-		const sourceLocation = {
-			scope: "board" as const,
-			space: 0,
-			position: {
-				x: 2,
-				y: 1,
-			},
-		};
-		const targetLocation = {
-			scope: "board" as const,
-			space: 0,
-			position: {
-				x: 0,
-				y: 1,
-			},
-		};
-		dropItemState.drop.mockImplementation(async () => {
-			publishRuntime({
-				...currentRuntime,
-				items: currentRuntime.items.filter(
-					(item) => item.id !== sourceId && item.id !== targetId,
-				),
-			});
-			return {
-				kind: DropItemResultKindEnumSchema.enum.Merge,
-				action: "consume",
-				effect: "remove",
-				source: {
-					itemId: sourceId,
-					previousRevision: sourceRevision,
-					previousLocation: sourceLocation,
-					previousQuantity: 1,
-					current: null,
-				},
-				target: {
-					itemId: targetId,
-					previousRevision: targetRevision,
-					previousLocation: targetLocation,
-					previousQuantity: 1,
-					current: null,
-				},
-			};
-		});
-
-		await dragTo(source, 50, 150);
-
-		expect(document.querySelector(`[data-runtime-id="${sourceId}"]`)).toBe(source);
-		expect(document.querySelector(`[data-runtime-id="${targetId}"]`)).toBe(target);
-		expect(
-			source.querySelector<HTMLElement>('[data-ui="TileActorVisual"]')?.dataset.motionPhase,
-		).toBe("exiting");
-		expect(
-			target.querySelector<HTMLElement>('[data-ui="TileActorVisual"]')?.dataset.motionPhase,
-		).toBe("exiting");
-
-		await act(async () => {
-			motionTestRuntime.finish(
-				...motionTestRuntime.completions.map((_completion, index) => index),
-			);
-			await Promise.resolve();
-		});
-
-		expect(document.querySelector(`[data-runtime-id="${sourceId}"]`)).toBeNull();
-		expect(document.querySelector(`[data-runtime-id="${targetId}"]`)).toBeNull();
-	});
-
-	it("allows the surviving merge actor to interrupt impact and issue the next command immediately", async () => {
-		motionTestRuntime.autoComplete = false;
-		const source = await renderBoard();
-		const target = document.querySelector<HTMLElement>(
-			'[data-ui="TileActor"][data-board-x="0"][data-board-y="1"]',
-		);
-		if (target === null) throw new Error("Missing merge survivor actor.");
-		const sourceId = source.dataset.runtimeId;
-		const sourceRevision = source.dataset.runtimeRevision;
-		const targetId = target.dataset.runtimeId;
-		const targetRevision = target.dataset.runtimeRevision;
-		if (
-			sourceId === undefined ||
-			sourceRevision === undefined ||
-			targetId === undefined ||
-			targetRevision === undefined
-		) {
-			throw new Error("Missing merge survivor identities.");
-		}
-		const sourceLocation = {
-			scope: "board" as const,
-			space: 0,
-			position: {
-				x: 2,
-				y: 1,
-			},
-		};
-		const targetLocation = {
-			scope: "board" as const,
-			space: 0,
-			position: {
-				x: 0,
-				y: 1,
-			},
-		};
-		const chainedLocation = {
-			scope: "board" as const,
-			space: 0,
-			position: {
-				x: 2,
-				y: 0,
-			},
-		};
-		const chainedRevision = "revision:tree-chained";
-
-		dropItemState.drop
-			.mockImplementationOnce(async () => {
-				publishRuntime({
-					...currentRuntime,
-					items: currentRuntime.items.filter((item) => item.id !== sourceId),
-				});
-				return {
-					kind: DropItemResultKindEnumSchema.enum.Merge,
-					action: "consume",
-					effect: "keep",
-					source: {
-						itemId: sourceId,
-						previousRevision: sourceRevision,
-						previousLocation: sourceLocation,
-						previousQuantity: 1,
-						current: null,
-					},
-					target: {
-						itemId: targetId,
-						previousRevision: targetRevision,
-						previousLocation: targetLocation,
-						previousQuantity: 1,
-						current: {
-							itemId: targetId,
-							canonicalItemId: "tree",
-							revision: targetRevision,
-							location: targetLocation,
-							quantity: 1,
-						},
-					},
-				};
-			})
-			.mockImplementationOnce(async () => {
-				publishRuntime({
-					...currentRuntime,
-					items: currentRuntime.items.map((item) =>
-						item.id === targetId
-							? {
-									...item,
-									revision: chainedRevision,
-									location: chainedLocation,
-								}
-							: item,
-					),
-				});
-				return {
-					kind: DropItemResultKindEnumSchema.enum.Move,
-					itemId: targetId,
-					revision: chainedRevision,
-					previousLocation: targetLocation,
-					location: chainedLocation,
-				};
-			});
-
-		await dragTo(source, 50, 150);
-
-		const targetVisual = target.querySelector<HTMLElement>('[data-ui="TileActorVisual"]');
-		const targetDragSurface = target.querySelector<HTMLElement>(
-			'[data-ui="TileActorDragSurface"]',
-		);
-		if (targetVisual === null || targetDragSurface === null) {
-			throw new Error("Missing merge survivor presentation.");
-		}
-		expect(targetVisual.dataset.motionPhase).toBe("impact");
-		expect(source.style.pointerEvents).toBe("none");
-
-		await act(async () => {
-			targetDragSurface.dispatchEvent(pointerEvent("pointerdown", 50, 150));
-			targetDragSurface.dispatchEvent(pointerEvent("pointermove", 250, 50));
-			motionTestRuntime.finish(
-				...motionTestRuntime.completions.map((_completion, index) => index),
-			);
-			await Promise.resolve();
-		});
-
-		expect(document.querySelector(`[data-runtime-id="${targetId}"]`)).toBe(target);
-		expect(targetVisual.dataset.motionPhase).toBe("dragging");
-		expect(document.querySelector(`[data-runtime-id="${sourceId}"]`)).toBeNull();
-
-		await act(async () => {
-			targetDragSurface.dispatchEvent(pointerEvent("pointerup", 250, 50));
-			await Promise.resolve();
-			await Promise.resolve();
-		});
-
-		expect(dropItemState.drop).toHaveBeenCalledTimes(2);
-		expect(dropItemState.drop).toHaveBeenLastCalledWith({
-			sourceItemId: targetId,
-			sourceRevision: targetRevision,
-			sourceLocation: targetLocation,
-			target: {
-				kind: "slot",
-				location: chainedLocation,
-				occupant: null,
-			},
-		});
-		expect(document.querySelector(`[data-runtime-id="${targetId}"]`)).toBe(target);
-		expect(target.dataset.boardX).toBe("2");
-		expect(target.dataset.boardY).toBe("0");
-	});
-
 	it("keeps an active drag actor targeted through an unrelated runtime publication", async () => {
-		motionTestRuntime.autoComplete = false;
 		const source = await renderBoard();
 		const runtimeId = source.dataset.runtimeId;
-		const visual = source.querySelector<HTMLElement>('[data-ui="TileActorVisual"]');
-		const dragSurface = source.querySelector<HTMLElement>('[data-ui="TileActorDragSurface"]');
-		if (runtimeId === undefined || visual === null || dragSurface === null) {
+		if (runtimeId === undefined) {
 			throw new Error("Missing active drag actor facts.");
 		}
 		expect(source.className).toContain("cursor-grab");
 
 		await act(async () => {
-			dragSurface.dispatchEvent(pointerEvent("pointerdown", 250, 150));
-			dragSurface.dispatchEvent(pointerEvent("pointermove", 150, 50));
+			source.dispatchEvent(pointerEvent("pointerdown", 250, 150));
+			source.dispatchEvent(pointerEvent("pointermove", 150, 50));
 		});
-		expect(visual.dataset.motionPhase).toBe("dragging");
+		expect(source.dataset.phase).toBe("dragging");
 		expect(source.className).toContain("cursor-grabbing");
-		const dragOffset = motionTestRuntime.readDragOffset();
 
 		await act(async () => {
 			publishRuntime({
@@ -1306,215 +686,7 @@ describe("Board drag", () => {
 		});
 
 		expect(document.querySelector(`[data-runtime-id="${runtimeId}"]`)).toBe(source);
-		expect(visual.dataset.motionPhase).toBe("dragging");
-		expect(motionTestRuntime.readDragOffset()).toEqual(dragOffset);
-	});
-
-	it("hands an autonomously removed drag pose to its terminal cue before releasing it", async () => {
-		motionTestRuntime.autoComplete = false;
-		const source = await renderBoard();
-		const sourceId = source.dataset.runtimeId;
-		const dragSurface = source.querySelector<HTMLElement>('[data-ui="TileActorDragSurface"]');
-		const cueVisual = source.querySelector<HTMLElement>('[data-ui="TileMotionCueVisual"]');
-		if (sourceId === undefined || dragSurface === null || cueVisual === null) {
-			throw new Error("Missing autonomously removed drag actor.");
-		}
-
-		await act(async () => {
-			dragSurface.dispatchEvent(pointerEvent("pointerdown", 250, 150));
-			dragSurface.dispatchEvent(pointerEvent("pointermove", 298, 162));
-		});
-		motionTestRuntime.writeMotionOffset("TileActorPointer", sourceId, {
-			x: 48,
-			y: 12,
-		});
-		const pointerOffset = motionTestRuntime.readMotionOffset("TileActorPointer", sourceId);
-		const responseOffset = motionTestRuntime.readMotionOffset(
-			"TileActorPhysicalResponse",
-			sourceId,
-		);
-		expect(pointerOffset).toEqual({
-			x: 48,
-			y: 12,
-		});
-		expect(responseOffset).not.toEqual({
-			x: 0,
-			y: 0,
-		});
-
-		await act(async () => {
-			const sourceItem = currentRuntime.items.find((item) => item.id === sourceId);
-			if (sourceItem?.location.scope !== "board")
-				throw new Error("Missing autonomously removed Board item.");
-			publishRuntime(
-				{
-					...currentRuntime,
-					items: currentRuntime.items.filter((item) => item.id !== sourceId),
-				},
-				[
-					{
-						type: GameEventEnumSchema.enum.ItemDepleted,
-						itemId: sourceId,
-						canonicalItemId: sourceItem.item.id,
-						location: sourceItem.location,
-						previousQuantity: sourceItem.quantity,
-						resultingQuantity: 0,
-					},
-				],
-			);
-			await Promise.resolve();
-			await Promise.resolve();
-		});
-
-		const retained = document.querySelector<HTMLElement>(`[data-runtime-id="${sourceId}"]`);
-		expect(retained).toBe(source);
-		expect(retained?.dataset.live).toBe("false");
-		expect(
-			retained
-				?.querySelector('[data-ui="TileMotionCueVisual"]')
-				?.getAttribute("data-motion-cue"),
-		).toBe("deplete-exit");
-		expect(motionTestRuntime.readMotionOffset("TileActorPointer", sourceId)).toEqual(
-			pointerOffset,
-		);
-		expect(motionTestRuntime.readMotionOffset("TileActorPhysicalResponse", sourceId)).toEqual(
-			responseOffset,
-		);
-
-		await act(async () => {
-			dragSurface.dispatchEvent(pointerEvent("pointerup", 298, 162));
-			dragSurface.dispatchEvent(pointerEvent("pointercancel", 298, 162));
-			await Promise.resolve();
-		});
-		expect(dropItemState.drop).not.toHaveBeenCalled();
-		expect(motionTestRuntime.readMotionOffset("TileActorPointer", sourceId)).toEqual(
-			pointerOffset,
-		);
-		expect(motionTestRuntime.readMotionOffset("TileActorPhysicalResponse", sourceId)).toEqual(
-			responseOffset,
-		);
-
-		await act(async () => {
-			motionTestRuntime.finish(motionTestRuntime.completions.length - 1);
-			await Promise.resolve();
-		});
-		expect(document.querySelector(`[data-runtime-id="${sourceId}"]`)).toBeNull();
-
-		const next = document.querySelector<HTMLElement>(
-			'[data-ui="TileActor"][data-board-x="0"][data-board-y="1"]',
-		);
-		const nextDragSurface = next?.querySelector<HTMLElement>(
-			'[data-ui="TileActorDragSurface"]',
-		);
-		const nextVisual = next?.querySelector<HTMLElement>('[data-ui="TileActorVisual"]');
-		if (nextDragSurface == null || nextVisual == null) {
-			throw new Error("Missing actor for the gesture reuse check.");
-		}
-
-		await act(async () => {
-			nextDragSurface.dispatchEvent(pointerEvent("pointerdown", 50, 150));
-			nextDragSurface.dispatchEvent(pointerEvent("pointermove", 57, 157));
-		});
-
-		expect(nextVisual.dataset.motionPhase).toBe("dragging");
-
-		await act(async () => {
-			nextDragSurface.dispatchEvent(pointerEvent("pointercancel", 57, 157));
-		});
-	});
-
-	it("keeps a live drag source owned when its terminal target exits", async () => {
-		motionTestRuntime.autoComplete = false;
-		const source = await renderBoard();
-		const sourceId = source.dataset.runtimeId;
-		const sourceVisual = source.querySelector<HTMLElement>('[data-ui="TileActorVisual"]');
-		const dragSurface = source.querySelector<HTMLElement>('[data-ui="TileActorDragSurface"]');
-		const target = document.querySelector<HTMLElement>(
-			'[data-ui="TileActor"][data-board-x="0"][data-board-y="1"]',
-		);
-		const targetId = target?.dataset.runtimeId;
-		if (
-			sourceId === undefined ||
-			sourceVisual === null ||
-			dragSurface === null ||
-			target === null ||
-			targetId === undefined
-		) {
-			throw new Error("Missing terminal-target drag actors.");
-		}
-
-		await act(async () => {
-			dragSurface.dispatchEvent(pointerEvent("pointerdown", 250, 150));
-			dragSurface.dispatchEvent(pointerEvent("pointermove", 50, 150));
-		});
-		motionTestRuntime.writeMotionOffset("TileActorPointer", sourceId, {
-			x: -200,
-			y: 0,
-		});
-		expect(sourceVisual.dataset.motionPhase).toBe("dragging");
-		expect(target.dataset.motionPhase).toBe("combining");
-
-		await act(async () => {
-			const targetItem = currentRuntime.items.find((item) => item.id === targetId);
-			if (targetItem === undefined) throw new Error("Missing terminal target item.");
-			publishRuntime(
-				{
-					...currentRuntime,
-					items: currentRuntime.items.filter((item) => item.id !== targetId),
-				},
-				[
-					{
-						type: GameEventEnumSchema.enum.ItemExplicitlyRemoved,
-						itemId: targetId,
-						canonicalItemId: targetItem.item.id,
-						location: targetItem.location,
-						quantity: targetItem.quantity,
-					},
-				],
-			);
-			await Promise.resolve();
-			await Promise.resolve();
-		});
-
-		expect(document.querySelector(`[data-runtime-id="${sourceId}"]`)).toBe(source);
-		expect(sourceVisual.dataset.motionPhase).toBe("dragging");
-		expect(motionTestRuntime.readMotionOffset("TileActorPointer", sourceId)).toEqual({
-			x: -200,
-			y: 0,
-		});
-		expect(document.querySelector(`[data-runtime-id="${targetId}"]`)).toBe(target);
-		expect(target.dataset.live).toBe("false");
-		expect(
-			target
-				.querySelector('[data-ui="TileMotionCueVisual"]')
-				?.getAttribute("data-motion-cue"),
-		).toBe("exit");
-
-		await act(async () => {
-			dragSurface.dispatchEvent(pointerEvent("pointermove", 150, 150));
-		});
-		motionTestRuntime.writeMotionOffset("TileActorPointer", sourceId, {
-			x: -100,
-			y: 0,
-		});
-		expect(sourceVisual.dataset.motionPhase).toBe("dragging");
-
-		await act(async () => {
-			dragSurface.dispatchEvent(pointerEvent("pointercancel", 150, 150));
-			await Promise.resolve();
-		});
-		expect(dropItemState.drop).not.toHaveBeenCalled();
-		expect(sourceVisual.dataset.motionPhase).not.toBe("dragging");
-		expect(motionTestRuntime.readMotionOffset("TileActorPointer", sourceId)).toEqual({
-			x: 0,
-			y: 0,
-		});
-
-		await act(async () => {
-			motionTestRuntime.finish(...motionTestRuntime.completions.map((_, index) => index));
-			await Promise.resolve();
-		});
-		expect(document.querySelector(`[data-runtime-id="${targetId}"]`)).toBeNull();
+		expect(source.dataset.phase).toBe("dragging");
 	});
 
 	it("opens one Item Detail modal from the exact live actor double-click", async () => {

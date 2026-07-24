@@ -14,9 +14,6 @@ vi.mock("~/bridge/tile/useDropItemPreview", () => ({
 		throw new Error("Static grid-frame rendering must not read a gameplay drop preview.");
 	},
 }));
-vi.mock("~/bridge/tile/useDropItemPreviewSequence", () => ({
-	useDropItemPreviewSequence: () => () => 0,
-}));
 vi.mock("~/ui/tile/TileActorLayer", () => ({
 	TileActorLayer: () => null,
 }));

@@ -61,20 +61,19 @@ describe("semantic cursor resolvers", () => {
 			readTileActorCursorSemantic({
 				...base,
 				feedback: "rejected",
-				phase: "settling",
+				phase: "targeted",
 			}),
 		).toBe("not-allowed");
 		expect(
 			readTileActorCursorSemantic({
 				...base,
-				phase: "settling",
+				phase: "targeted",
 			}),
 		).toBe("default");
 		expect(
 			readTileActorCursorSemantic({
 				...base,
 				live: false,
-				phase: "exiting",
 			}),
 		).toBe("default");
 		expect(

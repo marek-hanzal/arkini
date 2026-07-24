@@ -18,7 +18,6 @@ import { InventoryProvider } from "~/ui/inventory/InventoryProvider";
 import { ItemDetailModal } from "~/ui/item-detail/ItemDetailModal";
 import { ItemDetailProvider } from "~/ui/item-detail/ItemDetailProvider";
 import { TileSystemProvider } from "~/ui/tile/TileSystemProvider";
-import { motionTestRuntime } from "~test/ui/support/motionReactMock";
 
 (
 	globalThis as {
@@ -159,7 +158,6 @@ const transitionListeners = new Set<
 	(transition: CommittedTransitionSchema.Type) => void | PromiseLike<void>
 >();
 let transitionSequence = 0;
-let claimedTilePresentationSequence = -1;
 let currentTransition: CommittedTransitionSchema.Type = {
 	sequence: transitionSequence,
 	previousRuntime: null,
@@ -192,13 +190,6 @@ const game = {
 	},
 	getSnapshot: () => currentRuntime,
 	getTransitionSnapshot: () => currentTransition,
-	canClaimTilePresentationTransition: (sequence: number) =>
-		sequence > claimedTilePresentationSequence,
-	claimTilePresentationTransition: (sequence: number) => {
-		if (sequence <= claimedTilePresentationSequence) return false;
-		claimedTilePresentationSequence = sequence;
-		return true;
-	},
 	getResourceUrl: (resourceId: string) => `resource:${resourceId}`,
 	subscribe: (listener: () => void) => {
 		listeners.add(listener);
@@ -252,10 +243,8 @@ const publishRuntime = (runtime: RuntimeSchema.Type) => {
 };
 
 beforeEach(() => {
-	motionTestRuntime.reset();
 	currentRuntime = initialRuntime;
 	transitionSequence = 0;
-	claimedTilePresentationSequence = -1;
 	currentTransition = {
 		sequence: transitionSequence,
 		previousRuntime: null,
@@ -274,14 +263,10 @@ beforeEach(() => {
 			if (element.dataset.ui === "BoardGrid") return rect(0, 0, 300, 100);
 			if (element.dataset.ui === "ToolbarGrid") return rect(0, 100, 100, 100);
 			if (element.dataset.ui === "TileActorLayer") return rect(0, 0, 300, 200);
-			if (
-				element.dataset.ui === "TileMotionCueVisual" ||
-				element.dataset.ui === "TileActorVisual"
-			) {
-				const actor = element.closest<HTMLElement>('[data-ui="TileActor"]');
-				const boardX = Number(actor?.dataset.boardX);
+			if (element.dataset.ui === "TileActor") {
+				const boardX = Number(element.dataset.boardX);
 				if (Number.isFinite(boardX)) return rect(boardX * 100 + 10, 10, 80, 80);
-				const toolbarX = Number(actor?.dataset.toolbarX);
+				const toolbarX = Number(element.dataset.toolbarX);
 				if (Number.isFinite(toolbarX)) {
 					return rect(toolbarX * 100 + 10, 110, 80, 80);
 				}
@@ -291,12 +276,6 @@ beforeEach(() => {
 			}
 			if (element.dataset.ui === "ToolbarCell") {
 				return rect(Number(element.dataset.toolbarX) * 100, 100, 100, 100);
-			}
-			if (element.dataset.ui === "TileActorDragSurface") {
-				const actor = element.closest<HTMLElement>('[data-ui="TileActor"]');
-				const boardX = Number(actor?.dataset.boardX);
-				if (Number.isFinite(boardX)) return rect(boardX * 100, 0, 100, 100);
-				return rect(Number(actor?.dataset.toolbarX) * 100, 100, 100, 100);
 			}
 			return rect(0, 0, 0, 0);
 		},
@@ -427,17 +406,13 @@ describe("TileActor primary action", () => {
 
 	it("cancels the delayed Inventory action when the actor starts dragging", async () => {
 		const { inventoryOpener } = await renderBoard();
-		const dragSurface = inventoryOpener.querySelector<HTMLElement>(
-			'[data-ui="TileActorDragSurface"]',
-		);
-		if (dragSurface === null) throw new Error("Missing inventory opener drag surface.");
 		vi.useFakeTimers();
 
 		await act(async () => {
 			click(inventoryOpener);
-			dragSurface.dispatchEvent(pointerEvent("pointerdown", 250, 50));
-			dragSurface.dispatchEvent(pointerEvent("pointermove", 260, 60));
-			dragSurface.dispatchEvent(pointerEvent("pointercancel", 260, 60));
+			inventoryOpener.dispatchEvent(pointerEvent("pointerdown", 250, 50));
+			inventoryOpener.dispatchEvent(pointerEvent("pointermove", 260, 60));
+			inventoryOpener.dispatchEvent(pointerEvent("pointercancel", 260, 60));
 			await Promise.resolve();
 		});
 		await finishPrimaryActionDelay();
@@ -578,22 +553,18 @@ describe("TileActor primary action", () => {
 
 	it("keeps Inventory closed when its delayed single-click becomes a double-click", async () => {
 		const { inventoryOpener } = await renderBoard();
-		const dragSurface = inventoryOpener.querySelector<HTMLElement>(
-			'[data-ui="TileActorDragSurface"]',
-		);
-		if (dragSurface === null) throw new Error("Missing inventory opener drag surface.");
 		vi.useFakeTimers();
 
 		await act(async () => {
 			click(inventoryOpener, 1);
 			vi.advanceTimersByTime(319);
-			dragSurface.dispatchEvent(pointerEvent("pointerdown", 250, 50));
+			inventoryOpener.dispatchEvent(pointerEvent("pointerdown", 250, 50));
 			vi.advanceTimersByTime(2);
 		});
 		expect(document.querySelector('[data-ui="InventoryHost"]')).toBeNull();
 
 		await act(async () => {
-			dragSurface.dispatchEvent(pointerEvent("pointerup", 250, 50));
+			inventoryOpener.dispatchEvent(pointerEvent("pointerup", 250, 50));
 			click(inventoryOpener, 2);
 			doubleClick(inventoryOpener);
 			await Promise.resolve();

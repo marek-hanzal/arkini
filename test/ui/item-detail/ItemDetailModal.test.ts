@@ -152,7 +152,6 @@ const initialRuntime = Effect.runSync(
 	),
 );
 let currentRuntime = initialRuntime;
-let claimedTilePresentationSequence = -1;
 const runtimeListeners = new Set<() => void>();
 const publishRuntime = (runtime: RuntimeSchema.Type) => {
 	currentRuntime = runtime;
@@ -189,13 +188,6 @@ const game = {
 		runtime: currentRuntime,
 		events: [],
 	}),
-	canClaimTilePresentationTransition: (sequence: number) =>
-		sequence > claimedTilePresentationSequence,
-	claimTilePresentationTransition: (sequence: number) => {
-		if (sequence <= claimedTilePresentationSequence) return false;
-		claimedTilePresentationSequence = sequence;
-		return true;
-	},
 	getResourceUrl: (resourceId: string) => `resource:${resourceId}`,
 	subscribe: (listener: () => void) => {
 		runtimeListeners.add(listener);
@@ -236,7 +228,6 @@ const Probe = ({ onControl }: { readonly onControl: (control: ItemDetailControl)
 beforeEach(() => {
 	motionTestRuntime.reset();
 	currentRuntime = initialRuntime;
-	claimedTilePresentationSequence = -1;
 	runtimeListeners.clear();
 	gameEngineState.game = game;
 });

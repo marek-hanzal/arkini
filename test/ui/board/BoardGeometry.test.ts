@@ -10,6 +10,7 @@ import { useGameFx } from "~/engine/game/fx/useGameFx";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { startFx } from "~/engine/start/write/startFx";
 import { Board } from "~/ui/board/Board";
+import { ItemDetailProvider } from "~/ui/item-detail/ItemDetailProvider";
 import type { TileSystemApi } from "~/ui/tile/TileSystemApiContext";
 import { TileSystemProvider } from "~/ui/tile/TileSystemProvider";
 import { useTileSystemApiContext } from "~/ui/tile/useTileSystemApiContext";
@@ -33,18 +34,6 @@ vi.mock("~/bridge/game/useGameEngine", () => ({
 		if (current === undefined) throw new Error("Test Game Engine is missing.");
 		return current;
 	},
-}));
-
-vi.mock("~/ui/tile/useTileMotionCues", () => ({
-	useTileMotionCues: () => ({
-		liveItems: [],
-		cues: new Map(),
-		retainedItems: [],
-		morphPreviousItems: new Map(),
-		start: vi.fn(),
-		contact: vi.fn(),
-		complete: vi.fn(),
-	}),
 }));
 
 const config = GameConfigSchema.parse({
@@ -103,7 +92,6 @@ const runtime = Effect.runSync(
 	),
 );
 let currentRuntime = runtime;
-let claimedTilePresentationSequence = -1;
 const runtimeListeners = new Set<() => void>();
 const game = {
 	arkpack: {
@@ -131,13 +119,6 @@ const game = {
 		runtime: currentRuntime,
 		events: [],
 	}),
-	canClaimTilePresentationTransition: (sequence: number) =>
-		sequence > claimedTilePresentationSequence,
-	claimTilePresentationTransition: (sequence: number) => {
-		if (sequence <= claimedTilePresentationSequence) return false;
-		claimedTilePresentationSequence = sequence;
-		return true;
-	},
 	getResourceUrl: (resourceId: string) => `resource:${resourceId}`,
 	subscribe: (listener: () => void) => {
 		runtimeListeners.add(listener);
@@ -177,7 +158,6 @@ const Capture = ({ onSystem }: { readonly onSystem: (system: TileSystemApi) => v
 
 beforeEach(() => {
 	currentRuntime = runtime;
-	claimedTilePresentationSequence = -1;
 	runtimeListeners.clear();
 	gameEngineState.game = game;
 });
@@ -199,14 +179,18 @@ const renderBoard = async () => {
 	await act(async () => {
 		root.render(
 			createElement(
-				TileSystemProvider,
+				ItemDetailProvider,
 				null,
-				createElement(Capture, {
-					onSystem: (system) => {
-						currentSystem = system;
-					},
-				}),
-				createElement(Board),
+				createElement(
+					TileSystemProvider,
+					null,
+					createElement(Capture, {
+						onSystem: (system) => {
+							currentSystem = system;
+						},
+					}),
+					createElement(Board),
+				),
 			),
 		);
 		await Promise.resolve();

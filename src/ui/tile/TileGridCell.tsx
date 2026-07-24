@@ -1,4 +1,3 @@
-import { motion } from "motion/react";
 import { memo, useMemo } from "react";
 
 import type { TileIdentity } from "~/ui/tile/TileIdentity";
@@ -76,27 +75,15 @@ const TileGridCellComponent = ({
 			data-toolbar-x={surface.kind === "toolbar" ? x : undefined}
 			data-drop-over={drop.over ? "true" : "false"}
 		>
-			<motion.span
+			<span
 				className="pointer-events-none absolute inset-0"
-				initial={false}
-				animate={
-					drop.over
-						? {
-								backgroundColor: "var(--ak-tile-grid-slot-hover-surface)",
-								boxShadow: "inset 0 0 0 2px var(--ak-tile-grid-slot-hover-ring)",
-								opacity: 1,
-							}
-						: {
-								backgroundColor: "transparent",
-								boxShadow: "inset 0 0 0 0 transparent",
-								opacity: 0,
-							}
-				}
-				transition={{
-					type: "spring",
-					stiffness: 190,
-					damping: 22,
-					mass: 0.62,
+				style={{
+					backgroundColor: drop.over
+						? "var(--ak-tile-grid-slot-hover-surface)"
+						: "transparent",
+					boxShadow: drop.over
+						? "inset 0 0 0 2px var(--ak-tile-grid-slot-hover-ring)"
+						: "none",
 				}}
 			/>
 		</div>

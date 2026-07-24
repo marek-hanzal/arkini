@@ -14,50 +14,14 @@ import {
 
 interface MockMotionValue<T> {
 	get: () => T;
-	getVelocity: () => number;
 	set: (value: T) => void;
-	jump: (value: T) => void;
-}
-
-const isMockMotionValue = (value: unknown): value is MockMotionValue<number> =>
-	typeof value === "object" && value !== null && "get" in value;
-
-interface MockDragBinding {
-	readonly node: HTMLElement;
-	readonly x: MockMotionValue<number>;
-	readonly y: MockMotionValue<number>;
 }
 
 interface MockDragControls {
-	bind: (binding: MockDragBinding) => void;
-	start: (
-		event: {
-			readonly clientX: number;
-			readonly clientY: number;
-		},
-		options?: {
-			readonly snapToCursor?: boolean;
-		},
-	) => void;
+	bind: () => void;
+	start: () => void;
 	stop: () => void;
 	cancel: () => void;
-}
-
-let activeDragBinding: MockDragBinding | null = null;
-const motionOffsetBindings = new Map<string, MockDragBinding>();
-const motionScaleBindings = new Map<string, MockMotionValue<number>>();
-const springBindings = new Set<{
-	readonly source: MockMotionValue<unknown>;
-	readonly lagged: MockMotionValue<unknown>;
-}>();
-
-interface MockAnimationControls extends PromiseLike<void> {
-	stop: () => void;
-}
-
-interface MockImperativeAnimation {
-	readonly finish: () => void;
-	readonly stopped: () => boolean;
 }
 
 interface MotionTestCompletion {
@@ -66,58 +30,10 @@ interface MotionTestCompletion {
 
 export const motionTestRuntime = {
 	autoComplete: true,
-	springLag: false,
-	deferImperativeValueWrites: false,
 	completions: [] as Array<MotionTestCompletion>,
-	imperativeAnimations: [] as Array<MockImperativeAnimation>,
-	autoCompleteImperativeAnimations: true,
 	reset() {
 		this.autoComplete = true;
-		this.springLag = false;
-		this.deferImperativeValueWrites = false;
 		this.completions.splice(0);
-		this.imperativeAnimations.splice(0);
-		this.autoCompleteImperativeAnimations = true;
-		activeDragBinding = null;
-		motionOffsetBindings.clear();
-		motionScaleBindings.clear();
-		springBindings.clear();
-	},
-	flushSprings() {
-		for (const binding of springBindings) binding.lagged.jump(binding.source.get());
-	},
-	readMotionOffset(ui: string, runtimeId: string) {
-		const binding = motionOffsetBindings.get(`${ui}:${runtimeId}`);
-		return binding === undefined
-			? null
-			: {
-					x: binding.x.get(),
-					y: binding.y.get(),
-				};
-	},
-	writeMotionOffset(
-		ui: string,
-		runtimeId: string,
-		offset: {
-			readonly x: number;
-			readonly y: number;
-		},
-	) {
-		const binding = motionOffsetBindings.get(`${ui}:${runtimeId}`);
-		if (binding === undefined) throw new Error(`Missing motion binding ${ui}:${runtimeId}.`);
-		binding.x.jump(offset.x);
-		binding.y.jump(offset.y);
-	},
-	readDragOffset() {
-		return activeDragBinding === null
-			? null
-			: {
-					x: activeDragBinding.x.get(),
-					y: activeDragBinding.y.get(),
-				};
-	},
-	readMotionScale(ui: string, runtimeId: string) {
-		return motionScaleBindings.get(`${ui}:${runtimeId}`)?.get() ?? null;
 	},
 	finish(...indexes: ReadonlyArray<number>) {
 		for (const index of indexes) this.completions[index]?.complete();
@@ -129,95 +45,24 @@ export const useMotionValue = <T,>(initial: T): MockMotionValue<T> => {
 	return useMemo(
 		() => ({
 			get: () => value.current,
-			getVelocity: () => 0,
 			set: (next: T) => {
 				value.current = next;
 			},
-			jump: (next: T) => {
-				value.current = next;
-			},
 		}),
 		[],
 	);
-};
-
-export const useSpring = <T,>(source: MockMotionValue<T>) => {
-	const lagged = useMotionValue(source.get());
-	const binding = useMemo(
-		() => ({
-			source: source as MockMotionValue<unknown>,
-			lagged: lagged as MockMotionValue<unknown>,
-		}),
-		[
-			lagged,
-			source,
-		],
-	);
-	springBindings.add(binding);
-	return motionTestRuntime.springLag ? lagged : source;
-};
-
-export const useTransform = <T,>(
-	sources: ReadonlyArray<MockMotionValue<number>>,
-	transformer: (values: ReadonlyArray<number>) => T,
-): MockMotionValue<T> => {
-	const sourcesRef = useRef(sources);
-	const transformerRef = useRef(transformer);
-	sourcesRef.current = sources;
-	transformerRef.current = transformer;
-	return useMemo(
-		() => ({
-			get: () => transformerRef.current(sourcesRef.current.map((source) => source.get())),
-			getVelocity: () => 0,
-			set: () => undefined,
-			jump: () => undefined,
-		}),
-		[],
-	);
-};
-
-export const animate = <T,>(value: MockMotionValue<T>, target: T): MockAnimationControls => {
-	if (!motionTestRuntime.deferImperativeValueWrites) value.set(target);
-	let stopped = false;
-	let finish: () => void = () => undefined;
-	const finished = motionTestRuntime.autoCompleteImperativeAnimations
-		? Promise.resolve()
-		: new Promise<void>((resolve) => {
-				finish = resolve;
-			});
-	motionTestRuntime.imperativeAnimations.push({
-		finish: () => {
-			if (motionTestRuntime.deferImperativeValueWrites && !stopped) value.set(target);
-			finish();
-		},
-		stopped: () => stopped,
-	});
-	return {
-		then: finished.then.bind(finished),
-		stop: () => {
-			stopped = true;
-		},
-	};
 };
 
 export const useDragControls = () =>
-	useMemo<MockDragControls>(() => {
-		let binding: MockDragBinding | null = null;
-		return {
-			bind: (next) => {
-				binding = next;
-				activeDragBinding = next;
-			},
-			start: (event, options) => {
-				if (binding === null || options?.snapToCursor !== true) return;
-				const rect = binding.node.getBoundingClientRect();
-				binding.x.set(binding.x.get() + event.clientX - (rect.left + rect.width / 2));
-				binding.y.set(binding.y.get() + event.clientY - (rect.top + rect.height / 2));
-			},
+	useMemo<MockDragControls>(
+		() => ({
+			bind: () => undefined,
+			start: () => undefined,
 			stop: () => undefined,
 			cancel: () => undefined,
-		};
-	}, []);
+		}),
+		[],
+	);
 
 interface PanInfoLike {
 	readonly point: {
@@ -313,7 +158,7 @@ const createMotionComponent = <TElement extends ElementType>(element: TElement) 
 		{
 			animate: animateTarget,
 			initial: _initial,
-			transition,
+			transition: _transition,
 			drag: _drag,
 			dragControls,
 			dragListener: _dragListener,
@@ -368,102 +213,18 @@ const createMotionComponent = <TElement extends ElementType>(element: TElement) 
 			onAnimationComplete,
 		]);
 
-		const motionScale =
-			typeof animateTarget === "object" && animateTarget !== null && "scale" in animateTarget
-				? String(animateTarget.scale)
-				: undefined;
-		const motionScaleX =
-			typeof animateTarget === "object" && animateTarget !== null && "scaleX" in animateTarget
-				? String(animateTarget.scaleX)
-				: undefined;
-		const motionScaleY =
-			typeof animateTarget === "object" && animateTarget !== null && "scaleY" in animateTarget
-				? String(animateTarget.scaleY)
-				: undefined;
-		const motionRotate =
-			typeof animateTarget === "object" && animateTarget !== null && "rotate" in animateTarget
-				? String(animateTarget.rotate)
-				: undefined;
-		const motionTimes =
-			typeof transition === "object" && transition !== null && "times" in transition
-				? String(transition.times)
-				: undefined;
-
-		const motionStyle = style as
-			| (CSSProperties & {
-					readonly x?: MockMotionValue<number>;
-					readonly y?: MockMotionValue<number>;
-					readonly scale?: MockMotionValue<number>;
-			  })
-			| undefined;
-		const ui = typeof props["data-ui"] === "string" ? props["data-ui"] : null;
-		const runtimeId =
-			typeof props["data-motion-id"] === "string" ? props["data-motion-id"] : null;
-
-		useEffect(() => {
-			if (
-				ui === null ||
-				runtimeId === null ||
-				motionStyle?.x === undefined ||
-				motionStyle.y === undefined
-			)
-				return;
-			const key = `${ui}:${runtimeId}`;
-			const binding = {
-				node: document.createElement("span"),
-				x: motionStyle.x,
-				y: motionStyle.y,
-			};
-			motionOffsetBindings.set(key, binding);
-			return () => {
-				if (motionOffsetBindings.get(key) === binding) motionOffsetBindings.delete(key);
-			};
-		}, [
-			motionStyle?.x,
-			motionStyle?.y,
-			runtimeId,
-			ui,
-		]);
-
-		useEffect(() => {
-			const scale = motionStyle?.scale;
-			if (ui === null || runtimeId === null || !isMockMotionValue(scale)) {
-				return;
-			}
-			const key = `${ui}:${runtimeId}`;
-			motionScaleBindings.set(key, scale);
-			return () => {
-				if (motionScaleBindings.get(key) === scale) motionScaleBindings.delete(key);
-			};
-		}, [
-			motionStyle?.scale,
-			runtimeId,
-			ui,
-		]);
-
 		return createElement(element, {
 			...props,
 			ref,
 			style: readStyle(style),
-			"data-motion-scale": motionScale,
-			"data-motion-scale-x": motionScaleX,
-			"data-motion-scale-y": motionScaleY,
-			"data-motion-rotate": motionRotate,
-			"data-motion-times": motionTimes,
 			onPointerDown: (event: ReactPointerEvent<HTMLElement>) => {
 				if (
 					typeof dragControls === "object" &&
 					dragControls !== null &&
 					"bind" in dragControls &&
-					typeof dragControls.bind === "function" &&
-					motionStyle?.x !== undefined &&
-					motionStyle.y !== undefined
+					typeof dragControls.bind === "function"
 				) {
-					(dragControls as MockDragControls).bind({
-						node: event.currentTarget,
-						x: motionStyle.x,
-						y: motionStyle.y,
-					});
+					(dragControls as MockDragControls).bind();
 				}
 				onPointerDown?.(event as never);
 				gesture.current = {

@@ -1,11 +1,10 @@
 import { z } from "zod";
 
-/** Valid top-level phases of the one Canvas-local tile presentation interaction. */
+/** Valid top-level phases of the one Canvas-local pointer interaction. */
 export const TileInteractionPhaseSchema = z.enum([
 	"pressed",
 	"dragging",
 	"awaiting-outcome",
-	"settling",
 ]);
 
 export type TileInteractionPhaseSchema = typeof TileInteractionPhaseSchema;

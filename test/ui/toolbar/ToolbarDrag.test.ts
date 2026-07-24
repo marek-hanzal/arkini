@@ -18,7 +18,6 @@ import { GameBoardLayout } from "~/ui/board/GameBoardLayout";
 import { ItemDetailModal } from "~/ui/item-detail/ItemDetailModal";
 import { ItemDetailProvider } from "~/ui/item-detail/ItemDetailProvider";
 import { TileSystemProvider } from "~/ui/tile/TileSystemProvider";
-import { motionTestRuntime } from "~test/ui/support/motionReactMock";
 
 (
 	globalThis as {
@@ -190,7 +189,6 @@ const roundTripRuntime = RuntimeSchema.parse({
 });
 let currentRuntime = roundTripRuntime;
 let transitionSequence = 0;
-let claimedTilePresentationSequence = -1;
 let currentTransition: CommittedTransitionSchema.Type = {
 	sequence: transitionSequence,
 	previousRuntime: null,
@@ -236,13 +234,6 @@ const game = {
 	},
 	getSnapshot: () => currentRuntime,
 	getTransitionSnapshot: () => currentTransition,
-	canClaimTilePresentationTransition: (sequence: number) =>
-		sequence > claimedTilePresentationSequence,
-	claimTilePresentationTransition: (sequence: number) => {
-		if (sequence <= claimedTilePresentationSequence) return false;
-		claimedTilePresentationSequence = sequence;
-		return true;
-	},
 	getResourceUrl: (resourceId: string) => `resource:${resourceId}`,
 	subscribe: (listener: () => void) => {
 		runtimeListeners.add(listener);
@@ -269,10 +260,8 @@ const game = {
 } satisfies GameEngine;
 
 beforeEach(() => {
-	motionTestRuntime.reset();
 	currentRuntime = roundTripRuntime;
 	transitionSequence = 0;
-	claimedTilePresentationSequence = -1;
 	currentTransition = {
 		sequence: transitionSequence,
 		previousRuntime: null,
@@ -290,91 +279,13 @@ beforeEach(() => {
 			if (element.dataset.ui === "BoardGrid") return rect(0, 0, 200, 200);
 			if (element.dataset.ui === "ToolbarGrid") return rect(0, 220, 200, 100);
 			if (element.dataset.ui === "TileActorLayer") return rect(0, 0, 200, 320);
-			if (
-				element.dataset.ui === "TileMotionCueVisual" ||
-				element.dataset.ui === "TileActorVisual"
-			) {
-				const actor = element.closest<HTMLElement>('[data-ui="TileActor"]');
-				const runtimeId = actor?.dataset.runtimeId;
-				const visual = actor?.querySelector<HTMLElement>('[data-ui="TileActorVisual"]');
-				const scale = Number(visual?.dataset.motionScale ?? 0.8);
-				if (runtimeId !== undefined && Number.isFinite(scale)) {
-					const travel = motionTestRuntime.readMotionOffset(
-						"TileActorTravel",
-						runtimeId,
-					) ?? {
-						x: 0,
-						y: 0,
-					};
-					const pointer = motionTestRuntime.readMotionOffset(
-						"TileActorPointer",
-						runtimeId,
-					) ?? {
-						x: 0,
-						y: 0,
-					};
-					const response = motionTestRuntime.readMotionOffset(
-						"TileActorPhysicalResponse",
-						runtimeId,
-					) ?? {
-						x: 0,
-						y: 0,
-					};
-					const pickup = motionTestRuntime.readMotionOffset(
-						"TileActorPickup",
-						runtimeId,
-					) ?? {
-						x: 0,
-						y: 0,
-					};
-					const neighbour = motionTestRuntime.readMotionOffset(
-						"TileActor",
-						runtimeId,
-					) ?? {
-						x: 0,
-						y: 0,
-					};
-					const size = 100 * scale;
-					const base =
-						actor?.dataset.locationScope === "toolbar"
-							? {
-									x: Number(actor.dataset.toolbarX) * 100,
-									y: 220,
-								}
-							: {
-									x: Number(actor?.dataset.boardX) * 100,
-									y: Number(actor?.dataset.boardY) * 100,
-								};
-					if (Number.isFinite(base.x) && Number.isFinite(base.y)) {
-						return rect(
-							base.x +
-								(100 - size) / 2 +
-								travel.x +
-								pointer.x +
-								response.x +
-								pickup.x +
-								neighbour.x,
-							base.y +
-								(100 - size) / 2 +
-								travel.y +
-								pointer.y +
-								response.y +
-								pickup.y +
-								neighbour.y,
-							size,
-							size,
-						);
-					}
-				}
-			}
-			if (element.dataset.ui === "TileActorDragSurface") {
-				const actor = element.closest<HTMLElement>('[data-ui="TileActor"]');
-				if (actor?.dataset.locationScope === "toolbar") {
-					const x = Number(actor.dataset.toolbarX);
+			if (element.dataset.ui === "TileActor") {
+				if (element.dataset.locationScope === "toolbar") {
+					const x = Number(element.dataset.toolbarX);
 					if (Number.isFinite(x)) return rect(x * 100, 220, 100, 100);
 				}
-				const x = Number(actor?.dataset.boardX);
-				const y = Number(actor?.dataset.boardY);
+				const x = Number(element.dataset.boardX);
+				const y = Number(element.dataset.boardY);
 				if (Number.isFinite(x) && Number.isFinite(y)) {
 					return rect(x * 100, y * 100, 100, 100);
 				}
@@ -464,55 +375,16 @@ const drag = async ({
 		number,
 	];
 }) => {
-	const dragSurface = actor.querySelector<HTMLElement>('[data-ui="TileActorDragSurface"]');
-	if (dragSurface === null) throw new Error("Missing actor drag surface.");
 	await act(async () => {
-		dragSurface.dispatchEvent(pointerEvent("pointerdown", from[0], from[1]));
-		dragSurface.dispatchEvent(pointerEvent("pointermove", to[0], to[1]));
-		dragSurface.dispatchEvent(pointerEvent("pointerup", to[0], to[1]));
+		actor.dispatchEvent(pointerEvent("pointerdown", from[0], from[1]));
+		actor.dispatchEvent(pointerEvent("pointermove", to[0], to[1]));
+		actor.dispatchEvent(pointerEvent("pointerup", to[0], to[1]));
 		await Promise.resolve();
 		await Promise.resolve();
 	});
 };
 
 describe("Toolbar drag", () => {
-	it("reuses weighted drag on Toolbar without displacing Board actors", async () => {
-		await renderGameBoard();
-		const toolbarActor = document.querySelector<HTMLElement>(
-			'[data-ui="TileActor"][data-location-scope="toolbar"]',
-		);
-		const boardActor = document.querySelector<HTMLElement>(
-			'[data-ui="TileActor"][data-location-scope="board"]',
-		);
-		const toolbarId = toolbarActor?.dataset.runtimeId;
-		const boardId = boardActor?.dataset.runtimeId;
-		const dragSurface = toolbarActor?.querySelector<HTMLElement>(
-			'[data-ui="TileActorDragSurface"]',
-		);
-		if (toolbarId === undefined || boardId === undefined || dragSurface == null) {
-			throw new Error("Missing cross-surface actor identity.");
-		}
-
-		await act(async () => {
-			dragSurface.dispatchEvent(pointerEvent("pointerdown", 150, 270));
-			dragSurface.dispatchEvent(pointerEvent("pointermove", 157, 277));
-			await Promise.resolve();
-		});
-
-		expect(motionTestRuntime.readMotionOffset("TileActorPhysicalResponse", toolbarId)).toEqual({
-			x: -1.4,
-			y: -1.12,
-		});
-		expect(motionTestRuntime.readMotionOffset("TileActor", boardId)).toEqual({
-			x: 0,
-			y: 0,
-		});
-
-		await act(async () => {
-			dragSurface.dispatchEvent(pointerEvent("pointercancel", 157, 277));
-		});
-	});
-
 	it("moves one real actor Board to Toolbar and back through exact slot targets", async () => {
 		await renderGameBoard();
 		const actor = document.querySelector<HTMLElement>(

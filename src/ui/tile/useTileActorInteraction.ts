@@ -27,19 +27,6 @@ const ownsActor = (active: TileInteractionState | null, itemId: string) =>
 			({ source, target }) =>
 				source.id === itemId || (target.kind === "slot" && target.occupant?.id === itemId),
 		)
-		.with(
-			{
-				phase: "settling",
-			},
-			({ settlement }) =>
-				settlement.pendingActorIds.includes(itemId) ||
-				(settlement.kind === "store-input" && settlement.outcome.owner.itemId === itemId) ||
-				(settlement.kind === "merge" && settlement.outcome.target.itemId === itemId) ||
-				(settlement.kind === "stack" && settlement.outcome.target.itemId === itemId) ||
-				("target" in settlement &&
-					settlement.target.kind === "slot" &&
-					settlement.target.occupant?.id === itemId),
-		)
 		.exhaustive();
 
 /** Subscribes one actor only while the exact interaction generation owns it. */

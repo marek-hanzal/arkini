@@ -21,7 +21,6 @@ import { InventoryProvider } from "~/ui/inventory/InventoryProvider";
 import { useInventoryControl } from "~/ui/inventory/useInventoryControl";
 import { ItemDetailProvider } from "~/ui/item-detail/ItemDetailProvider";
 import { TileSystemProvider } from "~/ui/tile/TileSystemProvider";
-import { motionTestRuntime } from "~test/ui/support/motionReactMock";
 
 (
 	globalThis as {
@@ -247,7 +246,6 @@ const initialRuntime = RuntimeSchema.parse({
 
 let currentRuntime = initialRuntime;
 let transitionSequence = 0;
-let claimedTilePresentationSequence = -1;
 let currentTransition: CommittedTransitionSchema.Type = {
 	sequence: transitionSequence,
 	previousRuntime: null,
@@ -294,13 +292,6 @@ const game = {
 	},
 	getSnapshot: () => currentRuntime,
 	getTransitionSnapshot: () => currentTransition,
-	canClaimTilePresentationTransition: (sequence: number) =>
-		sequence > claimedTilePresentationSequence,
-	claimTilePresentationTransition: (sequence: number) => {
-		if (sequence <= claimedTilePresentationSequence) return false;
-		claimedTilePresentationSequence = sequence;
-		return true;
-	},
 	getResourceUrl: (resourceId: string) => `resource:${resourceId}`,
 	subscribe: (listener: () => void) => {
 		runtimeListeners.add(listener);
@@ -358,10 +349,8 @@ const actorCellRect = (runtimeId: string) => {
 };
 
 beforeEach(() => {
-	motionTestRuntime.reset();
 	currentRuntime = initialRuntime;
 	transitionSequence = 0;
-	claimedTilePresentationSequence = -1;
 	currentTransition = {
 		sequence: transitionSequence,
 		previousRuntime: null,
@@ -380,11 +369,7 @@ beforeEach(() => {
 			if (element.dataset.ui === "ToolbarGrid") return rect(0, 220, 200, 100);
 			if (element.dataset.ui === "InventoryGrid") return rect(300, 0, 300, 200);
 			if (element.dataset.ui === "TileActorLayer") return rect(0, 0, 600, 320);
-			if (
-				element.dataset.ui === "TileMotionCueVisual" ||
-				element.dataset.ui === "TileActorVisual" ||
-				element.dataset.ui === "TileActorDragSurface"
-			) {
+			if (element.dataset.ui === "TileActorVisual" || element.dataset.ui === "TileActor") {
 				const actor = element.closest<HTMLElement>('[data-ui="TileActor"]');
 				const runtimeId = actor?.dataset.runtimeId;
 				if (runtimeId !== undefined) return actorCellRect(runtimeId) ?? rect(0, 0, 0, 0);
@@ -537,12 +522,10 @@ const drag = async ({
 		number,
 	];
 }) => {
-	const dragSurface = actor.querySelector<HTMLElement>('[data-ui="TileActorDragSurface"]');
-	if (dragSurface === null) throw new Error("Missing actor drag surface.");
 	await act(async () => {
-		dragSurface.dispatchEvent(pointerEvent("pointerdown", from[0], from[1]));
-		dragSurface.dispatchEvent(pointerEvent("pointermove", to[0], to[1]));
-		dragSurface.dispatchEvent(pointerEvent("pointerup", to[0], to[1]));
+		actor.dispatchEvent(pointerEvent("pointerdown", from[0], from[1]));
+		actor.dispatchEvent(pointerEvent("pointermove", to[0], to[1]));
+		actor.dispatchEvent(pointerEvent("pointerup", to[0], to[1]));
 		await Promise.resolve();
 		await Promise.resolve();
 	});
@@ -874,160 +857,17 @@ describe("Inventory cross-surface tile scene", () => {
 		expect(document.querySelectorAll(`[data-runtime-id="${targetItem.id}"]`)).toHaveLength(1);
 	});
 
-	it("preserves a full Stack approach and impact after Inventory closes while pending", async () => {
-		motionTestRuntime.autoComplete = false;
-		motionTestRuntime.autoCompleteImperativeAnimations = false;
-		const initialSource = runtimeItem("water", "inventory");
-		currentRuntime = RuntimeSchema.parse({
-			...currentRuntime,
-			items: currentRuntime.items.map((candidate) =>
-				candidate.id === initialSource.id
-					? {
-							...candidate,
-							quantity: 2,
-						}
-					: candidate,
-			),
-		});
-		currentTransition = {
-			sequence: transitionSequence,
-			previousRuntime: null,
-			runtime: currentRuntime,
-			events: [],
-		};
-		const { readControl } = await renderScene();
-		const sourceItem = runtimeItem("water", "inventory");
-		const targetItem = runtimeItem("water", "toolbar");
-		const source = actorByRuntimeId(sourceItem.id);
-		const target = actorByRuntimeId(targetItem.id);
-		const targetRevision = "revision:water-full-after-close";
-		let resolveDrop: ((outcome: dropItemFx.Result) => void) | undefined;
-		dropItemState.drop.mockImplementation(
-			() =>
-				new Promise<dropItemFx.Result>((resolve) => {
-					resolveDrop = resolve;
-				}),
-		);
-
-		await drag({
-			actor: source,
-			from: [
-				350,
-				50,
-			],
-			to: [
-				50,
-				270,
-			],
-		});
-		expect(source.dataset.motionPhase).toBe("dragging");
-
-		await act(async () => {
-			readControl().close({
-				restoreFocus: false,
-			});
-			await Promise.resolve();
-		});
-		expect(document.querySelector('[data-ui="InventoryHost"]')).toBeNull();
-		expect(actorByRuntimeId(sourceItem.id)).toBe(source);
-		expect(actorByRuntimeId(targetItem.id)).toBe(target);
-		expect(source.dataset.motionPhase).toBe("dragging");
-
-		await act(async () => {
-			publishRuntime(
-				RuntimeSchema.parse({
-					...currentRuntime,
-					items: currentRuntime.items.flatMap((candidate) => {
-						if (candidate.id === sourceItem.id) return [];
-						return candidate.id === targetItem.id
-							? [
-									{
-										...candidate,
-										revision: targetRevision,
-										quantity: 10,
-									},
-								]
-							: [
-									candidate,
-								];
-					}),
-				}),
-			);
-			resolveDrop?.({
-				kind: DropItemResultKindEnumSchema.enum.Stack,
-				transferredQuantity: 2,
-				source: {
-					itemId: sourceItem.id,
-					canonicalItemId: "water",
-					previousRevision: sourceItem.revision,
-					previousLocation: inventory(0, 0),
-					previousQuantity: 2,
-					current: null,
-				},
-				target: {
-					itemId: targetItem.id,
-					canonicalItemId: "water",
-					previousRevision: targetItem.revision,
-					previousLocation: toolbar(0),
-					previousQuantity: 8,
-					current: {
-						itemId: targetItem.id,
-						canonicalItemId: "water",
-						revision: targetRevision,
-						location: toolbar(0),
-						quantity: 10,
-					},
-				},
-			});
-			await Promise.resolve();
-			await Promise.resolve();
-		});
-
-		expect(actorByRuntimeId(sourceItem.id)).toBe(source);
-		expect(actorByRuntimeId(targetItem.id)).toBe(target);
-		expect(source.dataset.live).toBe("false");
-		expect(source.dataset.motionPhase).toBe("combining");
-		expect(target.dataset.motionPhase).toBe("combining");
-		expect(document.querySelectorAll(`[data-runtime-id="${sourceItem.id}"]`)).toHaveLength(1);
-		expect(document.querySelectorAll(`[data-runtime-id="${targetItem.id}"]`)).toHaveLength(1);
-
-		await act(async () => {
-			for (const animation of motionTestRuntime.imperativeAnimations) {
-				animation.finish();
-			}
-			await Promise.resolve();
-			await Promise.resolve();
-		});
-
-		expect(actorByRuntimeId(sourceItem.id)).toBe(source);
-		expect(actorByRuntimeId(targetItem.id)).toBe(target);
-		expect(source.dataset.motionPhase).toBe("exiting");
-		expect(target.dataset.motionPhase).toBe("impact");
-		expect(target.querySelector('[data-ui="TileActorQuantity"]')?.textContent).toBe("10");
-
-		await act(async () => {
-			motionTestRuntime.finish(...motionTestRuntime.completions.map((_, index) => index));
-			await Promise.resolve();
-			await Promise.resolve();
-		});
-		expect(document.querySelector(`[data-runtime-id="${sourceItem.id}"]`)).toBeNull();
-		expect(actorByRuntimeId(targetItem.id)).toBe(target);
-		expect(document.querySelectorAll(`[data-runtime-id="${targetItem.id}"]`)).toHaveLength(1);
-	});
-
 	it("cancels an Inventory drag on close and reuses the actor after reopen", async () => {
 		const { readControl } = await renderScene();
 		const item = runtimeItem("water", "inventory");
 		const actor = actorByRuntimeId(item.id);
-		const dragSurface = actor.querySelector<HTMLElement>('[data-ui="TileActorDragSurface"]');
-		if (dragSurface === null) throw new Error("Missing Inventory drag surface.");
 
 		await act(async () => {
-			dragSurface.dispatchEvent(pointerEvent("pointerdown", 350, 50));
-			dragSurface.dispatchEvent(pointerEvent("pointermove", 250, 50));
+			actor.dispatchEvent(pointerEvent("pointerdown", 350, 50));
+			actor.dispatchEvent(pointerEvent("pointermove", 250, 50));
 			await Promise.resolve();
 		});
-		expect(actor.dataset.motionPhase).toBe("dragging");
+		expect(actor.dataset.phase).toBe("dragging");
 
 		await act(async () => {
 			readControl().close({
@@ -1039,7 +879,7 @@ describe("Inventory cross-surface tile scene", () => {
 		expect(document.querySelector('[data-ui="InventoryHost"]')).toBeNull();
 		expect(dropItemState.drop).not.toHaveBeenCalled();
 		expect(actorByRuntimeId(item.id)).toBe(actor);
-		expect(actor.dataset.motionPhase).toBe("stable");
+		expect(actor.dataset.phase).toBe("stable");
 		expect(actor.style.visibility).toBe("hidden");
 
 		await act(async () => {
@@ -1077,7 +917,7 @@ describe("Inventory cross-surface tile scene", () => {
 			],
 		});
 		expect(dropItemState.drop).toHaveBeenCalledOnce();
-		expect(actor.dataset.motionPhase).toBe("dragging");
+		expect(actor.dataset.phase).toBe("dragging");
 
 		await act(async () => {
 			readControl().close({
@@ -1087,7 +927,7 @@ describe("Inventory cross-surface tile scene", () => {
 		});
 		expect(document.querySelector('[data-ui="InventoryHost"]')).toBeNull();
 		expect(actorByRuntimeId(item.id)).toBe(actor);
-		expect(actor.dataset.motionPhase).toBe("dragging");
+		expect(actor.dataset.phase).toBe("dragging");
 
 		await act(async () => {
 			publishRuntime(
@@ -1125,79 +965,6 @@ describe("Inventory cross-surface tile scene", () => {
 		});
 		expect(actorByRuntimeId(item.id)).toBe(actor);
 		expect(document.querySelectorAll(`[data-runtime-id="${item.id}"]`)).toHaveLength(1);
-	});
-
-	it("keeps one settling actor alive while Inventory closes and reopens", async () => {
-		motionTestRuntime.autoComplete = false;
-		motionTestRuntime.autoCompleteImperativeAnimations = false;
-		const { readControl } = await renderScene();
-		const item = runtimeItem("stone", "inventory");
-		const actor = actorByRuntimeId(item.id);
-		const revision = "revision:settling-toolbar";
-		dropItemState.drop.mockImplementation(async () => {
-			publishRuntime(
-				RuntimeSchema.parse({
-					...currentRuntime,
-					items: currentRuntime.items.map((candidate) =>
-						candidate.id === item.id
-							? {
-									...candidate,
-									revision,
-									location: toolbar(1),
-								}
-							: candidate,
-					),
-				}),
-			);
-			return {
-				kind: DropItemResultKindEnumSchema.enum.Move,
-				itemId: item.id,
-				revision,
-				previousLocation: inventory(1, 0),
-				location: toolbar(1),
-			};
-		});
-
-		await drag({
-			actor,
-			from: [
-				450,
-				50,
-			],
-			to: [
-				150,
-				270,
-			],
-		});
-		expect(actor.dataset.motionPhase).toBe("settling");
-
-		await act(async () => {
-			readControl().close({
-				restoreFocus: false,
-			});
-			await Promise.resolve();
-		});
-		expect(document.querySelector('[data-ui="InventoryHost"]')).toBeNull();
-		expect(actorByRuntimeId(item.id)).toBe(actor);
-		expect(actor.dataset.locationScope).toBe("toolbar");
-		expect(actor.dataset.motionPhase).toBe("settling");
-
-		await act(async () => {
-			readControl().open();
-			await Promise.resolve();
-		});
-		expect(actorByRuntimeId(item.id)).toBe(actor);
-		expect(document.querySelectorAll(`[data-runtime-id="${item.id}"]`)).toHaveLength(1);
-
-		await act(async () => {
-			for (const animation of motionTestRuntime.imperativeAnimations) {
-				animation.finish();
-			}
-			await Promise.resolve();
-			motionTestRuntime.finish(...motionTestRuntime.completions.map((_, index) => index));
-			await Promise.resolve();
-		});
-		expect(actor.dataset.motionPhase).toBe("stable");
 	});
 
 	it("keeps Inventory and global actors stable across active Board space changes", async () => {

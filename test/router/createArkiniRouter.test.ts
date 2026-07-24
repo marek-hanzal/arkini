@@ -164,6 +164,15 @@ describe("createArkiniRouter", () => {
 			],
 			[
 				"/game/built-in/board",
+				"/game/built-in/action/exit",
+				[
+					"arkini-route",
+					"board-to-hero",
+					"board-to-action",
+				],
+			],
+			[
+				"/game/built-in/board",
 				"/game/other/board",
 				[
 					"arkini-route",
@@ -218,6 +227,15 @@ describe("createArkiniRouter", () => {
 			[
 				"/game/built-in/action/reset",
 				"/action/load-game/built-in",
+				[
+					"arkini-route",
+					"hero-to-hero",
+					"action-to-action",
+				],
+			],
+			[
+				"/game/built-in/action/leave",
+				"/game/built-in/action/exit",
 				[
 					"arkini-route",
 					"hero-to-hero",

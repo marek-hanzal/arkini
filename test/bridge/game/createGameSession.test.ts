@@ -121,26 +121,6 @@ describe("createGameSessionFx", () => {
 		}
 	});
 
-	it("claims each tile-presentation transition once for one live Game session", async () => {
-		const session = await createTestGameSession({
-			config: createJobTestConfig(),
-			tickIntervalMs: 60_000,
-		});
-
-		try {
-			expect(session.canClaimTilePresentationTransition(0)).toBe(true);
-			expect(session.claimTilePresentationTransition(0)).toBe(true);
-			expect(session.canClaimTilePresentationTransition(0)).toBe(false);
-			expect(session.claimTilePresentationTransition(0)).toBe(false);
-			expect(session.canClaimTilePresentationTransition(1)).toBe(true);
-			expect(session.claimTilePresentationTransition(1)).toBe(true);
-			expect(session.canClaimTilePresentationTransition(1)).toBe(false);
-			expect(session.claimTilePresentationTransition(0)).toBe(false);
-		} finally {
-			await Effect.runPromise(session.disposeFx);
-		}
-	});
-
 	it("does not replay the initial committed transition to React subscribers", async () => {
 		const session = await createTestGameSession({
 			config: createJobTestConfig(),

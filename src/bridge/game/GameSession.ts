@@ -21,10 +21,6 @@ export interface GameSession {
 	readonly getSnapshot: () => RuntimeSchema.Type;
 	/** Latest exact runtime plus the ordered facts and bounded outgoing snapshot for that commit. */
 	readonly getTransitionSnapshot: () => CommittedTransitionSchema.Type;
-	/** Reports whether this Game's tile presentation has not claimed the sequence yet. */
-	readonly canClaimTilePresentationTransition: (sequence: number) => boolean;
-	/** Claims one committed sequence for the single tile-presentation lifetime of this Game. */
-	readonly claimTilePresentationTransition: (sequence: number) => boolean;
 	/** Executes one synchronous live read inside this Game's existing session runtime. */
 	readonly read: <Result, Error, Requirements extends GameSessionServices>(
 		effect: Effect.Effect<Result, Error, Requirements>,

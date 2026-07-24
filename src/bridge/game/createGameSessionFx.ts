@@ -101,7 +101,6 @@ export const createGameSessionFx = Effect.fn("createGameSessionFx")(
 			const lifecycle = MutableRef.make<SessionLifecycle>({
 				type: "running",
 			});
-			const lastTilePresentationSequence = MutableRef.make(-1);
 			const lifecycleLock = yield* Effect.makeSemaphore(1);
 
 			const flushSaveFx = runManagedFx(
@@ -205,14 +204,6 @@ export const createGameSessionFx = Effect.fn("createGameSessionFx")(
 				flushSaveFx,
 				getSnapshot: () => managed.runSync(readRuntimeFx()),
 				getTransitionSnapshot: () => managed.runSync(readCommittedTransitionFx()),
-				canClaimTilePresentationTransition: (sequence) =>
-					sequence > MutableRef.get(lastTilePresentationSequence),
-				claimTilePresentationTransition: (sequence) => {
-					const previous = MutableRef.get(lastTilePresentationSequence);
-					if (sequence <= previous) return false;
-					MutableRef.set(lastTilePresentationSequence, sequence);
-					return true;
-				},
 				read: (effect) => managed.runSyncExit(effect),
 				run: (effect) => runCommand(ensureRunningFx.pipe(Effect.zipRight(effect))),
 				subscribe: (listener) =>

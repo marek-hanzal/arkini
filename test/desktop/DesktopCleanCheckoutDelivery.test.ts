@@ -26,6 +26,9 @@ const copyTrackedWorkspace = async (target: string) => {
 		"git",
 		[
 			"ls-files",
+			"--cached",
+			"--others",
+			"--exclude-standard",
 			"-z",
 		],
 		{
@@ -34,12 +37,25 @@ const copyTrackedWorkspace = async (target: string) => {
 			maxBuffer: 16 * 1024 * 1024,
 		},
 	);
-	const trackedFiles = stdout
+	const workspaceFiles = stdout
 		.toString("utf8")
 		.split("\0")
 		.filter((path) => path.length > 0);
 
-	for (const relativePath of trackedFiles) {
+	for (const relativePath of workspaceFiles) {
+		try {
+			await stat(resolve(relativePath));
+		} catch (error) {
+			if (
+				typeof error === "object" &&
+				error !== null &&
+				"code" in error &&
+				error.code === "ENOENT"
+			) {
+				continue;
+			}
+			throw error;
+		}
 		const output = join(target, relativePath);
 		await mkdir(dirname(output), {
 			recursive: true,

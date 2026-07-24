@@ -29,9 +29,6 @@ vi.mock("~/bridge/tile/useDropItemPreview", () => ({
 		throw new Error("Inventory rendering must not read a gameplay drop preview.");
 	},
 }));
-vi.mock("~/bridge/tile/useDropItemPreviewSequence", () => ({
-	useDropItemPreviewSequence: () => () => 0,
-}));
 vi.mock("~/ui/tile/TileActorLayer", async () => {
 	const { createElement: createReactElement } = await import("react");
 	return {

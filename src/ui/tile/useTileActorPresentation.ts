@@ -3,9 +3,8 @@ import { match } from "ts-pattern";
 
 import { DropItemResultKindEnumSchema } from "~/bridge/tile/DropItemResultKindEnumSchema";
 import type { useTileActors } from "~/bridge/tile/useTileActors";
-import type { TileLocation } from "~/bridge/tile/TileLocation";
 import type { TileDragSource } from "~/ui/tile/TileDragSource";
-import type { TileInteractionState, TileSettlingInteraction } from "~/ui/tile/TileInteractionState";
+import type { TileInteractionState } from "~/ui/tile/TileInteractionState";
 import type { TileActorPhaseSchema } from "~/ui/tile/schema/TileActorPhaseSchema";
 import type { TileInteractionFeedbackSchema } from "~/ui/tile/schema/TileInteractionFeedbackSchema";
 import { tileSlotForLocation } from "~/ui/tile/tileSlotForLocation";
@@ -13,586 +12,134 @@ import { tileSurfaceForLocation } from "~/ui/tile/tileSurfaceForLocation";
 import { useTileActorInteraction } from "~/ui/tile/useTileActorInteraction";
 
 export namespace useTileActorPresentation {
-	export type PositionCompletion =
-		| {
-				readonly kind: "none";
-		  }
-		| {
-				readonly kind: "always";
-				readonly generation: number;
-		  }
-		| {
-				readonly kind: "location";
-				readonly generation: number;
-				readonly location: TileLocation;
-		  };
-
-	export interface FollowTarget {
-		readonly interactionGeneration: number;
-		readonly stage: "approach";
-		readonly sourceItemId: string;
-		readonly targetItemId: string;
-	}
-
 	export interface Model {
 		readonly canonicalSource: TileDragSource;
-		readonly desiredSource: TileDragSource;
-		readonly followTarget: FollowTarget | null;
 		readonly phase: TileActorPhaseSchema.Type;
 		readonly feedback: TileInteractionFeedbackSchema.Type | null;
 		readonly forbiddenDrop: boolean;
 		readonly zIndex: number;
-		readonly placementFrozen: boolean;
-		readonly positionCompletion: PositionCompletion;
-		readonly visualCompletionGeneration: number | null;
-		readonly quantityOverride: number | null;
 		readonly hovered: boolean;
 		readonly setHovered: (hovered: boolean) => void;
 	}
 }
 
-interface TileActorPresentationView {
-	readonly desiredLocation: TileLocation;
-	readonly followTarget: useTileActorPresentation.FollowTarget | null;
-	readonly phase: TileActorPhaseSchema.Type;
-	readonly feedback: TileInteractionFeedbackSchema.Type | null;
-	readonly forbiddenDrop: boolean;
-	readonly placementFrozen: boolean;
-	readonly positionCompletion: useTileActorPresentation.PositionCompletion;
-	readonly visualCompletionGeneration: number | null;
-	readonly quantityOverride: number | null;
-}
-
-const actorSource = (item: useTileActors.Item, location: TileLocation): TileDragSource => ({
+const actorSource = (item: useTileActors.Item): TileDragSource => ({
 	id: item.id,
 	revision: item.revision,
-	location,
-	surface: tileSurfaceForLocation(location),
-	slot: tileSlotForLocation(location),
+	location: item.location,
+	surface: tileSurfaceForLocation(item.location),
+	slot: tileSlotForLocation(item.location),
 });
 
-const zIndexForPhase = (phase: TileActorPhaseSchema.Type) =>
-	match(phase)
-		.with("dragging", () => 40)
-		.with("combining", () => 35)
-		.with("settling", "impact", "exiting", () => 30)
-		.with("targeted", () => 25)
-		.with("hovered", () => 20)
-		.with("stable", () => 10)
-		.exhaustive();
-
-const passiveView = (
-	item: useTileActors.Item,
-	live: boolean,
-	hovered: boolean,
-): TileActorPresentationView => ({
-	desiredLocation: item.location,
-	followTarget: null,
-	phase: live && hovered ? "hovered" : "stable",
-	feedback: null,
-	forbiddenDrop: false,
-	placementFrozen: false,
-	positionCompletion: {
-		kind: "none",
-	},
-	visualCompletionGeneration: null,
-	quantityOverride: null,
-});
-
-const settlingView = (
-	settling: TileSettlingInteraction,
-	item: useTileActors.Item,
-	passive: TileActorPresentationView,
-): TileActorPresentationView =>
-	match(settling.settlement)
-		.with(
-			{
-				kind: "failed",
-			},
-			{
-				kind: DropItemResultKindEnumSchema.enum.Reject,
-			},
-			{
-				kind: DropItemResultKindEnumSchema.enum.Ignored,
-			},
-			(settlement) => {
-				if (settling.source.id === item.id) {
-					return {
-						...passive,
-						phase: "settling" as const,
-						feedback: settlement.feedback,
-						positionCompletion: {
-							kind: "location" as const,
-							generation: settling.generation,
-							location: item.location,
-						},
-					};
+const feedbackForPreview = (
+	previewKind:
+		| Extract<
+				TileInteractionState,
+				{
+					readonly phase: "dragging";
 				}
-				if (
-					"target" in settlement &&
-					settlement.target.kind === "slot" &&
-					settlement.target.occupant?.id === item.id
-				) {
-					return {
-						...passive,
-						phase: "settling" as const,
-						feedback: settlement.feedback,
-					};
+		  >["previewKind"]
+		| Extract<
+				TileInteractionState,
+				{
+					readonly phase: "awaiting-outcome";
 				}
-				return passive;
-			},
-		)
+		  >["previewKind"],
+): TileInteractionFeedbackSchema.Type | null =>
+	match(previewKind)
+		.with(null, () => null)
+		.with(DropItemResultKindEnumSchema.enum.Reject, () => "rejected" as const)
+		.with(DropItemResultKindEnumSchema.enum.Ignored, () => "ignored" as const)
 		.with(
-			{
-				kind: DropItemResultKindEnumSchema.enum.Move,
-			},
-			(settlement) =>
-				settling.source.id === item.id
-					? {
-							...passive,
-							desiredLocation: settlement.location,
-							phase: "settling" as const,
-							feedback: settlement.feedback,
-							positionCompletion: {
-								kind: "location" as const,
-								generation: settling.generation,
-								location: settlement.location,
-							},
-						}
-					: passive,
-		)
-		.with(
-			{
-				kind: DropItemResultKindEnumSchema.enum.Swap,
-			},
-			(settlement) => {
-				let location: TileLocation | null = null;
-				if (settlement.outcome.source.itemId === item.id) {
-					location = settlement.sourceLocation;
-				} else if (settlement.outcome.target.itemId === item.id) {
-					location = settlement.outcome.target.location;
-				}
-				if (location === null) return passive;
-				return {
-					...passive,
-					desiredLocation: location,
-					phase: "settling" as const,
-					feedback: settlement.feedback,
-					positionCompletion: {
-						kind: "location" as const,
-						generation: settling.generation,
-						location,
-					},
-				};
-			},
-		)
-		.with(
-			{
-				kind: DropItemResultKindEnumSchema.enum.StoreInput,
-				stage: "approach",
-			},
-			(settlement) => {
-				const targetLocation = settlement.outcome.owner.location;
-				if (settlement.outcome.source.itemId === item.id) {
-					return {
-						...passive,
-						desiredLocation: targetLocation,
-						followTarget: {
-							interactionGeneration: settling.generation,
-							stage: "approach" as const,
-							sourceItemId: settlement.outcome.source.itemId,
-							targetItemId: settlement.outcome.owner.itemId,
-						},
-						phase: "combining" as const,
-						feedback: settlement.feedback,
-						positionCompletion: {
-							kind: "always" as const,
-							generation: settling.generation,
-						},
-					};
-				}
-				return passive;
-			},
-		)
-		.with(
-			{
-				kind: DropItemResultKindEnumSchema.enum.StoreInput,
-				stage: "resolve",
-			},
-			(settlement) => {
-				if (!settlement.pendingActorIds.includes(item.id)) return passive;
-				if (settlement.outcome.source.itemId === item.id) {
-					const current = settlement.outcome.source.current;
-					if (current === null) {
-						return {
-							...passive,
-							desiredLocation: settlement.outcome.owner.location,
-							phase: "exiting" as const,
-							feedback: settlement.feedback,
-							placementFrozen: true,
-							visualCompletionGeneration: settling.generation,
-						};
-					}
-					return {
-						...passive,
-						desiredLocation: current.location,
-						phase: "settling" as const,
-						feedback: settlement.feedback,
-						positionCompletion: {
-							kind: "location" as const,
-							generation: settling.generation,
-							location: current.location,
-						},
-					};
-				}
-				return settlement.outcome.owner.itemId === item.id
-					? {
-							...passive,
-							phase: "impact" as const,
-							feedback: settlement.feedback,
-							visualCompletionGeneration: settling.generation,
-						}
-					: passive;
-			},
-		)
-		.with(
-			{
-				kind: DropItemResultKindEnumSchema.enum.Merge,
-				stage: "approach",
-			},
-			(settlement) => {
-				const targetLocation =
-					settlement.outcome.target.current?.location ??
-					settlement.outcome.target.previousLocation;
-				if (settlement.outcome.source.itemId === item.id) {
-					const targetItemId =
-						settlement.outcome.target.current?.itemId ??
-						settlement.outcome.target.itemId;
-					return {
-						...passive,
-						desiredLocation: targetLocation,
-						followTarget: {
-							interactionGeneration: settling.generation,
-							stage: "approach" as const,
-							sourceItemId: settlement.outcome.source.itemId,
-							targetItemId,
-						},
-						phase: "combining" as const,
-						feedback: settlement.feedback,
-						positionCompletion: {
-							kind: "always" as const,
-							generation: settling.generation,
-						},
-					};
-				}
-				return settlement.outcome.target.itemId === item.id
-					? {
-							...passive,
-							phase: "combining" as const,
-							feedback: settlement.feedback,
-						}
-					: passive;
-			},
-		)
-		.with(
-			{
-				kind: DropItemResultKindEnumSchema.enum.Merge,
-				stage: "resolve",
-			},
-			(settlement) => {
-				if (!settlement.pendingActorIds.includes(item.id)) return passive;
-				const targetLocation =
-					settlement.outcome.target.current?.location ??
-					settlement.outcome.target.previousLocation;
-				if (settlement.outcome.source.itemId === item.id) {
-					const current = settlement.outcome.source.current;
-					if (current === null) {
-						return {
-							...passive,
-							desiredLocation: targetLocation,
-							phase: "exiting" as const,
-							feedback: settlement.feedback,
-							placementFrozen: true,
-							visualCompletionGeneration: settling.generation,
-						};
-					}
-					return {
-						...passive,
-						desiredLocation: current.location,
-						phase: "settling" as const,
-						feedback: settlement.feedback,
-						positionCompletion: {
-							kind: "location" as const,
-							generation: settling.generation,
-							location: current.location,
-						},
-					};
-				}
-				if (settlement.outcome.target.itemId !== item.id) return passive;
-				const current = settlement.outcome.target.current;
-				return {
-					...passive,
-					desiredLocation: current?.location ?? targetLocation,
-					phase: current === null ? ("exiting" as const) : ("impact" as const),
-					feedback: settlement.feedback,
-					visualCompletionGeneration: settling.generation,
-				};
-			},
-		)
-		.with(
-			{
-				kind: DropItemResultKindEnumSchema.enum.Stack,
-				stage: "approach",
-			},
-			(settlement) => {
-				const targetLocation = settlement.outcome.target.current.location;
-				if (settlement.outcome.source.itemId === item.id) {
-					return {
-						...passive,
-						desiredLocation: targetLocation,
-						followTarget: {
-							interactionGeneration: settling.generation,
-							stage: "approach" as const,
-							sourceItemId: settlement.outcome.source.itemId,
-							targetItemId: settlement.outcome.target.itemId,
-						},
-						phase: "combining" as const,
-						feedback: settlement.feedback,
-						positionCompletion: {
-							kind: "always" as const,
-							generation: settling.generation,
-						},
-						quantityOverride: settlement.outcome.source.previousQuantity,
-					};
-				}
-				return settlement.outcome.target.itemId === item.id
-					? {
-							...passive,
-							phase: "combining" as const,
-							feedback: settlement.feedback,
-							quantityOverride: settlement.outcome.target.previousQuantity,
-						}
-					: passive;
-			},
-		)
-		.with(
-			{
-				kind: DropItemResultKindEnumSchema.enum.Stack,
-				stage: "resolve",
-			},
-			(settlement) => {
-				if (!settlement.pendingActorIds.includes(item.id)) return passive;
-				const targetLocation = settlement.outcome.target.current.location;
-				if (settlement.outcome.source.itemId === item.id) {
-					const current = settlement.outcome.source.current;
-					if (current === null) {
-						return {
-							...passive,
-							desiredLocation: targetLocation,
-							phase: "exiting" as const,
-							feedback: settlement.feedback,
-							placementFrozen: true,
-							visualCompletionGeneration: settling.generation,
-						};
-					}
-					return {
-						...passive,
-						desiredLocation: current.location,
-						phase: "settling" as const,
-						feedback: settlement.feedback,
-						positionCompletion: {
-							kind: "location" as const,
-							generation: settling.generation,
-							location: current.location,
-						},
-					};
-				}
-				return settlement.outcome.target.itemId === item.id
-					? {
-							...passive,
-							desiredLocation: targetLocation,
-							phase: "impact" as const,
-							feedback: settlement.feedback,
-							visualCompletionGeneration: settling.generation,
-						}
-					: passive;
-			},
+			DropItemResultKindEnumSchema.enum.Move,
+			DropItemResultKindEnumSchema.enum.Swap,
+			DropItemResultKindEnumSchema.enum.StoreInput,
+			DropItemResultKindEnumSchema.enum.Merge,
+			DropItemResultKindEnumSchema.enum.Stack,
+			() => "accepted" as const,
 		)
 		.exhaustive();
 
-const interactionView = (
+const activePresentation = (
 	active: TileInteractionState | null,
-	item: useTileActors.Item,
-	passive: TileActorPresentationView,
-): TileActorPresentationView =>
+	itemId: string,
+	hovered: boolean,
+): Omit<useTileActorPresentation.Model, "canonicalSource" | "setHovered"> =>
 	match(active)
-		.with(null, () => passive)
+		.with(null, () => ({
+			phase: hovered ? ("hovered" as const) : ("stable" as const),
+			feedback: null,
+			forbiddenDrop: false,
+			zIndex: hovered ? 20 : 10,
+			hovered,
+		}))
 		.with(
 			{
 				phase: "pressed",
 			},
-			(pressed) =>
-				pressed.source.id === item.id
-					? {
-							...passive,
-							placementFrozen: true,
-						}
-					: passive,
+			() => ({
+				phase: hovered ? ("hovered" as const) : ("stable" as const),
+				feedback: null,
+				forbiddenDrop: false,
+				zIndex: hovered ? 20 : 10,
+				hovered,
+			}),
 		)
 		.with(
 			{
-				phase: "dragging" as const,
+				phase: "dragging",
 			},
-			(dragging) => {
-				const previewsMerge =
-					dragging.previewKind === DropItemResultKindEnumSchema.enum.Merge;
-				const previewsStack =
-					dragging.previewKind === DropItemResultKindEnumSchema.enum.Stack;
-				const previewsInputStore =
-					dragging.previewKind === DropItemResultKindEnumSchema.enum.StoreInput;
-				const previewsCombine = previewsMerge || previewsStack;
-				const acceptsInteraction = previewsCombine || previewsInputStore;
-				const occupied =
-					dragging.target?.kind === "slot" && dragging.target.occupant !== null;
-				if (dragging.source.id === item.id) {
-					return {
-						...passive,
-						phase: "dragging" as const,
-						feedback: acceptsInteraction
-							? ("accepted" as const)
-							: dragging.previewKind === DropItemResultKindEnumSchema.enum.Reject
-								? ("rejected" as const)
-								: occupied
-									? ("ignored" as const)
-									: null,
-						forbiddenDrop: dragging.target?.kind !== "slot",
-						placementFrozen: true,
-					};
-				}
-				if (dragging.target?.kind === "slot" && dragging.target.occupant?.id === item.id) {
-					if (acceptsInteraction) {
-						return {
-							...passive,
-							phase: previewsCombine ? ("combining" as const) : ("targeted" as const),
-							feedback: "accepted" as const,
-						};
-					}
-					if (dragging.previewKind === DropItemResultKindEnumSchema.enum.Reject) {
-						return {
-							...passive,
-							phase: "targeted" as const,
-							feedback: "rejected" as const,
-						};
-					}
-				}
-				return passive;
-			},
-		)
-		.with(
 			{
 				phase: "awaiting-outcome",
 			},
-			(awaiting) => {
-				const previewsMerge =
-					awaiting.previewKind === DropItemResultKindEnumSchema.enum.Merge;
-				const previewsStack =
-					awaiting.previewKind === DropItemResultKindEnumSchema.enum.Stack;
-				const previewsInputStore =
-					awaiting.previewKind === DropItemResultKindEnumSchema.enum.StoreInput;
-				const previewsCombine = previewsMerge || previewsStack;
-				const acceptsInteraction = previewsCombine || previewsInputStore;
-				const occupied =
-					awaiting.target.kind === "slot" && awaiting.target.occupant !== null;
-				if (awaiting.source.id === item.id) {
+			(interaction) => {
+				const feedback = feedbackForPreview(interaction.previewKind);
+				if (interaction.source.id === itemId) {
 					return {
-						...passive,
 						phase: "dragging" as const,
-						feedback: acceptsInteraction
-							? ("accepted" as const)
-							: awaiting.previewKind === DropItemResultKindEnumSchema.enum.Reject
-								? ("rejected" as const)
-								: occupied
-									? ("ignored" as const)
-									: null,
-						forbiddenDrop: awaiting.target.kind !== "slot",
-						placementFrozen: true,
+						feedback,
+						forbiddenDrop: interaction.target?.kind !== "slot",
+						zIndex: 40,
+						hovered,
 					};
 				}
-				if (awaiting.target.kind === "slot" && awaiting.target.occupant?.id === item.id) {
-					if (acceptsInteraction) {
-						return {
-							...passive,
-							phase: previewsCombine ? ("combining" as const) : ("targeted" as const),
-							feedback: "accepted" as const,
-							placementFrozen: true,
-						};
-					}
-					if (awaiting.previewKind === DropItemResultKindEnumSchema.enum.Reject) {
-						return {
-							...passive,
-							phase: "targeted" as const,
-							feedback: "rejected" as const,
-							placementFrozen: true,
-						};
-					}
-				}
-				return passive;
+				return {
+					phase: "targeted" as const,
+					feedback,
+					forbiddenDrop: false,
+					zIndex: 25,
+					hovered,
+				};
 			},
-		)
-		.with(
-			{
-				phase: "settling" as const,
-			},
-			(settling) => settlingView(settling, item, passive),
 		)
 		.exhaustive();
 
-/** Derives one exhaustive actor-owned presentation view from the shared interaction vocabulary. */
+/** Derives immediate actor interaction state without animation-owned lifecycle stages. */
 export const useTileActorPresentation = ({
 	item,
-	live,
 }: {
 	readonly item: useTileActors.Item;
-	readonly live: boolean;
 }): useTileActorPresentation.Model => {
 	const active = useTileActorInteraction(item.id);
 	const [hovered, setHovered] = useState(false);
 	const canonicalSource = useMemo(
-		() => actorSource(item, item.location),
+		() => actorSource(item),
 		[
 			item,
 		],
 	);
-	const view = useMemo(
-		() => interactionView(active, item, passiveView(item, live, hovered)),
+	const presentation = useMemo(
+		() => activePresentation(active, item.id, hovered),
 		[
 			active,
 			hovered,
-			item,
-			live,
-		],
-	);
-	const desiredSource = useMemo(
-		() => actorSource(item, view.desiredLocation),
-		[
-			item,
-			view.desiredLocation,
+			item.id,
 		],
 	);
 
 	return {
 		canonicalSource,
-		desiredSource,
-		followTarget: view.followTarget,
-		phase: view.phase,
-		feedback: view.feedback,
-		forbiddenDrop: view.forbiddenDrop,
-		zIndex: zIndexForPhase(view.phase),
-		placementFrozen: view.placementFrozen,
-		positionCompletion: view.positionCompletion,
-		visualCompletionGeneration: view.visualCompletionGeneration,
-		quantityOverride: view.quantityOverride,
-		hovered,
+		...presentation,
 		setHovered,
 	};
 };

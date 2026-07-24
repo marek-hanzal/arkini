@@ -4,7 +4,6 @@ import { act, createElement, useEffect, useMemo, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { DropItemRejectedReasonEnumSchema } from "~/engine/runtime/schema/command/DropItemRejectedReasonEnumSchema";
 import { DropItemResultKindEnumSchema } from "~/engine/runtime/schema/command/DropItemResultKindEnumSchema";
 import { useTileActorInteraction } from "~/ui/tile/useTileActorInteraction";
 import type { TileDragSource } from "~/ui/tile/TileDragSource";
@@ -25,20 +24,6 @@ vi.mock("~/bridge/tile/useTileActors", () => ({
 const previewState = vi.hoisted(() => ({
 	occupiedKind: "swap" as "swap" | "merge" | "stack" | "store-input",
 	observedRevisions: [] as string[],
-}));
-
-vi.mock("~/bridge/tile/useDropItemPreviewSequence", () => ({
-	useDropItemPreviewSequence: () => () => 0,
-}));
-
-vi.mock("~/ui/tile/useTileMotionCues", () => ({
-	useTileMotionCues: () => ({
-		liveItems: [],
-		cues: new Map(),
-		retainedItems: [],
-		start: vi.fn(),
-		complete: vi.fn(),
-	}),
 }));
 
 vi.mock("~/bridge/tile/useDropItemPreview", () => ({
@@ -540,8 +525,7 @@ describe("TileSystemProvider", () => {
 			},
 		});
 		await act(async () => {
-			if (seam !== null) readSystem().settle(seam.source, seam.generation, null);
-			if (seam !== null) readSystem().complete(source.id, seam.generation);
+			if (seam !== null) readSystem().completeDrop(seam.source, seam.generation);
 		});
 
 		const outerEdge = await startDrag(readSystem(), 100.5, 99.5);
@@ -643,49 +627,6 @@ describe("TileSystemProvider", () => {
 		});
 	});
 
-	it("refreshes an active target preview after authoritative facts change", async () => {
-		previewState.occupiedKind = "store-input";
-		const { readSystem } = await renderHarness();
-		await act(async () => {
-			const system = readSystem();
-			expect(system.press(source)).toBe(true);
-			system.startDrag(source);
-			system.moveDrag(source, 440, 50);
-		});
-		expect(readSystem().active).toMatchObject({
-			phase: "dragging",
-			previewKind: DropItemResultKindEnumSchema.enum.StoreInput,
-		});
-
-		previewState.occupiedKind = "swap";
-		await act(async () => {
-			readSystem().refreshActivePreview();
-		});
-		expect(readSystem().active).toMatchObject({
-			phase: "dragging",
-			previewKind: DropItemResultKindEnumSchema.enum.Swap,
-		});
-	});
-
-	it("refreshes a pending target preview while the command still revalidates", async () => {
-		previewState.occupiedKind = "store-input";
-		const { readSystem } = await renderHarness();
-		await startDrag(readSystem(), 440, 50);
-		expect(readSystem().active).toMatchObject({
-			phase: "awaiting-outcome",
-			previewKind: DropItemResultKindEnumSchema.enum.StoreInput,
-		});
-
-		previewState.occupiedKind = "swap";
-		await act(async () => {
-			readSystem().refreshActivePreview();
-		});
-		expect(readSystem().active).toMatchObject({
-			phase: "awaiting-outcome",
-			previewKind: DropItemResultKindEnumSchema.enum.Swap,
-		});
-	});
-
 	it("distinguishes a surface gap and an unrelated topmost overlay from a slot", async () => {
 		const { readSystem } = await renderHarness();
 		const gap = await startDrag(readSystem(), 300, 50);
@@ -696,8 +637,7 @@ describe("TileSystemProvider", () => {
 			},
 		});
 		await act(async () => {
-			if (gap !== null) readSystem().settle(gap.source, gap.generation, null);
-			if (gap !== null) readSystem().complete(source.id, gap.generation);
+			if (gap !== null) readSystem().completeDrop(gap.source, gap.generation);
 		});
 
 		const overlay = document.createElement("div");
@@ -713,428 +653,20 @@ describe("TileSystemProvider", () => {
 		});
 	});
 
-	it("keeps the rejected target snapshot without making its lifetime block settlement", async () => {
-		const { readSystem } = await renderHarness();
-		const released = await startDrag(readSystem(), 440, 50);
-		if (released === null) throw new Error("Expected a released drag.");
-
-		await act(async () => {
-			readSystem().settle(released.source, released.generation, {
-				kind: DropItemResultKindEnumSchema.enum.Reject,
-				reason: DropItemRejectedReasonEnumSchema.enum.Occupied,
-				itemId: source.id,
-				targetItemId: toolbarOccupant.id,
-			});
-		});
-
-		expect(readSystem().active).toMatchObject({
-			phase: "settling",
-			settlement: {
-				kind: DropItemResultKindEnumSchema.enum.Reject,
-				target: {
-					kind: "slot",
-					occupant: toolbarOccupant,
-				},
-				pendingActorIds: [
-					source.id,
-				],
-			},
-		});
-
-		await act(async () => readSystem().complete(source.id, released.generation));
-		expect(readSystem().active).toBeNull();
-	});
-
-	it("keeps one swap generation active until both actor settlements complete", async () => {
-		const { readSystem } = await renderHarness();
-		const released = await startDrag(readSystem(), 440, 50);
-		if (released === null) throw new Error("Expected a released drag.");
-
-		await act(async () => {
-			readSystem().settle(released.source, released.generation, {
-				kind: DropItemResultKindEnumSchema.enum.Swap,
-				source: {
-					itemId: source.id,
-					revision: "revision:source-swapped",
-					previousLocation: source.location,
-					location: {
-						scope: "inventory",
-						position: {
-							x: toolbarSlot.x,
-							y: toolbarSlot.y,
-						},
-					},
-				},
-				target: {
-					itemId: toolbarOccupant.id,
-					revision: "revision:target-swapped",
-					previousLocation: {
-						scope: "inventory",
-						position: {
-							x: toolbarSlot.x,
-							y: toolbarSlot.y,
-						},
-					},
-					location: source.location,
-				},
-			});
-		});
-		expect(readSystem().active).toMatchObject({
-			phase: "settling",
-			settlement: {
-				kind: DropItemResultKindEnumSchema.enum.Swap,
-				pendingActorIds: [
-					source.id,
-					toolbarOccupant.id,
-				],
-			},
-		});
-
-		await act(async () => {
-			readSystem().complete(source.id, released.generation);
-		});
-		expect(readSystem().active).toMatchObject({
-			phase: "settling",
-			settlement: {
-				kind: DropItemResultKindEnumSchema.enum.Swap,
-				pendingActorIds: [
-					toolbarOccupant.id,
-				],
-			},
-		});
-
-		await act(async () => {
-			readSystem().complete(toolbarOccupant.id, released.generation);
-		});
-		expect(readSystem().active).toBeNull();
-	});
-
-	it("advances one input-store generation through approach and full source absorption", async () => {
-		previewState.occupiedKind = "store-input";
-		const { readSystem } = await renderHarness();
-		const released = await startDrag(readSystem(), 440, 50);
-		if (released === null) throw new Error("Expected a released drag.");
-		const targetLocation = {
-			scope: "inventory" as const,
-			position: {
-				x: toolbarSlot.x,
-				y: toolbarSlot.y,
-			},
-		};
-
-		await act(async () => {
-			readSystem().settle(released.source, released.generation, {
-				kind: DropItemResultKindEnumSchema.enum.StoreInput,
-				storedQuantity: 1,
-				lineId: "line:target",
-				inputIndex: 0,
-				source: {
-					itemId: source.id,
-					canonicalItemId: "item:source",
-					previousRevision: source.revision,
-					previousLocation: source.location,
-					previousQuantity: 1,
-					current: null,
-				},
-				owner: {
-					itemId: toolbarOccupant.id,
-					revision: toolbarOccupant.revision,
-					location: targetLocation,
-				},
-			});
-		});
-		expect(readSystem().active).toMatchObject({
-			phase: "settling",
-			settlement: {
-				kind: DropItemResultKindEnumSchema.enum.StoreInput,
-				stage: "approach",
-				pendingActorIds: [
-					source.id,
-				],
-			},
-		});
-		expect(
-			document.querySelector<HTMLElement>(`[data-actor-selection="${toolbarOccupant.id}"]`)
-				?.dataset.activePhase,
-		).toBe("settling");
-
-		await act(async () => {
-			readSystem().complete(source.id, released.generation);
-		});
-		expect(readSystem().active).toMatchObject({
-			phase: "settling",
-			settlement: {
-				kind: DropItemResultKindEnumSchema.enum.StoreInput,
-				stage: "resolve",
-				pendingActorIds: [
-					source.id,
-					toolbarOccupant.id,
-				],
-			},
-		});
-
-		await act(async () => {
-			readSystem().complete(source.id, released.generation);
-			readSystem().complete(toolbarOccupant.id, released.generation);
-		});
-		expect(readSystem().active).toBeNull();
-	});
-
-	it("advances one merge generation from approach into source and target resolution", async () => {
-		const { readSystem } = await renderHarness();
-		const released = await startDrag(readSystem(), 440, 50);
-		if (released === null) throw new Error("Expected a released drag.");
-		const targetLocation = {
-			scope: "inventory" as const,
-			position: {
-				x: toolbarSlot.x,
-				y: toolbarSlot.y,
-			},
-		};
-
-		await act(async () => {
-			readSystem().settle(released.source, released.generation, {
-				kind: DropItemResultKindEnumSchema.enum.Merge,
-				action: "consume",
-				effect: "keep",
-				source: {
-					itemId: source.id,
-					previousRevision: source.revision,
-					previousLocation: source.location,
-					previousQuantity: 1,
-					current: null,
-				},
-				target: {
-					itemId: toolbarOccupant.id,
-					previousRevision: toolbarOccupant.revision,
-					previousLocation: targetLocation,
-					previousQuantity: 1,
-					current: {
-						itemId: toolbarOccupant.id,
-						canonicalItemId: "item:target",
-						revision: toolbarOccupant.revision,
-						location: targetLocation,
-						quantity: 1,
-					},
-				},
-			});
-		});
-		expect(readSystem().active).toMatchObject({
-			phase: "settling",
-			settlement: {
-				kind: DropItemResultKindEnumSchema.enum.Merge,
-				stage: "approach",
-				pendingActorIds: [
-					source.id,
-				],
-			},
-		});
-		expect(
-			document.querySelector<HTMLElement>(`[data-actor-selection="${toolbarOccupant.id}"]`)
-				?.dataset.activePhase,
-		).toBe("settling");
-
-		await act(async () => {
-			readSystem().complete(source.id, released.generation);
-		});
-		expect(readSystem().active).toMatchObject({
-			phase: "settling",
-			settlement: {
-				kind: DropItemResultKindEnumSchema.enum.Merge,
-				stage: "resolve",
-				pendingActorIds: [
-					source.id,
-					toolbarOccupant.id,
-				],
-			},
-		});
-
-		await act(async () => {
-			readSystem().complete(source.id, released.generation);
-			readSystem().complete(toolbarOccupant.id, released.generation);
-		});
-		expect(readSystem().active).toBeNull();
-	});
-
-	it("advances one stack generation, ignores stale completion, and clears both resolve actors", async () => {
-		previewState.occupiedKind = "stack";
-		const { readSystem } = await renderHarness();
-		const released = await startDrag(readSystem(), 440, 50);
-		if (released === null) throw new Error("Expected a released drag.");
-		const targetLocation = {
-			scope: "inventory" as const,
-			position: {
-				x: toolbarSlot.x,
-				y: toolbarSlot.y,
-			},
-		};
-
-		await act(async () => {
-			readSystem().settle(released.source, released.generation, {
-				kind: DropItemResultKindEnumSchema.enum.Stack,
-				transferredQuantity: 1,
-				source: {
-					itemId: source.id,
-					canonicalItemId: "item:shared",
-					previousRevision: source.revision,
-					previousLocation: source.location,
-					previousQuantity: 2,
-					current: {
-						itemId: source.id,
-						canonicalItemId: "item:shared",
-						revision: "revision:source-current",
-						location: source.location,
-						quantity: 1,
-					},
-				},
-				target: {
-					itemId: toolbarOccupant.id,
-					canonicalItemId: "item:shared",
-					previousRevision: toolbarOccupant.revision,
-					previousLocation: targetLocation,
-					previousQuantity: 9,
-					current: {
-						itemId: toolbarOccupant.id,
-						canonicalItemId: "item:shared",
-						revision: "revision:target-current",
-						location: targetLocation,
-						quantity: 10,
-					},
-				},
-			});
-			readSystem().complete(source.id, released.generation - 1);
-		});
-		expect(readSystem().active).toMatchObject({
-			phase: "settling",
-			settlement: {
-				kind: DropItemResultKindEnumSchema.enum.Stack,
-				stage: "approach",
-				pendingActorIds: [
-					source.id,
-				],
-			},
-		});
-
-		await act(async () => {
-			readSystem().complete(source.id, released.generation);
-		});
-		expect(readSystem().active).toMatchObject({
-			phase: "settling",
-			settlement: {
-				kind: DropItemResultKindEnumSchema.enum.Stack,
-				stage: "resolve",
-				pendingActorIds: [
-					source.id,
-					toolbarOccupant.id,
-				],
-			},
-		});
-
-		await act(async () => {
-			readSystem().complete(source.id, released.generation);
-		});
-		expect(readSystem().active).toMatchObject({
-			settlement: {
-				kind: DropItemResultKindEnumSchema.enum.Stack,
-				stage: "resolve",
-				pendingActorIds: [
-					toolbarOccupant.id,
-				],
-			},
-		});
-
-		await act(async () => {
-			readSystem().complete(toolbarOccupant.id, released.generation);
-		});
-		expect(readSystem().active).toBeNull();
-	});
-
-	it("ignores stale completion generations and clears only the current settlement", async () => {
+	it("clears only the exact pending generation when the drop command completes", async () => {
 		const { readSystem } = await renderHarness();
 		const released = await startDrag(readSystem(), 240, 50);
 		if (released === null) throw new Error("Expected a released drag.");
+		expect(readSystem().active?.phase).toBe("awaiting-outcome");
 
 		await act(async () => {
-			readSystem().settle(released.source, released.generation, {
-				kind: DropItemResultKindEnumSchema.enum.Move,
-				itemId: source.id,
-				revision: "revision:moved",
-				previousLocation: source.location,
-				location: {
-					scope: "inventory",
-					position: {
-						x: inventorySlot.x,
-						y: inventorySlot.y,
-					},
-				},
-			});
-			readSystem().complete(source.id, released.generation - 1);
+			readSystem().completeDrop(released.source, released.generation - 1);
 		});
-		expect(readSystem().active?.phase).toBe("settling");
+		expect(readSystem().active?.phase).toBe("awaiting-outcome");
 
 		await act(async () => {
-			readSystem().complete(source.id, released.generation);
+			readSystem().completeDrop(released.source, released.generation);
 		});
 		expect(readSystem().active).toBeNull();
-	});
-
-	it("unlocks a surviving actor at the authoritative outcome and ignores the interrupted settle completion", async () => {
-		const { readSystem } = await renderHarness();
-		const released = await startDrag(readSystem(), 240, 50);
-		if (released === null) throw new Error("Expected a released drag.");
-		const movedSource = {
-			...source,
-			revision: "revision:moved",
-			location: {
-				scope: "inventory" as const,
-				position: {
-					x: inventorySlot.x,
-					y: inventorySlot.y,
-				},
-			},
-			surface: inventorySurface,
-			slot: inventorySlot,
-		} satisfies TileDragSource;
-
-		expect(readSystem().press(movedSource)).toBe(false);
-
-		await act(async () => {
-			readSystem().settle(released.source, released.generation, {
-				kind: DropItemResultKindEnumSchema.enum.Move,
-				itemId: source.id,
-				revision: movedSource.revision,
-				previousLocation: source.location,
-				location: movedSource.location,
-			});
-			expect(readSystem().press(movedSource)).toBe(true);
-			readSystem().complete(source.id, released.generation);
-		});
-
-		expect(readSystem().active).toMatchObject({
-			phase: "pressed",
-			source: movedSource,
-		});
-		expect(readSystem().active?.generation).toBeGreaterThan(released.generation);
-
-		const chainedRelease: {
-			value: ReturnType<TileSystem["release"]>;
-		} = {
-			value: null,
-		};
-		await act(async () => {
-			readSystem().startDrag(movedSource);
-			readSystem().moveDrag(movedSource, 440, 50);
-			chainedRelease.value = readSystem().release(movedSource.id);
-		});
-
-		expect(chainedRelease.value).toMatchObject({
-			source: movedSource,
-			target: {
-				kind: "slot",
-				surface: toolbarSurface,
-				slot: toolbarSlot,
-			},
-		});
-		expect(chainedRelease.value?.generation).toBeGreaterThan(released.generation);
 	});
 });

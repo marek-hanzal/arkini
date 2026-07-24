@@ -11,7 +11,7 @@ const GameRoute = () => (
 );
 
 export const Route = createFileRoute("/game/$packageId")({
-	beforeLoad: ({ context, params }) => {
+	beforeLoad: ({ context, location, params }) => {
 		const resource = getCachedGameEngineResource(context.queryClient);
 		if (resource === null || resource.game.arkpack.packageId !== params.packageId) {
 			throw redirect({
@@ -20,7 +20,7 @@ export const Route = createFileRoute("/game/$packageId")({
 				replace: true,
 			});
 		}
-		resource.assertUsable();
+		if (!location.pathname.endsWith("/action/exit")) resource.assertUsable();
 		return {
 			gameEngine: resource.game,
 			gameEngineResource: resource,

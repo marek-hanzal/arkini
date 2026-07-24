@@ -1,20 +1,28 @@
 import { Effect } from "effect";
+import { ArkiniArkpack } from "~/bridge/arkpack/ArkiniArkpack";
 import type { ArkpackDescriptor } from "~/bridge/arkpack/Arkpack";
+import { BuiltInArkpackResolutionError } from "~/bridge/arkpack/BuiltInArkpackResolutionError";
 
-/** Resolves the single official built-in package used for canonical launcher startup. */
+/** Resolves the exact signed Arkini package used for canonical launcher startup. */
 export const resolveBuiltInArkpackFx = Effect.fn("resolveBuiltInArkpackFx")(
 	(arkpacks: ReadonlyArray<ArkpackDescriptor>) =>
 		Effect.gen(function* () {
-			const official = arkpacks.filter(
-				(arkpack) => arkpack.source === "built-in" && arkpack.trust.type === "official",
+			const officialArkini = arkpacks.filter(
+				(arkpack) =>
+					arkpack.packageId === ArkiniArkpack.packageId &&
+					arkpack.gameId === "arkini" &&
+					arkpack.source === "built-in" &&
+					arkpack.trust.type === "official",
 			);
-			if (official.length !== 1 || official[0] === undefined) {
+			if (officialArkini.length !== 1 || officialArkini[0] === undefined) {
 				return yield* Effect.fail(
-					new Error(
-						`Arkini requires exactly one official built-in package; catalog contains ${official.length}.`,
-					),
+					new BuiltInArkpackResolutionError({
+						packageId: ArkiniArkpack.packageId,
+						matchingCount: officialArkini.length,
+						message: "Arkini requires its exact official built-in package.",
+					}),
 				);
 			}
-			return official[0];
+			return officialArkini[0];
 		}),
 );

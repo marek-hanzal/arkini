@@ -23,16 +23,20 @@ describe("readArkpackFx", () => {
 			readArkpackFx({
 				bytes,
 				filename: "bridge.arkpack",
+				signature: {
+					trustedKeys,
+				},
 				source: "imported",
-				trustedKeys,
 			}),
 		);
 		const second = await Effect.runPromise(
 			readArkpackFx({
 				bytes,
 				filename: "renamed.arkpack",
+				signature: {
+					trustedKeys,
+				},
 				source: "imported",
-				trustedKeys,
 			}),
 		);
 
@@ -53,10 +57,12 @@ describe("readArkpackFx", () => {
 			readArkpackFx({
 				bytes: createTestArkpack(),
 				signature: {
-					nope: true,
+					metadata: {
+						nope: true,
+					},
+					trustedKeys,
 				},
 				source: "imported",
-				trustedKeys,
 			}),
 		);
 
@@ -71,8 +77,10 @@ describe("readArkpackFx", () => {
 			Effect.runPromise(
 				readArkpackFx({
 					bytes: new Uint8Array(ArkpackLimits.maxCompressedBytes + 1),
+					signature: {
+						trustedKeys,
+					},
 					source: "imported",
-					trustedKeys,
 				}),
 			),
 		).rejects.toThrow("compressed limit");
@@ -115,8 +123,10 @@ describe("readArkpackFx", () => {
 			Effect.either(
 				readArkpackFx({
 					bytes: new Uint8Array(gzipSync(encoded)),
+					signature: {
+						trustedKeys,
+					},
 					source: "imported",
-					trustedKeys,
 				}),
 			),
 		);

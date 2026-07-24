@@ -6,6 +6,7 @@ import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { readArkpackFx } from "~/bridge/arkpack/readArkpackFx";
+import { ArkpackSigningError } from "~/engine/pack/error/ArkpackSigningError";
 import { generateArkpackKeyPairFx } from "~/engine/pack/fx/generateArkpackKeyPairFx";
 import { packSignedDirectoryFx } from "~/engine/pack/fx/packSignedDirectoryFx";
 import { signArkpackFx } from "~/engine/pack/fx/signArkpackFx";
@@ -50,6 +51,33 @@ describe("Arkpack signing workflow", () => {
 			],
 		});
 		const arkpackPath = join(root, "workflow.game.arkpack");
+		const untrustedKey = await Effect.runPromise(
+			Effect.either(
+				packSignedDirectoryFx({
+					input: "game/demo",
+					keyId,
+					metadata: {
+						output: join(root, "untrusted.metadata.json"),
+						packageId: "untrusted-workflow",
+					},
+					output: join(root, "untrusted.game.arkpack"),
+					privateKey: pair.privateKey,
+					trustedKeys: {
+						formatVersion: 1,
+						keys: [],
+					},
+				}).pipe(Effect.provide(NodeContext.layer)),
+			),
+		);
+		expect(untrustedKey._tag).toBe("Left");
+		if (untrustedKey._tag === "Left") {
+			expect(untrustedKey.left).toBeInstanceOf(ArkpackSigningError);
+			expect(untrustedKey.left).toMatchObject({
+				reason: "untrusted-key-id",
+				keyId,
+			});
+		}
+
 		const result = await Effect.runPromise(
 			packSignedDirectoryFx({
 				input: "game/demo",
@@ -82,11 +110,13 @@ describe("Arkpack signing workflow", () => {
 		const loaded = await Effect.runPromise(
 			readArkpackFx({
 				bytes,
-				expectedOfficialKeyId: keyId,
 				packageId: "test-workflow",
-				signature,
+				signature: {
+					expectedKeyId: keyId,
+					metadata: signature,
+					trustedKeys,
+				},
 				source: "built-in",
-				trustedKeys,
 			}),
 		);
 		expect(loaded.descriptor.trust).toEqual({
@@ -97,23 +127,38 @@ describe("Arkpack signing workflow", () => {
 
 		const mutated = bytes.slice();
 		mutated[mutated.byteLength - 1] = (mutated[mutated.byteLength - 1] ?? 0) ^ 1;
-		await expect(
-			Effect.runPromise(
+		const mismatchedTrust = await Effect.runPromise(
+			Effect.either(
 				readArkpackFx({
 					bytes: mutated,
-					expectedOfficialKeyId: keyId,
-					signature,
+					signature: {
+						expectedKeyId: keyId,
+						metadata: signature,
+						trustedKeys,
+					},
 					source: "built-in",
-					trustedKeys,
 				}),
 			),
-		).rejects.toThrow("expected official signature");
+		);
+		expect(mismatchedTrust._tag).toBe("Left");
+		if (mismatchedTrust._tag === "Left") {
+			expect(mismatchedTrust.left).toMatchObject({
+				_tag: "ArkpackTrustMismatchError",
+				expectedKeyId: keyId,
+				actualTrust: {
+					type: "invalid",
+					reason: "hash-mismatch",
+				},
+			});
+		}
 
 		const unsigned = await Effect.runPromise(
 			readArkpackFx({
 				bytes,
+				signature: {
+					trustedKeys,
+				},
 				source: "imported",
-				trustedKeys,
 			}),
 		);
 		expect(unsigned.descriptor.trust).toEqual({
@@ -131,9 +176,11 @@ describe("Arkpack signing workflow", () => {
 		const unknown = await Effect.runPromise(
 			readArkpackFx({
 				bytes,
-				signature: unknownSignature,
+				signature: {
+					metadata: unknownSignature,
+					trustedKeys,
+				},
 				source: "imported",
-				trustedKeys,
 			}),
 		);
 		expect(unknown.descriptor.trust).toEqual({

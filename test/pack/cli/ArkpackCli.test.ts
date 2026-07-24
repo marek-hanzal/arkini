@@ -88,5 +88,87 @@ describe("Arkpack signing CLI", () => {
 		).rejects.toMatchObject({
 			code: 1,
 		});
+	}, 15_000);
+
+	it("reports invalid signing metadata and trusted-key JSON without raw parser stacks", async () => {
+		const privateKeyPath = join(root, "private.pem");
+		const publicKeyPath = join(root, "public.pem");
+		await runCli(
+			"keygen",
+			"--private-key-output",
+			privateKeyPath,
+			"--public-key-output",
+			publicKeyPath,
+		);
+		const arkpackPath = join(root, "fixture.arkpack");
+		await writeFile(arkpackPath, new TextEncoder().encode("exact CLI fixture bytes"));
+
+		const invalidKeyId = await runCli(
+			"sign",
+			arkpackPath,
+			"--key-id",
+			"INVALID KEY",
+			"--private-key",
+			privateKeyPath,
+		).catch((error: unknown) => error);
+		expect(invalidKeyId).toMatchObject({
+			code: 1,
+			stderr: expect.stringContaining("Invalid Arkpack signing metadata"),
+		});
+		expect(
+			String(
+				(
+					invalidKeyId as {
+						stderr?: unknown;
+					}
+				).stderr,
+			),
+		).not.toMatch(/ZodError|FiberFailure/);
+
+		const registryPath = join(root, "keys.json");
+		await writeFile(registryPath, "{ definitely not JSON");
+		const invalidRegistry = await runCli(
+			"verify",
+			arkpackPath,
+			"--trusted-keys",
+			registryPath,
+		).catch((error: unknown) => error);
+		expect(invalidRegistry).toMatchObject({
+			code: 1,
+			stderr: expect.stringContaining("Invalid Arkpack trusted-key registry"),
+		});
+		expect(
+			String(
+				(
+					invalidRegistry as {
+						stderr?: unknown;
+					}
+				).stderr,
+			),
+		).not.toMatch(/SyntaxError|FiberFailure/);
+
+		const collidingPath = join(root, "colliding.pem");
+		const collidingOutputs = await runCli(
+			"keygen",
+			"--private-key-output",
+			collidingPath,
+			"--public-key-output",
+			collidingPath,
+		).catch((error: unknown) => error);
+		expect(collidingOutputs).toMatchObject({
+			code: 1,
+			stderr: expect.stringContaining(
+				"Private and public Arkpack keys require different output paths",
+			),
+		});
+		expect(
+			String(
+				(
+					collidingOutputs as {
+						stderr?: unknown;
+					}
+				).stderr,
+			),
+		).not.toMatch(/FiberFailure/);
 	});
 });

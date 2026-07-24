@@ -112,8 +112,14 @@ Only [`game/arkini.arkpack.keys.json`](game/arkini.arkpack.keys.json), containin
 1. Generate a new key pair and choose a new rotation-specific `keyId`.
 2. Add the new public key to the registry while retaining the old public key.
 3. Release an application version that trusts both identities.
-4. Replace the CI secret and start signing new packages with the new private key.
-5. Retain old public keys while older official packages or saves may still need verification.
-6. Remove or mark a compromised identity only through a deliberate application update.
+4. Change the single active `keyId` in
+   [`cli/arkpack/ArkiniOfficialArkpackSigning.ts`](cli/arkpack/ArkiniOfficialArkpackSigning.ts),
+   replace the
+   `ARKINI_ARKPACK_PRIVATE_KEY` CI secret, and run `npm run game:pack:official`.
+5. Verify the regenerated signature and commit the tracked metadata. The sidecar remains a
+   generated, ignored build input; runtime trust expectations are read from that exact generated
+   sidecar, so the build and loader cannot carry separate active-key constants.
+6. Retain old public keys while older official packages or saves may still need verification.
+7. Remove or mark a compromised identity only through a deliberate application update.
 
 There is no network revocation, automatic expiry, remote PKI, Workshop identity, or third-party author certificate model in this milestone.

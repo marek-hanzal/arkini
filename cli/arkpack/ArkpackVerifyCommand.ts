@@ -1,6 +1,7 @@
 import { Args, Command, Options } from "@effect/cli";
 import { Console, Effect } from "effect";
 
+import { ArkpackInputError } from "~/engine/pack/error/ArkpackInputError";
 import { readArkpackTrustedKeysFx } from "~/engine/pack/fx/readArkpackTrustedKeysFx";
 import { verifyArkpackFileFx } from "~/engine/pack/fx/verifyArkpackFileFx";
 
@@ -28,7 +29,19 @@ export const ArkpackVerifyCommand = Command.make(
 					new Error(`Arkpack signature is invalid: ${result.trust.reason}.`),
 				);
 			}
-		}),
+		}).pipe(
+			Effect.catchIf(
+				(error) => error instanceof ArkpackInputError,
+				(error) =>
+					Console.error(error.message).pipe(
+						Effect.tap(() =>
+							Effect.sync(() => {
+								process.exitCode = 1;
+							}),
+						),
+					),
+			),
+		),
 ).pipe(
 	Command.withDescription(
 		"Verify one Arkpack and print its explicit official, external, or invalid trust.",

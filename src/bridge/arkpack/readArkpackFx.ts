@@ -1,6 +1,7 @@
 import { Effect } from "effect";
 
 import { ArkpackLimits } from "~/bridge/arkpack/ArkpackLimits";
+import { assertExpectedArkpackTrustFx } from "~/bridge/arkpack/assertExpectedArkpackTrustFx";
 import { decodeFx } from "~/engine/pack/fx/decodeFx";
 import { verifyArkpackTrustFx } from "~/engine/pack/fx/verifyArkpackTrustFx";
 import type { ArkpackTrustedKeysSchema } from "~/engine/pack/schema/ArkpackTrustedKeysSchema";
@@ -15,11 +16,14 @@ export namespace readArkpackFx {
 		bytes: Uint8Array;
 		filename?: string;
 		importedAtMs?: number;
-		expectedOfficialKeyId?: string;
 		packageId?: string;
-		signature?: unknown;
+		signature: {
+			/** Official key identity required by trusted bundled content. */
+			readonly expectedKeyId?: string;
+			readonly metadata?: unknown;
+			readonly trustedKeys: ArkpackTrustedKeysSchema.Type;
+		};
 		source: "built-in" | "imported";
-		trustedKeys: ArkpackTrustedKeysSchema.Type;
 	}
 }
 
@@ -91,13 +95,11 @@ const createPackProvenance = (
 /** Decodes, schema-validates and semantically validates one compressed arkpack binary. */
 export const readArkpackFx = Effect.fn("readArkpackFx")(function* ({
 	bytes,
-	expectedOfficialKeyId,
 	filename,
 	importedAtMs,
 	packageId,
 	signature,
 	source,
-	trustedKeys,
 }: readArkpackFx.Props) {
 	if (bytes.byteLength > ArkpackLimits.maxCompressedBytes) {
 		return yield* Effect.fail(
@@ -108,20 +110,13 @@ export const readArkpackFx = Effect.fn("readArkpackFx")(function* ({
 	}
 	const verification = yield* verifyArkpackTrustFx({
 		bytes,
-		signature,
-		trustedKeys,
+		signature: signature.metadata,
+		trustedKeys: signature.trustedKeys,
 	});
-	if (
-		expectedOfficialKeyId !== undefined &&
-		(verification.trust.type !== "official" ||
-			verification.trust.keyId !== expectedOfficialKeyId)
-	) {
-		return yield* Effect.fail(
-			new Error(
-				`Arkpack expected official signature ${expectedOfficialKeyId}, received ${verification.trust.type}.`,
-			),
-		);
-	}
+	yield* assertExpectedArkpackTrustFx({
+		expectedKeyId: signature.expectedKeyId,
+		trust: verification.trust,
+	});
 	const contentHash = verification.contentHash;
 	const payload = yield* decodeFx(yield* decompress(bytes));
 	for (const resource of payload.resources) {

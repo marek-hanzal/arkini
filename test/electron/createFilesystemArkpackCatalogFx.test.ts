@@ -114,4 +114,30 @@ describe("createFilesystemArkpackCatalogFx", () => {
 			"Invalid imported Arkpack",
 		);
 	});
+
+	it("never trusts an imported descriptor without a persisted signature", async () => {
+		const catalog = await createCatalog();
+		await Effect.runPromise(
+			catalog.installFx({
+				descriptor: {
+					...descriptor,
+					trust: {
+						type: "official",
+						keyId: "forged-official",
+					},
+				},
+				bytes: packageBytes,
+			}),
+		);
+
+		expect(await Effect.runPromise(catalog.listFx)).toEqual([
+			{
+				...descriptor,
+				trust: {
+					type: "external",
+					reason: "unsigned",
+				},
+			},
+		]);
+	});
 });

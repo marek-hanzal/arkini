@@ -54,7 +54,20 @@ describe("MainMenu", () => {
 			type: "ready" as const,
 			arkpacks: [
 				{
-					packageId: "canonical-built-in",
+					packageId: "competing-official",
+					contentHash: "b".repeat(64),
+					gameId: "other-game",
+					title: "Other Game",
+					configVersion: "1",
+					compressedSize: 1,
+					trust: {
+						type: "official",
+						keyId: "other-official",
+					} as const,
+					source: "built-in" as const,
+				},
+				{
+					packageId: "arkini",
 					contentHash: "a".repeat(64),
 					gameId: "arkini",
 					title: "Arkini",
@@ -81,7 +94,7 @@ describe("MainMenu", () => {
 				theme: "dark",
 				accent: "rose",
 			},
-			builtInPackageId: "canonical-built-in",
+			builtInPackageId: "arkini",
 			cheatsAvailable: false,
 			heroReady: true,
 			splashCompleted: true,
@@ -140,7 +153,7 @@ describe("MainMenu", () => {
 		const play = Array.from(container.querySelectorAll("a")).find(
 			(link) => link.textContent === "Play",
 		);
-		expect(play?.getAttribute("href")).toContain("/action/load-game/canonical-built-in");
+		expect(play?.getAttribute("href")).toContain("/action/load-game/arkini");
 		expect(
 			container.querySelector<HTMLElement>('[data-ui="MainPageLayout"]')?.style
 				.viewTransitionName,

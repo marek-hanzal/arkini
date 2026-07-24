@@ -1,6 +1,8 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
+import { ArkiniArkpack } from "~/bridge/arkpack/ArkiniArkpack";
 import type { ArkpackDescriptor } from "~/bridge/arkpack/Arkpack";
+import { BuiltInArkpackResolutionError } from "~/bridge/arkpack/BuiltInArkpackResolutionError";
 import { resolveBuiltInArkpackFx } from "~/bridge/arkpack/resolveBuiltInArkpackFx";
 
 const descriptor = (packageId: string, source: ArkpackDescriptor["source"]): ArkpackDescriptor => ({
@@ -35,11 +37,38 @@ const invalidCatalogs: ReadonlyArray<{
 			descriptor("second", "built-in"),
 		],
 	},
+	{
+		arkpacks: [
+			{
+				...descriptor(ArkiniArkpack.packageId, "built-in"),
+				gameId: "arkini",
+			},
+			{
+				...descriptor(ArkiniArkpack.packageId, "built-in"),
+				gameId: "arkini",
+			},
+		],
+	},
+	{
+		arkpacks: [
+			{
+				...descriptor(ArkiniArkpack.packageId, "built-in"),
+				gameId: "arkini",
+				trust: {
+					type: "external",
+					reason: "unsigned",
+				},
+			},
+		],
+	},
 ];
 
 describe("resolveBuiltInArkpackFx", () => {
-	it("returns the only official built-in package without hardcoding its identity", async () => {
-		const builtIn = descriptor("official", "built-in");
+	it("returns exact signed Arkini even beside another official built-in package", async () => {
+		const builtIn = {
+			...descriptor(ArkiniArkpack.packageId, "built-in"),
+			gameId: "arkini",
+		};
 		const demo: ArkpackDescriptor = {
 			...descriptor("demo", "built-in"),
 			trust: {
@@ -51,6 +80,7 @@ describe("resolveBuiltInArkpackFx", () => {
 			Effect.runPromise(
 				resolveBuiltInArkpackFx([
 					descriptor("imported", "imported"),
+					descriptor("other-official", "built-in"),
 					demo,
 					builtIn,
 				]),
@@ -58,11 +88,17 @@ describe("resolveBuiltInArkpackFx", () => {
 		).resolves.toBe(builtIn);
 	});
 
-	it.each(invalidCatalogs)("rejects catalogs without exactly one official package", async ({
+	it.each(invalidCatalogs)("rejects catalogs without exact signed Arkini", async ({
 		arkpacks,
 	}) => {
-		await expect(Effect.runPromise(resolveBuiltInArkpackFx(arkpacks))).rejects.toThrow(
-			"exactly one official built-in package",
-		);
+		const result = await Effect.runPromise(Effect.either(resolveBuiltInArkpackFx(arkpacks)));
+		expect(result._tag).toBe("Left");
+		if (result._tag === "Left") {
+			expect(result.left).toBeInstanceOf(BuiltInArkpackResolutionError);
+			expect(result.left).toMatchObject({
+				packageId: ArkiniArkpack.packageId,
+				matchingCount: expect.any(Number),
+			});
+		}
 	});
 });

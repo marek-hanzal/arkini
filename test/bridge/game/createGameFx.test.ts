@@ -25,8 +25,10 @@ const createStorages = async () => {
 		readArkpackFx({
 			bytes,
 			filename: "bridge.arkpack",
+			signature: {
+				trustedKeys,
+			},
 			source: "imported",
-			trustedKeys,
 		}),
 	);
 	const record = {

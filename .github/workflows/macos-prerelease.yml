@@ -19,7 +19,6 @@ jobs:
     runs-on: macos-15
     timeout-minutes: 60
     env:
-      ARKINI_ARKPACK_PRIVATE_KEY: ${{ secrets.ARKINI_ARKPACK_PRIVATE_KEY }}
       CSC_IDENTITY_AUTO_DISCOVERY: "false"
     steps:
       - name: Check out repository
@@ -51,6 +50,8 @@ jobs:
           npm run game:validate
 
       - name: Package unsigned macOS arm64 application with signed official game content
+        env:
+          ARKINI_ARKPACK_PRIVATE_KEY: ${{ secrets.ARKINI_ARKPACK_PRIVATE_KEY }}
         run: npm run package:mac
 
       - name: Verify dependency graph and permanent tests against packaged build inputs

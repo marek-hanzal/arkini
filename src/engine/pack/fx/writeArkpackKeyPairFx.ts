@@ -1,6 +1,7 @@
 import { FileSystem, Path } from "@effect/platform";
 import { Effect } from "effect";
 
+import { ArkpackInputError } from "~/engine/pack/error/ArkpackInputError";
 import { generateArkpackKeyPairFx } from "./generateArkpackKeyPairFx";
 
 export namespace writeArkpackKeyPairFx {
@@ -19,6 +20,18 @@ export const writeArkpackKeyPairFx = Effect.fn("writeArkpackKeyPairFx")(function
 }: writeArkpackKeyPairFx.Props) {
 	const fileSystem = yield* FileSystem.FileSystem;
 	const path = yield* Path.Path;
+	if (path.resolve(privateKeyOutput) === path.resolve(publicKeyOutput)) {
+		return yield* Effect.fail(
+			new ArkpackInputError({
+				operation: "write-key-pair",
+				message: "Private and public Arkpack keys require different output paths.",
+				cause: {
+					privateKeyOutput,
+					publicKeyOutput,
+				},
+			}),
+		);
+	}
 	const outputs = [
 		privateKeyOutput,
 		publicKeyOutput,

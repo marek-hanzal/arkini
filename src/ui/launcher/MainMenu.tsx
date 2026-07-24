@@ -1,4 +1,5 @@
 import { useSyncExternalStore } from "react";
+import { ArkiniArkpack } from "~/bridge/arkpack/ArkiniArkpack";
 import { useArkpacks } from "~/bridge/arkpack/useArkpacks";
 import { Button, ButtonLink, PrimaryButton, PrimaryButtonLink } from "~/ui/button/Button";
 import { useExitApplicationMutation } from "~/ui/launcher/mutation/useExitApplicationMutation";
@@ -14,16 +15,16 @@ export const MainMenu = () => {
 		startup.getSnapshot,
 	);
 	const exit = useExitApplicationMutation();
-	const builtInPackageId =
-		startupState.type === "ready" ? startupState.builtInPackageId : undefined;
 	const builtInAvailable =
-		builtInPackageId !== undefined &&
+		startupState.type === "ready" &&
+		startupState.builtInPackageId === ArkiniArkpack.packageId &&
 		catalogState.type === "ready" &&
 		catalogState.arkpacks.some(
 			(arkpack) =>
 				arkpack.source === "built-in" &&
 				arkpack.trust.type === "official" &&
-				arkpack.packageId === builtInPackageId,
+				arkpack.gameId === "arkini" &&
+				arkpack.packageId === ArkiniArkpack.packageId,
 		);
 
 	return (
@@ -32,12 +33,12 @@ export const MainMenu = () => {
 			aria-label="Main menu"
 			data-ui="MainMenu"
 		>
-			{builtInAvailable && builtInPackageId !== undefined ? (
+			{builtInAvailable ? (
 				<PrimaryButtonLink
 					to="/action/load-game/$packageId"
 					preload={false}
 					params={{
-						packageId: builtInPackageId,
+						packageId: ArkiniArkpack.packageId,
 					}}
 					className="rounded-xl"
 				>

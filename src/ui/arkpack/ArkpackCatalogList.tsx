@@ -1,30 +1,7 @@
 import { match } from "ts-pattern";
 
-import type { ArkpackDescriptor } from "~/bridge/arkpack/Arkpack";
 import type { useArkpacks } from "~/bridge/arkpack/useArkpacks";
 import { DangerButton, PrimaryButtonLink } from "~/ui/button/Button";
-
-const readTrustLabel = (trust: ArkpackDescriptor["trust"]) =>
-	match(trust)
-		.with(
-			{
-				type: "official",
-			},
-			() => "Official",
-		)
-		.with(
-			{
-				type: "external",
-			},
-			() => "External",
-		)
-		.with(
-			{
-				type: "invalid",
-			},
-			() => "Invalid",
-		)
-		.exhaustive();
 
 export namespace ArkpackCatalogList {
 	export interface Props {
@@ -71,7 +48,26 @@ export const ArkpackCatalogList = ({ state, onRemove }: ArkpackCatalogList.Props
 										{arkpack.title}
 									</h2>
 									<span className="rounded-full bg-surface-raised px-2 py-0.5 text-[0.65rem] font-semibold uppercase tracking-wider text-muted">
-										{readTrustLabel(arkpack.trust)}
+										{match(arkpack.trust)
+											.with(
+												{
+													type: "official",
+												},
+												() => "Official",
+											)
+											.with(
+												{
+													type: "external",
+												},
+												() => "External",
+											)
+											.with(
+												{
+													type: "invalid",
+												},
+												() => "Invalid",
+											)
+											.exhaustive()}
 									</span>
 								</div>
 								<p className="mt-1 truncate text-xs text-subtle">
@@ -91,6 +87,40 @@ export const ArkpackCatalogList = ({ state, onRemove }: ArkpackCatalogList.Props
 								{match(arkpack.trust)
 									.with(
 										{
+											type: "official",
+										},
+										() => (
+											<PrimaryButtonLink
+												to="/action/load-game/$packageId"
+												preload={false}
+												params={{
+													packageId: arkpack.packageId,
+												}}
+												className="min-h-0 px-4 py-2 text-sm shadow-none"
+											>
+												Play
+											</PrimaryButtonLink>
+										),
+									)
+									.with(
+										{
+											type: "external",
+										},
+										() => (
+											<PrimaryButtonLink
+												to="/action/load-game/$packageId"
+												preload={false}
+												params={{
+													packageId: arkpack.packageId,
+												}}
+												className="min-h-0 px-4 py-2 text-sm shadow-none"
+											>
+												Play
+											</PrimaryButtonLink>
+										),
+									)
+									.with(
+										{
 											type: "invalid",
 										},
 										() => (
@@ -99,18 +129,7 @@ export const ArkpackCatalogList = ({ state, onRemove }: ArkpackCatalogList.Props
 											</span>
 										),
 									)
-									.otherwise(() => (
-										<PrimaryButtonLink
-											to="/action/load-game/$packageId"
-											preload={false}
-											params={{
-												packageId: arkpack.packageId,
-											}}
-											className="min-h-0 px-4 py-2 text-sm shadow-none"
-										>
-											Play
-										</PrimaryButtonLink>
-									))}
+									.exhaustive()}
 							</div>
 						</article>
 					))}

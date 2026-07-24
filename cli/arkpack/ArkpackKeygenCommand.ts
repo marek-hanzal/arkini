@@ -1,6 +1,7 @@
 import { Command, Options } from "@effect/cli";
 import { Console, Effect } from "effect";
 
+import { ArkpackInputError } from "~/engine/pack/error/ArkpackInputError";
 import { writeArkpackKeyPairFx } from "~/engine/pack/fx/writeArkpackKeyPairFx";
 
 export const ArkpackKeygenCommand = Command.make(
@@ -30,7 +31,19 @@ export const ArkpackKeygenCommand = Command.make(
 			yield* Console.log(
 				"Keep the private PEM only in ignored .arkini storage or a protected CI secret.",
 			);
-		}),
+		}).pipe(
+			Effect.catchIf(
+				(error) => error instanceof ArkpackInputError,
+				(error) =>
+					Console.error(error.message).pipe(
+						Effect.tap(() =>
+							Effect.sync(() => {
+								process.exitCode = 1;
+							}),
+						),
+					),
+			),
+		),
 ).pipe(
 	Command.withDescription(
 		"Generate an Ed25519 PKCS8/SPKI key pair without printing private material.",

@@ -4,8 +4,8 @@ import { describe, expect, it, vi } from "vitest";
 
 const calls = vi.hoisted(() => [] as string[]);
 
-vi.mock("../../cli/desktop/packOfficialGameFx", () => ({
-	packOfficialGameFx: ({ gameDirectory }: { readonly gameDirectory: string }) =>
+vi.mock("../../cli/arkpack/packOfficialArkiniFx", () => ({
+	packOfficialArkiniFx: ({ gameDirectory }: { readonly gameDirectory: string }) =>
 		Effect.sync(() => calls.push(`pack:${gameDirectory}`)),
 }));
 vi.mock("../../cli/desktop/packDemoGameFx", () => ({

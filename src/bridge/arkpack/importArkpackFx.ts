@@ -26,8 +26,10 @@ export const importArkpackFx = Effect.fn("importArkpackFx")(function* ({
 			bytes,
 			filename,
 			importedAtMs,
+			signature: {
+				trustedKeys: ArkiniTrustedKeys,
+			},
 			source: "imported",
-			trustedKeys: ArkiniTrustedKeys,
 		});
 		yield* storage.writeFx(loaded.descriptor, bytes.slice().buffer);
 		return loaded.descriptor;

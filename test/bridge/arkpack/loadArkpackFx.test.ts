@@ -71,13 +71,22 @@ describe("loadArkpackFx official package", () => {
 			),
 		);
 
-		await expect(
-			Effect.runPromise(
+		const result = await Effect.runPromise(
+			Effect.either(
 				loadArkpackFx({
 					packageId: ArkiniArkpack.packageId,
 				}),
 			),
-		).rejects.toThrow("Unable to load bundled arkini signature");
+		);
+		expect(result._tag).toBe("Left");
+		if (result._tag === "Left") {
+			expect(result.left).toMatchObject({
+				_tag: "ArkpackLoadError",
+				operation: "fetch-signature",
+				packageId: "arkini",
+				message: expect.stringContaining("Unable to load bundled arkini signature"),
+			});
+		}
 	});
 
 	it("loads the bundled unsigned demo as external content", async () => {

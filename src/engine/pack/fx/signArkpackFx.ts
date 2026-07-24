@@ -1,6 +1,7 @@
 import { Effect } from "effect";
 
 import { ArkpackCryptoError } from "~/engine/pack/error/ArkpackCryptoError";
+import { ArkpackInputError } from "~/engine/pack/error/ArkpackInputError";
 import { ArkpackSignatureSchema } from "~/engine/pack/schema/ArkpackSignatureSchema";
 import { createArkpackSigningPayloadFx } from "./createArkpackSigningPayloadFx";
 import { readArkpackContentHashFx } from "./readArkpackContentHashFx";
@@ -67,13 +68,21 @@ export const signArkpackFx = Effect.fn("signArkpackFx")(function* ({
 	);
 	const contentHash = yield* readArkpackContentHashFx(bytes);
 
-	return yield* Effect.sync(() =>
-		ArkpackSignatureSchema.parse({
-			formatVersion: 1,
-			algorithm: "ed25519",
-			keyId,
-			contentHash,
-			signature,
-		}),
-	);
+	return yield* Effect.try({
+		try: () =>
+			ArkpackSignatureSchema.parse({
+				formatVersion: 1,
+				algorithm: "ed25519",
+				keyId,
+				contentHash,
+				signature,
+			}),
+		catch: (cause) =>
+			new ArkpackInputError({
+				operation: "create-signature",
+				message:
+					"Invalid Arkpack signing metadata; keyId must use 1-64 lowercase letters, digits, dots, underscores, or hyphens.",
+				cause,
+			}),
+	});
 });

@@ -1,5 +1,6 @@
 import { Effect } from "effect";
 
+import { ArkpackSigningError } from "~/engine/pack/error/ArkpackSigningError";
 import type { ArkpackTrustedKeysSchema } from "~/engine/pack/schema/ArkpackTrustedKeysSchema";
 import { packDirectoryFx } from "./packDirectoryFx";
 import { signArkpackFileFx } from "./signArkpackFileFx";
@@ -30,7 +31,11 @@ export const packSignedDirectoryFx = Effect.fn("packSignedDirectoryFx")(function
 }: packSignedDirectoryFx.Props) {
 	if (!trustedKeys.keys.some((key) => key.keyId === keyId)) {
 		return yield* Effect.fail(
-			new Error(`Official Arkpack keyId ${keyId} is absent from the trusted registry.`),
+			new ArkpackSigningError({
+				reason: "untrusted-key-id",
+				keyId,
+				message: `Official Arkpack keyId ${keyId} is absent from the trusted registry.`,
+			}),
 		);
 	}
 	const packed = yield* packDirectoryFx({
@@ -53,7 +58,12 @@ export const packSignedDirectoryFx = Effect.fn("packSignedDirectoryFx")(function
 	});
 	if (verification.trust.type !== "official" || verification.trust.keyId !== keyId) {
 		return yield* Effect.fail(
-			new Error("Official Arkpack post-sign verification did not establish trust."),
+			new ArkpackSigningError({
+				reason: "post-sign-verification",
+				keyId,
+				actualTrust: verification.trust,
+				message: "Official Arkpack post-sign verification did not establish trust.",
+			}),
 		);
 	}
 	return {

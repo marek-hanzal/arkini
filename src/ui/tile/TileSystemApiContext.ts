@@ -4,6 +4,7 @@ import type { TileSystem } from "~/ui/tile/TileSystem";
 import type { useTileInteractionController } from "~/ui/tile/useTileInteractionController";
 
 export type TileSystemApi = Omit<TileSystem, "active"> & {
+	readonly interactionBlocked: boolean;
 	readonly refreshSlotTarget: ReturnType<
 		typeof useTileInteractionController
 	>["refreshSlotTarget"];

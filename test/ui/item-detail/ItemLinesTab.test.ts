@@ -17,6 +17,9 @@ import { JobStatusEnumSchema } from "~/engine/job/schema/read/JobStatusEnumSchem
 const control = vi.hoisted(() => ({
 	openItemDetail: vi.fn(),
 	openItemDefinitionDetail: vi.fn(),
+	readActionError: vi.fn(() => null),
+	readPendingAction: vi.fn(() => null),
+	runPendingAction: vi.fn(({ run }: { readonly run: () => Promise<unknown> }) => run()),
 }));
 const commands = vi.hoisted(() => ({
 	autofill: vi.fn(() => Promise.resolve()),
@@ -154,6 +157,11 @@ const projection = {
 
 beforeEach(() => {
 	for (const value of Object.values(control)) value.mockReset();
+	control.readActionError.mockReturnValue(null);
+	control.readPendingAction.mockReturnValue(null);
+	control.runPendingAction.mockImplementation(
+		({ run }: { readonly run: () => Promise<unknown> }) => run(),
+	);
 	for (const value of Object.values(commands)) {
 		value.mockReset();
 		value.mockResolvedValue(undefined);

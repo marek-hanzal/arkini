@@ -431,14 +431,16 @@ select {
 }
 
 @media (hover: hover) and (pointer: fine) {
-	.ak-list-row-interactive:not(:disabled):not([aria-disabled="true"]):hover {
+	.ak-list-row-interactive:not(.ak-list-row-pending):not(:disabled):not(
+		[aria-disabled="true"]
+	):hover {
 		background-color: var(--ak-list-row-interactive-surface);
 		box-shadow: inset 0 0 0 1px var(--ak-list-row-emphasis-border);
 	}
 }
 
-.ak-list-row-interactive:focus-visible,
-.ak-list-row-interactive:focus-within {
+.ak-list-row-interactive:not(.ak-list-row-pending):focus-visible,
+.ak-list-row-interactive:not(.ak-list-row-pending):focus-within {
 	background-color: var(--ak-list-row-interactive-surface);
 	box-shadow: inset 0 0 0 2px var(--ak-list-row-emphasis-border);
 	outline: none;
@@ -456,15 +458,17 @@ select {
 }
 
 @media (hover: hover) and (pointer: fine) {
-	.ak-list-row-interactive.ak-list-row-selected:not(:disabled):not([aria-disabled="true"]):hover {
+	.ak-list-row-interactive.ak-list-row-selected:not(.ak-list-row-pending):not(:disabled):not(
+		[aria-disabled="true"]
+	):hover {
 		color: var(--ak-list-row-selected-foreground);
 		background-color: var(--ak-list-row-selected-surface);
 		box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--ak-accent-contrast) 48%, transparent);
 	}
 }
 
-.ak-list-row-interactive.ak-list-row-selected:focus-visible,
-.ak-list-row-interactive.ak-list-row-selected:focus-within {
+.ak-list-row-interactive.ak-list-row-selected:not(.ak-list-row-pending):focus-visible,
+.ak-list-row-interactive.ak-list-row-selected:not(.ak-list-row-pending):focus-within {
 	color: var(--ak-list-row-selected-foreground);
 	background-color: var(--ak-list-row-selected-surface);
 	box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--ak-accent-contrast) 58%, transparent);

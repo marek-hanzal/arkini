@@ -1,4 +1,4 @@
-import { Effect } from "effect";
+import { Deferred, Effect } from "effect";
 import { describe, expect, it, vi } from "vitest";
 import type { ArkpackDescriptor } from "~/bridge/arkpack/Arkpack";
 import { createArkpackCatalogFx } from "~/bridge/arkpack/createArkpackCatalogFx";
@@ -109,6 +109,75 @@ describe("createArkpackCatalogFx", () => {
 		expect(catalog.getSnapshot()).toEqual({
 			type: "failed",
 			error: failure,
+		});
+	});
+
+	it("publishes loading before import and remove operations complete", async () => {
+		let descriptors: ReadonlyArray<ArkpackDescriptor> = [
+			builtIn,
+		];
+		const importStarted = Effect.runSync(Deferred.make<void>());
+		const finishImport = Effect.runSync(Deferred.make<void>());
+		const removeStarted = Effect.runSync(Deferred.make<void>());
+		const finishRemove = Effect.runSync(Deferred.make<void>());
+		const catalog = Effect.runSync(
+			createArkpackCatalogFx({
+				listFx: Effect.sync(() => descriptors),
+				importFileFx: () =>
+					Deferred.succeed(importStarted, undefined).pipe(
+						Effect.zipRight(Deferred.await(finishImport)),
+						Effect.tap(() =>
+							Effect.sync(() => {
+								descriptors = [
+									builtIn,
+									imported,
+								];
+							}),
+						),
+						Effect.as(imported),
+					),
+				removeFx: () =>
+					Deferred.succeed(removeStarted, undefined).pipe(
+						Effect.zipRight(Deferred.await(finishRemove)),
+						Effect.tap(() =>
+							Effect.sync(() => {
+								descriptors = [
+									builtIn,
+								];
+							}),
+						),
+					),
+			}),
+		);
+		await Effect.runPromise(catalog.refreshFx);
+
+		const importing = Effect.runPromise(catalog.importFileFx({} as File));
+		await Effect.runPromise(Deferred.await(importStarted));
+		expect(catalog.getSnapshot()).toEqual({
+			type: "loading",
+		});
+		Effect.runSync(Deferred.succeed(finishImport, undefined));
+		await expect(importing).resolves.toBe(imported);
+		expect(catalog.getSnapshot()).toEqual({
+			type: "ready",
+			arkpacks: [
+				builtIn,
+				imported,
+			],
+		});
+
+		const removing = Effect.runPromise(catalog.removeFx(imported.packageId));
+		await Effect.runPromise(Deferred.await(removeStarted));
+		expect(catalog.getSnapshot()).toEqual({
+			type: "loading",
+		});
+		Effect.runSync(Deferred.succeed(finishRemove, undefined));
+		await expect(removing).resolves.toBeUndefined();
+		expect(catalog.getSnapshot()).toEqual({
+			type: "ready",
+			arkpacks: [
+				builtIn,
+			],
 		});
 	});
 });

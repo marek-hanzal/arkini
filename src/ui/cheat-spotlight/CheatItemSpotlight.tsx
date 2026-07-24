@@ -1,5 +1,12 @@
 import { useHotkey } from "@tanstack/react-hotkeys";
-import { useEffect, useMemo, useRef, useState } from "react";
+import {
+	type KeyboardEvent as ReactKeyboardEvent,
+	useCallback,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+} from "react";
 
 import type { Game } from "~/bridge/game/Game";
 import { useCheatItemCatalog } from "~/bridge/cheat/useCheatItemCatalog";
@@ -12,16 +19,42 @@ import { useFuseSearch } from "~/ui/search/useFuseSearch";
 
 const maxVisibleResults = 10;
 const errorMessage = (error: unknown) => (error instanceof Error ? error.message : String(error));
+const focusableSelector = [
+	"button:not([disabled])",
+	"[href]",
+	"input:not([disabled])",
+	"select:not([disabled])",
+	"textarea:not([disabled])",
+	'[tabindex]:not([tabindex="-1"])',
+].join(",");
+const canRestoreFocus = (element: HTMLElement) =>
+	element.isConnected &&
+	!element.hidden &&
+	element.closest("[hidden], [inert]") === null &&
+	element.style.display !== "none" &&
+	element.style.visibility !== "hidden" &&
+	element.style.pointerEvents !== "none";
 
 /** Owns the Board-local Cheat item search, keyboard navigation and canonical spawn command. */
-export const CheatItemSpotlight = ({ game }: { readonly game: Game }) => {
+export const CheatItemSpotlight = ({
+	game,
+	onBeforeOpen,
+}: {
+	readonly game: Game;
+	readonly onBeforeOpen?: () => void;
+}) => {
 	const cheats = useGameCheats(game);
 	const cheatAvailability = useCheatAvailability();
 	const catalog = useCheatItemCatalog(game);
 	const gameMenu = useGameMenuControl();
 	const itemDetail = useItemDetailControl();
 	const spawn = useSpawnCheatItemMutation(game);
+	const dialogRef = useRef<HTMLElement>(null);
 	const inputRef = useRef<HTMLInputElement>(null);
+	const originRef = useRef<HTMLElement | null>(null);
+	const preserveSpawnOutcomeRef = useRef(false);
+	const restoreFocusRef = useRef(true);
+	const spawnPendingRef = useRef(spawn.isPending);
 	const [open, setOpen] = useState(false);
 	const [query, setQuery] = useState("");
 	const [selectedIndex, setSelectedIndex] = useState(0);
@@ -65,13 +98,31 @@ export const CheatItemSpotlight = ({ game }: { readonly game: Game }) => {
 		.slice(0, maxVisibleResults);
 	const blockedByHigherOwner = gameMenu.isOpen || itemDetail.isOpen;
 	const available = cheatAvailability.available && cheats.enabled && !blockedByHigherOwner;
+	spawnPendingRef.current = spawn.isPending;
+	const closeSpotlight = useCallback((restoreFocus = true) => {
+		if (spawnPendingRef.current) preserveSpawnOutcomeRef.current = true;
+		restoreFocusRef.current = restoreFocus;
+		setOpen(false);
+	}, []);
 
 	useHotkey(
 		"Mod+P",
 		() => {
-			if (!available && !open) return;
-			setOpen((current) => !current);
-			spawn.reset();
+			if (open) {
+				closeSpotlight();
+				return;
+			}
+			if (!available) return;
+			originRef.current =
+				document.activeElement instanceof HTMLElement ? document.activeElement : null;
+			restoreFocusRef.current = true;
+			onBeforeOpen?.();
+			if (preserveSpawnOutcomeRef.current) {
+				preserveSpawnOutcomeRef.current = false;
+			} else if (!spawn.isPending) {
+				spawn.reset();
+			}
+			setOpen(true);
 		},
 		{
 			enabled: cheatAvailability.available && cheats.enabled,
@@ -80,18 +131,35 @@ export const CheatItemSpotlight = ({ game }: { readonly game: Game }) => {
 	);
 
 	useEffect(() => {
-		if (!cheatAvailability.available || !cheats.enabled || blockedByHigherOwner) setOpen(false);
+		if (!open) return;
+		if (blockedByHigherOwner) {
+			closeSpotlight(false);
+			return;
+		}
+		if (!cheatAvailability.available || !cheats.enabled) closeSpotlight();
 	}, [
 		blockedByHigherOwner,
 		cheatAvailability.available,
+		closeSpotlight,
 		cheats.enabled,
+		open,
 	]);
 
 	useEffect(() => {
 		if (!open) return;
 		setQuery("");
 		setSelectedIndex(0);
-		queueMicrotask(() => inputRef.current?.focus());
+		queueMicrotask(() => (inputRef.current ?? dialogRef.current)?.focus());
+		return () => {
+			if (!restoreFocusRef.current) return;
+			const origin = originRef.current;
+			originRef.current = null;
+			if (origin !== null && canRestoreFocus(origin)) {
+				origin.focus();
+				if (document.activeElement === origin) return;
+			}
+			document.querySelector<HTMLElement>('[data-ui="GameShell"]')?.focus();
+		};
 	}, [
 		open,
 	]);
@@ -109,19 +177,53 @@ export const CheatItemSpotlight = ({ game }: { readonly game: Game }) => {
 		if (selected === undefined || spawn.isPending) return;
 		spawn.mutate(selected.itemId);
 	};
+	const keepFocusInside = (event: ReactKeyboardEvent<HTMLElement>) => {
+		if (event.key === "Escape") {
+			event.preventDefault();
+			event.stopPropagation();
+			closeSpotlight();
+			return;
+		}
+		if (event.key !== "Tab") return;
+		const controls = Array.from(
+			dialogRef.current?.querySelectorAll<HTMLElement>(focusableSelector) ?? [],
+		);
+		if (controls.length === 0) {
+			event.preventDefault();
+			dialogRef.current?.focus();
+			return;
+		}
+		const first = controls[0];
+		const last = controls.at(-1);
+		if (first === undefined || last === undefined) return;
+		if (event.shiftKey && document.activeElement === first) {
+			event.preventDefault();
+			last.focus();
+			return;
+		}
+		if (!event.shiftKey && document.activeElement === last) {
+			event.preventDefault();
+			first.focus();
+		}
+	};
 
 	return (
 		<div
 			className="absolute inset-0 z-[75] grid cursor-default place-items-start overflow-hidden bg-overlay/75 p-[var(--ak-viewport-padding)] pt-[12vh] text-overlay-foreground"
 			data-ui="CheatItemSpotlightBackdrop"
 			onPointerDown={(event) => {
-				if (event.currentTarget === event.target) setOpen(false);
+				if (event.currentTarget === event.target) closeSpotlight();
 			}}
 		>
 			<section
+				ref={dialogRef}
+				role="dialog"
+				aria-modal="true"
 				className="mx-auto grid w-[38rem] max-w-full gap-3 rounded-2xl border border-line-strong bg-surface-raised p-4 text-foreground shadow-2xl"
 				aria-labelledby="cheat-item-spotlight-title"
 				data-ui="CheatItemSpotlight"
+				tabIndex={-1}
+				onKeyDown={keepFocusInside}
 			>
 				<h2
 					id="cheat-item-spotlight-title"
@@ -133,21 +235,17 @@ export const CheatItemSpotlight = ({ game }: { readonly game: Game }) => {
 					ref={inputRef}
 					type="search"
 					value={query}
-					className="w-full rounded-lg border border-line-strong bg-surface px-4 py-3 text-base text-foreground outline-none focus:border-accent"
+					className={`w-full rounded-lg border border-line-strong bg-surface px-4 py-3 text-base text-foreground outline-none focus:border-accent ${spawn.isPending ? "cursor-progress" : ""}`}
 					placeholder="Search item title or ID…"
 					aria-label="Search items to spawn"
+					readOnly={spawn.isPending}
 					onChange={(event) => {
+						if (spawn.isPending) return;
 						setQuery(event.currentTarget.value);
 						setSelectedIndex(0);
 						spawn.reset();
 					}}
 					onKeyDown={(event) => {
-						if (event.key === "Escape") {
-							event.preventDefault();
-							event.stopPropagation();
-							setOpen(false);
-							return;
-						}
 						if (event.key === "ArrowDown") {
 							event.preventDefault();
 							setSelectedIndex((current) =>

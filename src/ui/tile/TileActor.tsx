@@ -34,7 +34,7 @@ const TileActorComponent = ({ item }: TileActor.Props) => {
 	const presentation = useTileActorPresentation({
 		item,
 	});
-	const { geometryVersion, readPlacement } = useTileActorSystem();
+	const { geometryVersion, interactionBlocked, readPlacement } = useTileActorSystem();
 	const placement = useMemo(
 		() => readPlacement(presentation.canonicalSource),
 		[
@@ -43,7 +43,7 @@ const TileActorComponent = ({ item }: TileActor.Props) => {
 			readPlacement,
 		],
 	);
-	const interactive = placement !== null && !itemDetail.isOpen;
+	const interactive = placement !== null && !interactionBlocked && !itemDetail.isOpen;
 	const drag = useTileActorDrag({
 		canonicalSource: presentation.canonicalSource,
 		live: interactive,
@@ -118,7 +118,6 @@ const TileActorComponent = ({ item }: TileActor.Props) => {
 	const cursor = readTileActorCursorSemantic({
 		feedback: presentation.feedback,
 		forbiddenDrop: presentation.forbiddenDrop,
-		hovered: presentation.hovered,
 		live: interactive,
 		phase: presentation.phase,
 		running: item.running,
@@ -163,10 +162,6 @@ const TileActorComponent = ({ item }: TileActor.Props) => {
 			}
 			data-dragging={presentation.phase === "dragging" ? "true" : "false"}
 			data-primary-action={item.primaryAction.kind}
-			onPointerEnter={() => {
-				if (interactive) presentation.setHovered(true);
-			}}
-			onPointerLeave={() => presentation.setHovered(false)}
 			onPointerDown={drag.onPointerDown}
 			onPointerUp={drag.onPointerUp}
 			onPointerCancel={drag.onPointerCancel}
@@ -183,7 +178,6 @@ const TileActorComponent = ({ item }: TileActor.Props) => {
 				}
 				if (event.shiftKey) {
 					event.preventDefault();
-					presentation.setHovered(false);
 					itemDetail.openItemDetail({
 						itemId: item.id,
 						origin: event.currentTarget,

@@ -1,4 +1,4 @@
-import { type PropsWithChildren, useCallback, useMemo } from "react";
+import { type PropsWithChildren, useCallback, useLayoutEffect, useMemo } from "react";
 
 import { useDropItemPreview } from "~/bridge/tile/useDropItemPreview";
 import { TileActorLayer } from "~/ui/tile/TileActorLayer";
@@ -13,8 +13,17 @@ import { useTileGeometry } from "~/ui/tile/useTileGeometry";
 import { useTileInteractionController } from "~/ui/tile/useTileInteractionController";
 import { tileLocationForTarget } from "~/ui/tile/tileLocationForTarget";
 
+export namespace TileSystemProvider {
+	export interface Props extends PropsWithChildren {
+		readonly interactionBlocked?: boolean;
+	}
+}
+
 /** Composes the focused Canvas-local geometry and interaction owners. */
-export const TileSystemProvider = ({ children }: PropsWithChildren) => {
+export const TileSystemProvider = ({
+	children,
+	interactionBlocked = false,
+}: TileSystemProvider.Props) => {
 	const geometry = useTileGeometry();
 	const dropItemPreview = useDropItemPreview();
 	const readPreview = useCallback(
@@ -50,6 +59,19 @@ export const TileSystemProvider = ({ children }: PropsWithChildren) => {
 		readPreview,
 		resolveTarget: geometry.resolveTarget,
 	});
+	useLayoutEffect(() => {
+		if (interactionBlocked) interaction.resetInteraction();
+	}, [
+		interaction.resetInteraction,
+		interactionBlocked,
+	]);
+	const press = useCallback(
+		(source: TileDragSource) => !interactionBlocked && interaction.press(source),
+		[
+			interaction.press,
+			interactionBlocked,
+		],
+	);
 	const registerSurface = useCallback(
 		(
 			surface: Parameters<typeof geometry.registerSurface>[0],
@@ -76,11 +98,12 @@ export const TileSystemProvider = ({ children }: PropsWithChildren) => {
 	const api = useMemo<TileSystemApi>(
 		() => ({
 			geometryVersion: geometry.geometryVersion,
+			interactionBlocked,
 			registerActorLayer: geometry.registerActorLayer,
 			registerSurface,
 			registerSlot: geometry.registerSlot,
 			readPlacement: geometry.readPlacement,
-			press: interaction.press,
+			press,
 			startDrag: interaction.startDrag,
 			moveDrag: interaction.moveDrag,
 			refreshSlotTarget: interaction.refreshSlotTarget,
@@ -94,14 +117,15 @@ export const TileSystemProvider = ({ children }: PropsWithChildren) => {
 			geometry.readPlacement,
 			geometry.registerActorLayer,
 			geometry.registerSlot,
+			interactionBlocked,
 			interaction.cancel,
 			interaction.moveDrag,
-			interaction.press,
 			interaction.refreshSlotTarget,
 			interaction.release,
 			interaction.resetInteraction,
 			interaction.completeDrop,
 			interaction.startDrag,
+			press,
 			registerSurface,
 		],
 	);

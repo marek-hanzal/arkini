@@ -45,10 +45,8 @@ const zIndex = (
 describe("TileActor stacking", () => {
 	it("occludes passive Board and Toolbar actors while keeping Inventory actors above its panel", () => {
 		expect(zIndex(board, "stable", 10)).toBeLessThan(tileInventoryOverlayZIndex);
-		expect(zIndex(board, "hovered", 20)).toBeLessThan(tileInventoryOverlayZIndex);
 		expect(zIndex(toolbar, "targeted", 25)).toBeLessThan(tileInventoryOverlayZIndex);
 		expect(zIndex(inventory, "stable", 10)).toBeGreaterThan(tileInventoryOverlayZIndex);
-		expect(zIndex(inventory, "hovered", 20)).toBeGreaterThan(tileInventoryOverlayZIndex);
 	});
 
 	it("lifts direct dragging above the Inventory panel regardless of its source scope", () => {

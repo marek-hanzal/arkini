@@ -51,10 +51,22 @@ export interface OpenItemDefinitionDetailProps {
 	readonly origin?: HTMLElement | null;
 }
 
+export type ItemDetailPendingAction = "autofill" | "clear-queue" | "default" | "start" | "withdraw";
+
+export interface RunItemDetailPendingActionProps {
+	readonly key: string;
+	readonly action: ItemDetailPendingAction;
+	readonly failureMessage: string;
+	readonly run: () => Promise<unknown>;
+}
+
 /** Canvas-local owner for one exact capability-tabbed Item Detail modal. */
 export interface ItemDetailControl {
 	readonly state: ItemDetailState;
 	readonly isOpen: boolean;
+	readonly readActionError: (key: string) => string | null;
+	readonly readPendingAction: (key: string) => ItemDetailPendingAction | null;
+	readonly runPendingAction: (props: RunItemDetailPendingActionProps) => Promise<unknown>;
 	readonly openItemDetail: (props: OpenItemDetailProps) => boolean;
 	readonly openItemDefinitionDetail: (props: OpenItemDefinitionDetailProps) => boolean;
 	readonly close: (props?: CloseItemDetailProps) => Promise<void>;

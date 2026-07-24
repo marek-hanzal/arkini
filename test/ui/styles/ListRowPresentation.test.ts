@@ -22,9 +22,16 @@ describe("semantic list-row presentation", () => {
 		expect(styles).toContain("--ak-list-row-selected-foreground: var(--ak-accent-contrast);");
 		expect(styles).toContain(".ak-list-row {");
 		expect(styles).toContain("background-color: var(--ak-list-row-surface);");
-		expect(styles).toContain(".ak-list-row-interactive:focus-visible");
-		expect(styles).toContain(".ak-list-row-interactive.ak-list-row-selected:focus-visible");
+		expect(styles).toContain(
+			".ak-list-row-interactive:not(.ak-list-row-pending):focus-visible",
+		);
+		expect(styles).toContain(
+			".ak-list-row-interactive.ak-list-row-selected:not(.ak-list-row-pending):focus-visible",
+		);
 		expect(styles).toContain(".ak-list-row-pending {");
+		expect(styles).toContain(
+			".ak-list-row-interactive:not(.ak-list-row-pending):not(:disabled):not(",
+		);
 		expect(styles).toContain(".ak-list-row-active {");
 		expect(styles).toContain(".ak-list-row-disabled,");
 		expect(styles).not.toContain("--ak-list-row-surface-a:");

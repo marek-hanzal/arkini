@@ -1,3 +1,5 @@
+import { useLayoutEffect } from "react";
+
 import type { Game } from "~/bridge/game/Game";
 import { useGameCheats } from "~/bridge/cheat/useGameCheats";
 import { useSetCheatEnabledMutation } from "~/bridge/cheat/useSetCheatEnabledMutation";
@@ -7,11 +9,25 @@ import { Button } from "~/ui/button/Button";
 const errorMessage = (error: unknown) => (error instanceof Error ? error.message : String(error));
 
 /** Renders the small save-scoped cheat option surface for one exact Game. */
-export const Cheats = ({ game, onBack }: { readonly game: Game; readonly onBack: () => void }) => {
+export const Cheats = ({
+	game,
+	onBack,
+	onBlockedChange,
+}: {
+	readonly game: Game;
+	readonly onBack: () => void;
+	readonly onBlockedChange?: (blocked: boolean) => void;
+}) => {
 	const cheats = useGameCheats(game);
 	const setCheatEnabled = useSetCheatEnabledMutation(game);
 	const setInstantGameplay = useSetInstantGameplayMutation(game);
 	const blocked = setCheatEnabled.isPending || setInstantGameplay.isPending;
+	useLayoutEffect(() => {
+		onBlockedChange?.(blocked);
+	}, [
+		blocked,
+		onBlockedChange,
+	]);
 
 	return (
 		<main

@@ -62,6 +62,9 @@ export const useTileInteractionController = ({
 					{
 						phase: "dragging",
 					},
+					() => publishActive(null),
+				)
+				.with(
 					{
 						phase: "awaiting-outcome",
 					},
@@ -266,7 +269,8 @@ export const useTileInteractionController = ({
 	);
 
 	const resetInteraction = useCallback(() => {
-		if (activeRef.current === null) return;
+		const current = activeRef.current;
+		if (current === null || current.phase === "awaiting-outcome") return;
 		nextGeneration.current += 1;
 		publishActive(null);
 	}, [
@@ -288,7 +292,7 @@ export const useTileInteractionController = ({
 					{
 						phase: "awaiting-outcome",
 					},
-					() => publishActive(null),
+					() => undefined,
 				)
 				.exhaustive();
 		},

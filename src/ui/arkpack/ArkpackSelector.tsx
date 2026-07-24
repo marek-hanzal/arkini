@@ -5,7 +5,7 @@ import { PrimaryButton } from "~/ui/button/Button";
 /** Selects a bundled or locally imported game package without uploading it anywhere. */
 export const ArkpackSelector = () => {
 	const actions = useArkpackSelectorActions();
-	const blocked = actions.busy || actions.exitPending;
+	const blocked = actions.blocked;
 
 	return (
 		<div
@@ -33,12 +33,14 @@ export const ArkpackSelector = () => {
 					ref={actions.inputRef}
 					type="file"
 					accept=".arkpack,application/octet-stream"
-					className="block min-w-0 w-full cursor-pointer text-sm disabled:cursor-progress file:cursor-pointer text-muted file:mr-4 file:rounded-lg file:border-0 file:bg-accent file:px-4 file:py-2 file:font-semibold file:text-accent-contrast hover:file:bg-accent-hover"
+					className="block min-w-0 w-full cursor-pointer text-sm disabled:cursor-progress file:cursor-pointer disabled:file:cursor-progress text-muted file:mr-4 file:rounded-lg file:border-0 file:bg-accent file:px-4 file:py-2 file:font-semibold file:text-accent-contrast hover:file:bg-accent-hover"
 					disabled={blocked}
 					onChange={(event) => void actions.upload(event.currentTarget.files?.[0])}
 				/>
-				{actions.busy ? (
+				{actions.busyAction === "import" ? (
 					<p className="mt-3 text-sm text-accent">Validating package…</p>
+				) : actions.busyAction === "remove" ? (
+					<p className="mt-3 text-sm text-accent">Removing package…</p>
 				) : null}
 				{actions.actionError === undefined ? null : (
 					<p className="mt-3 text-sm text-danger">{String(actions.actionError)}</p>
@@ -47,6 +49,7 @@ export const ArkpackSelector = () => {
 
 			<section className="grid min-h-0 content-start gap-3 overflow-y-auto overscroll-contain">
 				<ArkpackCatalogList
+					blocked={blocked}
 					state={actions.state}
 					onRemove={actions.removeArkpack}
 				/>

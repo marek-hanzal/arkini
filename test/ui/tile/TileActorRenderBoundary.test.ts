@@ -52,8 +52,6 @@ vi.mock("~/ui/tile/useTileActorPresentation", () => ({
 		feedback: null,
 		forbiddenDrop: false,
 		zIndex: 10,
-		hovered: false,
-		setHovered: vi.fn(),
 	}),
 }));
 

@@ -1,4 +1,4 @@
-import { match, P } from "ts-pattern";
+import { match } from "ts-pattern";
 
 import type { TileActorPhaseSchema } from "~/ui/tile/schema/TileActorPhaseSchema";
 import type { TileInteractionFeedbackSchema } from "~/ui/tile/schema/TileInteractionFeedbackSchema";
@@ -8,7 +8,6 @@ export namespace readTileActorCursorSemantic {
 	export interface Props {
 		readonly feedback: TileInteractionFeedbackSchema.Type | null;
 		readonly forbiddenDrop: boolean;
-		readonly hovered: boolean;
 		readonly live: boolean;
 		readonly phase: TileActorPhaseSchema.Type;
 		readonly running: boolean;
@@ -20,7 +19,6 @@ export namespace readTileActorCursorSemantic {
 export const readTileActorCursorSemantic = ({
 	feedback,
 	forbiddenDrop,
-	hovered,
 	live,
 	phase,
 	running,
@@ -30,7 +28,6 @@ export const readTileActorCursorSemantic = ({
 	return match({
 		feedback,
 		forbiddenDrop,
-		hovered,
 		phase,
 		running,
 	})
@@ -62,15 +59,14 @@ export const readTileActorCursorSemantic = ({
 		)
 		.with(
 			{
-				hovered: true,
-				phase: P.union("stable", "hovered"),
+				phase: "stable",
 				running: true,
 			},
 			() => "progress" as const,
 		)
 		.with(
 			{
-				phase: P.union("stable", "hovered"),
+				phase: "stable",
 			},
 			() => "grab" as const,
 		)

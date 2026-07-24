@@ -247,10 +247,18 @@ const Capture = ({ onSystem }: { readonly onSystem: (system: TileSystem) => void
 	return null;
 };
 
-const Harness = ({ onSystem }: { readonly onSystem: (system: TileSystem) => void }) =>
+const Harness = ({
+	interactionBlocked,
+	onSystem,
+}: {
+	readonly interactionBlocked: boolean;
+	readonly onSystem: (system: TileSystem) => void;
+}) =>
 	createElement(
 		TileSystemProvider,
-		null,
+		{
+			interactionBlocked,
+		},
 		createElement(Capture, {
 			onSystem,
 		}),
@@ -346,25 +354,34 @@ afterEach(async () => {
 
 const renderHarness = async () => {
 	let currentSystem: TileSystem | null = null;
+	let interactionBlocked = false;
 	const container = document.createElement("div");
 	document.body.append(container);
 	const root = createRoot(container);
 	roots.push(root);
-	await act(async () => {
-		root.render(
-			createElement(Harness, {
-				onSystem: (system) => {
-					currentSystem = system;
-				},
-			}),
-		);
-	});
+	const render = async () => {
+		await act(async () => {
+			root.render(
+				createElement(Harness, {
+					interactionBlocked,
+					onSystem: (system) => {
+						currentSystem = system;
+					},
+				}),
+			);
+		});
+	};
+	await render();
 	const readSystem = () => {
 		if (currentSystem === null) throw new Error("Tile system was not captured.");
 		return currentSystem;
 	};
 	return {
 		readSystem,
+		setInteractionBlocked: async (blocked: boolean) => {
+			interactionBlocked = blocked;
+			await render();
+		},
 	};
 };
 
@@ -552,6 +569,47 @@ describe("TileSystemProvider", () => {
 
 		expect(readSystem().active).toBeNull();
 		expect(readSystem().release(source.id)).toBeNull();
+	});
+
+	it.each([
+		"pressed",
+		"dragging",
+	] as const)("invalidates a %s interaction when a higher owner blocks the scene", async (phase) => {
+		const { readSystem, setInteractionBlocked } = await renderHarness();
+		await act(async () => {
+			const system = readSystem();
+			expect(system.press(source)).toBe(true);
+			if (phase === "dragging") {
+				system.startDrag(source);
+				system.moveDrag(source, 240, 50);
+			}
+		});
+		expect(readSystem().active?.phase).toBe(phase);
+
+		await setInteractionBlocked(true);
+
+		expect(readSystem().active).toBeNull();
+		expect(readSystem().release(source.id)).toBeNull();
+		expect(readSystem().press(source)).toBe(false);
+	});
+
+	it("preserves an awaiting drop while a higher owner blocks the scene", async () => {
+		const { readSystem, setInteractionBlocked } = await renderHarness();
+		const released = await startDrag(readSystem(), 240, 50);
+		expect(released).not.toBeNull();
+		expect(readSystem().active?.phase).toBe("awaiting-outcome");
+
+		await setInteractionBlocked(true);
+
+		expect(readSystem().active?.phase).toBe("awaiting-outcome");
+		expect(readSystem().press(source)).toBe(false);
+
+		await act(async () => {
+			if (released !== null) {
+				readSystem().completeDrop(released.source, released.generation);
+			}
+		});
+		expect(readSystem().active).toBeNull();
 	});
 
 	it("reports a Board source dropped into one inventory slot", async () => {

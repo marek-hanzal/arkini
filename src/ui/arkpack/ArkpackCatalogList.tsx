@@ -5,13 +5,18 @@ import { DangerButton, PrimaryButtonLink } from "~/ui/button/Button";
 
 export namespace ArkpackCatalogList {
 	export interface Props {
+		readonly blocked?: boolean;
 		readonly state: useArkpacks.State;
 		readonly onRemove: (packageId: string) => void;
 	}
 }
 
 /** Exhaustively renders the current Arkpack catalog projection. */
-export const ArkpackCatalogList = ({ state, onRemove }: ArkpackCatalogList.Props) =>
+export const ArkpackCatalogList = ({
+	blocked = false,
+	state,
+	onRemove,
+}: ArkpackCatalogList.Props) =>
 	match(state)
 		.with(
 			{
@@ -79,6 +84,8 @@ export const ArkpackCatalogList = ({ state, onRemove }: ArkpackCatalogList.Props
 								{arkpack.source === "imported" ? (
 									<DangerButton
 										className="min-h-0 px-3 py-2 text-xs shadow-none"
+										cursorIntent={blocked ? "progress" : undefined}
+										disabled={blocked}
 										onClick={() => onRemove(arkpack.packageId)}
 									>
 										Remove
@@ -96,7 +103,9 @@ export const ArkpackCatalogList = ({ state, onRemove }: ArkpackCatalogList.Props
 												params={{
 													packageId: arkpack.packageId,
 												}}
+												aria-disabled={blocked}
 												className="min-h-0 px-4 py-2 text-sm shadow-none"
+												cursorIntent={blocked ? "progress" : undefined}
 											>
 												Play
 											</PrimaryButtonLink>
@@ -113,7 +122,9 @@ export const ArkpackCatalogList = ({ state, onRemove }: ArkpackCatalogList.Props
 												params={{
 													packageId: arkpack.packageId,
 												}}
+												aria-disabled={blocked}
 												className="min-h-0 px-4 py-2 text-sm shadow-none"
+												cursorIntent={blocked ? "progress" : undefined}
 											>
 												Play
 											</PrimaryButtonLink>

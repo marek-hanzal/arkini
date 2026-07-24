@@ -25,7 +25,7 @@ export const readTileActorStackingZIndex = ({
 	localZIndex +
 	match(phase)
 		.with("dragging", () => draggingActorOffset)
-		.with("stable", "hovered", "targeted", () =>
+		.with("stable", "targeted", () =>
 			location.scope === LocationScopeEnumSchema.enum.Inventory ? inventoryActorOffset : 0,
 		)
 		.exhaustive();

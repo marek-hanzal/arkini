@@ -604,16 +604,20 @@ const LineRow = ({
 	readonly line: useItemDetailLines.Line;
 	readonly ownerItemId: string;
 }) => {
+	const itemDetail = useItemDetailControl();
 	const autofillLine = useAutofillItemDetailLine();
 	const setDefaultLine = useSetDefaultItemDetailLine();
 	const unsetDefaultLine = useUnsetDefaultItemDetailLine();
 	const startLine = useStartItemDetailLine();
 	const withdrawLine = useWithdrawItemDetailLine();
-	const [pendingAction, setPendingAction] = useState<
-		"autofill" | "default" | "start" | "withdraw" | null
-	>(null);
-	const [error, setError] = useState<string | null>(null);
-	const runAction = async ({
+	const pendingKey = JSON.stringify([
+		"line",
+		ownerItemId,
+		line.lineId,
+	]);
+	const pendingAction = itemDetail.readPendingAction(pendingKey);
+	const error = itemDetail.readActionError(pendingKey);
+	const runAction = ({
 		action,
 		failureMessage,
 		run,
@@ -622,15 +626,12 @@ const LineRow = ({
 		readonly failureMessage: string;
 		readonly run: () => Promise<unknown>;
 	}) => {
-		setPendingAction(action);
-		setError(null);
-		try {
-			await run();
-		} catch (cause) {
-			setError(cause instanceof Error ? cause.message : failureMessage);
-		} finally {
-			setPendingAction(null);
-		}
+		void itemDetail.runPendingAction({
+			key: pendingKey,
+			action,
+			failureMessage,
+			run,
+		});
 	};
 	const readiness = readinessLabel(line.availability);
 	const activeWork = line.activeJob === undefined ? undefined : activeJobLabel(line.activeJob);

@@ -25,6 +25,7 @@ export const useItemDetailFocus = ({
 	phase,
 	origin,
 	restoreFocus,
+	focusKey,
 }: {
 	readonly phase: Exclude<
 		ItemDetailState,
@@ -34,6 +35,7 @@ export const useItemDetailFocus = ({
 	>["phase"];
 	readonly origin: HTMLElement | null;
 	readonly restoreFocus: boolean;
+	readonly focusKey: string;
 }) => {
 	const dialogRef = useRef<HTMLDivElement>(null);
 	const originRef = useRef(origin);
@@ -56,8 +58,13 @@ export const useItemDetailFocus = ({
 
 	useEffect(() => {
 		if (phase !== "open") return;
-		dialogRef.current?.querySelector<HTMLElement>(focusableSelector)?.focus();
+		const dialog = dialogRef.current;
+		const selectedTab = dialog?.querySelector<HTMLElement>(
+			'[data-ui="ItemDetailTabs"] button[aria-selected="true"]:not([disabled])',
+		);
+		(selectedTab ?? dialog?.querySelector<HTMLElement>(focusableSelector))?.focus();
 	}, [
+		focusKey,
 		phase,
 	]);
 

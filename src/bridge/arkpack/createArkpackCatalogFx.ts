@@ -68,10 +68,10 @@ export const createArkpackCatalogFx = Effect.fn("createArkpackCatalogFx")(
 			): Effect.Effect<Value, unknown> =>
 				lock.withPermits(1)(
 					Effect.gen(function* () {
-						const value = yield* operation;
 						publish({
 							type: "loading",
 						});
+						const value = yield* operation;
 						const arkpacks = yield* list;
 						publish({
 							type: "ready",

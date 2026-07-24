@@ -333,6 +333,9 @@ describe("ItemDetailModal", () => {
 		expect(document.querySelector('[data-ui="ItemDetailModal"]')).toBe(modal);
 		expect(modal?.dataset.tab).toBe("info");
 		expect(document.querySelector('[data-ui="ItemInfoTab"]')).not.toBeNull();
+		expect(document.activeElement).toBe(
+			document.querySelector<HTMLButtonElement>('[data-tab="info"][aria-selected="true"]'),
+		);
 
 		const queueTab = document.querySelector<HTMLButtonElement>('[data-tab="queue"]');
 		if (queueTab === null) throw new Error("Missing Queue tab.");
@@ -340,6 +343,9 @@ describe("ItemDetailModal", () => {
 		expect(document.querySelector('[data-ui="ItemDetailModal"]')).toBe(modal);
 		expect(modal?.dataset.tab).toBe("queue");
 		expect(document.querySelector('[data-ui="ItemQueueTab"]')).not.toBeNull();
+		expect(document.activeElement).toBe(
+			document.querySelector<HTMLButtonElement>('[data-tab="queue"][aria-selected="true"]'),
+		);
 		expect(readControl().state).toMatchObject({
 			phase: "open",
 			target: {
@@ -391,6 +397,9 @@ describe("ItemDetailModal", () => {
 		});
 		expect(modal.dataset.runtimeId).toBeUndefined();
 		expect(document.querySelector('[data-ui="ItemDefinitionInfoTab"]')).not.toBeNull();
+		expect(document.activeElement).toBe(
+			document.querySelector<HTMLButtonElement>('[data-tab="info"][aria-selected="true"]'),
+		);
 		expect(
 			Array.from(
 				document.querySelectorAll<HTMLElement>('[data-ui="ItemDetailTabs"] button'),
@@ -547,6 +556,74 @@ describe("ItemDetailModal", () => {
 			document.querySelector<HTMLButtonElement>('[data-ui="TileLineSetDefaultButton"]')
 				?.textContent,
 		).toBe("Set default");
+	});
+
+	it("retains pending and failure ownership across keyed tab remounts", async () => {
+		const { readControl } = await renderItemDetail();
+		const owner = currentRuntime.items.find((item) => item.item.id === "workshop");
+		if (owner === undefined) throw new Error("Missing Workshop runtime item.");
+		let rejectRun: ((cause: Error) => void) | undefined;
+		const pendingRun = new Promise<never>((_resolve, reject) => {
+			rejectRun = reject;
+		});
+		const run = vi
+			.spyOn(game, "run")
+			.mockImplementationOnce((() => pendingRun) as GameEngine["run"]);
+
+		await act(async () => {
+			readControl().openItemDetail({
+				itemId: owner.id,
+			});
+			await Promise.resolve();
+			await Promise.resolve();
+		});
+		const setDefault = document.querySelector<HTMLButtonElement>(
+			'[data-ui="TileLineSetDefaultButton"]',
+		);
+		if (setDefault === null) throw new Error("Missing Set default button.");
+
+		await act(async () => {
+			setDefault.click();
+			await Promise.resolve();
+		});
+		expect(setDefault.disabled).toBe(true);
+		expect(setDefault.textContent).toBe("Saving…");
+		expect(run).toHaveBeenCalledTimes(1);
+
+		const infoTab = document.querySelector<HTMLButtonElement>('[data-tab="info"]');
+		if (infoTab === null) throw new Error("Missing Info tab.");
+		await act(async () => infoTab.click());
+		const linesTab = document.querySelector<HTMLButtonElement>('[data-tab="lines"]');
+		if (linesTab === null) throw new Error("Missing Lines tab.");
+		await act(async () => linesTab.click());
+
+		const remountedDefault = document.querySelector<HTMLButtonElement>(
+			'[data-ui="TileLineSetDefaultButton"]',
+		);
+		if (remountedDefault === null) throw new Error("Missing remounted Set default button.");
+		expect(remountedDefault).not.toBe(setDefault);
+		expect(remountedDefault.disabled).toBe(true);
+		expect(remountedDefault.textContent).toBe("Saving…");
+		expect(remountedDefault.className).toContain("cursor-progress");
+
+		await act(async () => {
+			remountedDefault.click();
+			await Promise.resolve();
+		});
+		expect(run).toHaveBeenCalledTimes(1);
+
+		await act(async () => {
+			rejectRun?.(new Error("Deferred default failure."));
+			await Promise.resolve();
+			await Promise.resolve();
+		});
+		expect(
+			document.querySelector<HTMLButtonElement>('[data-ui="TileLineSetDefaultButton"]')
+				?.disabled,
+		).toBe(false);
+		expect(document.querySelector('[data-ui="TileLine"]')?.textContent).toContain(
+			"Deferred default failure.",
+		);
 	});
 
 	it("counts active work down in the fixed runtime slot without adding a layout row", async () => {

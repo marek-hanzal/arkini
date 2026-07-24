@@ -464,36 +464,54 @@ const ControlProbe = ({
 	return null;
 };
 
+const Scene = ({
+	interactionBlocked,
+	onControl,
+}: {
+	readonly interactionBlocked: boolean;
+	readonly onControl: (control: InventoryControl) => void;
+}) =>
+	createElement(
+		ItemDetailProvider,
+		null,
+		createElement(
+			InventoryProvider,
+			null,
+			createElement(ControlProbe, {
+				onControl,
+			}),
+			createElement(
+				TileSystemProvider,
+				{
+					interactionBlocked,
+				},
+				createElement(GameBoardLayout),
+				createElement(InventoryHost),
+			),
+		),
+	);
+
 const renderScene = async () => {
 	let control: InventoryControl | undefined;
+	let interactionBlocked = false;
 	const container = document.createElement("div");
 	document.body.append(container);
 	const root = createRoot(container);
 	roots.push(root);
-	await act(async () => {
-		root.render(
-			createElement(
-				ItemDetailProvider,
-				null,
-				createElement(
-					InventoryProvider,
-					null,
-					createElement(ControlProbe, {
-						onControl: (next) => {
-							control = next;
-						},
-					}),
-					createElement(
-						TileSystemProvider,
-						null,
-						createElement(GameBoardLayout),
-						createElement(InventoryHost),
-					),
-				),
-			),
-		);
-		await Promise.resolve();
-	});
+	const render = async () => {
+		await act(async () => {
+			root.render(
+				createElement(Scene, {
+					interactionBlocked,
+					onControl: (next) => {
+						control = next;
+					},
+				}),
+			);
+			await Promise.resolve();
+		});
+	};
+	await render();
 	const readControl = () => {
 		if (control === undefined) throw new Error("Missing Inventory control.");
 		return control;
@@ -504,6 +522,10 @@ const renderScene = async () => {
 	});
 	return {
 		readControl,
+		setInteractionBlocked: async (blocked: boolean) => {
+			interactionBlocked = blocked;
+			await render();
+		},
 	};
 };
 
@@ -890,6 +912,108 @@ describe("Inventory cross-surface tile scene", () => {
 		expect(actorByRuntimeId(item.id)).toBe(actor);
 		expect(actor.style.visibility).toBe("visible");
 		expect(document.querySelectorAll(`[data-runtime-id="${item.id}"]`)).toHaveLength(1);
+	});
+
+	it("cancels a live drag before a higher overlay can release it", async () => {
+		const { setInteractionBlocked } = await renderScene();
+		const item = runtimeItem("water", "inventory");
+		const actor = actorByRuntimeId(item.id);
+
+		await act(async () => {
+			actor.dispatchEvent(pointerEvent("pointerdown", 350, 50));
+			actor.dispatchEvent(pointerEvent("pointermove", 150, 270));
+			await Promise.resolve();
+		});
+		expect(actor.dataset.phase).toBe("dragging");
+
+		await setInteractionBlocked(true);
+		expect(actor.dataset.phase).toBe("stable");
+		expect(actor.style.pointerEvents).toBe("none");
+
+		await act(async () => {
+			actor.dispatchEvent(pointerEvent("pointerup", 150, 270));
+			await Promise.resolve();
+			await Promise.resolve();
+		});
+		expect(dropItemState.drop).not.toHaveBeenCalled();
+
+		await setInteractionBlocked(false);
+		expect(actor.style.pointerEvents).toBe("auto");
+	});
+
+	it("preserves a pending drop across a higher overlay lifecycle", async () => {
+		const { setInteractionBlocked } = await renderScene();
+		const item = runtimeItem("water", "inventory");
+		const actor = actorByRuntimeId(item.id);
+		const revision = "revision:pending-overlay";
+		let resolveDrop: ((outcome: dropItemFx.Result) => void) | undefined;
+		dropItemState.drop.mockImplementation(
+			() =>
+				new Promise<dropItemFx.Result>((resolve) => {
+					resolveDrop = resolve;
+				}),
+		);
+
+		await drag({
+			actor,
+			from: [
+				350,
+				50,
+			],
+			to: [
+				150,
+				270,
+			],
+		});
+		expect(dropItemState.drop).toHaveBeenCalledOnce();
+		expect(actor.dataset.phase).toBe("dragging");
+
+		await setInteractionBlocked(true);
+		expect(actor.dataset.phase).toBe("dragging");
+		expect(actor.style.pointerEvents).toBe("none");
+
+		await setInteractionBlocked(false);
+		await drag({
+			actor,
+			from: [
+				350,
+				50,
+			],
+			to: [
+				150,
+				270,
+			],
+		});
+		expect(dropItemState.drop).toHaveBeenCalledOnce();
+
+		await act(async () => {
+			publishRuntime(
+				RuntimeSchema.parse({
+					...currentRuntime,
+					items: currentRuntime.items.map((candidate) =>
+						candidate.id === item.id
+							? {
+									...candidate,
+									revision,
+									location: toolbar(1),
+								}
+							: candidate,
+					),
+				}),
+			);
+			resolveDrop?.({
+				kind: DropItemResultKindEnumSchema.enum.Move,
+				itemId: item.id,
+				revision,
+				previousLocation: inventory(0, 0),
+				location: toolbar(1),
+			});
+			await Promise.resolve();
+			await Promise.resolve();
+		});
+
+		expect(actor.dataset.phase).toBe("stable");
+		expect(actor.dataset.locationScope).toBe("toolbar");
 	});
 
 	it("finishes a pending cross-surface move after close and survives reopen", async () => {

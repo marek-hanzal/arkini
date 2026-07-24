@@ -6,10 +6,12 @@ import { useResolveItemDetailTarget } from "~/bridge/item-detail/useResolveItemD
 import { ItemDetailContext } from "~/ui/item-detail/ItemDetailContext";
 import type {
 	ItemDetailControl,
+	ItemDetailPendingAction,
 	ItemDetailState,
 	ItemDetailTarget,
 	OpenItemDefinitionDetailProps,
 	OpenItemDetailProps,
+	RunItemDetailPendingActionProps,
 } from "~/ui/item-detail/ItemDetailControl";
 
 interface ExitCompletion {
@@ -28,6 +30,12 @@ export const ItemDetailProvider = ({ children }: PropsWithChildren) => {
 	const resolveTarget = useResolveItemDetailTarget();
 	const [state, setState] = useState<ItemDetailState>(closedState);
 	const stateRef = useRef<ItemDetailState>(state);
+	const [pendingActions, setPendingActions] = useState<
+		ReadonlyMap<string, ItemDetailPendingAction>
+	>(() => new Map());
+	const pendingActionsRef = useRef(new Map<string, ItemDetailPendingAction>());
+	const [actionErrors, setActionErrors] = useState<ReadonlyMap<string, string>>(() => new Map());
+	const actionErrorsRef = useRef(new Map<string, string>());
 	const nextGeneration = useRef(0);
 	const exitCompletionRef = useRef<ExitCompletion | undefined>(undefined);
 
@@ -35,6 +43,50 @@ export const ItemDetailProvider = ({ children }: PropsWithChildren) => {
 		stateRef.current = next;
 		setState(next);
 	}, []);
+	const publishPendingActions = useCallback(() => {
+		setPendingActions(new Map(pendingActionsRef.current));
+	}, []);
+	const readPendingAction = useCallback(
+		(key: string) => pendingActions.get(key) ?? null,
+		[
+			pendingActions,
+		],
+	);
+	const publishActionErrors = useCallback(() => {
+		setActionErrors(new Map(actionErrorsRef.current));
+	}, []);
+	const readActionError = useCallback(
+		(key: string) => actionErrors.get(key) ?? null,
+		[
+			actionErrors,
+		],
+	);
+	const runPendingAction = useCallback(
+		async ({ key, action, failureMessage, run }: RunItemDetailPendingActionProps) => {
+			if (pendingActionsRef.current.has(key)) return;
+			if (actionErrorsRef.current.delete(key)) publishActionErrors();
+			pendingActionsRef.current.set(key, action);
+			publishPendingActions();
+			try {
+				return await run();
+			} catch (cause) {
+				actionErrorsRef.current.set(
+					key,
+					cause instanceof Error ? cause.message : failureMessage,
+				);
+				publishActionErrors();
+			} finally {
+				if (pendingActionsRef.current.get(key) === action) {
+					pendingActionsRef.current.delete(key);
+					publishPendingActions();
+				}
+			}
+		},
+		[
+			publishActionErrors,
+			publishPendingActions,
+		],
+	);
 
 	const resolveExitCompletion = useCallback((generation?: number) => {
 		const completion = exitCompletionRef.current;
@@ -323,6 +375,8 @@ export const ItemDetailProvider = ({ children }: PropsWithChildren) => {
 		() => () => {
 			resolveExitCompletion();
 			stateRef.current = closedState;
+			actionErrorsRef.current.clear();
+			pendingActionsRef.current.clear();
 		},
 		[
 			resolveExitCompletion,
@@ -333,6 +387,9 @@ export const ItemDetailProvider = ({ children }: PropsWithChildren) => {
 		() => ({
 			state,
 			isOpen: state.phase !== "closed",
+			readActionError,
+			readPendingAction,
+			runPendingAction,
 			openItemDetail,
 			openItemDefinitionDetail,
 			close,
@@ -345,6 +402,9 @@ export const ItemDetailProvider = ({ children }: PropsWithChildren) => {
 			completeExit,
 			openItemDetail,
 			openItemDefinitionDetail,
+			readActionError,
+			readPendingAction,
+			runPendingAction,
 			state,
 		],
 	);

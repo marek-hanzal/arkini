@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { match } from "ts-pattern";
 
 import { DropItemResultKindEnumSchema } from "~/bridge/tile/DropItemResultKindEnumSchema";
@@ -18,8 +18,6 @@ export namespace useTileActorPresentation {
 		readonly feedback: TileInteractionFeedbackSchema.Type | null;
 		readonly forbiddenDrop: boolean;
 		readonly zIndex: number;
-		readonly hovered: boolean;
-		readonly setHovered: (hovered: boolean) => void;
 	}
 }
 
@@ -63,26 +61,23 @@ const feedbackForPreview = (
 const activePresentation = (
 	active: TileInteractionState | null,
 	itemId: string,
-	hovered: boolean,
-): Omit<useTileActorPresentation.Model, "canonicalSource" | "setHovered"> =>
+): Omit<useTileActorPresentation.Model, "canonicalSource"> =>
 	match(active)
 		.with(null, () => ({
-			phase: hovered ? ("hovered" as const) : ("stable" as const),
+			phase: "stable" as const,
 			feedback: null,
 			forbiddenDrop: false,
-			zIndex: hovered ? 20 : 10,
-			hovered,
+			zIndex: 10,
 		}))
 		.with(
 			{
 				phase: "pressed",
 			},
 			() => ({
-				phase: hovered ? ("hovered" as const) : ("stable" as const),
+				phase: "stable" as const,
 				feedback: null,
 				forbiddenDrop: false,
-				zIndex: hovered ? 20 : 10,
-				hovered,
+				zIndex: 10,
 			}),
 		)
 		.with(
@@ -100,7 +95,6 @@ const activePresentation = (
 						feedback,
 						forbiddenDrop: interaction.target?.kind !== "slot",
 						zIndex: 40,
-						hovered,
 					};
 				}
 				return {
@@ -108,7 +102,6 @@ const activePresentation = (
 					feedback,
 					forbiddenDrop: false,
 					zIndex: 25,
-					hovered,
 				};
 			},
 		)
@@ -121,7 +114,6 @@ export const useTileActorPresentation = ({
 	readonly item: useTileActors.Item;
 }): useTileActorPresentation.Model => {
 	const active = useTileActorInteraction(item.id);
-	const [hovered, setHovered] = useState(false);
 	const canonicalSource = useMemo(
 		() => actorSource(item),
 		[
@@ -129,10 +121,9 @@ export const useTileActorPresentation = ({
 		],
 	);
 	const presentation = useMemo(
-		() => activePresentation(active, item.id, hovered),
+		() => activePresentation(active, item.id),
 		[
 			active,
-			hovered,
 			item.id,
 		],
 	);
@@ -140,6 +131,5 @@ export const useTileActorPresentation = ({
 	return {
 		canonicalSource,
 		...presentation,
-		setHovered,
 	};
 };

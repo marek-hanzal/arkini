@@ -1,9 +1,8 @@
-import { useState } from "react";
-
 import { useClearItemDetailQueue } from "~/bridge/item-detail/useClearItemDetailQueue";
 import type { useItemDetailQueue } from "~/bridge/item-detail/useItemDetailQueue";
 import { Button } from "~/ui/button/Button";
 import { Scrollable } from "~/ui/scrollable/Scrollable";
+import { useItemDetailControl } from "~/ui/item-detail/useItemDetailControl";
 
 /** Renders authoritative queued intents without treating active work as cancellable. */
 export const ItemQueueTab = ({
@@ -18,9 +17,14 @@ export const ItemQueueTab = ({
 		}
 	>;
 }) => {
+	const itemDetail = useItemDetailControl();
 	const clearQueue = useClearItemDetailQueue();
-	const [pending, setPending] = useState(false);
-	const [error, setError] = useState<string | null>(null);
+	const pendingKey = JSON.stringify([
+		"queue",
+		queue.itemId,
+	]);
+	const pending = itemDetail.readPendingAction(pendingKey) === "clear-queue";
+	const error = itemDetail.readActionError(pendingKey);
 	const used = queue.activeCount + queue.request.length;
 
 	return (
@@ -36,22 +40,16 @@ export const ItemQueueTab = ({
 					type="button"
 					disabled={disabled || queue.request.length === 0 || pending}
 					cursorIntent={pending ? "progress" : undefined}
-					onClick={async () => {
-						setPending(true);
-						setError(null);
-						try {
-							await clearQueue({
-								ownerItemId: queue.itemId,
-							});
-						} catch (cause) {
-							setError(
-								cause instanceof Error
-									? cause.message
-									: "Queue could not be cleared.",
-							);
-						} finally {
-							setPending(false);
-						}
+					onClick={() => {
+						void itemDetail.runPendingAction({
+							key: pendingKey,
+							action: "clear-queue",
+							failureMessage: "Queue could not be cleared.",
+							run: () =>
+								clearQueue({
+									ownerItemId: queue.itemId,
+								}),
+						});
 					}}
 				>
 					{pending ? "Clearing…" : "Clear queue"}

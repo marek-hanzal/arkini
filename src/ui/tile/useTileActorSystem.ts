@@ -4,6 +4,7 @@ import { useTileSystemApiContext } from "~/ui/tile/useTileSystemApiContext";
 export const useTileActorSystem = () => {
 	const {
 		geometryVersion,
+		interactionBlocked,
 		readPlacement,
 		press,
 		startDrag,
@@ -14,6 +15,7 @@ export const useTileActorSystem = () => {
 	} = useTileSystemApiContext();
 	return {
 		geometryVersion,
+		interactionBlocked,
 		readPlacement,
 		press,
 		startDrag,

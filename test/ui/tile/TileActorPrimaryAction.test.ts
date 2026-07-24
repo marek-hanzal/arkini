@@ -455,6 +455,56 @@ describe("TileActor primary action", () => {
 		).toBe("lines");
 	});
 
+	it("restores the progress cursor after closing Item Detail while work keeps running", async () => {
+		const owner = initialRuntime.items.find((item) => item.item.id === "producer");
+		if (owner === undefined) throw new Error("Missing producer runtime item.");
+		publishRuntime(
+			RuntimeSchema.parse({
+				...initialRuntime,
+				defaultLineByOwnerItemId: {
+					[owner.id]: "line:produce",
+				},
+				jobs: [
+					{
+						id: "job:running",
+						ownerItemId: owner.id,
+						lineId: "line:produce",
+						durationMs: 1_000,
+						remainingMs: 800,
+					},
+				],
+			}),
+		);
+		const { producer } = await renderBoard();
+		expect(producer.className).toContain("cursor-progress");
+
+		await act(async () => {
+			click(producer, {
+				shiftKey: true,
+			});
+			await Promise.resolve();
+			await Promise.resolve();
+		});
+		const close = document.querySelector<HTMLButtonElement>(
+			'button[aria-label="Close item detail"]',
+		);
+		if (close === null) throw new Error("Missing Item Detail close button.");
+
+		await act(async () => {
+			close.click();
+			await Promise.resolve();
+			await Promise.resolve();
+		});
+
+		const liveProducer = document.querySelector<HTMLButtonElement>(
+			'[data-ui="TileActor"][data-item-id="producer"]',
+		);
+		expect(document.querySelector('[data-ui="ItemDetailModal"]')).toBeNull();
+		expect(liveProducer?.style.pointerEvents).toBe("auto");
+		expect(liveProducer?.className).toContain("cursor-progress");
+		expect(currentRuntime.jobs).toHaveLength(1);
+	});
+
 	it("opens Item Detail on Shift+click without opening Inventory", async () => {
 		const { inventoryOpener } = await renderBoard();
 

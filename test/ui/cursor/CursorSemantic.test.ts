@@ -29,7 +29,6 @@ describe("semantic cursor resolvers", () => {
 		const base = {
 			feedback: null,
 			forbiddenDrop: false,
-			hovered: false,
 			live: true,
 			phase: "stable" as const,
 			running: false,
@@ -52,8 +51,6 @@ describe("semantic cursor resolvers", () => {
 		expect(
 			readTileActorCursorSemantic({
 				...base,
-				hovered: true,
-				phase: "hovered",
 				running: true,
 			}),
 		).toBe("progress");

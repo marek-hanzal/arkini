@@ -3,14 +3,17 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import { useArkpacks } from "~/bridge/arkpack/useArkpacks";
 
+type BusyAction = "import" | "remove";
+
 /** Owns Arkpack import, removal, exit navigation, mounted guards, and Escape lifecycle. */
 export const useArkpackSelectorActions = () => {
 	const { state, importFile, remove } = useArkpacks();
 	const navigate = useNavigate();
 	const inputRef = useRef<HTMLInputElement>(null);
 	const mountedRef = useRef(false);
+	const busyRef = useRef<BusyAction | null>(null);
 	const exitPendingRef = useRef(false);
-	const [busy, setBusy] = useState(false);
+	const [busyAction, setBusyAction] = useState<BusyAction | null>(null);
 	const [exitPending, setExitPending] = useState(false);
 	const [actionError, setActionError] = useState<unknown>();
 
@@ -22,7 +25,7 @@ export const useArkpackSelectorActions = () => {
 	}, []);
 
 	const requestMainMenu = useCallback(() => {
-		if (busy || exitPendingRef.current) return;
+		if (busyRef.current !== null || exitPendingRef.current || state.type === "loading") return;
 		exitPendingRef.current = true;
 		setExitPending(true);
 		setActionError(undefined);
@@ -37,8 +40,8 @@ export const useArkpackSelectorActions = () => {
 				if (mountedRef.current) setExitPending(false);
 			});
 	}, [
-		busy,
 		navigate,
+		state.type,
 	]);
 
 	useEffect(() => {
@@ -55,8 +58,16 @@ export const useArkpackSelectorActions = () => {
 
 	const upload = useCallback(
 		async (file: File | undefined) => {
-			if (file === undefined) return;
-			setBusy(true);
+			if (
+				file === undefined ||
+				busyRef.current !== null ||
+				exitPendingRef.current ||
+				state.type === "loading"
+			) {
+				return;
+			}
+			busyRef.current = "import";
+			setBusyAction("import");
 			setActionError(undefined);
 			try {
 				const arkpack = await importFile(file);
@@ -69,8 +80,9 @@ export const useArkpackSelectorActions = () => {
 			} catch (error) {
 				if (mountedRef.current) setActionError(error);
 			} finally {
+				busyRef.current = null;
 				if (mountedRef.current) {
-					setBusy(false);
+					setBusyAction(null);
 					if (inputRef.current !== null) inputRef.current.value = "";
 				}
 			}
@@ -78,25 +90,38 @@ export const useArkpackSelectorActions = () => {
 		[
 			importFile,
 			navigate,
+			state.type,
 		],
 	);
 
 	const removeArkpack = useCallback(
 		(packageId: string) => {
+			if (busyRef.current !== null || exitPendingRef.current || state.type === "loading") {
+				return;
+			}
+			busyRef.current = "remove";
+			setBusyAction("remove");
 			setActionError(undefined);
-			void remove(packageId).catch((error) => {
-				if (mountedRef.current) setActionError(error);
-			});
+			void remove(packageId)
+				.catch((error) => {
+					if (mountedRef.current) setActionError(error);
+				})
+				.finally(() => {
+					busyRef.current = null;
+					if (mountedRef.current) setBusyAction(null);
+				});
 		},
 		[
 			remove,
+			state.type,
 		],
 	);
 
 	return {
 		state,
 		inputRef,
-		busy,
+		busyAction,
+		blocked: busyAction !== null || exitPending || state.type === "loading",
 		exitPending,
 		actionError,
 		upload,

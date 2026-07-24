@@ -543,6 +543,7 @@ const ItemDetailDialog = ({
 		phase: state.phase,
 		origin: state.target.origin,
 		restoreFocus: state.phase === "exiting" ? state.restoreFocus : true,
+		focusKey: `${state.target.kind}:${state.target.itemId}:${state.target.tab}`,
 	});
 	const disabled = state.phase === "exiting";
 	return (

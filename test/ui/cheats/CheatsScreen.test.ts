@@ -1,0 +1,135 @@
+// @vitest-environment jsdom
+
+import { act, createElement } from "react";
+import { createRoot } from "react-dom/client";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+import { CheatsScreen } from "~/ui/cheats/CheatsScreen";
+
+(
+	globalThis as {
+		IS_REACT_ACT_ENVIRONMENT?: boolean;
+	}
+).IS_REACT_ACT_ENVIRONMENT = true;
+
+const state = vi.hoisted(() => ({
+	back: vi.fn(),
+	blocked: true,
+	listeners: new Set<() => void>(),
+	navigate: vi.fn(() => Promise.resolve()),
+	publishBlocked: (blocked: boolean) => {
+		state.blocked = blocked;
+		for (const listener of state.listeners) listener();
+	},
+}));
+
+vi.mock("@tanstack/react-router", () => ({
+	useNavigate: () => state.navigate,
+	useRouter: () => ({
+		history: {
+			back: state.back,
+			canGoBack: () => true,
+		},
+	}),
+}));
+vi.mock("~/bridge/game/useGameEngine", () => ({
+	useGameEngine: () => ({
+		arkpack: {
+			packageId: "package:cheats",
+		},
+	}),
+}));
+vi.mock("~/ui/cheat-availability/useCheatAvailability", () => ({
+	useCheatAvailability: () => ({
+		available: true,
+	}),
+}));
+vi.mock("~/ui/cheats/Cheats", async () => {
+	const { createElement, useEffect, useSyncExternalStore } = await import("react");
+	return {
+		Cheats: ({
+			onBack,
+			onBlockedChange,
+		}: {
+			readonly onBack: () => void;
+			readonly onBlockedChange?: (blocked: boolean) => void;
+		}) => {
+			const blocked = useSyncExternalStore(
+				(listener) => {
+					state.listeners.add(listener);
+					return () => state.listeners.delete(listener);
+				},
+				() => state.blocked,
+				() => state.blocked,
+			);
+			useEffect(() => {
+				onBlockedChange?.(blocked);
+			}, [
+				blocked,
+				onBlockedChange,
+			]);
+			return createElement(
+				"button",
+				{
+					disabled: blocked,
+					onClick: onBack,
+					type: "button",
+				},
+				"Back to game",
+			);
+		},
+	};
+});
+
+const roots: Array<ReturnType<typeof createRoot>> = [];
+
+beforeEach(() => {
+	state.back.mockReset();
+	state.blocked = true;
+	state.listeners.clear();
+	state.navigate.mockClear();
+});
+
+afterEach(async () => {
+	await act(async () => {
+		for (const root of roots.splice(0)) root.unmount();
+	});
+	document.body.replaceChildren();
+});
+
+describe("CheatsScreen", () => {
+	it("keeps Escape on the Cheats route until the active mutation settles", async () => {
+		const container = document.createElement("div");
+		document.body.append(container);
+		const root = createRoot(container);
+		roots.push(root);
+		await act(async () => {
+			root.render(createElement(CheatsScreen));
+		});
+
+		await act(async () => {
+			window.dispatchEvent(
+				new KeyboardEvent("keydown", {
+					key: "Escape",
+					bubbles: true,
+					cancelable: true,
+				}),
+			);
+		});
+		expect(state.back).not.toHaveBeenCalled();
+		expect(state.navigate).not.toHaveBeenCalled();
+
+		await act(async () => state.publishBlocked(false));
+		await act(async () => {
+			window.dispatchEvent(
+				new KeyboardEvent("keydown", {
+					key: "Escape",
+					bubbles: true,
+					cancelable: true,
+				}),
+			);
+		});
+		expect(state.back).toHaveBeenCalledOnce();
+		expect(state.navigate).not.toHaveBeenCalled();
+	});
+});

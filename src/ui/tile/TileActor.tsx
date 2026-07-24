@@ -1,9 +1,8 @@
 import { motion } from "motion/react";
-import { memo, useCallback, useContext, useEffect, useMemo, useRef } from "react";
+import { memo, useCallback, useContext, useMemo } from "react";
 import { match } from "ts-pattern";
 
 import { useStartItemDetailLine } from "~/bridge/item-detail/useStartItemDetailLine";
-import { isSameTileLocation } from "~/bridge/tile/isSameTileLocation";
 import { LocationScopeEnumSchema } from "~/bridge/tile/LocationScopeEnumSchema";
 import type { useTileActors } from "~/bridge/tile/useTileActors";
 import { CursorClassName } from "~/ui/cursor/CursorSemantic";
@@ -17,14 +16,9 @@ import { useTileActorDrag } from "~/ui/tile/useTileActorDrag";
 import { useTileActorPresentation } from "~/ui/tile/useTileActorPresentation";
 import { useTileActorSystem } from "~/ui/tile/useTileActorSystem";
 
-const primaryActionDelayMs = 320;
-
 const unavailableInventoryControl = {
 	open: () => false,
 } satisfies Pick<InventoryControl, "open">;
-
-const primaryActionKey = (action: useTileActors.Item["primaryAction"]) =>
-	action.kind === "start-default-line" ? `${action.kind}:${action.lineId}` : action.kind;
 
 export namespace TileActor {
 	export interface Props {
@@ -54,15 +48,6 @@ const TileActorComponent = ({ item }: TileActor.Props) => {
 		canonicalSource: presentation.canonicalSource,
 		live: interactive,
 	});
-	const pendingPrimaryAction = useRef<ReturnType<typeof setTimeout> | null>(null);
-	const latestItem = useRef(item);
-	latestItem.current = item;
-
-	const cancelPendingPrimaryAction = useCallback(() => {
-		if (pendingPrimaryAction.current === null) return;
-		clearTimeout(pendingPrimaryAction.current);
-		pendingPrimaryAction.current = null;
-	}, []);
 
 	const runPrimaryAction = useCallback(
 		(origin: HTMLElement) =>
@@ -121,17 +106,6 @@ const TileActorComponent = ({ item }: TileActor.Props) => {
 			startLine,
 		],
 	);
-
-	useEffect(() => {
-		if (!interactive) cancelPendingPrimaryAction();
-		return cancelPendingPrimaryAction;
-	}, [
-		cancelPendingPrimaryAction,
-		interactive,
-		item.location,
-		item.primaryAction,
-		item.revision,
-	]);
 
 	const visible = placement !== null;
 	const boardLocation =
@@ -193,19 +167,10 @@ const TileActorComponent = ({ item }: TileActor.Props) => {
 				if (interactive) presentation.setHovered(true);
 			}}
 			onPointerLeave={() => presentation.setHovered(false)}
-			onPointerDown={(event) => {
-				cancelPendingPrimaryAction();
-				drag.onPointerDown(event);
-			}}
+			onPointerDown={drag.onPointerDown}
 			onPointerUp={drag.onPointerUp}
-			onPointerCancel={() => {
-				cancelPendingPrimaryAction();
-				drag.onPointerCancel();
-			}}
-			onDragStart={(event, info) => {
-				cancelPendingPrimaryAction();
-				drag.onDragStart(event, info);
-			}}
+			onPointerCancel={drag.onPointerCancel}
+			onDragStart={drag.onDragStart}
 			onDrag={drag.onDrag}
 			onDragEnd={drag.onDragEnd}
 			onClick={(event) => {
@@ -214,42 +179,19 @@ const TileActorComponent = ({ item }: TileActor.Props) => {
 					presentation.phase === "dragging" ||
 					drag.consumeClickSuppression()
 				) {
-					cancelPendingPrimaryAction();
 					return;
 				}
-				if (event.detail > 1) {
-					cancelPendingPrimaryAction();
+				if (event.shiftKey) {
+					event.preventDefault();
+					presentation.setHovered(false);
+					itemDetail.openItemDetail({
+						itemId: item.id,
+						origin: event.currentTarget,
+					});
 					return;
 				}
 				if (item.primaryAction.kind === "none") return;
-				const origin = event.currentTarget;
-				const scheduledItem = item;
-				const scheduledActionKey = primaryActionKey(scheduledItem.primaryAction);
-				cancelPendingPrimaryAction();
-				pendingPrimaryAction.current = setTimeout(() => {
-					pendingPrimaryAction.current = null;
-					const currentItem = latestItem.current;
-					if (
-						currentItem.id !== scheduledItem.id ||
-						currentItem.revision !== scheduledItem.revision ||
-						!isSameTileLocation(currentItem.location, scheduledItem.location) ||
-						primaryActionKey(currentItem.primaryAction) !== scheduledActionKey
-					) {
-						return;
-					}
-					runPrimaryAction(origin);
-				}, primaryActionDelayMs);
-			}}
-			onDoubleClick={(event) => {
-				cancelPendingPrimaryAction();
-				if (!interactive || presentation.phase === "dragging") return;
-				event.preventDefault();
-				event.stopPropagation();
-				presentation.setHovered(false);
-				itemDetail.openItemDetail({
-					itemId: item.id,
-					origin: event.currentTarget,
-				});
+				runPrimaryAction(event.currentTarget);
 			}}
 		>
 			<TileActorContent

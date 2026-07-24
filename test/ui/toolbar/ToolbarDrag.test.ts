@@ -645,7 +645,7 @@ describe("Toolbar drag", () => {
 		expect(source.dataset.toolbarX).toBe("1");
 		expect(target.dataset.toolbarX).toBe("0");
 	});
-	it("opens the same Item Detail modal from an exact Toolbar actor", async () => {
+	it("opens the same Item Detail modal from an exact Toolbar actor Shift+click", async () => {
 		await renderGameBoard();
 		const actor = document.querySelector<HTMLElement>(
 			'[data-ui="TileActor"][data-location-scope="toolbar"]',
@@ -656,10 +656,11 @@ describe("Toolbar drag", () => {
 
 		await act(async () => {
 			actor.dispatchEvent(
-				new MouseEvent("dblclick", {
+				new MouseEvent("click", {
 					bubbles: true,
 					button: 0,
 					cancelable: true,
+					shiftKey: true,
 				}),
 			);
 			await Promise.resolve();

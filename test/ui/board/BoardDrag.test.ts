@@ -689,17 +689,18 @@ describe("Board drag", () => {
 		expect(source.dataset.phase).toBe("dragging");
 	});
 
-	it("opens one Item Detail modal from the exact live actor double-click", async () => {
+	it("opens one Item Detail modal from the exact live actor Shift+click", async () => {
 		const source = await renderBoard();
 		const runtimeId = source.dataset.runtimeId;
 		if (runtimeId === undefined) throw new Error("Missing source runtime identity.");
 
 		await act(async () => {
 			source.dispatchEvent(
-				new MouseEvent("dblclick", {
+				new MouseEvent("click", {
 					bubbles: true,
 					button: 0,
 					cancelable: true,
+					shiftKey: true,
 				}),
 			);
 			await Promise.resolve();

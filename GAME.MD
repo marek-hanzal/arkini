@@ -282,6 +282,8 @@ Speed mode is runtime-backed as root session state. `toggleSpeedModeFx()` switch
 
 The authored speed-cheat item is only the player-facing control and asset projection for that global mode. Its first asset represents accelerated mode and its second asset represents normal mode. Cheat inventory is a Board sink backed by one atomic consume command and a committed removal-feedback event. Nuke activation emits an explicit confirmation request; confirmed deletion is performed by the renderer session and Electron storage boundary and never by deleting every live runtime item. The singleton Inventory opener has one canonical `open-inventory` primary action and opens the shared non-modal surface without inventing gameplay state.
 
+Tile interaction has no double-click gesture. An unmodified click executes the canonical primary action immediately; `Shift+click` opens Item Detail without executing that primary action.
+
 A capability is runtime-backed only when it has an owned command or Tick path and behavioral tests. Schema presence alone is not implementation.
 
 ## 17. Save and reload semantics

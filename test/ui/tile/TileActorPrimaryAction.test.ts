@@ -336,158 +336,57 @@ const renderBoard = async () => {
 	};
 };
 
-const click = (actor: HTMLElement, detail = 1) => {
-	if (detail === 1) {
-		actor.click();
-		return true;
-	}
-	return actor.dispatchEvent(
+const click = (
+	actor: HTMLElement,
+	{
+		shiftKey = false,
+	}: {
+		readonly shiftKey?: boolean;
+	} = {},
+) =>
+	actor.dispatchEvent(
 		new MouseEvent("click", {
 			bubbles: true,
 			button: 0,
 			cancelable: true,
-			detail,
+			shiftKey,
 		}),
 	);
-};
-
-const doubleClick = (actor: HTMLElement) =>
-	actor.dispatchEvent(
-		new MouseEvent("dblclick", {
-			bubbles: true,
-			button: 0,
-			cancelable: true,
-			detail: 2,
-		}),
-	);
-
-const pointerEvent = (type: string, x: number, y: number) => {
-	const event = new MouseEvent(type, {
-		bubbles: true,
-		button: 0,
-		cancelable: true,
-		clientX: x,
-		clientY: y,
-	});
-	Object.defineProperties(event, {
-		isPrimary: {
-			value: true,
-		},
-		pointerId: {
-			value: 1,
-		},
-	});
-	return event;
-};
-
-const finishPrimaryActionDelay = async () => {
-	await act(async () => {
-		vi.advanceTimersByTime(321);
-		await Promise.resolve();
-		await Promise.resolve();
-	});
-};
 
 describe("TileActor primary action", () => {
-	it("opens Inventory from the Board without mutating runtime location", async () => {
+	it("opens Inventory immediately from the Board without mutating runtime location", async () => {
 		const { inventoryOpener } = await renderBoard();
 		const runtimeBefore = currentRuntime;
-		vi.useFakeTimers();
 
 		expect(inventoryOpener.dataset.primaryAction).toBe("open-inventory");
 		expect(inventoryOpener.dataset.locationScope).toBe("board");
-		await act(async () => click(inventoryOpener));
-		await finishPrimaryActionDelay();
+		await act(async () => {
+			click(inventoryOpener);
+			await Promise.resolve();
+		});
 
 		expect(document.querySelector('[data-ui="InventoryHost"]')).not.toBeNull();
 		expect(currentRuntime).toBe(runtimeBefore);
 		expect(runCommand).not.toHaveBeenCalled();
 	});
 
-	it("cancels the delayed Inventory action when the actor starts dragging", async () => {
-		const { inventoryOpener } = await renderBoard();
-		vi.useFakeTimers();
-
-		await act(async () => {
-			click(inventoryOpener);
-			inventoryOpener.dispatchEvent(pointerEvent("pointerdown", 250, 50));
-			inventoryOpener.dispatchEvent(pointerEvent("pointermove", 260, 60));
-			inventoryOpener.dispatchEvent(pointerEvent("pointercancel", 260, 60));
-			await Promise.resolve();
-		});
-		await finishPrimaryActionDelay();
-
-		expect(document.querySelector('[data-ui="InventoryHost"]')).toBeNull();
-		expect(runCommand).not.toHaveBeenCalled();
-	});
-
-	it("cancels a stale Board click after movement and opens from the exact Toolbar revision", async () => {
-		const { inventoryOpener } = await renderBoard();
-		const opener = currentRuntime.items.find((item) => item.item.type === "inventory");
-		if (opener === undefined) throw new Error("Missing inventory opener.");
-		vi.useFakeTimers();
-
-		await act(async () => click(inventoryOpener));
-		const movedRuntime = RuntimeSchema.parse({
-			...currentRuntime,
-			items: currentRuntime.items.map((item) =>
-				item.id === opener.id
-					? {
-							...item,
-							revision: "revision:satchel:toolbar",
-							location: {
-								scope: "toolbar",
-								position: {
-									x: 0,
-									y: 0,
-								},
-							},
-						}
-					: item,
-			),
-		});
-		await act(async () => {
-			publishRuntime(movedRuntime);
-			await Promise.resolve();
-			await Promise.resolve();
-		});
-		await finishPrimaryActionDelay();
-		expect(document.querySelector('[data-ui="InventoryHost"]')).toBeNull();
-
-		const toolbarOpener = document.querySelector<HTMLButtonElement>(
-			'[data-ui="TileActor"][data-item-id="satchel-control"][data-location-scope="toolbar"]',
-		);
-		if (toolbarOpener === null) throw new Error("Missing Toolbar inventory opener.");
-		expect(toolbarOpener.dataset.runtimeRevision).toBe("revision:satchel:toolbar");
-		await act(async () => click(toolbarOpener));
-		await finishPrimaryActionDelay();
-
-		expect(document.querySelector('[data-ui="InventoryHost"]')).not.toBeNull();
-		expect(currentRuntime).toBe(movedRuntime);
-		expect(currentRuntime.items.find((item) => item.id === opener.id)?.location).toEqual({
-			scope: "toolbar",
-			position: {
-				x: 0,
-				y: 0,
-			},
-		});
-		expect(runCommand).not.toHaveBeenCalled();
-	});
-
 	it("opens Lines for a line owner without a default and ignores ordinary items", async () => {
 		const { producer, resource } = await renderBoard();
-		vi.useFakeTimers();
 		expect(producer.dataset.primaryAction).toBe("open-lines");
 		expect(producer.style.pointerEvents).toBe("auto");
 		expect(resource.dataset.primaryAction).toBe("none");
 
-		await act(async () => click(resource));
-		await finishPrimaryActionDelay();
+		await act(async () => {
+			click(resource);
+			await Promise.resolve();
+		});
 		expect(document.querySelector('[data-ui="ItemDetailModal"]')).toBeNull();
 		expect(runCommand).not.toHaveBeenCalled();
 
-		await act(async () => click(producer));
-		await finishPrimaryActionDelay();
+		await act(async () => {
+			click(producer);
+			await Promise.resolve();
+		});
 		expect(
 			document.querySelector<HTMLElement>('[data-ui="ItemDetailModal"]')?.dataset.tab,
 		).toBe("lines");
@@ -506,24 +405,28 @@ describe("TileActor primary action", () => {
 			}),
 		);
 		const { producer } = await renderBoard();
-		vi.useFakeTimers();
 		expect(producer.dataset.primaryAction).toBe("start-default-line");
 
-		await act(async () => click(producer));
-		await finishPrimaryActionDelay();
+		await act(async () => {
+			click(producer);
+			await Promise.resolve();
+		});
 		expect(runCommand).toHaveBeenCalledTimes(1);
 		expect(document.querySelector('[data-ui="ItemDetailModal"]')).toBeNull();
 
 		runCommand.mockRejectedValueOnce(new Error("Missing inputs"));
-		await act(async () => click(producer));
-		await finishPrimaryActionDelay();
+		await act(async () => {
+			click(producer);
+			await Promise.resolve();
+			await Promise.resolve();
+		});
 		expect(runCommand).toHaveBeenCalledTimes(2);
 		expect(
 			document.querySelector<HTMLElement>('[data-ui="ItemDetailModal"]')?.dataset.tab,
 		).toBe("lines");
 	});
 
-	it("cancels the delayed single-click when the gesture becomes a double-click", async () => {
+	it("opens Item Detail on Shift+click without starting the default line", async () => {
 		const owner = initialRuntime.items.find((item) => item.item.id === "producer");
 		if (owner === undefined) throw new Error("Missing producer runtime item.");
 		publishRuntime(
@@ -535,41 +438,32 @@ describe("TileActor primary action", () => {
 			}),
 		);
 		const { producer } = await renderBoard();
-		vi.useFakeTimers();
 
 		await act(async () => {
-			click(producer, 1);
-			click(producer, 2);
-			doubleClick(producer);
+			click(producer, {
+				shiftKey: true,
+			});
 			await Promise.resolve();
 		});
-		await finishPrimaryActionDelay();
 
 		expect(runCommand).not.toHaveBeenCalled();
+		expect(
+			document.querySelector<HTMLElement>('[data-ui="ItemDetailModal"]')?.dataset.runtimeId,
+		).toBe(owner.id);
 		expect(
 			document.querySelector<HTMLElement>('[data-ui="ItemDetailModal"]')?.dataset.tab,
 		).toBe("lines");
 	});
 
-	it("keeps Inventory closed when its delayed single-click becomes a double-click", async () => {
+	it("opens Item Detail on Shift+click without opening Inventory", async () => {
 		const { inventoryOpener } = await renderBoard();
-		vi.useFakeTimers();
 
 		await act(async () => {
-			click(inventoryOpener, 1);
-			vi.advanceTimersByTime(319);
-			inventoryOpener.dispatchEvent(pointerEvent("pointerdown", 250, 50));
-			vi.advanceTimersByTime(2);
-		});
-		expect(document.querySelector('[data-ui="InventoryHost"]')).toBeNull();
-
-		await act(async () => {
-			inventoryOpener.dispatchEvent(pointerEvent("pointerup", 250, 50));
-			click(inventoryOpener, 2);
-			doubleClick(inventoryOpener);
+			click(inventoryOpener, {
+				shiftKey: true,
+			});
 			await Promise.resolve();
 		});
-		await finishPrimaryActionDelay();
 
 		expect(document.querySelector('[data-ui="InventoryHost"]')).toBeNull();
 		expect(document.querySelector('[data-ui="ItemDetailModal"]')).not.toBeNull();

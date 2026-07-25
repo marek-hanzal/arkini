@@ -1,30 +1,35 @@
 import { Effect } from "effect";
-import { animate, type AnimationPlaybackControls } from "motion/react";
 
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
+import type {
+	PixiAnimationControl,
+	PixiAnimationDriver,
+} from "~/ui/pixi/animation/PixiAnimationDriver";
 import type { PixiActorAnimation, PixiActorAnimator } from "~/ui/pixi/animation/PixiActorAnimator";
-import type { DemandFrameLoop } from "~/ui/pixi/runtime/DemandFrameLoop";
 
 export namespace createPixiActorAnimatorFx {
 	export interface Props {
-		readonly frames: DemandFrameLoop;
+		readonly animationDriver: PixiAnimationDriver;
 	}
 }
 
 interface ActiveAnimation {
-	readonly controls: AnimationPlaybackControls;
+	control: PixiAnimationControl | null;
 }
 
 /** Uses Motion as the sole runtime for interruptible Pixi display-object interpolation. */
 export const createPixiActorAnimatorFx = Effect.fn("createPixiActorAnimatorFx")(
-	({ frames }: createPixiActorAnimatorFx.Props) =>
+	({ animationDriver }: createPixiActorAnimatorFx.Props) =>
 		Effect.sync((): PixiActorAnimator => {
 			const animations = new Map<string, ActiveAnimation>();
 			let closed = false;
 
 			const cancel = (animationKey: string) => {
-				animations.get(animationKey)?.controls.stop();
+				const animation = animations.get(animationKey);
 				animations.delete(animationKey);
+				if (animation?.control !== null && animation !== undefined) {
+					RendererRuntime.runSync(animation.control.stopFx);
+				}
 			};
 
 			const animateFx = Effect.fn("PixiActorAnimator.animateFx")(
@@ -48,29 +53,41 @@ export const createPixiActorAnimatorFx = Effect.fn("createPixiActorAnimatorFx")(
 						const fromScale = actor.container.scale.x;
 						const targetAlpha = toAlpha ?? fromAlpha;
 						const targetScale = toScale ?? fromScale;
-						const controls = animate(0, 1, {
-							delay: delayMs / 1000,
-							duration: durationMs / 1000,
-							ease: "easeInOut",
-							onUpdate: (progress) => {
-								if (closed || actor.container.destroyed) return;
-								actor.container.x = fromX + (toX - fromX) * progress;
-								actor.container.y = fromY + (toY - fromY) * progress;
-								actor.container.alpha =
-									fromAlpha + (targetAlpha - fromAlpha) * progress;
-								actor.container.scale.set(
-									fromScale + (targetScale - fromScale) * progress,
-								);
-								RendererRuntime.runSync(frames.invalidateFx);
-							},
-							onComplete: () => {
+						const activeAnimation: ActiveAnimation = {
+							control: null,
+						};
+						animations.set(animationKey, activeAnimation);
+						try {
+							activeAnimation.control = RendererRuntime.runSync(
+								animationDriver.startTweenFx({
+									delayMs,
+									durationMs,
+									from: 0,
+									onUpdate: (progress) => {
+										if (closed || actor.container.destroyed) return;
+										actor.container.x = fromX + (toX - fromX) * progress;
+										actor.container.y = fromY + (toY - fromY) * progress;
+										actor.container.alpha =
+											fromAlpha + (targetAlpha - fromAlpha) * progress;
+										actor.container.scale.set(
+											fromScale + (targetScale - fromScale) * progress,
+										);
+									},
+									onComplete: () => {
+										if (animations.get(animationKey) !== activeAnimation)
+											return;
+										animations.delete(animationKey);
+										onComplete?.();
+									},
+									to: 1,
+								}),
+							);
+						} catch (cause) {
+							if (animations.get(animationKey) === activeAnimation) {
 								animations.delete(animationKey);
-								onComplete?.();
-							},
-						});
-						animations.set(animationKey, {
-							controls,
-						});
+							}
+							throw cause;
+						}
 					}),
 			);
 
@@ -82,8 +99,19 @@ export const createPixiActorAnimatorFx = Effect.fn("createPixiActorAnimatorFx")(
 				closeFx: Effect.sync(() => {
 					if (closed) return;
 					closed = true;
-					for (const animation of animations.values()) animation.controls.stop();
+					const failures: unknown[] = [];
+					for (const animation of animations.values()) {
+						if (animation.control === null) continue;
+						try {
+							RendererRuntime.runSync(animation.control.stopFx);
+						} catch (cause) {
+							failures.push(cause);
+						}
+					}
 					animations.clear();
+					if (failures.length > 0) {
+						throw new AggregateError(failures, "Pixi actor animation cleanup failed.");
+					}
 				}),
 			};
 		}),

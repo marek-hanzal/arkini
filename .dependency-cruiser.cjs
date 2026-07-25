@@ -114,6 +114,33 @@ const boundaryRules = [
 		},
 	},
 	{
+		name: "pixi-motion-only-through-animation-driver",
+		comment:
+			"Pixi domains consume Arkini animation capabilities; only the animation driver may import Motion directly.",
+		severity: "error",
+		from: {
+			path: "^src/ui/pixi(?:/|$)",
+			pathNot: [
+				"^src/ui/pixi/animation/createPixiAnimationDriverFx[.]ts$",
+			],
+		},
+		to: {
+			path: "^node_modules/(?:motion|framer-motion)(?:/|$)",
+		},
+	},
+	{
+		name: "pixi-animation-driver-no-react-motion",
+		comment:
+			"The Pixi animation driver uses Motion's framework-neutral runtime and never its React entrypoint.",
+		severity: "error",
+		from: {
+			path: "^src/ui/pixi/animation/createPixiAnimationDriverFx[.]ts$",
+		},
+		to: {
+			path: "^node_modules/(?:framer-motion(?:/|$)|motion/(?:react(?:[-/]|$)|dist/(?:es/)?react(?:[./-]|$)))",
+		},
+	},
+	{
 		name: "page-only-composes-ui",
 		comment:
 			"Pages compose UI and router layout only; engine and bridge access stays inside reusable UI boundaries.",

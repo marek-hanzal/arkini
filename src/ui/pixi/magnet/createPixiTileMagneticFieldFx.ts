@@ -1,30 +1,29 @@
 import { Effect } from "effect";
-import { type MotionValue, motionValue, springValue } from "motion/react";
 
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import { LocationScopeEnumSchema } from "~/bridge/tile/LocationScopeEnumSchema";
 import type { PixiMainSceneActorStore } from "~/ui/pixi/actor/PixiMainSceneActorStore";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
+import type {
+	PixiAnimationDriver,
+	PixiAnimationSpring,
+} from "~/ui/pixi/animation/PixiAnimationDriver";
 import type { PixiTileMagneticField } from "~/ui/pixi/magnet/PixiTileMagneticField";
 import { readPixiTileMagneticDisplacementFx } from "~/ui/pixi/magnet/readPixiTileMagneticDisplacementFx";
-import type { DemandFrameLoop } from "~/ui/pixi/runtime/DemandFrameLoop";
 import type { PixiMainSceneSurface } from "~/ui/pixi/scene/PixiMainSceneSurface";
 
 export namespace createPixiTileMagneticFieldFx {
 	export interface Props {
 		readonly actorStore: PixiMainSceneActorStore;
-		readonly frames: DemandFrameLoop;
+		readonly animationDriver: PixiAnimationDriver;
 		readonly surface: PixiMainSceneSurface;
 	}
 }
 
 interface ActorSpring {
 	readonly actor: PixiTileActor;
-	readonly targetX: MotionValue<number>;
-	readonly targetY: MotionValue<number>;
-	readonly x: MotionValue<number>;
-	readonly y: MotionValue<number>;
-	readonly close: () => void;
+	readonly x: PixiAnimationSpring;
+	readonly y: PixiAnimationSpring;
 }
 
 const crowdSpring = {
@@ -37,51 +36,66 @@ const crowdSpring = {
 
 /** Uses Motion springs to apply Board-only magnetic response without moving hit geometry. */
 export const createPixiTileMagneticFieldFx = Effect.fn("createPixiTileMagneticFieldFx")(
-	({ actorStore, frames, surface }: createPixiTileMagneticFieldFx.Props) =>
+	({ actorStore, animationDriver, surface }: createPixiTileMagneticFieldFx.Props) =>
 		Effect.sync((): PixiTileMagneticField => {
 			const springs = new Map<string, ActorSpring>();
 			let closed = false;
 
 			const closeSpring = (spring: ActorSpring) => {
-				spring.close();
-				spring.x.destroy();
-				spring.y.destroy();
-				spring.targetX.destroy();
-				spring.targetY.destroy();
+				const failures: unknown[] = [];
+				for (const closeFx of [
+					spring.x.closeFx,
+					spring.y.closeFx,
+				]) {
+					try {
+						RendererRuntime.runSync(closeFx);
+					} catch (cause) {
+						failures.push(cause);
+					}
+				}
 				if (!spring.actor.container.destroyed) spring.actor.crowdLayer.position.set(0);
+				if (failures.length > 0) {
+					throw new AggregateError(failures, "Pixi magnetic spring cleanup failed.");
+				}
 			};
 
 			const readSpring = (actor: PixiTileActor) => {
 				const existing = springs.get(actor.item.id);
 				if (existing?.actor === actor) return existing;
 				if (existing !== undefined) {
-					closeSpring(existing);
 					springs.delete(actor.item.id);
+					closeSpring(existing);
 				}
-				const targetX = motionValue(0);
-				const targetY = motionValue(0);
-				const x = springValue(targetX, crowdSpring);
-				const y = springValue(targetY, crowdSpring);
-				const removeX = x.on("change", (value) => {
-					if (closed || actor.container.destroyed) return;
-					actor.crowdLayer.x = value;
-					RendererRuntime.runSync(frames.invalidateFx);
-				});
-				const removeY = y.on("change", (value) => {
-					if (closed || actor.container.destroyed) return;
-					actor.crowdLayer.y = value;
-					RendererRuntime.runSync(frames.invalidateFx);
-				});
+				const x = RendererRuntime.runSync(
+					animationDriver.createSpringFx({
+						initialValue: 0,
+						onUpdate: (value) => {
+							if (closed || actor.container.destroyed) return;
+							actor.crowdLayer.x = value;
+						},
+						options: crowdSpring,
+					}),
+				);
+				let y: PixiAnimationSpring;
+				try {
+					y = RendererRuntime.runSync(
+						animationDriver.createSpringFx({
+							initialValue: 0,
+							onUpdate: (value) => {
+								if (closed || actor.container.destroyed) return;
+								actor.crowdLayer.y = value;
+							},
+							options: crowdSpring,
+						}),
+					);
+				} catch (cause) {
+					RendererRuntime.runSync(x.closeFx);
+					throw cause;
+				}
 				const spring = {
 					actor,
-					targetX,
-					targetY,
 					x,
 					y,
-					close: () => {
-						removeX();
-						removeY();
-					},
 				} satisfies ActorSpring;
 				springs.set(actor.item.id, spring);
 				return spring;
@@ -98,8 +112,8 @@ export const createPixiTileMagneticFieldFx = Effect.fn("createPixiTileMagneticFi
 			const reset = () => {
 				removeStaleSprings();
 				for (const spring of springs.values()) {
-					spring.targetX.set(0);
-					spring.targetY.set(0);
+					RendererRuntime.runSync(spring.x.setTargetFx(0));
+					RendererRuntime.runSync(spring.y.setTargetFx(0));
 				}
 			};
 
@@ -121,8 +135,10 @@ export const createPixiTileMagneticFieldFx = Effect.fn("createPixiTileMagneticFi
 								actor.item.location.scope !== LocationScopeEnumSchema.enum.Board
 							) {
 								const spring = springs.get(actor.item.id);
-								spring?.targetX.set(0);
-								spring?.targetY.set(0);
+								if (spring !== undefined) {
+									RendererRuntime.runSync(spring.x.setTargetFx(0));
+									RendererRuntime.runSync(spring.y.setTargetFx(0));
+								}
 								continue;
 							}
 							const pose = RendererRuntime.runSync(
@@ -150,16 +166,26 @@ export const createPixiTileMagneticFieldFx = Effect.fn("createPixiTileMagneticFi
 								}),
 							);
 							const spring = readSpring(actor);
-							spring.targetX.set(displacement.x);
-							spring.targetY.set(displacement.y);
+							RendererRuntime.runSync(spring.x.setTargetFx(displacement.x));
+							RendererRuntime.runSync(spring.y.setTargetFx(displacement.y));
 						}
 					}),
 				),
 				closeFx: Effect.sync(() => {
 					if (closed) return;
 					closed = true;
-					for (const spring of springs.values()) closeSpring(spring);
+					const failures: unknown[] = [];
+					for (const spring of springs.values()) {
+						try {
+							closeSpring(spring);
+						} catch (cause) {
+							failures.push(cause);
+						}
+					}
 					springs.clear();
+					if (failures.length > 0) {
+						throw new AggregateError(failures, "Pixi magnetic field cleanup failed.");
+					}
 				}),
 			};
 		}),

@@ -477,8 +477,6 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 				for (const actor of actorStore.actors.values()) {
 					detachActor(actor);
 				}
-				yield* cursorGrab.closeFx;
-				yield* magneticField.closeFx;
 			}),
 		} satisfies PixiMainSceneDragController;
 	},

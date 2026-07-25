@@ -5,6 +5,7 @@ import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import type { runTileDropAtom } from "~/bridge/tile/runTileDropAtom";
 import type { TileActorItem } from "~/bridge/tile/TileActorItem";
 import { createPixiMainSceneActorStoreFx } from "~/ui/pixi/actor/createPixiMainSceneActorStoreFx";
+import { createPixiAnimationDriverFx } from "~/ui/pixi/animation/createPixiAnimationDriverFx";
 import { createPixiActorAnimatorFx } from "~/ui/pixi/animation/createPixiActorAnimatorFx";
 import { readPixiScenePaletteFx } from "~/ui/pixi/appearance/readPixiScenePaletteFx";
 import { createPixiCursorGrabMotionFx } from "~/ui/pixi/drag/createPixiCursorGrabMotionFx";
@@ -68,8 +69,12 @@ export const createPixiMainSceneRuntimeFx = Effect.fn("createPixiMainSceneRuntim
 		};
 		const actorStore = yield* createPixiMainSceneActorStoreFx();
 		registerRollback(actorStore.closeFx);
-		const animator = yield* createPixiActorAnimatorFx({
+		const animationDriver = yield* createPixiAnimationDriverFx({
 			frames: application.frames,
+		});
+		registerRollback(animationDriver.closeFx);
+		const animator = yield* createPixiActorAnimatorFx({
+			animationDriver,
 		});
 		registerRollback(animator.closeFx);
 		const surface = yield* createPixiMainSceneSurfaceFx({
@@ -89,12 +94,13 @@ export const createPixiMainSceneRuntimeFx = Effect.fn("createPixiMainSceneRuntim
 		});
 		registerRollback(motion.closeFx);
 		const cursorGrab = yield* createPixiCursorGrabMotionFx({
+			animationDriver,
 			frames: application.frames,
 		});
 		registerRollback(cursorGrab.closeFx);
 		const magneticField = yield* createPixiTileMagneticFieldFx({
 			actorStore,
-			frames: application.frames,
+			animationDriver,
 			surface,
 		});
 		registerRollback(magneticField.closeFx);

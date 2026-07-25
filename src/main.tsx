@@ -1,3 +1,6 @@
+// Installs Pixi's static shader/uniform synchronizers before the renderer graph
+// is evaluated so Electron can keep its strict no-unsafe-eval CSP.
+import "pixi.js/unsafe-eval";
 import { RegistryContext } from "@effect/atom-react";
 import { RouterProvider } from "@tanstack/react-router";
 import { StrictMode } from "react";

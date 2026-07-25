@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 
 import { DropItemResultKindEnumSchema } from "~/bridge/tile/DropItemResultKindEnumSchema";
-import type { dropItemAtom } from "~/bridge/tile/dropItemAtom";
-import type { useDropItemPreview } from "~/bridge/tile/useDropItemPreview";
+import type { readTileDropPreviewFx } from "~/bridge/tile/readTileDropPreviewFx";
+import type { runTileDropAtom } from "~/bridge/tile/runTileDropAtom";
 
 const sourceLocation = {
 	scope: "board" as const,
@@ -26,7 +26,7 @@ describe("public tile stack contracts", () => {
 	it("exposes Stack through both preview and committed bridge result types", () => {
 		const preview = {
 			kind: DropItemResultKindEnumSchema.enum.Stack,
-		} satisfies useDropItemPreview.Result;
+		} satisfies readTileDropPreviewFx.Result;
 		const outcome = {
 			kind: DropItemResultKindEnumSchema.enum.Stack,
 			transferredQuantity: 2,
@@ -58,7 +58,7 @@ describe("public tile stack contracts", () => {
 					quantity: 10,
 				},
 			},
-		} satisfies dropItemAtom.Result;
+		} satisfies runTileDropAtom.Result;
 
 		expect(preview.kind).toBe("stack");
 		expect(outcome).toMatchObject({

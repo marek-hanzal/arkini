@@ -22,8 +22,6 @@
 	--color-overlay: var(--ak-overlay);
 	--color-overlay-foreground: var(--ak-overlay-foreground);
 	--background-image-game-shell: var(--ak-game-shell-background);
-	--shadow-board-surface: var(--ak-board-surface-shadow);
-	--shadow-toolbar-surface: var(--ak-toolbar-surface-shadow);
 	--radius-xs: var(--ak-radius-xs);
 	--radius-sm: var(--ak-radius-sm);
 	--radius-md: var(--ak-radius-md);
@@ -68,8 +66,6 @@
 	--ak-radius-2xl: 0.5rem;
 	--ak-radius-3xl: 0.75rem;
 	--ak-radius-4xl: 1rem;
-	--ak-tile-grid-frame-radius: var(--ak-radius-2xl);
-	--ak-tile-actor-radius: 10%;
 
 	--ak-scrollbar-size: 0.625rem;
 	--ak-scrollbar-track: light-dark(
@@ -102,26 +98,8 @@
 		color-mix(in srgb, var(--ak-surface-raised) 68%, var(--ak-surface)),
 		color-mix(in srgb, var(--ak-surface-raised) 68%, var(--ak-surface))
 	);
-	--ak-tile-grid-slot-hover-surface: light-dark(
-		color-mix(in srgb, var(--ak-accent) 14%, var(--ak-surface-raised)),
-		color-mix(in srgb, var(--ak-accent) 18%, var(--ak-surface-raised))
-	);
-	--ak-tile-grid-slot-hover-ring: light-dark(
-		color-mix(in srgb, var(--ak-accent) 76%, var(--ak-line-strong)),
-		color-mix(in srgb, var(--ak-accent) 82%, var(--ak-line-strong))
-	);
 
 	--ak-toolbar-grid-hue: color-mix(in srgb, var(--ak-info) 52%, var(--ak-accent));
-	--ak-toolbar-grid-frame-surface: color-mix(
-		in srgb,
-		var(--ak-toolbar-grid-hue) 8%,
-		var(--ak-surface)
-	);
-	--ak-toolbar-grid-frame-border: color-mix(
-		in srgb,
-		var(--ak-toolbar-grid-hue) 30%,
-		var(--ak-line)
-	);
 	--ak-toolbar-grid-slot-surface-a: color-mix(
 		in srgb,
 		var(--ak-toolbar-grid-hue) 6%,
@@ -202,7 +180,6 @@
 	--ak-game-shell-base-end: light-dark(#eee4f7, #0b0711);
 	--ak-game-shell-intro-delay: 2500ms;
 	--ak-game-shell-intro-duration: 900ms;
-	--ak-game-shell-ambient-cycle: 24s;
 	--ak-game-shell-background:
 		radial-gradient(
 			ellipse 110% 88% at 50% 45%,
@@ -258,15 +235,6 @@
 			transparent 76%
 		),
 		linear-gradient(318deg, var(--ak-game-shell-highlight) 0%, transparent 30%);
-	--ak-board-surface-shadow:
-		0 0.35rem 0.85rem light-dark(rgb(70 42 85 / 18%), rgb(0 0 0 / 52%)),
-		0 1.55rem 4.25rem light-dark(rgb(78 45 98 / 20%), rgb(0 0 0 / 46%)),
-		0 0 0 1px light-dark(rgb(255 255 255 / 58%), rgb(255 255 255 / 5%));
-	--ak-toolbar-surface-shadow:
-		0 0.2rem 0.42rem light-dark(rgb(70 42 85 / 22%), rgb(0 0 0 / 58%)),
-		0 0.72rem 1.45rem light-dark(rgb(78 45 98 / 16%), rgb(0 0 0 / 34%)),
-		0 0 0 1px light-dark(rgb(255 255 255 / 48%), rgb(255 255 255 / 4%));
-
 	color: var(--ak-foreground);
 	background: var(--ak-canvas);
 }
@@ -572,11 +540,8 @@ select {
 [data-ui="GameShell"]::before {
 	background-image: var(--ak-game-shell-background-ambient);
 	opacity: 0;
-	animation:
-		ak-game-shell-intro-fade-in var(--ak-game-shell-intro-duration) ease-out
-		var(--ak-game-shell-intro-delay) forwards,
-		ak-game-shell-ambient-crossfade var(--ak-game-shell-ambient-cycle) ease-in-out
-		calc(var(--ak-game-shell-intro-delay) + var(--ak-game-shell-intro-duration)) infinite;
+	animation: ak-game-shell-ambient-fade-in var(--ak-game-shell-intro-duration) ease-out
+		var(--ak-game-shell-intro-delay) forwards;
 }
 
 [data-ui="GameShell"]::after {
@@ -596,104 +561,29 @@ select {
 	}
 }
 
-@keyframes ak-game-shell-ambient-crossfade {
-	0%,
-	100% {
-		opacity: 0.26;
+@keyframes ak-game-shell-ambient-fade-in {
+	from {
+		opacity: 0;
 	}
 
-	50% {
-		opacity: 0.9;
-	}
-}
-
-[data-ui="GameBoardLayout"] {
-	padding: var(--ak-viewport-padding);
-}
-
-[data-ui="GameBoardViewport"] {
-	container-type: size;
-	display: grid;
-	place-items: center;
-}
-
-[data-ui="GameBoardStack"] {
-	width: 100%;
-	height: 100%;
-	max-width: 100%;
-	max-height: 100%;
-	gap: clamp(0.25rem, 1.2vmin, 0.75rem);
-}
-
-[data-ui="BoardFrame"] {
-	box-shadow: var(--ak-board-surface-shadow);
-}
-
-/* The Toolbar scroll owner carries its depth so the frame shadow is not clipped vertically. */
-[data-ui="Toolbar"] {
-	border-radius: var(--ak-tile-grid-frame-radius);
-	box-shadow: var(--ak-toolbar-surface-shadow);
-}
-
-[data-tile-grid="true"] {
-	gap: 0;
-	padding: 0;
-}
-
-[data-tile-slot-tone="a"] {
-	background: var(--ak-tile-grid-slot-surface-a);
-}
-
-[data-tile-slot-tone="b"] {
-	background: var(--ak-tile-grid-slot-surface-b);
-}
-
-[data-tile-grid-surface="toolbar"] {
-	border-color: var(--ak-toolbar-grid-frame-border);
-	background: var(--ak-toolbar-grid-frame-surface);
-}
-
-[data-tile-surface="toolbar"] [data-tile-slot-tone="a"] {
-	background: var(--ak-toolbar-grid-slot-surface-a);
-}
-
-[data-tile-surface="toolbar"] [data-tile-slot-tone="b"] {
-	background: var(--ak-toolbar-grid-slot-surface-b);
-}
-
-[data-ui="ToolbarTrack"] {
-	min-width: calc(100% / var(--game-board-columns));
-}
-
-@supports (width: 1cqw) {
-	[data-ui="GameBoardStack"] {
-		width: min(100cqw, var(--game-board-width-from-height));
-		height: min(100cqh, var(--game-board-height-from-width));
+	to {
+		opacity: 0.58;
 	}
 }
 
-[data-ui="TileActorVisual"] {
-	container-type: size;
-}
+@media (prefers-reduced-motion: reduce) {
+	[data-ui="GameShell"]::before,
+	[data-ui="GameShell"]::after {
+		animation: none;
+	}
 
-[data-ui="TileActorTitle"] {
-	font-size: clamp(0.35rem, 12cqw, 0.7rem);
-	line-height: 1.1;
-}
+	[data-ui="GameShell"]::before {
+		opacity: 0.58;
+	}
 
-[data-ui="TileActorQuantity"] {
-	min-width: clamp(1rem, 24cqw, 1.5rem);
-	font-size: clamp(0.4rem, 14cqw, 0.75rem);
-	line-height: 1;
-}
-
-/* Explicit opt-out for surfaces whose interaction contract owns scrolling without a rail. */
-.scrollbar-hidden {
-	scrollbar-width: none;
-}
-
-.scrollbar-hidden::-webkit-scrollbar {
-	display: none;
+	[data-ui="GameShell"]::after {
+		opacity: 1;
+	}
 }
 
 .launcher-scene__backdrop {

@@ -1,11 +1,20 @@
 import { Effect } from "effect";
 
 import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
+import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { replayRuntimeStepsFx } from "~/engine/tick/internal/replayRuntimeStepsFx";
 
 export namespace advanceRuntimeElapsedFx {
 	export interface Props {
 		elapsedMs: number;
+	}
+
+	export interface Result {
+		/**
+		 * Exact runtime reference proven to remain unchanged by another fixed step.
+		 * A later authoritative command replaces the reference and invalidates the proof.
+		 */
+		readonly stableRuntime: RuntimeSchema.Type | null;
 	}
 }
 
@@ -20,7 +29,9 @@ export const advanceRuntimeElapsedFx = Effect.fn("advanceRuntimeElapsedFx")(func
 				runtime,
 			});
 			return [
-				undefined,
+				{
+					stableRuntime: replay.isStable ? replay.runtime : null,
+				} satisfies advanceRuntimeElapsedFx.Result,
 				replay.runtime,
 				replay.events,
 			] as const;

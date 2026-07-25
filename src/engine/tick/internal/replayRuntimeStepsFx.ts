@@ -13,6 +13,7 @@ export namespace replayRuntimeStepsFx {
 
 	export interface Result {
 		readonly events: readonly GameEventSchema.Type[];
+		readonly isStable: boolean;
 		readonly processedSteps: number;
 		readonly runtime: RuntimeSchema.Type;
 		readonly skippedSteps: number;
@@ -41,18 +42,23 @@ export const replayRuntimeStepsFx = Effect.fn("replayRuntimeStepsFx")(function* 
 	let draft = runtime;
 	const events: GameEventSchema.Type[] = [];
 	let processedSteps = 0;
+	let isStable = false;
 
 	for (let stepIndex = 0; stepIndex < totalSteps; stepIndex += 1) {
 		const step = yield* advanceRuntimeStepFx(draft);
 		processedSteps = stepIndex + 1;
 		const isStableNoOp = step.runtime === draft && step.events.length === 0;
-		if (isStableNoOp) break;
+		if (isStableNoOp) {
+			isStable = true;
+			break;
+		}
 		draft = step.runtime;
 		events.push(...step.events);
 	}
 
 	return {
 		events,
+		isStable,
 		processedSteps,
 		runtime: draft,
 		skippedSteps: totalSteps - processedSteps,

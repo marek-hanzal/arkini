@@ -1,27 +1,57 @@
 import type { PropsWithChildren } from "react";
 
 import { useGameEngine } from "~/bridge/game/useGameEngine";
+import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import { CheatItemSpotlight } from "~/ui/cheat-spotlight/CheatItemSpotlight";
 import { GameMenu } from "~/ui/game-menu/GameMenu";
 import { GameMenuProvider } from "~/ui/game-menu/GameMenuProvider";
-import { useGameMenuControl } from "~/ui/game-menu/useGameMenuControl";
 import { InventoryHigherOwnerGuard } from "~/ui/inventory/InventoryHigherOwnerGuard";
 import { InventoryHost } from "~/ui/inventory/InventoryHost";
 import { InventoryProvider } from "~/ui/inventory/InventoryProvider";
+import { useInventoryControl } from "~/ui/inventory/useInventoryControl";
 import { ItemDetailHigherOwnerGuard } from "~/ui/item-detail/ItemDetailHigherOwnerGuard";
 import { ItemDetailModal } from "~/ui/item-detail/ItemDetailModal";
 import { ItemDetailProvider } from "~/ui/item-detail/ItemDetailProvider";
 import { gameBoardViewTransitionName } from "~/ui/navigation/gameBoardViewTransitionName";
-import { TileSystemProvider } from "~/ui/tile/TileSystemProvider";
-import { useTileSystemApiContext } from "~/ui/tile/useTileSystemApiContext";
+import { PixiGameProvider } from "~/ui/pixi/PixiGameProvider";
+import { usePixiGameRuntime } from "~/ui/pixi/usePixiGameRuntime";
 
 const CheatItemSpotlightHost = ({ game }: { readonly game: ReturnType<typeof useGameEngine> }) => {
-	const { resetInteraction } = useTileSystemApiContext();
+	const { interaction } = usePixiGameRuntime();
 	return (
 		<CheatItemSpotlight
 			game={game}
-			onBeforeOpen={resetInteraction}
+			onBeforeOpen={() => RendererRuntime.runSync(interaction.cancelFx)}
 		/>
+	);
+};
+
+const GameTileScene = ({
+	children,
+	game,
+}: PropsWithChildren<{
+	readonly game: ReturnType<typeof useGameEngine>;
+}>) => {
+	const inventory = useInventoryControl();
+	return (
+		<div
+			className="relative isolate z-0 size-full min-h-0 min-w-0"
+			data-ui="TileScene"
+			style={{
+				viewTransitionName: gameBoardViewTransitionName,
+			}}
+		>
+			<div
+				aria-hidden={inventory.isOpen ? "true" : undefined}
+				className="size-full min-h-0 min-w-0"
+				data-ui="GameSceneContent"
+				inert={inventory.isOpen}
+			>
+				{children}
+			</div>
+			<InventoryHost />
+			<CheatItemSpotlightHost game={game} />
+		</div>
 	);
 };
 
@@ -31,28 +61,16 @@ const GameShellLayers = ({
 }: PropsWithChildren<{
 	readonly game: ReturnType<typeof useGameEngine>;
 }>) => {
-	const gameMenu = useGameMenuControl();
-
 	return (
 		<>
 			<ItemDetailProvider>
 				<InventoryProvider>
-					<ItemDetailHigherOwnerGuard />
-					<InventoryHigherOwnerGuard />
-					<div
-						className="relative isolate z-0 size-full min-h-0 min-w-0"
-						data-ui="TileScene"
-						style={{
-							viewTransitionName: gameBoardViewTransitionName,
-						}}
-					>
-						<TileSystemProvider interactionBlocked={gameMenu.isOpen}>
-							{children}
-							<InventoryHost />
-							<CheatItemSpotlightHost game={game} />
-						</TileSystemProvider>
-					</div>
-					<ItemDetailModal />
+					<PixiGameProvider>
+						<ItemDetailHigherOwnerGuard />
+						<InventoryHigherOwnerGuard />
+						<GameTileScene game={game}>{children}</GameTileScene>
+						<ItemDetailModal />
+					</PixiGameProvider>
 				</InventoryProvider>
 			</ItemDetailProvider>
 			<GameMenu game={game} />

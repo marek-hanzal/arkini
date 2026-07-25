@@ -2,10 +2,11 @@ import { Array, Effect } from "effect";
 
 import type { GameEngine } from "~/bridge/game/GameEngine";
 import type { TileActorItem } from "~/bridge/tile/TileActorItem";
-import { readRuntimeItemPrimaryAssetIdFx } from "~/engine/item/read/readRuntimeItemPrimaryAssetIdFx";
+import { readTileActorVisualFx } from "~/bridge/tile/readTileActorVisualFx";
 import { readRuntimeItemPrimaryActionFx } from "~/engine/item-detail/read/readRuntimeItemPrimaryActionFx";
 import { resolveActiveJobStatusFx } from "~/engine/job/fx/resolveActiveJobStatusFx";
 import { JobStatusEnumSchema } from "~/engine/job/schema/read/JobStatusEnumSchema";
+import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 import { isGridRuntimeItemFx } from "~/engine/runtime/read/isGridRuntimeItemFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
@@ -13,13 +14,15 @@ export namespace readTileActorsFx {
 	export interface Props {
 		readonly game: GameEngine;
 		readonly runtime: RuntimeSchema.Type;
+		readonly surface: "inventory" | "main";
 	}
 }
 
-/** Projects every exact live grid identity needed by the shared Canvas actor layer. */
+/** Projects only exact live grid identities visible to one Pixi scene. */
 export const readTileActorsFx = Effect.fn("readTileActorsFx")(function* ({
 	game,
 	runtime,
+	surface,
 }: readTileActorsFx.Props) {
 	const activeJobs = new Map(
 		runtime.jobs.map((job) => [
@@ -27,7 +30,15 @@ export const readTileActorsFx = Effect.fn("readTileActorsFx")(function* ({
 			job,
 		]),
 	);
-	const gridItems = Array.getSomes(yield* Effect.forEach(runtime.items, isGridRuntimeItemFx));
+	const gridItems = Array.getSomes(
+		yield* Effect.forEach(runtime.items, isGridRuntimeItemFx),
+	).filter((item) =>
+		surface === "inventory"
+			? item.location.scope === LocationScopeEnumSchema.enum.Inventory
+			: item.location.scope === LocationScopeEnumSchema.enum.Toolbar ||
+				(item.location.scope === LocationScopeEnumSchema.enum.Board &&
+					item.location.space === runtime.currentSpace),
+	);
 
 	return yield* Effect.forEach(gridItems, (item) =>
 		Effect.gen(function* () {
@@ -39,15 +50,15 @@ export const readTileActorsFx = Effect.fn("readTileActorsFx")(function* ({
 							job: activeJob,
 							runtime,
 						});
-			const primaryAssetId = yield* readRuntimeItemPrimaryAssetIdFx({
+			const visual = yield* readTileActorVisualFx({
+				game,
 				item: item.item,
 			});
 
 			return {
+				...visual,
 				id: item.id,
 				revision: item.revision,
-				itemId: item.item.id,
-				title: item.item.title,
 				quantity: item.quantity,
 				location: item.location,
 				...(activeJobStatus === undefined
@@ -60,12 +71,6 @@ export const readTileActorsFx = Effect.fn("readTileActorsFx")(function* ({
 					item,
 					runtime,
 				}),
-				sourceUrl: game.getResourceUrl(primaryAssetId),
-				...(item.item.asset.composite === undefined
-					? {}
-					: {
-							compositeUrl: game.getResourceUrl(item.item.asset.composite),
-						}),
 			} satisfies TileActorItem;
 		}),
 	);

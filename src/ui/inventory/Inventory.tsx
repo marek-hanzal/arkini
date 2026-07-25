@@ -1,14 +1,14 @@
 import { useEffect, useRef } from "react";
 
+import { useGameEngine } from "~/bridge/game/useGameEngine";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
-import { TileGridFrame } from "~/ui/tile/TileGridFrame";
 import { useInventoryControl } from "~/ui/inventory/useInventoryControl";
-import { useInventoryView } from "~/ui/inventory/useInventoryView";
+import { PixiInventorySurface } from "~/ui/pixi/PixiInventorySurface";
 
-/** Renders the active Inventory through the shared tile-grid surface. */
+/** Keeps standard React modal ownership around the isolated native Pixi scene. */
 export const Inventory = () => {
+	const game = useGameEngine();
 	const control = useInventoryControl();
-	const view = useInventoryView();
 	const closeButtonRef = useRef<HTMLButtonElement>(null);
 
 	useEffect(() => {
@@ -17,7 +17,9 @@ export const Inventory = () => {
 
 	return (
 		<section
-			className="pointer-events-auto flex max-h-full w-[min(42rem,70%)] min-w-0 flex-col gap-3 rounded-2xl border border-line-strong bg-surface-raised/95 p-[var(--ak-panel-padding)] text-foreground shadow-2xl"
+			role="dialog"
+			aria-modal="true"
+			className="flex h-[min(46rem,100%)] max-h-full w-full max-w-5xl min-w-0 cursor-default flex-col gap-3 overflow-hidden rounded-2xl border border-line-strong bg-surface-raised p-[var(--ak-panel-padding)] text-foreground shadow-[0_2rem_5rem_color-mix(in_srgb,var(--ak-overlay)_58%,transparent),0_0_0_1px_color-mix(in_srgb,var(--ak-line-strong)_45%,transparent)]"
 			aria-labelledby="inventory-title"
 			data-ui="Inventory"
 		>
@@ -46,18 +48,10 @@ export const Inventory = () => {
 					className="mx-auto w-full"
 					data-ui="InventoryGridAspect"
 					style={{
-						aspectRatio: `${view.width} / ${view.height}`,
+						aspectRatio: `${game.config.meta.inventory.width} / ${game.config.meta.inventory.height}`,
 					}}
 				>
-					<TileGridFrame
-						surface={view.surface}
-						width={view.width}
-						height={view.height}
-						cells={view.cells}
-						frameUi="InventoryFrame"
-						gridUi="InventoryGrid"
-						cellUi="InventoryCell"
-					/>
+					<PixiInventorySurface />
 				</div>
 			</div>
 		</section>

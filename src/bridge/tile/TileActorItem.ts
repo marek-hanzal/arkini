@@ -1,16 +1,13 @@
 import type { readRuntimeItemPrimaryActionFx } from "~/engine/item-detail/read/readRuntimeItemPrimaryActionFx";
 import type { JobStatusEnumSchema } from "~/engine/job/schema/read/JobStatusEnumSchema";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
+import type { TileActorVisual } from "~/bridge/tile/TileActorVisual";
 
 /** One exact live grid identity projected for the shared Canvas tile actor layer. */
-export interface TileActorItem {
+export interface TileActorItem extends TileActorVisual {
 	readonly id: string;
 	readonly revision: string;
-	readonly itemId: string;
-	readonly title: string;
 	readonly quantity: number;
-	readonly sourceUrl: string;
-	readonly compositeUrl?: string;
 	readonly location: GridLocationSchema.Type;
 	readonly jobStatus?: JobStatusEnumSchema.Type;
 	readonly running: boolean;

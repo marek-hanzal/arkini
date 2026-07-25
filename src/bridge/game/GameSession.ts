@@ -13,6 +13,9 @@ export type GameSessionServices =
 	| LayerModule.Success<ReturnType<typeof GameSessionLayerFx>>
 	| RuntimeSaveFx;
 
+/** Exact committed game fact exposed across the renderer bridge boundary. */
+export type GameTransition = CommittedTransitionSchema.Type;
+
 /**
  * Stable renderer-facing owner of one loaded game's Effect services and resources.
  *
@@ -26,10 +29,10 @@ export interface GameSession {
 	readonly disposeWithoutSaveFx: Effect.Effect<void, unknown>;
 	readonly flushSaveFx: Effect.Effect<void, unknown>;
 	/** Read-only renderer projection of the authoritative committed transition source. */
-	readonly committedTransitionAtom: Atom.Atom<CommittedTransitionSchema.Type>;
+	readonly committedTransitionAtom: Atom.Atom<GameTransition>;
 	readonly getSnapshot: () => RuntimeSchema.Type;
 	/** Latest exact runtime plus the ordered facts and bounded outgoing snapshot for that commit. */
-	readonly getTransitionSnapshot: () => CommittedTransitionSchema.Type;
+	readonly getTransitionSnapshot: () => GameTransition;
 	/** Executes one synchronous live read inside this Game's existing session runtime. */
 	readonly read: <Result, Error, Requirements extends GameSessionServices>(
 		effect: Effect.Effect<Result, Error, Requirements>,
@@ -45,7 +48,7 @@ export interface GameSession {
 	readonly subscribe: (listener: () => void | PromiseLike<void>) => () => void;
 	/** Replays the atomically captured current transition, then every later commit in order. */
 	readonly subscribeTransitions: (
-		listener: (transition: CommittedTransitionSchema.Type) => void | PromiseLike<void>,
+		listener: (transition: GameTransition) => void | PromiseLike<void>,
 	) => () => void;
 	readonly subscribeEvents: (
 		listener: (batch: GameEventBatchSchema.Type) => void | PromiseLike<void>,

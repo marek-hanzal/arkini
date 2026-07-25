@@ -16,7 +16,13 @@ const defaultOnTickError = (cause: unknown) => {
 	console.error("Arkini tick failed; its elapsed budget remains pending.", cause);
 };
 
-/** Starts one scoped production tick fiber for the lifetime of a game session. */
+/**
+ * Starts one scoped production Tick fiber for the lifetime of a game session.
+ *
+ * The periodic clock pulse remains authoritative while Tick skips stable runtime work.
+ * An async runtime notification has no commit timestamp, so rebasing wall time when its
+ * listener runs would silently move job completion boundaries under renderer load.
+ */
 export const GameLoopLayerFx = ({
 	intervalMs = TickStepMs,
 	onTickError = defaultOnTickError,

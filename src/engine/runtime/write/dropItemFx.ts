@@ -8,6 +8,7 @@ import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
 import { commitMergeDropFx } from "~/engine/runtime/drop/commitMergeDropFx";
 import { commitMoveDropFx } from "~/engine/runtime/drop/commitMoveDropFx";
 import { commitStackDropFx } from "~/engine/runtime/drop/commitStackDropFx";
+import { commitStoreInventoryDropFx } from "~/engine/runtime/drop/commitStoreInventoryDropFx";
 import { commitStoreInputDropFx } from "~/engine/runtime/drop/commitStoreInputDropFx";
 import { commitSwapDropFx } from "~/engine/runtime/drop/commitSwapDropFx";
 import { readDropItemPreviewFx } from "~/engine/runtime/read/readDropItemPreviewFx";
@@ -114,6 +115,20 @@ export const dropItemFx = Effect.fn("dropItemFx")(function* ({
 					sourceRevision,
 					targetItemId,
 					targetRevision,
+				}),
+		)
+		.with(
+			{
+				kind: DropItemResultKindEnumSchema.enum.StoreInventory,
+			},
+			() =>
+				commitStoreInventoryDropFx({
+					sourceItemId,
+					sourceRevision,
+					sourceLocation,
+					inventoryItemId: targetItemId,
+					inventoryRevision: targetRevision,
+					inventoryLocation: targetLocation,
 				}),
 		)
 		.with(

@@ -18,7 +18,7 @@ export const createRendererDevelopmentContentSecurityPolicyFx = Effect.fn(
 			RendererContentSecurityPolicy.commonDirectives[0],
 			`script-src 'self' 'nonce-${nonce}'`,
 			...RendererContentSecurityPolicy.commonDirectives.slice(1),
-			`connect-src 'self' ${developmentUrl.webSocketEndpoint}`,
+			`connect-src 'self' blob: data: ${developmentUrl.webSocketEndpoint}`,
 		].join("; "),
 	),
 );

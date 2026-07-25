@@ -14,7 +14,7 @@ const focusableSelector = [
 	'[tabindex]:not([tabindex="-1"])',
 ].join(",");
 
-/** Owns the idempotent open/close lifecycle of one non-modal Inventory surface. */
+/** Owns the idempotent open/close lifecycle of the Inventory modal. */
 export const InventoryProvider = ({ children }: PropsWithChildren) => {
 	const canRestoreFocus = (element: HTMLElement) =>
 		element.isConnected &&

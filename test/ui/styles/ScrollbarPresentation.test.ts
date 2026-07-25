@@ -6,10 +6,6 @@ const arkpackSelector = readFileSync(
 	new URL("../../../src/ui/arkpack/ArkpackSelector.tsx", import.meta.url),
 	"utf8",
 );
-const toolbar = readFileSync(
-	new URL("../../../src/ui/toolbar/Toolbar.tsx", import.meta.url),
-	"utf8",
-);
 
 describe("global scrollbar presentation", () => {
 	it("owns one semantic native scrollbar treatment at the renderer style boundary", () => {
@@ -33,11 +29,9 @@ describe("global scrollbar presentation", () => {
 		expect(styles).toContain("*::-webkit-scrollbar-corner {");
 	});
 
-	it("shows ordinary catalog overflow while retaining only the explicit Toolbar opt-out", () => {
+	it("shows ordinary catalog overflow without a hidden-scrollbar exception", () => {
 		expect(arkpackSelector).toContain("overflow-y-auto overscroll-contain");
 		expect(arkpackSelector).not.toContain("scrollbar-hidden");
-		expect(toolbar).toContain("overflow-x-auto overflow-y-hidden scrollbar-hidden");
-		expect(styles).toContain(".scrollbar-hidden {");
-		expect(styles).toContain("scrollbar-width: none;");
+		expect(styles).not.toContain(".scrollbar-hidden {");
 	});
 });

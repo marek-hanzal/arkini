@@ -6,6 +6,7 @@ import { readDropItemPreviewFx } from "~/engine/runtime/read/readDropItemPreview
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { dropItemFx } from "~/engine/runtime/write/dropItemFx";
+import { releaseInventoryItemFx } from "~/engine/runtime/write/releaseInventoryItemFx";
 import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
 import { DropItemResultKindEnumSchema } from "~/engine/runtime/schema/command/DropItemResultKindEnumSchema";
 import { DropItemIgnoredReasonEnumSchema } from "~/engine/runtime/schema/command/DropItemIgnoredReasonEnumSchema";
@@ -62,6 +63,19 @@ const configInput = {
 			categoryId: "resource",
 			scope: "any",
 			maxStackSize: 10,
+		},
+		backpack: {
+			id: "backpack",
+			type: "inventory",
+			title: "Backpack",
+			description: "Backpack",
+			asset: {
+				source: [
+					"asset:backpack",
+				],
+			},
+			tags: [],
+			categoryId: "utility",
 		},
 	},
 } as const;
@@ -301,6 +315,42 @@ describe("readDropItemPreviewFx", () => {
 			reason: DropItemRejectedReasonEnumSchema.enum.StaleSource,
 		});
 	});
+
+	it("advertises whole-item storage instead of swapping with the Inventory opener", () => {
+		const result = run(
+			Effect.gen(function* () {
+				const source = yield* spawnItemFx({
+					id: "runtime:water",
+					itemId: "water",
+					location: sourceLocation,
+					quantity: 3,
+				});
+				const inventory = yield* spawnItemFx({
+					id: "runtime:backpack",
+					itemId: "backpack",
+					location: occupiedLocation,
+					quantity: 1,
+				});
+				return yield* readDropItemPreviewFx({
+					sourceItemId: source.id,
+					sourceRevision: source.revision,
+					sourceLocation,
+					target: {
+						kind: "slot",
+						location: occupiedLocation,
+						occupant: {
+							itemId: inventory.id,
+							revision: inventory.revision,
+						},
+					},
+				});
+			}),
+		);
+
+		expect(result).toEqual({
+			kind: DropItemResultKindEnumSchema.enum.StoreInventory,
+		});
+	});
 });
 
 describe("dropItemFx", () => {
@@ -380,6 +430,277 @@ describe("dropItemFx", () => {
 			location: emptyLocation,
 		});
 		expect(result.runtime.items[0]?.location).toEqual(emptyLocation);
+	});
+
+	it("stores the whole source stack through the Inventory opener atomically", () => {
+		const result = run(
+			Effect.gen(function* () {
+				const source = yield* spawnItemFx({
+					id: "runtime:water-source",
+					itemId: "water",
+					location: sourceLocation,
+					quantity: 3,
+				});
+				yield* spawnItemFx({
+					id: "runtime:water-stack",
+					itemId: "water",
+					location: {
+						scope: "inventory",
+						position: {
+							x: 0,
+							y: 0,
+						},
+					},
+					quantity: 8,
+				});
+				const inventory = yield* spawnItemFx({
+					id: "runtime:backpack",
+					itemId: "backpack",
+					location: occupiedLocation,
+					quantity: 1,
+				});
+				const outcome = yield* dropItemFx({
+					sourceItemId: source.id,
+					sourceRevision: source.revision,
+					sourceLocation,
+					target: {
+						kind: "slot",
+						location: occupiedLocation,
+						occupant: {
+							itemId: inventory.id,
+							revision: inventory.revision,
+						},
+					},
+				});
+				return {
+					outcome,
+					runtime: yield* readRuntimeFx(),
+				};
+			}),
+		);
+
+		expect(result.outcome).toMatchObject({
+			kind: DropItemResultKindEnumSchema.enum.StoreInventory,
+			source: {
+				itemId: "runtime:water-source",
+				previousQuantity: 3,
+				current: null,
+			},
+			inventory: {
+				itemId: "runtime:backpack",
+				location: occupiedLocation,
+			},
+		});
+		expect(
+			result.runtime.items
+				.filter((item) => item.item.id === "water" && item.location.scope === "inventory")
+				.map((item) => item.quantity)
+				.sort((left, right) => left - right),
+		).toEqual([
+			1,
+			10,
+		]);
+		expect(result.runtime.items.some((item) => item.id === "runtime:water-source")).toBe(false);
+	});
+
+	it("releases the whole Inventory stack through board-first placement", () => {
+		const inventoryLocation = {
+			scope: "inventory" as const,
+			position: {
+				x: 0,
+				y: 0,
+			},
+		};
+		const result = run(
+			Effect.gen(function* () {
+				yield* spawnItemFx({
+					id: "runtime:board-water",
+					itemId: "water",
+					location: sourceLocation,
+					quantity: 8,
+				});
+				const inventoryItem = yield* spawnItemFx({
+					id: "runtime:inventory-water",
+					itemId: "water",
+					location: inventoryLocation,
+					quantity: 4,
+				});
+				const outcome = yield* releaseInventoryItemFx({
+					itemId: inventoryItem.id,
+					revision: inventoryItem.revision,
+					location: inventoryLocation,
+				});
+				return {
+					outcome,
+					runtime: yield* readRuntimeFx(),
+				};
+			}),
+		);
+
+		expect(result.outcome.events.map((event) => event.type)).toEqual([
+			"item:stacked",
+			"item:spawned",
+		]);
+		expect(
+			result.runtime.items
+				.filter((item) => item.item.id === "water")
+				.map((item) => ({
+					location: item.location,
+					quantity: item.quantity,
+				})),
+		).toEqual(
+			expect.arrayContaining([
+				expect.objectContaining({
+					location: sourceLocation,
+					quantity: 10,
+				}),
+				expect.objectContaining({
+					location: {
+						scope: "board",
+						space: 0,
+						position: {
+							x: 1,
+							y: 0,
+						},
+					},
+					quantity: 2,
+				}),
+			]),
+		);
+		expect(result.runtime.items.some((item) => item.id === "runtime:inventory-water")).toBe(
+			false,
+		);
+	});
+
+	it("releases into compatible Board stack capacity when every cell is occupied", () => {
+		const inventoryLocation = {
+			scope: "inventory" as const,
+			position: {
+				x: 0,
+				y: 0,
+			},
+		};
+		const result = run(
+			Effect.gen(function* () {
+				yield* spawnItemFx({
+					id: "runtime:board-water",
+					itemId: "water",
+					location: sourceLocation,
+					quantity: 8,
+				});
+				let blockerIndex = 0;
+				for (let y = 0; y < 2; y += 1) {
+					for (let x = 0; x < 3; x += 1) {
+						if (x === sourceLocation.position.x && y === sourceLocation.position.y) {
+							continue;
+						}
+						yield* spawnItemFx({
+							id: `runtime:blocker:${blockerIndex}`,
+							itemId: "stone",
+							location: {
+								scope: "board",
+								space: 0,
+								position: {
+									x,
+									y,
+								},
+							},
+							quantity: 1,
+						});
+						blockerIndex += 1;
+					}
+				}
+				const inventoryItem = yield* spawnItemFx({
+					id: "runtime:inventory-water",
+					itemId: "water",
+					location: inventoryLocation,
+					quantity: 2,
+				});
+				const outcome = yield* releaseInventoryItemFx({
+					itemId: inventoryItem.id,
+					revision: inventoryItem.revision,
+					location: inventoryLocation,
+				});
+				return {
+					outcome,
+					runtime: yield* readRuntimeFx(),
+				};
+			}),
+		);
+
+		expect(result.outcome.events.map((event) => event.type)).toEqual([
+			"item:stacked",
+		]);
+		expect(
+			result.runtime.items.find((item) => item.id === "runtime:board-water")?.quantity,
+		).toBe(10);
+		expect(result.runtime.items.some((item) => item.id === "runtime:inventory-water")).toBe(
+			false,
+		);
+		expect(result.runtime.items.filter((item) => item.location.scope === "board")).toHaveLength(
+			6,
+		);
+	});
+
+	it("rejects a release that could only fall back into passive storage", () => {
+		const inventoryLocation = {
+			scope: "inventory" as const,
+			position: {
+				x: 0,
+				y: 0,
+			},
+		};
+		const result = run(
+			Effect.gen(function* () {
+				let blockerIndex = 0;
+				for (let y = 0; y < 2; y += 1) {
+					for (let x = 0; x < 3; x += 1) {
+						yield* spawnItemFx({
+							id: `runtime:blocker:${blockerIndex}`,
+							itemId: "stone",
+							location: {
+								scope: "board",
+								space: 0,
+								position: {
+									x,
+									y,
+								},
+							},
+							quantity: 1,
+						});
+						blockerIndex += 1;
+					}
+				}
+				const inventoryItem = yield* spawnItemFx({
+					id: "runtime:inventory-water",
+					itemId: "water",
+					location: inventoryLocation,
+					quantity: 1,
+				});
+				const before = yield* readRuntimeFx();
+				const outcome = yield* Effect.result(
+					releaseInventoryItemFx({
+						itemId: inventoryItem.id,
+						revision: inventoryItem.revision,
+						location: inventoryLocation,
+					}),
+				);
+				return {
+					after: yield* readRuntimeFx(),
+					before,
+					outcome,
+				};
+			}),
+		);
+
+		expect(Result.isFailure(result.outcome)).toBe(true);
+		if (Result.isFailure(result.outcome)) {
+			expect(result.outcome.failure).toMatchObject({
+				_tag: "PlacementUnavailableError",
+				reason: "board:full",
+			});
+		}
+		expect(result.after).toEqual(result.before);
 	});
 
 	it("swaps two non-mergeable occupied Board items and returns both actor identities", () => {

@@ -3,7 +3,14 @@ import { Context, type Effect } from "effect";
 import type { advanceRuntimeElapsedFx } from "~/engine/tick/internal/advanceRuntimeElapsedFx";
 import type { TickSchema } from "~/engine/tick/schema/TickSchema";
 
-type RuntimeAdvanceFx = ReturnType<typeof advanceRuntimeElapsedFx>;
+type RuntimeAdvanceFx =
+	ReturnType<typeof advanceRuntimeElapsedFx> extends Effect.Effect<
+		unknown,
+		infer Error,
+		infer Requirements
+	>
+		? Effect.Effect<void, Error, Requirements>
+		: never;
 
 export interface TickFxService {
 	readonly read: Effect.Effect<TickSchema.Type>;

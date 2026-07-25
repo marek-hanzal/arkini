@@ -34,8 +34,8 @@ export namespace placeRuntimeItemFx {
 }
 
 /**
- * Returns one existing input-buffered or reserved item through the canonical
- * drop policy and reports the exact visible placement facts owned by that return.
+ * Returns one existing input-buffered, reserved, or Inventory item through the
+ * canonical drop policy and reports the exact visible placement facts.
  */
 export const placeRuntimeItemFx = Effect.fn("placeRuntimeItemFx")(function* ({
 	itemId,
@@ -57,18 +57,21 @@ export const placeRuntimeItemFx = Effect.fn("placeRuntimeItemFx")(function* ({
 	}
 	if (
 		item.location.scope !== LocationScopeEnumSchema.enum.Input &&
-		item.location.scope !== LocationScopeEnumSchema.enum.Reserved
+		item.location.scope !== LocationScopeEnumSchema.enum.Reserved &&
+		item.location.scope !== LocationScopeEnumSchema.enum.Inventory
 	) {
 		return yield* Effect.die(
 			new Error(
-				`Existing-item placement only accepts input or reserved items; ${item.id} is ${item.location.scope}.`,
+				`Existing-item placement only accepts input, reserved, or Inventory items; ${item.id} is ${item.location.scope}.`,
 			),
 		);
 	}
-	yield* assertOwnerIdleFx({
-		ownerItemId: item.id,
-		runtime,
-	});
+	if (item.location.scope !== LocationScopeEnumSchema.enum.Inventory) {
+		yield* assertOwnerIdleFx({
+			ownerItemId: item.id,
+			runtime,
+		});
+	}
 	const pure = yield* isItemPureFx({
 		item,
 		runtime,

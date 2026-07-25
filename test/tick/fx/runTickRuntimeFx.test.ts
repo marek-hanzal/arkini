@@ -6,6 +6,7 @@ import { storeInputMaterialFx } from "~/engine/input/write/storeInputMaterialFx"
 import { readOwnerJobQueueFx } from "~/engine/job/read/readOwnerJobQueueFx";
 import { startLineFx } from "~/engine/job/write/startLineFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
+import { readCommittedTransitionFx } from "~/engine/runtime/read/readCommittedTransitionFx";
 import { removeItemFx } from "~/engine/runtime/write/removeItemFx";
 import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
@@ -96,6 +97,45 @@ const createLiveRuleConfig = () => {
 };
 
 describe("TickFx elapsed budget", () => {
+	it("does not commit stable idle ticks and advances again after an external command", () => {
+		const result = Effect.runSync(
+			Effect.gen(function* () {
+				const beforeIdle = yield* readCommittedTransitionFx();
+				yield* runTickRuntimeByFx({
+					elapsedMs: 200,
+				});
+				yield* runTickRuntimeByFx({
+					elapsedMs: 2_000,
+				});
+				const afterIdle = yield* readCommittedTransitionFx();
+
+				yield* prepareJobLineFx();
+				yield* startLineFx(props);
+				const afterCommand = yield* readCommittedTransitionFx();
+				yield* runTickRuntimeByFx({
+					elapsedMs: 200,
+				});
+				const afterRearmedTick = yield* readCommittedTransitionFx();
+
+				return {
+					afterCommand,
+					afterIdle,
+					afterRearmedTick,
+					beforeIdle,
+				};
+			}).pipe(
+				useGameFx({
+					config: createJobTestConfig(),
+				}),
+			),
+		);
+
+		expect(result.afterIdle).toBe(result.beforeIdle);
+		expect(result.afterIdle.sequence).toBe(0);
+		expect(result.afterRearmedTick.sequence).toBe(result.afterCommand.sequence + 1);
+		expect(result.afterRearmedTick.runtime.jobs[0]?.remainingMs).toBe(800);
+	});
+
 	it("does not replay one successful elapsed budget", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {

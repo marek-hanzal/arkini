@@ -7,14 +7,40 @@ import { readOwnerJobQueueFx } from "~/engine/job/read/readOwnerJobQueueFx";
 import { startLineFx } from "~/engine/job/write/startLineFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import { moveItemFx } from "~/engine/runtime/write/moveItemFx";
+import { releaseInventoryItemFx } from "~/engine/runtime/write/releaseInventoryItemFx";
 import { removeItemFx } from "~/engine/runtime/write/removeItemFx";
 import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
+import { storeItemInInventoryFx } from "~/engine/runtime/write/storeItemInInventoryFx";
+import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { runTickRuntimeByFx } from "~/engine/tick/fx/runTickRuntimeByFx";
 import { createJobTestConfig, prepareJobLineFx } from "~test/job/support/jobTestConfig";
 import { JobStatusEnumSchema } from "~/engine/job/schema/read/JobStatusEnumSchema";
 
 const ownerItemId = "runtime:forge";
 const lineId = "line:forge:run";
+
+const createInventoryOpenerJobConfig = () => {
+	const base = createJobTestConfig(2, "any");
+	return GameConfigSchema.parse({
+		...base,
+		items: {
+			...base.items,
+			backpack: {
+				id: "backpack",
+				type: "inventory",
+				title: "Backpack",
+				description: "Stores items.",
+				asset: {
+					source: [
+						"asset:backpack",
+					],
+				},
+				tags: [],
+				categoryId: "utility",
+			},
+		},
+	});
+};
 
 const moveOwnerFx = Effect.fn("moveOwnerFx")(function* (scope: "board" | "inventory") {
 	const runtime = yield* readRuntimeFx();
@@ -164,6 +190,85 @@ describe("job owner inventory contract", () => {
 				(item) => item.location.scope === "job" || item.location.scope === "reserved",
 			),
 		).toBe(false);
+	});
+
+	it("preserves an active owner through opener storage and Inventory release", () => {
+		const result = Effect.runSync(
+			Effect.gen(function* () {
+				yield* prepareJobLineFx();
+				const opener = yield* spawnItemFx({
+					id: "runtime:backpack",
+					itemId: "backpack",
+					location: {
+						scope: "board",
+						space: 0,
+						position: {
+							x: 4,
+							y: 0,
+						},
+					},
+					quantity: 1,
+				});
+				yield* startLineFx({
+					ownerItemId,
+					lineId,
+				});
+				yield* runTickRuntimeByFx({
+					elapsedMs: 400,
+				});
+				const activeRuntime = yield* readRuntimeFx();
+				const activeOwner = activeRuntime.items.find((item) => item.id === ownerItemId);
+				if (activeOwner === undefined || activeOwner.location.scope !== "board") {
+					throw new Error("Expected active Board owner.");
+				}
+				yield* storeItemInInventoryFx({
+					sourceItemId: activeOwner.id,
+					sourceRevision: activeOwner.revision,
+					sourceLocation: activeOwner.location,
+					inventoryItemId: opener.id,
+					inventoryRevision: opener.revision,
+					inventoryLocation: opener.location,
+				});
+				yield* runTickRuntimeByFx({
+					elapsedMs: 5_000,
+				});
+				const pausedRuntime = yield* readRuntimeFx();
+				const pausedOwner = pausedRuntime.items.find((item) => item.id === ownerItemId);
+				if (pausedOwner === undefined || pausedOwner.location.scope !== "inventory") {
+					throw new Error("Expected paused Inventory owner.");
+				}
+				yield* releaseInventoryItemFx({
+					itemId: pausedOwner.id,
+					location: pausedOwner.location,
+					revision: pausedOwner.revision,
+				});
+				yield* runTickRuntimeByFx({
+					elapsedMs: 600,
+				});
+				return {
+					completed: yield* readRuntimeFx(),
+					paused: pausedRuntime,
+				};
+			}).pipe(
+				useGameFx({
+					config: createInventoryOpenerJobConfig(),
+				}),
+			),
+		);
+
+		expect(result.paused.jobs).toEqual([
+			expect.objectContaining({
+				ownerItemId,
+				remainingMs: 600,
+			}),
+		]);
+		expect(result.paused.items.find((item) => item.id === ownerItemId)?.location.scope).toBe(
+			"inventory",
+		);
+		expect(result.completed.jobs).toEqual([]);
+		expect(result.completed.items.find((item) => item.id === ownerItemId)?.location.scope).toBe(
+			"board",
+		);
 	});
 
 	it("keeps a ready job paused in inventory until the owner returns to the board", () => {

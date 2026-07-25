@@ -42,6 +42,7 @@ export const modifyRuntimeFx = Effect.fn("modifyRuntimeFx")(function* <Result, E
 				read: Effect.succeed(transition.runtime),
 			}),
 			Effect.tap(([, nextRuntime]) => {
+				if (nextRuntime === transition.runtime) return Effect.void;
 				return assertRuntimeFx({
 					runtime: nextRuntime,
 				});

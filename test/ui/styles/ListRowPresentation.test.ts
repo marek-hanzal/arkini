@@ -9,8 +9,6 @@ const mainMenu = readSource("src/ui/launcher/MainMenu.tsx");
 const gameMenu = readSource("src/ui/game-menu/GameMenu.tsx");
 const settings = readSource("src/ui/settings/Settings.tsx");
 const spotlight = readSource("src/ui/cheat-spotlight/CheatItemSpotlight.tsx");
-const board = readSource("src/ui/board/Board.tsx");
-const toolbar = readSource("src/ui/toolbar/Toolbar.tsx");
 const lines = readSource("src/ui/item-detail/ItemLinesTab.tsx");
 const lineRow = readSource("src/ui/item-detail/ItemLineRow.tsx");
 const sources = readSource("src/ui/item-detail/ItemSourcesTab.tsx");
@@ -58,8 +56,6 @@ describe("semantic list-row presentation", () => {
 		expect(spotlight).toContain("ak-spotlight-option grid");
 		expect(spotlight).toContain("ak-spotlight-option-secondary");
 		expect(spotlight).not.toContain("ak-list-row");
-		expect(board).not.toContain("ak-list-row");
-		expect(toolbar).not.toContain("ak-list-row");
 	});
 
 	it("owns a complete Spotlight selected contrast pair and precedence", () => {

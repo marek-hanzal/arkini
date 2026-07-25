@@ -80,7 +80,7 @@ const DropItemMergedResultSchema = z
 	})
 	.strict();
 
-const DropItemStoredInputActorStateSchema = z
+const DropItemStoredActorStateSchema = z
 	.object({
 		itemId: IdSchema,
 		canonicalItemId: IdSchema,
@@ -105,10 +105,35 @@ const DropItemStoredInputResultSchema = z
 				previousRevision: RevisionSchema,
 				previousLocation: GridLocationSchema,
 				previousQuantity: PositiveIntegerSchema,
-				current: DropItemStoredInputActorStateSchema.nullable(),
+				current: DropItemStoredActorStateSchema.nullable(),
 			})
 			.strict(),
 		owner: z
+			.object({
+				itemId: IdSchema,
+				revision: RevisionSchema,
+				location: GridLocationSchema,
+			})
+			.strict(),
+	})
+	.strict();
+
+const DropItemStoredInventoryResultSchema = z
+	.object({
+		kind: DropItemResultKindEnumSchema.extract([
+			"StoreInventory",
+		]),
+		source: z
+			.object({
+				itemId: IdSchema,
+				canonicalItemId: IdSchema,
+				previousRevision: RevisionSchema,
+				previousLocation: GridLocationSchema,
+				previousQuantity: PositiveIntegerSchema,
+				current: DropItemStoredActorStateSchema.nullable(),
+			})
+			.strict(),
+		inventory: z
 			.object({
 				itemId: IdSchema,
 				revision: RevisionSchema,
@@ -175,6 +200,7 @@ export const DropItemResultSchema = z
 		DropItemMovedResultSchema,
 		DropItemSwappedResultSchema,
 		DropItemMergedResultSchema,
+		DropItemStoredInventoryResultSchema,
 		DropItemStoredInputResultSchema,
 		DropItemStackedResultSchema,
 		DropItemIgnoredResultSchema,

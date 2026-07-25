@@ -18,6 +18,6 @@ export const RendererContentSecurityPolicy = {
 		commonDirectives[0],
 		"script-src 'self'",
 		...commonDirectives.slice(1),
-		"connect-src 'self'",
+		"connect-src 'self' blob: data:",
 	].join("; "),
 } as const;

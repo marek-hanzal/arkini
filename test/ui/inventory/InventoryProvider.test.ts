@@ -57,7 +57,11 @@ const ControlProbe = ({
 	);
 	return createElement(
 		"div",
-		null,
+		{
+			"aria-hidden": control.isOpen ? "true" : undefined,
+			"data-ui": "GameSceneContent",
+			inert: control.isOpen,
+		},
 		createElement(
 			"button",
 			{
@@ -74,6 +78,7 @@ const ControlProbe = ({
 			},
 			"Other control",
 		),
+		createElement("tile-actor-layer"),
 	);
 };
 
@@ -125,7 +130,6 @@ const renderShell = async () => {
 							},
 						}),
 						createElement(InventoryHost),
-						createElement("tile-actor-layer"),
 					),
 				),
 			),
@@ -145,7 +149,7 @@ const renderShell = async () => {
 };
 
 describe("InventoryProvider", () => {
-	it("mounts and unregisters one non-modal surface inside the existing Tile scene", async () => {
+	it("mounts one modal surface and makes the existing Tile scene content inert", async () => {
 		const { container, readControl } = await renderShell();
 		const origin = container.querySelector<HTMLButtonElement>('[data-ui="BoardControl"]');
 		const other = container.querySelector<HTMLButtonElement>('[data-ui="OtherControl"]');
@@ -171,12 +175,12 @@ describe("InventoryProvider", () => {
 		const tileScene = container.querySelector('[data-ui="TileScene"]');
 		const host = container.querySelector('[data-ui="InventoryHost"]');
 		expect(host?.parentElement).toBe(tileScene);
-		expect(host?.className).toContain("pointer-events-none");
-		expect(origin.closest("[inert]")).toBeNull();
+		expect(host?.className).toContain("place-items-center");
+		expect(host?.className).toContain("bg-overlay/70");
+		expect(origin.closest("[inert]")).not.toBeNull();
+		expect(origin.closest('[aria-hidden="true"]')).not.toBeNull();
 		expect(container.querySelectorAll("inventory-surface")).toHaveLength(1);
 		expect(container.querySelectorAll("tile-actor-layer")).toHaveLength(1);
-		other.focus();
-		expect(document.activeElement).toBe(other);
 
 		await act(async () => {
 			expect(

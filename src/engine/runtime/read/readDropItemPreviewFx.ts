@@ -3,6 +3,7 @@ import { match } from "ts-pattern";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { GameConfigFx } from "~/engine/game/context/GameConfigFx";
+import { ItemEnumSchema } from "~/engine/item/schema/ItemEnumSchema";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 import { isItemLocationScopeAllowedFx } from "~/engine/location/read/isItemLocationScopeAllowedFx";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
@@ -15,6 +16,7 @@ import { isGridRuntimeItemFx } from "~/engine/runtime/read/isGridRuntimeItemFx";
 import { readDropItemStackRejectedReasonFx } from "~/engine/runtime/read/readDropItemStackRejectedReasonFx";
 import { readItemStackResolutionFx } from "~/engine/runtime/read/readItemStackResolutionFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
+import { readStoreItemInInventoryPlanFx } from "~/engine/runtime/fx/readStoreItemInInventoryPlanFx";
 import { DropItemIgnoredReasonEnumSchema } from "~/engine/runtime/schema/command/DropItemIgnoredReasonEnumSchema";
 import { DropItemRejectedReasonEnumSchema } from "~/engine/runtime/schema/command/DropItemRejectedReasonEnumSchema";
 import { DropItemResultKindEnumSchema } from "~/engine/runtime/schema/command/DropItemResultKindEnumSchema";
@@ -44,6 +46,7 @@ export namespace readDropItemPreviewFx {
 					| typeof DropItemResultKindEnumSchema.enum.Move
 					| typeof DropItemResultKindEnumSchema.enum.Swap
 					| typeof DropItemResultKindEnumSchema.enum.Merge
+					| typeof DropItemResultKindEnumSchema.enum.StoreInventory
 					| typeof DropItemResultKindEnumSchema.enum.Stack;
 		  }
 		| {
@@ -168,6 +171,26 @@ export const readDropItemPreviewFx = Effect.fn("readDropItemPreviewFx")(function
 		boardItem.location.space !== runtime.currentSpace
 	) {
 		return rejected(DropItemRejectedReasonEnumSchema.enum.InvalidTarget);
+	}
+	if (targetItem.item.type === ItemEnumSchema.enum.Inventory) {
+		if (
+			source.location.scope === LocationScopeEnumSchema.enum.Inventory ||
+			!(yield* isItemLocationScopeAllowedFx({
+				item: source.item,
+				locationScope: LocationScopeEnumSchema.enum.Inventory,
+			}))
+		) {
+			return rejected(DropItemRejectedReasonEnumSchema.enum.InvalidTarget);
+		}
+		const storagePlan = yield* readStoreItemInInventoryPlanFx({
+			item: source,
+			runtime,
+		}).pipe(Effect.option);
+		return Option.isSome(storagePlan)
+			? {
+					kind: DropItemResultKindEnumSchema.enum.StoreInventory,
+				}
+			: rejected(DropItemRejectedReasonEnumSchema.enum.Blocked);
 	}
 	if (targetItem.location.scope === LocationScopeEnumSchema.enum.Board) {
 		const mergeRule = yield* resolveMergeRuleFx({

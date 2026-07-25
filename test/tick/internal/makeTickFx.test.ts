@@ -1,0 +1,71 @@
+import { Effect, Ref } from "effect";
+import { describe, expect, it } from "vitest";
+
+import { RuntimeFx } from "~/engine/runtime/context/RuntimeFx";
+import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import { makeTickServiceFx } from "~/engine/tick/internal/makeTickServiceFx";
+import { TickStepMs } from "~/engine/tick/TickStepMs";
+
+const makeEmptyRuntime = (): RuntimeSchema.Type => ({
+	cheats: {
+		enabled: false,
+		everEnabled: false,
+		instantGameplay: false,
+	},
+	currentSpace: 0,
+	items: [],
+	jobs: [],
+	jobQueue: [],
+});
+
+describe("makeTickFx idle scheduling", () => {
+	it("reuses a stable proof until an external runtime replacement re-arms advancement", () => {
+		const result = Effect.runSync(
+			Effect.gen(function* () {
+				const runtimeRef = yield* Ref.make(makeEmptyRuntime());
+				const elapsedBudgets = yield* Ref.make<number[]>([]);
+				const tick = yield* makeTickServiceFx({
+					advanceRuntimeElapsed: ({ elapsedMs }) =>
+						Effect.gen(function* () {
+							yield* Ref.update(elapsedBudgets, (budgets) => [
+								...budgets,
+								elapsedMs,
+							]);
+							return {
+								stableRuntime: yield* Ref.get(runtimeRef),
+							};
+						}),
+				}).pipe(
+					Effect.provideService(RuntimeFx, {
+						read: Ref.get(runtimeRef),
+					}),
+				);
+
+				yield* tick.advanceRuntimeBy(TickStepMs);
+				yield* tick.advanceRuntimeBy(TickStepMs * 3);
+				const afterStableIdle = yield* Ref.get(elapsedBudgets);
+
+				const replacement = {
+					...(yield* Ref.get(runtimeRef)),
+				};
+				yield* Ref.set(runtimeRef, replacement);
+				yield* tick.advanceRuntimeBy(TickStepMs);
+
+				return {
+					afterRearm: yield* Ref.get(elapsedBudgets),
+					afterStableIdle,
+					state: yield* tick.read,
+				};
+			}),
+		);
+
+		expect(result.afterStableIdle).toEqual([
+			TickStepMs,
+		]);
+		expect(result.afterRearm).toEqual([
+			TickStepMs,
+			TickStepMs,
+		]);
+		expect(result.state.pendingElapsedMs).toBe(0);
+	});
+});

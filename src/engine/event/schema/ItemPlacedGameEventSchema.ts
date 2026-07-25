@@ -3,6 +3,7 @@ import { z } from "zod";
 import { IdSchema } from "~/engine/common/schema/IdSchema";
 import { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 import { InputLocationSchema } from "~/engine/location/schema/InputLocationSchema";
+import { InventoryLocationSchema } from "~/engine/location/schema/InventoryLocationSchema";
 import { ReservedLocationSchema } from "~/engine/location/schema/ReservedLocationSchema";
 import { GameEventEnumSchema } from "./GameEventEnumSchema";
 
@@ -18,6 +19,7 @@ export const ItemPlacedGameEventSchema = z
 		previousLocation: z.union([
 			InputLocationSchema,
 			ReservedLocationSchema,
+			InventoryLocationSchema,
 		]),
 		location: GridLocationSchema,
 		quantity: z.number().int().positive(),
@@ -26,7 +28,7 @@ export const ItemPlacedGameEventSchema = z
 	.meta({
 		id: "ItemPlacedGameEventSchema",
 		description:
-			"Transient fact that one existing exact runtime identity became visible from one exact visible origin identity at a canonical grid anchor.",
+			"Transient fact that one existing exact runtime identity became visible from a buffered, reserved, or Inventory origin at a canonical grid anchor.",
 	});
 
 export type ItemPlacedGameEventSchema = typeof ItemPlacedGameEventSchema;

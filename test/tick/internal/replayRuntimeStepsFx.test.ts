@@ -87,6 +87,7 @@ describe("replayRuntimeStepsFx", () => {
 
 		expect(result.replay.runtime).toBe(result.runtime);
 		expect(result.replay.events).toEqual([]);
+		expect(result.replay.isStable).toBe(true);
 		expect(result.replay.processedSteps).toBe(1);
 		expect(result.replay.skippedSteps).toBe(hourMs / TickStepMs - 1);
 	});
@@ -118,6 +119,7 @@ describe("replayRuntimeStepsFx", () => {
 
 		expect(result.replay.runtime).toBe(result.runtime);
 		expect(result.replay.runtime.jobs[0]?.remainingMs).toBe(1_000);
+		expect(result.replay.isStable).toBe(true);
 		expect(result.replay.processedSteps).toBe(1);
 		expect(result.replay.skippedSteps).toBe(hourMs / TickStepMs - 1);
 	});
@@ -149,6 +151,7 @@ describe("replayRuntimeStepsFx", () => {
 
 		expect(summarizeRuntime(result.replay.runtime)).toEqual(summarizeRuntime(result.literal));
 		expect(result.replay.runtime.jobs).toEqual([]);
+		expect(result.replay.isStable).toBe(true);
 		expect(result.replay.processedSteps).toBe(6);
 		expect(result.replay.skippedSteps).toBe(hourMs / TickStepMs - 6);
 	});

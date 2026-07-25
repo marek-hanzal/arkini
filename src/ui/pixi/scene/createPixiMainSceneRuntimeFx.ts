@@ -30,7 +30,6 @@ export namespace createPixiMainSceneRuntimeFx {
 			origin: HTMLElement,
 		) => void | PromiseLike<void>;
 		readonly onDrop: (command: runTileDropAtom.Command) => PromiseLike<runTileDropAtom.Result>;
-		readonly semanticHost: HTMLElement;
 		readonly textures: PixiTextureStore;
 	}
 }
@@ -42,12 +41,10 @@ export const createPixiMainSceneRuntimeFx = Effect.fn("createPixiMainSceneRuntim
 	host,
 	onActivate,
 	onDrop,
-	semanticHost,
 	textures,
 }: createPixiMainSceneRuntimeFx.Props) {
 	const application = yield* createPixiApplicationOwnerFx({
 		host,
-		label: `${game.config.meta.title} board`,
 	});
 	const rollbackEffects: Effect.Effect<void, unknown>[] = [];
 	const registerRollback = (closeFx: Effect.Effect<void, unknown>) => {
@@ -128,7 +125,6 @@ export const createPixiMainSceneRuntimeFx = Effect.fn("createPixiMainSceneRuntim
 			magneticField,
 			motion,
 			readPalette: () => paletteState.current,
-			semanticHost,
 			surface,
 			textures,
 		});

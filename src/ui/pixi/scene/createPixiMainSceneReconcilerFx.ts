@@ -20,7 +20,6 @@ import type { PixiApplicationOwner } from "~/ui/pixi/runtime/PixiApplicationOwne
 import type { PixiTextureStore } from "~/ui/pixi/runtime/createPixiTextureStoreFx";
 import type { PixiMainSceneReconciler } from "~/ui/pixi/scene/PixiMainSceneReconciler";
 import type { PixiMainSceneSurface } from "~/ui/pixi/scene/PixiMainSceneSurface";
-import { renderPixiTileSemanticListFx } from "~/ui/pixi/semantic/renderPixiTileSemanticListFx";
 
 export namespace createPixiMainSceneReconcilerFx {
 	export interface Props {
@@ -32,7 +31,6 @@ export namespace createPixiMainSceneReconcilerFx {
 		readonly magneticField: PixiTileMagneticField;
 		readonly motion: PixiTileMotionRuntime;
 		readonly readPalette: () => PixiScenePalette;
-		readonly semanticHost: HTMLElement;
 		readonly surface: PixiMainSceneSurface;
 		readonly textures: PixiTextureStore;
 	}
@@ -64,7 +62,6 @@ export const createPixiMainSceneReconcilerFx = Effect.fn("createPixiMainSceneRec
 		magneticField,
 		motion,
 		readPalette,
-		semanticHost,
 		surface,
 		textures,
 	}: createPixiMainSceneReconcilerFx.Props) {
@@ -322,10 +319,6 @@ export const createPixiMainSceneReconcilerFx = Effect.fn("createPixiMainSceneRec
 			yield* magneticField.pruneFx;
 			yield* motion.syncQuantitiesFx;
 			yield* motion.startFx;
-			yield* renderPixiTileSemanticListFx({
-				host: semanticHost,
-				items: visibleItems.values(),
-			});
 		});
 
 		return {
@@ -337,7 +330,6 @@ export const createPixiMainSceneReconcilerFx = Effect.fn("createPixiMainSceneRec
 				closed = true;
 				processedCueKeys.clear();
 				processedReplacementKeys.clear();
-				semanticHost.replaceChildren();
 			}),
 		} satisfies PixiMainSceneReconciler;
 	},

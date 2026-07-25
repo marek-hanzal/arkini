@@ -379,8 +379,7 @@ const mountScene = async ({
 		},
 	});
 	const host = document.createElement("div");
-	const semanticHost = document.createElement("div");
-	tileScene.append(host, semanticHost);
+	tileScene.append(host);
 	document.body.append(tileScene);
 	const runtime = await Effect.runPromise(
 		createPixiInventorySceneRuntimeFx({
@@ -388,7 +387,6 @@ const mountScene = async ({
 			host,
 			onActivate,
 			onDrop,
-			semanticHost,
 			textures: {} as never,
 		}),
 	);

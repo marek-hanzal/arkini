@@ -8,7 +8,6 @@ import { createDemandFrameLoopFx } from "~/ui/pixi/runtime/createDemandFrameLoop
 export namespace createPixiApplicationOwnerFx {
 	export interface Props {
 		readonly host: HTMLElement;
-		readonly label: string;
 	}
 }
 
@@ -22,7 +21,7 @@ Ticker.system.stop();
 
 /** Acquires one explicitly rendered Pixi application and its DOM/resize lifecycle. */
 export const createPixiApplicationOwnerFx = Effect.fn("createPixiApplicationOwnerFx")(
-	({ host, label }: createPixiApplicationOwnerFx.Props) => {
+	({ host }: createPixiApplicationOwnerFx.Props) => {
 		const app = new Application();
 		const hostGeneration = (hostGenerations.get(host) ?? 0) + 1;
 		hostGenerations.set(host, hostGeneration);
@@ -70,11 +69,8 @@ export const createPixiApplicationOwnerFx = Effect.fn("createPixiApplicationOwne
 					new Error("A newer Pixi application already owns this host."),
 				);
 			}
-			app.canvas.setAttribute("aria-hidden", "true");
-			app.canvas.setAttribute("role", "presentation");
-			app.canvas.title = label;
 			app.canvas.dataset.ui = "PixiCanvas";
-			app.canvas.className = "block size-full touch-none outline-none";
+			app.canvas.className = "block size-full touch-none";
 			host.replaceChildren(app.canvas);
 
 			const frames = yield* createDemandFrameLoopFx({

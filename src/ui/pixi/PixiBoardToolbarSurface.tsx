@@ -26,7 +26,6 @@ export const PixiBoardToolbarSurface = () => {
 		mode: "promise",
 	});
 	const hostRef = useRef<HTMLDivElement>(null);
-	const semanticHostRef = useRef<HTMLDivElement>(null);
 	const runtimeRef = useRef<PixiMainSceneRuntime | null>(null);
 	const interactionBlockedRef = useRef(false);
 	const interactionBlocked = gameMenu.isOpen || inventory.isOpen || itemDetail.isOpen;
@@ -129,8 +128,7 @@ export const PixiBoardToolbarSurface = () => {
 
 	useLayoutEffect(() => {
 		const host = hostRef.current;
-		const semanticHost = semanticHostRef.current;
-		if (host === null || semanticHost === null) return;
+		if (host === null) return;
 		let cancelled = false;
 		let runtime: PixiMainSceneRuntime | null = null;
 		let unregisterInteraction: () => void = () => undefined;
@@ -141,7 +139,6 @@ export const PixiBoardToolbarSurface = () => {
 				host,
 				onActivate: activate,
 				onDrop: runDrop,
-				semanticHost,
 				textures,
 			}),
 		)
@@ -194,19 +191,10 @@ export const PixiBoardToolbarSurface = () => {
 	]);
 
 	return (
-		<>
-			<div
-				ref={hostRef}
-				className="size-full min-h-0 min-w-0"
-				data-ui="PixiBoardToolbarSurface"
-			/>
-			<div
-				ref={semanticHostRef}
-				aria-label="Visible Board and Toolbar items"
-				className="sr-only"
-				data-ui="PixiBoardToolbarSemantics"
-				role="region"
-			/>
-		</>
+		<div
+			ref={hostRef}
+			className="size-full min-h-0 min-w-0"
+			data-ui="PixiBoardToolbarSurface"
+		/>
 	);
 };

@@ -13,7 +13,6 @@ import type { PixiTextureStore } from "~/ui/pixi/runtime/createPixiTextureStoreF
 import type { PixiInventorySceneRuntime } from "~/ui/pixi/scene/PixiInventorySceneRuntime";
 import type { PixiInventorySceneSurface } from "~/ui/pixi/scene/PixiInventorySceneSurface";
 import { createPixiInventorySceneSurfaceFx } from "~/ui/pixi/scene/createPixiInventorySceneSurfaceFx";
-import { renderPixiTileSemanticListFx } from "~/ui/pixi/semantic/renderPixiTileSemanticListFx";
 
 export namespace createPixiInventorySceneRuntimeFx {
 	export interface Props {
@@ -30,7 +29,6 @@ export namespace createPixiInventorySceneRuntimeFx {
 			},
 		) => void | PromiseLike<unknown>;
 		readonly onDrop: (command: runTileDropAtom.Command) => PromiseLike<runTileDropAtom.Result>;
-		readonly semanticHost: HTMLElement;
 		readonly textures: PixiTextureStore;
 	}
 }
@@ -44,12 +42,10 @@ export const createPixiInventorySceneRuntimeFx = Effect.fn("createPixiInventoryS
 		host,
 		onActivate,
 		onDrop,
-		semanticHost,
 		textures,
 	}: createPixiInventorySceneRuntimeFx.Props) {
 		const application = yield* createPixiApplicationOwnerFx({
 			host,
-			label: "Inventory items",
 		});
 		let surface: PixiInventorySceneSurface | null = null;
 		let actorStore: PixiInventoryActorStore | null = null;
@@ -81,7 +77,6 @@ export const createPixiInventorySceneRuntimeFx = Effect.fn("createPixiInventoryS
 			if (drag !== null) yield* ignoreCleanupFailure(drag.closeFx);
 			if (actorStore !== null) yield* ignoreCleanupFailure(actorStore.closeFx);
 			if (surface !== null) yield* ignoreCleanupFailure(surface.closeFx);
-			yield* ignoreCleanupFailure(Effect.sync(() => semanticHost.replaceChildren()));
 			yield* ignoreCleanupFailure(application.closeFx);
 		});
 
@@ -123,12 +118,6 @@ export const createPixiInventorySceneRuntimeFx = Effect.fn("createPixiInventoryS
 					RendererRuntime.runSync(createdDrag.attachActorFx(actor));
 				}
 				RendererRuntime.runSync(createdDrag.refreshPreviewFx);
-				RendererRuntime.runSync(
-					renderPixiTileSemanticListFx({
-						host: semanticHost,
-						items: result.items,
-					}),
-				);
 			};
 			replayCurrentTransition = () => reconcile(game.getTransitionSnapshot());
 

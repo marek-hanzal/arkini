@@ -25,7 +25,6 @@ export const PixiInventorySurface = () => {
 		mode: "promise",
 	});
 	const hostRef = useRef<HTMLDivElement>(null);
-	const semanticHostRef = useRef<HTMLDivElement>(null);
 	const controlsRef = useRef({
 		handoffs,
 		itemDetail,
@@ -79,8 +78,7 @@ export const PixiInventorySurface = () => {
 
 	useLayoutEffect(() => {
 		const host = hostRef.current;
-		const semanticHost = semanticHostRef.current;
-		if (host === null || semanticHost === null) return;
+		if (host === null) return;
 		const tileScene = host.closest<HTMLElement>('[data-ui="TileScene"]');
 		const mainLayout = RendererRuntime.runSync(
 			readPixiMainSceneLayoutFx({
@@ -105,7 +103,6 @@ export const PixiInventorySurface = () => {
 				host,
 				onActivate: activate,
 				onDrop: runDrop,
-				semanticHost,
 				textures,
 			}),
 		)
@@ -142,19 +139,10 @@ export const PixiInventorySurface = () => {
 	]);
 
 	return (
-		<>
-			<div
-				ref={hostRef}
-				className="size-full min-h-0 min-w-0"
-				data-ui="PixiInventorySurface"
-			/>
-			<div
-				ref={semanticHostRef}
-				aria-label="Visible Inventory items"
-				className="sr-only"
-				data-ui="PixiInventorySemantics"
-				role="region"
-			/>
-		</>
+		<div
+			ref={hostRef}
+			className="size-full min-h-0 min-w-0"
+			data-ui="PixiInventorySurface"
+		/>
 	);
 };

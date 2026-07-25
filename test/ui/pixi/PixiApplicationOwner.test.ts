@@ -73,13 +73,11 @@ describe("Pixi application owner", () => {
 		const first = Effect.runPromise(
 			createPixiApplicationOwnerFx({
 				host,
-				label: "first",
 			}),
 		);
 		const second = Effect.runPromise(
 			createPixiApplicationOwnerFx({
 				host,
-				label: "second",
 			}),
 		);
 		const firstApp = applicationState.instances.at(-2);
@@ -91,6 +89,9 @@ describe("Pixi application owner", () => {
 		secondApp.resolveInit();
 		const secondOwner = await second;
 		expect(host.firstElementChild).toBe(secondApp.canvas);
+		expect(secondApp.canvas.getAttribute("title")).toBeNull();
+		expect(secondApp.canvas.getAttribute("role")).toBeNull();
+		expect(secondApp.canvas.getAttribute("aria-hidden")).toBeNull();
 
 		firstApp.resolveInit();
 		await expect(first).rejects.toThrow("newer Pixi application");

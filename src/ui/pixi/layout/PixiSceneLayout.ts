@@ -17,7 +17,7 @@ export interface PixiMainSceneLayout {
 }
 
 export interface PixiInventorySceneLayout {
-	/** Inventory slot geometry may be denser than the Board presentation. */
+	/** Inventory actors and slots share the Board-derived cell scale. */
 	readonly actorSize: number;
 	readonly surface: PixiGridSurfaceLayout;
 }

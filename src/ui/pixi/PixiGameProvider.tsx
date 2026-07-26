@@ -6,7 +6,7 @@ import { createTileSceneHandoffStoreFx } from "~/ui/pixi/handoff/createTileScene
 import { createPixiGameInteractionControlFx } from "~/ui/pixi/runtime/createPixiGameInteractionControlFx";
 import { createPixiTextureStoreFx } from "~/ui/pixi/runtime/createPixiTextureStoreFx";
 
-/** Owns route-local capabilities shared across the main and Inventory Pixi canvases. */
+/** Owns scene-layout capabilities retained while Board and Inventory leaves alternate. */
 export const PixiGameProvider = ({ children }: PropsWithChildren) => {
 	const handoffs = useMemo(() => RendererRuntime.runSync(createTileSceneHandoffStoreFx()), []);
 	const interaction = useMemo(

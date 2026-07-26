@@ -54,28 +54,28 @@ describe("Pixi scene layout", () => {
 		expect(layout.toolbar?.width).toBe(552);
 	});
 
-	it("centers the isolated Inventory grid inside its modal canvas", () => {
+	it("centers Inventory at its preferred Board cell scale without enlarging it", () => {
 		const layout = Effect.runSync(
 			readPixiInventorySceneLayoutFx({
-				actorSize: 96,
 				columns: 5,
 				height: 480,
+				preferredCellSize: 96,
 				rows: 4,
 				width: 800,
 			}),
 		);
 
 		expect(layout.actorSize).toBe(96);
-		expect(layout.surface.cellSize).toBe(120);
+		expect(layout.surface.cellSize).toBe(96);
 		expect(layout.surface).toMatchObject({
-			height: 480,
-			width: 600,
-			x: 100,
-			y: 0,
+			height: 384,
+			width: 480,
+			x: 160,
+			y: 48,
 		});
 	});
 
-	it("keeps the Board actor size independent from Inventory slot density", () => {
+	it("uses the same size for Inventory cells and their Board-style actors", () => {
 		const main = Effect.runSync(
 			readPixiMainSceneLayoutFx({
 				boardHeight: 7,
@@ -87,33 +87,32 @@ describe("Pixi scene layout", () => {
 		);
 		const inventory = Effect.runSync(
 			readPixiInventorySceneLayoutFx({
-				actorSize: main.board.cellSize,
 				columns: 5,
 				height: 480,
+				preferredCellSize: main.board.cellSize,
 				rows: 4,
 				width: 800,
 			}),
 		);
 
-		expect(inventory.surface.cellSize).toBe(120);
+		expect(inventory.surface.cellSize).toBe(main.board.cellSize);
 		expect(inventory.actorSize).toBe(main.board.cellSize);
-		expect(inventory.actorSize).not.toBe(inventory.surface.cellSize);
 	});
 
-	it("lets a dense Inventory overflow instead of shrinking Board-sized actors", () => {
+	it("shrinks a dense Inventory only when Board-sized cells cannot fit", () => {
 		const layout = Effect.runSync(
 			readPixiInventorySceneLayoutFx({
-				actorSize: 96,
 				columns: 9,
 				height: 240,
+				preferredCellSize: 96,
 				rows: 6,
 				width: 360,
 			}),
 		);
 
-		expect(layout.actorSize).toBe(96);
-		expect(layout.surface.cellSize).toBe(96);
-		expect(layout.surface.width).toBe(864);
-		expect(layout.surface.height).toBe(576);
+		expect(layout.actorSize).toBe(40);
+		expect(layout.surface.cellSize).toBe(40);
+		expect(layout.surface.width).toBe(360);
+		expect(layout.surface.height).toBe(240);
 	});
 });

@@ -10,10 +10,9 @@ import { runTileDropAtom } from "~/bridge/tile/runTileDropAtom";
 import { useItemDetailControl } from "~/ui/item-detail/useItemDetailControl";
 import type { PixiInventorySceneRuntime } from "~/ui/pixi/scene/PixiInventorySceneRuntime";
 import { createPixiInventorySceneRuntimeFx } from "~/ui/pixi/scene/createPixiInventorySceneRuntimeFx";
-import { readPixiMainSceneLayoutFx } from "~/ui/pixi/layout/readPixiMainSceneLayoutFx";
 import { usePixiGameRuntime } from "~/ui/pixi/usePixiGameRuntime";
 
-/** Mounts the isolated Inventory Pixi scene inside React-owned modal chrome. */
+/** Mounts the routed full-screen Inventory Pixi scene. */
 export const PixiInventorySurface = () => {
 	const game = useGameEngine();
 	const itemDetail = useItemDetailControl();
@@ -79,21 +78,6 @@ export const PixiInventorySurface = () => {
 	useLayoutEffect(() => {
 		const host = hostRef.current;
 		if (host === null) return;
-		const tileScene = host.closest<HTMLElement>('[data-ui="TileScene"]');
-		const mainLayout = RendererRuntime.runSync(
-			readPixiMainSceneLayoutFx({
-				boardHeight: game.config.meta.board.height,
-				boardWidth: game.config.meta.board.width,
-				height: Math.max(
-					1,
-					tileScene?.clientHeight ?? document.documentElement.clientHeight,
-				),
-				toolbarSize: game.config.meta.toolbarSize ?? 0,
-				width: Math.max(1, tileScene?.clientWidth ?? document.documentElement.clientWidth),
-			}),
-		);
-		host.style.minWidth = `${mainLayout.board.cellSize * game.config.meta.inventory.width}px`;
-		host.style.minHeight = `${mainLayout.board.cellSize * game.config.meta.inventory.height}px`;
 		let cancelled = false;
 		let runtime: PixiInventorySceneRuntime | null = null;
 		let unregisterInteraction: () => void = () => undefined;

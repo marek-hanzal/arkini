@@ -48,8 +48,7 @@ interface ActiveInventoryDrag {
 	readonly sourceItem: TileActorItem;
 	readonly startX: number;
 	readonly startY: number;
-	awaitingCommand: boolean;
-	started: boolean;
+	phase: "dragging" | "pressed" | "submitting";
 	target: PixiInventoryDropTarget | null;
 }
 
@@ -179,7 +178,7 @@ export const createPixiInventoryDragControllerFx = Effect.fn("createPixiInventor
 
 		const cancelInteraction = () => {
 			const drag = activeDrag;
-			if (drag === null || drag.awaitingCommand) return;
+			if (drag === null || drag.phase === "submitting") return;
 			releasePointerCapture(drag.pointerId);
 			activeDrag = null;
 			RendererRuntime.runSync(surface.renderDropFeedbackFx(null, null));
@@ -188,14 +187,18 @@ export const createPixiInventoryDragControllerFx = Effect.fn("createPixiInventor
 
 		const onPointerMove = (event: FederatedPointerEvent) => {
 			const drag = activeDrag;
-			if (drag === null || drag.awaitingCommand || event.pointerId !== drag.pointerId) {
+			if (
+				drag === null ||
+				drag.phase === "submitting" ||
+				event.pointerId !== drag.pointerId
+			) {
 				return;
 			}
 			const offsetX = event.global.x - drag.pressX;
 			const offsetY = event.global.y - drag.pressY;
-			if (!drag.started && Math.hypot(offsetX, offsetY) < dragThreshold) return;
-			if (!drag.started) {
-				drag.started = true;
+			if (drag.phase === "pressed" && Math.hypot(offsetX, offsetY) < dragThreshold) return;
+			if (drag.phase === "pressed") {
+				drag.phase = "dragging";
 				drag.actor.dragging = true;
 				drag.actor.container.cursor = "grabbing";
 				surface.actorLayer.addChild(drag.actor.container);
@@ -212,11 +215,15 @@ export const createPixiInventoryDragControllerFx = Effect.fn("createPixiInventor
 
 		const finishPointer = (event: FederatedPointerEvent) => {
 			const drag = activeDrag;
-			if (drag === null || drag.awaitingCommand || event.pointerId !== drag.pointerId) {
+			if (
+				drag === null ||
+				drag.phase === "submitting" ||
+				event.pointerId !== drag.pointerId
+			) {
 				return;
 			}
 			releasePointerCapture(event.pointerId);
-			if (!drag.started) {
+			if (drag.phase === "pressed") {
 				activeDrag = null;
 				activateActor(drag.actor, event.shiftKey);
 				return;
@@ -227,7 +234,7 @@ export const createPixiInventoryDragControllerFx = Effect.fn("createPixiInventor
 			// The occupant may have changed while the pointer remained over this slot.
 			previewTarget(drag, target, true);
 			RendererRuntime.runSync(surface.renderDropFeedbackFx(null, null));
-			drag.awaitingCommand = true;
+			drag.phase = "submitting";
 			drag.actor.container.cursor = "progress";
 			const command = {
 				sourceItemId: drag.sourceItem.id,
@@ -287,7 +294,11 @@ export const createPixiInventoryDragControllerFx = Effect.fn("createPixiInventor
 
 		const cancelPointer = (event: FederatedPointerEvent) => {
 			const drag = activeDrag;
-			if (drag === null || drag.awaitingCommand || event.pointerId !== drag.pointerId) {
+			if (
+				drag === null ||
+				drag.phase === "submitting" ||
+				event.pointerId !== drag.pointerId
+			) {
 				return;
 			}
 			activeDrag = null;
@@ -320,12 +331,11 @@ export const createPixiInventoryDragControllerFx = Effect.fn("createPixiInventor
 						}
 						activeDrag = {
 							actor,
-							awaitingCommand: false,
 							pointerId: event.pointerId,
 							pressX: event.global.x,
 							pressY: event.global.y,
+							phase: "pressed",
 							sourceItem: actor.item,
-							started: false,
 							startX: actor.container.x,
 							startY: actor.container.y,
 							target: null,
@@ -349,7 +359,7 @@ export const createPixiInventoryDragControllerFx = Effect.fn("createPixiInventor
 			}),
 			refreshPreviewFx: Effect.sync(() => {
 				const drag = activeDrag;
-				if (drag === null || !drag.started || drag.awaitingCommand) return;
+				if (drag === null || drag.phase !== "dragging") return;
 				previewTarget(drag, drag.target, true);
 			}),
 			removeActorFx: Effect.fn("PixiInventoryDragController.removeActorFx")((actor) =>

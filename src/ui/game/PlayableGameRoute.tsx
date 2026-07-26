@@ -4,7 +4,7 @@ import { useGameEngine } from "~/bridge/game/useGameEngine";
 import { GameAudio } from "~/ui/audio/GameAudio";
 import { CheatItemSpawnProvider } from "~/ui/cheat-spotlight/CheatItemSpawnProvider";
 
-/** Mounts exact-Game React resources only for playable board and cheat routes. */
+/** Mounts exact-Game React resources only for playable scene and cheat routes. */
 export const PlayableGameRoute = ({ children }: PropsWithChildren) => {
 	const game = useGameEngine();
 	return (

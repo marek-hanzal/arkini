@@ -56,37 +56,28 @@ export const createPixiInventorySceneSurfaceFx = Effect.fn("createPixiInventoryS
 		application.stage.eventMode = "static";
 		let closed = false;
 
-		const readBoardActorSize = () => {
-			const tileScene = host.closest<HTMLElement>('[data-ui="TileScene"]');
-			const sceneWidth = Math.max(
-				1,
-				tileScene?.clientWidth ?? document.documentElement.clientWidth,
-			);
-			const sceneHeight = Math.max(
-				1,
-				tileScene?.clientHeight ?? document.documentElement.clientHeight,
-			);
-			return RendererRuntime.runSync(
+		const createLayout = () => {
+			const width = Math.max(1, application.app.screen.width);
+			const height = Math.max(1, application.app.screen.height);
+			const preferredCellSize = RendererRuntime.runSync(
 				readPixiMainSceneLayoutFx({
 					boardHeight: game.config.meta.board.height,
 					boardWidth: game.config.meta.board.width,
-					height: sceneHeight,
+					height,
 					toolbarSize: game.config.meta.toolbarSize ?? 0,
-					width: sceneWidth,
+					width,
 				}),
 			).board.cellSize;
-		};
-
-		const createLayout = () =>
-			RendererRuntime.runSync(
+			return RendererRuntime.runSync(
 				readPixiInventorySceneLayoutFx({
-					actorSize: readBoardActorSize(),
 					columns: game.config.meta.inventory.width,
-					height: application.app.screen.height,
+					height,
+					preferredCellSize,
 					rows: game.config.meta.inventory.height,
-					width: application.app.screen.width,
+					width,
 				}),
 			);
+		};
 
 		let layout: PixiInventorySceneLayout = createLayout();
 

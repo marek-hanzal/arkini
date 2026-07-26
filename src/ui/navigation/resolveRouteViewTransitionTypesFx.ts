@@ -1,9 +1,12 @@
+import { Effect } from "effect";
+
 type VisualRouteId =
 	| "about"
 	| "action"
 	| "arkpacks"
 	| "board"
 	| "cheats"
+	| "inventory"
 	| "main-menu"
 	| "settings"
 	| "startup";
@@ -11,6 +14,7 @@ type VisualRouteId =
 const gameBoardPattern = /^\/game\/[^/]+\/board\/?$/;
 const gameActionPattern = /^\/game\/[^/]+\/action\/[^/]+\/?$/;
 const gameCheatsPattern = /^\/game\/[^/]+\/cheats\/?$/;
+const gameInventoryPattern = /^\/game\/[^/]+\/inventory\/?$/;
 
 const resolveVisualRouteId = (pathname: string): VisualRouteId => {
 	if (pathname === "/") return "startup";
@@ -20,11 +24,13 @@ const resolveVisualRouteId = (pathname: string): VisualRouteId => {
 	if (pathname === "/arkpacks") return "arkpacks";
 	if (gameBoardPattern.test(pathname)) return "board";
 	if (gameCheatsPattern.test(pathname)) return "cheats";
+	if (gameInventoryPattern.test(pathname)) return "inventory";
 	if (pathname.startsWith("/action/") || gameActionPattern.test(pathname)) return "action";
 	throw new Error(`Missing View Transition classification for route: ${pathname}`);
 };
 
-const isHeroRoute = (route: VisualRouteId) => route !== "board" && route !== "cheats";
+const isHeroRoute = (route: VisualRouteId) =>
+	route !== "board" && route !== "cheats" && route !== "inventory";
 
 /** Selects one explicit pair plus one broad scene relationship for every visible route change. */
 export const resolveRouteViewTransitionTypesFx = Effect.fn("resolveRouteViewTransitionTypesFx")(
@@ -44,6 +50,13 @@ export const resolveRouteViewTransitionTypesFx = Effect.fn("resolveRouteViewTran
 				return false;
 			const from = resolveVisualRouteId(fromLocation.pathname);
 			const to = resolveVisualRouteId(toLocation.pathname);
+			// Both leaves share one live GameShell background; a native snapshot would cover it.
+			if (
+				(from === "board" && to === "inventory") ||
+				(from === "inventory" && to === "board")
+			) {
+				return false;
+			}
 			const sceneRelationship = isHeroRoute(from)
 				? isHeroRoute(to)
 					? "hero-to-hero"
@@ -64,4 +77,3 @@ export const resolveRouteViewTransitionTypesFx = Effect.fn("resolveRouteViewTran
 					];
 		}),
 );
-import { Effect } from "effect";

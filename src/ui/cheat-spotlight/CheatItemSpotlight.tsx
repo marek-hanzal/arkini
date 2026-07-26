@@ -14,7 +14,6 @@ import { useGameCheats } from "~/bridge/cheat/useGameCheats";
 import { useCheatAvailability } from "~/ui/cheat-availability/useCheatAvailability";
 import { useCheatItemSpawn } from "~/ui/cheat-spotlight/useCheatItemSpawn";
 import { useGameMenuControl } from "~/ui/game-menu/useGameMenuControl";
-import { useInventoryControl } from "~/ui/inventory/useInventoryControl";
 import { useItemDetailControl } from "~/ui/item-detail/useItemDetailControl";
 import { useFuseSearch } from "~/ui/search/useFuseSearch";
 
@@ -42,7 +41,6 @@ export const CheatItemSpotlight = ({
 	const cheatAvailability = useCheatAvailability();
 	const catalog = useCheatItemCatalog(game);
 	const gameMenu = useGameMenuControl();
-	const inventory = useInventoryControl();
 	const itemDetail = useItemDetailControl();
 	const spawn = useCheatItemSpawn();
 	const spawnError = spawn.state.kind === "error" ? spawn.state.error : undefined;
@@ -92,7 +90,7 @@ export const CheatItemSpotlight = ({
 					];
 		})
 		.slice(0, maxVisibleResults);
-	const blockedByHigherOwner = gameMenu.isOpen || inventory.isOpen || itemDetail.isOpen;
+	const blockedByHigherOwner = gameMenu.isOpen || itemDetail.isOpen;
 	const available = cheatAvailability.available && cheats.enabled && !blockedByHigherOwner;
 	const closeSpotlight = useCallback(
 		(restoreFocus = true) => {

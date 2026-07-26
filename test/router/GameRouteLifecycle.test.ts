@@ -171,6 +171,31 @@ describe("game route lifecycle", () => {
 		expect(available.router.state.location.pathname).toBe("/game/package-route/cheats");
 	});
 
+	it("keeps the exact parent Game while Board and Inventory leaves alternate", async () => {
+		const game = createGame();
+		const { rendererRuntime, resource, router } = await createHarness(
+			"/game/package-route/board",
+			game,
+		);
+		const engine = resource.game;
+		await router.load();
+
+		await router.navigate({
+			to: "/game/$packageId/inventory",
+			params: {
+				packageId: "package-route",
+			},
+		});
+
+		const sceneMatch = router.state.matches.find(
+			(match) => match.routeId === "/game/$packageId/_scene",
+		);
+		expect(sceneMatch).toBeDefined();
+		expect(resource.game).toBe(engine);
+		expect(rendererRuntime.runSync(readCurrentGameEngineResourceFx())).toBe(resource);
+		expect(router.state.location.pathname).toBe("/game/package-route/inventory");
+	});
+
 	it("preserves the current Game while standalone Settings is open", async () => {
 		vi.useFakeTimers();
 		const dispose = vi.fn();

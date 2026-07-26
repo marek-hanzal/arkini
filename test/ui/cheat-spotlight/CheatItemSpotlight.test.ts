@@ -69,11 +69,6 @@ vi.mock("~/ui/game-menu/useGameMenuControl", () => ({
 		isOpen: false,
 	}),
 }));
-vi.mock("~/ui/inventory/useInventoryControl", () => ({
-	useInventoryControl: () => ({
-		isOpen: false,
-	}),
-}));
 vi.mock("~/ui/item-detail/useItemDetailControl", () => ({
 	useItemDetailControl: () => ({
 		isOpen: false,

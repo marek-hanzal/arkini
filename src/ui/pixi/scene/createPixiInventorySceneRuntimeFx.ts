@@ -35,7 +35,7 @@ export namespace createPixiInventorySceneRuntimeFx {
 
 type GameTransition = ReturnType<GameEngine["getTransitionSnapshot"]>;
 
-/** Composes the modal-local Pixi owners and their exact disposal order. */
+/** Composes the routed Inventory Pixi owners and their exact disposal order. */
 export const createPixiInventorySceneRuntimeFx = Effect.fn("createPixiInventorySceneRuntimeFx")(
 	function* ({
 		game,

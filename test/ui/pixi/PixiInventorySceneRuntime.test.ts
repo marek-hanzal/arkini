@@ -6,6 +6,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { GameEngine } from "~/bridge/game/GameEngine";
 import type { TileActorItem } from "~/bridge/tile/TileActorItem";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
+import { readPixiInventorySceneLayoutFx } from "~/ui/pixi/layout/readPixiInventorySceneLayoutFx";
 import { readPixiMainSceneLayoutFx } from "~/ui/pixi/layout/readPixiMainSceneLayoutFx";
 import type { PixiApplicationOwner } from "~/ui/pixi/runtime/PixiApplicationOwner";
 import { createPixiInventorySceneRuntimeFx } from "~/ui/pixi/scene/createPixiInventorySceneRuntimeFx";
@@ -234,8 +235,16 @@ vi.mock("~/bridge/tile/readTileDropPreviewFx", async () => {
 		readTileDropPreviewFx: (props: unknown) =>
 			EffectModule.sync(() => {
 				sceneState.preview(props);
+				const target = (
+					props as {
+						readonly target?: {
+							readonly kind?: string;
+							readonly occupant?: unknown;
+						};
+					}
+				).target;
 				return {
-					kind: "move",
+					kind: target?.kind === "slot" && target.occupant !== null ? "swap" : "move",
 				};
 			}),
 	};
@@ -304,6 +313,22 @@ const inventoryItem = {
 	title: "Water",
 } satisfies TileActorItem;
 
+const inventoryTargetItem = {
+	...inventoryItem,
+	id: "runtime:stone",
+	itemId: "stone",
+	location: {
+		scope: "inventory",
+		position: {
+			x: 1,
+			y: 0,
+		},
+	},
+	revision: "revision:stone",
+	sourceUrl: "resource:stone",
+	title: "Stone",
+} satisfies TileActorItem;
+
 const pointer = (x: number, y: number, shiftKey = false): FakePointerEvent => ({
 	button: 0,
 	global: {
@@ -315,6 +340,36 @@ const pointer = (x: number, y: number, shiftKey = false): FakePointerEvent => ({
 	shiftKey,
 	stopPropagation: vi.fn(),
 });
+
+const readTestInventoryLayout = () => {
+	const preferredCellSize = Effect.runSync(
+		readPixiMainSceneLayoutFx({
+			boardHeight: 7,
+			boardWidth: 11,
+			height: 480,
+			toolbarSize: 8,
+			width: 800,
+		}),
+	).board.cellSize;
+	return Effect.runSync(
+		readPixiInventorySceneLayoutFx({
+			columns: 5,
+			height: 480,
+			preferredCellSize,
+			rows: 4,
+			width: 800,
+		}),
+	);
+};
+
+const slotPointer = (x: number, shiftKey = false) => {
+	const { surface } = readTestInventoryLayout();
+	return pointer(
+		surface.x + (x + 0.5) * surface.cellSize,
+		surface.y + surface.cellSize * 0.5,
+		shiftKey,
+	);
+};
 
 const flushMicrotasks = async () => {
 	for (let index = 0; index < 5; index += 1) await Promise.resolve();
@@ -368,19 +423,8 @@ const mountScene = async ({
 	readonly onActivate?: createPixiInventorySceneRuntimeFx.Props["onActivate"];
 	readonly onDrop?: createPixiInventorySceneRuntimeFx.Props["onDrop"];
 } = {}) => {
-	const tileScene = document.createElement("div");
-	tileScene.dataset.ui = "TileScene";
-	Object.defineProperties(tileScene, {
-		clientHeight: {
-			value: 900,
-		},
-		clientWidth: {
-			value: 1100,
-		},
-	});
 	const host = document.createElement("div");
-	tileScene.append(host);
-	document.body.append(tileScene);
+	document.body.append(host);
 	const runtime = await Effect.runPromise(
 		createPixiInventorySceneRuntimeFx({
 			game,
@@ -466,16 +510,16 @@ describe("Pixi Inventory scene runtime", () => {
 			readPixiMainSceneLayoutFx({
 				boardHeight: 7,
 				boardWidth: 11,
-				height: 900,
+				height: 480,
 				toolbarSize: 8,
-				width: 1100,
+				width: 800,
 			}),
 		).board.cellSize;
 
 		expect(actor.size).toBe(expectedBoardSize);
 		expect(sceneState.roundRects).toBeGreaterThanOrEqual(3);
-		(actor.container as unknown as FakeContainer).emit("pointerdown", pointer(160, 60));
-		stage.emit("pointerup", pointer(160, 60));
+		(actor.container as unknown as FakeContainer).emit("pointerdown", slotPointer(0));
+		stage.emit("pointerup", slotPointer(0));
 		await Promise.resolve();
 
 		expect(onActivate).toHaveBeenCalledOnce();
@@ -494,9 +538,9 @@ describe("Pixi Inventory scene runtime", () => {
 	it("drags only between Inventory slots and commits the release through the engine bridge", async () => {
 		const { actor, onActivate, runtime, stage } = await mountScene();
 		const initialX = actor.container.x;
-		(actor.container as unknown as FakeContainer).emit("pointerdown", pointer(160, 60));
-		stage.emit("globalpointermove", pointer(280, 60));
-		stage.emit("pointerup", pointer(280, 60));
+		(actor.container as unknown as FakeContainer).emit("pointerdown", slotPointer(0));
+		stage.emit("globalpointermove", slotPointer(1));
+		stage.emit("pointerup", slotPointer(1));
 		await Promise.resolve();
 		await Promise.resolve();
 
@@ -541,6 +585,47 @@ describe("Pixi Inventory scene runtime", () => {
 		await Effect.runPromise(runtime.closeFx);
 	});
 
+	it("submits the exact occupied Inventory slot so the engine can commit a swap", async () => {
+		sceneState.items = [
+			inventoryItem,
+			inventoryTargetItem,
+		];
+		const onDrop = vi.fn(() =>
+			Promise.resolve({
+				kind: "swap",
+			} as never),
+		);
+		const { actor, runtime, stage } = await mountScene({
+			onDrop,
+		});
+		(actor.container as unknown as FakeContainer).emit("pointerdown", slotPointer(0));
+		stage.emit("globalpointermove", slotPointer(1));
+		stage.emit("pointerup", slotPointer(1));
+		await flushMicrotasks();
+
+		const occupiedTarget = {
+			kind: "slot",
+			location: inventoryTargetItem.location,
+			occupant: {
+				itemId: inventoryTargetItem.id,
+				revision: inventoryTargetItem.revision,
+			},
+		};
+		expect(sceneState.preview).toHaveBeenCalledWith(
+			expect.objectContaining({
+				sourceItemId: inventoryItem.id,
+				target: occupiedTarget,
+			}),
+		);
+		expect(onDrop).toHaveBeenCalledWith(
+			expect.objectContaining({
+				sourceItemId: inventoryItem.id,
+				target: occupiedTarget,
+			}),
+		);
+		await Effect.runPromise(runtime.closeFx);
+	});
+
 	it("keeps awaitingCommand exclusive and settles only a rejected drop", async () => {
 		let resolveDrop: ((result: never) => void) | undefined;
 		const onDrop = vi.fn(
@@ -554,17 +639,17 @@ describe("Pixi Inventory scene runtime", () => {
 		});
 		const initialX = actor.container.x;
 		const actorContainer = actor.container as unknown as FakeContainer;
-		actorContainer.emit("pointerdown", pointer(160, 60));
-		stage.emit("globalpointermove", pointer(280, 60));
-		stage.emit("pointerup", pointer(280, 60));
+		actorContainer.emit("pointerdown", slotPointer(0));
+		stage.emit("globalpointermove", slotPointer(1));
+		stage.emit("pointerup", slotPointer(1));
 		await Promise.resolve();
 
 		expect(onDrop).toHaveBeenCalledOnce();
 		expect(actor.container.x).not.toBe(initialX);
 		Effect.runSync(runtime.cancelInteractionFx);
 		expect(actor.container.x).not.toBe(initialX);
-		actorContainer.emit("pointerdown", pointer(280, 60));
-		stage.emit("pointerup", pointer(280, 60));
+		actorContainer.emit("pointerdown", slotPointer(1));
+		stage.emit("pointerup", slotPointer(1));
 		expect(onDrop).toHaveBeenCalledOnce();
 		expect(onActivate).not.toHaveBeenCalled();
 
@@ -590,9 +675,14 @@ describe("Pixi Inventory scene runtime", () => {
 			onDrop,
 		});
 		const initialX = actor.container.x;
-		(actor.container as unknown as FakeContainer).emit("pointerdown", pointer(160, 60));
-		stage.emit("globalpointermove", pointer(330, 60));
-		stage.emit("pointerup", pointer(330, 60));
+		const releasedPointer = slotPointer(1);
+		const offsetReleasedPointer = pointer(
+			releasedPointer.global.x + 10,
+			releasedPointer.global.y,
+		);
+		(actor.container as unknown as FakeContainer).emit("pointerdown", slotPointer(0));
+		stage.emit("globalpointermove", offsetReleasedPointer);
+		stage.emit("pointerup", offsetReleasedPointer);
 		await Promise.resolve();
 
 		expect(onDrop).toHaveBeenCalledOnce();
@@ -603,7 +693,7 @@ describe("Pixi Inventory scene runtime", () => {
 
 		expect(actor.dragging).toBe(true);
 		expect(actor.container.x).toBe(releasedX);
-		expect(actor.container.x).not.toBe(initialX + 120);
+		expect(actor.container.x).not.toBe(initialX + readTestInventoryLayout().surface.cellSize);
 
 		if (resolveDrop === undefined) throw new Error("Drop Promise was not created.");
 		resolveDrop({
@@ -613,16 +703,16 @@ describe("Pixi Inventory scene runtime", () => {
 
 		expect(actor.dragging).toBe(false);
 		expect(actor.container.zIndex).toBe(0);
-		expect(actor.container.x).toBe(initialX + 120);
+		expect(actor.container.x).toBe(initialX + readTestInventoryLayout().surface.cellSize);
 		await Effect.runPromise(runtime.closeFx);
 	});
 
 	it("settles against the current snapshot when acceptance precedes its transition", async () => {
 		const { actor, runtime, stage } = await mountScene();
 		const initialX = actor.container.x;
-		(actor.container as unknown as FakeContainer).emit("pointerdown", pointer(160, 60));
-		stage.emit("globalpointermove", pointer(330, 60));
-		stage.emit("pointerup", pointer(330, 60));
+		(actor.container as unknown as FakeContainer).emit("pointerdown", slotPointer(0));
+		stage.emit("globalpointermove", slotPointer(1));
+		stage.emit("pointerup", slotPointer(1));
 		await flushMicrotasks();
 
 		expect(actor.dragging).toBe(false);
@@ -633,22 +723,22 @@ describe("Pixi Inventory scene runtime", () => {
 			moveInventoryItem(1),
 		]);
 
-		expect(actor.container.x).toBe(initialX + 120);
+		expect(actor.container.x).toBe(initialX + readTestInventoryLayout().surface.cellSize);
 		await Effect.runPromise(runtime.closeFx);
 	});
 
 	it("cancels one active gesture through the shared interaction owner", async () => {
 		const { actor, onActivate, onDrop, runtime, stage } = await mountScene();
 		const initialX = actor.container.x;
-		(actor.container as unknown as FakeContainer).emit("pointerdown", pointer(160, 60));
-		stage.emit("globalpointermove", pointer(280, 60));
+		(actor.container as unknown as FakeContainer).emit("pointerdown", slotPointer(0));
+		stage.emit("globalpointermove", slotPointer(1));
 		expect(actor.container.x).not.toBe(initialX);
 
 		Effect.runSync(runtime.cancelInteractionFx);
 
 		expect(actor.container.x).toBe(initialX);
 		expect(runtime.canvas.releasePointerCapture).toHaveBeenCalledWith(1);
-		stage.emit("pointerup", pointer(280, 60));
+		stage.emit("pointerup", slotPointer(1));
 		expect(onDrop).not.toHaveBeenCalled();
 		expect(onActivate).not.toHaveBeenCalled();
 		await Effect.runPromise(runtime.closeFx);
@@ -658,17 +748,17 @@ describe("Pixi Inventory scene runtime", () => {
 		const { actor, onActivate, runtime, stage } = await mountScene();
 		const actorContainer = actor.container as unknown as FakeContainer;
 
-		actorContainer.emit("pointerdown", pointer(160, 60));
-		stage.emit("pointerup", pointer(160, 60));
+		actorContainer.emit("pointerdown", slotPointer(0));
+		stage.emit("pointerup", slotPointer(0));
 		Effect.runSync(runtime.closeFx);
 		await flushMicrotasks();
 		expect(onActivate).not.toHaveBeenCalled();
 
 		const second = await mountScene();
 		const secondActorContainer = second.actor.container as unknown as FakeContainer;
-		secondActorContainer.emit("pointerdown", pointer(160, 60));
-		second.stage.emit("globalpointermove", pointer(280, 60));
-		second.stage.emit("pointerup", pointer(280, 60));
+		secondActorContainer.emit("pointerdown", slotPointer(0));
+		second.stage.emit("globalpointermove", slotPointer(1));
+		second.stage.emit("pointerup", slotPointer(1));
 		Effect.runSync(second.runtime.closeFx);
 		await flushMicrotasks();
 		expect(second.onDrop).not.toHaveBeenCalled();
@@ -714,13 +804,13 @@ describe("Pixi Inventory scene runtime", () => {
 		});
 		const actorContainer = actor.container as unknown as FakeContainer;
 
-		actorContainer.emit("pointerdown", pointer(160, 60));
-		stage.emit("pointerup", pointer(160, 60));
+		actorContainer.emit("pointerdown", slotPointer(0));
+		stage.emit("pointerup", slotPointer(0));
 		await Promise.resolve();
 		await Promise.resolve();
 		await Promise.resolve();
-		actorContainer.emit("pointerdown", pointer(160, 60));
-		stage.emit("pointerup", pointer(160, 60));
+		actorContainer.emit("pointerdown", slotPointer(0));
+		stage.emit("pointerup", slotPointer(0));
 		await Promise.resolve();
 		await Promise.resolve();
 
@@ -739,9 +829,9 @@ describe("Pixi Inventory scene runtime", () => {
 		});
 		const initialX = actor.container.x;
 
-		(actor.container as unknown as FakeContainer).emit("pointerdown", pointer(160, 60));
-		stage.emit("globalpointermove", pointer(280, 60));
-		stage.emit("pointerup", pointer(280, 60));
+		(actor.container as unknown as FakeContainer).emit("pointerdown", slotPointer(0));
+		stage.emit("globalpointermove", slotPointer(1));
+		stage.emit("pointerup", slotPointer(1));
 		await Promise.resolve();
 		await Promise.resolve();
 		await Promise.resolve();

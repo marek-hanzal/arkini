@@ -1,4 +1,5 @@
 import { useAtom, useAtomSet } from "@effect/atom-react";
+import { useNavigate } from "@tanstack/react-router";
 import { match } from "ts-pattern";
 import { useCallback, useEffect, useLayoutEffect, useRef } from "react";
 
@@ -8,7 +9,6 @@ import { TileDefaultLineCommandAtom } from "~/bridge/tile/TileDefaultLineCommand
 import type { TileActorItem } from "~/bridge/tile/TileActorItem";
 import { runTileDropAtom } from "~/bridge/tile/runTileDropAtom";
 import { useGameMenuControl } from "~/ui/game-menu/useGameMenuControl";
-import { useInventoryControl } from "~/ui/inventory/useInventoryControl";
 import { useItemDetailControl } from "~/ui/item-detail/useItemDetailControl";
 import type { PixiMainSceneRuntime } from "~/ui/pixi/scene/PixiMainSceneRuntime";
 import { createPixiMainSceneRuntimeFx } from "~/ui/pixi/scene/createPixiMainSceneRuntimeFx";
@@ -18,8 +18,8 @@ import { usePixiGameRuntime } from "~/ui/pixi/usePixiGameRuntime";
 export const PixiBoardToolbarSurface = () => {
 	const game = useGameEngine();
 	const gameMenu = useGameMenuControl();
-	const inventory = useInventoryControl();
 	const itemDetail = useItemDetailControl();
+	const navigate = useNavigate();
 	const { handoffs, interaction, textures } = usePixiGameRuntime();
 	const [startLineState, runStartLine] = useAtom(TileDefaultLineCommandAtom(game));
 	const runDrop = useAtomSet(runTileDropAtom(game), {
@@ -28,14 +28,12 @@ export const PixiBoardToolbarSurface = () => {
 	const hostRef = useRef<HTMLDivElement>(null);
 	const runtimeRef = useRef<PixiMainSceneRuntime | null>(null);
 	const interactionBlockedRef = useRef(false);
-	const interactionBlocked = gameMenu.isOpen || inventory.isOpen || itemDetail.isOpen;
+	const interactionBlocked = gameMenu.isOpen || itemDetail.isOpen;
 	interactionBlockedRef.current = interactionBlocked;
 	const controlsRef = useRef({
-		inventory,
 		itemDetail,
 	});
 	controlsRef.current = {
-		inventory,
 		itemDetail,
 	};
 
@@ -49,10 +47,23 @@ export const PixiBoardToolbarSurface = () => {
 		);
 	}, []);
 
+	const openInventory = useCallback(
+		() =>
+			navigate({
+				to: "/game/$packageId/inventory",
+				params: {
+					packageId: game.arkpack.packageId,
+				},
+			}).then(() => undefined),
+		[
+			game.arkpack.packageId,
+			navigate,
+		],
+	);
+
 	const activate = useCallback(
 		async (item: TileActorItem, shiftKey: boolean, origin: HTMLElement) => {
-			const { inventory: currentInventory, itemDetail: currentItemDetail } =
-				controlsRef.current;
+			const { itemDetail: currentItemDetail } = controlsRef.current;
 			if (shiftKey) {
 				RendererRuntime.runSync(
 					currentItemDetail.openItemDetailFx({
@@ -82,12 +93,7 @@ export const PixiBoardToolbarSurface = () => {
 					{
 						kind: "open-inventory",
 					},
-					() =>
-						RendererRuntime.runPromise(
-							currentInventory.openFx({
-								origin,
-							}),
-						).then(() => undefined),
+					() => openInventory(),
 				)
 				.with(
 					{
@@ -108,6 +114,7 @@ export const PixiBoardToolbarSurface = () => {
 				.exhaustive();
 		},
 		[
+			openInventory,
 			openLines,
 			runStartLine,
 		],

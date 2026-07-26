@@ -1,10 +1,11 @@
 import { GameBoardLayout } from "~/ui/board/GameBoardLayout";
-import { GameShell } from "~/ui/shell/GameShell";
+import { GameCheatItemSpotlight } from "~/ui/cheat-spotlight/GameCheatItemSpotlight";
 
 export function GamePage() {
 	return (
-		<GameShell>
+		<>
 			<GameBoardLayout />
-		</GameShell>
+			<GameCheatItemSpotlight />
+		</>
 	);
 }

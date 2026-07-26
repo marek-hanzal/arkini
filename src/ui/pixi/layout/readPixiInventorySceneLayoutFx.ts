@@ -4,27 +4,30 @@ import type { PixiInventorySceneLayout } from "~/ui/pixi/layout/PixiSceneLayout"
 
 export namespace readPixiInventorySceneLayoutFx {
 	export interface Props {
-		readonly actorSize: number;
 		readonly columns: number;
 		readonly height: number;
+		readonly preferredCellSize: number;
 		readonly rows: number;
 		readonly width: number;
 	}
 }
 
-/** Fits the isolated Inventory grid into its modal-local Pixi viewport. */
+/** Centers Inventory at Board scale, shrinking only when its grid cannot fit the viewport. */
 export const readPixiInventorySceneLayoutFx = Effect.fn("readPixiInventorySceneLayoutFx")(
-	({ actorSize, columns, height, rows, width }: readPixiInventorySceneLayoutFx.Props) =>
+	({ columns, height, preferredCellSize, rows, width }: readPixiInventorySceneLayoutFx.Props) =>
 		Effect.sync((): PixiInventorySceneLayout => {
-			const normalizedActorSize = Math.max(1, actorSize);
 			const cellSize = Math.max(
-				normalizedActorSize,
-				Math.min(width / columns, height / rows),
+				1,
+				Math.min(
+					Math.max(1, preferredCellSize),
+					Math.max(1, width) / columns,
+					Math.max(1, height) / rows,
+				),
 			);
 			const gridWidth = columns * cellSize;
 			const gridHeight = rows * cellSize;
 			return {
-				actorSize: normalizedActorSize,
+				actorSize: cellSize,
 				surface: {
 					cellSize,
 					columns,

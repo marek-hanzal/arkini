@@ -19,11 +19,13 @@ import { Route as LauncherMainMenuRouteImport } from "./@routes/_launcher/main-m
 import { Route as LauncherArkpacksRouteImport } from "./@routes/_launcher/arkpacks"
 import { Route as LauncherAboutRouteImport } from "./@routes/_launcher/about"
 import { Route as GamePackageIdCheatsRouteImport } from "./@routes/game/$packageId/cheats"
-import { Route as GamePackageIdBoardRouteImport } from "./@routes/game/$packageId/board"
+import { Route as GamePackageIdSceneRouteImport } from "./@routes/game/$packageId/_scene"
 import { Route as ActionLoadGamePackageIdRouteImport } from "./@routes/action/load-game/$packageId"
 import { Route as GamePackageIdActionResetRouteImport } from "./@routes/game/$packageId/action/reset"
 import { Route as GamePackageIdActionLeaveRouteImport } from "./@routes/game/$packageId/action/leave"
 import { Route as GamePackageIdActionExitRouteImport } from "./@routes/game/$packageId/action/exit"
+import { Route as GamePackageIdSceneInventoryRouteImport } from "./@routes/game/$packageId/_scene/inventory"
+import { Route as GamePackageIdSceneBoardRouteImport } from "./@routes/game/$packageId/_scene/board"
 
 const LauncherRoute = LauncherRouteImport.update({
   id: "/_launcher",
@@ -74,9 +76,8 @@ const GamePackageIdCheatsRoute = GamePackageIdCheatsRouteImport.update({
   path: "/cheats",
   getParentRoute: () => GamePackageIdRoute,
 } as any)
-const GamePackageIdBoardRoute = GamePackageIdBoardRouteImport.update({
-  id: "/board",
-  path: "/board",
+const GamePackageIdSceneRoute = GamePackageIdSceneRouteImport.update({
+  id: "/_scene",
   getParentRoute: () => GamePackageIdRoute,
 } as any)
 const ActionLoadGamePackageIdRoute = ActionLoadGamePackageIdRouteImport.update({
@@ -101,6 +102,17 @@ const GamePackageIdActionExitRoute = GamePackageIdActionExitRouteImport.update({
   path: "/action/exit",
   getParentRoute: () => GamePackageIdRoute,
 } as any)
+const GamePackageIdSceneInventoryRoute =
+  GamePackageIdSceneInventoryRouteImport.update({
+    id: "/inventory",
+    path: "/inventory",
+    getParentRoute: () => GamePackageIdSceneRoute,
+  } as any)
+const GamePackageIdSceneBoardRoute = GamePackageIdSceneBoardRouteImport.update({
+  id: "/board",
+  path: "/board",
+  getParentRoute: () => GamePackageIdSceneRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   "/": typeof IndexRoute
@@ -112,8 +124,9 @@ export interface FileRoutesByFullPath {
   "/action/recover-game-save": typeof ActionRecoverGameSaveRoute
   "/game/$packageId": typeof GamePackageIdRouteWithChildren
   "/action/load-game/$packageId": typeof ActionLoadGamePackageIdRoute
-  "/game/$packageId/board": typeof GamePackageIdBoardRoute
   "/game/$packageId/cheats": typeof GamePackageIdCheatsRoute
+  "/game/$packageId/board": typeof GamePackageIdSceneBoardRoute
+  "/game/$packageId/inventory": typeof GamePackageIdSceneInventoryRoute
   "/game/$packageId/action/exit": typeof GamePackageIdActionExitRoute
   "/game/$packageId/action/leave": typeof GamePackageIdActionLeaveRoute
   "/game/$packageId/action/reset": typeof GamePackageIdActionResetRoute
@@ -128,8 +141,9 @@ export interface FileRoutesByTo {
   "/action/recover-game-save": typeof ActionRecoverGameSaveRoute
   "/game/$packageId": typeof GamePackageIdRouteWithChildren
   "/action/load-game/$packageId": typeof ActionLoadGamePackageIdRoute
-  "/game/$packageId/board": typeof GamePackageIdBoardRoute
   "/game/$packageId/cheats": typeof GamePackageIdCheatsRoute
+  "/game/$packageId/board": typeof GamePackageIdSceneBoardRoute
+  "/game/$packageId/inventory": typeof GamePackageIdSceneInventoryRoute
   "/game/$packageId/action/exit": typeof GamePackageIdActionExitRoute
   "/game/$packageId/action/leave": typeof GamePackageIdActionLeaveRoute
   "/game/$packageId/action/reset": typeof GamePackageIdActionResetRoute
@@ -146,8 +160,10 @@ export interface FileRoutesById {
   "/action/recover-game-save": typeof ActionRecoverGameSaveRoute
   "/game/$packageId": typeof GamePackageIdRouteWithChildren
   "/action/load-game/$packageId": typeof ActionLoadGamePackageIdRoute
-  "/game/$packageId/board": typeof GamePackageIdBoardRoute
+  "/game/$packageId/_scene": typeof GamePackageIdSceneRouteWithChildren
   "/game/$packageId/cheats": typeof GamePackageIdCheatsRoute
+  "/game/$packageId/_scene/board": typeof GamePackageIdSceneBoardRoute
+  "/game/$packageId/_scene/inventory": typeof GamePackageIdSceneInventoryRoute
   "/game/$packageId/action/exit": typeof GamePackageIdActionExitRoute
   "/game/$packageId/action/leave": typeof GamePackageIdActionLeaveRoute
   "/game/$packageId/action/reset": typeof GamePackageIdActionResetRoute
@@ -164,8 +180,9 @@ export interface FileRouteTypes {
     | "/action/recover-game-save"
     | "/game/$packageId"
     | "/action/load-game/$packageId"
-    | "/game/$packageId/board"
     | "/game/$packageId/cheats"
+    | "/game/$packageId/board"
+    | "/game/$packageId/inventory"
     | "/game/$packageId/action/exit"
     | "/game/$packageId/action/leave"
     | "/game/$packageId/action/reset"
@@ -180,8 +197,9 @@ export interface FileRouteTypes {
     | "/action/recover-game-save"
     | "/game/$packageId"
     | "/action/load-game/$packageId"
-    | "/game/$packageId/board"
     | "/game/$packageId/cheats"
+    | "/game/$packageId/board"
+    | "/game/$packageId/inventory"
     | "/game/$packageId/action/exit"
     | "/game/$packageId/action/leave"
     | "/game/$packageId/action/reset"
@@ -197,8 +215,10 @@ export interface FileRouteTypes {
     | "/action/recover-game-save"
     | "/game/$packageId"
     | "/action/load-game/$packageId"
-    | "/game/$packageId/board"
+    | "/game/$packageId/_scene"
     | "/game/$packageId/cheats"
+    | "/game/$packageId/_scene/board"
+    | "/game/$packageId/_scene/inventory"
     | "/game/$packageId/action/exit"
     | "/game/$packageId/action/leave"
     | "/game/$packageId/action/reset"
@@ -285,11 +305,11 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof GamePackageIdCheatsRouteImport
       parentRoute: typeof GamePackageIdRoute
     }
-    "/game/$packageId/board": {
-      id: "/game/$packageId/board"
-      path: "/board"
-      fullPath: "/game/$packageId/board"
-      preLoaderRoute: typeof GamePackageIdBoardRouteImport
+    "/game/$packageId/_scene": {
+      id: "/game/$packageId/_scene"
+      path: ""
+      fullPath: "/game/$packageId"
+      preLoaderRoute: typeof GamePackageIdSceneRouteImport
       parentRoute: typeof GamePackageIdRoute
     }
     "/action/load-game/$packageId": {
@@ -320,6 +340,20 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof GamePackageIdActionExitRouteImport
       parentRoute: typeof GamePackageIdRoute
     }
+    "/game/$packageId/_scene/inventory": {
+      id: "/game/$packageId/_scene/inventory"
+      path: "/inventory"
+      fullPath: "/game/$packageId/inventory"
+      preLoaderRoute: typeof GamePackageIdSceneInventoryRouteImport
+      parentRoute: typeof GamePackageIdSceneRoute
+    }
+    "/game/$packageId/_scene/board": {
+      id: "/game/$packageId/_scene/board"
+      path: "/board"
+      fullPath: "/game/$packageId/board"
+      preLoaderRoute: typeof GamePackageIdSceneBoardRouteImport
+      parentRoute: typeof GamePackageIdSceneRoute
+    }
   }
 }
 
@@ -341,8 +375,21 @@ const LauncherRouteWithChildren = LauncherRoute._addFileChildren(
   LauncherRouteChildren,
 )
 
+interface GamePackageIdSceneRouteChildren {
+  GamePackageIdSceneBoardRoute: typeof GamePackageIdSceneBoardRoute
+  GamePackageIdSceneInventoryRoute: typeof GamePackageIdSceneInventoryRoute
+}
+
+const GamePackageIdSceneRouteChildren: GamePackageIdSceneRouteChildren = {
+  GamePackageIdSceneBoardRoute: GamePackageIdSceneBoardRoute,
+  GamePackageIdSceneInventoryRoute: GamePackageIdSceneInventoryRoute,
+}
+
+const GamePackageIdSceneRouteWithChildren =
+  GamePackageIdSceneRoute._addFileChildren(GamePackageIdSceneRouteChildren)
+
 interface GamePackageIdRouteChildren {
-  GamePackageIdBoardRoute: typeof GamePackageIdBoardRoute
+  GamePackageIdSceneRoute: typeof GamePackageIdSceneRouteWithChildren
   GamePackageIdCheatsRoute: typeof GamePackageIdCheatsRoute
   GamePackageIdActionExitRoute: typeof GamePackageIdActionExitRoute
   GamePackageIdActionLeaveRoute: typeof GamePackageIdActionLeaveRoute
@@ -350,7 +397,7 @@ interface GamePackageIdRouteChildren {
 }
 
 const GamePackageIdRouteChildren: GamePackageIdRouteChildren = {
-  GamePackageIdBoardRoute: GamePackageIdBoardRoute,
+  GamePackageIdSceneRoute: GamePackageIdSceneRouteWithChildren,
   GamePackageIdCheatsRoute: GamePackageIdCheatsRoute,
   GamePackageIdActionExitRoute: GamePackageIdActionExitRoute,
   GamePackageIdActionLeaveRoute: GamePackageIdActionLeaveRoute,

@@ -76,11 +76,13 @@ const createLifecycleConfig = ({
 	sourceProducer = false,
 	targetProducer = false,
 	resultCharges,
+	targetCharges,
 }: {
 	action?: "consume" | "use";
 	effect?: "keep" | "remove" | "replace";
 	resultCharges?: number;
 	sourceProducer?: boolean;
+	targetCharges?: number;
 	targetProducer?: boolean;
 } = {}) => {
 	const targetSelector = {
@@ -130,6 +132,12 @@ const createLifecycleConfig = ({
 						"participant",
 					],
 				}),
+				charges:
+					targetCharges === undefined
+						? undefined
+						: {
+								amount: targetCharges,
+							},
 				type: "simple" as const,
 			};
 
@@ -523,6 +531,86 @@ describe("mergeItemsFx participant lifecycle", () => {
 			remainingCharges: undefined,
 		});
 		expect(replaced?.revision).not.toBe(beforeTarget?.revision);
+	});
+
+	it("preserves spent charges through a compatible replacement", () => {
+		const config = createLifecycleConfig({
+			effect: "replace",
+			resultCharges: 36,
+			targetCharges: 18,
+		});
+		const state = {
+			cheats: {
+				enabled: false,
+				everEnabled: false,
+				instantGameplay: false,
+			},
+			currentSpace: 0,
+			items: [
+				boardItem("source", 0),
+				{
+					...boardItem("target", 1),
+					remainingCharges: 5,
+				},
+			],
+			jobs: [],
+		} satisfies StateSchema.Type;
+		const result = Effect.runSync(
+			attemptMergeFx().pipe(
+				useGameFx({
+					config,
+					state,
+				}),
+			),
+		);
+
+		expect(Result.isSuccess(result.attempt)).toBe(true);
+		expect(result.after.items.find((item) => item.id === "runtime:target")).toMatchObject({
+			item: {
+				id: "result",
+				charges: {
+					amount: 36,
+				},
+			},
+			remainingCharges: 23,
+		});
+	});
+
+	it("rejects a charged replacement when the result cannot carry its wear", () => {
+		const config = createLifecycleConfig({
+			effect: "replace",
+			targetCharges: 18,
+		});
+		const state = {
+			cheats: {
+				enabled: false,
+				everEnabled: false,
+				instantGameplay: false,
+			},
+			currentSpace: 0,
+			items: [
+				boardItem("source", 0),
+				{
+					...boardItem("target", 1),
+					remainingCharges: 5,
+				},
+			],
+			jobs: [],
+		} satisfies StateSchema.Type;
+		const result = Effect.runSync(
+			attemptMergeFx().pipe(
+				useGameFx({
+					config,
+					state,
+				}),
+			),
+		);
+
+		expect(Result.isFailure(result.attempt)).toBe(true);
+		if (Result.isFailure(result.attempt)) {
+			expect(result.attempt.failure._tag).toBe("ItemStatefulError");
+		}
+		expect(result.after).toEqual(result.before);
 	});
 
 	it("rejects replacing stateful targets but remove releases buffered inputs", () => {

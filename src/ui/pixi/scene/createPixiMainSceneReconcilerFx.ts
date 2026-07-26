@@ -284,10 +284,29 @@ export const createPixiMainSceneReconcilerFx = Effect.fn("createPixiMainSceneRec
 							}),
 						)
 					: [];
+				const inputMotionCues = compiledCues.filter((cue) => cue.kind === "input");
+				const inputMotionFeedbackPrefixes = new Set(
+					inputMotionCues.map((cue) => `${cue.sequence}:${cue.eventIndex}:`),
+				);
+				const inputMotionActorIds = new Set(
+					inputMotionCues.flatMap((cue) => [
+						cue.sourceActorId,
+						cue.targetActorId,
+					]),
+				);
 				const feedbackCues = presentCommittedEffects
 					? [
-							...RendererRuntime.runSync(readTileActorFeedbackCuesFx(transition)),
-							...(dropSnapshot.feedback?.cues ?? []),
+							...RendererRuntime.runSync(
+								readTileActorFeedbackCuesFx(transition),
+							).filter(
+								(cue) =>
+									![
+										...inputMotionFeedbackPrefixes,
+									].some((prefix) => cue.key.startsWith(prefix)),
+							),
+							...(dropSnapshot.feedback?.cues ?? []).filter(
+								(cue) => !inputMotionActorIds.has(cue.actorId),
+							),
 						]
 					: [];
 				const replacementActorIds = new Set(replacements.map(({ actorId }) => actorId));
@@ -362,13 +381,20 @@ export const createPixiMainSceneReconcilerFx = Effect.fn("createPixiMainSceneRec
 					const pose = RendererRuntime.runSync(surface.readActorPoseFx(item));
 					if (pose === null) continue;
 					const hiddenQuantity = motionSnapshot.unsettledQuantities.get(item.id) ?? 0;
+					const unsettledInputSourceQuantity =
+						motionSnapshot.unsettledInputSourceQuantities.get(item.id);
 					const displayItem =
-						hiddenQuantity === 0
-							? item
-							: {
+						unsettledInputSourceQuantity !== undefined
+							? {
 									...item,
-									quantity: Math.max(1, item.quantity - hiddenQuantity),
-								};
+									quantity: unsettledInputSourceQuantity,
+								}
+							: hiddenQuantity === 0
+								? item
+								: {
+										...item,
+										quantity: Math.max(1, item.quantity - hiddenQuantity),
+									};
 					const actor = actorStore.actors.get(item.id);
 					if (actor === undefined) {
 						const created = RendererRuntime.runSync(
@@ -485,13 +511,13 @@ export const createPixiMainSceneReconcilerFx = Effect.fn("createPixiMainSceneRec
 							y: actor.container.y,
 						});
 					}
-					pose.layer.addChild(actor.container);
-					if (
+					const needsTravel =
 						moved ||
 						actor.container.x !== pose.x ||
 						actor.container.y !== pose.y ||
-						sizeChanged
-					) {
+						sizeChanged;
+					if (needsTravel) {
+						surface.transientActorLayer.addChild(actor.container);
 						yield* animator.animateFx({
 							actor,
 							channel: "pose",
@@ -502,10 +528,19 @@ export const createPixiMainSceneReconcilerFx = Effect.fn("createPixiMainSceneRec
 								toX: pose.x,
 								toY: pose.y,
 							}),
+							onComplete: () => {
+								if (actor.container.destroyed) return;
+								const latest =
+									RendererRuntime.runSync(surface.readActorPoseFx(actor.item)) ??
+									pose;
+								latest.layer.addChild(actor.container);
+							},
 							toScale: 1,
 							toX: pose.x,
 							toY: pose.y,
 						});
+					} else {
+						pose.layer.addChild(actor.container);
 					}
 				}
 

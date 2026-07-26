@@ -5,6 +5,7 @@ import { useGameFx } from "~/engine/game/fx/useGameFx";
 import { autofillLineInputsFx } from "~/engine/input/write/autofillLineInputsFx";
 import { withdrawLineInputsFx } from "~/engine/input/write/withdrawLineInputsFx";
 import { readItemDetailLinesFx } from "~/engine/item-detail/read/readItemDetailLinesFx";
+import { startLineFx } from "~/engine/job/write/startLineFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
 import {
@@ -49,7 +50,7 @@ const spawnWaterFx = ({
 	});
 
 describe("Item Detail line input actions", () => {
-	it("autofills the minimum from deterministic eligible grids and exposes live actions", () => {
+	it("autofills deterministic board sources without reaching into Inventory", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {
 				yield* spawnOwnerFx();
@@ -115,8 +116,8 @@ describe("Item Detail line input actions", () => {
 			],
 		});
 		expect(result.autofilled).toEqual({
-			storedQuantity: 3,
-			remainingMissingQuantity: 0,
+			storedQuantity: 2,
+			remainingMissingQuantity: 1,
 		});
 		const buffered = result.runtime.items.filter(
 			(item) =>
@@ -127,11 +128,10 @@ describe("Item Detail line input actions", () => {
 		expect(buffered.map((item) => item.id)).toEqual([
 			"runtime:far",
 			"runtime:near",
-			expect.stringMatching(/^runtime:/),
 		]);
-		expect(buffered.reduce((total, item) => total + item.quantity, 0)).toBe(3);
+		expect(buffered.reduce((total, item) => total + item.quantity, 0)).toBe(2);
 		expect(result.runtime.items.find((item) => item.id === "runtime:inventory")).toMatchObject({
-			quantity: 1,
+			quantity: 2,
 			location: {
 				scope: "inventory",
 			},
@@ -145,10 +145,85 @@ describe("Item Detail line input actions", () => {
 						canWithdraw: true,
 					},
 					availability: {
-						kind: "ready",
+						kind: "blocked",
+						reason: "inputs",
 					},
 				},
 			],
+		});
+	});
+
+	it("submits a complete board stack through ordinary drop capacity semantics", () => {
+		const result = Effect.runSync(
+			Effect.gen(function* () {
+				yield* spawnOwnerFx();
+				yield* spawnWaterFx({
+					id: "runtime:water",
+					location: sourceLocation(1),
+					quantity: 7,
+				});
+
+				const autofilled = yield* autofillLineInputsFx({
+					ownerItemId,
+					lineId,
+				});
+				return {
+					autofilled,
+					runtime: yield* readRuntimeFx(),
+				};
+			}).pipe(
+				useGameFx({
+					config: inputRuntimeTestConfig,
+				}),
+			),
+		);
+
+		expect(result.autofilled).toEqual({
+			storedQuantity: 5,
+			remainingMissingQuantity: 0,
+		});
+		expect(result.runtime.items.find((item) => item.id === "runtime:water")).toMatchObject({
+			location: sourceLocation(1),
+			quantity: 2,
+		});
+	});
+
+	it("starts immediately after default-click autofill without waiting for presentation", () => {
+		const result = Effect.runSync(
+			Effect.gen(function* () {
+				yield* spawnOwnerFx();
+				yield* spawnWaterFx({
+					id: "runtime:water",
+					location: sourceLocation(1),
+					quantity: 7,
+				});
+
+				yield* autofillLineInputsFx({
+					ownerItemId,
+					lineId,
+				});
+				const started = yield* startLineFx({
+					ownerItemId,
+					lineId,
+				});
+				return {
+					started,
+					runtime: yield* readRuntimeFx(),
+				};
+			}).pipe(
+				useGameFx({
+					config: inputRuntimeTestConfig,
+				}),
+			),
+		);
+
+		expect(result.runtime.jobs).toHaveLength(1);
+		expect(result.runtime.items.find((item) => item.id === "runtime:water")).toMatchObject({
+			location: sourceLocation(1),
+			quantity: 2,
+		});
+		expect(result.started).toMatchObject({
+			type: "started",
 		});
 	});
 

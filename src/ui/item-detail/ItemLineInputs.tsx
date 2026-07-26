@@ -118,7 +118,7 @@ const ItemLineInputRow = ({
 						</div>
 						<div className="text-right">
 							<p className="font-medium text-foreground">
-								{deposit.readyTargets} / {deposit.requiredTargets} available
+								{deposit.requiredCharges} / {deposit.availableCharges} available
 							</p>
 							{deposit.targetTitles.length === 0 ? null : (
 								<p className="mt-0.5 max-w-56 truncate text-xs text-muted">

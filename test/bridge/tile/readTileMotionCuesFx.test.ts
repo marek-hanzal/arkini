@@ -24,6 +24,7 @@ const config = GameConfigSchema.parse({
 			width: 1,
 			height: 1,
 		},
+		toolbarSize: 1,
 	},
 	start: {
 		currentSpace: 0,
@@ -39,6 +40,15 @@ const config = GameConfigSchema.parse({
 				space: 0,
 				x: 2,
 				y: 0,
+			},
+		],
+		toolbar: [
+			{
+				itemId: "inventory",
+				position: {
+					x: 0,
+					y: 0,
+				},
 			},
 		],
 	},
@@ -59,6 +69,19 @@ const config = GameConfigSchema.parse({
 			scope: "any",
 			maxStackSize: 10,
 		},
+		inventory: {
+			id: "inventory",
+			type: "inventory",
+			title: "Inventory",
+			description: "Inventory",
+			asset: {
+				source: [
+					"asset:inventory",
+				],
+			},
+			tags: [],
+			categoryId: "utility",
+		},
 	},
 });
 
@@ -75,11 +98,14 @@ const source = runtime.items.find(
 const target = runtime.items.find(
 	(item) => item.location.scope === "board" && item.location.position.x === 2,
 );
+const inventoryOpener = runtime.items.find((item) => item.item.id === "inventory");
 if (
 	source === undefined ||
 	target === undefined ||
+	inventoryOpener === undefined ||
 	source.location.scope !== "board" ||
-	target.location.scope !== "board"
+	target.location.scope !== "board" ||
+	inventoryOpener.location.scope !== "toolbar"
 ) {
 	throw new Error("Tile motion cue fixture is missing its board actors.");
 }
@@ -194,7 +220,23 @@ describe("readTileMotionCuesFx", () => {
 		]);
 	});
 
-	it("compiles one exact Inventory release as retained actor motion", () => {
+	it.each([
+		{
+			label: "Board",
+			openerLocation: {
+				scope: "board" as const,
+				space: 0,
+				position: {
+					x: 1,
+					y: 0,
+				},
+			},
+		},
+		{
+			label: "Toolbar",
+			openerLocation: inventoryOpener.location,
+		},
+	])("compiles one exact Inventory release from its live $label opener", ({ openerLocation }) => {
 		const inventoryLocation = {
 			scope: "inventory" as const,
 			position: {
@@ -210,6 +252,22 @@ describe("readTileMotionCuesFx", () => {
 							...item,
 							location: inventoryLocation,
 						}
+					: item.id === inventoryOpener.id
+						? {
+								...item,
+								location: openerLocation,
+							}
+						: item,
+			),
+		};
+		const currentRuntime = {
+			...runtime,
+			items: runtime.items.map((item) =>
+				item.id === inventoryOpener.id
+					? {
+							...item,
+							location: openerLocation,
+						}
 					: item,
 			),
 		};
@@ -219,13 +277,13 @@ describe("readTileMotionCuesFx", () => {
 				readTileMotionCuesFx({
 					sequence: 9,
 					previousRuntime,
-					runtime,
+					runtime: currentRuntime,
 					events: [
 						{
 							type: GameEventEnumSchema.enum.ItemPlaced,
 							itemId: source.id,
 							canonicalItemId: source.item.id,
-							originItemId: source.id,
+							originItemId: inventoryOpener.id,
 							previousLocation: inventoryLocation,
 							location: sourceLocation,
 							quantity: source.quantity,
@@ -240,9 +298,51 @@ describe("readTileMotionCuesFx", () => {
 				eventIndex: 0,
 				staggerIndex: 0,
 				actorId: source.id,
-				originActorId: source.id,
-				originLocation: inventoryLocation,
+				originActorId: inventoryOpener.id,
+				originLocation: openerLocation,
 				targetLocation: sourceLocation,
+			},
+		]);
+	});
+
+	it("compiles a board input store as whole-source delivery to its live owner", () => {
+		expect(
+			Effect.runSync(
+				readTileMotionCuesFx({
+					sequence: 10,
+					previousRuntime: runtime,
+					runtime: committedRuntime,
+					events: [
+						{
+							type: GameEventEnumSchema.enum.ItemInputStored,
+							sourceItemId: source.id,
+							canonicalItemId: source.item.id,
+							previousSourceLocation: sourceLocation,
+							previousQuantity: 7,
+							storedQuantity: 5,
+							resultingQuantity: 2,
+							ownerItemId: target.id,
+							lineId: "line:water",
+							inputIndex: 0,
+						},
+					],
+				}),
+			),
+		).toEqual([
+			{
+				kind: "input",
+				sequence: 10,
+				eventIndex: 0,
+				staggerIndex: 0,
+				sourceActorId: source.id,
+				targetActorId: target.id,
+				canonicalItemId: source.item.id,
+				previousQuantity: 7,
+				storedQuantity: 5,
+				resultingQuantity: 2,
+				originActorId: source.id,
+				originLocation: sourceLocation,
+				targetLocation,
 			},
 		]);
 	});

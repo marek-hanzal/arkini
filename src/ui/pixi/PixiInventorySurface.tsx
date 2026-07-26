@@ -15,13 +15,13 @@ import { usePixiGameRuntime } from "~/ui/pixi/usePixiGameRuntime";
 /**
  * Mounts the routed Inventory canvas while React retains page framing and navigation ownership.
  *
- * Ordinary activation releases the canonical Inventory item and records only its source geometry
- * for the next scene. Shift+click remains Item Detail and never initiates a release.
+ * Ordinary activation releases the canonical Inventory item from the engine-owned physical
+ * opener. Shift+click remains Item Detail and never initiates a release.
  */
 export const PixiInventorySurface = () => {
 	const game = useGameEngine();
 	const itemDetail = useItemDetailControl();
-	const { handoffs, interaction, textures } = usePixiGameRuntime();
+	const { interaction, textures } = usePixiGameRuntime();
 	const releaseInventoryItem = useAtomSet(runInventoryReleaseAtom(game), {
 		mode: "promise",
 	});
@@ -30,55 +30,33 @@ export const PixiInventorySurface = () => {
 	});
 	const hostRef = useRef<HTMLDivElement>(null);
 	const controlsRef = useRef({
-		handoffs,
 		itemDetail,
 		releaseInventoryItem,
 	});
 	controlsRef.current = {
-		handoffs,
 		itemDetail,
 		releaseInventoryItem,
 	};
 
-	const activate = useCallback(
-		(
-			item: TileActorItem,
-			shiftKey: boolean,
-			origin: HTMLElement,
-			handoff: {
-				readonly centerX: number;
-				readonly centerY: number;
-				readonly size: number;
-			},
-		) => {
-			const {
-				handoffs: currentHandoffs,
-				itemDetail: currentItemDetail,
-				releaseInventoryItem: currentReleaseInventoryItem,
-			} = controlsRef.current;
-			if (shiftKey) {
-				RendererRuntime.runSync(
-					currentItemDetail.openItemDetailFx({
-						itemId: item.id,
-						origin,
-					}),
-				);
-				return;
-			}
-			if (item.location.scope !== LocationScopeEnumSchema.enum.Inventory) return;
+	const activate = useCallback((item: TileActorItem, shiftKey: boolean, origin: HTMLElement) => {
+		const { itemDetail: currentItemDetail, releaseInventoryItem: currentReleaseInventoryItem } =
+			controlsRef.current;
+		if (shiftKey) {
 			RendererRuntime.runSync(
-				currentHandoffs.writeFx(item.id, {
-					...handoff,
+				currentItemDetail.openItemDetailFx({
+					itemId: item.id,
+					origin,
 				}),
 			);
-			return currentReleaseInventoryItem({
-				itemId: item.id,
-				location: item.location,
-				revision: item.revision,
-			});
-		},
-		[],
-	);
+			return;
+		}
+		if (item.location.scope !== LocationScopeEnumSchema.enum.Inventory) return;
+		return currentReleaseInventoryItem({
+			itemId: item.id,
+			location: item.location,
+			revision: item.revision,
+		});
+	}, []);
 
 	useLayoutEffect(() => {
 		const host = hostRef.current;

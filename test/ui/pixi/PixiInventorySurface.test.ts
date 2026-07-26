@@ -21,15 +21,9 @@ const surfaceState = vi.hoisted(() => ({
 			item: TileActorItem,
 			shiftKey: boolean,
 			origin: HTMLElement,
-			handoff: {
-				readonly centerX: number;
-				readonly centerY: number;
-				readonly size: number;
-			},
 		) => void | PromiseLike<void>;
 	} | null,
 	detail: vi.fn(),
-	handoff: vi.fn(),
 	interactionCancel: vi.fn(),
 	interactionRegister: vi.fn(),
 	interactionUnregister: vi.fn(),
@@ -82,12 +76,6 @@ vi.mock("~/ui/item-detail/useItemDetailControl", () => ({
 
 vi.mock("~/ui/pixi/usePixiGameRuntime", () => ({
 	usePixiGameRuntime: () => ({
-		handoffs: {
-			writeFx: (itemId: string, handoff: unknown) =>
-				Effect.sync(() => {
-					surfaceState.handoff(itemId, handoff);
-				}),
-		},
 		interaction: {
 			registerFx: (cancel: () => void) =>
 				Effect.sync(() => {
@@ -154,7 +142,6 @@ afterEach(async () => {
 	});
 	surfaceState.createProps = null;
 	surfaceState.detail.mockClear();
-	surfaceState.handoff.mockClear();
 	surfaceState.interactionCancel.mockClear();
 	surfaceState.interactionRegister.mockClear();
 	surfaceState.interactionUnregister.mockClear();
@@ -167,20 +154,8 @@ describe("PixiInventorySurface", () => {
 		const props = await renderSurface();
 		const canvas = document.createElement("canvas");
 
-		await props.onActivate(item, false, canvas, {
-			centerX: 100,
-			centerY: 120,
-			size: 84,
-		});
+		await props.onActivate(item, false, canvas);
 
-		expect(surfaceState.handoff).toHaveBeenCalledWith(
-			item.id,
-			expect.objectContaining({
-				centerX: 100,
-				centerY: 120,
-				size: 84,
-			}),
-		);
 		expect(surfaceState.release).toHaveBeenCalledWith({
 			itemId: item.id,
 			location: item.location,
@@ -204,17 +179,12 @@ describe("PixiInventorySurface", () => {
 		const props = await renderSurface();
 		const canvas = document.createElement("canvas");
 
-		await props.onActivate(item, true, canvas, {
-			centerX: 100,
-			centerY: 120,
-			size: 84,
-		});
+		await props.onActivate(item, true, canvas);
 
 		expect(surfaceState.detail).toHaveBeenCalledWith({
 			itemId: item.id,
 			origin: canvas,
 		});
-		expect(surfaceState.handoff).not.toHaveBeenCalled();
 		expect(surfaceState.release).not.toHaveBeenCalled();
 	});
 });

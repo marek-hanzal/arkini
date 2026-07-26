@@ -28,6 +28,7 @@ const configInput = {
 			width: 2,
 			height: 1,
 		},
+		toolbarSize: 1,
 	},
 	start: {
 		currentSpace: 0,
@@ -204,6 +205,21 @@ const occupiedLocation = {
 		y: 0,
 	},
 };
+const inventoryOpenerLocation = {
+	scope: "toolbar" as const,
+	position: {
+		x: 0,
+		y: 0,
+	},
+};
+
+const spawnInventoryOpenerFx = () =>
+	spawnItemFx({
+		id: "runtime:backpack",
+		itemId: "backpack",
+		location: inventoryOpenerLocation,
+		quantity: 1,
+	});
 
 const run = <A, E, R>(effect: Effect.Effect<A, E, R>, gameConfig: GameConfigSchema.Type = config) =>
 	Effect.runSync(
@@ -513,6 +529,7 @@ describe("dropItemFx", () => {
 		};
 		const result = run(
 			Effect.gen(function* () {
+				const inventoryOpener = yield* spawnInventoryOpenerFx();
 				yield* spawnItemFx({
 					id: "runtime:board-water",
 					itemId: "water",
@@ -531,6 +548,7 @@ describe("dropItemFx", () => {
 					location: inventoryLocation,
 				});
 				return {
+					inventoryOpenerId: inventoryOpener.id,
 					outcome,
 					runtime: yield* readRuntimeFx(),
 				};
@@ -541,6 +559,12 @@ describe("dropItemFx", () => {
 			"item:stacked",
 			"item:spawned",
 		]);
+		expect(
+			result.outcome.events.every(
+				(event) =>
+					!("originItemId" in event) || event.originItemId === result.inventoryOpenerId,
+			),
+		).toBe(true);
 		expect(
 			result.runtime.items
 				.filter((item) => item.item.id === "water")
@@ -582,6 +606,7 @@ describe("dropItemFx", () => {
 		};
 		const result = run(
 			Effect.gen(function* () {
+				yield* spawnInventoryOpenerFx();
 				yield* spawnItemFx({
 					id: "runtime:board-water",
 					itemId: "water",
@@ -652,6 +677,7 @@ describe("dropItemFx", () => {
 		};
 		const result = run(
 			Effect.gen(function* () {
+				yield* spawnInventoryOpenerFx();
 				let blockerIndex = 0;
 				for (let y = 0; y < 2; y += 1) {
 					for (let x = 0; x < 3; x += 1) {
@@ -701,6 +727,41 @@ describe("dropItemFx", () => {
 			});
 		}
 		expect(result.after).toEqual(result.before);
+	});
+
+	it("rejects an Inventory release without its physical opener", () => {
+		const inventoryLocation = {
+			scope: "inventory" as const,
+			position: {
+				x: 0,
+				y: 0,
+			},
+		};
+		const outcome = run(
+			Effect.gen(function* () {
+				const inventoryItem = yield* spawnItemFx({
+					id: "runtime:inventory-water",
+					itemId: "water",
+					location: inventoryLocation,
+					quantity: 1,
+				});
+				return yield* Effect.result(
+					releaseInventoryItemFx({
+						itemId: inventoryItem.id,
+						revision: inventoryItem.revision,
+						location: inventoryLocation,
+					}),
+				);
+			}),
+		);
+
+		expect(Result.isFailure(outcome)).toBe(true);
+		if (Result.isFailure(outcome)) {
+			expect(outcome.failure).toMatchObject({
+				_tag: "InventoryOpenerUnavailableError",
+				itemId: "runtime:inventory-water",
+			});
+		}
 	});
 
 	it("swaps two non-mergeable occupied Board items and returns both actor identities", () => {

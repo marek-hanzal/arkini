@@ -25,7 +25,7 @@ export const Inventory = ({ onClose }: { readonly onClose: () => void }) => {
 			<button
 				ref={closeButtonRef}
 				type="button"
-				className="absolute right-[var(--ak-viewport-padding)] top-[var(--ak-viewport-padding)] z-10 grid size-10 shrink-0 cursor-pointer place-items-center rounded-lg border border-line bg-surface/90 text-xl leading-none text-muted shadow-lg backdrop-blur transition-colors hover:bg-accent/15 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+				className="absolute right-[var(--ak-viewport-padding)] top-[var(--ak-viewport-padding)] z-10 grid size-10 shrink-0 cursor-pointer place-items-center rounded-lg border border-line bg-surface/90 text-xl leading-none text-muted shadow-lg backdrop-blur transition-colors hover:bg-accent/15 hover:text-foreground"
 				aria-label="Close inventory"
 				onClick={onClose}
 			>

@@ -115,6 +115,31 @@ const output = {
 	],
 } as const satisfies useItemDetailLines.OutputSet;
 
+const depositInput = {
+	kind: "deposit",
+	selector: {
+		kind: "item",
+		label: "Tree",
+	},
+	distance: "close",
+	requiredCharges: 1,
+	availableCharges: 33,
+	targetTitles: [
+		"Tree",
+	],
+	ready: true,
+	charges: {
+		cost: 1,
+		from: "target",
+	},
+	detail: {
+		itemId: "tree",
+		title: "Tree",
+		sourceUrl: "resource:tree",
+		detailItemId: "runtime:tree",
+	},
+} as const satisfies useItemDetailLines.Input;
+
 const line = ({
 	active = false,
 	isDefault = false,
@@ -287,6 +312,24 @@ describe("ItemLinesTab", () => {
 				"icon-[lucide--chevron-right]",
 			);
 		}
+	});
+
+	it("renders the summed live charge pool for a deposit input", async () => {
+		await renderLines({
+			...projection,
+			line: [
+				{
+					...projection.line[0],
+					input: [
+						depositInput,
+					],
+				},
+			],
+		});
+
+		expect(document.querySelector('[data-input-kind="deposit"]')?.textContent).toContain(
+			"1 / 33 available",
+		);
 	});
 
 	it("keeps authored order, toggles default state, and reserves active border geometry", async () => {

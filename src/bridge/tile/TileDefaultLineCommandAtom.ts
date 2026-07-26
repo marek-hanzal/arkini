@@ -4,6 +4,7 @@ import * as Atom from "effect/unstable/reactivity/Atom";
 import { makeExactGameAtomFamilyFx } from "~/bridge/game/makeExactGameAtomFamilyFx";
 import { readExactCauseFailure } from "~/bridge/game/readExactCauseFailure";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
+import { autofillLineInputsFx } from "~/engine/input/write/autofillLineInputsFx";
 import { startLineFx } from "~/engine/job/write/startLineFx";
 
 export namespace TileDefaultLineCommandAtom {
@@ -50,10 +51,17 @@ export const TileDefaultLineCommandAtom = RendererRuntime.runSync(
 				Effect.gen(function* () {
 					const exit = yield* Effect.exit(
 						game.runFx(
-							startLineFx({
+							autofillLineInputsFx({
 								lineId: command.lineId,
 								ownerItemId: command.ownerItemId,
-							}),
+							}).pipe(
+								Effect.andThen(
+									startLineFx({
+										lineId: command.lineId,
+										ownerItemId: command.ownerItemId,
+									}),
+								),
+							),
 						),
 					);
 					if (Exit.isFailure(exit)) {

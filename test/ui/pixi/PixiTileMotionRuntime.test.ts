@@ -642,6 +642,410 @@ const createStackHarness = () => {
 };
 
 describe("Pixi tile motion runtime", () => {
+	it("launches produced payloads from the held producer's live presentation pose", () => {
+		const { actors, animations, cue, runtime } = createStackHarness();
+		const producer = createActor(cue.originActorId);
+		producer.dragging = true;
+		producer.container.position.set(460, 300);
+		producer.container.pivot.set(16, 12);
+		producer.container.scale.set(1.25);
+		producer.offsetLayer.position.set(5, -4);
+		actors.set(producer.item.id, producer);
+
+		Effect.runSync(
+			runtime.enqueueFx([
+				cue,
+			]),
+		);
+		Effect.runSync(runtime.startFx);
+
+		const travel = animations.find(
+			(animation) => animation.channel === "pose" && animation.ownerKey === "motion:30:0",
+		);
+		if (travel?.channel !== "pose") throw new Error("Expected a stack payload travel.");
+		expect(travel.actor.container).toMatchObject({
+			x: 446.25,
+			y: 280,
+		});
+		expect(travel.actor.container.scale.x).toBe(1.25);
+		expect(travel.actor.container.x).not.toBe(100);
+		expect(travel.actor.container.y).not.toBe(40);
+
+		Effect.runSync(runtime.closeFx);
+	});
+
+	it("chases a moving input owner with the whole stack and settles source quantity at contact", () => {
+		const source = createActor("runtime:input-source");
+		const owner = createActor("runtime:input-owner");
+		source.item = {
+			...createItem(source.item.id, firstBoardLocation),
+			quantity: 7,
+		};
+		owner.item = createItem(owner.item.id, secondBoardLocation);
+		source.container.position.set(125, 40);
+		source.container.alpha = 1;
+		owner.container.position.set(200, 40);
+		owner.container.alpha = 1;
+		const canonicalSource = {
+			...source.item,
+			quantity: 2,
+			revision: "revision:input-source:stored",
+		};
+		const actors = new Map([
+			[
+				source.item.id,
+				source,
+			],
+			[
+				owner.item.id,
+				owner,
+			],
+		]);
+		const canonicalItems = new Map([
+			[
+				source.item.id,
+				canonicalSource,
+			],
+			[
+				owner.item.id,
+				owner.item,
+			],
+		]);
+		const animations: PixiActorAnimation[] = [];
+		const magneticReleases: Array<{
+			readonly sourceActorId: string;
+			readonly sourceKind: "drag" | "motion";
+		}> = [];
+		const magneticUpdates: PixiTileMagneticFieldSample[] = [];
+		const transientActorLayer = new Container();
+		const actorLayer = new Container();
+		const readPose = (location: TileActorItem["location"]) => ({
+			layer: actorLayer,
+			size: 80,
+			x: location.position.x * 100,
+			y: 40,
+		});
+		const runtime = Effect.runSync(
+			createPixiTileMotionRuntimeFx({
+				actorStore: {
+					actors,
+					canonicalItems,
+					deleteActorFx: (actorId: string) =>
+						Effect.sync(() => {
+							const actor = actors.get(actorId) ?? null;
+							actors.delete(actorId);
+							return actor;
+						}),
+				} as unknown as PixiMainSceneActorStore,
+				animator: createRecordingAnimator({
+					animations,
+				}),
+				application: {
+					app: {
+						canvas: {
+							getBoundingClientRect: () => ({
+								left: 0,
+								top: 0,
+							}),
+						},
+					},
+					frames: {
+						invalidateFx: Effect.void,
+					},
+				} as unknown as PixiApplicationOwner,
+				handoffs: {
+					takeFx: () => Effect.succeed(null),
+				} as unknown as TileSceneHandoffStore,
+				magneticField: createRecordingMagneticField({
+					releases: magneticReleases,
+					updates: magneticUpdates,
+				}),
+				readPalette: () => ({}) as PixiScenePalette,
+				surface: {
+					readActorPoseFx: (item: TileActorItem) =>
+						Effect.succeed(readPose(item.location)),
+					readLocationPoseFx: (location: TileActorItem["location"]) =>
+						Effect.succeed(readPose(location)),
+					transientActorLayer,
+				} as unknown as PixiMainSceneSurface,
+				textures: {} as never,
+			}),
+		);
+		const cue = {
+			canonicalItemId: source.item.itemId,
+			eventIndex: 0,
+			kind: "input",
+			originActorId: source.item.id,
+			originLocation: firstBoardLocation,
+			previousQuantity: 7,
+			storedQuantity: 5,
+			resultingQuantity: 2,
+			sequence: 40,
+			sourceActorId: source.item.id,
+			staggerIndex: 0,
+			targetActorId: owner.item.id,
+			targetLocation: secondBoardLocation,
+		} satisfies TileMotionCue;
+
+		Effect.runSync(
+			runtime.enqueueFx([
+				cue,
+			]),
+		);
+		Effect.runSync(runtime.syncQuantitiesFx);
+		Effect.runSync(runtime.startFx);
+
+		expect(source.item.quantity).toBe(7);
+		expect(source.container.alpha).toBe(0);
+		expect(Effect.runSync(runtime.readSnapshotFx)).toMatchObject({
+			interactionClaimByActorId: new Map([
+				[
+					source.item.id,
+					"blocked",
+				],
+			]),
+			unsettledInputSourceQuantities: new Map([
+				[
+					source.item.id,
+					7,
+				],
+			]),
+		});
+		const firstTravel = animations.find(
+			(animation) => animation.channel === "pose" && animation.ownerKey === "motion:40:0",
+		);
+		if (firstTravel?.channel !== "pose") {
+			throw new Error("Expected the first input delivery segment.");
+		}
+		const transient = firstTravel.actor;
+		expect(transient.item.quantity).toBe(7);
+		expect(transient.container.x).toBe(125);
+		expect(source.container.x).toBe(100);
+		samplePoseAnimation(firstTravel, 1);
+		owner.container.x = 340;
+		firstTravel.onComplete?.();
+
+		const travelSegments = animations.filter(
+			(animation) =>
+				animation.actor === transient &&
+				animation.channel === "pose" &&
+				animation.ownerKey === "motion:40:0",
+		);
+		expect(travelSegments).toHaveLength(2);
+		const finalTravel = travelSegments[1];
+		if (finalTravel?.channel !== "pose") {
+			throw new Error("Expected the retargeted input delivery segment.");
+		}
+		samplePoseAnimation(finalTravel, 1);
+		finalTravel.onComplete?.();
+
+		expect(source.item.quantity).toBe(7);
+		expect(source.container.alpha).toBe(0);
+		expect(transient.item.quantity).toBe(2);
+		const returnTravel = animations
+			.filter(
+				(animation) =>
+					animation.actor === transient &&
+					animation.channel === "pose" &&
+					animation.ownerKey === "motion:40:0",
+			)
+			.at(-1);
+		if (returnTravel?.channel !== "pose") {
+			throw new Error("Expected the input remainder return.");
+		}
+		expect(returnTravel.durationMs).toBe(
+			Effect.runSync(
+				readPixiTileTravelDurationMsFx({
+					fromX: 340,
+					fromY: 40,
+					tileSize: 80,
+					toX: 100,
+					toY: 40,
+				}),
+			),
+		);
+		expect(samplePoseAnimation(returnTravel, 1)).toEqual({
+			scale: 1,
+			x: 100,
+			y: 40,
+		});
+		returnTravel.onComplete?.();
+
+		expect(transient.container.destroyed).toBe(true);
+		expect(source.item.quantity).toBe(2);
+		expect(source.container.x).toBe(100);
+		expect(source.container.alpha).toBe(1);
+		expect(Effect.runSync(runtime.readSnapshotFx)).toMatchObject({
+			interactionClaimByActorId: new Map(),
+			unsettledInputSourceQuantities: new Map(),
+		});
+		expect(
+			animations.filter(
+				(animation) => animation.actor === owner && animation.channel === "glow-opacity",
+			),
+		).toHaveLength(1);
+		expect(magneticUpdates.at(-1)).toMatchObject({
+			attractedActorId: null,
+			eligibleAttractionActorIds: new Set([
+				source.item.id,
+			]),
+			sourceActorId: transient.item.id,
+			sourceKind: "motion",
+		});
+		expect(
+			magneticReleases.filter((release) => release.sourceActorId === transient.item.id),
+		).toHaveLength(2);
+		Effect.runSync(runtime.closeFx);
+	});
+
+	it("destroys a fully stored stack without restoring a ghost at its origin", () => {
+		const source = createActor("runtime:consumed-input-source");
+		const owner = createActor("runtime:consumed-input-owner");
+		source.item = {
+			...createItem(source.item.id, firstBoardLocation),
+			quantity: 3,
+		};
+		owner.item = createItem(owner.item.id, secondBoardLocation);
+		source.container.position.set(100, 40);
+		source.container.alpha = 1;
+		owner.container.position.set(200, 40);
+		owner.container.alpha = 1;
+		const actors = new Map([
+			[
+				source.item.id,
+				source,
+			],
+			[
+				owner.item.id,
+				owner,
+			],
+		]);
+		const canonicalItems = new Map([
+			[
+				owner.item.id,
+				owner.item,
+			],
+		]);
+		const animations: PixiActorAnimation[] = [];
+		const transientActorLayer = new Container();
+		const readPose = (location: TileActorItem["location"]) => ({
+			layer: transientActorLayer,
+			size: 80,
+			x: location.position.x * 100,
+			y: 40,
+		});
+		const runtime = Effect.runSync(
+			createPixiTileMotionRuntimeFx({
+				actorStore: {
+					actors,
+					canonicalItems,
+					deleteActorFx: (actorId: string) =>
+						Effect.sync(() => {
+							const actor = actors.get(actorId) ?? null;
+							actors.delete(actorId);
+							return actor;
+						}),
+					destroyExitingActorFx: (actor: PixiTileActor) =>
+						Effect.sync(() => {
+							actor.container.destroy({
+								children: true,
+							});
+						}),
+					releaseActorFx: (actorId: string) =>
+						Effect.sync(() => {
+							const actor = actors.get(actorId) ?? null;
+							actors.delete(actorId);
+							return actor;
+						}),
+				} as unknown as PixiMainSceneActorStore,
+				animator: createRecordingAnimator({
+					animations,
+				}),
+				application: {
+					app: {
+						canvas: {
+							getBoundingClientRect: () => ({
+								left: 0,
+								top: 0,
+							}),
+						},
+					},
+					frames: {
+						invalidateFx: Effect.void,
+					},
+				} as unknown as PixiApplicationOwner,
+				handoffs: {
+					takeFx: () => Effect.succeed(null),
+				} as unknown as TileSceneHandoffStore,
+				magneticField: createRecordingMagneticField(),
+				readPalette: () => ({}) as PixiScenePalette,
+				surface: {
+					readActorPoseFx: (item: TileActorItem) =>
+						Effect.succeed(readPose(item.location)),
+					readLocationPoseFx: (location: TileActorItem["location"]) =>
+						Effect.succeed(readPose(location)),
+					transientActorLayer,
+				} as unknown as PixiMainSceneSurface,
+				textures: {} as never,
+			}),
+		);
+		const cue = {
+			canonicalItemId: source.item.itemId,
+			eventIndex: 0,
+			kind: "input",
+			originActorId: source.item.id,
+			originLocation: firstBoardLocation,
+			previousQuantity: 3,
+			storedQuantity: 3,
+			resultingQuantity: 0,
+			sequence: 41,
+			sourceActorId: source.item.id,
+			staggerIndex: 0,
+			targetActorId: owner.item.id,
+			targetLocation: secondBoardLocation,
+		} satisfies TileMotionCue;
+
+		Effect.runSync(
+			runtime.enqueueFx([
+				cue,
+			]),
+		);
+		Effect.runSync(runtime.startFx);
+
+		const travel = animations.find(
+			(animation) => animation.channel === "pose" && animation.ownerKey === "motion:41:0",
+		);
+		if (travel?.channel !== "pose") throw new Error("Expected the complete input travel.");
+		const transient = travel.actor;
+		samplePoseAnimation(travel, 1);
+		travel.onComplete?.();
+		const removal = animations.find(
+			(animation) =>
+				animation.actor === transient &&
+				animation.channel === "lifecycle-opacity" &&
+				animation.toAlpha === 0,
+		);
+		if (removal?.channel !== "lifecycle-opacity") {
+			throw new Error("Expected the complete input contact fade.");
+		}
+		expect(source.container.alpha).toBe(0);
+		removal.onComplete?.();
+
+		expect(actors.has(source.item.id)).toBe(false);
+		expect(source.container.destroyed).toBe(true);
+		expect(transient.container.destroyed).toBe(true);
+		expect(
+			animations.some(
+				(animation) =>
+					animation.actor === source &&
+					animation.channel === "lifecycle-opacity" &&
+					animation.toAlpha === 1,
+			),
+		).toBe(false);
+		expect(Effect.runSync(runtime.readSnapshotFx).interactionClaimByActorId).toEqual(new Map());
+		Effect.runSync(runtime.closeFx);
+	});
+
 	it("shares one Inventory handoff across a delivery batch and fades a spawn in", () => {
 		const spawned = createActor("runtime:spawned");
 		const stacked = createActor("runtime:stacked");

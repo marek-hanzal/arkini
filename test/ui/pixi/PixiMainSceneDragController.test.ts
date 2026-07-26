@@ -23,7 +23,7 @@ const previewState = vi.hoisted(() => ({
 		string,
 		"merge" | "move" | "reject" | "stack" | "store-input" | "store-inventory" | "swap"
 	>(),
-	kind: "move" as "move" | "reject" | "store-inventory",
+	kind: "move" as "ignored" | "move" | "reject" | "store-inventory" | "swap",
 }));
 
 vi.mock("~/bridge/tile/readTileDropPreviewFx", () => ({
@@ -281,6 +281,7 @@ const mountController = ({
 				readSnapshotFx: Effect.succeed({
 					interactionClaimByActorId,
 					spawnCueByActorId: new Map(),
+					unsettledInputSourceQuantities: new Map(),
 					unsettledQuantities: new Map(),
 				}),
 				startFx: Effect.void,
@@ -427,6 +428,17 @@ describe("Pixi main-scene drag controller", () => {
 		await flushMicrotasks();
 		expect(mounted.onActivate).not.toHaveBeenCalled();
 		expect(mounted.onDrop).toHaveBeenCalledOnce();
+	});
+
+	it("keeps the grab cursor while a committed swap is being submitted", async () => {
+		const mounted = mountController();
+		previewState.kind = "swap";
+		mounted.actorEvents.emit("pointerdown", pointer(10, 20));
+		mounted.stage.emit("globalpointermove", pointer(30, 20));
+		mounted.stage.emit("pointerup", pointer(30, 20));
+
+		expect(mounted.actor.container.cursor).toBe("grab");
+		await flushMicrotasks();
 	});
 
 	it("does not reinterpret a failed motion handoff drag as a click", async () => {
@@ -949,6 +961,15 @@ describe("Pixi main-scene drag controller", () => {
 
 	it("refreshes held feedback and settles a rejected release from its exact pose", async () => {
 		const mounted = mountController();
+		const canonicalLayer = {
+			addChild: vi.fn(),
+		};
+		mounted.setActorPose({
+			layer: canonicalLayer,
+			size: 80,
+			x: 10,
+			y: 20,
+		});
 		mounted.actorEvents.emit("pointerdown", pointer(10, 20));
 		mounted.stage.emit("globalpointermove", pointer(45, 20));
 		previewState.kind = "reject";
@@ -963,12 +984,30 @@ describe("Pixi main-scene drag controller", () => {
 
 		const settleAnimation = mounted.animations.at(-1);
 		if (settleAnimation === undefined) throw new Error("Expected a settle animation.");
+		expect(mounted.transientActorLayer.addChild).toHaveBeenLastCalledWith(
+			mounted.actor.container,
+		);
+		expect(canonicalLayer.addChild).not.toHaveBeenCalled();
 		samplePoseAnimation(settleAnimation, 1);
+		settleAnimation.onComplete?.();
 		expect(mounted.onAcceptedDrop).not.toHaveBeenCalled();
+		expect(canonicalLayer.addChild).toHaveBeenCalledOnce();
+		expect(canonicalLayer.addChild).toHaveBeenCalledWith(mounted.actor.container);
 		expect(mounted.actor.container.x).toBe(10);
 		expect(mounted.actor.container.y).toBe(20);
 		expect(mounted.actor.dragging).toBe(false);
 		expect(mounted.actor.container.zIndex).toBe(0);
+		expect(mounted.actor.container.cursor).toBe("grab");
+	});
+
+	it("keeps the origin available with a grab cursor during drag", () => {
+		const mounted = mountController();
+		previewState.kind = "ignored";
+
+		mounted.actorEvents.emit("pointerdown", pointer(10, 20));
+		mounted.stage.emit("globalpointermove", pointer(45, 20));
+
+		expect(mounted.actor.dragging).toBe(true);
 		expect(mounted.actor.container.cursor).toBe("grab");
 	});
 

@@ -4,6 +4,7 @@ import { match } from "ts-pattern";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { ItemDetailLines } from "~/engine/item-detail/read/ItemDetailLines";
 import { readItemDetailChargeKeyFx } from "~/engine/item-detail/read/readItemDetailChargeKeyFx";
+import { readItemDetailDepositAvailableChargesFx } from "~/engine/item-detail/read/readItemDetailDepositAvailableChargesFx";
 import { readItemDetailQuantityBoundsFx } from "~/engine/item-detail/read/readItemDetailQuantityBoundsFx";
 import { readItemDetailSelectorKeyFx } from "~/engine/item-detail/read/readItemDetailSelectorKeyFx";
 import type { InputRunResolutionSchema } from "~/engine/input/schema/run/InputRunResolutionSchema";
@@ -116,9 +117,16 @@ export const readItemDetailInputsFx = Effect.fn("readItemDetailInputsFx")(functi
 							kind: "deposit",
 							selector: depositInput.query.selector,
 							distance: depositInput.query.distance,
-							requiredTargets: (previous?.requiredTargets ?? 0) + 1,
-							readyTargets:
-								(previous?.readyTargets ?? 0) + (resolution?.ready ? 1 : 0),
+							requiredCharges:
+								(previous?.requiredCharges ?? 0) +
+								(depositInput.charges?.cost ?? 0),
+							availableCharges:
+								previous?.availableCharges ??
+								(yield* readItemDetailDepositAvailableChargesFx({
+									input: depositInput,
+									ownerItemId,
+									runtime,
+								})),
 							targetItemIds:
 								targetItemId === undefined
 									? (previous?.targetItemIds ?? [])

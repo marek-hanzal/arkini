@@ -1,17 +1,13 @@
 import { Effect, Option } from "effect";
+import { match } from "ts-pattern";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
-import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
-import { applyInputMaterialStorePlanFx } from "~/engine/input/fx/applyInputMaterialStorePlanFx";
 import { planLineInputAutofillFx } from "~/engine/input/fx/planLineInputAutofillFx";
-import { readItemMaterialInputFx } from "~/engine/input/read/readItemMaterialInputFx";
-import { ItemNotOnGridError } from "~/engine/item/error/ItemNotOnGridError";
-import { isolateStatefulOwnerTransitionFx } from "~/engine/item/fx/isolateStatefulOwnerTransitionFx";
-import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
 import { isGridRuntimeItemFx } from "~/engine/runtime/read/isGridRuntimeItemFx";
+import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import { readRuntimeItemByIdFx } from "~/engine/runtime/read/readRuntimeItemByIdFx";
-import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
+import { DropItemResultKindEnumSchema } from "~/engine/runtime/schema/command/DropItemResultKindEnumSchema";
+import { dropItemFx } from "~/engine/runtime/write/dropItemFx";
 
 export namespace autofillLineInputsFx {
 	export interface Props {
@@ -25,98 +21,78 @@ export namespace autofillLineInputsFx {
 	}
 }
 
-/** Atomically fills one line's missing material minimum from canonical eligible grids. */
+/**
+ * Fills one line from its owner's board through ordinary item-drop commands.
+ *
+ * Each planned source is submitted as its complete current stack. The canonical drop path alone
+ * decides the accepted quantity, publishes one normal committed transition, and leaves any
+ * remainder exactly where a pointer drop would leave it.
+ */
 export const autofillLineInputsFx = Effect.fn("autofillLineInputsFx")(function* ({
 	ownerItemId,
 	lineId,
 }: autofillLineInputsFx.Props) {
-	return yield* modifyRuntimeFx((runtime) =>
-		Effect.gen(function* () {
-			const plan = yield* planLineInputAutofillFx({
-				ownerItemId,
-				lineId,
-				runtime,
-			});
-			if (plan.entry.length === 0) {
-				return [
-					{
-						storedQuantity: 0,
-						remainingMissingQuantity: plan.remainingMissingQuantity,
-					} satisfies autofillLineInputsFx.Result,
-					runtime,
-				] as const;
-			}
-
-			const owner = yield* readRuntimeItemByIdFx({
-				itemId: ownerItemId,
-				runtime,
-			});
-			let draft = runtime;
-			const events: GameEventSchema.Type[] = [];
-			for (const entry of plan.entry) {
-				const runtimeSource = yield* readRuntimeItemByIdFx({
-					itemId: entry.sourceItemId,
-					runtime: draft,
-				});
-				const source = Option.getOrUndefined(yield* isGridRuntimeItemFx(runtimeSource));
-				if (source === undefined) {
-					return yield* Effect.fail(
-						new ItemNotOnGridError({
-							itemId: runtimeSource.id,
-							location: runtimeSource.location,
-						}),
-					);
-				}
-				yield* readItemMaterialInputFx({
-					inputIndex: entry.inputIndex,
-					item: owner.item,
-					lineId,
-					ownerItemId,
-				});
-				const [stored, nextDraft] = yield* applyInputMaterialStorePlanFx({
-					location: {
-						scope: LocationScopeEnumSchema.enum.Input,
-						ownerItemId,
-						lineId,
-						inputIndex: entry.inputIndex,
-					},
-					plan: {
-						sourceItemId: source.id,
-						quantity: entry.quantity,
-					},
-					runtime: draft,
-					source,
-				});
-				events.push({
-					type: GameEventEnumSchema.enum.ItemInputStored,
-					sourceItemId: source.id,
-					canonicalItemId: source.item.id,
-					previousSourceLocation: source.location,
-					previousQuantity: source.quantity,
-					storedQuantity: stored.storedItem.quantity,
-					resultingQuantity: stored.sourceItem?.quantity ?? 0,
-					ownerItemId,
-					lineId,
-					inputIndex: entry.inputIndex,
-				} satisfies GameEventSchema.Type);
-				draft = nextDraft;
-			}
-
-			const isolation = yield* isolateStatefulOwnerTransitionFx({
-				ownerItemId,
-				runtime: draft,
-			});
-			return [
+	let storedQuantity = 0;
+	while (true) {
+		const runtime = yield* readRuntimeFx();
+		const plan = yield* planLineInputAutofillFx({
+			ownerItemId,
+			lineId,
+			runtime,
+		});
+		const next = plan.entry[0];
+		if (next === undefined) {
+			return {
+				storedQuantity,
+				remainingMissingQuantity: plan.remainingMissingQuantity,
+			} satisfies autofillLineInputsFx.Result;
+		}
+		const runtimeOwner = yield* readRuntimeItemByIdFx({
+			itemId: ownerItemId,
+			runtime,
+		});
+		const runtimeSource = yield* readRuntimeItemByIdFx({
+			itemId: next.sourceItemId,
+			runtime,
+		});
+		const [owner, source] = [
+			Option.getOrUndefined(yield* isGridRuntimeItemFx(runtimeOwner)),
+			Option.getOrUndefined(yield* isGridRuntimeItemFx(runtimeSource)),
+		];
+		if (owner === undefined || source === undefined) {
+			return {
+				storedQuantity,
+				remainingMissingQuantity: plan.remainingMissingQuantity,
+			} satisfies autofillLineInputsFx.Result;
+		}
+		const outcome = yield* dropItemFx({
+			sourceItemId: source.id,
+			sourceLocation: source.location,
+			sourceRevision: source.revision,
+			target: {
+				kind: "slot",
+				inputLineId: lineId,
+				location: owner.location,
+				occupant: {
+					itemId: owner.id,
+					revision: owner.revision,
+				},
+			},
+		});
+		const stored = match(outcome)
+			.with(
 				{
-					storedQuantity: plan.storedQuantity,
-					remainingMissingQuantity: plan.remainingMissingQuantity,
-				} satisfies autofillLineInputsFx.Result,
-				isolation.runtime,
-				[
-					...events,
-					...isolation.events,
-				],
-			] as const;
-		}),
-	);
+					kind: DropItemResultKindEnumSchema.enum.StoreInput,
+				},
+				(result) => result.storedQuantity,
+			)
+			.otherwise(() => null);
+		if (stored === null) {
+			return {
+				storedQuantity,
+				remainingMissingQuantity: plan.remainingMissingQuantity,
+			} satisfies autofillLineInputsFx.Result;
+		}
+		storedQuantity += stored;
+	}
 });

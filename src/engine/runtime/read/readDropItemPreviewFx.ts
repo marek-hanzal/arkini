@@ -7,7 +7,7 @@ import { ItemEnumSchema } from "~/engine/item/schema/ItemEnumSchema";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 import { isItemLocationScopeAllowedFx } from "~/engine/location/read/isItemLocationScopeAllowedFx";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
-import { resolveDefaultLineInputStoreFx } from "~/engine/input/fx/resolveDefaultLineInputStoreFx";
+import { resolveLineInputStoreFx } from "~/engine/input/fx/resolveLineInputStoreFx";
 import { isSameGridLocationFx } from "~/engine/location/read/isSameGridLocationFx";
 import { resolveMergeRuleFx } from "~/engine/merge/fx/resolveMergeRuleFx";
 import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
@@ -34,6 +34,7 @@ export namespace readDropItemPreviewFx {
 						readonly itemId: IdSchema.Type;
 						readonly revision: RevisionSchema.Type;
 					} | null;
+					readonly inputLineId?: IdSchema.Type;
 			  }
 			| {
 					readonly kind: "unsupported";
@@ -203,7 +204,8 @@ export const readDropItemPreviewFx = Effect.fn("readDropItemPreviewFx")(function
 			} satisfies readDropItemPreviewFx.Result;
 		}
 	}
-	const inputStore = yield* resolveDefaultLineInputStoreFx({
+	const inputStore = yield* resolveLineInputStoreFx({
+		lineId: target.inputLineId,
 		owner: targetItem,
 		runtime,
 		source,

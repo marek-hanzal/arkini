@@ -31,6 +31,7 @@ import type { PixiTextureStore } from "~/ui/pixi/runtime/createPixiTextureStoreF
 import type { PixiMainSceneSurface } from "~/ui/pixi/scene/PixiMainSceneSurface";
 import type { TileMotionLanesState } from "~/ui/tile/motion/TileMotionLanesState";
 import { readTileMotionActorClaimsFx } from "~/ui/tile/motion/readTileMotionActorClaimsFx";
+import { readUnsettledTileInputSourceQuantitiesFx } from "~/ui/tile/motion/readUnsettledTileInputSourceQuantitiesFx";
 import { readUnsettledTileStackQuantitiesFx } from "~/ui/tile/motion/readUnsettledTileStackQuantitiesFx";
 import { updateTileMotionLanesFx } from "~/ui/tile/motion/updateTileMotionLanesFx";
 
@@ -119,6 +120,13 @@ export const createPixiTileMotionRuntimeFx = Effect.fn("createPixiTileMotionRunt
 			}),
 		);
 
+	const readUnsettledInputSourceQuantities = () =>
+		RendererRuntime.runSync(
+			readUnsettledTileInputSourceQuantitiesFx({
+				cues: readCues(),
+			}),
+		);
+
 	const syncQuantities = () => {
 		RendererRuntime.runSync(
 			syncPixiTileMotionQuantitiesFx({
@@ -128,6 +136,7 @@ export const createPixiTileMotionRuntimeFx = Effect.fn("createPixiTileMotionRunt
 				readPalette,
 				surface,
 				textures,
+				unsettledInputSourceQuantities: readUnsettledInputSourceQuantities(),
 				unsettledQuantities: readUnsettledQuantities(),
 			}),
 		);
@@ -168,6 +177,7 @@ export const createPixiTileMotionRuntimeFx = Effect.fn("createPixiTileMotionRunt
 			(candidate) => readCueHandoffKey(candidate) === completedHandoffKey,
 		);
 		if (!handoffStillClaimed) claimedHandoffs.delete(completedHandoffKey);
+		const stillClaimedActorIds = readOwnedActorIds();
 		RendererRuntime.runSync(
 			finalizePixiTileMotionActorsFx({
 				actorIds: RendererRuntime.runSync(readTileMotionActorClaimsFx(cue)),
@@ -175,12 +185,27 @@ export const createPixiTileMotionRuntimeFx = Effect.fn("createPixiTileMotionRunt
 				animator,
 				application,
 				readPalette,
-				stillClaimedActorIds: readOwnedActorIds(),
+				stillClaimedActorIds,
 				surface,
 				textures,
 			}),
 		);
 		syncQuantities();
+		if (
+			cue.kind === "input" &&
+			!stillClaimedActorIds.has(cue.sourceActorId) &&
+			actorStore.canonicalItems.has(cue.sourceActorId)
+		) {
+			const sourceActor = actorStore.actors.get(cue.sourceActorId);
+			if (sourceActor !== undefined && !sourceActor.container.destroyed) {
+				RendererRuntime.runSync(
+					startPixiTileActorFadeInFx({
+						actor: sourceActor,
+						animator,
+					}),
+				);
+			}
+		}
 		if (detachedSwapLegByActorId.size === 0) startCues();
 	}
 
@@ -324,6 +349,12 @@ export const createPixiTileMotionRuntimeFx = Effect.fn("createPixiTileMotionRunt
 			.with(
 				{
 					kind: "stack",
+				},
+				() => false,
+			)
+			.with(
+				{
+					kind: "input",
 				},
 				() => false,
 			)
@@ -562,6 +593,7 @@ export const createPixiTileMotionRuntimeFx = Effect.fn("createPixiTileMotionRunt
 							: [],
 					),
 				),
+				unsettledInputSourceQuantities: readUnsettledInputSourceQuantities(),
 				unsettledQuantities: readUnsettledQuantities(),
 			}),
 		),

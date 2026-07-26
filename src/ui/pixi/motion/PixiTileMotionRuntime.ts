@@ -15,6 +15,7 @@ export interface PixiTileMotionSnapshot {
 			}
 		>
 	>;
+	readonly unsettledInputSourceQuantities: ReadonlyMap<string, number>;
 	readonly unsettledQuantities: ReadonlyMap<string, number>;
 }
 

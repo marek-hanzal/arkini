@@ -30,6 +30,7 @@ export namespace dropItemFx {
 						readonly itemId: IdSchema.Type;
 						readonly revision: RevisionSchema.Type;
 					} | null;
+					readonly inputLineId?: IdSchema.Type;
 			  }
 			| {
 					readonly kind: "unsupported";
@@ -85,6 +86,21 @@ export const dropItemFx = Effect.fn("dropItemFx")(function* ({
 		return {
 			kind: DropItemResultKindEnumSchema.enum.Reject,
 			reason: preflight.reason,
+			itemId: sourceItemId,
+			...(target.occupant === null
+				? {}
+				: {
+						targetItemId: target.occupant.itemId,
+					}),
+		} satisfies dropItemFx.Result;
+	}
+	if (
+		target.inputLineId !== undefined &&
+		preflight.kind !== DropItemResultKindEnumSchema.enum.StoreInput
+	) {
+		return {
+			kind: DropItemResultKindEnumSchema.enum.Reject,
+			reason: DropItemRejectedReasonEnumSchema.enum.Blocked,
 			itemId: sourceItemId,
 			...(target.occupant === null
 				? {}

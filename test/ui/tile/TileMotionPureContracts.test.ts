@@ -1,11 +1,17 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import type { TileMotionCue, TileStackMotionCue } from "~/bridge/tile/motion/TileMotionCue";
+import type {
+	TileInputMotionCue,
+	TileMotionCue,
+	TileStackMotionCue,
+} from "~/bridge/tile/motion/TileMotionCue";
+import { readPixiTileInteractionClaimsFx } from "~/ui/pixi/motion/readPixiTileInteractionClaimsFx";
 import { readTileMotionActorClaimsFx } from "~/ui/tile/motion/readTileMotionActorClaimsFx";
 import { readTileMotionLaneClaimsFx } from "~/ui/tile/motion/readTileMotionLaneClaimsFx";
 import { readTileMotionStaggerDelaySecondsFx } from "~/ui/tile/motion/readTileMotionStaggerDelaySecondsFx";
 import { readUnsettledTileStackQuantitiesFx } from "~/ui/tile/motion/readUnsettledTileStackQuantitiesFx";
+import { readUnsettledTileInputSourceQuantitiesFx } from "~/ui/tile/motion/readUnsettledTileInputSourceQuantitiesFx";
 
 const board = (x: number) => ({
 	scope: "board" as const,
@@ -33,6 +39,28 @@ const stackCue = ({
 	canonicalItemId: "water",
 	quantity,
 	originActorId: "runtime:producer",
+	originLocation: board(0),
+	targetLocation: board(1),
+});
+
+const inputCue = ({
+	eventIndex,
+	previousQuantity,
+}: {
+	readonly eventIndex: number;
+	readonly previousQuantity: number;
+}): TileInputMotionCue => ({
+	kind: "input",
+	sequence: 7 + eventIndex,
+	eventIndex: 0,
+	staggerIndex: 0,
+	sourceActorId: "runtime:source",
+	targetActorId: "runtime:owner",
+	canonicalItemId: "water",
+	previousQuantity,
+	storedQuantity: 1,
+	resultingQuantity: previousQuantity - 1,
+	originActorId: "runtime:source",
 	originLocation: board(0),
 	targetLocation: board(1),
 });
@@ -148,6 +176,47 @@ describe("pure tile motion contracts", () => {
 				[
 					"runtime:second",
 					2,
+				],
+			]),
+		);
+	});
+
+	it("blocks the delivered source and exposes only its oldest unsettled quantity", () => {
+		const cues = [
+			inputCue({
+				eventIndex: 0,
+				previousQuantity: 7,
+			}),
+			inputCue({
+				eventIndex: 1,
+				previousQuantity: 2,
+			}),
+		];
+
+		expect(Effect.runSync(readTileMotionActorClaimsFx(cues[0]))).toEqual(
+			new Set([
+				"runtime:source",
+			]),
+		);
+		expect(Effect.runSync(readPixiTileInteractionClaimsFx(cues))).toEqual(
+			new Map([
+				[
+					"runtime:source",
+					"blocked",
+				],
+			]),
+		);
+		expect(
+			Effect.runSync(
+				readUnsettledTileInputSourceQuantitiesFx({
+					cues,
+				}),
+			),
+		).toEqual(
+			new Map([
+				[
+					"runtime:source",
+					7,
 				],
 			]),
 		);

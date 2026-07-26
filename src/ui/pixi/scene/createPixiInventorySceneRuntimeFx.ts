@@ -29,11 +29,6 @@ export namespace createPixiInventorySceneRuntimeFx {
 			item: TileActorItem,
 			shiftKey: boolean,
 			origin: HTMLElement,
-			handoff: {
-				readonly centerX: number;
-				readonly centerY: number;
-				readonly size: number;
-			},
 		) => void | PromiseLike<unknown>;
 		readonly onDrop: (command: runTileDropAtom.Command) => PromiseLike<runTileDropAtom.Result>;
 		readonly textures: PixiTextureStore;

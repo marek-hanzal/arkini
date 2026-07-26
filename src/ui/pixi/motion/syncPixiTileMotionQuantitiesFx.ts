@@ -16,6 +16,7 @@ export namespace syncPixiTileMotionQuantitiesFx {
 		readonly readPalette: () => PixiScenePalette;
 		readonly surface: PixiMainSceneSurface;
 		readonly textures: PixiTextureStore;
+		readonly unsettledInputSourceQuantities: ReadonlyMap<string, number>;
 		readonly unsettledQuantities: ReadonlyMap<string, number>;
 	}
 }
@@ -29,8 +30,28 @@ export const syncPixiTileMotionQuantitiesFx = Effect.fn("syncPixiTileMotionQuant
 		readPalette,
 		surface,
 		textures,
+		unsettledInputSourceQuantities,
 		unsettledQuantities,
 	}: syncPixiTileMotionQuantitiesFx.Props) {
+		for (const [actorId, previousQuantity] of unsettledInputSourceQuantities) {
+			const actor = actorStore.actors.get(actorId);
+			if (actor === undefined) continue;
+			const item = actorStore.canonicalItems.get(actorId) ?? actor.item;
+			const pose = yield* surface.readActorPoseFx(item);
+			if (pose === null) continue;
+			yield* updatePixiTileActorFx({
+				actor,
+				animator,
+				frames: application.frames,
+				item: {
+					...item,
+					quantity: previousQuantity,
+				},
+				palette: readPalette(),
+				size: actor.dragging ? actor.size : pose.size,
+				textures,
+			});
+		}
 		for (const [actorId, hiddenQuantity] of unsettledQuantities) {
 			const actor = actorStore.actors.get(actorId);
 			const canonical = actorStore.canonicalItems.get(actorId);
@@ -50,7 +71,9 @@ export const syncPixiTileMotionQuantitiesFx = Effect.fn("syncPixiTileMotionQuant
 			});
 		}
 		for (const [actorId, canonical] of actorStore.canonicalItems) {
-			if (unsettledQuantities.has(actorId)) continue;
+			if (unsettledInputSourceQuantities.has(actorId) || unsettledQuantities.has(actorId)) {
+				continue;
+			}
 			const actor = actorStore.actors.get(actorId);
 			const pose = yield* surface.readActorPoseFx(canonical);
 			if (

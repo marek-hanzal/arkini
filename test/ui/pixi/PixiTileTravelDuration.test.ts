@@ -19,15 +19,19 @@ describe("Pixi tile travel duration", () => {
 		expect(readDuration(0)).toBe(0);
 	});
 
-	it("increases duration with distance instead of increasing tile speed", () => {
+	it("keeps short travel readable while letting long travel cover tiles faster", () => {
+		const quarterTile = readDuration(0.25);
 		const oneTile = readDuration(1);
 		const fourTiles = readDuration(4);
 		const tenTiles = readDuration(10);
 
-		expect(oneTile).toBeCloseTo(433.0127, 3);
-		expect(fourTiles).toBeCloseTo(1000, 3);
-		expect(tenTiles).toBeCloseTo(2500, 3);
+		expect(quarterTile).toBe(280);
+		expect(oneTile).toBe(280);
+		expect(fourTiles).toBeCloseTo(547.7226, 3);
+		expect(tenTiles).toBeCloseTo(1250, 3);
 		expect(oneTile).toBeLessThan(fourTiles);
 		expect(fourTiles).toBeLessThan(tenTiles);
+		expect(1 / (oneTile / 1000)).toBeLessThan(4 / (fourTiles / 1000));
+		expect(4 / (fourTiles / 1000)).toBeLessThan(10 / (tenTiles / 1000));
 	});
 });

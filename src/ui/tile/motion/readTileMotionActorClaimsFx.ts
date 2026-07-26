@@ -25,6 +25,15 @@ export const readTileMotionActorClaimsFx = Effect.fn("readTileMotionActorClaimsF
 				)
 				.with(
 					{
+						kind: "input",
+					},
+					(input) =>
+						new Set([
+							input.sourceActorId,
+						]),
+				)
+				.with(
+					{
 						kind: "swap",
 					},
 					(swap) =>

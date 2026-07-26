@@ -68,7 +68,7 @@ export const Settings = ({ onBackFx }: Settings.Props) => {
 						return (
 							<label
 								key={option.value}
-								className={`relative rounded-lg px-3 py-2.5 text-center text-sm font-semibold transition-colors focus-within:outline-none focus-within:ring-2 focus-within:ring-accent ${
+								className={`relative rounded-lg px-3 py-2.5 text-center text-sm font-semibold transition-colors ${
 									model.blocked
 										? selected
 											? "cursor-progress bg-accent text-accent-contrast opacity-60"

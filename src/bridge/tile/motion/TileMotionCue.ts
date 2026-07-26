@@ -21,6 +21,16 @@ export interface TileStackMotionCue extends TileMotionCueBase {
 	readonly quantity: number;
 }
 
+export interface TileInputMotionCue extends TileMotionCueBase {
+	readonly kind: "input";
+	readonly sourceActorId: string;
+	readonly targetActorId: string;
+	readonly canonicalItemId: string;
+	readonly previousQuantity: number;
+	readonly storedQuantity: number;
+	readonly resultingQuantity: number;
+}
+
 export interface TileSwapMotionCue extends TileMotionCueBase {
 	readonly kind: "swap";
 	readonly actorId: string;
@@ -28,4 +38,8 @@ export interface TileSwapMotionCue extends TileMotionCueBase {
 }
 
 /** One renderer-owned physical intent compiled from a complete committed transition. */
-export type TileMotionCue = TileSpawnMotionCue | TileStackMotionCue | TileSwapMotionCue;
+export type TileMotionCue =
+	| TileSpawnMotionCue
+	| TileStackMotionCue
+	| TileInputMotionCue
+	| TileSwapMotionCue;

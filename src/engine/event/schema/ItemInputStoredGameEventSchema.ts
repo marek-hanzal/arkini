@@ -4,7 +4,7 @@ import { IdSchema } from "~/engine/common/schema/IdSchema";
 import { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 import { GameEventEnumSchema } from "./GameEventEnumSchema";
 
-/** One autonomous input store changed one exact visible source identity. */
+/** One input store changed one exact visible source identity. */
 export const ItemInputStoredGameEventSchema = z
 	.object({
 		type: GameEventEnumSchema.extract([
@@ -24,7 +24,7 @@ export const ItemInputStoredGameEventSchema = z
 	.meta({
 		id: "ItemInputStoredGameEventSchema",
 		description:
-			"Transient fact that one autonomous input store changed one exact visible source identity.",
+			"Transient fact that one input store changed one exact visible source identity.",
 	});
 
 export type ItemInputStoredGameEventSchema = typeof ItemInputStoredGameEventSchema;

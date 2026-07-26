@@ -11,6 +11,7 @@ import type { PixiScenePalette } from "~/ui/pixi/appearance/PixiScenePalette";
 import type { TileSceneHandoff } from "~/ui/pixi/handoff/TileSceneHandoff";
 import type { PixiTileMagneticField } from "~/ui/pixi/magnet/PixiTileMagneticField";
 import { readPixiTileMotionOriginFx } from "~/ui/pixi/motion/readPixiTileMotionOriginFx";
+import { runPixiInputMotionFx } from "~/ui/pixi/motion/runPixiInputMotionFx";
 import { runPixiSpawnMotionFx } from "~/ui/pixi/motion/runPixiSpawnMotionFx";
 import { runPixiStackMotionFx } from "~/ui/pixi/motion/runPixiStackMotionFx";
 import { runPixiSwapMotionFx } from "~/ui/pixi/motion/runPixiSwapMotionFx";
@@ -60,9 +61,11 @@ export const runPixiTileMotionCueFx = Effect.fn("runPixiTileMotionCueFx")(functi
 	textures,
 }: runPixiTileMotionCueFx.Props) {
 	const target = yield* surface.readLocationPoseFx(cue.targetLocation);
+	const originActor = actorStore.actors.get(cue.originActorId) ?? null;
 	let origin = yield* readPixiTileMotionOriginFx({
 		application,
 		handoff: null,
+		originActor,
 		originLocation: cue.originLocation,
 		surface,
 		target,
@@ -71,6 +74,7 @@ export const runPixiTileMotionCueFx = Effect.fn("runPixiTileMotionCueFx")(functi
 		origin = yield* readPixiTileMotionOriginFx({
 			application,
 			handoff: readHandoff(),
+			originActor,
 			originLocation: cue.originLocation,
 			surface,
 			target,
@@ -120,6 +124,30 @@ export const runPixiTileMotionCueFx = Effect.fn("runPixiTileMotionCueFx")(functi
 									animator,
 									application,
 									cue: stack,
+									cueKey,
+									delayMs,
+									magneticField,
+									onComplete,
+									onMagneticSourceAcquired,
+									onMagneticSourceReleased,
+									onTransientCreated,
+									origin,
+									readPalette,
+									surface,
+									target,
+									textures,
+								}),
+						)
+						.with(
+							{
+								kind: "input",
+							},
+							(input) =>
+								runPixiInputMotionFx({
+									actorStore,
+									animator,
+									application,
+									cue: input,
 									cueKey,
 									delayMs,
 									magneticField,
@@ -196,6 +224,12 @@ export const runPixiTileMotionCueFx = Effect.fn("runPixiTileMotionCueFx")(functi
 						.with(
 							{
 								kind: "stack",
+							},
+							() => {},
+						)
+						.with(
+							{
+								kind: "input",
 							},
 							() => {},
 						)

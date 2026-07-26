@@ -47,6 +47,18 @@ export const readTileMotionLaneClaimsFx = Effect.fn("readTileMotionLaneClaimsFx"
 				)
 				.with(
 					{
+						kind: "input",
+					},
+					(input): ReadonlyArray<TileMotionLaneClaim> => [
+						{
+							kind: "exclusive",
+							actorId: input.sourceActorId,
+						},
+						batchClaim(input.targetActorId),
+					],
+				)
+				.with(
+					{
 						kind: "swap",
 					},
 					(swap): ReadonlyArray<TileMotionLaneClaim> => [

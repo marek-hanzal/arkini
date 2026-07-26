@@ -152,7 +152,7 @@
 		var(--ak-accent-contrast) 78%,
 		transparent
 	);
-	--ak-spotlight-option-focus-border: light-dark(
+	--ak-spotlight-option-emphasis-border: light-dark(
 		color-mix(in srgb, var(--ak-accent) 62%, var(--ak-line-strong)),
 		color-mix(in srgb, var(--ak-accent) 72%, var(--ak-line-strong))
 	);
@@ -302,6 +302,10 @@ select {
 	font: inherit;
 }
 
+:where(:focus, :focus-visible) {
+	outline: none !important;
+}
+
 ::selection {
 	color: var(--ak-accent-contrast);
 	background: var(--ak-accent);
@@ -330,13 +334,6 @@ select {
 	}
 }
 
-.ak-list-row-interactive:not(.ak-list-row-pending):focus-visible,
-.ak-list-row-interactive:not(.ak-list-row-pending):focus-within {
-	background-color: var(--ak-list-row-interactive-surface);
-	box-shadow: inset 0 0 0 2px var(--ak-list-row-emphasis-border);
-	outline: none;
-}
-
 .ak-list-row-active {
 	background-color: var(--ak-list-row-active-surface);
 	box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ak-success) 34%, transparent);
@@ -356,13 +353,6 @@ select {
 		background-color: var(--ak-list-row-selected-surface);
 		box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--ak-accent-contrast) 48%, transparent);
 	}
-}
-
-.ak-list-row-interactive.ak-list-row-selected:not(.ak-list-row-pending):focus-visible,
-.ak-list-row-interactive.ak-list-row-selected:not(.ak-list-row-pending):focus-within {
-	color: var(--ak-list-row-selected-foreground);
-	background-color: var(--ak-list-row-selected-surface);
-	box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--ak-accent-contrast) 58%, transparent);
 }
 
 .ak-list-row-pending {
@@ -397,15 +387,8 @@ select {
 @media (hover: hover) and (pointer: fine) {
 	.ak-spotlight-option:not(:disabled):not([data-selected="true"]):hover {
 		background-color: var(--ak-spotlight-option-hover-surface);
-		border-color: var(--ak-spotlight-option-focus-border);
+		border-color: var(--ak-spotlight-option-emphasis-border);
 	}
-}
-
-.ak-spotlight-option:not([data-selected="true"]):focus-visible {
-	background-color: var(--ak-spotlight-option-hover-surface);
-	border-color: var(--ak-spotlight-option-focus-border);
-	box-shadow: inset 0 0 0 1px var(--ak-spotlight-option-focus-border);
-	outline: none;
 }
 
 .ak-spotlight-option[data-selected="true"] {
@@ -429,14 +412,6 @@ select {
 		box-shadow: inset 0 0 0 1px
 			color-mix(in srgb, var(--ak-spotlight-option-selected-foreground) 58%, transparent);
 	}
-}
-
-.ak-spotlight-option[data-selected="true"]:focus-visible {
-	color: var(--ak-spotlight-option-selected-foreground);
-	background-color: var(--ak-spotlight-option-selected-hover-surface);
-	box-shadow: inset 0 0 0 2px
-		color-mix(in srgb, var(--ak-spotlight-option-selected-foreground) 68%, transparent);
-	outline: none;
 }
 
 .ak-spotlight-option:disabled {

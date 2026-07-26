@@ -27,6 +27,14 @@ export const readPixiTileInteractionClaimsFx = Effect.fn("readPixiTileInteractio
 					)
 					.with(
 						{
+							kind: "input",
+						},
+						(input) => {
+							claims.set(input.sourceActorId, "blocked");
+						},
+					)
+					.with(
+						{
 							kind: "swap",
 						},
 						(swap) => {

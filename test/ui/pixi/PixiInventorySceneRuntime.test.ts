@@ -790,9 +790,6 @@ describe("Pixi Inventory scene runtime", () => {
 			inventoryItem,
 			false,
 			expect.any(HTMLCanvasElement),
-			expect.objectContaining({
-				size: expectedBoardSize,
-			}),
 		);
 		expect(sceneState.drop).not.toHaveBeenCalled();
 		await Effect.runPromise(runtime.closeFx);

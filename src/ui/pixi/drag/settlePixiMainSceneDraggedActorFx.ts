@@ -21,7 +21,7 @@ export const settlePixiMainSceneDraggedActorFx = Effect.fn("settlePixiMainSceneD
 	function* ({ actor, animator, surface }: settlePixiMainSceneDraggedActorFx.Props) {
 		const pose = yield* surface.readActorPoseFx(actor.item);
 		if (pose === null || actor.container.destroyed) return;
-		pose.layer.addChild(actor.container);
+		surface.transientActorLayer.addChild(actor.container);
 		actor.dragging = false;
 		actor.container.zIndex = 0;
 		actor.container.cursor = yield* readPixiTileActorCursorFx({
@@ -55,6 +55,11 @@ export const settlePixiMainSceneDraggedActorFx = Effect.fn("settlePixiMainSceneD
 			actor,
 			channel: "pose",
 			durationMs,
+			onComplete: () => {
+				if (actor.container.destroyed) return;
+				const latest = RendererRuntime.runSync(surface.readActorPoseFx(actor.item)) ?? pose;
+				latest.layer.addChild(actor.container);
+			},
 			readPose,
 		});
 	},

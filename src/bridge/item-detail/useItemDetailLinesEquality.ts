@@ -55,8 +55,8 @@ export const useItemDetailLinesEquality = () =>
 						right.kind === "deposit" &&
 						sameSelector(deposit.selector, right.selector) &&
 						deposit.distance === right.distance &&
-						deposit.requiredTargets === right.requiredTargets &&
-						deposit.readyTargets === right.readyTargets &&
+						deposit.requiredCharges === right.requiredCharges &&
+						deposit.availableCharges === right.availableCharges &&
 						sameStringArray(deposit.targetTitles, right.targetTitles) &&
 						deposit.ready === right.ready &&
 						sameCharge(deposit.charges, right.charges) &&

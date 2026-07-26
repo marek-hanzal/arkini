@@ -100,7 +100,8 @@ gameplay outcome. Missing visual identities or handoffs degrade to ordinary reco
 - Engine-driven spawn, swap, stack, and direct drag share one magnetic field. Spawn and swap repel
   nearby board responders without attracting their own exchange counterpart; a stack payload
   attracts and chases its receiver's live physical pose through distance-aware nonlinear segments.
-  Settlement releases the magnetic source, and stack contact only then publishes canonical quantity.
+  Settlement releases the magnetic source. Producer input moves the complete stack to its owner,
+  consumes it at contact, and physically returns any remainder before publishing its quantity.
 - Accepted consumption presents exact result/event facts: the surviving source dips, a removed
   source fades, and the receiver flashes the shared accent glow. Drop-result facts cover manual
   stack, producer-input, and Inventory storage commands that do not emit equivalent engine events.

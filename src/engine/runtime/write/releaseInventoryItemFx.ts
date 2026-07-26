@@ -18,6 +18,7 @@ import { ItemLocationConflictError } from "~/engine/runtime/error/ItemLocationCo
 import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
 import { isGridRuntimeItemFx } from "~/engine/runtime/read/isGridRuntimeItemFx";
 import { readRuntimeItemByIdFx } from "~/engine/runtime/read/readRuntimeItemByIdFx";
+import { readRuntimeInventoryOpenerFx } from "~/engine/runtime/read/readRuntimeInventoryOpenerFx";
 
 export namespace releaseInventoryItemFx {
 	export interface Props {
@@ -68,6 +69,10 @@ export const releaseInventoryItemFx = Effect.fn("releaseInventoryItemFx")(functi
 					}),
 				);
 			}
+			const inventoryOpener = yield* readRuntimeInventoryOpenerFx({
+				itemId,
+				runtime,
+			});
 			const canOwnBoardLocation = yield* isItemLocationScopeAllowedFx({
 				item: item.item,
 				locationScope: LocationScopeEnumSchema.enum.Board,
@@ -92,7 +97,7 @@ export const releaseInventoryItemFx = Effect.fn("releaseInventoryItemFx")(functi
 			const placed = yield* placeRuntimeItemFx({
 				itemId,
 				origin,
-				originItemId: itemId,
+				originItemId: inventoryOpener.id,
 				runtime,
 			});
 			if (

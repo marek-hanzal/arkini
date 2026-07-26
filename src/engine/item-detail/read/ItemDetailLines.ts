@@ -41,8 +41,8 @@ export namespace ItemDetailLines {
 		readonly kind: "deposit";
 		readonly selector: SelectorSchema.Type;
 		readonly distance: DistanceEnumSchema.Type;
-		readonly requiredTargets: number;
-		readonly readyTargets: number;
+		readonly requiredCharges: number;
+		readonly availableCharges: number;
 		readonly targetItemIds: readonly IdSchema.Type[];
 		readonly ready: boolean;
 		readonly charges?: ItemDetailLineChargeCost;

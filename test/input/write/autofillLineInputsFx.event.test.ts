@@ -1,4 +1,4 @@
-import { Deferred, Effect, Fiber, Option, Stream } from "effect";
+import { Deferred, Effect, Fiber, Stream } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
@@ -17,7 +17,7 @@ const lineId = "line:workshop:build";
 
 describe("autofillLineInputsFx events", () => {
 	it("publishes visible source transfers in committed autofill order", async () => {
-		const transition = await Effect.runPromise(
+		const transitions = await Effect.runPromise(
 			Effect.scoped(
 				Effect.gen(function* () {
 					yield* spawnItemFx({
@@ -56,7 +56,8 @@ describe("autofillLineInputsFx events", () => {
 					const nextFiber = yield* transitions.changes.pipe(
 						Stream.tap(() => Deferred.succeed(replaySeen, undefined)),
 						Stream.drop(1),
-						Stream.runHead,
+						Stream.take(2),
+						Stream.runCollect,
 						Effect.forkChild,
 					);
 					yield* Deferred.await(replaySeen);
@@ -64,7 +65,7 @@ describe("autofillLineInputsFx events", () => {
 						ownerItemId,
 						lineId,
 					});
-					return Option.getOrThrow(yield* Fiber.join(nextFiber));
+					return Array.from(yield* Fiber.join(nextFiber));
 				}),
 			).pipe(
 				useGameFx({
@@ -73,7 +74,7 @@ describe("autofillLineInputsFx events", () => {
 			),
 		);
 
-		expect(transition.events).toEqual([
+		expect(transitions.flatMap((transition) => transition.events)).toEqual([
 			{
 				type: GameEventEnumSchema.enum.ItemInputStored,
 				sourceItemId: "runtime:near",
@@ -94,24 +95,6 @@ describe("autofillLineInputsFx events", () => {
 				previousQuantity: 1,
 				storedQuantity: 1,
 				resultingQuantity: 0,
-				ownerItemId,
-				lineId,
-				inputIndex: 0,
-			},
-			{
-				type: GameEventEnumSchema.enum.ItemInputStored,
-				sourceItemId: "runtime:inventory",
-				canonicalItemId: "water",
-				previousSourceLocation: {
-					scope: "inventory",
-					position: {
-						x: 0,
-						y: 0,
-					},
-				},
-				previousQuantity: 2,
-				storedQuantity: 1,
-				resultingQuantity: 1,
 				ownerItemId,
 				lineId,
 				inputIndex: 0,

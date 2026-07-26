@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import { match, P } from "ts-pattern";
+import { match } from "ts-pattern";
 
 import { DropItemResultKindEnumSchema } from "~/bridge/tile/DropItemResultKindEnumSchema";
 import type { readTileDropPreviewFx } from "~/bridge/tile/readTileDropPreviewFx";
@@ -24,18 +24,29 @@ export const readPixiTileActorCursorFx = Effect.fn("readPixiTileActorCursorFx")(
 				.with(
 					{
 						phase: "pending",
+						previewKind: DropItemResultKindEnumSchema.enum.Swap,
+					},
+					() => "grab" as const,
+				)
+				.with(
+					{
+						phase: "pending",
 					},
 					() => "progress" as const,
 				)
 				.with(
 					{
 						phase: "dragging",
-						previewKind: P.union(
-							DropItemResultKindEnumSchema.enum.Reject,
-							DropItemResultKindEnumSchema.enum.Ignored,
-						),
+						previewKind: DropItemResultKindEnumSchema.enum.Reject,
 					},
 					() => "not-allowed" as const,
+				)
+				.with(
+					{
+						phase: "dragging",
+						previewKind: DropItemResultKindEnumSchema.enum.Ignored,
+					},
+					() => "grab" as const,
 				)
 				.with(
 					{

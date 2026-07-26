@@ -48,8 +48,8 @@ export namespace ItemDetailLines {
 				readonly kind: "deposit";
 				readonly selector: Selector;
 				readonly distance: "close" | "near" | "far";
-				readonly requiredTargets: number;
-				readonly readyTargets: number;
+				readonly requiredCharges: number;
+				readonly availableCharges: number;
 				readonly targetTitles: readonly string[];
 				readonly ready: boolean;
 				readonly charges?: ChargeCost;

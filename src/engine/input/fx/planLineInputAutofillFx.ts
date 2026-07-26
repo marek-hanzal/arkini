@@ -1,4 +1,4 @@
-import { Effect, Option } from "effect";
+import { Array, Effect, Option } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { planInputMaterialStoreFx } from "~/engine/input/fx/planInputMaterialStoreFx";
@@ -11,9 +11,7 @@ import { readItemLineFx } from "~/engine/line/fx/readItemLineFx";
 import { isBoardRuntimeItemFx } from "~/engine/runtime/read/isBoardRuntimeItemFx";
 import { readRuntimeItemByIdFx } from "~/engine/runtime/read/readRuntimeItemByIdFx";
 import type { BoardRuntimeItemSchema } from "~/engine/runtime/schema/BoardRuntimeItemSchema";
-import type { GridRuntimeItemSchema } from "~/engine/runtime/schema/GridRuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
-import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 import { InputEnumSchema } from "~/engine/input/schema/InputEnumSchema";
 
 export namespace planLineInputAutofillFx {
@@ -40,28 +38,19 @@ const candidateRank = ({
 	candidate,
 	owner,
 }: {
-	readonly candidate: GridRuntimeItemSchema.Type;
+	readonly candidate: BoardRuntimeItemSchema.Type;
 	readonly owner: BoardRuntimeItemSchema.Type;
 }) => {
-	if (candidate.location.scope === LocationScopeEnumSchema.enum.Board) {
-		return {
-			surface: 0,
-			distance:
-				Math.abs(candidate.location.position.x - owner.location.position.x) +
-				Math.abs(candidate.location.position.y - owner.location.position.y),
-			position: candidate.location.position.y * 10_000 + candidate.location.position.x,
-		};
-	}
-
 	return {
-		surface: candidate.location.scope === LocationScopeEnumSchema.enum.Inventory ? 1 : 2,
-		distance: 0,
+		distance:
+			Math.abs(candidate.location.position.x - owner.location.position.x) +
+			Math.abs(candidate.location.position.y - owner.location.position.y),
 		position: candidate.location.position.y * 10_000 + candidate.location.position.x,
 	};
 };
 
 const compareCandidates = (owner: BoardRuntimeItemSchema.Type) => {
-	return (left: GridRuntimeItemSchema.Type, right: GridRuntimeItemSchema.Type) => {
+	return (left: BoardRuntimeItemSchema.Type, right: BoardRuntimeItemSchema.Type) => {
 		const leftRank = candidateRank({
 			candidate: left,
 			owner,
@@ -72,7 +61,6 @@ const compareCandidates = (owner: BoardRuntimeItemSchema.Type) => {
 		});
 
 		return (
-			leftRank.surface - rightRank.surface ||
 			leftRank.distance - rightRank.distance ||
 			leftRank.position - rightRank.position ||
 			left.id.localeCompare(right.id)
@@ -83,10 +71,8 @@ const compareCandidates = (owner: BoardRuntimeItemSchema.Type) => {
 /**
  * Plans deterministic automatic material delivery for one exact line.
  *
- * Board sources are limited to the owner's current space. Shared Inventory and
- * Toolbar sources remain eligible under the canonical `scope: any` meaning.
- * The plan fills only each slot's minimum missing quantity and never mutates
- * runtime truth by itself.
+ * Sources are limited to the owner's board space. The plan fills only each
+ * slot's minimum missing quantity and never mutates runtime truth by itself.
  */
 export const planLineInputAutofillFx = Effect.fn("planLineInputAutofillFx")(function* ({
 	ownerItemId,
@@ -120,15 +106,12 @@ export const planLineInputAutofillFx = Effect.fn("planLineInputAutofillFx")(func
 		);
 	}
 
-	const candidates = runtime.items
+	const candidates = Array.getSomes(
+		yield* Effect.forEach(runtime.items, (candidate) => isBoardRuntimeItemFx(candidate)),
+	)
 		.filter(
-			(candidate): candidate is GridRuntimeItemSchema.Type =>
-				candidate.id !== owner.id &&
-				(candidate.location.scope === LocationScopeEnumSchema.enum.Board ||
-					candidate.location.scope === LocationScopeEnumSchema.enum.Inventory ||
-					candidate.location.scope === LocationScopeEnumSchema.enum.Toolbar) &&
-				(candidate.location.scope !== LocationScopeEnumSchema.enum.Board ||
-					candidate.location.space === owner.location.space),
+			(candidate) =>
+				candidate.id !== owner.id && candidate.location.space === owner.location.space,
 		)
 		.slice()
 		.sort(compareCandidates(owner));

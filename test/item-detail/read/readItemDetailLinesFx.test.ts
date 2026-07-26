@@ -8,6 +8,8 @@ import { readItemDetailLinesFx } from "~/engine/item-detail/read/readItemDetailL
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { lineRunRuntime, lineRunTestConfig } from "~test/line/fx/run/support/lineRunTestRuntime";
 import { JobStatusEnumSchema } from "~/engine/job/schema/read/JobStatusEnumSchema";
+import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
+import { readArkiniGameConfigSource } from "~test/schema/support/readArkiniGameConfigSource";
 
 const readLines = (runtime: RuntimeSchema.Type, itemId = "runtime:workshop") =>
 	Effect.runSync(
@@ -215,6 +217,115 @@ describe("readItemDetailLinesFx", () => {
 				reason: "queue",
 			},
 			startMode: "start",
+		});
+	});
+
+	it("sums the real charges of every eligible nearby deposit", async () => {
+		const config = await readArkiniGameConfigSource();
+		const lines = Effect.runSync(
+			Effect.gen(function* () {
+				const runtime = yield* readRuntimeFx();
+				return yield* readItemDetailLinesFx({
+					itemId: "runtime:lumberjack",
+					runtime,
+				});
+			}).pipe(
+				useGameFx({
+					config,
+					state: {
+						cheats: {
+							enabled: false,
+							everEnabled: false,
+							instantGameplay: false,
+						},
+						currentSpace: 0,
+						items: [
+							{
+								id: "runtime:lumberjack",
+								itemId: "producer:lumberjack-t1",
+								location: {
+									scope: "board",
+									space: 0,
+									position: {
+										x: 1,
+										y: 1,
+									},
+								},
+								quantity: 1,
+							},
+							{
+								id: "runtime:tree:full",
+								itemId: "item:tree",
+								location: {
+									scope: "board",
+									space: 0,
+									position: {
+										x: 1,
+										y: 0,
+									},
+								},
+								quantity: 1,
+							},
+							{
+								id: "runtime:tree:five",
+								itemId: "item:tree",
+								location: {
+									scope: "board",
+									space: 0,
+									position: {
+										x: 0,
+										y: 1,
+									},
+								},
+								quantity: 1,
+								remainingCharges: 5,
+							},
+							{
+								id: "runtime:tree:ten",
+								itemId: "item:tree",
+								location: {
+									scope: "board",
+									space: 0,
+									position: {
+										x: 1,
+										y: 2,
+									},
+								},
+								quantity: 1,
+								remainingCharges: 10,
+							},
+							{
+								id: "runtime:tree:far",
+								itemId: "item:tree",
+								location: {
+									scope: "board",
+									space: 0,
+									position: {
+										x: 12,
+										y: 8,
+									},
+								},
+								quantity: 1,
+								remainingCharges: 7,
+							},
+						],
+						jobs: [],
+					},
+				}),
+			),
+		);
+
+		expect(lines.kind).toBe("available");
+		if (lines.kind !== "available") throw new Error("Expected available lines.");
+		expect(
+			lines.line
+				.find((line) => line.lineId === "line:lumberjack-t1:log")
+				?.input.find((input) => input.kind === "deposit"),
+		).toMatchObject({
+			kind: "deposit",
+			requiredCharges: 1,
+			availableCharges: 33,
+			ready: true,
 		});
 	});
 

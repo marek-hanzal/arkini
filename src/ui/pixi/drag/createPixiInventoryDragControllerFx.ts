@@ -39,11 +39,6 @@ export namespace createPixiInventoryDragControllerFx {
 			item: TileActorItem,
 			shiftKey: boolean,
 			origin: HTMLElement,
-			handoff: {
-				readonly centerX: number;
-				readonly centerY: number;
-				readonly size: number;
-			},
 		) => void | PromiseLike<unknown>;
 		readonly onAcceptedDropFx: Effect.Effect<void>;
 		readonly onDrop: (command: runTileDropAtom.Command) => PromiseLike<runTileDropAtom.Result>;
@@ -180,25 +175,10 @@ export const createPixiInventoryDragControllerFx = Effect.fn("createPixiInventor
 		};
 
 		const activateActor = (actor: PixiTileActor, shiftKey: boolean) => {
-			const bounds = application.app.canvas.getBoundingClientRect();
 			const item = actor.item;
 			const removalFeedbackGeneration = shiftKey
 				? null
 				: (removalFeedbackGenerationByActorId.get(item.id) ?? 0) + 1;
-			const presentedSize = actor.size * actor.container.scale.x;
-			const handoff = {
-				centerX:
-					bounds.left +
-					actor.container.x -
-					actor.container.pivot.x * actor.container.scale.x +
-					presentedSize / 2,
-				centerY:
-					bounds.top +
-					actor.container.y -
-					actor.container.pivot.y * actor.container.scale.y +
-					presentedSize / 2,
-				size: presentedSize,
-			};
 			if (removalFeedbackGeneration !== null) {
 				removalFeedbackGenerationByActorId.set(item.id, removalFeedbackGeneration);
 				actor.container.cursor = "progress";
@@ -212,7 +192,7 @@ export const createPixiInventoryDragControllerFx = Effect.fn("createPixiInventor
 			void Promise.resolve()
 				.then(() => {
 					if (closed) return;
-					return onActivate(item, shiftKey, application.app.canvas, handoff);
+					return onActivate(item, shiftKey, application.app.canvas);
 				})
 				.catch((cause) => {
 					if (closed) return;

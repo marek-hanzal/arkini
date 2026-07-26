@@ -67,7 +67,7 @@ export const ItemReferenceButton = ({
 				}
 			}}
 		>
-			<span className="relative block size-11 shrink-0 rounded-lg bg-surface/45 ring-1 ring-line/50 transition-[background-color,box-shadow] group-enabled:group-hover:bg-accent/8 group-enabled:group-hover:ring-accent/35 group-enabled:group-focus-visible:ring-2 group-enabled:group-focus-visible:ring-accent">
+			<span className="relative block size-11 shrink-0 rounded-lg bg-surface/45 ring-1 ring-line/50 transition-[background-color,box-shadow] group-enabled:group-hover:bg-accent/8 group-enabled:group-hover:ring-accent/35">
 				<img
 					className="absolute inset-0 size-full object-contain p-0.5 drop-shadow-[0_0.25rem_0.45rem_color-mix(in_srgb,var(--ak-overlay)_24%,transparent)]"
 					src={sourceUrl}
@@ -83,7 +83,7 @@ export const ItemReferenceButton = ({
 					/>
 				)}
 			</span>
-			<span className="truncate font-medium text-foreground transition-colors group-enabled:group-hover:text-accent group-enabled:group-focus-visible:text-accent">
+			<span className="truncate font-medium text-foreground transition-colors group-enabled:group-hover:text-accent">
 				{label}
 			</span>
 		</motion.button>

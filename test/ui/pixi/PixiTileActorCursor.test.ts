@@ -27,6 +27,15 @@ describe("Pixi tile actor cursor", () => {
 			Effect.runSync(
 				readPixiTileActorCursorFx({
 					phase: "dragging",
+					previewKind: "ignored",
+					running: false,
+				}),
+			),
+		).toBe("grab");
+		expect(
+			Effect.runSync(
+				readPixiTileActorCursorFx({
+					phase: "dragging",
 					previewKind: "reject",
 					running: false,
 				}),
@@ -41,6 +50,15 @@ describe("Pixi tile actor cursor", () => {
 				}),
 			),
 		).toBe("progress");
+		expect(
+			Effect.runSync(
+				readPixiTileActorCursorFx({
+					phase: "pending",
+					previewKind: "swap",
+					running: false,
+				}),
+			),
+		).toBe("grab");
 		expect(
 			Effect.runSync(
 				readPixiTileActorCursorFx({

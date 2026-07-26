@@ -238,8 +238,8 @@ describe("startFx", () => {
 			height: 9,
 		});
 		expect(config.meta.inventory).toEqual({
-			width: 7,
-			height: 7,
+			width: 13,
+			height: 9,
 		});
 		expect(config.meta.toolbarSize).toBe(13);
 

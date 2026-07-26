@@ -728,16 +728,15 @@ describe("createGameSessionFx", () => {
 		});
 		const batches: Array<ReadonlyArray<string>> = [];
 		const unsubscribe = session.subscribeEvents((batch) => {
-			batches.push(
-				batch.events.flatMap((event) =>
-					event.type === GameEventEnumSchema.enum.JobStarted ||
-					event.type === GameEventEnumSchema.enum.JobCompleted
-						? [
-								`${event.type}:${"source" in event ? event.source : ""}`,
-							]
-						: [],
-				),
+			const jobEvents = batch.events.flatMap((event) =>
+				event.type === GameEventEnumSchema.enum.JobStarted ||
+				event.type === GameEventEnumSchema.enum.JobCompleted
+					? [
+							`${event.type}:${"source" in event ? event.source : ""}`,
+						]
+					: [],
 			);
+			if (jobEvents.length > 0) batches.push(jobEvents);
 		});
 
 		try {

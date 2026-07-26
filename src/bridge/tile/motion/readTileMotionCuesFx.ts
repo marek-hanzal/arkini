@@ -25,6 +25,15 @@ type UnstaggeredTileMotionCue =
 			Extract<
 				TileMotionCue,
 				{
+					readonly kind: "input";
+				}
+			>,
+			"staggerIndex"
+	  >
+	| Omit<
+			Extract<
+				TileMotionCue,
+				{
 					readonly kind: "stack";
 				}
 			>,
@@ -165,32 +174,68 @@ const readEventCueFx = Effect.fn("readTileMotionEventCueFx")(function* ({
 		)
 		.with(
 			{
-				type: GameEventEnumSchema.enum.ItemPlaced,
-				previousLocation: {
-					scope: LocationScopeEnumSchema.enum.Inventory,
+				type: GameEventEnumSchema.enum.ItemInputStored,
+				previousSourceLocation: {
+					scope: LocationScopeEnumSchema.enum.Board,
 				},
 			},
-			(placed) =>
-				readTargetFx({
-					canonicalItemId: placed.canonicalItemId,
-					itemId: placed.itemId,
-					location: placed.location,
+			(stored) =>
+				readGridItemFx({
+					itemId: stored.ownerItemId,
 					runtime: transition.runtime,
 				}).pipe(
 					Effect.map((target) =>
 						target === null
 							? null
 							: ({
-									kind: "spawn",
+									kind: "input",
 									sequence: transition.sequence,
 									eventIndex,
-									actorId: target.id,
-									originActorId: placed.originItemId,
-									originLocation: placed.previousLocation,
+									sourceActorId: stored.sourceItemId,
+									targetActorId: stored.ownerItemId,
+									canonicalItemId: stored.canonicalItemId,
+									previousQuantity: stored.previousQuantity,
+									storedQuantity: stored.storedQuantity,
+									resultingQuantity: stored.resultingQuantity,
+									originActorId: stored.sourceItemId,
+									originLocation: stored.previousSourceLocation,
 									targetLocation: target.location,
 								} satisfies UnstaggeredTileMotionCue),
 					),
 				),
+		)
+		.with(
+			{
+				type: GameEventEnumSchema.enum.ItemPlaced,
+				previousLocation: {
+					scope: LocationScopeEnumSchema.enum.Inventory,
+				},
+			},
+			(placed) =>
+				Effect.gen(function* () {
+					const [originLocation, target] = yield* Effect.all([
+						readOriginLocationFx({
+							originItemId: placed.originItemId,
+							transition,
+						}),
+						readTargetFx({
+							canonicalItemId: placed.canonicalItemId,
+							itemId: placed.itemId,
+							location: placed.location,
+							runtime: transition.runtime,
+						}),
+					]);
+					if (originLocation === null || target === null) return null;
+					return {
+						kind: "spawn",
+						sequence: transition.sequence,
+						eventIndex,
+						actorId: target.id,
+						originActorId: placed.originItemId,
+						originLocation,
+						targetLocation: target.location,
+					} satisfies UnstaggeredTileMotionCue;
+				}),
 		)
 		.otherwise(() => Effect.succeed(null));
 });
@@ -211,7 +256,7 @@ export const readTileMotionCuesFx = Effect.fn("readTileMotionCuesFx")(function* 
 			transition,
 		}),
 	);
-	const unstaggered = cues.filter((cue): cue is UnstaggeredTileMotionCue => cue !== null);
+	const unstaggered: ReadonlyArray<UnstaggeredTileMotionCue> = cues.filter((cue) => cue !== null);
 	const staggered = yield* Effect.reduce(
 		unstaggered,
 		() => ({

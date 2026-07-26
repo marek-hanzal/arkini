@@ -1,9 +1,13 @@
-import { Effect } from "effect";
+import { Effect, Option } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~/engine/game/fx/useGameFx";
 import { mergeItemsFx } from "~/engine/merge/write/mergeItemsFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
+import { isGridRuntimeItemFx } from "~/engine/runtime/read/isGridRuntimeItemFx";
+import { readDropItemPreviewFx } from "~/engine/runtime/read/readDropItemPreviewFx";
+import { DropItemResultKindEnumSchema } from "~/engine/runtime/schema/command/DropItemResultKindEnumSchema";
+import { dropItemFx } from "~/engine/runtime/write/dropItemFx";
 import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
 import {
 	readArkiniGameConfigSource,
@@ -25,6 +29,46 @@ const mergeLiveItemsFx = (sourceItemId: string, targetItemId: string) =>
 			targetItemId: target.id,
 			targetRevision: target.revision,
 		});
+	});
+
+const dropLiveItemFx = (sourceItemId: string, targetItemId: string) =>
+	Effect.gen(function* () {
+		const runtime = yield* readRuntimeFx();
+		const runtimeSource = runtime.items.find((item) => item.id === sourceItemId);
+		const runtimeTarget = runtime.items.find((item) => item.id === targetItemId);
+		const source =
+			runtimeSource === undefined
+				? undefined
+				: Option.getOrUndefined(yield* isGridRuntimeItemFx(runtimeSource));
+		const target =
+			runtimeTarget === undefined
+				? undefined
+				: Option.getOrUndefined(yield* isGridRuntimeItemFx(runtimeTarget));
+		if (source === undefined || target === undefined) {
+			return yield* Effect.die(new Error("Expected live authored drop participants."));
+		}
+		const targetCommand = {
+			kind: "slot" as const,
+			location: target.location,
+			occupant: {
+				itemId: target.id,
+				revision: target.revision,
+			},
+		};
+		return {
+			preview: yield* readDropItemPreviewFx({
+				sourceItemId: source.id,
+				sourceRevision: source.revision,
+				sourceLocation: source.location,
+				target: targetCommand,
+			}),
+			result: yield* dropItemFx({
+				sourceItemId: source.id,
+				sourceRevision: source.revision,
+				sourceLocation: source.location,
+				target: targetCommand,
+			}),
+		};
 	});
 
 describe("authored directional merge gameplay", () => {
@@ -208,6 +252,89 @@ describe("authored directional merge gameplay", () => {
 		expect(result.after.items.find((item) => item.id === "runtime:tree")?.item.id).toBe(
 			"item:micro-forest",
 		);
+		expect(result.after.items.some((item) => item.id === "runtime:water")).toBe(false);
+	});
+
+	it("evolves the water chain through the exact player drop command", async () => {
+		const config = await readArkiniGameConfigSource();
+		const result = Effect.runSync(
+			Effect.gen(function* () {
+				const first = yield* dropLiveItemFx("runtime:water", "runtime:tree");
+				const firstTarget = (yield* readRuntimeFx()).items.find(
+					(item) => item.id === "runtime:tree",
+				);
+				const second = yield* dropLiveItemFx("runtime:water", "runtime:tree");
+
+				return {
+					after: yield* readRuntimeFx(),
+					first,
+					firstTarget,
+					second,
+				};
+			}).pipe(
+				useGameFx({
+					config,
+					state: {
+						cheats: {
+							enabled: false,
+							everEnabled: false,
+							instantGameplay: false,
+						},
+						currentSpace: 0,
+						items: [
+							{
+								id: "runtime:water",
+								itemId: "item:water",
+								location: {
+									scope: "board",
+									space: 0,
+									position: {
+										x: 0,
+										y: 0,
+									},
+								},
+								quantity: 2,
+							},
+							{
+								id: "runtime:tree",
+								itemId: "item:tree",
+								location: {
+									scope: "board",
+									space: 0,
+									position: {
+										x: 1,
+										y: 0,
+									},
+								},
+								quantity: 1,
+								remainingCharges: 5,
+							},
+						],
+						jobs: [],
+						jobQueue: [],
+					},
+				}),
+			),
+		);
+
+		expect(result.first.preview.kind).toBe(DropItemResultKindEnumSchema.enum.Merge);
+		expect(result.first.result).toMatchObject({
+			kind: DropItemResultKindEnumSchema.enum.Merge,
+			resultCanonicalItemId: "item:double-tree",
+		});
+		expect(result.firstTarget?.item.id).toBe("item:double-tree");
+		expect(result.firstTarget?.remainingCharges).toBe(23);
+		expect(result.second.preview.kind).toBe(DropItemResultKindEnumSchema.enum.Merge);
+		expect(result.second.result).toMatchObject({
+			kind: DropItemResultKindEnumSchema.enum.Merge,
+			resultCanonicalItemId: "item:micro-forest",
+		});
+		expect(result.after.items.find((item) => item.id === "runtime:tree")?.item.id).toBe(
+			"item:micro-forest",
+		);
+		expect(
+			result.after.items.find((item) => item.id === "runtime:tree")?.remainingCharges,
+		).toBe(59);
 		expect(result.after.items.some((item) => item.id === "runtime:water")).toBe(false);
 	});
 

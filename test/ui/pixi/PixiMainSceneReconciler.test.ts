@@ -353,6 +353,7 @@ const createMotion = () =>
 		readSnapshotFx: Effect.succeed({
 			interactionClaimByActorId: new Map(),
 			spawnCueByActorId: new Map(),
+			unsettledInputSourceQuantities: new Map(),
 			unsettledQuantities: new Map(),
 		}),
 		startFx: Effect.void,
@@ -361,9 +362,21 @@ const createMotion = () =>
 
 const createReconcilerHarness = ({
 	actor,
+	motion = createMotion(),
+	pose = {
+		size: 80,
+		x: 40,
+		y: 60,
+	},
 	readPose = true,
 }: {
 	readonly actor: PixiTileActor;
+	readonly motion?: PixiTileMotionRuntime;
+	readonly pose?: {
+		readonly size: number;
+		readonly x: number;
+		readonly y: number;
+	};
 	readonly readPose?: boolean;
 }) => {
 	const { actors, canonicalItems, store } = createActorStore(actor);
@@ -371,6 +384,7 @@ const createReconcilerHarness = ({
 	const dragHarness = createDrag();
 	const invalidate = vi.fn();
 	const layer = new Container();
+	const transientActorLayer = new Container();
 	const dropPresentation = Effect.runSync(createPixiMainSceneDropPresentationFx());
 	const game = {
 		readOrThrow: (query: unknown) => {
@@ -401,7 +415,7 @@ const createReconcilerHarness = ({
 				resetFx: Effect.void,
 				updateFx: () => Effect.void,
 			} satisfies PixiTileMagneticField,
-			motion: createMotion(),
+			motion,
 			readPalette: () => ({}) as never,
 			runningGlowTexture: {
 				closeFx: Effect.void,
@@ -413,13 +427,11 @@ const createReconcilerHarness = ({
 						readPose
 							? {
 									layer,
-									size: 80,
-									x: 40,
-									y: 60,
+									...pose,
 								}
 							: null,
 					),
-				transientActorLayer: layer,
+				transientActorLayer,
 			} as unknown as PixiMainSceneSurface,
 			textures: {} as never,
 		}),
@@ -433,6 +445,7 @@ const createReconcilerHarness = ({
 		invalidate,
 		layer,
 		reconciler,
+		transientActorLayer,
 	};
 };
 
@@ -454,6 +467,115 @@ beforeEach(() => {
 });
 
 describe("Pixi main-scene reconciliation", () => {
+	it("holds an input source at its pre-contact quantity and suppresses early feedback", () => {
+		const previous = createItem("runtime:input-source", boardLocation, {
+			quantity: 7,
+			revision: "revision:input-source:7",
+		});
+		const current = createItem(previous.id, boardLocation, {
+			quantity: 2,
+			revision: "revision:input-source:2",
+		});
+		const actor = createActor(previous);
+		const motion = {
+			...createMotion(),
+			readSnapshotFx: Effect.succeed({
+				interactionClaimByActorId: new Map([
+					[
+						previous.id,
+						"blocked" as const,
+					],
+				]),
+				spawnCueByActorId: new Map(),
+				unsettledInputSourceQuantities: new Map([
+					[
+						previous.id,
+						7,
+					],
+				]),
+				unsettledQuantities: new Map(),
+			}),
+		} satisfies PixiTileMotionRuntime;
+		const harness = createReconcilerHarness({
+			actor,
+			motion,
+		});
+		projectionState.main = [
+			current,
+		];
+		projectionState.cues = [
+			{
+				canonicalItemId: previous.itemId,
+				eventIndex: 0,
+				kind: "input",
+				originActorId: previous.id,
+				originLocation: boardLocation,
+				previousQuantity: 7,
+				storedQuantity: 5,
+				resultingQuantity: 2,
+				sequence: 2,
+				sourceActorId: previous.id,
+				staggerIndex: 0,
+				targetActorId: "runtime:owner",
+				targetLocation: boardLocation,
+			},
+		];
+		projectionState.feedback = [
+			{
+				actorId: previous.id,
+				key: "2:0:consume-source",
+				kind: "consume-source",
+			},
+		];
+
+		Effect.runSync(harness.reconciler.reconcileFx(transition(2)));
+
+		expect(actor.item.quantity).toBe(7);
+		expect(
+			harness.animations.some(
+				(animation) =>
+					animation.actor === actor &&
+					animation.channel === "lifecycle-opacity" &&
+					animation.toAlpha === 0.42,
+			),
+		).toBe(false);
+	});
+
+	it("keeps a canonical board transport above masks until it reaches its destination", () => {
+		const previous = createItem("runtime:moving-water", boardLocation);
+		const current = createItem(previous.id, {
+			...boardLocation,
+			position: {
+				x: 4,
+				y: 3,
+			},
+		});
+		const actor = createActor(previous);
+		const harness = createReconcilerHarness({
+			actor,
+			pose: {
+				size: 80,
+				x: 420,
+				y: 340,
+			},
+		});
+		projectionState.main = [
+			current,
+		];
+
+		Effect.runSync(harness.reconciler.reconcileFx(transition(2)));
+
+		expect(actor.container.parent).toBe(harness.transientActorLayer);
+		const travel = harness.animations.find(
+			(animation) => animation.actor === actor && animation.channel === "pose",
+		);
+		if (travel?.channel !== "pose") throw new Error("Expected a canonical pose travel.");
+		expect(actor.container.parent).not.toBe(harness.layer);
+
+		travel.onComplete?.();
+		expect(actor.container.parent).toBe(harness.layer);
+	});
+
 	it("retains a pending source, then fades it while glowing the Inventory receiver", () => {
 		const now = vi.spyOn(performance, "now").mockReturnValue(1_000);
 		const source = createItem("runtime:water-source", boardLocation);

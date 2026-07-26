@@ -29,7 +29,7 @@ export const ItemLinesTab = ({
 				<input
 					type="search"
 					value={query}
-					className="w-full rounded-lg border border-line-strong bg-surface px-3 py-2 text-sm text-foreground outline-none placeholder:text-muted focus:border-accent focus:ring-1 focus:ring-accent"
+					className="w-full rounded-lg border border-line-strong bg-surface px-3 py-2 text-sm text-foreground outline-none placeholder:text-muted"
 					placeholder="Search lines…"
 					aria-label="Search visible lines"
 					onChange={(event) => setQuery(event.currentTarget.value)}

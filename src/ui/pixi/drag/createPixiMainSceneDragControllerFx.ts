@@ -363,7 +363,13 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 			previewTarget(drag, target, true);
 			RendererRuntime.runSync(surface.renderDropFeedbackFx(null, null));
 			drag.phase = "submitting";
-			drag.actor.container.cursor = "progress";
+			drag.actor.container.cursor = RendererRuntime.runSync(
+				readPixiTileActorCursorFx({
+					phase: "pending",
+					previewKind: drag.previewKind,
+					running: drag.sourceItem.running,
+				}),
+			);
 			const drop = RendererRuntime.runSync(
 				beginPixiMainSceneDropFx({
 					dropPresentation,

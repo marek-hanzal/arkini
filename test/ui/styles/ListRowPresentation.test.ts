@@ -21,12 +21,6 @@ describe("semantic list-row presentation", () => {
 		expect(styles).toContain("--ak-list-row-selected-foreground: var(--ak-accent-contrast);");
 		expect(styles).toContain(".ak-list-row {");
 		expect(styles).toContain("background-color: var(--ak-list-row-surface);");
-		expect(styles).toContain(
-			".ak-list-row-interactive:not(.ak-list-row-pending):focus-visible",
-		);
-		expect(styles).toContain(
-			".ak-list-row-interactive.ak-list-row-selected:not(.ak-list-row-pending):focus-visible",
-		);
 		expect(styles).toContain(".ak-list-row-pending {");
 		expect(styles).toContain(
 			".ak-list-row-interactive:not(.ak-list-row-pending):not(:disabled):not(",
@@ -52,7 +46,7 @@ describe("semantic list-row presentation", () => {
 		expect(settings).toContain(
 			'className="grid grid-cols-3 gap-1 rounded-xl border border-line bg-surface-raised/65 p-1"',
 		);
-		expect(settings).toContain("focus-within:ring-accent");
+		expect(settings).not.toContain("focus-within:");
 		expect(spotlight).toContain("ak-spotlight-option grid");
 		expect(spotlight).toContain("ak-spotlight-option-secondary");
 		expect(spotlight).not.toContain("ak-list-row");
@@ -68,7 +62,6 @@ describe("semantic list-row presentation", () => {
 		expect(styles).toContain(
 			'.ak-spotlight-option[data-selected="true"] .ak-spotlight-option-secondary',
 		);
-		expect(styles).toContain('.ak-spotlight-option[data-selected="true"]:focus-visible');
 		expect(styles).toContain('.ak-spotlight-option[data-selected="true"]:not(:disabled):hover');
 	});
 });

@@ -42,6 +42,12 @@ export const readUnsettledTileStackQuantitiesFx = Effect.fn("readUnsettledTileSt
 					)
 					.with(
 						{
+							kind: "input",
+						},
+						() => Effect.succeed(quantities),
+					)
+					.with(
+						{
 							kind: "swap",
 						},
 						() => Effect.succeed(quantities),

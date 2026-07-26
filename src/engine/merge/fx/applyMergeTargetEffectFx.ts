@@ -5,11 +5,10 @@ import { readOutputPlacementItemEventsFx } from "~/engine/event/read/readOutputP
 import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
 import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
 import { EffectEnumSchema } from "~/engine/merge/schema/EffectEnumSchema";
-import { ItemStatefulError } from "~/engine/item/error/ItemStatefulError";
-import { isItemPureFx } from "~/engine/item/fx/purity/isItemPureFx";
 import { resolveItemFx } from "~/engine/item/fx/resolveItemFx";
 import { assertOwnerIdleFx } from "~/engine/job/fx/assertOwnerIdleFx";
 import type { MergeSchema } from "~/engine/merge/schema/MergeSchema";
+import { resolveMergeReplacementChargesFx } from "~/engine/merge/fx/resolveMergeReplacementChargesFx";
 import { applyOutputPlacementFx } from "~/engine/placement/fx/applyOutputPlacementFx";
 import { PlacementEnumSchema } from "~/engine/placement/schema/PlacementEnumSchema";
 import { createRuntimeItemFx } from "~/engine/runtime/fx/createRuntimeItemFx";
@@ -92,26 +91,20 @@ export const applyMergeTargetEffectFx = Effect.fn("applyMergeTargetEffectFx")(fu
 						ownerItemId: target.id,
 						runtime,
 					});
-					const pure = yield* isItemPureFx({
-						item: target,
-						runtime,
-					});
-					if (!pure) {
-						return yield* Effect.fail(
-							new ItemStatefulError({
-								itemId: target.id,
-							}),
-						);
-					}
-
 					const resultItem = yield* resolveItemFx({
 						itemId: result,
+					});
+					const replacementCharges = yield* resolveMergeReplacementChargesFx({
+						resultItem,
+						runtime,
+						target,
 					});
 					const replacedTarget = yield* createRuntimeItemFx({
 						id: target.id,
 						item: resultItem,
 						location: target.location,
 						quantity: 1,
+						...replacementCharges,
 					});
 					const replacedRuntime = {
 						...runtime,

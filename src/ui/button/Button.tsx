@@ -12,7 +12,7 @@ import { CursorClassName, type CursorSemantic } from "~/ui/cursor/CursorSemantic
 import { readControlCursorSemanticFx } from "~/ui/cursor/readControlCursorSemanticFx";
 
 const ButtonBaseClassName =
-	"inline-flex min-h-[var(--ak-control-min-height)] items-center justify-center rounded-lg px-[var(--ak-control-padding-inline)] py-[var(--ak-control-padding-block)] text-center text-[var(--ak-control-font-size)] font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-canvas disabled:opacity-60 aria-disabled:opacity-60";
+	"inline-flex min-h-[var(--ak-control-min-height)] items-center justify-center rounded-lg px-[var(--ak-control-padding-inline)] py-[var(--ak-control-padding-block)] text-center text-[var(--ak-control-font-size)] font-semibold transition-colors disabled:opacity-60 aria-disabled:opacity-60";
 
 const ButtonVariantClassNames = {
 	default:

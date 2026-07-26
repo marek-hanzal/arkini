@@ -12,9 +12,9 @@ export namespace readPixiTileTravelDurationMsFx {
 	}
 }
 
-const maximumSpeedTilesPerSecond = 6;
-const maximumAccelerationTilesPerSecondSquared = 32;
-const minimumTravelDurationMs = 420;
+const maximumSpeedTilesPerSecond = 12;
+const maximumAccelerationTilesPerSecondSquared = 80;
+const minimumTravelDurationMs = 280;
 
 /** Derives a distance-sensitive tile duration with bounded speed and acceleration. */
 export const readPixiTileTravelDurationMsFx = Effect.fn("readPixiTileTravelDurationMsFx")(

@@ -3,6 +3,8 @@ import { Effect, Option } from "effect";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeIntegerSchema";
 import type { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
+import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
+import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
 import { InputMaterialUnavailableError } from "~/engine/input/error/InputMaterialUnavailableError";
 import { applyInputMaterialStorePlanFx } from "~/engine/input/fx/applyInputMaterialStorePlanFx";
 import { planInputMaterialStoreFx } from "~/engine/input/fx/planInputMaterialStoreFx";
@@ -247,7 +249,21 @@ export const storeInputMaterialFx = Effect.fn("storeInputMaterialFx")(function* 
 					ownerItem,
 				} satisfies InputMaterialStoreResultSchema.Type,
 				isolation.runtime,
-				isolation.events,
+				[
+					{
+						type: GameEventEnumSchema.enum.ItemInputStored,
+						sourceItemId: source.id,
+						canonicalItemId: source.item.id,
+						previousSourceLocation: source.location,
+						previousQuantity: source.quantity,
+						storedQuantity: result.storedItem.quantity,
+						resultingQuantity: result.sourceItem?.quantity ?? 0,
+						ownerItemId,
+						lineId,
+						inputIndex,
+					} satisfies GameEventSchema.Type,
+					...isolation.events,
+				],
 			] as const;
 		});
 	});

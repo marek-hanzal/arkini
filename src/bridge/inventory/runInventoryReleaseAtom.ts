@@ -1,4 +1,5 @@
 import * as Atom from "effect/unstable/reactivity/Atom";
+import { Effect } from "effect";
 
 import { makeExactGameAtomFamilyFx } from "~/bridge/game/makeExactGameAtomFamilyFx";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
@@ -11,11 +12,17 @@ export namespace runInventoryReleaseAtom {
 /**
  * Owns mounted Inventory release execution for one exact live Game.
  * Placement and resulting inventory semantics remain entirely engine-owned.
+ * Concurrent mode prevents rapid releases from interrupting each other; the
+ * scheduling yield only stabilizes per-command AsyncResult publication.
  */
 export const runInventoryReleaseAtom = RendererRuntime.runSync(
 	makeExactGameAtomFamilyFx((game) =>
-		Atom.fn((command: runInventoryReleaseAtom.Command) =>
-			game.runFx(releaseInventoryItemFx(command)),
+		Atom.fn(
+			(command: runInventoryReleaseAtom.Command) =>
+				Effect.yieldNow.pipe(Effect.andThen(game.runFx(releaseInventoryItemFx(command)))),
+			{
+				concurrent: true,
+			},
 		).pipe(Atom.setIdleTTL(0)),
 	),
 );

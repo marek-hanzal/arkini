@@ -253,7 +253,7 @@ describe("CheatItemSpotlight", () => {
 		expect(document.activeElement).toBe(origin);
 		expect(container.querySelector('[role="dialog"][aria-modal="true"]')).toBeNull();
 	});
-	it("admits only one spawn across same-tick keyboard and pointer actions", async () => {
+	it("admits every same-tick keyboard and pointer spawn action", async () => {
 		const container = document.createElement("div");
 		document.body.append(container);
 		const root = createRoot(container);
@@ -294,9 +294,9 @@ describe("CheatItemSpotlight", () => {
 			selected.click();
 		});
 
-		expect(state.spawn).toHaveBeenCalledOnce();
+		expect(state.spawn).toHaveBeenCalledTimes(2);
 	});
-	it("retains pending spawn ownership across close, reopen and query attempts", async () => {
+	it("retains command ownership while pending without locking spotlight interaction", async () => {
 		const container = document.createElement("div");
 		document.body.append(container);
 		const root = createRoot(container);
@@ -338,8 +338,8 @@ describe("CheatItemSpotlight", () => {
 		});
 		const pendingInput = container.querySelector<HTMLInputElement>('input[type="search"]');
 		if (pendingInput === null) throw new Error("Expected pending Spotlight search input.");
-		expect(pendingInput.readOnly).toBe(true);
-		expect(pendingInput.className).toContain("cursor-progress");
+		expect(pendingInput.readOnly).toBe(false);
+		expect(pendingInput.className).not.toContain("cursor-progress");
 		expect(container.textContent).toContain("Spawning…");
 
 		await toggle();
@@ -348,7 +348,7 @@ describe("CheatItemSpotlight", () => {
 		await toggle();
 		const reopenedInput = container.querySelector<HTMLInputElement>('input[type="search"]');
 		if (reopenedInput === null) throw new Error("Expected reopened Spotlight search input.");
-		expect(reopenedInput.readOnly).toBe(true);
+		expect(reopenedInput.readOnly).toBe(false);
 		await vi.waitFor(() => expect(document.activeElement).toBe(reopenedInput));
 
 		const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")?.set;
@@ -361,12 +361,12 @@ describe("CheatItemSpotlight", () => {
 				}),
 			);
 		});
-		expect(reopenedInput.value).toBe("");
+		expect(reopenedInput.value).toBe("beta");
 		expect(
 			Array.from(container.querySelectorAll<HTMLButtonElement>("button")).every(
 				(button) => button.disabled,
 			),
-		).toBe(true);
+		).toBe(false);
 
 		await toggle();
 		const complete = state.complete;
@@ -379,7 +379,7 @@ describe("CheatItemSpotlight", () => {
 		expect(container.querySelector<HTMLInputElement>('input[type="search"]')?.readOnly).toBe(
 			false,
 		);
-		expect(container.textContent).toContain("Item spawned.");
+		expect(container.textContent).toContain("Enter spawn");
 
 		await toggle();
 		await toggle();
@@ -445,7 +445,7 @@ describe("CheatItemSpotlight", () => {
 		await toggle();
 		const remounted = container.querySelector<HTMLInputElement>('input[type="search"]');
 		if (remounted === null) throw new Error("Expected remounted Spotlight input.");
-		expect(remounted.readOnly).toBe(true);
+		expect(remounted.readOnly).toBe(false);
 		await act(async () => {
 			remounted.dispatchEvent(
 				new KeyboardEvent("keydown", {
@@ -455,7 +455,7 @@ describe("CheatItemSpotlight", () => {
 				}),
 			);
 		});
-		expect(state.spawn).toHaveBeenCalledOnce();
+		expect(state.spawn).toHaveBeenCalledTimes(2);
 	});
 	it("searches the authoritative catalog by shared Fuse terms", async () => {
 		const container = document.createElement("div");

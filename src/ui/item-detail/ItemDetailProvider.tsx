@@ -9,6 +9,7 @@ import {
 	useSyncExternalStore,
 } from "react";
 
+import type { GameEngine } from "~/bridge/game/GameEngine";
 import { useResolveItemDefinitionDetailTarget } from "~/bridge/item-detail/useResolveItemDefinitionDetailTarget";
 import { useResolveItemDetailTarget } from "~/bridge/item-detail/useResolveItemDetailTarget";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
@@ -32,7 +33,12 @@ import { readSettledAsyncResultError } from "~/ui/reactivity/readSettledAsyncRes
  * the resulting open intent, so no click timers or double-click policy belong
  * here.
  */
-export const ItemDetailProvider = ({ children }: PropsWithChildren) => {
+export const ItemDetailProvider = ({
+	children,
+	game,
+}: PropsWithChildren<{
+	readonly game: GameEngine;
+}>) => {
 	const resolveDefinitionTarget = useResolveItemDefinitionDetailTarget();
 	const resolveTarget = useResolveItemDetailTarget();
 	const [controller] = useState(() => RendererRuntime.runSync(createItemDetailControllerFx()));
@@ -105,6 +111,16 @@ export const ItemDetailProvider = ({ children }: PropsWithChildren) => {
 
 	useEffect(
 		() => () => {
+			RendererRuntime.runSync(controller.cancelPendingActionsFx);
+		},
+		[
+			controller,
+			game,
+		],
+	);
+
+	useEffect(
+		() => () => {
 			RendererRuntime.runSync(controller.resetFx);
 		},
 		[
@@ -116,7 +132,6 @@ export const ItemDetailProvider = ({ children }: PropsWithChildren) => {
 		() => ({
 			state: snapshot.state,
 			isOpen: snapshot.state.phase !== "closed",
-			hasPendingActions: snapshot.pendingActions.size > 0,
 			readActionError: controller.readActionError,
 			readPendingAction: controller.readPendingAction,
 			runPendingActionFx: controller.runPendingActionFx,

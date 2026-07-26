@@ -801,8 +801,12 @@ describe("Pixi tile motion runtime", () => {
 			interactionClaimByActorId: new Map([
 				[
 					source.item.id,
-					"blocked",
+					"activation-only",
 				],
+			]),
+			retainedActorIds: new Set([
+				source.item.id,
+				owner.item.id,
 			]),
 			unsettledInputSourceQuantities: new Map([
 				[
@@ -877,6 +881,7 @@ describe("Pixi tile motion runtime", () => {
 		expect(source.container.alpha).toBe(1);
 		expect(Effect.runSync(runtime.readSnapshotFx)).toMatchObject({
 			interactionClaimByActorId: new Map(),
+			retainedActorIds: new Set(),
 			unsettledInputSourceQuantities: new Map(),
 		});
 		expect(
@@ -898,9 +903,10 @@ describe("Pixi tile motion runtime", () => {
 		Effect.runSync(runtime.closeFx);
 	});
 
-	it("destroys a fully stored stack without restoring a ghost at its origin", () => {
+	it("gates resolved owner output after the last input without returning a stale remainder", () => {
 		const source = createActor("runtime:consumed-input-source");
 		const owner = createActor("runtime:consumed-input-owner");
+		const output = createActor("runtime:consumed-input-output");
 		source.item = {
 			...createItem(source.item.id, firstBoardLocation),
 			quantity: 3,
@@ -919,11 +925,15 @@ describe("Pixi tile motion runtime", () => {
 				owner.item.id,
 				owner,
 			],
+			[
+				output.item.id,
+				output,
+			],
 		]);
 		const canonicalItems = new Map([
 			[
-				owner.item.id,
-				owner.item,
+				output.item.id,
+				output.item,
 			],
 		]);
 		const animations: PixiActorAnimation[] = [];
@@ -996,18 +1006,37 @@ describe("Pixi tile motion runtime", () => {
 			originActorId: source.item.id,
 			originLocation: firstBoardLocation,
 			previousQuantity: 3,
-			storedQuantity: 3,
-			resultingQuantity: 0,
+			storedQuantity: 2,
+			resultingQuantity: 1,
 			sequence: 41,
 			sourceActorId: source.item.id,
 			staggerIndex: 0,
 			targetActorId: owner.item.id,
 			targetLocation: secondBoardLocation,
 		} satisfies TileMotionCue;
+		const finalCue = {
+			...cue,
+			previousQuantity: 1,
+			storedQuantity: 1,
+			resultingQuantity: 0,
+			sequence: 42,
+		} satisfies TileMotionCue;
+		const outputCue = {
+			actorId: output.item.id,
+			eventIndex: 0,
+			kind: "spawn",
+			originActorId: owner.item.id,
+			originLocation: secondBoardLocation,
+			sequence: 43,
+			staggerIndex: 0,
+			targetLocation: firstBoardLocation,
+		} satisfies TileMotionCue;
 
 		Effect.runSync(
 			runtime.enqueueFx([
 				cue,
+				finalCue,
+				outputCue,
 			]),
 		);
 		Effect.runSync(runtime.startFx);
@@ -1028,7 +1057,23 @@ describe("Pixi tile motion runtime", () => {
 		if (removal?.channel !== "lifecycle-opacity") {
 			throw new Error("Expected the complete input contact fade.");
 		}
+		expect(
+			animations.filter(
+				(animation) =>
+					animation.actor === transient &&
+					animation.channel === "pose" &&
+					animation.ownerKey === "motion:41:0",
+			),
+		).toHaveLength(1);
 		expect(source.container.alpha).toBe(0);
+		expect(
+			animations.some(
+				(animation) =>
+					animation.actor === output &&
+					animation.channel === "pose" &&
+					animation.ownerKey === "motion:43:0",
+			),
+		).toBe(false);
 		removal.onComplete?.();
 
 		expect(actors.has(source.item.id)).toBe(false);
@@ -1042,7 +1087,45 @@ describe("Pixi tile motion runtime", () => {
 					animation.toAlpha === 1,
 			),
 		).toBe(false);
-		expect(Effect.runSync(runtime.readSnapshotFx).interactionClaimByActorId).toEqual(new Map());
+		const outputTravel = animations.find(
+			(animation) =>
+				animation.actor === output &&
+				animation.channel === "pose" &&
+				animation.ownerKey === "motion:43:0",
+		);
+		if (outputTravel?.channel !== "pose") {
+			throw new Error("Expected output to start after the last input settled.");
+		}
+		expect(actors.get(owner.item.id)).toBe(owner);
+		expect(Effect.runSync(runtime.readSnapshotFx)).toMatchObject({
+			interactionClaimByActorId: new Map([
+				[
+					output.item.id,
+					"handoff",
+				],
+			]),
+			retainedActorIds: new Set([
+				output.item.id,
+				owner.item.id,
+			]),
+		});
+
+		samplePoseAnimation(outputTravel, 1);
+		outputTravel.onComplete?.();
+
+		expect(actors.has(owner.item.id)).toBe(false);
+		expect(Effect.runSync(runtime.readSnapshotFx)).toMatchObject({
+			interactionClaimByActorId: new Map(),
+			retainedActorIds: new Set(),
+		});
+		expect(animations).toContainEqual(
+			expect.objectContaining({
+				actor: owner,
+				channel: "lifecycle-opacity",
+				durationMs: 220,
+				toAlpha: 0,
+			}),
+		);
 		Effect.runSync(runtime.closeFx);
 	});
 

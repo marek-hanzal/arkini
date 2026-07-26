@@ -2,10 +2,13 @@ import type { Effect } from "effect";
 
 import type { TileMotionCue } from "~/bridge/tile/motion/TileMotionCue";
 
-export type PixiTileInteractionClaim = "blocked" | "handoff";
+/** Presentation ownership of dragging; ordinary click activation always remains available. */
+export type PixiTileInteractionClaim = "activation-only" | "handoff";
 
 export interface PixiTileMotionSnapshot {
 	readonly interactionClaimByActorId: ReadonlyMap<string, PixiTileInteractionClaim>;
+	/** Actors kept alive until every presentation cue that references them has settled. */
+	readonly retainedActorIds: ReadonlySet<string>;
 	readonly spawnCueByActorId: ReadonlyMap<
 		string,
 		Extract<

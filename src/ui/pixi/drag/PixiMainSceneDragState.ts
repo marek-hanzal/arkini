@@ -24,11 +24,17 @@ export interface PixiMainSceneMotionHandoffGesture extends PixiMainSceneActiveDr
 	readonly phase: "pressed";
 }
 
+export interface PixiMainSceneActivationOnlyGesture extends PixiMainSceneActiveDragBase {
+	readonly mode: "activation-only";
+	readonly phase: "pressed";
+}
+
 export interface PixiMainSceneMovableGesture extends PixiMainSceneActiveDragBase {
 	readonly mode: "drag";
 	phase: "dragging" | "pressed" | "submitting";
 }
 
 export type PixiMainSceneActiveDrag =
+	| PixiMainSceneActivationOnlyGesture
 	| PixiMainSceneMotionHandoffGesture
 	| PixiMainSceneMovableGesture;

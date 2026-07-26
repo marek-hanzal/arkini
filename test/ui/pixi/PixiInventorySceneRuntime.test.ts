@@ -808,6 +808,7 @@ describe("Pixi Inventory scene runtime", () => {
 		await Promise.resolve();
 
 		expect(onActivate).toHaveBeenCalledOnce();
+		expect(actor.container.cursor).toBe("grab");
 		expect(actor.container.alpha).toBe(0);
 		expect(actor.container.destroyed).toBe(false);
 
@@ -826,7 +827,7 @@ describe("Pixi Inventory scene runtime", () => {
 		await Effect.runPromise(runtime.closeFx);
 	});
 
-	it("dispatches repeated clicks while an older Inventory activation is still pending", async () => {
+	it("coalesces repeated clicks while the same Inventory activation is still pending", async () => {
 		const onActivate = vi.fn(() => new Promise<void>(() => undefined));
 		const { actor, runtime, stage } = await mountScene({
 			onActivate,
@@ -840,7 +841,7 @@ describe("Pixi Inventory scene runtime", () => {
 		stage.emit("pointerup", slotPointer(0));
 		await Promise.resolve();
 
-		expect(onActivate).toHaveBeenCalledTimes(2);
+		expect(onActivate).toHaveBeenCalledOnce();
 		expect(actor.container.alpha).toBe(0);
 		await Effect.runPromise(runtime.closeFx);
 	});
@@ -1024,6 +1025,7 @@ describe("Pixi Inventory scene runtime", () => {
 		await Promise.resolve();
 
 		expect(onDrop).toHaveBeenCalledOnce();
+		expect(actor.container.cursor).toBe("grab");
 		expect(actor.container.x).not.toBe(initialX);
 		Effect.runSync(runtime.cancelInteractionFx);
 		expect(actor.container.x).not.toBe(initialX);

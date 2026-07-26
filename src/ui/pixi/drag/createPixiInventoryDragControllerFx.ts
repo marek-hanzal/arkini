@@ -176,12 +176,19 @@ export const createPixiInventoryDragControllerFx = Effect.fn("createPixiInventor
 
 		const activateActor = (actor: PixiTileActor, shiftKey: boolean) => {
 			const item = actor.item;
+			if (!shiftKey && removalFeedbackGenerationByActorId.has(item.id)) return;
 			const removalFeedbackGeneration = shiftKey
 				? null
 				: (removalFeedbackGenerationByActorId.get(item.id) ?? 0) + 1;
 			if (removalFeedbackGeneration !== null) {
 				removalFeedbackGenerationByActorId.set(item.id, removalFeedbackGeneration);
-				actor.container.cursor = "progress";
+				actor.container.cursor = RendererRuntime.runSync(
+					readPixiTileActorCursorFx({
+						phase: "pending",
+						previewKind: null,
+						running: item.running,
+					}),
+				);
 				RendererRuntime.runSync(
 					startPixiInventoryActorRemovalFeedbackFx({
 						actor,
@@ -375,7 +382,13 @@ export const createPixiInventoryDragControllerFx = Effect.fn("createPixiInventor
 			previewTarget(drag, target, true);
 			RendererRuntime.runSync(surface.renderDropFeedbackFx(null, null));
 			drag.phase = "submitting";
-			drag.actor.container.cursor = "progress";
+			drag.actor.container.cursor = RendererRuntime.runSync(
+				readPixiTileActorCursorFx({
+					phase: "pending",
+					previewKind: null,
+					running: drag.sourceItem.running,
+				}),
+			);
 			const command = {
 				sourceItemId: drag.sourceItem.id,
 				sourceLocation: drag.sourceItem.location,

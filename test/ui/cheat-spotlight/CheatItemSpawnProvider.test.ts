@@ -240,4 +240,53 @@ describe("CheatItemSpawnProvider lifecycle", () => {
 			expect(control.state.kind).toBe("success");
 		});
 	});
+
+	it("admits a second spawn while the first engine command is still running", async () => {
+		const session = await createTestGameSession({
+			config: createJobTestConfig(),
+			tickIntervalMs: 60_000,
+		});
+		sessions.push(session);
+		const bothEntered = Effect.runSync(Deferred.make<void>());
+		const releaseBoth = Effect.runSync(Deferred.make<void>());
+		let invocation = 0;
+		const commandFx = Effect.gen(function* () {
+			invocation += 1;
+			if (invocation === 2) yield* Deferred.succeed(bothEntered, undefined);
+			yield* Deferred.await(releaseBoth);
+		});
+		const game = makeGame(session, commandFx, "overlap");
+		const registry = makeRegistry();
+		const container = document.createElement("div");
+		document.body.append(container);
+		const root = createRoot(container);
+		roots.push(root);
+		let control: CheatItemSpawnControl | undefined;
+
+		await act(async () => {
+			renderProvider({
+				game,
+				observe: (next) => {
+					control = next;
+				},
+				registry,
+				root,
+			});
+		});
+		if (control === undefined) throw new Error("Expected spawn control.");
+		await act(async () => {
+			control?.request("item:first");
+			control?.request("item:second");
+			await Effect.runPromise(Deferred.await(bothEntered));
+		});
+		expect(invocation).toBe(2);
+
+		await act(async () => {
+			await Effect.runPromise(Deferred.succeed(releaseBoth, undefined));
+		});
+		await vi.waitFor(() => {
+			if (control === undefined) throw new Error("Expected spawn control.");
+			expect(control.state.kind).toBe("success");
+		});
+	});
 });

@@ -198,7 +198,13 @@ const returnPixiInputRemainderFx = Effect.fn("returnPixiInputRemainderFx")(funct
 	});
 });
 
-/** Delivers one complete source stack to a line owner and returns any remainder to its origin. */
+/**
+ * Delivers one complete source stack and returns only a remainder that survives canonical truth.
+ *
+ * Several immediately committed input stores may consume one source before the oldest visual cue
+ * reaches contact. An intermediate event remainder must not return as a ghost when the latest
+ * canonical snapshot already removed that source.
+ */
 export const runPixiInputMotionFx = Effect.fn("runPixiInputMotionFx")(function* ({
 	actorStore,
 	animator,
@@ -323,7 +329,7 @@ export const runPixiInputMotionFx = Effect.fn("runPixiInputMotionFx")(function* 
 					}),
 				);
 			}
-			if (cue.resultingQuantity > 0) {
+			if (cue.resultingQuantity > 0 && actorStore.canonicalItems.has(cue.sourceActorId)) {
 				if (sourceHome !== null) {
 					RendererRuntime.runSync(
 						returnPixiInputRemainderFx({

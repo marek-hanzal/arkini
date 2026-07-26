@@ -361,7 +361,7 @@ export const createPixiMainSceneReconcilerFx = Effect.fn("createPixiMainSceneRec
 						yield* removeActorImmediatelyFx(id);
 						continue;
 					}
-					if (motionSnapshot.interactionClaimByActorId.has(id)) continue;
+					if (motionSnapshot.retainedActorIds.has(id)) continue;
 					const exitFeedbackCues = feedbackCues.filter(
 						({ actorId, kind }) => actorId === id && kind !== "consume-source",
 					);

@@ -51,8 +51,7 @@
 							{
 								"roll": [
 									{
-										"type": "chance",
-										"chance": 0.5,
+										"type": "guaranteed",
 										"drop": [
 											{
 												"itemId": "item:log",
@@ -110,6 +109,19 @@
 						"set": [
 							{
 								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:log",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									},
 									{
 										"type": "chance",
 										"chance": 0.65,
@@ -170,6 +182,19 @@
 						"set": [
 							{
 								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:log",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									},
 									{
 										"type": "chance",
 										"chance": 0.85,

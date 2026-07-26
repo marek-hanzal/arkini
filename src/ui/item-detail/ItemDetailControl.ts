@@ -67,7 +67,6 @@ export interface OpenItemDefinitionDetailProps {
 export interface ItemDetailControl {
 	readonly state: ItemDetailState;
 	readonly isOpen: boolean;
-	readonly hasPendingActions: boolean;
 	readonly readActionError: (key: string) => string | null;
 	readonly readPendingAction: (key: string) => ItemDetailPendingAction | null;
 	readonly runPendingActionFx: <Result, Failure>(

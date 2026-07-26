@@ -17,10 +17,13 @@ export type TileMotionLaneClaim =
 /** Separates exclusive actor motion from shareable deliveries in one producer batch. */
 export const readTileMotionLaneClaimsFx = Effect.fn("readTileMotionLaneClaimsFx")(
 	(cue: TileMotionCue) => {
-		const batchClaim = (actorId: string): TileMotionLaneClaim => ({
+		const batchClaim = (
+			actorId: string,
+			batchKey = `${cue.sequence}:${cue.originActorId}`,
+		): TileMotionLaneClaim => ({
 			kind: "delivery-batch",
 			actorId,
-			batchKey: `${cue.sequence}:${cue.originActorId}`,
+			batchKey,
 		});
 		return Effect.succeed(
 			match(cue)
@@ -54,7 +57,7 @@ export const readTileMotionLaneClaimsFx = Effect.fn("readTileMotionLaneClaimsFx"
 							kind: "exclusive",
 							actorId: input.sourceActorId,
 						},
-						batchClaim(input.targetActorId),
+						batchClaim(input.targetActorId, `input:${input.targetActorId}`),
 					],
 				)
 				.with(

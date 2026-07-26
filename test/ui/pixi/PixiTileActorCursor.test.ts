@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import { readPixiTileActorCursorFx } from "~/ui/pixi/actor/readPixiTileActorCursorFx";
 
 describe("Pixi tile actor cursor", () => {
-	it("prioritizes native drag, rejection, pending and running feedback", () => {
+	it("reserves progress exclusively for an actor with a running line", () => {
 		expect(
 			Effect.runSync(
 				readPixiTileActorCursorFx({
@@ -49,7 +49,7 @@ describe("Pixi tile actor cursor", () => {
 					running: false,
 				}),
 			),
-		).toBe("progress");
+		).toBe("grab");
 		expect(
 			Effect.runSync(
 				readPixiTileActorCursorFx({
@@ -59,6 +59,15 @@ describe("Pixi tile actor cursor", () => {
 				}),
 			),
 		).toBe("grab");
+		expect(
+			Effect.runSync(
+				readPixiTileActorCursorFx({
+					phase: "pending",
+					previewKind: "move",
+					running: true,
+				}),
+			),
+		).toBe("progress");
 		expect(
 			Effect.runSync(
 				readPixiTileActorCursorFx({

@@ -111,7 +111,15 @@ export const createPixiTileMotionRuntimeFx = Effect.fn("createPixiTileMotionRunt
 		return claims;
 	};
 
-	const readOwnedActorIds = () => new Set(readInteractionClaims().keys());
+	const readRetainedActorIds = () => {
+		const actorIds = new Set(detachedSwapLegByActorId.keys());
+		for (const cue of readCues()) {
+			for (const actorId of RendererRuntime.runSync(readTileMotionActorClaimsFx(cue))) {
+				actorIds.add(actorId);
+			}
+		}
+		return actorIds;
+	};
 
 	const readUnsettledQuantities = () =>
 		RendererRuntime.runSync(
@@ -177,7 +185,7 @@ export const createPixiTileMotionRuntimeFx = Effect.fn("createPixiTileMotionRunt
 			(candidate) => readCueHandoffKey(candidate) === completedHandoffKey,
 		);
 		if (!handoffStillClaimed) claimedHandoffs.delete(completedHandoffKey);
-		const stillClaimedActorIds = readOwnedActorIds();
+		const stillClaimedActorIds = readRetainedActorIds();
 		RendererRuntime.runSync(
 			finalizePixiTileMotionActorsFx({
 				actorIds: RendererRuntime.runSync(readTileMotionActorClaimsFx(cue)),
@@ -248,7 +256,7 @@ export const createPixiTileMotionRuntimeFx = Effect.fn("createPixiTileMotionRunt
 				animator,
 				application,
 				readPalette,
-				stillClaimedActorIds: readOwnedActorIds(),
+				stillClaimedActorIds: readRetainedActorIds(),
 				surface,
 				textures,
 			}),
@@ -501,7 +509,7 @@ export const createPixiTileMotionRuntimeFx = Effect.fn("createPixiTileMotionRunt
 						}
 					}
 
-					const stillClaimedActorIds = readOwnedActorIds();
+					const stillClaimedActorIds = readRetainedActorIds();
 					const settleActorIds = new Set(
 						[
 							...pendingCounterpartIds,
@@ -581,6 +589,7 @@ export const createPixiTileMotionRuntimeFx = Effect.fn("createPixiTileMotionRunt
 		readSnapshotFx: Effect.sync(
 			(): PixiTileMotionSnapshot => ({
 				interactionClaimByActorId: readInteractionClaims(),
+				retainedActorIds: readRetainedActorIds(),
 				spawnCueByActorId: new Map(
 					readCues().flatMap((cue) =>
 						cue.kind === "spawn"

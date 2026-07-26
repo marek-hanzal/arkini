@@ -119,7 +119,7 @@ const mountController = ({
 	interactionClaimByActorId = new Map(),
 	targetItems = [],
 }: {
-	readonly interactionClaimByActorId?: ReadonlyMap<string, "blocked" | "handoff">;
+	readonly interactionClaimByActorId?: ReadonlyMap<string, "activation-only" | "handoff">;
 	readonly targetItems?: ReadonlyArray<TileActorItem>;
 } = {}) => {
 	previewState.kind = "move";
@@ -186,6 +186,10 @@ const mountController = ({
 	]);
 	for (const targetItem of targetItems) {
 		actors.set(targetItem.id, {
+			container: {
+				destroyed: false,
+			},
+			instanceId: `test:${targetItem.id}`,
 			item: targetItem,
 		} as PixiTileActor);
 		canonicalItems.set(targetItem.id, targetItem);
@@ -280,6 +284,7 @@ const mountController = ({
 				enqueueFx: () => Effect.void,
 				readSnapshotFx: Effect.succeed({
 					interactionClaimByActorId,
+					retainedActorIds: new Set(interactionClaimByActorId.keys()),
 					spawnCueByActorId: new Map(),
 					unsettledInputSourceQuantities: new Map(),
 					unsettledQuantities: new Map(),
@@ -430,9 +435,12 @@ describe("Pixi main-scene drag controller", () => {
 		expect(mounted.onDrop).toHaveBeenCalledOnce();
 	});
 
-	it("keeps the grab cursor while a committed swap is being submitted", async () => {
+	it.each([
+		"move",
+		"swap",
+	] as const)("keeps the grab cursor while a %s is being submitted", async (kind) => {
 		const mounted = mountController();
-		previewState.kind = "swap";
+		previewState.kind = kind;
 		mounted.actorEvents.emit("pointerdown", pointer(10, 20));
 		mounted.stage.emit("globalpointermove", pointer(30, 20));
 		mounted.stage.emit("pointerup", pointer(30, 20));
@@ -442,7 +450,7 @@ describe("Pixi main-scene drag controller", () => {
 	});
 
 	it("does not reinterpret a failed motion handoff drag as a click", async () => {
-		const claims = new Map<string, "blocked" | "handoff">([
+		const claims = new Map<string, "activation-only" | "handoff">([
 			[
 				item.id,
 				"handoff",
@@ -454,7 +462,7 @@ describe("Pixi main-scene drag controller", () => {
 		mounted.beginInteractionHandoff.mockReturnValueOnce(false);
 
 		mounted.actorEvents.emit("pointerdown", pointer(10, 20));
-		claims.set(item.id, "blocked");
+		claims.set(item.id, "activation-only");
 		mounted.stage.emit("globalpointermove", pointer(30, 20));
 		mounted.stage.emit("pointerup", pointer(30, 20));
 		await flushMicrotasks();
@@ -468,7 +476,7 @@ describe("Pixi main-scene drag controller", () => {
 		"spawn",
 		"swap",
 	] as const)("does not promote an exiting actor when %s completes between press and drag threshold", async () => {
-		const claims = new Map<string, "blocked" | "handoff">([
+		const claims = new Map<string, "activation-only" | "handoff">([
 			[
 				item.id,
 				"handoff",
@@ -497,7 +505,7 @@ describe("Pixi main-scene drag controller", () => {
 	});
 
 	it("leaves an active motion cue intact when its canonical actor disappears after press", async () => {
-		const claims = new Map<string, "blocked" | "handoff">([
+		const claims = new Map<string, "activation-only" | "handoff">([
 			[
 				item.id,
 				"handoff",
@@ -523,11 +531,11 @@ describe("Pixi main-scene drag controller", () => {
 		expect(mounted.onDrop).not.toHaveBeenCalled();
 	});
 
-	it("admits a fresh gesture as soon as an animation interaction claim releases", async () => {
-		const claims = new Map<string, "blocked" | "handoff">([
+	it("admits click activation while a presentation claim keeps the actor non-draggable", async () => {
+		const claims = new Map<string, "activation-only" | "handoff">([
 			[
 				item.id,
-				"blocked",
+				"activation-only",
 			],
 		]);
 		const mounted = mountController({
@@ -537,14 +545,36 @@ describe("Pixi main-scene drag controller", () => {
 		mounted.actorEvents.emit("pointerdown", pointer(10, 20));
 		mounted.stage.emit("pointerup", pointer(10, 20));
 		await flushMicrotasks();
-		expect(mounted.onActivate).not.toHaveBeenCalled();
+		expect(mounted.onActivate).toHaveBeenCalledOnce();
 
 		claims.delete(item.id);
 		mounted.actorEvents.emit("pointerdown", pointer(10, 20));
 		mounted.stage.emit("pointerup", pointer(10, 20));
 		await flushMicrotasks();
 
-		expect(mounted.onActivate).toHaveBeenCalledOnce();
+		expect(mounted.onActivate).toHaveBeenCalledTimes(2);
+	});
+
+	it("cancels drag intent without mutating a presentation-retained actor", async () => {
+		const mounted = mountController({
+			interactionClaimByActorId: new Map([
+				[
+					item.id,
+					"activation-only",
+				],
+			]),
+		});
+
+		mounted.actorEvents.emit("pointerdown", pointer(10, 20));
+		mounted.stage.emit("globalpointermove", pointer(30, 20));
+		mounted.stage.emit("pointerup", pointer(30, 20));
+		await flushMicrotasks();
+
+		expect(mounted.onActivate).not.toHaveBeenCalled();
+		expect(mounted.onDrop).not.toHaveBeenCalled();
+		expect(mounted.cancelAnimation).not.toHaveBeenCalled();
+		expect(mounted.startCursorGrab).not.toHaveBeenCalled();
+		expect(mounted.transientActorLayer.addChild).not.toHaveBeenCalled();
 	});
 
 	it("activates the latest projected item and immediately admits another click", async () => {
@@ -596,13 +626,21 @@ describe("Pixi main-scene drag controller", () => {
 		);
 	});
 
-	it("starts an optimistic Inventory removal fade before the drop Promise resolves", async () => {
+	it("starts Inventory removal and receiver glow together before the drop Promise resolves", async () => {
 		const inventory = createItem("runtime:inventory", 1);
 		const mounted = mountController({
 			targetItems: [
 				inventory,
 			],
 		});
+		const inventoryActor = {
+			container: {
+				destroyed: false,
+			},
+			instanceId: `test:${inventory.id}`,
+			item: inventory,
+		} as PixiTileActor;
+		mounted.actors.set(inventory.id, inventoryActor);
 		previewState.actorKinds.set(inventory.id, "store-inventory");
 		mounted.setOccupant(inventory);
 		mounted.setCommandTarget({
@@ -635,6 +673,15 @@ describe("Pixi main-scene drag controller", () => {
 				toAlpha: 0,
 			}),
 		);
+		expect(mounted.animations).toContainEqual(
+			expect.objectContaining({
+				actor: inventoryActor,
+				channel: "glow-opacity",
+				durationMs: 110,
+				ownerKey: `feedback-glow:${inventoryActor.instanceId}`,
+				toRunningGlowAlpha: 0.82,
+			}),
+		);
 		expect(Effect.runSync(mounted.dropPresentation.readSnapshotFx).pendingActorIds).toEqual(
 			new Set([
 				item.id,
@@ -661,6 +708,7 @@ describe("Pixi main-scene drag controller", () => {
 		await flushMicrotasks();
 
 		expect(mounted.onAcceptedDrop).toHaveBeenCalledOnce();
+		expect(Effect.runSync(mounted.dropPresentation.readSnapshotFx).feedback).toBeNull();
 		expect(
 			mounted.animations.some(
 				(animation) => animation.channel === "lifecycle-opacity" && animation.toAlpha === 1,

@@ -27,8 +27,6 @@ export const useSetDefaultItemDetailLine = ({
 		() =>
 			Atom.fn(
 				(command: useSetDefaultItemDetailLine.Props) =>
-					// TODO(#397): Revalidate stable concurrent-command pending settlement
-					// before removing this scheduling boundary.
 					Effect.yieldNow.pipe(
 						Effect.andThen(
 							runPendingActionFx({

@@ -15,6 +15,7 @@ import {
 	restorePixiTileActorRemovalFeedbackFx,
 	startPixiTileActorRemovalFeedbackFx,
 } from "~/ui/pixi/animation/startPixiTileActorRemovalFeedbackFx";
+import { flashPixiTileActorFeedbackGlowFx } from "~/ui/pixi/animation/runPixiTileActorRunningGlowFx";
 import type { PixiMainSceneActiveDrag } from "~/ui/pixi/drag/PixiMainSceneDragState";
 import type { PixiCursorGrabMotion } from "~/ui/pixi/drag/PixiCursorGrabMotion";
 import type { PixiMainSceneDragController } from "~/ui/pixi/drag/PixiMainSceneDragController";
@@ -58,8 +59,9 @@ const dragThreshold = 6;
  * Press-time source identity is immutable, while target occupancy and preview are refreshed at
  * release because canonical state may change under a held pointer. Geometry drives presentation
  * only; the bridge preview and command remain the authority for every drop outcome. A click never
- * interrupts canonical spawn or swap motion, while crossing the drag threshold explicitly hands
- * its live pose to the gesture before any direct transform write.
+ * waits for presentation ownership. Crossing the drag threshold either explicitly hands an
+ * interruptible live pose to the gesture or cancels a presentation-retained, non-draggable source
+ * without reinterpreting it as a click.
  */
 export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainSceneDragControllerFx")(
 	function* ({
@@ -180,7 +182,7 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 			} catch {
 				// Capture may already be released by the browser.
 			}
-			if (drag.mode === "motion-handoff") return;
+			if (drag.mode !== "drag") return;
 			RendererRuntime.runSync(surface.renderDropFeedbackFx(null, null));
 			RendererRuntime.runSync(magneticField.resetFx);
 			RendererRuntime.runSync(cursorGrab.finishFx(drag.actor));
@@ -200,7 +202,7 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 			} catch {
 				// Capture may already be released by the browser.
 			}
-			if (drag.mode === "motion-handoff") {
+			if (drag.mode !== "drag") {
 				actor.container.cursor = "default";
 				return;
 			}
@@ -223,6 +225,15 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 			const offsetX = event.global.x - drag.pressX;
 			const offsetY = event.global.y - drag.pressY;
 			if (drag.phase === "pressed" && Math.hypot(offsetX, offsetY) < dragThreshold) return;
+			if (drag.phase === "pressed" && drag.mode === "activation-only") {
+				activeDrag = null;
+				try {
+					application.app.canvas.releasePointerCapture(drag.pointerId);
+				} catch {
+					// Capture may already be released by the browser.
+				}
+				return;
+			}
 			if (drag.phase === "pressed" && drag.mode === "motion-handoff") {
 				const actorStillCanonicalBeforeHandoff =
 					actorStore.actors.get(drag.sourceItem.id) === drag.actor &&
@@ -250,7 +261,7 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 				if (
 					!actorStillCanonicalAfterHandoff ||
 					(!handedOff && remainingClaim !== undefined) ||
-					remainingClaim === "blocked"
+					remainingClaim === "activation-only"
 				) {
 					activeDrag = null;
 					try {
@@ -388,10 +399,23 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 							sourceActorId: drag.sourceItem.id,
 						}
 					: null;
+			const optimisticInventoryReceiver =
+				drag.previewKind === DropItemResultKindEnumSchema.enum.StoreInventory &&
+				drag.targetItem !== null
+					? (actorStore.actors.get(drag.targetItem.id) ?? null)
+					: null;
 			if (optimisticRemoval !== null) {
 				RendererRuntime.runSync(
 					startPixiTileActorRemovalFeedbackFx({
 						actor: optimisticRemoval.actor,
+						animator,
+					}),
+				);
+			}
+			if (optimisticInventoryReceiver !== null) {
+				RendererRuntime.runSync(
+					flashPixiTileActorFeedbackGlowFx({
+						actor: optimisticInventoryReceiver,
 						animator,
 					}),
 				);
@@ -411,6 +435,19 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 								result,
 							}),
 						);
+						if (
+							result.kind === DropItemResultKindEnumSchema.enum.StoreInventory &&
+							optimisticInventoryReceiver !== null &&
+							result.inventory.itemId === optimisticInventoryReceiver.item.id &&
+							actorStore.actors.get(result.inventory.itemId) ===
+								optimisticInventoryReceiver
+						) {
+							// The exact surviving receiver already flashed at release. A replaced
+							// receiver keeps the canonical cue and receives feedback during reconcile.
+							RendererRuntime.runSync(
+								dropPresentation.clearFeedbackFx(drop.generation),
+							);
+						}
 						const retainedSource =
 							actorStore.actors.get(drag.sourceItem.id) === drag.actor
 								? drag.actor
@@ -481,7 +518,7 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 			} catch {
 				// Capture may already be released by the browser.
 			}
-			if (drag.mode === "motion-handoff") return;
+			if (drag.mode !== "drag") return;
 			RendererRuntime.runSync(surface.renderDropFeedbackFx(null, null));
 			RendererRuntime.runSync(magneticField.resetFx);
 			RendererRuntime.runSync(cursorGrab.finishFx(drag.actor));
@@ -504,20 +541,24 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 						const motionClaim = motionSnapshot.interactionClaimByActorId.get(
 							actor.item.id,
 						);
-						const motionOwned = motionClaim !== undefined;
 						const needsMotionHandoff = motionClaim === "handoff";
+						const gestureMode =
+							motionClaim === "activation-only"
+								? "activation-only"
+								: needsMotionHandoff
+									? "motion-handoff"
+									: "drag";
 						if (
 							closed ||
 							interactionBlocked ||
 							activeDrag !== null ||
-							(motionOwned && !needsMotionHandoff) ||
 							!event.isPrimary ||
 							event.button !== 0
 						) {
 							return;
 						}
 						event.stopPropagation();
-						if (!needsMotionHandoff) {
+						if (gestureMode === "drag") {
 							RendererRuntime.runSync(animator.cancelFx(actor.item.id));
 						}
 						try {
@@ -534,7 +575,7 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 							lastPointerX: event.global.x,
 							lastPointerY: event.global.y,
 							previewKind: null,
-							mode: needsMotionHandoff ? "motion-handoff" : "drag",
+							mode: gestureMode,
 							phase: "pressed",
 							sourceItem: actor.item,
 							startX: actor.container.x,
@@ -553,8 +594,7 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 			),
 			refreshPreviewFx: Effect.sync(() => {
 				const drag = activeDrag;
-				if (drag === null || drag.mode === "motion-handoff" || drag.phase !== "dragging")
-					return;
+				if (drag === null || drag.mode !== "drag" || drag.phase !== "dragging") return;
 				previewTarget(
 					drag,
 					RendererRuntime.runSync(

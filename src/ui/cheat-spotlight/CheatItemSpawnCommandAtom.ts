@@ -32,30 +32,43 @@ export namespace CheatItemSpawnCommandAtom {
 		  };
 }
 
+type SpawnCommand = Extract<
+	CheatItemSpawnCommandAtom.Command,
+	{
+		readonly kind: "spawn";
+	}
+>;
+
+type AdmittedSpawnCommand = SpawnCommand & {
+	readonly generation: number;
+};
+
 /**
- * Owns synchronous spawn admission and settlement for one mounted exact-Game provider.
- * Reading the runner ties command interruption to the Provider's Atom subscription.
+ * Immediately admits every spawn request for one mounted exact-Game provider.
  *
- * TODO(#397): Revalidate stable writable-authority admission and the settlement yield;
- * pending must remain observable and survive the provider remount contract.
+ * Commands overlap and revalidate against canonical engine state. Presentation
+ * retains only the newest request outcome while Provider teardown still
+ * interrupts every surviving command.
  */
 export const CheatItemSpawnCommandAtom = Effect.runSync(
 	makeExactGameAtomFamilyFx((game: Game) => {
+		let latestCommandGeneration = 0;
 		const stateAtom = Atom.make<CheatItemSpawnCommandAtom.State>({
 			kind: "idle",
 		}).pipe(Atom.setIdleTTL(0));
 		const runnerAtom = Atom.fn(
-			(itemId: string, get) =>
+			(command: AdmittedSpawnCommand, get) =>
 				Effect.gen(function* () {
 					const exit = yield* Effect.exit(
 						get
-							.setResult(spawnCheatItemAtom(game), itemId)
+							.setResult(spawnCheatItemAtom(game), command.itemId)
 							.pipe(Effect.andThen(Effect.yieldNow)),
 					);
 					if (Exit.isFailure(exit)) {
 						if (Cause.hasInterruptsOnly(exit.cause)) {
 							return yield* Effect.failCause(exit.cause);
 						}
+						if (command.generation !== latestCommandGeneration) return;
 						const failure = readExactCauseFailure(exit.cause);
 						yield* Atom.set(stateAtom, {
 							kind: "error",
@@ -63,6 +76,7 @@ export const CheatItemSpawnCommandAtom = Effect.runSync(
 						});
 						return;
 					}
+					if (command.generation !== latestCommandGeneration) return;
 					yield* Atom.set(stateAtom, {
 						kind: "success",
 					});
@@ -78,18 +92,21 @@ export const CheatItemSpawnCommandAtom = Effect.runSync(
 				return get(stateAtom);
 			},
 			(context, command: CheatItemSpawnCommandAtom.Command) => {
-				const state = context.get(stateAtom);
-				if (state.kind === "pending") return;
 				if (command.kind === "reset") {
+					latestCommandGeneration += 1;
 					context.set(stateAtom, {
 						kind: "idle",
 					});
 					return;
 				}
+				const generation = ++latestCommandGeneration;
 				context.set(stateAtom, {
 					kind: "pending",
 				});
-				context.set(runnerAtom, command.itemId);
+				context.set(runnerAtom, {
+					...command,
+					generation,
+				});
 			},
 		).pipe(Atom.setIdleTTL(0));
 	}),

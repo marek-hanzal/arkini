@@ -24,15 +24,16 @@ export const readPixiTileActorCursorFx = Effect.fn("readPixiTileActorCursorFx")(
 				.with(
 					{
 						phase: "pending",
-						previewKind: DropItemResultKindEnumSchema.enum.Swap,
+						running: true,
 					},
-					() => "grab" as const,
+					() => "progress" as const,
 				)
 				.with(
 					{
 						phase: "pending",
+						running: false,
 					},
-					() => "progress" as const,
+					() => "grab" as const,
 				)
 				.with(
 					{

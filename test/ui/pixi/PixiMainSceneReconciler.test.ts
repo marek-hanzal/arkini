@@ -352,6 +352,7 @@ const createMotion = () =>
 		enqueueFx: () => Effect.void,
 		readSnapshotFx: Effect.succeed({
 			interactionClaimByActorId: new Map(),
+			retainedActorIds: new Set(),
 			spawnCueByActorId: new Map(),
 			unsettledInputSourceQuantities: new Map(),
 			unsettledQuantities: new Map(),
@@ -483,8 +484,12 @@ describe("Pixi main-scene reconciliation", () => {
 				interactionClaimByActorId: new Map([
 					[
 						previous.id,
-						"blocked" as const,
+						"activation-only" as const,
 					],
+				]),
+				retainedActorIds: new Set([
+					previous.id,
+					"runtime:owner",
 				]),
 				spawnCueByActorId: new Map(),
 				unsettledInputSourceQuantities: new Map([
@@ -539,6 +544,51 @@ describe("Pixi main-scene reconciliation", () => {
 					animation.toAlpha === 0.42,
 			),
 		).toBe(false);
+	});
+
+	it("keeps a resolved line owner alive until its last input presentation settles", () => {
+		const owner = createItem("runtime:resolved-craft", boardLocation);
+		const actor = createActor(owner);
+		const retainedActorIds = new Set([
+			owner.id,
+		]);
+		const motion = {
+			...createMotion(),
+			readSnapshotFx: Effect.sync(() => ({
+				interactionClaimByActorId: new Map(),
+				retainedActorIds,
+				spawnCueByActorId: new Map(),
+				unsettledInputSourceQuantities: new Map(),
+				unsettledQuantities: new Map(),
+			})),
+		} satisfies PixiTileMotionRuntime;
+		const harness = createReconcilerHarness({
+			actor,
+			motion,
+		});
+		projectionState.main = [];
+
+		Effect.runSync(harness.reconciler.reconcileFx(transition(2)));
+
+		expect(harness.actors.get(owner.id)).toBe(actor);
+		expect(harness.detached).toEqual([]);
+		expect(harness.animations).toEqual([]);
+
+		retainedActorIds.clear();
+		Effect.runSync(harness.reconciler.reconcileFx(transition(3)));
+
+		expect(harness.actors.has(owner.id)).toBe(false);
+		expect(harness.detached).toEqual([
+			actor,
+		]);
+		expect(harness.animations).toContainEqual(
+			expect.objectContaining({
+				actor,
+				channel: "lifecycle-opacity",
+				durationMs: 220,
+				toAlpha: 0,
+			}),
+		);
 	});
 
 	it("keeps a canonical board transport above masks until it reaches its destination", () => {

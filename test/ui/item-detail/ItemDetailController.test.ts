@@ -103,33 +103,38 @@ describe("ItemDetailController", () => {
 		expect(listener).toHaveBeenCalledTimes(6);
 	});
 
-	it("retains command ownership across tab remounts and scopes failures to one target", async () => {
+	it("coalesces a same-key command, retains it across tab remounts, and readmits it after settlement", async () => {
 		const controller = Effect.runSync(createItemDetailControllerFx());
 		Effect.runSync(controller.openTargetFx(runtimeTarget()));
 		const entering = controller.getSnapshot().state;
 		if (entering.phase !== "entering") throw new Error("Expected entering state.");
 		Effect.runSync(controller.completeEnterFx(entering.generation));
-		const deferred = Effect.runSync(Deferred.make<never, Error>());
-		const entered = vi.fn();
-		const run = Effect.sync(entered).pipe(Effect.andThen(Deferred.await(deferred)));
+		const firstDeferred = Effect.runSync(Deferred.make<void>());
+		const latestDeferred = Effect.runSync(Deferred.make<never, Error>());
+		const firstEntered = vi.fn();
+		const latestEntered = vi.fn();
 
-		const outcome = Effect.runPromiseExit(
+		const firstOutcome = Effect.runPromise(
 			controller.runPendingActionFx({
 				key: "line:first",
 				action: "default",
 				failureMessage: "Default failed.",
-				run,
+				run: Effect.sync(firstEntered).pipe(Effect.andThen(Deferred.await(firstDeferred))),
 			}),
 		);
-		void Effect.runPromise(
+		const coalescedOutcome = Effect.runPromise(
 			controller.runPendingActionFx({
 				key: "line:first",
 				action: "start",
 				failureMessage: "Start failed.",
-				run,
+				run: Effect.sync(latestEntered).pipe(
+					Effect.andThen(Deferred.await(latestDeferred)),
+				),
 			}),
 		);
-		expect(entered).toHaveBeenCalledOnce();
+		await coalescedOutcome;
+		expect(firstEntered).toHaveBeenCalledOnce();
+		expect(latestEntered).not.toHaveBeenCalled();
 		expect(controller.readPendingAction("line:first")).toBe("default");
 
 		Effect.runSync(
@@ -141,9 +146,26 @@ describe("ItemDetailController", () => {
 			),
 		);
 		expect(controller.readPendingAction("line:first")).toBe("default");
+		Effect.runSync(Deferred.succeed(firstDeferred, undefined));
+		await firstOutcome;
+		expect(controller.readPendingAction("line:first")).toBeNull();
+		expect(controller.readActionError("line:first")).toBeNull();
+
+		const latestOutcome = Effect.runPromiseExit(
+			controller.runPendingActionFx({
+				key: "line:first",
+				action: "start",
+				failureMessage: "Start failed.",
+				run: Effect.sync(latestEntered).pipe(
+					Effect.andThen(Deferred.await(latestDeferred)),
+				),
+			}),
+		);
+		expect(latestEntered).toHaveBeenCalledOnce();
+		expect(controller.readPendingAction("line:first")).toBe("start");
 		const failure = new Error("Deferred failure.");
-		Effect.runSync(Deferred.fail(deferred, failure));
-		const commandExit = await outcome;
+		Effect.runSync(Deferred.fail(latestDeferred, failure));
+		const commandExit = await latestOutcome;
 		expect(Exit.isFailure(commandExit)).toBe(true);
 		if (Exit.isSuccess(commandExit)) throw new Error("Expected command failure.");
 		expect(Cause.findErrorOption(commandExit.cause)).toEqual(Option.some(failure));
@@ -161,7 +183,7 @@ describe("ItemDetailController", () => {
 		expect(controller.readActionError("line:first")).toBeNull();
 	});
 
-	it("keeps pending actions visible and resolves outstanding exit settlement on reset", async () => {
+	it("allows close and target replacement while a command settles independently", async () => {
 		const controller = Effect.runSync(createItemDetailControllerFx());
 		Effect.runSync(controller.openTargetFx(runtimeTarget()));
 		const entering = controller.getSnapshot().state;
@@ -176,27 +198,40 @@ describe("ItemDetailController", () => {
 				run: Deferred.await(deferred),
 			}),
 		);
-		await Effect.runPromise(controller.closeFx());
-		expect(controller.getSnapshot().state.phase).toBe("open");
+		const exit = Effect.runPromise(controller.closeFx());
+		expect(controller.getSnapshot().state.phase).toBe("exiting");
+		expect(controller.readPendingAction("line:first")).toBe("start");
+		Effect.runSync(controller.completeExitFx(entering.generation));
+		await exit;
+		expect(controller.getSnapshot().state.phase).toBe("closed");
+		expect(controller.readPendingAction("line:first")).toBe("start");
 		expect(
 			Effect.runSync(
 				controller.openTargetFx(
 					runtimeTarget({
+						itemId: "runtime:second",
 						tab: "info",
 					}),
 				),
 			),
-		).toBe(false);
+		).toBe(true);
 
-		const failure = new Error("Visible failure.");
+		const failure = new Error("Late hidden failure.");
 		Effect.runSync(Deferred.fail(deferred, failure));
 		const commandExit = await outcome;
 		expect(Exit.isFailure(commandExit)).toBe(true);
 		if (Exit.isSuccess(commandExit)) throw new Error("Expected command failure.");
 		expect(Cause.findErrorOption(commandExit.cause)).toEqual(Option.some(failure));
-		expect(controller.readActionError("line:first")).toBe("Visible failure.");
+		expect(controller.readActionError("line:first")).toBeNull();
 		expect(controller.readPendingAction("line:first")).toBeNull();
+	});
 
+	it("resolves outstanding exit settlement on reset", async () => {
+		const controller = Effect.runSync(createItemDetailControllerFx());
+		Effect.runSync(controller.openTargetFx(runtimeTarget()));
+		const entering = controller.getSnapshot().state;
+		if (entering.phase !== "entering") throw new Error("Expected entering state.");
+		Effect.runSync(controller.completeEnterFx(entering.generation));
 		const exit = Effect.runPromise(controller.closeFx());
 		expect(controller.getSnapshot().state.phase).toBe("exiting");
 		Effect.runSync(controller.resetFx);
@@ -252,7 +287,7 @@ describe("ItemDetailController", () => {
 		expect(controller.readPendingAction("line:defect")).toBeNull();
 	});
 
-	it("cleans interruption and lets different keys settle independently", async () => {
+	it("keeps admitted commands alive across caller interruption and settles keys independently", async () => {
 		const controller = Effect.runSync(createItemDetailControllerFx());
 		Effect.runSync(controller.openTargetFx(runtimeTarget()));
 		const entering = controller.getSnapshot().state;
@@ -271,8 +306,16 @@ describe("ItemDetailController", () => {
 			expect(controller.readPendingAction("line:interrupted")).toBe("withdraw"),
 		);
 		await Effect.runPromise(Fiber.interrupt(interruptedFiber));
-		expect(controller.readPendingAction("line:interrupted")).toBeNull();
+		expect(controller.readPendingAction("line:interrupted")).toBe("withdraw");
 		expect(controller.readActionError("line:interrupted")).toBeNull();
+		await Effect.runPromise(controller.resetFx);
+		expect(controller.readPendingAction("line:interrupted")).toBeNull();
+		Effect.runSync(controller.openTargetFx(runtimeTarget()));
+		const replacementEntering = controller.getSnapshot().state;
+		if (replacementEntering.phase !== "entering") {
+			throw new Error("Expected replacement entering state.");
+		}
+		Effect.runSync(controller.completeEnterFx(replacementEntering.generation));
 
 		const first = Effect.runSync(Deferred.make<void>());
 		const second = Effect.runSync(Deferred.make<void>());

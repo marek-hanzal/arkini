@@ -264,12 +264,10 @@ export const CheatItemSpotlight = ({
 					ref={inputRef}
 					type="search"
 					value={query}
-					className={`w-full rounded-lg border border-line-strong bg-surface px-4 py-3 text-base text-foreground outline-none ${spawn.pending ? "cursor-progress" : ""}`}
+					className="w-full rounded-lg border border-line-strong bg-surface px-4 py-3 text-base text-foreground outline-none"
 					placeholder="Search item title or ID…"
 					aria-label="Search items to spawn"
-					readOnly={spawn.pending}
 					onChange={(event) => {
-						if (spawn.pending) return;
 						setQuery(event.currentTarget.value);
 						setSelectedIndex(0);
 						spawn.reset();
@@ -313,7 +311,6 @@ export const CheatItemSpotlight = ({
 								key={item.itemId}
 								className="ak-spotlight-option grid grid-cols-[3rem_1fr_auto] items-center gap-3 rounded-lg border px-3 py-2 text-left"
 								data-selected={index === selectedIndex ? "true" : undefined}
-								disabled={spawn.pending}
 								onMouseEnter={() => setSelectedIndex(index)}
 								onClick={() => {
 									setSelectedIndex(index);

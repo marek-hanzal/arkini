@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 
-import { Effect } from "effect";
+import { Deferred, Effect } from "effect";
 import { act, createElement, useEffect } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -267,7 +267,9 @@ const renderItemDetail = async () => {
 		root.render(
 			createElement(
 				ItemDetailProvider,
-				null,
+				{
+					game,
+				},
 				createElement(Probe, {
 					onControl: (next) => {
 						control = next;
@@ -576,7 +578,7 @@ describe("ItemDetailModal", () => {
 		).toBe("Set default");
 	});
 
-	it("keeps the command-owning tab visible until pending work settles", async () => {
+	it("allows tab switches while pending work settles against its command key", async () => {
 		const { readControl } = await renderItemDetail();
 		const owner = currentRuntime.items.find((item) => item.item.id === "workshop");
 		if (owner === undefined) throw new Error("Missing Workshop runtime item.");
@@ -606,42 +608,28 @@ describe("ItemDetailModal", () => {
 			setDefault.click();
 			await Promise.resolve();
 		});
-		expect(setDefault.disabled).toBe(true);
+		expect(setDefault.disabled).toBe(false);
 		expect(setDefault.textContent).toBe("Saving…");
 		expect(runFx).toHaveBeenCalledTimes(1);
 
 		const infoTab = document.querySelector<HTMLButtonElement>('[data-tab="info"]');
 		if (infoTab === null) throw new Error("Missing Info tab.");
 		await act(async () => infoTab.click());
-		const linesTab = document.querySelector<HTMLButtonElement>('[data-tab="lines"]');
-		if (linesTab === null) throw new Error("Missing Lines tab.");
-		expect(infoTab.getAttribute("aria-selected")).toBe("false");
 		expect(readControl().state).toMatchObject({
 			target: {
-				tab: "lines",
+				tab: "info",
 			},
 		});
-
-		const visibleDefault = document.querySelector<HTMLButtonElement>(
-			'[data-ui="TileLineSetDefaultButton"]',
-		);
-		if (visibleDefault === null) throw new Error("Missing visible Set default button.");
-		expect(visibleDefault).toBe(setDefault);
-		expect(visibleDefault.disabled).toBe(true);
-		expect(visibleDefault.textContent).toBe("Saving…");
-		expect(visibleDefault.className).toContain("cursor-progress");
-
-		await act(async () => {
-			visibleDefault.click();
-			await Promise.resolve();
-		});
-		expect(runFx).toHaveBeenCalledTimes(1);
+		expect(document.querySelector('[data-ui="TileLineSetDefaultButton"]')).toBeNull();
 
 		await act(async () => {
 			rejectRun?.(new Error("Deferred default failure."));
 			await Promise.resolve();
 			await Promise.resolve();
 		});
+		const linesTab = document.querySelector<HTMLButtonElement>('[data-tab="lines"]');
+		if (linesTab === null) throw new Error("Missing Lines tab.");
+		await act(async () => linesTab.click());
 		expect(
 			document.querySelector<HTMLButtonElement>('[data-ui="TileLineSetDefaultButton"]')
 				?.disabled,
@@ -837,6 +825,54 @@ describe("ItemDetailModal", () => {
 			},
 		});
 		expect(document.querySelector('[data-ui="ItemLinesTab"]')).not.toBeNull();
+	});
+
+	it("closes immediately while an admitted autofill command keeps settling", async () => {
+		const { readControl } = await renderItemDetail();
+		const owner = currentRuntime.items.find((item) => item.item.id === "workshop");
+		if (owner === undefined) throw new Error("Missing Workshop runtime item.");
+
+		await act(async () => {
+			openItemDetail(readControl(), {
+				itemId: owner.id,
+				tab: "lines",
+			});
+			await Promise.resolve();
+			await Promise.resolve();
+		});
+		const settlement = Effect.runSync(Deferred.make<void>());
+		let outcome: Promise<unknown> | undefined;
+		await act(async () => {
+			outcome = Effect.runPromise(
+				readControl().runPendingActionFx({
+					key: "line:autofill",
+					action: "autofill",
+					failureMessage: "Autofill failed.",
+					run: Deferred.await(settlement),
+				}),
+			);
+			await Promise.resolve();
+		});
+		expect(readControl().readPendingAction("line:autofill")).toBe("autofill");
+
+		const closeButton = document.querySelector<HTMLButtonElement>(
+			'button[aria-label="Close item detail"]',
+		);
+		if (closeButton === null) throw new Error("Missing Item Detail close button.");
+		expect(closeButton.disabled).toBe(false);
+		await act(async () => {
+			closeButton.click();
+			await Promise.resolve();
+			await Promise.resolve();
+		});
+
+		expect(readControl().state.phase).toBe("closed");
+		expect(readControl().readPendingAction("line:autofill")).toBe("autofill");
+		await act(async () => {
+			Effect.runSync(Deferred.succeed(settlement, undefined));
+			await outcome;
+		});
+		expect(readControl().readPendingAction("line:autofill")).toBeNull();
 	});
 
 	it("removes Sources live when the last exact Board source disappears", async () => {

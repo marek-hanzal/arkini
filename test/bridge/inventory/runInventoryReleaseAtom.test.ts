@@ -1,5 +1,5 @@
 import { scheduleTask } from "@effect/atom-react";
-import { Effect, Exit } from "effect";
+import { Deferred, Effect, Exit } from "effect";
 import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
@@ -25,6 +25,57 @@ afterEach(() => {
 });
 
 describe("runInventoryReleaseAtom", () => {
+	it("keeps an earlier release alive when another item is clicked immediately", async () => {
+		const firstGate = Effect.runSync(Deferred.make<void>());
+		const firstEntered = vi.fn();
+		const firstInterrupted = vi.fn();
+		const firstOutcome = {
+			transition: "first-released",
+		};
+		const secondOutcome = {
+			transition: "second-released",
+		};
+		const runFx = vi
+			.fn()
+			.mockReturnValueOnce(
+				Effect.sync(firstEntered).pipe(
+					Effect.andThen(Deferred.await(firstGate)),
+					Effect.as(firstOutcome),
+					Effect.onInterrupt(() => Effect.sync(firstInterrupted)),
+				),
+			)
+			.mockReturnValueOnce(Effect.succeed(secondOutcome));
+		const game = {
+			runFx,
+		} as unknown as Game;
+		const registry = AtomRegistry.make({
+			scheduleTask,
+		});
+		registries.push(registry);
+		const atom = runInventoryReleaseAtom(game);
+		const unmount = registry.mount(atom);
+
+		registry.set(atom, command);
+		await vi.waitFor(() => expect(firstEntered).toHaveBeenCalledOnce());
+		registry.set(atom, {
+			...command,
+			itemId: "runtime:second-inventory",
+			revision: "revision:second-inventory",
+		});
+		await vi.waitFor(() => expect(runFx).toHaveBeenCalledTimes(2));
+		expect(firstInterrupted).not.toHaveBeenCalled();
+
+		Effect.runSync(Deferred.succeed(firstGate, undefined));
+		const exit = await Effect.runPromiseExit(
+			AtomRegistry.getResult(registry, atom, {
+				suspendOnWaiting: true,
+			}),
+		);
+		expect(Exit.isSuccess(exit)).toBe(true);
+		expect(firstInterrupted).not.toHaveBeenCalled();
+		unmount();
+	});
+
 	it("preserves the exact Game command result and isolates Game identity", async () => {
 		const outcome = {
 			transition: "released",

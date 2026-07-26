@@ -5,6 +5,7 @@ import { act, createElement, useEffect } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
+import type { GameEngine } from "~/bridge/game/GameEngine";
 import type { GameMenuControl } from "~/ui/game-menu/GameMenuControl";
 import { GameMenuProvider } from "~/ui/game-menu/GameMenuProvider";
 import { useGameMenuControl } from "~/ui/game-menu/useGameMenuControl";
@@ -66,6 +67,9 @@ vi.mock("~/bridge/item-detail/useResolveItemDefinitionDetailTarget", () => ({
 }));
 
 const roots: Array<ReturnType<typeof createRoot>> = [];
+const providerGame = {
+	id: "game:item-detail-provider",
+} as unknown as GameEngine;
 
 const openItemDetail = (
 	control: ItemDetailControl,
@@ -128,11 +132,13 @@ const renderProvider = async () => {
 	document.body.append(container);
 	const root = createRoot(container);
 	roots.push(root);
-	await act(async () => {
+	const render = (game: GameEngine = providerGame) =>
 		root.render(
 			createElement(
 				ItemDetailProvider,
-				null,
+				{
+					game,
+				},
 				createElement(Probe, {
 					onControl: (next) => {
 						control = next;
@@ -140,6 +146,8 @@ const renderProvider = async () => {
 				}),
 			),
 		);
+	await act(async () => {
+		render();
 	});
 	if (control === undefined) throw new Error("Missing Item Detail control.");
 	return {
@@ -147,6 +155,7 @@ const renderProvider = async () => {
 			if (control === undefined) throw new Error("Missing Item Detail control.");
 			return control;
 		},
+		render,
 		root,
 	};
 };
@@ -165,7 +174,9 @@ const renderGuardedProvider = async () => {
 				null,
 				createElement(
 					ItemDetailProvider,
-					null,
+					{
+						game: providerGame,
+					},
 					createElement(ItemDetailHigherOwnerGuard),
 					createElement(Probe, {
 						onControl: (next) => {
@@ -297,6 +308,39 @@ describe("ItemDetailProvider", () => {
 		});
 	});
 
+	it("cancels pending commands when the exact Game owner is replaced", async () => {
+		const { readControl, render } = await renderProvider();
+		await act(async () => {
+			openItemDetail(readControl(), {
+				itemId: "runtime:first",
+				tab: "lines",
+			});
+		});
+		const entering = readControl().state;
+		if (entering.phase !== "entering") throw new Error("Expected entering state.");
+		await act(async () => completeEnter(readControl(), entering.generation));
+		const interrupted = vi.fn();
+		const outcome = Effect.runPromiseExit(
+			readControl().runPendingActionFx({
+				key: "line:runtime:first",
+				action: "autofill",
+				failureMessage: "Autofill failed.",
+				run: Effect.never.pipe(Effect.onInterrupt(() => Effect.sync(interrupted))),
+			}),
+		);
+		expect(readControl().readPendingAction("line:runtime:first")).toBe("autofill");
+
+		await act(async () => {
+			render({
+				id: "game:item-detail-provider:replacement",
+			} as unknown as GameEngine);
+		});
+
+		await vi.waitFor(() => expect(interrupted).toHaveBeenCalledOnce());
+		expect(readControl().readPendingAction("line:runtime:first")).toBeNull();
+		expect(Exit.isFailure(await outcome)).toBe(true);
+	});
+
 	it("retains action errors across tabs but evicts them across target and exit lifecycles", async () => {
 		const { readControl } = await renderProvider();
 		await act(async () => {
@@ -331,7 +375,7 @@ describe("ItemDetailProvider", () => {
 					itemId: "runtime:first",
 					tab: "info",
 				}),
-			).toBe(false);
+			).toBe(true);
 			rejectFirst?.(firstError);
 			firstExit = await firstOutcome;
 		});
@@ -367,8 +411,13 @@ describe("ItemDetailProvider", () => {
 					catch: (cause) => cause,
 				}),
 			});
-			await close(readControl());
-			expect(readControl().state.phase).toBe("open");
+			const closeOutcome = close(readControl());
+			await Promise.resolve();
+			const exiting = readControl().state;
+			if (exiting.phase !== "exiting") throw new Error("Expected exiting state.");
+			completeExit(readControl(), exiting.generation);
+			await closeOutcome;
+			expect(readControl().state.phase).toBe("closed");
 			rejectSecond?.(secondError);
 			secondExit = await secondOutcome;
 		});
@@ -377,17 +426,6 @@ describe("ItemDetailProvider", () => {
 			throw new Error("Expected second action failure.");
 		}
 		expect(Cause.findErrorOption(secondExit.cause)).toEqual(Option.some(secondError));
-		expect(readControl().readActionError("line:runtime:second")).toBe(
-			"Late failure after close.",
-		);
-		const secondState = readControl().state;
-		if (secondState.phase !== "open") throw new Error("Expected open state.");
-		let exit: Promise<void> | undefined;
-		await act(async () => {
-			exit = close(readControl());
-			completeExit(readControl(), secondState.generation);
-			await exit;
-		});
 		expect(readControl().readActionError("line:runtime:second")).toBeNull();
 	});
 
@@ -454,7 +492,7 @@ describe("ItemDetailProvider", () => {
 		});
 	});
 
-	it("rejects Game Menu ownership while an Item Detail command is pending", async () => {
+	it("yields to Game Menu while an Item Detail command settles independently", async () => {
 		const { readGameMenu, readItemDetail } = await renderGuardedProvider();
 		await act(async () => {
 			openItemDetail(readItemDetail(), {
@@ -485,16 +523,18 @@ describe("ItemDetailProvider", () => {
 			await Promise.resolve();
 		});
 
-		expect(readGameMenu().phase).toBe("exiting");
-		expect(readItemDetail().state.phase).toBe("open");
-		expect(readItemDetail().hasPendingActions).toBe(true);
+		expect(readGameMenu().phase).toBe("entering");
+		expect(readItemDetail().state).toMatchObject({
+			phase: "exiting",
+			restoreFocus: false,
+		});
 		expect(readItemDetail().readPendingAction("line:runtime:first")).toBe("start");
 
 		await act(async () => {
 			completeRun?.();
 			await outcome;
 		});
-		expect(readGameMenu().phase).toBe("exiting");
-		expect(readItemDetail().state.phase).toBe("open");
+		expect(readGameMenu().phase).toBe("entering");
+		expect(readItemDetail().state.phase).toBe("exiting");
 	});
 });

@@ -100,6 +100,34 @@
 												"rules": []
 											}
 										]
+									},
+									{
+										"type": "chance",
+										"chance": 0.2,
+										"drop": [
+											{
+												"itemId": "item:bio-waste",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									},
+									{
+										"type": "chance",
+										"chance": 0.1,
+										"drop": [
+											{
+												"itemId": "item:trash",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
 									}
 								]
 							}

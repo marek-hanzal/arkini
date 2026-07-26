@@ -7,7 +7,8 @@ import { startLineFx } from "~/engine/job/write/startLineFx";
 /**
  * Creates the isolated concurrent start command for one exact live Game.
  *
- * TODO(#397): Revalidate the stable pending settlement boundary before removing its yield.
+ * The scheduling yield stabilizes AsyncResult publication only; it does not
+ * serialize commands or gate another interaction.
  */
 export const createStartItemDetailLineAtomFx = Effect.fn("createStartItemDetailLineAtomFx")(
 	(game: Game) =>

@@ -1,4 +1,4 @@
-import { Deferred, Effect } from "effect";
+import { Deferred, Effect, Fiber } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
 import { match } from "ts-pattern";
 
@@ -26,6 +26,7 @@ export interface ItemDetailController {
 	readonly completeExitFx: (generation: number) => Effect.Effect<void>;
 	readonly readActionError: (key: string) => string | null;
 	readonly readPendingAction: (key: string) => ItemDetailPendingAction | null;
+	readonly cancelPendingActionsFx: Effect.Effect<void>;
 	readonly runPendingActionFx: <Result, Failure>(
 		props: RunItemDetailPendingActionProps<Result, Failure>,
 	) => Effect.Effect<Result | void, Failure>;
@@ -88,13 +89,17 @@ const sameTarget = (left: ItemDetailTarget, right: ItemDetailTarget) =>
  * after the visible modal has left or a superseding open intent has explicitly
  * taken ownership of that exit.
  *
- * Pending commands pin the exact target and block close/switch so a settlement
- * cannot be presented against another item. Errors are presentation state only;
- * command truth remains with the bridge command Atom.
+ * Pending commands own only their exact command key. Repeated clicks on that
+ * key coalesce until its engine command settles, while distinct commands remain
+ * independent. Closing or switching the modal never waits for command
+ * settlement; a late failure is published only while its admitting target
+ * generation still owns the visible detail.
  */
 export const createItemDetailControllerFx = Effect.fn("createItemDetailControllerFx")(() =>
 	Effect.sync((): ItemDetailController => {
 		const listeners = new Set<() => void>();
+		const actionFibers = new Set<Fiber.Fiber<unknown, unknown>>();
+		const actionTokenByKey = new Map<string, symbol>();
 		let snapshot: ItemDetailController.Snapshot = initialSnapshot;
 		let nextGeneration = 0;
 		let exitCompletion: ExitCompletion | undefined;
@@ -153,10 +158,6 @@ export const createItemDetailControllerFx = Effect.fn("createItemDetailControlle
 				Effect.gen(function* () {
 					const current = snapshot.state;
 					if (current.phase === "closed") return enter(target);
-					// Keep command settlement attached to the target that admitted it.
-					if (snapshot.pendingActions.size > 0 && !sameTarget(current.target, target)) {
-						return false;
-					}
 					// Resolve the superseded exit so its close waiter cannot hang.
 					if (current.phase === "exiting") {
 						yield* resolveExitCompletionFx(current.generation);
@@ -181,7 +182,6 @@ export const createItemDetailControllerFx = Effect.fn("createItemDetailControlle
 				Effect.gen(function* () {
 					const current = snapshot.state;
 					if (current.phase === "closed") return;
-					if (snapshot.pendingActions.size > 0) return;
 					if (current.phase === "exiting") {
 						if (!restoreFocus && current.restoreFocus) {
 							publishState({
@@ -215,15 +215,9 @@ export const createItemDetailControllerFx = Effect.fn("createItemDetailControlle
 				}),
 		);
 
-		// TODO(#397): Revalidate stable concurrent-command pending settlement before
-		// removing the close command's scheduling yield.
-		const closeAtom = Atom.fn(
-			(props: CloseItemDetailProps | undefined) =>
-				Effect.yieldNow.pipe(Effect.andThen(closeFx(props))),
-			{
-				concurrent: true,
-			},
-		).pipe(Atom.setIdleTTL(0));
+		const closeAtom = Atom.fn((props: CloseItemDetailProps | undefined) => closeFx(props), {
+			concurrent: true,
+		}).pipe(Atom.setIdleTTL(0));
 
 		const completeEnterFx = Effect.fn("ItemDetailController.completeEnterFx")(
 			(generation: number) =>
@@ -268,6 +262,8 @@ export const createItemDetailControllerFx = Effect.fn("createItemDetailControlle
 					const outcomeScope = actionOutcomeScope(snapshot.state);
 					const pendingActions = new Map(snapshot.pendingActions);
 					pendingActions.set(key, action);
+					const actionToken = Symbol(key);
+					actionTokenByKey.set(key, actionToken);
 					const actionErrors = new Map(snapshot.actionErrors);
 					actionErrors.delete(key);
 					publish({
@@ -276,39 +272,63 @@ export const createItemDetailControllerFx = Effect.fn("createItemDetailControlle
 						actionErrors,
 					});
 
-					return run.pipe(
-						Effect.tapError((error) =>
-							Effect.sync(() => {
-								if (
-									outcomeScope !== undefined &&
-									actionOutcomeScope(snapshot.state) === outcomeScope
-								) {
-									const nextErrors = new Map(snapshot.actionErrors);
-									nextErrors.set(
-										key,
-										error instanceof Error ? error.message : failureMessage,
-									);
+					return Effect.gen(function* () {
+						const fiber = yield* run.pipe(
+							Effect.tapError((error) =>
+								Effect.sync(() => {
+									if (
+										outcomeScope !== undefined &&
+										actionOutcomeScope(snapshot.state) === outcomeScope &&
+										actionTokenByKey.get(key) === actionToken
+									) {
+										const nextErrors = new Map(snapshot.actionErrors);
+										nextErrors.set(
+											key,
+											error instanceof Error ? error.message : failureMessage,
+										);
+										publish({
+											...snapshot,
+											actionErrors: nextErrors,
+										});
+									}
+								}),
+							),
+							Effect.ensuring(
+								Effect.sync(() => {
+									if (actionTokenByKey.get(key) !== actionToken) return;
+									actionTokenByKey.delete(key);
+									const nextPending = new Map(snapshot.pendingActions);
+									nextPending.delete(key);
 									publish({
 										...snapshot,
-										actionErrors: nextErrors,
+										pendingActions: nextPending,
 									});
-								}
+								}),
+							),
+							Effect.exit,
+							Effect.forkDetach({
+								startImmediately: true,
 							}),
-						),
-						Effect.ensuring(
-							Effect.sync(() => {
-								if (snapshot.pendingActions.get(key) !== action) return;
-								const nextPending = new Map(snapshot.pendingActions);
-								nextPending.delete(key);
-								publish({
-									...snapshot,
-									pendingActions: nextPending,
-								});
-							}),
-						),
-					);
+						);
+						actionFibers.add(fiber);
+						fiber.addObserver(() => actionFibers.delete(fiber));
+						const outcome = yield* Fiber.join(fiber);
+						return yield* outcome;
+					});
 				}),
 		);
+
+		const cancelPendingActionsFx = Effect.sync(() => {
+			for (const fiber of actionFibers) fiber.interruptUnsafe();
+			actionFibers.clear();
+			actionTokenByKey.clear();
+			if (snapshot.pendingActions.size === 0 && snapshot.actionErrors.size === 0) return;
+			publish({
+				...snapshot,
+				pendingActions: new Map(),
+				actionErrors: new Map(),
+			});
+		});
 
 		return {
 			getSnapshot: () => snapshot,
@@ -326,8 +346,10 @@ export const createItemDetailControllerFx = Effect.fn("createItemDetailControlle
 			completeExitFx,
 			readActionError: (key) => snapshot.actionErrors.get(key) ?? null,
 			readPendingAction: (key) => snapshot.pendingActions.get(key) ?? null,
+			cancelPendingActionsFx,
 			runPendingActionFx,
 			resetFx: Effect.gen(function* () {
+				yield* cancelPendingActionsFx;
 				yield* resolveExitCompletionFx();
 				snapshot = initialSnapshot;
 				nextGeneration = 0;

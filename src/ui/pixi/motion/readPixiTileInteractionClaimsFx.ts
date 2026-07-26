@@ -4,7 +4,7 @@ import { match } from "ts-pattern";
 import type { TileMotionCue } from "~/bridge/tile/motion/TileMotionCue";
 import type { PixiTileInteractionClaim } from "~/ui/pixi/motion/PixiTileMotionRuntime";
 
-/** Projects every canonical motion actor as explicitly handoff-capable interaction ownership. */
+/** Projects drag ownership without turning presentation work into a click lock. */
 export const readPixiTileInteractionClaimsFx = Effect.fn("readPixiTileInteractionClaimsFx")(
 	(cues: ReadonlyArray<TileMotionCue>) =>
 		Effect.sync(() => {
@@ -30,7 +30,7 @@ export const readPixiTileInteractionClaimsFx = Effect.fn("readPixiTileInteractio
 							kind: "input",
 						},
 						(input) => {
-							claims.set(input.sourceActorId, "blocked");
+							claims.set(input.sourceActorId, "activation-only");
 						},
 					)
 					.with(

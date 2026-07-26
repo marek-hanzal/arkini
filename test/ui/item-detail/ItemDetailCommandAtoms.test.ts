@@ -259,7 +259,7 @@ describe("Item Detail command Atoms", () => {
 		expect(controller.getSnapshot().pendingActions.size).toBe(0);
 	});
 
-	it("rejects a same-key duplicate while different line keys run independently", async () => {
+	it("coalesces repeated same-key commands while different line keys run independently", async () => {
 		const controller = openController();
 		const firstGate = Effect.runSync(Deferred.make<void>());
 		const secondGate = Effect.runSync(Deferred.make<void>());
@@ -312,6 +312,19 @@ describe("Item Detail command Atoms", () => {
 		});
 		await vi.waitFor(() => expect(controller.readPendingAction("line:first")).toBeNull());
 		expect(controller.readPendingAction("line:second")).toBe("autofill");
+		await act(async () => {
+			first.autofill({
+				ownerItemId: "runtime:owner",
+				lineId: "line:first",
+			});
+		});
+		await vi.waitFor(() =>
+			expect(entered).toEqual([
+				"line:first",
+				"line:second",
+				"line:first",
+			]),
+		);
 
 		await act(async () => {
 			Effect.runSync(Deferred.succeed(secondGate, undefined));
@@ -356,7 +369,7 @@ describe("Item Detail command Atoms", () => {
 		expect(controller.readPendingAction("line:first")).toBeNull();
 	});
 
-	it("interrupts Game A on replacement, ignores its stale failure, and cleans on registry disposal", async () => {
+	it("cancels the exact Game owner while surviving command Atom registry disposal", async () => {
 		const controller = openController();
 		let rejectGameA: ((cause: Error) => void) | undefined;
 		const gameAPromise = new Promise<never>((_resolve, reject) => {
@@ -392,6 +405,7 @@ describe("Item Detail command Atoms", () => {
 		await vi.waitFor(() => expect(controller.readPendingAction("line:first")).toBe("start"));
 
 		gameState.game = gameB;
+		Effect.runSync(controller.cancelPendingActionsFx);
 		await act(async () => rendered.render());
 		await vi.waitFor(() => expect(gameAInterrupted).toHaveBeenCalledOnce());
 		expect(controller.readPendingAction("line:first")).toBeNull();
@@ -413,6 +427,9 @@ describe("Item Detail command Atoms", () => {
 		await vi.waitFor(() => expect(controller.readPendingAction("line:first")).toBe("start"));
 
 		await act(async () => rendered.registry.dispose());
+		expect(gameBInterrupted).not.toHaveBeenCalled();
+		expect(controller.readPendingAction("line:first")).toBe("start");
+		Effect.runSync(controller.cancelPendingActionsFx);
 		await vi.waitFor(() => expect(gameBInterrupted).toHaveBeenCalledOnce());
 		expect(controller.readPendingAction("line:first")).toBeNull();
 	});

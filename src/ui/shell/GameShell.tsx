@@ -35,7 +35,7 @@ const GameShellLayers = ({
 }>) => {
 	return (
 		<>
-			<ItemDetailProvider>
+			<ItemDetailProvider game={game}>
 				<PixiGameProvider>
 					<ItemDetailHigherOwnerGuard />
 					<GameTileScene>{children}</GameTileScene>

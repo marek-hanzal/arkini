@@ -19,16 +19,28 @@ const boardState = vi.hoisted(() => ({
 	close: vi.fn(),
 	createProps: null as createPixiMainSceneRuntimeFx.Props | null,
 	navigate: vi.fn(() => Promise.resolve()),
+	openItemDetail: vi.fn(),
 	registerInteraction: vi.fn(),
+	runStartLine: vi.fn(),
+	startLineState: {
+		kind: "idle",
+	} as
+		| {
+				readonly kind: "idle";
+		  }
+		| {
+				readonly kind: "error";
+				readonly autofilled: boolean;
+				readonly error: unknown;
+				readonly ownerItemId: string;
+		  },
 	unregisterInteraction: vi.fn(),
 }));
 
 vi.mock("@effect/atom-react", () => ({
 	useAtom: () => [
-		{
-			kind: "idle",
-		},
-		vi.fn(),
+		boardState.startLineState,
+		boardState.runStartLine,
 	],
 	useAtomSet: () => vi.fn(),
 }));
@@ -69,7 +81,10 @@ vi.mock("~/ui/game-menu/useGameMenuControl", () => ({
 vi.mock("~/ui/item-detail/useItemDetailControl", () => ({
 	useItemDetailControl: () => ({
 		isOpen: false,
-		openItemDetailFx: () => Effect.void,
+		openItemDetailFx: (props: unknown) =>
+			Effect.sync(() => {
+				boardState.openItemDetail(props);
+			}),
 	}),
 }));
 
@@ -110,12 +125,86 @@ afterEach(async () => {
 	boardState.close.mockClear();
 	boardState.createProps = null;
 	boardState.navigate.mockClear();
+	boardState.openItemDetail.mockClear();
 	boardState.registerInteraction.mockClear();
+	boardState.runStartLine.mockClear();
+	boardState.startLineState = {
+		kind: "idle",
+	};
 	boardState.unregisterInteraction.mockClear();
 	document.body.replaceChildren();
 });
 
 describe("PixiBoardToolbarSurface", () => {
+	it("does not open Lines after a click already autofilled the owner", async () => {
+		boardState.startLineState = {
+			kind: "error",
+			autofilled: true,
+			error: {
+				_tag: "DepositUnavailable",
+			},
+			ownerItemId: "runtime:producer",
+		};
+		const host = document.createElement("div");
+		document.body.append(host);
+		const root = createRoot(host);
+		roots.push(root);
+
+		await act(async () => {
+			root.render(createElement(PixiBoardToolbarSurface));
+			await Promise.resolve();
+		});
+
+		expect(boardState.openItemDetail).not.toHaveBeenCalled();
+		expect(boardState.runStartLine).toHaveBeenCalledWith({
+			kind: "reset",
+		});
+	});
+
+	it("sends another default-line command for a running owner and lets the engine enqueue or reject it", async () => {
+		const host = document.createElement("div");
+		document.body.append(host);
+		const root = createRoot(host);
+		roots.push(root);
+		await act(async () => {
+			root.render(createElement(PixiBoardToolbarSurface));
+			await Promise.resolve();
+		});
+		const createProps = boardState.createProps;
+		if (createProps === null) throw new Error("Board scene did not create its runtime.");
+		const producer = {
+			id: "runtime:producer",
+			itemId: "producer",
+			location: {
+				scope: "board",
+				space: 0,
+				position: {
+					x: 0,
+					y: 0,
+				},
+			},
+			primaryAction: {
+				kind: "start-default-line",
+				lineId: "line:default",
+			},
+			quantity: 1,
+			revision: "revision:producer:running",
+			running: true,
+			runningGlow: true,
+			sourceUrl: "resource:producer",
+			title: "Producer",
+		} satisfies TileActorItem;
+
+		await createProps.onActivate(producer, false, document.createElement("canvas"));
+
+		expect(boardState.runStartLine).toHaveBeenCalledWith({
+			kind: "start",
+			lineId: "line:default",
+			ownerItemId: producer.id,
+		});
+		expect(boardState.openItemDetail).not.toHaveBeenCalled();
+	});
+
 	it("routes the open-inventory primary action to the sibling Inventory leaf", async () => {
 		const host = document.createElement("div");
 		document.body.append(host);

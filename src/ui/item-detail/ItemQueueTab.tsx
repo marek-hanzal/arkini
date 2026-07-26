@@ -43,7 +43,7 @@ export const ItemQueueTab = ({
 				</p>
 				<Button
 					type="button"
-					disabled={disabled || queue.request.length === 0 || pending}
+					disabled={disabled || queue.request.length === 0}
 					cursorIntent={pending ? "progress" : undefined}
 					onClick={() =>
 						clearQueue.run({

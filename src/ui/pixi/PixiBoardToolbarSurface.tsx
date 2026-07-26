@@ -105,10 +105,6 @@ export const PixiBoardToolbarSurface = () => {
 						kind: "start-default-line",
 					},
 					({ lineId }) => {
-						if (item.running) {
-							openLines(item.id, origin);
-							return;
-						}
 						runStartLine({
 							kind: "start",
 							lineId,
@@ -128,7 +124,9 @@ export const PixiBoardToolbarSurface = () => {
 	useEffect(() => {
 		if (startLineState.kind !== "error") return;
 		const origin = runtimeRef.current?.canvas ?? hostRef.current;
-		if (origin !== null) openLines(startLineState.ownerItemId, origin);
+		if (!startLineState.autofilled && origin !== null) {
+			openLines(startLineState.ownerItemId, origin);
+		}
 		runStartLine({
 			kind: "reset",
 		});

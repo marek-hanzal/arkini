@@ -9,6 +9,7 @@ import { ItemLineInputs } from "~/ui/item-detail/ItemLineInputs";
 import { ItemLineOutputs } from "~/ui/item-detail/ItemLineOutputs";
 import { ItemLineRuntime } from "~/ui/item-detail/ItemLineRuntime";
 import { ItemLineSummary } from "~/ui/item-detail/ItemLineSummary";
+import type { ItemDetailPendingAction } from "~/ui/item-detail/ItemDetailControl";
 import { useItemDetailControl } from "~/ui/item-detail/useItemDetailControl";
 import { readSettledAsyncResultError } from "~/ui/reactivity/readSettledAsyncResultError";
 
@@ -23,27 +24,54 @@ export const ItemLineRow = ({
 	readonly ownerItemId: string;
 }) => {
 	const itemDetail = useItemDetailControl();
-	const pendingKey = JSON.stringify([
-		"line",
-		ownerItemId,
-		line.lineId,
-	]);
-	const pendingOptions = {
-		pendingKey,
-		pendingOwner: itemDetail,
+	const pendingKey = (action: ItemDetailPendingAction) =>
+		JSON.stringify([
+			"line",
+			ownerItemId,
+			line.lineId,
+			action,
+		]);
+	const pendingKeys = {
+		autofill: pendingKey("autofill"),
+		default: pendingKey("default"),
+		start: pendingKey("start"),
+		withdraw: pendingKey("withdraw"),
 	} as const;
-	const autofillLine = useAutofillItemDetailLine(pendingOptions);
-	const setDefaultLine = useSetDefaultItemDetailLine(pendingOptions);
-	const unsetDefaultLine = useUnsetDefaultItemDetailLine(pendingOptions);
-	const startLine = useStartPendingItemDetailLine(pendingOptions);
-	const withdrawLine = useWithdrawItemDetailLine(pendingOptions);
+	const autofillLine = useAutofillItemDetailLine({
+		pendingKey: pendingKeys.autofill,
+		pendingOwner: itemDetail,
+	});
+	const setDefaultLine = useSetDefaultItemDetailLine({
+		pendingKey: pendingKeys.default,
+		pendingOwner: itemDetail,
+	});
+	const unsetDefaultLine = useUnsetDefaultItemDetailLine({
+		pendingKey: pendingKeys.default,
+		pendingOwner: itemDetail,
+	});
+	const startLine = useStartPendingItemDetailLine({
+		pendingKey: pendingKeys.start,
+		pendingOwner: itemDetail,
+	});
+	const withdrawLine = useWithdrawItemDetailLine({
+		pendingKey: pendingKeys.withdraw,
+		pendingOwner: itemDetail,
+	});
 	readSettledAsyncResultError(autofillLine.result);
 	readSettledAsyncResultError(setDefaultLine.result);
 	readSettledAsyncResultError(unsetDefaultLine.result);
 	readSettledAsyncResultError(startLine.result);
 	readSettledAsyncResultError(withdrawLine.result);
-	const pendingAction = itemDetail.readPendingAction(pendingKey);
-	const error = itemDetail.readActionError(pendingKey);
+	const pending = {
+		autofill: itemDetail.readPendingAction(pendingKeys.autofill) === "autofill",
+		default: itemDetail.readPendingAction(pendingKeys.default) === "default",
+		start: itemDetail.readPendingAction(pendingKeys.start) === "start",
+		withdraw: itemDetail.readPendingAction(pendingKeys.withdraw) === "withdraw",
+	} as const;
+	const error =
+		Object.values(pendingKeys)
+			.map((key) => itemDetail.readActionError(key))
+			.find((message) => message !== null) ?? null;
 
 	return (
 		<article
@@ -59,10 +87,10 @@ export const ItemLineRow = ({
 					<div className="flex flex-wrap justify-end gap-2">
 						<Button
 							className="min-h-8 px-3 py-1 text-xs"
-							cursorIntent={pendingAction === "default" ? "progress" : undefined}
+							cursorIntent={pending.default ? "progress" : undefined}
 							data-ui="TileLineSetDefaultButton"
 							data-default={line.isDefault ? "true" : "false"}
-							disabled={disabled || pendingAction !== null}
+							disabled={disabled}
 							onClick={() => {
 								if (line.isDefault) {
 									unsetDefaultLine.run({
@@ -76,17 +104,15 @@ export const ItemLineRow = ({
 								});
 							}}
 						>
-							{pendingAction === "default"
+							{pending.default
 								? "Saving…"
 								: line.isDefault
 									? "Unset default"
 									: "Set default"}
 						</Button>
 						<Button
-							cursorIntent={pendingAction === "autofill" ? "progress" : undefined}
-							disabled={
-								disabled || !line.actions.canAutofill || pendingAction !== null
-							}
+							cursorIntent={pending.autofill ? "progress" : undefined}
+							disabled={disabled || !line.actions.canAutofill}
 							onClick={() =>
 								autofillLine.run({
 									ownerItemId,
@@ -94,13 +120,11 @@ export const ItemLineRow = ({
 								})
 							}
 						>
-							{pendingAction === "autofill" ? "Filling…" : "Autofill"}
+							{pending.autofill ? "Filling…" : "Autofill"}
 						</Button>
 						<Button
-							cursorIntent={pendingAction === "withdraw" ? "progress" : undefined}
-							disabled={
-								disabled || !line.actions.canWithdraw || pendingAction !== null
-							}
+							cursorIntent={pending.withdraw ? "progress" : undefined}
+							disabled={disabled || !line.actions.canWithdraw}
 							onClick={() =>
 								withdrawLine.run({
 									ownerItemId,
@@ -108,18 +132,14 @@ export const ItemLineRow = ({
 								})
 							}
 						>
-							{pendingAction === "withdraw" ? "Withdrawing…" : "Withdraw"}
+							{pending.withdraw ? "Withdrawing…" : "Withdraw"}
 						</Button>
 						<PrimaryButton
 							className="min-w-24"
-							cursorIntent={pendingAction === "start" ? "progress" : undefined}
+							cursorIntent={pending.start ? "progress" : undefined}
 							data-ui="TileLineStartButton"
 							data-start-mode={line.startMode}
-							disabled={
-								disabled ||
-								line.availability.kind !== "ready" ||
-								pendingAction !== null
-							}
+							disabled={disabled || line.availability.kind !== "ready"}
 							onClick={() =>
 								startLine.start({
 									ownerItemId,
@@ -127,7 +147,7 @@ export const ItemLineRow = ({
 								})
 							}
 						>
-							{pendingAction === "start"
+							{pending.start
 								? line.startMode === "enqueue"
 									? "Queueing…"
 									: "Starting…"

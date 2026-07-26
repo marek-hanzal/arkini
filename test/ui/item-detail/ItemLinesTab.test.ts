@@ -6,6 +6,7 @@ import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { useItemDetailLines } from "~/bridge/item-detail/useItemDetailLines";
+import type { ItemDetailPendingAction } from "~/ui/item-detail/ItemDetailControl";
 import { ItemLinesTab } from "~/ui/item-detail/ItemLinesTab";
 import { JobStatusEnumSchema } from "~/engine/job/schema/read/JobStatusEnumSchema";
 
@@ -18,8 +19,8 @@ import { JobStatusEnumSchema } from "~/engine/job/schema/read/JobStatusEnumSchem
 const control = vi.hoisted(() => ({
 	openItemDetailFx: vi.fn(),
 	openItemDefinitionDetailFx: vi.fn(),
-	readActionError: vi.fn(() => null),
-	readPendingAction: vi.fn(() => null),
+	readActionError: vi.fn((_key: string) => null),
+	readPendingAction: vi.fn((_key: string): ItemDetailPendingAction | null => null),
 	runPendingActionFx: vi.fn(),
 }));
 const commands = vi.hoisted(() => ({
@@ -370,6 +371,52 @@ describe("ItemLinesTab", () => {
 			ownerItemId: "runtime:producer",
 		});
 	});
+
+	it("keeps engine-eligible line actions clickable while their presentation status is pending", async () => {
+		control.readPendingAction.mockImplementation((key: string) => {
+			if (key.includes('"autofill"')) return "autofill";
+			if (key.includes('"default"')) return "default";
+			if (key.includes('"start"')) return "start";
+			if (key.includes('"withdraw"')) return "withdraw";
+			return null;
+		});
+		await renderLines({
+			...projection,
+			line: [
+				{
+					...projection.line[0],
+					actions: {
+						canAutofill: true,
+						canWithdraw: true,
+					},
+				},
+			],
+		});
+		const buttons = Array.from(document.querySelectorAll<HTMLButtonElement>("button"));
+		const pendingLabels = [
+			"Saving…",
+			"Filling…",
+			"Withdrawing…",
+			"Starting…",
+		];
+
+		for (const label of pendingLabels) {
+			const button = buttons.find((candidate) => candidate.textContent === label);
+			expect(button, `Missing ${label} button.`).toBeDefined();
+			expect(button?.disabled).toBe(false);
+		}
+		expect(
+			control.readPendingAction.mock.calls.map(([key]) => JSON.parse(key as string).at(-1)),
+		).toEqual(
+			expect.arrayContaining([
+				"autofill",
+				"default",
+				"start",
+				"withdraw",
+			]),
+		);
+	});
+
 	it("filters authoritative visible lines by semantic facts without indexing volatile numbers", async () => {
 		const advancedInput = {
 			...input,

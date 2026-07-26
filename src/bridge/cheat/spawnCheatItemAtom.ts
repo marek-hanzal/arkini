@@ -9,13 +9,19 @@ export const spawnCheatItemAtom = Effect.runSync(
 	makeExactGameAtomFamilyFx((game) =>
 		Atom.fn(
 			(itemId: string) =>
-				game.runFx(
-					spawnCheatItemFx({
-						itemId,
-					}),
+				// Let Atom publish the exact AsyncResult without serializing
+				// independent engine commands behind the previous spawn.
+				Effect.yieldNow.pipe(
+					Effect.andThen(
+						game.runFx(
+							spawnCheatItemFx({
+								itemId,
+							}),
+						),
+					),
 				),
 			{
-				concurrent: false,
+				concurrent: true,
 			},
 		).pipe(Atom.setIdleTTL(0)),
 	),

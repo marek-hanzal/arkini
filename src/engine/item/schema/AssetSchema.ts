@@ -5,15 +5,15 @@ import { IdSchema } from "~/engine/common/schema/IdSchema";
 /**
  * Describes the visual representation of a game item.
  *
- * The ordered source list always has at least one asset. The runtime currently
- * renders its first entry; a later progress-aware renderer can select a later
- * entry without changing the configuration contract. When `composite` is set,
- * the renderer composes that secondary asset with the selected source asset.
+ * The ordered source list always has at least one asset. Craft and blueprint
+ * tiles distribute their entries from an empty to a completely filled material
+ * line; other item kinds render the first entry. When `composite` is set, the
+ * renderer composes that secondary asset with the selected source asset.
  */
 export const AssetSchema = z
 	.object({
 		/**
-		 * Ordered primary asset IDs for this item's visual representation.
+		 * Ordered primary asset IDs from the empty to the fully filled visual.
 		 */
 		source: z
 			.tuple(
@@ -22,7 +22,9 @@ export const AssetSchema = z
 				],
 				IdSchema,
 			)
-			.describe("The ordered primary asset IDs for this item's visual representation."),
+			.describe(
+				"The ordered primary asset IDs from the empty to the fully filled visual representation.",
+			),
 		/**
 		 * Optional secondary asset composed with the selected primary asset.
 		 */

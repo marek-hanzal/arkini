@@ -12,6 +12,7 @@ import { readTileMotionLaneClaimsFx } from "~/ui/tile/motion/readTileMotionLaneC
 import { readTileMotionStaggerDelaySecondsFx } from "~/ui/tile/motion/readTileMotionStaggerDelaySecondsFx";
 import { readUnsettledTileStackQuantitiesFx } from "~/ui/tile/motion/readUnsettledTileStackQuantitiesFx";
 import { readUnsettledTileInputSourceQuantitiesFx } from "~/ui/tile/motion/readUnsettledTileInputSourceQuantitiesFx";
+import { updateTileMotionLanesFx } from "~/ui/tile/motion/updateTileMotionLanesFx";
 
 const board = (x: number) => ({
 	scope: "board" as const,
@@ -46,21 +47,25 @@ const stackCue = ({
 const inputCue = ({
 	eventIndex,
 	previousQuantity,
+	sourceActorId = "runtime:source",
+	targetActorId = "runtime:owner",
 }: {
 	readonly eventIndex: number;
 	readonly previousQuantity: number;
+	readonly sourceActorId?: string;
+	readonly targetActorId?: string;
 }): TileInputMotionCue => ({
 	kind: "input",
 	sequence: 7 + eventIndex,
 	eventIndex: 0,
 	staggerIndex: 0,
-	sourceActorId: "runtime:source",
-	targetActorId: "runtime:owner",
+	sourceActorId,
+	targetActorId,
 	canonicalItemId: "water",
 	previousQuantity,
 	storedQuantity: 1,
 	resultingQuantity: previousQuantity - 1,
-	originActorId: "runtime:source",
+	originActorId: sourceActorId,
 	originLocation: board(0),
 	targetLocation: board(1),
 });
@@ -109,7 +114,7 @@ describe("pure tile motion contracts", () => {
 		);
 	});
 
-	it("keeps a delivery producer in its lane without claiming its direct input", () => {
+	it("retains delivery endpoints without blocking a producer's direct input", () => {
 		const spawn = {
 			kind: "spawn",
 			sequence: 7,
@@ -129,9 +134,29 @@ describe("pure tile motion contracts", () => {
 		expect(Effect.runSync(readTileMotionActorClaimsFx(spawn))).toEqual(
 			new Set([
 				"runtime:spawned",
+				"runtime:producer",
 			]),
 		);
-		expect(Effect.runSync(readTileMotionActorClaimsFx(stack))).toEqual(new Set());
+		expect(Effect.runSync(readTileMotionActorClaimsFx(stack))).toEqual(
+			new Set([
+				"runtime:producer",
+			]),
+		);
+		expect(
+			Effect.runSync(
+				readPixiTileInteractionClaimsFx([
+					spawn,
+					stack,
+				]),
+			),
+		).toEqual(
+			new Map([
+				[
+					"runtime:spawned",
+					"handoff",
+				],
+			]),
+		);
 
 		const producerLane = {
 			kind: "delivery-batch",
@@ -181,7 +206,7 @@ describe("pure tile motion contracts", () => {
 		);
 	});
 
-	it("blocks the delivered source and exposes only its oldest unsettled quantity", () => {
+	it("keeps the delivered source click-only and exposes only its oldest unsettled quantity", () => {
 		const cues = [
 			inputCue({
 				eventIndex: 0,
@@ -196,13 +221,14 @@ describe("pure tile motion contracts", () => {
 		expect(Effect.runSync(readTileMotionActorClaimsFx(cues[0]))).toEqual(
 			new Set([
 				"runtime:source",
+				"runtime:owner",
 			]),
 		);
 		expect(Effect.runSync(readPixiTileInteractionClaimsFx(cues))).toEqual(
 			new Map([
 				[
 					"runtime:source",
-					"blocked",
+					"activation-only",
 				],
 			]),
 		);
@@ -220,5 +246,89 @@ describe("pure tile motion contracts", () => {
 				],
 			]),
 		);
+	});
+
+	it("flies independent inputs together and starts owner output only after every contact", () => {
+		const first = inputCue({
+			eventIndex: 0,
+			previousQuantity: 1,
+			sourceActorId: "runtime:first-source",
+		});
+		const second = inputCue({
+			eventIndex: 1,
+			previousQuantity: 1,
+			sourceActorId: "runtime:second-source",
+		});
+		const output = {
+			actorId: "runtime:output",
+			eventIndex: 0,
+			kind: "spawn",
+			originActorId: "runtime:owner",
+			originLocation: board(1),
+			sequence: 12,
+			staggerIndex: 0,
+			targetLocation: board(2),
+		} satisfies TileMotionCue;
+
+		const launched = Effect.runSync(
+			updateTileMotionLanesFx({
+				action: {
+					cues: [
+						first,
+						second,
+						output,
+					],
+					type: "enqueue",
+				},
+				state: {
+					active: [],
+					pending: [],
+				},
+			}),
+		);
+		expect(launched).toEqual({
+			active: [
+				first,
+				second,
+			],
+			pending: [
+				output,
+			],
+		});
+
+		const afterFirstContact = Effect.runSync(
+			updateTileMotionLanesFx({
+				action: {
+					cue: first,
+					type: "complete",
+				},
+				state: launched,
+			}),
+		);
+		expect(afterFirstContact).toEqual({
+			active: [
+				second,
+			],
+			pending: [
+				output,
+			],
+		});
+
+		expect(
+			Effect.runSync(
+				updateTileMotionLanesFx({
+					action: {
+						cue: second,
+						type: "complete",
+					},
+					state: afterFirstContact,
+				}),
+			),
+		).toEqual({
+			active: [
+				output,
+			],
+			pending: [],
+		});
 	});
 });

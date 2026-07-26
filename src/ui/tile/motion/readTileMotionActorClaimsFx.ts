@@ -3,7 +3,7 @@ import { match } from "ts-pattern";
 
 import type { TileMotionCue } from "~/bridge/tile/motion/TileMotionCue";
 
-/** Returns every canonical actor whose direct input is owned by one motion cue. */
+/** Returns every canonical actor whose presentation lifecycle is retained by one motion cue. */
 export const readTileMotionActorClaimsFx = Effect.fn("readTileMotionActorClaimsFx")(
 	(cue: TileMotionCue) =>
 		Effect.succeed(
@@ -15,13 +15,17 @@ export const readTileMotionActorClaimsFx = Effect.fn("readTileMotionActorClaimsF
 					(spawn) =>
 						new Set([
 							spawn.actorId,
+							spawn.originActorId,
 						]),
 				)
 				.with(
 					{
 						kind: "stack",
 					},
-					() => new Set<string>(),
+					(stack) =>
+						new Set([
+							stack.originActorId,
+						]),
 				)
 				.with(
 					{
@@ -30,6 +34,7 @@ export const readTileMotionActorClaimsFx = Effect.fn("readTileMotionActorClaimsF
 					(input) =>
 						new Set([
 							input.sourceActorId,
+							input.targetActorId,
 						]),
 				)
 				.with(

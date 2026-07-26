@@ -222,6 +222,66 @@ describe("dropItemFx default-line input storage", () => {
 		).toBe(5);
 	});
 
+	it("honors an exact engine input request without consuming spare capacity", () => {
+		const result = run(
+			Effect.gen(function* () {
+				const { owner, source } = yield* setupFx({
+					quantity: 7,
+				});
+				const target = {
+					...targetFor({
+						revision: owner.revision,
+					}),
+					inputStore: {
+						lineId,
+						inputIndex: 0,
+						quantity: 3,
+					},
+				};
+				const preview = yield* readDropItemPreviewFx({
+					sourceItemId: source.id,
+					sourceRevision: source.revision,
+					sourceLocation: sourceLocation(1),
+					target,
+				});
+				const outcome = yield* dropItemFx({
+					sourceItemId: source.id,
+					sourceRevision: source.revision,
+					sourceLocation: sourceLocation(1),
+					target,
+				});
+				return {
+					outcome,
+					preview,
+					runtime: yield* readRuntimeFx(),
+				};
+			}),
+		);
+
+		expect(result.preview).toEqual({
+			kind: DropItemResultKindEnumSchema.enum.StoreInput,
+			lineId,
+			inputIndex: 0,
+			quantity: 3,
+		});
+		expect(result.outcome).toMatchObject({
+			kind: DropItemResultKindEnumSchema.enum.StoreInput,
+			storedQuantity: 3,
+			source: {
+				previousQuantity: 7,
+				current: {
+					location: sourceLocation(1),
+					quantity: 4,
+				},
+			},
+		});
+		expect(
+			result.runtime.items
+				.filter((item) => item.location.scope === "input")
+				.reduce((total, item) => total + item.quantity, 0),
+		).toBe(3);
+	});
+
 	it("preserves ordinary swap when the target has no selected default line", () => {
 		const result = run(
 			Effect.gen(function* () {

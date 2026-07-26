@@ -101,4 +101,60 @@ describe("autofillLineInputsFx events", () => {
 			},
 		]);
 	});
+
+	it("publishes only the missing quantity and preserves the visible stack remainder", async () => {
+		const transitions = await Effect.runPromise(
+			Effect.scoped(
+				Effect.gen(function* () {
+					yield* spawnItemFx({
+						id: ownerItemId,
+						itemId: "workshop",
+						location: workshopLocation,
+						quantity: 1,
+					});
+					yield* spawnItemFx({
+						id: "runtime:stack",
+						itemId: "water",
+						location: sourceLocation(1),
+						quantity: 7,
+					});
+
+					const transitions = yield* CommittedTransitionsFx;
+					const replaySeen = yield* Deferred.make<void>();
+					const nextFiber = yield* transitions.changes.pipe(
+						Stream.tap(() => Deferred.succeed(replaySeen, undefined)),
+						Stream.drop(1),
+						Stream.take(1),
+						Stream.runCollect,
+						Effect.forkChild,
+					);
+					yield* Deferred.await(replaySeen);
+					yield* autofillLineInputsFx({
+						ownerItemId,
+						lineId,
+					});
+					return Array.from(yield* Fiber.join(nextFiber));
+				}),
+			).pipe(
+				useGameFx({
+					config: inputRuntimeTestConfig,
+				}),
+			),
+		);
+
+		expect(transitions.flatMap((transition) => transition.events)).toEqual([
+			{
+				type: GameEventEnumSchema.enum.ItemInputStored,
+				sourceItemId: "runtime:stack",
+				canonicalItemId: "water",
+				previousSourceLocation: sourceLocation(1),
+				previousQuantity: 7,
+				storedQuantity: 3,
+				resultingQuantity: 4,
+				ownerItemId,
+				lineId,
+				inputIndex: 0,
+			},
+		]);
+	});
 });

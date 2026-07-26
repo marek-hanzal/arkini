@@ -2,6 +2,8 @@ import { Effect } from "effect";
 import { match } from "ts-pattern";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
+import type { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeIntegerSchema";
+import type { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
 import { isSameGridLocationFx } from "~/engine/location/read/isSameGridLocationFx";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
@@ -30,7 +32,11 @@ export namespace dropItemFx {
 						readonly itemId: IdSchema.Type;
 						readonly revision: RevisionSchema.Type;
 					} | null;
-					readonly inputLineId?: IdSchema.Type;
+					readonly inputStore?: {
+						readonly lineId: IdSchema.Type;
+						readonly inputIndex: NonNegativeIntegerSchema.Type;
+						readonly quantity: PositiveIntegerSchema.Type;
+					};
 			  }
 			| {
 					readonly kind: "unsupported";
@@ -95,7 +101,7 @@ export const dropItemFx = Effect.fn("dropItemFx")(function* ({
 		} satisfies dropItemFx.Result;
 	}
 	if (
-		target.inputLineId !== undefined &&
+		target.inputStore !== undefined &&
 		preflight.kind !== DropItemResultKindEnumSchema.enum.StoreInput
 	) {
 		return {

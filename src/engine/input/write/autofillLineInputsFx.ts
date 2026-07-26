@@ -24,9 +24,9 @@ export namespace autofillLineInputsFx {
 /**
  * Fills one line from its owner's board through ordinary item-drop commands.
  *
- * Each planned source is submitted as its complete current stack. The canonical drop path alone
- * decides the accepted quantity, publishes one normal committed transition, and leaves any
- * remainder exactly where a pointer drop would leave it.
+ * Each planned source presents its complete current stack, while the command requests only the
+ * exact missing quantity for one slot. The canonical drop path rechecks that request against current
+ * capacity, publishes one normal committed transition, and leaves any remainder at its origin.
  */
 export const autofillLineInputsFx = Effect.fn("autofillLineInputsFx")(function* ({
 	ownerItemId,
@@ -71,7 +71,11 @@ export const autofillLineInputsFx = Effect.fn("autofillLineInputsFx")(function* 
 			sourceRevision: source.revision,
 			target: {
 				kind: "slot",
-				inputLineId: lineId,
+				inputStore: {
+					lineId,
+					inputIndex: next.inputIndex,
+					quantity: next.quantity,
+				},
 				location: owner.location,
 				occupant: {
 					itemId: owner.id,

@@ -2,6 +2,8 @@ import { Effect, Option } from "effect";
 import { match } from "ts-pattern";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
+import type { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeIntegerSchema";
+import type { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
 import { GameConfigFx } from "~/engine/game/context/GameConfigFx";
 import { ItemEnumSchema } from "~/engine/item/schema/ItemEnumSchema";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
@@ -34,7 +36,11 @@ export namespace readDropItemPreviewFx {
 						readonly itemId: IdSchema.Type;
 						readonly revision: RevisionSchema.Type;
 					} | null;
-					readonly inputLineId?: IdSchema.Type;
+					readonly inputStore?: {
+						readonly lineId: IdSchema.Type;
+						readonly inputIndex: NonNegativeIntegerSchema.Type;
+						readonly quantity: PositiveIntegerSchema.Type;
+					};
 			  }
 			| {
 					readonly kind: "unsupported";
@@ -205,8 +211,10 @@ export const readDropItemPreviewFx = Effect.fn("readDropItemPreviewFx")(function
 		}
 	}
 	const inputStore = yield* resolveLineInputStoreFx({
-		lineId: target.inputLineId,
+		lineId: target.inputStore?.lineId,
+		inputIndex: target.inputStore?.inputIndex,
 		owner: targetItem,
+		requestedQuantity: target.inputStore?.quantity,
 		runtime,
 		source,
 	});

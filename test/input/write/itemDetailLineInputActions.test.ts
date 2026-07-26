@@ -153,7 +153,7 @@ describe("Item Detail line input actions", () => {
 		});
 	});
 
-	it("submits a complete board stack through ordinary drop capacity semantics", () => {
+	it("autofills only the missing quantity without consuming spare input capacity", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {
 				yield* spawnOwnerFx();
@@ -179,12 +179,12 @@ describe("Item Detail line input actions", () => {
 		);
 
 		expect(result.autofilled).toEqual({
-			storedQuantity: 5,
+			storedQuantity: 3,
 			remainingMissingQuantity: 0,
 		});
 		expect(result.runtime.items.find((item) => item.id === "runtime:water")).toMatchObject({
 			location: sourceLocation(1),
-			quantity: 2,
+			quantity: 4,
 		});
 	});
 
@@ -220,7 +220,7 @@ describe("Item Detail line input actions", () => {
 		expect(result.runtime.jobs).toHaveLength(1);
 		expect(result.runtime.items.find((item) => item.id === "runtime:water")).toMatchObject({
 			location: sourceLocation(1),
-			quantity: 2,
+			quantity: 4,
 		});
 		expect(result.started).toMatchObject({
 			type: "started",

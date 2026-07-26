@@ -448,6 +448,10 @@ select {
 	isolation: isolate;
 }
 
+.game-scene__backdrop {
+	background: var(--ak-game-shell-background);
+}
+
 .launcher-scene__backdrop {
 	background:
 		radial-gradient(
@@ -577,12 +581,10 @@ select {
 	background: var(--ak-canvas);
 }
 
-/*
- * Board and Inventory replace only the keyed game scene. The transition compositor uses the
- * exact same solid color as the persistent GameShell, so no intermediate black frame can leak.
- */
-:root:active-view-transition-type(board-to-inventory)::view-transition,
-:root:active-view-transition-type(inventory-to-board)::view-transition {
+/* Every transition crossing the game-scene boundary keeps the GameShell color underneath. */
+:root:active-view-transition-type(hero-to-board)::view-transition,
+:root:active-view-transition-type(board-to-hero)::view-transition,
+:root:active-view-transition-type(board-to-board)::view-transition {
 	background: var(--ak-game-shell-background);
 }
 
@@ -772,51 +774,6 @@ select {
 	arkini-launcher-hero-artwork
 ) {
 	animation: arkini-vt-hero-in 400ms 150ms cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-
-/*
- * GameMenu leaves commit through a Board-origin navigation, but their terminal redirect is
- * painted from the already-visible action Hero. Preserve that old launcher raster through
- * Settings/Main Menu handoff instead of cross-fading it with an identical destination Hero.
- */
-:root:active-view-transition-type(board-to-settings)::view-transition-old(arkini-launcher-backdrop),
-:root:active-view-transition-type(board-to-settings)::view-transition-old(
-	arkini-launcher-hero-shadow
-),
-:root:active-view-transition-type(board-to-settings)::view-transition-old(
-	arkini-launcher-hero-artwork
-),
-:root:active-view-transition-type(board-to-main-menu)::view-transition-old(
-	arkini-launcher-backdrop
-),
-:root:active-view-transition-type(board-to-main-menu)::view-transition-old(
-	arkini-launcher-hero-shadow
-),
-:root:active-view-transition-type(board-to-main-menu)::view-transition-old(
-	arkini-launcher-hero-artwork
-) {
-	animation: none;
-	opacity: 1;
-}
-
-:root:active-view-transition-type(board-to-settings)::view-transition-new(arkini-launcher-backdrop),
-:root:active-view-transition-type(board-to-settings)::view-transition-new(
-	arkini-launcher-hero-shadow
-),
-:root:active-view-transition-type(board-to-settings)::view-transition-new(
-	arkini-launcher-hero-artwork
-),
-:root:active-view-transition-type(board-to-main-menu)::view-transition-new(
-	arkini-launcher-backdrop
-),
-:root:active-view-transition-type(board-to-main-menu)::view-transition-new(
-	arkini-launcher-hero-shadow
-),
-:root:active-view-transition-type(board-to-main-menu)::view-transition-new(
-	arkini-launcher-hero-artwork
-) {
-	animation: none;
-	opacity: 0;
 }
 
 /* An open GameMenu is one old-only scene over Board; it never morphs into progress or a page card. */

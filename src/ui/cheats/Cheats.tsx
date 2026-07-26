@@ -2,6 +2,7 @@ import { match } from "ts-pattern";
 
 import { Button } from "~/ui/button/Button";
 import type { useCheatsModel } from "~/ui/cheats/useCheatsModel";
+import { RouteBackdrop } from "~/ui/navigation/RouteBackdrop";
 
 /** Renders the small save-scoped cheat option surface from one authoritative model. */
 export const Cheats = ({
@@ -15,11 +16,15 @@ export const Cheats = ({
 		error instanceof Error ? error.message : String(error);
 	return (
 		<main
-			className="relative grid size-full min-h-0 min-w-0 place-items-center overflow-hidden bg-canvas p-[var(--ak-viewport-padding)] text-foreground"
+			className="relative grid size-full min-h-0 min-w-0 place-items-center overflow-hidden bg-[var(--ak-game-shell-background)] p-[var(--ak-viewport-padding)] text-foreground"
 			data-ui="CheatsPage"
 		>
+			<RouteBackdrop
+				className="game-scene__backdrop pointer-events-none absolute inset-0 z-0"
+				dataUi="GameSceneBackdrop"
+			/>
 			<section
-				className="grid w-[34rem] max-w-full gap-6 rounded-2xl border border-line-strong bg-surface-raised p-[var(--ak-panel-padding)] shadow-2xl"
+				className="relative z-10 grid w-[34rem] max-w-full gap-6 rounded-2xl border border-line-strong bg-surface-raised p-[var(--ak-panel-padding)] shadow-2xl"
 				aria-labelledby="cheats-title"
 				data-ui="Cheats"
 			>

@@ -1,6 +1,6 @@
 import type { PropsWithChildren, ReactNode } from "react";
 import { LauncherHero } from "~/ui/launcher/LauncherHero";
-import { launcherBackdropViewTransitionName } from "~/ui/navigation/launcherBackdropViewTransitionName";
+import { RouteBackdrop } from "~/ui/navigation/RouteBackdrop";
 
 const layoutClassNames = {
 	centered:
@@ -46,13 +46,9 @@ export const LauncherScene = ({
 		className={`launcher-scene relative size-full min-h-0 min-w-0 overflow-hidden bg-canvas text-foreground${className === undefined ? "" : ` ${className}`}`}
 		data-ui={dataUi}
 	>
-		<div
+		<RouteBackdrop
 			className="launcher-scene__backdrop absolute inset-0"
-			aria-hidden="true"
-			data-ui="LauncherSceneBackdrop"
-			style={{
-				viewTransitionName: launcherBackdropViewTransitionName,
-			}}
+			dataUi="LauncherSceneBackdrop"
 		/>
 		<div
 			className={`relative z-10 overflow-hidden p-[var(--ak-viewport-padding)] ${layoutClassNames[layout]}`}

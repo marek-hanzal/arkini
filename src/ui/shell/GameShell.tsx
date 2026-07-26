@@ -7,11 +7,12 @@ import { ItemDetailHigherOwnerGuard } from "~/ui/item-detail/ItemDetailHigherOwn
 import { ItemDetailModal } from "~/ui/item-detail/ItemDetailModal";
 import { ItemDetailProvider } from "~/ui/item-detail/ItemDetailProvider";
 import { gameBoardViewTransitionName } from "~/ui/navigation/gameBoardViewTransitionName";
+import { RouteBackdrop } from "~/ui/navigation/RouteBackdrop";
 import { PixiGameProvider } from "~/ui/pixi/PixiGameProvider";
 
 const GameTileScene = ({ children }: PropsWithChildren) => (
 	<div
-		className="relative isolate z-0 size-full min-h-0 min-w-0"
+		className="relative isolate z-10 size-full min-h-0 min-w-0"
 		data-ui="TileScene"
 		style={{
 			viewTransitionName: gameBoardViewTransitionName,
@@ -55,6 +56,10 @@ export function GameShell({ children }: PropsWithChildren) {
 			data-ui="GameShell"
 			tabIndex={-1}
 		>
+			<RouteBackdrop
+				className="game-scene__backdrop pointer-events-none absolute inset-0 z-0"
+				dataUi="GameSceneBackdrop"
+			/>
 			<GameMenuProvider>
 				<GameShellLayers game={gameEngine}>{children}</GameShellLayers>
 			</GameMenuProvider>

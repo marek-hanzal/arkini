@@ -26,29 +26,23 @@ describe("View Transition styles", () => {
 		expect(styles).not.toContain("plus-lighter");
 	});
 
-	it("keeps the solid GameShell background while Board and Inventory morph", () => {
+	it("keeps the solid GameShell background across every game-scene boundary", () => {
 		expect(styles).toContain(
-			":root:active-view-transition-type(board-to-inventory)::view-transition",
+			":root:active-view-transition-type(hero-to-board)::view-transition",
 		);
 		expect(styles).toContain(
-			":root:active-view-transition-type(inventory-to-board)::view-transition",
+			":root:active-view-transition-type(board-to-hero)::view-transition",
 		);
 		expect(styles).toMatch(
-			/active-view-transition-type\(inventory-to-board\)::view-transition\s*\{\s*background: var\(--ak-game-shell-background\);/,
+			/active-view-transition-type\(board-to-board\)::view-transition\s*\{\s*background: var\(--ak-game-shell-background\);/,
 		);
 	});
 
-	it("keeps GameMenu leave Hero raster stable through terminal launcher redirects", () => {
-		expect(styles).toContain(
+	it("does not pin terminal launcher backdrops to either transition endpoint", () => {
+		expect(styles).not.toContain(
 			":root:active-view-transition-type(board-to-settings)::view-transition-old(",
 		);
-		expect(styles).toContain(
-			":root:active-view-transition-type(board-to-main-menu)::view-transition-old(",
-		);
-		expect(styles).toContain(
-			":root:active-view-transition-type(board-to-settings)::view-transition-new(",
-		);
-		expect(styles).toContain(
+		expect(styles).not.toContain(
 			":root:active-view-transition-type(board-to-main-menu)::view-transition-new(",
 		);
 	});

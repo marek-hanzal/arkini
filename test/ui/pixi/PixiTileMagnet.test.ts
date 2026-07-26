@@ -28,6 +28,7 @@ const readDisplacement = (overrides: Partial<readPixiTileMagneticDisplacementFx.
 				y: 0,
 			},
 			attractedActorId: null,
+			eligibleAttractionActorIds: new Set(),
 			sourceActorId: "runtime:source",
 			sourceDirection: {
 				x: 1,
@@ -71,11 +72,34 @@ describe("Pixi tile magnet", () => {
 	it("attracts only the engine-confirmed combine actor", () => {
 		const displacement = readDisplacement({
 			attractedActorId: "runtime:target",
+			eligibleAttractionActorIds: new Set([
+				"runtime:target",
+			]),
 		});
 
 		expect(displacement.x).toBeLessThan(0);
 		expect(displacement.y).toBe(-0);
 		expect(Math.hypot(displacement.x, displacement.y)).toBeLessThanOrEqual(4.5);
+	});
+
+	it("keeps eligible responders neutral before hover while invalid neighbours repel", () => {
+		expect(
+			readDisplacement({
+				eligibleAttractionActorIds: new Set([
+					"runtime:target",
+				]),
+			}),
+		).toEqual({
+			x: 0,
+			y: 0,
+		});
+		expect(
+			readDisplacement({
+				eligibleAttractionActorIds: new Set([
+					"runtime:other",
+				]),
+			}).x,
+		).toBeGreaterThan(0);
 	});
 
 	it("excludes the dragged source and resolves exact overlap deterministically", () => {
@@ -223,6 +247,7 @@ describe("Pixi tile magnet", () => {
 		);
 		const sample = {
 			attractedActorId: null,
+			eligibleAttractionActorIds: new Set<string>(),
 			sourceActorId: source.item.id,
 			sourceDirection: {
 				x: 1,

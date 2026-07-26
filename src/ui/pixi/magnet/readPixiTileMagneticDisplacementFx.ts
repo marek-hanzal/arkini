@@ -12,6 +12,7 @@ export namespace readPixiTileMagneticDisplacementFx {
 		readonly actorId: string;
 		readonly actorRect: Rect;
 		readonly attractedActorId: string | null;
+		readonly eligibleAttractionActorIds: ReadonlySet<string>;
 		readonly sourceActorId: string;
 		readonly sourceDirection: {
 			readonly x: number;
@@ -45,12 +46,20 @@ export const readPixiTileMagneticDisplacementFx = Effect.fn("readPixiTileMagneti
 		actorId,
 		actorRect,
 		attractedActorId,
+		eligibleAttractionActorIds,
 		sourceActorId,
 		sourceDirection,
 		sourceRect,
 	}: readPixiTileMagneticDisplacementFx.Props) =>
 		Effect.sync(() => {
 			if (actorId === sourceActorId) {
+				return {
+					x: 0,
+					y: 0,
+				};
+			}
+			const attracted = attractedActorId === actorId;
+			if (!attracted && eligibleAttractionActorIds.has(actorId)) {
 				return {
 					x: 0,
 					y: 0,
@@ -71,7 +80,6 @@ export const readPixiTileMagneticDisplacementFx = Effect.fn("readPixiTileMagneti
 				};
 			}
 
-			const attracted = attractedActorId === actorId;
 			const direction =
 				distance > minimumDirectionMagnitude
 					? {

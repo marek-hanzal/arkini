@@ -33,6 +33,7 @@ export const updatePixiTileActorFx = Effect.fn("updatePixiTileActorFx")(function
 }: updatePixiTileActorFx.Props) {
 	const texturesChanged =
 		actor.item.sourceUrl !== item.sourceUrl || actor.item.compositeUrl !== item.compositeUrl;
+	const runningChanged = actor.item.running !== item.running;
 	const inset = (size * (1 - tileToSlotRatio)) / 2;
 	const faceSize = Math.max(1, size - inset * 2);
 	const titlePaddingX = faceSize * 0.06;
@@ -112,6 +113,6 @@ export const updatePixiTileActorFx = Effect.fn("updatePixiTileActorFx")(function
 				color: palette.overlay,
 			});
 	}
-	actor.crowdLayer.alpha = item.running ? 0.82 : 1;
+	if (runningChanged) actor.crowdLayer.alpha = item.running ? 0.82 : 1;
 	yield* frames.invalidateFx;
 });

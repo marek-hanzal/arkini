@@ -155,6 +155,7 @@ export const createPixiTileMagneticFieldFx = Effect.fn("createPixiTileMagneticFi
 										y: pose.y,
 									},
 									attractedActorId: sample.attractedActorId,
+									eligibleAttractionActorIds: sample.eligibleAttractionActorIds,
 									sourceActorId: sample.sourceActorId,
 									sourceDirection: sample.sourceDirection,
 									sourceRect: {

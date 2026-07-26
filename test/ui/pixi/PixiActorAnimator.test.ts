@@ -54,6 +54,9 @@ const createActor = () =>
 			x: 10,
 			y: 20,
 		},
+		crowdLayer: {
+			alpha: 1,
+		},
 		item: {
 			id: "runtime:actor",
 		},
@@ -108,6 +111,64 @@ describe("Pixi actor animator", () => {
 
 		expect(actor.container.alpha).toBe(1);
 		expect(actor.container.scale.x).toBe(1);
+	});
+
+	it("animates crowd opacity without becoming a second transform owner", () => {
+		const actor = createActor();
+		const { animationDriver, tweens } = createAnimationDriver();
+		const animator = Effect.runSync(
+			createPixiActorAnimatorFx({
+				animationDriver,
+			}),
+		);
+
+		Effect.runSync(
+			animator.animateFx({
+				actor,
+				animationKey: "running:runtime:actor",
+				durationMs: 180,
+				toCrowdAlpha: 0.82,
+			}),
+		);
+		tweens[0]?.props.onUpdate(0.5);
+
+		expect(actor.crowdLayer.alpha).toBeCloseTo(0.91);
+		expect(actor.container.x).toBe(10);
+		expect(actor.container.y).toBe(20);
+		expect(actor.container.alpha).toBe(0.82);
+		expect(actor.container.scale.x).toBe(0.75);
+	});
+
+	it("reverses crowd opacity from the live interrupted value", () => {
+		const actor = createActor();
+		const { animationDriver, tweens } = createAnimationDriver();
+		const animator = Effect.runSync(
+			createPixiActorAnimatorFx({
+				animationDriver,
+			}),
+		);
+
+		Effect.runSync(
+			animator.animateFx({
+				actor,
+				animationKey: "running:runtime:actor",
+				durationMs: 180,
+				toCrowdAlpha: 0.82,
+			}),
+		);
+		tweens[0]?.props.onUpdate(0.5);
+		Effect.runSync(
+			animator.animateFx({
+				actor,
+				animationKey: "running:runtime:actor",
+				durationMs: 180,
+				toCrowdAlpha: 1,
+			}),
+		);
+		tweens[1]?.props.onUpdate(0.5);
+
+		expect(tweens[0]?.stop).toHaveBeenCalledOnce();
+		expect(actor.crowdLayer.alpha).toBeCloseTo(0.955);
 	});
 
 	it("stops the replaced key and ignores its stale completion", () => {

@@ -11,6 +11,7 @@ import type { PixiTileActorPose } from "~/ui/pixi/scene/PixiTileActorPose";
 
 export interface PixiMainSceneSurface {
 	readonly transientActorLayer: Container;
+	readonly closeFx: Effect.Effect<void>;
 	readonly readActorPoseFx: (item: TileActorItem) => Effect.Effect<PixiTileActorPose | null>;
 	readonly readCommandTargetFx: (
 		target: PixiSceneDropTarget | null,

@@ -7,6 +7,7 @@ export interface PixiTileMagneticField {
 	readonly resetFx: Effect.Effect<void>;
 	readonly updateFx: (sample: {
 		readonly attractedActorId: string | null;
+		readonly eligibleAttractionActorIds: ReadonlySet<string>;
 		readonly sourceActorId: string;
 		readonly sourceDirection: {
 			readonly x: number;

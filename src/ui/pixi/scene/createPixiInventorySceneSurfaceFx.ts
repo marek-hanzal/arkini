@@ -8,6 +8,10 @@ import { DropItemResultKindEnumSchema } from "~/bridge/tile/DropItemResultKindEn
 import { LocationScopeEnumSchema } from "~/bridge/tile/LocationScopeEnumSchema";
 import type { readTileDropPreviewFx } from "~/bridge/tile/readTileDropPreviewFx";
 import { readPixiScenePaletteFx } from "~/ui/pixi/appearance/readPixiScenePaletteFx";
+import { drawPixiGridDropFeedbackFx } from "~/ui/pixi/grid/drawPixiGridDropFeedbackFx";
+import { drawPixiGridMaskFx } from "~/ui/pixi/grid/drawPixiGridMaskFx";
+import { drawPixiGridSurfaceFx } from "~/ui/pixi/grid/drawPixiGridSurfaceFx";
+import { readPixiGridSlotFx } from "~/ui/pixi/grid/readPixiGridSlotFx";
 import type { PixiInventorySceneLayout } from "~/ui/pixi/layout/PixiSceneLayout";
 import { readPixiInventorySceneLayoutFx } from "~/ui/pixi/layout/readPixiInventorySceneLayoutFx";
 import { readPixiMainSceneLayoutFx } from "~/ui/pixi/layout/readPixiMainSceneLayoutFx";
@@ -86,8 +90,6 @@ export const createPixiInventorySceneSurfaceFx = Effect.fn("createPixiInventoryS
 
 		let layout: PixiInventorySceneLayout = createLayout();
 
-		const readSurfaceRadius = () => Math.min(16, layout.surface.cellSize * 0.12);
-
 		const readActorPoseFx = Effect.fn("PixiInventorySceneSurface.readActorPoseFx")(
 			(item: TileActorItem) =>
 				Effect.sync((): PixiInventoryActorPose | null => {
@@ -108,31 +110,11 @@ export const createPixiInventorySceneSurfaceFx = Effect.fn("createPixiInventoryS
 
 		const readDropTargetFx = Effect.fn("PixiInventorySceneSurface.readDropTargetFx")(
 			(x: number, y: number) =>
-				Effect.sync((): PixiInventoryDropTarget | null => {
-					const surface = layout.surface;
-					if (
-						x < surface.x ||
-						x > surface.x + surface.width ||
-						y < surface.y ||
-						y > surface.y + surface.height
-					) {
-						return null;
-					}
-					const slotX = Math.min(
-						surface.columns - 1,
-						Math.floor((x - surface.x) / surface.cellSize),
-					);
-					const slotY = Math.min(
-						surface.rows - 1,
-						Math.floor((y - surface.y) / surface.cellSize),
-					);
-					return slotX < 0 || slotY < 0
-						? null
-						: {
-								x: slotX,
-								y: slotY,
-							};
-				}),
+				readPixiGridSlotFx({
+					surface: layout.surface,
+					x,
+					y,
+				}) satisfies Effect.Effect<PixiInventoryDropTarget | null>,
 		);
 
 		const renderDropFeedbackFx = Effect.fn("PixiInventorySceneSurface.renderDropFeedbackFx")(
@@ -140,37 +122,22 @@ export const createPixiInventorySceneSurfaceFx = Effect.fn("createPixiInventoryS
 				target: PixiInventoryDropTarget | null,
 				kind: readTileDropPreviewFx.Result["kind"] | null,
 			) =>
-				Effect.sync(() => {
-					feedback.clear();
-					if (target === null) {
-						RendererRuntime.runSync(application.frames.invalidateFx);
-						return;
-					}
+				Effect.gen(function* () {
 					const accepted =
 						kind !== null &&
 						kind !== DropItemResultKindEnumSchema.enum.Reject &&
 						kind !== DropItemResultKindEnumSchema.enum.Ignored;
-					feedback
-						.rect(
-							layout.surface.x + target.x * layout.surface.cellSize,
-							layout.surface.y + target.y * layout.surface.cellSize,
-							layout.surface.cellSize,
-							layout.surface.cellSize,
-						)
-						.fill({
-							alpha: 0.16,
-							color: accepted ? palette.accent : palette.danger,
-						})
-						.stroke({
-							alpha: 0.95,
-							color: accepted ? palette.accent : palette.danger,
-							width: Math.max(2, layout.surface.cellSize * 0.025),
-						});
-					RendererRuntime.runSync(application.frames.invalidateFx);
+					yield* drawPixiGridDropFeedbackFx({
+						color: accepted ? palette.accent : palette.danger,
+						graphics: feedback,
+						slot: target,
+						surface: layout.surface,
+					});
+					yield* application.frames.invalidateFx;
 				}),
 		);
 
-		const redrawFx = Effect.sync(() => {
+		const redrawFx = Effect.gen(function* () {
 			layout = createLayout();
 			application.stage.hitArea = new Rectangle(
 				0,
@@ -178,41 +145,21 @@ export const createPixiInventorySceneSurfaceFx = Effect.fn("createPixiInventoryS
 				application.app.screen.width,
 				application.app.screen.height,
 			);
-			const surface = layout.surface;
-			const radius = readSurfaceRadius();
-			grid.clear()
-				.roundRect(surface.x, surface.y, surface.width, surface.height, radius)
-				.fill({
-					alpha: 0.78,
-					color: palette.surface,
-				});
-			for (let y = 0; y < surface.rows; y += 1) {
-				for (let x = 0; x < surface.columns; x += 1) {
-					grid.rect(
-						surface.x + x * surface.cellSize,
-						surface.y + y * surface.cellSize,
-						surface.cellSize,
-						surface.cellSize,
-					)
-						.fill({
-							alpha: 0.92,
-							color: (x + y) % 2 === 0 ? palette.gridA : palette.gridB,
-						})
-						.stroke({
-							alpha: 0.55,
-							color: palette.line,
-							width: 1,
-						});
-				}
-			}
-			grid.roundRect(surface.x, surface.y, surface.width, surface.height, radius).stroke({
-				color: palette.line,
-				width: 1,
+			yield* drawPixiGridSurfaceFx({
+				graphics: grid,
+				lineColor: palette.line,
+				slotColors: [
+					palette.gridA,
+					palette.gridB,
+				],
+				surface: layout.surface,
+				surfaceColor: palette.surface,
 			});
-			mask.clear()
-				.roundRect(surface.x, surface.y, surface.width, surface.height, radius)
-				.fill(0xffffff);
-			RendererRuntime.runSync(application.frames.invalidateFx);
+			yield* drawPixiGridMaskFx({
+				graphics: mask,
+				surface: layout.surface,
+			});
+			yield* application.frames.invalidateFx;
 		});
 
 		return {

@@ -10,6 +10,7 @@ import { createPixiActorAnimatorFx } from "~/ui/pixi/animation/createPixiActorAn
 import { readPixiScenePaletteFx } from "~/ui/pixi/appearance/readPixiScenePaletteFx";
 import { createPixiCursorGrabMotionFx } from "~/ui/pixi/drag/createPixiCursorGrabMotionFx";
 import { createPixiMainSceneDragControllerFx } from "~/ui/pixi/drag/createPixiMainSceneDragControllerFx";
+import { createPixiMainSceneDropPresentationFx } from "~/ui/pixi/drop/createPixiMainSceneDropPresentationFx";
 import type { TileSceneHandoffStore } from "~/ui/pixi/handoff/createTileSceneHandoffStoreFx";
 import { createPixiTileMagneticFieldFx } from "~/ui/pixi/magnet/createPixiTileMagneticFieldFx";
 import { createPixiTileMotionRuntimeFx } from "~/ui/pixi/motion/createPixiTileMotionRuntimeFx";
@@ -65,7 +66,6 @@ export const createPixiMainSceneRuntimeFx = Effect.fn("createPixiMainSceneRuntim
 			current: yield* readPixiScenePaletteFx(host),
 		};
 		const actorStore = yield* createPixiMainSceneActorStoreFx();
-		registerRollback(actorStore.closeFx);
 		const animationDriver = yield* createPixiAnimationDriverFx({
 			frames: application.frames,
 		});
@@ -73,13 +73,16 @@ export const createPixiMainSceneRuntimeFx = Effect.fn("createPixiMainSceneRuntim
 		const animator = yield* createPixiActorAnimatorFx({
 			animationDriver,
 		});
-		registerRollback(animator.closeFx);
 		const surface = yield* createPixiMainSceneSurfaceFx({
 			application,
 			game,
 			palette: paletteState.current,
 			readActors: () => actorStore.actors.values(),
 		});
+		registerRollback(surface.closeFx);
+		// Retained actors must die before their parent surface destroys its layers.
+		registerRollback(actorStore.closeFx);
+		registerRollback(animator.closeFx);
 		const motion = yield* createPixiTileMotionRuntimeFx({
 			actorStore,
 			animator,
@@ -101,12 +104,15 @@ export const createPixiMainSceneRuntimeFx = Effect.fn("createPixiMainSceneRuntim
 			surface,
 		});
 		registerRollback(magneticField.closeFx);
+		const dropPresentation = yield* createPixiMainSceneDropPresentationFx();
+		registerRollback(dropPresentation.closeFx);
 		let replayCurrentTransition: () => void = () => undefined;
 		const drag = yield* createPixiMainSceneDragControllerFx({
 			actorStore,
 			animator,
 			application,
 			cursorGrab,
+			dropPresentation,
 			game,
 			magneticField,
 			motion,
@@ -121,6 +127,7 @@ export const createPixiMainSceneRuntimeFx = Effect.fn("createPixiMainSceneRuntim
 			animator,
 			application,
 			drag,
+			dropPresentation,
 			game,
 			magneticField,
 			motion,

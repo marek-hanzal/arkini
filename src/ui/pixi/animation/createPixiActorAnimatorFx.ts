@@ -40,6 +40,7 @@ export const createPixiActorAnimatorFx = Effect.fn("createPixiActorAnimatorFx")(
 					durationMs,
 					onComplete,
 					toAlpha,
+					toCrowdAlpha,
 					toScale,
 					toX,
 					toY,
@@ -50,9 +51,9 @@ export const createPixiActorAnimatorFx = Effect.fn("createPixiActorAnimatorFx")(
 						const fromX = actor.container.x;
 						const fromY = actor.container.y;
 						const fromAlpha = actor.container.alpha;
+						const fromCrowdAlpha =
+							toCrowdAlpha === undefined ? null : actor.crowdLayer.alpha;
 						const fromScale = actor.container.scale.x;
-						const targetAlpha = toAlpha ?? fromAlpha;
-						const targetScale = toScale ?? fromScale;
 						const activeAnimation: ActiveAnimation = {
 							control: null,
 						};
@@ -65,13 +66,26 @@ export const createPixiActorAnimatorFx = Effect.fn("createPixiActorAnimatorFx")(
 									from: 0,
 									onUpdate: (progress) => {
 										if (closed || actor.container.destroyed) return;
-										actor.container.x = fromX + (toX - fromX) * progress;
-										actor.container.y = fromY + (toY - fromY) * progress;
-										actor.container.alpha =
-											fromAlpha + (targetAlpha - fromAlpha) * progress;
-										actor.container.scale.set(
-											fromScale + (targetScale - fromScale) * progress,
-										);
+										if (toX !== undefined) {
+											actor.container.x = fromX + (toX - fromX) * progress;
+										}
+										if (toY !== undefined) {
+											actor.container.y = fromY + (toY - fromY) * progress;
+										}
+										if (toAlpha !== undefined) {
+											actor.container.alpha =
+												fromAlpha + (toAlpha - fromAlpha) * progress;
+										}
+										if (fromCrowdAlpha !== null && toCrowdAlpha !== undefined) {
+											actor.crowdLayer.alpha =
+												fromCrowdAlpha +
+												(toCrowdAlpha - fromCrowdAlpha) * progress;
+										}
+										if (toScale !== undefined) {
+											actor.container.scale.set(
+												fromScale + (toScale - fromScale) * progress,
+											);
+										}
 									},
 									onComplete: () => {
 										if (animations.get(animationKey) !== activeAnimation)

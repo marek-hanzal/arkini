@@ -11,6 +11,7 @@ import type {
 } from "~/ui/pixi/actor/PixiInventoryActorStore";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
 import { createPixiTileActorFx } from "~/ui/pixi/actor/createPixiTileActorFx";
+import { destroyPixiTileActorFx } from "~/ui/pixi/actor/destroyPixiTileActorFx";
 import { updatePixiTileActorFx } from "~/ui/pixi/actor/updatePixiTileActorFx";
 import type { PixiApplicationOwner } from "~/ui/pixi/runtime/PixiApplicationOwner";
 import type { PixiTextureStore } from "~/ui/pixi/runtime/createPixiTextureStoreFx";
@@ -55,20 +56,15 @@ export const createPixiInventoryActorStoreFx = Effect.fn("createPixiInventoryAct
 			};
 
 			return {
-				closeFx: Effect.sync(() => {
+				closeFx: Effect.gen(function* () {
 					if (closed) return;
 					closed = true;
-					for (const actor of actors.values()) actor.textureGeneration += 1;
+					for (const actor of actors.values()) yield* destroyPixiTileActorFx(actor);
 					actors.clear();
 				}),
 				destroyRemovedFx: Effect.fn("PixiInventoryActorStore.destroyRemovedFx")((removed) =>
-					Effect.sync(() => {
-						for (const actor of removed) {
-							if (actor.container.destroyed) continue;
-							actor.container.destroy({
-								children: true,
-							});
-						}
+					Effect.forEach(removed, destroyPixiTileActorFx, {
+						discard: true,
 					}),
 				),
 				readActorFx: Effect.fn("PixiInventoryActorStore.readActorFx")((itemId) =>
@@ -113,7 +109,6 @@ export const createPixiInventoryActorStoreFx = Effect.fn("createPixiInventoryAct
 						for (const [id, actor] of actors) {
 							if (nextIds.has(id)) continue;
 							actors.delete(id);
-							actor.textureGeneration += 1;
 							removed.push(actor);
 							changed = true;
 						}

@@ -2,8 +2,10 @@ import type { Effect } from "effect";
 
 import type { TileMotionCue } from "~/bridge/tile/motion/TileMotionCue";
 
+export type PixiTileInteractionClaim = "activation-only" | "blocked";
+
 export interface PixiTileMotionSnapshot {
-	readonly ownedActorIds: ReadonlySet<string>;
+	readonly interactionClaimByActorId: ReadonlyMap<string, PixiTileInteractionClaim>;
 	readonly spawnCueByActorId: ReadonlyMap<
 		string,
 		Extract<

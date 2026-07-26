@@ -60,7 +60,10 @@ const secondBoardLocation = {
 	},
 };
 
-const createItem = (id: string, location = firstBoardLocation) => ({
+const createItem = (
+	id: string,
+	location: TileActorItem["location"] = firstBoardLocation,
+): TileActorItem => ({
 	id,
 	itemId: id,
 	location,
@@ -83,6 +86,130 @@ const createActor = (id: string) => {
 		size: 80,
 		textureGeneration: 0,
 	} as unknown as PixiTileActor;
+};
+
+const createSwapHarness = ({
+	includeSource = true,
+	includeTarget = true,
+}: {
+	readonly includeSource?: boolean;
+	readonly includeTarget?: boolean;
+} = {}) => {
+	const source = createActor("runtime:source");
+	const target = createActor("runtime:target");
+	source.container.x = 245;
+	source.container.y = 47;
+	target.container.x = 200;
+	target.container.y = 40;
+	source.item = createItem(source.item.id, secondBoardLocation);
+	target.item = createItem(target.item.id, firstBoardLocation);
+	const actors = new Map([
+		...(includeSource
+			? [
+					[
+						source.item.id,
+						source,
+					] as const,
+				]
+			: []),
+		...(includeTarget
+			? [
+					[
+						target.item.id,
+						target,
+					] as const,
+				]
+			: []),
+	]);
+	const canonicalItems = new Map([
+		[
+			source.item.id,
+			source.item,
+		],
+		[
+			target.item.id,
+			target.item,
+		],
+	]);
+	const animations: PixiActorAnimation[] = [];
+	const canceledAnimationKeys: string[] = [];
+	const transientActorLayer = new Container();
+	const readPose = (location: TileActorItem["location"]) => ({
+		layer: transientActorLayer,
+		size: 80,
+		x: location.position.x * 100,
+		y: 40,
+	});
+	const runtime = Effect.runSync(
+		createPixiTileMotionRuntimeFx({
+			actorStore: {
+				actors,
+				canonicalItems,
+				deleteActorFx: (actorId: string) =>
+					Effect.sync(() => {
+						const actor = actors.get(actorId) ?? null;
+						actors.delete(actorId);
+						return actor;
+					}),
+			} as unknown as PixiMainSceneActorStore,
+			animator: {
+				animateFx: (animation) =>
+					Effect.sync(() => {
+						animations.push(animation);
+					}),
+				cancelFx: (animationKey) =>
+					Effect.sync(() => {
+						canceledAnimationKeys.push(animationKey);
+					}),
+				closeFx: Effect.void,
+			} satisfies PixiActorAnimator,
+			application: {
+				app: {
+					canvas: {
+						getBoundingClientRect: () => ({
+							left: 0,
+							top: 0,
+						}),
+					},
+				},
+				frames: {
+					invalidateFx: Effect.void,
+				},
+			} as unknown as PixiApplicationOwner,
+			handoffs: {
+				takeFx: () => Effect.succeed(null),
+			} as unknown as TileSceneHandoffStore,
+			readPalette: () => ({}) as PixiScenePalette,
+			surface: {
+				readActorPoseFx: (item: TileActorItem) => Effect.succeed(readPose(item.location)),
+				readLocationPoseFx: (location: TileActorItem["location"]) =>
+					Effect.succeed(readPose(location)),
+				transientActorLayer,
+			} as unknown as PixiMainSceneSurface,
+			textures: {} as never,
+		}),
+	);
+	const cue = {
+		actorId: target.item.id,
+		counterpartActorId: source.item.id,
+		eventIndex: 0,
+		kind: "swap",
+		originActorId: target.item.id,
+		originLocation: secondBoardLocation,
+		sequence: 9,
+		staggerIndex: 0,
+		targetLocation: firstBoardLocation,
+	} satisfies TileMotionCue;
+	return {
+		actors,
+		animations,
+		canceledAnimationKeys,
+		canonicalItems,
+		cue,
+		runtime,
+		source,
+		target,
+	};
 };
 
 describe("Pixi tile motion runtime", () => {
@@ -226,5 +353,172 @@ describe("Pixi tile motion runtime", () => {
 		expect(spawned.container.y).toBe(110);
 		expect(animations[1]?.actor.container.x).toBe(100);
 		expect(animations[1]?.actor.container.y).toBe(110);
+
+		const stackTransient = animations[1]?.actor;
+		Effect.runSync(runtime.closeFx);
+		expect(stackTransient?.container.destroyed).toBe(true);
+		expect(spawned.container.destroyed).toBe(false);
+	});
+
+	it("animates both swap legs from their live poses and releases claims together", () => {
+		const { animations, cue, runtime, source, target } = createSwapHarness();
+
+		Effect.runSync(
+			runtime.enqueueFx([
+				cue,
+			]),
+		);
+		Effect.runSync(runtime.startFx);
+
+		expect(animations).toHaveLength(2);
+		expect(animations.find((animation) => animation.actor === target)).toMatchObject({
+			toX: 100,
+			toY: 40,
+		});
+		expect(animations.find((animation) => animation.actor === source)).toMatchObject({
+			toX: 200,
+			toY: 40,
+		});
+		expect(source.container.x).toBe(245);
+		expect(source.container.y).toBe(47);
+		expect(Effect.runSync(runtime.readSnapshotFx).interactionClaimByActorId).toEqual(
+			new Map([
+				[
+					target.item.id,
+					"activation-only",
+				],
+				[
+					source.item.id,
+					"activation-only",
+				],
+			]),
+		);
+
+		animations.find((animation) => animation.actor === target)?.onComplete?.();
+		expect(Effect.runSync(runtime.readSnapshotFx).interactionClaimByActorId.size).toBe(2);
+		animations.find((animation) => animation.actor === source)?.onComplete?.();
+
+		expect(Effect.runSync(runtime.readSnapshotFx).interactionClaimByActorId).toEqual(new Map());
+		expect(target.container.x).toBe(100);
+		expect(source.container.x).toBe(200);
+	});
+
+	it("animates and completes the available swap leg when its counterpart actor is missing", () => {
+		const { animations, cue, runtime, target } = createSwapHarness({
+			includeSource: false,
+		});
+
+		Effect.runSync(
+			runtime.enqueueFx([
+				cue,
+			]),
+		);
+		Effect.runSync(runtime.startFx);
+
+		expect(animations).toHaveLength(1);
+		expect(animations[0]?.actor).toBe(target);
+		animations[0]?.onComplete?.();
+		expect(Effect.runSync(runtime.readSnapshotFx).interactionClaimByActorId).toEqual(new Map());
+	});
+
+	it("retargets each completed swap leg to its latest canonical pose", () => {
+		const { animations, canonicalItems, cue, runtime, source, target } = createSwapHarness();
+		Effect.runSync(
+			runtime.enqueueFx([
+				cue,
+			]),
+		);
+		Effect.runSync(runtime.startFx);
+		canonicalItems.set(
+			target.item.id,
+			createItem(target.item.id, {
+				...firstBoardLocation,
+				position: {
+					x: 4,
+					y: 0,
+				},
+			}),
+		);
+		canonicalItems.set(
+			source.item.id,
+			createItem(source.item.id, {
+				...secondBoardLocation,
+				position: {
+					x: 5,
+					y: 0,
+				},
+			}),
+		);
+
+		for (const animation of animations) animation.onComplete?.();
+
+		expect(target.container.x).toBe(400);
+		expect(source.container.x).toBe(500);
+	});
+
+	it("deduplicates completed cues and ignores duplicate leg completion", () => {
+		const { animations, cue, runtime } = createSwapHarness();
+		Effect.runSync(
+			runtime.enqueueFx([
+				cue,
+			]),
+		);
+		Effect.runSync(runtime.startFx);
+
+		animations[0]?.onComplete?.();
+		animations[0]?.onComplete?.();
+		expect(Effect.runSync(runtime.readSnapshotFx).interactionClaimByActorId.size).toBe(2);
+		animations[1]?.onComplete?.();
+		animations[1]?.onComplete?.();
+		expect(Effect.runSync(runtime.readSnapshotFx).interactionClaimByActorId.size).toBe(0);
+
+		Effect.runSync(
+			runtime.enqueueFx([
+				cue,
+			]),
+		);
+		Effect.runSync(runtime.startFx);
+		expect(animations).toHaveLength(2);
+	});
+
+	it("keeps blocked interaction stronger than activation-only on overlapping cues", () => {
+		const { cue, runtime, target } = createSwapHarness();
+		Effect.runSync(
+			runtime.enqueueFx([
+				cue,
+				{
+					actorId: target.item.id,
+					eventIndex: 1,
+					kind: "spawn",
+					originActorId: target.item.id,
+					originLocation: secondBoardLocation,
+					sequence: cue.sequence,
+					staggerIndex: 0,
+					targetLocation: firstBoardLocation,
+				},
+			]),
+		);
+
+		expect(
+			Effect.runSync(runtime.readSnapshotFx).interactionClaimByActorId.get(target.item.id),
+		).toBe("blocked");
+	});
+
+	it("clears claims on close and ignores late swap completion callbacks", () => {
+		const { animations, canceledAnimationKeys, cue, runtime } = createSwapHarness();
+		Effect.runSync(
+			runtime.enqueueFx([
+				cue,
+			]),
+		);
+		Effect.runSync(runtime.startFx);
+
+		Effect.runSync(runtime.closeFx);
+		for (const animation of animations) animation.onComplete?.();
+
+		expect(Effect.runSync(runtime.readSnapshotFx).interactionClaimByActorId).toEqual(new Map());
+		expect(canceledAnimationKeys).toContain(`motion:9:0:${cue.actorId}`);
+		expect(canceledAnimationKeys).toContain(`motion:9:0:${cue.counterpartActorId}`);
+		expect(animations).toHaveLength(2);
 	});
 });

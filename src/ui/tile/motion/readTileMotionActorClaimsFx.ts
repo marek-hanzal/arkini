@@ -14,7 +14,6 @@ export const readTileMotionActorClaimsFx = Effect.fn("readTileMotionActorClaimsF
 					},
 					(spawn) =>
 						new Set([
-							spawn.originActorId,
 							spawn.actorId,
 						]),
 				)
@@ -24,7 +23,6 @@ export const readTileMotionActorClaimsFx = Effect.fn("readTileMotionActorClaimsF
 					},
 					(stack) =>
 						new Set([
-							stack.originActorId,
 							stack.targetActorId,
 						]),
 				)

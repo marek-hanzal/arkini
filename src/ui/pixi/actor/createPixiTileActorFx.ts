@@ -38,6 +38,7 @@ export const createPixiTileActorFx = Effect.fn("createPixiTileActorFx")(
 				eventMode: "none",
 				label: `TileActorCrowd:${item.id}`,
 			});
+			crowdLayer.alpha = item.running ? 0.82 : 1;
 			const primary = new Sprite(Texture.EMPTY);
 			const composite = new Sprite(Texture.EMPTY);
 			const titleBackground = new Graphics();

@@ -2,6 +2,7 @@ import { Effect } from "effect";
 
 import type { PixiMainSceneActorStore } from "~/ui/pixi/actor/PixiMainSceneActorStore";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
+import { destroyPixiTileActorFx } from "~/ui/pixi/actor/destroyPixiTileActorFx";
 
 /** Owns canonical item projections and retained actor identity for the main Pixi scene. */
 export const createPixiMainSceneActorStoreFx = Effect.fn("createPixiMainSceneActorStoreFx")(() =>
@@ -33,22 +34,17 @@ export const createPixiMainSceneActorStoreFx = Effect.fn("createPixiMainSceneAct
 						for (const item of items) canonicalItems.set(item.id, item);
 					}),
 			),
-			setActorFx: Effect.fn("PixiMainSceneActorStore.setActorFx")((actor) =>
-				Effect.sync(() => {
-					if (closed) {
-						actor.textureGeneration += 1;
-						actor.container.destroy({
-							children: true,
-						});
-						return;
-					}
-					actors.set(actor.item.id, actor);
-				}),
-			),
-			closeFx: Effect.sync(() => {
+			setActorFx: Effect.fn("PixiMainSceneActorStore.setActorFx")(function* (actor) {
+				if (closed) {
+					yield* destroyPixiTileActorFx(actor);
+					return;
+				}
+				actors.set(actor.item.id, actor);
+			}),
+			closeFx: Effect.gen(function* () {
 				if (closed) return;
 				closed = true;
-				for (const actor of actors.values()) actor.textureGeneration += 1;
+				for (const actor of actors.values()) yield* destroyPixiTileActorFx(actor);
 				actors.clear();
 				canonicalItems.clear();
 			}),

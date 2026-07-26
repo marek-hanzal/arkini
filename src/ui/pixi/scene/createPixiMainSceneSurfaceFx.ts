@@ -9,7 +9,11 @@ import { LocationScopeEnumSchema } from "~/bridge/tile/LocationScopeEnumSchema";
 import type { readTileDropPreviewFx } from "~/bridge/tile/readTileDropPreviewFx";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
 import type { PixiScenePalette } from "~/ui/pixi/appearance/PixiScenePalette";
-import type { PixiGridSurfaceLayout, PixiMainSceneLayout } from "~/ui/pixi/layout/PixiSceneLayout";
+import { drawPixiGridDropFeedbackFx } from "~/ui/pixi/grid/drawPixiGridDropFeedbackFx";
+import { drawPixiGridMaskFx } from "~/ui/pixi/grid/drawPixiGridMaskFx";
+import { drawPixiGridSurfaceFx } from "~/ui/pixi/grid/drawPixiGridSurfaceFx";
+import { readPixiGridSlotFx } from "~/ui/pixi/grid/readPixiGridSlotFx";
+import type { PixiMainSceneLayout } from "~/ui/pixi/layout/PixiSceneLayout";
 import { readPixiMainSceneLayoutFx } from "~/ui/pixi/layout/readPixiMainSceneLayoutFx";
 import type { PixiApplicationOwner } from "~/ui/pixi/runtime/PixiApplicationOwner";
 import type { PixiMainSceneSurface } from "~/ui/pixi/scene/PixiMainSceneSurface";
@@ -23,8 +27,6 @@ export namespace createPixiMainSceneSurfaceFx {
 		readonly readActors: () => Iterable<PixiTileActor>;
 	}
 }
-
-const readSurfaceRadius = (surface: PixiGridSurfaceLayout) => Math.min(16, surface.cellSize * 0.12);
 
 /** Owns main-scene geometry, layers, masks, hit testing and drop feedback paint. */
 export const createPixiMainSceneSurfaceFx = Effect.fn("createPixiMainSceneSurfaceFx")(
@@ -99,80 +101,7 @@ export const createPixiMainSceneSurfaceFx = Effect.fn("createPixiMainSceneSurfac
 				transientActorLayer,
 			);
 			application.stage.eventMode = "static";
-
-			const drawSurface = (
-				graphics: Graphics,
-				surface: PixiGridSurfaceLayout | null,
-				colors: readonly [
-					number,
-					number,
-				],
-			) => {
-				graphics.clear();
-				if (surface === null) {
-					graphics.visible = false;
-					return;
-				}
-				graphics.visible = true;
-				const radius = readSurfaceRadius(surface);
-				graphics
-					.roundRect(surface.x, surface.y, surface.width, surface.height, radius)
-					.fill({
-						alpha: 0.78,
-						color: palette.surface,
-					});
-				for (let y = 0; y < surface.rows; y += 1) {
-					for (let x = 0; x < surface.columns; x += 1) {
-						graphics
-							.rect(
-								surface.x + x * surface.cellSize,
-								surface.y + y * surface.cellSize,
-								surface.cellSize,
-								surface.cellSize,
-							)
-							.fill({
-								alpha: 0.92,
-								color: colors[(x + y) % 2],
-							})
-							.stroke({
-								alpha: 0.55,
-								color: palette.line,
-								width: 1,
-							});
-					}
-				}
-				graphics
-					.roundRect(surface.x, surface.y, surface.width, surface.height, radius)
-					.stroke({
-						color: palette.line,
-						width: 1,
-					});
-			};
-
-			const drawMasks = () => {
-				boardMask
-					.clear()
-					.roundRect(
-						layout.board.x,
-						layout.board.y,
-						layout.board.width,
-						layout.board.height,
-						readSurfaceRadius(layout.board),
-					)
-					.fill(0xffffff);
-				toolbarMask.clear();
-				if (layout.toolbar !== null) {
-					toolbarMask
-						.roundRect(
-							layout.toolbar.x,
-							layout.toolbar.y,
-							layout.toolbar.width,
-							layout.toolbar.height,
-							readSurfaceRadius(layout.toolbar),
-						)
-						.fill(0xffffff);
-				}
-			};
+			let closed = false;
 
 			const readLocationPose = (location: TileActorItem["location"]) => {
 				if (
@@ -200,37 +129,6 @@ export const createPixiMainSceneSurfaceFx = Effect.fn("createPixiMainSceneSurfac
 				return null;
 			};
 
-			const hitSurface = (
-				surface: PixiGridSurfaceLayout | null,
-				x: number,
-				y: number,
-			): PixiSceneDropTarget | null => {
-				if (
-					surface === null ||
-					x < surface.x ||
-					x > surface.x + surface.width ||
-					y < surface.y ||
-					y > surface.y + surface.height
-				) {
-					return null;
-				}
-				const slotX = Math.min(
-					surface.columns - 1,
-					Math.floor((x - surface.x) / surface.cellSize),
-				);
-				const slotY = Math.min(
-					surface.rows - 1,
-					Math.floor((y - surface.y) / surface.cellSize),
-				);
-				if (slotX < 0 || slotY < 0) return null;
-				return {
-					kind: "slot",
-					layout: surface,
-					x: slotX,
-					y: slotY,
-				};
-			};
-
 			const readOccupant = (target: PixiSceneDropTarget) => {
 				for (const actor of readActors()) {
 					const location = actor.item.location;
@@ -256,6 +154,24 @@ export const createPixiMainSceneSurfaceFx = Effect.fn("createPixiMainSceneSurfac
 
 			return {
 				transientActorLayer,
+				closeFx: Effect.sync(() => {
+					if (closed) return;
+					closed = true;
+					for (const displayObject of [
+						transientActorLayer,
+						toolbarActorLayer,
+						boardActorLayer,
+						toolbarMask,
+						boardMask,
+						feedbackLayer,
+						gridLayer,
+					]) {
+						if (displayObject.destroyed) continue;
+						displayObject.destroy({
+							children: true,
+						});
+					}
+				}),
 				readActorPoseFx: Effect.fn("PixiMainSceneSurface.readActorPoseFx")((item) =>
 					Effect.sync(() => readLocationPose(item.location)),
 				),
@@ -298,9 +214,33 @@ export const createPixiMainSceneSurfaceFx = Effect.fn("createPixiMainSceneSurfac
 						}),
 				),
 				readDropTargetFx: Effect.fn("PixiMainSceneSurface.readDropTargetFx")((x, y) =>
-					Effect.sync(
-						() => hitSurface(layout.toolbar, x, y) ?? hitSurface(layout.board, x, y),
-					),
+					Effect.gen(function* () {
+						const toolbar = layout.toolbar;
+						const toolbarSlot = yield* readPixiGridSlotFx({
+							surface: toolbar,
+							x,
+							y,
+						});
+						if (toolbar !== null && toolbarSlot !== null) {
+							return {
+								kind: "slot" as const,
+								layout: toolbar,
+								...toolbarSlot,
+							};
+						}
+						const boardSlot = yield* readPixiGridSlotFx({
+							surface: layout.board,
+							x,
+							y,
+						});
+						return boardSlot === null
+							? null
+							: {
+									kind: "slot" as const,
+									layout: layout.board,
+									...boardSlot,
+								};
+					}),
 				),
 				readLocationPoseFx: Effect.fn("PixiMainSceneSurface.readLocationPoseFx")(
 					(location) => Effect.sync(() => readLocationPose(location)),
@@ -308,7 +248,7 @@ export const createPixiMainSceneSurfaceFx = Effect.fn("createPixiMainSceneSurfac
 				readOccupantFx: Effect.fn("PixiMainSceneSurface.readOccupantFx")((target) =>
 					Effect.sync(() => readOccupant(target)),
 				),
-				redrawFx: Effect.sync(() => {
+				redrawFx: Effect.gen(function* () {
 					layout = RendererRuntime.runSync(
 						readPixiMainSceneLayoutFx({
 							boardHeight: game.config.meta.board.height,
@@ -324,47 +264,53 @@ export const createPixiMainSceneSurfaceFx = Effect.fn("createPixiMainSceneSurfac
 						application.app.screen.width,
 						application.app.screen.height,
 					);
-					drawSurface(boardGrid, layout.board, [
-						palette.gridA,
-						palette.gridB,
-					]);
-					drawSurface(toolbarGrid, layout.toolbar, [
-						palette.toolbarA,
-						palette.toolbarB,
-					]);
-					drawMasks();
-					RendererRuntime.runSync(application.frames.invalidateFx);
+					yield* drawPixiGridSurfaceFx({
+						graphics: boardGrid,
+						lineColor: palette.line,
+						slotColors: [
+							palette.gridA,
+							palette.gridB,
+						],
+						surface: layout.board,
+						surfaceColor: palette.surface,
+					});
+					yield* drawPixiGridSurfaceFx({
+						graphics: toolbarGrid,
+						lineColor: palette.line,
+						slotColors: [
+							palette.toolbarA,
+							palette.toolbarB,
+						],
+						surface: layout.toolbar,
+						surfaceColor: palette.surface,
+					});
+					yield* drawPixiGridMaskFx({
+						graphics: boardMask,
+						surface: layout.board,
+					});
+					yield* drawPixiGridMaskFx({
+						graphics: toolbarMask,
+						surface: layout.toolbar,
+					});
+					yield* application.frames.invalidateFx;
 				}),
 				renderDropFeedbackFx: Effect.fn("PixiMainSceneSurface.renderDropFeedbackFx")(
 					(
 						target: PixiSceneDropTarget | null,
 						kind: readTileDropPreviewFx.Result["kind"] | null,
 					) =>
-						Effect.sync(() => {
-							feedbackLayer.clear();
-							if (target !== null) {
-								const accepted =
-									kind !== null &&
-									kind !== DropItemResultKindEnumSchema.enum.Reject &&
-									kind !== DropItemResultKindEnumSchema.enum.Ignored;
-								feedbackLayer
-									.rect(
-										target.layout.x + target.x * target.layout.cellSize,
-										target.layout.y + target.y * target.layout.cellSize,
-										target.layout.cellSize,
-										target.layout.cellSize,
-									)
-									.fill({
-										alpha: 0.16,
-										color: accepted ? palette.accent : palette.danger,
-									})
-									.stroke({
-										alpha: 0.95,
-										color: accepted ? palette.accent : palette.danger,
-										width: Math.max(2, target.layout.cellSize * 0.025),
-									});
-							}
-							RendererRuntime.runSync(application.frames.invalidateFx);
+						Effect.gen(function* () {
+							const accepted =
+								kind !== null &&
+								kind !== DropItemResultKindEnumSchema.enum.Reject &&
+								kind !== DropItemResultKindEnumSchema.enum.Ignored;
+							yield* drawPixiGridDropFeedbackFx({
+								color: accepted ? palette.accent : palette.danger,
+								graphics: feedbackLayer,
+								slot: target,
+								surface: target?.layout ?? null,
+							});
+							yield* application.frames.invalidateFx;
 						}),
 				),
 				setPaletteFx: Effect.fn("PixiMainSceneSurface.setPaletteFx")((nextPalette) =>

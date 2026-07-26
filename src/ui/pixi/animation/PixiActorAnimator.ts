@@ -9,9 +9,10 @@ export interface PixiActorAnimation {
 	readonly durationMs: number;
 	readonly onComplete?: () => void;
 	readonly toAlpha?: number;
+	readonly toCrowdAlpha?: number;
 	readonly toScale?: number;
-	readonly toX: number;
-	readonly toY: number;
+	readonly toX?: number;
+	readonly toY?: number;
 }
 
 export interface PixiActorAnimator {

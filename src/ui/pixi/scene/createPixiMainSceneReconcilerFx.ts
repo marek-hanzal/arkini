@@ -9,17 +9,21 @@ import { readTileMotionCuesFx } from "~/bridge/tile/motion/readTileMotionCuesFx"
 import { readTileActorsFx } from "~/bridge/tile/readTileActorsFx";
 import type { PixiMainSceneActorStore } from "~/ui/pixi/actor/PixiMainSceneActorStore";
 import { createPixiTileActorFx } from "~/ui/pixi/actor/createPixiTileActorFx";
+import { destroyPixiTileActorFx } from "~/ui/pixi/actor/destroyPixiTileActorFx";
 import { updatePixiTileActorFx } from "~/ui/pixi/actor/updatePixiTileActorFx";
 import type { PixiActorAnimator } from "~/ui/pixi/animation/PixiActorAnimator";
 import { readPixiTileTravelDurationMsFx } from "~/ui/pixi/animation/readPixiTileTravelDurationMsFx";
 import type { PixiScenePalette } from "~/ui/pixi/appearance/PixiScenePalette";
 import type { PixiMainSceneDragController } from "~/ui/pixi/drag/PixiMainSceneDragController";
+import type { PixiMainSceneDropPresentation } from "~/ui/pixi/drop/PixiMainSceneDropPresentation";
 import type { PixiTileMagneticField } from "~/ui/pixi/magnet/PixiTileMagneticField";
 import type { PixiTileMotionRuntime } from "~/ui/pixi/motion/PixiTileMotionRuntime";
 import type { PixiApplicationOwner } from "~/ui/pixi/runtime/PixiApplicationOwner";
 import type { PixiTextureStore } from "~/ui/pixi/runtime/createPixiTextureStoreFx";
 import type { PixiMainSceneReconciler } from "~/ui/pixi/scene/PixiMainSceneReconciler";
 import type { PixiMainSceneSurface } from "~/ui/pixi/scene/PixiMainSceneSurface";
+import { releasePixiMainSceneActorFx } from "~/ui/pixi/scene/releasePixiMainSceneActorFx";
+import { runPixiMainSceneReplacementsFx } from "~/ui/pixi/scene/runPixiMainSceneReplacementsFx";
 
 export namespace createPixiMainSceneReconcilerFx {
 	export interface Props {
@@ -27,6 +31,7 @@ export namespace createPixiMainSceneReconcilerFx {
 		readonly animator: PixiActorAnimator;
 		readonly application: PixiApplicationOwner;
 		readonly drag: PixiMainSceneDragController;
+		readonly dropPresentation: PixiMainSceneDropPresentation;
 		readonly game: GameEngine;
 		readonly magneticField: PixiTileMagneticField;
 		readonly motion: PixiTileMotionRuntime;
@@ -38,6 +43,9 @@ export namespace createPixiMainSceneReconcilerFx {
 
 const sameLocation = (left: TileActorItem["location"], right: TileActorItem["location"]) =>
 	JSON.stringify(left) === JSON.stringify(right);
+
+const readRunningAlpha = (running: boolean) => (running ? 0.82 : 1);
+const runningTransitionDurationMs = 180;
 
 const sameVisual = (left: TileActorItem, right: TileActorItem) =>
 	left.revision === right.revision &&
@@ -58,6 +66,7 @@ export const createPixiMainSceneReconcilerFx = Effect.fn("createPixiMainSceneRec
 		animator,
 		application,
 		drag,
+		dropPresentation,
 		game,
 		magneticField,
 		motion,
@@ -65,18 +74,9 @@ export const createPixiMainSceneReconcilerFx = Effect.fn("createPixiMainSceneRec
 		surface,
 		textures,
 	}: createPixiMainSceneReconcilerFx.Props) {
-		const processedCueKeys = new Set<string>();
 		const processedReplacementKeys = new Set<string>();
 		let exitGeneration = 0;
 		let closed = false;
-
-		const retainNewestKeys = (keys: Set<string>, maximumSize = 256) => {
-			while (keys.size > maximumSize) {
-				const oldest = keys.values().next().value;
-				if (oldest === undefined) return;
-				keys.delete(oldest);
-			}
-		};
 
 		const refreshActor = (actor: NonNullable<ReturnType<typeof actorStore.actors.get>>) => {
 			const pose = RendererRuntime.runSync(surface.readActorPoseFx(actor.item));
@@ -93,6 +93,20 @@ export const createPixiMainSceneReconcilerFx = Effect.fn("createPixiMainSceneRec
 			);
 		};
 
+		const removeActorImmediatelyFx = Effect.fn(
+			"PixiMainSceneReconciler.removeActorImmediatelyFx",
+		)(function* (actorId: string) {
+			const actor = yield* releasePixiMainSceneActorFx({
+				actorId,
+				actorStore,
+				animator,
+				drag,
+			});
+			if (actor === null) return;
+			yield* destroyPixiTileActorFx(actor);
+			yield* application.frames.invalidateFx;
+		});
+
 		const reconcileFx = Effect.fn("PixiMainSceneReconciler.reconcileFx")(function* (
 			transition: ReturnType<GameEngine["getTransitionSnapshot"]>,
 		) {
@@ -104,6 +118,18 @@ export const createPixiMainSceneReconcilerFx = Effect.fn("createPixiMainSceneRec
 					surface: "main",
 				}),
 			);
+			const inventoryActorIds = new Set(
+				game
+					.readOrThrow(
+						readTileActorsFx({
+							game,
+							runtime: transition.runtime,
+							surface: "inventory",
+						}),
+					)
+					.map((item) => item.id),
+			);
+			const dropSnapshot = yield* dropPresentation.readSnapshotFx;
 			yield* actorStore.replaceCanonicalItemsFx(nextItems);
 			const compiledCues = [
 				...RendererRuntime.runSync(readTileMotionCuesFx(transition)),
@@ -114,30 +140,23 @@ export const createPixiMainSceneReconcilerFx = Effect.fn("createPixiMainSceneRec
 					transition,
 				}),
 			);
-			const swapCandidate = yield* drag.readSwapCandidateFx;
-			if (swapCandidate !== null) {
+			if (dropSnapshot.swap !== null) {
 				const swapCue = RendererRuntime.runSync(
 					readCommittedTileSwapMotionCueFx({
-						...swapCandidate,
+						...dropSnapshot.swap.candidate,
 						transition,
 					}),
 				);
 				if (swapCue !== null) {
 					compiledCues.push(swapCue);
-					yield* drag.clearSwapCandidateFx;
+					yield* dropPresentation.clearSwapFx(dropSnapshot.swap.generation);
 				}
 			}
-			const incomingCues = compiledCues.filter((cue) => {
-				const key = `${cue.sequence}:${cue.eventIndex}`;
-				if (processedCueKeys.has(key)) return false;
-				processedCueKeys.add(key);
-				retainNewestKeys(processedCueKeys);
-				return true;
-			});
-			yield* motion.enqueueFx(incomingCues);
+			yield* motion.enqueueFx(compiledCues);
 			const motionSnapshot = yield* motion.readSnapshotFx;
 			const visibleItems = new Map(
 				nextItems.flatMap((item) =>
+					dropSnapshot.hiddenActorIds.has(item.id) ||
 					RendererRuntime.runSync(surface.readActorPoseFx(item)) === null
 						? []
 						: [
@@ -148,27 +167,37 @@ export const createPixiMainSceneReconcilerFx = Effect.fn("createPixiMainSceneRec
 							],
 				),
 			);
-
-			for (const [id, actor] of actorStore.actors) {
-				if (visibleItems.has(id) || motionSnapshot.ownedActorIds.has(id)) continue;
-				yield* drag.detachActorFx(actor);
-				yield* actorStore.deleteActorFx(id);
-				yield* animator.cancelFx(id);
+			for (const id of actorStore.actors.keys()) {
+				if (visibleItems.has(id)) continue;
+				if (dropSnapshot.pendingActorIds.has(id)) continue;
+				if (dropSnapshot.hiddenActorIds.has(id)) {
+					yield* removeActorImmediatelyFx(id);
+					continue;
+				}
+				if (inventoryActorIds.has(id)) {
+					yield* removeActorImmediatelyFx(id);
+					continue;
+				}
+				if (motionSnapshot.interactionClaimByActorId.has(id)) continue;
+				const releasedActor = yield* releasePixiMainSceneActorFx({
+					actorId: id,
+					actorStore,
+					animator,
+					drag,
+				});
+				if (releasedActor === null) continue;
 				exitGeneration += 1;
 				yield* animator.animateFx({
-					actor,
+					actor: releasedActor,
 					animationKey: `exit:${id}:${exitGeneration}`,
 					durationMs: 220,
 					onComplete: () => {
-						actor.textureGeneration += 1;
-						actor.container.destroy({
-							children: true,
-						});
+						RendererRuntime.runSync(destroyPixiTileActorFx(releasedActor));
 					},
 					toAlpha: 0,
 					toScale: 0.76,
-					toX: actor.container.x,
-					toY: actor.container.y,
+					toX: releasedActor.container.x,
+					toY: releasedActor.container.y,
 				});
 			}
 
@@ -231,6 +260,8 @@ export const createPixiMainSceneReconcilerFx = Effect.fn("createPixiMainSceneRec
 				const moved = !sameLocation(actor.item.location, item.location);
 				const visualChanged = !sameVisual(actor.item, displayItem);
 				const sizeChanged = actor.size !== pose.size;
+				const runningChanged = actor.item.running !== displayItem.running;
+				const previousCrowdAlpha = actor.crowdLayer.alpha;
 				if (visualChanged || sizeChanged) {
 					yield* updatePixiTileActorFx({
 						actor,
@@ -243,7 +274,17 @@ export const createPixiMainSceneReconcilerFx = Effect.fn("createPixiMainSceneRec
 				} else {
 					actor.item = displayItem;
 				}
-				if (actor.dragging || motionSnapshot.ownedActorIds.has(item.id)) continue;
+				if (runningChanged) {
+					actor.crowdLayer.alpha = previousCrowdAlpha;
+					yield* animator.animateFx({
+						actor,
+						animationKey: `running:${item.id}`,
+						durationMs: runningTransitionDurationMs,
+						toCrowdAlpha: readRunningAlpha(displayItem.running),
+					});
+				}
+				if (actor.dragging || motionSnapshot.interactionClaimByActorId.has(item.id))
+					continue;
 				pose.layer.addChild(actor.container);
 				if (
 					moved ||
@@ -266,55 +307,20 @@ export const createPixiMainSceneReconcilerFx = Effect.fn("createPixiMainSceneRec
 				}
 			}
 
-			for (const replacement of replacements) {
-				if (processedReplacementKeys.has(replacement.key)) continue;
-				const canonical = actorStore.canonicalItems.get(replacement.actorId);
-				const pose =
-					canonical === undefined
-						? null
-						: RendererRuntime.runSync(surface.readActorPoseFx(canonical));
-				if (canonical === undefined || pose === null) continue;
-				processedReplacementKeys.add(replacement.key);
-				retainNewestKeys(processedReplacementKeys);
-				const outgoing = RendererRuntime.runSync(
-					createPixiTileActorFx({
-						frames: application.frames,
-						item: {
-							...canonical,
-							...replacement.previous,
-							quantity: replacement.previousQuantity,
-						},
-						palette: readPalette(),
-						textures,
-					}),
-				);
-				outgoing.container.eventMode = "none";
-				surface.transientActorLayer.addChild(outgoing.container);
-				outgoing.container.x = pose.x;
-				outgoing.container.y = pose.y;
-				yield* updatePixiTileActorFx({
-					actor: outgoing,
-					frames: application.frames,
-					item: outgoing.item,
-					palette: readPalette(),
-					size: pose.size,
-					textures,
-				});
-				yield* animator.animateFx({
-					actor: outgoing,
-					animationKey: `replacement:${replacement.key}`,
-					durationMs: 280,
-					onComplete: () => {
-						outgoing.textureGeneration += 1;
-						outgoing.container.destroy({
-							children: true,
-						});
-					},
-					toAlpha: 0,
-					toX: pose.x,
-					toY: pose.y,
-				});
-			}
+			yield* runPixiMainSceneReplacementsFx({
+				actorStore,
+				animator,
+				application,
+				processedKeys: processedReplacementKeys,
+				readPalette,
+				replacements,
+				surface,
+				textures,
+			});
+			yield* dropPresentation.reconcileActorIdsFx({
+				inventoryActorIds,
+				mainActorIds: new Set(nextItems.map((item) => item.id)),
+			});
 			yield* drag.refreshPreviewFx;
 			yield* magneticField.pruneFx;
 			yield* motion.syncQuantitiesFx;
@@ -328,7 +334,6 @@ export const createPixiMainSceneReconcilerFx = Effect.fn("createPixiMainSceneRec
 			}),
 			closeFx: Effect.sync(() => {
 				closed = true;
-				processedCueKeys.clear();
 				processedReplacementKeys.clear();
 			}),
 		} satisfies PixiMainSceneReconciler;

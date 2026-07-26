@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 
 import type { TileMotionCue, TileStackMotionCue } from "~/bridge/tile/motion/TileMotionCue";
 import { readTileMotionActorClaimsFx } from "~/ui/tile/motion/readTileMotionActorClaimsFx";
+import { readTileMotionLaneClaimsFx } from "~/ui/tile/motion/readTileMotionLaneClaimsFx";
 import { readTileMotionStaggerDelaySecondsFx } from "~/ui/tile/motion/readTileMotionStaggerDelaySecondsFx";
 import { readUnsettledTileStackQuantitiesFx } from "~/ui/tile/motion/readUnsettledTileStackQuantitiesFx";
 
@@ -78,6 +79,43 @@ describe("pure tile motion contracts", () => {
 				"runtime:source",
 			]),
 		);
+	});
+
+	it("keeps a delivery producer in its lane without claiming its direct input", () => {
+		const spawn = {
+			kind: "spawn",
+			sequence: 7,
+			eventIndex: 0,
+			staggerIndex: 0,
+			actorId: "runtime:spawned",
+			originActorId: "runtime:producer",
+			originLocation: board(0),
+			targetLocation: board(1),
+		} satisfies TileMotionCue;
+		const stack = stackCue({
+			eventIndex: 1,
+			quantity: 2,
+			targetActorId: "runtime:stacked",
+		});
+
+		expect(Effect.runSync(readTileMotionActorClaimsFx(spawn))).toEqual(
+			new Set([
+				"runtime:spawned",
+			]),
+		);
+		expect(Effect.runSync(readTileMotionActorClaimsFx(stack))).toEqual(
+			new Set([
+				"runtime:stacked",
+			]),
+		);
+
+		const producerLane = {
+			kind: "delivery-batch",
+			actorId: "runtime:producer",
+			batchKey: "7:runtime:producer",
+		};
+		expect(Effect.runSync(readTileMotionLaneClaimsFx(spawn))).toContainEqual(producerLane);
+		expect(Effect.runSync(readTileMotionLaneClaimsFx(stack))).toContainEqual(producerLane);
 	});
 
 	it("sums unsettled stack payloads by exact target", () => {

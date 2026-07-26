@@ -1,6 +1,7 @@
 import { Effect } from "effect";
 import type { Graphics } from "pixi.js";
 
+import { readPixiGridSurfaceRadius } from "~/ui/pixi/grid/readPixiGridSurfaceRadius";
 import type { PixiGridSurfaceLayout } from "~/ui/pixi/layout/PixiSceneLayout";
 
 export namespace drawPixiGridMaskFx {
@@ -22,7 +23,7 @@ export const drawPixiGridMaskFx = Effect.fn("drawPixiGridMaskFx")(
 					surface.y,
 					surface.width,
 					surface.height,
-					Math.min(16, surface.cellSize * 0.12),
+					readPixiGridSurfaceRadius(surface),
 				)
 				.fill(0xffffff);
 		}),

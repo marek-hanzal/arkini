@@ -11,5 +11,6 @@ export interface TileActorItem extends TileActorVisual {
 	readonly location: GridLocationSchema.Type;
 	readonly jobStatus?: JobStatusEnumSchema.Type;
 	readonly running: boolean;
+	readonly runningGlow: boolean;
 	readonly primaryAction: readRuntimeItemPrimaryActionFx.Result;
 }

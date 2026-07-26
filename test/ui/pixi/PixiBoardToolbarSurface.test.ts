@@ -144,6 +144,7 @@ describe("PixiBoardToolbarSurface", () => {
 			quantity: 1,
 			revision: "revision:inventory",
 			running: false,
+			runningGlow: false,
 			sourceUrl: "resource:inventory",
 			title: "Inventory",
 		} satisfies TileActorItem;

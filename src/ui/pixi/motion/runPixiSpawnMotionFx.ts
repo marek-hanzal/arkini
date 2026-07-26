@@ -5,6 +5,11 @@ import type { TileSpawnMotionCue } from "~/bridge/tile/motion/TileMotionCue";
 import type { PixiMainSceneActorStore } from "~/ui/pixi/actor/PixiMainSceneActorStore";
 import type { PixiActorAnimator } from "~/ui/pixi/animation/PixiActorAnimator";
 import { readPixiTileTravelDurationMsFx } from "~/ui/pixi/animation/readPixiTileTravelDurationMsFx";
+import { startPixiTileActorFadeInFx } from "~/ui/pixi/animation/startPixiTileActorFadeInFx";
+import type { PixiTileMagneticField } from "~/ui/pixi/magnet/PixiTileMagneticField";
+import { createPixiTileMotionMagneticProjectorFx } from "~/ui/pixi/motion/createPixiTileMotionMagneticProjectorFx";
+import { createPixiTileMotionPoseSamplerFx } from "~/ui/pixi/motion/createPixiTileMotionPoseSamplerFx";
+import { settlePixiTileMotionActorFx } from "~/ui/pixi/motion/settlePixiTileMotionActorFx";
 import type { PixiMainSceneSurface } from "~/ui/pixi/scene/PixiMainSceneSurface";
 import type { PixiTileActorPose } from "~/ui/pixi/scene/PixiTileActorPose";
 
@@ -15,7 +20,10 @@ export namespace runPixiSpawnMotionFx {
 		readonly cue: TileSpawnMotionCue;
 		readonly cueKey: string;
 		readonly delayMs: number;
+		readonly magneticField: PixiTileMagneticField;
 		readonly onComplete: () => void;
+		readonly onMagneticSourceAcquired: (actorId: string) => void;
+		readonly onMagneticSourceReleased: (actorId: string) => void;
 		readonly origin: PixiTileActorPose;
 		readonly surface: PixiMainSceneSurface;
 		readonly target: PixiTileActorPose;
@@ -29,7 +37,10 @@ export const runPixiSpawnMotionFx = Effect.fn("runPixiSpawnMotionFx")(function* 
 	cue,
 	cueKey,
 	delayMs,
+	magneticField,
 	onComplete,
+	onMagneticSourceAcquired,
+	onMagneticSourceReleased,
 	origin,
 	surface,
 	target,
@@ -39,10 +50,19 @@ export const runPixiSpawnMotionFx = Effect.fn("runPixiSpawnMotionFx")(function* 
 		onComplete();
 		return;
 	}
-	yield* animator.cancelFx(actor.item.id);
 	surface.transientActorLayer.addChild(actor.container);
-	actor.container.x = origin.x;
-	actor.container.y = origin.y;
+	yield* animator.setFx({
+		actor,
+		channel: "pose",
+		scale: origin.size / Math.max(1, actor.size),
+		x: origin.x,
+		y: origin.y,
+	});
+	yield* startPixiTileActorFadeInFx({
+		actor,
+		animator,
+		delayMs,
+	});
 	const durationMs = yield* readPixiTileTravelDurationMsFx({
 		fromX: origin.x,
 		fromY: origin.y,
@@ -50,23 +70,63 @@ export const runPixiSpawnMotionFx = Effect.fn("runPixiSpawnMotionFx")(function* 
 		toX: target.x,
 		toY: target.y,
 	});
+	const poseSampler = yield* createPixiTileMotionPoseSamplerFx({
+		actorBaseSize: actor.size,
+		from: {
+			scale: actor.container.scale.x,
+			x: actor.container.x,
+			y: actor.container.y,
+		},
+		surface,
+		target,
+		targetLocation: cue.targetLocation,
+	});
+	const magneticProjector = yield* createPixiTileMotionMagneticProjectorFx({
+		actor,
+		attractedActorId: null,
+		eligibleAttractionActorIds: new Set(),
+		magneticField,
+		onAcquired: onMagneticSourceAcquired,
+		onReleased: onMagneticSourceReleased,
+	});
 	yield* animator.animateFx({
 		actor,
-		animationKey: `motion:${cueKey}`,
+		channel: "pose",
 		delayMs,
 		durationMs,
+		ownerKey: `motion:${cueKey}`,
 		onComplete: () => {
-			const currentTarget =
-				RendererRuntime.runSync(surface.readLocationPoseFx(cue.targetLocation)) ?? target;
-			if (!actor.container.destroyed) {
-				currentTarget.layer.addChild(actor.container);
-				actor.container.x = currentTarget.x;
-				actor.container.y = currentTarget.y;
+			const settle = () => {
+				magneticProjector.release();
+				const currentTarget =
+					RendererRuntime.runSync(surface.readLocationPoseFx(cue.targetLocation)) ??
+					target;
+				if (!actor.container.destroyed) {
+					currentTarget.layer.addChild(actor.container);
+				}
+				onComplete();
+			};
+			if (!poseSampler.needsCompletionSettle()) {
+				settle();
+				return;
 			}
-			onComplete();
+			RendererRuntime.runSync(
+				settlePixiTileMotionActorFx({
+					actor,
+					animator,
+					fallbackTarget: target,
+					onPose: magneticProjector.projectPose,
+					onSettled: settle,
+					ownerKey: `motion:${cueKey}`,
+					surface,
+					targetLocation: cue.targetLocation,
+				}),
+			);
 		},
-		toAlpha: 1,
-		toX: target.x,
-		toY: target.y,
+		readPose: (progress) => {
+			const pose = poseSampler.readPose(progress);
+			magneticProjector.projectPose(pose);
+			return pose;
+		},
 	});
 });

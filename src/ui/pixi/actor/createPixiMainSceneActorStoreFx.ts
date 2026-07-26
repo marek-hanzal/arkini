@@ -9,6 +9,7 @@ export const createPixiMainSceneActorStoreFx = Effect.fn("createPixiMainSceneAct
 	Effect.sync((): PixiMainSceneActorStore => {
 		const actors = new Map<string, PixiTileActor>();
 		const canonicalItems = new Map<string, PixiTileActor["item"]>();
+		const exitingActors = new Set<PixiTileActor>();
 		let closed = false;
 
 		return {
@@ -20,6 +21,13 @@ export const createPixiMainSceneActorStoreFx = Effect.fn("createPixiMainSceneAct
 					actors.delete(actorId);
 					return actor;
 				}),
+			),
+			destroyExitingActorFx: Effect.fn("PixiMainSceneActorStore.destroyExitingActorFx")(
+				(actor) =>
+					Effect.gen(function* () {
+						exitingActors.delete(actor);
+						yield* destroyPixiTileActorFx(actor);
+					}),
 			),
 			readActorFx: Effect.fn("PixiMainSceneActorStore.readActorFx")((actorId) =>
 				Effect.sync(() => actors.get(actorId) ?? null),
@@ -34,6 +42,23 @@ export const createPixiMainSceneActorStoreFx = Effect.fn("createPixiMainSceneAct
 						for (const item of items) canonicalItems.set(item.id, item);
 					}),
 			),
+			releaseActorFx: Effect.fn("PixiMainSceneActorStore.releaseActorFx")((actorId) =>
+				Effect.sync(() => {
+					const actor = actors.get(actorId) ?? null;
+					actors.delete(actorId);
+					if (actor !== null && !actor.container.destroyed) {
+						if (actor.onPointerDown !== null) {
+							actor.container.off("pointerdown", actor.onPointerDown);
+							actor.onPointerDown = null;
+						}
+						actor.container.eventMode = "none";
+						actor.container.cursor = "default";
+						actor.dragging = false;
+						exitingActors.add(actor);
+					}
+					return actor;
+				}),
+			),
 			setActorFx: Effect.fn("PixiMainSceneActorStore.setActorFx")(function* (actor) {
 				if (closed) {
 					yield* destroyPixiTileActorFx(actor);
@@ -44,9 +69,15 @@ export const createPixiMainSceneActorStoreFx = Effect.fn("createPixiMainSceneAct
 			closeFx: Effect.gen(function* () {
 				if (closed) return;
 				closed = true;
-				for (const actor of actors.values()) yield* destroyPixiTileActorFx(actor);
+				for (const actor of new Set([
+					...actors.values(),
+					...exitingActors,
+				])) {
+					yield* destroyPixiTileActorFx(actor);
+				}
 				actors.clear();
 				canonicalItems.clear();
+				exitingActors.clear();
 			}),
 		};
 	}),

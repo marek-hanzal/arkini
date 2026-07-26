@@ -1,5 +1,6 @@
 import { Effect } from "effect";
 import type { FederatedPointerEvent } from "pixi.js";
+import { match, P } from "ts-pattern";
 
 import type { GameEngine } from "~/bridge/game/GameEngine";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
@@ -14,7 +15,16 @@ import type { runTileDropAtom } from "~/bridge/tile/runTileDropAtom";
 import type { PixiInventoryActorStore } from "~/ui/pixi/actor/PixiInventoryActorStore";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
 import { readPixiTileActorCursorFx } from "~/ui/pixi/actor/readPixiTileActorCursorFx";
+import type { PixiActorAnimator } from "~/ui/pixi/animation/PixiActorAnimator";
+import { createPixiRetargetablePoseSamplerFx } from "~/ui/pixi/animation/createPixiRetargetablePoseSamplerFx";
+import { flashPixiTileActorConsumedSourceFx } from "~/ui/pixi/animation/flashPixiTileActorConsumedSourceFx";
+import { readPixiTileTravelDurationMsFx } from "~/ui/pixi/animation/readPixiTileTravelDurationMsFx";
+import { flashPixiTileActorFeedbackGlowFx } from "~/ui/pixi/animation/runPixiTileActorRunningGlowFx";
 import type { PixiInventoryDragController } from "~/ui/pixi/drag/PixiInventoryDragController";
+import {
+	restorePixiInventoryActorRemovalFeedbackFx,
+	startPixiInventoryActorRemovalFeedbackFx,
+} from "~/ui/pixi/drag/startPixiInventoryActorRemovalFeedbackFx";
 import type { PixiApplicationOwner } from "~/ui/pixi/runtime/PixiApplicationOwner";
 import type { PixiInventoryDropTarget } from "~/ui/pixi/scene/PixiInventoryDropTarget";
 import type { PixiInventorySceneSurface } from "~/ui/pixi/scene/PixiInventorySceneSurface";
@@ -22,6 +32,7 @@ import type { PixiInventorySceneSurface } from "~/ui/pixi/scene/PixiInventorySce
 export namespace createPixiInventoryDragControllerFx {
 	export interface Props {
 		readonly actorStore: PixiInventoryActorStore;
+		readonly animator: PixiActorAnimator;
 		readonly application: PixiApplicationOwner;
 		readonly game: GameEngine;
 		readonly onActivate: (
@@ -63,6 +74,7 @@ const dragThreshold = 6;
 export const createPixiInventoryDragControllerFx = Effect.fn("createPixiInventoryDragControllerFx")(
 	function* ({
 		actorStore,
+		animator,
 		application,
 		game,
 		onActivate,
@@ -70,7 +82,7 @@ export const createPixiInventoryDragControllerFx = Effect.fn("createPixiInventor
 		onDrop,
 		surface,
 	}: createPixiInventoryDragControllerFx.Props) {
-		const activatingActorIds = new Set<string>();
+		const removalFeedbackGenerationByActorId = new Map<string, number>();
 		let activeDrag: ActiveInventoryDrag | null = null;
 		let closed = false;
 
@@ -108,16 +120,95 @@ export const createPixiInventoryDragControllerFx = Effect.fn("createPixiInventor
 			};
 		};
 
+		const flashReceiver = (result: runTileDropAtom.Result) => {
+			const receiverActorId = match(result)
+				.with(
+					{
+						kind: DropItemResultKindEnumSchema.enum.Stack,
+					},
+					({ target }) => target.itemId,
+				)
+				.with(
+					{
+						kind: DropItemResultKindEnumSchema.enum.StoreInput,
+					},
+					({ owner }) => owner.itemId,
+				)
+				.with(
+					{
+						kind: DropItemResultKindEnumSchema.enum.StoreInventory,
+					},
+					({ inventory }) => inventory.itemId,
+				)
+				.otherwise(() => null);
+			if (receiverActorId === null) return;
+			const receiver = RendererRuntime.runSync(actorStore.readActorFx(receiverActorId));
+			if (receiver === null) return;
+			RendererRuntime.runSync(
+				flashPixiTileActorFeedbackGlowFx({
+					actor: receiver,
+					animator,
+				}),
+			);
+		};
+
+		const flashSurvivingSource = (result: runTileDropAtom.Result) => {
+			const sourceActorId = match(result)
+				.with(
+					{
+						kind: P.union(
+							DropItemResultKindEnumSchema.enum.Stack,
+							DropItemResultKindEnumSchema.enum.StoreInput,
+							DropItemResultKindEnumSchema.enum.StoreInventory,
+						),
+						source: {
+							current: P.nonNullable,
+						},
+					},
+					({ source }) => source.itemId,
+				)
+				.otherwise(() => null);
+			if (sourceActorId === null) return;
+			const source = RendererRuntime.runSync(actorStore.readActorFx(sourceActorId));
+			if (source === null) return;
+			RendererRuntime.runSync(
+				flashPixiTileActorConsumedSourceFx({
+					actor: source,
+					animator,
+				}),
+			);
+		};
+
 		const activateActor = (actor: PixiTileActor, shiftKey: boolean) => {
-			if (activatingActorIds.has(actor.item.id)) return;
 			const bounds = application.app.canvas.getBoundingClientRect();
 			const item = actor.item;
+			const removalFeedbackGeneration = shiftKey
+				? null
+				: (removalFeedbackGenerationByActorId.get(item.id) ?? 0) + 1;
+			const presentedSize = actor.size * actor.container.scale.x;
 			const handoff = {
-				centerX: bounds.left + actor.container.x + actor.size / 2,
-				centerY: bounds.top + actor.container.y + actor.size / 2,
-				size: actor.size,
+				centerX:
+					bounds.left +
+					actor.container.x -
+					actor.container.pivot.x * actor.container.scale.x +
+					presentedSize / 2,
+				centerY:
+					bounds.top +
+					actor.container.y -
+					actor.container.pivot.y * actor.container.scale.y +
+					presentedSize / 2,
+				size: presentedSize,
 			};
-			activatingActorIds.add(item.id);
+			if (removalFeedbackGeneration !== null) {
+				removalFeedbackGenerationByActorId.set(item.id, removalFeedbackGeneration);
+				actor.container.cursor = "progress";
+				RendererRuntime.runSync(
+					startPixiInventoryActorRemovalFeedbackFx({
+						actor,
+						animator,
+					}),
+				);
+			}
 			void Promise.resolve()
 				.then(() => {
 					if (closed) return;
@@ -128,7 +219,30 @@ export const createPixiInventoryDragControllerFx = Effect.fn("createPixiInventor
 					console.error("Pixi Inventory activation failed.", cause);
 				})
 				.finally(() => {
-					activatingActorIds.delete(item.id);
+					if (
+						removalFeedbackGeneration === null ||
+						removalFeedbackGenerationByActorId.get(item.id) !==
+							removalFeedbackGeneration
+					) {
+						return;
+					}
+					removalFeedbackGenerationByActorId.delete(item.id);
+					if (closed) return;
+					const current = RendererRuntime.runSync(actorStore.readActorFx(item.id));
+					if (current !== actor || actor.container.destroyed) return;
+					actor.container.cursor = RendererRuntime.runSync(
+						readPixiTileActorCursorFx({
+							phase: "idle",
+							previewKind: null,
+							running: actor.item.running,
+						}),
+					);
+					RendererRuntime.runSync(
+						restorePixiInventoryActorRemovalFeedbackFx({
+							actor,
+							animator,
+						}),
+					);
 				});
 		};
 
@@ -176,9 +290,43 @@ export const createPixiInventoryDragControllerFx = Effect.fn("createPixiInventor
 					running: actor.item.running,
 				}),
 			);
-			actor.container.x = pose.x;
-			actor.container.y = pose.y;
-			RendererRuntime.runSync(application.frames.invalidateFx);
+			const durationMs = RendererRuntime.runSync(
+				readPixiTileTravelDurationMsFx({
+					fromX: actor.container.x,
+					fromY: actor.container.y,
+					tileSize: actor.size,
+					toX: pose.x,
+					toY: pose.y,
+				}),
+			);
+			const readPose = RendererRuntime.runSync(
+				createPixiRetargetablePoseSamplerFx({
+					from: {
+						scale: actor.container.scale.x,
+						x: actor.container.x,
+						y: actor.container.y,
+					},
+					readTarget: () => {
+						const latest =
+							RendererRuntime.runSync(surface.readActorPoseFx(actor.item)) ?? pose;
+						return {
+							scale:
+								RendererRuntime.runSync(surface.readActorSizeFx) /
+								Math.max(1, actor.size),
+							x: latest.x,
+							y: latest.y,
+						};
+					},
+				}),
+			);
+			RendererRuntime.runSync(
+				animator.animateFx({
+					actor,
+					channel: "pose",
+					durationMs,
+					readPose,
+				}),
+			);
 		};
 
 		const cancelInteraction = () => {
@@ -208,14 +356,21 @@ export const createPixiInventoryDragControllerFx = Effect.fn("createPixiInventor
 				drag.actor.container.cursor = "grabbing";
 				surface.actorLayer.addChild(drag.actor.container);
 				drag.actor.container.zIndex = 10_000;
+				RendererRuntime.runSync(animator.cancelChannelFx(drag.actor, "pose"));
 			}
-			drag.actor.container.x = drag.startX + offsetX;
-			drag.actor.container.y = drag.startY + offsetY;
+			RendererRuntime.runSync(
+				animator.setFx({
+					actor: drag.actor,
+					channel: "pose",
+					scale: drag.actor.container.scale.x,
+					x: drag.startX + offsetX,
+					y: drag.startY + offsetY,
+				}),
+			);
 			previewTarget(
 				drag,
 				RendererRuntime.runSync(surface.readDropTargetFx(event.global.x, event.global.y)),
 			);
-			RendererRuntime.runSync(application.frames.invalidateFx);
 		};
 
 		const finishPointer = (event: FederatedPointerEvent) => {
@@ -275,6 +430,8 @@ export const createPixiInventoryDragControllerFx = Effect.fn("createPixiInventor
 							result.kind !== DropItemResultKindEnumSchema.enum.Reject &&
 							result.kind !== DropItemResultKindEnumSchema.enum.Ignored
 						) {
+							flashSurvivingSource(result);
+							flashReceiver(result);
 							RendererRuntime.runSync(onAcceptedDropFx);
 							return;
 						}
@@ -356,7 +513,7 @@ export const createPixiInventoryDragControllerFx = Effect.fn("createPixiInventor
 				closed = true;
 				if (activeDrag !== null) releasePointerCapture(activeDrag.pointerId);
 				activeDrag = null;
-				activatingActorIds.clear();
+				removalFeedbackGenerationByActorId.clear();
 				application.stage.off("globalpointermove", onPointerMove);
 				application.stage.off("pointerup", finishPointer);
 				application.stage.off("pointerupoutside", finishPointer);
@@ -369,7 +526,13 @@ export const createPixiInventoryDragControllerFx = Effect.fn("createPixiInventor
 			}),
 			removeActorFx: Effect.fn("PixiInventoryDragController.removeActorFx")((actor) =>
 				Effect.sync(() => {
-					activatingActorIds.delete(actor.item.id);
+					removalFeedbackGenerationByActorId.delete(actor.item.id);
+					if (actor.onPointerDown !== null) {
+						actor.container.off("pointerdown", actor.onPointerDown);
+						actor.onPointerDown = null;
+					}
+					actor.container.eventMode = "none";
+					actor.container.cursor = "default";
 					if (activeDrag?.actor !== actor) return;
 					releasePointerCapture(activeDrag.pointerId);
 					activeDrag = null;

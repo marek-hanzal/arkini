@@ -103,11 +103,7 @@ describe("pure tile motion contracts", () => {
 				"runtime:spawned",
 			]),
 		);
-		expect(Effect.runSync(readTileMotionActorClaimsFx(stack))).toEqual(
-			new Set([
-				"runtime:stacked",
-			]),
-		);
+		expect(Effect.runSync(readTileMotionActorClaimsFx(stack))).toEqual(new Set());
 
 		const producerLane = {
 			kind: "delivery-batch",

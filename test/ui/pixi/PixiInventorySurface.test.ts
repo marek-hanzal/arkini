@@ -127,6 +127,7 @@ const item = {
 	quantity: 4,
 	revision: "revision:water",
 	running: false,
+	runningGlow: false,
 	sourceUrl: "resource:water",
 	title: "Water",
 } satisfies TileActorItem;

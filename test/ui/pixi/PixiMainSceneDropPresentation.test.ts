@@ -135,7 +135,7 @@ describe("Pixi main-scene drop presentation", () => {
 		expect(Effect.runSync(presentation.readSnapshotFx).swap).toBeNull();
 	});
 
-	it("hides an Inventory drop source for one canonical removal reconciliation", () => {
+	it("retains exact Inventory-consumption feedback through canonical reconciliation", () => {
 		const presentation = Effect.runSync(createPixiMainSceneDropPresentationFx());
 		const generation = Effect.runSync(
 			presentation.beginFx({
@@ -166,18 +166,38 @@ describe("Pixi main-scene drop presentation", () => {
 			}),
 		);
 
-		expect(Effect.runSync(presentation.readSnapshotFx).hiddenActorIds).toEqual(
+		const snapshot = Effect.runSync(presentation.readSnapshotFx);
+		expect(snapshot.hiddenActorIds).toEqual(
 			new Set([
 				swapCandidate.source.id,
 			]),
 		);
+		expect(snapshot.feedback).toEqual({
+			cues: [
+				{
+					actorId: swapCandidate.source.id,
+					key: `drop:${generation}:consume-source`,
+					kind: "consume-source",
+				},
+				{
+					actorId: "runtime:inventory",
+					key: `drop:${generation}:consume`,
+					kind: "consume",
+				},
+			],
+			generation,
+		});
 
+		Effect.runSync(presentation.clearFeedbackFx(generation));
 		Effect.runSync(
 			presentation.reconcileActorIdsFx({
 				inventoryActorIds: new Set(),
 				mainActorIds: new Set(),
 			}),
 		);
-		expect(Effect.runSync(presentation.readSnapshotFx).hiddenActorIds).toEqual(new Set());
+		expect(Effect.runSync(presentation.readSnapshotFx)).toMatchObject({
+			feedback: null,
+			hiddenActorIds: new Set(),
+		});
 	});
 });

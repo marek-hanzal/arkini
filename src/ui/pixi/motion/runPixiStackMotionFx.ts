@@ -8,8 +8,12 @@ import { createPixiTileActorFx } from "~/ui/pixi/actor/createPixiTileActorFx";
 import { destroyPixiTileActorFx } from "~/ui/pixi/actor/destroyPixiTileActorFx";
 import { updatePixiTileActorFx } from "~/ui/pixi/actor/updatePixiTileActorFx";
 import type { PixiActorAnimator } from "~/ui/pixi/animation/PixiActorAnimator";
-import { readPixiTileTravelDurationMsFx } from "~/ui/pixi/animation/readPixiTileTravelDurationMsFx";
+import { flashPixiTileActorFeedbackGlowFx } from "~/ui/pixi/animation/runPixiTileActorRunningGlowFx";
+import { startPixiTileActorFadeInFx } from "~/ui/pixi/animation/startPixiTileActorFadeInFx";
 import type { PixiScenePalette } from "~/ui/pixi/appearance/PixiScenePalette";
+import type { PixiTileMagneticField } from "~/ui/pixi/magnet/PixiTileMagneticField";
+import { chasePixiTileMotionTargetFx } from "~/ui/pixi/motion/chasePixiTileMotionTargetFx";
+import { createPixiTileMotionMagneticProjectorFx } from "~/ui/pixi/motion/createPixiTileMotionMagneticProjectorFx";
 import type { PixiApplicationOwner } from "~/ui/pixi/runtime/PixiApplicationOwner";
 import type { PixiTextureStore } from "~/ui/pixi/runtime/createPixiTextureStoreFx";
 import type { PixiMainSceneSurface } from "~/ui/pixi/scene/PixiMainSceneSurface";
@@ -23,7 +27,10 @@ export namespace runPixiStackMotionFx {
 		readonly cue: TileStackMotionCue;
 		readonly cueKey: string;
 		readonly delayMs: number;
+		readonly magneticField: PixiTileMagneticField;
 		readonly onComplete: () => void;
+		readonly onMagneticSourceAcquired: (actorId: string) => void;
+		readonly onMagneticSourceReleased: (actorId: string) => void;
 		readonly onTransientCreated: (actor: PixiTileActor) => void;
 		readonly origin: PixiTileActorPose;
 		readonly readPalette: () => PixiScenePalette;
@@ -41,7 +48,10 @@ export const runPixiStackMotionFx = Effect.fn("runPixiStackMotionFx")(function* 
 	cue,
 	cueKey,
 	delayMs,
+	magneticField,
 	onComplete,
+	onMagneticSourceAcquired,
+	onMagneticSourceReleased,
 	onTransientCreated,
 	origin,
 	readPalette,
@@ -67,33 +77,79 @@ export const runPixiStackMotionFx = Effect.fn("runPixiStackMotionFx")(function* 
 	transient.container.eventMode = "none";
 	onTransientCreated(transient);
 	surface.transientActorLayer.addChild(transient.container);
-	transient.container.x = origin.x;
-	transient.container.y = origin.y;
 	yield* updatePixiTileActorFx({
 		actor: transient,
+		animator,
 		frames: application.frames,
 		item: transient.item,
 		palette: readPalette(),
 		size: target.size,
 		textures,
 	});
-	const durationMs = yield* readPixiTileTravelDurationMsFx({
-		fromX: origin.x,
-		fromY: origin.y,
-		tileSize: target.size,
-		toX: target.x,
-		toY: target.y,
-	});
-	yield* animator.animateFx({
+	yield* animator.setFx({
 		actor: transient,
-		animationKey: `motion:${cueKey}`,
+		alpha: 0,
+		channel: "lifecycle-opacity",
+	});
+	yield* animator.setFx({
+		actor: transient,
+		channel: "pose",
+		scale: origin.size / Math.max(1, transient.size),
+		x: origin.x,
+		y: origin.y,
+	});
+	yield* startPixiTileActorFadeInFx({
+		actor: transient,
+		animator,
 		delayMs,
-		durationMs,
-		onComplete: () => {
+	});
+	const readLiveTarget = () => {
+		const actor = actorStore.actors.get(cue.targetActorId);
+		if (actor === undefined || actor.container.destroyed) return null;
+		const scale = actor.container.scale.x;
+		// The child-local magnetic offset is response feedback, not physical contact geometry.
+		// Feeding it back here makes the payload chase the displacement that it creates itself.
+		return {
+			scale: (actor.size * scale) / Math.max(1, transient.size),
+			x: actor.container.x - actor.container.pivot.x * scale,
+			y: actor.container.y - actor.container.pivot.y * scale,
+		};
+	};
+	const eligibleAttractionActorIds = new Set([
+		cue.targetActorId,
+	]);
+	const magneticProjector = yield* createPixiTileMotionMagneticProjectorFx({
+		actor: transient,
+		attractedActorId: cue.targetActorId,
+		eligibleAttractionActorIds,
+		magneticField,
+		onAcquired: onMagneticSourceAcquired,
+		onReleased: onMagneticSourceReleased,
+	});
+	yield* chasePixiTileMotionTargetFx({
+		actor: transient,
+		animator,
+		delayMs,
+		fallbackTarget: target,
+		onPose: magneticProjector.projectPose,
+		onSettled: () => {
+			magneticProjector.release();
+			const targetActor = actorStore.actors.get(cue.targetActorId);
+			if (targetActor !== undefined) {
+				RendererRuntime.runSync(
+					flashPixiTileActorFeedbackGlowFx({
+						actor: targetActor,
+						animator,
+					}),
+				);
+			}
+			RendererRuntime.runSync(animator.cancelActorFx(transient));
 			RendererRuntime.runSync(destroyPixiTileActorFx(transient));
 			onComplete();
 		},
-		toX: target.x,
-		toY: target.y,
+		ownerKey: `motion:${cueKey}`,
+		readLiveTarget,
+		surface,
+		targetLocation: cue.targetLocation,
 	});
 });

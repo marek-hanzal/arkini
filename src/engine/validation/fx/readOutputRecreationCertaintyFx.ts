@@ -1,4 +1,5 @@
 import { Effect } from "effect";
+import { match } from "ts-pattern";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { DropSchema } from "~/engine/output/schema/DropSchema";
@@ -27,23 +28,43 @@ export const readOutputRecreationCertaintyFx = Effect.fn("readOutputRecreationCe
 	function* (output: OutputSchema.Type, itemId: IdSchema.Type) {
 		const sets = output.set.map((set) => {
 			const rolls = set.roll.map((roll): OutputRecreationCertainty => {
-				if (roll.type === RollEnumSchema.enum.Guaranteed) {
-					return readDropCertainty(roll.drop, itemId);
-				}
-				if (roll.type === RollEnumSchema.enum.Chance) {
-					if (roll.chance === 0) return "none";
-					const drop = readDropCertainty(roll.drop, itemId);
-					if (drop === "none") return "none";
-					return roll.chance === 1 && drop === "guaranteed" ? "guaranteed" : "stochastic";
-				}
-
-				const candidates = roll.drop.map((candidate) =>
-					readDropCertainty(candidate.drop, itemId),
-				);
-				if (candidates.every((candidate) => candidate === "guaranteed")) {
-					return "guaranteed";
-				}
-				return candidates.some((candidate) => candidate !== "none") ? "stochastic" : "none";
+				return match(roll)
+					.with(
+						{
+							type: RollEnumSchema.enum.Guaranteed,
+						},
+						(guaranteed) => readDropCertainty(guaranteed.drop, itemId),
+					)
+					.with(
+						{
+							type: RollEnumSchema.enum.Chance,
+						},
+						(chance) => {
+							if (chance.chance === 0) return "none";
+							const drop = readDropCertainty(chance.drop, itemId);
+							if (drop === "none") return "none";
+							return chance.chance === 1 && drop === "guaranteed"
+								? "guaranteed"
+								: "stochastic";
+						},
+					)
+					.with(
+						{
+							type: RollEnumSchema.enum.Weight,
+						},
+						(weight) => {
+							const candidates = weight.drop.map((candidate) =>
+								readDropCertainty(candidate.drop, itemId),
+							);
+							if (candidates.every((candidate) => candidate === "guaranteed")) {
+								return "guaranteed";
+							}
+							return candidates.some((candidate) => candidate !== "none")
+								? "stochastic"
+								: "none";
+						},
+					)
+					.exhaustive();
 			});
 
 			if (rolls.some((roll) => roll === "guaranteed")) return "guaranteed" as const;

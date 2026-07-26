@@ -5,7 +5,11 @@ import type { TileActorItem } from "~/bridge/tile/TileActorItem";
 import type { runTileDropAtom } from "~/bridge/tile/runTileDropAtom";
 import type { PixiMainSceneActorStore } from "~/ui/pixi/actor/PixiMainSceneActorStore";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
-import type { PixiActorAnimator } from "~/ui/pixi/animation/PixiActorAnimator";
+import type {
+	PixiActorAnimation,
+	PixiActorAnimator,
+	PixiActorPresentationWrite,
+} from "~/ui/pixi/animation/PixiActorAnimator";
 import { createPixiMainSceneDragControllerFx } from "~/ui/pixi/drag/createPixiMainSceneDragControllerFx";
 import type { PixiCursorGrabMotion } from "~/ui/pixi/drag/PixiCursorGrabMotion";
 import { createPixiMainSceneDropPresentationFx } from "~/ui/pixi/drop/createPixiMainSceneDropPresentationFx";
@@ -15,8 +19,11 @@ import type { PixiApplicationOwner } from "~/ui/pixi/runtime/PixiApplicationOwne
 import type { PixiMainSceneSurface } from "~/ui/pixi/scene/PixiMainSceneSurface";
 
 const previewState = vi.hoisted(() => ({
-	actorKinds: new Map<string, "merge" | "move" | "reject" | "stack" | "store-input" | "swap">(),
-	kind: "move" as "move" | "reject",
+	actorKinds: new Map<
+		string,
+		"merge" | "move" | "reject" | "stack" | "store-input" | "store-inventory" | "swap"
+	>(),
+	kind: "move" as "move" | "reject" | "store-inventory",
 }));
 
 vi.mock("~/bridge/tile/readTileDropPreviewFx", () => ({
@@ -112,7 +119,7 @@ const mountController = ({
 	interactionClaimByActorId = new Map(),
 	targetItems = [],
 }: {
-	readonly interactionClaimByActorId?: ReadonlyMap<string, "activation-only" | "blocked">;
+	readonly interactionClaimByActorId?: ReadonlyMap<string, "blocked" | "handoff">;
 	readonly targetItems?: ReadonlyArray<TileActorItem>;
 } = {}) => {
 	previewState.kind = "move";
@@ -121,24 +128,47 @@ const mountController = ({
 	const stage = new FakeEmitter();
 	const animateActor = vi.fn();
 	const cancelAnimation = vi.fn();
+	const cancelChannel = vi.fn();
 	const finishCursorGrab = vi.fn();
 	const startCursorGrab = vi.fn();
+	const animations: PixiActorAnimation[] = [];
+	const presentationWrites: PixiActorPresentationWrite[] = [];
 	const transientActorLayer = {
 		addChild: vi.fn(),
 	};
-	const actor = {
-		container: Object.assign(actorEvents, {
-			destroyed: false,
-			pivot: {
-				x: 0,
-				y: 0,
+	const actorContainer = Object.assign(actorEvents, {
+		cursor: "grab",
+		destroyed: false,
+		pivot: {
+			x: 0,
+			y: 0,
+		},
+		position: {
+			set(x: number, y: number) {
+				actorContainer.x = x;
+				actorContainer.y = y;
 			},
-			x: 10,
-			y: 20,
-			zIndex: 0,
-		}),
+		},
+		scale: {
+			set(value: number) {
+				this.x = value;
+				this.y = value;
+			},
+			x: 1,
+			y: 1,
+		},
+		x: 10,
+		y: 20,
+		zIndex: 0,
+	});
+	const actor = {
+		container: actorContainer,
 		dragging: false,
+		instanceId: `test:${item.id}`,
 		item,
+		lifecycleFadeStarted: false,
+		lifecycleIntentGeneration: 0,
+		lifecycleTargetAlpha: 1,
 		onPointerDown: null,
 		size: 80,
 	} as unknown as PixiTileActor;
@@ -148,19 +178,34 @@ const mountController = ({
 			actor,
 		],
 	]);
+	const canonicalItems = new Map([
+		[
+			item.id,
+			item,
+		],
+	]);
 	for (const targetItem of targetItems) {
 		actors.set(targetItem.id, {
 			item: targetItem,
 		} as PixiTileActor);
+		canonicalItems.set(targetItem.id, targetItem);
 	}
 	let currentCommandTarget: runTileDropAtom.Command["target"] = {
 		kind: "unsupported" as const,
+	};
+	let currentActorPose = {
+		layer: transientActorLayer,
+		size: 80,
+		x: 10,
+		y: 20,
 	};
 	let currentDropTargetX = 1;
 	let currentOccupant: TileActorItem | null = null;
 	const magneticUpdates: Array<Parameters<PixiTileMagneticField["updateFx"]>[0]> = [];
 	const onActivate = vi.fn();
 	const onAcceptedDrop = vi.fn();
+	const beginInteractionHandoff = vi.fn((_actorId: string) => true);
+	const releasePointerCapture = vi.fn();
 	const dropPresentation = Effect.runSync(createPixiMainSceneDropPresentationFx());
 	const onDrop = vi.fn(() =>
 		Promise.resolve({
@@ -171,21 +216,38 @@ const mountController = ({
 		createPixiMainSceneDragControllerFx({
 			actorStore: {
 				actors,
+				canonicalItems,
 			} as unknown as PixiMainSceneActorStore,
 			animator: {
 				animateFx: (animation) =>
 					Effect.sync(() => {
+						animations.push(animation);
 						animateActor(animation);
-						animation.actor.container.x = animation.toX ?? animation.actor.container.x;
-						animation.actor.container.y = animation.toY ?? animation.actor.container.y;
 					}),
-				cancelFx: () => Effect.sync(cancelAnimation),
+				cancelActorFx: () => Effect.void,
+				cancelChannelFx: (animationActor, channel) =>
+					Effect.sync(() => {
+						cancelChannel(animationActor, channel);
+					}),
+				cancelFx: (ownerKey) =>
+					Effect.sync(() => {
+						cancelAnimation(ownerKey);
+					}),
 				closeFx: Effect.void,
+				setFx: (write) =>
+					Effect.sync(() => {
+						presentationWrites.push(write);
+						if (write.channel !== "pose") return;
+						write.actor.container.position.set(write.x, write.y);
+						if (write.scale !== undefined) {
+							write.actor.container.scale.set(write.scale);
+						}
+					}),
 			} satisfies PixiActorAnimator,
 			application: {
 				app: {
 					canvas: {
-						releasePointerCapture: vi.fn(),
+						releasePointerCapture,
 						setPointerCapture: vi.fn(),
 					},
 				},
@@ -204,6 +266,7 @@ const mountController = ({
 			magneticField: {
 				closeFx: Effect.void,
 				pruneFx: Effect.void,
+				releaseFx: () => Effect.void,
 				resetFx: Effect.void,
 				updateFx: (sample) =>
 					Effect.sync(() => {
@@ -211,6 +274,8 @@ const mountController = ({
 					}),
 			} satisfies PixiTileMagneticField,
 			motion: {
+				beginInteractionHandoffFx: (actorId) =>
+					Effect.sync(() => beginInteractionHandoff(actorId)),
 				closeFx: Effect.void,
 				enqueueFx: () => Effect.void,
 				readSnapshotFx: Effect.succeed({
@@ -225,13 +290,7 @@ const mountController = ({
 			onActivate,
 			onDrop: onDrop as never,
 			surface: {
-				readActorPoseFx: () =>
-					Effect.succeed({
-						layer: transientActorLayer,
-						size: 80,
-						x: 10,
-						y: 20,
-					}),
+				readActorPoseFx: () => Effect.succeed(currentActorPose),
 				readCommandTargetFx: () => Effect.succeed(currentCommandTarget),
 				readDropTargetFx: () =>
 					Effect.succeed({
@@ -254,8 +313,13 @@ const mountController = ({
 	return {
 		actor,
 		actorEvents,
+		actors,
+		animations,
 		animateActor,
+		beginInteractionHandoff,
+		canonicalItems,
 		cancelAnimation,
+		cancelChannel,
 		controller,
 		dropPresentation,
 		finishCursorGrab,
@@ -263,6 +327,11 @@ const mountController = ({
 		onActivate,
 		onAcceptedDrop,
 		onDrop,
+		presentationWrites,
+		releasePointerCapture,
+		setActorPose: (pose: typeof currentActorPose) => {
+			currentActorPose = pose;
+		},
 		setCommandTarget: (target: typeof currentCommandTarget) => {
 			currentCommandTarget = target;
 		},
@@ -272,6 +341,9 @@ const mountController = ({
 		setOccupant: (occupant: TileActorItem | null) => {
 			currentOccupant = occupant;
 		},
+		setItem: (nextItem: TileActorItem) => {
+			actor.item = nextItem;
+		},
 		startCursorGrab,
 		stage,
 		transientActorLayer,
@@ -280,6 +352,16 @@ const mountController = ({
 
 const flushMicrotasks = async () => {
 	for (let index = 0; index < 4; index += 1) await Promise.resolve();
+};
+
+const samplePoseAnimation = (animation: PixiActorAnimation, progress: number) => {
+	if (animation.channel !== "pose" || animation.readPose === undefined) {
+		throw new Error("Expected a semantic pose animation.");
+	}
+	const pose = animation.readPose(progress);
+	animation.actor.container.position.set(pose.x, pose.y);
+	if (pose.scale !== undefined) animation.actor.container.scale.set(pose.scale);
+	return pose;
 };
 
 describe("Pixi main-scene drag controller", () => {
@@ -294,19 +376,19 @@ describe("Pixi main-scene drag controller", () => {
 		expect(onActivate).toHaveBeenCalledWith(item, true, expect.anything());
 	});
 
-	it("allows click activation without transform ownership during a swap", async () => {
+	it("allows click activation without taking transform ownership during canonical motion", async () => {
 		const mounted = mountController({
 			interactionClaimByActorId: new Map([
 				[
 					item.id,
-					"activation-only",
+					"handoff",
 				],
 			]),
 		});
 
 		mounted.actorEvents.emit("pointerdown", pointer(10, 20));
-		mounted.stage.emit("globalpointermove", pointer(70, 80));
-		mounted.stage.emit("pointerup", pointer(70, 80));
+		mounted.stage.emit("globalpointermove", pointer(13, 23));
+		mounted.stage.emit("pointerup", pointer(13, 23));
 		await flushMicrotasks();
 
 		expect(mounted.onActivate).toHaveBeenCalledWith(item, false, expect.anything());
@@ -318,6 +400,173 @@ describe("Pixi main-scene drag controller", () => {
 		expect(mounted.transientActorLayer.addChild).not.toHaveBeenCalled();
 		expect(mounted.actor.container.x).toBe(10);
 		expect(mounted.actor.container.y).toBe(20);
+		expect(mounted.beginInteractionHandoff).not.toHaveBeenCalled();
+	});
+
+	it("supersedes canonical motion at drag threshold without jumping from the live pose", async () => {
+		const mounted = mountController({
+			interactionClaimByActorId: new Map([
+				[
+					item.id,
+					"handoff",
+				],
+			]),
+		});
+		mounted.actorEvents.emit("pointerdown", pointer(10, 20));
+		mounted.actor.container.x = 42;
+		mounted.actor.container.y = 34;
+		mounted.stage.emit("globalpointermove", pointer(30, 20));
+
+		expect(mounted.beginInteractionHandoff).toHaveBeenCalledWith(item.id);
+		expect(mounted.actor.dragging).toBe(true);
+		expect(mounted.actor.container.x).toBe(42);
+		expect(mounted.actor.container.y).toBe(34);
+		expect(mounted.startCursorGrab).toHaveBeenCalledOnce();
+
+		mounted.stage.emit("pointerup", pointer(30, 20));
+		await flushMicrotasks();
+		expect(mounted.onActivate).not.toHaveBeenCalled();
+		expect(mounted.onDrop).toHaveBeenCalledOnce();
+	});
+
+	it("does not reinterpret a failed motion handoff drag as a click", async () => {
+		const claims = new Map<string, "blocked" | "handoff">([
+			[
+				item.id,
+				"handoff",
+			],
+		]);
+		const mounted = mountController({
+			interactionClaimByActorId: claims,
+		});
+		mounted.beginInteractionHandoff.mockReturnValueOnce(false);
+
+		mounted.actorEvents.emit("pointerdown", pointer(10, 20));
+		claims.set(item.id, "blocked");
+		mounted.stage.emit("globalpointermove", pointer(30, 20));
+		mounted.stage.emit("pointerup", pointer(30, 20));
+		await flushMicrotasks();
+
+		expect(mounted.onActivate).not.toHaveBeenCalled();
+		expect(mounted.onDrop).not.toHaveBeenCalled();
+		expect(mounted.startCursorGrab).not.toHaveBeenCalled();
+	});
+
+	it.each([
+		"spawn",
+		"swap",
+	] as const)("does not promote an exiting actor when %s completes between press and drag threshold", async () => {
+		const claims = new Map<string, "blocked" | "handoff">([
+			[
+				item.id,
+				"handoff",
+			],
+		]);
+		const mounted = mountController({
+			interactionClaimByActorId: claims,
+		});
+		mounted.beginInteractionHandoff.mockReturnValueOnce(false);
+
+		mounted.actorEvents.emit("pointerdown", pointer(10, 20));
+		claims.delete(item.id);
+		mounted.actors.delete(item.id);
+		mounted.canonicalItems.delete(item.id);
+		mounted.stage.emit("globalpointermove", pointer(30, 20));
+		mounted.stage.emit("pointerup", pointer(30, 20));
+		await flushMicrotasks();
+
+		expect(mounted.beginInteractionHandoff).not.toHaveBeenCalled();
+		expect(mounted.releasePointerCapture).toHaveBeenCalledWith(1);
+		expect(mounted.actor.dragging).toBe(false);
+		expect(mounted.transientActorLayer.addChild).not.toHaveBeenCalled();
+		expect(mounted.startCursorGrab).not.toHaveBeenCalled();
+		expect(mounted.onActivate).not.toHaveBeenCalled();
+		expect(mounted.onDrop).not.toHaveBeenCalled();
+	});
+
+	it("leaves an active motion cue intact when its canonical actor disappears after press", async () => {
+		const claims = new Map<string, "blocked" | "handoff">([
+			[
+				item.id,
+				"handoff",
+			],
+		]);
+		const mounted = mountController({
+			interactionClaimByActorId: claims,
+		});
+
+		mounted.actorEvents.emit("pointerdown", pointer(10, 20));
+		mounted.canonicalItems.delete(item.id);
+		mounted.stage.emit("globalpointermove", pointer(30, 20));
+		mounted.stage.emit("pointerup", pointer(30, 20));
+		await flushMicrotasks();
+
+		expect(mounted.actors.get(item.id)).toBe(mounted.actor);
+		expect(claims.get(item.id)).toBe("handoff");
+		expect(mounted.beginInteractionHandoff).not.toHaveBeenCalled();
+		expect(mounted.releasePointerCapture).toHaveBeenCalledWith(1);
+		expect(mounted.actor.dragging).toBe(false);
+		expect(mounted.startCursorGrab).not.toHaveBeenCalled();
+		expect(mounted.onActivate).not.toHaveBeenCalled();
+		expect(mounted.onDrop).not.toHaveBeenCalled();
+	});
+
+	it("admits a fresh gesture as soon as an animation interaction claim releases", async () => {
+		const claims = new Map<string, "blocked" | "handoff">([
+			[
+				item.id,
+				"blocked",
+			],
+		]);
+		const mounted = mountController({
+			interactionClaimByActorId: claims,
+		});
+
+		mounted.actorEvents.emit("pointerdown", pointer(10, 20));
+		mounted.stage.emit("pointerup", pointer(10, 20));
+		await flushMicrotasks();
+		expect(mounted.onActivate).not.toHaveBeenCalled();
+
+		claims.delete(item.id);
+		mounted.actorEvents.emit("pointerdown", pointer(10, 20));
+		mounted.stage.emit("pointerup", pointer(10, 20));
+		await flushMicrotasks();
+
+		expect(mounted.onActivate).toHaveBeenCalledOnce();
+	});
+
+	it("activates the latest projected item and immediately admits another click", async () => {
+		const mounted = mountController();
+		let resolveFirstActivation: (() => void) | undefined;
+		mounted.onActivate.mockImplementationOnce(
+			() =>
+				new Promise<void>((resolve) => {
+					resolveFirstActivation = resolve;
+				}),
+		);
+		const completedInstantRun = {
+			...item,
+			revision: "revision:log:instant-complete",
+			running: false,
+		} satisfies TileActorItem;
+
+		mounted.actorEvents.emit("pointerdown", pointer(10, 20));
+		mounted.stage.emit("pointerup", pointer(10, 20));
+		mounted.setItem(completedInstantRun);
+		await flushMicrotasks();
+
+		expect(mounted.onActivate).toHaveBeenCalledWith(
+			completedInstantRun,
+			false,
+			expect.anything(),
+		);
+
+		mounted.actorEvents.emit("pointerdown", pointer(10, 20));
+		mounted.stage.emit("pointerup", pointer(10, 20));
+		await flushMicrotasks();
+
+		expect(mounted.onActivate).toHaveBeenCalledTimes(2);
+		resolveFirstActivation?.();
 	});
 
 	it("exposes an exact pending command actor until the drop resolves", () => {
@@ -333,6 +582,337 @@ describe("Pixi main-scene drag controller", () => {
 				item.id,
 			]),
 		);
+	});
+
+	it("starts an optimistic Inventory removal fade before the drop Promise resolves", async () => {
+		const inventory = createItem("runtime:inventory", 1);
+		const mounted = mountController({
+			targetItems: [
+				inventory,
+			],
+		});
+		previewState.actorKinds.set(inventory.id, "store-inventory");
+		mounted.setOccupant(inventory);
+		mounted.setCommandTarget({
+			kind: "slot",
+			location: inventory.location,
+			occupant: {
+				itemId: inventory.id,
+				revision: inventory.revision,
+			},
+		});
+		let resolveDrop!: (result: runTileDropAtom.Result) => void;
+		mounted.onDrop.mockReturnValueOnce(
+			new Promise<runTileDropAtom.Result>((resolve) => {
+				resolveDrop = resolve;
+			}) as never,
+		);
+
+		mounted.actorEvents.emit("pointerdown", pointer(10, 20));
+		mounted.stage.emit("globalpointermove", pointer(30, 20));
+		mounted.stage.emit("pointerup", pointer(30, 20));
+
+		expect(mounted.actor.lifecycleIntentGeneration).toBe(1);
+		expect(mounted.actor.lifecycleTargetAlpha).toBe(0);
+		expect(mounted.animations).toContainEqual(
+			expect.objectContaining({
+				actor: mounted.actor,
+				channel: "lifecycle-opacity",
+				durationMs: 260,
+				ownerKey: `actor-alpha:${mounted.actor.instanceId}`,
+				toAlpha: 0,
+			}),
+		);
+		expect(Effect.runSync(mounted.dropPresentation.readSnapshotFx).pendingActorIds).toEqual(
+			new Set([
+				item.id,
+			]),
+		);
+		expect(mounted.onAcceptedDrop).not.toHaveBeenCalled();
+
+		resolveDrop({
+			inventory: {
+				itemId: inventory.id,
+				location: inventory.location,
+				revision: inventory.revision,
+			},
+			kind: "store-inventory",
+			source: {
+				canonicalItemId: item.itemId,
+				current: null,
+				itemId: item.id,
+				previousLocation: item.location,
+				previousQuantity: item.quantity,
+				previousRevision: item.revision,
+			},
+		});
+		await flushMicrotasks();
+
+		expect(mounted.onAcceptedDrop).toHaveBeenCalledOnce();
+		expect(
+			mounted.animations.some(
+				(animation) => animation.channel === "lifecycle-opacity" && animation.toAlpha === 1,
+			),
+		).toBe(false);
+	});
+
+	it("restores only the surviving optimistic Inventory actor after a rejected drop", async () => {
+		const inventory = createItem("runtime:inventory", 1);
+		const mounted = mountController({
+			targetItems: [
+				inventory,
+			],
+		});
+		previewState.actorKinds.set(inventory.id, "store-inventory");
+		mounted.setOccupant(inventory);
+		mounted.setCommandTarget({
+			kind: "slot",
+			location: inventory.location,
+			occupant: {
+				itemId: inventory.id,
+				revision: inventory.revision,
+			},
+		});
+		let resolveDrop!: (result: runTileDropAtom.Result) => void;
+		mounted.onDrop.mockReturnValueOnce(
+			new Promise<runTileDropAtom.Result>((resolve) => {
+				resolveDrop = resolve;
+			}) as never,
+		);
+
+		mounted.actorEvents.emit("pointerdown", pointer(10, 20));
+		mounted.stage.emit("globalpointermove", pointer(30, 20));
+		mounted.stage.emit("pointerup", pointer(30, 20));
+		resolveDrop({
+			kind: "reject",
+		} as runTileDropAtom.Result);
+		await flushMicrotasks();
+
+		expect(mounted.actor.lifecycleIntentGeneration).toBe(2);
+		expect(mounted.actor.lifecycleTargetAlpha).toBe(1);
+		expect(mounted.animations).toContainEqual(
+			expect.objectContaining({
+				actor: mounted.actor,
+				channel: "lifecycle-opacity",
+				durationMs: 160,
+				ownerKey: `actor-alpha:${mounted.actor.instanceId}`,
+				toAlpha: 1,
+			}),
+		);
+		expect(
+			mounted.animations.some(
+				(animation) => animation.actor === mounted.actor && animation.channel === "pose",
+			),
+		).toBe(true);
+	});
+
+	it("restores the optimistic Inventory fade after an ignored result", async () => {
+		const inventory = createItem("runtime:inventory", 1);
+		const mounted = mountController({
+			targetItems: [
+				inventory,
+			],
+		});
+		previewState.actorKinds.set(inventory.id, "store-inventory");
+		mounted.setOccupant(inventory);
+		mounted.setCommandTarget({
+			kind: "slot",
+			location: inventory.location,
+			occupant: {
+				itemId: inventory.id,
+				revision: inventory.revision,
+			},
+		});
+		mounted.onDrop.mockResolvedValueOnce({
+			kind: "ignored",
+		} as never);
+
+		mounted.actorEvents.emit("pointerdown", pointer(10, 20));
+		mounted.stage.emit("globalpointermove", pointer(30, 20));
+		mounted.stage.emit("pointerup", pointer(30, 20));
+		await flushMicrotasks();
+
+		expect(mounted.actor.lifecycleTargetAlpha).toBe(1);
+		expect(mounted.animations).toContainEqual(
+			expect.objectContaining({
+				actor: mounted.actor,
+				channel: "lifecycle-opacity",
+				durationMs: 160,
+				toAlpha: 1,
+			}),
+		);
+		expect(mounted.onAcceptedDrop).not.toHaveBeenCalled();
+	});
+
+	it("restores and settles the optimistic Inventory actor after a command error", async () => {
+		const inventory = createItem("runtime:inventory", 1);
+		const mounted = mountController({
+			targetItems: [
+				inventory,
+			],
+		});
+		previewState.actorKinds.set(inventory.id, "store-inventory");
+		mounted.setOccupant(inventory);
+		mounted.setCommandTarget({
+			kind: "slot",
+			location: inventory.location,
+			occupant: {
+				itemId: inventory.id,
+				revision: inventory.revision,
+			},
+		});
+		const error = vi.spyOn(console, "error").mockImplementation(() => undefined);
+		const cause = new Error("drop failed");
+		mounted.onDrop.mockRejectedValueOnce(cause);
+
+		mounted.actorEvents.emit("pointerdown", pointer(10, 20));
+		mounted.stage.emit("globalpointermove", pointer(30, 20));
+		mounted.stage.emit("pointerup", pointer(30, 20));
+		await flushMicrotasks();
+
+		expect(error).toHaveBeenCalledWith("Pixi tile drop failed.", cause);
+		expect(mounted.actor.lifecycleTargetAlpha).toBe(1);
+		expect(mounted.animations).toContainEqual(
+			expect.objectContaining({
+				actor: mounted.actor,
+				channel: "lifecycle-opacity",
+				durationMs: 160,
+				toAlpha: 1,
+			}),
+		);
+		expect(
+			mounted.animations.some(
+				(animation) => animation.actor === mounted.actor && animation.channel === "pose",
+			),
+		).toBe(true);
+	});
+
+	it("does not let a stale rejected result restore a superseded actor lifecycle", async () => {
+		const inventory = createItem("runtime:inventory", 1);
+		const mounted = mountController({
+			targetItems: [
+				inventory,
+			],
+		});
+		previewState.actorKinds.set(inventory.id, "store-inventory");
+		mounted.setOccupant(inventory);
+		mounted.setCommandTarget({
+			kind: "slot",
+			location: inventory.location,
+			occupant: {
+				itemId: inventory.id,
+				revision: inventory.revision,
+			},
+		});
+		let resolveDrop!: (result: runTileDropAtom.Result) => void;
+		mounted.onDrop.mockReturnValueOnce(
+			new Promise<runTileDropAtom.Result>((resolve) => {
+				resolveDrop = resolve;
+			}) as never,
+		);
+
+		mounted.actorEvents.emit("pointerdown", pointer(10, 20));
+		mounted.stage.emit("globalpointermove", pointer(30, 20));
+		mounted.stage.emit("pointerup", pointer(30, 20));
+		mounted.actor.lifecycleIntentGeneration += 1;
+		mounted.actor.lifecycleTargetAlpha = 0;
+		resolveDrop({
+			kind: "reject",
+		} as runTileDropAtom.Result);
+		await flushMicrotasks();
+
+		expect(mounted.actor.lifecycleIntentGeneration).toBe(2);
+		expect(
+			mounted.animations.some(
+				(animation) => animation.channel === "lifecycle-opacity" && animation.toAlpha === 1,
+			),
+		).toBe(false);
+	});
+
+	it("does not let a stale drop callback touch a replacement actor instance", async () => {
+		const inventory = createItem("runtime:inventory", 1);
+		const mounted = mountController({
+			targetItems: [
+				inventory,
+			],
+		});
+		previewState.actorKinds.set(inventory.id, "store-inventory");
+		mounted.setOccupant(inventory);
+		mounted.setCommandTarget({
+			kind: "slot",
+			location: inventory.location,
+			occupant: {
+				itemId: inventory.id,
+				revision: inventory.revision,
+			},
+		});
+		let resolveDrop!: (result: runTileDropAtom.Result) => void;
+		mounted.onDrop.mockReturnValueOnce(
+			new Promise<runTileDropAtom.Result>((resolve) => {
+				resolveDrop = resolve;
+			}) as never,
+		);
+
+		mounted.actorEvents.emit("pointerdown", pointer(10, 20));
+		mounted.stage.emit("globalpointermove", pointer(30, 20));
+		mounted.stage.emit("pointerup", pointer(30, 20));
+		const replacement = {
+			...mounted.actor,
+			dragging: true,
+			instanceId: "test:replacement",
+		} satisfies PixiTileActor;
+		mounted.actors.set(item.id, replacement);
+		resolveDrop({
+			kind: "reject",
+		} as runTileDropAtom.Result);
+		await flushMicrotasks();
+
+		expect(replacement.dragging).toBe(true);
+		expect(mounted.animations.some((animation) => animation.actor === replacement)).toBe(false);
+		expect(
+			mounted.animations.some(
+				(animation) => animation.channel === "lifecycle-opacity" && animation.toAlpha === 1,
+			),
+		).toBe(false);
+	});
+
+	it("ignores a pending Inventory result after the controller closes", async () => {
+		const inventory = createItem("runtime:inventory", 1);
+		const mounted = mountController();
+		previewState.actorKinds.set(inventory.id, "store-inventory");
+		mounted.setOccupant(inventory);
+		mounted.setCommandTarget({
+			kind: "slot",
+			location: inventory.location,
+			occupant: {
+				itemId: inventory.id,
+				revision: inventory.revision,
+			},
+		});
+		let resolveDrop!: (result: runTileDropAtom.Result) => void;
+		mounted.onDrop.mockReturnValueOnce(
+			new Promise<runTileDropAtom.Result>((resolve) => {
+				resolveDrop = resolve;
+			}) as never,
+		);
+
+		mounted.actorEvents.emit("pointerdown", pointer(10, 20));
+		mounted.stage.emit("globalpointermove", pointer(30, 20));
+		mounted.stage.emit("pointerup", pointer(30, 20));
+		await Promise.resolve();
+		expect(mounted.onDrop).toHaveBeenCalledOnce();
+		Effect.runSync(mounted.controller.closeFx);
+		resolveDrop({
+			kind: "reject",
+		} as runTileDropAtom.Result);
+		await flushMicrotasks();
+
+		expect(mounted.onAcceptedDrop).not.toHaveBeenCalled();
+		expect(
+			mounted.animations.some(
+				(animation) => animation.channel === "lifecycle-opacity" && animation.toAlpha === 1,
+			),
+		).toBe(false);
 	});
 
 	it("freezes the command target at release and suppresses callbacks after close", async () => {
@@ -381,12 +961,59 @@ describe("Pixi main-scene drag controller", () => {
 		mounted.stage.emit("pointerup", pointer(45, 20));
 		await flushMicrotasks();
 
+		const settleAnimation = mounted.animations.at(-1);
+		if (settleAnimation === undefined) throw new Error("Expected a settle animation.");
+		samplePoseAnimation(settleAnimation, 1);
 		expect(mounted.onAcceptedDrop).not.toHaveBeenCalled();
 		expect(mounted.actor.container.x).toBe(10);
 		expect(mounted.actor.container.y).toBe(20);
 		expect(mounted.actor.dragging).toBe(false);
 		expect(mounted.actor.container.zIndex).toBe(0);
 		expect(mounted.actor.container.cursor).toBe("grab");
+	});
+
+	it("retargets a running settle from its live frame without a resize or completion snap", async () => {
+		const mounted = mountController();
+		mounted.actorEvents.emit("pointerdown", pointer(10, 20));
+		mounted.stage.emit("globalpointermove", pointer(45, 20));
+		mounted.onDrop.mockResolvedValueOnce({
+			kind: "reject",
+		} as never);
+		mounted.stage.emit("pointerup", pointer(45, 20));
+		await flushMicrotasks();
+
+		const settleAnimation = mounted.animations.at(-1);
+		if (settleAnimation === undefined) throw new Error("Expected a settle animation.");
+		const beforeResize = samplePoseAnimation(settleAnimation, 0.4);
+		expect(beforeResize).toEqual({
+			scale: 1,
+			x: 31,
+			y: 20,
+		});
+
+		mounted.setActorPose({
+			layer: mounted.transientActorLayer,
+			size: 120,
+			x: 200,
+			y: 100,
+		});
+		expect(samplePoseAnimation(settleAnimation, 0.4)).toEqual(beforeResize);
+		const afterResize = samplePoseAnimation(settleAnimation, 0.7);
+		expect(afterResize.scale).toBeCloseTo(1.25);
+		expect(afterResize.x).toBeCloseTo(115.5);
+		expect(afterResize.y).toBeCloseTo(60);
+		const destination = samplePoseAnimation(settleAnimation, 1);
+		expect(destination).toEqual({
+			scale: 1.5,
+			x: 200,
+			y: 100,
+		});
+		settleAnimation.onComplete?.();
+		expect(mounted.actor.container).toMatchObject({
+			x: destination.x,
+			y: destination.y,
+		});
+		expect(mounted.actor.container.scale.x).toBe(destination.scale);
 	});
 
 	it("derives neutral responders from engine previews before attracting the hovered target", () => {

@@ -1,8 +1,10 @@
 import { Effect } from "effect";
 
+import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
 import { readPixiTileActorCursorFx } from "~/ui/pixi/actor/readPixiTileActorCursorFx";
 import type { PixiActorAnimator } from "~/ui/pixi/animation/PixiActorAnimator";
+import { createPixiRetargetablePoseSamplerFx } from "~/ui/pixi/animation/createPixiRetargetablePoseSamplerFx";
 import { readPixiTileTravelDurationMsFx } from "~/ui/pixi/animation/readPixiTileTravelDurationMsFx";
 import type { PixiMainSceneSurface } from "~/ui/pixi/scene/PixiMainSceneSurface";
 
@@ -34,11 +36,26 @@ export const settlePixiMainSceneDraggedActorFx = Effect.fn("settlePixiMainSceneD
 			toX: pose.x,
 			toY: pose.y,
 		});
+		const readPose = yield* createPixiRetargetablePoseSamplerFx({
+			from: {
+				scale: actor.container.scale.x,
+				x: actor.container.x,
+				y: actor.container.y,
+			},
+			readTarget: () => {
+				const latest = RendererRuntime.runSync(surface.readActorPoseFx(actor.item)) ?? pose;
+				return {
+					scale: latest.size / Math.max(1, actor.size),
+					x: latest.x,
+					y: latest.y,
+				};
+			},
+		});
 		yield* animator.animateFx({
 			actor,
+			channel: "pose",
 			durationMs,
-			toX: pose.x,
-			toY: pose.y,
+			readPose,
 		});
 	},
 );

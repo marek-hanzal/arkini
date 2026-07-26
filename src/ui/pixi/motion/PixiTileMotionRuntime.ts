@@ -2,7 +2,7 @@ import type { Effect } from "effect";
 
 import type { TileMotionCue } from "~/bridge/tile/motion/TileMotionCue";
 
-export type PixiTileInteractionClaim = "activation-only" | "blocked";
+export type PixiTileInteractionClaim = "blocked" | "handoff";
 
 export interface PixiTileMotionSnapshot {
 	readonly interactionClaimByActorId: ReadonlyMap<string, PixiTileInteractionClaim>;
@@ -19,6 +19,8 @@ export interface PixiTileMotionSnapshot {
 }
 
 export interface PixiTileMotionRuntime {
+	/** Releases interruptible spawn or swap ownership at its live pose for direct interaction. */
+	readonly beginInteractionHandoffFx: (actorId: string) => Effect.Effect<boolean>;
 	readonly enqueueFx: (cues: ReadonlyArray<TileMotionCue>) => Effect.Effect<void>;
 	readonly readSnapshotFx: Effect.Effect<PixiTileMotionSnapshot>;
 	readonly startFx: Effect.Effect<void>;

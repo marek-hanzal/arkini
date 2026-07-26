@@ -1,12 +1,15 @@
 import { Effect } from "effect";
-import { match } from "ts-pattern";
+import { match, P } from "ts-pattern";
 
+import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import type { TileMotionCue } from "~/bridge/tile/motion/TileMotionCue";
 import type { PixiMainSceneActorStore } from "~/ui/pixi/actor/PixiMainSceneActorStore";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
 import type { PixiActorAnimator } from "~/ui/pixi/animation/PixiActorAnimator";
+import { startPixiTileActorFadeInFx } from "~/ui/pixi/animation/startPixiTileActorFadeInFx";
 import type { PixiScenePalette } from "~/ui/pixi/appearance/PixiScenePalette";
 import type { TileSceneHandoff } from "~/ui/pixi/handoff/TileSceneHandoff";
+import type { PixiTileMagneticField } from "~/ui/pixi/magnet/PixiTileMagneticField";
 import { readPixiTileMotionOriginFx } from "~/ui/pixi/motion/readPixiTileMotionOriginFx";
 import { runPixiSpawnMotionFx } from "~/ui/pixi/motion/runPixiSpawnMotionFx";
 import { runPixiStackMotionFx } from "~/ui/pixi/motion/runPixiStackMotionFx";
@@ -23,7 +26,12 @@ export namespace runPixiTileMotionCueFx {
 		readonly application: PixiApplicationOwner;
 		readonly cue: TileMotionCue;
 		readonly cueKey: string;
+		readonly magneticField: PixiTileMagneticField;
 		readonly onComplete: () => void;
+		readonly onMagneticSourceAcquired: (actorId: string) => void;
+		readonly onMagneticSourceReleased: (actorId: string) => void;
+		readonly onSwapLegSettled: (actorId: string) => void;
+		readonly onSwapLegStarted: (actorId: string) => void;
 		readonly onTransientCreated: (actor: PixiTileActor) => void;
 		readonly readHandoff: () => TileSceneHandoff | null;
 		readonly readPalette: () => PixiScenePalette;
@@ -39,7 +47,12 @@ export const runPixiTileMotionCueFx = Effect.fn("runPixiTileMotionCueFx")(functi
 	application,
 	cue,
 	cueKey,
+	magneticField,
 	onComplete,
+	onMagneticSourceAcquired,
+	onMagneticSourceReleased,
+	onSwapLegSettled,
+	onSwapLegStarted,
 	onTransientCreated,
 	readHandoff,
 	readPalette,
@@ -63,93 +76,144 @@ export const runPixiTileMotionCueFx = Effect.fn("runPixiTileMotionCueFx")(functi
 			target,
 		});
 	}
-	if (origin === null || target === null) {
-		match(cue)
-			.with(
-				{
-					kind: "spawn",
-				},
-				(spawn) => {
-					const actor = actorStore.actors.get(spawn.actorId);
-					if (actor === undefined || target === null) return;
-					target.layer.addChild(actor.container);
-					actor.container.x = target.x;
-					actor.container.y = target.y;
-					actor.container.alpha = 1;
-				},
-			)
-			.with(
-				{
-					kind: "stack",
-				},
-				() => {},
-			)
-			.with(
-				{
-					kind: "swap",
-				},
-				() => {},
-			)
-			.exhaustive();
-		onComplete();
-		return;
-	}
-	const delayMs = (yield* readTileMotionStaggerDelaySecondsFx(cue.staggerIndex)) * 1000;
-	return yield* match(cue)
+	return yield* match({
+		origin,
+		target,
+	})
 		.with(
 			{
-				kind: "spawn",
+				origin: P.nonNullable,
+				target: P.nonNullable,
 			},
-			(spawn) =>
-				runPixiSpawnMotionFx({
-					actorStore,
-					animator,
-					cue: spawn,
-					cueKey,
-					delayMs,
-					onComplete,
-					origin,
-					surface,
-					target,
+			({ origin, target }) =>
+				Effect.gen(function* () {
+					const delayMs =
+						(yield* readTileMotionStaggerDelaySecondsFx(cue.staggerIndex)) * 1000;
+					return yield* match(cue)
+						.with(
+							{
+								kind: "spawn",
+							},
+							(spawn) =>
+								runPixiSpawnMotionFx({
+									actorStore,
+									animator,
+									cue: spawn,
+									cueKey,
+									delayMs,
+									magneticField,
+									onComplete,
+									onMagneticSourceAcquired,
+									onMagneticSourceReleased,
+									origin,
+									surface,
+									target,
+								}),
+						)
+						.with(
+							{
+								kind: "stack",
+							},
+							(stack) =>
+								runPixiStackMotionFx({
+									actorStore,
+									animator,
+									application,
+									cue: stack,
+									cueKey,
+									delayMs,
+									magneticField,
+									onComplete,
+									onMagneticSourceAcquired,
+									onMagneticSourceReleased,
+									onTransientCreated,
+									origin,
+									readPalette,
+									surface,
+									target,
+									textures,
+								}),
+						)
+						.with(
+							{
+								kind: "swap",
+							},
+							(swap) =>
+								runPixiSwapMotionFx({
+									actorStore,
+									animator,
+									cue: swap,
+									cueKey,
+									delayMs,
+									magneticField,
+									onComplete,
+									onMagneticSourceAcquired,
+									onMagneticSourceReleased,
+									onSwapLegSettled,
+									onSwapLegStarted,
+									origin,
+									surface,
+									target,
+								}),
+						)
+						.exhaustive();
 				}),
 		)
 		.with(
 			{
-				kind: "stack",
+				origin: null,
+				target: P.nonNullable,
 			},
-			(stack) =>
-				runPixiStackMotionFx({
-					actorStore,
-					animator,
-					application,
-					cue: stack,
-					cueKey,
-					delayMs,
-					onComplete,
-					onTransientCreated,
-					origin,
-					readPalette,
-					surface,
-					target,
-					textures,
+			({ target }) =>
+				Effect.sync(() => {
+					match(cue)
+						.with(
+							{
+								kind: "spawn",
+							},
+							(spawn) => {
+								const actor = actorStore.actors.get(spawn.actorId);
+								if (actor === undefined) return;
+								target.layer.addChild(actor.container);
+								RendererRuntime.runSync(
+									animator.setFx({
+										actor,
+										channel: "pose",
+										scale: 1,
+										x: target.x,
+										y: target.y,
+									}),
+								);
+								RendererRuntime.runSync(
+									startPixiTileActorFadeInFx({
+										actor,
+										animator,
+										delayMs: 0,
+									}),
+								);
+							},
+						)
+						.with(
+							{
+								kind: "stack",
+							},
+							() => {},
+						)
+						.with(
+							{
+								kind: "swap",
+							},
+							() => {},
+						)
+						.exhaustive();
+					onComplete();
 				}),
 		)
 		.with(
 			{
-				kind: "swap",
+				target: null,
 			},
-			(swap) =>
-				runPixiSwapMotionFx({
-					actorStore,
-					animator,
-					cue: swap,
-					cueKey,
-					delayMs,
-					onComplete,
-					origin,
-					surface,
-					target,
-				}),
+			() => Effect.sync(onComplete),
 		)
 		.exhaustive();
 });

@@ -1,4 +1,5 @@
 import { Effect } from "effect";
+import { Container, Sprite, Texture } from "pixi.js";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { GameEngine } from "~/bridge/game/GameEngine";
@@ -6,7 +7,15 @@ import type { runTileDropAtom } from "~/bridge/tile/runTileDropAtom";
 import type { TileActorItem } from "~/bridge/tile/TileActorItem";
 import type { PixiMainSceneActorStore } from "~/ui/pixi/actor/PixiMainSceneActorStore";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
-import type { PixiActorAnimation, PixiActorAnimator } from "~/ui/pixi/animation/PixiActorAnimator";
+import type { PixiTileActorVisual } from "~/ui/pixi/actor/PixiTileActorVisual";
+import { completePixiTileActorVisualTextureLoadFx } from "~/ui/pixi/actor/PixiTileActorVisualReadiness";
+import { destroyPixiTileActorFx } from "~/ui/pixi/actor/destroyPixiTileActorFx";
+import type {
+	PixiActorAnimation,
+	PixiActorAnimationChannel,
+	PixiActorAnimator,
+	PixiActorPresentationWrite,
+} from "~/ui/pixi/animation/PixiActorAnimator";
 import type { PixiMainSceneDragController } from "~/ui/pixi/drag/PixiMainSceneDragController";
 import { createPixiMainSceneDropPresentationFx } from "~/ui/pixi/drop/createPixiMainSceneDropPresentationFx";
 import type { PixiTileMagneticField } from "~/ui/pixi/magnet/PixiTileMagneticField";
@@ -14,11 +23,25 @@ import type { PixiTileMotionRuntime } from "~/ui/pixi/motion/PixiTileMotionRunti
 import type { PixiApplicationOwner } from "~/ui/pixi/runtime/PixiApplicationOwner";
 import { createPixiMainSceneReconcilerFx } from "~/ui/pixi/scene/createPixiMainSceneReconcilerFx";
 import type { PixiMainSceneSurface } from "~/ui/pixi/scene/PixiMainSceneSurface";
+import { replacementCrossfadeDurationMs } from "~/ui/pixi/scene/runPixiMainSceneReplacementsFx";
 
 const projectionState = vi.hoisted(() => ({
+	cues: [] as unknown[],
+	feedback: [] as unknown[],
 	inventory: [] as unknown[],
 	main: [] as unknown[],
 	replacements: [] as unknown[],
+}));
+
+vi.mock("~/bridge/tile/feedback/readTileActorFeedbackCuesFx", async () => {
+	const { Effect: EffectModule } = await import("effect");
+	return {
+		readTileActorFeedbackCuesFx: () => EffectModule.succeed(projectionState.feedback),
+	};
+});
+
+const createdVisualState = vi.hoisted(() => ({
+	created: [] as unknown[],
 }));
 
 vi.mock("~/bridge/tile/readTileActorsFx", () => ({
@@ -38,41 +61,35 @@ vi.mock("~/bridge/tile/motion/readCommittedTileReplacementsFx", async () => {
 vi.mock("~/bridge/tile/motion/readTileMotionCuesFx", async () => {
 	const { Effect: EffectModule } = await import("effect");
 	return {
-		readTileMotionCuesFx: () => EffectModule.succeed([]),
+		readTileMotionCuesFx: () => EffectModule.succeed(projectionState.cues),
 	};
 });
 
-vi.mock("~/ui/pixi/actor/createPixiTileActorFx", async () => {
+vi.mock("~/ui/pixi/actor/createPixiTileActorVisualFx", async () => {
 	const { Effect: EffectModule } = await import("effect");
+	const { Container: PixiContainer } = await import("pixi.js");
 	return {
-		createPixiTileActorFx: ({ item }: { readonly item: TileActorItem }) =>
+		createPixiTileActorVisualFx: ({
+			item,
+			size,
+		}: {
+			readonly item: TileActorItem;
+			readonly size: number;
+		}) =>
 			EffectModule.sync(() => {
-				const container = {
-					alpha: 1,
-					destroyed: false,
-					destroy: vi.fn(function (this: {
-						destroyed: boolean;
-					}) {
-						this.destroyed = true;
+				const visual = {
+					container: new PixiContainer({
+						eventMode: "none",
+						label: `TestVisual:${item.revision}`,
 					}),
-					eventMode: "static",
-					scale: {
-						set: vi.fn(),
-					},
-					x: 0,
-					y: 0,
-				};
-				return {
-					container,
-					crowdLayer: {
-						alpha: item.running ? 0.82 : 1,
-					},
-					dragging: false,
 					item,
-					onPointerDown: null,
-					size: 0,
-					textureGeneration: 0,
+					readyListeners: new Set(),
+					size,
+					textureGeneration: 1,
+					textureState: "loading",
 				};
+				createdVisualState.created.push(visual);
+				return visual;
 			}),
 	};
 });
@@ -90,10 +107,8 @@ vi.mock("~/ui/pixi/actor/updatePixiTileActorFx", async () => {
 			readonly size: number;
 		}) =>
 			EffectModule.sync(() => {
-				const runningChanged = actor.item.running !== item.running;
 				actor.item = item;
 				actor.size = size;
-				if (runningChanged) actor.crowdLayer.alpha = item.running ? 0.82 : 1;
 			}),
 	};
 });
@@ -115,7 +130,11 @@ const inventoryLocation = {
 	},
 };
 
-const createItem = (id: string, location: TileActorItem["location"]): TileActorItem => ({
+const createItem = (
+	id: string,
+	location: TileActorItem["location"],
+	overrides: Partial<TileActorItem> = {},
+): TileActorItem => ({
 	compositeUrl: undefined,
 	id,
 	itemId: "water",
@@ -126,83 +145,101 @@ const createItem = (id: string, location: TileActorItem["location"]): TileActorI
 	quantity: 3,
 	revision: `revision:${id}`,
 	running: false,
+	runningGlow: false,
 	sourceUrl: "resource:water",
 	title: "Water",
+	...overrides,
 });
 
-const createActor = (item: TileActorItem) => {
-	const container = {
-		alpha: 1,
-		destroyed: false,
-		destroy: vi.fn(function (this: {
-			destroyed: boolean;
-		}) {
-			this.destroyed = true;
+const createVisual = (
+	item: TileActorItem,
+	textureState: PixiTileActorVisual["textureState"] = "ready",
+) =>
+	({
+		container: new Container({
+			eventMode: "none",
+			label: `CurrentVisual:${item.revision}`,
 		}),
-		scale: {
-			set: vi.fn(),
-		},
-		x: 40,
-		y: 60,
-	};
-	return {
-		container,
-		crowdLayer: {
-			alpha: 1,
-		},
-		dragging: true,
 		item,
-		onPointerDown: null,
+		readyListeners: new Set(),
 		size: 80,
-		textureGeneration: 0,
-	} as unknown as PixiTileActor;
+		textureGeneration: 1,
+		textureState,
+	}) as unknown as PixiTileActorVisual;
+
+const createActor = (item: TileActorItem): PixiTileActor => {
+	const container = new Container({
+		eventMode: "static",
+	});
+	container.alpha = 1;
+	container.position.set(40, 60);
+	const offsetLayer = new Container();
+	const crowdLayer = new Container();
+	const visualLayer = new Container();
+	const runningGlow = new Sprite(Texture.EMPTY);
+	const currentVisual = createVisual(item);
+	visualLayer.addChild(currentVisual.container);
+	crowdLayer.addChild(visualLayer);
+	offsetLayer.addChild(runningGlow, crowdLayer);
+	container.addChild(offsetLayer);
+	return {
+		instanceId: `test:${item.id}`,
+		container,
+		offsetLayer,
+		crowdLayer,
+		visualLayer,
+		runningGlow,
+		visuals: new Set([
+			currentVisual,
+		]),
+		currentVisual,
+		pendingVisual: null,
+		item,
+		size: 80,
+		visualTransitionGeneration: 0,
+		lifecycleIntentGeneration: 0,
+		lifecycleFadeStarted: false,
+		lifecycleTargetAlpha: 1,
+		lifecycleNotBeforeMs: 0,
+		lifecycleDurationMs: 0,
+		dragging: false,
+		dragOffsetX: 0,
+		dragOffsetY: 0,
+		onPointerDown: null,
+	} satisfies PixiTileActor;
 };
 
-beforeEach(() => {
-	projectionState.main = [];
-	projectionState.inventory = [];
-	projectionState.replacements = [];
-});
-
-describe("Pixi main-scene reconciliation", () => {
-	it("retains a pending source across an earlier transition, then destroys the exact pure Inventory source", () => {
-		const source = createItem("runtime:water-source", boardLocation);
-		const inventorySpawn = createItem("runtime:water-inventory-new-id", inventoryLocation);
-		const actor = createActor(source);
-		const actors = new Map([
-			[
-				source.id,
-				actor,
-			],
-		]);
-		const canonicalItems = new Map([
-			[
-				source.id,
-				source,
-			],
-		]);
-		const detachActor = vi.fn();
-		const deleteActor = vi.fn();
-		const animate = vi.fn<(animation: PixiActorAnimation) => void>();
-		const cancel = vi.fn<(animationKey: string) => void>();
-		const invalidate = vi.fn();
-		const dropPresentation = Effect.runSync(createPixiMainSceneDropPresentationFx());
-		const dropGeneration = Effect.runSync(
-			dropPresentation.beginFx({
-				sourceActorId: source.id,
-				swapCandidate: null,
-			}),
-		);
-		const actorStore = {
+const createActorStore = (actor: PixiTileActor) => {
+	const actors = new Map([
+		[
+			actor.item.id,
+			actor,
+		],
+	]);
+	const canonicalItems = new Map([
+		[
+			actor.item.id,
+			actor.item,
+		],
+	]);
+	const exitingActors = new Set<PixiTileActor>();
+	return {
+		actors,
+		canonicalItems,
+		store: {
 			actors,
 			canonicalItems,
 			closeFx: Effect.void,
 			deleteActorFx: (actorId: string) =>
 				Effect.sync(() => {
-					deleteActor(actorId);
-					const current = actors.get(actorId) ?? null;
+					const deleted = actors.get(actorId) ?? null;
 					actors.delete(actorId);
-					return current;
+					return deleted;
+				}),
+			destroyExitingActorFx: (exitingActor: PixiTileActor) =>
+				Effect.gen(function* () {
+					exitingActors.delete(exitingActor);
+					yield* destroyPixiTileActorFx(exitingActor);
 				}),
 			readActorFx: (actorId: string) => Effect.succeed(actors.get(actorId) ?? null),
 			readCanonicalItemFx: (actorId: string) =>
@@ -212,97 +249,246 @@ describe("Pixi main-scene reconciliation", () => {
 					canonicalItems.clear();
 					for (const item of items) canonicalItems.set(item.id, item);
 				}),
+			releaseActorFx: (actorId: string) =>
+				Effect.sync(() => {
+					const released = actors.get(actorId) ?? null;
+					actors.delete(actorId);
+					if (released !== null) exitingActors.add(released);
+					return released;
+				}),
 			setActorFx: (nextActor: PixiTileActor) =>
 				Effect.sync(() => {
 					actors.set(nextActor.item.id, nextActor);
 				}),
-		} satisfies PixiMainSceneActorStore;
-		const drag = {
+		} satisfies PixiMainSceneActorStore,
+	};
+};
+
+const createAnimator = () => {
+	const animations: PixiActorAnimation[] = [];
+	const canceledActors: PixiTileActor[] = [];
+	const canceledChannels: Array<{
+		readonly actor: PixiTileActor;
+		readonly channel: PixiActorAnimationChannel;
+	}> = [];
+	const canceledOwners: string[] = [];
+	const writes: PixiActorPresentationWrite[] = [];
+	return {
+		animations,
+		canceledActors,
+		canceledChannels,
+		canceledOwners,
+		writes,
+		animator: {
+			animateFx: (animation) =>
+				Effect.sync(() => {
+					animations.push(animation);
+				}),
+			cancelActorFx: (actor) =>
+				Effect.sync(() => {
+					canceledActors.push(actor);
+				}),
+			cancelChannelFx: (actor, channel) =>
+				Effect.sync(() => {
+					canceledChannels.push({
+						actor,
+						channel,
+					});
+				}),
+			cancelFx: (ownerKey) =>
+				Effect.sync(() => {
+					canceledOwners.push(ownerKey);
+				}),
+			closeFx: Effect.void,
+			setFx: (write) =>
+				Effect.sync(() => {
+					writes.push(write);
+					switch (write.channel) {
+						case "pose":
+							write.actor.container.position.set(write.x, write.y);
+							if (write.scale !== undefined)
+								write.actor.container.scale.set(write.scale);
+							break;
+						case "lifecycle-opacity":
+							write.actor.container.alpha = write.alpha;
+							break;
+						case "crowd-opacity":
+							write.actor.crowdLayer.alpha = write.alpha;
+							break;
+						case "glow-opacity":
+							if (write.alpha !== undefined)
+								write.actor.runningGlow.alpha = write.alpha;
+							if (write.visible !== undefined)
+								write.actor.runningGlow.visible = write.visible;
+							break;
+					}
+				}),
+		} satisfies PixiActorAnimator,
+	};
+};
+
+const createDrag = () => {
+	const detached: PixiTileActor[] = [];
+	return {
+		detached,
+		drag: {
 			attachActorFx: () => Effect.void,
 			cancelInteractionFx: Effect.void,
 			closeFx: Effect.void,
-			detachActorFx: (target: PixiTileActor) =>
+			detachActorFx: (actor: PixiTileActor) =>
 				Effect.sync(() => {
-					detachActor(target);
+					detached.push(actor);
 				}),
 			refreshPreviewFx: Effect.void,
 			setInteractionBlockedFx: () => Effect.void,
-		} satisfies PixiMainSceneDragController;
-		const animator = {
-			animateFx: (animation) =>
-				Effect.sync(() => {
-					animate(animation);
-				}),
-			cancelFx: (animationKey) =>
-				Effect.sync(() => {
-					cancel(animationKey);
-				}),
-			closeFx: Effect.void,
-		} satisfies PixiActorAnimator;
-		const game = {
-			readOrThrow: (query: unknown) => {
-				const projection = query as {
-					readonly kind: "tile-actors";
-					readonly surface: "inventory" | "main";
-				};
-				if (projection.kind !== "tile-actors") throw new Error("Unexpected game read.");
-				return projectionState[projection.surface];
+		} satisfies PixiMainSceneDragController,
+	};
+};
+
+const createMotion = () =>
+	({
+		beginInteractionHandoffFx: () => Effect.succeed(false),
+		closeFx: Effect.void,
+		enqueueFx: () => Effect.void,
+		readSnapshotFx: Effect.succeed({
+			interactionClaimByActorId: new Map(),
+			spawnCueByActorId: new Map(),
+			unsettledQuantities: new Map(),
+		}),
+		startFx: Effect.void,
+		syncQuantitiesFx: Effect.void,
+	}) satisfies PixiTileMotionRuntime;
+
+const createReconcilerHarness = ({
+	actor,
+	readPose = true,
+}: {
+	readonly actor: PixiTileActor;
+	readonly readPose?: boolean;
+}) => {
+	const { actors, canonicalItems, store } = createActorStore(actor);
+	const animatorHarness = createAnimator();
+	const dragHarness = createDrag();
+	const invalidate = vi.fn();
+	const layer = new Container();
+	const dropPresentation = Effect.runSync(createPixiMainSceneDropPresentationFx());
+	const game = {
+		readOrThrow: (query: unknown) => {
+			const projection = query as {
+				readonly kind: "tile-actors";
+				readonly surface: "inventory" | "main";
+			};
+			if (projection.kind !== "tile-actors") throw new Error("Unexpected game read.");
+			return projectionState[projection.surface];
+		},
+	} as unknown as GameEngine;
+	const reconciler = Effect.runSync(
+		createPixiMainSceneReconcilerFx({
+			actorStore: store,
+			animator: animatorHarness.animator,
+			application: {
+				frames: {
+					invalidateFx: Effect.sync(invalidate),
+				},
+			} as unknown as PixiApplicationOwner,
+			drag: dragHarness.drag,
+			dropPresentation,
+			game,
+			magneticField: {
+				closeFx: Effect.void,
+				pruneFx: Effect.void,
+				releaseFx: () => Effect.void,
+				resetFx: Effect.void,
+				updateFx: () => Effect.void,
+			} satisfies PixiTileMagneticField,
+			motion: createMotion(),
+			readPalette: () => ({}) as never,
+			runningGlowTexture: {
+				closeFx: Effect.void,
+				texture: Texture.EMPTY,
 			},
-		} as unknown as GameEngine;
-		const motion = {
-			closeFx: Effect.void,
-			enqueueFx: () => Effect.void,
-			readSnapshotFx: Effect.succeed({
-				interactionClaimByActorId: new Map(),
-				spawnCueByActorId: new Map(),
-				unsettledQuantities: new Map(),
-			}),
-			startFx: Effect.void,
-			syncQuantitiesFx: Effect.void,
-		} satisfies PixiTileMotionRuntime;
-		const reconciler = Effect.runSync(
-			createPixiMainSceneReconcilerFx({
-				actorStore,
-				animator,
-				application: {
-					frames: {
-						invalidateFx: Effect.sync(invalidate),
-					},
-				} as unknown as PixiApplicationOwner,
-				drag,
-				dropPresentation,
-				game,
-				magneticField: {
-					closeFx: Effect.void,
-					pruneFx: Effect.void,
-					resetFx: Effect.void,
-					updateFx: () => Effect.void,
-				} satisfies PixiTileMagneticField,
-				motion,
-				readPalette: () => ({}) as never,
-				surface: {
-					readActorPoseFx: () => Effect.succeed(null),
-				} as unknown as PixiMainSceneSurface,
-				textures: {} as never,
+			surface: {
+				readActorPoseFx: () =>
+					Effect.succeed(
+						readPose
+							? {
+									layer,
+									size: 80,
+									x: 40,
+									y: 60,
+								}
+							: null,
+					),
+				transientActorLayer: layer,
+			} as unknown as PixiMainSceneSurface,
+			textures: {} as never,
+		}),
+	);
+	return {
+		...animatorHarness,
+		...dragHarness,
+		actors,
+		canonicalItems,
+		dropPresentation,
+		invalidate,
+		layer,
+		reconciler,
+	};
+};
+
+const transition = (sequence: number) =>
+	({
+		events: [],
+		previousRuntime: {},
+		runtime: {},
+		sequence,
+	}) as unknown as ReturnType<GameEngine["getTransitionSnapshot"]>;
+
+beforeEach(() => {
+	projectionState.cues = [];
+	projectionState.feedback = [];
+	projectionState.main = [];
+	projectionState.inventory = [];
+	projectionState.replacements = [];
+	createdVisualState.created = [];
+});
+
+describe("Pixi main-scene reconciliation", () => {
+	it("retains a pending source, then fades it while glowing the Inventory receiver", () => {
+		const now = vi.spyOn(performance, "now").mockReturnValue(1_000);
+		const source = createItem("runtime:water-source", boardLocation);
+		const inventorySpawn = createItem("runtime:water-inventory-new-id", inventoryLocation);
+		const inventory = createItem("runtime:backpack", boardLocation);
+		const actor = createActor(source);
+		const harness = createReconcilerHarness({
+			actor,
+		});
+		const inventoryActor = createActor(inventory);
+		harness.actors.set(inventory.id, inventoryActor);
+		harness.canonicalItems.set(inventory.id, inventory);
+		const dropGeneration = Effect.runSync(
+			harness.dropPresentation.beginFx({
+				sourceActorId: source.id,
+				swapCandidate: null,
 			}),
 		);
 		projectionState.inventory = [
 			inventorySpawn,
 		];
-		const committedAfterStore = {
-			events: [],
-			previousRuntime: null,
-			runtime: {},
-			sequence: 2,
-		} as unknown as ReturnType<GameEngine["getTransitionSnapshot"]>;
+		projectionState.main = [
+			inventory,
+		];
+		actor.container.alpha = 0.37;
+		actor.lifecycleDurationMs = 260;
+		actor.lifecycleFadeStarted = true;
+		actor.lifecycleNotBeforeMs = 900;
+		actor.lifecycleTargetAlpha = 0;
 
-		Effect.runSync(reconciler.reconcileFx(committedAfterStore));
-
-		expect(actors.get(source.id)).toBe(actor);
-		expect(detachActor).not.toHaveBeenCalled();
-		expect(deleteActor).not.toHaveBeenCalled();
-		expect(animate).not.toHaveBeenCalled();
-		expect(actor.container.destroyed).toBe(false);
+		Effect.runSync(harness.reconciler.reconcileFx(transition(2)));
+		expect(harness.actors.get(source.id)).toBe(actor);
+		expect(harness.detached).toEqual([]);
+		expect(harness.animations).toEqual([]);
+		expect(actor.container.alpha).toBe(0.37);
 
 		const result = {
 			kind: "store-inventory",
@@ -321,168 +507,198 @@ describe("Pixi main-scene reconciliation", () => {
 			},
 		} satisfies runTileDropAtom.Result;
 		Effect.runSync(
-			dropPresentation.completeFx({
+			harness.dropPresentation.completeFx({
 				generation: dropGeneration,
 				result,
 			}),
 		);
-		Effect.runSync(reconciler.reconcileFx(committedAfterStore));
+		Effect.runSync(harness.reconciler.reconcileFx(transition(2)));
 
-		expect(actors.has(source.id)).toBe(false);
-		expect(detachActor).toHaveBeenCalledExactlyOnceWith(actor);
-		expect(deleteActor).toHaveBeenCalledExactlyOnceWith(source.id);
-		expect(cancel.mock.calls).toEqual([
-			[
-				source.id,
-			],
-			[
-				`running:${source.id}`,
-			],
-			[
-				`replacement-alpha:${source.id}`,
-			],
+		expect(harness.actors.has(source.id)).toBe(false);
+		expect(harness.detached).toEqual([
+			actor,
 		]);
-		expect(animate).not.toHaveBeenCalled();
-		expect(actor.container.destroyed).toBe(true);
-		expect(invalidate).toHaveBeenCalledOnce();
+		expect(harness.canceledActors).toEqual([
+			actor,
+		]);
+		expect(actor.container.alpha).toBe(0.37);
+		expect(actor.container.destroyed).toBe(false);
+		expect(harness.animations).toContainEqual(
+			expect.objectContaining({
+				actor,
+				channel: "lifecycle-opacity",
+				durationMs: 160,
+				toAlpha: 0,
+			}),
+		);
+		expect(harness.animations).toContainEqual(
+			expect.objectContaining({
+				actor: inventoryActor,
+				channel: "glow-opacity",
+				durationMs: 110,
+				toRunningGlowAlpha: 0.82,
+			}),
+		);
+		expect(Effect.runSync(harness.dropPresentation.readSnapshotFx).feedback).toBeNull();
 
-		Effect.runSync(reconciler.reconcileFx(committedAfterStore));
-		expect(actors.has(source.id)).toBe(false);
-		expect(animate).not.toHaveBeenCalled();
+		const exit = harness.animations.find(
+			(animation) =>
+				animation.actor === actor &&
+				animation.channel === "lifecycle-opacity" &&
+				animation.toAlpha === 0,
+		);
+		const destroy = vi.spyOn(actor.container, "destroy");
+		exit?.onComplete?.();
+		exit?.onComplete?.();
+		expect(destroy).toHaveBeenCalledOnce();
+		expect(actor.container.destroyed).toBe(true);
+		expect(actor.visuals.size).toBe(0);
+		now.mockRestore();
 	});
 
-	it("crossfades both replacement actors while running opacity owns only its crowd channel", () => {
-		const previous = {
-			...createItem("runtime:producer", boardLocation),
+	it("flashes a surviving committed feedback receiver exactly once", () => {
+		const item = createItem("runtime:tree", boardLocation);
+		const actor = createActor(item);
+		const harness = createReconcilerHarness({
+			actor,
+		});
+		projectionState.main = [
+			item,
+		];
+		projectionState.feedback = [
+			{
+				actorId: item.id,
+				key: "2:0:resource-spent",
+				kind: "resource-spent",
+			},
+		];
+
+		Effect.runSync(harness.reconciler.reconcileFx(transition(2)));
+		expect(harness.animations).toContainEqual(
+			expect.objectContaining({
+				actor,
+				channel: "glow-opacity",
+				durationMs: 110,
+				ownerKey: `feedback-glow:${actor.instanceId}`,
+				toRunningGlowAlpha: 0.82,
+			}),
+		);
+		const animationCount = harness.animations.length;
+
+		Effect.runSync(harness.reconciler.reconcileFx(transition(2)));
+		expect(harness.animations).toHaveLength(animationCount);
+	});
+
+	it("dips a surviving consumed source and restores only that lifecycle intent", () => {
+		const item = createItem("runtime:ore", boardLocation, {
+			quantity: 2,
+			revision: "revision:ore:2",
+		});
+		const actor = createActor(
+			createItem(item.id, boardLocation, {
+				quantity: 3,
+				revision: "revision:ore:3",
+			}),
+		);
+		const harness = createReconcilerHarness({
+			actor,
+		});
+		projectionState.main = [
+			item,
+		];
+		projectionState.feedback = [
+			{
+				actorId: item.id,
+				key: "2:0:consume-source",
+				kind: "consume-source",
+			},
+		];
+
+		Effect.runSync(harness.reconciler.reconcileFx(transition(2)));
+		const dip = harness.animations.find(
+			(animation) =>
+				animation.actor === actor &&
+				animation.channel === "lifecycle-opacity" &&
+				animation.toAlpha === 0.42,
+		);
+		expect(dip).toMatchObject({
+			durationMs: 130,
+			ownerKey: `actor-alpha:${actor.instanceId}`,
+		});
+
+		dip?.onComplete?.();
+		expect(harness.animations).toContainEqual(
+			expect.objectContaining({
+				actor,
+				channel: "lifecycle-opacity",
+				durationMs: 360,
+				ownerKey: `actor-alpha:${actor.instanceId}`,
+				toAlpha: 1,
+			}),
+		);
+	});
+
+	it("starts terminal deposit feedback before its longer fade-off releases the actor", () => {
+		const item = createItem("runtime:depleted-tree", boardLocation);
+		const actor = createActor(item);
+		const harness = createReconcilerHarness({
+			actor,
+		});
+		projectionState.feedback = [
+			{
+				actorId: item.id,
+				key: "3:0:resource-spent",
+				kind: "resource-spent",
+			},
+		];
+
+		Effect.runSync(harness.reconciler.reconcileFx(transition(3)));
+
+		expect(harness.animations[0]).toMatchObject({
+			actor,
+			channel: "glow-opacity",
+			durationMs: 110,
+			ownerKey: `feedback-glow:${actor.instanceId}`,
+		});
+		expect(harness.animations).toContainEqual(
+			expect.objectContaining({
+				actor,
+				channel: "lifecycle-opacity",
+				durationMs: 630,
+				toAlpha: 0,
+			}),
+		);
+		expect(harness.animations).toContainEqual(
+			expect.objectContaining({
+				actor,
+				channel: "pose",
+				durationMs: 630,
+				toScale: 0.76,
+			}),
+		);
+		expect(actor.container.destroyed).toBe(false);
+	});
+
+	it("keeps the current visual visible until a complete incoming slot can crossfade", () => {
+		const previous = createItem("runtime:producer", boardLocation, {
 			itemId: "producer:idle",
-			running: false,
+			revision: "revision:producer-idle",
 			sourceUrl: "resource:producer-idle",
 			title: "Idle producer",
-		} satisfies TileActorItem;
-		const current = {
-			...previous,
+		});
+		const current = createItem(previous.id, boardLocation, {
 			itemId: "producer:running",
 			revision: "revision:producer-running",
 			running: true,
+			runningGlow: true,
 			sourceUrl: "resource:producer-running",
 			title: "Running producer",
-		} satisfies TileActorItem;
+		});
 		const actor = createActor(previous);
-		actor.dragging = false;
-		const actors = new Map([
-			[
-				actor.item.id,
-				actor,
-			],
-		]);
-		const canonicalItems = new Map([
-			[
-				actor.item.id,
-				actor.item,
-			],
-		]);
-		const animations: PixiActorAnimation[] = [];
-		const cancellations: string[] = [];
-		const layer = {
-			addChild: vi.fn(),
-		};
-		const actorStore = {
-			actors,
-			canonicalItems,
-			closeFx: Effect.void,
-			deleteActorFx: (actorId: string) =>
-				Effect.sync(() => {
-					const deleted = actors.get(actorId) ?? null;
-					actors.delete(actorId);
-					return deleted;
-				}),
-			readActorFx: (actorId: string) => Effect.succeed(actors.get(actorId) ?? null),
-			readCanonicalItemFx: (actorId: string) =>
-				Effect.succeed(canonicalItems.get(actorId) ?? null),
-			replaceCanonicalItemsFx: (items: ReadonlyArray<TileActorItem>) =>
-				Effect.sync(() => {
-					canonicalItems.clear();
-					for (const item of items) canonicalItems.set(item.id, item);
-				}),
-			setActorFx: (nextActor: PixiTileActor) =>
-				Effect.sync(() => {
-					actors.set(nextActor.item.id, nextActor);
-				}),
-		} satisfies PixiMainSceneActorStore;
-		const drag = {
-			attachActorFx: () => Effect.void,
-			cancelInteractionFx: Effect.void,
-			closeFx: Effect.void,
-			detachActorFx: () => Effect.void,
-			refreshPreviewFx: Effect.void,
-			setInteractionBlockedFx: () => Effect.void,
-		} satisfies PixiMainSceneDragController;
-		const dropPresentation = Effect.runSync(createPixiMainSceneDropPresentationFx());
-		const animator = {
-			animateFx: (animation) =>
-				Effect.sync(() => {
-					animations.push(animation);
-				}),
-			cancelFx: (animationKey) =>
-				Effect.sync(() => {
-					cancellations.push(animationKey);
-				}),
-			closeFx: Effect.void,
-		} satisfies PixiActorAnimator;
-		const game = {
-			readOrThrow: (query: unknown) => {
-				const projection = query as {
-					readonly kind: "tile-actors";
-					readonly surface: "inventory" | "main";
-				};
-				if (projection.kind !== "tile-actors") throw new Error("Unexpected game read.");
-				return projectionState[projection.surface];
-			},
-		} as unknown as GameEngine;
-		const motion = {
-			closeFx: Effect.void,
-			enqueueFx: () => Effect.void,
-			readSnapshotFx: Effect.succeed({
-				interactionClaimByActorId: new Map(),
-				spawnCueByActorId: new Map(),
-				unsettledQuantities: new Map(),
-			}),
-			startFx: Effect.void,
-			syncQuantitiesFx: Effect.void,
-		} satisfies PixiTileMotionRuntime;
-		const reconciler = Effect.runSync(
-			createPixiMainSceneReconcilerFx({
-				actorStore,
-				animator,
-				application: {
-					frames: {
-						invalidateFx: Effect.void,
-					},
-				} as unknown as PixiApplicationOwner,
-				drag,
-				dropPresentation,
-				game,
-				magneticField: {
-					closeFx: Effect.void,
-					pruneFx: Effect.void,
-					resetFx: Effect.void,
-					updateFx: () => Effect.void,
-				} satisfies PixiTileMagneticField,
-				motion,
-				readPalette: () => ({}) as never,
-				surface: {
-					readActorPoseFx: () =>
-						Effect.succeed({
-							layer,
-							size: 80,
-							x: 40,
-							y: 60,
-						}),
-					transientActorLayer: layer,
-				} as unknown as PixiMainSceneSurface,
-				textures: {} as never,
-			}),
-		);
+		const oldVisual = actor.currentVisual;
+		const harness = createReconcilerHarness({
+			actor,
+		});
 		projectionState.main = [
 			current,
 		];
@@ -499,78 +715,156 @@ describe("Pixi main-scene reconciliation", () => {
 				previousQuantity: previous.quantity,
 			},
 		];
-		const transition = {
-			events: [],
-			previousRuntime: {},
-			runtime: {},
-			sequence: 2,
-		} as unknown as ReturnType<GameEngine["getTransitionSnapshot"]>;
 
-		Effect.runSync(reconciler.reconcileFx(transition));
+		Effect.runSync(harness.reconciler.reconcileFx(transition(2)));
+		const incoming = createdVisualState.created[0] as PixiTileActorVisual;
+		expect(incoming).toBeDefined();
+		expect(actor.currentVisual).toBe(oldVisual);
+		expect(actor.pendingVisual).toBe(incoming);
+		expect(oldVisual.container.destroyed).toBe(false);
+		expect(oldVisual.container.alpha).toBe(1);
+		expect(incoming.container.alpha).toBe(0);
+		expect(harness.animations.some(({ channel }) => channel === "visual-mix")).toBe(false);
 
-		const running = animations.find(
-			(animation) => animation.animationKey === `running:${current.id}`,
-		);
-		const incoming = animations.find(
-			(animation) => animation.animationKey === `replacement-alpha:${current.id}`,
-		);
-		const outgoing = animations.find(
-			(animation) => animation.animationKey === "replacement-out:2:0:replacement",
-		);
-		expect(running).toMatchObject({
-			actor,
-			durationMs: 180,
-			toCrowdAlpha: 0.82,
-		});
-		expect(running?.toX).toBeUndefined();
-		expect(running?.toY).toBeUndefined();
-		expect(actor.crowdLayer.alpha).toBe(1);
-		expect(actor.container.alpha).toBe(0);
-		expect(incoming).toMatchObject({
-			actor,
-			durationMs: 280,
-			toAlpha: 1,
-		});
-		expect(outgoing).toMatchObject({
-			durationMs: 280,
-			toAlpha: 0,
-		});
-		expect(outgoing?.actor).not.toBe(actor);
-		expect(outgoing?.actor.container.alpha).toBe(1);
-
-		projectionState.replacements = [
-			{
-				actorId: current.id,
-				key: "3:0:replacement",
-				previous: {
-					compositeUrl: current.compositeUrl,
-					itemId: current.itemId,
-					sourceUrl: current.sourceUrl,
-					title: current.title,
-				},
-				previousQuantity: current.quantity,
-			},
-		];
 		Effect.runSync(
-			reconciler.reconcileFx({
-				...transition,
-				sequence: 3,
+			completePixiTileActorVisualTextureLoadFx({
+				generation: incoming.textureGeneration,
+				visual: incoming,
 			}),
 		);
-		expect(
-			animations.filter(
-				(animation) => animation.animationKey === `replacement-alpha:${current.id}`,
-			),
-		).toHaveLength(2);
+		const mix = harness.animations.find(({ channel }) => channel === "visual-mix");
+		expect(mix).toMatchObject({
+			actor,
+			channel: "visual-mix",
+			durationMs: replacementCrossfadeDurationMs,
+			incoming: incoming.container,
+			ownerKey: "replacement:2:0:replacement",
+		});
+		expect(mix?.channel === "visual-mix" ? mix.outgoing.alpha : null).toBe(1);
+		expect(oldVisual.container.destroyed).toBe(false);
+
+		mix?.onComplete?.();
+		expect(actor.currentVisual).toBe(incoming);
+		expect(actor.pendingVisual).toBeNull();
+		expect(incoming.container.alpha).toBe(1);
+		expect(oldVisual.container.destroyed).toBe(true);
+		expect(actor.visuals).toEqual(
+			new Set([
+				incoming,
+			]),
+		);
+		expect(harness.animations.find(({ channel }) => channel === "crowd-opacity")).toMatchObject(
+			{
+				actor,
+				channel: "crowd-opacity",
+				durationMs: 180,
+				ownerKey: `running:${actor.item.id}`,
+				toCrowdAlpha: 0.82,
+			},
+		);
+		expect(harness.animations.find(({ channel }) => channel === "glow-opacity")).toMatchObject({
+			actor,
+			channel: "glow-opacity",
+			durationMs: 640,
+			ownerKey: `running-glow:${actor.instanceId}`,
+			toRunningGlowAlpha: 0.62,
+		});
+	});
+
+	it("cannot resurrect rapid replacement visuals after the canonical actor exits", () => {
+		const first = createItem("runtime:producer", boardLocation, {
+			revision: "revision:first",
+			sourceUrl: "resource:first",
+		});
+		const second = createItem(first.id, boardLocation, {
+			revision: "revision:second",
+			sourceUrl: "resource:second",
+		});
+		const third = createItem(first.id, boardLocation, {
+			revision: "revision:third",
+			sourceUrl: "resource:third",
+		});
+		const actor = createActor(first);
+		const harness = createReconcilerHarness({
+			actor,
+		});
+
+		projectionState.main = [
+			second,
+		];
+		projectionState.replacements = [
+			{
+				actorId: first.id,
+				key: "2:0:replacement",
+				previous: {
+					itemId: first.itemId,
+					sourceUrl: first.sourceUrl,
+					title: first.title,
+				},
+				previousQuantity: first.quantity,
+			},
+		];
+		Effect.runSync(harness.reconciler.reconcileFx(transition(2)));
+		const pendingSecond = createdVisualState.created[0] as PixiTileActorVisual;
+
+		projectionState.main = [
+			third,
+		];
+		projectionState.replacements = [
+			{
+				actorId: first.id,
+				key: "3:0:replacement",
+				previous: {
+					itemId: second.itemId,
+					sourceUrl: second.sourceUrl,
+					title: second.title,
+				},
+				previousQuantity: second.quantity,
+			},
+		];
+		Effect.runSync(harness.reconciler.reconcileFx(transition(3)));
+		const pendingThird = createdVisualState.created[1] as PixiTileActorVisual;
+		expect(actor.pendingVisual).toBe(pendingThird);
 
 		projectionState.main = [];
 		projectionState.replacements = [];
+		Effect.runSync(harness.reconciler.reconcileFx(transition(4)));
+		const exit = harness.animations.find(
+			(animation) => animation.channel === "lifecycle-opacity" && animation.toAlpha === 0,
+		);
+		expect(harness.actors.has(first.id)).toBe(false);
+		expect(harness.canceledActors).toEqual([
+			actor,
+		]);
+
 		Effect.runSync(
-			reconciler.reconcileFx({
-				...transition,
-				sequence: 4,
+			completePixiTileActorVisualTextureLoadFx({
+				generation: pendingSecond.textureGeneration,
+				visual: pendingSecond,
 			}),
 		);
-		expect(cancellations).toContain(`replacement-alpha:${current.id}`);
+		Effect.runSync(
+			completePixiTileActorVisualTextureLoadFx({
+				generation: pendingThird.textureGeneration,
+				visual: pendingThird,
+			}),
+		);
+		expect(harness.animations.some(({ channel }) => channel === "visual-mix")).toBe(false);
+		expect(actor.currentVisual.item.revision).toBe("revision:first");
+
+		exit?.onComplete?.();
+		expect(actor.container.destroyed).toBe(true);
+		expect(actor.visuals.size).toBe(0);
+		expect(pendingSecond.container.destroyed).toBe(true);
+		expect(pendingThird.container.destroyed).toBe(true);
+
+		Effect.runSync(
+			completePixiTileActorVisualTextureLoadFx({
+				generation: pendingThird.textureGeneration - 1,
+				visual: pendingThird,
+			}),
+		);
+		expect(actor.container.destroyed).toBe(true);
+		expect(harness.actors.has(first.id)).toBe(false);
 	});
 });

@@ -5,6 +5,7 @@ import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import type { runTileDropAtom } from "~/bridge/tile/runTileDropAtom";
 import type { TileActorItem } from "~/bridge/tile/TileActorItem";
 import { createPixiMainSceneActorStoreFx } from "~/ui/pixi/actor/createPixiMainSceneActorStoreFx";
+import { createPixiTileActorRunningGlowTextureFx } from "~/ui/pixi/actor/createPixiTileActorRunningGlowTextureFx";
 import { createPixiAnimationDriverFx } from "~/ui/pixi/animation/createPixiAnimationDriverFx";
 import { createPixiActorAnimatorFx } from "~/ui/pixi/animation/createPixiActorAnimatorFx";
 import { readPixiScenePaletteFx } from "~/ui/pixi/appearance/readPixiScenePaletteFx";
@@ -18,6 +19,7 @@ import { createPixiApplicationOwnerFx } from "~/ui/pixi/runtime/createPixiApplic
 import type { PixiTextureStore } from "~/ui/pixi/runtime/createPixiTextureStoreFx";
 import type { PixiMainSceneRuntime } from "~/ui/pixi/scene/PixiMainSceneRuntime";
 import { createPixiMainSceneReconcilerFx } from "~/ui/pixi/scene/createPixiMainSceneReconcilerFx";
+import { createPixiMainSceneSubscriptionReplayGateFx } from "~/ui/pixi/scene/createPixiMainSceneSubscriptionReplayGateFx";
 import { createPixiMainSceneSurfaceFx } from "~/ui/pixi/scene/createPixiMainSceneSurfaceFx";
 
 export namespace createPixiMainSceneRuntimeFx {
@@ -71,6 +73,8 @@ export const createPixiMainSceneRuntimeFx = Effect.fn("createPixiMainSceneRuntim
 		const paletteState = {
 			current: yield* readPixiScenePaletteFx(host),
 		};
+		const runningGlowTexture = yield* createPixiTileActorRunningGlowTextureFx();
+		registerRollback(runningGlowTexture.closeFx);
 		const actorStore = yield* createPixiMainSceneActorStoreFx();
 		const animationDriver = yield* createPixiAnimationDriverFx({
 			frames: application.frames,
@@ -78,6 +82,7 @@ export const createPixiMainSceneRuntimeFx = Effect.fn("createPixiMainSceneRuntim
 		registerRollback(animationDriver.closeFx);
 		const animator = yield* createPixiActorAnimatorFx({
 			animationDriver,
+			frames: application.frames,
 		});
 		const surface = yield* createPixiMainSceneSurfaceFx({
 			application,
@@ -89,11 +94,17 @@ export const createPixiMainSceneRuntimeFx = Effect.fn("createPixiMainSceneRuntim
 		// Retained actors must die before their parent surface destroys its layers.
 		registerRollback(actorStore.closeFx);
 		registerRollback(animator.closeFx);
+		const magneticField = yield* createPixiTileMagneticFieldFx({
+			actorStore,
+			animationDriver,
+		});
+		registerRollback(magneticField.closeFx);
 		const motion = yield* createPixiTileMotionRuntimeFx({
 			actorStore,
 			animator,
 			application,
 			handoffs,
+			magneticField,
 			readPalette: () => paletteState.current,
 			surface,
 			textures,
@@ -101,15 +112,9 @@ export const createPixiMainSceneRuntimeFx = Effect.fn("createPixiMainSceneRuntim
 		registerRollback(motion.closeFx);
 		const cursorGrab = yield* createPixiCursorGrabMotionFx({
 			animationDriver,
-			frames: application.frames,
+			animator,
 		});
 		registerRollback(cursorGrab.closeFx);
-		const magneticField = yield* createPixiTileMagneticFieldFx({
-			actorStore,
-			animationDriver,
-			surface,
-		});
-		registerRollback(magneticField.closeFx);
 		const dropPresentation = yield* createPixiMainSceneDropPresentationFx();
 		registerRollback(dropPresentation.closeFx);
 		let replayCurrentTransition: () => void = () => undefined;
@@ -138,6 +143,7 @@ export const createPixiMainSceneRuntimeFx = Effect.fn("createPixiMainSceneRuntim
 			magneticField,
 			motion,
 			readPalette: () => paletteState.current,
+			runningGlowTexture,
 			surface,
 			textures,
 		});
@@ -145,23 +151,33 @@ export const createPixiMainSceneRuntimeFx = Effect.fn("createPixiMainSceneRuntim
 		let closed = false;
 		let latestTransition = game.getTransitionSnapshot();
 
-		const applyTransition = (transition: ReturnType<GameEngine["getTransitionSnapshot"]>) => {
+		const applyTransition = (
+			transition: ReturnType<GameEngine["getTransitionSnapshot"]>,
+			delivery: "hydrate" | "present",
+		) => {
 			if (closed) return;
 			latestTransition = transition;
 			// Surface hit testing and actor reconciliation must observe one committed snapshot.
 			RendererRuntime.runSync(surface.setTransitionFx(transition));
-			RendererRuntime.runSync(reconciler.reconcileFx(transition));
+			RendererRuntime.runSync(
+				delivery === "hydrate"
+					? reconciler.hydrateFx(transition)
+					: reconciler.reconcileFx(transition),
+			);
 		};
-		replayCurrentTransition = () => applyTransition(game.getTransitionSnapshot());
+		replayCurrentTransition = () => applyTransition(game.getTransitionSnapshot(), "present");
 
 		const redraw = () => {
 			if (closed) return;
 			RendererRuntime.runSync(surface.redrawFx);
-			RendererRuntime.runSync(reconciler.reconcileFx(latestTransition));
+			RendererRuntime.runSync(reconciler.hydrateFx(latestTransition));
 		};
 
 		RendererRuntime.runSync(surface.redrawFx);
-		applyTransition(latestTransition);
+		applyTransition(latestTransition, "hydrate");
+		const subscriptionReplayGate = yield* createPixiMainSceneSubscriptionReplayGateFx(
+			latestTransition.sequence,
+		);
 		const removeResizeListener = yield* application.addResizeListenerFx(redraw);
 		registerRollback(Effect.sync(() => removeResizeListener()));
 		const appearanceObserver = new MutationObserver(() => {
@@ -180,7 +196,10 @@ export const createPixiMainSceneRuntimeFx = Effect.fn("createPixiMainSceneRuntim
 		registerRollback(Effect.sync(() => appearanceObserver.disconnect()));
 		const unsubscribeTransitions = game.subscribeTransitions((transition) => {
 			try {
-				applyTransition(transition);
+				const delivery = RendererRuntime.runSync(
+					subscriptionReplayGate.classifyFx(transition.sequence),
+				);
+				applyTransition(transition, delivery);
 			} catch (cause) {
 				console.error("Pixi main-scene transition reconciliation failed.", cause);
 			}

@@ -1,4 +1,5 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
+import { match } from "ts-pattern";
 
 import { releaseGameEngineResourceFx } from "~/bridge/game/releaseGameEngineResourceFx";
 import { ActionPendingPage } from "~/page/action/ActionPendingPage";
@@ -20,36 +21,66 @@ export const Route = createFileRoute("/game/$packageId/action/leave")({
 		} catch (cause) {
 			throw context.gameEngineResource.markCriticalFailure("game-leave", cause);
 		}
-		switch (deps.destination) {
-			case "about":
-				throw redirect({
-					to: "/about",
-					replace: true,
-				});
-			case "arkpacks":
-				throw redirect({
-					to: "/arkpacks",
-					replace: true,
-				});
-			case "main-menu":
-				throw redirect({
-					to: "/main-menu",
-					replace: true,
-				});
-			case "settings":
-				throw redirect({
-					to: "/settings",
-					replace: true,
-				});
-			case "game":
-				throw redirect({
-					to: "/action/load-game/$packageId",
-					params: {
-						packageId: deps.packageId,
-					},
-					replace: true,
-				});
-		}
+		return match(deps)
+			.with(
+				{
+					destination: "about",
+				},
+				() => {
+					throw redirect({
+						to: "/about",
+						replace: true,
+					});
+				},
+			)
+			.with(
+				{
+					destination: "arkpacks",
+				},
+				() => {
+					throw redirect({
+						to: "/arkpacks",
+						replace: true,
+					});
+				},
+			)
+			.with(
+				{
+					destination: "main-menu",
+				},
+				() => {
+					throw redirect({
+						to: "/main-menu",
+						replace: true,
+					});
+				},
+			)
+			.with(
+				{
+					destination: "settings",
+				},
+				() => {
+					throw redirect({
+						to: "/settings",
+						replace: true,
+					});
+				},
+			)
+			.with(
+				{
+					destination: "game",
+				},
+				({ packageId }) => {
+					throw redirect({
+						to: "/action/load-game/$packageId",
+						params: {
+							packageId,
+						},
+						replace: true,
+					});
+				},
+			)
+			.exhaustive();
 	},
 	pendingMs: 0,
 	pendingMinMs: 2_500,

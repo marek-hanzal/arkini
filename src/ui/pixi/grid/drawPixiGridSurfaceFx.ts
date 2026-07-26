@@ -1,6 +1,7 @@
 import { Effect } from "effect";
 import type { Graphics } from "pixi.js";
 
+import { readPixiGridSurfaceRadius } from "~/ui/pixi/grid/readPixiGridSurfaceRadius";
 import type { PixiGridSurfaceLayout } from "~/ui/pixi/layout/PixiSceneLayout";
 
 export namespace drawPixiGridSurfaceFx {
@@ -26,7 +27,7 @@ export const drawPixiGridSurfaceFx = Effect.fn("drawPixiGridSurfaceFx")(
 				return;
 			}
 			graphics.visible = true;
-			const radius = Math.min(16, surface.cellSize * 0.12);
+			const radius = readPixiGridSurfaceRadius(surface);
 			graphics.roundRect(surface.x, surface.y, surface.width, surface.height, radius).fill({
 				alpha: 0.78,
 				color: surfaceColor,

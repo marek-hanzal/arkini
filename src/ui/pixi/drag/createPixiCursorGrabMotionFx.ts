@@ -6,13 +6,13 @@ import type {
 	PixiAnimationDriver,
 	PixiAnimationSpring,
 } from "~/ui/pixi/animation/PixiAnimationDriver";
+import type { PixiActorAnimator } from "~/ui/pixi/animation/PixiActorAnimator";
 import type { PixiCursorGrabMotion } from "~/ui/pixi/drag/PixiCursorGrabMotion";
-import type { DemandFrameLoop } from "~/ui/pixi/runtime/DemandFrameLoop";
 
 export namespace createPixiCursorGrabMotionFx {
 	export interface Props {
 		readonly animationDriver: PixiAnimationDriver;
-		readonly frames: DemandFrameLoop;
+		readonly animator: PixiActorAnimator;
 	}
 }
 
@@ -28,7 +28,7 @@ const cursorGrabSpring = {
 
 /** Uses Motion springs to settle a dragged tile's center beneath the pointer. */
 export const createPixiCursorGrabMotionFx = Effect.fn("createPixiCursorGrabMotionFx")(
-	({ animationDriver, frames }: createPixiCursorGrabMotionFx.Props) =>
+	({ animationDriver, animator }: createPixiCursorGrabMotionFx.Props) =>
 		Effect.sync((): PixiCursorGrabMotion => {
 			let springs: ReadonlyArray<PixiAnimationSpring> = [];
 			let closed = false;
@@ -55,10 +55,23 @@ export const createPixiCursorGrabMotionFx = Effect.fn("createPixiCursorGrabMotio
 				} catch (cause) {
 					cleanupFailure = cause;
 				}
-				actor.container.x -= actor.container.pivot.x;
-				actor.container.y -= actor.container.pivot.y;
-				actor.container.pivot.set(0);
-				RendererRuntime.runSync(frames.invalidateFx);
+				RendererRuntime.runSync(
+					animator.setFx({
+						actor,
+						channel: "pose",
+						scale: actor.container.scale.x,
+						x: actor.container.x - actor.container.pivot.x * actor.container.scale.x,
+						y: actor.container.y - actor.container.pivot.y * actor.container.scale.y,
+					}),
+				);
+				RendererRuntime.runSync(
+					animator.setFx({
+						actor,
+						channel: "grab-offset",
+						pivotX: 0,
+						pivotY: 0,
+					}),
+				);
 				if (cleanupFailure !== null) throw cleanupFailure;
 			};
 
@@ -70,8 +83,12 @@ export const createPixiCursorGrabMotionFx = Effect.fn("createPixiCursorGrabMotio
 					Effect.sync(() => {
 						if (closed) return;
 						stop();
-						const localPointerX = pointer.x - actor.container.x;
-						const localPointerY = pointer.y - actor.container.y;
+						const localPointerX =
+							(pointer.x - actor.container.x) /
+							Math.max(Number.EPSILON, actor.container.scale.x);
+						const localPointerY =
+							(pointer.y - actor.container.y) /
+							Math.max(Number.EPSILON, actor.container.scale.y);
 						const targetPivotX = actor.size / 2 - localPointerX;
 						const targetPivotY = actor.size / 2 - localPointerY;
 						const x = RendererRuntime.runSync(
@@ -79,7 +96,14 @@ export const createPixiCursorGrabMotionFx = Effect.fn("createPixiCursorGrabMotio
 								initialValue: actor.container.pivot.x,
 								onUpdate: (value) => {
 									if (closed || actor.container.destroyed) return;
-									actor.container.pivot.x = value;
+									RendererRuntime.runSync(
+										animator.setFx({
+											actor,
+											channel: "grab-offset",
+											pivotX: value,
+											pivotY: actor.container.pivot.y,
+										}),
+									);
 								},
 								options: cursorGrabSpring,
 							}),
@@ -91,7 +115,14 @@ export const createPixiCursorGrabMotionFx = Effect.fn("createPixiCursorGrabMotio
 									initialValue: actor.container.pivot.y,
 									onUpdate: (value) => {
 										if (closed || actor.container.destroyed) return;
-										actor.container.pivot.y = value;
+										RendererRuntime.runSync(
+											animator.setFx({
+												actor,
+												channel: "grab-offset",
+												pivotX: actor.container.pivot.x,
+												pivotY: value,
+											}),
+										);
 									},
 									options: cursorGrabSpring,
 								}),

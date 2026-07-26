@@ -3,9 +3,15 @@ import { Effect } from "effect";
 import type { GameEngine } from "~/bridge/game/GameEngine";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import type { TileActorItem } from "~/bridge/tile/TileActorItem";
+import { readTileActorFeedbackCuesFx } from "~/bridge/tile/feedback/readTileActorFeedbackCuesFx";
 import type { runTileDropAtom } from "~/bridge/tile/runTileDropAtom";
 import type { PixiInventoryActorStore } from "~/ui/pixi/actor/PixiInventoryActorStore";
+import type { PixiTileActorRunningGlowTexture } from "~/ui/pixi/actor/PixiTileActorRunningGlowTexture";
 import { createPixiInventoryActorStoreFx } from "~/ui/pixi/actor/createPixiInventoryActorStoreFx";
+import { createPixiTileActorRunningGlowTextureFx } from "~/ui/pixi/actor/createPixiTileActorRunningGlowTextureFx";
+import { createPixiActorAnimatorFx } from "~/ui/pixi/animation/createPixiActorAnimatorFx";
+import { createPixiAnimationDriverFx } from "~/ui/pixi/animation/createPixiAnimationDriverFx";
+import { flashPixiTileActorConsumedSourceFx } from "~/ui/pixi/animation/flashPixiTileActorConsumedSourceFx";
 import type { PixiInventoryDragController } from "~/ui/pixi/drag/PixiInventoryDragController";
 import { createPixiInventoryDragControllerFx } from "~/ui/pixi/drag/createPixiInventoryDragControllerFx";
 import { createPixiApplicationOwnerFx } from "~/ui/pixi/runtime/createPixiApplicationOwnerFx";
@@ -13,6 +19,7 @@ import type { PixiTextureStore } from "~/ui/pixi/runtime/createPixiTextureStoreF
 import type { PixiInventorySceneRuntime } from "~/ui/pixi/scene/PixiInventorySceneRuntime";
 import type { PixiInventorySceneSurface } from "~/ui/pixi/scene/PixiInventorySceneSurface";
 import { createPixiInventorySceneSurfaceFx } from "~/ui/pixi/scene/createPixiInventorySceneSurfaceFx";
+import { createPixiMainSceneSubscriptionReplayGateFx } from "~/ui/pixi/scene/createPixiMainSceneSubscriptionReplayGateFx";
 
 export namespace createPixiInventorySceneRuntimeFx {
 	export interface Props {
@@ -52,13 +59,22 @@ export const createPixiInventorySceneRuntimeFx = Effect.fn("createPixiInventoryS
 		const application = yield* createPixiApplicationOwnerFx({
 			host,
 		});
+		const animationDriver = yield* createPixiAnimationDriverFx({
+			frames: application.frames,
+		});
+		const animator = yield* createPixiActorAnimatorFx({
+			animationDriver,
+			frames: application.frames,
+		});
 		let surface: PixiInventorySceneSurface | null = null;
 		let actorStore: PixiInventoryActorStore | null = null;
+		let runningGlowTexture: PixiTileActorRunningGlowTexture | null = null;
 		let drag: PixiInventoryDragController | null = null;
 		let removeResizeListener: (() => void) | null = null;
 		let appearanceObserver: MutationObserver | null = null;
 		let unsubscribeTransitions: (() => void) | null = null;
 		let closed = false;
+		const processedFeedbackKeys = new Set<string>();
 		const ignoreCleanupFailure = (cleanupFx: Effect.Effect<void>) =>
 			cleanupFx.pipe(Effect.catchCause(() => Effect.void));
 		const closeFx = Effect.gen(function* () {
@@ -81,7 +97,13 @@ export const createPixiInventorySceneRuntimeFx = Effect.fn("createPixiInventoryS
 			}
 			if (drag !== null) yield* ignoreCleanupFailure(drag.closeFx);
 			if (actorStore !== null) yield* ignoreCleanupFailure(actorStore.closeFx);
+			processedFeedbackKeys.clear();
+			yield* ignoreCleanupFailure(animator.closeFx);
 			if (surface !== null) yield* ignoreCleanupFailure(surface.closeFx);
+			if (runningGlowTexture !== null) {
+				yield* ignoreCleanupFailure(runningGlowTexture.closeFx);
+			}
+			yield* ignoreCleanupFailure(animationDriver.closeFx);
 			yield* ignoreCleanupFailure(application.closeFx);
 		});
 
@@ -92,9 +114,13 @@ export const createPixiInventorySceneRuntimeFx = Effect.fn("createPixiInventoryS
 				host,
 			});
 			surface = createdSurface;
+			const createdRunningGlowTexture = yield* createPixiTileActorRunningGlowTextureFx();
+			runningGlowTexture = createdRunningGlowTexture;
 			const createdActorStore = yield* createPixiInventoryActorStoreFx({
+				animator,
 				application,
 				game,
+				runningGlowTexture: createdRunningGlowTexture.texture,
 				surface: createdSurface,
 				textures,
 			});
@@ -102,6 +128,7 @@ export const createPixiInventorySceneRuntimeFx = Effect.fn("createPixiInventoryS
 			let replayCurrentTransition: () => void = () => undefined;
 			const createdDrag = yield* createPixiInventoryDragControllerFx({
 				actorStore: createdActorStore,
+				animator,
 				application,
 				game,
 				onActivate,
@@ -111,8 +138,11 @@ export const createPixiInventorySceneRuntimeFx = Effect.fn("createPixiInventoryS
 			});
 			drag = createdDrag;
 			let latestTransition: GameTransition = game.getTransitionSnapshot();
+			const subscriptionReplayGate = yield* createPixiMainSceneSubscriptionReplayGateFx(
+				latestTransition.sequence,
+			);
 
-			const reconcile = (transition: GameTransition) => {
+			const reconcile = (transition: GameTransition, presentFeedback: boolean) => {
 				latestTransition = transition;
 				const result = RendererRuntime.runSync(createdActorStore.reconcileFx(transition));
 				for (const actor of result.removed) {
@@ -122,20 +152,44 @@ export const createPixiInventorySceneRuntimeFx = Effect.fn("createPixiInventoryS
 				for (const actor of result.created) {
 					RendererRuntime.runSync(createdDrag.attachActorFx(actor));
 				}
+				if (presentFeedback) {
+					const cues = RendererRuntime.runSync(readTileActorFeedbackCuesFx(transition));
+					for (const cue of cues) {
+						if (cue.kind !== "consume-source" || processedFeedbackKeys.has(cue.key)) {
+							continue;
+						}
+						const source = RendererRuntime.runSync(
+							createdActorStore.readActorFx(cue.actorId),
+						);
+						if (source === null) continue;
+						processedFeedbackKeys.add(cue.key);
+						RendererRuntime.runSync(
+							flashPixiTileActorConsumedSourceFx({
+								actor: source,
+								animator,
+							}),
+						);
+					}
+					while (processedFeedbackKeys.size > 256) {
+						const oldest = processedFeedbackKeys.values().next().value;
+						if (oldest === undefined) break;
+						processedFeedbackKeys.delete(oldest);
+					}
+				}
 				RendererRuntime.runSync(createdDrag.refreshPreviewFx);
 			};
-			replayCurrentTransition = () => reconcile(game.getTransitionSnapshot());
+			replayCurrentTransition = () => reconcile(game.getTransitionSnapshot(), false);
 
 			const redraw = () => {
 				RendererRuntime.runSync(createdSurface.redrawFx);
-				reconcile(latestTransition);
+				reconcile(latestTransition, false);
 			};
 
 			removeResizeListener = yield* application.addResizeListenerFx(redraw);
 			redraw();
 			appearanceObserver = new MutationObserver(() => {
 				RendererRuntime.runSync(createdSurface.refreshPaletteFx);
-				reconcile(latestTransition);
+				reconcile(latestTransition, false);
 				RendererRuntime.runSync(createdActorStore.refreshAppearanceFx);
 			});
 			appearanceObserver.observe(document.documentElement, {
@@ -145,7 +199,12 @@ export const createPixiInventorySceneRuntimeFx = Effect.fn("createPixiInventoryS
 				],
 				attributes: true,
 			});
-			unsubscribeTransitions = game.subscribeTransitions(reconcile);
+			unsubscribeTransitions = game.subscribeTransitions((transition) => {
+				const delivery = RendererRuntime.runSync(
+					subscriptionReplayGate.classifyFx(transition.sequence),
+				);
+				reconcile(transition, delivery === "present");
+			});
 
 			return {
 				canvas: application.app.canvas,

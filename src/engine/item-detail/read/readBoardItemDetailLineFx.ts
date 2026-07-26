@@ -1,4 +1,5 @@
 import { Effect } from "effect";
+import { match } from "ts-pattern";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { planLineInputAutofillFx } from "~/engine/input/fx/planLineInputAutofillFx";
@@ -58,6 +59,52 @@ export const readBoardItemDetailLineFx = Effect.fn("readBoardItemDetailLineFx")(
 					job: activeJob,
 					runtime,
 				});
+	const availability: ItemDetailLines.Line["availability"] = match({
+		allInputsReady,
+		enabled: resolution.enable,
+		ready: start.ready,
+	})
+		.with(
+			{
+				ready: true,
+			},
+			() => ({
+				kind: "ready" as const,
+			}),
+		)
+		.with(
+			{
+				enabled: false,
+				ready: false,
+			},
+			() => ({
+				kind: "blocked" as const,
+				reason: "disabled" as const,
+			}),
+		)
+		.with(
+			{
+				allInputsReady: false,
+				enabled: true,
+				ready: false,
+			},
+			() => ({
+				kind: "blocked" as const,
+				reason: "inputs" as const,
+			}),
+		)
+		.with(
+			{
+				allInputsReady: true,
+				enabled: true,
+				ready: false,
+			},
+			() => ({
+				kind: "blocked" as const,
+				reason: "queue" as const,
+			}),
+		)
+		.exhaustive();
 
 	return {
 		lineId: line.id,
@@ -65,14 +112,7 @@ export const readBoardItemDetailLineFx = Effect.fn("readBoardItemDetailLineFx")(
 		description: line.description,
 		baseRuntimeMs: line.runtimeMs,
 		effectiveRuntimeMs: resolution.runtimeMs,
-		availability: start.ready
-			? {
-					kind: "ready",
-				}
-			: {
-					kind: "blocked",
-					reason: !resolution.enable ? "disabled" : !allInputsReady ? "inputs" : "queue",
-				},
+		availability,
 		startMode: ownerHasWork && start.queue.capacity > 1 ? "enqueue" : "start",
 		isDefault: line.id === defaultLineId,
 		actions: {

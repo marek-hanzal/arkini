@@ -2,6 +2,7 @@ import type { Effect } from "effect";
 
 import type { runTileDropAtom } from "~/bridge/tile/runTileDropAtom";
 import type { TileActorItem } from "~/bridge/tile/TileActorItem";
+import type { TileActorFeedbackCue } from "~/bridge/tile/feedback/TileActorFeedbackCue";
 
 export interface PixiSceneSwapCandidate {
 	readonly source: {
@@ -17,6 +18,10 @@ export interface PixiSceneSwapCandidate {
 }
 
 export interface PixiMainSceneDropPresentationSnapshot {
+	readonly feedback: {
+		readonly cues: ReadonlyArray<TileActorFeedbackCue>;
+		readonly generation: number;
+	} | null;
 	readonly hiddenActorIds: ReadonlySet<string>;
 	readonly pendingActorIds: ReadonlySet<string>;
 	readonly swap: {
@@ -31,6 +36,7 @@ export interface PixiMainSceneDropPresentation {
 		readonly swapCandidate: PixiSceneSwapCandidate | null;
 	}) => Effect.Effect<number>;
 	readonly clearSwapFx: (generation: number) => Effect.Effect<void>;
+	readonly clearFeedbackFx: (generation: number) => Effect.Effect<void>;
 	readonly completeFx: (props: {
 		readonly generation: number;
 		readonly result: runTileDropAtom.Result;

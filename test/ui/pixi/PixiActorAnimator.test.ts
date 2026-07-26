@@ -7,14 +7,20 @@ import type {
 	PixiAnimationSpring,
 } from "~/ui/pixi/animation/PixiAnimationDriver";
 import { createPixiActorAnimatorFx } from "~/ui/pixi/animation/createPixiActorAnimatorFx";
+import { readPixiActorAlphaAnimationKey } from "~/ui/pixi/animation/readPixiActorAlphaAnimationKey";
+import type { DemandFrameLoop } from "~/ui/pixi/runtime/DemandFrameLoop";
 
 type TweenProps = Parameters<PixiAnimationDriver["startTweenFx"]>[0];
 
+interface TestTween {
+	readonly complete: () => void;
+	readonly props: TweenProps;
+	readonly stop: ReturnType<typeof vi.fn>;
+	readonly update: (progress: number) => void;
+}
+
 const createAnimationDriver = () => {
-	const tweens: Array<{
-		readonly props: TweenProps;
-		readonly stop: ReturnType<typeof vi.fn>;
-	}> = [];
+	const tweens: TestTween[] = [];
 	const animationDriver = {
 		closeFx: Effect.void,
 		createSpringFx: () =>
@@ -24,10 +30,21 @@ const createAnimationDriver = () => {
 			} satisfies PixiAnimationSpring),
 		startTweenFx: (props) =>
 			Effect.sync(() => {
-				const stop = vi.fn();
+				let active = true;
+				const stop = vi.fn(() => {
+					active = false;
+				});
 				tweens.push({
+					complete: () => {
+						if (!active) return;
+						active = false;
+						props.onComplete?.();
+					},
 					props,
 					stop,
+					update: (progress) => {
+						if (active) props.onUpdate(progress);
+					},
 				});
 				return {
 					stopFx: Effect.sync(stop),
@@ -40,7 +57,18 @@ const createAnimationDriver = () => {
 	};
 };
 
-const createActor = () =>
+const createFrames = () => {
+	const invalidate = vi.fn();
+	return {
+		frames: {
+			closeFx: Effect.void,
+			invalidateFx: Effect.sync(invalidate),
+		} satisfies DemandFrameLoop,
+		invalidate,
+	};
+};
+
+const createActor = (id = "runtime:actor", instanceId = `instance:${id}`) =>
 	({
 		container: {
 			alpha: 0.82,
@@ -57,198 +85,356 @@ const createActor = () =>
 		crowdLayer: {
 			alpha: 1,
 		},
+		instanceId,
 		item: {
-			id: "runtime:actor",
+			id,
+		},
+		runningGlow: {
+			alpha: 0.28,
+			visible: true,
 		},
 	}) as unknown as PixiTileActor;
 
+const createAnimator = () => {
+	const { animationDriver, tweens } = createAnimationDriver();
+	const { frames, invalidate } = createFrames();
+	return {
+		animator: Effect.runSync(
+			createPixiActorAnimatorFx({
+				animationDriver,
+				frames,
+			}),
+		),
+		invalidate,
+		tweens,
+	};
+};
+
 describe("Pixi actor animator", () => {
-	it("leaves unspecified alpha and scale channels untouched", () => {
+	it("keeps pose, lifecycle, crowd, and glow channels physically isolated", () => {
 		const actor = createActor();
-		const { animationDriver, tweens } = createAnimationDriver();
-		const animator = Effect.runSync(
-			createPixiActorAnimatorFx({
-				animationDriver,
-			}),
-		);
+		const { animator, tweens } = createAnimator();
 
 		Effect.runSync(
 			animator.animateFx({
 				actor,
+				channel: "pose",
 				durationMs: 300,
-				toX: 100,
-				toY: 200,
-			}),
-		);
-		tweens[0]?.props.onUpdate(1);
-
-		expect(actor.container.x).toBe(100);
-		expect(actor.container.y).toBe(200);
-		expect(actor.container.alpha).toBe(0.82);
-		expect(actor.container.scale.x).toBe(0.75);
-	});
-
-	it("animates explicitly owned alpha and scale channels", () => {
-		const actor = createActor();
-		const { animationDriver, tweens } = createAnimationDriver();
-		const animator = Effect.runSync(
-			createPixiActorAnimatorFx({
-				animationDriver,
-			}),
-		);
-
-		Effect.runSync(
-			animator.animateFx({
-				actor,
-				durationMs: 300,
-				toAlpha: 1,
+				ownerKey: "motion:actor",
 				toScale: 1,
 				toX: 100,
 				toY: 200,
 			}),
 		);
-		tweens[0]?.props.onUpdate(1);
+		tweens[0]?.update(1);
 
-		expect(actor.container.alpha).toBe(1);
+		expect(actor.container).toMatchObject({
+			alpha: 0.82,
+			x: 100,
+			y: 200,
+		});
 		expect(actor.container.scale.x).toBe(1);
-	});
-
-	it("animates crowd opacity without becoming a second transform owner", () => {
-		const actor = createActor();
-		const { animationDriver, tweens } = createAnimationDriver();
-		const animator = Effect.runSync(
-			createPixiActorAnimatorFx({
-				animationDriver,
-			}),
-		);
+		expect(actor.crowdLayer.alpha).toBe(1);
+		expect(actor.runningGlow.alpha).toBe(0.28);
 
 		Effect.runSync(
 			animator.animateFx({
 				actor,
-				animationKey: "running:runtime:actor",
+				channel: "lifecycle-opacity",
+				durationMs: 300,
+				ownerKey: "entry:actor",
+				toAlpha: 1,
+			}),
+		);
+		Effect.runSync(
+			animator.animateFx({
+				actor,
+				channel: "crowd-opacity",
 				durationMs: 180,
+				ownerKey: "running:actor",
 				toCrowdAlpha: 0.82,
 			}),
 		);
-		tweens[0]?.props.onUpdate(0.5);
+		Effect.runSync(
+			animator.animateFx({
+				actor,
+				channel: "glow-opacity",
+				durationMs: 640,
+				ownerKey: "glow:actor",
+				toRunningGlowAlpha: 0.62,
+			}),
+		);
+		tweens[1]?.update(0.5);
+		tweens[2]?.update(0.5);
+		tweens[3]?.update(0.5);
 
+		expect(actor.container.alpha).toBeCloseTo(0.91);
 		expect(actor.crowdLayer.alpha).toBeCloseTo(0.91);
-		expect(actor.container.x).toBe(10);
-		expect(actor.container.y).toBe(20);
-		expect(actor.container.alpha).toBe(0.82);
-		expect(actor.container.scale.x).toBe(0.75);
+		expect(actor.runningGlow.alpha).toBeCloseTo(0.45);
+		expect(actor.container.x).toBe(100);
+		expect(actor.container.y).toBe(200);
 	});
 
-	it("reverses crowd opacity from the live interrupted value", () => {
+	it("supersedes different owners on one actor channel while another channel keeps producing frames", () => {
 		const actor = createActor();
-		const { animationDriver, tweens } = createAnimationDriver();
-		const animator = Effect.runSync(
-			createPixiActorAnimatorFx({
-				animationDriver,
-			}),
-		);
+		const { animator, tweens } = createAnimator();
 
 		Effect.runSync(
 			animator.animateFx({
 				actor,
-				animationKey: "running:runtime:actor",
+				channel: "lifecycle-opacity",
+				durationMs: 520,
+				ownerKey: "spawn-entry",
+				toAlpha: 1,
+			}),
+		);
+		Effect.runSync(
+			animator.animateFx({
+				actor,
+				channel: "pose",
+				durationMs: 800,
+				ownerKey: "spawn-travel",
+				toX: 110,
+				toY: 220,
+			}),
+		);
+		tweens[0]?.update(0.5);
+		tweens[1]?.update(0.25);
+		expect(actor.container.alpha).toBeCloseTo(0.91);
+		expect(actor.container.x).toBe(35);
+		expect(actor.container.y).toBe(70);
+
+		Effect.runSync(
+			animator.animateFx({
+				actor,
+				channel: "lifecycle-opacity",
+				durationMs: 220,
+				ownerKey: "exit",
+				toAlpha: 0,
+			}),
+		);
+
+		expect(tweens[0]?.stop).toHaveBeenCalledOnce();
+		expect(tweens[1]?.stop).not.toHaveBeenCalled();
+
+		// A stopped driver's stale frame is ignored, the independently owned pose keeps advancing,
+		// and the successor opacity starts from the exact live interrupted value.
+		tweens[0]?.update(1);
+		tweens[1]?.update(0.75);
+		tweens[2]?.update(0.5);
+
+		expect(actor.container.alpha).toBeCloseTo(0.455);
+		expect(actor.container.x).toBe(85);
+		expect(actor.container.y).toBe(170);
+	});
+
+	it("reverses one channel from its live value even when the successor has another owner key", () => {
+		const actor = createActor();
+		const { animator, tweens } = createAnimator();
+
+		Effect.runSync(
+			animator.animateFx({
+				actor,
+				channel: "crowd-opacity",
 				durationMs: 180,
+				ownerKey: "running:start",
 				toCrowdAlpha: 0.82,
 			}),
 		);
-		tweens[0]?.props.onUpdate(0.5);
+		tweens[0]?.update(0.5);
 		Effect.runSync(
 			animator.animateFx({
 				actor,
-				animationKey: "running:runtime:actor",
+				channel: "crowd-opacity",
 				durationMs: 180,
+				ownerKey: "running:stop",
 				toCrowdAlpha: 1,
 			}),
 		);
-		tweens[1]?.props.onUpdate(0.5);
+		tweens[1]?.update(0.5);
 
 		expect(tweens[0]?.stop).toHaveBeenCalledOnce();
 		expect(actor.crowdLayer.alpha).toBeCloseTo(0.955);
 	});
 
-	it("stops the replaced key and ignores its stale completion", () => {
+	it("setFx cancels only its physical channel, applies the write, and invalidates one frame", () => {
 		const actor = createActor();
-		const { animationDriver, tweens } = createAnimationDriver();
-		const animator = Effect.runSync(
-			createPixiActorAnimatorFx({
-				animationDriver,
-			}),
-		);
-		const firstComplete = vi.fn();
-		const secondComplete = vi.fn();
+		const { animator, invalidate, tweens } = createAnimator();
 
 		Effect.runSync(
 			animator.animateFx({
 				actor,
-				animationKey: "shared",
+				channel: "lifecycle-opacity",
+				durationMs: 520,
+				ownerKey: "entry",
+				toAlpha: 1,
+			}),
+		);
+		Effect.runSync(
+			animator.animateFx({
+				actor,
+				channel: "pose",
+				durationMs: 520,
+				ownerKey: "travel",
+				toX: 100,
+				toY: 200,
+			}),
+		);
+
+		Effect.runSync(
+			animator.setFx({
+				actor,
+				alpha: 0.25,
+				channel: "lifecycle-opacity",
+			}),
+		);
+
+		expect(tweens[0]?.stop).toHaveBeenCalledOnce();
+		expect(tweens[1]?.stop).not.toHaveBeenCalled();
+		expect(actor.container.alpha).toBe(0.25);
+		expect(invalidate).toHaveBeenCalledOnce();
+	});
+
+	it("cancelActorFx stops every channel owned by the exact actor only", () => {
+		const firstActor = createActor("runtime:first");
+		const secondActor = createActor("runtime:second");
+		const { animator, tweens } = createAnimator();
+
+		for (const [actor, channel, ownerKey] of [
+			[
+				firstActor,
+				"pose",
+				"first:pose",
+			],
+			[
+				firstActor,
+				"lifecycle-opacity",
+				"first:alpha",
+			],
+			[
+				secondActor,
+				"pose",
+				"second:pose",
+			],
+		] as const) {
+			Effect.runSync(
+				channel === "pose"
+					? animator.animateFx({
+							actor,
+							channel,
+							durationMs: 300,
+							ownerKey,
+							toX: 100,
+							toY: 200,
+						})
+					: animator.animateFx({
+							actor,
+							channel,
+							durationMs: 300,
+							ownerKey,
+							toAlpha: 0,
+						}),
+			);
+		}
+
+		Effect.runSync(animator.cancelActorFx(firstActor));
+
+		expect(tweens[0]?.stop).toHaveBeenCalledOnce();
+		expect(tweens[1]?.stop).toHaveBeenCalledOnce();
+		expect(tweens[2]?.stop).not.toHaveBeenCalled();
+	});
+
+	it("does not let a replacement instance cancel the exiting instance with the same item id", () => {
+		const exiting = createActor("runtime:same", "instance:exiting");
+		const replacement = createActor("runtime:same", "instance:replacement");
+		const { animator, tweens } = createAnimator();
+
+		Effect.runSync(
+			animator.animateFx({
+				actor: exiting,
+				channel: "lifecycle-opacity",
+				durationMs: 220,
+				ownerKey: readPixiActorAlphaAnimationKey(exiting),
+				toAlpha: 0,
+			}),
+		);
+		Effect.runSync(
+			animator.animateFx({
+				actor: replacement,
+				channel: "lifecycle-opacity",
+				durationMs: 520,
+				ownerKey: readPixiActorAlphaAnimationKey(replacement),
+				toAlpha: 1,
+			}),
+		);
+
+		expect(readPixiActorAlphaAnimationKey(exiting)).not.toBe(
+			readPixiActorAlphaAnimationKey(replacement),
+		);
+		expect(tweens[0]?.stop).not.toHaveBeenCalled();
+		expect(tweens[1]?.stop).not.toHaveBeenCalled();
+	});
+
+	it("ignores stale completion and attempts every active channel during close", () => {
+		const firstActor = createActor("runtime:first");
+		const secondActor = createActor("runtime:second");
+		const thirdActor = createActor("runtime:third");
+		const { animator, tweens } = createAnimator();
+		const staleComplete = vi.fn();
+		const survivingComplete = vi.fn();
+
+		Effect.runSync(
+			animator.animateFx({
+				actor: firstActor,
+				channel: "pose",
 				durationMs: 300,
-				onComplete: firstComplete,
+				onComplete: staleComplete,
+				ownerKey: "first-owner",
 				toX: 100,
 				toY: 200,
 			}),
 		);
 		Effect.runSync(
 			animator.animateFx({
-				actor,
-				animationKey: "shared",
+				actor: firstActor,
+				channel: "pose",
 				durationMs: 300,
-				onComplete: secondComplete,
+				onComplete: survivingComplete,
+				ownerKey: "second-owner",
 				toX: 200,
 				toY: 300,
 			}),
 		);
-
-		expect(tweens[0]?.stop).toHaveBeenCalledOnce();
-		tweens[0]?.props.onComplete?.();
-		tweens[1]?.props.onComplete?.();
-		tweens[1]?.props.onComplete?.();
-		expect(firstComplete).not.toHaveBeenCalled();
-		expect(secondComplete).toHaveBeenCalledOnce();
-	});
-
-	it("does not mutate a destroyed actor and attempts every close", () => {
-		const firstActor = createActor();
-		const secondActor = createActor();
-		const { animationDriver, tweens } = createAnimationDriver();
-		const animator = Effect.runSync(
-			createPixiActorAnimatorFx({
-				animationDriver,
+		Effect.runSync(
+			animator.animateFx({
+				actor: secondActor,
+				channel: "glow-opacity",
+				durationMs: 300,
+				ownerKey: "second-actor-glow",
+				toRunningGlowAlpha: 0.62,
 			}),
 		);
-		for (const [actor, animationKey] of [
-			[
-				firstActor,
-				"first",
-			],
-			[
-				secondActor,
-				"second",
-			],
-		] as const) {
-			Effect.runSync(
-				animator.animateFx({
-					actor,
-					animationKey,
-					durationMs: 300,
-					toX: 100,
-					toY: 200,
-				}),
-			);
-		}
-		firstActor.container.destroyed = true;
-		tweens[0]?.props.onUpdate(1);
-		expect(firstActor.container.x).toBe(10);
-		tweens[0]?.stop.mockImplementationOnce(() => {
+		Effect.runSync(
+			animator.animateFx({
+				actor: thirdActor,
+				channel: "pose",
+				durationMs: 300,
+				ownerKey: "third-actor-pose",
+				toX: 50,
+				toY: 60,
+			}),
+		);
+
+		tweens[0]?.complete();
+		tweens[1]?.complete();
+		expect(staleComplete).not.toHaveBeenCalled();
+		expect(survivingComplete).toHaveBeenCalledOnce();
+
+		tweens[2]?.stop.mockImplementationOnce(() => {
 			throw new Error("stop failed");
 		});
-
 		expect(() => Effect.runSync(animator.closeFx)).toThrow();
-		expect(tweens[0]?.stop).toHaveBeenCalledOnce();
-		expect(tweens[1]?.stop).toHaveBeenCalledOnce();
+		expect(tweens[2]?.stop).toHaveBeenCalledOnce();
+		expect(tweens[3]?.stop).toHaveBeenCalledOnce();
 	});
 });

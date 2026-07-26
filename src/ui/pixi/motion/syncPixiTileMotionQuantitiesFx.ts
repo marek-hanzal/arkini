@@ -2,6 +2,7 @@ import { Effect } from "effect";
 
 import type { PixiMainSceneActorStore } from "~/ui/pixi/actor/PixiMainSceneActorStore";
 import { updatePixiTileActorFx } from "~/ui/pixi/actor/updatePixiTileActorFx";
+import type { PixiActorAnimator } from "~/ui/pixi/animation/PixiActorAnimator";
 import type { PixiScenePalette } from "~/ui/pixi/appearance/PixiScenePalette";
 import type { PixiApplicationOwner } from "~/ui/pixi/runtime/PixiApplicationOwner";
 import type { PixiTextureStore } from "~/ui/pixi/runtime/createPixiTextureStoreFx";
@@ -10,6 +11,7 @@ import type { PixiMainSceneSurface } from "~/ui/pixi/scene/PixiMainSceneSurface"
 export namespace syncPixiTileMotionQuantitiesFx {
 	export interface Props {
 		readonly actorStore: PixiMainSceneActorStore;
+		readonly animator: PixiActorAnimator;
 		readonly application: PixiApplicationOwner;
 		readonly readPalette: () => PixiScenePalette;
 		readonly surface: PixiMainSceneSurface;
@@ -22,6 +24,7 @@ export namespace syncPixiTileMotionQuantitiesFx {
 export const syncPixiTileMotionQuantitiesFx = Effect.fn("syncPixiTileMotionQuantitiesFx")(
 	function* ({
 		actorStore,
+		animator,
 		application,
 		readPalette,
 		surface,
@@ -35,13 +38,14 @@ export const syncPixiTileMotionQuantitiesFx = Effect.fn("syncPixiTileMotionQuant
 			if (actor === undefined || canonical === undefined || pose === null) continue;
 			yield* updatePixiTileActorFx({
 				actor,
+				animator,
 				frames: application.frames,
 				item: {
 					...canonical,
 					quantity: Math.max(1, canonical.quantity - hiddenQuantity),
 				},
 				palette: readPalette(),
-				size: pose.size,
+				size: actor.dragging ? actor.size : pose.size,
 				textures,
 			});
 		}
@@ -58,10 +62,11 @@ export const syncPixiTileMotionQuantitiesFx = Effect.fn("syncPixiTileMotionQuant
 			}
 			yield* updatePixiTileActorFx({
 				actor,
+				animator,
 				frames: application.frames,
 				item: canonical,
 				palette: readPalette(),
-				size: pose.size,
+				size: actor.dragging ? actor.size : pose.size,
 				textures,
 			});
 		}

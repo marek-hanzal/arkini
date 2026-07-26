@@ -1,14 +1,21 @@
 import { Effect } from "effect";
+import { match } from "ts-pattern";
 
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
-import type { TileMotionCue } from "~/bridge/tile/motion/TileMotionCue";
+import type {
+	TileMotionCue,
+	TileSpawnMotionCue,
+	TileSwapMotionCue,
+} from "~/bridge/tile/motion/TileMotionCue";
 import type { PixiMainSceneActorStore } from "~/ui/pixi/actor/PixiMainSceneActorStore";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
 import { destroyPixiTileActorFx } from "~/ui/pixi/actor/destroyPixiTileActorFx";
 import type { PixiActorAnimator } from "~/ui/pixi/animation/PixiActorAnimator";
+import { startPixiTileActorFadeInFx } from "~/ui/pixi/animation/startPixiTileActorFadeInFx";
 import type { PixiScenePalette } from "~/ui/pixi/appearance/PixiScenePalette";
 import type { TileSceneHandoff } from "~/ui/pixi/handoff/TileSceneHandoff";
 import type { TileSceneHandoffStore } from "~/ui/pixi/handoff/createTileSceneHandoffStoreFx";
+import type { PixiTileMagneticField } from "~/ui/pixi/magnet/PixiTileMagneticField";
 import type {
 	PixiTileMotionRuntime,
 	PixiTileMotionSnapshot,
@@ -17,6 +24,7 @@ import { finalizePixiTileMotionActorsFx } from "~/ui/pixi/motion/finalizePixiTil
 import { readPixiTileInteractionClaimsFx } from "~/ui/pixi/motion/readPixiTileInteractionClaimsFx";
 import { readPixiTileMotionAnimationKeysFx } from "~/ui/pixi/motion/readPixiTileMotionAnimationKeysFx";
 import { runPixiTileMotionCueFx } from "~/ui/pixi/motion/runPixiTileMotionCueFx";
+import { settlePixiTileMotionActorFx } from "~/ui/pixi/motion/settlePixiTileMotionActorFx";
 import { syncPixiTileMotionQuantitiesFx } from "~/ui/pixi/motion/syncPixiTileMotionQuantitiesFx";
 import type { PixiApplicationOwner } from "~/ui/pixi/runtime/PixiApplicationOwner";
 import type { PixiTextureStore } from "~/ui/pixi/runtime/createPixiTextureStoreFx";
@@ -32,6 +40,7 @@ export namespace createPixiTileMotionRuntimeFx {
 		readonly animator: PixiActorAnimator;
 		readonly application: PixiApplicationOwner;
 		readonly handoffs: TileSceneHandoffStore;
+		readonly magneticField: PixiTileMagneticField;
 		readonly readPalette: () => PixiScenePalette;
 		readonly surface: PixiMainSceneSurface;
 		readonly textures: PixiTextureStore;
@@ -45,6 +54,12 @@ const emptyMotionLanes = {
 
 const maximumRememberedCueKeys = 256;
 
+interface PixiDetachedSwapLeg {
+	readonly actorId: string;
+	readonly cueKey: string;
+	readonly ownerKey: string;
+}
+
 /**
  * Owns ordered presentation-cue lanes, idempotency, interaction claims, and completion cleanup.
  *
@@ -57,6 +72,7 @@ export const createPixiTileMotionRuntimeFx = Effect.fn("createPixiTileMotionRunt
 	animator,
 	application,
 	handoffs,
+	magneticField,
 	readPalette,
 	surface,
 	textures,
@@ -67,6 +83,9 @@ export const createPixiTileMotionRuntimeFx = Effect.fn("createPixiTileMotionRunt
 	const startedCueKeys = new Set<string>();
 	const claimedHandoffs = new Map<string, TileSceneHandoff>();
 	const transientActorByCueKey = new Map<string, PixiTileActor>();
+	const activeMagneticSourceActorIds = new Set<string>();
+	const activeSwapLegActorIdsByCueKey = new Map<string, Set<string>>();
+	const detachedSwapLegByActorId = new Map<string, PixiDetachedSwapLeg>();
 
 	const readCueKey = (cue: TileMotionCue) => `${cue.sequence}:${cue.eventIndex}`;
 	const readCueHandoffKey = (cue: TileMotionCue) => `${cue.sequence}:${cue.originActorId}`;
@@ -83,8 +102,13 @@ export const createPixiTileMotionRuntimeFx = Effect.fn("createPixiTileMotionRunt
 		}
 	};
 
-	const readInteractionClaims = () =>
-		RendererRuntime.runSync(readPixiTileInteractionClaimsFx(readCues()));
+	const readInteractionClaims = () => {
+		const claims = RendererRuntime.runSync(readPixiTileInteractionClaimsFx(readCues()));
+		for (const actorId of detachedSwapLegByActorId.keys()) {
+			claims.set(actorId, "handoff");
+		}
+		return claims;
+	};
 
 	const readOwnedActorIds = () => new Set(readInteractionClaims().keys());
 
@@ -99,6 +123,7 @@ export const createPixiTileMotionRuntimeFx = Effect.fn("createPixiTileMotionRunt
 		RendererRuntime.runSync(
 			syncPixiTileMotionQuantitiesFx({
 				actorStore,
+				animator,
 				application,
 				readPalette,
 				surface,
@@ -108,18 +133,36 @@ export const createPixiTileMotionRuntimeFx = Effect.fn("createPixiTileMotionRunt
 		);
 	};
 
+	const releaseMagneticSource = (actorId: string) => {
+		if (!activeMagneticSourceActorIds.delete(actorId)) return;
+		RendererRuntime.runSync(
+			magneticField.releaseFx({
+				sourceActorId: actorId,
+				sourceKind: "motion",
+			}),
+		);
+	};
+
 	function completeCue(cue: TileMotionCue) {
 		if (closed || !startedCueKeys.delete(readCueKey(cue))) return;
 		transientActorByCueKey.delete(readCueKey(cue));
-		motionLanes = RendererRuntime.runSync(
-			updateTileMotionLanesFx({
-				action: {
-					cue,
-					type: "complete",
-				},
-				state: motionLanes,
-			}),
-		);
+		motionLanes =
+			detachedSwapLegByActorId.size > 0
+				? {
+						active: motionLanes.active.filter(
+							(activeCue) => readCueKey(activeCue) !== readCueKey(cue),
+						),
+						pending: motionLanes.pending,
+					}
+				: RendererRuntime.runSync(
+						updateTileMotionLanesFx({
+							action: {
+								cue,
+								type: "complete",
+							},
+							state: motionLanes,
+						}),
+					);
 		const completedHandoffKey = readCueHandoffKey(cue);
 		const handoffStillClaimed = readCues().some(
 			(candidate) => readCueHandoffKey(candidate) === completedHandoffKey,
@@ -130,12 +173,15 @@ export const createPixiTileMotionRuntimeFx = Effect.fn("createPixiTileMotionRunt
 				actorIds: RendererRuntime.runSync(readTileMotionActorClaimsFx(cue)),
 				actorStore,
 				animator,
+				application,
+				readPalette,
 				stillClaimedActorIds: readOwnedActorIds(),
 				surface,
+				textures,
 			}),
 		);
 		syncQuantities();
-		startCues();
+		if (detachedSwapLegByActorId.size === 0) startCues();
 	}
 
 	function readClaimedHandoff(cue: TileMotionCue) {
@@ -147,6 +193,55 @@ export const createPixiTileMotionRuntimeFx = Effect.fn("createPixiTileMotionRunt
 		return handoff;
 	}
 
+	function startSwapLeg(cueKey: string, actorId: string) {
+		const activeActorIds = activeSwapLegActorIdsByCueKey.get(cueKey);
+		if (activeActorIds !== undefined) {
+			activeActorIds.add(actorId);
+			return;
+		}
+		activeSwapLegActorIdsByCueKey.set(
+			cueKey,
+			new Set([
+				actorId,
+			]),
+		);
+	}
+
+	function settleSwapLeg(cueKey: string, actorId: string) {
+		const activeActorIds = activeSwapLegActorIdsByCueKey.get(cueKey);
+		activeActorIds?.delete(actorId);
+		if (activeActorIds?.size === 0) activeSwapLegActorIdsByCueKey.delete(cueKey);
+		const detached = detachedSwapLegByActorId.get(actorId);
+		if (detached?.cueKey !== cueKey) return;
+		detachedSwapLegByActorId.delete(actorId);
+		RendererRuntime.runSync(
+			finalizePixiTileMotionActorsFx({
+				actorIds: new Set([
+					actorId,
+				]),
+				actorStore,
+				animator,
+				application,
+				readPalette,
+				stillClaimedActorIds: readOwnedActorIds(),
+				surface,
+				textures,
+			}),
+		);
+		if (detachedSwapLegByActorId.size > 0) return;
+		motionLanes = RendererRuntime.runSync(
+			updateTileMotionLanesFx({
+				action: {
+					cues: [],
+					type: "enqueue",
+				},
+				state: motionLanes,
+			}),
+		);
+		syncQuantities();
+		startCues();
+	}
+
 	function startCue(cue: TileMotionCue) {
 		const cueKey = readCueKey(cue);
 		RendererRuntime.runSync(
@@ -156,7 +251,20 @@ export const createPixiTileMotionRuntimeFx = Effect.fn("createPixiTileMotionRunt
 				application,
 				cue,
 				cueKey,
+				magneticField,
 				onComplete: () => completeCue(cue),
+				onMagneticSourceAcquired: (actorId) => {
+					activeMagneticSourceActorIds.add(actorId);
+				},
+				onMagneticSourceReleased: (actorId) => {
+					activeMagneticSourceActorIds.delete(actorId);
+				},
+				onSwapLegSettled: (actorId) => {
+					settleSwapLeg(cueKey, actorId);
+				},
+				onSwapLegStarted: (actorId) => {
+					startSwapLeg(cueKey, actorId);
+				},
 				onTransientCreated: (actor) => {
 					transientActorByCueKey.set(cueKey, actor);
 				},
@@ -178,7 +286,236 @@ export const createPixiTileMotionRuntimeFx = Effect.fn("createPixiTileMotionRunt
 		}
 	}
 
+	const settleReleasedActor = (actorId: string) =>
+		Effect.gen(function* () {
+			const actor = actorStore.actors.get(actorId);
+			const canonical = actorStore.canonicalItems.get(actorId);
+			if (actor === undefined || canonical === undefined || actor.container.destroyed) return;
+			const target = yield* surface.readActorPoseFx(canonical);
+			if (target === null) return;
+			yield* settlePixiTileMotionActorFx({
+				actor,
+				animator,
+				fallbackTarget: target,
+				onSettled: () => {
+					if (actor.container.destroyed) return;
+					const latest = actorStore.canonicalItems.get(actorId);
+					if (latest === undefined) return;
+					const latestPose = RendererRuntime.runSync(surface.readActorPoseFx(latest));
+					latestPose?.layer.addChild(actor.container);
+				},
+				ownerKey: `motion-handoff-settle:${actor.instanceId}`,
+				surface,
+				targetLocation: canonical.location,
+			});
+		});
+
+	const isInterruptibleCueForActor = (
+		cue: TileMotionCue,
+		actorId: string,
+	): cue is TileSpawnMotionCue | TileSwapMotionCue =>
+		match(cue)
+			.with(
+				{
+					kind: "spawn",
+				},
+				(spawn) => spawn.actorId === actorId,
+			)
+			.with(
+				{
+					kind: "stack",
+				},
+				() => false,
+			)
+			.with(
+				{
+					kind: "swap",
+				},
+				(swap) => swap.actorId === actorId || swap.counterpartActorId === actorId,
+			)
+			.exhaustive();
+
 	return {
+		beginInteractionHandoffFx: Effect.fn("PixiTileMotionRuntime.beginInteractionHandoffFx")(
+			(actorId) =>
+				Effect.gen(function* () {
+					if (closed) return false;
+					const detached = detachedSwapLegByActorId.get(actorId);
+					const handedOffDetached = detached !== undefined;
+					if (detached !== undefined) {
+						yield* animator.cancelFx(detached.ownerKey);
+						detachedSwapLegByActorId.delete(actorId);
+						const activeActorIds = activeSwapLegActorIdsByCueKey.get(detached.cueKey);
+						activeActorIds?.delete(actorId);
+						if (activeActorIds?.size === 0) {
+							activeSwapLegActorIdsByCueKey.delete(detached.cueKey);
+						}
+						releaseMagneticSource(actorId);
+					}
+					const cues = readCues();
+					const superseded = cues.filter(
+						(cue): cue is TileSpawnMotionCue | TileSwapMotionCue =>
+							isInterruptibleCueForActor(cue, actorId),
+					);
+					if (superseded.length === 0) {
+						if (!handedOffDetached) return false;
+						if (detachedSwapLegByActorId.size === 0) {
+							motionLanes = yield* updateTileMotionLanesFx({
+								action: {
+									cues: [],
+									type: "enqueue",
+								},
+								state: motionLanes,
+							});
+							syncQuantities();
+							startCues();
+						}
+						return true;
+					}
+					const supersededCueKeys = new Set(superseded.map(readCueKey));
+					const hasBlockingClaim = cues.some(
+						(cue) =>
+							!supersededCueKeys.has(readCueKey(cue)) &&
+							RendererRuntime.runSync(readTileMotionActorClaimsFx(cue)).has(actorId),
+					);
+					if (hasBlockingClaim) return false;
+
+					const activeCounterpartIds = new Set<string>();
+					const completedCounterpartIds = new Set<string>();
+					const pendingCounterpartIds = new Set<string>();
+					const activeSpawnActorIds = new Set<string>();
+					const pendingSpawnActorIds = new Set<string>();
+					for (const cue of superseded) {
+						const cueKey = readCueKey(cue);
+						const started = startedCueKeys.delete(cueKey);
+						yield* match(cue)
+							.with(
+								{
+									kind: "spawn",
+								},
+								(spawn) =>
+									Effect.gen(function* () {
+										if (!started) {
+											pendingSpawnActorIds.add(spawn.actorId);
+											return;
+										}
+										activeSpawnActorIds.add(spawn.actorId);
+										yield* animator.cancelFx(`motion:${cueKey}`);
+									}),
+							)
+							.with(
+								{
+									kind: "swap",
+								},
+								(swap) =>
+									Effect.gen(function* () {
+										const counterpartId =
+											swap.actorId === actorId
+												? swap.counterpartActorId
+												: swap.actorId;
+										if (!started) {
+											pendingCounterpartIds.add(counterpartId);
+											return;
+										}
+										yield* animator.cancelFx(`motion:${cueKey}:${actorId}`);
+										const activeActorIds =
+											activeSwapLegActorIdsByCueKey.get(cueKey);
+										activeActorIds?.delete(actorId);
+										if (activeActorIds?.has(counterpartId)) {
+											activeCounterpartIds.add(counterpartId);
+											detachedSwapLegByActorId.set(counterpartId, {
+												actorId: counterpartId,
+												cueKey,
+												ownerKey: `motion:${cueKey}:${counterpartId}`,
+											});
+										} else {
+											completedCounterpartIds.add(counterpartId);
+										}
+										if (activeActorIds?.size === 0) {
+											activeSwapLegActorIdsByCueKey.delete(cueKey);
+										}
+									}),
+							)
+							.exhaustive();
+						if (started) releaseMagneticSource(actorId);
+						transientActorByCueKey.delete(cueKey);
+					}
+					const filteredMotionLanes = {
+						active: motionLanes.active.filter(
+							(cue) => !supersededCueKeys.has(readCueKey(cue)),
+						),
+						pending: motionLanes.pending.filter(
+							(cue) => !supersededCueKeys.has(readCueKey(cue)),
+						),
+					};
+					motionLanes =
+						detachedSwapLegByActorId.size > 0
+							? filteredMotionLanes
+							: yield* updateTileMotionLanesFx({
+									action: {
+										cues: [],
+										type: "enqueue",
+									},
+									state: filteredMotionLanes,
+								});
+
+					for (const cue of superseded) {
+						const handoffKey = readCueHandoffKey(cue);
+						if (
+							!readCues().some(
+								(candidate) => readCueHandoffKey(candidate) === handoffKey,
+							)
+						) {
+							claimedHandoffs.delete(handoffKey);
+						}
+					}
+
+					const stillClaimedActorIds = readOwnedActorIds();
+					const settleActorIds = new Set(
+						[
+							...pendingCounterpartIds,
+							...completedCounterpartIds,
+						].filter(
+							(counterpartId) =>
+								counterpartId !== actorId &&
+								!activeCounterpartIds.has(counterpartId) &&
+								!stillClaimedActorIds.has(counterpartId),
+						),
+					);
+					if (settleActorIds.size > 0) {
+						yield* finalizePixiTileMotionActorsFx({
+							actorIds: settleActorIds,
+							actorStore,
+							animator,
+							application,
+							readPalette,
+							stillClaimedActorIds,
+							surface,
+							textures,
+						});
+						yield* Effect.forEach(settleActorIds, settleReleasedActor, {
+							discard: true,
+						});
+					}
+					for (const pendingSpawnActorId of pendingSpawnActorIds) {
+						if (activeSpawnActorIds.has(pendingSpawnActorId)) continue;
+						const pendingSpawnActor = actorStore.actors.get(pendingSpawnActorId);
+						if (
+							pendingSpawnActor === undefined ||
+							pendingSpawnActor.container.destroyed
+						) {
+							continue;
+						}
+						yield* startPixiTileActorFadeInFx({
+							actor: pendingSpawnActor,
+							animator,
+						});
+					}
+					syncQuantities();
+					if (detachedSwapLegByActorId.size === 0) startCues();
+					return true;
+				}),
+		),
 		enqueueFx: Effect.fn("PixiTileMotionRuntime.enqueueFx")((cues) =>
 			Effect.sync(() => {
 				if (closed || cues.length === 0) return;
@@ -190,15 +527,24 @@ export const createPixiTileMotionRuntimeFx = Effect.fn("createPixiTileMotionRunt
 				});
 				retainNewestCueKeys();
 				if (uniqueCues.length === 0) return;
-				motionLanes = RendererRuntime.runSync(
-					updateTileMotionLanesFx({
-						action: {
-							cues: uniqueCues,
-							type: "enqueue",
-						},
-						state: motionLanes,
-					}),
-				);
+				motionLanes =
+					detachedSwapLegByActorId.size > 0
+						? {
+								active: motionLanes.active,
+								pending: [
+									...motionLanes.pending,
+									...uniqueCues,
+								],
+							}
+						: RendererRuntime.runSync(
+								updateTileMotionLanesFx({
+									action: {
+										cues: uniqueCues,
+										type: "enqueue",
+									},
+									state: motionLanes,
+								}),
+							);
 			}),
 		),
 		readSnapshotFx: Effect.sync(
@@ -235,14 +581,26 @@ export const createPixiTileMotionRuntimeFx = Effect.fn("createPixiTileMotionRunt
 					yield* animator.cancelFx(animationKey);
 				}
 			}
+			for (const detached of detachedSwapLegByActorId.values()) {
+				yield* animator.cancelFx(detached.ownerKey);
+			}
 			for (const transientActor of transientActorByCueKey.values()) {
+				yield* animator.cancelActorFx(transientActor);
 				yield* destroyPixiTileActorFx(transientActor);
+			}
+			for (const actorId of [
+				...activeMagneticSourceActorIds,
+			]) {
+				releaseMagneticSource(actorId);
 			}
 			motionLanes = emptyMotionLanes;
 			knownCueKeys.clear();
 			startedCueKeys.clear();
 			claimedHandoffs.clear();
 			transientActorByCueKey.clear();
+			activeMagneticSourceActorIds.clear();
+			activeSwapLegActorIdsByCueKey.clear();
+			detachedSwapLegByActorId.clear();
 		}),
 	} satisfies PixiTileMotionRuntime;
 });

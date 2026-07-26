@@ -1,4 +1,5 @@
 import { Effect } from "effect";
+import { match } from "ts-pattern";
 
 type VisualRouteId =
 	| "about"
@@ -50,13 +51,39 @@ export const resolveRouteViewTransitionTypesFx = Effect.fn("resolveRouteViewTran
 				return false;
 			const from = resolveVisualRouteId(fromLocation.pathname);
 			const to = resolveVisualRouteId(toLocation.pathname);
-			const sceneRelationship = isHeroRoute(from)
-				? isHeroRoute(to)
-					? "hero-to-hero"
-					: "hero-to-board"
-				: isHeroRoute(to)
-					? "board-to-hero"
-					: "board-to-board";
+			const sceneRelationship = match({
+				fromHero: isHeroRoute(from),
+				toHero: isHeroRoute(to),
+			})
+				.with(
+					{
+						fromHero: true,
+						toHero: true,
+					},
+					() => "hero-to-hero" as const,
+				)
+				.with(
+					{
+						fromHero: true,
+						toHero: false,
+					},
+					() => "hero-to-board" as const,
+				)
+				.with(
+					{
+						fromHero: false,
+						toHero: true,
+					},
+					() => "board-to-hero" as const,
+				)
+				.with(
+					{
+						fromHero: false,
+						toHero: false,
+					},
+					() => "board-to-board" as const,
+				)
+				.exhaustive();
 			const pair = `${from}-to-${to}`;
 			return pair === sceneRelationship
 				? [

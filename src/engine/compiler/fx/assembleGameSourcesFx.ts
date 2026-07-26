@@ -1,7 +1,7 @@
 import path from "node:path";
 
 import { Effect } from "effect";
-import { match } from "ts-pattern";
+import { match, P } from "ts-pattern";
 
 import type { GameSourceSchema } from "~/engine/schema/GameSourceSchema";
 import type { GameSourceAssemblySchema } from "../schema/GameSourceAssemblySchema";
@@ -29,49 +29,75 @@ export const assembleGameSourcesFx = Effect.fn("assembleGameSourcesFx")(function
 	const diagnostics: GameDiagnosticsSchema.Type = [];
 
 	for (const source of sources) {
-		if (source.value.$schema !== undefined) {
-			const resolved = path.resolve(path.dirname(source.path), source.value.$schema);
-			if (provenance.schema === undefined) {
-				value.$schema = source.value.$schema;
-				provenance.schema = {
-					path: source.path,
-					value: source.value.$schema,
-					resolved,
-				};
-			} else if (provenance.schema.resolved !== resolved) {
-				diagnostics.push({
-					code: DiagnosticCodeEnumSchema.enum.SourceSchemaReferenceConflict,
-					severity: DiagnosticSeverityEnumSchema.enum.Error,
-					path: [
-						"$schema",
-					],
-					source: source.path,
-					message: `JSON Schema reference ${JSON.stringify(source.value.$schema)} conflicts with ${JSON.stringify(provenance.schema.value)}.`,
-					values: [
-						provenance.schema.value,
-						source.value.$schema,
-					],
-					sources: [
-						provenance.schema.path,
-						source.path,
-					],
-				});
-			} else {
-				const currentParents = provenance.schema.value
-					.split("/")
-					.filter((part) => part === "..").length;
-				const nextParents = source.value.$schema
-					.split("/")
-					.filter((part) => part === "..").length;
-				if (nextParents < currentParents) {
-					value.$schema = source.value.$schema;
-					provenance.schema = {
-						path: source.path,
-						value: source.value.$schema,
-						resolved,
-					};
-				}
-			}
+		const schemaReference = source.value.$schema;
+		if (schemaReference !== undefined) {
+			const resolved = path.resolve(path.dirname(source.path), schemaReference);
+			const current = provenance.schema;
+			match({
+				current,
+				resolutionMatches: current?.resolved === resolved,
+			})
+				.with(
+					{
+						current: undefined,
+					},
+					() => {
+						value.$schema = schemaReference;
+						provenance.schema = {
+							path: source.path,
+							value: schemaReference,
+							resolved,
+						};
+					},
+				)
+				.with(
+					{
+						current: P.nonNullable,
+						resolutionMatches: false,
+					},
+					({ current }) => {
+						diagnostics.push({
+							code: DiagnosticCodeEnumSchema.enum.SourceSchemaReferenceConflict,
+							severity: DiagnosticSeverityEnumSchema.enum.Error,
+							path: [
+								"$schema",
+							],
+							source: source.path,
+							message: `JSON Schema reference ${JSON.stringify(schemaReference)} conflicts with ${JSON.stringify(current.value)}.`,
+							values: [
+								current.value,
+								schemaReference,
+							],
+							sources: [
+								current.path,
+								source.path,
+							],
+						});
+					},
+				)
+				.with(
+					{
+						current: P.nonNullable,
+						resolutionMatches: true,
+					},
+					({ current }) => {
+						const currentParents = current.value
+							.split("/")
+							.filter((part) => part === "..").length;
+						const nextParents = schemaReference
+							.split("/")
+							.filter((part) => part === "..").length;
+						if (nextParents < currentParents) {
+							value.$schema = schemaReference;
+							provenance.schema = {
+								path: source.path,
+								value: schemaReference,
+								resolved,
+							};
+						}
+					},
+				)
+				.exhaustive();
 		}
 
 		for (const provider of DiagnosticProviderEnumSchema.options) {

@@ -19,8 +19,8 @@ interface PixiMainSceneActiveDragBase {
 	targetItem: TileActorItem | null;
 }
 
-export interface PixiMainSceneActivationGesture extends PixiMainSceneActiveDragBase {
-	readonly mode: "activation-only";
+export interface PixiMainSceneMotionHandoffGesture extends PixiMainSceneActiveDragBase {
+	readonly mode: "motion-handoff";
 	readonly phase: "pressed";
 }
 
@@ -29,4 +29,6 @@ export interface PixiMainSceneMovableGesture extends PixiMainSceneActiveDragBase
 	phase: "dragging" | "pressed" | "submitting";
 }
 
-export type PixiMainSceneActiveDrag = PixiMainSceneActivationGesture | PixiMainSceneMovableGesture;
+export type PixiMainSceneActiveDrag =
+	| PixiMainSceneMotionHandoffGesture
+	| PixiMainSceneMovableGesture;

@@ -42,8 +42,8 @@ export const updatePixiMainSceneMagneticFieldFx = Effect.fn("updatePixiMainScene
 			sourceActorId: sourceItem.id,
 			sourceDirection,
 			sourceItem,
-			sourceX: actor.container.x - actor.container.pivot.x,
-			sourceY: actor.container.y - actor.container.pivot.y,
+			sourceX: actor.container.x - actor.container.pivot.x * actor.container.scale.x,
+			sourceY: actor.container.y - actor.container.pivot.y * actor.container.scale.y,
 		});
 	},
 );

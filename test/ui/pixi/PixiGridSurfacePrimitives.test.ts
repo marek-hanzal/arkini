@@ -23,10 +23,42 @@ class FakeGraphics {
 		return this;
 	}
 
+	closePath() {
+		this.calls.push({
+			args: [],
+			name: "closePath",
+		});
+		return this;
+	}
+
 	fill(...args: readonly unknown[]) {
 		this.calls.push({
 			args,
 			name: "fill",
+		});
+		return this;
+	}
+
+	lineTo(...args: readonly unknown[]) {
+		this.calls.push({
+			args,
+			name: "lineTo",
+		});
+		return this;
+	}
+
+	moveTo(...args: readonly unknown[]) {
+		this.calls.push({
+			args,
+			name: "moveTo",
+		});
+		return this;
+	}
+
+	quadraticCurveTo(...args: readonly unknown[]) {
+		this.calls.push({
+			args,
+			name: "quadraticCurveTo",
 		});
 		return this;
 	}
@@ -248,8 +280,15 @@ describe("Pixi grid surface primitives", () => {
 		});
 	});
 
-	it("paints one slot feedback marker and clears an empty target", () => {
+	it("paints an interior slot feedback marker and clears an empty target", () => {
 		const graphics = new FakeGraphics();
+		const interiorSurface = {
+			...surface,
+			columns: 3,
+			height: 90,
+			rows: 3,
+			width: 90,
+		} satisfies PixiGridSurfaceLayout;
 
 		Effect.runSync(
 			drawPixiGridDropFeedbackFx({
@@ -257,9 +296,9 @@ describe("Pixi grid surface primitives", () => {
 				graphics: asGraphics(graphics),
 				slot: {
 					x: 1,
-					y: 0,
+					y: 1,
 				},
-				surface,
+				surface: interiorSurface,
 			}),
 		);
 
@@ -271,7 +310,7 @@ describe("Pixi grid surface primitives", () => {
 			{
 				args: [
 					40,
-					20,
+					50,
 					30,
 					30,
 				],
@@ -310,5 +349,88 @@ describe("Pixi grid surface primitives", () => {
 			args: [],
 			name: "clear",
 		});
+	});
+
+	it.each([
+		{
+			expectedQuadratics: [
+				[
+					10,
+					20,
+					13.6,
+					20,
+				],
+			],
+			kind: "board",
+			slot: {
+				x: 0,
+				y: 0,
+			},
+		},
+		{
+			expectedQuadratics: [
+				[
+					70,
+					80,
+					66.4,
+					80,
+				],
+			],
+			kind: "inventory",
+			slot: {
+				x: 1,
+				y: 1,
+			},
+		},
+		{
+			expectedQuadratics: [
+				[
+					10,
+					50,
+					10,
+					46.4,
+				],
+				[
+					10,
+					20,
+					13.6,
+					20,
+				],
+			],
+			kind: "toolbar",
+			slot: {
+				x: 0,
+				y: 0,
+			},
+		},
+	] as const)("rounds only the outer $kind slot corners that meet its surface outline", ({
+		expectedQuadratics,
+		kind,
+		slot,
+	}) => {
+		const graphics = new FakeGraphics();
+		const targetSurface = {
+			...surface,
+			height: kind === "toolbar" ? 30 : surface.height,
+			kind,
+			rows: kind === "toolbar" ? 1 : surface.rows,
+		} satisfies PixiGridSurfaceLayout;
+
+		Effect.runSync(
+			drawPixiGridDropFeedbackFx({
+				color: 0xabcdef,
+				graphics: asGraphics(graphics),
+				slot,
+				surface: targetSurface,
+			}),
+		);
+
+		expect(graphics.calls.some(({ name }) => name === "rect")).toBe(false);
+		const roundedCorners = graphics.calls
+			.filter(({ name }) => name === "quadraticCurveTo")
+			.map(({ args }) => args)
+			.filter((args) => args[0] !== args[2] || args[1] !== args[3]);
+		expect(roundedCorners).toEqual(expectedQuadratics);
+		expect(graphics.calls.at(-3)?.name).toBe("closePath");
 	});
 });

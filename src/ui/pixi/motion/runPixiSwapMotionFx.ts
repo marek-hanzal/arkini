@@ -6,6 +6,10 @@ import type { PixiMainSceneActorStore } from "~/ui/pixi/actor/PixiMainSceneActor
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
 import type { PixiActorAnimator } from "~/ui/pixi/animation/PixiActorAnimator";
 import { readPixiTileTravelDurationMsFx } from "~/ui/pixi/animation/readPixiTileTravelDurationMsFx";
+import type { PixiTileMagneticField } from "~/ui/pixi/magnet/PixiTileMagneticField";
+import { createPixiTileMotionMagneticProjectorFx } from "~/ui/pixi/motion/createPixiTileMotionMagneticProjectorFx";
+import { createPixiTileMotionPoseSamplerFx } from "~/ui/pixi/motion/createPixiTileMotionPoseSamplerFx";
+import { settlePixiTileMotionActorFx } from "~/ui/pixi/motion/settlePixiTileMotionActorFx";
 import type { PixiMainSceneSurface } from "~/ui/pixi/scene/PixiMainSceneSurface";
 import type { PixiTileActorPose } from "~/ui/pixi/scene/PixiTileActorPose";
 
@@ -13,6 +17,7 @@ interface PixiSwapMotionLeg {
 	readonly actor: PixiTileActor;
 	readonly forceOrigin: PixiTileActorPose | null;
 	readonly target: PixiTileActorPose;
+	readonly targetLocation: TileSwapMotionCue["targetLocation"];
 }
 
 export namespace runPixiSwapMotionFx {
@@ -22,7 +27,12 @@ export namespace runPixiSwapMotionFx {
 		readonly cue: TileSwapMotionCue;
 		readonly cueKey: string;
 		readonly delayMs: number;
+		readonly magneticField: PixiTileMagneticField;
 		readonly onComplete: () => void;
+		readonly onMagneticSourceAcquired: (actorId: string) => void;
+		readonly onMagneticSourceReleased: (actorId: string) => void;
+		readonly onSwapLegSettled: (actorId: string) => void;
+		readonly onSwapLegStarted: (actorId: string) => void;
 		readonly origin: PixiTileActorPose;
 		readonly surface: PixiMainSceneSurface;
 		readonly target: PixiTileActorPose;
@@ -36,7 +46,12 @@ export const runPixiSwapMotionFx = Effect.fn("runPixiSwapMotionFx")(function* ({
 	cue,
 	cueKey,
 	delayMs,
+	magneticField,
 	onComplete,
+	onMagneticSourceAcquired,
+	onMagneticSourceReleased,
+	onSwapLegSettled,
+	onSwapLegStarted,
 	origin,
 	surface,
 	target,
@@ -51,6 +66,7 @@ export const runPixiSwapMotionFx = Effect.fn("runPixiSwapMotionFx")(function* ({
 						actor: exchanged,
 						forceOrigin: origin,
 						target,
+						targetLocation: cue.targetLocation,
 					},
 				]),
 		...(counterpart === undefined
@@ -60,6 +76,7 @@ export const runPixiSwapMotionFx = Effect.fn("runPixiSwapMotionFx")(function* ({
 						actor: counterpart,
 						forceOrigin: null,
 						target: origin,
+						targetLocation: cue.originLocation,
 					},
 				]),
 	];
@@ -69,12 +86,15 @@ export const runPixiSwapMotionFx = Effect.fn("runPixiSwapMotionFx")(function* ({
 	}
 	const pendingActorIds = new Set(legs.map(({ actor }) => actor.item.id));
 	for (const leg of legs) {
-		yield* animator.cancelFx(leg.actor.item.id);
 		surface.transientActorLayer.addChild(leg.actor.container);
-		leg.actor.container.alpha = 1;
 		if (leg.forceOrigin !== null) {
-			leg.actor.container.x = leg.forceOrigin.x;
-			leg.actor.container.y = leg.forceOrigin.y;
+			yield* animator.setFx({
+				actor: leg.actor,
+				channel: "pose",
+				scale: leg.forceOrigin.size / Math.max(1, leg.actor.size),
+				x: leg.forceOrigin.x,
+				y: leg.forceOrigin.y,
+			});
 		}
 		const durationMs = yield* readPixiTileTravelDurationMsFx({
 			fromX: leg.actor.container.x,
@@ -83,28 +103,74 @@ export const runPixiSwapMotionFx = Effect.fn("runPixiSwapMotionFx")(function* ({
 			toX: leg.target.x,
 			toY: leg.target.y,
 		});
+		const poseSampler = yield* createPixiTileMotionPoseSamplerFx({
+			actorBaseSize: leg.actor.size,
+			from: {
+				scale: leg.actor.container.scale.x,
+				x: leg.actor.container.x,
+				y: leg.actor.container.y,
+			},
+			surface,
+			target: leg.target,
+			targetLocation: leg.targetLocation,
+		});
+		const counterpartActorId =
+			leg.actor.item.id === cue.actorId ? cue.counterpartActorId : cue.actorId;
+		const magneticProjector = yield* createPixiTileMotionMagneticProjectorFx({
+			actor: leg.actor,
+			attractedActorId: null,
+			eligibleAttractionActorIds: new Set([
+				counterpartActorId,
+			]),
+			magneticField,
+			onAcquired: onMagneticSourceAcquired,
+			onReleased: onMagneticSourceReleased,
+		});
+		onSwapLegStarted(leg.actor.item.id);
 		yield* animator.animateFx({
 			actor: leg.actor,
-			animationKey: `motion:${cueKey}:${leg.actor.item.id}`,
+			channel: "pose",
 			delayMs,
 			durationMs,
+			ownerKey: `motion:${cueKey}:${leg.actor.item.id}`,
 			onComplete: () => {
-				if (!pendingActorIds.delete(leg.actor.item.id)) return;
-				if (!leg.actor.container.destroyed) {
-					const canonical = actorStore.canonicalItems.get(leg.actor.item.id);
-					const currentTarget =
-						canonical === undefined
-							? null
-							: RendererRuntime.runSync(surface.readActorPoseFx(canonical));
-					const settledTarget = currentTarget ?? leg.target;
-					settledTarget.layer.addChild(leg.actor.container);
-					leg.actor.container.x = settledTarget.x;
-					leg.actor.container.y = settledTarget.y;
+				const settle = () => {
+					if (!pendingActorIds.delete(leg.actor.item.id)) return;
+					magneticProjector.release();
+					if (!leg.actor.container.destroyed) {
+						const canonical = actorStore.canonicalItems.get(leg.actor.item.id);
+						const currentTarget =
+							canonical === undefined
+								? null
+								: RendererRuntime.runSync(surface.readActorPoseFx(canonical));
+						const settledTarget = currentTarget ?? leg.target;
+						settledTarget.layer.addChild(leg.actor.container);
+					}
+					onSwapLegSettled(leg.actor.item.id);
+					if (pendingActorIds.size === 0) onComplete();
+				};
+				if (!poseSampler.needsCompletionSettle()) {
+					settle();
+					return;
 				}
-				if (pendingActorIds.size === 0) onComplete();
+				RendererRuntime.runSync(
+					settlePixiTileMotionActorFx({
+						actor: leg.actor,
+						animator,
+						fallbackTarget: leg.target,
+						onPose: magneticProjector.projectPose,
+						onSettled: settle,
+						ownerKey: `motion:${cueKey}:${leg.actor.item.id}`,
+						surface,
+						targetLocation: leg.targetLocation,
+					}),
+				);
 			},
-			toX: leg.target.x,
-			toY: leg.target.y,
+			readPose: (progress) => {
+				const pose = poseSampler.readPose(progress);
+				magneticProjector.projectPose(pose);
+				return pose;
+			},
 		});
 	}
 });

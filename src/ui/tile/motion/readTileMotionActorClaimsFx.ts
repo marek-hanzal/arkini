@@ -21,10 +21,7 @@ export const readTileMotionActorClaimsFx = Effect.fn("readTileMotionActorClaimsF
 					{
 						kind: "stack",
 					},
-					(stack) =>
-						new Set([
-							stack.targetActorId,
-						]),
+					() => new Set<string>(),
 				)
 				.with(
 					{

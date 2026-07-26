@@ -6,6 +6,9 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { GameEngine } from "~/bridge/game/GameEngine";
 import type { TileActorItem } from "~/bridge/tile/TileActorItem";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
+import { pixiTileActorConsumedSourceFadeDurationMs } from "~/ui/pixi/animation/flashPixiTileActorConsumedSourceFx";
+import { pixiTileActorFeedbackGlowRiseDurationMs } from "~/ui/pixi/animation/runPixiTileActorRunningGlowFx";
+import { pixiInventoryActorRemovalFeedbackDurationMs } from "~/ui/pixi/drag/startPixiInventoryActorRemovalFeedbackFx";
 import { readPixiInventorySceneLayoutFx } from "~/ui/pixi/layout/readPixiInventorySceneLayoutFx";
 import { readPixiMainSceneLayoutFx } from "~/ui/pixi/layout/readPixiMainSceneLayoutFx";
 import type { PixiApplicationOwner } from "~/ui/pixi/runtime/PixiApplicationOwner";
@@ -24,11 +27,23 @@ interface FakePointerEvent {
 }
 
 interface FakeContainer {
+	alpha: number;
 	children: FakeContainer[];
+	cursor: string;
 	destroyed: boolean;
 	eventMode: string;
 	hitArea: unknown;
 	mask: unknown;
+	pivot: {
+		x: number;
+		y: number;
+		set: (x: number, y?: number) => void;
+	};
+	scale: {
+		x: number;
+		y: number;
+		set: (x: number, y?: number) => void;
+	};
 	x: number;
 	y: number;
 	zIndex: number;
@@ -45,10 +60,16 @@ const sceneState = vi.hoisted(() => ({
 	actors: [] as PixiTileActor[],
 	close: vi.fn(),
 	createContainer: undefined as (() => FakeContainer) | undefined,
+	deferredTweenDurations: new Set<number>(),
 	drop: vi.fn(),
+	glowTextureClose: vi.fn(),
+	glowTexture: {
+		kind: "running-glow-texture",
+	},
 	items: [] as TileActorItem[],
 	owner: null as PixiApplicationOwner | null,
 	preview: vi.fn(),
+	pendingTweenCompletions: [] as Array<() => void>,
 	resize: null as (() => void) | null,
 	roundRects: 0,
 	transition: null as GameTransition | null,
@@ -57,11 +78,29 @@ const sceneState = vi.hoisted(() => ({
 
 vi.mock("pixi.js", () => {
 	class Container implements FakeContainer {
+		alpha = 1;
 		children: FakeContainer[] = [];
+		cursor = "default";
 		destroyed = false;
 		eventMode = "auto";
 		hitArea: unknown = null;
 		mask: unknown = null;
+		pivot = {
+			x: 0,
+			y: 0,
+			set: (x: number, y = x) => {
+				this.pivot.x = x;
+				this.pivot.y = y;
+			},
+		};
+		scale = {
+			x: 1,
+			y: 1,
+			set: (x: number, y = x) => {
+				this.scale.x = x;
+				this.scale.y = y;
+			},
+		};
 		x = 0;
 		y = 0;
 		zIndex = 0;
@@ -204,6 +243,75 @@ vi.mock("~/ui/pixi/runtime/createPixiApplicationOwnerFx", async () => {
 	};
 });
 
+vi.mock("~/ui/pixi/actor/createPixiTileActorRunningGlowTextureFx", async () => {
+	const { Effect: EffectModule } = await import("effect");
+	return {
+		createPixiTileActorRunningGlowTextureFx: () =>
+			EffectModule.succeed({
+				closeFx: EffectModule.sync(sceneState.glowTextureClose),
+				texture: sceneState.glowTexture,
+			}),
+	};
+});
+
+vi.mock("~/ui/pixi/animation/createPixiAnimationDriverFx", async () => {
+	const { Effect: EffectModule } = await import("effect");
+	return {
+		createPixiAnimationDriverFx: () =>
+			EffectModule.succeed({
+				closeFx: EffectModule.void,
+				createSpringFx: ({
+					initialValue,
+					onUpdate,
+				}: {
+					readonly initialValue: number;
+					readonly onUpdate: (value: number) => void;
+				}) =>
+					EffectModule.sync(() => {
+						onUpdate(initialValue);
+						return {
+							closeFx: EffectModule.void,
+							setTargetFx: (value: number) =>
+								EffectModule.sync(() => onUpdate(value)),
+						};
+					}),
+				startTweenFx: ({
+					durationMs,
+					onComplete,
+					onUpdate,
+					to,
+				}: {
+					readonly durationMs: number;
+					readonly onComplete?: () => void;
+					readonly onUpdate: (value: number) => void;
+					readonly to: number;
+				}) =>
+					EffectModule.sync(() => {
+						onUpdate(to);
+						let active = true;
+						const complete = () => {
+							if (!active) return;
+							active = false;
+							onComplete?.();
+						};
+						if (
+							durationMs === 2_400 ||
+							sceneState.deferredTweenDurations.has(durationMs)
+						) {
+							sceneState.pendingTweenCompletions.push(complete);
+						} else {
+							complete();
+						}
+						return {
+							stopFx: EffectModule.sync(() => {
+								active = false;
+							}),
+						};
+					}),
+			}),
+	};
+});
+
 vi.mock("~/ui/pixi/appearance/readPixiScenePaletteFx", async () => {
 	const { Effect: EffectModule } = await import("effect");
 	return {
@@ -253,15 +361,38 @@ vi.mock("~/bridge/tile/readTileDropPreviewFx", async () => {
 vi.mock("~/ui/pixi/actor/createPixiTileActorFx", async () => {
 	const { Effect: EffectModule } = await import("effect");
 	return {
-		createPixiTileActorFx: ({ item }: { readonly item: TileActorItem }) =>
+		createPixiTileActorFx: ({
+			item,
+			runningGlowTexture,
+		}: {
+			readonly item: TileActorItem;
+			readonly runningGlowTexture: unknown;
+		}) =>
 			EffectModule.sync(() => {
 				const createContainer = sceneState.createContainer;
 				if (createContainer === undefined) throw new Error("Pixi mock is not ready.");
 				const actor = {
 					container: createContainer(),
+					crowdLayer: {
+						alpha: item.running ? 0.82 : 1,
+					},
+					currentVisual: {
+						item,
+					},
+					instanceId: `test-inventory:${item.id}`,
 					item,
+					lifecycleDurationMs: 0,
+					lifecycleFadeStarted: false,
+					lifecycleIntentGeneration: 0,
+					lifecycleNotBeforeMs: 0,
+					lifecycleTargetAlpha: 1,
+					runningGlow: {
+						alpha: 0,
+						texture: runningGlowTexture,
+						visible: false,
+					},
 					size: 0,
-					textureGeneration: 0,
+					visuals: new Set(),
 					dragging: false,
 					dragOffsetX: 0,
 					dragOffsetY: 0,
@@ -287,6 +418,7 @@ vi.mock("~/ui/pixi/actor/updatePixiTileActorFx", async () => {
 		}) =>
 			EffectModule.sync(() => {
 				actor.item = item;
+				actor.currentVisual.item = item;
 				actor.size = size;
 			}),
 	};
@@ -309,6 +441,7 @@ const inventoryItem = {
 	quantity: 4,
 	revision: "revision:water",
 	running: false,
+	runningGlow: false,
 	sourceUrl: "resource:water",
 	title: "Water",
 } satisfies TileActorItem;
@@ -341,23 +474,23 @@ const pointer = (x: number, y: number, shiftKey = false): FakePointerEvent => ({
 	stopPropagation: vi.fn(),
 });
 
-const readTestInventoryLayout = () => {
+const readTestInventoryLayout = (width = 800, height = 480) => {
 	const preferredCellSize = Effect.runSync(
 		readPixiMainSceneLayoutFx({
 			boardHeight: 7,
 			boardWidth: 11,
-			height: 480,
+			height,
 			toolbarSize: 8,
-			width: 800,
+			width,
 		}),
 	).board.cellSize;
 	return Effect.runSync(
 		readPixiInventorySceneLayoutFx({
 			columns: 5,
-			height: 480,
+			height,
 			preferredCellSize,
 			rows: 4,
-			width: 800,
+			width,
 		}),
 	);
 };
@@ -479,12 +612,15 @@ const publishItems = (items: readonly TileActorItem[], notify = true) => {
 beforeEach(() => {
 	sceneState.actors.length = 0;
 	sceneState.close.mockClear();
+	sceneState.deferredTweenDurations.clear();
 	sceneState.drop.mockClear();
+	sceneState.glowTextureClose.mockClear();
 	sceneState.items = [
 		inventoryItem,
 	];
 	sceneState.owner = null;
 	sceneState.preview.mockClear();
+	sceneState.pendingTweenCompletions.length = 0;
 	sceneState.resize = null;
 	sceneState.roundRects = 0;
 	sceneState.transition = {
@@ -504,6 +640,133 @@ afterEach(() => {
 });
 
 describe("Pixi Inventory scene runtime", () => {
+	it("owns and fades the same running glow as the Board scene", async () => {
+		sceneState.items = [
+			{
+				...inventoryItem,
+				running: true,
+				runningGlow: true,
+			},
+		];
+		const { actor, runtime } = await mountScene();
+
+		expect(actor.runningGlow).toMatchObject({
+			alpha: 0.28,
+			texture: sceneState.glowTexture,
+			visible: true,
+		});
+
+		publishItems([
+			{
+				...inventoryItem,
+				running: false,
+				runningGlow: false,
+			},
+		]);
+		expect(actor.runningGlow).toMatchObject({
+			alpha: 0,
+			visible: false,
+		});
+
+		await Effect.runPromise(runtime.closeFx);
+		expect(sceneState.glowTextureClose).toHaveBeenCalledOnce();
+	});
+
+	it("dips a surviving Inventory source from a committed input-consumption fact", async () => {
+		sceneState.deferredTweenDurations.add(pixiTileActorConsumedSourceFadeDurationMs);
+		const { actor, runtime } = await mountScene();
+		const current = sceneState.transition;
+		if (current === null) throw new Error("Test transition is missing.");
+		const transition = {
+			events: [
+				{
+					type: "item:input-stored",
+					sourceItemId: inventoryItem.id,
+					canonicalItemId: inventoryItem.itemId,
+					previousSourceLocation: inventoryItem.location,
+					previousQuantity: 4,
+					storedQuantity: 1,
+					resultingQuantity: 3,
+					ownerItemId: "runtime:producer",
+					lineId: "line:default",
+					inputIndex: 0,
+				},
+			],
+			previousRuntime: current.runtime,
+			runtime: {
+				currentSpace: 0,
+			} as never,
+			sequence: current.sequence + 1,
+		} satisfies GameTransition;
+		sceneState.items = [
+			{
+				...inventoryItem,
+				quantity: 3,
+				revision: "revision:water:3",
+			},
+		];
+		sceneState.transition = transition;
+		sceneState.transitionListener?.(transition);
+
+		expect(actor.item.quantity).toBe(3);
+		expect(actor.container.alpha).toBeCloseTo(0.42);
+		await Effect.runPromise(runtime.closeFx);
+	});
+
+	it("hydrates historical Inventory feedback without replaying its animation", async () => {
+		sceneState.deferredTweenDurations.add(pixiTileActorConsumedSourceFadeDurationMs);
+		sceneState.items = [
+			{
+				...inventoryItem,
+				quantity: 3,
+				revision: "revision:water:historical",
+			},
+		];
+		sceneState.transition = {
+			events: [
+				{
+					type: "item:input-stored",
+					sourceItemId: inventoryItem.id,
+					canonicalItemId: inventoryItem.itemId,
+					previousSourceLocation: inventoryItem.location,
+					previousQuantity: 4,
+					storedQuantity: 1,
+					resultingQuantity: 3,
+					ownerItemId: "runtime:producer",
+					lineId: "line:default",
+					inputIndex: 0,
+				},
+			],
+			previousRuntime: null,
+			runtime: {
+				currentSpace: 0,
+			} as never,
+			sequence: 8,
+		};
+		const baseGame = createGame();
+		const replayingGame = {
+			...baseGame,
+			subscribeTransitions: (listener: (transition: GameTransition) => void) => {
+				sceneState.transitionListener = listener;
+				if (sceneState.transition !== null) listener(sceneState.transition);
+				return () => {
+					if (sceneState.transitionListener === listener) {
+						sceneState.transitionListener = null;
+					}
+				};
+			},
+		} as unknown as GameEngine;
+
+		const { actor, runtime } = await mountScene({
+			game: replayingGame,
+		});
+
+		expect(actor.item.quantity).toBe(3);
+		expect(actor.container.alpha).toBe(1);
+		expect(sceneState.pendingTweenCompletions).toEqual([]);
+		await Effect.runPromise(runtime.closeFx);
+	});
+
 	it("uses the Board actor size and routes an ordinary click to Inventory activation", async () => {
 		const { actor, onActivate, runtime, stage } = await mountScene();
 		const expectedBoardSize = Effect.runSync(
@@ -532,6 +795,85 @@ describe("Pixi Inventory scene runtime", () => {
 			}),
 		);
 		expect(sceneState.drop).not.toHaveBeenCalled();
+		await Effect.runPromise(runtime.closeFx);
+	});
+
+	it("starts removal feedback on click and retains the removed actor until its fade completes", async () => {
+		sceneState.deferredTweenDurations.add(pixiInventoryActorRemovalFeedbackDurationMs);
+		const onActivate = vi.fn(() => new Promise<void>(() => undefined));
+		const { actor, runtime, stage } = await mountScene({
+			onActivate,
+		});
+		const actorContainer = actor.container as unknown as FakeContainer;
+
+		actorContainer.emit("pointerdown", slotPointer(0));
+		stage.emit("pointerup", slotPointer(0));
+		await Promise.resolve();
+
+		expect(onActivate).toHaveBeenCalledOnce();
+		expect(actor.container.alpha).toBe(0);
+		expect(actor.container.destroyed).toBe(false);
+
+		publishItems([]);
+
+		expect(actor.onPointerDown).toBeNull();
+		expect(actorContainer.eventMode).toBe("none");
+		expect(actor.container.destroyed).toBe(false);
+
+		for (const complete of [
+			...sceneState.pendingTweenCompletions,
+		]) {
+			complete();
+		}
+		expect(actor.container.destroyed).toBe(true);
+		await Effect.runPromise(runtime.closeFx);
+	});
+
+	it("dispatches repeated clicks while an older Inventory activation is still pending", async () => {
+		const onActivate = vi.fn(() => new Promise<void>(() => undefined));
+		const { actor, runtime, stage } = await mountScene({
+			onActivate,
+		});
+		const actorContainer = actor.container as unknown as FakeContainer;
+
+		actorContainer.emit("pointerdown", slotPointer(0));
+		stage.emit("pointerup", slotPointer(0));
+		await Promise.resolve();
+		actorContainer.emit("pointerdown", slotPointer(0));
+		stage.emit("pointerup", slotPointer(0));
+		await Promise.resolve();
+
+		expect(onActivate).toHaveBeenCalledTimes(2);
+		expect(actor.container.alpha).toBe(0);
+		await Effect.runPromise(runtime.closeFx);
+	});
+
+	it("restores an ordinary-click fade after a newer Shift activation settles first", async () => {
+		let resolveOrdinary: () => void = () => undefined;
+		const ordinary = new Promise<void>((resolve) => {
+			resolveOrdinary = resolve;
+		});
+		const onActivate = vi.fn((_item: TileActorItem, shiftKey: boolean) =>
+			shiftKey ? Promise.resolve() : ordinary,
+		);
+		const { actor, runtime, stage } = await mountScene({
+			onActivate,
+		});
+		const actorContainer = actor.container as unknown as FakeContainer;
+
+		actorContainer.emit("pointerdown", slotPointer(0));
+		stage.emit("pointerup", slotPointer(0));
+		await Promise.resolve();
+		actorContainer.emit("pointerdown", slotPointer(0, true));
+		stage.emit("pointerup", slotPointer(0, true));
+		await flushMicrotasks();
+
+		expect(onActivate).toHaveBeenCalledTimes(2);
+		expect(actor.container.alpha).toBe(0);
+
+		resolveOrdinary();
+		await flushMicrotasks();
+		expect(actor.container.alpha).toBe(1);
 		await Effect.runPromise(runtime.closeFx);
 	});
 
@@ -623,6 +965,46 @@ describe("Pixi Inventory scene runtime", () => {
 				target: occupiedTarget,
 			}),
 		);
+		await Effect.runPromise(runtime.closeFx);
+	});
+
+	it("flashes the canonical receiver after an accepted Inventory stack", async () => {
+		sceneState.items = [
+			inventoryItem,
+			inventoryTargetItem,
+		];
+		sceneState.deferredTweenDurations.add(pixiTileActorConsumedSourceFadeDurationMs);
+		sceneState.deferredTweenDurations.add(pixiTileActorFeedbackGlowRiseDurationMs);
+		const onDrop = vi.fn(() =>
+			Promise.resolve({
+				kind: "stack",
+				source: {
+					current: {
+						itemId: inventoryItem.id,
+					},
+					itemId: inventoryItem.id,
+				},
+				target: {
+					itemId: inventoryTargetItem.id,
+				},
+			} as never),
+		);
+		const { actor, runtime, stage } = await mountScene({
+			onDrop,
+		});
+
+		(actor.container as unknown as FakeContainer).emit("pointerdown", slotPointer(0));
+		stage.emit("globalpointermove", slotPointer(1));
+		stage.emit("pointerup", slotPointer(1));
+		await flushMicrotasks();
+
+		const receiver = sceneState.actors[1];
+		if (receiver === undefined) throw new Error("Expected the Inventory stack receiver.");
+		expect(receiver.runningGlow).toMatchObject({
+			alpha: 0.82,
+			visible: true,
+		});
+		expect(actor.container.alpha).toBeCloseTo(0.42);
 		await Effect.runPromise(runtime.closeFx);
 	});
 
@@ -744,6 +1126,31 @@ describe("Pixi Inventory scene runtime", () => {
 		await Effect.runPromise(runtime.closeFx);
 	});
 
+	it("settles a dragged actor at the latest physical size after a live resize", async () => {
+		const { actor, runtime, stage } = await mountScene();
+		const originalBaseSize = actor.size;
+		(actor.container as unknown as FakeContainer).emit("pointerdown", slotPointer(0));
+		stage.emit("globalpointermove", slotPointer(1));
+
+		if (sceneState.owner === null || sceneState.resize === null) {
+			throw new Error("Inventory resize owner is missing.");
+		}
+		(
+			sceneState.owner.app.screen as {
+				width: number;
+			}
+		).width = 600;
+		sceneState.resize();
+		expect(actor.dragging).toBe(true);
+		expect(actor.size).toBe(originalBaseSize);
+
+		Effect.runSync(runtime.cancelInteractionFx);
+
+		expect(actor.dragging).toBe(false);
+		expect(actor.size * actor.container.scale.x).toBe(readTestInventoryLayout(600).actorSize);
+		await Effect.runPromise(runtime.closeFx);
+	});
+
 	it("does not invoke deferred activation or drop callbacks after the scene closes", async () => {
 		const { actor, onActivate, runtime, stage } = await mountScene();
 		const actorContainer = actor.container as unknown as FakeContainer;
@@ -811,11 +1218,11 @@ describe("Pixi Inventory scene runtime", () => {
 		await Promise.resolve();
 		actorContainer.emit("pointerdown", slotPointer(0));
 		stage.emit("pointerup", slotPointer(0));
-		await Promise.resolve();
-		await Promise.resolve();
+		await flushMicrotasks();
 
 		expect(onActivate).toHaveBeenCalledTimes(2);
 		expect(error).toHaveBeenCalledWith("Pixi Inventory activation failed.", expect.any(Error));
+		expect(actor.container.alpha).toBe(1);
 		await Effect.runPromise(runtime.closeFx);
 	});
 

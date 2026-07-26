@@ -3,7 +3,6 @@ import { Effect } from "effect";
 import type { PixiMainSceneActorStore } from "~/ui/pixi/actor/PixiMainSceneActorStore";
 import type { PixiActorAnimator } from "~/ui/pixi/animation/PixiActorAnimator";
 import type { PixiMainSceneDragController } from "~/ui/pixi/drag/PixiMainSceneDragController";
-import { readPixiReplacementAlphaAnimationKey } from "~/ui/pixi/scene/readPixiReplacementAlphaAnimationKey";
 
 export namespace releasePixiMainSceneActorFx {
 	export interface Props {
@@ -24,9 +23,11 @@ export const releasePixiMainSceneActorFx = Effect.fn("releasePixiMainSceneActorF
 	const actor = actorStore.actors.get(actorId);
 	if (actor === undefined) return null;
 	yield* drag.detachActorFx(actor);
-	yield* actorStore.deleteActorFx(actorId);
-	yield* animator.cancelFx(actorId);
-	yield* animator.cancelFx(`running:${actorId}`);
-	yield* animator.cancelFx(readPixiReplacementAlphaAnimationKey(actorId));
+	yield* actorStore.releaseActorFx(actorId);
+	yield* animator.cancelActorFx(actor);
+	actor.lifecycleIntentGeneration += 1;
+	actor.lifecycleTargetAlpha = 0;
+	actor.lifecycleFadeStarted = true;
+	actor.visualTransitionGeneration += 1;
 	return actor;
 });

@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import { match } from "ts-pattern";
+import { match, P } from "ts-pattern";
 
 import { DropItemResultKindEnumSchema } from "~/bridge/tile/DropItemResultKindEnumSchema";
 import type { readTileDropPreviewFx } from "~/bridge/tile/readTileDropPreviewFx";
@@ -16,15 +16,47 @@ export namespace readPixiTileActorCursorFx {
 export const readPixiTileActorCursorFx = Effect.fn("readPixiTileActorCursorFx")(
 	({ phase, previewKind, running }: readPixiTileActorCursorFx.Props) =>
 		Effect.sync(() =>
-			match(phase)
-				.with("pending", () => "progress" as const)
-				.with("dragging", () =>
-					previewKind === DropItemResultKindEnumSchema.enum.Reject ||
-					previewKind === DropItemResultKindEnumSchema.enum.Ignored
-						? ("not-allowed" as const)
-						: ("grabbing" as const),
+			match({
+				phase,
+				previewKind,
+				running,
+			})
+				.with(
+					{
+						phase: "pending",
+					},
+					() => "progress" as const,
 				)
-				.with("idle", () => (running ? ("progress" as const) : ("grab" as const)))
+				.with(
+					{
+						phase: "dragging",
+						previewKind: P.union(
+							DropItemResultKindEnumSchema.enum.Reject,
+							DropItemResultKindEnumSchema.enum.Ignored,
+						),
+					},
+					() => "not-allowed" as const,
+				)
+				.with(
+					{
+						phase: "dragging",
+					},
+					() => "grabbing" as const,
+				)
+				.with(
+					{
+						phase: "idle",
+						running: true,
+					},
+					() => "progress" as const,
+				)
+				.with(
+					{
+						phase: "idle",
+						running: false,
+					},
+					() => "grab" as const,
+				)
 				.exhaustive(),
 		),
 );

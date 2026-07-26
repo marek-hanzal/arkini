@@ -3,6 +3,7 @@ import { Array, Effect } from "effect";
 import type { GameEngine } from "~/bridge/game/GameEngine";
 import type { TileActorItem } from "~/bridge/tile/TileActorItem";
 import { readTileActorVisualFx } from "~/bridge/tile/readTileActorVisualFx";
+import { readTileActorRunningGlowFx } from "~/bridge/tile/readTileActorRunningGlowFx";
 import { readRuntimeItemPrimaryActionFx } from "~/engine/item-detail/read/readRuntimeItemPrimaryActionFx";
 import { resolveActiveJobStatusFx } from "~/engine/job/fx/resolveActiveJobStatusFx";
 import { JobStatusEnumSchema } from "~/engine/job/schema/read/JobStatusEnumSchema";
@@ -54,6 +55,7 @@ export const readTileActorsFx = Effect.fn("readTileActorsFx")(function* ({
 				game,
 				item: item.item,
 			});
+			const running = activeJobStatus === JobStatusEnumSchema.enum.Running;
 
 			return {
 				...visual,
@@ -66,7 +68,11 @@ export const readTileActorsFx = Effect.fn("readTileActorsFx")(function* ({
 					: {
 							jobStatus: activeJobStatus,
 						}),
-				running: activeJobStatus === JobStatusEnumSchema.enum.Running,
+				running,
+				runningGlow: yield* readTileActorRunningGlowFx({
+					itemType: item.item.type,
+					running,
+				}),
 				primaryAction: yield* readRuntimeItemPrimaryActionFx({
 					item,
 					runtime,

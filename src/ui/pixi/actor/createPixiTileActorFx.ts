@@ -1,11 +1,11 @@
 import { Effect } from "effect";
-import { Container, Graphics, Sprite, Text, TextStyle, Texture } from "pixi.js";
+import { Container, Sprite, Texture } from "pixi.js";
 
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import type { TileActorItem } from "~/bridge/tile/TileActorItem";
 import type { PixiScenePalette } from "~/ui/pixi/appearance/PixiScenePalette";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
-import { loadPixiTileActorTexturesFx } from "~/ui/pixi/actor/loadPixiTileActorTexturesFx";
+import { createPixiTileActorVisualFx } from "~/ui/pixi/actor/createPixiTileActorVisualFx";
 import { readPixiTileActorCursorFx } from "~/ui/pixi/actor/readPixiTileActorCursorFx";
 import type { DemandFrameLoop } from "~/ui/pixi/runtime/DemandFrameLoop";
 import type { PixiTextureStore } from "~/ui/pixi/runtime/createPixiTextureStoreFx";
@@ -15,17 +15,28 @@ export namespace createPixiTileActorFx {
 		readonly frames: DemandFrameLoop;
 		readonly item: TileActorItem;
 		readonly palette: PixiScenePalette;
+		readonly runningGlowTexture?: Texture;
 		readonly textures: PixiTextureStore;
 	}
 }
 
+let nextPixiTileActorInstance = 0;
+
 /** Creates one retained native Pixi actor; async textures are generation guarded. */
 export const createPixiTileActorFx = Effect.fn("createPixiTileActorFx")(
-	({ frames, item, palette, textures }: createPixiTileActorFx.Props) =>
-		Effect.sync((): PixiTileActor => {
+	({
+		frames,
+		item,
+		palette,
+		runningGlowTexture = Texture.EMPTY,
+		textures,
+	}: createPixiTileActorFx.Props) =>
+		Effect.gen(function* (): Effect.fn.Return<PixiTileActor> {
+			nextPixiTileActorInstance += 1;
+			const instanceId = `pixi-tile:${nextPixiTileActorInstance}`;
 			const container = new Container({
 				eventMode: "static",
-				label: `TileActor:${item.id}`,
+				label: `TileActor:${item.id}:${instanceId}`,
 			});
 			container.cursor = RendererRuntime.runSync(
 				readPixiTileActorCursorFx({
@@ -34,70 +45,65 @@ export const createPixiTileActorFx = Effect.fn("createPixiTileActorFx")(
 					running: item.running,
 				}),
 			);
+			const offsetLayer = new Container({
+				eventMode: "none",
+				label: `TileActorOffset:${item.id}:${instanceId}`,
+			});
 			const crowdLayer = new Container({
 				eventMode: "none",
-				label: `TileActorCrowd:${item.id}`,
+				label: `TileActorCrowd:${item.id}:${instanceId}`,
 			});
 			crowdLayer.alpha = item.running ? 0.82 : 1;
-			const primary = new Sprite(Texture.EMPTY);
-			const composite = new Sprite(Texture.EMPTY);
-			const titleBackground = new Graphics();
-			const titleStyle = new TextStyle({
-				fill: palette.overlayForeground,
-				fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif",
-				fontSize: 14,
-				fontWeight: "500",
+			const visualLayer = new Container({
+				eventMode: "none",
+				label: `TileActorVisualLayer:${item.id}:${instanceId}`,
 			});
-			const title = new Text({
-				style: titleStyle,
-				text: item.title,
+			const runningGlow = new Sprite({
+				eventMode: "none",
+				label: `TileActorRunningGlow:${item.id}:${instanceId}`,
+				texture: runningGlowTexture,
 			});
-			const quantityBackground = new Graphics();
-			const quantity = new Text({
-				style: {
-					fill: palette.overlayForeground,
-					fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif",
-					fontSize: 14,
-					fontWeight: "700",
-				},
-				text: String(item.quantity),
+			runningGlow.anchor.set(0.5);
+			runningGlow.alpha = 0;
+			runningGlow.tint = palette.accent;
+			runningGlow.visible = false;
+			const currentVisual = yield* createPixiTileActorVisualFx({
+				frames,
+				item,
+				palette,
+				size: 0,
+				textures,
 			});
-			crowdLayer.addChild(
-				primary,
-				composite,
-				titleBackground,
-				title,
-				quantityBackground,
-				quantity,
-			);
-			container.addChild(crowdLayer);
+			const visuals = new Set([
+				currentVisual,
+			]);
+			visualLayer.addChild(currentVisual.container);
+			crowdLayer.addChild(visualLayer);
+			offsetLayer.addChild(runningGlow, crowdLayer);
+			container.addChild(offsetLayer);
 
-			const actor: PixiTileActor = {
+			return {
+				instanceId,
 				container,
+				offsetLayer,
 				crowdLayer,
-				primary,
-				composite,
-				title,
-				titleBackground,
-				quantity,
-				quantityBackground,
-				titleStyle,
+				visualLayer,
+				runningGlow,
+				visuals,
+				currentVisual,
+				pendingVisual: null,
 				item,
 				size: 0,
-				textureGeneration: 0,
+				visualTransitionGeneration: 0,
+				lifecycleIntentGeneration: 0,
+				lifecycleFadeStarted: false,
+				lifecycleTargetAlpha: 1,
+				lifecycleNotBeforeMs: 0,
+				lifecycleDurationMs: 0,
 				dragging: false,
 				dragOffsetX: 0,
 				dragOffsetY: 0,
 				onPointerDown: null,
-			};
-
-			RendererRuntime.runSync(
-				loadPixiTileActorTexturesFx({
-					actor,
-					frames,
-					textures,
-				}),
-			);
-			return actor;
+			} satisfies PixiTileActor;
 		}),
 );

@@ -32,7 +32,7 @@ export const readPixiTileMotionOriginFx = Effect.fn("readPixiTileMotionOriginFx"
 	return {
 		layer: surface.transientActorLayer,
 		size: handoff.size,
-		x: handoff.centerX - canvasRect.left - target.size / 2,
-		y: handoff.centerY - canvasRect.top - target.size / 2,
+		x: handoff.centerX - canvasRect.left - handoff.size / 2,
+		y: handoff.centerY - canvasRect.top - handoff.size / 2,
 	} satisfies readPixiTileMotionOriginFx.Result;
 });

@@ -11,7 +11,6 @@ import type {
 import { createPixiTileMagneticFieldFx } from "~/ui/pixi/magnet/createPixiTileMagneticFieldFx";
 import { readPixiTileAttractionActorIdFx } from "~/ui/pixi/magnet/readPixiTileAttractionActorIdFx";
 import { readPixiTileMagneticDisplacementFx } from "~/ui/pixi/magnet/readPixiTileMagneticDisplacementFx";
-import type { PixiMainSceneSurface } from "~/ui/pixi/scene/PixiMainSceneSurface";
 
 const targetItem = {
 	id: "runtime:target",
@@ -195,8 +194,17 @@ describe("Pixi tile magnet", () => {
 			({
 				container: {
 					destroyed: false,
+					pivot: {
+						x: 0,
+						y: 0,
+					},
+					scale: {
+						x: 1,
+					},
+					x: x * 80,
+					y: 0,
 				},
-				crowdLayer: {
+				offsetLayer: {
 					position: {
 						set: vi.fn(),
 					},
@@ -234,15 +242,6 @@ describe("Pixi tile magnet", () => {
 					actors,
 				} as unknown as PixiMainSceneActorStore,
 				animationDriver,
-				surface: {
-					readActorPoseFx: (item: TileActorItem) =>
-						Effect.succeed({
-							layer: {} as never,
-							size: 80,
-							x: item.location.position.x * 80,
-							y: 0,
-						}),
-				} as unknown as PixiMainSceneSurface,
 			}),
 		);
 		const sample = {
@@ -270,13 +269,129 @@ describe("Pixi tile magnet", () => {
 		Effect.runSync(field.pruneFx);
 		expect(springs[0]?.close).toHaveBeenCalledOnce();
 		expect(springs[1]?.close).toHaveBeenCalledOnce();
-		expect(target.crowdLayer.position.set).toHaveBeenCalledWith(0);
+		expect(target.offsetLayer.position.set).toHaveBeenCalledWith(0);
 
 		Effect.runSync(field.updateFx(sample));
 		expect(springs).toHaveLength(4);
 		Effect.runSync(field.closeFx);
 		expect(springs[2]?.close).toHaveBeenCalledOnce();
 		expect(springs[3]?.close).toHaveBeenCalledOnce();
-		expect(replacement.crowdLayer.position.set).toHaveBeenCalledWith(0);
+		expect(replacement.offsetLayer.position.set).toHaveBeenCalledWith(0);
+	});
+
+	it("composes an incoming payload with a receiver drag without flipping polarity", () => {
+		const targets: Array<ReturnType<typeof vi.fn>> = [];
+		const animationDriver = {
+			closeFx: Effect.void,
+			createSpringFx: () =>
+				Effect.sync(() => {
+					const setTarget = vi.fn();
+					targets.push(setTarget);
+					return {
+						closeFx: Effect.void,
+						setTargetFx: (value) => Effect.sync(() => setTarget(value)),
+					} satisfies PixiAnimationSpring;
+				}),
+			startTweenFx: () =>
+				Effect.succeed({
+					stopFx: Effect.void,
+				}),
+		} satisfies PixiAnimationDriver;
+		const createActor = (id: string, x: number) =>
+			({
+				container: {
+					destroyed: false,
+					pivot: {
+						x: 0,
+						y: 0,
+					},
+					scale: {
+						x: 1,
+					},
+					x,
+					y: 0,
+				},
+				offsetLayer: {
+					position: {
+						set: vi.fn(),
+					},
+					x: 0,
+					y: 0,
+				},
+				item: {
+					id,
+					location: {
+						position: {
+							x: x / 80,
+							y: 0,
+						},
+						scope: "board",
+						space: 0,
+					},
+				},
+				size: 80,
+			}) as unknown as PixiTileActor;
+		const receiver = createActor("runtime:receiver", 80);
+		const neighbour = createActor("runtime:neighbour", 160);
+		const field = Effect.runSync(
+			createPixiTileMagneticFieldFx({
+				actorStore: {
+					actors: new Map([
+						[
+							receiver.item.id,
+							receiver,
+						],
+						[
+							neighbour.item.id,
+							neighbour,
+						],
+					]),
+				} as unknown as PixiMainSceneActorStore,
+				animationDriver,
+			}),
+		);
+
+		Effect.runSync(
+			field.updateFx({
+				attractedActorId: null,
+				eligibleAttractionActorIds: new Set(),
+				sourceActorId: receiver.item.id,
+				sourceDirection: {
+					x: 1,
+					y: 0,
+				},
+				sourceItem: receiver.item,
+				sourceX: 80,
+				sourceY: 0,
+			}),
+		);
+		Effect.runSync(
+			field.updateFx({
+				attractedActorId: receiver.item.id,
+				eligibleAttractionActorIds: new Set([
+					receiver.item.id,
+				]),
+				sourceActorId: "motion:incoming",
+				sourceDirection: {
+					x: 1,
+					y: 0,
+				},
+				sourceItem: receiver.item,
+				sourceKind: "motion",
+				sourceSize: 80,
+				sourceX: 0,
+				sourceY: 0,
+			}),
+		);
+
+		expect(targets[2]?.mock.lastCall?.[0]).toBeLessThan(0);
+		Effect.runSync(
+			field.releaseFx({
+				sourceActorId: "motion:incoming",
+				sourceKind: "motion",
+			}),
+		);
+		expect(targets[2]).toHaveBeenLastCalledWith(0);
+		expect(targets[0]?.mock.lastCall?.[0]).toBeGreaterThan(0);
 	});
 });

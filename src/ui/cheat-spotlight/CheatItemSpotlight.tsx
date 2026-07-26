@@ -7,6 +7,7 @@ import {
 	useRef,
 	useState,
 } from "react";
+import { match } from "ts-pattern";
 
 import type { Game } from "~/bridge/game/Game";
 import { useCheatItemCatalog } from "~/bridge/cheat/useCheatItemCatalog";
@@ -115,11 +116,35 @@ export const CheatItemSpotlight = ({
 				document.activeElement instanceof HTMLElement ? document.activeElement : null;
 			restoreFocusRef.current = true;
 			onBeforeOpen?.();
-			if (preserveSpawnOutcomeRef.current) {
-				preserveSpawnOutcomeRef.current = false;
-			} else if (!spawn.pending) {
-				spawn.reset();
-			}
+			match({
+				preserveSpawnOutcome: preserveSpawnOutcomeRef.current,
+				spawnPending: spawn.pending,
+			})
+				.with(
+					{
+						preserveSpawnOutcome: true,
+					},
+					() => {
+						preserveSpawnOutcomeRef.current = false;
+					},
+				)
+				.with(
+					{
+						preserveSpawnOutcome: false,
+						spawnPending: false,
+					},
+					() => {
+						spawn.reset();
+					},
+				)
+				.with(
+					{
+						preserveSpawnOutcome: false,
+						spawnPending: true,
+					},
+					() => {},
+				)
+				.exhaustive();
 			setOpen(true);
 		},
 		{

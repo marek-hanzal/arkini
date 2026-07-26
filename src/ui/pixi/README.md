@@ -17,6 +17,9 @@ all scene-local owners.
 | `runtime/createPixiApplicationOwnerFx.ts` | One canvas, Pixi application, resize lifecycle, and demand renderer |
 | `scene/*Surface*` | Layout, layers, hit geometry, masks, palette, and drop-feedback paint |
 | `actor/*ActorStore*` | Retained display-object identity for one canvas |
+| `actor/transitionPixiTileActorVisualFx.ts` | One double-buffer lifecycle for complete tile-face revisions |
+| `actor/*RunningGlowTexture*` | One procedural radial-gradient texture shared under active tiles |
+| `animation/createPixiActorAnimatorFx.ts` | Sole writer for root pose and typed opacity channels |
 | `scene/createPixiMainSceneReconcilerFx.ts` | Canonical actor reconciliation and presentation entry/exit |
 | `motion/createPixiTileMotionRuntimeFx.ts` | Ordered cue lanes, animation claims, transient payloads, and cue settlement |
 | `drag/*DragController*` | One pointer gesture and its frozen source/release facts |
@@ -60,6 +63,10 @@ gameplay outcome. Missing visual identities or handoffs degrade to ordinary reco
 - Click performs the tile's immediate primary action.
 - Shift+click opens Item Detail.
 - Crossing the drag threshold changes the same pointer gesture from activation to drag.
+- Press identity stays frozen for drag/drop commands, while click activation reads the latest
+  projected actor item. Async activation never owns the next pointer gesture.
+- A canonical actor already moving through spawn or swap choreography keeps its click path; crossing
+  the threshold explicitly hands its live pose from the motion lane to direct drag.
 - Drop validity and magnetic attraction come from bridge previews, never from Pixi geometry or
   renderer-side compatibility rules.
 - Main-scene overlays block and cancel local interaction; route teardown closes either scene's
@@ -71,10 +78,38 @@ gameplay outcome. Missing visual identities or handoffs degrade to ordinary reco
   own acquisition, cancellation, completion, and teardown.
 - Rendering is demand-driven. Every visual mutation invalidates the scene; no idle Pixi ticker or
   second animation loop may run.
+- Gameplay feedback animations are intentional product behavior and must not branch on
+  `prefers-reduced-motion`; tune their motion directly instead of silently disabling or replacing it.
 - Teardown stops subscriptions and interactions before destroying actors, layers, or the
   application they reference.
-- Animation keys are ownership keys. Reusing a key must interrupt the previous writer; opacity,
-  running-state alpha, transforms, and replacement fades must not gain competing writers.
+- Actor presentation is keyed by physical actor instance and typed channel. `pose`, `grab-offset`,
+  `lifecycle-opacity`, `crowd-opacity`, `glow-opacity`, and `visual-mix` each have exactly one
+  writer; caller ownership keys may cancel work, but may never create a second writer for the same
+  channel.
+- The animator is the only production writer of root `x`, `y`, `scale`, `pivot`, and `alpha`. Layout
+  publishes canonical geometry through surfaces; motion owns normalized progress. Retargetable
+  placement samples current geometry without completion snaps, while a live stack chase snapshots
+  one endpoint per speed-bounded segment and opens another segment when its receiver moves.
+- Every texture-bearing visual revision uses one complete private slot. The current slot remains
+  renderable until the pending slot has loaded all required textures, then the visual controller
+  crossfades both from their live alpha. A superseding revision flattens the surviving composite;
+  readiness, cancellation, promotion, and destruction are scoped to the physical visual generation.
+- Spawn lifecycle opacity is durable actor intent, independent from travel and from any particular
+  texture generation. Travel may start immediately; whichever complete visual survives texture
+  supersession resumes the same fade, while a later exit remains free to supersede it.
+- Engine-driven spawn, swap, stack, and direct drag share one magnetic field. Spawn and swap repel
+  nearby board responders without attracting their own exchange counterpart; a stack payload
+  attracts and chases its receiver's live physical pose through distance-aware nonlinear segments.
+  Settlement releases the magnetic source, and stack contact only then publishes canonical quantity.
+- Accepted consumption presents exact result/event facts: the surviving source dips, a removed
+  source fades, and the receiver flashes the shared accent glow. Drop-result facts cover manual
+  stack, producer-input, and Inventory storage commands that do not emit equivalent engine events.
+- The main actor store retains physical actors after canonical removal until their exit animation
+  completes. Scene teardown destroys every retained exit and cancels visual readiness before its
+  parent layers disappear.
+- A newly mounted main scene hydrates the current committed snapshot without compiling its
+  historical events into choreography. Only later subscription deliveries present motion cues and
+  replacements; subscription replay and geometry redraw remain hydration-only.
 - Async texture completion is generation-guarded, and route-level texture ownership outlives both
   alternating canvases.
 

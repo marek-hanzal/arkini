@@ -21,7 +21,6 @@
 	--color-danger-contrast: var(--ak-danger-contrast);
 	--color-overlay: var(--ak-overlay);
 	--color-overlay-foreground: var(--ak-overlay-foreground);
-	--background-image-game-shell: var(--ak-game-shell-background);
 	--radius-xs: var(--ak-radius-xs);
 	--radius-sm: var(--ak-radius-sm);
 	--radius-md: var(--ak-radius-md);
@@ -158,83 +157,7 @@
 		color-mix(in srgb, var(--ak-accent) 72%, var(--ak-line-strong))
 	);
 
-	--ak-game-shell-field-primary: light-dark(
-		color-mix(in srgb, var(--ak-accent) 24%, transparent),
-		color-mix(in srgb, var(--ak-accent) 26%, transparent)
-	);
-	--ak-game-shell-field-secondary: light-dark(
-		color-mix(in srgb, var(--ak-info) 22%, transparent),
-		color-mix(in srgb, var(--ak-info) 18%, transparent)
-	);
-	--ak-game-shell-field-tertiary: light-dark(
-		color-mix(in srgb, var(--ak-success) 16%, transparent),
-		color-mix(in srgb, var(--ak-success) 12%, transparent)
-	);
-	--ak-game-shell-field-quaternary: light-dark(
-		color-mix(in srgb, var(--ak-warning) 14%, transparent),
-		color-mix(in srgb, var(--ak-warning) 11%, transparent)
-	);
-	--ak-game-shell-highlight: light-dark(rgb(255 255 255 / 62%), rgb(255 255 255 / 7%));
-	--ak-game-shell-vignette: light-dark(rgb(62 35 78 / 14%), rgb(0 0 0 / 36%));
-	--ak-game-shell-base-start: light-dark(#fff8ff, #15101f);
-	--ak-game-shell-base-end: light-dark(#eee4f7, #0b0711);
-	--ak-game-shell-intro-delay: 2500ms;
-	--ak-game-shell-intro-duration: 900ms;
-	--ak-game-shell-background:
-		radial-gradient(
-			ellipse 110% 88% at 50% 45%,
-			transparent 42%,
-			var(--ak-game-shell-vignette) 100%
-		),
-		radial-gradient(
-			ellipse 72% 54% at 10% 12%,
-			var(--ak-game-shell-field-primary) 0%,
-			transparent 74%
-		),
-		radial-gradient(
-			ellipse 62% 46% at 90% 16%,
-			var(--ak-game-shell-field-secondary) 0%,
-			transparent 76%
-		),
-		radial-gradient(
-			ellipse 54% 36% at 54% 104%,
-			var(--ak-game-shell-field-tertiary) 0%,
-			transparent 78%
-		),
-		radial-gradient(
-			ellipse 30% 24% at 22% 78%,
-			var(--ak-game-shell-field-quaternary) 0%,
-			transparent 74%
-		),
-		radial-gradient(
-			ellipse 28% 18% at 76% 68%,
-			color-mix(in srgb, var(--ak-accent) 10%, transparent) 0%,
-			transparent 78%
-		),
-		linear-gradient(132deg, var(--ak-game-shell-highlight) 0%, transparent 34%),
-		linear-gradient(148deg, var(--ak-game-shell-base-start), var(--ak-game-shell-base-end));
-	--ak-game-shell-background-ambient:
-		radial-gradient(
-			ellipse 58% 46% at 84% 82%,
-			var(--ak-game-shell-field-primary) 0%,
-			transparent 76%
-		),
-		radial-gradient(
-			ellipse 50% 42% at 14% 70%,
-			var(--ak-game-shell-field-secondary) 0%,
-			transparent 78%
-		),
-		radial-gradient(
-			ellipse 42% 32% at 64% 6%,
-			var(--ak-game-shell-field-tertiary) 0%,
-			transparent 80%
-		),
-		radial-gradient(
-			ellipse 34% 26% at 34% 26%,
-			var(--ak-game-shell-field-quaternary) 0%,
-			transparent 76%
-		),
-		linear-gradient(318deg, var(--ak-game-shell-highlight) 0%, transparent 30%);
+	--ak-game-shell-background: light-dark(#e7d8ee, #24142f);
 	color: var(--ak-foreground);
 	background: var(--ak-canvas);
 }
@@ -521,69 +444,8 @@ select {
 }
 
 [data-ui="GameShell"] {
-	background-color: var(--ak-canvas);
+	background-color: var(--ak-game-shell-background);
 	isolation: isolate;
-}
-
-[data-ui="GameShell"]::before,
-[data-ui="GameShell"]::after {
-	position: absolute;
-	z-index: -1;
-	inset: -8%;
-	content: "";
-	pointer-events: none;
-	background-repeat: no-repeat;
-	background-size: 100% 100%;
-	will-change: opacity;
-}
-
-[data-ui="GameShell"]::before {
-	background-image: var(--ak-game-shell-background-ambient);
-	opacity: 0;
-	animation: ak-game-shell-ambient-fade-in var(--ak-game-shell-intro-duration) ease-out
-		var(--ak-game-shell-intro-delay) forwards;
-}
-
-[data-ui="GameShell"]::after {
-	background-image: var(--ak-game-shell-background);
-	opacity: 0;
-	animation: ak-game-shell-intro-fade-in var(--ak-game-shell-intro-duration) ease-out
-		var(--ak-game-shell-intro-delay) forwards;
-}
-
-@keyframes ak-game-shell-intro-fade-in {
-	from {
-		opacity: 0;
-	}
-
-	to {
-		opacity: 1;
-	}
-}
-
-@keyframes ak-game-shell-ambient-fade-in {
-	from {
-		opacity: 0;
-	}
-
-	to {
-		opacity: 0.58;
-	}
-}
-
-@media (prefers-reduced-motion: reduce) {
-	[data-ui="GameShell"]::before,
-	[data-ui="GameShell"]::after {
-		animation: none;
-	}
-
-	[data-ui="GameShell"]::before {
-		opacity: 0.58;
-	}
-
-	[data-ui="GameShell"]::after {
-		opacity: 1;
-	}
 }
 
 .launcher-scene__backdrop {
@@ -716,12 +578,12 @@ select {
 }
 
 /*
- * Board and Inventory replace only the keyed game scene. Their shared live GameShell
- * background stays visible through the transition overlay instead of being covered by canvas.
+ * Board and Inventory replace only the keyed game scene. The transition compositor uses the
+ * exact same solid color as the persistent GameShell, so no intermediate black frame can leak.
  */
 :root:active-view-transition-type(board-to-inventory)::view-transition,
 :root:active-view-transition-type(inventory-to-board)::view-transition {
-	background: transparent;
+	background: var(--ak-game-shell-background);
 }
 
 /* The application screenshot never participates. Named surfaces own every visible route frame. */

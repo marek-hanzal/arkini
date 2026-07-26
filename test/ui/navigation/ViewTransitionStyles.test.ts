@@ -26,7 +26,7 @@ describe("View Transition styles", () => {
 		expect(styles).not.toContain("plus-lighter");
 	});
 
-	it("keeps the live GameShell background visible while Board and Inventory morph", () => {
+	it("keeps the solid GameShell background while Board and Inventory morph", () => {
 		expect(styles).toContain(
 			":root:active-view-transition-type(board-to-inventory)::view-transition",
 		);
@@ -34,7 +34,7 @@ describe("View Transition styles", () => {
 			":root:active-view-transition-type(inventory-to-board)::view-transition",
 		);
 		expect(styles).toMatch(
-			/active-view-transition-type\(inventory-to-board\)::view-transition\s*\{\s*background: transparent;/,
+			/active-view-transition-type\(inventory-to-board\)::view-transition\s*\{\s*background: var\(--ak-game-shell-background\);/,
 		);
 	});
 

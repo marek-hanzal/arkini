@@ -50,13 +50,6 @@ export const resolveRouteViewTransitionTypesFx = Effect.fn("resolveRouteViewTran
 				return false;
 			const from = resolveVisualRouteId(fromLocation.pathname);
 			const to = resolveVisualRouteId(toLocation.pathname);
-			// Both leaves share one live GameShell background; a native snapshot would cover it.
-			if (
-				(from === "board" && to === "inventory") ||
-				(from === "inventory" && to === "board")
-			) {
-				return false;
-			}
 			const sceneRelationship = isHeroRoute(from)
 				? isHeroRoute(to)
 					? "hero-to-hero"

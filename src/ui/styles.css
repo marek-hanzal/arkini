@@ -715,6 +715,15 @@ select {
 	background: var(--ak-canvas);
 }
 
+/*
+ * Board and Inventory replace only the keyed game scene. Their shared live GameShell
+ * background stays visible through the transition overlay instead of being covered by canvas.
+ */
+:root:active-view-transition-type(board-to-inventory)::view-transition,
+:root:active-view-transition-type(inventory-to-board)::view-transition {
+	background: transparent;
+}
+
 /* The application screenshot never participates. Named surfaces own every visible route frame. */
 ::view-transition-group(root) {
 	animation: none;

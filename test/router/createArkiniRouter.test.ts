@@ -171,6 +171,24 @@ describe("createArkiniRouterFx", () => {
 			],
 			[
 				"/game/built-in/board",
+				"/game/built-in/inventory",
+				[
+					"arkini-route",
+					"board-to-board",
+					"board-to-inventory",
+				],
+			],
+			[
+				"/game/built-in/inventory",
+				"/game/built-in/board",
+				[
+					"arkini-route",
+					"board-to-board",
+					"inventory-to-board",
+				],
+			],
+			[
+				"/game/built-in/board",
 				"/game/built-in/cheats",
 				[
 					"arkini-route",
@@ -236,8 +254,6 @@ describe("createArkiniRouterFx", () => {
 
 		expect(resolveTypes(undefined, "/main-menu")).toBe(false);
 		expect(resolveTypes("/main-menu", "/main-menu")).toBe(false);
-		expect(resolveTypes("/game/built-in/board", "/game/built-in/inventory")).toBe(false);
-		expect(resolveTypes("/game/built-in/inventory", "/game/built-in/board")).toBe(false);
 		for (const [from, to, types] of pairs) {
 			expect(resolveTypes(from, to)).toEqual(types);
 		}

@@ -1,6 +1,11 @@
 import { useLayoutEffect, useRef } from "react";
 
-/** Retains the last authoritative projection for one exact target after that target disappears. */
+/**
+ * Retains the last authoritative projection only to make actor disappearance
+ * visually intelligible during Detail teardown. Consumers must mark the result
+ * stale and inert; retained values are never permission to issue gameplay
+ * commands or pretend the runtime item still exists.
+ */
 export const useRetainedItemDetailProjection = <Value>({
 	available,
 	targetKey,

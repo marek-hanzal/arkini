@@ -14,7 +14,12 @@ import type { PixiMainSceneRuntime } from "~/ui/pixi/scene/PixiMainSceneRuntime"
 import { createPixiMainSceneRuntimeFx } from "~/ui/pixi/scene/createPixiMainSceneRuntimeFx";
 import { usePixiGameRuntime } from "~/ui/pixi/usePixiGameRuntime";
 
-/** Mounts the one Pixi-native Board + Toolbar scene into the React game shell. */
+/**
+ * Mounts the one Pixi-native Board + Toolbar scene into the React-owned game shell.
+ *
+ * Click performs the canonical primary action and Shift+click opens Item Detail. React forwards
+ * commands and overlay cancellation only; the scene runtime owns pointer and display lifecycle.
+ */
 export const PixiBoardToolbarSurface = () => {
 	const game = useGameEngine();
 	const gameMenu = useGameMenuControl();

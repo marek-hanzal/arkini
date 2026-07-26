@@ -20,7 +20,13 @@ type NavigationState =
 			readonly error: unknown;
 	  };
 
-/** Owns GameMenu commands, route requests, destructive confirmation, and status projection. */
+/**
+ * Orchestrates menu intent without taking Game lifecycle ownership. Local save
+ * remains an exact-Game bridge command; save-and-exit requests the application
+ * close handshake; leave/reset delegate resource mutation to action-route
+ * loaders; settings/cheats are navigation only. The action claim serializes
+ * these paths until their command or navigation request settles.
+ */
 export const useGameMenuActions = ({
 	game,
 	phase,

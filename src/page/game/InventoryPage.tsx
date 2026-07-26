@@ -5,7 +5,12 @@ import { useGameMenuControl } from "~/ui/game-menu/useGameMenuControl";
 import { Inventory } from "~/ui/inventory/Inventory";
 import { useItemDetailControl } from "~/ui/item-detail/useItemDetailControl";
 
-/** Owns deterministic Inventory return navigation while the parent keeps the Game alive. */
+/**
+ * Owns only Inventory-to-Board navigation; the parent scene route keeps the
+ * exact Game and shared overlays alive. Escape respects overlay priority:
+ * Item Detail consumes it first, then Game Menu, and only an otherwise
+ * unclaimed Escape replaces this leaf with Board.
+ */
 export const InventoryPage = ({ packageId }: { readonly packageId: string }) => {
 	const gameMenu = useGameMenuControl();
 	const itemDetail = useItemDetailControl();

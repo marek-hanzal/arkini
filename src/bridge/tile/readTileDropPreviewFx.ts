@@ -11,7 +11,10 @@ export namespace readTileDropPreviewFx {
 	export type Result = readDropItemPreviewFx.Result;
 }
 
-/** Reads one exact engine-owned drop preview through the renderer bridge. */
+/**
+ * Reads one exact engine-owned drop preview through the renderer bridge.
+ * Renderer occupancy or drag geometry must never manufacture drop legality.
+ */
 export const readTileDropPreviewFx = Effect.fn("readTileDropPreviewFx")(
 	({ game, ...props }: readTileDropPreviewFx.Props) =>
 		Effect.sync(

@@ -17,7 +17,12 @@ interface ActiveAnimation {
 	control: PixiAnimationControl | null;
 }
 
-/** Uses Motion as the sole runtime for interruptible Pixi display-object interpolation. */
+/**
+ * Owns interruptible, keyed writes from Motion into retained Pixi display objects.
+ *
+ * An animation key is an ownership key: starting a successor first cancels the previous writer.
+ * Callers must use stable per-channel keys when transform and opacity lifecycles may overlap.
+ */
 export const createPixiActorAnimatorFx = Effect.fn("createPixiActorAnimatorFx")(
 	({ animationDriver }: createPixiActorAnimatorFx.Props) =>
 		Effect.sync((): PixiActorAnimator => {

@@ -11,7 +11,14 @@ export namespace compileGameDirectoryFx {
 	}
 }
 
-/** Reads one authoring directory and runs the canonical completed-game compiler. */
+/**
+ * Reads one authoring directory and runs the canonical completed-game compiler.
+ *
+ * User-authored parse, assembly, schema, semantic, and resource problems accumulate
+ * as provenance-aware diagnostics instead of failing fast. A parsed config may
+ * therefore coexist with diagnostics; delivery callers own the explicit
+ * `assertGameConfigValidFx` gate.
+ */
 export const compileGameDirectoryFx = Effect.fn("compileGameDirectoryFx")(function* ({
 	input,
 }: compileGameDirectoryFx.Props) {

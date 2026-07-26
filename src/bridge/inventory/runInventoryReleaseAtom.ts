@@ -8,7 +8,10 @@ export namespace runInventoryReleaseAtom {
 	export type Command = releaseInventoryItemFx.Props;
 }
 
-/** Owns mounted Inventory release execution for one exact live Game. */
+/**
+ * Owns mounted Inventory release execution for one exact live Game.
+ * Placement and resulting inventory semantics remain entirely engine-owned.
+ */
 export const runInventoryReleaseAtom = RendererRuntime.runSync(
 	makeExactGameAtomFamilyFx((game) =>
 		Atom.fn((command: runInventoryReleaseAtom.Command) =>

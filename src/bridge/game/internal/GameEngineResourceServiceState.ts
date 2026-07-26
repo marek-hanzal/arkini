@@ -8,7 +8,9 @@ import type { GameSaveBootstrapError } from "~/bridge/game/GameSaveBootstrapErro
 export interface AcquisitionOwner {
 	readonly id: number;
 	readonly packageId: string;
+	/** Native-close claims that keep provisional acquisition alive across navigation. */
 	readonly closeClaims: Set<symbol>;
+	/** Scoped acquisition callers currently borrowing this exact result. */
 	readonly consumers: Set<symbol>;
 	readonly result: Deferred.Deferred<GameEngineResource, unknown>;
 	fiber: Fiber.Fiber<GameEngineResource, unknown> | undefined;
@@ -55,6 +57,7 @@ export type GameEngineResourceServiceState =
 	  }
 	| {
 			readonly _tag: "Provisional";
+			/** Fully created, but not yet adopted by the package route. */
 			readonly owner: AcquisitionOwner;
 			readonly resource: GameEngineResource;
 	  }

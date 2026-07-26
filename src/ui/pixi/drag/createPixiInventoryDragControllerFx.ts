@@ -54,7 +54,12 @@ interface ActiveInventoryDrag {
 
 const dragThreshold = 6;
 
-/** Owns Inventory activation, pointer capture, local drag preview and Atom drop handoff. */
+/**
+ * Owns one Inventory pointer gesture and its local retained-actor presentation.
+ *
+ * Click and Shift+click remain activation paths; only a threshold-crossing gesture becomes drag.
+ * Release re-reads the target occupant and sends exact canonical source facts through the bridge.
+ */
 export const createPixiInventoryDragControllerFx = Effect.fn("createPixiInventoryDragControllerFx")(
 	function* ({
 		actorStore,

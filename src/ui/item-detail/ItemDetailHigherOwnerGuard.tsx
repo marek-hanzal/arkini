@@ -4,7 +4,12 @@ import { useGameMenuControl } from "~/ui/game-menu/useGameMenuControl";
 import { useCloseItemDetail } from "~/ui/item-detail/useCloseItemDetail";
 import { useItemDetailControl } from "~/ui/item-detail/useItemDetailControl";
 
-/** Disposes Item Detail when the higher-priority game menu takes interaction ownership. */
+/**
+ * Enforces the overlay ownership order: Game Menu may replace idle Item Detail,
+ * but it must yield when Detail has an admitted command that pins its target.
+ * Focus restoration is suppressed during handoff so the hidden scene cannot
+ * steal focus from the incoming higher owner.
+ */
 export const ItemDetailHigherOwnerGuard = () => {
 	const gameMenu = useGameMenuControl();
 	const itemDetail = useItemDetailControl();

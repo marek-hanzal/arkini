@@ -11,7 +11,12 @@ const GameSceneRoute = () => (
 	</PlayableGameRoute>
 );
 
-/** Keeps shared playable-scene owners alive while Board and Inventory leaves alternate. */
+/**
+ * Lifetime boundary for playable Board and Inventory leaves. Exact-Game audio,
+ * cheat admission, menu, Item Detail and renderer providers live here so leaf
+ * navigation cannot recreate them or lose in-flight overlay/presentation state.
+ * Action and Cheats routes intentionally sit outside this shell.
+ */
 export const Route = createFileRoute("/game/$packageId/_scene")({
 	component: GameSceneRoute,
 });

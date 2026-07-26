@@ -7,6 +7,14 @@ export namespace fromRuntimeFx {
 		runtime: RuntimeSchema.Type;
 	}
 }
+
+/**
+ * Projects one hydrated runtime into serializable gameplay state.
+ *
+ * Runtime-only canonical objects and optimistic revisions are intentionally
+ * omitted; hydration will resolve item definitions and mint new revisions for
+ * the next session.
+ */
 export const fromRuntimeFx = Effect.fn("fromRuntimeFx")(function* ({
 	runtime,
 }: fromRuntimeFx.Props) {

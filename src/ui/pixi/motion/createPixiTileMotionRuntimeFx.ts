@@ -45,7 +45,13 @@ const emptyMotionLanes = {
 
 const maximumRememberedCueKeys = 256;
 
-/** Owns ordered tile cue lanes, idempotency, interaction claims and cue completion cleanup. */
+/**
+ * Owns ordered presentation-cue lanes, idempotency, interaction claims, and completion cleanup.
+ *
+ * Cues are already compiled from committed engine facts. This runtime may serialize conflicting
+ * presentation work and retain cross-scene geometry, but it must never reinterpret a cue as a new
+ * gameplay mutation. Closing cancels every keyed writer before destroying transient actors.
+ */
 export const createPixiTileMotionRuntimeFx = Effect.fn("createPixiTileMotionRuntimeFx")(function* ({
 	actorStore,
 	animator,

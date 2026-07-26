@@ -19,6 +19,12 @@ const loadGameRouteFx = Effect.fn("loadGameRouteFx")((packageId: string) =>
 	),
 );
 
+/**
+ * This action route is the only route-level Game acquisition owner. A newly
+ * acquired lease survives the scoped loader only when adoption publishes it;
+ * interruption otherwise releases it. Package switches first traverse the
+ * current Game's leave route, preventing two live resources from overlapping.
+ */
 export const Route = createFileRoute("/action/load-game/$packageId")({
 	beforeLoad: ({ context, params }) => {
 		const resource = context.rendererRuntime.runSync(readCurrentGameEngineResourceFx());

@@ -48,7 +48,13 @@ export namespace createPixiMainSceneDragControllerFx {
 
 const dragThreshold = 6;
 
-/** Owns one pointer gesture, exact engine preview/drop facts and cursor-grab settlement. */
+/**
+ * Owns one main-scene pointer gesture from press through activation, drag, or submission.
+ *
+ * Press-time source identity is immutable, while target occupancy and preview are refreshed at
+ * release because canonical state may change under a held pointer. Geometry drives presentation
+ * only; the bridge preview and command remain the authority for every drop outcome.
+ */
 export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainSceneDragControllerFx")(
 	function* ({
 		actorStore,

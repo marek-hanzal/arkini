@@ -21,7 +21,17 @@ import type {
 } from "~/ui/item-detail/ItemDetailControl";
 import { readSettledAsyncResultError } from "~/ui/reactivity/readSettledAsyncResultError";
 
-/** Owns one exact Item Detail target and one exhaustive enter/open/exit lifecycle. */
+/**
+ * Game-shell owner for one exact Item Detail target, modal lifecycle and
+ * command-presentation settlement. Bridge resolvers remain authoritative for
+ * target availability and allowed tabs; this provider must not retain or
+ * manufacture gameplay facts when a runtime item disappears.
+ *
+ * Gesture semantics are decided by the invoking surface: Shift+click opens
+ * Detail and suppresses the immediate primary action. The provider receives only
+ * the resulting open intent, so no click timers or double-click policy belong
+ * here.
+ */
 export const ItemDetailProvider = ({ children }: PropsWithChildren) => {
 	const resolveDefinitionTarget = useResolveItemDefinitionDetailTarget();
 	const resolveTarget = useResolveItemDetailTarget();

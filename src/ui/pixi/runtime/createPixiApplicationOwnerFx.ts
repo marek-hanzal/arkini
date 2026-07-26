@@ -19,7 +19,13 @@ const hostGenerations = new WeakMap<HTMLElement, number>();
 Ticker.system.autoStart = false;
 Ticker.system.stop();
 
-/** Acquires one explicitly rendered Pixi application and its DOM/resize lifecycle. */
+/**
+ * Acquires one explicitly rendered Pixi application and its complete DOM/resize lifecycle.
+ *
+ * Arkini keeps both Pixi tickers stopped: Motion drives interpolation and every visual writer
+ * invalidates the local demand frame owner. Closing this owner is therefore the terminal scene
+ * boundary and must happen only after children release their display objects and listeners.
+ */
 export const createPixiApplicationOwnerFx = Effect.fn("createPixiApplicationOwnerFx")(
 	({ host }: createPixiApplicationOwnerFx.Props) => {
 		const app = new Application();

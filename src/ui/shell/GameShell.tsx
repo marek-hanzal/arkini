@@ -47,7 +47,18 @@ const GameShellLayers = ({
 	);
 };
 
-/** Keeps shared playable-scene owners alive while one routed Pixi leaf is active. */
+/**
+ * React owner for route composition, focusable overlays and their precedence
+ * across Board/Inventory navigation. The provider order is intentional: Item
+ * Detail stays attached to the renderer scene, while Game Menu is the higher
+ * interaction owner and dismisses Detail through ItemDetailHigherOwnerGuard.
+ *
+ * Gameplay remains outside this shell. Pixi surfaces present canonical bridge
+ * projections and issue commands; neither React nor Pixi may infer committed
+ * move/swap/stack outcomes. Tile input also stays immediate: ordinary click is
+ * the primary action, while Shift+click requests Item Detail without introducing
+ * delayed or double-click arbitration here.
+ */
 export function GameShell({ children }: PropsWithChildren) {
 	const gameEngine = useGameEngine();
 	return (

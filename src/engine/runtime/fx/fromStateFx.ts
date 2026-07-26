@@ -8,6 +8,14 @@ export namespace fromStateFx {
 		state: StateSchema.Type;
 	}
 }
+
+/**
+ * Hydrates serializable state into one validated runtime.
+ *
+ * Canonical item definitions are rebound from the loaded config and every item
+ * receives a fresh session revision. Persisted identities and job ownership stay
+ * stable, but stale command tokens cannot survive a save/load boundary.
+ */
 export const fromStateFx = Effect.fn("fromStateFx")(function* ({ state }: fromStateFx.Props) {
 	const items = yield* Effect.forEach(state.items, (state) =>
 		fromStateItemFx({

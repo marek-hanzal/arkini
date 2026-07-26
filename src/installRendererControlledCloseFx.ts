@@ -17,7 +17,15 @@ export namespace installRendererControlledCloseFx {
 	}
 }
 
-/** Sends active-game native close through the terminal route and its completed Hero frame. */
+/**
+ * Installs the renderer-owned half of the native close handshake.
+ *
+ * The first callback claims an active or provisional Game before route
+ * interruption can orphan it, then delegates final save/disposal to the terminal
+ * exit route. The second callback waits for that route's completed presentation
+ * frame. This owner coordinates the handshake; it never saves or disposes a Game
+ * itself.
+ */
 export const installRendererControlledCloseFx = Effect.fn("installRendererControlledCloseFx")(
 	({ lifecycle, rendererRuntime, router }: installRendererControlledCloseFx.Props) =>
 		Effect.sync(() => {
@@ -35,6 +43,7 @@ export const installRendererControlledCloseFx = Effect.fn("installRendererContro
 				const resource = exit.value;
 				if (resource === null) return;
 				exitPresentationRequired = true;
+				// Route ownership keeps finalization identical for UI-requested and native close.
 				await router.navigate({
 					to: "/game/$packageId/action/exit",
 					params: {
@@ -45,6 +54,7 @@ export const installRendererControlledCloseFx = Effect.fn("installRendererContro
 			});
 			const removeBeforeCloseReady = lifecycle.onBeforeCloseReady(async () => {
 				if (!exitPresentationRequired) return;
+				// Native close may continue only after the completed route has painted once.
 				await rendererRuntime.runPromise(waitForActionLoadingCompletionFrameFx());
 			});
 

@@ -24,6 +24,11 @@ if (!rootElement) {
 	throw new Error("Arkini root element is missing.");
 }
 
+/**
+ * Renderer composition root. Every owner built here has process lifetime and
+ * must exist before React consumers mount; StrictMode remounts must never
+ * duplicate the registry, runtime-backed authorities or native close listeners.
+ */
 const catalog = RendererRuntime.runSync(createArkpackCatalogFx());
 RendererRuntime.runSync(configureArkpackCatalogFx(catalog));
 const lifecycle = RendererRuntime.runSync(createRendererLifecycleFx(window.arkini.lifecycle));
@@ -39,6 +44,7 @@ const router = RendererRuntime.runSync(
 	}),
 );
 
+// Install the native handshake once at the process boundary, outside React ownership.
 RendererRuntime.runSync(
 	installRendererControlledCloseFx({
 		lifecycle: window.arkini.lifecycle,

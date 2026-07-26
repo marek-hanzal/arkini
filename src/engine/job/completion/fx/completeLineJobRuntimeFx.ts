@@ -23,7 +23,15 @@ export namespace completeLineJobRuntimeFx {
 	}
 }
 
-/** Completes one line job and returns exact semantic facts in commit order. */
+/**
+ * Completes one line job and returns exact semantic facts in commit order.
+ *
+ * A depleted owner is detached before output placement so its board cell becomes
+ * available while its last location remains the placement origin. Line output is
+ * delivered before charge-depletion output, then owned inputs and job reservations
+ * are released through canonical placement. The caller publishes the resulting
+ * draft and this event order atomically.
+ */
 export const completeLineJobRuntimeFx = Effect.fn("completeLineJobRuntimeFx")(function* (
 	context: JobCompletionContext,
 ) {

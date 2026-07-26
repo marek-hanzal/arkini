@@ -15,6 +15,13 @@ import { ItemChargeSpentGameEventSchema } from "./ItemChargeSpentGameEventSchema
 import { ItemDepletedGameEventSchema } from "./ItemDepletedGameEventSchema";
 import { ItemExplicitlyRemovedGameEventSchema } from "./ItemExplicitlyRemovedGameEventSchema";
 
+/**
+ * Exact semantic facts emitted by successful engine commits.
+ *
+ * This union deliberately excludes animation, timing, and renderer intent.
+ * Presentation may derive cues from committed facts, but engine commands must
+ * never encode choreography into the authoritative event vocabulary.
+ */
 export const GameEventSchema = z.discriminatedUnion("type", [
 	CurrentSpaceChangedGameEventSchema,
 	JobStartedGameEventSchema,

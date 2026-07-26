@@ -10,7 +10,12 @@ export interface TileSceneHandoffStore {
 
 const handoffLifetimeMs = 2_000;
 
-/** Owns one route-local, consume-once bridge between independent Pixi canvases. */
+/**
+ * Owns a route-local, consume-once presentation bridge between independent Pixi canvases.
+ *
+ * It carries only source geometry, expires quickly, and may be absent. Canonical transitions still
+ * decide the receiving actor identity and motion outcome; a missing handoff degrades gracefully.
+ */
 export const createTileSceneHandoffStoreFx = Effect.fn("createTileSceneHandoffStoreFx")(() =>
 	Effect.sync((): TileSceneHandoffStore => {
 		const handoffs = new Map<

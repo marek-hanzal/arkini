@@ -59,7 +59,13 @@ const sameVisual = (left: TileActorItem, right: TileActorItem) =>
 		(right.primaryAction.kind === "start-default-line" &&
 			left.primaryAction.lineId === right.primaryAction.lineId));
 
-/** Consumes canonical transitions into retained actors while motion owns presentation lag. */
+/**
+ * Reconciles one canonical transition into retained actors while motion owns presentation lag.
+ *
+ * Motion/drop claims may temporarily retain, hide, or offset actors, but this owner never infers a
+ * gameplay result. It derives actors and cues through bridge reads and eventually converges every
+ * unclaimed display object to the committed snapshot.
+ */
 export const createPixiMainSceneReconcilerFx = Effect.fn("createPixiMainSceneReconcilerFx")(
 	function* ({
 		actorStore,

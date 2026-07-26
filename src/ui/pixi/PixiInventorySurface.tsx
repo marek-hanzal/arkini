@@ -12,7 +12,12 @@ import type { PixiInventorySceneRuntime } from "~/ui/pixi/scene/PixiInventorySce
 import { createPixiInventorySceneRuntimeFx } from "~/ui/pixi/scene/createPixiInventorySceneRuntimeFx";
 import { usePixiGameRuntime } from "~/ui/pixi/usePixiGameRuntime";
 
-/** Mounts the routed full-screen Inventory Pixi scene. */
+/**
+ * Mounts the routed Inventory canvas while React retains page framing and navigation ownership.
+ *
+ * Ordinary activation releases the canonical Inventory item and records only its source geometry
+ * for the next scene. Shift+click remains Item Detail and never initiates a release.
+ */
 export const PixiInventorySurface = () => {
 	const game = useGameEngine();
 	const itemDetail = useItemDetailControl();

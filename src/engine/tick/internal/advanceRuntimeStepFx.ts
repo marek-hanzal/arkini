@@ -90,7 +90,14 @@ const dispatchQueueOnlyOwnersFx = Effect.fn("dispatchQueueOnlyOwnersFx")(functio
 	} satisfies RuntimeStepResult;
 });
 
-/** Advances one canonical fixed simulation step from one shared step-start snapshot. */
+/**
+ * Advances one canonical fixed simulation step from one shared step-start snapshot.
+ *
+ * Queue-only owners dispatch first. Runnable decisions and eligible identities are
+ * then frozen and sorted by stable id before any draft mutation; later completions
+ * may remove those identities but cannot change who earned this step. Completed
+ * owners dispatch one FIFO successor before ready temporary items expire.
+ */
 export const advanceRuntimeStepFx = Effect.fn("advanceRuntimeStepFx")(function* (
 	stepStart: RuntimeSchema.Type,
 ) {

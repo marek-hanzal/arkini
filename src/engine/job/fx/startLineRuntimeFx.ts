@@ -15,7 +15,15 @@ export namespace startLineRuntimeFx {
 		runtime: RuntimeSchema.Type;
 	}
 }
-/** Canonical internal start pipeline used by direct starts and queue dispatch. */
+/**
+ * Canonical internal start pipeline used by direct starts and queue dispatch.
+ *
+ * The job identity is created before inputs move because consumed and reserved
+ * material locations refer to it. Inputs and charges then apply to one draft,
+ * output capacity is checked on that exact candidate, and stateful owner stacks
+ * are isolated last. The enclosing runtime transaction discards the whole draft
+ * if any stage fails.
+ */
 export const startLineRuntimeFx = Effect.fn("startLineRuntimeFx")(function* ({
 	ownerItemId,
 	lineId,

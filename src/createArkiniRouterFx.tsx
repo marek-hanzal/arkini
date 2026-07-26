@@ -4,6 +4,10 @@ import { routeTree } from "~/_route";
 import type { RootContext } from "~/ui/root/RootContext";
 import { resolveRouteViewTransitionTypesFx } from "~/ui/navigation/resolveRouteViewTransitionTypesFx";
 
+/**
+ * Creates the one process router around an explicit renderer-runtime context.
+ * Routes may borrow that authority; router or React lifetime must not recreate it.
+ */
 export const createArkiniRouterFx = Effect.fn("createArkiniRouterFx")((context: RootContext) =>
 	Effect.sync(() => {
 		const supportsTypedViewTransitions =

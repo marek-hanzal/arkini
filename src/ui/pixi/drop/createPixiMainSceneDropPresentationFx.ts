@@ -17,7 +17,12 @@ interface PendingSwap {
 	readonly generation: number;
 }
 
-/** Owns generation-safe presentation facts from pointer release through canonical settlement. */
+/**
+ * Owns generation-safe presentation facts between pointer release and canonical reconciliation.
+ *
+ * These facts may retain or hide a display actor and preserve an exact swap candidate, but never
+ * become gameplay truth. Generations make stale Promise completion unable to clear newer work.
+ */
 export const createPixiMainSceneDropPresentationFx = Effect.fn(
 	"createPixiMainSceneDropPresentationFx",
 )(() =>

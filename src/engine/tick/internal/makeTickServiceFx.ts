@@ -58,6 +58,11 @@ export const makeTickServiceFx = Effect.fn("makeTickServiceFx")(function* <Error
 						] as const;
 					}
 					const runtime = yield* runtimeFx.read;
+					/*
+					 * Stability is proven only for this exact immutable runtime root.
+					 * Any command replaces the root and invalidates the proof; while it
+					 * remains identical, replaying another fixed step is the same no-op.
+					 */
 					if (runtime === stableRuntime) {
 						return [
 							Exit.succeed({
@@ -75,6 +80,10 @@ export const makeTickServiceFx = Effect.fn("makeTickServiceFx")(function* <Error
 					}
 					return [
 						exit,
+						/*
+						 * Elapsed budget is acknowledged only after the runtime transaction
+						 * succeeds. Failure keeps the complete budget pending for retry.
+						 */
 						Exit.isSuccess(exit)
 							? {
 									...next,

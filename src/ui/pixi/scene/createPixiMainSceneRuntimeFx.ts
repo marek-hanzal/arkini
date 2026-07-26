@@ -35,7 +35,13 @@ export namespace createPixiMainSceneRuntimeFx {
 	}
 }
 
-/** Composes one Pixi-native game scene from explicit surface, drag, motion and actor owners. */
+/**
+ * Composes the main scene's explicit owner graph without taking ownership of gameplay state.
+ *
+ * Every acquisition registers a reverse-order rollback immediately. Transition subscribers,
+ * interactions, animations, actors, surfaces, and finally the Pixi application must close in that
+ * dependency order on both partial initialization failure and normal teardown.
+ */
 export const createPixiMainSceneRuntimeFx = Effect.fn("createPixiMainSceneRuntimeFx")(function* ({
 	game,
 	handoffs,
@@ -142,6 +148,7 @@ export const createPixiMainSceneRuntimeFx = Effect.fn("createPixiMainSceneRuntim
 		const applyTransition = (transition: ReturnType<GameEngine["getTransitionSnapshot"]>) => {
 			if (closed) return;
 			latestTransition = transition;
+			// Surface hit testing and actor reconciliation must observe one committed snapshot.
 			RendererRuntime.runSync(surface.setTransitionFx(transition));
 			RendererRuntime.runSync(reconciler.reconcileFx(transition));
 		};

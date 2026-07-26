@@ -197,6 +197,11 @@ export const createGameSessionFx = Effect.fn("createGameSessionFx")(
 									return yield* restore(Deferred.await(claim.result));
 								}
 
+								/**
+								 * Quiesce every runtime producer before observing the final
+								 * save. Reordering flush ahead of command-scope closure can
+								 * persist a snapshot while an admitted command is still committing.
+								 */
 								const attempt = stopGameLoopFx.pipe(
 									Effect.andThen(stopCommandsFx),
 									Effect.andThen(
@@ -262,6 +267,7 @@ export const createGameSessionFx = Effect.fn("createGameSessionFx")(
 					const openSubscription = (
 						effect: Effect.Effect<GameSessionTransitionSubscriptionCleanup>,
 					) => {
+						// Admit new observers only while the session can still publish commands.
 						if (MutableRef.get(lifecycle).type !== "running") return () => undefined;
 						const cleanup = managed.runSync(effect);
 						let closed = false;

@@ -39,7 +39,14 @@ export namespace dropItemFx {
 	export type Result = DropItemResultSchema.Type;
 }
 
-/** Resolves one requested item drop through the current atomic runtime command path. */
+/**
+ * Resolves one requested item drop through the authoritative runtime command path.
+ *
+ * Preflight chooses semantic intent for feedback and dispatch only. Every commit
+ * leaf rechecks identities, revisions, locations, and capacity against the latest
+ * serialized runtime, then normalizes an expected race into Reject/Ignored instead
+ * of letting renderer-observed state decide the gameplay outcome.
+ */
 export const dropItemFx = Effect.fn("dropItemFx")(function* ({
 	sourceItemId,
 	sourceRevision,

@@ -20,7 +20,13 @@ const defaultOnError = (error: unknown) => {
 	console.error("Arkini autosave failed; the latest runtime remains pending.", error);
 };
 
-/** Debounces committed runtime identities and serializes saves against the latest runtime. */
+/**
+ * Owns autosave for one GameSession.
+ *
+ * Debounced commits, explicit flush and scope finalization share one mutex, so
+ * durable writes cannot overtake each other. Gameplay owns the runtime; this
+ * layer only converts the latest committed snapshot into persisted state.
+ */
 export const RuntimeSaveLayerFx = <Error>({
 	debounceMs = 250,
 	onError = defaultOnError,
@@ -75,11 +81,13 @@ export const RuntimeSaveLayerFx = <Error>({
 			const consumer = yield* Effect.forkScoped(stream, {
 				startImmediately: true,
 			});
+			// Reset first stops the consumer, then joins any in-flight write before disposal.
 			const discard = Ref.set(discarded, true).pipe(
 				Effect.andThen(Fiber.interrupt(consumer)),
 				Effect.andThen(saveMutex.withPermits(1)(Effect.void)),
 			);
 
+			// Normal scope closure stops future debounce work before the final flush.
 			yield* Effect.addFinalizer(() =>
 				Fiber.interrupt(consumer).pipe(
 					Effect.andThen(Ref.get(discarded)),

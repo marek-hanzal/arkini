@@ -24,6 +24,14 @@ export namespace packDirectoryFx {
 	}
 }
 
+/**
+ * Compiles one authoring directory into exact compressed Arkpack bytes.
+ *
+ * Packing is gated by the completed-game compiler and semantic diagnostics.
+ * Rewriting an output always removes its detached signature sidecar because any
+ * prior signature belongs to the previous bytes; the signed workflow owns signing
+ * and post-verification as a separate stricter boundary.
+ */
 export const packDirectoryFx = Effect.fn("packDirectoryFx")(function* ({
 	input,
 	output,

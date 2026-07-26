@@ -21,7 +21,12 @@ export namespace createPixiAnimationDriverFx {
 	}
 }
 
-/** Owns Motion controls and springs without exposing Motion or React to Pixi domains. */
+/**
+ * Owns Motion controls and springs without exposing Motion or React to Pixi domains.
+ *
+ * Motion is only the interpolation clock. Every update invalidates Pixi's demand renderer, and
+ * closing the driver stops all deferred callbacks before its scene destroys display objects.
+ */
 export const createPixiAnimationDriverFx = Effect.fn("createPixiAnimationDriverFx")(
 	({ frames }: createPixiAnimationDriverFx.Props) =>
 		Effect.sync((): PixiAnimationDriver => {

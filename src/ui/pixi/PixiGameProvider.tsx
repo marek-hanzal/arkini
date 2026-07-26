@@ -6,7 +6,13 @@ import { createTileSceneHandoffStoreFx } from "~/ui/pixi/handoff/createTileScene
 import { createPixiGameInteractionControlFx } from "~/ui/pixi/runtime/createPixiGameInteractionControlFx";
 import { createPixiTextureStoreFx } from "~/ui/pixi/runtime/createPixiTextureStoreFx";
 
-/** Owns scene-layout capabilities retained while Board and Inventory leaves alternate. */
+/**
+ * Owns route-local capabilities that must survive Board and Inventory scene alternation.
+ *
+ * Individual scene runtimes still own their canvases, actors, and subscriptions. The deferred
+ * cleanup prevents a React development remount from disposing capabilities that the surviving
+ * provider generation still uses.
+ */
 export const PixiGameProvider = ({ children }: PropsWithChildren) => {
 	const handoffs = useMemo(() => RendererRuntime.runSync(createTileSceneHandoffStoreFx()), []);
 	const interaction = useMemo(

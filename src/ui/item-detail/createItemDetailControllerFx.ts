@@ -82,7 +82,16 @@ const sameActionOutcomeTarget = (left: ItemDetailTarget, right: ItemDetailTarget
 const sameTarget = (left: ItemDetailTarget, right: ItemDetailTarget) =>
 	sameActionOutcomeTarget(left, right) && left.tab === right.tab;
 
-/** Creates one owner for Item Detail lifecycle and command settlement state. */
+/**
+ * Creates the non-React Item Detail state owner. Motion reports generation-keyed
+ * enter/exit completion back here; callers awaiting close therefore finish only
+ * after the visible modal has left or a superseding open intent has explicitly
+ * taken ownership of that exit.
+ *
+ * Pending commands pin the exact target and block close/switch so a settlement
+ * cannot be presented against another item. Errors are presentation state only;
+ * command truth remains with the bridge command Atom.
+ */
 export const createItemDetailControllerFx = Effect.fn("createItemDetailControllerFx")(() =>
 	Effect.sync((): ItemDetailController => {
 		const listeners = new Set<() => void>();
@@ -144,9 +153,11 @@ export const createItemDetailControllerFx = Effect.fn("createItemDetailControlle
 				Effect.gen(function* () {
 					const current = snapshot.state;
 					if (current.phase === "closed") return enter(target);
+					// Keep command settlement attached to the target that admitted it.
 					if (snapshot.pendingActions.size > 0 && !sameTarget(current.target, target)) {
 						return false;
 					}
+					// Resolve the superseded exit so its close waiter cannot hang.
 					if (current.phase === "exiting") {
 						yield* resolveExitCompletionFx(current.generation);
 						return enter(target);
@@ -305,6 +316,7 @@ export const createItemDetailControllerFx = Effect.fn("createItemDetailControlle
 				listeners.add(listener);
 				return () => listeners.delete(listener);
 			},
+			// References opened from inside Detail restore focus to the original scene actor.
 			readOrigin: (origin) =>
 				snapshot.state.phase === "closed" ? origin : snapshot.state.target.origin,
 			openTargetFx,

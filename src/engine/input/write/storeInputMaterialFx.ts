@@ -41,6 +41,11 @@ export namespace storeInputMaterialFx {
 
 /**
  * Atomically stores accepted material from one grid item in one owner line input.
+ *
+ * Optimistic owner/source facts, spatial scope, line availability, selector, and
+ * capacity are all rechecked inside the serialized mutation. Once buffered state
+ * attaches to the owner identity, a stacked owner is isolated to quantity one and
+ * its pure remainder is delivered through canonical placement in the same commit.
  */
 export const storeInputMaterialFx = Effect.fn("storeInputMaterialFx")(function* ({
 	ownerItemId,

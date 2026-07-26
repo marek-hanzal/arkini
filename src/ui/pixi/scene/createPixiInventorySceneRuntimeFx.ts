@@ -35,7 +35,12 @@ export namespace createPixiInventorySceneRuntimeFx {
 
 type GameTransition = ReturnType<GameEngine["getTransitionSnapshot"]>;
 
-/** Composes the routed Inventory Pixi owners and their exact disposal order. */
+/**
+ * Composes the routed Inventory canvas without sharing display objects with the main scene.
+ *
+ * Subscription and DOM observers stop first, then drag releases actors before their store,
+ * surface, and application disappear. The same close path rolls back partial acquisition.
+ */
 export const createPixiInventorySceneRuntimeFx = Effect.fn("createPixiInventorySceneRuntimeFx")(
 	function* ({
 		game,

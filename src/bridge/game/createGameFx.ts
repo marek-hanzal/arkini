@@ -19,7 +19,12 @@ export namespace createGameFx {
 	}
 }
 
-/** Loads one selected package, restores its exact save and returns one live game. */
+/**
+ * Loads one package into a jointly owned session/resource-URL aggregate.
+ *
+ * No partially bootstrapped Game escapes: every failure discards the session
+ * without writing a save and revokes all object URLs allocated so far.
+ */
 export const createGameFx = Effect.fn("createGameFx")(function* ({
 	packageId,
 	arkpackStorage,
@@ -110,6 +115,7 @@ export const createGameFx = Effect.fn("createGameFx")(function* ({
 			}
 		});
 		if (state === undefined) {
+			// A restored save is already started; only a new state receives the initial command.
 			yield* session.runFx(startFx());
 		}
 

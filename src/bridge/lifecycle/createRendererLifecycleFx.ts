@@ -3,6 +3,10 @@ import type { ArkiniElectronApi } from "../../../electron/contract/ArkiniElectro
 import type { RendererLifecycle } from "~/bridge/lifecycle/RendererLifecycle";
 import { RendererLifecycleError } from "~/bridge/lifecycle/RendererLifecycleError";
 
+/**
+ * Adapts only the pure preload contract into Effect. Renderer lifecycle callers
+ * must not reach into Electron main/preload runtime modules behind this seam.
+ */
 export const createRendererLifecycleFx = Effect.fn("createRendererLifecycleFx")(
 	(
 		api: Pick<

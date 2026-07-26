@@ -49,7 +49,13 @@ type ClaimDecision =
 			readonly token: symbol;
 	  };
 
-/** Creates one scoped Game resource state machine without publishing it globally. */
+/**
+ * Creates the sole serialized Game lifecycle state machine for one renderer root.
+ *
+ * Capability modules split acquisition/cancellation/finalization/recovery code,
+ * but all transitions still share this semaphore, state Ref and operation Scope;
+ * none is an independent owner.
+ */
 export const createGameEngineResourceServiceFx = Effect.fn("createGameEngineResourceServiceFx")(
 	(dependencies: createGameEngineResourceServiceFx.Dependencies) =>
 		Effect.gen(function* () {
@@ -92,6 +98,10 @@ export const createGameEngineResourceServiceFx = Effect.fn("createGameEngineReso
 				stateRef,
 			});
 
+			/**
+			 * Native close must claim provisional ownership before navigation aborts
+			 * the loader that currently holds the last acquisition lease.
+			 */
 			const claimForCloseFx: GameEngineResourceFxService["claimForCloseFx"] = Effect.fn(
 				"GameEngineResourceFx.claimForCloseFx",
 			)(() =>

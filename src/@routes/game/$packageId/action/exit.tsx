@@ -13,6 +13,13 @@ const GameExitCompletedPage = () => (
 	/>
 );
 
+/**
+ * Terminal renderer side of the native controlled-close handshake. This route
+ * owns or joins one best-effort final save/disposal attempt and then exposes the
+ * completed Hero frame. It never requests native close itself; the application
+ * lifecycle owner waits for that frame and alone reports renderer readiness to
+ * Electron.
+ */
 export const Route = createFileRoute("/game/$packageId/action/exit")({
 	loader: async ({ context }) => {
 		const result = await context.rendererRuntime.runPromise(

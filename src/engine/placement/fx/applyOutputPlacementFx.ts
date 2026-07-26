@@ -16,7 +16,14 @@ export namespace applyOutputPlacementFx {
 	}
 }
 
-/** Applies one already resolved output to one explicit runtime draft. */
+/**
+ * Applies one already resolved output to one explicit runtime draft.
+ *
+ * Drops are planned and applied in authored result order against the evolving
+ * draft, so an earlier stack or spawn consumes capacity seen by later drops.
+ * This function does not publish; its enclosing runtime command owns all-or-nothing
+ * commit of the complete output.
+ */
 export const applyOutputPlacementFx = Effect.fn("applyOutputPlacementFx")(function* ({
 	origin,
 	output,

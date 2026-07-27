@@ -44,23 +44,23 @@ export const createPixiTileMotionPoseSamplerFx = Effect.fn("createPixiTileMotion
 				x: props.target.x,
 				y: props.target.y,
 			};
+			const readCurrentTarget = () => {
+				const liveTarget = props.readLiveTarget?.();
+				if (liveTarget !== null && liveTarget !== undefined) return liveTarget;
+				const currentTarget =
+					RendererRuntime.runSync(
+						props.surface.readLocationPoseFx(props.targetLocation),
+					) ?? props.target;
+				return {
+					scale: currentTarget.size / Math.max(1, props.actorBaseSize),
+					x: currentTarget.x,
+					y: currentTarget.y,
+				};
+			};
 			const readPose = yield* createPixiRetargetablePoseSamplerFx({
 				from: props.from,
 				readTarget: () => {
-					const liveTarget = props.readLiveTarget?.();
-					const nextTarget =
-						liveTarget ??
-						(() => {
-							const currentTarget =
-								RendererRuntime.runSync(
-									props.surface.readLocationPoseFx(props.targetLocation),
-								) ?? props.target;
-							return {
-								scale: currentTarget.size / Math.max(1, props.actorBaseSize),
-								x: currentTarget.x,
-								y: currentTarget.y,
-							};
-						})();
+					const nextTarget = readCurrentTarget();
 					if (sampleProgress >= 1 && !samePose(previousTarget, nextTarget)) {
 						completionRetargeted = true;
 					}
@@ -69,7 +69,8 @@ export const createPixiTileMotionPoseSamplerFx = Effect.fn("createPixiTileMotion
 				},
 			});
 			return {
-				needsCompletionSettle: () => completionRetargeted,
+				needsCompletionSettle: () =>
+					completionRetargeted || !samePose(previousTarget, readCurrentTarget()),
 				readPose: (progress) => {
 					sampleProgress = progress;
 					return readPose(progress);

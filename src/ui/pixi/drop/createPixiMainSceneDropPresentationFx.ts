@@ -99,6 +99,7 @@ export const createPixiMainSceneDropPresentationFx = Effect.fn(
 	Effect.sync((): PixiMainSceneDropPresentation => {
 		const feedback = new Map<number, PendingFeedback>();
 		const hiddenActorIds = new Set<string>();
+		const landingActorIds = new Set<string>();
 		let closed = false;
 		let nextGeneration = 0;
 		const pending = new Map<number, PendingDrop>();
@@ -163,6 +164,9 @@ export const createPixiMainSceneDropPresentationFx = Effect.fn(
 						) {
 							hiddenActorIds.add(result.source.itemId);
 						}
+						if (result.kind === DropItemResultKindEnumSchema.enum.Move) {
+							landingActorIds.add(result.itemId);
+						}
 						if (result.kind !== DropItemResultKindEnumSchema.enum.Swap) {
 							swaps.delete(generation);
 						}
@@ -178,6 +182,7 @@ export const createPixiMainSceneDropPresentationFx = Effect.fn(
 				(): PixiMainSceneDropPresentationSnapshot => ({
 					feedback: Array.from(feedback.values()),
 					hiddenActorIds: new Set(hiddenActorIds),
+					landingActorIds: new Set(landingActorIds),
 					pendingActorIds: new Set(
 						Array.from(pending.values(), ({ sourceActorId }) => sourceActorId),
 					),
@@ -193,12 +198,14 @@ export const createPixiMainSceneDropPresentationFx = Effect.fn(
 								continue;
 							hiddenActorIds.delete(actorId);
 						}
+						landingActorIds.clear();
 					}),
 			),
 			closeFx: Effect.sync(() => {
 				if (closed) return;
 				closed = true;
 				hiddenActorIds.clear();
+				landingActorIds.clear();
 				pending.clear();
 				swaps.clear();
 				feedback.clear();

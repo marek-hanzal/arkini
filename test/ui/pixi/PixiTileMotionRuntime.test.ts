@@ -1517,44 +1517,12 @@ describe("Pixi tile motion runtime", () => {
 		expect(lateTargetMove.y).toBeLessThan(stackBeforeTargetDrag.y);
 		const firstEndpoint = samplePoseAnimation(stackTravel, 1);
 		expect(firstEndpoint).toEqual({
-			scale: 1,
-			x: 200,
-			y: 40,
-		});
-		stackTravel.onComplete?.();
-		expect(stacked.item.quantity).toBe(1);
-
-		const firstChase = animations
-			.filter(
-				(animation) => animation.actor === stackTransient && animation.channel === "pose",
-			)
-			.at(-1);
-		if (firstChase?.channel !== "pose") {
-			throw new Error("Expected first live-target chase segment.");
-		}
-		expect(firstChase.durationMs).toBe(
-			Effect.runSync(
-				readPixiTileTravelDurationMsFx({
-					fromX: 200,
-					fromY: 40,
-					tileSize: 120,
-					toX: 900,
-					toY: 400,
-				}),
-			),
-		);
-		samplePoseAnimation(firstChase, 0.9);
-		stacked.container.position.set(1_240, 640);
-		const secondLateTargetMove = samplePoseAnimation(firstChase, 0.95);
-		expect(secondLateTargetMove.x).toBeLessThan(900);
-		expect(secondLateTargetMove.y).toBeLessThan(400);
-		expect(samplePoseAnimation(firstChase, 1)).toEqual({
 			scale: 1.5,
 			x: 900,
 			y: 400,
 		});
-		expect(stacked.item.quantity).toBe(1);
-		firstChase.onComplete?.();
+		stacked.container.position.set(1_240, 640);
+		stackTravel.onComplete?.();
 		expect(stacked.item.quantity).toBe(1);
 
 		const finalContact = animations
@@ -1786,7 +1754,7 @@ describe("Pixi tile motion runtime", () => {
 		Effect.runSync(runtime.closeFx);
 	});
 
-	it("falls back and cleans a stack payload exactly once when its target disappears mid-chase", () => {
+	it("follows a consumed held target into its redirected sink before vanishing", () => {
 		const {
 			actors,
 			animations,
@@ -1809,20 +1777,77 @@ describe("Pixi tile motion runtime", () => {
 		if (travel?.channel !== "pose") throw new Error("Expected a stack payload travel.");
 		const transient = travel.actor;
 		const destroy = vi.spyOn(transient.container, "destroy");
+		const inventory = createActor("runtime:inventory");
+		inventory.item = createItem(inventory.item.id, inventoryLocation);
+		inventory.container.position.set(640, 320);
+		actors.set(inventory.item.id, inventory);
+		canonicalItems.set(inventory.item.id, inventory.item);
 
 		samplePoseAnimation(travel, 0.4);
-		actors.delete(target.item.id);
+		Effect.runSync(
+			runtime.redirectTargetFx({
+				sourceActorId: target.item.id,
+				targetActorId: inventory.item.id,
+				targetLocation: inventory.item.location,
+			}),
+		);
+		expect(Effect.runSync(runtime.readSnapshotFx).unsettledQuantities).toEqual(
+			new Map([
+				[
+					inventory.item.id,
+					1,
+				],
+			]),
+		);
 		canonicalItems.delete(target.item.id);
 		samplePoseAnimation(travel, 1);
 		travel.onComplete?.();
+		const redirectedTravel = animations
+			.filter(
+				(animation) =>
+					animation.actor === transient &&
+					animation.channel === "pose" &&
+					animation.ownerKey === "motion:30:0",
+			)
+			.at(-1);
+		if (redirectedTravel?.channel !== "pose" || redirectedTravel === travel) {
+			throw new Error("Expected redirected sink chase.");
+		}
+		expect(samplePoseAnimation(redirectedTravel, 1)).toEqual({
+			scale: 1,
+			x: 640,
+			y: 320,
+		});
+		redirectedTravel.onComplete?.();
 
 		expect(magneticUpdates.length).toBeGreaterThan(0);
+		expect(magneticUpdates.at(-1)).toMatchObject({
+			attractedActorId: inventory.item.id,
+			eligibleAttractionActorIds: new Set([
+				inventory.item.id,
+			]),
+		});
 		expect(magneticReleases).toEqual([
 			{
 				sourceActorId: transient.item.id,
 				sourceKind: "motion",
 			},
 		]);
+		expect(transient.container.destroyed).toBe(false);
+		expect(destroy).not.toHaveBeenCalled();
+		const vanishOpacity = animations.find(
+			(animation) =>
+				animation.actor === transient &&
+				animation.channel === "lifecycle-opacity" &&
+				animation.toAlpha === 0,
+		);
+		if (vanishOpacity?.channel !== "lifecycle-opacity") {
+			throw new Error("Expected redirected payload fade-out.");
+		}
+		expect(vanishOpacity.durationMs).toBe(pixiTileActorRemovalFeedbackDurationMs);
+		expect(Effect.runSync(runtime.readSnapshotFx).unsettledQuantities.size).toBe(1);
+		vanishOpacity.onComplete?.();
+
 		expect(transient.container.destroyed).toBe(true);
 		expect(destroy).toHaveBeenCalledOnce();
 		expect(Effect.runSync(runtime.readSnapshotFx).unsettledQuantities).toEqual(new Map());
@@ -2030,12 +2055,21 @@ describe("Pixi tile motion runtime", () => {
 		expect(animations).toHaveLength(2);
 		expect(animations.find((animation) => animation.actor === target)).toMatchObject({
 			channel: "pose",
+			curve: {
+				bounce: 0.14,
+				kind: "spring",
+			},
 			ownerKey: `motion:9:0:${target.item.id}`,
 		});
 		expect(animations.find((animation) => animation.actor === source)).toMatchObject({
 			channel: "pose",
+			curve: {
+				bounce: 0.14,
+				kind: "spring",
+			},
 			ownerKey: `motion:9:0:${source.item.id}`,
 		});
+		expect(animations.every(({ durationMs }) => durationMs < 280)).toBe(true);
 		expect(source.container.x).toBe(245);
 		expect(source.container.y).toBe(47);
 		expect(Effect.runSync(runtime.readSnapshotFx).interactionClaimByActorId).toEqual(

@@ -2,8 +2,8 @@ import { Effect } from "effect";
 
 import type { GameEngine } from "~/bridge/game/GameEngine";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
-import { LocationScopeEnumSchema } from "~/bridge/tile/LocationScopeEnumSchema";
 import type { TileActorItem } from "~/bridge/tile/TileActorItem";
+import { isSameTileActorLocation } from "~/bridge/tile/isSameTileActorLocation";
 import type { TileActorFeedbackCue } from "~/bridge/tile/feedback/TileActorFeedbackCue";
 import { readTileActorFeedbackCuesFx } from "~/bridge/tile/feedback/readTileActorFeedbackCuesFx";
 import { readCommittedTileReplacementsFx } from "~/bridge/tile/motion/readCommittedTileReplacementsFx";
@@ -32,6 +32,7 @@ import {
 import { startPixiTileActorFadeInFx } from "~/ui/pixi/animation/startPixiTileActorFadeInFx";
 import type { PixiScenePalette } from "~/ui/pixi/appearance/PixiScenePalette";
 import type { PixiMainSceneDragController } from "~/ui/pixi/drag/PixiMainSceneDragController";
+import { readPixiDragSettleDurationMsFx } from "~/ui/pixi/drag/readPixiDragSettleDurationMsFx";
 import type { PixiMainSceneDropPresentation } from "~/ui/pixi/drop/PixiMainSceneDropPresentation";
 import type { PixiTileMagneticField } from "~/ui/pixi/magnet/PixiTileMagneticField";
 import type { PixiTileMotionRuntime } from "~/ui/pixi/motion/PixiTileMotionRuntime";
@@ -58,13 +59,6 @@ export namespace createPixiMainSceneReconcilerFx {
 		readonly textures: PixiTextureStore;
 	}
 }
-
-const sameLocation = (left: TileActorItem["location"], right: TileActorItem["location"]) =>
-	left.scope === right.scope &&
-	left.position.x === right.position.x &&
-	left.position.y === right.position.y &&
-	(left.scope !== LocationScopeEnumSchema.enum.Board ||
-		(right.scope === LocationScopeEnumSchema.enum.Board && left.space === right.space));
 
 const runningTransitionDurationMs = 180;
 const feedbackExitDurationMs = 420;
@@ -479,7 +473,7 @@ export const createPixiMainSceneReconcilerFx = Effect.fn("createPixiMainSceneRec
 						continue;
 					}
 
-					const moved = !sameLocation(actor.item.location, item.location);
+					const moved = !isSameTileActorLocation(actor.item.location, item.location);
 					const visualChanged = !sameVisual(actor.currentVisual.item, displayItem);
 					const progressChanged = actor.item.progressRatio !== displayItem.progressRatio;
 					const sizeChanged = actor.size !== pose.size;
@@ -548,10 +542,23 @@ export const createPixiMainSceneReconcilerFx = Effect.fn("createPixiMainSceneRec
 						sizeChanged;
 					if (needsTravel) {
 						surface.transientActorLayer.addChild(actor.container);
+						const directLanding = dropSnapshot.landingActorIds.has(item.id);
 						yield* animator.animateFx({
 							actor,
 							channel: "pose",
-							durationMs: yield* readPixiTileTravelDurationMsFx({
+							...(directLanding
+								? {
+										curve: {
+											bounce: 0.14,
+											kind: "spring" as const,
+										},
+									}
+								: {}),
+							durationMs: yield* (
+								directLanding
+									? readPixiDragSettleDurationMsFx
+									: readPixiTileTravelDurationMsFx
+							)({
 								fromX: actor.container.x,
 								fromY: actor.container.y,
 								tileSize: pose.size,

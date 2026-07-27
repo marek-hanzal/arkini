@@ -9,12 +9,14 @@ import { destroyPixiTileActorFx } from "~/ui/pixi/actor/destroyPixiTileActorFx";
 import { updatePixiTileActorFx } from "~/ui/pixi/actor/updatePixiTileActorFx";
 import type { PixiActorAnimator } from "~/ui/pixi/animation/PixiActorAnimator";
 import { startPixiTileActorFadeInFx } from "~/ui/pixi/animation/startPixiTileActorFadeInFx";
+import { startPixiTileActorVanishFeedbackFx } from "~/ui/pixi/animation/startPixiTileActorVanishFeedbackFx";
 import type { PixiScenePalette } from "~/ui/pixi/appearance/PixiScenePalette";
 import type { PixiTileMagneticField } from "~/ui/pixi/magnet/PixiTileMagneticField";
 import { chasePixiTileMotionTargetFx } from "~/ui/pixi/motion/chasePixiTileMotionTargetFx";
 import { createPixiTileMotionMagneticProjectorFx } from "~/ui/pixi/motion/createPixiTileMotionMagneticProjectorFx";
 import { flashPixiMotionTargetFx } from "~/ui/pixi/motion/flashPixiMotionTargetFx";
 import { readPixiLiveActorContactPose } from "~/ui/pixi/motion/readPixiLiveActorContactPose";
+import type { PixiTileMotionTargetRoute } from "~/ui/pixi/motion/PixiTileMotionTargetRoute";
 import type { PixiApplicationOwner } from "~/ui/pixi/runtime/PixiApplicationOwner";
 import type { PixiTextureStore } from "~/ui/pixi/runtime/createPixiTextureStoreFx";
 import type { PixiMainSceneSurface } from "~/ui/pixi/scene/PixiMainSceneSurface";
@@ -35,6 +37,10 @@ export namespace runPixiStackMotionFx {
 		readonly onTransientCreated: (actor: PixiTileActor) => void;
 		readonly origin: PixiTileActorPose;
 		readonly readPalette: () => PixiScenePalette;
+		readonly readTargetRoute: (
+			actorId: string,
+			location: PixiTileMotionTargetRoute["location"],
+		) => PixiTileMotionTargetRoute;
 		readonly surface: PixiMainSceneSurface;
 		readonly target: PixiTileActorPose;
 		readonly textures: PixiTextureStore;
@@ -56,11 +62,14 @@ export const runPixiStackMotionFx = Effect.fn("runPixiStackMotionFx")(function* 
 	onTransientCreated,
 	origin,
 	readPalette,
+	readTargetRoute,
 	surface,
 	target,
 	textures,
 }: runPixiStackMotionFx.Props) {
-	const canonical = actorStore.canonicalItems.get(cue.targetActorId);
+	const canonical =
+		actorStore.canonicalItems.get(cue.targetActorId) ??
+		actorStore.actors.get(cue.targetActorId)?.item;
 	if (canonical === undefined) {
 		onComplete();
 		return;
@@ -104,23 +113,33 @@ export const runPixiStackMotionFx = Effect.fn("runPixiStackMotionFx")(function* 
 		animator,
 		delayMs,
 	});
+	const readCurrentRoute = () => readTargetRoute(cue.targetActorId, cue.targetLocation);
 	const readLiveTarget = () => {
+		const route = readCurrentRoute();
 		return readPixiLiveActorContactPose({
-			actorId: cue.targetActorId,
+			actorId: route.actorId,
 			actors: actorStore.actors,
 			movingActorSize: transient.size,
 		});
 	};
-	const eligibleAttractionActorIds = new Set([
-		cue.targetActorId,
-	]);
 	const magneticProjector = yield* createPixiTileMotionMagneticProjectorFx({
 		actor: transient,
 		attractedActorId: cue.targetActorId,
-		eligibleAttractionActorIds,
+		eligibleAttractionActorIds: new Set([
+			cue.targetActorId,
+		]),
 		magneticField,
 		onAcquired: onMagneticSourceAcquired,
 		onReleased: onMagneticSourceReleased,
+		readAttraction: () => {
+			const route = readCurrentRoute();
+			return {
+				attractedActorId: route.actorId,
+				eligibleAttractionActorIds: new Set([
+					route.actorId,
+				]),
+			};
+		},
 	});
 	yield* chasePixiTileMotionTargetFx({
 		actor: transient,
@@ -130,13 +149,31 @@ export const runPixiStackMotionFx = Effect.fn("runPixiStackMotionFx")(function* 
 		onPose: magneticProjector.projectPose,
 		onSettled: () => {
 			magneticProjector.release();
+			const route = readCurrentRoute();
 			RendererRuntime.runSync(
 				flashPixiMotionTargetFx({
 					actorStore,
 					animator,
-					targetActorId: cue.targetActorId,
+					targetActorId: route.actorId,
 				}),
 			);
+			if (route.redirected) {
+				let settled = false;
+				const settle = () => {
+					if (settled) return;
+					settled = true;
+					onComplete();
+				};
+				RendererRuntime.runSync(
+					startPixiTileActorVanishFeedbackFx({
+						actor: transient,
+						animator,
+						onCancel: settle,
+						onComplete: settle,
+					}),
+				);
+				return;
+			}
 			RendererRuntime.runSync(animator.cancelActorFx(transient));
 			RendererRuntime.runSync(destroyPixiTileActorFx(transient));
 			onComplete();

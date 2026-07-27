@@ -24,13 +24,16 @@ const motionState = vi.hoisted(() => ({
 	throwOnSpring: false,
 	throwOnTween: false,
 	tweens: [] as Array<{
-		readonly ease: string;
+		readonly ease?: string;
 		readonly from: number;
 		readonly onComplete: () => void;
 		readonly onUpdate: (value: number) => void;
 		readonly options: {
+			readonly bounce?: number;
 			readonly delay: number;
-			readonly duration: number;
+			readonly duration?: number;
+			readonly type?: string;
+			readonly visualDuration?: number;
 		};
 		readonly stop: ReturnType<typeof vi.fn>;
 		readonly to: number;
@@ -81,11 +84,14 @@ vi.mock("motion", () => {
 			from: number,
 			to: number,
 			options: {
+				readonly bounce?: number;
 				readonly delay: number;
-				readonly duration: number;
-				readonly ease: string;
+				readonly duration?: number;
+				readonly ease?: string;
 				readonly onComplete: () => void;
 				readonly onUpdate: (value: number) => void;
+				readonly type?: string;
+				readonly visualDuration?: number;
 			},
 		) => {
 			if (motionState.throwOnTween) throw new Error("tween failed");
@@ -204,6 +210,31 @@ describe("Pixi animation driver", () => {
 		expect(tween?.stop).toHaveBeenCalledOnce();
 		expect(onUpdate).toHaveBeenCalledOnce();
 		expect(onComplete).not.toHaveBeenCalled();
+	});
+
+	it("runs a bounded visual-duration spring through the same completion owner", () => {
+		const { driver } = createDriver();
+		Effect.runSync(
+			driver.startTweenFx({
+				curve: {
+					bounce: 0.14,
+					kind: "spring",
+				},
+				durationMs: 160,
+				from: 0,
+				onUpdate: vi.fn(),
+				to: 1,
+			}),
+		);
+
+		expect(motionState.tweens[0]?.options).toMatchObject({
+			bounce: 0.14,
+			delay: 0,
+			type: "spring",
+			visualDuration: 0.16,
+		});
+		expect(motionState.tweens[0]?.options.duration).toBeUndefined();
+		expect(motionState.tweens[0]?.ease).toBeUndefined();
 	});
 
 	it("completes a tween exactly once", () => {

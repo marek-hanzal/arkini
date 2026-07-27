@@ -2,6 +2,7 @@ import type { Effect } from "effect";
 import type { Container } from "pixi.js";
 
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
+import type { PixiAnimationCurve } from "~/ui/pixi/animation/PixiAnimationDriver";
 
 export type PixiActorAnimationChannel =
 	| "crowd-opacity"
@@ -13,6 +14,7 @@ export type PixiActorAnimationChannel =
 
 interface PixiActorAnimationBase {
 	readonly actor: PixiTileActor;
+	readonly curve?: PixiAnimationCurve;
 	readonly delayMs?: number;
 	readonly durationMs: number;
 	readonly onCancel?: () => void;

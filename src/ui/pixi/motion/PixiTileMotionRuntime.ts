@@ -1,6 +1,7 @@
 import type { Effect } from "effect";
 
 import type { TileMotionCue } from "~/bridge/tile/motion/TileMotionCue";
+import type { PixiTileMotionTargetRedirect } from "~/ui/pixi/motion/PixiTileMotionTargetRoute";
 
 /** Presentation ownership of dragging; ordinary click activation always remains available. */
 export type PixiTileInteractionClaim = "activation-only" | "handoff";
@@ -26,6 +27,8 @@ export interface PixiTileMotionRuntime {
 	/** Releases interruptible spawn or swap ownership at its live pose for direct interaction. */
 	readonly beginInteractionHandoffFx: (actorId: string) => Effect.Effect<boolean>;
 	readonly enqueueFx: (cues: ReadonlyArray<TileMotionCue>) => Effect.Effect<void>;
+	/** Transfers trailing presentation payloads when their original receiver is consumed. */
+	readonly redirectTargetFx: (redirect: PixiTileMotionTargetRedirect) => Effect.Effect<void>;
 	readonly readSnapshotFx: Effect.Effect<PixiTileMotionSnapshot>;
 	readonly startFx: Effect.Effect<void>;
 	readonly syncQuantitiesFx: Effect.Effect<void>;

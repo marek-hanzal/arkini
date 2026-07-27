@@ -8,6 +8,7 @@ import type {
 	PixiActorPresentedPose,
 } from "~/ui/pixi/animation/PixiActorAnimator";
 import { readPixiTileTravelDurationMsFx } from "~/ui/pixi/animation/readPixiTileTravelDurationMsFx";
+import { createPixiTileMotionPoseSamplerFx } from "~/ui/pixi/motion/createPixiTileMotionPoseSamplerFx";
 import type { PixiMainSceneSurface } from "~/ui/pixi/scene/PixiMainSceneSurface";
 import type { PixiTileActorPose } from "~/ui/pixi/scene/PixiTileActorPose";
 
@@ -21,25 +22,19 @@ export namespace chasePixiTileMotionTargetFx {
 		readonly onSettled: () => void;
 		readonly ownerKey: string;
 		readonly readLiveTarget: () => Required<PixiActorPresentedPose> | null;
+		readonly shouldSettle?: () => boolean;
 		readonly surface: PixiMainSceneSurface;
 		readonly targetLocation: TileActorItem["location"];
 	}
 }
 
-const samePose = (
-	left: Required<PixiActorPresentedPose>,
-	right: Required<PixiActorPresentedPose>,
-) => left.x === right.x && left.y === right.y && left.scale === right.scale;
-
-const mix = (from: number, to: number, progress: number) => from + (to - from) * progress;
-
 /**
- * Chases a moving semantic target through speed-bounded, distance-aware segments.
+ * Chases a moving semantic target through one continuous, retargetable presentation.
  *
- * Each segment snapshots its endpoint. A late or far target move therefore starts a fresh segment
- * from the payload's exact contact candidate instead of compressing displacement into the original
- * tween's remaining progress. Settlement occurs only when a completed segment still matches the
- * latest live target.
+ * Target movement rebases from the exact presented frame instead of finishing at a stale endpoint
+ * and starting another visible leg. Only a final-frame retarget requires a continuation. A caller
+ * may end the presentation when its canonical receiver leaves this scene, preventing fallback
+ * travel toward a location the receiver no longer owns.
  */
 export const chasePixiTileMotionTargetFx = Effect.fn("chasePixiTileMotionTargetFx")(function* ({
 	actor,
@@ -50,10 +45,11 @@ export const chasePixiTileMotionTargetFx = Effect.fn("chasePixiTileMotionTargetF
 	onSettled,
 	ownerKey,
 	readLiveTarget,
+	shouldSettle,
 	surface,
 	targetLocation,
 }: chasePixiTileMotionTargetFx.Props) {
-	if (actor.container.destroyed) {
+	if (actor.container.destroyed || shouldSettle?.()) {
 		onSettled();
 		return;
 	}
@@ -68,10 +64,18 @@ export const chasePixiTileMotionTargetFx = Effect.fn("chasePixiTileMotionTargetF
 		x: semanticTarget.x,
 		y: semanticTarget.y,
 	};
-	if (samePose(from, target)) {
+	if (from.x === target.x && from.y === target.y && from.scale === target.scale) {
 		onSettled();
 		return;
 	}
+	const poseSampler = yield* createPixiTileMotionPoseSamplerFx({
+		actorBaseSize: actor.size,
+		from,
+		readLiveTarget,
+		surface,
+		target: semanticTarget,
+		targetLocation,
+	});
 	yield* animator.animateFx({
 		actor,
 		channel: "pose",
@@ -85,6 +89,10 @@ export const chasePixiTileMotionTargetFx = Effect.fn("chasePixiTileMotionTargetF
 		}),
 		ownerKey,
 		onComplete: () => {
+			if (shouldSettle?.() || !poseSampler.needsCompletionSettle()) {
+				onSettled();
+				return;
+			}
 			RendererRuntime.runSync(
 				chasePixiTileMotionTargetFx({
 					actor,
@@ -94,17 +102,14 @@ export const chasePixiTileMotionTargetFx = Effect.fn("chasePixiTileMotionTargetF
 					onSettled,
 					ownerKey,
 					readLiveTarget,
+					shouldSettle,
 					surface,
 					targetLocation,
 				}),
 			);
 		},
 		readPose: (progress) => {
-			const pose = {
-				scale: mix(from.scale, target.scale, progress),
-				x: mix(from.x, target.x, progress),
-				y: mix(from.y, target.y, progress),
-			};
+			const pose = poseSampler.readPose(progress);
 			onPose?.(pose);
 			return pose;
 		},

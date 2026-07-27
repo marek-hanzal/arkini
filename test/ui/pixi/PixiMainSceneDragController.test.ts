@@ -256,6 +256,7 @@ const mountController = ({
 	let currentDropTargetX = 1;
 	let currentOccupant: TileActorItem | null = null;
 	const magneticUpdates: Array<Parameters<PixiTileMagneticField["updateFx"]>[0]> = [];
+	const targetRedirects: Array<Parameters<PixiTileMotionRuntime["redirectTargetFx"]>[0]> = [];
 	const onActivate = vi.fn();
 	const onAcceptedDrop = vi.fn();
 	const reportCriticalFailure = vi.fn();
@@ -344,6 +345,10 @@ const mountController = ({
 						Effect.sync(() => beginInteractionHandoff(actorId)),
 					closeFx: Effect.void,
 					enqueueFx: () => Effect.void,
+					redirectTargetFx: (redirect) =>
+						Effect.sync(() => {
+							targetRedirects.push(redirect);
+						}),
 					readSnapshotFx: Effect.succeed({
 						interactionClaimByActorId,
 						retainedActorIds: new Set(interactionClaimByActorId.keys()),
@@ -431,6 +436,7 @@ const mountController = ({
 		},
 		startCursorGrab,
 		stage,
+		targetRedirects,
 		transientActorLayer,
 	};
 };
@@ -826,12 +832,73 @@ describe("Pixi main-scene drag controller", () => {
 		await flushMicrotasks();
 
 		expect(mounted.onAcceptedDrop).toHaveBeenCalledOnce();
+		expect(mounted.targetRedirects).toEqual([
+			{
+				sourceActorId: item.id,
+				targetActorId: inventory.id,
+				targetLocation: inventory.location,
+			},
+		]);
 		expect(Effect.runSync(mounted.dropPresentation.readSnapshotFx).feedback).toEqual([]);
 		expect(
 			mounted.animations.some(
 				(animation) => animation.channel === "lifecycle-opacity" && animation.toAlpha === 1,
 			),
 		).toBe(false);
+	});
+
+	it("rebases a held stack to its latest canonical revision before an Inventory release", () => {
+		const inventory = {
+			...createItem("runtime:inventory", 1),
+			itemType: "inventory",
+		} as TileActorItem;
+		const mounted = mountController({
+			targetItems: [
+				inventory,
+			],
+		});
+		previewState.actorKinds.set(inventory.id, "store-inventory");
+		mounted.setOccupant(inventory);
+		mounted.setCommandTarget({
+			kind: "slot",
+			location: inventory.location,
+			occupant: {
+				itemId: inventory.id,
+				revision: inventory.revision,
+			},
+		});
+		mounted.onDrop.mockReturnValueOnce(new Promise(() => undefined));
+
+		mounted.actorEvents.emit("pointerdown", pointer(10, 20));
+		mounted.stage.emit("globalpointermove", pointer(30, 20));
+		const canonicalStack = {
+			...item,
+			quantity: 2,
+			revision: "revision:log:incoming-stacked",
+		} satisfies TileActorItem;
+		mounted.canonicalItems.set(item.id, canonicalStack);
+		mounted.setItem({
+			...canonicalStack,
+			// The incoming payload remains visually hidden until physical contact.
+			quantity: 1,
+		});
+		mounted.stage.emit("pointerup", pointer(30, 20));
+
+		expect(mounted.onDrop).toHaveBeenCalledWith(
+			expect.objectContaining({
+				sourceItemId: item.id,
+				sourceLocation: item.location,
+				sourceRevision: canonicalStack.revision,
+			}),
+		);
+		expect(
+			mounted.animations.some(
+				(animation) =>
+					animation.actor === mounted.actor &&
+					animation.channel === "lifecycle-opacity" &&
+					animation.toAlpha === 0,
+			),
+		).toBe(true);
 	});
 
 	it("sends a held item to the physical Inventory with i and retains it through travel and fade", async () => {
@@ -919,6 +986,13 @@ describe("Pixi main-scene drag controller", () => {
 		await flushMicrotasks();
 
 		expect(mounted.onAcceptedDrop).not.toHaveBeenCalled();
+		expect(mounted.targetRedirects).toEqual([
+			{
+				sourceActorId: item.id,
+				targetActorId: inventory.id,
+				targetLocation: inventory.location,
+			},
+		]);
 		expect(Effect.runSync(mounted.dropPresentation.readSnapshotFx).pendingActorIds).toEqual(
 			new Set([
 				item.id,
@@ -1033,6 +1107,13 @@ describe("Pixi main-scene drag controller", () => {
 		await flushMicrotasks();
 
 		expect(mounted.onAcceptedDrop).toHaveBeenCalledOnce();
+		expect(mounted.targetRedirects).toEqual([
+			{
+				sourceActorId: item.id,
+				targetActorId: target.id,
+				targetLocation: target.location,
+			},
+		]);
 		expect(
 			mounted.animations.some(
 				(animation) => animation.channel === "lifecycle-opacity" && animation.toAlpha === 1,
@@ -1459,6 +1540,13 @@ describe("Pixi main-scene drag controller", () => {
 
 		const settleAnimation = mounted.animations.at(-1);
 		if (settleAnimation === undefined) throw new Error("Expected a settle animation.");
+		expect(settleAnimation).toMatchObject({
+			curve: {
+				bounce: 0.14,
+				kind: "spring",
+			},
+		});
+		expect(settleAnimation.durationMs).toBeLessThan(280);
 		expect(mounted.transientActorLayer.addChild).toHaveBeenLastCalledWith(
 			mounted.actor.container,
 		);

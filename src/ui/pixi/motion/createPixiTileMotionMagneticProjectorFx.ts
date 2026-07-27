@@ -13,6 +13,10 @@ export namespace createPixiTileMotionMagneticProjectorFx {
 		readonly magneticField: PixiTileMagneticField;
 		readonly onAcquired: (actorId: string) => void;
 		readonly onReleased: (actorId: string) => void;
+		readonly readAttraction?: () => {
+			readonly attractedActorId: string | null;
+			readonly eligibleAttractionActorIds: ReadonlySet<string>;
+		};
 	}
 
 	export interface Result {
@@ -37,6 +41,7 @@ export const createPixiTileMotionMagneticProjectorFx = Effect.fn(
 		magneticField,
 		onAcquired,
 		onReleased,
+		readAttraction,
 	}: createPixiTileMotionMagneticProjectorFx.Props) =>
 		Effect.sync((): createPixiTileMotionMagneticProjectorFx.Result => {
 			const sourceActorId = actor.item.id;
@@ -63,10 +68,14 @@ export const createPixiTileMotionMagneticProjectorFx = Effect.fn(
 						acquired = true;
 						onAcquired(sourceActorId);
 					}
+					const attraction = readAttraction?.() ?? {
+						attractedActorId,
+						eligibleAttractionActorIds,
+					};
 					RendererRuntime.runSync(
 						magneticField.updateFx({
-							attractedActorId,
-							eligibleAttractionActorIds,
+							attractedActorId: attraction.attractedActorId,
+							eligibleAttractionActorIds: attraction.eligibleAttractionActorIds,
 							sourceActorId,
 							sourceDirection:
 								travelMagnitude <= 0.001

@@ -18,6 +18,15 @@ export interface PixiSpringOptions {
 	readonly velocity?: number;
 }
 
+export type PixiAnimationCurve =
+	| {
+			readonly kind: "ease-in-out";
+	  }
+	| {
+			readonly bounce: number;
+			readonly kind: "spring";
+	  };
+
 export interface PixiAnimationDriver {
 	readonly createSpringFx: (props: {
 		readonly initialValue: number;
@@ -25,6 +34,7 @@ export interface PixiAnimationDriver {
 		readonly options: PixiSpringOptions;
 	}) => Effect.Effect<PixiAnimationSpring>;
 	readonly startTweenFx: (props: {
+		readonly curve?: PixiAnimationCurve;
 		readonly delayMs?: number;
 		readonly durationMs: number;
 		readonly from: number;

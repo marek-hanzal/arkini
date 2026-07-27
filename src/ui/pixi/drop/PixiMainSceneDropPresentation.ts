@@ -23,6 +23,8 @@ export interface PixiMainSceneDropPresentationSnapshot {
 		readonly generation: number;
 	}>;
 	readonly hiddenActorIds: ReadonlySet<string>;
+	/** Directly manipulated actors whose next canonical pose should use the release spring. */
+	readonly landingActorIds: ReadonlySet<string>;
 	readonly pendingActorIds: ReadonlySet<string>;
 	readonly swaps: ReadonlyArray<{
 		readonly candidate: PixiSceneSwapCandidate;

@@ -127,7 +127,17 @@ export const createPixiAnimationDriverFx = Effect.fn("createPixiAnimationDriverF
 						}),
 				),
 				startTweenFx: Effect.fn("PixiAnimationDriver.startTweenFx")(
-					({ delayMs = 0, durationMs, from, onComplete, onUpdate, to }) =>
+					({
+						curve = {
+							kind: "ease-in-out",
+						},
+						delayMs = 0,
+						durationMs,
+						from,
+						onComplete,
+						onUpdate,
+						to,
+					}) =>
 						Effect.sync((): PixiAnimationControl => {
 							if (closed) return inactiveControl;
 							let controls: AnimationPlaybackControls | null = null;
@@ -155,10 +165,21 @@ export const createPixiAnimationDriverFx = Effect.fn("createPixiAnimationDriverF
 							};
 							activeClosers.add(stop);
 							try {
+								const timing =
+									curve.kind === "spring"
+										? {
+												bounce: curve.bounce,
+												type: "spring" as const,
+												visualDuration: durationMs / 1000,
+											}
+										: {
+												duration: durationMs / 1000,
+												ease: "easeInOut" as const,
+												type: "keyframes" as const,
+											};
 								controls = animate(from, to, {
 									delay: delayMs / 1000,
-									duration: durationMs / 1000,
-									ease: "easeInOut",
+									...timing,
 									onUpdate: (latest) => {
 										if (closed || playback.state !== "active") return;
 										try {

@@ -94,6 +94,11 @@ describe("Pixi main-scene drop presentation", () => {
 				generation: second,
 			}),
 		]);
+		expect(snapshot.landingActorIds).toEqual(
+			new Set([
+				moveResult.itemId,
+			]),
+		);
 	});
 
 	it("clears a captured swap on an accepted non-swap terminal result", () => {
@@ -115,6 +120,37 @@ describe("Pixi main-scene drop presentation", () => {
 		expect(Effect.runSync(presentation.readSnapshotFx)).toMatchObject({
 			swaps: [],
 		});
+	});
+
+	it("consumes a direct landing hint after its canonical reconciliation", () => {
+		const presentation = Effect.runSync(createPixiMainSceneDropPresentationFx());
+		const generation = Effect.runSync(
+			presentation.beginFx({
+				sourceActorId: moveResult.itemId,
+				swapCandidate: null,
+			}),
+		);
+		Effect.runSync(
+			presentation.completeFx({
+				generation,
+				result: moveResult,
+			}),
+		);
+
+		expect(Effect.runSync(presentation.readSnapshotFx).landingActorIds).toEqual(
+			new Set([
+				moveResult.itemId,
+			]),
+		);
+		Effect.runSync(
+			presentation.reconcileActorIdsFx({
+				inventoryActorIds: new Set(),
+				mainActorIds: new Set([
+					moveResult.itemId,
+				]),
+			}),
+		);
+		expect(Effect.runSync(presentation.readSnapshotFx).landingActorIds).toEqual(new Set());
 	});
 
 	it("retains an accepted swap until its exact generation is consumed", () => {

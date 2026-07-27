@@ -5,7 +5,7 @@ import type { TileSwapMotionCue } from "~/bridge/tile/motion/TileMotionCue";
 import type { PixiMainSceneActorStore } from "~/ui/pixi/actor/PixiMainSceneActorStore";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
 import type { PixiActorAnimator } from "~/ui/pixi/animation/PixiActorAnimator";
-import { readPixiTileTravelDurationMsFx } from "~/ui/pixi/animation/readPixiTileTravelDurationMsFx";
+import { readPixiDragSettleDurationMsFx } from "~/ui/pixi/drag/readPixiDragSettleDurationMsFx";
 import type { PixiTileMagneticField } from "~/ui/pixi/magnet/PixiTileMagneticField";
 import { createPixiTileMotionMagneticProjectorFx } from "~/ui/pixi/motion/createPixiTileMotionMagneticProjectorFx";
 import { createPixiTileMotionPoseSamplerFx } from "~/ui/pixi/motion/createPixiTileMotionPoseSamplerFx";
@@ -96,7 +96,7 @@ export const runPixiSwapMotionFx = Effect.fn("runPixiSwapMotionFx")(function* ({
 				y: leg.forceOrigin.y,
 			});
 		}
-		const durationMs = yield* readPixiTileTravelDurationMsFx({
+		const durationMs = yield* readPixiDragSettleDurationMsFx({
 			fromX: leg.actor.container.x,
 			fromY: leg.actor.container.y,
 			tileSize: leg.target.size,
@@ -130,6 +130,10 @@ export const runPixiSwapMotionFx = Effect.fn("runPixiSwapMotionFx")(function* ({
 		yield* animator.animateFx({
 			actor: leg.actor,
 			channel: "pose",
+			curve: {
+				bounce: 0.14,
+				kind: "spring",
+			},
 			delayMs,
 			durationMs,
 			ownerKey: `motion:${cueKey}:${leg.actor.item.id}`,

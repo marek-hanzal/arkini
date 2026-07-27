@@ -135,6 +135,7 @@ export const createPixiActorAnimatorFx = Effect.fn("createPixiActorAnimatorFx")(
 						try {
 							active.control = RendererRuntime.runSync(
 								animationDriver.startTweenFx({
+									curve: animation.curve,
 									delayMs: animation.delayMs,
 									durationMs: animation.durationMs,
 									from: 0,

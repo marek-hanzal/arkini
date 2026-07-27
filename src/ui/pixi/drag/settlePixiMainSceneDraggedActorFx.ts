@@ -5,7 +5,7 @@ import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
 import { readPixiTileActorCursorFx } from "~/ui/pixi/actor/readPixiTileActorCursorFx";
 import type { PixiActorAnimator } from "~/ui/pixi/animation/PixiActorAnimator";
 import { createPixiRetargetablePoseSamplerFx } from "~/ui/pixi/animation/createPixiRetargetablePoseSamplerFx";
-import { readPixiTileTravelDurationMsFx } from "~/ui/pixi/animation/readPixiTileTravelDurationMsFx";
+import { readPixiDragSettleDurationMsFx } from "~/ui/pixi/drag/readPixiDragSettleDurationMsFx";
 import type { PixiMainSceneSurface } from "~/ui/pixi/scene/PixiMainSceneSurface";
 
 export namespace settlePixiMainSceneDraggedActorFx {
@@ -29,7 +29,7 @@ export const settlePixiMainSceneDraggedActorFx = Effect.fn("settlePixiMainSceneD
 			previewKind: null,
 			running: actor.item.running,
 		});
-		const durationMs = yield* readPixiTileTravelDurationMsFx({
+		const durationMs = yield* readPixiDragSettleDurationMsFx({
 			fromX: actor.container.x,
 			fromY: actor.container.y,
 			tileSize: pose.size,
@@ -54,6 +54,10 @@ export const settlePixiMainSceneDraggedActorFx = Effect.fn("settlePixiMainSceneD
 		yield* animator.animateFx({
 			actor,
 			channel: "pose",
+			curve: {
+				bounce: 0.14,
+				kind: "spring",
+			},
 			durationMs,
 			onComplete: () => {
 				if (actor.container.destroyed) return;

@@ -358,6 +358,7 @@ const createMotion = () =>
 		beginInteractionHandoffFx: () => Effect.succeed(false),
 		closeFx: Effect.void,
 		enqueueFx: () => Effect.void,
+		redirectTargetFx: () => Effect.void,
 		readSnapshotFx: Effect.succeed({
 			interactionClaimByActorId: new Map(),
 			retainedActorIds: new Set(),
@@ -635,6 +636,64 @@ describe("Pixi main-scene reconciliation", () => {
 
 		travel.onComplete?.();
 		expect(actor.container.parent).toBe(harness.layer);
+	});
+
+	it("springs a directly dropped actor into its committed slot", () => {
+		const previous = createItem("runtime:dropped-water", boardLocation);
+		const destination = {
+			...boardLocation,
+			position: {
+				x: 4,
+				y: 3,
+			},
+		};
+		const current = createItem(previous.id, destination);
+		const actor = createActor(previous);
+		const harness = createReconcilerHarness({
+			actor,
+			pose: {
+				size: 80,
+				x: 420,
+				y: 340,
+			},
+		});
+		const generation = Effect.runSync(
+			harness.dropPresentation.beginFx({
+				sourceActorId: previous.id,
+				swapCandidate: null,
+			}),
+		);
+		Effect.runSync(
+			harness.dropPresentation.completeFx({
+				generation,
+				result: {
+					itemId: current.id,
+					kind: "move",
+					location: destination,
+					previousLocation: boardLocation,
+					revision: current.revision,
+				},
+			}),
+		);
+		projectionState.main = [
+			current,
+		];
+
+		Effect.runSync(harness.reconciler.reconcileFx(transition(2)));
+
+		const landing = harness.animations.find(
+			(animation) => animation.actor === actor && animation.channel === "pose",
+		);
+		expect(landing).toMatchObject({
+			curve: {
+				bounce: 0.14,
+				kind: "spring",
+			},
+		});
+		expect(landing?.durationMs).toBeLessThan(280);
+		expect(Effect.runSync(harness.dropPresentation.readSnapshotFx).landingActorIds).toEqual(
+			new Set(),
+		);
 	});
 
 	it("retains a pending source, then fades it while glowing the Inventory receiver", () => {

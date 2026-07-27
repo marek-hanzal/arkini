@@ -26,6 +26,10 @@ import { readPixiTileMotionAnimationKeysFx } from "~/ui/pixi/motion/readPixiTile
 import { runPixiTileMotionCueFx } from "~/ui/pixi/motion/runPixiTileMotionCueFx";
 import { settlePixiTileMotionActorFx } from "~/ui/pixi/motion/settlePixiTileMotionActorFx";
 import { syncPixiTileMotionQuantitiesFx } from "~/ui/pixi/motion/syncPixiTileMotionQuantitiesFx";
+import type {
+	PixiTileMotionTargetRedirect,
+	PixiTileMotionTargetRoute,
+} from "~/ui/pixi/motion/PixiTileMotionTargetRoute";
 import type { PixiApplicationOwner } from "~/ui/pixi/runtime/PixiApplicationOwner";
 import type { PixiTextureStore } from "~/ui/pixi/runtime/createPixiTextureStoreFx";
 import type { PixiMainSceneSurface } from "~/ui/pixi/scene/PixiMainSceneSurface";
@@ -54,6 +58,7 @@ const emptyMotionLanes = {
 } satisfies TileMotionLanesState;
 
 const maximumRememberedCueKeys = 256;
+const maximumRememberedTargetRedirects = 256;
 
 interface PixiDetachedSwapLeg {
 	readonly actorId: string;
@@ -87,6 +92,7 @@ export const createPixiTileMotionRuntimeFx = Effect.fn("createPixiTileMotionRunt
 	const activeMagneticSourceActorIds = new Set<string>();
 	const activeSwapLegActorIdsByCueKey = new Map<string, Set<string>>();
 	const detachedSwapLegByActorId = new Map<string, PixiDetachedSwapLeg>();
+	const targetRedirectByActorId = new Map<string, PixiTileMotionTargetRedirect>();
 
 	const readCueKey = (cue: TileMotionCue) => `${cue.sequence}:${cue.eventIndex}`;
 	const readCueHandoffKey = (cue: TileMotionCue) => `${cue.sequence}:${cue.originActorId}`;
@@ -101,6 +107,37 @@ export const createPixiTileMotionRuntimeFx = Effect.fn("createPixiTileMotionRunt
 			if (oldest === undefined) return;
 			knownCueKeys.delete(oldest);
 		}
+	};
+
+	const retainNewestTargetRedirects = () => {
+		while (targetRedirectByActorId.size > maximumRememberedTargetRedirects) {
+			const oldest = targetRedirectByActorId.keys().next().value;
+			if (oldest === undefined) return;
+			targetRedirectByActorId.delete(oldest);
+		}
+	};
+
+	const readTargetRoute = (
+		actorId: string,
+		location: PixiTileMotionTargetRoute["location"],
+	): PixiTileMotionTargetRoute => {
+		let currentActorId = actorId;
+		let currentLocation = location;
+		let redirected = false;
+		const visitedActorIds = new Set<string>();
+		while (!visitedActorIds.has(currentActorId)) {
+			visitedActorIds.add(currentActorId);
+			const redirect = targetRedirectByActorId.get(currentActorId);
+			if (redirect === undefined || redirect.targetActorId === currentActorId) break;
+			currentActorId = redirect.targetActorId;
+			currentLocation = redirect.targetLocation;
+			redirected = true;
+		}
+		return {
+			actorId: currentActorId,
+			location: currentLocation,
+			redirected,
+		};
 	};
 
 	const readInteractionClaims = () => {
@@ -121,12 +158,36 @@ export const createPixiTileMotionRuntimeFx = Effect.fn("createPixiTileMotionRunt
 		return actorIds;
 	};
 
-	const readUnsettledQuantities = () =>
-		RendererRuntime.runSync(
+	const readUnsettledQuantities = () => {
+		const quantities = RendererRuntime.runSync(
 			readUnsettledTileStackQuantitiesFx({
 				cues: readCues(),
 			}),
 		);
+		const targetLocationByActorId = new Map(
+			readCues().flatMap((cue) =>
+				cue.kind === "stack"
+					? [
+							[
+								cue.targetActorId,
+								cue.targetLocation,
+							] as const,
+						]
+					: [],
+			),
+		);
+		const routedQuantities = new Map<string, number>();
+		for (const [actorId, quantity] of quantities) {
+			const location = targetLocationByActorId.get(actorId);
+			const routedActorId =
+				location === undefined ? actorId : readTargetRoute(actorId, location).actorId;
+			routedQuantities.set(
+				routedActorId,
+				(routedQuantities.get(routedActorId) ?? 0) + quantity,
+			);
+		}
+		return routedQuantities;
+	};
 
 	const readUnsettledInputSourceQuantities = () =>
 		RendererRuntime.runSync(
@@ -328,6 +389,7 @@ export const createPixiTileMotionRuntimeFx = Effect.fn("createPixiTileMotionRunt
 					claimedHandoffs.get(readCueHandoffKey(cue)) ?? readClaimedHandoff(cue),
 				readPalette,
 				readSourceSurvives,
+				readTargetRoute,
 				surface,
 				textures,
 			}),
@@ -610,6 +672,16 @@ export const createPixiTileMotionRuntimeFx = Effect.fn("createPixiTileMotionRunt
 							);
 			}),
 		),
+		redirectTargetFx: Effect.fn("PixiTileMotionRuntime.redirectTargetFx")((redirect) =>
+			Effect.sync(() => {
+				if (closed || redirect.sourceActorId === redirect.targetActorId) {
+					return;
+				}
+				targetRedirectByActorId.delete(redirect.sourceActorId);
+				targetRedirectByActorId.set(redirect.sourceActorId, redirect);
+				retainNewestTargetRedirects();
+			}),
+		),
 		readSnapshotFx: Effect.sync(
 			(): PixiTileMotionSnapshot => ({
 				interactionClaimByActorId: readInteractionClaims(),
@@ -666,6 +738,7 @@ export const createPixiTileMotionRuntimeFx = Effect.fn("createPixiTileMotionRunt
 			activeMagneticSourceActorIds.clear();
 			activeSwapLegActorIdsByCueKey.clear();
 			detachedSwapLegByActorId.clear();
+			targetRedirectByActorId.clear();
 		}),
 	} satisfies PixiTileMotionRuntime;
 });

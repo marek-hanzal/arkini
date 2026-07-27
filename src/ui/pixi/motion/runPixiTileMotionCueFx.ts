@@ -19,6 +19,7 @@ import type { PixiApplicationOwner } from "~/ui/pixi/runtime/PixiApplicationOwne
 import type { PixiTextureStore } from "~/ui/pixi/runtime/createPixiTextureStoreFx";
 import type { PixiMainSceneSurface } from "~/ui/pixi/scene/PixiMainSceneSurface";
 import { readTileMotionStaggerDelaySecondsFx } from "~/ui/tile/motion/readTileMotionStaggerDelaySecondsFx";
+import type { PixiTileMotionTargetRoute } from "~/ui/pixi/motion/PixiTileMotionTargetRoute";
 
 export namespace runPixiTileMotionCueFx {
 	export interface Props {
@@ -37,6 +38,10 @@ export namespace runPixiTileMotionCueFx {
 		readonly readHandoff: () => TileSceneHandoff | null;
 		readonly readPalette: () => PixiScenePalette;
 		readonly readSourceSurvives: () => boolean;
+		readonly readTargetRoute: (
+			actorId: string,
+			location: PixiTileMotionTargetRoute["location"],
+		) => PixiTileMotionTargetRoute;
 		readonly surface: PixiMainSceneSurface;
 		readonly textures: PixiTextureStore;
 	}
@@ -59,6 +64,7 @@ export const runPixiTileMotionCueFx = Effect.fn("runPixiTileMotionCueFx")(functi
 	readHandoff,
 	readPalette,
 	readSourceSurvives,
+	readTargetRoute,
 	surface,
 	textures,
 }: runPixiTileMotionCueFx.Props) {
@@ -135,6 +141,7 @@ export const runPixiTileMotionCueFx = Effect.fn("runPixiTileMotionCueFx")(functi
 									onTransientCreated,
 									origin,
 									readPalette,
+									readTargetRoute,
 									surface,
 									target,
 									textures,

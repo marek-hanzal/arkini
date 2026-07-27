@@ -4,6 +4,7 @@ import type { FederatedPointerEvent } from "pixi.js";
 import type { GameEngine } from "~/bridge/game/GameEngine";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import type { TileActorItem } from "~/bridge/tile/TileActorItem";
+import { isSameTileActorLocation } from "~/bridge/tile/isSameTileActorLocation";
 import { DropItemResultKindEnumSchema } from "~/bridge/tile/DropItemResultKindEnumSchema";
 import type { runTileDropAtom } from "~/bridge/tile/runTileDropAtom";
 import { readTileDropPreviewFx } from "~/bridge/tile/readTileDropPreviewFx";
@@ -32,6 +33,7 @@ import type { PixiMainSceneDropPresentation } from "~/ui/pixi/drop/PixiMainScene
 import type { PixiTileMagneticField } from "~/ui/pixi/magnet/PixiTileMagneticField";
 import { readPixiTileEligibleAttractionActorIdsFx } from "~/ui/pixi/magnet/readPixiTileEligibleAttractionActorIdsFx";
 import type { PixiTileMotionRuntime } from "~/ui/pixi/motion/PixiTileMotionRuntime";
+import { readPixiTileMotionTargetRedirect } from "~/ui/pixi/motion/readPixiTileMotionTargetRedirect";
 import type { PixiApplicationOwner } from "~/ui/pixi/runtime/PixiApplicationOwner";
 import type { PixiMainSceneSurface } from "~/ui/pixi/scene/PixiMainSceneSurface";
 import type { PixiSceneDropTarget } from "~/ui/pixi/scene/PixiSceneDropTarget";
@@ -64,13 +66,12 @@ const inventoryShortcutTravelOwnerPrefix = "inventory-shortcut-travel";
 /**
  * Owns one main-scene pointer gesture from press through activation or drop release.
  *
- * Press-time source identity is immutable, while target occupancy and preview are refreshed at
- * release because canonical state may change under a held pointer. Geometry drives presentation
- * only; the bridge preview and command remain the authority for every drop outcome. A submitted
- * drop retains only its exact source actor and immediately releases the scene-wide gesture slot.
- * A click never waits for presentation ownership. Crossing the drag threshold either explicitly
- * hands an interruptible live pose to the gesture or cancels a presentation-retained,
- * non-draggable source without reinterpreting it as a click.
+ * Press-time identity anchors the gesture, while the release command rebases to the latest
+ * canonical revision of that same actor at that same location. This lets an engine-committed
+ * incoming stack update a held item without turning the eventual drop into a stale command.
+ * Geometry drives presentation only; the bridge preview and command remain the authority for
+ * every drop outcome. A submitted drop retains only its exact source actor and immediately
+ * releases the scene-wide gesture slot.
  */
 export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainSceneDragControllerFx")(
 	function* ({
@@ -93,10 +94,28 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 		let interactionBlocked = false;
 		const pendingDropGenerations = new Set<number>();
 
-		const readTargetFacts = (
-			drag: PixiMainSceneActiveDrag,
-			target: PixiSceneDropTarget | null,
-		) => {
+		const readCurrentSourceItem = (drag: PixiMainSceneActiveDrag) => {
+			if (
+				drag.actor.container.destroyed ||
+				actorStore.actors.get(drag.sourceItem.id) !== drag.actor
+			) {
+				return null;
+			}
+			const canonical = actorStore.canonicalItems.get(drag.sourceItem.id);
+			if (
+				canonical === undefined ||
+				!isSameTileActorLocation(canonical.location, drag.sourceItem.location)
+			) {
+				return null;
+			}
+			return {
+				...drag.actor.item,
+				location: canonical.location,
+				revision: canonical.revision,
+			} satisfies TileActorItem;
+		};
+
+		const readTargetFacts = (sourceItem: TileActorItem, target: PixiSceneDropTarget | null) => {
 			const targetItem =
 				target === null ? null : RendererRuntime.runSync(surface.readOccupantFx(target));
 			let kind: readTileDropPreviewFx.Result["kind"] | null = null;
@@ -104,9 +123,9 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 				kind = RendererRuntime.runSync(
 					readTileDropPreviewFx({
 						game,
-						sourceItemId: drag.sourceItem.id,
-						sourceLocation: drag.sourceItem.location,
-						sourceRevision: drag.sourceItem.revision,
+						sourceItemId: sourceItem.id,
+						sourceLocation: sourceItem.location,
+						sourceRevision: sourceItem.revision,
 						target: RendererRuntime.runSync(surface.readCommandTargetFx(target)),
 					}),
 				).kind;
@@ -119,12 +138,15 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 			};
 		};
 
-		const refreshEligibleAttractionActorIds = (drag: PixiMainSceneActiveDrag) => {
+		const refreshEligibleAttractionActorIds = (
+			drag: PixiMainSceneActiveDrag,
+			sourceItem: TileActorItem,
+		) => {
 			try {
 				drag.eligibleAttractionActorIds = RendererRuntime.runSync(
 					readPixiTileEligibleAttractionActorIdsFx({
 						game,
-						sourceItem: drag.sourceItem,
+						sourceItem,
 						targetItems: Array.from(actorStore.actors.values(), ({ item }) => item),
 					}),
 				);
@@ -138,16 +160,25 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 			drag: PixiMainSceneActiveDrag,
 			target: PixiSceneDropTarget | null,
 			force = false,
+			releaseSourceItem?: TileActorItem,
 		) => {
+			const sourceItem = releaseSourceItem ?? readCurrentSourceItem(drag);
+			if (sourceItem === null) {
+				drag.target = target;
+				drag.targetItem = null;
+				drag.previewKind = null;
+				RendererRuntime.runSync(surface.renderDropFeedbackFx(null, null));
+				return null;
+			}
 			if (
 				!force &&
 				drag.target?.layout.kind === target?.layout.kind &&
 				drag.target?.x === target?.x &&
 				drag.target?.y === target?.y
 			) {
-				return;
+				return sourceItem;
 			}
-			const facts = readTargetFacts(drag, target);
+			const facts = readTargetFacts(sourceItem, target);
 			drag.target = target;
 			drag.targetItem = facts.targetItem;
 			drag.previewKind = facts.kind;
@@ -155,10 +186,11 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 				readPixiTileActorCursorFx({
 					phase: "dragging",
 					previewKind: facts.kind,
-					running: drag.sourceItem.running,
+					running: sourceItem.running,
 				}),
 			);
 			RendererRuntime.runSync(surface.renderDropFeedbackFx(target, facts.kind));
+			return sourceItem;
 		};
 
 		const settleActor = (actor: PixiTileActor) => {
@@ -306,7 +338,12 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 			}
 			if (drag.phase === "pressed") {
 				drag.phase = "dragging";
-				refreshEligibleAttractionActorIds(drag);
+				const sourceItem = readCurrentSourceItem(drag);
+				if (sourceItem === null) {
+					cancelDrag(drag);
+					return;
+				}
+				refreshEligibleAttractionActorIds(drag, sourceItem);
 				drag.actor.dragging = true;
 				drag.actor.container.cursor = "grabbing";
 				surface.transientActorLayer.addChild(drag.actor.container);
@@ -327,10 +364,14 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 					y: drag.startY + offsetY,
 				}),
 			);
-			previewTarget(
+			const sourceItem = previewTarget(
 				drag,
 				RendererRuntime.runSync(surface.readDropTargetFx(event.global.x, event.global.y)),
 			);
+			if (sourceItem === null) {
+				cancelDrag(drag);
+				return;
+			}
 			const pointerTravel = {
 				x: event.global.x - drag.lastPointerX,
 				y: event.global.y - drag.lastPointerY,
@@ -349,7 +390,7 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 									x: pointerTravel.x / pointerTravelMagnitude,
 									y: pointerTravel.y / pointerTravelMagnitude,
 								},
-					sourceItem: drag.sourceItem,
+					sourceItem,
 					targetItem: drag.targetItem,
 				}),
 			);
@@ -359,10 +400,12 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 
 		const submitDrag = ({
 			drag,
+			sourceItem,
 			shortcutReceiver,
 			target,
 		}: {
 			readonly drag: PixiMainSceneActiveDrag;
+			readonly sourceItem: TileActorItem;
 			readonly shortcutReceiver?: {
 				readonly actor: PixiTileActor;
 				readonly pose: {
@@ -380,14 +423,14 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 				readPixiTileActorCursorFx({
 					phase: "pending",
 					previewKind: drag.previewKind,
-					running: drag.sourceItem.running,
+					running: sourceItem.running,
 				}),
 			);
 			const drop = RendererRuntime.runSync(
 				beginPixiMainSceneDropFx({
 					dropPresentation,
 					previewKind: drag.previewKind,
-					sourceItem: drag.sourceItem,
+					sourceItem,
 					surface,
 					target,
 					targetItem: drag.targetItem,
@@ -396,11 +439,11 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 			const optimisticRemoval =
 				drag.previewKind === DropItemResultKindEnumSchema.enum.StoreInventory ||
 				(drag.previewKind === DropItemResultKindEnumSchema.enum.Stack &&
-					drag.sourceItem.quantity === 1)
+					sourceItem.quantity === 1)
 					? {
 							actor: drag.actor,
 							lifecycleGeneration: drag.actor.lifecycleIntentGeneration + 1,
-							sourceActorId: drag.sourceItem.id,
+							sourceActorId: sourceItem.id,
 						}
 					: null;
 			const optimisticInventoryReceiver =
@@ -412,6 +455,7 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 			let shortcutVisualComplete = shortcutReceiver === undefined;
 			let queuedResult: runTileDropAtom.Result | null = null;
 			let finalized = false;
+			let targetRedirected = false;
 
 			const startRemoval = () => {
 				if (optimisticRemoval === null || removalStarted) return;
@@ -446,6 +490,18 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 				if (finalized || closed || !pendingDropGenerations.has(drop.generation)) {
 					return;
 				}
+				try {
+					if (!targetRedirected) {
+						const targetRedirect = readPixiTileMotionTargetRedirect(result);
+						if (targetRedirect !== null) {
+							RendererRuntime.runSync(motion.redirectTargetFx(targetRedirect));
+							targetRedirected = true;
+						}
+					}
+				} catch (cause) {
+					game.reportCriticalFailure("game-presentation", cause);
+					return;
+				}
 				if (
 					shortcutReceiver !== undefined &&
 					result.kind === DropItemResultKindEnumSchema.enum.StoreInventory &&
@@ -475,9 +531,7 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 						RendererRuntime.runSync(dropPresentation.clearFeedbackFx(drop.generation));
 					}
 					const retainedSource =
-						actorStore.actors.get(drag.sourceItem.id) === drag.actor
-							? drag.actor
-							: null;
+						actorStore.actors.get(sourceItem.id) === drag.actor ? drag.actor : null;
 					if (retainedSource !== null) {
 						retainedSource.dragging = false;
 						retainedSource.container.zIndex = 0;
@@ -517,7 +571,7 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 				finalized = true;
 				RendererRuntime.runSync(dropPresentation.failFx(drop.generation));
 				const retainedSource =
-					actorStore.actors.get(drag.sourceItem.id) === drag.actor ? drag.actor : null;
+					actorStore.actors.get(sourceItem.id) === drag.actor ? drag.actor : null;
 				if (retainedSource !== null) {
 					retainedSource.dragging = false;
 					if (optimisticRemoval !== null && removalStarted) {
@@ -625,10 +679,15 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 			);
 			// Canonical state may have changed beneath a held pointer while the target
 			// coordinates stayed stable. Freeze fresh release-time preview facts.
-			previewTarget(drag, target, true);
+			const sourceItem = previewTarget(drag, target, true);
+			if (sourceItem === null) {
+				cancelDrag(drag);
+				return;
+			}
 			drag.phase = "submitting";
 			submitDrag({
 				drag,
+				sourceItem,
 				target,
 			});
 		};
@@ -673,7 +732,9 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 				surface.readDropTargetFx(pose.x + pose.size / 2, pose.y + pose.size / 2),
 			);
 			if (target === null) return;
-			const facts = readTargetFacts(drag, target);
+			const sourceItem = readCurrentSourceItem(drag);
+			if (sourceItem === null) return;
+			const facts = readTargetFacts(sourceItem, target);
 			if (
 				facts.kind !== DropItemResultKindEnumSchema.enum.StoreInventory ||
 				facts.targetItem?.id !== inventoryActor.item.id
@@ -693,6 +754,7 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 			drag.phase = "submitting";
 			submitDrag({
 				drag,
+				sourceItem,
 				shortcutReceiver: {
 					actor: inventoryActor,
 					pose,
@@ -780,14 +842,18 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 			refreshPreviewFx: Effect.sync(() => {
 				const drag = activeDrag;
 				if (drag === null || drag.mode !== "drag" || drag.phase !== "dragging") return;
-				previewTarget(
+				const sourceItem = previewTarget(
 					drag,
 					RendererRuntime.runSync(
 						surface.readDropTargetFx(drag.lastPointerX, drag.lastPointerY),
 					),
 					true,
 				);
-				refreshEligibleAttractionActorIds(drag);
+				if (sourceItem === null) {
+					cancelDrag(drag);
+					return;
+				}
+				refreshEligibleAttractionActorIds(drag, sourceItem);
 				RendererRuntime.runSync(
 					updatePixiMainSceneMagneticFieldFx({
 						actor: drag.actor,
@@ -795,7 +861,7 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 						field: magneticField,
 						previewKind: drag.previewKind,
 						sourceDirection: null,
-						sourceItem: drag.sourceItem,
+						sourceItem,
 						targetItem: drag.targetItem,
 					}),
 				);

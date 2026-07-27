@@ -89,11 +89,17 @@ describe("temporary item lifetime", () => {
 				const first = yield* advanceRuntimeStepFx(initial);
 				const second = yield* advanceRuntimeStepFx(first.runtime);
 				const third = yield* advanceRuntimeStepFx(second.runtime);
+				const fourth = yield* advanceRuntimeStepFx(third.runtime);
+				const fifth = yield* advanceRuntimeStepFx(fourth.runtime);
+				const sixth = yield* advanceRuntimeStepFx(fifth.runtime);
 				return {
 					spawned,
 					first,
 					second,
 					third,
+					fourth,
+					fifth,
+					sixth,
 				};
 			}).pipe(
 				useGameFx({
@@ -103,10 +109,13 @@ describe("temporary item lifetime", () => {
 		);
 
 		expect(result.spawned.remainingDurationMs).toBe(600);
-		expect(result.first.runtime.items[0]?.remainingDurationMs).toBe(400);
-		expect(result.second.runtime.items[0]?.remainingDurationMs).toBe(200);
-		expect(result.third.runtime.items).toEqual([]);
-		expect(result.third.events).toEqual([
+		expect(result.first.runtime.items[0]?.remainingDurationMs).toBe(500);
+		expect(result.second.runtime.items[0]?.remainingDurationMs).toBe(400);
+		expect(result.third.runtime.items[0]?.remainingDurationMs).toBe(300);
+		expect(result.fourth.runtime.items[0]?.remainingDurationMs).toBe(200);
+		expect(result.fifth.runtime.items[0]?.remainingDurationMs).toBe(100);
+		expect(result.sixth.runtime.items).toEqual([]);
+		expect(result.sixth.events).toEqual([
 			{
 				type: GameEventEnumSchema.enum.ItemExpired,
 				itemId: "runtime:temporary",
@@ -196,12 +205,15 @@ describe("temporary item lifetime", () => {
 				const first = yield* advanceRuntimeStepFx(initial);
 				const second = yield* advanceRuntimeStepFx(first.runtime);
 				const third = yield* advanceRuntimeStepFx(second.runtime);
-				const output = third.runtime.items.find((item) => item.item.id === "result");
+				const fourth = yield* advanceRuntimeStepFx(third.runtime);
+				const fifth = yield* advanceRuntimeStepFx(fourth.runtime);
+				const sixth = yield* advanceRuntimeStepFx(fifth.runtime);
+				const output = sixth.runtime.items.find((item) => item.item.id === "result");
 				if (output === undefined) throw new Error("Expected expiry output.");
 				return {
 					output,
 					temporary,
-					third,
+					expiry: sixth,
 				};
 			}).pipe(
 				useGameFx({
@@ -210,7 +222,7 @@ describe("temporary item lifetime", () => {
 			),
 		);
 
-		expect(result.third.events).toEqual([
+		expect(result.expiry.events).toEqual([
 			{
 				type: GameEventEnumSchema.enum.ItemExpired,
 				itemId: result.temporary.id,

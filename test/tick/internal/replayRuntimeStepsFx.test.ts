@@ -125,6 +125,7 @@ describe("replayRuntimeStepsFx", () => {
 	});
 
 	it("replays every changing step before fast-forwarding the stable remainder", () => {
+		const stepsUntilStable = 1_000 / TickStepMs + 1;
 		const result = Effect.runSync(
 			Effect.gen(function* () {
 				yield* prepareJobLineFx();
@@ -137,7 +138,7 @@ describe("replayRuntimeStepsFx", () => {
 					elapsedMs: hourMs,
 					runtime,
 				});
-				const literal = yield* replayLiterallyFx(runtime, 6);
+				const literal = yield* replayLiterallyFx(runtime, stepsUntilStable);
 				return {
 					literal,
 					replay,
@@ -152,7 +153,7 @@ describe("replayRuntimeStepsFx", () => {
 		expect(summarizeRuntime(result.replay.runtime)).toEqual(summarizeRuntime(result.literal));
 		expect(result.replay.runtime.jobs).toEqual([]);
 		expect(result.replay.isStable).toBe(true);
-		expect(result.replay.processedSteps).toBe(6);
-		expect(result.replay.skippedSteps).toBe(hourMs / TickStepMs - 6);
+		expect(result.replay.processedSteps).toBe(stepsUntilStable);
+		expect(result.replay.skippedSteps).toBe(hourMs / TickStepMs - stepsUntilStable);
 	});
 });

@@ -165,7 +165,7 @@ describe("TickFx elapsed budget", () => {
 			),
 		);
 
-		expect(result.afterFirst.jobs[0]?.remainingMs).toBe(600);
+		expect(result.afterFirst.jobs[0]?.remainingMs).toBe(500);
 		expect(result.afterSecond).toEqual(result.afterFirst);
 		expect(result.afterRemainder.jobs[0]?.remainingMs).toBe(400);
 		expect(result.state.pendingElapsedMs).toBe(0);
@@ -200,8 +200,8 @@ describe("TickFx elapsed budget", () => {
 			),
 		);
 
-		expect(result.runtime.jobs[0]?.remainingMs).toBe(600);
-		expect(result.state.pendingElapsedMs).toBe(100);
+		expect(result.runtime.jobs[0]?.remainingMs).toBe(500);
+		expect(result.state.pendingElapsedMs).toBe(0);
 	});
 });
 
@@ -346,7 +346,7 @@ describe("runTickRuntimeByFx", () => {
 		expect(result.resumed[0]).toMatchObject({
 			status: JobStatusEnumSchema.enum.Running,
 			job: {
-				remainingMs: 400,
+				remainingMs: 500,
 			},
 		});
 	});
@@ -365,10 +365,12 @@ describe("fixed Tick steps", () => {
 					].reverse(),
 				});
 				const next = yield* advanceRuntimeStepFx(forward.runtime);
+				const third = yield* advanceRuntimeStepFx(next.runtime);
 				return {
 					forward: summarizeFixedStepRuntime(forward.runtime),
 					next: summarizeFixedStepRuntime(next.runtime),
 					reversed: summarizeFixedStepRuntime(reversed.runtime),
+					third: summarizeFixedStepRuntime(third.runtime),
 				};
 			}).pipe(
 				useGameFx({
@@ -379,12 +381,17 @@ describe("fixed Tick steps", () => {
 
 		expect(result.forward).toEqual({
 			dependentRemainingMs: 400,
-			enablerActive: false,
-			permitQuantity: 1,
+			enablerActive: true,
+			permitQuantity: 0,
 		});
 		expect(result.reversed).toEqual(result.forward);
 		expect(result.next).toEqual({
-			dependentRemainingMs: 200,
+			dependentRemainingMs: 400,
+			enablerActive: false,
+			permitQuantity: 1,
+		});
+		expect(result.third).toEqual({
+			dependentRemainingMs: 300,
 			enablerActive: false,
 			permitQuantity: 1,
 		});

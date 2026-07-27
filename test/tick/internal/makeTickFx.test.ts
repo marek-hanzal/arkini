@@ -19,6 +19,47 @@ const makeEmptyRuntime = (): RuntimeSchema.Type => ({
 });
 
 describe("makeTickFx idle scheduling", () => {
+	it("accumulates wall time until the exact 100 ms simulation boundary", () => {
+		const result = Effect.runSync(
+			Effect.gen(function* () {
+				const runtimeRef = yield* Ref.make(makeEmptyRuntime());
+				const elapsedBudgets = yield* Ref.make<number[]>([]);
+				const tick = yield* makeTickServiceFx({
+					advanceRuntimeElapsed: ({ elapsedMs }) =>
+						Effect.gen(function* () {
+							yield* Ref.update(elapsedBudgets, (budgets) => [
+								...budgets,
+								elapsedMs,
+							]);
+							return {
+								stableRuntime: yield* Ref.get(runtimeRef),
+							};
+						}),
+				}).pipe(
+					Effect.provideService(RuntimeFx, {
+						read: Ref.get(runtimeRef),
+					}),
+				);
+
+				yield* tick.advanceRuntimeBy(TickStepMs - 1);
+				const beforeBoundary = yield* tick.read;
+				yield* tick.advanceRuntimeBy(1);
+
+				return {
+					beforeBoundary,
+					elapsedBudgets: yield* Ref.get(elapsedBudgets),
+					state: yield* tick.read,
+				};
+			}),
+		);
+
+		expect(result.beforeBoundary.pendingElapsedMs).toBe(TickStepMs - 1);
+		expect(result.elapsedBudgets).toEqual([
+			TickStepMs,
+		]);
+		expect(result.state.pendingElapsedMs).toBe(0);
+	});
+
 	it("reuses a stable proof until an external runtime replacement re-arms advancement", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {

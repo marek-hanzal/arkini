@@ -85,7 +85,7 @@ The central rules are:
   runtime mutation path;
 - runtime and transient events commit together;
 - failed or interrupted planning commits nothing;
-- Tick uses a fixed 200 ms simulation step and stores job time as `remainingMs`;
+- Tick uses a fixed 100 ms simulation step and stores job time as `remainingMs`;
 - job commands admit work only; Tick owns progress and completion, including Instant gameplay;
 - UI may lag behind the canonical runtime for animation, but never becomes gameplay truth;
 - persistence observes runtime identity, not transient event traffic;

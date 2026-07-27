@@ -260,7 +260,7 @@ describe("job board and inventory flow", () => {
 			]),
 		);
 		expect(result.blocked.items.filter((item) => item.item.id === "ingot")).toEqual([]);
-		expect(result.pendingAfterBlocked.pendingElapsedMs).toBe(100);
+		expect(result.pendingAfterBlocked.pendingElapsedMs).toBe(0);
 		expect(result.resumed.jobs).toHaveLength(1);
 		expect(result.resumed.jobs[0]?.remainingMs).toBe(1_000);
 		expect(result.resumed.jobQueue).toEqual([]);

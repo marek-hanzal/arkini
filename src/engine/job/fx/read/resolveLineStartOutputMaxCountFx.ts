@@ -61,26 +61,31 @@ export const resolveLineStartOutputMaxCountFx = Effect.fn("resolveLineStartOutpu
 						plan,
 						runtime,
 					});
-		const direct = yield* resolveDirectLineOutputMaxCountFx({
-			line,
-			netOutput,
-			runtime,
-		});
-		if (direct !== undefined) {
-			return {
-				kind: "direct-output-max-count",
-				...direct,
-			} satisfies resolveLineStartOutputMaxCountFx.Block;
-		}
+		/*
+		 * Prefer the purpose-bound target violation over an intermediate
+		 * Blueprint's own cap so the player sees the limit that actually makes
+		 * another Blueprint useless.
+		 */
 		const downstream = yield* resolveOneHopLineOutputMaxCountFx({
 			line,
 			netOutput,
 			runtime,
 		});
-		if (downstream === undefined) return undefined;
+		if (downstream !== undefined) {
+			return {
+				kind: "downstream-output-max-count",
+				...downstream,
+			} satisfies resolveLineStartOutputMaxCountFx.Block;
+		}
+		const direct = yield* resolveDirectLineOutputMaxCountFx({
+			line,
+			netOutput,
+			runtime,
+		});
+		if (direct === undefined) return undefined;
 		return {
-			kind: "downstream-output-max-count",
-			...downstream,
+			kind: "direct-output-max-count",
+			...direct,
 		} satisfies resolveLineStartOutputMaxCountFx.Block;
 	},
 );

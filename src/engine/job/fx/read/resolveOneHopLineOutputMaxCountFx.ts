@@ -11,6 +11,7 @@ import { readOutputMaximumQuantitiesFx } from "~/engine/output/fx/readOutputMaxi
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import type { OutputMaxCountBlock } from "./resolveOutputMaxCountFx";
 import { readDefinitionLineNetMaximumOutputQuantitiesFx } from "./readDefinitionLineNetMaximumOutputQuantitiesFx";
+import { readReservedJobOutputQuantitiesFx } from "./readReservedJobOutputQuantitiesFx";
 import { resolveDirectLineOutputMaxCountFx } from "./resolveDirectLineOutputMaxCountFx";
 
 export interface OneHopLineOutputMaxCountBlock extends OutputMaxCountBlock {
@@ -36,6 +37,9 @@ export const resolveOneHopLineOutputMaxCountFx = Effect.fn("resolveOneHopLineOut
 		if (line.output === undefined) return undefined;
 		const produced = yield* readOutputMaximumQuantitiesFx({
 			output: line.output,
+		});
+		const activeReservations = yield* readReservedJobOutputQuantitiesFx({
+			runtime,
 		});
 		const netAdjustments = new Map<IdSchema.Type, number>();
 		if (netOutput !== undefined) {
@@ -71,6 +75,38 @@ export const resolveOneHopLineOutputMaxCountFx = Effect.fn("resolveOneHopLineOut
 				if (quantity <= 0) branchReserved.delete(itemId);
 				else branchReserved.set(itemId, quantity);
 			}
+			/*
+			 * Every idle Blueprint and every pending Blueprint output is one future
+			 * execution of its purpose-bound line. Active Blueprint owners are
+			 * represented by their job output reservation instead of being counted
+			 * twice as both a live Blueprint and a future target.
+			 */
+			const activeJobCountByBlueprintOwnerId = new Map<IdSchema.Type, number>();
+			for (const job of runtime.jobs) {
+				const jobOwner = runtime.items.find((item) => item.id === job.ownerItemId);
+				if (jobOwner?.item.id !== intermediateItemId) continue;
+				activeJobCountByBlueprintOwnerId.set(
+					job.ownerItemId,
+					(activeJobCountByBlueprintOwnerId.get(job.ownerItemId) ?? 0) + 1,
+				);
+			}
+			const liveIdleQuantity = runtime.items.reduce(
+				(quantity, candidate) =>
+					candidate.item.id === intermediateItemId
+						? quantity +
+							Math.max(
+								0,
+								candidate.quantity -
+									(activeJobCountByBlueprintOwnerId.get(candidate.id) ?? 0),
+							)
+						: quantity,
+				0,
+			);
+			const committedIntermediateQuantity =
+				liveIdleQuantity +
+				(activeReservations.get(intermediateItemId)?.quantity ?? 0) +
+				(branchReserved.get(intermediateItemId) ?? 0);
+			if (committedIntermediateQuantity <= 0) continue;
 
 			let firstBlock: OutputMaxCountBlock | undefined;
 			let everyApplicableLineBlocked = true;
@@ -79,10 +115,21 @@ export const resolveOneHopLineOutputMaxCountFx = Effect.fn("resolveOneHopLineOut
 					line: candidate,
 					owner: intermediate,
 				});
+				const committedNetOutput = new Map(
+					[
+						...netOutput,
+					].map(([itemId, quantity]) => [
+						itemId,
+						quantity * committedIntermediateQuantity,
+					]),
+				);
 				const block = yield* resolveDirectLineOutputMaxCountFx({
 					additionalReserved: branchReserved,
+					excludedItemIds: new Set([
+						intermediateItemId,
+					]),
 					line: candidate,
-					netOutput,
+					netOutput: committedNetOutput,
 					runtime,
 				});
 				if (block === undefined) {

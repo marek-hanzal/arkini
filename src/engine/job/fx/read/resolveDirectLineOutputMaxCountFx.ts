@@ -10,6 +10,7 @@ import { resolveOutputMaxCountFx } from "./resolveOutputMaxCountFx";
 export namespace resolveDirectLineOutputMaxCountFx {
 	export interface Props {
 		readonly additionalReserved?: ReadonlyMap<IdSchema.Type, number>;
+		readonly excludedItemIds?: ReadonlySet<IdSchema.Type>;
 		readonly line: LineSchema.Type;
 		readonly netOutput?: ReadonlyMap<IdSchema.Type, number>;
 		readonly runtime: RuntimeSchema.Type;
@@ -20,6 +21,7 @@ export namespace resolveDirectLineOutputMaxCountFx {
 export const resolveDirectLineOutputMaxCountFx = Effect.fn("resolveDirectLineOutputMaxCountFx")(
 	function* ({
 		additionalReserved,
+		excludedItemIds,
 		line,
 		netOutput,
 		runtime,
@@ -41,6 +43,9 @@ export const resolveDirectLineOutputMaxCountFx = Effect.fn("resolveDirectLineOut
 		}
 		for (const [itemId, quantity] of additionalReserved ?? []) {
 			reserved.set(itemId, (reserved.get(itemId) ?? 0) + quantity);
+		}
+		for (const itemId of excludedItemIds ?? []) {
+			reserved.delete(itemId);
 		}
 		return yield* resolveOutputMaxCountFx({
 			reserved,

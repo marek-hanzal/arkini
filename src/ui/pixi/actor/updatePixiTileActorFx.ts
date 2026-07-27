@@ -27,6 +27,16 @@ export namespace updatePixiTileActorFx {
 	}
 }
 
+export namespace updatePixiTileActorProgressFx {
+	export interface Props {
+		readonly actor: PixiTileActor;
+		readonly frames: DemandFrameLoop;
+		readonly item: TileActorItem;
+		readonly palette: PixiScenePalette;
+		readonly size: number;
+	}
+}
+
 const tileToSlotRatio = 0.8;
 
 const updateProgressBar = ({
@@ -59,6 +69,23 @@ const updateProgressBar = ({
 		color: palette.accent,
 	});
 };
+
+/** Updates the 10 Hz job overlay without remeasuring or rebuilding either retained tile face. */
+export const updatePixiTileActorProgressFx = Effect.fnUntraced(function* ({
+	actor,
+	frames,
+	item,
+	palette,
+	size,
+}: updatePixiTileActorProgressFx.Props) {
+	actor.item = item;
+	updateProgressBar({
+		actor,
+		palette,
+		size,
+	});
+	yield* frames.invalidateFx;
+});
 
 const sameVisualRevision = (left: TileActorItem, right: TileActorItem) =>
 	left.revision === right.revision &&

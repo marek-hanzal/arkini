@@ -13,17 +13,20 @@ import type {
 	PixiTileMagneticFieldSample,
 	PixiTileMagneticSourceKind,
 } from "~/ui/pixi/magnet/PixiTileMagneticField";
-import { readPixiTileMagneticDisplacementFx } from "~/ui/pixi/magnet/readPixiTileMagneticDisplacementFx";
+import { readPixiTileMagneticDisplacement } from "~/ui/pixi/magnet/readPixiTileMagneticDisplacementFx";
 
 export namespace createPixiTileMagneticFieldFx {
 	export interface Props {
 		readonly actorStore: PixiMainSceneActorStore;
 		readonly animationDriver: PixiAnimationDriver;
+		readonly scheduleApply?: (apply: () => void) => void;
 	}
 }
 
 interface ActorSpring {
 	readonly actor: PixiTileActor;
+	targetX: number;
+	targetY: number;
 	readonly x: PixiAnimationSpring;
 	readonly y: PixiAnimationSpring;
 }
@@ -51,10 +54,15 @@ const readSourceKey = (sourceKind: PixiTileMagneticSourceKind, sourceActorId: st
  * field through stale canonical geometry.
  */
 export const createPixiTileMagneticFieldFx = Effect.fn("createPixiTileMagneticFieldFx")(
-	({ actorStore, animationDriver }: createPixiTileMagneticFieldFx.Props) =>
+	({
+		actorStore,
+		animationDriver,
+		scheduleApply = queueMicrotask,
+	}: createPixiTileMagneticFieldFx.Props) =>
 		Effect.sync((): PixiTileMagneticField => {
 			const springs = new Map<string, ActorSpring>();
 			const samples = new Map<string, ActiveMagneticSample>();
+			let applyScheduled = false;
 			let closed = false;
 
 			const closeSpring = (spring: ActorSpring) => {
@@ -110,6 +118,8 @@ export const createPixiTileMagneticFieldFx = Effect.fn("createPixiTileMagneticFi
 				}
 				const spring = {
 					actor,
+					targetX: 0,
+					targetY: 0,
 					x,
 					y,
 				} satisfies ActorSpring;
@@ -130,7 +140,7 @@ export const createPixiTileMagneticFieldFx = Effect.fn("createPixiTileMagneticFi
 				for (const [key, sample] of samples) {
 					if (sample.sourceKind === "drag") samples.delete(key);
 				}
-				applySamples();
+				requestApply();
 			};
 
 			const readActorRect = (actor: PixiTileActor) => {
@@ -160,6 +170,21 @@ export const createPixiTileMagneticFieldFx = Effect.fn("createPixiTileMagneticFi
 						};
 			};
 
+			const setSpringTarget = (
+				spring: ActorSpring,
+				displacementX: number,
+				displacementY: number,
+			) => {
+				if (spring.targetX !== displacementX) {
+					spring.targetX = displacementX;
+					RendererRuntime.runSync(spring.x.setTargetFx(displacementX));
+				}
+				if (spring.targetY !== displacementY) {
+					spring.targetY = displacementY;
+					RendererRuntime.runSync(spring.y.setTargetFx(displacementY));
+				}
+			};
+
 			function applySamples() {
 				removeStaleSprings();
 				const activeSamples = Array.from(samples.values(), (sample) => ({
@@ -176,27 +201,22 @@ export const createPixiTileMagneticFieldFx = Effect.fn("createPixiTileMagneticFi
 				for (const actor of actorStore.actors.values()) {
 					if (actor.item.location.scope !== LocationScopeEnumSchema.enum.Board) {
 						const spring = springs.get(actor.item.id);
-						if (spring !== undefined) {
-							RendererRuntime.runSync(spring.x.setTargetFx(0));
-							RendererRuntime.runSync(spring.y.setTargetFx(0));
-						}
+						if (spring !== undefined) setSpringTarget(spring, 0, 0);
 						continue;
 					}
 					let displacementX = 0;
 					let displacementY = 0;
 					const actorRect = readActorRect(actor);
 					for (const { sample, sourceRect } of activeSamples) {
-						const displacement = RendererRuntime.runSync(
-							readPixiTileMagneticDisplacementFx({
-								actorId: actor.item.id,
-								actorRect,
-								attractedActorId: sample.attractedActorId,
-								eligibleAttractionActorIds: sample.eligibleAttractionActorIds,
-								sourceActorId: sample.sourceActorId,
-								sourceDirection: sample.sourceDirection,
-								sourceRect,
-							}),
-						);
+						const displacement = readPixiTileMagneticDisplacement({
+							actorId: actor.item.id,
+							actorRect,
+							attractedActorId: sample.attractedActorId,
+							eligibleAttractionActorIds: sample.eligibleAttractionActorIds,
+							sourceActorId: sample.sourceActorId,
+							sourceDirection: sample.sourceDirection,
+							sourceRect,
+						});
 						displacementX += displacement.x;
 						displacementY += displacement.y;
 					}
@@ -205,14 +225,27 @@ export const createPixiTileMagneticFieldFx = Effect.fn("createPixiTileMagneticFi
 						continue;
 					}
 					const activeSpring = spring ?? readSpring(actor);
-					RendererRuntime.runSync(activeSpring.x.setTargetFx(displacementX));
-					RendererRuntime.runSync(activeSpring.y.setTargetFx(displacementY));
+					setSpringTarget(activeSpring, displacementX, displacementY);
+				}
+			}
+
+			function requestApply() {
+				if (closed || applyScheduled) return;
+				applyScheduled = true;
+				try {
+					scheduleApply(() => {
+						applyScheduled = false;
+						if (!closed) applySamples();
+					});
+				} catch (cause) {
+					applyScheduled = false;
+					throw cause;
 				}
 			}
 
 			const release = (sourceKind: PixiTileMagneticSourceKind, sourceActorId: string) => {
 				samples.delete(readSourceKey(sourceKind, sourceActorId));
-				applySamples();
+				requestApply();
 			};
 
 			const update = (sample: PixiTileMagneticFieldSample) => {
@@ -224,7 +257,7 @@ export const createPixiTileMagneticFieldFx = Effect.fn("createPixiTileMagneticFi
 					readSourceKey(activeSample.sourceKind, activeSample.sourceActorId),
 					activeSample,
 				);
-				applySamples();
+				requestApply();
 			};
 
 			const close = () => {
@@ -255,12 +288,10 @@ export const createPixiTileMagneticFieldFx = Effect.fn("createPixiTileMagneticFi
 						}),
 				),
 				resetFx: Effect.sync(() => reset()),
-				updateFx: Effect.fn("PixiTileMagneticField.updateFx")((sample) =>
-					Effect.sync(() => {
-						if (closed) return;
-						update(sample);
-					}),
-				),
+				updateFx: Effect.fnUntraced(function* (sample) {
+					if (closed) return;
+					update(sample);
+				}),
 				closeFx: Effect.sync(close),
 			};
 		}),

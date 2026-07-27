@@ -43,16 +43,20 @@ const registries: AtomRegistry.AtomRegistry[] = [];
 const createSynthHarness = ({
 	closeFx,
 	playFx,
+	prepareFx,
 	unlockFx,
 }: {
 	readonly closeFx?: Effect.Effect<void, unknown>;
 	readonly playFx?: createGameAudioSynthFx.Result["playFx"];
+	readonly prepareFx?: Effect.Effect<void, unknown>;
 	readonly unlockFx?: Effect.Effect<void, unknown>;
 } = {}) => {
+	const prepare = vi.fn();
 	const unlock = vi.fn();
 	const play = vi.fn();
 	const close = vi.fn();
 	const synth = {
+		prepareFx: prepareFx ?? Effect.sync(() => prepare()),
 		unlockFx: unlockFx ?? Effect.sync(() => unlock()),
 		playFx: playFx ?? ((cues) => Effect.sync(() => play(cues))),
 		closeFx: closeFx ?? Effect.sync(() => close()),
@@ -61,6 +65,7 @@ const createSynthHarness = ({
 	return {
 		close,
 		play,
+		prepare,
 		synth,
 		unlock,
 	};
@@ -160,6 +165,8 @@ describe("GameAudio", () => {
 			createSynthFx,
 		});
 		expect(createSynthFx).toHaveBeenCalledOnce();
+		await vi.waitFor(() => expect(harness.prepare).toHaveBeenCalledOnce());
+		expect(harness.unlock).not.toHaveBeenCalled();
 
 		window.dispatchEvent(new Event("pointerdown"));
 		await vi.waitFor(() => expect(harness.unlock).toHaveBeenCalledOnce());

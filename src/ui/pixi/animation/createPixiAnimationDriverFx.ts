@@ -17,7 +17,9 @@ import type { DemandFrameLoop } from "~/ui/pixi/runtime/DemandFrameLoop";
 
 export namespace createPixiAnimationDriverFx {
 	export interface Props {
+		readonly cancelFrame?: (frameId: number) => void;
 		readonly frames: DemandFrameLoop;
+		readonly requestFrame?: (callback: FrameRequestCallback) => number;
 	}
 }
 
@@ -28,7 +30,11 @@ export namespace createPixiAnimationDriverFx {
  * closing the driver stops all deferred callbacks before its scene destroys display objects.
  */
 export const createPixiAnimationDriverFx = Effect.fn("createPixiAnimationDriverFx")(
-	({ frames }: createPixiAnimationDriverFx.Props) =>
+	({
+		cancelFrame = cancelAnimationFrame,
+		frames,
+		requestFrame = requestAnimationFrame,
+	}: createPixiAnimationDriverFx.Props) =>
 		Effect.sync((): PixiAnimationDriver => {
 			const activeClosers = new Set<() => void>();
 			let closed = false;
@@ -113,13 +119,10 @@ export const createPixiAnimationDriverFx = Effect.fn("createPixiAnimationDriverF
 							activeClosers.add(close);
 							return {
 								closeFx: Effect.sync(close),
-								setTargetFx: Effect.fn("PixiAnimationSpring.setTargetFx")(
-									(nextValue) =>
-										Effect.sync(() => {
-											if (closed || springClosed) return;
-											target.set(nextValue);
-										}),
-								),
+								setTargetFx: Effect.fnUntraced(function* (nextValue) {
+									if (closed || springClosed) return;
+									target.set(nextValue);
+								}),
 							};
 						}),
 				),
@@ -128,16 +131,27 @@ export const createPixiAnimationDriverFx = Effect.fn("createPixiAnimationDriverF
 						Effect.sync((): PixiAnimationControl => {
 							if (closed) return inactiveControl;
 							let controls: AnimationPlaybackControls | null = null;
+							let completionFrameId: number | null = null;
 							const playback: {
-								state: "active" | "completed" | "stopped";
+								state: "active" | "completing" | "completed" | "stopped";
 							} = {
 								state: "active",
 							};
 							const stop = () => {
-								if (playback.state !== "active") return;
+								if (
+									playback.state === "completed" ||
+									playback.state === "stopped"
+								) {
+									return;
+								}
 								playback.state = "stopped";
 								activeClosers.delete(stop);
-								controls?.stop();
+								if (completionFrameId !== null) {
+									cancelFrame(completionFrameId);
+									completionFrameId = null;
+								} else {
+									controls?.stop();
+								}
 							};
 							activeClosers.add(stop);
 							try {
@@ -157,13 +171,18 @@ export const createPixiAnimationDriverFx = Effect.fn("createPixiAnimationDriverF
 									},
 									onComplete: () => {
 										if (closed || playback.state !== "active") return;
-										playback.state = "completed";
-										activeClosers.delete(stop);
-										try {
-											onComplete?.();
-										} catch (cause) {
-											frames.reportCriticalFailure(cause);
-										}
+										playback.state = "completing";
+										completionFrameId = requestFrame(() => {
+											completionFrameId = null;
+											if (closed || playback.state !== "completing") return;
+											playback.state = "completed";
+											activeClosers.delete(stop);
+											try {
+												onComplete?.();
+											} catch (cause) {
+												frames.reportCriticalFailure(cause);
+											}
+										});
 									},
 								});
 							} catch (cause) {

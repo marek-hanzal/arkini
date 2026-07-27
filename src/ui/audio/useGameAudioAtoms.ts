@@ -60,6 +60,27 @@ export const useGameAudioAtoms = (game: Game, createSynthFx: useGameAudioAtoms.C
 				concurrent: true,
 			},
 		).pipe(Atom.setIdleTTL(0));
+		const prepareAtom = Atom.fn(
+			(_: void, get) =>
+				Effect.yieldNow.pipe(
+					Effect.andThen(get.result(synthAtom)),
+					Effect.flatMap((audio) => audio.prepareFx),
+					Effect.catchCause((cause) =>
+						Cause.hasInterruptsOnly(cause)
+							? Effect.void
+							: Effect.sync(() => {
+									const failure = readExactCauseFailure(cause);
+									console.error(
+										"Arkini game audio preparation failed; gameplay continues.",
+										Option.isSome(failure) ? failure.value : cause,
+									);
+								}),
+					),
+				),
+			{
+				concurrent: true,
+			},
+		).pipe(Atom.setIdleTTL(0));
 		const playBatchAtom = Atom.fn(
 			(batch: useGameEvents.Batch, get) =>
 				Effect.yieldNow.pipe(
@@ -86,6 +107,7 @@ export const useGameAudioAtoms = (game: Game, createSynthFx: useGameAudioAtoms.C
 
 		return {
 			playBatchAtom,
+			prepareAtom,
 			synthAtom,
 			unlockAtom,
 		};

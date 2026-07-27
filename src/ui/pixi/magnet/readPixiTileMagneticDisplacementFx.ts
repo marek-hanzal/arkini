@@ -40,68 +40,71 @@ const readStableDirection = (actorId: string, sourceActorId: string) => {
 	};
 };
 
-/** Projects the frozen magnetic field geometry; Motion owns interpolation and rest. */
-export const readPixiTileMagneticDisplacementFx = Effect.fn("readPixiTileMagneticDisplacementFx")(
-	({
-		actorId,
-		actorRect,
-		attractedActorId,
-		eligibleAttractionActorIds,
-		sourceActorId,
-		sourceDirection,
-		sourceRect,
-	}: readPixiTileMagneticDisplacementFx.Props) =>
-		Effect.sync(() => {
-			if (actorId === sourceActorId) {
-				return {
-					x: 0,
-					y: 0,
-				};
-			}
-			const attracted = attractedActorId === actorId;
-			if (!attracted && eligibleAttractionActorIds.has(actorId)) {
-				return {
-					x: 0,
-					y: 0,
-				};
-			}
-			const relative = {
-				x: actorRect.x + actorRect.width / 2 - (sourceRect.x + sourceRect.width / 2),
-				y: actorRect.y + actorRect.height / 2 - (sourceRect.y + sourceRect.height / 2),
-			};
-			const distance = Math.hypot(relative.x, relative.y);
-			const influenceRadius =
-				Math.max(sourceRect.width, sourceRect.height, actorRect.width, actorRect.height) *
-				influenceRadiusRatio;
-			if (influenceRadius <= 0 || distance >= influenceRadius) {
-				return {
-					x: 0,
-					y: 0,
-				};
-			}
+/** Projects the frozen magnetic field geometry without allocating an Effect per actor and source. */
+export const readPixiTileMagneticDisplacement = ({
+	actorId,
+	actorRect,
+	attractedActorId,
+	eligibleAttractionActorIds,
+	sourceActorId,
+	sourceDirection,
+	sourceRect,
+}: readPixiTileMagneticDisplacementFx.Props) => {
+	if (actorId === sourceActorId) {
+		return {
+			x: 0,
+			y: 0,
+		};
+	}
+	const attracted = attractedActorId === actorId;
+	if (!attracted && eligibleAttractionActorIds.has(actorId)) {
+		return {
+			x: 0,
+			y: 0,
+		};
+	}
+	const relative = {
+		x: actorRect.x + actorRect.width / 2 - (sourceRect.x + sourceRect.width / 2),
+		y: actorRect.y + actorRect.height / 2 - (sourceRect.y + sourceRect.height / 2),
+	};
+	const distance = Math.hypot(relative.x, relative.y);
+	const influenceRadius =
+		Math.max(sourceRect.width, sourceRect.height, actorRect.width, actorRect.height) *
+		influenceRadiusRatio;
+	if (influenceRadius <= 0 || distance >= influenceRadius) {
+		return {
+			x: 0,
+			y: 0,
+		};
+	}
 
-			const direction =
-				distance > minimumDirectionMagnitude
-					? {
-							x: relative.x / distance,
-							y: relative.y / distance,
-						}
-					: attracted
-						? {
-								x: 0,
-								y: 0,
-							}
-						: (sourceDirection ?? readStableDirection(actorId, sourceActorId));
-			const proximity = 1 - distance / influenceRadius;
-			const smoothProximity = proximity * proximity * (3 - 2 * proximity);
-			const maximumDisplacement =
-				Math.min(actorRect.width, actorRect.height) *
-				(attracted ? attractionDisplacementRatio : repulsionDisplacementRatio);
-			const polarity = attracted ? -1 : 1;
-			const magnitude = maximumDisplacement * smoothProximity * polarity;
-			return {
-				x: direction.x * magnitude,
-				y: direction.y * magnitude,
-			};
-		}),
+	const direction =
+		distance > minimumDirectionMagnitude
+			? {
+					x: relative.x / distance,
+					y: relative.y / distance,
+				}
+			: attracted
+				? {
+						x: 0,
+						y: 0,
+					}
+				: (sourceDirection ?? readStableDirection(actorId, sourceActorId));
+	const proximity = 1 - distance / influenceRadius;
+	const smoothProximity = proximity * proximity * (3 - 2 * proximity);
+	const maximumDisplacement =
+		Math.min(actorRect.width, actorRect.height) *
+		(attracted ? attractionDisplacementRatio : repulsionDisplacementRatio);
+	const polarity = attracted ? -1 : 1;
+	const magnitude = maximumDisplacement * smoothProximity * polarity;
+	return {
+		x: direction.x * magnitude,
+		y: direction.y * magnitude,
+	};
+};
+
+/** Keeps the pure projection available at Effect boundaries outside the per-frame hot loop. */
+export const readPixiTileMagneticDisplacementFx = Effect.fn("readPixiTileMagneticDisplacementFx")(
+	(props: readPixiTileMagneticDisplacementFx.Props) =>
+		Effect.sync(() => readPixiTileMagneticDisplacement(props)),
 );

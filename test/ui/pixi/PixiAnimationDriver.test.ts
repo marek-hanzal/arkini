@@ -123,18 +123,36 @@ vi.mock("motion", () => {
 });
 
 const createDriver = () => {
+	const frameCallbacks = new Map<number, FrameRequestCallback>();
+	let nextFrameId = 0;
 	const invalidate = vi.fn();
 	const reportCriticalFailure = vi.fn();
 	const driver = Effect.runSync(
 		createPixiAnimationDriverFx({
+			cancelFrame: (frameId) => {
+				frameCallbacks.delete(frameId);
+			},
 			frames: {
 				invalidateFx: Effect.sync(invalidate),
 				reportCriticalFailure,
 			} as unknown as DemandFrameLoop,
+			requestFrame: (callback) => {
+				nextFrameId += 1;
+				frameCallbacks.set(nextFrameId, callback);
+				return nextFrameId;
+			},
 		}),
 	);
 	return {
 		driver,
+		flushFrames: () => {
+			const callbacks = [
+				...frameCallbacks.values(),
+			];
+			frameCallbacks.clear();
+			for (const callback of callbacks) callback(performance.now());
+		},
+		frameCallbacks,
 		invalidate,
 		reportCriticalFailure,
 	};
@@ -189,7 +207,7 @@ describe("Pixi animation driver", () => {
 	});
 
 	it("completes a tween exactly once", () => {
-		const { driver } = createDriver();
+		const { driver, flushFrames, frameCallbacks } = createDriver();
 		const onComplete = vi.fn();
 		Effect.runSync(
 			driver.startTweenFx({
@@ -203,6 +221,9 @@ describe("Pixi animation driver", () => {
 
 		motionState.tweens[0]?.onComplete();
 		motionState.tweens[0]?.onComplete();
+		expect(onComplete).not.toHaveBeenCalled();
+		expect(frameCallbacks.size).toBe(1);
+		flushFrames();
 		Effect.runSync(driver.closeFx);
 		Effect.runSync(driver.closeFx);
 		expect(onComplete).toHaveBeenCalledOnce();
@@ -210,7 +231,7 @@ describe("Pixi animation driver", () => {
 	});
 
 	it("reports consumer callback failures while containing Motion callbacks", () => {
-		const { driver, invalidate, reportCriticalFailure } = createDriver();
+		const { driver, flushFrames, invalidate, reportCriticalFailure } = createDriver();
 		Effect.runSync(
 			driver.startTweenFx({
 				durationMs: 300,
@@ -227,8 +248,31 @@ describe("Pixi animation driver", () => {
 
 		expect(() => motionState.tweens[0]?.onUpdate(0.5)).not.toThrow();
 		expect(() => motionState.tweens[0]?.onComplete()).not.toThrow();
+		expect(() => flushFrames()).not.toThrow();
 		expect(invalidate).toHaveBeenCalledOnce();
 		expect(reportCriticalFailure).toHaveBeenCalledTimes(2);
+	});
+
+	it("cancels presentation completion while the final frame is pending", () => {
+		const { driver, flushFrames, frameCallbacks } = createDriver();
+		const onComplete = vi.fn();
+		const control = Effect.runSync(
+			driver.startTweenFx({
+				durationMs: 300,
+				from: 0,
+				onComplete,
+				onUpdate: vi.fn(),
+				to: 1,
+			}),
+		);
+
+		motionState.tweens[0]?.onComplete();
+		expect(frameCallbacks.size).toBe(1);
+		Effect.runSync(control.stopFx);
+		expect(frameCallbacks.size).toBe(0);
+		flushFrames();
+		expect(onComplete).not.toHaveBeenCalled();
+		expect(motionState.tweens[0]?.stop).not.toHaveBeenCalled();
 	});
 
 	it("retargets one persistent spring and disposes it exactly once", () => {

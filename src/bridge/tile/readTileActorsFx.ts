@@ -23,7 +23,7 @@ export namespace readTileActorsFx {
 }
 
 /** Projects only exact live grid identities visible to one Pixi scene. */
-export const readTileActorsFx = Effect.fn("readTileActorsFx")(function* ({
+export const readTileActorsFx = Effect.fnUntraced(function* ({
 	game,
 	runtime,
 	surface,

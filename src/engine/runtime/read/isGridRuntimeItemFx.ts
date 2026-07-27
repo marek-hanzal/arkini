@@ -5,9 +5,7 @@ import type { GridRuntimeItemSchema } from "~/engine/runtime/schema/GridRuntimeI
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
 
 /** Narrows one live runtime item to a board, inventory, or toolbar item. */
-export const isGridRuntimeItemFx = Effect.fn("isGridRuntimeItemFx")(function* (
-	item: RuntimeItemSchema.Type,
-) {
+export const isGridRuntimeItemFx = Effect.fnUntraced(function* (item: RuntimeItemSchema.Type) {
 	return Option.liftPredicate(
 		item,
 		(candidate): candidate is GridRuntimeItemSchema.Type =>

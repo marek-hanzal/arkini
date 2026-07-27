@@ -9,6 +9,7 @@ export namespace createGameAudioSynthFx {
 	}
 
 	export interface Result {
+		readonly prepareFx: Effect.Effect<void, unknown>;
 		readonly unlockFx: Effect.Effect<void, unknown>;
 		readonly playFx: (cues: ReadonlyArray<readGameAudioCuesFx.Result>) => Effect.Effect<void>;
 		readonly closeFx: Effect.Effect<void, unknown>;
@@ -103,6 +104,7 @@ export const createGameAudioSynthFx = Effect.fn("createGameAudioSynthFx")(
 					});
 				}),
 			);
+			const prepareFx = ensureContextFx.pipe(Effect.asVoid);
 
 			const playFx: createGameAudioSynthFx.Result["playFx"] = Effect.fn(
 				"GameAudioSynth.playFx",
@@ -230,6 +232,7 @@ export const createGameAudioSynthFx = Effect.fn("createGameAudioSynthFx")(
 			});
 
 			return {
+				prepareFx,
 				unlockFx,
 				playFx,
 				closeFx,

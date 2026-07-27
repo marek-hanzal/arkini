@@ -112,6 +112,10 @@ describe("createGameAudioSynthFx", () => {
 		Effect.runSync(synth.playFx(cues));
 		expect(harness.createContext).not.toHaveBeenCalled();
 
+		await Effect.runPromise(synth.prepareFx);
+		expect(harness.createContext).toHaveBeenCalledOnce();
+		expect(harness.resume).not.toHaveBeenCalled();
+
 		await Effect.runPromise(synth.unlockFx);
 		expect(harness.createContext).toHaveBeenCalledOnce();
 		expect(harness.resume).toHaveBeenCalledOnce();

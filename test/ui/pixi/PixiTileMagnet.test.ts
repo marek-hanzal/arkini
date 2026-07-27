@@ -165,6 +165,57 @@ describe("Pixi tile magnet", () => {
 		).toBeNull();
 	});
 
+	it("coalesces multiple source updates into one magnetic projection pass", () => {
+		const scheduled: Array<() => void> = [];
+		const field = Effect.runSync(
+			createPixiTileMagneticFieldFx({
+				actorStore: {
+					actors: new Map(),
+				} as unknown as PixiMainSceneActorStore,
+				animationDriver: {
+					closeFx: Effect.void,
+					createSpringFx: () =>
+						Effect.die("An empty actor store must not acquire springs."),
+					startTweenFx: () =>
+						Effect.succeed({
+							stopFx: Effect.void,
+						}),
+				},
+				scheduleApply: (apply) => scheduled.push(apply),
+			}),
+		);
+		const sample = {
+			attractedActorId: null,
+			eligibleAttractionActorIds: new Set<string>(),
+			sourceActorId: "runtime:source",
+			sourceDirection: null,
+			sourceItem: targetItem,
+			sourceX: 0,
+			sourceY: 0,
+		};
+
+		Effect.runSync(field.updateFx(sample));
+		Effect.runSync(
+			field.updateFx({
+				...sample,
+				sourceX: 40,
+			}),
+		);
+		expect(scheduled).toHaveLength(1);
+		scheduled[0]?.();
+		expect(scheduled).toHaveLength(1);
+
+		Effect.runSync(
+			field.releaseFx({
+				sourceActorId: sample.sourceActorId,
+				sourceKind: "drag",
+			}),
+		);
+		expect(scheduled).toHaveLength(2);
+		Effect.runSync(field.closeFx);
+		expect(() => scheduled[1]?.()).not.toThrow();
+	});
+
 	it("reuses, prunes and closes persistent actor spring pairs", () => {
 		const springs: Array<{
 			readonly close: ReturnType<typeof vi.fn>;
@@ -242,6 +293,7 @@ describe("Pixi tile magnet", () => {
 					actors,
 				} as unknown as PixiMainSceneActorStore,
 				animationDriver,
+				scheduleApply: (apply) => apply(),
 			}),
 		);
 		const sample = {
@@ -260,9 +312,11 @@ describe("Pixi tile magnet", () => {
 		Effect.runSync(field.updateFx(sample));
 		Effect.runSync(field.updateFx(sample));
 		expect(springs).toHaveLength(2);
+		expect(springs[0]?.setTarget).toHaveBeenCalledOnce();
+		expect(springs[1]?.setTarget).not.toHaveBeenCalled();
 		Effect.runSync(field.resetFx);
 		expect(springs[0]?.setTarget).toHaveBeenLastCalledWith(0);
-		expect(springs[1]?.setTarget).toHaveBeenLastCalledWith(0);
+		expect(springs[1]?.setTarget).not.toHaveBeenCalled();
 
 		const replacement = createActor(target.item.id, 1);
 		actors.set(target.item.id, replacement);
@@ -348,6 +402,7 @@ describe("Pixi tile magnet", () => {
 					]),
 				} as unknown as PixiMainSceneActorStore,
 				animationDriver,
+				scheduleApply: (apply) => apply(),
 			}),
 		);
 

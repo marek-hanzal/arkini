@@ -53,7 +53,7 @@ const rejected = (reason: DropItemRejectedReasonEnumSchema.Type): readDropItemPr
 });
 
 /** Reads the current authoritative semantic kind of one prospective item drop without mutating runtime. */
-export const readDropItemPreviewFx = Effect.fn("readDropItemPreviewFx")(function* ({
+export const readDropItemPreviewFx = Effect.fnUntraced(function* ({
 	sourceItemId,
 	sourceRevision,
 	sourceLocation,

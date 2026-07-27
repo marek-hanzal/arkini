@@ -2,6 +2,7 @@ import { Effect } from "effect";
 
 import type { GameEngine } from "~/bridge/game/GameEngine";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
+import { LocationScopeEnumSchema } from "~/bridge/tile/LocationScopeEnumSchema";
 import type { TileActorItem } from "~/bridge/tile/TileActorItem";
 import type { TileActorFeedbackCue } from "~/bridge/tile/feedback/TileActorFeedbackCue";
 import { readTileActorFeedbackCuesFx } from "~/bridge/tile/feedback/readTileActorFeedbackCuesFx";
@@ -13,7 +14,10 @@ import type { PixiMainSceneActorStore } from "~/ui/pixi/actor/PixiMainSceneActor
 import type { PixiTileActorRunningGlowTexture } from "~/ui/pixi/actor/PixiTileActorRunningGlowTexture";
 import { createPixiTileActorFx } from "~/ui/pixi/actor/createPixiTileActorFx";
 import { readPixiTileActorCrowdAlpha } from "~/ui/pixi/actor/readPixiTileActorCrowdAlpha";
-import { updatePixiTileActorFx } from "~/ui/pixi/actor/updatePixiTileActorFx";
+import {
+	updatePixiTileActorFx,
+	updatePixiTileActorProgressFx,
+} from "~/ui/pixi/actor/updatePixiTileActorFx";
 import type { PixiActorAnimator } from "~/ui/pixi/animation/PixiActorAnimator";
 import { flashPixiTileActorConsumedSourceFx } from "~/ui/pixi/animation/flashPixiTileActorConsumedSourceFx";
 import { readPixiActorAlphaAnimationKey } from "~/ui/pixi/animation/readPixiActorAlphaAnimationKey";
@@ -56,7 +60,11 @@ export namespace createPixiMainSceneReconcilerFx {
 }
 
 const sameLocation = (left: TileActorItem["location"], right: TileActorItem["location"]) =>
-	JSON.stringify(left) === JSON.stringify(right);
+	left.scope === right.scope &&
+	left.position.x === right.position.x &&
+	left.position.y === right.position.y &&
+	(left.scope !== LocationScopeEnumSchema.enum.Board ||
+		(right.scope === LocationScopeEnumSchema.enum.Board && left.space === right.space));
 
 const runningTransitionDurationMs = 180;
 const feedbackExitDurationMs = 420;
@@ -300,16 +308,17 @@ export const createPixiMainSceneReconcilerFx = Effect.fn("createPixiMainSceneRec
 						cue.targetActorId,
 					]),
 				);
+				const belongsToInputMotion = (cue: TileActorFeedbackCue) => {
+					for (const prefix of inputMotionFeedbackPrefixes) {
+						if (cue.key.startsWith(prefix)) return true;
+					}
+					return false;
+				};
 				const feedbackCues = presentCommittedEffects
 					? [
 							...RendererRuntime.runSync(
 								readTileActorFeedbackCuesFx(transition),
-							).filter(
-								(cue) =>
-									![
-										...inputMotionFeedbackPrefixes,
-									].some((prefix) => cue.key.startsWith(prefix)),
-							),
+							).filter((cue) => !belongsToInputMotion(cue)),
 							...dropSnapshot.feedback.flatMap(({ cues }) =>
 								cues.filter((cue) => !inputMotionActorIds.has(cue.actorId)),
 							),
@@ -335,17 +344,21 @@ export const createPixiMainSceneReconcilerFx = Effect.fn("createPixiMainSceneRec
 				}
 				const motionSnapshot = yield* motion.readSnapshotFx;
 				const visibleItems = new Map(
-					nextItems.flatMap((item) =>
-						dropSnapshot.hiddenActorIds.has(item.id) ||
-						RendererRuntime.runSync(surface.readActorPoseFx(item)) === null
+					nextItems.flatMap((item) => {
+						if (dropSnapshot.hiddenActorIds.has(item.id)) return [];
+						const pose = RendererRuntime.runSync(surface.readActorPoseFx(item));
+						return pose === null
 							? []
 							: [
 									[
 										item.id,
-										item,
-									],
-								],
-					),
+										{
+											item,
+											pose,
+										},
+									] as const,
+								];
+					}),
 				);
 				const visibleActorIds = new Set(visibleItems.keys());
 				const leavingFeedbackActorIds = new Set(
@@ -385,9 +398,7 @@ export const createPixiMainSceneReconcilerFx = Effect.fn("createPixiMainSceneRec
 					});
 				}
 
-				for (const item of visibleItems.values()) {
-					const pose = RendererRuntime.runSync(surface.readActorPoseFx(item));
-					if (pose === null) continue;
+				for (const { item, pose } of visibleItems.values()) {
 					const hiddenQuantity = motionSnapshot.unsettledQuantities.get(item.id) ?? 0;
 					const unsettledInputSourceQuantity =
 						motionSnapshot.unsettledInputSourceQuantities.get(item.id);
@@ -479,7 +490,7 @@ export const createPixiMainSceneReconcilerFx = Effect.fn("createPixiMainSceneRec
 						readPixiTileActorCrowdAlpha(displayItem);
 					const runningGlowChanged = actor.item.runningGlow !== displayItem.runningGlow;
 					const previousDisplayedSize = actor.size * actor.container.scale.x;
-					if (visualChanged || sizeChanged || progressChanged) {
+					if (visualChanged || sizeChanged) {
 						yield* updatePixiTileActorFx({
 							actor,
 							animator,
@@ -489,6 +500,14 @@ export const createPixiMainSceneReconcilerFx = Effect.fn("createPixiMainSceneRec
 							preserveVisual: replacementActorIds.has(item.id),
 							size: poseOwned ? actor.size : pose.size,
 							textures,
+						});
+					} else if (progressChanged) {
+						yield* updatePixiTileActorProgressFx({
+							actor,
+							frames: application.frames,
+							item: displayItem,
+							palette: readPalette(),
+							size: actor.size,
 						});
 					} else {
 						actor.item = displayItem;

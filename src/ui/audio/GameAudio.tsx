@@ -21,6 +21,7 @@ export const GameAudio = ({ createSynthFx = createGameAudioSynthFx }: GameAudio.
 	const audioAtoms = useGameAudioAtoms(game, createSynthFx);
 	const activeAudioAtomsRef = useRef<typeof audioAtoms | null>(null);
 	useAtomMount(audioAtoms.synthAtom);
+	const prepare = useAtomSet(audioAtoms.prepareAtom);
 	const unlock = useAtomSet(audioAtoms.unlockAtom);
 	const playBatch = useAtomSet(audioAtoms.playBatchAtom);
 
@@ -33,6 +34,12 @@ export const GameAudio = ({ createSynthFx = createGameAudioSynthFx }: GameAudio.
 		};
 	}, [
 		audioAtoms,
+	]);
+
+	useEffect(() => {
+		prepare();
+	}, [
+		prepare,
 	]);
 
 	useEffect(() => {

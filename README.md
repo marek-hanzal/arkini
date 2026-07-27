@@ -70,7 +70,8 @@ game source fragments + PNG resources
 
 selected exact package + separately namespaced optional persisted state
 → hydrated runtime
-→ serialized interruptible mutation planning
+→ concurrent command admission
+→ narrowly serialized interruptible mutation planning
 → candidate validation
 → one SubscriptionRef committed transition
      runtime snapshot + transient events
@@ -80,10 +81,12 @@ selected exact package + separately namespaced optional persisted state
 The central rules are:
 
 - one canonical committed runtime;
-- every production write enters through the serialized runtime mutation path;
+- independent commands run concurrently until each production write enters the short serialized
+  runtime mutation path;
 - runtime and transient events commit together;
 - failed or interrupted planning commits nothing;
 - Tick uses a fixed 200 ms simulation step and stores job time as `remainingMs`;
+- job commands admit work only; Tick owns progress and completion, including Instant gameplay;
 - UI may lag behind the canonical runtime for animation, but never becomes gameplay truth;
 - persistence observes runtime identity, not transient event traffic;
 - all exact identifiers use the single shared `IdSchema`;

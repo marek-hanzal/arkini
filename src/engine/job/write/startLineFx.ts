@@ -1,6 +1,5 @@
 import { Effect } from "effect";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import { settleInstantGameplayFx } from "~/engine/cheat/write/settleInstantGameplayFx";
 import { assertLineStartReadyFx } from "~/engine/job/fx/assertLineStartReadyFx";
 import { createJobQueueRequestFx } from "~/engine/job/fx/createJobQueueRequestFx";
 import { resolveLineStartFx } from "~/engine/job/fx/read/resolveLineStartFx";
@@ -17,12 +16,18 @@ export namespace startLineFx {
 		lineId: IdSchema.Type;
 	}
 }
-/** Explicitly starts an idle owner or appends one FIFO request behind any existing owner work. */
+/**
+ * Explicitly starts an idle owner or appends one FIFO request behind existing owner work.
+ *
+ * The command commits only its own admission. Even under Instant gameplay, completion belongs to
+ * the shared Tick boundary so independent owner commands can enter the runtime before one global
+ * simulation pass resolves every runnable job.
+ */
 export const startLineFx = Effect.fn("startLineFx")(function* ({
 	ownerItemId,
 	lineId,
 }: startLineFx.Props) {
-	const result = yield* modifyRuntimeFx((runtime) =>
+	return yield* modifyRuntimeFx((runtime) =>
 		Effect.gen(function* () {
 			const hasOwnerWork =
 				runtime.jobs.some((job) => job.ownerItemId === ownerItemId) ||
@@ -82,6 +87,4 @@ export const startLineFx = Effect.fn("startLineFx")(function* ({
 			];
 		}),
 	);
-	yield* settleInstantGameplayFx();
-	return result;
 });

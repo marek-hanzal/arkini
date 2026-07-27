@@ -6,6 +6,8 @@ import { setInstantGameplayFx } from "~/engine/cheat/write/setInstantGameplayFx"
 import { useGameFx } from "~/engine/game/fx/useGameFx";
 import { startLineFx } from "~/engine/job/write/startLineFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
+import { runTickRuntimeByFx } from "~/engine/tick/fx/runTickRuntimeByFx";
+import { TickStepMs } from "~/engine/tick/TickStepMs";
 import { createJobTestConfig, prepareJobLineFx } from "~test/job/support/jobTestConfig";
 
 const startProps = {
@@ -14,7 +16,7 @@ const startProps = {
 } as const;
 
 describe("Instant gameplay", () => {
-	it("settles existing and newly started valid work while preserving the stored option", () => {
+	it("settles admitted work at the shared Tick boundary while preserving the stored option", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {
 				yield* prepareJobLineFx();
@@ -27,15 +29,22 @@ describe("Instant gameplay", () => {
 					enabled: true,
 				});
 				const enabledRuntime = yield* readRuntimeFx();
+				yield* startLineFx(startProps);
+				const admittedInstantRuntime = yield* readRuntimeFx();
+				yield* runTickRuntimeByFx({
+					elapsedMs: TickStepMs,
+				});
+				const settledInstantRuntime = yield* readRuntimeFx();
 				yield* setCheatEnabledFx({
 					enabled: false,
 				});
-				yield* startLineFx(startProps);
 				const restoredTimingRuntime = yield* readRuntimeFx();
 				return {
+					admittedInstantRuntime,
 					disabledRuntime,
 					enabledRuntime,
 					restoredTimingRuntime,
+					settledInstantRuntime,
 				};
 			}).pipe(
 				useGameFx({
@@ -52,13 +61,15 @@ describe("Instant gameplay", () => {
 			everEnabled: true,
 			instantGameplay: true,
 		});
+		expect(result.admittedInstantRuntime.jobs).toHaveLength(1);
+		expect(result.admittedInstantRuntime.jobs[0]?.remainingMs).toBe(1_000);
+		expect(result.settledInstantRuntime.jobs).toEqual([]);
 		expect(result.restoredTimingRuntime.cheats).toEqual({
 			enabled: false,
 			everEnabled: true,
 			instantGameplay: true,
 		});
-		expect(result.restoredTimingRuntime.jobs).toHaveLength(1);
-		expect(result.restoredTimingRuntime.jobs[0]?.remainingMs).toBe(1_000);
+		expect(result.restoredTimingRuntime.jobs).toEqual([]);
 	});
 
 	it("changes duration rather than command validity", () => {

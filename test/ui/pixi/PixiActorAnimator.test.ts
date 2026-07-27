@@ -63,6 +63,7 @@ const createFrames = () => {
 		frames: {
 			closeFx: Effect.void,
 			invalidateFx: Effect.sync(invalidate),
+			reportCriticalFailure: vi.fn(),
 		} satisfies DemandFrameLoop,
 		invalidate,
 	};

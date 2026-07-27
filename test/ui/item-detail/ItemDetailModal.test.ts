@@ -184,8 +184,10 @@ const game = {
 		packageId: "test-package",
 		contentHash: "0".repeat(64),
 	},
+	getFatalError: () => null,
 	getSnapshot: () => currentRuntime,
 	committedTransitionAtom: transitionAtomFields.committedTransitionAtom,
+	failStop: transitionAtomFields.failStop,
 	getTransitionSnapshot: () => ({
 		sequence: 0,
 		previousRuntime: null,
@@ -207,8 +209,10 @@ const game = {
 		return () => undefined;
 	},
 	subscribeEvents: () => () => undefined,
+	subscribeFatalError: () => () => undefined,
 	read: testGameRead,
 	readOrThrow: readOrThrowWithConfig as GameEngine["readOrThrow"],
+	reportCriticalFailure: () => undefined,
 	runFx: transitionAtomFields.runFx,
 	run: (() => Promise.reject(new Error("Not used by this test."))) as GameEngine["run"],
 	disposeFx: Effect.void,

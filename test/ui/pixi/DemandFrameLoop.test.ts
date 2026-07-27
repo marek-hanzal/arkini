@@ -39,6 +39,7 @@ describe("DemandFrameLoop", () => {
 		const loop = Effect.runSync(
 			createDemandFrameLoopFx({
 				cancelFrame: fake.cancelFrame,
+				reportCriticalFailure: vi.fn(),
 				render,
 				requestFrame: fake.requestFrame,
 			}),
@@ -58,6 +59,7 @@ describe("DemandFrameLoop", () => {
 		const loop = Effect.runSync(
 			createDemandFrameLoopFx({
 				cancelFrame: fake.cancelFrame,
+				reportCriticalFailure: vi.fn(),
 				render,
 				requestFrame: fake.requestFrame,
 			}),
@@ -72,11 +74,11 @@ describe("DemandFrameLoop", () => {
 
 	it("poisons the loop after a renderer failure instead of spinning", () => {
 		const fake = createFakeFrames();
-		const onError = vi.fn();
+		const reportCriticalFailure = vi.fn();
 		const loop = Effect.runSync(
 			createDemandFrameLoopFx({
 				cancelFrame: fake.cancelFrame,
-				onError,
+				reportCriticalFailure,
 				render: () => {
 					throw new Error("context lost");
 				},
@@ -86,7 +88,7 @@ describe("DemandFrameLoop", () => {
 		Effect.runSync(loop.invalidateFx);
 		fake.runNext(10);
 
-		expect(onError).toHaveBeenCalledOnce();
+		expect(reportCriticalFailure).toHaveBeenCalledOnce();
 		Effect.runSync(loop.invalidateFx);
 		expect(fake.callbacks).toHaveLength(0);
 	});

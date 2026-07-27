@@ -8,6 +8,7 @@ import { createDemandFrameLoopFx } from "~/ui/pixi/runtime/createDemandFrameLoop
 export namespace createPixiApplicationOwnerFx {
 	export interface Props {
 		readonly host: HTMLElement;
+		readonly reportCriticalFailure: (cause: unknown) => void;
 	}
 }
 
@@ -27,7 +28,7 @@ Ticker.system.stop();
  * boundary and must happen only after children release their display objects and listeners.
  */
 export const createPixiApplicationOwnerFx = Effect.fn("createPixiApplicationOwnerFx")(
-	({ host }: createPixiApplicationOwnerFx.Props) => {
+	({ host, reportCriticalFailure }: createPixiApplicationOwnerFx.Props) => {
 		const app = new Application();
 		const hostGeneration = (hostGenerations.get(host) ?? 0) + 1;
 		hostGenerations.set(host, hostGeneration);
@@ -80,6 +81,7 @@ export const createPixiApplicationOwnerFx = Effect.fn("createPixiApplicationOwne
 			host.replaceChildren(app.canvas);
 
 			const frames = yield* createDemandFrameLoopFx({
+				reportCriticalFailure,
 				render: () => app.render(),
 			});
 			const resizeListeners = new Set<() => void>();

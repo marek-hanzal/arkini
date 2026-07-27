@@ -531,6 +531,7 @@ const createGame = ({ subscribeError }: { readonly subscribeError?: Error } = {}
 			return transition;
 		},
 		readOrThrow: () => sceneState.items,
+		reportCriticalFailure: vi.fn(),
 		subscribeTransitions: (listener: (transition: GameTransition) => void) => {
 			if (subscribeError !== undefined) throw subscribeError;
 			sceneState.transitionListener = listener;
@@ -573,6 +574,7 @@ const mountScene = async ({
 	if (owner === null || actor === undefined) throw new Error("Inventory scene did not mount.");
 	return {
 		actor,
+		game,
 		onActivate,
 		onDrop,
 		runtime,
@@ -1202,11 +1204,10 @@ describe("Pixi Inventory scene runtime", () => {
 	});
 
 	it("isolates synchronous activation failures and releases exact actor ownership", async () => {
-		const error = vi.spyOn(console, "error").mockImplementation(() => undefined);
 		const onActivate = vi.fn(() => {
 			throw new Error("activation failed");
 		});
-		const { actor, runtime, stage } = await mountScene({
+		const { actor, game, runtime, stage } = await mountScene({
 			onActivate,
 		});
 		const actorContainer = actor.container as unknown as FakeContainer;
@@ -1221,17 +1222,39 @@ describe("Pixi Inventory scene runtime", () => {
 		await flushMicrotasks();
 
 		expect(onActivate).toHaveBeenCalledTimes(2);
-		expect(error).toHaveBeenCalledWith("Pixi Inventory activation failed.", expect.any(Error));
+		expect(game.reportCriticalFailure).toHaveBeenCalledWith(
+			"game-presentation",
+			expect.any(Error),
+		);
+		expect(actor.container.alpha).toBe(1);
+		await Effect.runPromise(runtime.closeFx);
+	});
+
+	it("keeps expected Inventory activation rejections non-fatal", async () => {
+		const expected = {
+			_tag: "PlacementUnavailableError",
+		};
+		const onActivate = vi.fn(() => Promise.reject(expected));
+		const { actor, game, runtime, stage } = await mountScene({
+			onActivate,
+		});
+		const actorContainer = actor.container as unknown as FakeContainer;
+
+		actorContainer.emit("pointerdown", slotPointer(0));
+		stage.emit("pointerup", slotPointer(0));
+		await flushMicrotasks();
+
+		expect(onActivate).toHaveBeenCalledOnce();
+		expect(game.reportCriticalFailure).not.toHaveBeenCalled();
 		expect(actor.container.alpha).toBe(1);
 		await Effect.runPromise(runtime.closeFx);
 	});
 
 	it("isolates synchronous drop failures and settles the released actor", async () => {
-		const error = vi.spyOn(console, "error").mockImplementation(() => undefined);
 		const onDrop = vi.fn(() => {
 			throw new Error("drop failed");
 		});
-		const { actor, runtime, stage } = await mountScene({
+		const { actor, game, runtime, stage } = await mountScene({
 			onDrop,
 		});
 		const initialX = actor.container.x;
@@ -1245,7 +1268,10 @@ describe("Pixi Inventory scene runtime", () => {
 
 		expect(onDrop).toHaveBeenCalledOnce();
 		expect(actor.container.x).toBe(initialX);
-		expect(error).toHaveBeenCalledWith("Pixi Inventory drop failed.", expect.any(Error));
+		expect(game.reportCriticalFailure).toHaveBeenCalledWith(
+			"game-presentation",
+			expect.any(Error),
+		);
 		await Effect.runPromise(runtime.closeFx);
 	});
 });

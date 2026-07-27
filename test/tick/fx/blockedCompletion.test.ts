@@ -85,7 +85,7 @@ describe("blocked job completion", () => {
 				.reduce((quantity, item) => quantity + item.quantity, 0),
 		).toBe(1);
 	});
-	it("keeps an invalidated output completion as a real Tick failure", () => {
+	it("consumes the attempted budget when output completion fatally fails", () => {
 		const config = createTickFailureTestConfig();
 		const result = Effect.runSync(
 			Effect.gen(function* () {
@@ -133,6 +133,6 @@ describe("blocked job completion", () => {
 			itemId: "inventoryOutput",
 		});
 		expect(result.after).toEqual(result.before);
-		expect(result.tick.pendingElapsedMs).toBe(200);
+		expect(result.tick.pendingElapsedMs).toBe(0);
 	});
 });

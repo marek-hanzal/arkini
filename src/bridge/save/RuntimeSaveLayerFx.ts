@@ -1,6 +1,5 @@
-import { Effect, Fiber, Layer, Ref, Semaphore, Stream } from "effect";
+import { Cause, Effect, Fiber, Layer, Ref, Semaphore, Stream } from "effect";
 
-import { invokeExternalCallbackFx } from "~/engine/common/fx/invokeExternalCallbackFx";
 import { CommittedTransitionsFx } from "~/engine/runtime/context/CommittedTransitionsFx";
 import { RuntimeFx } from "~/engine/runtime/context/RuntimeFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
@@ -11,14 +10,10 @@ import { RuntimeSaveFx } from "~/bridge/save/RuntimeSaveFx";
 export namespace RuntimeSaveLayerFx {
 	export interface Props<Error = unknown> {
 		debounceMs?: number;
-		onError?: (error: Error) => void | PromiseLike<void>;
+		onFatalError?: (cause: Cause.Cause<Error>) => void;
 		save: (state: StateSchema.Type) => Effect.Effect<void, Error>;
 	}
 }
-
-const defaultOnError = (error: unknown) => {
-	console.error("Arkini autosave failed; the latest runtime remains pending.", error);
-};
 
 /**
  * Owns autosave for one GameSession.
@@ -29,7 +24,7 @@ const defaultOnError = (error: unknown) => {
  */
 export const RuntimeSaveLayerFx = <Error>({
 	debounceMs = 250,
-	onError = defaultOnError,
+	onFatalError = () => undefined,
 	save,
 }: RuntimeSaveLayerFx.Props<Error>) =>
 	Layer.effect(
@@ -67,13 +62,10 @@ export const RuntimeSaveLayerFx = <Error>({
 				debounceMs > 0 ? Stream.debounce(`${debounceMs} millis`) : (value) => value,
 				Stream.runForEach(() =>
 					flush.pipe(
-						Effect.catch((error) =>
-							invokeExternalCallbackFx({
-								callback: onError,
-								failureMessage:
-									"Arkini autosave error callback failed; the save consumer remains active.",
-								value: error,
-							}),
+						Effect.onError((cause) =>
+							Cause.hasInterruptsOnly(cause)
+								? Effect.void
+								: Effect.sync(() => onFatalError(cause)),
 						),
 					),
 				),
@@ -95,13 +87,10 @@ export const RuntimeSaveLayerFx = <Error>({
 						shouldDiscard
 							? Effect.void
 							: flush.pipe(
-									Effect.catch((error) =>
-										invokeExternalCallbackFx({
-											callback: onError,
-											failureMessage:
-												"Arkini autosave error callback failed during finalization.",
-											value: error,
-										}),
+									Effect.catchCause((cause) =>
+										Cause.hasInterruptsOnly(cause)
+											? Effect.void
+											: Effect.sync(() => onFatalError(cause)),
 									),
 								),
 					),

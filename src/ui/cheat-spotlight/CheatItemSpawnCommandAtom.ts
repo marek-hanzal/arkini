@@ -56,6 +56,9 @@ export const CheatItemSpawnCommandAtom = Effect.runSync(
 		const stateAtom = Atom.make<CheatItemSpawnCommandAtom.State>({
 			kind: "idle",
 		}).pipe(Atom.setIdleTTL(0));
+		const fatalCauseAtom = Atom.make<Cause.Cause<unknown> | undefined>(undefined).pipe(
+			Atom.setIdleTTL(0),
+		);
 		const runnerAtom = Atom.fn(
 			(command: AdmittedSpawnCommand, get) =>
 				Effect.gen(function* () {
@@ -68,11 +71,16 @@ export const CheatItemSpawnCommandAtom = Effect.runSync(
 						if (Cause.hasInterruptsOnly(exit.cause)) {
 							return yield* Effect.failCause(exit.cause);
 						}
-						if (command.generation !== latestCommandGeneration) return;
 						const failure = readExactCauseFailure(exit.cause);
+						if (Option.isNone(failure)) {
+							game.failStop("ui", exit.cause);
+							yield* Atom.set(fatalCauseAtom, exit.cause);
+							return yield* Effect.failCause(exit.cause);
+						}
+						if (command.generation !== latestCommandGeneration) return;
 						yield* Atom.set(stateAtom, {
 							kind: "error",
-							error: Option.isSome(failure) ? failure.value : exit.cause,
+							error: failure.value,
 						});
 						return;
 					}
@@ -89,6 +97,8 @@ export const CheatItemSpawnCommandAtom = Effect.runSync(
 		return Atom.writable(
 			(get) => {
 				get(runnerAtom);
+				const fatalCause = get(fatalCauseAtom);
+				if (fatalCause !== undefined) throw fatalCause;
 				return get(stateAtom);
 			},
 			(context, command: CheatItemSpawnCommandAtom.Command) => {

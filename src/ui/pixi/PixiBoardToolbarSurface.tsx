@@ -169,7 +169,7 @@ export const PixiBoardToolbarSurface = () => {
 			})
 			.catch((cause) => {
 				if (cancelled) return;
-				console.error("Pixi Board + Toolbar scene failed to initialize.", cause);
+				game.reportCriticalFailure("game-presentation", cause);
 			});
 
 		return () => {

@@ -52,8 +52,11 @@ export const createPixiMainSceneRuntimeFx = Effect.fn("createPixiMainSceneRuntim
 	onDrop,
 	textures,
 }: createPixiMainSceneRuntimeFx.Props) {
+	const reportCriticalFailure = (cause: unknown) =>
+		game.reportCriticalFailure("game-presentation", cause);
 	const application = yield* createPixiApplicationOwnerFx({
 		host,
+		reportCriticalFailure,
 	});
 	const rollbackEffects: Effect.Effect<void, unknown>[] = [];
 	const registerRollback = (closeFx: Effect.Effect<void, unknown>) => {
@@ -202,7 +205,7 @@ export const createPixiMainSceneRuntimeFx = Effect.fn("createPixiMainSceneRuntim
 				);
 				applyTransition(transition, delivery);
 			} catch (cause) {
-				console.error("Pixi main-scene transition reconciliation failed.", cause);
+				reportCriticalFailure(cause);
 			}
 		});
 		registerRollback(Effect.sync(() => unsubscribeTransitions()));

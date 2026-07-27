@@ -12,7 +12,7 @@ export const GameSessionLayerFx = ({
 	config,
 	state,
 	intervalMs,
-	onTickError,
+	onFatalError,
 }: GameSessionLayerFx.Props) => {
 	const core = GameCoreLayerFx({
 		config,
@@ -20,7 +20,7 @@ export const GameSessionLayerFx = ({
 	});
 	const loop = GameLoopLayerFx({
 		intervalMs,
-		onTickError,
+		onFatalError,
 	}).pipe(Layer.provide(core));
 
 	return Layer.merge(core, loop);

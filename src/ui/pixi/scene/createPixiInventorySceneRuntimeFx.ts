@@ -51,8 +51,11 @@ export const createPixiInventorySceneRuntimeFx = Effect.fn("createPixiInventoryS
 		onDrop,
 		textures,
 	}: createPixiInventorySceneRuntimeFx.Props) {
+		const reportCriticalFailure = (cause: unknown) =>
+			game.reportCriticalFailure("game-presentation", cause);
 		const application = yield* createPixiApplicationOwnerFx({
 			host,
+			reportCriticalFailure,
 		});
 		const animationDriver = yield* createPixiAnimationDriverFx({
 			frames: application.frames,
@@ -195,10 +198,14 @@ export const createPixiInventorySceneRuntimeFx = Effect.fn("createPixiInventoryS
 				attributes: true,
 			});
 			unsubscribeTransitions = game.subscribeTransitions((transition) => {
-				const delivery = RendererRuntime.runSync(
-					subscriptionReplayGate.classifyFx(transition.sequence),
-				);
-				reconcile(transition, delivery === "present");
+				try {
+					const delivery = RendererRuntime.runSync(
+						subscriptionReplayGate.classifyFx(transition.sequence),
+					);
+					reconcile(transition, delivery === "present");
+				} catch (cause) {
+					reportCriticalFailure(cause);
+				}
 			});
 
 			return {

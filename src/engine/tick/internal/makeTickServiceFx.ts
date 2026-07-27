@@ -80,16 +80,10 @@ export const makeTickServiceFx = Effect.fn("makeTickServiceFx")(function* <Error
 					}
 					return [
 						exit,
-						/*
-						 * Elapsed budget is acknowledged only after the runtime transaction
-						 * succeeds. Failure keeps the complete budget pending for retry.
-						 */
-						Exit.isSuccess(exit)
-							? {
-									...next,
-									pendingElapsedMs: next.pendingElapsedMs - applicableElapsedMs,
-								}
-							: next,
+						{
+							...next,
+							pendingElapsedMs: next.pendingElapsedMs - applicableElapsedMs,
+						},
 					] as const;
 				}),
 			).pipe(

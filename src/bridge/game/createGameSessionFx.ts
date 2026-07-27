@@ -13,7 +13,9 @@ import {
 import * as Atom from "effect/unstable/reactivity/Atom";
 
 import type { GameSession, GameSessionServices } from "~/bridge/game/GameSession";
+import type { GameSessionFatalSource } from "~/bridge/game/GameSessionFatalError";
 import { GameSessionNotRunningError } from "~/bridge/game/GameSessionNotRunningError";
+import { createGameSessionFatalSignal } from "~/bridge/game/internal/createGameSessionFatalSignal";
 import {
 	type GameSessionTransitionSubscriptionCleanup,
 	createGameSessionTransitionSubscriptionsFx,
@@ -32,10 +34,8 @@ export namespace createGameSessionFx {
 		config: GameConfigSchema.Type;
 		state?: StateSchema.Type;
 		tickIntervalMs?: number;
-		onTickError?: (cause: unknown) => void | PromiseLike<void>;
 		save?: {
 			debounceMs?: number;
-			onError?: (error: SaveError) => void | PromiseLike<void>;
 			write: (state: StateSchema.Type) => Effect.Effect<void, SaveError>;
 		};
 	}
@@ -86,21 +86,32 @@ type CommandClaim<Result, Error> =
  * against stable Effect while preserving exactly-once bootstrap and disposal cleanup.
  */
 export const createGameSessionFx = Effect.fn("createGameSessionFx")(
-	<SaveError>({
-		config,
-		state,
-		tickIntervalMs,
-		onTickError,
-		save,
-	}: createGameSessionFx.Props<SaveError>) =>
+	<SaveError>({ config, state, tickIntervalMs, save }: createGameSessionFx.Props<SaveError>) =>
 		Effect.uninterruptibleMask((restore) =>
 			Effect.gen(function* () {
 				const ownerScope = yield* Scope.make();
+				const lifecycle = MutableRef.make<SessionLifecycle>({
+					type: "running",
+				});
+				const fatalSignal = createGameSessionFatalSignal();
+				let quiesceFatalSession = () => undefined;
+				let fatalQuiesceStarted = false;
+				const failStop = (source: GameSessionFatalSource, cause: unknown) => {
+					const publication = fatalSignal.report(source, cause, () => {
+						if (MutableRef.get(lifecycle).type === "running") {
+							MutableRef.set(lifecycle, {
+								type: "frozen",
+							});
+						}
+						quiesceFatalSession();
+					});
+					return publication.error;
+				};
 				const sessionLayer = GameSessionLayerFx({
 					config,
 					state,
 					intervalMs: tickIntervalMs,
-					onTickError,
+					onFatalError: (cause) => failStop("tick", cause),
 				});
 				const saveLayer =
 					save === undefined
@@ -110,7 +121,7 @@ export const createGameSessionFx = Effect.fn("createGameSessionFx")(
 							})
 						: RuntimeSaveLayerFx({
 								debounceMs: save.debounceMs,
-								onError: save.onError,
+								onFatalError: (cause) => failStop("autosave", cause),
 								save: save.write,
 							}).pipe(Layer.provide(sessionLayer));
 				const managed = ManagedRuntime.make(Layer.merge(sessionLayer, saveLayer));
@@ -130,9 +141,9 @@ export const createGameSessionFx = Effect.fn("createGameSessionFx")(
 					const sessionScope = yield* Scope.fork(ownerScope, "sequential");
 					const commandScope = yield* Scope.fork(ownerScope, "sequential");
 					const transitionSubscriptions = yield* runManagedFx(
-						createGameSessionTransitionSubscriptionsFx().pipe(
-							Scope.provide(sessionScope),
-						),
+						createGameSessionTransitionSubscriptionsFx((cause) =>
+							failStop("subscription", cause),
+						).pipe(Scope.provide(sessionScope)),
 					);
 					const committedTransitions = yield* runManagedFx(CommittedTransitionsFx);
 					const committedTransitionSubscriptionAtom = Atom.subscriptionRef(
@@ -145,9 +156,6 @@ export const createGameSessionFx = Effect.fn("createGameSessionFx")(
 							Scope.provide(commandScope),
 						),
 					);
-					const lifecycle = MutableRef.make<SessionLifecycle>({
-						type: "running",
-					});
 					const lifecycleLock = yield* Semaphore.make(1);
 
 					const flushSaveFx = runManagedFx(
@@ -160,7 +168,19 @@ export const createGameSessionFx = Effect.fn("createGameSessionFx")(
 						GameLoopFx.pipe(Effect.flatMap((service) => service.stop)),
 					);
 					const stopCommandsFx = Scope.close(commandScope, Exit.void);
+					const stopTransitionSubscriptionsFx = Scope.close(sessionScope, Exit.void);
 					const releaseSessionFx = Scope.close(ownerScope, Exit.void);
+					quiesceFatalSession = () => {
+						if (fatalQuiesceStarted) return;
+						fatalQuiesceStarted = true;
+						managed.runFork(
+							stopGameLoopFx.pipe(
+								Effect.andThen(stopCommandsFx),
+								Effect.andThen(stopTransitionSubscriptionsFx),
+							),
+						);
+					};
+					if (fatalSignal.getSnapshot() !== null) quiesceFatalSession();
 
 					const claimDisposeFx = lifecycleLock.withPermits(1)(
 						Effect.gen(function* () {
@@ -284,9 +304,24 @@ export const createGameSessionFx = Effect.fn("createGameSessionFx")(
 						disposeWithoutSaveFx: disposeWithSaveModeFx("discard"),
 						flushSaveFx,
 						committedTransitionAtom,
+						failStop,
+						getFatalError: fatalSignal.getSnapshot,
 						getSnapshot: () => committedTransitions.readUnsafe().runtime,
 						getTransitionSnapshot: committedTransitions.readUnsafe,
-						read: (effect) => managed.runSyncExit(effect),
+						read: (effect) => {
+							const current = MutableRef.get(lifecycle);
+							return current.type === "running"
+								? managed.runSyncExit(effect)
+								: Exit.fail(
+										new GameSessionNotRunningError({
+											message:
+												current.type === "disposed"
+													? "Game session is disposed."
+													: "Game session is shutting down.",
+											state: current.type,
+										}),
+									);
+						},
 						runFx,
 						run: (effect) => Effect.runPromise(runFx(effect)),
 						subscribe: (listener) =>
@@ -297,6 +332,7 @@ export const createGameSessionFx = Effect.fn("createGameSessionFx")(
 							),
 						subscribeEvents: (listener) =>
 							openSubscription(transitionSubscriptions.subscribeEvents(listener)),
+						subscribeFatalError: fatalSignal.subscribe,
 					} satisfies GameSession;
 				});
 

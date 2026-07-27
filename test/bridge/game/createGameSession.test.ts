@@ -3,6 +3,8 @@ import * as Atom from "effect/unstable/reactivity/Atom";
 import { describe, expect, it } from "vitest";
 import { createTestGameSession } from "~test/bridge/game/createTestGameSession";
 
+import type { Game } from "~/bridge/game/Game";
+import { createGameEngineResourceFx } from "~/bridge/game/createGameEngineResourceFx";
 import { startLineFx } from "~/engine/job/write/startLineFx";
 import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
 import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
@@ -38,6 +40,113 @@ const emitCompletedEventFx = (jobId: string) =>
 	);
 
 describe("createGameSessionFx", () => {
+	it("freezes the exact session before publishing a presentation failure", async () => {
+		const config = createJobTestConfig();
+		const session = await createTestGameSession({
+			config,
+			tickIntervalMs: 60_000,
+		});
+		const resource = Effect.runSync(
+			createGameEngineResourceFx({
+				...session,
+				arkpack: {
+					packageId: "fail-stop-test",
+				},
+				config,
+				getResourceUrl: () => "blob:test",
+				saveKey: {
+					packageId: "fail-stop-test",
+					contentHash: "0".repeat(64),
+				},
+			} as unknown as Game),
+		);
+		let notifications = 0;
+		let readWasFrozenDuringNotification = false;
+		let runWasFrozenDuringNotification = false;
+		resource.subscribeCriticalFailure(() => {
+			notifications += 1;
+			readWasFrozenDuringNotification = session.read(Effect.void)._tag === "Failure";
+			runWasFrozenDuringNotification =
+				Effect.runSyncExit(session.runFx(Effect.void))._tag === "Failure";
+		});
+		const failure = new Error("presentation exploded");
+
+		try {
+			resource.game.reportCriticalFailure("game-presentation", failure);
+			const first = resource.getCriticalFailure();
+			resource.game.reportCriticalFailure("game-runtime", new Error("later failure"));
+
+			expect(first?.operation).toBe("game-presentation");
+			expect(resource.getCriticalFailure()).toBe(first);
+			expect(session.getFatalError()?.source).toBe("presentation");
+			expect(session.getFatalError()?.cause).toBe(failure);
+			expect(notifications).toBe(1);
+			expect(readWasFrozenDuringNotification).toBe(true);
+			expect(runWasFrozenDuringNotification).toBe(true);
+			await expect(session.run(Effect.void)).rejects.toMatchObject({
+				_tag: "GameSessionNotRunningError",
+				state: "frozen",
+			});
+		} finally {
+			await Effect.runPromise(session.disposeFx);
+		}
+	});
+
+	it("freezes the exact session before publishing a failed readOrThrow", async () => {
+		const config = createJobTestConfig();
+		const session = await createTestGameSession({
+			config,
+			tickIntervalMs: 60_000,
+		});
+		const resource = Effect.runSync(
+			createGameEngineResourceFx({
+				...session,
+				arkpack: {
+					packageId: "failed-read-test",
+				},
+				config,
+				getResourceUrl: () => "blob:test",
+				saveKey: {
+					packageId: "failed-read-test",
+					contentHash: "0".repeat(64),
+				},
+			} as unknown as Game),
+		);
+		let readWasFrozenDuringNotification = false;
+		let runWasFrozenDuringNotification = false;
+		resource.subscribeCriticalFailure(() => {
+			readWasFrozenDuringNotification = session.read(Effect.void)._tag === "Failure";
+			runWasFrozenDuringNotification =
+				Effect.runSyncExit(session.runFx(Effect.void))._tag === "Failure";
+		});
+		const failure = new Error("read exploded");
+		let thrown: unknown;
+
+		try {
+			try {
+				resource.game.readOrThrow(Effect.fail(failure));
+			} catch (cause) {
+				thrown = cause;
+			}
+
+			const first = resource.getCriticalFailure();
+			const sessionFatal = session.getFatalError();
+			expect(thrown).toBe(first);
+			expect(first?.operation).toBe("game-read");
+			expect(first?.cause).toBe(sessionFatal);
+			expect(sessionFatal?.source).toBe("runtime");
+			expect(sessionFatal?.cause).toBe(failure);
+			expect(readWasFrozenDuringNotification).toBe(true);
+			expect(runWasFrozenDuringNotification).toBe(true);
+			await expect(Effect.runPromise(session.runFx(Effect.void))).rejects.toMatchObject({
+				_tag: "GameSessionNotRunningError",
+				state: "frozen",
+			});
+		} finally {
+			await Effect.runPromise(session.disposeFx);
+		}
+	});
+
 	it("exposes its authoritative committed transition source as truly read-only", async () => {
 		const session = await createTestGameSession({
 			config: createJobTestConfig(),
@@ -777,29 +886,17 @@ describe("createGameSessionFx", () => {
 		}
 	});
 
-	it("isolates throwing and rejected listeners without losing later transitions", async () => {
+	it("freezes the session when a runtime listener throws", async () => {
 		const session = await createTestGameSession({
 			config: createJobTestConfig(),
 			tickIntervalMs: 60_000,
 		});
-		const unhandledRejections: unknown[] = [];
-		const onUnhandledRejection = (reason: unknown) => {
-			unhandledRejections.push(reason);
-		};
-		process.on("unhandledRejection", onUnhandledRejection);
 		let runtimeNotifications = 0;
-		let eventNotifications = 0;
 		const unsubscribeThrowingRuntime = session.subscribe(() => {
 			throw new Error("runtime listener exploded");
 		});
 		const unsubscribeHealthyRuntime = session.subscribe(() => {
 			runtimeNotifications += 1;
-		});
-		const unsubscribeRejectedEvent = session.subscribeEvents(async () => {
-			throw new Error("async event listener exploded");
-		});
-		const unsubscribeHealthyEvent = session.subscribeEvents(() => {
-			eventNotifications += 1;
 		});
 
 		try {
@@ -817,39 +914,52 @@ describe("createGameSessionFx", () => {
 					quantity: 1,
 				}),
 			);
-			await session.run(emitCompletedEventFx("job:listener:first"));
-			await session.run(emitCompletedEventFx("job:listener:second"));
-			await waitFor(() => runtimeNotifications === 1 && eventNotifications === 2);
+			await waitFor(() => session.getFatalError() !== null);
 			await new Promise((resolve) => setTimeout(resolve, 20));
 
 			expect(runtimeNotifications).toBe(1);
-			expect(eventNotifications).toBe(2);
-			expect(unhandledRejections).toEqual([]);
+			expect(session.getFatalError()?.source).toBe("subscription");
+			await expect(
+				session.run(emitCompletedEventFx("job:listener:rejected")),
+			).rejects.toMatchObject({
+				_tag: "GameSessionNotRunningError",
+				state: "frozen",
+			});
 		} finally {
-			process.off("unhandledRejection", onUnhandledRejection);
 			unsubscribeThrowingRuntime();
 			unsubscribeHealthyRuntime();
-			unsubscribeRejectedEvent();
-			unsubscribeHealthyEvent();
 			await Effect.runPromise(session.disposeFx);
 		}
 	});
 
-	it("keeps retrying Tick failures when an async reporting callback rejects", async () => {
-		const unhandledRejections: unknown[] = [];
-		const onUnhandledRejection = (reason: unknown) => {
-			unhandledRejections.push(reason);
-		};
-		process.on("unhandledRejection", onUnhandledRejection);
-		let reports = 0;
+	it("freezes the session when an event listener rejects", async () => {
+		const session = await createTestGameSession({
+			config: createJobTestConfig(),
+			tickIntervalMs: 60_000,
+		});
+		const unsubscribe = session.subscribeEvents(async () => {
+			throw new Error("async event listener exploded");
+		});
+
+		try {
+			await session.run(emitCompletedEventFx("job:listener:rejected"));
+			await waitFor(() => session.getFatalError() !== null);
+			expect(session.getFatalError()?.source).toBe("subscription");
+		} finally {
+			unsubscribe();
+			await Effect.runPromise(session.disposeFx);
+		}
+	});
+
+	it("freezes the session exactly once when Tick fails", async () => {
 		const config = createTickFailureTestConfig();
 		const session = await createTestGameSession({
 			config,
 			tickIntervalMs: 5,
-			onTickError: async () => {
-				reports += 1;
-				throw new Error("async tick reporter exploded");
-			},
+		});
+		let notifications = 0;
+		const unsubscribe = session.subscribeFatalError(() => {
+			notifications += 1;
 		});
 
 		try {
@@ -876,13 +986,16 @@ describe("createGameSessionFx", () => {
 			);
 			delete (config.items as Record<string, unknown>).inventoryOutput;
 
-			await waitFor(() => reports >= 2, 2_000);
-			await Effect.runPromise(session.disposeFx);
-			await new Promise((resolve) => setTimeout(resolve, 20));
-			expect(reports).toBeGreaterThanOrEqual(2);
-			expect(unhandledRejections).toEqual([]);
+			await waitFor(() => session.getFatalError() !== null, 2_000);
+			await new Promise((resolve) => setTimeout(resolve, 30));
+			expect(session.getFatalError()?.source).toBe("tick");
+			expect(notifications).toBe(1);
+			await expect(session.run(Effect.void)).rejects.toMatchObject({
+				_tag: "GameSessionNotRunningError",
+				state: "frozen",
+			});
 		} finally {
-			process.off("unhandledRejection", onUnhandledRejection);
+			unsubscribe();
 			await Effect.runPromise(session.disposeFx);
 		}
 	});

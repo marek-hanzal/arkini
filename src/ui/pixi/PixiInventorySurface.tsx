@@ -86,7 +86,7 @@ export const PixiInventorySurface = () => {
 			})
 			.catch((cause) => {
 				if (cancelled) return;
-				console.error("Pixi Inventory scene failed to initialize.", cause);
+				game.reportCriticalFailure("game-presentation", cause);
 			});
 		return () => {
 			cancelled = true;

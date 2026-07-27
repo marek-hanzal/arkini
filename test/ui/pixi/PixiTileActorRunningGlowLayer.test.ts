@@ -58,6 +58,7 @@ describe("Pixi tile actor running glow layer", () => {
 				frames: {
 					closeFx: Effect.void,
 					invalidateFx: Effect.void,
+					reportCriticalFailure: vi.fn(),
 				},
 				item,
 				palette: {

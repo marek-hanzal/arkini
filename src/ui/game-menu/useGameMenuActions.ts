@@ -1,6 +1,6 @@
 import { useAtom } from "@effect/atom-react";
 import { useNavigate } from "@tanstack/react-router";
-import { Exit, Option } from "effect";
+import { Cause, Exit, Option } from "effect";
 import { useEffect, useState } from "react";
 import { match, P } from "ts-pattern";
 import * as AsyncResult from "effect/unstable/reactivity/AsyncResult";
@@ -46,16 +46,26 @@ export const useGameMenuActions = ({
 	const saveAndExitPending = menu.activeAction === "save-and-exit";
 	const pending = menu.activeAction !== null || commandResult.waiting;
 	const actionDisabled = phase !== "open" || pending;
+	if (AsyncResult.isFailure(commandResult) && !commandResult.waiting) {
+		throw commandResult.cause;
+	}
 	const settledCommand =
 		AsyncResult.isSuccess(commandResult) && !commandResult.waiting
 			? commandResult.value
 			: undefined;
 	const commandFailure = (() => {
 		if (settledCommand === undefined || Exit.isSuccess(settledCommand.exit)) return undefined;
+		if (Cause.hasInterruptsOnly(settledCommand.exit.cause)) {
+			throw settledCommand.exit.cause;
+		}
 		const failure = readExactCauseFailure(settledCommand.exit.cause);
+		if (Option.isNone(failure)) {
+			game.failStop("ui", settledCommand.exit.cause);
+			throw settledCommand.exit.cause;
+		}
 		return {
 			command: settledCommand.command,
-			error: Option.isSome(failure) ? failure.value : settledCommand.exit.cause,
+			error: failure.value,
 		};
 	})();
 	const successfulCommand =

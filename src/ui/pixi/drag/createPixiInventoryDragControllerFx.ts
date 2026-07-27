@@ -59,6 +59,21 @@ interface ActiveInventoryDrag {
 }
 
 const dragThreshold = 6;
+const expectedActivationFailureTags = new Set([
+	"InventoryOpenerUnavailableError",
+	"ItemLocationConflictError",
+	"ItemNotFoundError",
+	"ItemNotOnGridError",
+	"PlacementUnavailableError",
+	"RevisionConflictError",
+]);
+
+const isExpectedActivationFailure = (cause: unknown) =>
+	typeof cause === "object" &&
+	cause !== null &&
+	"_tag" in cause &&
+	typeof cause._tag === "string" &&
+	expectedActivationFailureTags.has(cause._tag);
 
 /**
  * Owns one Inventory pointer gesture and its local retained-actor presentation.
@@ -203,7 +218,9 @@ export const createPixiInventoryDragControllerFx = Effect.fn("createPixiInventor
 				})
 				.catch((cause) => {
 					if (closed) return;
-					console.error("Pixi Inventory activation failed.", cause);
+					if (!isExpectedActivationFailure(cause)) {
+						game.reportCriticalFailure("game-presentation", cause);
+					}
 				})
 				.finally(() => {
 					if (
@@ -252,7 +269,7 @@ export const createPixiInventoryDragControllerFx = Effect.fn("createPixiInventor
 					}),
 				).kind;
 			} catch (cause) {
-				console.error("Pixi Inventory drop preview failed.", cause);
+				game.reportCriticalFailure("game-presentation", cause);
 			}
 			drag.actor.container.cursor = RendererRuntime.runSync(
 				readPixiTileActorCursorFx({
@@ -430,12 +447,11 @@ export const createPixiInventoryDragControllerFx = Effect.fn("createPixiInventor
 						}
 						if (current !== null) settleActor(current);
 					} catch (cause) {
-						console.error("Pixi Inventory drop completion failed.", cause);
+						game.reportCriticalFailure("game-presentation", cause);
 					}
 				})
 				.catch((cause) => {
 					if (closed || activeDrag !== drag) return;
-					console.error("Pixi Inventory drop failed.", cause);
 					activeDrag = null;
 					const current = RendererRuntime.runSync(
 						actorStore.readActorFx(drag.sourceItem.id),
@@ -444,6 +460,7 @@ export const createPixiInventoryDragControllerFx = Effect.fn("createPixiInventor
 						current.dragging = false;
 						settleActor(current);
 					}
+					game.reportCriticalFailure("game-presentation", cause);
 				});
 		};
 

@@ -1,16 +1,64 @@
-import { Effect } from "effect";
+import { Deferred, Effect } from "effect";
 import { TestClock } from "effect/testing";
 import { describe, expect, it } from "vitest";
 
 import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
+import { GameLoopFx } from "~/engine/game/context/GameLoopFx";
+import { GameCoreLayerFx } from "~/engine/game/layer/GameCoreLayerFx";
+import { GameLoopLayerFx } from "~/engine/game/layer/GameLoopLayerFx";
 import { GameSessionLayerFx } from "~/engine/game/layer/GameSessionLayerFx";
 import { startLineFx } from "~/engine/job/write/startLineFx";
 import { readCommittedTransitionFx } from "~/engine/runtime/read/readCommittedTransitionFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
+import { TickFx } from "~/engine/tick/context/TickFx";
 import { createTickFailureTestConfig } from "~test/tick/support/createTickFailureTestConfig";
 
 describe("GameLoopLayerFx", () => {
+	it("does not report interruption of an in-flight Tick advance as fatal", async () => {
+		let fatalFailures = 0;
+		await Effect.runPromise(
+			Effect.gen(function* () {
+				const advanceStarted = yield* Deferred.make<void>();
+				const releaseAdvance = yield* Deferred.make<void>();
+				yield* Effect.scoped(
+					Effect.gen(function* () {
+						const loop = yield* GameLoopFx;
+						yield* Deferred.await(advanceStarted);
+						yield* loop.stop;
+						yield* Deferred.succeed(releaseAdvance, undefined);
+					}),
+				).pipe(
+					Effect.provide(
+						GameLoopLayerFx({
+							intervalMs: 1,
+							onFatalError: () => {
+								fatalFailures += 1;
+							},
+						}),
+					),
+					Effect.provideService(TickFx, {
+						advanceRuntime: Deferred.succeed(advanceStarted, undefined).pipe(
+							Effect.andThen(Deferred.await(releaseAdvance)),
+						),
+						advanceRuntimeBy: () => Effect.void,
+						read: Effect.succeed({
+							observedAtMs: 0,
+							pendingElapsedMs: 0,
+						}),
+					}),
+					Effect.provide(
+						GameCoreLayerFx({
+							config: createTickFailureTestConfig(),
+						}),
+					),
+				);
+			}),
+		);
+
+		expect(fatalFailures).toBe(0);
+	});
+
 	it("commits one producer output on the exact fixed-step completion boundary", async () => {
 		const result = await Effect.runPromise(
 			Effect.scoped(

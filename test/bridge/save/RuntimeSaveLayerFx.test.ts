@@ -1,4 +1,4 @@
-import { Deferred, Effect } from "effect";
+import { Cause, Deferred, Effect } from "effect";
 import { describe, expect, it } from "vitest";
 import { createTestGameSession } from "~test/bridge/game/createTestGameSession";
 
@@ -39,6 +39,50 @@ const emitCompletedEventFx = (jobId: string) =>
 	);
 
 describe("RuntimeSaveLayerFx", () => {
+	it("preserves an exact mixed autosave Cause", async () => {
+		const mixedCause = Cause.combine(
+			Cause.fail(new Error("save typed failure")),
+			Cause.die(new Error("save defect")),
+		);
+		const session = await createTestGameSession({
+			config: createJobTestConfig(),
+			tickIntervalMs: 60_000,
+			save: {
+				debounceMs: 0,
+				write: () => Effect.failCause(mixedCause),
+			},
+		});
+
+		try {
+			await waitFor(() => session.getFatalError() !== null);
+			expect(session.getFatalError()?.cause).toBe(mixedCause);
+			expect(Cause.hasFails(mixedCause)).toBe(true);
+			expect(Cause.hasDies(mixedCause)).toBe(true);
+		} finally {
+			await Effect.runPromise(session.disposeWithoutSaveFx);
+		}
+	});
+
+	it("preserves the full autosave Cause when the writer defects", async () => {
+		const session = await createTestGameSession({
+			config: createJobTestConfig(),
+			tickIntervalMs: 60_000,
+			save: {
+				debounceMs: 0,
+				write: () => Effect.die(new Error("save defect")),
+			},
+		});
+
+		try {
+			await waitFor(() => session.getFatalError() !== null);
+			const cause = session.getFatalError()?.cause;
+			expect(Cause.isCause(cause)).toBe(true);
+			expect(Cause.isCause(cause) && Cause.hasDies(cause)).toBe(true);
+		} finally {
+			await expect(Effect.runPromise(session.disposeFx)).rejects.toThrow("save defect");
+		}
+	});
+
 	it("debounces committed snapshots and ignores failed mutations", async () => {
 		const saves: StateSchema.Type[] = [];
 		const session = await createTestGameSession({
@@ -233,137 +277,30 @@ describe("RuntimeSaveLayerFx", () => {
 		}
 	});
 
-	it("keeps the autosave consumer alive when its reporting callback throws", async () => {
+	it("freezes the session exactly once after an autosave failure", async () => {
 		let writes = 0;
-		let reports = 0;
 		const session = await createTestGameSession({
 			config: createJobTestConfig(),
 			tickIntervalMs: 60_000,
 			save: {
 				debounceMs: 0,
-				onError: () => {
-					reports += 1;
-					throw new Error("save reporter exploded");
-				},
 				write: () =>
 					Effect.sync(() => {
 						writes += 1;
 					}).pipe(Effect.andThen(Effect.fail(new Error("save failed")))),
 			},
 		});
-
 		try {
-			await session.run(
-				spawnItemFx({
-					id: "runtime:save:reporter:first",
-					itemId: "water",
-					location: {
-						scope: "inventory",
-						position: {
-							x: 0,
-							y: 0,
-						},
-					},
-					quantity: 1,
-				}),
-			);
-			await sleep(30);
-			await session.run(
-				spawnItemFx({
-					id: "runtime:save:reporter:second",
-					itemId: "water",
-					location: {
-						scope: "inventory",
-						position: {
-							x: 1,
-							y: 0,
-						},
-					},
-					quantity: 1,
-				}),
-			);
-			await sleep(30);
-
-			expect(writes).toBeGreaterThanOrEqual(2);
-			expect(reports).toBeGreaterThanOrEqual(2);
+			await waitFor(() => session.getFatalError() !== null);
+			await sleep(20);
+			expect(writes).toBe(1);
+			expect(session.getFatalError()?.source).toBe("autosave");
+			await expect(session.run(Effect.void)).rejects.toMatchObject({
+				_tag: "GameSessionNotRunningError",
+				state: "frozen",
+			});
 		} finally {
 			await expect(Effect.runPromise(session.disposeFx)).rejects.toThrow("save failed");
-		}
-	});
-
-	it("keeps the autosave consumer alive when its async reporting callback rejects", async () => {
-		const unhandledRejections: unknown[] = [];
-		const onUnhandledRejection = (reason: unknown) => {
-			unhandledRejections.push(reason);
-		};
-		process.on("unhandledRejection", onUnhandledRejection);
-		let writes = 0;
-		let reports = 0;
-		const session = await createTestGameSession({
-			config: createJobTestConfig(),
-			tickIntervalMs: 60_000,
-			save: {
-				debounceMs: 0,
-				onError: async () => {
-					reports += 1;
-					throw new Error("async save reporter exploded");
-				},
-				write: () =>
-					Effect.sync(() => {
-						writes += 1;
-					}).pipe(Effect.andThen(Effect.fail(new Error("save failed")))),
-			},
-		});
-
-		try {
-			await waitFor(() => writes >= 1 && reports >= 1);
-			const initialWrites = writes;
-			const initialReports = reports;
-
-			await session.run(
-				spawnItemFx({
-					id: "runtime:save:async-reporter:first",
-					itemId: "water",
-					location: {
-						scope: "inventory",
-						position: {
-							x: 0,
-							y: 0,
-						},
-					},
-					quantity: 1,
-				}),
-			);
-			await waitFor(() => writes > initialWrites && reports > initialReports);
-			const firstWrites = writes;
-			const firstReports = reports;
-
-			await session.run(
-				spawnItemFx({
-					id: "runtime:save:async-reporter:second",
-					itemId: "water",
-					location: {
-						scope: "inventory",
-						position: {
-							x: 1,
-							y: 0,
-						},
-					},
-					quantity: 1,
-				}),
-			);
-			await waitFor(() => writes > firstWrites && reports > firstReports);
-			await sleep(20);
-
-			expect(unhandledRejections).toEqual([]);
-		} finally {
-			try {
-				await expect(Effect.runPromise(session.disposeFx)).rejects.toThrow("save failed");
-				await sleep(20);
-				expect(unhandledRejections).toEqual([]);
-			} finally {
-				process.off("unhandledRejection", onUnhandledRejection);
-			}
 		}
 	});
 

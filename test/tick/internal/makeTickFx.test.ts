@@ -1,4 +1,4 @@
-import { Effect, Ref } from "effect";
+import { Effect, Exit, Ref } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { RuntimeFx } from "~/engine/runtime/context/RuntimeFx";
@@ -66,6 +66,30 @@ describe("makeTickFx idle scheduling", () => {
 			TickStepMs,
 			TickStepMs,
 		]);
+		expect(result.state.pendingElapsedMs).toBe(0);
+	});
+
+	it("acknowledges the attempted elapsed budget when advancement fails", () => {
+		const result = Effect.runSync(
+			Effect.gen(function* () {
+				const runtimeRef = yield* Ref.make(makeEmptyRuntime());
+				const tick = yield* makeTickServiceFx({
+					advanceRuntimeElapsed: () => Effect.fail("broken-runtime"),
+				}).pipe(
+					Effect.provideService(RuntimeFx, {
+						read: Ref.get(runtimeRef),
+					}),
+				);
+
+				const exit = yield* Effect.exit(tick.advanceRuntimeBy(TickStepMs * 2));
+				return {
+					exit,
+					state: yield* tick.read,
+				};
+			}),
+		);
+
+		expect(Exit.isFailure(result.exit)).toBe(true);
 		expect(result.state.pendingElapsedMs).toBe(0);
 	});
 });

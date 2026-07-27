@@ -6,11 +6,11 @@ import type {
 	PixiTileActorVisualReadyListener,
 } from "~/ui/pixi/actor/PixiTileActorVisual";
 
-const invokeListener = (callback: () => void) => {
+const invokeListener = (visual: PixiTileActorVisual, callback: () => void) => {
 	try {
 		callback();
 	} catch (cause) {
-		console.error("Pixi tile visual readiness listener failed.", cause);
+		visual.reportCriticalFailure(cause);
 	}
 };
 
@@ -24,7 +24,7 @@ const drainListeners = (
 	visual.readyListeners.clear();
 	for (const listener of listeners) {
 		const callback = select(listener);
-		if (callback !== undefined) invokeListener(callback);
+		if (callback !== undefined) invokeListener(visual, callback);
 	}
 };
 
@@ -77,10 +77,10 @@ export const whenPixiTileActorVisualReadyFx = Effect.fn("whenPixiTileActorVisual
 		Effect.sync(() => {
 			match(visual.textureState)
 				.with("ready", () => {
-					invokeListener(onReady);
+					invokeListener(visual, onReady);
 				})
 				.with("destroyed", "failed", () => {
-					if (onCancel !== undefined) invokeListener(onCancel);
+					if (onCancel !== undefined) invokeListener(visual, onCancel);
 				})
 				.with("loading", () => {
 					visual.readyListeners.add({

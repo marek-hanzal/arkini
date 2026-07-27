@@ -56,6 +56,9 @@ export const updateGameCheatsAtom = Effect.runSync(
 		const stateAtom = Atom.make<updateGameCheatsAtom.State>({
 			kind: "idle",
 		}).pipe(Atom.setIdleTTL(0));
+		const fatalCauseAtom = Atom.make<Cause.Cause<unknown> | undefined>(undefined).pipe(
+			Atom.setIdleTTL(0),
+		);
 		const runnerAtom = Atom.fn(
 			(command: updateGameCheatsAtom.Command, get) =>
 				Effect.gen(function* () {
@@ -87,10 +90,15 @@ export const updateGameCheatsAtom = Effect.runSync(
 							return yield* Effect.failCause(exit.cause);
 						}
 						const failure = readExactCauseFailure(exit.cause);
+						if (Option.isNone(failure)) {
+							game.failStop("ui", exit.cause);
+							yield* Atom.set(fatalCauseAtom, exit.cause);
+							return yield* Effect.failCause(exit.cause);
+						}
 						yield* Atom.set(stateAtom, {
 							kind: "error",
 							action: command.action,
-							error: Option.isSome(failure) ? failure.value : exit.cause,
+							error: failure.value,
 						});
 						return;
 					}
@@ -114,6 +122,8 @@ export const updateGameCheatsAtom = Effect.runSync(
 		return Atom.writable(
 			(get) => {
 				get(runnerAtom);
+				const fatalCause = get(fatalCauseAtom);
+				if (fatalCause !== undefined) throw fatalCause;
 				return get(stateAtom);
 			},
 			(context, command: updateGameCheatsAtom.Command) => {

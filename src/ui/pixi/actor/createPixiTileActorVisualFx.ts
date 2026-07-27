@@ -65,6 +65,7 @@ export const createPixiTileActorVisualFx = Effect.fn("createPixiTileActorVisualF
 		quantityBackground,
 		titleStyle,
 		readyListeners: new Set(),
+		reportCriticalFailure: frames.reportCriticalFailure,
 		item,
 		size,
 		textureGeneration: 0,

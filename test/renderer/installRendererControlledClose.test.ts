@@ -25,6 +25,7 @@ const createResource = (packageId: string): GameEngineResource => ({
 		disposeWithoutSaveFx: Effect.void,
 	} as unknown as GameEngineResource["game"],
 	assertUsable: () => undefined,
+	getCriticalFailure: () => null,
 	markCriticalFailure: (operation, cause) =>
 		cause instanceof CriticalGameLifecycleError
 			? cause
@@ -32,6 +33,7 @@ const createResource = (packageId: string): GameEngineResource => ({
 					operation,
 					cause,
 				}),
+	subscribeCriticalFailure: () => () => undefined,
 });
 
 const runtimes: Array<ReturnType<typeof createTestRendererRuntime>["rendererRuntime"]> = [];

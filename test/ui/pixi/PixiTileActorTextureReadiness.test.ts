@@ -112,12 +112,15 @@ const createControlledTextures = () => {
 
 const createFrames = () => {
 	const invalidate = vi.fn();
+	const reportCriticalFailure = vi.fn();
 	return {
 		frames: {
 			closeFx: Effect.void,
 			invalidateFx: Effect.sync(invalidate),
+			reportCriticalFailure,
 		},
 		invalidate,
+		reportCriticalFailure,
 	};
 };
 
@@ -163,6 +166,25 @@ const createActor = ({
 };
 
 describe("Pixi tile actor visual readiness", () => {
+	it("reports one required texture failure against the owning scene", async () => {
+		const { rejects, textures } = createControlledTextures();
+		const { actor, frames } = createActor({
+			textures,
+		});
+		const failure = new Error("texture unavailable");
+
+		await vi.waitFor(() => {
+			expect(rejects.has("resource:old")).toBe(true);
+		});
+		rejects.get("resource:old")?.(failure);
+
+		await vi.waitFor(() => {
+			expect(frames.reportCriticalFailure).toHaveBeenCalledOnce();
+		});
+		expect(frames.reportCriticalFailure).toHaveBeenCalledWith(failure);
+		expect(actor.currentVisual.textureState).toBe("failed");
+	});
+
 	it("keeps the current visual renderable while a delayed incoming revision loads", async () => {
 		const { resolves, textures } = createControlledTextures();
 		const { actor, frames } = createActor({

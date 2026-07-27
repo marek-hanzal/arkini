@@ -3,6 +3,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { CriticalGameLifecycleError } from "~/bridge/game/CriticalGameLifecycleError";
 import type { Game } from "~/bridge/game/Game";
+import { GameSessionFatalError } from "~/bridge/game/GameSessionFatalError";
 import { GameEngineResourceLayer } from "~/bridge/game/GameEngineResourceLayer";
 import type { GameEngineResource } from "~/bridge/game/GameEngineResource";
 import { GameEngineResourceFx, type GameEngineLease } from "~/bridge/game/GameEngineResourceFx";
@@ -214,10 +215,12 @@ describe("GameEngineResourceFx", () => {
 			critical = cause;
 		}
 		expect(critical).toBeInstanceOf(CriticalGameLifecycleError);
-		expect(critical).toMatchObject({
-			operation: "game-read",
-			cause: failure,
-		});
+		const criticalError = critical as CriticalGameLifecycleError;
+		expect(criticalError.operation).toBe("game-read");
+		expect(criticalError.cause).toBeInstanceOf(GameSessionFatalError);
+		const sessionFatal = criticalError.cause as GameSessionFatalError;
+		expect(sessionFatal.source).toBe("runtime");
+		expect(sessionFatal.cause).toBe(failure);
 	});
 
 	it("preserves a mixed live read Cause inside the game-read fail-stop error", () => {
@@ -239,7 +242,11 @@ describe("GameEngineResourceFx", () => {
 		}
 		expect(critical).toBeInstanceOf(CriticalGameLifecycleError);
 		expect((critical as CriticalGameLifecycleError).operation).toBe("game-read");
-		const preservedCause = (critical as CriticalGameLifecycleError).cause;
+		const sessionFatal = (critical as CriticalGameLifecycleError).cause;
+		expect(sessionFatal).toBeInstanceOf(GameSessionFatalError);
+		expect((sessionFatal as GameSessionFatalError).source).toBe("runtime");
+		const preservedCause = (sessionFatal as GameSessionFatalError).cause;
+		expect(preservedCause).toBe(readCause);
 		expect(Cause.isCause(preservedCause)).toBe(true);
 		if (Cause.isCause(preservedCause)) {
 			expect(Cause.hasDies(preservedCause)).toBe(true);

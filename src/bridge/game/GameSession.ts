@@ -3,6 +3,10 @@ import type * as LayerModule from "effect/Layer";
 import type * as Atom from "effect/unstable/reactivity/Atom";
 
 import type { GameSessionNotRunningError } from "~/bridge/game/GameSessionNotRunningError";
+import type {
+	GameSessionFatalError,
+	GameSessionFatalSource,
+} from "~/bridge/game/GameSessionFatalError";
 import type { RuntimeSaveFx } from "~/bridge/save/RuntimeSaveFx";
 import type { GameEventBatchSchema } from "~/engine/event/schema/GameEventBatchSchema";
 import type { GameSessionLayerFx } from "~/engine/game/layer/GameSessionLayerFx";
@@ -33,6 +37,12 @@ export interface GameSession {
 	readonly getSnapshot: () => RuntimeSchema.Type;
 	/** Latest exact runtime plus the ordered facts and bounded outgoing snapshot for that commit. */
 	readonly getTransitionSnapshot: () => GameTransition;
+	/** The exact first background failure that permanently froze this session. */
+	readonly getFatalError: () => GameSessionFatalError | null;
+	/** Synchronously freezes this exact session on its first unrecoverable failure. */
+	readonly failStop: (source: GameSessionFatalSource, cause: unknown) => GameSessionFatalError;
+	/** Notifies once when this exact session first becomes fatally unusable. */
+	readonly subscribeFatalError: (listener: () => void) => () => void;
 	/** Executes one synchronous live read inside this Game's existing session runtime. */
 	readonly read: <Result, Error, Requirements extends GameSessionServices>(
 		effect: Effect.Effect<Result, Error, Requirements>,

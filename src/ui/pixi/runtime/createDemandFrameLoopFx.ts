@@ -4,7 +4,7 @@ import type { DemandFrameLoop } from "~/ui/pixi/runtime/DemandFrameLoop";
 
 export namespace createDemandFrameLoopFx {
 	export interface Props {
-		readonly onError?: (cause: unknown) => void;
+		readonly reportCriticalFailure: (cause: unknown) => void;
 		readonly render: () => void;
 		readonly requestFrame?: (callback: FrameRequestCallback) => number;
 		readonly cancelFrame?: (handle: number) => void;
@@ -14,7 +14,7 @@ export namespace createDemandFrameLoopFx {
 /** Creates one coalescing render owner that fully stops while the scene is idle. */
 export const createDemandFrameLoopFx = Effect.fn("createDemandFrameLoopFx")(
 	({
-		onError = (cause) => console.error("Pixi demand frame loop failed.", cause),
+		reportCriticalFailure,
 		render,
 		requestFrame = window.requestAnimationFrame.bind(window),
 		cancelFrame = window.cancelAnimationFrame.bind(window),
@@ -42,7 +42,7 @@ export const createDemandFrameLoopFx = Effect.fn("createDemandFrameLoopFx")(
 					} catch (cause) {
 						poisoned = true;
 						dirty = false;
-						onError(cause);
+						reportCriticalFailure(cause);
 						return;
 					}
 				}
@@ -63,6 +63,7 @@ export const createDemandFrameLoopFx = Effect.fn("createDemandFrameLoopFx")(
 			document.addEventListener("visibilitychange", onVisibilityChange);
 
 			return {
+				reportCriticalFailure,
 				invalidateFx: Effect.sync(() => {
 					if (closed) return;
 					dirty = true;

@@ -100,7 +100,7 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 				);
 			} catch (cause) {
 				drag.eligibleAttractionActorIds = new Set();
-				console.error("Pixi tile attraction preview failed.", cause);
+				game.reportCriticalFailure("game-presentation", cause);
 			}
 		};
 
@@ -132,7 +132,7 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 					}),
 				).kind;
 			} catch (cause) {
-				console.error("Pixi tile drop preview failed.", cause);
+				game.reportCriticalFailure("game-presentation", cause);
 			}
 			drag.previewKind = kind;
 			drag.actor.container.cursor = RendererRuntime.runSync(
@@ -369,7 +369,7 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 						}),
 					);
 				} catch (cause) {
-					console.error("Pixi tile activation acknowledgement failed.", cause);
+					game.reportCriticalFailure("game-presentation", cause);
 				}
 				void Promise.resolve()
 					.then(() => {
@@ -380,7 +380,7 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 					})
 					.catch((cause) => {
 						if (closed) return;
-						console.error("Pixi tile activation failed.", cause);
+						game.reportCriticalFailure("game-presentation", cause);
 					});
 				return;
 			}
@@ -508,12 +508,11 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 						}
 						if (retainedSource !== null) settleActor(retainedSource);
 					} catch (cause) {
-						console.error("Pixi tile drop completion failed.", cause);
+						game.reportCriticalFailure("game-presentation", cause);
 					}
 				})
 				.catch((cause) => {
 					if (closed || !pendingDropGenerations.delete(drop.generation)) return;
-					console.error("Pixi tile drop failed.", cause);
 					RendererRuntime.runSync(dropPresentation.failFx(drop.generation));
 					const retainedSource =
 						actorStore.actors.get(drag.sourceItem.id) === drag.actor
@@ -526,6 +525,7 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 						}
 						settleActor(retainedSource);
 					}
+					game.reportCriticalFailure("game-presentation", cause);
 				});
 		};
 

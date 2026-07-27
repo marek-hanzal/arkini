@@ -1,6 +1,5 @@
-import { Duration, Effect, Fiber, Layer, Schedule } from "effect";
+import { Cause, Duration, Effect, Fiber, Layer, Schedule } from "effect";
 
-import { invokeExternalCallbackFx } from "~/engine/common/fx/invokeExternalCallbackFx";
 import { GameLoopFx } from "~/engine/game/context/GameLoopFx";
 import { runTickRuntimeFx } from "~/engine/tick/fx/runTickRuntimeFx";
 import { TickStepMs } from "~/engine/tick/TickStepMs";
@@ -8,13 +7,9 @@ import { TickStepMs } from "~/engine/tick/TickStepMs";
 export namespace GameLoopLayerFx {
 	export interface Props {
 		intervalMs?: number;
-		onTickError?: (cause: unknown) => void | PromiseLike<void>;
+		onFatalError?: (cause: unknown) => void;
 	}
 }
-
-const defaultOnTickError = (cause: unknown) => {
-	console.error("Arkini tick failed; its elapsed budget remains pending.", cause);
-};
 
 /**
  * Starts one scoped production Tick fiber for the lifetime of a game session.
@@ -25,15 +20,11 @@ const defaultOnTickError = (cause: unknown) => {
  */
 export const GameLoopLayerFx = ({
 	intervalMs = TickStepMs,
-	onTickError = defaultOnTickError,
+	onFatalError = () => undefined,
 }: GameLoopLayerFx.Props = {}) => {
 	const advance = runTickRuntimeFx().pipe(
-		Effect.catchCause((cause) =>
-			invokeExternalCallbackFx({
-				callback: onTickError,
-				failureMessage: "Arkini tick error callback failed; the Tick loop remains active.",
-				value: cause,
-			}),
+		Effect.onError((cause) =>
+			Cause.hasInterruptsOnly(cause) ? Effect.void : Effect.sync(() => onFatalError(cause)),
 		),
 	);
 

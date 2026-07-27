@@ -2,15 +2,19 @@ import { Effect, SubscriptionRef } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
 
 import type { GameSession } from "~/bridge/game/GameSession";
+import { GameSessionFatalError } from "~/bridge/game/GameSessionFatalError";
 import type { CommittedTransitionSchema } from "~/engine/runtime/schema/CommittedTransitionSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
 type TransitionFields = Pick<
 	GameSession,
 	| "committedTransitionAtom"
+	| "failStop"
+	| "getFatalError"
 	| "getSnapshot"
 	| "getTransitionSnapshot"
 	| "runFx"
+	| "subscribeFatalError"
 	| "subscribeTransitions"
 >;
 
@@ -42,10 +46,17 @@ export const makeTestGameTransitionFieldsFx = Effect.fn("makeTestGameTransitionF
 			return {
 				committedTransitionAtom,
 				committedTransitionRef: ref,
+				failStop: (source, cause) =>
+					new GameSessionFatalError({
+						source,
+						cause,
+					}),
+				getFatalError: () => null,
 				getSnapshot: () => getTransitionSnapshot().runtime,
 				getTransitionSnapshot,
 				runFx: ((effect: Effect.Effect<unknown, unknown>) =>
 					effect) as GameSession["runFx"],
+				subscribeFatalError: () => () => undefined,
 				subscribeTransitions: (listener) => {
 					void listener(getTransitionSnapshot());
 					return () => undefined;

@@ -23,6 +23,7 @@ export interface PixiTileActorVisual {
 	readonly quantityBackground: Graphics;
 	readonly titleStyle: TextStyle;
 	readonly readyListeners: Set<PixiTileActorVisualReadyListener>;
+	readonly reportCriticalFailure: (cause: unknown) => void;
 	item: TileActorItem;
 	size: number;
 	textureGeneration: number;

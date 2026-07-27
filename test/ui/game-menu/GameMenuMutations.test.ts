@@ -1,5 +1,5 @@
 import { scheduleTask } from "@effect/atom-react";
-import { Cause, Deferred, Effect, Exit, Option } from "effect";
+import { Cause, Deferred, Effect, Exit, Option, Result } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
 import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 import { afterEach, describe, expect, it, vi } from "vitest";
@@ -9,14 +9,17 @@ import { RendererLifecycleOwnerAtom } from "~/bridge/lifecycle/RendererLifecycle
 import { createRendererLifecycleFx } from "~/bridge/lifecycle/createRendererLifecycleFx";
 import { requestApplicationCloseAtom } from "~/bridge/lifecycle/requestApplicationCloseAtom";
 import { saveGameAtom } from "~/bridge/save/saveGameAtom";
+import { gameMenuCommandAtom } from "~/ui/game-menu/gameMenuCommandAtom";
 import { testArkpackConfig } from "~test/bridge/arkpack/support/createTestArkpack";
 import { makeTestGameTransitionFieldsFx } from "~test/support/game/makeTestGameTransitionFieldsFx";
 import { testGameRead } from "~test/support/game/testGameRead";
 
 const registries: AtomRegistry.AtomRegistry[] = [];
+const failStop = vi.fn<Game["failStop"]>();
 
 afterEach(() => {
 	for (const registry of registries.splice(0)) registry.dispose();
+	failStop.mockReset();
 	vi.restoreAllMocks();
 	Reflect.deleteProperty(globalThis, "window");
 });
@@ -53,6 +56,7 @@ const createGame = (explicitSaveFx: Effect.Effect<void, unknown> = Effect.void):
 	flushSaveFx: Effect.die("Lifecycle flushSaveFx must not own an explicit UI save."),
 	getResourceUrl: () => "blob:test",
 	...Effect.runSync(makeTestGameTransitionFieldsFx({} as ReturnType<Game["getSnapshot"]>)),
+	failStop,
 	read: testGameRead,
 	runFx: ((_effect) => explicitSaveFx) as Game["runFx"],
 	run: (() => Promise.reject(new Error("Not used by this test."))) as Game["run"],
@@ -187,5 +191,78 @@ describe("game menu command atoms", () => {
 			),
 		);
 		expect(requestClose).toHaveBeenCalledOnce();
+	});
+
+	it("keeps a sole typed save failure as the Game Menu's expected command result", async () => {
+		const failure = {
+			_tag: "ExplicitSaveFailure",
+		} as const;
+		const registry = makeRegistry();
+
+		const exit = await runCommand(
+			registry,
+			gameMenuCommandAtom(createGame(Effect.fail(failure))),
+			"save",
+		);
+
+		expect(Exit.isSuccess(exit)).toBe(true);
+		if (Exit.isFailure(exit)) throw new Error("Expected a settled Game Menu result.");
+		expect(exit.value.command).toBe("save");
+		expect(exit.value.exit).toEqual(Exit.fail(failure));
+		expect(failStop).not.toHaveBeenCalled();
+	});
+
+	it("propagates pure save interruption without fail-stopping the Game", async () => {
+		const registry = makeRegistry();
+
+		const exit = await runCommand(
+			registry,
+			gameMenuCommandAtom(createGame(Effect.interrupt)),
+			"save",
+		);
+
+		expect(Exit.isFailure(exit)).toBe(true);
+		if (Exit.isSuccess(exit)) throw new Error("Expected save interruption.");
+		expect(Cause.hasInterruptsOnly(exit.cause)).toBe(true);
+		expect(failStop).not.toHaveBeenCalled();
+	});
+
+	it("propagates a save defect instead of flattening it into a Game Menu error", async () => {
+		const defect = new Error("Explicit save defect");
+		const registry = makeRegistry();
+
+		const exit = await runCommand(
+			registry,
+			gameMenuCommandAtom(createGame(Effect.die(defect))),
+			"save",
+		);
+
+		expect(Exit.isFailure(exit)).toBe(true);
+		if (Exit.isSuccess(exit)) throw new Error("Expected the Game Menu defect.");
+		const found = Cause.findDefect(exit.cause);
+		expect(Result.isSuccess(found)).toBe(true);
+		if (Result.isSuccess(found)) expect(found.success).toBe(defect);
+		expect(failStop).toHaveBeenCalledOnce();
+		expect(failStop).toHaveBeenCalledWith("ui", exit.cause);
+	});
+
+	it("propagates a mixed save Cause instead of projecting its typed failure", async () => {
+		const mixedCause = Cause.combine(
+			Cause.fail({
+				_tag: "ExplicitSaveFailure",
+			} as const),
+			Cause.die(new Error("Explicit save defect")),
+		);
+		const registry = makeRegistry();
+
+		const exit = await runCommand(
+			registry,
+			gameMenuCommandAtom(createGame(Effect.failCause(mixedCause))),
+			"save",
+		);
+
+		expect(exit).toEqual(Exit.failCause(mixedCause));
+		expect(failStop).toHaveBeenCalledOnce();
+		expect(failStop).toHaveBeenCalledWith("ui", mixedCause);
 	});
 });

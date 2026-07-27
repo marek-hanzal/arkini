@@ -220,6 +220,7 @@ const mountController = ({
 	const magneticUpdates: Array<Parameters<PixiTileMagneticField["updateFx"]>[0]> = [];
 	const onActivate = vi.fn();
 	const onAcceptedDrop = vi.fn();
+	const reportCriticalFailure = vi.fn();
 	const beginInteractionHandoff = vi.fn((_actorId: string) => true);
 	const releasePointerCapture = vi.fn();
 	const dropPresentation = Effect.runSync(createPixiMainSceneDropPresentationFx());
@@ -278,7 +279,9 @@ const mountController = ({
 				startFx: () => Effect.sync(startCursorGrab),
 			} satisfies PixiCursorGrabMotion,
 			dropPresentation,
-			game: {} as never,
+			game: {
+				reportCriticalFailure,
+			} as never,
 			magneticField: {
 				closeFx: Effect.void,
 				pruneFx: Effect.void,
@@ -348,6 +351,7 @@ const mountController = ({
 		onDrop,
 		presentationWrites,
 		releasePointerCapture,
+		reportCriticalFailure,
 		setActorPose: (pose: typeof currentActorPose) => {
 			currentActorPose = pose;
 		},
@@ -963,7 +967,6 @@ describe("Pixi main-scene drag controller", () => {
 				revision: inventory.revision,
 			},
 		});
-		const error = vi.spyOn(console, "error").mockImplementation(() => undefined);
 		const cause = new Error("drop failed");
 		mounted.onDrop.mockRejectedValueOnce(cause);
 
@@ -972,7 +975,7 @@ describe("Pixi main-scene drag controller", () => {
 		mounted.stage.emit("pointerup", pointer(30, 20));
 		await flushMicrotasks();
 
-		expect(error).toHaveBeenCalledWith("Pixi tile drop failed.", cause);
+		expect(mounted.reportCriticalFailure).toHaveBeenCalledWith("game-presentation", cause);
 		expect(mounted.actor.lifecycleTargetAlpha).toBe(1);
 		expect(mounted.animations).toContainEqual(
 			expect.objectContaining({
@@ -1283,19 +1286,18 @@ describe("Pixi main-scene drag controller", () => {
 		]);
 	});
 
-	it("logs an accepted replay failure without misclassifying it as command failure", async () => {
+	it("reports an accepted replay failure without misclassifying it as command failure", async () => {
 		const mounted = mountController();
 		const failure = new Error("replay failed");
 		mounted.onAcceptedDrop.mockImplementationOnce(() => {
 			throw failure;
 		});
-		const error = vi.spyOn(console, "error").mockImplementation(() => undefined);
 		mounted.actorEvents.emit("pointerdown", pointer(10, 20));
 		mounted.stage.emit("globalpointermove", pointer(45, 20));
 		mounted.stage.emit("pointerup", pointer(45, 20));
 		await flushMicrotasks();
 
-		expect(error).toHaveBeenCalledWith("Pixi tile drop completion failed.", failure);
+		expect(mounted.reportCriticalFailure).toHaveBeenCalledWith("game-presentation", failure);
 		expect(mounted.onDrop).toHaveBeenCalledOnce();
 	});
 });

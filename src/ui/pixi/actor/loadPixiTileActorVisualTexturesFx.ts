@@ -63,13 +63,13 @@ export const loadPixiTileActorVisualTexturesFx = Effect.fn("loadPixiTileActorVis
 					) {
 						return;
 					}
-					console.error(`Pixi tile visual failed to load: ${sourceUrl}`, cause);
 					RendererRuntime.runSync(
 						failPixiTileActorVisualTextureLoadFx({
 							generation,
 							visual,
 						}),
 					);
+					frames.reportCriticalFailure(cause);
 				});
 		}),
 );

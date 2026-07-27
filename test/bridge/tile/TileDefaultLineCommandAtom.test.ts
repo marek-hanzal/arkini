@@ -1,5 +1,5 @@
 import { scheduleTask } from "@effect/atom-react";
-import { Deferred, Effect } from "effect";
+import { Cause, Deferred, Effect } from "effect";
 import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -10,6 +10,7 @@ const engineCommands = vi.hoisted(() => ({
 	autofill: vi.fn(),
 	start: vi.fn(),
 }));
+const failStop = vi.fn<Game["failStop"]>();
 
 vi.mock("~/engine/input/write/autofillLineInputsFx", () => ({
 	autofillLineInputsFx: (props: unknown) => engineCommands.autofill(props),
@@ -36,8 +37,9 @@ const createRegistry = () => {
 };
 
 const game = {
+	failStop,
 	runFx: ((effect: Effect.Effect<unknown, unknown>) => effect) as Game["runFx"],
-} as Game;
+} as unknown as Game;
 
 const runCommand = async () => {
 	const registry = createRegistry();
@@ -55,6 +57,7 @@ const runCommand = async () => {
 beforeEach(() => {
 	engineCommands.autofill.mockReset();
 	engineCommands.start.mockReset();
+	failStop.mockReset();
 });
 
 afterEach(() => {
@@ -130,6 +133,29 @@ describe("TileDefaultLineCommandAtom", () => {
 		unmount();
 	});
 
+	it("treats Provider teardown interruption as cancellation without fail-stopping the Game", async () => {
+		const entered = Effect.runSync(Deferred.make<void>());
+		const interrupted = Effect.runSync(Deferred.make<void>());
+		engineCommands.autofill.mockReturnValue(
+			Deferred.succeed(entered, undefined).pipe(
+				Effect.andThen(Effect.never),
+				Effect.onInterrupt(() =>
+					Deferred.succeed(interrupted, undefined).pipe(Effect.asVoid),
+				),
+			),
+		);
+		const registry = createRegistry();
+		const atom = TileDefaultLineCommandAtom(game);
+		const unmount = registry.mount(atom);
+		registry.set(atom, command);
+		await Effect.runPromise(Deferred.await(entered));
+
+		unmount();
+		await Effect.runPromise(Deferred.await(interrupted));
+
+		expect(failStop).not.toHaveBeenCalled();
+	});
+
 	it("settles after a partial autofill without starting the line or requesting Detail fallback", async () => {
 		engineCommands.autofill.mockReturnValue(
 			Effect.succeed({
@@ -202,5 +228,34 @@ describe("TileDefaultLineCommandAtom", () => {
 		});
 		expect(engineCommands.start).toHaveBeenCalledOnce();
 		unmount();
+	});
+
+	it("propagates an autofill defect instead of flattening it into Detail fallback state", async () => {
+		const defectCause = Cause.die(new Error("Autofill defect"));
+		engineCommands.autofill.mockReturnValue(Effect.failCause(defectCause));
+
+		await expect(runCommand()).rejects.toBe(defectCause);
+		expect(failStop).toHaveBeenCalledOnce();
+		expect(failStop).toHaveBeenCalledWith("ui", defectCause);
+	});
+
+	it("propagates a mixed start Cause instead of projecting its typed failure", async () => {
+		const mixedCause = Cause.combine(
+			Cause.fail({
+				_tag: "MissingInputs",
+			} as const),
+			Cause.die(new Error("Start defect")),
+		);
+		engineCommands.autofill.mockReturnValue(
+			Effect.succeed({
+				storedQuantity: 0,
+				remainingMissingQuantity: 0,
+			}),
+		);
+		engineCommands.start.mockReturnValue(Effect.failCause(mixedCause));
+
+		await expect(runCommand()).rejects.toBe(mixedCause);
+		expect(failStop).toHaveBeenCalledOnce();
+		expect(failStop).toHaveBeenCalledWith("ui", mixedCause);
 	});
 });

@@ -240,6 +240,7 @@ const game = {
 	subscribeEvents: () => () => undefined,
 	read: testGameRead,
 	readOrThrow: testGameReadOrThrow,
+	reportCriticalFailure: () => undefined,
 	run: (() => Promise.reject(new Error("Not used by this test."))) as GameEngine["run"],
 	disposeFx: Effect.void,
 	disposeWithoutSaveFx: Effect.void,

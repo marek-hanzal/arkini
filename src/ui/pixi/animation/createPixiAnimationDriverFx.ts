@@ -79,7 +79,7 @@ export const createPixiAnimationDriverFx = Effect.fn("createPixiAnimationDriverF
 									try {
 										onUpdate(latest);
 									} catch (cause) {
-										console.error("Pixi spring update failed.", cause);
+										frames.reportCriticalFailure(cause);
 									} finally {
 										invalidate();
 									}
@@ -150,7 +150,7 @@ export const createPixiAnimationDriverFx = Effect.fn("createPixiAnimationDriverF
 										try {
 											onUpdate(latest);
 										} catch (cause) {
-											console.error("Pixi tween update failed.", cause);
+											frames.reportCriticalFailure(cause);
 										} finally {
 											invalidate();
 										}
@@ -162,7 +162,7 @@ export const createPixiAnimationDriverFx = Effect.fn("createPixiAnimationDriverF
 										try {
 											onComplete?.();
 										} catch (cause) {
-											console.error("Pixi tween completion failed.", cause);
+											frames.reportCriticalFailure(cause);
 										}
 									},
 								});

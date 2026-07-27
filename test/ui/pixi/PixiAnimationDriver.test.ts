@@ -124,16 +124,19 @@ vi.mock("motion", () => {
 
 const createDriver = () => {
 	const invalidate = vi.fn();
+	const reportCriticalFailure = vi.fn();
 	const driver = Effect.runSync(
 		createPixiAnimationDriverFx({
 			frames: {
 				invalidateFx: Effect.sync(invalidate),
+				reportCriticalFailure,
 			} as unknown as DemandFrameLoop,
 		}),
 	);
 	return {
 		driver,
 		invalidate,
+		reportCriticalFailure,
 	};
 };
 
@@ -206,9 +209,8 @@ describe("Pixi animation driver", () => {
 		expect(motionState.tweens[0]?.stop).not.toHaveBeenCalled();
 	});
 
-	it("isolates consumer callback failures", () => {
-		const { driver, invalidate } = createDriver();
-		const error = vi.spyOn(console, "error").mockImplementation(() => undefined);
+	it("reports consumer callback failures while containing Motion callbacks", () => {
+		const { driver, invalidate, reportCriticalFailure } = createDriver();
 		Effect.runSync(
 			driver.startTweenFx({
 				durationMs: 300,
@@ -226,7 +228,7 @@ describe("Pixi animation driver", () => {
 		expect(() => motionState.tweens[0]?.onUpdate(0.5)).not.toThrow();
 		expect(() => motionState.tweens[0]?.onComplete()).not.toThrow();
 		expect(invalidate).toHaveBeenCalledOnce();
-		expect(error).toHaveBeenCalledTimes(2);
+		expect(reportCriticalFailure).toHaveBeenCalledTimes(2);
 	});
 
 	it("retargets one persistent spring and disposes it exactly once", () => {

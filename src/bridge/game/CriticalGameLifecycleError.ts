@@ -2,7 +2,10 @@ export type CriticalGameLifecycleOperation =
 	| "engine-ownership"
 	| "game-read"
 	| "game-leave"
-	| "game-reset";
+	| "game-reset"
+	| "game-runtime"
+	| "game-save"
+	| "game-presentation";
 
 /** Ends the current renderer run after one critical Game Engine ownership failure. */
 export class CriticalGameLifecycleError extends Error {

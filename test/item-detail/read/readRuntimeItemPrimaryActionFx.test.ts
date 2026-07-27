@@ -125,7 +125,7 @@ if (producer === undefined || resource === undefined || inventoryOpener === unde
 }
 
 describe("readRuntimeItemPrimaryActionFx", () => {
-	it("does nothing for ordinary items and opens Lines for owners without a default", () => {
+	it("does nothing for ordinary items and owners without a default action", () => {
 		expect(
 			Effect.runSync(
 				readRuntimeItemPrimaryActionFx({
@@ -144,7 +144,7 @@ describe("readRuntimeItemPrimaryActionFx", () => {
 				}),
 			),
 		).toEqual({
-			kind: "open-lines",
+			kind: "none",
 		});
 	});
 
@@ -210,7 +210,7 @@ describe("readRuntimeItemPrimaryActionFx", () => {
 				}),
 			),
 		).toEqual({
-			kind: "open-lines",
+			kind: "none",
 		});
 	});
 });

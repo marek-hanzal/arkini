@@ -11,9 +11,11 @@ import { createPixiInventoryActorStoreFx } from "~/ui/pixi/actor/createPixiInven
 import { createPixiTileActorRunningGlowTextureFx } from "~/ui/pixi/actor/createPixiTileActorRunningGlowTextureFx";
 import { createPixiActorAnimatorFx } from "~/ui/pixi/animation/createPixiActorAnimatorFx";
 import { createPixiAnimationDriverFx } from "~/ui/pixi/animation/createPixiAnimationDriverFx";
+import { createPixiGridDropFeedbackFx } from "~/ui/pixi/grid/createPixiGridDropFeedbackFx";
 import { flashPixiTileActorConsumedSourceFx } from "~/ui/pixi/animation/flashPixiTileActorConsumedSourceFx";
 import type { PixiInventoryDragController } from "~/ui/pixi/drag/PixiInventoryDragController";
 import { createPixiInventoryDragControllerFx } from "~/ui/pixi/drag/createPixiInventoryDragControllerFx";
+import type { PixiGridDropFeedback } from "~/ui/pixi/grid/PixiGridDropFeedback";
 import { createPixiApplicationOwnerFx } from "~/ui/pixi/runtime/createPixiApplicationOwnerFx";
 import type { PixiTextureStore } from "~/ui/pixi/runtime/createPixiTextureStoreFx";
 import type { PixiInventorySceneRuntime } from "~/ui/pixi/scene/PixiInventorySceneRuntime";
@@ -65,6 +67,7 @@ export const createPixiInventorySceneRuntimeFx = Effect.fn("createPixiInventoryS
 			frames: application.frames,
 		});
 		let surface: PixiInventorySceneSurface | null = null;
+		let dropFeedback: PixiGridDropFeedback | null = null;
 		let actorStore: PixiInventoryActorStore | null = null;
 		let runningGlowTexture: PixiTileActorRunningGlowTexture | null = null;
 		let drag: PixiInventoryDragController | null = null;
@@ -97,6 +100,7 @@ export const createPixiInventorySceneRuntimeFx = Effect.fn("createPixiInventoryS
 			if (actorStore !== null) yield* ignoreCleanupFailure(actorStore.closeFx);
 			processedFeedbackKeys.clear();
 			yield* ignoreCleanupFailure(animator.closeFx);
+			if (dropFeedback !== null) yield* ignoreCleanupFailure(dropFeedback.closeFx);
 			if (surface !== null) yield* ignoreCleanupFailure(surface.closeFx);
 			if (runningGlowTexture !== null) {
 				yield* ignoreCleanupFailure(runningGlowTexture.closeFx);
@@ -106,8 +110,14 @@ export const createPixiInventorySceneRuntimeFx = Effect.fn("createPixiInventoryS
 		});
 
 		return yield* Effect.gen(function* () {
+			const createdDropFeedback = yield* createPixiGridDropFeedbackFx({
+				animationDriver,
+				label: "InventoryDropFeedback",
+			});
+			dropFeedback = createdDropFeedback;
 			const createdSurface = yield* createPixiInventorySceneSurfaceFx({
 				application,
+				dropFeedback: createdDropFeedback,
 				game,
 				host,
 			});

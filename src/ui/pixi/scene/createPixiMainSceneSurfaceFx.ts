@@ -9,7 +9,7 @@ import { LocationScopeEnumSchema } from "~/bridge/tile/LocationScopeEnumSchema";
 import type { readTileDropPreviewFx } from "~/bridge/tile/readTileDropPreviewFx";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
 import type { PixiScenePalette } from "~/ui/pixi/appearance/PixiScenePalette";
-import { drawPixiGridDropFeedbackFx } from "~/ui/pixi/grid/drawPixiGridDropFeedbackFx";
+import type { PixiGridDropFeedback } from "~/ui/pixi/grid/PixiGridDropFeedback";
 import { drawPixiGridMaskFx } from "~/ui/pixi/grid/drawPixiGridMaskFx";
 import { drawPixiGridSurfaceFx } from "~/ui/pixi/grid/drawPixiGridSurfaceFx";
 import { readPixiGridSlotFx } from "~/ui/pixi/grid/readPixiGridSlotFx";
@@ -22,6 +22,7 @@ import type { PixiSceneDropTarget } from "~/ui/pixi/scene/PixiSceneDropTarget";
 export namespace createPixiMainSceneSurfaceFx {
 	export interface Props {
 		readonly application: PixiApplicationOwner;
+		readonly dropFeedback: PixiGridDropFeedback;
 		readonly game: GameEngine;
 		readonly palette: PixiScenePalette;
 		readonly readActors: () => Iterable<PixiTileActor>;
@@ -32,6 +33,7 @@ export namespace createPixiMainSceneSurfaceFx {
 export const createPixiMainSceneSurfaceFx = Effect.fn("createPixiMainSceneSurfaceFx")(
 	({
 		application,
+		dropFeedback,
 		game,
 		palette: initialPalette,
 		readActors,
@@ -65,10 +67,6 @@ export const createPixiMainSceneSurfaceFx = Effect.fn("createPixiMainSceneSurfac
 				eventMode: "passive",
 				label: "TransientActorLayer",
 			});
-			const feedbackLayer = new Graphics({
-				eventMode: "none",
-				label: "DropFeedbackLayer",
-			});
 			const boardGrid = new Graphics({
 				eventMode: "none",
 				label: "BoardGrid",
@@ -93,7 +91,7 @@ export const createPixiMainSceneSurfaceFx = Effect.fn("createPixiMainSceneSurfac
 			toolbarActorLayer.mask = toolbarMask;
 			application.stage.addChild(
 				gridLayer,
-				feedbackLayer,
+				dropFeedback.container,
 				boardMask,
 				toolbarMask,
 				boardActorLayer,
@@ -163,7 +161,6 @@ export const createPixiMainSceneSurfaceFx = Effect.fn("createPixiMainSceneSurfac
 						boardActorLayer,
 						toolbarMask,
 						boardMask,
-						feedbackLayer,
 						gridLayer,
 					]) {
 						if (displayObject.destroyed) continue;
@@ -304,9 +301,8 @@ export const createPixiMainSceneSurfaceFx = Effect.fn("createPixiMainSceneSurfac
 								kind !== null &&
 								kind !== DropItemResultKindEnumSchema.enum.Reject &&
 								kind !== DropItemResultKindEnumSchema.enum.Ignored;
-							yield* drawPixiGridDropFeedbackFx({
+							yield* dropFeedback.renderFx({
 								color: accepted ? palette.accent : palette.danger,
-								graphics: feedbackLayer,
 								slot: target,
 								surface: target?.layout ?? null,
 							});

@@ -42,16 +42,6 @@ export const PixiBoardToolbarSurface = () => {
 		itemDetail,
 	};
 
-	const openLines = useCallback((itemId: string, origin: HTMLElement) => {
-		RendererRuntime.runSync(
-			controlsRef.current.itemDetail.openItemDetailFx({
-				itemId,
-				origin,
-				tab: "lines",
-			}),
-		);
-	}, []);
-
 	const openInventory = useCallback(
 		() =>
 			navigate({
@@ -87,15 +77,6 @@ export const PixiBoardToolbarSurface = () => {
 				)
 				.with(
 					{
-						kind: "open-lines",
-					},
-					() => {
-						openLines(item.id, origin);
-						return Promise.resolve();
-					},
-				)
-				.with(
-					{
 						kind: "open-inventory",
 					},
 					() => openInventory(),
@@ -116,22 +97,16 @@ export const PixiBoardToolbarSurface = () => {
 		},
 		[
 			openInventory,
-			openLines,
 			runStartLine,
 		],
 	);
 
 	useEffect(() => {
 		if (startLineState.kind !== "error") return;
-		const origin = runtimeRef.current?.canvas ?? hostRef.current;
-		if (!startLineState.autofilled && origin !== null) {
-			openLines(startLineState.ownerItemId, origin);
-		}
 		runStartLine({
 			kind: "reset",
 		});
 	}, [
-		openLines,
 		runStartLine,
 		startLineState,
 	]);

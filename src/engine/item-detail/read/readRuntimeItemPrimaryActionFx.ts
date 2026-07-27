@@ -12,9 +12,6 @@ export namespace readRuntimeItemPrimaryActionFx {
 				readonly kind: "none";
 		  }
 		| {
-				readonly kind: "open-lines";
-		  }
-		| {
 				readonly kind: "open-inventory";
 		  }
 		| {
@@ -53,7 +50,7 @@ export const readRuntimeItemPrimaryActionFx = Effect.fn("readRuntimeItemPrimaryA
 			} satisfies readRuntimeItemPrimaryActionFx.Result;
 		}
 		return {
-			kind: "open-lines" as const,
+			kind: "none" as const,
 		} satisfies readRuntimeItemPrimaryActionFx.Result;
 	},
 );

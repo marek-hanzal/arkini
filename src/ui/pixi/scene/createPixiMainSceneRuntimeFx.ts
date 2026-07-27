@@ -7,6 +7,7 @@ import type { TileActorItem } from "~/bridge/tile/TileActorItem";
 import { createPixiMainSceneActorStoreFx } from "~/ui/pixi/actor/createPixiMainSceneActorStoreFx";
 import { createPixiTileActorRunningGlowTextureFx } from "~/ui/pixi/actor/createPixiTileActorRunningGlowTextureFx";
 import { createPixiAnimationDriverFx } from "~/ui/pixi/animation/createPixiAnimationDriverFx";
+import { createPixiGridDropFeedbackFx } from "~/ui/pixi/grid/createPixiGridDropFeedbackFx";
 import { createPixiActorAnimatorFx } from "~/ui/pixi/animation/createPixiActorAnimatorFx";
 import { readPixiScenePaletteFx } from "~/ui/pixi/appearance/readPixiScenePaletteFx";
 import { createPixiCursorGrabMotionFx } from "~/ui/pixi/drag/createPixiCursorGrabMotionFx";
@@ -87,8 +88,14 @@ export const createPixiMainSceneRuntimeFx = Effect.fn("createPixiMainSceneRuntim
 			animationDriver,
 			frames: application.frames,
 		});
+		const dropFeedback = yield* createPixiGridDropFeedbackFx({
+			animationDriver,
+			label: "DropFeedbackLayer",
+		});
+		registerRollback(dropFeedback.closeFx);
 		const surface = yield* createPixiMainSceneSurfaceFx({
 			application,
+			dropFeedback,
 			game,
 			palette: paletteState.current,
 			readActors: () => actorStore.actors.values(),

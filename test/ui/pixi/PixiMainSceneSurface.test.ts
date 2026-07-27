@@ -3,6 +3,7 @@ import { Container } from "pixi.js";
 import { describe, expect, it, vi } from "vitest";
 
 import type { GameEngine } from "~/bridge/game/GameEngine";
+import type { PixiGridDropFeedback } from "~/ui/pixi/grid/PixiGridDropFeedback";
 import type { PixiApplicationOwner } from "~/ui/pixi/runtime/PixiApplicationOwner";
 import { createPixiMainSceneSurfaceFx } from "~/ui/pixi/scene/createPixiMainSceneSurfaceFx";
 
@@ -114,8 +115,15 @@ const readTree = (root: FakeDisplayObject): readonly FakeDisplayObject[] => [
 ];
 
 describe("Pixi main scene surface", () => {
-	it("destroys its display tree exactly once", () => {
+	it("destroys its owned display tree without closing borrowed drop feedback", () => {
 		const stage = new Container() as unknown as FakeDisplayObject;
+		const dropFeedbackContainer = new Container();
+		const dropFeedbackDisplayObject = dropFeedbackContainer as unknown as FakeDisplayObject;
+		const dropFeedback = {
+			closeFx: Effect.void,
+			container: dropFeedbackContainer,
+			renderFx: () => Effect.void,
+		} satisfies PixiGridDropFeedback;
 		const application = {
 			app: {
 				screen: {
@@ -132,6 +140,7 @@ describe("Pixi main scene surface", () => {
 		const surface = Effect.runSync(
 			createPixiMainSceneSurfaceFx({
 				application,
+				dropFeedback,
 				game,
 				palette,
 				readActors: () => [],
@@ -144,6 +153,11 @@ describe("Pixi main scene surface", () => {
 
 		expect(owned).toHaveLength(9);
 		for (const displayObject of owned) {
+			if (displayObject === dropFeedbackDisplayObject) {
+				expect(displayObject.destroyed).toBe(false);
+				expect(displayObject.destroyCalls).toBe(0);
+				continue;
+			}
 			expect(displayObject.destroyed).toBe(true);
 			expect(displayObject.destroyCalls).toBe(1);
 		}

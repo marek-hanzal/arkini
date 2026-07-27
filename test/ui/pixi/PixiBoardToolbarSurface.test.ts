@@ -136,10 +136,10 @@ afterEach(async () => {
 });
 
 describe("PixiBoardToolbarSurface", () => {
-	it("does not open Lines after a click already autofilled the owner", async () => {
+	it("silently resets a failed primary action without opening Item Detail", async () => {
 		boardState.startLineState = {
 			kind: "error",
-			autofilled: true,
+			autofilled: false,
 			error: {
 				_tag: "DepositUnavailable",
 			},
@@ -159,6 +159,55 @@ describe("PixiBoardToolbarSurface", () => {
 		expect(boardState.runStartLine).toHaveBeenCalledWith({
 			kind: "reset",
 		});
+	});
+
+	it("keeps an unavailable ordinary click inert and reserves Item Detail for Shift+click", async () => {
+		const host = document.createElement("div");
+		document.body.append(host);
+		const root = createRoot(host);
+		roots.push(root);
+		await act(async () => {
+			root.render(createElement(PixiBoardToolbarSurface));
+			await Promise.resolve();
+		});
+		const createProps = boardState.createProps;
+		if (createProps === null) throw new Error("Board scene did not create its runtime.");
+		const owner = {
+			id: "runtime:producer",
+			itemId: "producer",
+			location: {
+				scope: "board",
+				space: 0,
+				position: {
+					x: 0,
+					y: 0,
+				},
+			},
+			primaryAction: {
+				kind: "none",
+			},
+			quantity: 1,
+			revision: "revision:producer",
+			running: false,
+			runningGlow: false,
+			sourceUrl: "resource:producer",
+			title: "Producer",
+		} satisfies TileActorItem;
+		const canvas = document.createElement("canvas");
+
+		await createProps.onActivate(owner, false, canvas);
+
+		expect(boardState.runStartLine).not.toHaveBeenCalled();
+		expect(boardState.openItemDetail).not.toHaveBeenCalled();
+		expect(boardState.navigate).not.toHaveBeenCalled();
+
+		await createProps.onActivate(owner, true, canvas);
+
+		expect(boardState.openItemDetail).toHaveBeenCalledWith({
+			itemId: owner.id,
+			origin: canvas,
+		});
+		expect(boardState.runStartLine).not.toHaveBeenCalled();
 	});
 
 	it("sends another default-line command for a running owner and lets the engine enqueue or reject it", async () => {

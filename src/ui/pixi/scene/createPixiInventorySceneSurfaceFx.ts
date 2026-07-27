@@ -8,7 +8,7 @@ import { DropItemResultKindEnumSchema } from "~/bridge/tile/DropItemResultKindEn
 import { LocationScopeEnumSchema } from "~/bridge/tile/LocationScopeEnumSchema";
 import type { readTileDropPreviewFx } from "~/bridge/tile/readTileDropPreviewFx";
 import { readPixiScenePaletteFx } from "~/ui/pixi/appearance/readPixiScenePaletteFx";
-import { drawPixiGridDropFeedbackFx } from "~/ui/pixi/grid/drawPixiGridDropFeedbackFx";
+import type { PixiGridDropFeedback } from "~/ui/pixi/grid/PixiGridDropFeedback";
 import { drawPixiGridMaskFx } from "~/ui/pixi/grid/drawPixiGridMaskFx";
 import { drawPixiGridSurfaceFx } from "~/ui/pixi/grid/drawPixiGridSurfaceFx";
 import { readPixiGridSlotFx } from "~/ui/pixi/grid/readPixiGridSlotFx";
@@ -25,6 +25,7 @@ import type {
 export namespace createPixiInventorySceneSurfaceFx {
 	export interface Props {
 		readonly application: PixiApplicationOwner;
+		readonly dropFeedback: PixiGridDropFeedback;
 		readonly game: GameEngine;
 		readonly host: HTMLElement;
 	}
@@ -32,15 +33,11 @@ export namespace createPixiInventorySceneSurfaceFx {
 
 /** Owns Inventory layout, grid chrome, masks, hit geometry and drop feedback. */
 export const createPixiInventorySceneSurfaceFx = Effect.fn("createPixiInventorySceneSurfaceFx")(
-	function* ({ application, game, host }: createPixiInventorySceneSurfaceFx.Props) {
+	function* ({ application, dropFeedback, game, host }: createPixiInventorySceneSurfaceFx.Props) {
 		let palette = yield* readPixiScenePaletteFx(host);
 		const grid = new Graphics({
 			eventMode: "none",
 			label: "InventoryGrid",
-		});
-		const feedback = new Graphics({
-			eventMode: "none",
-			label: "InventoryDropFeedback",
 		});
 		const mask = new Graphics({
 			eventMode: "none",
@@ -52,7 +49,7 @@ export const createPixiInventorySceneSurfaceFx = Effect.fn("createPixiInventoryS
 		});
 		grid.mask = mask;
 		actorLayer.mask = mask;
-		application.stage.addChild(grid, feedback, mask, actorLayer);
+		application.stage.addChild(grid, dropFeedback.container, mask, actorLayer);
 		application.stage.eventMode = "static";
 		let closed = false;
 
@@ -118,9 +115,8 @@ export const createPixiInventorySceneSurfaceFx = Effect.fn("createPixiInventoryS
 						kind !== null &&
 						kind !== DropItemResultKindEnumSchema.enum.Reject &&
 						kind !== DropItemResultKindEnumSchema.enum.Ignored;
-					yield* drawPixiGridDropFeedbackFx({
+					yield* dropFeedback.renderFx({
 						color: accepted ? palette.accent : palette.danger,
-						graphics: feedback,
 						slot: target,
 						surface: layout.surface,
 					});
@@ -161,7 +157,6 @@ export const createPixiInventorySceneSurfaceFx = Effect.fn("createPixiInventoryS
 				for (const displayObject of [
 					actorLayer,
 					mask,
-					feedback,
 					grid,
 				]) {
 					if (displayObject.destroyed) continue;

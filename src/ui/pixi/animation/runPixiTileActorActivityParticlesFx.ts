@@ -31,6 +31,7 @@ const runningRampDurationMs = 520;
 const drainDurationMs = 460;
 export const pixiTileActorFeedbackParticlesDurationMs = 720;
 const waveTurns = 1.15;
+const shimmerTurns = 2.35;
 const twoPi = Math.PI * 2;
 
 export const readPixiTileActorActivityParticlesAnimationKey = (actor: PixiTileActor) =>
@@ -39,23 +40,57 @@ export const readPixiTileActorActivityParticlesAnimationKey = (actor: PixiTileAc
 const clampUnit = (value: number) => Math.min(1, Math.max(0, value));
 const easeOutCubic = (value: number) => 1 - (1 - value) ** 3;
 const smoothEnvelope = (value: number) => Math.sin(Math.PI * clampUnit(value)) ** 1.35;
+const smoothStep = (value: number) => {
+	const unit = clampUnit(value);
+	return unit * unit * (3 - 2 * unit);
+};
+const mix = (from: number, to: number, progress: number) => from + (to - from) * progress;
+
+const mixChannel = (channel: number, target: number, amount: number) =>
+	Math.round(channel + (target - channel) * amount);
+const mixTint = (from: number, to: number, progress: number) => {
+	const red = Math.round(mix((from >> 16) & 0xff, (to >> 16) & 0xff, progress));
+	const green = Math.round(mix((from >> 8) & 0xff, (to >> 8) & 0xff, progress));
+	const blue = Math.round(mix(from & 0xff, to & 0xff, progress));
+	return (red << 16) | (green << 8) | blue;
+};
+
+/** Preserves the semantic hue while pushing each shimmer toward the contrast side of its surface. */
+export const readPixiParticleShimmerTint = (
+	tint: number,
+	shimmer: number,
+	lightSurface: boolean,
+) => {
+	const unitShimmer = clampUnit(shimmer);
+	const amount = lightSurface ? 0.08 + unitShimmer * 0.26 : 0.04 + unitShimmer * 0.34;
+	const target = lightSurface ? 0 : 255;
+	const red = mixChannel((tint >> 16) & 0xff, target, amount);
+	const green = mixChannel((tint >> 8) & 0xff, target, amount);
+	const blue = mixChannel(tint & 0xff, target, amount);
+	return (red << 16) | (green << 8) | blue;
+};
 
 const renderParticles = ({
 	actor,
+	handoffProgress = 0,
 	intensity,
 	kind,
 	progress,
 	tint,
 }: {
 	readonly actor: PixiTileActor;
+	readonly handoffProgress?: number;
 	readonly intensity: number;
 	readonly kind: ParticlePlaybackKind;
 	readonly progress: number;
 	readonly tint: number;
 }) => {
 	const effect = actor.activityParticles;
-	effect.lastProgress = progress;
 	const burstWindow = 0.64;
+	const resolvedHandoffProgress = kind === "burst" ? clampUnit(handoffProgress) : 0;
+	const runningHandoffProgress = (progress * 0.32) % 1;
+	effect.lastProgress = resolvedHandoffProgress > 0 ? runningHandoffProgress : progress;
+	const lightSurface = effect.container.blendMode === "normal";
 	for (const {
 		alphaScale,
 		particle,
@@ -63,14 +98,12 @@ const renderParticles = ({
 		spreadOffset,
 		waveOffset,
 	} of effect.particles) {
-		const localProgress =
+		const rawLocalProgress =
 			kind === "running"
 				? (progress + phaseOffset) % 1
 				: (progress - phaseOffset * (1 - burstWindow)) / burstWindow;
-		if (localProgress < 0 || localProgress > 1) {
-			particle.alpha = 0;
-			continue;
-		}
+		const localProgress = clampUnit(rawLocalProgress);
+		const visible = rawLocalProgress >= 0 && rawLocalProgress <= 1;
 		const riseProgress = easeOutCubic(localProgress);
 		const spreadProgress = localProgress ** 0.82;
 		const plumeHalfWidth = effect.topHalfWidth * spreadProgress;
@@ -79,14 +112,52 @@ const renderParticles = ({
 			effect.topHalfWidth *
 			0.075 *
 			spreadProgress;
-		particle.x = effect.centerX + spreadOffset * plumeHalfWidth + wave;
-		particle.y = effect.startY + (effect.topY - effect.startY) * riseProgress;
-		particle.tint = tint;
-		particle.alpha =
-			smoothEnvelope(localProgress) *
+		const shimmer =
+			(Math.sin(waveOffset * 1.73 + localProgress * twoPi * shimmerTurns) + 1) / 2;
+		const x = effect.centerX + spreadOffset * plumeHalfWidth + wave;
+		const y = effect.startY + (effect.topY - effect.startY) * riseProgress;
+		const particleTint = readPixiParticleShimmerTint(tint, shimmer, lightSurface);
+		const alpha =
+			(visible ? smoothEnvelope(localProgress) : 0) *
 			intensity *
 			alphaScale *
-			(kind === "burst" ? 0.96 : 0.58);
+			(kind === "burst" ? 0.96 : 0.58) *
+			(0.82 + shimmer * 0.18);
+		if (resolvedHandoffProgress <= 0) {
+			particle.x = x;
+			particle.y = y;
+			particle.tint = particleTint;
+			particle.alpha = alpha;
+			continue;
+		}
+
+		const runningLocalProgress = (runningHandoffProgress + phaseOffset) % 1;
+		const runningRiseProgress = easeOutCubic(runningLocalProgress);
+		const runningSpreadProgress = runningLocalProgress ** 0.82;
+		const runningPlumeHalfWidth = effect.topHalfWidth * runningSpreadProgress;
+		const runningWave =
+			Math.sin(waveOffset + runningLocalProgress * twoPi * waveTurns) *
+			effect.topHalfWidth *
+			0.075 *
+			runningSpreadProgress;
+		const runningShimmer =
+			(Math.sin(waveOffset * 1.73 + runningLocalProgress * twoPi * shimmerTurns) + 1) / 2;
+		const runningX = effect.centerX + spreadOffset * runningPlumeHalfWidth + runningWave;
+		const runningY = effect.startY + (effect.topY - effect.startY) * runningRiseProgress;
+		const runningTint = readPixiParticleShimmerTint(
+			effect.workingTint,
+			runningShimmer,
+			lightSurface,
+		);
+		const runningAlpha =
+			smoothEnvelope(runningLocalProgress) *
+			alphaScale *
+			0.58 *
+			(0.82 + runningShimmer * 0.18);
+		particle.x = mix(x, runningX, resolvedHandoffProgress);
+		particle.y = mix(y, runningY, resolvedHandoffProgress);
+		particle.tint = mixTint(particleTint, runningTint, resolvedHandoffProgress);
+		particle.alpha = mix(alpha, runningAlpha, resolvedHandoffProgress);
 	}
 };
 
@@ -229,6 +300,8 @@ export const burstPixiTileActorFeedbackParticlesFx = Effect.fn(
 		reset: true,
 		visible: true,
 	});
+	let handoffStartProgress: number | null = null;
+	let handoffCompleted = false;
 	yield* animator.animateFx({
 		actor,
 		channel: "activity-particles",
@@ -242,7 +315,7 @@ export const burstPixiTileActorFeedbackParticlesFx = Effect.fn(
 					startPixiTileActorActivityParticlesFx({
 						actor,
 						animator,
-						rampIn: true,
+						rampIn: !handoffCompleted,
 					}),
 				);
 				return;
@@ -250,8 +323,20 @@ export const burstPixiTileActorFeedbackParticlesFx = Effect.fn(
 			RendererRuntime.runSync(hideParticlesFx(actor, animator));
 		},
 		render: (progress) => {
+			if (!actor.item.activityEffect) {
+				handoffStartProgress = null;
+				handoffCompleted = false;
+			} else if (handoffStartProgress === null) {
+				handoffStartProgress = Math.max(0.58, progress);
+			}
+			const handoffProgress =
+				handoffStartProgress === null || handoffStartProgress >= 1
+					? 0
+					: smoothStep((progress - handoffStartProgress) / (1 - handoffStartProgress));
+			if (handoffProgress >= 0.98) handoffCompleted = true;
 			renderParticles({
 				actor,
+				handoffProgress,
 				intensity: 1,
 				kind: "burst",
 				progress,

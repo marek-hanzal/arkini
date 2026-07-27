@@ -85,7 +85,13 @@ gameplay outcome. Missing visual identities or handoffs degrade to ordinary reco
   widens from one bottom-center apex into an inverted-fire plume, rises no more than half a tile above
   the face, and uses one linear repeated tween in the existing Motion-driven demand renderer. Resolved
   scene luminance selects additive compositing on dark surfaces and normal chromatic compositing on
-  light surfaces; appearance refresh updates every retained actor without restarting playback.
+  light surfaces. Each retained particle continuously shifts the semantic tint toward white on dark
+  surfaces or toward black on light surfaces, producing contrast-safe shimmer without changing hue,
+  allocating display objects, or restarting playback; appearance refresh updates every retained actor.
+- A click ACK owns the shared pool first. If canonical projection starts a job during that burst, its
+  final segment interpolates the same particles from ACK pose, alpha, shimmer, and semantic tint into
+  the sparse working plume. The infinite running tween adopts that exact final phase without a reset,
+  second writer, overlapping emitter, or blank frame.
 - Teardown stops subscriptions and interactions before destroying actors, layers, or the
   application they reference.
 - Actor presentation is keyed by physical actor instance and typed channel. `pose`, `grab-offset`,

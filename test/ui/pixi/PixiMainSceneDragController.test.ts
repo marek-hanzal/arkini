@@ -506,7 +506,12 @@ describe("Pixi main-scene drag controller", () => {
 				animation.actor === mounted.actor && animation.channel === "activity-particles",
 		);
 		if (burst?.channel === "activity-particles") burst.render(0.5);
-		expect(mounted.actor.activityParticles.particles[0]?.particle.tint).toBe(0x57d7b2);
+		const tint = mounted.actor.activityParticles.particles[0]?.particle.tint ?? 0;
+		const red = (tint >> 16) & 0xff;
+		const green = (tint >> 8) & 0xff;
+		const blue = tint & 0xff;
+		expect(green).toBeGreaterThan(blue);
+		expect(blue).toBeGreaterThan(red);
 	});
 
 	it("opens Item Detail with right click and ignores Shift on left click", async () => {

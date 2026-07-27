@@ -11,6 +11,7 @@ import {
 	burstPixiTileActorAckParticlesFx,
 	burstPixiTileActorFeedbackParticlesFx,
 	pixiTileActorFeedbackParticlesDurationMs,
+	readPixiParticleShimmerTint,
 	startPixiTileActorActivityParticlesFx,
 	stopPixiTileActorActivityParticlesFx,
 } from "~/ui/pixi/animation/runPixiTileActorActivityParticlesFx";
@@ -20,6 +21,7 @@ const createActor = () =>
 		activityParticles: {
 			centerX: 40,
 			container: {
+				blendMode: "add",
 				visible: false,
 			},
 			feedbackPhase: null,
@@ -91,7 +93,34 @@ const createAnimator = () => {
 	};
 };
 
+const readChannelSum = (color: number) =>
+	((color >> 16) & 0xff) + ((color >> 8) & 0xff) + (color & 0xff);
+
+const readColorDistance = (left: number, right: number) =>
+	Math.abs(((left >> 16) & 0xff) - ((right >> 16) & 0xff)) +
+	Math.abs(((left >> 8) & 0xff) - ((right >> 8) & 0xff)) +
+	Math.abs((left & 0xff) - (right & 0xff));
+
 describe("Pixi tile actor activity particles", () => {
+	it("pushes shimmer toward the contrast side of the resolved surface", () => {
+		const baseTint = 0x57d7b2;
+		const darkLow = readPixiParticleShimmerTint(baseTint, 0, false);
+		const darkHigh = readPixiParticleShimmerTint(baseTint, 1, false);
+		const lightLow = readPixiParticleShimmerTint(baseTint, 0, true);
+		const lightHigh = readPixiParticleShimmerTint(baseTint, 1, true);
+
+		expect(readChannelSum(darkHigh)).toBeGreaterThan(readChannelSum(darkLow));
+		expect(readChannelSum(lightHigh)).toBeLessThan(readChannelSum(lightLow));
+		expect(
+			new Set([
+				darkLow,
+				darkHigh,
+				lightLow,
+				lightHigh,
+			]).size,
+		).toBe(4);
+	});
+
 	it("runs one linear repeated plume tween without allocating or chaining another pool", () => {
 		const actor = createActor();
 		const particles = actor.activityParticles.particles.map(({ particle }) => particle);
@@ -168,6 +197,7 @@ describe("Pixi tile actor activity particles", () => {
 		playback.render(0.9999);
 		const beforeWrap = actor.activityParticles.particles.map(({ particle }) => ({
 			alpha: particle.alpha,
+			tint: particle.tint,
 			x: particle.x,
 			y: particle.y,
 		}));
@@ -177,6 +207,7 @@ describe("Pixi tile actor activity particles", () => {
 			if (before === undefined) throw new Error("Expected particle snapshot.");
 			expect(particle.alpha).toBeCloseTo(before.alpha, 2);
 			if (Math.max(particle.alpha, before.alpha) < 0.05) continue;
+			expect(readColorDistance(particle.tint, before.tint)).toBeLessThanOrEqual(3);
 			expect(particle.x).toBeCloseTo(before.x, 1);
 			expect(particle.y).toBeCloseTo(before.y, 1);
 		}
@@ -257,20 +288,30 @@ describe("Pixi tile actor activity particles", () => {
 			ownerKey: "activity-particles:pixi-tile:producer",
 		});
 		if (animations[0]?.channel === "activity-particles") animations[0].render(0.62);
-		expect(
-			actor.activityParticles.particles
-				.filter(({ particle }) => particle.alpha > 0)
-				.every(({ particle }) => particle.tint === 0x57d7b2),
-		).toBe(true);
+		const visibleTints = actor.activityParticles.particles
+			.filter(({ particle }) => particle.alpha > 0)
+			.map(({ particle }) => particle.tint);
+		expect(new Set(visibleTints).size).toBeGreaterThan(1);
+		for (const tint of visibleTints) {
+			const red = (tint >> 16) & 0xff;
+			const green = (tint >> 8) & 0xff;
+			const blue = tint & 0xff;
+			expect(green).toBeGreaterThan(blue);
+			expect(blue).toBeGreaterThan(red);
+		}
 
 		animations[0]?.onComplete?.();
 		expect(actor.activityParticles.container.visible).toBe(false);
 		expect(actor.activityParticles.feedbackPhase).toBeNull();
 	});
 
-	it("hands one completed feedback burst directly to the working plume", () => {
+	it("crossfades one ACK pool into the running plume without an overlap or reset", () => {
 		const actor = createActor();
-		const { animations, animator, cancellations } = createAnimator();
+		const { animations, animator, cancellations, writes } = createAnimator();
+		actor.item = {
+			...actor.item,
+			activityEffect: false,
+		};
 
 		Effect.runSync(
 			burstPixiTileActorFeedbackParticlesFx({
@@ -279,6 +320,44 @@ describe("Pixi tile actor activity particles", () => {
 				tint: 0x57d7b2,
 			}),
 		);
+		const burst = animations[0];
+		if (burst?.channel !== "activity-particles") {
+			throw new Error("Expected feedback particle burst.");
+		}
+		burst.render(0.7);
+		const ackFrame = actor.activityParticles.particles.map(({ particle }) => ({
+			alpha: particle.alpha,
+			tint: particle.tint,
+			x: particle.x,
+			y: particle.y,
+		}));
+		actor.item = {
+			...actor.item,
+			activityEffect: true,
+		};
+		Effect.runSync(
+			startPixiTileActorActivityParticlesFx({
+				actor,
+				animator,
+			}),
+		);
+		expect(animations).toHaveLength(1);
+		burst.render(0.7);
+		for (const [index, { particle }] of actor.activityParticles.particles.entries()) {
+			const ack = ackFrame[index];
+			if (ack === undefined) throw new Error("Expected ACK particle snapshot.");
+			expect(particle.alpha).toBeCloseTo(ack.alpha, 6);
+			expect(particle.tint).toBe(ack.tint);
+			expect(particle.x).toBeCloseTo(ack.x, 6);
+			expect(particle.y).toBeCloseTo(ack.y, 6);
+		}
+		burst.render(1);
+		const handoffFrame = actor.activityParticles.particles.map(({ particle }) => ({
+			alpha: particle.alpha,
+			tint: particle.tint,
+			x: particle.x,
+			y: particle.y,
+		}));
 		animations[0]?.onComplete?.();
 
 		expect(cancellations).toEqual([
@@ -293,6 +372,25 @@ describe("Pixi tile actor activity particles", () => {
 			durationMs: 1_760,
 			ownerKey: "activity-particles:pixi-tile:producer",
 			repeat: Number.POSITIVE_INFINITY,
+		});
+		const running = animations[1];
+		if (running?.channel !== "activity-particles") {
+			throw new Error("Expected running particle playback.");
+		}
+		running.render(0);
+		for (const [index, { particle }] of actor.activityParticles.particles.entries()) {
+			const handoff = handoffFrame[index];
+			if (handoff === undefined) throw new Error("Expected handoff particle snapshot.");
+			expect(particle.alpha).toBeCloseTo(handoff.alpha, 6);
+			expect(particle.tint).toBe(handoff.tint);
+			expect(particle.x).toBeCloseTo(handoff.x, 6);
+			expect(particle.y).toBeCloseTo(handoff.y, 6);
+		}
+		expect(writes.at(-1)).toEqual({
+			actor,
+			channel: "activity-particles",
+			reset: false,
+			visible: true,
 		});
 		expect(actor.activityParticles.feedbackPhase).toBeNull();
 	});

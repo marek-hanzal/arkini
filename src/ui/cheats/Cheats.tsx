@@ -2,7 +2,14 @@ import { match } from "ts-pattern";
 
 import { Button } from "~/ui/button/Button";
 import type { useCheatsModel } from "~/ui/cheats/useCheatsModel";
+import type { updateGameCheatsAtom } from "~/ui/cheats/updateGameCheatsAtom";
 import { RouteBackdrop } from "~/ui/navigation/RouteBackdrop";
+
+const actionLabel = (action: updateGameCheatsAtom.Command["action"]) => {
+	if (action === "instant-gameplay") return "Instant gameplay";
+	if (action === "cheat-mode") return "Cheat mode";
+	return "Navigation";
+};
 
 /** Renders the small save-scoped cheat option surface from one authoritative model. */
 export const Cheats = ({
@@ -94,40 +101,52 @@ export const Cheats = ({
 						.with(
 							{
 								kind: "pending",
-							},
-							({ label }) => <p className="text-accent">Saving {label}…</p>,
-						)
-						.with(
-							{
-								kind: "error",
-							},
-							({ error, label }) => (
-								<p className="text-danger">
-									{label} update failed: {errorMessage(error)}
-								</p>
-							),
-						)
-						.with(
-							{
-								kind: "success",
-							},
-							({ label }) => <p className="text-muted">{label} saved.</p>,
-						)
-						.with(
-							{
-								kind: "idle",
+								action: "exit",
 							},
 							() => null,
 						)
 						.with(
 							{
-								kind: "navigation-error",
+								kind: "pending",
+							},
+							({ action }) => (
+								<p className="text-accent">Saving {actionLabel(action)}…</p>
+							),
+						)
+						.with(
+							{
+								kind: "error",
+								action: "exit",
 							},
 							({ error }) => (
 								<p className="text-danger">
 									Navigation failed: {errorMessage(error)}
 								</p>
 							),
+						)
+						.with(
+							{
+								kind: "error",
+							},
+							({ action, error }) => (
+								<p className="text-danger">
+									{actionLabel(action)} update failed: {errorMessage(error)}
+								</p>
+							),
+						)
+						.with(
+							{
+								kind: "saved",
+							},
+							({ action }) => (
+								<p className="text-muted">{actionLabel(action)} saved.</p>
+							),
+						)
+						.with(
+							{
+								kind: "idle",
+							},
+							() => null,
 						)
 						.exhaustive()}
 				</div>

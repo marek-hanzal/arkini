@@ -101,7 +101,7 @@ export const ItemLinesTab = ({
 							return (
 								<label
 									key={option.value}
-									className={`relative rounded-md px-3 py-1.5 text-center text-xs font-semibold transition-colors focus-within:ring-2 focus-within:ring-accent/60 ${
+									className={`relative rounded-md px-3 py-1.5 text-center text-xs font-semibold transition-colors ${
 										optionDisabled
 											? "cursor-not-allowed text-muted opacity-50"
 											: selected

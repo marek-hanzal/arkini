@@ -1170,7 +1170,7 @@ describe("item charges", () => {
 		expect(result.after).toEqual(result.before);
 	});
 
-	it("rolls back an external depletion when its immediate output exceeds maxCount", () => {
+	it("rejects an external depletion when its immediate output exceeds maxCount", () => {
 		const result = run(
 			Effect.gen(function* () {
 				const owner = yield* spawnItemFx({
@@ -1209,8 +1209,8 @@ describe("item charges", () => {
 		expect(result.attempt).toEqual(
 			Result.fail(
 				expect.objectContaining({
-					_tag: "PlacementUnavailableError",
-					reason: "item:max-count",
+					_tag: "JobOutputMaxCountError",
+					itemId: "item:capped-seed",
 				}),
 			),
 		);

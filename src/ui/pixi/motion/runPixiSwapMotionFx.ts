@@ -9,7 +9,7 @@ import { readPixiDragSettleDurationMsFx } from "~/ui/pixi/drag/readPixiDragSettl
 import type { PixiTileMagneticField } from "~/ui/pixi/magnet/PixiTileMagneticField";
 import { createPixiTileMotionMagneticProjectorFx } from "~/ui/pixi/motion/createPixiTileMotionMagneticProjectorFx";
 import { createPixiTileMotionPoseSamplerFx } from "~/ui/pixi/motion/createPixiTileMotionPoseSamplerFx";
-import { settlePixiTileMotionActorFx } from "~/ui/pixi/motion/settlePixiTileMotionActorFx";
+import { chasePixiTileMotionTargetFx } from "~/ui/pixi/motion/chasePixiTileMotionTargetFx";
 import type { PixiMainSceneSurface } from "~/ui/pixi/scene/PixiMainSceneSurface";
 import type { PixiTileActorPose } from "~/ui/pixi/scene/PixiTileActorPose";
 
@@ -29,8 +29,6 @@ export namespace runPixiSwapMotionFx {
 		readonly delayMs: number;
 		readonly magneticField: PixiTileMagneticField;
 		readonly onComplete: () => void;
-		readonly onMagneticSourceAcquired: (actorId: string) => void;
-		readonly onMagneticSourceReleased: (actorId: string) => void;
 		readonly onSwapLegSettled: (actorId: string) => void;
 		readonly onSwapLegStarted: (actorId: string) => void;
 		readonly origin: PixiTileActorPose;
@@ -48,8 +46,6 @@ export const runPixiSwapMotionFx = Effect.fn("runPixiSwapMotionFx")(function* ({
 	delayMs,
 	magneticField,
 	onComplete,
-	onMagneticSourceAcquired,
-	onMagneticSourceReleased,
 	onSwapLegSettled,
 	onSwapLegStarted,
 	origin,
@@ -123,8 +119,6 @@ export const runPixiSwapMotionFx = Effect.fn("runPixiSwapMotionFx")(function* ({
 				counterpartActorId,
 			]),
 			magneticField,
-			onAcquired: onMagneticSourceAcquired,
-			onReleased: onMagneticSourceReleased,
 		});
 		onSwapLegStarted(leg.actor.item.id);
 		yield* animator.animateFx({
@@ -158,7 +152,7 @@ export const runPixiSwapMotionFx = Effect.fn("runPixiSwapMotionFx")(function* ({
 					return;
 				}
 				RendererRuntime.runSync(
-					settlePixiTileMotionActorFx({
+					chasePixiTileMotionTargetFx({
 						actor: leg.actor,
 						animator,
 						fallbackTarget: leg.target,

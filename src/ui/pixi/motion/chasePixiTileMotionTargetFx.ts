@@ -7,6 +7,7 @@ import type {
 	PixiActorAnimator,
 	PixiActorPresentedPose,
 } from "~/ui/pixi/animation/PixiActorAnimator";
+import type { PixiAnimationCurve } from "~/ui/pixi/animation/PixiAnimationDriver";
 import { readPixiTileTravelDurationMsFx } from "~/ui/pixi/animation/readPixiTileTravelDurationMsFx";
 import { createPixiTileMotionPoseSamplerFx } from "~/ui/pixi/motion/createPixiTileMotionPoseSamplerFx";
 import type { PixiMainSceneSurface } from "~/ui/pixi/scene/PixiMainSceneSurface";
@@ -16,12 +17,13 @@ export namespace chasePixiTileMotionTargetFx {
 	export interface Props {
 		readonly actor: PixiTileActor;
 		readonly animator: PixiActorAnimator;
+		readonly curve?: PixiAnimationCurve;
 		readonly delayMs?: number;
 		readonly fallbackTarget: PixiTileActorPose;
 		readonly onPose?: (pose: PixiActorPresentedPose) => void;
 		readonly onSettled: () => void;
 		readonly ownerKey: string;
-		readonly readLiveTarget: () => Required<PixiActorPresentedPose> | null;
+		readonly readLiveTarget?: () => Required<PixiActorPresentedPose> | null;
 		readonly shouldSettle?: () => boolean;
 		readonly surface: PixiMainSceneSurface;
 		readonly targetLocation: TileActorItem["location"];
@@ -39,6 +41,7 @@ export namespace chasePixiTileMotionTargetFx {
 export const chasePixiTileMotionTargetFx = Effect.fn("chasePixiTileMotionTargetFx")(function* ({
 	actor,
 	animator,
+	curve,
 	delayMs = 0,
 	fallbackTarget,
 	onPose,
@@ -59,7 +62,7 @@ export const chasePixiTileMotionTargetFx = Effect.fn("chasePixiTileMotionTargetF
 		x: actor.container.x,
 		y: actor.container.y,
 	};
-	const target = readLiveTarget() ?? {
+	const target = readLiveTarget?.() ?? {
 		scale: semanticTarget.size / Math.max(1, actor.size),
 		x: semanticTarget.x,
 		y: semanticTarget.y,
@@ -79,6 +82,7 @@ export const chasePixiTileMotionTargetFx = Effect.fn("chasePixiTileMotionTargetF
 	yield* animator.animateFx({
 		actor,
 		channel: "pose",
+		curve,
 		delayMs,
 		durationMs: yield* readPixiTileTravelDurationMsFx({
 			fromX: from.x,
@@ -97,6 +101,7 @@ export const chasePixiTileMotionTargetFx = Effect.fn("chasePixiTileMotionTargetF
 				chasePixiTileMotionTargetFx({
 					actor,
 					animator,
+					curve,
 					fallbackTarget: semanticTarget,
 					onPose,
 					onSettled,

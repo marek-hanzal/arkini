@@ -1,9 +1,10 @@
 import { FileSystem } from "effect";
 import { Effect, Semaphore } from "effect";
 import { join } from "node:path";
+import { CheatAvailabilitySchema } from "../../contract/cheat/CheatAvailabilitySchema";
+import { readElectronPreferenceFx } from "../preference/readElectronPreferenceFx";
+import { writeElectronPreferenceFx } from "../preference/writeElectronPreferenceFx";
 import type { CheatPreferences } from "./CheatPreferences";
-import { readCheatAvailabilityFx } from "./readCheatAvailabilityFx";
-import { writeCheatAvailabilityFx } from "./writeCheatAvailabilityFx";
 
 export namespace createFilesystemCheatPreferencesFx {
 	export interface Props {
@@ -20,22 +21,35 @@ export const createFilesystemCheatPreferencesFx = Effect.fn("createFilesystemChe
 	}: createFilesystemCheatPreferencesFx.Props) {
 		const fileSystem = providedFileSystem ?? (yield* FileSystem.FileSystem);
 		const root = join(userDataPath, "arkini", "preferences");
+		const currentPath = join(root, "cheats.available");
 		const writeSemaphore = yield* Semaphore.make(1);
 		const writeAvailableFx: CheatPreferences["writeAvailableFx"] = Effect.fn(
 			"FilesystemCheatPreferences.writeAvailableFx",
 		)((available) =>
 			writeSemaphore.withPermits(1)(
-				writeCheatAvailabilityFx({
+				writeElectronPreferenceFx({
 					root,
 					fileSystem,
-					available,
+					pendingPath: join(root, "cheats-available.pending"),
+					currentPath,
+					value: available,
+					operation: "persist the cheat availability preference",
+					serialize: (value) => String(CheatAvailabilitySchema.parse(value)),
 				}),
 			),
 		);
 		return {
-			readAvailableFx: readCheatAvailabilityFx({
-				root,
+			readAvailableFx: readElectronPreferenceFx({
 				fileSystem,
+				path: currentPath,
+				fallback: false,
+				operation: "read the cheat availability preference",
+				parse: (stored) => {
+					const value = stored.trim();
+					if (value === "true") return true;
+					if (value === "false") return false;
+					return undefined;
+				},
 			}),
 			writeAvailableFx,
 		} satisfies CheatPreferences;

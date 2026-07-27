@@ -137,10 +137,13 @@ export const createPixiTileMagneticFieldFx = Effect.fn("createPixiTileMagneticFi
 
 			const reset = () => {
 				removeStaleSprings();
+				let released = false;
 				for (const [key, sample] of samples) {
-					if (sample.sourceKind === "drag") samples.delete(key);
+					if (sample.sourceKind !== "drag") continue;
+					samples.delete(key);
+					released = true;
 				}
-				requestApply();
+				if (released) requestApply();
 			};
 
 			const readActorRect = (actor: PixiTileActor) => {
@@ -244,8 +247,17 @@ export const createPixiTileMagneticFieldFx = Effect.fn("createPixiTileMagneticFi
 			}
 
 			const release = (sourceKind: PixiTileMagneticSourceKind, sourceActorId: string) => {
-				samples.delete(readSourceKey(sourceKind, sourceActorId));
-				requestApply();
+				if (samples.delete(readSourceKey(sourceKind, sourceActorId))) requestApply();
+			};
+
+			const releaseSources = (sourceKind: PixiTileMagneticSourceKind) => {
+				let released = false;
+				for (const [key, sample] of samples) {
+					if (sample.sourceKind !== sourceKind) continue;
+					samples.delete(key);
+					released = true;
+				}
+				if (released) requestApply();
 			};
 
 			const update = (sample: PixiTileMagneticFieldSample) => {
@@ -285,6 +297,13 @@ export const createPixiTileMagneticFieldFx = Effect.fn("createPixiTileMagneticFi
 						Effect.sync(() => {
 							if (closed) return;
 							release(sourceKind, sourceActorId);
+						}),
+				),
+				releaseSourcesFx: Effect.fn("PixiTileMagneticField.releaseSourcesFx")(
+					(sourceKind) =>
+						Effect.sync(() => {
+							if (closed) return;
+							releaseSources(sourceKind);
 						}),
 				),
 				resetFx: Effect.sync(() => reset()),

@@ -9,23 +9,10 @@ import type { LineRunPlanSchema } from "~/engine/line/schema/run/LineRunPlanSche
 import { readOutputMaximumQuantitiesFx } from "~/engine/output/fx/readOutputMaximumQuantitiesFx";
 import { readRuntimeItemByIdFx } from "~/engine/runtime/read/readRuntimeItemByIdFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
-
-const adjustQuantity = (
-	quantities: Map<IdSchema.Type, number>,
-	itemId: IdSchema.Type,
-	delta: number,
-) => {
-	const quantity = (quantities.get(itemId) ?? 0) + delta;
-	if (quantity === 0) quantities.delete(itemId);
-	else quantities.set(itemId, quantity);
-};
-
-const clampNetReservations = (quantities: Map<IdSchema.Type, number>) => {
-	for (const [itemId, quantity] of quantities) {
-		if (quantity <= 0) quantities.delete(itemId);
-	}
-	return quantities;
-};
+import {
+	adjustLineNetMaximumOutputQuantity,
+	clampLineNetMaximumOutputQuantities,
+} from "./lineNetMaximumOutputQuantities";
 
 export namespace readPlannedLineNetMaximumOutputQuantitiesFx {
 	export interface Props {
@@ -63,7 +50,7 @@ export const readPlannedLineNetMaximumOutputQuantitiesFx = Effect.fn(
 				itemId: allocation.itemId,
 				runtime,
 			});
-			adjustQuantity(quantities, item.item.id, -allocation.quantity);
+			adjustLineNetMaximumOutputQuantity(quantities, item.item.id, -allocation.quantity);
 		}
 	}
 
@@ -87,11 +74,11 @@ export const readPlannedLineNetMaximumOutputQuantitiesFx = Effect.fn(
 				output: payer.item.charges.output,
 			});
 			for (const [itemId, quantity] of lifecycleOutput) {
-				adjustQuantity(quantities, itemId, quantity);
+				adjustLineNetMaximumOutputQuantity(quantities, itemId, quantity);
 			}
 		}
-		adjustQuantity(quantities, payer.item.id, -1);
+		adjustLineNetMaximumOutputQuantity(quantities, payer.item.id, -1);
 	}
 
-	return clampNetReservations(quantities);
+	return clampLineNetMaximumOutputQuantities(quantities);
 });

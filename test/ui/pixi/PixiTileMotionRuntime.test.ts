@@ -277,19 +277,39 @@ const createRecordingMagneticField = ({
 		readonly sourceKind: "drag" | "motion";
 	}>;
 	readonly updates?: PixiTileMagneticFieldSample[];
-} = {}): PixiTileMagneticField => ({
-	closeFx: Effect.void,
-	pruneFx: Effect.void,
-	releaseFx: (source) =>
-		Effect.sync(() => {
-			releases.push(source);
-		}),
-	resetFx: Effect.void,
-	updateFx: (sample) =>
-		Effect.sync(() => {
-			updates.push(sample);
-		}),
-});
+} = {}): PixiTileMagneticField => {
+	const activeSources = new Map<string, PixiTileMagneticFieldSample>();
+	const readSourceKey = (sourceKind: "drag" | "motion", sourceActorId: string) =>
+		`${sourceKind}:${sourceActorId}`;
+	return {
+		closeFx: Effect.void,
+		pruneFx: Effect.void,
+		releaseFx: (source) =>
+			Effect.sync(() => {
+				if (!activeSources.delete(readSourceKey(source.sourceKind, source.sourceActorId)))
+					return;
+				releases.push(source);
+			}),
+		releaseSourcesFx: (sourceKind) =>
+			Effect.sync(() => {
+				for (const [key, sample] of activeSources) {
+					if ((sample.sourceKind ?? "drag") !== sourceKind) continue;
+					activeSources.delete(key);
+					releases.push({
+						sourceActorId: sample.sourceActorId,
+						sourceKind,
+					});
+				}
+			}),
+		resetFx: Effect.void,
+		updateFx: (sample) =>
+			Effect.sync(() => {
+				updates.push(sample);
+				const sourceKind = sample.sourceKind ?? "drag";
+				activeSources.set(readSourceKey(sourceKind, sample.sourceActorId), sample);
+			}),
+	};
+};
 
 const readPoseAnimation = (animations: ReadonlyArray<PixiActorAnimation>, actor: PixiTileActor) => {
 	const animation = animations.find(
@@ -911,6 +931,12 @@ describe("Pixi tile motion runtime", () => {
 		if (returnTravel?.channel !== "pose") {
 			throw new Error("Expected the input remainder return.");
 		}
+		expect(returnTravel).toMatchObject({
+			curve: {
+				kind: "linear",
+			},
+			delayMs: 0,
+		});
 		expect(returnTravel.durationMs).toBe(
 			Effect.runSync(
 				readPixiTileTravelDurationMsFx({
@@ -1043,8 +1069,6 @@ describe("Pixi tile motion runtime", () => {
 				delayMs: 0,
 				magneticField: createRecordingMagneticField(),
 				onComplete: completed,
-				onMagneticSourceAcquired: () => undefined,
-				onMagneticSourceReleased: () => undefined,
 				onTransientCreated: (actor) => {
 					transients.push(actor);
 				},
@@ -1091,12 +1115,47 @@ describe("Pixi tile motion runtime", () => {
 			)
 			.at(-1);
 		if (returned?.channel !== "pose") throw new Error("Expected Inventory remainder return.");
+		expect(returned).toMatchObject({
+			curve: {
+				kind: "linear",
+			},
+			delayMs: 0,
+		});
 		expect(samplePoseAnimation(returned, 1)).toMatchObject({
 			x: openerPose.x,
 			y: openerPose.y,
 		});
-		const animationCountBeforeVanish = animations.length;
+		opener.container.x = 560;
+		const animationCountBeforeContinuation = animations.length;
 		returned.onComplete?.();
+
+		const continuation = animations
+			.slice(animationCountBeforeContinuation)
+			.find(
+				(animation) =>
+					animation.actor === transient &&
+					animation.channel === "pose" &&
+					animation.ownerKey === "motion:44:0",
+			);
+		if (continuation?.channel !== "pose") {
+			throw new Error("Expected the retargeted Inventory remainder return.");
+		}
+		expect(continuation).toMatchObject({
+			curve: {
+				kind: "linear",
+			},
+			delayMs: 0,
+		});
+		expect(samplePoseAnimation(continuation, 0)).toMatchObject({
+			x: openerPose.x,
+			y: openerPose.y,
+		});
+		expect(samplePoseAnimation(continuation, 1)).toMatchObject({
+			x: opener.container.x,
+			y: openerPose.y,
+		});
+		const animationCountBeforeVanish = animations.length;
+		continuation.onComplete?.();
 
 		expect(transient.container.destroyed).toBe(false);
 		const vanishAnimations = animations.slice(animationCountBeforeVanish);
@@ -1109,7 +1168,7 @@ describe("Pixi tile motion runtime", () => {
 		expect(vanishPose.durationMs).toBe(pixiTileActorRemovalFeedbackDurationMs);
 		expect(vanishPose).toMatchObject({
 			toScale: 0.72,
-			toX: openerPose.x + transient.size * 0.14,
+			toX: opener.container.x + transient.size * 0.14,
 			toY: openerPose.y + transient.size * 0.14,
 		});
 		const vanishOpacity = vanishAnimations.find(

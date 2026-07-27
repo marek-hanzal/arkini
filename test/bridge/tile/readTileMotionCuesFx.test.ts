@@ -550,4 +550,62 @@ describe("readCommittedTileSwapMotionCueFx", () => {
 			),
 		).toBeNull();
 	});
+
+	it("rejects missing history, stale captured geometry, and a non-exchange", () => {
+		const captured = {
+			source: {
+				id: source.id,
+				revision: source.revision,
+				location: sourceLocation,
+			},
+			target: {
+				id: target.id,
+				revision: target.revision,
+				location: targetLocation,
+			},
+		};
+		expect(
+			Effect.runSync(
+				readCommittedTileSwapMotionCueFx({
+					...captured,
+					transition: {
+						sequence: 10,
+						previousRuntime: null,
+						runtime: swappedRuntime,
+						events: [],
+					},
+				}),
+			),
+		).toBeNull();
+		expect(
+			Effect.runSync(
+				readCommittedTileSwapMotionCueFx({
+					...captured,
+					source: {
+						...captured.source,
+						location: targetLocation,
+					},
+					transition: {
+						sequence: 10,
+						previousRuntime: runtime,
+						runtime: swappedRuntime,
+						events: [],
+					},
+				}),
+			),
+		).toBeNull();
+		expect(
+			Effect.runSync(
+				readCommittedTileSwapMotionCueFx({
+					...captured,
+					transition: {
+						sequence: 10,
+						previousRuntime: runtime,
+						runtime,
+						events: [],
+					},
+				}),
+			),
+		).toBeNull();
+	});
 });

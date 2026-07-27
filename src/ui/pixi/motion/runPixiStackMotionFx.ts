@@ -32,8 +32,6 @@ export namespace runPixiStackMotionFx {
 		readonly delayMs: number;
 		readonly magneticField: PixiTileMagneticField;
 		readonly onComplete: () => void;
-		readonly onMagneticSourceAcquired: (actorId: string) => void;
-		readonly onMagneticSourceReleased: (actorId: string) => void;
 		readonly onTransientCreated: (actor: PixiTileActor) => void;
 		readonly origin: PixiTileActorPose;
 		readonly readPalette: () => PixiScenePalette;
@@ -57,8 +55,6 @@ export const runPixiStackMotionFx = Effect.fn("runPixiStackMotionFx")(function* 
 	delayMs,
 	magneticField,
 	onComplete,
-	onMagneticSourceAcquired,
-	onMagneticSourceReleased,
 	onTransientCreated,
 	origin,
 	readPalette,
@@ -129,8 +125,6 @@ export const runPixiStackMotionFx = Effect.fn("runPixiStackMotionFx")(function* 
 			cue.targetActorId,
 		]),
 		magneticField,
-		onAcquired: onMagneticSourceAcquired,
-		onReleased: onMagneticSourceReleased,
 		readAttraction: () => {
 			const route = readCurrentRoute();
 			return {

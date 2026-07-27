@@ -7,6 +7,7 @@ const run = {
 	lineId: "line:forge:run",
 	show: true,
 	enable: true,
+	rules: [],
 	runtimeMs: 1_000,
 	input: [
 		{

@@ -2,13 +2,12 @@ import { Effect } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeIntegerSchema";
-import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
 import { LineInputEmptyError } from "~/engine/input/error/LineInputEmptyError";
 import { filterInputSlotItemsFx } from "~/engine/input/read/filterInputSlotItemsFx";
 import { readItemMaterialInputFx } from "~/engine/input/read/readItemMaterialInputFx";
 import { readBoardItemLineFx } from "~/engine/line/fx/readBoardItemLineFx";
-import { placeRuntimeItemFx } from "~/engine/placement/fx/placeRuntimeItemFx";
 import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
+import { returnBufferedLineItemsFx } from "./returnBufferedLineItemsFx";
 
 export namespace withdrawLineInputFx {
 	export interface Props {
@@ -58,29 +57,19 @@ export const withdrawLineInputFx = Effect.fn("withdrawLineInputFx")(function* ({
 				);
 			}
 
-			let draft = runtime;
-			const events: GameEventSchema.Type[] = [];
-			for (const bufferedItem of bufferedItems) {
-				const placement = yield* placeRuntimeItemFx({
-					itemId: bufferedItem.id,
-					origin: owner.location,
-					originItemId: owner.id,
-					runtime: draft,
-				});
-				events.push(...placement.events);
-				draft = placement.runtime;
-			}
+			const returned = yield* returnBufferedLineItemsFx({
+				items: bufferedItems,
+				owner,
+				runtime,
+			});
 
 			return [
 				{
-					withdrawnItemCount: bufferedItems.length,
-					withdrawnQuantity: bufferedItems.reduce(
-						(total, item) => total + item.quantity,
-						0,
-					),
+					withdrawnItemCount: returned.withdrawnItemCount,
+					withdrawnQuantity: returned.withdrawnQuantity,
 				} satisfies withdrawLineInputFx.Result,
-				draft,
-				events,
+				returned.runtime,
+				returned.events,
 			] as const;
 		}),
 	);

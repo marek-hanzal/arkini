@@ -101,6 +101,49 @@ const readTargetFx = Effect.fn("readTileMotionCueTargetFx")(function* ({
 	return target;
 });
 
+type SpawnMotionEvent = Pick<
+	Extract<
+		GameEventSchema.Type,
+		{
+			readonly type: typeof GameEventEnumSchema.enum.ItemSpawned;
+		}
+	>,
+	"canonicalItemId" | "itemId" | "location" | "originItemId"
+>;
+
+const readSpawnCueFx = Effect.fn("readTileSpawnMotionCueFx")(function* ({
+	event,
+	eventIndex,
+	transition,
+}: {
+	readonly event: SpawnMotionEvent;
+	readonly eventIndex: number;
+	readonly transition: CommittedTransitionSchema.Type;
+}) {
+	const [originLocation, target] = yield* Effect.all([
+		readOriginLocationFx({
+			originItemId: event.originItemId,
+			transition,
+		}),
+		readTargetFx({
+			canonicalItemId: event.canonicalItemId,
+			itemId: event.itemId,
+			location: event.location,
+			runtime: transition.runtime,
+		}),
+	]);
+	if (originLocation === null || target === null) return null;
+	return {
+		kind: "spawn",
+		sequence: transition.sequence,
+		eventIndex,
+		actorId: target.id,
+		originActorId: event.originItemId,
+		originLocation,
+		targetLocation: target.location,
+	} satisfies UnstaggeredTileMotionCue;
+});
+
 const readInventoryInputSourceItemFx = Effect.fn("readInventoryInputSourceItemFx")(function* ({
 	game,
 	runtime,
@@ -156,29 +199,10 @@ const readEventCueFx = Effect.fn("readTileMotionEventCueFx")(function* ({
 				type: GameEventEnumSchema.enum.ItemSpawned,
 			},
 			(spawned) =>
-				Effect.gen(function* () {
-					const [originLocation, target] = yield* Effect.all([
-						readOriginLocationFx({
-							originItemId: spawned.originItemId,
-							transition,
-						}),
-						readTargetFx({
-							canonicalItemId: spawned.canonicalItemId,
-							itemId: spawned.itemId,
-							location: spawned.location,
-							runtime: transition.runtime,
-						}),
-					]);
-					if (originLocation === null || target === null) return null;
-					return {
-						kind: "spawn",
-						sequence: transition.sequence,
-						eventIndex,
-						actorId: target.id,
-						originActorId: spawned.originItemId,
-						originLocation,
-						targetLocation: target.location,
-					} satisfies UnstaggeredTileMotionCue;
+				readSpawnCueFx({
+					event: spawned,
+					eventIndex,
+					transition,
 				}),
 		)
 		.with(
@@ -309,29 +333,10 @@ const readEventCueFx = Effect.fn("readTileMotionEventCueFx")(function* ({
 				},
 			},
 			(placed) =>
-				Effect.gen(function* () {
-					const [originLocation, target] = yield* Effect.all([
-						readOriginLocationFx({
-							originItemId: placed.originItemId,
-							transition,
-						}),
-						readTargetFx({
-							canonicalItemId: placed.canonicalItemId,
-							itemId: placed.itemId,
-							location: placed.location,
-							runtime: transition.runtime,
-						}),
-					]);
-					if (originLocation === null || target === null) return null;
-					return {
-						kind: "spawn",
-						sequence: transition.sequence,
-						eventIndex,
-						actorId: target.id,
-						originActorId: placed.originItemId,
-						originLocation,
-						targetLocation: target.location,
-					} satisfies UnstaggeredTileMotionCue;
+				readSpawnCueFx({
+					event: placed,
+					eventIndex,
+					transition,
 				}),
 		)
 		.otherwise(() => Effect.succeed(null));
@@ -356,33 +361,14 @@ export const readTileMotionCuesFx = Effect.fn("readTileMotionCuesFx")(function* 
 		}),
 	);
 	const unstaggered: ReadonlyArray<UnstaggeredTileMotionCue> = cues.filter((cue) => cue !== null);
-	const staggered = yield* Effect.reduce(
-		unstaggered,
-		() => ({
-			cues: [] as ReadonlyArray<TileMotionCue>,
-			nextIndexByBatch: new Map<string, number>(),
-		}),
-		(current, cue) =>
-			Effect.sync(() => {
-				const batchKey = `${cue.sequence}:${cue.originActorId}`;
-				const staggerIndex = current.nextIndexByBatch.get(batchKey) ?? 0;
-				return {
-					cues: [
-						...current.cues,
-						{
-							...cue,
-							staggerIndex,
-						},
-					],
-					nextIndexByBatch: new Map([
-						...current.nextIndexByBatch,
-						[
-							batchKey,
-							staggerIndex + 1,
-						],
-					]),
-				};
-			}),
-	);
-	return staggered.cues;
+	const nextIndexByBatch = new Map<string, number>();
+	return unstaggered.map((cue): TileMotionCue => {
+		const batchKey = `${cue.sequence}:${cue.originActorId}`;
+		const staggerIndex = nextIndexByBatch.get(batchKey) ?? 0;
+		nextIndexByBatch.set(batchKey, staggerIndex + 1);
+		return {
+			...cue,
+			staggerIndex,
+		};
+	});
 });

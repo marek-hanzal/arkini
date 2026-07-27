@@ -207,6 +207,15 @@ describe("Pixi tile magnet", () => {
 
 		Effect.runSync(
 			field.releaseFx({
+				sourceActorId: "runtime:missing",
+				sourceKind: "motion",
+			}),
+		);
+		Effect.runSync(field.releaseSourcesFx("motion"));
+		expect(scheduled).toHaveLength(1);
+
+		Effect.runSync(
+			field.releaseFx({
 				sourceActorId: sample.sourceActorId,
 				sourceKind: "drag",
 			}),
@@ -440,12 +449,15 @@ describe("Pixi tile magnet", () => {
 		);
 
 		expect(targets[2]?.mock.lastCall?.[0]).toBeLessThan(0);
+		const receiverTargetCount = targets[2]?.mock.calls.length;
 		Effect.runSync(
 			field.releaseFx({
-				sourceActorId: "motion:incoming",
+				sourceActorId: receiver.item.id,
 				sourceKind: "motion",
 			}),
 		);
+		expect(targets[2]).toHaveBeenCalledTimes(receiverTargetCount ?? 0);
+		Effect.runSync(field.releaseSourcesFx("motion"));
 		expect(targets[2]).toHaveBeenLastCalledWith(0);
 		expect(targets[0]?.mock.lastCall?.[0]).toBeGreaterThan(0);
 	});

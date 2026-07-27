@@ -23,6 +23,8 @@ const ThemeOptions: ReadonlyArray<{
 	},
 ];
 
+const errorMessage = (error: unknown) => (error instanceof Error ? error.message : String(error));
+
 export namespace Settings {
 	export interface Props {
 		readonly onBackFx: Effect.Effect<void, unknown>;
@@ -135,29 +137,38 @@ export const Settings = ({ onBackFx }: Settings.Props) => {
 						{
 							kind: "navigation-error",
 						},
-						({ message }) => (
-							<p className="text-danger">Navigation failed: {message}</p>
+						({ error }) => (
+							<p className="text-danger">Navigation failed: {errorMessage(error)}</p>
 						),
 					)
 					.with(
 						{
-							kind: "saving-cheat-tools",
+							kind: "pending",
+							action: "cheat-tools",
 						},
 						() => <p className="text-accent">Saving Cheat tools…</p>,
 					)
 					.with(
 						{
-							kind: "saving-theme",
+							kind: "pending",
+							action: "theme",
 						},
 						() => <p className="text-accent">Saving theme…</p>,
 					)
 					.with(
 						{
+							kind: "pending",
+							action: "exit",
+						},
+						() => null,
+					)
+					.with(
+						{
 							kind: "save-error",
 						},
-						({ label, message }) => (
+						({ error, label }) => (
 							<p className="text-danger">
-								{label} update failed: {message}
+								{label} update failed: {errorMessage(error)}
 							</p>
 						),
 					)

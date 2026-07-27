@@ -151,6 +151,10 @@ const renderProjection = async (projection: ItemDetailLines.Projection) => {
 };
 
 describe("useItemDetailLinesEquality", () => {
+	it("returns one stable comparator across consumers", () => {
+		expect(useItemDetailLinesEquality()).toBe(useItemDetailLinesEquality());
+	});
+
 	it("retains the previous projection when every nested plain value is structurally equal", async () => {
 		const { output, rerender } = await renderProjection(makeProjection(lineDisabledReason));
 

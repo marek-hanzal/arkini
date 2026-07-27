@@ -1,11 +1,11 @@
 import { FileSystem } from "effect";
 import { Effect, Semaphore } from "effect";
 import { join } from "node:path";
+import { AppearanceAccentSchema } from "../../contract/appearance/AppearanceAccentSchema";
+import { AppearanceThemeSchema } from "../../contract/appearance/AppearanceThemeSchema";
+import { readElectronPreferenceFx } from "../preference/readElectronPreferenceFx";
+import { writeElectronPreferenceFx } from "../preference/writeElectronPreferenceFx";
 import type { AppearancePreferences } from "./AppearancePreferences";
-import { readAppearanceAccentFx } from "./readAppearanceAccentFx";
-import { readAppearanceThemeFx } from "./readAppearanceThemeFx";
-import { writeAppearanceAccentFx } from "./writeAppearanceAccentFx";
-import { writeAppearanceThemeFx } from "./writeAppearanceThemeFx";
 
 export namespace createFilesystemAppearancePreferencesFx {
 	export interface Props {
@@ -25,14 +25,20 @@ export const createFilesystemAppearancePreferencesFx = Effect.fn(
 	const root = join(userDataPath, "arkini", "preferences");
 	const themeWriteSemaphore = yield* Semaphore.make(1);
 	const accentWriteSemaphore = yield* Semaphore.make(1);
+	const themePath = join(root, "appearance.theme");
+	const accentPath = join(root, "appearance.accent");
 	const writeThemeFx: AppearancePreferences["writeThemeFx"] = Effect.fn(
 		"FilesystemAppearancePreferences.writeThemeFx",
 	)((theme) =>
 		themeWriteSemaphore.withPermits(1)(
-			writeAppearanceThemeFx({
+			writeElectronPreferenceFx({
 				root,
 				fileSystem,
-				theme,
+				pendingPath: join(root, "appearance.pending"),
+				currentPath: themePath,
+				value: theme,
+				operation: "persist the appearance preference",
+				serialize: (value) => AppearanceThemeSchema.parse(value),
 			}),
 		),
 	);
@@ -40,22 +46,32 @@ export const createFilesystemAppearancePreferencesFx = Effect.fn(
 		"FilesystemAppearancePreferences.writeAccentFx",
 	)((accent) =>
 		accentWriteSemaphore.withPermits(1)(
-			writeAppearanceAccentFx({
+			writeElectronPreferenceFx({
 				root,
 				fileSystem,
-				accent,
+				pendingPath: join(root, "appearance-accent.pending"),
+				currentPath: accentPath,
+				value: accent,
+				operation: "persist the appearance accent preference",
+				serialize: (value) => AppearanceAccentSchema.parse(value),
 			}),
 		),
 	);
 	return {
-		readThemeFx: readAppearanceThemeFx({
-			root,
+		readThemeFx: readElectronPreferenceFx({
 			fileSystem,
+			path: themePath,
+			fallback: "dark" as const,
+			operation: "read the appearance preference",
+			parse: (stored) => AppearanceThemeSchema.safeParse(stored.trim()).data,
 		}),
 		writeThemeFx,
-		readAccentFx: readAppearanceAccentFx({
-			root,
+		readAccentFx: readElectronPreferenceFx({
 			fileSystem,
+			path: accentPath,
+			fallback: "rose" as const,
+			operation: "read the appearance accent preference",
+			parse: (stored) => AppearanceAccentSchema.safeParse(stored.trim()).data,
 		}),
 		writeAccentFx,
 	} satisfies AppearancePreferences;

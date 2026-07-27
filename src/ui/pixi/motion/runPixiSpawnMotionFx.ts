@@ -9,7 +9,7 @@ import { startPixiTileActorFadeInFx } from "~/ui/pixi/animation/startPixiTileAct
 import type { PixiTileMagneticField } from "~/ui/pixi/magnet/PixiTileMagneticField";
 import { createPixiTileMotionMagneticProjectorFx } from "~/ui/pixi/motion/createPixiTileMotionMagneticProjectorFx";
 import { createPixiTileMotionPoseSamplerFx } from "~/ui/pixi/motion/createPixiTileMotionPoseSamplerFx";
-import { settlePixiTileMotionActorFx } from "~/ui/pixi/motion/settlePixiTileMotionActorFx";
+import { chasePixiTileMotionTargetFx } from "~/ui/pixi/motion/chasePixiTileMotionTargetFx";
 import type { PixiMainSceneSurface } from "~/ui/pixi/scene/PixiMainSceneSurface";
 import type { PixiTileActorPose } from "~/ui/pixi/scene/PixiTileActorPose";
 
@@ -22,8 +22,6 @@ export namespace runPixiSpawnMotionFx {
 		readonly delayMs: number;
 		readonly magneticField: PixiTileMagneticField;
 		readonly onComplete: () => void;
-		readonly onMagneticSourceAcquired: (actorId: string) => void;
-		readonly onMagneticSourceReleased: (actorId: string) => void;
 		readonly origin: PixiTileActorPose;
 		readonly surface: PixiMainSceneSurface;
 		readonly target: PixiTileActorPose;
@@ -39,8 +37,6 @@ export const runPixiSpawnMotionFx = Effect.fn("runPixiSpawnMotionFx")(function* 
 	delayMs,
 	magneticField,
 	onComplete,
-	onMagneticSourceAcquired,
-	onMagneticSourceReleased,
 	origin,
 	surface,
 	target,
@@ -86,8 +82,6 @@ export const runPixiSpawnMotionFx = Effect.fn("runPixiSpawnMotionFx")(function* 
 		attractedActorId: null,
 		eligibleAttractionActorIds: new Set(),
 		magneticField,
-		onAcquired: onMagneticSourceAcquired,
-		onReleased: onMagneticSourceReleased,
 	});
 	yield* animator.animateFx({
 		actor,
@@ -111,7 +105,7 @@ export const runPixiSpawnMotionFx = Effect.fn("runPixiSpawnMotionFx")(function* 
 				return;
 			}
 			RendererRuntime.runSync(
-				settlePixiTileMotionActorFx({
+				chasePixiTileMotionTargetFx({
 					actor,
 					animator,
 					fallbackTarget: target,

@@ -342,6 +342,7 @@ const mountController = ({
 		closeFx: Effect.void,
 		pruneFx: Effect.void,
 		releaseFx: () => Effect.void,
+		releaseSourcesFx: () => Effect.void,
 		resetFx: Effect.void,
 		updateFx: (sample) =>
 			Effect.sync(() => {

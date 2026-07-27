@@ -1,5 +1,4 @@
 import { createLink, type LinkComponent } from "@tanstack/react-router";
-import { Effect } from "effect";
 import {
 	forwardRef,
 	type AnchorHTMLAttributes,
@@ -9,7 +8,6 @@ import {
 import { twMerge } from "tailwind-merge";
 
 import { CursorClassName, type CursorSemantic } from "~/ui/cursor/CursorSemantic";
-import { readControlCursorSemanticFx } from "~/ui/cursor/readControlCursorSemanticFx";
 
 const ButtonBaseClassName =
 	"inline-flex min-h-[var(--ak-control-min-height)] items-center justify-center rounded-lg px-[var(--ak-control-padding-inline)] py-[var(--ak-control-padding-block)] text-center text-[var(--ak-control-font-size)] font-semibold transition-colors disabled:opacity-60 aria-disabled:opacity-60";
@@ -33,127 +31,93 @@ type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & ControlCursorProps;
 
 type ButtonAnchorProps = AnchorHTMLAttributes<HTMLAnchorElement> & ControlCursorProps;
 
-interface ButtonFactoryProps {
-	readonly displayName: string;
-	readonly variant: ButtonVariant;
-}
+const readControlCursorSemantic = ({
+	ariaDisabled = false,
+	disabled = false,
+	intent = "pointer",
+}: {
+	readonly ariaDisabled?: boolean;
+	readonly disabled?: boolean;
+	readonly intent?: ControlCursorIntent;
+}): ControlCursorIntent => {
+	if (!ariaDisabled && !disabled) return intent;
+	return intent === "progress" || intent === "wait" ? intent : "not-allowed";
+};
 
-const createButtonFx = Effect.fn("createButtonFx")(({ displayName, variant }: ButtonFactoryProps) =>
-	Effect.sync(() => {
-		const Component = forwardRef<HTMLButtonElement, ButtonProps>(
-			({ className, cursorIntent, disabled, type = "button", ...props }, ref) => {
-				const ariaDisabled =
-					props["aria-disabled"] === true || props["aria-disabled"] === "true";
-				const cursor = Effect.runSync(
-					readControlCursorSemanticFx({
-						ariaDisabled,
-						disabled,
-						intent: cursorIntent,
-					}),
-				);
-				return (
-					<button
-						ref={ref}
-						type={type}
-						disabled={disabled}
-						className={twMerge(
-							ButtonBaseClassName,
-							ButtonVariantClassNames[variant],
-							CursorClassName[cursor],
-							className,
-						)}
-						{...props}
-					/>
-				);
-			},
-		);
-		Component.displayName = displayName;
-		return Component;
-	}),
-);
-
-const createButtonAnchorFx = Effect.fn("createButtonAnchorFx")(
-	({ displayName, variant }: ButtonFactoryProps) =>
-		Effect.sync(() => {
-			const Component = forwardRef<HTMLAnchorElement, ButtonAnchorProps>(
-				({ className, cursorIntent, onClick, ...props }, ref) => {
-					const disabled =
-						props["aria-disabled"] === true || props["aria-disabled"] === "true";
-					const cursor = Effect.runSync(
-						readControlCursorSemanticFx({
-							ariaDisabled: disabled,
-							intent: cursorIntent,
-						}),
-					);
-					const handleClick: MouseEventHandler<HTMLAnchorElement> = (event) => {
-						if (disabled) {
-							event.preventDefault();
-							return;
-						}
-						onClick?.(event);
-					};
-					return (
-						<a
-							ref={ref}
-							className={twMerge(
-								ButtonBaseClassName,
-								ButtonVariantClassNames[variant],
-								CursorClassName[cursor],
-								className,
-							)}
-							onClick={handleClick}
-							{...props}
-						/>
-					);
-				},
+const createButton = (displayName: string, variant: ButtonVariant) => {
+	const Component = forwardRef<HTMLButtonElement, ButtonProps>(
+		({ className, cursorIntent, disabled, type = "button", ...props }, ref) => {
+			const cursor = readControlCursorSemantic({
+				ariaDisabled: props["aria-disabled"] === true || props["aria-disabled"] === "true",
+				disabled,
+				intent: cursorIntent,
+			});
+			return (
+				<button
+					ref={ref}
+					type={type}
+					disabled={disabled}
+					className={twMerge(
+						ButtonBaseClassName,
+						ButtonVariantClassNames[variant],
+						CursorClassName[cursor],
+						className,
+					)}
+					{...props}
+				/>
 			);
-			Component.displayName = displayName;
-			return Component;
-		}),
-);
+		},
+	);
+	Component.displayName = displayName;
+	return Component;
+};
+
+const createButtonAnchor = (displayName: string, variant: ButtonVariant) => {
+	const Component = forwardRef<HTMLAnchorElement, ButtonAnchorProps>(
+		({ className, cursorIntent, onClick, ...props }, ref) => {
+			const disabled = props["aria-disabled"] === true || props["aria-disabled"] === "true";
+			const cursor = readControlCursorSemantic({
+				ariaDisabled: disabled,
+				intent: cursorIntent,
+			});
+			const handleClick: MouseEventHandler<HTMLAnchorElement> = (event) => {
+				if (disabled) {
+					event.preventDefault();
+					return;
+				}
+				onClick?.(event);
+			};
+			return (
+				<a
+					ref={ref}
+					className={twMerge(
+						ButtonBaseClassName,
+						ButtonVariantClassNames[variant],
+						CursorClassName[cursor],
+						className,
+					)}
+					onClick={handleClick}
+					{...props}
+				/>
+			);
+		},
+	);
+	Component.displayName = displayName;
+	return Component;
+};
 
 /** Renders the canonical neutral game action on a native button. */
-export const Button = Effect.runSync(
-	createButtonFx({
-		displayName: "Button",
-		variant: "default",
-	}),
-);
+export const Button = createButton("Button", "default");
 
 /** Renders the canonical primary game action on a native button. */
-export const PrimaryButton = Effect.runSync(
-	createButtonFx({
-		displayName: "PrimaryButton",
-		variant: "primary",
-	}),
-);
+export const PrimaryButton = createButton("PrimaryButton", "primary");
 
 /** Renders the canonical destructive game action on a native button. */
-export const DangerButton = Effect.runSync(
-	createButtonFx({
-		displayName: "DangerButton",
-		variant: "danger",
-	}),
-);
+export const DangerButton = createButton("DangerButton", "danger");
 
-const ButtonAnchor = Effect.runSync(
-	createButtonAnchorFx({
-		displayName: "ButtonAnchor",
-		variant: "default",
-	}),
-);
-const PrimaryButtonAnchor = Effect.runSync(
-	createButtonAnchorFx({
-		displayName: "PrimaryButtonAnchor",
-		variant: "primary",
-	}),
-);
-const DangerButtonAnchor = Effect.runSync(
-	createButtonAnchorFx({
-		displayName: "DangerButtonAnchor",
-		variant: "danger",
-	}),
-);
+const ButtonAnchor = createButtonAnchor("ButtonAnchor", "default");
+const PrimaryButtonAnchor = createButtonAnchor("PrimaryButtonAnchor", "primary");
+const DangerButtonAnchor = createButtonAnchor("DangerButtonAnchor", "danger");
 
 const CreatedButtonLink = createLink(ButtonAnchor);
 const CreatedPrimaryButtonLink = createLink(PrimaryButtonAnchor);

@@ -30,8 +30,6 @@ export namespace runPixiTileMotionCueFx {
 		readonly cueKey: string;
 		readonly magneticField: PixiTileMagneticField;
 		readonly onComplete: () => void;
-		readonly onMagneticSourceAcquired: (actorId: string) => void;
-		readonly onMagneticSourceReleased: (actorId: string) => void;
 		readonly onSwapLegSettled: (actorId: string) => void;
 		readonly onSwapLegStarted: (actorId: string) => void;
 		readonly onTransientCreated: (actor: PixiTileActor) => void;
@@ -56,8 +54,6 @@ export const runPixiTileMotionCueFx = Effect.fn("runPixiTileMotionCueFx")(functi
 	cueKey,
 	magneticField,
 	onComplete,
-	onMagneticSourceAcquired,
-	onMagneticSourceReleased,
 	onSwapLegSettled,
 	onSwapLegStarted,
 	onTransientCreated,
@@ -115,8 +111,6 @@ export const runPixiTileMotionCueFx = Effect.fn("runPixiTileMotionCueFx")(functi
 									delayMs,
 									magneticField,
 									onComplete,
-									onMagneticSourceAcquired,
-									onMagneticSourceReleased,
 									origin,
 									surface,
 									target,
@@ -136,8 +130,6 @@ export const runPixiTileMotionCueFx = Effect.fn("runPixiTileMotionCueFx")(functi
 									delayMs,
 									magneticField,
 									onComplete,
-									onMagneticSourceAcquired,
-									onMagneticSourceReleased,
 									onTransientCreated,
 									origin,
 									readPalette,
@@ -161,8 +153,6 @@ export const runPixiTileMotionCueFx = Effect.fn("runPixiTileMotionCueFx")(functi
 									delayMs,
 									magneticField,
 									onComplete,
-									onMagneticSourceAcquired,
-									onMagneticSourceReleased,
 									onTransientCreated,
 									origin,
 									readPalette,
@@ -185,8 +175,6 @@ export const runPixiTileMotionCueFx = Effect.fn("runPixiTileMotionCueFx")(functi
 									delayMs,
 									magneticField,
 									onComplete,
-									onMagneticSourceAcquired,
-									onMagneticSourceReleased,
 									onSwapLegSettled,
 									onSwapLegStarted,
 									origin,

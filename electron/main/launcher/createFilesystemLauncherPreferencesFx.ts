@@ -1,9 +1,10 @@
 import { FileSystem } from "effect";
 import { Effect, Semaphore } from "effect";
 import { join } from "node:path";
+import { LastPackageIdSchema } from "../../contract/launcher/LastPackageIdSchema";
+import { readElectronPreferenceFx } from "../preference/readElectronPreferenceFx";
+import { writeElectronPreferenceFx } from "../preference/writeElectronPreferenceFx";
 import type { LauncherPreferences } from "./LauncherPreferences";
-import { readLastPackageIdFx } from "./readLastPackageIdFx";
-import { writeLastPackageIdFx as writeLastPackageIdFileFx } from "./writeLastPackageIdFx";
 
 export namespace createFilesystemLauncherPreferencesFx {
 	export interface Props {
@@ -21,24 +22,32 @@ export const createFilesystemLauncherPreferencesFx = Effect.fn(
 }: createFilesystemLauncherPreferencesFx.Props) {
 	const fileSystem = providedFileSystem ?? (yield* FileSystem.FileSystem);
 	const root = join(userDataPath, "arkini", "preferences");
+	const currentPath = join(root, "launcher.last-package");
 	// The fixed pending path makes operation ordering part of this repository's contract.
 	const operations = yield* Semaphore.make(1);
 	const writeLastPackageIdFx: LauncherPreferences["writeLastPackageIdFx"] = Effect.fn(
 		"FilesystemLauncherPreferences.writeLastPackageIdFx",
 	)((packageId) =>
 		operations.withPermits(1)(
-			writeLastPackageIdFileFx({
+			writeElectronPreferenceFx({
 				root,
 				fileSystem,
-				packageId,
+				pendingPath: join(root, "launcher-last-package.pending"),
+				currentPath,
+				value: packageId,
+				operation: "persist the last package preference",
+				serialize: (value) => LastPackageIdSchema.parse(value),
 			}),
 		),
 	);
 	return {
 		readLastPackageIdFx: operations.withPermits(1)(
-			readLastPackageIdFx({
-				root,
+			readElectronPreferenceFx({
 				fileSystem,
+				path: currentPath,
+				fallback: null,
+				operation: "read the last package preference",
+				parse: (stored) => LastPackageIdSchema.safeParse(stored).data,
 			}),
 		),
 		writeLastPackageIdFx,

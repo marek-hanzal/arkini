@@ -444,6 +444,7 @@ const createReconcilerHarness = ({
 				closeFx: Effect.void,
 				pruneFx: Effect.void,
 				releaseFx: () => Effect.void,
+				releaseSourcesFx: () => Effect.void,
 				resetFx: Effect.void,
 				updateFx: () => Effect.void,
 			} satisfies PixiTileMagneticField,

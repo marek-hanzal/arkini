@@ -83,6 +83,7 @@ describe("lineRuleFx", () => {
 			},
 			{
 				active: false,
+				failedWhenIndex: 1,
 				type: "enable",
 			},
 			{

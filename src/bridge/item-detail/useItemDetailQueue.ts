@@ -1,3 +1,4 @@
+import { Equal } from "effect";
 import { useCallback } from "react";
 
 import { useGameEngine } from "~/bridge/game/useGameEngine";
@@ -13,25 +14,6 @@ export namespace useItemDetailQueue {
 /** Projects the authoritative FIFO queue for one exact Item Detail target. */
 export const useItemDetailQueue = (itemId: IdSchema.Type): useItemDetailQueue.Projection => {
 	const game = useGameEngine();
-	const isEqual = useCallback(
-		(left: useItemDetailQueue.Projection, right: useItemDetailQueue.Projection) => {
-			if (left.kind !== right.kind) return false;
-			if (left.kind === "unavailable" || right.kind === "unavailable") return true;
-			return (
-				left.itemId === right.itemId &&
-				left.capacity === right.capacity &&
-				left.activeCount === right.activeCount &&
-				left.request.length === right.request.length &&
-				left.request.every(
-					(request, index) =>
-						right.request[index]?.requestId === request.requestId &&
-						right.request[index]?.lineId === request.lineId &&
-						right.request[index]?.title === request.title,
-				)
-			);
-		},
-		[],
-	);
 	const selector = useCallback(
 		(runtime: RuntimeSchema.Type): useItemDetailQueue.Projection => {
 			const queue = game.readOrThrow(
@@ -58,5 +40,5 @@ export const useItemDetailQueue = (itemId: IdSchema.Type): useItemDetailQueue.Pr
 			itemId,
 		],
 	);
-	return useRuntimeSelector(game, selector, isEqual);
+	return useRuntimeSelector(game, selector, Equal.equals);
 };

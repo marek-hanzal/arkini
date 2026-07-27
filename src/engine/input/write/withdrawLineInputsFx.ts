@@ -1,11 +1,10 @@
 import { Array, Effect } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
 import { readBoardItemLineFx } from "~/engine/line/fx/readBoardItemLineFx";
-import { placeRuntimeItemFx } from "~/engine/placement/fx/placeRuntimeItemFx";
 import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
 import { isInputRuntimeItemFx } from "~/engine/runtime/read/isInputRuntimeItemFx";
+import { returnBufferedLineItemsFx } from "./returnBufferedLineItemsFx";
 
 export namespace withdrawLineInputsFx {
 	export interface Props {
@@ -38,29 +37,19 @@ export const withdrawLineInputsFx = Effect.fn("withdrawLineInputsFx")(function* 
 				(item) =>
 					item.location.ownerItemId === ownerItemId && item.location.lineId === lineId,
 			);
-			let draft = runtime;
-			const events: GameEventSchema.Type[] = [];
-			for (const bufferedItem of bufferedItems) {
-				const placement = yield* placeRuntimeItemFx({
-					itemId: bufferedItem.id,
-					origin: owner.location,
-					originItemId: owner.id,
-					runtime: draft,
-				});
-				events.push(...placement.events);
-				draft = placement.runtime;
-			}
+			const returned = yield* returnBufferedLineItemsFx({
+				items: bufferedItems,
+				owner,
+				runtime,
+			});
 
 			return [
 				{
-					withdrawnItemCount: bufferedItems.length,
-					withdrawnQuantity: bufferedItems.reduce(
-						(total, item) => total + item.quantity,
-						0,
-					),
+					withdrawnItemCount: returned.withdrawnItemCount,
+					withdrawnQuantity: returned.withdrawnQuantity,
 				} satisfies withdrawLineInputsFx.Result,
-				draft,
-				events,
+				returned.runtime,
+				returned.events,
 			] as const;
 		}),
 	);

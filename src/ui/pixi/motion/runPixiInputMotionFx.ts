@@ -33,8 +33,6 @@ export namespace runPixiInputMotionFx {
 		readonly delayMs: number;
 		readonly magneticField: PixiTileMagneticField;
 		readonly onComplete: () => void;
-		readonly onMagneticSourceAcquired: (actorId: string) => void;
-		readonly onMagneticSourceReleased: (actorId: string) => void;
 		readonly readSourceSurvives: () => boolean;
 		readonly onTransientCreated: (actor: PixiTileActor) => void;
 		readonly origin: PixiTileActorPose;
@@ -102,8 +100,6 @@ const returnPixiInputRemainderFx = Effect.fn("returnPixiInputRemainderFx")(funct
 	cueKey,
 	magneticField,
 	onComplete,
-	onMagneticSourceAcquired,
-	onMagneticSourceReleased,
 	readPalette,
 	source,
 	sourceHome,
@@ -118,8 +114,6 @@ const returnPixiInputRemainderFx = Effect.fn("returnPixiInputRemainderFx")(funct
 	readonly cueKey: string;
 	readonly magneticField: PixiTileMagneticField;
 	readonly onComplete: () => void;
-	readonly onMagneticSourceAcquired: (actorId: string) => void;
-	readonly onMagneticSourceReleased: (actorId: string) => void;
 	readonly readPalette: () => PixiScenePalette;
 	readonly source: PixiTileActor | null;
 	readonly sourceHome: PixiTileActorPose;
@@ -147,8 +141,6 @@ const returnPixiInputRemainderFx = Effect.fn("returnPixiInputRemainderFx")(funct
 			source?.item.id ?? cue.originActorId,
 		]),
 		magneticField,
-		onAcquired: onMagneticSourceAcquired,
-		onReleased: onMagneticSourceReleased,
 	});
 	const readLiveOrigin = () => {
 		if (source !== null && !source.dragging) return null;
@@ -161,6 +153,9 @@ const returnPixiInputRemainderFx = Effect.fn("returnPixiInputRemainderFx")(funct
 	yield* chasePixiTileMotionTargetFx({
 		actor: transient,
 		animator,
+		curve: {
+			kind: "linear",
+		},
 		fallbackTarget: sourceHome,
 		onPose: magneticProjector.projectPose,
 		onSettled: () => {
@@ -262,8 +257,6 @@ export const runPixiInputMotionFx = Effect.fn("runPixiInputMotionFx")(function* 
 	delayMs,
 	magneticField,
 	onComplete,
-	onMagneticSourceAcquired,
-	onMagneticSourceReleased,
 	onTransientCreated,
 	origin,
 	readPalette,
@@ -367,8 +360,6 @@ export const runPixiInputMotionFx = Effect.fn("runPixiInputMotionFx")(function* 
 			cue.targetActorId,
 		]),
 		magneticField,
-		onAcquired: onMagneticSourceAcquired,
-		onReleased: onMagneticSourceReleased,
 	});
 	yield* chasePixiTileMotionTargetFx({
 		actor: transient,
@@ -396,8 +387,6 @@ export const runPixiInputMotionFx = Effect.fn("runPixiInputMotionFx")(function* 
 							cueKey,
 							magneticField,
 							onComplete,
-							onMagneticSourceAcquired,
-							onMagneticSourceReleased,
 							readPalette,
 							source,
 							sourceHome,

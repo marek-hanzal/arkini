@@ -2,23 +2,15 @@ import { useAtom } from "@effect/atom-react";
 import { useNavigate } from "@tanstack/react-router";
 import { Cause, Exit, Option } from "effect";
 import { useEffect, useState } from "react";
-import { match, P } from "ts-pattern";
 import * as AsyncResult from "effect/unstable/reactivity/AsyncResult";
 
 import type { Game } from "~/bridge/game/Game";
 import { readExactCauseFailure } from "~/bridge/game/readExactCauseFailure";
-import type { GameMenuPhase } from "~/ui/game-menu/GameMenuControl";
+import type { GameMenuAction, GameMenuPhase } from "~/ui/game-menu/GameMenuControl";
 import { gameMenuCommandAtom } from "~/ui/game-menu/gameMenuCommandAtom";
 import { useGameMenuControl } from "~/ui/game-menu/useGameMenuControl";
 
-type NavigationState =
-	| {
-			readonly kind: "idle";
-	  }
-	| {
-			readonly kind: "error";
-			readonly error: unknown;
-	  };
+const errorMessage = (error: unknown) => (error instanceof Error ? error.message : String(error));
 
 /**
  * Orchestrates menu intent without taking Game lifecycle ownership. Local save
@@ -34,8 +26,6 @@ export const useGameMenuActions = ({
 	readonly game: Game;
 	readonly phase: Exclude<GameMenuPhase, "closed">;
 }) => {
-	const errorMessage = (error: unknown) =>
-		error instanceof Error ? error.message : String(error);
 	const menu = useGameMenuControl();
 	const navigate = useNavigate();
 	const commandAtom = gameMenuCommandAtom(game);
@@ -99,50 +89,48 @@ export const useGameMenuActions = ({
 		menu.completeAction,
 	]);
 
-	const requestSettings = () => {
-		if (!menu.beginAction("settings")) return;
+	const requestNavigation = (
+		action: Exclude<GameMenuAction, "save" | "save-and-exit">,
+		request: () => Promise<unknown>,
+	) => {
+		if (!menu.beginAction(action)) return;
 		setNavigationError(undefined);
-		void navigate({
-			to: "/settings",
-		})
+		void request()
 			.catch(setNavigationError)
 			.finally(() => {
-				menu.completeAction("settings");
+				menu.completeAction(action);
 			});
 	};
 
-	const requestCheats = () => {
-		if (!menu.beginAction("cheats")) return;
-		setNavigationError(undefined);
-		void navigate({
-			to: "/game/$packageId/cheats",
-			params: {
-				packageId: game.arkpack.packageId,
-			},
-		})
-			.catch(setNavigationError)
-			.finally(() => {
-				menu.completeAction("cheats");
-			});
-	};
+	const requestSettings = () =>
+		requestNavigation("settings", () =>
+			navigate({
+				to: "/settings",
+			}),
+		);
 
-	const requestMainMenu = () => {
-		if (!menu.beginAction("main-menu")) return;
-		setNavigationError(undefined);
-		void navigate({
-			to: "/game/$packageId/action/leave",
-			params: {
-				packageId: game.arkpack.packageId,
-			},
-			search: {
-				destination: "main-menu",
-			},
-		})
-			.catch(setNavigationError)
-			.finally(() => {
-				menu.completeAction("main-menu");
-			});
-	};
+	const requestCheats = () =>
+		requestNavigation("cheats", () =>
+			navigate({
+				to: "/game/$packageId/cheats",
+				params: {
+					packageId: game.arkpack.packageId,
+				},
+			}),
+		);
+
+	const requestMainMenu = () =>
+		requestNavigation("main-menu", () =>
+			navigate({
+				to: "/game/$packageId/action/leave",
+				params: {
+					packageId: game.arkpack.packageId,
+				},
+				search: {
+					destination: "main-menu",
+				},
+			}),
+		);
 
 	const requestSave = () => {
 		if (!menu.beginAction("save")) return;
@@ -154,126 +142,31 @@ export const useGameMenuActions = ({
 		runCommand("save-and-exit");
 	};
 
-	const requestHardReset = () => {
-		if (!menu.beginAction("hard-reset")) return;
-		setNavigationError(undefined);
-		void navigate({
-			to: "/game/$packageId/action/reset",
-			params: {
-				packageId: game.arkpack.packageId,
-			},
-		})
-			.catch(setNavigationError)
-			.finally(() => {
-				menu.completeAction("hard-reset");
-			});
-	};
+	const requestHardReset = () =>
+		requestNavigation("hard-reset", () =>
+			navigate({
+				to: "/game/$packageId/action/reset",
+				params: {
+					packageId: game.arkpack.packageId,
+				},
+			}),
+		);
 
-	const navigation: NavigationState =
-		navigationError === undefined
-			? {
-					kind: "idle",
-				}
-			: {
-					kind: "error",
-					error: navigationError,
-				};
-	const status = match([
-		saveAndExitPending,
-		savePending,
-		commandFailure,
-		navigation,
-		menu.routePending,
-		successfulCommand,
-	] as const)
-		.with(
-			[
-				true,
-				P._,
-				P._,
-				P._,
-				P._,
-				P._,
-			],
-			() => "Saving and exiting Arkini…",
-		)
-		.with(
-			[
-				false,
-				true,
-				P._,
-				P._,
-				P._,
-				P._,
-			],
-			() => "Saving…",
-		)
-		.with(
-			[
-				false,
-				false,
-				P.not(undefined),
-				P._,
-				P._,
-				P._,
-			],
-			([, , failure]) =>
-				`${failure.command === "save-and-exit" ? "Save and exit" : "Save"} failed: ${errorMessage(failure.error)}`,
-		)
-		.with(
-			[
-				false,
-				false,
-				undefined,
-				{
-					kind: "error",
-				},
-				P._,
-				P._,
-			],
-			([, , , failed]) => `Navigation failed: ${errorMessage(failed.error)}`,
-		)
-		.with(
-			[
-				false,
-				false,
-				undefined,
-				{
-					kind: "idle",
-				},
-				true,
-				P._,
-			],
-			() => "Opening action page…",
-		)
-		.with(
-			[
-				false,
-				false,
-				undefined,
-				{
-					kind: "idle",
-				},
-				false,
-				"save-and-exit",
-			],
-			() => "Save and exit requested.",
-		)
-		.with(
-			[
-				false,
-				false,
-				undefined,
-				{
-					kind: "idle",
-				},
-				false,
-				"save",
-			],
-			() => "Saved.",
-		)
-		.with(P._, () => null)
-		.exhaustive();
+	const status = (() => {
+		if (saveAndExitPending) return "Saving and exiting Arkini…";
+		if (savePending) return "Saving…";
+		if (commandFailure !== undefined) {
+			const label = commandFailure.command === "save-and-exit" ? "Save and exit" : "Save";
+			return `${label} failed: ${errorMessage(commandFailure.error)}`;
+		}
+		if (navigationError !== undefined) {
+			return `Navigation failed: ${errorMessage(navigationError)}`;
+		}
+		if (menu.routePending) return "Opening action page…";
+		if (successfulCommand === "save-and-exit") return "Save and exit requested.";
+		if (successfulCommand === "save") return "Saved.";
+		return null;
+	})();
 
 	return {
 		status,

@@ -26,6 +26,7 @@ describe("line run schemas", () => {
 				lineId: plan.lineId,
 				show: true,
 				enable: true,
+				rules: [],
 				runtimeMs: plan.runtimeMs,
 				input: [
 					{

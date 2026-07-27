@@ -95,6 +95,14 @@ describe("Button primitives", () => {
 						"Pending button",
 					),
 					createElement(
+						PrimaryButton,
+						{
+							"aria-disabled": true,
+							cursorIntent: "wait",
+						},
+						"Waiting button",
+					),
+					createElement(
 						DangerButtonLink,
 						{
 							to: "/about",
@@ -151,6 +159,11 @@ describe("Button primitives", () => {
 			"button",
 			"Pending button",
 		);
+		const waitingButton = elementByText<HTMLButtonElement>(
+			container,
+			"button",
+			"Waiting button",
+		);
 		const dangerLink = elementByText<HTMLAnchorElement>(container, "a", "Danger link");
 		const dangerButton = elementByText<HTMLButtonElement>(container, "button", "Danger button");
 
@@ -165,6 +178,7 @@ describe("Button primitives", () => {
 		expect(disabledLink.className).toContain("cursor-not-allowed");
 		expect(primaryButton.className).toContain("cursor-pointer");
 		expect(pendingButton.className).toContain("cursor-progress");
+		expect(waitingButton.className).toContain("cursor-wait");
 		expect(primaryLink.className).toContain("bg-accent");
 		expect(primaryLink.className).toContain("aria-disabled:hover:bg-accent");
 		expect(pendingButton.className).toContain("disabled:hover:bg-accent");

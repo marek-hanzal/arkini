@@ -1,3 +1,4 @@
+import { Equal } from "effect";
 import { useCallback } from "react";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
@@ -29,11 +30,6 @@ export const useItemDetailTabs = (
 ): readonly useItemDetailTabs.Tab[] => {
 	const game = useGameEngine();
 	const { itemId, kind } = target;
-	const isEqual = useCallback(
-		(left: readonly useItemDetailTabs.Tab[], right: readonly useItemDetailTabs.Tab[]) =>
-			left.length === right.length && left.every((tab, index) => tab === right[index]),
-		[],
-	);
 	const selector = useCallback(
 		(runtime: RuntimeSchema.Type) =>
 			game.readOrThrow(
@@ -57,5 +53,5 @@ export const useItemDetailTabs = (
 			sources,
 		],
 	);
-	return useRuntimeSelector(game, selector, isEqual);
+	return useRuntimeSelector(game, selector, Equal.equals);
 };

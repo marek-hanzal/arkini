@@ -1,21 +1,8 @@
-import { Cause, Effect, Semaphore, SubscriptionRef } from "effect";
+import { Cause, Effect, Option, Semaphore, SubscriptionRef } from "effect";
 import type { ArkpackCatalog } from "~/bridge/arkpack/ArkpackCatalog";
 import { importArkpackFileFx } from "~/bridge/arkpack/importArkpackFileFx";
 import { listArkpacksFx } from "~/bridge/arkpack/listArkpacksFx";
-import { publishArkpackCatalogStateFx } from "~/bridge/arkpack/publishArkpackCatalogStateFx";
 import { removeArkpackFx } from "~/bridge/arkpack/removeArkpackFx";
-
-const publishArkpackCatalogFailureFx = (
-	state: SubscriptionRef.SubscriptionRef<ArkpackCatalog.State>,
-	cause: Cause.Cause<unknown>,
-) =>
-	publishArkpackCatalogStateFx({
-		state,
-		next: {
-			type: "failed",
-			error: Cause.squash(cause),
-		},
-	});
 
 /** Creates one shared catalog owner over authoritative Arkpack storage operations. */
 export const createArkpackCatalogFx = Effect.fn("createArkpackCatalogFx")(
@@ -41,85 +28,52 @@ export const createArkpackCatalogFx = Effect.fn("createArkpackCatalogFx")(
 							packageId,
 						})),
 			);
-
-			const refreshFx = lock.withPermits(1)(
-				Effect.gen(function* () {
-					yield* publishArkpackCatalogStateFx({
+			const publishStateFx = Effect.fn("ArkpackCatalog.publishStateFx")(
+				(next: ArkpackCatalog.State) =>
+					SubscriptionRef.modifySome(
 						state,
-						next: {
+						(current) =>
+							[
+								undefined,
+								current === next ||
+								(current.type === "loading" && next.type === "loading")
+									? Option.none()
+									: Option.some(next),
+							] as const,
+					),
+			);
+			const runCatalogOperationFx = <Result>(operationFx: Effect.Effect<Result, unknown>) =>
+				lock.withPermits(1)(
+					Effect.gen(function* () {
+						yield* publishStateFx({
 							type: "loading",
-						},
-					});
-					const arkpacks = yield* listFx;
-					yield* publishArkpackCatalogStateFx({
-						state,
-						next: {
+						});
+						const result = yield* operationFx;
+						const arkpacks = yield* listFx;
+						yield* publishStateFx({
 							type: "ready",
 							arkpacks,
-						},
-					});
-				}).pipe(
-					Effect.tapCause((cause) => publishArkpackCatalogFailureFx(state, cause)),
-					Effect.uninterruptible,
-				),
-			);
+						});
+						return result;
+					}).pipe(
+						Effect.tapCause((cause) =>
+							publishStateFx({
+								type: "failed",
+								error: Cause.squash(cause),
+							}),
+						),
+						Effect.uninterruptible,
+					),
+				);
 
 			return {
 				state,
-				refreshFx,
+				refreshFx: runCatalogOperationFx(Effect.void),
 				importFileFx: Effect.fn("ArkpackCatalog.importFileFx")((file: File) =>
-					lock.withPermits(1)(
-						Effect.gen(function* () {
-							yield* publishArkpackCatalogStateFx({
-								state,
-								next: {
-									type: "loading",
-								},
-							});
-							const imported = yield* importFileDependencyFx(file);
-							const arkpacks = yield* listFx;
-							yield* publishArkpackCatalogStateFx({
-								state,
-								next: {
-									type: "ready",
-									arkpacks,
-								},
-							});
-							return imported;
-						}).pipe(
-							Effect.tapCause((cause) =>
-								publishArkpackCatalogFailureFx(state, cause),
-							),
-							Effect.uninterruptible,
-						),
-					),
+					runCatalogOperationFx(importFileDependencyFx(file)),
 				),
 				removeFx: Effect.fn("ArkpackCatalog.removeFx")((packageId: string) =>
-					lock.withPermits(1)(
-						Effect.gen(function* () {
-							yield* publishArkpackCatalogStateFx({
-								state,
-								next: {
-									type: "loading",
-								},
-							});
-							const removed = yield* removeDependencyFx(packageId);
-							const arkpacks = yield* listFx;
-							yield* publishArkpackCatalogStateFx({
-								state,
-								next: {
-									type: "ready",
-									arkpacks,
-								},
-							});
-							return removed;
-						}).pipe(
-							Effect.tapCause((cause) =>
-								publishArkpackCatalogFailureFx(state, cause),
-							),
-							Effect.uninterruptible,
-						),
-					),
+					runCatalogOperationFx(removeDependencyFx(packageId)),
 				),
 			} satisfies ArkpackCatalog;
 		}),

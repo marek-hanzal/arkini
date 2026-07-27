@@ -24,7 +24,7 @@ import { finalizePixiTileMotionActorsFx } from "~/ui/pixi/motion/finalizePixiTil
 import { readPixiTileInteractionClaimsFx } from "~/ui/pixi/motion/readPixiTileInteractionClaimsFx";
 import { readPixiTileMotionAnimationKeysFx } from "~/ui/pixi/motion/readPixiTileMotionAnimationKeysFx";
 import { runPixiTileMotionCueFx } from "~/ui/pixi/motion/runPixiTileMotionCueFx";
-import { settlePixiTileMotionActorFx } from "~/ui/pixi/motion/settlePixiTileMotionActorFx";
+import { chasePixiTileMotionTargetFx } from "~/ui/pixi/motion/chasePixiTileMotionTargetFx";
 import { syncPixiTileMotionQuantitiesFx } from "~/ui/pixi/motion/syncPixiTileMotionQuantitiesFx";
 import type {
 	PixiTileMotionTargetRedirect,
@@ -89,7 +89,6 @@ export const createPixiTileMotionRuntimeFx = Effect.fn("createPixiTileMotionRunt
 	const startedCueKeys = new Set<string>();
 	const claimedHandoffs = new Map<string, TileSceneHandoff>();
 	const transientActorByCueKey = new Map<string, PixiTileActor>();
-	const activeMagneticSourceActorIds = new Set<string>();
 	const activeSwapLegActorIdsByCueKey = new Map<string, Set<string>>();
 	const detachedSwapLegByActorId = new Map<string, PixiDetachedSwapLeg>();
 	const targetRedirectByActorId = new Map<string, PixiTileMotionTargetRedirect>();
@@ -212,7 +211,6 @@ export const createPixiTileMotionRuntimeFx = Effect.fn("createPixiTileMotionRunt
 	};
 
 	const releaseMagneticSource = (actorId: string) => {
-		if (!activeMagneticSourceActorIds.delete(actorId)) return;
 		RendererRuntime.runSync(
 			magneticField.releaseFx({
 				sourceActorId: actorId,
@@ -370,12 +368,6 @@ export const createPixiTileMotionRuntimeFx = Effect.fn("createPixiTileMotionRunt
 				cueKey,
 				magneticField,
 				onComplete: () => completeCue(cue),
-				onMagneticSourceAcquired: (actorId) => {
-					activeMagneticSourceActorIds.add(actorId);
-				},
-				onMagneticSourceReleased: (actorId) => {
-					activeMagneticSourceActorIds.delete(actorId);
-				},
 				onSwapLegSettled: (actorId) => {
 					settleSwapLeg(cueKey, actorId);
 				},
@@ -412,7 +404,7 @@ export const createPixiTileMotionRuntimeFx = Effect.fn("createPixiTileMotionRunt
 			if (actor === undefined || canonical === undefined || actor.container.destroyed) return;
 			const target = yield* surface.readActorPoseFx(canonical);
 			if (target === null) return;
-			yield* settlePixiTileMotionActorFx({
+			yield* chasePixiTileMotionTargetFx({
 				actor,
 				animator,
 				fallbackTarget: target,
@@ -725,17 +717,12 @@ export const createPixiTileMotionRuntimeFx = Effect.fn("createPixiTileMotionRunt
 				yield* animator.cancelActorFx(transientActor);
 				yield* destroyPixiTileActorFx(transientActor);
 			}
-			for (const actorId of [
-				...activeMagneticSourceActorIds,
-			]) {
-				releaseMagneticSource(actorId);
-			}
+			yield* magneticField.releaseSourcesFx("motion");
 			motionLanes = emptyMotionLanes;
 			knownCueKeys.clear();
 			startedCueKeys.clear();
 			claimedHandoffs.clear();
 			transientActorByCueKey.clear();
-			activeMagneticSourceActorIds.clear();
 			activeSwapLegActorIdsByCueKey.clear();
 			detachedSwapLegByActorId.clear();
 			targetRedirectByActorId.clear();

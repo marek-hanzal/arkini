@@ -45,7 +45,7 @@ const SourceRow = ({
 		>
 			<button
 				type="button"
-				className="group flex w-full min-w-0 cursor-pointer items-center justify-between gap-4 rounded-lg text-left outline-none transition-colors hover:text-accent focus-visible:ring-2 focus-visible:ring-accent/60 disabled:cursor-not-allowed disabled:opacity-50"
+				className="group flex w-full min-w-0 cursor-pointer items-center justify-between gap-4 rounded-lg text-left outline-none transition-colors hover:text-accent disabled:cursor-not-allowed disabled:opacity-50"
 				disabled={disabled}
 				data-ui="ItemSourceDetailLink"
 				onClick={() => {

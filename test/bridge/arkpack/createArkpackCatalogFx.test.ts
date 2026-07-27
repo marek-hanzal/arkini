@@ -1,4 +1,4 @@
-import { Cause, Deferred, Effect, Exit, Stream, SubscriptionRef } from "effect";
+import { Cause, Deferred, Effect, Exit, Fiber, Stream, SubscriptionRef } from "effect";
 import { describe, expect, it, vi } from "vitest";
 import type { ArkpackDescriptor } from "~/bridge/arkpack/Arkpack";
 import { createArkpackCatalogFx } from "~/bridge/arkpack/createArkpackCatalogFx";
@@ -227,6 +227,52 @@ describe("createArkpackCatalogFx", () => {
 			type: "ready",
 			arkpacks: [
 				builtIn,
+			],
+		});
+	});
+
+	it("settles an admitted operation before honoring caller interruption", async () => {
+		let descriptors: ReadonlyArray<ArkpackDescriptor> = [
+			builtIn,
+		];
+		const importStarted = Effect.runSync(Deferred.make<void>());
+		const finishImport = Effect.runSync(Deferred.make<void>());
+		const catalog = Effect.runSync(
+			createArkpackCatalogFx({
+				listFx: Effect.sync(() => descriptors),
+				importFileFx: () =>
+					Deferred.succeed(importStarted, undefined).pipe(
+						Effect.andThen(Deferred.await(finishImport)),
+						Effect.tap(() =>
+							Effect.sync(() => {
+								descriptors = [
+									builtIn,
+									imported,
+								];
+							}),
+						),
+						Effect.as(imported),
+					),
+			}),
+		);
+
+		const importing = Effect.runFork(catalog.importFileFx({} as File));
+		await Effect.runPromise(Deferred.await(importStarted));
+		const interrupted = Effect.runPromise(Fiber.interrupt(importing));
+		await Promise.resolve();
+		expect(Effect.runSync(SubscriptionRef.get(catalog.state))).toEqual({
+			type: "loading",
+		});
+
+		Effect.runSync(Deferred.succeed(finishImport, undefined));
+		await interrupted;
+		const exit = await Effect.runPromise(Fiber.await(importing));
+		expect(Exit.isFailure(exit) && Cause.hasInterruptsOnly(exit.cause)).toBe(true);
+		expect(Effect.runSync(SubscriptionRef.get(catalog.state))).toEqual({
+			type: "ready",
+			arkpacks: [
+				builtIn,
+				imported,
 			],
 		});
 	});

@@ -25,6 +25,7 @@ export interface PixiTileMagneticField {
 		readonly sourceActorId: string;
 		readonly sourceKind: PixiTileMagneticSourceKind;
 	}) => Effect.Effect<void>;
+	readonly releaseSourcesFx: (sourceKind: PixiTileMagneticSourceKind) => Effect.Effect<void>;
 	readonly resetFx: Effect.Effect<void>;
 	readonly updateFx: (sample: PixiTileMagneticFieldSample) => Effect.Effect<void>;
 	readonly closeFx: Effect.Effect<void>;

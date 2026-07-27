@@ -61,7 +61,7 @@ const swapResult = {
 } satisfies runTileDropAtom.Result;
 
 describe("Pixi main-scene drop presentation", () => {
-	it("ignores a stale completion without clearing a newer pending generation", () => {
+	it("retains independent pending generations when either completes", () => {
 		const presentation = Effect.runSync(createPixiMainSceneDropPresentationFx());
 		const first = Effect.runSync(
 			presentation.beginFx({
@@ -89,7 +89,11 @@ describe("Pixi main-scene drop presentation", () => {
 				"runtime:second",
 			]),
 		);
-		expect(snapshot.swap?.generation).toBe(second);
+		expect(snapshot.swaps).toEqual([
+			expect.objectContaining({
+				generation: second,
+			}),
+		]);
 	});
 
 	it("clears a captured swap on an accepted non-swap terminal result", () => {
@@ -109,7 +113,7 @@ describe("Pixi main-scene drop presentation", () => {
 		);
 
 		expect(Effect.runSync(presentation.readSnapshotFx)).toMatchObject({
-			swap: null,
+			swaps: [],
 		});
 	});
 
@@ -129,10 +133,12 @@ describe("Pixi main-scene drop presentation", () => {
 		);
 
 		Effect.runSync(presentation.clearSwapFx(generation - 1));
-		expect(Effect.runSync(presentation.readSnapshotFx).swap?.candidate).toEqual(swapCandidate);
+		expect(Effect.runSync(presentation.readSnapshotFx).swaps[0]?.candidate).toEqual(
+			swapCandidate,
+		);
 
 		Effect.runSync(presentation.clearSwapFx(generation));
-		expect(Effect.runSync(presentation.readSnapshotFx).swap).toBeNull();
+		expect(Effect.runSync(presentation.readSnapshotFx).swaps).toEqual([]);
 	});
 
 	it("retains exact Inventory-consumption feedback through canonical reconciliation", () => {
@@ -172,21 +178,23 @@ describe("Pixi main-scene drop presentation", () => {
 				swapCandidate.source.id,
 			]),
 		);
-		expect(snapshot.feedback).toEqual({
-			cues: [
-				{
-					actorId: swapCandidate.source.id,
-					key: `drop:${generation}:consume-source`,
-					kind: "consume-source",
-				},
-				{
-					actorId: "runtime:inventory",
-					key: `drop:${generation}:consume`,
-					kind: "consume",
-				},
-			],
-			generation,
-		});
+		expect(snapshot.feedback).toEqual([
+			{
+				cues: [
+					{
+						actorId: swapCandidate.source.id,
+						key: `drop:${generation}:consume-source`,
+						kind: "consume-source",
+					},
+					{
+						actorId: "runtime:inventory",
+						key: `drop:${generation}:consume`,
+						kind: "consume",
+					},
+				],
+				generation,
+			},
+		]);
 
 		Effect.runSync(presentation.clearFeedbackFx(generation));
 		Effect.runSync(
@@ -196,7 +204,7 @@ describe("Pixi main-scene drop presentation", () => {
 			}),
 		);
 		expect(Effect.runSync(presentation.readSnapshotFx)).toMatchObject({
-			feedback: null,
+			feedback: [],
 			hiddenActorIds: new Set(),
 		});
 	});

@@ -752,12 +752,110 @@ describe("Pixi main-scene drag controller", () => {
 		await flushMicrotasks();
 
 		expect(mounted.onAcceptedDrop).toHaveBeenCalledOnce();
-		expect(Effect.runSync(mounted.dropPresentation.readSnapshotFx).feedback).toBeNull();
+		expect(Effect.runSync(mounted.dropPresentation.readSnapshotFx).feedback).toEqual([]);
 		expect(
 			mounted.animations.some(
 				(animation) => animation.channel === "lifecycle-opacity" && animation.toAlpha === 1,
 			),
 		).toBe(false);
+	});
+
+	it("releases the board gesture while an Inventory drop is still pending", async () => {
+		const inventory = createItem("runtime:inventory", 1);
+		const secondItem = createItem("runtime:second-log", 2);
+		const mounted = mountController({
+			targetItems: [
+				inventory,
+			],
+		});
+		previewState.actorKinds.set(inventory.id, "store-inventory");
+		mounted.setOccupant(inventory);
+		mounted.setCommandTarget({
+			kind: "slot",
+			location: inventory.location,
+			occupant: {
+				itemId: inventory.id,
+				revision: inventory.revision,
+			},
+		});
+		mounted.onDrop.mockReturnValueOnce(new Promise(() => undefined));
+
+		mounted.actorEvents.emit("pointerdown", pointer(10, 20));
+		mounted.stage.emit("globalpointermove", pointer(30, 20));
+		mounted.stage.emit("pointerup", pointer(30, 20));
+		await flushMicrotasks();
+
+		const pendingSourcePointer = pointer(10, 20);
+		mounted.actorEvents.emit("pointerdown", pendingSourcePointer);
+		expect(pendingSourcePointer.stopPropagation).not.toHaveBeenCalled();
+
+		const secondEvents = new FakeEmitter();
+		const secondContainer = Object.assign(secondEvents, {
+			cursor: "grab",
+			destroyed: false,
+			pivot: {
+				x: 0,
+				y: 0,
+			},
+			position: {
+				set(x: number, y: number) {
+					secondContainer.x = x;
+					secondContainer.y = y;
+				},
+			},
+			scale: {
+				set(value: number) {
+					this.x = value;
+					this.y = value;
+				},
+				x: 1,
+				y: 1,
+			},
+			x: 170,
+			y: 20,
+			zIndex: 0,
+		});
+		const secondActor = {
+			container: secondContainer,
+			dragging: false,
+			feedbackGlowPhase: null,
+			instanceId: `test:${secondItem.id}`,
+			item: secondItem,
+			lifecycleFadeStarted: false,
+			lifecycleIntentGeneration: 0,
+			lifecycleTargetAlpha: 1,
+			onPointerDown: null,
+			runningGlow: createRunningGlow(),
+			size: 80,
+			workingGlowTint: 0xf05bb8,
+		} as unknown as PixiTileActor;
+		mounted.actors.set(secondItem.id, secondActor);
+		mounted.canonicalItems.set(secondItem.id, secondItem);
+		Effect.runSync(mounted.controller.attachActorFx(secondActor));
+
+		const secondPointer = {
+			...pointer(170, 20),
+			pointerId: 2,
+		};
+		secondEvents.emit("pointerdown", secondPointer);
+		expect(secondPointer.stopPropagation).toHaveBeenCalledOnce();
+		mounted.stage.emit("globalpointermove", {
+			...pointer(190, 20),
+			pointerId: 2,
+		});
+		expect(secondActor.dragging).toBe(true);
+		mounted.stage.emit("pointerup", {
+			...pointer(190, 20),
+			pointerId: 2,
+		});
+		await flushMicrotasks();
+
+		expect(mounted.onDrop).toHaveBeenCalledTimes(2);
+		expect(Effect.runSync(mounted.dropPresentation.readSnapshotFx).pendingActorIds).toEqual(
+			new Set([
+				item.id,
+			]),
+		);
 	});
 
 	it("restores only the surviving optimistic Inventory actor after a rejected drop", async () => {

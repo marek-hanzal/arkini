@@ -717,7 +717,7 @@ describe("Pixi main-scene reconciliation", () => {
 				toRunningGlowAlpha: 0.82,
 			}),
 		);
-		expect(Effect.runSync(harness.dropPresentation.readSnapshotFx).feedback).toBeNull();
+		expect(Effect.runSync(harness.dropPresentation.readSnapshotFx).feedback).toEqual([]);
 
 		const exit = harness.animations.find(
 			(animation) =>

@@ -304,22 +304,24 @@ export const createPixiMainSceneReconcilerFx = Effect.fn("createPixiMainSceneRec
 										...inputMotionFeedbackPrefixes,
 									].some((prefix) => cue.key.startsWith(prefix)),
 							),
-							...(dropSnapshot.feedback?.cues ?? []).filter(
-								(cue) => !inputMotionActorIds.has(cue.actorId),
+							...dropSnapshot.feedback.flatMap(({ cues }) =>
+								cues.filter((cue) => !inputMotionActorIds.has(cue.actorId)),
 							),
 						]
 					: [];
 				const replacementActorIds = new Set(replacements.map(({ actorId }) => actorId));
-				if (presentCommittedEffects && dropSnapshot.swap !== null) {
-					const swapCue = RendererRuntime.runSync(
-						readCommittedTileSwapMotionCueFx({
-							...dropSnapshot.swap.candidate,
-							transition,
-						}),
-					);
-					if (swapCue !== null) {
-						compiledCues.push(swapCue);
-						yield* dropPresentation.clearSwapFx(dropSnapshot.swap.generation);
+				if (presentCommittedEffects) {
+					for (const swap of dropSnapshot.swaps) {
+						const swapCue = RendererRuntime.runSync(
+							readCommittedTileSwapMotionCueFx({
+								...swap.candidate,
+								transition,
+							}),
+						);
+						if (swapCue !== null) {
+							compiledCues.push(swapCue);
+							yield* dropPresentation.clearSwapFx(swap.generation);
+						}
 					}
 				}
 				if (presentCommittedEffects) {
@@ -555,8 +557,8 @@ export const createPixiMainSceneReconcilerFx = Effect.fn("createPixiMainSceneRec
 					textures,
 				});
 				yield* runFeedbackCuesFx(feedbackCues);
-				if (dropSnapshot.feedback !== null) {
-					yield* dropPresentation.clearFeedbackFx(dropSnapshot.feedback.generation);
+				for (const feedback of dropSnapshot.feedback) {
+					yield* dropPresentation.clearFeedbackFx(feedback.generation);
 				}
 				yield* dropPresentation.reconcileActorIdsFx({
 					inventoryActorIds,

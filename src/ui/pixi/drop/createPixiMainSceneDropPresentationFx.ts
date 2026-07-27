@@ -89,24 +89,25 @@ const readFeedbackCues = (
 /**
  * Owns generation-safe presentation facts between pointer release and canonical reconciliation.
  *
- * These facts may retain or hide a display actor and preserve an exact swap candidate, but never
- * become gameplay truth. Generations make stale Promise completion unable to clear newer work.
+ * These facts may retain or hide display actors and preserve exact swap candidates, but never
+ * become gameplay truth. Independent generations let concurrent submissions reconcile without
+ * one Promise completion clearing another drop's presentation work.
  */
 export const createPixiMainSceneDropPresentationFx = Effect.fn(
 	"createPixiMainSceneDropPresentationFx",
 )(() =>
 	Effect.sync((): PixiMainSceneDropPresentation => {
-		let feedback: PendingFeedback | null = null;
+		const feedback = new Map<number, PendingFeedback>();
 		const hiddenActorIds = new Set<string>();
 		let closed = false;
 		let nextGeneration = 0;
-		let pending: PendingDrop | null = null;
-		let swap: PendingSwap | null = null;
+		const pending = new Map<number, PendingDrop>();
+		const swaps = new Map<number, PendingSwap>();
 
 		const clearGeneration = (generation: number) => {
-			if (pending?.generation === generation) pending = null;
-			if (swap?.generation === generation) swap = null;
-			if (feedback?.generation === generation) feedback = null;
+			pending.delete(generation);
+			swaps.delete(generation);
+			feedback.delete(generation);
 		};
 
 		return {
@@ -120,49 +121,46 @@ export const createPixiMainSceneDropPresentationFx = Effect.fn(
 						}
 						nextGeneration += 1;
 						const generation = nextGeneration;
-						pending = {
+						pending.set(generation, {
 							generation,
 							sourceActorId,
-						};
-						swap =
-							swapCandidate === null
-								? null
-								: {
-										candidate: swapCandidate,
-										generation,
-									};
+						});
+						if (swapCandidate !== null) {
+							swaps.set(generation, {
+								candidate: swapCandidate,
+								generation,
+							});
+						}
 						return generation;
 					}),
 			),
 			clearSwapFx: Effect.fn("PixiMainSceneDropPresentation.clearSwapFx")((generation) =>
 				Effect.sync(() => {
-					if (swap?.generation === generation) swap = null;
+					swaps.delete(generation);
 				}),
 			),
 			clearFeedbackFx: Effect.fn("PixiMainSceneDropPresentation.clearFeedbackFx")(
 				(generation) =>
 					Effect.sync(() => {
-						if (feedback?.generation === generation) feedback = null;
+						feedback.delete(generation);
 					}),
 			),
 			completeFx: Effect.fn("PixiMainSceneDropPresentation.completeFx")(
 				({ generation, result }) =>
 					Effect.sync(() => {
-						if (closed || pending?.generation !== generation) return;
-						pending = null;
+						if (closed || !pending.delete(generation)) return;
 						const cues = readFeedbackCues(generation, result);
-						feedback =
-							cues.length === 0
-								? null
-								: {
-										cues,
-										generation,
-									};
+						if (cues.length > 0) {
+							feedback.set(generation, {
+								cues,
+								generation,
+							});
+						}
 						if (result.kind === DropItemResultKindEnumSchema.enum.StoreInventory) {
 							hiddenActorIds.add(result.source.itemId);
 						}
 						if (result.kind !== DropItemResultKindEnumSchema.enum.Swap) {
-							if (swap?.generation === generation) swap = null;
+							swaps.delete(generation);
 						}
 					}),
 			),
@@ -174,27 +172,12 @@ export const createPixiMainSceneDropPresentationFx = Effect.fn(
 			),
 			readSnapshotFx: Effect.sync(
 				(): PixiMainSceneDropPresentationSnapshot => ({
-					feedback:
-						feedback === null
-							? null
-							: {
-									cues: feedback.cues,
-									generation: feedback.generation,
-								},
+					feedback: Array.from(feedback.values()),
 					hiddenActorIds: new Set(hiddenActorIds),
-					pendingActorIds:
-						pending === null
-							? new Set()
-							: new Set([
-									pending.sourceActorId,
-								]),
-					swap:
-						swap === null
-							? null
-							: {
-									candidate: swap.candidate,
-									generation: swap.generation,
-								},
+					pendingActorIds: new Set(
+						Array.from(pending.values(), ({ sourceActorId }) => sourceActorId),
+					),
+					swaps: Array.from(swaps.values()),
 				}),
 			),
 			reconcileActorIdsFx: Effect.fn("PixiMainSceneDropPresentation.reconcileActorIdsFx")(
@@ -211,10 +194,10 @@ export const createPixiMainSceneDropPresentationFx = Effect.fn(
 			closeFx: Effect.sync(() => {
 				if (closed) return;
 				closed = true;
-				feedback = null;
 				hiddenActorIds.clear();
-				pending = null;
-				swap = null;
+				pending.clear();
+				swaps.clear();
+				feedback.clear();
 			}),
 		};
 	}),

@@ -58,14 +58,15 @@ export namespace createPixiMainSceneDragControllerFx {
 const dragThreshold = 6;
 
 /**
- * Owns one main-scene pointer gesture from press through activation, drag, or submission.
+ * Owns one main-scene pointer gesture from press through activation or drop release.
  *
  * Press-time source identity is immutable, while target occupancy and preview are refreshed at
  * release because canonical state may change under a held pointer. Geometry drives presentation
- * only; the bridge preview and command remain the authority for every drop outcome. A click never
- * waits for presentation ownership. Crossing the drag threshold either explicitly hands an
- * interruptible live pose to the gesture or cancels a presentation-retained, non-draggable source
- * without reinterpreting it as a click.
+ * only; the bridge preview and command remain the authority for every drop outcome. A submitted
+ * drop retains only its exact source actor and immediately releases the scene-wide gesture slot.
+ * A click never waits for presentation ownership. Crossing the drag threshold either explicitly
+ * hands an interruptible live pose to the gesture or cancels a presentation-retained,
+ * non-draggable source without reinterpreting it as a click.
  */
 export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainSceneDragControllerFx")(
 	function* ({
@@ -86,6 +87,7 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 		let activeDrag: PixiMainSceneActiveDrag | null = null;
 		let closed = false;
 		let interactionBlocked = false;
+		const pendingDropGenerations = new Set<number>();
 
 		const refreshEligibleAttractionActorIds = (drag: PixiMainSceneActiveDrag) => {
 			try {
@@ -438,14 +440,21 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 					}),
 				);
 			}
+			pendingDropGenerations.add(drop.generation);
+			activeDrag = null;
 			void Promise.resolve()
 				.then(() => {
 					if (closed) return null;
 					return onDrop(drop.command);
 				})
 				.then((result) => {
-					if (result === null || closed || activeDrag !== drag) return;
-					activeDrag = null;
+					if (
+						result === null ||
+						closed ||
+						!pendingDropGenerations.delete(drop.generation)
+					) {
+						return;
+					}
 					try {
 						RendererRuntime.runSync(
 							dropPresentation.completeFx({
@@ -503,10 +512,9 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 					}
 				})
 				.catch((cause) => {
-					if (closed || activeDrag !== drag) return;
+					if (closed || !pendingDropGenerations.delete(drop.generation)) return;
 					console.error("Pixi tile drop failed.", cause);
 					RendererRuntime.runSync(dropPresentation.failFx(drop.generation));
-					activeDrag = null;
 					const retainedSource =
 						actorStore.actors.get(drag.sourceItem.id) === drag.actor
 							? drag.actor
@@ -556,6 +564,9 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 					}
 					const onPointerDown = (event: FederatedPointerEvent) => {
 						const motionSnapshot = RendererRuntime.runSync(motion.readSnapshotFx);
+						const dropSnapshot = RendererRuntime.runSync(
+							dropPresentation.readSnapshotFx,
+						);
 						const motionClaim = motionSnapshot.interactionClaimByActorId.get(
 							actor.item.id,
 						);
@@ -570,6 +581,7 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 							closed ||
 							interactionBlocked ||
 							activeDrag !== null ||
+							dropSnapshot.pendingActorIds.has(actor.item.id) ||
 							!event.isPrimary ||
 							event.button !== 0
 						) {
@@ -645,6 +657,7 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 				if (closed) return;
 				closed = true;
 				cancelInteraction();
+				pendingDropGenerations.clear();
 				application.stage.off("globalpointermove", onPointerMove);
 				application.stage.off("pointerup", finishPointer);
 				application.stage.off("pointerupoutside", finishPointer);

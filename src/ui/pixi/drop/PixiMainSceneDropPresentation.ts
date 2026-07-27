@@ -18,16 +18,16 @@ export interface PixiSceneSwapCandidate {
 }
 
 export interface PixiMainSceneDropPresentationSnapshot {
-	readonly feedback: {
+	readonly feedback: ReadonlyArray<{
 		readonly cues: ReadonlyArray<TileActorFeedbackCue>;
 		readonly generation: number;
-	} | null;
+	}>;
 	readonly hiddenActorIds: ReadonlySet<string>;
 	readonly pendingActorIds: ReadonlySet<string>;
-	readonly swap: {
+	readonly swaps: ReadonlyArray<{
 		readonly candidate: PixiSceneSwapCandidate;
 		readonly generation: number;
-	} | null;
+	}>;
 }
 
 export interface PixiMainSceneDropPresentation {

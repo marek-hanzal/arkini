@@ -412,11 +412,13 @@ export const createPixiInventoryDragControllerFx = Effect.fn("createPixiInventor
 				sourceRevision: drag.sourceItem.revision,
 				target: readCommandTarget(target),
 			} satisfies runTileDropAtom.Command;
-			void Promise.resolve()
-				.then(() => {
-					if (closed) return null;
-					return onDrop(command);
-				})
+			let submittedDrop: PromiseLike<runTileDropAtom.Result | null>;
+			try {
+				submittedDrop = closed ? Promise.resolve(null) : onDrop(command);
+			} catch (cause) {
+				submittedDrop = Promise.reject(cause);
+			}
+			void Promise.resolve(submittedDrop)
 				.then((result) => {
 					if (result === null || closed || activeDrag !== drag) return;
 					activeDrag = null;

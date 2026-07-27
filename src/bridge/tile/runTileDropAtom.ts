@@ -15,7 +15,8 @@ export namespace runTileDropAtom {
  * The exact engine command/result crosses this seam; the renderer does not
  * choose move, swap or rejection semantics. Concurrent mode prevents one
  * admitted engine command from being interrupted by a later gesture; the
- * scheduling yield only stabilizes AsyncResult publication.
+ * scheduling yield stabilizes AsyncResult publication after synchronous
+ * pointer-release admission.
  */
 export const runTileDropAtom = RendererRuntime.runSync(
 	makeExactGameAtomFamilyFx((game) =>

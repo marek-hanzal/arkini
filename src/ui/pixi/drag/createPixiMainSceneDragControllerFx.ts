@@ -442,11 +442,13 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 			}
 			pendingDropGenerations.add(drop.generation);
 			activeDrag = null;
-			void Promise.resolve()
-				.then(() => {
-					if (closed) return null;
-					return onDrop(drop.command);
-				})
+			let submittedDrop: PromiseLike<runTileDropAtom.Result | null>;
+			try {
+				submittedDrop = closed ? Promise.resolve(null) : onDrop(drop.command);
+			} catch (cause) {
+				submittedDrop = Promise.reject(cause);
+			}
+			void Promise.resolve(submittedDrop)
 				.then((result) => {
 					if (
 						result === null ||

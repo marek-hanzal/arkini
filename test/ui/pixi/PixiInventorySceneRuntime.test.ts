@@ -884,6 +884,7 @@ describe("Pixi Inventory scene runtime", () => {
 		(actor.container as unknown as FakeContainer).emit("pointerdown", slotPointer(0));
 		stage.emit("globalpointermove", slotPointer(1));
 		stage.emit("pointerup", slotPointer(1));
+		expect(sceneState.drop).toHaveBeenCalledOnce();
 		await Promise.resolve();
 		await Promise.resolve();
 
@@ -924,7 +925,7 @@ describe("Pixi Inventory scene runtime", () => {
 		);
 		expect(runtime.canvas.setPointerCapture).toHaveBeenCalledWith(1);
 		expect(runtime.canvas.releasePointerCapture).toHaveBeenCalledWith(1);
-		expect(actor.container.x).not.toBe(initialX);
+		expect(actor.container.x).toBe(initialX);
 		await Effect.runPromise(runtime.closeFx);
 	});
 
@@ -1153,7 +1154,7 @@ describe("Pixi Inventory scene runtime", () => {
 		await Effect.runPromise(runtime.closeFx);
 	});
 
-	it("does not invoke deferred activation or drop callbacks after the scene closes", async () => {
+	it("suppresses deferred activation but admits a released drop before close", async () => {
 		const { actor, onActivate, runtime, stage } = await mountScene();
 		const actorContainer = actor.container as unknown as FakeContainer;
 
@@ -1164,13 +1165,15 @@ describe("Pixi Inventory scene runtime", () => {
 		expect(onActivate).not.toHaveBeenCalled();
 
 		const second = await mountScene();
-		const secondActorContainer = second.actor.container as unknown as FakeContainer;
+		const latestActor = sceneState.actors.at(-1);
+		if (latestActor === undefined) throw new Error("Second Inventory actor is missing.");
+		const secondActorContainer = latestActor.container as unknown as FakeContainer;
 		secondActorContainer.emit("pointerdown", slotPointer(0));
 		second.stage.emit("globalpointermove", slotPointer(1));
 		second.stage.emit("pointerup", slotPointer(1));
 		Effect.runSync(second.runtime.closeFx);
 		await flushMicrotasks();
-		expect(second.onDrop).not.toHaveBeenCalled();
+		expect(second.onDrop).toHaveBeenCalledOnce();
 	});
 
 	it("closes normally exactly once", async () => {

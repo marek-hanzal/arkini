@@ -656,7 +656,7 @@ describe("Pixi main-scene drag controller", () => {
 		resolveFirstActivation?.();
 	});
 
-	it("exposes an exact pending command actor until the drop resolves", () => {
+	it("submits on pointer release and retains the exact pending actor until resolution", () => {
 		const mounted = mountController();
 		mounted.onDrop.mockReturnValueOnce(new Promise(() => undefined));
 
@@ -664,6 +664,7 @@ describe("Pixi main-scene drag controller", () => {
 		mounted.stage.emit("globalpointermove", pointer(30, 20));
 		mounted.stage.emit("pointerup", pointer(30, 20));
 
+		expect(mounted.onDrop).toHaveBeenCalledOnce();
 		expect(Effect.runSync(mounted.dropPresentation.readSnapshotFx).pendingActorIds).toEqual(
 			new Set([
 				item.id,
@@ -1120,7 +1121,7 @@ describe("Pixi main-scene drag controller", () => {
 		).toBe(false);
 	});
 
-	it("freezes the command target at release and suppresses callbacks after close", async () => {
+	it("freezes the command target and admits it before a later close", async () => {
 		const first = mountController();
 		const releaseTarget = {
 			kind: "unsupported" as const,
@@ -1149,7 +1150,8 @@ describe("Pixi main-scene drag controller", () => {
 		second.stage.emit("pointerup", pointer(30, 20));
 		Effect.runSync(second.controller.closeFx);
 		await flushMicrotasks();
-		expect(second.onDrop).not.toHaveBeenCalled();
+		expect(second.onDrop).toHaveBeenCalledOnce();
+		expect(second.onAcceptedDrop).not.toHaveBeenCalled();
 	});
 
 	it("refreshes held feedback and settles a rejected release from its exact pose", async () => {

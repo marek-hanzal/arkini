@@ -1,8 +1,10 @@
 import { Effect } from "effect";
+import { Rectangle } from "pixi.js";
 import { match } from "ts-pattern";
 
 import type { TileActorItem } from "~/bridge/tile/TileActorItem";
 import type { PixiScenePalette } from "~/ui/pixi/appearance/PixiScenePalette";
+import { readPixiParticleBlendMode } from "~/ui/pixi/appearance/readPixiParticleBlendMode";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
 import { readPixiTileActorCursorFx } from "~/ui/pixi/actor/readPixiTileActorCursorFx";
 import {
@@ -142,13 +144,26 @@ export const updatePixiTileActorFx = Effect.fn("updatePixiTileActorFx")(function
 
 	const inset = (size * (1 - tileToSlotRatio)) / 2;
 	const faceSize = Math.max(1, size - inset * 2);
-	const runningGlowSize = faceSize * 1.6;
-	actor.runningGlow.x = inset + faceSize / 2;
-	actor.runningGlow.y = inset + faceSize / 2;
-	actor.runningGlow.width = runningGlowSize;
-	actor.runningGlow.height = runningGlowSize;
-	actor.workingGlowTint = palette.accent;
-	if (actor.feedbackGlowPhase === null) actor.runningGlow.tint = actor.workingGlowTint;
+	const activityParticles = actor.activityParticles;
+	activityParticles.centerX = inset + faceSize / 2;
+	activityParticles.startY = inset + faceSize * 0.92;
+	activityParticles.topY = inset - faceSize * 0.35;
+	activityParticles.topHalfWidth = faceSize * 0.46;
+	activityParticles.workingTint = palette.accent;
+	activityParticles.container.blendMode = readPixiParticleBlendMode(palette);
+	activityParticles.container.boundsArea = new Rectangle(
+		inset - faceSize * 0.16,
+		activityParticles.topY - faceSize * 0.14,
+		faceSize * 1.32,
+		activityParticles.startY - activityParticles.topY + faceSize * 0.28,
+	);
+	for (const [index, { particle }] of activityParticles.particles.entries()) {
+		const particleSize = faceSize * (index % 4 === 0 ? 0.18 : 0.14);
+		particle.scaleX = particleSize / Math.max(1, particle.texture.width);
+		particle.scaleY =
+			(particleSize * (index % 4 === 0 ? 1.4 : 1)) / Math.max(1, particle.texture.height);
+	}
+	activityParticles.container.update();
 
 	for (const visual of actor.visuals) {
 		yield* updatePixiTileActorVisualFx({

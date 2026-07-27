@@ -18,8 +18,8 @@ all scene-local owners.
 | `scene/*Surface*` | Layout, layers, hit geometry, masks, palette, and drop-feedback paint |
 | `actor/*ActorStore*` | Retained display-object identity for one canvas |
 | `actor/transitionPixiTileActorVisualFx.ts` | One double-buffer lifecycle for complete tile-face revisions |
-| `actor/*RunningGlowTexture*` | One procedural radial-gradient texture shared under active tiles |
-| `animation/createPixiActorAnimatorFx.ts` | Sole writer for root pose and typed opacity channels |
+| `actor/*ParticleTextures*` | One procedural mote/spark atlas shared by actor particle containers |
+| `animation/createPixiActorAnimatorFx.ts` | Sole writer for root pose and typed presentation channels |
 | `scene/createPixiMainSceneReconcilerFx.ts` | Canonical actor reconciliation and presentation entry/exit |
 | `motion/createPixiTileMotionRuntimeFx.ts` | Ordered cue lanes, animation claims, transient payloads, and cue settlement |
 | `drag/*DragController*` | One pointer gesture and its frozen source/release facts |
@@ -80,10 +80,16 @@ gameplay outcome. Missing visual identities or handoffs degrade to ordinary reco
   second animation loop may run.
 - Gameplay feedback animations are intentional product behavior and must not branch on
   `prefers-reduced-motion`; tune their motion directly instead of silently disabling or replacing it.
+- Every tile owns one fixed twelve-particle `ParticleContainer` below its face. Main and Inventory
+  scenes share one private procedural mote/spark atlas each; playback only mutates the retained pool,
+  widens from one bottom-center apex into an inverted-fire plume, rises no more than half a tile above
+  the face, and uses one linear repeated tween in the existing Motion-driven demand renderer. Resolved
+  scene luminance selects additive compositing on dark surfaces and normal chromatic compositing on
+  light surfaces; appearance refresh updates every retained actor without restarting playback.
 - Teardown stops subscriptions and interactions before destroying actors, layers, or the
   application they reference.
 - Actor presentation is keyed by physical actor instance and typed channel. `pose`, `grab-offset`,
-  `lifecycle-opacity`, `crowd-opacity`, `glow-opacity`, and `visual-mix` each have exactly one
+  `lifecycle-opacity`, `crowd-opacity`, `activity-particles`, and `visual-mix` each have exactly one
   writer; caller ownership keys may cancel work, but may never create a second writer for the same
   channel.
 - The animator is the only production writer of root `x`, `y`, `scale`, `pivot`, and `alpha`. Layout
@@ -103,13 +109,13 @@ gameplay outcome. Missing visual identities or handoffs degrade to ordinary reco
   Settlement releases the magnetic source. Producer input moves the complete stack to its owner,
   consumes it at contact, and physically returns any remainder before publishing its quantity.
 - Accepted consumption presents exact result/event facts: the surviving source dips, a removed
-  source fades, and the receiver flashes the shared accent glow. Drop-result facts cover manual
+  source fades, and the receiver emits the shared accent particle burst. Drop-result facts cover manual
   stack, producer-input, and Inventory storage commands that do not emit equivalent engine events.
-- Every admitted main-scene tile click immediately flashes one optimistic semantic-success ACK
-  glow before any asynchronous command work. ACK confirms that presentation heard the click; it
+- Every admitted main-scene tile click immediately emits one optimistic semantic-success particle
+  burst before any asynchronous command work. ACK confirms that presentation heard the click; it
   does not claim that the engine will accept the resulting action. If the owner becomes active, the
-  same visible sprite changes back to its working tint and continues the slow pulse without fading
-  out or spawning a competing glow.
+  same fixed actor-owned pool changes back to its working tint and continues the sparse inverted-fire
+  plume without allocating or spawning a competing emitter.
 - The main actor store retains physical actors after canonical removal until their exit animation
   completes. Scene teardown destroys every retained exit and cancels visual readiness before its
   parent layers disappear.

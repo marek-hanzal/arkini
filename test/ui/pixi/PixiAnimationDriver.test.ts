@@ -32,6 +32,7 @@ const motionState = vi.hoisted(() => ({
 			readonly bounce?: number;
 			readonly delay: number;
 			readonly duration?: number;
+			readonly repeat?: number;
 			readonly type?: string;
 			readonly visualDuration?: number;
 		};
@@ -90,6 +91,7 @@ vi.mock("motion", () => {
 				readonly ease?: string;
 				readonly onComplete: () => void;
 				readonly onUpdate: (value: number) => void;
+				readonly repeat?: number;
 				readonly type?: string;
 				readonly visualDuration?: number;
 			},
@@ -210,6 +212,40 @@ describe("Pixi animation driver", () => {
 		expect(tween?.stop).toHaveBeenCalledOnce();
 		expect(onUpdate).toHaveBeenCalledOnce();
 		expect(onComplete).not.toHaveBeenCalled();
+	});
+
+	it("keeps one linear Motion tween alive across repeated cycles", () => {
+		const { driver, invalidate } = createDriver();
+		const control = Effect.runSync(
+			driver.startTweenFx({
+				curve: {
+					kind: "linear",
+				},
+				durationMs: 1_760,
+				from: 0,
+				onUpdate: vi.fn(),
+				repeat: Number.POSITIVE_INFINITY,
+				to: 1,
+			}),
+		);
+		const tween = motionState.tweens[0];
+
+		expect(tween).toMatchObject({
+			ease: "linear",
+			from: 0,
+			to: 1,
+		});
+		expect(tween?.options).toMatchObject({
+			duration: 1.76,
+			repeat: Number.POSITIVE_INFINITY,
+			type: "keyframes",
+		});
+		tween?.onUpdate(0.99);
+		tween?.onUpdate(0.01);
+		expect(invalidate).toHaveBeenCalledTimes(2);
+
+		Effect.runSync(control.stopFx);
+		expect(tween?.stop).toHaveBeenCalledOnce();
 	});
 
 	it("runs a bounded visual-duration spring through the same completion owner", () => {

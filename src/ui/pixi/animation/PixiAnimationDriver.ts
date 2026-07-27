@@ -23,6 +23,9 @@ export type PixiAnimationCurve =
 			readonly kind: "ease-in-out";
 	  }
 	| {
+			readonly kind: "linear";
+	  }
+	| {
 			readonly bounce: number;
 			readonly kind: "spring";
 	  };
@@ -40,6 +43,7 @@ export interface PixiAnimationDriver {
 		readonly from: number;
 		readonly onComplete?: () => void;
 		readonly onUpdate: (value: number) => void;
+		readonly repeat?: number;
 		readonly to: number;
 	}) => Effect.Effect<PixiAnimationControl>;
 	readonly closeFx: Effect.Effect<void>;

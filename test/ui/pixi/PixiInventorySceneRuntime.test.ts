@@ -7,7 +7,7 @@ import type { GameEngine } from "~/bridge/game/GameEngine";
 import type { TileActorItem } from "~/bridge/tile/TileActorItem";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
 import { pixiTileActorConsumedSourceFadeDurationMs } from "~/ui/pixi/animation/flashPixiTileActorConsumedSourceFx";
-import { pixiTileActorFeedbackGlowRiseDurationMs } from "~/ui/pixi/animation/runPixiTileActorRunningGlowFx";
+import { pixiTileActorFeedbackParticlesDurationMs } from "~/ui/pixi/animation/runPixiTileActorActivityParticlesFx";
 import { pixiInventoryActorRemovalFeedbackDurationMs } from "~/ui/pixi/drag/startPixiInventoryActorRemovalFeedbackFx";
 import { readPixiInventorySceneLayoutFx } from "~/ui/pixi/layout/readPixiInventorySceneLayoutFx";
 import { readPixiMainSceneLayoutFx } from "~/ui/pixi/layout/readPixiMainSceneLayoutFx";
@@ -62,9 +62,14 @@ const sceneState = vi.hoisted(() => ({
 	createContainer: undefined as (() => FakeContainer) | undefined,
 	deferredTweenDurations: new Set<number>(),
 	drop: vi.fn(),
-	glowTextureClose: vi.fn(),
-	glowTexture: {
-		kind: "running-glow-texture",
+	particleTextureClose: vi.fn(),
+	particleTextures: {
+		mote: {
+			kind: "activity-particle-mote",
+		},
+		spark: {
+			kind: "activity-particle-spark",
+		},
 	},
 	items: [] as TileActorItem[],
 	owner: null as PixiApplicationOwner | null,
@@ -243,13 +248,13 @@ vi.mock("~/ui/pixi/runtime/createPixiApplicationOwnerFx", async () => {
 	};
 });
 
-vi.mock("~/ui/pixi/actor/createPixiTileActorRunningGlowTextureFx", async () => {
+vi.mock("~/ui/pixi/actor/createPixiTileActorParticleTexturesFx", async () => {
 	const { Effect: EffectModule } = await import("effect");
 	return {
-		createPixiTileActorRunningGlowTextureFx: () =>
+		createPixiTileActorParticleTexturesFx: () =>
 			EffectModule.succeed({
-				closeFx: EffectModule.sync(sceneState.glowTextureClose),
-				texture: sceneState.glowTexture,
+				closeFx: EffectModule.sync(sceneState.particleTextureClose),
+				...sceneState.particleTextures,
 			}),
 	};
 });
@@ -287,17 +292,22 @@ vi.mock("~/ui/pixi/animation/createPixiAnimationDriverFx", async () => {
 					readonly to: number;
 				}) =>
 					EffectModule.sync(() => {
-						onUpdate(to);
+						const deferred =
+							durationMs === 1_760 ||
+							sceneState.deferredTweenDurations.has(durationMs);
+						onUpdate(
+							durationMs === 1_760 ||
+								durationMs === pixiTileActorFeedbackParticlesDurationMs
+								? 0.5
+								: to,
+						);
 						let active = true;
 						const complete = () => {
 							if (!active) return;
 							active = false;
 							onComplete?.();
 						};
-						if (
-							durationMs === 2_400 ||
-							sceneState.deferredTweenDurations.has(durationMs)
-						) {
+						if (deferred) {
 							sceneState.pendingTweenCompletions.push(complete);
 						} else {
 							complete();
@@ -364,15 +374,45 @@ vi.mock("~/ui/pixi/actor/createPixiTileActorFx", async () => {
 	return {
 		createPixiTileActorFx: ({
 			item,
-			runningGlowTexture,
+			particleTextures,
 		}: {
 			readonly item: TileActorItem;
-			readonly runningGlowTexture: unknown;
+			readonly particleTextures: {
+				readonly mote: unknown;
+				readonly spark: unknown;
+			};
 		}) =>
 			EffectModule.sync(() => {
 				const createContainer = sceneState.createContainer;
 				if (createContainer === undefined) throw new Error("Pixi mock is not ready.");
 				const actor = {
+					activityParticles: {
+						centerX: 40,
+						container: {
+							visible: false,
+						},
+						feedbackPhase: null,
+						lastProgress: 0,
+						particles: [
+							{
+								alphaScale: 1,
+								particle: {
+									alpha: 0,
+									texture: particleTextures.mote,
+									tint: 0,
+									x: 0,
+									y: 0,
+								},
+								phaseOffset: 0,
+								spreadOffset: 0,
+								waveOffset: 0,
+							},
+						],
+						startY: 68,
+						topHalfWidth: 24,
+						topY: -18,
+						workingTint: 0x00ff00,
+					},
 					container: createContainer(),
 					crowdLayer: {
 						alpha: item.running ? 0.82 : 1,
@@ -387,11 +427,6 @@ vi.mock("~/ui/pixi/actor/createPixiTileActorFx", async () => {
 					lifecycleIntentGeneration: 0,
 					lifecycleNotBeforeMs: 0,
 					lifecycleTargetAlpha: 1,
-					runningGlow: {
-						alpha: 0,
-						texture: runningGlowTexture,
-						visible: false,
-					},
 					size: 0,
 					visuals: new Set(),
 					dragging: false,
@@ -443,7 +478,7 @@ const inventoryItem = {
 	quantity: 4,
 	revision: "revision:water",
 	running: false,
-	runningGlow: false,
+	activityEffect: false,
 	sourceUrl: "resource:water",
 	title: "Water",
 } satisfies TileActorItem;
@@ -618,7 +653,7 @@ beforeEach(() => {
 	sceneState.close.mockClear();
 	sceneState.deferredTweenDurations.clear();
 	sceneState.drop.mockClear();
-	sceneState.glowTextureClose.mockClear();
+	sceneState.particleTextureClose.mockClear();
 	sceneState.items = [
 		inventoryItem,
 	];
@@ -644,36 +679,36 @@ afterEach(() => {
 });
 
 describe("Pixi Inventory scene runtime", () => {
-	it("owns and fades the same running glow as the Board scene", async () => {
+	it("owns and drains the same running particle effect as the Board scene", async () => {
 		sceneState.items = [
 			{
 				...inventoryItem,
 				running: true,
-				runningGlow: true,
+				activityEffect: true,
 			},
 		];
 		const { actor, runtime } = await mountScene();
 
-		expect(actor.runningGlow).toMatchObject({
-			alpha: 0.28,
-			texture: sceneState.glowTexture,
+		expect(actor.activityParticles.container).toMatchObject({
 			visible: true,
 		});
+		expect(actor.activityParticles.particles[0]?.particle.texture).toBe(
+			sceneState.particleTextures.mote,
+		);
 
 		publishItems([
 			{
 				...inventoryItem,
 				running: false,
-				runningGlow: false,
+				activityEffect: false,
 			},
 		]);
-		expect(actor.runningGlow).toMatchObject({
-			alpha: 0,
+		expect(actor.activityParticles.container).toMatchObject({
 			visible: false,
 		});
 
 		await Effect.runPromise(runtime.closeFx);
-		expect(sceneState.glowTextureClose).toHaveBeenCalledOnce();
+		expect(sceneState.particleTextureClose).toHaveBeenCalledOnce();
 	});
 
 	it("dips a surviving Inventory source from a committed input-consumption fact", async () => {
@@ -977,7 +1012,7 @@ describe("Pixi Inventory scene runtime", () => {
 			inventoryTargetItem,
 		];
 		sceneState.deferredTweenDurations.add(pixiTileActorConsumedSourceFadeDurationMs);
-		sceneState.deferredTweenDurations.add(pixiTileActorFeedbackGlowRiseDurationMs);
+		sceneState.deferredTweenDurations.add(pixiTileActorFeedbackParticlesDurationMs);
 		const onDrop = vi.fn(() =>
 			Promise.resolve({
 				kind: "stack",
@@ -1003,10 +1038,10 @@ describe("Pixi Inventory scene runtime", () => {
 
 		const receiver = sceneState.actors[1];
 		if (receiver === undefined) throw new Error("Expected the Inventory stack receiver.");
-		expect(receiver.runningGlow).toMatchObject({
-			alpha: 0.82,
+		expect(receiver.activityParticles.container).toMatchObject({
 			visible: true,
 		});
+		expect(receiver.activityParticles.particles[0]?.particle.alpha).toBeGreaterThan(0);
 		expect(actor.container.alpha).toBeCloseTo(0.42);
 		await Effect.runPromise(runtime.closeFx);
 	});

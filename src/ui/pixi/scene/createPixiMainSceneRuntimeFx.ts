@@ -5,7 +5,7 @@ import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import type { runTileDropAtom } from "~/bridge/tile/runTileDropAtom";
 import type { TileActorItem } from "~/bridge/tile/TileActorItem";
 import { createPixiMainSceneActorStoreFx } from "~/ui/pixi/actor/createPixiMainSceneActorStoreFx";
-import { createPixiTileActorRunningGlowTextureFx } from "~/ui/pixi/actor/createPixiTileActorRunningGlowTextureFx";
+import { createPixiTileActorParticleTexturesFx } from "~/ui/pixi/actor/createPixiTileActorParticleTexturesFx";
 import { createPixiAnimationDriverFx } from "~/ui/pixi/animation/createPixiAnimationDriverFx";
 import { createPixiGridDropFeedbackFx } from "~/ui/pixi/grid/createPixiGridDropFeedbackFx";
 import { createPixiActorAnimatorFx } from "~/ui/pixi/animation/createPixiActorAnimatorFx";
@@ -77,8 +77,8 @@ export const createPixiMainSceneRuntimeFx = Effect.fn("createPixiMainSceneRuntim
 		const paletteState = {
 			current: yield* readPixiScenePaletteFx(host),
 		};
-		const runningGlowTexture = yield* createPixiTileActorRunningGlowTextureFx();
-		registerRollback(runningGlowTexture.closeFx);
+		const particleTextures = yield* createPixiTileActorParticleTexturesFx();
+		registerRollback(particleTextures.closeFx);
 		const actorStore = yield* createPixiMainSceneActorStoreFx();
 		const animationDriver = yield* createPixiAnimationDriverFx({
 			frames: application.frames,
@@ -153,8 +153,8 @@ export const createPixiMainSceneRuntimeFx = Effect.fn("createPixiMainSceneRuntim
 			game,
 			magneticField,
 			motion,
+			particleTextures,
 			readPalette: () => paletteState.current,
-			runningGlowTexture,
 			surface,
 			textures,
 		});

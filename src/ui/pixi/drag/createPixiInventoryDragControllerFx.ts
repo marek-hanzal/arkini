@@ -18,7 +18,7 @@ import { readPixiTileActorCursorFx } from "~/ui/pixi/actor/readPixiTileActorCurs
 import type { PixiActorAnimator } from "~/ui/pixi/animation/PixiActorAnimator";
 import { animatePixiActorToRetargetablePoseFx } from "~/ui/pixi/animation/animatePixiActorToRetargetablePoseFx";
 import { flashPixiTileActorConsumedSourceFx } from "~/ui/pixi/animation/flashPixiTileActorConsumedSourceFx";
-import { flashPixiTileActorFeedbackGlowFx } from "~/ui/pixi/animation/runPixiTileActorRunningGlowFx";
+import { burstPixiTileActorFeedbackParticlesFx } from "~/ui/pixi/animation/runPixiTileActorActivityParticlesFx";
 import type { PixiInventoryDragController } from "~/ui/pixi/drag/PixiInventoryDragController";
 import { readPixiDragPointerOffset } from "~/ui/pixi/drag/readPixiDragPointerOffset";
 import { setPixiDraggedActorPoseFx } from "~/ui/pixi/drag/setPixiDraggedActorPoseFx";
@@ -158,7 +158,7 @@ export const createPixiInventoryDragControllerFx = Effect.fn("createPixiInventor
 			const receiver = RendererRuntime.runSync(actorStore.readActorFx(receiverActorId));
 			if (receiver === null) return;
 			RendererRuntime.runSync(
-				flashPixiTileActorFeedbackGlowFx({
+				burstPixiTileActorFeedbackParticlesFx({
 					actor: receiver,
 					animator,
 				}),

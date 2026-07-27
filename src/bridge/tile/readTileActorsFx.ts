@@ -6,7 +6,7 @@ import { readTileActorBadgeCountFx } from "~/bridge/tile/readTileActorBadgeCount
 import { readTileActorPrimaryAssetIdFx } from "~/bridge/tile/readTileActorPrimaryAssetIdFx";
 import { readTileActorProgressRatioFx } from "~/bridge/tile/readTileActorProgressRatioFx";
 import { readTileActorVisualFx } from "~/bridge/tile/readTileActorVisualFx";
-import { readTileActorRunningGlowFx } from "~/bridge/tile/readTileActorRunningGlowFx";
+import { readTileActorActivityEffectFx } from "~/bridge/tile/readTileActorActivityEffectFx";
 import { readRuntimeItemPrimaryActionFx } from "~/engine/item-detail/read/readRuntimeItemPrimaryActionFx";
 import { resolveActiveJobStatusFx } from "~/engine/job/fx/resolveActiveJobStatusFx";
 import { JobStatusEnumSchema } from "~/engine/job/schema/read/JobStatusEnumSchema";
@@ -92,7 +92,7 @@ export const readTileActorsFx = Effect.fnUntraced(function* ({
 					: {
 							progressRatio,
 						}),
-				runningGlow: yield* readTileActorRunningGlowFx({
+				activityEffect: yield* readTileActorActivityEffectFx({
 					itemType: item.item.type,
 					running,
 				}),

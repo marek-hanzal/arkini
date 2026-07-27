@@ -1,5 +1,4 @@
 import { Effect } from "effect";
-import type { Texture } from "pixi.js";
 
 import type { GameEngine } from "~/bridge/game/GameEngine";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
@@ -10,6 +9,7 @@ import type {
 	PixiInventoryActorReconciliation,
 	PixiInventoryActorStore,
 } from "~/ui/pixi/actor/PixiInventoryActorStore";
+import type { PixiTileActorParticleTextures } from "~/ui/pixi/actor/PixiTileActorParticleTextures";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
 import { createPixiTileActorFx } from "~/ui/pixi/actor/createPixiTileActorFx";
 import { readPixiTileActorCrowdAlpha } from "~/ui/pixi/actor/readPixiTileActorCrowdAlpha";
@@ -18,9 +18,9 @@ import { updatePixiTileActorFx } from "~/ui/pixi/actor/updatePixiTileActorFx";
 import type { PixiActorAnimator } from "~/ui/pixi/animation/PixiActorAnimator";
 import { animatePixiActorToRetargetablePoseFx } from "~/ui/pixi/animation/animatePixiActorToRetargetablePoseFx";
 import {
-	startPixiTileActorRunningGlowFx,
-	stopPixiTileActorRunningGlowFx,
-} from "~/ui/pixi/animation/runPixiTileActorRunningGlowFx";
+	startPixiTileActorActivityParticlesFx,
+	stopPixiTileActorActivityParticlesFx,
+} from "~/ui/pixi/animation/runPixiTileActorActivityParticlesFx";
 import { startPixiTileActorFadeInFx } from "~/ui/pixi/animation/startPixiTileActorFadeInFx";
 import { startPixiInventoryActorRemovalFeedbackFx } from "~/ui/pixi/drag/startPixiInventoryActorRemovalFeedbackFx";
 import type { PixiApplicationOwner } from "~/ui/pixi/runtime/PixiApplicationOwner";
@@ -33,7 +33,7 @@ export namespace createPixiInventoryActorStoreFx {
 		readonly animator: PixiActorAnimator;
 		readonly application: PixiApplicationOwner;
 		readonly game: GameEngine;
-		readonly runningGlowTexture: Texture;
+		readonly particleTextures: Pick<PixiTileActorParticleTextures, "mote" | "spark">;
 		readonly surface: PixiInventorySceneSurface;
 		readonly textures: PixiTextureStore;
 	}
@@ -47,7 +47,7 @@ const sameVisual = (left: TileActorItem, right: TileActorItem) =>
 	left.sourceUrl === right.sourceUrl &&
 	left.compositeUrl === right.compositeUrl &&
 	left.running === right.running &&
-	left.runningGlow === right.runningGlow &&
+	left.activityEffect === right.activityEffect &&
 	left.progressRatio === right.progressRatio;
 
 /** Owns retained Inventory actors and their canonical transition reconciliation. */
@@ -56,7 +56,7 @@ export const createPixiInventoryActorStoreFx = Effect.fn("createPixiInventoryAct
 		animator,
 		application,
 		game,
-		runningGlowTexture,
+		particleTextures,
 		surface,
 		textures,
 	}: createPixiInventoryActorStoreFx.Props) =>
@@ -175,7 +175,7 @@ export const createPixiInventoryActorStoreFx = Effect.fn("createPixiInventoryAct
 										frames: application.frames,
 										item,
 										palette: RendererRuntime.runSync(surface.readPaletteFx),
-										runningGlowTexture,
+										particleTextures,
 										textures,
 									}),
 								);
@@ -186,7 +186,8 @@ export const createPixiInventoryActorStoreFx = Effect.fn("createPixiInventoryAct
 							const crowdAlphaChanged =
 								readPixiTileActorCrowdAlpha(actor.item) !==
 								readPixiTileActorCrowdAlpha(item);
-							const runningGlowChanged = actor.item.runningGlow !== item.runningGlow;
+							const activityEffectChanged =
+								actor.item.activityEffect !== item.activityEffect;
 							const sizeChanged = actor.size !== actorSize;
 							const previousDisplayedSize = actor.size * actor.container.scale.x;
 							const reconciledSize = actor.dragging ? actor.size : actorSize;
@@ -210,11 +211,11 @@ export const createPixiInventoryActorStoreFx = Effect.fn("createPixiInventoryAct
 									}),
 								);
 							}
-							if (runningGlowChanged) {
+							if (activityEffectChanged) {
 								RendererRuntime.runSync(
-									(item.runningGlow
-										? startPixiTileActorRunningGlowFx
-										: stopPixiTileActorRunningGlowFx)({
+									(item.activityEffect
+										? startPixiTileActorActivityParticlesFx
+										: stopPixiTileActorActivityParticlesFx)({
 										actor,
 										animator,
 									}),
@@ -253,9 +254,9 @@ export const createPixiInventoryActorStoreFx = Effect.fn("createPixiInventoryAct
 										}),
 									);
 								}
-								if (item.runningGlow) {
+								if (item.activityEffect) {
 									RendererRuntime.runSync(
-										startPixiTileActorRunningGlowFx({
+										startPixiTileActorActivityParticlesFx({
 											actor,
 											animator,
 										}),

@@ -136,6 +136,7 @@ export const createPixiAnimationDriverFx = Effect.fn("createPixiAnimationDriverF
 						from,
 						onComplete,
 						onUpdate,
+						repeat,
 						to,
 					}) =>
 						Effect.sync((): PixiAnimationControl => {
@@ -174,7 +175,11 @@ export const createPixiAnimationDriverFx = Effect.fn("createPixiAnimationDriverF
 											}
 										: {
 												duration: durationMs / 1000,
-												ease: "easeInOut" as const,
+												ease:
+													curve.kind === "linear"
+														? ("linear" as const)
+														: ("easeInOut" as const),
+												repeat,
 												type: "keyframes" as const,
 											};
 								controls = animate(from, to, {

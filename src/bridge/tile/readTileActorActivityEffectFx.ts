@@ -3,16 +3,16 @@ import { P, match } from "ts-pattern";
 
 import { ItemEnumSchema } from "~/engine/item/schema/ItemEnumSchema";
 
-export namespace readTileActorRunningGlowFx {
+export namespace readTileActorActivityEffectFx {
 	export interface Props {
 		readonly itemType: ItemEnumSchema.Type;
 		readonly running: boolean;
 	}
 }
 
-/** Restricts active-job glow feedback to the three product-facing line owners. */
-export const readTileActorRunningGlowFx = Effect.fn("readTileActorRunningGlowFx")(
-	({ itemType, running }: readTileActorRunningGlowFx.Props) =>
+/** Restricts active-job particle feedback to the three product-facing line owners. */
+export const readTileActorActivityEffectFx = Effect.fn("readTileActorActivityEffectFx")(
+	({ itemType, running }: readTileActorActivityEffectFx.Props) =>
 		Effect.succeed(
 			match(itemType)
 				.with(

@@ -1,6 +1,7 @@
-import type { Container, FederatedPointerEvent, Graphics, Sprite } from "pixi.js";
+import type { Container, FederatedPointerEvent, Graphics } from "pixi.js";
 
 import type { TileActorItem } from "~/bridge/tile/TileActorItem";
+import type { PixiTileActorActivityParticles } from "~/ui/pixi/actor/PixiTileActorActivityParticles";
 import type { PixiTileActorVisual } from "~/ui/pixi/actor/PixiTileActorVisual";
 
 export interface PixiTileActor {
@@ -9,11 +10,9 @@ export interface PixiTileActor {
 	readonly offsetLayer: Container;
 	readonly crowdLayer: Container;
 	readonly visualLayer: Container;
-	readonly runningGlow: Sprite;
+	readonly activityParticles: PixiTileActorActivityParticles;
 	readonly progressBar: Graphics;
 	readonly visuals: Set<PixiTileActorVisual>;
-	feedbackGlowPhase: "falling" | "rising" | null;
-	workingGlowTint: number;
 	currentVisual: PixiTileActorVisual;
 	pendingVisual: PixiTileActorVisual | null;
 	item: TileActorItem;

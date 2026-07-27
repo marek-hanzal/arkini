@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import { Texture } from "pixi.js";
+import { ParticleContainer, Texture } from "pixi.js";
 import { describe, expect, it, vi } from "vitest";
 
 import type { TileActorItem } from "~/bridge/tile/TileActorItem";
@@ -48,7 +48,7 @@ const item = {
 	quantity: 1,
 	revision: "revision:producer",
 	running: true,
-	runningGlow: true,
+	activityEffect: true,
 	sourceUrl: "resource:producer",
 	title: "Lumberjack",
 } satisfies TileActorItem;
@@ -67,10 +67,23 @@ const palette = {
 	toolbarA: 0,
 	toolbarB: 0,
 };
+const darkPalette = {
+	...palette,
+	accent: 0xf05bb8,
+	foreground: 0xfcf6ff,
+	surface: 0x151020,
+};
+const lightPalette = {
+	...palette,
+	accent: 0xb9247d,
+	foreground: 0x2a1532,
+	surface: 0xfffaff,
+};
 
-describe("Pixi tile actor running glow layer", () => {
-	it("retains the shared procedural texture strictly below all tile content", () => {
-		const runningGlowTexture = new Texture();
+describe("Pixi tile actor activity-particle layer", () => {
+	it("retains one fixed ParticleContainer pool strictly below all tile content", () => {
+		const mote = new Texture();
+		const spark = new Texture();
 		const actor = Effect.runSync(
 			createPixiTileActorFx({
 				frames: {
@@ -80,7 +93,10 @@ describe("Pixi tile actor running glow layer", () => {
 				},
 				item,
 				palette,
-				runningGlowTexture,
+				particleTextures: {
+					mote,
+					spark,
+				},
 				textures: {} as never,
 			}),
 		);
@@ -89,7 +105,7 @@ describe("Pixi tile actor running glow layer", () => {
 			actor.offsetLayer,
 		]);
 		expect(actor.offsetLayer.children).toEqual([
-			actor.runningGlow,
+			actor.activityParticles.container,
 			actor.crowdLayer,
 			actor.progressBar,
 		]);
@@ -99,15 +115,19 @@ describe("Pixi tile actor running glow layer", () => {
 		expect(actor.visualLayer.children).toEqual([
 			actor.currentVisual.container,
 		]);
-		expect(actor.runningGlow.texture).toBe(runningGlowTexture);
-		expect(actor.runningGlow.anchor).toMatchObject({
-			x: 0.5,
-			y: 0.5,
-		});
-		expect(actor.runningGlow.visible).toBe(false);
+		expect(actor.activityParticles.container).toBeInstanceOf(ParticleContainer);
+		expect(actor.activityParticles.container.visible).toBe(false);
+		expect(actor.activityParticles.particles).toHaveLength(12);
+		expect(actor.activityParticles.particles.map(({ particle }) => particle.texture)).toContain(
+			mote,
+		);
+		expect(actor.activityParticles.particles.map(({ particle }) => particle.texture)).toContain(
+			spark,
+		);
 
 		Effect.runSync(destroyPixiTileActorFx(actor));
-		runningGlowTexture.destroy();
+		mote.destroy();
+		spark.destroy();
 	});
 
 	it("draws and clears the shared tile progress overlay from projected progress", () => {
@@ -149,6 +169,24 @@ describe("Pixi tile actor running glow layer", () => {
 
 		expect(actor.progressBar.visible).toBe(true);
 		expect(actor.progressBar.getLocalBounds().width).toBeGreaterThan(0);
+		const faceInset = 80 * 0.1;
+		const faceSize = 80 * 0.8;
+		const tallestParticleHalfHeight = Math.max(
+			...actor.activityParticles.particles.map(
+				({ particle }) => (particle.texture.height * particle.scaleY) / 2,
+			),
+		);
+		expect(actor.activityParticles.topY - tallestParticleHalfHeight).toBeGreaterThanOrEqual(
+			faceInset - faceSize * 0.5,
+		);
+		const renderedParticleWidths = actor.activityParticles.particles.map(
+			({ particle }) => particle.texture.width * particle.scaleX,
+		);
+		expect(Math.min(...renderedParticleWidths)).toBeGreaterThanOrEqual(faceSize * 0.14);
+		expect(actor.activityParticles.topHalfWidth).toBeGreaterThan(faceSize * 0.4);
+		expect(actor.activityParticles.particles.every(({ particle }) => particle.scaleX > 0)).toBe(
+			true,
+		);
 
 		Effect.runSync(
 			updatePixiTileActorFx({
@@ -163,6 +201,66 @@ describe("Pixi tile actor running glow layer", () => {
 		);
 
 		expect(actor.progressBar.visible).toBe(false);
+		Effect.runSync(destroyPixiTileActorFx(actor));
+	});
+
+	it("switches retained particle compositing when the resolved theme changes", () => {
+		const frames = {
+			closeFx: Effect.void,
+			invalidateFx: Effect.void,
+			reportCriticalFailure: vi.fn(),
+		};
+		const actor = Effect.runSync(
+			createPixiTileActorFx({
+				frames,
+				item,
+				palette: darkPalette,
+				textures: {} as never,
+			}),
+		);
+		const particles = actor.activityParticles.particles;
+		const animateFx = vi.fn(() => Effect.void);
+		const animator = {
+			animateFx,
+			cancelActorFx: () => Effect.void,
+			cancelChannelFx: () => Effect.void,
+			cancelFx: () => Effect.void,
+			closeFx: Effect.void,
+			setFx: () => Effect.void,
+		} satisfies PixiActorAnimator;
+
+		expect(actor.activityParticles.container.blendMode).toBe("add");
+		Effect.runSync(
+			updatePixiTileActorFx({
+				actor,
+				animator,
+				frames,
+				item,
+				palette: lightPalette,
+				size: 80,
+				textures: {} as never,
+			}),
+		);
+		expect(actor.activityParticles.container.blendMode).toBe("normal");
+		expect(actor.activityParticles.workingTint).toBe(lightPalette.accent);
+		expect(actor.activityParticles.particles).toBe(particles);
+		expect(animateFx).not.toHaveBeenCalled();
+
+		Effect.runSync(
+			updatePixiTileActorFx({
+				actor,
+				animator,
+				frames,
+				item,
+				palette: darkPalette,
+				size: 80,
+				textures: {} as never,
+			}),
+		);
+		expect(actor.activityParticles.container.blendMode).toBe("add");
+		expect(actor.activityParticles.workingTint).toBe(darkPalette.accent);
+		expect(actor.activityParticles.particles).toBe(particles);
+
 		Effect.runSync(destroyPixiTileActorFx(actor));
 	});
 });

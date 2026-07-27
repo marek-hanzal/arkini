@@ -132,6 +132,7 @@ const item = {
 	quantity: 1,
 	revision: "revision:log",
 	running: false,
+	activityEffect: false,
 	sourceUrl: "resource:log",
 	title: "Log",
 } as TileActorItem;
@@ -152,10 +153,31 @@ const createItem = (id: string, x: number) =>
 		title: id,
 	}) as TileActorItem;
 
-const createRunningGlow = () => ({
-	alpha: 0,
-	tint: 0xf05bb8,
-	visible: false,
+const createActivityParticles = () => ({
+	centerX: 40,
+	container: {
+		visible: false,
+	},
+	feedbackPhase: null,
+	lastProgress: 0,
+	particles: [
+		{
+			alphaScale: 1,
+			particle: {
+				alpha: 0,
+				tint: 0,
+				x: 0,
+				y: 0,
+			},
+			phaseOffset: 0,
+			spreadOffset: 0,
+			waveOffset: 0,
+		},
+	],
+	startY: 68,
+	topHalfWidth: 24,
+	topY: -18,
+	workingTint: 0xf05bb8,
 });
 
 const mountController = ({
@@ -205,18 +227,16 @@ const mountController = ({
 		zIndex: 0,
 	});
 	const actor = {
+		activityParticles: createActivityParticles(),
 		container: actorContainer,
 		dragging: false,
-		feedbackGlowPhase: null,
 		instanceId: `test:${item.id}`,
 		item,
 		lifecycleFadeStarted: false,
 		lifecycleIntentGeneration: 0,
 		lifecycleTargetAlpha: 1,
 		onPointerDown: null,
-		runningGlow: createRunningGlow(),
 		size: 80,
-		workingGlowTint: 0xf05bb8,
 	} as unknown as PixiTileActor;
 	const actors = new Map([
 		[
@@ -232,15 +252,13 @@ const mountController = ({
 	]);
 	for (const targetItem of targetItems) {
 		actors.set(targetItem.id, {
+			activityParticles: createActivityParticles(),
 			container: {
 				destroyed: false,
 			},
-			feedbackGlowPhase: null,
 			instanceId: `test:${targetItem.id}`,
 			item: targetItem,
-			runningGlow: createRunningGlow(),
-			workingGlowTint: 0xf05bb8,
-		} as PixiTileActor);
+		} as unknown as PixiTileActor);
 		canonicalItems.set(targetItem.id, targetItem);
 	}
 	let currentCommandTarget: runTileDropAtom.Command["target"] = {
@@ -302,6 +320,10 @@ const mountController = ({
 					setFx: (write) =>
 						Effect.sync(() => {
 							presentationWrites.push(write);
+							if (write.channel === "activity-particles") {
+								write.actor.activityParticles.container.visible = write.visible;
+								return;
+							}
 							if (write.channel !== "pose") return;
 							write.actor.container.position.set(write.x, write.y);
 							if (write.scale !== undefined) {
@@ -464,22 +486,27 @@ describe("Pixi main-scene drag controller", () => {
 		mounted.stage.emit("pointerup", pointer(10, 20));
 
 		expect(mounted.onActivate).not.toHaveBeenCalled();
-		expect(mounted.actor.feedbackGlowPhase).toBe("rising");
-		expect(mounted.actor.runningGlow.tint).toBe(0x57d7b2);
+		expect(mounted.actor.activityParticles.feedbackPhase).toBe("burst");
 		expect(mounted.presentationWrites).toContainEqual({
 			actor: mounted.actor,
-			channel: "glow-opacity",
+			channel: "activity-particles",
+			reset: true,
 			visible: true,
 		});
 		expect(mounted.animations).toContainEqual(
 			expect.objectContaining({
 				actor: mounted.actor,
-				channel: "glow-opacity",
-				durationMs: 110,
-				ownerKey: `feedback-glow:${mounted.actor.instanceId}`,
-				toRunningGlowAlpha: 0.82,
+				channel: "activity-particles",
+				durationMs: 720,
+				ownerKey: `activity-particles:${mounted.actor.instanceId}`,
 			}),
 		);
+		const burst = mounted.animations.find(
+			(animation) =>
+				animation.actor === mounted.actor && animation.channel === "activity-particles",
+		);
+		if (burst?.channel === "activity-particles") burst.render(0.5);
+		expect(mounted.actor.activityParticles.particles[0]?.particle.tint).toBe(0x57d7b2);
 	});
 
 	it("opens Item Detail with right click and ignores Shift on left click", async () => {
@@ -518,7 +545,7 @@ describe("Pixi main-scene drag controller", () => {
 		expect(mounted.onActivate).toHaveBeenCalledWith(item, false, expect.anything());
 		expect(mounted.onDrop).not.toHaveBeenCalled();
 		expect(mounted.cancelAnimation).toHaveBeenCalledExactlyOnceWith(
-			`feedback-glow:${mounted.actor.instanceId}`,
+			`activity-particles:${mounted.actor.instanceId}`,
 		);
 		expect(mounted.startCursorGrab).not.toHaveBeenCalled();
 		expect(mounted.finishCursorGrab).not.toHaveBeenCalled();
@@ -747,7 +774,7 @@ describe("Pixi main-scene drag controller", () => {
 		);
 	});
 
-	it("starts Inventory removal and receiver glow together before the drop Promise resolves", async () => {
+	it("starts Inventory removal and receiver particles together before the drop Promise resolves", async () => {
 		const inventory = createItem("runtime:inventory", 1);
 		const mounted = mountController({
 			targetItems: [
@@ -755,15 +782,13 @@ describe("Pixi main-scene drag controller", () => {
 			],
 		});
 		const inventoryActor = {
+			activityParticles: createActivityParticles(),
 			container: {
 				destroyed: false,
 			},
-			feedbackGlowPhase: null,
 			instanceId: `test:${inventory.id}`,
 			item: inventory,
-			runningGlow: createRunningGlow(),
-			workingGlowTint: 0xf05bb8,
-		} as PixiTileActor;
+		} as unknown as PixiTileActor;
 		mounted.actors.set(inventory.id, inventoryActor);
 		previewState.actorKinds.set(inventory.id, "store-inventory");
 		mounted.setOccupant(inventory);
@@ -800,10 +825,9 @@ describe("Pixi main-scene drag controller", () => {
 		expect(mounted.animations).toContainEqual(
 			expect.objectContaining({
 				actor: inventoryActor,
-				channel: "glow-opacity",
-				durationMs: 110,
-				ownerKey: `feedback-glow:${inventoryActor.instanceId}`,
-				toRunningGlowAlpha: 0.82,
+				channel: "activity-particles",
+				durationMs: 720,
+				ownerKey: `activity-particles:${inventoryActor.instanceId}`,
 			}),
 		);
 		expect(Effect.runSync(mounted.dropPresentation.readSnapshotFx).pendingActorIds).toEqual(
@@ -1013,7 +1037,8 @@ describe("Pixi main-scene drag controller", () => {
 		expect(
 			mounted.animations.some(
 				(animation) =>
-					animation.actor === inventoryActor && animation.channel === "glow-opacity",
+					animation.actor === inventoryActor &&
+					animation.channel === "activity-particles",
 			),
 		).toBe(true);
 		fade?.onComplete?.();
@@ -1183,18 +1208,16 @@ describe("Pixi main-scene drag controller", () => {
 			zIndex: 0,
 		});
 		const secondActor = {
+			activityParticles: createActivityParticles(),
 			container: secondContainer,
 			dragging: false,
-			feedbackGlowPhase: null,
 			instanceId: `test:${secondItem.id}`,
 			item: secondItem,
 			lifecycleFadeStarted: false,
 			lifecycleIntentGeneration: 0,
 			lifecycleTargetAlpha: 1,
 			onPointerDown: null,
-			runningGlow: createRunningGlow(),
 			size: 80,
-			workingGlowTint: 0xf05bb8,
 		} as unknown as PixiTileActor;
 		mounted.actors.set(secondItem.id, secondActor);
 		mounted.canonicalItems.set(secondItem.id, secondItem);

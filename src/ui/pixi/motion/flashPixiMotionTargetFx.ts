@@ -2,9 +2,9 @@ import { Effect } from "effect";
 
 import type { PixiMainSceneActorStore } from "~/ui/pixi/actor/PixiMainSceneActorStore";
 import type { PixiActorAnimator } from "~/ui/pixi/animation/PixiActorAnimator";
-import { flashPixiTileActorFeedbackGlowFx } from "~/ui/pixi/animation/runPixiTileActorRunningGlowFx";
+import { burstPixiTileActorFeedbackParticlesFx } from "~/ui/pixi/animation/runPixiTileActorActivityParticlesFx";
 
-/** Flashes contact acknowledgement only while the canonical target actor still exists. */
+/** Bursts contact acknowledgement only while the canonical target actor still exists. */
 export const flashPixiMotionTargetFx = Effect.fn("flashPixiMotionTargetFx")(function* ({
 	actorStore,
 	animator,
@@ -16,7 +16,7 @@ export const flashPixiMotionTargetFx = Effect.fn("flashPixiMotionTargetFx")(func
 }) {
 	const target = actorStore.actors.get(targetActorId);
 	if (target === undefined) return;
-	yield* flashPixiTileActorFeedbackGlowFx({
+	yield* burstPixiTileActorFeedbackParticlesFx({
 		actor: target,
 		animator,
 	});

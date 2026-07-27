@@ -1,10 +1,13 @@
 import { Effect } from "effect";
-import { Container, Graphics, Sprite, Texture } from "pixi.js";
+import { Container, Graphics } from "pixi.js";
 
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import type { TileActorItem } from "~/bridge/tile/TileActorItem";
 import type { PixiScenePalette } from "~/ui/pixi/appearance/PixiScenePalette";
+import { readPixiParticleBlendMode } from "~/ui/pixi/appearance/readPixiParticleBlendMode";
+import type { PixiTileActorParticleTextures } from "~/ui/pixi/actor/PixiTileActorParticleTextures";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
+import { createPixiTileActorActivityParticlesFx } from "~/ui/pixi/actor/createPixiTileActorActivityParticlesFx";
 import { createPixiTileActorVisualFx } from "~/ui/pixi/actor/createPixiTileActorVisualFx";
 import { readPixiTileActorCursorFx } from "~/ui/pixi/actor/readPixiTileActorCursorFx";
 import { readPixiTileActorCrowdAlpha } from "~/ui/pixi/actor/readPixiTileActorCrowdAlpha";
@@ -16,7 +19,7 @@ export namespace createPixiTileActorFx {
 		readonly frames: DemandFrameLoop;
 		readonly item: TileActorItem;
 		readonly palette: PixiScenePalette;
-		readonly runningGlowTexture?: Texture;
+		readonly particleTextures?: Pick<PixiTileActorParticleTextures, "mote" | "spark">;
 		readonly textures: PixiTextureStore;
 	}
 }
@@ -25,13 +28,7 @@ let nextPixiTileActorInstance = 0;
 
 /** Creates one retained native Pixi actor; async textures are generation guarded. */
 export const createPixiTileActorFx = Effect.fn("createPixiTileActorFx")(
-	({
-		frames,
-		item,
-		palette,
-		runningGlowTexture = Texture.EMPTY,
-		textures,
-	}: createPixiTileActorFx.Props) =>
+	({ frames, item, palette, particleTextures, textures }: createPixiTileActorFx.Props) =>
 		Effect.gen(function* (): Effect.fn.Return<PixiTileActor> {
 			nextPixiTileActorInstance += 1;
 			const instanceId = `pixi-tile:${nextPixiTileActorInstance}`;
@@ -59,15 +56,13 @@ export const createPixiTileActorFx = Effect.fn("createPixiTileActorFx")(
 				eventMode: "none",
 				label: `TileActorVisualLayer:${item.id}:${instanceId}`,
 			});
-			const runningGlow = new Sprite({
-				eventMode: "none",
-				label: `TileActorRunningGlow:${item.id}:${instanceId}`,
-				texture: runningGlowTexture,
+			const activityParticles = yield* createPixiTileActorActivityParticlesFx({
+				actorId: item.id,
+				instanceId,
+				textures: particleTextures,
+				tint: palette.accent,
 			});
-			runningGlow.anchor.set(0.5);
-			runningGlow.alpha = 0;
-			runningGlow.tint = palette.accent;
-			runningGlow.visible = false;
+			activityParticles.container.blendMode = readPixiParticleBlendMode(palette);
 			const progressBar = new Graphics({
 				eventMode: "none",
 				label: `TileActorProgress:${item.id}:${instanceId}`,
@@ -85,7 +80,7 @@ export const createPixiTileActorFx = Effect.fn("createPixiTileActorFx")(
 			]);
 			visualLayer.addChild(currentVisual.container);
 			crowdLayer.addChild(visualLayer);
-			offsetLayer.addChild(runningGlow, crowdLayer, progressBar);
+			offsetLayer.addChild(activityParticles.container, crowdLayer, progressBar);
 			container.addChild(offsetLayer);
 
 			return {
@@ -94,11 +89,9 @@ export const createPixiTileActorFx = Effect.fn("createPixiTileActorFx")(
 				offsetLayer,
 				crowdLayer,
 				visualLayer,
-				runningGlow,
+				activityParticles,
 				progressBar,
 				visuals,
-				feedbackGlowPhase: null,
-				workingGlowTint: palette.accent,
 				currentVisual,
 				pendingVisual: null,
 				item,

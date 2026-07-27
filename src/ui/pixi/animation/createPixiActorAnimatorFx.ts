@@ -79,6 +79,14 @@ export const createPixiActorAnimatorFx = Effect.fn("createPixiActorAnimatorFx")(
 			const applyWrite = (write: PixiActorPresentationWrite) => {
 				if (write.actor.container.destroyed) return;
 				switch (write.channel) {
+					case "activity-particles":
+						if (write.reset) {
+							for (const { particle } of write.actor.activityParticles.particles) {
+								particle.alpha = 0;
+							}
+						}
+						write.actor.activityParticles.container.visible = write.visible;
+						break;
 					case "pose":
 						write.actor.container.x = write.x;
 						write.actor.container.y = write.y;
@@ -92,11 +100,6 @@ export const createPixiActorAnimatorFx = Effect.fn("createPixiActorAnimatorFx")(
 						break;
 					case "grab-offset":
 						write.actor.container.pivot.set(write.pivotX, write.pivotY);
-						break;
-					case "glow-opacity":
-						if (write.alpha !== undefined) write.actor.runningGlow.alpha = write.alpha;
-						if (write.visible !== undefined)
-							write.actor.runningGlow.visible = write.visible;
 						break;
 				}
 			};
@@ -116,7 +119,6 @@ export const createPixiActorAnimatorFx = Effect.fn("createPixiActorAnimatorFx")(
 						const fromScale = actor.container.scale.x;
 						const fromAlpha = actor.container.alpha;
 						const fromCrowdAlpha = actor.crowdLayer.alpha;
-						const fromGlowAlpha = actor.runningGlow.alpha;
 						const fromIncomingAlpha =
 							animation.channel === "visual-mix" ? animation.incoming.alpha : 0;
 						const fromOutgoingAlpha =
@@ -142,6 +144,9 @@ export const createPixiActorAnimatorFx = Effect.fn("createPixiActorAnimatorFx")(
 									onUpdate: (progress) => {
 										if (closed || actor.container.destroyed) return;
 										switch (animation.channel) {
+											case "activity-particles":
+												animation.render(progress);
+												break;
 											case "pose": {
 												const pose = animation.readPose?.(progress);
 												actor.container.x =
@@ -174,12 +179,6 @@ export const createPixiActorAnimatorFx = Effect.fn("createPixiActorAnimatorFx")(
 													(animation.toCrowdAlpha - fromCrowdAlpha) *
 														progress;
 												break;
-											case "glow-opacity":
-												actor.runningGlow.alpha =
-													fromGlowAlpha +
-													(animation.toRunningGlowAlpha - fromGlowAlpha) *
-														progress;
-												break;
 											case "visual-mix":
 												animation.incoming.alpha =
 													fromIncomingAlpha +
@@ -199,6 +198,7 @@ export const createPixiActorAnimatorFx = Effect.fn("createPixiActorAnimatorFx")(
 										release(active);
 										animation.onComplete?.();
 									},
+									repeat: animation.repeat,
 									to: 1,
 								}),
 							);

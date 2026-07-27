@@ -85,7 +85,7 @@ const createItem = ({
 		quantity: 1,
 		revision,
 		running: false,
-		runningGlow: false,
+		activityEffect: false,
 		sourceUrl,
 		title: "Water",
 	}) satisfies TileActorItem;

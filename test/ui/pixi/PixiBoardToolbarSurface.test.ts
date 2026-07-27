@@ -190,7 +190,7 @@ describe("PixiBoardToolbarSurface", () => {
 			quantity: 1,
 			revision: "revision:producer",
 			running: false,
-			runningGlow: false,
+			activityEffect: false,
 			sourceUrl: "resource:producer",
 			title: "Producer",
 		} satisfies TileActorItem;
@@ -241,7 +241,7 @@ describe("PixiBoardToolbarSurface", () => {
 			quantity: 1,
 			revision: "revision:producer:running",
 			running: true,
-			runningGlow: true,
+			activityEffect: true,
 			sourceUrl: "resource:producer",
 			title: "Producer",
 		} satisfies TileActorItem;
@@ -285,7 +285,7 @@ describe("PixiBoardToolbarSurface", () => {
 			quantity: 1,
 			revision: "revision:inventory",
 			running: false,
-			runningGlow: false,
+			activityEffect: false,
 			sourceUrl: "resource:inventory",
 			title: "Inventory",
 		} satisfies TileActorItem;

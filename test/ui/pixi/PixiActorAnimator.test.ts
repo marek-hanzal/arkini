@@ -86,13 +86,21 @@ const createActor = (id = "runtime:actor", instanceId = `instance:${id}`) =>
 		crowdLayer: {
 			alpha: 1,
 		},
+		activityParticles: {
+			container: {
+				visible: true,
+			},
+			particles: [
+				{
+					particle: {
+						alpha: 0.28,
+					},
+				},
+			],
+		},
 		instanceId,
 		item: {
 			id,
-		},
-		runningGlow: {
-			alpha: 0.28,
-			visible: true,
 		},
 	}) as unknown as PixiTileActor;
 
@@ -112,7 +120,7 @@ const createAnimator = () => {
 };
 
 describe("Pixi actor animator", () => {
-	it("keeps pose, lifecycle, crowd, and glow channels physically isolated", () => {
+	it("keeps pose, lifecycle, crowd, and activity-particle channels physically isolated", () => {
 		const actor = createActor();
 		const { animator, tweens } = createAnimator();
 
@@ -136,7 +144,7 @@ describe("Pixi actor animator", () => {
 		});
 		expect(actor.container.scale.x).toBe(1);
 		expect(actor.crowdLayer.alpha).toBe(1);
-		expect(actor.runningGlow.alpha).toBe(0.28);
+		expect(actor.activityParticles.particles[0]?.particle.alpha).toBe(0.28);
 
 		Effect.runSync(
 			animator.animateFx({
@@ -159,19 +167,32 @@ describe("Pixi actor animator", () => {
 		Effect.runSync(
 			animator.animateFx({
 				actor,
-				channel: "glow-opacity",
+				channel: "activity-particles",
+				curve: {
+					kind: "linear",
+				},
 				durationMs: 640,
-				ownerKey: "glow:actor",
-				toRunningGlowAlpha: 0.62,
+				ownerKey: "particles:actor",
+				repeat: Number.POSITIVE_INFINITY,
+				render: (progress) => {
+					const particle = actor.activityParticles.particles[0]?.particle;
+					if (particle !== undefined) particle.alpha = progress;
+				},
 			}),
 		);
 		tweens[1]?.update(0.5);
 		tweens[2]?.update(0.5);
 		tweens[3]?.update(0.5);
 
+		expect(tweens[3]?.props).toMatchObject({
+			curve: {
+				kind: "linear",
+			},
+			repeat: Number.POSITIVE_INFINITY,
+		});
 		expect(actor.container.alpha).toBeCloseTo(0.91);
 		expect(actor.crowdLayer.alpha).toBeCloseTo(0.91);
-		expect(actor.runningGlow.alpha).toBeCloseTo(0.45);
+		expect(actor.activityParticles.particles[0]?.particle.alpha).toBeCloseTo(0.5);
 		expect(actor.container.x).toBe(100);
 		expect(actor.container.y).toBe(200);
 	});
@@ -436,10 +457,10 @@ describe("Pixi actor animator", () => {
 		Effect.runSync(
 			animator.animateFx({
 				actor: secondActor,
-				channel: "glow-opacity",
+				channel: "activity-particles",
 				durationMs: 300,
-				ownerKey: "second-actor-glow",
-				toRunningGlowAlpha: 0.62,
+				ownerKey: "second-actor-particles",
+				render: () => undefined,
 			}),
 		);
 		Effect.runSync(

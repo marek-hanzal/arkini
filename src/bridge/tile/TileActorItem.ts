@@ -15,6 +15,6 @@ export interface TileActorItem extends TileActorVisual {
 	readonly jobStatus?: JobStatusEnumSchema.Type;
 	readonly progressRatio?: number;
 	readonly running: boolean;
-	readonly runningGlow: boolean;
+	readonly activityEffect: boolean;
 	readonly primaryAction: readRuntimeItemPrimaryActionFx.Result;
 }

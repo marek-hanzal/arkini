@@ -150,7 +150,7 @@ describe("readTileActorFeedbackCuesFx", () => {
 		]);
 	});
 
-	it("does not glow a producer that starts without consuming material", () => {
+	it("does not burst a producer that starts without consuming material", () => {
 		const transition = {
 			events: [
 				{

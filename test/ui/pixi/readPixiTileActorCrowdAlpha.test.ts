@@ -24,7 +24,7 @@ const item = (overrides: Partial<TileActorItem> = {}): TileActorItem => ({
 	quantity: 1,
 	revision: "revision:item",
 	running: false,
-	runningGlow: false,
+	activityEffect: false,
 	sourceUrl: "resource:test",
 	title: "Test",
 	...overrides,

@@ -48,6 +48,30 @@ vi.mock("~/ui/pixi/actor/createPixiTileActorFx", async () => {
 				textureState: "ready",
 			};
 			return EffectModule.succeed({
+				activityParticles: {
+					centerX: 40,
+					container: new PixiContainer(),
+					feedbackPhase: null,
+					lastProgress: 0,
+					particles: [
+						{
+							alphaScale: 1,
+							particle: {
+								alpha: 0,
+								tint: 0,
+								x: 0,
+								y: 0,
+							},
+							phaseOffset: 0,
+							spreadOffset: 0,
+							waveOffset: 0,
+						},
+					],
+					startY: 68,
+					topHalfWidth: 24,
+					topY: -18,
+					workingTint: 0xf05bb8,
+				},
 				container: new PixiContainer(),
 				crowdLayer: new PixiContainer(),
 				currentVisual: visual,
@@ -64,7 +88,6 @@ vi.mock("~/ui/pixi/actor/createPixiTileActorFx", async () => {
 				offsetLayer: new PixiContainer(),
 				onPointerDown: null,
 				pendingVisual: null,
-				runningGlow: new PixiContainer(),
 				size: 80,
 				visualLayer: new PixiContainer(),
 				visuals: new Set([
@@ -133,7 +156,7 @@ const createItem = (
 	quantity: 1,
 	revision: `revision:${id}`,
 	running: false,
-	runningGlow: false,
+	activityEffect: false,
 	sourceUrl: `resource:${id}`,
 	title: id,
 });
@@ -151,6 +174,30 @@ const createActor = (id: string) => {
 		textureState: "ready",
 	} as unknown as PixiTileActorVisual;
 	return {
+		activityParticles: {
+			centerX: 40,
+			container: new Container(),
+			feedbackPhase: null,
+			lastProgress: 0,
+			particles: [
+				{
+					alphaScale: 1,
+					particle: {
+						alpha: 0,
+						tint: 0,
+						x: 0,
+						y: 0,
+					},
+					phaseOffset: 0,
+					spreadOffset: 0,
+					waveOffset: 0,
+				},
+			],
+			startY: 68,
+			topHalfWidth: 24,
+			topY: -18,
+			workingTint: 0xf05bb8,
+		},
 		container,
 		crowdLayer: new Container(),
 		currentVisual: visual,
@@ -167,7 +214,6 @@ const createActor = (id: string) => {
 		offsetLayer: new Container(),
 		onPointerDown: null,
 		pendingVisual: null,
-		runningGlow: new Container(),
 		size: 80,
 		visualLayer: new Container(),
 		visuals: new Set([
@@ -189,9 +235,8 @@ const applyPresentationWrite = (write: PixiActorPresentationWrite) => {
 		case "crowd-opacity":
 			write.actor.crowdLayer.alpha = write.alpha;
 			return;
-		case "glow-opacity":
-			if (write.alpha !== undefined) write.actor.runningGlow.alpha = write.alpha;
-			if (write.visible !== undefined) write.actor.runningGlow.visible = write.visible;
+		case "activity-particles":
+			write.actor.activityParticles.container.visible = write.visible;
 	}
 };
 
@@ -891,7 +936,8 @@ describe("Pixi tile motion runtime", () => {
 		});
 		expect(
 			animations.filter(
-				(animation) => animation.actor === owner && animation.channel === "glow-opacity",
+				(animation) =>
+					animation.actor === owner && animation.channel === "activity-particles",
 			),
 		).toHaveLength(1);
 		expect(magneticUpdates.at(-1)).toMatchObject({
@@ -1555,7 +1601,8 @@ describe("Pixi tile motion runtime", () => {
 		const animationCountBeforeContact = animations.length;
 		expect(
 			animations.filter(
-				(animation) => animation.actor === stacked && animation.channel === "glow-opacity",
+				(animation) =>
+					animation.actor === stacked && animation.channel === "activity-particles",
 			),
 		).toHaveLength(0);
 		expect(
@@ -1583,7 +1630,8 @@ describe("Pixi tile motion runtime", () => {
 		]);
 		expect(
 			animations.filter(
-				(animation) => animation.actor === stacked && animation.channel === "glow-opacity",
+				(animation) =>
+					animation.actor === stacked && animation.channel === "activity-particles",
 			),
 		).toHaveLength(1);
 		Effect.runSync(runtime.closeFx);
@@ -1700,7 +1748,8 @@ describe("Pixi tile motion runtime", () => {
 		expect(stacked.item.quantity).toBe(1);
 		expect(
 			animations.filter(
-				(animation) => animation.actor === stacked && animation.channel === "glow-opacity",
+				(animation) =>
+					animation.actor === stacked && animation.channel === "activity-particles",
 			),
 		).toHaveLength(0);
 		const firstTravel = animations.find(
@@ -1723,7 +1772,8 @@ describe("Pixi tile motion runtime", () => {
 		expect(stacked.item.quantity).toBe(2);
 		expect(
 			animations.filter(
-				(animation) => animation.actor === stacked && animation.channel === "glow-opacity",
+				(animation) =>
+					animation.actor === stacked && animation.channel === "activity-particles",
 			),
 		).toHaveLength(1);
 		expect(
@@ -1744,7 +1794,8 @@ describe("Pixi tile motion runtime", () => {
 		expect(stacked.item.quantity).toBe(3);
 		expect(
 			animations.filter(
-				(animation) => animation.actor === stacked && animation.channel === "glow-opacity",
+				(animation) =>
+					animation.actor === stacked && animation.channel === "activity-particles",
 			),
 		).toHaveLength(2);
 		expect(
@@ -1896,13 +1947,14 @@ describe("Pixi tile motion runtime", () => {
 		expect(replacement.item.quantity).toBe(2);
 		expect(
 			animations.filter(
-				(animation) => animation.actor === target && animation.channel === "glow-opacity",
+				(animation) =>
+					animation.actor === target && animation.channel === "activity-particles",
 			),
 		).toHaveLength(0);
 		expect(
 			animations.filter(
 				(animation) =>
-					animation.actor === replacement && animation.channel === "glow-opacity",
+					animation.actor === replacement && animation.channel === "activity-particles",
 			),
 		).toHaveLength(1);
 		expect(magneticReleases).toEqual([

@@ -5,9 +5,9 @@ import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
 import type { PixiAnimationCurve } from "~/ui/pixi/animation/PixiAnimationDriver";
 
 export type PixiActorAnimationChannel =
+	| "activity-particles"
 	| "crowd-opacity"
 	| "grab-offset"
-	| "glow-opacity"
 	| "lifecycle-opacity"
 	| "pose"
 	| "visual-mix";
@@ -20,6 +20,7 @@ interface PixiActorAnimationBase {
 	readonly onCancel?: () => void;
 	readonly onComplete?: () => void;
 	readonly ownerKey?: string;
+	readonly repeat?: number;
 }
 
 export interface PixiActorPresentedPose {
@@ -45,8 +46,8 @@ export type PixiActorAnimation =
 			readonly toCrowdAlpha: number;
 	  })
 	| (PixiActorAnimationBase & {
-			readonly channel: "glow-opacity";
-			readonly toRunningGlowAlpha: number;
+			readonly channel: "activity-particles";
+			readonly render: (progress: number) => void;
 	  })
 	| (PixiActorAnimationBase & {
 			readonly channel: "visual-mix";
@@ -73,9 +74,9 @@ export type PixiActorPresentationWrite =
 	  }
 	| {
 			readonly actor: PixiTileActor;
-			readonly alpha?: number;
-			readonly channel: "glow-opacity";
-			readonly visible?: boolean;
+			readonly channel: "activity-particles";
+			readonly reset?: boolean;
+			readonly visible: boolean;
 	  }
 	| {
 			readonly actor: PixiTileActor;

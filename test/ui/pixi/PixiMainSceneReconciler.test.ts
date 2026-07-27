@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import { Container, Graphics, Sprite, Texture } from "pixi.js";
+import { Container, Graphics, Particle, ParticleContainer, Texture } from "pixi.js";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { GameEngine } from "~/bridge/game/GameEngine";
@@ -18,7 +18,7 @@ import type {
 	PixiActorAnimator,
 	PixiActorPresentationWrite,
 } from "~/ui/pixi/animation/PixiActorAnimator";
-import { flashPixiTileActorAckGlowFx } from "~/ui/pixi/animation/runPixiTileActorRunningGlowFx";
+import { burstPixiTileActorAckParticlesFx } from "~/ui/pixi/animation/runPixiTileActorActivityParticlesFx";
 import type { PixiMainSceneDragController } from "~/ui/pixi/drag/PixiMainSceneDragController";
 import { createPixiMainSceneDropPresentationFx } from "~/ui/pixi/drop/createPixiMainSceneDropPresentationFx";
 import type { PixiTileMagneticField } from "~/ui/pixi/magnet/PixiTileMagneticField";
@@ -149,7 +149,7 @@ const createItem = (
 	quantity: 3,
 	revision: `revision:${id}`,
 	running: false,
-	runningGlow: false,
+	activityEffect: false,
 	sourceUrl: "resource:water",
 	title: "Water",
 	...overrides,
@@ -180,12 +180,19 @@ const createActor = (item: TileActorItem): PixiTileActor => {
 	const offsetLayer = new Container();
 	const crowdLayer = new Container();
 	const visualLayer = new Container();
-	const runningGlow = new Sprite(Texture.EMPTY);
+	const particle = new Particle(Texture.EMPTY);
+	const activityParticleContainer = new ParticleContainer({
+		particles: [
+			particle,
+		],
+		texture: Texture.EMPTY,
+	});
+	activityParticleContainer.visible = false;
 	const progressBar = new Graphics();
 	const currentVisual = createVisual(item);
 	visualLayer.addChild(currentVisual.container);
 	crowdLayer.addChild(visualLayer);
-	offsetLayer.addChild(runningGlow, crowdLayer);
+	offsetLayer.addChild(activityParticleContainer, crowdLayer);
 	container.addChild(offsetLayer);
 	return {
 		instanceId: `test:${item.id}`,
@@ -193,13 +200,29 @@ const createActor = (item: TileActorItem): PixiTileActor => {
 		offsetLayer,
 		crowdLayer,
 		visualLayer,
-		runningGlow,
+		activityParticles: {
+			centerX: 40,
+			container: activityParticleContainer,
+			feedbackPhase: null,
+			lastProgress: 0,
+			particles: [
+				{
+					alphaScale: 1,
+					particle,
+					phaseOffset: 0,
+					spreadOffset: 0,
+					waveOffset: 0,
+				},
+			],
+			startY: 68,
+			topHalfWidth: 24,
+			topY: -18,
+			workingTint: 0xf05bb8,
+		},
 		progressBar,
 		visuals: new Set([
 			currentVisual,
 		]),
-		feedbackGlowPhase: null,
-		workingGlowTint: 0xf05bb8,
 		currentVisual,
 		pendingVisual: null,
 		item,
@@ -323,11 +346,8 @@ const createAnimator = () => {
 						case "crowd-opacity":
 							write.actor.crowdLayer.alpha = write.alpha;
 							break;
-						case "glow-opacity":
-							if (write.alpha !== undefined)
-								write.actor.runningGlow.alpha = write.alpha;
-							if (write.visible !== undefined)
-								write.actor.runningGlow.visible = write.visible;
+						case "activity-particles":
+							write.actor.activityParticles.container.visible = write.visible;
 							break;
 					}
 				}),
@@ -426,14 +446,15 @@ const createReconcilerHarness = ({
 				updateFx: () => Effect.void,
 			} satisfies PixiTileMagneticField,
 			motion,
+			particleTextures: {
+				closeFx: Effect.void,
+				mote: Texture.EMPTY,
+				spark: Texture.EMPTY,
+			},
 			readPalette: () =>
 				({
 					success: 0x57d7b2,
 				}) as never,
-			runningGlowTexture: {
-				closeFx: Effect.void,
-				texture: Texture.EMPTY,
-			},
 			surface: {
 				readActorPoseFx: () =>
 					Effect.succeed(
@@ -696,7 +717,7 @@ describe("Pixi main-scene reconciliation", () => {
 		);
 	});
 
-	it("retains a pending source, then fades it while glowing the Inventory receiver", () => {
+	it("retains a pending source, then fades it while bursting the Inventory receiver", () => {
 		const now = vi.spyOn(performance, "now").mockReturnValue(1_000);
 		const source = createItem("runtime:water-source", boardLocation);
 		const inventorySpawn = createItem("runtime:water-inventory-new-id", inventoryLocation);
@@ -776,9 +797,8 @@ describe("Pixi main-scene reconciliation", () => {
 		expect(harness.animations).toContainEqual(
 			expect.objectContaining({
 				actor: inventoryActor,
-				channel: "glow-opacity",
-				durationMs: 110,
-				toRunningGlowAlpha: 0.82,
+				channel: "activity-particles",
+				durationMs: 720,
 			}),
 		);
 		expect(Effect.runSync(harness.dropPresentation.readSnapshotFx).feedback).toEqual([]);
@@ -798,7 +818,7 @@ describe("Pixi main-scene reconciliation", () => {
 		now.mockRestore();
 	});
 
-	it("flashes a surviving committed feedback receiver exactly once", () => {
+	it("bursts a surviving committed feedback receiver exactly once", () => {
 		const item = createItem("runtime:tree", boardLocation);
 		const actor = createActor(item);
 		const harness = createReconcilerHarness({
@@ -819,10 +839,9 @@ describe("Pixi main-scene reconciliation", () => {
 		expect(harness.animations).toContainEqual(
 			expect.objectContaining({
 				actor,
-				channel: "glow-opacity",
-				durationMs: 110,
-				ownerKey: `feedback-glow:${actor.instanceId}`,
-				toRunningGlowAlpha: 0.82,
+				channel: "activity-particles",
+				durationMs: 720,
+				ownerKey: `activity-particles:${actor.instanceId}`,
 			}),
 		);
 		const animationCount = harness.animations.length;
@@ -837,7 +856,7 @@ describe("Pixi main-scene reconciliation", () => {
 			...idle,
 			revision: "revision:producer:running",
 			running: true,
-			runningGlow: true,
+			activityEffect: true,
 		} satisfies TileActorItem;
 		const settled = {
 			...idle,
@@ -848,7 +867,7 @@ describe("Pixi main-scene reconciliation", () => {
 			actor,
 		});
 		Effect.runSync(
-			flashPixiTileActorAckGlowFx({
+			burstPixiTileActorAckParticlesFx({
 				actor,
 				animator: harness.animator,
 				tint: 0x57d7b2,
@@ -859,11 +878,11 @@ describe("Pixi main-scene reconciliation", () => {
 		];
 
 		Effect.runSync(harness.reconciler.reconcileFx(transition(2)));
-		expect(actor.feedbackGlowPhase).toBe("rising");
-		expect(actor.runningGlow.tint).toBe(0x57d7b2);
+		expect(actor.activityParticles.feedbackPhase).toBe("burst");
 		expect(
 			harness.animations.filter(
-				(animation) => animation.actor === actor && animation.channel === "glow-opacity",
+				(animation) =>
+					animation.actor === actor && animation.channel === "activity-particles",
 			),
 		).toHaveLength(1);
 
@@ -873,11 +892,11 @@ describe("Pixi main-scene reconciliation", () => {
 		projectionState.feedback = [];
 		Effect.runSync(harness.reconciler.reconcileFx(transition(3)));
 
-		expect(actor.feedbackGlowPhase).toBe("rising");
-		expect(actor.runningGlow.tint).toBe(0x57d7b2);
+		expect(actor.activityParticles.feedbackPhase).toBe("burst");
 		expect(
 			harness.animations.filter(
-				(animation) => animation.actor === actor && animation.channel === "glow-opacity",
+				(animation) =>
+					animation.actor === actor && animation.channel === "activity-particles",
 			),
 		).toHaveLength(1);
 	});
@@ -978,15 +997,15 @@ describe("Pixi main-scene reconciliation", () => {
 
 		expect(harness.animations[0]).toMatchObject({
 			actor,
-			channel: "glow-opacity",
-			durationMs: 110,
-			ownerKey: `feedback-glow:${actor.instanceId}`,
+			channel: "activity-particles",
+			durationMs: 720,
+			ownerKey: `activity-particles:${actor.instanceId}`,
 		});
 		expect(harness.animations).toContainEqual(
 			expect.objectContaining({
 				actor,
 				channel: "lifecycle-opacity",
-				durationMs: 630,
+				durationMs: 720,
 				toAlpha: 0,
 			}),
 		);
@@ -994,7 +1013,7 @@ describe("Pixi main-scene reconciliation", () => {
 			expect.objectContaining({
 				actor,
 				channel: "pose",
-				durationMs: 630,
+				durationMs: 720,
 				toScale: 0.76,
 			}),
 		);
@@ -1012,7 +1031,7 @@ describe("Pixi main-scene reconciliation", () => {
 			itemId: "producer:running",
 			revision: "revision:producer-running",
 			running: true,
-			runningGlow: true,
+			activityEffect: true,
 			sourceUrl: "resource:producer-running",
 			title: "Running producer",
 		});
@@ -1084,12 +1103,17 @@ describe("Pixi main-scene reconciliation", () => {
 				toCrowdAlpha: 0.82,
 			},
 		);
-		expect(harness.animations.find(({ channel }) => channel === "glow-opacity")).toMatchObject({
+		expect(
+			harness.animations.find(({ channel }) => channel === "activity-particles"),
+		).toMatchObject({
 			actor,
-			channel: "glow-opacity",
-			durationMs: 640,
-			ownerKey: `running-glow:${actor.instanceId}`,
-			toRunningGlowAlpha: 0.62,
+			channel: "activity-particles",
+			curve: {
+				kind: "linear",
+			},
+			durationMs: 1_760,
+			ownerKey: `activity-particles:${actor.instanceId}`,
+			repeat: Number.POSITIVE_INFINITY,
 		});
 	});
 

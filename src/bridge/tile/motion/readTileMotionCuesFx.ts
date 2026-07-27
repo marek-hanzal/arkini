@@ -135,7 +135,7 @@ const readInventoryInputSourceItemFx = Effect.fn("readInventoryInputSourceItemFx
 		quantity: source.quantity,
 		revision: source.revision,
 		running: false,
-		runningGlow: false,
+		activityEffect: false,
 	} satisfies TileActorItem;
 });
 

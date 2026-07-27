@@ -11,7 +11,7 @@ import { readCommittedTileSwapMotionCueFx } from "~/bridge/tile/motion/readCommi
 import { readTileMotionCuesFx } from "~/bridge/tile/motion/readTileMotionCuesFx";
 import { readTileActorsFx } from "~/bridge/tile/readTileActorsFx";
 import type { PixiMainSceneActorStore } from "~/ui/pixi/actor/PixiMainSceneActorStore";
-import type { PixiTileActorRunningGlowTexture } from "~/ui/pixi/actor/PixiTileActorRunningGlowTexture";
+import type { PixiTileActorParticleTextures } from "~/ui/pixi/actor/PixiTileActorParticleTextures";
 import { createPixiTileActorFx } from "~/ui/pixi/actor/createPixiTileActorFx";
 import { readPixiTileActorCrowdAlpha } from "~/ui/pixi/actor/readPixiTileActorCrowdAlpha";
 import {
@@ -23,12 +23,11 @@ import { flashPixiTileActorConsumedSourceFx } from "~/ui/pixi/animation/flashPix
 import { readPixiActorAlphaAnimationKey } from "~/ui/pixi/animation/readPixiActorAlphaAnimationKey";
 import { readPixiTileTravelDurationMsFx } from "~/ui/pixi/animation/readPixiTileTravelDurationMsFx";
 import {
-	flashPixiTileActorFeedbackGlowFx,
-	pixiTileActorFeedbackGlowFallDurationMs,
-	pixiTileActorFeedbackGlowRiseDurationMs,
-	startPixiTileActorRunningGlowFx,
-	stopPixiTileActorRunningGlowFx,
-} from "~/ui/pixi/animation/runPixiTileActorRunningGlowFx";
+	burstPixiTileActorFeedbackParticlesFx,
+	pixiTileActorFeedbackParticlesDurationMs,
+	startPixiTileActorActivityParticlesFx,
+	stopPixiTileActorActivityParticlesFx,
+} from "~/ui/pixi/animation/runPixiTileActorActivityParticlesFx";
 import { startPixiTileActorFadeInFx } from "~/ui/pixi/animation/startPixiTileActorFadeInFx";
 import type { PixiScenePalette } from "~/ui/pixi/appearance/PixiScenePalette";
 import type { PixiMainSceneDragController } from "~/ui/pixi/drag/PixiMainSceneDragController";
@@ -53,8 +52,8 @@ export namespace createPixiMainSceneReconcilerFx {
 		readonly game: GameEngine;
 		readonly magneticField: PixiTileMagneticField;
 		readonly motion: PixiTileMotionRuntime;
+		readonly particleTextures: PixiTileActorParticleTextures;
 		readonly readPalette: () => PixiScenePalette;
-		readonly runningGlowTexture: PixiTileActorRunningGlowTexture;
 		readonly surface: PixiMainSceneSurface;
 		readonly textures: PixiTextureStore;
 	}
@@ -62,8 +61,6 @@ export namespace createPixiMainSceneReconcilerFx {
 
 const runningTransitionDurationMs = 180;
 const feedbackExitDurationMs = 420;
-const feedbackGlowExitDurationMs =
-	pixiTileActorFeedbackGlowRiseDurationMs + pixiTileActorFeedbackGlowFallDurationMs;
 const defaultExitDurationMs = 220;
 
 const sameVisual = (left: TileActorItem, right: TileActorItem) =>
@@ -74,7 +71,7 @@ const sameVisual = (left: TileActorItem, right: TileActorItem) =>
 	left.sourceUrl === right.sourceUrl &&
 	left.compositeUrl === right.compositeUrl &&
 	left.running === right.running &&
-	left.runningGlow === right.runningGlow &&
+	left.activityEffect === right.activityEffect &&
 	left.primaryAction.kind === right.primaryAction.kind &&
 	(left.primaryAction.kind !== "start-default-line" ||
 		(right.primaryAction.kind === "start-default-line" &&
@@ -97,8 +94,8 @@ export const createPixiMainSceneReconcilerFx = Effect.fn("createPixiMainSceneRec
 		game,
 		magneticField,
 		motion,
+		particleTextures,
 		readPalette,
-		runningGlowTexture,
 		surface,
 		textures,
 	}: createPixiMainSceneReconcilerFx.Props) {
@@ -128,7 +125,7 @@ export const createPixiMainSceneReconcilerFx = Effect.fn("createPixiMainSceneRec
 				yield* (
 					cue.kind === "consume-source"
 						? flashPixiTileActorConsumedSourceFx
-						: flashPixiTileActorFeedbackGlowFx
+						: burstPixiTileActorFeedbackParticlesFx
 				)({
 					actor,
 					animator,
@@ -384,7 +381,7 @@ export const createPixiMainSceneReconcilerFx = Effect.fn("createPixiMainSceneRec
 						actorId: id,
 						durationMs:
 							exitFeedbackCues.length > 0
-								? feedbackGlowExitDurationMs
+								? pixiTileActorFeedbackParticlesDurationMs
 								: leavingFeedbackActorIds.has(id)
 									? feedbackExitDurationMs
 									: defaultExitDurationMs,
@@ -415,7 +412,7 @@ export const createPixiMainSceneReconcilerFx = Effect.fn("createPixiMainSceneRec
 								frames: application.frames,
 								item: displayItem,
 								palette: readPalette(),
-								runningGlowTexture: runningGlowTexture.texture,
+								particleTextures,
 								textures,
 							}),
 						);
@@ -450,8 +447,8 @@ export const createPixiMainSceneReconcilerFx = Effect.fn("createPixiMainSceneRec
 							size: pose.size,
 							textures,
 						});
-						if (displayItem.runningGlow) {
-							yield* startPixiTileActorRunningGlowFx({
+						if (displayItem.activityEffect) {
+							yield* startPixiTileActorActivityParticlesFx({
 								actor: created,
 								animator,
 							});
@@ -482,7 +479,8 @@ export const createPixiMainSceneReconcilerFx = Effect.fn("createPixiMainSceneRec
 					const crowdAlphaChanged =
 						readPixiTileActorCrowdAlpha(actor.item) !==
 						readPixiTileActorCrowdAlpha(displayItem);
-					const runningGlowChanged = actor.item.runningGlow !== displayItem.runningGlow;
+					const activityEffectChanged =
+						actor.item.activityEffect !== displayItem.activityEffect;
 					const previousDisplayedSize = actor.size * actor.container.scale.x;
 					if (visualChanged || sizeChanged) {
 						yield* updatePixiTileActorFx({
@@ -515,11 +513,11 @@ export const createPixiMainSceneReconcilerFx = Effect.fn("createPixiMainSceneRec
 							toCrowdAlpha: readPixiTileActorCrowdAlpha(displayItem),
 						});
 					}
-					if (runningGlowChanged) {
+					if (activityEffectChanged) {
 						yield* (
-							displayItem.runningGlow
-								? startPixiTileActorRunningGlowFx
-								: stopPixiTileActorRunningGlowFx
+							displayItem.activityEffect
+								? startPixiTileActorActivityParticlesFx
+								: stopPixiTileActorActivityParticlesFx
 						)({
 							actor,
 							animator,

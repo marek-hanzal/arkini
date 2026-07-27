@@ -1,6 +1,7 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
+import type { GameEngine } from "~/bridge/game/GameEngine";
 import { readCommittedTileSwapMotionCueFx } from "~/bridge/tile/motion/readCommittedTileSwapMotionCueFx";
 import { readTileMotionCuesFx } from "~/bridge/tile/motion/readTileMotionCuesFx";
 import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
@@ -92,6 +93,14 @@ const runtime = Effect.runSync(
 		}),
 	),
 );
+const game = {
+	getResourceUrl: (resourceId: string) => resourceId,
+} as GameEngine;
+const readCues = (transition: readTileMotionCuesFx.Props["transition"]) =>
+	readTileMotionCuesFx({
+		game,
+		transition,
+	});
 const source = runtime.items.find(
 	(item) => item.location.scope === "board" && item.location.position.x === 0,
 );
@@ -126,7 +135,7 @@ const committedRuntime = {
 describe("readTileMotionCuesFx", () => {
 	it("compiles ordered spawn and stack facts from the complete committed transition", () => {
 		const cues = Effect.runSync(
-			readTileMotionCuesFx({
+			readCues({
 				sequence: 7,
 				previousRuntime: runtime,
 				runtime: committedRuntime,
@@ -180,7 +189,7 @@ describe("readTileMotionCuesFx", () => {
 
 	it("keeps stagger indexes local to each producer in one committed transition", () => {
 		const cues = Effect.runSync(
-			readTileMotionCuesFx({
+			readCues({
 				sequence: 8,
 				previousRuntime: runtime,
 				runtime: committedRuntime,
@@ -274,7 +283,7 @@ describe("readTileMotionCuesFx", () => {
 
 		expect(
 			Effect.runSync(
-				readTileMotionCuesFx({
+				readCues({
 					sequence: 9,
 					previousRuntime,
 					runtime: currentRuntime,
@@ -308,7 +317,7 @@ describe("readTileMotionCuesFx", () => {
 	it("compiles a board input store as whole-source delivery to its live owner", () => {
 		expect(
 			Effect.runSync(
-				readTileMotionCuesFx({
+				readCues({
 					sequence: 10,
 					previousRuntime: runtime,
 					runtime: committedRuntime,
@@ -347,9 +356,92 @@ describe("readTileMotionCuesFx", () => {
 		]);
 	});
 
+	it("anchors an Inventory input store to the physical toolbar opener", () => {
+		const inventorySourceLocation = {
+			scope: "inventory" as const,
+			position: {
+				x: 0,
+				y: 0,
+			},
+		};
+		const previousRuntime = {
+			...runtime,
+			items: runtime.items.map((item) =>
+				item.id === source.id
+					? {
+							...item,
+							location: inventorySourceLocation,
+							quantity: 2,
+						}
+					: item,
+			),
+		};
+		const currentRuntime = {
+			...previousRuntime,
+			items: previousRuntime.items.map((item) =>
+				item.id === source.id
+					? {
+							...item,
+							quantity: 1,
+							revision: `${item.revision}:remainder`,
+						}
+					: item,
+			),
+		};
+
+		expect(
+			Effect.runSync(
+				readCues({
+					sequence: 11,
+					previousRuntime,
+					runtime: currentRuntime,
+					events: [
+						{
+							type: GameEventEnumSchema.enum.ItemInputStored,
+							sourceItemId: source.id,
+							canonicalItemId: source.item.id,
+							previousSourceLocation: inventorySourceLocation,
+							previousQuantity: 2,
+							storedQuantity: 1,
+							resultingQuantity: 1,
+							ownerItemId: target.id,
+							lineId: "line:water",
+							inputIndex: 0,
+						},
+					],
+				}),
+			),
+		).toMatchObject([
+			{
+				kind: "input",
+				sequence: 11,
+				eventIndex: 0,
+				staggerIndex: 0,
+				sourceActorId: source.id,
+				sourceItem: {
+					badgeCount: 2,
+					id: source.id,
+					itemId: source.item.id,
+					itemType: "simple",
+					location: inventorySourceLocation,
+					quantity: 2,
+					sourceUrl: "asset:water",
+				},
+				targetActorId: target.id,
+				canonicalItemId: source.item.id,
+				previousQuantity: 2,
+				storedQuantity: 1,
+				resultingQuantity: 1,
+				originActorId: inventoryOpener.id,
+				originLocation: inventoryOpener.location,
+				targetLocation,
+			},
+		]);
+	});
+
 	it("degrades stale or missing visual identities to no choreography", () => {
 		const cues = Effect.runSync(
-			readTileMotionCuesFx({
+			readCues({
 				sequence: 8,
 				previousRuntime: runtime,
 				runtime: committedRuntime,

@@ -1,4 +1,4 @@
-import type { Container, FederatedPointerEvent, Sprite } from "pixi.js";
+import type { Container, FederatedPointerEvent, Graphics, Sprite } from "pixi.js";
 
 import type { TileActorItem } from "~/bridge/tile/TileActorItem";
 import type { PixiTileActorVisual } from "~/ui/pixi/actor/PixiTileActorVisual";
@@ -10,6 +10,7 @@ export interface PixiTileActor {
 	readonly crowdLayer: Container;
 	readonly visualLayer: Container;
 	readonly runningGlow: Sprite;
+	readonly progressBar: Graphics;
 	readonly visuals: Set<PixiTileActorVisual>;
 	feedbackGlowPhase: "falling" | "rising" | null;
 	workingGlowTint: number;

@@ -179,12 +179,14 @@ describe("Pixi actor animator", () => {
 	it("supersedes different owners on one actor channel while another channel keeps producing frames", () => {
 		const actor = createActor();
 		const { animator, tweens } = createAnimator();
+		const canceled = vi.fn();
 
 		Effect.runSync(
 			animator.animateFx({
 				actor,
 				channel: "lifecycle-opacity",
 				durationMs: 520,
+				onCancel: canceled,
 				ownerKey: "spawn-entry",
 				toAlpha: 1,
 			}),
@@ -217,6 +219,7 @@ describe("Pixi actor animator", () => {
 
 		expect(tweens[0]?.stop).toHaveBeenCalledOnce();
 		expect(tweens[1]?.stop).not.toHaveBeenCalled();
+		expect(canceled).toHaveBeenCalledOnce();
 
 		// A stopped driver's stale frame is ignored, the independently owned pose keeps advancing,
 		// and the successor opacity starts from the exact live interrupted value.
@@ -256,6 +259,30 @@ describe("Pixi actor animator", () => {
 
 		expect(tweens[0]?.stop).toHaveBeenCalledOnce();
 		expect(actor.crowdLayer.alpha).toBeCloseTo(0.955);
+	});
+
+	it("settles cancellation separately from natural completion", () => {
+		const actor = createActor();
+		const { animator, tweens } = createAnimator();
+		const canceled = vi.fn();
+		const completed = vi.fn();
+
+		Effect.runSync(
+			animator.animateFx({
+				actor,
+				channel: "lifecycle-opacity",
+				durationMs: 220,
+				onCancel: canceled,
+				onComplete: completed,
+				toAlpha: 0,
+			}),
+		);
+		tweens[0]?.complete();
+
+		expect(completed).toHaveBeenCalledOnce();
+		expect(canceled).not.toHaveBeenCalled();
+		Effect.runSync(animator.cancelActorFx(actor));
+		expect(canceled).not.toHaveBeenCalled();
 	});
 
 	it("setFx cancels only its physical channel, applies the write, and invalidates one frame", () => {

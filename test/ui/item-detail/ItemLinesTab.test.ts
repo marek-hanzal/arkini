@@ -333,6 +333,59 @@ describe("ItemLinesTab", () => {
 		);
 	});
 
+	it("withdraws one exact buffered runtime item without replacing the whole-line action", async () => {
+		await renderLines({
+			...projection,
+			line: [
+				{
+					...projection.line[0],
+					actions: {
+						canAutofill: false,
+						canWithdraw: true,
+					},
+					input: [
+						{
+							...input,
+							availableCapacity: 0,
+							missingQuantity: 0,
+							storedQuantity: 1,
+							storedItems: [
+								{
+									itemId: "townhall",
+									quantity: 1,
+									revision: "revision:townhall:buffered",
+									runtimeItemId: "runtime:townhall",
+									sourceUrl: "resource:townhall",
+									title: "Town Hall",
+								},
+							],
+						},
+					],
+				},
+			],
+		});
+		const itemWithdraw = document.querySelector<HTMLButtonElement>(
+			'[data-ui="TileLineStoredInputWithdrawButton"]',
+		);
+		const lineWithdraw = Array.from(
+			document.querySelectorAll<HTMLButtonElement>("button"),
+		).find((button) => button.textContent === "Withdraw" && button !== itemWithdraw);
+
+		expect(itemWithdraw).not.toBeNull();
+		expect(itemWithdraw?.parentElement?.dataset.runtimeItemId).toBe("runtime:townhall");
+		expect(itemWithdraw?.getAttribute("aria-label")).toBe("Withdraw Town Hall");
+		expect(lineWithdraw).toBeDefined();
+
+		await act(async () => itemWithdraw?.click());
+
+		expect(commands.withdraw).toHaveBeenCalledWith({
+			itemId: "runtime:townhall",
+			itemRevision: "revision:townhall:buffered",
+			ownerItemId: "runtime:producer",
+			lineId: "line:first",
+		});
+	});
+
 	it("keeps authored order, toggles default state, and reserves active border geometry", async () => {
 		await renderLines();
 		const rows = Array.from(document.querySelectorAll<HTMLElement>('[data-ui="TileLine"]'));

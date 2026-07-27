@@ -56,7 +56,7 @@ describe("autofillLineInputsFx events", () => {
 					const nextFiber = yield* transitions.changes.pipe(
 						Stream.tap(() => Deferred.succeed(replaySeen, undefined)),
 						Stream.drop(1),
-						Stream.take(2),
+						Stream.take(3),
 						Stream.runCollect,
 						Effect.forkChild,
 					);
@@ -95,6 +95,24 @@ describe("autofillLineInputsFx events", () => {
 				previousQuantity: 1,
 				storedQuantity: 1,
 				resultingQuantity: 0,
+				ownerItemId,
+				lineId,
+				inputIndex: 0,
+			},
+			{
+				type: GameEventEnumSchema.enum.ItemInputStored,
+				sourceItemId: "runtime:inventory",
+				canonicalItemId: "water",
+				previousSourceLocation: {
+					scope: "inventory",
+					position: {
+						x: 0,
+						y: 0,
+					},
+				},
+				previousQuantity: 2,
+				storedQuantity: 1,
+				resultingQuantity: 1,
 				ownerItemId,
 				lineId,
 				inputIndex: 0,

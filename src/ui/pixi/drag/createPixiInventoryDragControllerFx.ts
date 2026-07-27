@@ -16,11 +16,12 @@ import type { PixiInventoryActorStore } from "~/ui/pixi/actor/PixiInventoryActor
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
 import { readPixiTileActorCursorFx } from "~/ui/pixi/actor/readPixiTileActorCursorFx";
 import type { PixiActorAnimator } from "~/ui/pixi/animation/PixiActorAnimator";
-import { createPixiRetargetablePoseSamplerFx } from "~/ui/pixi/animation/createPixiRetargetablePoseSamplerFx";
+import { animatePixiActorToRetargetablePoseFx } from "~/ui/pixi/animation/animatePixiActorToRetargetablePoseFx";
 import { flashPixiTileActorConsumedSourceFx } from "~/ui/pixi/animation/flashPixiTileActorConsumedSourceFx";
-import { readPixiTileTravelDurationMsFx } from "~/ui/pixi/animation/readPixiTileTravelDurationMsFx";
 import { flashPixiTileActorFeedbackGlowFx } from "~/ui/pixi/animation/runPixiTileActorRunningGlowFx";
 import type { PixiInventoryDragController } from "~/ui/pixi/drag/PixiInventoryDragController";
+import { readPixiDragPointerOffset } from "~/ui/pixi/drag/readPixiDragPointerOffset";
+import { setPixiDraggedActorPoseFx } from "~/ui/pixi/drag/setPixiDraggedActorPoseFx";
 import {
 	restorePixiInventoryActorRemovalFeedbackFx,
 	startPixiInventoryActorRemovalFeedbackFx,
@@ -37,7 +38,7 @@ export namespace createPixiInventoryDragControllerFx {
 		readonly game: GameEngine;
 		readonly onActivate: (
 			item: TileActorItem,
-			shiftKey: boolean,
+			openDetail: boolean,
 			origin: HTMLElement,
 		) => void | PromiseLike<unknown>;
 		readonly onAcceptedDropFx: Effect.Effect<void>;
@@ -48,6 +49,7 @@ export namespace createPixiInventoryDragControllerFx {
 
 interface ActiveInventoryDrag {
 	readonly actor: PixiTileActor;
+	readonly openDetail: boolean;
 	readonly pointerId: number;
 	readonly pressX: number;
 	readonly pressY: number;
@@ -78,8 +80,9 @@ const isExpectedActivationFailure = (cause: unknown) =>
 /**
  * Owns one Inventory pointer gesture and its local retained-actor presentation.
  *
- * Click and Shift+click remain activation paths; only a threshold-crossing gesture becomes drag.
- * Release re-reads the target occupant and sends exact canonical source facts through the bridge.
+ * Left click activates, right click opens Item Detail, and only a threshold-crossing left gesture
+ * becomes drag. Release re-reads the target occupant and sends exact canonical source facts
+ * through the bridge.
  */
 export const createPixiInventoryDragControllerFx = Effect.fn("createPixiInventoryDragControllerFx")(
 	function* ({
@@ -189,10 +192,10 @@ export const createPixiInventoryDragControllerFx = Effect.fn("createPixiInventor
 			);
 		};
 
-		const activateActor = (actor: PixiTileActor, shiftKey: boolean) => {
+		const activateActor = (actor: PixiTileActor, openDetail: boolean) => {
 			const item = actor.item;
-			if (!shiftKey && removalFeedbackGenerationByActorId.has(item.id)) return;
-			const removalFeedbackGeneration = shiftKey
+			if (!openDetail && removalFeedbackGenerationByActorId.has(item.id)) return;
+			const removalFeedbackGeneration = openDetail
 				? null
 				: (removalFeedbackGenerationByActorId.get(item.id) ?? 0) + 1;
 			if (removalFeedbackGeneration !== null) {
@@ -214,7 +217,7 @@ export const createPixiInventoryDragControllerFx = Effect.fn("createPixiInventor
 			void Promise.resolve()
 				.then(() => {
 					if (closed) return;
-					return onActivate(item, shiftKey, application.app.canvas);
+					return onActivate(item, openDetail, application.app.canvas);
 				})
 				.catch((cause) => {
 					if (closed) return;
@@ -294,41 +297,13 @@ export const createPixiInventoryDragControllerFx = Effect.fn("createPixiInventor
 					running: actor.item.running,
 				}),
 			);
-			const durationMs = RendererRuntime.runSync(
-				readPixiTileTravelDurationMsFx({
-					fromX: actor.container.x,
-					fromY: actor.container.y,
-					tileSize: actor.size,
-					toX: pose.x,
-					toY: pose.y,
-				}),
-			);
-			const readPose = RendererRuntime.runSync(
-				createPixiRetargetablePoseSamplerFx({
-					from: {
-						scale: actor.container.scale.x,
-						x: actor.container.x,
-						y: actor.container.y,
-					},
-					readTarget: () => {
-						const latest =
-							RendererRuntime.runSync(surface.readActorPoseFx(actor.item)) ?? pose;
-						return {
-							scale:
-								RendererRuntime.runSync(surface.readActorSizeFx) /
-								Math.max(1, actor.size),
-							x: latest.x,
-							y: latest.y,
-						};
-					},
-				}),
-			);
 			RendererRuntime.runSync(
-				animator.animateFx({
+				animatePixiActorToRetargetablePoseFx({
 					actor,
-					channel: "pose",
-					durationMs,
-					readPose,
+					animator,
+					readSize: () => RendererRuntime.runSync(surface.readActorSizeFx),
+					readTarget: () => RendererRuntime.runSync(surface.readActorPoseFx(actor.item)),
+					target: pose,
 				}),
 			);
 		};
@@ -343,17 +318,15 @@ export const createPixiInventoryDragControllerFx = Effect.fn("createPixiInventor
 		};
 
 		const onPointerMove = (event: FederatedPointerEvent) => {
-			const drag = activeDrag;
-			if (
-				drag === null ||
-				drag.phase === "submitting" ||
-				event.pointerId !== drag.pointerId
-			) {
+			const pointer = readPixiDragPointerOffset(event, activeDrag);
+			if (pointer === null) return;
+			const { drag, offsetX, offsetY } = pointer;
+			if (drag.phase === "pressed" && Math.hypot(offsetX, offsetY) < dragThreshold) return;
+			if (drag.phase === "pressed" && drag.openDetail) {
+				releasePointerCapture(drag.pointerId);
+				activeDrag = null;
 				return;
 			}
-			const offsetX = event.global.x - drag.pressX;
-			const offsetY = event.global.y - drag.pressY;
-			if (drag.phase === "pressed" && Math.hypot(offsetX, offsetY) < dragThreshold) return;
 			if (drag.phase === "pressed") {
 				drag.phase = "dragging";
 				drag.actor.dragging = true;
@@ -363,10 +336,9 @@ export const createPixiInventoryDragControllerFx = Effect.fn("createPixiInventor
 				RendererRuntime.runSync(animator.cancelChannelFx(drag.actor, "pose"));
 			}
 			RendererRuntime.runSync(
-				animator.setFx({
+				setPixiDraggedActorPoseFx({
 					actor: drag.actor,
-					channel: "pose",
-					scale: drag.actor.container.scale.x,
+					animator,
 					x: drag.startX + offsetX,
 					y: drag.startY + offsetY,
 				}),
@@ -389,7 +361,7 @@ export const createPixiInventoryDragControllerFx = Effect.fn("createPixiInventor
 			releasePointerCapture(event.pointerId);
 			if (drag.phase === "pressed") {
 				activeDrag = null;
-				activateActor(drag.actor, event.shiftKey);
+				activateActor(drag.actor, drag.openDetail);
 				return;
 			}
 			const target = RendererRuntime.runSync(
@@ -493,7 +465,7 @@ export const createPixiInventoryDragControllerFx = Effect.fn("createPixiInventor
 							closed ||
 							activeDrag !== null ||
 							!event.isPrimary ||
-							event.button !== 0
+							(event.button !== 0 && event.button !== 2)
 						) {
 							return;
 						}
@@ -505,6 +477,7 @@ export const createPixiInventoryDragControllerFx = Effect.fn("createPixiInventor
 						}
 						activeDrag = {
 							actor,
+							openDetail: event.button === 2,
 							pointerId: event.pointerId,
 							pressX: event.global.x,
 							pressY: event.global.y,

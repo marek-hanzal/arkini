@@ -17,7 +17,7 @@ import { usePixiGameRuntime } from "~/ui/pixi/usePixiGameRuntime";
 /**
  * Mounts the one Pixi-native Board + Toolbar scene into the React-owned game shell.
  *
- * Click performs the canonical primary action and Shift+click opens Item Detail. React forwards
+ * Left click performs the canonical primary action and right click opens Item Detail. React forwards
  * commands and overlay cancellation only; the scene runtime owns pointer and display lifecycle.
  */
 export const PixiBoardToolbarSurface = () => {
@@ -57,9 +57,9 @@ export const PixiBoardToolbarSurface = () => {
 	);
 
 	const activate = useCallback(
-		async (item: TileActorItem, shiftKey: boolean, origin: HTMLElement) => {
+		async (item: TileActorItem, openDetail: boolean, origin: HTMLElement) => {
 			const { itemDetail: currentItemDetail } = controlsRef.current;
-			if (shiftKey) {
+			if (openDetail) {
 				RendererRuntime.runSync(
 					currentItemDetail.openItemDetailFx({
 						itemId: item.id,
@@ -180,6 +180,7 @@ export const PixiBoardToolbarSurface = () => {
 			ref={hostRef}
 			className="size-full min-h-0 min-w-0"
 			data-ui="PixiBoardToolbarSurface"
+			onContextMenu={(event) => event.preventDefault()}
 		/>
 	);
 };

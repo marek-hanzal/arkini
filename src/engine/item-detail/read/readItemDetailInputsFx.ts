@@ -47,19 +47,17 @@ export const readItemDetailInputsFx = Effect.fn("readItemDetailInputsFx")(functi
 						const required = yield* readItemDetailQuantityBoundsFx(
 							materialInput.quantity,
 						);
+						const storedItems = runtime.items.filter(
+							(item) =>
+								item.location.scope === LocationScopeEnumSchema.enum.Input &&
+								item.location.ownerItemId === ownerItemId &&
+								item.location.lineId === lineId &&
+								item.location.inputIndex === inputIndex,
+						);
 						const storedQuantity =
 							resolution?.type === InputEnumSchema.enum.Materials
 								? resolution.storedQuantity
-								: runtime.items
-										.filter(
-											(item) =>
-												item.location.scope ===
-													LocationScopeEnumSchema.enum.Input &&
-												item.location.ownerItemId === ownerItemId &&
-												item.location.lineId === lineId &&
-												item.location.inputIndex === inputIndex,
-										)
-										.reduce((total, item) => total + item.quantity, 0);
+								: storedItems.reduce((total, item) => total + item.quantity, 0);
 						const maxStoredQuantity =
 							resolution?.type === InputEnumSchema.enum.Materials
 								? resolution.maxStoredQuantity
@@ -89,6 +87,16 @@ export const readItemDetailInputsFx = Effect.fn("readItemDetailInputsFx")(functi
 							ready:
 								(previous?.ready ?? true) &&
 								(resolution?.ready ?? storedQuantity >= required.min),
+							storedItems: [
+								...(previous?.storedItems ?? []),
+								...storedItems.map((item) => ({
+									itemId: item.item.id,
+									quantity: item.quantity,
+									revision: item.revision,
+									runtimeItemId: item.id,
+									title: item.item.title,
+								})),
+							],
 							...(materialInput.charges === undefined
 								? {}
 								: {

@@ -8,12 +8,13 @@ import { createPixiTileActorFx } from "~/ui/pixi/actor/createPixiTileActorFx";
 import { destroyPixiTileActorFx } from "~/ui/pixi/actor/destroyPixiTileActorFx";
 import { updatePixiTileActorFx } from "~/ui/pixi/actor/updatePixiTileActorFx";
 import type { PixiActorAnimator } from "~/ui/pixi/animation/PixiActorAnimator";
-import { flashPixiTileActorFeedbackGlowFx } from "~/ui/pixi/animation/runPixiTileActorRunningGlowFx";
 import { startPixiTileActorFadeInFx } from "~/ui/pixi/animation/startPixiTileActorFadeInFx";
 import type { PixiScenePalette } from "~/ui/pixi/appearance/PixiScenePalette";
 import type { PixiTileMagneticField } from "~/ui/pixi/magnet/PixiTileMagneticField";
 import { chasePixiTileMotionTargetFx } from "~/ui/pixi/motion/chasePixiTileMotionTargetFx";
 import { createPixiTileMotionMagneticProjectorFx } from "~/ui/pixi/motion/createPixiTileMotionMagneticProjectorFx";
+import { flashPixiMotionTargetFx } from "~/ui/pixi/motion/flashPixiMotionTargetFx";
+import { readPixiLiveActorContactPose } from "~/ui/pixi/motion/readPixiLiveActorContactPose";
 import type { PixiApplicationOwner } from "~/ui/pixi/runtime/PixiApplicationOwner";
 import type { PixiTextureStore } from "~/ui/pixi/runtime/createPixiTextureStoreFx";
 import type { PixiMainSceneSurface } from "~/ui/pixi/scene/PixiMainSceneSurface";
@@ -104,16 +105,11 @@ export const runPixiStackMotionFx = Effect.fn("runPixiStackMotionFx")(function* 
 		delayMs,
 	});
 	const readLiveTarget = () => {
-		const actor = actorStore.actors.get(cue.targetActorId);
-		if (actor === undefined || actor.container.destroyed) return null;
-		const scale = actor.container.scale.x;
-		// The child-local magnetic offset is response feedback, not physical contact geometry.
-		// Feeding it back here makes the payload chase the displacement that it creates itself.
-		return {
-			scale: (actor.size * scale) / Math.max(1, transient.size),
-			x: actor.container.x - actor.container.pivot.x * scale,
-			y: actor.container.y - actor.container.pivot.y * scale,
-		};
+		return readPixiLiveActorContactPose({
+			actorId: cue.targetActorId,
+			actors: actorStore.actors,
+			movingActorSize: transient.size,
+		});
 	};
 	const eligibleAttractionActorIds = new Set([
 		cue.targetActorId,
@@ -134,15 +130,13 @@ export const runPixiStackMotionFx = Effect.fn("runPixiStackMotionFx")(function* 
 		onPose: magneticProjector.projectPose,
 		onSettled: () => {
 			magneticProjector.release();
-			const targetActor = actorStore.actors.get(cue.targetActorId);
-			if (targetActor !== undefined) {
-				RendererRuntime.runSync(
-					flashPixiTileActorFeedbackGlowFx({
-						actor: targetActor,
-						animator,
-					}),
-				);
-			}
+			RendererRuntime.runSync(
+				flashPixiMotionTargetFx({
+					actorStore,
+					animator,
+					targetActorId: cue.targetActorId,
+				}),
+			);
 			RendererRuntime.runSync(animator.cancelActorFx(transient));
 			RendererRuntime.runSync(destroyPixiTileActorFx(transient));
 			onComplete();

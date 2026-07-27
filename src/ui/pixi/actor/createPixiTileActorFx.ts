@@ -1,5 +1,5 @@
 import { Effect } from "effect";
-import { Container, Sprite, Texture } from "pixi.js";
+import { Container, Graphics, Sprite, Texture } from "pixi.js";
 
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import type { TileActorItem } from "~/bridge/tile/TileActorItem";
@@ -7,6 +7,7 @@ import type { PixiScenePalette } from "~/ui/pixi/appearance/PixiScenePalette";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
 import { createPixiTileActorVisualFx } from "~/ui/pixi/actor/createPixiTileActorVisualFx";
 import { readPixiTileActorCursorFx } from "~/ui/pixi/actor/readPixiTileActorCursorFx";
+import { readPixiTileActorCrowdAlpha } from "~/ui/pixi/actor/readPixiTileActorCrowdAlpha";
 import type { DemandFrameLoop } from "~/ui/pixi/runtime/DemandFrameLoop";
 import type { PixiTextureStore } from "~/ui/pixi/runtime/createPixiTextureStoreFx";
 
@@ -53,7 +54,7 @@ export const createPixiTileActorFx = Effect.fn("createPixiTileActorFx")(
 				eventMode: "none",
 				label: `TileActorCrowd:${item.id}:${instanceId}`,
 			});
-			crowdLayer.alpha = item.running ? 0.82 : 1;
+			crowdLayer.alpha = readPixiTileActorCrowdAlpha(item);
 			const visualLayer = new Container({
 				eventMode: "none",
 				label: `TileActorVisualLayer:${item.id}:${instanceId}`,
@@ -67,6 +68,11 @@ export const createPixiTileActorFx = Effect.fn("createPixiTileActorFx")(
 			runningGlow.alpha = 0;
 			runningGlow.tint = palette.accent;
 			runningGlow.visible = false;
+			const progressBar = new Graphics({
+				eventMode: "none",
+				label: `TileActorProgress:${item.id}:${instanceId}`,
+			});
+			progressBar.visible = false;
 			const currentVisual = yield* createPixiTileActorVisualFx({
 				frames,
 				item,
@@ -79,7 +85,7 @@ export const createPixiTileActorFx = Effect.fn("createPixiTileActorFx")(
 			]);
 			visualLayer.addChild(currentVisual.container);
 			crowdLayer.addChild(visualLayer);
-			offsetLayer.addChild(runningGlow, crowdLayer);
+			offsetLayer.addChild(runningGlow, crowdLayer, progressBar);
 			container.addChild(offsetLayer);
 
 			return {
@@ -89,6 +95,7 @@ export const createPixiTileActorFx = Effect.fn("createPixiTileActorFx")(
 				crowdLayer,
 				visualLayer,
 				runningGlow,
+				progressBar,
 				visuals,
 				feedbackGlowPhase: null,
 				workingGlowTint: palette.accent,

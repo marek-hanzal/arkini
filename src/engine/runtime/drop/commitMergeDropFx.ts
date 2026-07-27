@@ -3,6 +3,15 @@ import { Effect } from "effect";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
 import { commitMergeItemsFx } from "~/engine/merge/internal/commitMergeItemsFx";
+import {
+	makeDropRejectedResult,
+	makeBlockedDropRejectedResult,
+	makeStaleDropRejectedResult,
+} from "~/engine/runtime/drop/makeDropRejectedResult";
+import {
+	projectDropActorCurrent,
+	projectDropTransferActor,
+} from "~/engine/runtime/drop/projectDropTransferActor";
 import { DropItemRejectedReasonEnumSchema } from "~/engine/runtime/schema/command/DropItemRejectedReasonEnumSchema";
 import type { DropItemResultSchema } from "~/engine/runtime/schema/command/DropItemResultSchema";
 import { DropItemResultKindEnumSchema } from "~/engine/runtime/schema/command/DropItemResultKindEnumSchema";
@@ -25,6 +34,13 @@ export const commitMergeDropFx = Effect.fn("commitMergeDropFx")(function* ({
 	targetItemId,
 	targetRevision,
 }: commitMergeDropFx.Props) {
+	const rejectBlockedFx = () =>
+		Effect.succeed(
+			makeBlockedDropRejectedResult({
+				sourceItemId,
+				targetItemId,
+			}),
+		);
 	return yield* commitMergeItemsFx({
 		sourceItemId,
 		sourceRevision,
@@ -42,121 +58,70 @@ export const commitMergeDropFx = Effect.fn("commitMergeDropFx")(function* ({
 					previousRevision: result.sourceBefore.revision,
 					previousLocation: result.sourceBefore.location,
 					previousQuantity: result.sourceBefore.quantity,
-					current:
-						result.sourceAfter === undefined
-							? null
-							: {
-									itemId: result.sourceAfter.id,
-									canonicalItemId: result.sourceAfter.item.id,
-									revision: result.sourceAfter.revision,
-									location: result.sourceAfter.location,
-									quantity: result.sourceAfter.quantity,
-								},
+					current: projectDropActorCurrent(result.sourceAfter),
 				},
-				target: {
-					itemId: result.targetBefore.id,
-					previousRevision: result.targetBefore.revision,
-					previousLocation: result.targetBefore.location,
-					previousQuantity: result.targetBefore.quantity,
-					current:
-						result.targetAfter === undefined
-							? null
-							: {
-									itemId: result.targetAfter.id,
-									canonicalItemId: result.targetAfter.item.id,
-									revision: result.targetAfter.revision,
-									location: result.targetAfter.location,
-									quantity: result.targetAfter.quantity,
-								},
-				},
+				target: projectDropTransferActor({
+					after: result.targetAfter,
+					before: result.targetBefore,
+				}),
 			}),
 		),
 		Effect.catchTags({
 			ItemNotFoundError: (error) =>
-				Effect.succeed({
-					kind: DropItemResultKindEnumSchema.enum.Reject,
-					reason:
-						error.itemId === targetItemId
-							? DropItemRejectedReasonEnumSchema.enum.StaleTarget
-							: DropItemRejectedReasonEnumSchema.enum.StaleSource,
-					itemId: sourceItemId,
-					targetItemId,
-				}),
+				Effect.succeed(
+					makeStaleDropRejectedResult({
+						entityId: error.itemId,
+						sourceItemId,
+						targetItemId,
+					}),
+				),
 			RevisionConflictError: (error) =>
-				Effect.succeed({
-					kind: DropItemResultKindEnumSchema.enum.Reject,
-					reason:
-						error.entityId === targetItemId
-							? DropItemRejectedReasonEnumSchema.enum.StaleTarget
-							: DropItemRejectedReasonEnumSchema.enum.StaleSource,
-					itemId: sourceItemId,
-					targetItemId,
-				}),
+				Effect.succeed(
+					makeStaleDropRejectedResult({
+						entityId: error.entityId,
+						sourceItemId,
+						targetItemId,
+					}),
+				),
 			ItemNotOnGridError: () =>
-				Effect.succeed({
-					kind: DropItemResultKindEnumSchema.enum.Reject,
-					reason: DropItemRejectedReasonEnumSchema.enum.InvalidSource,
-					itemId: sourceItemId,
-					targetItemId,
-				}),
+				Effect.succeed(
+					makeDropRejectedResult({
+						reason: DropItemRejectedReasonEnumSchema.enum.InvalidSource,
+						sourceItemId,
+						targetItemId,
+					}),
+				),
 			ItemNotOnBoardError: () =>
-				Effect.succeed({
-					kind: DropItemResultKindEnumSchema.enum.Reject,
-					reason: DropItemRejectedReasonEnumSchema.enum.InvalidTarget,
-					itemId: sourceItemId,
-					targetItemId,
-				}),
+				Effect.succeed(
+					makeDropRejectedResult({
+						reason: DropItemRejectedReasonEnumSchema.enum.InvalidTarget,
+						sourceItemId,
+						targetItemId,
+					}),
+				),
 			CrossSpaceBoardOperationError: () =>
-				Effect.succeed({
-					kind: DropItemResultKindEnumSchema.enum.Reject,
-					reason: DropItemRejectedReasonEnumSchema.enum.InvalidTarget,
-					itemId: sourceItemId,
-					targetItemId,
-				}),
+				Effect.succeed(
+					makeDropRejectedResult({
+						reason: DropItemRejectedReasonEnumSchema.enum.InvalidTarget,
+						sourceItemId,
+						targetItemId,
+					}),
+				),
 			MergeRuleNotFoundError: () =>
-				Effect.succeed({
-					kind: DropItemResultKindEnumSchema.enum.Reject,
-					reason: DropItemRejectedReasonEnumSchema.enum.InvalidTarget,
-					itemId: sourceItemId,
-					targetItemId,
-				}),
+				Effect.succeed(
+					makeDropRejectedResult({
+						reason: DropItemRejectedReasonEnumSchema.enum.InvalidTarget,
+						sourceItemId,
+						targetItemId,
+					}),
+				),
 		}),
 		Effect.catchTags({
-			ItemStatefulError: () =>
-				Effect.succeed({
-					kind: DropItemResultKindEnumSchema.enum.Reject,
-					reason: DropItemRejectedReasonEnumSchema.enum.Blocked,
-					itemId: sourceItemId,
-					targetItemId,
-				}),
-			PlacementUnavailableError: () =>
-				Effect.succeed({
-					kind: DropItemResultKindEnumSchema.enum.Reject,
-					reason: DropItemRejectedReasonEnumSchema.enum.Blocked,
-					itemId: sourceItemId,
-					targetItemId,
-				}),
-			JobOwnerBusyError: () =>
-				Effect.succeed({
-					kind: DropItemResultKindEnumSchema.enum.Reject,
-					reason: DropItemRejectedReasonEnumSchema.enum.Blocked,
-					itemId: sourceItemId,
-					targetItemId,
-				}),
-			ItemJobScopedError: () =>
-				Effect.succeed({
-					kind: DropItemResultKindEnumSchema.enum.Reject,
-					reason: DropItemRejectedReasonEnumSchema.enum.Blocked,
-					itemId: sourceItemId,
-					targetItemId,
-				}),
-			MergeSameItemError: () =>
-				Effect.succeed({
-					kind: DropItemResultKindEnumSchema.enum.Reject,
-					reason: DropItemRejectedReasonEnumSchema.enum.Blocked,
-					itemId: sourceItemId,
-					targetItemId,
-				}),
+			ItemStatefulError: rejectBlockedFx,
+			PlacementUnavailableError: rejectBlockedFx,
+			JobOwnerBusyError: rejectBlockedFx,
+			ItemJobScopedError: rejectBlockedFx,
+			MergeSameItemError: rejectBlockedFx,
 		}),
 	);
 });

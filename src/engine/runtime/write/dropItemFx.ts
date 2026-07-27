@@ -1,12 +1,7 @@
 import { Effect } from "effect";
 import { match } from "ts-pattern";
 
-import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import type { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeIntegerSchema";
-import type { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
 import { isSameGridLocationFx } from "~/engine/location/read/isSameGridLocationFx";
-import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
-import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
 import { commitMergeDropFx } from "~/engine/runtime/drop/commitMergeDropFx";
 import { commitMoveDropFx } from "~/engine/runtime/drop/commitMoveDropFx";
 import { commitStackDropFx } from "~/engine/runtime/drop/commitStackDropFx";
@@ -14,34 +9,14 @@ import { commitStoreInventoryDropFx } from "~/engine/runtime/drop/commitStoreInv
 import { commitStoreInputDropFx } from "~/engine/runtime/drop/commitStoreInputDropFx";
 import { commitSwapDropFx } from "~/engine/runtime/drop/commitSwapDropFx";
 import { readDropItemPreviewFx } from "~/engine/runtime/read/readDropItemPreviewFx";
+import type { DropItemCommand } from "~/engine/runtime/schema/command/DropItemCommand";
 import { DropItemIgnoredReasonEnumSchema } from "~/engine/runtime/schema/command/DropItemIgnoredReasonEnumSchema";
 import { DropItemRejectedReasonEnumSchema } from "~/engine/runtime/schema/command/DropItemRejectedReasonEnumSchema";
 import type { DropItemResultSchema } from "~/engine/runtime/schema/command/DropItemResultSchema";
 import { DropItemResultKindEnumSchema } from "~/engine/runtime/schema/command/DropItemResultKindEnumSchema";
 
 export namespace dropItemFx {
-	export interface Props {
-		readonly sourceItemId: IdSchema.Type;
-		readonly sourceRevision: RevisionSchema.Type;
-		readonly sourceLocation: GridLocationSchema.Type;
-		readonly target:
-			| {
-					readonly kind: "slot";
-					readonly location: GridLocationSchema.Type;
-					readonly occupant: {
-						readonly itemId: IdSchema.Type;
-						readonly revision: RevisionSchema.Type;
-					} | null;
-					readonly inputStore?: {
-						readonly lineId: IdSchema.Type;
-						readonly inputIndex: NonNegativeIntegerSchema.Type;
-						readonly quantity: PositiveIntegerSchema.Type;
-					};
-			  }
-			| {
-					readonly kind: "unsupported";
-			  };
-	}
+	export type Props = DropItemCommand;
 
 	export type Result = DropItemResultSchema.Type;
 }

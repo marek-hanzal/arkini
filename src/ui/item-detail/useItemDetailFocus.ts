@@ -6,15 +6,7 @@ import {
 } from "react";
 
 import type { ItemDetailState } from "~/ui/item-detail/ItemDetailControl";
-
-const focusableSelector = [
-	"button:not([disabled])",
-	"[href]",
-	"input:not([disabled])",
-	"select:not([disabled])",
-	"textarea:not([disabled])",
-	'[tabindex]:not([tabindex="-1"])',
-].join(",");
+import { dialogFocusableSelector, keepDialogFocusInside } from "~/ui/focus/keepDialogFocusInside";
 
 /** Owns Item Detail focus entry, containment, and exact actor restoration. */
 export const useItemDetailFocus = ({
@@ -52,7 +44,7 @@ export const useItemDetailFocus = ({
 			if (
 				latestOrigin !== null &&
 				latestOrigin.isConnected &&
-				latestOrigin.matches(focusableSelector) &&
+				latestOrigin.matches(dialogFocusableSelector) &&
 				!latestOrigin.hidden &&
 				latestOrigin.closest("[inert]") === null &&
 				latestOrigin.style.display !== "none" &&
@@ -72,34 +64,17 @@ export const useItemDetailFocus = ({
 		const selectedTab = dialog?.querySelector<HTMLElement>(
 			'[data-ui="ItemDetailTabs"] button[aria-selected="true"]:not([disabled])',
 		);
-		(selectedTab ?? dialog?.querySelector<HTMLElement>(focusableSelector))?.focus();
+		(selectedTab ?? dialog?.querySelector<HTMLElement>(dialogFocusableSelector))?.focus();
 	}, [
 		focusKey,
 		phase,
 	]);
 
 	const keepFocusInside = (event: ReactKeyboardEvent<HTMLDivElement>) => {
-		if (event.key !== "Tab") return;
-		const controls = Array.from(
-			dialogRef.current?.querySelectorAll<HTMLElement>(focusableSelector) ?? [],
-		);
-		if (controls.length === 0) {
-			event.preventDefault();
-			dialogRef.current?.focus();
-			return;
-		}
-		const first = controls[0];
-		const last = controls.at(-1);
-		if (first === undefined || last === undefined) return;
-		if (event.shiftKey && document.activeElement === first) {
-			event.preventDefault();
-			last.focus();
-			return;
-		}
-		if (!event.shiftKey && document.activeElement === last) {
-			event.preventDefault();
-			first.focus();
-		}
+		keepDialogFocusInside({
+			dialogRef,
+			event,
+		});
 	};
 
 	return {

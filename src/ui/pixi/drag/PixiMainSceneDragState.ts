@@ -5,6 +5,7 @@ import type { PixiSceneDropTarget } from "~/ui/pixi/scene/PixiSceneDropTarget";
 
 interface PixiMainSceneActiveDragBase {
 	readonly actor: PixiTileActor;
+	readonly openDetail: boolean;
 	readonly pointerId: number;
 	readonly pressX: number;
 	readonly pressY: number;

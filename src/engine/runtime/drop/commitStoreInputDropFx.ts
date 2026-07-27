@@ -4,6 +4,13 @@ import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { storeInputMaterialFx } from "~/engine/input/write/storeInputMaterialFx";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
+import {
+	makeBlockedDropRejectedResult,
+	makeDropRejectedResult,
+	makeInvalidGridDropRejectedResult,
+	makeStaleDropRejectedResult,
+} from "~/engine/runtime/drop/makeDropRejectedResult";
+import { projectDropTransferActor } from "~/engine/runtime/drop/projectDropTransferActor";
 import { DropItemRejectedReasonEnumSchema } from "~/engine/runtime/schema/command/DropItemRejectedReasonEnumSchema";
 import type { DropItemResultSchema } from "~/engine/runtime/schema/command/DropItemResultSchema";
 import { DropItemResultKindEnumSchema } from "~/engine/runtime/schema/command/DropItemResultKindEnumSchema";
@@ -36,6 +43,13 @@ export const commitStoreInputDropFx = Effect.fn("commitStoreInputDropFx")(functi
 	inputIndex,
 	quantity,
 }: commitStoreInputDropFx.Props) {
+	const rejectBlockedFx = () =>
+		Effect.succeed(
+			makeBlockedDropRejectedResult({
+				sourceItemId,
+				targetItemId,
+			}),
+		);
 	return yield* Effect.gen(function* () {
 		const stored = yield* storeInputMaterialFx({
 			ownerItemId: targetItemId,
@@ -54,23 +68,10 @@ export const commitStoreInputDropFx = Effect.fn("commitStoreInputDropFx")(functi
 			storedQuantity: stored.storedItem.quantity,
 			lineId,
 			inputIndex,
-			source: {
-				itemId: stored.sourceBefore.id,
-				canonicalItemId: stored.sourceBefore.item.id,
-				previousRevision: stored.sourceBefore.revision,
-				previousLocation: stored.sourceBefore.location,
-				previousQuantity: stored.sourceBefore.quantity,
-				current:
-					stored.sourceItem === undefined
-						? null
-						: {
-								itemId: stored.sourceItem.id,
-								canonicalItemId: stored.sourceItem.item.id,
-								revision: stored.sourceItem.revision,
-								location: stored.sourceItem.location,
-								quantity: stored.sourceItem.quantity,
-							},
-			},
+			source: projectDropTransferActor({
+				after: stored.sourceItem,
+				before: stored.sourceBefore,
+			}),
 			owner: {
 				itemId: stored.ownerItem.id,
 				revision: stored.ownerItem.revision,
@@ -80,82 +81,51 @@ export const commitStoreInputDropFx = Effect.fn("commitStoreInputDropFx")(functi
 	}).pipe(
 		Effect.catchTags({
 			ItemNotFoundError: (error) =>
-				Effect.succeed({
-					kind: DropItemResultKindEnumSchema.enum.Reject,
-					reason:
-						error.itemId === targetItemId
-							? DropItemRejectedReasonEnumSchema.enum.StaleTarget
-							: DropItemRejectedReasonEnumSchema.enum.StaleSource,
-					itemId: sourceItemId,
-					targetItemId,
-				}),
+				Effect.succeed(
+					makeStaleDropRejectedResult({
+						entityId: error.itemId,
+						sourceItemId,
+						targetItemId,
+					}),
+				),
 			RevisionConflictError: (error) =>
-				Effect.succeed({
-					kind: DropItemResultKindEnumSchema.enum.Reject,
-					reason:
-						error.entityId === targetItemId
-							? DropItemRejectedReasonEnumSchema.enum.StaleTarget
-							: DropItemRejectedReasonEnumSchema.enum.StaleSource,
-					itemId: sourceItemId,
-					targetItemId,
-				}),
+				Effect.succeed(
+					makeStaleDropRejectedResult({
+						entityId: error.entityId,
+						sourceItemId,
+						targetItemId,
+					}),
+				),
 			ItemLocationConflictError: (error) =>
-				Effect.succeed({
-					kind: DropItemResultKindEnumSchema.enum.Reject,
-					reason:
-						error.itemId === targetItemId
-							? DropItemRejectedReasonEnumSchema.enum.StaleTarget
-							: DropItemRejectedReasonEnumSchema.enum.StaleSource,
-					itemId: sourceItemId,
-					targetItemId,
-				}),
+				Effect.succeed(
+					makeStaleDropRejectedResult({
+						entityId: error.itemId,
+						sourceItemId,
+						targetItemId,
+					}),
+				),
 			ItemNotOnGridError: (error) =>
-				Effect.succeed({
-					kind: DropItemResultKindEnumSchema.enum.Reject,
-					reason:
-						error.itemId === targetItemId
-							? DropItemRejectedReasonEnumSchema.enum.InvalidTarget
-							: DropItemRejectedReasonEnumSchema.enum.InvalidSource,
-					itemId: sourceItemId,
-					targetItemId,
-				}),
+				Effect.succeed(
+					makeInvalidGridDropRejectedResult({
+						itemId: error.itemId,
+						sourceItemId,
+						targetItemId,
+					}),
+				),
 			CrossSpaceBoardOperationError: () =>
-				Effect.succeed({
-					kind: DropItemResultKindEnumSchema.enum.Reject,
-					reason: DropItemRejectedReasonEnumSchema.enum.InvalidTarget,
-					itemId: sourceItemId,
-					targetItemId,
-				}),
+				Effect.succeed(
+					makeDropRejectedResult({
+						reason: DropItemRejectedReasonEnumSchema.enum.InvalidTarget,
+						sourceItemId,
+						targetItemId,
+					}),
+				),
 		}),
 		Effect.catchTags({
-			ItemStatefulError: () =>
-				Effect.succeed({
-					kind: DropItemResultKindEnumSchema.enum.Reject,
-					reason: DropItemRejectedReasonEnumSchema.enum.Blocked,
-					itemId: sourceItemId,
-					targetItemId,
-				}),
-			PlacementUnavailableError: () =>
-				Effect.succeed({
-					kind: DropItemResultKindEnumSchema.enum.Reject,
-					reason: DropItemRejectedReasonEnumSchema.enum.Blocked,
-					itemId: sourceItemId,
-					targetItemId,
-				}),
-			InputMaterialUnavailableError: () =>
-				Effect.succeed({
-					kind: DropItemResultKindEnumSchema.enum.Reject,
-					reason: DropItemRejectedReasonEnumSchema.enum.Blocked,
-					itemId: sourceItemId,
-					targetItemId,
-				}),
-			LineInputClosedError: () =>
-				Effect.succeed({
-					kind: DropItemResultKindEnumSchema.enum.Reject,
-					reason: DropItemRejectedReasonEnumSchema.enum.Blocked,
-					itemId: sourceItemId,
-					targetItemId,
-				}),
+			ItemStatefulError: rejectBlockedFx,
+			PlacementUnavailableError: rejectBlockedFx,
+			InputMaterialUnavailableError: rejectBlockedFx,
+			LineInputClosedError: rejectBlockedFx,
 		}),
 	);
 });

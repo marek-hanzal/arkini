@@ -429,6 +429,7 @@ const inventoryItem = {
 	compositeUrl: undefined,
 	id: "runtime:water",
 	itemId: "water",
+	itemType: "simple",
 	location: {
 		scope: "inventory",
 		position: {
@@ -463,15 +464,15 @@ const inventoryTargetItem = {
 	title: "Stone",
 } satisfies TileActorItem;
 
-const pointer = (x: number, y: number, shiftKey = false): FakePointerEvent => ({
-	button: 0,
+const pointer = (x: number, y: number, button = 0): FakePointerEvent => ({
+	button,
 	global: {
 		x,
 		y,
 	},
 	isPrimary: true,
 	pointerId: 1,
-	shiftKey,
+	shiftKey: false,
 	stopPropagation: vi.fn(),
 });
 
@@ -496,12 +497,12 @@ const readTestInventoryLayout = (width = 800, height = 480) => {
 	);
 };
 
-const slotPointer = (x: number, shiftKey = false) => {
+const slotPointer = (x: number, button = 0) => {
 	const { surface } = readTestInventoryLayout();
 	return pointer(
 		surface.x + (x + 0.5) * surface.cellSize,
 		surface.y + surface.cellSize * 0.5,
-		shiftKey,
+		button,
 	);
 };
 
@@ -849,13 +850,13 @@ describe("Pixi Inventory scene runtime", () => {
 		await Effect.runPromise(runtime.closeFx);
 	});
 
-	it("restores an ordinary-click fade after a newer Shift activation settles first", async () => {
+	it("restores a left-click fade after a newer right-click detail activation settles first", async () => {
 		let resolveOrdinary: () => void = () => undefined;
 		const ordinary = new Promise<void>((resolve) => {
 			resolveOrdinary = resolve;
 		});
-		const onActivate = vi.fn((_item: TileActorItem, shiftKey: boolean) =>
-			shiftKey ? Promise.resolve() : ordinary,
+		const onActivate = vi.fn((_item: TileActorItem, openDetail: boolean) =>
+			openDetail ? Promise.resolve() : ordinary,
 		);
 		const { actor, runtime, stage } = await mountScene({
 			onActivate,
@@ -865,8 +866,8 @@ describe("Pixi Inventory scene runtime", () => {
 		actorContainer.emit("pointerdown", slotPointer(0));
 		stage.emit("pointerup", slotPointer(0));
 		await Promise.resolve();
-		actorContainer.emit("pointerdown", slotPointer(0, true));
-		stage.emit("pointerup", slotPointer(0, true));
+		actorContainer.emit("pointerdown", slotPointer(0, 2));
+		stage.emit("pointerup", slotPointer(0, 2));
 		await flushMicrotasks();
 
 		expect(onActivate).toHaveBeenCalledTimes(2);

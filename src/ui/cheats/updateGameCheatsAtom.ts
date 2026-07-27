@@ -1,4 +1,4 @@
-import { Cause, Effect, Exit, Option } from "effect";
+import { Cause, Effect, Exit } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
 import { match } from "ts-pattern";
 
@@ -6,7 +6,7 @@ import { setCheatEnabledAtom } from "~/bridge/cheat/setCheatEnabledAtom";
 import { setInstantGameplayAtom } from "~/bridge/cheat/setInstantGameplayAtom";
 import type { Game } from "~/bridge/game/Game";
 import { makeExactGameAtomFamilyFx } from "~/bridge/game/makeExactGameAtomFamilyFx";
-import { readExactCauseFailure } from "~/bridge/game/readExactCauseFailure";
+import { settleRendererCommandFailureFx } from "~/bridge/game/settleRendererCommandFailureFx";
 
 type UpdateGameCheatsAction = "cheat-mode" | "instant-gameplay" | "exit";
 
@@ -86,21 +86,17 @@ export const updateGameCheatsAtom = Effect.runSync(
 						commandFx.pipe(Effect.andThen(Effect.yieldNow)),
 					);
 					if (Exit.isFailure(exit)) {
-						if (Cause.hasInterruptsOnly(exit.cause)) {
-							return yield* Effect.failCause(exit.cause);
-						}
-						const failure = readExactCauseFailure(exit.cause);
-						if (Option.isNone(failure)) {
-							game.failStop("ui", exit.cause);
-							yield* Atom.set(fatalCauseAtom, exit.cause);
-							return yield* Effect.failCause(exit.cause);
-						}
-						yield* Atom.set(stateAtom, {
-							kind: "error",
-							action: command.action,
-							error: failure.value,
+						return yield* settleRendererCommandFailureFx({
+							cause: exit.cause,
+							game,
+							onFailure: (failure) =>
+								Atom.set(stateAtom, {
+									kind: "error",
+									action: command.action,
+									error: failure,
+								}),
+							setFatalCause: (cause) => Atom.set(fatalCauseAtom, cause),
 						});
-						return;
 					}
 					yield* Atom.set(
 						stateAtom,

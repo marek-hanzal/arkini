@@ -1,0 +1,2348 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"producer:library-t3": {
+			"id": "producer:library-t3",
+			"type": "producer",
+			"title": "Library III",
+			"description": "Advanced library that researches and reissues blueprints up through Era VIII.",
+			"asset": {
+				"source": [
+					"producer-library-t3"
+				]
+			},
+			"tags": [
+				"producer",
+				"building",
+				"library",
+				"blueprint",
+				"knowledge",
+				"unique",
+				"era:VIII"
+			],
+			"categoryId": "blueprint",
+			"scope": "any",
+			"maxCount": 1,
+			"maxStackSize": 1,
+			"maxQueueSize": 1,
+			"lines": [
+				{
+					"id": "line:library-t3:blueprint-lumberjack-t1",
+					"title": "Blueprint: Lumberjack I",
+					"description": "Researches and reissues Lumberjack I for Library III.",
+					"runtimeMs": 7000,
+					"input": [
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:log"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 1
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:stone"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 1
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:blueprint-lumberjack-t1",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:library-t3:blueprint-quarry-t1",
+					"title": "Blueprint: Quarry I",
+					"description": "Researches and reissues Quarry I for Library III.",
+					"runtimeMs": 7000,
+					"input": [
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:log"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 1
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:stone"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 1
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:blueprint-quarry-t1",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:library-t3:blueprint-sawmill-t1",
+					"title": "Blueprint: Sawmill I",
+					"description": "Researches and reissues Sawmill I for Library III.",
+					"runtimeMs": 7000,
+					"input": [
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:log"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 1
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:stone"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 1
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:blueprint-sawmill-t1",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:library-t3:blueprint-shrine-t1",
+					"title": "Blueprint: Wayside Shrine",
+					"description": "Researches and reissues Wayside Shrine for Library III.",
+					"runtimeMs": 7000,
+					"input": [
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:log"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 1
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:stone"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 1
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:blueprint-shrine-t1",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:library-t3:blueprint-stonemason-t1",
+					"title": "Blueprint: Stonemason I",
+					"description": "Researches and reissues Stonemason I for Library III.",
+					"runtimeMs": 7000,
+					"input": [
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:log"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 1
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:stone"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 1
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:blueprint-stonemason-t1",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:library-t3:blueprint-townhall-t2",
+					"title": "Blueprint: Town Hall II",
+					"description": "Researches and reissues Town Hall II for Library III.",
+					"runtimeMs": 60000,
+					"input": [
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:log"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 1
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:stone"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 1
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:blueprint-townhall-t2",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:library-t3:blueprint-well-t1",
+					"title": "Blueprint: Well I",
+					"description": "Researches and reissues Well I for Library III.",
+					"runtimeMs": 7000,
+					"input": [
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:log"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 1
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:stone"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 1
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:blueprint-well-t1",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:library-t3:blueprint-bio-waste-processor-t1",
+					"title": "Blueprint: Bio-Waste Processor I",
+					"description": "Researches and reissues Bio-Waste Processor I for Library III.",
+					"runtimeMs": 10000,
+					"input": [
+						{
+							"type": "simple"
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:blueprint-bio-waste-processor-t1",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:library-t3:blueprint-cattle-farm-t1",
+					"title": "Blueprint: Cattle Farm I",
+					"description": "Researches and reissues Cattle Farm I for Library III.",
+					"runtimeMs": 10000,
+					"input": [
+						{
+							"type": "simple"
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:blueprint-cattle-farm-t1",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:library-t3:blueprint-chicken-coop-t1",
+					"title": "Blueprint: Chicken Coop I",
+					"description": "Researches and reissues Chicken Coop I for Library III.",
+					"runtimeMs": 10000,
+					"input": [
+						{
+							"type": "simple"
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:blueprint-chicken-coop-t1",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:library-t3:blueprint-cookhouse-t1",
+					"title": "Blueprint: Cookhouse I",
+					"description": "Researches and reissues Cookhouse I for Library III.",
+					"runtimeMs": 10000,
+					"input": [
+						{
+							"type": "simple"
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:blueprint-cookhouse-t1",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:library-t3:blueprint-farm-t1",
+					"title": "Blueprint: Farm I",
+					"description": "Researches and reissues Farm I for Library III.",
+					"runtimeMs": 10000,
+					"input": [
+						{
+							"type": "simple"
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:blueprint-farm-t1",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:library-t3:blueprint-house-t1",
+					"title": "Blueprint: House I",
+					"description": "Researches and reissues House I for Library III.",
+					"runtimeMs": 10000,
+					"input": [
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:feast"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 4
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:blueprint-house-t1",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:library-t3:blueprint-library-t1",
+					"title": "Blueprint: Library I",
+					"description": "Researches and reissues Library I for Library III.",
+					"runtimeMs": 7000,
+					"input": [
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:log"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 1
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:stone"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 1
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:blueprint-library-t1",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:library-t3:blueprint-pig-farm-t1",
+					"title": "Blueprint: Pig Farm I",
+					"description": "Researches and reissues Pig Farm I for Library III.",
+					"runtimeMs": 10000,
+					"input": [
+						{
+							"type": "simple"
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:blueprint-pig-farm-t1",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:library-t3:blueprint-sheep-pasture-t1",
+					"title": "Blueprint: Sheep Pasture I",
+					"description": "Researches and reissues Sheep Pasture I for Library III.",
+					"runtimeMs": 10000,
+					"input": [
+						{
+							"type": "simple"
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:blueprint-sheep-pasture-t1",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:library-t3:blueprint-townhall-t3",
+					"title": "Blueprint: Town Hall III",
+					"description": "Researches and reissues Town Hall III for Library III.",
+					"runtimeMs": 90000,
+					"input": [
+						{
+							"type": "simple"
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:blueprint-townhall-t3",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:library-t3:blueprint-vegetable-garden-t1",
+					"title": "Blueprint: Vegetable Garden I",
+					"description": "Researches and reissues Vegetable Garden I for Library III.",
+					"runtimeMs": 10000,
+					"input": [
+						{
+							"type": "simple"
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:blueprint-vegetable-garden-t1",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:library-t3:blueprint-waste-processor-t1",
+					"title": "Blueprint: Waste Processor I",
+					"description": "Researches and reissues Waste Processor I for Library III.",
+					"runtimeMs": 10000,
+					"input": [
+						{
+							"type": "simple"
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:blueprint-waste-processor-t1",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:library-t3:blueprint-bakery-t1",
+					"title": "Blueprint: Bakery I",
+					"description": "Researches and reissues Bakery I for Library III.",
+					"runtimeMs": 12000,
+					"input": [
+						{
+							"type": "simple"
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:blueprint-bakery-t1",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:library-t3:blueprint-brewery-t1",
+					"title": "Blueprint: Brewery I",
+					"description": "Researches and reissues Brewery I for Library III.",
+					"runtimeMs": 12000,
+					"input": [
+						{
+							"type": "simple"
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:blueprint-brewery-t1",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:library-t3:blueprint-dairy-t1",
+					"title": "Blueprint: Dairy I",
+					"description": "Researches and reissues Dairy I for Library III.",
+					"runtimeMs": 12000,
+					"input": [
+						{
+							"type": "simple"
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:blueprint-dairy-t1",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:library-t3:blueprint-house-t2",
+					"title": "Blueprint: House II",
+					"description": "Researches and reissues House II for Library III.",
+					"runtimeMs": 12000,
+					"input": [
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:beer"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 4
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:blueprint-house-t2",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:library-t3:blueprint-market-t1",
+					"title": "Blueprint: Market",
+					"description": "Researches and reissues Market for Library III.",
+					"runtimeMs": 12000,
+					"input": [
+						{
+							"type": "simple"
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:blueprint-market-t1",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:library-t3:blueprint-slaughterhouse-t1",
+					"title": "Blueprint: Slaughterhouse I",
+					"description": "Researches and reissues Slaughterhouse I for Library III.",
+					"runtimeMs": 12000,
+					"input": [
+						{
+							"type": "simple"
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:blueprint-slaughterhouse-t1",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:library-t3:blueprint-tavern-t1",
+					"title": "Blueprint: Tavern I",
+					"description": "Researches and reissues Tavern I for Library III.",
+					"runtimeMs": 12000,
+					"input": [
+						{
+							"type": "simple"
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:blueprint-tavern-t1",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:library-t3:blueprint-townhall-t4",
+					"title": "Blueprint: Town Hall IV",
+					"description": "Researches and reissues Town Hall IV for Library III.",
+					"runtimeMs": 120000,
+					"input": [
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:feast"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 4
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:blueprint-townhall-t4",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:library-t3:blueprint-windmill-t1",
+					"title": "Blueprint: Windmill I",
+					"description": "Researches and reissues Windmill I for Library III.",
+					"runtimeMs": 12000,
+					"input": [
+						{
+							"type": "simple"
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:blueprint-windmill-t1",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:library-t3:blueprint-winery-t1",
+					"title": "Blueprint: Winery I",
+					"description": "Researches and reissues Winery I for Library III.",
+					"runtimeMs": 12000,
+					"input": [
+						{
+							"type": "simple"
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:blueprint-winery-t1",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:library-t3:blueprint-civic-office-t1",
+					"title": "Blueprint: Civic Office I",
+					"description": "Researches and reissues Civic Office I for Library III.",
+					"runtimeMs": 16000,
+					"input": [
+						{
+							"type": "simple"
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:blueprint-civic-office-t1",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:library-t3:blueprint-library-t2",
+					"title": "Blueprint: Library II",
+					"description": "Researches and reissues Library II for Library III.",
+					"runtimeMs": 16000,
+					"input": [
+						{
+							"type": "simple"
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:blueprint-library-t2",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:library-t3:blueprint-market-t2",
+					"title": "Blueprint: Market II",
+					"description": "Researches and reissues Market II for Library III.",
+					"runtimeMs": 16000,
+					"input": [
+						{
+							"type": "simple"
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:blueprint-market-t2",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:library-t3:blueprint-paper-mill-t1",
+					"title": "Blueprint: Paper Mill I",
+					"description": "Researches and reissues Paper Mill I for Library III.",
+					"runtimeMs": 16000,
+					"input": [
+						{
+							"type": "simple"
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:blueprint-paper-mill-t1",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:library-t3:blueprint-prospector-guild-t1",
+					"title": "Blueprint: Prospector Guild",
+					"description": "Researches and reissues Prospector Guild for Library III.",
+					"runtimeMs": 16000,
+					"input": [
+						{
+							"type": "simple"
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:blueprint-prospector-guild-t1",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:library-t3:blueprint-school",
+					"title": "Blueprint: School",
+					"description": "Researches and reissues School for Library III.",
+					"runtimeMs": 16000,
+					"input": [
+						{
+							"type": "simple"
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:blueprint-school",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:library-t3:blueprint-dye-workshop-t1",
+					"title": "Blueprint: Dye Workshop I",
+					"description": "Researches and reissues Dye Workshop I for Library III.",
+					"runtimeMs": 16000,
+					"input": [
+						{
+							"type": "simple"
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:blueprint-dye-workshop-t1",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:library-t3:blueprint-house-t3",
+					"title": "Blueprint: House III",
+					"description": "Researches and reissues House III for Library III.",
+					"runtimeMs": 16000,
+					"input": [
+						{
+							"type": "simple"
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:blueprint-house-t3",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:library-t3:blueprint-tailor-workshop-t1",
+					"title": "Blueprint: Tailor Workshop I",
+					"description": "Researches and reissues Tailor Workshop I for Library III.",
+					"runtimeMs": 16000,
+					"input": [
+						{
+							"type": "simple"
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:blueprint-tailor-workshop-t1",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:library-t3:blueprint-tannery-t1",
+					"title": "Blueprint: Tannery I",
+					"description": "Researches and reissues Tannery I for Library III.",
+					"runtimeMs": 16000,
+					"input": [
+						{
+							"type": "simple"
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:blueprint-tannery-t1",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:library-t3:blueprint-weaver-hut-t1",
+					"title": "Blueprint: Weaver Hut I",
+					"description": "Researches and reissues Weaver Hut I for Library III.",
+					"runtimeMs": 16000,
+					"input": [
+						{
+							"type": "simple"
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:blueprint-weaver-hut-t1",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:library-t3:blueprint-academy",
+					"title": "Blueprint: Academy",
+					"description": "Researches and reissues Academy for Library III.",
+					"runtimeMs": 18000,
+					"input": [
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:basic-knowledge"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 2
+							},
+							"capacity": 2
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:paper"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 2
+							},
+							"capacity": 2
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:blueprint-academy",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:library-t3:blueprint-coal-mine-t1",
+					"title": "Blueprint: Coal Mine I",
+					"description": "Researches and reissues Coal Mine I for Library III.",
+					"runtimeMs": 24000,
+					"input": [
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:advanced-knowledge"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 3
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:paper"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 3
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:blueprint-coal-mine-t1",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:library-t3:blueprint-gold-mine-t1",
+					"title": "Blueprint: Gold Mine I",
+					"description": "Researches and reissues Gold Mine I for Library III.",
+					"runtimeMs": 24000,
+					"input": [
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:advanced-knowledge"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 3
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:paper"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 3
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:blueprint-gold-mine-t1",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:library-t3:blueprint-iron-mine-t1",
+					"title": "Blueprint: Iron Mine I",
+					"description": "Researches and reissues Iron Mine I for Library III.",
+					"runtimeMs": 24000,
+					"input": [
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:advanced-knowledge"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 3
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:paper"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 3
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:blueprint-iron-mine-t1",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:library-t3:blueprint-prospector-guild-t2",
+					"title": "Blueprint: Prospector Guild",
+					"description": "Researches and reissues Prospector Guild for Library III.",
+					"runtimeMs": 24000,
+					"input": [
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:advanced-knowledge"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 3
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:paper"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 2
+							},
+							"capacity": 2
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:blueprint-prospector-guild-t2",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:library-t3:blueprint-bio-waste-processor-t2",
+					"title": "Blueprint: Bio-Waste Processor II",
+					"description": "Researches and reissues Bio-Waste Processor II for Library III.",
+					"runtimeMs": 24000,
+					"input": [
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:advanced-knowledge"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 3
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:blueprint-bio-waste-processor-t2",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:library-t3:blueprint-brickyard",
+					"title": "Blueprint: Brickyard",
+					"description": "Researches and reissues Brickyard for Library III.",
+					"runtimeMs": 24000,
+					"input": [
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:advanced-knowledge"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 3
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:blueprint-brickyard",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:library-t3:blueprint-charcoal-burner-t1",
+					"title": "Blueprint: Charcoal Burner I",
+					"description": "Researches and reissues Charcoal Burner I for Library III.",
+					"runtimeMs": 24000,
+					"input": [
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:advanced-knowledge"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 3
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:paper"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 3
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:blueprint-charcoal-burner-t1",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:library-t3:blueprint-clay-pit",
+					"title": "Blueprint: Clay Pit",
+					"description": "Researches and reissues Clay Pit for Library III.",
+					"runtimeMs": 24000,
+					"input": [
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:advanced-knowledge"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 3
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:clay-deposit"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 3
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:blueprint-clay-pit",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:library-t3:blueprint-construction-yard-t1",
+					"title": "Blueprint: Construction Yard I",
+					"description": "Researches and reissues Construction Yard I for Library III.",
+					"runtimeMs": 24000,
+					"input": [
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:advanced-knowledge"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 3
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:blueprint-construction-yard-t1",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:library-t3:blueprint-glassworks",
+					"title": "Blueprint: Glassworks",
+					"description": "Researches and reissues Glassworks for Library III.",
+					"runtimeMs": 24000,
+					"input": [
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:advanced-knowledge"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 3
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:blueprint-glassworks",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:library-t3:blueprint-library-t3",
+					"title": "Blueprint: Library III",
+					"description": "Researches and reissues Library III for Library III.",
+					"runtimeMs": 16000,
+					"input": [
+						{
+							"type": "simple"
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:blueprint-library-t3",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:library-t3:blueprint-purifier-t1",
+					"title": "Blueprint: Purifier I",
+					"description": "Researches and reissues Purifier I for Library III.",
+					"runtimeMs": 24000,
+					"input": [
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:advanced-knowledge"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 3
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:blueprint-purifier-t1",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:library-t3:blueprint-roof-tile-factory",
+					"title": "Blueprint: Roof Tile Factory",
+					"description": "Researches and reissues Roof Tile Factory for Library III.",
+					"runtimeMs": 24000,
+					"input": [
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:advanced-knowledge"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 3
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:blueprint-roof-tile-factory",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:library-t3:blueprint-sand-pit",
+					"title": "Blueprint: Sand Pit",
+					"description": "Researches and reissues Sand Pit for Library III.",
+					"runtimeMs": 24000,
+					"input": [
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:advanced-knowledge"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 3
+						},
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:sand-deposit"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 3
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:blueprint-sand-pit",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:library-t3:blueprint-smelter-t1",
+					"title": "Blueprint: Smelter I",
+					"description": "Researches and reissues Smelter I for Library III.",
+					"runtimeMs": 24000,
+					"input": [
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:advanced-knowledge"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 3
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:blueprint-smelter-t1",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				},
+				{
+					"id": "line:library-t3:blueprint-waste-processor-t2",
+					"title": "Blueprint: Waste Processor II",
+					"description": "Researches and reissues Waste Processor II for Library III.",
+					"runtimeMs": 24000,
+					"input": [
+						{
+							"type": "materials",
+							"selector": {
+								"type": "item",
+								"itemId": "item:advanced-knowledge"
+							},
+							"quantity": {
+								"type": "value",
+								"value": 1
+							},
+							"capacity": 3
+						}
+					],
+					"rules": [],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:blueprint-waste-processor-t2",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				}
+			]
+		}
+	}
+}

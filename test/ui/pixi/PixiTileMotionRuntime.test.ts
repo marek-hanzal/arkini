@@ -15,6 +15,7 @@ import type {
 	PixiActorPresentationWrite,
 } from "~/ui/pixi/animation/PixiActorAnimator";
 import { readPixiTileTravelDurationMsFx } from "~/ui/pixi/animation/readPixiTileTravelDurationMsFx";
+import { pixiTileActorRemovalFeedbackDurationMs } from "~/ui/pixi/animation/startPixiTileActorRemovalFeedbackFx";
 import type { PixiScenePalette } from "~/ui/pixi/appearance/PixiScenePalette";
 import type { TileSceneHandoffStore } from "~/ui/pixi/handoff/createTileSceneHandoffStoreFx";
 import type {
@@ -23,6 +24,7 @@ import type {
 } from "~/ui/pixi/magnet/PixiTileMagneticField";
 import { createPixiTileMotionRuntimeFx } from "~/ui/pixi/motion/createPixiTileMotionRuntimeFx";
 import { finalizePixiTileMotionActorsFx } from "~/ui/pixi/motion/finalizePixiTileMotionActorsFx";
+import { runPixiInputMotionFx } from "~/ui/pixi/motion/runPixiInputMotionFx";
 import type { PixiApplicationOwner } from "~/ui/pixi/runtime/PixiApplicationOwner";
 import type { PixiMainSceneSurface } from "~/ui/pixi/scene/PixiMainSceneSurface";
 
@@ -123,6 +125,7 @@ const createItem = (
 ): TileActorItem => ({
 	id,
 	itemId: id,
+	itemType: "simple",
 	location,
 	primaryAction: {
 		kind: "none",
@@ -674,7 +677,7 @@ describe("Pixi tile motion runtime", () => {
 		Effect.runSync(runtime.closeFx);
 	});
 
-	it("chases a moving input owner with the whole stack and settles source quantity at contact", () => {
+	it("chases a moving input owner and returns its remainder to the stable engine origin", () => {
 		const source = createActor("runtime:input-source");
 		const owner = createActor("runtime:input-owner");
 		source.item = {
@@ -841,6 +844,8 @@ describe("Pixi tile motion runtime", () => {
 			throw new Error("Expected the retargeted input delivery segment.");
 		}
 		samplePoseAnimation(finalTravel, 1);
+		source.container.position.set(140, 80);
+		source.dragging = false;
 		finalTravel.onComplete?.();
 
 		expect(source.item.quantity).toBe(7);
@@ -901,6 +906,178 @@ describe("Pixi tile motion runtime", () => {
 			magneticReleases.filter((release) => release.sourceActorId === transient.item.id),
 		).toHaveLength(2);
 		Effect.runSync(runtime.closeFx);
+	});
+
+	it("spawns an Inventory autofill payload at its physical opener and uses ordinary input travel", () => {
+		const opener = createActor("runtime:inventory-opener");
+		const owner = createActor("runtime:inventory-input-owner");
+		const sourceItem = {
+			...createItem("runtime:inventory-source", inventoryLocation),
+			quantity: 2,
+		};
+		opener.item = createItem(opener.item.id, {
+			scope: "toolbar",
+			position: {
+				x: 0,
+				y: 0,
+			},
+		});
+		owner.item = createItem(owner.item.id, secondBoardLocation);
+		opener.container.position.set(500, 24);
+		owner.container.position.set(200, 40);
+		const actors = new Map([
+			[
+				opener.item.id,
+				opener,
+			],
+			[
+				owner.item.id,
+				owner,
+			],
+		]);
+		const animations: PixiActorAnimation[] = [];
+		const animator = createRecordingAnimator({
+			animations,
+		});
+		const transientActorLayer = new Container();
+		const openerPose = {
+			layer: transientActorLayer,
+			size: 64,
+			x: 500,
+			y: 24,
+		};
+		const targetPose = {
+			layer: transientActorLayer,
+			size: 80,
+			x: 200,
+			y: 40,
+		};
+		const completed = vi.fn();
+		const transients: PixiTileActor[] = [];
+		const cue = {
+			canonicalItemId: sourceItem.itemId,
+			eventIndex: 0,
+			kind: "input",
+			originActorId: opener.item.id,
+			originLocation: opener.item.location,
+			previousQuantity: 2,
+			storedQuantity: 1,
+			resultingQuantity: 1,
+			sequence: 44,
+			sourceActorId: sourceItem.id,
+			sourceItem,
+			staggerIndex: 0,
+			targetActorId: owner.item.id,
+			targetLocation: owner.item.location,
+		} satisfies TileMotionCue;
+
+		Effect.runSync(
+			runPixiInputMotionFx({
+				actorStore: {
+					actors,
+					canonicalItems: new Map([
+						[
+							owner.item.id,
+							owner.item,
+						],
+					]),
+				} as unknown as PixiMainSceneActorStore,
+				animator,
+				application: {
+					frames: {
+						invalidateFx: Effect.void,
+					},
+				} as unknown as PixiApplicationOwner,
+				cue,
+				cueKey: "44:0",
+				delayMs: 0,
+				magneticField: createRecordingMagneticField(),
+				onComplete: completed,
+				onMagneticSourceAcquired: () => undefined,
+				onMagneticSourceReleased: () => undefined,
+				onTransientCreated: (actor) => {
+					transients.push(actor);
+				},
+				origin: openerPose,
+				readPalette: () => ({}) as PixiScenePalette,
+				readSourceSurvives: () => true,
+				surface: {
+					readLocationPoseFx: (location: TileActorItem["location"]) =>
+						Effect.succeed(location.scope === "toolbar" ? openerPose : targetPose),
+					transientActorLayer,
+				} as unknown as PixiMainSceneSurface,
+				target: targetPose,
+				textures: {} as never,
+			}),
+		);
+
+		const transient = transients[0];
+		if (transient === undefined) throw new Error("Expected Inventory input transient.");
+		expect(transient.item).toMatchObject({
+			badgeCount: 2,
+			id: "motion:44:0",
+			itemId: sourceItem.itemId,
+			quantity: 2,
+		});
+		expect(transient.container).toMatchObject({
+			x: openerPose.x,
+			y: openerPose.y,
+		});
+		const delivery = animations.find(
+			(animation) => animation.channel === "pose" && animation.ownerKey === "motion:44:0",
+		);
+		if (delivery?.channel !== "pose") throw new Error("Expected Inventory input delivery.");
+		samplePoseAnimation(delivery, 1);
+		delivery.onComplete?.();
+
+		expect(transient.item.quantity).toBe(1);
+		expect(transient.item.badgeCount).toBeUndefined();
+		const returned = animations
+			.filter(
+				(animation) =>
+					animation.actor === transient &&
+					animation.channel === "pose" &&
+					animation.ownerKey === "motion:44:0",
+			)
+			.at(-1);
+		if (returned?.channel !== "pose") throw new Error("Expected Inventory remainder return.");
+		expect(samplePoseAnimation(returned, 1)).toMatchObject({
+			x: openerPose.x,
+			y: openerPose.y,
+		});
+		const animationCountBeforeVanish = animations.length;
+		returned.onComplete?.();
+
+		expect(transient.container.destroyed).toBe(false);
+		const vanishAnimations = animations.slice(animationCountBeforeVanish);
+		const vanishPose = vanishAnimations.find(
+			(animation) => animation.actor === transient && animation.channel === "pose",
+		);
+		if (vanishPose?.channel !== "pose") {
+			throw new Error("Expected Inventory remainder scale-down.");
+		}
+		expect(vanishPose.durationMs).toBe(pixiTileActorRemovalFeedbackDurationMs);
+		expect(vanishPose).toMatchObject({
+			toScale: 0.72,
+			toX: openerPose.x + transient.size * 0.14,
+			toY: openerPose.y + transient.size * 0.14,
+		});
+		const vanishOpacity = vanishAnimations.find(
+			(animation) =>
+				animation.actor === transient &&
+				animation.channel === "lifecycle-opacity" &&
+				animation.toAlpha === 0,
+		);
+		if (vanishOpacity?.channel !== "lifecycle-opacity") {
+			throw new Error("Expected Inventory remainder fade-out.");
+		}
+		expect(vanishOpacity.durationMs).toBe(pixiTileActorRemovalFeedbackDurationMs);
+		vanishOpacity.onCancel?.();
+
+		expect(transient.container.destroyed).toBe(true);
+		expect(completed).toHaveBeenCalledOnce();
+		vanishOpacity.onComplete?.();
+		expect(completed).toHaveBeenCalledOnce();
 	});
 
 	it("gates resolved owner output after the last input without returning a stale remainder", () => {
@@ -1046,6 +1223,7 @@ describe("Pixi tile motion runtime", () => {
 		);
 		if (travel?.channel !== "pose") throw new Error("Expected the complete input travel.");
 		const transient = travel.actor;
+		expect(transient).toBe(source);
 		samplePoseAnimation(travel, 1);
 		travel.onComplete?.();
 		const removal = animations.find(
@@ -1065,7 +1243,7 @@ describe("Pixi tile motion runtime", () => {
 					animation.ownerKey === "motion:41:0",
 			),
 		).toHaveLength(1);
-		expect(source.container.alpha).toBe(0);
+		expect(source.container.alpha).toBe(1);
 		expect(
 			animations.some(
 				(animation) =>

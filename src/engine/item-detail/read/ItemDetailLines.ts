@@ -4,6 +4,11 @@ import type { DistanceEnumSchema } from "~/engine/distance/schema/DistanceEnumSc
 import type { InputChargeFromEnumSchema } from "~/engine/input/schema/InputChargeFromEnumSchema";
 import type { InputModeEnumSchema } from "~/engine/input/schema/InputModeEnumSchema";
 import type { JobStatusEnumSchema } from "~/engine/job/schema/read/JobStatusEnumSchema";
+import type {
+	ItemDetailOutputRoll,
+	ItemDetailOutputSet,
+	ItemDetailQuantityBounds,
+} from "~/engine/item-detail/read/ItemDetailOutput";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import type { SelectorSchema } from "~/engine/selector/schema/SelectorSchema";
 
@@ -19,10 +24,7 @@ export namespace ItemDetailLines {
 		readonly runtime: RuntimeSchema.Type;
 	}
 
-	export interface QuantityBounds {
-		readonly min: number;
-		readonly max: number;
-	}
+	export type QuantityBounds = ItemDetailQuantityBounds;
 
 	export interface MaterialInput {
 		readonly kind: "materials";
@@ -34,6 +36,13 @@ export namespace ItemDetailLines {
 		readonly missingQuantity: number;
 		readonly availableCapacity: number;
 		readonly ready: boolean;
+		readonly storedItems?: readonly {
+			readonly itemId: IdSchema.Type;
+			readonly quantity: number;
+			readonly revision: string;
+			readonly runtimeItemId: IdSchema.Type;
+			readonly title: string;
+		}[];
 		readonly charges?: ItemDetailLineChargeCost;
 	}
 
@@ -62,29 +71,8 @@ export namespace ItemDetailLines {
 		readonly quantity: QuantityBounds;
 	}
 
-	export type OutputRoll =
-		| {
-				readonly kind: "guaranteed";
-				readonly item: readonly OutputItem[];
-		  }
-		| {
-				readonly kind: "chance";
-				readonly chance: number;
-				readonly item: readonly OutputItem[];
-		  }
-		| {
-				readonly kind: "weight";
-				readonly selections: QuantityBounds;
-				readonly option: readonly {
-					readonly weight: number;
-					readonly item: readonly OutputItem[];
-				}[];
-		  };
-
-	export interface OutputSet {
-		readonly weight: number;
-		readonly roll: readonly OutputRoll[];
-	}
+	export type OutputRoll = ItemDetailOutputRoll<OutputItem>;
+	export type OutputSet = ItemDetailOutputSet<OutputItem>;
 
 	export type Availability =
 		| {

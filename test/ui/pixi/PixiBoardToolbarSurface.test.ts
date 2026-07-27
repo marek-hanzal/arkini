@@ -161,7 +161,7 @@ describe("PixiBoardToolbarSurface", () => {
 		});
 	});
 
-	it("keeps an unavailable ordinary click inert and reserves Item Detail for Shift+click", async () => {
+	it("keeps an unavailable left click inert and reserves Item Detail for right click", async () => {
 		const host = document.createElement("div");
 		document.body.append(host);
 		const root = createRoot(host);
@@ -175,6 +175,7 @@ describe("PixiBoardToolbarSurface", () => {
 		const owner = {
 			id: "runtime:producer",
 			itemId: "producer",
+			itemType: "producer",
 			location: {
 				scope: "board",
 				space: 0,
@@ -224,6 +225,7 @@ describe("PixiBoardToolbarSurface", () => {
 		const producer = {
 			id: "runtime:producer",
 			itemId: "producer",
+			itemType: "producer",
 			location: {
 				scope: "board",
 				space: 0,
@@ -268,6 +270,7 @@ describe("PixiBoardToolbarSurface", () => {
 		const item = {
 			id: "runtime:inventory",
 			itemId: "inventory",
+			itemType: "inventory",
 			location: {
 				scope: "board",
 				space: 0,

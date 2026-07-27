@@ -1,10 +1,12 @@
 import { Effect } from "effect";
-import { Container, Sprite, Texture } from "pixi.js";
+import { Container, Graphics, Sprite, Texture } from "pixi.js";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { GameEngine } from "~/bridge/game/GameEngine";
 import type { runTileDropAtom } from "~/bridge/tile/runTileDropAtom";
 import type { TileActorItem } from "~/bridge/tile/TileActorItem";
+import { ItemEnumSchema } from "~/engine/item/schema/ItemEnumSchema";
+import { JobStatusEnumSchema } from "~/engine/job/schema/read/JobStatusEnumSchema";
 import type { PixiMainSceneActorStore } from "~/ui/pixi/actor/PixiMainSceneActorStore";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
 import type { PixiTileActorVisual } from "~/ui/pixi/actor/PixiTileActorVisual";
@@ -139,6 +141,7 @@ const createItem = (
 	compositeUrl: undefined,
 	id,
 	itemId: "water",
+	itemType: "simple",
 	location,
 	primaryAction: {
 		kind: "none",
@@ -178,6 +181,7 @@ const createActor = (item: TileActorItem): PixiTileActor => {
 	const crowdLayer = new Container();
 	const visualLayer = new Container();
 	const runningGlow = new Sprite(Texture.EMPTY);
+	const progressBar = new Graphics();
 	const currentVisual = createVisual(item);
 	visualLayer.addChild(currentVisual.container);
 	crowdLayer.addChild(visualLayer);
@@ -190,6 +194,7 @@ const createActor = (item: TileActorItem): PixiTileActor => {
 		crowdLayer,
 		visualLayer,
 		runningGlow,
+		progressBar,
 		visuals: new Set([
 			currentVisual,
 		]),
@@ -816,6 +821,35 @@ describe("Pixi main-scene reconciliation", () => {
 				(animation) => animation.actor === actor && animation.channel === "glow-opacity",
 			),
 		).toHaveLength(1);
+	});
+
+	it("dims a craft as soon as its active job starts collecting inputs", () => {
+		const idle = createItem("runtime:craft", boardLocation, {
+			itemType: ItemEnumSchema.enum.Craft,
+		});
+		const collecting = createItem(idle.id, boardLocation, {
+			itemType: ItemEnumSchema.enum.Craft,
+			jobStatus: JobStatusEnumSchema.enum.Paused,
+		});
+		const actor = createActor(idle);
+		const harness = createReconcilerHarness({
+			actor,
+		});
+		projectionState.main = [
+			collecting,
+		];
+
+		Effect.runSync(harness.reconciler.reconcileFx(transition(2)));
+
+		expect(harness.animations.find(({ channel }) => channel === "crowd-opacity")).toMatchObject(
+			{
+				actor,
+				channel: "crowd-opacity",
+				durationMs: 180,
+				ownerKey: `running:${actor.item.id}`,
+				toCrowdAlpha: 0.6,
+			},
+		);
 	});
 
 	it("dips a surviving consumed source and restores only that lifecycle intent", () => {

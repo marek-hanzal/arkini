@@ -30,7 +30,7 @@ export namespace createPixiMainSceneRuntimeFx {
 		readonly host: HTMLElement;
 		readonly onActivate: (
 			item: TileActorItem,
-			shiftKey: boolean,
+			openDetail: boolean,
 			origin: HTMLElement,
 		) => void | PromiseLike<void>;
 		readonly onDrop: (command: runTileDropAtom.Command) => PromiseLike<runTileDropAtom.Result>;

@@ -25,7 +25,7 @@ export namespace autofillLineInputsFx {
 const maxConsecutiveDropConflicts = 16;
 
 /**
- * Fills one line from its owner's board through ordinary item-drop commands.
+ * Fills one line from its owner's board and Inventory through ordinary item-drop commands.
  *
  * Each planned source presents its complete current stack, while the command requests only the
  * exact missing quantity for one slot. The canonical drop path rechecks that request against current

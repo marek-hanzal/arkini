@@ -12,11 +12,11 @@ import type {
 } from "~/ui/pixi/actor/PixiInventoryActorStore";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
 import { createPixiTileActorFx } from "~/ui/pixi/actor/createPixiTileActorFx";
+import { readPixiTileActorCrowdAlpha } from "~/ui/pixi/actor/readPixiTileActorCrowdAlpha";
 import { destroyPixiTileActorFx } from "~/ui/pixi/actor/destroyPixiTileActorFx";
 import { updatePixiTileActorFx } from "~/ui/pixi/actor/updatePixiTileActorFx";
 import type { PixiActorAnimator } from "~/ui/pixi/animation/PixiActorAnimator";
-import { createPixiRetargetablePoseSamplerFx } from "~/ui/pixi/animation/createPixiRetargetablePoseSamplerFx";
-import { readPixiTileTravelDurationMsFx } from "~/ui/pixi/animation/readPixiTileTravelDurationMsFx";
+import { animatePixiActorToRetargetablePoseFx } from "~/ui/pixi/animation/animatePixiActorToRetargetablePoseFx";
 import {
 	startPixiTileActorRunningGlowFx,
 	stopPixiTileActorRunningGlowFx,
@@ -42,11 +42,13 @@ export namespace createPixiInventoryActorStoreFx {
 const sameVisual = (left: TileActorItem, right: TileActorItem) =>
 	left.revision === right.revision &&
 	left.title === right.title &&
+	left.badgeCount === right.badgeCount &&
 	left.quantity === right.quantity &&
 	left.sourceUrl === right.sourceUrl &&
 	left.compositeUrl === right.compositeUrl &&
 	left.running === right.running &&
-	left.runningGlow === right.runningGlow;
+	left.runningGlow === right.runningGlow &&
+	left.progressRatio === right.progressRatio;
 
 /** Owns retained Inventory actors and their canonical transition reconciliation. */
 export const createPixiInventoryActorStoreFx = Effect.fn("createPixiInventoryActorStoreFx")(
@@ -181,7 +183,9 @@ export const createPixiInventoryActorStoreFx = Effect.fn("createPixiInventoryAct
 								surface.actorLayer.addChild(actor.container);
 								created.push(actor);
 							}
-							const runningChanged = actor.item.running !== item.running;
+							const crowdAlphaChanged =
+								readPixiTileActorCrowdAlpha(actor.item) !==
+								readPixiTileActorCrowdAlpha(item);
 							const runningGlowChanged = actor.item.runningGlow !== item.runningGlow;
 							const sizeChanged = actor.size !== actorSize;
 							const previousDisplayedSize = actor.size * actor.container.scale.x;
@@ -195,14 +199,14 @@ export const createPixiInventoryActorStoreFx = Effect.fn("createPixiInventoryAct
 							} else {
 								actor.item = item;
 							}
-							if (runningChanged) {
+							if (crowdAlphaChanged) {
 								RendererRuntime.runSync(
 									animator.animateFx({
 										actor,
 										channel: "crowd-opacity",
 										durationMs: 180,
 										ownerKey: `running:${item.id}`,
-										toCrowdAlpha: item.running ? 0.82 : 1,
+										toCrowdAlpha: readPixiTileActorCrowdAlpha(item),
 									}),
 								);
 							}
@@ -279,44 +283,17 @@ export const createPixiInventoryActorStoreFx = Effect.fn("createPixiInventoryAct
 								actor.container.y !== pose.y ||
 								actor.container.scale.x !== 1
 							) {
-								const durationMs = RendererRuntime.runSync(
-									readPixiTileTravelDurationMsFx({
-										fromX: actor.container.x,
-										fromY: actor.container.y,
-										tileSize: actor.size,
-										toX: pose.x,
-										toY: pose.y,
-									}),
-								);
-								const readPose = RendererRuntime.runSync(
-									createPixiRetargetablePoseSamplerFx({
-										from: {
-											scale: actor.container.scale.x,
-											x: actor.container.x,
-											y: actor.container.y,
-										},
-										readTarget: () => {
-											const latest =
-												RendererRuntime.runSync(
-													surface.readActorPoseFx(actor.item),
-												) ?? pose;
-											return {
-												scale:
-													RendererRuntime.runSync(
-														surface.readActorSizeFx,
-													) / Math.max(1, actor.size),
-												x: latest.x,
-												y: latest.y,
-											};
-										},
-									}),
-								);
 								RendererRuntime.runSync(
-									animator.animateFx({
+									animatePixiActorToRetargetablePoseFx({
 										actor,
-										channel: "pose",
-										durationMs,
-										readPose,
+										animator,
+										readSize: () =>
+											RendererRuntime.runSync(surface.readActorSizeFx),
+										readTarget: () =>
+											RendererRuntime.runSync(
+												surface.readActorPoseFx(actor.item),
+											),
+										target: pose,
 									}),
 								);
 							}

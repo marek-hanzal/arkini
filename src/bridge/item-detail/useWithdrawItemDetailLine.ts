@@ -5,10 +5,11 @@ import { useMemo } from "react";
 
 import { useGameEngine } from "~/bridge/game/useGameEngine";
 import type { ItemDetailPendingActionOwner } from "~/bridge/item-detail/ItemDetailPendingActionOwner";
+import { withdrawLineInputItemFx } from "~/engine/input/write/withdrawLineInputItemFx";
 import { withdrawLineInputsFx } from "~/engine/input/write/withdrawLineInputsFx";
 
 export namespace useWithdrawItemDetailLine {
-	export type Props = withdrawLineInputsFx.Props;
+	export type Props = withdrawLineInputsFx.Props | withdrawLineInputItemFx.Props;
 
 	export interface Options {
 		readonly pendingKey: string;
@@ -16,7 +17,7 @@ export namespace useWithdrawItemDetailLine {
 	}
 }
 
-/** Withdraws one exact Item Detail line through canonical placement. */
+/** Withdraws one exact buffered root or its complete Item Detail line through canonical placement. */
 export const useWithdrawItemDetailLine = ({
 	pendingKey,
 	pendingOwner,
@@ -33,7 +34,14 @@ export const useWithdrawItemDetailLine = ({
 								key: pendingKey,
 								action: "withdraw",
 								failureMessage: "Inputs could not be withdrawn.",
-								run: game.runFx(withdrawLineInputsFx(command)),
+								run:
+									"itemId" in command
+										? game
+												.runFx(withdrawLineInputItemFx(command))
+												.pipe(Effect.asVoid)
+										: game
+												.runFx(withdrawLineInputsFx(command))
+												.pipe(Effect.asVoid),
 							}),
 						),
 					),

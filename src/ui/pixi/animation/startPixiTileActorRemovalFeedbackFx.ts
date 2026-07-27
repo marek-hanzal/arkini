@@ -8,6 +8,7 @@ export namespace startPixiTileActorRemovalFeedbackFx {
 	export interface Props {
 		readonly actor: PixiTileActor;
 		readonly animator: PixiActorAnimator;
+		readonly onCancel?: () => void;
 		readonly onComplete?: () => void;
 	}
 }
@@ -22,7 +23,12 @@ export const pixiTileActorRemovalRestoreDurationMs = 160;
  * restore only the exact actor instance and lifecycle generation that still owns this intent.
  */
 export const startPixiTileActorRemovalFeedbackFx = Effect.fn("startPixiTileActorRemovalFeedbackFx")(
-	function* ({ actor, animator, onComplete }: startPixiTileActorRemovalFeedbackFx.Props) {
+	function* ({
+		actor,
+		animator,
+		onCancel,
+		onComplete,
+	}: startPixiTileActorRemovalFeedbackFx.Props) {
 		if (actor.container.destroyed) return;
 		actor.lifecycleIntentGeneration += 1;
 		actor.lifecycleTargetAlpha = 0;
@@ -33,6 +39,7 @@ export const startPixiTileActorRemovalFeedbackFx = Effect.fn("startPixiTileActor
 			actor,
 			channel: "lifecycle-opacity",
 			durationMs: pixiTileActorRemovalFeedbackDurationMs,
+			onCancel,
 			onComplete,
 			ownerKey: readPixiActorAlphaAnimationKey(actor),
 			toAlpha: 0,

@@ -27,6 +27,34 @@ export const useItemDetailLinesEquality = () =>
 			left?.detailItemId === right?.detailItemId;
 		const sameStringArray = (left: readonly string[], right: readonly string[]) =>
 			left.length === right.length && left.every((value, index) => value === right[index]);
+		const sameStoredItems = (
+			left: Extract<
+				ItemDetailLines.Input,
+				{
+					readonly kind: "materials";
+				}
+			>["storedItems"],
+			right: Extract<
+				ItemDetailLines.Input,
+				{
+					readonly kind: "materials";
+				}
+			>["storedItems"],
+		) =>
+			(left ?? []).length === (right ?? []).length &&
+			(left ?? []).every((item, index) => {
+				const candidate = (right ?? [])[index];
+				return (
+					candidate !== undefined &&
+					item.runtimeItemId === candidate.runtimeItemId &&
+					item.revision === candidate.revision &&
+					item.itemId === candidate.itemId &&
+					item.title === candidate.title &&
+					item.quantity === candidate.quantity &&
+					item.sourceUrl === candidate.sourceUrl &&
+					item.compositeUrl === candidate.compositeUrl
+				);
+			});
 		const sameInput = (left: ItemDetailLines.Input, right: ItemDetailLines.Input) => {
 			if (left.kind !== right.kind) return false;
 			return match(left)
@@ -44,6 +72,7 @@ export const useItemDetailLinesEquality = () =>
 						materials.missingQuantity === right.missingQuantity &&
 						materials.availableCapacity === right.availableCapacity &&
 						materials.ready === right.ready &&
+						sameStoredItems(materials.storedItems, right.storedItems) &&
 						sameCharge(materials.charges, right.charges) &&
 						sameDetailReference(materials.detail, right.detail),
 				)

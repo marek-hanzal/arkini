@@ -1,15 +1,11 @@
-import { Array, Effect, Option } from "effect";
+import { Array, Effect } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
-import { ItemNotOnBoardError } from "~/engine/item/error/ItemNotOnBoardError";
-import { LineNotFoundError } from "~/engine/line/error/LineNotFoundError";
-import { readItemLineFx } from "~/engine/line/fx/readItemLineFx";
+import { readBoardItemLineFx } from "~/engine/line/fx/readBoardItemLineFx";
 import { placeRuntimeItemFx } from "~/engine/placement/fx/placeRuntimeItemFx";
 import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
-import { isBoardRuntimeItemFx } from "~/engine/runtime/read/isBoardRuntimeItemFx";
 import { isInputRuntimeItemFx } from "~/engine/runtime/read/isInputRuntimeItemFx";
-import { readRuntimeItemByIdFx } from "~/engine/runtime/read/readRuntimeItemByIdFx";
 
 export namespace withdrawLineInputsFx {
 	export interface Props {
@@ -30,31 +26,11 @@ export const withdrawLineInputsFx = Effect.fn("withdrawLineInputsFx")(function* 
 }: withdrawLineInputsFx.Props) {
 	return yield* modifyRuntimeFx((runtime) =>
 		Effect.gen(function* () {
-			const runtimeOwner = yield* readRuntimeItemByIdFx({
-				itemId: ownerItemId,
+			const { owner } = yield* readBoardItemLineFx({
+				ownerItemId,
+				lineId,
 				runtime,
 			});
-			const owner = Option.getOrUndefined(yield* isBoardRuntimeItemFx(runtimeOwner));
-			if (owner === undefined) {
-				return yield* Effect.fail(
-					new ItemNotOnBoardError({
-						itemId: runtimeOwner.id,
-						location: runtimeOwner.location,
-					}),
-				);
-			}
-			const line = yield* readItemLineFx({
-				item: owner.item,
-				lineId,
-			});
-			if (line === undefined) {
-				return yield* Effect.fail(
-					new LineNotFoundError({
-						itemId: owner.id,
-						lineId,
-					}),
-				);
-			}
 
 			const bufferedItems = Array.getSomes(
 				yield* Effect.forEach(runtime.items, isInputRuntimeItemFx),

@@ -1,15 +1,13 @@
-import { Array, Effect, Option, pipe } from "effect";
+import { Effect } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
 import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
-import { ItemNotFoundError } from "~/engine/item/error/ItemNotFoundError";
 import { assertOwnerIdleFx } from "~/engine/job/fx/assertOwnerIdleFx";
-import { assertRevisionFx } from "~/engine/revision/fx/assertRevisionFx";
-import { assertNonJobScopeFx } from "~/engine/runtime/fx/assertNonJobScopeFx";
 import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
 import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
 import { removeRuntimeItemFx } from "~/engine/runtime/fx/removeRuntimeItemFx";
+import { readValidatedRuntimeItemFx } from "~/engine/runtime/read/readValidatedRuntimeItemFx";
 
 export namespace removeItemFx {
 	export interface Props {
@@ -27,27 +25,10 @@ export const removeItemFx = Effect.fn("removeItemFx")(function* ({
 }: removeItemFx.Props) {
 	return yield* modifyRuntimeFx((runtime) => {
 		return Effect.gen(function* () {
-			const item = pipe(
-				runtime.items,
-				Array.findFirst((candidate) => candidate.id === itemId),
-				Option.getOrUndefined,
-			);
-			if (item === undefined) {
-				return yield* Effect.fail(
-					new ItemNotFoundError({
-						itemId,
-					}),
-				);
-			}
-
-			yield* assertRevisionFx({
-				actualRevision: item.revision,
-				entityId: item.id,
-				expectedRevision: revision,
-			});
-
-			yield* assertNonJobScopeFx({
-				item,
+			const item = yield* readValidatedRuntimeItemFx({
+				itemId,
+				revision,
+				runtime,
 			});
 			yield* assertOwnerIdleFx({
 				ownerItemId: item.id,

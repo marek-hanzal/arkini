@@ -36,6 +36,7 @@ export namespace runPixiTileMotionCueFx {
 		readonly onTransientCreated: (actor: PixiTileActor) => void;
 		readonly readHandoff: () => TileSceneHandoff | null;
 		readonly readPalette: () => PixiScenePalette;
+		readonly readSourceSurvives: () => boolean;
 		readonly surface: PixiMainSceneSurface;
 		readonly textures: PixiTextureStore;
 	}
@@ -57,6 +58,7 @@ export const runPixiTileMotionCueFx = Effect.fn("runPixiTileMotionCueFx")(functi
 	onTransientCreated,
 	readHandoff,
 	readPalette,
+	readSourceSurvives,
 	surface,
 	textures,
 }: runPixiTileMotionCueFx.Props) {
@@ -157,6 +159,7 @@ export const runPixiTileMotionCueFx = Effect.fn("runPixiTileMotionCueFx")(functi
 									onTransientCreated,
 									origin,
 									readPalette,
+									readSourceSurvives,
 									surface,
 									target,
 									textures,

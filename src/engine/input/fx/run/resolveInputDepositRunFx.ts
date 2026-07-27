@@ -1,13 +1,12 @@
-import { Array, Effect, Option } from "effect";
+import { Array, Effect } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { InputDepositSchema } from "~/engine/input/schema/InputDepositSchema";
 import type { InputRunResolutionSchema } from "~/engine/input/schema/run/InputRunResolutionSchema";
-import { ItemNotOnBoardError } from "~/engine/item/error/ItemNotOnBoardError";
 import { queryFx } from "~/engine/query/fx/queryFx";
 import { RuntimeFx } from "~/engine/runtime/context/RuntimeFx";
 import { isBoardRuntimeItemFx } from "~/engine/runtime/read/isBoardRuntimeItemFx";
-import { readRuntimeItemByIdFx } from "~/engine/runtime/read/readRuntimeItemByIdFx";
+import { readBoardRuntimeItemByIdFx } from "~/engine/runtime/read/readBoardRuntimeItemByIdFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { InputEnumSchema } from "~/engine/input/schema/InputEnumSchema";
 
@@ -68,19 +67,10 @@ export const resolveInputDepositRunFx = Effect.fn("resolveInputDepositRunFx")(fu
 	reservedCharges,
 	runtime,
 }: resolveInputDepositRunFx.Props) {
-	const runtimeOwner = yield* readRuntimeItemByIdFx({
+	const owner = yield* readBoardRuntimeItemByIdFx({
 		itemId: ownerItemId,
 		runtime,
 	});
-	const owner = Option.getOrUndefined(yield* isBoardRuntimeItemFx(runtimeOwner));
-	if (owner === undefined) {
-		return yield* Effect.fail(
-			new ItemNotOnBoardError({
-				itemId: runtimeOwner.id,
-				location: runtimeOwner.location,
-			}),
-		);
-	}
 
 	const candidates = yield* queryFx({
 		origin: owner.location,

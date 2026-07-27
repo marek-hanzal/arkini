@@ -16,7 +16,7 @@ import { usePixiGameRuntime } from "~/ui/pixi/usePixiGameRuntime";
  * Mounts the routed Inventory canvas while React retains page framing and navigation ownership.
  *
  * Ordinary activation releases the canonical Inventory item from the engine-owned physical
- * opener. Shift+click remains Item Detail and never initiates a release.
+ * opener. Right click opens Item Detail and never initiates a release.
  */
 export const PixiInventorySurface = () => {
 	const game = useGameEngine();
@@ -38,25 +38,30 @@ export const PixiInventorySurface = () => {
 		releaseInventoryItem,
 	};
 
-	const activate = useCallback((item: TileActorItem, shiftKey: boolean, origin: HTMLElement) => {
-		const { itemDetail: currentItemDetail, releaseInventoryItem: currentReleaseInventoryItem } =
-			controlsRef.current;
-		if (shiftKey) {
-			RendererRuntime.runSync(
-				currentItemDetail.openItemDetailFx({
-					itemId: item.id,
-					origin,
-				}),
-			);
-			return;
-		}
-		if (item.location.scope !== LocationScopeEnumSchema.enum.Inventory) return;
-		return currentReleaseInventoryItem({
-			itemId: item.id,
-			location: item.location,
-			revision: item.revision,
-		});
-	}, []);
+	const activate = useCallback(
+		(item: TileActorItem, openDetail: boolean, origin: HTMLElement) => {
+			const {
+				itemDetail: currentItemDetail,
+				releaseInventoryItem: currentReleaseInventoryItem,
+			} = controlsRef.current;
+			if (openDetail) {
+				RendererRuntime.runSync(
+					currentItemDetail.openItemDetailFx({
+						itemId: item.id,
+						origin,
+					}),
+				);
+				return;
+			}
+			if (item.location.scope !== LocationScopeEnumSchema.enum.Inventory) return;
+			return currentReleaseInventoryItem({
+				itemId: item.id,
+				location: item.location,
+				revision: item.revision,
+			});
+		},
+		[],
+	);
 
 	useLayoutEffect(() => {
 		const host = hostRef.current;
@@ -110,6 +115,7 @@ export const PixiInventorySurface = () => {
 			ref={hostRef}
 			className="size-full min-h-0 min-w-0"
 			data-ui="PixiInventorySurface"
+			onContextMenu={(event) => event.preventDefault()}
 		/>
 	);
 };

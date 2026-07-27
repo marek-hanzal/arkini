@@ -1,8 +1,8 @@
-import { Cause, Effect, Exit, Option } from "effect";
+import { Cause, Effect, Exit } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
 
 import { makeExactGameAtomFamilyFx } from "~/bridge/game/makeExactGameAtomFamilyFx";
-import { readExactCauseFailure } from "~/bridge/game/readExactCauseFailure";
+import { settleRendererCommandFailureFx } from "~/bridge/game/settleRendererCommandFailureFx";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import { autofillLineInputsFx } from "~/engine/input/write/autofillLineInputsFx";
 import { startLineFx } from "~/engine/job/write/startLineFx";
@@ -99,42 +99,36 @@ export const TileDefaultLineCommandAtom = RendererRuntime.runSync(
 						),
 					);
 					if (Exit.isFailure(exit)) {
-						if (Cause.hasInterruptsOnly(exit.cause)) {
-							return yield* Effect.failCause(exit.cause);
-						}
-						const failure = readExactCauseFailure(exit.cause);
-						if (Option.isNone(failure)) {
-							game.failStop("ui", exit.cause);
-							yield* Atom.set(fatalCauseAtom, exit.cause);
-							return yield* Effect.failCause(exit.cause);
-						}
-						if (command.generation !== latestCommandGeneration) return;
-						yield* Atom.set(stateAtom, {
-							kind: "error",
-							autofilled: false,
-							error: failure.value,
-							ownerItemId: command.ownerItemId,
+						return yield* settleRendererCommandFailureFx({
+							cause: exit.cause,
+							game,
+							onFailure: (failure) =>
+								command.generation !== latestCommandGeneration
+									? Effect.void
+									: Atom.set(stateAtom, {
+											kind: "error",
+											autofilled: false,
+											error: failure,
+											ownerItemId: command.ownerItemId,
+										}),
+							setFatalCause: (cause) => Atom.set(fatalCauseAtom, cause),
 						});
-						return;
 					}
 					if (exit.value.startExit !== null && Exit.isFailure(exit.value.startExit)) {
-						if (Cause.hasInterruptsOnly(exit.value.startExit.cause)) {
-							return yield* Effect.failCause(exit.value.startExit.cause);
-						}
-						const failure = readExactCauseFailure(exit.value.startExit.cause);
-						if (Option.isNone(failure)) {
-							game.failStop("ui", exit.value.startExit.cause);
-							yield* Atom.set(fatalCauseAtom, exit.value.startExit.cause);
-							return yield* Effect.failCause(exit.value.startExit.cause);
-						}
-						if (command.generation !== latestCommandGeneration) return;
-						yield* Atom.set(stateAtom, {
-							kind: "error",
-							autofilled: exit.value.autofilled,
-							error: failure.value,
-							ownerItemId: command.ownerItemId,
+						return yield* settleRendererCommandFailureFx({
+							cause: exit.value.startExit.cause,
+							game,
+							onFailure: (failure) =>
+								command.generation !== latestCommandGeneration
+									? Effect.void
+									: Atom.set(stateAtom, {
+											kind: "error",
+											autofilled: exit.value.autofilled,
+											error: failure,
+											ownerItemId: command.ownerItemId,
+										}),
+							setFatalCause: (cause) => Atom.set(fatalCauseAtom, cause),
 						});
-						return;
 					}
 					if (command.generation !== latestCommandGeneration) return;
 					yield* Atom.set(stateAtom, {

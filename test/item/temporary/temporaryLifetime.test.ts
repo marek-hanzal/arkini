@@ -7,6 +7,7 @@ import { mergeItemsFx } from "~/engine/merge/write/mergeItemsFx";
 import { checkRuntimeFx } from "~/engine/runtime/check/checkRuntimeFx";
 import { fromStateFx } from "~/engine/runtime/fx/fromStateFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
+import { dropItemFx } from "~/engine/runtime/write/dropItemFx";
 import { removeItemFx } from "~/engine/runtime/write/removeItemFx";
 import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
@@ -110,6 +111,7 @@ describe("temporary item lifetime", () => {
 
 		expect(result.spawned.remainingDurationMs).toBe(600);
 		expect(result.first.runtime.items[0]?.remainingDurationMs).toBe(500);
+		expect(result.first.runtime.items[0]?.revision).toBe(result.spawned.revision);
 		expect(result.second.runtime.items[0]?.remainingDurationMs).toBe(400);
 		expect(result.third.runtime.items[0]?.remainingDurationMs).toBe(300);
 		expect(result.fourth.runtime.items[0]?.remainingDurationMs).toBe(200);
@@ -161,6 +163,55 @@ describe("temporary item lifetime", () => {
 				200,
 			]),
 		);
+	});
+
+	it("keeps a temporary item draggable across passive lifetime ticks", () => {
+		const result = Effect.runSync(
+			Effect.gen(function* () {
+				const spawned = yield* spawnTemporaryFx({});
+				yield* runTickRuntimeByFx({
+					elapsedMs: 100,
+				});
+				const outcome = yield* dropItemFx({
+					sourceItemId: spawned.id,
+					sourceLocation: spawned.location,
+					sourceRevision: spawned.revision,
+					target: {
+						kind: "slot",
+						location: {
+							scope: "board",
+							space: 0,
+							position: {
+								x: 1,
+								y: 0,
+							},
+						},
+						occupant: null,
+					},
+				});
+				return {
+					outcome,
+					runtime: yield* readRuntimeFx(),
+				};
+			}).pipe(
+				useGameFx({
+					config,
+				}),
+			),
+		);
+
+		expect(result.outcome).toMatchObject({
+			kind: "move",
+			location: {
+				scope: "board",
+				space: 0,
+				position: {
+					x: 1,
+					y: 0,
+				},
+			},
+		});
+		expect(result.runtime.items[0]?.remainingDurationMs).toBe(500);
 	});
 
 	it("persists and restores the remaining duration with a fresh revision", () => {

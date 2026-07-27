@@ -1,11 +1,11 @@
-import { Effect, Option } from "effect";
+import { Effect } from "effect";
 import { match, P } from "ts-pattern";
 
 import type { GameTransition } from "~/bridge/game/GameSession";
 import type { TileLocation } from "~/bridge/tile/TileLocation";
 import type { TileSwapMotionCue } from "~/bridge/tile/motion/TileMotionCue";
+import { readGridRuntimeItemFx } from "~/bridge/tile/motion/readGridRuntimeItemFx";
 import { isSameGridLocationFx } from "~/engine/location/read/isSameGridLocationFx";
-import { isGridRuntimeItemFx } from "~/engine/runtime/read/isGridRuntimeItemFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
 interface CapturedTileSwapActor {
@@ -14,19 +14,6 @@ interface CapturedTileSwapActor {
 	readonly location: TileLocation;
 }
 
-const readGridItemFx = Effect.fn("readCommittedTileSwapGridItemFx")(function* ({
-	itemId,
-	runtime,
-}: {
-	readonly itemId: string;
-	readonly runtime: RuntimeSchema.Type | null;
-}) {
-	if (runtime === null) return null;
-	const item = runtime.items.find((candidate) => candidate.id === itemId);
-	if (item === undefined) return null;
-	return Option.getOrNull(yield* isGridRuntimeItemFx(item));
-});
-
 const readCapturedGridItemFx = Effect.fn("readCapturedCommittedTileSwapGridItemFx")(function* ({
 	actor,
 	runtime,
@@ -34,7 +21,7 @@ const readCapturedGridItemFx = Effect.fn("readCapturedCommittedTileSwapGridItemF
 	readonly actor: CapturedTileSwapActor;
 	readonly runtime: RuntimeSchema.Type | null;
 }) {
-	const item = yield* readGridItemFx({
+	const item = yield* readGridRuntimeItemFx({
 		itemId: actor.id,
 		runtime,
 	});
@@ -61,11 +48,11 @@ export const readCommittedTileSwapMotionCueFx = Effect.fn("readCommittedTileSwap
 				actor: target,
 				runtime: transition.previousRuntime,
 			}),
-			readGridItemFx({
+			readGridRuntimeItemFx({
 				itemId: source.id,
 				runtime: transition.runtime,
 			}),
-			readGridItemFx({
+			readGridRuntimeItemFx({
 				itemId: target.id,
 				runtime: transition.runtime,
 			}),

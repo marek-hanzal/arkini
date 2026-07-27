@@ -170,6 +170,8 @@ export const ItemLineRow = ({
 				<ItemLineInputs
 					disabled={disabled}
 					input={line.input}
+					lineId={line.lineId}
+					ownerItemId={ownerItemId}
 				/>
 				<div
 					className="grid place-items-center text-muted"

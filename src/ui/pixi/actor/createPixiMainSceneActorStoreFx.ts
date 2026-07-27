@@ -64,6 +64,13 @@ export const createPixiMainSceneActorStoreFx = Effect.fn("createPixiMainSceneAct
 					yield* destroyPixiTileActorFx(actor);
 					return;
 				}
+				for (const exitingActor of exitingActors) {
+					if (exitingActor === actor || exitingActor.item.id !== actor.item.id) {
+						continue;
+					}
+					exitingActors.delete(exitingActor);
+					yield* destroyPixiTileActorFx(exitingActor);
+				}
 				actors.set(actor.item.id, actor);
 			}),
 			closeFx: Effect.gen(function* () {

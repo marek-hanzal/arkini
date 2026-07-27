@@ -15,6 +15,7 @@ interface PixiActorAnimationBase {
 	readonly actor: PixiTileActor;
 	readonly delayMs?: number;
 	readonly durationMs: number;
+	readonly onCancel?: () => void;
 	readonly onComplete?: () => void;
 	readonly ownerKey?: string;
 }

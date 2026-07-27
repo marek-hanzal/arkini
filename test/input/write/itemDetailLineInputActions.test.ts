@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~/engine/game/fx/useGameFx";
 import { autofillLineInputsFx } from "~/engine/input/write/autofillLineInputsFx";
+import { withdrawLineInputItemFx } from "~/engine/input/write/withdrawLineInputItemFx";
 import { withdrawLineInputsFx } from "~/engine/input/write/withdrawLineInputsFx";
 import { readItemDetailLinesFx } from "~/engine/item-detail/read/readItemDetailLinesFx";
 import { startLineFx } from "~/engine/job/write/startLineFx";
@@ -50,7 +51,7 @@ const spawnWaterFx = ({
 	});
 
 describe("Item Detail line input actions", () => {
-	it("autofills deterministic board sources without reaching into Inventory", () => {
+	it("autofills deterministic board sources before falling back to Inventory", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {
 				yield* spawnOwnerFx();
@@ -116,8 +117,8 @@ describe("Item Detail line input actions", () => {
 			],
 		});
 		expect(result.autofilled).toEqual({
-			storedQuantity: 2,
-			remainingMissingQuantity: 1,
+			storedQuantity: 3,
+			remainingMissingQuantity: 0,
 		});
 		const buffered = result.runtime.items.filter(
 			(item) =>
@@ -125,13 +126,14 @@ describe("Item Detail line input actions", () => {
 				item.location.ownerItemId === ownerItemId &&
 				item.location.lineId === lineId,
 		);
-		expect(buffered.map((item) => item.id)).toEqual([
-			"runtime:far",
-			"runtime:near",
+		expect(buffered.map((item) => item.item.id)).toEqual([
+			"water",
+			"water",
+			"water",
 		]);
-		expect(buffered.reduce((total, item) => total + item.quantity, 0)).toBe(2);
+		expect(buffered.reduce((total, item) => total + item.quantity, 0)).toBe(3);
 		expect(result.runtime.items.find((item) => item.id === "runtime:inventory")).toMatchObject({
-			quantity: 2,
+			quantity: 1,
 			location: {
 				scope: "inventory",
 			},
@@ -145,8 +147,7 @@ describe("Item Detail line input actions", () => {
 						canWithdraw: true,
 					},
 					availability: {
-						kind: "blocked",
-						reason: "inputs",
+						kind: "ready",
 					},
 				},
 			],
@@ -363,6 +364,117 @@ describe("Item Detail line input actions", () => {
 						kind: "blocked",
 						reason: "inputs",
 					},
+				},
+			],
+		});
+	});
+
+	it("withdraws one exact buffered root while leaving the rest of the line intact", () => {
+		const result = Effect.runSync(
+			Effect.gen(function* () {
+				yield* spawnOwnerFx();
+				yield* spawnWaterFx({
+					id: "runtime:near",
+					location: sourceLocation(1),
+					quantity: 1,
+				});
+				yield* spawnWaterFx({
+					id: "runtime:far",
+					location: sourceLocation(2),
+					quantity: 1,
+				});
+				yield* autofillLineInputsFx({
+					ownerItemId,
+					lineId,
+				});
+				const beforeRuntime = yield* readRuntimeFx();
+				const selected = beforeRuntime.items.find((item) => item.id === "runtime:near");
+				if (selected === undefined) throw new Error("Expected buffered near input.");
+				const before = yield* readItemDetailLinesFx({
+					itemId: ownerItemId,
+					runtime: beforeRuntime,
+				});
+				const withdrawn = yield* withdrawLineInputItemFx({
+					itemId: selected.id,
+					itemRevision: selected.revision,
+					ownerItemId,
+					lineId,
+				});
+				const runtime = yield* readRuntimeFx();
+				const after = yield* readItemDetailLinesFx({
+					itemId: ownerItemId,
+					runtime,
+				});
+				return {
+					after,
+					before,
+					runtime,
+					withdrawn,
+				};
+			}).pipe(
+				useGameFx({
+					config: inputRuntimeTestConfig,
+				}),
+			),
+		);
+
+		expect(result.before).toMatchObject({
+			kind: "available",
+			line: [
+				{
+					input: [
+						{
+							kind: "materials",
+							storedItems: expect.arrayContaining([
+								expect.objectContaining({
+									runtimeItemId: "runtime:near",
+								}),
+								expect.objectContaining({
+									runtimeItemId: "runtime:far",
+								}),
+							]),
+						},
+					],
+				},
+			],
+		});
+		expect(result.withdrawn).toEqual({
+			itemId: "runtime:near",
+			withdrawnQuantity: 1,
+		});
+		expect(
+			result.runtime.items.find(
+				(item) => item.item.id === "water" && item.location.scope === "board",
+			)?.location,
+		).toMatchObject({
+			scope: "board",
+			space: 0,
+		});
+		expect(
+			result.runtime.items.find((item) => item.id === "runtime:far")?.location,
+		).toMatchObject({
+			scope: "input",
+			ownerItemId,
+			lineId,
+		});
+		expect(result.after).toMatchObject({
+			kind: "available",
+			line: [
+				{
+					actions: {
+						canWithdraw: true,
+					},
+					input: [
+						{
+							kind: "materials",
+							storedQuantity: 1,
+							storedItems: [
+								expect.objectContaining({
+									runtimeItemId: "runtime:far",
+								}),
+							],
+						},
+					],
 				},
 			],
 		});

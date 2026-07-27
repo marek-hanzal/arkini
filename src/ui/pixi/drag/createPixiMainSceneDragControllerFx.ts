@@ -10,6 +10,7 @@ import { readTileDropPreviewFx } from "~/bridge/tile/readTileDropPreviewFx";
 import type { PixiMainSceneActorStore } from "~/ui/pixi/actor/PixiMainSceneActorStore";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
 import { readPixiTileActorCursorFx } from "~/ui/pixi/actor/readPixiTileActorCursorFx";
+import { animatePixiActorToRetargetablePoseFx } from "~/ui/pixi/animation/animatePixiActorToRetargetablePoseFx";
 import type { PixiActorAnimator } from "~/ui/pixi/animation/PixiActorAnimator";
 import {
 	restorePixiTileActorRemovalFeedbackFx,
@@ -23,6 +24,8 @@ import type { PixiMainSceneActiveDrag } from "~/ui/pixi/drag/PixiMainSceneDragSt
 import type { PixiCursorGrabMotion } from "~/ui/pixi/drag/PixiCursorGrabMotion";
 import type { PixiMainSceneDragController } from "~/ui/pixi/drag/PixiMainSceneDragController";
 import { beginPixiMainSceneDropFx } from "~/ui/pixi/drag/beginPixiMainSceneDropFx";
+import { readPixiDragPointerOffset } from "~/ui/pixi/drag/readPixiDragPointerOffset";
+import { setPixiDraggedActorPoseFx } from "~/ui/pixi/drag/setPixiDraggedActorPoseFx";
 import { settlePixiMainSceneDraggedActorFx } from "~/ui/pixi/drag/settlePixiMainSceneDraggedActorFx";
 import { updatePixiMainSceneMagneticFieldFx } from "~/ui/pixi/drag/updatePixiMainSceneMagneticFieldFx";
 import type { PixiMainSceneDropPresentation } from "~/ui/pixi/drop/PixiMainSceneDropPresentation";
@@ -45,7 +48,7 @@ export namespace createPixiMainSceneDragControllerFx {
 		readonly motion: PixiTileMotionRuntime;
 		readonly onActivate: (
 			item: TileActorItem,
-			shiftKey: boolean,
+			openDetail: boolean,
 			origin: HTMLElement,
 		) => void | PromiseLike<void>;
 		readonly onAcceptedDrop: () => void;
@@ -56,6 +59,7 @@ export namespace createPixiMainSceneDragControllerFx {
 }
 
 const dragThreshold = 6;
+const inventoryShortcutTravelOwnerPrefix = "inventory-shortcut-travel";
 
 /**
  * Owns one main-scene pointer gesture from press through activation or drop release.
@@ -89,6 +93,32 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 		let interactionBlocked = false;
 		const pendingDropGenerations = new Set<number>();
 
+		const readTargetFacts = (
+			drag: PixiMainSceneActiveDrag,
+			target: PixiSceneDropTarget | null,
+		) => {
+			const targetItem =
+				target === null ? null : RendererRuntime.runSync(surface.readOccupantFx(target));
+			let kind: readTileDropPreviewFx.Result["kind"] | null = null;
+			try {
+				kind = RendererRuntime.runSync(
+					readTileDropPreviewFx({
+						game,
+						sourceItemId: drag.sourceItem.id,
+						sourceLocation: drag.sourceItem.location,
+						sourceRevision: drag.sourceItem.revision,
+						target: RendererRuntime.runSync(surface.readCommandTargetFx(target)),
+					}),
+				).kind;
+			} catch (cause) {
+				game.reportCriticalFailure("game-presentation", cause);
+			}
+			return {
+				kind,
+				targetItem,
+			};
+		};
+
 		const refreshEligibleAttractionActorIds = (drag: PixiMainSceneActiveDrag) => {
 			try {
 				drag.eligibleAttractionActorIds = RendererRuntime.runSync(
@@ -117,32 +147,18 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 			) {
 				return;
 			}
+			const facts = readTargetFacts(drag, target);
 			drag.target = target;
-			drag.targetItem =
-				target === null ? null : RendererRuntime.runSync(surface.readOccupantFx(target));
-			let kind: readTileDropPreviewFx.Result["kind"] | null = null;
-			try {
-				kind = RendererRuntime.runSync(
-					readTileDropPreviewFx({
-						game,
-						sourceItemId: drag.sourceItem.id,
-						sourceLocation: drag.sourceItem.location,
-						sourceRevision: drag.sourceItem.revision,
-						target: RendererRuntime.runSync(surface.readCommandTargetFx(target)),
-					}),
-				).kind;
-			} catch (cause) {
-				game.reportCriticalFailure("game-presentation", cause);
-			}
-			drag.previewKind = kind;
+			drag.targetItem = facts.targetItem;
+			drag.previewKind = facts.kind;
 			drag.actor.container.cursor = RendererRuntime.runSync(
 				readPixiTileActorCursorFx({
 					phase: "dragging",
-					previewKind: kind,
+					previewKind: facts.kind,
 					running: drag.sourceItem.running,
 				}),
 			);
-			RendererRuntime.runSync(surface.renderDropFeedbackFx(target, kind));
+			RendererRuntime.runSync(surface.renderDropFeedbackFx(target, facts.kind));
 		};
 
 		const settleActor = (actor: PixiTileActor) => {
@@ -153,6 +169,24 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 					surface,
 				}),
 			);
+		};
+
+		const releaseDragPointer = (pointerId: number) => {
+			try {
+				application.app.canvas.releasePointerCapture(pointerId);
+			} catch {
+				// Capture may already be released by the browser.
+			}
+		};
+
+		const cancelDrag = (drag: PixiMainSceneActiveDrag) => {
+			activeDrag = null;
+			releaseDragPointer(drag.pointerId);
+			if (drag.mode !== "drag") return;
+			RendererRuntime.runSync(surface.renderDropFeedbackFx(null, null));
+			RendererRuntime.runSync(magneticField.resetFx);
+			RendererRuntime.runSync(cursorGrab.finishFx(drag.actor));
+			settleActor(drag.actor);
 		};
 
 		const restoreOptimisticRemoval = ({
@@ -182,18 +216,7 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 
 		const cancelInteraction = () => {
 			if (activeDrag === null || activeDrag.phase === "submitting") return;
-			const drag = activeDrag;
-			activeDrag = null;
-			try {
-				application.app.canvas.releasePointerCapture(drag.pointerId);
-			} catch {
-				// Capture may already be released by the browser.
-			}
-			if (drag.mode !== "drag") return;
-			RendererRuntime.runSync(surface.renderDropFeedbackFx(null, null));
-			RendererRuntime.runSync(magneticField.resetFx);
-			RendererRuntime.runSync(cursorGrab.finishFx(drag.actor));
-			settleActor(drag.actor);
+			cancelDrag(activeDrag);
 		};
 
 		const detachActor = (actor: PixiTileActor) => {
@@ -221,16 +244,10 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 		};
 
 		const onPointerMove = (event: FederatedPointerEvent) => {
-			let drag = activeDrag;
-			if (
-				drag === null ||
-				drag.phase === "submitting" ||
-				event.pointerId !== drag.pointerId
-			) {
-				return;
-			}
-			const offsetX = event.global.x - drag.pressX;
-			const offsetY = event.global.y - drag.pressY;
+			const pointer = readPixiDragPointerOffset(event, activeDrag);
+			if (pointer === null) return;
+			let { drag } = pointer;
+			const { offsetX, offsetY } = pointer;
 			if (drag.phase === "pressed" && Math.hypot(offsetX, offsetY) < dragThreshold) return;
 			if (drag.phase === "pressed" && drag.mode === "activation-only") {
 				activeDrag = null;
@@ -303,10 +320,9 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 				);
 			}
 			RendererRuntime.runSync(
-				animator.setFx({
+				setPixiDraggedActorPoseFx({
 					actor: drag.actor,
-					channel: "pose",
-					scale: drag.actor.container.scale.x,
+					animator,
 					x: drag.startX + offsetX,
 					y: drag.startY + offsetY,
 				}),
@@ -341,59 +357,25 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 			drag.lastPointerY = event.global.y;
 		};
 
-		const finishPointer = (event: FederatedPointerEvent) => {
-			const drag = activeDrag;
-			if (
-				drag === null ||
-				drag.phase === "submitting" ||
-				event.pointerId !== drag.pointerId
-			) {
-				return;
-			}
-			try {
-				application.app.canvas.releasePointerCapture(event.pointerId);
-			} catch {
-				// Capture may already be released by the browser.
-			}
-			if (drag.phase === "pressed") {
-				activeDrag = null;
-				const shiftKey = event.shiftKey;
-				const currentActor = actorStore.actors.get(drag.sourceItem.id);
-				if (currentActor === undefined || currentActor.container.destroyed) return;
-				try {
-					RendererRuntime.runSync(
-						flashPixiTileActorAckGlowFx({
-							actor: currentActor,
-							animator,
-							tint: readAckTint(),
-						}),
-					);
-				} catch (cause) {
-					game.reportCriticalFailure("game-presentation", cause);
-				}
-				void Promise.resolve()
-					.then(() => {
-						if (closed) return;
-						const currentItem = actorStore.actors.get(drag.sourceItem.id)?.item;
-						if (currentItem === undefined) return;
-						return onActivate(currentItem, shiftKey, application.app.canvas);
-					})
-					.catch((cause) => {
-						if (closed) return;
-						game.reportCriticalFailure("game-presentation", cause);
-					});
-				return;
-			}
+		const submitDrag = ({
+			drag,
+			shortcutReceiver,
+			target,
+		}: {
+			readonly drag: PixiMainSceneActiveDrag;
+			readonly shortcutReceiver?: {
+				readonly actor: PixiTileActor;
+				readonly pose: {
+					readonly size: number;
+					readonly x: number;
+					readonly y: number;
+				};
+			};
+			readonly target: PixiSceneDropTarget | null;
+		}) => {
 			RendererRuntime.runSync(cursorGrab.finishFx(drag.actor));
 			RendererRuntime.runSync(magneticField.resetFx);
-			const target = RendererRuntime.runSync(
-				surface.readDropTargetFx(event.global.x, event.global.y),
-			);
-			// Canonical state may have changed beneath a held pointer while the target
-			// coordinates stayed stable. Freeze fresh release-time preview facts.
-			previewTarget(drag, target, true);
 			RendererRuntime.runSync(surface.renderDropFeedbackFx(null, null));
-			drag.phase = "submitting";
 			drag.actor.container.cursor = RendererRuntime.runSync(
 				readPixiTileActorCursorFx({
 					phase: "pending",
@@ -426,24 +408,163 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 				drag.targetItem !== null
 					? (actorStore.actors.get(drag.targetItem.id) ?? null)
 					: null;
-			if (optimisticRemoval !== null) {
+			let removalStarted = false;
+			let shortcutVisualComplete = shortcutReceiver === undefined;
+			let queuedResult: runTileDropAtom.Result | null = null;
+			let finalized = false;
+
+			const startRemoval = () => {
+				if (optimisticRemoval === null || removalStarted) return;
+				removalStarted = true;
 				RendererRuntime.runSync(
 					startPixiTileActorRemovalFeedbackFx({
 						actor: optimisticRemoval.actor,
 						animator,
+						onCancel: () => {
+							shortcutVisualComplete = true;
+							if (queuedResult !== null) finalizeResult(queuedResult);
+						},
+						onComplete: () => {
+							shortcutVisualComplete = true;
+							if (queuedResult !== null) finalizeResult(queuedResult);
+						},
 					}),
 				);
-			}
-			if (optimisticInventoryReceiver !== null) {
+			};
+
+			const flashInventoryReceiver = () => {
+				if (optimisticInventoryReceiver === null) return;
 				RendererRuntime.runSync(
 					flashPixiTileActorFeedbackGlowFx({
 						actor: optimisticInventoryReceiver,
 						animator,
 					}),
 				);
-			}
+			};
+
+			const finalizeResult = (result: runTileDropAtom.Result) => {
+				if (finalized || closed || !pendingDropGenerations.has(drop.generation)) {
+					return;
+				}
+				if (
+					shortcutReceiver !== undefined &&
+					result.kind === DropItemResultKindEnumSchema.enum.StoreInventory &&
+					!shortcutVisualComplete
+				) {
+					queuedResult = result;
+					return;
+				}
+				finalized = true;
+				pendingDropGenerations.delete(drop.generation);
+				try {
+					RendererRuntime.runSync(
+						dropPresentation.completeFx({
+							generation: drop.generation,
+							result,
+						}),
+					);
+					if (
+						result.kind === DropItemResultKindEnumSchema.enum.StoreInventory &&
+						optimisticInventoryReceiver !== null &&
+						result.inventory.itemId === optimisticInventoryReceiver.item.id &&
+						actorStore.actors.get(result.inventory.itemId) ===
+							optimisticInventoryReceiver
+					) {
+						// The exact surviving receiver already flashed. A replaced receiver keeps
+						// the canonical cue and receives feedback during reconcile.
+						RendererRuntime.runSync(dropPresentation.clearFeedbackFx(drop.generation));
+					}
+					const retainedSource =
+						actorStore.actors.get(drag.sourceItem.id) === drag.actor
+							? drag.actor
+							: null;
+					if (retainedSource !== null) {
+						retainedSource.dragging = false;
+						retainedSource.container.zIndex = 0;
+						retainedSource.container.cursor = RendererRuntime.runSync(
+							readPixiTileActorCursorFx({
+								phase: "idle",
+								previewKind: null,
+								running: retainedSource.item.running,
+							}),
+						);
+					}
+					if (
+						result.kind !== DropItemResultKindEnumSchema.enum.Reject &&
+						result.kind !== DropItemResultKindEnumSchema.enum.Ignored
+					) {
+						const removalAccepted =
+							result.kind === DropItemResultKindEnumSchema.enum.StoreInventory ||
+							(result.kind === DropItemResultKindEnumSchema.enum.Stack &&
+								result.source.current === null);
+						if (!removalAccepted && optimisticRemoval !== null && removalStarted) {
+							restoreOptimisticRemoval(optimisticRemoval);
+						}
+						onAcceptedDrop();
+						return;
+					}
+					if (optimisticRemoval !== null && removalStarted) {
+						restoreOptimisticRemoval(optimisticRemoval);
+					}
+					if (retainedSource !== null) settleActor(retainedSource);
+				} catch (cause) {
+					game.reportCriticalFailure("game-presentation", cause);
+				}
+			};
+
+			const failDrop = (cause: unknown) => {
+				if (closed || finalized || !pendingDropGenerations.delete(drop.generation)) return;
+				finalized = true;
+				RendererRuntime.runSync(dropPresentation.failFx(drop.generation));
+				const retainedSource =
+					actorStore.actors.get(drag.sourceItem.id) === drag.actor ? drag.actor : null;
+				if (retainedSource !== null) {
+					retainedSource.dragging = false;
+					if (optimisticRemoval !== null && removalStarted) {
+						restoreOptimisticRemoval(optimisticRemoval);
+					}
+					settleActor(retainedSource);
+				}
+				game.reportCriticalFailure("game-presentation", cause);
+			};
+
 			pendingDropGenerations.add(drop.generation);
 			activeDrag = null;
+			if (shortcutReceiver === undefined) {
+				startRemoval();
+				flashInventoryReceiver();
+			} else {
+				const finishTravel = () => {
+					if (closed || finalized) return;
+					flashInventoryReceiver();
+					startRemoval();
+				};
+				RendererRuntime.runSync(
+					animatePixiActorToRetargetablePoseFx({
+						actor: drag.actor,
+						animator,
+						onCancel: finishTravel,
+						onComplete: finishTravel,
+						ownerKey: `${inventoryShortcutTravelOwnerPrefix}:${drag.actor.instanceId}`,
+						readSize: () =>
+							RendererRuntime.runSync(
+								surface.readActorPoseFx(shortcutReceiver.actor.item),
+							)?.size ?? shortcutReceiver.pose.size,
+						readTarget: () => {
+							const pose = RendererRuntime.runSync(
+								surface.readActorPoseFx(shortcutReceiver.actor.item),
+							);
+							return pose === null
+								? null
+								: {
+										x: pose.x,
+										y: pose.y,
+									};
+						},
+						target: shortcutReceiver.pose,
+					}),
+				);
+			}
 			let submittedDrop: PromiseLike<runTileDropAtom.Result | null>;
 			try {
 				submittedDrop = closed ? Promise.resolve(null) : onDrop(drop.command);
@@ -452,86 +573,64 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 			}
 			void Promise.resolve(submittedDrop)
 				.then((result) => {
-					if (
-						result === null ||
-						closed ||
-						!pendingDropGenerations.delete(drop.generation)
-					) {
-						return;
-					}
-					try {
-						RendererRuntime.runSync(
-							dropPresentation.completeFx({
-								generation: drop.generation,
-								result,
-							}),
-						);
-						if (
-							result.kind === DropItemResultKindEnumSchema.enum.StoreInventory &&
-							optimisticInventoryReceiver !== null &&
-							result.inventory.itemId === optimisticInventoryReceiver.item.id &&
-							actorStore.actors.get(result.inventory.itemId) ===
-								optimisticInventoryReceiver
-						) {
-							// The exact surviving receiver already flashed at release. A replaced
-							// receiver keeps the canonical cue and receives feedback during reconcile.
-							RendererRuntime.runSync(
-								dropPresentation.clearFeedbackFx(drop.generation),
-							);
-						}
-						const retainedSource =
-							actorStore.actors.get(drag.sourceItem.id) === drag.actor
-								? drag.actor
-								: null;
-						if (retainedSource !== null) {
-							retainedSource.dragging = false;
-							retainedSource.container.zIndex = 0;
-							retainedSource.container.cursor = RendererRuntime.runSync(
-								readPixiTileActorCursorFx({
-									phase: "idle",
-									previewKind: null,
-									running: retainedSource.item.running,
-								}),
-							);
-						}
-						if (
-							result.kind !== DropItemResultKindEnumSchema.enum.Reject &&
-							result.kind !== DropItemResultKindEnumSchema.enum.Ignored
-						) {
-							const removalAccepted =
-								result.kind === DropItemResultKindEnumSchema.enum.StoreInventory ||
-								(result.kind === DropItemResultKindEnumSchema.enum.Stack &&
-									result.source.current === null);
-							if (!removalAccepted && optimisticRemoval !== null) {
-								restoreOptimisticRemoval(optimisticRemoval);
-							}
-							onAcceptedDrop();
-							return;
-						}
-						if (optimisticRemoval !== null) {
-							restoreOptimisticRemoval(optimisticRemoval);
-						}
-						if (retainedSource !== null) settleActor(retainedSource);
-					} catch (cause) {
-						game.reportCriticalFailure("game-presentation", cause);
-					}
+					if (result !== null) finalizeResult(result);
 				})
-				.catch((cause) => {
-					if (closed || !pendingDropGenerations.delete(drop.generation)) return;
-					RendererRuntime.runSync(dropPresentation.failFx(drop.generation));
-					const retainedSource =
-						actorStore.actors.get(drag.sourceItem.id) === drag.actor
-							? drag.actor
-							: null;
-					if (retainedSource !== null) {
-						retainedSource.dragging = false;
-						if (optimisticRemoval !== null) {
-							restoreOptimisticRemoval(optimisticRemoval);
-						}
-						settleActor(retainedSource);
-					}
+				.catch(failDrop);
+		};
+
+		const finishPointer = (event: FederatedPointerEvent) => {
+			const drag = activeDrag;
+			if (
+				drag === null ||
+				drag.phase === "submitting" ||
+				event.pointerId !== drag.pointerId
+			) {
+				return;
+			}
+			try {
+				application.app.canvas.releasePointerCapture(event.pointerId);
+			} catch {
+				// Capture may already be released by the browser.
+			}
+			if (drag.phase === "pressed") {
+				activeDrag = null;
+				const currentActor = actorStore.actors.get(drag.sourceItem.id);
+				if (currentActor === undefined || currentActor.container.destroyed) return;
+				try {
+					RendererRuntime.runSync(
+						flashPixiTileActorAckGlowFx({
+							actor: currentActor,
+							animator,
+							tint: readAckTint(),
+						}),
+					);
+				} catch (cause) {
 					game.reportCriticalFailure("game-presentation", cause);
-				});
+				}
+				void Promise.resolve()
+					.then(() => {
+						if (closed) return;
+						const currentItem = actorStore.actors.get(drag.sourceItem.id)?.item;
+						if (currentItem === undefined) return;
+						return onActivate(currentItem, drag.openDetail, application.app.canvas);
+					})
+					.catch((cause) => {
+						if (closed) return;
+						game.reportCriticalFailure("game-presentation", cause);
+					});
+				return;
+			}
+			const target = RendererRuntime.runSync(
+				surface.readDropTargetFx(event.global.x, event.global.y),
+			);
+			// Canonical state may have changed beneath a held pointer while the target
+			// coordinates stayed stable. Freeze fresh release-time preview facts.
+			previewTarget(drag, target, true);
+			drag.phase = "submitting";
+			submitDrag({
+				drag,
+				target,
+			});
 		};
 
 		const cancelPointer = (event: FederatedPointerEvent) => {
@@ -543,23 +642,73 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 			) {
 				return;
 			}
-			activeDrag = null;
+			cancelDrag(drag);
+		};
+
+		const storeDraggedItemInInventory = (event: KeyboardEvent) => {
+			const drag = activeDrag;
+			if (
+				closed ||
+				event.repeat ||
+				event.key.toLowerCase() !== "i" ||
+				event.altKey ||
+				event.ctrlKey ||
+				event.metaKey ||
+				drag === null ||
+				drag.mode !== "drag" ||
+				drag.phase !== "dragging"
+			) {
+				return;
+			}
+			const inventoryActor = Array.from(actorStore.actors.values()).find(
+				(actor) =>
+					actor !== drag.actor &&
+					!actor.container.destroyed &&
+					actor.item.itemType === "inventory",
+			);
+			if (inventoryActor === undefined) return;
+			const pose = RendererRuntime.runSync(surface.readActorPoseFx(inventoryActor.item));
+			if (pose === null) return;
+			const target = RendererRuntime.runSync(
+				surface.readDropTargetFx(pose.x + pose.size / 2, pose.y + pose.size / 2),
+			);
+			if (target === null) return;
+			const facts = readTargetFacts(drag, target);
+			if (
+				facts.kind !== DropItemResultKindEnumSchema.enum.StoreInventory ||
+				facts.targetItem?.id !== inventoryActor.item.id
+			) {
+				return;
+			}
+			event.preventDefault();
+			event.stopImmediatePropagation();
 			try {
 				application.app.canvas.releasePointerCapture(drag.pointerId);
 			} catch {
 				// Capture may already be released by the browser.
 			}
-			if (drag.mode !== "drag") return;
-			RendererRuntime.runSync(surface.renderDropFeedbackFx(null, null));
-			RendererRuntime.runSync(magneticField.resetFx);
-			RendererRuntime.runSync(cursorGrab.finishFx(drag.actor));
-			settleActor(drag.actor);
+			drag.target = target;
+			drag.targetItem = facts.targetItem;
+			drag.previewKind = facts.kind;
+			drag.phase = "submitting";
+			submitDrag({
+				drag,
+				shortcutReceiver: {
+					actor: inventoryActor,
+					pose,
+				},
+				target,
+			});
 		};
 
 		application.stage.on("globalpointermove", onPointerMove);
 		application.stage.on("pointerup", finishPointer);
 		application.stage.on("pointerupoutside", finishPointer);
 		application.stage.on("pointercancel", cancelPointer);
+		const keyboardTarget = typeof window === "undefined" ? null : window;
+		keyboardTarget?.addEventListener("keydown", storeDraggedItemInInventory, {
+			capture: true,
+		});
 
 		return {
 			attachActorFx: Effect.fn("PixiMainSceneDragController.attachActorFx")((actor) =>
@@ -577,7 +726,7 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 						);
 						const needsMotionHandoff = motionClaim === "handoff";
 						const gestureMode =
-							motionClaim === "activation-only"
+							event.button === 2 || motionClaim === "activation-only"
 								? "activation-only"
 								: needsMotionHandoff
 									? "motion-handoff"
@@ -588,7 +737,7 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 							activeDrag !== null ||
 							dropSnapshot.pendingActorIds.has(actor.item.id) ||
 							!event.isPrimary ||
-							event.button !== 0
+							(event.button !== 0 && event.button !== 2)
 						) {
 							return;
 						}
@@ -604,6 +753,7 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 						activeDrag = {
 							actor,
 							eligibleAttractionActorIds: new Set(),
+							openDetail: event.button === 2,
 							pointerId: event.pointerId,
 							pressX: event.global.x,
 							pressY: event.global.y,
@@ -667,6 +817,9 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 				application.stage.off("pointerup", finishPointer);
 				application.stage.off("pointerupoutside", finishPointer);
 				application.stage.off("pointercancel", cancelPointer);
+				keyboardTarget?.removeEventListener("keydown", storeDraggedItemInInventory, {
+					capture: true,
+				});
 				for (const actor of actorStore.actors.values()) {
 					detachActor(actor);
 				}

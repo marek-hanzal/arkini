@@ -2,7 +2,9 @@ import { Array, Effect } from "effect";
 
 import type { GameEngine } from "~/bridge/game/GameEngine";
 import type { TileActorItem } from "~/bridge/tile/TileActorItem";
+import { readTileActorBadgeCountFx } from "~/bridge/tile/readTileActorBadgeCountFx";
 import { readTileActorPrimaryAssetIdFx } from "~/bridge/tile/readTileActorPrimaryAssetIdFx";
+import { readTileActorProgressRatioFx } from "~/bridge/tile/readTileActorProgressRatioFx";
 import { readTileActorVisualFx } from "~/bridge/tile/readTileActorVisualFx";
 import { readTileActorRunningGlowFx } from "~/bridge/tile/readTileActorRunningGlowFx";
 import { readRuntimeItemPrimaryActionFx } from "~/engine/item-detail/read/readRuntimeItemPrimaryActionFx";
@@ -61,10 +63,21 @@ export const readTileActorsFx = Effect.fn("readTileActorsFx")(function* ({
 				}),
 			});
 			const running = activeJobStatus === JobStatusEnumSchema.enum.Running;
+			const badgeCount = yield* readTileActorBadgeCountFx(item);
+			const progressRatio = yield* readTileActorProgressRatioFx({
+				activeJob,
+				item,
+			});
 
 			return {
 				...visual,
+				...(badgeCount === undefined
+					? {}
+					: {
+							badgeCount,
+						}),
 				id: item.id,
+				itemType: item.item.type,
 				revision: item.revision,
 				quantity: item.quantity,
 				location: item.location,
@@ -74,6 +87,11 @@ export const readTileActorsFx = Effect.fn("readTileActorsFx")(function* ({
 							jobStatus: activeJobStatus,
 						}),
 				running,
+				...(progressRatio === undefined
+					? {}
+					: {
+							progressRatio,
+						}),
 				runningGlow: yield* readTileActorRunningGlowFx({
 					itemType: item.item.type,
 					running,

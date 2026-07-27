@@ -28,7 +28,7 @@ import { readSettledAsyncResultError } from "~/ui/reactivity/readSettledAsyncRes
  * target availability and allowed tabs; this provider must not retain or
  * manufacture gameplay facts when a runtime item disappears.
  *
- * Gesture semantics are decided by the invoking surface: Shift+click opens
+ * Gesture semantics are decided by the invoking surface: right click opens
  * Detail and suppresses the immediate primary action. The provider receives only
  * the resulting open intent, so no click timers or double-click policy belong
  * here.

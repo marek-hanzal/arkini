@@ -11,10 +11,13 @@ import type { PixiActorAnimator } from "~/ui/pixi/animation/PixiActorAnimator";
 import { readPixiActorAlphaAnimationKey } from "~/ui/pixi/animation/readPixiActorAlphaAnimationKey";
 import { flashPixiTileActorFeedbackGlowFx } from "~/ui/pixi/animation/runPixiTileActorRunningGlowFx";
 import { startPixiTileActorRemovalFeedbackFx } from "~/ui/pixi/animation/startPixiTileActorRemovalFeedbackFx";
+import { startPixiTileActorVanishFeedbackFx } from "~/ui/pixi/animation/startPixiTileActorVanishFeedbackFx";
 import type { PixiScenePalette } from "~/ui/pixi/appearance/PixiScenePalette";
 import type { PixiTileMagneticField } from "~/ui/pixi/magnet/PixiTileMagneticField";
 import { chasePixiTileMotionTargetFx } from "~/ui/pixi/motion/chasePixiTileMotionTargetFx";
 import { createPixiTileMotionMagneticProjectorFx } from "~/ui/pixi/motion/createPixiTileMotionMagneticProjectorFx";
+import { flashPixiMotionTargetFx } from "~/ui/pixi/motion/flashPixiMotionTargetFx";
+import { readPixiLiveActorContactPose } from "~/ui/pixi/motion/readPixiLiveActorContactPose";
 import type { PixiApplicationOwner } from "~/ui/pixi/runtime/PixiApplicationOwner";
 import type { PixiTextureStore } from "~/ui/pixi/runtime/createPixiTextureStoreFx";
 import type { PixiMainSceneSurface } from "~/ui/pixi/scene/PixiMainSceneSurface";
@@ -32,6 +35,7 @@ export namespace runPixiInputMotionFx {
 		readonly onComplete: () => void;
 		readonly onMagneticSourceAcquired: (actorId: string) => void;
 		readonly onMagneticSourceReleased: (actorId: string) => void;
+		readonly readSourceSurvives: () => boolean;
 		readonly onTransientCreated: (actor: PixiTileActor) => void;
 		readonly origin: PixiTileActorPose;
 		readonly readPalette: () => PixiScenePalette;
@@ -62,14 +66,25 @@ const finishPixiConsumedInputStackFx = Effect.fn("finishPixiConsumedInputStackFx
 	readonly actorStore: PixiMainSceneActorStore;
 	readonly animator: PixiActorAnimator;
 	readonly onComplete: () => void;
-	readonly source: PixiTileActor;
+	readonly source: PixiTileActor | null;
 	readonly transient: PixiTileActor;
 }) {
-	yield* destroyPixiInputTransientFx({
-		animator,
-		transient,
-	});
-	if (actorStore.actors.get(source.item.id) === source) {
+	const sourceStillCanonical =
+		source !== null &&
+		source === transient &&
+		actorStore.actors.get(source.item.id) === source &&
+		actorStore.canonicalItems.has(source.item.id);
+	if (!sourceStillCanonical) {
+		yield* destroyPixiInputTransientFx({
+			animator,
+			transient,
+		});
+	}
+	if (
+		source !== null &&
+		actorStore.actors.get(source.item.id) === source &&
+		!actorStore.canonicalItems.has(source.item.id)
+	) {
 		yield* actorStore.releaseActorFx(source.item.id);
 		yield* animator.cancelActorFx(source);
 		if (!source.container.destroyed) {
@@ -106,7 +121,7 @@ const returnPixiInputRemainderFx = Effect.fn("returnPixiInputRemainderFx")(funct
 	readonly onMagneticSourceAcquired: (actorId: string) => void;
 	readonly onMagneticSourceReleased: (actorId: string) => void;
 	readonly readPalette: () => PixiScenePalette;
-	readonly source: PixiTileActor;
+	readonly source: PixiTileActor | null;
 	readonly sourceHome: PixiTileActorPose;
 	readonly surface: PixiMainSceneSurface;
 	readonly textures: PixiTextureStore;
@@ -118,6 +133,7 @@ const returnPixiInputRemainderFx = Effect.fn("returnPixiInputRemainderFx")(funct
 		frames: application.frames,
 		item: {
 			...transient.item,
+			badgeCount: cue.resultingQuantity > 1 ? cue.resultingQuantity : undefined,
 			quantity: cue.resultingQuantity,
 		},
 		palette: readPalette(),
@@ -128,12 +144,20 @@ const returnPixiInputRemainderFx = Effect.fn("returnPixiInputRemainderFx")(funct
 		actor: transient,
 		attractedActorId: null,
 		eligibleAttractionActorIds: new Set([
-			cue.sourceActorId,
+			source?.item.id ?? cue.originActorId,
 		]),
 		magneticField,
 		onAcquired: onMagneticSourceAcquired,
 		onReleased: onMagneticSourceReleased,
 	});
+	const readLiveOrigin = () => {
+		if (source !== null && !source.dragging) return null;
+		return readPixiLiveActorContactPose({
+			actorId: cue.originActorId,
+			actors: actorStore.actors,
+			movingActorSize: transient.size,
+		});
+	};
 	yield* chasePixiTileMotionTargetFx({
 		actor: transient,
 		animator,
@@ -145,6 +169,29 @@ const returnPixiInputRemainderFx = Effect.fn("returnPixiInputRemainderFx")(funct
 				Effect.gen(function* () {
 					const latestHome =
 						(yield* surface.readLocationPoseFx(cue.originLocation)) ?? sourceHome;
+					if (source === null) {
+						let settled = false;
+						const settle = () => {
+							if (settled) return;
+							settled = true;
+							RendererRuntime.runSync(
+								Effect.gen(function* () {
+									yield* destroyPixiInputTransientFx({
+										animator,
+										transient,
+									});
+									onComplete();
+								}),
+							);
+						};
+						yield* startPixiTileActorVanishFeedbackFx({
+							actor: transient,
+							animator,
+							onCancel: settle,
+							onComplete: settle,
+						});
+						return;
+					}
 					if (
 						actorStore.actors.get(cue.sourceActorId) === source &&
 						!source.container.destroyed
@@ -192,7 +239,7 @@ const returnPixiInputRemainderFx = Effect.fn("returnPixiInputRemainderFx")(funct
 			);
 		},
 		ownerKey: `motion:${cueKey}`,
-		readLiveTarget: () => null,
+		readLiveTarget: readLiveOrigin,
 		surface,
 		targetLocation: cue.originLocation,
 	});
@@ -200,6 +247,7 @@ const returnPixiInputRemainderFx = Effect.fn("returnPixiInputRemainderFx")(funct
 
 /**
  * Delivers one complete source stack and returns only a remainder that survives canonical truth.
+ * A consumed source travels as its one physical actor; only a surviving remainder needs a clone.
  *
  * Several immediately committed input stores may consume one source before the oldest visual cue
  * reaches contact. An intermediate event remainder must not return as a ghost when the latest
@@ -219,12 +267,18 @@ export const runPixiInputMotionFx = Effect.fn("runPixiInputMotionFx")(function* 
 	onTransientCreated,
 	origin,
 	readPalette,
+	readSourceSurvives,
 	surface,
 	target,
 	textures,
 }: runPixiInputMotionFx.Props) {
-	const source = actorStore.actors.get(cue.sourceActorId);
-	if (source === undefined || source.container.destroyed) {
+	const candidateSource = actorStore.actors.get(cue.sourceActorId);
+	const source =
+		candidateSource === undefined || candidateSource.container.destroyed
+			? null
+			: candidateSource;
+	const sourceItem = source?.item ?? cue.sourceItem;
+	if (sourceItem === undefined) {
 		const targetActor = actorStore.actors.get(cue.targetActorId);
 		if (targetActor !== undefined) {
 			yield* flashPixiTileActorFeedbackGlowFx({
@@ -236,16 +290,21 @@ export const runPixiInputMotionFx = Effect.fn("runPixiInputMotionFx")(function* 
 		return;
 	}
 
-	const transient = yield* createPixiTileActorFx({
-		frames: application.frames,
-		item: {
-			...source.item,
-			id: `motion:${cueKey}`,
-			quantity: cue.previousQuantity,
-		},
-		palette: readPalette(),
-		textures,
-	});
+	const sourceSurvives = () => cue.resultingQuantity > 0 && readSourceSurvives();
+	const transient =
+		source === null || sourceSurvives()
+			? yield* createPixiTileActorFx({
+					frames: application.frames,
+					item: {
+						...sourceItem,
+						badgeCount: cue.previousQuantity > 1 ? cue.previousQuantity : undefined,
+						id: `motion:${cueKey}`,
+						quantity: cue.previousQuantity,
+					},
+					palette: readPalette(),
+					textures,
+				})
+			: source;
 	transient.container.eventMode = "none";
 	onTransientCreated(transient);
 	surface.transientActorLayer.addChild(transient.container);
@@ -271,17 +330,19 @@ export const runPixiInputMotionFx = Effect.fn("runPixiInputMotionFx")(function* 
 		y: origin.y,
 	});
 
-	source.lifecycleIntentGeneration += 1;
-	source.lifecycleTargetAlpha = 0;
-	source.lifecycleFadeStarted = true;
-	yield* animator.cancelFx(readPixiActorAlphaAnimationKey(source));
-	yield* animator.setFx({
-		actor: source,
-		alpha: 0,
-		channel: "lifecycle-opacity",
-	});
 	const sourceHome = yield* surface.readLocationPoseFx(cue.originLocation);
-	if (sourceHome !== null) {
+	if (sourceSurvives() && source !== null) {
+		source.lifecycleIntentGeneration += 1;
+		source.lifecycleTargetAlpha = 0;
+		source.lifecycleFadeStarted = true;
+		yield* animator.cancelFx(readPixiActorAlphaAnimationKey(source));
+		yield* animator.setFx({
+			actor: source,
+			alpha: 0,
+			channel: "lifecycle-opacity",
+		});
+	}
+	if (sourceSurvives() && source !== null && sourceHome !== null) {
 		sourceHome.layer.addChild(source.container);
 		yield* animator.setFx({
 			actor: source,
@@ -293,14 +354,11 @@ export const runPixiInputMotionFx = Effect.fn("runPixiInputMotionFx")(function* 
 	}
 
 	const readLiveTarget = () => {
-		const actor = actorStore.actors.get(cue.targetActorId);
-		if (actor === undefined || actor.container.destroyed) return null;
-		const scale = actor.container.scale.x;
-		return {
-			scale: (actor.size * scale) / Math.max(1, transient.size),
-			x: actor.container.x - actor.container.pivot.x * scale,
-			y: actor.container.y - actor.container.pivot.y * scale,
-		};
+		return readPixiLiveActorContactPose({
+			actorId: cue.targetActorId,
+			actors: actorStore.actors,
+			movingActorSize: transient.size,
+		});
 	};
 	const magneticProjector = yield* createPixiTileMotionMagneticProjectorFx({
 		actor: transient,
@@ -320,16 +378,14 @@ export const runPixiInputMotionFx = Effect.fn("runPixiInputMotionFx")(function* 
 		onPose: magneticProjector.projectPose,
 		onSettled: () => {
 			magneticProjector.release();
-			const targetActor = actorStore.actors.get(cue.targetActorId);
-			if (targetActor !== undefined) {
-				RendererRuntime.runSync(
-					flashPixiTileActorFeedbackGlowFx({
-						actor: targetActor,
-						animator,
-					}),
-				);
-			}
-			if (cue.resultingQuantity > 0 && actorStore.canonicalItems.has(cue.sourceActorId)) {
+			RendererRuntime.runSync(
+				flashPixiMotionTargetFx({
+					actorStore,
+					animator,
+					targetActorId: cue.targetActorId,
+				}),
+			);
+			if (sourceSurvives()) {
 				if (sourceHome !== null) {
 					RendererRuntime.runSync(
 						returnPixiInputRemainderFx({
@@ -353,10 +409,11 @@ export const runPixiInputMotionFx = Effect.fn("runPixiInputMotionFx")(function* 
 					return;
 				}
 				RendererRuntime.runSync(
-					startPixiTileActorRemovalFeedbackFx({
-						actor: transient,
-						animator,
-						onComplete: () => {
+					Effect.gen(function* () {
+						let settled = false;
+						const settle = () => {
+							if (settled) return;
+							settled = true;
 							RendererRuntime.runSync(
 								Effect.gen(function* () {
 									yield* destroyPixiInputTransientFx({
@@ -366,16 +423,23 @@ export const runPixiInputMotionFx = Effect.fn("runPixiInputMotionFx")(function* 
 									onComplete();
 								}),
 							);
-						},
+						};
+						yield* startPixiTileActorRemovalFeedbackFx({
+							actor: transient,
+							animator,
+							onCancel: settle,
+							onComplete: settle,
+						});
 					}),
 				);
 				return;
 			}
 			RendererRuntime.runSync(
-				startPixiTileActorRemovalFeedbackFx({
-					actor: transient,
-					animator,
-					onComplete: () => {
+				Effect.gen(function* () {
+					let settled = false;
+					const settle = () => {
+						if (settled) return;
+						settled = true;
 						RendererRuntime.runSync(
 							finishPixiConsumedInputStackFx({
 								actorStore,
@@ -385,7 +449,13 @@ export const runPixiInputMotionFx = Effect.fn("runPixiInputMotionFx")(function* 
 								transient,
 							}),
 						);
-					},
+					};
+					yield* startPixiTileActorRemovalFeedbackFx({
+						actor: transient,
+						animator,
+						onCancel: settle,
+						onComplete: settle,
+					});
 				}),
 			);
 		},

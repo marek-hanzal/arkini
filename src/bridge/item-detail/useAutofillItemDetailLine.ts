@@ -1,10 +1,6 @@
-import { useAtom } from "@effect/atom-react";
-import { Effect } from "effect";
-import * as Atom from "effect/unstable/reactivity/Atom";
-import { useMemo } from "react";
-
-import { useGameEngine } from "~/bridge/game/useGameEngine";
+import type { Game } from "~/bridge/game/Game";
 import type { ItemDetailPendingActionOwner } from "~/bridge/item-detail/ItemDetailPendingActionOwner";
+import { useItemDetailPendingCommand } from "~/bridge/item-detail/useItemDetailPendingCommand";
 import { autofillLineInputsFx } from "~/engine/input/write/autofillLineInputsFx";
 
 export namespace useAutofillItemDetailLine {
@@ -16,46 +12,18 @@ export namespace useAutofillItemDetailLine {
 	}
 }
 
+const runAutofillFx = (game: Game, command: useAutofillItemDetailLine.Props) =>
+	game.runFx(autofillLineInputsFx(command));
+
 /** Autofills one exact Item Detail line through the canonical input command. */
 export const useAutofillItemDetailLine = ({
 	pendingKey,
 	pendingOwner,
-}: useAutofillItemDetailLine.Options) => {
-	const game = useGameEngine();
-	const runPendingActionFx = pendingOwner.runPendingActionFx;
-	const commandAtom = useMemo(
-		() =>
-			Atom.fn(
-				(command: useAutofillItemDetailLine.Props) =>
-					Effect.yieldNow.pipe(
-						Effect.andThen(
-							runPendingActionFx({
-								key: pendingKey,
-								action: "autofill",
-								failureMessage: "Inputs could not be autofilled.",
-								run: game.runFx(autofillLineInputsFx(command)),
-							}),
-						),
-					),
-				{
-					concurrent: true,
-				},
-			).pipe(Atom.setIdleTTL(0)),
-		[
-			game,
-			pendingKey,
-			runPendingActionFx,
-		],
-	);
-	const [result, run] = useAtom(commandAtom);
-	return useMemo(
-		() => ({
-			result,
-			run,
-		}),
-		[
-			result,
-			run,
-		],
-	);
-};
+}: useAutofillItemDetailLine.Options) =>
+	useItemDetailPendingCommand({
+		action: "autofill",
+		failureMessage: "Inputs could not be autofilled.",
+		pendingKey,
+		pendingOwner,
+		run: runAutofillFx,
+	});

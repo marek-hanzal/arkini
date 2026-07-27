@@ -50,10 +50,13 @@ export const RuntimeItemSchema = z
 			"The positive quantity represented by this live runtime entry.",
 		),
 		/**
-		 * Opaque optimistic-concurrency token replaced after every mutation.
+		 * Opaque optimistic-concurrency token replaced after command-relevant mutations.
+		 *
+		 * Passive temporary lifetime aging preserves the token so a pointer gesture does not become
+		 * stale every fixed tick. Expiry still removes the exact identity atomically.
 		 */
 		revision: RevisionSchema.describe(
-			"The optimistic-concurrency revision of this live runtime item.",
+			"The optimistic-concurrency revision of this live runtime item; passive lifetime aging preserves it.",
 		),
 	})
 	.strict()

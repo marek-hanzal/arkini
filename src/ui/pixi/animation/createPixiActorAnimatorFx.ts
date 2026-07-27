@@ -24,6 +24,7 @@ export namespace createPixiActorAnimatorFx {
 interface ActiveAnimation {
 	readonly actor: PixiTileActor;
 	readonly channel: PixiActorAnimationChannel;
+	readonly onCancel?: () => void;
 	readonly ownerKey: string;
 	control: PixiAnimationControl | null;
 }
@@ -68,6 +69,7 @@ export const createPixiActorAnimatorFx = Effect.fn("createPixiActorAnimatorFx")(
 				if (animation === undefined) return;
 				release(animation);
 				if (animation.control !== null) RendererRuntime.runSync(animation.control.stopFx);
+				animation.onCancel?.();
 			};
 
 			const cancelChannel = (actor: PixiTileActor, channel: PixiActorAnimationChannel) => {
@@ -122,6 +124,7 @@ export const createPixiActorAnimatorFx = Effect.fn("createPixiActorAnimatorFx")(
 						const active: ActiveAnimation = {
 							actor,
 							channel,
+							onCancel: animation.onCancel,
 							ownerKey,
 							control: null,
 						};

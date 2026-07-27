@@ -12,6 +12,7 @@ import type {
 } from "~/ui/pixi/animation/PixiActorAnimator";
 import { createPixiMainSceneDragControllerFx } from "~/ui/pixi/drag/createPixiMainSceneDragControllerFx";
 import type { PixiCursorGrabMotion } from "~/ui/pixi/drag/PixiCursorGrabMotion";
+import type { PixiMainSceneDragController } from "~/ui/pixi/drag/PixiMainSceneDragController";
 import { createPixiMainSceneDropPresentationFx } from "~/ui/pixi/drop/createPixiMainSceneDropPresentationFx";
 import type { PixiTileMagneticField } from "~/ui/pixi/magnet/PixiTileMagneticField";
 import type { PixiTileMotionRuntime } from "~/ui/pixi/motion/PixiTileMotionRuntime";
@@ -54,6 +55,42 @@ class FakeEmitter {
 	}
 }
 
+interface FakeKeyboardEvent {
+	altKey: boolean;
+	ctrlKey: boolean;
+	key: string;
+	metaKey: boolean;
+	preventDefault: () => void;
+	repeat: boolean;
+	stopImmediatePropagation: () => void;
+}
+
+class FakeKeyboardTarget {
+	private readonly listeners = new Set<(event: FakeKeyboardEvent) => void>();
+
+	addEventListener(_name: string, listener: (event: FakeKeyboardEvent) => void) {
+		this.listeners.add(listener);
+	}
+
+	removeEventListener(_name: string, listener: (event: FakeKeyboardEvent) => void) {
+		this.listeners.delete(listener);
+	}
+
+	emit(event: FakeKeyboardEvent) {
+		for (const listener of this.listeners) listener(event);
+	}
+}
+
+const keyboard = (key: string): FakeKeyboardEvent => ({
+	altKey: false,
+	ctrlKey: false,
+	key,
+	metaKey: false,
+	preventDefault: vi.fn(),
+	repeat: false,
+	stopImmediatePropagation: vi.fn(),
+});
+
 interface FakePointerEvent {
 	button: number;
 	global: {
@@ -66,15 +103,15 @@ interface FakePointerEvent {
 	stopPropagation: () => void;
 }
 
-const pointer = (x: number, y: number, shiftKey = false): FakePointerEvent => ({
-	button: 0,
+const pointer = (x: number, y: number, button = 0): FakePointerEvent => ({
+	button,
 	global: {
 		x,
 		y,
 	},
 	isPrimary: true,
 	pointerId: 1,
-	shiftKey,
+	shiftKey: false,
 	stopPropagation: vi.fn(),
 });
 
@@ -215,6 +252,7 @@ const mountController = ({
 		x: 10,
 		y: 20,
 	};
+	const actorPoses = new Map<string, typeof currentActorPose>();
 	let currentDropTargetX = 1;
 	let currentOccupant: TileActorItem | null = null;
 	const magneticUpdates: Array<Parameters<PixiTileMagneticField["updateFx"]>[0]> = [];
@@ -229,108 +267,128 @@ const mountController = ({
 			kind: "move" as const,
 		}),
 	);
-	const controller = Effect.runSync(
-		createPixiMainSceneDragControllerFx({
-			actorStore: {
-				actors,
-				canonicalItems,
-			} as unknown as PixiMainSceneActorStore,
-			animator: {
-				animateFx: (animation) =>
-					Effect.sync(() => {
-						animations.push(animation);
-						animateActor(animation);
-					}),
-				cancelActorFx: () => Effect.void,
-				cancelChannelFx: (animationActor, channel) =>
-					Effect.sync(() => {
-						cancelChannel(animationActor, channel);
-					}),
-				cancelFx: (ownerKey) =>
-					Effect.sync(() => {
-						cancelAnimation(ownerKey);
-					}),
-				closeFx: Effect.void,
-				setFx: (write) =>
-					Effect.sync(() => {
-						presentationWrites.push(write);
-						if (write.channel !== "pose") return;
-						write.actor.container.position.set(write.x, write.y);
-						if (write.scale !== undefined) {
-							write.actor.container.scale.set(write.scale);
-						}
-					}),
-			} satisfies PixiActorAnimator,
-			application: {
-				app: {
-					canvas: {
-						releasePointerCapture,
-						setPointerCapture: vi.fn(),
-					},
-				},
-				frames: {
-					invalidateFx: Effect.void,
-				},
-				stage,
-			} as unknown as PixiApplicationOwner,
-			cursorGrab: {
-				closeFx: Effect.void,
-				finishFx: () => Effect.sync(finishCursorGrab),
-				startFx: () => Effect.sync(startCursorGrab),
-			} satisfies PixiCursorGrabMotion,
-			dropPresentation,
-			game: {
-				reportCriticalFailure,
-			} as never,
-			magneticField: {
-				closeFx: Effect.void,
-				pruneFx: Effect.void,
-				releaseFx: () => Effect.void,
-				resetFx: Effect.void,
-				updateFx: (sample) =>
-					Effect.sync(() => {
-						magneticUpdates.push(sample);
-					}),
-			} satisfies PixiTileMagneticField,
-			motion: {
-				beginInteractionHandoffFx: (actorId) =>
-					Effect.sync(() => beginInteractionHandoff(actorId)),
-				closeFx: Effect.void,
-				enqueueFx: () => Effect.void,
-				readSnapshotFx: Effect.succeed({
-					interactionClaimByActorId,
-					retainedActorIds: new Set(interactionClaimByActorId.keys()),
-					spawnCueByActorId: new Map(),
-					unsettledInputSourceQuantities: new Map(),
-					unsettledQuantities: new Map(),
-				}),
-				startFx: Effect.void,
-				syncQuantitiesFx: Effect.void,
-			} satisfies PixiTileMotionRuntime,
-			onAcceptedDrop,
-			onActivate,
-			onDrop: onDrop as never,
-			readAckTint: () => 0x57d7b2,
-			surface: {
-				readActorPoseFx: () => Effect.succeed(currentActorPose),
-				readCommandTargetFx: () => Effect.succeed(currentCommandTarget),
-				readDropTargetFx: () =>
-					Effect.succeed({
-						layout: {
-							cellSize: 80,
-							kind: "board",
-							x: 0,
-							y: 0,
+	const keyboardTarget = new FakeKeyboardTarget();
+	const hadWindow = Object.hasOwn(globalThis, "window");
+	const previousWindow = globalThis.window;
+	Object.defineProperty(globalThis, "window", {
+		configurable: true,
+		value: keyboardTarget,
+	});
+	let controller: PixiMainSceneDragController;
+	try {
+		controller = Effect.runSync(
+			createPixiMainSceneDragControllerFx({
+				actorStore: {
+					actors,
+					canonicalItems,
+				} as unknown as PixiMainSceneActorStore,
+				animator: {
+					animateFx: (animation) =>
+						Effect.sync(() => {
+							animations.push(animation);
+							animateActor(animation);
+						}),
+					cancelActorFx: () => Effect.void,
+					cancelChannelFx: (animationActor, channel) =>
+						Effect.sync(() => {
+							cancelChannel(animationActor, channel);
+						}),
+					cancelFx: (ownerKey) =>
+						Effect.sync(() => {
+							cancelAnimation(ownerKey);
+						}),
+					closeFx: Effect.void,
+					setFx: (write) =>
+						Effect.sync(() => {
+							presentationWrites.push(write);
+							if (write.channel !== "pose") return;
+							write.actor.container.position.set(write.x, write.y);
+							if (write.scale !== undefined) {
+								write.actor.container.scale.set(write.scale);
+							}
+						}),
+				} satisfies PixiActorAnimator,
+				application: {
+					app: {
+						canvas: {
+							releasePointerCapture,
+							setPointerCapture: vi.fn(),
 						},
-						x: currentDropTargetX,
-						y: 0,
+					},
+					frames: {
+						invalidateFx: Effect.void,
+					},
+					stage,
+				} as unknown as PixiApplicationOwner,
+				cursorGrab: {
+					closeFx: Effect.void,
+					finishFx: () => Effect.sync(finishCursorGrab),
+					startFx: () => Effect.sync(startCursorGrab),
+				} satisfies PixiCursorGrabMotion,
+				dropPresentation,
+				game: {
+					reportCriticalFailure,
+				} as never,
+				magneticField: {
+					closeFx: Effect.void,
+					pruneFx: Effect.void,
+					releaseFx: () => Effect.void,
+					resetFx: Effect.void,
+					updateFx: (sample) =>
+						Effect.sync(() => {
+							magneticUpdates.push(sample);
+						}),
+				} satisfies PixiTileMagneticField,
+				motion: {
+					beginInteractionHandoffFx: (actorId) =>
+						Effect.sync(() => beginInteractionHandoff(actorId)),
+					closeFx: Effect.void,
+					enqueueFx: () => Effect.void,
+					readSnapshotFx: Effect.succeed({
+						interactionClaimByActorId,
+						retainedActorIds: new Set(interactionClaimByActorId.keys()),
+						spawnCueByActorId: new Map(),
+						unsettledInputSourceQuantities: new Map(),
+						unsettledQuantities: new Map(),
 					}),
-				readOccupantFx: () => Effect.succeed(currentOccupant),
-				renderDropFeedbackFx: () => Effect.void,
-				transientActorLayer,
-			} as unknown as PixiMainSceneSurface,
-		}),
-	);
+					startFx: Effect.void,
+					syncQuantitiesFx: Effect.void,
+				} satisfies PixiTileMotionRuntime,
+				onAcceptedDrop,
+				onActivate,
+				onDrop: onDrop as never,
+				readAckTint: () => 0x57d7b2,
+				surface: {
+					readActorPoseFx: (actorItem: TileActorItem) =>
+						Effect.succeed(actorPoses.get(actorItem.id) ?? currentActorPose),
+					readCommandTargetFx: () => Effect.succeed(currentCommandTarget),
+					readDropTargetFx: () =>
+						Effect.succeed({
+							layout: {
+								cellSize: 80,
+								kind: "board",
+								x: 0,
+								y: 0,
+							},
+							x: currentDropTargetX,
+							y: 0,
+						}),
+					readOccupantFx: () => Effect.succeed(currentOccupant),
+					renderDropFeedbackFx: () => Effect.void,
+					transientActorLayer,
+				} as unknown as PixiMainSceneSurface,
+			}),
+		);
+	} finally {
+		if (hadWindow) {
+			Object.defineProperty(globalThis, "window", {
+				configurable: true,
+				value: previousWindow,
+			});
+		} else {
+			Reflect.deleteProperty(globalThis, "window");
+		}
+	}
 	Effect.runSync(controller.attachActorFx(actor));
 	return {
 		actor,
@@ -345,6 +403,7 @@ const mountController = ({
 		controller,
 		dropPresentation,
 		finishCursorGrab,
+		keyboardTarget,
 		magneticUpdates,
 		onActivate,
 		onAcceptedDrop,
@@ -354,6 +413,9 @@ const mountController = ({
 		reportCriticalFailure,
 		setActorPose: (pose: typeof currentActorPose) => {
 			currentActorPose = pose;
+		},
+		setItemActorPose: (itemId: string, pose: typeof currentActorPose) => {
+			actorPoses.set(itemId, pose);
 		},
 		setCommandTarget: (target: typeof currentCommandTarget) => {
 			currentCommandTarget = target;
@@ -414,15 +476,22 @@ describe("Pixi main-scene drag controller", () => {
 		);
 	});
 
-	it("snapshots Shift at release instead of retaining a pooled Pixi event", async () => {
+	it("opens Item Detail with right click and ignores Shift on left click", async () => {
 		const { actorEvents, onActivate, stage } = mountController();
-		actorEvents.emit("pointerdown", pointer(10, 20));
-		const release = pointer(10, 20, true);
-		stage.emit("pointerup", release);
-		release.shiftKey = false;
+		const rightClick = pointer(10, 20, 2);
+		actorEvents.emit("pointerdown", rightClick);
+		stage.emit("pointerup", rightClick);
 		await flushMicrotasks();
 
 		expect(onActivate).toHaveBeenCalledWith(item, true, expect.anything());
+
+		const shiftedLeftClick = pointer(10, 20);
+		shiftedLeftClick.shiftKey = true;
+		actorEvents.emit("pointerdown", shiftedLeftClick);
+		stage.emit("pointerup", shiftedLeftClick);
+		await flushMicrotasks();
+
+		expect(onActivate).toHaveBeenLastCalledWith(item, false, expect.anything());
 	});
 
 	it("allows click activation without taking transform ownership during canonical motion", async () => {
@@ -763,6 +832,139 @@ describe("Pixi main-scene drag controller", () => {
 				(animation) => animation.channel === "lifecycle-opacity" && animation.toAlpha === 1,
 			),
 		).toBe(false);
+	});
+
+	it("sends a held item to the physical Inventory with i and retains it through travel and fade", async () => {
+		const inventory = {
+			...createItem("runtime:inventory", 2),
+			itemType: "inventory",
+		} as TileActorItem;
+		const mounted = mountController({
+			targetItems: [
+				inventory,
+			],
+		});
+		const inventoryActor = mounted.actors.get(inventory.id);
+		if (inventoryActor === undefined) throw new Error("Expected the Inventory actor.");
+		mounted.setItemActorPose(inventory.id, {
+			layer: mounted.transientActorLayer,
+			size: 80,
+			x: 170,
+			y: 20,
+		});
+		previewState.actorKinds.set(inventory.id, "store-inventory");
+		mounted.setOccupant(inventory);
+		mounted.setCommandTarget({
+			kind: "slot",
+			location: inventory.location,
+			occupant: {
+				itemId: inventory.id,
+				revision: inventory.revision,
+			},
+		});
+		let resolveDrop!: (result: runTileDropAtom.Result) => void;
+		mounted.onDrop.mockReturnValueOnce(
+			new Promise<runTileDropAtom.Result>((resolve) => {
+				resolveDrop = resolve;
+			}) as never,
+		);
+
+		mounted.actorEvents.emit("pointerdown", pointer(10, 20));
+		mounted.stage.emit("globalpointermove", pointer(30, 20));
+		const keyEvent = keyboard("i");
+		mounted.keyboardTarget.emit(keyEvent);
+
+		expect(keyEvent.preventDefault).toHaveBeenCalledOnce();
+		expect(keyEvent.stopImmediatePropagation).toHaveBeenCalledOnce();
+		expect(mounted.releasePointerCapture).toHaveBeenCalledWith(1);
+		expect(mounted.onDrop).toHaveBeenCalledOnce();
+		expect(mounted.onDrop).toHaveBeenCalledWith(
+			expect.objectContaining({
+				target: {
+					kind: "slot",
+					location: inventory.location,
+					occupant: {
+						itemId: inventory.id,
+						revision: inventory.revision,
+					},
+				},
+			}),
+		);
+		const travel = mounted.animations.find(
+			(animation) =>
+				animation.channel === "pose" &&
+				animation.ownerKey === `inventory-shortcut-travel:${mounted.actor.instanceId}`,
+		);
+		expect(travel).toBeDefined();
+		expect(
+			mounted.animations.some((animation) => animation.channel === "lifecycle-opacity"),
+		).toBe(false);
+
+		resolveDrop({
+			inventory: {
+				itemId: inventory.id,
+				location: inventory.location,
+				revision: inventory.revision,
+			},
+			kind: "store-inventory",
+			source: {
+				canonicalItemId: item.itemId,
+				current: null,
+				itemId: item.id,
+				previousLocation: item.location,
+				previousQuantity: item.quantity,
+				previousRevision: item.revision,
+			},
+		});
+		await flushMicrotasks();
+
+		expect(mounted.onAcceptedDrop).not.toHaveBeenCalled();
+		expect(Effect.runSync(mounted.dropPresentation.readSnapshotFx).pendingActorIds).toEqual(
+			new Set([
+				item.id,
+			]),
+		);
+
+		travel?.onComplete?.();
+		const fade = mounted.animations.find(
+			(animation) =>
+				animation.actor === mounted.actor && animation.channel === "lifecycle-opacity",
+		);
+		expect(fade).toEqual(
+			expect.objectContaining({
+				durationMs: 260,
+				toAlpha: 0,
+			}),
+		);
+		expect(
+			mounted.animations.some(
+				(animation) =>
+					animation.actor === inventoryActor && animation.channel === "glow-opacity",
+			),
+		).toBe(true);
+		fade?.onComplete?.();
+
+		expect(mounted.onAcceptedDrop).toHaveBeenCalledOnce();
+		expect(Effect.runSync(mounted.dropPresentation.readSnapshotFx).pendingActorIds).toEqual(
+			new Set(),
+		);
+		expect(mounted.actor.dragging).toBe(false);
+	});
+
+	it("leaves an active drag untouched when i cannot resolve a valid Inventory drop", () => {
+		const mounted = mountController();
+
+		mounted.actorEvents.emit("pointerdown", pointer(10, 20));
+		mounted.stage.emit("globalpointermove", pointer(30, 20));
+		const keyEvent = keyboard("i");
+		mounted.keyboardTarget.emit(keyEvent);
+
+		expect(keyEvent.preventDefault).not.toHaveBeenCalled();
+		expect(mounted.onDrop).not.toHaveBeenCalled();
+		expect(mounted.actor.dragging).toBe(true);
+
+		mounted.stage.emit("pointerup", pointer(30, 20));
+		expect(mounted.onDrop).toHaveBeenCalledOnce();
 	});
 
 	it("starts a one-item stack exit at release and keeps it hidden after full consumption", async () => {

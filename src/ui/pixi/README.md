@@ -61,7 +61,7 @@ gameplay outcome. Missing visual identities or handoffs degrade to ordinary reco
 ## Interaction contract
 
 - Click performs the tile's immediate primary action.
-- Shift+click opens Item Detail.
+- Right click opens Item Detail.
 - Crossing the drag threshold changes the same pointer gesture from activation to drag.
 - Press identity stays frozen for drag/drop commands, while click activation reads the latest
   projected actor item. Async activation never owns the next pointer gesture.
@@ -125,7 +125,7 @@ gameplay outcome. Missing visual identities or handoffs degrade to ordinary reco
 | --- | --- |
 | Scene composition or teardown | `scene/createPixi*SceneRuntimeFx.ts` |
 | Canonical actor appearance or identity | `actor/` and `scene/createPixiMainSceneReconcilerFx.ts` |
-| Drag, click, Shift+click, or drop release | `drag/` |
+| Drag, left click, right click, or drop release | `drag/` |
 | Move, swap, stack, spawn, or replacement choreography | `motion/` and `scene/runPixiMainSceneReplacementsFx.ts` |
 | Cross-canvas Inventory release | `PixiInventorySurface.tsx` and `handoff/` |
 | Hit testing, slot geometry, or masks | `scene/*Surface*`, `layout/`, and `grid/` |

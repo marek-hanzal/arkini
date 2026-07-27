@@ -184,4 +184,50 @@ describe("Pixi tile actor destruction", () => {
 		expect(visual.textureState).toBe("destroyed");
 		expect(actor.container.destroyed).toBe(true);
 	});
+
+	it("destroys a stale exiting instance before publishing a replacement with the same runtime id", () => {
+		const previousVisual = createVisual().visual;
+		const replacementVisual = createVisual().visual;
+		const createActor = (visual: PixiTileActorVisual, instanceId: string) => {
+			const container = {
+				cursor: "grab",
+				destroyed: false,
+				eventMode: "static",
+				off: vi.fn(),
+				destroy: () => {
+					container.destroyed = true;
+				},
+			};
+			return {
+				container,
+				currentVisual: visual,
+				dragging: false,
+				instanceId,
+				item: {
+					id: "runtime:replaced",
+				} as TileActorItem,
+				lifecycleIntentGeneration: 0,
+				onPointerDown: null,
+				pendingVisual: null,
+				visuals: new Set([
+					visual,
+				]),
+				visualTransitionGeneration: 0,
+			} as unknown as PixiTileActor;
+		};
+		const previous = createActor(previousVisual, "instance:previous");
+		const replacement = createActor(replacementVisual, "instance:replacement");
+		const store = Effect.runSync(createPixiMainSceneActorStoreFx());
+
+		Effect.runSync(store.setActorFx(previous));
+		Effect.runSync(store.releaseActorFx(previous.item.id));
+		expect(previous.container.destroyed).toBe(false);
+
+		Effect.runSync(store.setActorFx(replacement));
+
+		expect(previous.container.destroyed).toBe(true);
+		expect(store.actors.get(replacement.item.id)).toBe(replacement);
+		expect(replacement.container.destroyed).toBe(false);
+		Effect.runSync(store.closeFx);
+	});
 });

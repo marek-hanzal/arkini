@@ -12,6 +12,7 @@ import { readTileActorsFx } from "~/bridge/tile/readTileActorsFx";
 import type { PixiMainSceneActorStore } from "~/ui/pixi/actor/PixiMainSceneActorStore";
 import type { PixiTileActorRunningGlowTexture } from "~/ui/pixi/actor/PixiTileActorRunningGlowTexture";
 import { createPixiTileActorFx } from "~/ui/pixi/actor/createPixiTileActorFx";
+import { readPixiTileActorCrowdAlpha } from "~/ui/pixi/actor/readPixiTileActorCrowdAlpha";
 import { updatePixiTileActorFx } from "~/ui/pixi/actor/updatePixiTileActorFx";
 import type { PixiActorAnimator } from "~/ui/pixi/animation/PixiActorAnimator";
 import { flashPixiTileActorConsumedSourceFx } from "~/ui/pixi/animation/flashPixiTileActorConsumedSourceFx";
@@ -57,7 +58,6 @@ export namespace createPixiMainSceneReconcilerFx {
 const sameLocation = (left: TileActorItem["location"], right: TileActorItem["location"]) =>
 	JSON.stringify(left) === JSON.stringify(right);
 
-const readRunningAlpha = (running: boolean) => (running ? 0.82 : 1);
 const runningTransitionDurationMs = 180;
 const feedbackExitDurationMs = 420;
 const feedbackGlowExitDurationMs =
@@ -67,6 +67,7 @@ const defaultExitDurationMs = 220;
 const sameVisual = (left: TileActorItem, right: TileActorItem) =>
 	left.revision === right.revision &&
 	left.title === right.title &&
+	left.badgeCount === right.badgeCount &&
 	left.quantity === right.quantity &&
 	left.sourceUrl === right.sourceUrl &&
 	left.compositeUrl === right.compositeUrl &&
@@ -273,7 +274,12 @@ export const createPixiMainSceneReconcilerFx = Effect.fn("createPixiMainSceneRec
 				yield* actorStore.replaceCanonicalItemsFx(nextItems);
 				const compiledCues = presentCommittedEffects
 					? [
-							...RendererRuntime.runSync(readTileMotionCuesFx(transition)),
+							...RendererRuntime.runSync(
+								readTileMotionCuesFx({
+									game,
+									transition,
+								}),
+							),
 						]
 					: [];
 				const replacements = presentCommittedEffects
@@ -464,13 +470,16 @@ export const createPixiMainSceneReconcilerFx = Effect.fn("createPixiMainSceneRec
 
 					const moved = !sameLocation(actor.item.location, item.location);
 					const visualChanged = !sameVisual(actor.currentVisual.item, displayItem);
+					const progressChanged = actor.item.progressRatio !== displayItem.progressRatio;
 					const sizeChanged = actor.size !== pose.size;
 					const poseOwned =
 						actor.dragging || motionSnapshot.interactionClaimByActorId.has(item.id);
-					const runningChanged = actor.item.running !== displayItem.running;
+					const crowdAlphaChanged =
+						readPixiTileActorCrowdAlpha(actor.item) !==
+						readPixiTileActorCrowdAlpha(displayItem);
 					const runningGlowChanged = actor.item.runningGlow !== displayItem.runningGlow;
 					const previousDisplayedSize = actor.size * actor.container.scale.x;
-					if (visualChanged || sizeChanged) {
+					if (visualChanged || sizeChanged || progressChanged) {
 						yield* updatePixiTileActorFx({
 							actor,
 							animator,
@@ -484,13 +493,13 @@ export const createPixiMainSceneReconcilerFx = Effect.fn("createPixiMainSceneRec
 					} else {
 						actor.item = displayItem;
 					}
-					if (runningChanged) {
+					if (crowdAlphaChanged) {
 						yield* animator.animateFx({
 							actor,
 							channel: "crowd-opacity",
 							durationMs: runningTransitionDurationMs,
 							ownerKey: `running:${item.id}`,
-							toCrowdAlpha: readRunningAlpha(displayItem.running),
+							toCrowdAlpha: readPixiTileActorCrowdAlpha(displayItem),
 						});
 					}
 					if (runningGlowChanged) {

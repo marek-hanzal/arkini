@@ -19,7 +19,7 @@ const surfaceState = vi.hoisted(() => ({
 	createProps: null as {
 		readonly onActivate: (
 			item: TileActorItem,
-			shiftKey: boolean,
+			openDetail: boolean,
 			origin: HTMLElement,
 		) => void | PromiseLike<void>;
 	} | null,
@@ -102,6 +102,7 @@ vi.mock("~/ui/pixi/scene/createPixiInventorySceneRuntimeFx", () => ({
 const item = {
 	id: "runtime:water",
 	itemId: "water",
+	itemType: "simple",
 	location: {
 		scope: "inventory",
 		position: {
@@ -175,7 +176,7 @@ describe("PixiInventorySurface", () => {
 		expect(surfaceState.interactionUnregister).toHaveBeenCalledOnce();
 	});
 
-	it("keeps Shift+click as Item Detail without releasing the item", async () => {
+	it("keeps right click as Item Detail without releasing the item", async () => {
 		const props = await renderSurface();
 		const canvas = document.createElement("canvas");
 

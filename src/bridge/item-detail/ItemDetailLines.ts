@@ -3,14 +3,16 @@ import type { InputChargeFromEnumSchema } from "~/engine/input/schema/InputCharg
 import type { InputModeEnumSchema } from "~/engine/input/schema/InputModeEnumSchema";
 import type { readItemDetailLinesFx } from "~/engine/item-detail/read/readItemDetailLinesFx";
 import type { JobStatusEnumSchema } from "~/engine/job/schema/read/JobStatusEnumSchema";
+import type {
+	ItemDetailOutputRoll,
+	ItemDetailOutputSet,
+	ItemDetailQuantityBounds,
+} from "~/engine/item-detail/read/ItemDetailOutput";
 import type { SelectorSchema } from "~/engine/selector/schema/SelectorSchema";
 
 /** Renderer-owned contract for one live Item Detail lines projection. */
 export namespace ItemDetailLines {
-	export interface QuantityBounds {
-		readonly min: number;
-		readonly max: number;
-	}
+	export type QuantityBounds = ItemDetailQuantityBounds;
 
 	export interface ChargeCost {
 		readonly cost: number;
@@ -41,6 +43,15 @@ export namespace ItemDetailLines {
 				readonly missingQuantity: number;
 				readonly availableCapacity: number;
 				readonly ready: boolean;
+				readonly storedItems?: readonly {
+					readonly compositeUrl?: string;
+					readonly itemId: string;
+					readonly quantity: number;
+					readonly revision: string;
+					readonly runtimeItemId: string;
+					readonly sourceUrl?: string;
+					readonly title: string;
+				}[];
 				readonly charges?: ChargeCost;
 				readonly detail?: DetailReference;
 		  }
@@ -71,29 +82,8 @@ export namespace ItemDetailLines {
 		readonly definitionItemId?: string;
 	}
 
-	export type OutputRoll =
-		| {
-				readonly kind: "guaranteed";
-				readonly item: readonly OutputItem[];
-		  }
-		| {
-				readonly kind: "chance";
-				readonly chance: number;
-				readonly item: readonly OutputItem[];
-		  }
-		| {
-				readonly kind: "weight";
-				readonly selections: QuantityBounds;
-				readonly option: readonly {
-					readonly weight: number;
-					readonly item: readonly OutputItem[];
-				}[];
-		  };
-
-	export interface OutputSet {
-		readonly weight: number;
-		readonly roll: readonly OutputRoll[];
-	}
+	export type OutputRoll = ItemDetailOutputRoll<OutputItem>;
+	export type OutputSet = ItemDetailOutputSet<OutputItem>;
 
 	export type Availability = readItemDetailLinesFx.Availability;
 

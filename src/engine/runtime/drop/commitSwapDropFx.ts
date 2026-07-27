@@ -3,6 +3,11 @@ import { Effect } from "effect";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
+import {
+	makeDropRejectedResult,
+	makeInvalidGridDropRejectedResult,
+	makeStaleDropRejectedResult,
+} from "~/engine/runtime/drop/makeDropRejectedResult";
 import { DropItemIgnoredReasonEnumSchema } from "~/engine/runtime/schema/command/DropItemIgnoredReasonEnumSchema";
 import { DropItemRejectedReasonEnumSchema } from "~/engine/runtime/schema/command/DropItemRejectedReasonEnumSchema";
 import type { DropItemResultSchema } from "~/engine/runtime/schema/command/DropItemResultSchema";
@@ -56,42 +61,37 @@ export const commitSwapDropFx = Effect.fn("commitSwapDropFx")(function* ({
 		),
 		Effect.catchTags({
 			ItemNotFoundError: (error) =>
-				Effect.succeed({
-					kind: DropItemResultKindEnumSchema.enum.Reject,
-					reason:
-						error.itemId === targetItemId
-							? DropItemRejectedReasonEnumSchema.enum.StaleTarget
-							: DropItemRejectedReasonEnumSchema.enum.StaleSource,
-					itemId: sourceItemId,
-					targetItemId,
-				}),
+				Effect.succeed(
+					makeStaleDropRejectedResult({
+						entityId: error.itemId,
+						sourceItemId,
+						targetItemId,
+					}),
+				),
 			RevisionConflictError: (error) =>
-				Effect.succeed({
-					kind: DropItemResultKindEnumSchema.enum.Reject,
-					reason:
-						error.entityId === targetItemId
-							? DropItemRejectedReasonEnumSchema.enum.StaleTarget
-							: DropItemRejectedReasonEnumSchema.enum.StaleSource,
-					itemId: sourceItemId,
-					targetItemId,
-				}),
+				Effect.succeed(
+					makeStaleDropRejectedResult({
+						entityId: error.entityId,
+						sourceItemId,
+						targetItemId,
+					}),
+				),
 			ItemNotOnGridError: (error) =>
-				Effect.succeed({
-					kind: DropItemResultKindEnumSchema.enum.Reject,
-					reason:
-						error.itemId === targetItemId
-							? DropItemRejectedReasonEnumSchema.enum.InvalidTarget
-							: DropItemRejectedReasonEnumSchema.enum.InvalidSource,
-					itemId: sourceItemId,
-					targetItemId,
-				}),
+				Effect.succeed(
+					makeInvalidGridDropRejectedResult({
+						itemId: error.itemId,
+						sourceItemId,
+						targetItemId,
+					}),
+				),
 			CrossSpaceBoardOperationError: () =>
-				Effect.succeed({
-					kind: DropItemResultKindEnumSchema.enum.Reject,
-					reason: DropItemRejectedReasonEnumSchema.enum.InvalidTarget,
-					itemId: sourceItemId,
-					targetItemId,
-				}),
+				Effect.succeed(
+					makeDropRejectedResult({
+						reason: DropItemRejectedReasonEnumSchema.enum.InvalidTarget,
+						sourceItemId,
+						targetItemId,
+					}),
+				),
 			SwapSameItemError: () =>
 				Effect.succeed({
 					kind: DropItemResultKindEnumSchema.enum.Ignored,

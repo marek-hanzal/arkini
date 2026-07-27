@@ -1,16 +1,13 @@
-import { Effect, Option } from "effect";
+import { Effect } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { resolveInputMaterialFx } from "~/engine/input/fx/resolveInputMaterialFx";
 import { isMaterialInputEligible } from "~/engine/input/read/readMaterialInputEligibilityFx";
-import { ItemNotOnBoardError } from "~/engine/item/error/ItemNotOnBoardError";
-import { LineNotFoundError } from "~/engine/line/error/LineNotFoundError";
 import { isLineInputClosedFx } from "~/engine/line/fx/input/isLineInputClosedFx";
-import { readItemLineFx } from "~/engine/line/fx/readItemLineFx";
+import { readBoardItemLineFx } from "~/engine/line/fx/readBoardItemLineFx";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
-import { isBoardRuntimeItemFx } from "~/engine/runtime/read/isBoardRuntimeItemFx";
-import { readRuntimeItemByIdFx } from "~/engine/runtime/read/readRuntimeItemByIdFx";
 import type { BoardRuntimeItemSchema } from "~/engine/runtime/schema/BoardRuntimeItemSchema";
+import type { GridRuntimeItemSchema } from "~/engine/runtime/schema/GridRuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { matchesItemSelector } from "~/engine/selector/fx/selectItemsFx";
 import { InputEnumSchema } from "~/engine/input/schema/InputEnumSchema";
@@ -39,19 +36,22 @@ const candidateRank = ({
 	candidate,
 	owner,
 }: {
-	readonly candidate: BoardRuntimeItemSchema.Type;
+	readonly candidate: GridRuntimeItemSchema.Type;
 	readonly owner: BoardRuntimeItemSchema.Type;
 }) => {
 	return {
+		scope: candidate.location.scope === LocationScopeEnumSchema.enum.Board ? 0 : 1,
 		distance:
-			Math.abs(candidate.location.position.x - owner.location.position.x) +
-			Math.abs(candidate.location.position.y - owner.location.position.y),
+			candidate.location.scope === LocationScopeEnumSchema.enum.Board
+				? Math.abs(candidate.location.position.x - owner.location.position.x) +
+					Math.abs(candidate.location.position.y - owner.location.position.y)
+				: 0,
 		position: candidate.location.position.y * 10_000 + candidate.location.position.x,
 	};
 };
 
 const compareCandidates = (owner: BoardRuntimeItemSchema.Type) => {
-	return (left: BoardRuntimeItemSchema.Type, right: BoardRuntimeItemSchema.Type) => {
+	return (left: GridRuntimeItemSchema.Type, right: GridRuntimeItemSchema.Type) => {
 		const leftRank = candidateRank({
 			candidate: left,
 			owner,
@@ -62,6 +62,7 @@ const compareCandidates = (owner: BoardRuntimeItemSchema.Type) => {
 		});
 
 		return (
+			leftRank.scope - rightRank.scope ||
 			leftRank.distance - rightRank.distance ||
 			leftRank.position - rightRank.position ||
 			left.id.localeCompare(right.id)
@@ -72,50 +73,28 @@ const compareCandidates = (owner: BoardRuntimeItemSchema.Type) => {
 /**
  * Plans deterministic automatic material delivery for one exact line.
  *
- * Sources are limited to the owner's board space. The plan fills only each
- * slot's minimum missing quantity and never mutates runtime truth by itself.
+ * Sources prefer the owner's board space by distance, then fall back to Inventory slot order.
+ * The plan fills only each slot's minimum missing quantity and never mutates runtime truth itself.
  */
 export const planLineInputAutofillFx = Effect.fn("planLineInputAutofillFx")(function* ({
 	ownerItemId,
 	lineId,
 	runtime,
 }: planLineInputAutofillFx.Props) {
-	const runtimeOwner = yield* readRuntimeItemByIdFx({
-		itemId: ownerItemId,
+	const { line, owner } = yield* readBoardItemLineFx({
+		ownerItemId,
+		lineId,
 		runtime,
 	});
-	const owner = Option.getOrUndefined(yield* isBoardRuntimeItemFx(runtimeOwner));
-	if (owner === undefined) {
-		return yield* Effect.fail(
-			new ItemNotOnBoardError({
-				itemId: runtimeOwner.id,
-				location: runtimeOwner.location,
-			}),
-		);
-	}
-
-	const line = yield* readItemLineFx({
-		item: owner.item,
-		lineId,
-	});
-	if (line === undefined) {
-		return yield* Effect.fail(
-			new LineNotFoundError({
-				itemId: owner.id,
-				lineId,
-			}),
-		);
-	}
 
 	const candidates = runtime.items
 		.filter(
-			(candidate): candidate is BoardRuntimeItemSchema.Type =>
-				candidate.location.scope === LocationScopeEnumSchema.enum.Board,
+			(candidate): candidate is GridRuntimeItemSchema.Type =>
+				(candidate.location.scope === LocationScopeEnumSchema.enum.Board &&
+					candidate.location.space === owner.location.space) ||
+				candidate.location.scope === LocationScopeEnumSchema.enum.Inventory,
 		)
-		.filter(
-			(candidate) =>
-				candidate.id !== owner.id && candidate.location.space === owner.location.space,
-		)
+		.filter((candidate) => candidate.id !== owner.id)
 		.slice()
 		.sort(compareCandidates(owner));
 	const remainingByItemId = new Map(

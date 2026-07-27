@@ -1,7 +1,6 @@
 import { Effect } from "effect";
 
 import { isInstantGameplayEnabledFx } from "~/engine/cheat/read/isInstantGameplayEnabledFx";
-import { reviseRuntimeItemFx } from "~/engine/runtime/fx/reviseRuntimeItemFx";
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { TickStepMs } from "~/engine/tick/TickStepMs";
@@ -33,18 +32,16 @@ export const advanceTemporaryItemDurationsFx = Effect.fn("advanceTemporaryItemDu
 				continue;
 			}
 
-			const revised = yield* reviseRuntimeItemFx({
-				item: {
-					...liveItem,
-					remainingDurationMs: instantGameplay
-						? 0
-						: Math.max(0, liveItem.remainingDurationMs - TickStepMs),
-				},
-			});
+			const advanced = {
+				...liveItem,
+				remainingDurationMs: instantGameplay
+					? 0
+					: Math.max(0, liveItem.remainingDurationMs - TickStepMs),
+			} satisfies RuntimeItemSchema.Type;
 			draft = {
 				...draft,
 				items: draft.items.map((candidate) =>
-					candidate.id === revised.id ? revised : candidate,
+					candidate.id === advanced.id ? advanced : candidate,
 				),
 			};
 		}

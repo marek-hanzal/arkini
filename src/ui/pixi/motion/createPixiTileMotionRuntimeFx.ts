@@ -161,8 +161,18 @@ export const createPixiTileMotionRuntimeFx = Effect.fn("createPixiTileMotionRunt
 	};
 
 	function completeCue(cue: TileMotionCue) {
-		if (closed || !startedCueKeys.delete(readCueKey(cue))) return;
-		transientActorByCueKey.delete(readCueKey(cue));
+		const cueKey = readCueKey(cue);
+		if (closed || !startedCueKeys.delete(cueKey)) return;
+		const transient = transientActorByCueKey.get(cueKey);
+		transientActorByCueKey.delete(cueKey);
+		if (
+			transient !== undefined &&
+			transient.item.id === `motion:${cueKey}` &&
+			!transient.container.destroyed
+		) {
+			RendererRuntime.runSync(animator.cancelActorFx(transient));
+			RendererRuntime.runSync(destroyPixiTileActorFx(transient));
+		}
 		motionLanes =
 			detachedSwapLegByActorId.size > 0
 				? {
@@ -277,6 +287,19 @@ export const createPixiTileMotionRuntimeFx = Effect.fn("createPixiTileMotionRunt
 
 	function startCue(cue: TileMotionCue) {
 		const cueKey = readCueKey(cue);
+		const readSourceSurvives = () => {
+			if (cue.kind !== "input") return false;
+			if (cue.sourceItem === undefined) {
+				return actorStore.canonicalItems.has(cue.sourceActorId);
+			}
+			const latest = readCues()
+				.filter(
+					(candidate) =>
+						candidate.kind === "input" && candidate.sourceActorId === cue.sourceActorId,
+				)
+				.at(-1);
+			return latest?.kind === "input" && latest.resultingQuantity > 0;
+		};
 		RendererRuntime.runSync(
 			runPixiTileMotionCueFx({
 				actorStore,
@@ -304,6 +327,7 @@ export const createPixiTileMotionRuntimeFx = Effect.fn("createPixiTileMotionRunt
 				readHandoff: () =>
 					claimedHandoffs.get(readCueHandoffKey(cue)) ?? readClaimedHandoff(cue),
 				readPalette,
+				readSourceSurvives,
 				surface,
 				textures,
 			}),

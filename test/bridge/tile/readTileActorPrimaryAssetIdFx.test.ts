@@ -331,4 +331,23 @@ describe("readTileActorPrimaryAssetIdFx", () => {
 			)[0]?.sourceUrl,
 		).toBe("resource:asset:stage-2");
 	});
+
+	it("projects active job progress through the canonical tile actor read", () => {
+		const nextRuntime = runtime({
+			active: true,
+		});
+		const game = {
+			getResourceUrl: (resourceId: string) => `resource:${resourceId}`,
+		} as GameEngine;
+
+		expect(
+			Effect.runSync(
+				readTileActorsFx({
+					game,
+					runtime: nextRuntime,
+					surface: "main",
+				}),
+			)[0]?.progressRatio,
+		).toBe(0.5);
+	});
 });

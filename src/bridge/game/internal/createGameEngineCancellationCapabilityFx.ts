@@ -163,35 +163,11 @@ export const createGameEngineCancellationCapabilityFx = Effect.fn(
 					),
 			);
 
-			const releaseLeaseRecordFx = Effect.fn("GameEngineCancellationFx.releaseLeaseRecordFx")(
-				(record: LeaseRecord) => {
-					if (record.owner === undefined) return Effect.void;
-					const owner = record.owner;
-					return withLifecycleLockFx(
-						Effect.gen(function* () {
-							owner.consumers.delete(record.token);
-							const state = yield* Ref.get(stateRef);
-							return (
-								(state._tag === "Acquiring" || state._tag === "Provisional") &&
-								state.owner === owner &&
-								owner.closeClaims.size === 0 &&
-								owner.consumers.size === 0
-							);
-						}),
-					).pipe(
-						Effect.flatMap((cancel) =>
-							cancel ? beginCancellationFx(owner, false) : Effect.void,
-						),
-						Effect.catch(() => Effect.void),
-					);
-				},
-			);
-
-			const releaseCloseClaimFx = Effect.fn("GameEngineCancellationFx.releaseCloseClaimFx")(
-				(owner: AcquisitionOwner, token: symbol) =>
+			const releaseOwnerClaimFx = Effect.fn("GameEngineCancellationFx.releaseOwnerClaimFx")(
+				(owner: AcquisitionOwner, release: () => void) =>
 					withLifecycleLockFx(
 						Effect.gen(function* () {
-							owner.closeClaims.delete(token);
+							release();
 							const state = yield* Ref.get(stateRef);
 							return (
 								(state._tag === "Acquiring" || state._tag === "Provisional") &&
@@ -205,6 +181,23 @@ export const createGameEngineCancellationCapabilityFx = Effect.fn(
 							cancel ? beginCancellationFx(owner, false) : Effect.void,
 						),
 					),
+			);
+
+			const releaseLeaseRecordFx = Effect.fn("GameEngineCancellationFx.releaseLeaseRecordFx")(
+				(record: LeaseRecord) => {
+					if (record.owner === undefined) return Effect.void;
+					const owner = record.owner;
+					return releaseOwnerClaimFx(owner, () => {
+						owner.consumers.delete(record.token);
+					}).pipe(Effect.catch(() => Effect.void));
+				},
+			);
+
+			const releaseCloseClaimFx = Effect.fn("GameEngineCancellationFx.releaseCloseClaimFx")(
+				(owner: AcquisitionOwner, token: symbol) =>
+					releaseOwnerClaimFx(owner, () => {
+						owner.closeClaims.delete(token);
+					}),
 			);
 
 			return {

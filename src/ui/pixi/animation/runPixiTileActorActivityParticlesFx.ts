@@ -4,22 +4,20 @@ import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
 import type { PixiActorAnimator } from "~/ui/pixi/animation/PixiActorAnimator";
 
-export namespace runPixiTileActorActivityParticlesFx {
-	export interface Props {
-		readonly actor: PixiTileActor;
-		readonly animator: PixiActorAnimator;
-		readonly rampIn?: boolean;
-	}
+interface ActivityParticlesProps {
+	readonly actor: PixiTileActor;
+	readonly animator: PixiActorAnimator;
+	readonly rampIn?: boolean;
 }
 
 export namespace burstPixiTileActorFeedbackParticlesFx {
-	export interface Props extends runPixiTileActorActivityParticlesFx.Props {
+	export interface Props extends ActivityParticlesProps {
 		readonly tint?: number;
 	}
 }
 
 export namespace burstPixiTileActorAckParticlesFx {
-	export interface Props extends runPixiTileActorActivityParticlesFx.Props {
+	export interface Props extends ActivityParticlesProps {
 		readonly tint: number;
 	}
 }
@@ -34,7 +32,7 @@ const waveTurns = 1.15;
 const shimmerTurns = 2.35;
 const twoPi = Math.PI * 2;
 
-export const readPixiTileActorActivityParticlesAnimationKey = (actor: PixiTileActor) =>
+const readPixiTileActorActivityParticlesAnimationKey = (actor: PixiTileActor) =>
 	`activity-particles:${actor.instanceId}`;
 
 const clampUnit = (value: number) => Math.min(1, Math.max(0, value));
@@ -172,7 +170,7 @@ const runContinuousPlaybackFx = ({
 	animator,
 	fromProgress,
 	rampIn,
-}: runPixiTileActorActivityParticlesFx.Props & {
+}: ActivityParticlesProps & {
 	readonly fromProgress: number;
 	readonly rampIn: boolean;
 }) => {
@@ -210,7 +208,7 @@ const runContinuousPlaybackFx = ({
 /** Starts one widening inverted-fire plume on one seamless actor-owned playback channel. */
 export const startPixiTileActorActivityParticlesFx = Effect.fn(
 	"startPixiTileActorActivityParticlesFx",
-)(function* ({ actor, animator, rampIn }: runPixiTileActorActivityParticlesFx.Props) {
+)(function* ({ actor, animator, rampIn }: ActivityParticlesProps) {
 	if (actor.container.destroyed) return;
 	const effect = actor.activityParticles;
 	if (effect.feedbackPhase === "burst") return;
@@ -236,7 +234,7 @@ export const startPixiTileActorActivityParticlesFx = Effect.fn(
 /** Stops emission, lets the currently distributed pool rise out, then hides the container. */
 export const stopPixiTileActorActivityParticlesFx = Effect.fn(
 	"stopPixiTileActorActivityParticlesFx",
-)(function* ({ actor, animator }: runPixiTileActorActivityParticlesFx.Props) {
+)(function* ({ actor, animator }: ActivityParticlesProps) {
 	const effect = actor.activityParticles;
 	if (actor.container.destroyed || effect.feedbackPhase === "burst") return;
 	const animationKey = readPixiTileActorActivityParticlesAnimationKey(actor);

@@ -126,7 +126,7 @@ PlayableGameRoute
 Ordinary asynchronous UI commands stay standalone in their owning UI domain:
 
 ```text
-saveGameAtom(exact Game)
+gameMenuCommandAtom(exact Game)
 → Atom.fn command
 → game.runFx(RuntimeSaveFx.flush)
 → AsyncResult consumed by the owning UI

@@ -126,7 +126,6 @@ Ephemeral commands using `Atom.setIdleTTL(0)`:
 - `src/bridge/item-detail/useUnsetDefaultItemDetailLine.ts`
 - `src/bridge/item-detail/useWithdrawItemDetailLine.ts`
 - `src/bridge/lifecycle/requestApplicationCloseAtom.ts`
-- `src/bridge/save/saveGameAtom.ts`
 - `src/bridge/tile/dropItemAtom.ts`
 - `src/ui/audio/useGameAudioAtoms.ts`
 - `src/ui/cheat-spotlight/CheatItemSpawnCommandAtom.ts`
@@ -136,7 +135,7 @@ Ephemeral commands using `Atom.setIdleTTL(0)`:
 
 ## Complete unstable reactivity inventory
 
-Snapshot: 90 files total — 58 production sources and 32 tests/support files.
+Snapshot: 89 files total — 57 production sources and 32 tests/support files.
 
 ### Production
 
@@ -170,7 +169,6 @@ src/bridge/lifecycle/requestApplicationCloseAtom.ts
 src/bridge/reactivity/RendererAtomRegistry.ts
 src/bridge/runtime/GameRuntimeAtom.ts
 src/bridge/runtime/useRuntimeSelector.ts
-src/bridge/save/saveGameAtom.ts
 src/bridge/tile/dropItemAtom.ts
 src/ui/audio/useGameAudioAtoms.ts
 src/ui/cheat-spotlight/CheatItemSpawnCommandAtom.ts

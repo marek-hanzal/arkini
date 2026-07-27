@@ -6,7 +6,6 @@ import { useGameFx } from "~/engine/game/fx/useGameFx";
 import { storeInputMaterialFx } from "~/engine/input/write/storeInputMaterialFx";
 import { readLineRunFx } from "~/engine/line/fx/run/readLineRunFx";
 import { mergeItemsFx } from "~/engine/merge/write/mergeItemsFx";
-import { placeDropFx } from "~/engine/placement/write/placeDropFx";
 import { queryFx } from "~/engine/query/fx/queryFx";
 import { checkRuntimeFx } from "~/engine/runtime/check/checkRuntimeFx";
 import { getItemAtFx } from "~/engine/runtime/read/getItemAtFx";
@@ -20,6 +19,7 @@ import {
 	inventoryLocation,
 	multiSpaceTestConfig,
 } from "~test/space/support/multiSpaceTestConfig";
+import { placeDropForTestFx } from "~test/placement/support/placeDropForTestFx";
 
 const useTestGame = <A, E, R>(effect: Effect.Effect<A, E, R>) =>
 	effect.pipe(
@@ -207,7 +207,7 @@ describe("multi-space spatial isolation", () => {
 					location: boardLocation(0, 1),
 					quantity: 2,
 				});
-				yield* placeDropFx({
+				yield* placeDropForTestFx({
 					drop: drop("drop", 2),
 					originItemId: origin.id,
 				});
@@ -235,7 +235,7 @@ describe("multi-space spatial isolation", () => {
 					location: boardLocation(4, 0),
 					quantity: 1,
 				});
-				yield* placeDropFx({
+				yield* placeDropForTestFx({
 					drop: drop("random"),
 					originItemId: origin.id,
 				});
@@ -278,7 +278,7 @@ describe("multi-space spatial isolation", () => {
 						quantity: 1,
 					});
 				}
-				yield* placeDropFx({
+				yield* placeDropForTestFx({
 					drop: drop("drop"),
 					originItemId: origin.id,
 				});

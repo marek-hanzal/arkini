@@ -4,19 +4,8 @@ import * as Atom from "effect/unstable/reactivity/Atom";
 import { useMemo } from "react";
 
 import { useGameEngine } from "~/bridge/game/useGameEngine";
-import { createStartItemDetailLineAtomFx } from "~/bridge/item-detail/createStartItemDetailLineAtomFx";
 import type { ItemDetailPendingActionOwner } from "~/bridge/item-detail/ItemDetailPendingActionOwner";
 import { startLineFx } from "~/engine/job/write/startLineFx";
-
-export namespace useStartItemDetailLine {
-	export interface Options {
-		/**
-		 * Stable identity for one Tile command result. It prevents unrelated Tile
-		 * starts in the same Game from sharing settlement state.
-		 */
-		readonly commandKey: string;
-	}
-}
 
 export namespace useStartPendingItemDetailLine {
 	export type Props = startLineFx.Props;
@@ -26,34 +15,6 @@ export namespace useStartPendingItemDetailLine {
 		readonly pendingOwner: ItemDetailPendingActionOwner;
 	}
 }
-
-/**
- * Owns one raw Tile start command and its isolated AsyncResult.
- *
- * Typed engine failures remain observable to Tile product policy. Defects and
- * interruptions stay in the AsyncResult Cause for the render boundary.
- */
-export const useStartItemDetailLine = ({ commandKey }: useStartItemDetailLine.Options) => {
-	const game = useGameEngine();
-	const commandAtom = useMemo(
-		() => Effect.runSync(createStartItemDetailLineAtomFx(game)),
-		[
-			commandKey,
-			game,
-		],
-	);
-	const [result, start] = useAtom(commandAtom);
-	return useMemo(
-		() => ({
-			result,
-			start,
-		}),
-		[
-			result,
-			start,
-		],
-	);
-};
 
 /** Starts or enqueues one controller-owned Item Detail line request. */
 export const useStartPendingItemDetailLine = ({

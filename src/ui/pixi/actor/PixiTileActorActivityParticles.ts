@@ -1,6 +1,6 @@
 import type { Particle, ParticleContainer } from "pixi.js";
 
-export interface PixiTileActorActivityParticle {
+interface PixiTileActorActivityParticle {
 	readonly alphaScale: number;
 	readonly phaseOffset: number;
 	readonly particle: Particle;

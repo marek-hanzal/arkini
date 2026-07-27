@@ -14,6 +14,7 @@ import { createPixiMainSceneDragControllerFx } from "~/ui/pixi/drag/createPixiMa
 import type { PixiCursorGrabMotion } from "~/ui/pixi/drag/PixiCursorGrabMotion";
 import type { PixiMainSceneDragController } from "~/ui/pixi/drag/PixiMainSceneDragController";
 import { createPixiMainSceneDropPresentationFx } from "~/ui/pixi/drop/createPixiMainSceneDropPresentationFx";
+import { createPixiMainSceneDropSubmissionFx } from "~/ui/pixi/drop/createPixiMainSceneDropSubmissionFx";
 import type { PixiTileMagneticField } from "~/ui/pixi/magnet/PixiTileMagneticField";
 import type { PixiTileMotionRuntime } from "~/ui/pixi/motion/PixiTileMotionRuntime";
 import type { PixiApplicationOwner } from "~/ui/pixi/runtime/PixiApplicationOwner";
@@ -295,44 +296,115 @@ const mountController = ({
 		configurable: true,
 		value: keyboardTarget,
 	});
+	const actorStore = {
+		actors,
+		canonicalItems,
+	} as unknown as PixiMainSceneActorStore;
+	const animator = {
+		animateFx: (animation) =>
+			Effect.sync(() => {
+				animations.push(animation);
+				animateActor(animation);
+			}),
+		cancelActorFx: () => Effect.void,
+		cancelChannelFx: (animationActor, channel) =>
+			Effect.sync(() => {
+				cancelChannel(animationActor, channel);
+			}),
+		cancelFx: (ownerKey) =>
+			Effect.sync(() => {
+				cancelAnimation(ownerKey);
+			}),
+		closeFx: Effect.void,
+		setFx: (write) =>
+			Effect.sync(() => {
+				presentationWrites.push(write);
+				if (write.channel === "activity-particles") {
+					write.actor.activityParticles.container.visible = write.visible;
+					return;
+				}
+				if (write.channel !== "pose") return;
+				write.actor.container.position.set(write.x, write.y);
+				if (write.scale !== undefined) {
+					write.actor.container.scale.set(write.scale);
+				}
+			}),
+	} satisfies PixiActorAnimator;
+	const cursorGrab = {
+		closeFx: Effect.void,
+		finishFx: () => Effect.sync(finishCursorGrab),
+		startFx: () => Effect.sync(startCursorGrab),
+	} satisfies PixiCursorGrabMotion;
+	const game = {
+		reportCriticalFailure,
+	} as never;
+	const magneticField = {
+		closeFx: Effect.void,
+		pruneFx: Effect.void,
+		releaseFx: () => Effect.void,
+		resetFx: Effect.void,
+		updateFx: (sample) =>
+			Effect.sync(() => {
+				magneticUpdates.push(sample);
+			}),
+	} satisfies PixiTileMagneticField;
+	const motion = {
+		beginInteractionHandoffFx: (actorId) => Effect.sync(() => beginInteractionHandoff(actorId)),
+		closeFx: Effect.void,
+		enqueueFx: () => Effect.void,
+		redirectTargetFx: (redirect) =>
+			Effect.sync(() => {
+				targetRedirects.push(redirect);
+			}),
+		readSnapshotFx: Effect.succeed({
+			interactionClaimByActorId,
+			retainedActorIds: new Set(interactionClaimByActorId.keys()),
+			spawnCueByActorId: new Map(),
+			unsettledInputSourceQuantities: new Map(),
+			unsettledQuantities: new Map(),
+		}),
+		startFx: Effect.void,
+		syncQuantitiesFx: Effect.void,
+	} satisfies PixiTileMotionRuntime;
+	const surface = {
+		readActorPoseFx: (actorItem: TileActorItem) =>
+			Effect.succeed(actorPoses.get(actorItem.id) ?? currentActorPose),
+		readCommandTargetFx: () => Effect.succeed(currentCommandTarget),
+		readDropTargetFx: () =>
+			Effect.succeed({
+				layout: {
+					cellSize: 80,
+					kind: "board",
+					x: 0,
+					y: 0,
+				},
+				x: currentDropTargetX,
+				y: 0,
+			}),
+		readOccupantFx: () => Effect.succeed(currentOccupant),
+		renderDropFeedbackFx: () => Effect.void,
+		transientActorLayer,
+	} as unknown as PixiMainSceneSurface;
+	const dropSubmission = Effect.runSync(
+		createPixiMainSceneDropSubmissionFx({
+			actorStore,
+			animator,
+			cursorGrab,
+			dropPresentation,
+			game,
+			magneticField,
+			motion,
+			onAcceptedDrop,
+			onDrop: onDrop as never,
+			surface,
+		}),
+	);
 	let controller: PixiMainSceneDragController;
 	try {
 		controller = Effect.runSync(
 			createPixiMainSceneDragControllerFx({
-				actorStore: {
-					actors,
-					canonicalItems,
-				} as unknown as PixiMainSceneActorStore,
-				animator: {
-					animateFx: (animation) =>
-						Effect.sync(() => {
-							animations.push(animation);
-							animateActor(animation);
-						}),
-					cancelActorFx: () => Effect.void,
-					cancelChannelFx: (animationActor, channel) =>
-						Effect.sync(() => {
-							cancelChannel(animationActor, channel);
-						}),
-					cancelFx: (ownerKey) =>
-						Effect.sync(() => {
-							cancelAnimation(ownerKey);
-						}),
-					closeFx: Effect.void,
-					setFx: (write) =>
-						Effect.sync(() => {
-							presentationWrites.push(write);
-							if (write.channel === "activity-particles") {
-								write.actor.activityParticles.container.visible = write.visible;
-								return;
-							}
-							if (write.channel !== "pose") return;
-							write.actor.container.position.set(write.x, write.y);
-							if (write.scale !== undefined) {
-								write.actor.container.scale.set(write.scale);
-							}
-						}),
-				} satisfies PixiActorAnimator,
+				actorStore,
+				animator,
 				application: {
 					app: {
 						canvas: {
@@ -345,67 +417,14 @@ const mountController = ({
 					},
 					stage,
 				} as unknown as PixiApplicationOwner,
-				cursorGrab: {
-					closeFx: Effect.void,
-					finishFx: () => Effect.sync(finishCursorGrab),
-					startFx: () => Effect.sync(startCursorGrab),
-				} satisfies PixiCursorGrabMotion,
-				dropPresentation,
-				game: {
-					reportCriticalFailure,
-				} as never,
-				magneticField: {
-					closeFx: Effect.void,
-					pruneFx: Effect.void,
-					releaseFx: () => Effect.void,
-					resetFx: Effect.void,
-					updateFx: (sample) =>
-						Effect.sync(() => {
-							magneticUpdates.push(sample);
-						}),
-				} satisfies PixiTileMagneticField,
-				motion: {
-					beginInteractionHandoffFx: (actorId) =>
-						Effect.sync(() => beginInteractionHandoff(actorId)),
-					closeFx: Effect.void,
-					enqueueFx: () => Effect.void,
-					redirectTargetFx: (redirect) =>
-						Effect.sync(() => {
-							targetRedirects.push(redirect);
-						}),
-					readSnapshotFx: Effect.succeed({
-						interactionClaimByActorId,
-						retainedActorIds: new Set(interactionClaimByActorId.keys()),
-						spawnCueByActorId: new Map(),
-						unsettledInputSourceQuantities: new Map(),
-						unsettledQuantities: new Map(),
-					}),
-					startFx: Effect.void,
-					syncQuantitiesFx: Effect.void,
-				} satisfies PixiTileMotionRuntime,
-				onAcceptedDrop,
+				cursorGrab,
+				dropSubmission,
+				game,
+				magneticField,
+				motion,
 				onActivate,
-				onDrop: onDrop as never,
 				readAckTint: () => 0x57d7b2,
-				surface: {
-					readActorPoseFx: (actorItem: TileActorItem) =>
-						Effect.succeed(actorPoses.get(actorItem.id) ?? currentActorPose),
-					readCommandTargetFx: () => Effect.succeed(currentCommandTarget),
-					readDropTargetFx: () =>
-						Effect.succeed({
-							layout: {
-								cellSize: 80,
-								kind: "board",
-								x: 0,
-								y: 0,
-							},
-							x: currentDropTargetX,
-							y: 0,
-						}),
-					readOccupantFx: () => Effect.succeed(currentOccupant),
-					renderDropFeedbackFx: () => Effect.void,
-					transientActorLayer,
-				} as unknown as PixiMainSceneSurface,
+				surface,
 			}),
 		);
 	} finally {
@@ -431,6 +450,7 @@ const mountController = ({
 		cancelChannel,
 		controller,
 		dropPresentation,
+		dropSubmission,
 		finishCursorGrab,
 		keyboardTarget,
 		magneticUpdates,
@@ -1055,6 +1075,9 @@ describe("Pixi main-scene drag controller", () => {
 			new Set(),
 		);
 		expect(mounted.actor.dragging).toBe(false);
+		fade?.onCancel?.();
+		expect(mounted.onAcceptedDrop).toHaveBeenCalledOnce();
+		expect(mounted.targetRedirects).toHaveLength(1);
 	});
 
 	it("consumes i and leaves an active drag untouched when Inventory storage is unavailable", () => {
@@ -1474,7 +1497,7 @@ describe("Pixi main-scene drag controller", () => {
 		).toBe(false);
 	});
 
-	it("ignores a pending Inventory result after the controller closes", async () => {
+	it("ignores a pending Inventory result after the scene owners close", async () => {
 		const inventory = createItem("runtime:inventory", 1);
 		const mounted = mountController();
 		previewState.actorKinds.set(inventory.id, "store-inventory");
@@ -1500,6 +1523,7 @@ describe("Pixi main-scene drag controller", () => {
 		await Promise.resolve();
 		expect(mounted.onDrop).toHaveBeenCalledOnce();
 		Effect.runSync(mounted.controller.closeFx);
+		Effect.runSync(mounted.dropSubmission.closeFx);
 		resolveDrop({
 			kind: "reject",
 		} as runTileDropAtom.Result);
@@ -1541,6 +1565,7 @@ describe("Pixi main-scene drag controller", () => {
 		second.stage.emit("globalpointermove", pointer(30, 20));
 		second.stage.emit("pointerup", pointer(30, 20));
 		Effect.runSync(second.controller.closeFx);
+		Effect.runSync(second.dropSubmission.closeFx);
 		await flushMicrotasks();
 		expect(second.onDrop).toHaveBeenCalledOnce();
 		expect(second.onAcceptedDrop).not.toHaveBeenCalled();

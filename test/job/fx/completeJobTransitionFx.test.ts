@@ -4,7 +4,6 @@ import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~/engine/game/fx/useGameFx";
 import { attemptJobCompletionFx } from "~/engine/job/fx/attemptJobCompletionFx";
-import { completeJobRuntimeFx } from "~/engine/job/fx/completeJobRuntimeFx";
 import { makeJobCompletionRandomFx } from "~/engine/job/random/makeJobCompletionRandomFx";
 import type { JobSchema } from "~/engine/job/schema/JobSchema";
 import { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
@@ -13,14 +12,15 @@ import {
 	prepareRandomCompletionRuntimeFx,
 	projectRandomCompletionItems,
 } from "~test/job/support/randomCompletionTestRuntime";
+import { completeJobRuntimeForTestFx } from "~test/job/support/completeJobRuntimeForTestFx";
 import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
 
-describe("completeJobRuntimeFx", () => {
+describe("job completion transition", () => {
 	it("replays one stable completion outcome across blocking, retry and restore", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {
 				const prepared = yield* prepareRandomCompletionRuntimeFx();
-				const immediate = yield* completeJobRuntimeFx({
+				const immediate = yield* completeJobRuntimeForTestFx({
 					jobId: prepared.job.id,
 					runtime: prepared.freeRuntime,
 				}).pipe(
@@ -42,7 +42,7 @@ describe("completeJobRuntimeFx", () => {
 						]),
 					),
 				);
-				const retried = yield* completeJobRuntimeFx({
+				const retried = yield* completeJobRuntimeForTestFx({
 					jobId: prepared.job.id,
 					runtime: prepared.freeRuntime,
 				}).pipe(
@@ -58,7 +58,7 @@ describe("completeJobRuntimeFx", () => {
 				);
 				const restoredJob = restoredRuntime.jobs[0];
 				if (restoredJob === undefined) throw new Error("Expected restored completion job.");
-				const restored = yield* completeJobRuntimeFx({
+				const restored = yield* completeJobRuntimeForTestFx({
 					jobId: restoredJob.id,
 					runtime: restoredRuntime,
 				}).pipe(
@@ -133,7 +133,7 @@ describe("completeJobRuntimeFx", () => {
 			Effect.gen(function* () {
 				const prepared = yield* prepareRandomCompletionRuntimeFx();
 				return yield* Effect.result(
-					completeJobRuntimeFx({
+					completeJobRuntimeForTestFx({
 						jobId: prepared.job.id,
 						runtime: {
 							...prepared.freeRuntime,

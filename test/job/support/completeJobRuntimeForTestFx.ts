@@ -4,16 +4,16 @@ import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { completeJobTransitionFx } from "~/engine/job/fx/completeJobTransitionFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
-export namespace completeJobRuntimeFx {
+export namespace completeJobRuntimeForTestFx {
 	export interface Props {
 		jobId: IdSchema.Type;
 		runtime: RuntimeSchema.Type;
 	}
 }
 
-/** Resolves one ready job and returns only its committed runtime for internal callers and tests. */
-export const completeJobRuntimeFx = Effect.fn("completeJobRuntimeFx")(function* (
-	props: completeJobRuntimeFx.Props,
+/** Projects the canonical completion transition to runtime-only test fixtures. */
+export const completeJobRuntimeForTestFx = Effect.fn("completeJobRuntimeForTestFx")(function* (
+	props: completeJobRuntimeForTestFx.Props,
 ) {
 	const transition = yield* completeJobTransitionFx(props);
 	return transition.runtime;

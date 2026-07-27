@@ -30,19 +30,15 @@ interface MotionTestCompletion {
 
 export const motionTestRuntime = {
 	autoComplete: true,
-	reducedMotion: false,
 	completions: [] as Array<MotionTestCompletion>,
 	reset() {
 		this.autoComplete = true;
-		this.reducedMotion = false;
 		this.completions.splice(0);
 	},
 	finish(...indexes: ReadonlyArray<number>) {
 		for (const index of indexes) this.completions[index]?.complete();
 	},
 };
-
-export const useReducedMotion = () => motionTestRuntime.reducedMotion;
 
 export const useMotionValue = <T,>(initial: T): MockMotionValue<T> => {
 	const value = useRef(initial);

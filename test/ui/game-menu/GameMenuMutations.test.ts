@@ -8,7 +8,6 @@ import type { Game } from "~/bridge/game/Game";
 import { RendererLifecycleOwnerAtom } from "~/bridge/lifecycle/RendererLifecycleOwnerAtom";
 import { createRendererLifecycleFx } from "~/bridge/lifecycle/createRendererLifecycleFx";
 import { requestApplicationCloseAtom } from "~/bridge/lifecycle/requestApplicationCloseAtom";
-import { saveGameAtom } from "~/bridge/save/saveGameAtom";
 import { gameMenuCommandAtom } from "~/ui/game-menu/gameMenuCommandAtom";
 import { testArkpackConfig } from "~test/bridge/arkpack/support/createTestArkpack";
 import { makeTestGameTransitionFieldsFx } from "~test/support/game/makeTestGameTransitionFieldsFx";
@@ -83,9 +82,14 @@ describe("game menu command atoms", () => {
 		const game = createGame(Effect.sync(save));
 		const registry = makeRegistry();
 
-		const exit = await runCommand(registry, saveGameAtom(game), undefined);
+		const exit = await runCommand(registry, gameMenuCommandAtom(game), "save");
 
-		expect(exit).toEqual(Exit.succeed(undefined));
+		expect(exit).toEqual(
+			Exit.succeed({
+				command: "save",
+				exit: Exit.succeed(undefined),
+			}),
+		);
 		expect(save).toHaveBeenCalledOnce();
 	});
 
@@ -93,8 +97,8 @@ describe("game menu command atoms", () => {
 		const gameA = createGame();
 		const gameB = createGame();
 
-		expect(saveGameAtom(gameA)).toBe(saveGameAtom(gameA));
-		expect(saveGameAtom(gameA)).not.toBe(saveGameAtom(gameB));
+		expect(gameMenuCommandAtom(gameA)).toBe(gameMenuCommandAtom(gameA));
+		expect(gameMenuCommandAtom(gameA)).not.toBe(gameMenuCommandAtom(gameB));
 	});
 
 	it("preserves the explicit save typed failure", async () => {
@@ -104,11 +108,14 @@ describe("game menu command atoms", () => {
 		const game = createGame(Effect.fail(failure));
 		const registry = makeRegistry();
 
-		const exit = await runCommand(registry, saveGameAtom(game), undefined);
+		const exit = await runCommand(registry, gameMenuCommandAtom(game), "save");
 
-		expect(Exit.isFailure(exit)).toBe(true);
-		if (Exit.isSuccess(exit)) throw new Error("Expected explicit save failure.");
-		expect(Cause.findErrorOption(exit.cause)).toEqual(Option.some(failure));
+		expect(Exit.isSuccess(exit)).toBe(true);
+		if (Exit.isFailure(exit)) throw new Error("Expected a settled Game Menu result.");
+		expect(exit.value.command).toBe("save");
+		expect(Exit.isFailure(exit.value.exit)).toBe(true);
+		if (Exit.isSuccess(exit.value.exit)) throw new Error("Expected explicit save failure.");
+		expect(Cause.findErrorOption(exit.value.exit.cause)).toEqual(Option.some(failure));
 	});
 
 	it("interrupts the running save Effect when its registry owner is disposed", async () => {
@@ -123,9 +130,9 @@ describe("game menu command atoms", () => {
 			),
 		);
 		const registry = makeRegistry();
-		const atom = saveGameAtom(game);
+		const atom = gameMenuCommandAtom(game);
 		const unmount = registry.mount(atom);
-		registry.set(atom, undefined);
+		registry.set(atom, "save");
 		await Effect.runPromise(Deferred.await(entered));
 
 		unmount();
@@ -148,18 +155,23 @@ describe("game menu command atoms", () => {
 		);
 		const secondGame = createGame(Effect.sync(secondSave));
 		const registry = makeRegistry();
-		const firstAtom = saveGameAtom(firstGame);
+		const firstAtom = gameMenuCommandAtom(firstGame);
 		const unmountFirst = registry.mount(firstAtom);
-		registry.set(firstAtom, undefined);
+		registry.set(firstAtom, "save");
 		await Effect.runPromise(Deferred.await(firstEntered));
 
 		unmountFirst();
 		await Effect.runPromise(Deferred.await(firstInterrupted));
-		const secondExit = await runCommand(registry, saveGameAtom(secondGame), undefined);
+		const secondExit = await runCommand(registry, gameMenuCommandAtom(secondGame), "save");
 
-		expect(secondExit).toEqual(Exit.succeed(undefined));
+		expect(secondExit).toEqual(
+			Exit.succeed({
+				command: "save",
+				exit: Exit.succeed(undefined),
+			}),
+		);
 		expect(secondSave).toHaveBeenCalledOnce();
-		expect(saveGameAtom(firstGame)).not.toBe(saveGameAtom(secondGame));
+		expect(gameMenuCommandAtom(firstGame)).not.toBe(gameMenuCommandAtom(secondGame));
 	});
 
 	it("requests only the native close handshake and preserves its failure", async () => {

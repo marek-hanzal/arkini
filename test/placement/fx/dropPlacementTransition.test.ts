@@ -5,13 +5,13 @@ import { describe, expect, it } from "vitest";
 import { useGameFx } from "~/engine/game/fx/useGameFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
-import { placeDropFx } from "~/engine/placement/write/placeDropFx";
 import {
 	boardLocation,
 	configuredDrop,
 	inventoryLocation,
 	placementTestConfig,
 } from "~test/placement/fx/support/placementTestConfig";
+import { placeDropForTestFx } from "~test/placement/support/placeDropForTestFx";
 
 const requirePlacement = <Value>(value: Value | undefined): Value => {
 	expect(value).toBeDefined();
@@ -22,7 +22,7 @@ const requirePlacement = <Value>(value: Value | undefined): Value => {
 	return value;
 };
 
-describe("placeDropFx", () => {
+describe("drop placement transition", () => {
 	it("fills board stacks, then nearby board cells, then inventory", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {
@@ -45,7 +45,7 @@ describe("placeDropFx", () => {
 					quantity: 1,
 				});
 
-				const placement = yield* placeDropFx({
+				const placement = yield* placeDropForTestFx({
 					drop: configuredDrop({
 						itemId: "log",
 						placement: "drop",
@@ -120,7 +120,7 @@ describe("placeDropFx", () => {
 					quantity: 1,
 				});
 
-				const placement = yield* placeDropFx({
+				const placement = yield* placeDropForTestFx({
 					drop: configuredDrop({
 						itemId: "inventory-only",
 						placement: "random",
@@ -199,7 +199,7 @@ describe("placeDropFx", () => {
 				}
 				const before = yield* readRuntimeFx();
 				const placement = yield* Effect.result(
-					placeDropFx({
+					placeDropForTestFx({
 						drop: configuredDrop({
 							itemId: "log",
 							placement: "drop",
@@ -251,7 +251,7 @@ describe("placeDropFx", () => {
 				});
 
 				return yield* Effect.result(
-					placeDropFx({
+					placeDropForTestFx({
 						drop: configuredDrop({
 							itemId: "limited",
 							placement: "drop",
@@ -287,7 +287,7 @@ describe("placeDropFx", () => {
 					quantity: 1,
 				});
 
-				return yield* placeDropFx({
+				return yield* placeDropForTestFx({
 					drop: configuredDrop({
 						itemId: "board-only",
 						placement: "random",
@@ -333,7 +333,7 @@ describe("placeDropFx", () => {
 					quantity: 1,
 				});
 
-				const placement = yield* placeDropFx({
+				const placement = yield* placeDropForTestFx({
 					drop: configuredDrop({
 						itemId: "board-only",
 						placement: "random",
@@ -396,7 +396,7 @@ describe("placeDropFx", () => {
 					quantity: 2,
 				});
 
-				return yield* placeDropFx({
+				return yield* placeDropForTestFx({
 					drop: configuredDrop({
 						itemId: "log",
 						placement: "random",
@@ -440,7 +440,7 @@ describe("placeDropFx", () => {
 					quantity: 1,
 				});
 
-				return yield* placeDropFx({
+				return yield* placeDropForTestFx({
 					drop: configuredDrop({
 						itemId: "log",
 						placement: "random",
@@ -499,13 +499,13 @@ describe("placeDropFx", () => {
 				const attempts = yield* Effect.all(
 					[
 						Effect.result(
-							placeDropFx({
+							placeDropForTestFx({
 								drop,
 								originItemId: "runtime:origin",
 							}),
 						),
 						Effect.result(
-							placeDropFx({
+							placeDropForTestFx({
 								drop,
 								originItemId: "runtime:origin",
 							}),

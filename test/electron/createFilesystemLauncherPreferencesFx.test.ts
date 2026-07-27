@@ -1,5 +1,5 @@
 import { NodeServices } from "@effect/platform-node";
-import { Effect, FileSystem, PlatformError } from "effect";
+import { Deferred, Effect, FileSystem, Option, PlatformError } from "effect";
 import { access, mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -11,12 +11,16 @@ const preferenceDirectory = () => join(root, "arkini", "preferences");
 const currentPath = () => join(preferenceDirectory(), "launcher.last-package");
 const pendingPath = () => join(preferenceDirectory(), "launcher-last-package.pending");
 
-const createPreferences = () =>
+const createPreferences = (fileSystem?: FileSystem.FileSystem) =>
 	Effect.runPromise(
 		createFilesystemLauncherPreferencesFx({
 			userDataPath: root,
+			fileSystem,
 		}).pipe(Effect.provide(NodeServices.layer)),
 	);
+
+const readNodeFileSystem = () =>
+	Effect.runPromise(FileSystem.FileSystem.pipe(Effect.provide(NodeServices.layer)));
 
 beforeEach(async () => {
 	root = await mkdtemp(join(tmpdir(), "arkini-launcher-"));
@@ -45,6 +49,47 @@ describe("createFilesystemLauncherPreferencesFx", () => {
 		await Effect.runPromise(preferences.writeLastPackageIdFx("  package:test  "));
 		expect(await readFile(currentPath(), "utf8")).toBe("package:test");
 		expect(await Effect.runPromise(preferences.readLastPackageIdFx)).toBe("package:test");
+		await expect(access(pendingPath())).rejects.toBeDefined();
+	});
+
+	it("serializes concurrent writes before either can reuse the shared pending path", async () => {
+		const fileSystem = await readNodeFileSystem();
+		const firstRenameEntered = Effect.runSync(Deferred.make<void>());
+		const releaseFirstRename = Effect.runSync(Deferred.make<void>());
+		const secondRenameEntered = Effect.runSync(Deferred.make<void>());
+		let renameCalls = 0;
+		const preferences = await createPreferences({
+			...fileSystem,
+			rename: (oldPath, newPath) =>
+				Effect.suspend(() => {
+					renameCalls += 1;
+					const rename = fileSystem.rename(oldPath, newPath);
+					if (renameCalls === 1) {
+						return Deferred.succeed(firstRenameEntered, undefined).pipe(
+							Effect.andThen(Deferred.await(releaseFirstRename)),
+							Effect.andThen(rename),
+						);
+					}
+					return Deferred.succeed(secondRenameEntered, undefined).pipe(
+						Effect.andThen(rename),
+					);
+				}),
+		});
+		const firstWrite = Effect.runPromise(preferences.writeLastPackageIdFx("package:first"));
+		await Effect.runPromise(Deferred.await(firstRenameEntered));
+
+		const secondWrite = Effect.runPromise(preferences.writeLastPackageIdFx("package:second"));
+		expect(Option.isNone(await Effect.runPromise(Deferred.poll(secondRenameEntered)))).toBe(
+			true,
+		);
+
+		Effect.runSync(Deferred.succeed(releaseFirstRename, undefined));
+		await Promise.all([
+			firstWrite,
+			secondWrite,
+		]);
+
+		expect(await Effect.runPromise(preferences.readLastPackageIdFx)).toBe("package:second");
 		await expect(access(pendingPath())).rejects.toBeDefined();
 	});
 

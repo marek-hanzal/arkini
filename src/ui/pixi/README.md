@@ -24,6 +24,7 @@ all scene-local owners.
 | `motion/createPixiTileMotionRuntimeFx.ts` | Ordered cue lanes, animation claims, transient payloads, and cue settlement |
 | `drag/*DragController*` | One pointer gesture and its frozen source/release facts |
 | `drop/createPixiMainSceneDropPresentationFx.ts` | Accepted-drop presentation facts until canonical settlement |
+| `drop/createPixiMainSceneDropSubmissionFx.ts` | Frozen release command, optimistic feedback, and async drop settlement |
 | `animation/createPixiAnimationDriverFx.ts` | Motion controls and springs; the only interpolation clock |
 | `animation/createPixiActorAnimatorFx.ts` | Interruptible, keyed writes to actor presentation channels |
 

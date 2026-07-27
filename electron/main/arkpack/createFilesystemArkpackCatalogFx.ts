@@ -1,5 +1,5 @@
 import { FileSystem } from "effect";
-import { Effect } from "effect";
+import { Effect, Semaphore } from "effect";
 import { join } from "node:path";
 import type { ArkpackCatalog } from "./ArkpackCatalog";
 import { installArkpackFx } from "./installArkpackFx";
@@ -22,36 +22,46 @@ export const createFilesystemArkpackCatalogFx = Effect.fn("createFilesystemArkpa
 	}: createFilesystemArkpackCatalogFx.Props) {
 		const fileSystem = providedFileSystem ?? (yield* FileSystem.FileSystem);
 		const root = join(userDataPath, "arkini", "arkpacks");
+		// Publish and removal must retain admission order even when IPC callers overlap.
+		const operations = yield* Semaphore.make(1);
 		const readFx: ArkpackCatalog["readFx"] = Effect.fn("FilesystemArkpackCatalog.readFx")(
 			(packageId) =>
-				readInstalledArkpackFx({
-					root,
-					fileSystem,
-					packageId,
-				}),
+				operations.withPermits(1)(
+					readInstalledArkpackFx({
+						root,
+						fileSystem,
+						packageId,
+					}),
+				),
 		);
 		const installFx: ArkpackCatalog["installFx"] = Effect.fn(
 			"FilesystemArkpackCatalog.installFx",
 		)((record) =>
-			installArkpackFx({
-				root,
-				fileSystem,
-				record,
-			}),
+			operations.withPermits(1)(
+				installArkpackFx({
+					root,
+					fileSystem,
+					record,
+				}),
+			),
 		);
 		const removeFx: ArkpackCatalog["removeFx"] = Effect.fn("FilesystemArkpackCatalog.removeFx")(
 			(packageId) =>
-				removeInstalledArkpackFx({
-					root,
-					fileSystem,
-					packageId,
-				}),
+				operations.withPermits(1)(
+					removeInstalledArkpackFx({
+						root,
+						fileSystem,
+						packageId,
+					}),
+				),
 		);
 		return {
-			listFx: listInstalledArkpacksFx({
-				root,
-				fileSystem,
-			}),
+			listFx: operations.withPermits(1)(
+				listInstalledArkpacksFx({
+					root,
+					fileSystem,
+				}),
+			),
 			readFx,
 			installFx,
 			removeFx,

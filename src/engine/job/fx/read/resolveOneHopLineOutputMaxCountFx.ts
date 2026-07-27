@@ -14,7 +14,7 @@ import { readDefinitionLineNetMaximumOutputQuantitiesFx } from "./readDefinition
 import { readReservedJobOutputQuantitiesFx } from "./readReservedJobOutputQuantitiesFx";
 import { resolveDirectLineOutputMaxCountFx } from "./resolveDirectLineOutputMaxCountFx";
 
-export interface OneHopLineOutputMaxCountBlock extends OutputMaxCountBlock {
+interface OneHopLineOutputMaxCountBlock extends OutputMaxCountBlock {
 	readonly intermediateItemId: IdSchema.Type;
 }
 

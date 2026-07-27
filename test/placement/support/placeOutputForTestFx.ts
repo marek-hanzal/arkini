@@ -7,7 +7,7 @@ import { applyOutputPlacementFx } from "~/engine/placement/fx/applyOutputPlaceme
 import { readPlacementOriginFx } from "~/engine/placement/fx/readPlacementOriginFx";
 import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
 
-export namespace placeOutputFx {
+export namespace placeOutputForTestFx {
 	export interface Props {
 		originItemId: IdSchema.Type;
 		output: OutputSchema.Type;
@@ -15,12 +15,12 @@ export namespace placeOutputFx {
 }
 
 /**
- * Atomically resolves and places one configured output from the latest runtime snapshot.
+ * Keeps atomic placement assertions on the canonical resolver and apply transition.
  */
-export const placeOutputFx = Effect.fn("placeOutputFx")(function* ({
+export const placeOutputForTestFx = Effect.fn("placeOutputForTestFx")(function* ({
 	originItemId,
 	output,
-}: placeOutputFx.Props) {
+}: placeOutputForTestFx.Props) {
 	return yield* modifyRuntimeFx((runtime) => {
 		return Effect.gen(function* () {
 			const origin = yield* readPlacementOriginFx({

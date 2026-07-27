@@ -6,7 +6,6 @@ import { useGameFx } from "~/engine/game/fx/useGameFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import { removeItemFx } from "~/engine/runtime/write/removeItemFx";
 import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
-import { placeOutputFx } from "~/engine/placement/write/placeOutputFx";
 import {
 	boardLocation,
 	configuredDrop,
@@ -14,8 +13,9 @@ import {
 	inventoryLocation,
 	placementTestConfig,
 } from "~test/placement/fx/support/placementTestConfig";
+import { placeOutputForTestFx } from "~test/placement/support/placeOutputForTestFx";
 
-describe("placeOutputFx", () => {
+describe("output placement transition", () => {
 	it("rolls back every earlier drop when a later drop cannot be placed", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {
@@ -50,7 +50,7 @@ describe("placeOutputFx", () => {
 				}
 				const before = yield* readRuntimeFx();
 				const placement = yield* Effect.result(
-					placeOutputFx({
+					placeOutputForTestFx({
 						originItemId: "runtime:origin",
 						output: configuredOutput([
 							configuredDrop({
@@ -99,7 +99,7 @@ describe("placeOutputFx", () => {
 					quantity: 1,
 				});
 
-				const placement = yield* placeOutputFx({
+				const placement = yield* placeOutputForTestFx({
 					originItemId: "runtime:origin",
 					output: configuredOutput([
 						configuredDrop({
@@ -173,7 +173,7 @@ describe("placeOutputFx", () => {
 					revision: permit.revision,
 				});
 
-				const placement = yield* placeOutputFx({
+				const placement = yield* placeOutputForTestFx({
 					originItemId: "runtime:origin",
 					output: configuredOutput([
 						configuredDrop({

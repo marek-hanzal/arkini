@@ -14,7 +14,7 @@ export namespace createPixiTileActorActivityParticlesFx {
 	}
 }
 
-export const pixiTileActorActivityParticleCount = 12;
+const pixiTileActorActivityParticleCount = 12;
 
 const goldenAngle = Math.PI * (3 - Math.sqrt(5));
 

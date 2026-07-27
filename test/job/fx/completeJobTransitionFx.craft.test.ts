@@ -5,7 +5,6 @@ import { describe, expect, it } from "vitest";
 import { useGameFx } from "~/engine/game/fx/useGameFx";
 import { storeInputMaterialFx } from "~/engine/input/write/storeInputMaterialFx";
 import { attemptJobCompletionFx } from "~/engine/job/fx/attemptJobCompletionFx";
-import { completeJobRuntimeFx } from "~/engine/job/fx/completeJobRuntimeFx";
 import { startLineFx } from "~/engine/job/write/startLineFx";
 import type { JobSchema } from "~/engine/job/schema/JobSchema";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
@@ -15,6 +14,7 @@ import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { fromRuntimeFx } from "~/engine/state/fx/fromRuntimeFx";
 import { fromStateFx } from "~/engine/runtime/fx/fromStateFx";
 import { runTickRuntimeByFx } from "~/engine/tick/fx/runTickRuntimeByFx";
+import { completeJobRuntimeForTestFx } from "~test/job/support/completeJobRuntimeForTestFx";
 
 const craftCompletionConfig = GameConfigSchema.parse({
 	version: "1.0",
@@ -479,7 +479,7 @@ const projectRandomCraftOutputFx = Effect.fn("projectRandomCraftOutputFx")(funct
 		.sort((first, second) => JSON.stringify(first).localeCompare(JSON.stringify(second)));
 });
 
-describe("craft job completion", () => {
+describe("craft job completion transition", () => {
 	it("consumes the craft, places ordinary output on its freed origin, then returns reservations", () => {
 		const runtime = Effect.runSync(
 			Effect.gen(function* () {
@@ -923,7 +923,7 @@ describe("craft job completion", () => {
 						]),
 					),
 				);
-				const immediate = yield* completeJobRuntimeFx({
+				const immediate = yield* completeJobRuntimeForTestFx({
 					jobId: job.id,
 					runtime: freeRuntime,
 				}).pipe(
@@ -934,7 +934,7 @@ describe("craft job completion", () => {
 						]),
 					),
 				);
-				const retried = yield* completeJobRuntimeFx({
+				const retried = yield* completeJobRuntimeForTestFx({
 					jobId: job.id,
 					runtime: freeRuntime,
 				}).pipe(

@@ -13,6 +13,7 @@ import { readPixiScenePaletteFx } from "~/ui/pixi/appearance/readPixiScenePalett
 import { createPixiCursorGrabMotionFx } from "~/ui/pixi/drag/createPixiCursorGrabMotionFx";
 import { createPixiMainSceneDragControllerFx } from "~/ui/pixi/drag/createPixiMainSceneDragControllerFx";
 import { createPixiMainSceneDropPresentationFx } from "~/ui/pixi/drop/createPixiMainSceneDropPresentationFx";
+import { createPixiMainSceneDropSubmissionFx } from "~/ui/pixi/drop/createPixiMainSceneDropSubmissionFx";
 import type { TileSceneHandoffStore } from "~/ui/pixi/handoff/createTileSceneHandoffStoreFx";
 import { createPixiTileMagneticFieldFx } from "~/ui/pixi/magnet/createPixiTileMagneticFieldFx";
 import { createPixiTileMotionRuntimeFx } from "~/ui/pixi/motion/createPixiTileMotionRuntimeFx";
@@ -128,18 +129,29 @@ export const createPixiMainSceneRuntimeFx = Effect.fn("createPixiMainSceneRuntim
 		const dropPresentation = yield* createPixiMainSceneDropPresentationFx();
 		registerRollback(dropPresentation.closeFx);
 		let replayCurrentTransition: () => void = () => undefined;
-		const drag = yield* createPixiMainSceneDragControllerFx({
+		const dropSubmission = yield* createPixiMainSceneDropSubmissionFx({
 			actorStore,
 			animator,
-			application,
 			cursorGrab,
 			dropPresentation,
 			game,
 			magneticField,
 			motion,
-			onActivate,
 			onAcceptedDrop: () => replayCurrentTransition(),
 			onDrop,
+			surface,
+		});
+		registerRollback(dropSubmission.closeFx);
+		const drag = yield* createPixiMainSceneDragControllerFx({
+			actorStore,
+			animator,
+			application,
+			cursorGrab,
+			dropSubmission,
+			game,
+			magneticField,
+			motion,
+			onActivate,
 			readAckTint: () => paletteState.current.success,
 			surface,
 		});

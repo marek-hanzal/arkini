@@ -3,7 +3,6 @@ import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~/engine/game/fx/useGameFx";
 import { storeInputMaterialFx } from "~/engine/input/write/storeInputMaterialFx";
-import { completeJobRuntimeFx } from "~/engine/job/fx/completeJobRuntimeFx";
 import { startLineFx } from "~/engine/job/write/startLineFx";
 import { fromStateFx } from "~/engine/runtime/fx/fromStateFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
@@ -13,6 +12,7 @@ import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { fromRuntimeFx } from "~/engine/state/fx/fromRuntimeFx";
 import { runTickRuntimeByFx } from "~/engine/tick/fx/runTickRuntimeByFx";
 import { StartLineResultEnumSchema } from "~/engine/job/schema/StartLineResultEnumSchema";
+import { completeJobRuntimeForTestFx } from "~test/job/support/completeJobRuntimeForTestFx";
 
 const value = (value: number) => ({
 	type: "value" as const,
@@ -248,7 +248,7 @@ const startStashFx = Effect.fn("startStashFx")(function* ({
 	};
 });
 
-describe("stash line completion", () => {
+describe("stash line completion transition", () => {
 	it("stores input, starts explicitly, emits guaranteed output, and removes the owner once", () => {
 		const result = run(
 			Effect.gen(function* () {
@@ -261,7 +261,7 @@ describe("stash line completion", () => {
 				});
 				const runtime = yield* readRuntimeFx();
 				const repeated = yield* Effect.result(
-					completeJobRuntimeFx({
+					completeJobRuntimeForTestFx({
 						jobId: started.job.id,
 						runtime,
 					}),

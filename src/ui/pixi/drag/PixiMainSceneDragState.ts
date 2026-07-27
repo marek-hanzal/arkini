@@ -20,19 +20,19 @@ interface PixiMainSceneActiveDragBase {
 	targetItem: TileActorItem | null;
 }
 
-export interface PixiMainSceneMotionHandoffGesture extends PixiMainSceneActiveDragBase {
+interface PixiMainSceneMotionHandoffGesture extends PixiMainSceneActiveDragBase {
 	readonly mode: "motion-handoff";
 	readonly phase: "pressed";
 }
 
-export interface PixiMainSceneActivationOnlyGesture extends PixiMainSceneActiveDragBase {
+interface PixiMainSceneActivationOnlyGesture extends PixiMainSceneActiveDragBase {
 	readonly mode: "activation-only";
 	readonly phase: "pressed";
 }
 
-export interface PixiMainSceneMovableGesture extends PixiMainSceneActiveDragBase {
+interface PixiMainSceneMovableGesture extends PixiMainSceneActiveDragBase {
 	readonly mode: "drag";
-	phase: "dragging" | "pressed" | "submitting";
+	phase: "dragging" | "pressed";
 }
 
 export type PixiMainSceneActiveDrag =

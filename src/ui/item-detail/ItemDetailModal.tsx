@@ -1,4 +1,4 @@
-import { motion, useReducedMotion } from "motion/react";
+import { motion } from "motion/react";
 import { type ReactNode, useEffect } from "react";
 import { match } from "ts-pattern";
 
@@ -335,33 +335,25 @@ const ItemDetailBodyTransition = ({
 }: {
 	readonly children: ReactNode;
 	readonly target: ItemDetailTarget;
-}) => {
-	const reducedMotion = useReducedMotion();
-	return (
-		<motion.div
-			key={`${target.kind}:${target.itemId}:${target.tab}`}
-			className="flex min-h-0 flex-1 flex-col"
-			data-ui="ItemDetailContentTransition"
-			data-tab={target.tab}
-			data-reduced-motion={reducedMotion ? "true" : "false"}
-			initial={
-				reducedMotion
-					? false
-					: {
-							opacity: 0,
-							y: 6,
-						}
-			}
-			animate={{
-				opacity: 1,
-				y: 0,
-			}}
-			transition={transition}
-		>
-			{children}
-		</motion.div>
-	);
-};
+}) => (
+	<motion.div
+		key={`${target.kind}:${target.itemId}:${target.tab}`}
+		className="flex min-h-0 flex-1 flex-col"
+		data-ui="ItemDetailContentTransition"
+		data-tab={target.tab}
+		initial={{
+			opacity: 0,
+			y: 6,
+		}}
+		animate={{
+			opacity: 1,
+			y: 0,
+		}}
+		transition={transition}
+	>
+		{children}
+	</motion.div>
+);
 
 const RuntimeItemDetailScene = ({
 	disabled,

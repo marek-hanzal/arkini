@@ -15,7 +15,7 @@ export namespace startPixiTileActorFadeInFx {
 	}
 }
 
-export const pixiTileActorFadeInDurationMs = 520;
+const pixiTileActorFadeInDurationMs = 520;
 
 /**
  * Reattaches one durable lifecycle intent to every surviving visual revision.

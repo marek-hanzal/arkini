@@ -9,7 +9,7 @@ export interface PixiAnimationSpring {
 	readonly setTargetFx: (value: number) => Effect.Effect<void>;
 }
 
-export interface PixiSpringOptions {
+interface PixiSpringOptions {
 	readonly damping: number;
 	readonly mass: number;
 	readonly restDelta: number;

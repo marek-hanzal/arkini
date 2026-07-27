@@ -3,14 +3,12 @@ import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~/engine/game/fx/useGameFx";
 import { storeInputMaterialFx } from "~/engine/input/write/storeInputMaterialFx";
-import { completeJobRuntimeFx } from "~/engine/job/fx/completeJobRuntimeFx";
 import { readPlannedLineNetMaximumOutputQuantitiesFx } from "~/engine/job/fx/read/readPlannedLineNetMaximumOutputQuantitiesFx";
 import { readReservedJobOutputQuantitiesFx } from "~/engine/job/fx/read/readReservedJobOutputQuantitiesFx";
 import { resolveLineStartFx } from "~/engine/job/fx/read/resolveLineStartFx";
 import { resolveOneHopLineOutputMaxCountFx } from "~/engine/job/fx/read/resolveOneHopLineOutputMaxCountFx";
 import { startLineFx } from "~/engine/job/write/startLineFx";
 import { readItemDetailLinesFx } from "~/engine/item-detail/read/readItemDetailLinesFx";
-import { placeDropFx } from "~/engine/placement/write/placeDropFx";
 import { fromStateFx } from "~/engine/runtime/fx/fromStateFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import { setItemQuantityFx } from "~/engine/runtime/write/setItemQuantityFx";
@@ -18,6 +16,8 @@ import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { fromRuntimeFx } from "~/engine/state/fx/fromRuntimeFx";
 import { runTickRuntimeByFx } from "~/engine/tick/fx/runTickRuntimeByFx";
+import { completeJobRuntimeForTestFx } from "~test/job/support/completeJobRuntimeForTestFx";
+import { placeDropForTestFx } from "~test/placement/support/placeDropForTestFx";
 
 const simpleItem = ({
 	id,
@@ -832,7 +832,7 @@ const sourceLine = (lineId: string) => {
 	return line;
 };
 
-describe("blueprint job completion", () => {
+describe("blueprint job completion transition", () => {
 	it("removes the depleted blueprint and places the first output at its freed cell", () => {
 		const result = run(
 			Effect.gen(function* () {
@@ -1101,7 +1101,7 @@ describe("blueprint job completion", () => {
 					ownerItemId: second.id,
 					lineId: "line:blueprint:plain",
 				}).pipe(Effect.result);
-				const placement = yield* placeDropFx({
+				const placement = yield* placeDropForTestFx({
 					originItemId: second.id,
 					drop: {
 						itemId: "item:target",
@@ -2077,7 +2077,7 @@ describe("blueprint job completion", () => {
 				});
 				const started = yield* readRuntimeFx();
 				const job = started.jobs[0];
-				return yield* completeJobRuntimeFx({
+				return yield* completeJobRuntimeForTestFx({
 					jobId: job.id,
 					runtime: {
 						...started,

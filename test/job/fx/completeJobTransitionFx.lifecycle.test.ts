@@ -222,7 +222,7 @@ const run = <A, E, R>(effect: Effect.Effect<A, E, R>) =>
 		) as Effect.Effect<A, E, never>,
 	);
 
-describe("charge-driven completion lifecycle", () => {
+describe("job completion charge lifecycle", () => {
 	it("removes a depleted producer and releases buffered input after placing output", () => {
 		const runtime = run(
 			Effect.gen(function* () {

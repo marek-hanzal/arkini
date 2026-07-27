@@ -14,7 +14,7 @@ export namespace startPixiTileActorRemovalFeedbackFx {
 }
 
 export const pixiTileActorRemovalFeedbackDurationMs = 260;
-export const pixiTileActorRemovalRestoreDurationMs = 160;
+const pixiTileActorRemovalRestoreDurationMs = 160;
 
 /**
  * Starts one interruptible optimistic exit without changing canonical actor ownership.

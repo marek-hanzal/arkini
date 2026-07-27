@@ -13,7 +13,7 @@ export namespace flashPixiTileActorConsumedSourceFx {
 }
 
 export const pixiTileActorConsumedSourceFadeDurationMs = 130;
-export const pixiTileActorConsumedSourceRestoreDurationMs = 360;
+const pixiTileActorConsumedSourceRestoreDurationMs = 360;
 const consumedSourceAlpha = 0.42;
 
 /**

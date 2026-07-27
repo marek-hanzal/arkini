@@ -461,46 +461,6 @@ describe("ItemDetailModal", () => {
 		});
 	});
 
-	it("swaps only the active body immediately under reduced motion", async () => {
-		motionTestRuntime.reducedMotion = true;
-		const { readControl } = await renderItemDetail();
-		const owner = currentRuntime.items.find((item) => item.item.id === "workshop");
-		if (owner === undefined) throw new Error("Missing Workshop runtime item.");
-
-		await act(async () => {
-			openItemDetail(readControl(), {
-				itemId: owner.id,
-				tab: "lines",
-			});
-			await Promise.resolve();
-			await Promise.resolve();
-		});
-		const modal = document.querySelector<HTMLElement>('[data-ui="ItemDetailModal"]');
-		const header = document.querySelector<HTMLElement>("header");
-		const tabs = document.querySelector<HTMLElement>('[data-ui="ItemDetailTabs"]');
-		const linesBody = document.querySelector<HTMLElement>(
-			'[data-ui="ItemDetailContentTransition"]',
-		);
-		expect(linesBody?.dataset.reducedMotion).toBe("true");
-
-		const infoTab = document.querySelector<HTMLButtonElement>('[data-tab="info"]');
-		if (infoTab === null) throw new Error("Missing Info tab.");
-		await act(async () => infoTab.click());
-
-		const infoBody = document.querySelector<HTMLElement>(
-			'[data-ui="ItemDetailContentTransition"]',
-		);
-		expect(document.querySelector('[data-ui="ItemDetailModal"]')).toBe(modal);
-		expect(document.querySelector("header")).toBe(header);
-		expect(document.querySelector('[data-ui="ItemDetailTabs"]')).toBe(tabs);
-		expect(infoBody).not.toBe(linesBody);
-		expect(infoBody?.dataset.reducedMotion).toBe("true");
-		expect(infoBody?.dataset.tab).toBe("info");
-		expect(document.querySelectorAll('[data-ui="ItemDetailContentTransition"]')).toHaveLength(
-			1,
-		);
-	});
-
 	it("keeps output recipes definition scoped even when a live item exists", async () => {
 		const { readControl } = await renderItemDetail();
 		const owner = currentRuntime.items.find((item) => item.item.id === "workshop");

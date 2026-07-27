@@ -1,5 +1,5 @@
 import { FileSystem } from "effect";
-import { Effect } from "effect";
+import { Effect, Semaphore } from "effect";
 import { join } from "node:path";
 import { clearGameSaveFx } from "./clearGameSaveFx";
 import type { GameSaveFiles } from "./GameSaveFiles";
@@ -21,29 +21,38 @@ export const createFilesystemGameSaveFilesFx = Effect.fn("createFilesystemGameSa
 	}: createFilesystemGameSaveFilesFx.Props) {
 		const fileSystem = providedFileSystem ?? (yield* FileSystem.FileSystem);
 		const root = join(userDataPath, "arkini", "saves");
+		// IPC callers cannot be required to share the renderer's autosave mutex.
+		// This repository therefore owns ordering around each shared pending/current namespace.
+		const operations = yield* Semaphore.make(1);
 		const readFx: GameSaveFiles["readFx"] = Effect.fn("FilesystemGameSaveFiles.readFx")((key) =>
-			readGameSaveFx({
-				root,
-				fileSystem,
-				key,
-			}),
+			operations.withPermits(1)(
+				readGameSaveFx({
+					root,
+					fileSystem,
+					key,
+				}),
+			),
 		);
 		const writeFx: GameSaveFiles["writeFx"] = Effect.fn("FilesystemGameSaveFiles.writeFx")(
 			(key, bytes) =>
-				writeGameSaveFx({
-					root,
-					fileSystem,
-					key,
-					bytes,
-				}),
+				operations.withPermits(1)(
+					writeGameSaveFx({
+						root,
+						fileSystem,
+						key,
+						bytes,
+					}),
+				),
 		);
 		const clearFx: GameSaveFiles["clearFx"] = Effect.fn("FilesystemGameSaveFiles.clearFx")(
 			(key) =>
-				clearGameSaveFx({
-					root,
-					fileSystem,
-					key,
-				}),
+				operations.withPermits(1)(
+					clearGameSaveFx({
+						root,
+						fileSystem,
+						key,
+					}),
+				),
 		);
 		return {
 			readFx,

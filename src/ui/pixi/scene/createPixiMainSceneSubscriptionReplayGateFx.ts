@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-export type PixiMainSceneTransitionDelivery = "hydrate" | "present";
+type PixiMainSceneTransitionDelivery = "hydrate" | "present";
 
 export interface PixiMainSceneSubscriptionReplayGate {
 	readonly classifyFx: (sequence: number) => Effect.Effect<PixiMainSceneTransitionDelivery>;

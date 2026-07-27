@@ -27,6 +27,7 @@
 				"id": "line:blueprint:paper-mill-t1:construct",
 				"title": "Construct Paper Mill I",
 				"description": "Consumes construction resources to build Paper Mill I.",
+				"default": true,
 				"runtimeMs": 34000,
 				"input": [
 					{

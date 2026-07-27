@@ -931,12 +931,12 @@ describe("ItemDetailModal", () => {
 		expect(document.querySelector('[data-ui="ItemSource"]')?.textContent).toContain("Space 1");
 		expect(document.querySelector('[data-ui="ItemSourceLine"]')).toBeNull();
 
-		const openLines = Array.from(document.querySelectorAll<HTMLButtonElement>("button")).find(
-			(button) => button.textContent === "Open Lines",
+		const sourceLink = document.querySelector<HTMLButtonElement>(
+			'[data-ui="ItemSourceDetailLink"]',
 		);
-		if (openLines === undefined) throw new Error("Missing Open Lines action.");
+		if (sourceLink === null) throw new Error("Missing clickable source.");
 		await act(async () => {
-			openLines.click();
+			sourceLink.click();
 			await Promise.resolve();
 		});
 
@@ -1000,7 +1000,7 @@ describe("ItemDetailModal", () => {
 		expect(readControl().readPendingAction("line:autofill")).toBeNull();
 	});
 
-	it("removes Sources live when the last exact Board source disappears", async () => {
+	it("keeps configured Sources discoverable when the last exact Board source disappears", async () => {
 		const { readControl } = await renderItemDetail();
 		const owner = currentRuntime.items.find((item) => item.item.id === "workshop");
 		const target = currentRuntime.items.find((item) => item.item.id === "water");
@@ -1030,18 +1030,21 @@ describe("ItemDetailModal", () => {
 		});
 
 		expect(document.querySelector('[data-ui="ItemDetailModal"]')).toBe(modal);
-		expect(modal.dataset.tab).toBe("info");
-		expect(document.querySelector('[data-ui="ItemSource"]')).toBeNull();
+		expect(modal.dataset.tab).toBe("sources");
+		expect(document.querySelector('[data-ui="ItemSource"]')?.textContent).toContain(
+			"Configured source",
+		);
 		expect(
 			Array.from(
 				document.querySelectorAll<HTMLElement>('[data-ui="ItemDetailTabs"] button'),
 			).map((tab) => tab.dataset.tab),
 		).toEqual([
+			"sources",
 			"info",
 		]);
 	});
 
-	it("falls back to Info when configured definition Sources disappear live", async () => {
+	it("keeps definition Sources independent of live ownership", async () => {
 		const { readControl } = await renderItemDetail();
 		const owner = currentRuntime.items.find((item) => item.item.id === "workshop");
 		if (owner === undefined) throw new Error("Missing source fixture.");
@@ -1072,9 +1075,11 @@ describe("ItemDetailModal", () => {
 
 		expect(document.querySelector('[data-ui="ItemDetailModal"]')).toBe(modal);
 		expect(modal.dataset.targetKind).toBe("definition");
-		expect(modal.dataset.tab).toBe("info");
-		expect(document.querySelector('[data-ui="ItemDefinitionInfoTab"]')).not.toBeNull();
-		expect(document.querySelector('[data-tab="sources"]')).toBeNull();
+		expect(modal.dataset.tab).toBe("sources");
+		expect(document.querySelector('[data-ui="ItemSource"]')?.textContent).toContain(
+			"Configured source",
+		);
+		expect(document.querySelector('[data-tab="sources"]')).not.toBeNull();
 	});
 
 	it("retains stale Sources content read-only when the inspected target disappears", async () => {
@@ -1104,10 +1109,10 @@ describe("ItemDetailModal", () => {
 		});
 
 		expect(document.querySelector('[data-ui="ItemSource"]')).not.toBeNull();
-		const openLines = Array.from(document.querySelectorAll<HTMLButtonElement>("button")).find(
-			(button) => button.textContent === "Open Lines",
+		const sourceLink = document.querySelector<HTMLButtonElement>(
+			'[data-ui="ItemSourceDetailLink"]',
 		);
-		expect(openLines?.disabled).toBe(true);
+		expect(sourceLink?.disabled).toBe(true);
 		expect(
 			document.querySelector<HTMLElement>('[data-ui="ItemDetailContentScene"]')?.dataset
 				.stale,

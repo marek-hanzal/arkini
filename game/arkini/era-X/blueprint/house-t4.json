@@ -27,6 +27,7 @@
 				"id": "line:blueprint:house-t4:construct",
 				"title": "Construct House IV",
 				"description": "Consumes construction resources to build House IV.",
+				"default": true,
 				"runtimeMs": 65000,
 				"input": [
 					{

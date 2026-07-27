@@ -25,6 +25,7 @@
 				"id": "line:blueprint:winery-t1:construct",
 				"title": "Construct Winery I",
 				"description": "Consumes construction resources to build Winery I.",
+				"default": true,
 				"runtimeMs": 28000,
 				"input": [
 					{

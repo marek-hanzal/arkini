@@ -38,19 +38,20 @@ const readDisabledConditionPhrase = (condition: ItemDetailLines.DisabledConditio
 			{
 				kind: "exists",
 			},
-			({ selector }) => selector.label,
+			({ locationLabel, selector }) => `${selector.label} (${locationLabel})`,
 		)
 		.with(
 			{
 				kind: "count",
 			},
-			({ count, selector }) => `${count} ${selector.label}`,
+			({ count, locationLabel, selector }) => `${count} ${selector.label} (${locationLabel})`,
 		)
 		.with(
 			{
 				kind: "range",
 			},
-			({ max, min, selector }) => `${min}-${max} ${selector.label}`,
+			({ locationLabel, max, min, selector }) =>
+				`${min}-${max} ${selector.label} (${locationLabel})`,
 		)
 		.exhaustive();
 
@@ -77,9 +78,43 @@ const readEnableConditionMarkup = (condition: ItemDetailLines.DisabledCondition)
 				({ max, min }) => `Requires ${min}-${max} `,
 			)
 			.exhaustive(),
-		messageAfterDetail: ".",
+		messageAfterDetail: ` · ${condition.locationLabel}.`,
 	};
 };
+
+const readQueryLocationLabel = (query: WhenSchema.Type["query"]) =>
+	match(query)
+		.with(
+			{
+				scope: "board",
+			},
+			({ distance }) => `Board · ${distance}`,
+		)
+		.with(
+			{
+				scope: "inventory",
+			},
+			() => "Inventory",
+		)
+		.with(
+			{
+				scope: "toolbar",
+			},
+			() => "Toolbar",
+		)
+		.with(
+			{
+				scope: "any",
+			},
+			() => "Board, inventory or toolbar",
+		)
+		.with(
+			{
+				scope: "universe",
+			},
+			() => "Anywhere",
+		)
+		.exhaustive();
 
 const readMaxCountMessageAfterTitle = ({
 	liveQuantity,
@@ -105,6 +140,7 @@ const projectDisabledConditionFx = Effect.fn("projectDisabledConditionFx")(funct
 		game,
 		selector: when.query.selector,
 	});
+	const locationLabel = readQueryLocationLabel(when.query);
 	const detail =
 		when.query.selector.type === "item"
 			? yield* projectItemDetailReferenceFx({
@@ -121,6 +157,7 @@ const projectDisabledConditionFx = Effect.fn("projectDisabledConditionFx")(funct
 			() => ({
 				condition: {
 					kind: "exists",
+					locationLabel,
 					selector,
 					...(detail === undefined
 						? {}
@@ -138,6 +175,7 @@ const projectDisabledConditionFx = Effect.fn("projectDisabledConditionFx")(funct
 			({ count }) => ({
 				condition: {
 					kind: "count",
+					locationLabel,
 					selector,
 					count,
 					...(detail === undefined
@@ -156,6 +194,7 @@ const projectDisabledConditionFx = Effect.fn("projectDisabledConditionFx")(funct
 			({ max, min }) => ({
 				condition: {
 					kind: "range",
+					locationLabel,
 					selector,
 					min,
 					max,

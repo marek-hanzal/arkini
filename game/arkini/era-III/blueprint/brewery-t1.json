@@ -25,6 +25,7 @@
 				"id": "line:blueprint:brewery-t1:construct",
 				"title": "Construct Brewery I",
 				"description": "Consumes construction resources to build Brewery I.",
+				"default": true,
 				"runtimeMs": 26000,
 				"input": [
 					{

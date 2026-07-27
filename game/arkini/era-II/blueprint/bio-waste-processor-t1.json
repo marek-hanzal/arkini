@@ -28,6 +28,7 @@
 				"id": "line:blueprint:bio-waste-processor-t1:construct",
 				"title": "Construct Bio-Waste Processor I",
 				"description": "Consumes construction resources to build Bio-Waste Processor I.",
+				"default": true,
 				"runtimeMs": 34000,
 				"input": [
 					{

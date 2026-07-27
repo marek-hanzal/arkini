@@ -69,6 +69,7 @@ export const useItemLineSearch = (
 	);
 	return {
 		availabilityFilter,
+		availableLineCount,
 		setAvailabilityFilter,
 		query,
 		setQuery,

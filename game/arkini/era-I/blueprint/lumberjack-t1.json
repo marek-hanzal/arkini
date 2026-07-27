@@ -25,6 +25,7 @@
 				"id": "line:blueprint:lumberjack-t1:construct",
 				"title": "Construct Lumberjack I",
 				"description": "Consumes construction resources to build Lumberjack I.",
+				"default": true,
 				"runtimeMs": 8000,
 				"input": [
 					{

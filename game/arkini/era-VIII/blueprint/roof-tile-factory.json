@@ -28,6 +28,7 @@
 				"id": "line:blueprint:roof-tile-factory:construct",
 				"title": "Construct Roof Tile Factory",
 				"description": "Consumes construction resources to build Roof Tile Factory.",
+				"default": true,
 				"runtimeMs": 48000,
 				"input": [
 					{

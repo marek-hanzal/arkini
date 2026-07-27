@@ -28,6 +28,7 @@
 				"id": "line:blueprint:brickyard:construct",
 				"title": "Construct Brickyard",
 				"description": "Consumes construction resources to build Brickyard.",
+				"default": true,
 				"runtimeMs": 48000,
 				"input": [
 					{

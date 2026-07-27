@@ -25,6 +25,7 @@
 				"id": "line:blueprint:cattle-farm-t1:construct",
 				"title": "Construct Cattle Farm I",
 				"description": "Consumes construction resources to build Cattle Farm I.",
+				"default": true,
 				"runtimeMs": 22000,
 				"input": [
 					{

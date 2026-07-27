@@ -25,6 +25,7 @@
 				"id": "line:blueprint:bakery-t1:construct",
 				"title": "Construct Bakery I",
 				"description": "Consumes construction resources to build Bakery I.",
+				"default": true,
 				"runtimeMs": 24000,
 				"input": [
 					{

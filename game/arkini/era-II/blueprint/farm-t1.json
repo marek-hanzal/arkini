@@ -25,6 +25,7 @@
 				"id": "line:blueprint:farm-t1:construct",
 				"title": "Construct Farm I",
 				"description": "Consumes construction resources to build Farm I.",
+				"default": true,
 				"runtimeMs": 14000,
 				"input": [
 					{

@@ -27,6 +27,7 @@
 				"id": "line:blueprint:tannery-t1:construct",
 				"title": "Construct Tannery I",
 				"description": "Consumes construction resources to build Tannery I.",
+				"default": true,
 				"runtimeMs": 38000,
 				"input": [
 					{

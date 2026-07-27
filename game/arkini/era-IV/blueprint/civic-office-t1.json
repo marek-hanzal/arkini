@@ -27,6 +27,7 @@
 				"id": "line:blueprint:civic-office-t1:construct",
 				"title": "Construct Civic Office I",
 				"description": "Consumes construction resources to build Civic Office I.",
+				"default": true,
 				"runtimeMs": 36000,
 				"input": [
 					{

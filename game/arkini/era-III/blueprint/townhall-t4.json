@@ -25,6 +25,7 @@
 				"id": "line:blueprint:townhall-t4:construct",
 				"title": "Construct Town Hall IV",
 				"description": "Consumes construction resources to build Town Hall IV.",
+				"default": true,
 				"runtimeMs": 60000,
 				"input": [
 					{

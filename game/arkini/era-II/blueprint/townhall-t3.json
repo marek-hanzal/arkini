@@ -25,6 +25,7 @@
 				"id": "line:blueprint:townhall-t3:construct",
 				"title": "Construct Town Hall III",
 				"description": "Consumes construction resources to build Town Hall III.",
+				"default": true,
 				"runtimeMs": 45000,
 				"input": [
 					{

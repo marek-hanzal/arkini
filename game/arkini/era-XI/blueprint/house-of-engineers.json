@@ -28,6 +28,7 @@
 				"id": "line:blueprint:house-of-engineers:construct",
 				"title": "Construct House of Engineers",
 				"description": "Consumes construction resources to build House of Engineers.",
+				"default": true,
 				"runtimeMs": 140000,
 				"input": [
 					{

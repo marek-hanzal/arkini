@@ -25,6 +25,7 @@
 				"id": "line:blueprint:gold-mine-t1:construct",
 				"title": "Construct Gold Mine I",
 				"description": "Consumes construction resources to build Gold Mine I.",
+				"default": true,
 				"runtimeMs": 70000,
 				"input": [
 					{

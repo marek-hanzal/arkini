@@ -27,6 +27,7 @@
 				"id": "line:blueprint:tailor-workshop-t1:construct",
 				"title": "Construct Tailor Workshop I",
 				"description": "Consumes construction resources to build Tailor Workshop I.",
+				"default": true,
 				"runtimeMs": 42000,
 				"input": [
 					{

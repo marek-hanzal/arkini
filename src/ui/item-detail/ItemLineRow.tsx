@@ -17,44 +17,10 @@ import { useItemDetailControl } from "~/ui/item-detail/useItemDetailControl";
 import { readSettledAsyncResultError } from "~/ui/reactivity/readSettledAsyncResultError";
 
 const ItemLineUnavailableReason = ({
-	disabled,
 	reason,
 }: {
-	readonly disabled: boolean;
 	readonly reason: ItemDetailLines.DisabledReason;
 }) => {
-	const dependency =
-		reason.kind === "deposit-target-missing"
-			? reason.detail
-			: reason.kind === "line-disabled" && reason.cause.kind === "enable-rule"
-				? reason.cause.condition.detail
-				: undefined;
-	const fragments =
-		"messageBeforeDetail" in reason &&
-		reason.messageBeforeDetail !== undefined &&
-		reason.messageAfterDetail !== undefined
-			? {
-					after: reason.messageAfterDetail,
-					before: reason.messageBeforeDetail,
-				}
-			: undefined;
-	if (dependency !== undefined && fragments !== undefined) {
-		return (
-			<div className="flex min-w-0 items-center">
-				<span className="whitespace-pre">{fragments.before}</span>
-				<ItemReferenceButton
-					compositeUrl={dependency.compositeUrl}
-					dataUi="TileLineUnavailableDependencyLink"
-					definitionItemId={dependency.itemId}
-					disabled={disabled}
-					label={dependency.title}
-					runtimeItemId={dependency.detailItemId}
-					sourceUrl={dependency.sourceUrl}
-				/>
-				<span className="whitespace-pre">{fragments.after}</span>
-			</div>
-		);
-	}
 	return match(reason)
 		.with(
 			{
@@ -84,6 +50,77 @@ const ItemLineUnavailableReason = ({
 		)
 		.exhaustive();
 };
+
+const readUnavailableDependency = (reason: ItemDetailLines.DisabledReason) => {
+	if (reason.kind === "deposit-target-missing") {
+		return reason.detail === undefined
+			? undefined
+			: {
+					detail: reason.detail,
+					status: `Required · None available (Board · ${reason.distance})`,
+				};
+	}
+	if (reason.kind !== "line-disabled" || reason.cause.kind !== "enable-rule") {
+		return undefined;
+	}
+	const detail = reason.cause.condition.detail;
+	return detail === undefined
+		? undefined
+		: {
+				detail,
+				status: match(reason.cause.condition)
+					.with(
+						{
+							kind: "exists",
+						},
+						({ locationLabel }) => `Required · ${locationLabel}`,
+					)
+					.with(
+						{
+							kind: "count",
+						},
+						({ count, locationLabel }) => `Required ${count} · ${locationLabel}`,
+					)
+					.with(
+						{
+							kind: "range",
+						},
+						({ locationLabel, max, min }) =>
+							`Required ${min}-${max} · ${locationLabel}`,
+					)
+					.exhaustive(),
+			};
+};
+
+const ItemLineUnavailableDependency = ({
+	dependency,
+	disabled,
+}: {
+	readonly dependency: NonNullable<ReturnType<typeof readUnavailableDependency>>;
+	readonly disabled: boolean;
+}) => (
+	<div
+		className="mt-4 flex min-w-0 flex-wrap items-center gap-x-3 gap-y-2 text-sm text-muted"
+		data-ui="TileLineUnavailableReason"
+	>
+		<ItemReferenceButton
+			compositeUrl={dependency.detail.compositeUrl}
+			dataUi="TileLineUnavailableDependencyLink"
+			definitionItemId={dependency.detail.itemId}
+			disabled={disabled}
+			label={dependency.detail.title}
+			runtimeItemId={dependency.detail.detailItemId}
+			sourceUrl={dependency.detail.sourceUrl}
+		/>
+		<span className="flex items-center gap-1.5">
+			{dependency.status}
+			<span
+				className="icon-[lucide--circle-alert] size-4 shrink-0 text-warning"
+				aria-hidden="true"
+			/>
+		</span>
+	</div>
+);
 
 /** Renders one live product line with its commands, runtime, inputs, and outputs. */
 export const ItemLineRow = ({
@@ -145,6 +182,10 @@ export const ItemLineRow = ({
 			.map((key) => itemDetail.readActionError(key))
 			.find((message) => message !== null) ?? null;
 	const unavailable = line.availability.kind === "unavailable";
+	const unavailableDependency =
+		line.availability.kind === "unavailable"
+			? readUnavailableDependency(line.availability.reason)
+			: undefined;
 
 	return (
 		<article
@@ -154,7 +195,15 @@ export const ItemLineRow = ({
 			data-active={line.activeJob === undefined ? "false" : "true"}
 		>
 			<div className="flex flex-wrap items-start justify-between gap-4">
-				<ItemLineSummary line={line} />
+				<div className="min-w-0 flex-1">
+					<ItemLineSummary line={line} />
+					{unavailableDependency === undefined ? null : (
+						<ItemLineUnavailableDependency
+							dependency={unavailableDependency}
+							disabled={disabled}
+						/>
+					)}
+				</div>
 				<div className="flex shrink-0 flex-col items-end gap-3">
 					<ItemLineRuntime line={line} />
 					<div className="flex flex-wrap justify-end gap-2">
@@ -240,7 +289,7 @@ export const ItemLineRow = ({
 					{error}
 				</p>
 			)}
-			{line.availability.kind === "unavailable" ? (
+			{line.availability.kind === "unavailable" && unavailableDependency === undefined ? (
 				<div
 					className="mt-4 flex items-center gap-3 border-t border-line pt-4 text-sm text-muted"
 					data-ui="TileLineUnavailableReason"
@@ -249,10 +298,7 @@ export const ItemLineRow = ({
 						className="icon-[lucide--circle-alert] size-5 shrink-0 text-warning"
 						aria-hidden="true"
 					/>
-					<ItemLineUnavailableReason
-						disabled={disabled}
-						reason={line.availability.reason}
-					/>
+					<ItemLineUnavailableReason reason={line.availability.reason} />
 					<ItemLineUnavailableWithdrawals
 						disabled={disabled}
 						input={line.input}
@@ -260,6 +306,13 @@ export const ItemLineRow = ({
 						ownerItemId={ownerItemId}
 					/>
 				</div>
+			) : line.availability.kind === "unavailable" ? (
+				<ItemLineUnavailableWithdrawals
+					disabled={disabled}
+					input={line.input}
+					lineId={line.lineId}
+					ownerItemId={ownerItemId}
+				/>
 			) : (
 				<div className="mt-4 grid min-w-0 grid-cols-[minmax(0,1fr)_2rem_minmax(0,1fr)] gap-x-4">
 					<ItemLineInputs

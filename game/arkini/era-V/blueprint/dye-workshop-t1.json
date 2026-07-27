@@ -27,6 +27,7 @@
 				"id": "line:blueprint:dye-workshop-t1:construct",
 				"title": "Construct Dye Workshop I",
 				"description": "Consumes construction resources to build Dye Workshop I.",
+				"default": true,
 				"runtimeMs": 40000,
 				"input": [
 					{

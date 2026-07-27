@@ -27,6 +27,7 @@
 				"id": "line:blueprint:heroes-guild-t1:construct",
 				"title": "Construct Heroes Guild I",
 				"description": "Consumes construction resources to build Heroes Guild I.",
+				"default": true,
 				"runtimeMs": 95000,
 				"input": [
 					{

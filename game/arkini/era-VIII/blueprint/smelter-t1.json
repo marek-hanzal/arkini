@@ -26,6 +26,7 @@
 				"id": "line:blueprint:smelter-t1:construct",
 				"title": "Construct Smelter I",
 				"description": "Consumes construction resources to build Smelter I.",
+				"default": true,
 				"runtimeMs": 65000,
 				"input": [
 					{

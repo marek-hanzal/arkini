@@ -25,6 +25,7 @@
 				"id": "line:blueprint:slaughterhouse-t1:construct",
 				"title": "Construct Slaughterhouse I",
 				"description": "Consumes construction resources to build Slaughterhouse I.",
+				"default": true,
 				"runtimeMs": 24000,
 				"input": [
 					{

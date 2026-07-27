@@ -25,6 +25,7 @@
 				"id": "line:blueprint:coal-mine-t1:construct",
 				"title": "Construct Coal Mine I",
 				"description": "Consumes construction resources to build Coal Mine I.",
+				"default": true,
 				"runtimeMs": 58000,
 				"input": [
 					{

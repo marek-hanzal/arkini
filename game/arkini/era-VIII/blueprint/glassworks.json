@@ -28,6 +28,7 @@
 				"id": "line:blueprint:glassworks:construct",
 				"title": "Construct Glassworks",
 				"description": "Consumes construction resources to build Glassworks.",
+				"default": true,
 				"runtimeMs": 55000,
 				"input": [
 					{

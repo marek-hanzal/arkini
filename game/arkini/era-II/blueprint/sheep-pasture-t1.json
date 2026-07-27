@@ -25,6 +25,7 @@
 				"id": "line:blueprint:sheep-pasture-t1:construct",
 				"title": "Construct Sheep Pasture I",
 				"description": "Consumes construction resources to build Sheep Pasture I.",
+				"default": true,
 				"runtimeMs": 22000,
 				"input": [
 					{

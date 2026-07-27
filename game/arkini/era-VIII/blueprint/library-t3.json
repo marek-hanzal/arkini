@@ -27,6 +27,7 @@
 				"id": "line:blueprint:library-t3:construct",
 				"title": "Construct Library III",
 				"description": "Consumes construction resources to build Library III.",
+				"default": true,
 				"runtimeMs": 48000,
 				"input": [
 					{

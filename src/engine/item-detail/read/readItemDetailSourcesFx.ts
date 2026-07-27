@@ -2,6 +2,7 @@ import { Effect, Option } from "effect";
 import { match } from "ts-pattern";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
+import { GameConfigFx } from "~/engine/game/context/GameConfigFx";
 import { resolveItemFx } from "~/engine/item/fx/resolveItemFx";
 import { RuntimeFx } from "~/engine/runtime/context/RuntimeFx";
 import { lineRulesFx } from "~/engine/line/fx/lineRulesFx";
@@ -66,9 +67,9 @@ export namespace readItemDetailSourcesFx {
 	}
 
 	export interface Source {
-		readonly ownerItemId: IdSchema.Type;
+		readonly ownerItemId?: IdSchema.Type;
 		readonly ownerDefinitionItemId: IdSchema.Type;
-		readonly space: number;
+		readonly space?: number;
 		readonly line: readonly Line[];
 	}
 
@@ -225,11 +226,12 @@ interface OrderedSource extends readItemDetailSourcesFx.Source {
 	readonly ownerTitle: string;
 }
 
-/** Finds exact owned Board line owners that visibly produce the inspected canonical item. */
+/** Finds live and configured one-hop line owners that produce the inspected canonical item. */
 export const readItemDetailSourcesFx = Effect.fn("readItemDetailSourcesFx")(function* ({
 	runtime,
 	target,
 }: readItemDetailSourcesFx.Props) {
+	const config = yield* GameConfigFx;
 	const targetItem =
 		target.kind === "runtime"
 			? runtime.items.find((candidate) => candidate.id === target.itemId)
@@ -299,7 +301,44 @@ export const readItemDetailSourcesFx = Effect.fn("readItemDetailSourcesFx")(func
 		});
 	}
 
+	const liveDefinitionItemIds = new Set(
+		source.map(({ ownerDefinitionItemId }) => ownerDefinitionItemId),
+	);
+	for (const configuredOwner of Object.values(config.items)) {
+		if (liveDefinitionItemIds.has(configuredOwner.id)) continue;
+		const ownerItem = Option.getOrUndefined(yield* isLineOwnerItemFx(configuredOwner));
+		if (ownerItem === undefined) continue;
+		const matchingLines: readItemDetailSourcesFx.Line[] = [];
+		for (const line of yield* readLineOwnerLinesFx(ownerItem)) {
+			const output = readMatchingFacts({
+				output: line.output,
+				targetDefinitionItemId,
+			});
+			if (output.length === 0) continue;
+			matchingLines.push({
+				lineId: line.id,
+				title: line.title,
+				output,
+			});
+		}
+		if (matchingLines.length === 0) continue;
+		source.push({
+			ownerDefinitionItemId: configuredOwner.id,
+			ownerTitle: configuredOwner.title,
+			line: matchingLines,
+		});
+	}
+
 	source.sort((left, right) => {
+		const leftLive = left.ownerItemId !== undefined && left.space !== undefined;
+		const rightLive = right.ownerItemId !== undefined && right.space !== undefined;
+		if (leftLive !== rightLive) return leftLive ? -1 : 1;
+		if (!leftLive || !rightLive) {
+			const titleOrder = left.ownerTitle.localeCompare(right.ownerTitle);
+			return titleOrder === 0
+				? left.ownerDefinitionItemId.localeCompare(right.ownerDefinitionItemId)
+				: titleOrder;
+		}
 		const leftCurrent = left.space === runtime.currentSpace;
 		const rightCurrent = right.space === runtime.currentSpace;
 		if (leftCurrent !== rightCurrent) return leftCurrent ? -1 : 1;

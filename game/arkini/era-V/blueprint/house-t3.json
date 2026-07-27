@@ -27,6 +27,7 @@
 				"id": "line:blueprint:house-t3:construct",
 				"title": "Construct House III",
 				"description": "Consumes construction resources to build House III.",
+				"default": true,
 				"runtimeMs": 36000,
 				"input": [
 					{

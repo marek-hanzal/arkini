@@ -27,6 +27,7 @@
 				"id": "line:blueprint:weaver-hut-t1:construct",
 				"title": "Construct Weaver Hut I",
 				"description": "Consumes construction resources to build Weaver Hut I.",
+				"default": true,
 				"runtimeMs": 36000,
 				"input": [
 					{

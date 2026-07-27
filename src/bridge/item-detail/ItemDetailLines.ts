@@ -79,25 +79,27 @@ export namespace ItemDetailLines {
 	export type OutputRoll = ItemDetailOutputRoll<OutputItem>;
 	export type OutputSet = ItemDetailOutputSet<OutputItem>;
 
-	export type DisabledCondition =
-		| {
-				readonly kind: "exists";
-				readonly selector: Selector;
-				readonly detail?: DetailReference;
-		  }
-		| {
-				readonly kind: "count";
-				readonly selector: Selector;
-				readonly count: number;
-				readonly detail?: DetailReference;
-		  }
-		| {
-				readonly kind: "range";
-				readonly selector: Selector;
-				readonly min: number;
-				readonly max: number;
-				readonly detail?: DetailReference;
-		  };
+	interface DisabledConditionContext {
+		readonly selector: Selector;
+		readonly locationLabel: string;
+		readonly detail?: DetailReference;
+	}
+
+	export type DisabledCondition = DisabledConditionContext &
+		(
+			| {
+					readonly kind: "exists";
+			  }
+			| {
+					readonly kind: "count";
+					readonly count: number;
+			  }
+			| {
+					readonly kind: "range";
+					readonly min: number;
+					readonly max: number;
+			  }
+		);
 
 	export type DisabledReason =
 		| {

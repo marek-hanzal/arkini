@@ -25,6 +25,7 @@
 				"id": "line:blueprint:quarry-t1:construct",
 				"title": "Construct Quarry I",
 				"description": "Consumes construction resources to build Quarry I.",
+				"default": true,
 				"runtimeMs": 9000,
 				"input": [
 					{

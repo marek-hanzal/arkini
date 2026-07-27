@@ -28,6 +28,7 @@
 				"id": "line:blueprint:prospector-guild-t1:construct",
 				"title": "Construct Prospector Guild",
 				"description": "Consumes construction resources to build Prospector Guild.",
+				"default": true,
 				"runtimeMs": 38000,
 				"input": [
 					{

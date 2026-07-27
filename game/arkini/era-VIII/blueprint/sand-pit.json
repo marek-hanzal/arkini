@@ -29,6 +29,7 @@
 				"id": "line:blueprint:sand-pit:construct",
 				"title": "Construct Sand Pit",
 				"description": "Consumes construction resources to build Sand Pit.",
+				"default": true,
 				"runtimeMs": 42000,
 				"input": [
 					{

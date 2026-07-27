@@ -25,6 +25,7 @@
 				"id": "line:blueprint:tavern-t1:construct",
 				"title": "Construct Tavern I",
 				"description": "Consumes construction resources to build Tavern I.",
+				"default": true,
 				"runtimeMs": 28000,
 				"input": [
 					{

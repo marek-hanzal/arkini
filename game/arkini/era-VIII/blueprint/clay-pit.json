@@ -28,6 +28,7 @@
 				"id": "line:blueprint:clay-pit:construct",
 				"title": "Construct Clay Pit",
 				"description": "Consumes construction resources to build Clay Pit.",
+				"default": true,
 				"runtimeMs": 42000,
 				"input": [
 					{

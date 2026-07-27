@@ -27,6 +27,7 @@
 				"id": "line:blueprint:library-t2:construct",
 				"title": "Construct Library II",
 				"description": "Consumes construction resources to build Library II.",
+				"default": true,
 				"runtimeMs": 38000,
 				"input": [
 					{

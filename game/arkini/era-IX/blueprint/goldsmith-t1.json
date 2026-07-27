@@ -25,6 +25,7 @@
 				"id": "line:blueprint:goldsmith-t1:construct",
 				"title": "Construct Goldsmith I",
 				"description": "Consumes construction resources to build Goldsmith I.",
+				"default": true,
 				"runtimeMs": 72000,
 				"input": [
 					{

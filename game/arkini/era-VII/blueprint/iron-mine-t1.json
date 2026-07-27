@@ -25,6 +25,7 @@
 				"id": "line:blueprint:iron-mine-t1:construct",
 				"title": "Construct Iron Mine I",
 				"description": "Consumes construction resources to build Iron Mine I.",
+				"default": true,
 				"runtimeMs": 62000,
 				"input": [
 					{

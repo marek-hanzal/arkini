@@ -25,6 +25,7 @@
 				"id": "line:blueprint:cookhouse-t1:construct",
 				"title": "Construct Cookhouse I",
 				"description": "Consumes construction resources to build Cookhouse I.",
+				"default": true,
 				"runtimeMs": 30000,
 				"input": [
 					{

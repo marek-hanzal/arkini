@@ -26,6 +26,7 @@
 				"id": "line:blueprint:school:construct",
 				"title": "Construct School",
 				"description": "Consumes construction resources to build School.",
+				"default": true,
 				"runtimeMs": 32000,
 				"input": [
 					{

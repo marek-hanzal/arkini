@@ -26,6 +26,7 @@
 				"id": "line:blueprint:construction-yard-t1:construct",
 				"title": "Construct Construction Yard I",
 				"description": "Consumes construction resources to build Construction Yard I.",
+				"default": true,
 				"runtimeMs": 70000,
 				"input": [
 					{

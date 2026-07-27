@@ -25,6 +25,7 @@
 				"id": "line:blueprint:vegetable-garden-t1:construct",
 				"title": "Construct Vegetable Garden I",
 				"description": "Consumes construction resources to build Vegetable Garden I.",
+				"default": true,
 				"runtimeMs": 16000,
 				"input": [
 					{

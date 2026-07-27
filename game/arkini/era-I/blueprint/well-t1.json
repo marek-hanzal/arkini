@@ -25,6 +25,7 @@
 				"id": "line:blueprint:well-t1:construct",
 				"title": "Construct Well I",
 				"description": "Consumes construction resources to build Well I.",
+				"default": true,
 				"runtimeMs": 9000,
 				"input": [
 					{

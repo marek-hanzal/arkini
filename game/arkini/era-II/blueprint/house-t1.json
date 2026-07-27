@@ -27,6 +27,7 @@
 				"id": "line:blueprint:house-t1:construct",
 				"title": "Construct House I",
 				"description": "Consumes construction resources to build House I.",
+				"default": true,
 				"runtimeMs": 18000,
 				"input": [
 					{

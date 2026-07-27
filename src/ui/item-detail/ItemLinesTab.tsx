@@ -60,6 +60,7 @@ export const ItemLinesTab = ({
 }) => {
 	const {
 		availabilityFilter,
+		availableLineCount,
 		filteredLines,
 		normalizedQuery,
 		query,
@@ -95,21 +96,27 @@ export const ItemLinesTab = ({
 					>
 						{availabilityOptions.map((option) => {
 							const selected = availabilityFilter === option.value;
+							const optionDisabled =
+								option.value === "available" && availableLineCount === 0;
 							return (
 								<label
 									key={option.value}
-									className={`relative cursor-pointer rounded-md px-3 py-1.5 text-center text-xs font-semibold transition-colors focus-within:ring-2 focus-within:ring-accent/60 ${
-										selected
-											? "bg-accent text-accent-contrast hover:bg-accent-hover"
-											: "text-muted hover:bg-surface"
+									className={`relative rounded-md px-3 py-1.5 text-center text-xs font-semibold transition-colors focus-within:ring-2 focus-within:ring-accent/60 ${
+										optionDisabled
+											? "cursor-not-allowed text-muted opacity-50"
+											: selected
+												? "bg-accent text-accent-contrast hover:bg-accent-hover"
+												: "cursor-pointer text-muted hover:bg-surface"
 									}`}
 									data-selected={selected ? "true" : "false"}
+									data-disabled={optionDisabled ? "true" : "false"}
 								>
 									<input
 										type="radio"
 										name="item-lines-availability"
 										value={option.value}
 										checked={selected}
+										disabled={optionDisabled}
 										className="sr-only"
 										onChange={() => setAvailabilityFilter(option.value)}
 									/>

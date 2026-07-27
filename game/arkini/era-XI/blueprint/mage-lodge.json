@@ -29,6 +29,7 @@
 				"id": "line:blueprint:mage-lodge:construct",
 				"title": "Construct Mage Lodge",
 				"description": "Consumes construction resources to build Mage Lodge.",
+				"default": true,
 				"runtimeMs": 145000,
 				"input": [
 					{

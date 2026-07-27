@@ -26,6 +26,7 @@
 				"id": "line:blueprint:blacksmith-t1:construct",
 				"title": "Construct Blacksmith I",
 				"description": "Consumes construction resources to build Blacksmith I.",
+				"default": true,
 				"runtimeMs": 65000,
 				"input": [
 					{

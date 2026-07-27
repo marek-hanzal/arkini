@@ -25,6 +25,7 @@
 				"id": "line:blueprint:stonemason-t1:construct",
 				"title": "Construct Stonemason I",
 				"description": "Consumes construction resources to build Stonemason I.",
+				"default": true,
 				"runtimeMs": 12000,
 				"input": [
 					{

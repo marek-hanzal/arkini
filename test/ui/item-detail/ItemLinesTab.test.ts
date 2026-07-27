@@ -556,12 +556,17 @@ describe("ItemLinesTab", () => {
 
 		await rerender(unavailableProjection);
 		expect(available()?.checked).toBe(false);
+		expect(available()?.disabled).toBe(true);
+		expect(available()?.closest("label")?.className).toContain("cursor-not-allowed");
+		expect(available()?.closest("label")?.dataset.disabled).toBe("true");
 		expect(all()?.checked).toBe(true);
 		expect(container.querySelector('[data-ui="ItemLinesAvailableEmpty"]')).toBeNull();
 		expect(container.querySelectorAll('[data-ui="TileLine"]')).toHaveLength(1);
 
 		await rerender(projection);
 		expect(available()?.checked).toBe(false);
+		expect(available()?.disabled).toBe(false);
+		expect(available()?.closest("label")?.className).toContain("cursor-pointer");
 		expect(all()?.checked).toBe(true);
 		expect(container.querySelectorAll('[data-ui="TileLine"]')).toHaveLength(2);
 
@@ -585,6 +590,11 @@ describe("ItemLinesTab", () => {
 				'input[name="item-lines-availability"][value="available"]',
 			)?.checked,
 		).toBe(false);
+		expect(
+			container.querySelector<HTMLInputElement>(
+				'input[name="item-lines-availability"][value="available"]',
+			)?.disabled,
+		).toBe(true);
 		expect(
 			container.querySelector<HTMLInputElement>(
 				'input[name="item-lines-availability"][value="all"]',
@@ -921,8 +931,9 @@ describe("ItemLinesTab", () => {
 
 		expect(document.querySelector('[data-input-kind="deposit"]')).toBeNull();
 		const reason = document.querySelector('[data-ui="TileLineUnavailableReason"]');
-		expect(reason?.textContent).toBe("Requires Tree · None available (Board · close).");
+		expect(reason?.textContent).toBe("TreeRequired · None available (Board · close)");
 		expect(reason?.textContent).not.toContain("1 / None available");
+		expect(reason?.className).not.toContain("border-t");
 		const link = reason?.querySelector<HTMLButtonElement>(
 			'[data-ui="TileLineUnavailableDependencyLink"]',
 		);
@@ -946,6 +957,7 @@ describe("ItemLinesTab", () => {
 						whenIndex: 0,
 						condition: {
 							kind: "exists",
+							locationLabel: "Board · close",
 							selector: {
 								kind: "item",
 								label: "Stonemason I",
@@ -959,8 +971,8 @@ describe("ItemLinesTab", () => {
 						},
 					},
 					messageBeforeDetail: "Requires ",
-					messageAfterDetail: ".",
-					message: "Requires Stonemason I.",
+					messageAfterDetail: " · Board · close.",
+					message: "Requires Stonemason I (Board · close).",
 				},
 			},
 			actions: {
@@ -981,9 +993,9 @@ describe("ItemLinesTab", () => {
 
 		expect(link?.textContent).toContain("Stonemason I");
 		expect(link?.querySelector("img")?.getAttribute("src")).toBe("resource:stonemason");
-		expect(document.querySelector('[data-ui="TileLineUnavailableReason"]')?.textContent).toBe(
-			"Requires Stonemason I.",
-		);
+		const reason = document.querySelector('[data-ui="TileLineUnavailableReason"]');
+		expect(reason?.textContent).toBe("Stonemason IRequired · Board · close");
+		expect(reason?.className).not.toContain("border-t");
 		await act(async () => link?.click());
 		expect(control.openItemDetailFx).toHaveBeenCalledWith({
 			itemId: "runtime:stonemason",

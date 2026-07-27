@@ -28,6 +28,7 @@
 				"id": "line:blueprint:cathedral:construct",
 				"title": "Construct Cathedral",
 				"description": "Consumes construction resources to build Cathedral.",
+				"default": true,
 				"runtimeMs": 150000,
 				"input": [
 					{

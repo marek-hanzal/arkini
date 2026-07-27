@@ -27,6 +27,7 @@
 				"id": "line:blueprint:armory-t1:construct",
 				"title": "Construct Armory I",
 				"description": "Consumes construction resources to build Armory I.",
+				"default": true,
 				"runtimeMs": 70000,
 				"input": [
 					{

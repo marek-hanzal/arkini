@@ -26,6 +26,7 @@
 				"id": "line:blueprint:academy:construct",
 				"title": "Construct Academy",
 				"description": "Consumes construction resources to build Academy.",
+				"default": true,
 				"runtimeMs": 55000,
 				"input": [
 					{

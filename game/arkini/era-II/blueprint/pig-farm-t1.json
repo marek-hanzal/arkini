@@ -25,6 +25,7 @@
 				"id": "line:blueprint:pig-farm-t1:construct",
 				"title": "Construct Pig Farm I",
 				"description": "Consumes construction resources to build Pig Farm I.",
+				"default": true,
 				"runtimeMs": 20000,
 				"input": [
 					{

@@ -26,6 +26,7 @@
 				"id": "line:blueprint:university:construct",
 				"title": "Construct University",
 				"description": "Consumes construction resources to build University.",
+				"default": true,
 				"runtimeMs": 90000,
 				"input": [
 					{

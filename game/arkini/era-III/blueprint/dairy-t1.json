@@ -25,6 +25,7 @@
 				"id": "line:blueprint:dairy-t1:construct",
 				"title": "Construct Dairy I",
 				"description": "Consumes construction resources to build Dairy I.",
+				"default": true,
 				"runtimeMs": 22000,
 				"input": [
 					{

@@ -108,7 +108,8 @@ const config = GameConfigSchema.parse({
 								{
 									type: "exists",
 									query: {
-										scope: "any",
+										scope: "board",
+										distance: "close",
 										selector: {
 											type: "item",
 											itemId: "material",
@@ -408,11 +409,11 @@ describe("useItemDetailLines", () => {
 		});
 		const output = container.querySelector("output");
 		expect(output?.dataset.canAutofill).toBe("false");
-		expect(output?.dataset.disabledMessage).toBe("Requires Material.");
+		expect(output?.dataset.disabledMessage).toBe("Requires Material (Board · close).");
 		expect(output?.dataset.disabledRule).toBe("enable-rule");
 		expect(output?.dataset.disabledRuleDetail).toBe("material");
 		expect(output?.dataset.disabledRuleBefore).toBe("Requires ");
-		expect(output?.dataset.disabledRuleAfter).toBe(".");
+		expect(output?.dataset.disabledRuleAfter).toBe(" · Board · close.");
 		expect(output?.dataset.outputHasRuntimeTarget).toBe("false");
 
 		await act(async () => publishRuntime(withSource));

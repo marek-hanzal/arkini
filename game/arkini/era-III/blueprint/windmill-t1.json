@@ -25,6 +25,7 @@
 				"id": "line:blueprint:windmill-t1:construct",
 				"title": "Construct Windmill I",
 				"description": "Consumes construction resources to build Windmill I.",
+				"default": true,
 				"runtimeMs": 20000,
 				"input": [
 					{

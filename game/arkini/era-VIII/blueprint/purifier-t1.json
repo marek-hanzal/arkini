@@ -26,6 +26,7 @@
 				"id": "line:blueprint:purifier-t1:construct",
 				"title": "Construct Purifier I",
 				"description": "Consumes construction resources to build Purifier I.",
+				"default": true,
 				"runtimeMs": 48000,
 				"input": [
 					{

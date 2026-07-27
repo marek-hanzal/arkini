@@ -27,6 +27,7 @@
 				"id": "line:blueprint:market-t2:construct",
 				"title": "Construct Market II",
 				"description": "Consumes construction resources to build Market II.",
+				"default": true,
 				"runtimeMs": 36000,
 				"input": [
 					{

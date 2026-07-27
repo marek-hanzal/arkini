@@ -6,6 +6,7 @@ import { readItemDetailSourcesFx } from "~/engine/item-detail/read/readItemDetai
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
+import { readArkiniGameConfigSource } from "~test/schema/support/readArkiniGameConfigSource";
 
 const fullLinesProjection = vi.hoisted(() => vi.fn());
 
@@ -396,6 +397,86 @@ describe("readItemDetailSourcesFx", () => {
 		]);
 	});
 
+	it("keeps configured one-hop sources discoverable without a live owner", () => {
+		const result = readSources({
+			target: {
+				kind: "definition",
+				itemId: "target",
+			},
+			runtime: {
+				...runtime,
+				items: runtime.items.filter((candidate) => candidate.item.id === "target"),
+			},
+		});
+		if (result.kind !== "available") throw new Error("Expected definition sources.");
+
+		expect(result.source).toMatchObject([
+			{
+				ownerDefinitionItemId: "alpha",
+				line: [
+					{
+						lineId: "line:hidden",
+					},
+					{
+						lineId: "line:alpha:first",
+					},
+					{
+						lineId: "line:alpha:second",
+					},
+				],
+			},
+			{
+				ownerDefinitionItemId: "beta",
+				line: [
+					{
+						lineId: "line:beta",
+					},
+				],
+			},
+		]);
+		expect(
+			result.source.every(
+				({ ownerItemId, space }) => ownerItemId === undefined && space === undefined,
+			),
+		).toBe(true);
+	});
+
+	it("finds Well Blueprint as a configured one-hop source of Well", async () => {
+		const officialConfig = await readArkiniGameConfigSource();
+		const result = Effect.runSync(
+			readItemDetailSourcesFx({
+				target: {
+					kind: "definition",
+					itemId: "producer:well-t1",
+				},
+				runtime: {
+					cheats: {
+						enabled: false,
+						everEnabled: false,
+						instantGameplay: false,
+					},
+					currentSpace: 0,
+					items: [],
+					jobs: [],
+				},
+			}).pipe(Effect.provideService(GameConfigFx, officialConfig)),
+		);
+		if (result.kind !== "available") throw new Error("Expected Well sources.");
+
+		expect(result.source).toEqual(
+			expect.arrayContaining([
+				expect.objectContaining({
+					ownerDefinitionItemId: "item:blueprint-well-t1",
+				}),
+			]),
+		);
+		expect(
+			result.source.find(
+				({ ownerDefinitionItemId }) => ownerDefinitionItemId === "item:blueprint-well-t1",
+			)?.ownerItemId,
+		).toBeUndefined();
+	});
+
 	it("returns unavailable for a missing configured definition target", () => {
 		expect(
 			readSources({
@@ -506,8 +587,16 @@ describe("readItemDetailSourcesFx", () => {
 			},
 		});
 		if (result.kind !== "available") throw new Error("Expected scaled sources.");
-		expect(result.source).toHaveLength(500);
-		expect(result.source.every((source) => source.line.length === 2)).toBe(true);
+		expect(result.source).toHaveLength(501);
+		expect(result.source.slice(0, 500).every((source) => source.line.length === 2)).toBe(true);
+		expect(result.source[500]).toMatchObject({
+			ownerDefinitionItemId: "beta",
+			line: [
+				{
+					lineId: "line:beta",
+				},
+			],
+		});
 		expect(fullLinesProjection).not.toHaveBeenCalled();
 	});
 

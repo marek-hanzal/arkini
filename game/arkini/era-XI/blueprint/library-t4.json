@@ -27,6 +27,7 @@
 				"id": "line:blueprint:library-t4:construct",
 				"title": "Construct Library IV",
 				"description": "Consumes construction resources to build Library IV.",
+				"default": true,
 				"runtimeMs": 65000,
 				"input": [
 					{

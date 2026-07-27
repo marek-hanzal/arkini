@@ -25,6 +25,7 @@
 				"id": "line:blueprint:shrine-t1:construct",
 				"title": "Construct Wayside Shrine",
 				"description": "Consumes construction resources to build Wayside Shrine.",
+				"default": true,
 				"runtimeMs": 9000,
 				"input": [
 					{

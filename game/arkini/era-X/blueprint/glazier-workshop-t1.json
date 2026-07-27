@@ -28,6 +28,7 @@
 				"id": "line:blueprint:glazier-workshop-t1:construct",
 				"title": "Construct Glazier Workshop I",
 				"description": "Consumes construction resources to build Glazier Workshop I.",
+				"default": true,
 				"runtimeMs": 80000,
 				"input": [
 					{

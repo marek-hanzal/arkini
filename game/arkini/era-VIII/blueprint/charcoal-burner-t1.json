@@ -26,6 +26,7 @@
 				"id": "line:blueprint:charcoal-burner-t1:construct",
 				"title": "Construct Charcoal Burner I",
 				"description": "Consumes construction resources to build Charcoal Burner I.",
+				"default": true,
 				"runtimeMs": 44000,
 				"input": [
 					{

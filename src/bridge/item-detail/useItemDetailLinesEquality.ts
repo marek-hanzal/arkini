@@ -30,6 +30,7 @@ export const useItemDetailLinesEquality = () =>
 			right: ItemDetailLines.DisabledCondition,
 		) =>
 			left.kind === right.kind &&
+			left.locationLabel === right.locationLabel &&
 			sameSelector(left.selector, right.selector) &&
 			sameDetailReference(left.detail, right.detail) &&
 			match(left)

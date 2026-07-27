@@ -27,11 +27,12 @@ export namespace useItemDetailSources {
 	}
 
 	export interface Source {
-		readonly ownerItemId: string;
+		readonly ownerItemId?: string;
+		readonly ownerDefinitionItemId: string;
 		readonly title: string;
 		readonly sourceUrl: string;
 		readonly compositeUrl?: string;
-		readonly space: number;
+		readonly space?: number;
 		readonly line: readonly Line[];
 	}
 
@@ -51,7 +52,7 @@ const unavailable = {
 	kind: "unavailable",
 } as const satisfies useItemDetailSources.Projection;
 
-/** Projects exact owned Board sources that visibly produce one inspected runtime or definition item. */
+/** Projects live and configured one-hop sources for one inspected runtime or definition item. */
 export const useItemDetailSources = (
 	target: useItemDetailSources.Target,
 ): useItemDetailSources.Projection => {
@@ -108,6 +109,7 @@ export const useItemDetailSources = (
 				rightSource: useItemDetailSources.Source,
 			) =>
 				leftSource.ownerItemId === rightSource.ownerItemId &&
+				leftSource.ownerDefinitionItemId === rightSource.ownerDefinitionItemId &&
 				leftSource.title === rightSource.title &&
 				leftSource.sourceUrl === rightSource.sourceUrl &&
 				leftSource.compositeUrl === rightSource.compositeUrl &&
@@ -150,22 +152,30 @@ export const useItemDetailSources = (
 				itemId: projection.itemId,
 				targetTitle: target.title,
 				source: projection.source.flatMap((source) => {
-					const owner = runtime.items.find(
-						(candidate) => candidate.id === source.ownerItemId,
-					);
 					const configured = game.config.items[source.ownerDefinitionItemId];
-					if (owner === undefined || configured === undefined) return [];
+					if (configured === undefined) return [];
+					const owner =
+						source.ownerItemId === undefined
+							? undefined
+							: runtime.items.find(
+									(candidate) => candidate.id === source.ownerItemId,
+								);
+					if (source.ownerItemId !== undefined && owner === undefined) return [];
 					return [
 						{
 							ownerItemId: source.ownerItemId,
+							ownerDefinitionItemId: source.ownerDefinitionItemId,
 							title: configured.title,
-							sourceUrl: game.getResourceUrl(
-								game.readOrThrow(
-									readRuntimeItemPrimaryAssetIdFx({
-										item: owner.item,
-									}),
-								),
-							),
+							sourceUrl:
+								owner === undefined
+									? game.getResourceUrl(configured.asset.source[0])
+									: game.getResourceUrl(
+											game.readOrThrow(
+												readRuntimeItemPrimaryAssetIdFx({
+													item: owner.item,
+												}),
+											),
+										),
 							...(configured.asset.composite === undefined
 								? {}
 								: {

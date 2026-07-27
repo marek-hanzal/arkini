@@ -28,6 +28,7 @@
 				"id": "line:blueprint:waste-processor-t2:construct",
 				"title": "Construct Waste Processor II",
 				"description": "Consumes construction resources to build Waste Processor II.",
+				"default": true,
 				"runtimeMs": 46000,
 				"input": [
 					{

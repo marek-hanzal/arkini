@@ -25,6 +25,7 @@
 				"id": "line:blueprint:chicken-coop-t1:construct",
 				"title": "Construct Chicken Coop I",
 				"description": "Consumes construction resources to build Chicken Coop I.",
+				"default": true,
 				"runtimeMs": 18000,
 				"input": [
 					{

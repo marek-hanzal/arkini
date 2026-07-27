@@ -27,6 +27,7 @@
 				"id": "line:blueprint:house-t2:construct",
 				"title": "Construct House II",
 				"description": "Consumes construction resources to build House II.",
+				"default": true,
 				"runtimeMs": 24000,
 				"input": [
 					{

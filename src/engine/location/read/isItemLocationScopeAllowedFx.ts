@@ -13,6 +13,16 @@ export namespace isItemLocationScopeAllowedFx {
 	}
 }
 
+/** Checks passive-grid scope permission without allocating an Effect in indexed scans. */
+export const isItemLocationScopeAllowed = ({
+	item,
+	locationScope,
+}: isItemLocationScopeAllowedFx.Props) =>
+	item.type === ItemEnumSchema.enum.Inventory
+		? locationScope === LocationScopeEnumSchema.enum.Board ||
+			locationScope === LocationScopeEnumSchema.enum.Toolbar
+		: item.scope === StorageScopeEnumSchema.enum.Any || item.scope === locationScope;
+
 /**
  * Reads whether one canonical item may own one concrete passive-grid scope.
  *
@@ -24,8 +34,8 @@ export const isItemLocationScopeAllowedFx = Effect.fn("isItemLocationScopeAllowe
 	item,
 	locationScope,
 }: isItemLocationScopeAllowedFx.Props) {
-	return item.type === ItemEnumSchema.enum.Inventory
-		? locationScope === LocationScopeEnumSchema.enum.Board ||
-				locationScope === LocationScopeEnumSchema.enum.Toolbar
-		: item.scope === StorageScopeEnumSchema.enum.Any || item.scope === locationScope;
+	return isItemLocationScopeAllowed({
+		item,
+		locationScope,
+	});
 });

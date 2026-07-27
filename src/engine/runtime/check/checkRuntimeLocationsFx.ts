@@ -1,10 +1,10 @@
-import { Array, Effect } from "effect";
+import { Effect } from "effect";
 import { match } from "ts-pattern";
 
-import { isItemLocationScopeAllowedFx } from "~/engine/location/read/isItemLocationScopeAllowedFx";
+import { isItemLocationScopeAllowed } from "~/engine/location/read/isItemLocationScopeAllowedFx";
 import { RuntimeCheckIssueEnumSchema } from "~/engine/runtime/schema/check/RuntimeCheckIssueEnumSchema";
 import { readGridLocationOccupantsFx } from "~/engine/location/read/readGridLocationOccupantsFx";
-import { isGridRuntimeItemFx } from "~/engine/runtime/read/isGridRuntimeItemFx";
+import type { GridRuntimeItemSchema } from "~/engine/runtime/schema/GridRuntimeItemSchema";
 import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import type { LocationOccupiedIssueSchema } from "~/engine/runtime/schema/check/LocationOccupiedIssueSchema";
@@ -30,14 +30,19 @@ export const checkRuntimeLocationsFx = Effect.fn("checkRuntimeLocationsFx")(func
 	config,
 	runtime,
 }: checkRuntimeLocationsFx.Props) {
-	const items = Array.getSomes(yield* Effect.forEach(runtime.items, isGridRuntimeItemFx));
+	const items = runtime.items.filter(
+		(item): item is GridRuntimeItemSchema.Type =>
+			item.location.scope === LocationScopeEnumSchema.enum.Board ||
+			item.location.scope === LocationScopeEnumSchema.enum.Inventory ||
+			item.location.scope === LocationScopeEnumSchema.enum.Toolbar,
+	);
 	const scopeIssues: LocationScopeIssueSchema.Type[] = [];
 	const boundsIssues: LocationOutOfBoundsIssueSchema.Type[] = [];
 	const occupancyIssues: LocationOccupiedIssueSchema.Type[] = [];
 
 	for (const item of items) {
 		const configuredScope = item.item.scope;
-		const scopeAllowed = yield* isItemLocationScopeAllowedFx({
+		const scopeAllowed = isItemLocationScopeAllowed({
 			item: item.item,
 			locationScope: item.location.scope,
 		});

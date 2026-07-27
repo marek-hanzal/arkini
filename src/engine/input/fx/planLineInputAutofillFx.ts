@@ -1,17 +1,18 @@
-import { Array, Effect, Option } from "effect";
+import { Effect, Option } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import { planInputMaterialStoreFx } from "~/engine/input/fx/planInputMaterialStoreFx";
 import { resolveInputMaterialFx } from "~/engine/input/fx/resolveInputMaterialFx";
-import { filterInputSlotItemsFx } from "~/engine/input/read/filterInputSlotItemsFx";
+import { isMaterialInputEligible } from "~/engine/input/read/readMaterialInputEligibilityFx";
 import { ItemNotOnBoardError } from "~/engine/item/error/ItemNotOnBoardError";
 import { LineNotFoundError } from "~/engine/line/error/LineNotFoundError";
 import { isLineInputClosedFx } from "~/engine/line/fx/input/isLineInputClosedFx";
 import { readItemLineFx } from "~/engine/line/fx/readItemLineFx";
+import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 import { isBoardRuntimeItemFx } from "~/engine/runtime/read/isBoardRuntimeItemFx";
 import { readRuntimeItemByIdFx } from "~/engine/runtime/read/readRuntimeItemByIdFx";
 import type { BoardRuntimeItemSchema } from "~/engine/runtime/schema/BoardRuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import { matchesItemSelector } from "~/engine/selector/fx/selectItemsFx";
 import { InputEnumSchema } from "~/engine/input/schema/InputEnumSchema";
 
 export namespace planLineInputAutofillFx {
@@ -106,9 +107,11 @@ export const planLineInputAutofillFx = Effect.fn("planLineInputAutofillFx")(func
 		);
 	}
 
-	const candidates = Array.getSomes(
-		yield* Effect.forEach(runtime.items, (candidate) => isBoardRuntimeItemFx(candidate)),
-	)
+	const candidates = runtime.items
+		.filter(
+			(candidate): candidate is BoardRuntimeItemSchema.Type =>
+				candidate.location.scope === LocationScopeEnumSchema.enum.Board,
+		)
 		.filter(
 			(candidate) =>
 				candidate.id !== owner.id && candidate.location.space === owner.location.space,
@@ -127,12 +130,13 @@ export const planLineInputAutofillFx = Effect.fn("planLineInputAutofillFx")(func
 	for (const [inputIndex, input] of line.input.entries()) {
 		if (input.type !== InputEnumSchema.enum.Materials) continue;
 
-		const storedItems = yield* filterInputSlotItemsFx({
-			inputIndex,
-			items: runtime.items,
-			lineId,
-			ownerItemId,
-		});
+		const storedItems = runtime.items.filter(
+			(item) =>
+				item.location.scope === LocationScopeEnumSchema.enum.Input &&
+				item.location.ownerItemId === ownerItemId &&
+				item.location.lineId === lineId &&
+				item.location.inputIndex === inputIndex,
+		);
 		let storedQuantity = storedItems.reduce((total, item) => total + item.quantity, 0);
 		const initialResolution = yield* resolveInputMaterialFx({
 			input,
@@ -157,25 +161,30 @@ export const planLineInputAutofillFx = Effect.fn("planLineInputAutofillFx")(func
 			const remainingQuantity = remainingByItemId.get(candidate.id) ?? 0;
 			if (remainingQuantity === 0) continue;
 
-			const plan = yield* planInputMaterialStoreFx({
-				input,
-				item: {
-					...candidate,
-					quantity: remainingQuantity,
-				},
-				requestedQuantity: missingQuantity,
-				storedQuantity,
-			});
-			if (plan === undefined) continue;
+			if (
+				!isMaterialInputEligible(candidate.item) ||
+				!matchesItemSelector({
+					item: candidate.item,
+					selector: input.selector,
+				})
+			) {
+				continue;
+			}
+			const quantity = Math.min(
+				remainingQuantity,
+				missingQuantity,
+				initialResolution.maxStoredQuantity - storedQuantity,
+			);
+			if (quantity === 0) continue;
 
 			entries.push({
 				inputIndex,
 				sourceItemId: candidate.id,
-				quantity: plan.quantity,
+				quantity,
 			});
-			remainingByItemId.set(candidate.id, remainingQuantity - plan.quantity);
-			storedQuantity += plan.quantity;
-			missingQuantity -= plan.quantity;
+			remainingByItemId.set(candidate.id, remainingQuantity - quantity);
+			storedQuantity += quantity;
+			missingQuantity -= quantity;
 		}
 
 		remainingMissingQuantity += missingQuantity;

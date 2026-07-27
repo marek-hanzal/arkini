@@ -412,7 +412,9 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 				}),
 			);
 			const optimisticRemoval =
-				drag.previewKind === DropItemResultKindEnumSchema.enum.StoreInventory
+				drag.previewKind === DropItemResultKindEnumSchema.enum.StoreInventory ||
+				(drag.previewKind === DropItemResultKindEnumSchema.enum.Stack &&
+					drag.sourceItem.quantity === 1)
 					? {
 							actor: drag.actor,
 							lifecycleGeneration: drag.actor.lifecycleIntentGeneration + 1,
@@ -496,10 +498,11 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 							result.kind !== DropItemResultKindEnumSchema.enum.Reject &&
 							result.kind !== DropItemResultKindEnumSchema.enum.Ignored
 						) {
-							if (
-								result.kind !== DropItemResultKindEnumSchema.enum.StoreInventory &&
-								optimisticRemoval !== null
-							) {
+							const removalAccepted =
+								result.kind === DropItemResultKindEnumSchema.enum.StoreInventory ||
+								(result.kind === DropItemResultKindEnumSchema.enum.Stack &&
+									result.source.current === null);
+							if (!removalAccepted && optimisticRemoval !== null) {
 								restoreOptimisticRemoval(optimisticRemoval);
 							}
 							onAcceptedDrop();

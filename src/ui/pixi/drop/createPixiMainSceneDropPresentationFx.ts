@@ -156,7 +156,11 @@ export const createPixiMainSceneDropPresentationFx = Effect.fn(
 								generation,
 							});
 						}
-						if (result.kind === DropItemResultKindEnumSchema.enum.StoreInventory) {
+						if (
+							result.kind === DropItemResultKindEnumSchema.enum.StoreInventory ||
+							(result.kind === DropItemResultKindEnumSchema.enum.Stack &&
+								result.source.current === null)
+						) {
 							hiddenActorIds.add(result.source.itemId);
 						}
 						if (result.kind !== DropItemResultKindEnumSchema.enum.Swap) {

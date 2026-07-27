@@ -765,6 +765,84 @@ describe("Pixi main-scene drag controller", () => {
 		).toBe(false);
 	});
 
+	it("starts a one-item stack exit at release and keeps it hidden after full consumption", async () => {
+		const target = createItem("runtime:target-log", 1);
+		const mounted = mountController({
+			targetItems: [
+				target,
+			],
+		});
+		previewState.actorKinds.set(target.id, "stack");
+		mounted.setOccupant(target);
+		mounted.setCommandTarget({
+			kind: "slot",
+			location: target.location,
+			occupant: {
+				itemId: target.id,
+				revision: target.revision,
+			},
+		});
+		let resolveDrop!: (result: runTileDropAtom.Result) => void;
+		mounted.onDrop.mockReturnValueOnce(
+			new Promise<runTileDropAtom.Result>((resolve) => {
+				resolveDrop = resolve;
+			}) as never,
+		);
+
+		mounted.actorEvents.emit("pointerdown", pointer(10, 20));
+		mounted.stage.emit("globalpointermove", pointer(30, 20));
+		mounted.stage.emit("pointerup", pointer(30, 20));
+
+		expect(mounted.actor.lifecycleTargetAlpha).toBe(0);
+		expect(mounted.animations).toContainEqual(
+			expect.objectContaining({
+				actor: mounted.actor,
+				channel: "lifecycle-opacity",
+				toAlpha: 0,
+			}),
+		);
+
+		resolveDrop({
+			kind: "stack",
+			transferredQuantity: 1,
+			source: {
+				canonicalItemId: item.itemId,
+				current: null,
+				itemId: item.id,
+				previousLocation: item.location,
+				previousQuantity: 1,
+				previousRevision: item.revision,
+			},
+			target: {
+				canonicalItemId: target.itemId,
+				current: {
+					canonicalItemId: target.itemId,
+					itemId: target.id,
+					location: target.location,
+					quantity: 2,
+					revision: "revision:target-stacked",
+				},
+				itemId: target.id,
+				previousLocation: target.location,
+				previousQuantity: 1,
+				previousRevision: target.revision,
+			},
+		});
+		await flushMicrotasks();
+
+		expect(mounted.onAcceptedDrop).toHaveBeenCalledOnce();
+		expect(
+			mounted.animations.some(
+				(animation) => animation.channel === "lifecycle-opacity" && animation.toAlpha === 1,
+			),
+		).toBe(false);
+		expect(Effect.runSync(mounted.dropPresentation.readSnapshotFx).hiddenActorIds).toEqual(
+			new Set([
+				item.id,
+			]),
+		);
+	});
+
 	it("releases the board gesture while an Inventory drop is still pending", async () => {
 		const inventory = createItem("runtime:inventory", 1);
 		const secondItem = createItem("runtime:second-log", 2);

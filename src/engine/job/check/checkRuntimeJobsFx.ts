@@ -1,4 +1,4 @@
-import { Array, Effect, Option } from "effect";
+import { Effect, Option } from "effect";
 
 import { RuntimeCheckIssueEnumSchema } from "~/engine/runtime/schema/check/RuntimeCheckIssueEnumSchema";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
@@ -14,7 +14,7 @@ import type { JobTimeInvalidIssueSchema } from "~/engine/job/schema/JobTimeInval
 import { readItemQueueSizeFx } from "~/engine/job/read/readItemQueueSizeFx";
 import { readItemLineFx } from "~/engine/line/fx/readItemLineFx";
 import { isGridRuntimeItemFx } from "~/engine/runtime/read/isGridRuntimeItemFx";
-import { isJobRuntimeItemFx } from "~/engine/runtime/read/isJobRuntimeItemFx";
+import type { JobRuntimeItemSchema } from "~/engine/runtime/schema/JobRuntimeItemSchema";
 import { readRuntimeItemOwnedStateFx } from "~/engine/runtime/read/readRuntimeItemOwnedStateFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
@@ -141,7 +141,10 @@ export const checkRuntimeJobsFx = Effect.fn("checkRuntimeJobsFx")(function* ({
 		}
 	}
 
-	const consumedItems = Array.getSomes(yield* Effect.forEach(runtime.items, isJobRuntimeItemFx));
+	const consumedItems = runtime.items.filter(
+		(item): item is JobRuntimeItemSchema.Type =>
+			item.location.scope === LocationScopeEnumSchema.enum.Job,
+	);
 	for (const item of consumedItems) {
 		const owned = yield* readRuntimeItemOwnedStateFx({
 			ownerItemId: item.id,

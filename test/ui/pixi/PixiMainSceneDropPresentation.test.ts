@@ -208,4 +208,62 @@ describe("Pixi main-scene drop presentation", () => {
 			hiddenActorIds: new Set(),
 		});
 	});
+
+	it("hides an exact fully consumed stack source while retaining receiver feedback", () => {
+		const presentation = Effect.runSync(createPixiMainSceneDropPresentationFx());
+		const generation = Effect.runSync(
+			presentation.beginFx({
+				sourceActorId: swapCandidate.source.id,
+				swapCandidate: null,
+			}),
+		);
+		Effect.runSync(
+			presentation.completeFx({
+				generation,
+				result: {
+					kind: "stack",
+					transferredQuantity: 1,
+					source: {
+						canonicalItemId: "log",
+						current: null,
+						itemId: swapCandidate.source.id,
+						previousLocation: sourceLocation,
+						previousQuantity: 1,
+						previousRevision: swapCandidate.source.revision,
+					},
+					target: {
+						canonicalItemId: "log",
+						current: {
+							canonicalItemId: "log",
+							itemId: swapCandidate.target.id,
+							location: targetLocation,
+							quantity: 2,
+							revision: "revision:target-stacked",
+						},
+						itemId: swapCandidate.target.id,
+						previousLocation: targetLocation,
+						previousQuantity: 1,
+						previousRevision: swapCandidate.target.revision,
+					},
+				},
+			}),
+		);
+
+		const snapshot = Effect.runSync(presentation.readSnapshotFx);
+		expect(snapshot.hiddenActorIds).toEqual(
+			new Set([
+				swapCandidate.source.id,
+			]),
+		);
+		expect(snapshot.feedback[0]?.cues).toEqual([
+			expect.objectContaining({
+				actorId: swapCandidate.source.id,
+				kind: "consume-source",
+			}),
+			expect.objectContaining({
+				actorId: swapCandidate.target.id,
+				kind: "consume",
+			}),
+		]);
+	});
 });

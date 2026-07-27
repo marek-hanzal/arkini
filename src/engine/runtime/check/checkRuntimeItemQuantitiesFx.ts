@@ -1,8 +1,9 @@
 import { Effect } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
+import { GameConfigFx } from "~/engine/game/context/GameConfigFx";
 import { resolveItemFx } from "~/engine/item/fx/resolveItemFx";
-import { readItemEffectiveMaxStackSizeFx } from "~/engine/item/fx/purity/readItemEffectiveMaxStackSizeFx";
+import { isItemPure, readItemPurityIndex } from "~/engine/item/fx/purity/isItemPureFx";
 import { readReservedJobOutputQuantitiesFx } from "~/engine/job/fx/read/readReservedJobOutputQuantitiesFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import type { ItemMaxCountIssueSchema } from "~/engine/runtime/schema/check/ItemMaxCountIssueSchema";
@@ -21,12 +22,23 @@ export const checkRuntimeItemQuantitiesFx = Effect.fn("checkRuntimeItemQuantitie
 }: checkRuntimeItemQuantitiesFx.Props) {
 	const stackIssues: ItemStackSizeIssueSchema.Type[] = [];
 	const maxCountIssues: ItemMaxCountIssueSchema.Type[] = [];
+	const purityIndex = readItemPurityIndex(runtime);
+	const liveByCanonicalItemId = new Map<
+		IdSchema.Type,
+		{
+			readonly itemIds: IdSchema.Type[];
+			quantity: number;
+		}
+	>();
 
 	for (const item of runtime.items) {
-		const maxStackSize = yield* readItemEffectiveMaxStackSizeFx({
+		const maxStackSize = isItemPure({
+			index: purityIndex,
 			item,
 			runtime,
-		});
+		})
+			? item.item.maxStackSize
+			: 1;
 		if (item.quantity > maxStackSize) {
 			stackIssues.push({
 				canonicalItemId: item.item.id,
@@ -36,24 +48,39 @@ export const checkRuntimeItemQuantitiesFx = Effect.fn("checkRuntimeItemQuantitie
 				type: RuntimeCheckIssueEnumSchema.enum.ItemStackSize,
 			});
 		}
+		const live = liveByCanonicalItemId.get(item.item.id);
+		if (live === undefined) {
+			liveByCanonicalItemId.set(item.item.id, {
+				itemIds: [
+					item.id,
+				],
+				quantity: item.quantity,
+			});
+		} else {
+			live.itemIds.push(item.id);
+			live.quantity += item.quantity;
+		}
 	}
 
 	const reserved = yield* readReservedJobOutputQuantitiesFx({
 		runtime,
 	});
 	const canonicalItemIds = new Set<IdSchema.Type>([
-		...runtime.items.map((item) => item.item.id),
+		...liveByCanonicalItemId.keys(),
 		...reserved.keys(),
 	]);
+	const config = yield* GameConfigFx;
 
 	for (const itemId of canonicalItemIds) {
-		const item = yield* resolveItemFx({
-			itemId,
-		});
+		const item =
+			config.items[itemId] ??
+			(yield* resolveItemFx({
+				itemId,
+			}));
 		if (item.maxCount === undefined) continue;
 
-		const items = runtime.items.filter((candidate) => candidate.item.id === itemId);
-		const liveQuantity = items.reduce((total, candidate) => total + candidate.quantity, 0);
+		const live = liveByCanonicalItemId.get(itemId);
+		const liveQuantity = live?.quantity ?? 0;
 		const reservation = reserved.get(itemId);
 		const reservedQuantity = reservation?.quantity ?? 0;
 		const quantity = liveQuantity + reservedQuantity;
@@ -61,7 +88,7 @@ export const checkRuntimeItemQuantitiesFx = Effect.fn("checkRuntimeItemQuantitie
 
 		maxCountIssues.push({
 			itemId,
-			itemIds: items.map((candidate) => candidate.id),
+			itemIds: live?.itemIds ?? [],
 			jobIds: reservation?.jobIds ?? [],
 			liveQuantity,
 			reservedQuantity,

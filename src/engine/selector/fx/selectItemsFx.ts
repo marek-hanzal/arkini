@@ -12,27 +12,38 @@ export namespace selectItemsFx {
 	}
 }
 
+/** Tests one canonical item against the exhaustive selector grammar without allocating an Effect. */
+export const matchesItemSelector = ({
+	item,
+	selector,
+}: {
+	readonly item: ItemSchema.Type;
+	readonly selector: SelectorSchema.Type;
+}) =>
+	match(selector)
+		.with(
+			{
+				type: SelectorEnumSchema.enum.Item,
+			},
+			({ itemId }) => itemId === item.id,
+		)
+		.with(
+			{
+				type: SelectorEnumSchema.enum.Tag,
+			},
+			({ tag }) => item.tags.includes(tag),
+		)
+		.exhaustive();
+
 /** Selects canonical items through the one exhaustive selector grammar. */
 export const selectItemsFx = Effect.fn("selectItemsFx")(function* ({
 	items,
 	selector,
 }: selectItemsFx.Props) {
-	const matchesSelector = (item: ItemSchema.Type) => {
-		return match(selector)
-			.with(
-				{
-					type: SelectorEnumSchema.enum.Item,
-				},
-				({ itemId }) => itemId === item.id,
-			)
-			.with(
-				{
-					type: SelectorEnumSchema.enum.Tag,
-				},
-				({ tag }) => item.tags.includes(tag),
-			)
-			.exhaustive();
-	};
-
-	return items.filter(matchesSelector);
+	return items.filter((item) =>
+		matchesItemSelector({
+			item,
+			selector,
+		}),
+	);
 });

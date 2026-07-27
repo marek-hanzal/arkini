@@ -2,7 +2,6 @@ import { Effect } from "effect";
 
 import { RuntimeCheckIssueEnumSchema } from "~/engine/runtime/schema/check/RuntimeCheckIssueEnumSchema";
 import { resolveInputMaterialFx } from "~/engine/input/fx/resolveInputMaterialFx";
-import { readInputSlotLocationFx } from "~/engine/input/read/readInputSlotLocationFx";
 import type { InputMaterialSchema } from "~/engine/input/schema/InputMaterialSchema";
 import type { InputCapacityExceededIssueSchema } from "~/engine/input/schema/check/InputCapacityExceededIssueSchema";
 import type { InputLineMissingIssueSchema } from "~/engine/input/schema/check/InputLineMissingIssueSchema";
@@ -15,8 +14,9 @@ import type { LineInputClosedIssueSchema } from "~/engine/line/schema/check/Line
 import { readItemLineFx } from "~/engine/line/fx/readItemLineFx";
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
-import { selectItemsFx } from "~/engine/selector/fx/selectItemsFx";
+import { matchesItemSelector } from "~/engine/selector/fx/selectItemsFx";
 import { InputEnumSchema } from "~/engine/input/schema/InputEnumSchema";
+import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 
 export namespace checkRuntimeInputLocationsFx {
 	export interface Props {
@@ -50,20 +50,14 @@ export const checkRuntimeInputLocationsFx = Effect.fn("checkRuntimeInputLocation
 	const closedIssues: LineInputClosedIssueSchema.Type[] = [];
 	const validItems: ValidInputItem[] = [];
 
-	const locatedItems = (yield* Effect.forEach(runtime.items, (item) => {
-		return readInputSlotLocationFx({
+	const locatedItems: LocatedInputItem[] = [];
+	for (const item of runtime.items) {
+		if (item.location.scope !== LocationScopeEnumSchema.enum.Input) continue;
+		locatedItems.push({
 			item,
-		}).pipe(
-			Effect.map((location) => {
-				return location === undefined
-					? undefined
-					: ({
-							item,
-							location,
-						} satisfies LocatedInputItem);
-			}),
-		);
-	})).filter((item): item is LocatedInputItem => item !== undefined);
+			location: item.location,
+		});
+	}
 
 	for (const { item, location } of locatedItems) {
 		const owner = runtime.items.find((candidate) => candidate.id === location.ownerItemId);
@@ -99,13 +93,11 @@ export const checkRuntimeInputLocationsFx = Effect.fn("checkRuntimeInputLocation
 			continue;
 		}
 
-		const matches = yield* selectItemsFx({
-			items: [
-				item.item,
-			],
+		const matches = matchesItemSelector({
+			item: item.item,
 			selector: input.selector,
 		});
-		if (matches.length === 0) {
+		if (!matches) {
 			selectorIssues.push({
 				itemId: item.id,
 				location,

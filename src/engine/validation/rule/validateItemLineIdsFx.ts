@@ -16,7 +16,7 @@ export namespace validateItemLineIdsFx {
 	}
 }
 
-/** Enforces owner-local line identity without requiring global line-ID uniqueness. */
+/** Enforces owner-local line identity and at most one authored default. */
 export const validateItemLineIdsFx = Effect.fn("validateItemLineIdsFx")(function* ({
 	config,
 	provenance,
@@ -24,6 +24,12 @@ export const validateItemLineIdsFx = Effect.fn("validateItemLineIdsFx")(function
 	const diagnostics: GameDiagnosticsSchema.Type = [];
 	for (const [ownerItemId, item] of Object.entries(config.items)) {
 		const firstById = new Map<IdSchema.Type, DiagnosticPathSchema.Type>();
+		let firstDefault:
+			| {
+					readonly lineId: IdSchema.Type;
+					readonly path: DiagnosticPathSchema.Type;
+			  }
+			| undefined;
 		const entries = yield* readItemLineEntriesFx({
 			itemId: ownerItemId,
 			item,
@@ -33,6 +39,35 @@ export const validateItemLineIdsFx = Effect.fn("validateItemLineIdsFx")(function
 				...entry.path,
 				"id",
 			] satisfies DiagnosticPathSchema.Type;
+			if (entry.line.default) {
+				const defaultPath = [
+					...entry.path,
+					"default",
+				] satisfies DiagnosticPathSchema.Type;
+				if (firstDefault !== undefined) {
+					diagnostics.push({
+						code: DiagnosticCodeEnumSchema.enum.LineMultipleDefaults,
+						severity: DiagnosticSeverityEnumSchema.enum.Error,
+						path: defaultPath,
+						source: provenance.items[ownerItemId],
+						message: `Item ${ownerItemId} marks both ${firstDefault.lineId} and ${entry.line.id} as authored default lines.`,
+						ownerItemId,
+						lineIds: [
+							firstDefault.lineId,
+							entry.line.id,
+						],
+						paths: [
+							firstDefault.path,
+							defaultPath,
+						],
+					});
+				} else {
+					firstDefault = {
+						lineId: entry.line.id,
+						path: defaultPath,
+					};
+				}
+			}
 			const previousPath = firstById.get(entry.line.id);
 			if (previousPath !== undefined) {
 				diagnostics.push({

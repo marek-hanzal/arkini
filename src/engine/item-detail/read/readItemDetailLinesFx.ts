@@ -4,6 +4,7 @@ import type { ItemDetailLines } from "~/engine/item-detail/read/ItemDetailLines"
 import { readBoardItemDetailLineFx } from "~/engine/item-detail/read/readBoardItemDetailLineFx";
 import { readStoredItemDetailLineFx } from "~/engine/item-detail/read/readStoredItemDetailLineFx";
 import { isLineOwnerItemFx } from "~/engine/line/read/isLineOwnerItemFx";
+import { readEffectiveDefaultLineFx } from "~/engine/line/read/readEffectiveDefaultLineFx";
 import { readLineOwnerLinesFx } from "~/engine/line/read/readLineOwnerLinesFx";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 
@@ -32,7 +33,11 @@ export const readItemDetailLinesFx = Effect.fn("readItemDetailLinesFx")(function
 	if (ownerItem === undefined) return unavailable;
 
 	const lines = yield* readLineOwnerLinesFx(ownerItem);
-	const defaultLineId = runtime.defaultLineByOwnerItemId?.[owner.id];
+	const defaultLineId = (yield* readEffectiveDefaultLineFx({
+		ownerItemId: owner.id,
+		ownerItem,
+		runtime,
+	}))?.id;
 	const ownerHasWork =
 		runtime.jobs.some((job) => job.ownerItemId === owner.id) ||
 		(runtime.jobQueue ?? []).some((request) => request.ownerItemId === owner.id);

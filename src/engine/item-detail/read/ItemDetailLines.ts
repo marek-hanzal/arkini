@@ -3,6 +3,7 @@ import type { TimeSchema } from "~/engine/common/schema/TimeSchema";
 import type { DistanceEnumSchema } from "~/engine/distance/schema/DistanceEnumSchema";
 import type { InputChargeFromEnumSchema } from "~/engine/input/schema/InputChargeFromEnumSchema";
 import type { InputModeEnumSchema } from "~/engine/input/schema/InputModeEnumSchema";
+import type { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeIntegerSchema";
 import type { JobStatusEnumSchema } from "~/engine/job/schema/read/JobStatusEnumSchema";
 import type {
 	ItemDetailOutputRoll,
@@ -11,6 +12,7 @@ import type {
 } from "~/engine/item-detail/read/ItemDetailOutput";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import type { SelectorSchema } from "~/engine/selector/schema/SelectorSchema";
+import type { WhenSchema } from "~/engine/when/schema/WhenSchema";
 
 interface ItemDetailLineChargeCost {
 	readonly cost: number;
@@ -28,6 +30,7 @@ export namespace ItemDetailLines {
 
 	export interface MaterialInput {
 		readonly kind: "materials";
+		readonly inputIndex: NonNegativeIntegerSchema.Type;
 		readonly selector: SelectorSchema.Type;
 		readonly mode: InputModeEnumSchema.Type;
 		readonly required: QuantityBounds;
@@ -36,6 +39,7 @@ export namespace ItemDetailLines {
 		readonly missingQuantity: number;
 		readonly availableCapacity: number;
 		readonly ready: boolean;
+		readonly canWithdraw: boolean;
 		readonly charges?: ItemDetailLineChargeCost;
 	}
 
@@ -67,13 +71,52 @@ export namespace ItemDetailLines {
 	export type OutputRoll = ItemDetailOutputRoll<OutputItem>;
 	export type OutputSet = ItemDetailOutputSet<OutputItem>;
 
-	export type Availability =
+	export type UnavailableReason =
 		| {
-				readonly kind: "ready";
+				readonly kind: "line-disabled";
+				readonly cause:
+					| {
+							readonly kind: "static";
+					  }
+					| {
+							readonly kind: "enable-rule";
+							readonly ruleIndex: number;
+							readonly whenIndex: number;
+							readonly when: WhenSchema.Type;
+					  }
+					| {
+							readonly kind: "disable-rule";
+							readonly ruleIndex: number;
+							readonly when: readonly WhenSchema.Type[];
+					  };
 		  }
 		| {
-				readonly kind: "blocked";
-				readonly reason: "disabled" | "inputs" | "queue" | "stored";
+				readonly kind: "owner-stored";
+		  }
+		| {
+				readonly kind: "direct-output-max-count";
+				readonly itemId: IdSchema.Type;
+				readonly liveQuantity: number;
+				readonly reservedQuantity: number;
+				readonly maxCount: number;
+		  }
+		| {
+				readonly kind: "downstream-output-max-count";
+				readonly intermediateItemId: IdSchema.Type;
+				readonly itemId: IdSchema.Type;
+				readonly liveQuantity: number;
+				readonly reservedQuantity: number;
+				readonly maxCount: number;
+		  };
+
+	export type Availability =
+		| {
+				readonly kind: "available";
+				readonly readiness: "ready" | "inputs" | "queue";
+		  }
+		| {
+				readonly kind: "unavailable";
+				readonly reason: UnavailableReason;
 		  };
 
 	export interface Line {
@@ -87,6 +130,7 @@ export namespace ItemDetailLines {
 		readonly isDefault: boolean;
 		readonly actions: {
 			readonly canAutofill: boolean;
+			readonly canStart: boolean;
 			readonly canWithdraw: boolean;
 		};
 		readonly input: readonly Input[];

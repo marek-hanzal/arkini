@@ -8,7 +8,8 @@ export const ItemLineSummary = ({ line }: { readonly line: ItemDetailLines.Line 
 	const readiness = match(line.availability)
 		.with(
 			{
-				kind: "ready",
+				kind: "available",
+				readiness: "ready",
 			},
 			() => ({
 				label: "Ready",
@@ -17,8 +18,7 @@ export const ItemLineSummary = ({ line }: { readonly line: ItemDetailLines.Line 
 		)
 		.with(
 			{
-				kind: "blocked",
-				reason: "disabled",
+				kind: "unavailable",
 			},
 			() => ({
 				label: "Disabled",
@@ -27,8 +27,8 @@ export const ItemLineSummary = ({ line }: { readonly line: ItemDetailLines.Line 
 		)
 		.with(
 			{
-				kind: "blocked",
-				reason: "inputs",
+				kind: "available",
+				readiness: "inputs",
 			},
 			() => ({
 				label: "Missing inputs",
@@ -37,22 +37,12 @@ export const ItemLineSummary = ({ line }: { readonly line: ItemDetailLines.Line 
 		)
 		.with(
 			{
-				kind: "blocked",
-				reason: "queue",
+				kind: "available",
+				readiness: "queue",
 			},
 			() => ({
 				label: "Queue full",
 				className: "border-warning/35 bg-warning/10 text-foreground",
-			}),
-		)
-		.with(
-			{
-				kind: "blocked",
-				reason: "stored",
-			},
-			() => ({
-				label: "Stored",
-				className: "border-line bg-surface text-muted",
 			}),
 		)
 		.exhaustive();

@@ -2,7 +2,7 @@ import { Effect, Option } from "effect";
 
 import { ItemEnumSchema } from "~/engine/item/schema/ItemEnumSchema";
 import { isLineOwnerItemFx } from "~/engine/line/read/isLineOwnerItemFx";
-import { readLineOwnerLinesFx } from "~/engine/line/read/readLineOwnerLinesFx";
+import { readEffectiveDefaultLineFx } from "~/engine/line/read/readEffectiveDefaultLineFx";
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
@@ -39,14 +39,15 @@ export const readRuntimeItemPrimaryActionFx = Effect.fn("readRuntimeItemPrimaryA
 				kind: "none" as const,
 			} satisfies readRuntimeItemPrimaryActionFx.Result;
 		}
-		const defaultLineId = runtime.defaultLineByOwnerItemId?.[item.id];
-		if (
-			defaultLineId !== undefined &&
-			(yield* readLineOwnerLinesFx(lineOwnerItem)).some((line) => line.id === defaultLineId)
-		) {
+		const defaultLine = yield* readEffectiveDefaultLineFx({
+			ownerItemId: item.id,
+			ownerItem: lineOwnerItem,
+			runtime,
+		});
+		if (defaultLine !== undefined) {
 			return {
 				kind: "start-default-line" as const,
-				lineId: defaultLineId,
+				lineId: defaultLine.id,
 			} satisfies readRuntimeItemPrimaryActionFx.Result;
 		}
 		return {

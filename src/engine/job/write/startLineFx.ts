@@ -1,6 +1,7 @@
 import { Effect } from "effect";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { assertLineStartReadyFx } from "~/engine/job/fx/assertLineStartReadyFx";
+import { assertLineOutputMaxCountFx } from "~/engine/job/fx/assertLineOutputMaxCountFx";
 import { createJobQueueRequestFx } from "~/engine/job/fx/createJobQueueRequestFx";
 import { resolveLineStartFx } from "~/engine/job/fx/read/resolveLineStartFx";
 import { startLineRuntimeFx } from "~/engine/job/fx/startLineRuntimeFx";
@@ -61,8 +62,15 @@ export const startLineFx = Effect.fn("startLineFx")(function* ({
 				lineId,
 				runtime,
 			});
-			yield* assertLineStartReadyFx({
+			const plan = yield* assertLineStartReadyFx({
 				resolution,
+			});
+			yield* assertLineOutputMaxCountFx({
+				candidateId: `queue-admission:${ownerItemId}:${lineId}`,
+				ownerItemId,
+				lineId,
+				plan,
+				runtime,
 			});
 			const request = yield* createJobQueueRequestFx({
 				ownerItemId,

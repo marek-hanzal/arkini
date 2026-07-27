@@ -68,6 +68,7 @@ const config = GameConfigSchema.parse({
 					id: "line:produce",
 					title: "Produce",
 					description: "Produce one resource.",
+					default: true,
 					runtimeMs: 1_000,
 					input: [
 						{
@@ -125,7 +126,7 @@ if (producer === undefined || resource === undefined || inventoryOpener === unde
 }
 
 describe("readRuntimeItemPrimaryActionFx", () => {
-	it("does nothing for ordinary items and owners without a default action", () => {
+	it("does nothing for ordinary items and uses an authored owner fallback", () => {
 		expect(
 			Effect.runSync(
 				readRuntimeItemPrimaryActionFx({
@@ -144,7 +145,8 @@ describe("readRuntimeItemPrimaryActionFx", () => {
 				}),
 			),
 		).toEqual({
-			kind: "none",
+			kind: "start-default-line",
+			lineId: "line:produce",
 		});
 	});
 
@@ -205,6 +207,21 @@ describe("readRuntimeItemPrimaryActionFx", () => {
 						...runtime,
 						defaultLineByOwnerItemId: {
 							[producer.id]: "line:missing",
+						},
+					},
+				}),
+			),
+		).toEqual({
+			kind: "none",
+		});
+		expect(
+			Effect.runSync(
+				readRuntimeItemPrimaryActionFx({
+					item: producer,
+					runtime: {
+						...runtime,
+						defaultLineByOwnerItemId: {
+							[producer.id]: null,
 						},
 					},
 				}),

@@ -4,6 +4,8 @@ import { describe, expect, it } from "vitest";
 import { compileGameSourcesFx } from "~/engine/compiler/fx/compileGameSourcesFx";
 import { GameSourceFileSchema } from "~/engine/source/schema/GameSourceFileSchema";
 import {
+	createLine,
+	createProducerItem,
 	createRootSource,
 	createSimpleItem,
 } from "~test/validation/support/gameValidationTestSource";
@@ -26,6 +28,32 @@ describe("compileGameSourcesFx", () => {
 		);
 
 		expect(result.config?.items[item.id]).toEqual(item);
+		expect(result.diagnostics).toEqual([]);
+	});
+
+	it("preserves an authored default line through the compiler used by packing", async () => {
+		const item = createProducerItem({
+			id: "item:producer",
+			lines: [
+				createLine({
+					default: true,
+					id: "line:default",
+				}),
+			],
+		});
+		const result = await compile(
+			createRootSource({
+				items: {
+					[item.id]: item,
+				},
+			}),
+		);
+		const compiled = result.config?.items[item.id];
+		if (compiled === undefined || !("lines" in compiled)) {
+			throw new Error("Expected compiled producer.");
+		}
+
+		expect(compiled.lines[0]?.default).toBe(true);
 		expect(result.diagnostics).toEqual([]);
 	});
 

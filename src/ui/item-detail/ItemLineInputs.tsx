@@ -1,7 +1,106 @@
 import { match } from "ts-pattern";
 
 import type { ItemDetailLines } from "~/bridge/item-detail/ItemDetailLines";
+import { useWithdrawItemDetailLine } from "~/bridge/item-detail/useWithdrawItemDetailLine";
+import { Button } from "~/ui/button/Button";
 import { ItemReferenceButton } from "~/ui/item-detail/ItemReferenceButton";
+import { useItemDetailControl } from "~/ui/item-detail/useItemDetailControl";
+import { readSettledAsyncResultError } from "~/ui/reactivity/readSettledAsyncResultError";
+
+const MaterialInputWithdraw = ({
+	disabled,
+	input,
+	lineId,
+	ownerItemId,
+}: {
+	readonly disabled: boolean;
+	readonly input: Extract<
+		ItemDetailLines.Input,
+		{
+			readonly kind: "materials";
+		}
+	>;
+	readonly lineId: string;
+	readonly ownerItemId: string;
+}) => {
+	const itemDetail = useItemDetailControl();
+	const pendingKey = JSON.stringify([
+		"line-input",
+		ownerItemId,
+		lineId,
+		input.inputIndex,
+		"withdraw",
+	]);
+	const withdraw = useWithdrawItemDetailLine({
+		pendingKey,
+		pendingOwner: itemDetail,
+	});
+	readSettledAsyncResultError(withdraw.result);
+	const pending = itemDetail.readPendingAction(pendingKey) === "withdraw";
+	const error = itemDetail.readActionError(pendingKey);
+
+	return (
+		<>
+			<Button
+				className="mt-1 min-h-7 px-2.5 py-1 text-xs"
+				cursorIntent={pending ? "progress" : undefined}
+				data-ui="TileLineInputWithdrawButton"
+				disabled={disabled || !input.canWithdraw}
+				onClick={() =>
+					withdraw.run({
+						ownerItemId,
+						lineId,
+						inputIndex: input.inputIndex,
+					})
+				}
+			>
+				{pending ? "Withdrawing…" : "Withdraw"}
+			</Button>
+			{error === null ? null : <p className="mt-1 text-xs text-danger">{error}</p>}
+		</>
+	);
+};
+
+/** Keeps exact buffered-input recovery available when the line body is unavailable. */
+export const ItemLineUnavailableWithdrawals = ({
+	disabled,
+	input,
+	lineId,
+	ownerItemId,
+}: {
+	readonly disabled: boolean;
+	readonly input: readonly ItemDetailLines.Input[];
+	readonly lineId: string;
+	readonly ownerItemId: string;
+}) => {
+	const buffered = input.filter(
+		(
+			candidate,
+		): candidate is Extract<
+			ItemDetailLines.Input,
+			{
+				readonly kind: "materials";
+			}
+		> => candidate.kind === "materials" && candidate.canWithdraw,
+	);
+	if (buffered.length === 0) return null;
+	return (
+		<div
+			className="ml-auto flex flex-wrap justify-end gap-2"
+			data-ui="TileLineUnavailableWithdrawals"
+		>
+			{buffered.map((candidate) => (
+				<MaterialInputWithdraw
+					key={candidate.inputIndex}
+					disabled={disabled}
+					input={candidate}
+					lineId={lineId}
+					ownerItemId={ownerItemId}
+				/>
+			))}
+		</div>
+	);
+};
 
 const ItemLineInputTitle = ({
 	detail,
@@ -29,9 +128,13 @@ const ItemLineInputTitle = ({
 const ItemLineInputRow = ({
 	disabled,
 	input,
+	lineId,
+	ownerItemId,
 }: {
 	readonly disabled: boolean;
 	readonly input: ItemDetailLines.Input;
+	readonly lineId: string;
+	readonly ownerItemId: string;
 }) =>
 	match(input)
 		.with(
@@ -65,6 +168,12 @@ const ItemLineInputRow = ({
 									? ""
 									: ` · ${materials.charges.cost} charge${materials.charges.cost === 1 ? "" : "s"} from ${materials.charges.from === "self" ? "owner" : "target"}`}
 							</p>
+							<MaterialInputWithdraw
+								disabled={disabled}
+								input={materials}
+								lineId={lineId}
+								ownerItemId={ownerItemId}
+							/>
 						</div>
 						<div className="flex flex-col items-end text-right">
 							<p className="font-medium text-foreground">
@@ -154,9 +263,13 @@ const ItemLineInputRow = ({
 export const ItemLineInputs = ({
 	disabled,
 	input,
+	lineId,
+	ownerItemId,
 }: {
 	readonly disabled: boolean;
 	readonly input: readonly ItemDetailLines.Input[];
+	readonly lineId: string;
+	readonly ownerItemId: string;
 }) => (
 	<section className="min-w-0">
 		<h4 className="border-b border-line pb-2 text-xs font-semibold uppercase tracking-[0.08em] text-muted">
@@ -171,6 +284,8 @@ export const ItemLineInputs = ({
 						key={`${entry.kind}:${index}`}
 						disabled={disabled}
 						input={entry}
+						lineId={lineId}
+						ownerItemId={ownerItemId}
 					/>
 				))}
 			</div>

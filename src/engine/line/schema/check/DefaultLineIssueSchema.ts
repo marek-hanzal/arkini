@@ -5,20 +5,20 @@ import { DefaultLineIssueReasonEnumSchema } from "./DefaultLineIssueReasonEnumSc
 
 import { IdSchema } from "~/engine/common/schema/IdSchema";
 
-/** One persisted default-line selection no longer belongs to its exact live owner. */
+/** One persisted default-line override no longer belongs to its exact live owner. */
 export const DefaultLineIssueSchema = z
 	.object({
 		type: RuntimeCheckIssueEnumSchema.extract([
 			"DefaultLine",
 		]),
 		ownerItemId: IdSchema,
-		lineId: IdSchema,
+		lineId: IdSchema.nullable(),
 		reason: DefaultLineIssueReasonEnumSchema,
 	})
 	.strict()
 	.meta({
 		id: "DefaultLineIssueSchema",
-		description: "One invalid save-backed default product-line selection.",
+		description: "One invalid save-backed default product-line override.",
 	});
 
 export type DefaultLineIssueSchema = typeof DefaultLineIssueSchema;

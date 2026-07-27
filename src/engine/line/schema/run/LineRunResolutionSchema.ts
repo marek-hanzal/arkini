@@ -3,6 +3,7 @@ import { z } from "zod";
 import { IdSchema } from "~/engine/common/schema/IdSchema";
 import { TimeSchema } from "~/engine/common/schema/TimeSchema";
 import { InputRunResolutionSchema } from "~/engine/input/schema/run/InputRunResolutionSchema";
+import { RulesResultSchema } from "~/engine/line/schema/rule/RulesResultSchema";
 import { LineRunPlanSchema } from "./LineRunPlanSchema";
 
 /**
@@ -26,6 +27,9 @@ export const LineRunResolutionSchema = z
 		 * Final availability after enable and disable rules are interpreted.
 		 */
 		enable: z.boolean().describe("The final product-line availability."),
+		rules: RulesResultSchema.describe(
+			"The ordered evaluated line-rule facts used to derive this resolution.",
+		),
 		/**
 		 * Effective runtime after active runtime multiplier rules are applied.
 		 */

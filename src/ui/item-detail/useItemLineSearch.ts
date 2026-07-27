@@ -4,7 +4,9 @@ import type { ItemDetailLines } from "~/bridge/item-detail/ItemDetailLines";
 import { useItemLineSearchCandidates } from "~/ui/item-detail/useItemLineSearchCandidates";
 import { useFuseSearch } from "~/ui/search/useFuseSearch";
 
-/** Owns query state and resolves semantic search identities against the latest line projection. */
+export type ItemLineAvailabilityFilter = "available" | "all";
+
+/** Owns local filtering and resolves semantic search identities in authored line order. */
 export const useItemLineSearch = (
 	lines: Extract<
 		ItemDetailLines.Projection,
@@ -14,36 +16,53 @@ export const useItemLineSearch = (
 	>,
 ) => {
 	const [query, setQuery] = useState("");
-	const searchCandidates = useItemLineSearchCandidates(lines);
-	const matchingLineIds = useFuseSearch(searchCandidates, query);
-	const lineById = useMemo(
-		() =>
-			new Map(
-				lines.line.map((line) => [
-					line.lineId,
-					line,
-				]),
-			),
+	const [availabilityFilter, setAvailabilityFilter] =
+		useState<ItemLineAvailabilityFilter>("available");
+	const availableLineCount = useMemo(
+		() => lines.line.filter((line) => line.availability.kind === "available").length,
 		[
 			lines.line,
 		],
 	);
-	const filteredLines = useMemo(
+	const selectedLines = useMemo(
 		() =>
-			matchingLineIds.flatMap((lineId) => {
-				const line = lineById.get(lineId);
-				return line === undefined
-					? []
-					: [
-							line,
-						];
-			}),
+			availabilityFilter === "all"
+				? lines.line
+				: lines.line.filter((line) => line.availability.kind === "available"),
 		[
-			lineById,
+			availabilityFilter,
+			lines.line,
+		],
+	);
+	const selectedProjection = useMemo(
+		() => ({
+			...lines,
+			line: selectedLines,
+		}),
+		[
+			lines,
+			selectedLines,
+		],
+	);
+	const searchCandidates = useItemLineSearchCandidates(selectedProjection);
+	const matchingLineIds = useFuseSearch(searchCandidates, query);
+	const matchingLineIdSet = useMemo(
+		() => new Set(matchingLineIds),
+		[
 			matchingLineIds,
 		],
 	);
+	const filteredLines = useMemo(
+		() => selectedLines.filter((line) => matchingLineIdSet.has(line.lineId)),
+		[
+			matchingLineIdSet,
+			selectedLines,
+		],
+	);
 	return {
+		availabilityFilter,
+		setAvailabilityFilter,
+		availableLineCount,
 		query,
 		setQuery,
 		filteredLines,

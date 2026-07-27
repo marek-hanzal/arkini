@@ -33,13 +33,16 @@ export const readStoredItemDetailLineFx = Effect.fn("readStoredItemDetailLineFx"
 		baseRuntimeMs: line.runtimeMs,
 		effectiveRuntimeMs: line.runtimeMs,
 		availability: {
-			kind: "blocked",
-			reason: "stored",
+			kind: "unavailable",
+			reason: {
+				kind: "owner-stored",
+			},
 		},
 		startMode: "start",
 		isDefault,
 		actions: {
 			canAutofill: false,
+			canStart: false,
 			canWithdraw: false,
 		},
 		input: yield* readItemDetailInputsFx({

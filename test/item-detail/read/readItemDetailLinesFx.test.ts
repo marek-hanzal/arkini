@@ -1,6 +1,7 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
+import { GameConfigFx } from "~/engine/game/context/GameConfigFx";
 import { useGameFx } from "~/engine/game/fx/useGameFx";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { startFx } from "~/engine/start/write/startFx";
@@ -11,12 +12,16 @@ import { JobStatusEnumSchema } from "~/engine/job/schema/read/JobStatusEnumSchem
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import { readArkiniGameConfigSource } from "~test/schema/support/readArkiniGameConfigSource";
 
-const readLines = (runtime: RuntimeSchema.Type, itemId = "runtime:workshop") =>
+const readLines = (
+	runtime: RuntimeSchema.Type,
+	itemId = "runtime:workshop",
+	config: GameConfigSchema.Type = lineRunTestConfig,
+) =>
 	Effect.runSync(
 		readItemDetailLinesFx({
 			itemId,
 			runtime,
-		}),
+		}).pipe(Effect.provideService(GameConfigFx, config)),
 	);
 
 describe("readItemDetailLinesFx", () => {
@@ -38,8 +43,8 @@ describe("readItemDetailLinesFx", () => {
 			baseRuntimeMs: 1_000,
 			effectiveRuntimeMs: 500,
 			availability: {
-				kind: "blocked",
-				reason: "inputs",
+				kind: "available",
+				readiness: "inputs",
 			},
 			input: [
 				{
@@ -69,7 +74,107 @@ describe("readItemDetailLinesFx", () => {
 		expect(ready.kind).toBe("available");
 		if (ready.kind !== "available") throw new Error("Expected available lines.");
 		expect(ready.line[0]?.availability).toEqual({
-			kind: "ready",
+			kind: "available",
+			readiness: "ready",
+		});
+	});
+
+	it("updates the exact failed rule cause live and gives disable veto deterministic priority", () => {
+		const job = {
+			id: "job:workshop",
+			ownerItemId: "runtime:workshop",
+			lineId: "line:workshop:build",
+			durationMs: 1_000,
+			remainingMs: 400,
+		} as const;
+		const missingPermit = readLines({
+			...lineRunRuntime({
+				permit: false,
+			}),
+			jobs: [
+				job,
+			],
+		});
+		const disableVeto = readLines({
+			...lineRunRuntime({
+				blocker: true,
+				permit: false,
+			}),
+			jobs: [
+				job,
+			],
+		});
+		const enabled = readLines({
+			...lineRunRuntime({
+				permit: true,
+			}),
+			jobs: [
+				job,
+			],
+		});
+		if (
+			missingPermit.kind !== "available" ||
+			disableVeto.kind !== "available" ||
+			enabled.kind !== "available"
+		) {
+			throw new Error("Expected live line projections.");
+		}
+
+		expect(missingPermit.line[0]?.availability).toEqual({
+			kind: "unavailable",
+			reason: {
+				kind: "line-disabled",
+				cause: {
+					kind: "enable-rule",
+					ruleIndex: 2,
+					whenIndex: 0,
+					when: {
+						type: "exists",
+						query: {
+							scope: "any",
+							selector: {
+								type: "item",
+								itemId: "permit",
+							},
+						},
+					},
+				},
+			},
+		});
+		expect(disableVeto.line[0]?.availability).toEqual({
+			kind: "unavailable",
+			reason: {
+				kind: "line-disabled",
+				cause: {
+					kind: "disable-rule",
+					ruleIndex: 3,
+					when: [
+						{
+							type: "exists",
+							query: {
+								scope: "any",
+								selector: {
+									type: "item",
+									itemId: "blocker",
+								},
+							},
+						},
+						{
+							type: "exists",
+							query: {
+								scope: "any",
+								selector: {
+									type: "item",
+									itemId: "blocker",
+								},
+							},
+						},
+					],
+				},
+			},
+		});
+		expect(enabled.line[0]?.availability).toMatchObject({
+			kind: "available",
 		});
 	});
 
@@ -109,8 +214,10 @@ describe("readItemDetailLinesFx", () => {
 		expect(lines.line).toMatchObject([
 			{
 				availability: {
-					kind: "blocked",
-					reason: "stored",
+					kind: "unavailable",
+					reason: {
+						kind: "owner-stored",
+					},
 				},
 				activeJob: {
 					status: JobStatusEnumSchema.enum.Paused,
@@ -213,8 +320,8 @@ describe("readItemDetailLinesFx", () => {
 		if (lines.kind !== "available") throw new Error("Expected available lines.");
 		expect(lines.line[0]).toMatchObject({
 			availability: {
-				kind: "blocked",
-				reason: "queue",
+				kind: "available",
+				readiness: "queue",
 			},
 			startMode: "start",
 		});
@@ -477,7 +584,7 @@ describe("readItemDetailLinesFx", () => {
 		);
 		const ownerId = runtime.items[0]?.id;
 		if (ownerId === undefined) throw new Error("Missing output owner.");
-		const lines = readLines(runtime, ownerId);
+		const lines = readLines(runtime, ownerId, config);
 		expect(lines.kind).toBe("available");
 		if (lines.kind !== "available") throw new Error("Expected available lines.");
 		expect(lines.line[0]?.output).toEqual([

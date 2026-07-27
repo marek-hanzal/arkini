@@ -68,25 +68,19 @@ export const readItemDetailInputsFx = Effect.fn("readItemDetailInputsFx")(functi
 							materialInput.selector,
 						);
 						const chargeKey = yield* readItemDetailChargeKeyFx(materialInput.charges);
-						const key = `${selectorKey}:${materialInput.mode}:${chargeKey}`;
-						const previous = materials.get(key);
+						const key = `${inputIndex}:${selectorKey}:${materialInput.mode}:${chargeKey}`;
 						materials.set(key, {
 							kind: "materials",
+							inputIndex,
 							selector: materialInput.selector,
 							mode: materialInput.mode,
-							required: {
-								min: (previous?.required.min ?? 0) + required.min,
-								max: (previous?.required.max ?? 0) + required.max,
-							},
-							storedQuantity: (previous?.storedQuantity ?? 0) + storedQuantity,
-							maxStoredQuantity:
-								(previous?.maxStoredQuantity ?? 0) + maxStoredQuantity,
-							missingQuantity: (previous?.missingQuantity ?? 0) + missingQuantity,
-							availableCapacity:
-								(previous?.availableCapacity ?? 0) + availableCapacity,
-							ready:
-								(previous?.ready ?? true) &&
-								(resolution?.ready ?? storedQuantity >= required.min),
+							required,
+							storedQuantity,
+							maxStoredQuantity,
+							missingQuantity,
+							availableCapacity,
+							ready: resolution?.ready ?? storedQuantity >= required.min,
+							canWithdraw: storedItems.length > 0,
 							...(materialInput.charges === undefined
 								? {}
 								: {

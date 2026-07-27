@@ -1,12 +1,12 @@
 import { Effect } from "effect";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import { assertJobOutputMaxCountFx } from "~/engine/job/fx/assertJobOutputMaxCountFx";
+import { assertLineOutputMaxCountFx } from "~/engine/job/fx/assertLineOutputMaxCountFx";
 import { assertLineStartReadyFx } from "~/engine/job/fx/assertLineStartReadyFx";
 import { createJobFx } from "~/engine/job/fx/createJobFx";
 import { resolveLineStartFx } from "~/engine/job/fx/read/resolveLineStartFx";
 import { isolateStatefulOwnerTransitionFx } from "~/engine/item/fx/isolateStatefulOwnerTransitionFx";
-import { applyLineRunPlanFx } from "~/engine/line/fx/run/applyLineRunPlanFx";
 import { applyLineChargePlansFx } from "~/engine/line/fx/run/applyLineChargePlansFx";
+import { applyLineRunPlanFx } from "~/engine/line/fx/run/applyLineRunPlanFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 export namespace startLineRuntimeFx {
 	export interface Props {
@@ -18,11 +18,9 @@ export namespace startLineRuntimeFx {
 /**
  * Canonical internal start pipeline used by direct starts and queue dispatch.
  *
- * The job identity is created before inputs move because consumed and reserved
- * material locations refer to it. Inputs and charges then apply to one draft,
- * output capacity is checked on that exact candidate, and stateful owner stacks
- * are isolated last. The enclosing runtime transaction discards the whole draft
- * if any stage fails.
+ * Pure output admission runs before job identity creation or mutation. The job
+ * identity is then created before inputs move because consumed and reserved
+ * material locations refer to it. Stateful owner stacks are isolated last.
  */
 export const startLineRuntimeFx = Effect.fn("startLineRuntimeFx")(function* ({
 	ownerItemId,
@@ -36,6 +34,13 @@ export const startLineRuntimeFx = Effect.fn("startLineRuntimeFx")(function* ({
 	});
 	const plan = yield* assertLineStartReadyFx({
 		resolution,
+	});
+	yield* assertLineOutputMaxCountFx({
+		candidateId: `line-admission:${ownerItemId}:${lineId}`,
+		ownerItemId,
+		lineId,
+		plan,
+		runtime,
 	});
 	const job = yield* createJobFx({
 		ownerItemId,
@@ -58,10 +63,6 @@ export const startLineRuntimeFx = Effect.fn("startLineRuntimeFx")(function* ({
 		job,
 		plan,
 		runtime: inputTransition.runtime,
-	});
-	yield* assertJobOutputMaxCountFx({
-		job,
-		runtime: charged.runtime,
 	});
 	const isolation = yield* isolateStatefulOwnerTransitionFx({
 		ownerItemId,

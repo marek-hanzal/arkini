@@ -1,7 +1,7 @@
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
+import type { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeIntegerSchema";
 import type { InputChargeFromEnumSchema } from "~/engine/input/schema/InputChargeFromEnumSchema";
 import type { InputModeEnumSchema } from "~/engine/input/schema/InputModeEnumSchema";
-import type { readItemDetailLinesFx } from "~/engine/item-detail/read/readItemDetailLinesFx";
 import type { JobStatusEnumSchema } from "~/engine/job/schema/read/JobStatusEnumSchema";
 import type {
 	ItemDetailOutputRoll,
@@ -35,6 +35,7 @@ export namespace ItemDetailLines {
 	export type Input =
 		| {
 				readonly kind: "materials";
+				readonly inputIndex: NonNegativeIntegerSchema.Type;
 				readonly selector: Selector;
 				readonly mode: InputModeEnumSchema.Type;
 				readonly required: QuantityBounds;
@@ -43,6 +44,7 @@ export namespace ItemDetailLines {
 				readonly missingQuantity: number;
 				readonly availableCapacity: number;
 				readonly ready: boolean;
+				readonly canWithdraw: boolean;
 				readonly charges?: ChargeCost;
 				readonly detail?: DetailReference;
 		  }
@@ -76,7 +78,58 @@ export namespace ItemDetailLines {
 	export type OutputRoll = ItemDetailOutputRoll<OutputItem>;
 	export type OutputSet = ItemDetailOutputSet<OutputItem>;
 
-	export type Availability = readItemDetailLinesFx.Availability;
+	export type DisabledReason =
+		| {
+				readonly kind: "owner-stored";
+				readonly message: string;
+		  }
+		| {
+				readonly kind: "line-disabled";
+				readonly cause:
+					| {
+							readonly kind: "static";
+					  }
+					| {
+							readonly kind: "enable-rule";
+							readonly ruleIndex: number;
+							readonly whenIndex: number;
+					  }
+					| {
+							readonly kind: "disable-rule";
+							readonly ruleIndex: number;
+					  };
+				readonly message: string;
+		  }
+		| {
+				readonly kind: "direct-output-max-count";
+				readonly itemId: string;
+				readonly itemTitle: string;
+				readonly liveQuantity: number;
+				readonly reservedQuantity: number;
+				readonly maxCount: number;
+				readonly message: string;
+		  }
+		| {
+				readonly kind: "downstream-output-max-count";
+				readonly intermediateItemId: string;
+				readonly intermediateItemTitle: string;
+				readonly itemId: string;
+				readonly itemTitle: string;
+				readonly liveQuantity: number;
+				readonly reservedQuantity: number;
+				readonly maxCount: number;
+				readonly message: string;
+		  };
+
+	export type Availability =
+		| {
+				readonly kind: "available";
+				readonly readiness: "ready" | "inputs" | "queue";
+		  }
+		| {
+				readonly kind: "unavailable";
+				readonly reason: DisabledReason;
+		  };
 
 	export interface Line {
 		readonly lineId: string;
@@ -89,6 +142,7 @@ export namespace ItemDetailLines {
 		readonly isDefault: boolean;
 		readonly actions: {
 			readonly canAutofill: boolean;
+			readonly canStart: boolean;
 			readonly canWithdraw: boolean;
 		};
 		readonly input: readonly Input[];

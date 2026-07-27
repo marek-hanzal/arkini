@@ -29,6 +29,7 @@
 				"id": "line:seed:grow",
 				"title": "Grow Tree",
 				"description": "Consumes water to grow this seed into a tree.",
+				"default": true,
 				"runtimeMs": 30000,
 				"input": [
 					{

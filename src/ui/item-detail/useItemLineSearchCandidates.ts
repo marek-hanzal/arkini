@@ -140,37 +140,30 @@ export const useItemLineSearchCandidates = (
 			match(availability)
 				.with(
 					{
-						kind: "ready",
+						kind: "available",
+						readiness: "ready",
 					},
 					() => "Ready",
 				)
 				.with(
 					{
-						kind: "blocked",
-						reason: "disabled",
+						kind: "unavailable",
 					},
-					() => "Disabled",
+					(unavailable) => `Disabled ${unavailable.reason.message}`,
 				)
 				.with(
 					{
-						kind: "blocked",
-						reason: "inputs",
+						kind: "available",
+						readiness: "inputs",
 					},
 					() => "Missing inputs",
 				)
 				.with(
 					{
-						kind: "blocked",
-						reason: "queue",
+						kind: "available",
+						readiness: "queue",
 					},
 					() => "Queue full",
-				)
-				.with(
-					{
-						kind: "blocked",
-						reason: "stored",
-					},
-					() => "Stored",
 				)
 				.exhaustive();
 		return lines.line.map((line) => ({

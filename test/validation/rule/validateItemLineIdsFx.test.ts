@@ -20,6 +20,17 @@ const lineDiagnostics = async (items: Record<string, unknown>) =>
 		)
 	).diagnostics.filter(({ code }) => code === DiagnosticCodeEnumSchema.enum.LineDuplicateId);
 
+const defaultDiagnostics = async (items: Record<string, unknown>) =>
+	(
+		await Effect.runPromise(
+			compileGameSourcesFx([
+				createRootSource({
+					items,
+				}),
+			]),
+		)
+	).diagnostics.filter(({ code }) => code === DiagnosticCodeEnumSchema.enum.LineMultipleDefaults);
+
 describe("validateItemLineIdsFx", () => {
 	it("rejects duplicate line IDs within one owner", async () => {
 		const owner = createProducerItem({
@@ -86,5 +97,97 @@ describe("validateItemLineIdsFx", () => {
 				[second.id]: second,
 			}),
 		).toEqual([]);
+	});
+
+	it("rejects two authored defaults on one owner with both line identities", async () => {
+		const owner = createProducerItem({
+			id: "producer:sawmill",
+			lines: [
+				createLine({
+					default: true,
+					id: "line:plank",
+				}),
+				createLine({
+					default: true,
+					id: "line:beam",
+				}),
+			],
+		});
+
+		expect(
+			await defaultDiagnostics({
+				[owner.id]: owner,
+			}),
+		).toEqual([
+			expect.objectContaining({
+				ownerItemId: owner.id,
+				lineIds: [
+					"line:plank",
+					"line:beam",
+				],
+				paths: [
+					[
+						"items",
+						owner.id,
+						"lines",
+						0,
+						"default",
+					],
+					[
+						"items",
+						owner.id,
+						"lines",
+						1,
+						"default",
+					],
+				],
+			}),
+		]);
+	});
+
+	it("reports the authored-default conflict independently from duplicate line identity", async () => {
+		const owner = createProducerItem({
+			id: "producer:sawmill",
+			lines: [
+				createLine({
+					default: true,
+					id: "line:plank",
+				}),
+				createLine({
+					default: true,
+					id: "line:plank",
+				}),
+			],
+		});
+
+		expect(
+			await defaultDiagnostics({
+				[owner.id]: owner,
+			}),
+		).toEqual([
+			expect.objectContaining({
+				ownerItemId: owner.id,
+				lineIds: [
+					"line:plank",
+					"line:plank",
+				],
+				paths: [
+					[
+						"items",
+						owner.id,
+						"lines",
+						0,
+						"default",
+					],
+					[
+						"items",
+						owner.id,
+						"lines",
+						1,
+						"default",
+					],
+				],
+			}),
+		]);
 	});
 });

@@ -3,9 +3,8 @@ import type { ItemDetailLines } from "~/bridge/item-detail/ItemDetailLines";
 import { useSetDefaultItemDetailLine } from "~/bridge/item-detail/useSetDefaultItemDetailLine";
 import { useStartPendingItemDetailLine } from "~/bridge/item-detail/useStartItemDetailLine";
 import { useUnsetDefaultItemDetailLine } from "~/bridge/item-detail/useUnsetDefaultItemDetailLine";
-import { useWithdrawItemDetailLine } from "~/bridge/item-detail/useWithdrawItemDetailLine";
 import { Button, PrimaryButton } from "~/ui/button/Button";
-import { ItemLineInputs } from "~/ui/item-detail/ItemLineInputs";
+import { ItemLineInputs, ItemLineUnavailableWithdrawals } from "~/ui/item-detail/ItemLineInputs";
 import { ItemLineOutputs } from "~/ui/item-detail/ItemLineOutputs";
 import { ItemLineRuntime } from "~/ui/item-detail/ItemLineRuntime";
 import { ItemLineSummary } from "~/ui/item-detail/ItemLineSummary";
@@ -35,7 +34,6 @@ export const ItemLineRow = ({
 		autofill: pendingKey("autofill"),
 		default: pendingKey("default"),
 		start: pendingKey("start"),
-		withdraw: pendingKey("withdraw"),
 	} as const;
 	const autofillLine = useAutofillItemDetailLine({
 		pendingKey: pendingKeys.autofill,
@@ -53,25 +51,20 @@ export const ItemLineRow = ({
 		pendingKey: pendingKeys.start,
 		pendingOwner: itemDetail,
 	});
-	const withdrawLine = useWithdrawItemDetailLine({
-		pendingKey: pendingKeys.withdraw,
-		pendingOwner: itemDetail,
-	});
 	readSettledAsyncResultError(autofillLine.result);
 	readSettledAsyncResultError(setDefaultLine.result);
 	readSettledAsyncResultError(unsetDefaultLine.result);
 	readSettledAsyncResultError(startLine.result);
-	readSettledAsyncResultError(withdrawLine.result);
 	const pending = {
 		autofill: itemDetail.readPendingAction(pendingKeys.autofill) === "autofill",
 		default: itemDetail.readPendingAction(pendingKeys.default) === "default",
 		start: itemDetail.readPendingAction(pendingKeys.start) === "start",
-		withdraw: itemDetail.readPendingAction(pendingKeys.withdraw) === "withdraw",
 	} as const;
 	const error =
 		Object.values(pendingKeys)
 			.map((key) => itemDetail.readActionError(key))
 			.find((message) => message !== null) ?? null;
+	const unavailable = line.availability.kind === "unavailable";
 
 	return (
 		<article
@@ -90,7 +83,7 @@ export const ItemLineRow = ({
 							cursorIntent={pending.default ? "progress" : undefined}
 							data-ui="TileLineSetDefaultButton"
 							data-default={line.isDefault ? "true" : "false"}
-							disabled={disabled}
+							disabled={disabled || unavailable}
 							onClick={() => {
 								if (line.isDefault) {
 									unsetDefaultLine.run({
@@ -112,7 +105,7 @@ export const ItemLineRow = ({
 						</Button>
 						<Button
 							cursorIntent={pending.autofill ? "progress" : undefined}
-							disabled={disabled || !line.actions.canAutofill}
+							disabled={disabled || unavailable || !line.actions.canAutofill}
 							onClick={() =>
 								autofillLine.run({
 									ownerItemId,
@@ -122,24 +115,12 @@ export const ItemLineRow = ({
 						>
 							{pending.autofill ? "Filling…" : "Autofill"}
 						</Button>
-						<Button
-							cursorIntent={pending.withdraw ? "progress" : undefined}
-							disabled={disabled || !line.actions.canWithdraw}
-							onClick={() =>
-								withdrawLine.run({
-									ownerItemId,
-									lineId: line.lineId,
-								})
-							}
-						>
-							{pending.withdraw ? "Withdrawing…" : "Withdraw"}
-						</Button>
 						<PrimaryButton
 							className="min-w-24"
 							cursorIntent={pending.start ? "progress" : undefined}
 							data-ui="TileLineStartButton"
 							data-start-mode={line.startMode}
-							disabled={disabled || line.availability.kind !== "ready"}
+							disabled={disabled || !line.actions.canStart}
 							onClick={() =>
 								startLine.start({
 									ownerItemId,
@@ -166,23 +147,44 @@ export const ItemLineRow = ({
 					{error}
 				</p>
 			)}
-			<div className="mt-4 grid min-w-0 grid-cols-[minmax(0,1fr)_2rem_minmax(0,1fr)] gap-x-4">
-				<ItemLineInputs
-					disabled={disabled}
-					input={line.input}
-				/>
+			{line.availability.kind === "unavailable" ? (
 				<div
-					className="grid place-items-center text-muted"
-					aria-hidden="true"
-					data-ui="TileLineFlowChevron"
+					className="mt-4 flex items-center gap-3 border-t border-line pt-4 text-sm text-muted"
+					data-ui="TileLineUnavailableReason"
 				>
-					<span className="icon-[lucide--chevron-right] size-5" />
+					<span
+						className="icon-[lucide--circle-alert] size-5 shrink-0 text-warning"
+						aria-hidden="true"
+					/>
+					<p>{line.availability.reason.message}</p>
+					<ItemLineUnavailableWithdrawals
+						disabled={disabled}
+						input={line.input}
+						lineId={line.lineId}
+						ownerItemId={ownerItemId}
+					/>
 				</div>
-				<ItemLineOutputs
-					disabled={disabled}
-					output={line.output}
-				/>
-			</div>
+			) : (
+				<div className="mt-4 grid min-w-0 grid-cols-[minmax(0,1fr)_2rem_minmax(0,1fr)] gap-x-4">
+					<ItemLineInputs
+						disabled={disabled}
+						input={line.input}
+						lineId={line.lineId}
+						ownerItemId={ownerItemId}
+					/>
+					<div
+						className="grid place-items-center text-muted"
+						aria-hidden="true"
+						data-ui="TileLineFlowChevron"
+					>
+						<span className="icon-[lucide--chevron-right] size-5" />
+					</div>
+					<ItemLineOutputs
+						disabled={disabled}
+						output={line.output}
+					/>
+				</div>
+			)}
 		</article>
 	);
 };

@@ -39,6 +39,7 @@ export const checkRuntimeDefaultLinesFx = Effect.fn("checkRuntimeDefaultLinesFx"
 			});
 			continue;
 		}
+		if (lineId === null) continue;
 		const lines = yield* readLineOwnerLinesFx(ownerItem);
 		if (!lines.some((line) => line.id === lineId)) {
 			issues.push({

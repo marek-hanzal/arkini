@@ -31,10 +31,12 @@ export const readRollMaximumQuantitiesFx = Effect.fn("readRollMaximumQuantitiesF
 			{
 				type: RollEnumSchema.enum.Chance,
 			},
-			({ drop }) =>
-				readDropMaximumQuantitiesFx({
-					drop,
-				}),
+			({ chance, drop }) =>
+				chance === 0
+					? Effect.succeed(new Map<IdSchema.Type, number>())
+					: readDropMaximumQuantitiesFx({
+							drop,
+						}),
 		)
 		.with(
 			{

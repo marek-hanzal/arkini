@@ -1,5 +1,4 @@
 import { Effect } from "effect";
-import { match } from "ts-pattern";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { planLineInputAutofillFx } from "~/engine/input/fx/planLineInputAutofillFx";
@@ -7,9 +6,12 @@ import type { ItemDetailLines } from "~/engine/item-detail/read/ItemDetailLines"
 import { readItemDetailInputsFx } from "~/engine/item-detail/read/readItemDetailInputsFx";
 import { readItemDetailOutputFx } from "~/engine/item-detail/read/readItemDetailOutputFx";
 import { resolveActiveJobStatusFx } from "~/engine/job/fx/resolveActiveJobStatusFx";
+import { resolveLineStartOutputMaxCountFx } from "~/engine/job/fx/read/resolveLineStartOutputMaxCountFx";
 import { resolveLineStartFx } from "~/engine/job/fx/read/resolveLineStartFx";
 import { JobStatusEnumSchema } from "~/engine/job/schema/read/JobStatusEnumSchema";
 import type { LineSchema } from "~/engine/line/schema/LineSchema";
+import { RuleEnumSchema } from "~/engine/line/schema/rule/RuleEnumSchema";
+import type { LineRunResolutionSchema } from "~/engine/line/schema/run/LineRunResolutionSchema";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
@@ -23,6 +25,42 @@ export namespace readBoardItemDetailLineFx {
 		readonly runtime: RuntimeSchema.Type;
 	}
 }
+
+const readLineDisabledCause = (
+	line: LineSchema.Type,
+	resolution: LineRunResolutionSchema.Type,
+): Extract<
+	ItemDetailLines.UnavailableReason,
+	{
+		readonly kind: "line-disabled";
+	}
+>["cause"] => {
+	for (const [ruleIndex, result] of resolution.rules.entries()) {
+		if (result.type !== RuleEnumSchema.enum.Disable || !result.active) continue;
+		const rule = line.rules[ruleIndex];
+		if (rule?.type !== RuleEnumSchema.enum.Disable) continue;
+		return {
+			kind: "disable-rule",
+			ruleIndex,
+			when: rule.when,
+		};
+	}
+	for (const [ruleIndex, result] of resolution.rules.entries()) {
+		if (result.type !== RuleEnumSchema.enum.Enable || result.active) continue;
+		const rule = line.rules[ruleIndex];
+		if (rule?.type !== RuleEnumSchema.enum.Enable) continue;
+		const whenIndex = result.failedWhenIndex ?? 0;
+		return {
+			kind: "enable-rule",
+			ruleIndex,
+			whenIndex,
+			when: rule.when[whenIndex] ?? rule.when[0],
+		};
+	}
+	return {
+		kind: "static",
+	};
+};
 
 /** Projects one live board line from canonical start, input, queue, and job truth. */
 export const readBoardItemDetailLineFx = Effect.fn("readBoardItemDetailLineFx")(function* ({
@@ -59,52 +97,53 @@ export const readBoardItemDetailLineFx = Effect.fn("readBoardItemDetailLineFx")(
 					job: activeJob,
 					runtime,
 				});
-	const availability: ItemDetailLines.Line["availability"] = match({
-		allInputsReady,
-		enabled: resolution.enable,
-		ready: start.ready,
-	})
-		.with(
-			{
-				ready: true,
-			},
-			() => ({
-				kind: "ready" as const,
-			}),
-		)
-		.with(
-			{
-				enabled: false,
-				ready: false,
-			},
-			() => ({
-				kind: "blocked" as const,
-				reason: "disabled" as const,
-			}),
-		)
-		.with(
-			{
-				allInputsReady: false,
-				enabled: true,
-				ready: false,
-			},
-			() => ({
-				kind: "blocked" as const,
-				reason: "inputs" as const,
-			}),
-		)
-		.with(
-			{
-				allInputsReady: true,
-				enabled: true,
-				ready: false,
-			},
-			() => ({
-				kind: "blocked" as const,
-				reason: "queue" as const,
-			}),
-		)
-		.exhaustive();
+	const outputBlock = resolution.enable
+		? yield* resolveLineStartOutputMaxCountFx({
+				lineId: line.id,
+				ownerItemId,
+				plan: resolution.plan,
+				runtime,
+			})
+		: undefined;
+	const directOutputBlock =
+		outputBlock?.kind === "direct-output-max-count" ? outputBlock : undefined;
+	const downstreamOutputBlock =
+		outputBlock?.kind === "downstream-output-max-count" ? outputBlock : undefined;
+	const availability: ItemDetailLines.Line["availability"] = !resolution.enable
+		? {
+				kind: "unavailable",
+				reason: {
+					kind: "line-disabled",
+					cause: readLineDisabledCause(line, resolution),
+				},
+			}
+		: directOutputBlock !== undefined
+			? {
+					kind: "unavailable",
+					reason: {
+						kind: "direct-output-max-count",
+						itemId: directOutputBlock.itemId,
+						liveQuantity: directOutputBlock.liveQuantity,
+						reservedQuantity: directOutputBlock.reservedQuantity,
+						maxCount: directOutputBlock.maxCount,
+					},
+				}
+			: downstreamOutputBlock !== undefined
+				? {
+						kind: "unavailable",
+						reason: {
+							kind: "downstream-output-max-count",
+							intermediateItemId: downstreamOutputBlock.intermediateItemId,
+							itemId: downstreamOutputBlock.itemId,
+							liveQuantity: downstreamOutputBlock.liveQuantity,
+							reservedQuantity: downstreamOutputBlock.reservedQuantity,
+							maxCount: downstreamOutputBlock.maxCount,
+						},
+					}
+				: {
+						kind: "available",
+						readiness: start.ready ? "ready" : allInputsReady ? "queue" : "inputs",
+					};
 
 	return {
 		lineId: line.id,
@@ -117,6 +156,7 @@ export const readBoardItemDetailLineFx = Effect.fn("readBoardItemDetailLineFx")(
 		isDefault: line.id === defaultLineId,
 		actions: {
 			canAutofill: autofillPlan.entry.length > 0,
+			canStart: availability.kind === "available" && start.ready,
 			canWithdraw,
 		},
 		input: yield* readItemDetailInputsFx({

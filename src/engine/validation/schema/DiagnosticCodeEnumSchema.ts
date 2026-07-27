@@ -22,6 +22,7 @@ export const DiagnosticCodeEnumSchema = z
 		SourceSchemaReferenceConflict: "source:schema-reference-conflict",
 		ConfigSchema: "config:schema",
 		LineDuplicateId: "line:duplicate-id",
+		LineMultipleDefaults: "line:multiple-defaults",
 		ConfigKeyIdMismatch: "config:key-id-mismatch",
 		DepositUnsustainable: "deposit:unsustainable",
 	})

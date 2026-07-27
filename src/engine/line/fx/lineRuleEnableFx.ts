@@ -19,21 +19,26 @@ export const lineRuleEnableFx = Effect.fn("lineRuleEnableFx")(function* ({
 	origin,
 	rule,
 }: lineRuleEnableFx.Props) {
-	let active = true;
-	for (const when of rule.when) {
+	let failedWhenIndex: number | undefined;
+	for (const [whenIndex, when] of rule.when.entries()) {
 		if (
 			!(yield* whenFx({
 				origin,
 				when,
 			}))
 		) {
-			active = false;
+			failedWhenIndex = whenIndex;
 			break;
 		}
 	}
 
 	return {
-		active,
+		active: failedWhenIndex === undefined,
 		type: rule.type,
+		...(failedWhenIndex === undefined
+			? {}
+			: {
+					failedWhenIndex,
+				}),
 	} satisfies RuleEnableResultSchema.Type;
 });

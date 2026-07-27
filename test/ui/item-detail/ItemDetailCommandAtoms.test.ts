@@ -25,6 +25,7 @@ const engineCommands = vi.hoisted(() => ({
 	start: vi.fn(),
 	unsetDefault: vi.fn(),
 	withdraw: vi.fn(),
+	withdrawInput: vi.fn(),
 }));
 
 const gameState = vi.hoisted(() => ({
@@ -61,6 +62,9 @@ vi.mock("~/engine/line/write/unsetDefaultLineFx", () => ({
 vi.mock("~/engine/input/write/withdrawLineInputsFx", () => ({
 	withdrawLineInputsFx: (props: unknown) => engineCommands.withdraw(props),
 }));
+vi.mock("~/engine/input/write/withdrawLineInputFx", () => ({
+	withdrawLineInputFx: (props: unknown) => engineCommands.withdrawInput(props),
+}));
 
 (
 	globalThis as {
@@ -75,7 +79,18 @@ interface Commands {
 	readonly setDefault: (props: { readonly ownerItemId: string; readonly lineId: string }) => void;
 	readonly start: (props: { readonly ownerItemId: string; readonly lineId: string }) => void;
 	readonly unsetDefault: (props: { readonly ownerItemId: string }) => void;
-	readonly withdraw: (props: { readonly ownerItemId: string; readonly lineId: string }) => void;
+	readonly withdraw: (
+		props:
+			| {
+					readonly ownerItemId: string;
+					readonly lineId: string;
+			  }
+			| {
+					readonly ownerItemId: string;
+					readonly lineId: string;
+					readonly inputIndex: number;
+			  },
+	) => void;
 }
 
 const roots: Array<ReturnType<typeof createRoot>> = [];
@@ -218,7 +233,7 @@ afterEach(async () => {
 });
 
 describe("Item Detail command Atoms", () => {
-	it("runs all six authoritative line and queue commands through game.runFx", async () => {
+	it("routes whole-line and exact-input withdrawal through their authoritative commands", async () => {
 		const controller = openController();
 		const { commands } = await renderProbes({
 			controller,
@@ -248,6 +263,11 @@ describe("Item Detail command Atoms", () => {
 			command.withdraw({
 				ownerItemId: "runtime:owner",
 				lineId: "line:first",
+			});
+			command.withdraw({
+				ownerItemId: "runtime:owner",
+				lineId: "line:first",
+				inputIndex: 2,
 			});
 		});
 

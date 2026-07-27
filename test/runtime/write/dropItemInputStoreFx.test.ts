@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~/engine/game/fx/useGameFx";
 import { storeInputMaterialFx } from "~/engine/input/write/storeInputMaterialFx";
+import { isItemPureFx } from "~/engine/item/fx/purity/isItemPureFx";
 import { setDefaultLineFx } from "~/engine/line/write/setDefaultLineFx";
 import { readDropItemPreviewFx } from "~/engine/runtime/read/readDropItemPreviewFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
@@ -38,6 +39,45 @@ const mergeBeforeInputConfig = GameConfigSchema.parse({
 					effect: "keep",
 				},
 			],
+		},
+	},
+});
+
+const workshopDefinition = inputRuntimeTestConfig.items.workshop;
+if (workshopDefinition === undefined || !("lines" in workshopDefinition)) {
+	throw new Error("Expected workshop producer definition.");
+}
+
+const authoredDefaultConfig = GameConfigSchema.parse({
+	...inputRuntimeTestConfig,
+	meta: {
+		...inputRuntimeTestConfig.meta,
+		id: "game:drop-input-authored-default",
+	},
+	items: {
+		...inputRuntimeTestConfig.items,
+		workshop: {
+			...workshopDefinition,
+			lines: workshopDefinition.lines.map((line) => ({
+				...line,
+				default: true,
+			})),
+		},
+	},
+});
+
+const authoredDefaultBlockedConfig = GameConfigSchema.parse({
+	...authoredDefaultConfig,
+	meta: {
+		...authoredDefaultConfig.meta,
+		id: "game:drop-input-authored-default-blocked",
+		board: {
+			width: 1,
+			height: 1,
+		},
+		inventory: {
+			width: 2,
+			height: 1,
 		},
 	},
 });
@@ -128,6 +168,154 @@ const dropFx = ({
 	});
 
 describe("dropItemFx default-line input storage", () => {
+	it("uses an authored fallback without state until the drop atomically isolates one stacked owner", () => {
+		const result = run(
+			Effect.gen(function* () {
+				const owner = yield* spawnItemFx({
+					id: "runtime:workshop",
+					itemId: "workshop",
+					location: workshopLocation,
+					quantity: 3,
+				});
+				const source = yield* spawnItemFx({
+					id: "runtime:water",
+					itemId: "water",
+					location: sourceLocation(1),
+					quantity: 1,
+				});
+				const before = yield* readRuntimeFx();
+				const beforeOwner = before.items.find((item) => item.id === owner.id);
+				if (beforeOwner === undefined) throw new Error("Missing authored-default owner.");
+				const pureBefore = yield* isItemPureFx({
+					item: beforeOwner,
+					runtime: before,
+				});
+				const preview = yield* previewFx({
+					ownerRevision: owner.revision,
+					sourceRevision: source.revision,
+				});
+				const outcome = yield* dropFx({
+					ownerRevision: owner.revision,
+					sourceRevision: source.revision,
+				});
+				const runtime = yield* readRuntimeFx();
+				const isolated = runtime.items.find((item) => item.id === owner.id);
+				const remainder = runtime.items.find(
+					(item) => item.item.id === "workshop" && item.id !== owner.id,
+				);
+				if (isolated === undefined || remainder === undefined) {
+					throw new Error("Expected isolated owner and pure remainder.");
+				}
+				return {
+					isolated,
+					outcome,
+					preview,
+					pureBefore,
+					remainder,
+					remainderPure: yield* isItemPureFx({
+						item: remainder,
+						runtime,
+					}),
+					runtime,
+				};
+			}),
+			authoredDefaultConfig,
+		);
+
+		expect(result.pureBefore).toBe(true);
+		expect(result.preview).toEqual({
+			kind: DropItemResultKindEnumSchema.enum.StoreInput,
+			lineId,
+			inputIndex: 0,
+			quantity: 1,
+		});
+		expect(result.outcome.kind).toBe(DropItemResultKindEnumSchema.enum.StoreInput);
+		expect(result.runtime.defaultLineByOwnerItemId).toBeUndefined();
+		expect(result.isolated).toMatchObject({
+			id: "runtime:workshop",
+			quantity: 1,
+		});
+		expect(result.remainder).toMatchObject({
+			quantity: 2,
+		});
+		expect(result.remainderPure).toBe(true);
+	});
+
+	it("rolls back an authored-default drop when the isolated remainder cannot be placed", () => {
+		const inventorySourceLocation = {
+			scope: "inventory" as const,
+			position: {
+				x: 0,
+				y: 0,
+			},
+		};
+		const result = run(
+			Effect.gen(function* () {
+				const owner = yield* spawnItemFx({
+					id: "runtime:workshop",
+					itemId: "workshop",
+					location: workshopLocation,
+					quantity: 2,
+				});
+				const source = yield* spawnItemFx({
+					id: "runtime:water",
+					itemId: "water",
+					location: inventorySourceLocation,
+					quantity: 7,
+				});
+				yield* spawnItemFx({
+					id: "runtime:blocker",
+					itemId: "stone",
+					location: {
+						scope: "inventory",
+						position: {
+							x: 1,
+							y: 0,
+						},
+					},
+					quantity: 1,
+				});
+				const target = targetFor({
+					revision: owner.revision,
+				});
+				const preview = yield* readDropItemPreviewFx({
+					sourceItemId: source.id,
+					sourceRevision: source.revision,
+					sourceLocation: inventorySourceLocation,
+					target,
+				});
+				const before = yield* readRuntimeFx();
+				const dropped = yield* Effect.result(
+					dropItemFx({
+						sourceItemId: source.id,
+						sourceRevision: source.revision,
+						sourceLocation: inventorySourceLocation,
+						target,
+					}),
+				);
+				return {
+					after: yield* readRuntimeFx(),
+					before,
+					dropped,
+					preview,
+				};
+			}),
+			authoredDefaultBlockedConfig,
+		);
+
+		expect(result.preview.kind).toBe(DropItemResultKindEnumSchema.enum.StoreInput);
+		expect(result.dropped._tag).toBe("Success");
+		if (result.dropped._tag === "Success") {
+			expect(result.dropped.success).toEqual({
+				kind: DropItemResultKindEnumSchema.enum.Reject,
+				reason: "blocked",
+				itemId: "runtime:water",
+				targetItemId: "runtime:workshop",
+			});
+		}
+		expect(result.after).toEqual(result.before);
+	});
+
 	it("previews and commits a full visible source store before swap", () => {
 		const result = run(
 			Effect.gen(function* () {

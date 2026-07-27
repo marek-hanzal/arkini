@@ -129,6 +129,7 @@ export const resolveLineRunFx = Effect.fn("resolveLineRunFx")(function* ({
 		lineId,
 		show,
 		enable,
+		rules,
 		runtimeMs,
 		input,
 		ready,

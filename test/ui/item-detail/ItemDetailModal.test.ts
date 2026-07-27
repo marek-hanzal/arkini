@@ -309,13 +309,31 @@ describe("ItemDetailModal", () => {
 			await Promise.resolve();
 		});
 		const modal = document.querySelector<HTMLElement>('[data-ui="ItemDetailModal"]');
+		const openState = readControl().state;
+		if (openState.phase !== "open") throw new Error("Missing open Item Detail state.");
 		expect(modal).not.toBeNull();
 		expect(modal?.dataset.runtimeId).toBe(owner.id);
 		expect(modal?.dataset.tab).toBe("lines");
 		expect(document.querySelector('[data-ui="ItemLinesTab"]')).not.toBeNull();
+		const contentScene = document.querySelector<HTMLElement>(
+			'[data-ui="ItemDetailContentScene"]',
+		);
+		const header = document.querySelector<HTMLElement>("header");
+		const headerArtwork = document.querySelector<HTMLElement>(
+			'[data-ui="ItemDetailHeaderArtwork"]',
+		);
+		const tabs = document.querySelector<HTMLElement>('[data-ui="ItemDetailTabs"]');
+		const linesBody = document.querySelector<HTMLElement>(
+			'[data-ui="ItemDetailContentTransition"]',
+		);
 		const closeButton = document.querySelector<HTMLButtonElement>(
 			'[data-ui="ItemDetailCloseButton"]',
 		);
+		expect(contentScene).not.toBeNull();
+		expect(header).not.toBeNull();
+		expect(headerArtwork).not.toBeNull();
+		expect(tabs).not.toBeNull();
+		expect(linesBody?.dataset.tab).toBe("lines");
 		expect(closeButton?.className).toContain("size-14");
 		expect(closeButton?.className).toContain("bg-transparent");
 		expect(closeButton?.className).not.toContain("border");
@@ -362,8 +380,21 @@ describe("ItemDetailModal", () => {
 		if (infoTab === null) throw new Error("Missing Info tab.");
 		await act(async () => infoTab.click());
 		expect(document.querySelector('[data-ui="ItemDetailModal"]')).toBe(modal);
+		expect(document.querySelector('[data-ui="ItemDetailContentScene"]')).toBe(contentScene);
+		expect(document.querySelector("header")).toBe(header);
+		expect(document.querySelector('[data-ui="ItemDetailHeaderArtwork"]')).toBe(headerArtwork);
+		expect(document.querySelector('[data-ui="ItemDetailTabs"]')).toBe(tabs);
+		expect(document.querySelector('[data-ui="ItemDetailCloseButton"]')).toBe(closeButton);
 		expect(modal?.dataset.tab).toBe("info");
 		expect(document.querySelector('[data-ui="ItemInfoTab"]')).not.toBeNull();
+		const infoBody = document.querySelector<HTMLElement>(
+			'[data-ui="ItemDetailContentTransition"]',
+		);
+		expect(infoBody).not.toBe(linesBody);
+		expect(infoBody?.dataset.tab).toBe("info");
+		expect(document.querySelectorAll('[data-ui="ItemDetailContentTransition"]')).toHaveLength(
+			1,
+		);
 		expect(document.activeElement).toBe(
 			document.querySelector<HTMLButtonElement>('[data-tab="info"][aria-selected="true"]'),
 		);
@@ -372,19 +403,102 @@ describe("ItemDetailModal", () => {
 		if (queueTab === null) throw new Error("Missing Queue tab.");
 		await act(async () => queueTab.click());
 		expect(document.querySelector('[data-ui="ItemDetailModal"]')).toBe(modal);
+		expect(document.querySelector('[data-ui="ItemDetailContentScene"]')).toBe(contentScene);
+		expect(document.querySelector("header")).toBe(header);
+		expect(document.querySelector('[data-ui="ItemDetailHeaderArtwork"]')).toBe(headerArtwork);
+		expect(document.querySelector('[data-ui="ItemDetailTabs"]')).toBe(tabs);
+		expect(document.querySelector('[data-ui="ItemDetailCloseButton"]')).toBe(closeButton);
 		expect(modal?.dataset.tab).toBe("queue");
 		expect(document.querySelector('[data-ui="ItemQueueTab"]')).not.toBeNull();
+		const queueBody = document.querySelector<HTMLElement>(
+			'[data-ui="ItemDetailContentTransition"]',
+		);
+		expect(queueBody).not.toBe(infoBody);
+		expect(queueBody?.dataset.tab).toBe("queue");
+		expect(document.querySelectorAll('[data-ui="ItemDetailContentTransition"]')).toHaveLength(
+			1,
+		);
 		expect(document.activeElement).toBe(
 			document.querySelector<HTMLButtonElement>('[data-tab="queue"][aria-selected="true"]'),
 		);
 		expect(readControl().state).toMatchObject({
 			phase: "open",
+			generation: openState.generation,
 			target: {
 				itemId: owner.id,
 				tab: "queue",
 				origin,
 			},
 		});
+
+		const linesTab = document.querySelector<HTMLButtonElement>('[data-tab="lines"]');
+		if (linesTab === null) throw new Error("Missing Lines tab.");
+		await act(async () => {
+			infoTab.click();
+			linesTab.click();
+			infoTab.click();
+		});
+		expect(document.querySelector('[data-ui="ItemDetailModal"]')).toBe(modal);
+		expect(document.querySelector('[data-ui="ItemDetailContentScene"]')).toBe(contentScene);
+		expect(document.querySelector("header")).toBe(header);
+		expect(document.querySelector('[data-ui="ItemDetailTabs"]')).toBe(tabs);
+		expect(document.querySelectorAll('[data-ui="ItemDetailContentTransition"]')).toHaveLength(
+			1,
+		);
+		expect(
+			document.querySelector<HTMLElement>('[data-ui="ItemDetailContentTransition"]')?.dataset
+				.tab,
+		).toBe("info");
+		expect(document.querySelector('[data-ui="ItemInfoTab"]')).not.toBeNull();
+		expect(readControl().state).toMatchObject({
+			phase: "open",
+			generation: openState.generation,
+			target: {
+				itemId: owner.id,
+				tab: "info",
+				origin,
+			},
+		});
+	});
+
+	it("swaps only the active body immediately under reduced motion", async () => {
+		motionTestRuntime.reducedMotion = true;
+		const { readControl } = await renderItemDetail();
+		const owner = currentRuntime.items.find((item) => item.item.id === "workshop");
+		if (owner === undefined) throw new Error("Missing Workshop runtime item.");
+
+		await act(async () => {
+			openItemDetail(readControl(), {
+				itemId: owner.id,
+				tab: "lines",
+			});
+			await Promise.resolve();
+			await Promise.resolve();
+		});
+		const modal = document.querySelector<HTMLElement>('[data-ui="ItemDetailModal"]');
+		const header = document.querySelector<HTMLElement>("header");
+		const tabs = document.querySelector<HTMLElement>('[data-ui="ItemDetailTabs"]');
+		const linesBody = document.querySelector<HTMLElement>(
+			'[data-ui="ItemDetailContentTransition"]',
+		);
+		expect(linesBody?.dataset.reducedMotion).toBe("true");
+
+		const infoTab = document.querySelector<HTMLButtonElement>('[data-tab="info"]');
+		if (infoTab === null) throw new Error("Missing Info tab.");
+		await act(async () => infoTab.click());
+
+		const infoBody = document.querySelector<HTMLElement>(
+			'[data-ui="ItemDetailContentTransition"]',
+		);
+		expect(document.querySelector('[data-ui="ItemDetailModal"]')).toBe(modal);
+		expect(document.querySelector("header")).toBe(header);
+		expect(document.querySelector('[data-ui="ItemDetailTabs"]')).toBe(tabs);
+		expect(infoBody).not.toBe(linesBody);
+		expect(infoBody?.dataset.reducedMotion).toBe("true");
+		expect(infoBody?.dataset.tab).toBe("info");
+		expect(document.querySelectorAll('[data-ui="ItemDetailContentTransition"]')).toHaveLength(
+			1,
+		);
 	});
 
 	it("keeps output recipes definition scoped even when a live item exists", async () => {

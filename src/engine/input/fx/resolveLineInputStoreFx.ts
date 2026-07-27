@@ -8,6 +8,7 @@ import { filterInputSlotItemsFx } from "~/engine/input/read/filterInputSlotItems
 import { InputEnumSchema } from "~/engine/input/schema/InputEnumSchema";
 import { isLineInputClosedFx } from "~/engine/line/fx/input/isLineInputClosedFx";
 import { isLineOwnerItemFx } from "~/engine/line/read/isLineOwnerItemFx";
+import { readEffectiveDefaultLineFx } from "~/engine/line/read/readEffectiveDefaultLineFx";
 import { readLineOwnerLinesFx } from "~/engine/line/read/readLineOwnerLinesFx";
 import { isBoardRuntimeItemFx } from "~/engine/runtime/read/isBoardRuntimeItemFx";
 import type { GridRuntimeItemSchema } from "~/engine/runtime/schema/GridRuntimeItemSchema";
@@ -52,7 +53,15 @@ export const resolveLineInputStoreFx = Effect.fn("resolveLineInputStoreFx")(func
 	if (narrowedLineOwnerItem === undefined) return undefined;
 	const boardOwner = Option.getOrUndefined(yield* isBoardRuntimeItemFx(owner));
 	if (boardOwner === undefined) return undefined;
-	const lineId = requestedLineId ?? runtime.defaultLineByOwnerItemId?.[boardOwner.id];
+	const effectiveDefaultLine =
+		requestedLineId === undefined
+			? yield* readEffectiveDefaultLineFx({
+					ownerItemId: boardOwner.id,
+					ownerItem: narrowedLineOwnerItem,
+					runtime,
+				})
+			: undefined;
+	const lineId = requestedLineId ?? effectiveDefaultLine?.id;
 	if (lineId === undefined) return undefined;
 	const line = (yield* readLineOwnerLinesFx(narrowedLineOwnerItem)).find(
 		(candidate) => candidate.id === lineId,

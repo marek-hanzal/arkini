@@ -49,8 +49,15 @@ describe("LineSchema", () => {
 
 		expect(LineSchema.safeParse(line).success).toBe(true);
 		const lineWithDefaults = LineSchema.parse(line);
+		expect(lineWithDefaults.default).toBe(false);
 		expect(lineWithDefaults.show).toBe(true);
 		expect(lineWithDefaults.enable).toBe(true);
+		expect(
+			LineSchema.parse({
+				...line,
+				default: true,
+			}).default,
+		).toBe(true);
 		expect(
 			LineSchema.parse({
 				...line,

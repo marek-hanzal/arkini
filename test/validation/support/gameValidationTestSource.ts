@@ -24,6 +24,7 @@ export const createSimpleItem = (id: string, tags: string[] = []) =>
 	});
 
 export const createLine = ({
+	default: isDefault = false,
 	id = "line:test",
 	input = [
 		{
@@ -32,6 +33,7 @@ export const createLine = ({
 	],
 	output,
 }: {
+	default?: boolean;
 	id?: string;
 	input?: ReadonlyArray<InputSchema.Type>;
 	output?: OutputSchema.Type;
@@ -40,6 +42,7 @@ export const createLine = ({
 		id,
 		title: id,
 		description: id,
+		default: isDefault,
 		runtimeMs: 0,
 		input,
 		output,

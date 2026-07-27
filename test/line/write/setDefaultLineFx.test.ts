@@ -17,10 +17,11 @@ import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
 import { RuntimeCheckIssueEnumSchema } from "~/engine/runtime/schema/check/RuntimeCheckIssueEnumSchema";
 import { DefaultLineIssueReasonEnumSchema } from "~/engine/line/schema/check/DefaultLineIssueReasonEnumSchema";
 
-const line = (id: string, title: string) => ({
+const line = (id: string, title: string, isDefault = false) => ({
 	id,
 	title,
 	description: `${title} description.`,
+	default: isDefault,
 	show: true,
 	enable: true,
 	runtimeMs: 1_000,
@@ -78,7 +79,7 @@ const config = GameConfigSchema.parse({
 			maxStackSize: 1,
 			maxQueueSize: 1,
 			lines: [
-				line("line:first", "First"),
+				line("line:first", "First", true),
 				line("line:second", "Second"),
 			],
 		},
@@ -123,7 +124,7 @@ const createStackConfig = ({ boardWidth }: { readonly boardWidth: number }) =>
 				maxStackSize: 3,
 				maxQueueSize: 1,
 				lines: [
-					line("line:only", "Only"),
+					line("line:only", "Only", true),
 				],
 			},
 			blocker: {
@@ -145,6 +146,47 @@ const createStackConfig = ({ boardWidth }: { readonly boardWidth: number }) =>
 	});
 
 describe("setDefaultLineFx", () => {
+	it("reads the authored fallback without creating runtime state", () => {
+		const result = Effect.runSync(
+			Effect.gen(function* () {
+				const runtime = yield* startFx();
+				const owner = runtime.items[0];
+				if (owner === undefined) throw new Error("Missing producer.");
+				return {
+					projection: yield* readItemDetailLinesFx({
+						itemId: owner.id,
+						runtime,
+					}),
+					pure: yield* isItemPureFx({
+						item: owner,
+						runtime,
+					}),
+					runtime,
+				};
+			}).pipe(
+				useGameFx({
+					config,
+				}),
+			),
+		);
+
+		expect(result.runtime.defaultLineByOwnerItemId).toBeUndefined();
+		expect(result.pure).toBe(true);
+		expect(result.projection).toMatchObject({
+			kind: "available",
+			line: [
+				{
+					lineId: "line:first",
+					isDefault: true,
+				},
+				{
+					lineId: "line:second",
+					isDefault: false,
+				},
+			],
+		});
+	});
+
 	it("persists one exact default without reordering authored lines and makes the owner impure", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {
@@ -210,7 +252,7 @@ describe("setDefaultLineFx", () => {
 		});
 	});
 
-	it("unsets the exact default and restores owner purity", () => {
+	it("persists an explicit no-default override instead of restoring the authored fallback", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {
 				const started = yield* startFx();
@@ -232,10 +274,18 @@ describe("setDefaultLineFx", () => {
 					item: runtime.items[0]!,
 					runtime,
 				});
+				const state = yield* fromRuntimeFx({
+					runtime,
+				});
+				const restored = yield* fromStateFx({
+					state,
+				});
 				return {
 					projection,
 					pure,
+					restored,
 					runtime,
+					state,
 				};
 			}).pipe(
 				useGameFx({
@@ -244,8 +294,16 @@ describe("setDefaultLineFx", () => {
 			),
 		);
 
-		expect(result.runtime.defaultLineByOwnerItemId).toBeUndefined();
-		expect(result.pure).toBe(true);
+		expect(result.runtime.defaultLineByOwnerItemId).toEqual({
+			[result.runtime.items[0]!.id]: null,
+		});
+		expect(result.state.defaultLineByOwnerItemId).toEqual(
+			result.runtime.defaultLineByOwnerItemId,
+		);
+		expect(result.restored.defaultLineByOwnerItemId).toEqual(
+			result.runtime.defaultLineByOwnerItemId,
+		);
+		expect(result.pure).toBe(false);
 		expect(result.projection).toMatchObject({
 			kind: "available",
 			line: [
@@ -424,7 +482,7 @@ describe("setDefaultLineFx", () => {
 		});
 		expect(result.selectedPure).toBe(false);
 		expect(result.remainderPure).toBe(true);
-		expect(result.clearedPure).toBe(true);
+		expect(result.clearedPure).toBe(false);
 	});
 
 	it("rolls back the default mapping and split when the remainder cannot be placed", () => {

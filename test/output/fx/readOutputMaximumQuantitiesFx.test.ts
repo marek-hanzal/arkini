@@ -15,6 +15,39 @@ const range = (min: number, max: number) => ({
 });
 
 describe("readOutputMaximumQuantitiesFx", () => {
+	it("does not reserve an impossible zero-chance drop", () => {
+		const output: OutputSchema.Type = {
+			set: [
+				{
+					roll: [
+						{
+							type: "chance",
+							chance: 0,
+							drop: [
+								{
+									itemId: "item:impossible",
+									quantity: value(1),
+									placement: "drop",
+									rules: [],
+								},
+							],
+						},
+					],
+				},
+			],
+		};
+
+		const quantities = Effect.runSync(
+			readOutputMaximumQuantitiesFx({
+				output,
+			}),
+		);
+
+		expect([
+			...quantities,
+		]).toEqual([]);
+	});
+
 	it("takes the maximum across alternative sets while summing rolls inside one set", () => {
 		const output: OutputSchema.Type = {
 			set: [

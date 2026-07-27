@@ -1,5 +1,5 @@
-import { motion } from "motion/react";
-import { useEffect } from "react";
+import { motion, useReducedMotion } from "motion/react";
+import { type ReactNode, useEffect } from "react";
 import { match } from "ts-pattern";
 
 import type { ItemDetailTab } from "~/bridge/item-detail/ItemDetailTab";
@@ -329,6 +329,40 @@ const ItemDetailContent = ({
 		))
 		.exhaustive();
 
+const ItemDetailBodyTransition = ({
+	children,
+	target,
+}: {
+	readonly children: ReactNode;
+	readonly target: ItemDetailTarget;
+}) => {
+	const reducedMotion = useReducedMotion();
+	return (
+		<motion.div
+			key={`${target.kind}:${target.itemId}:${target.tab}`}
+			className="flex min-h-0 flex-1 flex-col"
+			data-ui="ItemDetailContentTransition"
+			data-tab={target.tab}
+			data-reduced-motion={reducedMotion ? "true" : "false"}
+			initial={
+				reducedMotion
+					? false
+					: {
+							opacity: 0,
+							y: 6,
+						}
+			}
+			animate={{
+				opacity: 1,
+				y: 0,
+			}}
+			transition={transition}
+		>
+			{children}
+		</motion.div>
+	);
+};
+
 const RuntimeItemDetailScene = ({
 	disabled,
 	target,
@@ -438,13 +472,15 @@ const RuntimeItemDetailScene = ({
 				className="flex min-h-0 flex-1 overflow-hidden pt-4"
 				data-stale={stale ? "true" : "false"}
 			>
-				<ItemDetailContent
-					disabled={stale || disabled}
-					itemId={target.itemId}
-					lines={lines}
-					sources={sources}
-					tab={target.tab}
-				/>
+				<ItemDetailBodyTransition target={target}>
+					<ItemDetailContent
+						disabled={stale || disabled}
+						itemId={target.itemId}
+						lines={lines}
+						sources={sources}
+						tab={target.tab}
+					/>
+				</ItemDetailBodyTransition>
 			</div>
 		</div>
 	);
@@ -526,14 +562,16 @@ const DefinitionItemDetailScene = ({
 				target={target}
 			/>
 			<div className="flex min-h-0 flex-1 overflow-hidden pt-4">
-				{target.tab === "info" ? (
-					<ItemDefinitionInfoTab definition={definition} />
-				) : (
-					<ItemSourcesContent
-						disabled={disabled}
-						sources={sources}
-					/>
-				)}
+				<ItemDetailBodyTransition target={target}>
+					{target.tab === "info" ? (
+						<ItemDefinitionInfoTab definition={definition} />
+					) : (
+						<ItemSourcesContent
+							disabled={disabled}
+							sources={sources}
+						/>
+					)}
+				</ItemDetailBodyTransition>
 			</div>
 		</div>
 	);
@@ -598,45 +636,30 @@ const ItemDetailDialog = ({
 				onAnimationComplete={motionState.completeMotionPhase}
 				onKeyDown={focus.keepFocusInside}
 			>
-				<motion.div
-					key={`${state.target.kind}:${state.target.itemId}:${state.target.tab}`}
-					className="flex min-h-0 flex-1 flex-col"
-					data-ui="ItemDetailContentTransition"
-					initial={{
-						opacity: 0,
-						y: 6,
-					}}
-					animate={{
-						opacity: 1,
-						y: 0,
-					}}
-					transition={transition}
-				>
-					{match(state.target)
-						.with(
-							{
-								kind: "runtime",
-							},
-							(target) => (
-								<RuntimeItemDetailScene
-									disabled={disabled}
-									target={target}
-								/>
-							),
-						)
-						.with(
-							{
-								kind: "definition",
-							},
-							(target) => (
-								<DefinitionItemDetailScene
-									disabled={disabled}
-									target={target}
-								/>
-							),
-						)
-						.exhaustive()}
-				</motion.div>
+				{match(state.target)
+					.with(
+						{
+							kind: "runtime",
+						},
+						(target) => (
+							<RuntimeItemDetailScene
+								disabled={disabled}
+								target={target}
+							/>
+						),
+					)
+					.with(
+						{
+							kind: "definition",
+						},
+						(target) => (
+							<DefinitionItemDetailScene
+								disabled={disabled}
+								target={target}
+							/>
+						),
+					)
+					.exhaustive()}
 			</motion.div>
 		</motion.div>
 	);

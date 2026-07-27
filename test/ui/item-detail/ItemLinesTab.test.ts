@@ -73,6 +73,7 @@ const roots: Array<ReturnType<typeof createRoot>> = [];
 
 const input = {
 	kind: "materials",
+	inputIndex: 0,
 	selector: {
 		kind: "item",
 		label: "Tree",
@@ -87,6 +88,7 @@ const input = {
 	missingQuantity: 1,
 	availableCapacity: 1,
 	ready: true,
+	canWithdraw: false,
 	detail: {
 		itemId: "tree",
 		title: "Tree",
@@ -158,12 +160,14 @@ const line = ({
 	baseRuntimeMs: 1_000,
 	effectiveRuntimeMs: 1_000,
 	availability: {
-		kind: "ready",
+		kind: "available",
+		readiness: "ready",
 	},
 	startMode: "start",
 	isDefault,
 	actions: {
 		canAutofill: false,
+		canStart: true,
 		canWithdraw: false,
 	},
 	input: [
@@ -241,6 +245,7 @@ const renderLines = async (
 		await act(async () => {
 			root.render(
 				createElement(ItemLinesTab, {
+					key: nextLines.itemId,
 					disabled: false,
 					lines: nextLines,
 				}),
@@ -267,6 +272,14 @@ const setSearchQuery = async (container: HTMLElement, value: string) => {
 			}),
 		);
 	});
+};
+
+const selectAvailabilityFilter = async (container: HTMLElement, value: "available" | "all") => {
+	const option = container.querySelector<HTMLInputElement>(
+		`input[name="item-lines-availability"][value="${value}"]`,
+	);
+	if (option === null) throw new Error(`Expected ${value} availability option.`);
+	await act(async () => option.click());
 };
 
 describe("ItemLinesTab", () => {
@@ -315,6 +328,311 @@ describe("ItemLinesTab", () => {
 		}
 	});
 
+	it("defaults to Available and keeps input-starved lines while hiding unavailable lines", async () => {
+		const inputStarved = {
+			...line({
+				lineId: "line:inputs",
+				title: "Needs Water",
+			}),
+			availability: {
+				kind: "available",
+				readiness: "inputs",
+			},
+			actions: {
+				canAutofill: true,
+				canStart: false,
+				canWithdraw: false,
+			},
+		} as const satisfies useItemDetailLines.Line;
+		const unavailable = {
+			...line({
+				lineId: "line:capped",
+				title: "Capped Well",
+			}),
+			availability: {
+				kind: "unavailable",
+				reason: {
+					kind: "direct-output-max-count",
+					itemId: "well",
+					itemTitle: "Well",
+					liveQuantity: 1,
+					reservedQuantity: 0,
+					maxCount: 1,
+					message: "Well limit reached (1/1).",
+				},
+			},
+			actions: {
+				canAutofill: false,
+				canStart: false,
+				canWithdraw: false,
+			},
+		} as const satisfies useItemDetailLines.Line;
+		const downstreamUnavailable = {
+			...unavailable,
+			lineId: "line:downstream-capped",
+			title: "Capped Blueprint",
+			availability: {
+				kind: "unavailable",
+				reason: {
+					kind: "downstream-output-max-count",
+					intermediateItemId: "well-blueprint",
+					intermediateItemTitle: "Well Blueprint",
+					itemId: "well",
+					itemTitle: "Well",
+					liveQuantity: 1,
+					reservedQuantity: 0,
+					maxCount: 1,
+					message: "Well limit reached (1/1).",
+				},
+			},
+		} as const satisfies useItemDetailLines.Line;
+		const mixed = {
+			...projection,
+			line: [
+				unavailable,
+				inputStarved,
+				downstreamUnavailable,
+				projection.line[0],
+			],
+		} as const satisfies Extract<
+			useItemDetailLines.Projection,
+			{
+				kind: "available";
+			}
+		>;
+		const { container } = await renderLines(mixed);
+		const available = container.querySelector<HTMLInputElement>(
+			'input[name="item-lines-availability"][value="available"]',
+		);
+		const all = container.querySelector<HTMLInputElement>(
+			'input[name="item-lines-availability"][value="all"]',
+		);
+
+		expect(
+			container
+				.querySelector('[data-ui="ItemLinesAvailabilityFilter"]')
+				?.getAttribute("role"),
+		).toBe("radiogroup");
+		expect(available?.checked).toBe(true);
+		expect(all?.checked).toBe(false);
+		expect(
+			Array.from(container.querySelectorAll<HTMLElement>('[data-ui="TileLine"]')).map(
+				(row) => row.dataset.lineId,
+			),
+		).toEqual([
+			"line:inputs",
+			"line:first",
+		]);
+		expect(container.textContent).toContain("Needs Water");
+		expect(container.textContent).not.toContain("Capped Well");
+		expect(container.textContent).not.toContain("Capped Blueprint");
+
+		await selectAvailabilityFilter(container, "all");
+		expect(
+			Array.from(container.querySelectorAll<HTMLElement>('[data-ui="TileLine"]')).map(
+				(row) => row.dataset.lineId,
+			),
+		).toEqual([
+			"line:capped",
+			"line:inputs",
+			"line:downstream-capped",
+			"line:first",
+		]);
+	});
+
+	it("composes search inside the selected subset without clearing query or reordering", async () => {
+		const unavailable = {
+			...line({
+				lineId: "line:capped",
+				title: "Capped Well",
+			}),
+			description: "Limited production line.",
+			availability: {
+				kind: "unavailable",
+				reason: {
+					kind: "direct-output-max-count",
+					itemId: "well",
+					itemTitle: "Well",
+					liveQuantity: 1,
+					reservedQuantity: 0,
+					maxCount: 1,
+					message: "Well limit reached (1/1).",
+				},
+			},
+			actions: {
+				canAutofill: false,
+				canStart: false,
+				canWithdraw: false,
+			},
+		} as const satisfies useItemDetailLines.Line;
+		const mixed = {
+			...projection,
+			line: [
+				unavailable,
+				...projection.line,
+			],
+		} as const satisfies Extract<
+			useItemDetailLines.Projection,
+			{
+				kind: "available";
+			}
+		>;
+		const { container } = await renderLines(mixed);
+
+		await setSearchQuery(container, "well limit");
+		expect(container.querySelectorAll('[data-ui="TileLine"]')).toHaveLength(0);
+		expect(container.querySelector('[data-ui="ItemLinesSearchEmpty"]')).not.toBeNull();
+
+		await selectAvailabilityFilter(container, "all");
+		expect(
+			container.querySelector<HTMLInputElement>('[aria-label="Search visible lines"]')?.value,
+		).toBe("well limit");
+		expect(
+			Array.from(container.querySelectorAll<HTMLElement>('[data-ui="TileLine"]')).map(
+				(row) => row.dataset.lineId,
+			),
+		).toEqual([
+			"line:capped",
+		]);
+
+		await setSearchQuery(container, "");
+		expect(
+			Array.from(container.querySelectorAll<HTMLElement>('[data-ui="TileLine"]')).map(
+				(row) => row.dataset.lineId,
+			),
+		).toEqual([
+			"line:capped",
+			"line:first",
+			"line:second",
+		]);
+	});
+
+	it("keeps Available selected in its dedicated empty state and updates live without reopening", async () => {
+		const unavailable = {
+			...projection.line[0],
+			availability: {
+				kind: "unavailable",
+				reason: {
+					kind: "line-disabled",
+					cause: {
+						kind: "static",
+					},
+					message: "This line is currently disabled.",
+				},
+			},
+			actions: {
+				canAutofill: false,
+				canStart: false,
+				canWithdraw: false,
+			},
+		} as const satisfies useItemDetailLines.Line;
+		const unavailableProjection = {
+			...projection,
+			line: [
+				unavailable,
+			],
+		} as const satisfies Extract<
+			useItemDetailLines.Projection,
+			{
+				kind: "available";
+			}
+		>;
+		const { container, rerender } = await renderLines(unavailableProjection);
+		const available = () =>
+			container.querySelector<HTMLInputElement>(
+				'input[name="item-lines-availability"][value="available"]',
+			);
+
+		expect(available()?.checked).toBe(true);
+		expect(container.querySelector('[data-ui="ItemLinesAvailableEmpty"]')).not.toBeNull();
+		expect(container.textContent).toContain("No lines are currently available.");
+		expect(container.querySelector('[data-ui="ItemLinesAvailableEmpty"]')?.innerHTML).toContain(
+			"icon-[lucide--circle-off]",
+		);
+		await setSearchQuery(container, "well");
+		expect(available()?.checked).toBe(true);
+		expect(container.querySelector('[data-ui="ItemLinesAvailableEmpty"]')).toBeNull();
+		expect(container.querySelector('[data-ui="ItemLinesSearchEmpty"]')).not.toBeNull();
+		await setSearchQuery(container, "");
+
+		await rerender({
+			...unavailableProjection,
+			line: [
+				{
+					...unavailable,
+					availability: {
+						kind: "available",
+						readiness: "inputs",
+					},
+				},
+			],
+		});
+		expect(available()?.checked).toBe(true);
+		expect(container.querySelector('[data-ui="ItemLinesAvailableEmpty"]')).toBeNull();
+		expect(container.querySelectorAll('[data-ui="TileLine"]')).toHaveLength(1);
+
+		await rerender(unavailableProjection);
+		expect(available()?.checked).toBe(true);
+		expect(container.querySelector('[data-ui="ItemLinesAvailableEmpty"]')).not.toBeNull();
+
+		await selectAvailabilityFilter(container, "all");
+		expect(available()?.checked).toBe(false);
+		expect(container.querySelectorAll('[data-ui="TileLine"]')).toHaveLength(1);
+		expect(container.textContent).toContain("This line is currently disabled.");
+	});
+
+	it("shows the canonical visible-lines empty state before suggesting All", async () => {
+		const { container } = await renderLines({
+			...projection,
+			line: [],
+		});
+
+		expect(
+			container.querySelector<HTMLInputElement>(
+				'input[name="item-lines-availability"][value="available"]',
+			)?.checked,
+		).toBe(true);
+		expect(container.querySelector('[data-ui="ItemLinesVisibleEmpty"]')).not.toBeNull();
+		expect(container.querySelector('[data-ui="ItemLinesAvailableEmpty"]')).toBeNull();
+		expect(container.textContent).toContain("No product line is currently visible.");
+		expect(container.textContent).not.toContain("Choose All");
+	});
+
+	it("preserves local controls for the same owner and resets them for an exact owner change", async () => {
+		const { container, rerender } = await renderLines(projection);
+		await selectAvailabilityFilter(container, "all");
+		await setSearchQuery(container, "first");
+
+		await rerender({
+			...projection,
+			line: projection.line.map((candidate) => ({
+				...candidate,
+				description: `${candidate.description} Live update.`,
+			})),
+		});
+		expect(
+			container.querySelector<HTMLInputElement>(
+				'input[name="item-lines-availability"][value="all"]',
+			)?.checked,
+		).toBe(true);
+		expect(
+			container.querySelector<HTMLInputElement>('[aria-label="Search visible lines"]')?.value,
+		).toBe("first");
+
+		await rerender({
+			...projection,
+			itemId: "runtime:other-producer",
+		});
+		expect(
+			container.querySelector<HTMLInputElement>(
+				'input[name="item-lines-availability"][value="available"]',
+			)?.checked,
+		).toBe(true);
+		expect(
+			container.querySelector<HTMLInputElement>('[aria-label="Search visible lines"]')?.value,
+		).toBe("");
+	});
+
 	it("renders the summed live charge pool for a deposit input", async () => {
 		await renderLines({
 			...projection,
@@ -333,14 +651,15 @@ describe("ItemLinesTab", () => {
 		);
 	});
 
-	it("renders one simple whole-line Withdraw action", async () => {
-		await renderLines({
+	it("withdraws the complete exact material input from its local row action", async () => {
+		const filledProjection = {
 			...projection,
 			line: [
 				{
 					...projection.line[0],
 					actions: {
 						canAutofill: false,
+						canStart: true,
 						canWithdraw: true,
 					},
 					input: [
@@ -349,16 +668,23 @@ describe("ItemLinesTab", () => {
 							availableCapacity: 0,
 							missingQuantity: 0,
 							storedQuantity: 5,
+							canWithdraw: true,
 						},
 					],
 				},
 			],
-		});
+		} as const satisfies Extract<
+			useItemDetailLines.Projection,
+			{
+				kind: "available";
+			}
+		>;
+		const { rerender } = await renderLines(filledProjection);
 		const withdrawButtons = Array.from(
 			document.querySelectorAll<HTMLButtonElement>("button"),
 		).filter((button) => button.textContent === "Withdraw");
 
-		expect(document.querySelector('[data-ui="TileLineStoredInputWithdrawButton"]')).toBeNull();
+		expect(document.querySelector('[data-ui="TileLineInputWithdrawButton"]')).not.toBeNull();
 		expect(withdrawButtons).toHaveLength(1);
 
 		await act(async () => withdrawButtons[0]?.click());
@@ -366,6 +692,80 @@ describe("ItemLinesTab", () => {
 		expect(commands.withdraw).toHaveBeenCalledWith({
 			ownerItemId: "runtime:producer",
 			lineId: "line:first",
+			inputIndex: 0,
+		});
+
+		await rerender({
+			...filledProjection,
+			line: [
+				{
+					...filledProjection.line[0],
+					input: [
+						{
+							...filledProjection.line[0].input[0],
+							storedQuantity: 0,
+							canWithdraw: false,
+						},
+					],
+				},
+			],
+		});
+		expect(
+			document.querySelector<HTMLButtonElement>('[data-ui="TileLineInputWithdrawButton"]')
+				?.disabled,
+		).toBe(true);
+	});
+
+	it("retains exact buffered-input withdrawal when a live line becomes unavailable", async () => {
+		const { container } = await renderLines({
+			...projection,
+			line: [
+				{
+					...projection.line[0],
+					availability: {
+						kind: "unavailable",
+						reason: {
+							kind: "direct-output-max-count",
+							itemId: "item:tree",
+							itemTitle: "Tree",
+							liveQuantity: 1,
+							reservedQuantity: 1,
+							maxCount: 1,
+							message: "Tree limit reached (2/1).",
+						},
+					},
+					actions: {
+						canAutofill: false,
+						canStart: false,
+						canWithdraw: true,
+					},
+					input: [
+						{
+							...input,
+							missingQuantity: 0,
+							storedQuantity: 1,
+							canWithdraw: true,
+						},
+					],
+				},
+			],
+		});
+		await selectAvailabilityFilter(container, "all");
+
+		expect(
+			document.querySelector('[data-ui="TileLineUnavailableReason"]')?.textContent,
+		).toContain("Tree limit reached");
+		expect(document.querySelector('[data-ui="TileLineFlowChevron"]')).toBeNull();
+		expect(document.querySelector('[data-ui="TileLineUnavailableWithdrawals"]')).not.toBeNull();
+		const withdraw = document.querySelector<HTMLButtonElement>(
+			'[data-ui="TileLineInputWithdrawButton"]',
+		);
+		expect(withdraw?.disabled).toBe(false);
+		await act(async () => withdraw?.click());
+		expect(commands.withdraw).toHaveBeenCalledWith({
+			ownerItemId: "runtime:producer",
+			lineId: "line:first",
+			inputIndex: 0,
 		});
 	});
 
@@ -423,8 +823,15 @@ describe("ItemLinesTab", () => {
 					...projection.line[0],
 					actions: {
 						canAutofill: true,
+						canStart: true,
 						canWithdraw: true,
 					},
+					input: [
+						{
+							...input,
+							canWithdraw: true,
+						},
+					],
 				},
 			],
 		});
@@ -491,8 +898,8 @@ describe("ItemLinesTab", () => {
 					title: "Advanced Knowledge",
 					description: "Studies arcane production methods.",
 					availability: {
-						kind: "blocked",
-						reason: "inputs",
+						kind: "available",
+						readiness: "inputs",
 					},
 					startMode: "enqueue",
 					input: [
@@ -514,8 +921,8 @@ describe("ItemLinesTab", () => {
 		expect(container.querySelector('[data-ui="ItemLinesSearch"]')).not.toBeNull();
 		expect(
 			container
-				.querySelector('[data-ui="ItemLinesSearch"]')
-				?.parentElement?.querySelector('[data-ui="Scrollable"]'),
+				.querySelector('[data-ui="ItemLinesTab"]')
+				?.querySelector('[data-ui="Scrollable"]'),
 		).not.toBeNull();
 
 		for (const query of [

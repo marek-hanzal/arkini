@@ -2,6 +2,7 @@ import { Effect, Option } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { ItemNotFoundError } from "~/engine/item/error/ItemNotFoundError";
+import { isolateStatefulOwnerTransitionFx } from "~/engine/item/fx/isolateStatefulOwnerTransitionFx";
 import { isLineOwnerItemFx } from "~/engine/line/read/isLineOwnerItemFx";
 import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
@@ -12,7 +13,7 @@ export namespace unsetDefaultLineFx {
 	}
 }
 
-/** Removes the save-backed default line from one exact live line-owner identity. */
+/** Explicitly disables default-line behavior for one exact live line-owner identity. */
 export const unsetDefaultLineFx = Effect.fn("unsetDefaultLineFx")(function* ({
 	ownerItemId,
 }: unsetDefaultLineFx.Props) {
@@ -30,7 +31,10 @@ export const unsetDefaultLineFx = Effect.fn("unsetDefaultLineFx")(function* ({
 					}),
 				);
 			}
-			if (runtime.defaultLineByOwnerItemId?.[ownerItemId] === undefined) {
+			if (
+				Object.hasOwn(runtime.defaultLineByOwnerItemId ?? {}, ownerItemId) &&
+				runtime.defaultLineByOwnerItemId?.[ownerItemId] === null
+			) {
 				return [
 					{
 						ownerItemId,
@@ -38,25 +42,23 @@ export const unsetDefaultLineFx = Effect.fn("unsetDefaultLineFx")(function* ({
 					runtime,
 				] as const;
 			}
-			const defaultLineByOwnerItemId = {
-				...(runtime.defaultLineByOwnerItemId ?? {}),
-			};
-			delete defaultLineByOwnerItemId[ownerItemId];
 			const nextRuntime = {
 				...runtime,
-				...(Object.keys(defaultLineByOwnerItemId).length === 0
-					? {
-							defaultLineByOwnerItemId: undefined,
-						}
-					: {
-							defaultLineByOwnerItemId,
-						}),
+				defaultLineByOwnerItemId: {
+					...(runtime.defaultLineByOwnerItemId ?? {}),
+					[ownerItemId]: null,
+				},
 			} satisfies RuntimeSchema.Type;
+			const isolation = yield* isolateStatefulOwnerTransitionFx({
+				ownerItemId,
+				runtime: nextRuntime,
+			});
 			return [
 				{
 					ownerItemId,
 				},
-				nextRuntime,
+				isolation.runtime,
+				isolation.events,
 			] as const;
 		}),
 	);

@@ -110,6 +110,7 @@ export const lineRunTestConfig = GameConfigSchema.parse({
 							type: "disable",
 							when: [
 								existsWhen("blocker"),
+								existsWhen("blocker"),
 							],
 						},
 						{

@@ -30,6 +30,16 @@ export const LineSchema = z
 			"The human-readable explanation of this product line's purpose.",
 		),
 		/**
+		 * Whether this line is the authored fallback default for its owning item.
+		 *
+		 * The preset is resolved from immutable config and does not create runtime
+		 * owner state until the player explicitly overrides or uses the line.
+		 */
+		default: z
+			.boolean()
+			.default(false)
+			.describe("Whether this line is the authored fallback default for its owning item."),
+		/**
 		 * Whether this product line is visible before its rules are evaluated.
 		 *
 		 * A line hidden by default can be revealed by an applicable `show` rule.

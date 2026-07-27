@@ -36,6 +36,7 @@ export const useItemDetailLinesEquality = () =>
 					},
 					(materials) =>
 						right.kind === "materials" &&
+						materials.inputIndex === right.inputIndex &&
 						sameSelector(materials.selector, right.selector) &&
 						materials.mode === right.mode &&
 						sameBounds(materials.required, right.required) &&
@@ -44,6 +45,7 @@ export const useItemDetailLinesEquality = () =>
 						materials.missingQuantity === right.missingQuantity &&
 						materials.availableCapacity === right.availableCapacity &&
 						materials.ready === right.ready &&
+						materials.canWithdraw === right.canWithdraw &&
 						sameCharge(materials.charges, right.charges) &&
 						sameDetailReference(materials.detail, right.detail),
 				)
@@ -136,9 +138,46 @@ export const useItemDetailLinesEquality = () =>
 		const sameAvailability = (
 			left: ItemDetailLines.Availability,
 			right: ItemDetailLines.Availability,
-		) =>
-			left.kind === right.kind &&
-			(left.kind !== "blocked" || right.kind !== "blocked" || left.reason === right.reason);
+		) => {
+			if (left.kind !== right.kind) return false;
+			if (left.kind === "available" && right.kind === "available") {
+				return left.readiness === right.readiness;
+			}
+			if (left.kind !== "unavailable" || right.kind !== "unavailable") return false;
+			if (left.reason.kind !== right.reason.kind) return false;
+			if (left.reason.kind === "line-disabled" && right.reason.kind === "line-disabled") {
+				if (left.reason.cause.kind !== right.reason.cause.kind) return false;
+				if (
+					left.reason.cause.kind === "enable-rule" &&
+					right.reason.cause.kind === "enable-rule" &&
+					(left.reason.cause.ruleIndex !== right.reason.cause.ruleIndex ||
+						left.reason.cause.whenIndex !== right.reason.cause.whenIndex)
+				) {
+					return false;
+				}
+				if (
+					left.reason.cause.kind === "disable-rule" &&
+					right.reason.cause.kind === "disable-rule" &&
+					left.reason.cause.ruleIndex !== right.reason.cause.ruleIndex
+				) {
+					return false;
+				}
+			}
+			return (
+				left.reason.message === right.reason.message &&
+				("itemId" in left.reason
+					? "itemId" in right.reason &&
+						left.reason.itemId === right.reason.itemId &&
+						left.reason.liveQuantity === right.reason.liveQuantity &&
+						left.reason.reservedQuantity === right.reason.reservedQuantity &&
+						left.reason.maxCount === right.reason.maxCount
+					: !("itemId" in right.reason)) &&
+				("intermediateItemId" in left.reason
+					? "intermediateItemId" in right.reason &&
+						left.reason.intermediateItemId === right.reason.intermediateItemId
+					: !("intermediateItemId" in right.reason))
+			);
+		};
 		const sameLine = (left: ItemDetailLines.Line, right: ItemDetailLines.Line) =>
 			left.lineId === right.lineId &&
 			left.title === right.title &&
@@ -148,6 +187,7 @@ export const useItemDetailLinesEquality = () =>
 			left.startMode === right.startMode &&
 			left.isDefault === right.isDefault &&
 			left.actions.canAutofill === right.actions.canAutofill &&
+			left.actions.canStart === right.actions.canStart &&
 			left.actions.canWithdraw === right.actions.canWithdraw &&
 			sameAvailability(left.availability, right.availability) &&
 			left.input.length === right.input.length &&

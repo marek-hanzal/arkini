@@ -1,15 +1,17 @@
-import { Effect } from "effect";
+import { Cause, Effect, Exit, Option } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~/engine/game/fx/useGameFx";
 import { autofillLineInputsFx } from "~/engine/input/write/autofillLineInputsFx";
 import { storeInputMaterialFx } from "~/engine/input/write/storeInputMaterialFx";
+import { withdrawLineInputFx } from "~/engine/input/write/withdrawLineInputFx";
 import { withdrawLineInputsFx } from "~/engine/input/write/withdrawLineInputsFx";
 import { readItemDetailLinesFx } from "~/engine/item-detail/read/readItemDetailLinesFx";
 import { startLineFx } from "~/engine/job/write/startLineFx";
 import { getItemFx } from "~/engine/runtime/read/getItemFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
+import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import {
 	inputRuntimeTestConfig,
 	sourceLocation,
@@ -18,6 +20,53 @@ import {
 
 const ownerItemId = "runtime:workshop";
 const lineId = "line:workshop:build";
+const inputTestWorkshop = inputRuntimeTestConfig.items.workshop;
+if (inputTestWorkshop.type !== "producer") {
+	throw new Error("Expected the input runtime test workshop to be a producer.");
+}
+
+const twoInputTestConfig = GameConfigSchema.parse({
+	...inputRuntimeTestConfig,
+	items: {
+		...inputRuntimeTestConfig.items,
+		workshop: {
+			...inputTestWorkshop,
+			lines: inputTestWorkshop.lines.map((line) => ({
+				...line,
+				input: [
+					line.input[0],
+					{
+						type: "materials",
+						selector: {
+							type: "item",
+							itemId: "stone",
+						},
+						quantity: {
+							type: "value",
+							value: 2,
+						},
+						capacity: 0,
+					},
+					...line.input.slice(1),
+				],
+			})),
+		},
+	},
+});
+const blockedPlacementTestConfig = GameConfigSchema.parse({
+	...inputRuntimeTestConfig,
+	meta: {
+		...inputRuntimeTestConfig.meta,
+		board: {
+			width: 1,
+			height: 1,
+		},
+		inventory: {
+			width: 1,
+			height: 1,
+		},
+	},
+});
 
 const spawnOwnerFx = () =>
 	spawnItemFx({
@@ -148,7 +197,8 @@ describe("Item Detail line input actions", () => {
 						canWithdraw: true,
 					},
 					availability: {
-						kind: "ready",
+						kind: "available",
+						readiness: "ready",
 					},
 				},
 			],
@@ -385,11 +435,244 @@ describe("Item Detail line input actions", () => {
 						canWithdraw: false,
 					},
 					availability: {
-						kind: "blocked",
-						reason: "inputs",
+						kind: "available",
+						readiness: "inputs",
 					},
 				},
 			],
 		});
+	});
+
+	it("withdraws one exact input completely while preserving its filled sibling", () => {
+		const result = Effect.runSync(
+			Effect.gen(function* () {
+				yield* spawnOwnerFx();
+				yield* spawnWaterFx({
+					id: "runtime:water",
+					location: sourceLocation(1),
+					quantity: 3,
+				});
+				yield* spawnItemFx({
+					id: "runtime:stone",
+					itemId: "stone",
+					location: sourceLocation(2),
+					quantity: 2,
+				});
+				const water = yield* getItemFx({
+					itemId: "runtime:water",
+				});
+				yield* storeInputMaterialFx({
+					ownerItemId,
+					lineId,
+					inputIndex: 0,
+					sourceItemId: water.id,
+					sourceItemRevision: water.revision,
+					quantity: 3,
+				});
+				const stone = yield* getItemFx({
+					itemId: "runtime:stone",
+				});
+				yield* storeInputMaterialFx({
+					ownerItemId,
+					lineId,
+					inputIndex: 1,
+					sourceItemId: stone.id,
+					sourceItemRevision: stone.revision,
+					quantity: 2,
+				});
+
+				const before = yield* readItemDetailLinesFx({
+					itemId: ownerItemId,
+					runtime: yield* readRuntimeFx(),
+				});
+				const withdrawn = yield* withdrawLineInputFx({
+					ownerItemId,
+					lineId,
+					inputIndex: 0,
+				});
+				const runtime = yield* readRuntimeFx();
+				const after = yield* readItemDetailLinesFx({
+					itemId: ownerItemId,
+					runtime,
+				});
+				const stale = yield* Effect.exit(
+					withdrawLineInputFx({
+						ownerItemId,
+						lineId,
+						inputIndex: 0,
+					}),
+				);
+				const withdrawnSibling = yield* withdrawLineInputFx({
+					ownerItemId,
+					lineId,
+					inputIndex: 1,
+				});
+				const afterBoth = yield* readItemDetailLinesFx({
+					itemId: ownerItemId,
+					runtime: yield* readRuntimeFx(),
+				});
+
+				return {
+					after,
+					afterBoth,
+					before,
+					runtime,
+					stale,
+					withdrawn,
+					withdrawnSibling,
+				};
+			}).pipe(
+				useGameFx({
+					config: twoInputTestConfig,
+				}),
+			),
+		);
+
+		expect(result.before).toMatchObject({
+			kind: "available",
+			line: [
+				{
+					input: [
+						{
+							inputIndex: 0,
+							storedQuantity: 3,
+							canWithdraw: true,
+						},
+						{
+							inputIndex: 1,
+							storedQuantity: 2,
+							canWithdraw: true,
+						},
+					],
+				},
+			],
+		});
+		expect(result.withdrawn).toEqual({
+			withdrawnItemCount: 1,
+			withdrawnQuantity: 3,
+		});
+		expect(result.runtime.items).toContainEqual(
+			expect.objectContaining({
+				id: "runtime:stone",
+				quantity: 2,
+				location: {
+					scope: "input",
+					ownerItemId,
+					lineId,
+					inputIndex: 1,
+				},
+			}),
+		);
+		expect(result.after).toMatchObject({
+			kind: "available",
+			line: [
+				{
+					input: [
+						{
+							inputIndex: 0,
+							storedQuantity: 0,
+							canWithdraw: false,
+						},
+						{
+							inputIndex: 1,
+							storedQuantity: 2,
+							canWithdraw: true,
+						},
+					],
+				},
+			],
+		});
+		expect(result.withdrawnSibling).toEqual({
+			withdrawnItemCount: 1,
+			withdrawnQuantity: 2,
+		});
+		expect(result.afterBoth).toMatchObject({
+			kind: "available",
+			line: [
+				{
+					input: [
+						{
+							inputIndex: 0,
+							storedQuantity: 0,
+							canWithdraw: false,
+						},
+						{
+							inputIndex: 1,
+							storedQuantity: 0,
+							canWithdraw: false,
+						},
+					],
+				},
+			],
+		});
+		expect(Exit.isFailure(result.stale)).toBe(true);
+		if (Exit.isFailure(result.stale)) {
+			expect(Option.getOrThrow(Cause.findErrorOption(result.stale.cause))).toMatchObject({
+				_tag: "LineInputEmptyError",
+				inputIndex: 0,
+			});
+		}
+	});
+
+	it("leaves the exact input unchanged when canonical placement fails", () => {
+		const result = Effect.runSync(
+			Effect.gen(function* () {
+				yield* spawnOwnerFx();
+				yield* spawnWaterFx({
+					id: "runtime:water",
+					location: {
+						scope: "inventory",
+						position: {
+							x: 0,
+							y: 0,
+						},
+					},
+					quantity: 3,
+				});
+				const water = yield* getItemFx({
+					itemId: "runtime:water",
+				});
+				yield* storeInputMaterialFx({
+					ownerItemId,
+					lineId,
+					inputIndex: 0,
+					sourceItemId: water.id,
+					sourceItemRevision: water.revision,
+					quantity: 3,
+				});
+				yield* spawnItemFx({
+					id: "runtime:blocker",
+					itemId: "stone",
+					location: {
+						scope: "inventory",
+						position: {
+							x: 0,
+							y: 0,
+						},
+					},
+					quantity: 1,
+				});
+				const before = yield* readRuntimeFx();
+				const withdrawal = yield* Effect.exit(
+					withdrawLineInputFx({
+						ownerItemId,
+						lineId,
+						inputIndex: 0,
+					}),
+				);
+				return {
+					after: yield* readRuntimeFx(),
+					before,
+					withdrawal,
+				};
+			}).pipe(
+				useGameFx({
+					config: blockedPlacementTestConfig,
+				}),
+			),
+		);
+
+		expect(Exit.isFailure(result.withdrawal)).toBe(true);
+		expect(result.after).toEqual(result.before);
 	});
 });

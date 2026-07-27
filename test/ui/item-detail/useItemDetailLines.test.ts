@@ -7,6 +7,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { GameEngine } from "~/bridge/game/GameEngine";
 import { useItemDetailLines } from "~/bridge/item-detail/useItemDetailLines";
+import { GameConfigFx } from "~/engine/game/context/GameConfigFx";
 import { useGameFx } from "~/engine/game/fx/useGameFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
@@ -14,7 +15,7 @@ import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { startFx } from "~/engine/start/write/startFx";
 import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
 import { makeTestGameTransitionFieldsFx } from "~test/support/game/makeTestGameTransitionFieldsFx";
-import { testGameRead, testGameReadOrThrow } from "~test/support/game/testGameRead";
+import { testGameRead } from "~test/support/game/testGameRead";
 
 (
 	globalThis as {
@@ -121,7 +122,23 @@ const config = GameConfigSchema.parse({
 							},
 						],
 					},
-					rules: [],
+					rules: [
+						{
+							type: "enable",
+							when: [
+								{
+									type: "exists",
+									query: {
+										scope: "any",
+										selector: {
+											type: "item",
+											itemId: "material",
+										},
+									},
+								},
+							],
+						},
+					],
 				},
 			],
 		},
@@ -212,6 +229,10 @@ const publishRuntime = (runtime: RuntimeSchema.Type) => {
 	for (const listener of listeners) listener();
 };
 
+const readOrThrowWithConfig = <Result, Error>(
+	effect: Effect.Effect<Result, Error, GameConfigFx>,
+): Result => Effect.runSync(effect.pipe(Effect.provideService(GameConfigFx, config)));
+
 const game = {
 	arkpack: {
 		packageId: "test-package",
@@ -239,7 +260,7 @@ const game = {
 	},
 	subscribeEvents: () => () => undefined,
 	read: testGameRead,
-	readOrThrow: testGameReadOrThrow,
+	readOrThrow: readOrThrowWithConfig as GameEngine["readOrThrow"],
 	reportCriticalFailure: () => undefined,
 	run: (() => Promise.reject(new Error("Not used by this test."))) as GameEngine["run"],
 	disposeFx: Effect.void,
@@ -253,10 +274,15 @@ const Probe = ({ itemId }: { readonly itemId: string }) => {
 	const projection = useItemDetailLines(itemId);
 	const line = projection.kind === "available" ? projection.line[0] : undefined;
 	const canAutofill = line?.actions.canAutofill;
+	const unavailableReason =
+		line?.availability.kind === "unavailable" ? line.availability.reason : undefined;
 	const roll = line?.output[0]?.roll[0];
 	const outputItem = roll?.kind === "guaranteed" ? roll.item[0] : undefined;
 	return createElement("output", {
 		"data-can-autofill": String(canAutofill),
+		"data-disabled-message": unavailableReason?.message ?? "",
+		"data-disabled-rule":
+			unavailableReason?.kind === "line-disabled" ? unavailableReason.cause.kind : "",
 		"data-output-has-runtime-target": String(
 			outputItem !== undefined && Object.hasOwn(outputItem, "detailItemId"),
 		),
@@ -295,10 +321,13 @@ describe("useItemDetailLines", () => {
 		});
 		const output = container.querySelector("output");
 		expect(output?.dataset.canAutofill).toBe("false");
+		expect(output?.dataset.disabledMessage).toBe("Requires Material.");
+		expect(output?.dataset.disabledRule).toBe("enable-rule");
 		expect(output?.dataset.outputHasRuntimeTarget).toBe("false");
 
 		await act(async () => publishRuntime(withSource));
 		expect(output?.dataset.canAutofill).toBe("true");
+		expect(output?.dataset.disabledMessage).toBe("");
 		expect(output?.dataset.outputHasRuntimeTarget).toBe("false");
 
 		await act(async () => publishRuntime(withTwoSources));

@@ -29,7 +29,7 @@ export const MainMenu = () => {
 
 	return (
 		<nav
-			className="grid w-full gap-2"
+			className="grid w-full gap-4"
 			aria-label="Main menu"
 			data-ui="MainMenu"
 		>

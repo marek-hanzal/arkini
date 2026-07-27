@@ -1025,7 +1025,7 @@ describe("Pixi main-scene drag controller", () => {
 		expect(mounted.actor.dragging).toBe(false);
 	});
 
-	it("leaves an active drag untouched when i cannot resolve a valid Inventory drop", () => {
+	it("consumes i and leaves an active drag untouched when Inventory storage is unavailable", () => {
 		const mounted = mountController();
 
 		mounted.actorEvents.emit("pointerdown", pointer(10, 20));
@@ -1033,7 +1033,8 @@ describe("Pixi main-scene drag controller", () => {
 		const keyEvent = keyboard("i");
 		mounted.keyboardTarget.emit(keyEvent);
 
-		expect(keyEvent.preventDefault).not.toHaveBeenCalled();
+		expect(keyEvent.preventDefault).toHaveBeenCalledOnce();
+		expect(keyEvent.stopImmediatePropagation).toHaveBeenCalledOnce();
 		expect(mounted.onDrop).not.toHaveBeenCalled();
 		expect(mounted.actor.dragging).toBe(true);
 

@@ -171,7 +171,12 @@ describe("MainMenu", () => {
 		).toBe("");
 		expect(container.querySelector('[data-ui="LauncherHeroShadow"]')).not.toBeNull();
 		const menu = container.querySelector<HTMLElement>('[data-ui="MainMenu"]');
+		const panel = container.querySelector<HTMLElement>('[data-ui="MainPagePanel"]');
 		expect(menu?.className).not.toContain("ak-list");
+		expect(menu?.className).toContain("gap-4");
+		expect(panel?.className).toContain("border-0");
+		expect(panel?.className).toContain("bg-transparent");
+		expect(panel?.className).toContain("shadow-none");
 		expect(play?.className).toContain("bg-accent");
 		expect(play?.className).toContain("text-accent-contrast");
 		expect(

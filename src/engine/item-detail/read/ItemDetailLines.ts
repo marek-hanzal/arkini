@@ -36,13 +36,6 @@ export namespace ItemDetailLines {
 		readonly missingQuantity: number;
 		readonly availableCapacity: number;
 		readonly ready: boolean;
-		readonly storedItems?: readonly {
-			readonly itemId: IdSchema.Type;
-			readonly quantity: number;
-			readonly revision: string;
-			readonly runtimeItemId: IdSchema.Type;
-			readonly title: string;
-		}[];
 		readonly charges?: ItemDetailLineChargeCost;
 	}
 

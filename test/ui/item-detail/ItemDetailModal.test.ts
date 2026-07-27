@@ -313,6 +313,15 @@ describe("ItemDetailModal", () => {
 		expect(modal?.dataset.runtimeId).toBe(owner.id);
 		expect(modal?.dataset.tab).toBe("lines");
 		expect(document.querySelector('[data-ui="ItemLinesTab"]')).not.toBeNull();
+		const closeButton = document.querySelector<HTMLButtonElement>(
+			'[data-ui="ItemDetailCloseButton"]',
+		);
+		expect(closeButton?.className).toContain("size-14");
+		expect(closeButton?.className).toContain("bg-transparent");
+		expect(closeButton?.className).not.toContain("border");
+		expect(closeButton?.className).not.toContain("opacity");
+		expect(closeButton?.innerHTML).toContain("icon-[lucide--x]");
+		expect(closeButton?.innerHTML).toContain("size-10");
 		expect(
 			Array.from(
 				document.querySelectorAll<HTMLElement>('[data-ui="ItemDetailTabs"] button'),

@@ -87,16 +87,6 @@ export const readItemDetailInputsFx = Effect.fn("readItemDetailInputsFx")(functi
 							ready:
 								(previous?.ready ?? true) &&
 								(resolution?.ready ?? storedQuantity >= required.min),
-							storedItems: [
-								...(previous?.storedItems ?? []),
-								...storedItems.map((item) => ({
-									itemId: item.item.id,
-									quantity: item.quantity,
-									revision: item.revision,
-									runtimeItemId: item.id,
-									title: item.item.title,
-								})),
-							],
 							...(materialInput.charges === undefined
 								? {}
 								: {

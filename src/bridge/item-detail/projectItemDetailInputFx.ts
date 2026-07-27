@@ -43,36 +43,9 @@ export const projectItemDetailInputFx = Effect.fn("projectItemDetailInputFx")(fu
 									runtime,
 								})
 							: undefined;
-					const storedItems = yield* Effect.forEach(
-						materials.storedItems ?? [],
-						(storedItem) =>
-							projectItemDetailReferenceFx({
-								game,
-								itemId: storedItem.itemId,
-								preferredRuntimeItemIds: [
-									storedItem.runtimeItemId,
-								],
-								runtime,
-							}).pipe(
-								Effect.map((reference) => ({
-									...storedItem,
-									...(reference?.sourceUrl === undefined
-										? {}
-										: {
-												sourceUrl: reference.sourceUrl,
-											}),
-									...(reference?.compositeUrl === undefined
-										? {}
-										: {
-												compositeUrl: reference.compositeUrl,
-											}),
-								})),
-							),
-					);
 					return {
 						...materials,
 						selector,
-						storedItems,
 						...(detail === undefined
 							? {}
 							: {

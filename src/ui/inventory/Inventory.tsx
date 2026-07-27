@@ -4,10 +4,10 @@ import { PixiInventorySurface } from "~/ui/pixi/PixiInventorySurface";
 
 /** Frames the standalone full-screen Inventory scene and its explicit Board return. */
 export const Inventory = ({ onClose }: { readonly onClose: () => void }) => {
-	const closeButtonRef = useRef<HTMLButtonElement>(null);
+	const backButtonRef = useRef<HTMLButtonElement>(null);
 
 	useEffect(() => {
-		closeButtonRef.current?.focus();
+		backButtonRef.current?.focus();
 	}, []);
 
 	return (
@@ -23,13 +23,17 @@ export const Inventory = ({ onClose }: { readonly onClose: () => void }) => {
 				Inventory
 			</h1>
 			<button
-				ref={closeButtonRef}
+				ref={backButtonRef}
 				type="button"
-				className="absolute right-[var(--ak-viewport-padding)] top-[var(--ak-viewport-padding)] z-10 grid size-10 shrink-0 cursor-pointer place-items-center rounded-lg border border-line bg-surface/90 text-xl leading-none text-muted shadow-lg backdrop-blur transition-colors hover:bg-accent/15 hover:text-foreground"
-				aria-label="Close inventory"
+				className="absolute left-[var(--ak-viewport-padding)] top-[var(--ak-viewport-padding)] z-10 grid size-14 shrink-0 cursor-pointer place-items-center bg-transparent text-foreground transition-[color,transform] hover:-translate-x-0.5 hover:text-accent"
+				aria-label="Back to board"
+				data-ui="InventoryBackButton"
 				onClick={onClose}
 			>
-				×
+				<span
+					className="icon-[lucide--arrow-left] size-9"
+					aria-hidden="true"
+				/>
 			</button>
 			<div
 				className="size-full min-h-0 min-w-0"

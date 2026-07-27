@@ -1,77 +1,7 @@
 import { match } from "ts-pattern";
 
 import type { ItemDetailLines } from "~/bridge/item-detail/ItemDetailLines";
-import { useWithdrawItemDetailLine } from "~/bridge/item-detail/useWithdrawItemDetailLine";
-import { Button } from "~/ui/button/Button";
 import { ItemReferenceButton } from "~/ui/item-detail/ItemReferenceButton";
-import { useItemDetailControl } from "~/ui/item-detail/useItemDetailControl";
-import { readSettledAsyncResultError } from "~/ui/reactivity/readSettledAsyncResultError";
-
-const StoredMaterialItemWithdraw = ({
-	disabled,
-	item,
-	lineId,
-	showItemTitle,
-	ownerItemId,
-}: {
-	readonly disabled: boolean;
-	readonly item: NonNullable<
-		Extract<
-			ItemDetailLines.Input,
-			{
-				readonly kind: "materials";
-			}
-		>["storedItems"]
-	>[number];
-	readonly lineId: string;
-	readonly showItemTitle: boolean;
-	readonly ownerItemId: string;
-}) => {
-	const itemDetail = useItemDetailControl();
-	const pendingKey = JSON.stringify([
-		"line-input",
-		ownerItemId,
-		lineId,
-		item.runtimeItemId,
-		"withdraw",
-	]);
-	const withdraw = useWithdrawItemDetailLine({
-		pendingKey,
-		pendingOwner: itemDetail,
-	});
-	readSettledAsyncResultError(withdraw.result);
-	const pending = itemDetail.readPendingAction(pendingKey) === "withdraw";
-	const error = itemDetail.readActionError(pendingKey);
-	return (
-		<div
-			className="flex flex-col items-end gap-1"
-			data-runtime-item-id={item.runtimeItemId}
-		>
-			<Button
-				aria-label={`Withdraw ${item.title}`}
-				className="min-h-7 px-2.5 py-1 text-xs"
-				cursorIntent={pending ? "progress" : undefined}
-				data-ui="TileLineStoredInputWithdrawButton"
-				disabled={disabled}
-				onClick={() =>
-					withdraw.run({
-						itemId: item.runtimeItemId,
-						itemRevision: item.revision,
-						ownerItemId,
-						lineId,
-					})
-				}
-			>
-				{pending
-					? "Withdrawing…"
-					: showItemTitle
-						? `Withdraw ${item.title}${item.quantity > 1 ? ` ×${item.quantity}` : ""}`
-						: "Withdraw"}
-			</Button>
-			{error === null ? null : <p className="mt-1 text-xs text-danger">{error}</p>}
-		</div>
-	);
-};
 
 const ItemLineInputTitle = ({
 	detail,
@@ -99,13 +29,9 @@ const ItemLineInputTitle = ({
 const ItemLineInputRow = ({
 	disabled,
 	input,
-	lineId,
-	ownerItemId,
 }: {
 	readonly disabled: boolean;
 	readonly input: ItemDetailLines.Input;
-	readonly lineId: string;
-	readonly ownerItemId: string;
 }) =>
 	match(input)
 		.with(
@@ -141,25 +67,13 @@ const ItemLineInputRow = ({
 							</p>
 						</div>
 						<div className="flex flex-col items-end text-right">
-							<div className="flex flex-wrap items-center justify-end gap-2">
-								<p className="font-medium text-foreground">
-									{materials.storedQuantity} /{" "}
-									{materials.required.min === materials.required.max
-										? materials.required.min
-										: `${materials.required.min}–${materials.required.max}`}{" "}
-									stored
-								</p>
-								{(materials.storedItems ?? []).map((item) => (
-									<StoredMaterialItemWithdraw
-										key={item.runtimeItemId}
-										disabled={disabled}
-										item={item}
-										lineId={lineId}
-										ownerItemId={ownerItemId}
-										showItemTitle={(materials.storedItems ?? []).length > 1}
-									/>
-								))}
-							</div>
+							<p className="font-medium text-foreground">
+								{materials.storedQuantity} /{" "}
+								{materials.required.min === materials.required.max
+									? materials.required.min
+									: `${materials.required.min}–${materials.required.max}`}{" "}
+								stored
+							</p>
 							<p className="mt-0.5 text-xs text-muted">
 								{materials.ready
 									? `${materials.availableCapacity} buffer space`
@@ -240,13 +154,9 @@ const ItemLineInputRow = ({
 export const ItemLineInputs = ({
 	disabled,
 	input,
-	lineId,
-	ownerItemId,
 }: {
 	readonly disabled: boolean;
 	readonly input: readonly ItemDetailLines.Input[];
-	readonly lineId: string;
-	readonly ownerItemId: string;
 }) => (
 	<section className="min-w-0">
 		<h4 className="border-b border-line pb-2 text-xs font-semibold uppercase tracking-[0.08em] text-muted">
@@ -261,8 +171,6 @@ export const ItemLineInputs = ({
 						key={`${entry.kind}:${index}`}
 						disabled={disabled}
 						input={entry}
-						lineId={lineId}
-						ownerItemId={ownerItemId}
 					/>
 				))}
 			</div>

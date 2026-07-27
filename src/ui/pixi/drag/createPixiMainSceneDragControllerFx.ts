@@ -719,6 +719,8 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 			) {
 				return;
 			}
+			event.preventDefault();
+			event.stopImmediatePropagation();
 			const inventoryActor = Array.from(actorStore.actors.values()).find(
 				(actor) =>
 					actor !== drag.actor &&
@@ -741,8 +743,6 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 			) {
 				return;
 			}
-			event.preventDefault();
-			event.stopImmediatePropagation();
 			try {
 				application.app.canvas.releasePointerCapture(drag.pointerId);
 			} catch {

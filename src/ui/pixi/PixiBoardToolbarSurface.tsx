@@ -111,6 +111,38 @@ export const PixiBoardToolbarSurface = () => {
 		startLineState,
 	]);
 
+	useEffect(() => {
+		const openInventoryFromKeyboard = (event: KeyboardEvent) => {
+			const target = event.target;
+			if (
+				event.defaultPrevented ||
+				event.repeat ||
+				event.key.toLowerCase() !== "i" ||
+				event.altKey ||
+				event.ctrlKey ||
+				event.metaKey ||
+				interactionBlocked ||
+				(target instanceof HTMLElement &&
+					(target.isContentEditable ||
+						target.tagName === "INPUT" ||
+						target.tagName === "SELECT" ||
+						target.tagName === "TEXTAREA"))
+			) {
+				return;
+			}
+			event.preventDefault();
+			event.stopPropagation();
+			void openInventory().catch((cause) => {
+				console.error("Inventory failed to open from the Board.", cause);
+			});
+		};
+		window.addEventListener("keydown", openInventoryFromKeyboard);
+		return () => window.removeEventListener("keydown", openInventoryFromKeyboard);
+	}, [
+		interactionBlocked,
+		openInventory,
+	]);
+
 	useLayoutEffect(() => {
 		const host = hostRef.current;
 		if (host === null) return;

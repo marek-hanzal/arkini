@@ -333,7 +333,7 @@ describe("ItemLinesTab", () => {
 		);
 	});
 
-	it("withdraws one exact buffered runtime item without replacing the whole-line action", async () => {
+	it("renders one simple whole-line Withdraw action", async () => {
 		await renderLines({
 			...projection,
 			line: [
@@ -348,39 +348,22 @@ describe("ItemLinesTab", () => {
 							...input,
 							availableCapacity: 0,
 							missingQuantity: 0,
-							storedQuantity: 1,
-							storedItems: [
-								{
-									itemId: "townhall",
-									quantity: 1,
-									revision: "revision:townhall:buffered",
-									runtimeItemId: "runtime:townhall",
-									sourceUrl: "resource:townhall",
-									title: "Town Hall",
-								},
-							],
+							storedQuantity: 5,
 						},
 					],
 				},
 			],
 		});
-		const itemWithdraw = document.querySelector<HTMLButtonElement>(
-			'[data-ui="TileLineStoredInputWithdrawButton"]',
-		);
-		const lineWithdraw = Array.from(
+		const withdrawButtons = Array.from(
 			document.querySelectorAll<HTMLButtonElement>("button"),
-		).find((button) => button.textContent === "Withdraw" && button !== itemWithdraw);
+		).filter((button) => button.textContent === "Withdraw");
 
-		expect(itemWithdraw).not.toBeNull();
-		expect(itemWithdraw?.parentElement?.dataset.runtimeItemId).toBe("runtime:townhall");
-		expect(itemWithdraw?.getAttribute("aria-label")).toBe("Withdraw Town Hall");
-		expect(lineWithdraw).toBeDefined();
+		expect(document.querySelector('[data-ui="TileLineStoredInputWithdrawButton"]')).toBeNull();
+		expect(withdrawButtons).toHaveLength(1);
 
-		await act(async () => itemWithdraw?.click());
+		await act(async () => withdrawButtons[0]?.click());
 
 		expect(commands.withdraw).toHaveBeenCalledWith({
-			itemId: "runtime:townhall",
-			itemRevision: "revision:townhall:buffered",
 			ownerItemId: "runtime:producer",
 			lineId: "line:first",
 		});

@@ -43,15 +43,6 @@ export namespace ItemDetailLines {
 				readonly missingQuantity: number;
 				readonly availableCapacity: number;
 				readonly ready: boolean;
-				readonly storedItems?: readonly {
-					readonly compositeUrl?: string;
-					readonly itemId: string;
-					readonly quantity: number;
-					readonly revision: string;
-					readonly runtimeItemId: string;
-					readonly sourceUrl?: string;
-					readonly title: string;
-				}[];
 				readonly charges?: ChargeCost;
 				readonly detail?: DetailReference;
 		  }

@@ -27,7 +27,12 @@ describe("Inventory", () => {
 		expect(html).not.toContain('aria-modal="true"');
 		expect(html).not.toContain("bg-canvas");
 		expect(html).toContain('data-ui="InventoryViewport"');
-		expect(html).toContain('aria-label="Close inventory"');
+		expect(html).toContain('aria-label="Back to board"');
+		expect(html).toContain('data-ui="InventoryBackButton"');
+		expect(html).toContain("icon-[lucide--arrow-left]");
+		expect(html).toContain("left-[var(--ak-viewport-padding)]");
+		expect(html).not.toContain("right-[var(--ak-viewport-padding)]");
+		expect(html).not.toContain("border-line");
 		expect([
 			...html.matchAll(/data-ui="PixiInventorySurface"/g),
 		]).toHaveLength(1);

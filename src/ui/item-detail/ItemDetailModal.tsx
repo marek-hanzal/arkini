@@ -102,12 +102,16 @@ const ItemDetailHeader = ({
 			</div>
 			<button
 				type="button"
-				className="grid size-9 shrink-0 cursor-pointer place-items-center rounded-lg border border-line bg-surface text-lg leading-none text-muted transition-colors hover:bg-accent/15 hover:text-foreground disabled:cursor-not-allowed"
+				className="grid size-14 shrink-0 cursor-pointer place-items-center bg-transparent text-foreground transition-[color,transform] hover:scale-110 hover:text-accent disabled:cursor-not-allowed"
 				aria-label="Close item detail"
+				data-ui="ItemDetailCloseButton"
 				disabled={disabled}
 				onClick={() => closeItemDetail()}
 			>
-				×
+				<span
+					className="icon-[lucide--x] size-10"
+					aria-hidden="true"
+				/>
 			</button>
 		</header>
 	);

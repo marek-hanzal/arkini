@@ -300,4 +300,70 @@ describe("PixiBoardToolbarSurface", () => {
 		});
 		expect(boardState.registerInteraction).toHaveBeenCalledOnce();
 	});
+
+	it("opens Inventory with an unmodified i key while the Board is idle", async () => {
+		const host = document.createElement("div");
+		document.body.append(host);
+		const root = createRoot(host);
+		roots.push(root);
+		await act(async () => {
+			root.render(createElement(PixiBoardToolbarSurface));
+			await Promise.resolve();
+		});
+		const event = new KeyboardEvent("keydown", {
+			cancelable: true,
+			key: "i",
+		});
+
+		await act(async () => {
+			window.dispatchEvent(event);
+			await Promise.resolve();
+		});
+
+		expect(event.defaultPrevented).toBe(true);
+		expect(boardState.navigate).toHaveBeenCalledOnce();
+		expect(boardState.navigate).toHaveBeenCalledWith({
+			to: "/game/$packageId/inventory",
+			params: {
+				packageId: "package-board",
+			},
+		});
+	});
+
+	it("does not hijack modified, repeated, or editable i key input", async () => {
+		const host = document.createElement("div");
+		document.body.append(host);
+		const root = createRoot(host);
+		roots.push(root);
+		await act(async () => {
+			root.render(createElement(PixiBoardToolbarSurface));
+			await Promise.resolve();
+		});
+		const input = document.createElement("input");
+		document.body.append(input);
+
+		await act(async () => {
+			window.dispatchEvent(
+				new KeyboardEvent("keydown", {
+					ctrlKey: true,
+					key: "i",
+				}),
+			);
+			window.dispatchEvent(
+				new KeyboardEvent("keydown", {
+					key: "i",
+					repeat: true,
+				}),
+			);
+			input.dispatchEvent(
+				new KeyboardEvent("keydown", {
+					bubbles: true,
+					key: "i",
+				}),
+			);
+			await Promise.resolve();
+		});
+
+		expect(boardState.navigate).not.toHaveBeenCalled();
+	});
 });

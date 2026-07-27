@@ -11,6 +11,8 @@ export interface PixiTileActor {
 	readonly visualLayer: Container;
 	readonly runningGlow: Sprite;
 	readonly visuals: Set<PixiTileActorVisual>;
+	feedbackGlowPhase: "falling" | "rising" | null;
+	workingGlowTint: number;
 	currentVisual: PixiTileActorVisual;
 	pendingVisual: PixiTileActorVisual | null;
 	item: TileActorItem;

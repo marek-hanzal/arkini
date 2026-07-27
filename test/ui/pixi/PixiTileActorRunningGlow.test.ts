@@ -8,6 +8,7 @@ import type {
 	PixiActorPresentationWrite,
 } from "~/ui/pixi/animation/PixiActorAnimator";
 import {
+	flashPixiTileActorAckGlowFx,
 	flashPixiTileActorFeedbackGlowFx,
 	startPixiTileActorRunningGlowFx,
 	stopPixiTileActorRunningGlowFx,
@@ -18,6 +19,7 @@ const createActor = () =>
 		container: {
 			destroyed: false,
 		},
+		feedbackGlowPhase: null,
 		instanceId: "pixi-tile:producer",
 		item: {
 			id: "runtime:producer",
@@ -25,8 +27,10 @@ const createActor = () =>
 		},
 		runningGlow: {
 			alpha: 0,
+			tint: 0xf05bb8,
 			visible: false,
 		},
+		workingGlowTint: 0xf05bb8,
 	}) as unknown as PixiTileActor;
 
 const createAnimator = () => {
@@ -195,18 +199,21 @@ describe("Pixi tile actor running glow", () => {
 		});
 		animations[1]?.onComplete?.();
 		expect(actor.runningGlow.visible).toBe(false);
+		expect(actor.feedbackGlowPhase).toBeNull();
 	});
 
-	it("resumes a running producer pulse after its feedback peak", () => {
+	it("recolors one visible feedback glow and hands it directly to the working pulse", () => {
 		const actor = createActor();
 		const { animations, animator, cancellations } = createAnimator();
 
 		Effect.runSync(
-			flashPixiTileActorFeedbackGlowFx({
+			flashPixiTileActorAckGlowFx({
 				actor,
 				animator,
+				tint: 0x57d7b2,
 			}),
 		);
+		expect(actor.runningGlow.tint).toBe(0x57d7b2);
 		animations[0]?.onComplete?.();
 
 		expect(cancellations).toEqual([
@@ -215,9 +222,88 @@ describe("Pixi tile actor running glow", () => {
 		]);
 		expect(animations[1]).toMatchObject({
 			channel: "glow-opacity",
-			durationMs: 640,
+			durationMs: 2_400,
 			ownerKey: "running-glow:pixi-tile:producer",
-			toRunningGlowAlpha: 0.62,
+			toRunningGlowAlpha: 0.28,
+		});
+		expect(actor.runningGlow.tint).toBe(0xf05bb8);
+		expect(actor.feedbackGlowPhase).toBeNull();
+	});
+
+	it("hands a falling ACK directly to working as soon as canonical running arrives", () => {
+		const actor = createActor();
+		const { animations, animator } = createAnimator();
+		actor.item = {
+			...actor.item,
+			runningGlow: false,
+		};
+
+		Effect.runSync(
+			flashPixiTileActorAckGlowFx({
+				actor,
+				animator,
+				tint: 0x57d7b2,
+			}),
+		);
+		animations[0]?.onComplete?.();
+		expect(actor.feedbackGlowPhase).toBe("falling");
+		actor.runningGlow.alpha = 0.46;
+		actor.item = {
+			...actor.item,
+			runningGlow: true,
+		};
+		Effect.runSync(
+			startPixiTileActorRunningGlowFx({
+				actor,
+				animator,
+			}),
+		);
+
+		expect(animations[2]).toMatchObject({
+			channel: "glow-opacity",
+			durationMs: 2_400,
+			ownerKey: "running-glow:pixi-tile:producer",
+			toRunningGlowAlpha: 0.28,
+		});
+		expect(actor.runningGlow.tint).toBe(0xf05bb8);
+		expect(actor.feedbackGlowPhase).toBeNull();
+	});
+
+	it("keeps ACK feedback alive when an instant job stops before its rise completes", () => {
+		const actor = createActor();
+		const { animations, animator, cancellations } = createAnimator();
+
+		Effect.runSync(
+			flashPixiTileActorAckGlowFx({
+				actor,
+				animator,
+				tint: 0x57d7b2,
+			}),
+		);
+		actor.item = {
+			...actor.item,
+			runningGlow: false,
+		};
+		Effect.runSync(
+			stopPixiTileActorRunningGlowFx({
+				actor,
+				animator,
+			}),
+		);
+
+		expect(cancellations).toEqual([
+			"feedback-glow:pixi-tile:producer",
+		]);
+		expect(animations).toHaveLength(1);
+		expect(actor.feedbackGlowPhase).toBe("rising");
+		expect(actor.runningGlow.tint).toBe(0x57d7b2);
+
+		animations[0]?.onComplete?.();
+		expect(animations[1]).toMatchObject({
+			channel: "glow-opacity",
+			durationMs: 520,
+			ownerKey: "feedback-glow:pixi-tile:producer",
+			toRunningGlowAlpha: 0,
 		});
 	});
 });

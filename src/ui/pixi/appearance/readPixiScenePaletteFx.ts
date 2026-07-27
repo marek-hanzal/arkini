@@ -40,6 +40,7 @@ export const readPixiScenePaletteFx = Effect.fn("readPixiScenePaletteFx")((host:
 				line: read("--ak-line"),
 				overlay: read("--ak-overlay"),
 				overlayForeground: read("--ak-overlay-foreground"),
+				success: read("--ak-success"),
 				surface: read("--ak-surface"),
 				toolbarA: read("--ak-toolbar-grid-slot-surface-a"),
 				toolbarB: read("--ak-toolbar-grid-slot-surface-b"),

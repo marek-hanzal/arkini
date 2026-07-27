@@ -69,6 +69,7 @@ describe("Pixi tile actor running glow layer", () => {
 					line: 0,
 					overlay: 0,
 					overlayForeground: 0,
+					success: 0x57d7b2,
 					surface: 0,
 					toolbarA: 0,
 					toolbarB: 0,

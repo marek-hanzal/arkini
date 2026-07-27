@@ -115,6 +115,12 @@ const createItem = (id: string, x: number) =>
 		title: id,
 	}) as TileActorItem;
 
+const createRunningGlow = () => ({
+	alpha: 0,
+	tint: 0xf05bb8,
+	visible: false,
+});
+
 const mountController = ({
 	interactionClaimByActorId = new Map(),
 	targetItems = [],
@@ -164,13 +170,16 @@ const mountController = ({
 	const actor = {
 		container: actorContainer,
 		dragging: false,
+		feedbackGlowPhase: null,
 		instanceId: `test:${item.id}`,
 		item,
 		lifecycleFadeStarted: false,
 		lifecycleIntentGeneration: 0,
 		lifecycleTargetAlpha: 1,
 		onPointerDown: null,
+		runningGlow: createRunningGlow(),
 		size: 80,
+		workingGlowTint: 0xf05bb8,
 	} as unknown as PixiTileActor;
 	const actors = new Map([
 		[
@@ -189,8 +198,11 @@ const mountController = ({
 			container: {
 				destroyed: false,
 			},
+			feedbackGlowPhase: null,
 			instanceId: `test:${targetItem.id}`,
 			item: targetItem,
+			runningGlow: createRunningGlow(),
+			workingGlowTint: 0xf05bb8,
 		} as PixiTileActor);
 		canonicalItems.set(targetItem.id, targetItem);
 	}
@@ -295,6 +307,7 @@ const mountController = ({
 			onAcceptedDrop,
 			onActivate,
 			onDrop: onDrop as never,
+			readAckTint: () => 0x57d7b2,
 			surface: {
 				readActorPoseFx: () => Effect.succeed(currentActorPose),
 				readCommandTargetFx: () => Effect.succeed(currentCommandTarget),
@@ -371,6 +384,32 @@ const samplePoseAnimation = (animation: PixiActorAnimation, progress: number) =>
 };
 
 describe("Pixi main-scene drag controller", () => {
+	it("acknowledges activation synchronously before async command admission", () => {
+		const mounted = mountController();
+		mounted.onActivate.mockReturnValueOnce(new Promise(() => undefined));
+
+		mounted.actorEvents.emit("pointerdown", pointer(10, 20));
+		mounted.stage.emit("pointerup", pointer(10, 20));
+
+		expect(mounted.onActivate).not.toHaveBeenCalled();
+		expect(mounted.actor.feedbackGlowPhase).toBe("rising");
+		expect(mounted.actor.runningGlow.tint).toBe(0x57d7b2);
+		expect(mounted.presentationWrites).toContainEqual({
+			actor: mounted.actor,
+			channel: "glow-opacity",
+			visible: true,
+		});
+		expect(mounted.animations).toContainEqual(
+			expect.objectContaining({
+				actor: mounted.actor,
+				channel: "glow-opacity",
+				durationMs: 110,
+				ownerKey: `feedback-glow:${mounted.actor.instanceId}`,
+				toRunningGlowAlpha: 0.82,
+			}),
+		);
+	});
+
 	it("snapshots Shift at release instead of retaining a pooled Pixi event", async () => {
 		const { actorEvents, onActivate, stage } = mountController();
 		actorEvents.emit("pointerdown", pointer(10, 20));
@@ -399,7 +438,9 @@ describe("Pixi main-scene drag controller", () => {
 
 		expect(mounted.onActivate).toHaveBeenCalledWith(item, false, expect.anything());
 		expect(mounted.onDrop).not.toHaveBeenCalled();
-		expect(mounted.cancelAnimation).not.toHaveBeenCalled();
+		expect(mounted.cancelAnimation).toHaveBeenCalledExactlyOnceWith(
+			`feedback-glow:${mounted.actor.instanceId}`,
+		);
 		expect(mounted.startCursorGrab).not.toHaveBeenCalled();
 		expect(mounted.finishCursorGrab).not.toHaveBeenCalled();
 		expect(mounted.magneticUpdates).toHaveLength(0);
@@ -637,8 +678,11 @@ describe("Pixi main-scene drag controller", () => {
 			container: {
 				destroyed: false,
 			},
+			feedbackGlowPhase: null,
 			instanceId: `test:${inventory.id}`,
 			item: inventory,
+			runningGlow: createRunningGlow(),
+			workingGlowTint: 0xf05bb8,
 		} as PixiTileActor;
 		mounted.actors.set(inventory.id, inventoryActor);
 		previewState.actorKinds.set(inventory.id, "store-inventory");

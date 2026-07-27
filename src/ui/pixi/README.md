@@ -105,6 +105,11 @@ gameplay outcome. Missing visual identities or handoffs degrade to ordinary reco
 - Accepted consumption presents exact result/event facts: the surviving source dips, a removed
   source fades, and the receiver flashes the shared accent glow. Drop-result facts cover manual
   stack, producer-input, and Inventory storage commands that do not emit equivalent engine events.
+- Every admitted main-scene tile click immediately flashes one optimistic semantic-success ACK
+  glow before any asynchronous command work. ACK confirms that presentation heard the click; it
+  does not claim that the engine will accept the resulting action. If the owner becomes active, the
+  same visible sprite changes back to its working tint and continues the slow pulse without fading
+  out or spawning a competing glow.
 - The main actor store retains physical actors after canonical removal until their exit animation
   completes. Scene teardown destroys every retained exit and cancels visual readiness before its
   parent layers disappear.

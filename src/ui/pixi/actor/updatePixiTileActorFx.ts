@@ -83,7 +83,8 @@ export const updatePixiTileActorFx = Effect.fn("updatePixiTileActorFx")(function
 	actor.runningGlow.y = inset + faceSize / 2;
 	actor.runningGlow.width = runningGlowSize;
 	actor.runningGlow.height = runningGlowSize;
-	actor.runningGlow.tint = palette.accent;
+	actor.workingGlowTint = palette.accent;
+	if (actor.feedbackGlowPhase === null) actor.runningGlow.tint = actor.workingGlowTint;
 
 	for (const visual of actor.visuals) {
 		yield* updatePixiTileActorVisualFx({

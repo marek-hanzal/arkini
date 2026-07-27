@@ -324,6 +324,7 @@ vi.mock("~/ui/pixi/appearance/readPixiScenePaletteFx", async () => {
 				line: 0x333333,
 				overlay: 0x444444,
 				overlayForeground: 0xffffff,
+				success: 0x57d7b2,
 				surface: 0x555555,
 				toolbarA: 0x666666,
 				toolbarB: 0x777777,

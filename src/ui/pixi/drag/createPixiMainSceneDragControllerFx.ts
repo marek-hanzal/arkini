@@ -15,7 +15,10 @@ import {
 	restorePixiTileActorRemovalFeedbackFx,
 	startPixiTileActorRemovalFeedbackFx,
 } from "~/ui/pixi/animation/startPixiTileActorRemovalFeedbackFx";
-import { flashPixiTileActorFeedbackGlowFx } from "~/ui/pixi/animation/runPixiTileActorRunningGlowFx";
+import {
+	flashPixiTileActorAckGlowFx,
+	flashPixiTileActorFeedbackGlowFx,
+} from "~/ui/pixi/animation/runPixiTileActorRunningGlowFx";
 import type { PixiMainSceneActiveDrag } from "~/ui/pixi/drag/PixiMainSceneDragState";
 import type { PixiCursorGrabMotion } from "~/ui/pixi/drag/PixiCursorGrabMotion";
 import type { PixiMainSceneDragController } from "~/ui/pixi/drag/PixiMainSceneDragController";
@@ -47,6 +50,7 @@ export namespace createPixiMainSceneDragControllerFx {
 		) => void | PromiseLike<void>;
 		readonly onAcceptedDrop: () => void;
 		readonly onDrop: (command: runTileDropAtom.Command) => PromiseLike<runTileDropAtom.Result>;
+		readonly readAckTint: () => number;
 		readonly surface: PixiMainSceneSurface;
 	}
 }
@@ -76,6 +80,7 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 		onActivate,
 		onAcceptedDrop,
 		onDrop,
+		readAckTint,
 		surface,
 	}: createPixiMainSceneDragControllerFx.Props) {
 		let activeDrag: PixiMainSceneActiveDrag | null = null;
@@ -351,6 +356,19 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 			if (drag.phase === "pressed") {
 				activeDrag = null;
 				const shiftKey = event.shiftKey;
+				const currentActor = actorStore.actors.get(drag.sourceItem.id);
+				if (currentActor === undefined || currentActor.container.destroyed) return;
+				try {
+					RendererRuntime.runSync(
+						flashPixiTileActorAckGlowFx({
+							actor: currentActor,
+							animator,
+							tint: readAckTint(),
+						}),
+					);
+				} catch (cause) {
+					console.error("Pixi tile activation acknowledgement failed.", cause);
+				}
 				void Promise.resolve()
 					.then(() => {
 						if (closed) return;

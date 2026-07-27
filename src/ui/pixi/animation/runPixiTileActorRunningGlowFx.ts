@@ -8,6 +8,19 @@ export namespace runPixiTileActorRunningGlowFx {
 	export interface Props {
 		readonly actor: PixiTileActor;
 		readonly animator: PixiActorAnimator;
+		readonly preserveVisibleGlow?: boolean;
+	}
+}
+
+export namespace flashPixiTileActorFeedbackGlowFx {
+	export interface Props extends runPixiTileActorRunningGlowFx.Props {
+		readonly tint?: number;
+	}
+}
+
+export namespace flashPixiTileActorAckGlowFx {
+	export interface Props extends runPixiTileActorRunningGlowFx.Props {
+		readonly tint: number;
 	}
 }
 
@@ -27,9 +40,17 @@ export const readPixiTileActorFeedbackGlowAnimationKey = (actor: PixiTileActor) 
 
 /** Fades the circular glow in, then starts one gentle 4.8 second pulse. */
 export const startPixiTileActorRunningGlowFx = Effect.fn("startPixiTileActorRunningGlowFx")(
-	function* ({ actor, animator }: runPixiTileActorRunningGlowFx.Props) {
+	function* ({
+		actor,
+		animator,
+		preserveVisibleGlow = false,
+	}: runPixiTileActorRunningGlowFx.Props) {
+		if (actor.feedbackGlowPhase === "rising" && !preserveVisibleGlow) return;
+		const preserveCurrentGlow = preserveVisibleGlow || actor.feedbackGlowPhase === "falling";
 		const animationKey = readPixiTileActorRunningGlowAnimationKey(actor);
 		yield* animator.cancelFx(animationKey);
+		actor.feedbackGlowPhase = null;
+		actor.runningGlow.tint = actor.workingGlowTint;
 		yield* animator.setFx({
 			actor,
 			channel: "glow-opacity",
@@ -57,6 +78,26 @@ export const startPixiTileActorRunningGlowFx = Effect.fn("startPixiTileActorRunn
 				}),
 			);
 		};
+		if (preserveCurrentGlow) {
+			yield* animator.animateFx({
+				actor,
+				channel: "glow-opacity",
+				durationMs: halfCycleDurationMs,
+				ownerKey: animationKey,
+				onComplete: () => {
+					if (
+						actor.container.destroyed ||
+						!actor.item.runningGlow ||
+						!actor.runningGlow.visible
+					) {
+						return;
+					}
+					pulseTo(maximumAlpha);
+				},
+				toRunningGlowAlpha: minimumAlpha,
+			});
+			return;
+		}
 		yield* animator.animateFx({
 			actor,
 			channel: "glow-opacity",
@@ -80,6 +121,7 @@ export const startPixiTileActorRunningGlowFx = Effect.fn("startPixiTileActorRunn
 /** Interrupts the pulse and fades its glow-only channel out before hiding it. */
 export const stopPixiTileActorRunningGlowFx = Effect.fn("stopPixiTileActorRunningGlowFx")(
 	function* ({ actor, animator }: runPixiTileActorRunningGlowFx.Props) {
+		if (actor.feedbackGlowPhase !== null) return;
 		const animationKey = readPixiTileActorRunningGlowAnimationKey(actor);
 		yield* animator.cancelFx(animationKey);
 		yield* animator.animateFx({
@@ -109,10 +151,12 @@ export const stopPixiTileActorRunningGlowFx = Effect.fn("stopPixiTileActorRunnin
  * zero and hides the sprite, so feedback never leaves a second opacity writer behind.
  */
 export const flashPixiTileActorFeedbackGlowFx = Effect.fn("flashPixiTileActorFeedbackGlowFx")(
-	function* ({ actor, animator }: runPixiTileActorRunningGlowFx.Props) {
+	function* ({ actor, animator, tint }: flashPixiTileActorFeedbackGlowFx.Props) {
 		if (actor.container.destroyed) return;
 		const animationKey = readPixiTileActorFeedbackGlowAnimationKey(actor);
 		yield* animator.cancelFx(animationKey);
+		actor.feedbackGlowPhase = "rising";
+		actor.runningGlow.tint = tint ?? actor.workingGlowTint;
 		yield* animator.setFx({
 			actor,
 			channel: "glow-opacity",
@@ -130,10 +174,12 @@ export const flashPixiTileActorFeedbackGlowFx = Effect.fn("flashPixiTileActorFee
 						startPixiTileActorRunningGlowFx({
 							actor,
 							animator,
+							preserveVisibleGlow: true,
 						}),
 					);
 					return;
 				}
+				actor.feedbackGlowPhase = "falling";
 				RendererRuntime.runSync(
 					animator.animateFx({
 						actor,
@@ -141,7 +187,18 @@ export const flashPixiTileActorFeedbackGlowFx = Effect.fn("flashPixiTileActorFee
 						durationMs: pixiTileActorFeedbackGlowFallDurationMs,
 						ownerKey: animationKey,
 						onComplete: () => {
-							if (actor.container.destroyed || actor.item.runningGlow) return;
+							if (actor.container.destroyed) return;
+							actor.feedbackGlowPhase = null;
+							actor.runningGlow.tint = actor.workingGlowTint;
+							if (actor.item.runningGlow) {
+								RendererRuntime.runSync(
+									startPixiTileActorRunningGlowFx({
+										actor,
+										animator,
+									}),
+								);
+								return;
+							}
 							RendererRuntime.runSync(
 								animator.setFx({
 									actor,
@@ -157,4 +214,14 @@ export const flashPixiTileActorFeedbackGlowFx = Effect.fn("flashPixiTileActorFee
 			toRunningGlowAlpha: feedbackPeakAlpha,
 		});
 	},
+);
+
+/** Uses the semantic success color while sharing feedback ownership and running handoff. */
+export const flashPixiTileActorAckGlowFx = Effect.fn("flashPixiTileActorAckGlowFx")(
+	({ actor, animator, tint }: flashPixiTileActorAckGlowFx.Props) =>
+		flashPixiTileActorFeedbackGlowFx({
+			actor,
+			animator,
+			tint,
+		}),
 );

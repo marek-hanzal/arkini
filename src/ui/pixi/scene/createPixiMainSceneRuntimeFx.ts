@@ -130,6 +130,7 @@ export const createPixiMainSceneRuntimeFx = Effect.fn("createPixiMainSceneRuntim
 			onActivate,
 			onAcceptedDrop: () => replayCurrentTransition(),
 			onDrop,
+			readAckTint: () => paletteState.current.success,
 			surface,
 		});
 		registerRollback(drag.closeFx);

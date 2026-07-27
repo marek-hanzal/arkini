@@ -90,6 +90,8 @@ export const createPixiTileActorFx = Effect.fn("createPixiTileActorFx")(
 				visualLayer,
 				runningGlow,
 				visuals,
+				feedbackGlowPhase: null,
+				workingGlowTint: palette.accent,
 				currentVisual,
 				pendingVisual: null,
 				item,

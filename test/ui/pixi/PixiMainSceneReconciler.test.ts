@@ -16,6 +16,7 @@ import type {
 	PixiActorAnimator,
 	PixiActorPresentationWrite,
 } from "~/ui/pixi/animation/PixiActorAnimator";
+import { flashPixiTileActorAckGlowFx } from "~/ui/pixi/animation/runPixiTileActorRunningGlowFx";
 import type { PixiMainSceneDragController } from "~/ui/pixi/drag/PixiMainSceneDragController";
 import { createPixiMainSceneDropPresentationFx } from "~/ui/pixi/drop/createPixiMainSceneDropPresentationFx";
 import type { PixiTileMagneticField } from "~/ui/pixi/magnet/PixiTileMagneticField";
@@ -192,6 +193,8 @@ const createActor = (item: TileActorItem): PixiTileActor => {
 		visuals: new Set([
 			currentVisual,
 		]),
+		feedbackGlowPhase: null,
+		workingGlowTint: 0xf05bb8,
 		currentVisual,
 		pendingVisual: null,
 		item,
@@ -417,7 +420,10 @@ const createReconcilerHarness = ({
 				updateFx: () => Effect.void,
 			} satisfies PixiTileMagneticField,
 			motion,
-			readPalette: () => ({}) as never,
+			readPalette: () =>
+				({
+					success: 0x57d7b2,
+				}) as never,
 			runningGlowTexture: {
 				closeFx: Effect.void,
 				texture: Texture.EMPTY,
@@ -759,6 +765,57 @@ describe("Pixi main-scene reconciliation", () => {
 
 		Effect.runSync(harness.reconciler.reconcileFx(transition(2)));
 		expect(harness.animations).toHaveLength(animationCount);
+	});
+
+	it("keeps a success ACK alive across an instant running-to-idle transition", () => {
+		const idle = createItem("runtime:producer", boardLocation);
+		const running = {
+			...idle,
+			revision: "revision:producer:running",
+			running: true,
+			runningGlow: true,
+		} satisfies TileActorItem;
+		const settled = {
+			...idle,
+			revision: "revision:producer:settled",
+		} satisfies TileActorItem;
+		const actor = createActor(idle);
+		const harness = createReconcilerHarness({
+			actor,
+		});
+		Effect.runSync(
+			flashPixiTileActorAckGlowFx({
+				actor,
+				animator: harness.animator,
+				tint: 0x57d7b2,
+			}),
+		);
+		projectionState.main = [
+			running,
+		];
+
+		Effect.runSync(harness.reconciler.reconcileFx(transition(2)));
+		expect(actor.feedbackGlowPhase).toBe("rising");
+		expect(actor.runningGlow.tint).toBe(0x57d7b2);
+		expect(
+			harness.animations.filter(
+				(animation) => animation.actor === actor && animation.channel === "glow-opacity",
+			),
+		).toHaveLength(1);
+
+		projectionState.main = [
+			settled,
+		];
+		projectionState.feedback = [];
+		Effect.runSync(harness.reconciler.reconcileFx(transition(3)));
+
+		expect(actor.feedbackGlowPhase).toBe("rising");
+		expect(actor.runningGlow.tint).toBe(0x57d7b2);
+		expect(
+			harness.animations.filter(
+				(animation) => animation.actor === actor && animation.channel === "glow-opacity",
+			),
+		).toHaveLength(1);
 	});
 
 	it("dips a surviving consumed source and restores only that lifecycle intent", () => {

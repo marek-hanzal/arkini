@@ -230,6 +230,7 @@ const renderLines = async (
 			kind: "available";
 		}
 	> = projection,
+	initialQuery?: string,
 ) => {
 	const container = document.createElement("div");
 	document.body.append(container);
@@ -248,6 +249,7 @@ const renderLines = async (
 				createElement(ItemLinesTab, {
 					key: nextLines.itemId,
 					disabled: false,
+					initialQuery,
 					lines: nextLines,
 				}),
 			);
@@ -327,6 +329,19 @@ describe("ItemLinesTab", () => {
 				"icon-[lucide--chevron-right]",
 			);
 		}
+	});
+
+	it("searches all lines when navigation provides an initial query", async () => {
+		const { container } = await renderLines(projection, "Log");
+
+		expect(
+			container.querySelector<HTMLInputElement>('[aria-label="Search visible lines"]')?.value,
+		).toBe("Log");
+		expect(
+			container.querySelector<HTMLInputElement>(
+				'input[name="item-lines-availability"][value="all"]',
+			)?.checked,
+		).toBe(true);
 	});
 
 	it("defaults to Available and keeps input-starved lines while hiding unavailable lines", async () => {
@@ -443,7 +458,53 @@ describe("ItemLinesTab", () => {
 		]);
 	});
 
-	it("composes search inside the selected subset without clearing query or reordering", async () => {
+	it("keeps a running job in Available when its line becomes unavailable", async () => {
+		const runningUnavailable = {
+			...line({
+				active: true,
+				lineId: "line:running-disabled",
+				title: "Running Disabled",
+			}),
+			availability: {
+				kind: "unavailable",
+				reason: {
+					kind: "line-disabled",
+					cause: {
+						kind: "static",
+					},
+					message: "This line is currently disabled.",
+				},
+			},
+			actions: {
+				canAutofill: false,
+				canStart: false,
+				canWithdraw: false,
+			},
+		} as const satisfies useItemDetailLines.Line;
+		const { container } = await renderLines({
+			...projection,
+			line: [
+				runningUnavailable,
+			],
+		});
+		const available = container.querySelector<HTMLInputElement>(
+			'input[name="item-lines-availability"][value="available"]',
+		);
+
+		expect(available?.checked).toBe(true);
+		expect(available?.disabled).toBe(false);
+		expect(
+			Array.from(container.querySelectorAll<HTMLElement>('[data-ui="TileLine"]')).map(
+				(row) => row.dataset.lineId,
+			),
+		).toEqual([
+			"line:running-disabled",
+		]);
+		expect(container.textContent).toContain("Running Disabled");
+		expect(container.textContent).toContain("This line is currently disabled.");
+	});
+
+	it("searches unavailable source lines initially and preserves the query across subsets", async () => {
 		const unavailable = {
 			...line({
 				lineId: "line:capped",
@@ -481,13 +542,8 @@ describe("ItemLinesTab", () => {
 				kind: "available";
 			}
 		>;
-		const { container } = await renderLines(mixed);
+		const { container } = await renderLines(mixed, "well limit");
 
-		await setSearchQuery(container, "well limit");
-		expect(container.querySelectorAll('[data-ui="TileLine"]')).toHaveLength(0);
-		expect(container.querySelector('[data-ui="ItemLinesSearchEmpty"]')).not.toBeNull();
-
-		await selectAvailabilityFilter(container, "all");
 		expect(
 			container.querySelector<HTMLInputElement>('[aria-label="Search visible lines"]')?.value,
 		).toBe("well limit");
@@ -499,6 +555,11 @@ describe("ItemLinesTab", () => {
 			"line:capped",
 		]);
 
+		await selectAvailabilityFilter(container, "available");
+		expect(container.querySelectorAll('[data-ui="TileLine"]')).toHaveLength(0);
+		expect(container.querySelector('[data-ui="ItemLinesSearchEmpty"]')).not.toBeNull();
+
+		await selectAvailabilityFilter(container, "all");
 		await setSearchQuery(container, "");
 		expect(
 			Array.from(container.querySelectorAll<HTMLElement>('[data-ui="TileLine"]')).map(

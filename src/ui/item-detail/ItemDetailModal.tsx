@@ -219,9 +219,11 @@ const ItemInfoContent = ({
 
 const ItemLinesContent = ({
 	disabled,
+	initialQuery,
 	lines,
 }: {
 	readonly disabled: boolean;
+	readonly initialQuery?: string;
 	readonly lines?: useItemDetailLines.Projection;
 }) => {
 	if (lines?.kind !== "available") {
@@ -234,6 +236,7 @@ const ItemLinesContent = ({
 	return (
 		<ItemLinesTab
 			disabled={disabled}
+			initialQuery={initialQuery}
 			lines={lines}
 		/>
 	);
@@ -292,12 +295,14 @@ const ItemSourcesContent = ({
 const ItemDetailContent = ({
 	disabled,
 	itemId,
+	linesSearchQuery,
 	lines,
 	sources,
 	tab,
 }: {
 	readonly disabled: boolean;
 	readonly itemId: string;
+	readonly linesSearchQuery?: string;
 	readonly lines?: useItemDetailLines.Projection;
 	readonly sources?: useItemDetailSources.Projection;
 	readonly tab: ItemDetailTab;
@@ -312,6 +317,7 @@ const ItemDetailContent = ({
 		.with("lines", () => (
 			<ItemLinesContent
 				disabled={disabled}
+				initialQuery={linesSearchQuery}
 				lines={lines}
 			/>
 		))
@@ -337,7 +343,9 @@ const ItemDetailBodyTransition = ({
 	readonly target: ItemDetailTarget;
 }) => (
 	<motion.div
-		key={`${target.kind}:${target.itemId}:${target.tab}`}
+		key={`${target.kind}:${target.itemId}:${target.tab}:${
+			target.kind === "runtime" ? (target.linesSearchQuery ?? "") : ""
+		}`}
 		className="flex min-h-0 flex-1 flex-col"
 		data-ui="ItemDetailContentTransition"
 		data-tab={target.tab}
@@ -468,6 +476,7 @@ const RuntimeItemDetailScene = ({
 					<ItemDetailContent
 						disabled={stale || disabled}
 						itemId={target.itemId}
+						linesSearchQuery={target.linesSearchQuery}
 						lines={lines}
 						sources={sources}
 						tab={target.tab}

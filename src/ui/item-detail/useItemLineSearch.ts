@@ -6,6 +6,9 @@ import { useFuseSearch } from "~/ui/search/useFuseSearch";
 
 export type ItemLineAvailabilityFilter = "available" | "all";
 
+const isAvailableLine = (line: ItemDetailLines.Line) =>
+	line.availability.kind === "available" || line.activeJob !== undefined;
+
 /** Owns local filtering and resolves semantic search identities in authored line order. */
 export const useItemLineSearch = (
 	lines: Extract<
@@ -14,16 +17,17 @@ export const useItemLineSearch = (
 			readonly kind: "available";
 		}
 	>,
+	initialQuery = "",
 ) => {
-	const [query, setQuery] = useState("");
+	const [query, setQuery] = useState(initialQuery);
 	const availableLineCount = useMemo(
-		() => lines.line.filter((line) => line.availability.kind === "available").length,
+		() => lines.line.filter(isAvailableLine).length,
 		[
 			lines.line,
 		],
 	);
 	const [availabilityFilter, setAvailabilityFilter] = useState<ItemLineAvailabilityFilter>(() =>
-		availableLineCount === 0 ? "all" : "available",
+		initialQuery.trim() !== "" || availableLineCount === 0 ? "all" : "available",
 	);
 	useEffect(() => {
 		if (availabilityFilter !== "available" || availableLineCount !== 0) return;
@@ -33,10 +37,7 @@ export const useItemLineSearch = (
 		availableLineCount,
 	]);
 	const selectedLines = useMemo(
-		() =>
-			availabilityFilter === "all"
-				? lines.line
-				: lines.line.filter((line) => line.availability.kind === "available"),
+		() => (availabilityFilter === "all" ? lines.line : lines.line.filter(isAvailableLine)),
 		[
 			availabilityFilter,
 			lines.line,

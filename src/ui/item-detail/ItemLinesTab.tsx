@@ -48,9 +48,11 @@ const ItemLinesEmptyState = ({
 /** Renders the authoritative visible product-line overview inside Item Detail. */
 export const ItemLinesTab = ({
 	disabled = false,
+	initialQuery,
 	lines,
 }: {
 	readonly disabled?: boolean;
+	readonly initialQuery?: string;
 	readonly lines: Extract<
 		ItemDetailLines.Projection,
 		{
@@ -66,7 +68,7 @@ export const ItemLinesTab = ({
 		query,
 		setAvailabilityFilter,
 		setQuery,
-	} = useItemLineSearch(lines);
+	} = useItemLineSearch(lines, initialQuery);
 	return (
 		<div
 			className="flex min-h-0 flex-1 flex-col"

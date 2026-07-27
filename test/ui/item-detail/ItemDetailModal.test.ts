@@ -907,9 +907,13 @@ describe("ItemDetailModal", () => {
 				kind: "runtime",
 				itemId: owner.id,
 				tab: "lines",
+				linesSearchQuery: "Water",
 			},
 		});
 		expect(document.querySelector('[data-ui="ItemLinesTab"]')).not.toBeNull();
+		expect(
+			document.querySelector<HTMLInputElement>('[aria-label="Search visible lines"]')?.value,
+		).toBe("Water");
 	});
 
 	it("closes immediately while an admitted autofill command keeps settling", async () => {

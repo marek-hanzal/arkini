@@ -237,6 +237,7 @@ describe("ItemDetailProvider", () => {
 			openItemDetail(readControl(), {
 				itemId: "runtime:first",
 				tab: "lines",
+				linesSearchQuery: "  Water  ",
 			});
 		});
 		expect(readControl().state).toMatchObject({
@@ -245,6 +246,7 @@ describe("ItemDetailProvider", () => {
 			target: {
 				itemId: "runtime:first",
 				tab: "lines",
+				linesSearchQuery: "Water",
 				origin,
 			},
 		});

@@ -51,7 +51,7 @@ export const ItemDetailProvider = ({
 	);
 
 	const openItemDetailFx = useCallback(
-		({ itemId, tab, origin = null }: OpenItemDetailProps) =>
+		({ itemId, linesSearchQuery, tab, origin = null }: OpenItemDetailProps) =>
 			Effect.suspend(() => {
 				const resolved = resolveTarget({
 					itemId,
@@ -62,6 +62,10 @@ export const ItemDetailProvider = ({
 					kind: "runtime",
 					itemId: resolved.itemId,
 					tab: resolved.tab,
+					linesSearchQuery:
+						resolved.tab === "lines"
+							? linesSearchQuery?.trim() || undefined
+							: undefined,
 					origin: controller.readOrigin(origin),
 				});
 			}),

@@ -893,6 +893,11 @@ describe("Pixi tile motion runtime", () => {
 		if (firstTravel?.channel !== "pose") {
 			throw new Error("Expected the first input delivery segment.");
 		}
+		expect(firstTravel).toMatchObject({
+			curve: {
+				kind: "linear",
+			},
+		});
 		const transient = firstTravel.actor;
 		expect(transient.item.quantity).toBe(7);
 		expect(transient.container.x).toBe(125);
@@ -912,11 +917,23 @@ describe("Pixi tile motion runtime", () => {
 		if (finalTravel?.channel !== "pose") {
 			throw new Error("Expected the retargeted input delivery segment.");
 		}
+		expect(finalTravel).toMatchObject({
+			curve: {
+				kind: "linear",
+			},
+			delayMs: 0,
+		});
+		expect(
+			magneticReleases.filter((release) => release.sourceActorId === transient.item.id),
+		).toHaveLength(0);
 		samplePoseAnimation(finalTravel, 1);
 		source.container.position.set(140, 80);
 		source.dragging = false;
 		finalTravel.onComplete?.();
 
+		expect(
+			magneticReleases.filter((release) => release.sourceActorId === transient.item.id),
+		).toHaveLength(1);
 		expect(source.item.quantity).toBe(7);
 		expect(source.container.alpha).toBe(0);
 		expect(transient.item.quantity).toBe(2);
@@ -1101,6 +1118,11 @@ describe("Pixi tile motion runtime", () => {
 			(animation) => animation.channel === "pose" && animation.ownerKey === "motion:44:0",
 		);
 		if (delivery?.channel !== "pose") throw new Error("Expected Inventory input delivery.");
+		expect(delivery).toMatchObject({
+			curve: {
+				kind: "linear",
+			},
+		});
 		samplePoseAnimation(delivery, 1);
 		delivery.onComplete?.();
 

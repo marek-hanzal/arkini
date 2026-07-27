@@ -364,6 +364,9 @@ export const runPixiInputMotionFx = Effect.fn("runPixiInputMotionFx")(function* 
 	yield* chasePixiTileMotionTargetFx({
 		actor: transient,
 		animator,
+		curve: {
+			kind: "linear",
+		},
 		delayMs,
 		fallbackTarget: target,
 		onPose: magneticProjector.projectPose,

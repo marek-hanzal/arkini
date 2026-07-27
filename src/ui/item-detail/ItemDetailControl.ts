@@ -17,6 +17,7 @@ export type ItemDetailTarget =
 			readonly kind: "runtime";
 			readonly itemId: string;
 			readonly tab: ItemDetailTab;
+			readonly linesSearchQuery?: string;
 			readonly origin: HTMLElement | null;
 	  }
 	| {
@@ -54,6 +55,7 @@ export interface CloseItemDetailProps {
 export interface OpenItemDetailProps {
 	readonly itemId: string;
 	readonly tab?: ItemDetailTab;
+	readonly linesSearchQuery?: string;
 	readonly origin?: HTMLElement | null;
 }
 

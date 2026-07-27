@@ -12,21 +12,54 @@ class ExpectedItemDetailFailure extends Data.TaggedError("ExpectedItemDetailFail
 
 const runtimeTarget = ({
 	itemId = "runtime:first",
+	linesSearchQuery,
 	tab = "lines",
 	origin = null,
 }: {
 	readonly itemId?: string;
+	readonly linesSearchQuery?: string;
 	readonly tab?: "info" | "lines" | "queue" | "sources";
 	readonly origin?: HTMLElement | null;
 } = {}) =>
 	({
 		kind: "runtime",
 		itemId,
+		linesSearchQuery,
 		tab,
 		origin,
 	}) satisfies ItemDetailTarget;
 
 describe("ItemDetailController", () => {
+	it("treats a changed Lines search query as a fresh navigation intent", () => {
+		const controller = Effect.runSync(createItemDetailControllerFx());
+		Effect.runSync(
+			controller.openTargetFx(
+				runtimeTarget({
+					linesSearchQuery: "Water",
+				}),
+			),
+		);
+		const entering = controller.getSnapshot().state;
+		if (entering.phase !== "entering") throw new Error("Expected entering state.");
+		Effect.runSync(controller.completeEnterFx(entering.generation));
+
+		Effect.runSync(
+			controller.openTargetFx(
+				runtimeTarget({
+					linesSearchQuery: "Stone",
+				}),
+			),
+		);
+
+		expect(controller.getSnapshot().state).toMatchObject({
+			phase: "open",
+			generation: entering.generation,
+			target: {
+				linesSearchQuery: "Stone",
+			},
+		});
+	});
+
 	it("owns same-tick lifecycle, origin retention, and generation-safe exit settlement", async () => {
 		const controller = Effect.runSync(createItemDetailControllerFx());
 		const listener = vi.fn();

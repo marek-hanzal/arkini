@@ -31,9 +31,11 @@ const SourceArtwork = ({
 const SourceRow = ({
 	disabled,
 	source,
+	targetTitle,
 }: {
 	readonly disabled: boolean;
 	readonly source: useItemDetailSources.Source;
+	readonly targetTitle: string;
 }) => {
 	const itemDetail = useItemDetailControl();
 	return (
@@ -54,6 +56,7 @@ const SourceRow = ({
 							itemDetail.openItemDetailFx({
 								itemId: source.ownerItemId,
 								tab: "lines",
+								linesSearchQuery: targetTitle,
 							}),
 						);
 						return;
@@ -113,6 +116,7 @@ export const ItemSourcesTab = ({
 					key={source.ownerItemId ?? source.ownerDefinitionItemId}
 					disabled={disabled}
 					source={source}
+					targetTitle={sources.targetTitle}
 				/>
 			))}
 		</div>

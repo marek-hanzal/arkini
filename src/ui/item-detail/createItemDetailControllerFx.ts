@@ -81,7 +81,11 @@ const sameActionOutcomeTarget = (left: ItemDetailTarget, right: ItemDetailTarget
 	left.kind === right.kind && left.itemId === right.itemId;
 
 const sameTarget = (left: ItemDetailTarget, right: ItemDetailTarget) =>
-	sameActionOutcomeTarget(left, right) && left.tab === right.tab;
+	sameActionOutcomeTarget(left, right) &&
+	left.tab === right.tab &&
+	(left.kind !== "runtime" ||
+		right.kind !== "runtime" ||
+		left.linesSearchQuery === right.linesSearchQuery);
 
 /**
  * Creates the non-React Item Detail state owner. Motion reports generation-keyed

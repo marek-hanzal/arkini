@@ -436,6 +436,139 @@ describe("readItemDetailLinesFx", () => {
 		});
 	});
 
+	it("distinguishes a missing deposit target from a present target with insufficient charges", async () => {
+		const config = await readArkiniGameConfigSource();
+		const lumberjack = config.items["producer:lumberjack-t1"];
+		if (lumberjack?.type !== "producer") throw new Error("Missing lumberjack definition.");
+		const testConfig = GameConfigSchema.parse({
+			...config,
+			items: {
+				...config.items,
+				[lumberjack.id]: {
+					...lumberjack,
+					lines: lumberjack.lines.map((line) =>
+						line.id === "line:lumberjack-t1:log-double-tree"
+							? {
+									...line,
+									input: [
+										...line.input,
+										...line.input,
+									],
+								}
+							: line,
+					),
+				},
+			},
+		});
+		const read = (includeDepletedTarget: boolean) =>
+			Effect.runSync(
+				Effect.gen(function* () {
+					const runtime = yield* readRuntimeFx();
+					return yield* readItemDetailLinesFx({
+						itemId: "runtime:lumberjack",
+						runtime,
+					});
+				}).pipe(
+					useGameFx({
+						config: testConfig,
+						state: {
+							cheats: {
+								enabled: false,
+								everEnabled: false,
+								instantGameplay: false,
+							},
+							currentSpace: 0,
+							items: [
+								{
+									id: "runtime:lumberjack",
+									itemId: "producer:lumberjack-t1",
+									location: {
+										scope: "board",
+										space: 0,
+										position: {
+											x: 1,
+											y: 1,
+										},
+									},
+									quantity: 1,
+								},
+								...(includeDepletedTarget
+									? [
+											{
+												id: "runtime:double-tree",
+												itemId: "item:double-tree",
+												location: {
+													scope: "board" as const,
+													space: 0,
+													position: {
+														x: 1,
+														y: 0,
+													},
+												},
+												quantity: 1,
+												remainingCharges: 1,
+											},
+										]
+									: []),
+							],
+							jobs: [],
+						},
+					}),
+				),
+			);
+		const missing = read(false);
+		const depleted = read(true);
+		if (missing.kind !== "available" || depleted.kind !== "available") {
+			throw new Error("Expected lumberjack lines.");
+		}
+		const missingLine = missing.line.find(
+			(line) => line.lineId === "line:lumberjack-t1:log-double-tree",
+		);
+		const depletedLine = depleted.line.find(
+			(line) => line.lineId === "line:lumberjack-t1:log-double-tree",
+		);
+
+		expect(missingLine).toMatchObject({
+			availability: {
+				kind: "unavailable",
+				reason: {
+					kind: "deposit-target-missing",
+					distance: "close",
+					selector: {
+						type: "item",
+						itemId: "item:double-tree",
+					},
+				},
+			},
+			input: [
+				{
+					kind: "deposit",
+					availableCharges: 0,
+					requiredCharges: 2,
+					targetItemIds: [],
+					ready: false,
+				},
+			],
+		});
+		expect(depletedLine).toMatchObject({
+			availability: {
+				kind: "available",
+				readiness: "inputs",
+			},
+			input: [
+				{
+					kind: "deposit",
+					availableCharges: 1,
+					requiredCharges: 2,
+					targetItemIds: [
+						"runtime:double-tree",
+					],
+					ready: false,
+				},
+			],
+		});
+	});
+
 	it("groups duplicate drops without flattening guaranteed and chance rolls", () => {
 		const config = GameConfigSchema.parse({
 			version: "1.0",

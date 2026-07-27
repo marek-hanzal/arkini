@@ -550,8 +550,8 @@ describe("ItemDetailModal", () => {
 				document.querySelectorAll<HTMLElement>('[data-ui="ItemDetailTabs"] button'),
 			).map((tab) => tab.dataset.tab),
 		).toEqual([
-			"info",
 			"sources",
+			"info",
 		]);
 
 		const sourcesTab = document.querySelector<HTMLButtonElement>('[data-tab="sources"]');
@@ -917,8 +917,8 @@ describe("ItemDetailModal", () => {
 				document.querySelectorAll<HTMLElement>('[data-ui="ItemDetailTabs"] button'),
 			).map((tab) => tab.dataset.tab),
 		).toEqual([
-			"info",
 			"sources",
+			"info",
 		]);
 		const sourcesTab = document.querySelector<HTMLButtonElement>('[data-tab="sources"]');
 		if (sourcesTab === null) throw new Error("Missing Sources tab.");
@@ -929,9 +929,7 @@ describe("ItemDetailModal", () => {
 		expect(modal.dataset.tab).toBe("sources");
 		expect(document.querySelector('[data-ui="ItemSource"]')?.textContent).toContain("Workshop");
 		expect(document.querySelector('[data-ui="ItemSource"]')?.textContent).toContain("Space 1");
-		expect(document.querySelector('[data-ui="ItemSourceLine"]')?.textContent).toContain(
-			"Water · 1× guaranteed",
-		);
+		expect(document.querySelector('[data-ui="ItemSourceLine"]')).toBeNull();
 
 		const openLines = Array.from(document.querySelectorAll<HTMLButtonElement>("button")).find(
 			(button) => button.textContent === "Open Lines",

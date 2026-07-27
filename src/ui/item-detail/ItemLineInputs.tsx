@@ -40,9 +40,9 @@ const MaterialInputWithdraw = ({
 	const error = itemDetail.readActionError(pendingKey);
 
 	return (
-		<>
+		<div className="flex flex-col items-end">
 			<Button
-				className="mt-1 min-h-7 px-2.5 py-1 text-xs"
+				className="min-h-7 px-2.5 py-1 text-xs"
 				cursorIntent={pending ? "progress" : undefined}
 				data-ui="TileLineInputWithdrawButton"
 				disabled={disabled || !input.canWithdraw}
@@ -57,7 +57,7 @@ const MaterialInputWithdraw = ({
 				{pending ? "Withdrawing…" : "Withdraw"}
 			</Button>
 			{error === null ? null : <p className="mt-1 text-xs text-danger">{error}</p>}
-		</>
+		</div>
 	);
 };
 
@@ -168,21 +168,26 @@ const ItemLineInputRow = ({
 									? ""
 									: ` · ${materials.charges.cost} charge${materials.charges.cost === 1 ? "" : "s"} from ${materials.charges.from === "self" ? "owner" : "target"}`}
 							</p>
-							<MaterialInputWithdraw
-								disabled={disabled}
-								input={materials}
-								lineId={lineId}
-								ownerItemId={ownerItemId}
-							/>
 						</div>
 						<div className="flex flex-col items-end text-right">
-							<p className="font-medium text-foreground">
-								{materials.storedQuantity} /{" "}
-								{materials.required.min === materials.required.max
-									? materials.required.min
-									: `${materials.required.min}–${materials.required.max}`}{" "}
-								stored
-							</p>
+							<div className="flex items-start justify-end gap-2">
+								<MaterialInputWithdraw
+									disabled={disabled}
+									input={materials}
+									lineId={lineId}
+									ownerItemId={ownerItemId}
+								/>
+								<p
+									className="pt-1 font-medium text-foreground"
+									data-ui="TileLineInputStoredQuantity"
+								>
+									{materials.storedQuantity} /{" "}
+									{materials.required.min === materials.required.max
+										? materials.required.min
+										: `${materials.required.min}–${materials.required.max}`}{" "}
+									stored
+								</p>
+							</div>
 							<p className="mt-0.5 text-xs text-muted">
 								{materials.ready
 									? `${materials.availableCapacity} buffer space`
@@ -227,7 +232,9 @@ const ItemLineInputRow = ({
 						</div>
 						<div className="text-right">
 							<p className="font-medium text-foreground">
-								{deposit.requiredCharges} / {deposit.availableCharges} available
+								{deposit.availableChargesLabel === "None"
+									? "None available"
+									: `${deposit.requiredCharges} / ${deposit.availableChargesLabel} available`}
 							</p>
 							{deposit.targetTitles.length === 0 ? null : (
 								<p className="mt-0.5 max-w-56 truncate text-xs text-muted">

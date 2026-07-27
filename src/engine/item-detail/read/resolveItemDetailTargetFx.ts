@@ -46,7 +46,11 @@ export const resolveItemDetailTargetFx = Effect.fn("resolveItemDetailTargetFx")(
 		sources,
 	});
 	if (item === undefined || tabs.length === 0) return unavailable;
-	const defaultTab = tabs[0];
+	const defaultTab = tabs.includes(ItemDetailTabEnumSchema.enum.Lines)
+		? ItemDetailTabEnumSchema.enum.Lines
+		: tabs.includes(ItemDetailTabEnumSchema.enum.Info)
+			? ItemDetailTabEnumSchema.enum.Info
+			: tabs[0];
 	const fallback =
 		requestedTab === undefined
 			? defaultTab

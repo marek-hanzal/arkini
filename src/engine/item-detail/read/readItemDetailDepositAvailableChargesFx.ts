@@ -43,5 +43,8 @@ export const readItemDetailDepositAvailableChargesFx = Effect.fn(
 		const remainingCharges = yield* readItemRemainingChargesFx(candidate);
 		availableCharges += (remainingCharges ?? 0) * candidate.quantity;
 	}
-	return availableCharges;
+	return {
+		availableCharges,
+		candidateItemIds: candidates.map((candidate) => candidate.id),
+	};
 });

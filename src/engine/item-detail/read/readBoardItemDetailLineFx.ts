@@ -109,6 +109,16 @@ export const readBoardItemDetailLineFx = Effect.fn("readBoardItemDetailLineFx")(
 		outputBlock?.kind === "direct-output-max-count" ? outputBlock : undefined;
 	const downstreamOutputBlock =
 		outputBlock?.kind === "downstream-output-max-count" ? outputBlock : undefined;
+	const input = yield* readItemDetailInputsFx({
+		configured: line.input,
+		lineId: line.id,
+		ownerItemId,
+		resolved: resolution.input,
+		runtime,
+	});
+	const missingDepositTarget = input.find(
+		(candidate) => candidate.kind === "deposit" && candidate.targetItemIds.length === 0,
+	);
 	const availability: ItemDetailLines.Line["availability"] = !resolution.enable
 		? {
 				kind: "unavailable",
@@ -140,10 +150,19 @@ export const readBoardItemDetailLineFx = Effect.fn("readBoardItemDetailLineFx")(
 							maxCount: downstreamOutputBlock.maxCount,
 						},
 					}
-				: {
-						kind: "available",
-						readiness: start.ready ? "ready" : allInputsReady ? "queue" : "inputs",
-					};
+				: missingDepositTarget?.kind === "deposit"
+					? {
+							kind: "unavailable",
+							reason: {
+								kind: "deposit-target-missing",
+								selector: missingDepositTarget.selector,
+								distance: missingDepositTarget.distance,
+							},
+						}
+					: {
+							kind: "available",
+							readiness: start.ready ? "ready" : allInputsReady ? "queue" : "inputs",
+						};
 
 	return {
 		lineId: line.id,
@@ -159,13 +178,7 @@ export const readBoardItemDetailLineFx = Effect.fn("readBoardItemDetailLineFx")(
 			canStart: availability.kind === "available" && start.ready,
 			canWithdraw,
 		},
-		input: yield* readItemDetailInputsFx({
-			configured: line.input,
-			lineId: line.id,
-			ownerItemId,
-			resolved: resolution.input,
-			runtime,
-		}),
+		input,
 		output: yield* readItemDetailOutputFx(line),
 		...(activeJob === undefined
 			? {}

@@ -101,9 +101,13 @@ export const readItemDetailInputsFx = Effect.fn("readItemDetailInputsFx")(functi
 						const chargeKey = yield* readItemDetailChargeKeyFx(depositInput.charges);
 						const key = `${selectorKey}:${depositInput.query.distance}:${chargeKey}`;
 						const previous = deposits.get(key);
-						const targetItemId =
-							resolution?.type === InputEnumSchema.enum.Deposit
-								? resolution.targetItemId
+						const availability =
+							previous === undefined
+								? yield* readItemDetailDepositAvailableChargesFx({
+										input: depositInput,
+										ownerItemId,
+										runtime,
+									})
 								: undefined;
 						deposits.set(key, {
 							kind: "deposit",
@@ -113,19 +117,9 @@ export const readItemDetailInputsFx = Effect.fn("readItemDetailInputsFx")(functi
 								(previous?.requiredCharges ?? 0) +
 								(depositInput.charges?.cost ?? 0),
 							availableCharges:
-								previous?.availableCharges ??
-								(yield* readItemDetailDepositAvailableChargesFx({
-									input: depositInput,
-									ownerItemId,
-									runtime,
-								})),
+								previous?.availableCharges ?? availability?.availableCharges ?? 0,
 							targetItemIds:
-								targetItemId === undefined
-									? (previous?.targetItemIds ?? [])
-									: [
-											...(previous?.targetItemIds ?? []),
-											targetItemId,
-										],
+								previous?.targetItemIds ?? availability?.candidateItemIds ?? [],
 							ready: (previous?.ready ?? true) && (resolution?.ready ?? false),
 							...(depositInput.charges === undefined
 								? {}

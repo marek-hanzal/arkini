@@ -49,8 +49,8 @@ describe("resolveItemDetailTargetFx", () => {
 		).toEqual([
 			"lines",
 			"queue",
-			"info",
 			"sources",
+			"info",
 		]);
 		expect(
 			Effect.runSync(
@@ -115,8 +115,8 @@ describe("resolveItemDetailTargetFx", () => {
 				}),
 			),
 		).toEqual([
-			"info",
 			"sources",
+			"info",
 		]);
 		expect(
 			Effect.runSync(
@@ -128,8 +128,8 @@ describe("resolveItemDetailTargetFx", () => {
 				}),
 			),
 		).toEqual([
-			"info",
 			"sources",
+			"info",
 		]);
 		expect(
 			Effect.runSync(
@@ -144,8 +144,8 @@ describe("resolveItemDetailTargetFx", () => {
 			itemId: "runtime:workshop",
 			tab: "info",
 			tabs: [
-				"info",
 				"sources",
+				"info",
 			],
 		});
 		expect(

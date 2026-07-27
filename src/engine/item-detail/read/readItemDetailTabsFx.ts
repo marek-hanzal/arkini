@@ -42,9 +42,9 @@ const withSources = (
 				ItemDetailTabEnumSchema.enum.Sources,
 			]
 		: [
-				...tabs.slice(0, infoIndex + 1),
+				...tabs.slice(0, infoIndex),
 				ItemDetailTabEnumSchema.enum.Sources,
-				...tabs.slice(infoIndex + 1),
+				...tabs.slice(infoIndex),
 			];
 };
 

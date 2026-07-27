@@ -94,6 +94,11 @@ export namespace ItemDetailLines {
 				readonly kind: "owner-stored";
 		  }
 		| {
+				readonly kind: "deposit-target-missing";
+				readonly selector: SelectorSchema.Type;
+				readonly distance: DistanceEnumSchema.Type;
+		  }
+		| {
 				readonly kind: "direct-output-max-count";
 				readonly itemId: IdSchema.Type;
 				readonly liveQuantity: number;

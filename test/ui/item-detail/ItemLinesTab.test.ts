@@ -127,6 +127,7 @@ const depositInput = {
 	distance: "close",
 	requiredCharges: 1,
 	availableCharges: 33,
+	availableChargesLabel: "33",
 	targetTitles: [
 		"Tree",
 	],
@@ -358,6 +359,7 @@ describe("ItemLinesTab", () => {
 					liveQuantity: 1,
 					reservedQuantity: 0,
 					maxCount: 1,
+					messageAfterTitle: "limit reached (1/1).",
 					message: "Well limit reached (1/1).",
 				},
 			},
@@ -382,6 +384,7 @@ describe("ItemLinesTab", () => {
 					liveQuantity: 1,
 					reservedQuantity: 0,
 					maxCount: 1,
+					messageAfterTitle: "limit reached (1/1).",
 					message: "Well limit reached (1/1).",
 				},
 			},
@@ -456,6 +459,7 @@ describe("ItemLinesTab", () => {
 					liveQuantity: 1,
 					reservedQuantity: 0,
 					maxCount: 1,
+					messageAfterTitle: "limit reached (1/1).",
 					message: "Well limit reached (1/1).",
 				},
 			},
@@ -507,7 +511,7 @@ describe("ItemLinesTab", () => {
 		]);
 	});
 
-	it("keeps Available selected in its dedicated empty state and updates live without reopening", async () => {
+	it("automatically selects All when Available becomes empty without switching back in a loop", async () => {
 		const unavailable = {
 			...projection.line[0],
 			availability: {
@@ -537,51 +541,40 @@ describe("ItemLinesTab", () => {
 				kind: "available";
 			}
 		>;
-		const { container, rerender } = await renderLines(unavailableProjection);
+		const { container, rerender } = await renderLines(projection);
 		const available = () =>
 			container.querySelector<HTMLInputElement>(
 				'input[name="item-lines-availability"][value="available"]',
 			);
+		const all = () =>
+			container.querySelector<HTMLInputElement>(
+				'input[name="item-lines-availability"][value="all"]',
+			);
 
 		expect(available()?.checked).toBe(true);
-		expect(container.querySelector('[data-ui="ItemLinesAvailableEmpty"]')).not.toBeNull();
-		expect(container.textContent).toContain("No lines are currently available.");
-		expect(container.querySelector('[data-ui="ItemLinesAvailableEmpty"]')?.innerHTML).toContain(
-			"icon-[lucide--circle-off]",
-		);
-		await setSearchQuery(container, "well");
-		expect(available()?.checked).toBe(true);
-		expect(container.querySelector('[data-ui="ItemLinesAvailableEmpty"]')).toBeNull();
-		expect(container.querySelector('[data-ui="ItemLinesSearchEmpty"]')).not.toBeNull();
-		await setSearchQuery(container, "");
+		expect(all()?.checked).toBe(false);
 
-		await rerender({
-			...unavailableProjection,
-			line: [
-				{
-					...unavailable,
-					availability: {
-						kind: "available",
-						readiness: "inputs",
-					},
-				},
-			],
-		});
-		expect(available()?.checked).toBe(true);
+		await rerender(unavailableProjection);
+		expect(available()?.checked).toBe(false);
+		expect(all()?.checked).toBe(true);
 		expect(container.querySelector('[data-ui="ItemLinesAvailableEmpty"]')).toBeNull();
 		expect(container.querySelectorAll('[data-ui="TileLine"]')).toHaveLength(1);
 
-		await rerender(unavailableProjection);
-		expect(available()?.checked).toBe(true);
-		expect(container.querySelector('[data-ui="ItemLinesAvailableEmpty"]')).not.toBeNull();
-
-		await selectAvailabilityFilter(container, "all");
+		await rerender(projection);
 		expect(available()?.checked).toBe(false);
+		expect(all()?.checked).toBe(true);
+		expect(container.querySelectorAll('[data-ui="TileLine"]')).toHaveLength(2);
+
+		await selectAvailabilityFilter(container, "available");
+		expect(available()?.checked).toBe(true);
+		await rerender(unavailableProjection);
+		expect(available()?.checked).toBe(false);
+		expect(all()?.checked).toBe(true);
 		expect(container.querySelectorAll('[data-ui="TileLine"]')).toHaveLength(1);
 		expect(container.textContent).toContain("This line is currently disabled.");
 	});
 
-	it("shows the canonical visible-lines empty state before suggesting All", async () => {
+	it("selects All once for an owner with no visible lines and keeps the canonical empty state", async () => {
 		const { container } = await renderLines({
 			...projection,
 			line: [],
@@ -590,6 +583,11 @@ describe("ItemLinesTab", () => {
 		expect(
 			container.querySelector<HTMLInputElement>(
 				'input[name="item-lines-availability"][value="available"]',
+			)?.checked,
+		).toBe(false);
+		expect(
+			container.querySelector<HTMLInputElement>(
+				'input[name="item-lines-availability"][value="all"]',
 			)?.checked,
 		).toBe(true);
 		expect(container.querySelector('[data-ui="ItemLinesVisibleEmpty"]')).not.toBeNull();
@@ -640,15 +638,67 @@ describe("ItemLinesTab", () => {
 				{
 					...projection.line[0],
 					input: [
-						depositInput,
+						{
+							...depositInput,
+							availableChargesLabel: "41",
+						},
 					],
 				},
 			],
 		});
 
 		expect(document.querySelector('[data-input-kind="deposit"]')?.textContent).toContain(
+			"1 / 41 available",
+		);
+		expect(document.querySelector('[data-input-kind="deposit"]')?.textContent).not.toContain(
 			"1 / 33 available",
 		);
+	});
+
+	it("keeps grouped deposit requirement and availability on their truthful sides", async () => {
+		await renderLines({
+			...projection,
+			line: [
+				{
+					...projection.line[0],
+					input: [
+						{
+							...depositInput,
+							requiredCharges: 2,
+							availableCharges: 1,
+							availableChargesLabel: "1",
+						},
+					],
+				},
+			],
+		});
+
+		expect(document.querySelector('[data-input-kind="deposit"]')?.textContent).toContain(
+			"2 / 1 available",
+		);
+	});
+
+	it("renders a missing deposit target as a human state instead of a malformed fraction", async () => {
+		await renderLines({
+			...projection,
+			line: [
+				{
+					...projection.line[0],
+					input: [
+						{
+							...depositInput,
+							availableCharges: 0,
+							availableChargesLabel: "None",
+							targetTitles: [],
+						},
+					],
+				},
+			],
+		});
+
+		const input = document.querySelector('[data-input-kind="deposit"]');
+		expect(input?.textContent).toContain("None available");
+		expect(input?.textContent).not.toContain("1 / None available");
 	});
 
 	it("withdraws the complete exact material input from its local row action", async () => {
@@ -680,19 +730,31 @@ describe("ItemLinesTab", () => {
 			}
 		>;
 		const { rerender } = await renderLines(filledProjection);
-		const withdrawButtons = Array.from(
-			document.querySelectorAll<HTMLButtonElement>("button"),
-		).filter((button) => button.textContent === "Withdraw");
+		const inputWithdraw = document.querySelector<HTMLButtonElement>(
+			'[data-ui="TileLineInputWithdrawButton"]',
+		);
+		const lineWithdraw = document.querySelector<HTMLButtonElement>(
+			'[data-ui="TileLineWithdrawButton"]',
+		);
+		const storedQuantity = document.querySelector<HTMLElement>(
+			'[data-ui="TileLineInputStoredQuantity"]',
+		);
 
-		expect(document.querySelector('[data-ui="TileLineInputWithdrawButton"]')).not.toBeNull();
-		expect(withdrawButtons).toHaveLength(1);
+		expect(inputWithdraw).not.toBeNull();
+		expect(lineWithdraw).not.toBeNull();
+		expect(storedQuantity?.previousElementSibling?.contains(inputWithdraw ?? null)).toBe(true);
 
-		await act(async () => withdrawButtons[0]?.click());
+		await act(async () => inputWithdraw?.click());
 
 		expect(commands.withdraw).toHaveBeenCalledWith({
 			ownerItemId: "runtime:producer",
 			lineId: "line:first",
 			inputIndex: 0,
+		});
+		await act(async () => lineWithdraw?.click());
+		expect(commands.withdraw).toHaveBeenCalledWith({
+			ownerItemId: "runtime:producer",
+			lineId: "line:first",
 		});
 
 		await rerender({
@@ -731,6 +793,7 @@ describe("ItemLinesTab", () => {
 							liveQuantity: 1,
 							reservedQuantity: 1,
 							maxCount: 1,
+							messageAfterTitle: "limit reached (1/1).",
 							message: "Tree limit reached (2/1).",
 						},
 					},
@@ -755,6 +818,15 @@ describe("ItemLinesTab", () => {
 		expect(
 			document.querySelector('[data-ui="TileLineUnavailableReason"]')?.textContent,
 		).toContain("Tree limit reached");
+		expect(
+			document.querySelector('[data-ui="TileLineUnavailableReason"] strong')?.textContent,
+		).toBe("Tree");
+		expect(
+			document.querySelector('[data-ui="TileLineUnavailableReason"]')?.textContent,
+		).toContain("1/1");
+		expect(
+			document.querySelector('[data-ui="TileLineUnavailableReason"]')?.textContent,
+		).not.toContain("2/1");
 		expect(document.querySelector('[data-ui="TileLineFlowChevron"]')).toBeNull();
 		expect(document.querySelector('[data-ui="TileLineUnavailableWithdrawals"]')).not.toBeNull();
 		const withdraw = document.querySelector<HTMLButtonElement>(
@@ -766,6 +838,155 @@ describe("ItemLinesTab", () => {
 			ownerItemId: "runtime:producer",
 			lineId: "line:first",
 			inputIndex: 0,
+		});
+	});
+
+	it("distinguishes a candidate-only max-count block from a reached live limit", async () => {
+		await renderLines({
+			...projection,
+			line: [
+				{
+					...projection.line[0],
+					availability: {
+						kind: "unavailable",
+						reason: {
+							kind: "direct-output-max-count",
+							itemId: "item:tree",
+							itemTitle: "Tree",
+							liveQuantity: 0,
+							reservedQuantity: 1,
+							maxCount: 1,
+							messageAfterTitle: "would exceed limit (0/1 currently).",
+							message: "Tree limit reached (1/1).",
+						},
+					},
+					actions: {
+						canAutofill: false,
+						canStart: false,
+						canWithdraw: false,
+					},
+				},
+			],
+		});
+
+		const reason = document.querySelector('[data-ui="TileLineUnavailableReason"]');
+		expect(reason?.textContent).toContain("Tree would exceed limit (0/1 currently).");
+		expect(reason?.querySelectorAll("strong")).toHaveLength(1);
+		expect(reason?.querySelector("strong")?.textContent).toBe("Tree");
+	});
+
+	it("renders a missing deposit dependency with canonical availability and opens its detail", async () => {
+		await renderLines({
+			...projection,
+			line: [
+				{
+					...projection.line[0],
+					availability: {
+						kind: "unavailable",
+						reason: {
+							kind: "deposit-target-missing",
+							selector: {
+								kind: "item",
+								label: "Tree",
+							},
+							distance: "close",
+							detail: {
+								itemId: "tree",
+								title: "Tree",
+								sourceUrl: "resource:tree",
+								detailItemId: "runtime:tree",
+							},
+							messageBeforeDetail: "Requires ",
+							messageAfterDetail: " · None available (Board · close).",
+							message: "Requires Tree · None available (Board · close).",
+						},
+					},
+					actions: {
+						canAutofill: false,
+						canStart: false,
+						canWithdraw: false,
+					},
+					input: [
+						{
+							...depositInput,
+							availableCharges: 0,
+							availableChargesLabel: "None",
+							targetTitles: [],
+							ready: false,
+						},
+					],
+				},
+			],
+		});
+
+		expect(document.querySelector('[data-input-kind="deposit"]')).toBeNull();
+		const reason = document.querySelector('[data-ui="TileLineUnavailableReason"]');
+		expect(reason?.textContent).toBe("Requires Tree · None available (Board · close).");
+		expect(reason?.textContent).not.toContain("1 / None available");
+		const link = reason?.querySelector<HTMLButtonElement>(
+			'[data-ui="TileLineUnavailableDependencyLink"]',
+		);
+		expect(link?.querySelector("img")?.getAttribute("src")).toBe("resource:tree");
+		await act(async () => link?.click());
+		expect(control.openItemDetailFx).toHaveBeenCalledWith({
+			itemId: "runtime:tree",
+		});
+	});
+
+	it("opens projected dependency artwork without reconstructing its identity", async () => {
+		const dependency = {
+			...projection.line[0],
+			availability: {
+				kind: "unavailable",
+				reason: {
+					kind: "line-disabled",
+					cause: {
+						kind: "enable-rule",
+						ruleIndex: 0,
+						whenIndex: 0,
+						condition: {
+							kind: "exists",
+							selector: {
+								kind: "item",
+								label: "Stonemason I",
+							},
+							detail: {
+								itemId: "stonemason",
+								title: "Stonemason I",
+								sourceUrl: "resource:stonemason",
+								detailItemId: "runtime:stonemason",
+							},
+						},
+					},
+					messageBeforeDetail: "Requires ",
+					messageAfterDetail: ".",
+					message: "Requires Stonemason I.",
+				},
+			},
+			actions: {
+				canAutofill: false,
+				canStart: false,
+				canWithdraw: false,
+			},
+		} as const satisfies useItemDetailLines.Line;
+		await renderLines({
+			...projection,
+			line: [
+				dependency,
+			],
+		});
+		const link = document.querySelector<HTMLButtonElement>(
+			'[data-ui="TileLineUnavailableDependencyLink"]',
+		);
+
+		expect(link?.textContent).toContain("Stonemason I");
+		expect(link?.querySelector("img")?.getAttribute("src")).toBe("resource:stonemason");
+		expect(document.querySelector('[data-ui="TileLineUnavailableReason"]')?.textContent).toBe(
+			"Requires Stonemason I.",
+		);
+		await act(async () => link?.click());
+		expect(control.openItemDetailFx).toHaveBeenCalledWith({
+			itemId: "runtime:stonemason",
 		});
 	});
 

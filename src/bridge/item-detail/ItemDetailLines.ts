@@ -54,6 +54,7 @@ export namespace ItemDetailLines {
 				readonly distance: "close" | "near" | "far";
 				readonly requiredCharges: number;
 				readonly availableCharges: number;
+				readonly availableChargesLabel: string;
 				readonly targetTitles: readonly string[];
 				readonly ready: boolean;
 				readonly charges?: ChargeCost;
@@ -78,6 +79,26 @@ export namespace ItemDetailLines {
 	export type OutputRoll = ItemDetailOutputRoll<OutputItem>;
 	export type OutputSet = ItemDetailOutputSet<OutputItem>;
 
+	export type DisabledCondition =
+		| {
+				readonly kind: "exists";
+				readonly selector: Selector;
+				readonly detail?: DetailReference;
+		  }
+		| {
+				readonly kind: "count";
+				readonly selector: Selector;
+				readonly count: number;
+				readonly detail?: DetailReference;
+		  }
+		| {
+				readonly kind: "range";
+				readonly selector: Selector;
+				readonly min: number;
+				readonly max: number;
+				readonly detail?: DetailReference;
+		  };
+
 	export type DisabledReason =
 		| {
 				readonly kind: "owner-stored";
@@ -93,11 +114,24 @@ export namespace ItemDetailLines {
 							readonly kind: "enable-rule";
 							readonly ruleIndex: number;
 							readonly whenIndex: number;
+							readonly condition: DisabledCondition;
 					  }
 					| {
 							readonly kind: "disable-rule";
 							readonly ruleIndex: number;
+							readonly condition: readonly DisabledCondition[];
 					  };
+				readonly messageBeforeDetail?: string;
+				readonly messageAfterDetail?: string;
+				readonly message: string;
+		  }
+		| {
+				readonly kind: "deposit-target-missing";
+				readonly selector: Selector;
+				readonly distance: "close" | "near" | "far";
+				readonly detail?: DetailReference;
+				readonly messageBeforeDetail?: string;
+				readonly messageAfterDetail?: string;
 				readonly message: string;
 		  }
 		| {
@@ -107,6 +141,7 @@ export namespace ItemDetailLines {
 				readonly liveQuantity: number;
 				readonly reservedQuantity: number;
 				readonly maxCount: number;
+				readonly messageAfterTitle: string;
 				readonly message: string;
 		  }
 		| {
@@ -118,6 +153,7 @@ export namespace ItemDetailLines {
 				readonly liveQuantity: number;
 				readonly reservedQuantity: number;
 				readonly maxCount: number;
+				readonly messageAfterTitle: string;
 				readonly message: string;
 		  };
 

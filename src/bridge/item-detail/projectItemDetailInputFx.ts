@@ -94,6 +94,10 @@ export const projectItemDetailInputFx = Effect.fn("projectItemDetailInputFx")(fu
 						distance: deposit.distance,
 						requiredCharges: deposit.requiredCharges,
 						availableCharges: deposit.availableCharges,
+						availableChargesLabel:
+							deposit.targetItemIds.length === 0
+								? "None"
+								: String(deposit.availableCharges),
 						targetTitles: deposit.targetItemIds.map(
 							(itemId) =>
 								runtime.items.find((item) => item.id === itemId)?.item.title ??

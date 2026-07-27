@@ -60,7 +60,6 @@ export const ItemLinesTab = ({
 }) => {
 	const {
 		availabilityFilter,
-		availableLineCount,
 		filteredLines,
 		normalizedQuery,
 		query,
@@ -128,18 +127,6 @@ export const ItemLinesTab = ({
 						icon="icon-[lucide--list-x]"
 					>
 						<p>No product line is currently visible.</p>
-					</ItemLinesEmptyState>
-				) : availabilityFilter === "available" &&
-					availableLineCount === 0 &&
-					normalizedQuery === "" ? (
-					<ItemLinesEmptyState
-						dataUi="ItemLinesAvailableEmpty"
-						icon="icon-[lucide--circle-off]"
-					>
-						<p>
-							No lines are currently available. Choose <strong>All</strong> to inspect
-							disabled reasons.
-						</p>
 					</ItemLinesEmptyState>
 				) : filteredLines.length === 0 ? (
 					<ItemLinesEmptyState

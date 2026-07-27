@@ -1,16 +1,89 @@
+import { match } from "ts-pattern";
+
 import { useAutofillItemDetailLine } from "~/bridge/item-detail/useAutofillItemDetailLine";
 import type { ItemDetailLines } from "~/bridge/item-detail/ItemDetailLines";
 import { useSetDefaultItemDetailLine } from "~/bridge/item-detail/useSetDefaultItemDetailLine";
 import { useStartPendingItemDetailLine } from "~/bridge/item-detail/useStartItemDetailLine";
 import { useUnsetDefaultItemDetailLine } from "~/bridge/item-detail/useUnsetDefaultItemDetailLine";
+import { useWithdrawItemDetailLine } from "~/bridge/item-detail/useWithdrawItemDetailLine";
 import { Button, PrimaryButton } from "~/ui/button/Button";
 import { ItemLineInputs, ItemLineUnavailableWithdrawals } from "~/ui/item-detail/ItemLineInputs";
 import { ItemLineOutputs } from "~/ui/item-detail/ItemLineOutputs";
 import { ItemLineRuntime } from "~/ui/item-detail/ItemLineRuntime";
 import { ItemLineSummary } from "~/ui/item-detail/ItemLineSummary";
+import { ItemReferenceButton } from "~/ui/item-detail/ItemReferenceButton";
 import type { ItemDetailPendingAction } from "~/ui/item-detail/ItemDetailControl";
 import { useItemDetailControl } from "~/ui/item-detail/useItemDetailControl";
 import { readSettledAsyncResultError } from "~/ui/reactivity/readSettledAsyncResultError";
+
+const ItemLineUnavailableReason = ({
+	disabled,
+	reason,
+}: {
+	readonly disabled: boolean;
+	readonly reason: ItemDetailLines.DisabledReason;
+}) => {
+	const dependency =
+		reason.kind === "deposit-target-missing"
+			? reason.detail
+			: reason.kind === "line-disabled" && reason.cause.kind === "enable-rule"
+				? reason.cause.condition.detail
+				: undefined;
+	const fragments =
+		"messageBeforeDetail" in reason &&
+		reason.messageBeforeDetail !== undefined &&
+		reason.messageAfterDetail !== undefined
+			? {
+					after: reason.messageAfterDetail,
+					before: reason.messageBeforeDetail,
+				}
+			: undefined;
+	if (dependency !== undefined && fragments !== undefined) {
+		return (
+			<div className="flex min-w-0 items-center">
+				<span className="whitespace-pre">{fragments.before}</span>
+				<ItemReferenceButton
+					compositeUrl={dependency.compositeUrl}
+					dataUi="TileLineUnavailableDependencyLink"
+					definitionItemId={dependency.itemId}
+					disabled={disabled}
+					label={dependency.title}
+					runtimeItemId={dependency.detailItemId}
+					sourceUrl={dependency.sourceUrl}
+				/>
+				<span className="whitespace-pre">{fragments.after}</span>
+			</div>
+		);
+	}
+	return match(reason)
+		.with(
+			{
+				kind: "direct-output-max-count",
+			},
+			{
+				kind: "downstream-output-max-count",
+			},
+			(limit) => (
+				<p>
+					<strong className="font-semibold text-foreground">{limit.itemTitle}</strong>{" "}
+					{limit.messageAfterTitle}
+				</p>
+			),
+		)
+		.with(
+			{
+				kind: "line-disabled",
+			},
+			{
+				kind: "owner-stored",
+			},
+			{
+				kind: "deposit-target-missing",
+			},
+			({ message }) => <p>{message}</p>,
+		)
+		.exhaustive();
+};
 
 /** Renders one live product line with its commands, runtime, inputs, and outputs. */
 export const ItemLineRow = ({
@@ -34,6 +107,7 @@ export const ItemLineRow = ({
 		autofill: pendingKey("autofill"),
 		default: pendingKey("default"),
 		start: pendingKey("start"),
+		withdraw: pendingKey("withdraw"),
 	} as const;
 	const autofillLine = useAutofillItemDetailLine({
 		pendingKey: pendingKeys.autofill,
@@ -51,14 +125,20 @@ export const ItemLineRow = ({
 		pendingKey: pendingKeys.start,
 		pendingOwner: itemDetail,
 	});
+	const withdrawLine = useWithdrawItemDetailLine({
+		pendingKey: pendingKeys.withdraw,
+		pendingOwner: itemDetail,
+	});
 	readSettledAsyncResultError(autofillLine.result);
 	readSettledAsyncResultError(setDefaultLine.result);
 	readSettledAsyncResultError(unsetDefaultLine.result);
 	readSettledAsyncResultError(startLine.result);
+	readSettledAsyncResultError(withdrawLine.result);
 	const pending = {
 		autofill: itemDetail.readPendingAction(pendingKeys.autofill) === "autofill",
 		default: itemDetail.readPendingAction(pendingKeys.default) === "default",
 		start: itemDetail.readPendingAction(pendingKeys.start) === "start",
+		withdraw: itemDetail.readPendingAction(pendingKeys.withdraw) === "withdraw",
 	} as const;
 	const error =
 		Object.values(pendingKeys)
@@ -115,6 +195,19 @@ export const ItemLineRow = ({
 						>
 							{pending.autofill ? "Filling…" : "Autofill"}
 						</Button>
+						<Button
+							cursorIntent={pending.withdraw ? "progress" : undefined}
+							data-ui="TileLineWithdrawButton"
+							disabled={disabled || !line.actions.canWithdraw}
+							onClick={() =>
+								withdrawLine.run({
+									ownerItemId,
+									lineId: line.lineId,
+								})
+							}
+						>
+							{pending.withdraw ? "Withdrawing…" : "Withdraw"}
+						</Button>
 						<PrimaryButton
 							className="min-w-24"
 							cursorIntent={pending.start ? "progress" : undefined}
@@ -156,7 +249,10 @@ export const ItemLineRow = ({
 						className="icon-[lucide--circle-alert] size-5 shrink-0 text-warning"
 						aria-hidden="true"
 					/>
-					<p>{line.availability.reason.message}</p>
+					<ItemLineUnavailableReason
+						disabled={disabled}
+						reason={line.availability.reason}
+					/>
 					<ItemLineUnavailableWithdrawals
 						disabled={disabled}
 						input={line.input}

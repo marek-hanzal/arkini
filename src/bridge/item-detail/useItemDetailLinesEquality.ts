@@ -25,6 +25,36 @@ export const useItemDetailLinesEquality = () =>
 			left?.sourceUrl === right?.sourceUrl &&
 			left?.compositeUrl === right?.compositeUrl &&
 			left?.detailItemId === right?.detailItemId;
+		const sameDisabledCondition = (
+			left: ItemDetailLines.DisabledCondition,
+			right: ItemDetailLines.DisabledCondition,
+		) =>
+			left.kind === right.kind &&
+			sameSelector(left.selector, right.selector) &&
+			sameDetailReference(left.detail, right.detail) &&
+			match(left)
+				.with(
+					{
+						kind: "exists",
+					},
+					() => right.kind === "exists",
+				)
+				.with(
+					{
+						kind: "count",
+					},
+					(condition) => right.kind === "count" && condition.count === right.count,
+				)
+				.with(
+					{
+						kind: "range",
+					},
+					(condition) =>
+						right.kind === "range" &&
+						condition.min === right.min &&
+						condition.max === right.max,
+				)
+				.exhaustive();
 		const sameStringArray = (left: readonly string[], right: readonly string[]) =>
 			left.length === right.length && left.every((value, index) => value === right[index]);
 		const sameInput = (left: ItemDetailLines.Input, right: ItemDetailLines.Input) => {
@@ -59,6 +89,7 @@ export const useItemDetailLinesEquality = () =>
 						deposit.distance === right.distance &&
 						deposit.requiredCharges === right.requiredCharges &&
 						deposit.availableCharges === right.availableCharges &&
+						deposit.availableChargesLabel === right.availableChargesLabel &&
 						sameStringArray(deposit.targetTitles, right.targetTitles) &&
 						deposit.ready === right.ready &&
 						sameCharge(deposit.charges, right.charges) &&
@@ -151,26 +182,59 @@ export const useItemDetailLinesEquality = () =>
 					left.reason.cause.kind === "enable-rule" &&
 					right.reason.cause.kind === "enable-rule" &&
 					(left.reason.cause.ruleIndex !== right.reason.cause.ruleIndex ||
-						left.reason.cause.whenIndex !== right.reason.cause.whenIndex)
+						left.reason.cause.whenIndex !== right.reason.cause.whenIndex ||
+						!sameDisabledCondition(
+							left.reason.cause.condition,
+							right.reason.cause.condition,
+						))
 				) {
 					return false;
 				}
 				if (
 					left.reason.cause.kind === "disable-rule" &&
-					right.reason.cause.kind === "disable-rule" &&
-					left.reason.cause.ruleIndex !== right.reason.cause.ruleIndex
+					right.reason.cause.kind === "disable-rule"
 				) {
-					return false;
+					const rightConditions = right.reason.cause.condition;
+					if (
+						left.reason.cause.ruleIndex !== right.reason.cause.ruleIndex ||
+						left.reason.cause.condition.length !== rightConditions.length ||
+						left.reason.cause.condition.some((condition, index) => {
+							const candidate = rightConditions[index];
+							return (
+								candidate === undefined ||
+								!sameDisabledCondition(condition, candidate)
+							);
+						})
+					) {
+						return false;
+					}
 				}
+			}
+			if (
+				left.reason.kind === "deposit-target-missing" &&
+				right.reason.kind === "deposit-target-missing"
+			) {
+				return (
+					left.reason.message === right.reason.message &&
+					left.reason.distance === right.reason.distance &&
+					sameSelector(left.reason.selector, right.reason.selector) &&
+					sameDetailReference(left.reason.detail, right.reason.detail)
+				);
 			}
 			return (
 				left.reason.message === right.reason.message &&
+				("messageBeforeDetail" in left.reason
+					? "messageBeforeDetail" in right.reason &&
+						left.reason.messageBeforeDetail === right.reason.messageBeforeDetail &&
+						left.reason.messageAfterDetail === right.reason.messageAfterDetail
+					: !("messageBeforeDetail" in right.reason)) &&
 				("itemId" in left.reason
 					? "itemId" in right.reason &&
 						left.reason.itemId === right.reason.itemId &&
 						left.reason.liveQuantity === right.reason.liveQuantity &&
 						left.reason.reservedQuantity === right.reason.reservedQuantity &&
-						left.reason.maxCount === right.reason.maxCount
+						left.reason.maxCount === right.reason.maxCount &&
+						left.reason.messageAfterTitle === right.reason.messageAfterTitle
 					: !("itemId" in right.reason)) &&
 				("intermediateItemId" in left.reason
 					? "intermediateItemId" in right.reason &&

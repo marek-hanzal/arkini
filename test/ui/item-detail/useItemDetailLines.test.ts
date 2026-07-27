@@ -101,6 +101,58 @@ const config = GameConfigSchema.parse({
 							mode: "consume",
 						},
 					],
+					rules: [
+						{
+							type: "enable",
+							when: [
+								{
+									type: "exists",
+									query: {
+										scope: "any",
+										selector: {
+											type: "item",
+											itemId: "material",
+										},
+									},
+								},
+							],
+						},
+					],
+				},
+				{
+					id: "line:producer:deposit",
+					title: "Deposit work",
+					description: "Requires a nearby material target.",
+					runtimeMs: 1_000,
+					input: [
+						{
+							type: "deposit",
+							query: {
+								scope: "board",
+								distance: "close",
+								selector: {
+									type: "item",
+									itemId: "material",
+								},
+							},
+							charges: {
+								from: "target",
+								cost: 1,
+							},
+						},
+					],
+					rules: [],
+				},
+				{
+					id: "line:producer:max",
+					title: "Limited output",
+					description: "Produces one capped material.",
+					runtimeMs: 1_000,
+					input: [
+						{
+							type: "simple",
+						},
+					],
 					output: {
 						set: [
 							{
@@ -122,23 +174,7 @@ const config = GameConfigSchema.parse({
 							},
 						],
 					},
-					rules: [
-						{
-							type: "enable",
-							when: [
-								{
-									type: "exists",
-									query: {
-										scope: "any",
-										selector: {
-											type: "item",
-											itemId: "material",
-										},
-									},
-								},
-							],
-						},
-					],
+					rules: [],
 				},
 			],
 		},
@@ -157,6 +193,7 @@ const config = GameConfigSchema.parse({
 			],
 			categoryId: "resource",
 			scope: "any",
+			maxCount: 1,
 			maxStackSize: 10,
 		},
 	},
@@ -276,6 +313,11 @@ const Probe = ({ itemId }: { readonly itemId: string }) => {
 	const canAutofill = line?.actions.canAutofill;
 	const unavailableReason =
 		line?.availability.kind === "unavailable" ? line.availability.reason : undefined;
+	const ruleDetail =
+		unavailableReason?.kind === "line-disabled" &&
+		unavailableReason.cause.kind === "enable-rule"
+			? unavailableReason.cause.condition.detail
+			: undefined;
 	const roll = line?.output[0]?.roll[0];
 	const outputItem = roll?.kind === "guaranteed" ? roll.item[0] : undefined;
 	return createElement("output", {
@@ -283,9 +325,54 @@ const Probe = ({ itemId }: { readonly itemId: string }) => {
 		"data-disabled-message": unavailableReason?.message ?? "",
 		"data-disabled-rule":
 			unavailableReason?.kind === "line-disabled" ? unavailableReason.cause.kind : "",
+		"data-disabled-rule-detail": ruleDetail?.itemId ?? "",
+		"data-disabled-rule-before":
+			unavailableReason?.kind === "line-disabled"
+				? unavailableReason.messageBeforeDetail
+				: "",
+		"data-disabled-rule-after":
+			unavailableReason?.kind === "line-disabled" ? unavailableReason.messageAfterDetail : "",
 		"data-output-has-runtime-target": String(
 			outputItem !== undefined && Object.hasOwn(outputItem, "detailItemId"),
 		),
+	});
+};
+
+const DepositProbe = ({ itemId }: { readonly itemId: string }) => {
+	const projection = useItemDetailLines(itemId);
+	const line =
+		projection.kind === "available"
+			? projection.line.find((candidate) => candidate.lineId === "line:producer:deposit")
+			: undefined;
+	const input = line?.input.find((candidate) => candidate.kind === "deposit");
+	const reason = line?.availability.kind === "unavailable" ? line.availability.reason : undefined;
+	return createElement("output", {
+		"data-available-charges": input?.kind === "deposit" ? input.availableChargesLabel : "",
+		"data-detail-item": reason?.kind === "deposit-target-missing" ? reason.detail?.itemId : "",
+		"data-detail-source":
+			reason?.kind === "deposit-target-missing" ? reason.detail?.sourceUrl : "",
+		"data-message-before":
+			reason?.kind === "deposit-target-missing" ? reason.messageBeforeDetail : "",
+		"data-message-after":
+			reason?.kind === "deposit-target-missing" ? reason.messageAfterDetail : "",
+		"data-message": reason?.message ?? "",
+		"data-reason": reason?.kind ?? "",
+	});
+};
+
+const MaxCountProbe = ({ itemId }: { readonly itemId: string }) => {
+	const projection = useItemDetailLines(itemId);
+	const line =
+		projection.kind === "available"
+			? projection.line.find((candidate) => candidate.lineId === "line:producer:max")
+			: undefined;
+	const reason = line?.availability.kind === "unavailable" ? line.availability.reason : undefined;
+	return createElement("output", {
+		"data-message": reason?.message ?? "",
+		"data-message-after-title":
+			reason?.kind === "direct-output-max-count" ? reason.messageAfterTitle : "",
+		"data-reserved":
+			reason?.kind === "direct-output-max-count" ? String(reason.reservedQuantity) : "",
 	});
 };
 
@@ -323,6 +410,9 @@ describe("useItemDetailLines", () => {
 		expect(output?.dataset.canAutofill).toBe("false");
 		expect(output?.dataset.disabledMessage).toBe("Requires Material.");
 		expect(output?.dataset.disabledRule).toBe("enable-rule");
+		expect(output?.dataset.disabledRuleDetail).toBe("material");
+		expect(output?.dataset.disabledRuleBefore).toBe("Requires ");
+		expect(output?.dataset.disabledRuleAfter).toBe(".");
 		expect(output?.dataset.outputHasRuntimeTarget).toBe("false");
 
 		await act(async () => publishRuntime(withSource));
@@ -336,5 +426,73 @@ describe("useItemDetailLines", () => {
 		await act(async () => publishRuntime(withoutSource));
 		expect(output?.dataset.canAutofill).toBe("false");
 		expect(output?.dataset.outputHasRuntimeTarget).toBe("false");
+	});
+
+	it("projects a missing deposit target as None with artwork/detail and clears it when present", async () => {
+		const owner = withoutSource.items.find((item) => item.item.id === "producer");
+		if (owner === undefined) throw new Error("Missing producer.");
+		const container = document.createElement("div");
+		document.body.append(container);
+		const root = createRoot(container);
+		roots.push(root);
+		await act(async () => {
+			root.render(
+				createElement(DepositProbe, {
+					itemId: owner.id,
+				}),
+			);
+		});
+		const output = container.querySelector("output");
+		expect(output?.dataset.reason).toBe("deposit-target-missing");
+		expect(output?.dataset.availableCharges).toBe("None");
+		expect(output?.dataset.detailItem).toBe("material");
+		expect(output?.dataset.detailSource).toBe("resource:asset:material");
+		expect(output?.dataset.messageBefore).toBe("Requires ");
+		expect(output?.dataset.messageAfter).toBe(" · None available (Board · close).");
+		expect(output?.dataset.message).toBe("Requires Material · None available (Board · close).");
+
+		await act(async () => publishRuntime(withSource));
+		expect(output?.dataset.reason).toBe("");
+		expect(output?.dataset.availableCharges).toBe("0");
+	});
+
+	it("keeps candidate reservations conservative while displaying only the live maxCount", async () => {
+		const owner = withoutSource.items.find((item) => item.item.id === "producer");
+		if (owner === undefined) throw new Error("Missing producer.");
+		currentRuntime = withSource;
+		Effect.runSync(transitionFields.resetRuntimeFx(currentRuntime));
+		const container = document.createElement("div");
+		document.body.append(container);
+		const root = createRoot(container);
+		roots.push(root);
+		await act(async () => {
+			root.render(
+				createElement(MaxCountProbe, {
+					itemId: owner.id,
+				}),
+			);
+		});
+		const output = container.querySelector("output");
+		expect(output?.dataset.message).toBe("Material limit reached (1/1).");
+		expect(output?.dataset.messageAfterTitle).toBe("limit reached (1/1).");
+		expect(output?.dataset.reserved).toBe("1");
+
+		await act(async () =>
+			publishRuntime({
+				...withoutSource,
+				jobs: [
+					{
+						id: "job:material-reservation",
+						ownerItemId: owner.id,
+						lineId: "line:producer:max",
+						durationMs: 1_000,
+						remainingMs: 500,
+					},
+				],
+			}),
+		);
+		expect(output?.dataset.message).toBe("Material would exceed limit (0/1 currently).");
+		expect(output?.dataset.messageAfterTitle).toBe("would exceed limit (0/1 currently).");
+		expect(output?.dataset.reserved).toBe("2");
 	});
 });

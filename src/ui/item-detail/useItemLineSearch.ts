@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import type { ItemDetailLines } from "~/bridge/item-detail/ItemDetailLines";
 import { useItemLineSearchCandidates } from "~/ui/item-detail/useItemLineSearchCandidates";
@@ -16,14 +16,22 @@ export const useItemLineSearch = (
 	>,
 ) => {
 	const [query, setQuery] = useState("");
-	const [availabilityFilter, setAvailabilityFilter] =
-		useState<ItemLineAvailabilityFilter>("available");
 	const availableLineCount = useMemo(
 		() => lines.line.filter((line) => line.availability.kind === "available").length,
 		[
 			lines.line,
 		],
 	);
+	const [availabilityFilter, setAvailabilityFilter] = useState<ItemLineAvailabilityFilter>(() =>
+		availableLineCount === 0 ? "all" : "available",
+	);
+	useEffect(() => {
+		if (availabilityFilter !== "available" || availableLineCount !== 0) return;
+		setAvailabilityFilter("all");
+	}, [
+		availabilityFilter,
+		availableLineCount,
+	]);
 	const selectedLines = useMemo(
 		() =>
 			availabilityFilter === "all"
@@ -62,7 +70,6 @@ export const useItemLineSearch = (
 	return {
 		availabilityFilter,
 		setAvailabilityFilter,
-		availableLineCount,
 		query,
 		setQuery,
 		filteredLines,

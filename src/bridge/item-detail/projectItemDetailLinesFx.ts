@@ -4,6 +4,7 @@ import type { GameEngine } from "~/bridge/game/GameEngine";
 import type { ItemDetailLines } from "~/bridge/item-detail/ItemDetailLines";
 import { projectItemDetailInputFx } from "~/bridge/item-detail/projectItemDetailInputFx";
 import { projectItemDetailOutputRollFx } from "~/bridge/item-detail/projectItemDetailOutputRollFx";
+import { projectItemDetailReferenceFx } from "~/bridge/item-detail/projectItemDetailReferenceFx";
 import { projectItemDetailSelectorFx } from "~/bridge/item-detail/projectItemDetailSelectorFx";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { ItemDetailLines as EngineItemDetailLines } from "~/engine/item-detail/read/ItemDetailLines";
@@ -24,60 +25,160 @@ export namespace projectItemDetailLinesFx {
 	export type Result = ItemDetailLines.Projection;
 }
 
-const projectDisabledRuleMessageFx = Effect.fn("projectDisabledRuleMessageFx")(function* ({
-	cause,
-	game,
-}: {
-	readonly cause: Extract<
-		EngineItemDetailLines.UnavailableReason,
-		{
-			readonly kind: "line-disabled";
-		}
-	>["cause"];
-	readonly game: GameEngine;
-}) {
-	if (cause.kind === "static") return "This line is currently disabled.";
-	const projectConditionFx = Effect.fn("projectDisabledRuleConditionFx")(function* (
-		when: WhenSchema.Type,
-	) {
-		const selector = yield* projectItemDetailSelectorFx({
-			game,
-			selector: when.query.selector,
-		});
-		return match(when)
-			.with(
-				{
-					type: WhenEnumSchema.enum.Exists,
-				},
-				() => selector.label,
-			)
-			.with(
-				{
-					type: WhenEnumSchema.enum.Count,
-				},
-				({ count }) => `${count} ${selector.label}`,
-			)
-			.with(
-				{
-					type: WhenEnumSchema.enum.Range,
-				},
-				({ max, min }) => `${min}-${max} ${selector.label}`,
-			)
-			.exhaustive();
-	});
-	if (cause.kind === "enable-rule") {
-		return `Requires ${yield* projectConditionFx(cause.when)}.`;
+type ProjectedLineDisabledCause = Extract<
+	ItemDetailLines.DisabledReason,
+	{
+		readonly kind: "line-disabled";
 	}
-	const conditions = yield* Effect.all(cause.when.map(projectConditionFx));
-	return `Unavailable while ${conditions.join(" and ")} match.`;
+>["cause"];
+
+const readDisabledConditionPhrase = (condition: ItemDetailLines.DisabledCondition) =>
+	match(condition)
+		.with(
+			{
+				kind: "exists",
+			},
+			({ selector }) => selector.label,
+		)
+		.with(
+			{
+				kind: "count",
+			},
+			({ count, selector }) => `${count} ${selector.label}`,
+		)
+		.with(
+			{
+				kind: "range",
+			},
+			({ max, min, selector }) => `${min}-${max} ${selector.label}`,
+		)
+		.exhaustive();
+
+const readEnableConditionMarkup = (condition: ItemDetailLines.DisabledCondition) => {
+	if (condition.detail === undefined) return undefined;
+	return {
+		messageBeforeDetail: match(condition)
+			.with(
+				{
+					kind: "exists",
+				},
+				() => "Requires ",
+			)
+			.with(
+				{
+					kind: "count",
+				},
+				({ count }) => `Requires ${count} `,
+			)
+			.with(
+				{
+					kind: "range",
+				},
+				({ max, min }) => `Requires ${min}-${max} `,
+			)
+			.exhaustive(),
+		messageAfterDetail: ".",
+	};
+};
+
+const readMaxCountMessageAfterTitle = ({
+	liveQuantity,
+	maxCount,
+}: {
+	readonly liveQuantity: number;
+	readonly maxCount: number;
+}) =>
+	liveQuantity >= maxCount
+		? `limit reached (${liveQuantity}/${maxCount}).`
+		: `would exceed limit (${liveQuantity}/${maxCount} currently).`;
+
+const projectDisabledConditionFx = Effect.fn("projectDisabledConditionFx")(function* ({
+	game,
+	runtime,
+	when,
+}: {
+	readonly game: GameEngine;
+	readonly runtime: RuntimeSchema.Type;
+	readonly when: WhenSchema.Type;
+}) {
+	const selector = yield* projectItemDetailSelectorFx({
+		game,
+		selector: when.query.selector,
+	});
+	const detail =
+		when.query.selector.type === "item"
+			? yield* projectItemDetailReferenceFx({
+					game,
+					itemId: when.query.selector.itemId,
+					runtime,
+				})
+			: undefined;
+	return match(when)
+		.with(
+			{
+				type: WhenEnumSchema.enum.Exists,
+			},
+			() => ({
+				condition: {
+					kind: "exists",
+					selector,
+					...(detail === undefined
+						? {}
+						: {
+								detail,
+							}),
+				} satisfies ItemDetailLines.DisabledCondition,
+				phrase: selector.label,
+			}),
+		)
+		.with(
+			{
+				type: WhenEnumSchema.enum.Count,
+			},
+			({ count }) => ({
+				condition: {
+					kind: "count",
+					selector,
+					count,
+					...(detail === undefined
+						? {}
+						: {
+								detail,
+							}),
+				} satisfies ItemDetailLines.DisabledCondition,
+				phrase: `${count} ${selector.label}`,
+			}),
+		)
+		.with(
+			{
+				type: WhenEnumSchema.enum.Range,
+			},
+			({ max, min }) => ({
+				condition: {
+					kind: "range",
+					selector,
+					min,
+					max,
+					...(detail === undefined
+						? {}
+						: {
+								detail,
+							}),
+				} satisfies ItemDetailLines.DisabledCondition,
+				phrase: `${min}-${max} ${selector.label}`,
+			}),
+		)
+		.exhaustive();
 });
 
 const projectAvailabilityFx = Effect.fn("projectItemDetailLineAvailabilityFx")(function* ({
 	availability,
 	game,
+	runtime,
 }: {
 	readonly availability: EngineItemDetailLines.Availability;
 	readonly game: GameEngine;
+	readonly runtime: RuntimeSchema.Type;
 }) {
 	return yield* match(availability)
 		.with(
@@ -99,29 +200,97 @@ const projectAvailabilityFx = Effect.fn("projectItemDetailLineAvailabilityFx")(f
 			},
 			({ reason }) =>
 				Effect.gen(function* () {
-					const message = yield* projectDisabledRuleMessageFx({
-						cause: reason.cause,
-						game,
-					});
-					const cause =
-						reason.cause.kind === "static"
-							? reason.cause
-							: reason.cause.kind === "enable-rule"
-								? {
-										kind: reason.cause.kind,
-										ruleIndex: reason.cause.ruleIndex,
-										whenIndex: reason.cause.whenIndex,
-									}
-								: {
-										kind: reason.cause.kind,
-										ruleIndex: reason.cause.ruleIndex,
-									};
+					let cause: ProjectedLineDisabledCause;
+					if (reason.cause.kind === "static") {
+						cause = reason.cause;
+					} else if (reason.cause.kind === "enable-rule") {
+						const projected = yield* projectDisabledConditionFx({
+							game,
+							runtime,
+							when: reason.cause.when,
+						});
+						cause = {
+							kind: reason.cause.kind,
+							ruleIndex: reason.cause.ruleIndex,
+							whenIndex: reason.cause.whenIndex,
+							condition: projected.condition,
+						};
+					} else {
+						const projected = yield* Effect.all(
+							reason.cause.when.map((when) =>
+								projectDisabledConditionFx({
+									game,
+									runtime,
+									when,
+								}),
+							),
+						);
+						cause = {
+							kind: reason.cause.kind,
+							ruleIndex: reason.cause.ruleIndex,
+							condition: projected.map(({ condition }) => condition),
+						};
+					}
+					const message =
+						cause.kind === "static"
+							? "This line is currently disabled."
+							: cause.kind === "enable-rule"
+								? `Requires ${readDisabledConditionPhrase(cause.condition)}.`
+								: `Unavailable while ${cause.condition
+										.map(readDisabledConditionPhrase)
+										.join(" and ")} match.`;
+					const markup =
+						cause.kind === "enable-rule"
+							? readEnableConditionMarkup(cause.condition)
+							: undefined;
 					return {
 						kind: "unavailable",
 						reason: {
 							kind: "line-disabled",
 							cause,
+							...(markup === undefined ? {} : markup),
 							message,
+						},
+					} as const;
+				}),
+		)
+		.with(
+			{
+				kind: "unavailable",
+				reason: {
+					kind: "deposit-target-missing",
+				},
+			},
+			({ reason }) =>
+				Effect.gen(function* () {
+					const selector = yield* projectItemDetailSelectorFx({
+						game,
+						selector: reason.selector,
+					});
+					const detail =
+						reason.selector.type === "item"
+							? yield* projectItemDetailReferenceFx({
+									game,
+									itemId: reason.selector.itemId,
+									runtime,
+								})
+							: undefined;
+					const messageBeforeDetail = "Requires ";
+					const messageAfterDetail = ` · None available (Board · ${reason.distance}).`;
+					return {
+						kind: "unavailable",
+						reason: {
+							kind: reason.kind,
+							selector,
+							distance: reason.distance,
+							...(detail === undefined
+								? {}
+								: {
+										detail,
+										messageBeforeDetail,
+										messageAfterDetail,
+									}),
+							message: `${messageBeforeDetail}${selector.label}${messageAfterDetail}`,
 						},
 					} as const;
 				}),
@@ -154,12 +323,17 @@ const projectAvailabilityFx = Effect.fn("projectItemDetailLineAvailabilityFx")(f
 					const item = yield* resolveItemFx({
 						itemId: reason.itemId,
 					});
+					const messageAfterTitle = readMaxCountMessageAfterTitle({
+						liveQuantity: reason.liveQuantity,
+						maxCount: reason.maxCount,
+					});
 					return {
 						kind: "unavailable",
 						reason: {
 							...reason,
 							itemTitle: item.title,
-							message: `${item.title} limit reached (${reason.liveQuantity + reason.reservedQuantity}/${reason.maxCount}).`,
+							messageAfterTitle,
+							message: `${item.title} ${messageAfterTitle}`,
 						},
 					} as const;
 				}),
@@ -179,13 +353,18 @@ const projectAvailabilityFx = Effect.fn("projectItemDetailLineAvailabilityFx")(f
 					const intermediate = yield* resolveItemFx({
 						itemId: reason.intermediateItemId,
 					});
+					const messageAfterTitle = readMaxCountMessageAfterTitle({
+						liveQuantity: reason.liveQuantity,
+						maxCount: reason.maxCount,
+					});
 					return {
 						kind: "unavailable",
 						reason: {
 							...reason,
 							itemTitle: item.title,
 							intermediateItemTitle: intermediate.title,
-							message: `${item.title} limit reached (${reason.liveQuantity + reason.reservedQuantity}/${reason.maxCount}).`,
+							messageAfterTitle,
+							message: `${item.title} ${messageAfterTitle}`,
 						},
 					} as const;
 				}),
@@ -217,6 +396,7 @@ export const projectItemDetailLinesFx = Effect.fn("projectItemDetailLinesFx")(fu
 					availability: projectAvailabilityFx({
 						availability: line.availability,
 						game,
+						runtime,
 					}),
 					input: Effect.all(
 						line.input.map((input) =>

@@ -6,7 +6,10 @@ import { useItemDetailControl } from "~/ui/item-detail/useItemDetailControl";
 
 export interface ItemReferenceButtonProps {
 	readonly compositeUrl?: string;
-	readonly dataUi: "TileLineInputDetailLink" | "TileLineOutputDetailLink";
+	readonly dataUi:
+		| "TileLineInputDetailLink"
+		| "TileLineOutputDetailLink"
+		| "TileLineUnavailableDependencyLink";
 	readonly definitionItemId?: string;
 	readonly disabled: boolean;
 	readonly label: string;

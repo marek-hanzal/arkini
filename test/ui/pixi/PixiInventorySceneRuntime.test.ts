@@ -64,11 +64,8 @@ const sceneState = vi.hoisted(() => ({
 	drop: vi.fn(),
 	particleTextureClose: vi.fn(),
 	particleTextures: {
-		mote: {
-			kind: "activity-particle-mote",
-		},
-		spark: {
-			kind: "activity-particle-spark",
+		star: {
+			kind: "activity-particle-star",
 		},
 	},
 	items: [] as TileActorItem[],
@@ -378,8 +375,7 @@ vi.mock("~/ui/pixi/actor/createPixiTileActorFx", async () => {
 		}: {
 			readonly item: TileActorItem;
 			readonly particleTextures: {
-				readonly mote: unknown;
-				readonly spark: unknown;
+				readonly star: unknown;
 			};
 		}) =>
 			EffectModule.sync(() => {
@@ -393,18 +389,20 @@ vi.mock("~/ui/pixi/actor/createPixiTileActorFx", async () => {
 						},
 						feedbackPhase: null,
 						lastProgress: 0,
+						lightSurface: false,
 						particles: [
 							{
 								alphaScale: 1,
 								particle: {
 									alpha: 0,
-									texture: particleTextures.mote,
+									texture: particleTextures.star,
 									tint: 0,
 									x: 0,
 									y: 0,
 								},
 								phaseOffset: 0,
 								spreadOffset: 0,
+								speedCycles: 1,
 								waveOffset: 0,
 							},
 						],
@@ -693,7 +691,7 @@ describe("Pixi Inventory scene runtime", () => {
 			visible: true,
 		});
 		expect(actor.activityParticles.particles[0]?.particle.texture).toBe(
-			sceneState.particleTextures.mote,
+			sceneState.particleTextures.star,
 		);
 
 		publishItems([

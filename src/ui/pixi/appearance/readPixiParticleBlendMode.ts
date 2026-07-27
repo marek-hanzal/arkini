@@ -10,14 +10,10 @@ const readRelativeLuminance = (color: number) =>
 	readLinearChannel(color, 8) * 0.7152 +
 	readLinearChannel(color, 0) * 0.0722;
 
-/**
- * Keeps colored particles luminous on dark surfaces and chromatic on light surfaces.
- *
- * Comparing resolved palette colors also covers the system theme without trusting DOM attributes.
- */
-export const readPixiParticleBlendMode = (
+/** Comparing resolved colors covers the system theme without trusting DOM attributes. */
+export const readPixiParticleLightSurface = (
 	palette: Pick<PixiScenePalette, "foreground" | "surface">,
-) =>
-	readRelativeLuminance(palette.surface) > readRelativeLuminance(palette.foreground)
-		? ("normal" as const)
-		: ("add" as const);
+) => readRelativeLuminance(palette.surface) > readRelativeLuminance(palette.foreground);
+
+/** Foreground particles retain their chroma over both light and dark regions of tile artwork. */
+export const readPixiParticleBlendMode = () => "normal" as const;

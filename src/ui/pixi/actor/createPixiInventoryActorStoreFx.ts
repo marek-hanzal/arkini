@@ -33,7 +33,7 @@ export namespace createPixiInventoryActorStoreFx {
 		readonly animator: PixiActorAnimator;
 		readonly application: PixiApplicationOwner;
 		readonly game: GameEngine;
-		readonly particleTextures: Pick<PixiTileActorParticleTextures, "mote" | "spark">;
+		readonly particleTextures: Pick<PixiTileActorParticleTextures, "star">;
 		readonly surface: PixiInventorySceneSurface;
 		readonly textures: PixiTextureStore;
 	}

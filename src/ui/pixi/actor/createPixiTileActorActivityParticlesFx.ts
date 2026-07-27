@@ -8,7 +8,8 @@ export namespace createPixiTileActorActivityParticlesFx {
 	export interface Props {
 		readonly actorId: string;
 		readonly instanceId: string;
-		readonly textures?: Pick<PixiTileActorParticleTextures, "mote" | "spark">;
+		readonly lightSurface: boolean;
+		readonly textures?: Pick<PixiTileActorParticleTextures, "star">;
 		readonly tint: number;
 	}
 }
@@ -24,9 +25,9 @@ export const createPixiTileActorActivityParticlesFx = Effect.fn(
 	({
 		actorId,
 		instanceId,
+		lightSurface,
 		textures = {
-			mote: Texture.EMPTY,
-			spark: Texture.EMPTY,
+			star: Texture.EMPTY,
 		},
 		tint,
 	}: createPixiTileActorActivityParticlesFx.Props) =>
@@ -40,11 +41,11 @@ export const createPixiTileActorActivityParticlesFx = Effect.fn(
 						alpha: 0,
 						anchorX: 0.5,
 						anchorY: 0.5,
-						texture: index % 4 === 0 ? textures.spark : textures.mote,
+						texture: textures.star,
 						tint,
 					});
 					return {
-						alphaScale: 0.72 + ((index * 37) % 29) / 100,
+						alphaScale: 0.84 + ((index * 37) % 17) / 100,
 						particle,
 						phaseOffset: index / pixiTileActorActivityParticleCount,
 						spreadOffset:
@@ -52,6 +53,7 @@ export const createPixiTileActorActivityParticlesFx = Effect.fn(
 								(pixiTileActorActivityParticleCount - 1)) *
 								2 -
 							1,
+						speedCycles: 1 + ((index * 5) % 3),
 						waveOffset: index * goldenAngle,
 					};
 				},
@@ -68,7 +70,7 @@ export const createPixiTileActorActivityParticlesFx = Effect.fn(
 				eventMode: "none",
 				label: `TileActorActivityParticles:${actorId}:${instanceId}`,
 				particles: particles.map(({ particle }) => particle),
-				texture: textures.mote,
+				texture: textures.star,
 			});
 			container.blendMode = "add";
 			container.visible = false;
@@ -78,6 +80,7 @@ export const createPixiTileActorActivityParticlesFx = Effect.fn(
 				container,
 				feedbackPhase: null,
 				lastProgress: 0,
+				lightSurface,
 				particles,
 				startY: 0,
 				topHalfWidth: 0,

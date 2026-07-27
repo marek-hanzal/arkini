@@ -205,12 +205,14 @@ const createActor = (item: TileActorItem): PixiTileActor => {
 			container: activityParticleContainer,
 			feedbackPhase: null,
 			lastProgress: 0,
+			lightSurface: false,
 			particles: [
 				{
 					alphaScale: 1,
 					particle,
 					phaseOffset: 0,
 					spreadOffset: 0,
+					speedCycles: 1,
 					waveOffset: 0,
 				},
 			],
@@ -448,8 +450,7 @@ const createReconcilerHarness = ({
 			motion,
 			particleTextures: {
 				closeFx: Effect.void,
-				mote: Texture.EMPTY,
-				spark: Texture.EMPTY,
+				star: Texture.EMPTY,
 			},
 			readPalette: () =>
 				({

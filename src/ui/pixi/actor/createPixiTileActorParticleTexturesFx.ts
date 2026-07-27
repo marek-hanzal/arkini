@@ -1,17 +1,17 @@
 import { Effect } from "effect";
-import { Rectangle, Texture } from "pixi.js";
+import { Texture } from "pixi.js";
 
 import type { PixiTileActorParticleTextures } from "~/ui/pixi/actor/PixiTileActorParticleTextures";
 
 const textureSize = 32;
 
-/** Creates one private procedural atlas with a soft mote and a narrow rising spark. */
+/** Creates one private procedural five-point star shared by every retained particle. */
 export const createPixiTileActorParticleTexturesFx = Effect.fn(
 	"createPixiTileActorParticleTexturesFx",
 )(() =>
 	Effect.sync((): PixiTileActorParticleTextures => {
 		const canvas = document.createElement("canvas");
-		canvas.width = textureSize * 2;
+		canvas.width = textureSize;
 		canvas.height = textureSize;
 		const context = canvas.getContext("2d");
 		if (context === null) {
@@ -19,63 +19,30 @@ export const createPixiTileActorParticleTexturesFx = Effect.fn(
 		}
 
 		const center = textureSize / 2;
-		const moteGradient = context.createRadialGradient(
-			center,
-			center,
-			0,
-			center,
-			center,
-			center,
-		);
-		moteGradient.addColorStop(0, "rgba(255, 255, 255, 1)");
-		moteGradient.addColorStop(0.24, "rgba(255, 255, 255, 0.94)");
-		moteGradient.addColorStop(0.62, "rgba(255, 255, 255, 0.38)");
-		moteGradient.addColorStop(1, "rgba(255, 255, 255, 0)");
-		context.fillStyle = moteGradient;
-		context.fillRect(0, 0, textureSize, textureSize);
+		const outerRadius = textureSize * 0.46;
+		const innerRadius = outerRadius * 0.43;
+		context.beginPath();
+		for (let point = 0; point < 10; point += 1) {
+			const radius = point % 2 === 0 ? outerRadius : innerRadius;
+			const angle = -Math.PI / 2 + (point * Math.PI) / 5;
+			const x = center + Math.cos(angle) * radius;
+			const y = center + Math.sin(angle) * radius;
+			if (point === 0) context.moveTo(x, y);
+			else context.lineTo(x, y);
+		}
+		context.closePath();
+		context.fillStyle = "rgba(255, 255, 255, 1)";
+		context.fill();
 
-		const sparkCenterX = textureSize + center;
-		const sparkGradient = context.createRadialGradient(
-			sparkCenterX,
-			center,
-			0,
-			sparkCenterX,
-			center,
-			center,
-		);
-		sparkGradient.addColorStop(0, "rgba(255, 255, 255, 1)");
-		sparkGradient.addColorStop(0.18, "rgba(255, 255, 255, 0.9)");
-		sparkGradient.addColorStop(0.54, "rgba(255, 255, 255, 0.3)");
-		sparkGradient.addColorStop(1, "rgba(255, 255, 255, 0)");
-		context.save();
-		context.translate(sparkCenterX, center);
-		context.scale(0.42, 1);
-		context.translate(-sparkCenterX, -center);
-		context.fillStyle = sparkGradient;
-		context.fillRect(textureSize, 0, textureSize, textureSize);
-		context.restore();
-
-		const atlas = Texture.from(canvas, true);
-		const mote = new Texture({
-			frame: new Rectangle(0, 0, textureSize, textureSize),
-			label: "TileActivityParticleMote",
-			source: atlas.source,
-		});
-		const spark = new Texture({
-			frame: new Rectangle(textureSize, 0, textureSize, textureSize),
-			label: "TileActivityParticleSpark",
-			source: atlas.source,
-		});
+		const star = Texture.from(canvas, true);
+		star.label = "TileActivityParticleStar";
 		let closed = false;
 		return {
-			mote,
-			spark,
+			star,
 			closeFx: Effect.sync(() => {
 				if (closed) return;
 				closed = true;
-				mote.destroy(false);
-				spark.destroy(false);
-				atlas.destroy(true);
+				star.destroy(true);
 			}),
 		};
 	}),

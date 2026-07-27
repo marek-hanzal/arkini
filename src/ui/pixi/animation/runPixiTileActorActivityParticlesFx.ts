@@ -62,7 +62,7 @@ export const readPixiParticleShimmerTint = (
 	lightSurface: boolean,
 ) => {
 	const unitShimmer = clampUnit(shimmer);
-	const amount = lightSurface ? 0.08 + unitShimmer * 0.26 : 0.04 + unitShimmer * 0.34;
+	const amount = lightSurface ? 0.06 + unitShimmer ** 2 * 0.48 : unitShimmer ** 3 * 0.38;
 	const target = lightSurface ? 0 : 255;
 	const red = mixChannel((tint >> 16) & 0xff, target, amount);
 	const green = mixChannel((tint >> 8) & 0xff, target, amount);
@@ -90,18 +90,20 @@ const renderParticles = ({
 	const resolvedHandoffProgress = kind === "burst" ? clampUnit(handoffProgress) : 0;
 	const runningHandoffProgress = (progress * 0.32) % 1;
 	effect.lastProgress = resolvedHandoffProgress > 0 ? runningHandoffProgress : progress;
-	const lightSurface = effect.container.blendMode === "normal";
+	const lightSurface = effect.lightSurface;
 	for (const {
 		alphaScale,
 		particle,
 		phaseOffset,
+		speedCycles,
 		spreadOffset,
 		waveOffset,
 	} of effect.particles) {
+		const burstSpeed = 0.82 + (speedCycles - 1) * 0.18;
 		const rawLocalProgress =
 			kind === "running"
-				? (progress + phaseOffset) % 1
-				: (progress - phaseOffset * (1 - burstWindow)) / burstWindow;
+				? (progress * speedCycles + phaseOffset) % 1
+				: (progress * burstSpeed - phaseOffset * (1 - burstWindow)) / burstWindow;
 		const localProgress = clampUnit(rawLocalProgress);
 		const visible = rawLocalProgress >= 0 && rawLocalProgress <= 1;
 		const riseProgress = easeOutCubic(localProgress);
@@ -121,8 +123,8 @@ const renderParticles = ({
 			(visible ? smoothEnvelope(localProgress) : 0) *
 			intensity *
 			alphaScale *
-			(kind === "burst" ? 0.96 : 0.58) *
-			(0.82 + shimmer * 0.18);
+			(kind === "burst" ? 1 : 0.86) *
+			(0.7 + shimmer * 0.3);
 		if (resolvedHandoffProgress <= 0) {
 			particle.x = x;
 			particle.y = y;
@@ -131,7 +133,7 @@ const renderParticles = ({
 			continue;
 		}
 
-		const runningLocalProgress = (runningHandoffProgress + phaseOffset) % 1;
+		const runningLocalProgress = (runningHandoffProgress * speedCycles + phaseOffset) % 1;
 		const runningRiseProgress = easeOutCubic(runningLocalProgress);
 		const runningSpreadProgress = runningLocalProgress ** 0.82;
 		const runningPlumeHalfWidth = effect.topHalfWidth * runningSpreadProgress;
@@ -150,10 +152,7 @@ const renderParticles = ({
 			lightSurface,
 		);
 		const runningAlpha =
-			smoothEnvelope(runningLocalProgress) *
-			alphaScale *
-			0.58 *
-			(0.82 + runningShimmer * 0.18);
+			smoothEnvelope(runningLocalProgress) * alphaScale * 0.86 * (0.7 + runningShimmer * 0.3);
 		particle.x = mix(x, runningX, resolvedHandoffProgress);
 		particle.y = mix(y, runningY, resolvedHandoffProgress);
 		particle.tint = mixTint(particleTint, runningTint, resolvedHandoffProgress);

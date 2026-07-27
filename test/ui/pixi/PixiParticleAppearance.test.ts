@@ -1,20 +1,24 @@
 import { describe, expect, it } from "vitest";
 
-import { readPixiParticleBlendMode } from "~/ui/pixi/appearance/readPixiParticleBlendMode";
+import {
+	readPixiParticleBlendMode,
+	readPixiParticleLightSurface,
+} from "~/ui/pixi/appearance/readPixiParticleBlendMode";
 
 describe("Pixi particle appearance", () => {
-	it("keeps dark-theme luminosity and light-theme chromatic contrast", () => {
+	it("uses backdrop-independent foreground compositing while preserving surface direction", () => {
+		expect(readPixiParticleBlendMode()).toBe("normal");
 		expect(
-			readPixiParticleBlendMode({
+			readPixiParticleLightSurface({
 				foreground: 0xfcf6ff,
 				surface: 0x151020,
 			}),
-		).toBe("add");
+		).toBe(false);
 		expect(
-			readPixiParticleBlendMode({
+			readPixiParticleLightSurface({
 				foreground: 0x2a1532,
 				surface: 0xfffaff,
 			}),
-		).toBe("normal");
+		).toBe(true);
 	});
 });

@@ -53,6 +53,7 @@ vi.mock("~/ui/pixi/actor/createPixiTileActorFx", async () => {
 					container: new PixiContainer(),
 					feedbackPhase: null,
 					lastProgress: 0,
+					lightSurface: false,
 					particles: [
 						{
 							alphaScale: 1,
@@ -64,6 +65,7 @@ vi.mock("~/ui/pixi/actor/createPixiTileActorFx", async () => {
 							},
 							phaseOffset: 0,
 							spreadOffset: 0,
+							speedCycles: 1,
 							waveOffset: 0,
 						},
 					],
@@ -179,6 +181,7 @@ const createActor = (id: string) => {
 			container: new Container(),
 			feedbackPhase: null,
 			lastProgress: 0,
+			lightSurface: false,
 			particles: [
 				{
 					alphaScale: 1,
@@ -190,6 +193,7 @@ const createActor = (id: string) => {
 					},
 					phaseOffset: 0,
 					spreadOffset: 0,
+					speedCycles: 1,
 					waveOffset: 0,
 				},
 			],

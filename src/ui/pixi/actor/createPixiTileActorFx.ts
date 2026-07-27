@@ -4,7 +4,10 @@ import { Container, Graphics } from "pixi.js";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import type { TileActorItem } from "~/bridge/tile/TileActorItem";
 import type { PixiScenePalette } from "~/ui/pixi/appearance/PixiScenePalette";
-import { readPixiParticleBlendMode } from "~/ui/pixi/appearance/readPixiParticleBlendMode";
+import {
+	readPixiParticleBlendMode,
+	readPixiParticleLightSurface,
+} from "~/ui/pixi/appearance/readPixiParticleBlendMode";
 import type { PixiTileActorParticleTextures } from "~/ui/pixi/actor/PixiTileActorParticleTextures";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
 import { createPixiTileActorActivityParticlesFx } from "~/ui/pixi/actor/createPixiTileActorActivityParticlesFx";
@@ -19,7 +22,7 @@ export namespace createPixiTileActorFx {
 		readonly frames: DemandFrameLoop;
 		readonly item: TileActorItem;
 		readonly palette: PixiScenePalette;
-		readonly particleTextures?: Pick<PixiTileActorParticleTextures, "mote" | "spark">;
+		readonly particleTextures?: Pick<PixiTileActorParticleTextures, "star">;
 		readonly textures: PixiTextureStore;
 	}
 }
@@ -59,10 +62,11 @@ export const createPixiTileActorFx = Effect.fn("createPixiTileActorFx")(
 			const activityParticles = yield* createPixiTileActorActivityParticlesFx({
 				actorId: item.id,
 				instanceId,
+				lightSurface: readPixiParticleLightSurface(palette),
 				textures: particleTextures,
 				tint: palette.accent,
 			});
-			activityParticles.container.blendMode = readPixiParticleBlendMode(palette);
+			activityParticles.container.blendMode = readPixiParticleBlendMode();
 			const progressBar = new Graphics({
 				eventMode: "none",
 				label: `TileActorProgress:${item.id}:${instanceId}`,
@@ -80,7 +84,7 @@ export const createPixiTileActorFx = Effect.fn("createPixiTileActorFx")(
 			]);
 			visualLayer.addChild(currentVisual.container);
 			crowdLayer.addChild(visualLayer);
-			offsetLayer.addChild(activityParticles.container, crowdLayer, progressBar);
+			offsetLayer.addChild(crowdLayer, activityParticles.container, progressBar);
 			container.addChild(offsetLayer);
 
 			return {

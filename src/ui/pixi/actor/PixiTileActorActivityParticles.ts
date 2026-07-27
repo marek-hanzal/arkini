@@ -5,6 +5,7 @@ export interface PixiTileActorActivityParticle {
 	readonly phaseOffset: number;
 	readonly particle: Particle;
 	readonly spreadOffset: number;
+	readonly speedCycles: number;
 	readonly waveOffset: number;
 }
 
@@ -14,6 +15,7 @@ export interface PixiTileActorActivityParticles {
 	centerX: number;
 	feedbackPhase: "burst" | "draining" | null;
 	lastProgress: number;
+	lightSurface: boolean;
 	startY: number;
 	topHalfWidth: number;
 	topY: number;

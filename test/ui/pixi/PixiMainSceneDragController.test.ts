@@ -160,6 +160,7 @@ const createActivityParticles = () => ({
 	},
 	feedbackPhase: null,
 	lastProgress: 0,
+	lightSurface: false,
 	particles: [
 		{
 			alphaScale: 1,
@@ -171,6 +172,7 @@ const createActivityParticles = () => ({
 			},
 			phaseOffset: 0,
 			spreadOffset: 0,
+			speedCycles: 1,
 			waveOffset: 0,
 		},
 	],

@@ -81,9 +81,8 @@ const lightPalette = {
 };
 
 describe("Pixi tile actor activity-particle layer", () => {
-	it("retains one fixed ParticleContainer pool strictly below all tile content", () => {
-		const mote = new Texture();
-		const spark = new Texture();
+	it("retains one fixed ParticleContainer pool above the tile face and below progress", () => {
+		const star = new Texture();
 		const actor = Effect.runSync(
 			createPixiTileActorFx({
 				frames: {
@@ -94,8 +93,7 @@ describe("Pixi tile actor activity-particle layer", () => {
 				item,
 				palette,
 				particleTextures: {
-					mote,
-					spark,
+					star,
 				},
 				textures: {} as never,
 			}),
@@ -105,8 +103,8 @@ describe("Pixi tile actor activity-particle layer", () => {
 			actor.offsetLayer,
 		]);
 		expect(actor.offsetLayer.children).toEqual([
-			actor.activityParticles.container,
 			actor.crowdLayer,
+			actor.activityParticles.container,
 			actor.progressBar,
 		]);
 		expect(actor.crowdLayer.children).toEqual([
@@ -118,16 +116,21 @@ describe("Pixi tile actor activity-particle layer", () => {
 		expect(actor.activityParticles.container).toBeInstanceOf(ParticleContainer);
 		expect(actor.activityParticles.container.visible).toBe(false);
 		expect(actor.activityParticles.particles).toHaveLength(12);
-		expect(actor.activityParticles.particles.map(({ particle }) => particle.texture)).toContain(
-			mote,
-		);
-		expect(actor.activityParticles.particles.map(({ particle }) => particle.texture)).toContain(
-			spark,
+		expect(
+			actor.activityParticles.particles.every(({ particle }) => particle.texture === star),
+		).toBe(true);
+		expect(
+			new Set(actor.activityParticles.particles.map(({ speedCycles }) => speedCycles)),
+		).toEqual(
+			new Set([
+				1,
+				2,
+				3,
+			]),
 		);
 
 		Effect.runSync(destroyPixiTileActorFx(actor));
-		mote.destroy();
-		spark.destroy();
+		star.destroy();
 	});
 
 	it("draws and clears the shared tile progress overlay from projected progress", () => {
@@ -176,17 +179,47 @@ describe("Pixi tile actor activity-particle layer", () => {
 				({ particle }) => (particle.texture.height * particle.scaleY) / 2,
 			),
 		);
-		expect(actor.activityParticles.topY - tallestParticleHalfHeight).toBeGreaterThanOrEqual(
-			faceInset - faceSize * 0.5,
+		const widestParticleHalfWidth = Math.max(
+			...actor.activityParticles.particles.map(
+				({ particle }) => (particle.texture.width * particle.scaleX) / 2,
+			),
 		);
+		expect(actor.activityParticles.container.boundsArea).toMatchObject({
+			height: 80,
+			width: 80,
+			x: 0,
+			y: 0,
+		});
+		expect(actor.activityParticles.topY - tallestParticleHalfHeight).toBeGreaterThanOrEqual(0);
+		expect(actor.activityParticles.startY + tallestParticleHalfHeight).toBeLessThanOrEqual(80);
+		expect(
+			actor.activityParticles.centerX -
+				actor.activityParticles.topHalfWidth * 1.075 -
+				widestParticleHalfWidth,
+		).toBeGreaterThanOrEqual(0);
+		expect(
+			actor.activityParticles.centerX +
+				actor.activityParticles.topHalfWidth * 1.075 +
+				widestParticleHalfWidth,
+		).toBeLessThanOrEqual(80);
+		const renderedPlumeHeight =
+			actor.activityParticles.startY -
+			actor.activityParticles.topY +
+			tallestParticleHalfHeight * 2;
+		expect(renderedPlumeHeight).toBeGreaterThan(80 * 0.7);
+		expect(renderedPlumeHeight).toBeLessThanOrEqual(80);
+		expect(actor.activityParticles.centerX).toBe(faceInset + faceSize / 2);
 		const renderedParticleWidths = actor.activityParticles.particles.map(
 			({ particle }) => particle.texture.width * particle.scaleX,
 		);
-		expect(Math.min(...renderedParticleWidths)).toBeGreaterThanOrEqual(faceSize * 0.14);
+		expect(Math.min(...renderedParticleWidths)).toBeGreaterThanOrEqual(faceSize * 0.1);
+		expect(Math.max(...renderedParticleWidths)).toBeGreaterThanOrEqual(faceSize * 0.18);
 		expect(actor.activityParticles.topHalfWidth).toBeGreaterThan(faceSize * 0.4);
-		expect(actor.activityParticles.particles.every(({ particle }) => particle.scaleX > 0)).toBe(
-			true,
-		);
+		expect(
+			actor.activityParticles.particles.every(
+				({ particle }) => particle.scaleX > 0 && particle.scaleX === particle.scaleY,
+			),
+		).toBe(true);
 
 		Effect.runSync(
 			updatePixiTileActorFx({
@@ -229,7 +262,8 @@ describe("Pixi tile actor activity-particle layer", () => {
 			setFx: () => Effect.void,
 		} satisfies PixiActorAnimator;
 
-		expect(actor.activityParticles.container.blendMode).toBe("add");
+		expect(actor.activityParticles.container.blendMode).toBe("normal");
+		expect(actor.activityParticles.lightSurface).toBe(false);
 		Effect.runSync(
 			updatePixiTileActorFx({
 				actor,
@@ -242,6 +276,7 @@ describe("Pixi tile actor activity-particle layer", () => {
 			}),
 		);
 		expect(actor.activityParticles.container.blendMode).toBe("normal");
+		expect(actor.activityParticles.lightSurface).toBe(true);
 		expect(actor.activityParticles.workingTint).toBe(lightPalette.accent);
 		expect(actor.activityParticles.particles).toBe(particles);
 		expect(animateFx).not.toHaveBeenCalled();
@@ -257,7 +292,8 @@ describe("Pixi tile actor activity-particle layer", () => {
 				textures: {} as never,
 			}),
 		);
-		expect(actor.activityParticles.container.blendMode).toBe("add");
+		expect(actor.activityParticles.container.blendMode).toBe("normal");
+		expect(actor.activityParticles.lightSurface).toBe(false);
 		expect(actor.activityParticles.workingTint).toBe(darkPalette.accent);
 		expect(actor.activityParticles.particles).toBe(particles);
 

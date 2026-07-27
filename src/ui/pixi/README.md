@@ -18,7 +18,7 @@ all scene-local owners.
 | `scene/*Surface*` | Layout, layers, hit geometry, masks, palette, and drop-feedback paint |
 | `actor/*ActorStore*` | Retained display-object identity for one canvas |
 | `actor/transitionPixiTileActorVisualFx.ts` | One double-buffer lifecycle for complete tile-face revisions |
-| `actor/*ParticleTextures*` | One procedural mote/spark atlas shared by actor particle containers |
+| `actor/*ParticleTextures*` | One procedural five-point star shared by actor particle containers |
 | `animation/createPixiActorAnimatorFx.ts` | Sole writer for root pose and typed presentation channels |
 | `scene/createPixiMainSceneReconcilerFx.ts` | Canonical actor reconciliation and presentation entry/exit |
 | `motion/createPixiTileMotionRuntimeFx.ts` | Ordered cue lanes, animation claims, transient payloads, and cue settlement |
@@ -80,18 +80,23 @@ gameplay outcome. Missing visual identities or handoffs degrade to ordinary reco
   second animation loop may run.
 - Gameplay feedback animations are intentional product behavior and must not branch on
   `prefers-reduced-motion`; tune their motion directly instead of silently disabling or replacing it.
-- Every tile owns one fixed twelve-particle `ParticleContainer` below its face. Main and Inventory
-  scenes share one private procedural mote/spark atlas each; playback only mutates the retained pool,
-  widens from one bottom-center apex into an inverted-fire plume, rises no more than half a tile above
-  the face, and uses one linear repeated tween in the existing Motion-driven demand renderer. Resolved
-  scene luminance selects additive compositing on dark surfaces and normal chromatic compositing on
-  light surfaces. Each retained particle continuously shifts the semantic tint toward white on dark
-  surfaces or toward black on light surfaces, producing contrast-safe shimmer without changing hue,
-  allocating display objects, or restarting playback; appearance refresh updates every retained actor.
+- Every tile owns one fixed twelve-particle `ParticleContainer` above its face. Main and Inventory
+  scenes share one private procedural five-point star texture each; playback only mutates the retained pool,
+  widens from one bottom-center apex into an inverted-fire plume, rises through most of the slot
+  without crossing its bounds, and uses one linear repeated tween in the existing Motion-driven
+  demand renderer. Every star keeps a square aspect ratio while deterministic size and one-, two-, or
+  three-cycle rate variants break up the plume without adding another clock. Resolved
+  scene luminance directs each retained particle's semantic tint toward white on dark surfaces or
+  toward black on light surfaces. Foreground particles use normal compositing so their chroma survives
+  both light and dark regions of tile artwork, producing contrast-safe shimmer without allocating
+  display objects or restarting playback; appearance refresh updates every retained actor.
 - A click ACK owns the shared pool first. If canonical projection starts a job during that burst, its
   final segment interpolates the same particles from ACK pose, alpha, shimmer, and semantic tint into
   the sparse working plume. The infinite running tween adopts that exact final phase without a reset,
   second writer, overlapping emitter, or blank frame.
+- Activity-particle bounds match the actor slot. Particle extents, horizontal wave, and the complete
+  bottom-anchored plume remain inside that slot while using most of its height. The retained particle
+  layer renders in front of the tile face while the progress overlay remains topmost.
 - Teardown stops subscriptions and interactions before destroying actors, layers, or the
   application they reference.
 - Actor presentation is keyed by physical actor instance and typed channel. `pose`, `grab-offset`,

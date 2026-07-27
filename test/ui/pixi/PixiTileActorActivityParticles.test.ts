@@ -26,6 +26,7 @@ const createActor = () =>
 			},
 			feedbackPhase: null,
 			lastProgress: 0,
+			lightSurface: false,
 			particles: Array.from(
 				{
 					length: 4,
@@ -40,6 +41,7 @@ const createActor = () =>
 					},
 					phaseOffset: index / 4,
 					spreadOffset: -1 + (index / 3) * 2,
+					speedCycles: index + 1,
 					waveOffset: index * 1.7,
 				}),
 			),

@@ -10,45 +10,34 @@ afterEach(() => {
 });
 
 describe("Pixi tile actor procedural particle textures", () => {
-	it("creates two atlas slices over one private source and destroys them exactly once", () => {
-		const addColorStop = vi.fn();
-		const fillRect = vi.fn();
+	it("creates one five-point star texture and destroys it exactly once", () => {
 		const context = {
-			addColorStop,
-			createRadialGradient: vi.fn(() => ({
-				addColorStop,
-			})),
-			fillRect,
+			beginPath: vi.fn(),
+			closePath: vi.fn(),
+			fill: vi.fn(),
 			fillStyle: "",
-			restore: vi.fn(),
-			save: vi.fn(),
-			scale: vi.fn(),
-			translate: vi.fn(),
+			lineTo: vi.fn(),
+			moveTo: vi.fn(),
 		};
 		vi.spyOn(HTMLCanvasElement.prototype, "getContext").mockReturnValue(context as never);
 
 		const textures = Effect.runSync(createPixiTileActorParticleTexturesFx());
 
-		expect(textures.mote.frame).toMatchObject({
+		expect(textures.star.frame).toMatchObject({
 			height: 32,
 			width: 32,
 			x: 0,
 			y: 0,
 		});
-		expect(textures.spark.frame).toMatchObject({
-			height: 32,
-			width: 32,
-			x: 32,
-			y: 0,
-		});
-		expect(textures.mote.source).toBe(textures.spark.source);
-		expect(context.createRadialGradient).toHaveBeenCalledTimes(2);
-		expect(fillRect).toHaveBeenCalledTimes(2);
+		expect(context.moveTo).toHaveBeenCalledTimes(1);
+		expect(context.lineTo).toHaveBeenCalledTimes(9);
+		expect(context.closePath).toHaveBeenCalledTimes(1);
+		expect(context.fill).toHaveBeenCalledTimes(1);
 
+		const source = textures.star.source;
 		Effect.runSync(textures.closeFx);
 		Effect.runSync(textures.closeFx);
-		expect(textures.mote.destroyed).toBe(true);
-		expect(textures.spark.destroyed).toBe(true);
-		expect(textures.mote.source.destroyed).toBe(true);
+		expect(textures.star.destroyed).toBe(true);
+		expect(source.destroyed).toBe(true);
 	});
 });

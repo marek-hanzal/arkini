@@ -15,7 +15,7 @@ export interface GameMenuControl {
 	readonly activeAction: GameMenuAction | null;
 	readonly routePending: boolean;
 	readonly open: () => void;
-	readonly close: () => Promise<void>;
+	readonly close: () => void;
 	readonly toggle: () => void;
 	readonly beginAction: (action: GameMenuAction) => boolean;
 	readonly completeAction: (action: GameMenuAction) => void;

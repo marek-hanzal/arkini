@@ -17,7 +17,9 @@ export interface RunItemDetailPendingActionProps<Result = unknown, Failure = unk
 
 /** Narrow command-settlement capability shared by Item Detail command atoms. */
 export interface ItemDetailPendingActionOwner {
-	readonly runPendingActionFx: <Result, Failure>(
+	readonly readActionError: (key: string) => string | null;
+	readonly readPendingAction: (key: string) => ItemDetailPendingAction | null;
+	readonly runPendingAction: <Result, Failure>(
 		props: RunItemDetailPendingActionProps<Result, Failure>,
-	) => Effect.Effect<Result | void, Failure>;
+	) => void;
 }

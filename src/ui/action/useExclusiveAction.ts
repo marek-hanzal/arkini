@@ -1,36 +1,37 @@
-import { useCallback, useMemo, useState, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
-import { createExclusiveActionOwnerFx } from "~/ui/action/createExclusiveActionOwnerFx";
-
-/** Owns one synchronous UI action claim and exposes it as one React snapshot. */
+/** Owns one mounted presentation action claim with same-tick admission. */
 export const useExclusiveAction = <Action extends string>() => {
-	const [owner] = useState(() => RendererRuntime.runSync(createExclusiveActionOwnerFx<Action>()));
-	const active = useSyncExternalStore(owner.subscribe, owner.getSnapshot, owner.getSnapshot);
-	const claim = useCallback(
-		(action: Action) => RendererRuntime.runSync(owner.claimFx(action)),
-		[
-			owner,
-		],
-	);
-	const release = useCallback(
-		(action: Action) => RendererRuntime.runSync(owner.releaseFx(action)),
-		[
-			owner,
-		],
-	);
+	const activeRef = useRef<Action | null>(null);
+	const mountedRef = useRef(false);
+	const [active, setActive] = useState<Action | null>(null);
+	useEffect(() => {
+		mountedRef.current = true;
+		return () => {
+			mountedRef.current = false;
+		};
+	}, []);
+	const claim = useCallback((action: Action) => {
+		if (activeRef.current !== null) return false;
+		activeRef.current = action;
+		if (mountedRef.current) setActive(action);
+		return true;
+	}, []);
+	const release = useCallback((action: Action) => {
+		if (activeRef.current !== action) return;
+		activeRef.current = null;
+		if (mountedRef.current) setActive(null);
+	}, []);
 
 	return useMemo(
 		() => ({
 			active,
 			claim,
-			getSnapshot: owner.getSnapshot,
 			release,
 		}),
 		[
 			active,
 			claim,
-			owner,
 			release,
 		],
 	);

@@ -21,7 +21,7 @@ const control = vi.hoisted(() => ({
 	openItemDefinitionDetailFx: vi.fn(),
 	readActionError: vi.fn((_key: string) => null),
 	readPendingAction: vi.fn((_key: string): ItemDetailPendingAction | null => null),
-	runPendingActionFx: vi.fn(),
+	runPendingAction: vi.fn(),
 }));
 const commands = vi.hoisted(() => ({
 	autofill: vi.fn(),
@@ -36,42 +36,45 @@ vi.mock("motion/react", async () => import("~test/ui/support/motionReactMock"));
 vi.mock("~/ui/item-detail/useItemDetailControl", () => ({
 	useItemDetailControl: () => control,
 }));
-vi.mock("~/ui/reactivity/readSettledAsyncResultError", () => ({
-	readSettledAsyncResultError: () => undefined,
-}));
 vi.mock("~/bridge/item-detail/useAutofillItemDetailLine", () => ({
-	useAutofillItemDetailLine: () => ({
-		result: undefined,
+	useAutofillItemDetailLine: ({ pendingKey }: { readonly pendingKey: string }) => ({
+		error: control.readActionError(pendingKey),
+		pending: control.readPendingAction(pendingKey) === "autofill",
 		run: commands.autofill,
 	}),
 }));
 vi.mock("~/bridge/item-detail/useSetAutonomousItemDetailLine", () => ({
-	useSetAutonomousItemDetailLine: () => ({
-		result: undefined,
+	useSetAutonomousItemDetailLine: ({ pendingKey }: { readonly pendingKey: string }) => ({
+		error: control.readActionError(pendingKey),
+		pending: control.readPendingAction(pendingKey) === "autonomous",
 		run: commands.setAutonomous,
 	}),
 }));
 vi.mock("~/bridge/item-detail/useSetDefaultItemDetailLine", () => ({
-	useSetDefaultItemDetailLine: () => ({
-		result: undefined,
+	useSetDefaultItemDetailLine: ({ pendingKey }: { readonly pendingKey: string }) => ({
+		error: control.readActionError(pendingKey),
+		pending: control.readPendingAction(pendingKey) === "default",
 		run: commands.setDefault,
 	}),
 }));
 vi.mock("~/bridge/item-detail/useStartItemDetailLine", () => ({
-	useStartPendingItemDetailLine: () => ({
-		result: undefined,
+	useStartPendingItemDetailLine: ({ pendingKey }: { readonly pendingKey: string }) => ({
+		error: control.readActionError(pendingKey),
+		pending: control.readPendingAction(pendingKey) === "start",
 		start: commands.start,
 	}),
 }));
 vi.mock("~/bridge/item-detail/useUnsetDefaultItemDetailLine", () => ({
-	useUnsetDefaultItemDetailLine: () => ({
-		result: undefined,
+	useUnsetDefaultItemDetailLine: ({ pendingKey }: { readonly pendingKey: string }) => ({
+		error: control.readActionError(pendingKey),
+		pending: control.readPendingAction(pendingKey) === "default",
 		run: commands.unsetDefault,
 	}),
 }));
 vi.mock("~/bridge/item-detail/useWithdrawItemDetailLine", () => ({
-	useWithdrawItemDetailLine: () => ({
-		result: undefined,
+	useWithdrawItemDetailLine: ({ pendingKey }: { readonly pendingKey: string }) => ({
+		error: control.readActionError(pendingKey),
+		pending: control.readPendingAction(pendingKey) === "withdraw",
 		run: commands.withdraw,
 	}),
 }));

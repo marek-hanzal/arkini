@@ -94,7 +94,7 @@ External and framework constructors remain valid where their API requires them. 
 
 ### Asynchronous UI and Game lifecycle boundaries
 
-React never owns canonical gameplay state, runtime reads, persistence truth, catalog truth, or domain lifecycle semantics. React-visible asynchronous commands use feature-owned Effect Atoms. A standalone operation may expose its `Atom.fn` `AsyncResult` directly. A surface that must synchronously exclude sibling commands or survive an allowed React remount exposes one domain-specific writable command Atom backed by a private `Atom.fn` runner and one tagged state; React must not reconstruct that ownership with refs, local booleans, or result-identity effects. The renderer-wide live Game is owned by one scoped Effect service in `RendererRuntime`:
+React never owns canonical gameplay state, runtime reads, persistence truth, catalog truth, or domain lifecycle semantics. React-visible asynchronous commands use feature-owned Effect Atoms. A standalone operation may expose its `Atom.fn` `AsyncResult` directly. A surface that must synchronously exclude sibling commands or survive an allowed React remount exposes one domain-specific writable command Atom backed by a private `Atom.fn` runner and one tagged state; React must not reconstruct application-command ownership with refs, local booleans, result-identity effects, or a second pending/error map. Mounted presentation actions that contain no Effect work may use React state plus a ref for same-tick admission. The renderer-wide live Game is owned by one scoped Effect service in `RendererRuntime`:
 
 ```text
 GameEngineResourceFx
@@ -326,6 +326,7 @@ Error precedence is observable behavior. Refactors must preserve it unless the c
 Allowed:
 
 - `useSyncExternalStore` over the canonical session snapshot;
+- `useSyncExternalStore` over one imperative presentation owner shared with Pixi/Motion;
 - public engine commands and reads exposed through concrete bridge domains;
 - transient-event reactions for animation, audio, and telemetry;
 - local presentation state;
@@ -364,7 +365,7 @@ Enforce these conventions through types, discriminated schemas, exhaustive match
 
 Tile dragging is renderer-native under `src/ui/pixi`. One full-viewport main scene owns Board and Toolbar; the routed Inventory leaf owns one isolated scene because Pixi display objects cannot cross canvases. Within a scene, the visible static tile and dragged tile are the same retained display object keyed by exact runtime item ID. Inventory release writes one consume-once, short-lived source-geometry handoff beside the engine command, keyed by the origin actor ID; receiving choreography uses it only when committed facts expose a compatible actor. It never asserts identity continuity, creates duplicate gameplay truth, or enables cross-canvas drag. Never create a preview actor, ghost, screenshot, hidden canonical tile, or competing runtime projection.
 
-Arkini is the presentation source of truth. Pixi scene owners hold actor phase, operation generation, frozen source/target identities, hit testing, z-order, scene handoff, and current canonical placement. Motion owns interruptible interpolation and spring channels; Motion values and displaced display geometry never decide gameplay semantics. Do not drive pointer-frequency React renders. Pointer press only arms the interaction. Crossing the drag threshold reparents the same live actor into the scene's transient layer, direct pointer movement owns its root pose, and pickup/magnetic offsets stay isolated visual channels.
+The engine is the gameplay source of truth; Pixi is the presentation authority for committed facts and movement already in progress. Pixi scene owners hold actor phase, operation generation, frozen source/target identities, hit testing, z-order, scene handoff, and the last committed canonical placement they were given. Motion owns interruptible interpolation and spring channels; Motion values and displaced display geometry never decide gameplay semantics. Do not drive pointer-frequency React renders. Pointer press only arms the interaction. Crossing the drag threshold reparents the same live actor into the scene's transient layer, direct pointer movement owns its root pose, and pickup/magnetic offsets stay isolated visual channels.
 
 Every drag release invokes one public atomic engine drop command. Ordinary Inventory click invokes the explicit release command; Shift+click remains Item Detail. UI must never infer merge, consume, swap, stacking, storage eligibility, placement fallback, or removal semantics. While a command is pending, the exact released source and target facts stay frozen; the newest canonical transition remains authoritative underneath any temporary presentation lag. Distance-bounded travel, pickup correction, magnetic neighbour response, producer emission, replacement, and entry/exit paint consume engine previews or standalone transition facts only. Rejected and unsupported targets are truthful feedback and settle from the exact released pose.
 

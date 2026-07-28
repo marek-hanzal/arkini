@@ -39,7 +39,7 @@ external imports directly.
 
 | Boundary | How it works on beta.101 | Stable target |
 | --- | --- | --- |
-| Package set | The three Effect packages are exactly pinned to the same beta. | Move the set to mutually compatible stable versions, regenerate the lockfile, and inspect release/migration notes for every crossed beta. |
+| Package set | The three Effect packages are exactly pinned to the same beta. | Move the set to mutually compatible stable versions, run the repository's documented lockfile-free install flow, record the resolved versions, and inspect release/migration notes for every crossed beta. |
 | Renderer Atom root | `RendererAtomRegistry` owns one process-lifetime registry, `scheduleTask`, a `400ms` default idle TTL, a registry Layer, and a zero-service Atom runtime. | Use the supported stable registry/runtime construction APIs while preserving one renderer authority. Re-evaluate the TTL from measured lifecycle behavior instead of blindly carrying `400`. |
 | Concurrent command settlement | Concurrent write atoms yield once before running work because beta.101 can otherwise settle a synchronous command before subscribers observe the pending state. | Remove `Effect.yieldNow` only if stable Atom settlement has a documented ordering guarantee and all pending/error/remount regressions pass without it. |
 | Command authorities | Cross-component commands use registry-owned `Atom.writable` authorities so pending and settlement survive React remounts and reject overlapping commands deterministically. | Prefer the final stable command abstraction if one exists; otherwise retain writable authorities and their single-command admission contract. Never move the truth back into component-local React state. |
@@ -71,16 +71,13 @@ command:
 - `src/bridge/appearance/setAppearanceThemeAtom.ts`
 - `src/bridge/arkpack/importArkpackFileAtom.ts`
 - `src/bridge/arkpack/removeArkpackAtom.ts`
-- `src/bridge/item-detail/useAutofillItemDetailLine.ts`
-- `src/bridge/item-detail/useClearItemDetailQueue.ts`
-- `src/bridge/item-detail/useSetDefaultItemDetailLine.ts`
-- `src/bridge/item-detail/useStartItemDetailLine.ts`
-- `src/bridge/item-detail/useUnsetDefaultItemDetailLine.ts`
-- `src/bridge/item-detail/useWithdrawItemDetailLine.ts`
+- `src/bridge/cheat/spawnCheatItemAtom.ts`
+- `src/bridge/inventory/runInventoryReleaseAtom.ts`
+- `src/bridge/item-detail/createItemDetailCommandAtom.ts`
+- `src/bridge/tile/runTileDropAtom.ts`
 - `src/ui/audio/useGameAudioAtoms.ts`
 - `src/ui/cheat-spotlight/CheatItemSpawnCommandAtom.ts`
 - `src/ui/cheats/updateGameCheatsAtom.ts`
-- `src/ui/item-detail/createItemDetailControllerFx.ts`
 - `src/ui/settings/SettingsCommandAtom.ts`
 
 Other commands whose contract depends on `concurrent: true` without a synthetic yield:
@@ -90,6 +87,8 @@ Other commands whose contract depends on `concurrent: true` without a synthetic 
 
 Registry-owned command authorities using `Atom.writable`:
 
+- `src/bridge/item-detail/createItemDetailCommandAtom.ts`
+- `src/bridge/tile/TileDefaultLineCommandAtom.ts`
 - `src/ui/cheat-spotlight/CheatItemSpawnCommandAtom.ts`
 - `src/ui/cheats/updateGameCheatsAtom.ts`
 - `src/ui/launcher/MainMenuExitCommandAtom.ts`
@@ -119,23 +118,20 @@ Ephemeral commands using `Atom.setIdleTTL(0)`:
 - `src/bridge/cheat/setCheatEnabledAtom.ts`
 - `src/bridge/cheat/setInstantGameplayAtom.ts`
 - `src/bridge/cheat/spawnCheatItemAtom.ts`
-- `src/bridge/item-detail/useAutofillItemDetailLine.ts`
-- `src/bridge/item-detail/useClearItemDetailQueue.ts`
-- `src/bridge/item-detail/useSetDefaultItemDetailLine.ts`
-- `src/bridge/item-detail/useStartItemDetailLine.ts`
-- `src/bridge/item-detail/useUnsetDefaultItemDetailLine.ts`
-- `src/bridge/item-detail/useWithdrawItemDetailLine.ts`
+- `src/bridge/inventory/runInventoryReleaseAtom.ts`
+- `src/bridge/item-detail/createItemDetailCommandAtom.ts`
 - `src/bridge/lifecycle/requestApplicationCloseAtom.ts`
-- `src/bridge/tile/dropItemAtom.ts`
+- `src/bridge/tile/TileDefaultLineCommandAtom.ts`
+- `src/bridge/tile/runTileDropAtom.ts`
 - `src/ui/audio/useGameAudioAtoms.ts`
 - `src/ui/cheat-spotlight/CheatItemSpawnCommandAtom.ts`
 - `src/ui/cheats/updateGameCheatsAtom.ts`
 - `src/ui/game-menu/gameMenuCommandAtom.ts`
-- `src/ui/item-detail/createItemDetailControllerFx.ts`
+- `src/ui/item-detail/createItemDetailController.ts`
 
 ## Complete unstable reactivity inventory
 
-Snapshot: 89 files total — 57 production sources and 32 tests/support files.
+Snapshot: 86 files total — 55 production sources and 31 tests/support files.
 
 ### Production
 
@@ -158,25 +154,25 @@ src/bridge/cheat/setInstantGameplayAtom.ts
 src/bridge/cheat/spawnCheatItemAtom.ts
 src/bridge/game/GameSession.ts
 src/bridge/game/createGameSessionFx.ts
-src/bridge/game/makeExactGameAtomFamily.ts
-src/bridge/item-detail/useAutofillItemDetailLine.ts
-src/bridge/item-detail/useClearItemDetailQueue.ts
-src/bridge/item-detail/useSetDefaultItemDetailLine.ts
-src/bridge/item-detail/useStartItemDetailLine.ts
-src/bridge/item-detail/useUnsetDefaultItemDetailLine.ts
-src/bridge/item-detail/useWithdrawItemDetailLine.ts
+src/bridge/game/makeExactGameAtomFamilyFx.ts
+src/bridge/inventory/runInventoryReleaseAtom.ts
+src/bridge/item-detail/createItemDetailCommandAtom.ts
+src/bridge/lifecycle/RendererLifecycleOwnerAtom.ts
+src/bridge/lifecycle/configureRendererLifecycleFx.ts
+src/bridge/lifecycle/readRendererLifecycleFx.ts
 src/bridge/lifecycle/requestApplicationCloseAtom.ts
 src/bridge/reactivity/RendererAtomRegistry.ts
 src/bridge/runtime/GameRuntimeAtom.ts
 src/bridge/runtime/useRuntimeSelector.ts
-src/bridge/tile/dropItemAtom.ts
+src/bridge/tile/TileDefaultLineCommandAtom.ts
+src/bridge/tile/runTileDropAtom.ts
 src/ui/audio/useGameAudioAtoms.ts
 src/ui/cheat-spotlight/CheatItemSpawnCommandAtom.ts
 src/ui/cheats/updateGameCheatsAtom.ts
 src/ui/game-menu/gameMenuCommandAtom.ts
 src/ui/game-menu/useGameMenuActions.ts
 src/ui/item-detail/ItemDetailControl.ts
-src/ui/item-detail/createItemDetailControllerFx.ts
+src/ui/item-detail/createItemDetailController.ts
 src/ui/launcher/LauncherAppearanceReadyAtom.ts
 src/ui/launcher/LauncherCheatAvailabilityReadyAtom.ts
 src/ui/launcher/LauncherHeroAtom.ts
@@ -195,8 +191,6 @@ src/ui/launcher/configureLauncherStartupFx.ts
 src/ui/launcher/retryLauncherStartupAtom.ts
 src/ui/reactivity/readSettledAsyncResultError.ts
 src/ui/settings/SettingsCommandAtom.ts
-src/ui/tile/TileActor.tsx
-src/ui/tile/useTileActorDrag.ts
 ```
 
 ### Tests and support
@@ -210,7 +204,9 @@ test/bridge/reactivity/CheatAvailabilityAtom.test.ts
 test/bridge/reactivity/RendererAtomLifecycle.test.ts
 test/bridge/reactivity/RendererAtomRegistry.test.ts
 test/bridge/runtime/useRuntimeSelector.test.ts
-test/bridge/tile/dropItemAtom.test.ts
+test/bridge/inventory/runInventoryReleaseAtom.test.ts
+test/bridge/tile/TileDefaultLineCommandAtom.test.ts
+test/bridge/tile/runTileDropAtom.test.ts
 test/support/createTestRendererRuntime.ts
 test/support/game/makeTestGameTransitionFieldsFx.ts
 test/ui/appearance/AppearanceAtom.test.ts
@@ -231,9 +227,6 @@ test/ui/launcher/Settings.test.ts
 test/ui/launcher/StartupSplash.test.ts
 test/ui/launcher/support/renderStartupSplashFx.ts
 test/ui/reactivity/readSettledAsyncResultError.test.ts
-test/ui/tile/TileActorDropLifecycle.test.ts
-test/ui/tile/TileActorRenderBoundary.test.ts
-test/ui/tile/support/makeDropItemTestAtom.ts
 ```
 
 ## Complete unstable CLI inventory
@@ -264,19 +257,13 @@ src/engine/validation/cli/ValidateCommand.ts
 
 ## Complete atom-react inventory
 
-Snapshot: 53 files total — 26 production sources and 27 tests/support files.
+Snapshot: 50 files total — 21 production sources and 29 tests/support files.
 
 ### Production
 
 ```text
 src/bridge/arkpack/useAboutPortraitAssets.ts
 src/bridge/arkpack/useArkpacks.ts
-src/bridge/item-detail/useAutofillItemDetailLine.ts
-src/bridge/item-detail/useClearItemDetailQueue.ts
-src/bridge/item-detail/useSetDefaultItemDetailLine.ts
-src/bridge/item-detail/useStartItemDetailLine.ts
-src/bridge/item-detail/useUnsetDefaultItemDetailLine.ts
-src/bridge/item-detail/useWithdrawItemDetailLine.ts
 src/bridge/reactivity/RendererAtomRegistry.ts
 src/bridge/runtime/useRuntimeSelector.ts
 src/main.tsx
@@ -293,8 +280,9 @@ src/ui/launcher/LauncherHero.tsx
 src/ui/launcher/LauncherStartupHydrator.tsx
 src/ui/launcher/MainMenu.tsx
 src/ui/launcher/useStartupSplashLifecycle.ts
+src/ui/pixi/PixiBoardToolbarSurface.tsx
+src/ui/pixi/PixiInventorySurface.tsx
 src/ui/settings/useSettingsModel.ts
-src/ui/tile/useTileActorDrag.ts
 ```
 
 ### Tests and support
@@ -307,7 +295,9 @@ test/bridge/reactivity/CheatAvailabilityAtom.test.ts
 test/bridge/reactivity/RendererAtomLifecycle.test.ts
 test/bridge/reactivity/RendererAtomRegistry.test.ts
 test/bridge/runtime/useRuntimeSelector.test.ts
-test/bridge/tile/dropItemAtom.test.ts
+test/bridge/inventory/runInventoryReleaseAtom.test.ts
+test/bridge/tile/TileDefaultLineCommandAtom.test.ts
+test/bridge/tile/runTileDropAtom.test.ts
 test/support/createTestRendererRuntime.ts
 test/ui/appearance/AppearanceAtom.test.ts
 test/ui/appearance/AppearanceThemeMutation.test.ts
@@ -326,7 +316,7 @@ test/ui/launcher/LauncherStartupHydrator.test.ts
 test/ui/launcher/MainMenu.test.ts
 test/ui/launcher/Settings.test.ts
 test/ui/launcher/support/renderStartupSplashFx.ts
-test/ui/tile/TileActorDropLifecycle.test.ts
+test/ui/pixi/PixiBoardToolbarSurface.test.ts
 ```
 
 ## Complete platform-node inventory
@@ -358,7 +348,7 @@ test/source/readGameSourceFilesFx.test.ts
 
 1. Read stable Effect, Atom, React Atom, Platform Node, and CLI migration notes.
 2. Refresh all inventories and add newly introduced boundaries to this ledger.
-3. Upgrade the three Effect packages and lockfile as one set.
+3. Upgrade the three Effect packages as one exact set and verify the resolved install tree.
 4. Migrate runtime and Scope ownership first: Electron root, renderer root, and game session.
 5. Migrate Atom registry/runtime construction and validate retention/disposal.
 6. Migrate command atoms, React hooks, AsyncResult handling, and Cause projection.
@@ -399,7 +389,9 @@ npx vitest run --no-color \
   test/ui/item-detail/ItemDetailCommandAtoms.test.ts \
   test/ui/launcher/MainMenu.test.ts \
   test/ui/launcher/Settings.test.ts \
-  test/ui/tile/TileActorDropLifecycle.test.ts \
+  test/bridge/inventory/runInventoryReleaseAtom.test.ts \
+  test/bridge/tile/TileDefaultLineCommandAtom.test.ts \
+  test/bridge/tile/runTileDropAtom.test.ts \
   test/ui/reactivity/readSettledAsyncResultError.test.ts
 ```
 
@@ -418,8 +410,8 @@ git diff --check
 
 ## Done criteria
 
-- `package.json` and the lockfile use mutually compatible stable Effect packages.
-- `rg 'effect/unstable|4\.0\.0-beta' package.json package-lock.json src electron cli test`
+- `package.json` pins mutually compatible stable Effect packages and the installed tree resolves that exact set.
+- `rg 'effect/unstable|4\.0\.0-beta' package.json src electron cli test`
   has no unreviewed matches.
 - Every `TODO(#397)` is removed or converted into a stable, intentionally documented
   invariant.

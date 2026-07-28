@@ -3,7 +3,6 @@ import type { useItemDetailQueue } from "~/bridge/item-detail/useItemDetailQueue
 import { Button } from "~/ui/button/Button";
 import { Scrollable } from "~/ui/scrollable/Scrollable";
 import { useItemDetailControl } from "~/ui/item-detail/useItemDetailControl";
-import { readSettledAsyncResultError } from "~/ui/reactivity/readSettledAsyncResultError";
 
 /** Renders authoritative queued intents without treating active work as cancellable. */
 export const ItemQueueTab = ({
@@ -27,9 +26,8 @@ export const ItemQueueTab = ({
 		pendingKey,
 		pendingOwner: itemDetail,
 	});
-	readSettledAsyncResultError(clearQueue.result);
-	const pending = itemDetail.readPendingAction(pendingKey) === "clear-queue";
-	const error = itemDetail.readActionError(pendingKey);
+	const pending = clearQueue.pending;
+	const error = clearQueue.error;
 	const used = queue.activeCount + queue.request.length;
 
 	return (

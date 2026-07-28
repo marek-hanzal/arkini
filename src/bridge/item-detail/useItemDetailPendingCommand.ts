@@ -1,7 +1,4 @@
-import { useAtom } from "@effect/atom-react";
-import { Effect } from "effect";
-import * as Atom from "effect/unstable/reactivity/Atom";
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 
 import type { Game } from "~/bridge/game/Game";
 import { useGameEngine } from "~/bridge/game/useGameEngine";
@@ -16,11 +13,11 @@ export namespace useItemDetailPendingCommand {
 		readonly failureMessage: string;
 		readonly pendingKey: string;
 		readonly pendingOwner: ItemDetailPendingActionOwner;
-		readonly run: (game: Game, props: Props) => Effect.Effect<Result, Failure>;
+		readonly run: (game: Game, props: Props) => import("effect").Effect.Effect<Result, Failure>;
 	}
 }
 
-/** Builds one concurrent Item Detail command with shared settlement ownership. */
+/** Projects one exact command key from the provider-scoped Item Detail authority. */
 export const useItemDetailPendingCommand = <Props, Result, Failure>({
 	action,
 	failureMessage,
@@ -29,42 +26,34 @@ export const useItemDetailPendingCommand = <Props, Result, Failure>({
 	run: runCommand,
 }: useItemDetailPendingCommand.Options<Props, Result, Failure>) => {
 	const game = useGameEngine();
-	const runPendingActionFx = pendingOwner.runPendingActionFx;
-	const commandAtom = useMemo(
-		() =>
-			Atom.fn(
-				(command: Props) =>
-					Effect.yieldNow.pipe(
-						Effect.andThen(
-							runPendingActionFx({
-								key: pendingKey,
-								action,
-								failureMessage,
-								run: runCommand(game, command),
-							}),
-						),
-					),
-				{
-					concurrent: true,
-				},
-			).pipe(Atom.setIdleTTL(0)),
+	const run = useCallback(
+		(command: Props) =>
+			pendingOwner.runPendingAction({
+				key: pendingKey,
+				action,
+				failureMessage,
+				run: runCommand(game, command),
+			}),
 		[
 			action,
 			failureMessage,
 			game,
 			pendingKey,
+			pendingOwner,
 			runCommand,
-			runPendingActionFx,
 		],
 	);
-	const [result, run] = useAtom(commandAtom);
+
 	return useMemo(
 		() => ({
-			result,
+			error: pendingOwner.readActionError(pendingKey),
+			pending: pendingOwner.readPendingAction(pendingKey) === action,
 			run,
 		}),
 		[
-			result,
+			action,
+			pendingKey,
+			pendingOwner,
 			run,
 		],
 	);

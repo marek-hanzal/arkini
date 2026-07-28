@@ -71,9 +71,9 @@ export interface ItemDetailControl {
 	readonly isOpen: boolean;
 	readonly readActionError: (key: string) => string | null;
 	readonly readPendingAction: (key: string) => ItemDetailPendingAction | null;
-	readonly runPendingActionFx: <Result, Failure>(
+	readonly runPendingAction: <Result, Failure>(
 		props: RunItemDetailPendingActionProps<Result, Failure>,
-	) => Effect.Effect<Result | void, Failure>;
+	) => void;
 	readonly openItemDetailFx: (props: OpenItemDetailProps) => Effect.Effect<boolean>;
 	readonly openItemDefinitionDetailFx: (
 		props: OpenItemDefinitionDetailProps,

@@ -914,16 +914,13 @@ describe("ItemDetailModal", () => {
 			await Promise.resolve();
 		});
 		const settlement = Effect.runSync(Deferred.make<void>());
-		let outcome: Promise<unknown> | undefined;
 		await act(async () => {
-			outcome = Effect.runPromise(
-				readControl().runPendingActionFx({
-					key: "line:autofill",
-					action: "autofill",
-					failureMessage: "Autofill failed.",
-					run: Deferred.await(settlement),
-				}),
-			);
+			readControl().runPendingAction({
+				key: "line:autofill",
+				action: "autofill",
+				failureMessage: "Autofill failed.",
+				run: Deferred.await(settlement),
+			});
 			await Promise.resolve();
 		});
 		expect(readControl().readPendingAction("line:autofill")).toBe("autofill");
@@ -943,8 +940,8 @@ describe("ItemDetailModal", () => {
 		expect(readControl().readPendingAction("line:autofill")).toBe("autofill");
 		await act(async () => {
 			Effect.runSync(Deferred.succeed(settlement, undefined));
-			await outcome;
 		});
+		await vi.waitFor(() => expect(readControl().readPendingAction("line:autofill")).toBeNull());
 		expect(readControl().readPendingAction("line:autofill")).toBeNull();
 	});
 

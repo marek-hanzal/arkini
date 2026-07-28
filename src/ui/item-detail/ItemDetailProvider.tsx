@@ -10,10 +10,12 @@ import {
 } from "react";
 
 import type { GameEngine } from "~/bridge/game/GameEngine";
+import type { RunItemDetailPendingActionProps } from "~/bridge/item-detail/ItemDetailPendingActionOwner";
+import { createItemDetailCommandAtom } from "~/bridge/item-detail/createItemDetailCommandAtom";
 import { useResolveItemDefinitionDetailTarget } from "~/bridge/item-detail/useResolveItemDefinitionDetailTarget";
 import { useResolveItemDetailTarget } from "~/bridge/item-detail/useResolveItemDetailTarget";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
-import { createItemDetailControllerFx } from "~/ui/item-detail/createItemDetailControllerFx";
+import { createItemDetailController } from "~/ui/item-detail/createItemDetailController";
 import { ItemDetailContext } from "~/ui/item-detail/ItemDetailContext";
 import type {
 	ItemDetailControl,
@@ -41,7 +43,26 @@ export const ItemDetailProvider = ({
 }>) => {
 	const resolveDefinitionTarget = useResolveItemDefinitionDetailTarget();
 	const resolveTarget = useResolveItemDetailTarget();
-	const [controller] = useState(() => RendererRuntime.runSync(createItemDetailControllerFx()));
+	const [controller] = useState(createItemDetailController);
+	const commandAtom = useMemo(
+		() =>
+			createItemDetailCommandAtom({
+				game,
+				readOutcomeScope: controller.readOutcomeScope,
+			}),
+		[
+			controller,
+			game,
+		],
+	);
+	const [commandState, writeCommand] = useAtom(commandAtom);
+	const runPendingAction = useCallback(
+		<Result, Failure>(command: RunItemDetailPendingActionProps<Result, Failure>) =>
+			writeCommand(command),
+		[
+			writeCommand,
+		],
+	);
 	const [closeResult, close] = useAtom(controller.closeAtom);
 	readSettledAsyncResultError(closeResult);
 	const snapshot = useSyncExternalStore(
@@ -49,6 +70,17 @@ export const ItemDetailProvider = ({
 		controller.getSnapshot,
 		controller.getSnapshot,
 	);
+
+	useEffect(() => {
+		writeCommand({
+			kind: "scope-changed",
+			outcomeScope: controller.readOutcomeScope(),
+		});
+	}, [
+		controller,
+		snapshot.state,
+		writeCommand,
+	]);
 
 	const openItemDetailFx = useCallback(
 		({ itemId, linesSearchQuery, tab, origin = null }: OpenItemDetailProps) =>
@@ -115,16 +147,6 @@ export const ItemDetailProvider = ({
 
 	useEffect(
 		() => () => {
-			RendererRuntime.runSync(controller.cancelPendingActionsFx);
-		},
-		[
-			controller,
-			game,
-		],
-	);
-
-	useEffect(
-		() => () => {
 			RendererRuntime.runSync(controller.resetFx);
 		},
 		[
@@ -136,9 +158,14 @@ export const ItemDetailProvider = ({
 		() => ({
 			state: snapshot.state,
 			isOpen: snapshot.state.phase !== "closed",
-			readActionError: controller.readActionError,
-			readPendingAction: controller.readPendingAction,
-			runPendingActionFx: controller.runPendingActionFx,
+			readActionError: (key) => {
+				const error = commandState.actionErrors.get(key);
+				return error !== undefined && error.outcomeScope === controller.readOutcomeScope()
+					? error.message
+					: null;
+			},
+			readPendingAction: (key) => commandState.pendingActions.get(key)?.action ?? null,
+			runPendingAction,
 			openItemDetailFx,
 			openItemDefinitionDetailFx,
 			closeAtom: controller.closeAtom,
@@ -148,8 +175,10 @@ export const ItemDetailProvider = ({
 		}),
 		[
 			controller,
+			commandState,
 			openItemDefinitionDetailFx,
 			openItemDetailFx,
+			runPendingAction,
 			snapshot,
 		],
 	);

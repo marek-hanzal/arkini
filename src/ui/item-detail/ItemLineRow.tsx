@@ -15,7 +15,6 @@ import { ItemLineSummary } from "~/ui/item-detail/ItemLineSummary";
 import { ItemReferenceButton } from "~/ui/item-detail/ItemReferenceButton";
 import type { ItemDetailPendingAction } from "~/ui/item-detail/ItemDetailControl";
 import { useItemDetailControl } from "~/ui/item-detail/useItemDetailControl";
-import { readSettledAsyncResultError } from "~/ui/reactivity/readSettledAsyncResultError";
 
 const ItemLineUnavailableReason = ({
 	reason,
@@ -189,23 +188,22 @@ export const ItemLineRow = ({
 		pendingKey: pendingKeys.withdraw,
 		pendingOwner: itemDetail,
 	});
-	readSettledAsyncResultError(autofillLine.result);
-	readSettledAsyncResultError(setAutonomousLine.result);
-	readSettledAsyncResultError(setDefaultLine.result);
-	readSettledAsyncResultError(unsetDefaultLine.result);
-	readSettledAsyncResultError(startLine.result);
-	readSettledAsyncResultError(withdrawLine.result);
 	const pending = {
-		autofill: itemDetail.readPendingAction(pendingKeys.autofill) === "autofill",
-		autonomous: itemDetail.readPendingAction(pendingKeys.autonomous) === "autonomous",
-		default: itemDetail.readPendingAction(pendingKeys.default) === "default",
-		start: itemDetail.readPendingAction(pendingKeys.start) === "start",
-		withdraw: itemDetail.readPendingAction(pendingKeys.withdraw) === "withdraw",
+		autofill: autofillLine.pending,
+		autonomous: setAutonomousLine.pending,
+		default: setDefaultLine.pending || unsetDefaultLine.pending,
+		start: startLine.pending,
+		withdraw: withdrawLine.pending,
 	} as const;
 	const error =
-		Object.values(pendingKeys)
-			.map((key) => itemDetail.readActionError(key))
-			.find((message) => message !== null) ?? null;
+		[
+			autofillLine.error,
+			setAutonomousLine.error,
+			setDefaultLine.error,
+			unsetDefaultLine.error,
+			startLine.error,
+			withdrawLine.error,
+		].find((message) => message !== null) ?? null;
 	const unavailable = line.availability.kind === "unavailable";
 	const unavailableDependency =
 		line.availability.kind === "unavailable"

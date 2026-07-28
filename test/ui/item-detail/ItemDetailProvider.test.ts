@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 
-import { Cause, Effect, Exit, Option } from "effect";
+import { Deferred, Effect } from "effect";
 import { act, createElement, useEffect } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
@@ -92,8 +92,8 @@ const close = (control: ItemDetailControl, props?: Parameters<ItemDetailControl[
 
 const runPendingAction = (
 	control: ItemDetailControl,
-	props: Parameters<ItemDetailControl["runPendingActionFx"]>[0],
-) => Effect.runPromiseExit(control.runPendingActionFx(props));
+	props: Parameters<ItemDetailControl["runPendingAction"]>[0],
+) => control.runPendingAction(props);
 
 afterEach(async () => {
 	await act(async () => {
@@ -322,14 +322,15 @@ describe("ItemDetailProvider", () => {
 		if (entering.phase !== "entering") throw new Error("Expected entering state.");
 		await act(async () => completeEnter(readControl(), entering.generation));
 		const interrupted = vi.fn();
-		const outcome = Effect.runPromiseExit(
-			readControl().runPendingActionFx({
+		await act(async () => {
+			readControl().runPendingAction({
 				key: "line:runtime:first",
 				action: "autofill",
 				failureMessage: "Autofill failed.",
 				run: Effect.never.pipe(Effect.onInterrupt(() => Effect.sync(interrupted))),
-			}),
-		);
+			});
+			await Promise.resolve();
+		});
 		expect(readControl().readPendingAction("line:runtime:first")).toBe("autofill");
 
 		await act(async () => {
@@ -340,7 +341,6 @@ describe("ItemDetailProvider", () => {
 
 		await vi.waitFor(() => expect(interrupted).toHaveBeenCalledOnce());
 		expect(readControl().readPendingAction("line:runtime:first")).toBeNull();
-		expect(Exit.isFailure(await outcome)).toBe(true);
 	});
 
 	it("retains action errors across tabs but evicts them across target and exit lifecycles", async () => {
@@ -355,22 +355,14 @@ describe("ItemDetailProvider", () => {
 		if (entering.phase !== "entering") throw new Error("Expected entering state.");
 		await act(async () => completeEnter(readControl(), entering.generation));
 
-		let rejectFirst: ((cause: Error) => void) | undefined;
-		const firstFailure = new Promise<never>((_resolve, reject) => {
-			rejectFirst = reject;
-		});
-		let firstOutcome: ReturnType<typeof runPendingAction> | undefined;
-		let firstExit: Exit.Exit<unknown, unknown> | undefined;
+		const firstFailure = Effect.runSync(Deferred.make<never, Error>());
 		const firstError = new Error("First deferred failure.");
 		await act(async () => {
-			firstOutcome = runPendingAction(readControl(), {
+			runPendingAction(readControl(), {
 				key: "line:runtime:first",
 				action: "default",
 				failureMessage: "First action failed.",
-				run: Effect.tryPromise({
-					try: () => firstFailure,
-					catch: (cause) => cause,
-				}),
+				run: Deferred.await(firstFailure),
 			});
 			expect(
 				openItemDetail(readControl(), {
@@ -378,15 +370,13 @@ describe("ItemDetailProvider", () => {
 					tab: "info",
 				}),
 			).toBe(true);
-			rejectFirst?.(firstError);
-			firstExit = await firstOutcome;
+			Effect.runSync(Deferred.fail(firstFailure, firstError));
 		});
-		expect(firstExit).toBeDefined();
-		if (firstExit === undefined || Exit.isSuccess(firstExit)) {
-			throw new Error("Expected first action failure.");
-		}
-		expect(Cause.findErrorOption(firstExit.cause)).toEqual(Option.some(firstError));
-		expect(readControl().readActionError("line:runtime:first")).toBe("First deferred failure.");
+		await vi.waitFor(() =>
+			expect(readControl().readActionError("line:runtime:first")).toBe(
+				"First deferred failure.",
+			),
+		);
 
 		await act(async () => {
 			openItemDetail(readControl(), {
@@ -396,22 +386,14 @@ describe("ItemDetailProvider", () => {
 		});
 		expect(readControl().readActionError("line:runtime:first")).toBeNull();
 
-		let rejectSecond: ((cause: Error) => void) | undefined;
-		const secondFailure = new Promise<never>((_resolve, reject) => {
-			rejectSecond = reject;
-		});
-		let secondOutcome: ReturnType<typeof runPendingAction> | undefined;
-		let secondExit: Exit.Exit<unknown, unknown> | undefined;
+		const secondFailure = Effect.runSync(Deferred.make<never, Error>());
 		const secondError = new Error("Late failure after close.");
 		await act(async () => {
-			secondOutcome = runPendingAction(readControl(), {
+			runPendingAction(readControl(), {
 				key: "line:runtime:second",
 				action: "start",
 				failureMessage: "Second action failed.",
-				run: Effect.tryPromise({
-					try: () => secondFailure,
-					catch: (cause) => cause,
-				}),
+				run: Deferred.await(secondFailure),
 			});
 			const closeOutcome = close(readControl());
 			await Promise.resolve();
@@ -420,14 +402,11 @@ describe("ItemDetailProvider", () => {
 			completeExit(readControl(), exiting.generation);
 			await closeOutcome;
 			expect(readControl().state.phase).toBe("closed");
-			rejectSecond?.(secondError);
-			secondExit = await secondOutcome;
+			Effect.runSync(Deferred.fail(secondFailure, secondError));
 		});
-		expect(secondExit).toBeDefined();
-		if (secondExit === undefined || Exit.isSuccess(secondExit)) {
-			throw new Error("Expected second action failure.");
-		}
-		expect(Cause.findErrorOption(secondExit.cause)).toEqual(Option.some(secondError));
+		await vi.waitFor(() =>
+			expect(readControl().readPendingAction("line:runtime:second")).toBeNull(),
+		);
 		expect(readControl().readActionError("line:runtime:second")).toBeNull();
 	});
 
@@ -510,9 +489,8 @@ describe("ItemDetailProvider", () => {
 		const run = new Promise<void>((resolve) => {
 			completeRun = resolve;
 		});
-		let outcome: Promise<unknown> | undefined;
 		await act(async () => {
-			outcome = runPendingAction(readItemDetail(), {
+			runPendingAction(readItemDetail(), {
 				key: "line:runtime:first",
 				action: "start",
 				failureMessage: "Start failed.",
@@ -534,8 +512,10 @@ describe("ItemDetailProvider", () => {
 
 		await act(async () => {
 			completeRun?.();
-			await outcome;
 		});
+		await vi.waitFor(() =>
+			expect(readItemDetail().readPendingAction("line:runtime:first")).toBeNull(),
+		);
 		expect(readGameMenu().phase).toBe("entering");
 		expect(readItemDetail().state.phase).toBe("exiting");
 	});

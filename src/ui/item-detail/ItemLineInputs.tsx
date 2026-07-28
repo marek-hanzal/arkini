@@ -6,7 +6,6 @@ import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import { Button } from "~/ui/button/Button";
 import { ItemReferenceButton } from "~/ui/item-detail/ItemReferenceButton";
 import { useItemDetailControl } from "~/ui/item-detail/useItemDetailControl";
-import { readSettledAsyncResultError } from "~/ui/reactivity/readSettledAsyncResultError";
 
 const MaterialInputWithdraw = ({
 	disabled,
@@ -36,9 +35,8 @@ const MaterialInputWithdraw = ({
 		pendingKey,
 		pendingOwner: itemDetail,
 	});
-	readSettledAsyncResultError(withdraw.result);
-	const pending = itemDetail.readPendingAction(pendingKey) === "withdraw";
-	const error = itemDetail.readActionError(pendingKey);
+	const pending = withdraw.pending;
+	const error = withdraw.error;
 
 	return (
 		<div className="flex flex-col items-end">

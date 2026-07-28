@@ -45,6 +45,12 @@ committed transition. The receiving scene still resolves identity and outcome fr
 The renderer may lag, retain, hide, or animate committed facts, but it must not manufacture a
 gameplay outcome. Missing visual identities degrade to ordinary reconciliation.
 
+Main-scene reconciliation has one ordered authority boundary. The reconciler first reads committed
+bridge projections and the current drop, delivery, and motion claims. A pure local classifier turns
+that complete snapshot into ordered actor arrivals and departures. The reconciler then applies the
+plan, remaining the only owner that allocates visual generations, mutates the actor store, hands
+poses to motion, runs entry or exit effects, and finalizes presentation claims.
+
 ## Interaction contract
 
 - Click performs the tile's immediate primary action.

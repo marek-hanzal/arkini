@@ -2,8 +2,6 @@ import { Effect } from "effect";
 
 import type { GameEngine } from "~/bridge/game/GameEngine";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
-import type { TileActorItem } from "~/bridge/tile/TileActorItem";
-import { isSameTileActorLocation } from "~/bridge/tile/isSameTileActorLocation";
 import type { TileActorFeedbackCue } from "~/bridge/tile/feedback/TileActorFeedbackCue";
 import { readTileActorFeedbackCuesFx } from "~/bridge/tile/feedback/readTileActorFeedbackCuesFx";
 import { readCommittedTileReplacementsFx } from "~/bridge/tile/motion/readCommittedTileReplacementsFx";
@@ -14,7 +12,6 @@ import { readTileDeliveriesFx } from "~/bridge/tile/readTileDeliveriesFx";
 import type { PixiMainSceneActorStore } from "~/ui/pixi/actor/PixiMainSceneActorStore";
 import type { PixiTileActorParticleTextures } from "~/ui/pixi/actor/PixiTileActorParticleTextures";
 import { createPixiTileActorFx } from "~/ui/pixi/actor/createPixiTileActorFx";
-import { readPixiTileActorCrowdAlpha } from "~/ui/pixi/actor/readPixiTileActorCrowdAlpha";
 import {
 	updatePixiTileActorFx,
 	updatePixiTileActorProgressFx,
@@ -42,6 +39,10 @@ import type { PixiApplicationOwner } from "~/ui/pixi/runtime/PixiApplicationOwne
 import type { PixiTextureStore } from "~/ui/pixi/runtime/createPixiTextureStoreFx";
 import type { PixiMainSceneReconciler } from "~/ui/pixi/scene/PixiMainSceneReconciler";
 import type { PixiMainSceneSurface } from "~/ui/pixi/scene/PixiMainSceneSurface";
+import {
+	classifyPixiMainSceneActorUpdate,
+	classifyPixiMainSceneReconciliation,
+} from "~/ui/pixi/scene/classifyPixiMainSceneReconciliation";
 import { releasePixiMainSceneActorFx } from "~/ui/pixi/scene/releasePixiMainSceneActorFx";
 import { runPixiMainSceneReplacementsFx } from "~/ui/pixi/scene/runPixiMainSceneReplacementsFx";
 
@@ -66,20 +67,6 @@ export namespace createPixiMainSceneReconcilerFx {
 const runningTransitionDurationMs = 180;
 const feedbackExitDurationMs = 420;
 const defaultExitDurationMs = 220;
-
-const sameVisual = (left: TileActorItem, right: TileActorItem) =>
-	left.revision === right.revision &&
-	left.title === right.title &&
-	left.badgeCount === right.badgeCount &&
-	left.quantity === right.quantity &&
-	left.sourceUrl === right.sourceUrl &&
-	left.compositeUrl === right.compositeUrl &&
-	left.running === right.running &&
-	left.activityEffect === right.activityEffect &&
-	left.primaryAction.kind === right.primaryAction.kind &&
-	(left.primaryAction.kind !== "start-default-line" ||
-		(right.primaryAction.kind === "start-default-line" &&
-			left.primaryAction.lineId === right.primaryAction.lineId));
 
 /**
  * Reconciles one canonical transition into retained actors while motion owns presentation lag.
@@ -365,52 +352,51 @@ export const createPixiMainSceneReconcilerFx = Effect.fn("createPixiMainSceneRec
 								];
 					}),
 				);
-				const visibleActorIds = new Set(visibleItems.keys());
-				const leavingFeedbackActorIds = new Set(
-					feedbackCues
-						.filter(({ actorId }) => !visibleActorIds.has(actorId))
-						.map(({ actorId }) => actorId),
-				);
-				for (const id of actorStore.actors.keys()) {
-					if (visibleItems.has(id)) continue;
-					if (dropSnapshot.pendingActorIds.has(id)) continue;
-					if (dropSnapshot.hiddenActorIds.has(id)) {
+				const reconciliationPlan = classifyPixiMainSceneReconciliation({
+					actorIds: actorStore.actors.keys(),
+					deliveryRetainedActorIds: deliverySnapshot.retainedActorIds,
+					feedbackCues,
+					hiddenActorIds: dropSnapshot.hiddenActorIds,
+					inventoryActorIds,
+					motionRetainedActorIds: motionSnapshot.retainedActorIds,
+					pendingActorIds: dropSnapshot.pendingActorIds,
+					visibleActors: visibleItems,
+				});
+				for (const departure of reconciliationPlan.departures) {
+					if (departure.kind === "release-hidden") {
 						yield* releaseActorWithExitFx({
 							adoptActiveLifecycleExit: true,
-							actorId: id,
+							actorId: departure.actorId,
 							durationMs: feedbackExitDurationMs,
 							feedbackCues: [],
 						});
 						continue;
 					}
-					if (inventoryActorIds.has(id)) {
-						yield* removeActorImmediatelyFx(id);
+					if (departure.kind === "remove-immediately") {
+						yield* removeActorImmediatelyFx(departure.actorId);
 						continue;
 					}
-					if (deliverySnapshot.retainedActorIds.has(id)) continue;
-					if (motionSnapshot.retainedActorIds.has(id)) continue;
-					const exitFeedbackCues = feedbackCues.filter(
-						({ actorId, kind }) => actorId === id && kind !== "consume-source",
-					);
 					yield* releaseActorWithExitFx({
-						actorId: id,
+						actorId: departure.actorId,
 						durationMs:
-							exitFeedbackCues.length > 0
+							departure.style === "feedback-particles"
 								? pixiTileActorFeedbackParticlesDurationMs
-								: leavingFeedbackActorIds.has(id)
+								: departure.style === "feedback"
 									? feedbackExitDurationMs
 									: defaultExitDurationMs,
-						feedbackCues: exitFeedbackCues,
+						feedbackCues: departure.feedbackCues,
 					});
 				}
 
-				for (const { item, pose } of visibleItems.values()) {
+				for (const arrival of reconciliationPlan.arrivals) {
+					const {
+						visible: { item, pose },
+					} = arrival;
 					const displayItem = projectPixiTileMotionItem(
 						item,
 						motionSnapshot.quantityPresentationByActorId.get(item.id),
 					);
-					const actor = actorStore.actors.get(item.id);
-					if (actor === undefined) {
+					if (arrival.kind === "add") {
 						const created = RendererRuntime.runSync(
 							createPixiTileActorFx({
 								frames: application.frames,
@@ -474,33 +460,30 @@ export const createPixiMainSceneReconcilerFx = Effect.fn("createPixiMainSceneRec
 						continue;
 					}
 
-					const moved = !isSameTileActorLocation(actor.item.location, item.location);
-					const visualChanged = !sameVisual(actor.currentVisual.item, displayItem);
-					const progressChanged = actor.item.progressRatio !== displayItem.progressRatio;
-					const sizeChanged = actor.size !== pose.size;
-					const poseOwned =
-						actor.dragging ||
-						deliverySnapshot.retainedActorIds.has(item.id) ||
-						motionSnapshot.interactionClaimByActorId.has(item.id) ||
-						(yield* animator.isChannelActiveFx(actor, "pose"));
-					const crowdAlphaChanged =
-						readPixiTileActorCrowdAlpha(actor.item) !==
-						readPixiTileActorCrowdAlpha(displayItem);
-					const activityEffectChanged =
-						actor.item.activityEffect !== displayItem.activityEffect;
-					const previousDisplayedSize = actor.size * actor.container.scale.x;
-					if (visualChanged || sizeChanged) {
+					const actor = actorStore.actors.get(item.id);
+					if (actor === undefined) continue;
+					const updatePlan = classifyPixiMainSceneActorUpdate({
+						actor,
+						deliveryRetained: deliverySnapshot.retainedActorIds.has(item.id),
+						directLanding: dropSnapshot.landingActorIds.has(item.id),
+						displayItem,
+						motionClaimed: motionSnapshot.interactionClaimByActorId.has(item.id),
+						pose,
+						poseChannelActive: yield* animator.isChannelActiveFx(actor, "pose"),
+						preserveVisual: replacementActorIds.has(item.id),
+					});
+					if (updatePlan.item.kind === "visual") {
 						yield* updatePixiTileActorFx({
 							actor,
 							animator,
 							frames: application.frames,
 							item: displayItem,
 							palette: readPalette(),
-							preserveVisual: replacementActorIds.has(item.id),
-							size: poseOwned ? actor.size : pose.size,
+							preserveVisual: updatePlan.item.preserveVisual,
+							size: updatePlan.item.size,
 							textures,
 						});
-					} else if (progressChanged) {
+					} else if (updatePlan.item.kind === "progress") {
 						yield* updatePixiTileActorProgressFx({
 							actor,
 							frames: application.frames,
@@ -511,18 +494,18 @@ export const createPixiMainSceneReconcilerFx = Effect.fn("createPixiMainSceneRec
 					} else {
 						actor.item = displayItem;
 					}
-					if (crowdAlphaChanged) {
+					if (updatePlan.crowdAlpha !== null) {
 						yield* animator.animateFx({
 							actor,
 							channel: "crowd-opacity",
 							durationMs: runningTransitionDurationMs,
 							ownerKey: `running:${item.id}`,
-							toCrowdAlpha: readPixiTileActorCrowdAlpha(displayItem),
+							toCrowdAlpha: updatePlan.crowdAlpha,
 						});
 					}
-					if (activityEffectChanged) {
+					if (updatePlan.activityEffect !== null) {
 						yield* (
-							displayItem.activityEffect
+							updatePlan.activityEffect === "start"
 								? startPixiTileActorActivityParticlesFx
 								: stopPixiTileActorActivityParticlesFx
 						)({
@@ -530,28 +513,25 @@ export const createPixiMainSceneReconcilerFx = Effect.fn("createPixiMainSceneRec
 							animator,
 						});
 					}
-					if (poseOwned) continue;
-					if (sizeChanged) {
+					if (updatePlan.pose.kind === "owned") continue;
+					if (
+						updatePlan.pose.kind === "travel" &&
+						updatePlan.pose.scaleBeforeTravel !== null
+					) {
 						yield* animator.setFx({
 							actor,
 							channel: "pose",
-							scale: previousDisplayedSize / Math.max(1, actor.size),
+							scale: updatePlan.pose.scaleBeforeTravel,
 							x: actor.container.x,
 							y: actor.container.y,
 						});
 					}
-					const needsTravel =
-						moved ||
-						actor.container.x !== pose.x ||
-						actor.container.y !== pose.y ||
-						sizeChanged;
-					if (needsTravel) {
+					if (updatePlan.pose.kind === "travel") {
 						surface.transientActorLayer.addChild(actor.container);
-						const directLanding = dropSnapshot.landingActorIds.has(item.id);
 						yield* animator.animateFx({
 							actor,
 							channel: "pose",
-							...(directLanding
+							...(updatePlan.pose.directLanding
 								? {
 										curve: {
 											bounce: 0.14,
@@ -560,7 +540,7 @@ export const createPixiMainSceneReconcilerFx = Effect.fn("createPixiMainSceneRec
 									}
 								: {}),
 							durationMs: yield* (
-								directLanding
+								updatePlan.pose.directLanding
 									? readPixiDragSettleDurationMsFx
 									: readPixiTileTravelDurationMsFx
 							)({

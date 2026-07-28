@@ -69,6 +69,10 @@ poses to motion, runs entry or exit effects, and finalizes presentation claims.
 
 - Motion supplies interpolation only. Pixi owns display objects and Effect-owned runtime objects
   own acquisition, cancellation, completion, and teardown.
+- The motion runtime keeps scheduling lanes, bounded completed-cue deduplication, detached swap
+  handoffs, and live target redirects as separate authorities. One cue-local lifecycle record owns
+  only that cue's started phase, revealed input remainder, transient payload actor, and active swap
+  legs, so completion and close cannot partially clear parallel bookkeeping.
 - Rendering is demand-driven. Every visual mutation invalidates the scene; no idle Pixi ticker or
   second animation loop may run.
 - Gameplay feedback animations are intentional product behavior and must not branch on

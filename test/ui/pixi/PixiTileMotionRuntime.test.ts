@@ -806,6 +806,67 @@ describe("Pixi tile motion runtime", () => {
 		Effect.runSync(runtime.closeFx);
 	});
 
+	it("isolates concurrent cue payload lifecycles across completion and close", () => {
+		const { actors, animations, canonicalItems, cue, runtime } = createStackHarness();
+		const secondTarget = createActor("runtime:second-stack-target");
+		secondTarget.item = createItem(secondTarget.item.id, {
+			scope: "board",
+			space: 0,
+			position: {
+				x: 3,
+				y: 0,
+			},
+		});
+		actors.set(secondTarget.item.id, secondTarget);
+		canonicalItems.set(secondTarget.item.id, {
+			...secondTarget.item,
+			quantity: 2,
+		});
+		const secondCue = {
+			...cue,
+			eventIndex: 1,
+			targetActorId: secondTarget.item.id,
+			targetLocation: secondTarget.item.location,
+		} satisfies TileMotionCue;
+		Effect.runSync(
+			runtime.enqueueFx([
+				cue,
+				secondCue,
+			]),
+		);
+		Effect.runSync(runtime.startFx);
+		const firstTravel = animations.find(
+			(animation) => animation.channel === "pose" && animation.ownerKey === "motion:30:0",
+		);
+		const secondTravel = animations.find(
+			(animation) => animation.channel === "pose" && animation.ownerKey === "motion:30:1",
+		);
+		if (firstTravel?.channel !== "pose" || secondTravel?.channel !== "pose") {
+			throw new Error("Expected both concurrent stack payloads.");
+		}
+		const firstDestroy = vi.spyOn(firstTravel.actor.container, "destroy");
+		const secondDestroy = vi.spyOn(secondTravel.actor.container, "destroy");
+
+		samplePoseAnimation(firstTravel, 1);
+		firstTravel.onComplete?.();
+		completeStackMergeVanish({
+			actor: firstTravel.actor,
+			animations,
+		});
+
+		expect(firstTravel.actor.container.destroyed).toBe(true);
+		expect(firstDestroy).toHaveBeenCalledOnce();
+		expect(secondTravel.actor.container.destroyed).toBe(false);
+		expect(secondDestroy).not.toHaveBeenCalled();
+
+		Effect.runSync(runtime.closeFx);
+		Effect.runSync(runtime.closeFx);
+
+		expect(firstDestroy).toHaveBeenCalledOnce();
+		expect(secondTravel.actor.container.destroyed).toBe(true);
+		expect(secondDestroy).toHaveBeenCalledOnce();
+	});
+
 	it("ignores a queued proximity settlement after the pose writer is superseded", async () => {
 		const actor = createActor("runtime:proximity-cancel");
 		actor.container.position.set(0, 0);

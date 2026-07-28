@@ -22,6 +22,7 @@
 			"maxStackSize": 1,
 			"line": {
 				"id": "line:quest:road-repair:complete",
+				"default": true,
 				"title": "Repair Road",
 				"description": "Consumes raw building materials to complete this road repair request.",
 				"runtimeMs": 6000,

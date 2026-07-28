@@ -22,6 +22,7 @@
 			"maxStackSize": 1,
 			"line": {
 				"id": "line:quest:water-carrier:complete",
+				"default": true,
 				"title": "Supply Water",
 				"description": "Consumes settlement supplies to complete this water carrier request.",
 				"runtimeMs": 6000,

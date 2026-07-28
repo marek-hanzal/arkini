@@ -22,6 +22,7 @@
 			"maxStackSize": 1,
 			"line": {
 				"id": "line:quest:tavern-commission:complete",
+				"default": true,
 				"title": "Complete Tavern Commission",
 				"description": "Consumes prepared drinks and payment to complete this tavern commission.",
 				"runtimeMs": 10000,

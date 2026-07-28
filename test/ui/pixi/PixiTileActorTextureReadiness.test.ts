@@ -138,6 +138,7 @@ const createAnimator = () => {
 			cancelChannelFx: () => Effect.void,
 			cancelFx: () => Effect.void,
 			closeFx: Effect.void,
+			isChannelActiveFx: () => Effect.succeed(false),
 			setFx: () => Effect.void,
 		} satisfies PixiActorAnimator,
 	};

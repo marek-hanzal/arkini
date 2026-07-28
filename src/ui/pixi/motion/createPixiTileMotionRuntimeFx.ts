@@ -21,9 +21,10 @@ import type {
 import { finalizePixiTileMotionActorsFx } from "~/ui/pixi/motion/finalizePixiTileMotionActorsFx";
 import { readPixiTileInteractionClaimsFx } from "~/ui/pixi/motion/readPixiTileInteractionClaimsFx";
 import { readPixiTileMotionAnimationKeysFx } from "~/ui/pixi/motion/readPixiTileMotionAnimationKeysFx";
+import { readPixiTileQuantityPresentationFx } from "~/ui/pixi/motion/readPixiTileQuantityPresentationFx";
 import { runPixiTileMotionCueFx } from "~/ui/pixi/motion/runPixiTileMotionCueFx";
 import { chasePixiTileMotionTargetFx } from "~/ui/pixi/motion/chasePixiTileMotionTargetFx";
-import { syncPixiTileMotionQuantitiesFx } from "~/ui/pixi/motion/syncPixiTileMotionQuantitiesFx";
+import { syncPixiTileMotionPresentationFx } from "~/ui/pixi/motion/syncPixiTileMotionPresentationFx";
 import type {
 	PixiTileMotionTargetRedirect,
 	PixiTileMotionTargetRoute,
@@ -33,8 +34,6 @@ import type { PixiTextureStore } from "~/ui/pixi/runtime/createPixiTextureStoreF
 import type { PixiMainSceneSurface } from "~/ui/pixi/scene/PixiMainSceneSurface";
 import type { TileMotionLanesState } from "~/ui/tile/motion/TileMotionLanesState";
 import { readTileMotionActorClaimsFx } from "~/ui/tile/motion/readTileMotionActorClaimsFx";
-import { readUnsettledTileInputSourceQuantitiesFx } from "~/ui/tile/motion/readUnsettledTileInputSourceQuantitiesFx";
-import { readUnsettledTileStackQuantitiesFx } from "~/ui/tile/motion/readUnsettledTileStackQuantitiesFx";
 import { updateTileMotionLanesFx } from "~/ui/tile/motion/updateTileMotionLanesFx";
 
 export namespace createPixiTileMotionRuntimeFx {
@@ -83,6 +82,7 @@ export const createPixiTileMotionRuntimeFx = Effect.fn("createPixiTileMotionRunt
 	let motionLanes: TileMotionLanesState = emptyMotionLanes;
 	const knownCueKeys = new Set<string>();
 	const startedCueKeys = new Set<string>();
+	const revealedInputCueKeys = new Set<string>();
 	const payloadActorByCueKey = new Map<string, PixiTileActor>();
 	const activeSwapLegActorIdsByCueKey = new Map<string, Set<string>>();
 	const detachedSwapLegByActorId = new Map<string, PixiDetachedSwapLeg>();
@@ -151,55 +151,26 @@ export const createPixiTileMotionRuntimeFx = Effect.fn("createPixiTileMotionRunt
 		return actorIds;
 	};
 
-	const readUnsettledQuantities = () => {
-		const quantities = RendererRuntime.runSync(
-			readUnsettledTileStackQuantitiesFx({
+	const readQuantityPresentation = () => {
+		return RendererRuntime.runSync(
+			readPixiTileQuantityPresentationFx({
 				cues: readCues(),
+				readTargetRoute,
+				revealedInputCueKeys,
 			}),
 		);
-		const targetLocationByActorId = new Map(
-			readCues().flatMap((cue) =>
-				cue.kind === "stack"
-					? [
-							[
-								cue.targetActorId,
-								cue.targetLocation,
-							] as const,
-						]
-					: [],
-			),
-		);
-		const routedQuantities = new Map<string, number>();
-		for (const [actorId, quantity] of quantities) {
-			const location = targetLocationByActorId.get(actorId);
-			const routedActorId =
-				location === undefined ? actorId : readTargetRoute(actorId, location).actorId;
-			routedQuantities.set(
-				routedActorId,
-				(routedQuantities.get(routedActorId) ?? 0) + quantity,
-			);
-		}
-		return routedQuantities;
 	};
 
-	const readUnsettledInputSourceQuantities = () =>
+	const syncPresentation = () => {
 		RendererRuntime.runSync(
-			readUnsettledTileInputSourceQuantitiesFx({
-				cues: readCues(),
-			}),
-		);
-
-	const syncQuantities = () => {
-		RendererRuntime.runSync(
-			syncPixiTileMotionQuantitiesFx({
+			syncPixiTileMotionPresentationFx({
 				actorStore,
 				animator,
 				application,
+				quantityPresentationByActorId: readQuantityPresentation(),
 				readPalette,
 				surface,
 				textures,
-				unsettledInputSourceQuantities: readUnsettledInputSourceQuantities(),
-				unsettledQuantities: readUnsettledQuantities(),
 			}),
 		);
 	};
@@ -215,6 +186,7 @@ export const createPixiTileMotionRuntimeFx = Effect.fn("createPixiTileMotionRunt
 
 	function completeCue(cue: TileMotionCue) {
 		const cueKey = readCueKey(cue);
+		revealedInputCueKeys.delete(cueKey);
 		if (closed || !startedCueKeys.delete(cueKey)) return;
 		const payload = payloadActorByCueKey.get(cueKey);
 		payloadActorByCueKey.delete(cueKey);
@@ -252,7 +224,7 @@ export const createPixiTileMotionRuntimeFx = Effect.fn("createPixiTileMotionRunt
 				textures,
 			}),
 		);
-		syncQuantities();
+		syncPresentation();
 		if (
 			cue.kind === "input" &&
 			!stillClaimedActorIds.has(cue.sourceActorId) &&
@@ -316,7 +288,7 @@ export const createPixiTileMotionRuntimeFx = Effect.fn("createPixiTileMotionRunt
 				state: motionLanes,
 			}),
 		);
-		syncQuantities();
+		syncPresentation();
 		startCues();
 	}
 
@@ -352,6 +324,10 @@ export const createPixiTileMotionRuntimeFx = Effect.fn("createPixiTileMotionRunt
 				},
 				onPayloadCreated: (actor) => {
 					payloadActorByCueKey.set(cueKey, actor);
+				},
+				onInputRemainderRevealed: () => {
+					revealedInputCueKeys.add(cueKey);
+					syncPresentation();
 				},
 				readPalette,
 				readSourceSurvives,
@@ -458,7 +434,7 @@ export const createPixiTileMotionRuntimeFx = Effect.fn("createPixiTileMotionRunt
 								},
 								state: motionLanes,
 							});
-							syncQuantities();
+							syncPresentation();
 							startCues();
 						}
 						return true;
@@ -591,7 +567,7 @@ export const createPixiTileMotionRuntimeFx = Effect.fn("createPixiTileMotionRunt
 							animator,
 						});
 					}
-					syncQuantities();
+					syncPresentation();
 					if (detachedSwapLegByActorId.size === 0) startCues();
 					return true;
 				}),
@@ -653,12 +629,11 @@ export const createPixiTileMotionRuntimeFx = Effect.fn("createPixiTileMotionRunt
 							: [],
 					),
 				),
-				unsettledInputSourceQuantities: readUnsettledInputSourceQuantities(),
-				unsettledQuantities: readUnsettledQuantities(),
+				quantityPresentationByActorId: readQuantityPresentation(),
 			}),
 		),
 		startFx: Effect.sync(() => startCues()),
-		syncQuantitiesFx: Effect.sync(() => syncQuantities()),
+		syncPresentationFx: Effect.sync(() => syncPresentation()),
 		closeFx: Effect.gen(function* () {
 			if (closed) return;
 			closed = true;
@@ -684,6 +659,7 @@ export const createPixiTileMotionRuntimeFx = Effect.fn("createPixiTileMotionRunt
 			motionLanes = emptyMotionLanes;
 			knownCueKeys.clear();
 			startedCueKeys.clear();
+			revealedInputCueKeys.clear();
 			payloadActorByCueKey.clear();
 			activeSwapLegActorIdsByCueKey.clear();
 			detachedSwapLegByActorId.clear();

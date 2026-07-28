@@ -557,6 +557,60 @@ describe("readItemDetailSourcesFx", () => {
 		).toBe(ownedBlueprint.id);
 	});
 
+	it("resolves an unowned Bakery through its blueprint to the owned Town Hall source", async () => {
+		const officialConfig = await readArkiniGameConfigSource();
+		const townHall = {
+			id: "runtime:townhall-t3",
+			item: officialConfig.items["producer:townhall-t3"],
+			location: {
+				scope: "board",
+				space: 0,
+				position: {
+					x: 0,
+					y: 0,
+				},
+			},
+			quantity: 1,
+			revision: "revision:townhall-t3",
+		} satisfies RuntimeItemSchema.Type;
+		const result = Effect.runSync(
+			readItemDetailSourcesFx({
+				target: {
+					kind: "definition",
+					itemId: "producer:bakery-t1",
+				},
+				runtime: {
+					cheats: {
+						enabled: false,
+						everEnabled: false,
+						instantGameplay: false,
+					},
+					currentSpace: 0,
+					items: [
+						townHall,
+					],
+					jobs: [],
+				},
+			}).pipe(Effect.provideService(GameConfigFx, officialConfig)),
+		);
+
+		expect(result).toMatchObject({
+			kind: "available",
+			targetDefinitionItemId: "item:blueprint-bakery-t1",
+			source: [
+				{
+					ownerItemId: townHall.id,
+					ownerDefinitionItemId: "producer:townhall-t3",
+					line: [
+						{
+							lineId: "line:townhall-t3:blueprint-bakery-t1",
+						},
+					],
+				},
+			],
+		});
+	});
+
 	it("returns unavailable for a missing configured definition target", () => {
 		expect(
 			readSources({

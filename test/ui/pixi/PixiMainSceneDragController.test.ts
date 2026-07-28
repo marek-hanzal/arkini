@@ -316,6 +316,7 @@ const mountController = ({
 				cancelAnimation(ownerKey);
 			}),
 		closeFx: Effect.void,
+		isChannelActiveFx: () => Effect.succeed(false),
 		setFx: (write) =>
 			Effect.sync(() => {
 				presentationWrites.push(write);
@@ -361,11 +362,10 @@ const mountController = ({
 			interactionClaimByActorId,
 			retainedActorIds: new Set(interactionClaimByActorId.keys()),
 			spawnCueByActorId: new Map(),
-			unsettledInputSourceQuantities: new Map(),
-			unsettledQuantities: new Map(),
+			quantityPresentationByActorId: new Map(),
 		}),
 		startFx: Effect.void,
-		syncQuantitiesFx: Effect.void,
+		syncPresentationFx: Effect.void,
 	} satisfies PixiTileMotionRuntime;
 	const surface = {
 		readActorPoseFx: (actorItem: TileActorItem) =>
@@ -1572,7 +1572,7 @@ describe("Pixi main-scene drag controller", () => {
 		expect(second.onAcceptedDrop).not.toHaveBeenCalled();
 	});
 
-	it("refreshes held feedback and settles a rejected release from its exact pose", async () => {
+	it("settles a rejected release from its exact pose", async () => {
 		const mounted = mountController();
 		const canonicalLayer = {
 			addChild: vi.fn(),
@@ -1585,9 +1585,6 @@ describe("Pixi main-scene drag controller", () => {
 		});
 		mounted.actorEvents.emit("pointerdown", pointer(10, 20));
 		mounted.stage.emit("globalpointermove", pointer(45, 20));
-		previewState.kind = "reject";
-		Effect.runSync(mounted.controller.refreshPreviewFx);
-		expect(mounted.actor.container.cursor).toBe("not-allowed");
 
 		mounted.onDrop.mockResolvedValueOnce({
 			kind: "reject",

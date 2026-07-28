@@ -226,6 +226,10 @@ export const createPixiActorAnimatorFx = Effect.fn("createPixiActorAnimatorFx")(
 				cancelFx: Effect.fn("PixiActorAnimator.cancelFx")((ownerKey) =>
 					Effect.sync(() => cancel(animationsByOwner.get(ownerKey))),
 				),
+				isChannelActiveFx: Effect.fn("PixiActorAnimator.isChannelActiveFx")(
+					(actor, channel) =>
+						Effect.sync(() => channelsByActor.get(actor)?.has(channel) === true),
+				),
 				setFx: Effect.fn("PixiActorAnimator.setFx")((write) =>
 					Effect.gen(function* () {
 						cancelChannel(write.actor, write.channel);

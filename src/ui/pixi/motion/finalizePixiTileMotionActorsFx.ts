@@ -65,7 +65,6 @@ export const finalizePixiTileMotionActorsFx = Effect.fn("finalizePixiTileMotionA
 				continue;
 			}
 			const displayedSize = actor.size * actor.container.scale.x;
-			actor.item = canonical;
 			pose.layer.addChild(actor.container);
 			yield* updatePixiTileActorFx({
 				actor,

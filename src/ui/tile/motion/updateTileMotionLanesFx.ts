@@ -28,6 +28,7 @@ interface TileMotionLaneSettlement {
 	readonly active: ReadonlyArray<TileMotionCue>;
 	readonly claims: ReadonlyArray<TileMotionLaneClaim>;
 	readonly pending: ReadonlyArray<TileMotionCue>;
+	readonly pendingClaims: ReadonlyArray<TileMotionLaneClaim>;
 }
 
 const readTileMotionClaimsFx = Effect.fn("readTileMotionClaimsFx")(
@@ -46,10 +47,14 @@ const canActivateTileMotionCue = (
 	cueClaims: ReadonlyArray<TileMotionLaneClaim>,
 ) =>
 	settlement.active.length < maximumActiveLanes &&
-	cueClaims.every((cueClaim) =>
-		settlement.claims.every(
-			(activeClaim) => !tileMotionLaneClaimsConflict(cueClaim, activeClaim),
-		),
+	cueClaims.every(
+		(cueClaim) =>
+			settlement.claims.every(
+				(activeClaim) => !tileMotionLaneClaimsConflict(cueClaim, activeClaim),
+			) &&
+			settlement.pendingClaims.every(
+				(pendingClaim) => !tileMotionLaneClaimsConflict(cueClaim, pendingClaim),
+			),
 	);
 
 const settleTileMotionLanesFx = Effect.fn("settleTileMotionLanesFx")(function* (
@@ -65,6 +70,7 @@ const settleTileMotionLanesFx = Effect.fn("settleTileMotionLanesFx")(function* (
 				],
 				claims,
 				pending: [] as ReadonlyArray<TileMotionCue>,
+				pendingClaims: [] as ReadonlyArray<TileMotionLaneClaim>,
 			}) satisfies TileMotionLaneSettlement,
 		(current, cue) =>
 			readTileMotionLaneClaimsFx(cue).pipe(
@@ -80,12 +86,17 @@ const settleTileMotionLanesFx = Effect.fn("settleTileMotionLanesFx")(function* (
 									...cueClaims,
 								],
 								pending: current.pending,
+								pendingClaims: current.pendingClaims,
 							}
 						: {
 								...current,
 								pending: [
 									...current.pending,
 									cue,
+								],
+								pendingClaims: [
+									...current.pendingClaims,
+									...cueClaims,
 								],
 							},
 				),

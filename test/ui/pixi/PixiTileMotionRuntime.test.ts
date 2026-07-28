@@ -265,6 +265,7 @@ const createRecordingAnimator = ({
 			canceledOwnerKeys.push(ownerKey);
 		}),
 	closeFx: Effect.void,
+	isChannelActiveFx: () => Effect.succeed(false),
 	setFx: (write) =>
 		Effect.sync(() => {
 			applyPresentationWrite(write);
@@ -336,6 +337,51 @@ const samplePoseAnimation = (
 	animation.actor.container.position.set(pose.x, pose.y);
 	if (pose.scale !== undefined) animation.actor.container.scale.set(pose.scale);
 	return pose;
+};
+
+const completeInputRemainderFlash = ({
+	actor,
+	animations,
+	cancelFadeIn = false,
+	cueKey,
+	expectedQuantity,
+}: {
+	readonly actor: PixiTileActor;
+	readonly animations: ReadonlyArray<PixiActorAnimation>;
+	readonly cancelFadeIn?: boolean;
+	readonly cueKey: string;
+	readonly expectedQuantity: number;
+}) => {
+	const fadeOut = animations.find(
+		(animation) =>
+			animation.actor === actor &&
+			animation.channel === "lifecycle-opacity" &&
+			animation.ownerKey === `motion:${cueKey}:consume` &&
+			animation.toAlpha === 0,
+	);
+	if (fadeOut?.channel !== "lifecycle-opacity") {
+		throw new Error("Expected the input consumption fade-out.");
+	}
+	const previousQuantity = actor.item.quantity;
+	expect(fadeOut.durationMs).toBe(275);
+	fadeOut.onComplete?.();
+	expect(previousQuantity).not.toBe(expectedQuantity);
+	expect(actor.item.quantity).toBe(expectedQuantity);
+	expect(actor.item.badgeCount).toBe(expectedQuantity > 1 ? expectedQuantity : undefined);
+
+	const fadeIn = animations.find(
+		(animation) =>
+			animation.actor === actor &&
+			animation.channel === "lifecycle-opacity" &&
+			animation.ownerKey === `motion:${cueKey}:consume` &&
+			animation.toAlpha === 1,
+	);
+	if (fadeIn?.channel !== "lifecycle-opacity") {
+		throw new Error("Expected the input remainder fade-in.");
+	}
+	expect(fadeIn.durationMs).toBe(375);
+	(cancelFadeIn ? fadeIn.onCancel : fadeIn.onComplete)?.();
+	expect(actor.item.quantity).toBe(expectedQuantity);
 };
 
 const createSwapHarness = ({
@@ -803,8 +849,10 @@ describe("Pixi tile motion runtime", () => {
 		const owner = createActor("runtime:input-owner");
 		source.item = {
 			...createItem(source.item.id, firstBoardLocation),
+			badgeCount: 7,
 			quantity: 7,
 		};
+		source.currentVisual.item = source.item;
 		owner.item = createItem(owner.item.id, secondBoardLocation);
 		source.container.position.set(125, 40);
 		source.container.alpha = 1;
@@ -919,7 +967,7 @@ describe("Pixi tile motion runtime", () => {
 				cue,
 			]),
 		);
-		Effect.runSync(runtime.syncQuantitiesFx);
+		Effect.runSync(runtime.syncPresentationFx);
 		Effect.runSync(runtime.startFx);
 
 		expect(source.item.quantity).toBe(7);
@@ -939,10 +987,13 @@ describe("Pixi tile motion runtime", () => {
 				source.item.id,
 				owner.item.id,
 			]),
-			unsettledInputSourceQuantities: new Map([
+			quantityPresentationByActorId: new Map([
 				[
 					source.item.id,
-					7,
+					{
+						kind: "exact",
+						quantity: 7,
+					},
 				],
 			]),
 		});
@@ -954,7 +1005,8 @@ describe("Pixi tile motion runtime", () => {
 		}
 		expect(firstTravel).toMatchObject({
 			curve: {
-				kind: "linear",
+				bounce: 0.1,
+				kind: "spring",
 			},
 		});
 		const transient = firstTravel.actor;
@@ -978,7 +1030,8 @@ describe("Pixi tile motion runtime", () => {
 		}
 		expect(finalTravel).toMatchObject({
 			curve: {
-				kind: "linear",
+				bounce: 0.1,
+				kind: "spring",
 			},
 			delayMs: 0,
 		});
@@ -992,7 +1045,28 @@ describe("Pixi tile motion runtime", () => {
 		expect(
 			magneticReleases.filter((release) => release.sourceActorId === transient.item.id),
 		).toHaveLength(1);
+		expect(source.item.quantity).toBe(7);
+		completeInputRemainderFlash({
+			actor: transient,
+			animations,
+			cancelFadeIn: true,
+			cueKey: "40:0",
+			expectedQuantity: 2,
+		});
+		expect(Effect.runSync(runtime.readSnapshotFx).quantityPresentationByActorId).toEqual(
+			new Map([
+				[
+					source.item.id,
+					{
+						kind: "exact",
+						quantity: 2,
+					},
+				],
+			]),
+		);
+		Effect.runSync(runtime.syncPresentationFx);
 		expect(source.item.quantity).toBe(2);
+		expect(source.item.badgeCount).toBe(2);
 		expect(source.container.alpha).toBe(1);
 		expect(transient.item.quantity).toBe(2);
 		const returnTravel = animations
@@ -1008,7 +1082,8 @@ describe("Pixi tile motion runtime", () => {
 		}
 		expect(returnTravel).toMatchObject({
 			curve: {
-				kind: "linear",
+				bounce: 0.22,
+				kind: "spring",
 			},
 			delayMs: 0,
 		});
@@ -1047,7 +1122,7 @@ describe("Pixi tile motion runtime", () => {
 		expect(Effect.runSync(runtime.readSnapshotFx)).toMatchObject({
 			interactionClaimByActorId: new Map(),
 			retainedActorIds: new Set(),
-			unsettledInputSourceQuantities: new Map(),
+			quantityPresentationByActorId: new Map(),
 		});
 		expect(
 			animations.filter(
@@ -1074,8 +1149,10 @@ describe("Pixi tile motion runtime", () => {
 		const owner = createActor("runtime:dragged-input-owner");
 		source.item = {
 			...createItem(source.item.id, firstBoardLocation),
+			badgeCount: 8,
 			quantity: 8,
 		};
+		source.currentVisual.item = source.item;
 		owner.item = createItem(owner.item.id, secondBoardLocation);
 		source.container.alpha = 1;
 		source.container.eventMode = "static";
@@ -1101,6 +1178,7 @@ describe("Pixi tile motion runtime", () => {
 				source.item.id,
 				{
 					...source.item,
+					badgeCount: 7,
 					quantity: 7,
 				},
 			],
@@ -1177,6 +1255,14 @@ describe("Pixi tile motion runtime", () => {
 				delayMs: 0,
 				magneticField: createRecordingMagneticField(),
 				onComplete: completed,
+				onRemainderRevealed: () => {
+					source.item = {
+						...source.item,
+						badgeCount: 7,
+						quantity: 7,
+					};
+					source.currentVisual.item = source.item;
+				},
 				onPayloadCreated: (actor) => {
 					transients.push(actor);
 				},
@@ -1190,6 +1276,8 @@ describe("Pixi tile motion runtime", () => {
 		);
 
 		expect(transients).toEqual([]);
+		expect(source.item.quantity).toBe(8);
+		expect(source.item.badgeCount).toBe(8);
 		expect({
 			x: source.container.x + source.offsetLayer.x * source.container.scale.x,
 			y: source.container.y + source.offsetLayer.y * source.container.scale.y,
@@ -1204,6 +1292,12 @@ describe("Pixi tile motion runtime", () => {
 		const delivery = readPoseAnimation(animations, source);
 		samplePoseAnimation(delivery, 1);
 		delivery.onComplete?.();
+		completeInputRemainderFlash({
+			actor: source,
+			animations,
+			cueKey: "42:0",
+			expectedQuantity: 7,
+		});
 
 		const returned = animations
 			.filter(
@@ -1330,6 +1424,7 @@ describe("Pixi tile motion runtime", () => {
 				delayMs: 0,
 				magneticField: createRecordingMagneticField(),
 				onComplete: completed,
+				onRemainderRevealed: () => {},
 				onPayloadCreated: (actor) => {
 					transients.push(actor);
 				},
@@ -1364,13 +1459,28 @@ describe("Pixi tile motion runtime", () => {
 		if (delivery?.channel !== "pose") throw new Error("Expected Inventory input delivery.");
 		expect(delivery).toMatchObject({
 			curve: {
-				kind: "linear",
+				bounce: 0.1,
+				kind: "spring",
 			},
 		});
+		const deliveryTarget = samplePoseAnimation(delivery, 1);
+		const deliveryOvershoot = samplePoseAnimation(delivery, 1.05);
+		expect(deliveryOvershoot.x - deliveryTarget.x).toBeCloseTo(
+			(deliveryTarget.x - openerPose.x) * 0.05,
+		);
+		expect(deliveryOvershoot.y - deliveryTarget.y).toBeCloseTo(
+			(deliveryTarget.y - openerPose.y) * 0.05,
+		);
 		samplePoseAnimation(delivery, 1);
 		delivery.onComplete?.();
 
-		expect(transient.item.quantity).toBe(1);
+		expect(transient.item.quantity).toBe(2);
+		completeInputRemainderFlash({
+			actor: transient,
+			animations,
+			cueKey: "44:0",
+			expectedQuantity: 1,
+		});
 		expect(transient.item.badgeCount).toBeUndefined();
 		const returned = animations
 			.filter(
@@ -1383,7 +1493,8 @@ describe("Pixi tile motion runtime", () => {
 		if (returned?.channel !== "pose") throw new Error("Expected Inventory remainder return.");
 		expect(returned).toMatchObject({
 			curve: {
-				kind: "linear",
+				bounce: 0.22,
+				kind: "spring",
 			},
 			delayMs: 0,
 		});
@@ -1408,7 +1519,8 @@ describe("Pixi tile motion runtime", () => {
 		}
 		expect(continuation).toMatchObject({
 			curve: {
-				kind: "linear",
+				bounce: 0.22,
+				kind: "spring",
 			},
 			delayMs: 0,
 		});
@@ -1968,6 +2080,7 @@ describe("Pixi tile motion runtime", () => {
 		stacked.container.position.set(200, 40);
 		const canonical = {
 			...stacked.item,
+			badgeCount: 3,
 			quantity: 3,
 		};
 		const actors = new Map([
@@ -2064,10 +2177,11 @@ describe("Pixi tile motion runtime", () => {
 		] satisfies TileMotionCue[];
 
 		Effect.runSync(runtime.enqueueFx(cues));
-		Effect.runSync(runtime.syncQuantitiesFx);
+		Effect.runSync(runtime.syncPresentationFx);
 		Effect.runSync(runtime.startFx);
 
 		expect(stacked.item.quantity).toBe(1);
+		expect(stacked.item.badgeCount).toBeUndefined();
 		expect(
 			animations.filter(
 				(animation) =>
@@ -2088,10 +2202,12 @@ describe("Pixi tile motion runtime", () => {
 		const firstTransient = firstTravel.actor;
 		samplePoseAnimation(firstTravel, 1);
 		expect(stacked.item.quantity).toBe(1);
+		expect(stacked.item.badgeCount).toBeUndefined();
 		firstTravel.onComplete?.();
 
 		expect(firstTransient.container.destroyed).toBe(true);
 		expect(stacked.item.quantity).toBe(2);
+		expect(stacked.item.badgeCount).toBe(2);
 		expect(
 			animations.filter(
 				(animation) =>
@@ -2110,10 +2226,12 @@ describe("Pixi tile motion runtime", () => {
 		const secondTransient = secondTravel.actor;
 		samplePoseAnimation(secondTravel, 1);
 		expect(stacked.item.quantity).toBe(2);
+		expect(stacked.item.badgeCount).toBe(2);
 		secondTravel.onComplete?.();
 
 		expect(secondTransient.container.destroyed).toBe(true);
 		expect(stacked.item.quantity).toBe(3);
+		expect(stacked.item.badgeCount).toBe(3);
 		expect(
 			animations.filter(
 				(animation) =>
@@ -2123,7 +2241,9 @@ describe("Pixi tile motion runtime", () => {
 		expect(
 			magneticReleases.filter((release) => release.sourceActorId === secondTransient.item.id),
 		).toHaveLength(1);
-		expect(Effect.runSync(runtime.readSnapshotFx).unsettledQuantities).toEqual(new Map());
+		expect(Effect.runSync(runtime.readSnapshotFx).quantityPresentationByActorId).toEqual(
+			new Map(),
+		);
 		Effect.runSync(runtime.closeFx);
 	});
 
@@ -2164,11 +2284,14 @@ describe("Pixi tile motion runtime", () => {
 				targetLocation: inventory.item.location,
 			}),
 		);
-		expect(Effect.runSync(runtime.readSnapshotFx).unsettledQuantities).toEqual(
+		expect(Effect.runSync(runtime.readSnapshotFx).quantityPresentationByActorId).toEqual(
 			new Map([
 				[
 					inventory.item.id,
-					1,
+					{
+						kind: "subtract",
+						quantity: 1,
+					},
 				],
 			]),
 		);
@@ -2218,12 +2341,14 @@ describe("Pixi tile motion runtime", () => {
 			throw new Error("Expected redirected payload fade-out.");
 		}
 		expect(vanishOpacity.durationMs).toBe(pixiTileActorRemovalFeedbackDurationMs);
-		expect(Effect.runSync(runtime.readSnapshotFx).unsettledQuantities.size).toBe(1);
+		expect(Effect.runSync(runtime.readSnapshotFx).quantityPresentationByActorId.size).toBe(1);
 		vanishOpacity.onComplete?.();
 
 		expect(transient.container.destroyed).toBe(true);
 		expect(destroy).toHaveBeenCalledOnce();
-		expect(Effect.runSync(runtime.readSnapshotFx).unsettledQuantities).toEqual(new Map());
+		expect(Effect.runSync(runtime.readSnapshotFx).quantityPresentationByActorId).toEqual(
+			new Map(),
+		);
 
 		Effect.runSync(runtime.closeFx);
 		Effect.runSync(runtime.closeFx);
@@ -2338,7 +2463,9 @@ describe("Pixi tile motion runtime", () => {
 					]
 				: [],
 		);
-		expect(Effect.runSync(runtime.readSnapshotFx).unsettledQuantities).toEqual(new Map());
+		expect(Effect.runSync(runtime.readSnapshotFx).quantityPresentationByActorId).toEqual(
+			new Map(),
+		);
 	});
 
 	it("supersedes an unfinished spawn fade when the actor disappears at settlement", () => {

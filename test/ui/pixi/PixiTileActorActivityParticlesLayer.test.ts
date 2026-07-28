@@ -153,6 +153,7 @@ describe("Pixi tile actor activity-particle layer", () => {
 			cancelChannelFx: () => Effect.void,
 			cancelFx: () => Effect.void,
 			closeFx: Effect.void,
+			isChannelActiveFx: () => Effect.succeed(false),
 			setFx: () => Effect.void,
 		} satisfies PixiActorAnimator;
 		Effect.runSync(
@@ -259,6 +260,7 @@ describe("Pixi tile actor activity-particle layer", () => {
 			cancelChannelFx: () => Effect.void,
 			cancelFx: () => Effect.void,
 			closeFx: Effect.void,
+			isChannelActiveFx: () => Effect.succeed(false),
 			setFx: () => Effect.void,
 		} satisfies PixiActorAnimator;
 

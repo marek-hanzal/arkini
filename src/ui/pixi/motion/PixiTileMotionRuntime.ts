@@ -1,6 +1,7 @@
 import type { Effect } from "effect";
 
 import type { TileMotionCue } from "~/bridge/tile/motion/TileMotionCue";
+import type { PixiTileQuantityPresentation } from "~/ui/pixi/motion/PixiTileQuantityPresentation";
 import type { PixiTileMotionTargetRedirect } from "~/ui/pixi/motion/PixiTileMotionTargetRoute";
 
 /** Presentation ownership of dragging; ordinary click activation always remains available. */
@@ -19,8 +20,7 @@ export interface PixiTileMotionSnapshot {
 			}
 		>
 	>;
-	readonly unsettledInputSourceQuantities: ReadonlyMap<string, number>;
-	readonly unsettledQuantities: ReadonlyMap<string, number>;
+	readonly quantityPresentationByActorId: ReadonlyMap<string, PixiTileQuantityPresentation>;
 }
 
 export interface PixiTileMotionRuntime {
@@ -31,6 +31,6 @@ export interface PixiTileMotionRuntime {
 	readonly redirectTargetFx: (redirect: PixiTileMotionTargetRedirect) => Effect.Effect<void>;
 	readonly readSnapshotFx: Effect.Effect<PixiTileMotionSnapshot>;
 	readonly startFx: Effect.Effect<void>;
-	readonly syncQuantitiesFx: Effect.Effect<void>;
+	readonly syncPresentationFx: Effect.Effect<void>;
 	readonly closeFx: Effect.Effect<void>;
 }

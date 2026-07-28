@@ -32,6 +32,7 @@ export namespace runPixiTileMotionCueFx {
 		readonly onSwapLegSettled: (actorId: string) => void;
 		readonly onSwapLegStarted: (actorId: string) => void;
 		readonly onPayloadCreated: (actor: PixiTileActor) => void;
+		readonly onInputRemainderRevealed: () => void;
 		readonly readPalette: () => PixiScenePalette;
 		readonly readSourceSurvives: () => boolean;
 		readonly readTargetRoute: (
@@ -55,6 +56,7 @@ export const runPixiTileMotionCueFx = Effect.fn("runPixiTileMotionCueFx")(functi
 	onSwapLegSettled,
 	onSwapLegStarted,
 	onPayloadCreated,
+	onInputRemainderRevealed,
 	readPalette,
 	readSourceSurvives,
 	readTargetRoute,
@@ -137,6 +139,7 @@ export const runPixiTileMotionCueFx = Effect.fn("runPixiTileMotionCueFx")(functi
 									delayMs,
 									magneticField,
 									onComplete,
+									onRemainderRevealed: onInputRemainderRevealed,
 									onPayloadCreated,
 									origin,
 									readPalette,

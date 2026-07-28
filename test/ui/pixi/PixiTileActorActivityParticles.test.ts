@@ -78,6 +78,7 @@ const createAnimator = () => {
 					cancellations.push(animationKey);
 				}),
 			closeFx: Effect.void,
+			isChannelActiveFx: () => Effect.succeed(false),
 			setFx: (write) =>
 				Effect.sync(() => {
 					writes.push(write);

@@ -2,7 +2,7 @@ import { Effect, Option } from "effect";
 import { match } from "ts-pattern";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import { resolveItemFx } from "~/engine/item/fx/resolveItemFx";
+import { GameConfigFx } from "~/engine/game/context/GameConfigFx";
 import { RuntimeFx } from "~/engine/runtime/context/RuntimeFx";
 import { lineRulesFx } from "~/engine/line/fx/lineRulesFx";
 import { resolveLineShowFx } from "~/engine/line/fx/run/resolveLineShowFx";
@@ -225,26 +225,13 @@ interface OrderedSource extends readItemDetailSourcesFx.Source {
 	readonly ownerTitle: string;
 }
 
-/** Finds owned one-hop line owners that produce the inspected canonical item. */
-export const readItemDetailSourcesFx = Effect.fn("readItemDetailSourcesFx")(function* ({
+const readOwnedSourcesFx = Effect.fn("readOwnedItemDetailSourcesFx")(function* ({
 	runtime,
-	target,
-}: readItemDetailSourcesFx.Props) {
-	const targetItem =
-		target.kind === "runtime"
-			? runtime.items.find((candidate) => candidate.id === target.itemId)
-			: undefined;
-	if (target.kind === "runtime" && targetItem === undefined) return unavailable;
-	let targetDefinitionItemId = targetItem?.item.id;
-	if (target.kind === "definition") {
-		const configuredTarget = yield* resolveItemFx({
-			itemId: target.itemId,
-		}).pipe(Effect.option);
-		if (Option.isNone(configuredTarget)) return unavailable;
-		targetDefinitionItemId = configuredTarget.value.id;
-	}
-	if (targetDefinitionItemId === undefined) return unavailable;
-
+	targetDefinitionItemId,
+}: {
+	readonly runtime: RuntimeSchema.Type;
+	readonly targetDefinitionItemId: IdSchema.Type;
+}) {
 	const activeLine = new Set(runtime.jobs.map((job) => `${job.ownerItemId}\u0000${job.lineId}`));
 	const source: OrderedSource[] = [];
 	for (const owner of runtime.items) {
@@ -327,6 +314,55 @@ export const readItemDetailSourcesFx = Effect.fn("readItemDetailSourcesFx")(func
 		const titleOrder = left.ownerTitle.localeCompare(right.ownerTitle);
 		return titleOrder === 0 ? left.ownerItemId.localeCompare(right.ownerItemId) : titleOrder;
 	});
+	return source;
+});
+
+/** Finds owned direct sources, resolving one unowned acquisition item hop when necessary. */
+export const readItemDetailSourcesFx = Effect.fn("readItemDetailSourcesFx")(function* ({
+	runtime,
+	target,
+}: readItemDetailSourcesFx.Props) {
+	const targetItem =
+		target.kind === "runtime"
+			? runtime.items.find((candidate) => candidate.id === target.itemId)
+			: undefined;
+	if (target.kind === "runtime" && targetItem === undefined) return unavailable;
+	const config = yield* GameConfigFx;
+	let targetDefinitionItemId =
+		target.kind === "runtime" ? targetItem?.item.id : config.items[target.itemId]?.id;
+	if (targetDefinitionItemId === undefined) return unavailable;
+	const requestedDefinitionItemId = targetDefinitionItemId;
+
+	let source = yield* readOwnedSourcesFx({
+		runtime,
+		targetDefinitionItemId,
+	});
+	if (target.kind === "definition" && source.length === 0) {
+		for (const candidate of Object.values(config.items)) {
+			const owner = Option.getOrUndefined(yield* isLineOwnerItemFx(candidate));
+			if (owner === undefined || owner.id === targetDefinitionItemId) continue;
+			const lines = yield* readLineOwnerLinesFx(owner);
+			if (
+				!lines.some(
+					(line) =>
+						readMatchingFacts({
+							output: line.output,
+							targetDefinitionItemId: requestedDefinitionItemId,
+						}).length > 0,
+				)
+			) {
+				continue;
+			}
+			const acquiredFrom = yield* readOwnedSourcesFx({
+				runtime,
+				targetDefinitionItemId: owner.id,
+			});
+			if (acquiredFrom.length === 0) continue;
+			targetDefinitionItemId = owner.id;
+			source = acquiredFrom;
+			break;
+		}
+	}
 
 	return {
 		kind: "available",

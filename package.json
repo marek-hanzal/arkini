@@ -12,6 +12,8 @@
 		"arkpack:verify": "tsx cli/arkini.ts arkpack verify",
 		"predev": "npm run game:pack:official && npm run game:pack:demo",
 		"dev": "electron-vite dev",
+		"predev:control": "npm run predev",
+		"dev:control": "ARKINI_DEV_CONTROL=1 electron-vite dev",
 		"build": "tsx cli/arkini.ts desktop build",
 		"preview": "electron-vite preview",
 		"preview:macos": "tsx cli/arkini.ts desktop preview-macos",

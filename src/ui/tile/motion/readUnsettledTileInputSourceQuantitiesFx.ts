@@ -5,6 +5,7 @@ import type { TileMotionCue } from "~/bridge/tile/motion/TileMotionCue";
 export namespace readUnsettledTileInputSourceQuantitiesFx {
 	export interface Props {
 		readonly cues: ReadonlyArray<TileMotionCue>;
+		readonly revealedCueKeys?: ReadonlySet<string>;
 	}
 
 	export type Result = ReadonlyMap<string, number>;
@@ -18,12 +19,17 @@ export namespace readUnsettledTileInputSourceQuantitiesFx {
  */
 export const readUnsettledTileInputSourceQuantitiesFx = Effect.fn(
 	"readUnsettledTileInputSourceQuantitiesFx",
-)(({ cues }: readUnsettledTileInputSourceQuantitiesFx.Props) =>
+)(({ cues, revealedCueKeys = new Set() }: readUnsettledTileInputSourceQuantitiesFx.Props) =>
 	Effect.sync(() => {
 		const quantities = new Map<string, number>();
 		for (const cue of cues) {
 			if (cue.kind !== "input" || quantities.has(cue.sourceActorId)) continue;
-			quantities.set(cue.sourceActorId, cue.previousQuantity);
+			quantities.set(
+				cue.sourceActorId,
+				revealedCueKeys.has(`${cue.sequence}:${cue.eventIndex}`)
+					? cue.resultingQuantity
+					: cue.previousQuantity,
+			);
 		}
 		return quantities as readUnsettledTileInputSourceQuantitiesFx.Result;
 	}),

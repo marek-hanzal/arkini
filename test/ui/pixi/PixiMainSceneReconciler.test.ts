@@ -20,6 +20,7 @@ import type {
 } from "~/ui/pixi/animation/PixiActorAnimator";
 import { burstPixiTileActorAckParticlesFx } from "~/ui/pixi/animation/runPixiTileActorActivityParticlesFx";
 import type { PixiMainSceneDragController } from "~/ui/pixi/drag/PixiMainSceneDragController";
+import { settlePixiMainSceneDraggedActorFx } from "~/ui/pixi/drag/settlePixiMainSceneDraggedActorFx";
 import { createPixiMainSceneDropPresentationFx } from "~/ui/pixi/drop/createPixiMainSceneDropPresentationFx";
 import type { PixiTileMagneticField } from "~/ui/pixi/magnet/PixiTileMagneticField";
 import type { PixiTileMotionRuntime } from "~/ui/pixi/motion/PixiTileMotionRuntime";
@@ -299,6 +300,7 @@ const createActorStore = (actor: PixiTileActor) => {
 
 const createAnimator = () => {
 	const animations: PixiActorAnimation[] = [];
+	const activeChannels = new WeakMap<PixiTileActor, Map<PixiActorAnimationChannel, symbol>>();
 	const canceledActors: PixiTileActor[] = [];
 	const canceledChannels: Array<{
 		readonly actor: PixiTileActor;
@@ -306,6 +308,17 @@ const createAnimator = () => {
 	}> = [];
 	const canceledOwners: string[] = [];
 	const writes: PixiActorPresentationWrite[] = [];
+	const clearChannel = (
+		actor: PixiTileActor,
+		channel: PixiActorAnimationChannel,
+		token?: symbol,
+	) => {
+		const channels = activeChannels.get(actor);
+		if (channels === undefined) return;
+		if (token !== undefined && channels.get(channel) !== token) return;
+		channels.delete(channel);
+		if (channels.size === 0) activeChannels.delete(actor);
+	};
 	return {
 		animations,
 		canceledActors,
@@ -315,14 +328,32 @@ const createAnimator = () => {
 		animator: {
 			animateFx: (animation) =>
 				Effect.sync(() => {
-					animations.push(animation);
+					const token = Symbol();
+					const channels =
+						activeChannels.get(animation.actor) ??
+						new Map<PixiActorAnimationChannel, symbol>();
+					channels.set(animation.channel, token);
+					activeChannels.set(animation.actor, channels);
+					animations.push({
+						...animation,
+						onCancel: () => {
+							clearChannel(animation.actor, animation.channel, token);
+							animation.onCancel?.();
+						},
+						onComplete: () => {
+							clearChannel(animation.actor, animation.channel, token);
+							animation.onComplete?.();
+						},
+					} as PixiActorAnimation);
 				}),
 			cancelActorFx: (actor) =>
 				Effect.sync(() => {
+					activeChannels.delete(actor);
 					canceledActors.push(actor);
 				}),
 			cancelChannelFx: (actor, channel) =>
 				Effect.sync(() => {
+					clearChannel(actor, channel);
 					canceledChannels.push({
 						actor,
 						channel,
@@ -333,8 +364,11 @@ const createAnimator = () => {
 					canceledOwners.push(ownerKey);
 				}),
 			closeFx: Effect.void,
+			isChannelActiveFx: (actor, channel) =>
+				Effect.sync(() => activeChannels.get(actor)?.has(channel) === true),
 			setFx: (write) =>
 				Effect.sync(() => {
+					clearChannel(write.actor, write.channel);
 					writes.push(write);
 					switch (write.channel) {
 						case "pose":
@@ -369,7 +403,6 @@ const createDrag = () => {
 				Effect.sync(() => {
 					detached.push(actor);
 				}),
-			refreshPreviewFx: Effect.void,
 			setInteractionBlockedFx: () => Effect.void,
 		} satisfies PixiMainSceneDragController,
 	};
@@ -385,11 +418,10 @@ const createMotion = () =>
 			interactionClaimByActorId: new Map(),
 			retainedActorIds: new Set(),
 			spawnCueByActorId: new Map(),
-			unsettledInputSourceQuantities: new Map(),
-			unsettledQuantities: new Map(),
+			quantityPresentationByActorId: new Map(),
 		}),
 		startFx: Effect.void,
-		syncQuantitiesFx: Effect.void,
+		syncPresentationFx: Effect.void,
 	}) satisfies PixiTileMotionRuntime;
 
 const createReconcilerHarness = ({
@@ -417,6 +449,18 @@ const createReconcilerHarness = ({
 	const invalidate = vi.fn();
 	const layer = new Container();
 	const transientActorLayer = new Container();
+	const surface = {
+		readActorPoseFx: () =>
+			Effect.succeed(
+				readPose
+					? {
+							layer,
+							...pose,
+						}
+					: null,
+			),
+		transientActorLayer,
+	} as unknown as PixiMainSceneSurface;
 	const dropPresentation = Effect.runSync(createPixiMainSceneDropPresentationFx());
 	const game = {
 		readOrThrow: (query: unknown) => {
@@ -457,18 +501,7 @@ const createReconcilerHarness = ({
 				({
 					success: 0x57d7b2,
 				}) as never,
-			surface: {
-				readActorPoseFx: () =>
-					Effect.succeed(
-						readPose
-							? {
-									layer,
-									...pose,
-								}
-							: null,
-					),
-				transientActorLayer,
-			} as unknown as PixiMainSceneSurface,
+			surface,
 			textures: {} as never,
 		}),
 	);
@@ -481,6 +514,7 @@ const createReconcilerHarness = ({
 		invalidate,
 		layer,
 		reconciler,
+		surface,
 		transientActorLayer,
 	};
 };
@@ -505,10 +539,12 @@ beforeEach(() => {
 describe("Pixi main-scene reconciliation", () => {
 	it("holds an input source at its pre-contact quantity and suppresses early feedback", () => {
 		const previous = createItem("runtime:input-source", boardLocation, {
+			badgeCount: 7,
 			quantity: 7,
 			revision: "revision:input-source:7",
 		});
 		const current = createItem(previous.id, boardLocation, {
+			badgeCount: 2,
 			quantity: 2,
 			revision: "revision:input-source:2",
 		});
@@ -527,13 +563,15 @@ describe("Pixi main-scene reconciliation", () => {
 					"runtime:owner",
 				]),
 				spawnCueByActorId: new Map(),
-				unsettledInputSourceQuantities: new Map([
+				quantityPresentationByActorId: new Map([
 					[
 						previous.id,
-						7,
+						{
+							kind: "exact",
+							quantity: 7,
+						},
 					],
 				]),
-				unsettledQuantities: new Map(),
 			}),
 		} satisfies PixiTileMotionRuntime;
 		const harness = createReconcilerHarness({
@@ -571,6 +609,7 @@ describe("Pixi main-scene reconciliation", () => {
 		Effect.runSync(harness.reconciler.reconcileFx(transition(2)));
 
 		expect(actor.item.quantity).toBe(7);
+		expect(actor.currentVisual.item.badgeCount).toBe(7);
 		expect(
 			harness.animations.some(
 				(animation) =>
@@ -593,8 +632,7 @@ describe("Pixi main-scene reconciliation", () => {
 				interactionClaimByActorId: new Map(),
 				retainedActorIds,
 				spawnCueByActorId: new Map(),
-				unsettledInputSourceQuantities: new Map(),
-				unsettledQuantities: new Map(),
+				quantityPresentationByActorId: new Map(),
 			})),
 		} satisfies PixiTileMotionRuntime;
 		const harness = createReconcilerHarness({
@@ -717,6 +755,114 @@ describe("Pixi main-scene reconciliation", () => {
 		expect(Effect.runSync(harness.dropPresentation.readSnapshotFx).landingActorIds).toEqual(
 			new Set(),
 		);
+	});
+
+	it("does not restart a direct landing when a running job ticks mid-flight", () => {
+		const previous = createItem("runtime:dropped-water", boardLocation);
+		const destination = {
+			...boardLocation,
+			position: {
+				x: 4,
+				y: 3,
+			},
+		};
+		const current = createItem(previous.id, destination);
+		const actor = createActor(previous);
+		const harness = createReconcilerHarness({
+			actor,
+			pose: {
+				size: 80,
+				x: 420,
+				y: 340,
+			},
+		});
+		const generation = Effect.runSync(
+			harness.dropPresentation.beginFx({
+				sourceActorId: previous.id,
+				swapCandidate: null,
+			}),
+		);
+		Effect.runSync(
+			harness.dropPresentation.completeFx({
+				generation,
+				result: {
+					itemId: current.id,
+					kind: "move",
+					location: destination,
+					previousLocation: boardLocation,
+					revision: current.revision,
+				},
+			}),
+		);
+		projectionState.main = [
+			current,
+		];
+
+		Effect.runSync(harness.reconciler.reconcileFx(transition(2)));
+		const landing = harness.animations.find(
+			(animation) => animation.actor === actor && animation.channel === "pose",
+		);
+		projectionState.main = [
+			{
+				...current,
+				activityEffect: true,
+				revision: `${current.revision}:tick`,
+				running: true,
+			},
+		];
+
+		Effect.runSync(harness.reconciler.reconcileFx(transition(3)));
+
+		expect(
+			harness.animations.filter(
+				(animation) => animation.actor === actor && animation.channel === "pose",
+			),
+		).toEqual([
+			landing,
+		]);
+	});
+
+	it("does not restart a rejected-drop return when a running job ticks mid-flight", () => {
+		const current = createItem("runtime:rejected-trash", boardLocation, {
+			itemId: "trash",
+			title: "Trash",
+		});
+		const actor = createActor(current);
+		actor.container.position.set(500, 400);
+		const harness = createReconcilerHarness({
+			actor,
+		});
+		projectionState.main = [
+			current,
+		];
+		Effect.runSync(
+			settlePixiMainSceneDraggedActorFx({
+				actor,
+				animator: harness.animator,
+				surface: harness.surface,
+			}),
+		);
+		const returning = harness.animations.find(
+			(animation) => animation.actor === actor && animation.channel === "pose",
+		);
+		projectionState.main = [
+			{
+				...current,
+				activityEffect: true,
+				revision: `${current.revision}:tick`,
+				running: true,
+			},
+		];
+
+		Effect.runSync(harness.reconciler.reconcileFx(transition(2)));
+
+		expect(
+			harness.animations.filter(
+				(animation) => animation.actor === actor && animation.channel === "pose",
+			),
+		).toEqual([
+			returning,
+		]);
 	});
 
 	it("retains a pending source, then fades it while bursting the Inventory receiver", () => {

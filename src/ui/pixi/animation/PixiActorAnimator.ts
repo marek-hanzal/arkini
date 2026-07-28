@@ -94,6 +94,10 @@ export interface PixiActorAnimator {
 		channel: PixiActorAnimationChannel,
 	) => Effect.Effect<void>;
 	readonly cancelFx: (ownerKey: string) => Effect.Effect<void>;
+	readonly isChannelActiveFx: (
+		actor: PixiTileActor,
+		channel: PixiActorAnimationChannel,
+	) => Effect.Effect<boolean>;
 	readonly setFx: (write: PixiActorPresentationWrite) => Effect.Effect<void>;
 	readonly closeFx: Effect.Effect<void>;
 }

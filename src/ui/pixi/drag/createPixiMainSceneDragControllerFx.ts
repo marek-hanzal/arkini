@@ -562,33 +562,6 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 			detachActorFx: Effect.fn("PixiMainSceneDragController.detachActorFx")((actor) =>
 				Effect.sync(() => detachActor(actor)),
 			),
-			refreshPreviewFx: Effect.sync(() => {
-				const drag = activeDrag;
-				if (drag === null || drag.mode !== "drag" || drag.phase !== "dragging") return;
-				const sourceItem = previewTarget(
-					drag,
-					RendererRuntime.runSync(
-						surface.readDropTargetFx(drag.lastPointerX, drag.lastPointerY),
-					),
-					true,
-				);
-				if (sourceItem === null) {
-					cancelDrag(drag);
-					return;
-				}
-				refreshEligibleAttractionActorIds(drag, sourceItem);
-				RendererRuntime.runSync(
-					updatePixiMainSceneMagneticFieldFx({
-						actor: drag.actor,
-						eligibleAttractionActorIds: drag.eligibleAttractionActorIds,
-						field: magneticField,
-						previewKind: drag.previewKind,
-						sourceDirection: null,
-						sourceItem,
-						targetItem: drag.targetItem,
-					}),
-				);
-			}),
 			setInteractionBlockedFx: Effect.fn(
 				"PixiMainSceneDragController.setInteractionBlockedFx",
 			)((blocked) =>

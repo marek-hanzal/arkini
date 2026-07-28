@@ -120,7 +120,10 @@ gameplay outcome. Missing visual identities degrade to ordinary reconciliation.
   nearby board responders without attracting their own exchange counterpart; a stack payload
   attracts and chases its receiver's live physical pose through distance-aware nonlinear segments.
   Settlement releases the magnetic source. Producer input moves the complete stack to its owner,
-  consumes it at contact, and physically returns any remainder before publishing its quantity.
+  hides it at contact, reveals the committed remainder, and physically returns that same actor.
+- Canonical engine items remain the only gameplay truth. Motion owns one narrow, phase-aware
+  quantity overlay (`exact` input remainder or in-flight stack subtraction); reconciler and
+  animation-triggered refreshes use the same projector, so quantity and badge can never disagree.
 - Accepted consumption presents exact result/event facts: the surviving source dips, a removed
   source fades, and the receiver emits the shared accent particle burst. Drop-result facts cover manual
   stack, producer-input, and Inventory storage commands that do not emit equivalent engine events.

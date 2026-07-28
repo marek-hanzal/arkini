@@ -214,7 +214,7 @@ describe("pure tile motion contracts", () => {
 			}),
 			inputCue({
 				eventIndex: 1,
-				previousQuantity: 2,
+				previousQuantity: 6,
 			}),
 		];
 
@@ -243,6 +243,54 @@ describe("pure tile motion contracts", () => {
 				[
 					"runtime:source",
 					7,
+				],
+			]),
+		);
+		expect(
+			Effect.runSync(
+				readUnsettledTileInputSourceQuantitiesFx({
+					cues,
+					revealedCueKeys: new Set([
+						`${cues[0].sequence}:${cues[0].eventIndex}`,
+					]),
+				}),
+			),
+		).toEqual(
+			new Map([
+				[
+					"runtime:source",
+					6,
+				],
+			]),
+		);
+		expect(
+			Effect.runSync(
+				readUnsettledTileInputSourceQuantitiesFx({
+					cues: cues.slice(1),
+				}),
+			),
+		).toEqual(
+			new Map([
+				[
+					"runtime:source",
+					6,
+				],
+			]),
+		);
+		expect(
+			Effect.runSync(
+				readUnsettledTileInputSourceQuantitiesFx({
+					cues: cues.slice(1),
+					revealedCueKeys: new Set([
+						`${cues[1].sequence}:${cues[1].eventIndex}`,
+					]),
+				}),
+			),
+		).toEqual(
+			new Map([
+				[
+					"runtime:source",
+					5,
 				],
 			]),
 		);
@@ -330,5 +378,50 @@ describe("pure tile motion contracts", () => {
 			],
 			pending: [],
 		});
+	});
+
+	it("does not let a later input bypass an older blocked stack on the same actor", () => {
+		const blocker = inputCue({
+			eventIndex: 0,
+			previousQuantity: 1,
+			sourceActorId: "runtime:producer",
+			targetActorId: "runtime:blocking-owner",
+		});
+		const stack = stackCue({
+			eventIndex: 1,
+			quantity: 1,
+			targetActorId: "runtime:shared",
+		});
+		const input = inputCue({
+			eventIndex: 2,
+			previousQuantity: 6,
+			sourceActorId: "runtime:shared",
+			targetActorId: "runtime:other-owner",
+		});
+
+		const state = Effect.runSync(
+			updateTileMotionLanesFx({
+				action: {
+					cues: [
+						blocker,
+						stack,
+						input,
+					],
+					type: "enqueue",
+				},
+				state: {
+					active: [],
+					pending: [],
+				},
+			}),
+		);
+
+		expect(state.active).toEqual([
+			blocker,
+		]);
+		expect(state.pending).toEqual([
+			stack,
+			input,
+		]);
 	});
 });

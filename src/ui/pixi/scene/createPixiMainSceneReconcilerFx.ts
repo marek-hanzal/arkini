@@ -35,6 +35,7 @@ import { readPixiDragSettleDurationMsFx } from "~/ui/pixi/drag/readPixiDragSettl
 import type { PixiMainSceneDropPresentation } from "~/ui/pixi/drop/PixiMainSceneDropPresentation";
 import type { PixiTileMagneticField } from "~/ui/pixi/magnet/PixiTileMagneticField";
 import type { PixiTileMotionRuntime } from "~/ui/pixi/motion/PixiTileMotionRuntime";
+import { projectPixiTileMotionItem } from "~/ui/pixi/motion/projectPixiTileMotionItem";
 import type { PixiApplicationOwner } from "~/ui/pixi/runtime/PixiApplicationOwner";
 import type { PixiTextureStore } from "~/ui/pixi/runtime/createPixiTextureStoreFx";
 import type { PixiMainSceneReconciler } from "~/ui/pixi/scene/PixiMainSceneReconciler";
@@ -390,21 +391,10 @@ export const createPixiMainSceneReconcilerFx = Effect.fn("createPixiMainSceneRec
 				}
 
 				for (const { item, pose } of visibleItems.values()) {
-					const hiddenQuantity = motionSnapshot.unsettledQuantities.get(item.id) ?? 0;
-					const unsettledInputSourceQuantity =
-						motionSnapshot.unsettledInputSourceQuantities.get(item.id);
-					const displayItem =
-						unsettledInputSourceQuantity !== undefined
-							? {
-									...item,
-									quantity: unsettledInputSourceQuantity,
-								}
-							: hiddenQuantity === 0
-								? item
-								: {
-										...item,
-										quantity: Math.max(1, item.quantity - hiddenQuantity),
-									};
+					const displayItem = projectPixiTileMotionItem(
+						item,
+						motionSnapshot.quantityPresentationByActorId.get(item.id),
+					);
 					const actor = actorStore.actors.get(item.id);
 					if (actor === undefined) {
 						const created = RendererRuntime.runSync(
@@ -475,7 +465,9 @@ export const createPixiMainSceneReconcilerFx = Effect.fn("createPixiMainSceneRec
 					const progressChanged = actor.item.progressRatio !== displayItem.progressRatio;
 					const sizeChanged = actor.size !== pose.size;
 					const poseOwned =
-						actor.dragging || motionSnapshot.interactionClaimByActorId.has(item.id);
+						actor.dragging ||
+						motionSnapshot.interactionClaimByActorId.has(item.id) ||
+						(yield* animator.isChannelActiveFx(actor, "pose"));
 					const crowdAlphaChanged =
 						readPixiTileActorCrowdAlpha(actor.item) !==
 						readPixiTileActorCrowdAlpha(displayItem);
@@ -597,9 +589,8 @@ export const createPixiMainSceneReconcilerFx = Effect.fn("createPixiMainSceneRec
 					inventoryActorIds,
 					mainActorIds: new Set(nextItems.map((item) => item.id)),
 				});
-				yield* drag.refreshPreviewFx;
 				yield* magneticField.pruneFx;
-				yield* motion.syncQuantitiesFx;
+				yield* motion.syncPresentationFx;
 				yield* motion.startFx;
 			},
 		);

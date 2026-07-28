@@ -36,6 +36,7 @@ export const readPixiTileMotionAnimationKeysFx = Effect.fn("readPixiTileMotionAn
 						kind: "input",
 					},
 					() => [
+						`motion:${cueKey}:consume`,
 						`motion:${cueKey}`,
 					],
 				)

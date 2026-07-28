@@ -288,6 +288,7 @@ describe("Pixi actor animator", () => {
 		const canceled = vi.fn();
 		const completed = vi.fn();
 
+		expect(Effect.runSync(animator.isChannelActiveFx(actor, "lifecycle-opacity"))).toBe(false);
 		Effect.runSync(
 			animator.animateFx({
 				actor,
@@ -298,10 +299,12 @@ describe("Pixi actor animator", () => {
 				toAlpha: 0,
 			}),
 		);
+		expect(Effect.runSync(animator.isChannelActiveFx(actor, "lifecycle-opacity"))).toBe(true);
 		tweens[0]?.complete();
 
 		expect(completed).toHaveBeenCalledOnce();
 		expect(canceled).not.toHaveBeenCalled();
+		expect(Effect.runSync(animator.isChannelActiveFx(actor, "lifecycle-opacity"))).toBe(false);
 		Effect.runSync(animator.cancelActorFx(actor));
 		expect(canceled).not.toHaveBeenCalled();
 	});

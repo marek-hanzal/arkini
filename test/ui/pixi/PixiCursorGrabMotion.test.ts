@@ -51,6 +51,7 @@ const createFixture = (failSpringAt: number | null = null) => {
 		cancelChannelFx: () => Effect.void,
 		cancelFx: () => Effect.void,
 		closeFx: Effect.void,
+		isChannelActiveFx: () => Effect.succeed(false),
 		setFx: (write) =>
 			Effect.sync(() => {
 				presentationWrites.push(write);

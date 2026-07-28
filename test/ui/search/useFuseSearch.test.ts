@@ -151,4 +151,41 @@ describe("useFuseSearch", () => {
 		expect(container.textContent).toBe("second");
 		expect(fuseState.constructionCount).toBe(2);
 	});
+
+	it("returns only authored exact-term matches before fuzzy results", async () => {
+		const container = document.createElement("div");
+		document.body.append(container);
+		const root = createRoot(container);
+		roots.push(root);
+
+		await act(async () => {
+			root.render(
+				createElement(Harness, {
+					candidates: [
+						{
+							identity: "exact:first",
+							terms: [
+								"Bakery I Blueprint",
+							],
+						},
+						{
+							identity: "fuzzy",
+							terms: [
+								"Blueprint: Bakery I",
+							],
+						},
+						{
+							identity: "exact:second",
+							terms: [
+								" bakery i blueprint ",
+							],
+						},
+					],
+					query: "BAKERY I BLUEPRINT",
+				}),
+			);
+		});
+
+		expect(container.textContent).toBe("exact:first,exact:second");
+	});
 });

@@ -48,9 +48,9 @@ interface ActiveDelivery {
 	stage:
 		| "awaiting-return-geometry"
 		| "awaiting-travel-geometry"
-		| "consuming"
 		| "contact-fade-in"
 		| "contact-fade-out"
+		| "exiting"
 		| "settling"
 		| "traveling";
 	target: PixiTileActorPose | null;
@@ -89,7 +89,7 @@ export const createPixiDeliveryMotionRuntimeFx = Effect.fn("createPixiDeliveryMo
 		const activeByItemId = new Map<string, ActiveDelivery>();
 		let closed = false;
 
-		const destroyConsumedActorFx = Effect.fn("destroyConsumedDeliveryActorFx")(function* (
+		const destroySettledActorFx = Effect.fn("destroySettledDeliveryActorFx")(function* (
 			itemId: string,
 			active: ActiveDelivery,
 		) {
@@ -279,14 +279,14 @@ export const createPixiDeliveryMotionRuntimeFx = Effect.fn("createPixiDeliveryMo
 						yield* drag.attachActorFx(active.actor);
 						continue;
 					}
-					if (active.stage === "consuming") continue;
-					if (active.delivery.phase === "outbound" && active.stage === "settling") {
-						active.stage = "consuming";
+					if (active.stage === "exiting") continue;
+					if (active.stage === "settling") {
+						active.stage = "exiting";
 						let settled = false;
 						const settle = () => {
 							if (settled) return;
 							settled = true;
-							RendererRuntime.runSync(destroyConsumedActorFx(itemId, active));
+							RendererRuntime.runSync(destroySettledActorFx(itemId, active));
 						};
 						yield* startPixiTileActorRemovalFeedbackFx({
 							actor: active.actor,
@@ -296,7 +296,7 @@ export const createPixiDeliveryMotionRuntimeFx = Effect.fn("createPixiDeliveryMo
 						});
 						continue;
 					}
-					yield* destroyConsumedActorFx(itemId, active);
+					yield* destroySettledActorFx(itemId, active);
 				}
 
 				for (const delivery of deliveries) {

@@ -9,6 +9,7 @@ import type { LineRunPlanSchema } from "~/engine/line/schema/run/LineRunPlanSche
 import { readOutputMaximumQuantitiesFx } from "~/engine/output/fx/readOutputMaximumQuantitiesFx";
 import { readRuntimeItemByIdFx } from "~/engine/runtime/read/readRuntimeItemByIdFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import { applyFinalChargePayerNetMaximumOutputFx } from "./applyFinalChargePayerNetMaximumOutputFx";
 import {
 	adjustLineNetMaximumOutputQuantity,
 	clampLineNetMaximumOutputQuantities,
@@ -69,15 +70,10 @@ export const readPlannedLineNetMaximumOutputQuantitiesFx = Effect.fn(
 		});
 		const remainingCharges = yield* readItemRemainingChargesFx(payer);
 		if (remainingCharges !== cost) continue;
-		if (payer.item.charges?.output !== undefined) {
-			const lifecycleOutput = yield* readOutputMaximumQuantitiesFx({
-				output: payer.item.charges.output,
-			});
-			for (const [itemId, quantity] of lifecycleOutput) {
-				adjustLineNetMaximumOutputQuantity(quantities, itemId, quantity);
-			}
-		}
-		adjustLineNetMaximumOutputQuantity(quantities, payer.item.id, -1);
+		yield* applyFinalChargePayerNetMaximumOutputFx({
+			payer: payer.item,
+			quantities,
+		});
 	}
 
 	return clampLineNetMaximumOutputQuantities(quantities);

@@ -74,6 +74,161 @@ const item = {
 };
 
 describe("PixiDeliveryMotionRuntime", () => {
+	it("fades concurrent deliveries after they settle back into Inventory", () => {
+		const firstItem = {
+			...item,
+			id: "runtime:returning-water",
+			revision: "revision:returning-water",
+		};
+		const secondItem = {
+			...item,
+			id: "runtime:returning-stone",
+			itemId: "stone",
+			revision: "revision:returning-stone",
+			sourceUrl: "resource:stone",
+			title: "Stone",
+		};
+		const createActor = (deliveryItem: typeof firstItem) => {
+			const container = new Container();
+			container.position.set(0, 0);
+			return {
+				container,
+				instanceId: `actor:${deliveryItem.id}`,
+				item: deliveryItem,
+				lifecycleDurationMs: 0,
+				lifecycleFadeStarted: false,
+				lifecycleIntentGeneration: 0,
+				lifecycleNotBeforeMs: 0,
+				lifecycleTargetAlpha: 1,
+				onPointerDown: null,
+				size: 80,
+			} as unknown as PixiTileActor;
+		};
+		const firstActor = createActor(firstItem);
+		const secondActor = createActor(secondItem);
+		const actors = new Map([
+			[
+				firstItem.id,
+				firstActor,
+			],
+			[
+				secondItem.id,
+				secondActor,
+			],
+		]);
+		const animations: PixiActorAnimation[] = [];
+		const destroyed: string[] = [];
+		const animator = {
+			animateFx: (animation: PixiActorAnimation) =>
+				Effect.sync(() => {
+					animations.push(animation);
+				}),
+			cancelActorFx: () => Effect.void,
+			cancelChannelFx: () => Effect.void,
+			cancelFx: () => Effect.void,
+			closeFx: Effect.void,
+			isChannelActiveFx: () => Effect.succeed(false),
+			setFx: () => Effect.void,
+		} satisfies PixiActorAnimator;
+		const run = vi.fn(() => Promise.resolve(undefined));
+		const runtime = Effect.runSync(
+			createPixiDeliveryMotionRuntimeFx({
+				actorStore: {
+					actors,
+					canonicalItems: new Map(),
+					destroyExitingActorFx: (actor: PixiTileActor) =>
+						Effect.sync(() => {
+							destroyed.push(actor.item.id);
+							actor.container.destroy();
+						}),
+					releaseActorFx: (actorId: string) =>
+						Effect.sync(() => {
+							const actor = actors.get(actorId) ?? null;
+							actors.delete(actorId);
+							return actor;
+						}),
+				} as unknown as PixiMainSceneActorStore,
+				animator,
+				application: {
+					frames: {
+						invalidateFx: Effect.void,
+					},
+				} as never,
+				drag: {
+					attachActorFx: () => Effect.void,
+					detachActorFx: () => Effect.void,
+				} as unknown as PixiMainSceneDragController,
+				game: {
+					reportCriticalFailure: vi.fn(),
+					run,
+				} as unknown as GameEngine,
+				magneticField: {
+					closeFx: Effect.void,
+					pruneFx: Effect.void,
+					releaseFx: () => Effect.void,
+					releaseSourcesFx: () => Effect.void,
+					resetFx: Effect.void,
+					updateFx: () => Effect.void,
+				},
+				particleTextures: {} as never,
+				readPalette: () => ({}) as never,
+				surface: {
+					readLocationPoseFx: (location: typeof origin) =>
+						Effect.succeed({
+							layer: new Container(),
+							size: 80,
+							x: location.position.x * 100,
+							y: 0,
+						}),
+					transientActorLayer: new Container(),
+				} as unknown as PixiMainSceneSurface,
+				textures: {} as never,
+			}),
+		);
+		const deliveries = [
+			{
+				from: target,
+				generation: 1,
+				item: firstItem,
+				phase: "returning",
+				to: origin,
+			},
+			{
+				from: target,
+				generation: 1,
+				item: secondItem,
+				phase: "returning",
+				to: origin,
+			},
+		] satisfies TileDelivery[];
+
+		Effect.runSync(runtime.syncFx(deliveries));
+		const travels = animations.filter((animation) => animation.channel === "pose");
+		expect(travels).toHaveLength(2);
+		for (const travel of travels) {
+			travel.onComplete?.();
+		}
+		expect(run).toHaveBeenCalledTimes(2);
+
+		Effect.runSync(runtime.syncFx([]));
+		const fades = animations.filter(
+			(animation) => animation.channel === "lifecycle-opacity" && animation.toAlpha === 0,
+		);
+		expect(fades).toHaveLength(2);
+		expect(destroyed).toEqual([]);
+		expect(actors.size).toBe(2);
+
+		for (const fade of fades) {
+			fade.onComplete?.();
+		}
+		expect(destroyed).toEqual([
+			firstItem.id,
+			secondItem.id,
+		]);
+		expect(actors.size).toBe(0);
+		expect(Effect.runSync(runtime.readSnapshotFx).retainedActorIds).toEqual(new Set());
+	});
+
 	it("adopts one actor, turns from its live pose on override, and settles each generation once", () => {
 		const container = new Container();
 		container.position.set(200, 0);

@@ -2,6 +2,7 @@ import { useAtom, useAtomValue } from "@effect/atom-react";
 import { Cause } from "effect";
 import * as AsyncResult from "effect/unstable/reactivity/AsyncResult";
 
+import { ArkiniAppVersion } from "../../../shared/ArkiniAppMetadata";
 import { ArkiniArkpack } from "~/bridge/arkpack/ArkiniArkpack";
 import { useArkpacks } from "~/bridge/arkpack/useArkpacks";
 import { Button, ButtonLink, PrimaryButton, PrimaryButtonLink } from "~/ui/button/Button";
@@ -87,6 +88,12 @@ export const MainMenu = () => {
 			>
 				{exitPending ? "Exiting…" : "Exit"}
 			</Button>
+			<p
+				className="pt-1 text-center text-xs text-subtle"
+				data-ui="ArkiniAppVersion"
+			>
+				v{ArkiniAppVersion}
+			</p>
 			{catalogState.type === "failed" ? (
 				<p className="text-center text-sm text-danger">
 					Catalog failed: {String(catalogState.error)}

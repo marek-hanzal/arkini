@@ -5,6 +5,7 @@ import { RegistryContext } from "@effect/atom-react";
 import { RouterProvider } from "@tanstack/react-router";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
+import { ArkiniWindowTitle } from "../shared/ArkiniAppMetadata";
 import { configureArkpackCatalogFx } from "~/bridge/arkpack/configureArkpackCatalogFx";
 import { createArkpackCatalogFx } from "~/bridge/arkpack/createArkpackCatalogFx";
 import { configureRendererLifecycleFx } from "~/bridge/lifecycle/configureRendererLifecycleFx";
@@ -24,6 +25,7 @@ const rootElement = document.getElementById("root");
 if (!rootElement) {
 	throw new Error("Arkini root element is missing.");
 }
+document.title = ArkiniWindowTitle;
 
 /**
  * Renderer composition root. Every owner built here has process lifetime and

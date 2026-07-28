@@ -3,6 +3,7 @@ import { ipcMain } from "electron";
 import { EventEmitter } from "node:events";
 import { Cause, Effect, Exit, Option } from "effect";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { ArkiniWindowTitle } from "../../shared/ArkiniAppMetadata";
 import { ArkiniElectronApi } from "../../electron/contract/ArkiniElectronApi";
 import { createMainWindowFx } from "../../electron/main/createMainWindowFx";
 import { ElectronMainError } from "../../electron/main/ElectronMainError";
@@ -113,9 +114,13 @@ describe("createMainWindowFx", () => {
 
 		const window = electronState.windows[0] as BrowserWindow & {
 			readonly destroy: ReturnType<typeof vi.fn>;
+			readonly options: {
+				readonly title?: string;
+			};
 			readonly show: ReturnType<typeof vi.fn>;
 			readonly webContents: WebContents;
 		};
+		expect(window.options.title).toBe(ArkiniWindowTitle);
 		expect(window.destroy).toHaveBeenCalledOnce();
 		expect(window.isDestroyed()).toBe(true);
 		expect(window.show).not.toHaveBeenCalled();

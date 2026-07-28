@@ -13,6 +13,7 @@ import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { ArkiniAppVersion } from "../../../shared/ArkiniAppMetadata";
 import type { ArkpackCatalog } from "~/bridge/arkpack/ArkpackCatalog";
 import { ArkpackCatalogOwnerAtom } from "~/bridge/arkpack/ArkpackCatalogOwnerAtom";
 import { RendererLifecycleOwnerAtom } from "~/bridge/lifecycle/RendererLifecycleOwnerAtom";
@@ -187,6 +188,9 @@ describe("MainMenu", () => {
 		expect(container.textContent).toContain("Arkpacks");
 		expect(container.textContent).toContain("Settings");
 		expect(container.textContent).toContain("About");
+		expect(
+			container.querySelector<HTMLElement>('[data-ui="ArkiniAppVersion"]')?.textContent,
+		).toBe(`v${ArkiniAppVersion}`);
 
 		const exit = Array.from(container.querySelectorAll("button")).find(
 			(button) => button.textContent === "Exit",

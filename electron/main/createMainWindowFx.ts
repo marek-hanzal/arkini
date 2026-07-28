@@ -1,6 +1,7 @@
 import { BrowserWindow, ipcMain, screen } from "electron";
 import { fileURLToPath } from "node:url";
 import { Effect, Exit } from "effect";
+import { ArkiniWindowTitle } from "../../shared/ArkiniAppMetadata";
 import { calculateInitialWindowBoundsFx } from "./calculateInitialWindowBoundsFx";
 import { ElectronMainError } from "./ElectronMainError";
 import { registerControlledWindowCloseFx } from "./registerControlledWindowCloseFx";
@@ -23,6 +24,7 @@ export const createMainWindowFx = Effect.fn("createMainWindowFx")(
 			const window = new BrowserWindow({
 				...bounds,
 				show: false,
+				title: ArkiniWindowTitle,
 				backgroundColor: "#000000",
 				webPreferences: {
 					preload: fileURLToPath(new URL("../preload/index.cjs", import.meta.url)),

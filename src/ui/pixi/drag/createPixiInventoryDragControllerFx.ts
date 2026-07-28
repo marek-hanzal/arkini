@@ -490,6 +490,14 @@ export const createPixiInventoryDragControllerFx = Effect.fn("createPixiInventor
 					};
 					actor.onPointerDown = onPointerDown;
 					actor.container.on("pointerdown", onPointerDown);
+					actor.container.eventMode = "static";
+					actor.container.cursor = RendererRuntime.runSync(
+						readPixiTileActorCursorFx({
+							phase: "idle",
+							previewKind: null,
+							running: actor.item.running,
+						}),
+					);
 				}),
 			),
 			cancelInteractionFx: Effect.sync(cancelInteraction),

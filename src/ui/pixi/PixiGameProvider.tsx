@@ -2,7 +2,6 @@ import { type PropsWithChildren, useEffect, useMemo, useRef } from "react";
 
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import { PixiGameRuntimeContext } from "~/ui/pixi/PixiGameRuntimeContext";
-import { createTileSceneHandoffStoreFx } from "~/ui/pixi/handoff/createTileSceneHandoffStoreFx";
 import { createPixiGameInteractionControlFx } from "~/ui/pixi/runtime/createPixiGameInteractionControlFx";
 import { createPixiTextureStoreFx } from "~/ui/pixi/runtime/createPixiTextureStoreFx";
 
@@ -14,7 +13,6 @@ import { createPixiTextureStoreFx } from "~/ui/pixi/runtime/createPixiTextureSto
  * provider generation still uses.
  */
 export const PixiGameProvider = ({ children }: PropsWithChildren) => {
-	const handoffs = useMemo(() => RendererRuntime.runSync(createTileSceneHandoffStoreFx()), []);
 	const interaction = useMemo(
 		() => RendererRuntime.runSync(createPixiGameInteractionControlFx()),
 		[],
@@ -22,12 +20,10 @@ export const PixiGameProvider = ({ children }: PropsWithChildren) => {
 	const textures = useMemo(() => RendererRuntime.runSync(createPixiTextureStoreFx()), []);
 	const capabilities = useMemo(
 		() => ({
-			handoffs,
 			interaction,
 			textures,
 		}),
 		[
-			handoffs,
 			interaction,
 			textures,
 		],
@@ -38,7 +34,6 @@ export const PixiGameProvider = ({ children }: PropsWithChildren) => {
 		return () => {
 			queueMicrotask(() => {
 				if (effectGeneration.current !== generation) return;
-				RendererRuntime.runSync(handoffs.closeFx);
 				RendererRuntime.runSync(interaction.closeFx);
 				void RendererRuntime.runPromise(textures.closeFx).catch((cause) => {
 					console.error("Pixi texture store failed to close.", cause);
@@ -46,7 +41,6 @@ export const PixiGameProvider = ({ children }: PropsWithChildren) => {
 			});
 		};
 	}, [
-		handoffs,
 		interaction,
 		textures,
 	]);

@@ -9,6 +9,7 @@ import { destroyPixiTileActorFx } from "~/ui/pixi/actor/destroyPixiTileActorFx";
 import { updatePixiTileActorFx } from "~/ui/pixi/actor/updatePixiTileActorFx";
 import type { PixiActorAnimator } from "~/ui/pixi/animation/PixiActorAnimator";
 import { startPixiTileActorFadeInFx } from "~/ui/pixi/animation/startPixiTileActorFadeInFx";
+import { restorePixiTileActorRemovalFeedbackFx } from "~/ui/pixi/animation/startPixiTileActorRemovalFeedbackFx";
 import { startPixiTileActorVanishFeedbackFx } from "~/ui/pixi/animation/startPixiTileActorVanishFeedbackFx";
 import type { PixiScenePalette } from "~/ui/pixi/appearance/PixiScenePalette";
 import type { PixiTileMagneticField } from "~/ui/pixi/magnet/PixiTileMagneticField";
@@ -32,7 +33,7 @@ export namespace runPixiStackMotionFx {
 		readonly delayMs: number;
 		readonly magneticField: PixiTileMagneticField;
 		readonly onComplete: () => void;
-		readonly onTransientCreated: (actor: PixiTileActor) => void;
+		readonly onPayloadCreated: (actor: PixiTileActor) => void;
 		readonly origin: PixiTileActorPose;
 		readonly readPalette: () => PixiScenePalette;
 		readonly readTargetRoute: (
@@ -45,7 +46,7 @@ export namespace runPixiStackMotionFx {
 	}
 }
 
-/** Creates and animates one transient stack payload without owning lane settlement. */
+/** Animates a consumed source actor or an identity-free produced stack payload. */
 export const runPixiStackMotionFx = Effect.fn("runPixiStackMotionFx")(function* ({
 	actorStore,
 	animator,
@@ -55,7 +56,7 @@ export const runPixiStackMotionFx = Effect.fn("runPixiStackMotionFx")(function* 
 	delayMs,
 	magneticField,
 	onComplete,
-	onTransientCreated,
+	onPayloadCreated,
 	origin,
 	readPalette,
 	readTargetRoute,
@@ -70,56 +71,72 @@ export const runPixiStackMotionFx = Effect.fn("runPixiStackMotionFx")(function* 
 		onComplete();
 		return;
 	}
-	const transient = yield* createPixiTileActorFx({
-		frames: application.frames,
-		item: {
-			...canonical,
-			id: `motion:${cueKey}`,
-			quantity: cue.quantity,
-		},
-		palette: readPalette(),
-		textures,
-	});
-	transient.container.eventMode = "none";
-	onTransientCreated(transient);
-	surface.transientActorLayer.addChild(transient.container);
+	const candidateSource = actorStore.actors.get(cue.originActorId);
+	const source =
+		candidateSource?.item.itemId === cue.canonicalItemId &&
+		!actorStore.canonicalItems.has(cue.originActorId)
+			? candidateSource
+			: null;
+	const payload =
+		source ??
+		(yield* createPixiTileActorFx({
+			frames: application.frames,
+			item: {
+				...canonical,
+				id: `motion:${cueKey}`,
+				quantity: cue.quantity,
+			},
+			palette: readPalette(),
+			textures,
+		}));
+	if (source !== null) {
+		yield* restorePixiTileActorRemovalFeedbackFx({
+			actor: source,
+			animator,
+		});
+	}
+	payload.container.eventMode = "none";
+	if (source === null) onPayloadCreated(payload);
+	surface.transientActorLayer.addChild(payload.container);
 	yield* updatePixiTileActorFx({
-		actor: transient,
+		actor: payload,
 		animator,
 		frames: application.frames,
-		item: transient.item,
+		item: payload.item,
 		palette: readPalette(),
 		size: target.size,
 		textures,
 	});
-	yield* animator.setFx({
-		actor: transient,
-		alpha: 0,
-		channel: "lifecycle-opacity",
-	});
-	yield* animator.setFx({
-		actor: transient,
-		channel: "pose",
-		scale: origin.size / Math.max(1, transient.size),
-		x: origin.x,
-		y: origin.y,
-	});
-	yield* startPixiTileActorFadeInFx({
-		actor: transient,
-		animator,
-		delayMs,
-	});
+	if (source === null) {
+		yield* animator.setFx({
+			actor: payload,
+			alpha: 0,
+			channel: "lifecycle-opacity",
+		});
+		yield* animator.setFx({
+			actor: payload,
+			channel: "pose",
+			scale: origin.size / Math.max(1, payload.size),
+			x: origin.x,
+			y: origin.y,
+		});
+		yield* startPixiTileActorFadeInFx({
+			actor: payload,
+			animator,
+			delayMs,
+		});
+	}
 	const readCurrentRoute = () => readTargetRoute(cue.targetActorId, cue.targetLocation);
 	const readLiveTarget = () => {
 		const route = readCurrentRoute();
 		return readPixiLiveActorContactPose({
 			actorId: route.actorId,
 			actors: actorStore.actors,
-			movingActorSize: transient.size,
+			movingActorSize: payload.size,
 		});
 	};
 	const magneticProjector = yield* createPixiTileMotionMagneticProjectorFx({
-		actor: transient,
+		actor: payload,
 		attractedActorId: cue.targetActorId,
 		eligibleAttractionActorIds: new Set([
 			cue.targetActorId,
@@ -136,7 +153,7 @@ export const runPixiStackMotionFx = Effect.fn("runPixiStackMotionFx")(function* 
 		},
 	});
 	yield* chasePixiTileMotionTargetFx({
-		actor: transient,
+		actor: payload,
 		animator,
 		delayMs,
 		fallbackTarget: target,
@@ -156,11 +173,13 @@ export const runPixiStackMotionFx = Effect.fn("runPixiStackMotionFx")(function* 
 				const settle = () => {
 					if (settled) return;
 					settled = true;
+					RendererRuntime.runSync(animator.cancelActorFx(payload));
+					RendererRuntime.runSync(destroyPixiTileActorFx(payload));
 					onComplete();
 				};
 				RendererRuntime.runSync(
 					startPixiTileActorVanishFeedbackFx({
-						actor: transient,
+						actor: payload,
 						animator,
 						onCancel: settle,
 						onComplete: settle,
@@ -168,8 +187,8 @@ export const runPixiStackMotionFx = Effect.fn("runPixiStackMotionFx")(function* 
 				);
 				return;
 			}
-			RendererRuntime.runSync(animator.cancelActorFx(transient));
-			RendererRuntime.runSync(destroyPixiTileActorFx(transient));
+			RendererRuntime.runSync(animator.cancelActorFx(payload));
+			RendererRuntime.runSync(destroyPixiTileActorFx(payload));
 			onComplete();
 		},
 		ownerKey: `motion:${cueKey}`,

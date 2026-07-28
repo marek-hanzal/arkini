@@ -25,7 +25,7 @@ export const PixiBoardToolbarSurface = () => {
 	const gameMenu = useGameMenuControl();
 	const itemDetail = useItemDetailControl();
 	const navigate = useNavigate();
-	const { handoffs, interaction, textures } = usePixiGameRuntime();
+	const { interaction, textures } = usePixiGameRuntime();
 	const [startLineState, runStartLine] = useAtom(TileDefaultLineCommandAtom(game));
 	const runDrop = useAtomSet(runTileDropAtom(game), {
 		mode: "promise",
@@ -152,7 +152,6 @@ export const PixiBoardToolbarSurface = () => {
 		void RendererRuntime.runPromise(
 			createPixiMainSceneRuntimeFx({
 				game,
-				handoffs,
 				host,
 				onActivate: activate,
 				onDrop: runDrop,
@@ -192,7 +191,6 @@ export const PixiBoardToolbarSurface = () => {
 	}, [
 		activate,
 		game,
-		handoffs,
 		interaction,
 		runDrop,
 		textures,

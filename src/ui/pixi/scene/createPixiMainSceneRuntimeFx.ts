@@ -14,7 +14,6 @@ import { createPixiCursorGrabMotionFx } from "~/ui/pixi/drag/createPixiCursorGra
 import { createPixiMainSceneDragControllerFx } from "~/ui/pixi/drag/createPixiMainSceneDragControllerFx";
 import { createPixiMainSceneDropPresentationFx } from "~/ui/pixi/drop/createPixiMainSceneDropPresentationFx";
 import { createPixiMainSceneDropSubmissionFx } from "~/ui/pixi/drop/createPixiMainSceneDropSubmissionFx";
-import type { TileSceneHandoffStore } from "~/ui/pixi/handoff/createTileSceneHandoffStoreFx";
 import { createPixiTileMagneticFieldFx } from "~/ui/pixi/magnet/createPixiTileMagneticFieldFx";
 import { createPixiTileMotionRuntimeFx } from "~/ui/pixi/motion/createPixiTileMotionRuntimeFx";
 import { createPixiApplicationOwnerFx } from "~/ui/pixi/runtime/createPixiApplicationOwnerFx";
@@ -27,7 +26,6 @@ import { createPixiMainSceneSurfaceFx } from "~/ui/pixi/scene/createPixiMainScen
 export namespace createPixiMainSceneRuntimeFx {
 	export interface Props {
 		readonly game: GameEngine;
-		readonly handoffs: TileSceneHandoffStore;
 		readonly host: HTMLElement;
 		readonly onActivate: (
 			item: TileActorItem,
@@ -48,7 +46,6 @@ export namespace createPixiMainSceneRuntimeFx {
  */
 export const createPixiMainSceneRuntimeFx = Effect.fn("createPixiMainSceneRuntimeFx")(function* ({
 	game,
-	handoffs,
 	host,
 	onActivate,
 	onDrop,
@@ -114,7 +111,6 @@ export const createPixiMainSceneRuntimeFx = Effect.fn("createPixiMainSceneRuntim
 			actorStore,
 			animator,
 			application,
-			handoffs,
 			magneticField,
 			readPalette: () => paletteState.current,
 			surface,

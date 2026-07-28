@@ -13,7 +13,7 @@ all scene-local owners.
 
 | Owner | Responsibility |
 | --- | --- |
-| `PixiGameProvider.tsx` | Route-local textures, interaction cancellation, and cross-scene handoffs |
+| `PixiGameProvider.tsx` | Route-local textures and interaction cancellation |
 | `runtime/createPixiApplicationOwnerFx.ts` | One canvas, Pixi application, resize lifecycle, and demand renderer |
 | `scene/*Surface*` | Layout, layers, hit geometry, masks, palette, and drop-feedback paint |
 | `actor/*ActorStore*` | Retained display-object identity for one canvas |
@@ -29,8 +29,9 @@ all scene-local owners.
 | `animation/createPixiActorAnimatorFx.ts` | Interruptible, keyed writes to actor presentation channels |
 
 Main-scene and Inventory actors are intentionally separate: Pixi display objects cannot move
-between canvases. `handoff/createTileSceneHandoffStoreFx.ts` transfers only short-lived source
-geometry. The receiving scene still resolves identity and outcome from a committed transition.
+between canvases. Inventory placement starts from the retained main-scene Inventory opener when it
+exists. Without that opener, choreography is skipped and ordinary reconciliation presents the
+committed transition. The receiving scene still resolves identity and outcome from that transition.
 
 ## Data flows
 
@@ -57,7 +58,7 @@ drag controller
 ```
 
 The renderer may lag, retain, hide, or animate committed facts, but it must not manufacture a
-gameplay outcome. Missing visual identities or handoffs degrade to ordinary reconciliation.
+gameplay outcome. Missing visual identities degrade to ordinary reconciliation.
 
 ## Interaction contract
 
@@ -145,7 +146,7 @@ gameplay outcome. Missing visual identities or handoffs degrade to ordinary reco
 | Canonical actor appearance or identity | `actor/` and `scene/createPixiMainSceneReconcilerFx.ts` |
 | Drag, left click, right click, or drop release | `drag/` |
 | Move, swap, stack, spawn, or replacement choreography | `motion/` and `scene/runPixiMainSceneReplacementsFx.ts` |
-| Cross-canvas Inventory release | `PixiInventorySurface.tsx` and `handoff/` |
+| Cross-canvas Inventory release | `PixiInventorySurface.tsx` and the main-scene Inventory opener |
 | Hit testing, slot geometry, or masks | `scene/*Surface*`, `layout/`, and `grid/` |
 | Magnetic response | `magnet/`; eligibility must continue to come from the bridge |
 | Frame scheduling or interpolation | `runtime/` and `animation/` |

@@ -90,7 +90,6 @@ vi.mock("~/ui/item-detail/useItemDetailControl", () => ({
 
 vi.mock("~/ui/pixi/usePixiGameRuntime", () => ({
 	usePixiGameRuntime: () => ({
-		handoffs: {},
 		interaction: {
 			registerFx: (cancel: () => void) =>
 				Effect.sync(() => {

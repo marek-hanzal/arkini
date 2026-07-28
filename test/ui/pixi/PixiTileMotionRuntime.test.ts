@@ -15,9 +15,11 @@ import type {
 	PixiActorPresentationWrite,
 } from "~/ui/pixi/animation/PixiActorAnimator";
 import { readPixiTileTravelDurationMsFx } from "~/ui/pixi/animation/readPixiTileTravelDurationMsFx";
-import { pixiTileActorRemovalFeedbackDurationMs } from "~/ui/pixi/animation/startPixiTileActorRemovalFeedbackFx";
+import {
+	pixiTileActorRemovalFeedbackDurationMs,
+	startPixiTileActorRemovalFeedbackFx,
+} from "~/ui/pixi/animation/startPixiTileActorRemovalFeedbackFx";
 import type { PixiScenePalette } from "~/ui/pixi/appearance/PixiScenePalette";
-import type { TileSceneHandoffStore } from "~/ui/pixi/handoff/createTileSceneHandoffStoreFx";
 import type {
 	PixiTileMagneticField,
 	PixiTileMagneticFieldSample,
@@ -442,9 +444,6 @@ const createSwapHarness = ({
 					invalidateFx: Effect.void,
 				},
 			} as unknown as PixiApplicationOwner,
-			handoffs: {
-				takeFx: () => Effect.succeed(null),
-			} as unknown as TileSceneHandoffStore,
 			magneticField: createRecordingMagneticField({
 				releases: magneticReleases,
 				updates: magneticUpdates,
@@ -558,9 +557,6 @@ const createSpawnHarness = () => {
 					invalidateFx: Effect.void,
 				},
 			} as unknown as PixiApplicationOwner,
-			handoffs: {
-				takeFx: () => Effect.succeed(null),
-			} as unknown as TileSceneHandoffStore,
 			magneticField: createRecordingMagneticField({
 				releases: magneticReleases,
 				updates: magneticUpdates,
@@ -637,6 +633,10 @@ const createStackHarness = () => {
 	const magneticUpdates: PixiTileMagneticFieldSample[] = [];
 	const actorLayer = new Container();
 	const transientActorLayer = new Container();
+	const animator = createRecordingAnimator({
+		animations,
+		canceledOwnerKeys,
+	});
 	const readPose = (location: TileActorItem["location"]) => ({
 		layer: actorLayer,
 		size: 80,
@@ -655,10 +655,7 @@ const createStackHarness = () => {
 						return actor;
 					}),
 			} as unknown as PixiMainSceneActorStore,
-			animator: createRecordingAnimator({
-				animations,
-				canceledOwnerKeys,
-			}),
+			animator,
 			application: {
 				app: {
 					canvas: {
@@ -672,9 +669,6 @@ const createStackHarness = () => {
 					invalidateFx: Effect.void,
 				},
 			} as unknown as PixiApplicationOwner,
-			handoffs: {
-				takeFx: () => Effect.succeed(null),
-			} as unknown as TileSceneHandoffStore,
 			magneticField: createRecordingMagneticField({
 				releases: magneticReleases,
 				updates: magneticUpdates,
@@ -703,6 +697,7 @@ const createStackHarness = () => {
 	} satisfies TileMotionCue;
 	return {
 		actors,
+		animator,
 		animations,
 		canceledOwnerKeys,
 		canonicalItems,
@@ -747,6 +742,62 @@ describe("Pixi tile motion runtime", () => {
 		Effect.runSync(runtime.closeFx);
 	});
 
+	it("stacks a consumed source with its one retained physical actor", () => {
+		const { actors, animations, animator, canonicalItems, cue, runtime, target } =
+			createStackHarness();
+		const source = createActor(cue.originActorId);
+		source.item = {
+			...source.item,
+			itemId: cue.canonicalItemId,
+			quantity: cue.quantity,
+		};
+		source.container.alpha = 1;
+		source.container.position.set(100, 40);
+		actors.set(source.item.id, source);
+		canonicalItems.delete(source.item.id);
+		Effect.runSync(
+			startPixiTileActorRemovalFeedbackFx({
+				actor: source,
+				animator,
+			}),
+		);
+		source.container.alpha = 0.35;
+
+		Effect.runSync(
+			runtime.enqueueFx([
+				cue,
+			]),
+		);
+		Effect.runSync(runtime.startFx);
+
+		const travel = animations.find(
+			(animation) => animation.channel === "pose" && animation.ownerKey === "motion:30:0",
+		);
+		if (travel?.channel !== "pose") throw new Error("Expected the source stack travel.");
+		expect(travel.actor).toBe(source);
+		expect(
+			animations.filter(
+				(animation) =>
+					animation.actor === source && animation.channel === "lifecycle-opacity",
+			),
+		).toEqual([
+			expect.objectContaining({
+				toAlpha: 0,
+			}),
+			expect.objectContaining({
+				toAlpha: 1,
+			}),
+		]);
+		expect(source.lifecycleTargetAlpha).toBe(1);
+		samplePoseAnimation(travel, 1);
+		travel.onComplete?.();
+
+		expect(source.container.destroyed).toBe(true);
+		expect(actors.has(source.item.id)).toBe(false);
+		expect(target.item.quantity).toBe(2);
+		Effect.runSync(runtime.closeFx);
+	});
+
 	it("chases a moving input owner and returns its remainder to the stable engine origin", () => {
 		const source = createActor("runtime:input-source");
 		const owner = createActor("runtime:input-owner");
@@ -757,6 +808,8 @@ describe("Pixi tile motion runtime", () => {
 		owner.item = createItem(owner.item.id, secondBoardLocation);
 		source.container.position.set(125, 40);
 		source.container.alpha = 1;
+		source.container.eventMode = "static";
+		source.offsetLayer.position.set(5, -4);
 		owner.container.position.set(200, 40);
 		owner.container.alpha = 1;
 		const canonicalSource = {
@@ -826,9 +879,6 @@ describe("Pixi tile motion runtime", () => {
 						invalidateFx: Effect.void,
 					},
 				} as unknown as PixiApplicationOwner,
-				handoffs: {
-					takeFx: () => Effect.succeed(null),
-				} as unknown as TileSceneHandoffStore,
 				magneticField: createRecordingMagneticField({
 					releases: magneticReleases,
 					updates: magneticUpdates,
@@ -859,6 +909,10 @@ describe("Pixi tile motion runtime", () => {
 			targetActorId: owner.item.id,
 			targetLocation: secondBoardLocation,
 		} satisfies TileMotionCue;
+		const effectivePoseBeforeSetup = {
+			x: source.container.x + source.offsetLayer.x * source.container.scale.x,
+			y: source.container.y + source.offsetLayer.y * source.container.scale.y,
+		};
 
 		Effect.runSync(
 			runtime.enqueueFx([
@@ -869,7 +923,11 @@ describe("Pixi tile motion runtime", () => {
 		Effect.runSync(runtime.startFx);
 
 		expect(source.item.quantity).toBe(7);
-		expect(source.container.alpha).toBe(0);
+		expect(source.container.alpha).toBe(1);
+		expect({
+			x: source.container.x + source.offsetLayer.x * source.container.scale.x,
+			y: source.container.y + source.offsetLayer.y * source.container.scale.y,
+		}).toEqual(effectivePoseBeforeSetup);
 		expect(Effect.runSync(runtime.readSnapshotFx)).toMatchObject({
 			interactionClaimByActorId: new Map([
 				[
@@ -900,9 +958,9 @@ describe("Pixi tile motion runtime", () => {
 			},
 		});
 		const transient = firstTravel.actor;
+		expect(transient).toBe(source);
 		expect(transient.item.quantity).toBe(7);
 		expect(transient.container.x).toBe(125);
-		expect(source.container.x).toBe(100);
 		samplePoseAnimation(firstTravel, 1);
 		owner.container.x = 340;
 		firstTravel.onComplete?.();
@@ -928,15 +986,14 @@ describe("Pixi tile motion runtime", () => {
 			magneticReleases.filter((release) => release.sourceActorId === transient.item.id),
 		).toHaveLength(0);
 		samplePoseAnimation(finalTravel, 1);
-		source.container.position.set(140, 80);
-		source.dragging = false;
+		source.dragging = true;
 		finalTravel.onComplete?.();
 
 		expect(
 			magneticReleases.filter((release) => release.sourceActorId === transient.item.id),
 		).toHaveLength(1);
-		expect(source.item.quantity).toBe(7);
-		expect(source.container.alpha).toBe(0);
+		expect(source.item.quantity).toBe(2);
+		expect(source.container.alpha).toBe(1);
 		expect(transient.item.quantity).toBe(2);
 		const returnTravel = animations
 			.filter(
@@ -971,12 +1028,22 @@ describe("Pixi tile motion runtime", () => {
 			x: 100,
 			y: 40,
 		});
+		const effectivePoseBeforeCompletion = {
+			x: source.container.x + source.offsetLayer.x * source.container.scale.x,
+			y: source.container.y + source.offsetLayer.y * source.container.scale.y,
+		};
+		source.dragging = false;
 		returnTravel.onComplete?.();
 
-		expect(transient.container.destroyed).toBe(true);
+		expect(transient.container.destroyed).toBe(false);
 		expect(source.item.quantity).toBe(2);
 		expect(source.container.x).toBe(100);
 		expect(source.container.alpha).toBe(1);
+		expect(source.container.eventMode).toBe("static");
+		expect({
+			x: source.container.x + source.offsetLayer.x * source.container.scale.x,
+			y: source.container.y + source.offsetLayer.y * source.container.scale.y,
+		}).toEqual(effectivePoseBeforeCompletion);
 		expect(Effect.runSync(runtime.readSnapshotFx)).toMatchObject({
 			interactionClaimByActorId: new Map(),
 			retainedActorIds: new Set(),
@@ -1073,12 +1140,9 @@ describe("Pixi tile motion runtime", () => {
 		};
 		const origin = Effect.runSync(
 			readPixiTileMotionOriginFx({
-				application,
-				handoff: null,
 				originActor: source,
 				originLocation: firstBoardLocation,
 				surface,
-				target,
 			}),
 		);
 		if (origin === null) throw new Error("Expected the dragged actor origin.");
@@ -1113,7 +1177,7 @@ describe("Pixi tile motion runtime", () => {
 				delayMs: 0,
 				magneticField: createRecordingMagneticField(),
 				onComplete: completed,
-				onTransientCreated: (actor) => {
+				onPayloadCreated: (actor) => {
 					transients.push(actor);
 				},
 				origin,
@@ -1125,9 +1189,7 @@ describe("Pixi tile motion runtime", () => {
 			}),
 		);
 
-		expect(transients).toEqual([
-			source,
-		]);
+		expect(transients).toEqual([]);
 		expect({
 			x: source.container.x + source.offsetLayer.x * source.container.scale.x,
 			y: source.container.y + source.offsetLayer.y * source.container.scale.y,
@@ -1268,7 +1330,7 @@ describe("Pixi tile motion runtime", () => {
 				delayMs: 0,
 				magneticField: createRecordingMagneticField(),
 				onComplete: completed,
-				onTransientCreated: (actor) => {
+				onPayloadCreated: (actor) => {
 					transients.push(actor);
 				},
 				origin: openerPose,
@@ -1474,9 +1536,6 @@ describe("Pixi tile motion runtime", () => {
 						invalidateFx: Effect.void,
 					},
 				} as unknown as PixiApplicationOwner,
-				handoffs: {
-					takeFx: () => Effect.succeed(null),
-				} as unknown as TileSceneHandoffStore,
 				magneticField: createRecordingMagneticField(),
 				readPalette: () => ({}) as PixiScenePalette,
 				surface: {
@@ -1620,11 +1679,17 @@ describe("Pixi tile motion runtime", () => {
 		Effect.runSync(runtime.closeFx);
 	});
 
-	it("shares one Inventory handoff across a delivery batch and fades a spawn in", () => {
+	it("uses one retained Inventory opener across a delivery batch and fades a spawn in", () => {
+		const opener = createActor("runtime:inventory-origin");
+		opener.container.position.set(150, 170);
 		const spawned = createActor("runtime:spawned");
 		const stacked = createActor("runtime:stacked");
 		stacked.container.position.set(200, 40);
 		const actors = new Map([
+			[
+				opener.item.id,
+				opener,
+			],
 			[
 				spawned.item.id,
 				spawned,
@@ -1635,6 +1700,10 @@ describe("Pixi tile motion runtime", () => {
 			],
 		]);
 		const canonicalItems = new Map([
+			[
+				opener.item.id,
+				opener.item,
+			],
 			[
 				spawned.item.id,
 				spawned.item,
@@ -1653,13 +1722,6 @@ describe("Pixi tile motion runtime", () => {
 			readonly sourceKind: "drag" | "motion";
 		}> = [];
 		const magneticUpdates: PixiTileMagneticFieldSample[] = [];
-		const takeHandoff = vi.fn(() =>
-			Effect.succeed({
-				centerX: 150,
-				centerY: 170,
-				size: 80,
-			}),
-		);
 		const boardActorLayer = new Container();
 		const transientActorLayer = new Container();
 		let boardGeometry = {
@@ -1706,9 +1768,6 @@ describe("Pixi tile motion runtime", () => {
 						invalidateFx: Effect.void,
 					},
 				} as unknown as PixiApplicationOwner,
-				handoffs: {
-					takeFx: takeHandoff,
-				} as unknown as TileSceneHandoffStore,
 				magneticField: createRecordingMagneticField({
 					releases: magneticReleases,
 					updates: magneticUpdates,
@@ -1762,7 +1821,6 @@ describe("Pixi tile motion runtime", () => {
 		Effect.runSync(runtime.enqueueFx(cues));
 		Effect.runSync(runtime.startFx);
 
-		expect(takeHandoff).toHaveBeenCalledOnce();
 		expect(
 			Effect.runSync(runtime.readSnapshotFx).interactionClaimByActorId.has(stacked.item.id),
 		).toBe(false);
@@ -1779,8 +1837,8 @@ describe("Pixi tile motion runtime", () => {
 			channel: "pose",
 			ownerKey: "motion:7:0",
 		});
-		expect(spawned.container.x).toBe(100);
-		expect(spawned.container.y).toBe(110);
+		expect(spawned.container.x).toBe(150);
+		expect(spawned.container.y).toBe(170);
 
 		const spawnTravel = readPoseAnimation(animations, spawned);
 		const beforeResize = samplePoseAnimation(spawnTravel, 0.4);
@@ -1793,7 +1851,7 @@ describe("Pixi tile motion runtime", () => {
 		expect(resizeFrame).toEqual(beforeResize);
 		const afterResize = samplePoseAnimation(spawnTravel, 0.7);
 		expect(afterResize.x).toBeGreaterThan(resizeFrame.x);
-		expect(afterResize.y).toBeGreaterThan(resizeFrame.y);
+		expect(afterResize.y).toBeLessThan(resizeFrame.y);
 		const destination = samplePoseAnimation(spawnTravel, 1);
 		expect(destination).toEqual({
 			scale: 1.5,
@@ -1964,9 +2022,6 @@ describe("Pixi tile motion runtime", () => {
 						invalidateFx: Effect.void,
 					},
 				} as unknown as PixiApplicationOwner,
-				handoffs: {
-					takeFx: () => Effect.succeed(null),
-				} as unknown as TileSceneHandoffStore,
 				magneticField: createRecordingMagneticField({
 					releases: magneticReleases,
 				}),

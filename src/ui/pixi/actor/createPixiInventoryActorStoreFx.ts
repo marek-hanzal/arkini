@@ -22,7 +22,10 @@ import {
 	stopPixiTileActorActivityParticlesFx,
 } from "~/ui/pixi/animation/runPixiTileActorActivityParticlesFx";
 import { startPixiTileActorFadeInFx } from "~/ui/pixi/animation/startPixiTileActorFadeInFx";
-import { startPixiInventoryActorRemovalFeedbackFx } from "~/ui/pixi/drag/startPixiInventoryActorRemovalFeedbackFx";
+import {
+	restorePixiInventoryActorRemovalFeedbackFx,
+	startPixiInventoryActorRemovalFeedbackFx,
+} from "~/ui/pixi/drag/startPixiInventoryActorRemovalFeedbackFx";
 import type { PixiApplicationOwner } from "~/ui/pixi/runtime/PixiApplicationOwner";
 import type { PixiTextureStore } from "~/ui/pixi/runtime/createPixiTextureStoreFx";
 import type { PixiInventoryDropTarget } from "~/ui/pixi/scene/PixiInventoryDropTarget";
@@ -62,7 +65,7 @@ export const createPixiInventoryActorStoreFx = Effect.fn("createPixiInventoryAct
 	}: createPixiInventoryActorStoreFx.Props) =>
 		Effect.sync((): PixiInventoryActorStore => {
 			const actors = new Map<string, PixiTileActor>();
-			const exitingActors = new Set<PixiTileActor>();
+			const exitingActors = new Map<string, PixiTileActor>();
 			let closed = false;
 			let hydrated = false;
 
@@ -86,7 +89,7 @@ export const createPixiInventoryActorStoreFx = Effect.fn("createPixiInventoryAct
 					closed = true;
 					for (const actor of new Set([
 						...actors.values(),
-						...exitingActors,
+						...exitingActors.values(),
 					])) {
 						yield* animator.cancelActorFx(actor);
 						yield* destroyPixiTileActorFx(actor);
@@ -99,14 +102,20 @@ export const createPixiInventoryActorStoreFx = Effect.fn("createPixiInventoryAct
 						removed,
 						(actor) =>
 							Effect.gen(function* () {
-								if (closed || actor.container.destroyed || exitingActors.has(actor))
+								const actorId = actor.item.id;
+								if (
+									closed ||
+									actor.container.destroyed ||
+									exitingActors.has(actorId)
+								)
 									return;
-								exitingActors.add(actor);
+								exitingActors.set(actorId, actor);
 								yield* startPixiInventoryActorRemovalFeedbackFx({
 									actor,
 									animator,
 									onComplete: () => {
-										if (!exitingActors.delete(actor)) return;
+										if (exitingActors.get(actorId) !== actor) return;
+										exitingActors.delete(actorId);
 										RendererRuntime.runSync(animator.cancelActorFx(actor));
 										RendererRuntime.runSync(destroyPixiTileActorFx(actor));
 									},
@@ -167,6 +176,24 @@ export const createPixiInventoryActorStoreFx = Effect.fn("createPixiInventoryAct
 							const pose = RendererRuntime.runSync(surface.readActorPoseFx(item));
 							if (pose === null) continue;
 							let actor = actors.get(item.id);
+							const exiting =
+								actor === undefined ? exitingActors.get(item.id) : undefined;
+							if (exiting !== undefined) {
+								exitingActors.delete(item.id);
+								if (!exiting.container.destroyed) {
+									actor = exiting;
+									actors.set(item.id, actor);
+									surface.actorLayer.addChild(actor.container);
+									created.push(actor);
+									changed = true;
+									RendererRuntime.runSync(
+										restorePixiInventoryActorRemovalFeedbackFx({
+											actor,
+											animator,
+										}),
+									);
+								}
+							}
 							const createdNow = actor === undefined;
 							if (actor === undefined) {
 								changed = true;

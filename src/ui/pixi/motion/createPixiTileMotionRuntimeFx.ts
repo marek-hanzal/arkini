@@ -13,8 +13,6 @@ import { destroyPixiTileActorFx } from "~/ui/pixi/actor/destroyPixiTileActorFx";
 import type { PixiActorAnimator } from "~/ui/pixi/animation/PixiActorAnimator";
 import { startPixiTileActorFadeInFx } from "~/ui/pixi/animation/startPixiTileActorFadeInFx";
 import type { PixiScenePalette } from "~/ui/pixi/appearance/PixiScenePalette";
-import type { TileSceneHandoff } from "~/ui/pixi/handoff/TileSceneHandoff";
-import type { TileSceneHandoffStore } from "~/ui/pixi/handoff/createTileSceneHandoffStoreFx";
 import type { PixiTileMagneticField } from "~/ui/pixi/magnet/PixiTileMagneticField";
 import type {
 	PixiTileMotionRuntime,
@@ -44,7 +42,6 @@ export namespace createPixiTileMotionRuntimeFx {
 		readonly actorStore: PixiMainSceneActorStore;
 		readonly animator: PixiActorAnimator;
 		readonly application: PixiApplicationOwner;
-		readonly handoffs: TileSceneHandoffStore;
 		readonly magneticField: PixiTileMagneticField;
 		readonly readPalette: () => PixiScenePalette;
 		readonly surface: PixiMainSceneSurface;
@@ -70,14 +67,13 @@ interface PixiDetachedSwapLeg {
  * Owns ordered presentation-cue lanes, idempotency, interaction claims, and completion cleanup.
  *
  * Cues are already compiled from committed engine facts. This runtime may serialize conflicting
- * presentation work and retain cross-scene geometry, but it must never reinterpret a cue as a new
- * gameplay mutation. Closing cancels every keyed writer before destroying transient actors.
+ * presentation work, but it must never reinterpret a cue as a new gameplay mutation. Closing
+ * cancels every keyed writer before destroying identity-free payload actors.
  */
 export const createPixiTileMotionRuntimeFx = Effect.fn("createPixiTileMotionRuntimeFx")(function* ({
 	actorStore,
 	animator,
 	application,
-	handoffs,
 	magneticField,
 	readPalette,
 	surface,
@@ -87,14 +83,12 @@ export const createPixiTileMotionRuntimeFx = Effect.fn("createPixiTileMotionRunt
 	let motionLanes: TileMotionLanesState = emptyMotionLanes;
 	const knownCueKeys = new Set<string>();
 	const startedCueKeys = new Set<string>();
-	const claimedHandoffs = new Map<string, TileSceneHandoff>();
-	const transientActorByCueKey = new Map<string, PixiTileActor>();
+	const payloadActorByCueKey = new Map<string, PixiTileActor>();
 	const activeSwapLegActorIdsByCueKey = new Map<string, Set<string>>();
 	const detachedSwapLegByActorId = new Map<string, PixiDetachedSwapLeg>();
 	const targetRedirectByActorId = new Map<string, PixiTileMotionTargetRedirect>();
 
 	const readCueKey = (cue: TileMotionCue) => `${cue.sequence}:${cue.eventIndex}`;
-	const readCueHandoffKey = (cue: TileMotionCue) => `${cue.sequence}:${cue.originActorId}`;
 	const readCues = () => [
 		...motionLanes.active,
 		...motionLanes.pending,
@@ -222,15 +216,11 @@ export const createPixiTileMotionRuntimeFx = Effect.fn("createPixiTileMotionRunt
 	function completeCue(cue: TileMotionCue) {
 		const cueKey = readCueKey(cue);
 		if (closed || !startedCueKeys.delete(cueKey)) return;
-		const transient = transientActorByCueKey.get(cueKey);
-		transientActorByCueKey.delete(cueKey);
-		if (
-			transient !== undefined &&
-			transient.item.id === `motion:${cueKey}` &&
-			!transient.container.destroyed
-		) {
-			RendererRuntime.runSync(animator.cancelActorFx(transient));
-			RendererRuntime.runSync(destroyPixiTileActorFx(transient));
+		const payload = payloadActorByCueKey.get(cueKey);
+		payloadActorByCueKey.delete(cueKey);
+		if (payload !== undefined && !payload.container.destroyed) {
+			RendererRuntime.runSync(animator.cancelActorFx(payload));
+			RendererRuntime.runSync(destroyPixiTileActorFx(payload));
 		}
 		motionLanes =
 			detachedSwapLegByActorId.size > 0
@@ -249,11 +239,6 @@ export const createPixiTileMotionRuntimeFx = Effect.fn("createPixiTileMotionRunt
 							state: motionLanes,
 						}),
 					);
-		const completedHandoffKey = readCueHandoffKey(cue);
-		const handoffStillClaimed = readCues().some(
-			(candidate) => readCueHandoffKey(candidate) === completedHandoffKey,
-		);
-		if (!handoffStillClaimed) claimedHandoffs.delete(completedHandoffKey);
 		const stillClaimedActorIds = readRetainedActorIds();
 		RendererRuntime.runSync(
 			finalizePixiTileMotionActorsFx({
@@ -284,15 +269,6 @@ export const createPixiTileMotionRuntimeFx = Effect.fn("createPixiTileMotionRunt
 			}
 		}
 		if (detachedSwapLegByActorId.size === 0) startCues();
-	}
-
-	function readClaimedHandoff(cue: TileMotionCue) {
-		const handoffKey = readCueHandoffKey(cue);
-		const claimed = claimedHandoffs.get(handoffKey);
-		if (claimed !== undefined) return claimed;
-		const handoff = RendererRuntime.runSync(handoffs.takeFx(cue.originActorId));
-		if (handoff !== null) claimedHandoffs.set(handoffKey, handoff);
-		return handoff;
 	}
 
 	function startSwapLeg(cueKey: string, actorId: string) {
@@ -374,11 +350,9 @@ export const createPixiTileMotionRuntimeFx = Effect.fn("createPixiTileMotionRunt
 				onSwapLegStarted: (actorId) => {
 					startSwapLeg(cueKey, actorId);
 				},
-				onTransientCreated: (actor) => {
-					transientActorByCueKey.set(cueKey, actor);
+				onPayloadCreated: (actor) => {
+					payloadActorByCueKey.set(cueKey, actor);
 				},
-				readHandoff: () =>
-					claimedHandoffs.get(readCueHandoffKey(cue)) ?? readClaimedHandoff(cue),
 				readPalette,
 				readSourceSurvives,
 				readTargetRoute,
@@ -555,7 +529,7 @@ export const createPixiTileMotionRuntimeFx = Effect.fn("createPixiTileMotionRunt
 							)
 							.exhaustive();
 						if (started) releaseMagneticSource(actorId);
-						transientActorByCueKey.delete(cueKey);
+						payloadActorByCueKey.delete(cueKey);
 					}
 					const filteredMotionLanes = {
 						active: motionLanes.active.filter(
@@ -575,17 +549,6 @@ export const createPixiTileMotionRuntimeFx = Effect.fn("createPixiTileMotionRunt
 									},
 									state: filteredMotionLanes,
 								});
-
-					for (const cue of superseded) {
-						const handoffKey = readCueHandoffKey(cue);
-						if (
-							!readCues().some(
-								(candidate) => readCueHandoffKey(candidate) === handoffKey,
-							)
-						) {
-							claimedHandoffs.delete(handoffKey);
-						}
-					}
 
 					const stillClaimedActorIds = readRetainedActorIds();
 					const settleActorIds = new Set(
@@ -713,18 +676,15 @@ export const createPixiTileMotionRuntimeFx = Effect.fn("createPixiTileMotionRunt
 			for (const detached of detachedSwapLegByActorId.values()) {
 				yield* animator.cancelFx(detached.ownerKey);
 			}
-			for (const [cueKey, transientActor] of transientActorByCueKey) {
-				yield* animator.cancelActorFx(transientActor);
-				if (transientActor.item.id === `motion:${cueKey}`) {
-					yield* destroyPixiTileActorFx(transientActor);
-				}
+			for (const payloadActor of payloadActorByCueKey.values()) {
+				yield* animator.cancelActorFx(payloadActor);
+				yield* destroyPixiTileActorFx(payloadActor);
 			}
 			yield* magneticField.releaseSourcesFx("motion");
 			motionLanes = emptyMotionLanes;
 			knownCueKeys.clear();
 			startedCueKeys.clear();
-			claimedHandoffs.clear();
-			transientActorByCueKey.clear();
+			payloadActorByCueKey.clear();
 			activeSwapLegActorIdsByCueKey.clear();
 			detachedSwapLegByActorId.clear();
 			targetRedirectByActorId.clear();

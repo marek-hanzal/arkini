@@ -864,6 +864,45 @@ describe("Pixi Inventory scene runtime", () => {
 		await Effect.runPromise(runtime.closeFx);
 	});
 
+	it("reclaims the same physical actor when its item returns before exit completes", async () => {
+		sceneState.deferredTweenDurations.add(pixiInventoryActorRemovalFeedbackDurationMs);
+		const { actor, onActivate, runtime, stage } = await mountScene();
+
+		publishItems([]);
+		expect(actor.container.alpha).toBe(0);
+		expect(actor.container.destroyed).toBe(false);
+
+		publishItems([
+			{
+				...inventoryItem,
+				quantity: 2,
+				revision: "revision:water:return",
+			},
+		]);
+
+		expect(sceneState.actors).toEqual([
+			actor,
+		]);
+		expect(actor.item.quantity).toBe(2);
+		expect(actor.container.alpha).toBe(1);
+		expect(actor.container.destroyed).toBe(false);
+		expect(actor.container.eventMode).toBe("static");
+		expect(actor.container.cursor).toBe("grab");
+		expect(actor.onPointerDown).not.toBeNull();
+
+		for (const complete of [
+			...sceneState.pendingTweenCompletions,
+		]) {
+			complete();
+		}
+		expect(actor.container.destroyed).toBe(false);
+		(actor.container as unknown as FakeContainer).emit("pointerdown", slotPointer(0));
+		stage.emit("pointerup", slotPointer(0));
+		await Promise.resolve();
+		expect(onActivate).toHaveBeenCalledOnce();
+		await Effect.runPromise(runtime.closeFx);
+	});
+
 	it("coalesces repeated clicks while the same Inventory activation is still pending", async () => {
 		const onActivate = vi.fn(() => new Promise<void>(() => undefined));
 		const { actor, runtime, stage } = await mountScene({

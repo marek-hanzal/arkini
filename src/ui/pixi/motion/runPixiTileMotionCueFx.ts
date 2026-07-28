@@ -8,7 +8,6 @@ import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
 import type { PixiActorAnimator } from "~/ui/pixi/animation/PixiActorAnimator";
 import { startPixiTileActorFadeInFx } from "~/ui/pixi/animation/startPixiTileActorFadeInFx";
 import type { PixiScenePalette } from "~/ui/pixi/appearance/PixiScenePalette";
-import type { TileSceneHandoff } from "~/ui/pixi/handoff/TileSceneHandoff";
 import type { PixiTileMagneticField } from "~/ui/pixi/magnet/PixiTileMagneticField";
 import { readPixiTileMotionOriginFx } from "~/ui/pixi/motion/readPixiTileMotionOriginFx";
 import { runPixiInputMotionFx } from "~/ui/pixi/motion/runPixiInputMotionFx";
@@ -32,8 +31,7 @@ export namespace runPixiTileMotionCueFx {
 		readonly onComplete: () => void;
 		readonly onSwapLegSettled: (actorId: string) => void;
 		readonly onSwapLegStarted: (actorId: string) => void;
-		readonly onTransientCreated: (actor: PixiTileActor) => void;
-		readonly readHandoff: () => TileSceneHandoff | null;
+		readonly onPayloadCreated: (actor: PixiTileActor) => void;
 		readonly readPalette: () => PixiScenePalette;
 		readonly readSourceSurvives: () => boolean;
 		readonly readTargetRoute: (
@@ -56,8 +54,7 @@ export const runPixiTileMotionCueFx = Effect.fn("runPixiTileMotionCueFx")(functi
 	onComplete,
 	onSwapLegSettled,
 	onSwapLegStarted,
-	onTransientCreated,
-	readHandoff,
+	onPayloadCreated,
 	readPalette,
 	readSourceSurvives,
 	readTargetRoute,
@@ -66,24 +63,11 @@ export const runPixiTileMotionCueFx = Effect.fn("runPixiTileMotionCueFx")(functi
 }: runPixiTileMotionCueFx.Props) {
 	const target = yield* surface.readLocationPoseFx(cue.targetLocation);
 	const originActor = actorStore.actors.get(cue.originActorId) ?? null;
-	let origin = yield* readPixiTileMotionOriginFx({
-		application,
-		handoff: null,
+	const origin = yield* readPixiTileMotionOriginFx({
 		originActor,
 		originLocation: cue.originLocation,
 		surface,
-		target,
 	});
-	if (origin === null && target !== null) {
-		origin = yield* readPixiTileMotionOriginFx({
-			application,
-			handoff: readHandoff(),
-			originActor,
-			originLocation: cue.originLocation,
-			surface,
-			target,
-		});
-	}
 	return yield* match({
 		origin,
 		target,
@@ -130,7 +114,7 @@ export const runPixiTileMotionCueFx = Effect.fn("runPixiTileMotionCueFx")(functi
 									delayMs,
 									magneticField,
 									onComplete,
-									onTransientCreated,
+									onPayloadCreated,
 									origin,
 									readPalette,
 									readTargetRoute,
@@ -153,7 +137,7 @@ export const runPixiTileMotionCueFx = Effect.fn("runPixiTileMotionCueFx")(functi
 									delayMs,
 									magneticField,
 									onComplete,
-									onTransientCreated,
+									onPayloadCreated,
 									origin,
 									readPalette,
 									readSourceSurvives,

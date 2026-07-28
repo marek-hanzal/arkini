@@ -122,6 +122,23 @@ const ItemLineUnavailableDependency = ({
 	</div>
 );
 
+const ItemLineUnavailableMessage = ({
+	reason,
+}: {
+	readonly reason: ItemDetailLines.DisabledReason;
+}) => (
+	<div
+		className="mt-4 flex min-w-0 items-center gap-2 text-sm text-muted"
+		data-ui="TileLineUnavailableReason"
+	>
+		<span
+			className="icon-[lucide--circle-alert] size-4 shrink-0 text-warning"
+			aria-hidden="true"
+		/>
+		<ItemLineUnavailableReason reason={reason} />
+	</div>
+);
+
 /** Renders one live product line with its commands, runtime, inputs, and outputs. */
 export const ItemLineRow = ({
 	disabled,
@@ -186,6 +203,7 @@ export const ItemLineRow = ({
 		line.availability.kind === "unavailable"
 			? readUnavailableDependency(line.availability.reason)
 			: undefined;
+	const showUnavailableReason = unavailable && line.activeJob === undefined;
 
 	return (
 		<article
@@ -197,7 +215,9 @@ export const ItemLineRow = ({
 			<div className="flex flex-wrap items-start justify-between gap-4">
 				<div className="min-w-0 flex-1">
 					<ItemLineSummary line={line} />
-					{unavailableDependency === undefined ? null : (
+					{!showUnavailableReason ? null : unavailableDependency === undefined ? (
+						<ItemLineUnavailableMessage reason={line.availability.reason} />
+					) : (
 						<ItemLineUnavailableDependency
 							dependency={unavailableDependency}
 							disabled={disabled}
@@ -289,24 +309,7 @@ export const ItemLineRow = ({
 					{error}
 				</p>
 			)}
-			{line.availability.kind === "unavailable" && unavailableDependency === undefined ? (
-				<div
-					className="mt-4 flex items-center gap-3 border-t border-line pt-4 text-sm text-muted"
-					data-ui="TileLineUnavailableReason"
-				>
-					<span
-						className="icon-[lucide--circle-alert] size-5 shrink-0 text-warning"
-						aria-hidden="true"
-					/>
-					<ItemLineUnavailableReason reason={line.availability.reason} />
-					<ItemLineUnavailableWithdrawals
-						disabled={disabled}
-						input={line.input}
-						lineId={line.lineId}
-						ownerItemId={ownerItemId}
-					/>
-				</div>
-			) : line.availability.kind === "unavailable" ? (
+			{line.availability.kind === "unavailable" ? (
 				<ItemLineUnavailableWithdrawals
 					disabled={disabled}
 					input={line.input}

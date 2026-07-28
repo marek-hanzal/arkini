@@ -86,7 +86,7 @@ export const ItemLineUnavailableWithdrawals = ({
 	if (buffered.length === 0) return null;
 	return (
 		<div
-			className="ml-auto flex flex-wrap justify-end gap-2"
+			className="mt-4 ml-auto flex flex-wrap justify-end gap-2"
 			data-ui="TileLineUnavailableWithdrawals"
 		>
 			{buffered.map((candidate) => (

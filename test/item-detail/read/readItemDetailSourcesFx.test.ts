@@ -330,7 +330,7 @@ describe("readItemDetailSourcesFx", () => {
 		fullLinesProjection.mockClear();
 	});
 
-	it("finds visible owned Board sources across spaces without filtering blocked lines", () => {
+	it("finds exact owned sources on and off the Board without filtering blocked lines", () => {
 		const result = readSources({
 			target: {
 				kind: "runtime",
@@ -344,6 +344,7 @@ describe("readItemDetailSourcesFx", () => {
 			"runtime:beta:current",
 			"runtime:alpha:space-0",
 			"runtime:alpha:space-3",
+			"runtime:alpha:stored",
 		]);
 		expect(result.source[1]?.line.map(({ lineId }) => lineId)).toEqual([
 			"line:alpha:first",
@@ -370,6 +371,11 @@ describe("readItemDetailSourcesFx", () => {
 				totalSetWeight: 4,
 			},
 		]);
+		expect(result.source[3]?.line.map(({ lineId }) => lineId)).toEqual([
+			"line:hidden",
+			"line:alpha:first",
+			"line:alpha:second",
+		]);
 		expect(fullLinesProjection).not.toHaveBeenCalled();
 	});
 
@@ -394,10 +400,97 @@ describe("readItemDetailSourcesFx", () => {
 			"runtime:beta:current",
 			"runtime:alpha:space-0",
 			"runtime:alpha:space-3",
+			"runtime:alpha:stored",
 		]);
 	});
 
-	it("keeps configured one-hop sources discoverable without a live owner", () => {
+	it("keeps multiple off-Board owners exact and deterministically ordered", () => {
+		const target = runtime.items.find(({ id }) => id === "runtime:target");
+		const storedOwner = runtime.items.find(({ id }) => id === "runtime:alpha:stored");
+		if (target === undefined || storedOwner === undefined) {
+			throw new Error("Missing off-Board source fixtures.");
+		}
+		const secondStoredOwner = runtimeItem({
+			definition: "alpha",
+			id: "runtime:alpha:inventory",
+			location: {
+				scope: "inventory",
+				position: {
+					x: 1,
+					y: 0,
+				},
+			},
+		});
+		const result = readSources({
+			target: {
+				kind: "runtime",
+				itemId: "runtime:target",
+			},
+			runtime: {
+				...runtime,
+				items: [
+					target,
+					secondStoredOwner,
+					storedOwner,
+				],
+			},
+		});
+		if (result.kind !== "available") throw new Error("Expected off-Board sources.");
+
+		expect(result.source.map(({ ownerItemId }) => ownerItemId)).toEqual([
+			"runtime:alpha:inventory",
+			"runtime:alpha:stored",
+		]);
+		expect(result.source.every(({ line }) => line.length === 3)).toBe(true);
+	});
+
+	it("does not reintroduce a hidden Board line as a generic owned source", () => {
+		const alpha = config.items.alpha;
+		if (alpha.type !== "producer") throw new Error("Expected Alpha producer fixture.");
+		const hiddenLine = alpha.lines[0];
+		const target = runtime.items.find(({ id }) => id === "runtime:target");
+		if (hiddenLine === undefined || target === undefined) {
+			throw new Error("Missing hidden source fixtures.");
+		}
+		const hiddenOwner = {
+			...runtimeItem({
+				definition: "alpha",
+				id: "runtime:alpha:hidden-only",
+				location: {
+					scope: "board",
+					space: 0,
+					position: {
+						x: 0,
+						y: 0,
+					},
+				},
+			}),
+			item: {
+				...alpha,
+				lines: [
+					hiddenLine,
+				],
+			},
+		} satisfies RuntimeItemSchema.Type;
+		const result = readSources({
+			target: {
+				kind: "runtime",
+				itemId: "runtime:target",
+			},
+			runtime: {
+				...runtime,
+				items: [
+					target,
+					hiddenOwner,
+				],
+			},
+		});
+		if (result.kind !== "available") throw new Error("Expected source projection.");
+
+		expect(result.source).toEqual([]);
+	});
+
+	it("omits configured one-hop sources that the player does not own", () => {
 		const result = readSources({
 			target: {
 				kind: "definition",
@@ -410,39 +503,24 @@ describe("readItemDetailSourcesFx", () => {
 		});
 		if (result.kind !== "available") throw new Error("Expected definition sources.");
 
-		expect(result.source).toMatchObject([
-			{
-				ownerDefinitionItemId: "alpha",
-				line: [
-					{
-						lineId: "line:hidden",
-					},
-					{
-						lineId: "line:alpha:first",
-					},
-					{
-						lineId: "line:alpha:second",
-					},
-				],
-			},
-			{
-				ownerDefinitionItemId: "beta",
-				line: [
-					{
-						lineId: "line:beta",
-					},
-				],
-			},
-		]);
-		expect(
-			result.source.every(
-				({ ownerItemId, space }) => ownerItemId === undefined && space === undefined,
-			),
-		).toBe(true);
+		expect(result.source).toEqual([]);
 	});
 
-	it("finds Well Blueprint as a configured one-hop source of Well", async () => {
+	it("finds an owned Well Blueprint outside the Board as a one-hop source of Well", async () => {
 		const officialConfig = await readArkiniGameConfigSource();
+		const ownedBlueprint = {
+			id: "runtime:blueprint-well",
+			item: officialConfig.items["item:blueprint-well-t1"],
+			location: {
+				scope: "inventory",
+				position: {
+					x: 0,
+					y: 0,
+				},
+			},
+			quantity: 1,
+			revision: "revision:blueprint-well",
+		} satisfies RuntimeItemSchema.Type;
 		const result = Effect.runSync(
 			readItemDetailSourcesFx({
 				target: {
@@ -456,7 +534,9 @@ describe("readItemDetailSourcesFx", () => {
 						instantGameplay: false,
 					},
 					currentSpace: 0,
-					items: [],
+					items: [
+						ownedBlueprint,
+					],
 					jobs: [],
 				},
 			}).pipe(Effect.provideService(GameConfigFx, officialConfig)),
@@ -474,7 +554,7 @@ describe("readItemDetailSourcesFx", () => {
 			result.source.find(
 				({ ownerDefinitionItemId }) => ownerDefinitionItemId === "item:blueprint-well-t1",
 			)?.ownerItemId,
-		).toBeUndefined();
+		).toBe(ownedBlueprint.id);
 	});
 
 	it("returns unavailable for a missing configured definition target", () => {
@@ -587,16 +667,8 @@ describe("readItemDetailSourcesFx", () => {
 			},
 		});
 		if (result.kind !== "available") throw new Error("Expected scaled sources.");
-		expect(result.source).toHaveLength(501);
-		expect(result.source.slice(0, 500).every((source) => source.line.length === 2)).toBe(true);
-		expect(result.source[500]).toMatchObject({
-			ownerDefinitionItemId: "beta",
-			line: [
-				{
-					lineId: "line:beta",
-				},
-			],
-		});
+		expect(result.source).toHaveLength(500);
+		expect(result.source.every((source) => source.line.length === 2)).toBe(true);
 		expect(fullLinesProjection).not.toHaveBeenCalled();
 	});
 

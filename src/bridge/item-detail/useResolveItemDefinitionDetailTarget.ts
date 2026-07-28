@@ -57,7 +57,9 @@ export const useResolveItemDefinitionDetailTarget = () => {
 			const tab =
 				requestedTab !== undefined && tabs.includes(requestedTab)
 					? requestedTab
-					: ItemDetailTabEnumSchema.enum.Info;
+					: tabs.includes(ItemDetailTabEnumSchema.enum.Sources)
+						? ItemDetailTabEnumSchema.enum.Sources
+						: ItemDetailTabEnumSchema.enum.Info;
 			return {
 				kind: "available",
 				itemId: sources.targetDefinitionItemId,

@@ -24,6 +24,7 @@ import type {
 } from "~/ui/pixi/magnet/PixiTileMagneticField";
 import { createPixiTileMotionRuntimeFx } from "~/ui/pixi/motion/createPixiTileMotionRuntimeFx";
 import { finalizePixiTileMotionActorsFx } from "~/ui/pixi/motion/finalizePixiTileMotionActorsFx";
+import { readPixiTileMotionOriginFx } from "~/ui/pixi/motion/readPixiTileMotionOriginFx";
 import { runPixiInputMotionFx } from "~/ui/pixi/motion/runPixiInputMotionFx";
 import type { PixiApplicationOwner } from "~/ui/pixi/runtime/PixiApplicationOwner";
 import type { PixiMainSceneSurface } from "~/ui/pixi/scene/PixiMainSceneSurface";
@@ -999,6 +1000,187 @@ describe("Pixi tile motion runtime", () => {
 			magneticReleases.filter((release) => release.sourceActorId === transient.item.id),
 		).toHaveLength(2);
 		Effect.runSync(runtime.closeFx);
+	});
+
+	it("returns a directly dropped input remainder with the same physical actor", () => {
+		const source = createActor("runtime:dragged-input-source");
+		const owner = createActor("runtime:dragged-input-owner");
+		source.item = {
+			...createItem(source.item.id, firstBoardLocation),
+			quantity: 8,
+		};
+		owner.item = createItem(owner.item.id, secondBoardLocation);
+		source.container.alpha = 1;
+		source.container.eventMode = "static";
+		source.container.position.set(280, 40);
+		source.offsetLayer.position.set(6, -4);
+		owner.container.position.set(300, 40);
+		const actorLayer = new Container();
+		const transientActorLayer = new Container();
+		transientActorLayer.addChild(source.container);
+		actorLayer.addChild(owner.container);
+		const actors = new Map([
+			[
+				source.item.id,
+				source,
+			],
+			[
+				owner.item.id,
+				owner,
+			],
+		]);
+		const canonicalItems = new Map([
+			[
+				source.item.id,
+				{
+					...source.item,
+					quantity: 7,
+				},
+			],
+			[
+				owner.item.id,
+				owner.item,
+			],
+		]);
+		const animations: PixiActorAnimation[] = [];
+		const completed = vi.fn();
+		const transients: PixiTileActor[] = [];
+		const home = {
+			layer: actorLayer,
+			size: 80,
+			x: 100,
+			y: 40,
+		};
+		const target = {
+			layer: actorLayer,
+			size: 80,
+			x: 300,
+			y: 40,
+		};
+		const application = {
+			frames: {
+				invalidateFx: Effect.void,
+			},
+		} as unknown as PixiApplicationOwner;
+		const surface = {
+			readLocationPoseFx: (location: TileActorItem["location"]) =>
+				Effect.succeed(location === firstBoardLocation ? home : target),
+			transientActorLayer,
+		} as unknown as PixiMainSceneSurface;
+		const effectivePoseBeforeSetup = {
+			x: source.container.x + source.offsetLayer.x * source.container.scale.x,
+			y: source.container.y + source.offsetLayer.y * source.container.scale.y,
+		};
+		const origin = Effect.runSync(
+			readPixiTileMotionOriginFx({
+				application,
+				handoff: null,
+				originActor: source,
+				originLocation: firstBoardLocation,
+				surface,
+				target,
+			}),
+		);
+		if (origin === null) throw new Error("Expected the dragged actor origin.");
+		const cue = {
+			canonicalItemId: source.item.itemId,
+			eventIndex: 0,
+			kind: "input",
+			originActorId: source.item.id,
+			originLocation: firstBoardLocation,
+			previousQuantity: 8,
+			storedQuantity: 1,
+			resultingQuantity: 7,
+			sequence: 42,
+			sourceActorId: source.item.id,
+			staggerIndex: 0,
+			targetActorId: owner.item.id,
+			targetLocation: secondBoardLocation,
+		} satisfies TileMotionCue;
+
+		Effect.runSync(
+			runPixiInputMotionFx({
+				actorStore: {
+					actors,
+					canonicalItems,
+				} as unknown as PixiMainSceneActorStore,
+				animator: createRecordingAnimator({
+					animations,
+				}),
+				application,
+				cue,
+				cueKey: "42:0",
+				delayMs: 0,
+				magneticField: createRecordingMagneticField(),
+				onComplete: completed,
+				onTransientCreated: (actor) => {
+					transients.push(actor);
+				},
+				origin,
+				readPalette: () => ({}) as PixiScenePalette,
+				readSourceSurvives: () => true,
+				surface,
+				target,
+				textures: {} as never,
+			}),
+		);
+
+		expect(transients).toEqual([
+			source,
+		]);
+		expect({
+			x: source.container.x + source.offsetLayer.x * source.container.scale.x,
+			y: source.container.y + source.offsetLayer.y * source.container.scale.y,
+		}).toEqual(effectivePoseBeforeSetup);
+		expect(source.container).toMatchObject({
+			alpha: 1,
+			eventMode: "none",
+			parent: transientActorLayer,
+			x: 280,
+			y: 40,
+		});
+		const delivery = readPoseAnimation(animations, source);
+		samplePoseAnimation(delivery, 1);
+		delivery.onComplete?.();
+
+		const returned = animations
+			.filter(
+				(animation) =>
+					animation.actor === source &&
+					animation.channel === "pose" &&
+					animation.ownerKey === "motion:42:0",
+			)
+			.at(-1);
+		if (returned?.channel !== "pose") throw new Error("Expected the input remainder return.");
+		expect(samplePoseAnimation(returned, 0.5)).toMatchObject({
+			x: 200,
+			y: 40,
+		});
+		expect(samplePoseAnimation(returned, 1)).toEqual({
+			scale: 1,
+			x: home.x,
+			y: home.y,
+		});
+		const effectivePoseBeforeCompletion = {
+			x: source.container.x + source.offsetLayer.x * source.container.scale.x,
+			y: source.container.y + source.offsetLayer.y * source.container.scale.y,
+		};
+		returned.onComplete?.();
+
+		expect(source.container.destroyed).toBe(false);
+		expect(source.container).toMatchObject({
+			alpha: 1,
+			eventMode: "static",
+			parent: actorLayer,
+			x: 100,
+			y: 40,
+		});
+		expect({
+			x: source.container.x + source.offsetLayer.x * source.container.scale.x,
+			y: source.container.y + source.offsetLayer.y * source.container.scale.y,
+		}).toEqual(effectivePoseBeforeCompletion);
+		expect(source.item.quantity).toBe(7);
+		expect(completed).toHaveBeenCalledOnce();
 	});
 
 	it("spawns an Inventory autofill payload at its physical opener and uses ordinary input travel", () => {

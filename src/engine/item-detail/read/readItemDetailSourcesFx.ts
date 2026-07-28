@@ -2,7 +2,6 @@ import { Effect, Option } from "effect";
 import { match } from "ts-pattern";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import { GameConfigFx } from "~/engine/game/context/GameConfigFx";
 import { resolveItemFx } from "~/engine/item/fx/resolveItemFx";
 import { RuntimeFx } from "~/engine/runtime/context/RuntimeFx";
 import { lineRulesFx } from "~/engine/line/fx/lineRulesFx";
@@ -67,7 +66,7 @@ export namespace readItemDetailSourcesFx {
 	}
 
 	export interface Source {
-		readonly ownerItemId?: IdSchema.Type;
+		readonly ownerItemId: IdSchema.Type;
 		readonly ownerDefinitionItemId: IdSchema.Type;
 		readonly space?: number;
 		readonly line: readonly Line[];
@@ -226,12 +225,11 @@ interface OrderedSource extends readItemDetailSourcesFx.Source {
 	readonly ownerTitle: string;
 }
 
-/** Finds live and configured one-hop line owners that produce the inspected canonical item. */
+/** Finds owned one-hop line owners that produce the inspected canonical item. */
 export const readItemDetailSourcesFx = Effect.fn("readItemDetailSourcesFx")(function* ({
 	runtime,
 	target,
 }: readItemDetailSourcesFx.Props) {
-	const config = yield* GameConfigFx;
 	const targetItem =
 		target.kind === "runtime"
 			? runtime.items.find((candidate) => candidate.id === target.itemId)
@@ -250,11 +248,12 @@ export const readItemDetailSourcesFx = Effect.fn("readItemDetailSourcesFx")(func
 	const activeLine = new Set(runtime.jobs.map((job) => `${job.ownerItemId}\u0000${job.lineId}`));
 	const source: OrderedSource[] = [];
 	for (const owner of runtime.items) {
-		if (owner.location.scope !== LocationScopeEnumSchema.enum.Board) {
-			continue;
-		}
 		const ownerItem = Option.getOrUndefined(yield* isLineOwnerItemFx(owner.item));
 		if (ownerItem === undefined) continue;
+		const boardLocation =
+			owner.location.scope === LocationScopeEnumSchema.enum.Board
+				? owner.location
+				: undefined;
 		const lines = yield* readLineOwnerLinesFx(ownerItem);
 		const matchingLines: readItemDetailSourcesFx.Line[] = [];
 		for (const line of lines) {
@@ -263,28 +262,30 @@ export const readItemDetailSourcesFx = Effect.fn("readItemDetailSourcesFx")(func
 				targetDefinitionItemId,
 			});
 			if (output.length === 0) continue;
-			const visibilityRules = line.rules.filter(
-				(rule) =>
-					rule.type === RuleEnumSchema.enum.Show ||
-					rule.type === RuleEnumSchema.enum.Hide,
-			);
-			let visible = line.show;
-			if (visibilityRules.length > 0) {
-				const rules = yield* lineRulesFx({
-					origin: owner.location,
-					rules: visibilityRules,
-				}).pipe(
-					Effect.provideService(RuntimeFx, {
-						read: Effect.succeed(runtime),
-					}),
+			if (boardLocation !== undefined) {
+				const visibilityRules = line.rules.filter(
+					(rule) =>
+						rule.type === RuleEnumSchema.enum.Show ||
+						rule.type === RuleEnumSchema.enum.Hide,
 				);
-				visible = yield* resolveLineShowFx({
-					line,
-					rules,
-				});
+				let visible = line.show;
+				if (visibilityRules.length > 0) {
+					const rules = yield* lineRulesFx({
+						origin: boardLocation,
+						rules: visibilityRules,
+					}).pipe(
+						Effect.provideService(RuntimeFx, {
+							read: Effect.succeed(runtime),
+						}),
+					);
+					visible = yield* resolveLineShowFx({
+						line,
+						rules,
+					});
+				}
+				visible ||= activeLine.has(`${owner.id}\u0000${line.id}`);
+				if (!visible) continue;
 			}
-			visible ||= activeLine.has(`${owner.id}\u0000${line.id}`);
-			if (!visible) continue;
 			matchingLines.push({
 				lineId: line.id,
 				title: line.title,
@@ -296,48 +297,28 @@ export const readItemDetailSourcesFx = Effect.fn("readItemDetailSourcesFx")(func
 			ownerItemId: owner.id,
 			ownerDefinitionItemId: owner.item.id,
 			ownerTitle: owner.item.title,
-			space: owner.location.space,
-			line: matchingLines,
-		});
-	}
-
-	const liveDefinitionItemIds = new Set(
-		source.map(({ ownerDefinitionItemId }) => ownerDefinitionItemId),
-	);
-	for (const configuredOwner of Object.values(config.items)) {
-		if (liveDefinitionItemIds.has(configuredOwner.id)) continue;
-		const ownerItem = Option.getOrUndefined(yield* isLineOwnerItemFx(configuredOwner));
-		if (ownerItem === undefined) continue;
-		const matchingLines: readItemDetailSourcesFx.Line[] = [];
-		for (const line of yield* readLineOwnerLinesFx(ownerItem)) {
-			const output = readMatchingFacts({
-				output: line.output,
-				targetDefinitionItemId,
-			});
-			if (output.length === 0) continue;
-			matchingLines.push({
-				lineId: line.id,
-				title: line.title,
-				output,
-			});
-		}
-		if (matchingLines.length === 0) continue;
-		source.push({
-			ownerDefinitionItemId: configuredOwner.id,
-			ownerTitle: configuredOwner.title,
+			...(boardLocation === undefined
+				? {}
+				: {
+						space: boardLocation.space,
+					}),
 			line: matchingLines,
 		});
 	}
 
 	source.sort((left, right) => {
-		const leftLive = left.ownerItemId !== undefined && left.space !== undefined;
-		const rightLive = right.ownerItemId !== undefined && right.space !== undefined;
-		if (leftLive !== rightLive) return leftLive ? -1 : 1;
-		if (!leftLive || !rightLive) {
+		const leftOnBoard = left.space !== undefined;
+		const rightOnBoard = right.space !== undefined;
+		if (leftOnBoard !== rightOnBoard) return leftOnBoard ? -1 : 1;
+		if (!leftOnBoard || !rightOnBoard) {
 			const titleOrder = left.ownerTitle.localeCompare(right.ownerTitle);
-			return titleOrder === 0
-				? left.ownerDefinitionItemId.localeCompare(right.ownerDefinitionItemId)
-				: titleOrder;
+			if (titleOrder !== 0) return titleOrder;
+			const definitionOrder = left.ownerDefinitionItemId.localeCompare(
+				right.ownerDefinitionItemId,
+			);
+			return definitionOrder === 0
+				? left.ownerItemId.localeCompare(right.ownerItemId)
+				: definitionOrder;
 		}
 		const leftCurrent = left.space === runtime.currentSpace;
 		const rightCurrent = right.space === runtime.currentSpace;

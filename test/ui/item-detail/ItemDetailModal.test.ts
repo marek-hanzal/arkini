@@ -497,13 +497,13 @@ describe("ItemDetailModal", () => {
 			target: {
 				kind: "definition",
 				itemId: "water",
-				tab: "info",
+				tab: "sources",
 			},
 		});
 		expect(modal.dataset.runtimeId).toBeUndefined();
-		expect(document.querySelector('[data-ui="ItemDefinitionInfoTab"]')).not.toBeNull();
+		expect(document.querySelector('[data-ui="ItemSource"]')?.textContent).toContain("Workshop");
 		expect(document.activeElement).toBe(
-			document.querySelector<HTMLButtonElement>('[data-tab="info"][aria-selected="true"]'),
+			document.querySelector<HTMLButtonElement>('[data-tab="sources"][aria-selected="true"]'),
 		);
 		expect(
 			Array.from(
@@ -514,10 +514,10 @@ describe("ItemDetailModal", () => {
 			"info",
 		]);
 
-		const sourcesTab = document.querySelector<HTMLButtonElement>('[data-tab="sources"]');
-		if (sourcesTab === null) throw new Error("Missing definition Sources tab.");
+		const infoTab = document.querySelector<HTMLButtonElement>('[data-tab="info"]');
+		if (infoTab === null) throw new Error("Missing definition Info tab.");
 		await act(async () => {
-			sourcesTab.click();
+			infoTab.click();
 			await Promise.resolve();
 		});
 		expect(readControl().state).toMatchObject({
@@ -526,11 +526,11 @@ describe("ItemDetailModal", () => {
 			target: {
 				kind: "definition",
 				itemId: "water",
-				tab: "sources",
+				tab: "info",
 			},
 		});
 		expect(modal.dataset.runtimeId).toBeUndefined();
-		expect(document.querySelector('[data-ui="ItemSource"]')?.textContent).toContain("Workshop");
+		expect(document.querySelector('[data-ui="ItemDefinitionInfoTab"]')).not.toBeNull();
 	});
 
 	it("keeps the modal shell stable when an output has only configured definition detail", async () => {
@@ -569,20 +569,11 @@ describe("ItemDetailModal", () => {
 			target: {
 				kind: "definition",
 				itemId: "water",
-				tab: "info",
+				tab: "sources",
 			},
 		});
 		expect(modal.dataset.targetKind).toBe("definition");
 		expect(modal.dataset.runtimeId).toBeUndefined();
-		expect(document.querySelector('[data-ui="ItemDefinitionInfoTab"]')).not.toBeNull();
-		const sourcesTab = document.querySelector<HTMLButtonElement>('[data-tab="sources"]');
-		if (sourcesTab === null) {
-			throw new Error("Missing Sources for configured output without a live target.");
-		}
-		await act(async () => {
-			sourcesTab.click();
-			await Promise.resolve();
-		});
 		expect(modal.dataset.tab).toBe("sources");
 		expect(document.querySelector('[data-ui="ItemSource"]')?.textContent).toContain("Workshop");
 	});
@@ -871,7 +862,7 @@ describe("ItemDetailModal", () => {
 
 		const modal = document.querySelector<HTMLElement>('[data-ui="ItemDetailModal"]');
 		if (modal === null) throw new Error("Missing Item Detail modal.");
-		expect(modal.dataset.tab).toBe("info");
+		expect(modal.dataset.tab).toBe("sources");
 		expect(
 			Array.from(
 				document.querySelectorAll<HTMLElement>('[data-ui="ItemDetailTabs"] button'),
@@ -880,13 +871,6 @@ describe("ItemDetailModal", () => {
 			"sources",
 			"info",
 		]);
-		const sourcesTab = document.querySelector<HTMLButtonElement>('[data-tab="sources"]');
-		if (sourcesTab === null) throw new Error("Missing Sources tab.");
-		await act(async () => {
-			sourcesTab.click();
-			await Promise.resolve();
-		});
-		expect(modal.dataset.tab).toBe("sources");
 		expect(document.querySelector('[data-ui="ItemSource"]')?.textContent).toContain("Workshop");
 		expect(document.querySelector('[data-ui="ItemSource"]')?.textContent).toContain("Space 1");
 		expect(document.querySelector('[data-ui="ItemSourceLine"]')).toBeNull();
@@ -964,7 +948,7 @@ describe("ItemDetailModal", () => {
 		expect(readControl().readPendingAction("line:autofill")).toBeNull();
 	});
 
-	it("keeps configured Sources discoverable when the last exact Board source disappears", async () => {
+	it("keeps an owned Source discoverable when its last owner moves off the Board", async () => {
 		const { readControl } = await renderItemDetail();
 		const owner = currentRuntime.items.find((item) => item.item.id === "workshop");
 		const target = currentRuntime.items.find((item) => item.item.id === "water");
@@ -986,7 +970,20 @@ describe("ItemDetailModal", () => {
 			publishRuntime(
 				RuntimeSchema.parse({
 					...currentRuntime,
-					items: currentRuntime.items.filter((item) => item.id !== owner.id),
+					items: currentRuntime.items.map((item) =>
+						item.id === owner.id
+							? {
+									...item,
+									location: {
+										scope: "inventory",
+										position: {
+											x: 0,
+											y: 0,
+										},
+									},
+								}
+							: item,
+					),
 				}),
 			);
 			await Promise.resolve();
@@ -996,7 +993,7 @@ describe("ItemDetailModal", () => {
 		expect(document.querySelector('[data-ui="ItemDetailModal"]')).toBe(modal);
 		expect(modal.dataset.tab).toBe("sources");
 		expect(document.querySelector('[data-ui="ItemSource"]')?.textContent).toContain(
-			"Configured source",
+			"Owned source",
 		);
 		expect(
 			Array.from(
@@ -1006,9 +1003,23 @@ describe("ItemDetailModal", () => {
 			"sources",
 			"info",
 		]);
+
+		await act(async () => {
+			publishRuntime(
+				RuntimeSchema.parse({
+					...currentRuntime,
+					items: currentRuntime.items.filter((item) => item.id !== owner.id),
+				}),
+			);
+			await Promise.resolve();
+			await Promise.resolve();
+		});
+
+		expect(modal.dataset.tab).toBe("info");
+		expect(document.querySelector('[data-tab="sources"]')).toBeNull();
 	});
 
-	it("keeps definition Sources independent of live ownership", async () => {
+	it("removes definition Sources when the player loses the last source owner", async () => {
 		const { readControl } = await renderItemDetail();
 		const owner = currentRuntime.items.find((item) => item.item.id === "workshop");
 		if (owner === undefined) throw new Error("Missing source fixture.");
@@ -1016,7 +1027,6 @@ describe("ItemDetailModal", () => {
 		await act(async () => {
 			openItemDefinitionDetail(readControl(), {
 				itemId: "water",
-				tab: "sources",
 			});
 			await Promise.resolve();
 			await Promise.resolve();
@@ -1039,11 +1049,10 @@ describe("ItemDetailModal", () => {
 
 		expect(document.querySelector('[data-ui="ItemDetailModal"]')).toBe(modal);
 		expect(modal.dataset.targetKind).toBe("definition");
-		expect(modal.dataset.tab).toBe("sources");
-		expect(document.querySelector('[data-ui="ItemSource"]')?.textContent).toContain(
-			"Configured source",
-		);
-		expect(document.querySelector('[data-tab="sources"]')).not.toBeNull();
+		expect(modal.dataset.tab).toBe("info");
+		expect(document.querySelector('[data-ui="ItemSource"]')).toBeNull();
+		expect(document.querySelector('[data-tab="sources"]')).toBeNull();
+		expect(document.querySelector('[data-ui="ItemDefinitionInfoTab"]')).not.toBeNull();
 	});
 
 	it("retains stale Sources content read-only when the inspected target disappears", async () => {

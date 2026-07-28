@@ -93,7 +93,7 @@ describe("resolveItemDetailTargetFx", () => {
 		});
 	});
 
-	it("keeps Info as the unsupported-tab fallback without retargeting and rejects stale identities", () => {
+	it("defaults source-only items to Sources while keeping Info as the unsupported-tab fallback", () => {
 		const runtime = lineRunRuntime({});
 		const ordinaryRuntime = {
 			...runtime,
@@ -142,7 +142,7 @@ describe("resolveItemDetailTargetFx", () => {
 		).toEqual({
 			kind: "available",
 			itemId: "runtime:workshop",
-			tab: "info",
+			tab: "sources",
 			tabs: [
 				"sources",
 				"info",

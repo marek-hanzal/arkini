@@ -20,7 +20,7 @@ export namespace useItemDetailSources {
 		  };
 
 	export interface Source {
-		readonly ownerItemId?: string;
+		readonly ownerItemId: string;
 		readonly ownerDefinitionItemId: string;
 		readonly title: string;
 		readonly sourceUrl: string;
@@ -49,7 +49,7 @@ const unavailable = {
 	kind: "unavailable",
 } as const satisfies useItemDetailSources.Projection;
 
-/** Projects live and configured one-hop sources for one inspected runtime or definition item. */
+/** Projects owned one-hop sources for one inspected runtime or definition item. */
 export const useItemDetailSources = (
 	target: useItemDetailSources.Target,
 ): useItemDetailSources.Projection => {
@@ -76,28 +76,22 @@ export const useItemDetailSources = (
 				source: projection.source.flatMap((source) => {
 					const configured = game.config.items[source.ownerDefinitionItemId];
 					if (configured === undefined) return [];
-					const owner =
-						source.ownerItemId === undefined
-							? undefined
-							: runtime.items.find(
-									(candidate) => candidate.id === source.ownerItemId,
-								);
-					if (source.ownerItemId !== undefined && owner === undefined) return [];
+					const owner = runtime.items.find(
+						(candidate) => candidate.id === source.ownerItemId,
+					);
+					if (owner === undefined) return [];
 					return [
 						{
 							ownerItemId: source.ownerItemId,
 							ownerDefinitionItemId: source.ownerDefinitionItemId,
 							title: configured.title,
-							sourceUrl:
-								owner === undefined
-									? game.getResourceUrl(configured.asset.source[0])
-									: game.getResourceUrl(
-											game.readOrThrow(
-												readRuntimeItemPrimaryAssetIdFx({
-													item: owner.item,
-												}),
-											),
-										),
+							sourceUrl: game.getResourceUrl(
+								game.readOrThrow(
+									readRuntimeItemPrimaryAssetIdFx({
+										item: owner.item,
+									}),
+								),
+							),
 							...(configured.asset.composite === undefined
 								? {}
 								: {

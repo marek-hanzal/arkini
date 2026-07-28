@@ -501,7 +501,8 @@ describe("ItemLinesTab", () => {
 			"line:running-disabled",
 		]);
 		expect(container.textContent).toContain("Running Disabled");
-		expect(container.textContent).toContain("This line is currently disabled.");
+		expect(container.textContent).not.toContain("This line is currently disabled.");
+		expect(container.querySelector('[data-ui="TileLineUnavailableReason"]')).toBeNull();
 	});
 
 	it("searches unavailable source lines initially and preserves the query across subsets", async () => {
@@ -942,6 +943,7 @@ describe("ItemLinesTab", () => {
 
 		const reason = document.querySelector('[data-ui="TileLineUnavailableReason"]');
 		expect(reason?.textContent).toContain("Tree would exceed limit (0/1 currently).");
+		expect(reason?.className).not.toContain("border-t");
 		expect(reason?.querySelectorAll("strong")).toHaveLength(1);
 		expect(reason?.querySelector("strong")?.textContent).toBe("Tree");
 	});

@@ -50,23 +50,15 @@ const SourceRow = ({
 				className="group flex w-full min-w-0 cursor-pointer items-center justify-between gap-4 rounded-lg text-left outline-none transition-colors hover:text-accent disabled:cursor-not-allowed disabled:opacity-50"
 				disabled={disabled}
 				data-ui="ItemSourceDetailLink"
-				onClick={() => {
-					if (source.ownerItemId !== undefined) {
-						RendererRuntime.runSync(
-							itemDetail.openItemDetailFx({
-								itemId: source.ownerItemId,
-								tab: "lines",
-								linesSearchQuery: targetTitle,
-							}),
-						);
-						return;
-					}
+				onClick={() =>
 					RendererRuntime.runSync(
-						itemDetail.openItemDefinitionDetailFx({
-							itemId: source.ownerDefinitionItemId,
+						itemDetail.openItemDetailFx({
+							itemId: source.ownerItemId,
+							tab: "lines",
+							linesSearchQuery: targetTitle,
 						}),
-					);
-				}}
+					)
+				}
 			>
 				<div className="flex min-w-0 items-center gap-3">
 					<SourceArtwork
@@ -79,7 +71,7 @@ const SourceRow = ({
 						</h3>
 						<p className="mt-0.5 text-sm text-muted">
 							{source.space === undefined
-								? "Configured source"
+								? "Owned source"
 								: `Space ${source.space + 1}`}
 						</p>
 					</div>
@@ -113,7 +105,7 @@ export const ItemSourcesTab = ({
 		<div className="ak-list grid gap-1">
 			{sources.source.map((source) => (
 				<SourceRow
-					key={source.ownerItemId ?? source.ownerDefinitionItemId}
+					key={source.ownerItemId}
 					disabled={disabled}
 					source={source}
 					targetTitle={sources.targetTitle}

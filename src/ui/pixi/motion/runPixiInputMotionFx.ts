@@ -225,10 +225,14 @@ const returnPixiInputRemainderFx = Effect.fn("returnPixiInputRemainderFx")(funct
 							channel: "lifecycle-opacity",
 						});
 					}
-					yield* destroyPixiInputTransientFx({
-						animator,
-						transient,
-					});
+					if (transient === source) {
+						source.container.eventMode = "static";
+					} else {
+						yield* destroyPixiInputTransientFx({
+							animator,
+							transient,
+						});
+					}
 					onComplete();
 				}),
 			);
@@ -242,7 +246,8 @@ const returnPixiInputRemainderFx = Effect.fn("returnPixiInputRemainderFx")(funct
 
 /**
  * Delivers one complete source stack and returns only a remainder that survives canonical truth.
- * A consumed source travels as its one physical actor; only a surviving remainder needs a clone.
+ * A directly dragged source keeps one physical actor through delivery and return. Other surviving
+ * inputs use a clone so overlapping committed cues cannot fight over the canonical actor.
  *
  * Several immediately committed input stores may consume one source before the oldest visual cue
  * reaches contact. An intermediate event remainder must not return as a ghost when the latest
@@ -284,8 +289,14 @@ export const runPixiInputMotionFx = Effect.fn("runPixiInputMotionFx")(function* 
 	}
 
 	const sourceSurvives = () => cue.resultingQuantity > 0 && readSourceSurvives();
+	// An accepted direct drop remains in this layer until its committed cue takes ownership.
+	// Keeping that actor avoids a visible clone-to-canonical swap of its magnetic offset.
+	const reusesPresentedSource =
+		source !== null &&
+		sourceSurvives() &&
+		source.container.parent === surface.transientActorLayer;
 	const transient =
-		source === null || sourceSurvives()
+		source === null || (sourceSurvives() && !reusesPresentedSource)
 			? yield* createPixiTileActorFx({
 					frames: application.frames,
 					item: {
@@ -315,16 +326,18 @@ export const runPixiInputMotionFx = Effect.fn("runPixiInputMotionFx")(function* 
 		alpha: 1,
 		channel: "lifecycle-opacity",
 	});
-	yield* animator.setFx({
-		actor: transient,
-		channel: "pose",
-		scale: origin.size / Math.max(1, transient.size),
-		x: origin.x,
-		y: origin.y,
-	});
+	if (transient !== source) {
+		yield* animator.setFx({
+			actor: transient,
+			channel: "pose",
+			scale: origin.size / Math.max(1, transient.size),
+			x: origin.x,
+			y: origin.y,
+		});
+	}
 
 	const sourceHome = yield* surface.readLocationPoseFx(cue.originLocation);
-	if (sourceSurvives() && source !== null) {
+	if (sourceSurvives() && source !== null && transient !== source) {
 		source.lifecycleIntentGeneration += 1;
 		source.lifecycleTargetAlpha = 0;
 		source.lifecycleFadeStarted = true;
@@ -335,7 +348,7 @@ export const runPixiInputMotionFx = Effect.fn("runPixiInputMotionFx")(function* 
 			channel: "lifecycle-opacity",
 		});
 	}
-	if (sourceSurvives() && source !== null && sourceHome !== null) {
+	if (sourceSurvives() && source !== null && transient !== source && sourceHome !== null) {
 		sourceHome.layer.addChild(source.container);
 		yield* animator.setFx({
 			actor: source,

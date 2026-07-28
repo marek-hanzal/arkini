@@ -713,9 +713,11 @@ export const createPixiTileMotionRuntimeFx = Effect.fn("createPixiTileMotionRunt
 			for (const detached of detachedSwapLegByActorId.values()) {
 				yield* animator.cancelFx(detached.ownerKey);
 			}
-			for (const transientActor of transientActorByCueKey.values()) {
+			for (const [cueKey, transientActor] of transientActorByCueKey) {
 				yield* animator.cancelActorFx(transientActor);
-				yield* destroyPixiTileActorFx(transientActor);
+				if (transientActor.item.id === `motion:${cueKey}`) {
+					yield* destroyPixiTileActorFx(transientActor);
+				}
 			}
 			yield* magneticField.releaseSourcesFx("motion");
 			motionLanes = emptyMotionLanes;

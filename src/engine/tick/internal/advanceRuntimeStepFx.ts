@@ -16,6 +16,7 @@ import type { JobSchema } from "~/engine/job/schema/JobSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { TickStepMs } from "~/engine/tick/TickStepMs";
 import { ItemEnumSchema } from "~/engine/item/schema/ItemEnumSchema";
+import { runAutonomousLinesRuntimeFx } from "~/engine/line/fx/runAutonomousLinesRuntimeFx";
 
 interface RuntimeStepResult {
 	readonly events: readonly GameEventSchema.Type[];
@@ -183,6 +184,11 @@ export const advanceRuntimeStepFx = Effect.fn("advanceRuntimeStepFx")(function* 
 		draft = expiry.runtime;
 		events.push(...expiry.events);
 	}
+	const autonomous = yield* runAutonomousLinesRuntimeFx({
+		runtime: draft,
+	});
+	draft = autonomous.runtime;
+	events.push(...autonomous.events);
 
 	return {
 		events,

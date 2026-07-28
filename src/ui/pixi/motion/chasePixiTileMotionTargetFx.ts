@@ -24,6 +24,7 @@ export namespace chasePixiTileMotionTargetFx {
 		readonly onSettled: () => void;
 		readonly ownerKey: string;
 		readonly readLiveTarget?: () => Required<PixiActorPresentedPose> | null;
+		readonly settleWithinTileRatio?: number;
 		readonly shouldSettle?: () => boolean;
 		readonly surface: PixiMainSceneSurface;
 		readonly targetLocation: TileActorItem["location"];
@@ -48,12 +49,32 @@ export const chasePixiTileMotionTargetFx = Effect.fn("chasePixiTileMotionTargetF
 	onSettled,
 	ownerKey,
 	readLiveTarget,
+	settleWithinTileRatio,
 	shouldSettle,
 	surface,
 	targetLocation,
 }: chasePixiTileMotionTargetFx.Props) {
-	if (actor.container.destroyed || shouldSettle?.()) {
+	let settled = false;
+	let cancelingForProximitySettlement = false;
+	let proximitySettlementQueued = false;
+	const settle = () => {
+		if (settled) return;
+		settled = true;
 		onSettled();
+	};
+	const isInsideSettlementField = (pose: PixiActorPresentedPose) => {
+		const liveTarget = readLiveTarget?.();
+		return (
+			settleWithinTileRatio !== undefined &&
+			liveTarget !== null &&
+			liveTarget !== undefined &&
+			Math.hypot(pose.x - liveTarget.x, pose.y - liveTarget.y) <=
+				Math.max(1, actor.size * (pose.scale ?? actor.container.scale.x)) *
+					settleWithinTileRatio
+		);
+	};
+	if (actor.container.destroyed || shouldSettle?.()) {
+		settle();
 		return;
 	}
 	const semanticTarget = (yield* surface.readLocationPoseFx(targetLocation)) ?? fallbackTarget;
@@ -68,7 +89,7 @@ export const chasePixiTileMotionTargetFx = Effect.fn("chasePixiTileMotionTargetF
 		y: semanticTarget.y,
 	};
 	if (from.x === target.x && from.y === target.y && from.scale === target.scale) {
-		onSettled();
+		settle();
 		return;
 	}
 	const poseSampler = yield* createPixiTileMotionPoseSamplerFx({
@@ -92,11 +113,15 @@ export const chasePixiTileMotionTargetFx = Effect.fn("chasePixiTileMotionTargetF
 			toY: target.y,
 		}),
 		ownerKey,
+		onCancel: () => {
+			if (!cancelingForProximitySettlement) settled = true;
+		},
 		onComplete: () => {
 			if (shouldSettle?.() || !poseSampler.needsCompletionSettle()) {
-				onSettled();
+				settle();
 				return;
 			}
+			settled = true;
 			RendererRuntime.runSync(
 				chasePixiTileMotionTargetFx({
 					actor,
@@ -107,6 +132,7 @@ export const chasePixiTileMotionTargetFx = Effect.fn("chasePixiTileMotionTargetF
 					onSettled,
 					ownerKey,
 					readLiveTarget,
+					settleWithinTileRatio,
 					shouldSettle,
 					surface,
 					targetLocation,
@@ -116,6 +142,42 @@ export const chasePixiTileMotionTargetFx = Effect.fn("chasePixiTileMotionTargetF
 		readPose: (progress) => {
 			const pose = poseSampler.readPose(progress);
 			onPose?.(pose);
+			if (progress < 1 && !proximitySettlementQueued && isInsideSettlementField(pose)) {
+				proximitySettlementQueued = true;
+				// The animator applies this returned pose after `readPose`; settle from the next
+				// microtask so contact observes the published frame and never destroys mid-write.
+				queueMicrotask(() => {
+					proximitySettlementQueued = false;
+					if (settled || actor.container.destroyed || shouldSettle?.()) return;
+					if (
+						!isInsideSettlementField({
+							scale: actor.container.scale.x,
+							x: actor.container.x,
+							y: actor.container.y,
+						})
+					) {
+						return;
+					}
+					const contactPose = readLiveTarget?.();
+					if (contactPose === null || contactPose === undefined) return;
+					cancelingForProximitySettlement = true;
+					try {
+						RendererRuntime.runSync(animator.cancelChannelFx(actor, "pose"));
+						RendererRuntime.runSync(
+							animator.setFx({
+								actor,
+								channel: "pose",
+								scale: contactPose.scale,
+								x: contactPose.x,
+								y: contactPose.y,
+							}),
+						);
+					} finally {
+						cancelingForProximitySettlement = false;
+					}
+					settle();
+				});
+			}
 			return pose;
 		},
 	});

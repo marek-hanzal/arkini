@@ -12,6 +12,7 @@ import { readItemLineFx } from "~/engine/line/fx/readItemLineFx";
 import { isBoardRuntimeItemFx } from "~/engine/runtime/read/isBoardRuntimeItemFx";
 import { isJobRuntimeItemFx } from "~/engine/runtime/read/isJobRuntimeItemFx";
 import { isReservedRuntimeItemFx } from "~/engine/runtime/read/isReservedRuntimeItemFx";
+import { removeRuntimeItemIdentityFx } from "~/engine/runtime/fx/removeRuntimeItemIdentityFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
 export namespace completeJobTransitionFx {
@@ -78,12 +79,16 @@ export const completeJobTransitionFx = Effect.fn("completeJobTransitionFx")(func
 		...owner,
 		item: owner.item,
 	} satisfies JobCompletionOwner;
-	const consumedItemIds = new Set(consumedItems.map((item) => item.id));
-	const completionRuntime = {
+	let completionRuntime = {
 		...runtime,
-		items: runtime.items.filter((item) => !consumedItemIds.has(item.id)),
 		jobs: runtime.jobs.filter((candidate) => candidate.id !== job.id),
 	} satisfies RuntimeSchema.Type;
+	for (const consumedItem of consumedItems) {
+		completionRuntime = yield* removeRuntimeItemIdentityFx({
+			item: consumedItem,
+			runtime: completionRuntime,
+		});
+	}
 	const completion = yield* makeJobCompletionRandomFx({
 		job,
 		program: completeLineJobRuntimeFx({

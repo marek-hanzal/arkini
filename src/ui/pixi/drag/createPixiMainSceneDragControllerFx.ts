@@ -238,6 +238,10 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 			if (pointer === null) return;
 			let { drag } = pointer;
 			const { offsetX, offsetY } = pointer;
+			let cursorGrabPointer = {
+				x: drag.pressX,
+				y: drag.pressY,
+			};
 			if (drag.phase === "pressed" && Math.hypot(offsetX, offsetY) < dragThreshold) return;
 			if (drag.phase === "pressed" && drag.mode === "activation-only") {
 				activeDrag = null;
@@ -293,6 +297,12 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 					startY: drag.actor.container.y - offsetY,
 				};
 				activeDrag = drag;
+				// The actor kept moving after the press. Its rebased pose stays at the live handoff
+				// frame, so the grab spring must meet the current pointer rather than the old press.
+				cursorGrabPointer = {
+					x: event.global.x,
+					y: event.global.y,
+				};
 			}
 			if (drag.phase === "pressed") {
 				drag.phase = "dragging";
@@ -307,12 +317,7 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 				surface.transientActorLayer.addChild(drag.actor.container);
 				drag.actor.container.zIndex = 10_000;
 				RendererRuntime.runSync(animator.cancelChannelFx(drag.actor, "pose"));
-				RendererRuntime.runSync(
-					cursorGrab.startFx(drag.actor, {
-						x: event.global.x,
-						y: event.global.y,
-					}),
-				);
+				RendererRuntime.runSync(cursorGrab.startFx(drag.actor, cursorGrabPointer));
 			}
 			RendererRuntime.runSync(
 				setPixiDraggedActorPoseFx({
@@ -498,10 +503,16 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 
 		return {
 			attachActorFx: Effect.fn("PixiMainSceneDragController.attachActorFx")((actor) =>
-				Effect.sync(() => {
+				Effect.gen(function* () {
 					if (actor.onPointerDown !== null) {
 						actor.container.off("pointerdown", actor.onPointerDown);
 					}
+					actor.container.eventMode = "static";
+					actor.container.cursor = yield* readPixiTileActorCursorFx({
+						phase: "idle",
+						previewKind: null,
+						running: actor.item.running,
+					});
 					const onPointerDown = (event: FederatedPointerEvent) => {
 						const motionSnapshot = RendererRuntime.runSync(motion.readSnapshotFx);
 						const motionClaim = motionSnapshot.interactionClaimByActorId.get(

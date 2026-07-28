@@ -8,6 +8,8 @@ import { ElectronMainRuntime } from "./ElectronMainRuntime";
 import type { LauncherPreferences } from "./launcher/LauncherPreferences";
 import { createFilesystemGameSaveFilesFx } from "./save/createFilesystemGameSaveFilesFx";
 import type { TrustedRenderer } from "./security/TrustedRenderer";
+import { DiagnosticRecordSchema } from "../contract/diagnostics/DiagnosticRecord";
+import type { DiagnosticLog } from "./diagnostics/DiagnosticLog";
 
 let registered = false;
 
@@ -17,6 +19,7 @@ export namespace registerArkiniElectronIpcFx {
 		readonly appearancePreferences: AppearancePreferences;
 		readonly cheatPreferences: CheatPreferences;
 		readonly launcherPreferences: LauncherPreferences;
+		readonly diagnostics: DiagnosticLog;
 	}
 }
 
@@ -27,6 +30,7 @@ export const registerArkiniElectronIpcFx = Effect.fn("registerArkiniElectronIpcF
 		appearancePreferences,
 		cheatPreferences,
 		launcherPreferences,
+		diagnostics,
 	}: registerArkiniElectronIpcFx.Props) =>
 		Effect.gen(function* () {
 			if (registered) return;
@@ -93,6 +97,17 @@ export const registerArkiniElectronIpcFx = Effect.fn("registerArkiniElectronIpcF
 				ipcMain.handle(ArkiniElectronApi.channels.launcherLastPackageIdRead, (event) =>
 					runAuthorized(event, launcherPreferences.readLastPackageIdFx),
 				);
+				ipcMain.handle(ArkiniElectronApi.channels.diagnosticsWrite, (event, record) =>
+					runAuthorized(
+						event,
+						Effect.sync(() => DiagnosticRecordSchema.parse(record)).pipe(
+							Effect.flatMap(diagnostics.writeFx),
+						),
+					),
+				);
+				ipcMain.handle(ArkiniElectronApi.channels.diagnosticsOpenDirectory, (event) =>
+					runAuthorized(event, diagnostics.openDirectoryFx),
+				);
 				ipcMain.handle(
 					ArkiniElectronApi.channels.launcherLastPackageIdWrite,
 					(event, packageId) =>
@@ -149,6 +164,8 @@ export const registerArkiniElectronIpcFx = Effect.fn("registerArkiniElectronIpcF
 						ArkiniElectronApi.channels.saveRead,
 						ArkiniElectronApi.channels.saveWrite,
 						ArkiniElectronApi.channels.saveClear,
+						ArkiniElectronApi.channels.diagnosticsWrite,
+						ArkiniElectronApi.channels.diagnosticsOpenDirectory,
 					]) {
 						ipcMain.removeHandler(channel);
 					}

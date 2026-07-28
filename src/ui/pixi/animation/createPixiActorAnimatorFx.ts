@@ -109,10 +109,15 @@ export const createPixiActorAnimatorFx = Effect.fn("createPixiActorAnimatorFx")(
 					Effect.sync(() => {
 						if (closed) return;
 						const { actor, channel } = animation;
+						if (actor.container.destroyed) return;
 						const ownerKey =
 							animation.ownerKey ?? `${actor.instanceId ?? actor.item.id}:${channel}`;
 						cancelChannel(actor, channel);
 						cancel(animationsByOwner.get(ownerKey));
+						// Cancellation callbacks are allowed to retire the actor synchronously. Pixi
+						// destroys its transform internals at that point, so even reading the old pose
+						// would be a use-after-destroy.
+						if (closed || actor.container.destroyed) return;
 
 						const fromX = actor.container.x;
 						const fromY = actor.container.y;

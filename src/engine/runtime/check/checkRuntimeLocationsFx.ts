@@ -3,8 +3,12 @@ import { match } from "ts-pattern";
 
 import { isItemLocationScopeAllowed } from "~/engine/location/read/isItemLocationScopeAllowedFx";
 import { RuntimeCheckIssueEnumSchema } from "~/engine/runtime/schema/check/RuntimeCheckIssueEnumSchema";
-import { readGridLocationOccupantsFx } from "~/engine/location/read/readGridLocationOccupantsFx";
-import type { GridRuntimeItemSchema } from "~/engine/runtime/schema/GridRuntimeItemSchema";
+import {
+	indexGridLocationClaims,
+	readGridLocationClaimsFx,
+} from "~/engine/location/read/readGridLocationClaimsFx";
+import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
+import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
 import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import type { LocationOccupiedIssueSchema } from "~/engine/runtime/schema/check/LocationOccupiedIssueSchema";
@@ -30,32 +34,47 @@ export const checkRuntimeLocationsFx = Effect.fn("checkRuntimeLocationsFx")(func
 	config,
 	runtime,
 }: checkRuntimeLocationsFx.Props) {
-	const items = runtime.items.filter(
-		(item): item is GridRuntimeItemSchema.Type =>
+	const items: {
+		readonly item: RuntimeItemSchema.Type;
+		readonly location: GridLocationSchema.Type;
+	}[] = [];
+	for (const item of runtime.items) {
+		if (
 			item.location.scope === LocationScopeEnumSchema.enum.Board ||
 			item.location.scope === LocationScopeEnumSchema.enum.Inventory ||
-			item.location.scope === LocationScopeEnumSchema.enum.Toolbar,
-	);
+			item.location.scope === LocationScopeEnumSchema.enum.Toolbar
+		) {
+			items.push({
+				item,
+				location: item.location,
+			});
+		} else if (item.location.scope === LocationScopeEnumSchema.enum.Delivery) {
+			items.push({
+				item,
+				location: item.location.origin,
+			});
+		}
+	}
 	const scopeIssues: LocationScopeIssueSchema.Type[] = [];
 	const boundsIssues: LocationOutOfBoundsIssueSchema.Type[] = [];
 	const occupancyIssues: LocationOccupiedIssueSchema.Type[] = [];
 
-	for (const item of items) {
+	for (const { item, location } of items) {
 		const configuredScope = item.item.scope;
 		const scopeAllowed = isItemLocationScopeAllowed({
 			item: item.item,
-			locationScope: item.location.scope,
+			locationScope: location.scope,
 		});
 		if (!scopeAllowed) {
 			scopeIssues.push({
 				configuredScope,
 				itemId: item.id,
-				location: item.location,
+				location,
 				type: RuntimeCheckIssueEnumSchema.enum.LocationScope,
 			});
 		}
 
-		const size = match(item.location.scope)
+		const size = match(location.scope)
 			.with(LocationScopeEnumSchema.enum.Board, () => config.meta.board)
 			.with(LocationScopeEnumSchema.enum.Inventory, () => config.meta.inventory)
 			.with(LocationScopeEnumSchema.enum.Toolbar, () => ({
@@ -63,27 +82,29 @@ export const checkRuntimeLocationsFx = Effect.fn("checkRuntimeLocationsFx")(func
 				height: 1,
 			}))
 			.exhaustive();
-		const insideBounds =
-			item.location.position.x < size.width && item.location.position.y < size.height;
+		const insideBounds = location.position.x < size.width && location.position.y < size.height;
 		if (!insideBounds) {
 			boundsIssues.push({
 				itemId: item.id,
-				location: item.location,
+				location,
 				size,
 				type: RuntimeCheckIssueEnumSchema.enum.LocationOutOfBounds,
 			});
 		}
 	}
 
-	const occupants = yield* readGridLocationOccupantsFx({
-		items,
-		locations: items.map((item) => item.location),
-	});
-	for (const entry of occupants) {
-		if (entry.items.length <= 1) continue;
+	const claimsByLocation = indexGridLocationClaims(
+		yield* readGridLocationClaimsFx({
+			runtime,
+		}),
+	);
+	for (const claims of claimsByLocation.values()) {
+		if (claims.length <= 1) continue;
+		const first = claims[0];
+		if (first === undefined) continue;
 		occupancyIssues.push({
-			itemIds: entry.items.map((item) => item.id),
-			location: entry.location,
+			itemIds: claims.map((claim) => claim.itemId),
+			location: first.location,
 			type: RuntimeCheckIssueEnumSchema.enum.LocationOccupied,
 		});
 	}

@@ -4,18 +4,25 @@ import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
 export const readPixiLiveActorContactPose = ({
 	actorId,
 	actors,
-	movingActorSize,
+	movingActor,
 }: {
 	readonly actorId: string;
 	readonly actors: ReadonlyMap<string, PixiTileActor>;
-	readonly movingActorSize: number;
+	readonly movingActor: PixiTileActor;
 }) => {
 	const actor = actors.get(actorId);
 	if (actor === undefined || actor.container.destroyed) return null;
-	const scale = actor.container.scale.x;
+	const targetScale = actor.container.scale.x;
+	const movingScale = (actor.size * targetScale) / Math.max(1, movingActor.size);
 	return {
-		scale: (actor.size * scale) / Math.max(1, movingActorSize),
-		x: actor.container.x - actor.container.pivot.x * scale,
-		y: actor.container.y - actor.container.pivot.y * scale,
+		scale: movingScale,
+		x:
+			actor.container.x -
+			actor.container.pivot.x * targetScale +
+			movingActor.container.pivot.x * movingScale,
+		y:
+			actor.container.y -
+			actor.container.pivot.y * targetScale +
+			movingActor.container.pivot.y * movingScale,
 	};
 };

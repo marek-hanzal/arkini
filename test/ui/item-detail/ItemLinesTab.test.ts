@@ -25,6 +25,7 @@ const control = vi.hoisted(() => ({
 }));
 const commands = vi.hoisted(() => ({
 	autofill: vi.fn(),
+	setAutonomous: vi.fn(),
 	setDefault: vi.fn(),
 	start: vi.fn(),
 	unsetDefault: vi.fn(),
@@ -42,6 +43,12 @@ vi.mock("~/bridge/item-detail/useAutofillItemDetailLine", () => ({
 	useAutofillItemDetailLine: () => ({
 		result: undefined,
 		run: commands.autofill,
+	}),
+}));
+vi.mock("~/bridge/item-detail/useSetAutonomousItemDetailLine", () => ({
+	useSetAutonomousItemDetailLine: () => ({
+		result: undefined,
+		run: commands.setAutonomous,
 	}),
 }));
 vi.mock("~/bridge/item-detail/useSetDefaultItemDetailLine", () => ({
@@ -84,6 +91,8 @@ const input = {
 		max: 1,
 	},
 	storedQuantity: 0,
+	deliveryQuantity: 0,
+	autofillAvailableQuantity: 0,
 	maxStoredQuantity: 1,
 	missingQuantity: 1,
 	availableCapacity: 1,
@@ -146,11 +155,15 @@ const depositInput = {
 
 const line = ({
 	active = false,
+	autonomousEnabled = false,
+	autonomousSupported = false,
 	isDefault = false,
 	lineId,
 	title,
 }: {
 	readonly active?: boolean;
+	readonly autonomousEnabled?: boolean;
+	readonly autonomousSupported?: boolean;
 	readonly isDefault?: boolean;
 	readonly lineId: string;
 	readonly title: string;
@@ -166,6 +179,10 @@ const line = ({
 	},
 	startMode: "start",
 	isDefault,
+	autonomous: {
+		enabled: autonomousEnabled,
+		supported: autonomousSupported,
+	},
 	actions: {
 		canAutofill: false,
 		canStart: true,
@@ -329,6 +346,87 @@ describe("ItemLinesTab", () => {
 				"icon-[lucide--chevron-right]",
 			);
 		}
+	});
+
+	it("shows the exact aggregate quantity currently delivered to a material input", async () => {
+		await renderLines({
+			...projection,
+			line: [
+				{
+					...projection.line[0],
+					input: [
+						{
+							...input,
+							deliveryQuantity: 1,
+							required: {
+								min: 2,
+								max: 2,
+							},
+						},
+					],
+				},
+			],
+		});
+
+		const delivery = document.querySelector<HTMLElement>(
+			'[data-ui="TileLineInputDeliveryQuantity"]',
+		);
+		expect(delivery?.textContent).toBe("1 / 2 on the way");
+		expect(delivery?.className).toContain("opacity-70");
+		expect(document.querySelector('[data-ui="TileLineInputStoredQuantity"]')).toBeNull();
+	});
+
+	it("shows autofill material truth and opens the first producer with a material filter", async () => {
+		const { rerender } = await renderLines({
+			...projection,
+			line: [
+				{
+					...projection.line[0],
+					input: [
+						{
+							...input,
+							autofillAvailableQuantity: 4,
+						},
+					],
+				},
+			],
+		});
+
+		const availability = document.querySelector<HTMLElement>(
+			'[data-ui="TileLineInputAutofillAvailability"]',
+		);
+		expect(availability?.textContent).toBe("4 available");
+		expect(document.querySelector('[data-ui="TileLineInputProducerLink"]')).toBeNull();
+
+		await rerender({
+			...projection,
+			line: [
+				{
+					...projection.line[0],
+					input: [
+						{
+							...input,
+							autofillAvailableQuantity: 0,
+							producerItemId: "runtime:lumber-yard",
+						},
+					],
+				},
+			],
+		});
+		const producerLink = document.querySelector<HTMLButtonElement>(
+			'[data-ui="TileLineInputProducerLink"]',
+		);
+		expect(producerLink?.textContent).toBe("None");
+		expect(producerLink?.className).toContain("underline");
+		expect(producerLink?.className).toContain("cursor-pointer");
+
+		await act(async () => producerLink?.click());
+		expect(control.openItemDetailFx).toHaveBeenCalledWith({
+			itemId: "runtime:lumber-yard",
+			linesSearchQuery: "Tree",
+			origin: producerLink,
+			tab: "lines",
+		});
 	});
 
 	it("searches all lines when navigation provides an initial query", async () => {
@@ -1101,6 +1199,65 @@ describe("ItemLinesTab", () => {
 		});
 		expect(commands.unsetDefault).toHaveBeenCalledWith({
 			ownerItemId: "runtime:producer",
+		});
+	});
+
+	it("fills the active row background with its exact completed progress", async () => {
+		const { rerender } = await renderLines();
+		const idleRow = document.querySelector<HTMLElement>('[data-line-id="line:first"]');
+		const activeRow = document.querySelector<HTMLElement>('[data-line-id="line:second"]');
+		const progress = activeRow?.querySelector<HTMLElement>('[data-ui="TileLineProgressFill"]');
+
+		expect(idleRow?.querySelector('[data-ui="TileLineProgress"]')).toBeNull();
+		expect(progress?.style.width).toBe("50%");
+		expect(progress?.className).toContain("bg-[var(--ak-list-row-active-progress-surface)]");
+
+		await rerender({
+			...projection,
+			line: projection.line.map((candidate) =>
+				candidate.lineId === "line:second" && candidate.activeJob !== undefined
+					? {
+							...candidate,
+							activeJob: {
+								...candidate.activeJob,
+								remainingMs: 250,
+							},
+						}
+					: candidate,
+			),
+		});
+		expect(
+			document.querySelector<HTMLElement>(
+				'[data-line-id="line:second"] [data-ui="TileLineProgressFill"]',
+			)?.style.width,
+		).toBe("75%");
+	});
+
+	it("renders and toggles only author-supported autonomous lines", async () => {
+		await renderLines({
+			...projection,
+			line: [
+				line({
+					autonomousSupported: true,
+					lineId: "line:auto",
+					title: "Automatic",
+				}),
+				line({
+					lineId: "line:manual",
+					title: "Manual",
+				}),
+			],
+		});
+		const buttons = Array.from(
+			document.querySelectorAll<HTMLButtonElement>('[data-ui="TileLineAutonomousButton"]'),
+		);
+		expect(buttons).toHaveLength(1);
+		expect(buttons[0]?.textContent).toBe("Enable auto");
+		await act(async () => buttons[0]?.click());
+		expect(commands.setAutonomous).toHaveBeenCalledWith({
+			enabled: true,
+			ownerItemId: "runtime:producer",
+			lineId: "line:auto",
 		});
 	});
 

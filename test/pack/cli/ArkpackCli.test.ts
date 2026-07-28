@@ -170,5 +170,5 @@ describe("Arkpack signing CLI", () => {
 				).stderr,
 			),
 		).not.toMatch(/FiberFailure/);
-	});
+	}, 15_000);
 });

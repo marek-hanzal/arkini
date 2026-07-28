@@ -11,6 +11,7 @@ import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
 import type { PixiTileActorVisual } from "~/ui/pixi/actor/PixiTileActorVisual";
 import type {
 	PixiActorAnimation,
+	PixiActorAnimationChannel,
 	PixiActorAnimator,
 	PixiActorPresentationWrite,
 } from "~/ui/pixi/animation/PixiActorAnimator";
@@ -24,6 +25,7 @@ import type {
 	PixiTileMagneticField,
 	PixiTileMagneticFieldSample,
 } from "~/ui/pixi/magnet/PixiTileMagneticField";
+import { chasePixiTileMotionTargetFx } from "~/ui/pixi/motion/chasePixiTileMotionTargetFx";
 import { createPixiTileMotionRuntimeFx } from "~/ui/pixi/motion/createPixiTileMotionRuntimeFx";
 import { finalizePixiTileMotionActorsFx } from "~/ui/pixi/motion/finalizePixiTileMotionActorsFx";
 import { readPixiTileMotionOriginFx } from "~/ui/pixi/motion/readPixiTileMotionOriginFx";
@@ -382,6 +384,34 @@ const completeInputRemainderFlash = ({
 	expect(fadeIn.durationMs).toBe(375);
 	(cancelFadeIn ? fadeIn.onCancel : fadeIn.onComplete)?.();
 	expect(actor.item.quantity).toBe(expectedQuantity);
+};
+
+const completeStackMergeVanish = ({
+	actor,
+	animations,
+}: {
+	readonly actor: PixiTileActor;
+	readonly animations: ReadonlyArray<PixiActorAnimation>;
+}) => {
+	const vanishPose = animations
+		.filter((animation) => animation.actor === actor && animation.channel === "pose")
+		.at(-1);
+	if (vanishPose?.channel !== "pose") throw new Error("Expected stack merge vanish pose.");
+	expect(vanishPose.durationMs).toBe(260);
+	expect(vanishPose.toScale).toBeCloseTo(actor.container.scale.x * 0.72);
+	const vanishOpacity = animations
+		.filter(
+			(animation) =>
+				animation.actor === actor &&
+				animation.channel === "lifecycle-opacity" &&
+				animation.toAlpha === 0,
+		)
+		.at(-1);
+	if (vanishOpacity?.channel !== "lifecycle-opacity") {
+		throw new Error("Expected stack merge vanish opacity.");
+	}
+	expect(vanishOpacity.durationMs).toBe(260);
+	vanishOpacity.onComplete?.();
 };
 
 const createSwapHarness = ({
@@ -756,6 +786,98 @@ const createStackHarness = () => {
 };
 
 describe("Pixi tile motion runtime", () => {
+	it("presents a produced stack payload with its exact delta instead of the target total", () => {
+		const { animations, cue, runtime } = createStackHarness();
+		Effect.runSync(
+			runtime.enqueueFx([
+				{
+					...cue,
+					quantity: 2,
+				},
+			]),
+		);
+		Effect.runSync(runtime.startFx);
+		const travel = animations.find(
+			(animation) => animation.channel === "pose" && animation.ownerKey === "motion:30:0",
+		);
+		if (travel?.channel !== "pose") throw new Error("Expected a produced stack payload.");
+		expect(travel.actor.item.quantity).toBe(2);
+		expect(travel.actor.item.badgeCount).toBe(2);
+		Effect.runSync(runtime.closeFx);
+	});
+
+	it("ignores a queued proximity settlement after the pose writer is superseded", async () => {
+		const actor = createActor("runtime:proximity-cancel");
+		actor.container.position.set(0, 0);
+		const animations: PixiActorAnimation[] = [];
+		const poseState: {
+			active: Extract<
+				PixiActorAnimation,
+				{
+					readonly channel: "pose";
+				}
+			> | null;
+		} = {
+			active: null,
+		};
+		const onSettled = vi.fn();
+		const animator = {
+			...createRecordingAnimator({
+				animations,
+			}),
+			animateFx: (animation: PixiActorAnimation) =>
+				Effect.sync(() => {
+					animations.push(animation);
+					if (animation.channel === "pose") poseState.active = animation;
+				}),
+			cancelChannelFx: (_actor: PixiTileActor, channel: PixiActorAnimationChannel) =>
+				Effect.sync(() => {
+					if (channel !== "pose" || poseState.active === null) return;
+					const canceled = poseState.active;
+					poseState.active = null;
+					canceled.onCancel?.();
+				}),
+		} satisfies PixiActorAnimator;
+		Effect.runSync(
+			chasePixiTileMotionTargetFx({
+				actor,
+				animator,
+				fallbackTarget: {
+					layer: new Container(),
+					size: 80,
+					x: 100,
+					y: 0,
+				},
+				onSettled,
+				ownerKey: "test:proximity-cancel",
+				readLiveTarget: () => ({
+					scale: 1,
+					x: 100,
+					y: 0,
+				}),
+				settleWithinTileRatio: 0.5,
+				surface: {
+					readLocationPoseFx: () =>
+						Effect.succeed({
+							layer: new Container(),
+							size: 80,
+							x: 100,
+							y: 0,
+						}),
+				} as unknown as PixiMainSceneSurface,
+				targetLocation: secondBoardLocation,
+			}),
+		);
+		const travel = poseState.active;
+		if (travel === null) throw new Error("Expected proximity travel.");
+		const pose = travel.readPose?.(0.7);
+		if (pose === undefined) throw new Error("Expected proximity pose.");
+		actor.container.position.set(pose.x, pose.y);
+		Effect.runSync(animator.cancelChannelFx(actor, "pose"));
+		await Promise.resolve();
+		expect(onSettled).not.toHaveBeenCalled();
+	});
+
 	it("launches produced payloads from the held producer's live presentation pose", () => {
 		const { actors, animations, cue, runtime } = createStackHarness();
 		const producer = createActor(cue.originActorId);
@@ -788,6 +910,51 @@ describe("Pixi tile motion runtime", () => {
 		Effect.runSync(runtime.closeFx);
 	});
 
+	it("hard-snaps a stack merge inside the half-tile live-target field", async () => {
+		const { animations, cue, magneticReleases, runtime, target } = createStackHarness();
+		Effect.runSync(
+			runtime.enqueueFx([
+				cue,
+			]),
+		);
+		Effect.runSync(runtime.startFx);
+		const travel = animations.find(
+			(animation) => animation.channel === "pose" && animation.ownerKey === "motion:30:0",
+		);
+		if (travel?.channel !== "pose") throw new Error("Expected a stack payload travel.");
+
+		target.container.x = 260;
+		samplePoseAnimation(travel, 0.8);
+		samplePoseAnimation(travel, 0.9);
+		target.container.x = 600;
+		await Promise.resolve();
+		expect(travel.actor.container.destroyed).toBe(false);
+
+		target.container.x = 260;
+		samplePoseAnimation(travel, 0.95);
+		await Promise.resolve();
+		expect(travel.actor.container).toMatchObject({
+			x: target.container.x,
+			y: target.container.y,
+		});
+		expect(travel.actor.container.scale.x).toBe(target.container.scale.x);
+		expect(magneticReleases).not.toContainEqual({
+			sourceActorId: travel.actor.item.id,
+			sourceKind: "motion",
+		});
+		completeStackMergeVanish({
+			actor: travel.actor,
+			animations,
+		});
+		expect(travel.actor.container.destroyed).toBe(true);
+		expect(target.item.quantity).toBe(2);
+		expect(magneticReleases).toContainEqual({
+			sourceActorId: travel.actor.item.id,
+			sourceKind: "motion",
+		});
+		Effect.runSync(runtime.closeFx);
+	});
+
 	it("stacks a consumed source with its one retained physical actor", () => {
 		const { actors, animations, animator, canonicalItems, cue, runtime, target } =
 			createStackHarness();
@@ -799,6 +966,7 @@ describe("Pixi tile motion runtime", () => {
 		};
 		source.container.alpha = 1;
 		source.container.position.set(100, 40);
+		source.container.pivot.set(30, 18);
 		actors.set(source.item.id, source);
 		canonicalItems.delete(source.item.id);
 		Effect.runSync(
@@ -836,7 +1004,18 @@ describe("Pixi tile motion runtime", () => {
 		]);
 		expect(source.lifecycleTargetAlpha).toBe(1);
 		samplePoseAnimation(travel, 1);
+		expect({
+			x: source.container.x - source.container.pivot.x * source.container.scale.x,
+			y: source.container.y - source.container.pivot.y * source.container.scale.y,
+		}).toEqual({
+			x: target.container.x - target.container.pivot.x * target.container.scale.x,
+			y: target.container.y - target.container.pivot.y * target.container.scale.y,
+		});
 		travel.onComplete?.();
+		completeStackMergeVanish({
+			actor: source,
+			animations,
+		});
 
 		expect(source.container.destroyed).toBe(true);
 		expect(actors.has(source.item.id)).toBe(false);
@@ -2046,7 +2225,11 @@ describe("Pixi tile motion runtime", () => {
 			magneticReleases.filter((release) => release.sourceActorId === stackTransient.item.id),
 		).toHaveLength(0);
 		finalContact.onComplete?.();
-		expect(animations).toHaveLength(animationCountBeforeContact + 1);
+		expect(animations.length).toBeGreaterThanOrEqual(animationCountBeforeContact + 3);
+		completeStackMergeVanish({
+			actor: stackTransient,
+			animations,
+		});
 		expect(stacked.item.quantity).toBe(2);
 		expect(stacked.size).toBe(draggedStackSize);
 		expect(stacked.container.parent).toBe(transientActorLayer);
@@ -2204,6 +2387,10 @@ describe("Pixi tile motion runtime", () => {
 		expect(stacked.item.quantity).toBe(1);
 		expect(stacked.item.badgeCount).toBeUndefined();
 		firstTravel.onComplete?.();
+		completeStackMergeVanish({
+			actor: firstTransient,
+			animations,
+		});
 
 		expect(firstTransient.container.destroyed).toBe(true);
 		expect(stacked.item.quantity).toBe(2);
@@ -2228,6 +2415,10 @@ describe("Pixi tile motion runtime", () => {
 		expect(stacked.item.quantity).toBe(2);
 		expect(stacked.item.badgeCount).toBe(2);
 		secondTravel.onComplete?.();
+		completeStackMergeVanish({
+			actor: secondTransient,
+			animations,
+		});
 
 		expect(secondTransient.container.destroyed).toBe(true);
 		expect(stacked.item.quantity).toBe(3);
@@ -2323,12 +2514,7 @@ describe("Pixi tile motion runtime", () => {
 				inventory.item.id,
 			]),
 		});
-		expect(magneticReleases).toEqual([
-			{
-				sourceActorId: transient.item.id,
-				sourceKind: "motion",
-			},
-		]);
+		expect(magneticReleases).toEqual([]);
 		expect(transient.container.destroyed).toBe(false);
 		expect(destroy).not.toHaveBeenCalled();
 		const vanishOpacity = animations.find(
@@ -2346,6 +2532,12 @@ describe("Pixi tile motion runtime", () => {
 
 		expect(transient.container.destroyed).toBe(true);
 		expect(destroy).toHaveBeenCalledOnce();
+		expect(magneticReleases).toEqual([
+			{
+				sourceActorId: transient.item.id,
+				sourceKind: "motion",
+			},
+		]);
 		expect(Effect.runSync(runtime.readSnapshotFx).quantityPresentationByActorId).toEqual(
 			new Map(),
 		);
@@ -2389,6 +2581,10 @@ describe("Pixi tile motion runtime", () => {
 			y: 140,
 		});
 		contact.onComplete?.();
+		completeStackMergeVanish({
+			actor: transient,
+			animations,
+		});
 
 		expect(target.item.quantity).toBe(1);
 		expect(replacement.item.quantity).toBe(2);

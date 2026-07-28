@@ -1,8 +1,11 @@
-import { Array, Effect } from "effect";
+import { Effect } from "effect";
 
-import { readGridLocationOccupantsFx } from "~/engine/location/read/readGridLocationOccupantsFx";
+import {
+	indexGridLocationClaims,
+	readGridLocationClaimsFx,
+} from "~/engine/location/read/readGridLocationClaimsFx";
+import { readGridLocationKey } from "~/engine/location/read/readGridLocationOccupantsFx";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
-import { isGridRuntimeItemFx } from "~/engine/runtime/read/isGridRuntimeItemFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
 export namespace readEmptyLocationsFx {
@@ -12,15 +15,14 @@ export namespace readEmptyLocationsFx {
 	}
 }
 
-/** Filters concrete locations down to currently unoccupied cells. */
+/** Filters concrete locations down to cells with neither an occupant nor a delivery return lease. */
 export const readEmptyLocationsFx = Effect.fn("readEmptyLocationsFx")(function* <
 	Location extends GridLocationSchema.Type,
 >({ locations, runtime }: readEmptyLocationsFx.Props<Location>) {
-	const gridItems = Array.getSomes(yield* Effect.forEach(runtime.items, isGridRuntimeItemFx));
-	const occupants = yield* readGridLocationOccupantsFx({
-		items: gridItems,
-		locations,
-	});
-
-	return locations.filter((_, index) => occupants[index]?.items.length === 0);
+	const claimsByLocation = indexGridLocationClaims(
+		yield* readGridLocationClaimsFx({
+			runtime,
+		}),
+	);
+	return locations.filter((location) => !claimsByLocation.has(readGridLocationKey(location)));
 });

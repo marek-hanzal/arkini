@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import { GridLocationSchema } from "./GridLocationSchema";
+import { DeliveryLocationSchema } from "./DeliveryLocationSchema";
 import { InputLocationSchema } from "./InputLocationSchema";
 import { JobLocationSchema } from "./JobLocationSchema";
 import { ReservedLocationSchema } from "./ReservedLocationSchema";
@@ -14,6 +15,7 @@ import { ReservedLocationSchema } from "./ReservedLocationSchema";
 export const LocationSchema = z
 	.discriminatedUnion("scope", [
 		GridLocationSchema,
+		DeliveryLocationSchema,
 		InputLocationSchema,
 		JobLocationSchema,
 		ReservedLocationSchema,
@@ -21,7 +23,7 @@ export const LocationSchema = z
 	.meta({
 		id: "LocationSchema",
 		description:
-			"The concrete grid, line-input, reserved, or consumed-job location owned by one live item.",
+			"The concrete grid, delivery, line-input, reserved, or consumed-job location owned by one live item.",
 	});
 
 export type LocationSchema = typeof LocationSchema;

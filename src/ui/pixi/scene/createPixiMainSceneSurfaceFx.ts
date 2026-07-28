@@ -7,7 +7,6 @@ import type { TileActorItem } from "~/bridge/tile/TileActorItem";
 import { DropItemResultKindEnumSchema } from "~/bridge/tile/DropItemResultKindEnumSchema";
 import { LocationScopeEnumSchema } from "~/bridge/tile/LocationScopeEnumSchema";
 import type { readTileDropPreviewFx } from "~/bridge/tile/readTileDropPreviewFx";
-import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
 import type { PixiScenePalette } from "~/ui/pixi/appearance/PixiScenePalette";
 import type { PixiGridDropFeedback } from "~/ui/pixi/grid/PixiGridDropFeedback";
 import { drawPixiGridMaskFx } from "~/ui/pixi/grid/drawPixiGridMaskFx";
@@ -25,7 +24,7 @@ export namespace createPixiMainSceneSurfaceFx {
 		readonly dropFeedback: PixiGridDropFeedback;
 		readonly game: GameEngine;
 		readonly palette: PixiScenePalette;
-		readonly readActors: () => Iterable<PixiTileActor>;
+		readonly readCanonicalItems: () => Iterable<TileActorItem>;
 	}
 }
 
@@ -36,7 +35,7 @@ export const createPixiMainSceneSurfaceFx = Effect.fn("createPixiMainSceneSurfac
 		dropFeedback,
 		game,
 		palette: initialPalette,
-		readActors,
+		readCanonicalItems,
 	}: createPixiMainSceneSurfaceFx.Props) =>
 		Effect.sync((): PixiMainSceneSurface => {
 			let palette = initialPalette;
@@ -128,8 +127,8 @@ export const createPixiMainSceneSurfaceFx = Effect.fn("createPixiMainSceneSurfac
 			};
 
 			const readOccupant = (target: PixiSceneDropTarget) => {
-				for (const actor of readActors()) {
-					const location = actor.item.location;
+				for (const item of readCanonicalItems()) {
+					const location = item.location;
 					if (
 						target.layout.kind === "board" &&
 						location.scope === LocationScopeEnumSchema.enum.Board &&
@@ -137,14 +136,14 @@ export const createPixiMainSceneSurfaceFx = Effect.fn("createPixiMainSceneSurfac
 						location.position.x === target.x &&
 						location.position.y === target.y
 					) {
-						return actor.item;
+						return item;
 					}
 					if (
 						target.layout.kind === "toolbar" &&
 						location.scope === LocationScopeEnumSchema.enum.Toolbar &&
 						location.position.x === target.x
 					) {
-						return actor.item;
+						return item;
 					}
 				}
 				return null;

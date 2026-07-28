@@ -100,6 +100,12 @@ const LocationInfoFact = ({
 				},
 				() => "Reserved by active work",
 			)
+			.with(
+				{
+					kind: "delivery",
+				},
+				() => "In delivery",
+			)
 			.exhaustive()}
 	/>
 );

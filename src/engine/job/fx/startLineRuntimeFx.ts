@@ -1,5 +1,6 @@
 import { Effect } from "effect";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
+import { reconcileOutboundDeliveriesRuntimeFx } from "~/engine/delivery/fx/reconcileOutboundDeliveriesRuntimeFx";
 import { assertLineOutputMaxCountFx } from "~/engine/job/fx/assertLineOutputMaxCountFx";
 import { assertLineStartReadyFx } from "~/engine/job/fx/assertLineStartReadyFx";
 import { createJobFx } from "~/engine/job/fx/createJobFx";
@@ -68,9 +69,12 @@ export const startLineRuntimeFx = Effect.fn("startLineRuntimeFx")(function* ({
 		ownerItemId,
 		runtime: charged.runtime,
 	});
+	const reconciledRuntime = yield* reconcileOutboundDeliveriesRuntimeFx({
+		runtime: isolation.runtime,
+	});
 	return [
 		job,
-		isolation.runtime,
+		reconciledRuntime,
 		[
 			...inputTransition.events,
 			...charged.events,

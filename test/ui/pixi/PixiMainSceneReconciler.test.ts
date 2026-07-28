@@ -55,6 +55,12 @@ vi.mock("~/bridge/tile/readTileActorsFx", () => ({
 	}),
 }));
 
+vi.mock("~/bridge/tile/readTileDeliveriesFx", () => ({
+	readTileDeliveriesFx: () => ({
+		kind: "tile-deliveries",
+	}),
+}));
+
 vi.mock("~/bridge/tile/motion/readCommittedTileReplacementsFx", async () => {
 	const { Effect: EffectModule } = await import("effect");
 	return {
@@ -465,9 +471,10 @@ const createReconcilerHarness = ({
 	const game = {
 		readOrThrow: (query: unknown) => {
 			const projection = query as {
-				readonly kind: "tile-actors";
+				readonly kind: "tile-actors" | "tile-deliveries";
 				readonly surface: "inventory" | "main";
 			};
+			if (projection.kind === "tile-deliveries") return [];
 			if (projection.kind !== "tile-actors") throw new Error("Unexpected game read.");
 			return projectionState[projection.surface];
 		},
@@ -482,6 +489,13 @@ const createReconcilerHarness = ({
 				},
 			} as unknown as PixiApplicationOwner,
 			drag: dragHarness.drag,
+			delivery: {
+				closeFx: Effect.void,
+				readSnapshotFx: Effect.succeed({
+					retainedActorIds: new Set(),
+				}),
+				syncFx: () => Effect.void,
+			},
 			dropPresentation,
 			game,
 			magneticField: {

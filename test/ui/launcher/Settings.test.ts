@@ -84,6 +84,7 @@ const renderSettings = async (
 	const deferred = createDeferred();
 	const write = vi.fn(() => deferred.promise);
 	const writeCheatAvailability = vi.fn(() => Promise.resolve());
+	const openDiagnostics = vi.fn(() => Promise.resolve());
 	const registry = AtomRegistry.make({
 		initialValues: [
 			[
@@ -108,6 +109,9 @@ const renderSettings = async (
 			},
 			cheats: {
 				writeAvailable: writeCheatAvailability,
+			},
+			diagnostics: {
+				openDirectory: openDiagnostics,
 			},
 		},
 	});
@@ -208,11 +212,21 @@ const renderSettings = async (
 		router,
 		write,
 		writeCheatAvailability,
+		openDiagnostics,
 		registry,
 	};
 };
 
 describe("Settings", () => {
+	it("opens the bounded diagnostic log directory", async () => {
+		const { container, openDiagnostics } = await renderSettings([
+			"/settings",
+		]);
+
+		await act(async () => buttonByText(container, "Open logs").click());
+		await vi.waitFor(() => expect(openDiagnostics).toHaveBeenCalledOnce());
+	});
+
 	it("changes and persists the authoritative theme, then returns through history with Escape", async () => {
 		const { container, deferred, router, write } = await renderSettings([
 			"/main-menu",

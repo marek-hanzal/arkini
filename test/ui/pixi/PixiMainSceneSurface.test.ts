@@ -143,7 +143,7 @@ describe("Pixi main scene surface", () => {
 				dropFeedback,
 				game,
 				palette,
-				readActors: () => [],
+				readCanonicalItems: () => [],
 			}),
 		);
 		const owned = stage.children.flatMap(readTree);

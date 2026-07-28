@@ -1,7 +1,9 @@
 import { Effect } from "effect";
 
+import { reconcileOutboundDeliveriesRuntimeFx } from "~/engine/delivery/fx/reconcileOutboundDeliveriesRuntimeFx";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { JobOwnerBusyError } from "~/engine/job/error/JobOwnerBusyError";
+import { discardRuntimeItemIdentityStateFx } from "~/engine/runtime/fx/discardRuntimeItemIdentityStateFx";
 import { readRuntimeItemOwnedStateFx } from "~/engine/runtime/read/readRuntimeItemOwnedStateFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
@@ -15,8 +17,9 @@ export namespace discardRuntimeItemOwnedStateFx {
 /**
  * Permanently discards passive input-owned state beneath one item identity.
  *
- * The root survives. Queued intents owned by the discarded tree are removed,
- * but active jobs and their committed materials are strict precondition failures.
+ * The root object survives for its caller's consume/remove transition, but identity-bound intents
+ * for the complete ownership tree are discarded. Active jobs and their committed materials remain
+ * strict precondition failures.
  */
 export const discardRuntimeItemOwnedStateFx = Effect.fn("discardRuntimeItemOwnedStateFx")(
 	function* ({ ownerItemId, runtime }: discardRuntimeItemOwnedStateFx.Props) {
@@ -35,25 +38,16 @@ export const discardRuntimeItemOwnedStateFx = Effect.fn("discardRuntimeItemOwned
 		}
 
 		const discardedItemIds = new Set(owned.inputItems.map((item) => item.id));
-		const defaultLineByOwnerItemId = {
-			...(runtime.defaultLineByOwnerItemId ?? {}),
-		};
-		for (const discardedItemId of discardedItemIds) {
-			delete defaultLineByOwnerItemId[discardedItemId];
-		}
-		return {
+		const withoutOwnedItems = {
 			...runtime,
 			items: runtime.items.filter((item) => !discardedItemIds.has(item.id)),
-			jobQueue: (runtime.jobQueue ?? []).filter(
-				(request) => !owned.ownerItemIds.has(request.ownerItemId),
-			),
-			...(Object.keys(defaultLineByOwnerItemId).length === 0
-				? {
-						defaultLineByOwnerItemId: undefined,
-					}
-				: {
-						defaultLineByOwnerItemId,
-					}),
 		} satisfies RuntimeSchema.Type;
+		const withoutIdentityState = yield* discardRuntimeItemIdentityStateFx({
+			ownerItemIds: owned.ownerItemIds,
+			runtime: withoutOwnedItems,
+		});
+		return yield* reconcileOutboundDeliveriesRuntimeFx({
+			runtime: withoutIdentityState,
+		});
 	},
 );

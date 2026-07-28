@@ -97,6 +97,32 @@ describe("Electron preload lifecycle", () => {
 		);
 	});
 
+	it("routes bounded diagnostics through dedicated IPC channels", async () => {
+		electron.ipcRenderer.invoke.mockResolvedValue(undefined);
+		const api = await loadPreload();
+		const record: Parameters<typeof api.diagnostics.write>[0] = {
+			schemaVersion: 1,
+			level: "fatal",
+			category: [
+				"renderer",
+				"test",
+			],
+			event: "test-failed",
+		};
+
+		await expect(api.diagnostics.write(record)).resolves.toBeUndefined();
+		await expect(api.diagnostics.openDirectory()).resolves.toBeUndefined();
+		expect(electron.ipcRenderer.invoke).toHaveBeenNthCalledWith(
+			1,
+			ArkiniElectronContract.channels.diagnosticsWrite,
+			record,
+		);
+		expect(electron.ipcRenderer.invoke).toHaveBeenNthCalledWith(
+			2,
+			ArkiniElectronContract.channels.diagnosticsOpenDirectory,
+		);
+	});
+
 	it("shares one pending native close request", async () => {
 		const api = await loadPreload();
 		const first = api.lifecycle.requestClose();

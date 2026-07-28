@@ -19,10 +19,14 @@ export const isLineInputPureFx = Effect.fn("isLineInputPureFx")(function* ({
 	runtime,
 }: isLineInputPureFx.Props) {
 	return !runtime.items.some((item) => {
+		if (item.location.scope === LocationScopeEnumSchema.enum.Input) {
+			return item.location.ownerItemId === ownerItemId && item.location.lineId === lineId;
+		}
 		return (
-			item.location.scope === LocationScopeEnumSchema.enum.Input &&
-			item.location.ownerItemId === ownerItemId &&
-			item.location.lineId === lineId
+			item.location.scope === LocationScopeEnumSchema.enum.Delivery &&
+			item.location.phase === "outbound" &&
+			item.location.target.ownerItemId === ownerItemId &&
+			item.location.target.lineId === lineId
 		);
 	});
 });

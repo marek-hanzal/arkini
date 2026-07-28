@@ -3,14 +3,16 @@ import { Array, Effect, Option, pipe } from "effect";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
 import { resolveItemFx } from "~/engine/item/fx/resolveItemFx";
-import { readGridLocationOccupantsFx } from "~/engine/location/read/readGridLocationOccupantsFx";
+import {
+	readGridLocationClaimsFx,
+	readGridLocationClaimAt,
+} from "~/engine/location/read/readGridLocationClaimsFx";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 import { assertPlacementMaxCountFx } from "~/engine/placement/fx/assertPlacementMaxCountFx";
 import { ItemAlreadyExistsError } from "~/engine/runtime/error/ItemAlreadyExistsError";
 import { LocationOccupiedError } from "~/engine/runtime/error/LocationOccupiedError";
 import { createRuntimeItemFx } from "~/engine/runtime/fx/createRuntimeItemFx";
 import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
-import { isGridRuntimeItemFx } from "~/engine/runtime/read/isGridRuntimeItemFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { PlacementEnumSchema } from "~/engine/placement/schema/PlacementEnumSchema";
 
@@ -56,20 +58,16 @@ export const spawnItemFx = Effect.fn("spawnItemFx")(function* ({
 				);
 			}
 
-			const gridItems = Array.getSomes(
-				yield* Effect.forEach(runtime.items, isGridRuntimeItemFx),
-			);
-			const [occupants] = yield* readGridLocationOccupantsFx({
-				items: gridItems,
-				locations: [
-					location,
-				],
+			const claim = readGridLocationClaimAt({
+				claims: yield* readGridLocationClaimsFx({
+					runtime,
+				}),
+				location,
 			});
-			const occupant = occupants?.items[0];
-			if (occupant !== undefined) {
+			if (claim !== undefined) {
 				return yield* Effect.fail(
 					new LocationOccupiedError({
-						itemId: occupant.id,
+						itemId: claim.itemId,
 						location,
 					}),
 				);

@@ -40,6 +40,10 @@ export const readStoredItemDetailLineFx = Effect.fn("readStoredItemDetailLineFx"
 		},
 		startMode: "start",
 		isDefault,
+		autonomous: {
+			enabled: false,
+			supported: line.autonomous,
+		},
 		actions: {
 			canAutofill: false,
 			canStart: false,

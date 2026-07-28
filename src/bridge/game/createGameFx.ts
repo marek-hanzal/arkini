@@ -5,6 +5,7 @@ import type { Game } from "~/bridge/game/Game";
 import type { GameSession } from "~/bridge/game/GameSession";
 import { GameSaveBootstrapError } from "~/bridge/game/GameSaveBootstrapError";
 import { createGameSessionFx } from "~/bridge/game/createGameSessionFx";
+import { installGameDiagnostics } from "~/bridge/game/installGameDiagnostics";
 import { createGameSaveStorageFx } from "~/bridge/save/createGameSaveStorageFx";
 import { decodeArkiniSaveFx } from "~/bridge/save/decodeArkiniSaveFx";
 import { encodeArkiniSaveFx } from "~/bridge/save/encodeArkiniSaveFx";
@@ -120,12 +121,30 @@ export const createGameFx = Effect.fn("createGameFx")(function* ({
 		}
 
 		const liveSession = session;
+		const diagnostics = installGameDiagnostics({
+			arkpack: loaded.descriptor,
+			restored: state !== undefined,
+			session: liveSession,
+		});
 		return {
 			...liveSession,
 			arkpack: loaded.descriptor,
 			config: loaded.payload.config,
-			disposeFx: liveSession.disposeFx.pipe(Effect.andThen(releaseResourcesFx)),
+			diagnosticSessionId: diagnostics.sessionId,
+			disposeFx: liveSession.disposeFx.pipe(
+				Effect.tap(() =>
+					Effect.sync(() => {
+						diagnostics.close("saved");
+					}),
+				),
+				Effect.andThen(releaseResourcesFx),
+			),
 			disposeWithoutSaveFx: liveSession.disposeWithoutSaveFx.pipe(
+				Effect.tap(() =>
+					Effect.sync(() => {
+						diagnostics.close("discarded");
+					}),
+				),
 				Effect.andThen(releaseResourcesFx),
 			),
 			saveKey,

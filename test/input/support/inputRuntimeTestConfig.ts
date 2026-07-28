@@ -103,6 +103,25 @@ export const inputRuntimeTestConfig = GameConfigSchema.parse({
 	},
 });
 
+export const inputRuntimeToolbarTestConfig = GameConfigSchema.parse({
+	...inputRuntimeTestConfig,
+	meta: {
+		...inputRuntimeTestConfig.meta,
+		toolbarSize: 3,
+	},
+	items: {
+		...inputRuntimeTestConfig.items,
+		inventory: {
+			...baseItem({
+				id: "inventory",
+				maxStackSize: 1,
+				scope: "board",
+			}),
+			type: "inventory",
+		},
+	},
+});
+
 export const workshopLocation = {
 	scope: "board" as const,
 	space: 0,

@@ -1,6 +1,10 @@
 import { Effect } from "effect";
 
+import { reconcileOutboundDeliveriesRuntimeFx } from "~/engine/delivery/fx/reconcileOutboundDeliveriesRuntimeFx";
 import { JobOwnerBusyError } from "~/engine/job/error/JobOwnerBusyError";
+import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
+import { discardRuntimeItemIdentityStateFx } from "~/engine/runtime/fx/discardRuntimeItemIdentityStateFx";
+import { reviseRuntimeItemFx } from "~/engine/runtime/fx/reviseRuntimeItemFx";
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
@@ -27,20 +31,52 @@ export const removeRuntimeItemIdentityFx = Effect.fn("removeRuntimeItemIdentityF
 		);
 	}
 
-	const defaultLineByOwnerItemId = {
-		...(runtime.defaultLineByOwnerItemId ?? {}),
-	};
-	delete defaultLineByOwnerItemId[item.id];
-	return {
-		...runtime,
-		items: runtime.items.filter((candidate) => candidate.id !== item.id),
-		jobQueue: (runtime.jobQueue ?? []).filter((request) => request.ownerItemId !== item.id),
-		...(Object.keys(defaultLineByOwnerItemId).length === 0
-			? {
-					defaultLineByOwnerItemId: undefined,
-				}
-			: {
-					defaultLineByOwnerItemId,
-				}),
+	const withoutIdentityState = yield* discardRuntimeItemIdentityStateFx({
+		ownerItemIds: new Set([
+			item.id,
+		]),
+		runtime,
+	});
+	let removedRuntime = {
+		...withoutIdentityState,
+		items: withoutIdentityState.items.filter((candidate) => candidate.id !== item.id),
 	} satisfies RuntimeSchema.Type;
+	removedRuntime = {
+		...removedRuntime,
+		items: yield* Effect.forEach(removedRuntime.items, (candidate) => {
+			if (
+				candidate.location.scope !== LocationScopeEnumSchema.enum.Delivery ||
+				candidate.location.purpose.kind !== "fill-and-try-start" ||
+				candidate.location.purpose.ownerItemId !== item.id
+			) {
+				return Effect.succeed(candidate);
+			}
+			return reviseRuntimeItemFx({
+				item: {
+					...candidate,
+					location: {
+						...candidate.location,
+						purpose: {
+							kind: "fill" as const,
+						},
+					},
+				},
+			});
+		}),
+	} satisfies RuntimeSchema.Type;
+	const returnFromByOwnerItemId =
+		item.location.scope === LocationScopeEnumSchema.enum.Board ||
+		item.location.scope === LocationScopeEnumSchema.enum.Inventory ||
+		item.location.scope === LocationScopeEnumSchema.enum.Toolbar
+			? new Map([
+					[
+						item.id,
+						item.location,
+					],
+				])
+			: undefined;
+	return yield* reconcileOutboundDeliveriesRuntimeFx({
+		returnFromByOwnerItemId,
+		runtime: removedRuntime,
+	});
 });

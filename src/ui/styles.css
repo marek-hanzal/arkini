@@ -122,6 +122,10 @@
 		color-mix(in srgb, var(--ak-success) 14%, var(--ak-surface)),
 		color-mix(in srgb, var(--ak-success) 18%, var(--ak-surface))
 	);
+	--ak-list-row-active-progress-surface: light-dark(
+		color-mix(in srgb, var(--ak-success) 28%, var(--ak-surface)),
+		color-mix(in srgb, var(--ak-success) 34%, var(--ak-surface))
+	);
 	--ak-list-row-selected-surface: var(--ak-accent);
 	--ak-list-row-selected-foreground: var(--ak-accent-contrast);
 	--ak-list-row-pending-surface: light-dark(

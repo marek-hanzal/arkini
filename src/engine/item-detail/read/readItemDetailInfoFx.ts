@@ -33,6 +33,9 @@ export namespace readItemDetailInfoFx {
 		  }
 		| {
 				readonly kind: typeof LocationScopeEnumSchema.enum.Reserved;
+		  }
+		| {
+				readonly kind: typeof LocationScopeEnumSchema.enum.Delivery;
 		  };
 
 	export type Result =
@@ -112,6 +115,14 @@ const readLocation = (location: LocationSchema.Type): readItemDetailInfoFx.Locat
 			},
 			() => ({
 				kind: LocationScopeEnumSchema.enum.Reserved,
+			}),
+		)
+		.with(
+			{
+				scope: LocationScopeEnumSchema.enum.Delivery,
+			},
+			() => ({
+				kind: LocationScopeEnumSchema.enum.Delivery,
 			}),
 		)
 		.exhaustive();

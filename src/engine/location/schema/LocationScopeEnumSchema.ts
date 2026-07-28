@@ -9,6 +9,7 @@ export const LocationScopeEnumSchema = z
 		Input: "input",
 		Job: "job",
 		Reserved: "reserved",
+		Delivery: "delivery",
 	})
 	.meta({
 		id: "LocationScopeEnumSchema",

@@ -2,18 +2,19 @@ import { Cause, Effect, Exit, Option } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~/engine/game/fx/useGameFx";
+import { settleItemDeliveryFx } from "~/engine/delivery/write/settleItemDeliveryFx";
 import { autofillLineInputsFx } from "~/engine/input/write/autofillLineInputsFx";
 import { storeInputMaterialFx } from "~/engine/input/write/storeInputMaterialFx";
 import { withdrawLineInputFx } from "~/engine/input/write/withdrawLineInputFx";
 import { withdrawLineInputsFx } from "~/engine/input/write/withdrawLineInputsFx";
 import { readItemDetailLinesFx } from "~/engine/item-detail/read/readItemDetailLinesFx";
-import { startLineFx } from "~/engine/job/write/startLineFx";
 import { getItemFx } from "~/engine/runtime/read/getItemFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import {
 	inputRuntimeTestConfig,
+	inputRuntimeToolbarTestConfig,
 	sourceLocation,
 	workshopLocation,
 } from "~test/input/support/inputRuntimeTestConfig";
@@ -65,6 +66,73 @@ const blockedPlacementTestConfig = GameConfigSchema.parse({
 			width: 1,
 			height: 1,
 		},
+		toolbarSize: 0,
+	},
+});
+const rangeInputTestConfig = GameConfigSchema.parse({
+	...inputRuntimeTestConfig,
+	items: {
+		...inputRuntimeTestConfig.items,
+		workshop: {
+			...inputTestWorkshop,
+			lines: inputTestWorkshop.lines.map((line) => ({
+				...line,
+				input: [
+					{
+						type: "materials",
+						selector: {
+							type: "item",
+							itemId: "water",
+						},
+						quantity: {
+							type: "range",
+							min: 1,
+							max: 4,
+						},
+						capacity: 2,
+					},
+					...line.input.slice(1),
+				],
+			})),
+		},
+	},
+});
+const competingRangeInputTestConfig = GameConfigSchema.parse({
+	...inputRuntimeTestConfig,
+	items: {
+		...inputRuntimeTestConfig.items,
+		workshop: {
+			...inputTestWorkshop,
+			lines: inputTestWorkshop.lines.map((line) => ({
+				...line,
+				input: [
+					{
+						type: "materials",
+						selector: {
+							type: "item",
+							itemId: "water",
+						},
+						quantity: {
+							type: "range",
+							min: 1,
+							max: 4,
+						},
+					},
+					{
+						type: "materials",
+						selector: {
+							type: "item",
+							itemId: "water",
+						},
+						quantity: {
+							type: "value",
+							value: 2,
+						},
+					},
+					...line.input.slice(1),
+				],
+			})),
+		},
 	},
 });
 
@@ -85,7 +153,7 @@ const spawnWaterFx = ({
 	readonly location:
 		| ReturnType<typeof sourceLocation>
 		| {
-				readonly scope: "inventory";
+				readonly scope: "inventory" | "toolbar";
 				readonly position: {
 					readonly x: number;
 					readonly y: number;
@@ -101,18 +169,181 @@ const spawnWaterFx = ({
 	});
 
 describe("Item Detail line input actions", () => {
-	it("autofills deterministic board sources before falling back to Inventory", () => {
+	it("autofills a range input toward the available maximum without filling its buffer", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {
 				yield* spawnOwnerFx();
 				yield* spawnWaterFx({
-					id: "runtime:far",
-					location: sourceLocation(3),
+					id: "runtime:water",
+					location: sourceLocation(1),
+					quantity: 7,
+				});
+
+				const autofilled = yield* autofillLineInputsFx({
+					ownerItemId,
+					lineId,
+				});
+				return {
+					autofilled,
+					runtime: yield* readRuntimeFx(),
+				};
+			}).pipe(
+				useGameFx({
+					config: rangeInputTestConfig,
+				}),
+			),
+		);
+
+		expect(result.autofilled).toEqual({
+			deliveryItemIds: [
+				"runtime:water",
+			],
+			remainingMissingQuantity: 0,
+			scheduledQuantity: 4,
+		});
+		expect(result.runtime.items.find((item) => item.id === "runtime:water")).toMatchObject({
+			quantity: 7,
+			location: {
+				scope: "delivery",
+				target: {
+					input: [
+						{
+							inputIndex: 0,
+							quantity: 4,
+						},
+					],
+				},
+			},
+		});
+	});
+
+	it("satisfies every compatible minimum before topping a range input toward max", () => {
+		const result = Effect.runSync(
+			Effect.gen(function* () {
+				yield* spawnOwnerFx();
+				yield* spawnWaterFx({
+					id: "runtime:water",
+					location: sourceLocation(1),
+					quantity: 4,
+				});
+
+				const autofilled = yield* autofillLineInputsFx({
+					ownerItemId,
+					lineId,
+				});
+				return {
+					autofilled,
+					runtime: yield* readRuntimeFx(),
+				};
+			}).pipe(
+				useGameFx({
+					config: competingRangeInputTestConfig,
+				}),
+			),
+		);
+
+		expect(result.autofilled).toMatchObject({
+			remainingMissingQuantity: 0,
+			scheduledQuantity: 4,
+		});
+		expect(result.runtime.items.find((item) => item.id === "runtime:water")).toMatchObject({
+			location: {
+				target: {
+					input: [
+						{
+							inputIndex: 0,
+							quantity: 2,
+						},
+						{
+							inputIndex: 1,
+							quantity: 2,
+						},
+					],
+				},
+			},
+		});
+	});
+
+	it("waits for every useful range top-up delivery before starting the line", () => {
+		const result = Effect.runSync(
+			Effect.gen(function* () {
+				yield* spawnOwnerFx();
+				yield* spawnWaterFx({
+					id: "runtime:minimum",
+					location: sourceLocation(1),
 					quantity: 1,
 				});
 				yield* spawnWaterFx({
+					id: "runtime:top-up",
+					location: sourceLocation(2),
+					quantity: 3,
+				});
+				yield* autofillLineInputsFx({
+					ownerItemId,
+					lineId,
+					purpose: {
+						kind: "fill-and-try-start",
+						ownerItemId,
+						lineId,
+						source: "player",
+					},
+				});
+
+				yield* settleItemDeliveryFx({
+					itemId: "runtime:minimum",
+					generation: 0,
+				});
+				const afterMinimum = yield* readRuntimeFx();
+				yield* settleItemDeliveryFx({
+					itemId: "runtime:top-up",
+					generation: 0,
+				});
+				return {
+					afterMinimum,
+					afterTopUp: yield* readRuntimeFx(),
+				};
+			}).pipe(
+				useGameFx({
+					config: rangeInputTestConfig,
+				}),
+			),
+		);
+
+		expect(result.afterMinimum.jobs).toHaveLength(0);
+		expect(
+			result.afterMinimum.items.find((item) => item.id === "runtime:top-up"),
+		).toMatchObject({
+			location: {
+				phase: "outbound",
+				scope: "delivery",
+			},
+		});
+		expect(result.afterTopUp.jobs).toHaveLength(1);
+		expect(
+			result.afterTopUp.items
+				.filter((item) => item.location.scope === "job")
+				.reduce((total, item) => total + item.quantity, 0),
+		).toBe(4);
+	});
+
+	it("autofills deterministic board, Toolbar, and Inventory sources in physical priority", () => {
+		const result = Effect.runSync(
+			Effect.gen(function* () {
+				yield* spawnOwnerFx();
+				yield* spawnWaterFx({
 					id: "runtime:near",
 					location: sourceLocation(1),
+					quantity: 1,
+				});
+				yield* spawnWaterFx({
+					id: "runtime:toolbar",
+					location: {
+						scope: "toolbar",
+						position: {
+							x: 1,
+							y: 0,
+						},
+					},
 					quantity: 1,
 				});
 				yield* spawnWaterFx({
@@ -150,7 +381,7 @@ describe("Item Detail line input actions", () => {
 				};
 			}).pipe(
 				useGameFx({
-					config: inputRuntimeTestConfig,
+					config: inputRuntimeToolbarTestConfig,
 				}),
 			),
 		);
@@ -167,8 +398,13 @@ describe("Item Detail line input actions", () => {
 			],
 		});
 		expect(result.autofilled).toEqual({
-			storedQuantity: 3,
+			deliveryItemIds: [
+				"runtime:near",
+				"runtime:toolbar",
+				"runtime:inventory",
+			],
 			remainingMissingQuantity: 0,
+			scheduledQuantity: 3,
 		});
 		const buffered = result.runtime.items.filter(
 			(item) =>
@@ -176,16 +412,18 @@ describe("Item Detail line input actions", () => {
 				item.location.ownerItemId === ownerItemId &&
 				item.location.lineId === lineId,
 		);
-		expect(buffered.map((item) => item.item.id)).toEqual([
-			"water",
-			"water",
-			"water",
-		]);
-		expect(buffered.reduce((total, item) => total + item.quantity, 0)).toBe(3);
+		expect(buffered).toHaveLength(0);
 		expect(result.runtime.items.find((item) => item.id === "runtime:inventory")).toMatchObject({
-			quantity: 1,
+			quantity: 2,
 			location: {
-				scope: "inventory",
+				phase: "outbound",
+				scope: "delivery",
+			},
+		});
+		expect(result.runtime.items.find((item) => item.id === "runtime:toolbar")).toMatchObject({
+			location: {
+				phase: "outbound",
+				scope: "delivery",
 			},
 		});
 		expect(result.after).toMatchObject({
@@ -194,11 +432,11 @@ describe("Item Detail line input actions", () => {
 				{
 					actions: {
 						canAutofill: false,
-						canWithdraw: true,
+						canWithdraw: false,
 					},
 					availability: {
 						kind: "available",
-						readiness: "ready",
+						readiness: "inputs",
 					},
 				},
 			],
@@ -231,16 +469,23 @@ describe("Item Detail line input actions", () => {
 		);
 
 		expect(result.autofilled).toEqual({
-			storedQuantity: 3,
+			deliveryItemIds: [
+				"runtime:water",
+			],
 			remainingMissingQuantity: 0,
+			scheduledQuantity: 3,
 		});
 		expect(result.runtime.items.find((item) => item.id === "runtime:water")).toMatchObject({
-			location: sourceLocation(1),
-			quantity: 4,
+			location: {
+				origin: sourceLocation(1),
+				phase: "outbound",
+				scope: "delivery",
+			},
+			quantity: 7,
 		});
 	});
 
-	it("starts immediately after default-click autofill without waiting for presentation", () => {
+	it("starts only after the physical delivery contact settles", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {
 				yield* spawnOwnerFx();
@@ -253,10 +498,16 @@ describe("Item Detail line input actions", () => {
 				yield* autofillLineInputsFx({
 					ownerItemId,
 					lineId,
+					purpose: {
+						kind: "fill-and-try-start",
+						ownerItemId,
+						lineId,
+						source: "player",
+					},
 				});
-				const started = yield* startLineFx({
-					ownerItemId,
-					lineId,
+				const started = yield* settleItemDeliveryFx({
+					itemId: "runtime:water",
+					generation: 0,
 				});
 				return {
 					started,
@@ -271,11 +522,14 @@ describe("Item Detail line input actions", () => {
 
 		expect(result.runtime.jobs).toHaveLength(1);
 		expect(result.runtime.items.find((item) => item.id === "runtime:water")).toMatchObject({
-			location: sourceLocation(1),
+			location: {
+				phase: "returning",
+				scope: "delivery",
+			},
 			quantity: 4,
 		});
 		expect(result.started).toMatchObject({
-			type: "started",
+			status: "stored",
 		});
 	});
 
@@ -319,8 +573,9 @@ describe("Item Detail line input actions", () => {
 		);
 
 		expect(result.autofilled).toEqual({
-			storedQuantity: 0,
+			deliveryItemIds: [],
 			remainingMissingQuantity: 3,
+			scheduledQuantity: 0,
 		});
 		expect(result.runtime.items).toContainEqual(
 			expect.objectContaining({

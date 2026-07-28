@@ -31,6 +31,20 @@ export const fromRuntimeFx = Effect.fn("fromRuntimeFx")(function* ({
 		items,
 		jobs: runtime.jobs,
 		jobQueue: runtime.jobQueue ?? [],
+		...(runtime.deliveryStartIntents === undefined
+			? {}
+			: {
+					deliveryStartIntents: runtime.deliveryStartIntents.map((intent) => ({
+						...intent,
+					})),
+				}),
+		...(runtime.autonomousLines === undefined
+			? {}
+			: {
+					autonomousLines: runtime.autonomousLines.map((line) => ({
+						...line,
+					})),
+				}),
 		...(runtime.defaultLineByOwnerItemId === undefined
 			? {}
 			: {

@@ -12,6 +12,7 @@ import { createRendererLifecycleFx } from "~/bridge/lifecycle/createRendererLife
 import { RendererAtomRegistry } from "~/bridge/reactivity/RendererAtomRegistry";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import { installRendererControlledCloseFx } from "~/installRendererControlledCloseFx";
+import { installRendererNativeDragGuardFx } from "~/installRendererNativeDragGuardFx";
 import { createArkiniRouterFx } from "~/createArkiniRouterFx";
 import { AppearanceDataset } from "~/ui/appearance/AppearanceDataset";
 import { configureLauncherStartupFx } from "~/ui/launcher/configureLauncherStartupFx";
@@ -31,6 +32,11 @@ if (!rootElement) {
  */
 const catalog = RendererRuntime.runSync(createArkpackCatalogFx());
 RendererRuntime.runSync(configureArkpackCatalogFx(catalog));
+RendererRuntime.runSync(
+	installRendererNativeDragGuardFx({
+		root: rootElement,
+	}),
+);
 const lifecycle = RendererRuntime.runSync(createRendererLifecycleFx(window.arkini.lifecycle));
 RendererRuntime.runSync(configureRendererLifecycleFx(lifecycle));
 RendererRuntime.runSync(

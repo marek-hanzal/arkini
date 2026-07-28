@@ -3,6 +3,7 @@ import * as Atom from "effect/unstable/reactivity/Atom";
 
 import { makeExactGameAtomFamilyFx } from "~/bridge/game/makeExactGameAtomFamilyFx";
 import { settleRendererCommandFailureFx } from "~/bridge/game/settleRendererCommandFailureFx";
+import { toDiagnosticValue, writeDiagnosticRecord } from "~/bridge/diagnostics/Diagnostics";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import { autofillLineInputsFx } from "~/engine/input/write/autofillLineInputsFx";
 import { startLineFx } from "~/engine/job/write/startLineFx";
@@ -78,9 +79,15 @@ export const TileDefaultLineCommandAtom = RendererRuntime.runSync(
 								const autofill = yield* autofillLineInputsFx({
 									lineId: command.lineId,
 									ownerItemId: command.ownerItemId,
+									purpose: {
+										kind: "fill-and-try-start",
+										lineId: command.lineId,
+										ownerItemId: command.ownerItemId,
+										source: "player",
+									},
 								});
-								const autofilled = autofill.storedQuantity > 0;
-								if (autofilled && autofill.remainingMissingQuantity > 0) {
+								const autofilled = autofill.scheduledQuantity > 0;
+								if (autofilled) {
 									return {
 										autofilled,
 										startExit: null,
@@ -99,6 +106,21 @@ export const TileDefaultLineCommandAtom = RendererRuntime.runSync(
 						),
 					);
 					if (Exit.isFailure(exit)) {
+						writeDiagnosticRecord({
+							category: [
+								"game",
+								"command",
+							],
+							event: "default-line-command-failed",
+							level: "error",
+							sessionId: game.diagnosticSessionId,
+							data: {
+								generation: command.generation,
+								lineId: command.lineId,
+								ownerItemId: command.ownerItemId,
+								cause: toDiagnosticValue(exit.cause),
+							},
+						});
 						return yield* settleRendererCommandFailureFx({
 							cause: exit.cause,
 							game,
@@ -115,6 +137,22 @@ export const TileDefaultLineCommandAtom = RendererRuntime.runSync(
 						});
 					}
 					if (exit.value.startExit !== null && Exit.isFailure(exit.value.startExit)) {
+						writeDiagnosticRecord({
+							category: [
+								"game",
+								"command",
+							],
+							event: "default-line-start-rejected",
+							level: "warning",
+							sessionId: game.diagnosticSessionId,
+							data: {
+								autofilled: exit.value.autofilled,
+								generation: command.generation,
+								lineId: command.lineId,
+								ownerItemId: command.ownerItemId,
+								cause: toDiagnosticValue(exit.value.startExit.cause),
+							},
+						});
 						return yield* settleRendererCommandFailureFx({
 							cause: exit.value.startExit.cause,
 							game,
@@ -130,6 +168,21 @@ export const TileDefaultLineCommandAtom = RendererRuntime.runSync(
 							setFatalCause: (cause) => Atom.set(fatalCauseAtom, cause),
 						});
 					}
+					writeDiagnosticRecord({
+						category: [
+							"game",
+							"command",
+						],
+						event: "default-line-command-succeeded",
+						level: "info",
+						sessionId: game.diagnosticSessionId,
+						data: {
+							autofilled: exit.value.autofilled,
+							generation: command.generation,
+							lineId: command.lineId,
+							ownerItemId: command.ownerItemId,
+						},
+					});
 					if (command.generation !== latestCommandGeneration) return;
 					yield* Atom.set(stateAtom, {
 						kind: "idle",
@@ -167,6 +220,20 @@ export const TileDefaultLineCommandAtom = RendererRuntime.runSync(
 				if (state.kind === "error" && state.ownerItemId === command.ownerItemId) return;
 				activeCommandKeys.add(key);
 				const generation = ++latestCommandGeneration;
+				writeDiagnosticRecord({
+					category: [
+						"game",
+						"command",
+					],
+					event: "default-line-command-admitted",
+					level: "info",
+					sessionId: game.diagnosticSessionId,
+					data: {
+						generation,
+						lineId: command.lineId,
+						ownerItemId: command.ownerItemId,
+					},
+				});
 				context.set(stateAtom, {
 					kind: "pending",
 					ownerItemId: command.ownerItemId,

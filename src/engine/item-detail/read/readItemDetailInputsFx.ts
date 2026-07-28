@@ -2,9 +2,11 @@ import { Effect } from "effect";
 import { match } from "ts-pattern";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
+import { readLineInputDeliveryClaimsFx } from "~/engine/delivery/read/readLineInputDeliveryClaimsFx";
 import type { ItemDetailLines } from "~/engine/item-detail/read/ItemDetailLines";
 import { readItemDetailChargeKeyFx } from "~/engine/item-detail/read/readItemDetailChargeKeyFx";
 import { readItemDetailDepositAvailableChargesFx } from "~/engine/item-detail/read/readItemDetailDepositAvailableChargesFx";
+import { readItemDetailMaterialAutofillAvailabilityFx } from "~/engine/item-detail/read/readItemDetailMaterialAutofillAvailabilityFx";
 import { readItemDetailQuantityBoundsFx } from "~/engine/item-detail/read/readItemDetailQuantityBoundsFx";
 import { readItemDetailSelectorKeyFx } from "~/engine/item-detail/read/readItemDetailSelectorKeyFx";
 import type { InputRunResolutionSchema } from "~/engine/input/schema/run/InputRunResolutionSchema";
@@ -58,12 +60,24 @@ export const readItemDetailInputsFx = Effect.fn("readItemDetailInputsFx")(functi
 							resolution?.type === InputEnumSchema.enum.Materials
 								? resolution.storedQuantity
 								: storedItems.reduce((total, item) => total + item.quantity, 0);
+						const deliveryQuantity = (yield* readLineInputDeliveryClaimsFx({
+							inputIndex,
+							lineId,
+							ownerItemId,
+							runtime,
+						})).reduce((total, claim) => total + claim.quantity, 0);
 						const maxStoredQuantity =
 							resolution?.type === InputEnumSchema.enum.Materials
 								? resolution.maxStoredQuantity
 								: required.max + materialInput.capacity;
 						const missingQuantity = Math.max(0, required.min - storedQuantity);
 						const availableCapacity = Math.max(0, maxStoredQuantity - storedQuantity);
+						const autofillAvailability =
+							yield* readItemDetailMaterialAutofillAvailabilityFx({
+								ownerItemId,
+								runtime,
+								selector: materialInput.selector,
+							});
 						const selectorKey = yield* readItemDetailSelectorKeyFx(
 							materialInput.selector,
 						);
@@ -76,6 +90,13 @@ export const readItemDetailInputsFx = Effect.fn("readItemDetailInputsFx")(functi
 							mode: materialInput.mode,
 							required,
 							storedQuantity,
+							deliveryQuantity,
+							autofillAvailableQuantity: autofillAvailability.availableQuantity,
+							...(autofillAvailability.producerItemId === undefined
+								? {}
+								: {
+										producerItemId: autofillAvailability.producerItemId,
+									}),
 							maxStoredQuantity,
 							missingQuantity,
 							availableCapacity,

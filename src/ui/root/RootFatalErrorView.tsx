@@ -3,7 +3,13 @@ import { Effect } from "effect";
 import { useEffect } from "react";
 
 import { forceApplicationCloseFx } from "~/bridge/lifecycle/forceApplicationCloseFx";
-import { DangerButton } from "~/ui/button/Button";
+import {
+	openDiagnosticDirectoryFx,
+	toDiagnosticValue,
+	writeDiagnosticRecord,
+} from "~/bridge/diagnostics/Diagnostics";
+import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
+import { Button, DangerButton } from "~/ui/button/Button";
 import { Canvas } from "~/ui/canvas/Canvas";
 
 export namespace RootFatalErrorView {
@@ -18,6 +24,17 @@ export const RootFatalErrorView = ({ error }: RootFatalErrorView.Props) => {
 
 	useEffect(() => {
 		console.error("Arkini renderer entered the fatal lifecycle boundary.", error);
+		writeDiagnosticRecord({
+			category: [
+				"renderer",
+				"fatal-boundary",
+			],
+			event: "root-fatal-error-rendered",
+			level: "fatal",
+			data: {
+				error: toDiagnosticValue(error),
+			},
+		});
 	}, [
 		error,
 	]);
@@ -37,15 +54,28 @@ export const RootFatalErrorView = ({ error }: RootFatalErrorView.Props) => {
 						Arkini cannot continue this session. Close the application and start the
 						game again.
 					</p>
-					<DangerButton
-						onClick={() =>
-							router.options.context.rendererRuntime.runSync(
-								forceApplicationCloseFx().pipe(Effect.orDie),
-							)
-						}
-					>
-						Close Arkini
-					</DangerButton>
+					<div className="flex flex-wrap justify-center gap-3">
+						<Button
+							onClick={() => {
+								void RendererRuntime.runPromise(openDiagnosticDirectoryFx()).catch(
+									(cause) => {
+										console.error("Arkini could not open diagnostics.", cause);
+									},
+								);
+							}}
+						>
+							Open diagnostics
+						</Button>
+						<DangerButton
+							onClick={() =>
+								router.options.context.rendererRuntime.runSync(
+									forceApplicationCloseFx().pipe(Effect.orDie),
+								)
+							}
+						>
+							Close Arkini
+						</DangerButton>
+					</div>
 				</section>
 			</main>
 		</Canvas>

@@ -2,7 +2,7 @@ import type { Effect } from "effect";
 import { match } from "ts-pattern";
 
 import type { AppearanceTheme } from "~/bridge/appearance/AppearanceTheme";
-import { PrimaryButton } from "~/ui/button/Button";
+import { Button, PrimaryButton } from "~/ui/button/Button";
 import { useSettingsModel } from "~/ui/settings/useSettingsModel";
 
 const ThemeOptions: ReadonlyArray<{
@@ -125,6 +125,28 @@ export const Settings = ({ onBackFx }: Settings.Props) => {
 						}
 					/>
 				</label>
+				<div
+					className="ak-list-row flex items-center justify-between gap-4 rounded-lg border border-line px-4 py-3"
+					data-ui="SettingsDiagnostics"
+				>
+					<span className="grid gap-1">
+						<span className="text-sm font-semibold text-foreground">Diagnostics</span>
+						<span className="text-sm leading-5 text-muted">
+							Open the bounded rotating logs used to investigate crashes and broken
+							gameplay sessions.
+						</span>
+					</span>
+					<Button
+						className="shrink-0"
+						cursorIntent={
+							model.diagnosticsStatus.kind === "pending" ? "progress" : undefined
+						}
+						disabled={model.diagnosticsStatus.kind === "pending"}
+						onClick={model.openDiagnostics}
+					>
+						{model.diagnosticsStatus.kind === "pending" ? "Opening…" : "Open logs"}
+					</Button>
+				</div>
 			</fieldset>
 
 			<div
@@ -132,6 +154,11 @@ export const Settings = ({ onBackFx }: Settings.Props) => {
 				aria-live="polite"
 				data-ui="SettingsStatus"
 			>
+				{model.diagnosticsStatus.kind === "error" ? (
+					<p className="text-danger">
+						Diagnostics failed: {errorMessage(model.diagnosticsStatus.error)}
+					</p>
+				) : null}
 				{match(model.status)
 					.with(
 						{

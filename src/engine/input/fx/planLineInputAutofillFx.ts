@@ -1,8 +1,11 @@
 import { Effect } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
+import { readLineInputDeliveryClaimsFx } from "~/engine/delivery/read/readLineInputDeliveryClaimsFx";
 import { resolveInputMaterialFx } from "~/engine/input/fx/resolveInputMaterialFx";
 import { isMaterialInputEligible } from "~/engine/input/read/readMaterialInputEligibilityFx";
+import { isLineInputAutofillSourceLocation } from "~/engine/input/read/isLineInputAutofillSourceLocation";
+import type { InputMaterialSchema } from "~/engine/input/schema/InputMaterialSchema";
 import { isLineInputClosedFx } from "~/engine/line/fx/input/isLineInputClosedFx";
 import { readBoardItemLineFx } from "~/engine/line/fx/readBoardItemLineFx";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
@@ -40,7 +43,12 @@ const candidateRank = ({
 	readonly owner: BoardRuntimeItemSchema.Type;
 }) => {
 	return {
-		scope: candidate.location.scope === LocationScopeEnumSchema.enum.Board ? 0 : 1,
+		scope:
+			candidate.location.scope === LocationScopeEnumSchema.enum.Board
+				? 0
+				: candidate.location.scope === LocationScopeEnumSchema.enum.Toolbar
+					? 1
+					: 2,
 		distance:
 			candidate.location.scope === LocationScopeEnumSchema.enum.Board
 				? Math.abs(candidate.location.position.x - owner.location.position.x) +
@@ -73,8 +81,10 @@ const compareCandidates = (owner: BoardRuntimeItemSchema.Type) => {
 /**
  * Plans deterministic automatic material delivery for one exact line.
  *
- * Sources prefer the owner's board space by distance, then fall back to Inventory slot order.
- * The plan fills only each slot's minimum missing quantity and never mutates runtime truth itself.
+ * Sources prefer the owner's board space by distance, then Toolbar and Inventory slot order.
+ * Required minima are allocated across every slot before compatible range inputs receive optional
+ * top-ups toward their maximum. The planner never consumes authored buffer capacity or mutates
+ * runtime truth itself.
  */
 export const planLineInputAutofillFx = Effect.fn("planLineInputAutofillFx")(function* ({
 	ownerItemId,
@@ -90,9 +100,13 @@ export const planLineInputAutofillFx = Effect.fn("planLineInputAutofillFx")(func
 	const candidates = runtime.items
 		.filter(
 			(candidate): candidate is GridRuntimeItemSchema.Type =>
-				(candidate.location.scope === LocationScopeEnumSchema.enum.Board &&
-					candidate.location.space === owner.location.space) ||
-				candidate.location.scope === LocationScopeEnumSchema.enum.Inventory,
+				(candidate.location.scope === LocationScopeEnumSchema.enum.Board ||
+					candidate.location.scope === LocationScopeEnumSchema.enum.Inventory ||
+					candidate.location.scope === LocationScopeEnumSchema.enum.Toolbar) &&
+				isLineInputAutofillSourceLocation({
+					location: candidate.location,
+					ownerSpace: owner.location.space,
+				}),
 		)
 		.filter((candidate) => candidate.id !== owner.id)
 		.slice()
@@ -104,7 +118,15 @@ export const planLineInputAutofillFx = Effect.fn("planLineInputAutofillFx")(func
 		]),
 	);
 	const entries: planLineInputAutofillFx.Entry[] = [];
-	let remainingMissingQuantity = 0;
+	const entryIndexByKey = new Map<string, number>();
+	const slots: {
+		readonly closed: boolean;
+		readonly input: InputMaterialSchema.Type;
+		readonly inputIndex: number;
+		readonly maxQuantity: number;
+		readonly minQuantity: number;
+		plannedQuantity: number;
+	}[] = [];
 
 	for (const [inputIndex, input] of line.input.entries()) {
 		if (input.type !== InputEnumSchema.enum.Materials) continue;
@@ -116,27 +138,38 @@ export const planLineInputAutofillFx = Effect.fn("planLineInputAutofillFx")(func
 				item.location.lineId === lineId &&
 				item.location.inputIndex === inputIndex,
 		);
-		let storedQuantity = storedItems.reduce((total, item) => total + item.quantity, 0);
+		const storedQuantity = storedItems.reduce((total, item) => total + item.quantity, 0);
+		const incomingQuantity = (yield* readLineInputDeliveryClaimsFx({
+			inputIndex,
+			lineId,
+			ownerItemId,
+			runtime,
+		})).reduce((total, claim) => total + claim.quantity, 0);
+		let plannedQuantity = storedQuantity + incomingQuantity;
 		const initialResolution = yield* resolveInputMaterialFx({
 			input,
-			storedQuantity,
+			storedQuantity: plannedQuantity,
 		});
-		if (initialResolution.missingQuantity === 0) continue;
-
 		const closed = yield* isLineInputClosedFx({
 			input,
 			ownerItemId,
 			lineId,
 			runtime,
 		});
-		if (closed) {
-			remainingMissingQuantity += initialResolution.missingQuantity;
-			continue;
-		}
+		slots.push({
+			closed,
+			input,
+			inputIndex,
+			maxQuantity: initialResolution.required.max,
+			minQuantity: initialResolution.required.min,
+			plannedQuantity,
+		});
+	}
 
-		let missingQuantity = initialResolution.missingQuantity;
+	const allocateTo = (slot: (typeof slots)[number], targetQuantity: number) => {
+		let requestedQuantity = Math.max(0, targetQuantity - slot.plannedQuantity);
 		for (const candidate of candidates) {
-			if (missingQuantity === 0) break;
+			if (requestedQuantity === 0) break;
 			const remainingQuantity = remainingByItemId.get(candidate.id) ?? 0;
 			if (remainingQuantity === 0) continue;
 
@@ -144,29 +177,51 @@ export const planLineInputAutofillFx = Effect.fn("planLineInputAutofillFx")(func
 				!isMaterialInputEligible(candidate.item) ||
 				!matchesItemSelector({
 					item: candidate.item,
-					selector: input.selector,
+					selector: slot.input.selector,
 				})
 			) {
 				continue;
 			}
-			const quantity = Math.min(
-				remainingQuantity,
-				missingQuantity,
-				initialResolution.maxStoredQuantity - storedQuantity,
-			);
+			const quantity = Math.min(remainingQuantity, requestedQuantity);
 			if (quantity === 0) continue;
 
-			entries.push({
-				inputIndex,
-				sourceItemId: candidate.id,
-				quantity,
-			});
+			const entryKey = `${candidate.id}\u0000${slot.inputIndex}`;
+			const existingEntryIndex = entryIndexByKey.get(entryKey);
+			if (existingEntryIndex === undefined) {
+				entryIndexByKey.set(entryKey, entries.length);
+				entries.push({
+					inputIndex: slot.inputIndex,
+					sourceItemId: candidate.id,
+					quantity,
+				});
+			} else {
+				const existingEntry = entries[existingEntryIndex];
+				if (existingEntry !== undefined) {
+					entries[existingEntryIndex] = {
+						...existingEntry,
+						quantity: existingEntry.quantity + quantity,
+					};
+				}
+			}
 			remainingByItemId.set(candidate.id, remainingQuantity - quantity);
-			storedQuantity += quantity;
-			missingQuantity -= quantity;
+			slot.plannedQuantity += quantity;
+			requestedQuantity -= quantity;
 		}
+	};
 
-		remainingMissingQuantity += missingQuantity;
+	// Preserve line readiness first when multiple compatible slots compete for one source.
+	for (const slot of slots) {
+		if (!slot.closed) allocateTo(slot, slot.minQuantity);
+	}
+	const remainingMissingQuantity = slots.reduce(
+		(total, slot) => total + Math.max(0, slot.minQuantity - slot.plannedQuantity),
+		0,
+	);
+	// Only material still unclaimed after every minimum may optimize range inputs toward max.
+	for (const slot of slots) {
+		if (!slot.closed && slot.maxQuantity > slot.minQuantity) {
+			allocateTo(slot, slot.maxQuantity);
+		}
 	}
 
 	return {

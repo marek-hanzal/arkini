@@ -10,6 +10,7 @@ import { readCommittedTileReplacementsFx } from "~/bridge/tile/motion/readCommit
 import { readCommittedTileSwapMotionCueFx } from "~/bridge/tile/motion/readCommittedTileSwapMotionCueFx";
 import { readTileMotionCuesFx } from "~/bridge/tile/motion/readTileMotionCuesFx";
 import { readTileActorsFx } from "~/bridge/tile/readTileActorsFx";
+import { readTileDeliveriesFx } from "~/bridge/tile/readTileDeliveriesFx";
 import type { PixiMainSceneActorStore } from "~/ui/pixi/actor/PixiMainSceneActorStore";
 import type { PixiTileActorParticleTextures } from "~/ui/pixi/actor/PixiTileActorParticleTextures";
 import { createPixiTileActorFx } from "~/ui/pixi/actor/createPixiTileActorFx";
@@ -31,6 +32,7 @@ import {
 import { startPixiTileActorFadeInFx } from "~/ui/pixi/animation/startPixiTileActorFadeInFx";
 import type { PixiScenePalette } from "~/ui/pixi/appearance/PixiScenePalette";
 import type { PixiMainSceneDragController } from "~/ui/pixi/drag/PixiMainSceneDragController";
+import type { PixiDeliveryMotionRuntime } from "~/ui/pixi/delivery/PixiDeliveryMotionRuntime";
 import { readPixiDragSettleDurationMsFx } from "~/ui/pixi/drag/readPixiDragSettleDurationMsFx";
 import type { PixiMainSceneDropPresentation } from "~/ui/pixi/drop/PixiMainSceneDropPresentation";
 import type { PixiTileMagneticField } from "~/ui/pixi/magnet/PixiTileMagneticField";
@@ -49,6 +51,7 @@ export namespace createPixiMainSceneReconcilerFx {
 		readonly animator: PixiActorAnimator;
 		readonly application: PixiApplicationOwner;
 		readonly drag: PixiMainSceneDragController;
+		readonly delivery: PixiDeliveryMotionRuntime;
 		readonly dropPresentation: PixiMainSceneDropPresentation;
 		readonly game: GameEngine;
 		readonly magneticField: PixiTileMagneticField;
@@ -91,6 +94,7 @@ export const createPixiMainSceneReconcilerFx = Effect.fn("createPixiMainSceneRec
 		animator,
 		application,
 		drag,
+		delivery,
 		dropPresentation,
 		game,
 		magneticField,
@@ -272,6 +276,15 @@ export const createPixiMainSceneReconcilerFx = Effect.fn("createPixiMainSceneRec
 				);
 				const dropSnapshot = yield* dropPresentation.readSnapshotFx;
 				yield* actorStore.replaceCanonicalItemsFx(nextItems);
+				yield* delivery.syncFx(
+					game.readOrThrow(
+						readTileDeliveriesFx({
+							game,
+							runtime: transition.runtime,
+						}),
+					),
+				);
+				const deliverySnapshot = yield* delivery.readSnapshotFx;
 				const compiledCues = presentCommittedEffects
 					? [
 							...RendererRuntime.runSync(
@@ -374,6 +387,7 @@ export const createPixiMainSceneReconcilerFx = Effect.fn("createPixiMainSceneRec
 						yield* removeActorImmediatelyFx(id);
 						continue;
 					}
+					if (deliverySnapshot.retainedActorIds.has(id)) continue;
 					if (motionSnapshot.retainedActorIds.has(id)) continue;
 					const exitFeedbackCues = feedbackCues.filter(
 						({ actorId, kind }) => actorId === id && kind !== "consume-source",
@@ -466,6 +480,7 @@ export const createPixiMainSceneReconcilerFx = Effect.fn("createPixiMainSceneRec
 					const sizeChanged = actor.size !== pose.size;
 					const poseOwned =
 						actor.dragging ||
+						deliverySnapshot.retainedActorIds.has(item.id) ||
 						motionSnapshot.interactionClaimByActorId.has(item.id) ||
 						(yield* animator.isChannelActiveFx(actor, "pose"));
 					const crowdAlphaChanged =

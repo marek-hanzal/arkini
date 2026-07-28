@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest";
 import { useGameFx } from "~/engine/game/fx/useGameFx";
 import { storeInputMaterialFx } from "~/engine/input/write/storeInputMaterialFx";
 import { startLineFx } from "~/engine/job/write/startLineFx";
+import { setDefaultLineFx } from "~/engine/line/write/setDefaultLineFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
@@ -169,6 +170,10 @@ const prepareNestedConsumeFx = Effect.fn("prepareNestedConsumeFx")(function* () 
 		quantity: 1,
 	});
 
+	yield* setDefaultLineFx({
+		ownerItemId: inner.id,
+		lineId: "line:inner:load",
+	});
 	yield* storeInputMaterialFx({
 		ownerItemId: middle.id,
 		lineId: "line:middle:load",
@@ -242,6 +247,7 @@ describe("consume material lifecycle", () => {
 		});
 		expect(result.running.items.some((item) => item.id === "runtime:middle")).toBe(false);
 		expect(result.running.items.some((item) => item.id === "runtime:payload")).toBe(false);
+		expect(result.running.defaultLineByOwnerItemId?.["runtime:inner"]).toBeUndefined();
 		expect(result.completed.items.some((item) => item.id === "runtime:inner")).toBe(false);
 		expect(
 			result.completed.items.filter((item) => item.item.id === "item:product"),

@@ -12,6 +12,7 @@ import { createPixiActorAnimatorFx } from "~/ui/pixi/animation/createPixiActorAn
 import { readPixiScenePaletteFx } from "~/ui/pixi/appearance/readPixiScenePaletteFx";
 import { createPixiCursorGrabMotionFx } from "~/ui/pixi/drag/createPixiCursorGrabMotionFx";
 import { createPixiMainSceneDragControllerFx } from "~/ui/pixi/drag/createPixiMainSceneDragControllerFx";
+import { createPixiDeliveryMotionRuntimeFx } from "~/ui/pixi/delivery/createPixiDeliveryMotionRuntimeFx";
 import { createPixiMainSceneDropPresentationFx } from "~/ui/pixi/drop/createPixiMainSceneDropPresentationFx";
 import { createPixiMainSceneDropSubmissionFx } from "~/ui/pixi/drop/createPixiMainSceneDropSubmissionFx";
 import { createPixiTileMagneticFieldFx } from "~/ui/pixi/magnet/createPixiTileMagneticFieldFx";
@@ -96,7 +97,7 @@ export const createPixiMainSceneRuntimeFx = Effect.fn("createPixiMainSceneRuntim
 			dropFeedback,
 			game,
 			palette: paletteState.current,
-			readActors: () => actorStore.actors.values(),
+			readCanonicalItems: () => actorStore.canonicalItems.values(),
 		});
 		registerRollback(surface.closeFx);
 		// Retained actors must die before their parent surface destroys its layers.
@@ -152,11 +153,25 @@ export const createPixiMainSceneRuntimeFx = Effect.fn("createPixiMainSceneRuntim
 			surface,
 		});
 		registerRollback(drag.closeFx);
+		const delivery = yield* createPixiDeliveryMotionRuntimeFx({
+			actorStore,
+			animator,
+			application,
+			drag,
+			game,
+			magneticField,
+			particleTextures,
+			readPalette: () => paletteState.current,
+			surface,
+			textures,
+		});
+		registerRollback(delivery.closeFx);
 		const reconciler = yield* createPixiMainSceneReconcilerFx({
 			actorStore,
 			animator,
 			application,
 			drag,
+			delivery,
 			dropPresentation,
 			game,
 			magneticField,

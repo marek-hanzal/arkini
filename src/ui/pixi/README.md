@@ -22,6 +22,7 @@ all scene-local owners.
 | `animation/createPixiActorAnimatorFx.ts` | Sole writer for root pose and typed presentation channels |
 | `scene/createPixiMainSceneReconcilerFx.ts` | Canonical actor reconciliation and presentation entry/exit |
 | `motion/createPixiTileMotionRuntimeFx.ts` | Ordered cue lanes, animation claims, transient payloads, and cue settlement |
+| `delivery/createPixiDeliveryMotionRuntimeFx.ts` | Canonical delivery travel, retargeting, and generation-guarded contact settlement |
 | `drag/*DragController*` | One pointer gesture and its frozen source/release facts |
 | `drop/createPixiMainSceneDropPresentationFx.ts` | Accepted-drop presentation facts until canonical settlement |
 | `drop/createPixiMainSceneDropSubmissionFx.ts` | Frozen release command, optimistic feedback, and async drop settlement |
@@ -35,27 +36,11 @@ committed transition. The receiving scene still resolves identity and outcome fr
 
 ## Data flows
 
-Canonical presentation:
-
-```text
-GameEngine committed transition
-→ scene runtime
-→ surface receives the exact transition snapshot
-→ reconciler projects bridge-level actors and motion cues
-→ actor store / motion runtime mutate retained presentation
-→ demand frame invalidation
-```
-
-Pointer release:
-
-```text
-drag controller
-→ bridge preview using canonical source and target facts
-→ freeze fresh release-time facts
-→ bridge command
-→ command result + current committed transition
-→ drop presentation / reconciler / motion cues
-```
+| Flow | Ordered ownership |
+| --- | --- |
+| Canonical presentation | A committed engine transition enters the scene runtime. The surface receives its exact snapshot, the reconciler projects bridge actors and motion cues, retained presentation mutates, then demand rendering is invalidated. |
+| Pointer release | The drag controller asks the bridge for a preview, freezes fresh release-time facts, submits the command, and hands its result plus the current committed transition to drop presentation and reconciliation. |
+| Canonical delivery | An engine delivery location projects persisted endpoints, phase, and generation. The delivery runtime adopts the retained actor, animates from its live pose, and submits generation-guarded settlement only at physical contact. The engine then commits input or return placement. |
 
 The renderer may lag, retain, hide, or animate committed facts, but it must not manufacture a
 gameplay outcome. Missing visual identities degrade to ordinary reconciliation.
@@ -107,8 +92,9 @@ gameplay outcome. Missing visual identities degrade to ordinary reconciliation.
   channel.
 - The animator is the only production writer of root `x`, `y`, `scale`, `pivot`, and `alpha`. Layout
   publishes canonical geometry through surfaces; motion owns normalized progress. Retargetable
-  placement samples current geometry without completion snaps, while a live stack chase snapshots
-  one endpoint per speed-bounded segment and opens another segment when its receiver moves.
+  placement samples current geometry without completion snaps. Stack and delivery travel sample a
+  receiver's live retained pose; stack payloads hard-snap at physical contact inside a half-tile
+  circular field instead of recursively chasing an already adjacent receiver.
 - Every texture-bearing visual revision uses one complete private slot. The current slot remains
   renderable until the pending slot has loaded all required textures, then the visual controller
   crossfades both from their live alpha. A superseding revision flattens the surviving composite;
@@ -119,11 +105,23 @@ gameplay outcome. Missing visual identities degrade to ordinary reconciliation.
 - Engine-driven spawn, swap, stack, and direct drag share one magnetic field. Spawn and swap repel
   nearby board responders without attracting their own exchange counterpart; a stack payload
   attracts and chases its receiver's live physical pose through distance-aware nonlinear segments.
-  Settlement releases the magnetic source. Producer input moves the complete stack to its owner,
-  hides it at contact, reveals the committed remainder, and physically returns that same actor.
-- Canonical engine items remain the only gameplay truth. Motion owns one narrow, phase-aware
-  quantity overlay (`exact` input remainder or in-flight stack subtraction); reconciler and
-  animation-triggered refreshes use the same projector, so quantity and badge can never disagree.
+  Settlement releases the magnetic source. Manual producer input remains committed by its drop
+  command; autofill and autonomous input instead create canonical deliveries whose input is not
+  available until physical contact settles the matching generation.
+- A delivery keeps its exact origin lease until its full quantity commits or returns. Player
+  interaction may reduce or invalidate its soft target claim; reconciliation then returns the same
+  actor, including any partial remainder, to the persisted origin.
+- Delivery travel may retarget from its current live pose when its generation or geometry changes.
+  If either endpoint has no geometry, presentation freezes without settlement. Save/hydration keeps
+  the delivery phase, generation, origin, and return endpoint, so a later visible main scene resumes
+  the physical trip instead of inventing an offscreen gameplay commit.
+- Autonomous lines are driven only in the currently presented board space. Switching space or
+  unmounting its main scene freezes already admitted physical deliveries; returning to that board
+  resumes them from canonical facts. No route-local renderer is allowed to settle invisible cargo.
+- Canonical engine items remain the only gameplay truth. Delivery quantity stays canonical on its
+  runtime item; ordinary cue motion owns only its narrow, phase-aware presentation overlay. The
+  reconciler and animation-triggered refreshes use the same projector, so quantity and badge can
+  never disagree.
 - Accepted consumption presents exact result/event facts: the surviving source dips, a removed
   source fades, and the receiver emits the shared accent particle burst. Drop-result facts cover manual
   stack, producer-input, and Inventory storage commands that do not emit equivalent engine events.
@@ -149,6 +147,7 @@ gameplay outcome. Missing visual identities degrade to ordinary reconciliation.
 | Canonical actor appearance or identity | `actor/` and `scene/createPixiMainSceneReconcilerFx.ts` |
 | Drag, left click, right click, or drop release | `drag/` |
 | Move, swap, stack, spawn, or replacement choreography | `motion/` and `scene/runPixiMainSceneReplacementsFx.ts` |
+| Autofill or autonomous delivery travel and settlement | `delivery/` and bridge `tile/readTileDeliveriesFx.ts` |
 | Cross-canvas Inventory release | `PixiInventorySurface.tsx` and the main-scene Inventory opener |
 | Hit testing, slot geometry, or masks | `scene/*Surface*`, `layout/`, and `grid/` |
 | Magnetic response | `magnet/`; eligibility must continue to come from the bridge |

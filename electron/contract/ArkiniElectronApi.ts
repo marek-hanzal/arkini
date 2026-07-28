@@ -2,6 +2,7 @@ import type { AppearanceAccentSchema } from "./appearance/AppearanceAccentSchema
 import type { AppearanceThemeSchema } from "./appearance/AppearanceThemeSchema";
 import type { CheatAvailabilitySchema } from "./cheat/CheatAvailabilitySchema";
 import type { LastPackageIdSchema } from "./launcher/LastPackageIdSchema";
+import type { DiagnosticRecord } from "./diagnostics/DiagnosticRecord";
 
 export namespace ArkiniElectronApi {
 	export const channels = {
@@ -20,6 +21,8 @@ export namespace ArkiniElectronApi {
 		cheatAvailabilityWrite: "arkini:cheats:available:write",
 		launcherLastPackageIdRead: "arkini:launcher:last-package:read",
 		launcherLastPackageIdWrite: "arkini:launcher:last-package:write",
+		diagnosticsWrite: "arkini:diagnostics:write",
+		diagnosticsOpenDirectory: "arkini:diagnostics:open-directory",
 		windowVisible: "arkini:lifecycle:window-visible",
 		beforeClose: "arkini:lifecycle:before-close",
 		closeReady: "arkini:lifecycle:close-ready",
@@ -89,6 +92,10 @@ export namespace ArkiniElectronApi {
 			readonly read: (key: SaveKey) => Promise<Uint8Array | null>;
 			readonly write: (key: SaveKey, bytes: Uint8Array) => Promise<void>;
 			readonly clear: (key: SaveKey) => Promise<void>;
+		};
+		readonly diagnostics: {
+			readonly write: (record: DiagnosticRecord) => Promise<void>;
+			readonly openDirectory: () => Promise<void>;
 		};
 		readonly lifecycle: {
 			readonly waitUntilVisible: () => Promise<number>;

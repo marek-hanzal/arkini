@@ -1,7 +1,6 @@
 import { Deferred, Effect, Fiber, Stream } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
 import { useGameFx } from "~/engine/game/fx/useGameFx";
 import { autofillLineInputsFx } from "~/engine/input/write/autofillLineInputsFx";
 import { CommittedTransitionsFx } from "~/engine/runtime/context/CommittedTransitionsFx";
@@ -12,131 +11,23 @@ import {
 	workshopLocation,
 } from "~test/input/support/inputRuntimeTestConfig";
 
-const ownerItemId = "runtime:workshop";
-const lineId = "line:workshop:build";
-
-describe("autofillLineInputsFx events", () => {
-	it("publishes visible source transfers in committed autofill order", async () => {
+describe("autofillLineInputsFx transition", () => {
+	it("commits one delivery admission without lying about input storage", async () => {
 		const transitions = await Effect.runPromise(
 			Effect.scoped(
 				Effect.gen(function* () {
 					yield* spawnItemFx({
-						id: ownerItemId,
+						id: "runtime:workshop",
 						itemId: "workshop",
 						location: workshopLocation,
 						quantity: 1,
 					});
 					yield* spawnItemFx({
-						id: "runtime:far",
-						itemId: "water",
-						location: sourceLocation(3),
-						quantity: 1,
-					});
-					yield* spawnItemFx({
-						id: "runtime:near",
-						itemId: "water",
-						location: sourceLocation(1),
-						quantity: 1,
-					});
-					yield* spawnItemFx({
-						id: "runtime:inventory",
-						itemId: "water",
-						location: {
-							scope: "inventory",
-							position: {
-								x: 0,
-								y: 0,
-							},
-						},
-						quantity: 2,
-					});
-
-					const transitions = yield* CommittedTransitionsFx;
-					const replaySeen = yield* Deferred.make<void>();
-					const nextFiber = yield* transitions.changes.pipe(
-						Stream.tap(() => Deferred.succeed(replaySeen, undefined)),
-						Stream.drop(1),
-						Stream.take(3),
-						Stream.runCollect,
-						Effect.forkChild,
-					);
-					yield* Deferred.await(replaySeen);
-					yield* autofillLineInputsFx({
-						ownerItemId,
-						lineId,
-					});
-					return Array.from(yield* Fiber.join(nextFiber));
-				}),
-			).pipe(
-				useGameFx({
-					config: inputRuntimeTestConfig,
-				}),
-			),
-		);
-
-		expect(transitions.flatMap((transition) => transition.events)).toEqual([
-			{
-				type: GameEventEnumSchema.enum.ItemInputStored,
-				sourceItemId: "runtime:near",
-				canonicalItemId: "water",
-				previousSourceLocation: sourceLocation(1),
-				previousQuantity: 1,
-				storedQuantity: 1,
-				resultingQuantity: 0,
-				ownerItemId,
-				lineId,
-				inputIndex: 0,
-			},
-			{
-				type: GameEventEnumSchema.enum.ItemInputStored,
-				sourceItemId: "runtime:far",
-				canonicalItemId: "water",
-				previousSourceLocation: sourceLocation(3),
-				previousQuantity: 1,
-				storedQuantity: 1,
-				resultingQuantity: 0,
-				ownerItemId,
-				lineId,
-				inputIndex: 0,
-			},
-			{
-				type: GameEventEnumSchema.enum.ItemInputStored,
-				sourceItemId: "runtime:inventory",
-				canonicalItemId: "water",
-				previousSourceLocation: {
-					scope: "inventory",
-					position: {
-						x: 0,
-						y: 0,
-					},
-				},
-				previousQuantity: 2,
-				storedQuantity: 1,
-				resultingQuantity: 1,
-				ownerItemId,
-				lineId,
-				inputIndex: 0,
-			},
-		]);
-	});
-
-	it("publishes only the missing quantity and preserves the visible stack remainder", async () => {
-		const transitions = await Effect.runPromise(
-			Effect.scoped(
-				Effect.gen(function* () {
-					yield* spawnItemFx({
-						id: ownerItemId,
-						itemId: "workshop",
-						location: workshopLocation,
-						quantity: 1,
-					});
-					yield* spawnItemFx({
-						id: "runtime:stack",
+						id: "runtime:water",
 						itemId: "water",
 						location: sourceLocation(1),
 						quantity: 7,
 					});
-
 					const transitions = yield* CommittedTransitionsFx;
 					const replaySeen = yield* Deferred.make<void>();
 					const nextFiber = yield* transitions.changes.pipe(
@@ -148,8 +39,8 @@ describe("autofillLineInputsFx events", () => {
 					);
 					yield* Deferred.await(replaySeen);
 					yield* autofillLineInputsFx({
-						ownerItemId,
-						lineId,
+						ownerItemId: "runtime:workshop",
+						lineId: "line:workshop:build",
 					});
 					return Array.from(yield* Fiber.join(nextFiber));
 				}),
@@ -160,19 +51,19 @@ describe("autofillLineInputsFx events", () => {
 			),
 		);
 
-		expect(transitions.flatMap((transition) => transition.events)).toEqual([
-			{
-				type: GameEventEnumSchema.enum.ItemInputStored,
-				sourceItemId: "runtime:stack",
-				canonicalItemId: "water",
-				previousSourceLocation: sourceLocation(1),
-				previousQuantity: 7,
-				storedQuantity: 3,
-				resultingQuantity: 4,
-				ownerItemId,
-				lineId,
-				inputIndex: 0,
+		expect(transitions).toHaveLength(1);
+		expect(transitions[0]?.events).toEqual([]);
+		expect(
+			transitions[0]?.runtime.items.find(({ id }) => id === "runtime:water"),
+		).toMatchObject({
+			location: {
+				phase: "outbound",
+				scope: "delivery",
 			},
-		]);
+			quantity: 7,
+		});
+		expect(
+			transitions[0]?.runtime.items.filter(({ location }) => location.scope === "input"),
+		).toHaveLength(0);
 	});
 });

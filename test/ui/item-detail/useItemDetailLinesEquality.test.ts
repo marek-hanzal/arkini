@@ -45,6 +45,10 @@ const makeProjection = (
 			},
 			startMode: "start",
 			isDefault: false,
+			autonomous: {
+				enabled: false,
+				supported: false,
+			},
 			actions: {
 				canAutofill: false,
 				canStart: false,

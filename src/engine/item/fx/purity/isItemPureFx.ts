@@ -45,8 +45,20 @@ export const readItemPurityIndex = (runtime: RuntimeSchema.Type): ItemPurityInde
 	const jobLineIdsByOwnerId = new Map<IdSchema.Type, Set<IdSchema.Type>>();
 	const queueLineIdsByOwnerId = new Map<IdSchema.Type, Set<IdSchema.Type>>();
 	for (const item of runtime.items) {
-		if (item.location.scope !== LocationScopeEnumSchema.enum.Input) continue;
-		addOwnedLine(inputLineIdsByOwnerId, item.location.ownerItemId, item.location.lineId);
+		if (item.location.scope === LocationScopeEnumSchema.enum.Input) {
+			addOwnedLine(inputLineIdsByOwnerId, item.location.ownerItemId, item.location.lineId);
+			continue;
+		}
+		if (
+			item.location.scope === LocationScopeEnumSchema.enum.Delivery &&
+			item.location.phase === "outbound"
+		) {
+			addOwnedLine(
+				inputLineIdsByOwnerId,
+				item.location.target.ownerItemId,
+				item.location.target.lineId,
+			);
+		}
 	}
 	for (const job of runtime.jobs) {
 		addOwnedLine(jobLineIdsByOwnerId, job.ownerItemId, job.lineId);
@@ -96,6 +108,7 @@ export const isItemPure = ({
 	if (
 		item.remainingCharges !== undefined ||
 		item.remainingDurationMs !== undefined ||
+		(runtime.autonomousLines ?? []).some((line) => line.ownerItemId === item.id) ||
 		Object.hasOwn(runtime.defaultLineByOwnerItemId ?? {}, item.id)
 	) {
 		return false;

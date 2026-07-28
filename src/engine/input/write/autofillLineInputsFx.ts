@@ -1,140 +1,187 @@
 import { Effect, Option } from "effect";
-import { match, P } from "ts-pattern";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
+import { DeliveryPhaseEnumSchema } from "~/engine/delivery/schema/DeliveryPhaseEnumSchema";
+import type { DeliveryPurposeSchema } from "~/engine/delivery/schema/DeliveryPurposeSchema";
+import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
 import { planLineInputAutofillFx } from "~/engine/input/fx/planLineInputAutofillFx";
+import { isolateStatefulOwnerTransitionFx } from "~/engine/item/fx/isolateStatefulOwnerTransitionFx";
+import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
+import { reviseRuntimeItemFx } from "~/engine/runtime/fx/reviseRuntimeItemFx";
+import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
 import { isGridRuntimeItemFx } from "~/engine/runtime/read/isGridRuntimeItemFx";
-import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
-import { readRuntimeItemByIdFx } from "~/engine/runtime/read/readRuntimeItemByIdFx";
-import { DropItemRejectedReasonEnumSchema } from "~/engine/runtime/schema/command/DropItemRejectedReasonEnumSchema";
-import { DropItemResultKindEnumSchema } from "~/engine/runtime/schema/command/DropItemResultKindEnumSchema";
-import { dropItemFx } from "~/engine/runtime/write/dropItemFx";
+import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
 export namespace autofillLineInputsFx {
 	export interface Props {
 		readonly ownerItemId: IdSchema.Type;
 		readonly lineId: IdSchema.Type;
+		readonly purpose?: DeliveryPurposeSchema.Type;
 	}
 
 	export interface Result {
-		readonly storedQuantity: number;
+		readonly deliveryItemIds: readonly IdSchema.Type[];
+		readonly scheduledQuantity: number;
 		readonly remainingMissingQuantity: number;
 	}
 }
 
-const maxConsecutiveDropConflicts = 16;
+export namespace autofillLineInputsRuntimeFx {
+	export interface Props extends autofillLineInputsFx.Props {
+		readonly runtime: RuntimeSchema.Type;
+	}
+
+	export interface Result {
+		readonly events: readonly GameEventSchema.Type[];
+		readonly result: autofillLineInputsFx.Result;
+		readonly runtime: RuntimeSchema.Type;
+	}
+}
+
+/** Applies canonical delivery admission to an immutable runtime draft. */
+export const autofillLineInputsRuntimeFx = Effect.fn("autofillLineInputsRuntimeFx")(function* ({
+	ownerItemId,
+	lineId,
+	purpose = {
+		kind: "fill",
+	},
+	runtime,
+}: autofillLineInputsRuntimeFx.Props) {
+	const plan = yield* planLineInputAutofillFx({
+		ownerItemId,
+		lineId,
+		runtime,
+	});
+	if (plan.entry.length === 0) {
+		return {
+			events: [],
+			result: {
+				deliveryItemIds: [],
+				scheduledQuantity: 0,
+				remainingMissingQuantity: plan.remainingMissingQuantity,
+			},
+			runtime,
+		} satisfies autofillLineInputsRuntimeFx.Result;
+	}
+
+	const allocationsBySourceItemId = new Map<
+		IdSchema.Type,
+		{
+			readonly inputIndex: number;
+			readonly quantity: number;
+		}[]
+	>();
+	for (const entry of plan.entry) {
+		const allocations = allocationsBySourceItemId.get(entry.sourceItemId);
+		const allocation = {
+			inputIndex: entry.inputIndex,
+			quantity: entry.quantity,
+		};
+		if (allocations === undefined) {
+			allocationsBySourceItemId.set(entry.sourceItemId, [
+				allocation,
+			]);
+		} else {
+			allocations.push(allocation);
+		}
+	}
+
+	let deliveryRuntime = runtime;
+	const deliveryItemIds: IdSchema.Type[] = [];
+	for (const [sourceItemId, input] of allocationsBySourceItemId) {
+		const runtimeSource = deliveryRuntime.items.find((item) => item.id === sourceItemId);
+		if (runtimeSource === undefined) continue;
+		const source = Option.getOrUndefined(yield* isGridRuntimeItemFx(runtimeSource));
+		if (source === undefined) continue;
+		const delivery = yield* reviseRuntimeItemFx({
+			item: {
+				...source,
+				location: {
+					scope: LocationScopeEnumSchema.enum.Delivery,
+					phase: DeliveryPhaseEnumSchema.enum.Outbound,
+					generation: 0,
+					origin: source.location,
+					purpose,
+					target: {
+						kind: "line-input",
+						ownerItemId,
+						lineId,
+						input,
+					},
+				},
+			},
+		});
+		deliveryRuntime = {
+			...deliveryRuntime,
+			items: deliveryRuntime.items.map((item) => (item.id === delivery.id ? delivery : item)),
+		} satisfies RuntimeSchema.Type;
+		deliveryItemIds.push(delivery.id);
+	}
+	if (purpose.kind === "fill-and-try-start") {
+		const existingIntents = deliveryRuntime.deliveryStartIntents ?? [];
+		const sameLine = (intent: (typeof existingIntents)[number]) =>
+			intent.ownerItemId === purpose.ownerItemId && intent.lineId === purpose.lineId;
+		const playerIntentExists = existingIntents.some(
+			(intent) => sameLine(intent) && intent.source === "player",
+		);
+		deliveryRuntime = {
+			...deliveryRuntime,
+			deliveryStartIntents:
+				purpose.source === "autonomous" && playerIntentExists
+					? existingIntents
+					: [
+							...existingIntents.filter((intent) => !sameLine(intent)),
+							{
+								ownerItemId: purpose.ownerItemId,
+								lineId: purpose.lineId,
+								source: purpose.source,
+							},
+						],
+		} satisfies RuntimeSchema.Type;
+	}
+
+	const isolation = yield* isolateStatefulOwnerTransitionFx({
+		ownerItemId,
+		runtime: deliveryRuntime,
+	});
+	return {
+		events: isolation.events,
+		result: {
+			deliveryItemIds,
+			scheduledQuantity: plan.entry.reduce((total, entry) => total + entry.quantity, 0),
+			remainingMissingQuantity: plan.remainingMissingQuantity,
+		},
+		runtime: isolation.runtime,
+	} satisfies autofillLineInputsRuntimeFx.Result;
+});
 
 /**
- * Fills one line from its owner's board and Inventory through ordinary item-drop commands.
+ * Atomically admits whole source stacks into canonical line-input deliveries.
  *
- * Each planned source presents its complete current stack, while the command requests only the
- * exact missing quantity for one slot. The canonical drop path rechecks that request against current
- * capacity, publishes one normal committed transition, and leaves any remainder at its origin.
- * A concurrent canonical command may invalidate the optimistic source or owner revision between
- * planning and drop; those expected conflicts reload runtime truth and replan instead of pretending
- * that no autofill source exists.
+ * One physical source may claim several compatible slots on the same line; its ordered allocations
+ * travel together under one runtime identity. Actual input remains unchanged until delivery
+ * settlement, so readiness and start commands observe only material that has physically arrived.
  */
 export const autofillLineInputsFx = Effect.fn("autofillLineInputsFx")(function* ({
 	ownerItemId,
 	lineId,
+	purpose = {
+		kind: "fill",
+	},
 }: autofillLineInputsFx.Props) {
-	let storedQuantity = 0;
-	let consecutiveDropConflicts = 0;
-	while (true) {
-		const runtime = yield* readRuntimeFx();
-		const plan = yield* planLineInputAutofillFx({
-			ownerItemId,
-			lineId,
-			runtime,
-		});
-		const next = plan.entry[0];
-		if (next === undefined) {
-			return {
-				storedQuantity,
-				remainingMissingQuantity: plan.remainingMissingQuantity,
-			} satisfies autofillLineInputsFx.Result;
-		}
-		const runtimeOwner = yield* readRuntimeItemByIdFx({
-			itemId: ownerItemId,
-			runtime,
-		});
-		const runtimeSource = yield* readRuntimeItemByIdFx({
-			itemId: next.sourceItemId,
-			runtime,
-		});
-		const [owner, source] = [
-			Option.getOrUndefined(yield* isGridRuntimeItemFx(runtimeOwner)),
-			Option.getOrUndefined(yield* isGridRuntimeItemFx(runtimeSource)),
-		];
-		if (owner === undefined || source === undefined) {
-			return {
-				storedQuantity,
-				remainingMissingQuantity: plan.remainingMissingQuantity,
-			} satisfies autofillLineInputsFx.Result;
-		}
-		const outcome = yield* dropItemFx({
-			sourceItemId: source.id,
-			sourceLocation: source.location,
-			sourceRevision: source.revision,
-			target: {
-				kind: "slot",
-				inputStore: {
-					lineId,
-					inputIndex: next.inputIndex,
-					quantity: next.quantity,
-				},
-				location: owner.location,
-				occupant: {
-					itemId: owner.id,
-					revision: owner.revision,
-				},
-			},
-		});
-		const resolution = match(outcome)
-			.with(
-				{
-					kind: DropItemResultKindEnumSchema.enum.StoreInput,
-				},
-				(result) =>
-					({
-						kind: "stored",
-						quantity: result.storedQuantity,
-					}) as const,
-			)
-			.with(
-				{
-					kind: DropItemResultKindEnumSchema.enum.Reject,
-					reason: P.union(
-						DropItemRejectedReasonEnumSchema.enum.StaleSource,
-						DropItemRejectedReasonEnumSchema.enum.StaleTarget,
-					),
-				},
-				() =>
-					({
-						kind: "conflict",
-					}) as const,
-			)
-			.otherwise(
-				() =>
-					({
-						kind: "rejected",
-					}) as const,
-			);
-		if (
-			resolution.kind === "conflict" &&
-			consecutiveDropConflicts < maxConsecutiveDropConflicts
-		) {
-			consecutiveDropConflicts += 1;
-			yield* Effect.yieldNow;
-			continue;
-		}
-		if (resolution.kind !== "stored") {
-			return {
-				storedQuantity,
-				remainingMissingQuantity: plan.remainingMissingQuantity,
-			} satisfies autofillLineInputsFx.Result;
-		}
-		consecutiveDropConflicts = 0;
-		storedQuantity += resolution.quantity;
-	}
+	return yield* modifyRuntimeFx((runtime) =>
+		Effect.gen(function* () {
+			const autofill = yield* autofillLineInputsRuntimeFx({
+				ownerItemId,
+				lineId,
+				purpose,
+				runtime,
+			});
+			return [
+				autofill.result,
+				autofill.runtime,
+				autofill.events,
+			] as const;
+		}),
+	);
 });

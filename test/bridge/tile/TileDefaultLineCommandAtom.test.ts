@@ -72,8 +72,9 @@ describe("TileDefaultLineCommandAtom", () => {
 		const firstGate = Effect.runSync(Deferred.make<never, typeof staleFailure>());
 		engineCommands.autofill.mockReturnValueOnce(Deferred.await(firstGate)).mockReturnValueOnce(
 			Effect.succeed({
-				storedQuantity: 0,
+				scheduledQuantity: 0,
 				remainingMissingQuantity: 0,
+				deliveryItemIds: [],
 			}),
 		);
 		engineCommands.start.mockReturnValue(Effect.void);
@@ -110,8 +111,9 @@ describe("TileDefaultLineCommandAtom", () => {
 	it("admits the same intent again after its previous engine command settles", async () => {
 		engineCommands.autofill.mockReturnValue(
 			Effect.succeed({
-				storedQuantity: 0,
+				scheduledQuantity: 0,
 				remainingMissingQuantity: 0,
+				deliveryItemIds: [],
 			}),
 		);
 		engineCommands.start.mockReturnValue(Effect.void);
@@ -159,8 +161,11 @@ describe("TileDefaultLineCommandAtom", () => {
 	it("settles after a partial autofill without starting the line or requesting Detail fallback", async () => {
 		engineCommands.autofill.mockReturnValue(
 			Effect.succeed({
-				storedQuantity: 2,
+				scheduledQuantity: 2,
 				remainingMissingQuantity: 1,
+				deliveryItemIds: [
+					"runtime:material",
+				],
 			}),
 		);
 		engineCommands.start.mockReturnValue(
@@ -184,8 +189,9 @@ describe("TileDefaultLineCommandAtom", () => {
 		} as const;
 		engineCommands.autofill.mockReturnValue(
 			Effect.succeed({
-				storedQuantity: 0,
+				scheduledQuantity: 0,
 				remainingMissingQuantity: 1,
+				deliveryItemIds: [],
 			}),
 		);
 		engineCommands.start.mockReturnValue(Effect.fail(failure));
@@ -204,29 +210,28 @@ describe("TileDefaultLineCommandAtom", () => {
 		unmount();
 	});
 
-	it("marks a later start failure as autofilled after moving all missing material", async () => {
-		const failure = {
-			_tag: "DepositUnavailable",
-		} as const;
+	it("retains the start intent in scheduled deliveries instead of starting early", async () => {
 		engineCommands.autofill.mockReturnValue(
 			Effect.succeed({
-				storedQuantity: 2,
+				scheduledQuantity: 2,
 				remainingMissingQuantity: 0,
+				deliveryItemIds: [
+					"runtime:material",
+				],
 			}),
 		);
-		engineCommands.start.mockReturnValue(Effect.fail(failure));
+		engineCommands.start.mockReturnValue(
+			Effect.die("Start must wait for canonical delivery settlement."),
+		);
 
 		const { atom, registry, unmount } = await runCommand();
 
 		await vi.waitFor(() => {
 			expect(registry.get(atom)).toEqual({
-				kind: "error",
-				autofilled: true,
-				error: failure,
-				ownerItemId: command.ownerItemId,
+				kind: "idle",
 			});
 		});
-		expect(engineCommands.start).toHaveBeenCalledOnce();
+		expect(engineCommands.start).not.toHaveBeenCalled();
 		unmount();
 	});
 
@@ -248,8 +253,9 @@ describe("TileDefaultLineCommandAtom", () => {
 		);
 		engineCommands.autofill.mockReturnValue(
 			Effect.succeed({
-				storedQuantity: 0,
+				scheduledQuantity: 0,
 				remainingMissingQuantity: 0,
+				deliveryItemIds: [],
 			}),
 		);
 		engineCommands.start.mockReturnValue(Effect.failCause(mixedCause));

@@ -11,7 +11,7 @@ export namespace readGridLocationOccupantsFx {
 	}
 }
 
-const readGridLocationKey = (location: GridLocationSchema.Type) => {
+export const readGridLocationKey = (location: GridLocationSchema.Type) => {
 	const position = `${location.position.x}:${location.position.y}`;
 	return location.scope === LocationScopeEnumSchema.enum.Board
 		? `${location.scope}:${location.space}:${position}`

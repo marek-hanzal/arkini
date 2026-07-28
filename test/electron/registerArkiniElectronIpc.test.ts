@@ -168,6 +168,23 @@ const invokeArguments = new Map<string, ReadonlyArray<unknown>>([
 			saveKey,
 		],
 	],
+	[
+		ArkiniElectronApi.channels.diagnosticsWrite,
+		[
+			{
+				schemaVersion: 1,
+				level: "info",
+				category: [
+					"test",
+				],
+				event: "ipc-tested",
+			},
+		],
+	],
+	[
+		ArkiniElectronApi.channels.diagnosticsOpenDirectory,
+		[],
+	],
 ]);
 
 const createInvokeEvent = (url: string): IpcMainInvokeEvent => {
@@ -211,6 +228,8 @@ describe("registerArkiniElectronIpcFx", () => {
 			assertTrustedIpcSenderFx,
 			registerWindowFx: () => Effect.void,
 		};
+		const writeDiagnostic = vi.fn();
+		const openDiagnosticDirectory = vi.fn();
 
 		try {
 			await Effect.runPromise(
@@ -229,6 +248,12 @@ describe("registerArkiniElectronIpcFx", () => {
 						appearancePreferences,
 						cheatPreferences,
 						launcherPreferences,
+						diagnostics: {
+							directoryPath: join(userDataPath, "arkini", "logs"),
+							writeFx: (record) => Effect.sync(() => writeDiagnostic(record)),
+							openDirectoryFx: Effect.sync(openDiagnosticDirectory),
+							closeFx: Effect.void,
+						},
 					});
 				}).pipe(Effect.provide(NodeServices.layer)),
 			);
@@ -296,6 +321,29 @@ describe("registerArkiniElectronIpcFx", () => {
 			await expect(
 				invoke(ArkiniElectronApi.channels.launcherLastPackageIdRead, trustedEvent),
 			).resolves.toBe("package:last");
+			const diagnosticRecord = {
+				schemaVersion: 1,
+				level: "info",
+				category: [
+					"game",
+					"test",
+				],
+				event: "trusted-record",
+			} as const;
+			await expect(
+				invoke(ArkiniElectronApi.channels.diagnosticsWrite, trustedEvent, diagnosticRecord),
+			).resolves.toBeUndefined();
+			expect(writeDiagnostic).toHaveBeenCalledWith(diagnosticRecord);
+			await expect(
+				invoke(ArkiniElectronApi.channels.diagnosticsOpenDirectory, trustedEvent),
+			).resolves.toBeUndefined();
+			expect(openDiagnosticDirectory).toHaveBeenCalledOnce();
+			await expect(
+				invoke(ArkiniElectronApi.channels.diagnosticsWrite, trustedEvent, {
+					...diagnosticRecord,
+					event: "",
+				}),
+			).rejects.toThrow();
 
 			const arkpackBytes = new Uint8Array([
 				1,

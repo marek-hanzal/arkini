@@ -1,35 +1,34 @@
 import { Effect } from "effect";
 
-import type { InputMaterialStoreResultSchema } from "~/engine/input/schema/command/InputMaterialStoreResultSchema";
 import type { InputMaterialStorePlanSchema } from "~/engine/input/schema/store/InputMaterialStorePlanSchema";
 import type { InputLocationSchema } from "~/engine/location/schema/InputLocationSchema";
 import { createRuntimeItemFx } from "~/engine/runtime/fx/createRuntimeItemFx";
 import { createRuntimeItemIdFx } from "~/engine/runtime/fx/createRuntimeItemIdFx";
 import { reviseRuntimeItemFx } from "~/engine/runtime/fx/reviseRuntimeItemFx";
-import type { GridRuntimeItemSchema } from "~/engine/runtime/schema/GridRuntimeItemSchema";
 import type { InputRuntimeItemSchema } from "~/engine/runtime/schema/InputRuntimeItemSchema";
+import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
 export namespace applyInputMaterialStorePlanFx {
-	export interface Props {
+	export interface Props<Source extends RuntimeItemSchema.Type> {
 		location: InputLocationSchema.Type;
 		plan: InputMaterialStorePlanSchema.Type;
 		runtime: RuntimeSchema.Type;
-		source: GridRuntimeItemSchema.Type;
+		source: Source;
 	}
 
-	export type Result = Pick<InputMaterialStoreResultSchema.Type, "sourceItem" | "storedItem">;
+	export interface Result<Source extends RuntimeItemSchema.Type> {
+		readonly sourceItem?: Source;
+		readonly storedItem: InputRuntimeItemSchema.Type;
+	}
 }
 
 /**
  * Applies one accepted material quantity to an immutable runtime draft.
  */
-export const applyInputMaterialStorePlanFx = Effect.fn("applyInputMaterialStorePlanFx")(function* ({
-	location,
-	plan,
-	runtime,
-	source,
-}: applyInputMaterialStorePlanFx.Props) {
+export const applyInputMaterialStorePlanFx = Effect.fn("applyInputMaterialStorePlanFx")(function* <
+	Source extends RuntimeItemSchema.Type,
+>({ location, plan, runtime, source }: applyInputMaterialStorePlanFx.Props<Source>) {
 	if (plan.quantity === source.quantity) {
 		const storedItem = yield* reviseRuntimeItemFx({
 			item: {
@@ -44,7 +43,7 @@ export const applyInputMaterialStorePlanFx = Effect.fn("applyInputMaterialStoreP
 			}),
 		} satisfies RuntimeSchema.Type;
 
-		const result: applyInputMaterialStorePlanFx.Result = {
+		const result: applyInputMaterialStorePlanFx.Result<Source> = {
 			storedItem,
 		};
 
@@ -58,7 +57,7 @@ export const applyInputMaterialStorePlanFx = Effect.fn("applyInputMaterialStoreP
 		item: {
 			...source,
 			quantity: source.quantity - plan.quantity,
-		} satisfies GridRuntimeItemSchema.Type,
+		} satisfies RuntimeItemSchema.Type,
 	});
 	const storedItem = yield* createRuntimeItemFx({
 		id: yield* createRuntimeItemIdFx(),
@@ -76,7 +75,7 @@ export const applyInputMaterialStorePlanFx = Effect.fn("applyInputMaterialStoreP
 		],
 	} satisfies RuntimeSchema.Type;
 
-	const result: applyInputMaterialStorePlanFx.Result = {
+	const result: applyInputMaterialStorePlanFx.Result<Source> = {
 		sourceItem,
 		storedItem,
 	};

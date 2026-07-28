@@ -2,6 +2,7 @@ import { match } from "ts-pattern";
 
 import type { ItemDetailLines } from "~/bridge/item-detail/ItemDetailLines";
 import { useWithdrawItemDetailLine } from "~/bridge/item-detail/useWithdrawItemDetailLine";
+import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import { Button } from "~/ui/button/Button";
 import { ItemReferenceButton } from "~/ui/item-detail/ItemReferenceButton";
 import { useItemDetailControl } from "~/ui/item-detail/useItemDetailControl";
@@ -125,6 +126,58 @@ const ItemLineInputTitle = ({
 		/>
 	);
 
+const MaterialInputAutofillAvailability = ({
+	disabled,
+	input,
+	label,
+}: {
+	readonly disabled: boolean;
+	readonly input: Extract<
+		ItemDetailLines.Input,
+		{
+			readonly kind: "materials";
+		}
+	>;
+	readonly label: string;
+}) => {
+	const itemDetail = useItemDetailControl();
+	const producerItemId = input.producerItemId;
+	return (
+		<p
+			className="mt-0.5 text-xs text-muted"
+			data-ui="TileLineInputAutofillAvailability"
+		>
+			{input.autofillAvailableQuantity > 0 ? (
+				`${input.autofillAvailableQuantity} available`
+			) : producerItemId === undefined ? (
+				"None available"
+			) : (
+				<>
+					<button
+						type="button"
+						className="cursor-pointer font-medium text-accent underline decoration-accent/55 underline-offset-2 transition-colors hover:text-accent-hover disabled:cursor-default disabled:text-muted disabled:no-underline"
+						disabled={disabled}
+						data-ui="TileLineInputProducerLink"
+						onClick={(event) =>
+							RendererRuntime.runSync(
+								itemDetail.openItemDetailFx({
+									itemId: producerItemId,
+									linesSearchQuery: label,
+									origin: event.currentTarget,
+									tab: "lines",
+								}),
+							)
+						}
+					>
+						None
+					</button>{" "}
+					available
+				</>
+			)}
+		</p>
+	);
+};
+
 const ItemLineInputRow = ({
 	disabled,
 	input,
@@ -178,21 +231,28 @@ const ItemLineInputRow = ({
 									ownerItemId={ownerItemId}
 								/>
 								<p
-									className="pt-1 font-medium text-foreground"
-									data-ui="TileLineInputStoredQuantity"
+									className={`pt-1 font-medium text-foreground ${materials.deliveryQuantity > 0 ? "opacity-70" : ""}`}
+									data-ui={
+										materials.deliveryQuantity > 0
+											? "TileLineInputDeliveryQuantity"
+											: "TileLineInputStoredQuantity"
+									}
 								>
-									{materials.storedQuantity} /{" "}
+									{materials.deliveryQuantity > 0
+										? materials.deliveryQuantity
+										: materials.storedQuantity}{" "}
+									/{" "}
 									{materials.required.min === materials.required.max
 										? materials.required.min
 										: `${materials.required.min}–${materials.required.max}`}{" "}
-									stored
+									{materials.deliveryQuantity > 0 ? "on the way" : "stored"}
 								</p>
 							</div>
-							<p className="mt-0.5 text-xs text-muted">
-								{materials.ready
-									? `${materials.availableCapacity} buffer space`
-									: `${materials.missingQuantity} still needed`}
-							</p>
+							<MaterialInputAutofillAvailability
+								disabled={disabled}
+								input={materials}
+								label={label}
+							/>
 						</div>
 					</div>
 				);

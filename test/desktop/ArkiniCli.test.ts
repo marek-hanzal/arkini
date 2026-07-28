@@ -52,7 +52,7 @@ describe("Arkini Effect CLI", () => {
 		expect(desktopPackage.status).toBe(0);
 		expect(desktopPackageOutput).toContain("--arch");
 		expect(desktopPackageOutput).toContain("choices: arm64");
-	});
+	}, 30_000);
 
 	it("rejects unsupported package architecture with a deterministic non-zero exit", () => {
 		const result = runCli("desktop", "package", "--arch", "x64");

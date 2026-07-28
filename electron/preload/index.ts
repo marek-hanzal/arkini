@@ -73,6 +73,11 @@ const api: ArkiniElectronApi.Api = {
 		write: (key, bytes) => ipcRenderer.invoke(ArkiniElectronApi.channels.saveWrite, key, bytes),
 		clear: (key) => ipcRenderer.invoke(ArkiniElectronApi.channels.saveClear, key),
 	},
+	diagnostics: {
+		write: (record) => ipcRenderer.invoke(ArkiniElectronApi.channels.diagnosticsWrite, record),
+		openDirectory: () =>
+			ipcRenderer.invoke(ArkiniElectronApi.channels.diagnosticsOpenDirectory),
+	},
 	lifecycle: {
 		waitUntilVisible: () => visiblePromise,
 		onBeforeClose: (listener) => {

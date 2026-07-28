@@ -40,6 +40,9 @@ export namespace ItemDetailLines {
 				readonly mode: InputModeEnumSchema.Type;
 				readonly required: QuantityBounds;
 				readonly storedQuantity: number;
+				readonly deliveryQuantity: number;
+				readonly autofillAvailableQuantity: number;
+				readonly producerItemId?: string;
 				readonly maxStoredQuantity: number;
 				readonly missingQuantity: number;
 				readonly availableCapacity: number;
@@ -169,6 +172,23 @@ export namespace ItemDetailLines {
 				readonly reason: DisabledReason;
 		  };
 
+	interface LineActions {
+		readonly canAutofill: boolean;
+		readonly canStart: boolean;
+		readonly canWithdraw: boolean;
+	}
+
+	interface LineAutonomous {
+		readonly enabled: boolean;
+		readonly supported: boolean;
+	}
+
+	interface LineActiveJob {
+		readonly status: JobStatusEnumSchema.Type;
+		readonly durationMs: number;
+		readonly remainingMs: number;
+	}
+
 	export interface Line {
 		readonly lineId: string;
 		readonly title: string;
@@ -178,18 +198,11 @@ export namespace ItemDetailLines {
 		readonly availability: Availability;
 		readonly startMode: "start" | "enqueue";
 		readonly isDefault: boolean;
-		readonly actions: {
-			readonly canAutofill: boolean;
-			readonly canStart: boolean;
-			readonly canWithdraw: boolean;
-		};
+		readonly autonomous: LineAutonomous;
+		readonly actions: LineActions;
 		readonly input: readonly Input[];
 		readonly output: readonly OutputSet[];
-		readonly activeJob?: {
-			readonly status: JobStatusEnumSchema.Type;
-			readonly durationMs: number;
-			readonly remainingMs: number;
-		};
+		readonly activeJob?: LineActiveJob;
 	}
 
 	export type Projection =

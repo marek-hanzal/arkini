@@ -427,6 +427,45 @@ describe("Pixi actor animator", () => {
 		expect(tweens[1]?.stop).not.toHaveBeenCalled();
 	});
 
+	it("does not read or animate an actor destroyed by the superseded animation cancellation", () => {
+		const actor = createActor();
+		const { animator, tweens } = createAnimator();
+
+		Effect.runSync(
+			animator.animateFx({
+				actor,
+				channel: "pose",
+				durationMs: 300,
+				onCancel: () => {
+					actor.container.destroyed = true;
+					Object.defineProperty(actor.container, "x", {
+						get: () => {
+							throw new Error("destroyed transform was read");
+						},
+					});
+				},
+				ownerKey: "delivery:arrival",
+				toX: 100,
+				toY: 200,
+			}),
+		);
+
+		expect(() =>
+			Effect.runSync(
+				animator.animateFx({
+					actor,
+					channel: "pose",
+					durationMs: 300,
+					ownerKey: "delivery:return",
+					toX: 10,
+					toY: 20,
+				}),
+			),
+		).not.toThrow();
+		expect(tweens[0]?.stop).toHaveBeenCalledOnce();
+		expect(tweens).toHaveLength(1);
+	});
+
 	it("ignores stale completion and attempts every active channel during close", () => {
 		const firstActor = createActor("runtime:first");
 		const secondActor = createActor("runtime:second");

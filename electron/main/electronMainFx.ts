@@ -10,6 +10,7 @@ import { createFilesystemAppearancePreferencesFx } from "./appearance/createFile
 import { createFilesystemCheatPreferencesFx } from "./cheat/createFilesystemCheatPreferencesFx";
 import { createFilesystemLauncherPreferencesFx } from "./launcher/createFilesystemLauncherPreferencesFx";
 import { createTrustedRendererFx } from "./security/createTrustedRendererFx";
+import { createDiagnosticLogFx } from "./diagnostics/createDiagnosticLogFx";
 
 export const electronMainFx = Effect.fn("electronMainFx")(function* () {
 	const hasSingleInstanceLock = app.requestSingleInstanceLock();
@@ -29,6 +30,55 @@ export const electronMainFx = Effect.fn("electronMainFx")(function* () {
 	yield* registerWindowLifecycleFx(app);
 	yield* Effect.promise(() => app.whenReady());
 
+	const diagnostics = yield* createDiagnosticLogFx(app.getPath("userData")).pipe(
+		Effect.catch((cause) =>
+			Effect.sync(() => {
+				console.error("Arkini diagnostic log could not be initialized.", cause);
+				return {
+					directoryPath: "",
+					writeFx: () => Effect.void,
+					openDirectoryFx: Effect.void,
+					closeFx: Effect.void,
+				};
+			}),
+		),
+	);
+	yield* diagnostics
+		.writeFx({
+			schemaVersion: 1,
+			category: [
+				"main",
+				"lifecycle",
+			],
+			event: "application-started",
+			level: "info",
+			data: {
+				version: app.getVersion(),
+				isPackaged: app.isPackaged,
+				platform: process.platform,
+				architecture: process.arch,
+			},
+		})
+		.pipe(Effect.catch((cause) => Effect.sync(() => console.error(cause))));
+	yield* Effect.sync(() => {
+		app.once("will-quit", () => {
+			void ElectronMainRuntime.runPromise(
+				diagnostics
+					.writeFx({
+						schemaVersion: 1,
+						category: [
+							"main",
+							"lifecycle",
+						],
+						event: "application-stopping",
+						level: "info",
+					})
+					.pipe(Effect.andThen(diagnostics.closeFx)),
+			).catch((cause) => {
+				console.error("Arkini diagnostic log could not be closed.", cause);
+			});
+		});
+	});
 	const appearancePreferences = yield* createFilesystemAppearancePreferencesFx({
 		userDataPath: app.getPath("userData"),
 	});
@@ -54,6 +104,7 @@ export const electronMainFx = Effect.fn("electronMainFx")(function* () {
 		appearancePreferences,
 		cheatPreferences,
 		launcherPreferences,
+		diagnostics,
 	});
 	yield* createMainWindowFx({
 		trustedRenderer,

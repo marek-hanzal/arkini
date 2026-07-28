@@ -16,6 +16,7 @@ import type { PixiTileMagneticField } from "~/ui/pixi/magnet/PixiTileMagneticFie
 import { chasePixiTileMotionTargetFx } from "~/ui/pixi/motion/chasePixiTileMotionTargetFx";
 import { createPixiTileMotionMagneticProjectorFx } from "~/ui/pixi/motion/createPixiTileMotionMagneticProjectorFx";
 import { flashPixiMotionTargetFx } from "~/ui/pixi/motion/flashPixiMotionTargetFx";
+import { projectPixiTileMotionItem } from "~/ui/pixi/motion/projectPixiTileMotionItem";
 import { readPixiLiveActorContactPose } from "~/ui/pixi/motion/readPixiLiveActorContactPose";
 import type { PixiTileMotionTargetRoute } from "~/ui/pixi/motion/PixiTileMotionTargetRoute";
 import type { PixiApplicationOwner } from "~/ui/pixi/runtime/PixiApplicationOwner";
@@ -81,11 +82,16 @@ export const runPixiStackMotionFx = Effect.fn("runPixiStackMotionFx")(function* 
 		source ??
 		(yield* createPixiTileActorFx({
 			frames: application.frames,
-			item: {
-				...canonical,
-				id: `motion:${cueKey}`,
-				quantity: cue.quantity,
-			},
+			item: projectPixiTileMotionItem(
+				{
+					...canonical,
+					id: `motion:${cueKey}`,
+				},
+				{
+					kind: "exact",
+					quantity: cue.quantity,
+				},
+			),
 			palette: readPalette(),
 			textures,
 		}));
@@ -132,7 +138,7 @@ export const runPixiStackMotionFx = Effect.fn("runPixiStackMotionFx")(function* 
 		return readPixiLiveActorContactPose({
 			actorId: route.actorId,
 			actors: actorStore.actors,
-			movingActorSize: payload.size,
+			movingActor: payload,
 		});
 	};
 	const magneticProjector = yield* createPixiTileMotionMagneticProjectorFx({
@@ -159,7 +165,6 @@ export const runPixiStackMotionFx = Effect.fn("runPixiStackMotionFx")(function* 
 		fallbackTarget: target,
 		onPose: magneticProjector.projectPose,
 		onSettled: () => {
-			magneticProjector.release();
 			const route = readCurrentRoute();
 			RendererRuntime.runSync(
 				flashPixiMotionTargetFx({
@@ -168,31 +173,27 @@ export const runPixiStackMotionFx = Effect.fn("runPixiStackMotionFx")(function* 
 					targetActorId: route.actorId,
 				}),
 			);
-			if (route.redirected) {
-				let settled = false;
-				const settle = () => {
-					if (settled) return;
-					settled = true;
-					RendererRuntime.runSync(animator.cancelActorFx(payload));
-					RendererRuntime.runSync(destroyPixiTileActorFx(payload));
-					onComplete();
-				};
-				RendererRuntime.runSync(
-					startPixiTileActorVanishFeedbackFx({
-						actor: payload,
-						animator,
-						onCancel: settle,
-						onComplete: settle,
-					}),
-				);
-				return;
-			}
-			RendererRuntime.runSync(animator.cancelActorFx(payload));
-			RendererRuntime.runSync(destroyPixiTileActorFx(payload));
-			onComplete();
+			let settled = false;
+			const settle = () => {
+				if (settled) return;
+				settled = true;
+				magneticProjector.release();
+				RendererRuntime.runSync(animator.cancelActorFx(payload));
+				RendererRuntime.runSync(destroyPixiTileActorFx(payload));
+				onComplete();
+			};
+			RendererRuntime.runSync(
+				startPixiTileActorVanishFeedbackFx({
+					actor: payload,
+					animator,
+					onCancel: settle,
+					onComplete: settle,
+				}),
+			);
 		},
 		ownerKey: `motion:${cueKey}`,
 		readLiveTarget,
+		settleWithinTileRatio: 0.5,
 		surface,
 		targetLocation: cue.targetLocation,
 	});

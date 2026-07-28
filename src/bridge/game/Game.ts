@@ -5,6 +5,8 @@ import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 
 /** One loaded game instance exclusively owned by its package route resource. */
 export interface Game extends GameSession {
+	/** Correlates renderer command diagnostics with this exact loaded session. */
+	readonly diagnosticSessionId?: string;
 	/** Exact package identity and launcher metadata for this live game. */
 	readonly arkpack: ArkpackDescriptor;
 	/** Exact filesystem save identity owned by this live game. */

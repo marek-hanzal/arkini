@@ -52,9 +52,55 @@ describe("discardRuntimeItemOwnedStateFx", () => {
 			jobs: [],
 			jobQueue: [
 				{
+					id: "request:root",
+					ownerItemId: root.id,
+					lineId: "line:forge:run",
+				},
+				{
 					id: "request:child",
 					ownerItemId: passiveChild.id,
 					lineId: "line:missing",
+				},
+				{
+					id: "request:unrelated",
+					ownerItemId: "runtime:unrelated",
+					lineId: "line:unrelated",
+				},
+			],
+			defaultLineByOwnerItemId: {
+				[root.id]: "line:forge:run",
+				[passiveChild.id]: "line:missing",
+				"runtime:unrelated": "line:unrelated",
+			},
+			autonomousLines: [
+				{
+					ownerItemId: root.id,
+					lineId: "line:forge:run",
+				},
+				{
+					ownerItemId: passiveChild.id,
+					lineId: "line:missing",
+				},
+				{
+					ownerItemId: "runtime:unrelated",
+					lineId: "line:unrelated",
+				},
+			],
+			deliveryStartIntents: [
+				{
+					ownerItemId: root.id,
+					lineId: "line:forge:run",
+					source: "player",
+				},
+				{
+					ownerItemId: passiveChild.id,
+					lineId: "line:missing",
+					source: "autonomous",
+				},
+				{
+					ownerItemId: "runtime:unrelated",
+					lineId: "line:unrelated",
+					source: "player",
 				},
 			],
 		} satisfies RuntimeSchema.Type;
@@ -68,7 +114,24 @@ describe("discardRuntimeItemOwnedStateFx", () => {
 		expect(result.items).toEqual([
 			root,
 		]);
-		expect(result.jobQueue).toEqual([]);
+		expect(result.jobQueue).toEqual([
+			expect.objectContaining({
+				id: "request:unrelated",
+			}),
+		]);
+		expect(result.defaultLineByOwnerItemId).toEqual({
+			"runtime:unrelated": "line:unrelated",
+		});
+		expect(result.autonomousLines).toEqual([
+			expect.objectContaining({
+				ownerItemId: "runtime:unrelated",
+			}),
+		]);
+		expect(result.deliveryStartIntents).toEqual([
+			expect.objectContaining({
+				ownerItemId: "runtime:unrelated",
+			}),
+		]);
 	});
 
 	it("rejects committed work anywhere beneath the discarded ownership tree", () => {

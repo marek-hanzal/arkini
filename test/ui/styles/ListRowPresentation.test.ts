@@ -36,7 +36,8 @@ describe("semantic list-row presentation", () => {
 
 	it("keeps list rows on genuine content while buttons, segmented options, and Spotlight own their states", () => {
 		expect(lines).toContain('className="ak-list grid gap-1"');
-		expect(lineRow).toContain("ak-list-row rounded-xl");
+		expect(lineRow).toContain("ak-list-row");
+		expect(lineRow).toContain("rounded-xl");
 		expect(sources).toContain('className="ak-list grid gap-1"');
 		expect(sources).toContain("ak-list-row border-b");
 		expect(catalog).toContain('data-ui="ArkpackCatalogList"');

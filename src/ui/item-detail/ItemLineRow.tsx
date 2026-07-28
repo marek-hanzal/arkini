@@ -3,6 +3,7 @@ import { match } from "ts-pattern";
 import { useAutofillItemDetailLine } from "~/bridge/item-detail/useAutofillItemDetailLine";
 import type { ItemDetailLines } from "~/bridge/item-detail/ItemDetailLines";
 import { useSetDefaultItemDetailLine } from "~/bridge/item-detail/useSetDefaultItemDetailLine";
+import { useSetAutonomousItemDetailLine } from "~/bridge/item-detail/useSetAutonomousItemDetailLine";
 import { useStartPendingItemDetailLine } from "~/bridge/item-detail/useStartItemDetailLine";
 import { useUnsetDefaultItemDetailLine } from "~/bridge/item-detail/useUnsetDefaultItemDetailLine";
 import { useWithdrawItemDetailLine } from "~/bridge/item-detail/useWithdrawItemDetailLine";
@@ -159,12 +160,17 @@ export const ItemLineRow = ({
 		]);
 	const pendingKeys = {
 		autofill: pendingKey("autofill"),
+		autonomous: pendingKey("autonomous"),
 		default: pendingKey("default"),
 		start: pendingKey("start"),
 		withdraw: pendingKey("withdraw"),
 	} as const;
 	const autofillLine = useAutofillItemDetailLine({
 		pendingKey: pendingKeys.autofill,
+		pendingOwner: itemDetail,
+	});
+	const setAutonomousLine = useSetAutonomousItemDetailLine({
+		pendingKey: pendingKeys.autonomous,
 		pendingOwner: itemDetail,
 	});
 	const setDefaultLine = useSetDefaultItemDetailLine({
@@ -184,12 +190,14 @@ export const ItemLineRow = ({
 		pendingOwner: itemDetail,
 	});
 	readSettledAsyncResultError(autofillLine.result);
+	readSettledAsyncResultError(setAutonomousLine.result);
 	readSettledAsyncResultError(setDefaultLine.result);
 	readSettledAsyncResultError(unsetDefaultLine.result);
 	readSettledAsyncResultError(startLine.result);
 	readSettledAsyncResultError(withdrawLine.result);
 	const pending = {
 		autofill: itemDetail.readPendingAction(pendingKeys.autofill) === "autofill",
+		autonomous: itemDetail.readPendingAction(pendingKeys.autonomous) === "autonomous",
 		default: itemDetail.readPendingAction(pendingKeys.default) === "default",
 		start: itemDetail.readPendingAction(pendingKeys.start) === "start",
 		withdraw: itemDetail.readPendingAction(pendingKeys.withdraw) === "withdraw",
@@ -204,15 +212,43 @@ export const ItemLineRow = ({
 			? readUnavailableDependency(line.availability.reason)
 			: undefined;
 	const showUnavailableReason = unavailable && line.activeJob === undefined;
+	const progress =
+		line.activeJob === undefined
+			? null
+			: line.activeJob.durationMs === 0
+				? 1
+				: Math.max(
+						0,
+						Math.min(
+							1,
+							(line.activeJob.durationMs - line.activeJob.remainingMs) /
+								line.activeJob.durationMs,
+						),
+					);
 
 	return (
 		<article
-			className={`ak-list-row rounded-xl border-b border-l-2 border-line px-3 py-5 pl-4 first:pt-3 last:border-b-0 last:pb-5 ${line.activeJob === undefined ? "border-l-line/55" : "ak-list-row-active border-l-success"}`}
+			className={`ak-list-row overflow-hidden rounded-xl border-b border-l-2 border-line px-3 py-5 pl-4 first:pt-3 last:border-b-0 last:pb-5 ${line.activeJob === undefined ? "border-l-line/55" : "ak-list-row-active border-l-success"}`}
 			data-ui="TileLine"
 			data-line-id={line.lineId}
 			data-active={line.activeJob === undefined ? "false" : "true"}
 		>
-			<div className="flex flex-wrap items-start justify-between gap-4">
+			{progress === null ? null : (
+				<div
+					className="pointer-events-none absolute inset-y-0 right-0 left-0.5 overflow-hidden rounded-r-[inherit]"
+					aria-hidden="true"
+					data-ui="TileLineProgress"
+				>
+					<div
+						className="h-full bg-[var(--ak-list-row-active-progress-surface)] transition-[width] duration-200 ease-linear"
+						data-ui="TileLineProgressFill"
+						style={{
+							width: `${progress * 100}%`,
+						}}
+					/>
+				</div>
+			)}
+			<div className="relative z-[1] flex flex-wrap items-start justify-between gap-4">
 				<div className="min-w-0 flex-1">
 					<ItemLineSummary line={line} />
 					{!showUnavailableReason ? null : unavailableDependency === undefined ? (
@@ -227,6 +263,28 @@ export const ItemLineRow = ({
 				<div className="flex shrink-0 flex-col items-end gap-3">
 					<ItemLineRuntime line={line} />
 					<div className="flex flex-wrap justify-end gap-2">
+						{!line.autonomous.supported ? null : (
+							<Button
+								className="min-h-8 px-3 py-1 text-xs"
+								cursorIntent={pending.autonomous ? "progress" : undefined}
+								data-ui="TileLineAutonomousButton"
+								data-enabled={line.autonomous.enabled ? "true" : "false"}
+								disabled={disabled || unavailable}
+								onClick={() =>
+									setAutonomousLine.run({
+										enabled: !line.autonomous.enabled,
+										ownerItemId,
+										lineId: line.lineId,
+									})
+								}
+							>
+								{pending.autonomous
+									? "Saving…"
+									: line.autonomous.enabled
+										? "Disable auto"
+										: "Enable auto"}
+							</Button>
+						)}
 						<Button
 							className="min-h-8 px-3 py-1 text-xs"
 							cursorIntent={pending.default ? "progress" : undefined}
@@ -303,21 +361,23 @@ export const ItemLineRow = ({
 			</div>
 			{error === null ? null : (
 				<p
-					className="mt-3 text-sm text-danger"
+					className="relative z-[1] mt-3 text-sm text-danger"
 					role="status"
 				>
 					{error}
 				</p>
 			)}
 			{line.availability.kind === "unavailable" ? (
-				<ItemLineUnavailableWithdrawals
-					disabled={disabled}
-					input={line.input}
-					lineId={line.lineId}
-					ownerItemId={ownerItemId}
-				/>
+				<div className="relative z-[1]">
+					<ItemLineUnavailableWithdrawals
+						disabled={disabled}
+						input={line.input}
+						lineId={line.lineId}
+						ownerItemId={ownerItemId}
+					/>
+				</div>
 			) : (
-				<div className="mt-4 grid min-w-0 grid-cols-[minmax(0,1fr)_2rem_minmax(0,1fr)] gap-x-4">
+				<div className="relative z-[1] mt-4 grid min-w-0 grid-cols-[minmax(0,1fr)_2rem_minmax(0,1fr)] gap-x-4">
 					<ItemLineInputs
 						disabled={disabled}
 						input={line.input}

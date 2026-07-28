@@ -334,7 +334,7 @@ const mountController = ({
 	const cursorGrab = {
 		closeFx: Effect.void,
 		finishFx: () => Effect.sync(finishCursorGrab),
-		startFx: () => Effect.sync(startCursorGrab),
+		startFx: (actor, pointer) => Effect.sync(() => startCursorGrab(actor, pointer)),
 	} satisfies PixiCursorGrabMotion;
 	const game = {
 		reportCriticalFailure,
@@ -501,6 +501,19 @@ const samplePoseAnimation = (animation: PixiActorAnimation, progress: number) =>
 };
 
 describe("Pixi main-scene drag controller", () => {
+	it("restores interaction state when a presentation owner hands an actor back", () => {
+		const mounted = mountController();
+
+		Effect.runSync(mounted.controller.detachActorFx(mounted.actor));
+		mounted.actor.container.eventMode = "none";
+		mounted.actor.container.cursor = "default";
+		Effect.runSync(mounted.controller.attachActorFx(mounted.actor));
+
+		expect(mounted.actor.container.eventMode).toBe("static");
+		expect(mounted.actor.container.cursor).toBe("grab");
+		expect(mounted.actor.onPointerDown).not.toBeNull();
+	});
+
 	it("acknowledges activation synchronously before async command admission", () => {
 		const mounted = mountController();
 		mounted.onActivate.mockReturnValueOnce(new Promise(() => undefined));
@@ -602,12 +615,29 @@ describe("Pixi main-scene drag controller", () => {
 		expect(mounted.actor.dragging).toBe(true);
 		expect(mounted.actor.container.x).toBe(42);
 		expect(mounted.actor.container.y).toBe(34);
-		expect(mounted.startCursorGrab).toHaveBeenCalledOnce();
+		expect(mounted.startCursorGrab).toHaveBeenCalledExactlyOnceWith(mounted.actor, {
+			x: 30,
+			y: 20,
+		});
 
 		mounted.stage.emit("pointerup", pointer(30, 20));
 		await flushMicrotasks();
 		expect(mounted.onActivate).not.toHaveBeenCalled();
 		expect(mounted.onDrop).toHaveBeenCalledOnce();
+	});
+
+	it("does not count the first pointer movement twice when settling a regular pickup", () => {
+		const mounted = mountController();
+
+		mounted.actorEvents.emit("pointerdown", pointer(10, 20));
+		mounted.stage.emit("globalpointermove", pointer(210, 120));
+
+		expect(mounted.actor.container.x).toBe(210);
+		expect(mounted.actor.container.y).toBe(120);
+		expect(mounted.startCursorGrab).toHaveBeenCalledExactlyOnceWith(mounted.actor, {
+			x: 10,
+			y: 20,
+		});
 	});
 
 	it.each([

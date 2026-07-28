@@ -11,6 +11,7 @@ describe("LocationScopeEnumSchema", () => {
 			LocationScopeEnumSchema.enum.Input,
 			LocationScopeEnumSchema.enum.Job,
 			LocationScopeEnumSchema.enum.Reserved,
+			LocationScopeEnumSchema.enum.Delivery,
 		]);
 		expect(LocationScopeEnumSchema.safeParse("any").success).toBe(false);
 	});

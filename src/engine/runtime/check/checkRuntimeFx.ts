@@ -1,8 +1,10 @@
 import { Effect } from "effect";
 
 import { GameConfigFx } from "~/engine/game/context/GameConfigFx";
+import { checkRuntimeDeliveriesFx } from "~/engine/delivery/check/checkRuntimeDeliveriesFx";
 import { checkRuntimeInputLocationsFx } from "~/engine/input/check/checkRuntimeInputLocationsFx";
 import { checkRuntimeDefaultLinesFx } from "~/engine/line/check/checkRuntimeDefaultLinesFx";
+import { checkRuntimeAutonomousLinesFx } from "~/engine/line/check/checkRuntimeAutonomousLinesFx";
 import { checkRuntimeJobsFx } from "~/engine/job/check/checkRuntimeJobsFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import type { RuntimeCheckResultSchema } from "~/engine/runtime/schema/check/RuntimeCheckResultSchema";
@@ -40,7 +42,13 @@ export const checkRuntimeFx = Effect.fn("checkRuntimeFx")(function* ({
 	const defaultLineIssues = yield* checkRuntimeDefaultLinesFx({
 		runtime,
 	});
+	const autonomousLineIssues = yield* checkRuntimeAutonomousLinesFx({
+		runtime,
+	});
 	const inputLocationIssues = yield* checkRuntimeInputLocationsFx({
+		runtime,
+	});
+	const deliveryIssues = yield* checkRuntimeDeliveriesFx({
 		runtime,
 	});
 	const jobIssues = yield* checkRuntimeJobsFx({
@@ -58,7 +66,9 @@ export const checkRuntimeFx = Effect.fn("checkRuntimeFx")(function* ({
 			...itemQuantityIssues,
 			...itemTemporaryDurationIssues,
 			...defaultLineIssues,
+			...autonomousLineIssues,
 			...inputLocationIssues,
+			...deliveryIssues,
 			...jobIssues,
 			...locationIssues,
 		],

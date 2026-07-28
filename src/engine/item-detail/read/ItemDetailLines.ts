@@ -35,6 +35,9 @@ export namespace ItemDetailLines {
 		readonly mode: InputModeEnumSchema.Type;
 		readonly required: QuantityBounds;
 		readonly storedQuantity: number;
+		readonly deliveryQuantity: number;
+		readonly autofillAvailableQuantity: number;
+		readonly producerItemId?: IdSchema.Type;
 		readonly maxStoredQuantity: number;
 		readonly missingQuantity: number;
 		readonly availableCapacity: number;
@@ -133,6 +136,10 @@ export namespace ItemDetailLines {
 		readonly availability: Availability;
 		readonly startMode: "start" | "enqueue";
 		readonly isDefault: boolean;
+		readonly autonomous: {
+			readonly enabled: boolean;
+			readonly supported: boolean;
+		};
 		readonly actions: {
 			readonly canAutofill: boolean;
 			readonly canStart: boolean;

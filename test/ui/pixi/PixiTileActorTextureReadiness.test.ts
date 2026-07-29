@@ -119,6 +119,7 @@ const createFrames = () => {
 			closeFx: Effect.void,
 			invalidateFx: Effect.sync(invalidate),
 			reportCriticalFailure,
+			scheduleFx: () => Effect.succeed(() => {}),
 		},
 		invalidate,
 		reportCriticalFailure,

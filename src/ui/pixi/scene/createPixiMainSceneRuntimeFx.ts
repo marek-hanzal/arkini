@@ -94,11 +94,11 @@ export const createPixiMainSceneRuntimeFx = Effect.fn("createPixiMainSceneRuntim
 		});
 		registerRollback(dropFeedback.closeFx);
 		const surface = yield* createPixiMainSceneSurfaceFx({
+			actorStore,
 			application,
 			dropFeedback,
 			game,
 			palette: paletteState.current,
-			readCanonicalItems: () => actorStore.canonicalItems.values(),
 		});
 		registerRollback(surface.closeFx);
 		// Retained actors must die before their parent surface destroys its layers.
@@ -107,6 +107,7 @@ export const createPixiMainSceneRuntimeFx = Effect.fn("createPixiMainSceneRuntim
 		const magneticField = yield* createPixiTileMagneticFieldFx({
 			actorStore,
 			animationDriver,
+			scheduleApply: (apply) => RendererRuntime.runSync(application.frames.scheduleFx(apply)),
 		});
 		registerRollback(magneticField.closeFx);
 		const motion = yield* createPixiTileMotionRuntimeFx({

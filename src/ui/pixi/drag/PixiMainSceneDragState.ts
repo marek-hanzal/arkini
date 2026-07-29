@@ -13,11 +13,21 @@ interface PixiMainSceneActiveDragBase {
 	readonly sourceItem: TileActorItem;
 	readonly startX: number;
 	readonly startY: number;
+	attractionEligibilityByActorId: Map<
+		string,
+		{
+			readonly eligible: boolean;
+			readonly source: Pick<TileActorItem, "id" | "location" | "revision">;
+			readonly target: Pick<TileActorItem, "id" | "location" | "revision">;
+		}
+	>;
 	eligibleAttractionActorIds: ReadonlySet<string>;
 	lastPointerX: number;
 	lastPointerY: number;
 	previewKind: readTileDropPreviewFx.Result["kind"] | null;
+	previewSource: Pick<TileActorItem, "id" | "location" | "revision"> | null;
 	target: PixiSceneDropTarget | null;
+	targetKey: string;
 	targetItem: TileActorItem | null;
 }
 

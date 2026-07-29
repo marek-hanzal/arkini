@@ -148,6 +148,7 @@ export const createPixiDeliveryMotionRuntimeFx = Effect.fn("createPixiDeliveryMo
 								delivery.targetActorId,
 							]),
 							magneticField,
+							surface,
 						})
 					: null;
 			active.releaseMagnet = () => magneticProjector?.release();

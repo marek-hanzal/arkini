@@ -25,7 +25,10 @@ const previewState = vi.hoisted(() => ({
 		string,
 		"merge" | "move" | "reject" | "stack" | "store-input" | "store-inventory" | "swap"
 	>(),
+	failureActorIds: new Set<string>(),
 	kind: "move" as "ignored" | "move" | "reject" | "store-inventory" | "swap",
+	reads: 0,
+	readsByActorId: new Map<string, number>(),
 }));
 
 const removalState = vi.hoisted(() => ({
@@ -42,11 +45,25 @@ vi.mock("~/bridge/cheat/removeDraggedCheatItemFx", () => ({
 
 vi.mock("~/bridge/tile/readTileDropPreviewFx", () => ({
 	readTileDropPreviewFx: ({ target }: { readonly target: runTileDropAtom.Command["target"] }) =>
-		Effect.succeed({
-			kind:
-				target.kind === "slot" && target.occupant !== null
-					? (previewState.actorKinds.get(target.occupant.itemId) ?? previewState.kind)
-					: previewState.kind,
+		Effect.sync(() => {
+			previewState.reads += 1;
+			const actorId =
+				target.kind === "slot" && target.occupant !== null ? target.occupant.itemId : null;
+			if (actorId !== null) {
+				previewState.readsByActorId.set(
+					actorId,
+					(previewState.readsByActorId.get(actorId) ?? 0) + 1,
+				);
+				if (previewState.failureActorIds.has(actorId)) {
+					throw new Error(`preview failed:${actorId}`);
+				}
+			}
+			return {
+				kind:
+					target.kind === "slot" && target.occupant !== null
+						? (previewState.actorKinds.get(target.occupant.itemId) ?? previewState.kind)
+						: previewState.kind,
+			};
 		}),
 }));
 
@@ -206,6 +223,9 @@ const mountController = ({
 } = {}) => {
 	previewState.kind = "move";
 	previewState.actorKinds.clear();
+	previewState.failureActorIds.clear();
+	previewState.reads = 0;
+	previewState.readsByActorId.clear();
 	removalState.remove.mockClear();
 	const actorEvents = new FakeEmitter();
 	const stage = new FakeEmitter();
@@ -213,9 +233,28 @@ const mountController = ({
 	const cancelAnimation = vi.fn();
 	const cancelChannel = vi.fn();
 	const finishCursorGrab = vi.fn();
+	const flushMagneticField = vi.fn();
 	const startCursorGrab = vi.fn();
+	let scheduledFrameWork: (() => void) | null = null;
+	const flushFrame = () => {
+		const work = scheduledFrameWork;
+		scheduledFrameWork = null;
+		work?.();
+	};
 	const animations: PixiActorAnimation[] = [];
 	const presentationWrites: PixiActorPresentationWrite[] = [];
+	const dropTargetReads: Array<{
+		readonly x: number;
+		readonly y: number;
+	}> = [];
+	const localActorReads: Array<{
+		readonly excludeActorId?: string;
+		readonly height: number;
+		readonly paddingRatio?: number;
+		readonly width: number;
+		readonly x: number;
+		readonly y: number;
+	}> = [];
 	const transientActorLayer = {
 		addChild: vi.fn(),
 	};
@@ -290,7 +329,12 @@ const mountController = ({
 	};
 	const actorPoses = new Map<string, typeof currentActorPose>();
 	let currentDropTargetX = 1;
+	let activeMagneticSourceActorIds: ReadonlyArray<string> = [];
+	let sourceMembershipListener: ((sourceKind: "drag" | "motion") => void) | null = null;
+	let currentLocalActorIds: ReadonlyArray<string> | null = null;
+	let currentTargetKind: "board" | "toolbar" | null = "board";
 	let currentOccupant: TileActorItem | null = null;
+	let targetFactsFailure: unknown | null = null;
 	const magneticUpdates: Array<Parameters<PixiTileMagneticField["updateFx"]>[0]> = [];
 	const targetRedirects: Array<Parameters<PixiTileMotionRuntime["redirectTargetFx"]>[0]> = [];
 	const onActivate = vi.fn();
@@ -361,10 +405,19 @@ const mountController = ({
 	} as never;
 	const magneticField = {
 		closeFx: Effect.void,
+		flushFx: Effect.sync(flushMagneticField),
 		pruneFx: Effect.void,
+		readActiveSourceActorIdsFx: Effect.sync(() => activeMagneticSourceActorIds),
 		releaseFx: () => Effect.void,
 		releaseSourcesFx: () => Effect.void,
 		resetFx: Effect.void,
+		subscribeSourceMembershipFx: (listen) =>
+			Effect.sync(() => {
+				sourceMembershipListener = listen;
+				return () => {
+					if (sourceMembershipListener === listen) sourceMembershipListener = null;
+				};
+			}),
 		updateFx: (sample) =>
 			Effect.sync(() => {
 				magneticUpdates.push(sample);
@@ -390,19 +443,37 @@ const mountController = ({
 	const surface = {
 		readActorPoseFx: (actorItem: TileActorItem) =>
 			Effect.succeed(actorPoses.get(actorItem.id) ?? currentActorPose),
-		readCommandTargetFx: () => Effect.succeed(currentCommandTarget),
-		readDropTargetFx: () =>
-			Effect.succeed({
-				layout: {
-					cellSize: 80,
-					kind: "board",
-					x: 0,
-					y: 0,
-				},
-				x: currentDropTargetX,
-				y: 0,
+		readLocalActorIdsFx: (bounds: Parameters<PixiMainSceneSurface["readLocalActorIdsFx"]>[0]) =>
+			Effect.sync(() => {
+				localActorReads.push(bounds);
+				return currentLocalActorIds ?? Array.from(actors.keys());
 			}),
-		readOccupantFx: () => Effect.succeed(currentOccupant),
+		readTargetFactsFx: (x: number, y: number) =>
+			Effect.sync(() => {
+				if (targetFactsFailure !== null) throw targetFactsFailure;
+				dropTargetReads.push({
+					x,
+					y,
+				});
+				return {
+					commandTarget: currentCommandTarget,
+					occupant: currentOccupant,
+					stableKey: `${currentDropTargetX}:${currentOccupant?.id ?? "empty"}:${currentOccupant?.revision ?? "none"}`,
+					target:
+						currentTargetKind !== null
+							? {
+									layout: {
+										cellSize: 80,
+										kind: currentTargetKind,
+										x: 0,
+										y: 0,
+									},
+									x: currentDropTargetX,
+									y: 0,
+								}
+							: null,
+				};
+			}),
 		renderDropFeedbackFx: () => Effect.void,
 		transientActorLayer,
 	} as unknown as PixiMainSceneSurface;
@@ -435,6 +506,13 @@ const mountController = ({
 					},
 					frames: {
 						invalidateFx: Effect.void,
+						scheduleFx: (work: () => void) =>
+							Effect.sync(() => {
+								scheduledFrameWork = work;
+								return () => {
+									if (scheduledFrameWork === work) scheduledFrameWork = null;
+								};
+							}),
 					},
 					stage,
 				} as unknown as PixiApplicationOwner,
@@ -472,8 +550,12 @@ const mountController = ({
 		controller,
 		dropPresentation,
 		dropSubmission,
+		dropTargetReads,
 		finishCursorGrab,
+		flushMagneticField,
+		flushFrame,
 		keyboardTarget,
+		localActorReads,
 		magneticUpdates,
 		onActivate,
 		onAcceptedDrop,
@@ -485,6 +567,12 @@ const mountController = ({
 		setActorPose: (pose: typeof currentActorPose) => {
 			currentActorPose = pose;
 		},
+		setActiveMagneticSourceActorIds: (actorIds: ReadonlyArray<string>) => {
+			activeMagneticSourceActorIds = actorIds;
+		},
+		triggerSourceMembership: (sourceKind: "drag" | "motion") => {
+			sourceMembershipListener?.(sourceKind);
+		},
 		setItemActorPose: (itemId: string, pose: typeof currentActorPose) => {
 			actorPoses.set(itemId, pose);
 		},
@@ -494,11 +582,20 @@ const mountController = ({
 		setDropTargetX: (x: number) => {
 			currentDropTargetX = x;
 		},
+		setTargetKind: (kind: "board" | "toolbar" | null) => {
+			currentTargetKind = kind;
+		},
 		setOccupant: (occupant: TileActorItem | null) => {
 			currentOccupant = occupant;
 		},
 		setItem: (nextItem: TileActorItem) => {
 			actor.item = nextItem;
+		},
+		setLocalActorIds: (actorIds: ReadonlyArray<string>) => {
+			currentLocalActorIds = actorIds;
+		},
+		setTargetFactsFailure: (cause: unknown | null) => {
+			targetFactsFailure = cause;
 		},
 		startCursorGrab,
 		stage,
@@ -522,6 +619,141 @@ const samplePoseAnimation = (animation: PixiActorAnimation, progress: number) =>
 };
 
 describe("Pixi main-scene drag controller", () => {
+	it("coalesces a raw pointer burst into one latest-sample drag update", () => {
+		const mounted = mountController();
+		mounted.actorEvents.emit("pointerdown", pointer(10, 20));
+
+		mounted.stage.emit("globalpointermove", pointer(20, 20));
+		mounted.stage.emit("globalpointermove", pointer(35, 20));
+		mounted.stage.emit("globalpointermove", pointer(70, 20));
+
+		expect(mounted.actor.dragging).toBe(false);
+		expect(mounted.magneticUpdates).toEqual([]);
+		mounted.flushFrame();
+
+		expect(mounted.actor.dragging).toBe(true);
+		expect(mounted.actor.container.x).toBe(70);
+		expect(mounted.magneticUpdates).toHaveLength(1);
+	});
+
+	it("latches a raw threshold crossing even when the latest frame sample returns below it", () => {
+		const mounted = mountController();
+		mounted.actorEvents.emit("pointerdown", pointer(10, 20));
+
+		mounted.stage.emit("globalpointermove", pointer(70, 20));
+		mounted.stage.emit("globalpointermove", pointer(12, 20));
+		mounted.flushFrame();
+
+		expect(mounted.actor.dragging).toBe(true);
+		expect(mounted.actor.container.x).toBe(12);
+	});
+
+	it("latches a raw threshold crossing through an exact release below the threshold", () => {
+		const mounted = mountController();
+		mounted.actorEvents.emit("pointerdown", pointer(10, 20));
+
+		mounted.stage.emit("globalpointermove", pointer(70, 20));
+		mounted.stage.emit("globalpointermove", pointer(12, 20));
+		mounted.stage.emit("pointerup", pointer(12, 20));
+
+		expect(mounted.onActivate).not.toHaveBeenCalled();
+		expect(mounted.onDrop).toHaveBeenCalledOnce();
+	});
+
+	it("cleans up a scheduled drag failure before reporting it", () => {
+		const mounted = mountController();
+		mounted.actorEvents.emit("pointerdown", pointer(10, 20));
+		mounted.stage.emit("globalpointermove", pointer(30, 20));
+		mounted.flushFrame();
+		expect(mounted.actor.dragging).toBe(true);
+
+		mounted.reportCriticalFailure.mockImplementationOnce(() => {
+			expect(mounted.actor.dragging).toBe(false);
+			expect(mounted.finishCursorGrab).toHaveBeenCalledOnce();
+		});
+		const failure = new Error("target facts failed");
+		mounted.setTargetFactsFailure(failure);
+		mounted.stage.emit("globalpointermove", pointer(40, 20));
+		mounted.flushFrame();
+
+		expect(mounted.reportCriticalFailure).toHaveBeenCalledExactlyOnceWith(
+			"game-presentation",
+			failure,
+		);
+	});
+
+	it("refreshes a stable target preview when exact source facts change", () => {
+		const mounted = mountController();
+		mounted.actorEvents.emit("pointerdown", pointer(10, 20));
+		mounted.stage.emit("globalpointermove", pointer(30, 20));
+		mounted.flushFrame();
+		expect(previewState.reads).toBe(1);
+
+		const nextItem = {
+			...item,
+			revision: "revision:log:updated",
+		} satisfies TileActorItem;
+		mounted.canonicalItems.set(item.id, nextItem);
+		mounted.setItem(nextItem);
+		mounted.stage.emit("globalpointermove", pointer(31, 20));
+		mounted.flushFrame();
+
+		expect(previewState.reads).toBe(2);
+	});
+
+	it("flushes the exact release coordinates before submitting and cancels the stale frame", () => {
+		const mounted = mountController();
+		mounted.actorEvents.emit("pointerdown", pointer(10, 20));
+		mounted.stage.emit("globalpointermove", pointer(30, 20));
+		mounted.stage.emit("globalpointermove", pointer(55, 20));
+
+		mounted.stage.emit("pointerup", pointer(90, 35));
+
+		expect(mounted.actor.container).toMatchObject({
+			x: 90,
+			y: 35,
+		});
+		expect(mounted.dropTargetReads.at(-1)).toEqual({
+			x: 90,
+			y: 35,
+		});
+		expect(mounted.onDrop).toHaveBeenCalledOnce();
+		const updateCount = mounted.magneticUpdates.length;
+		mounted.flushFrame();
+		expect(mounted.magneticUpdates).toHaveLength(updateCount);
+	});
+
+	it.each([
+		"pointer-cancel",
+		"detach",
+		"block",
+		"close",
+	] as const)("cancels stale scheduled pointer work on %s", (action) => {
+		const mounted = mountController();
+		mounted.actorEvents.emit("pointerdown", pointer(10, 20));
+		mounted.stage.emit("globalpointermove", pointer(70, 20));
+
+		switch (action) {
+			case "pointer-cancel":
+				mounted.stage.emit("pointercancel", pointer(70, 20));
+				break;
+			case "detach":
+				Effect.runSync(mounted.controller.detachActorFx(mounted.actor));
+				break;
+			case "block":
+				Effect.runSync(mounted.controller.setInteractionBlockedFx(true));
+				break;
+			case "close":
+				Effect.runSync(mounted.controller.closeFx);
+				break;
+		}
+		mounted.flushFrame();
+
+		expect(mounted.actor.dragging).toBe(false);
+		expect(mounted.magneticUpdates).toEqual([]);
+		expect(mounted.onDrop).not.toHaveBeenCalled();
+	});
+
 	it("restores interaction state when a presentation owner hands an actor back", () => {
 		const mounted = mountController();
 
@@ -631,6 +863,7 @@ describe("Pixi main-scene drag controller", () => {
 		mounted.actor.container.x = 42;
 		mounted.actor.container.y = 34;
 		mounted.stage.emit("globalpointermove", pointer(30, 20));
+		mounted.flushFrame();
 
 		expect(mounted.beginInteractionHandoff).toHaveBeenCalledWith(item.id);
 		expect(mounted.actor.dragging).toBe(true);
@@ -652,6 +885,7 @@ describe("Pixi main-scene drag controller", () => {
 
 		mounted.actorEvents.emit("pointerdown", pointer(10, 20));
 		mounted.stage.emit("globalpointermove", pointer(210, 120));
+		mounted.flushFrame();
 
 		expect(mounted.actor.container.x).toBe(210);
 		expect(mounted.actor.container.y).toBe(120);
@@ -1041,6 +1275,7 @@ describe("Pixi main-scene drag controller", () => {
 
 		mounted.actorEvents.emit("pointerdown", pointer(10, 20));
 		mounted.stage.emit("globalpointermove", pointer(30, 20));
+		mounted.flushFrame();
 		const keyEvent = keyboard("i");
 		mounted.keyboardTarget.emit(keyEvent);
 
@@ -1137,6 +1372,7 @@ describe("Pixi main-scene drag controller", () => {
 
 		mounted.actorEvents.emit("pointerdown", pointer(10, 20));
 		mounted.stage.emit("globalpointermove", pointer(30, 20));
+		mounted.flushFrame();
 		const keyEvent = keyboard("i");
 		mounted.keyboardTarget.emit(keyEvent);
 
@@ -1156,6 +1392,7 @@ describe("Pixi main-scene drag controller", () => {
 
 		mounted.actorEvents.emit("pointerdown", pointer(10, 20));
 		mounted.stage.emit("globalpointermove", pointer(30, 20));
+		mounted.flushFrame();
 		const keyEvent = keyboard("d");
 		mounted.keyboardTarget.emit(keyEvent);
 		await flushMicrotasks();
@@ -1177,6 +1414,7 @@ describe("Pixi main-scene drag controller", () => {
 
 		mounted.actorEvents.emit("pointerdown", pointer(10, 20));
 		mounted.stage.emit("globalpointermove", pointer(30, 20));
+		mounted.flushFrame();
 		const keyEvent = keyboard("d");
 		mounted.keyboardTarget.emit(keyEvent);
 
@@ -1355,6 +1593,7 @@ describe("Pixi main-scene drag controller", () => {
 			...pointer(190, 20),
 			pointerId: 2,
 		});
+		mounted.flushFrame();
 		expect(secondActor.dragging).toBe(true);
 		mounted.stage.emit("pointerup", {
 			...pointer(190, 20),
@@ -1676,6 +1915,7 @@ describe("Pixi main-scene drag controller", () => {
 		});
 		mounted.actorEvents.emit("pointerdown", pointer(10, 20));
 		mounted.stage.emit("globalpointermove", pointer(45, 20));
+		mounted.flushFrame();
 
 		mounted.onDrop.mockResolvedValueOnce({
 			kind: "reject",
@@ -1708,15 +1948,48 @@ describe("Pixi main-scene drag controller", () => {
 		expect(mounted.actor.container.cursor).toBe("grab");
 	});
 
-	it("keeps the origin available with a grab cursor during drag", () => {
+	it.each([
+		"ignored",
+		"move",
+		"reject",
+		"swap",
+	] as const)("keeps one grabbing cursor anywhere inside the Board for %s preview", (kind) => {
 		const mounted = mountController();
-		previewState.kind = "ignored";
+		previewState.kind = kind;
 
 		mounted.actorEvents.emit("pointerdown", pointer(10, 20));
 		mounted.stage.emit("globalpointermove", pointer(45, 20));
+		mounted.flushFrame();
 
 		expect(mounted.actor.dragging).toBe(true);
-		expect(mounted.actor.container.cursor).toBe("grab");
+		expect(mounted.actor.container.cursor).toBe("grabbing");
+	});
+
+	it.each([
+		"move",
+		"reject",
+	] as const)("keeps one grabbing cursor over a Toolbar target for %s preview", (kind) => {
+		const mounted = mountController();
+		previewState.kind = kind;
+		mounted.setTargetKind("toolbar");
+
+		mounted.actorEvents.emit("pointerdown", pointer(10, 20));
+		mounted.stage.emit("globalpointermove", pointer(45, 20));
+		mounted.flushFrame();
+
+		expect(mounted.actor.container.cursor).toBe("grabbing");
+	});
+
+	it("uses not-allowed only when no main-scene drop target exists", () => {
+		const mounted = mountController();
+		previewState.kind = "move";
+		mounted.setTargetKind(null);
+
+		mounted.actorEvents.emit("pointerdown", pointer(10, 20));
+		mounted.stage.emit("globalpointermove", pointer(45, 20));
+		mounted.flushFrame();
+
+		expect(mounted.actor.container.cursor).toBe("not-allowed");
 	});
 
 	it("retargets a running settle from its live frame without a resize or completion snap", async () => {
@@ -1777,6 +2050,7 @@ describe("Pixi main-scene drag controller", () => {
 		mounted.setDropTargetX(3);
 		mounted.actorEvents.emit("pointerdown", pointer(10, 20));
 		mounted.stage.emit("globalpointermove", pointer(30, 20));
+		mounted.flushFrame();
 
 		expect(mounted.magneticUpdates[0]?.attractedActorId).toBeNull();
 		expect(Array.from(mounted.magneticUpdates[0]?.eligibleAttractionActorIds ?? [])).toEqual([
@@ -1794,11 +2068,189 @@ describe("Pixi main-scene drag controller", () => {
 			},
 		});
 		mounted.stage.emit("globalpointermove", pointer(40, 20));
+		mounted.flushFrame();
 
 		expect(mounted.magneticUpdates[1]?.attractedActorId).toBe(eligible.id);
-		expect(Array.from(mounted.magneticUpdates[1]?.eligibleAttractionActorIds ?? [])).toEqual([
+		expect(
+			Array.from(mounted.magneticUpdates.at(-1)?.eligibleAttractionActorIds ?? []),
+		).toEqual([
 			eligible.id,
 		]);
+	});
+
+	it("coalesces a stationary drag refresh when a compatible motion source enters", () => {
+		const moving = createItem("runtime:moving", 8);
+		const mounted = mountController({
+			targetItems: [
+				moving,
+			],
+		});
+		previewState.actorKinds.set(moving.id, "merge");
+		mounted.setLocalActorIds([]);
+		mounted.actorEvents.emit("pointerdown", pointer(10, 20));
+		mounted.stage.emit("globalpointermove", pointer(30, 20));
+		mounted.flushFrame();
+		expect(previewState.readsByActorId.get(moving.id)).toBeUndefined();
+
+		const targetReadCount = mounted.dropTargetReads.length;
+		mounted.stage.emit("globalpointermove", pointer(35, 20));
+		mounted.stage.emit("globalpointermove", pointer(40, 20));
+		mounted.setActiveMagneticSourceActorIds([
+			moving.id,
+		]);
+		mounted.triggerSourceMembership("motion");
+		mounted.flushFrame();
+
+		expect(mounted.dropTargetReads).toHaveLength(targetReadCount + 1);
+		expect(previewState.readsByActorId.get(moving.id)).toBe(1);
+		expect(
+			Array.from(mounted.magneticUpdates.at(-1)?.eligibleAttractionActorIds ?? []),
+		).toContain(moving.id);
+	});
+
+	it("requests a padded live-source neighborhood and always includes the exact target", () => {
+		const eligible = createItem("runtime:eligible", 8);
+		const moving = createItem("runtime:moving", 9);
+		const mounted = mountController({
+			targetItems: [
+				eligible,
+				moving,
+			],
+		});
+		previewState.actorKinds.set(eligible.id, "merge");
+		previewState.actorKinds.set(moving.id, "merge");
+		mounted.setLocalActorIds([]);
+		mounted.setActiveMagneticSourceActorIds([
+			item.id,
+			moving.id,
+		]);
+		mounted.setOccupant(eligible);
+		mounted.setCommandTarget({
+			kind: "slot",
+			location: eligible.location,
+			occupant: {
+				itemId: eligible.id,
+				revision: eligible.revision,
+			},
+		});
+
+		mounted.actorEvents.emit("pointerdown", pointer(10, 20));
+		mounted.stage.emit("globalpointermove", pointer(30, 20));
+		mounted.flushFrame();
+
+		expect(mounted.localActorReads).toEqual([
+			{
+				excludeActorId: item.id,
+				height: 80,
+				paddingRatio: 1.5,
+				width: 80,
+				x: 30,
+				y: 20,
+			},
+		]);
+		expect(mounted.magneticUpdates[0]?.candidateActorIds).toEqual([
+			moving.id,
+			eligible.id,
+		]);
+		expect(mounted.flushMagneticField).toHaveBeenCalledOnce();
+	});
+
+	it("caches positive and negative local eligibility, then prunes actors that leave", () => {
+		const eligible = createItem("runtime:eligible", 1);
+		const invalid = createItem("runtime:invalid", 2);
+		const mounted = mountController({
+			targetItems: [
+				eligible,
+				invalid,
+			],
+		});
+		previewState.actorKinds.set(eligible.id, "merge");
+		previewState.actorKinds.set(invalid.id, "swap");
+		mounted.setLocalActorIds([
+			eligible.id,
+			invalid.id,
+		]);
+		mounted.actorEvents.emit("pointerdown", pointer(10, 20));
+
+		mounted.stage.emit("globalpointermove", pointer(30, 20));
+		mounted.flushFrame();
+		mounted.stage.emit("globalpointermove", pointer(31, 20));
+		mounted.flushFrame();
+		expect(previewState.readsByActorId.get(eligible.id)).toBe(1);
+		expect(previewState.readsByActorId.get(invalid.id)).toBe(1);
+
+		mounted.setLocalActorIds([
+			invalid.id,
+		]);
+		mounted.stage.emit("globalpointermove", pointer(32, 20));
+		mounted.flushFrame();
+		mounted.setLocalActorIds([
+			eligible.id,
+		]);
+		mounted.stage.emit("globalpointermove", pointer(33, 20));
+		mounted.flushFrame();
+
+		expect(previewState.readsByActorId.get(eligible.id)).toBe(2);
+		expect(previewState.readsByActorId.get(invalid.id)).toBe(1);
+	});
+
+	it("does not cache a failed local eligibility preview", () => {
+		const eligible = createItem("runtime:eligible", 1);
+		const mounted = mountController({
+			targetItems: [
+				eligible,
+			],
+		});
+		previewState.actorKinds.set(eligible.id, "merge");
+		previewState.failureActorIds.add(eligible.id);
+		mounted.setLocalActorIds([
+			eligible.id,
+		]);
+		mounted.actorEvents.emit("pointerdown", pointer(10, 20));
+		mounted.stage.emit("globalpointermove", pointer(30, 20));
+		mounted.flushFrame();
+		expect(mounted.actor.dragging).toBe(false);
+		expect(mounted.reportCriticalFailure).toHaveBeenCalledOnce();
+
+		previewState.failureActorIds.delete(eligible.id);
+		mounted.actorEvents.emit("pointerdown", pointer(10, 20));
+		mounted.stage.emit("globalpointermove", pointer(31, 20));
+		mounted.flushFrame();
+
+		expect(previewState.readsByActorId.get(eligible.id)).toBe(2);
+		expect(
+			Array.from(mounted.magneticUpdates.at(-1)?.eligibleAttractionActorIds ?? []),
+		).toEqual([
+			eligible.id,
+		]);
+	});
+
+	it("refreshes a stationary pointer target when its canonical identity changes", () => {
+		const eligible = createItem("runtime:eligible", 1);
+		const mounted = mountController({
+			targetItems: [
+				eligible,
+			],
+		});
+		previewState.actorKinds.set(eligible.id, "merge");
+		mounted.actorEvents.emit("pointerdown", pointer(10, 20));
+		mounted.stage.emit("globalpointermove", pointer(30, 20));
+		mounted.flushFrame();
+		expect(mounted.magneticUpdates[0]?.attractedActorId).toBeNull();
+
+		mounted.setOccupant(eligible);
+		mounted.setCommandTarget({
+			kind: "slot",
+			location: eligible.location,
+			occupant: {
+				itemId: eligible.id,
+				revision: eligible.revision,
+			},
+		});
+		Effect.runSync(mounted.controller.requestRefreshFx);
+		mounted.flushFrame();
+
+		expect(mounted.magneticUpdates[1]?.attractedActorId).toBe(eligible.id);
 	});
 
 	it("reports an accepted replay failure without misclassifying it as command failure", async () => {

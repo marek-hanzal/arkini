@@ -164,15 +164,19 @@ describe("PixiDeliveryMotionRuntime", () => {
 				} as unknown as GameEngine,
 				magneticField: {
 					closeFx: Effect.void,
+					flushFx: Effect.void,
 					pruneFx: Effect.void,
+					readActiveSourceActorIdsFx: Effect.succeed([]),
 					releaseFx: () => Effect.void,
 					releaseSourcesFx: () => Effect.void,
 					resetFx: Effect.void,
+					subscribeSourceMembershipFx: () => Effect.succeed(() => {}),
 					updateFx: () => Effect.void,
 				},
 				particleTextures: {} as never,
 				readPalette: () => ({}) as never,
 				surface: {
+					readLocalActorIdsFx: () => Effect.succeed([]),
 					readLocationPoseFx: (location: typeof origin) =>
 						Effect.succeed({
 							layer: new Container(),
@@ -315,15 +319,19 @@ describe("PixiDeliveryMotionRuntime", () => {
 				} as unknown as GameEngine,
 				magneticField: {
 					closeFx: Effect.void,
+					flushFx: Effect.void,
 					pruneFx: Effect.void,
+					readActiveSourceActorIdsFx: Effect.succeed([]),
 					releaseFx: releaseMagnetFx,
 					releaseSourcesFx: () => Effect.void,
 					resetFx: Effect.void,
+					subscribeSourceMembershipFx: () => Effect.succeed(() => {}),
 					updateFx: updateMagnetFx,
 				},
 				particleTextures: {} as never,
 				readPalette: () => ({}) as never,
 				surface: {
+					readLocalActorIdsFx: () => Effect.succeed([]),
 					readLocationPoseFx: (location: typeof origin) =>
 						Effect.succeed(
 							geometryAvailable

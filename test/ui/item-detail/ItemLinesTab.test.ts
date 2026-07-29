@@ -696,14 +696,11 @@ describe("ItemLinesTab", () => {
 			"line:first",
 		]);
 		expect(
-			container.querySelector(
-				'[data-line-id="line:capped"] [data-ui="TileLineStatusBadge"]',
-			)?.textContent,
+			container.querySelector('[data-line-id="line:capped"] [data-ui="TileLineStatusBadge"]')
+				?.textContent,
 		).toBe("Disabled");
 		expect(
-			container.querySelector(
-				'[data-line-id="line:inputs"] [data-ui="TileLineStatusBadge"]',
-			),
+			container.querySelector('[data-line-id="line:inputs"] [data-ui="TileLineStatusBadge"]'),
 		).toBeNull();
 	});
 
@@ -783,9 +780,9 @@ describe("ItemLinesTab", () => {
 			],
 		});
 
-		expect(
-			container.querySelector('[data-ui="TileLineStatusBadge"]')?.textContent,
-		).toBe("Paused");
+		expect(container.querySelector('[data-ui="TileLineStatusBadge"]')?.textContent).toBe(
+			"Paused",
+		);
 
 		await rerender({
 			...projection,

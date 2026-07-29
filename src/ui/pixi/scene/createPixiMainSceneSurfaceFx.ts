@@ -7,6 +7,7 @@ import type { TileActorItem } from "~/bridge/tile/TileActorItem";
 import { DropItemResultKindEnumSchema } from "~/bridge/tile/DropItemResultKindEnumSchema";
 import { LocationScopeEnumSchema } from "~/bridge/tile/LocationScopeEnumSchema";
 import type { readTileDropPreviewFx } from "~/bridge/tile/readTileDropPreviewFx";
+import type { PixiMainSceneActorStore } from "~/ui/pixi/actor/PixiMainSceneActorStore";
 import type { PixiScenePalette } from "~/ui/pixi/appearance/PixiScenePalette";
 import type { PixiGridDropFeedback } from "~/ui/pixi/grid/PixiGridDropFeedback";
 import { drawPixiGridMaskFx } from "~/ui/pixi/grid/drawPixiGridMaskFx";
@@ -15,31 +16,35 @@ import { readPixiGridSlotFx } from "~/ui/pixi/grid/readPixiGridSlotFx";
 import type { PixiMainSceneLayout } from "~/ui/pixi/layout/PixiSceneLayout";
 import { readPixiMainSceneLayoutFx } from "~/ui/pixi/layout/readPixiMainSceneLayoutFx";
 import type { PixiApplicationOwner } from "~/ui/pixi/runtime/PixiApplicationOwner";
-import type { PixiMainSceneSurface } from "~/ui/pixi/scene/PixiMainSceneSurface";
+import type {
+	PixiMainSceneSurface,
+	PixiMainSceneTargetFacts,
+} from "~/ui/pixi/scene/PixiMainSceneSurface";
 import type { PixiSceneDropTarget } from "~/ui/pixi/scene/PixiSceneDropTarget";
 
 export namespace createPixiMainSceneSurfaceFx {
 	export interface Props {
+		readonly actorStore: PixiMainSceneActorStore;
 		readonly application: PixiApplicationOwner;
 		readonly dropFeedback: PixiGridDropFeedback;
 		readonly game: GameEngine;
 		readonly palette: PixiScenePalette;
-		readonly readCanonicalItems: () => Iterable<TileActorItem>;
 	}
 }
 
 /** Owns main-scene geometry, layers, masks, hit testing and drop feedback paint. */
 export const createPixiMainSceneSurfaceFx = Effect.fn("createPixiMainSceneSurfaceFx")(
 	({
+		actorStore,
 		application,
 		dropFeedback,
 		game,
 		palette: initialPalette,
-		readCanonicalItems,
 	}: createPixiMainSceneSurfaceFx.Props) =>
 		Effect.sync((): PixiMainSceneSurface => {
 			let palette = initialPalette;
 			let latestTransition = game.getTransitionSnapshot();
+			let layoutRevision = 0;
 			let layout: PixiMainSceneLayout = RendererRuntime.runSync(
 				readPixiMainSceneLayoutFx({
 					boardHeight: game.config.meta.board.height,
@@ -126,27 +131,173 @@ export const createPixiMainSceneSurfaceFx = Effect.fn("createPixiMainSceneSurfac
 				return null;
 			};
 
-			const readOccupant = (target: PixiSceneDropTarget) => {
-				for (const item of readCanonicalItems()) {
-					const location = item.location;
-					if (
-						target.layout.kind === "board" &&
-						location.scope === LocationScopeEnumSchema.enum.Board &&
-						location.space === latestTransition.runtime.currentSpace &&
-						location.position.x === target.x &&
-						location.position.y === target.y
-					) {
-						return item;
+			const readTargetLocation = (target: PixiSceneDropTarget): TileActorItem["location"] =>
+				target.layout.kind === "board"
+					? {
+							scope: LocationScopeEnumSchema.enum.Board,
+							space: latestTransition.runtime.currentSpace,
+							position: {
+								x: target.x,
+								y: target.y,
+							},
+						}
+					: {
+							scope: LocationScopeEnumSchema.enum.Toolbar,
+							position: {
+								x: target.x,
+								y: 0,
+							},
+						};
+
+			const readTargetFactsFromTarget = (
+				target: PixiSceneDropTarget | null,
+			): Effect.Effect<PixiMainSceneTargetFacts> =>
+				Effect.gen(function* () {
+					if (target === null) {
+						return {
+							commandTarget: {
+								kind: "unsupported" as const,
+							},
+							occupant: null,
+							stableKey: JSON.stringify([
+								"unsupported",
+								layoutRevision,
+							]),
+							target: null,
+						};
 					}
-					if (
-						target.layout.kind === "toolbar" &&
-						location.scope === LocationScopeEnumSchema.enum.Toolbar &&
-						location.position.x === target.x
-					) {
-						return item;
+					const location = readTargetLocation(target);
+					const occupant = yield* actorStore.readCanonicalOccupantFx(location);
+					return {
+						commandTarget: {
+							kind: "slot" as const,
+							location,
+							occupant:
+								occupant === null
+									? null
+									: {
+											itemId: occupant.id,
+											revision: occupant.revision,
+										},
+						},
+						occupant,
+						stableKey: JSON.stringify([
+							layoutRevision,
+							location.scope,
+							location.scope === LocationScopeEnumSchema.enum.Board
+								? location.space
+								: null,
+							location.position.x,
+							location.position.y,
+							occupant?.id ?? null,
+							occupant?.revision ?? null,
+						]),
+						target,
+					};
+				});
+
+			const readDropTarget = (x: number, y: number) =>
+				Effect.gen(function* () {
+					const toolbar = layout.toolbar;
+					const toolbarSlot = yield* readPixiGridSlotFx({
+						surface: toolbar,
+						x,
+						y,
+					});
+					if (toolbar !== null && toolbarSlot !== null) {
+						return {
+							kind: "slot" as const,
+							layout: toolbar,
+							...toolbarSlot,
+						};
+					}
+					const boardSlot = yield* readPixiGridSlotFx({
+						surface: layout.board,
+						x,
+						y,
+					});
+					return boardSlot === null
+						? null
+						: {
+								kind: "slot" as const,
+								layout: layout.board,
+								...boardSlot,
+							};
+				});
+
+			const appendIntersectingLocations = (
+				locations: TileActorItem["location"][],
+				surface: PixiMainSceneLayout["board"] | null,
+				bounds: {
+					readonly height: number;
+					readonly paddingRatio?: number;
+					readonly width: number;
+					readonly x: number;
+					readonly y: number;
+				},
+			) => {
+				const padding =
+					surface === null
+						? 0
+						: Math.max(bounds.width, bounds.height, surface.cellSize) *
+							(bounds.paddingRatio ?? 0);
+				const queryBounds = {
+					height: bounds.height + padding * 2,
+					width: bounds.width + padding * 2,
+					x: bounds.x - padding,
+					y: bounds.y - padding,
+				};
+				if (
+					surface === null ||
+					queryBounds.width <= 0 ||
+					queryBounds.height <= 0 ||
+					queryBounds.x >= surface.x + surface.width ||
+					queryBounds.y >= surface.y + surface.height ||
+					queryBounds.x + queryBounds.width <= surface.x ||
+					queryBounds.y + queryBounds.height <= surface.y
+				) {
+					return;
+				}
+				const firstX = Math.max(
+					0,
+					Math.floor((queryBounds.x - surface.x) / surface.cellSize),
+				);
+				const lastX = Math.min(
+					surface.columns - 1,
+					Math.ceil((queryBounds.x + queryBounds.width - surface.x) / surface.cellSize) -
+						1,
+				);
+				const firstY = Math.max(
+					0,
+					Math.floor((queryBounds.y - surface.y) / surface.cellSize),
+				);
+				const lastY = Math.min(
+					surface.rows - 1,
+					Math.ceil((queryBounds.y + queryBounds.height - surface.y) / surface.cellSize) -
+						1,
+				);
+				for (let slotY = firstY; slotY <= lastY; slotY += 1) {
+					for (let slotX = firstX; slotX <= lastX; slotX += 1) {
+						locations.push(
+							surface.kind === "board"
+								? {
+										scope: LocationScopeEnumSchema.enum.Board,
+										space: latestTransition.runtime.currentSpace,
+										position: {
+											x: slotX,
+											y: slotY,
+										},
+									}
+								: {
+										scope: LocationScopeEnumSchema.enum.Toolbar,
+										position: {
+											x: slotX,
+											y: 0,
+										},
+									},
+						);
 					}
 				}
-				return null;
 			};
 
 			return {
@@ -171,80 +322,29 @@ export const createPixiMainSceneSurfaceFx = Effect.fn("createPixiMainSceneSurfac
 				readActorPoseFx: Effect.fn("PixiMainSceneSurface.readActorPoseFx")((item) =>
 					Effect.sync(() => readLocationPose(item.location)),
 				),
-				readCommandTargetFx: Effect.fn("PixiMainSceneSurface.readCommandTargetFx")(
-					(target) =>
-						Effect.sync(() => {
-							if (target === null) {
-								return {
-									kind: "unsupported" as const,
-								};
-							}
-							const occupant = readOccupant(target);
-							return {
-								kind: "slot" as const,
-								location:
-									target.layout.kind === "board"
-										? {
-												scope: LocationScopeEnumSchema.enum.Board,
-												space: latestTransition.runtime.currentSpace,
-												position: {
-													x: target.x,
-													y: target.y,
-												},
-											}
-										: {
-												scope: LocationScopeEnumSchema.enum.Toolbar,
-												position: {
-													x: target.x,
-													y: 0,
-												},
-											},
-								occupant:
-									occupant === null
-										? null
-										: {
-												itemId: occupant.id,
-												revision: occupant.revision,
-											},
-							};
-						}),
-				),
-				readDropTargetFx: Effect.fn("PixiMainSceneSurface.readDropTargetFx")((x, y) =>
+				readTargetFactsFx: Effect.fn("PixiMainSceneSurface.readTargetFactsFx")((x, y) =>
 					Effect.gen(function* () {
-						const toolbar = layout.toolbar;
-						const toolbarSlot = yield* readPixiGridSlotFx({
-							surface: toolbar,
-							x,
-							y,
-						});
-						if (toolbar !== null && toolbarSlot !== null) {
-							return {
-								kind: "slot" as const,
-								layout: toolbar,
-								...toolbarSlot,
-							};
-						}
-						const boardSlot = yield* readPixiGridSlotFx({
-							surface: layout.board,
-							x,
-							y,
-						});
-						return boardSlot === null
-							? null
-							: {
-									kind: "slot" as const,
-									layout: layout.board,
-									...boardSlot,
-								};
+						const target = yield* readDropTarget(x, y);
+						return yield* readTargetFactsFromTarget(target);
 					}),
 				),
 				readLocationPoseFx: Effect.fn("PixiMainSceneSurface.readLocationPoseFx")(
 					(location) => Effect.sync(() => readLocationPose(location)),
 				),
-				readOccupantFx: Effect.fn("PixiMainSceneSurface.readOccupantFx")((target) =>
-					Effect.sync(() => readOccupant(target)),
+				readLocalActorIdsFx: Effect.fn("PixiMainSceneSurface.readLocalActorIdsFx")(
+					(bounds) =>
+						Effect.gen(function* () {
+							const locations: TileActorItem["location"][] = [];
+							appendIntersectingLocations(locations, layout.board, bounds);
+							appendIntersectingLocations(locations, layout.toolbar, bounds);
+							const occupants = yield* actorStore.readCanonicalOccupantsFx(locations);
+							return occupants
+								.filter(({ id }) => id !== bounds.excludeActorId)
+								.map(({ id }) => id);
+						}),
 				),
 				redrawFx: Effect.gen(function* () {
+					layoutRevision += 1;
 					layout = RendererRuntime.runSync(
 						readPixiMainSceneLayoutFx({
 							boardHeight: game.config.meta.board.height,

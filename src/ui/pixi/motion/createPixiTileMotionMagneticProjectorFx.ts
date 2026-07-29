@@ -4,6 +4,7 @@ import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
 import type { PixiActorPresentedPose } from "~/ui/pixi/animation/PixiActorAnimator";
 import type { PixiTileMagneticField } from "~/ui/pixi/magnet/PixiTileMagneticField";
+import type { PixiMainSceneSurface } from "~/ui/pixi/scene/PixiMainSceneSurface";
 
 export namespace createPixiTileMotionMagneticProjectorFx {
 	export interface Props {
@@ -11,6 +12,7 @@ export namespace createPixiTileMotionMagneticProjectorFx {
 		readonly attractedActorId: string | null;
 		readonly eligibleAttractionActorIds: ReadonlySet<string>;
 		readonly magneticField: PixiTileMagneticField;
+		readonly surface: PixiMainSceneSurface;
 		readonly readAttraction?: () => {
 			readonly attractedActorId: string | null;
 			readonly eligibleAttractionActorIds: ReadonlySet<string>;
@@ -38,10 +40,12 @@ export const createPixiTileMotionMagneticProjectorFx = Effect.fn(
 		eligibleAttractionActorIds,
 		magneticField,
 		readAttraction,
+		surface,
 	}: createPixiTileMotionMagneticProjectorFx.Props) =>
 		Effect.sync((): createPixiTileMotionMagneticProjectorFx.Result => {
 			const sourceActorId = actor.item.id;
 			let acquired = false;
+			let released = false;
 			let previousPose = {
 				scale: actor.container.scale.x,
 				x: actor.container.x - actor.container.pivot.x * actor.container.scale.x,
@@ -49,6 +53,7 @@ export const createPixiTileMotionMagneticProjectorFx = Effect.fn(
 			};
 			return {
 				projectPose: (pose) => {
+					if (released) return;
 					const scale = pose.scale ?? previousPose.scale;
 					const sourcePose = {
 						scale,
@@ -70,8 +75,19 @@ export const createPixiTileMotionMagneticProjectorFx = Effect.fn(
 					RendererRuntime.runSync(
 						magneticField.updateFx({
 							attractedActorId: attraction.attractedActorId,
+							candidateActorIds: RendererRuntime.runSync(
+								surface.readLocalActorIdsFx({
+									excludeActorId: sourceActorId,
+									height: actor.size * scale,
+									paddingRatio: 1.5,
+									width: actor.size * scale,
+									x: sourcePose.x,
+									y: sourcePose.y,
+								}),
+							),
 							eligibleAttractionActorIds: attraction.eligibleAttractionActorIds,
 							sourceActorId,
+							sourceInstanceId: actor.instanceId,
 							sourceDirection:
 								travelMagnitude <= 0.001
 									? null
@@ -79,7 +95,6 @@ export const createPixiTileMotionMagneticProjectorFx = Effect.fn(
 											x: travel.x / travelMagnitude,
 											y: travel.y / travelMagnitude,
 										},
-							sourceItem: actor.item,
 							sourceKind: "motion",
 							sourceSize: actor.size * scale,
 							sourceX: sourcePose.x,
@@ -89,11 +104,14 @@ export const createPixiTileMotionMagneticProjectorFx = Effect.fn(
 					previousPose = sourcePose;
 				},
 				release: () => {
+					if (released) return;
+					released = true;
 					if (!acquired) return;
 					acquired = false;
 					RendererRuntime.runSync(
 						magneticField.releaseFx({
 							sourceActorId,
+							sourceInstanceId: actor.instanceId,
 							sourceKind: "motion",
 						}),
 					);

@@ -265,6 +265,12 @@ const createRecordingAnimator = ({
 	cancelFx: (ownerKey) =>
 		Effect.sync(() => {
 			canceledOwnerKeys.push(ownerKey);
+			[
+				...animations,
+			]
+				.reverse()
+				.find((animation) => animation.ownerKey === ownerKey)
+				?.onCancel?.();
 		}),
 	closeFx: Effect.void,
 	isChannelActiveFx: () => Effect.succeed(false),
@@ -285,16 +291,39 @@ const createRecordingMagneticField = ({
 	readonly updates?: PixiTileMagneticFieldSample[];
 } = {}): PixiTileMagneticField => {
 	const activeSources = new Map<string, PixiTileMagneticFieldSample>();
-	const readSourceKey = (sourceKind: "drag" | "motion", sourceActorId: string) =>
-		`${sourceKind}:${sourceActorId}`;
+	const readSourceKey = (
+		sourceKind: "drag" | "motion",
+		sourceActorId: string,
+		sourceInstanceId: string,
+	) =>
+		JSON.stringify([
+			sourceKind,
+			sourceActorId,
+			sourceInstanceId,
+		]);
 	return {
 		closeFx: Effect.void,
+		flushFx: Effect.void,
 		pruneFx: Effect.void,
+		readActiveSourceActorIdsFx: Effect.sync(() =>
+			Array.from(activeSources.values(), ({ sourceActorId }) => sourceActorId),
+		),
 		releaseFx: (source) =>
 			Effect.sync(() => {
-				if (!activeSources.delete(readSourceKey(source.sourceKind, source.sourceActorId)))
+				if (
+					!activeSources.delete(
+						readSourceKey(
+							source.sourceKind,
+							source.sourceActorId,
+							source.sourceInstanceId,
+						),
+					)
+				)
 					return;
-				releases.push(source);
+				releases.push({
+					sourceActorId: source.sourceActorId,
+					sourceKind: source.sourceKind,
+				});
 			}),
 		releaseSourcesFx: (sourceKind) =>
 			Effect.sync(() => {
@@ -308,11 +337,15 @@ const createRecordingMagneticField = ({
 				}
 			}),
 		resetFx: Effect.void,
+		subscribeSourceMembershipFx: () => Effect.succeed(() => {}),
 		updateFx: (sample) =>
 			Effect.sync(() => {
 				updates.push(sample);
 				const sourceKind = sample.sourceKind ?? "drag";
-				activeSources.set(readSourceKey(sourceKind, sample.sourceActorId), sample);
+				activeSources.set(
+					readSourceKey(sourceKind, sample.sourceActorId, sample.sourceInstanceId),
+					sample,
+				);
 			}),
 	};
 };
@@ -526,6 +559,7 @@ const createSwapHarness = ({
 			}),
 			readPalette: () => ({}) as PixiScenePalette,
 			surface: {
+				readLocalActorIdsFx: () => Effect.succeed([]),
 				readActorPoseFx: (item: TileActorItem) => Effect.succeed(readPose(item.location)),
 				readLocationPoseFx: (location: TileActorItem["location"]) =>
 					Effect.succeed(readPose(location)),
@@ -639,6 +673,7 @@ const createSpawnHarness = () => {
 			}),
 			readPalette: () => ({}) as PixiScenePalette,
 			surface: {
+				readLocalActorIdsFx: () => Effect.succeed([]),
 				readActorPoseFx: (item: TileActorItem) => Effect.succeed(readPose(item.location)),
 				readLocationPoseFx: (location: TileActorItem["location"]) =>
 					Effect.succeed(readPose(location)),
@@ -751,6 +786,7 @@ const createStackHarness = () => {
 			}),
 			readPalette: () => ({}) as PixiScenePalette,
 			surface: {
+				readLocalActorIdsFx: () => Effect.succeed([]),
 				readActorPoseFx: (item: TileActorItem) => Effect.succeed(readPose(item.location)),
 				readLocationPoseFx: (location: TileActorItem["location"]) =>
 					Effect.succeed(readPose(location)),
@@ -918,6 +954,7 @@ describe("Pixi tile motion runtime", () => {
 				}),
 				settleWithinTileRatio: 0.5,
 				surface: {
+					readLocalActorIdsFx: () => Effect.succeed([]),
 					readLocationPoseFx: () =>
 						Effect.succeed({
 							layer: new Container(),
@@ -1173,6 +1210,7 @@ describe("Pixi tile motion runtime", () => {
 				}),
 				readPalette: () => ({}) as PixiScenePalette,
 				surface: {
+					readLocalActorIdsFx: () => Effect.succeed([]),
 					readActorPoseFx: (item: TileActorItem) =>
 						Effect.succeed(readPose(item.location)),
 					readLocationPoseFx: (location: TileActorItem["location"]) =>
@@ -1448,6 +1486,7 @@ describe("Pixi tile motion runtime", () => {
 			},
 		} as unknown as PixiApplicationOwner;
 		const surface = {
+			readLocalActorIdsFx: () => Effect.succeed([]),
 			readLocationPoseFx: (location: TileActorItem["location"]) =>
 				Effect.succeed(location === firstBoardLocation ? home : target),
 			transientActorLayer,
@@ -1672,6 +1711,7 @@ describe("Pixi tile motion runtime", () => {
 				readPalette: () => ({}) as PixiScenePalette,
 				readSourceSurvives: () => true,
 				surface: {
+					readLocalActorIdsFx: () => Effect.succeed([]),
 					readLocationPoseFx: (location: TileActorItem["location"]) =>
 						Effect.succeed(location.scope === "toolbar" ? openerPose : targetPose),
 					transientActorLayer,
@@ -1891,6 +1931,7 @@ describe("Pixi tile motion runtime", () => {
 				magneticField: createRecordingMagneticField(),
 				readPalette: () => ({}) as PixiScenePalette,
 				surface: {
+					readLocalActorIdsFx: () => Effect.succeed([]),
 					readActorPoseFx: (item: TileActorItem) =>
 						Effect.succeed(readPose(item.location)),
 					readLocationPoseFx: (location: TileActorItem["location"]) =>
@@ -2126,6 +2167,7 @@ describe("Pixi tile motion runtime", () => {
 				}),
 				readPalette: () => ({}) as PixiScenePalette,
 				surface: {
+					readLocalActorIdsFx: () => Effect.succeed([]),
 					readActorPoseFx: (item: TileActorItem) =>
 						Effect.succeed(
 							readLocationPose(
@@ -2384,6 +2426,7 @@ describe("Pixi tile motion runtime", () => {
 				}),
 				readPalette: () => ({}) as PixiScenePalette,
 				surface: {
+					readLocalActorIdsFx: () => Effect.succeed([]),
 					readActorPoseFx: (item: TileActorItem) =>
 						Effect.succeed(readPose(item.location)),
 					readLocationPoseFx: (location: TileActorItem["location"]) =>
@@ -2777,6 +2820,7 @@ describe("Pixi tile motion runtime", () => {
 				readPalette: () => ({}) as PixiScenePalette,
 				stillClaimedActorIds: new Set(),
 				surface: {
+					readLocalActorIdsFx: () => Effect.succeed([]),
 					readActorPoseFx: () => Effect.succeed(null),
 				} as unknown as PixiMainSceneSurface,
 				textures: {} as never,

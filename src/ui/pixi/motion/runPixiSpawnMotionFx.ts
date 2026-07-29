@@ -82,6 +82,7 @@ export const runPixiSpawnMotionFx = Effect.fn("runPixiSpawnMotionFx")(function* 
 		attractedActorId: null,
 		eligibleAttractionActorIds: new Set(),
 		magneticField,
+		surface,
 	});
 	yield* animator.animateFx({
 		actor,
@@ -89,6 +90,7 @@ export const runPixiSpawnMotionFx = Effect.fn("runPixiSpawnMotionFx")(function* 
 		delayMs,
 		durationMs,
 		ownerKey: `motion:${cueKey}`,
+		onCancel: magneticProjector.release,
 		onComplete: () => {
 			const settle = () => {
 				magneticProjector.release();

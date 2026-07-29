@@ -116,11 +116,25 @@ poses to motion, runs entry or exit effects, and finalizes presentation claims.
 - Engine-driven spawn, swap, stack, and direct drag share one magnetic field. Spawn and swap repel
   nearby board responders without attracting their own exchange counterpart; a stack payload
   attracts and chases its receiver's live physical pose through distance-aware nonlinear segments.
-  Settlement releases the magnetic source. Manual producer input remains committed by its drop
-  command; autofill instead creates canonical deliveries whose input is not available until
-  physical contact settles the matching generation. Queued work uses that delivery path for
-  Producer, Craft, Blueprint, and every other line owner. No job may start while any outbound
-  delivery still targets that owner and line.
+  Raw pointer events retain only the latest sample for the existing demand frame. Release flushes
+  exact coordinates synchronously; canonical publication, resize, and active motion-source
+  membership coalesce through that same bounded frame slot.
+- Main-scene target facts resolve pointer geometry, exact canonical occupant, and command target
+  from one surface-owned snapshot. The actor store rebuilds one derived active-scene slot index at
+  canonical publication boundaries; pointer reads never scan the complete canonical collection.
+- Magnetic broad phase converts the source's live AABB into bounded Board/Toolbar slot ranges, then
+  the field uses live actor AABBs for deterministic narrow phase. Active moving sources and the
+  exact target are explicit candidates; lazy bridge eligibility is scoped to the active drag and
+  exact source/target revisions. Previously affected actors reset once when they leave the field.
+  Settlement releases the exact physical source instance. The regular grid already supplies the
+  required locality, so no quadtree, second actor store, or additional animation clock exists.
+- Main-scene drag cursor is intentionally non-semantic: every Board or Toolbar target keeps
+  `grabbing`, and only leaving both surfaces shows `not-allowed`. Engine preview and physical drop
+  feedback remain authoritative and publish the actual outcome at drop.
+- Manual producer input remains committed by its drop command; autofill instead creates canonical
+  deliveries whose input is not available until physical contact settles the matching generation.
+  Queued work uses that delivery path for Producer, Craft, Blueprint, and every other line owner. No
+  job may start while any outbound delivery still targets that owner and line.
 - A delivery keeps its exact origin lease until its full quantity commits or returns. Player
   interaction may reduce or invalidate its soft target claim; reconciliation then returns the same
   actor, including any partial remainder, to the persisted origin.

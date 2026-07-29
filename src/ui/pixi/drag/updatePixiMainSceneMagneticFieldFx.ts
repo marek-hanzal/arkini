@@ -9,6 +9,7 @@ import { readPixiTileAttractionActorIdFx } from "~/ui/pixi/magnet/readPixiTileAt
 export namespace updatePixiMainSceneMagneticFieldFx {
 	export interface Props {
 		readonly actor: PixiTileActor;
+		readonly candidateActorIds: ReadonlyArray<string>;
 		readonly eligibleAttractionActorIds: ReadonlySet<string>;
 		readonly field: PixiTileMagneticField;
 		readonly previewKind: readTileDropPreviewFx.Result["kind"] | null;
@@ -25,6 +26,7 @@ export namespace updatePixiMainSceneMagneticFieldFx {
 export const updatePixiMainSceneMagneticFieldFx = Effect.fn("updatePixiMainSceneMagneticFieldFx")(
 	function* ({
 		actor,
+		candidateActorIds,
 		eligibleAttractionActorIds,
 		field,
 		previewKind,
@@ -38,10 +40,11 @@ export const updatePixiMainSceneMagneticFieldFx = Effect.fn("updatePixiMainScene
 		});
 		yield* field.updateFx({
 			attractedActorId,
+			candidateActorIds,
 			eligibleAttractionActorIds,
 			sourceActorId: sourceItem.id,
+			sourceInstanceId: actor.instanceId,
 			sourceDirection,
-			sourceItem,
 			sourceX: actor.container.x - actor.container.pivot.x * actor.container.scale.x,
 			sourceY: actor.container.y - actor.container.pivot.y * actor.container.scale.y,
 		});

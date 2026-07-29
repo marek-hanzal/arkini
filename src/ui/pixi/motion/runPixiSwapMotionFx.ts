@@ -119,6 +119,7 @@ export const runPixiSwapMotionFx = Effect.fn("runPixiSwapMotionFx")(function* ({
 				counterpartActorId,
 			]),
 			magneticField,
+			surface,
 		});
 		onSwapLegStarted(leg.actor.item.id);
 		yield* animator.animateFx({
@@ -131,6 +132,7 @@ export const runPixiSwapMotionFx = Effect.fn("runPixiSwapMotionFx")(function* ({
 			delayMs,
 			durationMs,
 			ownerKey: `motion:${cueKey}:${leg.actor.item.id}`,
+			onCancel: magneticProjector.release,
 			onComplete: () => {
 				const settle = () => {
 					if (!pendingActorIds.delete(leg.actor.item.id)) return;

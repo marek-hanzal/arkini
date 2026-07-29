@@ -19,7 +19,11 @@ export namespace createPixiTileMagneticFieldFx {
 	export interface Props {
 		readonly actorStore: PixiMainSceneActorStore;
 		readonly animationDriver: PixiAnimationDriver;
-		readonly scheduleApply?: (apply: () => void) => void;
+		/** Injectable structural counters for focused performance tests. */
+		readonly onApply?: () => void;
+		readonly onDisplacementEvaluation?: (actorId: string, sourceActorId: string) => void;
+		readonly onSpringTargetWrite?: (actorId: string) => void;
+		readonly scheduleApply: (apply: () => void) => () => void;
 	}
 }
 
@@ -43,8 +47,23 @@ interface ActiveMagneticSample extends PixiTileMagneticFieldSample {
 	readonly sourceKind: PixiTileMagneticSourceKind;
 }
 
-const readSourceKey = (sourceKind: PixiTileMagneticSourceKind, sourceActorId: string) =>
-	`${sourceKind}:${sourceActorId}`;
+const compareText = (left: string, right: string) => (left < right ? -1 : left > right ? 1 : 0);
+
+const compareSource = (left: ActiveMagneticSample, right: ActiveMagneticSample) =>
+	compareText(left.sourceKind, right.sourceKind) ||
+	compareText(left.sourceActorId, right.sourceActorId) ||
+	compareText(left.sourceInstanceId, right.sourceInstanceId);
+
+const readSourceKey = (
+	sourceKind: PixiTileMagneticSourceKind,
+	sourceActorId: string,
+	sourceInstanceId: string,
+) =>
+	JSON.stringify([
+		sourceKind,
+		sourceActorId,
+		sourceInstanceId,
+	]);
 
 /**
  * Uses one shared set of Motion springs for drag and engine-driven magnetic sources.
@@ -57,13 +76,22 @@ export const createPixiTileMagneticFieldFx = Effect.fn("createPixiTileMagneticFi
 	({
 		actorStore,
 		animationDriver,
-		scheduleApply = queueMicrotask,
+		onApply,
+		onDisplacementEvaluation,
+		onSpringTargetWrite,
+		scheduleApply,
 	}: createPixiTileMagneticFieldFx.Props) =>
 		Effect.sync((): PixiTileMagneticField => {
 			const springs = new Map<string, ActorSpring>();
 			const samples = new Map<string, ActiveMagneticSample>();
-			let applyScheduled = false;
+			const sourceMembershipListeners = new Set<
+				(sourceKind: PixiTileMagneticSourceKind) => void
+			>();
+			let affectedActorIds = new Set<string>();
+			let cancelScheduledApply: (() => void) | null = null;
 			let closed = false;
+			let dirty = false;
+			let scheduleGeneration = 0;
 
 			const closeSpring = (spring: ActorSpring) => {
 				const failures: unknown[] = [];
@@ -131,6 +159,7 @@ export const createPixiTileMagneticFieldFx = Effect.fn("createPixiTileMagneticFi
 				for (const [actorId, spring] of springs) {
 					if (actorStore.actors.get(actorId) === spring.actor) continue;
 					springs.delete(actorId);
+					affectedActorIds.delete(actorId);
 					closeSpring(spring);
 				}
 			};
@@ -178,6 +207,9 @@ export const createPixiTileMagneticFieldFx = Effect.fn("createPixiTileMagneticFi
 				displacementX: number,
 				displacementY: number,
 			) => {
+				if (spring.targetX !== displacementX || spring.targetY !== displacementY) {
+					onSpringTargetWrite?.(spring.actor.item.id);
+				}
 				if (spring.targetX !== displacementX) {
 					spring.targetX = displacementX;
 					RendererRuntime.runSync(spring.x.setTargetFx(displacementX));
@@ -189,30 +221,57 @@ export const createPixiTileMagneticFieldFx = Effect.fn("createPixiTileMagneticFi
 			};
 
 			function applySamples() {
-				removeStaleSprings();
-				const activeSamples = Array.from(samples.values(), (sample) => ({
-					sample,
-					sourceRect: readSourceRect(sample),
-				})).filter(
-					(
-						source,
-					): source is {
-						readonly sample: ActiveMagneticSample;
-						readonly sourceRect: NonNullable<ReturnType<typeof readSourceRect>>;
-					} => source.sourceRect !== null,
+				onApply?.();
+				const activeSamples = Array.from(samples.values())
+					.sort(compareSource)
+					.map((sample) => ({
+						sample,
+						sourceRect: readSourceRect(sample),
+					}))
+					.filter(
+						(
+							source,
+						): source is {
+							readonly sample: ActiveMagneticSample;
+							readonly sourceRect: NonNullable<ReturnType<typeof readSourceRect>>;
+						} => source.sourceRect !== null,
+					);
+				const activeSourceActorIds = new Set(
+					activeSamples.map(({ sample }) => sample.sourceActorId),
 				);
-				for (const actor of actorStore.actors.values()) {
-					if (actor.item.location.scope !== LocationScopeEnumSchema.enum.Board) {
-						const spring = springs.get(actor.item.id);
-						if (spring !== undefined) setSpringTarget(spring, 0, 0);
-						continue;
+				const actorRects = new Map<string, ReturnType<typeof readActorRect>>();
+				const displacements = new Map<
+					string,
+					{
+						x: number;
+						y: number;
 					}
-					let displacementX = 0;
-					let displacementY = 0;
-					const actorRect = readActorRect(actor);
-					for (const { sample, sourceRect } of activeSamples) {
+				>();
+				for (const { sample, sourceRect } of activeSamples) {
+					const candidateActorIds = new Set(sample.candidateActorIds);
+					for (const sourceActorId of activeSourceActorIds) {
+						candidateActorIds.add(sourceActorId);
+					}
+					if (sample.attractedActorId !== null) {
+						candidateActorIds.add(sample.attractedActorId);
+					}
+					for (const actorId of Array.from(candidateActorIds).sort()) {
+						if (actorId === sample.sourceActorId) continue;
+						const actor = actorStore.actors.get(actorId);
+						if (
+							actor === undefined ||
+							actor.item.location.scope !== LocationScopeEnumSchema.enum.Board
+						) {
+							continue;
+						}
+						let actorRect = actorRects.get(actorId);
+						if (actorRect === undefined) {
+							actorRect = readActorRect(actor);
+							actorRects.set(actorId, actorRect);
+						}
+						onDisplacementEvaluation?.(actorId, sample.sourceActorId);
 						const displacement = readPixiTileMagneticDisplacement({
-							actorId: actor.item.id,
+							actorId,
 							actorRect,
 							attractedActorId: sample.attractedActorId,
 							eligibleAttractionActorIds: sample.eligibleAttractionActorIds,
@@ -220,34 +279,74 @@ export const createPixiTileMagneticFieldFx = Effect.fn("createPixiTileMagneticFi
 							sourceDirection: sample.sourceDirection,
 							sourceRect,
 						});
-						displacementX += displacement.x;
-						displacementY += displacement.y;
+						if (displacement.x === 0 && displacement.y === 0) continue;
+						const current = displacements.get(actorId);
+						if (current === undefined) {
+							displacements.set(actorId, displacement);
+						} else {
+							current.x += displacement.x;
+							current.y += displacement.y;
+						}
 					}
-					const spring = springs.get(actor.item.id);
-					if (displacementX === 0 && displacementY === 0 && spring === undefined) {
-						continue;
-					}
-					const activeSpring = spring ?? readSpring(actor);
-					setSpringTarget(activeSpring, displacementX, displacementY);
 				}
+				for (const actorId of affectedActorIds) {
+					if (displacements.has(actorId)) continue;
+					const spring = springs.get(actorId);
+					if (spring !== undefined) setSpringTarget(spring, 0, 0);
+				}
+				const nextAffectedActorIds = new Set<string>();
+				for (const [actorId, displacement] of displacements) {
+					const actor = actorStore.actors.get(actorId);
+					if (actor === undefined) continue;
+					setSpringTarget(readSpring(actor), displacement.x, displacement.y);
+					nextAffectedActorIds.add(actorId);
+				}
+				affectedActorIds = nextAffectedActorIds;
 			}
 
 			function requestApply() {
-				if (closed || applyScheduled) return;
-				applyScheduled = true;
+				if (closed) return;
+				dirty = true;
+				if (cancelScheduledApply !== null) return;
+				const generation = ++scheduleGeneration;
+				let ranSynchronously = false;
 				try {
-					scheduleApply(() => {
-						applyScheduled = false;
-						if (!closed) applySamples();
+					const cancel = scheduleApply(() => {
+						ranSynchronously = true;
+						if (generation !== scheduleGeneration) return;
+						cancelScheduledApply = null;
+						if (!closed && dirty) {
+							dirty = false;
+							applySamples();
+						}
 					});
+					if (!ranSynchronously && generation === scheduleGeneration && !closed) {
+						cancelScheduledApply = cancel;
+					}
 				} catch (cause) {
-					applyScheduled = false;
+					cancelScheduledApply = null;
 					throw cause;
 				}
 			}
 
-			const release = (sourceKind: PixiTileMagneticSourceKind, sourceActorId: string) => {
-				if (samples.delete(readSourceKey(sourceKind, sourceActorId))) requestApply();
+			const flush = () => {
+				if (closed || !dirty) return;
+				scheduleGeneration += 1;
+				cancelScheduledApply?.();
+				cancelScheduledApply = null;
+				dirty = false;
+				applySamples();
+			};
+
+			const release = (
+				sourceKind: PixiTileMagneticSourceKind,
+				sourceActorId: string,
+				sourceInstanceId: string,
+			) => {
+				if (samples.delete(readSourceKey(sourceKind, sourceActorId, sourceInstanceId))) {
+					for (const listen of sourceMembershipListeners) listen(sourceKind);
+					requestApply();
+				}
 			};
 
 			const releaseSources = (sourceKind: PixiTileMagneticSourceKind) => {
@@ -257,7 +356,10 @@ export const createPixiTileMagneticFieldFx = Effect.fn("createPixiTileMagneticFi
 					samples.delete(key);
 					released = true;
 				}
-				if (released) requestApply();
+				if (released) {
+					for (const listen of sourceMembershipListeners) listen(sourceKind);
+					requestApply();
+				}
 			};
 
 			const update = (sample: PixiTileMagneticFieldSample) => {
@@ -265,17 +367,29 @@ export const createPixiTileMagneticFieldFx = Effect.fn("createPixiTileMagneticFi
 					...sample,
 					sourceKind: sample.sourceKind ?? "drag",
 				} satisfies ActiveMagneticSample;
-				samples.set(
-					readSourceKey(activeSample.sourceKind, activeSample.sourceActorId),
-					activeSample,
+				const sourceKey = readSourceKey(
+					activeSample.sourceKind,
+					activeSample.sourceActorId,
+					activeSample.sourceInstanceId,
 				);
+				const entered = !samples.has(sourceKey);
+				samples.set(sourceKey, activeSample);
+				if (entered) {
+					for (const listen of sourceMembershipListeners) listen(activeSample.sourceKind);
+				}
 				requestApply();
 			};
 
 			const close = () => {
 				if (closed) return;
 				closed = true;
+				scheduleGeneration += 1;
+				cancelScheduledApply?.();
+				cancelScheduledApply = null;
+				dirty = false;
 				samples.clear();
+				sourceMembershipListeners.clear();
+				affectedActorIds.clear();
 				const failures: unknown[] = [];
 				for (const spring of springs.values()) {
 					try {
@@ -291,12 +405,18 @@ export const createPixiTileMagneticFieldFx = Effect.fn("createPixiTileMagneticFi
 			};
 
 			return {
+				flushFx: Effect.sync(flush),
 				pruneFx: Effect.sync(() => removeStaleSprings()),
+				readActiveSourceActorIdsFx: Effect.sync(() =>
+					Array.from(samples.values())
+						.sort(compareSource)
+						.map(({ sourceActorId }) => sourceActorId),
+				),
 				releaseFx: Effect.fn("PixiTileMagneticField.releaseFx")(
-					({ sourceActorId, sourceKind }) =>
+					({ sourceActorId, sourceInstanceId, sourceKind }) =>
 						Effect.sync(() => {
 							if (closed) return;
-							release(sourceKind, sourceActorId);
+							release(sourceKind, sourceActorId, sourceInstanceId);
 						}),
 				),
 				releaseSourcesFx: Effect.fn("PixiTileMagneticField.releaseSourcesFx")(
@@ -307,6 +427,14 @@ export const createPixiTileMagneticFieldFx = Effect.fn("createPixiTileMagneticFi
 						}),
 				),
 				resetFx: Effect.sync(() => reset()),
+				subscribeSourceMembershipFx: (listen) =>
+					Effect.sync(() => {
+						if (closed) return () => {};
+						sourceMembershipListeners.add(listen);
+						return () => {
+							sourceMembershipListeners.delete(listen);
+						};
+					}),
 				updateFx: Effect.fnUntraced(function* (sample) {
 					if (closed) return;
 					update(sample);

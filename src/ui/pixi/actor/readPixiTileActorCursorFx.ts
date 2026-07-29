@@ -6,17 +6,28 @@ import type { readTileDropPreviewFx } from "~/bridge/tile/readTileDropPreviewFx"
 
 export namespace readPixiTileActorCursorFx {
 	export interface Props {
+		readonly dragPolicy?: "main-target-presence" | "preview-result";
+		readonly hasDropTarget?: boolean;
 		readonly phase: "dragging" | "idle" | "pending";
-		readonly previewKind: readTileDropPreviewFx.Result["kind"] | null;
+		/** Drop semantics are intentionally ignored while dragging. */
+		readonly previewKind?: readTileDropPreviewFx.Result["kind"] | null;
 		readonly running: boolean;
 	}
 }
 
 /** Resolves native Pixi cursor feedback without introducing keyboard navigation state. */
 export const readPixiTileActorCursorFx = Effect.fn("readPixiTileActorCursorFx")(
-	({ phase, previewKind, running }: readPixiTileActorCursorFx.Props) =>
+	({
+		dragPolicy = "preview-result",
+		hasDropTarget,
+		phase,
+		previewKind,
+		running,
+	}: readPixiTileActorCursorFx.Props) =>
 		Effect.sync(() =>
 			match({
+				dragPolicy,
+				hasDropTarget,
 				phase,
 				previewKind,
 				running,
@@ -37,6 +48,15 @@ export const readPixiTileActorCursorFx = Effect.fn("readPixiTileActorCursorFx")(
 				)
 				.with(
 					{
+						dragPolicy: "main-target-presence",
+						phase: "dragging",
+						hasDropTarget: false,
+					},
+					() => "not-allowed" as const,
+				)
+				.with(
+					{
+						dragPolicy: "preview-result",
 						phase: "dragging",
 						previewKind: DropItemResultKindEnumSchema.enum.Reject,
 					},
@@ -44,6 +64,7 @@ export const readPixiTileActorCursorFx = Effect.fn("readPixiTileActorCursorFx")(
 				)
 				.with(
 					{
+						dragPolicy: "preview-result",
 						phase: "dragging",
 						previewKind: DropItemResultKindEnumSchema.enum.Ignored,
 					},

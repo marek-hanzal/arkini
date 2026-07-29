@@ -89,6 +89,7 @@ describe("Pixi tile actor activity-particle layer", () => {
 					closeFx: Effect.void,
 					invalidateFx: Effect.void,
 					reportCriticalFailure: vi.fn(),
+					scheduleFx: () => Effect.succeed(() => {}),
 				},
 				item,
 				palette,
@@ -138,6 +139,7 @@ describe("Pixi tile actor activity-particle layer", () => {
 			closeFx: Effect.void,
 			invalidateFx: Effect.void,
 			reportCriticalFailure: vi.fn(),
+			scheduleFx: () => Effect.succeed(() => {}),
 		};
 		const actor = Effect.runSync(
 			createPixiTileActorFx({
@@ -243,6 +245,7 @@ describe("Pixi tile actor activity-particle layer", () => {
 			closeFx: Effect.void,
 			invalidateFx: Effect.void,
 			reportCriticalFailure: vi.fn(),
+			scheduleFx: () => Effect.succeed(() => {}),
 		};
 		const actor = Effect.runSync(
 			createPixiTileActorFx({

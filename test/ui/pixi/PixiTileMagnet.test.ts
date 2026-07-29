@@ -9,8 +9,11 @@ import type {
 	PixiAnimationSpring,
 } from "~/ui/pixi/animation/PixiAnimationDriver";
 import { createPixiTileMagneticFieldFx } from "~/ui/pixi/magnet/createPixiTileMagneticFieldFx";
+import type { PixiTileMagneticField } from "~/ui/pixi/magnet/PixiTileMagneticField";
 import { readPixiTileAttractionActorIdFx } from "~/ui/pixi/magnet/readPixiTileAttractionActorIdFx";
 import { readPixiTileMagneticDisplacementFx } from "~/ui/pixi/magnet/readPixiTileMagneticDisplacementFx";
+import { createPixiTileMotionMagneticProjectorFx } from "~/ui/pixi/motion/createPixiTileMotionMagneticProjectorFx";
+import type { PixiMainSceneSurface } from "~/ui/pixi/scene/PixiMainSceneSurface";
 
 const targetItem = {
 	id: "runtime:target",
@@ -181,15 +184,22 @@ describe("Pixi tile magnet", () => {
 							stopFx: Effect.void,
 						}),
 				},
-				scheduleApply: (apply) => scheduled.push(apply),
+				scheduleApply: (apply) => {
+					scheduled.push(apply);
+					return () => {
+						const index = scheduled.indexOf(apply);
+						if (index >= 0) scheduled.splice(index, 1);
+					};
+				},
 			}),
 		);
 		const sample = {
 			attractedActorId: null,
+			candidateActorIds: [],
 			eligibleAttractionActorIds: new Set<string>(),
 			sourceActorId: "runtime:source",
+			sourceInstanceId: "pixi:source",
 			sourceDirection: null,
-			sourceItem: targetItem,
 			sourceX: 0,
 			sourceY: 0,
 		};
@@ -202,27 +212,97 @@ describe("Pixi tile magnet", () => {
 			}),
 		);
 		expect(scheduled).toHaveLength(1);
-		scheduled[0]?.();
-		expect(scheduled).toHaveLength(1);
+		scheduled.shift()?.();
+		expect(scheduled).toHaveLength(0);
 
 		Effect.runSync(
 			field.releaseFx({
 				sourceActorId: "runtime:missing",
+				sourceInstanceId: "pixi:missing",
 				sourceKind: "motion",
 			}),
 		);
 		Effect.runSync(field.releaseSourcesFx("motion"));
-		expect(scheduled).toHaveLength(1);
+		expect(scheduled).toHaveLength(0);
 
 		Effect.runSync(
 			field.releaseFx({
 				sourceActorId: sample.sourceActorId,
+				sourceInstanceId: sample.sourceInstanceId,
 				sourceKind: "drag",
 			}),
 		);
-		expect(scheduled).toHaveLength(2);
+		expect(scheduled).toHaveLength(1);
 		Effect.runSync(field.closeFx);
-		expect(() => scheduled[1]?.()).not.toThrow();
+		expect(scheduled).toHaveLength(0);
+	});
+
+	it("keeps projector release terminal against late pose callbacks", () => {
+		const update = vi.fn();
+		const release = vi.fn();
+		const actor = {
+			container: {
+				pivot: {
+					x: 0,
+					y: 0,
+				},
+				scale: {
+					x: 1,
+					y: 1,
+				},
+				x: 0,
+				y: 0,
+			},
+			instanceId: "pixi:source",
+			item: {
+				...targetItem,
+				location: {
+					position: {
+						x: 0,
+						y: 0,
+					},
+					scope: "board",
+					space: 0,
+				},
+			},
+			size: 80,
+		} as unknown as PixiTileActor;
+		const projector = Effect.runSync(
+			createPixiTileMotionMagneticProjectorFx({
+				actor,
+				attractedActorId: null,
+				eligibleAttractionActorIds: new Set(),
+				magneticField: {
+					releaseFx: (source: Parameters<PixiTileMagneticField["releaseFx"]>[0]) =>
+						Effect.sync(() => release(source)),
+					updateFx: (sample: Parameters<PixiTileMagneticField["updateFx"]>[0]) =>
+						Effect.sync(() => update(sample)),
+				} as unknown as PixiTileMagneticField,
+				surface: {
+					readLocalActorIdsFx: () => Effect.succeed([]),
+				} as unknown as PixiMainSceneSurface,
+			}),
+		);
+
+		projector.projectPose({
+			scale: 1,
+			x: 20,
+			y: 0,
+		});
+		projector.release();
+		projector.projectPose({
+			scale: 1,
+			x: 40,
+			y: 0,
+		});
+
+		expect(update).toHaveBeenCalledOnce();
+		expect(release).toHaveBeenCalledOnce();
+		expect(release).toHaveBeenCalledWith({
+			sourceActorId: targetItem.id,
+			sourceInstanceId: actor.instanceId,
+			sourceKind: "motion",
+		});
 	});
 
 	it("reuses, prunes and closes persistent actor spring pairs", () => {
@@ -286,6 +366,7 @@ describe("Pixi tile magnet", () => {
 			}) as unknown as PixiTileActor;
 		const source = createActor("runtime:source", 0);
 		const target = createActor("runtime:target", 1);
+		const distant = createActor("runtime:distant", 40);
 		const actors = new Map([
 			[
 				source.item.id,
@@ -295,31 +376,59 @@ describe("Pixi tile magnet", () => {
 				target.item.id,
 				target,
 			],
+			[
+				distant.item.id,
+				distant,
+			],
 		]);
+		const displacementEvaluations: Array<
+			[
+				string,
+				string,
+			]
+		> = [];
 		const field = Effect.runSync(
 			createPixiTileMagneticFieldFx({
 				actorStore: {
 					actors,
 				} as unknown as PixiMainSceneActorStore,
 				animationDriver,
-				scheduleApply: (apply) => apply(),
+				onDisplacementEvaluation: (actorId, sourceActorId) =>
+					displacementEvaluations.push([
+						actorId,
+						sourceActorId,
+					]),
+				scheduleApply: (apply) => {
+					apply();
+					return () => {};
+				},
 			}),
 		);
 		const sample = {
 			attractedActorId: null,
+			candidateActorIds: [
+				target.item.id,
+			],
 			eligibleAttractionActorIds: new Set<string>(),
 			sourceActorId: source.item.id,
+			sourceInstanceId: "pixi:source",
 			sourceDirection: {
 				x: 1,
 				y: 0,
 			},
-			sourceItem: source.item,
 			sourceX: 0,
 			sourceY: 0,
 		};
 
 		Effect.runSync(field.updateFx(sample));
+		expect(displacementEvaluations).toEqual([
+			[
+				target.item.id,
+				source.item.id,
+			],
+		]);
 		Effect.runSync(field.updateFx(sample));
+		expect(displacementEvaluations).toHaveLength(2);
 		expect(springs).toHaveLength(2);
 		expect(springs[0]?.setTarget).toHaveBeenCalledOnce();
 		expect(springs[1]?.setTarget).not.toHaveBeenCalled();
@@ -411,20 +520,26 @@ describe("Pixi tile magnet", () => {
 					]),
 				} as unknown as PixiMainSceneActorStore,
 				animationDriver,
-				scheduleApply: (apply) => apply(),
+				scheduleApply: (apply) => {
+					apply();
+					return () => {};
+				},
 			}),
 		);
 
 		Effect.runSync(
 			field.updateFx({
 				attractedActorId: null,
+				candidateActorIds: [
+					neighbour.item.id,
+				],
 				eligibleAttractionActorIds: new Set(),
 				sourceActorId: receiver.item.id,
+				sourceInstanceId: "pixi:receiver",
 				sourceDirection: {
 					x: 1,
 					y: 0,
 				},
-				sourceItem: receiver.item,
 				sourceX: 80,
 				sourceY: 0,
 			}),
@@ -432,15 +547,19 @@ describe("Pixi tile magnet", () => {
 		Effect.runSync(
 			field.updateFx({
 				attractedActorId: receiver.item.id,
+				candidateActorIds: [
+					receiver.item.id,
+					neighbour.item.id,
+				],
 				eligibleAttractionActorIds: new Set([
 					receiver.item.id,
 				]),
 				sourceActorId: "motion:incoming",
+				sourceInstanceId: "pixi:incoming",
 				sourceDirection: {
 					x: 1,
 					y: 0,
 				},
-				sourceItem: receiver.item,
 				sourceKind: "motion",
 				sourceSize: 80,
 				sourceX: 0,
@@ -453,6 +572,7 @@ describe("Pixi tile magnet", () => {
 		Effect.runSync(
 			field.releaseFx({
 				sourceActorId: receiver.item.id,
+				sourceInstanceId: "pixi:receiver",
 				sourceKind: "motion",
 			}),
 		);

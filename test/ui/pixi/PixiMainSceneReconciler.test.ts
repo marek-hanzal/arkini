@@ -284,6 +284,26 @@ const createActorStore = (actor: PixiTileActor) => {
 			readActorFx: (actorId: string) => Effect.succeed(actors.get(actorId) ?? null),
 			readCanonicalItemFx: (actorId: string) =>
 				Effect.succeed(canonicalItems.get(actorId) ?? null),
+			readCanonicalOccupantFx: (location: TileActorItem["location"]) =>
+				Effect.succeed(
+					Array.from(canonicalItems.values()).find(
+						(item) => JSON.stringify(item.location) === JSON.stringify(location),
+					) ?? null,
+				),
+			readCanonicalOccupantsFx: (locations: ReadonlyArray<TileActorItem["location"]>) =>
+				Effect.succeed(
+					locations.flatMap((location) => {
+						const item = Array.from(canonicalItems.values()).find(
+							(candidate) =>
+								JSON.stringify(candidate.location) === JSON.stringify(location),
+						);
+						return item === undefined
+							? []
+							: [
+									item,
+								];
+					}),
+				),
 			replaceCanonicalItemsFx: (items: ReadonlyArray<TileActorItem>) =>
 				Effect.sync(() => {
 					canonicalItems.clear();
@@ -399,8 +419,10 @@ const createAnimator = () => {
 
 const createDrag = () => {
 	const detached: PixiTileActor[] = [];
+	const requestRefresh = vi.fn();
 	return {
 		detached,
+		requestRefresh,
 		drag: {
 			attachActorFx: () => Effect.void,
 			cancelInteractionFx: Effect.void,
@@ -409,6 +431,7 @@ const createDrag = () => {
 				Effect.sync(() => {
 					detached.push(actor);
 				}),
+			requestRefreshFx: Effect.sync(requestRefresh),
 			setInteractionBlockedFx: () => Effect.void,
 		} satisfies PixiMainSceneDragController,
 	};
@@ -500,10 +523,13 @@ const createReconcilerHarness = ({
 			game,
 			magneticField: {
 				closeFx: Effect.void,
+				flushFx: Effect.void,
 				pruneFx: Effect.void,
+				readActiveSourceActorIdsFx: Effect.succeed([]),
 				releaseFx: () => Effect.void,
 				releaseSourcesFx: () => Effect.void,
 				resetFx: Effect.void,
+				subscribeSourceMembershipFx: () => Effect.succeed(() => {}),
 				updateFx: () => Effect.void,
 			} satisfies PixiTileMagneticField,
 			motion,
@@ -582,6 +608,7 @@ describe("Pixi main-scene reconciliation", () => {
 		]);
 		expect(harness.actors.get(current.id)?.item.revision).toBe(current.revision);
 		expect(harness.actors.get(added.id)?.item).toEqual(added);
+		expect(harness.requestRefresh).toHaveBeenCalledOnce();
 	});
 
 	it("does not allocate another actor for an identical repeated snapshot", () => {

@@ -197,15 +197,6 @@ export const createPixiTileMotionRuntimeFx = Effect.fn("createPixiTileMotionRunt
 		);
 	};
 
-	const releaseMagneticSource = (actorId: string) => {
-		RendererRuntime.runSync(
-			magneticField.releaseFx({
-				sourceActorId: actorId,
-				sourceKind: "motion",
-			}),
-		);
-	};
-
 	const releaseDetachedCueLifecycleIfSettled = (cueKey: string) => {
 		const lifecycle = cueLifecycleByKey.get(cueKey);
 		if (lifecycle === undefined || lifecycle.activeSwapLegActorIds.size > 0) return;
@@ -443,7 +434,6 @@ export const createPixiTileMotionRuntimeFx = Effect.fn("createPixiTileMotionRunt
 						const lifecycle = cueLifecycleByKey.get(detached.cueKey);
 						lifecycle?.activeSwapLegActorIds.delete(actorId);
 						releaseDetachedCueLifecycleIfSettled(detached.cueKey);
-						releaseMagneticSource(actorId);
 					}
 					const cues = readCues();
 					const superseded = cues.filter(
@@ -528,7 +518,6 @@ export const createPixiTileMotionRuntimeFx = Effect.fn("createPixiTileMotionRunt
 									}),
 							)
 							.exhaustive();
-						if (started) releaseMagneticSource(actorId);
 						if (lifecycle !== undefined) lifecycle.payloadActor = null;
 					}
 					const filteredMotionLanes = {

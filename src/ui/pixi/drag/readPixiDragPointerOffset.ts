@@ -1,5 +1,3 @@
-import type { FederatedPointerEvent } from "pixi.js";
-
 interface PressedDrag {
 	readonly pointerId: number;
 	readonly pressX: number;
@@ -9,7 +7,13 @@ interface PressedDrag {
 
 /** Validates pointer ownership and reads displacement from the admitted press. */
 export const readPixiDragPointerOffset = <Drag extends PressedDrag>(
-	event: FederatedPointerEvent,
+	event: {
+		readonly global: {
+			readonly x: number;
+			readonly y: number;
+		};
+		readonly pointerId: number;
+	},
 	drag: Drag | null,
 ) => {
 	if (drag === null || drag.phase === "submitting" || event.pointerId !== drag.pointerId) {

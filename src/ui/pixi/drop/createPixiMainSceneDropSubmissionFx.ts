@@ -105,7 +105,7 @@ export const createPixiMainSceneDropSubmissionFx = Effect.fn("createPixiMainScen
 				),
 			),
 			submitFx: Effect.fn("PixiMainSceneDropSubmission.submitFx")(
-				({ actor, previewKind, shortcutReceiver, sourceItem, target, targetItem }) =>
+				({ actor, commandTarget, previewKind, shortcutReceiver, sourceItem, targetItem }) =>
 					Effect.sync(() => {
 						if (closed) return;
 						RendererRuntime.runSync(cursorGrab.finishFx(actor));
@@ -120,11 +120,10 @@ export const createPixiMainSceneDropSubmissionFx = Effect.fn("createPixiMainScen
 						);
 						const drop = RendererRuntime.runSync(
 							beginPixiMainSceneDropFx({
+								commandTarget,
 								dropPresentation,
 								previewKind,
 								sourceItem,
-								surface,
-								target,
 								targetItem,
 							}),
 						);

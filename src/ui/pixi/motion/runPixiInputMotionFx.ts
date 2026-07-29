@@ -157,6 +157,7 @@ const returnPixiInputRemainderFx = Effect.fn("returnPixiInputRemainderFx")(funct
 			source?.item.id ?? cue.originActorId,
 		]),
 		magneticField,
+		surface,
 	});
 	const readLiveOrigin = () => {
 		if (source !== null) return null;
@@ -334,6 +335,7 @@ export const runPixiInputMotionFx = Effect.fn("runPixiInputMotionFx")(function* 
 			cue.targetActorId,
 		]),
 		magneticField,
+		surface,
 	});
 	yield* chasePixiTileMotionTargetFx({
 		actor: transient,

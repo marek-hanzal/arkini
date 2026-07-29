@@ -589,6 +589,7 @@ export const createPixiMainSceneReconcilerFx = Effect.fn("createPixiMainSceneRec
 				yield* magneticField.pruneFx;
 				yield* motion.syncPresentationFx;
 				yield* motion.startFx;
+				yield* drag.requestRefreshFx;
 			},
 		);
 

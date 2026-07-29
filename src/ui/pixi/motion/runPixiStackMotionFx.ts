@@ -148,6 +148,7 @@ export const runPixiStackMotionFx = Effect.fn("runPixiStackMotionFx")(function* 
 			cue.targetActorId,
 		]),
 		magneticField,
+		surface,
 		readAttraction: () => {
 			const route = readCurrentRoute();
 			return {

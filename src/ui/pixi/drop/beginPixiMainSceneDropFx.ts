@@ -5,16 +5,13 @@ import { DropItemResultKindEnumSchema } from "~/bridge/tile/DropItemResultKindEn
 import type { runTileDropAtom } from "~/bridge/tile/runTileDropAtom";
 import type { readTileDropPreviewFx } from "~/bridge/tile/readTileDropPreviewFx";
 import type { PixiMainSceneDropPresentation } from "~/ui/pixi/drop/PixiMainSceneDropPresentation";
-import type { PixiMainSceneSurface } from "~/ui/pixi/scene/PixiMainSceneSurface";
-import type { PixiSceneDropTarget } from "~/ui/pixi/scene/PixiSceneDropTarget";
 
 export namespace beginPixiMainSceneDropFx {
 	export interface Props {
+		readonly commandTarget: runTileDropAtom.Command["target"];
 		readonly dropPresentation: PixiMainSceneDropPresentation;
 		readonly previewKind: readTileDropPreviewFx.Result["kind"] | null;
 		readonly sourceItem: TileActorItem;
-		readonly surface: PixiMainSceneSurface;
-		readonly target: PixiSceneDropTarget | null;
 		readonly targetItem: TileActorItem | null;
 	}
 
@@ -26,11 +23,10 @@ export namespace beginPixiMainSceneDropFx {
 
 /** Freezes release-time drop facts and registers their presentation generation. */
 export const beginPixiMainSceneDropFx = Effect.fn("beginPixiMainSceneDropFx")(function* ({
+	commandTarget,
 	dropPresentation,
 	previewKind,
 	sourceItem,
-	surface,
-	target,
 	targetItem,
 }: beginPixiMainSceneDropFx.Props) {
 	const swapCandidate =
@@ -52,7 +48,7 @@ export const beginPixiMainSceneDropFx = Effect.fn("beginPixiMainSceneDropFx")(fu
 		sourceItemId: sourceItem.id,
 		sourceLocation: sourceItem.location,
 		sourceRevision: sourceItem.revision,
-		target: yield* surface.readCommandTargetFx(target),
+		target: commandTarget,
 	} satisfies runTileDropAtom.Command;
 	const generation = yield* dropPresentation.beginFx({
 		sourceActorId: sourceItem.id,

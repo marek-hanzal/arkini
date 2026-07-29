@@ -22,8 +22,10 @@ export const createDemandFrameLoopFx = Effect.fn("createDemandFrameLoopFx")(
 		Effect.sync((): DemandFrameLoop => {
 			let closed = false;
 			let dirty = false;
+			let nextWorkId = 0;
 			let poisoned = false;
 			let queuedFrame: number | null = null;
+			const scheduledWork = new Map<number, () => void>();
 
 			const schedule = () => {
 				if (closed || poisoned || document.hidden || queuedFrame !== null) return;
@@ -31,9 +33,27 @@ export const createDemandFrameLoopFx = Effect.fn("createDemandFrameLoopFx")(
 			};
 
 			const runFrame = () => {
-				queuedFrame = null;
 				if (closed || poisoned) return;
 
+				const workIds = Array.from(scheduledWork.keys());
+				for (const workId of workIds) {
+					if (closed || poisoned) return;
+					const run = scheduledWork.get(workId);
+					if (run === undefined) continue;
+					scheduledWork.delete(workId);
+					try {
+						run();
+					} catch (cause) {
+						poisoned = true;
+						dirty = false;
+						scheduledWork.clear();
+						queuedFrame = null;
+						reportCriticalFailure(cause);
+						return;
+					}
+				}
+				if (closed || poisoned) return;
+				queuedFrame = null;
 				const renderRequested = dirty;
 				dirty = false;
 				if (renderRequested) {
@@ -46,7 +66,7 @@ export const createDemandFrameLoopFx = Effect.fn("createDemandFrameLoopFx")(
 						return;
 					}
 				}
-				if (dirty) schedule();
+				if (dirty || scheduledWork.size > 0) schedule();
 			};
 
 			const onVisibilityChange = () => {
@@ -69,10 +89,21 @@ export const createDemandFrameLoopFx = Effect.fn("createDemandFrameLoopFx")(
 					dirty = true;
 					schedule();
 				}),
+				scheduleFx: (work) =>
+					Effect.sync(() => {
+						if (closed || poisoned) return () => {};
+						const workId = ++nextWorkId;
+						scheduledWork.set(workId, work);
+						schedule();
+						return () => {
+							scheduledWork.delete(workId);
+						};
+					}),
 				closeFx: Effect.sync(() => {
 					if (closed) return;
 					closed = true;
 					dirty = false;
+					scheduledWork.clear();
 					document.removeEventListener("visibilitychange", onVisibilityChange);
 					if (queuedFrame !== null) {
 						cancelFrame(queuedFrame);

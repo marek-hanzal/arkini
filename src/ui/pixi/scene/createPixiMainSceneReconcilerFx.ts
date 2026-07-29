@@ -17,9 +17,9 @@ import {
 	updatePixiTileActorProgressFx,
 } from "~/ui/pixi/actor/updatePixiTileActorFx";
 import type { PixiActorAnimator } from "~/ui/pixi/animation/PixiActorAnimator";
+import { animatePixiActorToRetargetablePoseFx } from "~/ui/pixi/animation/animatePixiActorToRetargetablePoseFx";
 import { flashPixiTileActorConsumedSourceFx } from "~/ui/pixi/animation/flashPixiTileActorConsumedSourceFx";
 import { readPixiActorAlphaAnimationKey } from "~/ui/pixi/animation/readPixiActorAlphaAnimationKey";
-import { readPixiTileTravelDurationMsFx } from "~/ui/pixi/animation/readPixiTileTravelDurationMsFx";
 import {
 	burstPixiTileActorFeedbackParticlesFx,
 	pixiTileActorFeedbackParticlesDurationMs,
@@ -469,7 +469,9 @@ export const createPixiMainSceneReconcilerFx = Effect.fn("createPixiMainSceneRec
 						displayItem,
 						motionClaimed: motionSnapshot.interactionClaimByActorId.has(item.id),
 						pose,
-						poseChannelActive: yield* animator.isChannelActiveFx(actor, "pose"),
+						poseChannelActive:
+							presentCommittedEffects &&
+							(yield* animator.isChannelActiveFx(actor, "pose")),
 						preserveVisual: replacementActorIds.has(item.id),
 					});
 					if (updatePlan.item.kind === "visual") {
@@ -528,38 +530,38 @@ export const createPixiMainSceneReconcilerFx = Effect.fn("createPixiMainSceneRec
 					}
 					if (updatePlan.pose.kind === "travel") {
 						surface.transientActorLayer.addChild(actor.container);
-						yield* animator.animateFx({
+						const finishTravel = () => {
+							if (actor.container.destroyed) return;
+							const latest =
+								RendererRuntime.runSync(surface.readActorPoseFx(actor.item)) ??
+								pose;
+							latest.layer.addChild(actor.container);
+						};
+						yield* animatePixiActorToRetargetablePoseFx({
 							actor,
-							channel: "pose",
-							...(updatePlan.pose.directLanding
+							animator,
+							curve: updatePlan.pose.directLanding
 								? {
-										curve: {
-											bounce: 0.14,
-											kind: "spring" as const,
-										},
+										bounce: 0.14,
+										kind: "spring",
 									}
-								: {}),
-							durationMs: yield* (
-								updatePlan.pose.directLanding
-									? readPixiDragSettleDurationMsFx
-									: readPixiTileTravelDurationMsFx
-							)({
-								fromX: actor.container.x,
-								fromY: actor.container.y,
-								tileSize: pose.size,
-								toX: pose.x,
-								toY: pose.y,
-							}),
-							onComplete: () => {
-								if (actor.container.destroyed) return;
-								const latest =
-									RendererRuntime.runSync(surface.readActorPoseFx(actor.item)) ??
-									pose;
-								latest.layer.addChild(actor.container);
-							},
-							toScale: 1,
-							toX: pose.x,
-							toY: pose.y,
+								: undefined,
+							durationMs: updatePlan.pose.directLanding
+								? yield* readPixiDragSettleDurationMsFx({
+										fromX: actor.container.x,
+										fromY: actor.container.y,
+										tileSize: pose.size,
+										toX: pose.x,
+										toY: pose.y,
+									})
+								: undefined,
+							onComplete: finishTravel,
+							readSize: () =>
+								RendererRuntime.runSync(surface.readActorPoseFx(actor.item))
+									?.size ?? pose.size,
+							readTarget: () =>
+								RendererRuntime.runSync(surface.readActorPoseFx(actor.item)),
+							target: pose,
 						});
 					} else {
 						pose.layer.addChild(actor.container);

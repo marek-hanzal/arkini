@@ -789,6 +789,61 @@ describe("Pixi main-scene reconciliation", () => {
 		expect(actor.container.parent).toBe(harness.layer);
 	});
 
+	it("retargets an active layout settle from its live frame on repeated resize hydration", () => {
+		const item = createItem("runtime:resizing-water", boardLocation);
+		const actor = createActor(item);
+		const pose = {
+			size: 80,
+			x: 420,
+			y: 340,
+		};
+		const harness = createReconcilerHarness({
+			actor,
+			pose,
+		});
+		projectionState.main = [
+			item,
+		];
+
+		Effect.runSync(harness.reconciler.hydrateFx(transition(2)));
+
+		const travel = harness.animations.find(
+			(animation) => animation.actor === actor && animation.channel === "pose",
+		);
+		if (travel?.channel !== "pose" || travel.readPose === undefined) {
+			throw new Error("Expected a retargetable layout settle.");
+		}
+		const beforeResize = travel.readPose(0.4);
+		actor.container.position.set(beforeResize.x, beforeResize.y);
+		actor.container.scale.set(beforeResize.scale ?? 1);
+		pose.size = 120;
+		pose.x = 700;
+		pose.y = 500;
+
+		Effect.runSync(harness.reconciler.hydrateFx(transition(2)));
+
+		const resizeTravels = harness.animations.filter(
+			(animation) => animation.actor === actor && animation.channel === "pose",
+		);
+		expect(resizeTravels).toHaveLength(2);
+		const retargeted = resizeTravels.at(-1);
+		if (retargeted?.channel !== "pose" || retargeted.readPose === undefined) {
+			throw new Error("Expected resize hydration to retarget the active settle.");
+		}
+		const retargetedStart = retargeted.readPose(0);
+		expect(retargetedStart).toMatchObject({
+			x: beforeResize.x,
+			y: beforeResize.y,
+		});
+		expect((retargetedStart.scale ?? 1) * actor.size).toBe((beforeResize.scale ?? 1) * 80);
+		expect(retargeted.readPose(1)).toEqual({
+			scale: 1,
+			x: 700,
+			y: 500,
+		});
+		expect(actor.size).toBe(120);
+	});
+
 	it("springs a directly dropped actor into its committed slot", () => {
 		const previous = createItem("runtime:dropped-water", boardLocation);
 		const destination = {

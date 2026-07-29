@@ -10,6 +10,7 @@ import type { TileActorItem } from "~/bridge/tile/TileActorItem";
 import { runTileDropAtom } from "~/bridge/tile/runTileDropAtom";
 import { useGameMenuControl } from "~/ui/game-menu/useGameMenuControl";
 import { useItemDetailControl } from "~/ui/item-detail/useItemDetailControl";
+import { isInventoryShortcutKey } from "~/ui/navigation/isInventoryShortcutKey";
 import type { PixiMainSceneRuntime } from "~/ui/pixi/scene/PixiMainSceneRuntime";
 import { createPixiMainSceneRuntimeFx } from "~/ui/pixi/scene/createPixiMainSceneRuntimeFx";
 import { usePixiGameRuntime } from "~/ui/pixi/usePixiGameRuntime";
@@ -113,21 +114,7 @@ export const PixiBoardToolbarSurface = () => {
 
 	useEffect(() => {
 		const openInventoryFromKeyboard = (event: KeyboardEvent) => {
-			const target = event.target;
-			if (
-				event.defaultPrevented ||
-				event.repeat ||
-				event.key.toLowerCase() !== "i" ||
-				event.altKey ||
-				event.ctrlKey ||
-				event.metaKey ||
-				interactionBlocked ||
-				(target instanceof HTMLElement &&
-					(target.isContentEditable ||
-						target.tagName === "INPUT" ||
-						target.tagName === "SELECT" ||
-						target.tagName === "TEXTAREA"))
-			) {
+			if (event.defaultPrevented || interactionBlocked || !isInventoryShortcutKey(event)) {
 				return;
 			}
 			event.preventDefault();

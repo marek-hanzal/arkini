@@ -2,6 +2,7 @@ import { Effect } from "effect";
 
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
 import type { PixiActorAnimator } from "~/ui/pixi/animation/PixiActorAnimator";
+import type { PixiAnimationCurve } from "~/ui/pixi/animation/PixiAnimationDriver";
 import { createPixiRetargetablePoseSamplerFx } from "~/ui/pixi/animation/createPixiRetargetablePoseSamplerFx";
 import { readPixiTileTravelDurationMsFx } from "~/ui/pixi/animation/readPixiTileTravelDurationMsFx";
 
@@ -16,6 +17,8 @@ export const animatePixiActorToRetargetablePoseFx = Effect.fn(
 )(function* ({
 	actor,
 	animator,
+	curve,
+	durationMs: requestedDurationMs,
 	onCancel,
 	onComplete,
 	ownerKey,
@@ -25,6 +28,8 @@ export const animatePixiActorToRetargetablePoseFx = Effect.fn(
 }: {
 	readonly actor: PixiTileActor;
 	readonly animator: PixiActorAnimator;
+	readonly curve?: PixiAnimationCurve;
+	readonly durationMs?: number;
 	readonly onCancel?: () => void;
 	readonly onComplete?: () => void;
 	readonly ownerKey?: string;
@@ -32,13 +37,15 @@ export const animatePixiActorToRetargetablePoseFx = Effect.fn(
 	readonly readTarget: () => TargetPose | null;
 	readonly target: TargetPose;
 }) {
-	const durationMs = yield* readPixiTileTravelDurationMsFx({
-		fromX: actor.container.x,
-		fromY: actor.container.y,
-		tileSize: actor.size,
-		toX: target.x,
-		toY: target.y,
-	});
+	const durationMs =
+		requestedDurationMs ??
+		(yield* readPixiTileTravelDurationMsFx({
+			fromX: actor.container.x,
+			fromY: actor.container.y,
+			tileSize: actor.size,
+			toX: target.x,
+			toY: target.y,
+		}));
 	const readPose = yield* createPixiRetargetablePoseSamplerFx({
 		from: {
 			scale: actor.container.scale.x,
@@ -57,6 +64,7 @@ export const animatePixiActorToRetargetablePoseFx = Effect.fn(
 	yield* animator.animateFx({
 		actor,
 		channel: "pose",
+		curve,
 		durationMs,
 		onCancel,
 		onComplete,

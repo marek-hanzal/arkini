@@ -78,7 +78,7 @@ afterEach(async () => {
 });
 
 describe("InventoryPage", () => {
-	it("returns the close button and unclaimed Escape deterministically to the Board", async () => {
+	it("returns the close button and unclaimed navigation keys deterministically to the Board", async () => {
 		const host = await renderPage();
 		const close = host.querySelector<HTMLButtonElement>('[data-ui="InventoryRouteClose"]');
 		if (close === null) throw new Error("Inventory close control is missing.");
@@ -101,9 +101,18 @@ describe("InventoryPage", () => {
 		await act(async () => window.dispatchEvent(escape));
 		expect(escape.defaultPrevented).toBe(true);
 		expect(pageState.navigate).toHaveBeenCalledOnce();
+
+		pageState.navigate.mockClear();
+		const inventoryShortcut = new KeyboardEvent("keydown", {
+			cancelable: true,
+			key: "i",
+		});
+		await act(async () => window.dispatchEvent(inventoryShortcut));
+		expect(inventoryShortcut.defaultPrevented).toBe(true);
+		expect(pageState.navigate).toHaveBeenCalledOnce();
 	});
 
-	it("leaves Escape to higher-priority Game Menu and Item Detail owners", async () => {
+	it("leaves navigation keys to higher-priority Game Menu and Item Detail owners", async () => {
 		pageState.detailOpen = true;
 		await renderPage();
 		const detailEscape = new KeyboardEvent("keydown", {
@@ -111,6 +120,12 @@ describe("InventoryPage", () => {
 			key: "Escape",
 		});
 		window.dispatchEvent(detailEscape);
+		window.dispatchEvent(
+			new KeyboardEvent("keydown", {
+				cancelable: true,
+				key: "i",
+			}),
+		);
 		expect(detailEscape.defaultPrevented).toBe(false);
 		expect(pageState.navigate).not.toHaveBeenCalled();
 
@@ -125,7 +140,40 @@ describe("InventoryPage", () => {
 			key: "Escape",
 		});
 		window.dispatchEvent(menuEscape);
+		window.dispatchEvent(
+			new KeyboardEvent("keydown", {
+				cancelable: true,
+				key: "i",
+			}),
+		);
 		expect(menuEscape.defaultPrevented).toBe(false);
+		expect(pageState.navigate).not.toHaveBeenCalled();
+	});
+
+	it("does not hijack modified, repeated, or editable i key input", async () => {
+		const host = await renderPage();
+		const input = document.createElement("input");
+		host.append(input);
+
+		window.dispatchEvent(
+			new KeyboardEvent("keydown", {
+				ctrlKey: true,
+				key: "i",
+			}),
+		);
+		window.dispatchEvent(
+			new KeyboardEvent("keydown", {
+				key: "i",
+				repeat: true,
+			}),
+		);
+		input.dispatchEvent(
+			new KeyboardEvent("keydown", {
+				bubbles: true,
+				key: "i",
+			}),
+		);
+
 		expect(pageState.navigate).not.toHaveBeenCalled();
 	});
 });

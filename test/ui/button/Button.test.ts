@@ -18,6 +18,7 @@ import {
 	PrimaryButton,
 	PrimaryButtonLink,
 } from "~/ui/button/Button";
+import { LinkButton } from "~/ui/button/LinkButton";
 
 (
 	globalThis as {
@@ -47,6 +48,31 @@ const elementByText = <T extends Element>(
 };
 
 describe("Button primitives", () => {
+	it("renders the shared inline-link action without button chrome", async () => {
+		const container = document.createElement("div");
+		document.body.append(container);
+		const root = createRoot(container);
+		roots.push(root);
+		await act(async () => {
+			root.render(
+				createElement(
+					LinkButton,
+					{
+						cursorIntent: "progress",
+					},
+					"Delete",
+				),
+			);
+		});
+
+		const linkButton = elementByText<HTMLButtonElement>(container, "button", "Delete");
+		expect(linkButton.type).toBe("button");
+		expect(linkButton.className).toContain("border-0");
+		expect(linkButton.className).toContain("bg-transparent");
+		expect(linkButton.className).toContain("underline");
+		expect(linkButton.className).toContain("cursor-progress");
+	});
+
 	it("shares each visual role across native buttons and typed router links", async () => {
 		const rootRoute = createRootRoute();
 		const indexRoute = createRoute({

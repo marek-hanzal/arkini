@@ -197,6 +197,7 @@ export const ItemLineRow = ({
 			: undefined;
 	const showUnavailableReason = !stale && unavailable && line.activeJob === undefined;
 	const queued = !stale && line.activeJob === undefined && line.queuedRequestCount > 0;
+	const contentReadOnly = disabled || line.activeJob !== undefined;
 	const progress =
 		line.activeJob === undefined
 			? null
@@ -311,6 +312,7 @@ export const ItemLineRow = ({
 								{pending.withdraw ? "Withdrawing…" : "Withdraw"}
 							</Button>
 							<PrimaryButton
+								aria-busy={pending.enqueue}
 								cursorIntent={pending.enqueue ? "progress" : undefined}
 								data-ui="TileLineEnqueueButton"
 								disabled={disabled || !line.actions.enqueue.enabled}
@@ -321,7 +323,7 @@ export const ItemLineRow = ({
 									})
 								}
 							>
-								{pending.enqueue ? "Queueing…" : "Enqueue"}
+								Enqueue
 							</PrimaryButton>
 						</div>
 						<ItemLineRuntime line={line} />
@@ -336,7 +338,7 @@ export const ItemLineRow = ({
 					{error}
 				</p>
 			)}
-			{!stale && line.availability.kind === "unavailable" ? (
+			{!stale && unavailable && line.activeJob === undefined ? (
 				<div className="relative z-[1]">
 					<ItemLineUnavailableWithdrawals
 						disabled={disabled}
@@ -348,11 +350,12 @@ export const ItemLineRow = ({
 			) : (
 				<div className="relative z-[1] mt-4 grid min-w-0 grid-cols-[minmax(0,1fr)_2rem_minmax(0,1fr)] gap-x-4">
 					<ItemLineInputs
-						disabled={disabled}
+						disabled={contentReadOnly}
 						input={line.input}
 						lineId={line.lineId}
 						ownerItemId={ownerItemId}
 						stale={stale}
+						suppressSurface={line.activeJob !== undefined}
 					/>
 					<div
 						className="grid place-items-center text-muted"
@@ -362,7 +365,7 @@ export const ItemLineRow = ({
 						<span className="icon-[lucide--chevron-right] size-5" />
 					</div>
 					<ItemLineOutputs
-						disabled={disabled}
+						disabled={contentReadOnly}
 						output={line.output}
 					/>
 				</div>

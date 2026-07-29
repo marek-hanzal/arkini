@@ -11,12 +11,12 @@ import { useItemDetailQueue } from "~/bridge/item-detail/useItemDetailQueue";
 import { useItemDetailSources } from "~/bridge/item-detail/useItemDetailSources";
 import { useItemDetailTabs } from "~/bridge/item-detail/useItemDetailTabs";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
+import { BadgeCount } from "~/ui/badge/BadgeCount";
 import { ItemDefinitionInfoTab } from "~/ui/item-detail/ItemDefinitionInfoTab";
 import type { ItemDetailState, ItemDetailTarget } from "~/ui/item-detail/ItemDetailControl";
 import { ItemInfoTab } from "~/ui/item-detail/ItemInfoTab";
 import { ItemLinesTab } from "~/ui/item-detail/ItemLinesTab";
 import { ItemQueueTab } from "~/ui/item-detail/ItemQueueTab";
-import { ItemDetailQueueBadgeClassName } from "~/ui/item-detail/ItemDetailQueueBadgeClassName";
 import { ItemSourcesTab } from "~/ui/item-detail/ItemSourcesTab";
 import { useCloseItemDetail } from "~/ui/item-detail/useCloseItemDetail";
 import { useItemDetailControl } from "~/ui/item-detail/useItemDetailControl";
@@ -171,20 +171,16 @@ const ItemDetailTabs = ({
 				>
 					{tabLabel[tab]}
 					{tab === "lines" && lineCount !== undefined ? (
-						<span
-							className="min-w-5 rounded-full bg-surface-raised/75 px-1.5 py-0.5 text-center text-[0.6875rem] font-semibold tabular-nums text-subtle"
-							data-ui="ItemDetailTabCount"
-						>
-							{lineCount}
-						</span>
+						<BadgeCount
+							count={lineCount}
+							dataUi="ItemDetailTabCount"
+						/>
 					) : null}
 					{tab === "queue" && queueCount !== undefined && queueCount > 0 ? (
-						<span
-							className={ItemDetailQueueBadgeClassName}
-							data-ui="ItemDetailQueueTabCount"
-						>
-							{queueCount}
-						</span>
+						<BadgeCount
+							count={queueCount}
+							dataUi="ItemDetailQueueTabCount"
+						/>
 					) : null}
 				</button>
 			))}

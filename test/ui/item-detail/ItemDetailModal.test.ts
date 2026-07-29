@@ -331,7 +331,9 @@ describe("ItemDetailModal", () => {
 		const queueTabBadge = document.querySelector<HTMLElement>(
 			'[data-ui="ItemDetailQueueTabCount"]',
 		);
+		const linesTabBadge = document.querySelector<HTMLElement>('[data-ui="ItemDetailTabCount"]');
 		expect(queueTabBadge?.textContent).toBe("2");
+		expect(linesTabBadge?.className).toBe(queueTabBadge?.className);
 		const line = document.querySelector<HTMLElement>('[data-ui="TileLine"]');
 		expect(line?.dataset.active).toBe("false");
 		expect(line?.dataset.queued).toBe("true");
@@ -930,6 +932,7 @@ describe("ItemDetailModal", () => {
 			"Remaining of 1 s",
 		);
 		expect(document.querySelector('[data-ui="ItemQueueRow"][data-state="queued"]')).toBeNull();
+		const activeSlot = document.querySelector('[data-ui="ItemQueueActiveSlot"]');
 
 		await act(async () => {
 			publishRuntime(
@@ -964,6 +967,30 @@ describe("ItemDetailModal", () => {
 		expect(queuedRow?.className).toContain("rounded-xl");
 		expect(queuedRow?.textContent).toContain("Water");
 		expect(queuedRow?.textContent).toContain("Queued #1");
+		const deleteButton = queuedRow?.querySelector<HTMLButtonElement>(
+			'[data-ui="ItemQueueDeleteButton"]',
+		);
+		expect(deleteButton?.textContent).toBe("Delete");
+		expect(deleteButton?.className).toContain("underline");
+		expect(deleteButton?.dataset.requestId).toBe("request:workshop");
+		expect(document.querySelector('[data-ui="ItemQueueClearButton"]')).not.toBeNull();
+
+		await act(async () => {
+			publishRuntime(
+				RuntimeSchema.parse({
+					...currentRuntime,
+					jobQueue: [],
+					jobs: [],
+				}),
+			);
+			await Promise.resolve();
+		});
+		expect(document.querySelector('[data-ui="ItemQueueActiveSlot"]')).toBe(activeSlot);
+		expect(document.querySelector('[data-ui="ItemQueueIdleSlot"]')?.textContent).toContain(
+			"Nothing happening, bro.",
+		);
+		expect(document.querySelector('[data-ui="ItemQueueRow"]')).toBeNull();
+		expect(document.querySelector('[data-ui="ItemQueueClearButton"]')).toBeNull();
 	});
 
 	it("shows exact owned sources and hands off through the stable modal shell", async () => {

@@ -85,7 +85,9 @@ interface PanInfoLike {
 
 interface MotionOnlyProps {
 	readonly animate?: unknown;
+	readonly exit?: unknown;
 	readonly initial?: unknown;
+	readonly layout?: unknown;
 	readonly transition?: unknown;
 	readonly drag?: unknown;
 	readonly dragControls?: unknown;
@@ -157,7 +159,9 @@ const createMotionComponent = <TElement extends ElementType>(element: TElement) 
 	forwardRef<HTMLElement, MockMotionProps<TElement>>(function MockMotionComponent(
 		{
 			animate: animateTarget,
+			exit: _exit,
 			initial: _initial,
+			layout: _layout,
 			transition: _transition,
 			drag: _drag,
 			dragControls,
@@ -278,7 +282,16 @@ const createMotionComponent = <TElement extends ElementType>(element: TElement) 
 	});
 
 export const motion = {
+	article: createMotionComponent("article"),
 	button: createMotionComponent("button"),
 	div: createMotionComponent("div"),
 	span: createMotionComponent("span"),
 };
+
+export const AnimatePresence = ({
+	children,
+}: {
+	readonly children?: ReactNode;
+	readonly initial?: boolean;
+	readonly mode?: string;
+}) => children;

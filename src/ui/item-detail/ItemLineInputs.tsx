@@ -3,7 +3,7 @@ import { match } from "ts-pattern";
 import type { ItemDetailLines } from "~/bridge/item-detail/ItemDetailLines";
 import { useWithdrawItemDetailLine } from "~/bridge/item-detail/useWithdrawItemDetailLine";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
-import { Button } from "~/ui/button/Button";
+import { LinkButton } from "~/ui/button/LinkButton";
 import { ItemReferenceButton } from "~/ui/item-detail/ItemReferenceButton";
 import { useItemDetailControl } from "~/ui/item-detail/useItemDetailControl";
 
@@ -40,8 +40,8 @@ const MaterialInputWithdraw = ({
 
 	return (
 		<div className="flex flex-col items-end">
-			<Button
-				className="min-h-7 px-2.5 py-1 text-xs"
+			<LinkButton
+				className="text-xs"
 				cursorIntent={pending ? "progress" : undefined}
 				data-ui="TileLineInputWithdrawButton"
 				disabled={disabled || !input.canWithdraw}
@@ -54,7 +54,7 @@ const MaterialInputWithdraw = ({
 				}
 			>
 				{pending ? "Withdrawing…" : "Withdraw"}
-			</Button>
+			</LinkButton>
 			{error === null ? null : <p className="mt-1 text-xs text-danger">{error}</p>}
 		</div>
 	);
@@ -80,7 +80,8 @@ export const ItemLineUnavailableWithdrawals = ({
 			{
 				readonly kind: "materials";
 			}
-		> => candidate.kind === "materials" && candidate.canWithdraw,
+		> =>
+			candidate.kind === "materials" && candidate.storedQuantity > 0 && candidate.canWithdraw,
 	);
 	if (buffered.length === 0) return null;
 	return (
@@ -151,9 +152,7 @@ const MaterialInputAutofillAvailability = ({
 				"None available"
 			) : (
 				<>
-					<button
-						type="button"
-						className="cursor-pointer font-medium text-accent underline decoration-accent/55 underline-offset-2 transition-colors hover:text-accent-hover disabled:cursor-default disabled:text-muted disabled:no-underline"
+					<LinkButton
 						disabled={disabled}
 						data-ui="TileLineInputProducerLink"
 						onClick={(event) =>
@@ -168,7 +167,7 @@ const MaterialInputAutofillAvailability = ({
 						}
 					>
 						None
-					</button>{" "}
+					</LinkButton>{" "}
 					available
 				</>
 			)}
@@ -176,20 +175,61 @@ const MaterialInputAutofillAvailability = ({
 	);
 };
 
+const inputSurfaceClassName = {
+	available: "bg-[var(--ak-list-row-active-surface)]",
+	delivery: "bg-[var(--ak-line-input-delivery-surface)]",
+	empty: "",
+	stored: "bg-[var(--ak-list-row-active-progress-surface)]",
+} as const;
+
+const readItemLineInputState = (input: ItemDetailLines.Input): keyof typeof inputSurfaceClassName =>
+	match(input)
+		.with(
+			{
+				kind: "materials",
+			},
+			(materials): keyof typeof inputSurfaceClassName =>
+				materials.storedQuantity >= materials.required.min
+					? "stored"
+					: materials.deliveryQuantity > 0
+						? "delivery"
+						: materials.storedQuantity > 0 || materials.autofillAvailableQuantity > 0
+							? "available"
+							: "empty",
+		)
+		.with(
+			{
+				kind: "deposit",
+			},
+			(deposit): keyof typeof inputSurfaceClassName =>
+				deposit.availableCharges > 0 ? "available" : "empty",
+		)
+		.with(
+			{
+				kind: "simple",
+			},
+			(): keyof typeof inputSurfaceClassName => "empty",
+		)
+		.exhaustive();
+
 const ItemLineInputRow = ({
 	disabled,
 	input,
 	lineId,
 	ownerItemId,
 	stale,
+	suppressSurface,
 }: {
 	readonly disabled: boolean;
 	readonly input: ItemDetailLines.Input;
 	readonly lineId: string;
 	readonly ownerItemId: string;
 	readonly stale: boolean;
-}) =>
-	match(input)
+	readonly suppressSurface: boolean;
+}) => {
+	const state = suppressSurface ? "empty" : readItemLineInputState(input);
+	const rowClassName = `ak-line-input grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-start gap-x-4 gap-y-1 rounded-xl px-3 py-2 text-sm ${inputSurfaceClassName[state]}`;
+	return match(input)
 		.with(
 			{
 				kind: "materials",
@@ -205,9 +245,10 @@ const ItemLineInputRow = ({
 						: materials.selector.label;
 				return (
 					<div
-						className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-start gap-x-4 gap-y-1 py-2 text-sm"
+						className={rowClassName}
 						data-ui="TileLineInput"
 						data-input-kind="materials"
+						data-input-state={state}
 					>
 						<div className="min-w-0">
 							<ItemLineInputTitle
@@ -224,15 +265,17 @@ const ItemLineInputRow = ({
 						</div>
 						{stale ? null : (
 							<div className="flex flex-col items-end text-right">
-								<div className="flex items-start justify-end gap-2">
-									<MaterialInputWithdraw
-										disabled={disabled}
-										input={materials}
-										lineId={lineId}
-										ownerItemId={ownerItemId}
-									/>
+								<div className="flex items-baseline justify-end gap-2">
+									{materials.storedQuantity === 0 ? null : (
+										<MaterialInputWithdraw
+											disabled={disabled}
+											input={materials}
+											lineId={lineId}
+											ownerItemId={ownerItemId}
+										/>
+									)}
 									<p
-										className={`pt-1 font-medium text-foreground ${materials.deliveryQuantity > 0 ? "opacity-70" : ""}`}
+										className={`font-medium text-foreground ${materials.deliveryQuantity > 0 ? "opacity-70" : ""}`}
 										data-ui={
 											materials.deliveryQuantity > 0
 												? "TileLineInputDeliveryQuantity"
@@ -275,9 +318,10 @@ const ItemLineInputRow = ({
 						: deposit.selector.label;
 				return (
 					<div
-						className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-start gap-x-4 gap-y-1 py-2 text-sm"
+						className={rowClassName}
 						data-ui="TileLineInput"
 						data-input-kind="deposit"
+						data-input-state={state}
 					>
 						<div className="min-w-0">
 							<ItemLineInputTitle
@@ -297,13 +341,8 @@ const ItemLineInputRow = ({
 								<p className="font-medium text-foreground">
 									{deposit.availableChargesLabel === "None"
 										? "None available"
-										: `${deposit.requiredCharges} / ${deposit.availableChargesLabel} available`}
+										: `${deposit.availableChargesLabel} available`}
 								</p>
-								{deposit.targetTitles.length === 0 ? null : (
-									<p className="mt-0.5 max-w-56 truncate text-xs text-muted">
-										{deposit.targetTitles.join(", ")}
-									</p>
-								)}
 							</div>
 						)}
 					</div>
@@ -316,9 +355,10 @@ const ItemLineInputRow = ({
 			},
 			(simple) => (
 				<div
-					className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-start gap-x-4 gap-y-1 py-2 text-sm"
+					className={rowClassName}
 					data-ui="TileLineInput"
 					data-input-kind="simple"
+					data-input-state={state}
 				>
 					<p className="font-medium text-foreground">Owner charge</p>
 					<p className="text-right text-sm text-muted">
@@ -329,6 +369,7 @@ const ItemLineInputRow = ({
 			),
 		)
 		.exhaustive();
+};
 
 /** Renders the full authored input side of one visible product line. */
 export const ItemLineInputs = ({
@@ -337,12 +378,14 @@ export const ItemLineInputs = ({
 	lineId,
 	ownerItemId,
 	stale = false,
+	suppressSurface = false,
 }: {
 	readonly disabled: boolean;
 	readonly input: readonly ItemDetailLines.Input[];
 	readonly lineId: string;
 	readonly ownerItemId: string;
 	readonly stale?: boolean;
+	readonly suppressSurface?: boolean;
 }) => (
 	<section className="min-w-0">
 		<h4 className="border-b border-line pb-2 text-xs font-semibold uppercase tracking-[0.08em] text-muted">
@@ -351,7 +394,7 @@ export const ItemLineInputs = ({
 		{input.length === 0 ? (
 			<p className="py-3 text-sm text-muted">No material input required.</p>
 		) : (
-			<div className="divide-y divide-line/60">
+			<div className="space-y-1">
 				{input.map((entry, index) => (
 					<ItemLineInputRow
 						key={`${entry.kind}:${index}`}
@@ -360,6 +403,7 @@ export const ItemLineInputs = ({
 						lineId={lineId}
 						ownerItemId={ownerItemId}
 						stale={stale}
+						suppressSurface={suppressSurface}
 					/>
 				))}
 			</div>

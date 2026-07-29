@@ -4,6 +4,7 @@ export type ItemDetailPendingAction =
 	| "autofill"
 	| "clear-queue"
 	| "default"
+	| "delete-queue-request"
 	| "enqueue"
 	| "withdraw";
 

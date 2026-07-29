@@ -354,6 +354,108 @@ describe("ItemLinesTab", () => {
 		expect(delivery?.textContent).toBe("1 / 2 on the way");
 		expect(delivery?.className).toContain("opacity-70");
 		expect(document.querySelector('[data-ui="TileLineInputStoredQuantity"]')).toBeNull();
+		expect(document.querySelector('[data-ui="TileLineInputWithdrawButton"]')).toBeNull();
+	});
+
+	it("transitions semantic input surfaces and hides them under active progress", async () => {
+		await renderLines({
+			...projection,
+			line: [
+				{
+					...projection.line[0],
+					lineId: "line:available",
+					input: [
+						{
+							...input,
+							autofillAvailableQuantity: 4,
+						},
+					],
+				},
+				{
+					...projection.line[0],
+					lineId: "line:delivery",
+					input: [
+						{
+							...input,
+							autofillAvailableQuantity: 4,
+							deliveryQuantity: 1,
+						},
+					],
+				},
+				{
+					...projection.line[0],
+					lineId: "line:partial",
+					input: [
+						{
+							...input,
+							required: {
+								min: 2,
+								max: 2,
+							},
+							storedQuantity: 1,
+						},
+					],
+				},
+				{
+					...projection.line[0],
+					lineId: "line:stored",
+					input: [
+						{
+							...input,
+							storedQuantity: 1,
+						},
+					],
+				},
+				{
+					...projection.line[0],
+					lineId: "line:active",
+					activeJob: {
+						status: JobStatusEnumSchema.enum.Running,
+						durationMs: 1_000,
+						remainingMs: 500,
+					},
+					input: [
+						{
+							...input,
+							storedQuantity: 1,
+						},
+					],
+				},
+				{
+					...projection.line[0],
+					lineId: "line:deposit",
+					input: [
+						depositInput,
+					],
+				},
+			],
+		});
+
+		const renderedInput = (lineId: string) =>
+			document.querySelector<HTMLElement>(
+				`[data-line-id="${lineId}"] [data-ui="TileLineInput"]`,
+			);
+		const available = renderedInput("line:available");
+		const delivery = renderedInput("line:delivery");
+		const partial = renderedInput("line:partial");
+		const stored = renderedInput("line:stored");
+		const active = renderedInput("line:active");
+		const deposit = renderedInput("line:deposit");
+
+		expect(available?.dataset.inputState).toBe("available");
+		expect(available?.className).toContain("bg-[var(--ak-list-row-active-surface)]");
+		expect(available?.className).toContain("rounded-xl");
+		expect(delivery?.dataset.inputState).toBe("delivery");
+		expect(delivery?.className).toContain("bg-[var(--ak-line-input-delivery-surface)]");
+		expect(partial?.dataset.inputState).toBe("available");
+		expect(partial?.className).toContain("bg-[var(--ak-list-row-active-surface)]");
+		expect(stored?.dataset.inputState).toBe("stored");
+		expect(stored?.className).toContain("bg-[var(--ak-list-row-active-progress-surface)]");
+		expect(active?.dataset.inputState).toBe("empty");
+		expect(active?.className).toContain("ak-line-input");
+		expect(active?.className).not.toContain("bg-[var(--ak-list-row-active-progress-surface)]");
+		expect(deposit?.dataset.inputState).toBe("available");
+		expect(deposit?.className).toContain("bg-[var(--ak-list-row-active-surface)]");
 	});
 
 	it("shows autofill material truth and opens the first producer with a material filter", async () => {
@@ -584,6 +686,18 @@ describe("ItemLinesTab", () => {
 		expect(container.textContent).toContain("Running Disabled");
 		expect(container.textContent).not.toContain("This line is currently disabled.");
 		expect(container.querySelector('[data-ui="TileLineUnavailableReason"]')).toBeNull();
+		expect(container.querySelector('[data-ui="TileLineReadinessBadge"]')).toBeNull();
+		expect(container.querySelector('[data-ui="TileLineInput"]')).not.toBeNull();
+		expect(container.querySelector('[data-ui="TileLineOutputItem"]')).not.toBeNull();
+		expect(container.querySelector('[data-ui="TileLineFlowChevron"]')).not.toBeNull();
+		expect(
+			container.querySelector<HTMLButtonElement>('[data-ui="TileLineInputDetailLink"]')
+				?.disabled,
+		).toBe(true);
+		expect(
+			container.querySelector<HTMLButtonElement>('[data-ui="TileLineOutputDetailLink"]')
+				?.disabled,
+		).toBe(true);
 	});
 
 	it("searches unavailable source lines initially and preserves the query across subsets", async () => {
@@ -803,14 +917,14 @@ describe("ItemLinesTab", () => {
 		});
 
 		expect(document.querySelector('[data-input-kind="deposit"]')?.textContent).toContain(
-			"1 / 41 available",
+			"41 available",
 		);
 		expect(document.querySelector('[data-input-kind="deposit"]')?.textContent).not.toContain(
-			"1 / 33 available",
+			"33 available",
 		);
 	});
 
-	it("keeps grouped deposit requirement and availability on their truthful sides", async () => {
+	it("shows only deposit availability without repeating its requirement or target title", async () => {
 		await renderLines({
 			...projection,
 			line: [
@@ -828,9 +942,10 @@ describe("ItemLinesTab", () => {
 			],
 		});
 
-		expect(document.querySelector('[data-input-kind="deposit"]')?.textContent).toContain(
-			"2 / 1 available",
-		);
+		const deposit = document.querySelector('[data-input-kind="deposit"]');
+		expect(deposit?.textContent).toContain("1 available");
+		expect(deposit?.textContent).not.toContain("2 /");
+		expect(deposit?.textContent?.match(/Tree/g)).toHaveLength(1);
 	});
 
 	it("renders a missing deposit target as a human state instead of a malformed fraction", async () => {
@@ -899,6 +1014,9 @@ describe("ItemLinesTab", () => {
 		expect(inputWithdraw).not.toBeNull();
 		expect(lineWithdraw).not.toBeNull();
 		expect(storedQuantity?.previousElementSibling?.contains(inputWithdraw ?? null)).toBe(true);
+		expect(inputWithdraw?.className).toContain("underline");
+		expect(inputWithdraw?.className).toContain("border-0");
+		expect(storedQuantity?.parentElement?.className).toContain("items-baseline");
 
 		await act(async () => inputWithdraw?.click());
 
@@ -928,10 +1046,7 @@ describe("ItemLinesTab", () => {
 				},
 			],
 		});
-		expect(
-			document.querySelector<HTMLButtonElement>('[data-ui="TileLineInputWithdrawButton"]')
-				?.disabled,
-		).toBe(true);
+		expect(document.querySelector('[data-ui="TileLineInputWithdrawButton"]')).toBeNull();
 	});
 
 	it("retains exact buffered-input withdrawal when a live line becomes unavailable", async () => {
@@ -1245,6 +1360,7 @@ describe("ItemLinesTab", () => {
 						{
 							...input,
 							canWithdraw: true,
+							storedQuantity: 1,
 						},
 					],
 				},
@@ -1253,7 +1369,6 @@ describe("ItemLinesTab", () => {
 		const buttons = Array.from(document.querySelectorAll<HTMLButtonElement>("button"));
 		const pendingLabels = [
 			"Saving…",
-			"Queueing…",
 			"Withdrawing…",
 		];
 
@@ -1262,6 +1377,10 @@ describe("ItemLinesTab", () => {
 			expect(button, `Missing ${label} button.`).toBeDefined();
 			expect(button?.disabled).toBe(false);
 		}
+		const enqueue = buttons.find((candidate) => candidate.textContent === "Enqueue");
+		expect(enqueue?.disabled).toBe(false);
+		expect(enqueue?.getAttribute("aria-busy")).toBe("true");
+		expect(enqueue?.className).toContain("cursor-progress");
 		expect(
 			control.readPendingAction.mock.calls.map(([key]) => JSON.parse(key as string).at(-1)),
 		).toEqual(
@@ -1273,7 +1392,7 @@ describe("ItemLinesTab", () => {
 		);
 	});
 
-	it("renders truthful Enqueue pending copy on its separate command", async () => {
+	it("keeps Enqueue geometry and copy stable while its command is pending", async () => {
 		control.readPendingAction.mockImplementation((key: string) =>
 			key.includes('"enqueue"') ? "enqueue" : null,
 		);
@@ -1288,7 +1407,8 @@ describe("ItemLinesTab", () => {
 		const button = document.querySelector<HTMLButtonElement>(
 			'[data-ui="TileLineEnqueueButton"]',
 		);
-		expect(button?.textContent).toBe("Queueing…");
+		expect(button?.textContent).toBe("Enqueue");
+		expect(button?.getAttribute("aria-busy")).toBe("true");
 		expect(button?.className).toContain("cursor-progress");
 	});
 

@@ -1,6 +1,7 @@
 import { Array, Effect } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
+import { removeLineJobQueueRequests } from "~/engine/job/fx/removeLineJobQueueRequests";
 import { readBoardItemLineFx } from "~/engine/line/fx/readBoardItemLineFx";
 import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
 import { isInputRuntimeItemFx } from "~/engine/runtime/read/isInputRuntimeItemFx";
@@ -48,7 +49,11 @@ export const withdrawLineInputsFx = Effect.fn("withdrawLineInputsFx")(function* 
 					withdrawnItemCount: returned.withdrawnItemCount,
 					withdrawnQuantity: returned.withdrawnQuantity,
 				} satisfies withdrawLineInputsFx.Result,
-				returned.runtime,
+				removeLineJobQueueRequests({
+					lineId,
+					ownerItemId,
+					runtime: returned.runtime,
+				}),
 				returned.events,
 			] as const;
 		}),

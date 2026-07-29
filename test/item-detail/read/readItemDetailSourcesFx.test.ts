@@ -611,6 +611,76 @@ describe("readItemDetailSourcesFx", () => {
 		});
 	});
 
+	it("resolves an owned Farm through its blueprint to the owned Town Hall source", async () => {
+		const officialConfig = await readArkiniGameConfigSource();
+		const farm = {
+			id: "runtime:farm-t1",
+			item: officialConfig.items["producer:farm-t1"],
+			location: {
+				scope: "board",
+				space: 0,
+				position: {
+					x: 1,
+					y: 0,
+				},
+			},
+			quantity: 1,
+			revision: "revision:farm-t1",
+		} satisfies RuntimeItemSchema.Type;
+		const townHall = {
+			id: "runtime:townhall-t2",
+			item: officialConfig.items["producer:townhall-t2"],
+			location: {
+				scope: "board",
+				space: 0,
+				position: {
+					x: 0,
+					y: 0,
+				},
+			},
+			quantity: 1,
+			revision: "revision:townhall-t2",
+		} satisfies RuntimeItemSchema.Type;
+		const result = Effect.runSync(
+			readItemDetailSourcesFx({
+				target: {
+					kind: "runtime",
+					itemId: farm.id,
+				},
+				runtime: {
+					cheats: {
+						enabled: false,
+						everEnabled: false,
+						instantGameplay: false,
+					},
+					currentSpace: 0,
+					items: [
+						farm,
+						townHall,
+					],
+					jobs: [],
+				},
+			}).pipe(Effect.provideService(GameConfigFx, officialConfig)),
+		);
+
+		expect(result).toMatchObject({
+			kind: "available",
+			itemId: farm.id,
+			targetDefinitionItemId: "item:blueprint-farm-t1",
+			source: [
+				{
+					ownerItemId: townHall.id,
+					ownerDefinitionItemId: "producer:townhall-t2",
+					line: [
+						{
+							lineId: "line:townhall-t2:blueprint-farm-t1",
+						},
+					],
+				},
+			],
+		});
+	});
+
 	it("returns unavailable for a missing configured definition target", () => {
 		expect(
 			readSources({

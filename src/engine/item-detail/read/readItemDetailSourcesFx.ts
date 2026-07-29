@@ -337,7 +337,7 @@ export const readItemDetailSourcesFx = Effect.fn("readItemDetailSourcesFx")(func
 		runtime,
 		targetDefinitionItemId,
 	});
-	if (target.kind === "definition" && source.length === 0) {
+	if (source.length === 0) {
 		for (const candidate of Object.values(config.items)) {
 			const owner = Option.getOrUndefined(yield* isLineOwnerItemFx(candidate));
 			if (owner === undefined || owner.id === targetDefinitionItemId) continue;

@@ -3,9 +3,11 @@ import { describe, expect, it } from "vitest";
 
 import { readTileActorBadgeCountFx } from "~/bridge/tile/readTileActorBadgeCountFx";
 import { readTileActorProgressRatioFx } from "~/bridge/tile/readTileActorProgressRatioFx";
+import { readTileActorQueueBadgeCount } from "~/bridge/tile/readTileActorQueueBadgeCount";
 import { ItemEnumSchema } from "~/engine/item/schema/ItemEnumSchema";
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
-import { formatTileBadgeCount } from "~/ui/tile/formatTileBadgeCount";
+import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import { formatTileBadgeCount, formatTileBadgeLabel } from "~/ui/tile/formatTileBadgeCount";
 
 const runtimeItem = (overrides: {
 	readonly item: {
@@ -31,6 +33,54 @@ describe("tile actor overlay projection", () => {
 		expect(formatTileBadgeCount(99)).toBe("99");
 		expect(formatTileBadgeCount(100)).toBe("99+");
 		expect(formatTileBadgeCount(450)).toBe("99+");
+		expect(
+			formatTileBadgeLabel({
+				count: 3,
+				kind: "queue",
+			}),
+		).toBe("x3");
+		expect(
+			formatTileBadgeLabel({
+				count: 3,
+			}),
+		).toBe("3");
+	});
+
+	it("counts active and planned queue work for one exact owner", () => {
+		const runtime = {
+			jobs: [
+				{
+					ownerItemId: "runtime:owner",
+				},
+				{
+					ownerItemId: "runtime:other",
+				},
+			],
+			jobQueue: [
+				{
+					ownerItemId: "runtime:owner",
+				},
+				{
+					ownerItemId: "runtime:owner",
+				},
+				{
+					ownerItemId: "runtime:other",
+				},
+			],
+		} as RuntimeSchema.Type;
+
+		expect(
+			readTileActorQueueBadgeCount({
+				ownerItemId: "runtime:owner",
+				runtime,
+			}),
+		).toBe(3);
+		expect(
+			readTileActorQueueBadgeCount({
+				ownerItemId: "runtime:missing",
+				runtime,
+			}),
+		).toBeUndefined();
 	});
 
 	it("shows stack quantity only above one and always projects deposit charges", () => {

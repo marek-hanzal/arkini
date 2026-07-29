@@ -79,7 +79,16 @@ const queue = {
 	kind: "available",
 	itemId: "runtime:producer",
 	capacity: 3,
-	activeCount: 1,
+	active: [
+		{
+			jobId: "job:active",
+			lineId: "line:produce",
+			title: "Produce",
+			status: "running",
+			durationMs: 1_000,
+			remainingMs: 600,
+		},
+	],
 	request: [
 		{
 			requestId: "request:1",
@@ -265,11 +274,16 @@ describe("Item Detail projection structural equality", () => {
 			},
 		],
 		[
-			"queue counts",
+			"queue active job",
 			queue,
 			{
 				...queue,
-				activeCount: 2,
+				active: [
+					{
+						...queue.active[0],
+						status: "paused",
+					},
+				],
 			},
 		],
 		[

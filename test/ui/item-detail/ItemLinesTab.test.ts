@@ -1272,6 +1272,24 @@ describe("ItemLinesTab", () => {
 		);
 	});
 
+	it("keeps Enqueue copy and width stable while its command is pending", async () => {
+		control.readPendingAction.mockImplementation((key: string) =>
+			key.includes('"start"') ? "start" : null,
+		);
+		await renderLines({
+			...projection,
+			line: [
+				{
+					...projection.line[0],
+					startMode: "enqueue",
+				},
+			],
+		});
+		const button = document.querySelector<HTMLButtonElement>('[data-ui="TileLineStartButton"]');
+		expect(button?.textContent).toBe("Enqueue");
+		expect(button?.className).toContain("cursor-progress");
+	});
+
 	it("filters authoritative visible lines by semantic facts without indexing volatile numbers", async () => {
 		const advancedInput = {
 			...input,

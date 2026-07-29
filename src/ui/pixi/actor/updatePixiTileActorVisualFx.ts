@@ -4,7 +4,7 @@ import type { TileActorItem } from "~/bridge/tile/TileActorItem";
 import type { PixiTileActorVisual } from "~/ui/pixi/actor/PixiTileActorVisual";
 import type { PixiScenePalette } from "~/ui/pixi/appearance/PixiScenePalette";
 import { fitPixiSingleLineTextFx } from "~/ui/pixi/text/fitPixiSingleLineTextFx";
-import { formatTileBadgeCount } from "~/ui/tile/formatTileBadgeCount";
+import { formatTileBadgeLabel } from "~/ui/tile/formatTileBadgeCount";
 
 export namespace updatePixiTileActorVisualFx {
 	export interface Props {
@@ -67,7 +67,12 @@ export const updatePixiTileActorVisualFx = Effect.fn("updatePixiTileActorVisualF
 
 	visual.quantity.style.fontSize = badgeFontSize;
 	visual.quantity.text =
-		item.badgeCount === undefined ? "" : formatTileBadgeCount(item.badgeCount);
+		item.badgeCount === undefined
+			? ""
+			: formatTileBadgeLabel({
+					count: item.badgeCount,
+					kind: item.badgeKind,
+				});
 	visual.quantity.visible = item.badgeCount !== undefined;
 	visual.quantityBackground.visible = item.badgeCount !== undefined;
 	if (item.badgeCount !== undefined) {

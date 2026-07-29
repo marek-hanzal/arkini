@@ -322,12 +322,10 @@ export const ItemLineRow = ({
 									})
 								}
 							>
-								{pending.start
-									? line.startMode === "enqueue"
-										? "Queueing…"
-										: "Starting…"
-									: line.startMode === "enqueue"
-										? "Enqueue"
+								{line.startMode === "enqueue"
+									? "Enqueue"
+									: pending.start
+										? "Starting…"
 										: "Start"}
 							</PrimaryButton>
 						</div>

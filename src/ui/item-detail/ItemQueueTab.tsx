@@ -1,10 +1,17 @@
 import { useClearItemDetailQueue } from "~/bridge/item-detail/useClearItemDetailQueue";
 import type { useItemDetailQueue } from "~/bridge/item-detail/useItemDetailQueue";
 import { Button } from "~/ui/button/Button";
+import { ItemRuntime, readActiveJobRuntime } from "~/ui/item-detail/ItemRuntime";
 import { Scrollable } from "~/ui/scrollable/Scrollable";
 import { useItemDetailControl } from "~/ui/item-detail/useItemDetailControl";
 
-/** Renders authoritative queued intents without treating active work as cancellable. */
+const statusLabel = {
+	"awaiting-output": "Awaiting output",
+	paused: "Paused",
+	running: "Running",
+} as const;
+
+/** Renders authoritative active and queued work without treating the active job as cancellable. */
 export const ItemQueueTab = ({
 	disabled = false,
 	queue,
@@ -28,7 +35,8 @@ export const ItemQueueTab = ({
 	});
 	const pending = clearQueue.pending;
 	const error = clearQueue.error;
-	const used = queue.activeCount + queue.request.length;
+	const used = queue.active.length + queue.request.length;
+	const empty = used === 0;
 
 	return (
 		<div
@@ -60,27 +68,91 @@ export const ItemQueueTab = ({
 					{error}
 				</p>
 			)}
-			{queue.request.length === 0 ? (
+			{empty ? (
 				<div className="grid flex-1 place-items-center py-12 text-muted">
-					Queue is empty.
+					No active or queued work.
 				</div>
 			) : (
-				<Scrollable className="flex-1">
-					{queue.request.map((request, index) => (
-						<div
-							key={request.requestId}
-							className="flex items-center gap-4 border-b border-line py-3 last:border-b-0"
-							data-ui="ItemQueueRow"
-						>
-							<span className="w-8 shrink-0 text-right text-sm tabular-nums text-muted">
-								{index + 1}
-							</span>
-							<div className="min-w-0">
-								<p className="truncate font-medium">{request.title}</p>
-								<p className="truncate text-xs text-muted">Queued intent</p>
-							</div>
-						</div>
-					))}
+				<Scrollable className="flex-1 pr-1">
+					<div
+						className="ak-list grid gap-1"
+						data-ui="ItemQueueList"
+					>
+						{queue.active.map((job) => {
+							const progress =
+								job.durationMs === 0
+									? 1
+									: Math.max(
+											0,
+											Math.min(
+												1,
+												(job.durationMs - job.remainingMs) / job.durationMs,
+											),
+										);
+							return (
+								<article
+									key={job.jobId}
+									className="ak-list-row ak-list-row-active overflow-hidden rounded-xl border-b border-l-2 border-line border-l-success px-4 py-5"
+									data-ui="ItemQueueRow"
+									data-state="active"
+								>
+									<div
+										className="pointer-events-none absolute inset-y-0 right-0 left-0.5 overflow-hidden rounded-r-[inherit]"
+										aria-hidden="true"
+										data-ui="ItemQueueProgress"
+									>
+										<div
+											className="h-full bg-[var(--ak-list-row-active-progress-surface)] transition-[width] duration-200 ease-linear"
+											data-ui="ItemQueueProgressFill"
+											style={{
+												width: `${progress * 100}%`,
+											}}
+										/>
+									</div>
+									<div className="relative z-[1] flex flex-wrap items-start justify-between gap-4">
+										<div className="min-w-0 flex-1">
+											<div className="flex flex-wrap items-center gap-2">
+												<h3 className="text-lg font-semibold leading-tight text-foreground">
+													{job.title}
+												</h3>
+												<span className="rounded-full border border-success/40 bg-success/12 px-2.5 py-1 text-xs font-semibold text-foreground">
+													{statusLabel[job.status]}
+												</span>
+											</div>
+											<p className="mt-2 text-sm text-muted">
+												Current queue slot
+											</p>
+										</div>
+										<ItemRuntime
+											dataUi="ItemQueueRuntime"
+											jobStatus={job.status}
+											runtime={readActiveJobRuntime(job)}
+										/>
+									</div>
+								</article>
+							);
+						})}
+						{queue.request.map((request, index) => (
+							<article
+								key={request.requestId}
+								className="ak-list-row rounded-xl border-b border-l-2 border-line border-l-line/55 px-4 py-5"
+								data-ui="ItemQueueRow"
+								data-state="queued"
+							>
+								<div className="flex flex-wrap items-center gap-2">
+									<h3 className="text-lg font-semibold leading-tight text-foreground">
+										{request.title}
+									</h3>
+									<span className="rounded-full border border-line-strong bg-surface-raised/65 px-2.5 py-1 text-xs font-semibold text-muted">
+										Queued #{index + 1}
+									</span>
+								</div>
+								<p className="mt-2 text-sm text-muted">
+									Waiting for the active slot
+								</p>
+							</article>
+						))}
+					</div>
 				</Scrollable>
 			)}
 		</div>

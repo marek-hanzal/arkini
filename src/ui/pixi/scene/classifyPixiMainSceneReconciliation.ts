@@ -108,6 +108,7 @@ const isSameMainSceneVisual = (left: TileActorItem, right: TileActorItem) => {
 	return (
 		left.activityEffect === right.activityEffect &&
 		left.badgeCount === right.badgeCount &&
+		left.badgeKind === right.badgeKind &&
 		left.compositeUrl === right.compositeUrl &&
 		left.quantity === right.quantity &&
 		left.running === right.running &&

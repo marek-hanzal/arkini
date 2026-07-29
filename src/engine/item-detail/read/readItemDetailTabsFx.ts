@@ -3,7 +3,6 @@ import { Effect, Option } from "effect";
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
 import { ItemDetailTabEnumSchema } from "~/engine/item-detail/schema/ItemDetailTabEnumSchema";
 import { isLineOwnerItemFx } from "~/engine/line/read/isLineOwnerItemFx";
-import { ItemEnumSchema } from "~/engine/item/schema/ItemEnumSchema";
 
 type ItemDetailTabsTarget =
 	| {
@@ -54,10 +53,6 @@ const infoTab: readonly ItemDetailTabEnumSchema.Type[] = [
 ];
 const lineOwnerTabs: readonly ItemDetailTabEnumSchema.Type[] = [
 	ItemDetailTabEnumSchema.enum.Lines,
-	ItemDetailTabEnumSchema.enum.Info,
-];
-const queuedProducerTabs: readonly ItemDetailTabEnumSchema.Type[] = [
-	ItemDetailTabEnumSchema.enum.Lines,
 	ItemDetailTabEnumSchema.enum.Queue,
 	ItemDetailTabEnumSchema.enum.Info,
 ];
@@ -71,10 +66,5 @@ export const readItemDetailTabsFx = Effect.fn("readItemDetailTabsFx")(function* 
 	if (target.item === undefined) return noTabs;
 	const lineOwnerItem = Option.getOrUndefined(yield* isLineOwnerItemFx(target.item.item));
 	if (lineOwnerItem === undefined) return withSources(infoTab, sources);
-	return withSources(
-		lineOwnerItem.type === ItemEnumSchema.enum.Producer && lineOwnerItem.maxQueueSize > 1
-			? queuedProducerTabs
-			: lineOwnerTabs,
-		sources,
-	);
+	return withSources(lineOwnerTabs, sources);
 });

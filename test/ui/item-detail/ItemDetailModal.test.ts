@@ -843,6 +843,62 @@ describe("ItemDetailModal", () => {
 		expect(startButton.textContent).toBe("Start");
 		expect(startButton.disabled).toBe(true);
 		expect(document.body.textContent).not.toContain("Enqueue");
+		const queueTab = document.querySelector<HTMLButtonElement>('[data-tab="queue"]');
+		if (queueTab === null) throw new Error("Missing single-slot Queue tab.");
+		await act(async () => {
+			queueTab.click();
+			await Promise.resolve();
+		});
+		const activeRow = document.querySelector<HTMLElement>(
+			'[data-ui="ItemQueueRow"][data-state="active"]',
+		);
+		expect(activeRow?.textContent).toContain("Water");
+		expect(activeRow?.textContent).toContain("Running");
+		expect(activeRow?.className).toContain("ak-list-row-active");
+		expect(
+			activeRow?.querySelector<HTMLElement>('[data-ui="ItemQueueProgressFill"]')?.style.width,
+		).toBe("60%");
+		expect(activeRow?.querySelector('[data-ui="ItemQueueRuntimeValue"]')?.textContent).toBe(
+			"0.4 s",
+		);
+		expect(activeRow?.querySelector('[data-ui="ItemQueueRuntimeDetail"]')?.textContent).toBe(
+			"Remaining of 1 s",
+		);
+		expect(document.querySelector('[data-ui="ItemQueueRow"][data-state="queued"]')).toBeNull();
+
+		await act(async () => {
+			publishRuntime(
+				RuntimeSchema.parse({
+					...currentRuntime,
+					items: currentRuntime.items.map((item) =>
+						item.id === owner.id && item.item.type === "producer"
+							? {
+									...item,
+									item: {
+										...item.item,
+										maxQueueSize: 2,
+									},
+								}
+							: item,
+					),
+					jobQueue: [
+						{
+							id: "request:workshop",
+							ownerItemId: owner.id,
+							lineId: "line:workshop:water",
+						},
+					],
+				}),
+			);
+			await Promise.resolve();
+		});
+		const queuedRow = document.querySelector<HTMLElement>(
+			'[data-ui="ItemQueueRow"][data-state="queued"]',
+		);
+		expect(queuedRow?.className).toContain("ak-list-row");
+		expect(queuedRow?.className).toContain("rounded-xl");
+		expect(queuedRow?.textContent).toContain("Water");
+		expect(queuedRow?.textContent).toContain("Queued #1");
 	});
 
 	it("shows exact owned sources and hands off through the stable modal shell", async () => {

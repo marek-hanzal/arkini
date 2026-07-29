@@ -128,7 +128,8 @@ poses to motion, runs entry or exit effects, and finalizes presentation claims.
 - Canonical engine items remain the only gameplay truth. Delivery quantity stays canonical on its
   runtime item; ordinary cue motion owns only its narrow, phase-aware presentation overlay. The
   reconciler and animation-triggered refreshes use the same projector, so quantity and badge can
-  never disagree.
+  never disagree. A line owner shows an `xN` queue badge only when its canonical active jobs plus
+  queued requests exceed one.
 - Accepted consumption presents exact result/event facts: the surviving source dips, a removed
   source fades, and the receiver emits the shared accent particle burst. Drop-result facts cover manual
   stack, producer-input, and Inventory storage commands that do not emit equivalent engine events.

@@ -4,8 +4,9 @@ import type { PixiTileQuantityPresentation } from "~/ui/pixi/motion/PixiTileQuan
 /**
  * Applies the one narrow piece of canonical truth that motion may delay.
  *
- * Deposits use their badge for remaining charges; every other badge mirrors the presented stack
- * quantity. Keeping both fields here prevents reconciler and animation code from disagreeing.
+ * Deposits use their badge for remaining charges and queue owners preserve canonical work count;
+ * every other badge mirrors the presented stack quantity. Keeping both fields here prevents the
+ * reconciler and animation code from disagreeing.
  */
 export const projectPixiTileMotionItem = (
 	item: TileActorItem,
@@ -19,7 +20,11 @@ export const projectPixiTileMotionItem = (
 	return {
 		...item,
 		badgeCount:
-			item.itemType === "deposit" ? item.badgeCount : quantity > 1 ? quantity : undefined,
+			item.itemType === "deposit" || item.badgeKind === "queue"
+				? item.badgeCount
+				: quantity > 1
+					? quantity
+					: undefined,
 		quantity,
 	};
 };

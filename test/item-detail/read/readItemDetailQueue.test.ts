@@ -6,8 +6,10 @@ import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { lineRunRuntime } from "~test/line/fx/run/support/lineRunTestRuntime";
 
 describe("readItemDetailQueue", () => {
-	it("projects only queued intents while preserving active work separately", () => {
-		const base = lineRunRuntime({});
+	it("projects active work before queued intents", () => {
+		const base = lineRunRuntime({
+			permit: true,
+		});
 		const runtime = {
 			...base,
 			jobs: [
@@ -39,7 +41,16 @@ describe("readItemDetailQueue", () => {
 			kind: "available",
 			itemId: "runtime:workshop",
 			capacity: 2,
-			activeCount: 1,
+			active: [
+				{
+					jobId: "job:active",
+					lineId: "line:workshop:build",
+					title: "Build",
+					status: "running",
+					durationMs: 1_000,
+					remainingMs: 600,
+				},
+			],
 			request: [
 				{
 					requestId: "job:queued",
@@ -50,12 +61,52 @@ describe("readItemDetailQueue", () => {
 		});
 	});
 
-	it("is unavailable for stale and non-queue owners", () => {
-		const runtime = lineRunRuntime({});
+	it("is available at capacity one and unavailable only for stale or non-line owners", () => {
+		const runtime = lineRunRuntime({
+			permit: true,
+		});
+		const singleSlotRuntime = {
+			...runtime,
+			items: runtime.items.map((item) =>
+				item.id === "runtime:workshop" && item.item.type === "producer"
+					? {
+							...item,
+							item: {
+								...item.item,
+								maxQueueSize: 1,
+							},
+						}
+					: item,
+			),
+		} satisfies RuntimeSchema.Type;
+		expect(
+			Effect.runSync(
+				readItemDetailQueueFx({
+					itemId: "runtime:workshop",
+					runtime: singleSlotRuntime,
+				}),
+			),
+		).toEqual({
+			kind: "available",
+			itemId: "runtime:workshop",
+			capacity: 1,
+			active: [],
+			request: [],
+		});
 		expect(
 			Effect.runSync(
 				readItemDetailQueueFx({
 					itemId: "runtime:missing",
+					runtime,
+				}),
+			),
+		).toEqual({
+			kind: "unavailable",
+		});
+		expect(
+			Effect.runSync(
+				readItemDetailQueueFx({
+					itemId: "runtime:permit",
 					runtime,
 				}),
 			),

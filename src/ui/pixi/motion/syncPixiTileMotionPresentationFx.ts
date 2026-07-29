@@ -45,6 +45,7 @@ export const syncPixiTileMotionPresentationFx = Effect.fn("syncPixiTileMotionPre
 			if (
 				actor.item.quantity === item.quantity &&
 				actor.item.badgeCount === item.badgeCount &&
+				actor.item.badgeKind === item.badgeKind &&
 				actor.size === size
 			) {
 				continue;

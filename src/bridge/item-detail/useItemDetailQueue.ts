@@ -31,7 +31,7 @@ export const useItemDetailQueue = (itemId: IdSchema.Type): useItemDetailQueue.Pr
 				kind: "available",
 				itemId: queue.itemId,
 				capacity: queue.capacity,
-				activeCount: queue.activeCount,
+				active: queue.active,
 				request: queue.request,
 			};
 		},

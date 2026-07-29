@@ -46,6 +46,7 @@ const sameVisual = (left: TileActorItem, right: TileActorItem) =>
 	left.revision === right.revision &&
 	left.title === right.title &&
 	left.badgeCount === right.badgeCount &&
+	left.badgeKind === right.badgeKind &&
 	left.quantity === right.quantity &&
 	left.sourceUrl === right.sourceUrl &&
 	left.compositeUrl === right.compositeUrl &&

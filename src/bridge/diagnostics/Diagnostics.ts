@@ -41,7 +41,7 @@ export const toDiagnosticValue = (
 			...(value.stack === undefined
 				? {}
 				: {
-						stack: value.stack.slice(0, 16_384),
+						stack: value.stack.slice(0, 8_192),
 					}),
 		};
 		if ("cause" in value && value.cause !== undefined) {
@@ -51,6 +51,28 @@ export const toDiagnosticValue = (
 			error.errors = Array.from(value.errors)
 				.slice(0, 20)
 				.map((cause) => toDiagnosticValue(cause, depth + 1, seen));
+		}
+		for (const key of Object.keys(value).slice(0, 100)) {
+			if (
+				key === "name" ||
+				key === "message" ||
+				key === "stack" ||
+				key === "cause" ||
+				key === "errors"
+			) {
+				continue;
+			}
+			try {
+				// Custom Error fields are diagnostic roots. Their surrounding Cause/Error wrappers
+				// must not spend the depth budget before domain details such as runtime issues.
+				error[key.slice(0, 100)] = toDiagnosticValue(
+					(value as unknown as Record<string, unknown>)[key],
+					0,
+					seen,
+				);
+			} catch (cause) {
+				error[key.slice(0, 100)] = `[Unreadable: ${String(cause)}]`;
+			}
 		}
 		return error;
 	}

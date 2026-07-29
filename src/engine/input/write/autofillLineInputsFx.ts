@@ -3,6 +3,7 @@ import { Effect, Option } from "effect";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { DeliveryPhaseEnumSchema } from "~/engine/delivery/schema/DeliveryPhaseEnumSchema";
 import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
+import { detachLineInputSourceFx } from "~/engine/input/fx/detachLineInputSourceFx";
 import { planLineInputAutofillFx } from "~/engine/input/fx/planLineInputAutofillFx";
 import { isolateStatefulOwnerTransitionFx } from "~/engine/item/fx/isolateStatefulOwnerTransitionFx";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
@@ -83,11 +84,22 @@ export const autofillLineInputsRuntimeFx = Effect.fn("autofillLineInputsRuntimeF
 
 	let deliveryRuntime = runtime;
 	const deliveryItemIds: IdSchema.Type[] = [];
+	const events: GameEventSchema.Type[] = [];
+	let scheduledQuantity = 0;
+	let skippedQuantity = 0;
 	for (const [sourceItemId, input] of allocationsBySourceItemId) {
 		const runtimeSource = deliveryRuntime.items.find((item) => item.id === sourceItemId);
 		if (runtimeSource === undefined) continue;
 		const source = Option.getOrUndefined(yield* isGridRuntimeItemFx(runtimeSource));
 		if (source === undefined) continue;
+		const detached = yield* detachLineInputSourceFx({
+			runtime: deliveryRuntime,
+			source,
+		});
+		if (detached.type === "active-job") {
+			skippedQuantity += input.reduce((total, allocation) => total + allocation.quantity, 0);
+			continue;
+		}
 		const delivery = yield* reviseRuntimeItemFx({
 			item: {
 				...source,
@@ -106,21 +118,30 @@ export const autofillLineInputsRuntimeFx = Effect.fn("autofillLineInputsRuntimeF
 			},
 		});
 		deliveryRuntime = {
-			...deliveryRuntime,
-			items: deliveryRuntime.items.map((item) => (item.id === delivery.id ? delivery : item)),
+			...detached.runtime,
+			items: [
+				...detached.runtime.items.slice(0, detached.insertionIndex),
+				delivery,
+				...detached.runtime.items.slice(detached.insertionIndex),
+			],
 		} satisfies RuntimeSchema.Type;
+		events.push(...detached.events);
 		deliveryItemIds.push(delivery.id);
+		scheduledQuantity += input.reduce((total, allocation) => total + allocation.quantity, 0);
 	}
 	const isolation = yield* isolateStatefulOwnerTransitionFx({
 		ownerItemId,
 		runtime: deliveryRuntime,
 	});
 	return {
-		events: isolation.events,
+		events: [
+			...events,
+			...isolation.events,
+		],
 		result: {
 			deliveryItemIds,
-			scheduledQuantity: plan.entry.reduce((total, entry) => total + entry.quantity, 0),
-			remainingMissingQuantity: plan.remainingMissingQuantity,
+			scheduledQuantity,
+			remainingMissingQuantity: plan.remainingMissingQuantity + skippedQuantity,
 		},
 		runtime: isolation.runtime,
 	} satisfies autofillLineInputsRuntimeFx.Result;

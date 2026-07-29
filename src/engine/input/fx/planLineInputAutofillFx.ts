@@ -98,6 +98,7 @@ export const planLineInputAutofillFx = Effect.fn("planLineInputAutofillFx")(func
 		lineId,
 		runtime,
 	});
+	const activeJobOwnerItemIds = new Set(runtime.jobs.map((job) => job.ownerItemId));
 
 	const candidates = runtime.items
 		.filter(
@@ -111,6 +112,7 @@ export const planLineInputAutofillFx = Effect.fn("planLineInputAutofillFx")(func
 				}),
 		)
 		.filter((candidate) => candidate.id !== owner.id)
+		.filter((candidate) => !activeJobOwnerItemIds.has(candidate.id))
 		.slice()
 		.sort(compareCandidates(owner));
 	const remainingByItemId = new Map(

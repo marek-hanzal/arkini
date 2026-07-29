@@ -31,13 +31,6 @@ export const fromStateFx = Effect.fn("fromStateFx")(function* ({ state }: fromSt
 			items,
 			jobs: state.jobs,
 			jobQueue: state.jobQueue ?? [],
-			...(state.deliveryStartIntents === undefined
-				? {}
-				: {
-						deliveryStartIntents: state.deliveryStartIntents.map((intent) => ({
-							...intent,
-						})),
-					}),
 			...(state.defaultLineByOwnerItemId === undefined
 				? {}
 				: {

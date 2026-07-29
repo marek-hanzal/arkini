@@ -391,7 +391,7 @@ describe("ItemDetailProvider", () => {
 		await act(async () => {
 			runPendingAction(readControl(), {
 				key: "line:runtime:second",
-				action: "start",
+				action: "enqueue",
 				failureMessage: "Second action failed.",
 				run: Deferred.await(secondFailure),
 			});
@@ -492,7 +492,7 @@ describe("ItemDetailProvider", () => {
 		await act(async () => {
 			runPendingAction(readItemDetail(), {
 				key: "line:runtime:first",
-				action: "start",
+				action: "enqueue",
 				failureMessage: "Start failed.",
 				run: Effect.promise(() => run),
 			});
@@ -508,7 +508,7 @@ describe("ItemDetailProvider", () => {
 			phase: "exiting",
 			restoreFocus: false,
 		});
-		expect(readItemDetail().readPendingAction("line:runtime:first")).toBe("start");
+		expect(readItemDetail().readPendingAction("line:runtime:first")).toBe("enqueue");
 
 		await act(async () => {
 			completeRun?.();

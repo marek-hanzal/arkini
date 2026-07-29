@@ -43,10 +43,6 @@ export const readStoredItemDetailLineFx = Effect.fn("readStoredItemDetailLineFx"
 			(request) => request.ownerItemId === ownerItemId && request.lineId === line.id,
 		).length,
 		actions: {
-			immediate: {
-				type: "fill",
-				enabled: false,
-			},
 			enqueue: {
 				enabled: false,
 			},

@@ -128,14 +128,6 @@ export const reconcileOutboundDeliveriesRuntimeFx = Effect.fn(
 								phase: "returning" as const,
 								generation: current.location.generation + 1,
 								origin: current.location.origin,
-								purpose:
-									owner === undefined &&
-									current.location.purpose.kind === "fill-and-try-start" &&
-									current.location.purpose.ownerItemId === target.ownerItemId
-										? {
-												kind: "fill" as const,
-											}
-										: current.location.purpose,
 								returnFrom:
 									owner?.location.scope === LocationScopeEnumSchema.enum.Board
 										? owner.location

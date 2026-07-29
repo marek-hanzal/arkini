@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~/engine/game/fx/useGameFx";
 import { readOwnerJobQueueFx } from "~/engine/job/read/readOwnerJobQueueFx";
-import { startLineFx } from "~/engine/job/write/startLineFx";
+import { startLineFx } from "~test/job/support/startLineTestFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import { moveItemFx } from "~/engine/runtime/write/moveItemFx";
 import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";

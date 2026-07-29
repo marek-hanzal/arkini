@@ -1,7 +1,6 @@
 import { z } from "zod";
 
 import { DeliveryTargetIssueSchema } from "~/engine/delivery/schema/check/DeliveryTargetIssueSchema";
-import { DeliveryPurposeIssueSchema } from "~/engine/delivery/schema/check/DeliveryPurposeIssueSchema";
 import { DuplicateJobIdIssueSchema } from "~/engine/job/schema/DuplicateJobIdIssueSchema";
 import { JobLineMissingIssueSchema } from "~/engine/job/schema/JobLineMissingIssueSchema";
 import { JobOwnerMissingIssueSchema } from "~/engine/job/schema/JobOwnerMissingIssueSchema";
@@ -54,7 +53,6 @@ export const RuntimeCheckIssueSchema = z
 		DefaultLineIssueSchema,
 		LineInputClosedIssueSchema,
 		DeliveryTargetIssueSchema,
-		DeliveryPurposeIssueSchema,
 		LocationOccupiedIssueSchema,
 		LocationOutOfBoundsIssueSchema,
 		LocationScopeIssueSchema,

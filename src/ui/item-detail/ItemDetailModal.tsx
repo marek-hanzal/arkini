@@ -16,6 +16,7 @@ import type { ItemDetailState, ItemDetailTarget } from "~/ui/item-detail/ItemDet
 import { ItemInfoTab } from "~/ui/item-detail/ItemInfoTab";
 import { ItemLinesTab } from "~/ui/item-detail/ItemLinesTab";
 import { ItemQueueTab } from "~/ui/item-detail/ItemQueueTab";
+import { ItemDetailQueueBadgeClassName } from "~/ui/item-detail/ItemDetailQueueBadgeClassName";
 import { ItemSourcesTab } from "~/ui/item-detail/ItemSourcesTab";
 import { useCloseItemDetail } from "~/ui/item-detail/useCloseItemDetail";
 import { useItemDetailControl } from "~/ui/item-detail/useItemDetailControl";
@@ -179,7 +180,7 @@ const ItemDetailTabs = ({
 					) : null}
 					{tab === "queue" && queueCount !== undefined && queueCount > 0 ? (
 						<span
-							className="min-w-5 rounded-full bg-warning/20 px-1.5 py-0.5 text-center text-[0.6875rem] font-semibold tabular-nums text-foreground"
+							className={ItemDetailQueueBadgeClassName}
 							data-ui="ItemDetailQueueTabCount"
 						>
 							{queueCount}

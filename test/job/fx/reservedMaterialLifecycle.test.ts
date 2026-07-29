@@ -4,13 +4,12 @@ import { describe, expect, it } from "vitest";
 import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
 import { useGameFx } from "~/engine/game/fx/useGameFx";
 import { storeInputMaterialFx } from "~/engine/input/write/storeInputMaterialFx";
-import { startLineFx } from "~/engine/job/write/startLineFx";
+import { startLineFx } from "~test/job/support/startLineTestFx";
 import { RuntimeStoreFx } from "~/engine/runtime/internal/RuntimeStoreFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { runTickRuntimeByFx } from "~/engine/tick/fx/runTickRuntimeByFx";
-import { StartLineResultEnumSchema } from "~/engine/job/schema/StartLineResultEnumSchema";
 
 const base = (id: string, scope: "any" | "board" = "board") => ({
 	id,
@@ -193,8 +192,7 @@ const reserveWorkerFx = Effect.fn("reserveWorkerFx")(function* ({
 		ownerItemId: employerId,
 		lineId: "line:employer:run",
 	});
-	if (started.type !== StartLineResultEnumSchema.enum.Started)
-		return yield* Effect.die(new Error("Employer did not start."));
+	if (started.type !== "started") return yield* Effect.die(new Error("Employer did not start."));
 	return started.job;
 });
 

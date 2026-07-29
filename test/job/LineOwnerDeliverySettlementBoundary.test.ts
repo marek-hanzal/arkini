@@ -3,9 +3,7 @@ import { describe, expect, it } from "vitest";
 
 import { settleItemDeliveryFx } from "~/engine/delivery/write/settleItemDeliveryFx";
 import { useGameFx } from "~/engine/game/fx/useGameFx";
-import { fillAndStartLineFx } from "~/engine/job/write/fillAndStartLineFx";
 import { enqueueLineFx } from "~/engine/job/write/enqueueLineFx";
-import { startLineFx } from "~/engine/job/write/startLineFx";
 import { readCommittedTransitionFx } from "~/engine/runtime/read/readCommittedTransitionFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
@@ -157,70 +155,6 @@ const spawnScenarioFx = Effect.fn("spawnLineOwnerDeliveryBoundaryScenarioFx")(fu
 describe("line-owner delivery settlement boundary", () => {
 	it.each(
 		ownerKinds,
-	)("keeps explicit Fill & Start for %s idle until the last physical delivery settles", (ownerKind) => {
-		const result = Effect.runSync(
-			Effect.gen(function* () {
-				const ids = yield* spawnScenarioFx(ownerKind);
-				const command = yield* fillAndStartLineFx(ids);
-				const admitted = yield* readRuntimeFx();
-				yield* settleItemDeliveryFx({
-					itemId: "runtime:material:a",
-					generation: 0,
-				});
-				const afterFirstContact = yield* readRuntimeFx();
-				const firstTransition = yield* readCommittedTransitionFx();
-				yield* settleItemDeliveryFx({
-					itemId: "runtime:material:b",
-					generation: 0,
-				});
-				return {
-					admitted,
-					afterFirstContact,
-					command,
-					firstTransition,
-					finished: yield* readRuntimeFx(),
-					finishedTransition: yield* readCommittedTransitionFx(),
-					ids,
-				};
-			}).pipe(
-				useGameFx({
-					config,
-				}),
-			),
-		);
-
-		expect(result.command).toEqual({
-			type: "filled",
-			remainingMissingQuantity: 0,
-			scheduledQuantity: 2,
-		});
-		expect(result.admitted.jobs).toEqual([]);
-		expect(
-			result.admitted.items
-				.filter((item) => item.location.scope === "delivery")
-				.map((item) => item.id)
-				.sort(),
-		).toEqual([
-			"runtime:material:a",
-			"runtime:material:b",
-		]);
-		expect(result.afterFirstContact.jobs).toEqual([]);
-		expect(result.firstTransition.events.some((event) => event.type === "job:started")).toBe(
-			false,
-		);
-		expect(result.finished.jobs).toEqual([
-			expect.objectContaining({
-				lineId: result.ids.lineId,
-				ownerItemId: result.ids.ownerItemId,
-			}),
-		]);
-		expect(result.finishedTransition.events.some((event) => event.type === "job:started")).toBe(
-			true,
-		);
-	});
-
-	it.each(
-		ownerKinds,
 	)("keeps queued %s work persisted until deliveries settle and a later Tick admits it", (ownerKind) => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {
@@ -285,68 +219,8 @@ describe("line-owner delivery settlement boundary", () => {
 			expect.arrayContaining([
 				expect.objectContaining({
 					type: "job:started",
-					source: "queue",
 				}),
 			]),
 		);
-	});
-
-	it("retries a durable Fill & Start intent after a transient owner-busy settlement", () => {
-		const result = Effect.runSync(
-			Effect.gen(function* () {
-				const ids = yield* spawnScenarioFx("producer");
-				yield* fillAndStartLineFx(ids);
-				yield* startLineFx({
-					ownerItemId: ids.ownerItemId,
-					lineId: "line:producer:other",
-				});
-				yield* settleItemDeliveryFx({
-					itemId: "runtime:material:a",
-					generation: 0,
-				});
-				yield* settleItemDeliveryFx({
-					itemId: "runtime:material:b",
-					generation: 0,
-				});
-				const blocked = yield* readRuntimeFx();
-				yield* runTickRuntimeByFx({
-					elapsedMs: 1_000,
-				});
-				const released = yield* readRuntimeFx();
-				yield* runTickRuntimeByFx({
-					elapsedMs: TickStepMs,
-				});
-				return {
-					blocked,
-					finished: yield* readRuntimeFx(),
-					released,
-				};
-			}).pipe(
-				useGameFx({
-					config,
-				}),
-			),
-		);
-
-		expect(result.blocked.jobs).toEqual([
-			expect.objectContaining({
-				lineId: "line:producer:other",
-			}),
-		]);
-		expect(result.blocked.deliveryStartIntents).toEqual([
-			{
-				ownerItemId: "runtime:producer",
-				lineId: "line:producer",
-			},
-		]);
-		expect(result.released.jobs).toEqual([]);
-		expect(result.released.deliveryStartIntents).toHaveLength(1);
-		expect(result.finished.jobs).toEqual([
-			expect.objectContaining({
-				lineId: "line:producer",
-				ownerItemId: "runtime:producer",
-			}),
-		]);
-		expect(result.finished.deliveryStartIntents).toEqual([]);
 	});
 });

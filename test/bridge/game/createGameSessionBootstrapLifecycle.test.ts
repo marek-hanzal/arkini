@@ -2,7 +2,7 @@ import { Cause, Effect, Exit, Fiber, Layer, Option } from "effect";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { createGameSessionFx } from "~/bridge/game/createGameSessionFx";
-import { startLineFx } from "~/engine/job/write/startLineFx";
+import { startLineFx } from "~test/job/support/startLineTestFx";
 import type { StateSchema } from "~/engine/state/schema/StateSchema";
 import { createJobTestConfig, prepareJobLineFx } from "~test/job/support/jobTestConfig";
 

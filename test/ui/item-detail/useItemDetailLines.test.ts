@@ -311,7 +311,7 @@ const roots: Array<ReturnType<typeof createRoot>> = [];
 const Probe = ({ itemId }: { readonly itemId: string }) => {
 	const projection = useItemDetailLines(itemId);
 	const line = projection.kind === "available" ? projection.line[0] : undefined;
-	const canAutofill = line?.actions.immediate.enabled;
+	const canEnqueue = line?.actions.enqueue.enabled;
 	const unavailableReason =
 		line?.availability.kind === "unavailable" ? line.availability.reason : undefined;
 	const ruleDetail =
@@ -322,7 +322,7 @@ const Probe = ({ itemId }: { readonly itemId: string }) => {
 	const roll = line?.output[0]?.roll[0];
 	const outputItem = roll?.kind === "guaranteed" ? roll.item[0] : undefined;
 	return createElement("output", {
-		"data-can-autofill": String(canAutofill),
+		"data-can-enqueue": String(canEnqueue),
 		"data-disabled-message": unavailableReason?.message ?? "",
 		"data-disabled-rule":
 			unavailableReason?.kind === "line-disabled" ? unavailableReason.cause.kind : "",
@@ -408,7 +408,7 @@ describe("useItemDetailLines", () => {
 			);
 		});
 		const output = container.querySelector("output");
-		expect(output?.dataset.canAutofill).toBe("false");
+		expect(output?.dataset.canEnqueue).toBe("false");
 		expect(output?.dataset.disabledMessage).toBe("Requires Material (Board · close).");
 		expect(output?.dataset.disabledRule).toBe("enable-rule");
 		expect(output?.dataset.disabledRuleDetail).toBe("material");
@@ -417,7 +417,7 @@ describe("useItemDetailLines", () => {
 		expect(output?.dataset.outputHasRuntimeTarget).toBe("false");
 
 		await act(async () => publishRuntime(withSource));
-		expect(output?.dataset.canAutofill).toBe("true");
+		expect(output?.dataset.canEnqueue).toBe("true");
 		expect(output?.dataset.disabledMessage).toBe("");
 		expect(output?.dataset.outputHasRuntimeTarget).toBe("false");
 
@@ -425,7 +425,7 @@ describe("useItemDetailLines", () => {
 		expect(output?.dataset.outputHasRuntimeTarget).toBe("false");
 
 		await act(async () => publishRuntime(withoutSource));
-		expect(output?.dataset.canAutofill).toBe("false");
+		expect(output?.dataset.canEnqueue).toBe("false");
 		expect(output?.dataset.outputHasRuntimeTarget).toBe("false");
 	});
 

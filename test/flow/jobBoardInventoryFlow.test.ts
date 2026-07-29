@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~/engine/game/fx/useGameFx";
-import { startLineFx } from "~/engine/job/write/startLineFx";
+import { startLineFx } from "~test/job/support/startLineTestFx";
 import { enqueueLineFx } from "~/engine/job/write/enqueueLineFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import { removeItemFx } from "~/engine/runtime/write/removeItemFx";
@@ -11,7 +11,6 @@ import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { TickFx } from "~/engine/tick/context/TickFx";
 import { runTickRuntimeByFx } from "~/engine/tick/fx/runTickRuntimeByFx";
 import { createJobTestConfig, prepareJobLineFx } from "~test/job/support/jobTestConfig";
-import { StartLineResultEnumSchema } from "~/engine/job/schema/StartLineResultEnumSchema";
 
 const props = {
 	ownerItemId: "runtime:forge",
@@ -167,7 +166,7 @@ describe("job board and inventory flow", () => {
 			),
 		);
 
-		expect(result.first.type).toBe(StartLineResultEnumSchema.enum.Started);
+		expect(result.first.type).toBe("started");
 		expect(result.second).toMatchObject(props);
 		expect(result.runtime.jobs).toEqual([]);
 		expect(result.runtime.jobQueue).toEqual([]);

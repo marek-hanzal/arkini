@@ -2,7 +2,6 @@ import { Effect, Option } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { DeliveryPhaseEnumSchema } from "~/engine/delivery/schema/DeliveryPhaseEnumSchema";
-import type { DeliveryPurposeSchema } from "~/engine/delivery/schema/DeliveryPurposeSchema";
 import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
 import { planLineInputAutofillFx } from "~/engine/input/fx/planLineInputAutofillFx";
 import { isolateStatefulOwnerTransitionFx } from "~/engine/item/fx/isolateStatefulOwnerTransitionFx";
@@ -16,7 +15,6 @@ export namespace autofillLineInputsFx {
 	export interface Props {
 		readonly ownerItemId: IdSchema.Type;
 		readonly lineId: IdSchema.Type;
-		readonly purpose?: DeliveryPurposeSchema.Type;
 	}
 
 	export interface Result {
@@ -42,9 +40,6 @@ export namespace autofillLineInputsRuntimeFx {
 export const autofillLineInputsRuntimeFx = Effect.fn("autofillLineInputsRuntimeFx")(function* ({
 	ownerItemId,
 	lineId,
-	purpose = {
-		kind: "fill",
-	},
 	runtime,
 }: autofillLineInputsRuntimeFx.Props) {
 	const plan = yield* planLineInputAutofillFx({
@@ -101,7 +96,6 @@ export const autofillLineInputsRuntimeFx = Effect.fn("autofillLineInputsRuntimeF
 					phase: DeliveryPhaseEnumSchema.enum.Outbound,
 					generation: 0,
 					origin: source.location,
-					purpose,
 					target: {
 						kind: "line-input",
 						ownerItemId,
@@ -117,22 +111,6 @@ export const autofillLineInputsRuntimeFx = Effect.fn("autofillLineInputsRuntimeF
 		} satisfies RuntimeSchema.Type;
 		deliveryItemIds.push(delivery.id);
 	}
-	if (purpose.kind === "fill-and-try-start") {
-		const existingIntents = deliveryRuntime.deliveryStartIntents ?? [];
-		const sameLine = (intent: (typeof existingIntents)[number]) =>
-			intent.ownerItemId === purpose.ownerItemId && intent.lineId === purpose.lineId;
-		deliveryRuntime = {
-			...deliveryRuntime,
-			deliveryStartIntents: [
-				...existingIntents.filter((intent) => !sameLine(intent)),
-				{
-					ownerItemId: purpose.ownerItemId,
-					lineId: purpose.lineId,
-				},
-			],
-		} satisfies RuntimeSchema.Type;
-	}
-
 	const isolation = yield* isolateStatefulOwnerTransitionFx({
 		ownerItemId,
 		runtime: deliveryRuntime,
@@ -158,16 +136,12 @@ export const autofillLineInputsRuntimeFx = Effect.fn("autofillLineInputsRuntimeF
 export const autofillLineInputsFx = Effect.fn("autofillLineInputsFx")(function* ({
 	ownerItemId,
 	lineId,
-	purpose = {
-		kind: "fill",
-	},
 }: autofillLineInputsFx.Props) {
 	return yield* modifyRuntimeFx((runtime) =>
 		Effect.gen(function* () {
 			const autofill = yield* autofillLineInputsRuntimeFx({
 				ownerItemId,
 				lineId,
-				purpose,
 				runtime,
 			});
 			return [

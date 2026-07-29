@@ -2,12 +2,11 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~/engine/game/fx/useGameFx";
-import { startLineFx } from "~/engine/job/write/startLineFx";
+import { startLineFx } from "~test/job/support/startLineTestFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { runTickRuntimeByFx } from "~/engine/tick/fx/runTickRuntimeByFx";
-import { StartLineResultEnumSchema } from "~/engine/job/schema/StartLineResultEnumSchema";
 
 const config = GameConfigSchema.parse({
 	version: "1.0",
@@ -120,7 +119,7 @@ describe("craft start resolution", () => {
 			),
 		);
 
-		expect(result.started.type).toBe(StartLineResultEnumSchema.enum.Started);
+		expect(result.started.type).toBe("started");
 		expect(result.beforeTick.items.filter((item) => item.item.id === "craft")).toHaveLength(2);
 		expect(result.beforeTick.jobs[0]?.remainingMs).toBe(1_000);
 		expect(result.afterTick.jobs[0]?.remainingMs).toBe(1_000);

@@ -2,8 +2,6 @@ import { Effect, Option } from "effect";
 
 import type { DeliveryTargetIssueSchema } from "~/engine/delivery/schema/check/DeliveryTargetIssueSchema";
 import { DeliveryTargetIssueReasonEnumSchema } from "~/engine/delivery/schema/check/DeliveryTargetIssueReasonEnumSchema";
-import type { DeliveryPurposeIssueSchema } from "~/engine/delivery/schema/check/DeliveryPurposeIssueSchema";
-import { DeliveryPurposeIssueReasonEnumSchema } from "~/engine/delivery/schema/check/DeliveryPurposeIssueReasonEnumSchema";
 import { resolveInputMaterialFx } from "~/engine/input/fx/resolveInputMaterialFx";
 import { isMaterialInputEligible } from "~/engine/input/read/readMaterialInputEligibilityFx";
 import { InputEnumSchema } from "~/engine/input/schema/InputEnumSchema";
@@ -33,51 +31,12 @@ export const checkRuntimeDeliveriesFx = Effect.fn("checkRuntimeDeliveriesFx")(fu
 	runtime,
 }: checkRuntimeDeliveriesFx.Props) {
 	const issues: DeliveryTargetIssueSchema.Type[] = [];
-	const purposeIssues: DeliveryPurposeIssueSchema.Type[] = [];
 	const validClaims: ValidClaim[] = [];
 
 	for (const item of runtime.items) {
 		const delivery = yield* isDeliveryRuntimeItemFx(item);
 		if (Option.isNone(delivery)) continue;
 		const current = delivery.value;
-		const purpose = current.location.purpose;
-		if (purpose.kind === "fill-and-try-start") {
-			const purposeIssue = (
-				reason: DeliveryPurposeIssueReasonEnumSchema.Type,
-			): DeliveryPurposeIssueSchema.Type => ({
-				itemId: current.id,
-				purpose,
-				reason,
-				type: RuntimeCheckIssueEnumSchema.enum.DeliveryPurpose,
-			});
-			const owner = runtime.items.find((candidate) => candidate.id === purpose.ownerItemId);
-			if (owner === undefined) {
-				purposeIssues.push(
-					purposeIssue(DeliveryPurposeIssueReasonEnumSchema.enum.OwnerMissing),
-				);
-			} else if (owner.location.scope !== LocationScopeEnumSchema.enum.Board) {
-				purposeIssues.push(
-					purposeIssue(DeliveryPurposeIssueReasonEnumSchema.enum.OwnerNotOnBoard),
-				);
-			} else if (
-				(yield* readItemLineFx({
-					item: owner.item,
-					lineId: purpose.lineId,
-				})) === undefined
-			) {
-				purposeIssues.push(
-					purposeIssue(DeliveryPurposeIssueReasonEnumSchema.enum.LineMissing),
-				);
-			} else if (
-				current.location.phase === "outbound" &&
-				(current.location.target.ownerItemId !== purpose.ownerItemId ||
-					current.location.target.lineId !== purpose.lineId)
-			) {
-				purposeIssues.push(
-					purposeIssue(DeliveryPurposeIssueReasonEnumSchema.enum.TargetMismatch),
-				);
-			}
-		}
 		if (current.location.phase !== "outbound") continue;
 		const { target } = current.location;
 		const issue = (
@@ -207,47 +166,5 @@ export const checkRuntimeDeliveriesFx = Effect.fn("checkRuntimeDeliveriesFx")(fu
 		}
 	}
 
-	const seenIntents = new Set<string>();
-	for (const intent of runtime.deliveryStartIntents ?? []) {
-		const purpose = {
-			kind: "fill-and-try-start" as const,
-			...intent,
-		};
-		const issue = (
-			reason: DeliveryPurposeIssueReasonEnumSchema.Type,
-		): DeliveryPurposeIssueSchema.Type => ({
-			purpose,
-			reason,
-			type: RuntimeCheckIssueEnumSchema.enum.DeliveryPurpose,
-		});
-		const key = `${intent.ownerItemId}:${intent.lineId}`;
-		if (seenIntents.has(key)) {
-			purposeIssues.push(issue(DeliveryPurposeIssueReasonEnumSchema.enum.Duplicate));
-			continue;
-		}
-		seenIntents.add(key);
-		const owner = runtime.items.find((candidate) => candidate.id === intent.ownerItemId);
-		if (owner === undefined) {
-			purposeIssues.push(issue(DeliveryPurposeIssueReasonEnumSchema.enum.OwnerMissing));
-			continue;
-		}
-		if (owner.location.scope !== LocationScopeEnumSchema.enum.Board) {
-			purposeIssues.push(issue(DeliveryPurposeIssueReasonEnumSchema.enum.OwnerNotOnBoard));
-			continue;
-		}
-		if (
-			(yield* readItemLineFx({
-				item: owner.item,
-				lineId: intent.lineId,
-			})) === undefined
-		) {
-			purposeIssues.push(issue(DeliveryPurposeIssueReasonEnumSchema.enum.LineMissing));
-			continue;
-		}
-	}
-
-	return [
-		...issues,
-		...purposeIssues,
-	];
+	return issues;
 });

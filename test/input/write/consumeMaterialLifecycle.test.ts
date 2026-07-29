@@ -3,13 +3,12 @@ import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~/engine/game/fx/useGameFx";
 import { storeInputMaterialFx } from "~/engine/input/write/storeInputMaterialFx";
-import { startLineFx } from "~/engine/job/write/startLineFx";
+import { startLineFx } from "~test/job/support/startLineTestFx";
 import { setDefaultLineFx } from "~/engine/line/write/setDefaultLineFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { runTickRuntimeByFx } from "~/engine/tick/fx/runTickRuntimeByFx";
-import { StartLineResultEnumSchema } from "~/engine/job/schema/StartLineResultEnumSchema";
 
 const base = (id: string) => ({
 	id,
@@ -212,7 +211,7 @@ describe("consume material lifecycle", () => {
 					ownerItemId: converter.id,
 					lineId: "line:converter:run",
 				});
-				if (started.type !== StartLineResultEnumSchema.enum.Started) {
+				if (started.type !== "started") {
 					return yield* Effect.die(new Error("Expected the converter job to start."));
 				}
 				const running = yield* readRuntimeFx();
@@ -343,7 +342,7 @@ describe("consume material lifecycle", () => {
 			),
 		);
 
-		expect(result.started.type).toBe(StartLineResultEnumSchema.enum.Started);
+		expect(result.started.type).toBe("started");
 		const products = result.runtime.items.filter((item) => item.item.id === "item:product");
 		expect(products).toHaveLength(1);
 		expect(products[0]?.id).not.toBe(result.product.id);

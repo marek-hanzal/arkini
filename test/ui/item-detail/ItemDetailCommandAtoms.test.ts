@@ -58,7 +58,7 @@ describe("Item Detail command authority", () => {
 
 		registry.set(atom, {
 			key: "line:first",
-			action: "start",
+			action: "enqueue",
 			failureMessage: "Start failed.",
 			run: Effect.sync(run),
 		});
@@ -99,7 +99,7 @@ describe("Item Detail command authority", () => {
 		});
 		registry.set(atom, {
 			key: "line:second",
-			action: "start",
+			action: "enqueue",
 			failureMessage: "Start failed.",
 			run: Effect.sync(secondRun).pipe(Effect.andThen(Deferred.await(second))),
 		});
@@ -136,7 +136,7 @@ describe("Item Detail command authority", () => {
 
 		registry.set(atom, {
 			key: "line:first",
-			action: "start",
+			action: "enqueue",
 			failureMessage: "Fallback failure.",
 			run: Effect.fail(
 				new ExpectedCommandFailure({
@@ -154,7 +154,7 @@ describe("Item Detail command authority", () => {
 		const retry = Effect.runSync(Deferred.make<void>());
 		registry.set(atom, {
 			key: "line:first",
-			action: "start",
+			action: "enqueue",
 			failureMessage: "Fallback failure.",
 			run: Deferred.await(retry),
 		});
@@ -250,7 +250,7 @@ describe("Item Detail command authority", () => {
 		const unmount = registry.mount(atom);
 		registry.set(atom, {
 			key: "line:first",
-			action: "start",
+			action: "enqueue",
 			failureMessage: "Start failed.",
 			run: Effect.failCause(defectCause),
 		});

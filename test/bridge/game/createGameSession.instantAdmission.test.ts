@@ -8,7 +8,7 @@ import { setInstantGameplayFx } from "~/engine/cheat/write/setInstantGameplayFx"
 import { settleItemDeliveryFx } from "~/engine/delivery/write/settleItemDeliveryFx";
 import { storeInputMaterialFx } from "~/engine/input/write/storeInputMaterialFx";
 import { enqueueLineFx } from "~/engine/job/write/enqueueLineFx";
-import { startLineFx } from "~/engine/job/write/startLineFx";
+import { startLineFx } from "~test/job/support/startLineTestFx";
 import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
 import { runTickRuntimeByFx } from "~/engine/tick/fx/runTickRuntimeByFx";
 import { TickStepMs } from "~/engine/tick/TickStepMs";

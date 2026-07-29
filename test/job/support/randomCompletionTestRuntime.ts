@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
 import type { JobSchema } from "~/engine/job/schema/JobSchema";
-import { startLineFx } from "~/engine/job/write/startLineFx";
+import { startLineFx } from "~test/job/support/startLineTestFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";

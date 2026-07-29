@@ -1,11 +1,8 @@
 import { Effect } from "effect";
 
-import { fulfillDeliveryStartPurposesRuntimeFx } from "~/engine/delivery/fx/fulfillDeliveryStartPurposesRuntimeFx";
 import { isPassiveStorageLocationFx } from "~/engine/location/read/isPassiveStorageLocationFx";
 import { isInstantGameplayEnabledFx } from "~/engine/cheat/read/isInstantGameplayEnabledFx";
 import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
-import { JobStartSourceEnumSchema } from "~/engine/event/schema/JobStartSourceEnumSchema";
-import { StartLineResultEnumSchema } from "~/engine/job/schema/StartLineResultEnumSchema";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
 import { advanceTemporaryItemDurationsFx } from "~/engine/item/temporary/fx/advanceTemporaryItemDurationsFx";
@@ -46,17 +43,16 @@ const dispatchQueueRequestFx = Effect.fn("dispatchQueueRequestFx")(function* (
 		requestId,
 		runtime,
 	});
-	if (attempt.type !== StartLineResultEnumSchema.enum.Started) return attempt;
+	if (attempt.type !== "started") return attempt;
 
 	return {
-		type: StartLineResultEnumSchema.enum.Started,
+		type: "started",
 		events: [
 			{
 				type: GameEventEnumSchema.enum.JobStarted,
 				jobId: attempt.job.id,
 				ownerItemId: attempt.job.ownerItemId,
 				lineId: attempt.job.lineId,
-				source: JobStartSourceEnumSchema.enum.Queue,
 			} satisfies GameEventSchema.Type,
 			...attempt.events,
 		],
@@ -84,7 +80,7 @@ const dispatchIdleQueueHeadsFx = Effect.fn("dispatchIdleQueueHeadsFx")(function*
 			events.push(...dispatched.events);
 			continue;
 		}
-		if (dispatched.type !== StartLineResultEnumSchema.enum.Started) continue;
+		if (dispatched.type !== "started") continue;
 		draft = dispatched.runtime;
 		activeOwnerItemIds.add(request.ownerItemId);
 		events.push(...dispatched.events);
@@ -107,10 +103,7 @@ const dispatchIdleQueueHeadsFx = Effect.fn("dispatchIdleQueueHeadsFx")(function*
 export const advanceRuntimeStepFx = Effect.fn("advanceRuntimeStepFx")(function* (
 	stepStart: RuntimeSchema.Type,
 ) {
-	const retriedDeliveryIntents = yield* fulfillDeliveryStartPurposesRuntimeFx({
-		runtime: stepStart,
-	});
-	const boundaryStart = yield* dispatchIdleQueueHeadsFx(retriedDeliveryIntents.runtime);
+	const boundaryStart = yield* dispatchIdleQueueHeadsFx(stepStart);
 	const instantGameplay = yield* isInstantGameplayEnabledFx({
 		runtime: boundaryStart.runtime,
 	});
@@ -144,7 +137,6 @@ export const advanceRuntimeStepFx = Effect.fn("advanceRuntimeStepFx")(function* 
 	}
 
 	const events: GameEventSchema.Type[] = [
-		...retriedDeliveryIntents.events,
 		...boundaryStart.events,
 	];
 	const completedOwnerItemIds: IdSchema.Type[] = [];

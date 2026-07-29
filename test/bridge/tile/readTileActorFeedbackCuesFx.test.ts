@@ -37,7 +37,6 @@ describe("readTileActorFeedbackCuesFx", () => {
 					jobId: "job:lumberjack",
 					ownerItemId: "runtime:lumberjack",
 					lineId: "line:lumberjack",
-					source: "explicit",
 				},
 				{
 					type: "item:consumed",
@@ -158,7 +157,6 @@ describe("readTileActorFeedbackCuesFx", () => {
 					jobId: "job:free",
 					ownerItemId: "runtime:free-producer",
 					lineId: "line:free",
-					source: "explicit",
 				},
 			],
 			sequence: 13,

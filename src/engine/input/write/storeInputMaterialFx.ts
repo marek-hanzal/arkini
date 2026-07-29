@@ -4,7 +4,6 @@ import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeIntegerSchema";
 import type { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
 import { reconcileOutboundDeliveriesRuntimeFx } from "~/engine/delivery/fx/reconcileOutboundDeliveriesRuntimeFx";
-import { fulfillDeliveryStartPurposesRuntimeFx } from "~/engine/delivery/fx/fulfillDeliveryStartPurposesRuntimeFx";
 import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
 import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
 import { InputMaterialUnavailableError } from "~/engine/input/error/InputMaterialUnavailableError";
@@ -234,12 +233,9 @@ export const storeInputMaterialFx = Effect.fn("storeInputMaterialFx")(function* 
 			const reconciledRuntime = yield* reconcileOutboundDeliveriesRuntimeFx({
 				runtime: isolation.runtime,
 			});
-			const fulfilledPurposes = yield* fulfillDeliveryStartPurposesRuntimeFx({
-				runtime: reconciledRuntime,
-			});
 			const runtimeOwnerItem = yield* readRuntimeItemByIdFx({
 				itemId: ownerItemId,
-				runtime: fulfilledPurposes.runtime,
+				runtime: reconciledRuntime,
 			});
 			const ownerItem = Option.getOrUndefined(yield* isGridRuntimeItemFx(runtimeOwnerItem));
 			if (ownerItem === undefined) {
@@ -256,7 +252,7 @@ export const storeInputMaterialFx = Effect.fn("storeInputMaterialFx")(function* 
 					sourceBefore: source,
 					ownerItem,
 				} satisfies InputMaterialStoreResultSchema.Type,
-				fulfilledPurposes.runtime,
+				reconciledRuntime,
 				[
 					{
 						type: GameEventEnumSchema.enum.ItemInputStored,
@@ -271,7 +267,6 @@ export const storeInputMaterialFx = Effect.fn("storeInputMaterialFx")(function* 
 						inputIndex,
 					} satisfies GameEventSchema.Type,
 					...isolation.events,
-					...fulfilledPurposes.events,
 				],
 			] as const;
 		});

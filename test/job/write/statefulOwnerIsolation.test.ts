@@ -4,7 +4,7 @@ import { createTestGameSession } from "~test/bridge/game/createTestGameSession";
 
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { useGameFx } from "~/engine/game/fx/useGameFx";
-import { startLineFx } from "~/engine/job/write/startLineFx";
+import { startLineFx } from "~test/job/support/startLineTestFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
 

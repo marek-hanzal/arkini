@@ -2,6 +2,7 @@ import { match } from "ts-pattern";
 
 import { JobStatusEnumSchema } from "~/bridge/job/JobStatusEnumSchema";
 import type { ItemDetailLines } from "~/bridge/item-detail/ItemDetailLines";
+import { ItemDetailQueueBadgeClassName } from "~/ui/item-detail/ItemDetailQueueBadgeClassName";
 
 /** Renders one line's identity, readiness, active state, and description. */
 export const ItemLineSummary = ({
@@ -74,7 +75,7 @@ export const ItemLineSummary = ({
 				)}
 				{stale || line.activeJob !== undefined || line.queuedRequestCount === 0 ? null : (
 					<span
-						className="rounded-full border border-warning/45 bg-warning/15 px-2.5 py-1 text-xs font-semibold text-foreground"
+						className={ItemDetailQueueBadgeClassName}
 						data-ui="TileLineQueuedBadge"
 					>
 						Queued

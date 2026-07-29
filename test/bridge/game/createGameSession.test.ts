@@ -5,7 +5,7 @@ import { createTestGameSession } from "~test/bridge/game/createTestGameSession";
 
 import type { Game } from "~/bridge/game/Game";
 import { createGameEngineResourceFx } from "~/bridge/game/createGameEngineResourceFx";
-import { startLineFx } from "~/engine/job/write/startLineFx";
+import { startLineFx } from "~test/job/support/startLineTestFx";
 import { enqueueLineFx } from "~/engine/job/write/enqueueLineFx";
 import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
 import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
@@ -842,7 +842,7 @@ describe("createGameSessionFx", () => {
 				event.type === GameEventEnumSchema.enum.JobStarted ||
 				event.type === GameEventEnumSchema.enum.JobCompleted
 					? [
-							`${event.type}:${"source" in event ? event.source : ""}`,
+							event.type,
 						]
 					: [],
 			);
@@ -873,12 +873,12 @@ describe("createGameSessionFx", () => {
 			await waitFor(() => batches.length === 2);
 			expect(batches).toEqual([
 				[
-					"job:started:explicit",
+					"job:started",
 				],
 				[
-					"job:completed:",
-					"job:started:queue",
-					"job:completed:",
+					"job:completed",
+					"job:started",
+					"job:completed",
 				],
 			]);
 		} finally {

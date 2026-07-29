@@ -2,7 +2,6 @@ import { z } from "zod";
 
 import { CheatStateSchema } from "~/engine/cheat/schema/CheatStateSchema";
 import { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeIntegerSchema";
-import { DeliveryStartIntentSchema } from "~/engine/delivery/schema/DeliveryStartIntentSchema";
 import { JobQueueRequestSchema } from "~/engine/job/schema/JobQueueRequestSchema";
 import { JobSchema } from "~/engine/job/schema/JobSchema";
 import { DefaultLineByOwnerItemIdSchema } from "~/engine/line/schema/DefaultLineByOwnerItemIdSchema";
@@ -30,10 +29,6 @@ export const RuntimeSchema = z
 		defaultLineByOwnerItemId: DefaultLineByOwnerItemIdSchema.optional().describe(
 			"Save-backed default product line selected for exact live owner identities.",
 		),
-		deliveryStartIntents: z
-			.array(DeliveryStartIntentSchema)
-			.optional()
-			.describe("Save-backed starts waiting for physically delivered line inputs."),
 	})
 	.strict()
 	.meta({

@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import { setCheatEnabledFx } from "~/engine/cheat/write/setCheatEnabledFx";
 import { setInstantGameplayFx } from "~/engine/cheat/write/setInstantGameplayFx";
 import { useGameFx } from "~/engine/game/fx/useGameFx";
-import { startLineFx } from "~/engine/job/write/startLineFx";
+import { startLineFx } from "~test/job/support/startLineTestFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import { runTickRuntimeByFx } from "~/engine/tick/fx/runTickRuntimeByFx";
 import { TickStepMs } from "~/engine/tick/TickStepMs";

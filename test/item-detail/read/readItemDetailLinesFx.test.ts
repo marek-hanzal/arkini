@@ -98,9 +98,6 @@ describe("readItemDetailLinesFx", () => {
 						y: 0,
 					},
 				},
-				purpose: {
-					kind: "fill" as const,
-				},
 				target: {
 					kind: "line-input" as const,
 					ownerItemId: "runtime:workshop",
@@ -135,9 +132,6 @@ describe("readItemDetailLinesFx", () => {
 								x: 6,
 								y: 0,
 							},
-						},
-						purpose: {
-							kind: "fill",
 						},
 						returnFrom: {
 							scope: "board",
@@ -183,9 +177,6 @@ describe("readItemDetailLinesFx", () => {
 						y: 0,
 					},
 				},
-				purpose: {
-					kind: "fill" as const,
-				},
 				target: {
 					kind: "line-input" as const,
 					ownerItemId: "runtime:workshop",
@@ -214,9 +205,6 @@ describe("readItemDetailLinesFx", () => {
 						x: 0,
 						y: 0,
 					},
-				},
-				purpose: {
-					kind: "fill" as const,
 				},
 				returnFrom: {
 					scope: "board" as const,
@@ -636,11 +624,7 @@ describe("readItemDetailLinesFx", () => {
 				kind: "available",
 				readiness: "queue",
 			},
-			actions: {
-				immediate: {
-					enabled: false,
-				},
-			},
+			actions: {},
 		});
 	});
 

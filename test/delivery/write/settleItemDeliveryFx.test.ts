@@ -4,7 +4,6 @@ import { describe, expect, it } from "vitest";
 import { settleItemDeliveryFx } from "~/engine/delivery/write/settleItemDeliveryFx";
 import { useGameFx } from "~/engine/game/fx/useGameFx";
 import { autofillLineInputsFx } from "~/engine/input/write/autofillLineInputsFx";
-import { storeInputMaterialFx } from "~/engine/input/write/storeInputMaterialFx";
 import { getItemFx } from "~/engine/runtime/read/getItemFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import { fromStateFx } from "~/engine/runtime/fx/fromStateFx";
@@ -297,169 +296,6 @@ describe("settleItemDeliveryFx", () => {
 		).toBe(4);
 	});
 
-	it("lets a player store preempt delivery and fulfils the retained start intent once", () => {
-		const result = Effect.runSync(
-			Effect.gen(function* () {
-				yield* spawnOwnerAndWaterFx;
-				yield* spawnItemFx({
-					id: "runtime:manual",
-					itemId: "water",
-					location: sourceLocation(2),
-					quantity: 3,
-				});
-				yield* autofillLineInputsFx({
-					ownerItemId,
-					lineId,
-					purpose: {
-						kind: "fill-and-try-start",
-						ownerItemId,
-						lineId,
-					},
-				});
-				const manual = yield* getItemFx({
-					itemId: "runtime:manual",
-				});
-				yield* storeInputMaterialFx({
-					ownerItemId,
-					lineId,
-					inputIndex: 0,
-					sourceItemId: manual.id,
-					sourceItemRevision: manual.revision,
-					quantity: 3,
-				});
-				return yield* readRuntimeFx();
-			}).pipe(
-				useGameFx({
-					config: inputRuntimeTestConfig,
-				}),
-			),
-		);
-
-		expect(result.jobs).toHaveLength(1);
-		expect(result.jobQueue ?? []).toHaveLength(0);
-		expect(result.items.find(({ id }) => id === "runtime:water")).toMatchObject({
-			location: {
-				generation: 1,
-				phase: "returning",
-				purpose: {
-					kind: "fill",
-				},
-				scope: "delivery",
-			},
-			quantity: 7,
-		});
-	});
-
-	it("fulfils start intent when exact cargo becomes input and no delivery identity remains", () => {
-		const runtime = Effect.runSync(
-			Effect.gen(function* () {
-				yield* spawnItemFx({
-					id: ownerItemId,
-					itemId: "workshop",
-					location: workshopLocation,
-					quantity: 1,
-				});
-				yield* spawnItemFx({
-					id: "runtime:water",
-					itemId: "water",
-					location: sourceLocation(1),
-					quantity: 3,
-				});
-				yield* autofillLineInputsFx({
-					ownerItemId,
-					lineId,
-					purpose: {
-						kind: "fill-and-try-start",
-						ownerItemId,
-						lineId,
-					},
-				});
-				yield* settleItemDeliveryFx({
-					itemId: "runtime:water",
-					generation: 0,
-				});
-				return yield* readRuntimeFx();
-			}).pipe(
-				useGameFx({
-					config: inputRuntimeTestConfig,
-				}),
-			),
-		);
-
-		expect(runtime.jobs).toHaveLength(1);
-		expect(runtime.items.find(({ id }) => id === "runtime:water")?.location.scope).toBe("job");
-		expect(runtime.deliveryStartIntents).toEqual([]);
-	});
-
-	it("persists start intent after exact partial cargo disappears until later manual input", () => {
-		const runtime = Effect.runSync(
-			Effect.gen(function* () {
-				yield* spawnItemFx({
-					id: ownerItemId,
-					itemId: "workshop",
-					location: workshopLocation,
-					quantity: 1,
-				});
-				yield* spawnItemFx({
-					id: "runtime:water",
-					itemId: "water",
-					location: sourceLocation(1),
-					quantity: 2,
-				});
-				yield* autofillLineInputsFx({
-					ownerItemId,
-					lineId,
-					purpose: {
-						kind: "fill-and-try-start",
-						ownerItemId,
-						lineId,
-					},
-				});
-				yield* settleItemDeliveryFx({
-					itemId: "runtime:water",
-					generation: 0,
-				});
-				const waitingState = yield* fromRuntimeFx({
-					runtime: yield* readRuntimeFx(),
-				});
-				const hydrated = yield* fromStateFx({
-					state: waitingState,
-				});
-				expect(hydrated.deliveryStartIntents).toEqual([
-					{
-						ownerItemId,
-						lineId,
-					},
-				]);
-				yield* spawnItemFx({
-					id: "runtime:manual",
-					itemId: "water",
-					location: sourceLocation(2),
-					quantity: 1,
-				});
-				const manual = yield* getItemFx({
-					itemId: "runtime:manual",
-				});
-				yield* storeInputMaterialFx({
-					ownerItemId,
-					lineId,
-					inputIndex: 0,
-					sourceItemId: manual.id,
-					sourceItemRevision: manual.revision,
-					quantity: 1,
-				});
-				return yield* readRuntimeFx();
-			}).pipe(
-				useGameFx({
-					config: inputRuntimeTestConfig,
-				}),
-			),
-		);
-
-		expect(runtime.jobs).toHaveLength(1);
-		expect(runtime.deliveryStartIntents).toEqual([]);
-	});
-
 	it("persists outbound motion facts and keeps the origin lease occupied", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {
@@ -592,18 +428,13 @@ describe("settleItemDeliveryFx", () => {
 		expect(Result.isFailure(result.conflict)).toBe(true);
 	});
 
-	it("redirects home and clears an impossible start intent when its target owner is removed", () => {
+	it("redirects delivery home when its target owner is removed", () => {
 		const runtime = Effect.runSync(
 			Effect.gen(function* () {
 				yield* spawnOwnerAndWaterFx;
 				yield* autofillLineInputsFx({
 					ownerItemId,
 					lineId,
-					purpose: {
-						kind: "fill-and-try-start",
-						ownerItemId,
-						lineId,
-					},
 				});
 				const owner = yield* getItemFx({
 					itemId: ownerItemId,
@@ -624,9 +455,6 @@ describe("settleItemDeliveryFx", () => {
 			location: {
 				generation: 1,
 				phase: "returning",
-				purpose: {
-					kind: "fill",
-				},
 				returnFrom: workshopLocation,
 				scope: "delivery",
 			},

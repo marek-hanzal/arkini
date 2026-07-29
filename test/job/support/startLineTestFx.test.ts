@@ -4,8 +4,8 @@ import { describe, expect, it } from "vitest";
 import { useGameFx } from "~/engine/game/fx/useGameFx";
 import { storeInputMaterialFx } from "~/engine/input/write/storeInputMaterialFx";
 import { startLineRuntimeFx } from "~/engine/job/fx/startLineRuntimeFx";
-import type { StartLineResultSchema } from "~/engine/job/schema/StartLineResultSchema";
-import { startLineFx } from "~/engine/job/write/startLineFx";
+import type { JobSchema } from "~/engine/job/schema/JobSchema";
+import { startLineFx } from "~test/job/support/startLineTestFx";
 import { enqueueLineFx } from "~/engine/job/write/enqueueLineFx";
 import { readLineRunFx } from "~/engine/line/fx/run/readLineRunFx";
 import { fromStateFx } from "~/engine/runtime/fx/fromStateFx";
@@ -17,21 +17,20 @@ import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
 import { fromRuntimeFx } from "~/engine/state/fx/fromRuntimeFx";
 import { createJobTestConfig, prepareJobLineFx } from "~test/job/support/jobTestConfig";
 import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
-import { StartLineResultEnumSchema } from "~/engine/job/schema/StartLineResultEnumSchema";
 
 const startProps = {
 	ownerItemId: "runtime:forge",
 	lineId: "line:forge:run",
 };
 
-const readStartedJob = (result: StartLineResultSchema.Type) => {
-	if (result.type !== StartLineResultEnumSchema.enum.Started) {
+const readStartedJob = (result: { readonly type: "started"; readonly job: JobSchema.Type }) => {
+	if (result.type !== "started") {
 		throw new Error("Expected an immediately started job.");
 	}
 	return result.job;
 };
 
-describe("startLineFx", () => {
+describe("startLineTestFx", () => {
 	it("atomically consumes, reserves, and creates one persistent job", () => {
 		const config = createJobTestConfig();
 		const result = Effect.runSync(
@@ -387,7 +386,7 @@ describe("startLineFx", () => {
 			),
 		);
 
-		expect(result.first.type).toBe(StartLineResultEnumSchema.enum.Started);
+		expect(result.first.type).toBe("started");
 		expect(result.second).toMatchObject(startProps);
 	});
 

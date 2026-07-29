@@ -7,7 +7,7 @@ import { readPlannedLineNetMaximumOutputQuantitiesFx } from "~/engine/job/fx/rea
 import { readReservedJobOutputQuantitiesFx } from "~/engine/job/fx/read/readReservedJobOutputQuantitiesFx";
 import { resolveLineStartFx } from "~/engine/job/fx/read/resolveLineStartFx";
 import { resolveOneHopLineOutputMaxCountFx } from "~/engine/job/fx/read/resolveOneHopLineOutputMaxCountFx";
-import { startLineFx } from "~/engine/job/write/startLineFx";
+import { startLineFx } from "~test/job/support/startLineTestFx";
 import { enqueueLineFx } from "~/engine/job/write/enqueueLineFx";
 import { readItemDetailLinesFx } from "~/engine/item-detail/read/readItemDetailLinesFx";
 import { fromStateFx } from "~/engine/runtime/fx/fromStateFx";
@@ -1383,11 +1383,7 @@ describe("blueprint job completion transition", () => {
 							itemId: "item:byproduct",
 						},
 					},
-					actions: {
-						immediate: {
-							enabled: false,
-						},
-					},
+					actions: {},
 				},
 			],
 		});
@@ -1437,11 +1433,7 @@ describe("blueprint job completion transition", () => {
 						kind: "available",
 						readiness: "inputs",
 					},
-					actions: {
-						immediate: {
-							enabled: true,
-						},
-					},
+					actions: {},
 				},
 			],
 		});

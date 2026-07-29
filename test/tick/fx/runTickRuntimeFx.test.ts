@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import { useGameFx } from "~/engine/game/fx/useGameFx";
 import { storeInputMaterialFx } from "~/engine/input/write/storeInputMaterialFx";
 import { readOwnerJobQueueFx } from "~/engine/job/read/readOwnerJobQueueFx";
-import { startLineFx } from "~/engine/job/write/startLineFx";
+import { startLineFx } from "~test/job/support/startLineTestFx";
 import { enqueueLineFx } from "~/engine/job/write/enqueueLineFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import { readCommittedTransitionFx } from "~/engine/runtime/read/readCommittedTransitionFx";
@@ -22,7 +22,6 @@ import {
 	prepareFixedStepRuntimeFx,
 	summarizeFixedStepRuntime,
 } from "~test/tick/support/fixedStepTestRuntime";
-import { StartLineResultEnumSchema } from "~/engine/job/schema/StartLineResultEnumSchema";
 
 const props = {
 	ownerItemId: "runtime:forge",
@@ -228,7 +227,7 @@ describe("runTickRuntimeByFx", () => {
 			),
 		);
 
-		expect(result.first.type).toBe(StartLineResultEnumSchema.enum.Started);
+		expect(result.first.type).toBe("started");
 		expect(result.second).toMatchObject(props);
 		expect(result.runtime.jobs).toEqual([]);
 		expect(result.runtime.jobQueue).toEqual([]);

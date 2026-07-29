@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
 import { useGameFx } from "~/engine/game/fx/useGameFx";
 import { storeInputMaterialFx } from "~/engine/input/write/storeInputMaterialFx";
-import { startLineFx } from "~/engine/job/write/startLineFx";
+import { startLineFx } from "~test/job/support/startLineTestFx";
 import { enqueueLineFx } from "~/engine/job/write/enqueueLineFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import { readCommittedTransitionFx } from "~/engine/runtime/read/readCommittedTransitionFx";
@@ -12,7 +12,6 @@ import { moveItemFx } from "~/engine/runtime/write/moveItemFx";
 import { removeItemFx } from "~/engine/runtime/write/removeItemFx";
 import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
 import { createJobTestConfig, prepareJobLineFx } from "../../job/support/jobTestConfig";
-import { StartLineResultEnumSchema } from "~/engine/job/schema/StartLineResultEnumSchema";
 
 const startProps = {
 	ownerItemId: "runtime:forge",
@@ -150,10 +149,7 @@ describe("removeItemFx owner lifecycle", () => {
 		);
 
 		expect(Result.isFailure(result.attempt)).toBe(true);
-		if (
-			Result.isFailure(result.attempt) &&
-			result.started.type === StartLineResultEnumSchema.enum.Started
-		) {
+		if (Result.isFailure(result.attempt) && result.started.type === "started") {
 			expect(result.attempt.failure).toMatchObject({
 				_tag: "JobOwnerBusyError",
 				ownerItemId: startProps.ownerItemId,

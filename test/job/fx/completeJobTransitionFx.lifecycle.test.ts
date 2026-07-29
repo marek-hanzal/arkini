@@ -4,14 +4,13 @@ import { describe, expect, it } from "vitest";
 import { useGameFx } from "~/engine/game/fx/useGameFx";
 import { checkRuntimeFx } from "~/engine/runtime/check/checkRuntimeFx";
 import { storeInputMaterialFx } from "~/engine/input/write/storeInputMaterialFx";
-import { startLineFx } from "~/engine/job/write/startLineFx";
+import { startLineFx } from "~test/job/support/startLineTestFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import type { StateSchema } from "~/engine/state/schema/StateSchema";
 import { runTickRuntimeByFx } from "~/engine/tick/fx/runTickRuntimeByFx";
 import { RuntimeCheckIssueEnumSchema } from "~/engine/runtime/schema/check/RuntimeCheckIssueEnumSchema";
-import { StartLineResultEnumSchema } from "~/engine/job/schema/StartLineResultEnumSchema";
 
 const output = {
 	set: [
@@ -457,7 +456,7 @@ describe("job completion charge lifecycle", () => {
 			}),
 		);
 
-		expect(result.restarted.type).toBe(StartLineResultEnumSchema.enum.Started);
+		expect(result.restarted.type).toBe("started");
 		expect(result.runtime.items.some((item) => item.item.id === "craft:repeatable")).toBe(true);
 		expect(result.runtime.items.filter((item) => item.item.id === "item:gift")).toHaveLength(1);
 	});
@@ -498,7 +497,7 @@ describe("job completion charge lifecycle", () => {
 			}),
 		);
 
-		expect(result.started.type).toBe(StartLineResultEnumSchema.enum.Started);
+		expect(result.started.type).toBe("started");
 		expect(
 			result.activeCheck.issues.some(
 				(issue) => issue.type === RuntimeCheckIssueEnumSchema.enum.ItemMaxCount,

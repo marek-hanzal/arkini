@@ -1,7 +1,6 @@
 import { z } from "zod";
 
 import { GameEventEnumSchema } from "./GameEventEnumSchema";
-import { JobStartSourceEnumSchema } from "./JobStartSourceEnumSchema";
 
 import { IdSchema } from "~/engine/common/schema/IdSchema";
 
@@ -13,7 +12,6 @@ export const JobStartedGameEventSchema = z
 		jobId: IdSchema,
 		ownerItemId: IdSchema,
 		lineId: IdSchema,
-		source: JobStartSourceEnumSchema,
 	})
 	.strict()
 	.meta({

@@ -24,9 +24,6 @@ export const discardRuntimeItemIdentityStateFx = Effect.fn("discardRuntimeItemId
 			jobQueue: (runtime.jobQueue ?? []).filter(
 				(request) => !ownerItemIds.has(request.ownerItemId),
 			),
-			deliveryStartIntents: (runtime.deliveryStartIntents ?? []).filter(
-				(intent) => !ownerItemIds.has(intent.ownerItemId),
-			),
 			...(Object.keys(defaultLineByOwnerItemId).length === 0
 				? {
 						defaultLineByOwnerItemId: undefined,

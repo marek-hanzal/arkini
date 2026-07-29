@@ -3,13 +3,12 @@ import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~/engine/game/fx/useGameFx";
 import { storeInputMaterialFx } from "~/engine/input/write/storeInputMaterialFx";
-import { startLineFx } from "~/engine/job/write/startLineFx";
+import { startLineFx } from "~test/job/support/startLineTestFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import { moveItemFx } from "~/engine/runtime/write/moveItemFx";
 import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
 import { runTickRuntimeByFx } from "~/engine/tick/fx/runTickRuntimeByFx";
 import { readArkiniGameConfigSource } from "~test/schema/support/readArkiniGameConfigSource";
-import { StartLineResultEnumSchema } from "~/engine/job/schema/StartLineResultEnumSchema";
 
 describe("authored craft lifecycle", () => {
 	it("pauses a seed craft in inventory and completes it after returning to the board", async () => {
@@ -112,7 +111,7 @@ describe("authored craft lifecycle", () => {
 			),
 		);
 
-		expect(result.started.type).toBe(StartLineResultEnumSchema.enum.Started);
+		expect(result.started.type).toBe("started");
 		expect(Result.isFailure(result.secondStart)).toBe(true);
 		if (Result.isFailure(result.secondStart)) {
 			expect([

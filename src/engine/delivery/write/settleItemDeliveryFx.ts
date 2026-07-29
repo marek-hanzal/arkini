@@ -3,8 +3,6 @@ import { Effect, Option } from "effect";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeIntegerSchema";
 import { reconcileOutboundDeliveriesRuntimeFx } from "~/engine/delivery/fx/reconcileOutboundDeliveriesRuntimeFx";
-import { fulfillDeliveryStartPurposesRuntimeFx } from "~/engine/delivery/fx/fulfillDeliveryStartPurposesRuntimeFx";
-import type { DeliveryPurposeSchema } from "~/engine/delivery/schema/DeliveryPurposeSchema";
 import { applyInputMaterialStorePlanFx } from "~/engine/input/fx/applyInputMaterialStorePlanFx";
 import { planInputMaterialStoreFx } from "~/engine/input/fx/planInputMaterialStoreFx";
 import { filterInputSlotItemsFx } from "~/engine/input/read/filterInputSlotItemsFx";
@@ -30,7 +28,6 @@ export namespace settleItemDeliveryFx {
 
 	export interface Result {
 		readonly acceptedQuantity: number;
-		readonly purpose?: DeliveryPurposeSchema.Type;
 		readonly status: "ignored" | "returned" | "stored";
 	}
 }
@@ -102,7 +99,6 @@ export const settleItemDeliveryFx = Effect.fn("settleItemDeliveryFx")(function* 
 				} satisfies RuntimeSchema.Type;
 				const result: settleItemDeliveryFx.Result = {
 					acceptedQuantity: 0,
-					purpose: current.location.purpose,
 					status: "returned",
 				};
 				return [
@@ -111,7 +107,6 @@ export const settleItemDeliveryFx = Effect.fn("settleItemDeliveryFx")(function* 
 				] as const;
 			}
 
-			const purpose = current.location.purpose;
 			const target = current.location.target;
 			const owner = runtime.items.find((candidate) => candidate.id === target.ownerItemId);
 			const line =
@@ -198,7 +193,6 @@ export const settleItemDeliveryFx = Effect.fn("settleItemDeliveryFx")(function* 
 							phase: "returning",
 							generation: current.location.generation + 1,
 							origin: current.location.origin,
-							purpose,
 							returnFrom: owner.location,
 						},
 					},
@@ -224,24 +218,14 @@ export const settleItemDeliveryFx = Effect.fn("settleItemDeliveryFx")(function* 
 			const reconciledRuntime = yield* reconcileOutboundDeliveriesRuntimeFx({
 				runtime: isolation.runtime,
 			});
-			const fulfilledPurposes = yield* fulfillDeliveryStartPurposesRuntimeFx({
-				purposes: [
-					purpose,
-				],
-				runtime: reconciledRuntime,
-			});
 			const result: settleItemDeliveryFx.Result = {
 				acceptedQuantity,
-				purpose,
 				status: acceptedQuantity > 0 ? "stored" : "returned",
 			};
 			return [
 				result,
-				fulfilledPurposes.runtime,
-				[
-					...isolation.events,
-					...fulfilledPurposes.events,
-				],
+				reconciledRuntime,
+				isolation.events,
 			] as const;
 		}),
 	);

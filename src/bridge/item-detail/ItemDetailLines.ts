@@ -173,15 +173,6 @@ export namespace ItemDetailLines {
 		  };
 
 	interface LineActions {
-		readonly immediate:
-			| {
-					readonly type: "fill";
-					readonly enabled: boolean;
-			  }
-			| {
-					readonly type: "start";
-					readonly enabled: boolean;
-			  };
 		readonly enqueue: {
 			readonly enabled: boolean;
 		};

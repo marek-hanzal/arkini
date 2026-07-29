@@ -2,7 +2,6 @@ import { z } from "zod";
 
 import { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeIntegerSchema";
 import { DeliveryPhaseEnumSchema } from "~/engine/delivery/schema/DeliveryPhaseEnumSchema";
-import { DeliveryPurposeSchema } from "~/engine/delivery/schema/DeliveryPurposeSchema";
 import { LineInputDeliveryTargetSchema } from "~/engine/delivery/schema/LineInputDeliveryTargetSchema";
 import { GridLocationSchema } from "./GridLocationSchema";
 import { LocationScopeEnumSchema } from "./LocationScopeEnumSchema";
@@ -24,7 +23,6 @@ const DeliveryLocationBaseSchema = z.object({
 	origin: GridLocationSchema.describe(
 		"The exact grid cell leased until this delivery no longer needs to return.",
 	),
-	purpose: DeliveryPurposeSchema,
 });
 
 export const DeliveryLocationSchema = z

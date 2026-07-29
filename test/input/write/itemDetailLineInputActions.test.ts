@@ -2,7 +2,6 @@ import { Cause, Effect, Exit, Option } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~/engine/game/fx/useGameFx";
-import { settleItemDeliveryFx } from "~/engine/delivery/write/settleItemDeliveryFx";
 import { autofillLineInputsFx } from "~/engine/input/write/autofillLineInputsFx";
 import { storeInputMaterialFx } from "~/engine/input/write/storeInputMaterialFx";
 import { withdrawLineInputFx } from "~/engine/input/write/withdrawLineInputFx";
@@ -264,137 +263,6 @@ describe("Item Detail line input actions", () => {
 		});
 	});
 
-	it("waits for every useful range top-up delivery before starting the line", () => {
-		const result = Effect.runSync(
-			Effect.gen(function* () {
-				yield* spawnOwnerFx();
-				yield* spawnWaterFx({
-					id: "runtime:minimum",
-					location: sourceLocation(1),
-					quantity: 1,
-				});
-				yield* spawnWaterFx({
-					id: "runtime:top-up",
-					location: sourceLocation(2),
-					quantity: 3,
-				});
-				yield* autofillLineInputsFx({
-					ownerItemId,
-					lineId,
-					purpose: {
-						kind: "fill-and-try-start",
-						ownerItemId,
-						lineId,
-					},
-				});
-
-				yield* settleItemDeliveryFx({
-					itemId: "runtime:minimum",
-					generation: 0,
-				});
-				const afterMinimum = yield* readRuntimeFx();
-				yield* settleItemDeliveryFx({
-					itemId: "runtime:top-up",
-					generation: 0,
-				});
-				return {
-					afterMinimum,
-					afterTopUp: yield* readRuntimeFx(),
-				};
-			}).pipe(
-				useGameFx({
-					config: rangeInputTestConfig,
-				}),
-			),
-		);
-
-		expect(result.afterMinimum.jobs).toHaveLength(0);
-		expect(
-			result.afterMinimum.items.find((item) => item.id === "runtime:top-up"),
-		).toMatchObject({
-			location: {
-				phase: "outbound",
-				scope: "delivery",
-			},
-		});
-		expect(result.afterTopUp.jobs).toHaveLength(1);
-		expect(
-			result.afterTopUp.items
-				.filter((item) => item.location.scope === "job")
-				.reduce((total, item) => total + item.quantity, 0),
-		).toBe(4);
-	});
-
-	it("waits for ordinary Fill deliveries that share a durable Fill & Start target", () => {
-		const result = Effect.runSync(
-			Effect.gen(function* () {
-				yield* spawnOwnerFx();
-				yield* spawnWaterFx({
-					id: "runtime:minimum",
-					location: sourceLocation(1),
-					quantity: 1,
-				});
-				yield* autofillLineInputsFx({
-					ownerItemId,
-					lineId,
-					purpose: {
-						kind: "fill-and-try-start",
-						ownerItemId,
-						lineId,
-					},
-				});
-				yield* spawnWaterFx({
-					id: "runtime:ordinary-top-up",
-					location: sourceLocation(2),
-					quantity: 3,
-				});
-				yield* autofillLineInputsFx({
-					ownerItemId,
-					lineId,
-				});
-
-				yield* settleItemDeliveryFx({
-					itemId: "runtime:minimum",
-					generation: 0,
-				});
-				const afterMinimum = yield* readRuntimeFx();
-				yield* settleItemDeliveryFx({
-					itemId: "runtime:ordinary-top-up",
-					generation: 0,
-				});
-				return {
-					afterMinimum,
-					afterTopUp: yield* readRuntimeFx(),
-				};
-			}).pipe(
-				useGameFx({
-					config: rangeInputTestConfig,
-				}),
-			),
-		);
-
-		expect(result.afterMinimum.jobs).toEqual([]);
-		expect(result.afterMinimum.deliveryStartIntents).toEqual([
-			{
-				ownerItemId,
-				lineId,
-			},
-		]);
-		expect(
-			result.afterMinimum.items.find((item) => item.id === "runtime:ordinary-top-up"),
-		).toMatchObject({
-			location: {
-				phase: "outbound",
-				purpose: {
-					kind: "fill",
-				},
-				scope: "delivery",
-			},
-		});
-		expect(result.afterTopUp.jobs).toHaveLength(1);
-		expect(result.afterTopUp.deliveryStartIntents).toEqual([]);
-	});
-
 	it("autofills deterministic board, Toolbar, and Inventory sources in physical priority", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {
@@ -460,9 +328,6 @@ describe("Item Detail line input actions", () => {
 			line: [
 				{
 					actions: {
-						immediate: {
-							enabled: true,
-						},
 						canWithdraw: false,
 					},
 				},
@@ -502,9 +367,6 @@ describe("Item Detail line input actions", () => {
 			line: [
 				{
 					actions: {
-						immediate: {
-							enabled: false,
-						},
 						canWithdraw: false,
 					},
 					availability: {
@@ -555,53 +417,6 @@ describe("Item Detail line input actions", () => {
 				scope: "delivery",
 			},
 			quantity: 7,
-		});
-	});
-
-	it("starts only after the physical delivery contact settles", () => {
-		const result = Effect.runSync(
-			Effect.gen(function* () {
-				yield* spawnOwnerFx();
-				yield* spawnWaterFx({
-					id: "runtime:water",
-					location: sourceLocation(1),
-					quantity: 7,
-				});
-
-				yield* autofillLineInputsFx({
-					ownerItemId,
-					lineId,
-					purpose: {
-						kind: "fill-and-try-start",
-						ownerItemId,
-						lineId,
-					},
-				});
-				const started = yield* settleItemDeliveryFx({
-					itemId: "runtime:water",
-					generation: 0,
-				});
-				return {
-					started,
-					runtime: yield* readRuntimeFx(),
-				};
-			}).pipe(
-				useGameFx({
-					config: inputRuntimeTestConfig,
-				}),
-			),
-		);
-
-		expect(result.runtime.jobs).toHaveLength(1);
-		expect(result.runtime.items.find((item) => item.id === "runtime:water")).toMatchObject({
-			location: {
-				phase: "returning",
-				scope: "delivery",
-			},
-			quantity: 4,
-		});
-		expect(result.started).toMatchObject({
-			status: "stored",
 		});
 	});
 
@@ -663,9 +478,6 @@ describe("Item Detail line input actions", () => {
 			line: [
 				{
 					actions: {
-						immediate: {
-							enabled: false,
-						},
 						canWithdraw: false,
 					},
 				},
@@ -760,9 +572,6 @@ describe("Item Detail line input actions", () => {
 			line: [
 				{
 					actions: {
-						immediate: {
-							enabled: true,
-						},
 						canWithdraw: false,
 					},
 					availability: {

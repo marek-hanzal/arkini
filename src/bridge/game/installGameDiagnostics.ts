@@ -14,7 +14,6 @@ const readDeliverySummary = (runtime: RuntimeSchema.Type) =>
 				quantity: item.quantity,
 				generation: location.generation,
 				phase: location.phase,
-				purpose: location.purpose,
 				origin: location.origin,
 				...(location.phase === "outbound"
 					? {
@@ -35,7 +34,6 @@ const readTransitionSignature = (transition: GameTransition) =>
 			lineId,
 			ownerItemId,
 		})),
-		deliveryStartIntents: transition.runtime.deliveryStartIntents ?? [],
 	});
 
 export const installGameDiagnostics = ({
@@ -89,7 +87,6 @@ export const installGameDiagnostics = ({
 					itemCount: runtime.items.length,
 					jobCount: runtime.jobs.length,
 					jobQueueCount: runtime.jobQueue?.length ?? 0,
-					deliveryStartIntentCount: runtime.deliveryStartIntents?.length ?? 0,
 					deliveries: readDeliverySummary(runtime),
 				},
 			});

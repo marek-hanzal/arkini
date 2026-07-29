@@ -96,7 +96,6 @@ describe("readGameAudioCuesFx", () => {
 					jobId: "job:1",
 					ownerItemId: "runtime:producer",
 					lineId: "line:1",
-					source: "explicit",
 				},
 				{
 					type: GameEventEnumSchema.enum.ItemSpawned,

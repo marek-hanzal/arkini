@@ -4,7 +4,6 @@ import { reconcileOutboundDeliveriesRuntimeFx } from "~/engine/delivery/fx/recon
 import { JobOwnerBusyError } from "~/engine/job/error/JobOwnerBusyError";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 import { discardRuntimeItemIdentityStateFx } from "~/engine/runtime/fx/discardRuntimeItemIdentityStateFx";
-import { reviseRuntimeItemFx } from "~/engine/runtime/fx/reviseRuntimeItemFx";
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
@@ -37,32 +36,9 @@ export const removeRuntimeItemIdentityFx = Effect.fn("removeRuntimeItemIdentityF
 		]),
 		runtime,
 	});
-	let removedRuntime = {
+	const removedRuntime = {
 		...withoutIdentityState,
 		items: withoutIdentityState.items.filter((candidate) => candidate.id !== item.id),
-	} satisfies RuntimeSchema.Type;
-	removedRuntime = {
-		...removedRuntime,
-		items: yield* Effect.forEach(removedRuntime.items, (candidate) => {
-			if (
-				candidate.location.scope !== LocationScopeEnumSchema.enum.Delivery ||
-				candidate.location.purpose.kind !== "fill-and-try-start" ||
-				candidate.location.purpose.ownerItemId !== item.id
-			) {
-				return Effect.succeed(candidate);
-			}
-			return reviseRuntimeItemFx({
-				item: {
-					...candidate,
-					location: {
-						...candidate.location,
-						purpose: {
-							kind: "fill" as const,
-						},
-					},
-				},
-			});
-		}),
 	} satisfies RuntimeSchema.Type;
 	const returnFromByOwnerItemId =
 		item.location.scope === LocationScopeEnumSchema.enum.Board ||

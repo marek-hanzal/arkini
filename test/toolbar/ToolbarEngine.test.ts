@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~/engine/game/fx/useGameFx";
 import { readOwnerJobQueueFx } from "~/engine/job/read/readOwnerJobQueueFx";
-import { startLineFx } from "~/engine/job/write/startLineFx";
+import { startLineFx } from "~test/job/support/startLineTestFx";
 import { checkRuntimeLocationsFx } from "~/engine/runtime/check/checkRuntimeLocationsFx";
 import { planDropScopePlacementFx } from "~/engine/placement/fx/planDropScopePlacementFx";
 import { fromStateFx } from "~/engine/runtime/fx/fromStateFx";

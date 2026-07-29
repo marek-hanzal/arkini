@@ -3,7 +3,6 @@ import { match } from "ts-pattern";
 import { useEnqueueItemDetailLine } from "~/bridge/item-detail/useEnqueueItemDetailLine";
 import type { ItemDetailLines } from "~/bridge/item-detail/ItemDetailLines";
 import { useSetDefaultItemDetailLine } from "~/bridge/item-detail/useSetDefaultItemDetailLine";
-import { useFillAndStartItemDetailLine } from "~/bridge/item-detail/useFillAndStartItemDetailLine";
 import { useUnsetDefaultItemDetailLine } from "~/bridge/item-detail/useUnsetDefaultItemDetailLine";
 import { useWithdrawItemDetailLine } from "~/bridge/item-detail/useWithdrawItemDetailLine";
 import { Button, PrimaryButton } from "~/ui/button/Button";
@@ -161,7 +160,6 @@ export const ItemLineRow = ({
 	const pendingKeys = {
 		default: pendingKey("default"),
 		enqueue: pendingKey("enqueue"),
-		start: pendingKey("start"),
 		withdraw: pendingKey("withdraw"),
 	} as const;
 	const setDefaultLine = useSetDefaultItemDetailLine({
@@ -176,10 +174,6 @@ export const ItemLineRow = ({
 		pendingKey: pendingKeys.default,
 		pendingOwner: itemDetail,
 	});
-	const fillAndStartLine = useFillAndStartItemDetailLine({
-		pendingKey: pendingKeys.start,
-		pendingOwner: itemDetail,
-	});
 	const withdrawLine = useWithdrawItemDetailLine({
 		pendingKey: pendingKeys.withdraw,
 		pendingOwner: itemDetail,
@@ -187,7 +181,6 @@ export const ItemLineRow = ({
 	const pending = {
 		default: setDefaultLine.pending || unsetDefaultLine.pending,
 		enqueue: enqueueLine.pending,
-		start: fillAndStartLine.pending,
 		withdraw: withdrawLine.pending,
 	} as const;
 	const error =
@@ -195,7 +188,6 @@ export const ItemLineRow = ({
 			enqueueLine.error,
 			setDefaultLine.error,
 			unsetDefaultLine.error,
-			fillAndStartLine.error,
 			withdrawLine.error,
 		].find((message) => message !== null) ?? null;
 	const unavailable = line.availability.kind === "unavailable";
@@ -279,7 +271,6 @@ export const ItemLineRow = ({
 				</div>
 				{stale ? null : (
 					<div className="flex shrink-0 flex-col items-end gap-3">
-						<ItemLineRuntime line={line} />
 						<div className="flex flex-wrap justify-end gap-2">
 							<Button
 								className="min-h-8 px-3 py-1 text-xs"
@@ -319,7 +310,7 @@ export const ItemLineRow = ({
 							>
 								{pending.withdraw ? "Withdrawing…" : "Withdraw"}
 							</Button>
-							<Button
+							<PrimaryButton
 								cursorIntent={pending.enqueue ? "progress" : undefined}
 								data-ui="TileLineEnqueueButton"
 								disabled={disabled || !line.actions.enqueue.enabled}
@@ -331,29 +322,9 @@ export const ItemLineRow = ({
 								}
 							>
 								{pending.enqueue ? "Queueing…" : "Enqueue"}
-							</Button>
-							<PrimaryButton
-								className="min-w-24"
-								cursorIntent={pending.start ? "progress" : undefined}
-								data-ui="TileLineStartButton"
-								data-start-mode={line.actions.immediate.type}
-								disabled={disabled || !line.actions.immediate.enabled}
-								onClick={() =>
-									fillAndStartLine.run({
-										ownerItemId,
-										lineId: line.lineId,
-									})
-								}
-							>
-								{line.actions.immediate.type === "fill"
-									? pending.start
-										? "Filling…"
-										: "Fill"
-									: pending.start
-										? "Starting…"
-										: "Start"}
 							</PrimaryButton>
 						</div>
+						<ItemLineRuntime line={line} />
 					</div>
 				)}
 			</div>

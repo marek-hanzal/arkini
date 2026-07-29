@@ -46,10 +46,6 @@ const makeProjection = (
 			isDefault: false,
 			queuedRequestCount: 0,
 			actions: {
-				immediate: {
-					type: "fill",
-					enabled: false,
-				},
 				enqueue: {
 					enabled: false,
 				},

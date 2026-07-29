@@ -72,20 +72,6 @@ describe("discardRuntimeItemOwnedStateFx", () => {
 				[passiveChild.id]: "line:missing",
 				"runtime:unrelated": "line:unrelated",
 			},
-			deliveryStartIntents: [
-				{
-					ownerItemId: root.id,
-					lineId: "line:forge:run",
-				},
-				{
-					ownerItemId: passiveChild.id,
-					lineId: "line:missing",
-				},
-				{
-					ownerItemId: "runtime:unrelated",
-					lineId: "line:unrelated",
-				},
-			],
 		} satisfies RuntimeSchema.Type;
 		const result = Effect.runSync(
 			discardRuntimeItemOwnedStateFx({
@@ -105,11 +91,6 @@ describe("discardRuntimeItemOwnedStateFx", () => {
 		expect(result.defaultLineByOwnerItemId).toEqual({
 			"runtime:unrelated": "line:unrelated",
 		});
-		expect(result.deliveryStartIntents).toEqual([
-			expect.objectContaining({
-				ownerItemId: "runtime:unrelated",
-			}),
-		]);
 	});
 
 	it("rejects committed work anywhere beneath the discarded ownership tree", () => {

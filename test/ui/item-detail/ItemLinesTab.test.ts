@@ -26,7 +26,6 @@ const control = vi.hoisted(() => ({
 const commands = vi.hoisted(() => ({
 	enqueue: vi.fn(),
 	setDefault: vi.fn(),
-	start: vi.fn(),
 	unsetDefault: vi.fn(),
 	withdraw: vi.fn(),
 }));
@@ -47,13 +46,6 @@ vi.mock("~/bridge/item-detail/useSetDefaultItemDetailLine", () => ({
 		error: control.readActionError(pendingKey),
 		pending: control.readPendingAction(pendingKey) === "default",
 		run: commands.setDefault,
-	}),
-}));
-vi.mock("~/bridge/item-detail/useFillAndStartItemDetailLine", () => ({
-	useFillAndStartItemDetailLine: ({ pendingKey }: { readonly pendingKey: string }) => ({
-		error: control.readActionError(pendingKey),
-		pending: control.readPendingAction(pendingKey) === "start",
-		run: commands.start,
 	}),
 }));
 vi.mock("~/bridge/item-detail/useUnsetDefaultItemDetailLine", () => ({
@@ -171,10 +163,6 @@ const line = ({
 	isDefault,
 	queuedRequestCount: 0,
 	actions: {
-		immediate: {
-			type: "start",
-			enabled: true,
-		},
 		enqueue: {
 			enabled: true,
 		},
@@ -445,10 +433,6 @@ describe("ItemLinesTab", () => {
 				readiness: "inputs",
 			},
 			actions: {
-				immediate: {
-					type: "fill",
-					enabled: true,
-				},
 				enqueue: {
 					enabled: true,
 				},
@@ -474,10 +458,6 @@ describe("ItemLinesTab", () => {
 				},
 			},
 			actions: {
-				immediate: {
-					type: "fill",
-					enabled: false,
-				},
 				enqueue: {
 					enabled: false,
 				},
@@ -576,10 +556,6 @@ describe("ItemLinesTab", () => {
 				},
 			},
 			actions: {
-				immediate: {
-					type: "fill",
-					enabled: false,
-				},
 				enqueue: {
 					enabled: false,
 				},
@@ -631,10 +607,6 @@ describe("ItemLinesTab", () => {
 				},
 			},
 			actions: {
-				immediate: {
-					type: "fill",
-					enabled: false,
-				},
 				enqueue: {
 					enabled: false,
 				},
@@ -697,10 +669,6 @@ describe("ItemLinesTab", () => {
 				},
 			},
 			actions: {
-				immediate: {
-					type: "fill",
-					enabled: false,
-				},
 				enqueue: {
 					enabled: false,
 				},
@@ -895,10 +863,6 @@ describe("ItemLinesTab", () => {
 				{
 					...projection.line[0],
 					actions: {
-						immediate: {
-							type: "start",
-							enabled: true,
-						},
 						enqueue: {
 							enabled: true,
 						},
@@ -990,10 +954,6 @@ describe("ItemLinesTab", () => {
 						},
 					},
 					actions: {
-						immediate: {
-							type: "fill",
-							enabled: false,
-						},
 						enqueue: {
 							enabled: false,
 						},
@@ -1058,10 +1018,6 @@ describe("ItemLinesTab", () => {
 						},
 					},
 					actions: {
-						immediate: {
-							type: "fill",
-							enabled: false,
-						},
 						enqueue: {
 							enabled: false,
 						},
@@ -1105,10 +1061,6 @@ describe("ItemLinesTab", () => {
 						},
 					},
 					actions: {
-						immediate: {
-							type: "fill",
-							enabled: false,
-						},
 						enqueue: {
 							enabled: false,
 						},
@@ -1174,10 +1126,6 @@ describe("ItemLinesTab", () => {
 				},
 			},
 			actions: {
-				immediate: {
-					type: "fill",
-					enabled: false,
-				},
 				enqueue: {
 					enabled: false,
 				},
@@ -1279,7 +1227,6 @@ describe("ItemLinesTab", () => {
 		control.readPendingAction.mockImplementation((key: string) => {
 			if (key.includes('"default"')) return "default";
 			if (key.includes('"enqueue"')) return "enqueue";
-			if (key.includes('"start"')) return "start";
 			if (key.includes('"withdraw"')) return "withdraw";
 			return null;
 		});
@@ -1289,10 +1236,6 @@ describe("ItemLinesTab", () => {
 				{
 					...projection.line[0],
 					actions: {
-						immediate: {
-							type: "start",
-							enabled: true,
-						},
 						enqueue: {
 							enabled: true,
 						},
@@ -1312,7 +1255,6 @@ describe("ItemLinesTab", () => {
 			"Saving…",
 			"Queueing…",
 			"Withdrawing…",
-			"Starting…",
 		];
 
 		for (const label of pendingLabels) {
@@ -1326,7 +1268,6 @@ describe("ItemLinesTab", () => {
 			expect.arrayContaining([
 				"default",
 				"enqueue",
-				"start",
 				"withdraw",
 			]),
 		);
@@ -1388,17 +1329,13 @@ describe("ItemLinesTab", () => {
 		expect(activeLine?.querySelector('[data-ui="TileLineQueuedMessage"]')).toBeNull();
 	});
 
-	it("keeps Fill and Enqueue as separate explicit commands", async () => {
+	it("exposes Enqueue as the only line execution command", async () => {
 		await renderLines({
 			...projection,
 			line: [
 				{
 					...projection.line[0],
 					actions: {
-						immediate: {
-							type: "fill",
-							enabled: true,
-						},
 						enqueue: {
 							enabled: true,
 						},
@@ -1407,24 +1344,22 @@ describe("ItemLinesTab", () => {
 				},
 			],
 		});
-		const fill = document.querySelector<HTMLButtonElement>('[data-ui="TileLineStartButton"]');
 		const enqueue = document.querySelector<HTMLButtonElement>(
 			'[data-ui="TileLineEnqueueButton"]',
 		);
-		expect(fill?.textContent).toBe("Fill");
+		const runtime = document.querySelector<HTMLElement>('[data-ui="TileLineRuntime"]');
 		expect(enqueue?.textContent).toBe("Enqueue");
-		await act(async () => fill?.click());
-		expect(commands.start).toHaveBeenCalledWith({
-			ownerItemId: projection.itemId,
-			lineId: projection.line[0]?.lineId,
-		});
-		expect(commands.enqueue).not.toHaveBeenCalled();
+		expect(document.querySelector('[data-ui="TileLineStartButton"]')).toBeNull();
+		expect(
+			enqueue !== null &&
+				runtime !== null &&
+				(enqueue.compareDocumentPosition(runtime) & Node.DOCUMENT_POSITION_FOLLOWING) !== 0,
+		).toBe(true);
 		await act(async () => enqueue?.click());
 		expect(commands.enqueue).toHaveBeenCalledWith({
 			ownerItemId: projection.itemId,
 			lineId: projection.line[0]?.lineId,
 		});
-		expect(commands.start).toHaveBeenCalledOnce();
 	});
 
 	it("filters authoritative visible lines by semantic facts without indexing volatile numbers", async () => {

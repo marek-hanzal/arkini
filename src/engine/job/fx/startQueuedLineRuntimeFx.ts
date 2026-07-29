@@ -8,11 +8,11 @@ import type { JobSchema } from "~/engine/job/schema/JobSchema";
 import { JobOwnerBusyError } from "~/engine/job/error/JobOwnerBusyError";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
-export namespace fillAndStartLineRuntimeFx {
+export namespace startQueuedLineRuntimeFx {
 	export interface Props {
 		readonly lineId: IdSchema.Type;
 		readonly ownerItemId: IdSchema.Type;
-		readonly queueRequestId?: IdSchema.Type;
+		readonly queueRequestId: IdSchema.Type;
 		readonly runtime: RuntimeSchema.Type;
 	}
 
@@ -31,7 +31,6 @@ export namespace fillAndStartLineRuntimeFx {
 		| {
 				readonly type: "started";
 				readonly events: readonly GameEventSchema.Type[];
-				readonly filledQuantity: number;
 				readonly job: JobSchema.Type;
 				readonly runtime: RuntimeSchema.Type;
 		  };
@@ -44,40 +43,38 @@ export namespace fillAndStartLineRuntimeFx {
  * successful start transition. Grid autofill coverage is reported to the caller but never applied
  * here, so every item still travels through the shared delivery pipeline before becoming startable.
  */
-export const fillAndStartLineRuntimeFx = Effect.fn("fillAndStartLineRuntimeFx")(function* ({
+export const startQueuedLineRuntimeFx = Effect.fn("startQueuedLineRuntimeFx")(function* ({
 	lineId,
 	ownerItemId,
 	queueRequestId,
 	runtime,
-}: fillAndStartLineRuntimeFx.Props) {
-	if (queueRequestId !== undefined) {
-		const request = (runtime.jobQueue ?? []).find((candidate) => {
-			return candidate.id === queueRequestId;
-		});
-		if (request === undefined) {
-			return {
-				type: "queue-request-unavailable",
-				reason: "missing",
-				runtime,
-			} satisfies fillAndStartLineRuntimeFx.Result;
-		}
-		if (request.ownerItemId !== ownerItemId || request.lineId !== lineId) {
-			return {
-				type: "queue-request-unavailable",
-				reason: "wrong-line",
-				runtime,
-			} satisfies fillAndStartLineRuntimeFx.Result;
-		}
-		const ownerHead = (runtime.jobQueue ?? []).find((candidate) => {
-			return candidate.ownerItemId === ownerItemId;
-		});
-		if (ownerHead?.id !== queueRequestId) {
-			return {
-				type: "queue-request-unavailable",
-				reason: "not-head",
-				runtime,
-			} satisfies fillAndStartLineRuntimeFx.Result;
-		}
+}: startQueuedLineRuntimeFx.Props) {
+	const request = (runtime.jobQueue ?? []).find((candidate) => {
+		return candidate.id === queueRequestId;
+	});
+	if (request === undefined) {
+		return {
+			type: "queue-request-unavailable",
+			reason: "missing",
+			runtime,
+		} satisfies startQueuedLineRuntimeFx.Result;
+	}
+	if (request.ownerItemId !== ownerItemId || request.lineId !== lineId) {
+		return {
+			type: "queue-request-unavailable",
+			reason: "wrong-line",
+			runtime,
+		} satisfies startQueuedLineRuntimeFx.Result;
+	}
+	const ownerHead = (runtime.jobQueue ?? []).find((candidate) => {
+		return candidate.ownerItemId === ownerItemId;
+	});
+	if (ownerHead?.id !== queueRequestId) {
+		return {
+			type: "queue-request-unavailable",
+			reason: "not-head",
+			runtime,
+		} satisfies startQueuedLineRuntimeFx.Result;
 	}
 	const jobIds = runtime.jobs
 		.filter((job) => job.ownerItemId === ownerItemId)
@@ -85,7 +82,7 @@ export const fillAndStartLineRuntimeFx = Effect.fn("fillAndStartLineRuntimeFx")(
 	const requestIds = (runtime.jobQueue ?? [])
 		.filter((request) => request.ownerItemId === ownerItemId)
 		.map((request) => request.id);
-	if (jobIds.length > 0 || (queueRequestId === undefined && requestIds.length > 0)) {
+	if (jobIds.length > 0) {
 		return yield* Effect.fail(
 			new JobOwnerBusyError({
 				ownerItemId,
@@ -106,18 +103,15 @@ export const fillAndStartLineRuntimeFx = Effect.fn("fillAndStartLineRuntimeFx")(
 			missingQuantity: coverage.type === "incomplete" ? coverage.missingQuantity : 0,
 			runtime,
 			selectedQuantity: coverage.selectedQuantity,
-		} satisfies fillAndStartLineRuntimeFx.Result;
+		} satisfies startQueuedLineRuntimeFx.Result;
 	}
 
-	const candidate =
-		queueRequestId === undefined
-			? runtime
-			: {
-					...runtime,
-					jobQueue: (runtime.jobQueue ?? []).filter((request) => {
-						return request.id !== queueRequestId;
-					}),
-				};
+	const candidate = {
+		...runtime,
+		jobQueue: (runtime.jobQueue ?? []).filter((request) => {
+			return request.id !== queueRequestId;
+		}),
+	};
 	const [job, startedRuntime, startEvents] = yield* startLineRuntimeFx({
 		lineId,
 		ownerItemId,
@@ -126,8 +120,7 @@ export const fillAndStartLineRuntimeFx = Effect.fn("fillAndStartLineRuntimeFx")(
 	return {
 		type: "started",
 		events: startEvents,
-		filledQuantity: 0,
 		job,
 		runtime: startedRuntime,
-	} satisfies fillAndStartLineRuntimeFx.Result;
+	} satisfies startQueuedLineRuntimeFx.Result;
 });

@@ -328,15 +328,19 @@ describe("ItemDetailModal", () => {
 			await Promise.resolve();
 		});
 
-		expect(document.querySelector('[data-ui="ItemDetailQueueTabCount"]')?.textContent).toBe(
-			"2",
+		const queueTabBadge = document.querySelector<HTMLElement>(
+			'[data-ui="ItemDetailQueueTabCount"]',
 		);
+		expect(queueTabBadge?.textContent).toBe("2");
 		const line = document.querySelector<HTMLElement>('[data-ui="TileLine"]');
 		expect(line?.dataset.active).toBe("false");
 		expect(line?.dataset.queued).toBe("true");
 		expect(line?.className).toContain("border-l-warning");
 		expect(line?.querySelector('[data-ui="TileLineQueuedBadge"]')?.textContent).toBe(
 			"Queued ×2",
+		);
+		expect(line?.querySelector('[data-ui="TileLineQueuedBadge"]')?.className).toBe(
+			queueTabBadge?.className,
 		);
 		expect(line?.querySelector('[data-ui="TileLineQueuedMessage"]')?.textContent).toContain(
 			"Queued for automatic start",
@@ -899,13 +903,6 @@ describe("ItemDetailModal", () => {
 			await Promise.resolve();
 		});
 
-		const startButton = document.querySelector<HTMLButtonElement>(
-			'[data-ui="TileLineStartButton"]',
-		);
-		if (startButton === null) throw new Error("Missing line Start button.");
-		expect(startButton.dataset.startMode).toBe("start");
-		expect(startButton.textContent).toBe("Start");
-		expect(startButton.disabled).toBe(true);
 		const enqueueButton = document.querySelector<HTMLButtonElement>(
 			'[data-ui="TileLineEnqueueButton"]',
 		);
@@ -1289,7 +1286,6 @@ describe("ItemDetailModal", () => {
 				document.querySelectorAll<HTMLButtonElement>('[data-ui="ItemDetailTabs"] button'),
 			).every((button) => !button.disabled),
 		).toBe(true);
-		expect(document.querySelector('[data-ui="TileLineStartButton"]')).toBeNull();
 		expect(document.querySelector('[data-ui="TileLineRuntime"]')).toBeNull();
 		expect(document.querySelector('[data-ui="TileLineProgress"]')).toBeNull();
 		expect(document.querySelector('[data-ui="ItemLinesAvailabilityFilter"]')).toBeNull();

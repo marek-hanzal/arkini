@@ -25,7 +25,6 @@ export const RuntimeCheckIssueEnumSchema = z
 		DefaultLine: "line:default",
 		LineInputClosed: "line:input-closed",
 		DeliveryTarget: "delivery:target",
-		DeliveryPurpose: "delivery:purpose",
 		LocationOccupied: "location:occupied",
 		LocationOutOfBounds: "location:out-of-bounds",
 		LocationScope: "location:scope",

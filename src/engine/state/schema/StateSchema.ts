@@ -1,7 +1,6 @@
 import { z } from "zod";
 import { CheatStateSchema } from "~/engine/cheat/schema/CheatStateSchema";
 import { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeIntegerSchema";
-import { DeliveryStartIntentSchema } from "~/engine/delivery/schema/DeliveryStartIntentSchema";
 import { JobQueueRequestSchema } from "~/engine/job/schema/JobQueueRequestSchema";
 import { JobSchema } from "~/engine/job/schema/JobSchema";
 import { DefaultLineByOwnerItemIdSchema } from "~/engine/line/schema/DefaultLineByOwnerItemIdSchema";
@@ -16,7 +15,6 @@ export const StateSchema = z
 		jobs: z.array(JobSchema),
 		jobQueue: z.array(JobQueueRequestSchema).optional(),
 		defaultLineByOwnerItemId: DefaultLineByOwnerItemIdSchema.optional(),
-		deliveryStartIntents: z.array(DeliveryStartIntentSchema).optional(),
 	})
 	.strict()
 	.meta({

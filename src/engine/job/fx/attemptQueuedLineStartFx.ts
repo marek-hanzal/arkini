@@ -1,7 +1,5 @@
 import { Effect } from "effect";
 
-import { StartLineResultEnumSchema } from "~/engine/job/schema/StartLineResultEnumSchema";
-
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { ItemChargesUnavailableError } from "~/engine/item/error/ItemChargesUnavailableError";
 import type { ItemNotOnBoardError } from "~/engine/item/error/ItemNotOnBoardError";
@@ -12,7 +10,7 @@ import type { PlacementUnavailableError } from "~/engine/placement/error/Placeme
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
 import { autofillLineInputsRuntimeFx } from "~/engine/input/write/autofillLineInputsFx";
-import { fillAndStartLineRuntimeFx } from "./fillAndStartLineRuntimeFx";
+import { startQueuedLineRuntimeFx } from "./startQueuedLineRuntimeFx";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 
 export namespace attemptQueuedLineStartFx {
@@ -42,7 +40,7 @@ export namespace attemptQueuedLineStartFx {
 				runtime: RuntimeSchema.Type;
 		  }
 		| {
-				type: typeof StartLineResultEnumSchema.enum.Started;
+				type: "started";
 				events: readonly GameEventSchema.Type[];
 				job: JobSchema.Type;
 				runtime: RuntimeSchema.Type;
@@ -76,7 +74,7 @@ export const attemptQueuedLineStartFx = Effect.fn("attemptQueuedLineStartFx")(fu
 	}
 
 	return yield* Effect.gen(function* () {
-		const result = yield* fillAndStartLineRuntimeFx({
+		const result = yield* startQueuedLineRuntimeFx({
 			ownerItemId: request.ownerItemId,
 			lineId: request.lineId,
 			queueRequestId: request.id,
@@ -111,7 +109,7 @@ export const attemptQueuedLineStartFx = Effect.fn("attemptQueuedLineStartFx")(fu
 			} satisfies attemptQueuedLineStartFx.Result;
 		}
 		return {
-			type: StartLineResultEnumSchema.enum.Started,
+			type: "started",
 			events: result.events,
 			job: result.job,
 			runtime: result.runtime,

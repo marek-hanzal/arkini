@@ -78,7 +78,6 @@ const jobStartedBatch = {
 			jobId: "job:1",
 			ownerItemId: "runtime:producer",
 			lineId: "line:1",
-			source: "explicit",
 		},
 	],
 } satisfies useGameEvents.Batch;

@@ -30,7 +30,7 @@ export namespace readLineInputAutofillCoverageFx {
  * Resolves whether exact current grid sources can complete one line's missing material inputs.
  *
  * In-flight deliveries are intentionally excluded. They are concrete runtime items, but they are
- * not physically available to an atomic Fill & Start transition until their canonical settlement.
+ * not physically available to queued start admission until their canonical settlement.
  */
 export const readLineInputAutofillCoverageFx = Effect.fn("readLineInputAutofillCoverageFx")(
 	function* ({ lineId, ownerItemId, runtime }: readLineInputAutofillCoverageFx.Props) {

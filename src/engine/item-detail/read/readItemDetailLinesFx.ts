@@ -38,9 +38,6 @@ export const readItemDetailLinesFx = Effect.fn("readItemDetailLinesFx")(function
 		ownerItem,
 		runtime,
 	}))?.id;
-	const ownerHasWork =
-		runtime.jobs.some((job) => job.ownerItemId === owner.id) ||
-		(runtime.jobQueue ?? []).some((request) => request.ownerItemId === owner.id);
 	const projected: ItemDetailLines.Line[] = [];
 
 	for (const line of lines) {
@@ -65,7 +62,6 @@ export const readItemDetailLinesFx = Effect.fn("readItemDetailLinesFx")(function
 			activeJob,
 			defaultLineId,
 			line,
-			ownerHasWork,
 			ownerItemId: owner.id,
 			runtime,
 		});

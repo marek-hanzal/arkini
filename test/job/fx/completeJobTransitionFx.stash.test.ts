@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~/engine/game/fx/useGameFx";
 import { storeInputMaterialFx } from "~/engine/input/write/storeInputMaterialFx";
-import { startLineFx } from "~/engine/job/write/startLineFx";
+import { startLineFx } from "~test/job/support/startLineTestFx";
 import { fromStateFx } from "~/engine/runtime/fx/fromStateFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import { removeItemFx } from "~/engine/runtime/write/removeItemFx";
@@ -11,7 +11,6 @@ import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { fromRuntimeFx } from "~/engine/state/fx/fromRuntimeFx";
 import { runTickRuntimeByFx } from "~/engine/tick/fx/runTickRuntimeByFx";
-import { StartLineResultEnumSchema } from "~/engine/job/schema/StartLineResultEnumSchema";
 import { completeJobRuntimeForTestFx } from "~test/job/support/completeJobRuntimeForTestFx";
 
 const value = (value: number) => ({
@@ -238,7 +237,7 @@ const startStashFx = Effect.fn("startStashFx")(function* ({
 		ownerItemId: owner.id,
 		lineId,
 	});
-	if (started.type !== StartLineResultEnumSchema.enum.Started) {
+	if (started.type !== "started") {
 		return yield* Effect.die(new Error(`Expected ${lineId} to start immediately.`));
 	}
 

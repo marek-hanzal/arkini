@@ -99,6 +99,29 @@ describe("StartupSplash", () => {
 		await vi.waitFor(() => expect(harness.router.state.location.pathname).toBe("/main-menu"));
 	});
 
+	it("uses a splash click to continue without changing the Escape hint", async () => {
+		const harness = await Effect.runPromise(
+			renderStartupSplashFx({
+				bootstrapFx: Effect.succeed(readyResult),
+				catalog,
+			}),
+		);
+		roots.push(harness.root);
+		registries.push(harness.registry);
+		await act(async () => harness.resolveVisible(performance.now()));
+		await act(async () => vi.advanceTimersByTime(500));
+
+		const splash = harness.container.querySelector('[data-ui="StartupSplash"]');
+		if (!(splash instanceof HTMLElement)) throw new Error("Startup splash missing.");
+		expect(harness.container.textContent).toContain("Press Esc to continue");
+		await act(async () => splash.click());
+
+		await vi.waitFor(() =>
+			expect(harness.registry.get(LauncherSplashCompletedAtom)).toBe(true),
+		);
+		await vi.waitFor(() => expect(harness.router.state.location.pathname).toBe("/main-menu"));
+	});
+
 	it("completes automatically after the minimum visible duration", async () => {
 		const harness = await Effect.runPromise(
 			renderStartupSplashFx({

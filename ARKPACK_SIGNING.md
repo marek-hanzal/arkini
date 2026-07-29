@@ -59,7 +59,7 @@ The command creates:
 .arkini/arkpack-public.pem
 ```
 
-`.arkini/` is the sole repository-local private-key convention and is ignored as a directory. The private file is written with mode `0600`. Key generation refuses to overwrite either requested output unless `--force` is explicit. Private key bytes are never printed.
+`.arkini/` is the sole repository-local private-key convention and is ignored as a config directory. Signing keys are build inputs rather than generated build output, so deleting disposable `.out/` cannot remove them. The private file is written with mode `0600`. Key generation refuses to overwrite either requested output unless `--force` is explicit. Private key bytes are never printed.
 
 There is no `.env.local` signing path. Local commands read `.arkini/arkpack-private.pem`; CI supplies the PEM directly through `ARKINI_ARKPACK_PRIVATE_KEY`.
 

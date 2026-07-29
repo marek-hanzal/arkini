@@ -45,7 +45,7 @@ export namespace useStartupSplashLifecycle {
 		  };
 }
 
-/** Owns native visibility timing, startup completion, Escape, retry, and navigation. */
+/** Owns native visibility timing, startup completion, skip input, retry, and navigation. */
 export const useStartupSplashLifecycle = () => {
 	const startup = useAtomValue(LauncherStartupAtom);
 	const visualReady = useAtomValue(LauncherVisualReadyAtom);
@@ -299,6 +299,7 @@ export const useStartupSplashLifecycle = () => {
 				};
 
 	return {
+		skip: complete,
 		view,
 		retry,
 	};

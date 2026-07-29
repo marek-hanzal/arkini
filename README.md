@@ -174,7 +174,9 @@ npm run preview
 npm run preview:macos
 ```
 
-Arkini is an [Electron](https://www.electronjs.org/docs/latest/)-only product. `npm run dev` starts Electron with a [Vite](https://vite.dev/guide/)-powered renderer. Vite may replace modules during development, but Arkini treats application state as disposable and implements no HMR preservation, shutdown, or ownership handoff. `npm run build` signs and verifies official Arkini, packs the deliberately unsigned demo, and then produces the production Electron build, so a production private key must be available through ignored `.arkini/arkpack-private.pem` or `ARKINI_ARKPACK_PRIVATE_KEY`. `npm run preview` starts an existing production build without repacking or rebuilding it. `npm run preview:macos` is the packaged local preview: it cleans old package output, performs the same one-time pack/build stages, creates `release/mac-arm64/Arkini.app` with `electron-builder --dir`, prints that exact path, and launches the resulting bundle. There is no standalone web target, web persistence fallback, or alternate renderer startup path.
+Arkini is an [Electron](https://www.electronjs.org/docs/latest/)-only product. `npm run dev` starts Electron with a [Vite](https://vite.dev/guide/)-powered renderer. Vite may replace modules during development, but Arkini treats application state as disposable and implements no HMR preservation, shutdown, or ownership handoff. `npm run build` signs and verifies official Arkini, packs the deliberately unsigned demo, and then produces the production Electron build, so a production private key must be available through ignored `.arkini/arkpack-private.pem` or `ARKINI_ARKPACK_PRIVATE_KEY`. `npm run preview` starts an existing production build without repacking or rebuilding it. `npm run preview:macos` is the packaged local preview: it cleans old desktop output, performs the same one-time pack/build stages, creates `.out/desktop/release/mac-arm64/Arkini.app` with `electron-builder --dir`, prints that exact path, and launches the resulting bundle. There is no standalone web target, web persistence fallback, or alternate renderer startup path.
+
+All disposable repository-local generated output lives below `.out/`: Electron build files under `.out/desktop/build`, the dependency-free packaging stage under `.out/desktop/stage`, distributable artifacts under `.out/desktop/release`, and tool caches under `.out/cache`. The `game/` tree is the deliberate generated-output exception because authored games and their generated Arkpack/schema companions share one domain-owned location. Local build inputs such as signing keys remain config under `.arkini/` and must survive deleting `.out/`.
 
 `npm run dev:control` starts the same disposable development application with Chromium DevTools Protocol exposed at `http://127.0.0.1:9222` for local UI automation and profiling. The endpoint is fixed to loopback and is never enabled by packaged builds.
 
@@ -200,7 +202,7 @@ For a packaged local smoke test without release archives, run:
 npm run preview:macos
 ```
 
-This canonical [Effect CLI command](cli/desktop/DesktopPreviewMacosCommand.ts) generates the official Arkpack once, builds Electron once, stages the production app, creates only the unpacked arm64 `release/mac-arm64/Arkini.app`, prints its path, and launches that exact bundle with macOS `open`. It does not create DMG, ZIP, checksums, signing, notarization, or release assets.
+This canonical [Effect CLI command](cli/desktop/DesktopPreviewMacosCommand.ts) generates the official Arkpack once, builds Electron once, stages the production app, creates only the unpacked arm64 `.out/desktop/release/mac-arm64/Arkini.app`, prints its path, and launches that exact bundle with macOS `open`. It does not create DMG, ZIP, checksums, signing, notarization, or release assets.
 
 The production distribution target is unsigned macOS Apple Silicon only. Build both local artifacts through the one canonical path:
 
@@ -208,7 +210,7 @@ The production distribution target is unsigned macOS Apple Silicon only. Build b
 npm run package:mac
 ```
 
-The [desktop package command](cli/desktop/DesktopPackageCommand.ts) cleans old package output, packs the official Arkini game once, builds Electron main/preload/renderer once, stages only `out/**` with a dependency-free production manifest, and runs one concrete [`electron-builder`](https://www.electron.build/docs/) arm64 DMG/ZIP operation. SHA-256 values are streamed from the large artifacts once while `SHA256SUMS` is written; the combined package flow then verifies artifact presence and the unpacked `Arkini.app` seam without hashing the same files again. `npm run package:verify` remains the standalone full checksum verification path for downloaded or later-modified artifacts. Output lives under `release/`:
+The [desktop package command](cli/desktop/DesktopPackageCommand.ts) cleans `.out/desktop`, packs the official Arkini game once, builds Electron main/preload/renderer once, stages only `.out/desktop/build/**` as `app/**` with a dependency-free production manifest, and runs one concrete [`electron-builder`](https://www.electron.build/docs/) arm64 DMG/ZIP operation. SHA-256 values are streamed from the large artifacts once while `SHA256SUMS` is written; the combined package flow then verifies artifact presence and the unpacked `Arkini.app` seam without hashing the same files again. `npm run package:verify` remains the standalone full checksum verification path for downloaded or later-modified artifacts. Output lives under `.out/desktop/release/`:
 
 ```text
 Arkini-<version>-mac-arm64.dmg

@@ -1,6 +1,7 @@
 import { Effect } from "effect";
 import { ChildProcess, ChildProcessSpawner } from "effect/unstable/process";
 import { verifyRendererAssetGraphFx } from "../../electron/verify/verifyRendererAssetGraphFx";
+import { ProjectOutputPaths } from "../../shared/ProjectOutputPaths";
 import { DesktopPackagingError } from "./DesktopPackagingError";
 
 export const buildDesktopOutputFx = Effect.fn("buildDesktopOutputFx")(function* () {
@@ -38,5 +39,5 @@ export const buildDesktopOutputFx = Effect.fn("buildDesktopOutputFx")(function* 
 						),
 			),
 		);
-	yield* verifyRendererAssetGraphFx();
+	yield* verifyRendererAssetGraphFx(`${ProjectOutputPaths.desktop.build}/renderer`);
 });

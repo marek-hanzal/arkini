@@ -92,7 +92,7 @@
 		"vite": "8.0.16",
 		"vitest": "4.1.7"
 	},
-	"main": "./out/main/index.js",
+	"main": "./.out/desktop/build/main/index.js",
 	"description": "Offline deterministic merge and production game.",
 	"author": "Marek Hanzal",
 	"engines": {

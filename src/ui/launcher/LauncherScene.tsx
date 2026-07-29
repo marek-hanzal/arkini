@@ -1,4 +1,4 @@
-import type { PropsWithChildren, ReactNode } from "react";
+import type { MouseEventHandler, PropsWithChildren, ReactNode } from "react";
 import { LauncherHero } from "~/ui/launcher/LauncherHero";
 import { RouteBackdrop } from "~/ui/navigation/RouteBackdrop";
 
@@ -28,6 +28,7 @@ export namespace LauncherScene {
 		readonly dataUi: string;
 		readonly foregroundOverlay?: ReactNode;
 		readonly layout?: LauncherSceneLayout;
+		readonly onClick?: MouseEventHandler<HTMLElement>;
 		readonly overlay?: ReactNode;
 	}
 }
@@ -40,11 +41,13 @@ export const LauncherScene = ({
 	dataUi,
 	foregroundOverlay,
 	layout = "centered",
+	onClick,
 	overlay,
 }: LauncherScene.Props) => (
 	<main
 		className={`launcher-scene relative size-full min-h-0 min-w-0 overflow-hidden bg-canvas text-foreground${className === undefined ? "" : ` ${className}`}`}
 		data-ui={dataUi}
+		onClick={onClick}
 	>
 		<RouteBackdrop
 			className="launcher-scene__backdrop absolute inset-0"

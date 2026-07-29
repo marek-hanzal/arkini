@@ -1,6 +1,7 @@
 import { access, readFile } from "node:fs/promises";
 import { isAbsolute, relative, resolve } from "node:path";
 import { Effect } from "effect";
+import { ProjectOutputPaths } from "../../shared/ProjectOutputPaths";
 import { readArkiniProtocolFilePathFx } from "../protocol/readArkiniProtocolFilePathFx";
 
 const representativeRoutes = [
@@ -26,7 +27,7 @@ const readAttributeValues = (
 };
 
 export const verifyRendererAssetGraphFx = Effect.fn("verifyRendererAssetGraphFx")(
-	(rendererRoot = "out/renderer") =>
+	(rendererRoot = `${ProjectOutputPaths.desktop.build}/renderer`) =>
 		Effect.gen(function* () {
 			const root = resolve(rendererRoot);
 			const html = yield* Effect.tryPromise({

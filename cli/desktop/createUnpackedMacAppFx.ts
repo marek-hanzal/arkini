@@ -1,6 +1,7 @@
 import { Effect, FileSystem } from "effect";
 import { ChildProcess, ChildProcessSpawner } from "effect/unstable/process";
 import { join, resolve } from "node:path";
+import { ProjectOutputPaths } from "../../shared/ProjectOutputPaths";
 import { DesktopPackagingError } from "./DesktopPackagingError";
 
 export namespace createUnpackedMacAppFx {
@@ -12,7 +13,7 @@ export namespace createUnpackedMacAppFx {
 
 export const createUnpackedMacAppFx = Effect.fn("createUnpackedMacAppFx")(function* ({
 	arch,
-	outputDirectory = "release",
+	outputDirectory = ProjectOutputPaths.desktop.release,
 }: createUnpackedMacAppFx.Props) {
 	const childProcessSpawner = yield* ChildProcessSpawner.ChildProcessSpawner;
 	yield* childProcessSpawner

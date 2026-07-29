@@ -5,7 +5,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const state = vi.hoisted(() => ({
 	calls: [] as string[],
 	failAt: undefined as string | undefined,
-	appPath: "/tmp/release/mac-arm64/Arkini.app",
+	appPath: "/tmp/.out/desktop/release/mac-arm64/Arkini.app",
 }));
 
 const record = (name: string) =>

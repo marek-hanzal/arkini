@@ -1,6 +1,7 @@
 import { FileSystem } from "effect";
 import { join } from "node:path";
 import { Effect } from "effect";
+import { ProjectOutputPaths } from "../../shared/ProjectOutputPaths";
 import { DesktopMacArtifacts } from "./DesktopMacArtifacts";
 import { DesktopPackagingError } from "./DesktopPackagingError";
 import { hashDesktopArtifactFx } from "./hashDesktopArtifactFx";
@@ -13,7 +14,7 @@ export namespace verifyDesktopArtifactsFx {
 }
 
 export const verifyDesktopArtifactsFx = Effect.fn("verifyDesktopArtifactsFx")(function* ({
-	directory = "release",
+	directory = ProjectOutputPaths.desktop.release,
 }: verifyDesktopArtifactsFx.Props = {}) {
 	const verification = Effect.gen(function* () {
 		const fileSystem = yield* FileSystem.FileSystem;

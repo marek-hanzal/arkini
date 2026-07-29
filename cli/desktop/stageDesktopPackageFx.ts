@@ -2,6 +2,7 @@ import { cp, mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { Effect } from "effect";
 import packageJson from "../../package.json" with { type: "json" };
+import { ProjectOutputPaths } from "../../shared/ProjectOutputPaths";
 import { DesktopPackagingError } from "./DesktopPackagingError";
 
 export namespace stageDesktopPackageFx {
@@ -13,15 +14,15 @@ export namespace stageDesktopPackageFx {
 
 export const stageDesktopPackageFx = Effect.fn("stageDesktopPackageFx")(
 	({
-		buildDirectory = "out",
-		stageDirectory = "desktop-package",
+		buildDirectory = ProjectOutputPaths.desktop.build,
+		stageDirectory = ProjectOutputPaths.desktop.stage,
 	}: stageDesktopPackageFx.Props = {}) =>
 		Effect.tryPromise({
 			try: async () => {
 				await mkdir(stageDirectory, {
 					recursive: true,
 				});
-				await cp(buildDirectory, join(stageDirectory, "out"), {
+				await cp(buildDirectory, join(stageDirectory, "app"), {
 					recursive: true,
 				});
 				await writeFile(
@@ -33,7 +34,7 @@ export const stageDesktopPackageFx = Effect.fn("stageDesktopPackageFx")(
 							description: packageJson.description,
 							author: packageJson.author,
 							type: "module",
-							main: "out/main/index.js",
+							main: "app/main/index.js",
 						},
 						null,
 						2,

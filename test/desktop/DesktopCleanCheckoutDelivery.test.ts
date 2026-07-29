@@ -16,6 +16,7 @@ import { dirname, join, resolve } from "node:path";
 import { promisify } from "node:util";
 import { describe, expect, it } from "vitest";
 import { ArkiniOfficialArkpackSigning } from "../../cli/arkpack/ArkiniOfficialArkpackSigning";
+import { ProjectOutputPaths } from "../../shared/ProjectOutputPaths";
 import { ArkpackTrustedKeysSchema } from "~/engine/pack/schema/ArkpackTrustedKeysSchema";
 
 const execFileAsync = promisify(execFile);
@@ -138,7 +139,7 @@ describe("fresh checkout desktop delivery inputs", () => {
 			await expect(stat(join(workspace, "game/arkini.game.arkpack"))).rejects.toMatchObject({
 				code: "ENOENT",
 			});
-			await expect(stat(join(workspace, ".arkini"))).rejects.toMatchObject({
+			await expect(stat(join(workspace, ProjectOutputPaths.root))).rejects.toMatchObject({
 				code: "ENOENT",
 			});
 			await writeEphemeralOfficialSigningInputs(workspace);
@@ -159,23 +160,35 @@ describe("fresh checkout desktop delivery inputs", () => {
 					code: "ENOENT",
 				},
 			);
-			const renderer = await stat(join(workspace, "out/renderer/index.html"));
+			const renderer = await stat(
+				join(workspace, ProjectOutputPaths.desktop.build, "renderer/index.html"),
+			);
 			expect(renderer.isFile()).toBe(true);
 			expect(await readFile(join(workspace, "public/hero.png"))).toEqual(
 				await readFile(join(workspace, "game/arkini/resources/hero.png")),
 			);
-			expect(await readFile(join(workspace, "out/renderer/hero.png"))).toEqual(
-				await readFile(join(workspace, "public/hero.png")),
+			expect(
+				await readFile(
+					join(workspace, ProjectOutputPaths.desktop.build, "renderer/hero.png"),
+				),
+			).toEqual(await readFile(join(workspace, "public/hero.png")));
+			const rendererAssets = await readdir(
+				join(workspace, ProjectOutputPaths.desktop.build, "renderer/assets"),
+				{
+					recursive: true,
+				},
 			);
-			const rendererAssets = await readdir(join(workspace, "out/renderer/assets"), {
-				recursive: true,
-			});
 			expect(rendererAssets.filter((path) => /^hero-.+[.]png$/.test(path))).toEqual([]);
 			const emittedSignatures = rendererAssets.filter((path) => path.endsWith(".sig"));
 			expect(emittedSignatures).toHaveLength(1);
 			expect(
 				await readFile(
-					join(workspace, "out/renderer/assets", emittedSignatures[0] ?? ""),
+					join(
+						workspace,
+						ProjectOutputPaths.desktop.build,
+						"renderer/assets",
+						emittedSignatures[0] ?? "",
+					),
 					"utf8",
 				),
 			).toBe(await readFile(join(workspace, "game/arkini.game.arkpack.sig"), "utf8"));

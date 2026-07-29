@@ -58,6 +58,7 @@ export const StartupSplash = () => {
 				<LauncherScene
 					className={content.kind === "loading" ? "cursor-wait" : "cursor-default"}
 					dataUi="StartupSplash"
+					onClick={lifecycle.skip}
 				>
 					<div
 						className="min-h-14 text-center text-sm text-muted"

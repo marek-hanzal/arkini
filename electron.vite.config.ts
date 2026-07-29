@@ -8,6 +8,7 @@ import { defineConfig } from "electron-vite";
 import { Effect } from "effect";
 import { RendererDevelopmentServer } from "./electron/security/RendererDevelopmentUrl";
 import { createRendererDevelopmentContentSecurityPolicyFx } from "./electron/security/createRendererDevelopmentContentSecurityPolicyFx";
+import { ProjectOutputPaths } from "./shared/ProjectOutputPaths";
 
 export default defineConfig(({ command }) => {
 	const developmentCspNonce =
@@ -16,6 +17,7 @@ export default defineConfig(({ command }) => {
 	return {
 		main: {
 			build: {
+				outDir: resolve(ProjectOutputPaths.desktop.build, "main"),
 				rollupOptions: {
 					input: resolve("electron/main/index.ts"),
 				},
@@ -23,6 +25,7 @@ export default defineConfig(({ command }) => {
 		},
 		preload: {
 			build: {
+				outDir: resolve(ProjectOutputPaths.desktop.build, "preload"),
 				rollupOptions: {
 					input: resolve("electron/preload/index.ts"),
 					output: {
@@ -69,6 +72,7 @@ export default defineConfig(({ command }) => {
 					target: "react",
 					routesDirectory: "./src/@routes",
 					generatedRouteTree: "./src/_route.ts",
+					tmpDir: ProjectOutputPaths.cache.tanstack,
 					autoCodeSplitting: false,
 					quoteStyle: "double",
 				}),
@@ -76,6 +80,7 @@ export default defineConfig(({ command }) => {
 				viteReact(),
 			],
 			build: {
+				outDir: resolve(ProjectOutputPaths.desktop.build, "renderer"),
 				target: "esnext",
 				rollupOptions: {
 					input: resolve("index.html"),

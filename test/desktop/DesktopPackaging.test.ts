@@ -117,9 +117,9 @@ describe("desktop packaging artifacts", () => {
 			description: packageJson.description,
 			author: packageJson.author,
 			type: "module",
-			main: "out/main/index.js",
+			main: "app/main/index.js",
 		});
 		expect(stagedPackage.dependencies).toBeUndefined();
-		expect(await readFile(join(stage, "out", "main", "index.js"), "utf8")).toBe("export {};\n");
+		expect(await readFile(join(stage, "app", "main", "index.js"), "utf8")).toBe("export {};\n");
 	});
 });

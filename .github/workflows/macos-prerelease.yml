@@ -64,9 +64,9 @@ jobs:
         with:
           name: arkini-macos-arm64-${{ github.run_number }}
           path: |
-            release/*.dmg
-            release/*.zip
-            release/SHA256SUMS
+            .out/desktop/release/*.dmg
+            .out/desktop/release/*.zip
+            .out/desktop/release/SHA256SUMS
           if-no-files-found: error
           retention-days: 14
 
@@ -76,9 +76,9 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           gh release create "$GITHUB_REF_NAME" \
-            release/*.dmg \
-            release/*.zip \
-            release/SHA256SUMS \
+            .out/desktop/release/*.dmg \
+            .out/desktop/release/*.zip \
+            .out/desktop/release/SHA256SUMS \
             --verify-tag \
             --prerelease \
             --title "Arkini $GITHUB_REF_NAME" \

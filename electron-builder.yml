@@ -4,13 +4,13 @@ asar: true
 npmRebuild: false
 artifactName: ${productName}-${version}-${os}-${arch}.${ext}
 directories:
-  app: desktop-package
-  output: release
-  buildResources: build
+  app: .out/desktop/stage
+  output: .out/desktop/release
+  buildResources: electron/resources
 files:
-  - out/**/*
+  - app/**/*
   - package.json
-  - '!out/**/*.map'
+  - '!app/**/*.map'
 mac:
   category: public.app-category.games
   icon: icon.png

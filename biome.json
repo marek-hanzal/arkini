@@ -10,17 +10,14 @@
 		"includes": [
 			"**/*",
 			"!game/schema.json",
+			"!**/.out",
 			"!**/dist",
-			"!**/out",
 			"!**/.output",
 			"!**/.nitro",
 			"!**/.vercel",
 			"!**/.venv",
-			"!**/.tanstack",
 			"!**/coverage",
 			"!**/results",
-			"!desktop-package",
-			"!release",
 			"!**/node_modules",
 			"!src/_route.ts"
 		]

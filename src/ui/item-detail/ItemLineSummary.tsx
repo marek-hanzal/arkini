@@ -4,7 +4,13 @@ import { JobStatusEnumSchema } from "~/bridge/job/JobStatusEnumSchema";
 import type { ItemDetailLines } from "~/bridge/item-detail/ItemDetailLines";
 
 /** Renders one line's identity, readiness, active state, and description. */
-export const ItemLineSummary = ({ line }: { readonly line: ItemDetailLines.Line }) => {
+export const ItemLineSummary = ({
+	line,
+	stale = false,
+}: {
+	readonly line: ItemDetailLines.Line;
+	readonly stale?: boolean;
+}) => {
 	const readiness = match(line.availability)
 		.with(
 			{
@@ -61,24 +67,26 @@ export const ItemLineSummary = ({ line }: { readonly line: ItemDetailLines.Line 
 				<h3 className="text-lg font-semibold leading-tight text-foreground">
 					{line.title}
 				</h3>
-				{activeWork === undefined ? null : (
+				{stale || activeWork === undefined ? null : (
 					<span className="rounded-full border border-success/40 bg-success/12 px-2.5 py-1 text-xs font-semibold text-foreground">
 						{activeWork}
 					</span>
 				)}
-				<span
-					className={`rounded-full border px-2.5 py-1 text-xs font-semibold ${readiness.className}`}
-				>
-					{readiness.label}
-				</span>
-				{line.isDefault ? (
+				{stale ? null : (
+					<span
+						className={`rounded-full border px-2.5 py-1 text-xs font-semibold ${readiness.className}`}
+					>
+						{readiness.label}
+					</span>
+				)}
+				{stale || !line.isDefault ? null : (
 					<span
 						className="rounded-full border border-accent/35 bg-accent/10 px-2.5 py-1 text-xs font-semibold text-foreground"
 						data-ui="TileLineDefaultBadge"
 					>
 						Default
 					</span>
-				) : null}
+				)}
 			</div>
 			<p className="mt-2 max-w-3xl text-sm leading-relaxed text-muted">{line.description}</p>
 		</div>

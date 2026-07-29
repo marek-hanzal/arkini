@@ -1052,7 +1052,7 @@ describe("ItemDetailModal", () => {
 		expect(document.querySelector('[data-ui="ItemDefinitionInfoTab"]')).not.toBeNull();
 	});
 
-	it("retains stale Sources content read-only when the inspected target disappears", async () => {
+	it("retains stale Sources navigation when the inspected target disappears", async () => {
 		const { readControl } = await renderItemDetail();
 		const target = currentRuntime.items.find((item) => item.item.id === "water");
 		if (target === undefined) throw new Error("Missing target fixture.");
@@ -1082,7 +1082,10 @@ describe("ItemDetailModal", () => {
 		const sourceLink = document.querySelector<HTMLButtonElement>(
 			'[data-ui="ItemSourceDetailLink"]',
 		);
-		expect(sourceLink?.disabled).toBe(true);
+		expect(sourceLink?.disabled).toBe(false);
+		expect(document.querySelector('[data-ui="ItemSource"]')?.textContent).not.toContain(
+			"Space 1",
+		);
 		expect(
 			document.querySelector<HTMLElement>('[data-ui="ItemDetailContentScene"]')?.dataset
 				.stale,
@@ -1124,7 +1127,7 @@ describe("ItemDetailModal", () => {
 		expect(document.activeElement).toBe(shell);
 	});
 
-	it("retains the last exact target snapshot and disables its interactions after removal", async () => {
+	it("keeps retained navigation and search while removing stale facts and commands", async () => {
 		const { readControl } = await renderItemDetail();
 		const owner = currentRuntime.items.find((item) => item.item.id === "workshop");
 		if (owner === undefined) throw new Error("Missing Workshop runtime item.");
@@ -1160,11 +1163,23 @@ describe("ItemDetailModal", () => {
 		expect(
 			Array.from(
 				document.querySelectorAll<HTMLButtonElement>('[data-ui="ItemDetailTabs"] button'),
-			).every((button) => button.disabled),
+			).every((button) => !button.disabled),
 		).toBe(true);
+		expect(document.querySelector('[data-ui="TileLineStartButton"]')).toBeNull();
+		expect(document.querySelector('[data-ui="TileLineRuntime"]')).toBeNull();
+		expect(document.querySelector('[data-ui="TileLineProgress"]')).toBeNull();
+		expect(document.querySelector('[data-ui="ItemLinesAvailabilityFilter"]')).toBeNull();
+		const retainedReferences = Array.from(
+			document.querySelectorAll<HTMLButtonElement>(
+				'[data-ui="TileLineInputDetailLink"], [data-ui="TileLineOutputDetailLink"]',
+			),
+		);
+		expect(retainedReferences.length).toBeGreaterThan(0);
+		expect(retainedReferences.every((button) => !button.disabled)).toBe(true);
 		expect(
-			document.querySelector<HTMLButtonElement>('[data-ui="TileLineStartButton"]')?.disabled,
-		).toBe(true);
+			document.querySelector<HTMLButtonElement>('[data-ui="ItemDetailCloseButton"]')
+				?.disabled,
+		).toBe(false);
 
 		const staleSearch = document.querySelector<HTMLInputElement>(
 			'[aria-label="Search visible lines"]',
@@ -1185,5 +1200,27 @@ describe("ItemDetailModal", () => {
 			);
 		});
 		expect(document.querySelector('[data-ui="ItemLinesSearchEmpty"]')).not.toBeNull();
+
+		const infoTab = document.querySelector<HTMLButtonElement>('[data-tab="info"]');
+		if (infoTab === null) throw new Error("Missing retained Info tab.");
+		await act(async () => {
+			infoTab.click();
+			await Promise.resolve();
+		});
+		expect(document.querySelector('[data-ui="ItemInfoTab"]')).not.toBeNull();
+		expect(document.querySelector('[data-label="Location"]')).toBeNull();
+		expect(document.querySelector('[data-label="Current stack"]')).toBeNull();
+		expect(document.querySelector('[data-label="Owned"]')).toBeNull();
+		expect(document.querySelector('[data-label="Charges"]')).toBeNull();
+		expect(document.querySelector('[data-label="Type"]')).not.toBeNull();
+
+		const queueTab = document.querySelector<HTMLButtonElement>('[data-tab="queue"]');
+		if (queueTab === null) throw new Error("Missing retained Queue tab.");
+		await act(async () => {
+			queueTab.click();
+			await Promise.resolve();
+		});
+		expect(document.querySelector('[data-ui="ItemQueueStale"]')).not.toBeNull();
+		expect(document.querySelector('[data-ui="ItemQueueRow"]')).toBeNull();
 	});
 });

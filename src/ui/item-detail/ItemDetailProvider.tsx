@@ -21,6 +21,7 @@ import type {
 	ItemDetailControl,
 	OpenItemDefinitionDetailProps,
 	OpenItemDetailProps,
+	SelectRetainedItemDetailTabProps,
 } from "~/ui/item-detail/ItemDetailControl";
 import { readSettledAsyncResultError } from "~/ui/reactivity/readSettledAsyncResultError";
 
@@ -128,6 +129,29 @@ export const ItemDetailProvider = ({
 		],
 	);
 
+	const selectRetainedItemDetailTabFx = useCallback(
+		({ itemId, tab }: SelectRetainedItemDetailTabProps) =>
+			Effect.suspend(() => {
+				const current = controller.getSnapshot().state;
+				if (
+					current.phase === "closed" ||
+					current.phase === "exiting" ||
+					current.target.kind !== "runtime" ||
+					current.target.itemId !== itemId
+				) {
+					return Effect.succeed(false);
+				}
+				return controller.openTargetFx({
+					...current.target,
+					tab,
+					linesSearchQuery: tab === "lines" ? current.target.linesSearchQuery : undefined,
+				});
+			}),
+		[
+			controller,
+		],
+	);
+
 	useEffect(() => {
 		const onKeyDown = (event: KeyboardEvent) => {
 			const current = controller.getSnapshot().state;
@@ -168,6 +192,7 @@ export const ItemDetailProvider = ({
 			runPendingAction,
 			openItemDetailFx,
 			openItemDefinitionDetailFx,
+			selectRetainedItemDetailTabFx,
 			closeAtom: controller.closeAtom,
 			closeFx: controller.closeFx,
 			completeEnterFx: controller.completeEnterFx,
@@ -179,6 +204,7 @@ export const ItemDetailProvider = ({
 			openItemDefinitionDetailFx,
 			openItemDetailFx,
 			runPendingAction,
+			selectRetainedItemDetailTabFx,
 			snapshot,
 		],
 	);

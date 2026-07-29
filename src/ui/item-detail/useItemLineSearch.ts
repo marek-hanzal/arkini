@@ -18,6 +18,7 @@ export const useItemLineSearch = (
 		}
 	>,
 	initialQuery = "",
+	ignoreAvailability = false,
 ) => {
 	const [query, setQuery] = useState(initialQuery);
 	const availableLineCount = useMemo(
@@ -27,7 +28,9 @@ export const useItemLineSearch = (
 		],
 	);
 	const [availabilityFilter, setAvailabilityFilter] = useState<ItemLineAvailabilityFilter>(() =>
-		initialQuery.trim() !== "" || availableLineCount === 0 ? "all" : "available",
+		ignoreAvailability || initialQuery.trim() !== "" || availableLineCount === 0
+			? "all"
+			: "available",
 	);
 	useEffect(() => {
 		if (availabilityFilter !== "available" || availableLineCount !== 0) return;
@@ -37,9 +40,13 @@ export const useItemLineSearch = (
 		availableLineCount,
 	]);
 	const selectedLines = useMemo(
-		() => (availabilityFilter === "all" ? lines.line : lines.line.filter(isAvailableLine)),
+		() =>
+			ignoreAvailability || availabilityFilter === "all"
+				? lines.line
+				: lines.line.filter(isAvailableLine),
 		[
 			availabilityFilter,
+			ignoreAvailability,
 			lines.line,
 		],
 	);

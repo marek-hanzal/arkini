@@ -144,10 +144,12 @@ export const ItemLineRow = ({
 	disabled,
 	line,
 	ownerItemId,
+	stale = false,
 }: {
 	readonly disabled: boolean;
 	readonly line: ItemDetailLines.Line;
 	readonly ownerItemId: string;
+	readonly stale?: boolean;
 }) => {
 	const itemDetail = useItemDetailControl();
 	const pendingKey = (action: ItemDetailPendingAction) =>
@@ -209,7 +211,7 @@ export const ItemLineRow = ({
 		line.availability.kind === "unavailable"
 			? readUnavailableDependency(line.availability.reason)
 			: undefined;
-	const showUnavailableReason = unavailable && line.activeJob === undefined;
+	const showUnavailableReason = !stale && unavailable && line.activeJob === undefined;
 	const progress =
 		line.activeJob === undefined
 			? null
@@ -226,12 +228,12 @@ export const ItemLineRow = ({
 
 	return (
 		<article
-			className={`ak-list-row overflow-hidden rounded-xl border-b border-l-2 border-line px-3 py-5 pl-4 first:pt-3 last:border-b-0 last:pb-5 ${line.activeJob === undefined ? "border-l-line/55" : "ak-list-row-active border-l-success"}`}
+			className={`ak-list-row overflow-hidden rounded-xl border-b border-l-2 border-line px-3 py-5 pl-4 first:pt-3 last:border-b-0 last:pb-5 ${stale || line.activeJob === undefined ? "border-l-line/55" : "ak-list-row-active border-l-success"}`}
 			data-ui="TileLine"
 			data-line-id={line.lineId}
-			data-active={line.activeJob === undefined ? "false" : "true"}
+			data-active={!stale && line.activeJob !== undefined ? "true" : "false"}
 		>
-			{progress === null ? null : (
+			{stale || progress === null ? null : (
 				<div
 					className="pointer-events-none absolute inset-y-0 right-0 left-0.5 overflow-hidden rounded-r-[inherit]"
 					aria-hidden="true"
@@ -248,7 +250,10 @@ export const ItemLineRow = ({
 			)}
 			<div className="relative z-[1] flex flex-wrap items-start justify-between gap-4">
 				<div className="min-w-0 flex-1">
-					<ItemLineSummary line={line} />
+					<ItemLineSummary
+						line={line}
+						stale={stale}
+					/>
 					{!showUnavailableReason ? null : unavailableDependency === undefined ? (
 						<ItemLineUnavailableMessage reason={line.availability.reason} />
 					) : (
@@ -258,106 +263,108 @@ export const ItemLineRow = ({
 						/>
 					)}
 				</div>
-				<div className="flex shrink-0 flex-col items-end gap-3">
-					<ItemLineRuntime line={line} />
-					<div className="flex flex-wrap justify-end gap-2">
-						{!line.autonomous.supported ? null : (
+				{stale ? null : (
+					<div className="flex shrink-0 flex-col items-end gap-3">
+						<ItemLineRuntime line={line} />
+						<div className="flex flex-wrap justify-end gap-2">
+							{!line.autonomous.supported ? null : (
+								<Button
+									className="min-h-8 px-3 py-1 text-xs"
+									cursorIntent={pending.autonomous ? "progress" : undefined}
+									data-ui="TileLineAutonomousButton"
+									data-enabled={line.autonomous.enabled ? "true" : "false"}
+									disabled={disabled || unavailable}
+									onClick={() =>
+										setAutonomousLine.run({
+											enabled: !line.autonomous.enabled,
+											ownerItemId,
+											lineId: line.lineId,
+										})
+									}
+								>
+									{pending.autonomous
+										? "Saving…"
+										: line.autonomous.enabled
+											? "Disable auto"
+											: "Enable auto"}
+								</Button>
+							)}
 							<Button
 								className="min-h-8 px-3 py-1 text-xs"
-								cursorIntent={pending.autonomous ? "progress" : undefined}
-								data-ui="TileLineAutonomousButton"
-								data-enabled={line.autonomous.enabled ? "true" : "false"}
+								cursorIntent={pending.default ? "progress" : undefined}
+								data-ui="TileLineSetDefaultButton"
+								data-default={line.isDefault ? "true" : "false"}
 								disabled={disabled || unavailable}
+								onClick={() => {
+									if (line.isDefault) {
+										unsetDefaultLine.run({
+											ownerItemId,
+										});
+										return;
+									}
+									setDefaultLine.run({
+										ownerItemId,
+										lineId: line.lineId,
+									});
+								}}
+							>
+								{pending.default
+									? "Saving…"
+									: line.isDefault
+										? "Unset default"
+										: "Set default"}
+							</Button>
+							<Button
+								cursorIntent={pending.autofill ? "progress" : undefined}
+								disabled={disabled || unavailable || !line.actions.canAutofill}
 								onClick={() =>
-									setAutonomousLine.run({
-										enabled: !line.autonomous.enabled,
+									autofillLine.run({
 										ownerItemId,
 										lineId: line.lineId,
 									})
 								}
 							>
-								{pending.autonomous
-									? "Saving…"
-									: line.autonomous.enabled
-										? "Disable auto"
-										: "Enable auto"}
+								{pending.autofill ? "Filling…" : "Autofill"}
 							</Button>
-						)}
-						<Button
-							className="min-h-8 px-3 py-1 text-xs"
-							cursorIntent={pending.default ? "progress" : undefined}
-							data-ui="TileLineSetDefaultButton"
-							data-default={line.isDefault ? "true" : "false"}
-							disabled={disabled || unavailable}
-							onClick={() => {
-								if (line.isDefault) {
-									unsetDefaultLine.run({
+							<Button
+								cursorIntent={pending.withdraw ? "progress" : undefined}
+								data-ui="TileLineWithdrawButton"
+								disabled={disabled || !line.actions.canWithdraw}
+								onClick={() =>
+									withdrawLine.run({
 										ownerItemId,
-									});
-									return;
+										lineId: line.lineId,
+									})
 								}
-								setDefaultLine.run({
-									ownerItemId,
-									lineId: line.lineId,
-								});
-							}}
-						>
-							{pending.default
-								? "Saving…"
-								: line.isDefault
-									? "Unset default"
-									: "Set default"}
-						</Button>
-						<Button
-							cursorIntent={pending.autofill ? "progress" : undefined}
-							disabled={disabled || unavailable || !line.actions.canAutofill}
-							onClick={() =>
-								autofillLine.run({
-									ownerItemId,
-									lineId: line.lineId,
-								})
-							}
-						>
-							{pending.autofill ? "Filling…" : "Autofill"}
-						</Button>
-						<Button
-							cursorIntent={pending.withdraw ? "progress" : undefined}
-							data-ui="TileLineWithdrawButton"
-							disabled={disabled || !line.actions.canWithdraw}
-							onClick={() =>
-								withdrawLine.run({
-									ownerItemId,
-									lineId: line.lineId,
-								})
-							}
-						>
-							{pending.withdraw ? "Withdrawing…" : "Withdraw"}
-						</Button>
-						<PrimaryButton
-							className="min-w-24"
-							cursorIntent={pending.start ? "progress" : undefined}
-							data-ui="TileLineStartButton"
-							data-start-mode={line.startMode}
-							disabled={disabled || !line.actions.canStart}
-							onClick={() =>
-								startLine.start({
-									ownerItemId,
-									lineId: line.lineId,
-								})
-							}
-						>
-							{pending.start
-								? line.startMode === "enqueue"
-									? "Queueing…"
-									: "Starting…"
-								: line.startMode === "enqueue"
-									? "Enqueue"
-									: "Start"}
-						</PrimaryButton>
+							>
+								{pending.withdraw ? "Withdrawing…" : "Withdraw"}
+							</Button>
+							<PrimaryButton
+								className="min-w-24"
+								cursorIntent={pending.start ? "progress" : undefined}
+								data-ui="TileLineStartButton"
+								data-start-mode={line.startMode}
+								disabled={disabled || !line.actions.canStart}
+								onClick={() =>
+									startLine.start({
+										ownerItemId,
+										lineId: line.lineId,
+									})
+								}
+							>
+								{pending.start
+									? line.startMode === "enqueue"
+										? "Queueing…"
+										: "Starting…"
+									: line.startMode === "enqueue"
+										? "Enqueue"
+										: "Start"}
+							</PrimaryButton>
+						</div>
 					</div>
-				</div>
+				)}
 			</div>
-			{error === null ? null : (
+			{stale || error === null ? null : (
 				<p
 					className="relative z-[1] mt-3 text-sm text-danger"
 					role="status"
@@ -365,7 +372,7 @@ export const ItemLineRow = ({
 					{error}
 				</p>
 			)}
-			{line.availability.kind === "unavailable" ? (
+			{!stale && line.availability.kind === "unavailable" ? (
 				<div className="relative z-[1]">
 					<ItemLineUnavailableWithdrawals
 						disabled={disabled}
@@ -381,6 +388,7 @@ export const ItemLineRow = ({
 						input={line.input}
 						lineId={line.lineId}
 						ownerItemId={ownerItemId}
+						stale={stale}
 					/>
 					<div
 						className="grid place-items-center text-muted"

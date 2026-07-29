@@ -31,10 +31,12 @@ const SourceArtwork = ({
 const SourceRow = ({
 	disabled,
 	source,
+	stale,
 	targetTitle,
 }: {
 	readonly disabled: boolean;
 	readonly source: useItemDetailSources.Source;
+	readonly stale: boolean;
 	readonly targetTitle: string;
 }) => {
 	const itemDetail = useItemDetailControl();
@@ -69,11 +71,13 @@ const SourceRow = ({
 						<h3 className="truncate text-base font-semibold text-foreground">
 							{source.title}
 						</h3>
-						<p className="mt-0.5 text-sm text-muted">
-							{source.space === undefined
-								? "Owned source"
-								: `Space ${source.space + 1}`}
-						</p>
+						{stale ? null : (
+							<p className="mt-0.5 text-sm text-muted">
+								{source.space === undefined
+									? "Owned source"
+									: `Space ${source.space + 1}`}
+							</p>
+						)}
 					</div>
 				</div>
 				<span
@@ -89,6 +93,7 @@ const SourceRow = ({
 export const ItemSourcesTab = ({
 	disabled = false,
 	sources,
+	stale = false,
 }: {
 	readonly disabled?: boolean;
 	readonly sources: Extract<
@@ -97,6 +102,7 @@ export const ItemSourcesTab = ({
 			readonly kind: "available";
 		}
 	>;
+	readonly stale?: boolean;
 }) => (
 	<Scrollable
 		className="h-full flex-1 pr-1"
@@ -108,6 +114,7 @@ export const ItemSourcesTab = ({
 					key={source.ownerItemId}
 					disabled={disabled}
 					source={source}
+					stale={stale}
 					targetTitle={sources.targetTitle}
 				/>
 			))}

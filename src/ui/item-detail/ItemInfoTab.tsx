@@ -128,6 +128,7 @@ const TagLabel = ({ tag }: { readonly tag: string }) => {
 export const ItemInfoTab = ({
 	identity,
 	info,
+	stale = false,
 }: {
 	readonly identity: Extract<
 		useItemDetailIdentity.Projection,
@@ -141,6 +142,7 @@ export const ItemInfoTab = ({
 			readonly kind: "available";
 		}
 	>;
+	readonly stale?: boolean;
 }) => (
 	<Scrollable
 		className="h-full pr-1"
@@ -165,28 +167,32 @@ export const ItemInfoTab = ({
 					label="Type"
 					value={itemTypeLabel[info.itemType]}
 				/>
-				<LocationInfoFact location={info.location} />
+				{stale ? null : <LocationInfoFact location={info.location} />}
 				<InfoFact
 					label="Storage"
 					value={storageScopeLabel[info.storageScope]}
 				/>
-				<InfoFact
-					label="Current stack"
-					value={`${info.quantity} ${info.quantity === 1 ? "item" : "items"}`}
-				/>
+				{stale ? null : (
+					<InfoFact
+						label="Current stack"
+						value={`${info.quantity} ${info.quantity === 1 ? "item" : "items"}`}
+					/>
+				)}
 				<InfoFact
 					label="Stack capacity"
 					value={info.maxStackSize === 1 ? "Single item" : `${info.maxStackSize} items`}
 				/>
-				<InfoFact
-					label="Owned"
-					value={`${info.ownedQuantity}${info.maxCount === undefined ? "" : ` / ${info.maxCount}`}`}
-				/>
+				{stale ? null : (
+					<InfoFact
+						label="Owned"
+						value={`${info.ownedQuantity}${info.maxCount === undefined ? "" : ` / ${info.maxCount}`}`}
+					/>
+				)}
 				<InfoFact
 					label="Game limit"
 					value={info.maxCount === undefined ? "No configured limit" : `${info.maxCount}`}
 				/>
-				{info.charges === undefined ? null : (
+				{stale || info.charges === undefined ? null : (
 					<InfoFact
 						label="Charges"
 						value={`${info.charges.remaining} / ${info.charges.total}`}

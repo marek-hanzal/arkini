@@ -65,6 +65,11 @@ export interface OpenItemDefinitionDetailProps {
 	readonly origin?: HTMLElement | null;
 }
 
+export interface SelectRetainedItemDetailTabProps {
+	readonly itemId: string;
+	readonly tab: ItemDetailTab;
+}
+
 /** Canvas-local owner for one exact capability-tabbed Item Detail modal. */
 export interface ItemDetailControl {
 	readonly state: ItemDetailState;
@@ -77,6 +82,13 @@ export interface ItemDetailControl {
 	readonly openItemDetailFx: (props: OpenItemDetailProps) => Effect.Effect<boolean>;
 	readonly openItemDefinitionDetailFx: (
 		props: OpenItemDefinitionDetailProps,
+	) => Effect.Effect<boolean>;
+	/**
+	 * Changes only the presentation tab of the exact retained runtime target.
+	 * It never resolves or grants gameplay authority to a disappeared item.
+	 */
+	readonly selectRetainedItemDetailTabFx: (
+		props: SelectRetainedItemDetailTabProps,
 	) => Effect.Effect<boolean>;
 	readonly closeAtom: Atom.AtomResultFn<CloseItemDetailProps | undefined, void, never>;
 	readonly closeFx: (props?: CloseItemDetailProps) => Effect.Effect<void>;

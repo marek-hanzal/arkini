@@ -4,6 +4,15 @@ import { routeTree } from "~/_route";
 import type { RootContext } from "~/ui/root/RootContext";
 import { resolveRouteViewTransitionTypesFx } from "~/ui/navigation/resolveRouteViewTransitionTypesFx";
 
+const isSkippedViewTransition = (error: unknown) =>
+	typeof error === "object" && error !== null && "name" in error && error.name === "AbortError";
+
+const observeSkippedViewTransition = (transition: ViewTransition) => {
+	void transition.ready.catch((error: unknown) => {
+		if (!isSkippedViewTransition(error)) throw error;
+	});
+};
+
 /**
  * Creates the one process router around an explicit renderer-runtime context.
  * Routes may borrow that authority; router or React lifetime must not recreate it.
@@ -14,7 +23,7 @@ export const createArkiniRouterFx = Effect.fn("createArkiniRouterFx")((context: 
 			typeof window !== "undefined" &&
 			typeof window.CSS?.supports === "function" &&
 			window.CSS.supports("selector(:active-view-transition-type(arkini))");
-		return createRouter({
+		const router = createRouter({
 			routeTree,
 			context,
 			defaultPreload: "intent",
@@ -26,6 +35,48 @@ export const createArkiniRouterFx = Effect.fn("createArkiniRouterFx")((context: 
 				: false,
 			scrollRestoration: true,
 		});
+		const startRouterViewTransition = router.startViewTransition.bind(router);
+		router.startViewTransition = (update) => {
+			if (
+				typeof document === "undefined" ||
+				typeof document.startViewTransition !== "function"
+			) {
+				startRouterViewTransition(update);
+				return;
+			}
+			const startNativeViewTransition = document.startViewTransition;
+			const ownStartViewTransition = Object.getOwnPropertyDescriptor(
+				document,
+				"startViewTransition",
+			);
+			const guardedStartViewTransition = ((
+				...args: Parameters<typeof document.startViewTransition>
+			) => {
+				const transition = Reflect.apply(startNativeViewTransition, document, args);
+				observeSkippedViewTransition(transition);
+				return transition;
+			}) as typeof document.startViewTransition;
+			Object.defineProperty(document, "startViewTransition", {
+				configurable: true,
+				value: guardedStartViewTransition,
+			});
+			try {
+				startRouterViewTransition(update);
+			} finally {
+				if (document.startViewTransition === guardedStartViewTransition) {
+					if (ownStartViewTransition === undefined) {
+						Reflect.deleteProperty(document, "startViewTransition");
+					} else {
+						Object.defineProperty(
+							document,
+							"startViewTransition",
+							ownStartViewTransition,
+						);
+					}
+				}
+			}
+		};
+		return router;
 	}),
 );
 

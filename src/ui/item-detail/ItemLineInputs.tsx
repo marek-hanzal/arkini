@@ -181,11 +181,13 @@ const ItemLineInputRow = ({
 	input,
 	lineId,
 	ownerItemId,
+	stale,
 }: {
 	readonly disabled: boolean;
 	readonly input: ItemDetailLines.Input;
 	readonly lineId: string;
 	readonly ownerItemId: string;
+	readonly stale: boolean;
 }) =>
 	match(input)
 		.with(
@@ -220,38 +222,40 @@ const ItemLineInputRow = ({
 									: ` · ${materials.charges.cost} charge${materials.charges.cost === 1 ? "" : "s"} from ${materials.charges.from === "self" ? "owner" : "target"}`}
 							</p>
 						</div>
-						<div className="flex flex-col items-end text-right">
-							<div className="flex items-start justify-end gap-2">
-								<MaterialInputWithdraw
+						{stale ? null : (
+							<div className="flex flex-col items-end text-right">
+								<div className="flex items-start justify-end gap-2">
+									<MaterialInputWithdraw
+										disabled={disabled}
+										input={materials}
+										lineId={lineId}
+										ownerItemId={ownerItemId}
+									/>
+									<p
+										className={`pt-1 font-medium text-foreground ${materials.deliveryQuantity > 0 ? "opacity-70" : ""}`}
+										data-ui={
+											materials.deliveryQuantity > 0
+												? "TileLineInputDeliveryQuantity"
+												: "TileLineInputStoredQuantity"
+										}
+									>
+										{materials.deliveryQuantity > 0
+											? materials.deliveryQuantity
+											: materials.storedQuantity}{" "}
+										/{" "}
+										{materials.required.min === materials.required.max
+											? materials.required.min
+											: `${materials.required.min}–${materials.required.max}`}{" "}
+										{materials.deliveryQuantity > 0 ? "on the way" : "stored"}
+									</p>
+								</div>
+								<MaterialInputAutofillAvailability
 									disabled={disabled}
 									input={materials}
-									lineId={lineId}
-									ownerItemId={ownerItemId}
+									label={label}
 								/>
-								<p
-									className={`pt-1 font-medium text-foreground ${materials.deliveryQuantity > 0 ? "opacity-70" : ""}`}
-									data-ui={
-										materials.deliveryQuantity > 0
-											? "TileLineInputDeliveryQuantity"
-											: "TileLineInputStoredQuantity"
-									}
-								>
-									{materials.deliveryQuantity > 0
-										? materials.deliveryQuantity
-										: materials.storedQuantity}{" "}
-									/{" "}
-									{materials.required.min === materials.required.max
-										? materials.required.min
-										: `${materials.required.min}–${materials.required.max}`}{" "}
-									{materials.deliveryQuantity > 0 ? "on the way" : "stored"}
-								</p>
 							</div>
-							<MaterialInputAutofillAvailability
-								disabled={disabled}
-								input={materials}
-								label={label}
-							/>
-						</div>
+						)}
 					</div>
 				);
 			},
@@ -288,18 +292,20 @@ const ItemLineInputRow = ({
 									: ` · ${deposit.charges.cost} charge${deposit.charges.cost === 1 ? "" : "s"} from ${deposit.charges.from === "self" ? "owner" : "target"}`}
 							</p>
 						</div>
-						<div className="text-right">
-							<p className="font-medium text-foreground">
-								{deposit.availableChargesLabel === "None"
-									? "None available"
-									: `${deposit.requiredCharges} / ${deposit.availableChargesLabel} available`}
-							</p>
-							{deposit.targetTitles.length === 0 ? null : (
-								<p className="mt-0.5 max-w-56 truncate text-xs text-muted">
-									{deposit.targetTitles.join(", ")}
+						{stale ? null : (
+							<div className="text-right">
+								<p className="font-medium text-foreground">
+									{deposit.availableChargesLabel === "None"
+										? "None available"
+										: `${deposit.requiredCharges} / ${deposit.availableChargesLabel} available`}
 								</p>
-							)}
-						</div>
+								{deposit.targetTitles.length === 0 ? null : (
+									<p className="mt-0.5 max-w-56 truncate text-xs text-muted">
+										{deposit.targetTitles.join(", ")}
+									</p>
+								)}
+							</div>
+						)}
 					</div>
 				);
 			},
@@ -330,11 +336,13 @@ export const ItemLineInputs = ({
 	input,
 	lineId,
 	ownerItemId,
+	stale = false,
 }: {
 	readonly disabled: boolean;
 	readonly input: readonly ItemDetailLines.Input[];
 	readonly lineId: string;
 	readonly ownerItemId: string;
+	readonly stale?: boolean;
 }) => (
 	<section className="min-w-0">
 		<h4 className="border-b border-line pb-2 text-xs font-semibold uppercase tracking-[0.08em] text-muted">
@@ -351,6 +359,7 @@ export const ItemLineInputs = ({
 						input={entry}
 						lineId={lineId}
 						ownerItemId={ownerItemId}
+						stale={stale}
 					/>
 				))}
 			</div>

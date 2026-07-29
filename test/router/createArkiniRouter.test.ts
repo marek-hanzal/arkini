@@ -294,4 +294,32 @@ describe("createArkiniRouterFx", () => {
 		router.startViewTransition(update);
 		await vi.waitFor(() => expect(update).toHaveBeenCalledOnce());
 	});
+
+	it("handles the expected AbortError when an overlapping view transition is skipped", async () => {
+		Object.defineProperty(window, "CSS", {
+			configurable: true,
+			value: {
+				supports: vi.fn(() => true),
+			},
+		});
+		const ready = Promise.reject(new DOMException("Transition was skipped", "AbortError"));
+		const catchReady = vi.spyOn(ready, "catch");
+		Object.defineProperty(document, "startViewTransition", {
+			configurable: true,
+			value: vi.fn(() => ({
+				finished: Promise.resolve(),
+				ready,
+				skipTransition: vi.fn(),
+				types: new Set<string>(),
+				updateCallbackDone: Promise.resolve(),
+			})),
+		});
+		const router = createRouter();
+		router.options.defaultViewTransition = true;
+
+		router.startViewTransition(async () => undefined);
+		await Promise.resolve();
+
+		expect(catchReady).toHaveBeenCalledOnce();
+	});
 });

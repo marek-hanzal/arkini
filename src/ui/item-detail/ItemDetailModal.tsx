@@ -121,12 +121,14 @@ const ItemDetailTabs = ({
 	active,
 	disabled,
 	lineCount,
+	stale = false,
 	tabs,
 	target,
 }: {
 	readonly active: ItemDetailTab;
 	readonly disabled: boolean;
 	readonly lineCount?: number;
+	readonly stale?: boolean;
 	readonly tabs: readonly ItemDetailTab[];
 	readonly target: ItemDetailTarget;
 }) => {
@@ -148,10 +150,15 @@ const ItemDetailTabs = ({
 					onClick={() =>
 						RendererRuntime.runSync(
 							target.kind === "runtime"
-								? itemDetail.openItemDetailFx({
-										itemId: target.itemId,
-										tab,
-									})
+								? stale
+									? itemDetail.selectRetainedItemDetailTabFx({
+											itemId: target.itemId,
+											tab,
+										})
+									: itemDetail.openItemDetailFx({
+											itemId: target.itemId,
+											tab,
+										})
 								: itemDetail.openItemDefinitionDetailFx({
 										itemId: target.itemId,
 										tab: tab === "sources" ? tab : "info",
@@ -176,24 +183,16 @@ const ItemDetailTabs = ({
 
 const ItemInfoContent = ({
 	disabled,
-	itemId,
+	identity,
+	info,
+	stale,
 }: {
 	readonly disabled: boolean;
-	readonly itemId: string;
+	readonly identity?: useItemDetailIdentity.Projection;
+	readonly info?: useItemDetailInfo.Projection;
+	readonly stale: boolean;
 }) => {
-	const liveIdentity = useItemDetailIdentity(itemId);
-	const liveInfo = useItemDetailInfo(itemId);
-	const identity = useRetainedItemDetailProjection({
-		available: liveIdentity.kind === "available",
-		targetKey: itemId,
-		value: liveIdentity,
-	});
-	const info = useRetainedItemDetailProjection({
-		available: liveInfo.kind === "available",
-		targetKey: itemId,
-		value: liveInfo,
-	});
-	if (identity.value?.kind !== "available" || info.value?.kind !== "available") {
+	if (identity?.kind !== "available" || info?.kind !== "available") {
 		return (
 			<div className="grid flex-1 place-items-center text-sm text-muted">
 				Item detail is unavailable.
@@ -202,16 +201,13 @@ const ItemInfoContent = ({
 	}
 	return (
 		<div
-			className={
-				disabled || identity.stale || info.stale
-					? "min-h-0 flex-1 opacity-70"
-					: "min-h-0 flex-1"
-			}
-			inert={disabled || identity.stale || info.stale}
+			className={disabled ? "min-h-0 flex-1 opacity-70" : "min-h-0 flex-1"}
+			inert={disabled}
 		>
 			<ItemInfoTab
-				identity={identity.value}
-				info={info.value}
+				identity={identity}
+				info={info}
+				stale={stale}
 			/>
 		</div>
 	);
@@ -221,10 +217,12 @@ const ItemLinesContent = ({
 	disabled,
 	initialQuery,
 	lines,
+	stale,
 }: {
 	readonly disabled: boolean;
 	readonly initialQuery?: string;
 	readonly lines?: useItemDetailLines.Projection;
+	readonly stale: boolean;
 }) => {
 	if (lines?.kind !== "available") {
 		return (
@@ -238,6 +236,7 @@ const ItemLinesContent = ({
 			disabled={disabled}
 			initialQuery={initialQuery}
 			lines={lines}
+			stale={stale}
 		/>
 	);
 };
@@ -245,9 +244,11 @@ const ItemLinesContent = ({
 const ItemQueueContent = ({
 	disabled,
 	itemId,
+	stale,
 }: {
 	readonly disabled: boolean;
 	readonly itemId: string;
+	readonly stale: boolean;
 }) => {
 	const liveQueue = useItemDetailQueue(itemId);
 	const queue = useRetainedItemDetailProjection({
@@ -255,6 +256,16 @@ const ItemQueueContent = ({
 		targetKey: itemId,
 		value: liveQueue,
 	});
+	if (stale || queue.stale) {
+		return (
+			<div
+				className="grid flex-1 place-items-center px-4 text-center text-sm text-muted"
+				data-ui="ItemQueueStale"
+			>
+				Queue is unavailable because this item no longer exists.
+			</div>
+		);
+	}
 	if (queue.value?.kind !== "available") {
 		return (
 			<div className="grid flex-1 place-items-center text-sm text-muted">
@@ -264,7 +275,7 @@ const ItemQueueContent = ({
 	}
 	return (
 		<ItemQueueTab
-			disabled={disabled || queue.stale}
+			disabled={disabled}
 			queue={queue.value}
 		/>
 	);
@@ -273,9 +284,11 @@ const ItemQueueContent = ({
 const ItemSourcesContent = ({
 	disabled,
 	sources,
+	stale = false,
 }: {
 	readonly disabled: boolean;
 	readonly sources?: useItemDetailSources.Projection;
+	readonly stale?: boolean;
 }) => {
 	if (sources?.kind !== "available" || sources.source.length === 0) {
 		return (
@@ -288,6 +301,7 @@ const ItemSourcesContent = ({
 		<ItemSourcesTab
 			disabled={disabled}
 			sources={sources}
+			stale={stale}
 		/>
 	);
 };
@@ -295,23 +309,31 @@ const ItemSourcesContent = ({
 const ItemDetailContent = ({
 	disabled,
 	itemId,
+	identity,
+	info,
 	linesSearchQuery,
 	lines,
 	sources,
+	stale,
 	tab,
 }: {
 	readonly disabled: boolean;
 	readonly itemId: string;
+	readonly identity?: useItemDetailIdentity.Projection;
+	readonly info?: useItemDetailInfo.Projection;
 	readonly linesSearchQuery?: string;
 	readonly lines?: useItemDetailLines.Projection;
 	readonly sources?: useItemDetailSources.Projection;
+	readonly stale: boolean;
 	readonly tab: ItemDetailTab;
 }) =>
 	match(tab)
 		.with("info", () => (
 			<ItemInfoContent
 				disabled={disabled}
-				itemId={itemId}
+				identity={identity}
+				info={info}
+				stale={stale}
 			/>
 		))
 		.with("lines", () => (
@@ -319,18 +341,21 @@ const ItemDetailContent = ({
 				disabled={disabled}
 				initialQuery={linesSearchQuery}
 				lines={lines}
+				stale={stale}
 			/>
 		))
 		.with("queue", () => (
 			<ItemQueueContent
 				disabled={disabled}
 				itemId={itemId}
+				stale={stale}
 			/>
 		))
 		.with("sources", () => (
 			<ItemSourcesContent
 				disabled={disabled}
 				sources={sources}
+				stale={stale}
 			/>
 		))
 		.exhaustive();
@@ -378,6 +403,7 @@ const RuntimeItemDetailScene = ({
 	const itemDetail = useItemDetailControl();
 	const closeItemDetail = useCloseItemDetail();
 	const liveIdentity = useItemDetailIdentity(target.itemId);
+	const liveInfo = useItemDetailInfo(target.itemId);
 	const liveLines = useItemDetailLines(target.itemId);
 	const liveSources = useItemDetailSources({
 		kind: "runtime",
@@ -400,6 +426,11 @@ const RuntimeItemDetailScene = ({
 		targetKey: `runtime:${target.itemId}`,
 		value: liveTabs,
 	});
+	const retainedInfo = useRetainedItemDetailProjection({
+		available: liveInfo.kind === "available",
+		targetKey: `runtime:${target.itemId}`,
+		value: liveInfo,
+	});
 	const retainedLines = useRetainedItemDetailProjection({
 		available: liveLines.kind === "available",
 		targetKey: `runtime:${target.itemId}`,
@@ -411,6 +442,7 @@ const RuntimeItemDetailScene = ({
 		value: liveSources,
 	});
 	const identity = retainedIdentity.value;
+	const info = retainedInfo.value;
 	const lines = retainedLines.value;
 	const sources = retainedSources.value;
 	const tabs = retainedTabs.value ?? [];
@@ -463,8 +495,9 @@ const RuntimeItemDetailScene = ({
 			)}
 			<ItemDetailTabs
 				active={target.tab}
-				disabled={stale || disabled}
-				lineCount={lineCount}
+				disabled={disabled}
+				lineCount={stale ? undefined : lineCount}
+				stale={stale}
 				tabs={tabs}
 				target={target}
 			/>
@@ -474,11 +507,14 @@ const RuntimeItemDetailScene = ({
 			>
 				<ItemDetailBodyTransition target={target}>
 					<ItemDetailContent
-						disabled={stale || disabled}
+						disabled={disabled}
 						itemId={target.itemId}
+						identity={identity}
+						info={info}
 						linesSearchQuery={target.linesSearchQuery}
 						lines={lines}
 						sources={sources}
+						stale={stale}
 						tab={target.tab}
 					/>
 				</ItemDetailBodyTransition>

@@ -50,6 +50,7 @@ export const ItemLinesTab = ({
 	disabled = false,
 	initialQuery,
 	lines,
+	stale = false,
 }: {
 	readonly disabled?: boolean;
 	readonly initialQuery?: string;
@@ -59,6 +60,7 @@ export const ItemLinesTab = ({
 			readonly kind: "available";
 		}
 	>;
+	readonly stale?: boolean;
 }) => {
 	const {
 		availabilityFilter,
@@ -68,7 +70,7 @@ export const ItemLinesTab = ({
 		query,
 		setAvailabilityFilter,
 		setQuery,
-	} = useItemLineSearch(lines, initialQuery);
+	} = useItemLineSearch(lines, initialQuery, stale);
 	return (
 		<div
 			className="flex min-h-0 flex-1 flex-col"
@@ -88,46 +90,48 @@ export const ItemLinesTab = ({
 						onChange={(event) => setQuery(event.currentTarget.value)}
 					/>
 				</div>
-				<fieldset className="shrink-0">
-					<legend className="sr-only">Line availability</legend>
-					<div
-						className="grid grid-cols-2 gap-1 rounded-lg border border-line bg-surface-raised/65 p-1"
-						role="radiogroup"
-						aria-label="Line availability"
-						data-ui="ItemLinesAvailabilityFilter"
-					>
-						{availabilityOptions.map((option) => {
-							const selected = availabilityFilter === option.value;
-							const optionDisabled =
-								option.value === "available" && availableLineCount === 0;
-							return (
-								<label
-									key={option.value}
-									className={`relative rounded-md px-3 py-1.5 text-center text-xs font-semibold transition-colors ${
-										optionDisabled
-											? "cursor-not-allowed text-muted opacity-50"
-											: selected
-												? "bg-accent text-accent-contrast hover:bg-accent-hover"
-												: "cursor-pointer text-muted hover:bg-surface"
-									}`}
-									data-selected={selected ? "true" : "false"}
-									data-disabled={optionDisabled ? "true" : "false"}
-								>
-									<input
-										type="radio"
-										name="item-lines-availability"
-										value={option.value}
-										checked={selected}
-										disabled={optionDisabled}
-										className="sr-only"
-										onChange={() => setAvailabilityFilter(option.value)}
-									/>
-									{option.label}
-								</label>
-							);
-						})}
-					</div>
-				</fieldset>
+				{stale ? null : (
+					<fieldset className="shrink-0">
+						<legend className="sr-only">Line availability</legend>
+						<div
+							className="grid grid-cols-2 gap-1 rounded-lg border border-line bg-surface-raised/65 p-1"
+							role="radiogroup"
+							aria-label="Line availability"
+							data-ui="ItemLinesAvailabilityFilter"
+						>
+							{availabilityOptions.map((option) => {
+								const selected = availabilityFilter === option.value;
+								const optionDisabled =
+									option.value === "available" && availableLineCount === 0;
+								return (
+									<label
+										key={option.value}
+										className={`relative rounded-md px-3 py-1.5 text-center text-xs font-semibold transition-colors ${
+											optionDisabled
+												? "cursor-not-allowed text-muted opacity-50"
+												: selected
+													? "bg-accent text-accent-contrast hover:bg-accent-hover"
+													: "cursor-pointer text-muted hover:bg-surface"
+										}`}
+										data-selected={selected ? "true" : "false"}
+										data-disabled={optionDisabled ? "true" : "false"}
+									>
+										<input
+											type="radio"
+											name="item-lines-availability"
+											value={option.value}
+											checked={selected}
+											disabled={optionDisabled}
+											className="sr-only"
+											onChange={() => setAvailabilityFilter(option.value)}
+										/>
+										{option.label}
+									</label>
+								);
+							})}
+						</div>
+					</fieldset>
+				)}
 			</div>
 			<Scrollable className="flex-1 pr-1">
 				{lines.line.length === 0 && normalizedQuery === "" ? (
@@ -155,6 +159,7 @@ export const ItemLinesTab = ({
 								disabled={disabled}
 								line={line}
 								ownerItemId={lines.itemId}
+								stale={stale}
 							/>
 						))}
 					</div>

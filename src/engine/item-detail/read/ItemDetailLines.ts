@@ -135,6 +135,7 @@ export namespace ItemDetailLines {
 		readonly effectiveRuntimeMs: TimeSchema.Type;
 		readonly availability: Availability;
 		readonly isDefault: boolean;
+		readonly queuedRequestCount: number;
 		readonly actions: {
 			readonly immediate:
 				| {

@@ -1,6 +1,7 @@
 import { Effect, Result } from "effect";
 import { describe, expect, it } from "vitest";
 
+import { settleItemDeliveryFx } from "~/engine/delivery/write/settleItemDeliveryFx";
 import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
 import { useGameFx } from "~/engine/game/fx/useGameFx";
 import { autofillLineInputsFx } from "~/engine/input/write/autofillLineInputsFx";
@@ -74,7 +75,7 @@ describe("fillAndStartLineFx", () => {
 		});
 	});
 
-	it("stores exact sources and creates hard job input in one committed transition", () => {
+	it("starts only after exact Autofill sources physically settle", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {
 				yield* spawnOwnerFx();
@@ -83,7 +84,13 @@ describe("fillAndStartLineFx", () => {
 					lineId,
 					ownerItemId,
 				});
+				const beforeContact = yield* readRuntimeFx();
+				yield* settleItemDeliveryFx({
+					itemId: "runtime:water",
+					generation: 0,
+				});
 				return {
+					beforeContact,
 					command,
 					runtime: yield* readRuntimeFx(),
 					transition: yield* readCommittedTransitionFx(),
@@ -95,19 +102,32 @@ describe("fillAndStartLineFx", () => {
 			),
 		);
 
-		expect(result.command).toMatchObject({
-			type: "started",
-			filledQuantity: 3,
+		expect(result.command).toEqual({
+			type: "filled",
+			remainingMissingQuantity: 0,
+			scheduledQuantity: 3,
+		});
+		expect(result.beforeContact.jobs).toHaveLength(0);
+		expect(
+			result.beforeContact.items.find((item) => item.id === "runtime:water"),
+		).toMatchObject({
+			location: {
+				phase: "outbound",
+				scope: "delivery",
+			},
+			quantity: 7,
 		});
 		expect(result.runtime.jobs).toEqual([
 			expect.objectContaining({
-				id: result.command.type === "started" ? result.command.job.id : undefined,
 				lineId,
 				ownerItemId,
 			}),
 		]);
 		expect(result.runtime.items.find((item) => item.id === "runtime:water")).toMatchObject({
-			location: sourceLocation(1),
+			location: {
+				phase: "returning",
+				scope: "delivery",
+			},
 			quantity: 4,
 		});
 		expect(
@@ -115,17 +135,17 @@ describe("fillAndStartLineFx", () => {
 				(item) =>
 					item.item.id === "water" &&
 					item.location.scope === "job" &&
-					item.location.jobId ===
-						(result.command.type === "started" ? result.command.job.id : undefined),
+					item.location.jobId === result.runtime.jobs[0]?.id,
 			),
 		).toMatchObject({
 			quantity: 3,
 		});
-		expect(result.transition.events.map((event) => event.type)).toEqual([
-			GameEventEnumSchema.enum.JobStarted,
-			GameEventEnumSchema.enum.ItemInputStored,
-			GameEventEnumSchema.enum.ItemConsumed,
-		]);
+		expect(result.transition.events.map((event) => event.type)).toEqual(
+			expect.arrayContaining([
+				GameEventEnumSchema.enum.JobStarted,
+				GameEventEnumSchema.enum.ItemConsumed,
+			]),
+		);
 	});
 
 	it("rejects a stale explicit action while the owner already has queued work", () => {
@@ -181,6 +201,10 @@ describe("fillAndStartLineFx", () => {
 				yield* fillAndStartLineFx({
 					lineId,
 					ownerItemId,
+				});
+				yield* settleItemDeliveryFx({
+					itemId: "runtime:water",
+					generation: 0,
 				});
 				const before = yield* readRuntimeFx();
 				const attempt = yield* Effect.result(
@@ -257,6 +281,14 @@ describe("fillAndStartLineFx", () => {
 			Effect.gen(function* () {
 				yield* spawnOwnerFx();
 				yield* spawnWaterFx(3);
+				yield* autofillLineInputsFx({
+					lineId,
+					ownerItemId,
+				});
+				yield* settleItemDeliveryFx({
+					itemId: "runtime:water",
+					generation: 0,
+				});
 				const before = yield* readRuntimeFx();
 				const request = {
 					id: "job:request-head",

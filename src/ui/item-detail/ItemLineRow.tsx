@@ -204,6 +204,7 @@ export const ItemLineRow = ({
 			? readUnavailableDependency(line.availability.reason)
 			: undefined;
 	const showUnavailableReason = !stale && unavailable && line.activeJob === undefined;
+	const queued = !stale && line.activeJob === undefined && line.queuedRequestCount > 0;
 	const progress =
 		line.activeJob === undefined
 			? null
@@ -220,10 +221,19 @@ export const ItemLineRow = ({
 
 	return (
 		<article
-			className={`ak-list-row overflow-hidden rounded-xl border-b border-l-2 border-line px-3 py-5 pl-4 first:pt-3 last:border-b-0 last:pb-5 ${stale || line.activeJob === undefined ? "border-l-line/55" : "ak-list-row-active border-l-success"}`}
+			className={`ak-list-row overflow-hidden rounded-xl border-b border-l-2 border-line px-3 py-5 pl-4 first:pt-3 last:border-b-0 last:pb-5 ${
+				stale
+					? "border-l-line/55"
+					: line.activeJob !== undefined
+						? "ak-list-row-active border-l-success"
+						: queued
+							? "border-l-warning bg-warning/[0.06]"
+							: "border-l-line/55"
+			}`}
 			data-ui="TileLine"
 			data-line-id={line.lineId}
 			data-active={!stale && line.activeJob !== undefined ? "true" : "false"}
+			data-queued={queued ? "true" : "false"}
 		>
 			{stale || progress === null ? null : (
 				<div
@@ -246,6 +256,18 @@ export const ItemLineRow = ({
 						line={line}
 						stale={stale}
 					/>
+					{queued ? (
+						<p
+							className="mt-3 flex items-center gap-2 text-sm font-medium text-warning"
+							data-ui="TileLineQueuedMessage"
+						>
+							<span
+								className="icon-[lucide--clock-3] size-4 shrink-0"
+								aria-hidden="true"
+							/>
+							Queued for automatic start when the required inputs become available.
+						</p>
+					) : null}
 					{!showUnavailableReason ? null : unavailableDependency === undefined ? (
 						<ItemLineUnavailableMessage reason={line.availability.reason} />
 					) : (

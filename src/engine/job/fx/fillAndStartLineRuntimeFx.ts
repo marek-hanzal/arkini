@@ -2,7 +2,6 @@ import { Effect } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
-import { applyLineInputAutofillPlanFx } from "~/engine/input/fx/applyLineInputAutofillPlanFx";
 import { readLineInputAutofillCoverageFx } from "~/engine/input/fx/readLineInputAutofillCoverageFx";
 import { startLineRuntimeFx } from "~/engine/job/fx/startLineRuntimeFx";
 import type { JobSchema } from "~/engine/job/schema/JobSchema";
@@ -39,11 +38,11 @@ export namespace fillAndStartLineRuntimeFx {
 }
 
 /**
- * Atomically fills exact current inputs and starts through the canonical hard-reservation path.
+ * Starts only from canonical input truth after every physical delivery has settled.
  *
  * A queue caller supplies the exact FIFO head identity. That request is removed only inside the
- * successful candidate transition; incomplete coverage, stale identity, and typed start failures
- * retain the original runtime unchanged.
+ * successful start transition. Grid autofill coverage is reported to the caller but never applied
+ * here, so every item still travels through the shared delivery pipeline before becoming startable.
  */
 export const fillAndStartLineRuntimeFx = Effect.fn("fillAndStartLineRuntimeFx")(function* ({
 	lineId,
@@ -101,10 +100,10 @@ export const fillAndStartLineRuntimeFx = Effect.fn("fillAndStartLineRuntimeFx")(
 		ownerItemId,
 		runtime,
 	});
-	if (coverage.type === "incomplete") {
+	if (coverage.type === "incomplete" || coverage.plan.entry.length > 0) {
 		return {
 			type: "incomplete",
-			missingQuantity: coverage.missingQuantity,
+			missingQuantity: coverage.type === "incomplete" ? coverage.missingQuantity : 0,
 			runtime,
 			selectedQuantity: coverage.selectedQuantity,
 		} satisfies fillAndStartLineRuntimeFx.Result;
@@ -119,24 +118,15 @@ export const fillAndStartLineRuntimeFx = Effect.fn("fillAndStartLineRuntimeFx")(
 						return request.id !== queueRequestId;
 					}),
 				};
-	const filled = yield* applyLineInputAutofillPlanFx({
-		lineId,
-		ownerItemId,
-		plan: coverage.plan,
-		runtime: candidate,
-	});
 	const [job, startedRuntime, startEvents] = yield* startLineRuntimeFx({
 		lineId,
 		ownerItemId,
-		runtime: filled.runtime,
+		runtime: candidate,
 	});
 	return {
 		type: "started",
-		events: [
-			...filled.events,
-			...startEvents,
-		],
-		filledQuantity: filled.storedQuantity,
+		events: startEvents,
+		filledQuantity: 0,
 		job,
 		runtime: startedRuntime,
 	} satisfies fillAndStartLineRuntimeFx.Result;

@@ -202,6 +202,7 @@ export namespace ItemDetailLines {
 		readonly effectiveRuntimeMs: number;
 		readonly availability: Availability;
 		readonly isDefault: boolean;
+		readonly queuedRequestCount: number;
 		readonly actions: LineActions;
 		readonly input: readonly Input[];
 		readonly output: readonly OutputSet[];

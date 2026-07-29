@@ -72,6 +72,15 @@ export const ItemLineSummary = ({
 						{activeWork}
 					</span>
 				)}
+				{stale || line.activeJob !== undefined || line.queuedRequestCount === 0 ? null : (
+					<span
+						className="rounded-full border border-warning/45 bg-warning/15 px-2.5 py-1 text-xs font-semibold text-foreground"
+						data-ui="TileLineQueuedBadge"
+					>
+						Queued
+						{line.queuedRequestCount > 1 ? ` ×${line.queuedRequestCount}` : ""}
+					</span>
+				)}
 				{stale ? null : (
 					<span
 						className={`rounded-full border px-2.5 py-1 text-xs font-semibold ${readiness.className}`}

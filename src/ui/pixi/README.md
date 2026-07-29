@@ -118,9 +118,9 @@ poses to motion, runs entry or exit effects, and finalizes presentation claims.
   attracts and chases its receiver's live physical pose through distance-aware nonlinear segments.
   Settlement releases the magnetic source. Manual producer input remains committed by its drop
   command; autofill instead creates canonical deliveries whose input is not available until
-  physical contact settles the matching generation. A fully covered `Start` is different: it
-  atomically stores the exact selected inputs and creates the job in one engine commit, while the
-  emitted semantic item facts remain available to presentation.
+  physical contact settles the matching generation. `Fill & Start` and queued work use that same
+  delivery path for Producer, Craft, Blueprint, and every other line owner. No job may start while
+  any outbound delivery still targets that owner and line.
 - A delivery keeps its exact origin lease until its full quantity commits or returns. Player
   interaction may reduce or invalidate its soft target claim; reconciliation then returns the same
   actor, including any partial remainder, to the persisted origin.
@@ -131,8 +131,8 @@ poses to motion, runs entry or exit effects, and finalizes presentation claims.
 - Canonical engine items remain the only gameplay truth. Delivery quantity stays canonical on its
   runtime item; ordinary cue motion owns only its narrow, phase-aware presentation overlay. The
   reconciler and animation-triggered refreshes use the same projector, so quantity and badge can
-  never disagree. A line owner shows an `xN` queue badge only when its canonical active jobs plus
-  queued requests exceed one.
+  never disagree. A line owner shows an `xN` queue badge for every non-zero canonical active-job
+  plus queued-request count, including `x1`.
 - Accepted consumption presents exact result/event facts: the surviving source dips, a removed
   source fades, and the receiver emits the shared accent particle burst. Drop-result facts cover manual
   stack, producer-input, and Inventory storage commands that do not emit equivalent engine events.

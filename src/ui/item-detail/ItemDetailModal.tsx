@@ -121,6 +121,7 @@ const ItemDetailTabs = ({
 	active,
 	disabled,
 	lineCount,
+	queueCount,
 	stale = false,
 	tabs,
 	target,
@@ -128,6 +129,7 @@ const ItemDetailTabs = ({
 	readonly active: ItemDetailTab;
 	readonly disabled: boolean;
 	readonly lineCount?: number;
+	readonly queueCount?: number;
 	readonly stale?: boolean;
 	readonly tabs: readonly ItemDetailTab[];
 	readonly target: ItemDetailTarget;
@@ -173,6 +175,14 @@ const ItemDetailTabs = ({
 							data-ui="ItemDetailTabCount"
 						>
 							{lineCount}
+						</span>
+					) : null}
+					{tab === "queue" && queueCount !== undefined && queueCount > 0 ? (
+						<span
+							className="min-w-5 rounded-full bg-warning/20 px-1.5 py-0.5 text-center text-[0.6875rem] font-semibold tabular-nums text-foreground"
+							data-ui="ItemDetailQueueTabCount"
+						>
+							{queueCount}
 						</span>
 					) : null}
 				</button>
@@ -405,6 +415,7 @@ const RuntimeItemDetailScene = ({
 	const liveIdentity = useItemDetailIdentity(target.itemId);
 	const liveInfo = useItemDetailInfo(target.itemId);
 	const liveLines = useItemDetailLines(target.itemId);
+	const liveQueue = useItemDetailQueue(target.itemId);
 	const liveSources = useItemDetailSources({
 		kind: "runtime",
 		itemId: target.itemId,
@@ -448,6 +459,7 @@ const RuntimeItemDetailScene = ({
 	const tabs = retainedTabs.value ?? [];
 	const stale = retainedIdentity.stale || retainedTabs.stale;
 	const lineCount = lines?.kind === "available" ? lines.line.length : undefined;
+	const queueCount = liveQueue.kind === "available" ? liveQueue.request.length : undefined;
 
 	useEffect(() => {
 		if (stale || liveTabs.includes(target.tab)) return;
@@ -497,6 +509,7 @@ const RuntimeItemDetailScene = ({
 				active={target.tab}
 				disabled={disabled}
 				lineCount={stale ? undefined : lineCount}
+				queueCount={stale ? undefined : queueCount}
 				stale={stale}
 				tabs={tabs}
 				target={target}

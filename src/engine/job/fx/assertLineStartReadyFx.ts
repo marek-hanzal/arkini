@@ -34,6 +34,14 @@ export const assertLineStartReadyFx = Effect.fn("assertLineStartReadyFx")(functi
 			}),
 		);
 	}
+	if (!resolution.ready) {
+		return yield* Effect.fail(
+			new LineRunUnavailableError({
+				ownerItemId: resolution.ownerItemId,
+				lineId: resolution.lineId,
+			}),
+		);
+	}
 
 	return plan satisfies LineRunPlanSchema.Type;
 });

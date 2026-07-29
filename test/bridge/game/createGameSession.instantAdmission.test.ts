@@ -5,6 +5,7 @@ import { createTestGameSession } from "~test/bridge/game/createTestGameSession";
 import { createJobTestConfig } from "~test/job/support/jobTestConfig";
 import { setCheatEnabledFx } from "~/engine/cheat/write/setCheatEnabledFx";
 import { setInstantGameplayFx } from "~/engine/cheat/write/setInstantGameplayFx";
+import { settleItemDeliveryFx } from "~/engine/delivery/write/settleItemDeliveryFx";
 import { storeInputMaterialFx } from "~/engine/input/write/storeInputMaterialFx";
 import { enqueueLineFx } from "~/engine/job/write/enqueueLineFx";
 import { startLineFx } from "~/engine/job/write/startLineFx";
@@ -148,7 +149,7 @@ describe("GameSession Instant gameplay admission", () => {
 		}
 	});
 
-	it("wakes five rapidly enqueued requests when later sources complete the head", async () => {
+	it("wakes five rapidly enqueued requests after later sources physically reach the head", async () => {
 		const session = await createTestGameSession({
 			config: createJobTestConfig(5),
 			tickIntervalMs: 1,
@@ -242,6 +243,34 @@ describe("GameSession Instant gameplay admission", () => {
 			);
 
 			const deadline = performance.now() + 1_000;
+			let deliveries = session
+				.getSnapshot()
+				.items.filter(
+					(item) =>
+						item.location.scope === "delivery" && item.location.phase === "outbound",
+				);
+			while (deliveries.length < 3) {
+				if (performance.now() >= deadline) {
+					throw new Error("Queued Instant sources were not admitted into delivery.");
+				}
+				await new Promise((resolve) => setTimeout(resolve, 5));
+				deliveries = session
+					.getSnapshot()
+					.items.filter(
+						(item) =>
+							item.location.scope === "delivery" &&
+							item.location.phase === "outbound",
+					);
+			}
+			for (const delivery of deliveries) {
+				if (delivery.location.scope !== "delivery") continue;
+				await session.run(
+					settleItemDeliveryFx({
+						itemId: delivery.id,
+						generation: delivery.location.generation,
+					}),
+				);
+			}
 			while ((session.getSnapshot().jobQueue ?? []).length === 5) {
 				if (performance.now() >= deadline) {
 					throw new Error("Queued Instant job did not wake after its sources appeared.");

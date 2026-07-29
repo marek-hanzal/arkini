@@ -9,7 +9,6 @@ import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { readLineInputAutofillCoverageFx } from "~/engine/input/fx/readLineInputAutofillCoverageFx";
 import { resolveLineStartFx } from "~/engine/job/fx/read/resolveLineStartFx";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
-import { applyLineInputAutofillPlanFx } from "~/engine/input/fx/applyLineInputAutofillPlanFx";
 import { assertLineOutputMaxCountFx } from "~/engine/job/fx/assertLineOutputMaxCountFx";
 import { assertLineEnqueueConditionsFx } from "~/engine/job/fx/assertLineEnqueueConditionsFx";
 
@@ -130,20 +129,16 @@ export const readItemDetailQueueFx = Effect.fn("readItemDetailQueueFx")(function
 						lineId: request.lineId,
 						runtime,
 					});
-					if (coverage.type === "incomplete") {
+					if (coverage.type === "incomplete" || coverage.plan.entry.length > 0) {
 						status = "waiting-inputs";
-						missingQuantity = coverage.missingQuantity;
+						missingQuantity =
+							coverage.selectedQuantity +
+							(coverage.type === "incomplete" ? coverage.missingQuantity : 0);
 					} else {
-						const filled = yield* applyLineInputAutofillPlanFx({
-							ownerItemId: owner.id,
-							lineId: request.lineId,
-							plan: coverage.plan,
-							runtime,
-						});
 						const candidate = yield* resolveLineStartFx({
 							ownerItemId: owner.id,
 							lineId: request.lineId,
-							runtime: filled.runtime,
+							runtime,
 						});
 						const output = yield* Effect.result(
 							assertLineOutputMaxCountFx({
@@ -151,7 +146,7 @@ export const readItemDetailQueueFx = Effect.fn("readItemDetailQueueFx")(function
 								ownerItemId: owner.id,
 								lineId: request.lineId,
 								plan: candidate.run.plan,
-								runtime: filled.runtime,
+								runtime,
 							}),
 						);
 						status =

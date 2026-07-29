@@ -325,6 +325,76 @@ describe("Item Detail line input actions", () => {
 		).toBe(4);
 	});
 
+	it("waits for ordinary Fill deliveries that share a durable Fill & Start target", () => {
+		const result = Effect.runSync(
+			Effect.gen(function* () {
+				yield* spawnOwnerFx();
+				yield* spawnWaterFx({
+					id: "runtime:minimum",
+					location: sourceLocation(1),
+					quantity: 1,
+				});
+				yield* autofillLineInputsFx({
+					ownerItemId,
+					lineId,
+					purpose: {
+						kind: "fill-and-try-start",
+						ownerItemId,
+						lineId,
+					},
+				});
+				yield* spawnWaterFx({
+					id: "runtime:ordinary-top-up",
+					location: sourceLocation(2),
+					quantity: 3,
+				});
+				yield* autofillLineInputsFx({
+					ownerItemId,
+					lineId,
+				});
+
+				yield* settleItemDeliveryFx({
+					itemId: "runtime:minimum",
+					generation: 0,
+				});
+				const afterMinimum = yield* readRuntimeFx();
+				yield* settleItemDeliveryFx({
+					itemId: "runtime:ordinary-top-up",
+					generation: 0,
+				});
+				return {
+					afterMinimum,
+					afterTopUp: yield* readRuntimeFx(),
+				};
+			}).pipe(
+				useGameFx({
+					config: rangeInputTestConfig,
+				}),
+			),
+		);
+
+		expect(result.afterMinimum.jobs).toEqual([]);
+		expect(result.afterMinimum.deliveryStartIntents).toEqual([
+			{
+				ownerItemId,
+				lineId,
+			},
+		]);
+		expect(
+			result.afterMinimum.items.find((item) => item.id === "runtime:ordinary-top-up"),
+		).toMatchObject({
+			location: {
+				phase: "outbound",
+				purpose: {
+					kind: "fill",
+				},
+				scope: "delivery",
+			},
+		});
+		expect(result.afterTopUp.jobs).toHaveLength(1);
+		expect(result.afterTopUp.deliveryStartIntents).toEqual([]);
+	});
+
 	it("autofills deterministic board, Toolbar, and Inventory sources in physical priority", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {

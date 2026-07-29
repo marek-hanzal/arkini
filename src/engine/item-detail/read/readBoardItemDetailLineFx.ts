@@ -187,6 +187,9 @@ export const readBoardItemDetailLineFx = Effect.fn("readBoardItemDetailLineFx")(
 		effectiveRuntimeMs: resolution.runtimeMs,
 		availability,
 		isDefault: line.id === defaultLineId,
+		queuedRequestCount: (runtime.jobQueue ?? []).filter(
+			(request) => request.ownerItemId === ownerItemId && request.lineId === line.id,
+		).length,
 		actions: {
 			immediate: {
 				type: immediateType,

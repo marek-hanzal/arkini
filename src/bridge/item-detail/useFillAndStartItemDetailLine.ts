@@ -15,7 +15,7 @@ export namespace useFillAndStartItemDetailLine {
 const runFillAndStartFx = (game: Game, command: useFillAndStartItemDetailLine.Props) =>
 	game.runFx(fillAndStartLineFx(command));
 
-/** Runs the authoritative Fill or atomic Fill & Start action for one exact Item Detail line. */
+/** Runs the authoritative Fill & Start intent for one exact Item Detail line. */
 export const useFillAndStartItemDetailLine = ({
 	pendingKey,
 	pendingOwner,

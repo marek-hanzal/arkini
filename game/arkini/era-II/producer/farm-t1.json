@@ -41,26 +41,24 @@
 								"value": 2
 							},
 							"capacity": 4
-						}
-					],
-					"rules": [
+						},
 						{
-							"type": "enable",
-							"when": [
-								{
-									"type": "exists",
-									"query": {
-										"scope": "board",
-										"distance": "close",
-										"selector": {
-											"type": "item",
-											"itemId": "item:wheat-field"
-										}
-									}
+							"type": "deposit",
+							"query": {
+								"scope": "board",
+								"distance": "close",
+								"selector": {
+									"type": "item",
+									"itemId": "item:wheat-field"
 								}
-							]
+							},
+							"charges": {
+								"cost": 1,
+								"from": "target"
+							}
 						}
 					],
+					"rules": [],
 					"output": {
 						"set": [
 							{
@@ -140,26 +138,24 @@
 								"value": 1
 							},
 							"capacity": 4
-						}
-					],
-					"rules": [
+						},
 						{
-							"type": "enable",
-							"when": [
-								{
-									"type": "exists",
-									"query": {
-										"scope": "board",
-										"distance": "close",
-										"selector": {
-											"type": "item",
-											"itemId": "item:wheat-field"
-										}
-									}
+							"type": "deposit",
+							"query": {
+								"scope": "board",
+								"distance": "close",
+								"selector": {
+									"type": "item",
+									"itemId": "item:wheat-field"
 								}
-							]
+							},
+							"charges": {
+								"cost": 1,
+								"from": "target"
+							}
 						}
 					],
+					"rules": [],
 					"output": {
 						"set": [
 							{

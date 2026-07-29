@@ -169,6 +169,7 @@ const line = ({
 		readiness: "ready",
 	},
 	isDefault,
+	queuedRequestCount: 0,
 	actions: {
 		immediate: {
 			type: "start",
@@ -1348,6 +1349,43 @@ describe("ItemLinesTab", () => {
 		);
 		expect(button?.textContent).toBe("Queueing…");
 		expect(button?.className).toContain("cursor-progress");
+	});
+
+	it("marks queued idle work in warning orange and explains its automatic start", async () => {
+		const { container, rerender } = await renderLines({
+			...projection,
+			line: [
+				{
+					...projection.line[0],
+					queuedRequestCount: 2,
+				},
+			],
+		});
+		const queuedLine = container.querySelector<HTMLElement>('[data-ui="TileLine"]');
+		expect(queuedLine?.dataset.queued).toBe("true");
+		expect(queuedLine?.className).toContain("border-l-warning");
+		expect(queuedLine?.querySelector('[data-ui="TileLineQueuedBadge"]')?.textContent).toBe(
+			"Queued ×2",
+		);
+		expect(
+			queuedLine?.querySelector('[data-ui="TileLineQueuedMessage"]')?.textContent,
+		).toContain("Queued for automatic start when the required inputs become available.");
+
+		await rerender({
+			...projection,
+			line: [
+				{
+					...projection.line[1],
+					queuedRequestCount: 2,
+				},
+			],
+		});
+		const activeLine = container.querySelector<HTMLElement>('[data-ui="TileLine"]');
+		expect(activeLine?.dataset.active).toBe("true");
+		expect(activeLine?.dataset.queued).toBe("false");
+		expect(activeLine?.className).toContain("border-l-success");
+		expect(activeLine?.querySelector('[data-ui="TileLineQueuedBadge"]')).toBeNull();
+		expect(activeLine?.querySelector('[data-ui="TileLineQueuedMessage"]')).toBeNull();
 	});
 
 	it("keeps Fill and Enqueue as separate explicit commands", async () => {

@@ -1,6 +1,7 @@
 import { Effect, Result } from "effect";
 import { describe, expect, it } from "vitest";
 
+import { settleItemDeliveryFx } from "~/engine/delivery/write/settleItemDeliveryFx";
 import { useGameFx } from "~/engine/game/fx/useGameFx";
 import { enqueueLineFx } from "~/engine/job/write/enqueueLineFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
@@ -179,7 +180,7 @@ describe("enqueueLineFx", () => {
 		expect(result.runtime.items).toHaveLength(1);
 	});
 
-	it("starts the exact queued head after concrete Autofill sources appear", () => {
+	it("starts the exact queued head only after concrete Autofill deliveries settle", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {
 				yield* spawnItemFx({
@@ -225,9 +226,24 @@ describe("enqueueLineFx", () => {
 				yield* runTickRuntimeByFx({
 					elapsedMs: 100,
 				});
+				const delivering = yield* readRuntimeFx();
+				yield* settleItemDeliveryFx({
+					itemId: "runtime:water",
+					generation: 0,
+				});
+				yield* settleItemDeliveryFx({
+					itemId: "runtime:tool",
+					generation: 0,
+				});
+				const settled = yield* readRuntimeFx();
+				yield* runTickRuntimeByFx({
+					elapsedMs: 100,
+				});
 				return {
+					delivering,
 					request,
 					runtime: yield* readRuntimeFx(),
+					settled,
 				};
 			}).pipe(
 				useGameFx({
@@ -236,6 +252,14 @@ describe("enqueueLineFx", () => {
 			),
 		);
 
+		expect(result.delivering.jobs).toEqual([]);
+		expect(result.delivering.jobQueue).toEqual([
+			result.request,
+		]);
+		expect(result.settled.jobs).toEqual([]);
+		expect(result.settled.jobQueue).toEqual([
+			result.request,
+		]);
 		expect(result.runtime.jobQueue).toEqual([]);
 		expect(result.runtime.jobs).toEqual([
 			expect.objectContaining({

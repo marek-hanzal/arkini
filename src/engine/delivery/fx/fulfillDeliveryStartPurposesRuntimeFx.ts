@@ -1,6 +1,7 @@
 import { Effect, Option } from "effect";
 
 import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
+import { readLineInputDeliveryClaimsFx } from "~/engine/delivery/read/readLineInputDeliveryClaimsFx";
 import { JobStartSourceEnumSchema } from "~/engine/event/schema/JobStartSourceEnumSchema";
 import { requestLineStartRuntimeFx } from "~/engine/job/fx/requestLineStartRuntimeFx";
 import type { DeliveryPurposeSchema } from "~/engine/delivery/schema/DeliveryPurposeSchema";
@@ -57,23 +58,12 @@ export const fulfillDeliveryStartPurposesRuntimeFx = Effect.fn(
 		if (attempted.has(key)) continue;
 		attempted.add(key);
 
-		let matchingOutboundDeliveryPending = false;
-		for (const candidate of nextRuntime.items) {
-			const delivery = yield* isDeliveryRuntimeItemFx(candidate);
-			if (Option.isNone(delivery) || delivery.value.location.phase !== "outbound") {
-				continue;
-			}
-			const candidatePurpose = delivery.value.location.purpose;
-			if (
-				candidatePurpose.kind === "fill-and-try-start" &&
-				candidatePurpose.ownerItemId === purpose.ownerItemId &&
-				candidatePurpose.lineId === purpose.lineId
-			) {
-				matchingOutboundDeliveryPending = true;
-				break;
-			}
-		}
-		if (matchingOutboundDeliveryPending) continue;
+		const pendingDeliveryClaims = yield* readLineInputDeliveryClaimsFx({
+			ownerItemId: purpose.ownerItemId,
+			lineId: purpose.lineId,
+			runtime: nextRuntime,
+		});
+		if (pendingDeliveryClaims.length > 0) continue;
 
 		const request = yield* Effect.option(
 			requestLineStartRuntimeFx({

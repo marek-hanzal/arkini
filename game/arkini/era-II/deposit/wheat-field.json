@@ -3,9 +3,9 @@
 	"items": {
 		"item:wheat-field": {
 			"id": "item:wheat-field",
-			"type": "simple",
+			"type": "deposit",
 			"title": "Wheat Field",
-			"description": "Movable grain source used by nearby farms.",
+			"description": "Movable grain deposit with 16 harvests for nearby farms.",
 			"asset": {
 				"source": [
 					"item-wheat-field"
@@ -19,7 +19,10 @@
 			],
 			"categoryId": "source",
 			"scope": "any",
-			"maxStackSize": 1
+			"maxStackSize": 1,
+			"charges": {
+				"amount": 16
+			}
 		}
 	}
 }

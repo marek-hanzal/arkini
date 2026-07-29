@@ -39,6 +39,9 @@ export const readStoredItemDetailLineFx = Effect.fn("readStoredItemDetailLineFx"
 			},
 		},
 		isDefault,
+		queuedRequestCount: (runtime.jobQueue ?? []).filter(
+			(request) => request.ownerItemId === ownerItemId && request.lineId === line.id,
+		).length,
 		actions: {
 			immediate: {
 				type: "fill",

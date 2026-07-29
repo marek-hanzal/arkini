@@ -293,6 +293,70 @@ const renderItemDetail = async () => {
 };
 
 describe("ItemDetailModal", () => {
+	it("shows a non-zero Queue badge and queued idle line state from live requests", async () => {
+		const { readControl } = await renderItemDetail();
+		const owner = currentRuntime.items.find((item) => item.item.id === "workshop");
+		if (owner === undefined) throw new Error("Missing Workshop runtime item.");
+
+		await act(async () => {
+			openItemDetail(readControl(), {
+				itemId: owner.id,
+			});
+			await Promise.resolve();
+			await Promise.resolve();
+		});
+		expect(document.querySelector('[data-ui="ItemDetailQueueTabCount"]')).toBeNull();
+
+		await act(async () => {
+			publishRuntime(
+				RuntimeSchema.parse({
+					...currentRuntime,
+					jobQueue: [
+						{
+							id: "request:workshop:1",
+							ownerItemId: owner.id,
+							lineId: "line:workshop:water",
+						},
+						{
+							id: "request:workshop:2",
+							ownerItemId: owner.id,
+							lineId: "line:workshop:water",
+						},
+					],
+				}),
+			);
+			await Promise.resolve();
+		});
+
+		expect(document.querySelector('[data-ui="ItemDetailQueueTabCount"]')?.textContent).toBe(
+			"2",
+		);
+		const line = document.querySelector<HTMLElement>('[data-ui="TileLine"]');
+		expect(line?.dataset.active).toBe("false");
+		expect(line?.dataset.queued).toBe("true");
+		expect(line?.className).toContain("border-l-warning");
+		expect(line?.querySelector('[data-ui="TileLineQueuedBadge"]')?.textContent).toBe(
+			"Queued ×2",
+		);
+		expect(line?.querySelector('[data-ui="TileLineQueuedMessage"]')?.textContent).toContain(
+			"Queued for automatic start",
+		);
+
+		await act(async () => {
+			publishRuntime(
+				RuntimeSchema.parse({
+					...currentRuntime,
+					jobQueue: [],
+				}),
+			);
+			await Promise.resolve();
+		});
+		expect(document.querySelector('[data-ui="ItemDetailQueueTabCount"]')).toBeNull();
+		expect(document.querySelector<HTMLElement>('[data-ui="TileLine"]')?.dataset.queued).toBe(
+			"false",
+		);
+	});
+
 	it("keeps one modal and exact target mounted while switching supported tabs", async () => {
 		const { readControl } = await renderItemDetail();
 		const owner = currentRuntime.items.find((item) => item.item.id === "workshop");

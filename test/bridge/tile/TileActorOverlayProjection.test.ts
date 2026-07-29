@@ -41,6 +41,12 @@ describe("tile actor overlay projection", () => {
 		).toBe("x3");
 		expect(
 			formatTileBadgeLabel({
+				count: 1,
+				kind: "queue",
+			}),
+		).toBe("x1");
+		expect(
+			formatTileBadgeLabel({
 				count: 3,
 			}),
 		).toBe("3");
@@ -75,6 +81,15 @@ describe("tile actor overlay projection", () => {
 				runtime,
 			}),
 		).toBe(3);
+		expect(
+			readTileActorQueueBadgeCount({
+				ownerItemId: "runtime:other",
+				runtime: {
+					...runtime,
+					jobs: [],
+				},
+			}),
+		).toBe(1);
 		expect(
 			readTileActorQueueBadgeCount({
 				ownerItemId: "runtime:missing",

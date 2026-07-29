@@ -345,9 +345,12 @@ Ready temporary items expire after job completions in stable runtime-ID order. E
 
 ## 8. Jobs and FIFO requests
 
-The immediate line action is one authoritative `Fill | Start` decision. Partial concrete coverage
-performs the existing passive Fill delivery. Complete concrete coverage stores the exact selected
-inputs and starts the job atomically in one serialized runtime commit.
+The immediate line action is one authoritative `Fill | Start` decision. A line starts immediately
+only from material already committed to canonical Input storage. Otherwise every currently useful
+Autofill source becomes a physical delivery carrying one durable Fill & Start intent. The job may
+start only after the last outbound delivery targeting that exact owner and line has settled and all
+remaining start conditions still hold. A transient busy or rule block retains that intent; fixed
+Tick admission retries it until the owner and line become startable.
 
 An owner may have:
 
@@ -360,18 +363,20 @@ Missing concrete material is therefore queueable. Pending requests remain editab
 explicit owner command may clear the whole pending queue without touching an active job, materials,
 charges, or outputs.
 
-Immediate and queued starts use the same concrete Autofill selection, input-store, and hard job-start
-pipeline. Queue playback is opportunistic: only an idle owner's FIFO head is eligible, and it does
-nothing until every missing material input can be selected from current concrete runtime items.
-Actual upstream output becomes ordinary concrete supply after commit; queued work never reasons
-about hypothetical future output. A blocked FIFO head remains first and cannot be overtaken. It
-waits for fresh runtime facts to make it runnable or for the player to clear that owner's pending
-queue; the engine never drops it automatically.
+Immediate and queued starts use the same concrete Autofill selection, physical delivery, input-store,
+and hard job-start pipeline for Producer, Craft, Blueprint, and every other line owner. Queue
+playback is opportunistic: only an idle owner's FIFO head is eligible. Each Tick may admit currently
+useful concrete material into delivery, including partial coverage, while retaining the exact queue
+request. Later Ticks retry the same head; only settled Input material can produce a job. Actual
+upstream output becomes ordinary concrete supply after commit; queued work never reasons about
+hypothetical future output. A blocked FIFO head remains first and cannot be overtaken. It waits for
+fresh runtime facts to make it runnable or for the player to clear that owner's pending queue; the
+engine never drops it automatically.
 
 The persisted `jobQueue` array is also the canonical cross-owner priority. One bounded Tick settle
 walks eligible owner heads in that exact array order, reusing the runtime produced by every accepted
-start before considering the next head. No owner-ID sort, wall clock, renderer order, planned claim,
-or second scheduler participates.
+delivery admission or start before considering the next head. No owner-ID sort, wall clock, renderer
+order, planned claim, or second scheduler participates.
 
 Jobs persist only:
 

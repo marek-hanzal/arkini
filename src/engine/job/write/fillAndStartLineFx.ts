@@ -31,7 +31,7 @@ export namespace fillAndStartLineFx {
 		  };
 }
 
-/** Fills available inputs or atomically fills every missing input and starts immediately. */
+/** Starts from settled inputs or sends available Autofill material through physical delivery. */
 export const fillAndStartLineFx = Effect.fn("fillAndStartLineFx")(function* ({
 	lineId,
 	ownerItemId,
@@ -52,6 +52,11 @@ export const fillAndStartLineFx = Effect.fn("fillAndStartLineFx")(function* ({
 				const autofill = yield* autofillLineInputsRuntimeFx({
 					lineId,
 					ownerItemId,
+					purpose: {
+						kind: "fill-and-try-start",
+						lineId,
+						ownerItemId,
+					},
 					runtime,
 				});
 				if (autofill.result.scheduledQuantity > 0) {

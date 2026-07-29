@@ -354,7 +354,7 @@ describe("runTickRuntimeByFx", () => {
 });
 
 describe("fixed Tick steps", () => {
-	it("dispatches idle queue heads in persisted global queue order", () => {
+	it("admits deliveries for idle queue heads in persisted global queue order", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {
 				const olderOwnerItemId = "runtime:zzz-forge";
@@ -433,16 +433,29 @@ describe("fixed Tick steps", () => {
 			),
 		);
 
-		expect(result.jobs.map((job) => job.ownerItemId)).toEqual([
-			"runtime:zzz-forge",
-		]);
+		expect(result.jobs).toEqual([]);
 		expect(result.jobQueue).toEqual([
+			{
+				id: "job:older-global-request",
+				ownerItemId: "runtime:zzz-forge",
+				lineId: props.lineId,
+			},
 			{
 				id: "job:newer-global-request",
 				ownerItemId: "runtime:aaa-forge",
 				lineId: props.lineId,
 			},
 		]);
+		const deliveries = result.items.filter((item) => item.location.scope === "delivery");
+		expect(deliveries).toHaveLength(2);
+		expect(
+			deliveries.every(
+				(item) =>
+					item.location.scope === "delivery" &&
+					item.location.phase === "outbound" &&
+					item.location.target.ownerItemId === "runtime:zzz-forge",
+			),
+		).toBe(true);
 	});
 
 	it("uses one step-start live-rule snapshot regardless of runtime job-array order", () => {

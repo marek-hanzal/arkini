@@ -44,6 +44,7 @@ const makeProjection = (
 				reason,
 			},
 			isDefault: false,
+			queuedRequestCount: 0,
 			actions: {
 				immediate: {
 					type: "fill",

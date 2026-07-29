@@ -11,6 +11,7 @@ import { LineRunUnavailableError } from "~/engine/line/error/LineRunUnavailableE
 import type { PlacementUnavailableError } from "~/engine/placement/error/PlacementUnavailableError";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
+import { autofillLineInputsRuntimeFx } from "~/engine/input/write/autofillLineInputsFx";
 import { fillAndStartLineRuntimeFx } from "./fillAndStartLineRuntimeFx";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 
@@ -33,6 +34,11 @@ export namespace attemptQueuedLineStartFx {
 					| JobOutputMaxCountError
 					| LineRunUnavailableError
 					| PlacementUnavailableError;
+				runtime: RuntimeSchema.Type;
+		  }
+		| {
+				type: "delivery-scheduled";
+				events: readonly GameEventSchema.Type[];
 				runtime: RuntimeSchema.Type;
 		  }
 		| {
@@ -69,36 +75,48 @@ export const attemptQueuedLineStartFx = Effect.fn("attemptQueuedLineStartFx")(fu
 		} satisfies attemptQueuedLineStartFx.Result;
 	}
 
-	return yield* fillAndStartLineRuntimeFx({
-		ownerItemId: request.ownerItemId,
-		lineId: request.lineId,
-		queueRequestId: request.id,
-		runtime,
-	}).pipe(
-		Effect.map((result): attemptQueuedLineStartFx.Result => {
-			if (result.type === "queue-request-unavailable") {
+	return yield* Effect.gen(function* () {
+		const result = yield* fillAndStartLineRuntimeFx({
+			ownerItemId: request.ownerItemId,
+			lineId: request.lineId,
+			queueRequestId: request.id,
+			runtime,
+		});
+		if (result.type === "queue-request-unavailable") {
+			return {
+				type: "empty",
+				runtime,
+			} satisfies attemptQueuedLineStartFx.Result;
+		}
+		if (result.type === "incomplete") {
+			const autofill = yield* autofillLineInputsRuntimeFx({
+				ownerItemId: request.ownerItemId,
+				lineId: request.lineId,
+				runtime,
+			});
+			if (autofill.result.scheduledQuantity > 0) {
 				return {
-					type: "empty",
-					runtime,
-				};
-			}
-			if (result.type === "incomplete") {
-				return {
-					type: "blocked",
-					error: new LineRunUnavailableError({
-						ownerItemId: request.ownerItemId,
-						lineId: request.lineId,
-					}),
-					runtime,
-				};
+					type: "delivery-scheduled",
+					events: autofill.events,
+					runtime: autofill.runtime,
+				} satisfies attemptQueuedLineStartFx.Result;
 			}
 			return {
-				type: StartLineResultEnumSchema.enum.Started,
-				events: result.events,
-				job: result.job,
-				runtime: result.runtime,
-			};
-		}),
+				type: "blocked",
+				error: new LineRunUnavailableError({
+					ownerItemId: request.ownerItemId,
+					lineId: request.lineId,
+				}),
+				runtime,
+			} satisfies attemptQueuedLineStartFx.Result;
+		}
+		return {
+			type: StartLineResultEnumSchema.enum.Started,
+			events: result.events,
+			job: result.job,
+			runtime: result.runtime,
+		} satisfies attemptQueuedLineStartFx.Result;
+	}).pipe(
 		Effect.catchTags({
 			ItemChargesUnavailableError: (error) =>
 				Effect.succeed({

@@ -338,12 +338,7 @@ describe("ItemDetailModal", () => {
 		expect(line?.dataset.active).toBe("false");
 		expect(line?.dataset.queued).toBe("true");
 		expect(line?.className).toContain("border-l-warning");
-		expect(line?.querySelector('[data-ui="TileLineQueuedBadge"]')?.textContent).toBe(
-			"Queued ×2",
-		);
-		expect(line?.querySelector('[data-ui="TileLineQueuedBadge"]')?.className).toBe(
-			queueTabBadge?.className,
-		);
+		expect(line?.querySelector('[data-ui="TileLineQueuedBadge"]')).toBeNull();
 		expect(line?.querySelector('[data-ui="TileLineQueuedMessage"]')?.textContent).toContain(
 			"Queued for automatic start",
 		);

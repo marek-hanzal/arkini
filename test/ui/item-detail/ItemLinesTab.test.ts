@@ -695,6 +695,16 @@ describe("ItemLinesTab", () => {
 			"line:downstream-capped",
 			"line:first",
 		]);
+		expect(
+			container.querySelector(
+				'[data-line-id="line:capped"] [data-ui="TileLineStatusBadge"]',
+			)?.textContent,
+		).toBe("Disabled");
+		expect(
+			container.querySelector(
+				'[data-line-id="line:inputs"] [data-ui="TileLineStatusBadge"]',
+			),
+		).toBeNull();
 	});
 
 	it("keeps a running job in Available when its line becomes unavailable", async () => {
@@ -739,6 +749,7 @@ describe("ItemLinesTab", () => {
 		expect(container.textContent).not.toContain("This line is currently disabled.");
 		expect(container.querySelector('[data-ui="TileLineUnavailableReason"]')).toBeNull();
 		expect(container.querySelector('[data-ui="TileLineReadinessBadge"]')).toBeNull();
+		expect(container.querySelector('[data-ui="TileLineStatusBadge"]')).toBeNull();
 		expect(container.querySelector('[data-ui="TileLineInput"]')).not.toBeNull();
 		expect(container.querySelector('[data-ui="TileLineOutputItem"]')).not.toBeNull();
 		expect(container.querySelector('[data-ui="TileLineFlowChevron"]')).not.toBeNull();
@@ -750,6 +761,45 @@ describe("ItemLinesTab", () => {
 			container.querySelector<HTMLButtonElement>('[data-ui="TileLineOutputDetailLink"]')
 				?.disabled,
 		).toBe(true);
+	});
+
+	it("keeps Paused as the only active-job status badge", async () => {
+		const paused = {
+			...line({
+				active: true,
+				lineId: "line:paused",
+				title: "Paused line",
+			}),
+			activeJob: {
+				status: JobStatusEnumSchema.enum.Paused,
+				durationMs: 1_000,
+				remainingMs: 500,
+			},
+		} as const satisfies useItemDetailLines.Line;
+		const { container, rerender } = await renderLines({
+			...projection,
+			line: [
+				paused,
+			],
+		});
+
+		expect(
+			container.querySelector('[data-ui="TileLineStatusBadge"]')?.textContent,
+		).toBe("Paused");
+
+		await rerender({
+			...projection,
+			line: [
+				{
+					...paused,
+					activeJob: {
+						...paused.activeJob,
+						status: JobStatusEnumSchema.enum.AwaitingOutput,
+					},
+				},
+			],
+		});
+		expect(container.querySelector('[data-ui="TileLineStatusBadge"]')).toBeNull();
 	});
 
 	it("searches unavailable source lines initially and preserves the query across subsets", async () => {
@@ -1471,9 +1521,7 @@ describe("ItemLinesTab", () => {
 		const queuedLine = container.querySelector<HTMLElement>('[data-ui="TileLine"]');
 		expect(queuedLine?.dataset.queued).toBe("true");
 		expect(queuedLine?.className).toContain("border-l-warning");
-		expect(queuedLine?.querySelector('[data-ui="TileLineQueuedBadge"]')?.textContent).toBe(
-			"Queued ×2",
-		);
+		expect(queuedLine?.querySelector('[data-ui="TileLineQueuedBadge"]')).toBeNull();
 		expect(
 			queuedLine?.querySelector('[data-ui="TileLineQueuedMessage"]')?.textContent,
 		).toContain("Queued for automatic start when the required inputs become available.");

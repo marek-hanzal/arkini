@@ -244,16 +244,6 @@ export const checkRuntimeDeliveriesFx = Effect.fn("checkRuntimeDeliveriesFx")(fu
 			purposeIssues.push(issue(DeliveryPurposeIssueReasonEnumSchema.enum.LineMissing));
 			continue;
 		}
-		if (
-			intent.source === "autonomous" &&
-			!(runtime.autonomousLines ?? []).some(
-				(selection) =>
-					selection.ownerItemId === intent.ownerItemId &&
-					selection.lineId === intent.lineId,
-			)
-		) {
-			purposeIssues.push(issue(DeliveryPurposeIssueReasonEnumSchema.enum.AutonomousDisabled));
-		}
 	}
 
 	return [

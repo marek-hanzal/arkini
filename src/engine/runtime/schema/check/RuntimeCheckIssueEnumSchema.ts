@@ -23,7 +23,6 @@ export const RuntimeCheckIssueEnumSchema = z
 		InputSelectorMismatch: "input:selector-mismatch",
 		InputCapacityExceeded: "input:capacity-exceeded",
 		DefaultLine: "line:default",
-		AutonomousLine: "line:autonomous",
 		LineInputClosed: "line:input-closed",
 		DeliveryTarget: "delivery:target",
 		DeliveryPurpose: "delivery:purpose",

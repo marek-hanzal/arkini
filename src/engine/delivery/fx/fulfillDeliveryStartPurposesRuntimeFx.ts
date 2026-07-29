@@ -47,11 +47,9 @@ export const fulfillDeliveryStartPurposesRuntimeFx = Effect.fn(
 		if (Option.isNone(delivery)) continue;
 		pendingPurposes.push(delivery.value.location.purpose);
 	}
-	pendingPurposes.sort((left, right) => {
-		if (left.kind !== "fill-and-try-start") return 1;
-		if (right.kind !== "fill-and-try-start") return -1;
-		return left.source === right.source ? 0 : left.source === "player" ? -1 : 1;
-	});
+	pendingPurposes.sort((left, right) =>
+		left.kind === right.kind ? 0 : left.kind === "fill-and-try-start" ? -1 : 1,
+	);
 
 	for (const purpose of pendingPurposes) {
 		if (purpose.kind !== "fill-and-try-start") continue;
@@ -82,10 +80,7 @@ export const fulfillDeliveryStartPurposesRuntimeFx = Effect.fn(
 				ownerItemId: purpose.ownerItemId,
 				lineId: purpose.lineId,
 				runtime: nextRuntime,
-				source:
-					purpose.source === "autonomous"
-						? JobStartSourceEnumSchema.enum.Autonomous
-						: JobStartSourceEnumSchema.enum.Delivery,
+				source: JobStartSourceEnumSchema.enum.Delivery,
 			}),
 		);
 		if (Option.isNone(request)) continue;

@@ -60,13 +60,6 @@ export const LineSchema = z
 			.default(true)
 			.describe("Whether this product line is enabled before its rules are evaluated."),
 		/**
-		 * Whether the game author allows the player to enable autonomous cycles for this line.
-		 */
-		autonomous: z
-			.boolean()
-			.default(false)
-			.describe("Whether this product line supports player-controlled autonomous cycles."),
-		/**
 		 * Runtime of this product line in milliseconds.
 		 *
 		 * Zero means that the line completes immediately.

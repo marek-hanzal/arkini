@@ -3,7 +3,6 @@ import { z } from "zod";
 /** The accepted command source that started one product-line job. */
 export const JobStartSourceEnumSchema = z
 	.enum({
-		Autonomous: "autonomous",
 		Delivery: "delivery",
 		Explicit: "explicit",
 		Queue: "queue",

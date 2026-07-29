@@ -72,35 +72,18 @@ describe("discardRuntimeItemOwnedStateFx", () => {
 				[passiveChild.id]: "line:missing",
 				"runtime:unrelated": "line:unrelated",
 			},
-			autonomousLines: [
-				{
-					ownerItemId: root.id,
-					lineId: "line:forge:run",
-				},
-				{
-					ownerItemId: passiveChild.id,
-					lineId: "line:missing",
-				},
-				{
-					ownerItemId: "runtime:unrelated",
-					lineId: "line:unrelated",
-				},
-			],
 			deliveryStartIntents: [
 				{
 					ownerItemId: root.id,
 					lineId: "line:forge:run",
-					source: "player",
 				},
 				{
 					ownerItemId: passiveChild.id,
 					lineId: "line:missing",
-					source: "autonomous",
 				},
 				{
 					ownerItemId: "runtime:unrelated",
 					lineId: "line:unrelated",
-					source: "player",
 				},
 			],
 		} satisfies RuntimeSchema.Type;
@@ -122,11 +105,6 @@ describe("discardRuntimeItemOwnedStateFx", () => {
 		expect(result.defaultLineByOwnerItemId).toEqual({
 			"runtime:unrelated": "line:unrelated",
 		});
-		expect(result.autonomousLines).toEqual([
-			expect.objectContaining({
-				ownerItemId: "runtime:unrelated",
-			}),
-		]);
 		expect(result.deliveryStartIntents).toEqual([
 			expect.objectContaining({
 				ownerItemId: "runtime:unrelated",

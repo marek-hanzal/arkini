@@ -6,7 +6,6 @@ import { DeliveryStartIntentSchema } from "~/engine/delivery/schema/DeliveryStar
 import { JobQueueRequestSchema } from "~/engine/job/schema/JobQueueRequestSchema";
 import { JobSchema } from "~/engine/job/schema/JobSchema";
 import { DefaultLineByOwnerItemIdSchema } from "~/engine/line/schema/DefaultLineByOwnerItemIdSchema";
-import { AutonomousLineSchema } from "~/engine/line/schema/AutonomousLineSchema";
 import { RuntimeItemSchema } from "./RuntimeItemSchema";
 
 /** Canonical loaded gameplay state for one exact persisted Game. */
@@ -31,10 +30,6 @@ export const RuntimeSchema = z
 		defaultLineByOwnerItemId: DefaultLineByOwnerItemIdSchema.optional().describe(
 			"Save-backed default product line selected for exact live owner identities.",
 		),
-		autonomousLines: z
-			.array(AutonomousLineSchema)
-			.optional()
-			.describe("Save-backed autonomous line selections for exact live owner identities."),
 		deliveryStartIntents: z
 			.array(DeliveryStartIntentSchema)
 			.optional()

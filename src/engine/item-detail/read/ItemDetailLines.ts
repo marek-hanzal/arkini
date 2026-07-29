@@ -136,10 +136,6 @@ export namespace ItemDetailLines {
 		readonly availability: Availability;
 		readonly startMode: "start" | "enqueue";
 		readonly isDefault: boolean;
-		readonly autonomous: {
-			readonly enabled: boolean;
-			readonly supported: boolean;
-		};
 		readonly actions: {
 			readonly canAutofill: boolean;
 			readonly canStart: boolean;

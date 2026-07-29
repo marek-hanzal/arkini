@@ -83,7 +83,6 @@ export const TileDefaultLineCommandAtom = RendererRuntime.runSync(
 										kind: "fill-and-try-start",
 										lineId: command.lineId,
 										ownerItemId: command.ownerItemId,
-										source: "player",
 									},
 								});
 								const autofilled = autofill.scheduledQuantity > 0;

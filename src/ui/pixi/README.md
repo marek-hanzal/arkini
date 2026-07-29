@@ -116,8 +116,8 @@ poses to motion, runs entry or exit effects, and finalizes presentation claims.
   nearby board responders without attracting their own exchange counterpart; a stack payload
   attracts and chases its receiver's live physical pose through distance-aware nonlinear segments.
   Settlement releases the magnetic source. Manual producer input remains committed by its drop
-  command; autofill and autonomous input instead create canonical deliveries whose input is not
-  available until physical contact settles the matching generation.
+  command; autofill instead creates canonical deliveries whose input is not available until
+  physical contact settles the matching generation.
 - A delivery keeps its exact origin lease until its full quantity commits or returns. Player
   interaction may reduce or invalidate its soft target claim; reconciliation then returns the same
   actor, including any partial remainder, to the persisted origin.
@@ -125,9 +125,6 @@ poses to motion, runs entry or exit effects, and finalizes presentation claims.
   If either endpoint has no geometry, presentation freezes without settlement. Save/hydration keeps
   the delivery phase, generation, origin, and return endpoint, so a later visible main scene resumes
   the physical trip instead of inventing an offscreen gameplay commit.
-- Autonomous lines are driven only in the currently presented board space. Switching space or
-  unmounting its main scene freezes already admitted physical deliveries; returning to that board
-  resumes them from canonical facts. No route-local renderer is allowed to settle invisible cargo.
 - Canonical engine items remain the only gameplay truth. Delivery quantity stays canonical on its
   runtime item; ordinary cue motion owns only its narrow, phase-aware presentation overlay. The
   reconciler and animation-triggered refreshes use the same projector, so quantity and badge can
@@ -157,7 +154,7 @@ poses to motion, runs entry or exit effects, and finalizes presentation claims.
 | Canonical actor appearance or identity | `actor/` and `scene/createPixiMainSceneReconcilerFx.ts` |
 | Drag, left click, right click, or drop release | `drag/` |
 | Move, swap, stack, spawn, or replacement choreography | `motion/` and `scene/runPixiMainSceneReplacementsFx.ts` |
-| Autofill or autonomous delivery travel and settlement | `delivery/` and bridge `tile/readTileDeliveriesFx.ts` |
+| Autofill delivery travel and settlement | `delivery/` and bridge `tile/readTileDeliveriesFx.ts` |
 | Cross-canvas Inventory release | `PixiInventorySurface.tsx` and the main-scene Inventory opener |
 | Hit testing, slot geometry, or masks | `scene/*Surface*`, `layout/`, and `grid/` |
 | Magnetic response | `magnet/`; eligibility must continue to come from the bridge |

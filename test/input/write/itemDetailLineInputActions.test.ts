@@ -285,7 +285,6 @@ describe("Item Detail line input actions", () => {
 						kind: "fill-and-try-start",
 						ownerItemId,
 						lineId,
-						source: "player",
 					},
 				});
 
@@ -502,7 +501,6 @@ describe("Item Detail line input actions", () => {
 						kind: "fill-and-try-start",
 						ownerItemId,
 						lineId,
-						source: "player",
 					},
 				});
 				const started = yield* settleItemDeliveryFx({

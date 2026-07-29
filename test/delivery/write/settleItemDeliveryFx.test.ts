@@ -314,7 +314,6 @@ describe("settleItemDeliveryFx", () => {
 						kind: "fill-and-try-start",
 						ownerItemId,
 						lineId,
-						source: "player",
 					},
 				});
 				const manual = yield* getItemFx({
@@ -373,7 +372,6 @@ describe("settleItemDeliveryFx", () => {
 						kind: "fill-and-try-start",
 						ownerItemId,
 						lineId,
-						source: "player",
 					},
 				});
 				yield* settleItemDeliveryFx({
@@ -415,7 +413,6 @@ describe("settleItemDeliveryFx", () => {
 						kind: "fill-and-try-start",
 						ownerItemId,
 						lineId,
-						source: "player",
 					},
 				});
 				yield* settleItemDeliveryFx({
@@ -432,7 +429,6 @@ describe("settleItemDeliveryFx", () => {
 					{
 						ownerItemId,
 						lineId,
-						source: "player",
 					},
 				]);
 				yield* spawnItemFx({
@@ -607,7 +603,6 @@ describe("settleItemDeliveryFx", () => {
 						kind: "fill-and-try-start",
 						ownerItemId,
 						lineId,
-						source: "player",
 					},
 				});
 				const owner = yield* getItemFx({

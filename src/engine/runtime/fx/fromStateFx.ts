@@ -38,13 +38,6 @@ export const fromStateFx = Effect.fn("fromStateFx")(function* ({ state }: fromSt
 							...intent,
 						})),
 					}),
-			...(state.autonomousLines === undefined
-				? {}
-				: {
-						autonomousLines: state.autonomousLines.map((line) => ({
-							...line,
-						})),
-					}),
 			...(state.defaultLineByOwnerItemId === undefined
 				? {}
 				: {

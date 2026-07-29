@@ -178,11 +178,6 @@ export namespace ItemDetailLines {
 		readonly canWithdraw: boolean;
 	}
 
-	interface LineAutonomous {
-		readonly enabled: boolean;
-		readonly supported: boolean;
-	}
-
 	interface LineActiveJob {
 		readonly status: JobStatusEnumSchema.Type;
 		readonly durationMs: number;
@@ -198,7 +193,6 @@ export namespace ItemDetailLines {
 		readonly availability: Availability;
 		readonly startMode: "start" | "enqueue";
 		readonly isDefault: boolean;
-		readonly autonomous: LineAutonomous;
 		readonly actions: LineActions;
 		readonly input: readonly Input[];
 		readonly output: readonly OutputSet[];

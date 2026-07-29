@@ -173,13 +173,6 @@ export const readBoardItemDetailLineFx = Effect.fn("readBoardItemDetailLineFx")(
 		availability,
 		startMode: ownerHasWork && start.queue.capacity > 1 ? "enqueue" : "start",
 		isDefault: line.id === defaultLineId,
-		autonomous: {
-			enabled: (runtime.autonomousLines ?? []).some(
-				(candidate) =>
-					candidate.ownerItemId === ownerItemId && candidate.lineId === line.id,
-			),
-			supported: line.autonomous,
-		},
 		actions: {
 			canAutofill: autofillPlan.entry.length > 0,
 			canStart: availability.kind === "available" && start.ready,

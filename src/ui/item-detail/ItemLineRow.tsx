@@ -3,7 +3,6 @@ import { match } from "ts-pattern";
 import { useAutofillItemDetailLine } from "~/bridge/item-detail/useAutofillItemDetailLine";
 import type { ItemDetailLines } from "~/bridge/item-detail/ItemDetailLines";
 import { useSetDefaultItemDetailLine } from "~/bridge/item-detail/useSetDefaultItemDetailLine";
-import { useSetAutonomousItemDetailLine } from "~/bridge/item-detail/useSetAutonomousItemDetailLine";
 import { useStartPendingItemDetailLine } from "~/bridge/item-detail/useStartItemDetailLine";
 import { useUnsetDefaultItemDetailLine } from "~/bridge/item-detail/useUnsetDefaultItemDetailLine";
 import { useWithdrawItemDetailLine } from "~/bridge/item-detail/useWithdrawItemDetailLine";
@@ -161,17 +160,12 @@ export const ItemLineRow = ({
 		]);
 	const pendingKeys = {
 		autofill: pendingKey("autofill"),
-		autonomous: pendingKey("autonomous"),
 		default: pendingKey("default"),
 		start: pendingKey("start"),
 		withdraw: pendingKey("withdraw"),
 	} as const;
 	const autofillLine = useAutofillItemDetailLine({
 		pendingKey: pendingKeys.autofill,
-		pendingOwner: itemDetail,
-	});
-	const setAutonomousLine = useSetAutonomousItemDetailLine({
-		pendingKey: pendingKeys.autonomous,
 		pendingOwner: itemDetail,
 	});
 	const setDefaultLine = useSetDefaultItemDetailLine({
@@ -192,7 +186,6 @@ export const ItemLineRow = ({
 	});
 	const pending = {
 		autofill: autofillLine.pending,
-		autonomous: setAutonomousLine.pending,
 		default: setDefaultLine.pending || unsetDefaultLine.pending,
 		start: startLine.pending,
 		withdraw: withdrawLine.pending,
@@ -200,7 +193,6 @@ export const ItemLineRow = ({
 	const error =
 		[
 			autofillLine.error,
-			setAutonomousLine.error,
 			setDefaultLine.error,
 			unsetDefaultLine.error,
 			startLine.error,
@@ -267,28 +259,6 @@ export const ItemLineRow = ({
 					<div className="flex shrink-0 flex-col items-end gap-3">
 						<ItemLineRuntime line={line} />
 						<div className="flex flex-wrap justify-end gap-2">
-							{!line.autonomous.supported ? null : (
-								<Button
-									className="min-h-8 px-3 py-1 text-xs"
-									cursorIntent={pending.autonomous ? "progress" : undefined}
-									data-ui="TileLineAutonomousButton"
-									data-enabled={line.autonomous.enabled ? "true" : "false"}
-									disabled={disabled || unavailable}
-									onClick={() =>
-										setAutonomousLine.run({
-											enabled: !line.autonomous.enabled,
-											ownerItemId,
-											lineId: line.lineId,
-										})
-									}
-								>
-									{pending.autonomous
-										? "Saving…"
-										: line.autonomous.enabled
-											? "Disable auto"
-											: "Enable auto"}
-								</Button>
-							)}
 							<Button
 								className="min-h-8 px-3 py-1 text-xs"
 								cursorIntent={pending.default ? "progress" : undefined}

@@ -121,22 +121,15 @@ export const autofillLineInputsRuntimeFx = Effect.fn("autofillLineInputsRuntimeF
 		const existingIntents = deliveryRuntime.deliveryStartIntents ?? [];
 		const sameLine = (intent: (typeof existingIntents)[number]) =>
 			intent.ownerItemId === purpose.ownerItemId && intent.lineId === purpose.lineId;
-		const playerIntentExists = existingIntents.some(
-			(intent) => sameLine(intent) && intent.source === "player",
-		);
 		deliveryRuntime = {
 			...deliveryRuntime,
-			deliveryStartIntents:
-				purpose.source === "autonomous" && playerIntentExists
-					? existingIntents
-					: [
-							...existingIntents.filter((intent) => !sameLine(intent)),
-							{
-								ownerItemId: purpose.ownerItemId,
-								lineId: purpose.lineId,
-								source: purpose.source,
-							},
-						],
+			deliveryStartIntents: [
+				...existingIntents.filter((intent) => !sameLine(intent)),
+				{
+					ownerItemId: purpose.ownerItemId,
+					lineId: purpose.lineId,
+				},
+			],
 		} satisfies RuntimeSchema.Type;
 	}
 

@@ -38,13 +38,6 @@ export const fromRuntimeFx = Effect.fn("fromRuntimeFx")(function* ({
 						...intent,
 					})),
 				}),
-		...(runtime.autonomousLines === undefined
-			? {}
-			: {
-					autonomousLines: runtime.autonomousLines.map((line) => ({
-						...line,
-					})),
-				}),
 		...(runtime.defaultLineByOwnerItemId === undefined
 			? {}
 			: {

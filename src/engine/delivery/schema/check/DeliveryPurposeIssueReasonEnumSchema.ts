@@ -1,7 +1,6 @@
 import { z } from "zod";
 
 export const DeliveryPurposeIssueReasonEnumSchema = z.enum({
-	AutonomousDisabled: "autonomous-disabled",
 	Duplicate: "duplicate",
 	LineMissing: "line-missing",
 	OwnerMissing: "owner-missing",

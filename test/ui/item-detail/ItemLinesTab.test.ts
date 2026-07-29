@@ -25,7 +25,6 @@ const control = vi.hoisted(() => ({
 }));
 const commands = vi.hoisted(() => ({
 	autofill: vi.fn(),
-	setAutonomous: vi.fn(),
 	setDefault: vi.fn(),
 	start: vi.fn(),
 	unsetDefault: vi.fn(),
@@ -41,13 +40,6 @@ vi.mock("~/bridge/item-detail/useAutofillItemDetailLine", () => ({
 		error: control.readActionError(pendingKey),
 		pending: control.readPendingAction(pendingKey) === "autofill",
 		run: commands.autofill,
-	}),
-}));
-vi.mock("~/bridge/item-detail/useSetAutonomousItemDetailLine", () => ({
-	useSetAutonomousItemDetailLine: ({ pendingKey }: { readonly pendingKey: string }) => ({
-		error: control.readActionError(pendingKey),
-		pending: control.readPendingAction(pendingKey) === "autonomous",
-		run: commands.setAutonomous,
 	}),
 }));
 vi.mock("~/bridge/item-detail/useSetDefaultItemDetailLine", () => ({
@@ -158,15 +150,11 @@ const depositInput = {
 
 const line = ({
 	active = false,
-	autonomousEnabled = false,
-	autonomousSupported = false,
 	isDefault = false,
 	lineId,
 	title,
 }: {
 	readonly active?: boolean;
-	readonly autonomousEnabled?: boolean;
-	readonly autonomousSupported?: boolean;
 	readonly isDefault?: boolean;
 	readonly lineId: string;
 	readonly title: string;
@@ -182,10 +170,6 @@ const line = ({
 	},
 	startMode: "start",
 	isDefault,
-	autonomous: {
-		enabled: autonomousEnabled,
-		supported: autonomousSupported,
-	},
 	actions: {
 		canAutofill: false,
 		canStart: true,
@@ -1234,34 +1218,6 @@ describe("ItemLinesTab", () => {
 				'[data-line-id="line:second"] [data-ui="TileLineProgressFill"]',
 			)?.style.width,
 		).toBe("75%");
-	});
-
-	it("renders and toggles only author-supported autonomous lines", async () => {
-		await renderLines({
-			...projection,
-			line: [
-				line({
-					autonomousSupported: true,
-					lineId: "line:auto",
-					title: "Automatic",
-				}),
-				line({
-					lineId: "line:manual",
-					title: "Manual",
-				}),
-			],
-		});
-		const buttons = Array.from(
-			document.querySelectorAll<HTMLButtonElement>('[data-ui="TileLineAutonomousButton"]'),
-		);
-		expect(buttons).toHaveLength(1);
-		expect(buttons[0]?.textContent).toBe("Enable auto");
-		await act(async () => buttons[0]?.click());
-		expect(commands.setAutonomous).toHaveBeenCalledWith({
-			enabled: true,
-			ownerItemId: "runtime:producer",
-			lineId: "line:auto",
-		});
 	});
 
 	it("keeps engine-eligible line actions clickable while their presentation status is pending", async () => {

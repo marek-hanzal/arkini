@@ -108,7 +108,6 @@ export const isItemPure = ({
 	if (
 		item.remainingCharges !== undefined ||
 		item.remainingDurationMs !== undefined ||
-		(runtime.autonomousLines ?? []).some((line) => line.ownerItemId === item.id) ||
 		Object.hasOwn(runtime.defaultLineByOwnerItemId ?? {}, item.id)
 	) {
 		return false;

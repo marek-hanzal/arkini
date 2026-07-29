@@ -24,6 +24,9 @@ vi.mock("~/bridge/appearance/readAppearanceThemeFx", () => ({
 vi.mock("~/bridge/cheat/readCheatAvailabilityFx", () => ({
 	readCheatAvailabilityFx: () => Effect.succeed(false),
 }));
+vi.mock("~/bridge/window/readWindowModeFx", () => ({
+	readWindowModeFx: () => Effect.succeed("bordered"),
+}));
 vi.mock("~/ui/launcher/LauncherHeroAtom", () => ({
 	LauncherHeroAtom: Atom.make(
 		Effect.succeed({

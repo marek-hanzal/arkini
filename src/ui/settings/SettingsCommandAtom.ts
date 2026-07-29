@@ -6,8 +6,10 @@ import type { AppearanceTheme } from "~/bridge/appearance/AppearanceTheme";
 import { setAppearanceThemeAtom } from "~/bridge/appearance/setAppearanceThemeAtom";
 import { setCheatAvailabilityAtom } from "~/bridge/cheat/setCheatAvailabilityAtom";
 import { readExactCauseFailure } from "~/bridge/game/readExactCauseFailure";
+import type { WindowMode } from "~/bridge/window/WindowMode";
+import { setWindowModeAtom } from "~/bridge/window/setWindowModeAtom";
 
-type SettingsCommandAction = "cheat-tools" | "theme" | "exit";
+type SettingsCommandAction = "cheat-tools" | "window-mode" | "theme" | "exit";
 
 export namespace SettingsCommandAtom {
 	export type Command =
@@ -18,6 +20,10 @@ export namespace SettingsCommandAtom {
 		| {
 				readonly action: "theme";
 				readonly theme: AppearanceTheme;
+		  }
+		| {
+				readonly action: "window-mode";
+				readonly mode: WindowMode;
 		  }
 		| {
 				readonly action: "exit";
@@ -38,12 +44,12 @@ export namespace SettingsCommandAtom {
 		  }
 		| {
 				readonly kind: "save-error";
-				readonly label: "Cheat tools" | "Theme";
+				readonly label: "Cheat tools" | "Theme" | "Window";
 				readonly error: unknown;
 		  }
 		| {
 				readonly kind: "saved";
-				readonly label: "Cheat tools" | "Theme";
+				readonly label: "Cheat tools" | "Theme" | "Window";
 		  };
 }
 
@@ -64,6 +70,12 @@ const SettingsCommandRunnerAtom = Atom.fn(
 						action: "cheat-tools",
 					},
 					({ available }) => get.setResult(setCheatAvailabilityAtom, available),
+				)
+				.with(
+					{
+						action: "window-mode",
+					},
+					({ mode }) => get.setResult(setWindowModeAtom, mode),
 				)
 				.with(
 					{
@@ -94,7 +106,12 @@ const SettingsCommandRunnerAtom = Atom.fn(
 							}
 						: {
 								kind: "save-error",
-								label: command.action === "cheat-tools" ? "Cheat tools" : "Theme",
+								label:
+									command.action === "cheat-tools"
+										? "Cheat tools"
+										: command.action === "window-mode"
+											? "Window"
+											: "Theme",
 								error,
 							},
 				);
@@ -108,7 +125,12 @@ const SettingsCommandRunnerAtom = Atom.fn(
 						}
 					: {
 							kind: "saved",
-							label: command.action === "cheat-tools" ? "Cheat tools" : "Theme",
+							label:
+								command.action === "cheat-tools"
+									? "Cheat tools"
+									: command.action === "window-mode"
+										? "Window"
+										: "Theme",
 						},
 			);
 		}),

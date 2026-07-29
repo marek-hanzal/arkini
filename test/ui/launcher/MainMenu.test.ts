@@ -111,6 +111,7 @@ describe("MainMenu", () => {
 				},
 				builtInPackageId: "arkini",
 				cheatsAvailable: false,
+				windowMode: "bordered" as const,
 			}),
 		});
 		registry.mount(LauncherStartupAtom);

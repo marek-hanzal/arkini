@@ -14,6 +14,7 @@ import { RendererAtomRegistry } from "~/bridge/reactivity/RendererAtomRegistry";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import { installRendererControlledCloseFx } from "~/installRendererControlledCloseFx";
 import { installRendererNativeDragGuardFx } from "~/installRendererNativeDragGuardFx";
+import { installWindowModeSyncFx } from "~/bridge/window/installWindowModeSyncFx";
 import { createArkiniRouterFx } from "~/createArkiniRouterFx";
 import { AppearanceDataset } from "~/ui/appearance/AppearanceDataset";
 import { configureLauncherStartupFx } from "~/ui/launcher/configureLauncherStartupFx";
@@ -41,6 +42,7 @@ RendererRuntime.runSync(
 );
 const lifecycle = RendererRuntime.runSync(createRendererLifecycleFx(window.arkini.lifecycle));
 RendererRuntime.runSync(configureRendererLifecycleFx(lifecycle));
+RendererRuntime.runSync(installWindowModeSyncFx());
 RendererRuntime.runSync(
 	configureLauncherStartupFx({
 		heroUrl: LauncherHeroAsset.url,

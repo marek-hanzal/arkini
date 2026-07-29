@@ -6,6 +6,8 @@ import { AppearanceAtom } from "~/bridge/appearance/AppearanceAtom";
 import type { AppearanceTheme } from "~/bridge/appearance/AppearanceTheme";
 import { openDiagnosticDirectoryFx } from "~/bridge/diagnostics/Diagnostics";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
+import type { WindowMode } from "~/bridge/window/WindowMode";
+import { WindowModeAtom } from "~/bridge/window/WindowModeAtom";
 import { useCheatAvailability } from "~/ui/cheat-availability/useCheatAvailability";
 import { SettingsCommandAtom } from "~/ui/settings/SettingsCommandAtom";
 
@@ -17,6 +19,7 @@ export const useSettingsModel = ({
 }) => {
 	const appearance = useAtomValue(AppearanceAtom);
 	const cheatAvailability = useCheatAvailability();
+	const windowMode = useAtomValue(WindowModeAtom);
 	const [commandState, runCommand] = useAtom(SettingsCommandAtom);
 	const [diagnosticsStatus, setDiagnosticsStatus] = useState<
 		| {
@@ -84,12 +87,19 @@ export const useSettingsModel = ({
 		diagnosticsStatus,
 		status: commandState,
 		theme: appearance.theme,
+		windowMode,
 		goBack,
 		openDiagnostics,
 		selectTheme: (theme: AppearanceTheme) => {
 			runCommand({
 				action: "theme",
 				theme,
+			});
+		},
+		selectWindowMode: (mode: WindowMode) => {
+			runCommand({
+				action: "window-mode",
+				mode,
 			});
 		},
 		setCheatToolsAvailable: (available: boolean) => {

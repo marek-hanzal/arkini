@@ -2,6 +2,7 @@ import type { Effect } from "effect";
 import { match } from "ts-pattern";
 
 import type { AppearanceTheme } from "~/bridge/appearance/AppearanceTheme";
+import type { WindowMode } from "~/bridge/window/WindowMode";
 import { Button, PrimaryButton } from "~/ui/button/Button";
 import { useSettingsModel } from "~/ui/settings/useSettingsModel";
 
@@ -20,6 +21,24 @@ const ThemeOptions: ReadonlyArray<{
 	{
 		value: "dark",
 		label: "Dark",
+	},
+];
+
+const WindowModeOptions: ReadonlyArray<{
+	readonly value: WindowMode;
+	readonly label: string;
+}> = [
+	{
+		value: "default",
+		label: "Default",
+	},
+	{
+		value: "bordered",
+		label: "Bordered",
+	},
+	{
+		value: "fullscreen",
+		label: "Fullscreen",
 	},
 ];
 
@@ -56,6 +75,53 @@ export const Settings = ({ onBackFx }: Settings.Props) => {
 
 			<fieldset
 				className="grid gap-3"
+				disabled={model.blocked}
+			>
+				<legend className="text-sm font-semibold text-foreground">Window</legend>
+				<div
+					className="grid grid-cols-3 gap-1 rounded-xl border border-line bg-surface-raised/65 p-1"
+					role="radiogroup"
+					aria-label="Window mode"
+					data-ui="SettingsWindowModeOptions"
+				>
+					{WindowModeOptions.map((option) => {
+						const selected = model.windowMode === option.value;
+						return (
+							<label
+								key={option.value}
+								className={`relative rounded-lg px-3 py-2.5 text-center text-sm font-semibold transition-colors ${
+									model.blocked
+										? selected
+											? "cursor-progress bg-accent text-accent-contrast opacity-60"
+											: "cursor-progress text-muted opacity-60"
+										: selected
+											? "cursor-pointer bg-accent text-accent-contrast hover:bg-accent-hover"
+											: "cursor-pointer text-muted hover:bg-surface"
+								}`}
+								data-selected={selected ? "true" : "false"}
+								data-pending={model.blocked ? "true" : "false"}
+							>
+								<input
+									type="radio"
+									name="window-mode"
+									value={option.value}
+									checked={selected}
+									className="sr-only"
+									onChange={() => model.selectWindowMode(option.value)}
+								/>
+								{option.label}
+							</label>
+						);
+					})}
+				</div>
+				<p className="text-sm leading-6 text-muted">
+					Default uses the standard window size. Bordered fills the screen with its title
+					bar. Fullscreen uses the native fullscreen space.
+				</p>
+			</fieldset>
+
+			<fieldset
+				className="grid gap-3 border-t border-line pt-5"
 				disabled={model.blocked}
 			>
 				<legend className="text-sm font-semibold text-foreground">Theme</legend>
@@ -160,6 +226,13 @@ export const Settings = ({ onBackFx }: Settings.Props) => {
 					</p>
 				) : null}
 				{match(model.status)
+					.with(
+						{
+							kind: "pending",
+							action: "window-mode",
+						},
+						() => <p className="text-accent">Applying window mode…</p>,
+					)
 					.with(
 						{
 							kind: "navigation-error",

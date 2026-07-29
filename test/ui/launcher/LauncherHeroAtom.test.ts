@@ -35,6 +35,9 @@ vi.mock("~/bridge/appearance/readAppearanceThemeFx", () => ({
 vi.mock("~/bridge/cheat/readCheatAvailabilityFx", () => ({
 	readCheatAvailabilityFx: () => Effect.succeed(false),
 }));
+vi.mock("~/bridge/window/readWindowModeFx", () => ({
+	readWindowModeFx: () => Effect.succeed("bordered"),
+}));
 vi.mock("~/bridge/launcher/readLastPackageIdFx", () => ({
 	readLastPackageIdFx: () => Effect.succeed(harness.lastPackageId),
 }));

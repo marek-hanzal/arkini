@@ -3,6 +3,7 @@ import type { AppearanceThemeSchema } from "./appearance/AppearanceThemeSchema";
 import type { CheatAvailabilitySchema } from "./cheat/CheatAvailabilitySchema";
 import type { LastPackageIdSchema } from "./launcher/LastPackageIdSchema";
 import type { DiagnosticRecord } from "./diagnostics/DiagnosticRecord";
+import type { WindowModeSchema } from "./window/WindowModeSchema";
 
 export namespace ArkiniElectronApi {
 	export const channels = {
@@ -23,6 +24,9 @@ export namespace ArkiniElectronApi {
 		launcherLastPackageIdWrite: "arkini:launcher:last-package:write",
 		diagnosticsWrite: "arkini:diagnostics:write",
 		diagnosticsOpenDirectory: "arkini:diagnostics:open-directory",
+		windowModeRead: "arkini:window:mode:read",
+		windowModeWrite: "arkini:window:mode:write",
+		windowModeChanged: "arkini:window:mode:changed",
 		windowVisible: "arkini:lifecycle:window-visible",
 		beforeClose: "arkini:lifecycle:before-close",
 		closeReady: "arkini:lifecycle:close-ready",
@@ -96,6 +100,11 @@ export namespace ArkiniElectronApi {
 		readonly diagnostics: {
 			readonly write: (record: DiagnosticRecord) => Promise<void>;
 			readonly openDirectory: () => Promise<void>;
+		};
+		readonly window: {
+			readonly readMode: () => Promise<WindowModeSchema.Type>;
+			readonly writeMode: (mode: WindowModeSchema.Type) => Promise<void>;
+			readonly onModeChanged: (listener: (mode: WindowModeSchema.Type) => void) => () => void;
 		};
 		readonly lifecycle: {
 			readonly waitUntilVisible: () => Promise<number>;

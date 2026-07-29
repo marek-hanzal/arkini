@@ -15,6 +15,7 @@ import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { AppearanceAtom } from "~/bridge/appearance/AppearanceAtom";
 import { CheatAvailabilityAtom } from "~/bridge/cheat/CheatAvailabilityAtom";
+import { WindowModeAtom } from "~/bridge/window/WindowModeAtom";
 import type { Game } from "~/bridge/game/Game";
 import type { GameEngine } from "~/bridge/game/GameEngine";
 import { createGameEngineResourceFx } from "~/bridge/game/createGameEngineResourceFx";
@@ -94,7 +95,15 @@ const renderSettings = async (
 					accent: "rose",
 				},
 			],
+			[
+				WindowModeAtom,
+				"default",
+			],
 		],
+	});
+	const writeWindowMode = vi.fn((mode: "default" | "bordered" | "fullscreen") => {
+		registry.set(WindowModeAtom, mode);
+		return Promise.resolve();
 	});
 	registries.push(registry);
 	Object.defineProperty(window, "scrollTo", {
@@ -112,6 +121,9 @@ const renderSettings = async (
 			},
 			diagnostics: {
 				openDirectory: openDiagnostics,
+			},
+			window: {
+				writeMode: writeWindowMode,
 			},
 		},
 	});
@@ -212,6 +224,7 @@ const renderSettings = async (
 		router,
 		write,
 		writeCheatAvailability,
+		writeWindowMode,
 		openDiagnostics,
 		registry,
 	};
@@ -350,6 +363,38 @@ describe("Settings", () => {
 		await act(async () => toggle.click());
 		await vi.waitFor(() => expect(writeCheatAvailability).toHaveBeenCalledWith(true));
 		await vi.waitFor(() => expect(registry.get(CheatAvailabilityAtom)).toBe(true));
+	});
+
+	it("renders the first theme-style control and applies Electron-confirmed window modes", async () => {
+		const { container, registry, writeWindowMode } = await renderSettings([
+			"/settings",
+		]);
+		const options = container.querySelector<HTMLElement>(
+			'[data-ui="SettingsWindowModeOptions"]',
+		);
+		if (options === null) throw new Error("Expected Window mode control.");
+		const radios = Array.from(
+			options.querySelectorAll<HTMLInputElement>('input[name="window-mode"]'),
+		);
+		expect(radios.map((radio) => radio.value)).toEqual([
+			"default",
+			"bordered",
+			"fullscreen",
+		]);
+		expect(radios[0]?.checked).toBe(true);
+		expect(
+			container
+				.querySelector("fieldset")
+				?.querySelector('[data-ui="SettingsWindowModeOptions"]'),
+		).toBe(options);
+		const fullscreen = radios.find((radio) => radio.value === "fullscreen");
+		if (fullscreen === undefined) throw new Error("Expected Fullscreen option.");
+
+		await act(async () => fullscreen.click());
+
+		await vi.waitFor(() => expect(writeWindowMode).toHaveBeenCalledWith("fullscreen"));
+		await vi.waitFor(() => expect(registry.get(WindowModeAtom)).toBe("fullscreen"));
+		expect(container.textContent).toContain("Window saved.");
 	});
 
 	it("admits only one settings mutation before React publishes the pending render", async () => {

@@ -3,7 +3,7 @@ import { createHash } from "node:crypto";
 import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import type { IpcMainInvokeEvent, WebContents, WebFrameMain } from "electron";
+import type { BrowserWindow, IpcMainInvokeEvent, WebContents, WebFrameMain } from "electron";
 import { Effect } from "effect";
 import { describe, expect, it, vi } from "vitest";
 import { ArkiniElectronApi } from "../../electron/contract/ArkiniElectronApi";
@@ -15,6 +15,10 @@ const electronHarness = vi.hoisted(() => {
 	const appListeners = new Map<string, () => void>();
 	const nativeThemeListeners = new Map<string, () => void>();
 	const setBackgroundColor = vi.fn();
+	const requestWindowMode = vi.fn();
+	const browserWindow = {
+		once: vi.fn(),
+	};
 	const userDataPath = {
 		value: "",
 	};
@@ -23,6 +27,8 @@ const electronHarness = vi.hoisted(() => {
 		handlers,
 		nativeThemeListeners,
 		setBackgroundColor,
+		requestWindowMode,
+		browserWindow,
 		userDataPath,
 		module: {
 			app: {
@@ -32,6 +38,7 @@ const electronHarness = vi.hoisted(() => {
 				},
 			},
 			BrowserWindow: {
+				fromWebContents: () => browserWindow,
 				getAllWindows: () => [
 					{
 						setBackgroundColor,
@@ -65,6 +72,8 @@ import { createFilesystemAppearancePreferencesFx } from "../../electron/main/app
 import { createFilesystemCheatPreferencesFx } from "../../electron/main/cheat/createFilesystemCheatPreferencesFx";
 import { createFilesystemLauncherPreferencesFx } from "../../electron/main/launcher/createFilesystemLauncherPreferencesFx";
 import { registerArkiniElectronIpcFx } from "../../electron/main/registerArkiniElectronIpcFx";
+import { createFilesystemWindowPreferencesFx } from "../../electron/main/window/createFilesystemWindowPreferencesFx";
+import { registerWindowModeControllerFx } from "../../electron/main/window/WindowModeControllerRegistry";
 
 const placeholderPackageId = "a".repeat(64);
 const saveKey = {
@@ -110,6 +119,16 @@ const invokeArguments = new Map<string, ReadonlyArray<unknown>>([
 		ArkiniElectronApi.channels.launcherLastPackageIdWrite,
 		[
 			"arkini",
+		],
+	],
+	[
+		ArkiniElectronApi.channels.windowModeRead,
+		[],
+	],
+	[
+		ArkiniElectronApi.channels.windowModeWrite,
+		[
+			"fullscreen",
 		],
 	],
 	[
@@ -243,11 +262,30 @@ describe("registerArkiniElectronIpcFx", () => {
 					const launcherPreferences = yield* createFilesystemLauncherPreferencesFx({
 						userDataPath,
 					});
+					const windowPreferences = yield* createFilesystemWindowPreferencesFx({
+						userDataPath,
+					});
+					yield* registerWindowModeControllerFx({
+						window: electronHarness.browserWindow as unknown as BrowserWindow,
+						controller: {
+							requestModeFx: (mode) =>
+								windowPreferences
+									.writeModeFx(mode)
+									.pipe(
+										Effect.tap(() =>
+											Effect.sync(() =>
+												electronHarness.requestWindowMode(mode),
+											),
+										),
+									),
+						},
+					});
 					yield* registerArkiniElectronIpcFx({
 						trustedRenderer,
 						appearancePreferences,
 						cheatPreferences,
 						launcherPreferences,
+						windowPreferences,
 						diagnostics: {
 							directoryPath: join(userDataPath, "arkini", "logs"),
 							writeFx: (record) => Effect.sync(() => writeDiagnostic(record)),
@@ -321,6 +359,23 @@ describe("registerArkiniElectronIpcFx", () => {
 			await expect(
 				invoke(ArkiniElectronApi.channels.launcherLastPackageIdRead, trustedEvent),
 			).resolves.toBe("package:last");
+			await expect(
+				invoke(ArkiniElectronApi.channels.windowModeRead, trustedEvent),
+			).resolves.toBe("default");
+			await expect(
+				invoke(ArkiniElectronApi.channels.windowModeWrite, trustedEvent, "fullscreen"),
+			).resolves.toBeUndefined();
+			expect(electronHarness.requestWindowMode).toHaveBeenCalledWith("fullscreen");
+			await expect(
+				invoke(ArkiniElectronApi.channels.windowModeRead, trustedEvent),
+			).resolves.toBe("fullscreen");
+			await expect(
+				invoke(ArkiniElectronApi.channels.windowModeWrite, trustedEvent, "bordered"),
+			).resolves.toBeUndefined();
+			expect(electronHarness.requestWindowMode).toHaveBeenCalledWith("bordered");
+			await expect(
+				invoke(ArkiniElectronApi.channels.windowModeWrite, trustedEvent, "floating"),
+			).rejects.toThrow();
 			const diagnosticRecord = {
 				schemaVersion: 1,
 				level: "info",

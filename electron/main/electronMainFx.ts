@@ -11,6 +11,7 @@ import { createFilesystemCheatPreferencesFx } from "./cheat/createFilesystemChea
 import { createFilesystemLauncherPreferencesFx } from "./launcher/createFilesystemLauncherPreferencesFx";
 import { createTrustedRendererFx } from "./security/createTrustedRendererFx";
 import { createDiagnosticLogFx } from "./diagnostics/createDiagnosticLogFx";
+import { createFilesystemWindowPreferencesFx } from "./window/createFilesystemWindowPreferencesFx";
 
 export const electronMainFx = Effect.fn("electronMainFx")(function* () {
 	const hasSingleInstanceLock = app.requestSingleInstanceLock();
@@ -88,6 +89,9 @@ export const electronMainFx = Effect.fn("electronMainFx")(function* () {
 	const launcherPreferences = yield* createFilesystemLauncherPreferencesFx({
 		userDataPath: app.getPath("userData"),
 	});
+	const windowPreferences = yield* createFilesystemWindowPreferencesFx({
+		userDataPath: app.getPath("userData"),
+	});
 	const appearanceTheme = yield* appearancePreferences.readThemeFx;
 	yield* Effect.sync(() => {
 		nativeTheme.themeSource = appearanceTheme;
@@ -104,20 +108,24 @@ export const electronMainFx = Effect.fn("electronMainFx")(function* () {
 		appearancePreferences,
 		cheatPreferences,
 		launcherPreferences,
+		windowPreferences,
 		diagnostics,
 	});
-	yield* createMainWindowFx({
-		trustedRenderer,
-	});
+	const createWindowFx = windowPreferences.readModeFx.pipe(
+		Effect.flatMap((windowMode) =>
+			createMainWindowFx({
+				trustedRenderer,
+				windowMode,
+				windowPreferences,
+			}),
+		),
+	);
+	yield* createWindowFx;
 
 	yield* Effect.sync(() => {
 		app.on("activate", () => {
 			if (BrowserWindow.getAllWindows().length === 0) {
-				void ElectronMainRuntime.runPromise(
-					createMainWindowFx({
-						trustedRenderer,
-					}),
-				).catch((error) => {
+				void ElectronMainRuntime.runPromise(createWindowFx).catch((error) => {
 					console.error("Arkini could not create a replacement window.", error);
 				});
 			}

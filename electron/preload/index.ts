@@ -4,6 +4,9 @@ import { ArkiniElectronApi } from "../contract/ArkiniElectronApi";
 const beforeCloseListeners = new Set<() => Promise<void>>();
 const beforeCloseReadyListeners = new Set<() => Promise<void>>();
 const closeFailedListeners = new Set<(error: unknown) => void>();
+const windowModeListeners = new Set<
+	Parameters<ArkiniElectronApi.Api["window"]["onModeChanged"]>[0]
+>();
 let closing = false;
 let requestedClose:
 	| {
@@ -22,6 +25,10 @@ ipcRenderer.on(ArkiniElectronApi.channels.windowVisible, () => {
 	if (visibleAtMs !== undefined) return;
 	visibleAtMs = performance.now();
 	resolveVisible(visibleAtMs);
+});
+
+ipcRenderer.on(ArkiniElectronApi.channels.windowModeChanged, (_event, mode) => {
+	for (const listener of Array.from(windowModeListeners)) listener(mode);
 });
 
 ipcRenderer.on(ArkiniElectronApi.channels.beforeClose, async () => {
@@ -77,6 +84,14 @@ const api: ArkiniElectronApi.Api = {
 		write: (record) => ipcRenderer.invoke(ArkiniElectronApi.channels.diagnosticsWrite, record),
 		openDirectory: () =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.diagnosticsOpenDirectory),
+	},
+	window: {
+		readMode: () => ipcRenderer.invoke(ArkiniElectronApi.channels.windowModeRead),
+		writeMode: (mode) => ipcRenderer.invoke(ArkiniElectronApi.channels.windowModeWrite, mode),
+		onModeChanged: (listener) => {
+			windowModeListeners.add(listener);
+			return () => windowModeListeners.delete(listener);
+		},
 	},
 	lifecycle: {
 		waitUntilVisible: () => visiblePromise,

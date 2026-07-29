@@ -28,6 +28,7 @@ const readyResult = {
 	},
 	builtInPackageId: "canonical-built-in",
 	cheatsAvailable: false,
+	windowMode: "bordered" as const,
 };
 
 beforeEach(() => {

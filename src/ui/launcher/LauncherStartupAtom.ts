@@ -7,9 +7,11 @@ import { readAppearanceThemeFx } from "~/bridge/appearance/readAppearanceThemeFx
 import { readCheatAvailabilityFx } from "~/bridge/cheat/readCheatAvailabilityFx";
 import { RendererLifecycleOwnerAtom } from "~/bridge/lifecycle/RendererLifecycleOwnerAtom";
 import { RendererLifecycleUnavailableError } from "~/bridge/lifecycle/RendererLifecycleUnavailableError";
+import { readWindowModeFx } from "~/bridge/window/readWindowModeFx";
 import { RendererAtomRuntime } from "~/bridge/reactivity/RendererAtomRegistry";
 import { applyLauncherAppearanceHydrationFx } from "~/ui/launcher/applyLauncherAppearanceHydrationFx";
 import { applyLauncherCheatAvailabilityHydrationFx } from "~/ui/launcher/applyLauncherCheatAvailabilityHydrationFx";
+import { applyLauncherWindowModeHydrationFx } from "~/ui/launcher/applyLauncherWindowModeHydrationFx";
 import { LauncherHeroAtom } from "~/ui/launcher/LauncherHeroAtom";
 import { LauncherStartupConfigAtom } from "~/ui/launcher/LauncherStartupConfigAtom";
 
@@ -41,6 +43,7 @@ export const LauncherStartupAtom = RendererAtomRuntime.atom((get) => {
 	const cheatAvailabilityFx = readCheatAvailabilityFx().pipe(
 		Effect.tap(applyLauncherCheatAvailabilityHydrationFx),
 	);
+	const windowModeFx = readWindowModeFx().pipe(Effect.tap(applyLauncherWindowModeHydrationFx));
 	const catalogFx = catalog.refreshFx.pipe(
 		Effect.andThen(SubscriptionRef.get(catalog.state)),
 		Effect.flatMap((state) =>
@@ -62,15 +65,17 @@ export const LauncherStartupAtom = RendererAtomRuntime.atom((get) => {
 				suspendOnWaiting: true,
 			}),
 			lifecycle: lifecycleReadyFx,
+			windowMode: windowModeFx,
 		},
 		{
 			concurrency: "unbounded",
 		},
 	).pipe(
-		Effect.map(({ appearance, builtIn, cheatsAvailable }) => ({
+		Effect.map(({ appearance, builtIn, cheatsAvailable, windowMode }) => ({
 			appearance,
 			builtInPackageId: builtIn.packageId,
 			cheatsAvailable,
+			windowMode,
 		})),
 	);
 
@@ -80,6 +85,7 @@ export const LauncherStartupAtom = RendererAtomRuntime.atom((get) => {
 				[
 					applyLauncherAppearanceHydrationFx(result.appearance),
 					applyLauncherCheatAvailabilityHydrationFx(result.cheatsAvailable),
+					applyLauncherWindowModeHydrationFx(result.windowMode),
 					Atom.getResult(LauncherHeroAtom, {
 						suspendOnWaiting: true,
 					}),

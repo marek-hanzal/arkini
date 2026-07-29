@@ -10,6 +10,9 @@ import { createFilesystemGameSaveFilesFx } from "./save/createFilesystemGameSave
 import type { TrustedRenderer } from "./security/TrustedRenderer";
 import { DiagnosticRecordSchema } from "../contract/diagnostics/DiagnosticRecord";
 import type { DiagnosticLog } from "./diagnostics/DiagnosticLog";
+import { WindowModeSchema } from "../contract/window/WindowModeSchema";
+import type { WindowPreferences } from "./window/WindowPreferences";
+import { readWindowModeControllerFx } from "./window/WindowModeControllerRegistry";
 
 let registered = false;
 
@@ -19,6 +22,7 @@ export namespace registerArkiniElectronIpcFx {
 		readonly appearancePreferences: AppearancePreferences;
 		readonly cheatPreferences: CheatPreferences;
 		readonly launcherPreferences: LauncherPreferences;
+		readonly windowPreferences: WindowPreferences;
 		readonly diagnostics: DiagnosticLog;
 	}
 }
@@ -30,6 +34,7 @@ export const registerArkiniElectronIpcFx = Effect.fn("registerArkiniElectronIpcF
 		appearancePreferences,
 		cheatPreferences,
 		launcherPreferences,
+		windowPreferences,
 		diagnostics,
 	}: registerArkiniElectronIpcFx.Props) =>
 		Effect.gen(function* () {
@@ -113,6 +118,28 @@ export const registerArkiniElectronIpcFx = Effect.fn("registerArkiniElectronIpcF
 					(event, packageId) =>
 						runAuthorized(event, launcherPreferences.writeLastPackageIdFx(packageId)),
 				);
+				ipcMain.handle(ArkiniElectronApi.channels.windowModeRead, (event) =>
+					runAuthorized(event, windowPreferences.readModeFx),
+				);
+				ipcMain.handle(ArkiniElectronApi.channels.windowModeWrite, (event, candidate) =>
+					runAuthorized(
+						event,
+						Effect.gen(function* () {
+							const mode = yield* Effect.try({
+								try: () => WindowModeSchema.parse(candidate),
+								catch: (cause) => cause,
+							});
+							const window = BrowserWindow.fromWebContents(event.sender);
+							if (window === null) {
+								return yield* Effect.fail(
+									new Error("The trusted renderer has no owning BrowserWindow."),
+								);
+							}
+							const controller = yield* readWindowModeControllerFx(window);
+							yield* controller.requestModeFx(mode);
+						}),
+					),
+				);
 
 				ipcMain.handle(ArkiniElectronApi.channels.arkpackList, (event) =>
 					runAuthorized(event, arkpacks.listFx),
@@ -166,6 +193,8 @@ export const registerArkiniElectronIpcFx = Effect.fn("registerArkiniElectronIpcF
 						ArkiniElectronApi.channels.saveClear,
 						ArkiniElectronApi.channels.diagnosticsWrite,
 						ArkiniElectronApi.channels.diagnosticsOpenDirectory,
+						ArkiniElectronApi.channels.windowModeRead,
+						ArkiniElectronApi.channels.windowModeWrite,
 					]) {
 						ipcMain.removeHandler(channel);
 					}

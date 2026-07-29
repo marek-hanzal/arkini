@@ -9,6 +9,8 @@ import type { ArkpackCatalog } from "~/bridge/arkpack/ArkpackCatalog";
 import { ArkpackCatalogOwnerAtom } from "~/bridge/arkpack/ArkpackCatalogOwnerAtom";
 import { AppearanceAtom } from "~/bridge/appearance/AppearanceAtom";
 import { CheatAvailabilityAtom } from "~/bridge/cheat/CheatAvailabilityAtom";
+import { WindowModeAtom } from "~/bridge/window/WindowModeAtom";
+import { WindowModeReadyAtom } from "~/bridge/window/WindowModeReadyAtom";
 import { LauncherAppearanceReadyAtom } from "~/ui/launcher/LauncherAppearanceReadyAtom";
 import { LauncherCheatAvailabilityReadyAtom } from "~/ui/launcher/LauncherCheatAvailabilityReadyAtom";
 import { LauncherSplashCompletedAtom } from "~/ui/launcher/LauncherSplashCompletedAtom";
@@ -53,6 +55,7 @@ describe("LauncherStartupAtom", () => {
 					},
 					builtInPackageId: "built-in",
 					cheatsAvailable: true,
+					windowMode: "bordered" as const,
 				};
 			}),
 		});
@@ -72,6 +75,8 @@ describe("LauncherStartupAtom", () => {
 		expect(registry.get(CheatAvailabilityAtom)).toBe(true);
 		expect(registry.get(LauncherAppearanceReadyAtom)).toBe(true);
 		expect(registry.get(LauncherCheatAvailabilityReadyAtom)).toBe(true);
+		expect(registry.get(WindowModeReadyAtom)).toBe(true);
+		expect(registry.get(WindowModeAtom)).toBe("bordered");
 		expect(registry.get(LauncherSplashCompletedAtom)).toBe(false);
 
 		registry.set(completeLauncherSplashAtom, undefined);
@@ -105,6 +110,7 @@ describe("LauncherStartupAtom", () => {
 							},
 							builtInPackageId: "built-in",
 							cheatsAvailable: false,
+							windowMode: "bordered" as const,
 						});
 			}),
 		});
@@ -151,6 +157,7 @@ describe("LauncherStartupAtom", () => {
 						},
 						builtInPackageId: "built-in",
 						cheatsAvailable: false,
+						windowMode: "bordered" as const,
 					}),
 				);
 			}),
@@ -191,6 +198,7 @@ describe("LauncherStartupAtom", () => {
 				},
 				builtInPackageId: "built-in",
 				cheatsAvailable: true,
+				windowMode: "bordered" as const,
 			}),
 		});
 
@@ -203,6 +211,7 @@ describe("LauncherStartupAtom", () => {
 			accent: "rose",
 		});
 		registry.set(CheatAvailabilityAtom, false);
+		registry.set(WindowModeAtom, "fullscreen");
 		registry.set(retryLauncherStartupAtom, undefined);
 		await vi.waitFor(() => {
 			const startup = registry.get(LauncherStartupAtom);
@@ -214,6 +223,7 @@ describe("LauncherStartupAtom", () => {
 			accent: "rose",
 		});
 		expect(registry.get(CheatAvailabilityAtom)).toBe(false);
+		expect(registry.get(WindowModeAtom)).toBe("fullscreen");
 	});
 
 	it("interrupts pending bootstrap work when the registry is disposed", async () => {

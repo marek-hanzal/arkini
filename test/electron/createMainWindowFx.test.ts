@@ -8,6 +8,7 @@ import { ArkiniElectronApi } from "../../electron/contract/ArkiniElectronApi";
 import { createMainWindowFx } from "../../electron/main/createMainWindowFx";
 import { ElectronMainError } from "../../electron/main/ElectronMainError";
 import type { TrustedRenderer } from "../../electron/main/security/TrustedRenderer";
+import type { WindowPreferences } from "../../electron/main/window/WindowPreferences";
 
 const electronState = vi.hoisted(() => ({
 	loadFailure: new Error("renderer unavailable"),
@@ -47,10 +48,19 @@ vi.mock("electron", async () => {
 			this.removeAllListeners();
 		});
 		private destroyed = false;
+		readonly getBounds = vi.fn(() => ({
+			x: 0,
+			y: 0,
+			width: 1_200,
+			height: 675,
+		}));
 		readonly isFullScreen = vi.fn(() => false);
 		readonly loadURL = vi.fn(() => Promise.reject(electronState.loadFailure));
+		readonly maximize = vi.fn();
 		readonly setFullScreen = vi.fn();
+		readonly setBounds = vi.fn();
 		readonly show = vi.fn();
+		readonly unmaximize = vi.fn();
 		readonly webContents = new TestWebContents();
 
 		constructor(readonly options: unknown) {
@@ -79,6 +89,14 @@ vi.mock("electron", async () => {
 					height: 900,
 				},
 			}),
+			getDisplayMatching: () => ({
+				workArea: {
+					x: 0,
+					y: 0,
+					width: 1_600,
+					height: 900,
+				},
+			}),
 		},
 	};
 });
@@ -99,10 +117,16 @@ describe("createMainWindowFx", () => {
 					window.once("closed", trustedWindowRemoved);
 				}),
 		} as unknown as TrustedRenderer;
+		const windowPreferences: WindowPreferences = {
+			readModeFx: Effect.succeed("bordered"),
+			writeModeFx: () => Effect.void,
+		};
 
 		const exit = await Effect.runPromiseExit(
 			createMainWindowFx({
 				trustedRenderer,
+				windowMode: "bordered",
+				windowPreferences,
 			}),
 		);
 
@@ -115,12 +139,18 @@ describe("createMainWindowFx", () => {
 		const window = electronState.windows[0] as BrowserWindow & {
 			readonly destroy: ReturnType<typeof vi.fn>;
 			readonly options: {
+				readonly fullscreen?: boolean;
+				readonly fullscreenable?: boolean;
 				readonly title?: string;
 			};
+			readonly maximize: ReturnType<typeof vi.fn>;
 			readonly show: ReturnType<typeof vi.fn>;
 			readonly webContents: WebContents;
 		};
 		expect(window.options.title).toBe(ArkiniWindowTitle);
+		expect(window.options.fullscreen).toBe(false);
+		expect(window.options.fullscreenable).toBe(true);
+		expect(window.maximize).toHaveBeenCalledOnce();
 		expect(window.destroy).toHaveBeenCalledOnce();
 		expect(window.isDestroyed()).toBe(true);
 		expect(window.show).not.toHaveBeenCalled();
@@ -136,5 +166,69 @@ describe("createMainWindowFx", () => {
 			),
 		).toBe(0);
 		expect(window.listenerCount("ready-to-show")).toBe(0);
+	});
+
+	it("restores exclusive fullscreen without maximizing the bordered shell", async () => {
+		const trustedRenderer = {
+			developmentRendererUrl: undefined,
+			isTrustedIpcSender: () => false,
+			registerWindowFx: () => Effect.void,
+		} as unknown as TrustedRenderer;
+		const windowPreferences: WindowPreferences = {
+			readModeFx: Effect.succeed("fullscreen"),
+			writeModeFx: () => Effect.void,
+		};
+
+		await Effect.runPromiseExit(
+			createMainWindowFx({
+				trustedRenderer,
+				windowMode: "fullscreen",
+				windowPreferences,
+			}),
+		);
+
+		const window = electronState.windows[0] as BrowserWindow & {
+			readonly options: {
+				readonly fullscreen?: boolean;
+			};
+			readonly maximize: ReturnType<typeof vi.fn>;
+		};
+		expect(window.options.fullscreen).toBe(true);
+		expect(window.maximize).not.toHaveBeenCalled();
+	});
+
+	it("keeps the canonical default window at its calculated bounds", async () => {
+		const trustedRenderer = {
+			developmentRendererUrl: undefined,
+			isTrustedIpcSender: () => false,
+			registerWindowFx: () => Effect.void,
+		} as unknown as TrustedRenderer;
+		const windowPreferences: WindowPreferences = {
+			readModeFx: Effect.succeed("default"),
+			writeModeFx: () => Effect.void,
+		};
+
+		await Effect.runPromiseExit(
+			createMainWindowFx({
+				trustedRenderer,
+				windowMode: "default",
+				windowPreferences,
+			}),
+		);
+
+		const window = electronState.windows[0] as BrowserWindow & {
+			readonly maximize: ReturnType<typeof vi.fn>;
+			readonly options: {
+				readonly fullscreen?: boolean;
+				readonly height?: number;
+				readonly width?: number;
+			};
+		};
+		expect(window.options).toMatchObject({
+			fullscreen: false,
+			width: 1_200,
+			height: 675,
+		});
+		expect(window.maximize).not.toHaveBeenCalled();
 	});
 });

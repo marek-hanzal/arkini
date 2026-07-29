@@ -5,19 +5,24 @@ import { ArkiniWindowTitle } from "../../shared/ArkiniAppMetadata";
 import { calculateInitialWindowBoundsFx } from "./calculateInitialWindowBoundsFx";
 import { ElectronMainError } from "./ElectronMainError";
 import { registerControlledWindowCloseFx } from "./registerControlledWindowCloseFx";
-import { registerFullscreenShortcutsFx } from "./registerFullscreenShortcutsFx";
 import { showMainWindowFx } from "./showMainWindowFx";
 import { ElectronMainRuntime } from "./ElectronMainRuntime";
 import type { TrustedRenderer } from "./security/TrustedRenderer";
+import { createWindowModeControllerFx } from "./window/createWindowModeControllerFx";
+import { registerWindowModeControllerFx } from "./window/WindowModeControllerRegistry";
+import type { WindowPreferences } from "./window/WindowPreferences";
+import type { WindowModeSchema } from "../contract/window/WindowModeSchema";
 
 export namespace createMainWindowFx {
 	export interface Props {
 		readonly trustedRenderer: TrustedRenderer;
+		readonly windowMode: WindowModeSchema.Type;
+		readonly windowPreferences: WindowPreferences;
 	}
 }
 
 export const createMainWindowFx = Effect.fn("createMainWindowFx")(
-	({ trustedRenderer }: createMainWindowFx.Props) =>
+	({ trustedRenderer, windowMode, windowPreferences }: createMainWindowFx.Props) =>
 		Effect.gen(function* () {
 			const display = screen.getDisplayNearestPoint(screen.getCursorScreenPoint());
 			const bounds = yield* calculateInitialWindowBoundsFx(display.workArea);
@@ -26,6 +31,8 @@ export const createMainWindowFx = Effect.fn("createMainWindowFx")(
 				show: false,
 				title: ArkiniWindowTitle,
 				backgroundColor: "#000000",
+				fullscreen: windowMode === "fullscreen",
+				fullscreenable: true,
 				webPreferences: {
 					preload: fileURLToPath(new URL("../preload/index.cjs", import.meta.url)),
 					contextIsolation: true,
@@ -41,7 +48,18 @@ export const createMainWindowFx = Effect.fn("createMainWindowFx")(
 
 			return yield* Effect.gen(function* () {
 				yield* trustedRenderer.registerWindowFx(window);
-				yield* registerFullscreenShortcutsFx(window);
+				if (windowMode === "bordered") {
+					yield* Effect.sync(() => window.maximize());
+				}
+				const windowModeController = yield* createWindowModeControllerFx({
+					initialMode: windowMode,
+					window,
+					windowPreferences,
+				});
+				yield* registerWindowModeControllerFx({
+					controller: windowModeController,
+					window,
+				});
 				yield* registerControlledWindowCloseFx({
 					window,
 					ipc: ipcMain,

@@ -283,6 +283,18 @@ const selectAvailabilityFilter = async (container: HTMLElement, value: "availabl
 };
 
 describe("ItemLinesTab", () => {
+	it("leaves an enqueue-ready line without a redundant readiness badge", async () => {
+		await renderLines({
+			...projection,
+			line: [
+				projection.line[0],
+			],
+		});
+
+		expect(document.querySelector('[data-ui="TileLineReadinessBadge"]')).toBeNull();
+		expect(document.body.textContent).not.toContain("Ready");
+	});
+
 	it("opens exact input runtime detail and configured output detail from subtle artwork links", async () => {
 		await renderLines();
 		const inputLink = document.querySelector<HTMLButtonElement>(
@@ -442,6 +454,9 @@ describe("ItemLinesTab", () => {
 		const active = renderedInput("line:active");
 		const deposit = renderedInput("line:deposit");
 
+		expect(document.querySelector('[data-ui="TileLineInputsList"]')?.className).toContain(
+			"pt-2",
+		);
 		expect(available?.dataset.inputState).toBe("available");
 		expect(available?.className).toContain("bg-[var(--ak-list-row-active-surface)]");
 		expect(available?.className).toContain("rounded-xl");

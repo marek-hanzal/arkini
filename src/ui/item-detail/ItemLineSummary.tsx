@@ -20,10 +20,7 @@ export const ItemLineSummary = ({
 				kind: "available",
 				readiness: "ready",
 			},
-			() => ({
-				label: "Ready",
-				className: "border-success/35 bg-success/12 text-foreground",
-			}),
+			() => undefined,
 		)
 		.with(
 			{
@@ -109,7 +106,7 @@ export const ItemLineSummary = ({
 					initial={false}
 					mode="popLayout"
 				>
-					{stale || line.activeJob !== undefined ? null : (
+					{stale || line.activeJob !== undefined || readiness === undefined ? null : (
 						<motion.span
 							key={`readiness:${readiness.label}`}
 							layout

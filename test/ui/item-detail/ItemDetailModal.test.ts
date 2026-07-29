@@ -1018,6 +1018,9 @@ describe("ItemDetailModal", () => {
 		expect(
 			document.querySelector('[data-ui="ItemQueueActiveSlotSeparator"]')?.className,
 		).toContain("border-b");
+		expect(
+			document.querySelector('[data-ui="ItemQueueActiveSlotSeparator"]')?.className,
+		).toContain("mb-2");
 		expect(document.querySelector('[data-ui="ItemQueueRow"]')).toBeNull();
 		expect(document.querySelector('[data-ui="ItemQueueClearButton"]')).toBeNull();
 	});

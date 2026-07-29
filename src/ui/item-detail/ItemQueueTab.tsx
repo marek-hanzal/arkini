@@ -361,7 +361,7 @@ export const ItemQueueTab = ({
 					data-ui="ItemQueueList"
 				>
 					<div
-						className="border-b border-line pb-3"
+						className="mb-2 border-b border-line pb-3"
 						data-ui="ItemQueueActiveSlotSeparator"
 					>
 						<ActiveQueueSlot

@@ -487,7 +487,10 @@ export const ItemLineInputs = ({
 		{input.length === 0 ? (
 			<p className="py-3 text-sm text-muted">No material input required.</p>
 		) : (
-			<div className="space-y-1">
+			<div
+				className="space-y-1 pt-2"
+				data-ui="TileLineInputsList"
+			>
 				<AnimatePresence
 					initial={false}
 					mode="popLayout"

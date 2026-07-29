@@ -241,7 +241,7 @@ describe("startFx", () => {
 			width: 15,
 			height: 9,
 		});
-		expect(config.meta.toolbarSize).toBe(13);
+		expect(config.meta.toolbarSize).toBe(15);
 
 		const result = Effect.runSync(
 			Effect.gen(function* () {

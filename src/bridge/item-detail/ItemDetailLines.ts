@@ -173,8 +173,18 @@ export namespace ItemDetailLines {
 		  };
 
 	interface LineActions {
-		readonly canAutofill: boolean;
-		readonly canStart: boolean;
+		readonly immediate:
+			| {
+					readonly type: "fill";
+					readonly enabled: boolean;
+			  }
+			| {
+					readonly type: "start";
+					readonly enabled: boolean;
+			  };
+		readonly enqueue: {
+			readonly enabled: boolean;
+		};
 		readonly canWithdraw: boolean;
 	}
 
@@ -191,7 +201,6 @@ export namespace ItemDetailLines {
 		readonly baseRuntimeMs: number;
 		readonly effectiveRuntimeMs: number;
 		readonly availability: Availability;
-		readonly startMode: "start" | "enqueue";
 		readonly isDefault: boolean;
 		readonly actions: LineActions;
 		readonly input: readonly Input[];

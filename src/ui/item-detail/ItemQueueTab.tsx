@@ -138,6 +138,7 @@ export const ItemQueueTab = ({
 								className="ak-list-row rounded-xl border-b border-l-2 border-line border-l-line/55 px-4 py-5"
 								data-ui="ItemQueueRow"
 								data-state="queued"
+								data-queue-status={request.status}
 							>
 								<div className="flex flex-wrap items-center gap-2">
 									<h3 className="text-lg font-semibold leading-tight text-foreground">
@@ -148,7 +149,15 @@ export const ItemQueueTab = ({
 									</span>
 								</div>
 								<p className="mt-2 text-sm text-muted">
-									Waiting for the active slot
+									{request.status === "inputs-ready"
+										? "Inputs available"
+										: request.status === "waiting-inputs"
+											? `Waiting for inputs · ${request.missingQuantity ?? "some"} ${
+													request.missingQuantity === 1 ? "unit" : "units"
+												} missing`
+											: request.status === "blocked-earlier"
+												? "Blocked by earlier work"
+												: "Waiting for runtime conditions"}
 								</p>
 							</article>
 						))}

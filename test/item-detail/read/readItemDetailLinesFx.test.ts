@@ -636,7 +636,11 @@ describe("readItemDetailLinesFx", () => {
 				kind: "available",
 				readiness: "queue",
 			},
-			startMode: "start",
+			actions: {
+				immediate: {
+					enabled: false,
+				},
+			},
 		});
 	});
 

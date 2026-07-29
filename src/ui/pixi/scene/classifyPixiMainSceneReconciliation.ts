@@ -100,8 +100,8 @@ const isSameMainSceneVisual = (left: TileActorItem, right: TileActorItem) => {
 	if (left.revision !== right.revision) return false;
 	if (left.primaryAction.kind !== right.primaryAction.kind) return false;
 	if (
-		left.primaryAction.kind === "start-default-line" &&
-		(right.primaryAction.kind !== "start-default-line" ||
+		left.primaryAction.kind === "enqueue-default-line" &&
+		(right.primaryAction.kind !== "enqueue-default-line" ||
 			left.primaryAction.lineId !== right.primaryAction.lineId)
 	)
 		return false;

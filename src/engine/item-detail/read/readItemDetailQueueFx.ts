@@ -1,4 +1,4 @@
-import { Effect, Option } from "effect";
+import { Effect, Option, Result } from "effect";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { resolveActiveJobStatusFx } from "~/engine/job/fx/resolveActiveJobStatusFx";
 import type { JobStatusEnumSchema } from "~/engine/job/schema/read/JobStatusEnumSchema";
@@ -6,11 +6,19 @@ import { readItemQueueSizeFx } from "~/engine/job/read/readItemQueueSizeFx";
 import { isLineOwnerItemFx } from "~/engine/line/read/isLineOwnerItemFx";
 import { readLineOwnerLinesFx } from "~/engine/line/read/readLineOwnerLinesFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import { readLineInputAutofillCoverageFx } from "~/engine/input/fx/readLineInputAutofillCoverageFx";
+import { resolveLineStartFx } from "~/engine/job/fx/read/resolveLineStartFx";
+import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
+import { applyLineInputAutofillPlanFx } from "~/engine/input/fx/applyLineInputAutofillPlanFx";
+import { assertLineOutputMaxCountFx } from "~/engine/job/fx/assertLineOutputMaxCountFx";
+import { assertLineEnqueueConditionsFx } from "~/engine/job/fx/assertLineEnqueueConditionsFx";
 
 interface ItemDetailQueueRequest {
 	readonly requestId: IdSchema.Type;
 	readonly lineId: IdSchema.Type;
 	readonly title: string;
+	readonly status: "inputs-ready" | "waiting-inputs" | "blocked-earlier" | "blocked-condition";
+	readonly missingQuantity?: number;
 }
 
 interface ItemDetailQueueActiveJob {
@@ -81,17 +89,96 @@ export const readItemDetailQueueFx = Effect.fn("readItemDetailQueueFx")(function
 				})),
 			),
 	);
+	const requests = (runtime.jobQueue ?? []).filter((request) => request.ownerItemId === owner.id);
+	const projectedRequests = yield* Effect.forEach(requests, (request, index) =>
+		Effect.gen(function* () {
+			let status: ItemDetailQueueRequest["status"] =
+				active.length > 0 || index > 0 ? "blocked-earlier" : "blocked-condition";
+			let missingQuantity: number | undefined;
+			if (
+				active.length === 0 &&
+				index === 0 &&
+				owner.location.scope === LocationScopeEnumSchema.enum.Board
+			) {
+				const start = yield* resolveLineStartFx({
+					ownerItemId: owner.id,
+					lineId: request.lineId,
+					runtime,
+				});
+				const nonMaterialInputsReady = start.run.input.every(
+					({ resolution: input }) => input.type === "materials" || input.ready,
+				);
+				if (start.run.enable && nonMaterialInputsReady) {
+					const hardConditions = yield* Effect.result(
+						assertLineEnqueueConditionsFx({
+							candidateId: request.id,
+							resolution: start,
+							runtime,
+						}),
+					);
+					if (Result.isFailure(hardConditions)) {
+						status = "blocked-condition";
+						return {
+							requestId: request.id,
+							lineId: request.lineId,
+							title: lineById.get(request.lineId)?.title ?? request.lineId,
+							status,
+						} satisfies ItemDetailQueueRequest;
+					}
+					const coverage = yield* readLineInputAutofillCoverageFx({
+						ownerItemId: owner.id,
+						lineId: request.lineId,
+						runtime,
+					});
+					if (coverage.type === "incomplete") {
+						status = "waiting-inputs";
+						missingQuantity = coverage.missingQuantity;
+					} else {
+						const filled = yield* applyLineInputAutofillPlanFx({
+							ownerItemId: owner.id,
+							lineId: request.lineId,
+							plan: coverage.plan,
+							runtime,
+						});
+						const candidate = yield* resolveLineStartFx({
+							ownerItemId: owner.id,
+							lineId: request.lineId,
+							runtime: filled.runtime,
+						});
+						const output = yield* Effect.result(
+							assertLineOutputMaxCountFx({
+								candidateId: request.id,
+								ownerItemId: owner.id,
+								lineId: request.lineId,
+								plan: candidate.run.plan,
+								runtime: filled.runtime,
+							}),
+						);
+						status =
+							candidate.run.ready && Result.isSuccess(output)
+								? "inputs-ready"
+								: "blocked-condition";
+					}
+				}
+			}
+			return {
+				requestId: request.id,
+				lineId: request.lineId,
+				title: lineById.get(request.lineId)?.title ?? request.lineId,
+				status,
+				...(missingQuantity === undefined
+					? {}
+					: {
+							missingQuantity,
+						}),
+			} satisfies ItemDetailQueueRequest;
+		}),
+	);
 	return {
 		kind: "available",
 		itemId: owner.id,
 		capacity,
 		active,
-		request: (runtime.jobQueue ?? [])
-			.filter((request) => request.ownerItemId === owner.id)
-			.map((request) => ({
-				requestId: request.id,
-				lineId: request.lineId,
-				title: lineById.get(request.lineId)?.title ?? request.lineId,
-			})),
+		request: projectedRequests,
 	};
 });

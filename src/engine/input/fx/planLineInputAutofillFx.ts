@@ -17,6 +17,7 @@ import { InputEnumSchema } from "~/engine/input/schema/InputEnumSchema";
 
 export namespace planLineInputAutofillFx {
 	export interface Props {
+		readonly includeIncomingDeliveries?: boolean;
 		readonly ownerItemId: IdSchema.Type;
 		readonly lineId: IdSchema.Type;
 		readonly runtime: RuntimeSchema.Type;
@@ -87,6 +88,7 @@ const compareCandidates = (owner: BoardRuntimeItemSchema.Type) => {
  * runtime truth itself.
  */
 export const planLineInputAutofillFx = Effect.fn("planLineInputAutofillFx")(function* ({
+	includeIncomingDeliveries = true,
 	ownerItemId,
 	lineId,
 	runtime,
@@ -139,12 +141,14 @@ export const planLineInputAutofillFx = Effect.fn("planLineInputAutofillFx")(func
 				item.location.inputIndex === inputIndex,
 		);
 		const storedQuantity = storedItems.reduce((total, item) => total + item.quantity, 0);
-		const incomingQuantity = (yield* readLineInputDeliveryClaimsFx({
-			inputIndex,
-			lineId,
-			ownerItemId,
-			runtime,
-		})).reduce((total, claim) => total + claim.quantity, 0);
+		const incomingQuantity = includeIncomingDeliveries
+			? (yield* readLineInputDeliveryClaimsFx({
+					inputIndex,
+					lineId,
+					ownerItemId,
+					runtime,
+				})).reduce((total, claim) => total + claim.quantity, 0)
+			: 0;
 		let plannedQuantity = storedQuantity + incomingQuantity;
 		const initialResolution = yield* resolveInputMaterialFx({
 			input,

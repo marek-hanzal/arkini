@@ -6,6 +6,7 @@ import { createTestGameSession } from "~test/bridge/game/createTestGameSession";
 import type { Game } from "~/bridge/game/Game";
 import { createGameEngineResourceFx } from "~/bridge/game/createGameEngineResourceFx";
 import { startLineFx } from "~/engine/job/write/startLineFx";
+import { enqueueLineFx } from "~/engine/job/write/enqueueLineFx";
 import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
 import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
 import { runTickRuntimeByFx } from "~/engine/tick/fx/runTickRuntimeByFx";
@@ -857,7 +858,7 @@ describe("createGameSessionFx", () => {
 				}),
 			);
 			await session.run(
-				startLineFx({
+				enqueueLineFx({
 					ownerItemId: owner.id,
 					lineId: "line:forge:run",
 				}),

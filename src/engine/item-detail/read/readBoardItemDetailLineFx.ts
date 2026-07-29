@@ -2,6 +2,7 @@ import { Effect } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { planLineInputAutofillFx } from "~/engine/input/fx/planLineInputAutofillFx";
+import { readLineInputAutofillCoverageFx } from "~/engine/input/fx/readLineInputAutofillCoverageFx";
 import type { ItemDetailLines } from "~/engine/item-detail/read/ItemDetailLines";
 import { readItemDetailInputsFx } from "~/engine/item-detail/read/readItemDetailInputsFx";
 import { readItemDetailOutputFx } from "~/engine/item-detail/read/readItemDetailOutputFx";
@@ -80,6 +81,11 @@ export const readBoardItemDetailLineFx = Effect.fn("readBoardItemDetailLineFx")(
 	if (!resolution.show && activeJob === undefined) return undefined;
 	const allInputsReady = resolution.input.every((input) => input.resolution.ready);
 	const autofillPlan = yield* planLineInputAutofillFx({
+		ownerItemId,
+		lineId: line.id,
+		runtime,
+	});
+	const autofillCoverage = yield* readLineInputAutofillCoverageFx({
 		ownerItemId,
 		lineId: line.id,
 		runtime,
@@ -163,6 +169,15 @@ export const readBoardItemDetailLineFx = Effect.fn("readBoardItemDetailLineFx")(
 							kind: "available",
 							readiness: start.ready ? "ready" : allInputsReady ? "queue" : "inputs",
 						};
+	const nonMaterialInputsReady = resolution.input.every(
+		({ resolution: input }) => input.type === "materials" || input.ready,
+	);
+	const immediateType =
+		autofillCoverage.type === "complete" && nonMaterialInputsReady ? "start" : "fill";
+	const immediateEnabled =
+		!ownerHasWork &&
+		availability.kind === "available" &&
+		(immediateType === "start" ? start.queue.available : autofillPlan.entry.length > 0);
 
 	return {
 		lineId: line.id,
@@ -171,11 +186,15 @@ export const readBoardItemDetailLineFx = Effect.fn("readBoardItemDetailLineFx")(
 		baseRuntimeMs: line.runtimeMs,
 		effectiveRuntimeMs: resolution.runtimeMs,
 		availability,
-		startMode: ownerHasWork && start.queue.capacity > 1 ? "enqueue" : "start",
 		isDefault: line.id === defaultLineId,
 		actions: {
-			canAutofill: autofillPlan.entry.length > 0,
-			canStart: availability.kind === "available" && start.ready,
+			immediate: {
+				type: immediateType,
+				enabled: immediateEnabled,
+			},
+			enqueue: {
+				enabled: availability.kind === "available" && start.queue.available,
+			},
 			canWithdraw,
 		},
 		input,

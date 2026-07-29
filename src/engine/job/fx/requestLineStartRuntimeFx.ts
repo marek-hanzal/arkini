@@ -3,15 +3,13 @@ import { Effect } from "effect";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
 import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
-import type { JobStartSourceEnumSchema } from "~/engine/event/schema/JobStartSourceEnumSchema";
-import { assertLineOutputMaxCountFx } from "~/engine/job/fx/assertLineOutputMaxCountFx";
-import { assertLineStartReadyFx } from "~/engine/job/fx/assertLineStartReadyFx";
-import { createJobQueueRequestFx } from "~/engine/job/fx/createJobQueueRequestFx";
+import { JobStartSourceEnumSchema } from "~/engine/event/schema/JobStartSourceEnumSchema";
 import { resolveLineStartFx } from "~/engine/job/fx/read/resolveLineStartFx";
 import { startLineRuntimeFx } from "~/engine/job/fx/startLineRuntimeFx";
 import { StartLineResultEnumSchema } from "~/engine/job/schema/StartLineResultEnumSchema";
 import type { StartLineResultSchema } from "~/engine/job/schema/StartLineResultSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import { LineRunUnavailableError } from "~/engine/line/error/LineRunUnavailableError";
 
 export namespace requestLineStartRuntimeFx {
 	export interface Props {
@@ -28,7 +26,7 @@ export namespace requestLineStartRuntimeFx {
 	}
 }
 
-/** Applies one explicit or delivery-owned line-start request to an immutable runtime draft. */
+/** Starts one ready idle line without ever creating a queue intent. */
 export const requestLineStartRuntimeFx = Effect.fn("requestLineStartRuntimeFx")(function* ({
 	lineId,
 	ownerItemId,
@@ -38,62 +36,39 @@ export const requestLineStartRuntimeFx = Effect.fn("requestLineStartRuntimeFx")(
 	const hasOwnerWork =
 		runtime.jobs.some((job) => job.ownerItemId === ownerItemId) ||
 		(runtime.jobQueue ?? []).some((request) => request.ownerItemId === ownerItemId);
-	if (!hasOwnerWork) {
-		const [job, nextRuntime, itemEvents] = yield* startLineRuntimeFx({
-			ownerItemId,
-			lineId,
-			runtime,
-		});
-		return {
-			events: [
-				{
-					type: GameEventEnumSchema.enum.JobStarted,
-					jobId: job.id,
-					ownerItemId: job.ownerItemId,
-					lineId: job.lineId,
-					source,
-				},
-				...itemEvents,
-			],
-			runtime: nextRuntime,
-			start: {
-				type: StartLineResultEnumSchema.enum.Started,
-				job,
-			},
-		} satisfies requestLineStartRuntimeFx.Result;
-	}
-
 	const resolution = yield* resolveLineStartFx({
 		ownerItemId,
 		lineId,
 		runtime,
 	});
-	const plan = yield* assertLineStartReadyFx({
-		resolution,
-	});
-	yield* assertLineOutputMaxCountFx({
-		candidateId: `queue-admission:${ownerItemId}:${lineId}`,
+	if (hasOwnerWork || !resolution.ready) {
+		return yield* Effect.fail(
+			new LineRunUnavailableError({
+				ownerItemId,
+				lineId,
+			}),
+		);
+	}
+	const [job, nextRuntime, itemEvents] = yield* startLineRuntimeFx({
 		ownerItemId,
 		lineId,
-		plan,
 		runtime,
 	});
-	const request = yield* createJobQueueRequestFx({
-		ownerItemId,
-		lineId,
-	});
 	return {
-		events: [],
-		runtime: {
-			...runtime,
-			jobQueue: [
-				...(runtime.jobQueue ?? []),
-				request,
-			],
-		},
+		events: [
+			{
+				type: GameEventEnumSchema.enum.JobStarted,
+				jobId: job.id,
+				ownerItemId: job.ownerItemId,
+				lineId: job.lineId,
+				source,
+			},
+			...itemEvents,
+		],
+		runtime: nextRuntime,
 		start: {
-			type: StartLineResultEnumSchema.enum.Queued,
-			request,
+			type: StartLineResultEnumSchema.enum.Started,
+			job,
 		},
 	} satisfies requestLineStartRuntimeFx.Result;
 });

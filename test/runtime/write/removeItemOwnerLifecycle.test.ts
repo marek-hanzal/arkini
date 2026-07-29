@@ -5,6 +5,7 @@ import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
 import { useGameFx } from "~/engine/game/fx/useGameFx";
 import { storeInputMaterialFx } from "~/engine/input/write/storeInputMaterialFx";
 import { startLineFx } from "~/engine/job/write/startLineFx";
+import { enqueueLineFx } from "~/engine/job/write/enqueueLineFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import { readCommittedTransitionFx } from "~/engine/runtime/read/readCommittedTransitionFx";
 import { moveItemFx } from "~/engine/runtime/write/moveItemFx";
@@ -125,7 +126,7 @@ describe("removeItemFx owner lifecycle", () => {
 					sourceItemRevision: tool.revision,
 					quantity: 1,
 				});
-				const queued = yield* startLineFx(startProps);
+				const queued = yield* enqueueLineFx(startProps);
 				const before = yield* readRuntimeFx();
 				const attempt = yield* Effect.result(
 					removeItemFx({
@@ -151,8 +152,7 @@ describe("removeItemFx owner lifecycle", () => {
 		expect(Result.isFailure(result.attempt)).toBe(true);
 		if (
 			Result.isFailure(result.attempt) &&
-			result.started.type === StartLineResultEnumSchema.enum.Started &&
-			result.queued.type === StartLineResultEnumSchema.enum.Queued
+			result.started.type === StartLineResultEnumSchema.enum.Started
 		) {
 			expect(result.attempt.failure).toMatchObject({
 				_tag: "JobOwnerBusyError",
@@ -161,7 +161,7 @@ describe("removeItemFx owner lifecycle", () => {
 					result.started.job.id,
 				],
 				requestIds: [
-					result.queued.request.id,
+					result.queued.id,
 				],
 			});
 		}

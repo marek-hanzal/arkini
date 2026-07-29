@@ -173,15 +173,20 @@ export const useItemLineSearchCandidates = (
 				line.title,
 				line.description,
 				availabilityLabel(line.availability),
-				line.startMode,
+				line.actions.immediate.type,
+				...(line.actions.enqueue.enabled
+					? [
+							"enqueue",
+						]
+					: []),
 				...(line.isDefault
 					? [
 							"default",
 						]
 					: []),
-				...(line.actions.canAutofill
+				...(line.actions.immediate.type === "fill"
 					? [
-							"autofill",
+							"fill",
 						]
 					: []),
 				...(line.actions.canWithdraw

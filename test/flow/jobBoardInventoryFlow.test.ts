@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 
 import { useGameFx } from "~/engine/game/fx/useGameFx";
 import { startLineFx } from "~/engine/job/write/startLineFx";
+import { enqueueLineFx } from "~/engine/job/write/enqueueLineFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import { removeItemFx } from "~/engine/runtime/write/removeItemFx";
 import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
@@ -148,7 +149,7 @@ describe("job board and inventory flow", () => {
 			Effect.gen(function* () {
 				yield* prepareJobLineFx();
 				const first = yield* startLineFx(props);
-				const second = yield* startLineFx(props);
+				const second = yield* enqueueLineFx(props);
 				yield* fillFreeBoardFx();
 
 				yield* runTickRuntimeByFx({
@@ -167,7 +168,7 @@ describe("job board and inventory flow", () => {
 		);
 
 		expect(result.first.type).toBe(StartLineResultEnumSchema.enum.Started);
-		expect(result.second.type).toBe(StartLineResultEnumSchema.enum.Queued);
+		expect(result.second).toMatchObject(props);
 		expect(result.runtime.jobs).toEqual([]);
 		expect(result.runtime.jobQueue).toEqual([]);
 		expect(
@@ -205,7 +206,7 @@ describe("job board and inventory flow", () => {
 			Effect.gen(function* () {
 				yield* prepareJobLineFx();
 				yield* startLineFx(props);
-				yield* startLineFx(props);
+				yield* enqueueLineFx(props);
 				yield* fillFreeBoardFx();
 
 				yield* runTickRuntimeByFx({
@@ -292,7 +293,7 @@ describe("job board and inventory flow", () => {
 				});
 				yield* prepareJobLineFx();
 				yield* startLineFx(props);
-				yield* startLineFx(props);
+				yield* enqueueLineFx(props);
 
 				yield* runTickRuntimeByFx({
 					elapsedMs: 400,

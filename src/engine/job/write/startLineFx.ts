@@ -10,10 +10,10 @@ export namespace startLineFx {
 	}
 }
 /**
- * Explicitly starts an idle owner or appends one FIFO request behind existing owner work.
+ * Explicitly starts one already-ready idle owner.
  *
- * The command commits only its own admission. Even under Instant gameplay, completion belongs to
- * the shared Tick boundary so independent owner commands can enter the runtime before one global
+ * Queue admission is a separate command. Even under Instant gameplay, completion belongs to the
+ * shared Tick boundary so independent owner commands can enter the runtime before one global
  * simulation pass resolves every runnable job.
  */
 export const startLineFx = Effect.fn("startLineFx")(function* ({

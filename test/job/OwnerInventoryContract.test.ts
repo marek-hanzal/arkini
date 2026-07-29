@@ -5,6 +5,7 @@ import { useGameFx } from "~/engine/game/fx/useGameFx";
 import { storeInputMaterialFx } from "~/engine/input/write/storeInputMaterialFx";
 import { readOwnerJobQueueFx } from "~/engine/job/read/readOwnerJobQueueFx";
 import { startLineFx } from "~/engine/job/write/startLineFx";
+import { enqueueLineFx } from "~/engine/job/write/enqueueLineFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import { moveItemFx } from "~/engine/runtime/write/moveItemFx";
 import { releaseInventoryItemFx } from "~/engine/runtime/write/releaseInventoryItemFx";
@@ -340,7 +341,7 @@ describe("job owner inventory contract", () => {
 					ownerItemId,
 					lineId,
 				});
-				yield* startLineFx({
+				yield* enqueueLineFx({
 					ownerItemId,
 					lineId,
 				});

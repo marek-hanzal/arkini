@@ -31,11 +31,11 @@ const owner = {
 	revision: "revision:owner",
 } satisfies RuntimeItemSchema.Type;
 
-const runAttempt = (runtime: RuntimeSchema.Type, ownerItemId = request.ownerItemId) =>
+const runAttempt = (runtime: RuntimeSchema.Type, requestId = request.id) =>
 	Effect.runSync(
 		Effect.result(
 			attemptQueuedLineStartFx({
-				ownerItemId,
+				requestId,
 				runtime,
 			}),
 		).pipe(
@@ -46,7 +46,7 @@ const runAttempt = (runtime: RuntimeSchema.Type, ownerItemId = request.ownerItem
 	);
 
 describe("attemptQueuedLineStartFx", () => {
-	it("returns empty when the owner has no live queued request", () => {
+	it("returns empty when the exact request is not a live FIFO head", () => {
 		const runtime = {
 			cheats: {
 				enabled: false,
@@ -62,6 +62,39 @@ describe("attemptQueuedLineStartFx", () => {
 		} satisfies RuntimeSchema.Type;
 
 		const result = runAttempt(runtime);
+
+		expect(result).toMatchObject({
+			_tag: "Success",
+			success: {
+				type: "empty",
+			},
+		});
+		if (result._tag === "Success") expect(result.success.runtime).toBe(runtime);
+	});
+
+	it("does not start a later request from the same owner", () => {
+		const later = {
+			...request,
+			id: "job:request:later",
+		} satisfies JobQueueRequestSchema.Type;
+		const runtime = {
+			cheats: {
+				enabled: false,
+				everEnabled: false,
+				instantGameplay: false,
+			},
+			currentSpace: 0,
+			items: [
+				owner,
+			],
+			jobs: [],
+			jobQueue: [
+				request,
+				later,
+			],
+		} satisfies RuntimeSchema.Type;
+
+		const result = runAttempt(runtime, later.id);
 
 		expect(result).toMatchObject({
 			_tag: "Success",
@@ -213,7 +246,7 @@ describe("attemptQueuedLineStartFx", () => {
 					],
 				} satisfies RuntimeSchema.Type;
 				return yield* attemptQueuedLineStartFx({
-					ownerItemId: request.ownerItemId,
+					requestId: request.id,
 					runtime,
 				});
 			}).pipe(

@@ -27,7 +27,7 @@ export const PixiBoardToolbarSurface = () => {
 	const itemDetail = useItemDetailControl();
 	const navigate = useNavigate();
 	const { interaction, textures } = usePixiGameRuntime();
-	const [startLineState, runStartLine] = useAtom(TileDefaultLineCommandAtom(game));
+	const [enqueueLineState, enqueueLine] = useAtom(TileDefaultLineCommandAtom(game));
 	const runDrop = useAtomSet(runTileDropAtom(game), {
 		mode: "promise",
 	});
@@ -84,11 +84,11 @@ export const PixiBoardToolbarSurface = () => {
 				)
 				.with(
 					{
-						kind: "start-default-line",
+						kind: "enqueue-default-line",
 					},
 					({ lineId }) => {
-						runStartLine({
-							kind: "start",
+						enqueueLine({
+							kind: "enqueue",
 							lineId,
 							ownerItemId: item.id,
 						});
@@ -98,18 +98,18 @@ export const PixiBoardToolbarSurface = () => {
 		},
 		[
 			openInventory,
-			runStartLine,
+			enqueueLine,
 		],
 	);
 
 	useEffect(() => {
-		if (startLineState.kind !== "error") return;
-		runStartLine({
+		if (enqueueLineState.kind !== "error") return;
+		enqueueLine({
 			kind: "reset",
 		});
 	}, [
-		runStartLine,
-		startLineState,
+		enqueueLine,
+		enqueueLineState,
 	]);
 
 	useEffect(() => {

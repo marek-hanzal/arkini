@@ -390,7 +390,9 @@ describe("Item Detail line input actions", () => {
 			line: [
 				{
 					actions: {
-						canAutofill: true,
+						immediate: {
+							enabled: true,
+						},
 						canWithdraw: false,
 					},
 				},
@@ -430,7 +432,9 @@ describe("Item Detail line input actions", () => {
 			line: [
 				{
 					actions: {
-						canAutofill: false,
+						immediate: {
+							enabled: false,
+						},
 						canWithdraw: false,
 					},
 					availability: {
@@ -589,7 +593,9 @@ describe("Item Detail line input actions", () => {
 			line: [
 				{
 					actions: {
-						canAutofill: false,
+						immediate: {
+							enabled: false,
+						},
 						canWithdraw: false,
 					},
 				},
@@ -684,7 +690,9 @@ describe("Item Detail line input actions", () => {
 			line: [
 				{
 					actions: {
-						canAutofill: true,
+						immediate: {
+							enabled: true,
+						},
 						canWithdraw: false,
 					},
 					availability: {

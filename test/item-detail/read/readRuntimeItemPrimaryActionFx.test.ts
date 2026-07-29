@@ -145,7 +145,7 @@ describe("readRuntimeItemPrimaryActionFx", () => {
 				}),
 			),
 		).toEqual({
-			kind: "start-default-line",
+			kind: "enqueue-default-line",
 			lineId: "line:produce",
 		});
 	});
@@ -182,7 +182,7 @@ describe("readRuntimeItemPrimaryActionFx", () => {
 		});
 	});
 
-	it("starts only a valid save-backed default line", () => {
+	it("enqueues only a valid save-backed default line", () => {
 		expect(
 			Effect.runSync(
 				readRuntimeItemPrimaryActionFx({
@@ -196,7 +196,7 @@ describe("readRuntimeItemPrimaryActionFx", () => {
 				}),
 			),
 		).toEqual({
-			kind: "start-default-line",
+			kind: "enqueue-default-line",
 			lineId: "line:produce",
 		});
 		expect(

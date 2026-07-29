@@ -7,21 +7,16 @@ import type { Game } from "~/bridge/game/Game";
 import { TileDefaultLineCommandAtom } from "~/bridge/tile/TileDefaultLineCommandAtom";
 
 const engineCommands = vi.hoisted(() => ({
-	autofill: vi.fn(),
-	start: vi.fn(),
+	enqueue: vi.fn(),
 }));
 const failStop = vi.fn<Game["failStop"]>();
 
-vi.mock("~/engine/input/write/autofillLineInputsFx", () => ({
-	autofillLineInputsFx: (props: unknown) => engineCommands.autofill(props),
-}));
-
-vi.mock("~/engine/job/write/startLineFx", () => ({
-	startLineFx: (props: unknown) => engineCommands.start(props),
+vi.mock("~/engine/job/write/enqueueLineFx", () => ({
+	enqueueLineFx: (props: unknown) => engineCommands.enqueue(props),
 }));
 
 const command = {
-	kind: "start",
+	kind: "enqueue",
 	lineId: "line:producer",
 	ownerItemId: "runtime:producer",
 } as const satisfies TileDefaultLineCommandAtom.Command;
@@ -46,7 +41,7 @@ const runCommand = async () => {
 	const atom = TileDefaultLineCommandAtom(game);
 	const unmount = registry.mount(atom);
 	registry.set(atom, command);
-	await vi.waitFor(() => expect(engineCommands.autofill).toHaveBeenCalledOnce());
+	await vi.waitFor(() => expect(engineCommands.enqueue).toHaveBeenCalledOnce());
 	return {
 		atom,
 		registry,
@@ -55,8 +50,7 @@ const runCommand = async () => {
 };
 
 beforeEach(() => {
-	engineCommands.autofill.mockReset();
-	engineCommands.start.mockReset();
+	engineCommands.enqueue.mockReset();
 	failStop.mockReset();
 });
 
@@ -70,34 +64,30 @@ describe("TileDefaultLineCommandAtom", () => {
 			_tag: "StaleMissingInputs",
 		} as const;
 		const firstGate = Effect.runSync(Deferred.make<never, typeof staleFailure>());
-		engineCommands.autofill.mockReturnValueOnce(Deferred.await(firstGate)).mockReturnValueOnce(
+		engineCommands.enqueue.mockReturnValueOnce(Deferred.await(firstGate)).mockReturnValueOnce(
 			Effect.succeed({
-				scheduledQuantity: 0,
-				remainingMissingQuantity: 0,
-				deliveryItemIds: [],
+				id: "request:other",
 			}),
 		);
-		engineCommands.start.mockReturnValue(Effect.void);
 		const registry = createRegistry();
 		const atom = TileDefaultLineCommandAtom(game);
 		const unmount = registry.mount(atom);
 
 		registry.set(atom, command);
-		await vi.waitFor(() => expect(engineCommands.autofill).toHaveBeenCalledOnce());
+		await vi.waitFor(() => expect(engineCommands.enqueue).toHaveBeenCalledOnce());
 		for (let click = 0; click < 100; click += 1) registry.set(atom, command);
 		await Promise.resolve();
-		expect(engineCommands.autofill).toHaveBeenCalledOnce();
+		expect(engineCommands.enqueue).toHaveBeenCalledOnce();
 		registry.set(atom, {
 			...command,
 			ownerItemId: "runtime:other-producer",
 		});
-		await vi.waitFor(() => expect(engineCommands.autofill).toHaveBeenCalledTimes(2));
+		await vi.waitFor(() => expect(engineCommands.enqueue).toHaveBeenCalledTimes(2));
 		await vi.waitFor(() =>
 			expect(registry.get(atom)).toEqual({
 				kind: "idle",
 			}),
 		);
-		expect(engineCommands.start).toHaveBeenCalledOnce();
 
 		Effect.runSync(Deferred.fail(firstGate, staleFailure));
 		await Promise.resolve();
@@ -109,20 +99,17 @@ describe("TileDefaultLineCommandAtom", () => {
 	});
 
 	it("admits the same intent again after its previous engine command settles", async () => {
-		engineCommands.autofill.mockReturnValue(
+		engineCommands.enqueue.mockReturnValue(
 			Effect.succeed({
-				scheduledQuantity: 0,
-				remainingMissingQuantity: 0,
-				deliveryItemIds: [],
+				id: "request:accepted",
 			}),
 		);
-		engineCommands.start.mockReturnValue(Effect.void);
 		const registry = createRegistry();
 		const atom = TileDefaultLineCommandAtom(game);
 		const unmount = registry.mount(atom);
 
 		registry.set(atom, command);
-		await vi.waitFor(() => expect(engineCommands.start).toHaveBeenCalledOnce());
+		await vi.waitFor(() => expect(engineCommands.enqueue).toHaveBeenCalledOnce());
 		await vi.waitFor(() =>
 			expect(registry.get(atom)).toEqual({
 				kind: "idle",
@@ -131,14 +118,14 @@ describe("TileDefaultLineCommandAtom", () => {
 		await Promise.resolve();
 		registry.set(atom, command);
 
-		await vi.waitFor(() => expect(engineCommands.start).toHaveBeenCalledTimes(2));
+		await vi.waitFor(() => expect(engineCommands.enqueue).toHaveBeenCalledTimes(2));
 		unmount();
 	});
 
 	it("treats Provider teardown interruption as cancellation without fail-stopping the Game", async () => {
 		const entered = Effect.runSync(Deferred.make<void>());
 		const interrupted = Effect.runSync(Deferred.make<void>());
-		engineCommands.autofill.mockReturnValue(
+		engineCommands.enqueue.mockReturnValue(
 			Deferred.succeed(entered, undefined).pipe(
 				Effect.andThen(Effect.never),
 				Effect.onInterrupt(() =>
@@ -158,18 +145,11 @@ describe("TileDefaultLineCommandAtom", () => {
 		expect(failStop).not.toHaveBeenCalled();
 	});
 
-	it("settles after a partial autofill without starting the line or requesting Detail fallback", async () => {
-		engineCommands.autofill.mockReturnValue(
+	it("settles one accepted Enqueue without invoking immediate work", async () => {
+		engineCommands.enqueue.mockReturnValue(
 			Effect.succeed({
-				scheduledQuantity: 2,
-				remainingMissingQuantity: 1,
-				deliveryItemIds: [
-					"runtime:material",
-				],
+				id: "request:accepted",
 			}),
-		);
-		engineCommands.start.mockReturnValue(
-			Effect.die("Start must not run after partial autofill."),
 		);
 
 		const { atom, registry, unmount } = await runCommand();
@@ -179,86 +159,49 @@ describe("TileDefaultLineCommandAtom", () => {
 				kind: "idle",
 			});
 		});
-		expect(engineCommands.start).not.toHaveBeenCalled();
+		expect(engineCommands.enqueue).toHaveBeenCalledWith({
+			lineId: command.lineId,
+			ownerItemId: command.ownerItemId,
+		});
 		unmount();
 	});
 
-	it("keeps the Detail fallback when autofill cannot move any input", async () => {
+	it("projects one rejected Enqueue as a recoverable tile command error", async () => {
 		const failure = {
-			_tag: "MissingInputs",
+			_tag: "JobQueueFullError",
 		} as const;
-		engineCommands.autofill.mockReturnValue(
-			Effect.succeed({
-				scheduledQuantity: 0,
-				remainingMissingQuantity: 1,
-				deliveryItemIds: [],
-			}),
-		);
-		engineCommands.start.mockReturnValue(Effect.fail(failure));
+		engineCommands.enqueue.mockReturnValue(Effect.fail(failure));
 
 		const { atom, registry, unmount } = await runCommand();
 
 		await vi.waitFor(() => {
 			expect(registry.get(atom)).toEqual({
 				kind: "error",
-				autofilled: false,
 				error: failure,
 				ownerItemId: command.ownerItemId,
 			});
 		});
-		expect(engineCommands.start).toHaveBeenCalledOnce();
+		expect(failStop).not.toHaveBeenCalled();
 		unmount();
 	});
 
-	it("retains the start intent in scheduled deliveries instead of starting early", async () => {
-		engineCommands.autofill.mockReturnValue(
-			Effect.succeed({
-				scheduledQuantity: 2,
-				remainingMissingQuantity: 0,
-				deliveryItemIds: [
-					"runtime:material",
-				],
-			}),
-		);
-		engineCommands.start.mockReturnValue(
-			Effect.die("Start must wait for canonical delivery settlement."),
-		);
-
-		const { atom, registry, unmount } = await runCommand();
-
-		await vi.waitFor(() => {
-			expect(registry.get(atom)).toEqual({
-				kind: "idle",
-			});
-		});
-		expect(engineCommands.start).not.toHaveBeenCalled();
-		unmount();
-	});
-
-	it("propagates an autofill defect instead of flattening it into Detail fallback state", async () => {
-		const defectCause = Cause.die(new Error("Autofill defect"));
-		engineCommands.autofill.mockReturnValue(Effect.failCause(defectCause));
+	it("propagates an Enqueue defect instead of flattening it", async () => {
+		const defectCause = Cause.die(new Error("Enqueue defect"));
+		engineCommands.enqueue.mockReturnValue(Effect.failCause(defectCause));
 
 		await expect(runCommand()).rejects.toBe(defectCause);
 		expect(failStop).toHaveBeenCalledOnce();
 		expect(failStop).toHaveBeenCalledWith("ui", defectCause);
 	});
 
-	it("propagates a mixed start Cause instead of projecting its typed failure", async () => {
+	it("propagates a mixed Enqueue Cause instead of projecting its typed failure", async () => {
 		const mixedCause = Cause.combine(
 			Cause.fail({
 				_tag: "MissingInputs",
 			} as const),
-			Cause.die(new Error("Start defect")),
+			Cause.die(new Error("Enqueue defect")),
 		);
-		engineCommands.autofill.mockReturnValue(
-			Effect.succeed({
-				scheduledQuantity: 0,
-				remainingMissingQuantity: 0,
-				deliveryItemIds: [],
-			}),
-		);
-		engineCommands.start.mockReturnValue(Effect.failCause(mixedCause));
+		engineCommands.enqueue.mockReturnValue(Effect.failCause(mixedCause));
 
 		await expect(runCommand()).rejects.toBe(mixedCause);
 		expect(failStop).toHaveBeenCalledOnce();

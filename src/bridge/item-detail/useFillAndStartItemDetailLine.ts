@@ -1,10 +1,10 @@
 import type { Game } from "~/bridge/game/Game";
 import type { ItemDetailPendingActionOwner } from "~/bridge/item-detail/ItemDetailPendingActionOwner";
 import { useItemDetailPendingCommand } from "~/bridge/item-detail/useItemDetailPendingCommand";
-import { startLineFx } from "~/engine/job/write/startLineFx";
+import { fillAndStartLineFx } from "~/engine/job/write/fillAndStartLineFx";
 
-export namespace useStartPendingItemDetailLine {
-	export type Props = startLineFx.Props;
+export namespace useFillAndStartItemDetailLine {
+	export type Props = fillAndStartLineFx.Props;
 
 	export interface Options {
 		readonly pendingKey: string;
@@ -12,24 +12,24 @@ export namespace useStartPendingItemDetailLine {
 	}
 }
 
-const runStartFx = (game: Game, command: useStartPendingItemDetailLine.Props) =>
-	game.runFx(startLineFx(command));
+const runFillAndStartFx = (game: Game, command: useFillAndStartItemDetailLine.Props) =>
+	game.runFx(fillAndStartLineFx(command));
 
-/** Starts or enqueues one exact Item Detail line request. */
-export const useStartPendingItemDetailLine = ({
+/** Runs the authoritative Fill or atomic Fill & Start action for one exact Item Detail line. */
+export const useFillAndStartItemDetailLine = ({
 	pendingKey,
 	pendingOwner,
-}: useStartPendingItemDetailLine.Options) => {
+}: useFillAndStartItemDetailLine.Options) => {
 	const command = useItemDetailPendingCommand({
 		action: "start",
 		failureMessage: "Work could not be started.",
 		pendingKey,
 		pendingOwner,
-		run: runStartFx,
+		run: runFillAndStartFx,
 	});
 	return {
 		error: command.error,
 		pending: command.pending,
-		start: command.run,
+		run: command.run,
 	};
 };

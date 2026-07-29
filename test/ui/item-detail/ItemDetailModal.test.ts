@@ -842,7 +842,11 @@ describe("ItemDetailModal", () => {
 		expect(startButton.dataset.startMode).toBe("start");
 		expect(startButton.textContent).toBe("Start");
 		expect(startButton.disabled).toBe(true);
-		expect(document.body.textContent).not.toContain("Enqueue");
+		const enqueueButton = document.querySelector<HTMLButtonElement>(
+			'[data-ui="TileLineEnqueueButton"]',
+		);
+		expect(enqueueButton?.textContent).toBe("Enqueue");
+		expect(enqueueButton?.disabled).toBe(true);
 		const queueTab = document.querySelector<HTMLButtonElement>('[data-tab="queue"]');
 		if (queueTab === null) throw new Error("Missing single-slot Queue tab.");
 		await act(async () => {

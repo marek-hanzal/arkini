@@ -2,8 +2,36 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { readItemDetailQueueFx } from "~/engine/item-detail/read/readItemDetailQueueFx";
+import { useGameFx } from "~/engine/game/fx/useGameFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
-import { lineRunRuntime } from "~test/line/fx/run/support/lineRunTestRuntime";
+import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
+import { lineRunRuntime, lineRunTestConfig } from "~test/line/fx/run/support/lineRunTestRuntime";
+
+const run = <A, E>(effect: Effect.Effect<A, E, never>) => Effect.runSync(effect);
+
+const readQueue = (
+	props: readItemDetailQueueFx.Props,
+	config: GameConfigSchema.Type = lineRunTestConfig,
+) =>
+	run(
+		readItemDetailQueueFx(props).pipe(
+			useGameFx({
+				config,
+			}),
+		),
+	);
+
+const queuedRuntime = (runtime: RuntimeSchema.Type) =>
+	({
+		...runtime,
+		jobQueue: [
+			{
+				id: "job:queued",
+				ownerItemId: "runtime:workshop",
+				lineId: "line:workshop:build",
+			},
+		],
+	}) satisfies RuntimeSchema.Type;
 
 describe("readItemDetailQueue", () => {
 	it("projects active work before queued intents", () => {
@@ -31,12 +59,10 @@ describe("readItemDetailQueue", () => {
 		} satisfies RuntimeSchema.Type;
 
 		expect(
-			Effect.runSync(
-				readItemDetailQueueFx({
-					itemId: "runtime:workshop",
-					runtime,
-				}),
-			),
+			readQueue({
+				itemId: "runtime:workshop",
+				runtime,
+			}),
 		).toEqual({
 			kind: "available",
 			itemId: "runtime:workshop",
@@ -56,6 +82,7 @@ describe("readItemDetailQueue", () => {
 					requestId: "job:queued",
 					lineId: "line:workshop:build",
 					title: "Build",
+					status: "blocked-earlier",
 				},
 			],
 		});
@@ -80,12 +107,10 @@ describe("readItemDetailQueue", () => {
 			),
 		} satisfies RuntimeSchema.Type;
 		expect(
-			Effect.runSync(
-				readItemDetailQueueFx({
-					itemId: "runtime:workshop",
-					runtime: singleSlotRuntime,
-				}),
-			),
+			readQueue({
+				itemId: "runtime:workshop",
+				runtime: singleSlotRuntime,
+			}),
 		).toEqual({
 			kind: "available",
 			itemId: "runtime:workshop",
@@ -94,24 +119,98 @@ describe("readItemDetailQueue", () => {
 			request: [],
 		});
 		expect(
-			Effect.runSync(
-				readItemDetailQueueFx({
-					itemId: "runtime:missing",
-					runtime,
-				}),
-			),
+			readQueue({
+				itemId: "runtime:missing",
+				runtime,
+			}),
 		).toEqual({
 			kind: "unavailable",
 		});
 		expect(
-			Effect.runSync(
-				readItemDetailQueueFx({
-					itemId: "runtime:permit",
-					runtime,
-				}),
-			),
+			readQueue({
+				itemId: "runtime:permit",
+				runtime,
+			}),
 		).toEqual({
 			kind: "unavailable",
+		});
+	});
+
+	it("reports missing material as a wait only while every hard queue condition still holds", () => {
+		const waiting = queuedRuntime(
+			lineRunRuntime({
+				permit: true,
+			}),
+		);
+		expect(
+			readQueue({
+				itemId: "runtime:workshop",
+				runtime: waiting,
+			}),
+		).toMatchObject({
+			request: [
+				{
+					missingQuantity: 3,
+					requestId: "job:queued",
+					status: "waiting-inputs",
+				},
+			],
+		});
+
+		const workshop = lineRunTestConfig.items.workshop;
+		if (workshop.type !== "producer") throw new Error("Expected producer fixture.");
+		const chargedConfig = GameConfigSchema.parse({
+			...lineRunTestConfig,
+			items: {
+				...lineRunTestConfig.items,
+				workshop: {
+					...workshop,
+					charges: {
+						amount: 1,
+					},
+					lines: workshop.lines.map((line) => ({
+						...line,
+						input: line.input.map((input, index) =>
+							index === 0 && input.type === "materials"
+								? {
+										...input,
+										charges: {
+											cost: 2,
+											from: "self",
+										},
+									}
+								: input,
+						),
+					})),
+				},
+			},
+		});
+		const blocked = queuedRuntime({
+			...waiting,
+			items: waiting.items.map((item) =>
+				item.id === "runtime:workshop"
+					? {
+							...item,
+							item: chargedConfig.items.workshop,
+						}
+					: item,
+			),
+		});
+		expect(
+			readQueue(
+				{
+					itemId: "runtime:workshop",
+					runtime: blocked,
+				},
+				chargedConfig,
+			),
+		).toMatchObject({
+			request: [
+				{
+					requestId: "job:queued",
+					status: "blocked-condition",
+				},
+			],
 		});
 	});
 });

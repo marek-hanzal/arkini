@@ -37,12 +37,12 @@ const replaceJob = (runtime: RuntimeSchema.Type, job: JobSchema.Type): RuntimeSc
 	jobs: runtime.jobs.map((candidate) => (candidate.id === job.id ? job : candidate)),
 });
 
-const dispatchOwnerQueueFx = Effect.fn("dispatchOwnerQueueFx")(function* (
-	ownerItemId: IdSchema.Type,
+const dispatchQueueRequestFx = Effect.fn("dispatchQueueRequestFx")(function* (
+	requestId: IdSchema.Type,
 	runtime: RuntimeSchema.Type,
 ) {
 	const attempt = yield* attemptQueuedLineStartFx({
-		ownerItemId,
+		requestId,
 		runtime,
 	});
 	if (attempt.type !== StartLineResultEnumSchema.enum.Started) return attempt;
@@ -63,24 +63,24 @@ const dispatchOwnerQueueFx = Effect.fn("dispatchOwnerQueueFx")(function* (
 	} as const;
 });
 
-const dispatchQueueOnlyOwnersFx = Effect.fn("dispatchQueueOnlyOwnersFx")(function* (
+const dispatchIdleQueueHeadsFx = Effect.fn("dispatchIdleQueueHeadsFx")(function* (
 	runtime: RuntimeSchema.Type,
 ) {
 	const activeOwnerItemIds = new Set(runtime.jobs.map((job) => job.ownerItemId));
-	const queueOnlyOwnerItemIds = [
-		...new Set(
-			(runtime.jobQueue ?? [])
-				.map((request) => request.ownerItemId)
-				.filter((ownerItemId) => !activeOwnerItemIds.has(ownerItemId)),
-		),
-	].sort((first, second) => first.localeCompare(second));
+	const visitedOwnerItemIds = new Set<IdSchema.Type>();
+	const queueSnapshot = runtime.jobQueue ?? [];
 
 	let draft = runtime;
 	const events: GameEventSchema.Type[] = [];
-	for (const ownerItemId of queueOnlyOwnerItemIds) {
-		const dispatched = yield* dispatchOwnerQueueFx(ownerItemId, draft);
+	for (const request of queueSnapshot) {
+		if (visitedOwnerItemIds.has(request.ownerItemId)) continue;
+		visitedOwnerItemIds.add(request.ownerItemId);
+		if (activeOwnerItemIds.has(request.ownerItemId)) continue;
+
+		const dispatched = yield* dispatchQueueRequestFx(request.id, draft);
 		if (dispatched.type !== StartLineResultEnumSchema.enum.Started) continue;
 		draft = dispatched.runtime;
+		activeOwnerItemIds.add(request.ownerItemId);
 		events.push(...dispatched.events);
 	}
 
@@ -101,7 +101,7 @@ const dispatchQueueOnlyOwnersFx = Effect.fn("dispatchQueueOnlyOwnersFx")(functio
 export const advanceRuntimeStepFx = Effect.fn("advanceRuntimeStepFx")(function* (
 	stepStart: RuntimeSchema.Type,
 ) {
-	const boundaryStart = yield* dispatchQueueOnlyOwnersFx(stepStart);
+	const boundaryStart = yield* dispatchIdleQueueHeadsFx(stepStart);
 	const instantGameplay = yield* isInstantGameplayEnabledFx({
 		runtime: boundaryStart.runtime,
 	});
@@ -159,11 +159,8 @@ export const advanceRuntimeStepFx = Effect.fn("advanceRuntimeStepFx")(function* 
 		completedOwnerItemIds.push(liveJob.ownerItemId);
 	}
 
-	for (const ownerItemId of [
-		...new Set(completedOwnerItemIds),
-	].sort((first, second) => first.localeCompare(second))) {
-		const dispatched = yield* dispatchOwnerQueueFx(ownerItemId, draft);
-		if (dispatched.type !== StartLineResultEnumSchema.enum.Started) continue;
+	if (completedOwnerItemIds.length > 0) {
+		const dispatched = yield* dispatchIdleQueueHeadsFx(draft);
 		draft = dispatched.runtime;
 		events.push(...dispatched.events);
 	}

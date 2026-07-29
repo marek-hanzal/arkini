@@ -24,7 +24,7 @@ const control = vi.hoisted(() => ({
 	runPendingAction: vi.fn(),
 }));
 const commands = vi.hoisted(() => ({
-	autofill: vi.fn(),
+	enqueue: vi.fn(),
 	setDefault: vi.fn(),
 	start: vi.fn(),
 	unsetDefault: vi.fn(),
@@ -35,11 +35,11 @@ vi.mock("motion/react", async () => import("~test/ui/support/motionReactMock"));
 vi.mock("~/ui/item-detail/useItemDetailControl", () => ({
 	useItemDetailControl: () => control,
 }));
-vi.mock("~/bridge/item-detail/useAutofillItemDetailLine", () => ({
-	useAutofillItemDetailLine: ({ pendingKey }: { readonly pendingKey: string }) => ({
+vi.mock("~/bridge/item-detail/useEnqueueItemDetailLine", () => ({
+	useEnqueueItemDetailLine: ({ pendingKey }: { readonly pendingKey: string }) => ({
 		error: control.readActionError(pendingKey),
-		pending: control.readPendingAction(pendingKey) === "autofill",
-		run: commands.autofill,
+		pending: control.readPendingAction(pendingKey) === "enqueue",
+		run: commands.enqueue,
 	}),
 }));
 vi.mock("~/bridge/item-detail/useSetDefaultItemDetailLine", () => ({
@@ -49,11 +49,11 @@ vi.mock("~/bridge/item-detail/useSetDefaultItemDetailLine", () => ({
 		run: commands.setDefault,
 	}),
 }));
-vi.mock("~/bridge/item-detail/useStartItemDetailLine", () => ({
-	useStartPendingItemDetailLine: ({ pendingKey }: { readonly pendingKey: string }) => ({
+vi.mock("~/bridge/item-detail/useFillAndStartItemDetailLine", () => ({
+	useFillAndStartItemDetailLine: ({ pendingKey }: { readonly pendingKey: string }) => ({
 		error: control.readActionError(pendingKey),
 		pending: control.readPendingAction(pendingKey) === "start",
-		start: commands.start,
+		run: commands.start,
 	}),
 }));
 vi.mock("~/bridge/item-detail/useUnsetDefaultItemDetailLine", () => ({
@@ -168,11 +168,15 @@ const line = ({
 		kind: "available",
 		readiness: "ready",
 	},
-	startMode: "start",
 	isDefault,
 	actions: {
-		canAutofill: false,
-		canStart: true,
+		immediate: {
+			type: "start",
+			enabled: true,
+		},
+		enqueue: {
+			enabled: true,
+		},
 		canWithdraw: false,
 	},
 	input: [
@@ -440,8 +444,13 @@ describe("ItemLinesTab", () => {
 				readiness: "inputs",
 			},
 			actions: {
-				canAutofill: true,
-				canStart: false,
+				immediate: {
+					type: "fill",
+					enabled: true,
+				},
+				enqueue: {
+					enabled: true,
+				},
 				canWithdraw: false,
 			},
 		} as const satisfies useItemDetailLines.Line;
@@ -464,8 +473,13 @@ describe("ItemLinesTab", () => {
 				},
 			},
 			actions: {
-				canAutofill: false,
-				canStart: false,
+				immediate: {
+					type: "fill",
+					enabled: false,
+				},
+				enqueue: {
+					enabled: false,
+				},
 				canWithdraw: false,
 			},
 		} as const satisfies useItemDetailLines.Line;
@@ -561,8 +575,13 @@ describe("ItemLinesTab", () => {
 				},
 			},
 			actions: {
-				canAutofill: false,
-				canStart: false,
+				immediate: {
+					type: "fill",
+					enabled: false,
+				},
+				enqueue: {
+					enabled: false,
+				},
 				canWithdraw: false,
 			},
 		} as const satisfies useItemDetailLines.Line;
@@ -611,8 +630,13 @@ describe("ItemLinesTab", () => {
 				},
 			},
 			actions: {
-				canAutofill: false,
-				canStart: false,
+				immediate: {
+					type: "fill",
+					enabled: false,
+				},
+				enqueue: {
+					enabled: false,
+				},
 				canWithdraw: false,
 			},
 		} as const satisfies useItemDetailLines.Line;
@@ -672,8 +696,13 @@ describe("ItemLinesTab", () => {
 				},
 			},
 			actions: {
-				canAutofill: false,
-				canStart: false,
+				immediate: {
+					type: "fill",
+					enabled: false,
+				},
+				enqueue: {
+					enabled: false,
+				},
 				canWithdraw: false,
 			},
 		} as const satisfies useItemDetailLines.Line;
@@ -865,8 +894,13 @@ describe("ItemLinesTab", () => {
 				{
 					...projection.line[0],
 					actions: {
-						canAutofill: false,
-						canStart: true,
+						immediate: {
+							type: "start",
+							enabled: true,
+						},
+						enqueue: {
+							enabled: true,
+						},
 						canWithdraw: true,
 					},
 					input: [
@@ -955,8 +989,13 @@ describe("ItemLinesTab", () => {
 						},
 					},
 					actions: {
-						canAutofill: false,
-						canStart: false,
+						immediate: {
+							type: "fill",
+							enabled: false,
+						},
+						enqueue: {
+							enabled: false,
+						},
 						canWithdraw: true,
 					},
 					input: [
@@ -1018,8 +1057,13 @@ describe("ItemLinesTab", () => {
 						},
 					},
 					actions: {
-						canAutofill: false,
-						canStart: false,
+						immediate: {
+							type: "fill",
+							enabled: false,
+						},
+						enqueue: {
+							enabled: false,
+						},
 						canWithdraw: false,
 					},
 				},
@@ -1060,8 +1104,13 @@ describe("ItemLinesTab", () => {
 						},
 					},
 					actions: {
-						canAutofill: false,
-						canStart: false,
+						immediate: {
+							type: "fill",
+							enabled: false,
+						},
+						enqueue: {
+							enabled: false,
+						},
 						canWithdraw: false,
 					},
 					input: [
@@ -1124,8 +1173,13 @@ describe("ItemLinesTab", () => {
 				},
 			},
 			actions: {
-				canAutofill: false,
-				canStart: false,
+				immediate: {
+					type: "fill",
+					enabled: false,
+				},
+				enqueue: {
+					enabled: false,
+				},
 				canWithdraw: false,
 			},
 		} as const satisfies useItemDetailLines.Line;
@@ -1222,8 +1276,8 @@ describe("ItemLinesTab", () => {
 
 	it("keeps engine-eligible line actions clickable while their presentation status is pending", async () => {
 		control.readPendingAction.mockImplementation((key: string) => {
-			if (key.includes('"autofill"')) return "autofill";
 			if (key.includes('"default"')) return "default";
+			if (key.includes('"enqueue"')) return "enqueue";
 			if (key.includes('"start"')) return "start";
 			if (key.includes('"withdraw"')) return "withdraw";
 			return null;
@@ -1234,8 +1288,13 @@ describe("ItemLinesTab", () => {
 				{
 					...projection.line[0],
 					actions: {
-						canAutofill: true,
-						canStart: true,
+						immediate: {
+							type: "start",
+							enabled: true,
+						},
+						enqueue: {
+							enabled: true,
+						},
 						canWithdraw: true,
 					},
 					input: [
@@ -1250,7 +1309,7 @@ describe("ItemLinesTab", () => {
 		const buttons = Array.from(document.querySelectorAll<HTMLButtonElement>("button"));
 		const pendingLabels = [
 			"Saving…",
-			"Filling…",
+			"Queueing…",
 			"Withdrawing…",
 			"Starting…",
 		];
@@ -1264,30 +1323,70 @@ describe("ItemLinesTab", () => {
 			control.readPendingAction.mock.calls.map(([key]) => JSON.parse(key as string).at(-1)),
 		).toEqual(
 			expect.arrayContaining([
-				"autofill",
 				"default",
+				"enqueue",
 				"start",
 				"withdraw",
 			]),
 		);
 	});
 
-	it("keeps Enqueue copy and width stable while its command is pending", async () => {
+	it("renders truthful Enqueue pending copy on its separate command", async () => {
 		control.readPendingAction.mockImplementation((key: string) =>
-			key.includes('"start"') ? "start" : null,
+			key.includes('"enqueue"') ? "enqueue" : null,
 		);
 		await renderLines({
 			...projection,
 			line: [
 				{
 					...projection.line[0],
-					startMode: "enqueue",
 				},
 			],
 		});
-		const button = document.querySelector<HTMLButtonElement>('[data-ui="TileLineStartButton"]');
-		expect(button?.textContent).toBe("Enqueue");
+		const button = document.querySelector<HTMLButtonElement>(
+			'[data-ui="TileLineEnqueueButton"]',
+		);
+		expect(button?.textContent).toBe("Queueing…");
 		expect(button?.className).toContain("cursor-progress");
+	});
+
+	it("keeps Fill and Enqueue as separate explicit commands", async () => {
+		await renderLines({
+			...projection,
+			line: [
+				{
+					...projection.line[0],
+					actions: {
+						immediate: {
+							type: "fill",
+							enabled: true,
+						},
+						enqueue: {
+							enabled: true,
+						},
+						canWithdraw: false,
+					},
+				},
+			],
+		});
+		const fill = document.querySelector<HTMLButtonElement>('[data-ui="TileLineStartButton"]');
+		const enqueue = document.querySelector<HTMLButtonElement>(
+			'[data-ui="TileLineEnqueueButton"]',
+		);
+		expect(fill?.textContent).toBe("Fill");
+		expect(enqueue?.textContent).toBe("Enqueue");
+		await act(async () => fill?.click());
+		expect(commands.start).toHaveBeenCalledWith({
+			ownerItemId: projection.itemId,
+			lineId: projection.line[0]?.lineId,
+		});
+		expect(commands.enqueue).not.toHaveBeenCalled();
+		await act(async () => enqueue?.click());
+		expect(commands.enqueue).toHaveBeenCalledWith({
+			ownerItemId: projection.itemId,
+			lineId: projection.line[0]?.lineId,
+		});
+		expect(commands.start).toHaveBeenCalledOnce();
 	});
 
 	it("filters authoritative visible lines by semantic facts without indexing volatile numbers", async () => {
@@ -1331,7 +1430,6 @@ describe("ItemLinesTab", () => {
 						kind: "available",
 						readiness: "inputs",
 					},
-					startMode: "enqueue",
 					input: [
 						advancedInput,
 					],
@@ -1360,7 +1458,6 @@ describe("ItemLinesTab", () => {
 			"knowledge advanced",
 			"item:plank",
 			"missing inputs",
-			"enqueue",
 		]) {
 			await setSearchQuery(container, query);
 			expect(

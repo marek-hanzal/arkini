@@ -1,6 +1,12 @@
 import type { Effect } from "effect";
 
-export type ItemDetailPendingAction = "autofill" | "clear-queue" | "default" | "start" | "withdraw";
+export type ItemDetailPendingAction =
+	| "autofill"
+	| "clear-queue"
+	| "default"
+	| "enqueue"
+	| "start"
+	| "withdraw";
 
 export interface RunItemDetailPendingActionProps<Result = unknown, Failure = unknown> {
 	readonly key: string;

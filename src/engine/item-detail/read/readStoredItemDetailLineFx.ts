@@ -38,11 +38,15 @@ export const readStoredItemDetailLineFx = Effect.fn("readStoredItemDetailLineFx"
 				kind: "owner-stored",
 			},
 		},
-		startMode: "start",
 		isDefault,
 		actions: {
-			canAutofill: false,
-			canStart: false,
+			immediate: {
+				type: "fill",
+				enabled: false,
+			},
+			enqueue: {
+				enabled: false,
+			},
 			canWithdraw: false,
 		},
 		input: yield* readItemDetailInputsFx({

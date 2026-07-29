@@ -21,8 +21,8 @@ const boardState = vi.hoisted(() => ({
 	navigate: vi.fn(() => Promise.resolve()),
 	openItemDetail: vi.fn(),
 	registerInteraction: vi.fn(),
-	runStartLine: vi.fn(),
-	startLineState: {
+	enqueueLine: vi.fn(),
+	enqueueLineState: {
 		kind: "idle",
 	} as
 		| {
@@ -30,7 +30,6 @@ const boardState = vi.hoisted(() => ({
 		  }
 		| {
 				readonly kind: "error";
-				readonly autofilled: boolean;
 				readonly error: unknown;
 				readonly ownerItemId: string;
 		  },
@@ -39,8 +38,8 @@ const boardState = vi.hoisted(() => ({
 
 vi.mock("@effect/atom-react", () => ({
 	useAtom: () => [
-		boardState.startLineState,
-		boardState.runStartLine,
+		boardState.enqueueLineState,
+		boardState.enqueueLine,
 	],
 	useAtomSet: () => vi.fn(),
 }));
@@ -126,8 +125,8 @@ afterEach(async () => {
 	boardState.navigate.mockClear();
 	boardState.openItemDetail.mockClear();
 	boardState.registerInteraction.mockClear();
-	boardState.runStartLine.mockClear();
-	boardState.startLineState = {
+	boardState.enqueueLine.mockClear();
+	boardState.enqueueLineState = {
 		kind: "idle",
 	};
 	boardState.unregisterInteraction.mockClear();
@@ -136,9 +135,8 @@ afterEach(async () => {
 
 describe("PixiBoardToolbarSurface", () => {
 	it("silently resets a failed primary action without opening Item Detail", async () => {
-		boardState.startLineState = {
+		boardState.enqueueLineState = {
 			kind: "error",
-			autofilled: false,
 			error: {
 				_tag: "DepositUnavailable",
 			},
@@ -155,7 +153,7 @@ describe("PixiBoardToolbarSurface", () => {
 		});
 
 		expect(boardState.openItemDetail).not.toHaveBeenCalled();
-		expect(boardState.runStartLine).toHaveBeenCalledWith({
+		expect(boardState.enqueueLine).toHaveBeenCalledWith({
 			kind: "reset",
 		});
 	});
@@ -197,7 +195,7 @@ describe("PixiBoardToolbarSurface", () => {
 
 		await createProps.onActivate(owner, false, canvas);
 
-		expect(boardState.runStartLine).not.toHaveBeenCalled();
+		expect(boardState.enqueueLine).not.toHaveBeenCalled();
 		expect(boardState.openItemDetail).not.toHaveBeenCalled();
 		expect(boardState.navigate).not.toHaveBeenCalled();
 
@@ -207,7 +205,7 @@ describe("PixiBoardToolbarSurface", () => {
 			itemId: owner.id,
 			origin: canvas,
 		});
-		expect(boardState.runStartLine).not.toHaveBeenCalled();
+		expect(boardState.enqueueLine).not.toHaveBeenCalled();
 	});
 
 	it("sends another default-line command for a running owner and lets the engine enqueue or reject it", async () => {
@@ -234,7 +232,7 @@ describe("PixiBoardToolbarSurface", () => {
 				},
 			},
 			primaryAction: {
-				kind: "start-default-line",
+				kind: "enqueue-default-line",
 				lineId: "line:default",
 			},
 			quantity: 1,
@@ -247,8 +245,8 @@ describe("PixiBoardToolbarSurface", () => {
 
 		await createProps.onActivate(producer, false, document.createElement("canvas"));
 
-		expect(boardState.runStartLine).toHaveBeenCalledWith({
-			kind: "start",
+		expect(boardState.enqueueLine).toHaveBeenCalledWith({
+			kind: "enqueue",
 			lineId: "line:default",
 			ownerItemId: producer.id,
 		});

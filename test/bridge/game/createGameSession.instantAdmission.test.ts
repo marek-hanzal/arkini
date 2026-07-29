@@ -6,6 +6,7 @@ import { createJobTestConfig } from "~test/job/support/jobTestConfig";
 import { setCheatEnabledFx } from "~/engine/cheat/write/setCheatEnabledFx";
 import { setInstantGameplayFx } from "~/engine/cheat/write/setInstantGameplayFx";
 import { storeInputMaterialFx } from "~/engine/input/write/storeInputMaterialFx";
+import { enqueueLineFx } from "~/engine/job/write/enqueueLineFx";
 import { startLineFx } from "~/engine/job/write/startLineFx";
 import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
 import { runTickRuntimeByFx } from "~/engine/tick/fx/runTickRuntimeByFx";
@@ -142,6 +143,117 @@ describe("GameSession Instant gameplay admission", () => {
 				}),
 			);
 			expect(session.getSnapshot().jobs).toEqual([]);
+		} finally {
+			await Effect.runPromise(session.disposeWithoutSaveFx);
+		}
+	});
+
+	it("wakes five rapidly enqueued requests when later sources complete the head", async () => {
+		const session = await createTestGameSession({
+			config: createJobTestConfig(5),
+			tickIntervalMs: 1,
+		});
+		const ownerItemId = "runtime:forge:queue-race";
+
+		try {
+			await session.run(
+				Effect.gen(function* () {
+					yield* setInstantGameplayFx({
+						enabled: true,
+					});
+					yield* setCheatEnabledFx({
+						enabled: true,
+					});
+					yield* spawnItemFx({
+						id: ownerItemId,
+						itemId: "forge",
+						location: {
+							scope: "board",
+							space: 0,
+							position: {
+								x: 0,
+								y: 0,
+							},
+						},
+						quantity: 1,
+					});
+					yield* spawnItemFx({
+						id: "runtime:water:partial",
+						itemId: "water",
+						location: {
+							scope: "board",
+							space: 0,
+							position: {
+								x: 1,
+								y: 0,
+							},
+						},
+						quantity: 2,
+					});
+				}),
+			);
+
+			await Promise.all(
+				Array.from(
+					{
+						length: 5,
+					},
+					() =>
+						session.run(
+							enqueueLineFx({
+								ownerItemId,
+								lineId,
+							}),
+						),
+				),
+			);
+			expect(session.getSnapshot().jobs).toEqual([]);
+			expect(session.getSnapshot().jobQueue).toHaveLength(5);
+
+			await session.run(
+				Effect.gen(function* () {
+					yield* spawnItemFx({
+						id: "runtime:water:remainder",
+						itemId: "water",
+						location: {
+							scope: "board",
+							space: 0,
+							position: {
+								x: 2,
+								y: 0,
+							},
+						},
+						quantity: 1,
+					});
+					yield* spawnItemFx({
+						id: "runtime:tool:late",
+						itemId: "tool",
+						location: {
+							scope: "board",
+							space: 0,
+							position: {
+								x: 3,
+								y: 0,
+							},
+						},
+						quantity: 1,
+					});
+				}),
+			);
+
+			const deadline = performance.now() + 1_000;
+			while ((session.getSnapshot().jobQueue ?? []).length === 5) {
+				if (performance.now() >= deadline) {
+					throw new Error("Queued Instant job did not wake after its sources appeared.");
+				}
+				await new Promise((resolve) => setTimeout(resolve, 5));
+			}
+
+			const runtime = session.getSnapshot();
+			expect(runtime.jobs).toEqual([]);
+			expect(runtime.jobQueue).toHaveLength(4);
+			expect(runtime.items.filter((item) => item.item.id === "water")).toEqual([]);
+			expect(session.getFatalError()).toBeNull();
 		} finally {
 			await Effect.runPromise(session.disposeWithoutSaveFx);
 		}

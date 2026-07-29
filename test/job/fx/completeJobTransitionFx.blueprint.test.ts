@@ -8,6 +8,7 @@ import { readReservedJobOutputQuantitiesFx } from "~/engine/job/fx/read/readRese
 import { resolveLineStartFx } from "~/engine/job/fx/read/resolveLineStartFx";
 import { resolveOneHopLineOutputMaxCountFx } from "~/engine/job/fx/read/resolveOneHopLineOutputMaxCountFx";
 import { startLineFx } from "~/engine/job/write/startLineFx";
+import { enqueueLineFx } from "~/engine/job/write/enqueueLineFx";
 import { readItemDetailLinesFx } from "~/engine/item-detail/read/readItemDetailLinesFx";
 import { fromStateFx } from "~/engine/runtime/fx/fromStateFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
@@ -1231,7 +1232,7 @@ describe("blueprint job completion transition", () => {
 					ownerItemId: owner.id,
 					lineId: "line:producer:limited",
 				});
-				const queued = yield* startLineFx({
+				const queued = yield* enqueueLineFx({
 					ownerItemId: owner.id,
 					lineId: "line:producer:limited",
 				}).pipe(Effect.result);
@@ -1383,7 +1384,9 @@ describe("blueprint job completion transition", () => {
 						},
 					},
 					actions: {
-						canStart: false,
+						immediate: {
+							enabled: false,
+						},
 					},
 				},
 			],
@@ -1435,7 +1438,9 @@ describe("blueprint job completion transition", () => {
 						readiness: "inputs",
 					},
 					actions: {
-						canStart: false,
+						immediate: {
+							enabled: true,
+						},
 					},
 				},
 			],
@@ -1813,7 +1818,7 @@ describe("blueprint job completion transition", () => {
 					itemId: owner.id,
 					runtime,
 				});
-				const secondStarted = yield* startLineFx({
+				const secondStarted = yield* enqueueLineFx({
 					ownerItemId: owner.id,
 					lineId: "line:producer:blueprint-source",
 				}).pipe(Effect.result);
@@ -1960,7 +1965,7 @@ describe("blueprint job completion transition", () => {
 						ownerItemId: owner.id,
 						lineId: "line:producer:ordinary-material",
 					}).pipe(Effect.result),
-					cycle: yield* startLineFx({
+					cycle: yield* enqueueLineFx({
 						ownerItemId: owner.id,
 						lineId: "line:producer:two-hop-cycle",
 					}).pipe(Effect.result),

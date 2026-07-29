@@ -94,6 +94,7 @@ const queue = {
 			requestId: "request:1",
 			lineId: "line:produce",
 			title: "Produce",
+			status: "waiting-inputs",
 		},
 	],
 } as const satisfies useItemDetailQueue.Projection;

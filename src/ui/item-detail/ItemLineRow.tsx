@@ -1,9 +1,9 @@
 import { match } from "ts-pattern";
 
-import { useAutofillItemDetailLine } from "~/bridge/item-detail/useAutofillItemDetailLine";
+import { useEnqueueItemDetailLine } from "~/bridge/item-detail/useEnqueueItemDetailLine";
 import type { ItemDetailLines } from "~/bridge/item-detail/ItemDetailLines";
 import { useSetDefaultItemDetailLine } from "~/bridge/item-detail/useSetDefaultItemDetailLine";
-import { useStartPendingItemDetailLine } from "~/bridge/item-detail/useStartItemDetailLine";
+import { useFillAndStartItemDetailLine } from "~/bridge/item-detail/useFillAndStartItemDetailLine";
 import { useUnsetDefaultItemDetailLine } from "~/bridge/item-detail/useUnsetDefaultItemDetailLine";
 import { useWithdrawItemDetailLine } from "~/bridge/item-detail/useWithdrawItemDetailLine";
 import { Button, PrimaryButton } from "~/ui/button/Button";
@@ -159,24 +159,24 @@ export const ItemLineRow = ({
 			action,
 		]);
 	const pendingKeys = {
-		autofill: pendingKey("autofill"),
 		default: pendingKey("default"),
+		enqueue: pendingKey("enqueue"),
 		start: pendingKey("start"),
 		withdraw: pendingKey("withdraw"),
 	} as const;
-	const autofillLine = useAutofillItemDetailLine({
-		pendingKey: pendingKeys.autofill,
-		pendingOwner: itemDetail,
-	});
 	const setDefaultLine = useSetDefaultItemDetailLine({
 		pendingKey: pendingKeys.default,
+		pendingOwner: itemDetail,
+	});
+	const enqueueLine = useEnqueueItemDetailLine({
+		pendingKey: pendingKeys.enqueue,
 		pendingOwner: itemDetail,
 	});
 	const unsetDefaultLine = useUnsetDefaultItemDetailLine({
 		pendingKey: pendingKeys.default,
 		pendingOwner: itemDetail,
 	});
-	const startLine = useStartPendingItemDetailLine({
+	const fillAndStartLine = useFillAndStartItemDetailLine({
 		pendingKey: pendingKeys.start,
 		pendingOwner: itemDetail,
 	});
@@ -185,17 +185,17 @@ export const ItemLineRow = ({
 		pendingOwner: itemDetail,
 	});
 	const pending = {
-		autofill: autofillLine.pending,
 		default: setDefaultLine.pending || unsetDefaultLine.pending,
-		start: startLine.pending,
+		enqueue: enqueueLine.pending,
+		start: fillAndStartLine.pending,
 		withdraw: withdrawLine.pending,
 	} as const;
 	const error =
 		[
-			autofillLine.error,
+			enqueueLine.error,
 			setDefaultLine.error,
 			unsetDefaultLine.error,
-			startLine.error,
+			fillAndStartLine.error,
 			withdrawLine.error,
 		].find((message) => message !== null) ?? null;
 	const unavailable = line.availability.kind === "unavailable";
@@ -285,18 +285,6 @@ export const ItemLineRow = ({
 										: "Set default"}
 							</Button>
 							<Button
-								cursorIntent={pending.autofill ? "progress" : undefined}
-								disabled={disabled || unavailable || !line.actions.canAutofill}
-								onClick={() =>
-									autofillLine.run({
-										ownerItemId,
-										lineId: line.lineId,
-									})
-								}
-							>
-								{pending.autofill ? "Filling…" : "Autofill"}
-							</Button>
-							<Button
 								cursorIntent={pending.withdraw ? "progress" : undefined}
 								data-ui="TileLineWithdrawButton"
 								disabled={disabled || !line.actions.canWithdraw}
@@ -309,21 +297,36 @@ export const ItemLineRow = ({
 							>
 								{pending.withdraw ? "Withdrawing…" : "Withdraw"}
 							</Button>
-							<PrimaryButton
-								className="min-w-24"
-								cursorIntent={pending.start ? "progress" : undefined}
-								data-ui="TileLineStartButton"
-								data-start-mode={line.startMode}
-								disabled={disabled || !line.actions.canStart}
+							<Button
+								cursorIntent={pending.enqueue ? "progress" : undefined}
+								data-ui="TileLineEnqueueButton"
+								disabled={disabled || !line.actions.enqueue.enabled}
 								onClick={() =>
-									startLine.start({
+									enqueueLine.run({
 										ownerItemId,
 										lineId: line.lineId,
 									})
 								}
 							>
-								{line.startMode === "enqueue"
-									? "Enqueue"
+								{pending.enqueue ? "Queueing…" : "Enqueue"}
+							</Button>
+							<PrimaryButton
+								className="min-w-24"
+								cursorIntent={pending.start ? "progress" : undefined}
+								data-ui="TileLineStartButton"
+								data-start-mode={line.actions.immediate.type}
+								disabled={disabled || !line.actions.immediate.enabled}
+								onClick={() =>
+									fillAndStartLine.run({
+										ownerItemId,
+										lineId: line.lineId,
+									})
+								}
+							>
+								{line.actions.immediate.type === "fill"
+									? pending.start
+										? "Filling…"
+										: "Fill"
 									: pending.start
 										? "Starting…"
 										: "Start"}

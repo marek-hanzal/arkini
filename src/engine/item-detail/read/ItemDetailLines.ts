@@ -134,11 +134,20 @@ export namespace ItemDetailLines {
 		readonly baseRuntimeMs: TimeSchema.Type;
 		readonly effectiveRuntimeMs: TimeSchema.Type;
 		readonly availability: Availability;
-		readonly startMode: "start" | "enqueue";
 		readonly isDefault: boolean;
 		readonly actions: {
-			readonly canAutofill: boolean;
-			readonly canStart: boolean;
+			readonly immediate:
+				| {
+						readonly type: "fill";
+						readonly enabled: boolean;
+				  }
+				| {
+						readonly type: "start";
+						readonly enabled: boolean;
+				  };
+			readonly enqueue: {
+				readonly enabled: boolean;
+			};
 			readonly canWithdraw: boolean;
 		};
 		readonly input: readonly Input[];

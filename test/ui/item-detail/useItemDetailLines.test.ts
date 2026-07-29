@@ -311,7 +311,7 @@ const roots: Array<ReturnType<typeof createRoot>> = [];
 const Probe = ({ itemId }: { readonly itemId: string }) => {
 	const projection = useItemDetailLines(itemId);
 	const line = projection.kind === "available" ? projection.line[0] : undefined;
-	const canAutofill = line?.actions.canAutofill;
+	const canAutofill = line?.actions.immediate.enabled;
 	const unavailableReason =
 		line?.availability.kind === "unavailable" ? line.availability.reason : undefined;
 	const ruleDetail =

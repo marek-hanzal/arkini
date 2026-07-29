@@ -6,6 +6,7 @@ import { storeInputMaterialFx } from "~/engine/input/write/storeInputMaterialFx"
 import { startLineRuntimeFx } from "~/engine/job/fx/startLineRuntimeFx";
 import type { StartLineResultSchema } from "~/engine/job/schema/StartLineResultSchema";
 import { startLineFx } from "~/engine/job/write/startLineFx";
+import { enqueueLineFx } from "~/engine/job/write/enqueueLineFx";
 import { readLineRunFx } from "~/engine/line/fx/run/readLineRunFx";
 import { fromStateFx } from "~/engine/runtime/fx/fromStateFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
@@ -293,7 +294,7 @@ describe("startLineFx", () => {
 		expect(result.after).toEqual(result.before);
 	});
 
-	it("serializes concurrent starts against one queue slot", async () => {
+	it("serializes concurrent starts without implicitly enqueueing the loser", async () => {
 		const config = createJobTestConfig(1);
 		const result = await Effect.runPromise(
 			Effect.gen(function* () {
@@ -323,13 +324,13 @@ describe("startLineFx", () => {
 		expect(result.attempts.filter(Result.isFailure)).toHaveLength(1);
 		const failure = result.attempts.find(Result.isFailure);
 		expect(failure && Result.isFailure(failure) ? failure.failure : undefined).toMatchObject({
-			_tag: "JobQueueFullError",
-			maxQueueSize: 1,
+			_tag: "LineRunUnavailableError",
 		});
 		expect(result.runtime.jobs).toHaveLength(1);
+		expect(result.runtime.jobQueue).toEqual([]);
 	});
 
-	it("lets two concurrent starts consume disjoint allocations when queue capacity permits", async () => {
+	it("does not turn a concurrent start into queue intent when queue capacity permits", async () => {
 		const config = createJobTestConfig(2);
 		const result = await Effect.runPromise(
 			Effect.gen(function* () {
@@ -355,9 +356,10 @@ describe("startLineFx", () => {
 			),
 		);
 
-		expect(result.attempts.every(Result.isSuccess)).toBe(true);
+		expect(result.attempts.filter(Result.isSuccess)).toHaveLength(1);
+		expect(result.attempts.filter(Result.isFailure)).toHaveLength(1);
 		expect(result.runtime.jobs).toHaveLength(1);
-		expect(result.runtime.jobQueue).toHaveLength(1);
+		expect(result.runtime.jobQueue).toEqual([]);
 		expect(result.runtime.items.find((item) => item.item.id === "water")).toMatchObject({
 			quantity: 3,
 		});
@@ -373,7 +375,7 @@ describe("startLineFx", () => {
 			Effect.gen(function* () {
 				yield* prepareJobLineFx();
 				const first = yield* startLineFx(startProps);
-				const second = yield* startLineFx(startProps);
+				const second = yield* enqueueLineFx(startProps);
 				return {
 					first,
 					second,
@@ -386,7 +388,7 @@ describe("startLineFx", () => {
 		);
 
 		expect(result.first.type).toBe(StartLineResultEnumSchema.enum.Started);
-		expect(result.second.type).toBe(StartLineResultEnumSchema.enum.Queued);
+		expect(result.second).toMatchObject(startProps);
 	});
 
 	it("never starts ahead of an existing blocked FIFO request", () => {
@@ -395,9 +397,7 @@ describe("startLineFx", () => {
 			Effect.gen(function* () {
 				yield* prepareJobLineFx();
 				yield* startLineFx(startProps);
-				const queued = yield* startLineFx(startProps);
-				if (queued.type !== StartLineResultEnumSchema.enum.Queued)
-					throw new Error("Expected queued request.");
+				const queued = yield* enqueueLineFx(startProps);
 
 				const runtime = yield* readRuntimeFx();
 				const water = runtime.items.find(
@@ -434,7 +434,7 @@ describe("startLineFx", () => {
 					quantity: 3,
 				});
 
-				const newer = yield* startLineFx(startProps);
+				const newer = yield* enqueueLineFx(startProps);
 				const queuedRuntime = yield* readRuntimeFx();
 				yield* runTickRuntimeByFx({
 					elapsedMs: 200,
@@ -452,20 +452,17 @@ describe("startLineFx", () => {
 			),
 		);
 
-		expect(result.newer.type).toBe(StartLineResultEnumSchema.enum.Queued);
 		expect(result.queuedRuntime.jobs).toEqual([]);
 		expect(result.queuedRuntime.jobQueue).toHaveLength(2);
-		expect((result.queuedRuntime.jobQueue ?? [])[0]?.id).toBe(result.queued.request.id);
-		if (result.newer.type === StartLineResultEnumSchema.enum.Queued) {
-			expect((result.queuedRuntime.jobQueue ?? [])[1]?.id).toBe(result.newer.request.id);
-			expect(result.afterDispatch.jobs).toHaveLength(1);
-			expect(result.afterDispatch.jobs[0]?.remainingMs).toBe(800);
-			expect(result.afterDispatch.jobQueue).toHaveLength(1);
-			expect((result.afterDispatch.jobQueue ?? [])[0]?.id).toBe(result.newer.request.id);
-		}
+		expect((result.queuedRuntime.jobQueue ?? [])[0]?.id).toBe(result.queued.id);
+		expect((result.queuedRuntime.jobQueue ?? [])[1]?.id).toBe(result.newer.id);
+		expect(result.afterDispatch.jobs).toHaveLength(1);
+		expect(result.afterDispatch.jobs[0]?.remainingMs).toBe(800);
+		expect(result.afterDispatch.jobQueue).toHaveLength(1);
+		expect((result.afterDispatch.jobQueue ?? [])[0]?.id).toBe(result.newer.id);
 	});
 
-	it("rejects an unavailable line without partially creating a job", () => {
+	it("queues an otherwise available line while concrete inputs are missing", () => {
 		const config = createJobTestConfig();
 		const result = Effect.runSync(
 			Effect.gen(function* () {
@@ -482,7 +479,7 @@ describe("startLineFx", () => {
 					},
 					quantity: 1,
 				});
-				const attempt = yield* Effect.result(startLineFx(startProps));
+				const attempt = yield* enqueueLineFx(startProps);
 				const runtime = yield* readRuntimeFx();
 				return {
 					attempt,
@@ -495,15 +492,14 @@ describe("startLineFx", () => {
 			),
 		);
 
-		expect(Result.isFailure(result.attempt)).toBe(true);
-		if (Result.isFailure(result.attempt)) {
-			expect(result.attempt.failure).toMatchObject({
-				_tag: "LineRunUnavailableError",
+		expect(result.attempt).toMatchObject(startProps);
+		expect(result.runtime.jobs).toEqual([]);
+		expect(result.runtime.jobQueue).toEqual([
+			expect.objectContaining({
 				ownerItemId: startProps.ownerItemId,
 				lineId: startProps.lineId,
-			});
-		}
-		expect(result.runtime.jobs).toEqual([]);
+			}),
+		]);
 		expect(result.runtime.items).toHaveLength(1);
 	});
 

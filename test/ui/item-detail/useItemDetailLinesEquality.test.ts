@@ -43,11 +43,15 @@ const makeProjection = (
 				kind: "unavailable",
 				reason,
 			},
-			startMode: "start",
 			isDefault: false,
 			actions: {
-				canAutofill: false,
-				canStart: false,
+				immediate: {
+					type: "fill",
+					enabled: false,
+				},
+				enqueue: {
+					enabled: false,
+				},
 				canWithdraw: false,
 			},
 			input: [],

@@ -53,7 +53,8 @@ poses to motion, runs entry or exit effects, and finalizes presentation claims.
 
 ## Interaction contract
 
-- Click performs the tile's immediate primary action.
+- Click performs the tile's primary action; a line owner with a default line appends one explicit
+  Enqueue intent and never Fill & Starts directly.
 - Right click opens Item Detail.
 - Crossing the drag threshold changes the same pointer gesture from activation to drag.
 - Press identity stays frozen for drag/drop commands, while click activation reads the latest
@@ -117,7 +118,9 @@ poses to motion, runs entry or exit effects, and finalizes presentation claims.
   attracts and chases its receiver's live physical pose through distance-aware nonlinear segments.
   Settlement releases the magnetic source. Manual producer input remains committed by its drop
   command; autofill instead creates canonical deliveries whose input is not available until
-  physical contact settles the matching generation.
+  physical contact settles the matching generation. A fully covered `Start` is different: it
+  atomically stores the exact selected inputs and creates the job in one engine commit, while the
+  emitted semantic item facts remain available to presentation.
 - A delivery keeps its exact origin lease until its full quantity commits or returns. Player
   interaction may reduce or invalidate its soft target claim; reconciliation then returns the same
   actor, including any partial remainder, to the persisted origin.

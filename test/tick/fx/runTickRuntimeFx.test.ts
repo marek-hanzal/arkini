@@ -5,6 +5,7 @@ import { useGameFx } from "~/engine/game/fx/useGameFx";
 import { storeInputMaterialFx } from "~/engine/input/write/storeInputMaterialFx";
 import { readOwnerJobQueueFx } from "~/engine/job/read/readOwnerJobQueueFx";
 import { startLineFx } from "~/engine/job/write/startLineFx";
+import { enqueueLineFx } from "~/engine/job/write/enqueueLineFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import { readCommittedTransitionFx } from "~/engine/runtime/read/readCommittedTransitionFx";
 import { removeItemFx } from "~/engine/runtime/write/removeItemFx";
@@ -211,7 +212,7 @@ describe("runTickRuntimeByFx", () => {
 			Effect.gen(function* () {
 				yield* prepareJobLineFx();
 				const first = yield* startLineFx(props);
-				const second = yield* startLineFx(props);
+				const second = yield* enqueueLineFx(props);
 				yield* runTickRuntimeByFx({
 					elapsedMs: 2_500,
 				});
@@ -228,7 +229,7 @@ describe("runTickRuntimeByFx", () => {
 		);
 
 		expect(result.first.type).toBe(StartLineResultEnumSchema.enum.Started);
-		expect(result.second.type).toBe(StartLineResultEnumSchema.enum.Queued);
+		expect(result.second).toMatchObject(props);
 		expect(result.runtime.jobs).toEqual([]);
 		expect(result.runtime.jobQueue).toEqual([]);
 		expect(result.runtime.items.filter((item) => item.item.id === "water")).toEqual([]);
@@ -249,7 +250,7 @@ describe("runTickRuntimeByFx", () => {
 			Effect.gen(function* () {
 				yield* prepareJobLineFx();
 				yield* startLineFx(props);
-				yield* startLineFx(props);
+				yield* enqueueLineFx(props);
 				yield* removeBufferedWaterFx();
 
 				yield* runTickRuntimeByFx({
@@ -353,6 +354,97 @@ describe("runTickRuntimeByFx", () => {
 });
 
 describe("fixed Tick steps", () => {
+	it("dispatches idle queue heads in persisted global queue order", () => {
+		const result = Effect.runSync(
+			Effect.gen(function* () {
+				const olderOwnerItemId = "runtime:zzz-forge";
+				const newerOwnerItemId = "runtime:aaa-forge";
+				for (const [id, x] of [
+					[
+						olderOwnerItemId,
+						0,
+					],
+					[
+						newerOwnerItemId,
+						4,
+					],
+				] as const) {
+					yield* spawnItemFx({
+						id,
+						itemId: "forge",
+						location: {
+							scope: "board",
+							space: 0,
+							position: {
+								x,
+								y: 0,
+							},
+						},
+						quantity: 1,
+					});
+				}
+				yield* spawnItemFx({
+					id: "runtime:shared-water",
+					itemId: "water",
+					location: {
+						scope: "board",
+						space: 0,
+						position: {
+							x: 1,
+							y: 0,
+						},
+					},
+					quantity: 3,
+				});
+				yield* spawnItemFx({
+					id: "runtime:shared-tool",
+					itemId: "tool",
+					location: {
+						scope: "board",
+						space: 0,
+						position: {
+							x: 2,
+							y: 0,
+						},
+					},
+					quantity: 1,
+				});
+				const prepared = yield* readRuntimeFx();
+				const stepped = yield* advanceRuntimeStepFx({
+					...prepared,
+					jobQueue: [
+						{
+							id: "job:older-global-request",
+							ownerItemId: olderOwnerItemId,
+							lineId: props.lineId,
+						},
+						{
+							id: "job:newer-global-request",
+							ownerItemId: newerOwnerItemId,
+							lineId: props.lineId,
+						},
+					],
+				});
+				return stepped.runtime;
+			}).pipe(
+				useGameFx({
+					config: createJobTestConfig(2),
+				}),
+			),
+		);
+
+		expect(result.jobs.map((job) => job.ownerItemId)).toEqual([
+			"runtime:zzz-forge",
+		]);
+		expect(result.jobQueue).toEqual([
+			{
+				id: "job:newer-global-request",
+				ownerItemId: "runtime:aaa-forge",
+				lineId: props.lineId,
+			},
+		]);
+	});
+
 	it("uses one step-start live-rule snapshot regardless of runtime job-array order", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {

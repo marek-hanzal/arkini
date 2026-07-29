@@ -15,7 +15,7 @@ export namespace readRuntimeItemPrimaryActionFx {
 				readonly kind: "open-inventory";
 		  }
 		| {
-				readonly kind: "start-default-line";
+				readonly kind: "enqueue-default-line";
 				readonly lineId: string;
 		  };
 
@@ -46,7 +46,7 @@ export const readRuntimeItemPrimaryActionFx = Effect.fn("readRuntimeItemPrimaryA
 		});
 		if (defaultLine !== undefined) {
 			return {
-				kind: "start-default-line" as const,
+				kind: "enqueue-default-line" as const,
 				lineId: defaultLine.id,
 			} satisfies readRuntimeItemPrimaryActionFx.Result;
 		}

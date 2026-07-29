@@ -11,12 +11,12 @@ export namespace assertLineOutputMaxCountFx {
 		readonly candidateId: IdSchema.Type;
 		readonly lineId: IdSchema.Type;
 		readonly ownerItemId: IdSchema.Type;
-		readonly plan: LineRunPlanSchema.Type;
+		readonly plan: LineRunPlanSchema.Type | undefined;
 		readonly runtime: RuntimeSchema.Type;
 	}
 }
 
-/** Revalidates direct and bounded downstream output limits before queue admission. */
+/** Revalidates direct and bounded downstream output limits before start or queue admission. */
 export const assertLineOutputMaxCountFx = Effect.fn("assertLineOutputMaxCountFx")(function* ({
 	candidateId,
 	lineId,

@@ -345,16 +345,33 @@ Ready temporary items expire after job completions in stable runtime-ID order. E
 
 ## 8. Jobs and FIFO requests
 
-Filling inputs is passive. Work starts only through the explicit line-start command.
+The immediate line action is one authoritative `Fill | Start` decision. Partial concrete coverage
+performs the existing passive Fill delivery. Complete concrete coverage stores the exact selected
+inputs and starts the job atomically in one serialized runtime commit.
 
 An owner may have:
 
 - zero or one active job;
 - FIFO queued start requests up to its configured capacity.
 
-A queued request is not a job. It owns no time, consumes nothing, and reserves nothing. Pending requests remain editable intent: one explicit owner command may clear the whole pending queue without touching an active job, materials, charges, or outputs.
+A queued request is not a job. It owns no time, consumes nothing, and reserves nothing. Enqueue
+always records only explicit player intent; it never fills an input or starts work as a side effect.
+Missing concrete material is therefore queueable. Pending requests remain editable intent: one
+explicit owner command may clear the whole pending queue without touching an active job, materials,
+charges, or outputs.
 
-Immediate and queued starts use the same internal start pipeline. A blocked FIFO head remains first and cannot be overtaken. It waits for fresh runtime facts to make it runnable or for the player to clear that owner's pending queue; the engine never drops it automatically.
+Immediate and queued starts use the same concrete Autofill selection, input-store, and hard job-start
+pipeline. Queue playback is opportunistic: only an idle owner's FIFO head is eligible, and it does
+nothing until every missing material input can be selected from current concrete runtime items.
+Actual upstream output becomes ordinary concrete supply after commit; queued work never reasons
+about hypothetical future output. A blocked FIFO head remains first and cannot be overtaken. It
+waits for fresh runtime facts to make it runnable or for the player to clear that owner's pending
+queue; the engine never drops it automatically.
+
+The persisted `jobQueue` array is also the canonical cross-owner priority. One bounded Tick settle
+walks eligible owner heads in that exact array order, reusing the runtime produced by every accepted
+start before considering the next head. No owner-ID sort, wall clock, renderer order, planned claim,
+or second scheduler participates.
 
 Jobs persist only:
 

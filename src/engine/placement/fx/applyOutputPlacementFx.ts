@@ -8,11 +8,15 @@ import type { OutputPlacementResultSchema } from "~/engine/placement/schema/Outp
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { applyPlacementPlanFx } from "./applyPlacementPlanFx";
 import { planDropPlacementFx } from "./planDropPlacementFx";
+import type { BoardRectangleSchema } from "~/engine/grid/schema/BoardRectangleSchema";
+import { createBoardRectangleFx } from "~/engine/grid/fx/createBoardRectangleFx";
+import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 
 export namespace applyOutputPlacementFx {
 	export interface Props {
 		excludedLocations?: ReadonlyArray<GridLocationSchema.Type>;
 		origin: BoardLocationSchema.Type;
+		originRectangle?: BoardRectangleSchema.Type;
 		output: OutputResultSchema.Type;
 		runtime: RuntimeSchema.Type;
 	}
@@ -31,9 +35,26 @@ export namespace applyOutputPlacementFx {
 export const applyOutputPlacementFx = Effect.fn("applyOutputPlacementFx")(function* ({
 	excludedLocations,
 	origin,
+	originRectangle,
 	output,
 	runtime,
 }: applyOutputPlacementFx.Props) {
+	const originItem = runtime.items.find(
+		(item) =>
+			item.location.scope === LocationScopeEnumSchema.enum.Board &&
+			item.location.space === origin.space &&
+			item.location.position.x === origin.position.x &&
+			item.location.position.y === origin.position.y,
+	);
+	const resolvedOriginRectangle =
+		originRectangle ??
+		(yield* createBoardRectangleFx({
+			anchor: origin,
+			footprint: originItem?.item.footprint ?? {
+				width: 1,
+				height: 1,
+			},
+		}));
 	const placement = yield* Effect.reduce(
 		output.drop,
 		() => ({
@@ -46,6 +67,7 @@ export const applyOutputPlacementFx = Effect.fn("applyOutputPlacementFx")(functi
 					drop,
 					excludedLocations,
 					origin,
+					originRectangle: resolvedOriginRectangle,
 					runtime: state.draft,
 				});
 				const [result, draft] = yield* applyPlacementPlanFx({

@@ -4,11 +4,7 @@ import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { ItemNotFoundError } from "~/engine/item/error/ItemNotFoundError";
 import { ItemLocationConflictError } from "~/engine/runtime/error/ItemLocationConflictError";
 import { ItemNotOnGridError } from "~/engine/item/error/ItemNotOnGridError";
-import {
-	indexGridLocationClaims,
-	readGridLocationClaimsFx,
-} from "~/engine/location/read/readGridLocationClaimsFx";
-import { readGridLocationKey } from "~/engine/location/read/readGridLocationOccupantsFx";
+import { readGridItemLocationConflictFx } from "~/engine/location/read/readGridItemLocationConflictFx";
 import { isSameGridLocationFx } from "~/engine/location/read/isSameGridLocationFx";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 import { assertRevisionFx } from "~/engine/revision/fx/assertRevisionFx";
@@ -126,12 +122,14 @@ export const moveItemFx = Effect.fn("moveItemFx")(function* ({
 				);
 			}
 
-			const claimsByLocation = indexGridLocationClaims(
-				(yield* readGridLocationClaimsFx({
-					runtime,
-				})).filter((claim) => claim.itemId !== itemId),
-			);
-			const claim = claimsByLocation.get(readGridLocationKey(location))?.[0];
+			const claim = yield* readGridItemLocationConflictFx({
+				excludedItemIds: new Set([
+					itemId,
+				]),
+				item: item.item,
+				location,
+				runtime,
+			});
 			if (claim !== undefined) {
 				return yield* Effect.fail(
 					new LocationOccupiedError({

@@ -20,6 +20,10 @@ const boardLocation = (x: number): TileActorItem["location"] => ({
 const actorItem = (id: string, overrides: Partial<TileActorItem> = {}): TileActorItem => ({
 	activityEffect: false,
 	compositeUrl: undefined,
+	footprint: {
+		height: 1,
+		width: 1,
+	},
 	id,
 	itemId: "water",
 	itemType: "simple",
@@ -40,8 +44,10 @@ const visibleActor = (id: string): PixiMainSceneVisibleActor => ({
 		id,
 	} as TileActorItem,
 	pose: {
+		height: 80,
 		layer: null as never,
 		size: 80,
+		width: 80,
 		x: 40,
 		y: 60,
 	},
@@ -60,6 +66,7 @@ describe("Pixi main-scene reconciliation classification", () => {
 			container: {
 				scale: {
 					x: 1.25,
+					y: 1.25,
 				},
 				x: 40,
 				y: 60,
@@ -70,6 +77,8 @@ describe("Pixi main-scene reconciliation classification", () => {
 			dragging: false,
 			item: current,
 			size: 80,
+			height: 80,
+			width: 80,
 		} as PixiTileActor;
 
 		expect(
@@ -80,8 +89,10 @@ describe("Pixi main-scene reconciliation classification", () => {
 				displayItem,
 				motionClaimed: false,
 				pose: {
+					height: 100,
 					layer: null as never,
 					size: 100,
+					width: 100,
 					x: 140,
 					y: 60,
 				},
@@ -99,7 +110,10 @@ describe("Pixi main-scene reconciliation classification", () => {
 			pose: {
 				directLanding: true,
 				kind: "travel",
-				scaleBeforeTravel: 1,
+				scaleBeforeTravel: {
+					x: 1,
+					y: 1,
+				},
 			},
 		});
 	});
@@ -133,8 +147,10 @@ describe("Pixi main-scene reconciliation classification", () => {
 				displayItem,
 				motionClaimed: false,
 				pose: {
+					height: 100,
 					layer: null as never,
 					size: 100,
+					width: 100,
 					x: 140,
 					y: 60,
 				},

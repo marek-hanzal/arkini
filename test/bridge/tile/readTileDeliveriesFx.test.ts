@@ -8,6 +8,7 @@ import { useGameFx } from "~/engine/game/fx/useGameFx";
 import { autofillLineInputsFx } from "~/engine/input/write/autofillLineInputsFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
+import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import {
 	inputRuntimeTestConfig,
 	inputRuntimeToolbarTestConfig,
@@ -94,14 +95,28 @@ describe("readTileDeliveriesFx", () => {
 		]);
 	});
 
-	it("projects an Inventory delivery through the live Toolbar opener", () => {
+	it("keeps an Inventory delivery compact while projecting through a Board opener", () => {
 		const openerLocation = {
-			scope: "toolbar" as const,
+			scope: "board" as const,
+			space: 0,
 			position: {
-				x: 0,
+				x: 4,
 				y: 0,
 			},
 		};
+		const config = GameConfigSchema.parse({
+			...inputRuntimeToolbarTestConfig,
+			items: {
+				...inputRuntimeToolbarTestConfig.items,
+				water: {
+					...inputRuntimeToolbarTestConfig.items.water,
+					footprint: {
+						height: 2,
+						width: 2,
+					},
+				},
+			},
+		});
 		const result = Effect.runSync(
 			Effect.gen(function* () {
 				yield* spawnItemFx({
@@ -126,34 +141,73 @@ describe("readTileDeliveriesFx", () => {
 							y: 0,
 						},
 					},
-					quantity: 3,
+					quantity: 7,
 				});
 				yield* autofillLineInputsFx({
 					ownerItemId: "runtime:workshop",
 					lineId: "line:workshop:build",
 				});
-				return yield* readTileDeliveriesFx({
+				const outbound = yield* readTileDeliveriesFx({
 					game,
 					runtime: yield* readRuntimeFx(),
 				});
+				yield* settleItemDeliveryFx({
+					itemId: "runtime:inventory-water",
+					generation: 0,
+				});
+				const returning = yield* readTileDeliveriesFx({
+					game,
+					runtime: yield* readRuntimeFx(),
+				});
+				return {
+					outbound,
+					returning,
+				};
 			}).pipe(
 				useGameFx({
-					config: inputRuntimeToolbarTestConfig,
+					config,
 				}),
 			),
 		);
 
-		expect(result).toMatchObject([
+		expect(result.outbound).toMatchObject([
 			{
 				from: openerLocation,
+				fromFootprint: {
+					height: 1,
+					width: 1,
+				},
 				item: {
+					footprint: {
+						height: 1,
+						width: 1,
+					},
 					id: "runtime:inventory-water",
 					location: openerLocation,
-					quantity: 3,
+					quantity: 7,
 				},
 				phase: "outbound",
 				targetActorId: "runtime:workshop",
 				to: workshopLocation,
+				toFootprint: {
+					height: 2,
+					width: 2,
+				},
+			},
+		]);
+		expect(result.returning).toMatchObject([
+			{
+				from: workshopLocation,
+				fromFootprint: {
+					height: 2,
+					width: 2,
+				},
+				phase: "returning",
+				to: openerLocation,
+				toFootprint: {
+					height: 1,
+					width: 1,
+				},
 			},
 		]);
 	});

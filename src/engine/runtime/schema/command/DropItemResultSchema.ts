@@ -38,6 +38,7 @@ const DropItemSwappedResultSchema = z
 		]),
 		source: DropItemSwappedActorSchema,
 		target: DropItemSwappedActorSchema,
+		relocations: z.array(DropItemSwappedActorSchema),
 	})
 	.strict();
 

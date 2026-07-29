@@ -79,6 +79,25 @@ const config = GameConfigSchema.parse({
 			maxStackSize: 1,
 			type: "simple",
 		},
+		wide: {
+			id: "wide",
+			title: "Wide item",
+			description: "Occupies a Board rectangle.",
+			asset: {
+				source: [
+					"asset:wide",
+				],
+			},
+			tags: [],
+			categoryId: "resource",
+			scope: "board",
+			footprint: {
+				width: 2,
+				height: 2,
+			},
+			maxStackSize: 1,
+			type: "simple",
+		},
 	},
 });
 
@@ -102,6 +121,61 @@ const location = (scope: "board" | "inventory", x: number, y: number) => {
 };
 
 describe("checkRuntimeFx", () => {
+	it("reports rectangle bounds and overlap through the existing location issues", () => {
+		const runtime = {
+			cheats: {
+				enabled: false,
+				everEnabled: false,
+				instantGameplay: false,
+			},
+			currentSpace: 0,
+			items: [
+				{
+					id: "runtime:wide",
+					item: config.items.wide,
+					location: location("board", 1, 1),
+					quantity: 1,
+					revision: "revision:wide",
+				},
+				{
+					id: "runtime:blocker",
+					item: config.items.any,
+					location: location("board", 1, 1),
+					quantity: 1,
+					revision: "revision:blocker",
+				},
+			],
+			jobs: [],
+		} satisfies RuntimeSchema.Type;
+
+		const result = Effect.runSync(
+			checkRuntimeFx({
+				runtime,
+			}).pipe(
+				useGameFx({
+					config,
+				}),
+			),
+		);
+
+		expect(result.issues).toEqual([
+			{
+				itemId: "runtime:wide",
+				location: location("board", 1, 1),
+				size: config.meta.board,
+				type: RuntimeCheckIssueEnumSchema.enum.LocationOutOfBounds,
+			},
+			{
+				itemIds: [
+					"runtime:wide",
+					"runtime:blocker",
+				],
+				location: location("board", 1, 1),
+				type: RuntimeCheckIssueEnumSchema.enum.LocationOccupied,
+			},
+		]);
+	});
+
 	it("reports readable identity and location invariant violations", () => {
 		const runtime = {
 			cheats: {
@@ -314,6 +388,46 @@ describe("checkRuntimeFx", () => {
 			});
 		}
 		expect(result.runtime.items).toEqual([]);
+	});
+
+	it("rejects a spawn intersecting a non-anchor footprint cell", () => {
+		const result = Effect.runSync(
+			Effect.gen(function* () {
+				yield* spawnItemFx({
+					id: "runtime:wide",
+					itemId: "wide",
+					location: location("board", 0, 0),
+					quantity: 1,
+				});
+				const overlap = yield* Effect.result(
+					spawnItemFx({
+						id: "runtime:overlap",
+						itemId: "any",
+						location: location("board", 1, 1),
+						quantity: 1,
+					}),
+				);
+				return {
+					overlap,
+					runtime: yield* readRuntimeFx(),
+				};
+			}).pipe(
+				useGameFx({
+					config,
+				}),
+			),
+		);
+
+		expect(Result.isFailure(result.overlap)).toBe(true);
+		if (Result.isFailure(result.overlap)) {
+			expect(result.overlap.failure).toMatchObject({
+				_tag: "LocationOccupiedError",
+				itemId: "runtime:wide",
+			});
+		}
+		expect(result.runtime.items.map(({ id }) => id)).toEqual([
+			"runtime:wide",
+		]);
 	});
 
 	it("rejects invalid persisted state before it becomes runtime", () => {

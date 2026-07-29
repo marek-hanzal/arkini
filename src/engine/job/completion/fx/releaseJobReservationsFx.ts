@@ -6,10 +6,12 @@ import type { BoardLocationSchema } from "~/engine/location/schema/BoardLocation
 import { placeRuntimeItemFx } from "~/engine/placement/fx/placeRuntimeItemFx";
 import type { ReservedRuntimeItemSchema } from "~/engine/runtime/schema/ReservedRuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import type { BoardRectangleSchema } from "~/engine/grid/schema/BoardRectangleSchema";
 
 export namespace releaseJobReservationsFx {
 	export interface Props {
 		origin: BoardLocationSchema.Type;
+		originRectangle?: BoardRectangleSchema.Type;
 		originItemId: IdSchema.Type;
 		reservations: readonly ReservedRuntimeItemSchema.Type[];
 		runtime: RuntimeSchema.Type;
@@ -19,6 +21,7 @@ export namespace releaseJobReservationsFx {
 /** Returns the same reserved instances through canonical placement with exact visible facts. */
 export const releaseJobReservationsFx = Effect.fn("releaseJobReservationsFx")(function* ({
 	origin,
+	originRectangle,
 	originItemId,
 	reservations,
 	runtime,
@@ -34,6 +37,7 @@ export const releaseJobReservationsFx = Effect.fn("releaseJobReservationsFx")(fu
 				const placement = yield* placeRuntimeItemFx({
 					itemId: reservation.id,
 					origin,
+					originRectangle,
 					originItemId,
 					runtime: state.runtime,
 				});

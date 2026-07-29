@@ -1,4 +1,4 @@
-import { Effect } from "effect";
+import { Effect, Option } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { readLineInputDeliveryClaimsFx } from "~/engine/delivery/read/readLineInputDeliveryClaimsFx";
@@ -9,11 +9,13 @@ import type { InputMaterialSchema } from "~/engine/input/schema/InputMaterialSch
 import { isLineInputClosedFx } from "~/engine/line/fx/input/isLineInputClosedFx";
 import { readBoardItemLineFx } from "~/engine/line/fx/readBoardItemLineFx";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
-import type { BoardRuntimeItemSchema } from "~/engine/runtime/schema/BoardRuntimeItemSchema";
 import type { GridRuntimeItemSchema } from "~/engine/runtime/schema/GridRuntimeItemSchema";
+import { isBoardRuntimeItemFx } from "~/engine/runtime/read/isBoardRuntimeItemFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { matchesItemSelector } from "~/engine/selector/fx/selectItemsFx";
 import { InputEnumSchema } from "~/engine/input/schema/InputEnumSchema";
+import { readBoardRuntimeItemRectangleFx } from "~/engine/grid/fx/readBoardRuntimeItemRectangleFx";
+import { readBoardRectangleManhattanGapFx } from "~/engine/grid/fx/readBoardRectangleManhattanGapFx";
 
 export namespace planLineInputAutofillFx {
 	export interface Props {
@@ -36,49 +38,6 @@ export namespace planLineInputAutofillFx {
 	}
 }
 
-const candidateRank = ({
-	candidate,
-	owner,
-}: {
-	readonly candidate: GridRuntimeItemSchema.Type;
-	readonly owner: BoardRuntimeItemSchema.Type;
-}) => {
-	return {
-		scope:
-			candidate.location.scope === LocationScopeEnumSchema.enum.Board
-				? 0
-				: candidate.location.scope === LocationScopeEnumSchema.enum.Toolbar
-					? 1
-					: 2,
-		distance:
-			candidate.location.scope === LocationScopeEnumSchema.enum.Board
-				? Math.abs(candidate.location.position.x - owner.location.position.x) +
-					Math.abs(candidate.location.position.y - owner.location.position.y)
-				: 0,
-		position: candidate.location.position.y * 10_000 + candidate.location.position.x,
-	};
-};
-
-const compareCandidates = (owner: BoardRuntimeItemSchema.Type) => {
-	return (left: GridRuntimeItemSchema.Type, right: GridRuntimeItemSchema.Type) => {
-		const leftRank = candidateRank({
-			candidate: left,
-			owner,
-		});
-		const rightRank = candidateRank({
-			candidate: right,
-			owner,
-		});
-
-		return (
-			leftRank.scope - rightRank.scope ||
-			leftRank.distance - rightRank.distance ||
-			leftRank.position - rightRank.position ||
-			left.id.localeCompare(right.id)
-		);
-	};
-};
-
 /**
  * Plans deterministic automatic material delivery for one exact line.
  *
@@ -99,20 +58,61 @@ export const planLineInputAutofillFx = Effect.fn("planLineInputAutofillFx")(func
 		runtime,
 	});
 
-	const candidates = runtime.items
-		.filter(
-			(candidate): candidate is GridRuntimeItemSchema.Type =>
-				(candidate.location.scope === LocationScopeEnumSchema.enum.Board ||
-					candidate.location.scope === LocationScopeEnumSchema.enum.Inventory ||
-					candidate.location.scope === LocationScopeEnumSchema.enum.Toolbar) &&
-				isLineInputAutofillSourceLocation({
-					location: candidate.location,
-					ownerSpace: owner.location.space,
-				}),
-		)
-		.filter((candidate) => candidate.id !== owner.id)
-		.slice()
-		.sort(compareCandidates(owner));
+	const ownerRectangle = yield* readBoardRuntimeItemRectangleFx({
+		item: owner,
+	});
+	const candidateRanks = yield* Effect.forEach(
+		runtime.items
+			.filter(
+				(candidate): candidate is GridRuntimeItemSchema.Type =>
+					(candidate.location.scope === LocationScopeEnumSchema.enum.Board ||
+						candidate.location.scope === LocationScopeEnumSchema.enum.Inventory ||
+						candidate.location.scope === LocationScopeEnumSchema.enum.Toolbar) &&
+					isLineInputAutofillSourceLocation({
+						location: candidate.location,
+						ownerSpace: owner.location.space,
+					}),
+			)
+			.filter((candidate) => candidate.id !== owner.id)
+			.slice(),
+		(candidate) =>
+			Effect.gen(function* () {
+				const scope =
+					candidate.location.scope === LocationScopeEnumSchema.enum.Board
+						? 0
+						: candidate.location.scope === LocationScopeEnumSchema.enum.Toolbar
+							? 1
+							: 2;
+				const boardCandidate = Option.getOrUndefined(
+					yield* isBoardRuntimeItemFx(candidate),
+				);
+				const distance =
+					boardCandidate === undefined
+						? 0
+						: yield* readBoardRectangleManhattanGapFx({
+								left: ownerRectangle,
+								right: yield* readBoardRuntimeItemRectangleFx({
+									item: boardCandidate,
+								}),
+							});
+				return {
+					candidate,
+					distance,
+					scope,
+				};
+			}),
+	);
+	const candidates = candidateRanks
+		.sort((left, right) => {
+			return (
+				left.scope - right.scope ||
+				left.distance - right.distance ||
+				left.candidate.location.position.y - right.candidate.location.position.y ||
+				left.candidate.location.position.x - right.candidate.location.position.x ||
+				left.candidate.id.localeCompare(right.candidate.id)
+			);
+		})
+		.map(({ candidate }) => candidate);
 	const remainingByItemId = new Map(
 		candidates.map((candidate) => [
 			candidate.id,

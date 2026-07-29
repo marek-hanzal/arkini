@@ -16,6 +16,11 @@ import { stackItemsFx } from "~/engine/runtime/write/stackItemsFx";
 
 export namespace commitStackDropFx {
 	export interface Props {
+		readonly destinationLocation: GridLocationSchema.Type;
+		readonly expectedCollisions: ReadonlyArray<{
+			readonly itemId: IdSchema.Type;
+			readonly revision: RevisionSchema.Type;
+		}>;
 		readonly sourceItemId: IdSchema.Type;
 		readonly sourceRevision: RevisionSchema.Type;
 		readonly sourceLocation: GridLocationSchema.Type;
@@ -29,6 +34,8 @@ export namespace commitStackDropFx {
 
 /** Commits one exact pure-stack transfer and normalizes both actor identities. */
 export const commitStackDropFx = Effect.fn("commitStackDropFx")(function* ({
+	destinationLocation,
+	expectedCollisions,
 	sourceItemId,
 	sourceRevision,
 	sourceLocation,
@@ -37,6 +44,8 @@ export const commitStackDropFx = Effect.fn("commitStackDropFx")(function* ({
 	targetLocation,
 }: commitStackDropFx.Props) {
 	return yield* stackItemsFx({
+		destinationLocation,
+		expectedCollisions,
 		sourceItemId,
 		sourceRevision,
 		sourceLocation,
@@ -82,6 +91,14 @@ export const commitStackDropFx = Effect.fn("commitStackDropFx")(function* ({
 			),
 		),
 		Effect.catchTags({
+			DropDestinationExpectationError: (error) =>
+				Effect.succeed(
+					makeDropRejectedResult({
+						reason: error.reason,
+						sourceItemId,
+						targetItemId,
+					}),
+				),
 			ItemNotFoundError: (error) =>
 				Effect.succeed(
 					makeStaleDropRejectedResult({

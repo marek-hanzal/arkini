@@ -177,7 +177,10 @@ const returnPixiInputRemainderFx = Effect.fn("returnPixiInputRemainderFx")(funct
 			RendererRuntime.runSync(
 				Effect.gen(function* () {
 					const latestHome =
-						(yield* surface.readLocationPoseFx(cue.originLocation)) ?? sourceHome;
+						(yield* surface.readLocationPoseFx(
+							cue.originLocation,
+							cue.originFootprint,
+						)) ?? sourceHome;
 					if (source === null) {
 						let settled = false;
 						const settle = () => {
@@ -209,7 +212,12 @@ const returnPixiInputRemainderFx = Effect.fn("returnPixiInputRemainderFx")(funct
 						yield* animator.setFx({
 							actor: source,
 							channel: "pose",
-							scale: latestHome.size / Math.max(1, source.size),
+							scaleX:
+								(latestHome.width ?? latestHome.size) /
+								Math.max(1, source.width || source.size),
+							scaleY:
+								(latestHome.height ?? latestHome.size) /
+								Math.max(1, source.height || source.size),
 							x: latestHome.x,
 							y: latestHome.y,
 						});
@@ -222,6 +230,7 @@ const returnPixiInputRemainderFx = Effect.fn("returnPixiInputRemainderFx")(funct
 		ownerKey: `motion:${cueKey}`,
 		readLiveTarget: readLiveOrigin,
 		surface,
+		targetFootprint: cue.originFootprint,
 		targetLocation: cue.originLocation,
 	});
 });
@@ -312,13 +321,15 @@ export const runPixiInputMotionFx = Effect.fn("runPixiInputMotionFx")(function* 
 		yield* animator.setFx({
 			actor: transient,
 			channel: "pose",
-			scale: origin.size / Math.max(1, transient.size),
+			scaleX: (origin.width ?? origin.size) / Math.max(1, transient.width || transient.size),
+			scaleY:
+				(origin.height ?? origin.size) / Math.max(1, transient.height || transient.size),
 			x: origin.x,
 			y: origin.y,
 		});
 	}
 
-	const sourceHome = yield* surface.readLocationPoseFx(cue.originLocation);
+	const sourceHome = yield* surface.readLocationPoseFx(cue.originLocation, cue.originFootprint);
 
 	const readLiveTarget = () => {
 		return readPixiLiveActorContactPose({
@@ -456,6 +467,7 @@ export const runPixiInputMotionFx = Effect.fn("runPixiInputMotionFx")(function* 
 		ownerKey: `motion:${cueKey}`,
 		readLiveTarget,
 		surface,
+		targetFootprint: cue.targetFootprint,
 		targetLocation: cue.targetLocation,
 	});
 });

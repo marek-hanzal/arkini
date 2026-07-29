@@ -24,6 +24,7 @@ export namespace createPixiMainSceneSurfaceFx {
 		readonly dropFeedback: PixiGridDropFeedback;
 		readonly game: GameEngine;
 		readonly palette: PixiScenePalette;
+		readonly readCanonicalItem: (actorId: string) => TileActorItem | undefined;
 		readonly readCanonicalItems: () => Iterable<TileActorItem>;
 	}
 }
@@ -35,6 +36,7 @@ export const createPixiMainSceneSurfaceFx = Effect.fn("createPixiMainSceneSurfac
 		dropFeedback,
 		game,
 		palette: initialPalette,
+		readCanonicalItem,
 		readCanonicalItems,
 	}: createPixiMainSceneSurfaceFx.Props) =>
 		Effect.sync((): PixiMainSceneSurface => {
@@ -99,15 +101,73 @@ export const createPixiMainSceneSurfaceFx = Effect.fn("createPixiMainSceneSurfac
 			);
 			application.stage.eventMode = "static";
 			let closed = false;
+			const occupancy = new Map<string, string>();
+			const occupancyKeysByActorId = new Map<string, ReadonlySet<string>>();
 
-			const readLocationPose = (location: TileActorItem["location"]) => {
+			const occupancyKey = (kind: "board" | "toolbar", x: number, y: number) =>
+				`${kind}:${x}:${y}`;
+
+			const readOccupancyKeys = (item: TileActorItem) => {
+				const keys = new Set<string>();
+				const location = item.location;
+				if (
+					location.scope === LocationScopeEnumSchema.enum.Board &&
+					location.space === latestTransition.runtime.currentSpace
+				) {
+					for (let y = 0; y < item.footprint.height; y += 1) {
+						for (let x = 0; x < item.footprint.width; x += 1) {
+							keys.add(
+								occupancyKey(
+									"board",
+									location.position.x + x,
+									location.position.y + y,
+								),
+							);
+						}
+					}
+				} else if (location.scope === LocationScopeEnumSchema.enum.Toolbar) {
+					keys.add(occupancyKey("toolbar", location.position.x, 0));
+				}
+				return keys;
+			};
+
+			const refreshOccupancy = (affectedActorIds: ReadonlySet<string>) => {
+				for (const actorId of affectedActorIds) {
+					for (const key of occupancyKeysByActorId.get(actorId) ?? []) {
+						if (occupancy.get(key) === actorId) occupancy.delete(key);
+					}
+					occupancyKeysByActorId.delete(actorId);
+					const item = readCanonicalItem(actorId);
+					if (item === undefined) continue;
+					const keys = readOccupancyKeys(item);
+					for (const key of keys) occupancy.set(key, item.id);
+					occupancyKeysByActorId.set(actorId, keys);
+				}
+			};
+
+			const rebuildOccupancy = () => {
+				occupancy.clear();
+				occupancyKeysByActorId.clear();
+				const items = Array.from(readCanonicalItems());
+				refreshOccupancy(new Set(items.map(({ id }) => id)));
+			};
+
+			const readLocationPose = (
+				location: TileActorItem["location"],
+				footprint = {
+					height: 1,
+					width: 1,
+				},
+			) => {
 				if (
 					location.scope === LocationScopeEnumSchema.enum.Board &&
 					location.space === latestTransition.runtime.currentSpace
 				) {
 					return {
 						layer: boardActorLayer,
+						height: layout.board.cellSize * footprint.height,
 						size: layout.board.cellSize,
+						width: layout.board.cellSize * footprint.width,
 						x: layout.board.x + location.position.x * layout.board.cellSize,
 						y: layout.board.y + location.position.y * layout.board.cellSize,
 					};
@@ -118,7 +178,9 @@ export const createPixiMainSceneSurfaceFx = Effect.fn("createPixiMainSceneSurfac
 				) {
 					return {
 						layer: toolbarActorLayer,
+						height: layout.toolbar.cellSize,
 						size: layout.toolbar.cellSize,
+						width: layout.toolbar.cellSize,
 						x: layout.toolbar.x + location.position.x * layout.toolbar.cellSize,
 						y: layout.toolbar.y,
 					};
@@ -127,27 +189,64 @@ export const createPixiMainSceneSurfaceFx = Effect.fn("createPixiMainSceneSurfac
 			};
 
 			const readOccupant = (target: PixiSceneDropTarget) => {
-				for (const item of readCanonicalItems()) {
-					const location = item.location;
-					if (
-						target.layout.kind === "board" &&
-						location.scope === LocationScopeEnumSchema.enum.Board &&
-						location.space === latestTransition.runtime.currentSpace &&
-						location.position.x === target.x &&
-						location.position.y === target.y
-					) {
-						return item;
-					}
-					if (
-						target.layout.kind === "toolbar" &&
-						location.scope === LocationScopeEnumSchema.enum.Toolbar &&
-						location.position.x === target.x
-					) {
-						return item;
+				return (
+					readCanonicalItem(
+						occupancy.get(
+							occupancyKey(
+								target.layout.kind === "toolbar" ? "toolbar" : "board",
+								target.hitX,
+								target.hitY,
+							),
+						) ?? "",
+					) ?? null
+				);
+			};
+
+			const readLocalActorIds = (rect: {
+				readonly height: number;
+				readonly width: number;
+				readonly x: number;
+				readonly y: number;
+			}) => {
+				const actorIds = new Set<string>();
+				for (const grid of [
+					layout.board,
+					...(layout.toolbar === null
+						? []
+						: [
+								layout.toolbar,
+							]),
+				]) {
+					const padding = 2;
+					const left = Math.max(
+						0,
+						Math.floor((rect.x - grid.x) / grid.cellSize) - padding,
+					);
+					const top = Math.max(
+						0,
+						Math.floor((rect.y - grid.y) / grid.cellSize) - padding,
+					);
+					const right = Math.min(
+						grid.columns - 1,
+						Math.floor((rect.x + rect.width - grid.x) / grid.cellSize) + padding,
+					);
+					const bottom = Math.min(
+						grid.rows - 1,
+						Math.floor((rect.y + rect.height - grid.y) / grid.cellSize) + padding,
+					);
+					if (right < left || bottom < top) continue;
+					const kind = grid.kind === "toolbar" ? "toolbar" : "board";
+					for (let y = top; y <= bottom; y += 1) {
+						for (let x = left; x <= right; x += 1) {
+							const occupantId = occupancy.get(occupancyKey(kind, x, y));
+							if (occupantId !== undefined) actorIds.add(occupantId);
+						}
 					}
 				}
-				return null;
+				return actorIds;
 			};
+
+			rebuildOccupancy();
 
 			return {
 				transientActorLayer,
@@ -169,7 +268,7 @@ export const createPixiMainSceneSurfaceFx = Effect.fn("createPixiMainSceneSurfac
 					}
 				}),
 				readActorPoseFx: Effect.fn("PixiMainSceneSurface.readActorPoseFx")((item) =>
-					Effect.sync(() => readLocationPose(item.location)),
+					Effect.sync(() => readLocationPose(item.location, item.footprint)),
 				),
 				readCommandTargetFx: Effect.fn("PixiMainSceneSurface.readCommandTargetFx")(
 					(target) =>
@@ -206,6 +305,23 @@ export const createPixiMainSceneSurfaceFx = Effect.fn("createPixiMainSceneSurfac
 												itemId: occupant.id,
 												revision: occupant.revision,
 											},
+								hitLocation:
+									target.layout.kind === "board"
+										? {
+												scope: LocationScopeEnumSchema.enum.Board,
+												space: latestTransition.runtime.currentSpace,
+												position: {
+													x: target.hitX,
+													y: target.hitY,
+												},
+											}
+										: {
+												scope: LocationScopeEnumSchema.enum.Toolbar,
+												position: {
+													x: target.hitX,
+													y: 0,
+												},
+											},
 							};
 						}),
 				),
@@ -222,6 +338,8 @@ export const createPixiMainSceneSurfaceFx = Effect.fn("createPixiMainSceneSurfac
 								kind: "slot" as const,
 								layout: toolbar,
 								...toolbarSlot,
+								hitX: toolbarSlot.x,
+								hitY: toolbarSlot.y,
 							};
 						}
 						const boardSlot = yield* readPixiGridSlotFx({
@@ -235,14 +353,23 @@ export const createPixiMainSceneSurfaceFx = Effect.fn("createPixiMainSceneSurfac
 									kind: "slot" as const,
 									layout: layout.board,
 									...boardSlot,
+									hitX: boardSlot.x,
+									hitY: boardSlot.y,
 								};
 					}),
 				),
 				readLocationPoseFx: Effect.fn("PixiMainSceneSurface.readLocationPoseFx")(
-					(location) => Effect.sync(() => readLocationPose(location)),
+					(location, footprint) =>
+						Effect.sync(() => readLocationPose(location, footprint)),
+				),
+				readLocalActorIdsFx: Effect.fn("PixiMainSceneSurface.readLocalActorIdsFx")((rect) =>
+					Effect.sync(() => readLocalActorIds(rect)),
 				),
 				readOccupantFx: Effect.fn("PixiMainSceneSurface.readOccupantFx")((target) =>
 					Effect.sync(() => readOccupant(target)),
+				),
+				refreshOccupancyFx: Effect.fn("PixiMainSceneSurface.refreshOccupancyFx")(
+					(affectedActorIds) => Effect.sync(() => refreshOccupancy(affectedActorIds)),
 				),
 				redrawFx: Effect.gen(function* () {
 					layout = RendererRuntime.runSync(
@@ -293,16 +420,79 @@ export const createPixiMainSceneSurfaceFx = Effect.fn("createPixiMainSceneSurfac
 				renderDropFeedbackFx: Effect.fn("PixiMainSceneSurface.renderDropFeedbackFx")(
 					(
 						target: PixiSceneDropTarget | null,
-						kind: readTileDropPreviewFx.Result["kind"] | null,
+						preview: readTileDropPreviewFx.Result | null,
 					) =>
 						Effect.gen(function* () {
+							const kind = preview?.kind ?? null;
 							const accepted =
 								kind !== null &&
 								kind !== DropItemResultKindEnumSchema.enum.Reject &&
 								kind !== DropItemResultKindEnumSchema.enum.Ignored;
+							const requestedColor = accepted ? palette.accent : palette.danger;
+							const explicitOccupantId =
+								target === null ? null : (readOccupant(target)?.id ?? null);
+							const collisionActorIds =
+								preview !== null && "collisions" in preview
+									? preview.collisions.map(({ itemId }) => itemId)
+									: [];
+							const collisionMarkers =
+								target === null
+									? []
+									: collisionActorIds.flatMap((actorId) =>
+											actorId === explicitOccupantId
+												? []
+												: Array.from(
+														occupancyKeysByActorId.get(actorId) ?? [],
+													).flatMap((key) => {
+														const [kind, x, y] = key.split(":");
+														return kind === target.layout.kind
+															? [
+																	{
+																		color: palette.danger,
+																		slot: {
+																			x: Number(x),
+																			y: Number(y),
+																		},
+																	},
+																]
+															: [];
+													}),
+										);
+							const requestedSlot =
+								target === null
+									? null
+									: {
+											x: target.x,
+											y: target.y,
+											width:
+												target.layout.kind === "board"
+													? preview?.destinationFootprint?.width
+													: 1,
+											height:
+												target.layout.kind === "board"
+													? preview?.destinationFootprint?.height
+													: 1,
+										};
 							yield* dropFeedback.renderFx({
-								color: accepted ? palette.accent : palette.danger,
-								slot: target,
+								color: requestedColor,
+								markers:
+									target === null || requestedSlot === null
+										? undefined
+										: [
+												{
+													color: requestedColor,
+													slot: requestedSlot,
+												},
+												...collisionMarkers,
+												{
+													color: palette.foreground,
+													slot: {
+														x: target.hitX,
+														y: target.hitY,
+													},
+												},
+											],
+								slot: requestedSlot,
 								surface: target?.layout ?? null,
 							});
 							yield* application.frames.invalidateFx;

@@ -1,16 +1,17 @@
-import { Effect } from "effect";
+import { Effect, Option } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { readOutputPlacementItemEventsFx } from "~/engine/event/read/readOutputPlacementItemEventsFx";
 import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
 import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
-import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 import { outputFx } from "~/engine/output/fx/outputFx";
 import { applyOutputPlacementFx } from "~/engine/placement/fx/applyOutputPlacementFx";
 import { removeRuntimeItemIdentityFx } from "~/engine/runtime/fx/removeRuntimeItemIdentityFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { ItemEnumSchema } from "~/engine/item/schema/ItemEnumSchema";
 import { makeTemporaryExpiryRandomFx } from "~/engine/item/temporary/random/makeTemporaryExpiryRandomFx";
+import { readBoardRuntimeItemRectangleFx } from "~/engine/grid/fx/readBoardRuntimeItemRectangleFx";
+import { isBoardRuntimeItemFx } from "~/engine/runtime/read/isBoardRuntimeItemFx";
 
 export namespace completeTemporaryItemExpiryTransitionFx {
 	export interface Props {
@@ -28,31 +29,39 @@ export namespace completeTemporaryItemExpiryTransitionFx {
 export const completeTemporaryItemExpiryTransitionFx = Effect.fn(
 	"completeTemporaryItemExpiryTransitionFx",
 )(function* ({ itemId, runtime }: completeTemporaryItemExpiryTransitionFx.Props) {
-	const item = runtime.items.find((candidate) => candidate.id === itemId);
-	if (item === undefined)
+	const runtimeItem = runtime.items.find((candidate) => candidate.id === itemId);
+	if (runtimeItem === undefined)
 		return yield* Effect.die(new Error(`Temporary item ${itemId} is missing.`));
-	if (item.item.type !== ItemEnumSchema.enum.Temporary) {
-		return yield* Effect.die(new Error(`Runtime item ${item.id} is not temporary.`));
+	if (runtimeItem.item.type !== ItemEnumSchema.enum.Temporary) {
+		return yield* Effect.die(new Error(`Runtime item ${runtimeItem.id} is not temporary.`));
 	}
-	if (item.location.scope !== LocationScopeEnumSchema.enum.Board) {
-		return yield* Effect.die(new Error(`Temporary item ${item.id} is not on the board.`));
+	const boardItem = Option.getOrUndefined(yield* isBoardRuntimeItemFx(runtimeItem));
+	if (boardItem === undefined) {
+		return yield* Effect.die(
+			new Error(`Temporary item ${runtimeItem.id} is not on the board.`),
+		);
 	}
-	if (item.remainingDurationMs !== 0) {
-		return yield* Effect.die(new Error(`Temporary item ${item.id} is not ready to expire.`));
+	if (runtimeItem.remainingDurationMs !== 0) {
+		return yield* Effect.die(
+			new Error(`Temporary item ${runtimeItem.id} is not ready to expire.`),
+		);
 	}
+	const originRectangle = yield* readBoardRuntimeItemRectangleFx({
+		item: boardItem,
+	});
 
 	const expiredEvent = {
 		type: GameEventEnumSchema.enum.ItemExpired,
-		itemId: item.id,
-		canonicalItemId: item.item.id,
-		location: item.location,
-		quantity: item.quantity,
+		itemId: runtimeItem.id,
+		canonicalItemId: runtimeItem.item.id,
+		location: boardItem.location,
+		quantity: runtimeItem.quantity,
 	} satisfies GameEventSchema.Type;
 	let draft: RuntimeSchema.Type = yield* removeRuntimeItemIdentityFx({
-		item,
+		item: runtimeItem,
 		runtime,
 	});
-	if (item.item.output === undefined) {
+	if (runtimeItem.item.output === undefined) {
 		return {
 			events: [
 				expiredEvent,
@@ -60,11 +69,11 @@ export const completeTemporaryItemExpiryTransitionFx = Effect.fn(
 			runtime: draft,
 		} satisfies completeTemporaryItemExpiryTransitionFx.Result;
 	}
-	const origin = item.location;
-	const configuredOutput = item.item.output;
+	const origin = boardItem.location;
+	const configuredOutput = runtimeItem.item.output;
 
 	return yield* makeTemporaryExpiryRandomFx({
-		item,
+		item: runtimeItem,
 		program: Effect.gen(function* () {
 			const output = yield* outputFx({
 				origin,
@@ -81,12 +90,13 @@ export const completeTemporaryItemExpiryTransitionFx = Effect.fn(
 
 			const [placement, withOutput] = yield* applyOutputPlacementFx({
 				origin,
+				originRectangle,
 				output,
 				runtime: draft,
 			});
 			draft = withOutput;
 			const placementEvents = yield* readOutputPlacementItemEventsFx({
-				originItemId: item.id,
+				originItemId: runtimeItem.id,
 				placement,
 			});
 

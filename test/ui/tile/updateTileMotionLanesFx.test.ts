@@ -17,6 +17,10 @@ const location = (x: number) => ({
 		y: 0,
 	},
 });
+const footprint = {
+	height: 1,
+	width: 1,
+} as const;
 
 const spawnCue = ({
 	sequence,
@@ -38,6 +42,10 @@ const spawnCue = ({
 	originActorId,
 	actorId,
 	originLocation: location(0),
+	targetFootprint: {
+		height: 1,
+		width: 1,
+	},
 	targetLocation: location(1),
 });
 
@@ -58,7 +66,9 @@ const stackCue = ({
 	targetActorId,
 	canonicalItemId: "water",
 	quantity: 1,
+	originFootprint: footprint,
 	originLocation: location(0),
+	targetFootprint: footprint,
 	targetLocation: location(1),
 });
 
@@ -77,8 +87,12 @@ const swapCue = ({
 	staggerIndex: 0,
 	actorId,
 	counterpartActorId,
+	counterpartOriginFootprint: footprint,
+	counterpartTargetFootprint: footprint,
 	originActorId: actorId,
+	originFootprint: footprint,
 	originLocation: location(1),
+	targetFootprint: footprint,
 	targetLocation: location(0),
 });
 

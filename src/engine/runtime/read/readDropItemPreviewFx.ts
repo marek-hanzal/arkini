@@ -1,17 +1,15 @@
 import { Effect, Option } from "effect";
-import { match } from "ts-pattern";
 
-import { GameConfigFx } from "~/engine/game/context/GameConfigFx";
 import { ItemEnumSchema } from "~/engine/item/schema/ItemEnumSchema";
+import { areGridLocationsWithinBoundsFx } from "~/engine/location/read/areGridLocationsWithinBoundsFx";
 import { isItemLocationScopeAllowedFx } from "~/engine/location/read/isItemLocationScopeAllowedFx";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
+import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 import { resolveLineInputStoreFx } from "~/engine/input/fx/resolveLineInputStoreFx";
 import { isSameGridLocationFx } from "~/engine/location/read/isSameGridLocationFx";
-import {
-	indexGridLocationClaims,
-	readGridLocationClaimsFx,
-} from "~/engine/location/read/readGridLocationClaimsFx";
-import { readGridLocationKey } from "~/engine/location/read/readGridLocationOccupantsFx";
+import { readGridItemDestinationFx } from "~/engine/location/read/readGridItemDestinationFx";
+import { readGridLocationClaimAt } from "~/engine/location/read/readGridLocationClaimAt";
+import { readGridLocationClaimsFx } from "~/engine/location/read/readGridLocationClaimsFx";
 import { resolveMergeRuleFx } from "~/engine/merge/fx/resolveMergeRuleFx";
 import type { DropItemCommand } from "~/engine/runtime/schema/command/DropItemCommand";
 import { isBoardRuntimeItemFx } from "~/engine/runtime/read/isBoardRuntimeItemFx";
@@ -30,17 +28,35 @@ export namespace readDropItemPreviewFx {
 	export type Result =
 		| {
 				readonly kind:
-					| typeof DropItemResultKindEnumSchema.enum.Move
-					| typeof DropItemResultKindEnumSchema.enum.Swap
 					| typeof DropItemResultKindEnumSchema.enum.Merge
 					| typeof DropItemResultKindEnumSchema.enum.StoreInventory
 					| typeof DropItemResultKindEnumSchema.enum.Stack;
+				readonly collisions: ReadonlyArray<{
+					readonly itemId: string;
+					readonly revision: string;
+				}>;
+		  }
+		| {
+				readonly kind: typeof DropItemResultKindEnumSchema.enum.Move;
+				readonly collisions: readonly [];
+		  }
+		| {
+				readonly kind: typeof DropItemResultKindEnumSchema.enum.Swap;
+				readonly collisions: ReadonlyArray<{
+					readonly itemId: string;
+					readonly revision: string;
+				}>;
+				readonly targetLocation: GridLocationSchema.Type;
 		  }
 		| {
 				readonly kind: typeof DropItemResultKindEnumSchema.enum.StoreInput;
 				readonly lineId: string;
 				readonly inputIndex: number;
 				readonly quantity: number;
+				readonly collisions: ReadonlyArray<{
+					readonly itemId: string;
+					readonly revision: string;
+				}>;
 		  }
 		| {
 				readonly kind: typeof DropItemResultKindEnumSchema.enum.Ignored;
@@ -95,40 +111,52 @@ export const readDropItemPreviewFx = Effect.fnUntraced(function* ({
 	) {
 		return rejected(DropItemRejectedReasonEnumSchema.enum.StaleSource);
 	}
+	const destination = yield* readGridItemDestinationFx({
+		excludedItemIds: new Set([
+			source.id,
+		]),
+		item: source.item,
+		location: target.location,
+		runtime,
+	});
+	if (
+		!(yield* isItemLocationScopeAllowedFx({
+			item: source.item,
+			locationScope: target.location.scope,
+		}))
+	) {
+		return rejected(DropItemRejectedReasonEnumSchema.enum.InvalidTarget);
+	}
+	if (
+		!(yield* areGridLocationsWithinBoundsFx({
+			locations: destination.locations,
+			scope: target.location.scope,
+		}))
+	) {
+		return rejected(DropItemRejectedReasonEnumSchema.enum.InvalidTarget);
+	}
+	if (destination.claims.some((claim) => claim.kind === "delivery-origin")) {
+		return rejected(DropItemRejectedReasonEnumSchema.enum.Blocked);
+	}
+	const collisions = destination.claims.map((claim) => {
+		const collision = runtime.items.find((item) => item.id === claim.itemId);
+		if (collision === undefined) {
+			throw new Error(
+				`Drop collision ${claim.itemId} disappeared from the runtime snapshot.`,
+			);
+		}
+		return {
+			itemId: collision.id,
+			revision: collision.revision,
+		};
+	});
 	if (target.occupant === null) {
-		const claimsByLocation = indexGridLocationClaims(
-			(yield* readGridLocationClaimsFx({
-				runtime,
-			})).filter((claim) => claim.itemId !== sourceItemId),
-		);
-		if (claimsByLocation.has(readGridLocationKey(target.location))) {
+		if (destination.claims.length > 0) {
 			return rejected(DropItemRejectedReasonEnumSchema.enum.Occupied);
-		}
-		if (
-			!(yield* isItemLocationScopeAllowedFx({
-				item: source.item,
-				locationScope: target.location.scope,
-			}))
-		) {
-			return rejected(DropItemRejectedReasonEnumSchema.enum.InvalidTarget);
-		}
-		const config = yield* GameConfigFx;
-		const targetSize = match(target.location.scope)
-			.with(LocationScopeEnumSchema.enum.Board, () => config.meta.board)
-			.with(LocationScopeEnumSchema.enum.Inventory, () => config.meta.inventory)
-			.with(LocationScopeEnumSchema.enum.Toolbar, () => ({
-				width: config.meta.toolbarSize ?? 0,
-				height: 1,
-			}))
-			.exhaustive();
-		if (
-			target.location.position.x >= targetSize.width ||
-			target.location.position.y >= targetSize.height
-		) {
-			return rejected(DropItemRejectedReasonEnumSchema.enum.InvalidTarget);
 		}
 		return {
 			kind: DropItemResultKindEnumSchema.enum.Move,
+			collisions: [],
 		} satisfies readDropItemPreviewFx.Result;
 	}
 
@@ -141,14 +169,24 @@ export const readDropItemPreviewFx = Effect.fnUntraced(function* ({
 	if (targetItem === undefined) {
 		return rejected(DropItemRejectedReasonEnumSchema.enum.InvalidTarget);
 	}
+	const hitClaim = readGridLocationClaimAt({
+		claims: yield* readGridLocationClaimsFx({
+			runtime,
+		}),
+		location: target.hitLocation ?? target.location,
+	});
 	if (
-		!(yield* isSameGridLocationFx({
-			left: targetItem.location,
-			right: target.location,
-		}))
+		hitClaim?.kind !== "occupant" ||
+		hitClaim.itemId !== targetItem.id ||
+		!destination.claims.some(
+			(claim) => claim.kind === "occupant" && claim.itemId === targetItem.id,
+		)
 	) {
 		return rejected(DropItemRejectedReasonEnumSchema.enum.StaleTarget);
 	}
+	const hasAdditionalCollision = collisions.some(
+		(collision) => collision.itemId !== targetItem.id,
+	);
 	const boardSource = Option.getOrUndefined(yield* isBoardRuntimeItemFx(source));
 	const boardTarget = Option.getOrUndefined(yield* isBoardRuntimeItemFx(targetItem));
 	if (
@@ -168,6 +206,9 @@ export const readDropItemPreviewFx = Effect.fnUntraced(function* ({
 		return rejected(DropItemRejectedReasonEnumSchema.enum.InvalidTarget);
 	}
 	if (targetItem.item.type === ItemEnumSchema.enum.Inventory) {
+		if (hasAdditionalCollision) {
+			return rejected(DropItemRejectedReasonEnumSchema.enum.Occupied);
+		}
 		if (
 			source.location.scope === LocationScopeEnumSchema.enum.Inventory ||
 			!(yield* isItemLocationScopeAllowedFx({
@@ -184,6 +225,7 @@ export const readDropItemPreviewFx = Effect.fnUntraced(function* ({
 		return Option.isSome(storagePlan)
 			? {
 					kind: DropItemResultKindEnumSchema.enum.StoreInventory,
+					collisions,
 				}
 			: rejected(DropItemRejectedReasonEnumSchema.enum.Blocked);
 	}
@@ -193,8 +235,12 @@ export const readDropItemPreviewFx = Effect.fnUntraced(function* ({
 			target: targetItem,
 		}).pipe(Effect.option);
 		if (Option.isSome(mergeRule)) {
+			if (hasAdditionalCollision) {
+				return rejected(DropItemRejectedReasonEnumSchema.enum.Occupied);
+			}
 			return {
 				kind: DropItemResultKindEnumSchema.enum.Merge,
+				collisions,
 			} satisfies readDropItemPreviewFx.Result;
 		}
 	}
@@ -207,11 +253,15 @@ export const readDropItemPreviewFx = Effect.fnUntraced(function* ({
 		source,
 	});
 	if (inputStore !== undefined) {
+		if (hasAdditionalCollision) {
+			return rejected(DropItemRejectedReasonEnumSchema.enum.Occupied);
+		}
 		return {
 			kind: DropItemResultKindEnumSchema.enum.StoreInput,
 			lineId: inputStore.lineId,
 			inputIndex: inputStore.inputIndex,
 			quantity: inputStore.quantity,
+			collisions,
 		} satisfies readDropItemPreviewFx.Result;
 	}
 	const stackResolution = yield* readItemStackResolutionFx({
@@ -221,11 +271,15 @@ export const readDropItemPreviewFx = Effect.fnUntraced(function* ({
 		sourceLocation,
 		targetItemId: targetItem.id,
 		targetRevision: targetOccupant.revision,
-		targetLocation: target.location,
+		targetLocation: targetItem.location,
 	});
 	if (stackResolution.kind === "available") {
+		if (hasAdditionalCollision) {
+			return rejected(DropItemRejectedReasonEnumSchema.enum.Occupied);
+		}
 		return {
 			kind: DropItemResultKindEnumSchema.enum.Stack,
+			collisions,
 		} satisfies readDropItemPreviewFx.Result;
 	}
 	if (stackResolution.kind === "blocked") {
@@ -246,7 +300,13 @@ export const readDropItemPreviewFx = Effect.fnUntraced(function* ({
 	if (!sourceScopeAllowed || !targetScopeAllowed) {
 		return rejected(DropItemRejectedReasonEnumSchema.enum.InvalidTarget);
 	}
+	const collisionIds = destination.claims.map((claim) => claim.itemId);
+	if (!collisionIds.includes(targetItem.id)) {
+		return rejected(DropItemRejectedReasonEnumSchema.enum.StaleTarget);
+	}
 	return {
 		kind: DropItemResultKindEnumSchema.enum.Swap,
+		collisions,
+		targetLocation: targetItem.location,
 	} satisfies readDropItemPreviewFx.Result;
 });

@@ -301,7 +301,8 @@ export const createPixiInventoryActorStoreFx = Effect.fn("createPixiInventoryAct
 									animator.setFx({
 										actor,
 										channel: "pose",
-										scale: previousDisplayedSize / Math.max(1, actor.size),
+										scaleX: previousDisplayedSize / Math.max(1, actor.width),
+										scaleY: previousDisplayedSize / Math.max(1, actor.height),
 										x: actor.container.x,
 										y: actor.container.y,
 									}),
@@ -316,13 +317,26 @@ export const createPixiInventoryActorStoreFx = Effect.fn("createPixiInventoryAct
 									animatePixiActorToRetargetablePoseFx({
 										actor,
 										animator,
-										readSize: () =>
-											RendererRuntime.runSync(surface.readActorSizeFx),
-										readTarget: () =>
-											RendererRuntime.runSync(
+										readTarget: () => {
+											const latest = RendererRuntime.runSync(
 												surface.readActorPoseFx(actor.item),
-											),
-										target: pose,
+											);
+											const size = RendererRuntime.runSync(
+												surface.readActorSizeFx,
+											);
+											return latest === null
+												? null
+												: {
+														height: size,
+														width: size,
+														...latest,
+													};
+										},
+										target: {
+											height: actor.size,
+											width: actor.size,
+											...pose,
+										},
 									}),
 								);
 							}

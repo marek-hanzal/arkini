@@ -9,6 +9,8 @@ import { resolveItemFx } from "~/engine/item/fx/resolveItemFx";
 import { assertOwnerIdleFx } from "~/engine/job/fx/assertOwnerIdleFx";
 import type { MergeSchema } from "~/engine/merge/schema/MergeSchema";
 import { resolveMergeReplacementChargesFx } from "~/engine/merge/fx/resolveMergeReplacementChargesFx";
+import { placeExactRuntimeItemFx } from "~/engine/placement/fx/placeExactRuntimeItemFx";
+import { readBoardRuntimeItemRectangleFx } from "~/engine/grid/fx/readBoardRuntimeItemRectangleFx";
 import { applyOutputPlacementFx } from "~/engine/placement/fx/applyOutputPlacementFx";
 import { PlacementEnumSchema } from "~/engine/placement/schema/PlacementEnumSchema";
 import { createRuntimeItemFx } from "~/engine/runtime/fx/createRuntimeItemFx";
@@ -106,10 +108,25 @@ export const applyMergeTargetEffectFx = Effect.fn("applyMergeTargetEffectFx")(fu
 						quantity: 1,
 						...replacementCharges,
 					});
-					const replacedRuntime = {
+					const detachedRuntime = {
 						...runtime,
+						items: runtime.items.filter((item) => item.id !== target.id),
+					} satisfies RuntimeSchema.Type;
+					const replacementPlacement = yield* placeExactRuntimeItemFx({
+						item: replacedTarget,
+						origin: target.location,
+						originRectangle: yield* readBoardRuntimeItemRectangleFx({
+							item: target,
+						}),
+						preferredLocations: [
+							target.location,
+						],
+						runtime: detachedRuntime,
+					});
+					const replacedRuntime = {
+						...replacementPlacement.runtime,
 						items: runtime.items.map((item) =>
-							item.id === target.id ? replacedTarget : item,
+							item.id === target.id ? replacementPlacement.item : item,
 						),
 					} satisfies RuntimeSchema.Type;
 					if (target.quantity === 1) {
@@ -121,6 +138,9 @@ export const applyMergeTargetEffectFx = Effect.fn("applyMergeTargetEffectFx")(fu
 
 					const [placement, placedRuntime] = yield* applyOutputPlacementFx({
 						origin: target.location,
+						originRectangle: yield* readBoardRuntimeItemRectangleFx({
+							item: target,
+						}),
 						output: {
 							drop: [
 								{

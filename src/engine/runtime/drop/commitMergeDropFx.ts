@@ -2,12 +2,13 @@ import { Effect } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
+import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 import { commitMergeItemsFx } from "~/engine/merge/internal/commitMergeItemsFx";
 import {
 	makeDropRejectedResult,
 	makeBlockedDropRejectedResult,
-	makeStaleDropRejectedResult,
 } from "~/engine/runtime/drop/makeDropRejectedResult";
+import { makeDropCommitRaceHandlers } from "~/engine/runtime/drop/makeDropCommitRaceHandlers";
 import {
 	projectDropActorCurrent,
 	projectDropTransferActor,
@@ -18,6 +19,11 @@ import { DropItemResultKindEnumSchema } from "~/engine/runtime/schema/command/Dr
 
 export namespace commitMergeDropFx {
 	export interface Props {
+		readonly destinationLocation: GridLocationSchema.Type;
+		readonly expectedCollisions: ReadonlyArray<{
+			readonly itemId: IdSchema.Type;
+			readonly revision: RevisionSchema.Type;
+		}>;
 		readonly sourceItemId: IdSchema.Type;
 		readonly sourceRevision: RevisionSchema.Type;
 		readonly targetItemId: IdSchema.Type;
@@ -29,6 +35,8 @@ export namespace commitMergeDropFx {
 
 /** Commits one exact authored merge and normalizes both actor identities. */
 export const commitMergeDropFx = Effect.fn("commitMergeDropFx")(function* ({
+	destinationLocation,
+	expectedCollisions,
 	sourceItemId,
 	sourceRevision,
 	targetItemId,
@@ -42,6 +50,8 @@ export const commitMergeDropFx = Effect.fn("commitMergeDropFx")(function* ({
 			}),
 		);
 	return yield* commitMergeItemsFx({
+		destinationLocation,
+		expectedCollisions,
 		sourceItemId,
 		sourceRevision,
 		targetItemId,
@@ -67,22 +77,10 @@ export const commitMergeDropFx = Effect.fn("commitMergeDropFx")(function* ({
 			}),
 		),
 		Effect.catchTags({
-			ItemNotFoundError: (error) =>
-				Effect.succeed(
-					makeStaleDropRejectedResult({
-						entityId: error.itemId,
-						sourceItemId,
-						targetItemId,
-					}),
-				),
-			RevisionConflictError: (error) =>
-				Effect.succeed(
-					makeStaleDropRejectedResult({
-						entityId: error.entityId,
-						sourceItemId,
-						targetItemId,
-					}),
-				),
+			...makeDropCommitRaceHandlers({
+				sourceItemId,
+				targetItemId,
+			}),
 			ItemNotOnGridError: () =>
 				Effect.succeed(
 					makeDropRejectedResult({

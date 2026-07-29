@@ -9,6 +9,7 @@ import { MergeSchema } from "~/engine/merge/schema/MergeSchema";
 import { TagSchema } from "~/engine/tag/schema/TagSchema";
 import { AssetSchema } from "./AssetSchema";
 import { ChargeSchema } from "./ChargeSchema";
+import { FootprintSchema } from "./FootprintSchema";
 
 /**
  * Fields shared by every item configuration.
@@ -55,6 +56,18 @@ export const BaseItemSchema = z
 		 */
 		scope: StorageScopeEnumSchema.describe(
 			"The part of game state in which this item may be stored.",
+		),
+		/**
+		 * Effective rectangular area occupied when this item is on a Board.
+		 *
+		 * Passive storage continues to occupy one storage slot regardless of this
+		 * authored Board footprint.
+		 */
+		footprint: FootprintSchema.default({
+			width: 1,
+			height: 1,
+		}).describe(
+			"The effective rectangular Board footprint; omitted definitions occupy one cell.",
 		),
 		/**
 		 * Optional maximum number of this item allowed across the game state.

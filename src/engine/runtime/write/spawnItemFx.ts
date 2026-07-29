@@ -3,10 +3,7 @@ import { Array, Effect, Option, pipe } from "effect";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
 import { resolveItemFx } from "~/engine/item/fx/resolveItemFx";
-import {
-	readGridLocationClaimsFx,
-	readGridLocationClaimAt,
-} from "~/engine/location/read/readGridLocationClaimsFx";
+import { readGridItemLocationConflictFx } from "~/engine/location/read/readGridItemLocationConflictFx";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 import { assertPlacementMaxCountFx } from "~/engine/placement/fx/assertPlacementMaxCountFx";
 import { ItemAlreadyExistsError } from "~/engine/runtime/error/ItemAlreadyExistsError";
@@ -58,11 +55,10 @@ export const spawnItemFx = Effect.fn("spawnItemFx")(function* ({
 				);
 			}
 
-			const claim = readGridLocationClaimAt({
-				claims: yield* readGridLocationClaimsFx({
-					runtime,
-				}),
+			const claim = yield* readGridItemLocationConflictFx({
+				item,
 				location,
+				runtime,
 			});
 			if (claim !== undefined) {
 				return yield* Effect.fail(

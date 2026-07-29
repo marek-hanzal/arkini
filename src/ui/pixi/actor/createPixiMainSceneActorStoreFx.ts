@@ -1,5 +1,6 @@
 import { Effect } from "effect";
 
+import { isSameTileActorLocation } from "~/bridge/tile/isSameTileActorLocation";
 import type { PixiMainSceneActorStore } from "~/ui/pixi/actor/PixiMainSceneActorStore";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
 import { destroyPixiTileActorFx } from "~/ui/pixi/actor/destroyPixiTileActorFx";
@@ -38,8 +39,30 @@ export const createPixiMainSceneActorStoreFx = Effect.fn("createPixiMainSceneAct
 			replaceCanonicalItemsFx: Effect.fn("PixiMainSceneActorStore.replaceCanonicalItemsFx")(
 				(items) =>
 					Effect.sync(() => {
+						const nextItems = new Map(
+							items.map((item) => [
+								item.id,
+								item,
+							]),
+						);
+						const affectedActorIds = new Set<string>();
+						for (const [actorId, previous] of canonicalItems) {
+							const next = nextItems.get(actorId);
+							if (
+								next === undefined ||
+								!isSameTileActorLocation(previous.location, next.location) ||
+								previous.footprint.width !== next.footprint.width ||
+								previous.footprint.height !== next.footprint.height
+							) {
+								affectedActorIds.add(actorId);
+							}
+						}
+						for (const actorId of nextItems.keys()) {
+							if (!canonicalItems.has(actorId)) affectedActorIds.add(actorId);
+						}
 						canonicalItems.clear();
-						for (const item of items) canonicalItems.set(item.id, item);
+						for (const [actorId, item] of nextItems) canonicalItems.set(actorId, item);
+						return affectedActorIds;
 					}),
 			),
 			releaseActorFx: Effect.fn("PixiMainSceneActorStore.releaseActorFx")((actorId) =>

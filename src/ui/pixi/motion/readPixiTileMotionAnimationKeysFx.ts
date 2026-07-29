@@ -49,6 +49,14 @@ export const readPixiTileMotionAnimationKeysFx = Effect.fn("readPixiTileMotionAn
 						`motion:${cueKey}:${swap.counterpartActorId}`,
 					],
 				)
+				.with(
+					{
+						kind: "relocation",
+					},
+					(relocation) => [
+						`motion:${cueKey}:${relocation.actorId}`,
+					],
+				)
 				.exhaustive(),
 		),
 );

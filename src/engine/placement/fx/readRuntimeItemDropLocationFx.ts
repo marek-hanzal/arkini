@@ -16,11 +16,14 @@ import { readEmptyLocationsFx } from "./readEmptyLocationsFx";
 import { readBoardLocationsFx } from "./readBoardLocationsFx";
 import { readInventoryLocationsFx } from "./readInventoryLocationsFx";
 import { readToolbarLocationsFx } from "./readToolbarLocationsFx";
+import { createBoardRectangleFx } from "~/engine/grid/fx/createBoardRectangleFx";
+import type { BoardRectangleSchema } from "~/engine/grid/schema/BoardRectangleSchema";
 
 export namespace readRuntimeItemDropLocationFx {
 	export interface Props {
 		item: RuntimeItemSchema.Type;
 		origin: BoardLocationSchema.Type;
+		originRectangle?: BoardRectangleSchema.Type;
 		runtime: RuntimeSchema.Type;
 	}
 }
@@ -29,6 +32,7 @@ export namespace readRuntimeItemDropLocationFx {
 export const readRuntimeItemDropLocationFx = Effect.fn("readRuntimeItemDropLocationFx")(function* ({
 	item,
 	origin,
+	originRectangle,
 	runtime,
 }: readRuntimeItemDropLocationFx.Props) {
 	const config = yield* GameConfigFx;
@@ -37,16 +41,27 @@ export const readRuntimeItemDropLocationFx = Effect.fn("readRuntimeItemDropLocat
 		space: origin.space,
 	});
 	const orderedBoard = yield* orderBoardLocationsFx({
+		item: item.item,
 		locations: yield* readEmptyLocationsFx({
+			item: item.item,
 			locations: board,
 			runtime,
 		}),
-		origin: origin.position,
+		origin:
+			originRectangle ??
+			(yield* createBoardRectangleFx({
+				anchor: origin,
+				footprint: {
+					width: 1,
+					height: 1,
+				},
+			})),
 	});
 	const inventory = yield* readInventoryLocationsFx({
 		size: config.meta.inventory,
 	});
 	const emptyInventory = yield* readEmptyLocationsFx({
+		item: item.item,
 		locations: inventory,
 		runtime,
 	});
@@ -54,6 +69,7 @@ export const readRuntimeItemDropLocationFx = Effect.fn("readRuntimeItemDropLocat
 		size: config.meta.toolbarSize ?? 0,
 	});
 	const emptyToolbar = yield* readEmptyLocationsFx({
+		item: item.item,
 		locations: toolbar,
 		runtime,
 	});

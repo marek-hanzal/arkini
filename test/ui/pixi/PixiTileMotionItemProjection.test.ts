@@ -9,6 +9,10 @@ import { readPixiTileQuantityPresentationFx } from "~/ui/pixi/motion/readPixiTil
 const item = (itemType: TileActorItem["itemType"]): TileActorItem => ({
 	activityEffect: false,
 	badgeCount: 8,
+	footprint: {
+		height: 1,
+		width: 1,
+	},
 	id: "runtime:item",
 	itemId: "item",
 	itemType,
@@ -61,11 +65,13 @@ describe("Pixi tile motion item projection", () => {
 			eventIndex: 0,
 			kind: "stack",
 			originActorId: "runtime:producer",
+			originFootprint: item("simple").footprint,
 			originLocation: location,
 			quantity: 1,
 			sequence: 1,
 			staggerIndex: 0,
 			targetActorId: "runtime:item",
+			targetFootprint: item("simple").footprint,
 			targetLocation: location,
 		} satisfies TileMotionCue;
 		const input = {
@@ -73,6 +79,7 @@ describe("Pixi tile motion item projection", () => {
 			eventIndex: 0,
 			kind: "input",
 			originActorId: "runtime:item",
+			originFootprint: item("simple").footprint,
 			originLocation: location,
 			previousQuantity: 6,
 			resultingQuantity: 4,
@@ -81,6 +88,7 @@ describe("Pixi tile motion item projection", () => {
 			staggerIndex: 0,
 			storedQuantity: 2,
 			targetActorId: "runtime:owner",
+			targetFootprint: item("simple").footprint,
 			targetLocation: location,
 		} satisfies TileMotionCue;
 		const read = (

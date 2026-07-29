@@ -47,6 +47,15 @@ export const readTileMotionActorClaimsFx = Effect.fn("readTileMotionActorClaimsF
 							swap.counterpartActorId,
 						]),
 				)
+				.with(
+					{
+						kind: "relocation",
+					},
+					(relocation) =>
+						new Set([
+							relocation.actorId,
+						]),
+				)
 				.exhaustive(),
 		),
 );

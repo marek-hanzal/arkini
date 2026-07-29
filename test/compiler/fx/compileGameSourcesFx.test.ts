@@ -31,6 +31,23 @@ describe("compileGameSourcesFx", () => {
 		expect(result.diagnostics).toEqual([]);
 	});
 
+	it("materializes the default footprint at the source compiler boundary", async () => {
+		const { footprint: _footprint, ...sourceItem } = createSimpleItem("item:a");
+		const result = await compile(
+			createRootSource({
+				items: {
+					[sourceItem.id]: sourceItem,
+				},
+			}),
+		);
+
+		expect(result.config?.items[sourceItem.id]?.footprint).toEqual({
+			width: 1,
+			height: 1,
+		});
+		expect(result.diagnostics).toEqual([]);
+	});
+
 	it("preserves an authored default line through the compiler used by packing", async () => {
 		const item = createProducerItem({
 			id: "item:producer",

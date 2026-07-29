@@ -158,7 +158,7 @@ describe("dropItemFx pure stack integration", () => {
 			}),
 		);
 
-		expect(result.preview).toEqual({
+		expect(result.preview).toMatchObject({
 			kind: DropItemResultKindEnumSchema.enum.Stack,
 		});
 		expect(result.outcome).toMatchObject({
@@ -417,7 +417,7 @@ describe("dropItemFx pure stack integration", () => {
 			inputBeforeStackConfig,
 		);
 
-		expect(mergePreview).toEqual({
+		expect(mergePreview).toMatchObject({
 			kind: DropItemResultKindEnumSchema.enum.Merge,
 		});
 		expect(inputPreview).toMatchObject({

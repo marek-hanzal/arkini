@@ -27,9 +27,15 @@ import { isBoardRuntimeItemFx } from "~/engine/runtime/read/isBoardRuntimeItemFx
 import { isGridRuntimeItemFx } from "~/engine/runtime/read/isGridRuntimeItemFx";
 import { readRuntimeItemByIdFx } from "~/engine/runtime/read/readRuntimeItemByIdFx";
 import { CrossSpaceBoardOperationError } from "~/engine/space/error/CrossSpaceBoardOperationError";
+import { assertDropDestinationExpectationFx } from "~/engine/runtime/read/assertDropDestinationExpectationFx";
 
 export namespace storeInputMaterialFx {
 	export interface Props {
+		readonly destinationLocation?: GridLocationSchema.Type;
+		readonly expectedCollisions?: ReadonlyArray<{
+			readonly itemId: IdSchema.Type;
+			readonly revision: RevisionSchema.Type;
+		}>;
 		ownerItemId: IdSchema.Type;
 		ownerItemRevision?: RevisionSchema.Type;
 		expectedOwnerLocation?: GridLocationSchema.Type;
@@ -51,6 +57,8 @@ export namespace storeInputMaterialFx {
  * its pure remainder is delivered through canonical placement in the same commit.
  */
 export const storeInputMaterialFx = Effect.fn("storeInputMaterialFx")(function* ({
+	destinationLocation,
+	expectedCollisions,
 	ownerItemId,
 	ownerItemRevision,
 	expectedOwnerLocation,
@@ -167,6 +175,16 @@ export const storeInputMaterialFx = Effect.fn("storeInputMaterialFx")(function* 
 						sourceItemId,
 					}),
 				);
+			}
+			if (destinationLocation !== undefined && expectedCollisions !== undefined) {
+				yield* assertDropDestinationExpectationFx({
+					allowAdditionalOccupants: false,
+					expectedCollisions,
+					explicitTargetItemId: owner.id,
+					location: destinationLocation,
+					runtime,
+					source,
+				});
 			}
 
 			const input = yield* readItemMaterialInputFx({

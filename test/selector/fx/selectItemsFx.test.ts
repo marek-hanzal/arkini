@@ -19,6 +19,10 @@ const item = {
 	],
 	categoryId: "resource",
 	scope: "board",
+	footprint: {
+		width: 1,
+		height: 1,
+	},
 	maxStackSize: 1,
 	type: "simple",
 } satisfies ItemSchema.Type;

@@ -27,6 +27,7 @@ const exitDurationMs = 180;
 
 const readTargetKey = (
 	color: number,
+	markers: Parameters<PixiGridDropFeedback["renderFx"]>[0]["markers"],
 	slot: NonNullable<Parameters<PixiGridDropFeedback["renderFx"]>[0]["slot"]>,
 	surface: PixiGridSurfaceLayout,
 ) =>
@@ -38,6 +39,15 @@ const readTargetKey = (
 		surface.cellSize,
 		slot.x,
 		slot.y,
+		slot.width ?? 1,
+		slot.height ?? 1,
+		...(markers ?? []).flatMap(({ color: markerColor, slot: markerSlot }) => [
+			markerColor,
+			markerSlot.x,
+			markerSlot.y,
+			markerSlot.width ?? 1,
+			markerSlot.height ?? 1,
+		]),
 	].join(":");
 
 /** Crossfades retained drop markers without delaying canonical hover targeting. */
@@ -131,53 +141,56 @@ export const createPixiGridDropFeedbackFx = Effect.fn("createPixiGridDropFeedbac
 						});
 					}
 				}),
-				renderFx: Effect.fn("PixiGridDropFeedback.renderFx")(({ color, slot, surface }) =>
-					Effect.gen(function* () {
-						if (closed) return;
-						if (slot === null || surface === null) {
-							currentKey = null;
-							for (const layer of layers) {
-								yield* animateLayerFx(layer, 0, exitDurationMs, true);
+				renderFx: Effect.fn("PixiGridDropFeedback.renderFx")(
+					({ color, markers, slot, surface }) =>
+						Effect.gen(function* () {
+							if (closed) return;
+							if (slot === null || surface === null) {
+								currentKey = null;
+								for (const layer of layers) {
+									yield* animateLayerFx(layer, 0, exitDurationMs, true);
+								}
+								return;
 							}
-							return;
-						}
 
-						const nextKey = readTargetKey(color, slot, surface);
-						const current = layers[currentIndex];
-						if (currentKey === nextKey) {
+							const nextKey = readTargetKey(color, markers, slot, surface);
+							const current = layers[currentIndex];
+							if (currentKey === nextKey) {
+								yield* drawPixiGridDropFeedbackFx({
+									color,
+									graphics: current.graphics,
+									markers,
+									slot,
+									surface,
+								});
+								yield* animateLayerFx(current, 1, enterDurationMs, false);
+								return;
+							}
+
+							const outgoing = current;
+							currentIndex = currentIndex === 0 ? 1 : 0;
+							const incoming = layers[currentIndex];
+							currentKey = nextKey;
+							yield* stopLayerFx(incoming);
+							incoming.graphics.alpha = 0;
 							yield* drawPixiGridDropFeedbackFx({
 								color,
-								graphics: current.graphics,
+								graphics: incoming.graphics,
+								markers,
 								slot,
 								surface,
 							});
-							yield* animateLayerFx(current, 1, enterDurationMs, false);
-							return;
-						}
-
-						const outgoing = current;
-						currentIndex = currentIndex === 0 ? 1 : 0;
-						const incoming = layers[currentIndex];
-						currentKey = nextKey;
-						yield* stopLayerFx(incoming);
-						incoming.graphics.alpha = 0;
-						yield* drawPixiGridDropFeedbackFx({
-							color,
-							graphics: incoming.graphics,
-							slot,
-							surface,
-						});
-						container.addChild(incoming.graphics);
-						yield* Effect.all(
-							[
-								animateLayerFx(outgoing, 0, exitDurationMs, true),
-								animateLayerFx(incoming, 1, enterDurationMs, false),
-							],
-							{
-								concurrency: "unbounded",
-							},
-						);
-					}),
+							container.addChild(incoming.graphics);
+							yield* Effect.all(
+								[
+									animateLayerFx(outgoing, 0, exitDurationMs, true),
+									animateLayerFx(incoming, 1, enterDurationMs, false),
+								],
+								{
+									concurrency: "unbounded",
+								},
+							);
+						}),
 				),
 			};
 		}),

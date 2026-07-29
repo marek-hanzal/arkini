@@ -2,6 +2,7 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import type { GameEngine } from "~/bridge/game/GameEngine";
+import { readCommittedTileRelocationMotionCuesFx } from "~/bridge/tile/motion/readCommittedTileRelocationMotionCuesFx";
 import { readCommittedTileSwapMotionCueFx } from "~/bridge/tile/motion/readCommittedTileSwapMotionCueFx";
 import { readTileMotionCuesFx } from "~/bridge/tile/motion/readTileMotionCuesFx";
 import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
@@ -18,7 +19,7 @@ const config = GameConfigSchema.parse({
 		id: "game:tile-motion-cues",
 		title: "Tile motion cues",
 		board: {
-			width: 3,
+			width: 4,
 			height: 1,
 		},
 		inventory: {
@@ -67,6 +68,10 @@ const config = GameConfigSchema.parse({
 			},
 			tags: [],
 			categoryId: "resource",
+			footprint: {
+				width: 2,
+				height: 1,
+			},
 			scope: "any",
 			maxStackSize: 10,
 		},
@@ -133,6 +138,171 @@ const committedRuntime = {
 };
 
 describe("readTileMotionCuesFx", () => {
+	it("compiles committed relocation legs in result order and omits stale or missing identities", () => {
+		const movedSource = {
+			...source,
+			location: targetLocation,
+			revision: "revision:source:moved",
+		};
+		const movedTarget = {
+			...target,
+			location: sourceLocation,
+			revision: "revision:target:moved",
+		};
+		const transition = {
+			events: [],
+			previousRuntime: runtime,
+			runtime: {
+				...runtime,
+				items: runtime.items.map((item) =>
+					item.id === source.id
+						? movedSource
+						: item.id === target.id
+							? movedTarget
+							: item,
+				),
+			},
+			sequence: 6,
+		};
+
+		expect(
+			Effect.runSync(
+				readCommittedTileRelocationMotionCuesFx({
+					relocations: [
+						{
+							itemId: target.id,
+							location: sourceLocation,
+							previousLocation: targetLocation,
+							revision: movedTarget.revision,
+						},
+						{
+							itemId: source.id,
+							location: targetLocation,
+							previousLocation: sourceLocation,
+							revision: movedSource.revision,
+						},
+						{
+							itemId: "runtime:missing",
+							location: targetLocation,
+							previousLocation: sourceLocation,
+							revision: "revision:missing",
+						},
+						{
+							itemId: source.id,
+							location: targetLocation,
+							previousLocation: sourceLocation,
+							revision: "revision:superseded",
+						},
+					],
+					transition,
+				}),
+			),
+		).toEqual([
+			{
+				actorId: target.id,
+				eventIndex: 0,
+				kind: "relocation",
+				originActorId: target.id,
+				originFootprint: {
+					height: 1,
+					width: 2,
+				},
+				originLocation: targetLocation,
+				sequence: 6,
+				staggerIndex: 0,
+				targetFootprint: {
+					height: 1,
+					width: 2,
+				},
+				targetLocation: sourceLocation,
+			},
+			{
+				actorId: source.id,
+				eventIndex: 1,
+				kind: "relocation",
+				originActorId: source.id,
+				originFootprint: {
+					height: 1,
+					width: 2,
+				},
+				originLocation: sourceLocation,
+				sequence: 6,
+				staggerIndex: 0,
+				targetFootprint: {
+					height: 1,
+					width: 2,
+				},
+				targetLocation,
+			},
+		]);
+	});
+
+	it("captures rectangular Board and compact storage endpoints from committed items", () => {
+		const authoredItem = {
+			...source.item,
+			footprint: {
+				height: 1,
+				width: 2,
+			},
+		};
+		const previousSource = {
+			...source,
+			item: authoredItem,
+		};
+		const toolbarLocation = {
+			scope: "toolbar" as const,
+			position: {
+				x: 0,
+				y: 0,
+			},
+		};
+		const currentSource = {
+			...previousSource,
+			location: toolbarLocation,
+			revision: "revision:source:toolbar",
+		};
+		const previousRuntime = {
+			...runtime,
+			items: runtime.items.map((item) => (item.id === source.id ? previousSource : item)),
+		};
+		const currentRuntime = {
+			...runtime,
+			items: runtime.items.map((item) => (item.id === source.id ? currentSource : item)),
+		};
+
+		expect(
+			Effect.runSync(
+				readCommittedTileRelocationMotionCuesFx({
+					relocations: [
+						{
+							itemId: source.id,
+							location: toolbarLocation,
+							previousLocation: sourceLocation,
+							revision: currentSource.revision,
+						},
+					],
+					transition: {
+						events: [],
+						previousRuntime,
+						runtime: currentRuntime,
+						sequence: 7,
+					},
+				}),
+			),
+		).toEqual([
+			expect.objectContaining({
+				originFootprint: {
+					height: 1,
+					width: 2,
+				},
+				targetFootprint: {
+					height: 1,
+					width: 1,
+				},
+			}),
+		]);
+	});
+
 	it("compiles ordered spawn and stack facts from the complete committed transition", () => {
 		const cues = Effect.runSync(
 			readCues({
@@ -171,7 +341,9 @@ describe("readTileMotionCuesFx", () => {
 				canonicalItemId: target.item.id,
 				quantity: 1,
 				originActorId: source.id,
+				originFootprint: source.item.footprint,
 				originLocation: sourceLocation,
+				targetFootprint: target.item.footprint,
 				targetLocation,
 			},
 			{
@@ -182,6 +354,7 @@ describe("readTileMotionCuesFx", () => {
 				actorId: target.id,
 				originActorId: source.id,
 				originLocation: sourceLocation,
+				targetFootprint: target.item.footprint,
 				targetLocation,
 			},
 		]);
@@ -309,6 +482,7 @@ describe("readTileMotionCuesFx", () => {
 				actorId: source.id,
 				originActorId: inventoryOpener.id,
 				originLocation: openerLocation,
+				targetFootprint: source.item.footprint,
 				targetLocation: sourceLocation,
 			},
 		]);
@@ -350,7 +524,9 @@ describe("readTileMotionCuesFx", () => {
 				storedQuantity: 5,
 				resultingQuantity: 2,
 				originActorId: source.id,
+				originFootprint: source.item.footprint,
 				originLocation: sourceLocation,
+				targetFootprint: source.item.footprint,
 				targetLocation,
 			},
 		]);
@@ -520,8 +696,12 @@ describe("readCommittedTileSwapMotionCueFx", () => {
 			staggerIndex: 0,
 			actorId: target.id,
 			counterpartActorId: source.id,
+			counterpartOriginFootprint: source.item.footprint,
+			counterpartTargetFootprint: source.item.footprint,
 			originActorId: target.id,
+			originFootprint: target.item.footprint,
 			originLocation: targetLocation,
+			targetFootprint: target.item.footprint,
 			targetLocation: sourceLocation,
 		});
 	});

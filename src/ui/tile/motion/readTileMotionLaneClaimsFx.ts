@@ -75,6 +75,17 @@ export const readTileMotionLaneClaimsFx = Effect.fn("readTileMotionLaneClaimsFx"
 						},
 					],
 				)
+				.with(
+					{
+						kind: "relocation",
+					},
+					(relocation): ReadonlyArray<TileMotionLaneClaim> => [
+						{
+							kind: "exclusive",
+							actorId: relocation.actorId,
+						},
+					],
+				)
 				.exhaustive(),
 		);
 	},

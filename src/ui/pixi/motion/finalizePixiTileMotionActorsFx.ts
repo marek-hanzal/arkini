@@ -64,7 +64,8 @@ export const finalizePixiTileMotionActorsFx = Effect.fn("finalizePixiTileMotionA
 				});
 				continue;
 			}
-			const displayedSize = actor.size * actor.container.scale.x;
+			const displayedWidth = actor.width * actor.container.scale.x;
+			const displayedHeight = actor.height * actor.container.scale.y;
 			pose.layer.addChild(actor.container);
 			yield* updatePixiTileActorFx({
 				actor,
@@ -78,7 +79,8 @@ export const finalizePixiTileMotionActorsFx = Effect.fn("finalizePixiTileMotionA
 			yield* animator.setFx({
 				actor,
 				channel: "pose",
-				scale: displayedSize / Math.max(1, actor.size),
+				scaleX: displayedWidth / Math.max(1, actor.width),
+				scaleY: displayedHeight / Math.max(1, actor.height),
 				x: actor.container.x,
 				y: actor.container.y,
 			});

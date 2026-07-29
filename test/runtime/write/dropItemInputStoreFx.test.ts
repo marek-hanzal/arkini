@@ -8,6 +8,7 @@ import { setDefaultLineFx } from "~/engine/line/write/setDefaultLineFx";
 import { readDropItemPreviewFx } from "~/engine/runtime/read/readDropItemPreviewFx";
 import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import { DropItemResultKindEnumSchema } from "~/engine/runtime/schema/command/DropItemResultKindEnumSchema";
+import { DropItemRejectedReasonEnumSchema } from "~/engine/runtime/schema/command/DropItemRejectedReasonEnumSchema";
 import { dropItemFx } from "~/engine/runtime/write/dropItemFx";
 import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
@@ -62,6 +63,23 @@ const authoredDefaultConfig = GameConfigSchema.parse({
 				...line,
 				default: true,
 			})),
+		},
+	},
+});
+const wideInputConfig = GameConfigSchema.parse({
+	...authoredDefaultConfig,
+	meta: {
+		...authoredDefaultConfig.meta,
+		id: "game:drop-input-wide-source",
+	},
+	items: {
+		...authoredDefaultConfig.items,
+		water: {
+			...authoredDefaultConfig.items.water,
+			footprint: {
+				width: 2,
+				height: 1,
+			},
 		},
 	},
 });
@@ -168,6 +186,63 @@ const dropFx = ({
 	});
 
 describe("dropItemFx default-line input storage", () => {
+	it("rejects input storage when the complete destination overlaps an unrelated identity", () => {
+		const result = run(
+			Effect.gen(function* () {
+				const owner = yield* spawnItemFx({
+					id: "runtime:workshop",
+					itemId: "workshop",
+					location: workshopLocation,
+					quantity: 1,
+				});
+				yield* spawnItemFx({
+					id: "runtime:extra",
+					itemId: "stone",
+					location: sourceLocation(1),
+					quantity: 1,
+				});
+				const source = yield* spawnItemFx({
+					id: "runtime:water",
+					itemId: "water",
+					location: sourceLocation(3),
+					quantity: 1,
+				});
+				yield* setDefaultLineFx({
+					ownerItemId: owner.id,
+					lineId,
+				});
+				const command = {
+					sourceItemId: source.id,
+					sourceRevision: source.revision,
+					sourceLocation: sourceLocation(3),
+					target: {
+						kind: "slot" as const,
+						location: workshopLocation,
+						occupant: {
+							itemId: owner.id,
+							revision: owner.revision,
+						},
+					},
+				};
+				const preview = yield* readDropItemPreviewFx(command);
+				return {
+					outcome: yield* dropItemFx(command),
+					preview,
+				};
+			}),
+			wideInputConfig,
+		);
+
+		expect(result.preview).toEqual({
+			kind: DropItemResultKindEnumSchema.enum.Reject,
+			reason: DropItemRejectedReasonEnumSchema.enum.Occupied,
+		});
+		expect(result.outcome).toMatchObject({
+			kind: DropItemResultKindEnumSchema.enum.Reject,
+			reason: DropItemRejectedReasonEnumSchema.enum.Occupied,
+		});
+	});
+
 	it("uses an authored fallback without state until the drop atomically isolates one stacked owner", () => {
 		const result = run(
 			Effect.gen(function* () {
@@ -223,7 +298,7 @@ describe("dropItemFx default-line input storage", () => {
 		);
 
 		expect(result.pureBefore).toBe(true);
-		expect(result.preview).toEqual({
+		expect(result.preview).toMatchObject({
 			kind: DropItemResultKindEnumSchema.enum.StoreInput,
 			lineId,
 			inputIndex: 0,
@@ -338,7 +413,7 @@ describe("dropItemFx default-line input storage", () => {
 			}),
 		);
 
-		expect(result.preview).toEqual({
+		expect(result.preview).toMatchObject({
 			kind: DropItemResultKindEnumSchema.enum.StoreInput,
 			lineId,
 			inputIndex: 0,
@@ -446,7 +521,7 @@ describe("dropItemFx default-line input storage", () => {
 			}),
 		);
 
-		expect(result.preview).toEqual({
+		expect(result.preview).toMatchObject({
 			kind: DropItemResultKindEnumSchema.enum.StoreInput,
 			lineId,
 			inputIndex: 0,
@@ -500,7 +575,7 @@ describe("dropItemFx default-line input storage", () => {
 			}),
 		);
 
-		expect(result.preview).toEqual({
+		expect(result.preview).toMatchObject({
 			kind: DropItemResultKindEnumSchema.enum.Swap,
 		});
 		expect(result.outcome.kind).toBe(DropItemResultKindEnumSchema.enum.Swap);
@@ -540,7 +615,7 @@ describe("dropItemFx default-line input storage", () => {
 			}),
 		);
 
-		expect(result).toEqual({
+		expect(result).toMatchObject({
 			kind: DropItemResultKindEnumSchema.enum.Swap,
 		});
 	});
@@ -559,7 +634,7 @@ describe("dropItemFx default-line input storage", () => {
 			mergeBeforeInputConfig,
 		);
 
-		expect(result).toEqual({
+		expect(result).toMatchObject({
 			kind: DropItemResultKindEnumSchema.enum.Merge,
 		});
 	});

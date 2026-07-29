@@ -71,4 +71,41 @@ describe("readGridLocationOccupantsFx", () => {
 			items: [],
 		});
 	});
+
+	it("projects Board occupants across every authored footprint cell", () => {
+		const wideItem = {
+			...log,
+			footprint: {
+				width: 2,
+				height: 1,
+			},
+		};
+		const item = {
+			...runtimeItem("runtime:wide", boardLocation(0, 0)),
+			item: wideItem,
+		};
+
+		const result = Effect.runSync(
+			readGridLocationOccupantsFx({
+				items: [
+					item,
+				],
+				locations: [
+					boardLocation(0, 0),
+					boardLocation(0, 1),
+					boardLocation(0, 2),
+				],
+			}),
+		);
+
+		expect(result.map(({ items }) => items.map(({ id }) => id))).toEqual([
+			[
+				"runtime:wide",
+			],
+			[
+				"runtime:wide",
+			],
+			[],
+		]);
+	});
 });

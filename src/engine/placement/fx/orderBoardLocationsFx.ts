@@ -1,12 +1,17 @@
 import { Effect } from "effect";
 
-import type { PositionSchema } from "~/engine/grid/schema/PositionSchema";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
+import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
+import { createBoardRectangleFx } from "~/engine/grid/fx/createBoardRectangleFx";
+import { readBoardRectangleManhattanGapFx } from "~/engine/grid/fx/readBoardRectangleManhattanGapFx";
+import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
+import type { BoardRectangleSchema } from "~/engine/grid/schema/BoardRectangleSchema";
 
 export namespace orderBoardLocationsFx {
 	export interface Props {
 		locations: ReadonlyArray<GridLocationSchema.Type>;
-		origin: PositionSchema.Type;
+		origin: BoardRectangleSchema.Type;
+		item: ItemSchema.Type;
 	}
 }
 
@@ -18,15 +23,33 @@ const compareByScanOrder = (left: GridLocationSchema.Type, right: GridLocationSc
 export const orderBoardLocationsFx = Effect.fn("orderBoardLocationsFx")(function* ({
 	locations,
 	origin,
+	item,
 }: orderBoardLocationsFx.Props) {
-	return [
-		...locations,
-	].sort((left, right) => {
-		const leftDistance =
-			Math.abs(left.position.x - origin.x) + Math.abs(left.position.y - origin.y);
-		const rightDistance =
-			Math.abs(right.position.x - origin.x) + Math.abs(right.position.y - origin.y);
-
-		return leftDistance - rightDistance || compareByScanOrder(left, right);
-	});
+	const candidates = yield* Effect.forEach(locations, (location) =>
+		Effect.gen(function* () {
+			if (location.scope !== LocationScopeEnumSchema.enum.Board) {
+				return yield* Effect.die(
+					new Error("Board placement ordering requires Board locations."),
+				);
+			}
+			const candidateRectangle = yield* createBoardRectangleFx({
+				anchor: location,
+				footprint: item.footprint,
+			});
+			return {
+				distance: yield* readBoardRectangleManhattanGapFx({
+					left: origin,
+					right: candidateRectangle,
+				}),
+				location,
+			};
+		}),
+	);
+	return candidates
+		.sort((left, right) => {
+			return (
+				left.distance - right.distance || compareByScanOrder(left.location, right.location)
+			);
+		})
+		.map(({ location }) => location);
 });

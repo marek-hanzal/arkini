@@ -313,7 +313,7 @@ describe("startFx", () => {
 					item: config.items["item:inventory"],
 					location: {
 						position: {
-							x: 12,
+							x: 14,
 							y: 0,
 						},
 						scope: "toolbar",

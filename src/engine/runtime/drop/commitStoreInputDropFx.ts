@@ -10,6 +10,7 @@ import {
 	makeInvalidGridDropRejectedResult,
 	makeStaleDropRejectedResult,
 } from "~/engine/runtime/drop/makeDropRejectedResult";
+import { makeDropCommitRaceHandlers } from "~/engine/runtime/drop/makeDropCommitRaceHandlers";
 import { projectDropTransferActor } from "~/engine/runtime/drop/projectDropTransferActor";
 import { DropItemRejectedReasonEnumSchema } from "~/engine/runtime/schema/command/DropItemRejectedReasonEnumSchema";
 import type { DropItemResultSchema } from "~/engine/runtime/schema/command/DropItemResultSchema";
@@ -17,6 +18,11 @@ import { DropItemResultKindEnumSchema } from "~/engine/runtime/schema/command/Dr
 
 export namespace commitStoreInputDropFx {
 	export interface Props {
+		readonly destinationLocation: GridLocationSchema.Type;
+		readonly expectedCollisions: ReadonlyArray<{
+			readonly itemId: IdSchema.Type;
+			readonly revision: RevisionSchema.Type;
+		}>;
 		readonly sourceItemId: IdSchema.Type;
 		readonly sourceRevision: RevisionSchema.Type;
 		readonly sourceLocation: GridLocationSchema.Type;
@@ -33,6 +39,8 @@ export namespace commitStoreInputDropFx {
 
 /** Commits one exact default-line input store and normalizes both actor identities. */
 export const commitStoreInputDropFx = Effect.fn("commitStoreInputDropFx")(function* ({
+	destinationLocation,
+	expectedCollisions,
 	sourceItemId,
 	sourceRevision,
 	sourceLocation,
@@ -52,6 +60,8 @@ export const commitStoreInputDropFx = Effect.fn("commitStoreInputDropFx")(functi
 		);
 	return yield* Effect.gen(function* () {
 		const stored = yield* storeInputMaterialFx({
+			destinationLocation,
+			expectedCollisions,
 			ownerItemId: targetItemId,
 			ownerItemRevision: targetRevision,
 			expectedOwnerLocation: targetLocation,
@@ -80,22 +90,10 @@ export const commitStoreInputDropFx = Effect.fn("commitStoreInputDropFx")(functi
 		} satisfies commitStoreInputDropFx.Result;
 	}).pipe(
 		Effect.catchTags({
-			ItemNotFoundError: (error) =>
-				Effect.succeed(
-					makeStaleDropRejectedResult({
-						entityId: error.itemId,
-						sourceItemId,
-						targetItemId,
-					}),
-				),
-			RevisionConflictError: (error) =>
-				Effect.succeed(
-					makeStaleDropRejectedResult({
-						entityId: error.entityId,
-						sourceItemId,
-						targetItemId,
-					}),
-				),
+			...makeDropCommitRaceHandlers({
+				sourceItemId,
+				targetItemId,
+			}),
 			ItemLocationConflictError: (error) =>
 				Effect.succeed(
 					makeStaleDropRejectedResult({

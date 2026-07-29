@@ -46,23 +46,27 @@ const tileToSlotRatio = 0.8;
 
 const updateProgressBar = ({
 	actor,
+	height: actorHeight,
 	palette,
 	size,
+	width: actorWidth,
 }: {
 	readonly actor: PixiTileActor;
+	readonly height: number;
 	readonly palette: PixiScenePalette;
 	readonly size: number;
+	readonly width: number;
 }) => {
 	const progressRatio = actor.item.progressRatio;
 	actor.progressBar.clear();
 	actor.progressBar.visible = progressRatio !== undefined;
 	if (progressRatio === undefined) return;
 	const inset = (size * (1 - tileToSlotRatio)) / 2;
-	const faceSize = Math.max(1, size - inset * 2);
-	const width = faceSize * 0.76;
+	const faceSize = Math.max(1, Math.min(actorWidth, actorHeight) - inset * 2);
+	const width = Math.max(1, actorWidth - inset * 2) * 0.76;
 	const height = Math.max(2, faceSize * 0.045);
-	const x = inset + (faceSize - width) / 2;
-	const y = inset + faceSize + Math.max(1, (inset - height) / 2);
+	const x = (actorWidth - width) / 2;
+	const y = actorHeight - inset + Math.max(1, (inset - height) / 2);
 	const radius = height / 2;
 	actor.progressBar.roundRect(x, y, width, height, radius).fill({
 		alpha: 0.62,
@@ -84,10 +88,14 @@ export const updatePixiTileActorProgressFx = Effect.fnUntraced(function* ({
 	size,
 }: updatePixiTileActorProgressFx.Props) {
 	actor.item = item;
+	const width = size * item.footprint.width;
+	const height = size * item.footprint.height;
 	updateProgressBar({
 		actor,
+		height,
 		palette,
 		size,
+		width,
 	});
 	yield* frames.invalidateFx;
 });
@@ -137,32 +145,42 @@ export const updatePixiTileActorFx = Effect.fn("updatePixiTileActorFx")(function
 		});
 	}
 	actor.size = size;
+	actor.width = size * item.footprint.width;
+	actor.height = size * item.footprint.height;
 	updateProgressBar({
 		actor,
+		height: actor.height,
 		palette,
 		size,
+		width: actor.width,
 	});
 	actor.container.hitArea = {
-		contains: (x: number, y: number) => x >= 0 && x <= size && y >= 0 && y <= size,
+		contains: (x: number, y: number) =>
+			x >= 0 && x <= actor.width && y >= 0 && y <= actor.height,
 	};
 
 	const inset = (size * (1 - tileToSlotRatio)) / 2;
-	const faceSize = Math.max(1, size - inset * 2);
+	const faceSize = Math.max(1, Math.min(actor.width, actor.height) - inset * 2);
+	actor.visualLayer.x = (actor.width - faceSize) / 2;
+	actor.visualLayer.y = (actor.height - faceSize) / 2;
 	const activityParticles = actor.activityParticles;
 	const largestParticleSize = faceSize * 0.18;
 	const largestParticleHalfWidth = largestParticleSize / 2;
 	const largestParticleHalfHeight = largestParticleSize / 2;
-	activityParticles.centerX = inset + faceSize / 2;
-	activityParticles.startY = Math.min(size - largestParticleHalfHeight, inset + faceSize * 0.92);
+	activityParticles.centerX = actor.width / 2;
+	activityParticles.startY = Math.min(
+		actor.height - largestParticleHalfHeight,
+		actor.visualLayer.y + faceSize * 0.92,
+	);
 	activityParticles.topY = largestParticleHalfHeight;
 	activityParticles.topHalfWidth = Math.min(
 		faceSize * 0.46,
-		Math.max(0, size / 2 - largestParticleHalfWidth) / 1.075,
+		Math.max(0, actor.width / 2 - largestParticleHalfWidth) / 1.075,
 	);
 	activityParticles.workingTint = palette.accent;
 	activityParticles.lightSurface = readPixiParticleLightSurface(palette);
 	activityParticles.container.blendMode = readPixiParticleBlendMode();
-	activityParticles.container.boundsArea = new Rectangle(0, 0, size, size);
+	activityParticles.container.boundsArea = new Rectangle(0, 0, actor.width, actor.height);
 	for (const [index, { particle }] of activityParticles.particles.entries()) {
 		const particleSize = faceSize * (index % 4 === 0 ? 0.18 : index % 3 === 0 ? 0.15 : 0.11);
 		particle.scaleX = particleSize / Math.max(1, particle.texture.width);
@@ -174,7 +192,7 @@ export const updatePixiTileActorFx = Effect.fn("updatePixiTileActorFx")(function
 		yield* updatePixiTileActorVisualFx({
 			item: visual.item,
 			palette,
-			size,
+			size: faceSize,
 			visual,
 		});
 	}
@@ -206,7 +224,7 @@ export const updatePixiTileActorFx = Effect.fn("updatePixiTileActorFx")(function
 					item,
 					ownerKey: `visual-update:${actor.item.id}:${item.revision}`,
 					palette,
-					size,
+					size: faceSize,
 					textures,
 				}),
 		)
@@ -220,7 +238,7 @@ export const updatePixiTileActorFx = Effect.fn("updatePixiTileActorFx")(function
 				updatePixiTileActorVisualFx({
 					item,
 					palette,
-					size,
+					size: faceSize,
 					visual: actor.currentVisual,
 				}),
 		)

@@ -11,7 +11,9 @@ export interface PixiMainSceneActorStore {
 	readonly readActorFx: (actorId: string) => Effect.Effect<PixiTileActor | null>;
 	readonly readCanonicalItemFx: (actorId: string) => Effect.Effect<TileActorItem | null>;
 	readonly releaseActorFx: (actorId: string) => Effect.Effect<PixiTileActor | null>;
-	readonly replaceCanonicalItemsFx: (items: ReadonlyArray<TileActorItem>) => Effect.Effect<void>;
+	readonly replaceCanonicalItemsFx: (
+		items: ReadonlyArray<TileActorItem>,
+	) => Effect.Effect<ReadonlySet<string>>;
 	readonly setActorFx: (actor: PixiTileActor) => Effect.Effect<void>;
 	readonly closeFx: Effect.Effect<void>;
 }

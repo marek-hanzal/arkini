@@ -46,6 +46,14 @@ export const readPixiTileInteractionClaimsFx = Effect.fn("readPixiTileInteractio
 							}
 						},
 					)
+					.with(
+						{
+							kind: "relocation",
+						},
+						(relocation) => {
+							claims.set(relocation.actorId, "handoff");
+						},
+					)
 					.exhaustive();
 			}
 			return claims;

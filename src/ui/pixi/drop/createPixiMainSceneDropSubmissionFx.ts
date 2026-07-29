@@ -105,7 +105,15 @@ export const createPixiMainSceneDropSubmissionFx = Effect.fn("createPixiMainScen
 				),
 			),
 			submitFx: Effect.fn("PixiMainSceneDropSubmission.submitFx")(
-				({ actor, previewKind, shortcutReceiver, sourceItem, target, targetItem }) =>
+				({
+					actor,
+					previewKind,
+					previewResult,
+					shortcutReceiver,
+					sourceItem,
+					target,
+					targetItem,
+				}) =>
 					Effect.sync(() => {
 						if (closed) return;
 						RendererRuntime.runSync(cursorGrab.finishFx(actor));
@@ -121,11 +129,10 @@ export const createPixiMainSceneDropSubmissionFx = Effect.fn("createPixiMainScen
 						const drop = RendererRuntime.runSync(
 							beginPixiMainSceneDropFx({
 								dropPresentation,
-								previewKind,
+								previewResult,
 								sourceItem,
 								surface,
 								target,
-								targetItem,
 							}),
 						);
 						const optimisticRemoval =
@@ -298,22 +305,15 @@ export const createPixiMainSceneDropSubmissionFx = Effect.fn("createPixiMainScen
 									onCancel: finishTravel,
 									onComplete: finishTravel,
 									ownerKey: `${inventoryShortcutTravelOwnerPrefix}:${actor.instanceId}`,
-									readSize: () =>
+									readTarget: () =>
 										RendererRuntime.runSync(
 											surface.readActorPoseFx(shortcutReceiver.actor.item),
-										)?.size ?? shortcutReceiver.pose.size,
-									readTarget: () => {
-										const pose = RendererRuntime.runSync(
-											surface.readActorPoseFx(shortcutReceiver.actor.item),
-										);
-										return pose === null
-											? null
-											: {
-													x: pose.x,
-													y: pose.y,
-												};
+										),
+									target: {
+										height: shortcutReceiver.pose.size,
+										width: shortcutReceiver.pose.size,
+										...shortcutReceiver.pose,
 									},
-									target: shortcutReceiver.pose,
 								}),
 							);
 						}

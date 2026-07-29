@@ -11,8 +11,7 @@ import type { InputMaterialStorePlanSchema } from "~/engine/input/schema/store/I
 import { isolateStatefulOwnerTransitionFx } from "~/engine/item/fx/isolateStatefulOwnerTransitionFx";
 import { isLineInputClosedFx } from "~/engine/line/fx/input/isLineInputClosedFx";
 import { readItemLineFx } from "~/engine/line/fx/readItemLineFx";
-import { readGridLocationClaimsFx } from "~/engine/location/read/readGridLocationClaimsFx";
-import { readGridLocationKey } from "~/engine/location/read/readGridLocationOccupantsFx";
+import { readGridItemLocationConflictFx } from "~/engine/location/read/readGridItemLocationConflictFx";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 import { reviseRuntimeItemFx } from "~/engine/runtime/fx/reviseRuntimeItemFx";
 import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
@@ -69,15 +68,14 @@ export const settleItemDeliveryFx = Effect.fn("settleItemDeliveryFx")(function* 
 			}
 			const current = delivery.value;
 			if (current.location.phase === "returning") {
-				const claims = yield* readGridLocationClaimsFx({
+				const conflictingClaim = yield* readGridItemLocationConflictFx({
+					excludedItemIds: new Set([
+						current.id,
+					]),
+					item: current.item,
+					location: current.location.origin,
 					runtime,
 				});
-				const conflictingClaim = claims.find(
-					(claim) =>
-						claim.itemId !== current.id &&
-						readGridLocationKey(claim.location) ===
-							readGridLocationKey(current.location.origin),
-				);
 				if (conflictingClaim !== undefined) {
 					return yield* Effect.die(
 						new Error(

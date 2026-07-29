@@ -26,8 +26,15 @@ describe("orderStackItemsFx", () => {
 					runtimeItem("runtime:left", 0),
 				],
 				origin: {
-					x: 1,
-					y: 0,
+					space: 0,
+					anchor: {
+						x: 1,
+						y: 0,
+					},
+					footprint: {
+						width: 1,
+						height: 1,
+					},
 				},
 			}),
 		);

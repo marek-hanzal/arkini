@@ -3,7 +3,7 @@ import { Effect } from "effect";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
-import { readGridLocationKey } from "./readGridLocationOccupantsFx";
+import { readGridItemLocationsFx } from "./readGridItemLocationsFx";
 
 export interface GridLocationClaim {
 	readonly itemId: string;
@@ -29,49 +29,32 @@ export const readGridLocationClaimsFx = Effect.fn("readGridLocationClaimsFx")(fu
 			item.location.scope === LocationScopeEnumSchema.enum.Inventory ||
 			item.location.scope === LocationScopeEnumSchema.enum.Toolbar
 		) {
-			claims.push({
-				itemId: item.id,
-				kind: "occupant",
+			const locations = yield* readGridItemLocationsFx({
+				item: item.item,
 				location: item.location,
 			});
+			for (const location of locations) {
+				claims.push({
+					itemId: item.id,
+					kind: "occupant",
+					location,
+				});
+			}
 			continue;
 		}
 		if (item.location.scope === LocationScopeEnumSchema.enum.Delivery) {
-			claims.push({
-				itemId: item.id,
-				kind: "delivery-origin",
+			const locations = yield* readGridItemLocationsFx({
+				item: item.item,
 				location: item.location.origin,
 			});
+			for (const location of locations) {
+				claims.push({
+					itemId: item.id,
+					kind: "delivery-origin",
+					location,
+				});
+			}
 		}
 	}
 	return claims;
 });
-
-/** Groups canonical occupants and delivery-origin leases by concrete grid cell. */
-export const indexGridLocationClaims = (claims: ReadonlyArray<GridLocationClaim>) => {
-	const claimsByLocation = new Map<string, GridLocationClaim[]>();
-	for (const claim of claims) {
-		const key = readGridLocationKey(claim.location);
-		const existing = claimsByLocation.get(key);
-		if (existing === undefined) {
-			claimsByLocation.set(key, [
-				claim,
-			]);
-		} else {
-			existing.push(claim);
-		}
-	}
-	return claimsByLocation;
-};
-
-/** Reads the first canonical claim at one exact grid cell. */
-export const readGridLocationClaimAt = ({
-	claims,
-	location,
-}: {
-	readonly claims: ReadonlyArray<GridLocationClaim>;
-	readonly location: GridLocationSchema.Type;
-}) => {
-	const key = readGridLocationKey(location);
-	return claims.find((claim) => readGridLocationKey(claim.location) === key);
-};

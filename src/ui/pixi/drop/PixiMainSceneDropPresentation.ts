@@ -26,6 +26,15 @@ export interface PixiMainSceneDropPresentationSnapshot {
 	/** Directly manipulated actors whose next canonical pose should use the release spring. */
 	readonly landingActorIds: ReadonlySet<string>;
 	readonly pendingActorIds: ReadonlySet<string>;
+	readonly relocations: ReadonlyArray<{
+		readonly generation: number;
+		readonly items: ReadonlyArray<{
+			readonly itemId: string;
+			readonly revision: string;
+			readonly previousLocation: TileActorItem["location"];
+			readonly location: TileActorItem["location"];
+		}>;
+	}>;
 	readonly swaps: ReadonlyArray<{
 		readonly candidate: PixiSceneSwapCandidate;
 		readonly generation: number;
@@ -34,10 +43,13 @@ export interface PixiMainSceneDropPresentationSnapshot {
 
 export interface PixiMainSceneDropPresentation {
 	readonly beginFx: (props: {
-		readonly sourceActorId: string;
+		/** Legacy single-source form retained for non-drop presentation callers and fixtures. */
+		readonly sourceActorId?: string;
+		readonly retainedActorIds?: ReadonlySet<string>;
 		readonly swapCandidate: PixiSceneSwapCandidate | null;
 	}) => Effect.Effect<number>;
 	readonly clearSwapFx: (generation: number) => Effect.Effect<void>;
+	readonly clearRelocationsFx: (generation: number) => Effect.Effect<void>;
 	readonly clearFeedbackFx: (generation: number) => Effect.Effect<void>;
 	readonly completeFx: (props: {
 		readonly generation: number;

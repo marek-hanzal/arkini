@@ -32,7 +32,7 @@ describe("ArkiniArkpack", () => {
 		expect(DemoArkpack.descriptor).toMatchObject({
 			packageId: "demo",
 			gameId: "demo",
-			title: "Arkini Trust Demo",
+			title: "Arkini Multi-slot Experiment",
 			trust: {
 				type: "external",
 				reason: "unsigned",

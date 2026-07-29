@@ -4,6 +4,7 @@ import { match } from "ts-pattern";
 import type { QuerySchema } from "~/engine/query/schema/QuerySchema";
 import type { BoardLocationSchema } from "~/engine/location/schema/BoardLocationSchema";
 import { QueryScopeEnumSchema } from "~/engine/query/schema/QueryScopeEnumSchema";
+import type { BoardRectangleSchema } from "~/engine/grid/schema/BoardRectangleSchema";
 
 import { queryAnyFx } from "./queryAnyFx";
 import { queryBoardFx } from "./queryBoardFx";
@@ -14,6 +15,7 @@ import { queryUniverseFx } from "./queryUniverseFx";
 export namespace queryFx {
 	export interface Props {
 		origin: BoardLocationSchema.Type;
+		originRectangle?: BoardRectangleSchema.Type;
 		query: QuerySchema.Type;
 	}
 }
@@ -29,9 +31,10 @@ export const queryFx = Effect.fn("queryFx")(function* (props: queryFx.Props) {
 					scope: QueryScopeEnumSchema.enum.Board,
 				},
 			},
-			({ origin, query }) => {
+			({ origin, originRectangle, query }) => {
 				return queryBoardFx({
 					origin,
+					originRectangle,
 					query,
 				});
 			},

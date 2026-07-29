@@ -10,6 +10,7 @@ import { startPixiTileActorFadeInFx } from "~/ui/pixi/animation/startPixiTileAct
 import type { PixiScenePalette } from "~/ui/pixi/appearance/PixiScenePalette";
 import type { PixiTileMagneticField } from "~/ui/pixi/magnet/PixiTileMagneticField";
 import { readPixiTileMotionOriginFx } from "~/ui/pixi/motion/readPixiTileMotionOriginFx";
+import { runPixiRelocationMotionFx } from "~/ui/pixi/motion/runPixiRelocationMotionFx";
 import { runPixiInputMotionFx } from "~/ui/pixi/motion/runPixiInputMotionFx";
 import { runPixiSpawnMotionFx } from "~/ui/pixi/motion/runPixiSpawnMotionFx";
 import { runPixiStackMotionFx } from "~/ui/pixi/motion/runPixiStackMotionFx";
@@ -63,10 +64,11 @@ export const runPixiTileMotionCueFx = Effect.fn("runPixiTileMotionCueFx")(functi
 	surface,
 	textures,
 }: runPixiTileMotionCueFx.Props) {
-	const target = yield* surface.readLocationPoseFx(cue.targetLocation);
+	const target = yield* surface.readLocationPoseFx(cue.targetLocation, cue.targetFootprint);
 	const originActor = actorStore.actors.get(cue.originActorId) ?? null;
 	const origin = yield* readPixiTileMotionOriginFx({
 		originActor,
+		footprint: cue.kind === "spawn" ? undefined : cue.originFootprint,
 		originLocation: cue.originLocation,
 		surface,
 	});
@@ -169,6 +171,26 @@ export const runPixiTileMotionCueFx = Effect.fn("runPixiTileMotionCueFx")(functi
 									target,
 								}),
 						)
+						.with(
+							{
+								kind: "relocation",
+							},
+							(relocation) =>
+								runPixiRelocationMotionFx({
+									actorStore,
+									animator,
+									cue: relocation,
+									cueKey,
+									delayMs,
+									magneticField,
+									onComplete,
+									onLegSettled: onSwapLegSettled,
+									onLegStarted: onSwapLegStarted,
+									origin,
+									surface,
+									target,
+								}),
+						)
 						.exhaustive();
 				}),
 		)
@@ -192,7 +214,12 @@ export const runPixiTileMotionCueFx = Effect.fn("runPixiTileMotionCueFx")(functi
 									animator.setFx({
 										actor,
 										channel: "pose",
-										scale: 1,
+										scaleX:
+											(target.width || target.size) /
+											Math.max(1, actor.width || actor.size),
+										scaleY:
+											(target.height || target.size) /
+											Math.max(1, actor.height || actor.size),
 										x: target.x,
 										y: target.y,
 									}),
@@ -221,6 +248,12 @@ export const runPixiTileMotionCueFx = Effect.fn("runPixiTileMotionCueFx")(functi
 						.with(
 							{
 								kind: "swap",
+							},
+							() => {},
+						)
+						.with(
+							{
+								kind: "relocation",
 							},
 							() => {},
 						)

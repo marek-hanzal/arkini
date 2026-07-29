@@ -11,8 +11,10 @@ const drawRoundedOuterSlotPath = (
 ) => {
 	const left = surface.x + slot.x * surface.cellSize;
 	const top = surface.y + slot.y * surface.cellSize;
-	const right = left + surface.cellSize;
-	const bottom = top + surface.cellSize;
+	const width = (slot.width ?? 1) * surface.cellSize;
+	const height = (slot.height ?? 1) * surface.cellSize;
+	const right = left + width;
+	const bottom = top + height;
 	const radius = readPixiGridSurfaceRadius(surface);
 	const isLeft = slot.x === 0;
 	const isRight = slot.x === surface.columns - 1;
@@ -29,7 +31,7 @@ const drawRoundedOuterSlotPath = (
 		bottomRightRadius === 0 &&
 		bottomLeftRadius === 0
 	) {
-		return graphics.rect(left, top, surface.cellSize, surface.cellSize);
+		return graphics.rect(left, top, width, height);
 	}
 
 	return graphics
@@ -49,7 +51,13 @@ export namespace drawPixiGridDropFeedbackFx {
 	export interface Props {
 		readonly color: number;
 		readonly graphics: Graphics;
+		readonly markers?: ReadonlyArray<{
+			readonly color: number;
+			readonly slot: NonNullable<Props["slot"]>;
+		}>;
 		readonly slot: {
+			readonly height?: number;
+			readonly width?: number;
 			readonly x: number;
 			readonly y: number;
 		} | null;
@@ -59,19 +67,26 @@ export namespace drawPixiGridDropFeedbackFx {
 
 /** Paints one accepted or rejected slot marker without owning preview semantics. */
 export const drawPixiGridDropFeedbackFx = Effect.fn("drawPixiGridDropFeedbackFx")(
-	({ color, graphics, slot, surface }: drawPixiGridDropFeedbackFx.Props) =>
+	({ color, graphics, markers, slot, surface }: drawPixiGridDropFeedbackFx.Props) =>
 		Effect.sync(() => {
 			graphics.clear();
 			if (slot === null || surface === null) return;
-			drawRoundedOuterSlotPath(graphics, surface, slot)
-				.fill({
-					alpha: 0.16,
+			for (const marker of markers ?? [
+				{
 					color,
-				})
-				.stroke({
-					alpha: 0.95,
-					color,
-					width: Math.max(2, surface.cellSize * 0.025),
-				});
+					slot,
+				},
+			]) {
+				drawRoundedOuterSlotPath(graphics, surface, marker.slot)
+					.fill({
+						alpha: 0.16,
+						color: marker.color,
+					})
+					.stroke({
+						alpha: 0.95,
+						color: marker.color,
+						width: Math.max(2, surface.cellSize * 0.025),
+					});
+			}
 		}),
 );

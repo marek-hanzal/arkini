@@ -78,6 +78,19 @@ const rangeMaterialInputConfig = GameConfigSchema.parse({
 		},
 	},
 });
+const wideDeliveryConfig = GameConfigSchema.parse({
+	...inputRuntimeTestConfig,
+	items: {
+		...inputRuntimeTestConfig.items,
+		water: {
+			...inputRuntimeTestConfig.items.water,
+			footprint: {
+				width: 2,
+				height: 2,
+			},
+		},
+	},
+});
 
 const spawnOwnerAndWaterFx = Effect.gen(function* () {
 	yield* spawnItemFx({
@@ -370,6 +383,115 @@ describe("settleItemDeliveryFx", () => {
 				_tag: "LocationOccupiedError",
 				itemId: "runtime:water",
 				location: sourceLocation(1),
+			});
+		}
+	});
+
+	it("leases and reclaims every authored Board footprint cell", () => {
+		const leasedCell = {
+			scope: "board" as const,
+			space: 0,
+			position: {
+				x: 2,
+				y: 1,
+			},
+		};
+		const result = Effect.runSync(
+			Effect.gen(function* () {
+				yield* spawnOwnerAndWaterFx;
+				yield* autofillLineInputsFx({
+					ownerItemId,
+					lineId,
+				});
+				const conflictingSpawn = yield* Effect.result(
+					spawnItemFx({
+						id: "runtime:spawn-intruder",
+						itemId: "stone",
+						location: leasedCell,
+						quantity: 1,
+					}),
+				);
+				const mover = yield* spawnItemFx({
+					id: "runtime:move-intruder",
+					itemId: "stone",
+					location: sourceLocation(4),
+					quantity: 1,
+				});
+				const conflictingMove = yield* Effect.result(
+					moveItemFx({
+						itemId: mover.id,
+						location: leasedCell,
+						revision: mover.revision,
+					}),
+				);
+				yield* settleItemDeliveryFx({
+					itemId: "runtime:water",
+					generation: 0,
+				});
+				const returned = yield* settleItemDeliveryFx({
+					itemId: "runtime:water",
+					generation: 1,
+				});
+				return {
+					conflictingMove,
+					conflictingSpawn,
+					returned,
+					runtime: yield* readRuntimeFx(),
+				};
+			}).pipe(
+				useGameFx({
+					config: wideDeliveryConfig,
+				}),
+			),
+		);
+
+		expect(Result.isFailure(result.conflictingSpawn)).toBe(true);
+		if (Result.isFailure(result.conflictingSpawn)) {
+			expect(result.conflictingSpawn.failure).toMatchObject({
+				_tag: "LocationOccupiedError",
+				itemId: "runtime:water",
+				location: leasedCell,
+			});
+		}
+		expect(Result.isFailure(result.conflictingMove)).toBe(true);
+		if (Result.isFailure(result.conflictingMove)) {
+			expect(result.conflictingMove.failure).toMatchObject({
+				_tag: "LocationOccupiedError",
+				itemId: "runtime:water",
+				location: leasedCell,
+			});
+		}
+		expect(result.returned).toEqual({
+			acceptedQuantity: 0,
+			status: "returned",
+		});
+		expect(result.runtime.items.find(({ id }) => id === "runtime:water")).toMatchObject({
+			location: sourceLocation(1),
+		});
+		const postReturnSpawn = Effect.runSync(
+			spawnItemFx({
+				id: "runtime:post-return-intruder",
+				itemId: "stone",
+				location: leasedCell,
+				quantity: 1,
+			}).pipe(
+				Effect.result,
+				useGameFx({
+					config: wideDeliveryConfig,
+					state: Effect.runSync(
+						fromRuntimeFx({
+							runtime: result.runtime,
+						}),
+					),
+				}),
+			),
+		);
+		expect(Result.isFailure(postReturnSpawn)).toBe(true);
+		if (Result.isFailure(postReturnSpawn)) {
+			expect(postReturnSpawn.failure).toMatchObject({
+				_tag: "LocationOccupiedError",
+				itemId: "runtime:water",
+				location: leasedCell,
 			});
 		}
 	});

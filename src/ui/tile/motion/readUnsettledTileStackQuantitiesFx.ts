@@ -52,6 +52,12 @@ export const readUnsettledTileStackQuantitiesFx = Effect.fn("readUnsettledTileSt
 						},
 						() => Effect.succeed(quantities),
 					)
+					.with(
+						{
+							kind: "relocation",
+						},
+						() => Effect.succeed(quantities),
+					)
 					.exhaustive(),
 		),
 );

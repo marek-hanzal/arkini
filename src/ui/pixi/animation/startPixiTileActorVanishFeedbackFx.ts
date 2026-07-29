@@ -35,8 +35,12 @@ export const startPixiTileActorVanishFeedbackFx = Effect.fn("startPixiTileActorV
 			channel: "pose",
 			durationMs: pixiTileActorRemovalFeedbackDurationMs,
 			toScale,
-			toX: actor.container.x + (actor.size / 2 - actor.container.pivot.x) * scaleDelta,
-			toY: actor.container.y + (actor.size / 2 - actor.container.pivot.y) * scaleDelta,
+			toX:
+				actor.container.x +
+				((actor.width ?? actor.size) / 2 - actor.container.pivot.x) * scaleDelta,
+			toY:
+				actor.container.y +
+				((actor.height ?? actor.size) / 2 - actor.container.pivot.y) * scaleDelta,
 		});
 		yield* startPixiTileActorRemovalFeedbackFx({
 			actor,

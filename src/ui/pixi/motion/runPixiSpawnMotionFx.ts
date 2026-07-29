@@ -7,8 +7,7 @@ import type { PixiActorAnimator } from "~/ui/pixi/animation/PixiActorAnimator";
 import { readPixiTileTravelDurationMsFx } from "~/ui/pixi/animation/readPixiTileTravelDurationMsFx";
 import { startPixiTileActorFadeInFx } from "~/ui/pixi/animation/startPixiTileActorFadeInFx";
 import type { PixiTileMagneticField } from "~/ui/pixi/magnet/PixiTileMagneticField";
-import { createPixiTileMotionMagneticProjectorFx } from "~/ui/pixi/motion/createPixiTileMotionMagneticProjectorFx";
-import { createPixiTileMotionPoseSamplerFx } from "~/ui/pixi/motion/createPixiTileMotionPoseSamplerFx";
+import { createPixiTileMotionTravelFx } from "~/ui/pixi/motion/createPixiTileMotionTravelFx";
 import { chasePixiTileMotionTargetFx } from "~/ui/pixi/motion/chasePixiTileMotionTargetFx";
 import type { PixiMainSceneSurface } from "~/ui/pixi/scene/PixiMainSceneSurface";
 import type { PixiTileActorPose } from "~/ui/pixi/scene/PixiTileActorPose";
@@ -50,7 +49,8 @@ export const runPixiSpawnMotionFx = Effect.fn("runPixiSpawnMotionFx")(function* 
 	yield* animator.setFx({
 		actor,
 		channel: "pose",
-		scale: origin.size / Math.max(1, actor.size),
+		scaleX: (origin.width || origin.size) / Math.max(1, actor.width || actor.size),
+		scaleY: (origin.height || origin.size) / Math.max(1, actor.height || actor.size),
 		x: origin.x,
 		y: origin.y,
 	});
@@ -66,22 +66,13 @@ export const runPixiSpawnMotionFx = Effect.fn("runPixiSpawnMotionFx")(function* 
 		toX: target.x,
 		toY: target.y,
 	});
-	const poseSampler = yield* createPixiTileMotionPoseSamplerFx({
-		actorBaseSize: actor.size,
-		from: {
-			scale: actor.container.scale.x,
-			x: actor.container.x,
-			y: actor.container.y,
-		},
+	const { magneticProjector, poseSampler } = yield* createPixiTileMotionTravelFx({
+		actor,
+		magneticField,
 		surface,
 		target,
+		targetFootprint: cue.targetFootprint,
 		targetLocation: cue.targetLocation,
-	});
-	const magneticProjector = yield* createPixiTileMotionMagneticProjectorFx({
-		actor,
-		attractedActorId: null,
-		eligibleAttractionActorIds: new Set(),
-		magneticField,
 	});
 	yield* animator.animateFx({
 		actor,
@@ -93,8 +84,9 @@ export const runPixiSpawnMotionFx = Effect.fn("runPixiSpawnMotionFx")(function* 
 			const settle = () => {
 				magneticProjector.release();
 				const currentTarget =
-					RendererRuntime.runSync(surface.readLocationPoseFx(cue.targetLocation)) ??
-					target;
+					RendererRuntime.runSync(
+						surface.readLocationPoseFx(cue.targetLocation, cue.targetFootprint),
+					) ?? target;
 				if (!actor.container.destroyed) {
 					currentTarget.layer.addChild(actor.container);
 				}
@@ -113,6 +105,7 @@ export const runPixiSpawnMotionFx = Effect.fn("runPixiSpawnMotionFx")(function* 
 					onSettled: settle,
 					ownerKey: `motion:${cueKey}`,
 					surface,
+					targetFootprint: cue.targetFootprint,
 					targetLocation: cue.targetLocation,
 				}),
 			);

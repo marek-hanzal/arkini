@@ -104,8 +104,9 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 			const targetItem =
 				target === null ? null : RendererRuntime.runSync(surface.readOccupantFx(target));
 			let kind: readTileDropPreviewFx.Result["kind"] | null = null;
+			let previewResult: readTileDropPreviewFx.Result | null = null;
 			try {
-				kind = RendererRuntime.runSync(
+				previewResult = RendererRuntime.runSync(
 					readTileDropPreviewFx({
 						game,
 						sourceItemId: sourceItem.id,
@@ -113,15 +114,29 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 						sourceRevision: sourceItem.revision,
 						target: RendererRuntime.runSync(surface.readCommandTargetFx(target)),
 					}),
-				).kind;
+				);
+				kind = previewResult.kind;
 			} catch (cause) {
 				game.reportCriticalFailure("game-presentation", cause);
 			}
 			return {
 				kind,
+				previewResult,
 				targetItem,
 			};
 		};
+
+		const applyGrabOffset = (
+			drag: PixiMainSceneActiveDrag,
+			target: PixiSceneDropTarget | null,
+		): PixiSceneDropTarget | null =>
+			target === null
+				? null
+				: {
+						...target,
+						x: target.hitX - drag.grabCellX,
+						y: target.hitY - drag.grabCellY,
+					};
 
 		const refreshEligibleAttractionActorIds = (
 			drag: PixiMainSceneActiveDrag,
@@ -152,6 +167,7 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 				drag.target = target;
 				drag.targetItem = null;
 				drag.previewKind = null;
+				drag.previewResult = null;
 				RendererRuntime.runSync(surface.renderDropFeedbackFx(null, null));
 				return null;
 			}
@@ -159,7 +175,9 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 				!force &&
 				drag.target?.layout.kind === target?.layout.kind &&
 				drag.target?.x === target?.x &&
-				drag.target?.y === target?.y
+				drag.target?.y === target?.y &&
+				drag.target?.hitX === target?.hitX &&
+				drag.target?.hitY === target?.hitY
 			) {
 				return sourceItem;
 			}
@@ -167,6 +185,7 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 			drag.target = target;
 			drag.targetItem = facts.targetItem;
 			drag.previewKind = facts.kind;
+			drag.previewResult = facts.previewResult;
 			drag.actor.container.cursor = RendererRuntime.runSync(
 				readPixiTileActorCursorFx({
 					phase: "dragging",
@@ -174,7 +193,7 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 					running: sourceItem.running,
 				}),
 			);
-			RendererRuntime.runSync(surface.renderDropFeedbackFx(target, facts.kind));
+			RendererRuntime.runSync(surface.renderDropFeedbackFx(target, facts.previewResult));
 			return sourceItem;
 		};
 
@@ -331,7 +350,12 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 			);
 			const sourceItem = previewTarget(
 				drag,
-				RendererRuntime.runSync(surface.readDropTargetFx(event.global.x, event.global.y)),
+				applyGrabOffset(
+					drag,
+					RendererRuntime.runSync(
+						surface.readDropTargetFx(event.global.x, event.global.y),
+					),
+				),
 			);
 			if (sourceItem === null) {
 				cancelDrag(drag);
@@ -405,8 +429,9 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 					});
 				return;
 			}
-			const target = RendererRuntime.runSync(
-				surface.readDropTargetFx(event.global.x, event.global.y),
+			const target = applyGrabOffset(
+				drag,
+				RendererRuntime.runSync(surface.readDropTargetFx(event.global.x, event.global.y)),
 			);
 			// Canonical state may have changed beneath a held pointer while the target
 			// coordinates stayed stable. Freeze fresh release-time preview facts.
@@ -420,6 +445,7 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 				dropSubmission.submitFx({
 					actor: drag.actor,
 					previewKind: drag.previewKind,
+					previewResult: drag.previewResult,
 					sourceItem,
 					target,
 					targetItem: drag.targetItem,
@@ -482,11 +508,13 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 			drag.target = target;
 			drag.targetItem = facts.targetItem;
 			drag.previewKind = facts.kind;
+			drag.previewResult = facts.previewResult;
 			activeDrag = null;
 			RendererRuntime.runSync(
 				dropSubmission.submitFx({
 					actor: drag.actor,
 					previewKind: drag.previewKind,
+					previewResult: drag.previewResult,
 					sourceItem,
 					shortcutReceiver: {
 						actor: inventoryActor,
@@ -600,9 +628,34 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 							pointerId: event.pointerId,
 							pressX: event.global.x,
 							pressY: event.global.y,
+							grabCellX: Math.max(
+								0,
+								Math.min(
+									actor.item.footprint.width - 1,
+									Math.floor(
+										((event.global.x - actor.container.x) /
+											Math.max(Number.EPSILON, actor.container.scale.x) +
+											actor.container.pivot.x) /
+											actor.size,
+									),
+								),
+							),
+							grabCellY: Math.max(
+								0,
+								Math.min(
+									actor.item.footprint.height - 1,
+									Math.floor(
+										((event.global.y - actor.container.y) /
+											Math.max(Number.EPSILON, actor.container.scale.y) +
+											actor.container.pivot.y) /
+											actor.size,
+									),
+								),
+							),
 							lastPointerX: event.global.x,
 							lastPointerY: event.global.y,
 							previewKind: null,
+							previewResult: null,
 							mode: gestureMode,
 							phase: "pressed",
 							sourceItem: actor.item,

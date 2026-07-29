@@ -8,7 +8,18 @@ export interface PixiGridDropFeedback {
 	readonly closeFx: Effect.Effect<void>;
 	readonly renderFx: (props: {
 		readonly color: number;
+		readonly markers?: ReadonlyArray<{
+			readonly color: number;
+			readonly slot: {
+				readonly height?: number;
+				readonly width?: number;
+				readonly x: number;
+				readonly y: number;
+			};
+		}>;
 		readonly slot: {
+			readonly height?: number;
+			readonly width?: number;
 			readonly x: number;
 			readonly y: number;
 		} | null;

@@ -59,7 +59,8 @@ export const createPixiCursorGrabMotionFx = Effect.fn("createPixiCursorGrabMotio
 					animator.setFx({
 						actor,
 						channel: "pose",
-						scale: actor.container.scale.x,
+						scaleX: actor.container.scale.x,
+						scaleY: actor.container.scale.y,
 						x: actor.container.x - actor.container.pivot.x * actor.container.scale.x,
 						y: actor.container.y - actor.container.pivot.y * actor.container.scale.y,
 					}),
@@ -89,8 +90,8 @@ export const createPixiCursorGrabMotionFx = Effect.fn("createPixiCursorGrabMotio
 						const localPointerY =
 							(pointer.y - actor.container.y) /
 							Math.max(Number.EPSILON, actor.container.scale.y);
-						const targetPivotX = actor.size / 2 - localPointerX;
-						const targetPivotY = actor.size / 2 - localPointerY;
+						const targetPivotX = (actor.width ?? actor.size) / 2 - localPointerX;
+						const targetPivotY = (actor.height ?? actor.size) / 2 - localPointerY;
 						const x = RendererRuntime.runSync(
 							animationDriver.createSpringFx({
 								initialValue: actor.container.pivot.x,

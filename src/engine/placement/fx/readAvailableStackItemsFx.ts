@@ -27,9 +27,17 @@ export const readAvailableStackItemsFx = Effect.fn("readAvailableStackItemsFx")(
 		items: gridItems,
 		locations,
 	});
-	const candidates = occupants
-		.flatMap((entry) => entry.items)
-		.filter((item) => item.item.id === itemId && item.quantity < item.item.maxStackSize);
+	const candidates = [
+		...new Map(
+			occupants
+				.flatMap((entry) => entry.items)
+				.filter((item) => item.item.id === itemId && item.quantity < item.item.maxStackSize)
+				.map((item) => [
+					item.id,
+					item,
+				]),
+		).values(),
+	];
 	const purity = yield* Effect.forEach(candidates, (item) =>
 		isItemPureFx({
 			item,

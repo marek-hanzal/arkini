@@ -18,11 +18,13 @@ import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { applyPlacementPlanFx } from "./applyPlacementPlanFx";
 import { planDropPlacementFx } from "./planDropPlacementFx";
 import { readRuntimeItemDropLocationFx } from "./readRuntimeItemDropLocationFx";
+import type { BoardRectangleSchema } from "~/engine/grid/schema/BoardRectangleSchema";
 
 export namespace placeRuntimeItemFx {
 	export interface Props {
 		itemId: IdSchema.Type;
 		origin: BoardLocationSchema.Type;
+		originRectangle?: BoardRectangleSchema.Type;
 		originItemId: IdSchema.Type;
 		runtime: RuntimeSchema.Type;
 	}
@@ -40,6 +42,7 @@ export namespace placeRuntimeItemFx {
 export const placeRuntimeItemFx = Effect.fn("placeRuntimeItemFx")(function* ({
 	itemId,
 	origin,
+	originRectangle,
 	originItemId,
 	runtime,
 }: placeRuntimeItemFx.Props) {
@@ -89,6 +92,7 @@ export const placeRuntimeItemFx = Effect.fn("placeRuntimeItemFx")(function* ({
 				quantity: item.quantity,
 			},
 			origin,
+			originRectangle,
 			runtime: detachedRuntime,
 		});
 		const [placement, placedRuntime] = yield* applyPlacementPlanFx({
@@ -151,6 +155,7 @@ export const placeRuntimeItemFx = Effect.fn("placeRuntimeItemFx")(function* ({
 	const location = yield* readRuntimeItemDropLocationFx({
 		item,
 		origin,
+		originRectangle,
 		runtime: detachedRuntime,
 	});
 	const placedItem = yield* reviseRuntimeItemFx({

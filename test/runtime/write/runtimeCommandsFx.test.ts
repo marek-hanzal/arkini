@@ -64,6 +64,21 @@ const config = GameConfigSchema.parse({
 			maxStackSize: 10,
 			type: "simple",
 		},
+		inventoryStone: {
+			id: "inventoryStone",
+			title: "Inventory stone",
+			description: "A stone constrained to Inventory.",
+			asset: {
+				source: [
+					"asset:stone",
+				],
+			},
+			tags: [],
+			categoryId: "resource",
+			scope: "inventory",
+			maxStackSize: 10,
+			type: "simple",
+		},
 	},
 });
 
@@ -194,6 +209,119 @@ describe("runtime commands", () => {
 		expect(result.runtime.items).toEqual([
 			result.item,
 		]);
+	});
+
+	it("relocates a scope-constrained cross-surface swap target through allowed storage fallback", () => {
+		const result = Effect.runSync(
+			Effect.gen(function* () {
+				const source = yield* spawnItemFx({
+					id: "runtime:log",
+					itemId: "log",
+					location: boardA,
+					quantity: 1,
+				});
+				const target = yield* spawnItemFx({
+					id: "runtime:inventory-stone",
+					itemId: "inventoryStone",
+					location: inventoryA,
+					quantity: 1,
+				});
+				const swapped = yield* swapItemsFx({
+					destinationLocation: inventoryA,
+					firstItemId: source.id,
+					firstItemRevision: source.revision,
+					secondItemId: target.id,
+					secondItemRevision: target.revision,
+				});
+				return {
+					runtime: yield* readRuntimeFx(),
+					swapped,
+				};
+			}).pipe(
+				useGameFx({
+					config,
+				}),
+			),
+		);
+
+		expect(result.swapped.first.location).toEqual(inventoryA);
+		expect(result.swapped.second.location).toEqual({
+			scope: "inventory",
+			position: {
+				x: 1,
+				y: 0,
+			},
+		});
+		expect(
+			result.runtime.items.find(({ id }) => id === result.swapped.second.id)?.location,
+		).toEqual(result.swapped.second.location);
+	});
+
+	it("rejects a cross-surface swap atomically when no allowed relocation candidate remains", () => {
+		const result = Effect.runSync(
+			Effect.gen(function* () {
+				const source = yield* spawnItemFx({
+					id: "runtime:log",
+					itemId: "log",
+					location: boardA,
+					quantity: 1,
+				});
+				const target = yield* spawnItemFx({
+					id: "runtime:inventory-stone",
+					itemId: "inventoryStone",
+					location: inventoryA,
+					quantity: 1,
+				});
+				let blockerIndex = 0;
+				for (let y = 0; y < config.meta.inventory.height; y += 1) {
+					for (let x = 0; x < config.meta.inventory.width; x += 1) {
+						if (x === inventoryA.position.x && y === inventoryA.position.y) continue;
+						yield* spawnItemFx({
+							id: `runtime:inventory-blocker:${blockerIndex}`,
+							itemId: "stone",
+							location: {
+								scope: "inventory",
+								position: {
+									x,
+									y,
+								},
+							},
+							quantity: 1,
+						});
+						blockerIndex += 1;
+					}
+				}
+				const before = yield* readRuntimeFx();
+				const swapped = yield* Effect.result(
+					swapItemsFx({
+						destinationLocation: inventoryA,
+						firstItemId: source.id,
+						firstItemRevision: source.revision,
+						secondItemId: target.id,
+						secondItemRevision: target.revision,
+					}),
+				);
+				return {
+					after: yield* readRuntimeFx(),
+					before,
+					swapped,
+				};
+			}).pipe(
+				useGameFx({
+					config,
+				}),
+			),
+		);
+
+		expect(Result.isFailure(result.swapped)).toBe(true);
+		if (Result.isFailure(result.swapped)) {
+			expect(result.swapped.failure).toMatchObject({
+				_tag: "PlacementUnavailableError",
+				itemId: "inventoryStone",
+				reason: "inventory:full",
+			});
+		}
+		expect(result.after).toEqual(result.before);
 	});
 
 	it("rejects duplicate identities and occupied destinations without partial writes", () => {

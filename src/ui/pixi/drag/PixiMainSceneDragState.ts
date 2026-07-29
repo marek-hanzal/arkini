@@ -10,6 +10,8 @@ interface PixiMainSceneActiveDragBase {
 	readonly pointerId: number;
 	readonly pressX: number;
 	readonly pressY: number;
+	readonly grabCellX: number;
+	readonly grabCellY: number;
 	readonly sourceItem: TileActorItem;
 	readonly startX: number;
 	readonly startY: number;
@@ -17,6 +19,7 @@ interface PixiMainSceneActiveDragBase {
 	lastPointerX: number;
 	lastPointerY: number;
 	previewKind: readTileDropPreviewFx.Result["kind"] | null;
+	previewResult: readTileDropPreviewFx.Result | null;
 	target: PixiSceneDropTarget | null;
 	targetItem: TileActorItem | null;
 }

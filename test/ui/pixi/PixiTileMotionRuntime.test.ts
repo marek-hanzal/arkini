@@ -31,19 +31,14 @@ import { finalizePixiTileMotionActorsFx } from "~/ui/pixi/motion/finalizePixiTil
 import { readPixiTileMotionOriginFx } from "~/ui/pixi/motion/readPixiTileMotionOriginFx";
 import { runPixiInputMotionFx } from "~/ui/pixi/motion/runPixiInputMotionFx";
 import type { PixiApplicationOwner } from "~/ui/pixi/runtime/PixiApplicationOwner";
+import type { PixiTextureStore } from "~/ui/pixi/runtime/createPixiTextureStoreFx";
 import type { PixiMainSceneSurface } from "~/ui/pixi/scene/PixiMainSceneSurface";
 
 vi.mock("~/ui/pixi/actor/createPixiTileActorFx", async () => {
 	const { Effect: EffectModule } = await import("effect");
 	const { Container: PixiContainer } = await import("pixi.js");
 	return {
-		createPixiTileActorFx: ({
-			item,
-		}: {
-			readonly item: {
-				readonly id: string;
-			};
-		}) => {
+		createPixiTileActorFx: ({ item }: { readonly item: TileActorItem }) => {
 			const visual = {
 				container: new PixiContainer(),
 				item,
@@ -96,6 +91,8 @@ vi.mock("~/ui/pixi/actor/createPixiTileActorFx", async () => {
 				onPointerDown: null,
 				pendingVisual: null,
 				size: 80,
+				height: 80 * item.footprint.height,
+				width: 80 * item.footprint.width,
 				visualLayer: new PixiContainer(),
 				visuals: new Set([
 					visual,
@@ -121,6 +118,8 @@ vi.mock("~/ui/pixi/actor/updatePixiTileActorFx", async () => {
 			EffectModule.sync(() => {
 				actor.item = item;
 				actor.size = size;
+				actor.height = size * item.footprint.height;
+				actor.width = size * item.footprint.width;
 			}),
 	};
 });
@@ -148,11 +147,16 @@ const secondBoardLocation = {
 		y: 0,
 	},
 };
+const unitFootprint = {
+	height: 1,
+	width: 1,
+} as const;
 
 const createItem = (
 	id: string,
 	location: TileActorItem["location"] = firstBoardLocation,
 ): TileActorItem => ({
+	footprint: unitFootprint,
 	id,
 	itemId: id,
 	itemType: "simple",
@@ -224,6 +228,8 @@ const createActor = (id: string) => {
 		onPointerDown: null,
 		pendingVisual: null,
 		size: 80,
+		width: 80,
+		height: 80,
 		visualLayer: new Container(),
 		visuals: new Set([
 			visual,
@@ -236,7 +242,16 @@ const applyPresentationWrite = (write: PixiActorPresentationWrite) => {
 	switch (write.channel) {
 		case "pose":
 			write.actor.container.position.set(write.x, write.y);
-			if (write.scale !== undefined) write.actor.container.scale.set(write.scale);
+			if (
+				write.scale !== undefined ||
+				write.scaleX !== undefined ||
+				write.scaleY !== undefined
+			) {
+				write.actor.container.scale.set(
+					write.scaleX ?? write.scale ?? write.actor.container.scale.x,
+					write.scaleY ?? write.scale ?? write.actor.container.scale.y,
+				);
+			}
 			return;
 		case "lifecycle-opacity":
 			write.actor.container.alpha = write.alpha;
@@ -338,6 +353,12 @@ const samplePoseAnimation = (
 	if (pose === undefined) throw new Error("Expected a semantic pose sampler.");
 	animation.actor.container.position.set(pose.x, pose.y);
 	if (pose.scale !== undefined) animation.actor.container.scale.set(pose.scale);
+	if (pose.scaleX !== undefined || pose.scaleY !== undefined) {
+		animation.actor.container.scale.set(
+			pose.scaleX ?? animation.actor.container.scale.x,
+			pose.scaleY ?? animation.actor.container.scale.y,
+		);
+	}
 	return pose;
 };
 
@@ -471,9 +492,17 @@ const createSwapHarness = ({
 		stepX: 100,
 		y: 40,
 	};
-	const readPose = (location: TileActorItem["location"]) => ({
+	const readPose = (
+		location: TileActorItem["location"],
+		footprint = {
+			height: 1,
+			width: 1,
+		},
+	) => ({
 		layer: transientActorLayer,
 		size: geometry.size,
+		width: geometry.size * footprint.width,
+		height: geometry.size * footprint.height,
 		x: location.position.x * geometry.stepX,
 		y: geometry.y,
 	});
@@ -526,9 +555,12 @@ const createSwapHarness = ({
 			}),
 			readPalette: () => ({}) as PixiScenePalette,
 			surface: {
-				readActorPoseFx: (item: TileActorItem) => Effect.succeed(readPose(item.location)),
-				readLocationPoseFx: (location: TileActorItem["location"]) =>
-					Effect.succeed(readPose(location)),
+				readActorPoseFx: (item: TileActorItem) =>
+					Effect.succeed(readPose(item.location, item.footprint)),
+				readLocationPoseFx: (
+					location: TileActorItem["location"],
+					footprint?: TileActorItem["footprint"],
+				) => Effect.succeed(readPose(location, footprint)),
 				transientActorLayer,
 			} as unknown as PixiMainSceneSurface,
 			textures: {} as never,
@@ -537,12 +569,16 @@ const createSwapHarness = ({
 	const cue = {
 		actorId: target.item.id,
 		counterpartActorId: source.item.id,
+		counterpartOriginFootprint: source.item.footprint,
+		counterpartTargetFootprint: source.item.footprint,
 		eventIndex: 0,
 		kind: "swap",
 		originActorId: target.item.id,
+		originFootprint: target.item.footprint,
 		originLocation: secondBoardLocation,
 		sequence: 9,
 		staggerIndex: 0,
+		targetFootprint: target.item.footprint,
 		targetLocation: firstBoardLocation,
 	} satisfies TileMotionCue;
 	return {
@@ -563,11 +599,21 @@ const createSwapHarness = ({
 	};
 };
 
-const createSpawnHarness = () => {
+const createSpawnHarness = (
+	spawnFootprint: TileActorItem["footprint"] = {
+		height: 1,
+		width: 1,
+	},
+) => {
 	const blocker = createActor("runtime:spawn-blocker");
 	const spawned = createActor("runtime:spawn-target");
 	blocker.item = createItem(blocker.item.id, secondBoardLocation);
-	spawned.item = createItem(spawned.item.id, firstBoardLocation);
+	spawned.item = {
+		...createItem(spawned.item.id, firstBoardLocation),
+		footprint: spawnFootprint,
+	};
+	spawned.width = spawned.size * spawnFootprint.width;
+	spawned.height = spawned.size * spawnFootprint.height;
 	blocker.container.position.set(200, 40);
 	spawned.container.position.set(40, 60);
 	const actors = new Map([
@@ -598,9 +644,18 @@ const createSpawnHarness = () => {
 	}> = [];
 	const magneticUpdates: PixiTileMagneticFieldSample[] = [];
 	const transientActorLayer = new Container();
-	const readPose = (location: TileActorItem["location"]) => ({
+	let cellSize = 80;
+	const readPose = (
+		location: TileActorItem["location"],
+		footprint: TileActorItem["footprint"] = {
+			height: 1,
+			width: 1,
+		},
+	) => ({
+		height: cellSize * footprint.height,
 		layer: transientActorLayer,
-		size: 80,
+		size: cellSize,
+		width: cellSize * footprint.width,
 		x: location.position.x * 100,
 		y: 40,
 	});
@@ -639,9 +694,12 @@ const createSpawnHarness = () => {
 			}),
 			readPalette: () => ({}) as PixiScenePalette,
 			surface: {
-				readActorPoseFx: (item: TileActorItem) => Effect.succeed(readPose(item.location)),
-				readLocationPoseFx: (location: TileActorItem["location"]) =>
-					Effect.succeed(readPose(location)),
+				readActorPoseFx: (item: TileActorItem) =>
+					Effect.succeed(readPose(item.location, item.footprint)),
+				readLocationPoseFx: (
+					location: TileActorItem["location"],
+					footprint?: TileActorItem["footprint"],
+				) => Effect.succeed(readPose(location, footprint)),
 				transientActorLayer,
 			} as unknown as PixiMainSceneSurface,
 			textures: {} as never,
@@ -655,6 +713,7 @@ const createSpawnHarness = () => {
 		originLocation: firstBoardLocation,
 		sequence: 10,
 		staggerIndex: 0,
+		targetFootprint: blocker.item.footprint,
 		targetLocation: secondBoardLocation,
 	} satisfies TileMotionCue;
 	const spawnCue = {
@@ -665,6 +724,7 @@ const createSpawnHarness = () => {
 		originLocation: secondBoardLocation,
 		sequence: 11,
 		staggerIndex: 0,
+		targetFootprint: spawned.item.footprint,
 		targetLocation: firstBoardLocation,
 	} satisfies TileMotionCue;
 	return {
@@ -675,14 +735,22 @@ const createSpawnHarness = () => {
 		magneticReleases,
 		magneticUpdates,
 		runtime,
+		setCellSize: (size: number) => {
+			cellSize = size;
+		},
 		spawnCue,
 		spawned,
 	};
 };
 
-const createStackHarness = () => {
+const createStackHarness = (footprint: TileActorItem["footprint"] = unitFootprint) => {
 	const target = createActor("runtime:stack-target");
-	target.item = createItem(target.item.id, secondBoardLocation);
+	target.item = {
+		...createItem(target.item.id, secondBoardLocation),
+		footprint,
+	};
+	target.width = target.size * footprint.width;
+	target.height = target.size * footprint.height;
 	target.container.position.set(200, 40);
 	const canonicalTarget = {
 		...target.item,
@@ -713,9 +781,14 @@ const createStackHarness = () => {
 		animations,
 		canceledOwnerKeys,
 	});
-	const readPose = (location: TileActorItem["location"]) => ({
+	const readPose = (
+		location: TileActorItem["location"],
+		poseFootprint: TileActorItem["footprint"] = unitFootprint,
+	) => ({
+		height: 80 * poseFootprint.height,
 		layer: actorLayer,
 		size: 80,
+		width: 80 * poseFootprint.width,
 		x: location.position.x * 100,
 		y: 40,
 	});
@@ -751,9 +824,12 @@ const createStackHarness = () => {
 			}),
 			readPalette: () => ({}) as PixiScenePalette,
 			surface: {
-				readActorPoseFx: (item: TileActorItem) => Effect.succeed(readPose(item.location)),
-				readLocationPoseFx: (location: TileActorItem["location"]) =>
-					Effect.succeed(readPose(location)),
+				readActorPoseFx: (item: TileActorItem) =>
+					Effect.succeed(readPose(item.location, item.footprint)),
+				readLocationPoseFx: (
+					location: TileActorItem["location"],
+					targetFootprint?: TileActorItem["footprint"],
+				) => Effect.succeed(readPose(location, targetFootprint)),
 				transientActorLayer,
 			} as unknown as PixiMainSceneSurface,
 			textures: {} as never,
@@ -764,11 +840,13 @@ const createStackHarness = () => {
 		eventIndex: 0,
 		kind: "stack",
 		originActorId: "runtime:producer",
+		originFootprint: target.item.footprint,
 		originLocation: firstBoardLocation,
 		quantity: 1,
 		sequence: 30,
 		staggerIndex: 0,
 		targetActorId: target.item.id,
+		targetFootprint: target.item.footprint,
 		targetLocation: secondBoardLocation,
 	} satisfies TileMotionCue;
 	return {
@@ -786,6 +864,34 @@ const createStackHarness = () => {
 };
 
 describe("Pixi tile motion runtime", () => {
+	it("keeps a synthetic rectangular stack payload rectangular through contact", () => {
+		const { animations, cue, runtime } = createStackHarness({
+			height: 1,
+			width: 2,
+		});
+
+		Effect.runSync(
+			runtime.enqueueFx([
+				cue,
+			]),
+		);
+		Effect.runSync(runtime.startFx);
+
+		const travel = animations.find((animation) => animation.channel === "pose");
+		if (travel?.channel !== "pose") {
+			throw new Error("Expected a rectangular stack payload.");
+		}
+		expect(travel.actor).toMatchObject({
+			height: 80,
+			width: 160,
+		});
+		expect(travel.readPose?.(1)).toMatchObject({
+			scale: 1,
+		});
+
+		Effect.runSync(runtime.closeFx);
+	});
+
 	it("presents a produced stack payload with its exact delta instead of the target total", () => {
 		const { animations, cue, runtime } = createStackHarness();
 		Effect.runSync(
@@ -904,8 +1010,10 @@ describe("Pixi tile motion runtime", () => {
 				actor,
 				animator,
 				fallbackTarget: {
+					height: 80,
 					layer: new Container(),
 					size: 80,
+					width: 80,
 					x: 100,
 					y: 0,
 				},
@@ -939,9 +1047,18 @@ describe("Pixi tile motion runtime", () => {
 		expect(onSettled).not.toHaveBeenCalled();
 	});
 
-	it("launches produced payloads from the held producer's live presentation pose", () => {
+	it("launches a one-slot stack payload from a held two-slot producer without inheriting its size", () => {
 		const { actors, animations, cue, runtime } = createStackHarness();
 		const producer = createActor(cue.originActorId);
+		producer.item = {
+			...producer.item,
+			footprint: {
+				height: 2,
+				width: 2,
+			},
+		};
+		producer.height = 160;
+		producer.width = 160;
 		producer.dragging = true;
 		producer.container.position.set(460, 300);
 		producer.container.pivot.set(16, 12);
@@ -964,7 +1081,10 @@ describe("Pixi tile motion runtime", () => {
 			x: 446.25,
 			y: 280,
 		});
-		expect(travel.actor.container.scale.x).toBe(1.25);
+		expect(travel.actor.container.scale).toMatchObject({
+			x: 1,
+			y: 1,
+		});
 		expect(travel.actor.container.x).not.toBe(100);
 		expect(travel.actor.container.y).not.toBe(40);
 
@@ -1037,6 +1157,9 @@ describe("Pixi tile motion runtime", () => {
 			}),
 		);
 		source.container.alpha = 0.35;
+		target.container.position.set(520, 260);
+		target.container.pivot.set(20, 30);
+		target.container.scale.set(1.25, 0.75);
 
 		Effect.runSync(
 			runtime.enqueueFx([
@@ -1065,6 +1188,10 @@ describe("Pixi tile motion runtime", () => {
 		]);
 		expect(source.lifecycleTargetAlpha).toBe(1);
 		samplePoseAnimation(travel, 1);
+		expect(source.container.scale).toMatchObject({
+			x: 1.25,
+			y: 0.75,
+		});
 		expect({
 			x: source.container.x - source.container.pivot.x * source.container.scale.x,
 			y: source.container.y - source.container.pivot.y * source.container.scale.y,
@@ -1187,6 +1314,7 @@ describe("Pixi tile motion runtime", () => {
 			eventIndex: 0,
 			kind: "input",
 			originActorId: source.item.id,
+			originFootprint: source.item.footprint,
 			originLocation: firstBoardLocation,
 			previousQuantity: 7,
 			storedQuantity: 5,
@@ -1195,6 +1323,7 @@ describe("Pixi tile motion runtime", () => {
 			sourceActorId: source.item.id,
 			staggerIndex: 0,
 			targetActorId: owner.item.id,
+			targetFootprint: source.item.footprint,
 			targetLocation: secondBoardLocation,
 		} satisfies TileMotionCue;
 		const effectivePoseBeforeSetup = {
@@ -1431,14 +1560,18 @@ describe("Pixi tile motion runtime", () => {
 		const completed = vi.fn();
 		const transients: PixiTileActor[] = [];
 		const home = {
+			height: 80,
 			layer: actorLayer,
 			size: 80,
+			width: 80,
 			x: 100,
 			y: 40,
 		};
 		const target = {
+			height: 80,
 			layer: actorLayer,
 			size: 80,
+			width: 80,
 			x: 300,
 			y: 40,
 		};
@@ -1469,6 +1602,7 @@ describe("Pixi tile motion runtime", () => {
 			eventIndex: 0,
 			kind: "input",
 			originActorId: source.item.id,
+			originFootprint: source.item.footprint,
 			originLocation: firstBoardLocation,
 			previousQuantity: 8,
 			storedQuantity: 1,
@@ -1477,6 +1611,7 @@ describe("Pixi tile motion runtime", () => {
 			sourceActorId: source.item.id,
 			staggerIndex: 0,
 			targetActorId: owner.item.id,
+			targetFootprint: source.item.footprint,
 			targetLocation: secondBoardLocation,
 		} satisfies TileMotionCue;
 
@@ -1593,6 +1728,15 @@ describe("Pixi tile motion runtime", () => {
 				y: 0,
 			},
 		});
+		opener.item = {
+			...opener.item,
+			footprint: {
+				height: 2,
+				width: 2,
+			},
+		};
+		opener.height = 128;
+		opener.width = 128;
 		owner.item = createItem(owner.item.id, secondBoardLocation);
 		opener.container.position.set(500, 24);
 		owner.container.position.set(200, 40);
@@ -1612,14 +1756,18 @@ describe("Pixi tile motion runtime", () => {
 		});
 		const transientActorLayer = new Container();
 		const openerPose = {
+			height: 64,
 			layer: transientActorLayer,
 			size: 64,
+			width: 64,
 			x: 500,
 			y: 24,
 		};
 		const targetPose = {
+			height: 80,
 			layer: transientActorLayer,
 			size: 80,
+			width: 80,
 			x: 200,
 			y: 40,
 		};
@@ -1630,6 +1778,7 @@ describe("Pixi tile motion runtime", () => {
 			eventIndex: 0,
 			kind: "input",
 			originActorId: opener.item.id,
+			originFootprint: sourceItem.footprint,
 			originLocation: opener.item.location,
 			previousQuantity: 2,
 			storedQuantity: 1,
@@ -1639,6 +1788,7 @@ describe("Pixi tile motion runtime", () => {
 			sourceItem,
 			staggerIndex: 0,
 			targetActorId: owner.item.id,
+			targetFootprint: sourceItem.footprint,
 			targetLocation: owner.item.location,
 		} satisfies TileMotionCue;
 
@@ -1692,6 +1842,10 @@ describe("Pixi tile motion runtime", () => {
 		expect(transient.container).toMatchObject({
 			x: openerPose.x,
 			y: openerPose.y,
+		});
+		expect(transient.container.scale).toMatchObject({
+			x: 0.8,
+			y: 0.8,
 		});
 		const delivery = animations.find(
 			(animation) => animation.channel === "pose" && animation.ownerKey === "motion:44:0",
@@ -1905,6 +2059,7 @@ describe("Pixi tile motion runtime", () => {
 			eventIndex: 0,
 			kind: "input",
 			originActorId: source.item.id,
+			originFootprint: source.item.footprint,
 			originLocation: firstBoardLocation,
 			previousQuantity: 3,
 			storedQuantity: 2,
@@ -1913,6 +2068,7 @@ describe("Pixi tile motion runtime", () => {
 			sourceActorId: source.item.id,
 			staggerIndex: 0,
 			targetActorId: owner.item.id,
+			targetFootprint: source.item.footprint,
 			targetLocation: secondBoardLocation,
 		} satisfies TileMotionCue;
 		const finalCue = {
@@ -1930,6 +2086,7 @@ describe("Pixi tile motion runtime", () => {
 			originLocation: secondBoardLocation,
 			sequence: 43,
 			staggerIndex: 0,
+			targetFootprint: output.item.footprint,
 			targetLocation: firstBoardLocation,
 		} satisfies TileMotionCue;
 
@@ -2154,6 +2311,7 @@ describe("Pixi tile motion runtime", () => {
 				originLocation: inventoryLocation,
 				sequence: 7,
 				staggerIndex: 0,
+				targetFootprint: spawned.item.footprint,
 				targetLocation: firstBoardLocation,
 			},
 			{
@@ -2161,11 +2319,13 @@ describe("Pixi tile motion runtime", () => {
 				eventIndex: 1,
 				kind: "stack",
 				originActorId: "runtime:inventory-origin",
+				originFootprint: unitFootprint,
 				originLocation: inventoryLocation,
 				quantity: 1,
 				sequence: 7,
 				staggerIndex: 1,
 				targetActorId: stacked.item.id,
+				targetFootprint: stacked.item.footprint,
 				targetLocation: secondBoardLocation,
 			},
 		] satisfies TileMotionCue[];
@@ -2399,11 +2559,13 @@ describe("Pixi tile motion runtime", () => {
 				eventIndex: 0,
 				kind: "stack",
 				originActorId: "runtime:producer",
+				originFootprint: stacked.item.footprint,
 				originLocation: firstBoardLocation,
 				quantity: 1,
 				sequence: 20,
 				staggerIndex: 0,
 				targetActorId: stacked.item.id,
+				targetFootprint: stacked.item.footprint,
 				targetLocation: secondBoardLocation,
 			},
 			{
@@ -2411,11 +2573,13 @@ describe("Pixi tile motion runtime", () => {
 				eventIndex: 0,
 				kind: "stack",
 				originActorId: "runtime:producer",
+				originFootprint: stacked.item.footprint,
 				originLocation: firstBoardLocation,
 				quantity: 1,
 				sequence: 21,
 				staggerIndex: 0,
 				targetActorId: stacked.item.id,
+				targetFootprint: stacked.item.footprint,
 				targetLocation: secondBoardLocation,
 			},
 		] satisfies TileMotionCue[];
@@ -2725,6 +2889,70 @@ describe("Pixi tile motion runtime", () => {
 		);
 	});
 
+	it("finalizes a released actor without collapsing independent displayed extents", () => {
+		const actor = createActor("runtime:rectangular-finalize");
+		actor.container.scale.set(1.5, 0.75);
+		const canonical = {
+			...actor.item,
+			footprint: {
+				height: 2,
+				width: 2,
+			},
+			revision: "revision:rectangular-finalize:board",
+		};
+		const layer = new Container();
+
+		Effect.runSync(
+			finalizePixiTileMotionActorsFx({
+				actorIds: new Set([
+					actor.item.id,
+				]),
+				actorStore: {
+					actors: new Map([
+						[
+							actor.item.id,
+							actor,
+						],
+					]),
+					canonicalItems: new Map([
+						[
+							canonical.id,
+							canonical,
+						],
+					]),
+				} as unknown as PixiMainSceneActorStore,
+				animator: createRecordingAnimator({
+					animations: [],
+				}),
+				application: {
+					frames: {
+						invalidateFx: Effect.void,
+					},
+				} as unknown as PixiApplicationOwner,
+				readPalette: () => ({}) as PixiScenePalette,
+				stillClaimedActorIds: new Set(),
+				surface: {
+					readActorPoseFx: () =>
+						Effect.succeed({
+							height: 160,
+							layer,
+							size: 80,
+							width: 160,
+							x: 320,
+							y: 240,
+						}),
+				} as unknown as PixiMainSceneSurface,
+				textures: {} as PixiTextureStore,
+			}),
+		);
+
+		expect(actor.container.parent).toBe(layer);
+		expect(actor.container.scale).toMatchObject({
+			x: 0.75,
+			y: 0.375,
+		});
+	});
+
 	it("supersedes an unfinished spawn fade when the actor disappears at settlement", () => {
 		const actor = createActor("runtime:short-lived-spawn");
 		actor.container.alpha = 0.37;
@@ -2895,6 +3123,101 @@ describe("Pixi tile motion runtime", () => {
 		expect(source.container.x).toBe(200);
 	});
 
+	it("runs committed relocation legs in result order and lets a missing actor reconcile normally", () => {
+		const { animations, cue, runtime, source, target } = createSwapHarness();
+		const relocations = [
+			{
+				actorId: target.item.id,
+				eventIndex: cue.eventIndex,
+				kind: "relocation",
+				originActorId: target.item.id,
+				originFootprint: {
+					height: 1,
+					width: 2,
+				},
+				originLocation: cue.originLocation,
+				sequence: cue.sequence,
+				staggerIndex: 0,
+				targetFootprint: {
+					height: 1,
+					width: 1,
+				},
+				targetLocation: cue.targetLocation,
+			},
+			{
+				actorId: source.item.id,
+				eventIndex: cue.eventIndex + 1,
+				kind: "relocation",
+				originActorId: source.item.id,
+				originFootprint: {
+					height: 1,
+					width: 1,
+				},
+				originLocation: cue.targetLocation,
+				sequence: cue.sequence,
+				staggerIndex: 0,
+				targetFootprint: {
+					height: 1,
+					width: 1,
+				},
+				targetLocation: cue.originLocation,
+			},
+			{
+				actorId: "runtime:missing",
+				eventIndex: cue.eventIndex + 2,
+				kind: "relocation",
+				originActorId: "runtime:missing",
+				originFootprint: {
+					height: 1,
+					width: 1,
+				},
+				originLocation: cue.originLocation,
+				sequence: cue.sequence,
+				staggerIndex: 0,
+				targetFootprint: {
+					height: 1,
+					width: 1,
+				},
+				targetLocation: cue.targetLocation,
+			},
+		] satisfies TileMotionCue[];
+
+		Effect.runSync(runtime.enqueueFx(relocations));
+		Effect.runSync(runtime.startFx);
+
+		expect(animations.map(({ actor }) => actor)).toEqual([
+			target,
+			source,
+		]);
+		const rectangularTravel = readPoseAnimation(animations, target);
+		expect(target.container.scale).toMatchObject({
+			x: 2,
+			y: 1,
+		});
+		expect(rectangularTravel.readPose?.(0.5)).toMatchObject({
+			scaleX: 1.5,
+			scaleY: 1,
+		});
+		expect(rectangularTravel.readPose?.(1)).toMatchObject({
+			scale: 1,
+		});
+		expect(Effect.runSync(runtime.readSnapshotFx).interactionClaimByActorId).toEqual(
+			new Map([
+				[
+					target.item.id,
+					"handoff",
+				],
+				[
+					source.item.id,
+					"handoff",
+				],
+			]),
+		);
+		rectangularTravel.onComplete?.();
+		readPoseAnimation(animations, source).onComplete?.();
+		expect(Effect.runSync(runtime.readSnapshotFx).interactionClaimByActorId).toEqual(new Map());
+	});
+
 	it("hands one live swap leg to direct interaction without canceling its counterpart", () => {
 		const {
 			animations,
@@ -3057,6 +3380,7 @@ describe("Pixi tile motion runtime", () => {
 			originLocation: secondBoardLocation,
 			sequence: 10,
 			staggerIndex: 0,
+			targetFootprint: independent.item.footprint,
 			targetLocation: firstBoardLocation,
 		} satisfies TileMotionCue;
 		const pendingDetachedCue = {
@@ -3067,6 +3391,7 @@ describe("Pixi tile motion runtime", () => {
 			originLocation: firstBoardLocation,
 			sequence: 12,
 			staggerIndex: 0,
+			targetFootprint: source.item.footprint,
 			targetLocation: secondBoardLocation,
 		} satisfies TileMotionCue;
 		Effect.runSync(
@@ -3206,6 +3531,38 @@ describe("Pixi tile motion runtime", () => {
 		expect(snapshot.interactionClaimByActorId.has(spawned.item.id)).toBe(false);
 		expect(snapshot.spawnCueByActorId.has(spawned.item.id)).toBe(false);
 		expect(Effect.runSync(runtime.beginInteractionHandoffFx(spawned.item.id))).toBe(false);
+	});
+
+	it("keeps a 3x3 spawn projected through target geometry while the surface resizes", () => {
+		const { animations, runtime, setCellSize, spawnCue, spawned } = createSpawnHarness({
+			height: 3,
+			width: 3,
+		});
+		Effect.runSync(
+			runtime.enqueueFx([
+				spawnCue,
+			]),
+		);
+		Effect.runSync(runtime.startFx);
+
+		expect(spawned.container.scale.x).toBeCloseTo(1 / 3);
+		expect(spawned.container.scale.y).toBeCloseTo(1 / 3);
+		const spawnTravel = readPoseAnimation(animations, spawned);
+		setCellSize(100);
+		samplePoseAnimation(spawnTravel, 1);
+		spawnTravel.onComplete?.();
+		const continuation = animations.at(-1);
+		if (continuation?.channel !== "pose") {
+			throw new Error("Expected resized spawn continuation.");
+		}
+		const finalPose = samplePoseAnimation(continuation, 1);
+		expect(finalPose).toMatchObject({
+			scale: 1.25,
+			x: 100,
+			y: 40,
+		});
+		continuation.onComplete?.();
+		expect(animations).toHaveLength(3);
 	});
 
 	it("releases a spawned magnetic source on natural settlement", () => {
@@ -3496,6 +3853,7 @@ describe("Pixi tile motion runtime", () => {
 					originLocation: secondBoardLocation,
 					sequence: cue.sequence,
 					staggerIndex: 0,
+					targetFootprint: target.item.footprint,
 					targetLocation: firstBoardLocation,
 				},
 			]),

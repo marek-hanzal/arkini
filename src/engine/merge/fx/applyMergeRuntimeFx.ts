@@ -11,6 +11,7 @@ import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { applyMergeSourceActionFx } from "./applyMergeSourceActionFx";
 import { applyMergeTargetEffectFx } from "./applyMergeTargetEffectFx";
 import { returnMergeSourceFx } from "./returnMergeSourceFx";
+import { readBoardRuntimeItemRectangleFx } from "~/engine/grid/fx/readBoardRuntimeItemRectangleFx";
 
 export namespace applyMergeRuntimeFx {
 	export interface Props {
@@ -33,6 +34,9 @@ export const applyMergeRuntimeFx = Effect.fn("applyMergeRuntimeFx")(function* ({
 	source,
 	target,
 }: applyMergeRuntimeFx.Props) {
+	const originRectangle = yield* readBoardRuntimeItemRectangleFx({
+		item: target,
+	});
 	const sourceAction = yield* applyMergeSourceActionFx({
 		action: rule.action,
 		runtime,
@@ -45,6 +49,7 @@ export const applyMergeRuntimeFx = Effect.fn("applyMergeRuntimeFx")(function* ({
 	});
 	let draft = yield* returnMergeSourceFx({
 		origin: target.location,
+		originRectangle,
 		returnDrop: sourceAction.returnDrop,
 		runtime: targetEffect.runtime,
 	});
@@ -64,6 +69,7 @@ export const applyMergeRuntimeFx = Effect.fn("applyMergeRuntimeFx")(function* ({
 	});
 	const [placement, withOutput] = yield* applyOutputPlacementFx({
 		origin: target.location,
+		originRectangle,
 		output,
 		runtime: draft,
 	});

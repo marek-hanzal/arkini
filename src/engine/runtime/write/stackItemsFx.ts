@@ -12,9 +12,15 @@ import { readItemStackResolutionFx } from "~/engine/runtime/read/readItemStackRe
 import type { GridRuntimeItemSchema } from "~/engine/runtime/schema/GridRuntimeItemSchema";
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import { assertDropDestinationExpectationFx } from "~/engine/runtime/read/assertDropDestinationExpectationFx";
 
 export namespace stackItemsFx {
 	export interface Props {
+		readonly destinationLocation?: GridLocationSchema.Type;
+		readonly expectedCollisions?: ReadonlyArray<{
+			readonly itemId: IdSchema.Type;
+			readonly revision: RevisionSchema.Type;
+		}>;
 		readonly sourceItemId: IdSchema.Type;
 		readonly sourceRevision: RevisionSchema.Type;
 		readonly sourceLocation: GridLocationSchema.Type;
@@ -34,6 +40,8 @@ export namespace stackItemsFx {
 
 /** Atomically transfers one pure compatible stack into another exact live grid identity. */
 export const stackItemsFx = Effect.fn("stackItemsFx")(function* ({
+	destinationLocation,
+	expectedCollisions,
 	sourceItemId,
 	sourceRevision,
 	sourceLocation,
@@ -60,6 +68,16 @@ export const stackItemsFx = Effect.fn("stackItemsFx")(function* ({
 						reason: resolution.reason,
 					}),
 				);
+			}
+			if (destinationLocation !== undefined && expectedCollisions !== undefined) {
+				yield* assertDropDestinationExpectationFx({
+					allowAdditionalOccupants: false,
+					expectedCollisions,
+					explicitTargetItemId: resolution.target.id,
+					location: destinationLocation,
+					runtime,
+					source: resolution.source,
+				});
 			}
 
 			const sourceRemainingQuantity =

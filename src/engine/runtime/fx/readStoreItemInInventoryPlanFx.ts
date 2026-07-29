@@ -80,6 +80,7 @@ export const readStoreItemInInventoryPlanFx = Effect.fn("readStoreItemInInventor
 			size: config.meta.inventory,
 		});
 		const [location] = yield* readEmptyLocationsFx({
+			item: item.item,
 			locations,
 			runtime,
 		});

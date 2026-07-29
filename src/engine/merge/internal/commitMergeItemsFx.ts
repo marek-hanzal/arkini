@@ -12,6 +12,7 @@ import { MergeSameItemError } from "~/engine/merge/error/MergeSameItemError";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 import { assertRevisionFx } from "~/engine/revision/fx/assertRevisionFx";
 import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
+import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
 import { isBoardRuntimeItemFx } from "~/engine/runtime/read/isBoardRuntimeItemFx";
 import { isGridRuntimeItemFx } from "~/engine/runtime/read/isGridRuntimeItemFx";
@@ -19,9 +20,15 @@ import { readRuntimeItemByIdFx } from "~/engine/runtime/read/readRuntimeItemById
 import type { GridRuntimeItemSchema } from "~/engine/runtime/schema/GridRuntimeItemSchema";
 import { CrossSpaceBoardOperationError } from "~/engine/space/error/CrossSpaceBoardOperationError";
 import { EffectEnumSchema } from "~/engine/merge/schema/EffectEnumSchema";
+import { assertDropDestinationExpectationFx } from "~/engine/runtime/read/assertDropDestinationExpectationFx";
 
 export namespace commitMergeItemsFx {
 	export interface Props {
+		readonly destinationLocation?: GridLocationSchema.Type;
+		readonly expectedCollisions?: ReadonlyArray<{
+			readonly itemId: IdSchema.Type;
+			readonly revision: RevisionSchema.Type;
+		}>;
 		readonly sourceItemId: IdSchema.Type;
 		readonly sourceRevision: RevisionSchema.Type;
 		readonly targetItemId: IdSchema.Type;
@@ -39,6 +46,8 @@ export namespace commitMergeItemsFx {
 
 /** Commits one directional merge and returns exact before/after actor identities. */
 export const commitMergeItemsFx = Effect.fn("commitMergeItemsFx")(function* ({
+	destinationLocation,
+	expectedCollisions,
 	sourceItemId,
 	sourceRevision,
 	targetItemId,
@@ -98,6 +107,16 @@ export const commitMergeItemsFx = Effect.fn("commitMergeItemsFx")(function* ({
 						toSpace: target.location.space,
 					}),
 				);
+			}
+			if (destinationLocation !== undefined && expectedCollisions !== undefined) {
+				yield* assertDropDestinationExpectationFx({
+					allowAdditionalOccupants: false,
+					expectedCollisions,
+					explicitTargetItemId: target.id,
+					location: destinationLocation,
+					runtime,
+					source,
+				});
 			}
 
 			const resolved = yield* resolveMergeRuleFx({

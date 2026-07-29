@@ -188,6 +188,10 @@ describe("PixiBoardToolbarSurface", () => {
 		const createProps = boardState.createProps;
 		if (createProps === null) throw new Error("Board scene did not create its runtime.");
 		const owner = {
+			footprint: {
+				height: 1,
+				width: 1,
+			},
 			id: "runtime:producer",
 			itemId: "producer",
 			itemType: "producer",
@@ -238,6 +242,10 @@ describe("PixiBoardToolbarSurface", () => {
 		const createProps = boardState.createProps;
 		if (createProps === null) throw new Error("Board scene did not create its runtime.");
 		const stack = {
+			footprint: {
+				height: 1,
+				width: 1,
+			},
 			id: "runtime:stack",
 			itemId: "material",
 			itemType: "simple",
@@ -283,6 +291,10 @@ describe("PixiBoardToolbarSurface", () => {
 		const createProps = boardState.createProps;
 		if (createProps === null) throw new Error("Board scene did not create its runtime.");
 		const producer = {
+			footprint: {
+				height: 1,
+				width: 1,
+			},
 			id: "runtime:producer",
 			itemId: "producer",
 			itemType: "producer",
@@ -328,6 +340,10 @@ describe("PixiBoardToolbarSurface", () => {
 		const createProps = boardState.createProps;
 		if (createProps === null) throw new Error("Board scene did not create its runtime.");
 		const item = {
+			footprint: {
+				height: 1,
+				width: 1,
+			},
 			id: "runtime:inventory",
 			itemId: "inventory",
 			itemType: "inventory",

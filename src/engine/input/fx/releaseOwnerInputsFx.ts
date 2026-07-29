@@ -8,6 +8,7 @@ import { isBoardRuntimeItemFx } from "~/engine/runtime/read/isBoardRuntimeItemFx
 import type { InputRuntimeItemSchema } from "~/engine/runtime/schema/InputRuntimeItemSchema";
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import { readBoardRuntimeItemRectangleFx } from "~/engine/grid/fx/readBoardRuntimeItemRectangleFx";
 
 export namespace releaseOwnerInputsFx {
 	export interface Props {
@@ -57,11 +58,15 @@ export const releaseOwnerInputsFx = Effect.fn("releaseOwnerInputsFx")(function* 
 			items: runtime.items.filter((item) => item.id !== owner.id),
 		},
 	};
+	const originRectangle = yield* readBoardRuntimeItemRectangleFx({
+		item: boardOwner,
+	});
 
 	for (const bufferedItem of bufferedItems) {
 		const placement = yield* placeRuntimeItemFx({
 			itemId: bufferedItem.id,
 			origin: boardOwner.location,
+			originRectangle,
 			originItemId: boardOwner.id,
 			runtime: state.runtime,
 		});

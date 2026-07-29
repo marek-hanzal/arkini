@@ -7,6 +7,7 @@ import { queryFx } from "~/engine/query/fx/queryFx";
 import { RuntimeFx } from "~/engine/runtime/context/RuntimeFx";
 import { readBoardRuntimeItemByIdFx } from "~/engine/runtime/read/readBoardRuntimeItemByIdFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import { readBoardRuntimeItemRectangleFx } from "~/engine/grid/fx/readBoardRuntimeItemRectangleFx";
 
 export namespace readItemDetailDepositAvailableChargesFx {
 	export interface Props {
@@ -31,6 +32,9 @@ export const readItemDetailDepositAvailableChargesFx = Effect.fn(
 	});
 	const candidates = yield* queryFx({
 		origin: owner.location,
+		originRectangle: yield* readBoardRuntimeItemRectangleFx({
+			item: owner,
+		}),
 		query: input.query,
 	}).pipe(
 		Effect.provideService(RuntimeFx, {

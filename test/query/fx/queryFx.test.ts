@@ -11,6 +11,7 @@ import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 import { queryFx } from "~/engine/query/fx/queryFx";
 import type { QuerySchema } from "~/engine/query/schema/QuerySchema";
+import { createBoardRectangleFx } from "~/engine/grid/fx/createBoardRectangleFx";
 
 const config = GameConfigSchema.parse({
 	version: "1.0",
@@ -52,6 +53,27 @@ const config = GameConfigSchema.parse({
 			maxStackSize: 10,
 			type: "simple",
 		},
+		grove: {
+			id: "grove",
+			title: "Grove",
+			description: "A wide forest.",
+			asset: {
+				source: [
+					"asset:grove",
+				],
+			},
+			tags: [
+				"forest",
+			],
+			categoryId: "resource",
+			scope: "board",
+			footprint: {
+				width: 2,
+				height: 1,
+			},
+			maxStackSize: 1,
+			type: "simple",
+		},
 	},
 });
 
@@ -87,6 +109,118 @@ const readIds = (items: ReadonlyArray<RuntimeItemSchema.Type>) => {
 };
 
 describe("queryFx", () => {
+	it("measures Board distance from the nearest occupied rectangle cells", () => {
+		const result = Effect.runSync(
+			Effect.gen(function* () {
+				yield* placeTreeFx({
+					id: "origin",
+					location: {
+						scope: "board",
+						space: 0,
+						position: {
+							x: 5,
+							y: 5,
+						},
+					},
+				});
+				yield* spawnItemFx({
+					id: "wide",
+					itemId: "grove",
+					location: {
+						scope: "board",
+						space: 0,
+						position: {
+							x: 3,
+							y: 5,
+						},
+					},
+					quantity: 1,
+				});
+				return yield* queryFx({
+					origin: {
+						scope: "board",
+						space: 0,
+						position: {
+							x: 5,
+							y: 5,
+						},
+					},
+					query: {
+						distance: "close",
+						scope: "board",
+						selector: {
+							tag: "forest",
+							type: "tag",
+						},
+					},
+				});
+			}).pipe(
+				useGameFx({
+					config,
+				}),
+			),
+		);
+
+		expect(readIds(result)).toEqual([
+			"wide",
+		]);
+	});
+
+	it("accepts an immutable origin rectangle for owner-relative distance", () => {
+		const result = Effect.runSync(
+			Effect.gen(function* () {
+				const ownerLocation = {
+					scope: "board",
+					space: 0,
+					position: {
+						x: 3,
+						y: 5,
+					},
+				} as const;
+				const owner = yield* spawnItemFx({
+					id: "wide-owner",
+					itemId: "grove",
+					location: ownerLocation,
+					quantity: 1,
+				});
+				yield* placeTreeFx({
+					id: "target",
+					location: {
+						scope: "board",
+						space: 0,
+						position: {
+							x: 6,
+							y: 5,
+						},
+					},
+				});
+				return yield* queryFx({
+					origin: ownerLocation,
+					originRectangle: yield* createBoardRectangleFx({
+						anchor: ownerLocation,
+						footprint: owner.item.footprint,
+					}),
+					query: {
+						distance: "near",
+						scope: "board",
+						selector: {
+							tag: "forest",
+							type: "tag",
+						},
+					},
+				});
+			}).pipe(
+				useGameFx({
+					config,
+				}),
+			),
+		);
+
+		expect(readIds(result)).toEqual([
+			"target",
+		]);
+	});
+
 	it("selects exact board distance rings and excludes the origin", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {

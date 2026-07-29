@@ -58,6 +58,12 @@ const createFixture = (failSpringAt: number | null = null) => {
 				if (write.channel === "pose") {
 					write.actor.container.position.set(write.x, write.y);
 					if (write.scale !== undefined) write.actor.container.scale.set(write.scale);
+					if (write.scaleX !== undefined || write.scaleY !== undefined) {
+						write.actor.container.scale.set(
+							write.scaleX ?? write.actor.container.scale.x,
+							write.scaleY ?? write.actor.container.scale.y,
+						);
+					}
 				}
 				if (write.channel === "grab-offset") {
 					write.actor.container.pivot.set(write.pivotX, write.pivotY);
@@ -88,9 +94,9 @@ const createFixture = (failSpringAt: number | null = null) => {
 				},
 			},
 			scale: {
-				set(value: number) {
-					this.x = value;
-					this.y = value;
+				set(x: number, y = x) {
+					this.x = x;
+					this.y = y;
 				},
 				x: 1,
 				y: 1,
@@ -133,7 +139,8 @@ describe("Pixi cursor grab motion", () => {
 			expect.objectContaining({
 				actor,
 				channel: "pose",
-				scale: 1,
+				scaleX: 1,
+				scaleY: 1,
 				x: -2,
 				y: 2,
 			}),
@@ -193,7 +200,7 @@ describe("Pixi cursor grab motion", () => {
 
 	it("removes a scaled pivot without moving the presented tile", () => {
 		const { actor, motion, springs } = createFixture();
-		actor.container.scale.set(0.75);
+		actor.container.scale.set(0.75, 0.5);
 		Effect.runSync(
 			motion.startFx(actor, {
 				x: 20,
@@ -206,7 +213,7 @@ describe("Pixi cursor grab motion", () => {
 		Effect.runSync(motion.finishFx(actor));
 
 		expect(actor.container.x).toBe(1);
-		expect(actor.container.y).toBe(6.5);
+		expect(actor.container.y).toBe(11);
 		expect(actor.container.pivot.x).toBe(0);
 		expect(actor.container.pivot.y).toBe(0);
 	});

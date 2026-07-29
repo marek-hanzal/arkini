@@ -4,15 +4,17 @@
 		"item:water": {
 			"id": "item:water",
 			"type": "simple",
-			"title": "Water",
-			"description": "Drag this water onto the tree to merge both items.",
+			"title": "Water (implicit 1 × 1)",
+			"description": "Stored in one Inventory slot. Drop it on the 2 × 2 tree: the 3 × 1 result cannot use the target anchor while the survey peg blocks its extra cell, so merge placement must use the deterministic fallback.",
 			"asset": {
 				"source": [
 					"item-water"
 				]
 			},
 			"tags": [
-				"demo"
+				"demo",
+				"implicit-footprint",
+				"merge-source"
 			],
 			"categoryId": "demo",
 			"scope": "any",
@@ -29,39 +31,218 @@
 				}
 			]
 		},
+		"item:survey-peg": {
+			"id": "item:survey-peg",
+			"type": "simple",
+			"title": "Survey Peg (explicit 1 × 1)",
+			"description": "A movable one-cell blocker. Two adjacent pegs are the bounded multi-collision drop target; the third forces merge fallback. The Toolbar copy proves storage remains one slot.",
+			"asset": {
+				"source": [
+					"item-water"
+				]
+			},
+			"tags": [
+				"demo",
+				"explicit-footprint",
+				"blocker"
+			],
+			"categoryId": "demo",
+			"scope": "any",
+			"maxStackSize": 1,
+			"footprint": {
+				"width": 1,
+				"height": 1
+			}
+		},
 		"item:tree": {
 			"id": "item:tree",
 			"type": "simple",
-			"title": "Tree",
-			"description": "The receiving item for the demo merge.",
+			"title": "Tree Plot (2 × 2)",
+			"description": "The differently sized merge target. Its occupied edge is also a visible reference for rectangle-based proximity.",
 			"asset": {
 				"source": [
 					"item-tree"
 				]
 			},
 			"tags": [
-				"demo"
+				"demo",
+				"merge-target",
+				"proximity-reference"
 			],
 			"categoryId": "demo",
 			"scope": "any",
-			"maxStackSize": 8
+			"maxStackSize": 1,
+			"footprint": {
+				"width": 2,
+				"height": 2
+			}
 		},
 		"item:double-tree": {
 			"id": "item:double-tree",
 			"type": "simple",
-			"title": "Double Tree",
-			"description": "The deterministic result of the demo merge.",
+			"title": "Windbreak (3 × 1)",
+			"description": "The deterministic result of watering the 2 × 2 tree. The blocked target-first anchor makes the standard exact-identity fallback observable.",
 			"asset": {
 				"source": [
 					"item-double-tree"
 				]
 			},
 			"tags": [
-				"demo"
+				"demo",
+				"merge-result"
 			],
 			"categoryId": "demo",
 			"scope": "any",
-			"maxStackSize": 8
+			"maxStackSize": 1,
+			"footprint": {
+				"width": 3,
+				"height": 1
+			}
+		},
+		"item:beam": {
+			"id": "item:beam",
+			"type": "simple",
+			"title": "Relocation Beam (3 × 1)",
+			"description": "Drop this across both adjacent survey pegs. The source stays at the requested anchor while the initial two-identity collision set relocates through standard exact-item placement.",
+			"asset": {
+				"source": [
+					"item-double-tree"
+				]
+			},
+			"tags": [
+				"demo",
+				"bounded-swap-source"
+			],
+			"categoryId": "demo",
+			"scope": "any",
+			"maxStackSize": 1,
+			"footprint": {
+				"width": 3,
+				"height": 1
+			}
+		},
+		"item:pallet": {
+			"id": "item:pallet",
+			"type": "simple",
+			"title": "Stackable Pallet (2 × 2)",
+			"description": "Two units begin compacted into one Inventory slot even though each unit occupies 2 × 2 on Board. Return and stack them on Board to exercise both storage and spatial rules.",
+			"asset": {
+				"source": [
+					"item-tree"
+				]
+			},
+			"tags": [
+				"demo",
+				"stackable-footprint",
+				"storage-return"
+			],
+			"categoryId": "demo",
+			"scope": "any",
+			"maxStackSize": 4,
+			"footprint": {
+				"width": 2,
+				"height": 2
+			}
+		},
+		"item:landmark": {
+			"id": "item:landmark",
+			"type": "simple",
+			"title": "Landmark (3 × 3)",
+			"description": "A non-stackable Board landmark used to constrain the initial layout and evaluate readability, storage compaction, Board return, and actor bounds.",
+			"asset": {
+				"source": [
+					"item-double-tree"
+				]
+			},
+			"tags": [
+				"demo",
+				"landmark"
+			],
+			"categoryId": "demo",
+			"scope": "any",
+			"maxStackSize": 1,
+			"footprint": {
+				"width": 3,
+				"height": 3
+			}
+		},
+		"item:output-yard": {
+			"id": "item:output-yard",
+			"type": "producer",
+			"title": "Output Yard (2 × 3)",
+			"description": "Start the default line while the Board has no 3 × 3 opening. Completion must remain ready and publish nothing until rearrangement opens enough area; its output is ordered from this large owner's rectangle.",
+			"asset": {
+				"source": [
+					"item-tree"
+				]
+			},
+			"tags": [
+				"demo",
+				"large-owner",
+				"blocked-completion"
+			],
+			"categoryId": "demo",
+			"scope": "board",
+			"maxCount": 1,
+			"maxStackSize": 1,
+			"footprint": {
+				"width": 2,
+				"height": 3
+			},
+			"maxQueueSize": 1,
+			"lines": [
+				{
+					"id": "line:output-yard:landmark",
+					"title": "Raise Landmark",
+					"description": "Produces one 3 × 3 landmark after a short delay.",
+					"default": true,
+					"runtimeMs": 2000,
+					"input": [
+						{
+							"type": "simple"
+						}
+					],
+					"rules": [
+						{
+							"type": "enable",
+							"when": [
+								{
+									"type": "exists",
+									"query": {
+										"scope": "board",
+										"distance": "close",
+										"selector": {
+											"type": "item",
+											"itemId": "item:survey-peg"
+										}
+									}
+								}
+							]
+						}
+					],
+					"output": {
+						"set": [
+							{
+								"roll": [
+									{
+										"type": "guaranteed",
+										"drop": [
+											{
+												"itemId": "item:landmark",
+												"quantity": {
+													"type": "value",
+													"value": 1
+												},
+												"rules": []
+											}
+										]
+									}
+								]
+							}
+						]
+					}
+				}
+			]
 		}
 	}
 }

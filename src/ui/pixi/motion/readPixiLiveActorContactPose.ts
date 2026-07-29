@@ -12,17 +12,20 @@ export const readPixiLiveActorContactPose = ({
 }) => {
 	const actor = actors.get(actorId);
 	if (actor === undefined || actor.container.destroyed) return null;
-	const targetScale = actor.container.scale.x;
-	const movingScale = (actor.size * targetScale) / Math.max(1, movingActor.size);
+	const targetScaleX = actor.container.scale.x;
+	const targetScaleY = actor.container.scale.y;
+	const movingScaleX = (actor.size * targetScaleX) / Math.max(1, movingActor.size);
+	const movingScaleY = (actor.size * targetScaleY) / Math.max(1, movingActor.size);
 	return {
-		scale: movingScale,
+		scaleX: movingScaleX,
+		scaleY: movingScaleY,
 		x:
 			actor.container.x -
-			actor.container.pivot.x * targetScale +
-			movingActor.container.pivot.x * movingScale,
+			actor.container.pivot.x * targetScaleX +
+			movingActor.container.pivot.x * movingScaleX,
 		y:
 			actor.container.y -
-			actor.container.pivot.y * targetScale +
-			movingActor.container.pivot.y * movingScale,
+			actor.container.pivot.y * targetScaleY +
+			movingActor.container.pivot.y * movingScaleY,
 	};
 };

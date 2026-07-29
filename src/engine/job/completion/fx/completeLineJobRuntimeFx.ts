@@ -11,6 +11,7 @@ import type { OutputResultSchema } from "~/engine/output/schema/OutputResultSche
 import { applyOutputPlacementFx } from "~/engine/placement/fx/applyOutputPlacementFx";
 import { removeRuntimeItemIdentityFx } from "~/engine/runtime/fx/removeRuntimeItemIdentityFx";
 import { releaseJobReservationsFx } from "./releaseJobReservationsFx";
+import { readBoardRuntimeItemRectangleFx } from "~/engine/grid/fx/readBoardRuntimeItemRectangleFx";
 
 const emptyOutput = {
 	drop: [],
@@ -35,6 +36,9 @@ export namespace completeLineJobRuntimeFx {
 export const completeLineJobRuntimeFx = Effect.fn("completeLineJobRuntimeFx")(function* (
 	context: JobCompletionContext,
 ) {
+	const originRectangle = yield* readBoardRuntimeItemRectangleFx({
+		item: context.owner,
+	});
 	const depleted =
 		context.owner.item.charges !== undefined && context.owner.remainingCharges === 0;
 	let draft = context.runtime;
@@ -65,6 +69,7 @@ export const completeLineJobRuntimeFx = Effect.fn("completeLineJobRuntimeFx")(fu
 	if (lineOutput.drop.length > 0) {
 		const [placement, withLineOutput] = yield* applyOutputPlacementFx({
 			origin: context.owner.location,
+			originRectangle,
 			output: lineOutput,
 			runtime: draft,
 		});
@@ -89,6 +94,7 @@ export const completeLineJobRuntimeFx = Effect.fn("completeLineJobRuntimeFx")(fu
 		if (depletionOutput.drop.length > 0) {
 			const [placement, withDepletionOutput] = yield* applyOutputPlacementFx({
 				origin: context.owner.location,
+				originRectangle,
 				output: depletionOutput,
 				runtime: draft,
 			});
@@ -113,6 +119,7 @@ export const completeLineJobRuntimeFx = Effect.fn("completeLineJobRuntimeFx")(fu
 
 	const releasedReservations = yield* releaseJobReservationsFx({
 		origin: context.owner.location,
+		originRectangle,
 		originItemId: context.owner.id,
 		reservations: context.reservations,
 		runtime: draft,

@@ -125,13 +125,30 @@ describe("createGameFx", () => {
 				}),
 			);
 
-			expect(game.getSnapshot().items).toEqual([
-				expect.objectContaining({
-					item: expect.objectContaining({
-						id: "item:double-tree",
-					}),
-				}),
-			]);
+			const merged = game.getSnapshot();
+			expect(merged.items).toHaveLength(initial.items.length - 1);
+			expect(merged.items.find((item) => item.id === water.id)).toBeUndefined();
+			expect(merged.items.find((item) => item.id === tree.id)).toMatchObject({
+				id: tree.id,
+				item: {
+					id: "item:double-tree",
+					footprint: {
+						width: 3,
+						height: 1,
+					},
+				},
+			});
+			expect(merged.items.find((item) => item.id === tree.id)?.location).not.toEqual(
+				tree.location,
+			);
+			expect(merged.items.map(({ item }) => item.id)).toEqual(
+				expect.arrayContaining([
+					"item:output-yard",
+					"item:beam",
+					"item:landmark",
+					"item:pallet",
+				]),
+			);
 		} finally {
 			await Effect.runPromise(game.disposeWithoutSaveFx);
 		}

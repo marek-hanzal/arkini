@@ -46,6 +46,14 @@ const moveResult = {
 
 const swapResult = {
 	kind: "swap",
+	relocations: [
+		{
+			itemId: swapCandidate.target.id,
+			location: sourceLocation,
+			previousLocation: targetLocation,
+			revision: "revision:target-swapped",
+		},
+	],
 	source: {
 		itemId: swapCandidate.source.id,
 		location: targetLocation,
@@ -153,7 +161,7 @@ describe("Pixi main-scene drop presentation", () => {
 		expect(Effect.runSync(presentation.readSnapshotFx).landingActorIds).toEqual(new Set());
 	});
 
-	it("retains an accepted swap until its exact generation is consumed", () => {
+	it("suppresses the legacy swap candidate when committed relocations are available", () => {
 		const presentation = Effect.runSync(createPixiMainSceneDropPresentationFx());
 		const generation = Effect.runSync(
 			presentation.beginFx({
@@ -169,12 +177,42 @@ describe("Pixi main-scene drop presentation", () => {
 		);
 
 		Effect.runSync(presentation.clearSwapFx(generation - 1));
-		expect(Effect.runSync(presentation.readSnapshotFx).swaps[0]?.candidate).toEqual(
-			swapCandidate,
+		const snapshot = Effect.runSync(presentation.readSnapshotFx);
+		expect(snapshot.swaps).toEqual([]);
+		expect(snapshot.relocations).toHaveLength(1);
+	});
+
+	it("retains ordered committed relocations until their exact generation is consumed", () => {
+		const presentation = Effect.runSync(createPixiMainSceneDropPresentationFx());
+		const generation = Effect.runSync(
+			presentation.beginFx({
+				retainedActorIds: new Set([
+					swapCandidate.source.id,
+					swapCandidate.target.id,
+				]),
+				swapCandidate: null,
+			}),
+		);
+		Effect.runSync(
+			presentation.completeFx({
+				generation,
+				result: swapResult,
+			}),
 		);
 
-		Effect.runSync(presentation.clearSwapFx(generation));
-		expect(Effect.runSync(presentation.readSnapshotFx).swaps).toEqual([]);
+		expect(Effect.runSync(presentation.readSnapshotFx).relocations).toEqual([
+			{
+				generation,
+				items: [
+					swapResult.source,
+					...swapResult.relocations,
+				],
+			},
+		]);
+		Effect.runSync(presentation.clearRelocationsFx(generation - 1));
+		expect(Effect.runSync(presentation.readSnapshotFx).relocations).toHaveLength(1);
+		Effect.runSync(presentation.clearRelocationsFx(generation));
+		expect(Effect.runSync(presentation.readSnapshotFx).relocations).toEqual([]);
 	});
 
 	it("retains exact Inventory-consumption feedback through canonical reconciliation", () => {

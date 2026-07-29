@@ -98,6 +98,7 @@ export const createPixiMainSceneRuntimeFx = Effect.fn("createPixiMainSceneRuntim
 			dropFeedback,
 			game,
 			palette: paletteState.current,
+			readCanonicalItem: (actorId) => actorStore.canonicalItems.get(actorId),
 			readCanonicalItems: () => actorStore.canonicalItems.values(),
 		});
 		registerRollback(surface.closeFx);
@@ -107,6 +108,7 @@ export const createPixiMainSceneRuntimeFx = Effect.fn("createPixiMainSceneRuntim
 		const magneticField = yield* createPixiTileMagneticFieldFx({
 			actorStore,
 			animationDriver,
+			readLocalActorIds: (rect) => RendererRuntime.runSync(surface.readLocalActorIdsFx(rect)),
 		});
 		registerRollback(magneticField.closeFx);
 		const motion = yield* createPixiTileMotionRuntimeFx({

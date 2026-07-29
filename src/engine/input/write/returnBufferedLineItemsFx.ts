@@ -5,6 +5,7 @@ import { placeRuntimeItemFx } from "~/engine/placement/fx/placeRuntimeItemFx";
 import type { BoardRuntimeItemSchema } from "~/engine/runtime/schema/BoardRuntimeItemSchema";
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import { readBoardRuntimeItemRectangleFx } from "~/engine/grid/fx/readBoardRuntimeItemRectangleFx";
 
 /** Returns selected buffered roots through canonical placement and aggregates their result. */
 export const returnBufferedLineItemsFx = Effect.fn("returnBufferedLineItemsFx")(function* ({
@@ -17,11 +18,15 @@ export const returnBufferedLineItemsFx = Effect.fn("returnBufferedLineItemsFx")(
 	readonly runtime: RuntimeSchema.Type;
 }) {
 	let draft = runtime;
+	const originRectangle = yield* readBoardRuntimeItemRectangleFx({
+		item: owner,
+	});
 	const events: GameEventSchema.Type[] = [];
 	for (const item of items) {
 		const placement = yield* placeRuntimeItemFx({
 			itemId: item.id,
 			origin: owner.location,
+			originRectangle,
 			originItemId: owner.id,
 			runtime: draft,
 		});

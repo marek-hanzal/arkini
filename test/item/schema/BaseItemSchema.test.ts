@@ -22,7 +22,44 @@ describe("BaseItemSchema", () => {
 			maxStackSize: 1,
 		};
 
-		expect(BaseItemSchema.safeParse(item).success).toBe(true);
+		expect(BaseItemSchema.parse(item)).toMatchObject({
+			footprint: {
+				width: 1,
+				height: 1,
+			},
+		});
+		expect(
+			BaseItemSchema.parse({
+				...item,
+				footprint: {
+					width: 3,
+					height: 2,
+				},
+			}),
+		).toMatchObject({
+			footprint: {
+				width: 3,
+				height: 2,
+			},
+		});
+		expect(
+			BaseItemSchema.safeParse({
+				...item,
+				footprint: {
+					width: 0,
+					height: 1,
+				},
+			}).success,
+		).toBe(false);
+		expect(
+			BaseItemSchema.safeParse({
+				...item,
+				footprint: {
+					width: 1,
+					height: 1.5,
+				},
+			}).success,
+		).toBe(false);
 		expect(
 			BaseItemSchema.safeParse({
 				...item,

@@ -57,6 +57,7 @@ interface ActiveInventoryDrag {
 	readonly startX: number;
 	readonly startY: number;
 	phase: "dragging" | "pressed" | "submitting";
+	previewResult: ReadTileDropPreviewFx.Result | null;
 	target: PixiInventoryDropTarget | null;
 }
 
@@ -260,9 +261,9 @@ export const createPixiInventoryDragControllerFx = Effect.fn("createPixiInventor
 		) => {
 			if (!force && drag.target?.x === target?.x && drag.target?.y === target?.y) return;
 			drag.target = target;
-			let kind: ReadTileDropPreviewFx.Result["kind"] | null = null;
+			drag.previewResult = null;
 			try {
-				kind = RendererRuntime.runSync(
+				drag.previewResult = RendererRuntime.runSync(
 					readTileDropPreviewFx({
 						game,
 						sourceItemId: drag.sourceItem.id,
@@ -270,10 +271,11 @@ export const createPixiInventoryDragControllerFx = Effect.fn("createPixiInventor
 						sourceRevision: drag.sourceItem.revision,
 						target: readCommandTarget(target),
 					}),
-				).kind;
+				);
 			} catch (cause) {
 				game.reportCriticalFailure("game-presentation", cause);
 			}
+			const kind = drag.previewResult?.kind ?? null;
 			drag.actor.container.cursor = RendererRuntime.runSync(
 				readPixiTileActorCursorFx({
 					phase: "dragging",
@@ -301,9 +303,22 @@ export const createPixiInventoryDragControllerFx = Effect.fn("createPixiInventor
 				animatePixiActorToRetargetablePoseFx({
 					actor,
 					animator,
-					readSize: () => RendererRuntime.runSync(surface.readActorSizeFx),
-					readTarget: () => RendererRuntime.runSync(surface.readActorPoseFx(actor.item)),
-					target: pose,
+					readTarget: () => {
+						const latest = RendererRuntime.runSync(surface.readActorPoseFx(actor.item));
+						const size = RendererRuntime.runSync(surface.readActorSizeFx);
+						return latest === null
+							? null
+							: {
+									height: size,
+									width: size,
+									...latest,
+								};
+					},
+					target: {
+						height: actor.size,
+						width: actor.size,
+						...pose,
+					},
 				}),
 			);
 		};
@@ -378,11 +393,22 @@ export const createPixiInventoryDragControllerFx = Effect.fn("createPixiInventor
 					running: drag.sourceItem.running,
 				}),
 			);
+			const commandTarget = readCommandTarget(target);
+			const expectedCollisions =
+				drag.previewResult !== null && "collisions" in drag.previewResult
+					? drag.previewResult.collisions
+					: undefined;
 			const command = {
 				sourceItemId: drag.sourceItem.id,
 				sourceLocation: drag.sourceItem.location,
 				sourceRevision: drag.sourceItem.revision,
-				target: readCommandTarget(target),
+				target:
+					commandTarget.kind === "slot" && expectedCollisions !== undefined
+						? {
+								...commandTarget,
+								expectedCollisions,
+							}
+						: commandTarget,
 			} satisfies runTileDropAtom.Command;
 			let submittedDrop: PromiseLike<runTileDropAtom.Result | null>;
 			try {
@@ -482,6 +508,7 @@ export const createPixiInventoryDragControllerFx = Effect.fn("createPixiInventor
 							pressX: event.global.x,
 							pressY: event.global.y,
 							phase: "pressed",
+							previewResult: null,
 							sourceItem: actor.item,
 							startX: actor.container.x,
 							startY: actor.container.y,

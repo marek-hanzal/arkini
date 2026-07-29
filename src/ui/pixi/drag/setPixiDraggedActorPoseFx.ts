@@ -19,7 +19,8 @@ export const setPixiDraggedActorPoseFx = Effect.fn("setPixiDraggedActorPoseFx")(
 		animator.setFx({
 			actor,
 			channel: "pose",
-			scale: actor.container.scale.x,
+			scaleX: actor.container.scale.x,
+			scaleY: actor.container.scale.y,
 			x,
 			y,
 		}),

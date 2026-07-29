@@ -4,6 +4,7 @@ import { match } from "ts-pattern";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import type {
 	TileMotionCue,
+	TileRelocationMotionCue,
 	TileSpawnMotionCue,
 	TileSwapMotionCue,
 } from "~/bridge/tile/motion/TileMotionCue";
@@ -402,7 +403,7 @@ export const createPixiTileMotionRuntimeFx = Effect.fn("createPixiTileMotionRunt
 	const isInterruptibleCueForActor = (
 		cue: TileMotionCue,
 		actorId: string,
-	): cue is TileSpawnMotionCue | TileSwapMotionCue =>
+	): cue is TileSpawnMotionCue | TileSwapMotionCue | TileRelocationMotionCue =>
 		match(cue)
 			.with(
 				{
@@ -428,6 +429,12 @@ export const createPixiTileMotionRuntimeFx = Effect.fn("createPixiTileMotionRunt
 				},
 				(swap) => swap.actorId === actorId || swap.counterpartActorId === actorId,
 			)
+			.with(
+				{
+					kind: "relocation",
+				},
+				(relocation) => relocation.actorId === actorId,
+			)
 			.exhaustive();
 
 	return {
@@ -447,8 +454,12 @@ export const createPixiTileMotionRuntimeFx = Effect.fn("createPixiTileMotionRunt
 					}
 					const cues = readCues();
 					const superseded = cues.filter(
-						(cue): cue is TileSpawnMotionCue | TileSwapMotionCue =>
-							isInterruptibleCueForActor(cue, actorId),
+						(
+							cue,
+						): cue is
+							| TileSpawnMotionCue
+							| TileSwapMotionCue
+							| TileRelocationMotionCue => isInterruptibleCueForActor(cue, actorId),
 					);
 					if (superseded.length === 0) {
 						if (!handedOffDetached) return false;
@@ -525,6 +536,17 @@ export const createPixiTileMotionRuntimeFx = Effect.fn("createPixiTileMotionRunt
 										} else {
 											completedCounterpartIds.add(counterpartId);
 										}
+									}),
+							)
+							.with(
+								{
+									kind: "relocation",
+								},
+								() =>
+									Effect.gen(function* () {
+										if (!started) return;
+										yield* animator.cancelFx(`motion:${cueKey}:${actorId}`);
+										lifecycle?.activeSwapLegActorIds.delete(actorId);
 									}),
 							)
 							.exhaustive();

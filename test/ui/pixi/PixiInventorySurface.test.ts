@@ -100,6 +100,10 @@ vi.mock("~/ui/pixi/scene/createPixiInventorySceneRuntimeFx", () => ({
 }));
 
 const item = {
+	footprint: {
+		height: 1,
+		width: 1,
+	},
 	id: "runtime:water",
 	itemId: "water",
 	itemType: "simple",

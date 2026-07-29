@@ -119,6 +119,8 @@ vi.mock("~/ui/pixi/actor/updatePixiTileActorFx", async () => {
 			EffectModule.sync(() => {
 				actor.item = item;
 				actor.size = size;
+				actor.height = size * item.footprint.height;
+				actor.width = size * item.footprint.width;
 			}),
 	};
 });
@@ -146,6 +148,10 @@ const createItem = (
 	overrides: Partial<TileActorItem> = {},
 ): TileActorItem => ({
 	compositeUrl: undefined,
+	footprint: {
+		height: 1,
+		width: 1,
+	},
 	id,
 	itemId: "water",
 	itemType: "simple",
@@ -236,6 +242,8 @@ const createActor = (item: TileActorItem): PixiTileActor => {
 		pendingVisual: null,
 		item,
 		size: 80,
+		width: 80,
+		height: 80,
 		visualTransitionGeneration: 0,
 		lifecycleIntentGeneration: 0,
 		lifecycleFadeStarted: false,
@@ -286,8 +294,13 @@ const createActorStore = (actor: PixiTileActor) => {
 				Effect.succeed(canonicalItems.get(actorId) ?? null),
 			replaceCanonicalItemsFx: (items: ReadonlyArray<TileActorItem>) =>
 				Effect.sync(() => {
+					const affectedActorIds = new Set([
+						...canonicalItems.keys(),
+						...items.map(({ id }) => id),
+					]);
 					canonicalItems.clear();
 					for (const item of items) canonicalItems.set(item.id, item);
+					return affectedActorIds;
 				}),
 			releaseActorFx: (actorId: string) =>
 				Effect.sync(() => {
@@ -381,6 +394,12 @@ const createAnimator = () => {
 							write.actor.container.position.set(write.x, write.y);
 							if (write.scale !== undefined)
 								write.actor.container.scale.set(write.scale);
+							if (write.scaleX !== undefined || write.scaleY !== undefined) {
+								write.actor.container.scale.set(
+									write.scaleX ?? write.actor.container.scale.x,
+									write.scaleY ?? write.actor.container.scale.y,
+								);
+							}
 							break;
 						case "lifecycle-opacity":
 							write.actor.container.alpha = write.alpha;
@@ -443,7 +462,9 @@ const createReconcilerHarness = ({
 	readonly actor: PixiTileActor;
 	readonly motion?: PixiTileMotionRuntime;
 	readonly pose?: {
+		readonly height?: number;
 		readonly size: number;
+		readonly width?: number;
 		readonly x: number;
 		readonly y: number;
 	};
@@ -460,11 +481,14 @@ const createReconcilerHarness = ({
 			Effect.succeed(
 				readPose
 					? {
+							height: pose.height ?? pose.size,
 							layer,
 							...pose,
+							width: pose.width ?? pose.size,
 						}
 					: null,
 			),
+		refreshOccupancyFx: () => Effect.void,
 		transientActorLayer,
 	} as unknown as PixiMainSceneSurface;
 	const dropPresentation = Effect.runSync(createPixiMainSceneDropPresentationFx());
@@ -789,6 +813,139 @@ describe("Pixi main-scene reconciliation", () => {
 		expect(actor.container.parent).toBe(harness.layer);
 	});
 
+	it("preserves both displayed extents while an ordinary move changes surface projection", () => {
+		const source = {
+			...createItem("runtime:rectangular-move", boardLocation),
+			footprint: {
+				height: 2,
+				width: 2,
+			},
+		};
+		const destination = {
+			...source,
+			footprint: {
+				height: 1,
+				width: 1,
+			},
+			location: {
+				scope: "toolbar" as const,
+				position: {
+					x: 1,
+					y: 0,
+				},
+			},
+			revision: "revision:rectangular-move:toolbar",
+		};
+		const actor = createActor(source);
+		actor.width = 160;
+		actor.height = 160;
+		actor.container.scale.set(0.75, 0.5);
+		const harness = createReconcilerHarness({
+			actor,
+			pose: {
+				height: 80,
+				size: 80,
+				width: 80,
+				x: 520,
+				y: 620,
+			},
+		});
+		projectionState.main = [
+			destination,
+		];
+
+		Effect.runSync(harness.reconciler.hydrateFx(transition(2)));
+
+		expect(harness.writes).toContainEqual(
+			expect.objectContaining({
+				channel: "pose",
+				scaleX: 1.5,
+				scaleY: 1,
+			}),
+		);
+		const travel = harness.animations.find(
+			(animation) => animation.actor === actor && animation.channel === "pose",
+		);
+		if (travel?.channel !== "pose" || travel.readPose === undefined) {
+			throw new Error("Expected ordinary rectangular travel.");
+		}
+		expect(travel.readPose(1)).toMatchObject({
+			scaleX: 1,
+			scaleY: 1,
+			x: 520,
+			y: 620,
+		});
+	});
+
+	it("preserves independent extents from Toolbar into a rectangular Board pose", () => {
+		const source = {
+			...createItem("runtime:toolbar-to-board", {
+				scope: "toolbar",
+				position: {
+					x: 1,
+					y: 0,
+				},
+			}),
+			footprint: {
+				height: 1,
+				width: 1,
+			},
+		};
+		const destination = {
+			...source,
+			footprint: {
+				height: 2,
+				width: 2,
+			},
+			location: {
+				scope: "board" as const,
+				space: 0,
+				position: {
+					x: 3,
+					y: 2,
+				},
+			},
+			revision: "revision:toolbar-to-board:board",
+		};
+		const actor = createActor(source);
+		actor.container.scale.set(1.5, 0.75);
+		const harness = createReconcilerHarness({
+			actor,
+			pose: {
+				height: 160,
+				size: 80,
+				width: 160,
+				x: 280,
+				y: 200,
+			},
+		});
+		projectionState.main = [
+			destination,
+		];
+
+		Effect.runSync(harness.reconciler.hydrateFx(transition(2)));
+
+		expect(harness.writes).toContainEqual(
+			expect.objectContaining({
+				channel: "pose",
+				scaleX: 0.75,
+				scaleY: 0.375,
+			}),
+		);
+		const travel = harness.animations.find(
+			(animation) => animation.actor === actor && animation.channel === "pose",
+		);
+		if (travel?.channel !== "pose" || travel.readPose === undefined) {
+			throw new Error("Expected Toolbar-to-Board rectangular travel.");
+		}
+		expect(travel.readPose(1)).toMatchObject({
+			scaleX: 1,
+			scaleY: 1,
+			x: 280,
+			y: 200,
+		});
+	});
+
 	it("retargets an active layout settle from its live frame on repeated resize hydration", () => {
 		const item = createItem("runtime:resizing-water", boardLocation);
 		const actor = createActor(item);
@@ -815,7 +972,7 @@ describe("Pixi main-scene reconciliation", () => {
 		}
 		const beforeResize = travel.readPose(0.4);
 		actor.container.position.set(beforeResize.x, beforeResize.y);
-		actor.container.scale.set(beforeResize.scale ?? 1);
+		actor.container.scale.set(beforeResize.scaleX ?? 1, beforeResize.scaleY ?? 1);
 		pose.size = 120;
 		pose.x = 700;
 		pose.y = 500;
@@ -835,9 +992,9 @@ describe("Pixi main-scene reconciliation", () => {
 			x: beforeResize.x,
 			y: beforeResize.y,
 		});
-		expect((retargetedStart.scale ?? 1) * actor.size).toBe((beforeResize.scale ?? 1) * 80);
 		expect(retargeted.readPose(1)).toEqual({
-			scale: 1,
+			scaleX: 1,
+			scaleY: 1,
 			x: 700,
 			y: 500,
 		});
@@ -974,6 +1131,7 @@ describe("Pixi main-scene reconciliation", () => {
 		});
 		const actor = createActor(current);
 		actor.container.position.set(500, 400);
+		actor.container.scale.set(1.25, 0.75);
 		const harness = createReconcilerHarness({
 			actor,
 		});
@@ -990,6 +1148,13 @@ describe("Pixi main-scene reconciliation", () => {
 		const returning = harness.animations.find(
 			(animation) => animation.actor === actor && animation.channel === "pose",
 		);
+		if (returning?.channel !== "pose" || returning.readPose === undefined) {
+			throw new Error("Expected a rectangular rejected-drop return.");
+		}
+		expect(returning.readPose(0)).toMatchObject({
+			scaleX: 1.25,
+			scaleY: 0.75,
+		});
 		projectionState.main = [
 			{
 				...current,

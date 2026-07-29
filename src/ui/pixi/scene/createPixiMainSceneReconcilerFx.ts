@@ -5,6 +5,7 @@ import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import type { TileActorFeedbackCue } from "~/bridge/tile/feedback/TileActorFeedbackCue";
 import { readTileActorFeedbackCuesFx } from "~/bridge/tile/feedback/readTileActorFeedbackCuesFx";
 import { readCommittedTileReplacementsFx } from "~/bridge/tile/motion/readCommittedTileReplacementsFx";
+import { readCommittedTileRelocationMotionCuesFx } from "~/bridge/tile/motion/readCommittedTileRelocationMotionCuesFx";
 import { readCommittedTileSwapMotionCueFx } from "~/bridge/tile/motion/readCommittedTileSwapMotionCueFx";
 import { readTileMotionCuesFx } from "~/bridge/tile/motion/readTileMotionCuesFx";
 import { readTileActorsFx } from "~/bridge/tile/readTileActorsFx";
@@ -262,7 +263,9 @@ export const createPixiMainSceneReconcilerFx = Effect.fn("createPixiMainSceneRec
 						.map((item) => item.id),
 				);
 				const dropSnapshot = yield* dropPresentation.readSnapshotFx;
-				yield* actorStore.replaceCanonicalItemsFx(nextItems);
+				const occupancyAffectedActorIds =
+					yield* actorStore.replaceCanonicalItemsFx(nextItems);
+				yield* surface.refreshOccupancyFx(occupancyAffectedActorIds);
 				yield* delivery.syncFx(
 					game.readOrThrow(
 						readTileDeliveriesFx({
@@ -318,6 +321,17 @@ export const createPixiMainSceneReconcilerFx = Effect.fn("createPixiMainSceneRec
 					: [];
 				const replacementActorIds = new Set(replacements.map(({ actorId }) => actorId));
 				if (presentCommittedEffects) {
+					for (const relocation of dropSnapshot.relocations) {
+						compiledCues.push(
+							...RendererRuntime.runSync(
+								readCommittedTileRelocationMotionCuesFx({
+									relocations: relocation.items,
+									transition,
+								}),
+							),
+						);
+						yield* dropPresentation.clearRelocationsFx(relocation.generation);
+					}
 					for (const swap of dropSnapshot.swaps) {
 						const swapCue = RendererRuntime.runSync(
 							readCommittedTileSwapMotionCueFx({
@@ -523,7 +537,8 @@ export const createPixiMainSceneReconcilerFx = Effect.fn("createPixiMainSceneRec
 						yield* animator.setFx({
 							actor,
 							channel: "pose",
-							scale: updatePlan.pose.scaleBeforeTravel,
+							scaleX: updatePlan.pose.scaleBeforeTravel.x,
+							scaleY: updatePlan.pose.scaleBeforeTravel.y,
 							x: actor.container.x,
 							y: actor.container.y,
 						});
@@ -556,9 +571,6 @@ export const createPixiMainSceneReconcilerFx = Effect.fn("createPixiMainSceneRec
 									})
 								: undefined,
 							onComplete: finishTravel,
-							readSize: () =>
-								RendererRuntime.runSync(surface.readActorPoseFx(actor.item))
-									?.size ?? pose.size,
 							readTarget: () =>
 								RendererRuntime.runSync(surface.readActorPoseFx(actor.item)),
 							target: pose,

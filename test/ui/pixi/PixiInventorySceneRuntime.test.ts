@@ -71,6 +71,7 @@ const sceneState = vi.hoisted(() => ({
 	items: [] as TileActorItem[],
 	owner: null as PixiApplicationOwner | null,
 	preview: vi.fn(),
+	readPreview: null as null | (() => unknown),
 	pendingTweenCompletions: [] as Array<() => void>,
 	resize: null as (() => void) | null,
 	roundRects: 0,
@@ -351,6 +352,7 @@ vi.mock("~/bridge/tile/readTileDropPreviewFx", async () => {
 		readTileDropPreviewFx: (props: unknown) =>
 			EffectModule.sync(() => {
 				sceneState.preview(props);
+				if (sceneState.readPreview !== null) return sceneState.readPreview();
 				const target = (
 					props as {
 						readonly target?: {
@@ -426,6 +428,8 @@ vi.mock("~/ui/pixi/actor/createPixiTileActorFx", async () => {
 					lifecycleNotBeforeMs: 0,
 					lifecycleTargetAlpha: 1,
 					size: 0,
+					height: 0,
+					width: 0,
 					visuals: new Set(),
 					dragging: false,
 					dragOffsetX: 0,
@@ -454,12 +458,18 @@ vi.mock("~/ui/pixi/actor/updatePixiTileActorFx", async () => {
 				actor.item = item;
 				actor.currentVisual.item = item;
 				actor.size = size;
+				actor.height = size;
+				actor.width = size;
 			}),
 	};
 });
 
 const inventoryItem = {
 	compositeUrl: undefined,
+	footprint: {
+		height: 1,
+		width: 1,
+	},
 	id: "runtime:water",
 	itemId: "water",
 	itemType: "simple",
@@ -657,6 +667,7 @@ beforeEach(() => {
 	];
 	sceneState.owner = null;
 	sceneState.preview.mockClear();
+	sceneState.readPreview = null;
 	sceneState.pendingTweenCompletions.length = 0;
 	sceneState.resize = null;
 	sceneState.roundRects = 0;
@@ -1038,6 +1049,51 @@ describe("Pixi Inventory scene runtime", () => {
 			expect.objectContaining({
 				sourceItemId: inventoryItem.id,
 				target: occupiedTarget,
+			}),
+		);
+		await Effect.runPromise(runtime.closeFx);
+	});
+
+	it("freezes collision expectations from the fresh release preview", async () => {
+		let previewGeneration = 0;
+		sceneState.readPreview = () => {
+			previewGeneration += 1;
+			return {
+				collisions: [
+					{
+						itemId: "runtime:blocker",
+						revision: `revision:blocker:${previewGeneration}`,
+					},
+				],
+				kind: "swap",
+				targetLocation: inventoryTargetItem.location,
+			};
+		};
+		const onDrop = vi.fn(() =>
+			Promise.resolve({
+				kind: "swap",
+			} as never),
+		);
+		const { actor, runtime, stage } = await mountScene({
+			onDrop,
+		});
+
+		(actor.container as unknown as FakeContainer).emit("pointerdown", slotPointer(0));
+		stage.emit("globalpointermove", slotPointer(1));
+		stage.emit("pointerup", slotPointer(1));
+		await flushMicrotasks();
+
+		expect(sceneState.preview).toHaveBeenCalledTimes(2);
+		expect(onDrop).toHaveBeenCalledWith(
+			expect.objectContaining({
+				target: expect.objectContaining({
+					expectedCollisions: [
+						{
+							itemId: "runtime:blocker",
+							revision: "revision:blocker:2",
+						},
+					],
+				}),
 			}),
 		);
 		await Effect.runPromise(runtime.closeFx);

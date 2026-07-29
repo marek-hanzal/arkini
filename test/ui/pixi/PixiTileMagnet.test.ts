@@ -4,6 +4,7 @@ import { describe, expect, it, vi } from "vitest";
 import type { TileActorItem } from "~/bridge/tile/TileActorItem";
 import type { PixiMainSceneActorStore } from "~/ui/pixi/actor/PixiMainSceneActorStore";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
+import { readPixiTileActorRect } from "~/ui/pixi/magnet/readPixiTileActorRect";
 import type {
 	PixiAnimationDriver,
 	PixiAnimationSpring,
@@ -44,6 +45,32 @@ const readDisplacement = (overrides: Partial<readPixiTileMagneticDisplacementFx.
 	);
 
 describe("Pixi tile magnet", () => {
+	it("reads independent scale and pivot geometry on both axes", () => {
+		expect(
+			readPixiTileActorRect({
+				container: {
+					pivot: {
+						x: 10,
+						y: 20,
+					},
+					scale: {
+						x: 1.5,
+						y: 0.5,
+					},
+					x: 100,
+					y: 80,
+				},
+				height: 160,
+				width: 240,
+			} as PixiTileActor),
+		).toEqual({
+			height: 80,
+			width: 360,
+			x: 85,
+			y: 70,
+		});
+	});
+
 	it("does not move actors outside the magnetic radius", () => {
 		expect(
 			readDisplacement({
@@ -225,6 +252,116 @@ describe("Pixi tile magnet", () => {
 		expect(() => scheduled[1]?.()).not.toThrow();
 	});
 
+	it("samples only unique actors returned by the local padded-cell broad phase", () => {
+		let distantPoseReads = 0;
+		let nearPoseReads = 0;
+		const createActor = (id: string, x: number, countReads = false) =>
+			({
+				container: {
+					destroyed: false,
+					pivot: {
+						x: 0,
+						y: 0,
+					},
+					scale: {
+						x: 1,
+						y: 1,
+					},
+					get x() {
+						if (countReads) distantPoseReads += 1;
+						if (id === "runtime:near") nearPoseReads += 1;
+						return x;
+					},
+					y: 0,
+				},
+				height: 80,
+				item: {
+					footprint: {
+						height: 1,
+						width: 1,
+					},
+					id,
+					location: {
+						position: {
+							x: x / 80,
+							y: 0,
+						},
+						scope: "board",
+						space: 0,
+					},
+				},
+				offsetLayer: {
+					position: {
+						set: vi.fn(),
+					},
+					x: 0,
+					y: 0,
+				},
+				size: 80,
+				width: 80,
+			}) as unknown as PixiTileActor;
+		const source = createActor("runtime:source", 0);
+		const near = createActor("runtime:near", 80);
+		const distant = Array.from(
+			{
+				length: 200,
+			},
+			(_, index) => createActor(`runtime:distant:${index}`, 2_000 + index * 80, true),
+		);
+		const actors = new Map(
+			[
+				source,
+				near,
+				...distant,
+			].map((actor) => [
+				actor.item.id,
+				actor,
+			]),
+		);
+		const field = Effect.runSync(
+			createPixiTileMagneticFieldFx({
+				actorStore: {
+					actors,
+				} as unknown as PixiMainSceneActorStore,
+				animationDriver: {
+					closeFx: Effect.void,
+					createSpringFx: () =>
+						Effect.succeed({
+							closeFx: Effect.void,
+							setTargetFx: () => Effect.void,
+						}),
+					startTweenFx: () =>
+						Effect.succeed({
+							stopFx: Effect.void,
+						}),
+				},
+				readLocalActorIds: () =>
+					new Set([
+						near.item.id,
+					]),
+				scheduleApply: (apply) => apply(),
+			}),
+		);
+
+		Effect.runSync(
+			field.updateFx({
+				attractedActorId: null,
+				eligibleAttractionActorIds: new Set(),
+				sourceActorId: source.item.id,
+				sourceDirection: {
+					x: 1,
+					y: 0,
+				},
+				sourceItem: source.item,
+				sourceX: 0,
+				sourceY: 0,
+			}),
+		);
+
+		expect(nearPoseReads).toBeGreaterThan(0);
+		expect(distantPoseReads).toBe(0);
+	});
+
 	it("reuses, prunes and closes persistent actor spring pairs", () => {
 		const springs: Array<{
 			readonly close: ReturnType<typeof vi.fn>;
@@ -260,6 +397,7 @@ describe("Pixi tile magnet", () => {
 					},
 					scale: {
 						x: 1,
+						y: 1,
 					},
 					x: x * 80,
 					y: 0,
@@ -283,6 +421,8 @@ describe("Pixi tile magnet", () => {
 					},
 				},
 				size: 80,
+				height: 80,
+				width: 80,
 			}) as unknown as PixiTileActor;
 		const source = createActor("runtime:source", 0);
 		const target = createActor("runtime:target", 1);
@@ -370,6 +510,7 @@ describe("Pixi tile magnet", () => {
 					},
 					scale: {
 						x: 1,
+						y: 1,
 					},
 					x,
 					y: 0,
@@ -393,6 +534,8 @@ describe("Pixi tile magnet", () => {
 					},
 				},
 				size: 80,
+				height: 80,
+				width: 80,
 			}) as unknown as PixiTileActor;
 		const receiver = createActor("runtime:receiver", 80);
 		const neighbour = createActor("runtime:neighbour", 160);

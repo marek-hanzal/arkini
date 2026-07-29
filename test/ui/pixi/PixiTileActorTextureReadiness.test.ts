@@ -68,6 +68,10 @@ const createItem = ({
 } = {}) =>
 	({
 		compositeUrl,
+		footprint: {
+			height: 1,
+			width: 1,
+		},
 		id: "runtime:spawn",
 		itemId: "water",
 		itemType: "simple",

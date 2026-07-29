@@ -22,6 +22,10 @@ const board = (x: number) => ({
 		y: 0,
 	},
 });
+const footprint = {
+	height: 1,
+	width: 1,
+} as const;
 
 const stackCue = ({
 	eventIndex,
@@ -40,7 +44,9 @@ const stackCue = ({
 	canonicalItemId: "water",
 	quantity,
 	originActorId: "runtime:producer",
+	originFootprint: footprint,
 	originLocation: board(0),
+	targetFootprint: footprint,
 	targetLocation: board(1),
 });
 
@@ -66,7 +72,9 @@ const inputCue = ({
 	storedQuantity: 1,
 	resultingQuantity: previousQuantity - 1,
 	originActorId: sourceActorId,
+	originFootprint: footprint,
 	originLocation: board(0),
+	targetFootprint: footprint,
 	targetLocation: board(1),
 });
 
@@ -101,8 +109,12 @@ describe("pure tile motion contracts", () => {
 			staggerIndex: 0,
 			actorId: "runtime:target",
 			counterpartActorId: "runtime:source",
+			counterpartOriginFootprint: footprint,
+			counterpartTargetFootprint: footprint,
 			originActorId: "runtime:target",
+			originFootprint: footprint,
 			originLocation: board(1),
+			targetFootprint: footprint,
 			targetLocation: board(0),
 		} satisfies TileMotionCue;
 
@@ -123,6 +135,10 @@ describe("pure tile motion contracts", () => {
 			actorId: "runtime:spawned",
 			originActorId: "runtime:producer",
 			originLocation: board(0),
+			targetFootprint: {
+				height: 1,
+				width: 1,
+			},
 			targetLocation: board(1),
 		} satisfies TileMotionCue;
 		const stack = stackCue({
@@ -315,6 +331,10 @@ describe("pure tile motion contracts", () => {
 			originLocation: board(1),
 			sequence: 12,
 			staggerIndex: 0,
+			targetFootprint: {
+				height: 1,
+				width: 1,
+			},
 			targetLocation: board(2),
 		} satisfies TileMotionCue;
 

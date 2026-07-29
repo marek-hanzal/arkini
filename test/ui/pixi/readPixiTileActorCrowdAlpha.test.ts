@@ -7,6 +7,10 @@ import { readPixiTileActorCrowdAlpha } from "~/ui/pixi/actor/readPixiTileActorCr
 
 const item = (overrides: Partial<TileActorItem> = {}): TileActorItem => ({
 	compositeUrl: undefined,
+	footprint: {
+		height: 1,
+		width: 1,
+	},
 	id: "runtime:item",
 	itemId: "item:test",
 	itemType: ItemEnumSchema.enum.Simple,

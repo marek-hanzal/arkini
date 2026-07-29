@@ -1,8 +1,9 @@
 import { Effect } from "effect";
 
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
-import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 import type { GridRuntimeItemSchema } from "~/engine/runtime/schema/GridRuntimeItemSchema";
+import { readGridItemLocationsFx } from "./readGridItemLocationsFx";
+import { readGridLocationKey } from "./readGridLocationKey";
 
 export namespace readGridLocationOccupantsFx {
 	export interface Props {
@@ -11,13 +12,6 @@ export namespace readGridLocationOccupantsFx {
 	}
 }
 
-export const readGridLocationKey = (location: GridLocationSchema.Type) => {
-	const position = `${location.position.x}:${location.position.y}`;
-	return location.scope === LocationScopeEnumSchema.enum.Board
-		? `${location.scope}:${location.space}:${position}`
-		: `${location.scope}:${position}`;
-};
-
 /** Groups live grid items by one explicit set of concrete board, inventory, or toolbar cells. */
 export const readGridLocationOccupantsFx = Effect.fn("readGridLocationOccupantsFx")(function* ({
 	items,
@@ -25,14 +19,20 @@ export const readGridLocationOccupantsFx = Effect.fn("readGridLocationOccupantsF
 }: readGridLocationOccupantsFx.Props) {
 	const itemsByLocation = new Map<string, GridRuntimeItemSchema.Type[]>();
 	for (const item of items) {
-		const key = readGridLocationKey(item.location);
-		const occupants = itemsByLocation.get(key);
-		if (occupants === undefined) {
-			itemsByLocation.set(key, [
-				item,
-			]);
-		} else {
-			occupants.push(item);
+		const occupiedLocations = yield* readGridItemLocationsFx({
+			item: item.item,
+			location: item.location,
+		});
+		for (const occupiedLocation of occupiedLocations) {
+			const key = readGridLocationKey(occupiedLocation);
+			const occupants = itemsByLocation.get(key);
+			if (occupants === undefined) {
+				itemsByLocation.set(key, [
+					item,
+				]);
+			} else if (!occupants.some((occupant) => occupant.id === item.id)) {
+				occupants.push(item);
+			}
 		}
 	}
 

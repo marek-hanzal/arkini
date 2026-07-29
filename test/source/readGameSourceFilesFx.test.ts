@@ -40,4 +40,59 @@ describe("readGameSourceFilesFx", () => {
 			]),
 		);
 	});
+
+	it("reports an invalid footprint dimension at its exact source path", async () => {
+		const result = await Effect.runPromise(
+			Effect.gen(function* () {
+				const fileSystem = yield* FileSystem.FileSystem;
+				const path = yield* Path.Path;
+				const input = yield* fileSystem.makeTempDirectoryScoped();
+				yield* fileSystem.writeFileString(
+					path.join(input, "invalid-footprint.json"),
+					JSON.stringify({
+						items: {
+							"item:a": {
+								id: "item:a",
+								title: "A",
+								description: "A",
+								asset: {
+									source: [
+										"asset:a",
+									],
+								},
+								tags: [],
+								categoryId: "category:test",
+								scope: "any",
+								maxStackSize: 1,
+								type: "simple",
+								footprint: {
+									width: 0,
+									height: 2,
+								},
+							},
+						},
+					}),
+				);
+				return yield* readGameSourceFilesFx({
+					input,
+				});
+			}).pipe(Effect.provide(NodeServices.layer), Effect.scoped),
+		);
+
+		expect(result.sources).toEqual([]);
+		expect(result.diagnostics).toEqual(
+			expect.arrayContaining([
+				expect.objectContaining({
+					code: DiagnosticCodeEnumSchema.enum.SourceSchemaInvalid,
+					path: [
+						"items",
+						"item:a",
+						"footprint",
+						"width",
+					],
+					source: expect.stringContaining("invalid-footprint.json"),
+				}),
+			]),
+		);
+	});
 });

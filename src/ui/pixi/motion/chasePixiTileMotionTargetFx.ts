@@ -23,10 +23,11 @@ export namespace chasePixiTileMotionTargetFx {
 		readonly onPose?: (pose: PixiActorPresentedPose) => void;
 		readonly onSettled: () => void;
 		readonly ownerKey: string;
-		readonly readLiveTarget?: () => Required<PixiActorPresentedPose> | null;
+		readonly readLiveTarget?: () => PixiActorPresentedPose | null;
 		readonly settleWithinTileRatio?: number;
 		readonly shouldSettle?: () => boolean;
 		readonly surface: PixiMainSceneSurface;
+		readonly targetFootprint?: TileActorItem["footprint"];
 		readonly targetLocation: TileActorItem["location"];
 	}
 }
@@ -52,6 +53,7 @@ export const chasePixiTileMotionTargetFx = Effect.fn("chasePixiTileMotionTargetF
 	settleWithinTileRatio,
 	shouldSettle,
 	surface,
+	targetFootprint,
 	targetLocation,
 }: chasePixiTileMotionTargetFx.Props) {
 	let settled = false;
@@ -77,27 +79,45 @@ export const chasePixiTileMotionTargetFx = Effect.fn("chasePixiTileMotionTargetF
 		settle();
 		return;
 	}
-	const semanticTarget = (yield* surface.readLocationPoseFx(targetLocation)) ?? fallbackTarget;
+	const semanticTarget =
+		(yield* surface.readLocationPoseFx(targetLocation, targetFootprint)) ?? fallbackTarget;
 	const from = {
-		scale: actor.container.scale.x,
+		scaleX: actor.container.scale.x,
+		scaleY: actor.container.scale.y,
 		x: actor.container.x,
 		y: actor.container.y,
 	};
-	const target = readLiveTarget?.() ?? {
-		scale: semanticTarget.size / Math.max(1, actor.size),
-		x: semanticTarget.x,
-		y: semanticTarget.y,
+	const liveTarget = readLiveTarget?.();
+	const target = {
+		scaleX:
+			liveTarget?.scaleX ??
+			liveTarget?.scale ??
+			(semanticTarget.width ?? semanticTarget.size) / Math.max(1, actor.width || actor.size),
+		scaleY:
+			liveTarget?.scaleY ??
+			liveTarget?.scale ??
+			(semanticTarget.height ?? semanticTarget.size) /
+				Math.max(1, actor.height || actor.size),
+		x: liveTarget?.x ?? semanticTarget.x,
+		y: liveTarget?.y ?? semanticTarget.y,
 	};
-	if (from.x === target.x && from.y === target.y && from.scale === target.scale) {
+	if (
+		from.x === target.x &&
+		from.y === target.y &&
+		from.scaleX === target.scaleX &&
+		from.scaleY === target.scaleY
+	) {
 		settle();
 		return;
 	}
 	const poseSampler = yield* createPixiTileMotionPoseSamplerFx({
-		actorBaseSize: actor.size,
+		actorBaseHeight: actor.height || actor.size,
+		actorBaseWidth: actor.width || actor.size,
 		from,
 		readLiveTarget,
 		surface,
 		target: semanticTarget,
+		targetFootprint,
 		targetLocation,
 	});
 	yield* animator.animateFx({
@@ -108,7 +128,13 @@ export const chasePixiTileMotionTargetFx = Effect.fn("chasePixiTileMotionTargetF
 		durationMs: yield* readPixiTileTravelDurationMsFx({
 			fromX: from.x,
 			fromY: from.y,
-			tileSize: Math.max(1, target.scale * actor.size),
+			tileSize: Math.max(
+				1,
+				Math.min(
+					target.scaleX * (actor.width || actor.size),
+					target.scaleY * (actor.height || actor.size),
+				),
+			),
 			toX: target.x,
 			toY: target.y,
 		}),
@@ -135,6 +161,7 @@ export const chasePixiTileMotionTargetFx = Effect.fn("chasePixiTileMotionTargetF
 					settleWithinTileRatio,
 					shouldSettle,
 					surface,
+					targetFootprint,
 					targetLocation,
 				}),
 			);
@@ -151,7 +178,8 @@ export const chasePixiTileMotionTargetFx = Effect.fn("chasePixiTileMotionTargetF
 					if (settled || actor.container.destroyed || shouldSettle?.()) return;
 					if (
 						!isInsideSettlementField({
-							scale: actor.container.scale.x,
+							scaleX: actor.container.scale.x,
+							scaleY: actor.container.scale.y,
 							x: actor.container.x,
 							y: actor.container.y,
 						})
@@ -167,7 +195,8 @@ export const chasePixiTileMotionTargetFx = Effect.fn("chasePixiTileMotionTargetF
 							animator.setFx({
 								actor,
 								channel: "pose",
-								scale: contactPose.scale,
+								scaleX: contactPose.scaleX ?? contactPose.scale,
+								scaleY: contactPose.scaleY ?? contactPose.scale,
 								x: contactPose.x,
 								y: contactPose.y,
 							}),

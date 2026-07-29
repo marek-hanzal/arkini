@@ -695,8 +695,8 @@ describe("readItemDetailLinesFx", () => {
 									scope: "board",
 									space: 0,
 									position: {
-										x: 1,
-										y: 2,
+										x: 0,
+										y: 3,
 									},
 								},
 								quantity: 1,

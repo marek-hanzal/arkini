@@ -12,11 +12,16 @@ export interface DropItemCommand {
 	readonly target:
 		| {
 				readonly kind: "slot";
+				readonly hitLocation?: GridLocationSchema.Type;
 				readonly location: GridLocationSchema.Type;
 				readonly occupant: {
 					readonly itemId: IdSchema.Type;
 					readonly revision: RevisionSchema.Type;
 				} | null;
+				readonly expectedCollisions?: ReadonlyArray<{
+					readonly itemId: IdSchema.Type;
+					readonly revision: RevisionSchema.Type;
+				}>;
 				readonly inputStore?: {
 					readonly lineId: IdSchema.Type;
 					readonly inputIndex: NonNegativeIntegerSchema.Type;

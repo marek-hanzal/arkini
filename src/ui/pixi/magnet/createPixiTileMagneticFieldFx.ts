@@ -13,12 +13,19 @@ import type {
 	PixiTileMagneticFieldSample,
 	PixiTileMagneticSourceKind,
 } from "~/ui/pixi/magnet/PixiTileMagneticField";
-import { readPixiTileMagneticDisplacement } from "~/ui/pixi/magnet/readPixiTileMagneticDisplacementFx";
+import {
+	readPixiTileMagneticDisplacement,
+	type readPixiTileMagneticDisplacementFx,
+} from "~/ui/pixi/magnet/readPixiTileMagneticDisplacementFx";
+import { readPixiTileActorRect } from "~/ui/pixi/magnet/readPixiTileActorRect";
 
 export namespace createPixiTileMagneticFieldFx {
 	export interface Props {
 		readonly actorStore: PixiMainSceneActorStore;
 		readonly animationDriver: PixiAnimationDriver;
+		readonly readLocalActorIds?: (
+			rect: readPixiTileMagneticDisplacementFx.Rect,
+		) => ReadonlySet<string>;
 		readonly scheduleApply?: (apply: () => void) => void;
 	}
 }
@@ -57,6 +64,7 @@ export const createPixiTileMagneticFieldFx = Effect.fn("createPixiTileMagneticFi
 	({
 		actorStore,
 		animationDriver,
+		readLocalActorIds,
 		scheduleApply = queueMicrotask,
 	}: createPixiTileMagneticFieldFx.Props) =>
 		Effect.sync((): PixiTileMagneticField => {
@@ -146,31 +154,33 @@ export const createPixiTileMagneticFieldFx = Effect.fn("createPixiTileMagneticFi
 				if (released) requestApply();
 			};
 
-			const readActorRect = (actor: PixiTileActor) => {
-				const scale = actor.container.scale.x;
-				return {
-					height: actor.size * scale,
-					width: actor.size * scale,
-					x: actor.container.x - actor.container.pivot.x * scale,
-					y: actor.container.y - actor.container.pivot.y * scale,
-				};
-			};
-
 			const readSourceRect = (sample: ActiveMagneticSample) => {
+				if (sample.sourceWidth !== undefined && sample.sourceHeight !== undefined) {
+					return {
+						height: sample.sourceHeight,
+						width: sample.sourceWidth,
+						x: sample.sourceX,
+						y: sample.sourceY,
+					};
+				}
 				const sourceActor = actorStore.actors.get(sample.sourceActorId);
-				const sourceSize =
-					sample.sourceSize ??
-					(sourceActor === undefined
-						? null
-						: sourceActor.size * sourceActor.container.scale.x);
-				return sourceSize === null
-					? null
-					: {
-							height: sourceSize,
-							width: sourceSize,
-							x: sample.sourceX,
-							y: sample.sourceY,
-						};
+				if (sourceActor !== undefined) {
+					const scaleX = sourceActor.container.scale.x;
+					const scaleY = sourceActor.container.scale.y;
+					return {
+						height: (sourceActor.height ?? sourceActor.size) * scaleY,
+						width: (sourceActor.width ?? sourceActor.size) * scaleX,
+						x: sample.sourceX,
+						y: sample.sourceY,
+					};
+				}
+				if (sample.sourceSize === undefined) return null;
+				return {
+					height: sample.sourceSize * (sample.sourceItem.footprint?.height ?? 1),
+					width: sample.sourceSize * (sample.sourceItem.footprint?.width ?? 1),
+					x: sample.sourceX,
+					y: sample.sourceY,
+				};
 			};
 
 			const setSpringTarget = (
@@ -201,7 +211,18 @@ export const createPixiTileMagneticFieldFx = Effect.fn("createPixiTileMagneticFi
 						readonly sourceRect: NonNullable<ReturnType<typeof readSourceRect>>;
 					} => source.sourceRect !== null,
 				);
-				for (const actor of actorStore.actors.values()) {
+				const candidateActorIds =
+					readLocalActorIds === undefined
+						? new Set(actorStore.actors.keys())
+						: new Set([
+								...springs.keys(),
+								...activeSamples.flatMap(({ sourceRect }) => [
+									...readLocalActorIds(sourceRect),
+								]),
+							]);
+				for (const actorId of candidateActorIds) {
+					const actor = actorStore.actors.get(actorId);
+					if (actor === undefined || actor.container.destroyed) continue;
 					if (actor.item.location.scope !== LocationScopeEnumSchema.enum.Board) {
 						const spring = springs.get(actor.item.id);
 						if (spring !== undefined) setSpringTarget(spring, 0, 0);
@@ -209,7 +230,7 @@ export const createPixiTileMagneticFieldFx = Effect.fn("createPixiTileMagneticFi
 					}
 					let displacementX = 0;
 					let displacementY = 0;
-					const actorRect = readActorRect(actor);
+					const actorRect = readPixiTileActorRect(actor);
 					for (const { sample, sourceRect } of activeSamples) {
 						const displacement = readPixiTileMagneticDisplacement({
 							actorId: actor.item.id,

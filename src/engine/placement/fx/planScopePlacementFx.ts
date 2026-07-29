@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
 import type { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
-import type { PositionSchema } from "~/engine/grid/schema/PositionSchema";
+import type { BoardRectangleSchema } from "~/engine/grid/schema/BoardRectangleSchema";
 import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import { isSameGridLocationFx } from "~/engine/location/read/isSameGridLocationFx";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
@@ -20,7 +20,7 @@ export namespace planScopePlacementFx {
 		excludedLocations?: ReadonlyArray<GridLocationSchema.Type>;
 		item: ItemSchema.Type;
 		locations: ReadonlyArray<GridLocationSchema.Type>;
-		origin?: PositionSchema.Type;
+		origin?: BoardRectangleSchema.Type;
 		quantity: PositiveIntegerSchema.Type;
 		runtime: RuntimeSchema.Type;
 	}
@@ -78,6 +78,7 @@ export const planScopePlacementFx = Effect.fn("planScopePlacementFx")(function* 
 	}
 
 	const emptyLocations = yield* readEmptyLocationsFx({
+		item,
 		locations: eligibleLocations,
 		runtime,
 	});

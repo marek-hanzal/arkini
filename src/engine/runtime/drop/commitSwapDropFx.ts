@@ -6,8 +6,8 @@ import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
 import {
 	makeDropRejectedResult,
 	makeInvalidGridDropRejectedResult,
-	makeStaleDropRejectedResult,
 } from "~/engine/runtime/drop/makeDropRejectedResult";
+import { makeDropCommitRaceHandlers } from "~/engine/runtime/drop/makeDropCommitRaceHandlers";
 import { DropItemIgnoredReasonEnumSchema } from "~/engine/runtime/schema/command/DropItemIgnoredReasonEnumSchema";
 import { DropItemRejectedReasonEnumSchema } from "~/engine/runtime/schema/command/DropItemRejectedReasonEnumSchema";
 import type { DropItemResultSchema } from "~/engine/runtime/schema/command/DropItemResultSchema";
@@ -16,6 +16,11 @@ import { swapItemsFx } from "~/engine/runtime/write/swapItemsFx";
 
 export namespace commitSwapDropFx {
 	export interface Props {
+		readonly expectedCollisions: ReadonlyArray<{
+			readonly itemId: IdSchema.Type;
+			readonly revision: RevisionSchema.Type;
+		}>;
+		readonly destinationLocation?: GridLocationSchema.Type;
 		readonly sourceItemId: IdSchema.Type;
 		readonly sourceRevision: RevisionSchema.Type;
 		readonly sourceLocation: GridLocationSchema.Type;
@@ -29,6 +34,8 @@ export namespace commitSwapDropFx {
 
 /** Commits one exact grid swap and normalizes both actor identities. */
 export const commitSwapDropFx = Effect.fn("commitSwapDropFx")(function* ({
+	expectedCollisions,
+	destinationLocation,
 	sourceItemId,
 	sourceRevision,
 	sourceLocation,
@@ -37,6 +44,8 @@ export const commitSwapDropFx = Effect.fn("commitSwapDropFx")(function* ({
 	targetLocation,
 }: commitSwapDropFx.Props) {
 	return yield* swapItemsFx({
+		destinationLocation,
+		expectedCollisions,
 		firstItemId: sourceItemId,
 		firstItemRevision: sourceRevision,
 		secondItemId: targetItemId,
@@ -57,25 +66,21 @@ export const commitSwapDropFx = Effect.fn("commitSwapDropFx")(function* ({
 					previousLocation: targetLocation,
 					location: result.second.location,
 				},
+				relocations: result.relocations.map(({ item, previousLocation }) => {
+					return {
+						itemId: item.id,
+						revision: item.revision,
+						previousLocation,
+						location: item.location,
+					};
+				}),
 			}),
 		),
 		Effect.catchTags({
-			ItemNotFoundError: (error) =>
-				Effect.succeed(
-					makeStaleDropRejectedResult({
-						entityId: error.itemId,
-						sourceItemId,
-						targetItemId,
-					}),
-				),
-			RevisionConflictError: (error) =>
-				Effect.succeed(
-					makeStaleDropRejectedResult({
-						entityId: error.entityId,
-						sourceItemId,
-						targetItemId,
-					}),
-				),
+			...makeDropCommitRaceHandlers({
+				sourceItemId,
+				targetItemId,
+			}),
 			ItemNotOnGridError: (error) =>
 				Effect.succeed(
 					makeInvalidGridDropRejectedResult({
@@ -88,6 +93,22 @@ export const commitSwapDropFx = Effect.fn("commitSwapDropFx")(function* ({
 				Effect.succeed(
 					makeDropRejectedResult({
 						reason: DropItemRejectedReasonEnumSchema.enum.InvalidTarget,
+						sourceItemId,
+						targetItemId,
+					}),
+				),
+			LocationOccupiedError: () =>
+				Effect.succeed(
+					makeDropRejectedResult({
+						reason: DropItemRejectedReasonEnumSchema.enum.Blocked,
+						sourceItemId,
+						targetItemId,
+					}),
+				),
+			PlacementUnavailableError: () =>
+				Effect.succeed(
+					makeDropRejectedResult({
+						reason: DropItemRejectedReasonEnumSchema.enum.Blocked,
 						sourceItemId,
 						targetItemId,
 					}),

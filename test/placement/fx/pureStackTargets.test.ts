@@ -49,6 +49,49 @@ const activeJob = (ownerItemId: string) => ({
 });
 
 describe("pure placement stack targets", () => {
+	it("returns one stack identity even when its footprint covers multiple requested cells", () => {
+		const wide = {
+			...craft({
+				id: "runtime:wide",
+				location: board(0),
+			}),
+			item: {
+				...purityTestConfig.items.craft,
+				footprint: {
+					width: 2,
+					height: 1,
+				},
+			},
+		};
+		const runtime = {
+			cheats: {
+				enabled: false,
+				everEnabled: false,
+				instantGameplay: false,
+			},
+			currentSpace: 0,
+			items: [
+				wide,
+			],
+			jobs: [],
+		} satisfies RuntimeSchema.Type;
+
+		const stacks = Effect.runSync(
+			readAvailableStackItemsFx({
+				itemId: "craft",
+				locations: [
+					board(0),
+					board(1),
+				],
+				runtime,
+			}),
+		);
+
+		expect(stacks.map(({ id }) => id)).toEqual([
+			wide.id,
+		]);
+	});
+
 	it("excludes active and queued owners while retaining idle compatible stacks", () => {
 		const active = craft({
 			id: "runtime:active",

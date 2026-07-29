@@ -14,6 +14,7 @@ import { JobStatusEnumSchema } from "~/engine/job/schema/read/JobStatusEnumSchem
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 import { isGridRuntimeItemFx } from "~/engine/runtime/read/isGridRuntimeItemFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import { readEffectiveGridFootprintFx } from "~/engine/grid/fx/readEffectiveGridFootprintFx";
 
 export namespace readTileActorsFx {
 	export interface Props {
@@ -90,6 +91,10 @@ export const readTileActorsFx = Effect.fnUntraced(function* ({
 							badgeKind: "queue" as const,
 						}),
 				id: item.id,
+				footprint: yield* readEffectiveGridFootprintFx({
+					authored: item.item.footprint,
+					location: item.location,
+				}),
 				itemType: item.item.type,
 				revision: item.revision,
 				quantity: item.quantity,

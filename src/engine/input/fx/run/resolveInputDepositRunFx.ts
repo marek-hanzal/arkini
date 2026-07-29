@@ -4,6 +4,8 @@ import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { InputDepositSchema } from "~/engine/input/schema/InputDepositSchema";
 import type { InputRunResolutionSchema } from "~/engine/input/schema/run/InputRunResolutionSchema";
 import { queryFx } from "~/engine/query/fx/queryFx";
+import { readBoardRuntimeItemRectangleFx } from "~/engine/grid/fx/readBoardRuntimeItemRectangleFx";
+import { readBoardRectangleManhattanGapFx } from "~/engine/grid/fx/readBoardRectangleManhattanGapFx";
 import { RuntimeFx } from "~/engine/runtime/context/RuntimeFx";
 import { isBoardRuntimeItemFx } from "~/engine/runtime/read/isBoardRuntimeItemFx";
 import { readBoardRuntimeItemByIdFx } from "~/engine/runtime/read/readBoardRuntimeItemByIdFx";
@@ -21,45 +23,6 @@ export namespace resolveInputDepositRunFx {
 	}
 }
 
-const compareTarget = (
-	origin: {
-		x: number;
-		y: number;
-	},
-	left: {
-		id: string;
-		location: {
-			position: {
-				x: number;
-				y: number;
-			};
-		};
-	},
-	right: {
-		id: string;
-		location: {
-			position: {
-				x: number;
-				y: number;
-			};
-		};
-	},
-) => {
-	const leftDistance =
-		Math.abs(left.location.position.x - origin.x) +
-		Math.abs(left.location.position.y - origin.y);
-	const rightDistance =
-		Math.abs(right.location.position.x - origin.x) +
-		Math.abs(right.location.position.y - origin.y);
-
-	return (
-		leftDistance - rightDistance ||
-		left.location.position.y - right.location.position.y ||
-		left.location.position.x - right.location.position.x ||
-		left.id.localeCompare(right.id)
-	);
-};
-
 /** Selects one deterministic board target that can pay a deposit input charge cost. */
 export const resolveInputDepositRunFx = Effect.fn("resolveInputDepositRunFx")(function* ({
 	input,
@@ -72,19 +35,43 @@ export const resolveInputDepositRunFx = Effect.fn("resolveInputDepositRunFx")(fu
 		runtime,
 	});
 
+	const ownerRectangle = yield* readBoardRuntimeItemRectangleFx({
+		item: owner,
+	});
 	const candidates = yield* queryFx({
 		origin: owner.location,
+		originRectangle: ownerRectangle,
 		query: input.query,
 	}).pipe(
 		Effect.provideService(RuntimeFx, {
 			read: Effect.succeed(runtime),
 		}),
 	);
-	const boardCandidates = Array.getSomes(
-		yield* Effect.forEach(candidates, isBoardRuntimeItemFx),
-	).sort((left, right) => compareTarget(owner.location.position, left, right));
+	const boardCandidates = yield* Effect.forEach(
+		Array.getSomes(yield* Effect.forEach(candidates, isBoardRuntimeItemFx)),
+		(candidate) =>
+			Effect.gen(function* () {
+				return {
+					candidate,
+					distance: yield* readBoardRectangleManhattanGapFx({
+						left: ownerRectangle,
+						right: yield* readBoardRuntimeItemRectangleFx({
+							item: candidate,
+						}),
+					}),
+				};
+			}),
+	);
+	boardCandidates.sort((left, right) => {
+		return (
+			left.distance - right.distance ||
+			left.candidate.location.position.y - right.candidate.location.position.y ||
+			left.candidate.location.position.x - right.candidate.location.position.x ||
+			left.candidate.id.localeCompare(right.candidate.id)
+		);
+	});
 
-	for (const target of boardCandidates) {
+	for (const { candidate: target } of boardCandidates) {
 		const charges = yield* resolveInputChargeRunFx({
 			charges: input.charges,
 			ownerItemId,

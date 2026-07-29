@@ -12,7 +12,7 @@ import type {
 
 interface PendingDrop {
 	readonly generation: number;
-	readonly sourceActorId: string;
+	readonly retainedActorIds: ReadonlySet<string>;
 }
 
 interface PendingSwap {
@@ -23,6 +23,18 @@ interface PendingSwap {
 interface PendingFeedback {
 	readonly cues: ReadonlyArray<TileActorFeedbackCue>;
 	readonly generation: number;
+}
+
+interface PendingRelocations {
+	readonly generation: number;
+	readonly items: NonNullable<
+		Extract<
+			runTileDropAtom.Result,
+			{
+				readonly kind: typeof DropItemResultKindEnumSchema.enum.Swap;
+			}
+		>["relocations"]
+	>;
 }
 
 const readFeedbackCues = (
@@ -103,17 +115,19 @@ export const createPixiMainSceneDropPresentationFx = Effect.fn(
 		let closed = false;
 		let nextGeneration = 0;
 		const pending = new Map<number, PendingDrop>();
+		const relocations = new Map<number, PendingRelocations>();
 		const swaps = new Map<number, PendingSwap>();
 
 		const clearGeneration = (generation: number) => {
 			pending.delete(generation);
 			swaps.delete(generation);
 			feedback.delete(generation);
+			relocations.delete(generation);
 		};
 
 		return {
 			beginFx: Effect.fn("PixiMainSceneDropPresentation.beginFx")(
-				({ sourceActorId, swapCandidate }) =>
+				({ retainedActorIds, sourceActorId, swapCandidate }) =>
 					Effect.sync(() => {
 						if (closed) {
 							throw new Error(
@@ -124,7 +138,15 @@ export const createPixiMainSceneDropPresentationFx = Effect.fn(
 						const generation = nextGeneration;
 						pending.set(generation, {
 							generation,
-							sourceActorId,
+							retainedActorIds:
+								retainedActorIds ??
+								new Set(
+									sourceActorId === undefined
+										? []
+										: [
+												sourceActorId,
+											],
+								),
 						});
 						if (swapCandidate !== null) {
 							swaps.set(generation, {
@@ -139,6 +161,12 @@ export const createPixiMainSceneDropPresentationFx = Effect.fn(
 				Effect.sync(() => {
 					swaps.delete(generation);
 				}),
+			),
+			clearRelocationsFx: Effect.fn("PixiMainSceneDropPresentation.clearRelocationsFx")(
+				(generation) =>
+					Effect.sync(() => {
+						relocations.delete(generation);
+					}),
 			),
 			clearFeedbackFx: Effect.fn("PixiMainSceneDropPresentation.clearFeedbackFx")(
 				(generation) =>
@@ -167,6 +195,16 @@ export const createPixiMainSceneDropPresentationFx = Effect.fn(
 						if (result.kind === DropItemResultKindEnumSchema.enum.Move) {
 							landingActorIds.add(result.itemId);
 						}
+						if (result.kind === DropItemResultKindEnumSchema.enum.Swap) {
+							relocations.set(generation, {
+								generation,
+								items: [
+									result.source,
+									...result.relocations,
+								],
+							});
+							swaps.delete(generation);
+						}
 						if (result.kind !== DropItemResultKindEnumSchema.enum.Swap) {
 							swaps.delete(generation);
 						}
@@ -184,8 +222,11 @@ export const createPixiMainSceneDropPresentationFx = Effect.fn(
 					hiddenActorIds: new Set(hiddenActorIds),
 					landingActorIds: new Set(landingActorIds),
 					pendingActorIds: new Set(
-						Array.from(pending.values(), ({ sourceActorId }) => sourceActorId),
+						Array.from(pending.values()).flatMap(({ retainedActorIds }) => [
+							...retainedActorIds,
+						]),
 					),
+					relocations: Array.from(relocations.values()),
 					swaps: Array.from(swaps.values()),
 				}),
 			),
@@ -209,6 +250,7 @@ export const createPixiMainSceneDropPresentationFx = Effect.fn(
 				pending.clear();
 				swaps.clear();
 				feedback.clear();
+				relocations.clear();
 			}),
 		};
 	}),

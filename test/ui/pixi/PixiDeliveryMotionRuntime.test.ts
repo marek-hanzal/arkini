@@ -34,6 +34,23 @@ vi.mock("~/ui/pixi/actor/updatePixiTileActorFx", async () => {
 	};
 });
 
+vi.mock("~/ui/pixi/actor/createPixiTileActorFx", async () => {
+	const { Effect: EffectModule } = await import("effect");
+	const { Container: PixiContainer } = await import("pixi.js");
+	return {
+		createPixiTileActorFx: ({ item }: { readonly item: TileDelivery["item"] }) =>
+			EffectModule.succeed({
+				container: new PixiContainer(),
+				height: 80 * item.footprint.height,
+				instanceId: `actor:${item.id}`,
+				item,
+				onPointerDown: null,
+				size: 80,
+				width: 80 * item.footprint.width,
+			} as unknown as PixiTileActor),
+	};
+});
+
 vi.mock("~/ui/pixi/motion/flashPixiMotionTargetFx", async () => {
 	const { Effect: EffectModule } = await import("effect");
 	return {
@@ -58,6 +75,10 @@ const target = {
 	},
 };
 const item = {
+	footprint: {
+		height: 1,
+		width: 1,
+	},
 	id: "runtime:water",
 	itemId: "water",
 	itemType: "simple" as const,
@@ -74,6 +95,137 @@ const item = {
 };
 
 describe("PixiDeliveryMotionRuntime", () => {
+	it("hydrates a multi-cell Board return at full size and ends compact at its Inventory portal", () => {
+		const multiItem = {
+			...item,
+			footprint: {
+				height: 2,
+				width: 3,
+			},
+		};
+		const actors = new Map<string, PixiTileActor>();
+		const poseWrites: PixiActorPresentationWrite[] = [];
+		const animations: PixiActorAnimation[] = [];
+		const requestedFootprints: Array<TileDelivery["fromFootprint"] | undefined> = [];
+		const animator = {
+			animateFx: (animation: PixiActorAnimation) =>
+				Effect.sync(() => {
+					animations.push(animation);
+				}),
+			cancelActorFx: () => Effect.void,
+			cancelChannelFx: () => Effect.void,
+			cancelFx: () => Effect.void,
+			closeFx: Effect.void,
+			isChannelActiveFx: () => Effect.succeed(false),
+			setFx: (write: PixiActorPresentationWrite) =>
+				Effect.sync(() => {
+					poseWrites.push(write);
+					if (write.channel !== "pose") return;
+					write.actor.container.position.set(write.x, write.y);
+					write.actor.container.scale.set(
+						write.scaleX ?? write.scale ?? write.actor.container.scale.x,
+						write.scaleY ?? write.scale ?? write.actor.container.scale.y,
+					);
+				}),
+		} satisfies PixiActorAnimator;
+		const runtime = Effect.runSync(
+			createPixiDeliveryMotionRuntimeFx({
+				actorStore: {
+					actors,
+					canonicalItems: new Map(),
+					setActorFx: (actor: PixiTileActor) =>
+						Effect.sync(() => {
+							actors.set(actor.item.id, actor);
+						}),
+				} as unknown as PixiMainSceneActorStore,
+				animator,
+				application: {
+					frames: {
+						invalidateFx: Effect.void,
+					},
+				} as never,
+				drag: {
+					attachActorFx: () => Effect.void,
+					detachActorFx: () => Effect.void,
+				} as unknown as PixiMainSceneDragController,
+				game: {
+					reportCriticalFailure: vi.fn(),
+					run: vi.fn(() => Promise.resolve(undefined)),
+				} as unknown as GameEngine,
+				magneticField: {
+					closeFx: Effect.void,
+					pruneFx: Effect.void,
+					releaseFx: () => Effect.void,
+					releaseSourcesFx: () => Effect.void,
+					resetFx: Effect.void,
+					updateFx: () => Effect.void,
+				},
+				particleTextures: {} as never,
+				readPalette: () => ({}) as never,
+				surface: {
+					readLocationPoseFx: (
+						location: typeof origin,
+						footprint?: TileDelivery["fromFootprint"],
+					) =>
+						Effect.sync(() => {
+							requestedFootprints.push(footprint);
+							const cellSize = location === target ? 60 : 80;
+							return {
+								height: cellSize * (footprint?.height ?? 1),
+								layer: new Container(),
+								size: cellSize,
+								width: cellSize * (footprint?.width ?? 1),
+								x: location.position.x * 100,
+								y: 0,
+							};
+						}),
+					transientActorLayer: new Container(),
+				} as unknown as PixiMainSceneSurface,
+				textures: {} as never,
+			}),
+		);
+
+		Effect.runSync(
+			runtime.syncFx([
+				{
+					from: origin,
+					fromFootprint: multiItem.footprint,
+					generation: 1,
+					item: multiItem,
+					phase: "returning",
+					to: target,
+					toFootprint: {
+						height: 1,
+						width: 1,
+					},
+				},
+			]),
+		);
+
+		expect(requestedFootprints[0]).toEqual(multiItem.footprint);
+		expect(requestedFootprints.slice(1)).toEqual(
+			requestedFootprints.slice(1).map(() => ({
+				height: 1,
+				width: 1,
+			})),
+		);
+		const initialPose = poseWrites.find((write) => write.channel === "pose");
+		expect(initialPose).toMatchObject({
+			scaleX: 1,
+			scaleY: 1,
+			x: 200,
+			y: 0,
+		});
+		const travel = animations.find((animation) => animation.channel === "pose");
+		if (travel?.channel !== "pose") throw new Error("Expected delivery return travel.");
+		expect(travel.readPose?.(1)).toMatchObject({
+			scaleX: 0.25,
+			scaleY: 0.375,
+			x: 0,
+			y: 0,
+		});
+	});
+
 	it("fades concurrent deliveries after they settle back into Inventory", () => {
 		const firstItem = {
 			...item,
@@ -188,17 +340,21 @@ describe("PixiDeliveryMotionRuntime", () => {
 		const deliveries = [
 			{
 				from: target,
+				fromFootprint: item.footprint,
 				generation: 1,
 				item: firstItem,
 				phase: "returning",
 				to: origin,
+				toFootprint: item.footprint,
 			},
 			{
 				from: target,
+				fromFootprint: item.footprint,
 				generation: 1,
 				item: secondItem,
 				phase: "returning",
 				to: origin,
+				toFootprint: item.footprint,
 			},
 		] satisfies TileDelivery[];
 
@@ -345,11 +501,13 @@ describe("PixiDeliveryMotionRuntime", () => {
 			runtime.syncFx([
 				{
 					from: origin,
+					fromFootprint: item.footprint,
 					generation: 0,
 					item,
 					phase: "outbound",
 					targetActorId: targetActor.item.id,
 					to: target,
+					toFootprint: item.footprint,
 				},
 			]),
 		);
@@ -379,11 +537,13 @@ describe("PixiDeliveryMotionRuntime", () => {
 			runtime.syncFx([
 				{
 					from: origin,
+					fromFootprint: item.footprint,
 					generation: 0,
 					item,
 					phase: "outbound",
 					targetActorId: targetActor.item.id,
 					to: target,
+					toFootprint: item.footprint,
 				},
 			]),
 		);
@@ -396,11 +556,13 @@ describe("PixiDeliveryMotionRuntime", () => {
 			runtime.syncFx([
 				{
 					from: origin,
+					fromFootprint: item.footprint,
 					generation: 0,
 					item,
 					phase: "outbound",
 					targetActorId: targetActor.item.id,
 					to: target,
+					toFootprint: item.footprint,
 				},
 			]),
 		);
@@ -419,6 +581,7 @@ describe("PixiDeliveryMotionRuntime", () => {
 			runtime.syncFx([
 				{
 					from: target,
+					fromFootprint: item.footprint,
 					generation: 1,
 					item: {
 						...item,
@@ -428,6 +591,7 @@ describe("PixiDeliveryMotionRuntime", () => {
 					},
 					phase: "returning",
 					to: origin,
+					toFootprint: item.footprint,
 				},
 			]),
 		);
@@ -445,6 +609,7 @@ describe("PixiDeliveryMotionRuntime", () => {
 			runtime.syncFx([
 				{
 					from: target,
+					fromFootprint: item.footprint,
 					generation: 1,
 					item: {
 						...item,
@@ -454,6 +619,7 @@ describe("PixiDeliveryMotionRuntime", () => {
 					},
 					phase: "returning",
 					to: origin,
+					toFootprint: item.footprint,
 				},
 			]),
 		);
@@ -475,6 +641,7 @@ describe("PixiDeliveryMotionRuntime", () => {
 			runtime.syncFx([
 				{
 					from: target,
+					fromFootprint: item.footprint,
 					generation: 1,
 					item: {
 						...item,
@@ -484,6 +651,7 @@ describe("PixiDeliveryMotionRuntime", () => {
 					},
 					phase: "returning",
 					to: origin,
+					toFootprint: item.footprint,
 				},
 			]),
 		);

@@ -3,10 +3,8 @@ import { match } from "ts-pattern";
 
 import { isItemLocationScopeAllowed } from "~/engine/location/read/isItemLocationScopeAllowedFx";
 import { RuntimeCheckIssueEnumSchema } from "~/engine/runtime/schema/check/RuntimeCheckIssueEnumSchema";
-import {
-	indexGridLocationClaims,
-	readGridLocationClaimsFx,
-} from "~/engine/location/read/readGridLocationClaimsFx";
+import { indexGridLocationClaims } from "~/engine/location/read/indexGridLocationClaims";
+import { readGridLocationClaimsFx } from "~/engine/location/read/readGridLocationClaimsFx";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
 import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
@@ -15,6 +13,7 @@ import type { LocationOccupiedIssueSchema } from "~/engine/runtime/schema/check/
 import type { LocationOutOfBoundsIssueSchema } from "~/engine/runtime/schema/check/LocationOutOfBoundsIssueSchema";
 import type { LocationScopeIssueSchema } from "~/engine/runtime/schema/check/LocationScopeIssueSchema";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
+import { readGridItemLocationsFx } from "~/engine/location/read/readGridItemLocationsFx";
 
 export namespace checkRuntimeLocationsFx {
 	export interface Props {
@@ -82,7 +81,15 @@ export const checkRuntimeLocationsFx = Effect.fn("checkRuntimeLocationsFx")(func
 				height: 1,
 			}))
 			.exhaustive();
-		const insideBounds = location.position.x < size.width && location.position.y < size.height;
+		const occupiedLocations = yield* readGridItemLocationsFx({
+			item: item.item,
+			location,
+		});
+		const insideBounds = occupiedLocations.every(
+			(occupiedLocation) =>
+				occupiedLocation.position.x < size.width &&
+				occupiedLocation.position.y < size.height,
+		);
 		if (!insideBounds) {
 			boundsIssues.push({
 				itemId: item.id,
@@ -99,11 +106,14 @@ export const checkRuntimeLocationsFx = Effect.fn("checkRuntimeLocationsFx")(func
 		}),
 	);
 	for (const claims of claimsByLocation.values()) {
-		if (claims.length <= 1) continue;
+		const itemIds = [
+			...new Set(claims.map((claim) => claim.itemId)),
+		];
+		if (itemIds.length <= 1) continue;
 		const first = claims[0];
 		if (first === undefined) continue;
 		occupancyIssues.push({
-			itemIds: claims.map((claim) => claim.itemId),
+			itemIds,
 			location: first.location,
 			type: RuntimeCheckIssueEnumSchema.enum.LocationOccupied,
 		});

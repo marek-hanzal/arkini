@@ -9,10 +9,89 @@ import { readDropItemPreviewFx } from "~/engine/runtime/read/readDropItemPreview
 import { DropItemResultKindEnumSchema } from "~/engine/runtime/schema/command/DropItemResultKindEnumSchema";
 import { dropItemFx } from "~/engine/runtime/write/dropItemFx";
 import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
-import {
-	readArkiniGameConfigSource,
-	readDemoGameConfigSource,
-} from "~test/schema/support/readArkiniGameConfigSource";
+import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
+import { readArkiniGameConfigSource } from "~test/schema/support/readArkiniGameConfigSource";
+
+const mergeIsolationConfig = GameConfigSchema.parse({
+	version: "1.0",
+	resources: {
+		hero: "hero",
+	},
+	meta: {
+		id: "game:merge-isolation-flow",
+		title: "Merge isolation flow",
+		board: {
+			width: 4,
+			height: 2,
+		},
+		inventory: {
+			width: 1,
+			height: 1,
+		},
+	},
+	start: {
+		currentSpace: 0,
+	},
+	categories: {},
+	items: {
+		water: {
+			id: "water",
+			type: "simple",
+			title: "Water",
+			description: "Water",
+			asset: {
+				source: [
+					"asset:water",
+				],
+			},
+			tags: [],
+			categoryId: "test",
+			scope: "any",
+			maxStackSize: 2,
+			merge: [
+				{
+					target: {
+						type: "item",
+						itemId: "tree",
+					},
+					action: "consume",
+					effect: "replace",
+					result: "double-tree",
+				},
+			],
+		},
+		tree: {
+			id: "tree",
+			type: "simple",
+			title: "Tree",
+			description: "Tree",
+			asset: {
+				source: [
+					"asset:tree",
+				],
+			},
+			tags: [],
+			categoryId: "test",
+			scope: "any",
+			maxStackSize: 2,
+		},
+		"double-tree": {
+			id: "double-tree",
+			type: "simple",
+			title: "Double tree",
+			description: "Double tree",
+			asset: {
+				source: [
+					"asset:double-tree",
+				],
+			},
+			tags: [],
+			categoryId: "test",
+			scope: "any",
+			maxStackSize: 2,
+		},
+	},
+});
 
 const mergeLiveItemsFx = (sourceItemId: string, targetItemId: string) =>
 	Effect.gen(function* () {
@@ -72,8 +151,7 @@ const dropLiveItemFx = (sourceItemId: string, targetItemId: string) =>
 	});
 
 describe("authored directional merge gameplay", () => {
-	it("isolates the stacked demo tree and consumes one water in place", async () => {
-		const config = await readDemoGameConfigSource();
+	it("isolates a stacked target and consumes one source quantity in place", () => {
 		const sourceLocation = {
 			scope: "board" as const,
 			space: 0,
@@ -94,13 +172,13 @@ describe("authored directional merge gameplay", () => {
 			Effect.gen(function* () {
 				yield* spawnItemFx({
 					id: "runtime:water",
-					itemId: "item:water",
+					itemId: "water",
 					location: sourceLocation,
 					quantity: 2,
 				});
 				yield* spawnItemFx({
 					id: "runtime:tree",
-					itemId: "item:tree",
+					itemId: "tree",
 					location: targetLocation,
 					quantity: 2,
 				});
@@ -112,7 +190,7 @@ describe("authored directional merge gameplay", () => {
 				};
 			}).pipe(
 				useGameFx({
-					config,
+					config: mergeIsolationConfig,
 					state: {
 						cheats: {
 							enabled: false,
@@ -132,25 +210,25 @@ describe("authored directional merge gameplay", () => {
 			expect.objectContaining({
 				action: "consume",
 				effect: "replace",
-				resultCanonicalItemId: "item:double-tree",
+				resultCanonicalItemId: "double-tree",
 			}),
 		);
 		expect(result.runtime.items.find((item) => item.id === "runtime:water")).toMatchObject({
 			item: {
-				id: "item:water",
+				id: "water",
 			},
 			location: sourceLocation,
 			quantity: 1,
 		});
 		expect(result.runtime.items.find((item) => item.id === "runtime:tree")).toMatchObject({
 			item: {
-				id: "item:double-tree",
+				id: "double-tree",
 			},
 			location: targetLocation,
 			quantity: 1,
 		});
 
-		const treeRemainder = result.runtime.items.find((item) => item.item.id === "item:tree");
+		const treeRemainder = result.runtime.items.find((item) => item.item.id === "tree");
 		expect(treeRemainder).toMatchObject({
 			location: {
 				scope: "board",

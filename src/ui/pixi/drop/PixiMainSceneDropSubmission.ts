@@ -11,6 +11,7 @@ export interface PixiMainSceneDropSubmission {
 	readonly submitFx: (request: {
 		readonly actor: PixiTileActor;
 		readonly previewKind: readTileDropPreviewFx.Result["kind"] | null;
+		readonly previewResult: readTileDropPreviewFx.Result | null;
 		readonly shortcutReceiver?: {
 			readonly actor: PixiTileActor;
 			readonly pose: {

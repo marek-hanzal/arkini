@@ -14,6 +14,7 @@ import { DropItemIgnoredReasonEnumSchema } from "~/engine/runtime/schema/command
 import { DropItemRejectedReasonEnumSchema } from "~/engine/runtime/schema/command/DropItemRejectedReasonEnumSchema";
 import type { DropItemResultSchema } from "~/engine/runtime/schema/command/DropItemResultSchema";
 import { DropItemResultKindEnumSchema } from "~/engine/runtime/schema/command/DropItemResultKindEnumSchema";
+import { doDropCollisionExpectationsMatchFx } from "~/engine/runtime/read/doDropCollisionExpectationsMatchFx";
 
 export namespace dropItemFx {
 	export type Props = DropItemCommand;
@@ -56,7 +57,6 @@ export const dropItemFx = Effect.fn("dropItemFx")(function* ({
 			location: sourceLocation,
 		} satisfies dropItemFx.Result;
 	}
-
 	const preflight = yield* readDropItemPreviewFx({
 		sourceItemId,
 		sourceRevision,
@@ -73,6 +73,21 @@ export const dropItemFx = Effect.fn("dropItemFx")(function* ({
 				: {
 						targetItemId: target.occupant.itemId,
 					}),
+		} satisfies dropItemFx.Result;
+	}
+	if (
+		"collisions" in preflight &&
+		target.expectedCollisions !== undefined &&
+		!(yield* doDropCollisionExpectationsMatchFx({
+			left: target.expectedCollisions,
+			right: preflight.collisions,
+		}))
+	) {
+		return {
+			kind: DropItemResultKindEnumSchema.enum.Reject,
+			reason: DropItemRejectedReasonEnumSchema.enum.StaleTarget,
+			itemId: sourceItemId,
+			targetItemId: target.occupant?.itemId,
 		} satisfies dropItemFx.Result;
 	}
 	if (
@@ -108,6 +123,16 @@ export const dropItemFx = Effect.fn("dropItemFx")(function* ({
 	const targetItemId = target.occupant.itemId;
 	const targetRevision = target.occupant.revision;
 	const targetLocation = target.location;
+	const expectedCollisions =
+		target.expectedCollisions ??
+		("collisions" in preflight
+			? preflight.collisions
+			: [
+					{
+						itemId: targetItemId,
+						revision: targetRevision,
+					},
+				]);
 	return yield* match(preflight)
 		.with(
 			{
@@ -115,6 +140,8 @@ export const dropItemFx = Effect.fn("dropItemFx")(function* ({
 			},
 			() =>
 				commitMergeDropFx({
+					destinationLocation: target.location,
+					expectedCollisions,
 					sourceItemId,
 					sourceRevision,
 					targetItemId,
@@ -127,6 +154,8 @@ export const dropItemFx = Effect.fn("dropItemFx")(function* ({
 			},
 			() =>
 				commitStoreInventoryDropFx({
+					destinationLocation: target.location,
+					expectedCollisions,
 					sourceItemId,
 					sourceRevision,
 					sourceLocation,
@@ -141,6 +170,8 @@ export const dropItemFx = Effect.fn("dropItemFx")(function* ({
 			},
 			(storeInput) =>
 				commitStoreInputDropFx({
+					destinationLocation: target.location,
+					expectedCollisions,
 					sourceItemId,
 					sourceRevision,
 					sourceLocation,
@@ -158,6 +189,8 @@ export const dropItemFx = Effect.fn("dropItemFx")(function* ({
 			},
 			() =>
 				commitStackDropFx({
+					destinationLocation: target.location,
+					expectedCollisions,
 					sourceItemId,
 					sourceRevision,
 					sourceLocation,
@@ -170,14 +203,16 @@ export const dropItemFx = Effect.fn("dropItemFx")(function* ({
 			{
 				kind: DropItemResultKindEnumSchema.enum.Swap,
 			},
-			() =>
+			(swap) =>
 				commitSwapDropFx({
+					destinationLocation: target.location,
+					expectedCollisions,
 					sourceItemId,
 					sourceRevision,
 					sourceLocation,
 					targetItemId,
 					targetRevision,
-					targetLocation,
+					targetLocation: swap.targetLocation,
 				}),
 		)
 		.with(

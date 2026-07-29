@@ -2,13 +2,14 @@ import { Effect } from "effect";
 import { match } from "ts-pattern";
 
 import { DistanceEnumSchema } from "~/engine/distance/schema/DistanceEnumSchema";
-import type { PositionSchema } from "~/engine/grid/schema/PositionSchema";
+import { readBoardRectangleChebyshevDistanceFx } from "~/engine/grid/fx/readBoardRectangleChebyshevDistanceFx";
+import type { BoardRectangleSchema } from "~/engine/grid/schema/BoardRectangleSchema";
 
 export namespace distanceFx {
 	export interface Props {
 		distance: DistanceEnumSchema.Type;
-		item: PositionSchema.Type;
-		origin: PositionSchema.Type;
+		item: BoardRectangleSchema.Type;
+		origin: BoardRectangleSchema.Type;
 	}
 }
 
@@ -23,9 +24,10 @@ export const distanceFx = Effect.fn("distanceFx")(function* ({
 	item,
 	origin,
 }: distanceFx.Props) {
-	const width = Math.abs(item.x - origin.x);
-	const height = Math.abs(item.y - origin.y);
-	const value = Math.max(width, height);
+	const value = yield* readBoardRectangleChebyshevDistanceFx({
+		left: origin,
+		right: item,
+	});
 
 	return match(distance)
 		.with(DistanceEnumSchema.enum.Close, () => {

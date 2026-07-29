@@ -19,6 +19,10 @@ const runtimeItem = {
 		tags: [],
 		categoryId: "resource",
 		scope: "any",
+		footprint: {
+			width: 1,
+			height: 1,
+		},
 		maxStackSize: 10,
 		type: "simple",
 	},

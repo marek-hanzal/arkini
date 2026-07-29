@@ -21,6 +21,7 @@ import { isBoardRuntimeItemFx } from "~/engine/runtime/read/isBoardRuntimeItemFx
 import { readRuntimeItemByIdFx } from "~/engine/runtime/read/readRuntimeItemByIdFx";
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+import { readBoardRuntimeItemRectangleFx } from "~/engine/grid/fx/readBoardRuntimeItemRectangleFx";
 
 export namespace spendItemChargesFx {
 	export interface Props {
@@ -56,6 +57,9 @@ export const spendItemChargesFx = Effect.fn("spendItemChargesFx")(function* ({
 			}),
 		);
 	}
+	const originRectangle = yield* readBoardRuntimeItemRectangleFx({
+		item,
+	});
 
 	const remainingCharges = yield* readItemRemainingChargesFx(item);
 	if (remainingCharges === undefined || remainingCharges < cost) {
@@ -151,6 +155,7 @@ export const spendItemChargesFx = Effect.fn("spendItemChargesFx")(function* ({
 		});
 		const [outputPlacement, withOutput] = yield* applyOutputPlacementFx({
 			origin: item.location,
+			originRectangle,
 			output,
 			runtime: draft,
 		});

@@ -17,6 +17,8 @@ export interface PixiTileActor {
 	pendingVisual: PixiTileActorVisual | null;
 	item: TileActorItem;
 	size: number;
+	width: number;
+	height: number;
 	visualTransitionGeneration: number;
 	lifecycleIntentGeneration: number;
 	lifecycleFadeStarted: boolean;

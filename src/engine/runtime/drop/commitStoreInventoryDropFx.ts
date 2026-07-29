@@ -12,6 +12,11 @@ import { storeItemInInventoryFx } from "~/engine/runtime/write/storeItemInInvent
 
 export namespace commitStoreInventoryDropFx {
 	export interface Props {
+		readonly destinationLocation: GridLocationSchema.Type;
+		readonly expectedCollisions: ReadonlyArray<{
+			readonly itemId: IdSchema.Type;
+			readonly revision: RevisionSchema.Type;
+		}>;
 		readonly sourceItemId: IdSchema.Type;
 		readonly sourceRevision: RevisionSchema.Type;
 		readonly sourceLocation: GridLocationSchema.Type;
@@ -41,6 +46,14 @@ export const commitStoreInventoryDropFx = Effect.fn("commitStoreInventoryDropFx"
 			}),
 		),
 		Effect.catchTags({
+			DropDestinationExpectationError: (error) =>
+				Effect.succeed(
+					makeDropRejectedResult({
+						reason: error.reason,
+						sourceItemId: props.sourceItemId,
+						targetItemId: props.inventoryItemId,
+					}),
+				),
 			ItemNotFoundError: (error) =>
 				Effect.succeed(
 					makeDropRejectedResult({

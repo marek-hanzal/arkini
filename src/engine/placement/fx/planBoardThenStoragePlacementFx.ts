@@ -15,6 +15,7 @@ import { planBoardPlacementFx } from "./planBoardPlacementFx";
 import { planInventoryPlacementFx } from "./planInventoryPlacementFx";
 import { planToolbarPlacementFx } from "./planToolbarPlacementFx";
 import { readPlacementPlanQuantityFx } from "./readPlacementPlanQuantityFx";
+import type { BoardRectangleSchema } from "~/engine/grid/schema/BoardRectangleSchema";
 
 export namespace planBoardThenStoragePlacementFx {
 	export interface Props {
@@ -22,6 +23,7 @@ export namespace planBoardThenStoragePlacementFx {
 		excludedLocations?: ReadonlyArray<GridLocationSchema.Type>;
 		item: ItemSchema.Type;
 		origin: BoardLocationSchema.Type;
+		originRectangle?: BoardRectangleSchema.Type;
 		quantity: PositiveIntegerSchema.Type;
 		runtime: RuntimeSchema.Type;
 	}
@@ -34,6 +36,7 @@ export const planBoardThenStoragePlacementFx = Effect.fn("planBoardThenStoragePl
 		excludedLocations,
 		item,
 		origin,
+		originRectangle,
 		quantity,
 		runtime,
 	}: planBoardThenStoragePlacementFx.Props) {
@@ -43,6 +46,7 @@ export const planBoardThenStoragePlacementFx = Effect.fn("planBoardThenStoragePl
 			),
 			item,
 			origin,
+			originRectangle,
 			placement: drop.placement,
 			quantity,
 			runtime,

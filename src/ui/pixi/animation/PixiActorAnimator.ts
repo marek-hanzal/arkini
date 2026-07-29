@@ -25,6 +25,14 @@ interface PixiActorAnimationBase {
 
 export interface PixiActorPresentedPose {
 	readonly scale?: number;
+	readonly scaleX?: number;
+	readonly scaleY?: number;
+	readonly x: number;
+	readonly y: number;
+}
+
+export interface PixiActorUniformPose extends PixiActorPresentedPose {
+	readonly scale: number;
 	readonly x: number;
 	readonly y: number;
 }
@@ -34,6 +42,8 @@ export type PixiActorAnimation =
 			readonly channel: "pose";
 			readonly readPose?: (progress: number) => PixiActorPresentedPose;
 			readonly toScale?: number;
+			readonly toScaleX?: number;
+			readonly toScaleY?: number;
 			readonly toX?: number;
 			readonly toY?: number;
 	  })
@@ -82,6 +92,8 @@ export type PixiActorPresentationWrite =
 			readonly actor: PixiTileActor;
 			readonly channel: "pose";
 			readonly scale?: number;
+			readonly scaleX?: number;
+			readonly scaleY?: number;
 			readonly x: number;
 			readonly y: number;
 	  };

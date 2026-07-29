@@ -122,7 +122,8 @@ export const runPixiStackMotionFx = Effect.fn("runPixiStackMotionFx")(function* 
 		yield* animator.setFx({
 			actor: payload,
 			channel: "pose",
-			scale: origin.size / Math.max(1, payload.size),
+			scaleX: (origin.width ?? origin.size) / Math.max(1, payload.width || payload.size),
+			scaleY: (origin.height ?? origin.size) / Math.max(1, payload.height || payload.size),
 			x: origin.x,
 			y: origin.y,
 		});
@@ -195,6 +196,7 @@ export const runPixiStackMotionFx = Effect.fn("runPixiStackMotionFx")(function* 
 		readLiveTarget,
 		settleWithinTileRatio: 0.5,
 		surface,
+		targetFootprint: cue.targetFootprint,
 		targetLocation: cue.targetLocation,
 	});
 });

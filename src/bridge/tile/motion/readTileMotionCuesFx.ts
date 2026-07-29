@@ -9,6 +9,7 @@ import { readTileActorVisualFx } from "~/bridge/tile/readTileActorVisualFx";
 import type { TileMotionCue } from "~/bridge/tile/motion/TileMotionCue";
 import { readGridRuntimeItemFx } from "~/bridge/tile/motion/readGridRuntimeItemFx";
 import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
+import { readEffectiveGridFootprintFx } from "~/engine/grid/fx/readEffectiveGridFootprintFx";
 import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
 import { isSameGridLocationFx } from "~/engine/location/read/isSameGridLocationFx";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
@@ -54,7 +55,7 @@ export namespace readTileMotionCuesFx {
 	}
 }
 
-const readOriginLocationFx = Effect.fn("readTileMotionCueOriginLocationFx")(function* ({
+const readOriginFx = Effect.fn("readTileMotionCueOriginFx")(function* ({
 	originItemId,
 	transition,
 }: {
@@ -65,12 +66,12 @@ const readOriginLocationFx = Effect.fn("readTileMotionCueOriginLocationFx")(func
 		itemId: originItemId,
 		runtime: transition.previousRuntime,
 	});
-	if (previous !== null) return previous.location;
+	if (previous !== null) return previous;
 	const current = yield* readGridRuntimeItemFx({
 		itemId: originItemId,
 		runtime: transition.runtime,
 	});
-	return current?.location ?? null;
+	return current;
 });
 
 const readTargetFx = Effect.fn("readTileMotionCueTargetFx")(function* ({
@@ -120,8 +121,8 @@ const readSpawnCueFx = Effect.fn("readTileSpawnMotionCueFx")(function* ({
 	readonly eventIndex: number;
 	readonly transition: CommittedTransitionSchema.Type;
 }) {
-	const [originLocation, target] = yield* Effect.all([
-		readOriginLocationFx({
+	const [origin, target] = yield* Effect.all([
+		readOriginFx({
 			originItemId: event.originItemId,
 			transition,
 		}),
@@ -132,14 +133,18 @@ const readSpawnCueFx = Effect.fn("readTileSpawnMotionCueFx")(function* ({
 			runtime: transition.runtime,
 		}),
 	]);
-	if (originLocation === null || target === null) return null;
+	if (origin === null || target === null) return null;
 	return {
 		kind: "spawn",
 		sequence: transition.sequence,
 		eventIndex,
 		actorId: target.id,
 		originActorId: event.originItemId,
-		originLocation,
+		originLocation: origin.location,
+		targetFootprint: yield* readEffectiveGridFootprintFx({
+			authored: target.item.footprint,
+			location: target.location,
+		}),
 		targetLocation: target.location,
 	} satisfies UnstaggeredTileMotionCue;
 });
@@ -170,6 +175,10 @@ const readInventoryInputSourceItemFx = Effect.fn("readInventoryInputSourceItemFx
 					badgeCount,
 				}),
 		id: source.id,
+		footprint: yield* readEffectiveGridFootprintFx({
+			authored: source.item.footprint,
+			location: source.location,
+		}),
 		itemType: source.item.type,
 		location: source.location,
 		primaryAction: {
@@ -211,8 +220,8 @@ const readEventCueFx = Effect.fn("readTileMotionEventCueFx")(function* ({
 			},
 			(stacked) =>
 				Effect.gen(function* () {
-					const [originLocation, target] = yield* Effect.all([
-						readOriginLocationFx({
+					const [origin, target] = yield* Effect.all([
+						readOriginFx({
 							originItemId: stacked.originItemId,
 							transition,
 						}),
@@ -223,7 +232,7 @@ const readEventCueFx = Effect.fn("readTileMotionEventCueFx")(function* ({
 							runtime: transition.runtime,
 						}),
 					]);
-					if (originLocation === null || target === null) return null;
+					if (origin === null || target === null) return null;
 					return {
 						kind: "stack",
 						sequence: transition.sequence,
@@ -232,7 +241,15 @@ const readEventCueFx = Effect.fn("readTileMotionEventCueFx")(function* ({
 						canonicalItemId: stacked.canonicalItemId,
 						quantity: stacked.quantity - stacked.previousQuantity,
 						originActorId: stacked.originItemId,
-						originLocation,
+						originFootprint: yield* readEffectiveGridFootprintFx({
+							authored: target.item.footprint,
+							location: origin.location,
+						}),
+						originLocation: origin.location,
+						targetFootprint: yield* readEffectiveGridFootprintFx({
+							authored: target.item.footprint,
+							location: target.location,
+						}),
 						targetLocation: target.location,
 					} satisfies UnstaggeredTileMotionCue;
 				}),
@@ -245,29 +262,51 @@ const readEventCueFx = Effect.fn("readTileMotionEventCueFx")(function* ({
 				},
 			},
 			(stored) =>
-				readGridRuntimeItemFx({
-					itemId: stored.ownerItemId,
-					runtime: transition.runtime,
-				}).pipe(
-					Effect.map((target) =>
-						target === null
-							? null
-							: ({
-									kind: "input",
-									sequence: transition.sequence,
-									eventIndex,
-									sourceActorId: stored.sourceItemId,
-									targetActorId: stored.ownerItemId,
-									canonicalItemId: stored.canonicalItemId,
-									previousQuantity: stored.previousQuantity,
-									storedQuantity: stored.storedQuantity,
-									resultingQuantity: stored.resultingQuantity,
-									originActorId: stored.sourceItemId,
-									originLocation: stored.previousSourceLocation,
-									targetLocation: target.location,
-								} satisfies UnstaggeredTileMotionCue),
-					),
-				),
+				Effect.gen(function* () {
+					const [source, target] = yield* Effect.all([
+						readGridRuntimeItemFx({
+							itemId: stored.sourceItemId,
+							runtime: transition.previousRuntime,
+						}),
+						readGridRuntimeItemFx({
+							itemId: stored.ownerItemId,
+							runtime: transition.runtime,
+						}),
+					]);
+					if (
+						source === null ||
+						target === null ||
+						source.item.id !== stored.canonicalItemId ||
+						!(yield* isSameGridLocationFx({
+							left: source.location,
+							right: stored.previousSourceLocation,
+						}))
+					) {
+						return null;
+					}
+					return {
+						kind: "input",
+						sequence: transition.sequence,
+						eventIndex,
+						sourceActorId: stored.sourceItemId,
+						targetActorId: stored.ownerItemId,
+						canonicalItemId: stored.canonicalItemId,
+						previousQuantity: stored.previousQuantity,
+						storedQuantity: stored.storedQuantity,
+						resultingQuantity: stored.resultingQuantity,
+						originActorId: stored.sourceItemId,
+						originFootprint: yield* readEffectiveGridFootprintFx({
+							authored: source.item.footprint,
+							location: source.location,
+						}),
+						originLocation: stored.previousSourceLocation,
+						targetFootprint: yield* readEffectiveGridFootprintFx({
+							authored: source.item.footprint,
+							location: target.location,
+						}),
+						targetLocation: target.location,
+					} satisfies UnstaggeredTileMotionCue;
+				}),
 		)
 		.with(
 			{
@@ -320,7 +359,15 @@ const readEventCueFx = Effect.fn("readTileMotionEventCueFx")(function* ({
 						storedQuantity: stored.storedQuantity,
 						resultingQuantity: stored.resultingQuantity,
 						originActorId: inventoryOpener.value.id,
+						originFootprint: yield* readEffectiveGridFootprintFx({
+							authored: source.item.footprint,
+							location: source.location,
+						}),
 						originLocation: inventoryOpener.value.location,
+						targetFootprint: yield* readEffectiveGridFootprintFx({
+							authored: source.item.footprint,
+							location: target.location,
+						}),
 						targetLocation: target.location,
 					} satisfies UnstaggeredTileMotionCue;
 				}),

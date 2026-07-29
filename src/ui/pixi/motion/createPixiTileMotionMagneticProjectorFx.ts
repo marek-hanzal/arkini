@@ -43,17 +43,20 @@ export const createPixiTileMotionMagneticProjectorFx = Effect.fn(
 			const sourceActorId = actor.item.id;
 			let acquired = false;
 			let previousPose = {
-				scale: actor.container.scale.x,
+				scaleX: actor.container.scale.x,
+				scaleY: actor.container.scale.y,
 				x: actor.container.x - actor.container.pivot.x * actor.container.scale.x,
 				y: actor.container.y - actor.container.pivot.y * actor.container.scale.y,
 			};
 			return {
 				projectPose: (pose) => {
-					const scale = pose.scale ?? previousPose.scale;
+					const scaleX = pose.scaleX ?? pose.scale ?? previousPose.scaleX;
+					const scaleY = pose.scaleY ?? pose.scale ?? previousPose.scaleY;
 					const sourcePose = {
-						scale,
-						x: pose.x - actor.container.pivot.x * scale,
-						y: pose.y - actor.container.pivot.y * scale,
+						scaleX,
+						scaleY,
+						x: pose.x - actor.container.pivot.x * scaleX,
+						y: pose.y - actor.container.pivot.y * scaleY,
 					};
 					const travel = {
 						x: sourcePose.x - previousPose.x,
@@ -81,7 +84,8 @@ export const createPixiTileMotionMagneticProjectorFx = Effect.fn(
 										},
 							sourceItem: actor.item,
 							sourceKind: "motion",
-							sourceSize: actor.size * scale,
+							sourceHeight: actor.height * scaleY,
+							sourceWidth: actor.width * scaleX,
 							sourceX: sourcePose.x,
 							sourceY: sourcePose.y,
 						}),

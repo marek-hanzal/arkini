@@ -189,6 +189,7 @@ export const createPixiDeliveryMotionRuntimeFx = Effect.fn("createPixiDeliveryMo
 					);
 				},
 				surface,
+				targetFootprint: delivery.toFootprint,
 				targetLocation: delivery.to,
 			});
 		});
@@ -300,8 +301,11 @@ export const createPixiDeliveryMotionRuntimeFx = Effect.fn("createPixiDeliveryMo
 				}
 
 				for (const delivery of deliveries) {
-					const from = yield* surface.readLocationPoseFx(delivery.from);
-					const to = yield* surface.readLocationPoseFx(delivery.to);
+					const from = yield* surface.readLocationPoseFx(
+						delivery.from,
+						delivery.fromFootprint,
+					);
+					const to = yield* surface.readLocationPoseFx(delivery.to, delivery.toFootprint);
 					let active = activeByItemId.get(delivery.item.id);
 					const generationChanged =
 						active === undefined || active.generation !== delivery.generation;
@@ -341,8 +345,13 @@ export const createPixiDeliveryMotionRuntimeFx = Effect.fn("createPixiDeliveryMo
 										active,
 										delivery,
 										to: {
+											height:
+												active.actor.height *
+												active.actor.container.scale.y,
 											layer: surface.transientActorLayer,
 											size: Math.max(1, active.actor.size),
+											width:
+												active.actor.width * active.actor.container.scale.x,
 											x: active.actor.container.x,
 											y: active.actor.container.y,
 										},
@@ -436,7 +445,11 @@ export const createPixiDeliveryMotionRuntimeFx = Effect.fn("createPixiDeliveryMo
 						yield* animator.setFx({
 							actor,
 							channel: "pose",
-							scale: 1,
+							scaleX:
+								(from.width || from.size) / Math.max(1, actor.width || actor.size),
+							scaleY:
+								(from.height || from.size) /
+								Math.max(1, actor.height || actor.size),
 							x: from.x,
 							y: from.y,
 						});

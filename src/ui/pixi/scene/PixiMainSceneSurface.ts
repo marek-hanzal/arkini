@@ -19,12 +19,22 @@ export interface PixiMainSceneSurface {
 	readonly readDropTargetFx: (x: number, y: number) => Effect.Effect<PixiSceneDropTarget | null>;
 	readonly readLocationPoseFx: (
 		location: TileActorItem["location"],
+		footprint?: TileActorItem["footprint"],
 	) => Effect.Effect<PixiTileActorPose | null>;
+	/** Reads unique canonical occupants in grid cells intersecting a padded presentation AABB. */
+	readonly readLocalActorIdsFx: (rect: {
+		readonly height: number;
+		readonly width: number;
+		readonly x: number;
+		readonly y: number;
+	}) => Effect.Effect<ReadonlySet<string>>;
 	readonly readOccupantFx: (target: PixiSceneDropTarget) => Effect.Effect<TileActorItem | null>;
 	readonly redrawFx: Effect.Effect<void>;
+	/** Refreshes presentation occupancy for canonical actor identities affected by reconciliation. */
+	readonly refreshOccupancyFx: (affectedActorIds: ReadonlySet<string>) => Effect.Effect<void>;
 	readonly renderDropFeedbackFx: (
 		target: PixiSceneDropTarget | null,
-		kind: readTileDropPreviewFx.Result["kind"] | null,
+		preview: readTileDropPreviewFx.Result | null,
 	) => Effect.Effect<void>;
 	readonly setPaletteFx: (palette: PixiScenePalette) => Effect.Effect<void>;
 	readonly setTransitionFx: (

@@ -31,6 +31,10 @@ vi.mock("~/ui/pixi/actor/updatePixiTileActorVisualFx", async () => {
 });
 
 const item = {
+	footprint: {
+		height: 1,
+		width: 1,
+	},
 	id: "runtime:producer",
 	itemId: "producer:lumberjack",
 	itemType: "producer",

@@ -2,17 +2,22 @@ import { Effect } from "effect";
 
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import type { PixiActorPresentedPose } from "~/ui/pixi/animation/PixiActorAnimator";
-import { createPixiRetargetablePoseSamplerFx } from "~/ui/pixi/animation/createPixiRetargetablePoseSamplerFx";
+import {
+	createPixiRectangularRetargetablePoseSamplerFx,
+	type PixiActorRectangularPose,
+} from "~/ui/pixi/animation/createPixiRectangularRetargetablePoseSamplerFx";
 import type { PixiMainSceneSurface } from "~/ui/pixi/scene/PixiMainSceneSurface";
 import type { PixiTileActorPose } from "~/ui/pixi/scene/PixiTileActorPose";
 
 export namespace createPixiTileMotionPoseSamplerFx {
 	export interface Props {
-		readonly actorBaseSize: number;
-		readonly from: Required<PixiActorPresentedPose>;
-		readonly readLiveTarget?: () => Required<PixiActorPresentedPose> | null;
+		readonly actorBaseHeight: number;
+		readonly actorBaseWidth: number;
+		readonly from: PixiActorRectangularPose;
+		readonly readLiveTarget?: () => PixiActorPresentedPose | null;
 		readonly surface: PixiMainSceneSurface;
 		readonly target: PixiTileActorPose;
+		readonly targetFootprint?: Parameters<PixiMainSceneSurface["readLocationPoseFx"]>[1];
 		readonly targetLocation: Parameters<PixiMainSceneSurface["readLocationPoseFx"]>[0];
 	}
 
@@ -22,10 +27,11 @@ export namespace createPixiTileMotionPoseSamplerFx {
 	}
 }
 
-const samePose = (
-	left: Required<PixiActorPresentedPose>,
-	right: Required<PixiActorPresentedPose>,
-) => left.x === right.x && left.y === right.y && left.scale === right.scale;
+const samePose = (left: PixiActorRectangularPose, right: PixiActorRectangularPose) =>
+	left.x === right.x &&
+	left.y === right.y &&
+	left.scaleX === right.scaleX &&
+	left.scaleY === right.scaleY;
 
 /**
  * Retargets travel from its live presentation toward the latest semantic destination.
@@ -39,25 +45,43 @@ export const createPixiTileMotionPoseSamplerFx = Effect.fn("createPixiTileMotion
 		Effect.gen(function* (): Effect.fn.Return<createPixiTileMotionPoseSamplerFx.Result> {
 			let sampleProgress = 0;
 			let completionRetargeted = false;
-			let previousTarget: Required<PixiActorPresentedPose> = {
-				scale: props.target.size / Math.max(1, props.actorBaseSize),
+			const normalizeLivePose = (pose: PixiActorPresentedPose): PixiActorRectangularPose => ({
+				scaleX: pose.scaleX ?? pose.scale ?? 1,
+				scaleY: pose.scaleY ?? pose.scale ?? 1,
+				x: pose.x,
+				y: pose.y,
+			});
+			let previousTarget: PixiActorRectangularPose = {
+				scaleX:
+					(props.target.width ?? props.target.size) / Math.max(1, props.actorBaseWidth),
+				scaleY:
+					(props.target.height ?? props.target.size) / Math.max(1, props.actorBaseHeight),
 				x: props.target.x,
 				y: props.target.y,
 			};
 			const readCurrentTarget = () => {
 				const liveTarget = props.readLiveTarget?.();
-				if (liveTarget !== null && liveTarget !== undefined) return liveTarget;
+				if (liveTarget !== null && liveTarget !== undefined)
+					return normalizeLivePose(liveTarget);
 				const currentTarget =
 					RendererRuntime.runSync(
-						props.surface.readLocationPoseFx(props.targetLocation),
+						props.surface.readLocationPoseFx(
+							props.targetLocation,
+							props.targetFootprint,
+						),
 					) ?? props.target;
 				return {
-					scale: currentTarget.size / Math.max(1, props.actorBaseSize),
+					scaleX:
+						(currentTarget.width ?? currentTarget.size) /
+						Math.max(1, props.actorBaseWidth),
+					scaleY:
+						(currentTarget.height ?? currentTarget.size) /
+						Math.max(1, props.actorBaseHeight),
 					x: currentTarget.x,
 					y: currentTarget.y,
 				};
 			};
-			const readPose = yield* createPixiRetargetablePoseSamplerFx({
+			const readPose = yield* createPixiRectangularRetargetablePoseSamplerFx({
 				from: props.from,
 				readTarget: () => {
 					const nextTarget = readCurrentTarget();
@@ -73,7 +97,14 @@ export const createPixiTileMotionPoseSamplerFx = Effect.fn("createPixiTileMotion
 					completionRetargeted || !samePose(previousTarget, readCurrentTarget()),
 				readPose: (progress) => {
 					sampleProgress = progress;
-					return readPose(progress);
+					const pose = readPose(progress);
+					return pose.scaleX === pose.scaleY
+						? {
+								scale: pose.scaleX,
+								x: pose.x,
+								y: pose.y,
+							}
+						: pose;
 				},
 			};
 		}),

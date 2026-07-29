@@ -22,6 +22,10 @@
 			"scope": "any",
 			"maxCount": 1,
 			"maxStackSize": 1,
+			"footprint": {
+				"width": 2,
+				"height": 2
+			},
 			"maxQueueSize": 1,
 			"lines": [
 				{

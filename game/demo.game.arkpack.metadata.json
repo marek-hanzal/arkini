@@ -2,9 +2,9 @@
 	"namespace": "arkini",
 	"format": 1,
 	"packageId": "demo",
-	"contentHash": "907057d8a298aa1d4a921b2c238f1723066e391f253f25e71f04e08699cb2a66",
+	"contentHash": "7756dada6b680aa57925efaf99092f53e18762996cf9990345542efd37998989",
 	"gameId": "demo",
-	"title": "Arkini Trust Demo",
+	"title": "Arkini Multi-slot Experiment",
 	"configVersion": "1.0",
-	"compressedSize": 59468
+	"compressedSize": 60917
 }

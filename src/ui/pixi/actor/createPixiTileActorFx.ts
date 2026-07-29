@@ -100,6 +100,8 @@ export const createPixiTileActorFx = Effect.fn("createPixiTileActorFx")(
 				pendingVisual: null,
 				item,
 				size: 0,
+				width: 0,
+				height: 0,
 				visualTransitionGeneration: 0,
 				lifecycleIntentGeneration: 0,
 				lifecycleFadeStarted: false,

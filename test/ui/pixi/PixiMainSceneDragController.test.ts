@@ -19,6 +19,7 @@ import type { PixiTileMagneticField } from "~/ui/pixi/magnet/PixiTileMagneticFie
 import type { PixiTileMotionRuntime } from "~/ui/pixi/motion/PixiTileMotionRuntime";
 import type { PixiApplicationOwner } from "~/ui/pixi/runtime/PixiApplicationOwner";
 import type { PixiMainSceneSurface } from "~/ui/pixi/scene/PixiMainSceneSurface";
+import type { PixiSceneDropTarget } from "~/ui/pixi/scene/PixiSceneDropTarget";
 
 const previewState = vi.hoisted(() => ({
 	actorKinds: new Map<
@@ -129,6 +130,10 @@ const pointer = (x: number, y: number, button = 0): FakePointerEvent => ({
 });
 
 const item = {
+	footprint: {
+		height: 1,
+		width: 1,
+	},
 	id: "runtime:log",
 	itemId: "log",
 	location: {
@@ -225,6 +230,10 @@ const mountController = ({
 		pivot: {
 			x: 0,
 			y: 0,
+			set(x: number, y = x) {
+				this.x = x;
+				this.y = y;
+			},
 		},
 		position: {
 			set(x: number, y: number) {
@@ -233,9 +242,9 @@ const mountController = ({
 			},
 		},
 		scale: {
-			set(value: number) {
-				this.x = value;
-				this.y = value;
+			set(x: number, y = x) {
+				this.x = x;
+				this.y = y;
 			},
 			x: 1,
 			y: 1,
@@ -255,6 +264,8 @@ const mountController = ({
 		lifecycleTargetAlpha: 1,
 		onPointerDown: null,
 		size: 80,
+		height: 80,
+		width: 80,
 	} as unknown as PixiTileActor;
 	const actors = new Map([
 		[
@@ -283,14 +294,18 @@ const mountController = ({
 		kind: "unsupported" as const,
 	};
 	let currentActorPose = {
+		height: 80,
 		layer: transientActorLayer,
 		size: 80,
+		width: 80,
 		x: 10,
 		y: 20,
 	};
 	const actorPoses = new Map<string, typeof currentActorPose>();
 	let currentDropTargetX = 1;
+	let currentDropTargetY = 0;
 	let currentOccupant: TileActorItem | null = null;
+	const renderedDropTargets: unknown[] = [];
 	const magneticUpdates: Array<Parameters<PixiTileMagneticField["updateFx"]>[0]> = [];
 	const targetRedirects: Array<Parameters<PixiTileMotionRuntime["redirectTargetFx"]>[0]> = [];
 	const onActivate = vi.fn();
@@ -393,6 +408,8 @@ const mountController = ({
 		readCommandTargetFx: () => Effect.succeed(currentCommandTarget),
 		readDropTargetFx: () =>
 			Effect.succeed({
+				hitX: currentDropTargetX,
+				hitY: currentDropTargetY,
 				layout: {
 					cellSize: 80,
 					kind: "board",
@@ -400,10 +417,13 @@ const mountController = ({
 					y: 0,
 				},
 				x: currentDropTargetX,
-				y: 0,
+				y: currentDropTargetY,
 			}),
 		readOccupantFx: () => Effect.succeed(currentOccupant),
-		renderDropFeedbackFx: () => Effect.void,
+		renderDropFeedbackFx: (target: PixiSceneDropTarget | null) =>
+			Effect.sync(() => {
+				renderedDropTargets.push(target);
+			}),
 		transientActorLayer,
 	} as unknown as PixiMainSceneSurface;
 	const dropSubmission = Effect.runSync(
@@ -480,6 +500,7 @@ const mountController = ({
 		onDrop,
 		presentationWrites,
 		releasePointerCapture,
+		renderedDropTargets,
 		reportCriticalFailure,
 		removeDraggedItem: removalState.remove,
 		setActorPose: (pose: typeof currentActorPose) => {
@@ -493,6 +514,9 @@ const mountController = ({
 		},
 		setDropTargetX: (x: number) => {
 			currentDropTargetX = x;
+		},
+		setDropTargetY: (y: number) => {
+			currentDropTargetY = y;
 		},
 		setOccupant: (occupant: TileActorItem | null) => {
 			currentOccupant = occupant;
@@ -518,6 +542,12 @@ const samplePoseAnimation = (animation: PixiActorAnimation, progress: number) =>
 	const pose = animation.readPose(progress);
 	animation.actor.container.position.set(pose.x, pose.y);
 	if (pose.scale !== undefined) animation.actor.container.scale.set(pose.scale);
+	if (pose.scaleX !== undefined || pose.scaleY !== undefined) {
+		animation.actor.container.scale.set(
+			pose.scaleX ?? animation.actor.container.scale.x,
+			pose.scaleY ?? animation.actor.container.scale.y,
+		);
+	}
 	return pose;
 };
 
@@ -1017,8 +1047,10 @@ describe("Pixi main-scene drag controller", () => {
 		const inventoryActor = mounted.actors.get(inventory.id);
 		if (inventoryActor === undefined) throw new Error("Expected the Inventory actor.");
 		mounted.setItemActorPose(inventory.id, {
+			height: 80,
 			layer: mounted.transientActorLayer,
 			size: 80,
+			width: 80,
 			x: 170,
 			y: 20,
 		});
@@ -1669,8 +1701,10 @@ describe("Pixi main-scene drag controller", () => {
 			addChild: vi.fn(),
 		};
 		mounted.setActorPose({
+			height: 80,
 			layer: canonicalLayer,
 			size: 80,
+			width: 80,
 			x: 10,
 			y: 20,
 		});
@@ -1719,6 +1753,38 @@ describe("Pixi main-scene drag controller", () => {
 		expect(mounted.actor.container.cursor).toBe("grab");
 	});
 
+	it("preserves the grabbed cell for a rectangular actor with an in-flight pivot and scale", () => {
+		const mounted = mountController();
+		mounted.setItem({
+			...mounted.actor.item,
+			footprint: {
+				height: 2,
+				width: 2,
+			},
+		});
+		mounted.actor.container.scale.set(1.5, 0.75);
+		mounted.actor.container.pivot.set(40, 80);
+		mounted.setDropTargetX(5);
+		mounted.setDropTargetY(4);
+
+		mounted.actorEvents.emit("pointerdown", pointer(85, 30));
+		mounted.stage.emit("globalpointermove", pointer(100, 50));
+
+		expect(mounted.renderedDropTargets.at(-1)).toMatchObject({
+			hitX: 5,
+			hitY: 4,
+			x: 4,
+			y: 3,
+		});
+		expect(mounted.presentationWrites).toContainEqual(
+			expect.objectContaining({
+				channel: "pose",
+				scaleX: 1.5,
+				scaleY: 0.75,
+			}),
+		);
+	});
+
 	it("retargets a running settle from its live frame without a resize or completion snap", async () => {
 		const mounted = mountController();
 		mounted.actorEvents.emit("pointerdown", pointer(10, 20));
@@ -1733,25 +1799,30 @@ describe("Pixi main-scene drag controller", () => {
 		if (settleAnimation === undefined) throw new Error("Expected a settle animation.");
 		const beforeResize = samplePoseAnimation(settleAnimation, 0.4);
 		expect(beforeResize).toEqual({
-			scale: 1,
+			scaleX: 1,
+			scaleY: 1,
 			x: 31,
 			y: 20,
 		});
 
 		mounted.setActorPose({
+			height: 120,
 			layer: mounted.transientActorLayer,
 			size: 120,
+			width: 120,
 			x: 200,
 			y: 100,
 		});
 		expect(samplePoseAnimation(settleAnimation, 0.4)).toEqual(beforeResize);
 		const afterResize = samplePoseAnimation(settleAnimation, 0.7);
-		expect(afterResize.scale).toBeCloseTo(1.25);
+		expect(afterResize.scaleX).toBeCloseTo(1.25);
+		expect(afterResize.scaleY).toBeCloseTo(1.25);
 		expect(afterResize.x).toBeCloseTo(115.5);
 		expect(afterResize.y).toBeCloseTo(60);
 		const destination = samplePoseAnimation(settleAnimation, 1);
 		expect(destination).toEqual({
-			scale: 1.5,
+			scaleX: 1.5,
+			scaleY: 1.5,
 			x: 200,
 			y: 100,
 		});
@@ -1760,7 +1831,8 @@ describe("Pixi main-scene drag controller", () => {
 			x: destination.x,
 			y: destination.y,
 		});
-		expect(mounted.actor.container.scale.x).toBe(destination.scale);
+		expect(mounted.actor.container.scale.x).toBe(destination.scaleX);
+		expect(mounted.actor.container.scale.y).toBe(destination.scaleY);
 	});
 
 	it("derives neutral responders from engine previews before attracting the hovered target", () => {

@@ -131,6 +131,37 @@ const config = GameConfigSchema.parse({
 		},
 	},
 });
+const outer = config.items.outer;
+if (outer.type !== "producer") throw new Error("Expected producer test owner.");
+const rectangleOwnerConfig = GameConfigSchema.parse({
+	...config,
+	meta: {
+		...config.meta,
+		board: {
+			width: 4,
+			height: 3,
+		},
+	},
+	items: {
+		...config.items,
+		outer: {
+			...outer,
+			footprint: {
+				width: 2,
+				height: 2,
+			},
+			lines: outer.lines.map((line) => ({
+				...line,
+				input: Array.from(
+					{
+						length: 6,
+					},
+					() => materialInput("worker"),
+				),
+			})),
+		},
+	},
+});
 
 const boardOwner = {
 	id: "runtime:outer",
@@ -171,7 +202,7 @@ const inputItem = ({
 	remainingCharges,
 });
 
-const runRemoveFx = (state: StateSchema.Type) =>
+const runRemoveFx = (state: StateSchema.Type, gameConfig: GameConfigSchema.Type = config) =>
 	Effect.gen(function* () {
 		const before = yield* readRuntimeFx();
 		const owner = before.items.find((item) => item.id === boardOwner.id);
@@ -194,12 +225,116 @@ const runRemoveFx = (state: StateSchema.Type) =>
 		};
 	}).pipe(
 		useGameFx({
-			config,
+			config: gameConfig,
 			state,
 		}),
 	);
 
 describe("releaseOwnerInputsFx existing identity", () => {
+	it("orders returns from the captured authored rectangle edge", () => {
+		const rectangleOwner = {
+			...boardOwner,
+			location: {
+				scope: "board" as const,
+				space: 2,
+				position: {
+					x: 1,
+					y: 1,
+				},
+			},
+		};
+		const state = {
+			cheats: {
+				enabled: false,
+				everEnabled: false,
+				instantGameplay: false,
+			},
+			currentSpace: 0,
+			items: [
+				rectangleOwner,
+				...Array.from(
+					{
+						length: 6,
+					},
+					(_, inputIndex) =>
+						inputItem({
+							id: `runtime:worker:${inputIndex}`,
+							inputIndex,
+							itemId: "worker",
+							remainingCharges: 1,
+						}),
+				),
+			],
+			jobs: [],
+		} satisfies StateSchema.Type;
+		const result = Effect.runSync(runRemoveFx(state, rectangleOwnerConfig));
+
+		expect(Result.isSuccess(result.attempt)).toBe(true);
+		expect(
+			result.after.items
+				.filter(({ id }) => id.startsWith("runtime:worker:"))
+				.map(({ id, location }) => ({
+					id,
+					location,
+				})),
+		).toMatchObject([
+			{
+				id: "runtime:worker:0",
+				location: {
+					position: {
+						x: 1,
+						y: 1,
+					},
+				},
+			},
+			{
+				id: "runtime:worker:1",
+				location: {
+					position: {
+						x: 2,
+						y: 1,
+					},
+				},
+			},
+			{
+				id: "runtime:worker:2",
+				location: {
+					position: {
+						x: 1,
+						y: 2,
+					},
+				},
+			},
+			{
+				id: "runtime:worker:3",
+				location: {
+					position: {
+						x: 2,
+						y: 2,
+					},
+				},
+			},
+			{
+				id: "runtime:worker:4",
+				location: {
+					position: {
+						x: 1,
+						y: 0,
+					},
+				},
+			},
+			{
+				id: "runtime:worker:5",
+				location: {
+					position: {
+						x: 2,
+						y: 0,
+					},
+				},
+			},
+		]);
+	});
+
 	it("preserves one impure buffered root and its passive subtree", () => {
 		const state = {
 			cheats: {

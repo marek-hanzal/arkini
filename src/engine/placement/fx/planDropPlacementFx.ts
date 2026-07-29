@@ -7,12 +7,14 @@ import type { DropResultSchema } from "~/engine/output/schema/DropResultSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { assertPlacementMaxCountFx } from "./assertPlacementMaxCountFx";
 import { planDropScopePlacementFx } from "./planDropScopePlacementFx";
+import type { BoardRectangleSchema } from "~/engine/grid/schema/BoardRectangleSchema";
 
 export namespace planDropPlacementFx {
 	export interface Props {
 		drop: DropResultSchema.Type;
 		excludedLocations?: ReadonlyArray<GridLocationSchema.Type>;
 		origin: BoardLocationSchema.Type;
+		originRectangle?: BoardRectangleSchema.Type;
 		runtime: RuntimeSchema.Type;
 	}
 }
@@ -22,6 +24,7 @@ export const planDropPlacementFx = Effect.fn("planDropPlacementFx")(function* ({
 	drop,
 	excludedLocations,
 	origin,
+	originRectangle,
 	runtime,
 }: planDropPlacementFx.Props) {
 	const item = yield* resolveItemFx({
@@ -38,6 +41,7 @@ export const planDropPlacementFx = Effect.fn("planDropPlacementFx")(function* ({
 		excludedLocations,
 		item,
 		origin,
+		originRectangle,
 		quantity: drop.quantity,
 		runtime,
 	});

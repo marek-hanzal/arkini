@@ -18,9 +18,15 @@ import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
 import { isGridRuntimeItemFx } from "~/engine/runtime/read/isGridRuntimeItemFx";
 import { readRuntimeItemByIdFx } from "~/engine/runtime/read/readRuntimeItemByIdFx";
 import type { GridRuntimeItemSchema } from "~/engine/runtime/schema/GridRuntimeItemSchema";
+import { assertDropDestinationExpectationFx } from "~/engine/runtime/read/assertDropDestinationExpectationFx";
 
 export namespace storeItemInInventoryFx {
 	export interface Props {
+		readonly destinationLocation?: GridLocationSchema.Type;
+		readonly expectedCollisions?: ReadonlyArray<{
+			readonly itemId: IdSchema.Type;
+			readonly revision: RevisionSchema.Type;
+		}>;
 		readonly sourceItemId: IdSchema.Type;
 		readonly sourceRevision: RevisionSchema.Type;
 		readonly sourceLocation: GridLocationSchema.Type;
@@ -38,6 +44,8 @@ export namespace storeItemInInventoryFx {
 
 /** Atomically stores one whole exact grid item through the live Inventory opener. */
 export const storeItemInInventoryFx = Effect.fn("storeItemInInventoryFx")(function* ({
+	destinationLocation,
+	expectedCollisions,
 	sourceItemId,
 	sourceRevision,
 	sourceLocation,
@@ -115,6 +123,16 @@ export const storeItemInInventoryFx = Effect.fn("storeItemInInventoryFx")(functi
 						itemId: source.id,
 					}),
 				);
+			}
+			if (destinationLocation !== undefined && expectedCollisions !== undefined) {
+				yield* assertDropDestinationExpectationFx({
+					allowAdditionalOccupants: false,
+					expectedCollisions,
+					explicitTargetItemId: inventory.id,
+					location: destinationLocation,
+					runtime,
+					source,
+				});
 			}
 			const plan = yield* readStoreItemInInventoryPlanFx({
 				item: source,

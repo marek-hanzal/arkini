@@ -90,7 +90,17 @@ export const createPixiActorAnimatorFx = Effect.fn("createPixiActorAnimatorFx")(
 					case "pose":
 						write.actor.container.x = write.x;
 						write.actor.container.y = write.y;
-						if (write.scale !== undefined) write.actor.container.scale.set(write.scale);
+						if (
+							write.scale !== undefined ||
+							write.scaleX !== undefined ||
+							write.scaleY !== undefined
+						) {
+							const scale = write.scale;
+							write.actor.container.scale.set(
+								write.scaleX ?? scale ?? write.actor.container.scale.x,
+								write.scaleY ?? scale ?? write.actor.container.scale.y,
+							);
+						}
 						break;
 					case "lifecycle-opacity":
 						write.actor.container.alpha = write.alpha;
@@ -122,6 +132,7 @@ export const createPixiActorAnimatorFx = Effect.fn("createPixiActorAnimatorFx")(
 						const fromX = actor.container.x;
 						const fromY = actor.container.y;
 						const fromScale = actor.container.scale.x;
+						const fromScaleY = actor.container.scale.y;
 						const fromAlpha = actor.container.alpha;
 						const fromCrowdAlpha = actor.crowdLayer.alpha;
 						const fromIncomingAlpha =
@@ -164,13 +175,25 @@ export const createPixiActorAnimatorFx = Effect.fn("createPixiActorAnimatorFx")(
 													fromY +
 														((animation.toY ?? fromY) - fromY) *
 															progress;
-												const scale =
+												const scaleX =
+													pose?.scaleX ??
 													pose?.scale ??
 													fromScale +
-														((animation.toScale ?? fromScale) -
+														((animation.toScaleX ??
+															animation.toScale ??
+															fromScale) -
 															fromScale) *
 															progress;
-												actor.container.scale.set(scale);
+												const scaleY =
+													pose?.scaleY ??
+													pose?.scale ??
+													fromScaleY +
+														((animation.toScaleY ??
+															animation.toScale ??
+															fromScaleY) -
+															fromScaleY) *
+															progress;
+												actor.container.scale.set(scaleX, scaleY);
 												break;
 											}
 											case "lifecycle-opacity":

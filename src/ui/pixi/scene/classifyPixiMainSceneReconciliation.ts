@@ -66,7 +66,10 @@ export interface PixiMainSceneActorUpdatePlan {
 		| {
 				readonly directLanding: boolean;
 				readonly kind: "travel";
-				readonly scaleBeforeTravel: number | null;
+				readonly scaleBeforeTravel: {
+					readonly x: number;
+					readonly y: number;
+				} | null;
 		  };
 }
 
@@ -130,7 +133,8 @@ export const classifyPixiMainSceneActorUpdate = ({
 	const moved = !isSameTileActorLocation(actor.item.location, displayItem.location);
 	const visualChanged = !isSameMainSceneVisual(actor.currentVisual.item, displayItem);
 	const progressChanged = actor.item.progressRatio !== displayItem.progressRatio;
-	const sizeChanged = actor.size !== pose.size;
+	const dimensionsChanged = actor.width !== pose.width || actor.height !== pose.height;
+	const sizeChanged = actor.size !== pose.size || dimensionsChanged;
 	const poseOwned = actor.dragging || deliveryRetained || motionClaimed || poseChannelActive;
 	const nextCrowdAlpha = readPixiTileActorCrowdAlpha(displayItem);
 	const crowdAlpha =
@@ -141,7 +145,8 @@ export const classifyPixiMainSceneActorUpdate = ({
 			: displayItem.activityEffect
 				? "start"
 				: "stop";
-	const previousDisplayedSize = actor.size * actor.container.scale.x;
+	const previousDisplayedWidth = actor.width * actor.container.scale.x;
+	const previousDisplayedHeight = actor.height * actor.container.scale.y;
 	const item: PixiMainSceneActorUpdatePlan["item"] =
 		visualChanged || sizeChanged
 			? {
@@ -177,7 +182,10 @@ export const classifyPixiMainSceneActorUpdate = ({
 					directLanding,
 					kind: "travel",
 					scaleBeforeTravel: sizeChanged
-						? previousDisplayedSize / Math.max(1, pose.size)
+						? {
+								x: previousDisplayedWidth / Math.max(1, pose.width),
+								y: previousDisplayedHeight / Math.max(1, pose.height),
+							}
 						: null,
 				}
 			: {

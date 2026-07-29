@@ -4,6 +4,7 @@ import type { GameTransition } from "~/bridge/game/GameSession";
 import type { TileLocation } from "~/bridge/tile/TileLocation";
 import type { TileSwapMotionCue } from "~/bridge/tile/motion/TileMotionCue";
 import { readGridRuntimeItemFx } from "~/bridge/tile/motion/readGridRuntimeItemFx";
+import { readEffectiveGridFootprintFx } from "~/engine/grid/fx/readEffectiveGridFootprintFx";
 import { isSameGridLocationFx } from "~/engine/location/read/isSameGridLocationFx";
 
 interface CapturedTileSwapActor {
@@ -77,8 +78,24 @@ export const readCommittedTileSwapMotionCueFx = Effect.fn("readCommittedTileSwap
 			staggerIndex: 0,
 			actorId: currentTarget.id,
 			counterpartActorId: currentSource.id,
+			counterpartOriginFootprint: yield* readEffectiveGridFootprintFx({
+				authored: previousSource.item.footprint,
+				location: previousSource.location,
+			}),
+			counterpartTargetFootprint: yield* readEffectiveGridFootprintFx({
+				authored: currentSource.item.footprint,
+				location: currentSource.location,
+			}),
 			originActorId: previousTarget.id,
+			originFootprint: yield* readEffectiveGridFootprintFx({
+				authored: previousTarget.item.footprint,
+				location: previousTarget.location,
+			}),
 			originLocation: previousTarget.location,
+			targetFootprint: yield* readEffectiveGridFootprintFx({
+				authored: currentTarget.item.footprint,
+				location: currentTarget.location,
+			}),
 			targetLocation: currentTarget.location,
 		} satisfies TileSwapMotionCue;
 	},

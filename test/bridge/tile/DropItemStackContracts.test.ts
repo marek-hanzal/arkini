@@ -26,6 +26,16 @@ describe("public tile stack contracts", () => {
 	it("exposes Stack through both preview and committed bridge result types", () => {
 		const preview = {
 			kind: DropItemResultKindEnumSchema.enum.Stack,
+			destinationFootprint: {
+				height: 1,
+				width: 1,
+			},
+			collisions: [
+				{
+					itemId: "runtime:target",
+					revision: "revision:target:before",
+				},
+			],
 		} satisfies readTileDropPreviewFx.Result;
 		const outcome = {
 			kind: DropItemResultKindEnumSchema.enum.Stack,

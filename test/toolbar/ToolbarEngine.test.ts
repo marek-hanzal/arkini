@@ -408,6 +408,7 @@ describe("Toolbar engine", () => {
 
 		expect(result.storePreview).toEqual({
 			kind: DropItemResultKindEnumSchema.enum.Move,
+			collisions: [],
 		});
 		expect(result.preview).toEqual({
 			kind: DropItemResultKindEnumSchema.enum.Reject,

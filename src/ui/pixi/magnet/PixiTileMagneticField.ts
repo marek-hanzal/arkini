@@ -15,6 +15,8 @@ export interface PixiTileMagneticFieldSample {
 	readonly sourceItem: TileActorItem;
 	readonly sourceKind?: PixiTileMagneticSourceKind;
 	readonly sourceSize?: number;
+	readonly sourceHeight?: number;
+	readonly sourceWidth?: number;
 	readonly sourceX: number;
 	readonly sourceY: number;
 }

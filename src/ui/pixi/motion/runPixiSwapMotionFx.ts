@@ -17,6 +17,7 @@ interface PixiSwapMotionLeg {
 	readonly actor: PixiTileActor;
 	readonly forceOrigin: PixiTileActorPose | null;
 	readonly target: PixiTileActorPose;
+	readonly targetFootprint: TileSwapMotionCue["targetFootprint"];
 	readonly targetLocation: TileSwapMotionCue["targetLocation"];
 }
 
@@ -54,6 +55,9 @@ export const runPixiSwapMotionFx = Effect.fn("runPixiSwapMotionFx")(function* ({
 }: runPixiSwapMotionFx.Props) {
 	const exchanged = actorStore.actors.get(cue.actorId);
 	const counterpart = actorStore.actors.get(cue.counterpartActorId);
+	const counterpartTarget =
+		(yield* surface.readLocationPoseFx(cue.originLocation, cue.counterpartTargetFootprint)) ??
+		origin;
 	const legs: ReadonlyArray<PixiSwapMotionLeg> = [
 		...(exchanged === undefined
 			? []
@@ -62,6 +66,7 @@ export const runPixiSwapMotionFx = Effect.fn("runPixiSwapMotionFx")(function* ({
 						actor: exchanged,
 						forceOrigin: origin,
 						target,
+						targetFootprint: cue.targetFootprint,
 						targetLocation: cue.targetLocation,
 					},
 				]),
@@ -71,7 +76,8 @@ export const runPixiSwapMotionFx = Effect.fn("runPixiSwapMotionFx")(function* ({
 					{
 						actor: counterpart,
 						forceOrigin: null,
-						target: origin,
+						target: counterpartTarget,
+						targetFootprint: cue.counterpartTargetFootprint,
 						targetLocation: cue.originLocation,
 					},
 				]),
@@ -87,7 +93,12 @@ export const runPixiSwapMotionFx = Effect.fn("runPixiSwapMotionFx")(function* ({
 			yield* animator.setFx({
 				actor: leg.actor,
 				channel: "pose",
-				scale: leg.forceOrigin.size / Math.max(1, leg.actor.size),
+				scaleX:
+					(leg.forceOrigin.width ?? leg.forceOrigin.size) /
+					Math.max(1, leg.actor.width || leg.actor.size),
+				scaleY:
+					(leg.forceOrigin.height ?? leg.forceOrigin.size) /
+					Math.max(1, leg.actor.height || leg.actor.size),
 				x: leg.forceOrigin.x,
 				y: leg.forceOrigin.y,
 			});
@@ -100,14 +111,17 @@ export const runPixiSwapMotionFx = Effect.fn("runPixiSwapMotionFx")(function* ({
 			toY: leg.target.y,
 		});
 		const poseSampler = yield* createPixiTileMotionPoseSamplerFx({
-			actorBaseSize: leg.actor.size,
+			actorBaseHeight: leg.actor.height || leg.actor.size,
+			actorBaseWidth: leg.actor.width || leg.actor.size,
 			from: {
-				scale: leg.actor.container.scale.x,
+				scaleX: leg.actor.container.scale.x,
+				scaleY: leg.actor.container.scale.y,
 				x: leg.actor.container.x,
 				y: leg.actor.container.y,
 			},
 			surface,
 			target: leg.target,
+			targetFootprint: leg.targetFootprint,
 			targetLocation: leg.targetLocation,
 		});
 		const counterpartActorId =

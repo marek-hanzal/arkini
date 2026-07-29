@@ -357,7 +357,7 @@ describe("ItemLinesTab", () => {
 		expect(document.querySelector('[data-ui="TileLineInputWithdrawButton"]')).toBeNull();
 	});
 
-	it("transitions semantic input surfaces and hides them under active progress", async () => {
+	it("transitions semantic input surfaces and makes them transparent under active progress", async () => {
 		await renderLines({
 			...projection,
 			line: [
@@ -451,11 +451,57 @@ describe("ItemLinesTab", () => {
 		expect(partial?.className).toContain("bg-[var(--ak-list-row-active-surface)]");
 		expect(stored?.dataset.inputState).toBe("stored");
 		expect(stored?.className).toContain("bg-[var(--ak-list-row-active-progress-surface)]");
-		expect(active?.dataset.inputState).toBe("empty");
+		expect(active?.dataset.inputState).toBe("stored");
+		expect(active?.dataset.surfaceSuppressed).toBe("true");
 		expect(active?.className).toContain("ak-line-input");
+		expect(active?.className).toContain("bg-transparent");
 		expect(active?.className).not.toContain("bg-[var(--ak-list-row-active-progress-surface)]");
 		expect(deposit?.dataset.inputState).toBe("available");
 		expect(deposit?.className).toContain("bg-[var(--ak-list-row-active-surface)]");
+	});
+
+	it("retains the exact input row while delivery surface fades to transparent running state", async () => {
+		const deliveryLine = {
+			...projection.line[0],
+			lineId: "line:stable-input",
+			input: [
+				{
+					...input,
+					deliveryQuantity: 1,
+				},
+			],
+		};
+		const { container, rerender } = await renderLines({
+			...projection,
+			line: [
+				deliveryLine,
+			],
+		});
+		const before = container.querySelector<HTMLElement>('[data-ui="TileLineInput"]');
+		expect(before?.className).toContain("bg-[var(--ak-line-input-delivery-surface)]");
+
+		await rerender({
+			...projection,
+			line: [
+				{
+					...deliveryLine,
+					activeJob: {
+						status: JobStatusEnumSchema.enum.Running,
+						durationMs: 1_000,
+						remainingMs: 900,
+					},
+					input: [
+						input,
+					],
+				},
+			],
+		});
+
+		const running = container.querySelector<HTMLElement>('[data-ui="TileLineInput"]');
+		expect(running).toBe(before);
+		expect(running?.dataset.surfaceSuppressed).toBe("true");
+		expect(running?.className).toContain("bg-transparent");
+		expect(running?.className).toContain("rounded-xl px-3 py-2");
 	});
 
 	it("shows autofill material truth and opens the first producer with a material filter", async () => {
@@ -517,11 +563,7 @@ describe("ItemLinesTab", () => {
 		expect(
 			container.querySelector<HTMLInputElement>('[aria-label="Search visible lines"]')?.value,
 		).toBe("Log");
-		expect(
-			container.querySelector<HTMLInputElement>(
-				'input[name="item-lines-availability"][value="all"]',
-			)?.checked,
-		).toBe(true);
+		expect(container.querySelector('[data-ui="ItemLinesAvailabilityFilter"]')).toBeNull();
 	});
 
 	it("defaults to Available and keeps input-starved lines while hiding unavailable lines", async () => {
@@ -670,12 +712,7 @@ describe("ItemLinesTab", () => {
 				runningUnavailable,
 			],
 		});
-		const available = container.querySelector<HTMLInputElement>(
-			'input[name="item-lines-availability"][value="available"]',
-		);
-
-		expect(available?.checked).toBe(true);
-		expect(available?.disabled).toBe(false);
+		expect(container.querySelector('[data-ui="ItemLinesAvailabilityFilter"]')).toBeNull();
 		expect(
 			Array.from(container.querySelectorAll<HTMLElement>('[data-ui="TileLine"]')).map(
 				(row) => row.dataset.lineId,
@@ -800,6 +837,18 @@ describe("ItemLinesTab", () => {
 				kind: "available";
 			}
 		>;
+		const mixedProjection = {
+			...projection,
+			line: [
+				unavailable,
+				...projection.line,
+			],
+		} as const satisfies Extract<
+			useItemDetailLines.Projection,
+			{
+				kind: "available";
+			}
+		>;
 		const { container, rerender } = await renderLines(projection);
 		const available = () =>
 			container.querySelector<HTMLInputElement>(
@@ -810,8 +859,7 @@ describe("ItemLinesTab", () => {
 				'input[name="item-lines-availability"][value="all"]',
 			);
 
-		expect(available()?.checked).toBe(true);
-		expect(all()?.checked).toBe(false);
+		expect(container.querySelector('[data-ui="ItemLinesAvailabilityFilter"]')).toBeNull();
 
 		await rerender(unavailableProjection);
 		expect(available()?.checked).toBe(false);
@@ -823,12 +871,14 @@ describe("ItemLinesTab", () => {
 		expect(container.querySelectorAll('[data-ui="TileLine"]')).toHaveLength(1);
 
 		await rerender(projection);
+		expect(container.querySelector('[data-ui="ItemLinesAvailabilityFilter"]')).toBeNull();
+		expect(container.querySelectorAll('[data-ui="TileLine"]')).toHaveLength(2);
+
+		await rerender(mixedProjection);
 		expect(available()?.checked).toBe(false);
 		expect(available()?.disabled).toBe(false);
 		expect(available()?.closest("label")?.className).toContain("cursor-pointer");
 		expect(all()?.checked).toBe(true);
-		expect(container.querySelectorAll('[data-ui="TileLine"]')).toHaveLength(2);
-
 		await selectAvailabilityFilter(container, "available");
 		expect(available()?.checked).toBe(true);
 		await rerender(unavailableProjection);
@@ -844,30 +894,15 @@ describe("ItemLinesTab", () => {
 			line: [],
 		});
 
-		expect(
-			container.querySelector<HTMLInputElement>(
-				'input[name="item-lines-availability"][value="available"]',
-			)?.checked,
-		).toBe(false);
-		expect(
-			container.querySelector<HTMLInputElement>(
-				'input[name="item-lines-availability"][value="available"]',
-			)?.disabled,
-		).toBe(true);
-		expect(
-			container.querySelector<HTMLInputElement>(
-				'input[name="item-lines-availability"][value="all"]',
-			)?.checked,
-		).toBe(true);
+		expect(container.querySelector('[data-ui="ItemLinesAvailabilityFilter"]')).toBeNull();
 		expect(container.querySelector('[data-ui="ItemLinesVisibleEmpty"]')).not.toBeNull();
 		expect(container.querySelector('[data-ui="ItemLinesAvailableEmpty"]')).toBeNull();
 		expect(container.textContent).toContain("No product line is currently visible.");
 		expect(container.textContent).not.toContain("Choose All");
 	});
 
-	it("preserves local controls for the same owner and resets them for an exact owner change", async () => {
+	it("preserves local search for the same owner and resets it for an exact owner change", async () => {
 		const { container, rerender } = await renderLines(projection);
-		await selectAvailabilityFilter(container, "all");
 		await setSearchQuery(container, "first");
 
 		await rerender({
@@ -877,11 +912,7 @@ describe("ItemLinesTab", () => {
 				description: `${candidate.description} Live update.`,
 			})),
 		});
-		expect(
-			container.querySelector<HTMLInputElement>(
-				'input[name="item-lines-availability"][value="all"]',
-			)?.checked,
-		).toBe(true);
+		expect(container.querySelector('[data-ui="ItemLinesAvailabilityFilter"]')).toBeNull();
 		expect(
 			container.querySelector<HTMLInputElement>('[aria-label="Search visible lines"]')?.value,
 		).toBe("first");
@@ -890,11 +921,7 @@ describe("ItemLinesTab", () => {
 			...projection,
 			itemId: "runtime:other-producer",
 		});
-		expect(
-			container.querySelector<HTMLInputElement>(
-				'input[name="item-lines-availability"][value="available"]',
-			)?.checked,
-		).toBe(true);
+		expect(container.querySelector('[data-ui="ItemLinesAvailabilityFilter"]')).toBeNull();
 		expect(
 			container.querySelector<HTMLInputElement>('[aria-label="Search visible lines"]')?.value,
 		).toBe("");
@@ -1013,6 +1040,9 @@ describe("ItemLinesTab", () => {
 
 		expect(inputWithdraw).not.toBeNull();
 		expect(lineWithdraw).not.toBeNull();
+		expect(lineWithdraw?.closest("section")?.querySelector("h4")?.textContent).toBe("Inputs");
+		expect(lineWithdraw?.className).toContain("underline");
+		expect(lineWithdraw?.className).toContain("border-0");
 		expect(storedQuantity?.previousElementSibling?.contains(inputWithdraw ?? null)).toBe(true);
 		expect(inputWithdraw?.className).toContain("underline");
 		expect(inputWithdraw?.className).toContain("border-0");
@@ -1047,6 +1077,7 @@ describe("ItemLinesTab", () => {
 			],
 		});
 		expect(document.querySelector('[data-ui="TileLineInputWithdrawButton"]')).toBeNull();
+		expect(document.querySelector('[data-ui="TileLineWithdrawButton"]')).toBeNull();
 	});
 
 	it("retains exact buffered-input withdrawal when a live line becomes unavailable", async () => {

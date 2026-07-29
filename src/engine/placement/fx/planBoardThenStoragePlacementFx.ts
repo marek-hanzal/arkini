@@ -4,6 +4,7 @@ import { PlacementFailureReasonEnumSchema } from "~/engine/placement/schema/Plac
 import type { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
 import { GameConfigFx } from "~/engine/game/context/GameConfigFx";
 import type { BoardLocationSchema } from "~/engine/location/schema/BoardLocationSchema";
+import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import type { DropResultSchema } from "~/engine/output/schema/DropResultSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
@@ -18,6 +19,7 @@ import { readPlacementPlanQuantityFx } from "./readPlacementPlanQuantityFx";
 export namespace planBoardThenStoragePlacementFx {
 	export interface Props {
 		drop: DropResultSchema.Type;
+		excludedLocations?: ReadonlyArray<GridLocationSchema.Type>;
 		item: ItemSchema.Type;
 		origin: BoardLocationSchema.Type;
 		quantity: PositiveIntegerSchema.Type;
@@ -27,8 +29,18 @@ export namespace planBoardThenStoragePlacementFx {
 
 /** Plans board first, then inventory, then toolbar for an `any` item. */
 export const planBoardThenStoragePlacementFx = Effect.fn("planBoardThenStoragePlacementFx")(
-	function* ({ drop, item, origin, quantity, runtime }: planBoardThenStoragePlacementFx.Props) {
+	function* ({
+		drop,
+		excludedLocations,
+		item,
+		origin,
+		quantity,
+		runtime,
+	}: planBoardThenStoragePlacementFx.Props) {
 		const boardPlan = yield* planBoardPlacementFx({
+			excludedLocations: excludedLocations?.filter(
+				(location): location is BoardLocationSchema.Type => location.scope === "board",
+			),
 			item,
 			origin,
 			placement: drop.placement,
@@ -42,6 +54,7 @@ export const planBoardThenStoragePlacementFx = Effect.fn("planBoardThenStoragePl
 		if (inventoryQuantity === 0) return boardPlan;
 
 		const inventoryPlan = yield* planInventoryPlacementFx({
+			excludedLocations,
 			item,
 			quantity: inventoryQuantity,
 			runtime,
@@ -76,6 +89,7 @@ export const planBoardThenStoragePlacementFx = Effect.fn("planBoardThenStoragePl
 		}
 
 		const toolbarPlan = yield* planToolbarPlacementFx({
+			excludedLocations,
 			item,
 			quantity: toolbarQuantity,
 			runtime,

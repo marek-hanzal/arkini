@@ -144,7 +144,7 @@
 		color-mix(in srgb, var(--ak-accent) 44%, var(--ak-line)),
 		color-mix(in srgb, var(--ak-accent) 52%, var(--ak-line))
 	);
-	--ak-list-row-transition-duration: 140ms;
+	--ak-list-row-transition-duration: 200ms;
 	--ak-list-row-transition-easing: cubic-bezier(0.22, 1, 0.36, 1);
 
 	--ak-spotlight-option-surface: transparent;
@@ -329,6 +329,7 @@ select {
 	box-shadow: inset 0 0 0 1px transparent;
 	transition:
 		background-color var(--ak-list-row-transition-duration) var(--ak-list-row-transition-easing),
+		border-color var(--ak-list-row-transition-duration) var(--ak-list-row-transition-easing),
 		box-shadow var(--ak-list-row-transition-duration) var(--ak-list-row-transition-easing),
 		opacity var(--ak-list-row-transition-duration) var(--ak-list-row-transition-easing);
 }
@@ -348,8 +349,10 @@ select {
 }
 
 .ak-line-input {
-	transition: background-color var(--ak-list-row-transition-duration)
-		var(--ak-list-row-transition-easing);
+	transition:
+		background-color var(--ak-list-row-transition-duration) var(--ak-list-row-transition-easing),
+		color var(--ak-list-row-transition-duration) var(--ak-list-row-transition-easing),
+		opacity var(--ak-list-row-transition-duration) var(--ak-list-row-transition-easing);
 }
 
 .ak-list-row-selected {

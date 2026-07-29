@@ -3,6 +3,7 @@ import { Effect } from "effect";
 import type { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
 import type { PositionSchema } from "~/engine/grid/schema/PositionSchema";
 import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
+import { isSameGridLocationFx } from "~/engine/location/read/isSameGridLocationFx";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 import type { PlacementPlanSchema } from "~/engine/placement/schema/PlacementPlanSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
@@ -16,6 +17,7 @@ import { readPlacementPlanQuantityFx } from "./readPlacementPlanQuantityFx";
 
 export namespace planScopePlacementFx {
 	export interface Props {
+		excludedLocations?: ReadonlyArray<GridLocationSchema.Type>;
 		item: ItemSchema.Type;
 		locations: ReadonlyArray<GridLocationSchema.Type>;
 		origin?: PositionSchema.Type;
@@ -26,15 +28,32 @@ export namespace planScopePlacementFx {
 
 /** Plans stack-first placement within one concrete runtime scope. */
 export const planScopePlacementFx = Effect.fn("planScopePlacementFx")(function* ({
+	excludedLocations = [],
 	item,
 	locations,
 	origin,
 	quantity,
 	runtime,
 }: planScopePlacementFx.Props) {
+	const eligibleLocations: GridLocationSchema.Type[] = [];
+	for (const location of locations) {
+		let excluded = false;
+		for (const excludedLocation of excludedLocations) {
+			if (
+				yield* isSameGridLocationFx({
+					left: location,
+					right: excludedLocation,
+				})
+			) {
+				excluded = true;
+				break;
+			}
+		}
+		if (!excluded) eligibleLocations.push(location);
+	}
 	const availableStacks = yield* readAvailableStackItemsFx({
 		itemId: item.id,
-		locations,
+		locations: eligibleLocations,
 		runtime,
 	});
 	const orderedStacks = yield* orderStackItemsFx({
@@ -59,7 +78,7 @@ export const planScopePlacementFx = Effect.fn("planScopePlacementFx")(function* 
 	}
 
 	const emptyLocations = yield* readEmptyLocationsFx({
-		locations,
+		locations: eligibleLocations,
 		runtime,
 	});
 	const spawn = yield* planSpawnPlacementFx({

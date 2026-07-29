@@ -8,18 +8,21 @@ import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import { TileDefaultLineCommandAtom } from "~/bridge/tile/TileDefaultLineCommandAtom";
 import type { TileActorItem } from "~/bridge/tile/TileActorItem";
 import { runTileDropAtom } from "~/bridge/tile/runTileDropAtom";
+import { runTileSplitAtom } from "~/bridge/tile/runTileSplitAtom";
 import { useGameMenuControl } from "~/ui/game-menu/useGameMenuControl";
 import { useItemDetailControl } from "~/ui/item-detail/useItemDetailControl";
 import { isInventoryShortcutKey } from "~/ui/navigation/isInventoryShortcutKey";
 import type { PixiMainSceneRuntime } from "~/ui/pixi/scene/PixiMainSceneRuntime";
+import type { PixiMainSceneActivationIntent } from "~/ui/pixi/scene/PixiMainSceneActivationIntent";
 import { createPixiMainSceneRuntimeFx } from "~/ui/pixi/scene/createPixiMainSceneRuntimeFx";
 import { usePixiGameRuntime } from "~/ui/pixi/usePixiGameRuntime";
 
 /**
  * Mounts the one Pixi-native Board + Toolbar scene into the React-owned game shell.
  *
- * Left click performs the canonical primary action and right click opens Item Detail. React forwards
- * commands and overlay cancellation only; the scene runtime owns pointer and display lifecycle.
+ * Left click performs the canonical primary action, Shift+left click splits a Board stack, and
+ * right click opens Item Detail. React forwards commands and overlay cancellation only; the scene
+ * runtime owns pointer and display lifecycle.
  */
 export const PixiBoardToolbarSurface = () => {
 	const game = useGameEngine();
@@ -29,6 +32,9 @@ export const PixiBoardToolbarSurface = () => {
 	const { interaction, textures } = usePixiGameRuntime();
 	const [enqueueLineState, enqueueLine] = useAtom(TileDefaultLineCommandAtom(game));
 	const runDrop = useAtomSet(runTileDropAtom(game), {
+		mode: "promise",
+	});
+	const runSplit = useAtomSet(runTileSplitAtom(game), {
 		mode: "promise",
 	});
 	const hostRef = useRef<HTMLDivElement>(null);
@@ -58,15 +64,24 @@ export const PixiBoardToolbarSurface = () => {
 	);
 
 	const activate = useCallback(
-		async (item: TileActorItem, openDetail: boolean, origin: HTMLElement) => {
+		async (item: TileActorItem, intent: PixiMainSceneActivationIntent, origin: HTMLElement) => {
 			const { itemDetail: currentItemDetail } = controlsRef.current;
-			if (openDetail) {
+			if (intent === "detail") {
 				RendererRuntime.runSync(
 					currentItemDetail.openItemDetailFx({
 						itemId: item.id,
 						origin,
 					}),
 				);
+				return;
+			}
+			if (intent === "split-stack") {
+				if (item.location.scope !== "board" || item.quantity < 2) return;
+				await runSplit({
+					itemId: item.id,
+					location: item.location,
+					revision: item.revision,
+				});
 				return;
 			}
 			await match(item.primaryAction)
@@ -99,6 +114,7 @@ export const PixiBoardToolbarSurface = () => {
 		[
 			openInventory,
 			enqueueLine,
+			runSplit,
 		],
 	);
 

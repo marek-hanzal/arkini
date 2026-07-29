@@ -817,6 +817,9 @@ describe("ItemDetailModal", () => {
 		const runtime = document.querySelector<HTMLElement>('[data-ui="TileLineRuntime"]');
 		if (runtime === null) throw new Error("Missing line runtime slot.");
 		expect(runtime.dataset.jobStatus).toBe(JobStatusEnumSchema.enum.Running);
+		expect(document.querySelector('[data-ui="TileLine"]')?.textContent).not.toContain(
+			"Running",
+		);
 		expect(document.querySelector('[data-ui="TileLineRuntimeValue"]')?.textContent).toBe(
 			"0.4 s",
 		);
@@ -920,7 +923,11 @@ describe("ItemDetailModal", () => {
 			'[data-ui="ItemQueueRow"][data-state="active"]',
 		);
 		expect(activeRow?.textContent).toContain("Water");
-		expect(activeRow?.textContent).toContain("Running");
+		expect(activeRow?.textContent).not.toContain("Running");
+		expect(
+			activeRow?.querySelector<HTMLImageElement>('[data-ui="ItemQueueWorkIdentity"] img')
+				?.src,
+		).toContain("resource:asset:water");
 		expect(activeRow?.className).toContain("ak-list-row-active");
 		expect(
 			activeRow?.querySelector<HTMLElement>('[data-ui="ItemQueueProgressFill"]')?.style.width,
@@ -967,13 +974,23 @@ describe("ItemDetailModal", () => {
 		expect(queuedRow?.className).toContain("rounded-xl");
 		expect(queuedRow?.textContent).toContain("Water");
 		expect(queuedRow?.textContent).toContain("Queued #1");
+		expect(
+			queuedRow?.querySelector<HTMLImageElement>('[data-ui="ItemQueueWorkIdentity"] img')
+				?.src,
+		).toContain("resource:asset:water");
 		const deleteButton = queuedRow?.querySelector<HTMLButtonElement>(
 			'[data-ui="ItemQueueDeleteButton"]',
 		);
 		expect(deleteButton?.textContent).toBe("Delete");
 		expect(deleteButton?.className).toContain("underline");
 		expect(deleteButton?.dataset.requestId).toBe("request:workshop");
-		expect(document.querySelector('[data-ui="ItemQueueClearButton"]')).not.toBeNull();
+		const clearQueueButton = document.querySelector<HTMLButtonElement>(
+			'[data-ui="ItemQueueClearButton"]',
+		);
+		expect(clearQueueButton).not.toBeNull();
+		expect(clearQueueButton?.className).toContain("underline");
+		expect(clearQueueButton?.className).toContain("border-0");
+		expect(document.querySelector('[data-ui="ItemQueueEmptyState"]')).toBeNull();
 
 		await act(async () => {
 			publishRuntime(
@@ -987,8 +1004,20 @@ describe("ItemDetailModal", () => {
 		});
 		expect(document.querySelector('[data-ui="ItemQueueActiveSlot"]')).toBe(activeSlot);
 		expect(document.querySelector('[data-ui="ItemQueueIdleSlot"]')?.textContent).toContain(
-			"Nothing happening, bro.",
+			"No active job",
 		);
+		expect(document.querySelector('[data-ui="ItemQueueIdleSlot"]')?.textContent).toContain(
+			"Nothing is currently scheduled to run.",
+		);
+		expect(
+			document.querySelector('[data-ui="ItemQueueIdleSlot"] [class*="lucide--circle-off"]'),
+		).not.toBeNull();
+		const emptyQueue = document.querySelector('[data-ui="ItemQueueEmptyState"]');
+		expect(emptyQueue?.textContent).toContain("Queue is empty");
+		expect(emptyQueue?.querySelector('[class*="lucide--list-x"]')).not.toBeNull();
+		expect(
+			document.querySelector('[data-ui="ItemQueueActiveSlotSeparator"]')?.className,
+		).toContain("border-b");
 		expect(document.querySelector('[data-ui="ItemQueueRow"]')).toBeNull();
 		expect(document.querySelector('[data-ui="ItemQueueClearButton"]')).toBeNull();
 	});

@@ -285,6 +285,7 @@ export const motion = {
 	article: createMotionComponent("article"),
 	button: createMotionComponent("button"),
 	div: createMotionComponent("div"),
+	p: createMotionComponent("p"),
 	span: createMotionComponent("span"),
 };
 

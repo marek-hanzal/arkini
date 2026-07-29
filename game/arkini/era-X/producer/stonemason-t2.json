@@ -26,7 +26,7 @@
 			"scope": "any",
 			"maxCount": 1,
 			"maxStackSize": 1,
-			"maxQueueSize": 1,
+			"maxQueueSize": 5,
 			"lines": [
 				{
 					"id": "line:stonemason-t2:stone-block",

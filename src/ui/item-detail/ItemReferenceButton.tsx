@@ -2,6 +2,7 @@ import { motion } from "motion/react";
 import { useState } from "react";
 
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
+import { ItemIdentity } from "~/ui/item/ItemIdentity";
 import { useItemDetailControl } from "~/ui/item-detail/useItemDetailControl";
 
 export interface ItemReferenceButtonProps {
@@ -70,25 +71,15 @@ export const ItemReferenceButton = ({
 				}
 			}}
 		>
-			<span className="relative block size-11 shrink-0 rounded-lg bg-surface/45 ring-1 ring-line/50 transition-[background-color,box-shadow] group-enabled:group-hover:bg-accent/8 group-enabled:group-hover:ring-accent/35">
-				<img
-					className="absolute inset-0 size-full object-contain p-0.5 drop-shadow-[0_0.25rem_0.45rem_color-mix(in_srgb,var(--ak-overlay)_24%,transparent)]"
-					src={sourceUrl}
-					alt=""
-					draggable={false}
-				/>
-				{compositeUrl === undefined ? null : (
-					<img
-						className="absolute inset-0 size-full object-contain p-0.5 drop-shadow-[0_0.25rem_0.45rem_color-mix(in_srgb,var(--ak-overlay)_24%,transparent)]"
-						src={compositeUrl}
-						alt=""
-						draggable={false}
-					/>
-				)}
-			</span>
-			<span className="truncate font-medium text-foreground transition-colors group-enabled:group-hover:text-accent">
-				{label}
-			</span>
+			<ItemIdentity
+				artworkClassName="rounded-lg bg-surface/45 ring-1 ring-line/50 transition-[background-color,box-shadow] group-enabled:group-hover:bg-accent/8 group-enabled:group-hover:ring-accent/35"
+				artworkImageClassName="p-0.5"
+				compositeUrl={compositeUrl}
+				rootTag="span"
+				sourceUrl={sourceUrl}
+				title={label}
+				titleClassName="truncate font-medium text-foreground transition-colors group-enabled:group-hover:text-accent"
+			/>
 		</motion.button>
 	);
 };

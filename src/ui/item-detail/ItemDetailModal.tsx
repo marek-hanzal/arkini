@@ -12,6 +12,7 @@ import { useItemDetailSources } from "~/bridge/item-detail/useItemDetailSources"
 import { useItemDetailTabs } from "~/bridge/item-detail/useItemDetailTabs";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import { BadgeCount } from "~/ui/badge/BadgeCount";
+import { ItemIdentity } from "~/ui/item/ItemIdentity";
 import { ItemDefinitionInfoTab } from "~/ui/item-detail/ItemDefinitionInfoTab";
 import type { ItemDetailState, ItemDetailTarget } from "~/ui/item-detail/ItemDetailControl";
 import { ItemInfoTab } from "~/ui/item-detail/ItemInfoTab";
@@ -48,28 +49,6 @@ interface HeaderIdentity {
 	readonly compositeUrl?: string;
 }
 
-const ItemDetailHeaderArtwork = ({ identity }: { readonly identity: HeaderIdentity }) => (
-	<div
-		className="relative size-16 shrink-0"
-		data-ui="ItemDetailHeaderArtwork"
-	>
-		<img
-			className="absolute inset-0 size-full object-contain drop-shadow-[0_0.45rem_0.65rem_color-mix(in_srgb,var(--ak-overlay)_35%,transparent)]"
-			src={identity.sourceUrl}
-			alt=""
-			draggable={false}
-		/>
-		{identity.compositeUrl === undefined ? null : (
-			<img
-				className="absolute inset-0 size-full object-contain drop-shadow-[0_0.45rem_0.65rem_color-mix(in_srgb,var(--ak-overlay)_35%,transparent)]"
-				src={identity.compositeUrl}
-				alt=""
-				draggable={false}
-			/>
-		)}
-	</div>
-);
-
 const ItemDetailHeader = ({
 	disabled,
 	identity,
@@ -82,25 +61,28 @@ const ItemDetailHeader = ({
 	const closeItemDetail = useCloseItemDetail();
 	return (
 		<header className="flex min-w-0 items-center justify-between gap-4 border-b border-line pb-3">
-			<div className="flex min-w-0 items-center gap-3">
-				<ItemDetailHeaderArtwork identity={identity} />
-				<div className="min-w-0">
-					<h2
-						id="item-detail-title"
-						className="truncate text-lg font-semibold leading-tight"
-					>
-						{identity.title}
-					</h2>
-					{identity.subtitle === undefined ? null : (
-						<p className="mt-1 truncate text-sm text-muted">{identity.subtitle}</p>
-					)}
-					{stale ? (
-						<p className="mt-1 text-xs font-medium text-warning">
-							This item no longer exists. Showing the last known detail.
-						</p>
-					) : null}
-				</div>
-			</div>
+			<ItemIdentity
+				artworkDataUi="ItemDetailHeaderArtwork"
+				compositeUrl={identity.compositeUrl}
+				description={
+					<>
+						{identity.subtitle === undefined ? null : (
+							<p className="mt-1 truncate text-sm text-muted">{identity.subtitle}</p>
+						)}
+						{stale ? (
+							<p className="mt-1 text-xs font-medium text-warning">
+								This item no longer exists. Showing the last known detail.
+							</p>
+						) : null}
+					</>
+				}
+				size="lg"
+				sourceUrl={identity.sourceUrl}
+				title={identity.title}
+				titleClassName="truncate text-lg font-semibold leading-tight"
+				titleId="item-detail-title"
+				titleTag="h2"
+			/>
 			<button
 				type="button"
 				className="grid size-14 shrink-0 cursor-pointer place-items-center bg-transparent text-foreground transition-[color,transform] hover:scale-110 hover:text-accent disabled:cursor-not-allowed"

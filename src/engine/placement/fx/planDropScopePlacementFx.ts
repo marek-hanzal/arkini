@@ -4,6 +4,7 @@ import { match } from "ts-pattern";
 import { PlacementFailureReasonEnumSchema } from "~/engine/placement/schema/PlacementFailureReasonEnumSchema";
 import type { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
 import type { BoardLocationSchema } from "~/engine/location/schema/BoardLocationSchema";
+import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
 import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import type { DropResultSchema } from "~/engine/output/schema/DropResultSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
@@ -18,6 +19,7 @@ import { planToolbarPlacementFx } from "./planToolbarPlacementFx";
 export namespace planDropScopePlacementFx {
 	export interface Props {
 		drop: DropResultSchema.Type;
+		excludedLocations?: ReadonlyArray<GridLocationSchema.Type>;
 		item: ItemSchema.Type;
 		origin: BoardLocationSchema.Type;
 		quantity: PositiveIntegerSchema.Type;
@@ -28,6 +30,7 @@ export namespace planDropScopePlacementFx {
 /** Plans one drop remainder according to the canonical item's allowed runtime scope. */
 export const planDropScopePlacementFx = Effect.fn("planDropScopePlacementFx")(function* ({
 	drop,
+	excludedLocations,
 	item,
 	origin,
 	quantity,
@@ -37,6 +40,10 @@ export const planDropScopePlacementFx = Effect.fn("planDropScopePlacementFx")(fu
 		.with(StorageScopeEnumSchema.enum.Board, () => {
 			return Effect.gen(function* () {
 				const plan = yield* planBoardPlacementFx({
+					excludedLocations: excludedLocations?.filter(
+						(location): location is BoardLocationSchema.Type =>
+							location.scope === "board",
+					),
 					item,
 					origin,
 					placement: drop.placement,
@@ -55,6 +62,7 @@ export const planDropScopePlacementFx = Effect.fn("planDropScopePlacementFx")(fu
 		.with(StorageScopeEnumSchema.enum.Inventory, () => {
 			return Effect.gen(function* () {
 				const plan = yield* planInventoryPlacementFx({
+					excludedLocations,
 					item,
 					quantity,
 					runtime,
@@ -71,6 +79,7 @@ export const planDropScopePlacementFx = Effect.fn("planDropScopePlacementFx")(fu
 		.with(StorageScopeEnumSchema.enum.Toolbar, () => {
 			return Effect.gen(function* () {
 				const plan = yield* planToolbarPlacementFx({
+					excludedLocations,
 					item,
 					quantity,
 					runtime,
@@ -87,6 +96,7 @@ export const planDropScopePlacementFx = Effect.fn("planDropScopePlacementFx")(fu
 		.with(StorageScopeEnumSchema.enum.Any, () => {
 			return planBoardThenStoragePlacementFx({
 				drop,
+				excludedLocations,
 				item,
 				origin,
 				quantity,

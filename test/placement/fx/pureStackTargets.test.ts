@@ -202,6 +202,60 @@ describe("pure placement stack targets", () => {
 		expect(nextRuntime.items.filter((item) => item.item.id === "craft")).toHaveLength(2);
 	});
 
+	it("keeps excluded coordinates out of both standard stack and spawn candidates", () => {
+		const excludedStack = {
+			id: "runtime:excluded-stack",
+			item: purityTestConfig.items.material,
+			location: board(0),
+			quantity: 2,
+			revision: "revision:excluded-stack",
+		};
+		const runtime = {
+			cheats: {
+				enabled: false,
+				everEnabled: false,
+				instantGameplay: false,
+			},
+			currentSpace: 0,
+			items: [
+				excludedStack,
+			],
+			jobs: [],
+		} satisfies RuntimeSchema.Type;
+
+		const [placement, nextRuntime] = Effect.runSync(
+			applyOutputPlacementFx({
+				excludedLocations: [
+					board(0),
+				],
+				origin: board(0),
+				output: {
+					drop: [
+						{
+							itemId: "material",
+							placement: "drop",
+							quantity: 3,
+						},
+					],
+				},
+				runtime,
+			}).pipe(
+				useGameFx({
+					config: purityTestConfig,
+				}),
+			),
+		);
+
+		expect(placement.drop[0]?.placement.stack).toEqual([]);
+		expect(placement.drop[0]?.placement.spawn).toEqual([
+			expect.objectContaining({
+				location: board(1),
+				quantity: 3,
+			}),
+		]);
+		expect(nextRuntime.items.find((item) => item.id === excludedStack.id)?.quantity).toBe(2);
+	});
+
 	it("rejects a stale placement plan that targets a stateful item", () => {
 		const active = craft({
 			id: "runtime:active",

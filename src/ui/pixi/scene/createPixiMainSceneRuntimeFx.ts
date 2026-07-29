@@ -20,6 +20,7 @@ import { createPixiTileMotionRuntimeFx } from "~/ui/pixi/motion/createPixiTileMo
 import { createPixiApplicationOwnerFx } from "~/ui/pixi/runtime/createPixiApplicationOwnerFx";
 import type { PixiTextureStore } from "~/ui/pixi/runtime/createPixiTextureStoreFx";
 import type { PixiMainSceneRuntime } from "~/ui/pixi/scene/PixiMainSceneRuntime";
+import type { PixiMainSceneActivationIntent } from "~/ui/pixi/scene/PixiMainSceneActivationIntent";
 import { createPixiMainSceneReconcilerFx } from "~/ui/pixi/scene/createPixiMainSceneReconcilerFx";
 import { createPixiMainSceneSubscriptionReplayGateFx } from "~/ui/pixi/scene/createPixiMainSceneSubscriptionReplayGateFx";
 import { createPixiMainSceneSurfaceFx } from "~/ui/pixi/scene/createPixiMainSceneSurfaceFx";
@@ -30,7 +31,7 @@ export namespace createPixiMainSceneRuntimeFx {
 		readonly host: HTMLElement;
 		readonly onActivate: (
 			item: TileActorItem,
-			openDetail: boolean,
+			intent: PixiMainSceneActivationIntent,
 			origin: HTMLElement,
 		) => void | PromiseLike<void>;
 		readonly onDrop: (command: runTileDropAtom.Command) => PromiseLike<runTileDropAtom.Result>;

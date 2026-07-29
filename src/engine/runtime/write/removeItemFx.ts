@@ -1,13 +1,9 @@
 import { Effect } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
-import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
-import { assertOwnerIdleFx } from "~/engine/job/fx/assertOwnerIdleFx";
 import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
+import { removeItemRuntimeTransitionFx } from "~/engine/runtime/fx/removeItemRuntimeTransitionFx";
 import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
-import { removeRuntimeItemFx } from "~/engine/runtime/fx/removeRuntimeItemFx";
-import { readValidatedRuntimeItemFx } from "~/engine/runtime/read/readValidatedRuntimeItemFx";
 
 export namespace removeItemFx {
 	export interface Props {
@@ -25,35 +21,16 @@ export const removeItemFx = Effect.fn("removeItemFx")(function* ({
 }: removeItemFx.Props) {
 	return yield* modifyRuntimeFx((runtime) => {
 		return Effect.gen(function* () {
-			const item = yield* readValidatedRuntimeItemFx({
+			const removal = yield* removeItemRuntimeTransitionFx({
 				itemId,
 				revision,
 				runtime,
 			});
-			yield* assertOwnerIdleFx({
-				ownerItemId: item.id,
-				runtime,
-			});
-
-			const explicitlyRemovedEvent = {
-				type: GameEventEnumSchema.enum.ItemExplicitlyRemoved,
-				itemId: item.id,
-				canonicalItemId: item.item.id,
-				location: item.location,
-				quantity: item.quantity,
-			} satisfies GameEventSchema.Type;
-			const removal = yield* removeRuntimeItemFx({
-				item,
-				runtime,
-			});
 
 			return [
-				item,
+				removal.item,
 				removal.runtime,
-				[
-					explicitlyRemovedEvent,
-					...removal.events,
-				],
+				removal.events,
 			] as const;
 		});
 	});

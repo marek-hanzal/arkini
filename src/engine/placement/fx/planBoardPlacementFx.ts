@@ -13,6 +13,7 @@ import { resolveBoardPlacementOriginFx } from "./resolveBoardPlacementOriginFx";
 
 export namespace planBoardPlacementFx {
 	export interface Props {
+		excludedLocations?: ReadonlyArray<BoardLocationSchema.Type>;
 		item: ItemSchema.Type;
 		origin: BoardLocationSchema.Type;
 		placement: PlacementEnumSchema.Type;
@@ -23,6 +24,7 @@ export namespace planBoardPlacementFx {
 
 /** Resolves one board-space origin, then plans stack-first nearest placement there. */
 export const planBoardPlacementFx = Effect.fn("planBoardPlacementFx")(function* ({
+	excludedLocations,
 	item,
 	origin,
 	placement,
@@ -45,6 +47,7 @@ export const planBoardPlacementFx = Effect.fn("planBoardPlacementFx")(function* 
 	});
 
 	return yield* planScopePlacementFx({
+		excludedLocations,
 		item,
 		locations: orderedBoardLocations,
 		origin: placementOrigin.position,

@@ -28,6 +28,18 @@ const previewState = vi.hoisted(() => ({
 	kind: "move" as "ignored" | "move" | "reject" | "store-inventory" | "swap",
 }));
 
+const removalState = vi.hoisted(() => ({
+	remove: vi.fn(),
+}));
+
+vi.mock("~/bridge/cheat/removeDraggedCheatItemFx", () => ({
+	removeDraggedCheatItemFx: (props: unknown) =>
+		Effect.sync(() => {
+			removalState.remove(props);
+			return true;
+		}),
+}));
+
 vi.mock("~/bridge/tile/readTileDropPreviewFx", () => ({
 	readTileDropPreviewFx: ({ target }: { readonly target: runTileDropAtom.Command["target"] }) =>
 		Effect.succeed({
@@ -184,14 +196,17 @@ const createActivityParticles = () => ({
 });
 
 const mountController = ({
+	cheatsEnabled = false,
 	interactionClaimByActorId = new Map(),
 	targetItems = [],
 }: {
+	readonly cheatsEnabled?: boolean;
 	readonly interactionClaimByActorId?: ReadonlyMap<string, "activation-only" | "handoff">;
 	readonly targetItems?: ReadonlyArray<TileActorItem>;
 } = {}) => {
 	previewState.kind = "move";
 	previewState.actorKinds.clear();
+	removalState.remove.mockClear();
 	const actorEvents = new FakeEmitter();
 	const stage = new FakeEmitter();
 	const animateActor = vi.fn();
@@ -337,6 +352,11 @@ const mountController = ({
 		startFx: (actor, pointer) => Effect.sync(() => startCursorGrab(actor, pointer)),
 	} satisfies PixiCursorGrabMotion;
 	const game = {
+		getSnapshot: () => ({
+			cheats: {
+				enabled: cheatsEnabled,
+			},
+		}),
 		reportCriticalFailure,
 	} as never;
 	const magneticField = {
@@ -461,6 +481,7 @@ const mountController = ({
 		presentationWrites,
 		releasePointerCapture,
 		reportCriticalFailure,
+		removeDraggedItem: removalState.remove,
 		setActorPose: (pose: typeof currentActorPose) => {
 			currentActorPose = pose;
 		},
@@ -550,14 +571,14 @@ describe("Pixi main-scene drag controller", () => {
 		expect(blue).toBeGreaterThan(red);
 	});
 
-	it("opens Item Detail with right click and ignores Shift on left click", async () => {
+	it("opens Item Detail with right click and requests a stack split with Shift+left click", async () => {
 		const { actorEvents, onActivate, stage } = mountController();
 		const rightClick = pointer(10, 20, 2);
 		actorEvents.emit("pointerdown", rightClick);
 		stage.emit("pointerup", rightClick);
 		await flushMicrotasks();
 
-		expect(onActivate).toHaveBeenCalledWith(item, true, expect.anything());
+		expect(onActivate).toHaveBeenCalledWith(item, "detail", expect.anything());
 
 		const shiftedLeftClick = pointer(10, 20);
 		shiftedLeftClick.shiftKey = true;
@@ -565,7 +586,7 @@ describe("Pixi main-scene drag controller", () => {
 		stage.emit("pointerup", shiftedLeftClick);
 		await flushMicrotasks();
 
-		expect(onActivate).toHaveBeenLastCalledWith(item, false, expect.anything());
+		expect(onActivate).toHaveBeenLastCalledWith(item, "split-stack", expect.anything());
 	});
 
 	it("allows click activation without taking transform ownership during canonical motion", async () => {
@@ -583,7 +604,7 @@ describe("Pixi main-scene drag controller", () => {
 		mounted.stage.emit("pointerup", pointer(13, 23));
 		await flushMicrotasks();
 
-		expect(mounted.onActivate).toHaveBeenCalledWith(item, false, expect.anything());
+		expect(mounted.onActivate).toHaveBeenCalledWith(item, "primary", expect.anything());
 		expect(mounted.onDrop).not.toHaveBeenCalled();
 		expect(mounted.cancelAnimation).toHaveBeenCalledExactlyOnceWith(
 			`activity-particles:${mounted.actor.instanceId}`,
@@ -804,7 +825,7 @@ describe("Pixi main-scene drag controller", () => {
 
 		expect(mounted.onActivate).toHaveBeenCalledWith(
 			completedInstantRun,
-			false,
+			"primary",
 			expect.anything(),
 		);
 
@@ -1122,6 +1143,46 @@ describe("Pixi main-scene drag controller", () => {
 		expect(keyEvent.preventDefault).toHaveBeenCalledOnce();
 		expect(keyEvent.stopImmediatePropagation).toHaveBeenCalledOnce();
 		expect(mounted.onDrop).not.toHaveBeenCalled();
+		expect(mounted.actor.dragging).toBe(true);
+
+		mounted.stage.emit("pointerup", pointer(30, 20));
+		expect(mounted.onDrop).toHaveBeenCalledOnce();
+	});
+
+	it("removes the held item through the Cheat command with d when this Game enabled cheats", async () => {
+		const mounted = mountController({
+			cheatsEnabled: true,
+		});
+
+		mounted.actorEvents.emit("pointerdown", pointer(10, 20));
+		mounted.stage.emit("globalpointermove", pointer(30, 20));
+		const keyEvent = keyboard("d");
+		mounted.keyboardTarget.emit(keyEvent);
+		await flushMicrotasks();
+
+		expect(keyEvent.preventDefault).toHaveBeenCalledOnce();
+		expect(keyEvent.stopImmediatePropagation).toHaveBeenCalledOnce();
+		expect(mounted.releasePointerCapture).toHaveBeenCalledWith(1);
+		expect(mounted.removeDraggedItem).toHaveBeenCalledWith({
+			game: expect.anything(),
+			itemId: item.id,
+			revision: item.revision,
+		});
+		expect(mounted.onDrop).not.toHaveBeenCalled();
+		expect(mounted.actor.dragging).toBe(false);
+	});
+
+	it("leaves d unclaimed and the held item untouched when this Game disabled cheats", () => {
+		const mounted = mountController();
+
+		mounted.actorEvents.emit("pointerdown", pointer(10, 20));
+		mounted.stage.emit("globalpointermove", pointer(30, 20));
+		const keyEvent = keyboard("d");
+		mounted.keyboardTarget.emit(keyEvent);
+
+		expect(keyEvent.preventDefault).not.toHaveBeenCalled();
+		expect(keyEvent.stopImmediatePropagation).not.toHaveBeenCalled();
+		expect(mounted.removeDraggedItem).not.toHaveBeenCalled();
 		expect(mounted.actor.dragging).toBe(true);
 
 		mounted.stage.emit("pointerup", pointer(30, 20));

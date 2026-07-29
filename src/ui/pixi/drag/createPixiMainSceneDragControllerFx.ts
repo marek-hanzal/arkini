@@ -2,6 +2,7 @@ import { Effect } from "effect";
 import type { FederatedPointerEvent } from "pixi.js";
 
 import type { GameEngine } from "~/bridge/game/GameEngine";
+import { removeDraggedCheatItemFx } from "~/bridge/cheat/removeDraggedCheatItemFx";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import type { TileActorItem } from "~/bridge/tile/TileActorItem";
 import { isSameTileActorLocation } from "~/bridge/tile/isSameTileActorLocation";
@@ -25,6 +26,7 @@ import { readPixiTileEligibleAttractionActorIdsFx } from "~/ui/pixi/magnet/readP
 import type { PixiTileMotionRuntime } from "~/ui/pixi/motion/PixiTileMotionRuntime";
 import type { PixiApplicationOwner } from "~/ui/pixi/runtime/PixiApplicationOwner";
 import type { PixiMainSceneSurface } from "~/ui/pixi/scene/PixiMainSceneSurface";
+import type { PixiMainSceneActivationIntent } from "~/ui/pixi/scene/PixiMainSceneActivationIntent";
 import type { PixiSceneDropTarget } from "~/ui/pixi/scene/PixiSceneDropTarget";
 
 export namespace createPixiMainSceneDragControllerFx {
@@ -39,7 +41,7 @@ export namespace createPixiMainSceneDragControllerFx {
 		readonly motion: PixiTileMotionRuntime;
 		readonly onActivate: (
 			item: TileActorItem,
-			openDetail: boolean,
+			intent: PixiMainSceneActivationIntent,
 			origin: HTMLElement,
 		) => void | PromiseLike<void>;
 		readonly readAckTint: () => number;
@@ -391,7 +393,11 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 						if (closed) return;
 						const currentItem = actorStore.actors.get(drag.sourceItem.id)?.item;
 						if (currentItem === undefined) return;
-						return onActivate(currentItem, drag.openDetail, application.app.canvas);
+						return onActivate(
+							currentItem,
+							drag.activationIntent,
+							application.app.canvas,
+						);
 					})
 					.catch((cause) => {
 						if (closed) return;
@@ -492,12 +498,48 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 			);
 		};
 
+		const removeDraggedItem = (event: KeyboardEvent) => {
+			const drag = activeDrag;
+			if (
+				closed ||
+				event.repeat ||
+				event.key.toLowerCase() !== "d" ||
+				event.altKey ||
+				event.ctrlKey ||
+				event.metaKey ||
+				!game.getSnapshot().cheats.enabled ||
+				drag === null ||
+				drag.mode !== "drag" ||
+				drag.phase !== "dragging"
+			) {
+				return;
+			}
+			const sourceItem = readCurrentSourceItem(drag);
+			if (sourceItem === null) return;
+			event.preventDefault();
+			event.stopImmediatePropagation();
+			cancelDrag(drag);
+			void RendererRuntime.runPromise(
+				removeDraggedCheatItemFx({
+					game,
+					itemId: sourceItem.id,
+					revision: sourceItem.revision,
+				}),
+			).catch((cause) => {
+				if (closed) return;
+				game.reportCriticalFailure("game-presentation", cause);
+			});
+		};
+
 		application.stage.on("globalpointermove", onPointerMove);
 		application.stage.on("pointerup", finishPointer);
 		application.stage.on("pointerupoutside", finishPointer);
 		application.stage.on("pointercancel", cancelPointer);
 		const keyboardTarget = typeof window === "undefined" ? null : window;
 		keyboardTarget?.addEventListener("keydown", storeDraggedItemInInventory, {
+			capture: true,
+		});
+		keyboardTarget?.addEventListener("keydown", removeDraggedItem, {
 			capture: true,
 		});
 
@@ -547,9 +589,14 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 							// Pixi still receives in-canvas pointer events without DOM capture.
 						}
 						activeDrag = {
+							activationIntent:
+								event.button === 2
+									? "detail"
+									: event.shiftKey
+										? "split-stack"
+										: "primary",
 							actor,
 							eligibleAttractionActorIds: new Set(),
-							openDetail: event.button === 2,
 							pointerId: event.pointerId,
 							pressX: event.global.x,
 							pressY: event.global.y,
@@ -590,6 +637,9 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 				application.stage.off("pointerupoutside", finishPointer);
 				application.stage.off("pointercancel", cancelPointer);
 				keyboardTarget?.removeEventListener("keydown", storeDraggedItemInInventory, {
+					capture: true,
+				});
+				keyboardTarget?.removeEventListener("keydown", removeDraggedItem, {
 					capture: true,
 				});
 				for (const actor of actorStore.actors.values()) {

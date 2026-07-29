@@ -1,8 +1,10 @@
+import { AnimatePresence, motion } from "motion/react";
 import { match } from "ts-pattern";
 
 import { JobStatusEnumSchema } from "~/bridge/job/JobStatusEnumSchema";
 import type { ItemDetailLines } from "~/bridge/item-detail/ItemDetailLines";
 import { BadgeCount } from "~/ui/badge/BadgeCount";
+import { itemDetailBadgeMotion, itemDetailFadeMotion } from "~/ui/item-detail/ItemDetailMotion";
 
 /** Renders one line's identity, readiness, active state, and description. */
 export const ItemLineSummary = ({
@@ -57,7 +59,7 @@ export const ItemLineSummary = ({
 		line.activeJob === undefined
 			? undefined
 			: match(line.activeJob.status)
-					.with(JobStatusEnumSchema.enum.Running, () => "Running")
+					.with(JobStatusEnumSchema.enum.Running, () => undefined)
 					.with(JobStatusEnumSchema.enum.Paused, () => "Paused")
 					.with(JobStatusEnumSchema.enum.AwaitingOutput, () => "Awaiting output")
 					.exhaustive();
@@ -68,36 +70,78 @@ export const ItemLineSummary = ({
 				<h3 className="text-lg font-semibold leading-tight text-foreground">
 					{line.title}
 				</h3>
-				{stale || activeWork === undefined ? null : (
-					<span className="rounded-full border border-success/40 bg-success/12 px-2.5 py-1 text-xs font-semibold text-foreground">
-						{activeWork}
-					</span>
-				)}
-				{stale || line.activeJob !== undefined || line.queuedRequestCount === 0 ? null : (
-					<BadgeCount
-						count={line.queuedRequestCount}
-						dataUi="TileLineQueuedBadge"
-						label="Queued"
-					/>
-				)}
-				{stale || line.activeJob !== undefined ? null : (
-					<span
-						className={`rounded-full border px-2.5 py-1 text-xs font-semibold ${readiness.className}`}
-						data-ui="TileLineReadinessBadge"
-					>
-						{readiness.label}
-					</span>
-				)}
-				{stale || !line.isDefault ? null : (
-					<span
-						className="rounded-full border border-accent/35 bg-accent/10 px-2.5 py-1 text-xs font-semibold text-foreground"
-						data-ui="TileLineDefaultBadge"
-					>
-						Default
-					</span>
-				)}
+				<AnimatePresence
+					initial={false}
+					mode="popLayout"
+				>
+					{stale || activeWork === undefined ? null : (
+						<motion.span
+							key={`active:${activeWork}`}
+							layout
+							className="rounded-full border border-success/40 bg-success/12 px-2.5 py-1 text-xs font-semibold text-foreground"
+							{...itemDetailBadgeMotion}
+						>
+							{activeWork}
+						</motion.span>
+					)}
+				</AnimatePresence>
+				<AnimatePresence
+					initial={false}
+					mode="popLayout"
+				>
+					{stale ||
+					line.activeJob !== undefined ||
+					line.queuedRequestCount === 0 ? null : (
+						<motion.span
+							key={`queued:${line.queuedRequestCount}`}
+							layout
+							{...itemDetailBadgeMotion}
+						>
+							<BadgeCount
+								count={line.queuedRequestCount}
+								dataUi="TileLineQueuedBadge"
+								label="Queued"
+							/>
+						</motion.span>
+					)}
+				</AnimatePresence>
+				<AnimatePresence
+					initial={false}
+					mode="popLayout"
+				>
+					{stale || line.activeJob !== undefined ? null : (
+						<motion.span
+							key={`readiness:${readiness.label}`}
+							layout
+							className={`rounded-full border px-2.5 py-1 text-xs font-semibold ${readiness.className}`}
+							data-ui="TileLineReadinessBadge"
+							{...itemDetailBadgeMotion}
+						>
+							{readiness.label}
+						</motion.span>
+					)}
+				</AnimatePresence>
+				<AnimatePresence initial={false}>
+					{stale || !line.isDefault ? null : (
+						<motion.span
+							key="default"
+							layout
+							className="rounded-full border border-accent/35 bg-accent/10 px-2.5 py-1 text-xs font-semibold text-foreground"
+							data-ui="TileLineDefaultBadge"
+							{...itemDetailBadgeMotion}
+						>
+							Default
+						</motion.span>
+					)}
+				</AnimatePresence>
 			</div>
-			<p className="mt-2 max-w-3xl text-sm leading-relaxed text-muted">{line.description}</p>
+			<motion.p
+				key={line.description}
+				className="mt-2 max-w-3xl text-sm leading-relaxed text-muted"
+				{...itemDetailFadeMotion}
+			>
+				{line.description}
+			</motion.p>
 		</div>
 	);
 };

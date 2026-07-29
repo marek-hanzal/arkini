@@ -1,11 +1,47 @@
+import { AnimatePresence, motion } from "motion/react";
 import { match } from "ts-pattern";
 
 import type { ItemDetailLines } from "~/bridge/item-detail/ItemDetailLines";
 import { useWithdrawItemDetailLine } from "~/bridge/item-detail/useWithdrawItemDetailLine";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import { LinkButton } from "~/ui/button/LinkButton";
+import { itemDetailBadgeMotion, itemDetailFadeMotion } from "~/ui/item-detail/ItemDetailMotion";
 import { ItemReferenceButton } from "~/ui/item-detail/ItemReferenceButton";
 import { useItemDetailControl } from "~/ui/item-detail/useItemDetailControl";
+
+export interface ItemLineInputsWithdrawAction {
+	readonly disabled: boolean;
+	readonly onClick: () => void;
+	readonly pending: boolean;
+}
+
+const ItemLineInputsHeader = ({
+	withdraw,
+}: {
+	readonly withdraw?: ItemLineInputsWithdrawAction;
+}) => (
+	<div className="flex items-baseline justify-between gap-3 border-b border-line pb-2">
+		<h4 className="text-xs font-semibold uppercase tracking-[0.08em] text-muted">Inputs</h4>
+		<AnimatePresence initial={false}>
+			{withdraw === undefined ? null : (
+				<motion.div
+					key="withdraw"
+					{...itemDetailBadgeMotion}
+				>
+					<LinkButton
+						className="text-xs"
+						cursorIntent={withdraw.pending ? "progress" : undefined}
+						data-ui="TileLineWithdrawButton"
+						disabled={withdraw.disabled}
+						onClick={withdraw.onClick}
+					>
+						{withdraw.pending ? "Withdrawing…" : "Withdraw"}
+					</LinkButton>
+				</motion.div>
+			)}
+		</AnimatePresence>
+	</div>
+);
 
 const MaterialInputWithdraw = ({
 	disabled,
@@ -66,11 +102,13 @@ export const ItemLineUnavailableWithdrawals = ({
 	input,
 	lineId,
 	ownerItemId,
+	withdraw,
 }: {
 	readonly disabled: boolean;
 	readonly input: readonly ItemDetailLines.Input[];
 	readonly lineId: string;
 	readonly ownerItemId: string;
+	readonly withdraw?: ItemLineInputsWithdrawAction;
 }) => {
 	const buffered = input.filter(
 		(
@@ -85,20 +123,23 @@ export const ItemLineUnavailableWithdrawals = ({
 	);
 	if (buffered.length === 0) return null;
 	return (
-		<div
-			className="mt-4 ml-auto flex flex-wrap justify-end gap-2"
+		<section
+			className="mt-4 min-w-0"
 			data-ui="TileLineUnavailableWithdrawals"
 		>
-			{buffered.map((candidate) => (
-				<MaterialInputWithdraw
-					key={candidate.inputIndex}
-					disabled={disabled}
-					input={candidate}
-					lineId={lineId}
-					ownerItemId={ownerItemId}
-				/>
-			))}
-		</div>
+			<ItemLineInputsHeader withdraw={withdraw} />
+			<div className="ml-auto flex flex-wrap justify-end gap-2 pt-3">
+				{buffered.map((candidate) => (
+					<MaterialInputWithdraw
+						key={candidate.inputIndex}
+						disabled={disabled}
+						input={candidate}
+						lineId={lineId}
+						ownerItemId={ownerItemId}
+					/>
+				))}
+			</div>
+		</section>
 	);
 };
 
@@ -141,44 +182,57 @@ const MaterialInputAutofillAvailability = ({
 }) => {
 	const itemDetail = useItemDetailControl();
 	const producerItemId = input.producerItemId;
+	const availabilityKey =
+		input.autofillAvailableQuantity > 0
+			? `available:${input.autofillAvailableQuantity}`
+			: producerItemId === undefined
+				? "none"
+				: `producer:${producerItemId}`;
 	return (
-		<p
-			className="mt-0.5 text-xs text-muted"
-			data-ui="TileLineInputAutofillAvailability"
+		<AnimatePresence
+			initial={false}
+			mode="popLayout"
 		>
-			{input.autofillAvailableQuantity > 0 ? (
-				`${input.autofillAvailableQuantity} available`
-			) : producerItemId === undefined ? (
-				"None available"
-			) : (
-				<>
-					<LinkButton
-						disabled={disabled}
-						data-ui="TileLineInputProducerLink"
-						onClick={(event) =>
-							RendererRuntime.runSync(
-								itemDetail.openItemDetailFx({
-									itemId: producerItemId,
-									linesSearchQuery: label,
-									origin: event.currentTarget,
-									tab: "lines",
-								}),
-							)
-						}
-					>
-						None
-					</LinkButton>{" "}
-					available
-				</>
-			)}
-		</p>
+			<motion.p
+				key={availabilityKey}
+				className="mt-0.5 text-xs text-muted"
+				data-ui="TileLineInputAutofillAvailability"
+				{...itemDetailFadeMotion}
+			>
+				{input.autofillAvailableQuantity > 0 ? (
+					`${input.autofillAvailableQuantity} available`
+				) : producerItemId === undefined ? (
+					"None available"
+				) : (
+					<>
+						<LinkButton
+							disabled={disabled}
+							data-ui="TileLineInputProducerLink"
+							onClick={(event) =>
+								RendererRuntime.runSync(
+									itemDetail.openItemDetailFx({
+										itemId: producerItemId,
+										linesSearchQuery: label,
+										origin: event.currentTarget,
+										tab: "lines",
+									}),
+								)
+							}
+						>
+							None
+						</LinkButton>{" "}
+						available
+					</>
+				)}
+			</motion.p>
+		</AnimatePresence>
 	);
 };
 
 const inputSurfaceClassName = {
 	available: "bg-[var(--ak-list-row-active-surface)]",
 	delivery: "bg-[var(--ak-line-input-delivery-surface)]",
-	empty: "",
+	empty: "bg-transparent",
 	stored: "bg-[var(--ak-list-row-active-progress-surface)]",
 } as const;
 
@@ -227,8 +281,9 @@ const ItemLineInputRow = ({
 	readonly stale: boolean;
 	readonly suppressSurface: boolean;
 }) => {
-	const state = suppressSurface ? "empty" : readItemLineInputState(input);
-	const rowClassName = `ak-line-input grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-start gap-x-4 gap-y-1 rounded-xl px-3 py-2 text-sm ${inputSurfaceClassName[state]}`;
+	const state = readItemLineInputState(input);
+	const surfaceClassName = suppressSurface ? "bg-transparent" : inputSurfaceClassName[state];
+	const rowClassName = `ak-line-input grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-start gap-x-4 gap-y-1 rounded-xl px-3 py-2 text-sm ${surfaceClassName}`;
 	return match(input)
 		.with(
 			{
@@ -244,11 +299,14 @@ const ItemLineInputRow = ({
 								.replace(/\b\p{L}/gu, (letter) => letter.toUpperCase())
 						: materials.selector.label;
 				return (
-					<div
+					<motion.div
+						layout
 						className={rowClassName}
 						data-ui="TileLineInput"
 						data-input-kind="materials"
 						data-input-state={state}
+						data-surface-suppressed={suppressSurface ? "true" : "false"}
+						{...itemDetailFadeMotion}
 					>
 						<div className="min-w-0">
 							<ItemLineInputTitle
@@ -265,32 +323,52 @@ const ItemLineInputRow = ({
 						</div>
 						{stale ? null : (
 							<div className="flex flex-col items-end text-right">
-								<div className="flex items-baseline justify-end gap-2">
-									{materials.storedQuantity === 0 ? null : (
-										<MaterialInputWithdraw
-											disabled={disabled}
-											input={materials}
-											lineId={lineId}
-											ownerItemId={ownerItemId}
-										/>
-									)}
-									<p
-										className={`font-medium text-foreground ${materials.deliveryQuantity > 0 ? "opacity-70" : ""}`}
-										data-ui={
-											materials.deliveryQuantity > 0
-												? "TileLineInputDeliveryQuantity"
-												: "TileLineInputStoredQuantity"
-										}
+								<div className="flex min-h-5 items-baseline justify-end gap-2">
+									<AnimatePresence initial={false}>
+										{materials.storedQuantity === 0 ? null : (
+											<motion.div
+												key="withdraw"
+												{...itemDetailBadgeMotion}
+											>
+												<MaterialInputWithdraw
+													disabled={disabled}
+													input={materials}
+													lineId={lineId}
+													ownerItemId={ownerItemId}
+												/>
+											</motion.div>
+										)}
+									</AnimatePresence>
+									<AnimatePresence
+										initial={false}
+										mode="popLayout"
 									>
-										{materials.deliveryQuantity > 0
-											? materials.deliveryQuantity
-											: materials.storedQuantity}{" "}
-										/{" "}
-										{materials.required.min === materials.required.max
-											? materials.required.min
-											: `${materials.required.min}–${materials.required.max}`}{" "}
-										{materials.deliveryQuantity > 0 ? "on the way" : "stored"}
-									</p>
+										<motion.p
+											key={
+												materials.deliveryQuantity > 0
+													? `delivery:${materials.deliveryQuantity}`
+													: `stored:${materials.storedQuantity}`
+											}
+											className={`font-medium text-foreground transition-opacity duration-200 ${materials.deliveryQuantity > 0 ? "opacity-70" : ""}`}
+											data-ui={
+												materials.deliveryQuantity > 0
+													? "TileLineInputDeliveryQuantity"
+													: "TileLineInputStoredQuantity"
+											}
+											{...itemDetailFadeMotion}
+										>
+											{materials.deliveryQuantity > 0
+												? materials.deliveryQuantity
+												: materials.storedQuantity}{" "}
+											/{" "}
+											{materials.required.min === materials.required.max
+												? materials.required.min
+												: `${materials.required.min}–${materials.required.max}`}{" "}
+											{materials.deliveryQuantity > 0
+												? "on the way"
+												: "stored"}
+										</motion.p>
+									</AnimatePresence>
 								</div>
 								<MaterialInputAutofillAvailability
 									disabled={disabled}
@@ -299,7 +377,7 @@ const ItemLineInputRow = ({
 								/>
 							</div>
 						)}
-					</div>
+					</motion.div>
 				);
 			},
 		)
@@ -317,11 +395,14 @@ const ItemLineInputRow = ({
 								.replace(/\b\p{L}/gu, (letter) => letter.toUpperCase())
 						: deposit.selector.label;
 				return (
-					<div
+					<motion.div
+						layout
 						className={rowClassName}
 						data-ui="TileLineInput"
 						data-input-kind="deposit"
 						data-input-state={state}
+						data-surface-suppressed={suppressSurface ? "true" : "false"}
+						{...itemDetailFadeMotion}
 					>
 						<div className="min-w-0">
 							<ItemLineInputTitle
@@ -338,14 +419,23 @@ const ItemLineInputRow = ({
 						</div>
 						{stale ? null : (
 							<div className="text-right">
-								<p className="font-medium text-foreground">
-									{deposit.availableChargesLabel === "None"
-										? "None available"
-										: `${deposit.availableChargesLabel} available`}
-								</p>
+								<AnimatePresence
+									initial={false}
+									mode="popLayout"
+								>
+									<motion.p
+										key={deposit.availableChargesLabel}
+										className="font-medium text-foreground"
+										{...itemDetailFadeMotion}
+									>
+										{deposit.availableChargesLabel === "None"
+											? "None available"
+											: `${deposit.availableChargesLabel} available`}
+									</motion.p>
+								</AnimatePresence>
 							</div>
 						)}
-					</div>
+					</motion.div>
 				);
 			},
 		)
@@ -354,18 +444,21 @@ const ItemLineInputRow = ({
 				kind: "simple",
 			},
 			(simple) => (
-				<div
+				<motion.div
+					layout
 					className={rowClassName}
 					data-ui="TileLineInput"
 					data-input-kind="simple"
 					data-input-state={state}
+					data-surface-suppressed={suppressSurface ? "true" : "false"}
+					{...itemDetailFadeMotion}
 				>
 					<p className="font-medium text-foreground">Owner charge</p>
 					<p className="text-right text-sm text-muted">
 						{simple.charges.cost} charge{simple.charges.cost === 1 ? "" : "s"} from{" "}
 						{simple.charges.from === "self" ? "owner" : "target"}
 					</p>
-				</div>
+				</motion.div>
 			),
 		)
 		.exhaustive();
@@ -379,6 +472,7 @@ export const ItemLineInputs = ({
 	ownerItemId,
 	stale = false,
 	suppressSurface = false,
+	withdraw,
 }: {
 	readonly disabled: boolean;
 	readonly input: readonly ItemDetailLines.Input[];
@@ -386,26 +480,30 @@ export const ItemLineInputs = ({
 	readonly ownerItemId: string;
 	readonly stale?: boolean;
 	readonly suppressSurface?: boolean;
+	readonly withdraw?: ItemLineInputsWithdrawAction;
 }) => (
 	<section className="min-w-0">
-		<h4 className="border-b border-line pb-2 text-xs font-semibold uppercase tracking-[0.08em] text-muted">
-			Inputs
-		</h4>
+		<ItemLineInputsHeader withdraw={withdraw} />
 		{input.length === 0 ? (
 			<p className="py-3 text-sm text-muted">No material input required.</p>
 		) : (
 			<div className="space-y-1">
-				{input.map((entry, index) => (
-					<ItemLineInputRow
-						key={`${entry.kind}:${index}`}
-						disabled={disabled}
-						input={entry}
-						lineId={lineId}
-						ownerItemId={ownerItemId}
-						stale={stale}
-						suppressSurface={suppressSurface}
-					/>
-				))}
+				<AnimatePresence
+					initial={false}
+					mode="popLayout"
+				>
+					{input.map((entry, index) => (
+						<ItemLineInputRow
+							key={`${entry.kind}:${index}`}
+							disabled={disabled}
+							input={entry}
+							lineId={lineId}
+							ownerItemId={ownerItemId}
+							stale={stale}
+							suppressSurface={suppressSurface}
+						/>
+					))}
+				</AnimatePresence>
 			</div>
 		)}
 	</section>

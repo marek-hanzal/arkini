@@ -2,6 +2,7 @@ import { Effect, Result } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { readCheatItemCatalogFx } from "~/engine/cheat/read/readCheatItemCatalogFx";
+import { removeCheatItemFx } from "~/engine/cheat/write/removeCheatItemFx";
 import { setCheatEnabledFx } from "~/engine/cheat/write/setCheatEnabledFx";
 import { spawnCheatItemFx } from "~/engine/cheat/write/spawnCheatItemFx";
 import { useGameFx } from "~/engine/game/fx/useGameFx";
@@ -66,6 +67,66 @@ describe("Cheat item spawning", () => {
 					space: 0,
 				}),
 				quantity: 1,
+			}),
+		);
+	});
+
+	it("authorizes canonical item removal only from the exact save-scoped Cheat mode", () => {
+		const result = Effect.runSync(
+			Effect.gen(function* () {
+				yield* setCheatEnabledFx({
+					enabled: true,
+				});
+				yield* spawnCheatItemFx({
+					itemId: "water",
+				});
+				const spawnedRuntime = yield* readRuntimeFx();
+				const spawned = spawnedRuntime.items.find((item) => item.item.id === "water");
+				if (spawned === undefined) return yield* Effect.die("Expected spawned Cheat item.");
+				yield* setCheatEnabledFx({
+					enabled: false,
+				});
+				const disabled = yield* Effect.result(
+					removeCheatItemFx({
+						itemId: spawned.id,
+						revision: spawned.revision,
+					}),
+				);
+				const afterDisabled = yield* readRuntimeFx();
+				yield* setCheatEnabledFx({
+					enabled: true,
+				});
+				const removed = yield* removeCheatItemFx({
+					itemId: spawned.id,
+					revision: spawned.revision,
+				});
+				const afterRemoved = yield* readRuntimeFx();
+				return {
+					afterDisabled,
+					afterRemoved,
+					disabled,
+					removed,
+					spawned,
+				};
+			}).pipe(
+				useGameFx({
+					config: createJobTestConfig(),
+				}),
+			),
+		);
+
+		expect(Result.isFailure(result.disabled)).toBe(true);
+		if (Result.isFailure(result.disabled)) {
+			expect(result.disabled.failure).toMatchObject({
+				_tag: "CheatModeDisabledError",
+				command: "remove-item",
+			});
+		}
+		expect(result.afterDisabled.items).toContainEqual(result.spawned);
+		expect(result.removed).toEqual(result.spawned);
+		expect(result.afterRemoved.items).not.toContainEqual(
+			expect.objectContaining({
+				id: result.spawned.id,
 			}),
 		);
 	});

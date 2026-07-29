@@ -1,6 +1,8 @@
+import { AnimatePresence, motion } from "motion/react";
 import { match } from "ts-pattern";
 
 import { JobStatusEnumSchema } from "~/bridge/job/JobStatusEnumSchema";
+import { itemDetailFadeMotion } from "~/ui/item-detail/ItemDetailMotion";
 
 interface ActiveJobRuntime {
 	readonly durationMs: number;
@@ -56,17 +58,28 @@ export const ItemRuntime = ({
 		data-job-status={jobStatus}
 	>
 		<p className="text-xs font-medium uppercase tracking-[0.08em] text-muted">Runtime</p>
-		<p
-			className="self-center font-semibold tabular-nums text-foreground"
-			data-ui={`${dataUi}Value`}
+		<AnimatePresence
+			initial={false}
+			mode="popLayout"
 		>
-			{runtime.value}
-		</p>
-		<p
-			className="self-end text-xs tabular-nums text-muted"
-			data-ui={`${dataUi}Detail`}
-		>
-			{runtime.detail}
-		</p>
+			<motion.div
+				key={jobStatus}
+				className="col-start-1 row-span-2 row-start-2 grid grid-rows-[1.5rem_1rem]"
+				{...itemDetailFadeMotion}
+			>
+				<p
+					className="self-center font-semibold tabular-nums text-foreground"
+					data-ui={`${dataUi}Value`}
+				>
+					{runtime.value}
+				</p>
+				<p
+					className="self-end text-xs tabular-nums text-muted"
+					data-ui={`${dataUi}Detail`}
+				>
+					{runtime.detail}
+				</p>
+			</motion.div>
+		</AnimatePresence>
 	</div>
 );

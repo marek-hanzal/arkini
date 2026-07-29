@@ -20,6 +20,8 @@ const boardState = vi.hoisted(() => ({
 	createProps: null as createPixiMainSceneRuntimeFx.Props | null,
 	navigate: vi.fn(() => Promise.resolve()),
 	openItemDetail: vi.fn(),
+	runDrop: vi.fn(),
+	splitStack: vi.fn(() => Promise.resolve(true)),
 	registerInteraction: vi.fn(),
 	enqueueLine: vi.fn(),
 	enqueueLineState: {
@@ -36,12 +38,22 @@ const boardState = vi.hoisted(() => ({
 	unregisterInteraction: vi.fn(),
 }));
 
+const tileAtoms = vi.hoisted(() => ({
+	drop: {
+		kind: "drop",
+	},
+	split: {
+		kind: "split",
+	},
+}));
+
 vi.mock("@effect/atom-react", () => ({
 	useAtom: () => [
 		boardState.enqueueLineState,
 		boardState.enqueueLine,
 	],
-	useAtomSet: () => vi.fn(),
+	useAtomSet: (atom: unknown) =>
+		atom === tileAtoms.split ? boardState.splitStack : boardState.runDrop,
 }));
 
 vi.mock("@tanstack/react-router", () => ({
@@ -68,7 +80,11 @@ vi.mock("~/bridge/tile/TileDefaultLineCommandAtom", () => ({
 }));
 
 vi.mock("~/bridge/tile/runTileDropAtom", () => ({
-	runTileDropAtom: () => ({}),
+	runTileDropAtom: () => tileAtoms.drop,
+}));
+
+vi.mock("~/bridge/tile/runTileSplitAtom", () => ({
+	runTileSplitAtom: () => tileAtoms.split,
 }));
 
 vi.mock("~/ui/game-menu/useGameMenuControl", () => ({
@@ -124,6 +140,8 @@ afterEach(async () => {
 	boardState.createProps = null;
 	boardState.navigate.mockClear();
 	boardState.openItemDetail.mockClear();
+	boardState.runDrop.mockClear();
+	boardState.splitStack.mockClear();
 	boardState.registerInteraction.mockClear();
 	boardState.enqueueLine.mockClear();
 	boardState.enqueueLineState = {
@@ -193,19 +211,64 @@ describe("PixiBoardToolbarSurface", () => {
 		} satisfies TileActorItem;
 		const canvas = document.createElement("canvas");
 
-		await createProps.onActivate(owner, false, canvas);
+		await createProps.onActivate(owner, "primary", canvas);
 
 		expect(boardState.enqueueLine).not.toHaveBeenCalled();
 		expect(boardState.openItemDetail).not.toHaveBeenCalled();
 		expect(boardState.navigate).not.toHaveBeenCalled();
 
-		await createProps.onActivate(owner, true, canvas);
+		await createProps.onActivate(owner, "detail", canvas);
 
 		expect(boardState.openItemDetail).toHaveBeenCalledWith({
 			itemId: owner.id,
 			origin: canvas,
 		});
 		expect(boardState.enqueueLine).not.toHaveBeenCalled();
+	});
+
+	it("submits an exact Board-stack split without invoking the tile primary action", async () => {
+		const host = document.createElement("div");
+		document.body.append(host);
+		const root = createRoot(host);
+		roots.push(root);
+		await act(async () => {
+			root.render(createElement(PixiBoardToolbarSurface));
+			await Promise.resolve();
+		});
+		const createProps = boardState.createProps;
+		if (createProps === null) throw new Error("Board scene did not create its runtime.");
+		const stack = {
+			id: "runtime:stack",
+			itemId: "material",
+			itemType: "simple",
+			location: {
+				scope: "board",
+				space: 0,
+				position: {
+					x: 2,
+					y: 1,
+				},
+			},
+			primaryAction: {
+				kind: "open-inventory",
+			},
+			quantity: 5,
+			revision: "revision:stack",
+			running: false,
+			activityEffect: false,
+			sourceUrl: "resource:material",
+			title: "Material",
+		} satisfies TileActorItem;
+
+		await createProps.onActivate(stack, "split-stack", document.createElement("canvas"));
+
+		expect(boardState.splitStack).toHaveBeenCalledWith({
+			itemId: stack.id,
+			location: stack.location,
+			revision: stack.revision,
+		});
+		expect(boardState.navigate).not.toHaveBeenCalled();
+		expect(boardState.openItemDetail).not.toHaveBeenCalled();
 	});
 
 	it("sends another default-line command for a running owner and lets the engine enqueue or reject it", async () => {
@@ -243,7 +306,7 @@ describe("PixiBoardToolbarSurface", () => {
 			title: "Producer",
 		} satisfies TileActorItem;
 
-		await createProps.onActivate(producer, false, document.createElement("canvas"));
+		await createProps.onActivate(producer, "primary", document.createElement("canvas"));
 
 		expect(boardState.enqueueLine).toHaveBeenCalledWith({
 			kind: "enqueue",
@@ -287,7 +350,7 @@ describe("PixiBoardToolbarSurface", () => {
 			title: "Inventory",
 		} satisfies TileActorItem;
 
-		await createProps.onActivate(item, false, document.createElement("canvas"));
+		await createProps.onActivate(item, "primary", document.createElement("canvas"));
 
 		expect(boardState.navigate).toHaveBeenCalledWith({
 			to: "/game/$packageId/inventory",

@@ -234,11 +234,11 @@ describe("startFx", () => {
 	it("boots the current Arkini authoring config into a valid runtime", async () => {
 		const config = GameConfigSchema.parse(await readArkiniGameConfigSource());
 		expect(config.meta.board).toEqual({
-			width: 13,
+			width: 15,
 			height: 9,
 		});
 		expect(config.meta.inventory).toEqual({
-			width: 13,
+			width: 15,
 			height: 9,
 		});
 		expect(config.meta.toolbarSize).toBe(13);
@@ -252,7 +252,7 @@ describe("startFx", () => {
 					location: {
 						space: 0,
 						position: {
-							x: 12,
+							x: 14,
 							y: 8,
 						},
 						scope: "board",
@@ -280,7 +280,7 @@ describe("startFx", () => {
 		expect(result.edgeItem.location).toEqual({
 			space: 0,
 			position: {
-				x: 12,
+				x: 14,
 				y: 8,
 			},
 			scope: "board",

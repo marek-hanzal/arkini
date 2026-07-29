@@ -3,8 +3,13 @@ import { AnimatePresence, motion } from "motion/react";
 import { useClearItemDetailQueue } from "~/bridge/item-detail/useClearItemDetailQueue";
 import type { useItemDetailQueue } from "~/bridge/item-detail/useItemDetailQueue";
 import { useRemoveItemDetailQueueRequest } from "~/bridge/item-detail/useRemoveItemDetailQueueRequest";
-import { Button } from "~/ui/button/Button";
 import { LinkButton } from "~/ui/button/LinkButton";
+import { ItemIdentity } from "~/ui/item/ItemIdentity";
+import {
+	itemDetailBadgeMotion,
+	itemDetailFadeMotion,
+	itemDetailMotionTransition,
+} from "~/ui/item-detail/ItemDetailMotion";
 import { ItemRuntime, readActiveJobRuntime } from "~/ui/item-detail/ItemRuntime";
 import { Scrollable } from "~/ui/scrollable/Scrollable";
 import { useItemDetailControl } from "~/ui/item-detail/useItemDetailControl";
@@ -15,22 +20,35 @@ const statusLabel = {
 	running: "Running",
 } as const;
 
-const queueMotionTransition = {
-	duration: 0.2,
-	ease: [
-		0.22,
-		1,
-		0.36,
-		1,
-	] as const,
-};
-
 type QueueProjection = Extract<
 	useItemDetailQueue.Projection,
 	{
 		readonly kind: "available";
 	}
 >;
+
+const QueueWorkIdentity = ({
+	identity,
+	title,
+}: {
+	readonly identity?: QueueProjection["active"][number]["identity"];
+	readonly title: string;
+}) =>
+	identity === undefined ? (
+		<h3 className="text-lg font-semibold leading-tight text-foreground">{title}</h3>
+	) : (
+		<ItemIdentity
+			artworkClassName="rounded-lg bg-surface/45 ring-1 ring-line/50"
+			artworkImageClassName="p-0.5"
+			compositeUrl={identity.compositeUrl}
+			dataUi="ItemQueueWorkIdentity"
+			size="md"
+			sourceUrl={identity.sourceUrl}
+			title={title}
+			titleClassName="truncate text-lg font-semibold leading-tight text-foreground"
+			titleTag="h3"
+		/>
+	);
 
 const ActiveQueueSlot = ({
 	job,
@@ -72,16 +90,29 @@ const ActiveQueueSlot = ({
 							opacity: 0,
 							y: -6,
 						}}
-						transition={queueMotionTransition}
+						transition={itemDetailMotionTransition}
 					>
-						<h3 className="text-lg font-semibold leading-tight text-foreground">
-							Nothing happening, bro.
+						<h3 className="flex items-center gap-2 text-lg font-semibold leading-tight text-foreground">
+							<span
+								className="icon-[lucide--circle-off] size-5 shrink-0 text-muted"
+								aria-hidden="true"
+							/>
+							No active job
 						</h3>
-						<p className="mt-2 text-sm text-muted">
-							{queuedRequestCount === 0
-								? "The current queue slot is idle."
-								: "Queued work is waiting for this slot."}
-						</p>
+						<AnimatePresence
+							initial={false}
+							mode="popLayout"
+						>
+							<motion.p
+								key={queuedRequestCount === 0 ? "empty" : "queued"}
+								className="mt-2 text-sm text-muted"
+								{...itemDetailFadeMotion}
+							>
+								{queuedRequestCount === 0
+									? "Nothing is currently scheduled to run."
+									: "Queued work will start as soon as its requirements are met."}
+							</motion.p>
+						</AnimatePresence>
 					</motion.article>
 				) : (
 					<motion.article
@@ -101,7 +132,7 @@ const ActiveQueueSlot = ({
 							opacity: 0,
 							y: -6,
 						}}
-						transition={queueMotionTransition}
+						transition={itemDetailMotionTransition}
 					>
 						<div
 							className="pointer-events-none absolute inset-y-0 right-0 left-0.5 overflow-hidden rounded-r-[inherit]"
@@ -119,14 +150,25 @@ const ActiveQueueSlot = ({
 						<div className="relative z-[1] flex flex-wrap items-start justify-between gap-4">
 							<div className="min-w-0 flex-1">
 								<div className="flex flex-wrap items-center gap-2">
-									<h3 className="text-lg font-semibold leading-tight text-foreground">
-										{job.title}
-									</h3>
-									<span className="rounded-full border border-success/40 bg-success/12 px-2.5 py-1 text-xs font-semibold text-foreground">
-										{statusLabel[job.status]}
-									</span>
+									<QueueWorkIdentity
+										identity={job.identity}
+										title={job.title}
+									/>
+									<AnimatePresence
+										initial={false}
+										mode="popLayout"
+									>
+										{job.status === "running" ? null : (
+											<motion.span
+												key={job.status}
+												className="rounded-full border border-success/40 bg-success/12 px-2.5 py-1 text-xs font-semibold text-foreground"
+												{...itemDetailBadgeMotion}
+											>
+												{statusLabel[job.status]}
+											</motion.span>
+										)}
+									</AnimatePresence>
 								</div>
-								<p className="mt-2 text-sm text-muted">Current queue slot</p>
 							</div>
 							<ItemRuntime
 								dataUi="ItemQueueRuntime"
@@ -173,32 +215,46 @@ const QueueRequestRow = ({
 			<div className="flex items-start justify-between gap-4">
 				<div className="min-w-0">
 					<div className="flex flex-wrap items-center gap-2">
-						<h3 className="text-lg font-semibold leading-tight text-foreground">
-							{request.title}
-						</h3>
+						<QueueWorkIdentity
+							identity={request.identity}
+							title={request.title}
+						/>
 						<span className="rounded-full border border-line-strong bg-surface-raised/65 px-2.5 py-1 text-xs font-semibold text-muted">
 							Queued #{index + 1}
 						</span>
 					</div>
-					<p className="mt-2 text-sm text-muted">
-						{request.status === "inputs-ready"
-							? "Inputs available"
-							: request.status === "waiting-inputs"
-								? `Waiting for inputs · ${request.missingQuantity ?? "some"} ${
-										request.missingQuantity === 1 ? "unit" : "units"
-									} missing`
-								: request.status === "blocked-earlier"
-									? "Blocked by earlier work"
-									: "Waiting for runtime conditions"}
-					</p>
-					{removeRequest.error === null ? null : (
-						<p
-							className="mt-2 text-sm text-danger"
-							role="status"
+					<AnimatePresence
+						initial={false}
+						mode="popLayout"
+					>
+						<motion.p
+							key={`${request.status}:${request.missingQuantity ?? "unknown"}`}
+							className="mt-2 text-sm text-muted"
+							{...itemDetailFadeMotion}
 						>
-							{removeRequest.error}
-						</p>
-					)}
+							{request.status === "inputs-ready"
+								? "Inputs available"
+								: request.status === "waiting-inputs"
+									? `Waiting for inputs · ${request.missingQuantity ?? "some"} ${
+											request.missingQuantity === 1 ? "unit" : "units"
+										} missing`
+									: request.status === "blocked-earlier"
+										? "Blocked by earlier work"
+										: "Waiting for runtime conditions"}
+						</motion.p>
+					</AnimatePresence>
+					<AnimatePresence initial={false}>
+						{removeRequest.error === null ? null : (
+							<motion.p
+								key={removeRequest.error}
+								className="mt-2 text-sm text-danger"
+								role="status"
+								{...itemDetailFadeMotion}
+							>
+								{removeRequest.error}
+							</motion.p>
+						)}
+					</AnimatePresence>
 				</div>
 				<LinkButton
 					className="mt-1 shrink-0 text-sm"
@@ -267,10 +323,10 @@ export const ItemQueueTab = ({
 									opacity: 0,
 									scale: 0.96,
 								}}
-								transition={queueMotionTransition}
+								transition={itemDetailMotionTransition}
 							>
-								<Button
-									type="button"
+								<LinkButton
+									className="text-sm"
 									data-ui="ItemQueueClearButton"
 									disabled={disabled || pending}
 									cursorIntent={pending ? "progress" : undefined}
@@ -281,63 +337,89 @@ export const ItemQueueTab = ({
 									}
 								>
 									{pending ? "Clearing…" : "Clear queue"}
-								</Button>
+								</LinkButton>
 							</motion.div>
 						)}
 					</AnimatePresence>
 				</div>
 			</div>
-			{error === null ? null : (
-				<p
-					className="mt-3 text-sm text-danger"
-					role="status"
-				>
-					{error}
-				</p>
-			)}
+			<AnimatePresence initial={false}>
+				{error === null ? null : (
+					<motion.p
+						key={error}
+						className="mt-3 text-sm text-danger"
+						role="status"
+						{...itemDetailFadeMotion}
+					>
+						{error}
+					</motion.p>
+				)}
+			</AnimatePresence>
 			<Scrollable className="flex-1 pr-1">
 				<div
 					className="ak-list grid gap-1"
 					data-ui="ItemQueueList"
 				>
-					<ActiveQueueSlot
-						job={queue.active[0]}
-						queuedRequestCount={queue.request.length}
-					/>
+					<div
+						className="border-b border-line pb-3"
+						data-ui="ItemQueueActiveSlotSeparator"
+					>
+						<ActiveQueueSlot
+							job={queue.active[0]}
+							queuedRequestCount={queue.request.length}
+						/>
+					</div>
 					<AnimatePresence
 						initial={false}
 						mode="sync"
 					>
-						{queue.request.map((request, index) => (
+						{queue.request.length === 0 ? (
 							<motion.div
-								key={request.requestId}
-								className="overflow-hidden"
-								layout
-								initial={{
-									height: 0,
-									opacity: 0,
-									y: 6,
-								}}
-								animate={{
-									height: "auto",
-									opacity: 1,
-									y: 0,
-								}}
-								exit={{
-									height: 0,
-									opacity: 0,
-									y: -6,
-								}}
-								transition={queueMotionTransition}
+								key="empty-queue"
+								className="grid min-h-48 place-items-center px-4 text-center text-sm text-muted"
+								data-ui="ItemQueueEmptyState"
+								{...itemDetailFadeMotion}
 							>
-								<QueueRequestRow
-									disabled={disabled}
-									index={index}
-									itemId={queue.itemId}
-									request={request}
-								/>
+								<div className="grid justify-items-center gap-2">
+									<span
+										className="icon-[lucide--list-x] size-6 text-subtle"
+										aria-hidden="true"
+									/>
+									<p>Queue is empty</p>
+								</div>
 							</motion.div>
-						))}
+						) : (
+							queue.request.map((request, index) => (
+								<motion.div
+									key={request.requestId}
+									className="overflow-hidden"
+									layout
+									initial={{
+										height: 0,
+										opacity: 0,
+										y: 6,
+									}}
+									animate={{
+										height: "auto",
+										opacity: 1,
+										y: 0,
+									}}
+									exit={{
+										height: 0,
+										opacity: 0,
+										y: -6,
+									}}
+									transition={itemDetailMotionTransition}
+								>
+									<QueueRequestRow
+										disabled={disabled}
+										index={index}
+										itemId={queue.itemId}
+										request={request}
+									/>
+								</motion.div>
+							))
+						)}
 					</AnimatePresence>
 				</div>
 			</Scrollable>

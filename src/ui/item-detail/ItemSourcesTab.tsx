@@ -1,32 +1,8 @@
 import type { useItemDetailSources } from "~/bridge/item-detail/useItemDetailSources";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
+import { ItemIdentity } from "~/ui/item/ItemIdentity";
 import { Scrollable } from "~/ui/scrollable/Scrollable";
 import { useItemDetailControl } from "~/ui/item-detail/useItemDetailControl";
-
-const SourceArtwork = ({
-	compositeUrl,
-	sourceUrl,
-}: {
-	readonly compositeUrl?: string;
-	readonly sourceUrl: string;
-}) => (
-	<div className="relative size-12 shrink-0">
-		<img
-			className="absolute inset-0 size-full object-contain drop-shadow-[0_0.35rem_0.5rem_color-mix(in_srgb,var(--ak-overlay)_30%,transparent)]"
-			src={sourceUrl}
-			alt=""
-			draggable={false}
-		/>
-		{compositeUrl === undefined ? null : (
-			<img
-				className="absolute inset-0 size-full object-contain drop-shadow-[0_0.35rem_0.5rem_color-mix(in_srgb,var(--ak-overlay)_30%,transparent)]"
-				src={compositeUrl}
-				alt=""
-				draggable={false}
-			/>
-		)}
-	</div>
-);
 
 const SourceRow = ({
 	disabled,
@@ -62,24 +38,23 @@ const SourceRow = ({
 					)
 				}
 			>
-				<div className="flex min-w-0 items-center gap-3">
-					<SourceArtwork
-						compositeUrl={source.compositeUrl}
-						sourceUrl={source.sourceUrl}
-					/>
-					<div className="min-w-0">
-						<h3 className="truncate text-base font-semibold text-foreground">
-							{source.title}
-						</h3>
-						{stale ? null : (
+				<ItemIdentity
+					compositeUrl={source.compositeUrl}
+					description={
+						stale ? null : (
 							<p className="mt-0.5 text-sm text-muted">
 								{source.space === undefined
 									? "Owned source"
 									: `Space ${source.space + 1}`}
 							</p>
-						)}
-					</div>
-				</div>
+						)
+					}
+					size="md"
+					sourceUrl={source.sourceUrl}
+					title={source.title}
+					titleClassName="truncate text-base font-semibold text-foreground"
+					titleTag="h3"
+				/>
 				<span
 					className="icon-[lucide--chevron-right] size-5 shrink-0 text-muted transition-colors group-hover:text-accent"
 					aria-hidden="true"

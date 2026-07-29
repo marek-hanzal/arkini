@@ -5,6 +5,7 @@ import type { JobStatusEnumSchema } from "~/engine/job/schema/read/JobStatusEnum
 import { readItemQueueSizeFx } from "~/engine/job/read/readItemQueueSizeFx";
 import { isLineOwnerItemFx } from "~/engine/line/read/isLineOwnerItemFx";
 import { readLineOwnerLinesFx } from "~/engine/line/read/readLineOwnerLinesFx";
+import type { LineSchema } from "~/engine/line/schema/LineSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { readLineInputAutofillCoverageFx } from "~/engine/input/fx/readLineInputAutofillCoverageFx";
 import { resolveLineStartFx } from "~/engine/job/fx/read/resolveLineStartFx";
@@ -16,6 +17,7 @@ interface ItemDetailQueueRequest {
 	readonly requestId: IdSchema.Type;
 	readonly lineId: IdSchema.Type;
 	readonly title: string;
+	readonly outputItemId?: IdSchema.Type;
 	readonly status: "inputs-ready" | "waiting-inputs" | "blocked-earlier" | "blocked-condition";
 	readonly missingQuantity?: number;
 }
@@ -24,6 +26,7 @@ interface ItemDetailQueueActiveJob {
 	readonly jobId: IdSchema.Type;
 	readonly lineId: IdSchema.Type;
 	readonly title: string;
+	readonly outputItemId?: IdSchema.Type;
 	readonly status: JobStatusEnumSchema.Type;
 	readonly durationMs: number;
 	readonly remainingMs: number;
@@ -52,6 +55,12 @@ const unavailable = {
 	kind: "unavailable",
 } as const satisfies readItemDetailQueueFx.Result;
 
+const readPrimaryOutputItemId = (line: LineSchema.Type | undefined) => {
+	const roll = line?.output?.set[0]?.roll[0];
+	if (roll === undefined) return undefined;
+	return roll.type === "weight" ? roll.drop[0]?.drop[0]?.itemId : roll.drop[0]?.itemId;
+};
+
 /** Projects active and queued line work for one exact line owner. */
 export const readItemDetailQueueFx = Effect.fn("readItemDetailQueueFx")(function* ({
 	itemId,
@@ -78,14 +87,23 @@ export const readItemDetailQueueFx = Effect.fn("readItemDetailQueueFx")(function
 				job,
 				runtime,
 			}).pipe(
-				Effect.map((status) => ({
-					jobId: job.id,
-					lineId: job.lineId,
-					title: lineById.get(job.lineId)?.title ?? job.lineId,
-					status,
-					durationMs: job.durationMs,
-					remainingMs: job.remainingMs,
-				})),
+				Effect.map((status) => {
+					const line = lineById.get(job.lineId);
+					const outputItemId = readPrimaryOutputItemId(line);
+					return {
+						jobId: job.id,
+						lineId: job.lineId,
+						title: line?.title ?? job.lineId,
+						...(outputItemId === undefined
+							? {}
+							: {
+									outputItemId,
+								}),
+						status,
+						durationMs: job.durationMs,
+						remainingMs: job.remainingMs,
+					};
+				}),
 			),
 	);
 	const requests = (runtime.jobQueue ?? []).filter((request) => request.ownerItemId === owner.id);
@@ -117,10 +135,17 @@ export const readItemDetailQueueFx = Effect.fn("readItemDetailQueueFx")(function
 					);
 					if (Result.isFailure(hardConditions)) {
 						status = "blocked-condition";
+						const line = lineById.get(request.lineId);
+						const outputItemId = readPrimaryOutputItemId(line);
 						return {
 							requestId: request.id,
 							lineId: request.lineId,
-							title: lineById.get(request.lineId)?.title ?? request.lineId,
+							title: line?.title ?? request.lineId,
+							...(outputItemId === undefined
+								? {}
+								: {
+										outputItemId,
+									}),
 							status,
 						} satisfies ItemDetailQueueRequest;
 					}
@@ -156,10 +181,17 @@ export const readItemDetailQueueFx = Effect.fn("readItemDetailQueueFx")(function
 					}
 				}
 			}
+			const line = lineById.get(request.lineId);
+			const outputItemId = readPrimaryOutputItemId(line);
 			return {
 				requestId: request.id,
 				lineId: request.lineId,
-				title: lineById.get(request.lineId)?.title ?? request.lineId,
+				title: line?.title ?? request.lineId,
+				...(outputItemId === undefined
+					? {}
+					: {
+							outputItemId,
+						}),
 				status,
 				...(missingQuantity === undefined
 					? {}
@@ -175,5 +207,5 @@ export const readItemDetailQueueFx = Effect.fn("readItemDetailQueueFx")(function
 		capacity,
 		active,
 		request: projectedRequests,
-	};
+	} satisfies readItemDetailQueueFx.Result;
 });

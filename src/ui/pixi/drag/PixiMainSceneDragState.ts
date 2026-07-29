@@ -1,11 +1,12 @@
 import type { TileActorItem } from "~/bridge/tile/TileActorItem";
 import type { readTileDropPreviewFx } from "~/bridge/tile/readTileDropPreviewFx";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
+import type { PixiMainSceneActivationIntent } from "~/ui/pixi/scene/PixiMainSceneActivationIntent";
 import type { PixiSceneDropTarget } from "~/ui/pixi/scene/PixiSceneDropTarget";
 
 interface PixiMainSceneActiveDragBase {
 	readonly actor: PixiTileActor;
-	readonly openDetail: boolean;
+	readonly activationIntent: PixiMainSceneActivationIntent;
 	readonly pointerId: number;
 	readonly pressX: number;
 	readonly pressY: number;

@@ -1,3 +1,4 @@
+import { AnimatePresence, motion } from "motion/react";
 import { match } from "ts-pattern";
 
 import { useEnqueueItemDetailLine } from "~/bridge/item-detail/useEnqueueItemDetailLine";
@@ -6,6 +7,7 @@ import { useSetDefaultItemDetailLine } from "~/bridge/item-detail/useSetDefaultI
 import { useUnsetDefaultItemDetailLine } from "~/bridge/item-detail/useUnsetDefaultItemDetailLine";
 import { useWithdrawItemDetailLine } from "~/bridge/item-detail/useWithdrawItemDetailLine";
 import { Button, PrimaryButton } from "~/ui/button/Button";
+import { itemDetailFadeMotion } from "~/ui/item-detail/ItemDetailMotion";
 import { ItemLineInputs, ItemLineUnavailableWithdrawals } from "~/ui/item-detail/ItemLineInputs";
 import { ItemLineOutputs } from "~/ui/item-detail/ItemLineOutputs";
 import { ItemLineRuntime } from "~/ui/item-detail/ItemLineRuntime";
@@ -198,6 +200,22 @@ export const ItemLineRow = ({
 	const showUnavailableReason = !stale && unavailable && line.activeJob === undefined;
 	const queued = !stale && line.activeJob === undefined && line.queuedRequestCount > 0;
 	const contentReadOnly = disabled || line.activeJob !== undefined;
+	const lineWithdraw =
+		!stale &&
+		line.actions.canWithdraw &&
+		line.input.some(
+			(candidate) => candidate.kind === "materials" && candidate.storedQuantity > 0,
+		)
+			? {
+					disabled: contentReadOnly,
+					onClick: () =>
+						withdrawLine.run({
+							ownerItemId,
+							lineId: line.lineId,
+						}),
+					pending: pending.withdraw,
+				}
+			: undefined;
 	const progress =
 		line.activeJob === undefined
 			? null
@@ -213,7 +231,8 @@ export const ItemLineRow = ({
 					);
 
 	return (
-		<article
+		<motion.article
+			layout
 			className={`ak-list-row overflow-hidden rounded-xl border-b border-l-2 border-line px-3 py-5 pl-4 first:pt-3 last:border-b-0 last:pb-5 ${
 				stale
 					? "border-l-line/55"
@@ -227,48 +246,76 @@ export const ItemLineRow = ({
 			data-line-id={line.lineId}
 			data-active={!stale && line.activeJob !== undefined ? "true" : "false"}
 			data-queued={queued ? "true" : "false"}
+			{...itemDetailFadeMotion}
 		>
-			{stale || progress === null ? null : (
-				<div
-					className="pointer-events-none absolute inset-y-0 right-0 left-0.5 overflow-hidden rounded-r-[inherit]"
-					aria-hidden="true"
-					data-ui="TileLineProgress"
-				>
-					<div
-						className="h-full bg-[var(--ak-list-row-active-progress-surface)] transition-[width] duration-200 ease-linear"
-						data-ui="TileLineProgressFill"
-						style={{
-							width: `${progress * 100}%`,
+			<AnimatePresence initial={false}>
+				{stale || progress === null ? null : (
+					<motion.div
+						key="progress"
+						animate={{
+							opacity: 1,
 						}}
-					/>
-				</div>
-			)}
+						className="pointer-events-none absolute inset-y-0 right-0 left-0.5 overflow-hidden rounded-r-[inherit]"
+						exit={{
+							opacity: 0,
+						}}
+						initial={{
+							opacity: 0,
+						}}
+						transition={itemDetailFadeMotion.transition}
+						aria-hidden="true"
+						data-ui="TileLineProgress"
+					>
+						<div
+							className="h-full bg-[var(--ak-list-row-active-progress-surface)] transition-[width] duration-200 ease-linear"
+							data-ui="TileLineProgressFill"
+							style={{
+								width: `${progress * 100}%`,
+							}}
+						/>
+					</motion.div>
+				)}
+			</AnimatePresence>
 			<div className="relative z-[1] flex flex-wrap items-start justify-between gap-4">
 				<div className="min-w-0 flex-1">
 					<ItemLineSummary
 						line={line}
 						stale={stale}
 					/>
-					{queued ? (
-						<p
-							className="mt-3 flex items-center gap-2 text-sm font-medium text-warning"
-							data-ui="TileLineQueuedMessage"
-						>
-							<span
-								className="icon-[lucide--clock-3] size-4 shrink-0"
-								aria-hidden="true"
-							/>
-							Queued for automatic start when the required inputs become available.
-						</p>
-					) : null}
-					{!showUnavailableReason ? null : unavailableDependency === undefined ? (
-						<ItemLineUnavailableMessage reason={line.availability.reason} />
-					) : (
-						<ItemLineUnavailableDependency
-							dependency={unavailableDependency}
-							disabled={disabled}
-						/>
-					)}
+					<AnimatePresence initial={false}>
+						{queued ? (
+							<motion.p
+								key="queued"
+								className="mt-3 flex items-center gap-2 text-sm font-medium text-warning"
+								data-ui="TileLineQueuedMessage"
+								{...itemDetailFadeMotion}
+							>
+								<span
+									className="icon-[lucide--clock-3] size-4 shrink-0"
+									aria-hidden="true"
+								/>
+								Queued for automatic start when the required inputs become
+								available.
+							</motion.p>
+						) : null}
+					</AnimatePresence>
+					<AnimatePresence initial={false}>
+						{!showUnavailableReason ? null : (
+							<motion.div
+								key="unavailable-reason"
+								{...itemDetailFadeMotion}
+							>
+								{unavailableDependency === undefined ? (
+									<ItemLineUnavailableMessage reason={line.availability.reason} />
+								) : (
+									<ItemLineUnavailableDependency
+										dependency={unavailableDependency}
+										disabled={disabled}
+									/>
+								)}
+							</motion.div>
+						)}
+					</AnimatePresence>
 				</div>
 				{stale ? null : (
 					<div className="flex shrink-0 flex-col items-end gap-3">
@@ -298,19 +345,6 @@ export const ItemLineRow = ({
 										? "Unset default"
 										: "Set default"}
 							</Button>
-							<Button
-								cursorIntent={pending.withdraw ? "progress" : undefined}
-								data-ui="TileLineWithdrawButton"
-								disabled={disabled || !line.actions.canWithdraw}
-								onClick={() =>
-									withdrawLine.run({
-										ownerItemId,
-										lineId: line.lineId,
-									})
-								}
-							>
-								{pending.withdraw ? "Withdrawing…" : "Withdraw"}
-							</Button>
 							<PrimaryButton
 								aria-busy={pending.enqueue}
 								cursorIntent={pending.enqueue ? "progress" : undefined}
@@ -330,46 +364,65 @@ export const ItemLineRow = ({
 					</div>
 				)}
 			</div>
-			{stale || error === null ? null : (
-				<p
-					className="relative z-[1] mt-3 text-sm text-danger"
-					role="status"
-				>
-					{error}
-				</p>
-			)}
-			{!stale && unavailable && line.activeJob === undefined ? (
-				<div className="relative z-[1]">
-					<ItemLineUnavailableWithdrawals
-						disabled={disabled}
-						input={line.input}
-						lineId={line.lineId}
-						ownerItemId={ownerItemId}
-					/>
-				</div>
-			) : (
-				<div className="relative z-[1] mt-4 grid min-w-0 grid-cols-[minmax(0,1fr)_2rem_minmax(0,1fr)] gap-x-4">
-					<ItemLineInputs
-						disabled={contentReadOnly}
-						input={line.input}
-						lineId={line.lineId}
-						ownerItemId={ownerItemId}
-						stale={stale}
-						suppressSurface={line.activeJob !== undefined}
-					/>
-					<div
-						className="grid place-items-center text-muted"
-						aria-hidden="true"
-						data-ui="TileLineFlowChevron"
+			<AnimatePresence initial={false}>
+				{stale || error === null ? null : (
+					<motion.p
+						key={error}
+						className="relative z-[1] mt-3 text-sm text-danger"
+						role="status"
+						{...itemDetailFadeMotion}
 					>
-						<span className="icon-[lucide--chevron-right] size-5" />
-					</div>
-					<ItemLineOutputs
-						disabled={contentReadOnly}
-						output={line.output}
-					/>
-				</div>
-			)}
-		</article>
+						{error}
+					</motion.p>
+				)}
+			</AnimatePresence>
+			<AnimatePresence
+				initial={false}
+				mode="wait"
+			>
+				{!stale && unavailable && line.activeJob === undefined ? (
+					<motion.div
+						key="unavailable-inputs"
+						className="relative z-[1]"
+						{...itemDetailFadeMotion}
+					>
+						<ItemLineUnavailableWithdrawals
+							disabled={disabled}
+							input={line.input}
+							lineId={line.lineId}
+							ownerItemId={ownerItemId}
+							withdraw={lineWithdraw}
+						/>
+					</motion.div>
+				) : (
+					<motion.div
+						key="line-details"
+						className="relative z-[1] mt-4 grid min-w-0 grid-cols-[minmax(0,1fr)_2rem_minmax(0,1fr)] gap-x-4"
+						{...itemDetailFadeMotion}
+					>
+						<ItemLineInputs
+							disabled={contentReadOnly}
+							input={line.input}
+							lineId={line.lineId}
+							ownerItemId={ownerItemId}
+							stale={stale}
+							suppressSurface={line.activeJob !== undefined}
+							withdraw={lineWithdraw}
+						/>
+						<div
+							className="grid place-items-center text-muted"
+							aria-hidden="true"
+							data-ui="TileLineFlowChevron"
+						>
+							<span className="icon-[lucide--chevron-right] size-5" />
+						</div>
+						<ItemLineOutputs
+							disabled={contentReadOnly}
+							output={line.output}
+						/>
+					</motion.div>
+				)}
+			</AnimatePresence>
+		</motion.article>
 	);
 };

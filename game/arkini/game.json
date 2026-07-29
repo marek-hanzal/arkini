@@ -4,11 +4,11 @@
 		"id": "arkini",
 		"title": "Arkini",
 		"board": {
-			"width": 13,
+			"width": 15,
 			"height": 9
 		},
 		"inventory": {
-			"width": 13,
+			"width": 15,
 			"height": 9
 		},
 		"toolbarSize": 13

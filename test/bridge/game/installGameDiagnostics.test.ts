@@ -1,10 +1,15 @@
+import { Cause } from "effect";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import type { ArkiniElectronApi } from "../../../electron/contract/ArkiniElectronApi";
-import type { DiagnosticRecord } from "../../../electron/contract/diagnostics/DiagnosticRecord";
+import {
+	type DiagnosticRecord,
+	DiagnosticRecordSchema,
+} from "../../../electron/contract/diagnostics/DiagnosticRecord";
 import type { GameSession, GameTransition } from "~/bridge/game/GameSession";
 import { installGameDiagnostics } from "~/bridge/game/installGameDiagnostics";
 import { GameSessionFatalError } from "~/bridge/game/GameSessionFatalError";
+import { RuntimeInvalidError } from "~/engine/runtime/error/RuntimeInvalidError";
 
 const originalWindow = globalThis.window;
 
@@ -28,7 +33,10 @@ const createTransition = (sequence: number): GameTransition =>
 
 describe("Game diagnostics", () => {
 	it("keeps tick-only commits quiet while preserving semantic, delivery, and fatal context", () => {
-		const write = vi.fn<(record: DiagnosticRecord) => Promise<void>>(() => Promise.resolve());
+		const write = vi.fn<(record: DiagnosticRecord) => Promise<void>>((record) => {
+			DiagnosticRecordSchema.parse(record);
+			return Promise.resolve();
+		});
 		Object.defineProperty(globalThis, "window", {
 			configurable: true,
 			value: {
@@ -105,15 +113,71 @@ describe("Game diagnostics", () => {
 		});
 
 		fatal = new GameSessionFatalError({
-			source: "presentation",
-			cause: new TypeError("destroyed transform"),
+			source: "tick",
+			cause: Cause.fail(
+				new RuntimeInvalidError({
+					result: {
+						issues: [
+							{
+								type: "job:owner-not-on-grid",
+								jobId: "job:stuck",
+								ownerItemId: "runtime:item:worker",
+								location: {
+									scope: "delivery",
+									phase: "outbound",
+									generation: 0,
+									origin: {
+										scope: "board",
+										space: 0,
+										position: {
+											x: 2,
+											y: 3,
+										},
+									},
+									target: {
+										kind: "line-input",
+										ownerItemId: "runtime:item:upgrade",
+										lineId: "line:upgrade",
+										input: [
+											{
+												inputIndex: 0,
+												quantity: 1,
+											},
+										],
+									},
+								},
+							},
+						],
+					},
+				}),
+			),
 		});
 		fatalListener?.();
 		expect(write.mock.calls.at(-1)?.[0]).toMatchObject({
 			event: "session-failed",
 			level: "fatal",
 			data: {
-				source: "presentation",
+				error: {
+					cause: {
+						reasons: [
+							{
+								error: {
+									_tag: "RuntimeInvalidError",
+									result: {
+										issues: [
+											{
+												type: "job:owner-not-on-grid",
+												jobId: "job:stuck",
+												ownerItemId: "runtime:item:worker",
+											},
+										],
+									},
+								},
+							},
+						],
+					},
+				},
+				source: "tick",
 				sequence: 2,
 			},
 		});

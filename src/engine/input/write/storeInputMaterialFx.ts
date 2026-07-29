@@ -22,6 +22,7 @@ import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeE
 import { assertRevisionFx } from "~/engine/revision/fx/assertRevisionFx";
 import type { RevisionSchema } from "~/engine/revision/schema/RevisionSchema";
 import { ItemLocationConflictError } from "~/engine/runtime/error/ItemLocationConflictError";
+import { discardRuntimeItemIdentityStateFx } from "~/engine/runtime/fx/discardRuntimeItemIdentityStateFx";
 import { modifyRuntimeFx } from "~/engine/runtime/internal/modifyRuntimeFx";
 import { isBoardRuntimeItemFx } from "~/engine/runtime/read/isBoardRuntimeItemFx";
 import { isGridRuntimeItemFx } from "~/engine/runtime/read/isGridRuntimeItemFx";
@@ -215,6 +216,22 @@ export const storeInputMaterialFx = Effect.fn("storeInputMaterialFx")(function* 
 				);
 			}
 
+			if (runtime.jobs.some((job) => job.ownerItemId === source.id)) {
+				return yield* Effect.fail(
+					new InputMaterialUnavailableError({
+						ownerItemId,
+						lineId,
+						inputIndex,
+						sourceItemId,
+					}),
+				);
+			}
+			const inputSourceRuntime = yield* discardRuntimeItemIdentityStateFx({
+				ownerItemIds: new Set([
+					source.id,
+				]),
+				runtime,
+			});
 			const [result, inputRuntime] = yield* applyInputMaterialStorePlanFx({
 				location: {
 					scope: LocationScopeEnumSchema.enum.Input,
@@ -223,7 +240,7 @@ export const storeInputMaterialFx = Effect.fn("storeInputMaterialFx")(function* 
 					inputIndex,
 				},
 				plan,
-				runtime,
+				runtime: inputSourceRuntime,
 				source,
 			});
 			const isolation = yield* isolateStatefulOwnerTransitionFx({

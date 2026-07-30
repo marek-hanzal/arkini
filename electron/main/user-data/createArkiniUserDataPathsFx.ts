@@ -19,12 +19,6 @@ export const createArkiniUserDataPathsFx = Effect.fn("createArkiniUserDataPathsF
 					saves: join(gameRoot, "saves"),
 				},
 				editor: join(root, "editor"),
-				legacy: {
-					arkpacks: join(root, "arkpacks"),
-					logs: join(root, "logs"),
-					preferences: join(root, "preferences"),
-					saves: join(root, "saves"),
-				},
 			};
 		}),
 );

@@ -13,7 +13,6 @@ import { createTrustedRendererFx } from "./security/createTrustedRendererFx";
 import { createDiagnosticLogFx } from "./diagnostics/createDiagnosticLogFx";
 import { createFilesystemWindowPreferencesFx } from "./window/createFilesystemWindowPreferencesFx";
 import { createArkiniUserDataPathsFx } from "./user-data/createArkiniUserDataPathsFx";
-import { migrateArkiniUserDataFx } from "./user-data/migrateArkiniUserDataFx";
 
 export const electronMainFx = Effect.fn("electronMainFx")(function* () {
 	const hasSingleInstanceLock = app.requestSingleInstanceLock();
@@ -35,9 +34,6 @@ export const electronMainFx = Effect.fn("electronMainFx")(function* () {
 
 	const userDataPath = app.getPath("userData");
 	const userDataPaths = yield* createArkiniUserDataPathsFx(userDataPath);
-	yield* migrateArkiniUserDataFx({
-		paths: userDataPaths,
-	});
 
 	const diagnostics = yield* createDiagnosticLogFx(userDataPaths.game.logs).pipe(
 		Effect.catch((cause) =>

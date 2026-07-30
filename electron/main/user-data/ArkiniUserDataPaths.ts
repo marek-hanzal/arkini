@@ -9,10 +9,4 @@ export interface ArkiniUserDataPaths {
 		readonly saves: string;
 	};
 	readonly editor: string;
-	readonly legacy: {
-		readonly arkpacks: string;
-		readonly logs: string;
-		readonly preferences: string;
-		readonly saves: string;
-	};
 }

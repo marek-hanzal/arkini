@@ -1,0 +1,163 @@
+// @vitest-environment jsdom
+
+import { act, createElement } from "react";
+import { createRoot } from "react-dom/client";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
+import { EditorItemList } from "~/ui/item/editor/EditorItemList";
+
+(
+	globalThis as {
+		IS_REACT_ACT_ENVIRONMENT?: boolean;
+	}
+).IS_REACT_ACT_ENVIRONMENT = true;
+
+const state = vi.hoisted(() => ({
+	project: undefined as unknown,
+}));
+
+vi.mock("~/bridge/editor/useEditorProject", () => ({
+	useEditorProject: () => state.project,
+}));
+
+vi.mock("~/ui/item/editor/EditorItemThumbnail", () => ({
+	EditorItemThumbnail: () =>
+		createElement("span", {
+			"data-ui": "EditorItemThumbnail",
+		}),
+}));
+
+const roots: Array<ReturnType<typeof createRoot>> = [];
+
+beforeEach(() => {
+	const createItem = ({
+		id,
+		title,
+		type,
+		tags = [],
+	}: {
+		readonly id: string;
+		readonly title: string;
+		readonly type: "deposit" | "producer" | "simple";
+		readonly tags?: readonly string[];
+	}) => ({
+		id,
+		title,
+		type,
+		tags,
+		description: `${title} description`,
+		categoryId: "resource",
+		asset: {
+			default: [
+				`asset:${id}`,
+			],
+		},
+	});
+	state.project = {
+		projectId: "editor-test",
+		title: "Editor test",
+		config: {
+			items: {
+				water: createItem({
+					id: "water",
+					title: "Water",
+					type: "simple",
+					tags: [
+						"hydration",
+					],
+				}),
+				well: createItem({
+					id: "well",
+					title: "Well",
+					type: "deposit",
+				}),
+				bakery: createItem({
+					id: "bakery",
+					title: "Bakery",
+					type: "producer",
+				}),
+			},
+		},
+	};
+});
+
+afterEach(async () => {
+	await act(async () => {
+		for (const root of roots.splice(0)) root.unmount();
+	});
+	document.body.replaceChildren();
+});
+
+const renderItemList = async () => {
+	const container = document.createElement("div");
+	document.body.append(container);
+	const root = createRoot(container);
+	roots.push(root);
+	await act(async () => {
+		root.render(createElement(EditorItemList));
+	});
+	return container;
+};
+
+const setSearch = async (container: HTMLElement, value: string) => {
+	const input = container.querySelector<HTMLInputElement>('[aria-label="Search editor items"]');
+	if (input === null) throw new Error("Missing editor item search.");
+	const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")?.set;
+	if (setter === undefined) throw new Error("Missing native input value setter.");
+	await act(async () => {
+		setter.call(input, value);
+		input.dispatchEvent(
+			new Event("input", {
+				bubbles: true,
+			}),
+		);
+	});
+};
+
+const click = async (element: Element | null) => {
+	if (!(element instanceof HTMLElement)) throw new Error("Missing clickable element.");
+	await act(async () => {
+		element.click();
+	});
+};
+
+const readVisibleItemIds = (container: HTMLElement) =>
+	[
+		...container.querySelectorAll<HTMLElement>("[data-item-id]"),
+	].map((row) => row.dataset.itemId);
+
+describe("EditorItemList", () => {
+	it("replaces the placeholder heading with shared Fuse search and a removable type filter", async () => {
+		const container = await renderItemList();
+
+		expect(container.textContent).not.toContain("source-backed items");
+		expect(container.textContent).not.toContain("Item editing forms");
+		expect(readVisibleItemIds(container)).toEqual([
+			"bakery",
+			"water",
+			"well",
+		]);
+
+		await setSearch(container, "hydration");
+		expect(readVisibleItemIds(container)).toEqual([
+			"water",
+		]);
+
+		await setSearch(container, "");
+		await click(container.querySelector('[aria-label="Filter items by deposit"]'));
+		expect(readVisibleItemIds(container)).toEqual([
+			"well",
+		]);
+		expect(container.querySelector('[data-ui="EditorItemTypeFilter"]')?.textContent).toContain(
+			"deposit",
+		);
+
+		await setSearch(container, "bakery");
+		expect(container.querySelector('[data-ui="EditorItemSearchEmpty"]')).not.toBeNull();
+
+		await click(container.querySelector('[aria-label="Clear deposit item filter"]'));
+		expect(readVisibleItemIds(container)).toEqual([
+			"bakery",
+		]);
+	});
+});

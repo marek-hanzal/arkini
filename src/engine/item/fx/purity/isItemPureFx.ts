@@ -83,6 +83,12 @@ const readOwnedLines = (item: RuntimeItemSchema.Type): readonly LineSchema.Type[
 		)
 		.with(
 			{
+				type: ItemEnumSchema.enum.Deposit,
+			},
+			({ lines }) => lines ?? [],
+		)
+		.with(
+			{
 				type: P.union(
 					ItemEnumSchema.enum.Blueprint,
 					ItemEnumSchema.enum.Craft,

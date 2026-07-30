@@ -1,5 +1,6 @@
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeIntegerSchema";
+import type { DistanceEnumSchema } from "~/engine/distance/schema/DistanceEnumSchema";
 import type { InputChargeFromEnumSchema } from "~/engine/input/schema/InputChargeFromEnumSchema";
 import type { InputModeEnumSchema } from "~/engine/input/schema/InputModeEnumSchema";
 import type { JobStatusEnumSchema } from "~/engine/job/schema/read/JobStatusEnumSchema";
@@ -54,7 +55,7 @@ export namespace ItemDetailLines {
 		| {
 				readonly kind: "deposit";
 				readonly selector: Selector;
-				readonly distance: "close" | "near" | "far";
+				readonly distance: DistanceEnumSchema.Type;
 				readonly requiredCharges: number;
 				readonly availableCharges: number;
 				readonly availableChargesLabel: string;
@@ -133,7 +134,7 @@ export namespace ItemDetailLines {
 		| {
 				readonly kind: "deposit-target-missing";
 				readonly selector: Selector;
-				readonly distance: "close" | "near" | "far";
+				readonly distance: DistanceEnumSchema.Type;
 				readonly detail?: DetailReference;
 				readonly messageBeforeDetail?: string;
 				readonly messageAfterDetail?: string;

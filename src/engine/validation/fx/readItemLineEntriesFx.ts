@@ -40,6 +40,24 @@ export const readItemLineEntriesFx = Effect.fn("readItemLineEntriesFx")(function
 		)
 		.with(
 			{
+				type: ItemEnumSchema.enum.Deposit,
+			},
+			({ lines }) =>
+				(lines ?? []).map(
+					(line, index) =>
+						({
+							line,
+							path: [
+								"items",
+								itemId,
+								"lines",
+								index,
+							],
+						}) satisfies ItemLineEntrySchema.Type,
+				),
+		)
+		.with(
+			{
 				type: P.union(
 					ItemEnumSchema.enum.Blueprint,
 					ItemEnumSchema.enum.Craft,
@@ -60,7 +78,6 @@ export const readItemLineEntriesFx = Effect.fn("readItemLineEntriesFx")(function
 		.with(
 			{
 				type: P.union(
-					ItemEnumSchema.enum.Deposit,
 					ItemEnumSchema.enum.Simple,
 					ItemEnumSchema.enum.Temporary,
 					ItemEnumSchema.enum.Inventory,

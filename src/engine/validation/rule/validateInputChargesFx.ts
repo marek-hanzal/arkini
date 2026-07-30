@@ -1,6 +1,8 @@
 import { Effect } from "effect";
 
+import { DistanceEnumSchema } from "~/engine/distance/schema/DistanceEnumSchema";
 import { InputChargeFromEnumSchema } from "~/engine/input/schema/InputChargeFromEnumSchema";
+import { ItemEnumSchema } from "~/engine/item/schema/ItemEnumSchema";
 import { selectItemsFx } from "~/engine/selector/fx/selectItemsFx";
 import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import type { GameSourceProvenanceSchema } from "~/engine/source/schema/GameSourceProvenanceSchema";
@@ -49,6 +51,31 @@ export const validateInputChargesFx = Effect.fn("validateInputChargesFx")(functi
 					inputIndex,
 					"charges",
 				];
+				if (
+					input.type === InputEnumSchema.enum.Deposit &&
+					input.query.distance === DistanceEnumSchema.enum.Self &&
+					item.type !== ItemEnumSchema.enum.Deposit
+				) {
+					diagnostics.push({
+						code: DiagnosticCodeEnumSchema.enum.InputChargesInvalid,
+						severity: DiagnosticSeverityEnumSchema.enum.Error,
+						path: [
+							...path,
+							"input",
+							inputIndex,
+							"query",
+							"distance",
+						],
+						source: provenance.items[itemId],
+						message: `Deposit input ${inputIndex} of line ${line.id} targets self, but owner ${itemId} is ${item.type}, not a deposit.`,
+						ownerItemId: itemId,
+						lineId: line.id,
+						inputIndex,
+						reason: InvalidInputChargesReasonEnumSchema.enum
+							.DepositSelfRequiresDepositOwner,
+					});
+					continue;
+				}
 				if (input.type === InputEnumSchema.enum.Deposit && input.charges === undefined) {
 					diagnostics.push({
 						code: DiagnosticCodeEnumSchema.enum.InputChargesInvalid,
@@ -138,7 +165,12 @@ export const validateInputChargesFx = Effect.fn("validateInputChargesFx")(functi
 
 				const targetChargeCost = input.charges.cost;
 				const matchedCandidates = yield* selectItemsFx({
-					items: Object.values(config.items),
+					items:
+						input.query.distance === DistanceEnumSchema.enum.Self
+							? [
+									item,
+								]
+							: Object.values(config.items),
 					selector: input.query.selector,
 				});
 				const available = matchedCandidates.some((candidate) => {

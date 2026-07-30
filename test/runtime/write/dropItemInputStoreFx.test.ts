@@ -44,7 +44,7 @@ const mergeBeforeInputConfig = GameConfigSchema.parse({
 });
 
 const workshopDefinition = inputRuntimeTestConfig.items.workshop;
-if (workshopDefinition === undefined || !("lines" in workshopDefinition)) {
+if (workshopDefinition?.type !== "producer") {
 	throw new Error("Expected workshop producer definition.");
 }
 

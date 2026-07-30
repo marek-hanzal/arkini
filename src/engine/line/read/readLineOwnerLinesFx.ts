@@ -11,6 +11,12 @@ export const readLineOwnerLinesFx = Effect.fn("readLineOwnerLinesFx")(function* 
 	return match(item)
 		.with(
 			{
+				type: ItemEnumSchema.enum.Deposit,
+			},
+			({ lines }) => lines,
+		)
+		.with(
+			{
 				type: ItemEnumSchema.enum.Producer,
 			},
 			({ lines }) => lines,

@@ -87,7 +87,7 @@ const readIds = (items: ReadonlyArray<RuntimeItemSchema.Type>) => {
 };
 
 describe("queryFx", () => {
-	it("selects exact board distance rings and excludes the origin", () => {
+	it("selects the origin and exact board distance rings", () => {
 		const result = Effect.runSync(
 			Effect.gen(function* () {
 				const origin = yield* placeTreeFx({
@@ -131,6 +131,21 @@ describe("queryFx", () => {
 						position: {
 							x: 8,
 							y: 5,
+						},
+					},
+				});
+				const self = yield* queryFx({
+					origin: {
+						scope: "board",
+						space: 0,
+						position: origin.location.position,
+					},
+					query: {
+						distance: "self",
+						scope: "board",
+						selector: {
+							tag: "forest",
+							type: "tag",
 						},
 					},
 				});
@@ -184,6 +199,7 @@ describe("queryFx", () => {
 					close,
 					far,
 					near,
+					self,
 				};
 			}).pipe(
 				useGameFx({
@@ -192,6 +208,9 @@ describe("queryFx", () => {
 			),
 		);
 
+		expect(readIds(result.self)).toEqual([
+			"origin",
+		]);
 		expect(readIds(result.close)).toEqual([
 			"close",
 		]);

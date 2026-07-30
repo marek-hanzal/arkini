@@ -33,4 +33,54 @@ describe("DepositItemSchema", () => {
 			}).success,
 		).toBe(false);
 	});
+
+	it("accepts optional production lines on a finite deposit", () => {
+		const result = DepositItemSchema.parse({
+			id: "deposit:well",
+			title: "Well",
+			description: "A finite self-consuming well.",
+			asset: {
+				source: [
+					"asset:well",
+				],
+			},
+			tags: [],
+			categoryId: "building",
+			scope: "board",
+			maxStackSize: 1,
+			type: "deposit",
+			charges: {
+				amount: 30,
+			},
+			lines: [
+				{
+					id: "line:well:water",
+					title: "Water",
+					description: "Draw water.",
+					runtimeMs: 1,
+					input: [
+						{
+							type: "deposit",
+							query: {
+								scope: "board",
+								distance: "self",
+								selector: {
+									type: "item",
+									itemId: "deposit:well",
+								},
+							},
+							charges: {
+								from: "target",
+								cost: 1,
+							},
+						},
+					],
+					rules: [],
+				},
+			],
+		});
+
+		expect(result.maxQueueSize).toBe(1);
+		expect(result.lines).toHaveLength(1);
+	});
 });

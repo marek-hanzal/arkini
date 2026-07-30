@@ -22,6 +22,7 @@ import { WhenEnumSchema } from "~/engine/when/schema/WhenEnumSchema";
 describe("business enum schemas", () => {
 	it("exposes stable named members for core engine vocabularies", () => {
 		expect(DistanceEnumSchema.options).toEqual([
+			DistanceEnumSchema.enum.Self,
 			DistanceEnumSchema.enum.Close,
 			DistanceEnumSchema.enum.Near,
 			DistanceEnumSchema.enum.Far,

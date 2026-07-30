@@ -5,6 +5,7 @@ import { z } from "zod";
  */
 export const DistanceEnumSchema = z
 	.enum({
+		Self: "self",
 		Close: "close",
 		Near: "near",
 		Far: "far",
@@ -12,7 +13,7 @@ export const DistanceEnumSchema = z
 	.meta({
 		id: "DistanceEnumSchema",
 		description:
-			"An exact close or near Chebyshev distance, or any positive far distance excluding the source cell.",
+			"The source cell itself, an exact close or near Chebyshev distance, or any positive far distance.",
 	});
 
 export type DistanceEnumSchema = typeof DistanceEnumSchema;

@@ -18,7 +18,7 @@ export const readItemQueueSizeFx = Effect.fn("readItemQueueSizeFx")(function* ({
 	return match(item)
 		.with(
 			{
-				type: ItemEnumSchema.enum.Producer,
+				type: P.union(ItemEnumSchema.enum.Deposit, ItemEnumSchema.enum.Producer),
 			},
 			({ maxQueueSize }) => maxQueueSize,
 		)

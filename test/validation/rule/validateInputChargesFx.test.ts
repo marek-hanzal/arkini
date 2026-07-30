@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 
 import { compileGameSourcesFx } from "~/engine/compiler/fx/compileGameSourcesFx";
 import {
+	createLine,
 	createProducerItem,
 	createRootSource,
 	createSimpleItem,
@@ -59,7 +60,62 @@ const exactDepositInput = (itemId: string, cost = 1) => ({
 	},
 });
 
+const selfDepositInput = (itemId: string, cost = 1) => ({
+	type: "deposit" as const,
+	query: {
+		scope: "board" as const,
+		distance: "self" as const,
+		selector: {
+			type: "item" as const,
+			itemId,
+		},
+	},
+	charges: {
+		cost,
+		from: "target" as const,
+	},
+});
+
 describe("validateInputChargesFx", () => {
+	it("allows self distance only for a deposit line owner", async () => {
+		const producer = createProducerItem({
+			id: "producer:self",
+			input: [
+				selfDepositInput("producer:self"),
+			],
+		});
+		const deposit = {
+			...createSimpleItem("deposit:self"),
+			type: "deposit" as const,
+			charges: {
+				amount: 2,
+			},
+			lines: [
+				createLine({
+					input: [
+						selfDepositInput("deposit:self"),
+					],
+				}),
+			],
+		};
+
+		expect(
+			await chargeDiagnostics({
+				[producer.id]: producer,
+			}),
+		).toEqual([
+			expect.objectContaining({
+				ownerItemId: producer.id,
+				reason: InvalidInputChargesReasonEnumSchema.enum.DepositSelfRequiresDepositOwner,
+			}),
+		]);
+		expect(
+			await chargeDiagnostics({
+				[deposit.id]: deposit,
+			}),
+		).toEqual([]);
+	});
+
 	it("requires every deposit input to author a target charge cost", async () => {
 		const producer = createProducerItem({
 			id: "producer",

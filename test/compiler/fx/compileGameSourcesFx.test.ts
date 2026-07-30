@@ -49,7 +49,7 @@ describe("compileGameSourcesFx", () => {
 			}),
 		);
 		const compiled = result.config?.items[item.id];
-		if (compiled === undefined || !("lines" in compiled)) {
+		if (compiled?.type !== "producer") {
 			throw new Error("Expected compiled producer.");
 		}
 

@@ -3,16 +3,16 @@
 	"items": {
 		"producer:well-t1": {
 			"id": "producer:well-t1",
-			"type": "producer",
+			"type": "deposit",
 			"title": "Well I",
-			"description": "Produces water.",
+			"description": "Produces water for 30 draws before the well runs dry.",
 			"asset": {
 				"source": [
 					"producer-well-t1"
 				]
 			},
 			"tags": [
-				"producer",
+				"deposit",
 				"food",
 				"water",
 				"era:I",
@@ -22,6 +22,9 @@
 			"scope": "any",
 			"maxCount": 1,
 			"maxStackSize": 1,
+			"charges": {
+				"amount": 30
+			},
 			"maxQueueSize": 5,
 			"lines": [
 				{
@@ -31,7 +34,19 @@
 					"runtimeMs": 5000,
 					"input": [
 						{
-							"type": "simple"
+							"type": "deposit",
+							"query": {
+								"scope": "board",
+								"distance": "self",
+								"selector": {
+									"type": "item",
+									"itemId": "producer:well-t1"
+								}
+							},
+							"charges": {
+								"from": "target",
+								"cost": 1
+							}
 						}
 					],
 					"rules": [],

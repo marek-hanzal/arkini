@@ -62,6 +62,7 @@ export const completeJobTransitionFx = Effect.fn("completeJobTransitionFx")(func
 	if (
 		owner.item.type !== ItemEnumSchema.enum.Blueprint &&
 		owner.item.type !== ItemEnumSchema.enum.Craft &&
+		owner.item.type !== ItemEnumSchema.enum.Deposit &&
 		owner.item.type !== ItemEnumSchema.enum.Producer &&
 		owner.item.type !== ItemEnumSchema.enum.Stash
 	) {

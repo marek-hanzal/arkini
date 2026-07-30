@@ -1,7 +1,5 @@
 import { Effect } from "effect";
-import {
-	EditorProjectManifestSchema,
-} from "../../../electron/contract/editor/EditorProjectManifest";
+import { EditorProjectManifestSchema } from "../../../electron/contract/editor/EditorProjectManifest";
 
 import type { EditorProjectDescriptor } from "~/bridge/editor/EditorProjectDescriptor";
 import type { EditorWorkspace } from "~/bridge/editor/EditorWorkspace";
@@ -29,7 +27,11 @@ export const listEditorProjectsFx = Effect.fn("listEditorProjectsFx")(function* 
 						({
 							projectId,
 							title,
-							...(game === undefined ? {} : { game }),
+							...(game === undefined
+								? {}
+								: {
+										game,
+									}),
 							createdAtMs,
 							updatedAtMs,
 						}) satisfies EditorProjectDescriptor,

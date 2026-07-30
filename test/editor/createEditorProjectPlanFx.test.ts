@@ -37,11 +37,20 @@ describe("createEditorProjectPlanFx", () => {
 		expect(compilation.payload.config).toEqual(editorTestConfig);
 		expect(
 			Object.fromEntries(
-				compilation.payload.resources.map((resource) => [resource.id, resource.bytes]),
+				compilation.payload.resources.map((resource) => [
+					resource.id,
+					resource.bytes,
+				]),
 			),
 		).toEqual({
-			hero: new Uint8Array([1, 2]),
-			"item-water": new Uint8Array([3, 4]),
+			hero: new Uint8Array([
+				1,
+				2,
+			]),
+			"item-water": new Uint8Array([
+				3,
+				4,
+			]),
 		});
 		expect(compilation.diagnostics).toEqual([]);
 	});
@@ -199,9 +208,7 @@ describe("createEditorProjectPlanFx", () => {
 		expect(itemPaths).toHaveLength(2);
 		expect(new Set(itemPaths.map((path) => path.toLowerCase())).size).toBe(2);
 		expect(
-			itemPaths.every((path) =>
-				/^simple\/(?:Water|water)-[a-f0-9]{16}\.json$/.test(path),
-			),
+			itemPaths.every((path) => /^simple\/(?:Water|water)-[a-f0-9]{16}\.json$/.test(path)),
 		).toBe(true);
 	});
 
@@ -213,7 +220,10 @@ describe("createEditorProjectPlanFx", () => {
 				{
 					id: "ITEM-WATER",
 					mime: "image/png" as const,
-					bytes: new Uint8Array([5, 6]),
+					bytes: new Uint8Array([
+						5,
+						6,
+					]),
 				},
 			],
 		};
@@ -225,7 +235,7 @@ describe("createEditorProjectPlanFx", () => {
 					payload,
 				}),
 			),
-		).rejects.toThrow("collides on a case-insensitive filesystem");
+		).rejects.toThrow("collide on a case-insensitive filesystem");
 	});
 
 	it("rejects resource IDs that cannot remain exact portable filenames", async () => {
@@ -240,9 +250,9 @@ describe("createEditorProjectPlanFx", () => {
 			resources: editorTestPayload.resources.map((resource) =>
 				resource.id === "hero"
 					? {
-						...resource,
-						id: "CON",
-					}
+							...resource,
+							id: "CON",
+						}
 					: resource,
 			),
 		};

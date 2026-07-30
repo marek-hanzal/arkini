@@ -60,12 +60,18 @@ export const editorTestPayload: PayloadSchema.Type = {
 		{
 			id: "hero",
 			mime: "image/png",
-			bytes: new Uint8Array([1, 2]),
+			bytes: new Uint8Array([
+				1,
+				2,
+			]),
 		},
 		{
 			id: "item-water",
 			mime: "image/png",
-			bytes: new Uint8Array([3, 4]),
+			bytes: new Uint8Array([
+				3,
+				4,
+			]),
 		},
 	],
 };

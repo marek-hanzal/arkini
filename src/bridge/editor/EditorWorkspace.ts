@@ -1,7 +1,5 @@
 import type { Effect } from "effect";
-import type {
-	EditorProjectManifest,
-} from "../../../electron/contract/editor/EditorProjectManifest";
+import type { EditorProjectManifest } from "../../../electron/contract/editor/EditorProjectManifest";
 import type { EditorProjectRecord } from "../../../electron/contract/editor/EditorProjectRecord";
 
 /** Renderer-side Effect adapter over the contained Electron editor workspace. */

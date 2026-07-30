@@ -82,7 +82,9 @@ describe("Arkpack signing schemas", () => {
 		expect(
 			ArkpackTrustedKeysSchema.safeParse({
 				format: 1,
-				keys: [key],
+				keys: [
+					key,
+				],
 			}).success,
 		).toBe(false);
 		expect(

@@ -197,7 +197,10 @@ const invokeArguments = new Map<string, ReadonlyArray<unknown>>([
 					editorManifestFile,
 					{
 						path: "game.json",
-						bytes: new Uint8Array([123, 125]),
+						bytes: new Uint8Array([
+							123,
+							125,
+						]),
 					},
 				],
 			},
@@ -493,7 +496,10 @@ describe("registerArkiniElectronIpcFx", () => {
 					editorManifestFile,
 					{
 						path: "game.json",
-						bytes: new Uint8Array([123, 125]),
+						bytes: new Uint8Array([
+							123,
+							125,
+						]),
 					},
 				],
 			};
@@ -502,7 +508,9 @@ describe("registerArkiniElectronIpcFx", () => {
 			).resolves.toBeUndefined();
 			await expect(
 				invoke(ArkiniElectronApi.channels.editorProjectList, trustedEvent),
-			).resolves.toEqual([editorManifest]);
+			).resolves.toEqual([
+				editorManifest,
+			]);
 			await expect(
 				invoke(ArkiniElectronApi.channels.editorProjectRead, trustedEvent, "editor-test"),
 			).resolves.toEqual(editorRecord);

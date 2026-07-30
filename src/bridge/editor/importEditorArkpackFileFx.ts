@@ -3,9 +3,7 @@ import { Effect } from "effect";
 import { ArkiniTrustedKeys } from "~/bridge/arkpack/ArkiniTrustedKeys";
 import { ArkpackLimits } from "~/bridge/arkpack/ArkpackLimits";
 import { readArkpackFx } from "~/bridge/arkpack/readArkpackFx";
-import {
-	createEditorProjectManifestFileFx,
-} from "~/bridge/editor/createEditorProjectManifestFileFx";
+import { createEditorProjectManifestFileFx } from "~/bridge/editor/createEditorProjectManifestFileFx";
 import { createEditorWorkspaceFx } from "~/bridge/editor/createEditorWorkspaceFx";
 import type { EditorProjectDescriptor } from "~/bridge/editor/EditorProjectDescriptor";
 import type { EditorWorkspace } from "~/bridge/editor/EditorWorkspace";

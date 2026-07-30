@@ -34,7 +34,8 @@ export const parseGameSourceFileFx = Effect.fn("parseGameSourceFileFx")(
 							severity: DiagnosticSeverityEnumSchema.enum.Error,
 							path: [],
 							source: path,
-							message: error instanceof Error ? error.message : "Invalid JSON syntax.",
+							message:
+								error instanceof Error ? error.message : "Invalid JSON syntax.",
 						},
 					],
 				};

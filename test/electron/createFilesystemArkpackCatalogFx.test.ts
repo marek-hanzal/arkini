@@ -94,7 +94,9 @@ describe("createFilesystemArkpackCatalogFx", () => {
 		});
 
 		await Effect.runPromise(catalog.removeFx(packageId));
-		await expect(access(join(root, "arkini", "game", "arkpacks", packageId))).rejects.toBeDefined();
+		await expect(
+			access(join(root, "arkini", "game", "arkpacks", packageId)),
+		).rejects.toBeDefined();
 	});
 
 	it("deduplicates exact package identities and rejects unsafe or incomplete records", async () => {

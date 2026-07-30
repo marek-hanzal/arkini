@@ -1,9 +1,7 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import {
-	createEditorProjectManifestFileFx,
-} from "~/bridge/editor/createEditorProjectManifestFileFx";
+import { createEditorProjectManifestFileFx } from "~/bridge/editor/createEditorProjectManifestFileFx";
 import type { EditorWorkspace } from "~/bridge/editor/EditorWorkspace";
 import { readEditorProjectFx } from "~/bridge/editor/readEditorProjectFx";
 import { createEditorProjectPlanFx } from "~/engine/editor/fx/createEditorProjectPlanFx";
@@ -16,16 +14,16 @@ const createWorkspace = (readFx: EditorWorkspace["readFx"]): EditorWorkspace => 
 	openDirectoryFx: () => Effect.void,
 });
 
-const createManifest = (
-	projectId: string,
-	title = "Editor test",
-	game: string | undefined = "1.0",
-) =>
+const createManifest = (projectId: string, title = "Editor test", game?: string) =>
 	Effect.runPromise(
 		createEditorProjectManifestFileFx({
 			projectId,
 			title,
-			...(game === undefined ? {} : { game }),
+			...(game === undefined
+				? {}
+				: {
+						game,
+					}),
 			nowMs: 123,
 		}),
 	);
@@ -38,14 +36,17 @@ describe("readEditorProjectFx", () => {
 				payload: editorTestPayload,
 			}),
 		);
-		const manifest = await createManifest(plan.projectId);
+		const manifest = await createManifest(plan.projectId, "Editor test", "1.0");
 		const project = await Effect.runPromise(
 			readEditorProjectFx({
 				projectId: plan.projectId,
 				workspace: createWorkspace(() =>
 					Effect.succeed({
 						projectId: plan.projectId,
-						files: [manifest.file, ...plan.files],
+						files: [
+							manifest.file,
+							...plan.files,
+						],
 					}),
 				),
 			}),
@@ -72,7 +73,9 @@ describe("readEditorProjectFx", () => {
 					workspace: createWorkspace(() =>
 						Effect.succeed({
 							projectId: "empty-project",
-							files: [manifest.file],
+							files: [
+								manifest.file,
+							],
 						}),
 					),
 				}),
@@ -100,7 +103,11 @@ describe("readEditorProjectFx", () => {
 								manifest.file,
 								{
 									path: "assets/hero.png",
-									bytes: new Uint8Array([1, 2, 3]),
+									bytes: new Uint8Array([
+										1,
+										2,
+										3,
+									]),
 								},
 							],
 						}),
@@ -137,7 +144,9 @@ describe("readEditorProjectFx", () => {
 					workspace: createWorkspace(() =>
 						Effect.succeed({
 							projectId: "different",
-							files: [manifest.file],
+							files: [
+								manifest.file,
+							],
 						}),
 					),
 				}),

@@ -7,7 +7,10 @@ export const useEditorResourceUrl = (resourceId: string | undefined) => {
 	const project = useEditorProject();
 	const resource = useMemo(
 		() => project.resources.find(({ id }) => id === resourceId),
-		[project.resources, resourceId],
+		[
+			project.resources,
+			resourceId,
+		],
 	);
 	const [url, setUrl] = useState<string>();
 	useEffect(() => {
@@ -16,14 +19,19 @@ export const useEditorResourceUrl = (resourceId: string | undefined) => {
 			return;
 		}
 		const nextUrl = URL.createObjectURL(
-			new Blob([
-				resource.bytes.slice().buffer,
-			], {
-				type: resource.mime,
-			}),
+			new Blob(
+				[
+					resource.bytes.slice().buffer,
+				],
+				{
+					type: resource.mime,
+				},
+			),
 		);
 		setUrl(nextUrl);
 		return () => URL.revokeObjectURL(nextUrl);
-	}, [resource]);
+	}, [
+		resource,
+	]);
 	return url;
 };

@@ -40,10 +40,7 @@ export const parseArkpackTrustFx = Effect.fn("parseArkpackTrustFx")(
 				.with(
 					{
 						type: "invalid",
-						reason: P.union(
-							"malformed-signature",
-							"invalid-signature",
-						),
+						reason: P.union("malformed-signature", "invalid-signature"),
 						keyId: P.optional(P.string),
 					},
 					(trust) =>

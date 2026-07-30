@@ -15,7 +15,9 @@ export const EditorResourceOverview = () => {
 				<h2 className="text-lg font-semibold">Hero image</h2>
 				<div className="mt-4 grid min-h-52 place-items-center overflow-hidden rounded-xl border border-line bg-canvas/70 p-4">
 					{heroResourceId === undefined ? (
-						<p className="text-sm text-muted">Project resources are not configured yet.</p>
+						<p className="text-sm text-muted">
+							Project resources are not configured yet.
+						</p>
 					) : heroUrl === undefined ? (
 						<p className="text-sm text-muted">Preparing hero preview…</p>
 					) : (

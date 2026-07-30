@@ -58,7 +58,9 @@ describe("tile identity and Info projections", () => {
 			itemId: owner.id,
 			title: "workshop",
 			categoryId: "resource",
-			sourceResourceId: "asset:workshop",
+			sourceResourceIds: [
+				"asset:workshop",
+			],
 		});
 		expect(
 			Effect.runSync(

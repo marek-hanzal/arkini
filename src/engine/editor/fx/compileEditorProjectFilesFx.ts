@@ -12,8 +12,7 @@ import { assertGameConfigValidFx } from "~/engine/validation/fx/assertGameConfig
 import { validateGameResourcesFx } from "~/engine/validation/rule/validateGameResourcesFx";
 import { DiagnosticSeverityEnumSchema } from "~/engine/validation/schema/DiagnosticSeverityEnumSchema";
 
-const readResourceId = (path: string) =>
-	path.slice(path.lastIndexOf("/") + 1, -".png".length);
+const readResourceId = (path: string) => path.slice(path.lastIndexOf("/") + 1, -".png".length);
 
 /** Recompiles one editor project snapshot through the canonical source and resource validators. */
 export const compileEditorProjectFilesFx = Effect.fn("compileEditorProjectFilesFx")(function* (
@@ -41,7 +40,13 @@ export const compileEditorProjectFilesFx = Effect.fn("compileEditorProjectFilesF
 			}),
 	);
 	const compilation = yield* compileGameSourcesFx(
-		parsed.flatMap((result) => (result.source === undefined ? [] : [result.source])),
+		parsed.flatMap((result) =>
+			result.source === undefined
+				? []
+				: [
+						result.source,
+					],
+		),
 	);
 	const combined = {
 		...compilation,

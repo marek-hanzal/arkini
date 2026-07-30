@@ -15,10 +15,7 @@ export namespace createFilesystemArkpackCatalogFx {
 
 /** Creates one narrow Effect-native capability over the Electron Arkpack namespace. */
 export const createFilesystemArkpackCatalogFx = Effect.fn("createFilesystemArkpackCatalogFx")(
-	function* ({
-		root,
-		fileSystem: providedFileSystem,
-	}: createFilesystemArkpackCatalogFx.Props) {
+	function* ({ root, fileSystem: providedFileSystem }: createFilesystemArkpackCatalogFx.Props) {
 		const fileSystem = providedFileSystem ?? (yield* FileSystem.FileSystem);
 		// Publish and removal must retain admission order even when IPC callers overlap.
 		const operations = yield* Semaphore.make(1);

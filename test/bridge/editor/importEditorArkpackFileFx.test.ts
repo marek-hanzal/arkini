@@ -46,11 +46,21 @@ describe("importEditorArkpackFileFx", () => {
 			expect.objectContaining({
 				projectId: "editor-test",
 				files: expect.arrayContaining([
-					expect.objectContaining({ path: "editor.json" }),
-					expect.objectContaining({ path: "game.json" }),
-					expect.objectContaining({ path: "simple/water.json" }),
-					expect.objectContaining({ path: "resources/hero.png" }),
-					expect.objectContaining({ path: "assets/item-water.png" }),
+					expect.objectContaining({
+						path: "editor.json",
+					}),
+					expect.objectContaining({
+						path: "game.json",
+					}),
+					expect.objectContaining({
+						path: "simple/water.json",
+					}),
+					expect.objectContaining({
+						path: "resources/hero.png",
+					}),
+					expect.objectContaining({
+						path: "assets/item-water.png",
+					}),
 				]),
 			}),
 		);

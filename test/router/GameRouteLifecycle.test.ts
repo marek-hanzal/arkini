@@ -216,10 +216,7 @@ describe("game route lifecycle", () => {
 		vi.useFakeTimers();
 		const dispose = vi.fn();
 		const game = createGame(Effect.sync(dispose));
-		const { rendererRuntime, router } = await createHarness(
-			"/game/package-route/board",
-			game,
-		);
+		const { rendererRuntime, router } = await createHarness("/game/package-route/board", game);
 		await router.load();
 
 		const navigation = router.navigate({

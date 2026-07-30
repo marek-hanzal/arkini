@@ -31,7 +31,9 @@ export const EditorBoard = () => {
 							</dd>
 						</div>
 						<div className="rounded-xl bg-surface-raised p-3">
-							<dt className="text-xs uppercase tracking-wider text-subtle">Starting tiles</dt>
+							<dt className="text-xs uppercase tracking-wider text-subtle">
+								Starting tiles
+							</dt>
 							<dd className="mt-1 font-semibold">
 								{config.start.board.length +
 									config.start.inventory.length +

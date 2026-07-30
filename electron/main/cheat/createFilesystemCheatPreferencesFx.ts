@@ -15,10 +15,7 @@ export namespace createFilesystemCheatPreferencesFx {
 
 /** Creates one narrow Effect-native capability over application-wide cheat preferences. */
 export const createFilesystemCheatPreferencesFx = Effect.fn("createFilesystemCheatPreferencesFx")(
-	function* ({
-		root,
-		fileSystem: providedFileSystem,
-	}: createFilesystemCheatPreferencesFx.Props) {
+	function* ({ root, fileSystem: providedFileSystem }: createFilesystemCheatPreferencesFx.Props) {
 		const fileSystem = providedFileSystem ?? (yield* FileSystem.FileSystem);
 		const currentPath = join(root, "cheats.available");
 		const writeSemaphore = yield* Semaphore.make(1);

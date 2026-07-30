@@ -88,7 +88,7 @@ export const readEditorProjectFx = Effect.fn("readEditorProjectFx")(function* ({
 			}
 			return {
 				path: portablePath,
-				bytes: yield* fileSystem.readFile(canonicalPath),
+				bytes: Uint8Array.from(yield* fileSystem.readFile(canonicalPath)),
 			};
 		}),
 	);

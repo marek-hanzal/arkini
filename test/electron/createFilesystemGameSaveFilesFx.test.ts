@@ -76,7 +76,17 @@ describe("createFilesystemGameSaveFilesFx", () => {
 			]),
 		);
 		await expect(
-			access(join(root, "arkini", "game", "saves", "arkini", first.contentHash, "pending.arksave")),
+			access(
+				join(
+					root,
+					"arkini",
+					"game",
+					"saves",
+					"arkini",
+					first.contentHash,
+					"pending.arksave",
+				),
+			),
 		).rejects.toBeDefined();
 		await Effect.runPromise(repository.clearFx(first));
 		expect(await Effect.runPromise(repository.readFx(first))).toBeNull();
@@ -175,7 +185,17 @@ describe("createFilesystemGameSaveFilesFx", () => {
 			]),
 		);
 		await expect(
-			access(join(root, "arkini", "game", "saves", "arkini", first.contentHash, "pending.arksave")),
+			access(
+				join(
+					root,
+					"arkini",
+					"game",
+					"saves",
+					"arkini",
+					first.contentHash,
+					"pending.arksave",
+				),
+			),
 		).rejects.toBeDefined();
 	});
 
@@ -184,7 +204,14 @@ describe("createFilesystemGameSaveFilesFx", () => {
 		const renameEntered = Effect.runSync(Deferred.make<void>());
 		const releaseRename = Effect.runSync(Deferred.make<void>());
 		const clearEntered = Effect.runSync(Deferred.make<void>());
-		const saveDirectory = join(root, "arkini", "game", "saves", first.packageId, first.contentHash);
+		const saveDirectory = join(
+			root,
+			"arkini",
+			"game",
+			"saves",
+			first.packageId,
+			first.contentHash,
+		);
 		const gatedFileSystem: FileSystem.FileSystem = {
 			...fileSystem,
 			rename: (oldPath, newPath) =>
@@ -263,7 +290,17 @@ describe("createFilesystemGameSaveFilesFx", () => {
 			]),
 		);
 		await expect(
-			access(join(root, "arkini", "game", "saves", "arkini", first.contentHash, "pending.arksave")),
+			access(
+				join(
+					root,
+					"arkini",
+					"game",
+					"saves",
+					"arkini",
+					first.contentHash,
+					"pending.arksave",
+				),
+			),
 		).rejects.toBeDefined();
 	});
 
@@ -328,7 +365,15 @@ describe("createFilesystemGameSaveFilesFx", () => {
 				]),
 			),
 		);
-		const path = join(root, "arkini", "game", "saves", "arkini", first.contentHash, "current.arksave");
+		const path = join(
+			root,
+			"arkini",
+			"game",
+			"saves",
+			"arkini",
+			first.contentHash,
+			"current.arksave",
+		);
 		expect(new Uint8Array(await readFile(path))).toEqual(
 			new Uint8Array([
 				9,

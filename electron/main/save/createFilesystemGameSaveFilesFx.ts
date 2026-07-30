@@ -14,10 +14,7 @@ export namespace createFilesystemGameSaveFilesFx {
 
 /** Creates one narrow Effect-native capability over the Electron save namespace. */
 export const createFilesystemGameSaveFilesFx = Effect.fn("createFilesystemGameSaveFilesFx")(
-	function* ({
-		root,
-		fileSystem: providedFileSystem,
-	}: createFilesystemGameSaveFilesFx.Props) {
+	function* ({ root, fileSystem: providedFileSystem }: createFilesystemGameSaveFilesFx.Props) {
 		const fileSystem = providedFileSystem ?? (yield* FileSystem.FileSystem);
 		// IPC callers cannot be required to share the renderer's autosave mutex.
 		// This repository therefore owns ordering around each shared pending/current namespace.

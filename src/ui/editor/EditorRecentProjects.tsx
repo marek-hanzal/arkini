@@ -36,14 +36,18 @@ export const EditorRecentProjects = ({ blocked, projects }: EditorRecentProjects
 					<ButtonLink
 						key={project.projectId}
 						to="/editor/$projectId/editor"
-						params={{ projectId: project.projectId }}
+						params={{
+							projectId: project.projectId,
+						}}
 						aria-disabled={blocked}
 						cursorIntent={blocked ? "progress" : undefined}
 						className="ak-list-row min-h-0 w-full justify-start gap-3 rounded-xl px-4 py-3 text-left"
 					>
 						<span className="icon-[lucide--folder-kanban] size-5 shrink-0 text-accent" />
 						<span className="min-w-0 flex-1">
-							<span className="block truncate text-sm font-semibold">{project.title}</span>
+							<span className="block truncate text-sm font-semibold">
+								{project.title}
+							</span>
 							<span className="mt-1 block truncate text-xs text-subtle">
 								{project.projectId}
 								{project.game === undefined ? "" : ` · ${project.game}`}

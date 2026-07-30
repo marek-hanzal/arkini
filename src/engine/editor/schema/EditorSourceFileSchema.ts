@@ -11,15 +11,17 @@ export const EditorSourceFileSchema = z
 			.max(512)
 			.refine(
 				(value) =>
-					value.split("/").every(
-						(segment) =>
-							portablePathSegmentPattern.test(segment) &&
-							!segment.endsWith(".") &&
-							!windowsDeviceNamePattern.test(segment),
-					) &&
-					/(?:^|\/).+\.(?:json|png)$/.test(value),
+					value
+						.split("/")
+						.every(
+							(segment) =>
+								portablePathSegmentPattern.test(segment) &&
+								!segment.endsWith(".") &&
+								!windowsDeviceNamePattern.test(segment),
+						) && /(?:^|\/).+\.(?:json|png)$/.test(value),
 				{
-					message: "Editor source path must be a portable project-relative JSON or PNG path.",
+					message:
+						"Editor source path must be a portable project-relative JSON or PNG path.",
 				},
 			),
 		bytes: z.custom<Uint8Array>((value) => value instanceof Uint8Array),

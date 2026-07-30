@@ -4,7 +4,10 @@ import { importEditorArkpackFileFx } from "~/bridge/editor/importEditorArkpackFi
 
 /** Runs one editor arkpack import without letting a later selection cancel an admitted write. */
 export const importEditorArkpackFileAtom = Atom.fn(
-	(file: File) => importEditorArkpackFileFx({ file }),
+	(file: File) =>
+		importEditorArkpackFileFx({
+			file,
+		}),
 	{
 		concurrent: true,
 	},

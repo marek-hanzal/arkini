@@ -1,5 +1,5 @@
 import { FileSystem } from "effect";
-import { Effect, Option } from "effect";
+import { Effect } from "effect";
 
 import type { EditorProjectManifest } from "../../contract/editor/EditorProjectManifest";
 import { ElectronMainError } from "../ElectronMainError";
@@ -25,14 +25,10 @@ export const listEditorProjectsFx = Effect.fn("listEditorProjectsFx")(
 					root,
 					fileSystem,
 					projectId,
-				}).pipe(
-					Effect.map(Option.fromNullable),
-					Effect.catch(() => Effect.succeed(Option.none())),
-				),
+				}).pipe(Effect.catch(() => Effect.succeed(null))),
 			);
 			return candidates
-				.filter(Option.isSome)
-				.map(({ value }) => value)
+				.filter((manifest): manifest is EditorProjectManifest => manifest !== null)
 				.sort(
 					(left, right) =>
 						right.updatedAtMs - left.updatedAtMs ||

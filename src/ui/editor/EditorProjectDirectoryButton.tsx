@@ -21,7 +21,9 @@ export const EditorProjectDirectoryButton = () => {
 			</Button>
 			{directory.error === undefined ? null : (
 				<p className="max-w-md break-words text-right text-xs text-danger">
-					{directory.error instanceof Error ? directory.error.message : String(directory.error)}
+					{directory.error instanceof Error
+						? directory.error.message
+						: String(directory.error)}
 				</p>
 			)}
 		</div>

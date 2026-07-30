@@ -50,8 +50,10 @@ export const EditorBuild = () => {
 								key={`${diagnostic.code}-${diagnostic.source ?? "project"}-${index}`}
 								className="rounded-lg bg-surface-raised p-3 text-sm text-muted"
 							>
-								<span className="font-semibold text-foreground">{diagnostic.code}</span>:
-								{diagnostic.message}
+								<span className="font-semibold text-foreground">
+									{diagnostic.code}
+								</span>
+								:{diagnostic.message}
 							</li>
 						))}
 					</ul>
@@ -60,7 +62,8 @@ export const EditorBuild = () => {
 			<article className="rounded-2xl border border-line bg-surface/85 p-5">
 				<h2 className="text-lg font-semibold">Signing and package output</h2>
 				<p className="mt-2 max-w-3xl text-sm leading-6 text-muted">
-					Arkpack output and optional signing-key input are not enabled in this editor foundation.
+					Arkpack output and optional signing-key input are not enabled in this editor
+					foundation.
 				</p>
 				<div className="mt-4 grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto]">
 					<input

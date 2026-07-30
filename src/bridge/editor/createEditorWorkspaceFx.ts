@@ -18,8 +18,8 @@ export const createEditorWorkspaceFx = Effect.fn("createEditorWorkspaceFx")(
 		const createFx: EditorWorkspace["createFx"] = Effect.fn("EditorWorkspace.createFx")(
 			(record) => invokeEditorTransportFx("create", () => api.createProject(record)),
 		);
-		const readFx: EditorWorkspace["readFx"] = Effect.fn("EditorWorkspace.readFx")(
-			(projectId) => invokeEditorTransportFx("read", () => api.readProject(projectId)),
+		const readFx: EditorWorkspace["readFx"] = Effect.fn("EditorWorkspace.readFx")((projectId) =>
+			invokeEditorTransportFx("read", () => api.readProject(projectId)),
 		);
 		const openDirectoryFx: EditorWorkspace["openDirectoryFx"] = Effect.fn(
 			"EditorWorkspace.openDirectoryFx",

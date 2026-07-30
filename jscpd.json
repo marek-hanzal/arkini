@@ -11,6 +11,7 @@
 		"**/*.test.ts",
 		"**/*.test.tsx",
 		"**/*.d.ts",
+		"**/_route.ts",
 		"**/node_modules/**",
 		"**/dist/**"
 	],

@@ -14,11 +14,14 @@ export const EditorProjectManifestSchema = z
 	.strict()
 	.refine(({ createdAtMs, updatedAtMs }) => updatedAtMs >= createdAtMs, {
 		message: "updatedAtMs must not precede createdAtMs.",
-		path: ["updatedAtMs"],
+		path: [
+			"updatedAtMs",
+		],
 	})
 	.meta({
 		id: "EditorProjectManifestSchema",
-		description: "The canonical editor.json manifest used to discover and open editor projects.",
+		description:
+			"The canonical editor.json manifest used to discover and open editor projects.",
 	});
 
 export type EditorProjectManifest = z.infer<typeof EditorProjectManifestSchema>;

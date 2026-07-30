@@ -1,7 +1,5 @@
 import { Effect } from "effect";
-import {
-	EditorProjectManifestSchema,
-} from "../../../electron/contract/editor/EditorProjectManifest";
+import { EditorProjectManifestSchema } from "../../../electron/contract/editor/EditorProjectManifest";
 import { EditorProjectRecordSchema } from "../../../electron/contract/editor/EditorProjectRecord";
 
 import type { EditorProject } from "~/bridge/editor/EditorProject";
@@ -83,16 +81,21 @@ export const readEditorProjectFx = Effect.fn("readEditorProjectFx")(function* ({
 	const descriptor = {
 		projectId: manifest.projectId,
 		title: manifest.title,
-		...(manifest.game === undefined ? {} : { game: manifest.game }),
+		...(manifest.game === undefined
+			? {}
+			: {
+					game: manifest.game,
+				}),
 		createdAtMs: manifest.createdAtMs,
 		updatedAtMs: manifest.updatedAtMs,
 	} as const;
 	if (!sourceRecords.some(({ path }) => path === "game.json")) {
-		return {
+		const project: EditorProject = {
 			...descriptor,
 			resources: [],
 			diagnostics: [],
-		} satisfies EditorProject;
+		};
+		return project;
 	}
 	const files = yield* Effect.try({
 		try: () => EditorSourceFileSchema.array().parse(sourceRecords),
@@ -104,10 +107,11 @@ export const readEditorProjectFx = Effect.fn("readEditorProjectFx")(function* ({
 			}),
 	});
 	const compilation = yield* compileEditorProjectFilesFx(files);
-	return {
+	const project: EditorProject = {
 		...descriptor,
 		config: compilation.payload.config,
 		resources: compilation.payload.resources,
 		diagnostics: compilation.diagnostics,
-	} satisfies EditorProject;
+	};
+	return project;
 });

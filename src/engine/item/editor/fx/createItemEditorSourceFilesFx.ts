@@ -14,10 +14,7 @@ const readStableIdHash = (value: string) => {
 	return hash.toString(16).padStart(16, "0");
 };
 
-const createReadableStem = (
-	id: string,
-	type: GameConfigSchema.Type["items"][string]["type"],
-) => {
+const createReadableStem = (id: string, type: GameConfigSchema.Type["items"][string]["type"]) => {
 	let readable = id.startsWith("item:") ? id.slice("item:".length) : id;
 	if (readable.startsWith(`${type}:`)) readable = readable.slice(type.length + 1);
 	if (type === "blueprint" && readable.startsWith("blueprint-")) {

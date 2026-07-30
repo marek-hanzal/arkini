@@ -14,7 +14,9 @@ export const EditorItemList = () => {
 				: Object.entries(config.items).sort(([, left], [, right]) =>
 						left.title.localeCompare(right.title),
 					),
-		[config],
+		[
+			config,
+		],
 	);
 	return (
 		<section

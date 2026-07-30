@@ -2,7 +2,14 @@ import { useEditorResourceUrl } from "~/ui/resource/editor/useEditorResourceUrl"
 
 export namespace EditorItemThumbnail {
 	export interface Props {
-		readonly resourceIds: readonly [string] | readonly [string, string];
+		readonly resourceIds:
+			| readonly [
+					string,
+			  ]
+			| readonly [
+					string,
+					string,
+			  ];
 	}
 }
 

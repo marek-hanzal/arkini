@@ -63,6 +63,12 @@ export const MainMenu = () => {
 				</PrimaryButton>
 			)}
 			<ButtonLink
+				to="/editor/welcome"
+				className="rounded-xl"
+			>
+				Editor
+			</ButtonLink>
+			<ButtonLink
 				to="/arkpacks"
 				className="rounded-xl"
 			>

@@ -598,10 +598,14 @@ select {
 ::view-transition-group(arkini-panel-settings),
 ::view-transition-group(arkini-panel-about),
 ::view-transition-group(arkini-panel-arkpacks),
+::view-transition-group(arkini-panel-editor-welcome),
 ::view-transition-group(arkini-action-panel),
 ::view-transition-group(arkini-action-progress),
 ::view-transition-group(arkini-startup-content),
 ::view-transition-group(arkini-game-board),
+::view-transition-group(arkini-editor-shell),
+::view-transition-group(arkini-editor-navigation),
+::view-transition-group(arkini-editor-content),
 ::view-transition-group(arkini-game-menu-backdrop),
 ::view-transition-group(arkini-game-menu-dialog) {
 	animation-duration: 520ms;
@@ -612,7 +616,8 @@ select {
 	z-index: 0;
 }
 
-::view-transition-group(arkini-game-board) {
+::view-transition-group(arkini-game-board),
+::view-transition-group(arkini-editor-shell) {
 	z-index: 10;
 }
 
@@ -630,11 +635,20 @@ select {
 ::view-transition-group(arkini-panel-settings),
 ::view-transition-group(arkini-panel-about),
 ::view-transition-group(arkini-panel-arkpacks),
+::view-transition-group(arkini-panel-editor-welcome),
 ::view-transition-group(arkini-action-panel),
 ::view-transition-group(arkini-action-progress),
 ::view-transition-group(arkini-startup-content) {
 	z-index: 40;
 	overflow: visible;
+}
+
+::view-transition-group(arkini-editor-navigation) {
+	z-index: 30;
+}
+
+::view-transition-group(arkini-editor-content) {
+	z-index: 20;
 }
 
 ::view-transition-group(arkini-game-menu-backdrop) {
@@ -660,6 +674,8 @@ select {
 ::view-transition-new(arkini-panel-about),
 ::view-transition-old(arkini-panel-arkpacks),
 ::view-transition-new(arkini-panel-arkpacks),
+::view-transition-old(arkini-panel-editor-welcome),
+::view-transition-new(arkini-panel-editor-welcome),
 ::view-transition-old(arkini-action-panel),
 ::view-transition-new(arkini-action-panel),
 ::view-transition-old(arkini-action-progress),
@@ -668,6 +684,12 @@ select {
 ::view-transition-new(arkini-startup-content),
 ::view-transition-old(arkini-game-board),
 ::view-transition-new(arkini-game-board),
+::view-transition-old(arkini-editor-shell),
+::view-transition-new(arkini-editor-shell),
+::view-transition-old(arkini-editor-navigation),
+::view-transition-new(arkini-editor-navigation),
+::view-transition-old(arkini-editor-content),
+::view-transition-new(arkini-editor-content),
 ::view-transition-old(arkini-game-menu-backdrop),
 ::view-transition-new(arkini-game-menu-backdrop),
 ::view-transition-old(arkini-game-menu-dialog),
@@ -707,6 +729,7 @@ select {
 ::view-transition-old(arkini-panel-settings),
 ::view-transition-old(arkini-panel-about),
 ::view-transition-old(arkini-panel-arkpacks),
+::view-transition-old(arkini-panel-editor-welcome),
 ::view-transition-old(arkini-action-panel) {
 	animation: arkini-vt-surface-out 180ms cubic-bezier(0.4, 0, 1, 1) both;
 }
@@ -715,6 +738,7 @@ select {
 ::view-transition-new(arkini-panel-settings),
 ::view-transition-new(arkini-panel-about),
 ::view-transition-new(arkini-panel-arkpacks),
+::view-transition-new(arkini-panel-editor-welcome),
 ::view-transition-new(arkini-action-panel) {
 	animation: arkini-vt-surface-in 320ms 190ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
@@ -743,6 +767,36 @@ select {
 
 ::view-transition-new(arkini-game-board) {
 	animation: arkini-vt-board-in 360ms 190ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+::view-transition-old(arkini-editor-shell) {
+	animation: arkini-vt-board-out 240ms cubic-bezier(0.4, 0, 1, 1) both;
+}
+
+::view-transition-new(arkini-editor-shell) {
+	animation: arkini-vt-board-in 360ms 190ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+::view-transition-old(arkini-editor-navigation),
+::view-transition-old(arkini-editor-content) {
+	animation: arkini-vt-fade-out 150ms cubic-bezier(0.4, 0, 1, 1) both;
+}
+
+::view-transition-new(arkini-editor-navigation),
+::view-transition-new(arkini-editor-content) {
+	animation: arkini-vt-fade-in 260ms 150ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+:root:active-view-transition-type(editor-to-editor)::view-transition-old(arkini-editor-shell),
+:root:active-view-transition-type(editor-to-editor)::view-transition-old(arkini-editor-navigation) {
+	animation: none;
+	opacity: 1;
+}
+
+:root:active-view-transition-type(editor-to-editor)::view-transition-new(arkini-editor-shell),
+:root:active-view-transition-type(editor-to-editor)::view-transition-new(arkini-editor-navigation) {
+	animation: none;
+	opacity: 0;
 }
 
 :root:active-view-transition-type(hero-to-board)::view-transition-old(arkini-launcher-backdrop) {

@@ -39,7 +39,7 @@ src/@routes → src/page / src/ui / src/bridge → src/engine
 → the only renderer, route lifecycle, presentation, game bridge, and engine
 ```
 
-Development Electron loads the Vite HTTP origin; module replacement remains development tooling and never an application lifecycle boundary. Packaged Electron registers `arkini` as a privileged standard secure scheme and serves the same renderer from `arkini://app/*`. TanStack Router uses standard history routing in both environments: `/` owns the one-session startup splash, `/main-menu` the semantic launcher menu, `/arkpacks` the shared package selector, `/settings` the application theme control, `/about` credits, `/game/$packageId` the non-visual live resource boundary, and `/game/$packageId/board` the explicit gameplay page. Electron does not interpret routes beyond static resource serving and SPA fallback.
+Development Electron loads the Vite HTTP origin; module replacement remains development tooling and never an application lifecycle boundary. Packaged Electron registers `arkini` as a privileged standard secure scheme and serves the same renderer from `arkini://app/*`. TanStack Router uses standard history routing in both environments: `/` owns the one-session startup splash, `/main-menu` the semantic launcher menu, `/arkpacks` the shared package selector, `/settings` the application theme control, `/about` credits, `/editor/welcome` editor project import, `/editor/$projectId/*` the integrated editor tools, `/game/$packageId` the non-visual live resource boundary, and `/game/$packageId/board` the explicit gameplay page. Electron does not interpret routes beyond static resource serving and SPA fallback.
 
 ### Renderer startup and launcher ownership
 
@@ -61,7 +61,7 @@ Packaged protocol responses set the production Content Security Policy. Developm
 
 Every production desktop build explicitly composes `packOfficialGameFx → buildDesktopOutputFx`; the generated official Arkpack is therefore available before Vite imports it, even in a fresh checkout. All disposable repository-local outputs are rooted under `.out`, partitioned into desktop build/stage/release and tool-cache ownership; generated game artifacts deliberately remain under `game/`. Required local build inputs such as signing keys remain config under `.arkini/` and survive deleting `.out/`. Local packaged preview composes clean → build once → stage → `electron-builder --dir` → launch the exact `.out/desktop/release/mac-arm64/Arkini.app`. Release delivery composes clean → build once → stage → invoke `electron-builder` once for DMG/ZIP → stream SHA-256 values once → verify artifact and unpacked-app structure. The standalone verify command deliberately re-streams artifacts because it validates downloads or later changes; the combined package flow never rehashes files it just hashed. CI runs format, type, and source-validation gates before this same package command, then runs Dependency Cruiser and permanent tests against the generated package inputs. Fresh checkouts never require stale ignored output, and no top-level build, preview, or package operation packs the official game more than once.
 
-Main/preload do not own game state, package semantics, save codec semantics, or Tick. Renderer domains do not import Electron or Node platform APIs. The shared `electron/contract/ArkiniElectronApi.ts` contract exposes only concrete Arkpack bytes/metadata, opaque save bytes, theme/accent/window preferences, confirmed window-mode events, and controlled-close signals. Physical paths are derived exclusively in Electron main; the renderer cannot request arbitrary filesystem access.
+Main/preload do not own game state, package semantics, save codec semantics, or Tick. Renderer domains do not import Electron or Node platform APIs. The shared `electron/contract/ArkiniElectronApi.ts` contract exposes only concrete Arkpack bytes/metadata, contained editor-project records and directory-open commands, opaque save bytes, theme/accent/window preferences, confirmed window-mode events, and controlled-close signals. Physical paths are derived exclusively in Electron main; the renderer cannot request arbitrary filesystem access.
 
 ## 1. Core model
 
@@ -207,25 +207,33 @@ Bootstrap save recovery is necessarily top-level because the failing `/game/$pac
 
 ### 4.2 Desktop persistence
 
-Electron `userData` owns separate Arkpack, save, and appearance namespaces:
+Electron `userData` has one Arkini root with explicit game and editor namespaces:
 
 ```text
-<userData>/arkini/arkpacks/<sha256>/
-  package.arkpack
-  descriptor.json
-
-<userData>/arkini/saves/<packageId>/<contentHash>/
-  current.arksave
-  pending.arksave
-
-<userData>/arkini/preferences/
-  appearance.theme
-  appearance.pending
-  appearance.accent
-  appearance-accent.pending
+<userData>/arkini/
+  game/
+    arkpacks/<sha256>/
+      package.arkpack
+      descriptor.json
+    saves/<packageId>/<contentHash>/
+      current.arksave
+      pending.arksave
+    preferences/
+      appearance.theme
+      appearance.pending
+      appearance.accent
+      appearance-accent.pending
+    logs/
+  editor/<projectId>/
+    game.json
+    <item-type>/*.json
+    assets/*.png
+    resources/*.png
 ```
 
 The original validated Arkpack binary is canonical. Imported catalog listing reads only derived `descriptor.json` files. Official Arkini listing reads only its generated tracked metadata sidecar, which is emitted from the same validated pack operation as the bundled binary. Exact read loads one binary and the renderer revalidates its format, identity, config, resources, and SHA-256 before use; official exact load additionally rejects a binary whose validated descriptor differs from the sidecar. Install writes a temporary directory and atomically renames it into place. Package removal never removes saves.
+
+The editor is another renderer surface around the same engine/compiler contracts, not a parallel application. Import validates the compressed Arkpack through the normal trust, payload, semantic, and resource boundaries, then projects the completed config into deterministic source fragments. Game-wide fields remain in `game.json`; item domains own their editor source projection and future forms and are grouped by item type because an Arkpack does not preserve authoring-era provenance; shell resources remain separate from item assets. Electron owns only contained, atomic filesystem publication below the editor root and exposes typed create/read/open-directory capabilities. Renderer UI never receives arbitrary filesystem authority.
 
 The engine's existing `StateSchema` is the complete canonical save state; creating a separate alias schema would add a second name without a second contract. `fromRuntimeFx` produces a detached state, and session construction hydrates a fresh runtime from validated state. The save codec wraps that state in exactly:
 

@@ -126,6 +126,42 @@ describe("createArkiniRouterFx", () => {
 				],
 			],
 			[
+				"/main-menu",
+				"/editor/welcome",
+				[
+					"arkini-route",
+					"hero-to-hero",
+					"main-menu-to-editor-welcome",
+				],
+			],
+			[
+				"/editor/welcome",
+				"/editor/arkini/editor",
+				[
+					"arkini-route",
+					"hero-to-board",
+					"editor-welcome-to-editor",
+				],
+			],
+			[
+				"/editor/arkini/editor",
+				"/editor/arkini/project",
+				[
+					"arkini-route",
+					"board-to-board",
+					"editor-to-editor",
+				],
+			],
+			[
+				"/editor/arkini/project",
+				"/main-menu",
+				[
+					"arkini-route",
+					"board-to-hero",
+					"editor-to-main-menu",
+				],
+			],
+			[
 				"/game/built-in/board",
 				"/",
 				[
@@ -254,6 +290,16 @@ describe("createArkiniRouterFx", () => {
 
 		expect(resolveTypes(undefined, "/main-menu")).toBe(false);
 		expect(resolveTypes("/main-menu", "/main-menu")).toBe(false);
+		expect(resolveTypes("/main-menu", "/editor")).toEqual([
+			"arkini-route",
+			"hero-to-hero",
+			"main-menu-to-editor-welcome",
+		]);
+		expect(resolveTypes("/main-menu", "/editor/welcome/")).toEqual([
+			"arkini-route",
+			"hero-to-hero",
+			"main-menu-to-editor-welcome",
+		]);
 		for (const [from, to, types] of pairs) {
 			expect(resolveTypes(from, to)).toEqual(types);
 		}

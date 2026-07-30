@@ -1,10 +1,16 @@
 import { Effect } from "effect";
 
-export type MainPageTransitionPage = "about" | "arkpacks" | "main-menu" | "settings";
+export type MainPageTransitionPage =
+	| "about"
+	| "arkpacks"
+	| "editor-welcome"
+	| "main-menu"
+	| "settings";
 
 const names = {
 	about: "arkini-panel-about",
 	arkpacks: "arkini-panel-arkpacks",
+	"editor-welcome": "arkini-panel-editor-welcome",
 	"main-menu": "arkini-panel-main-menu",
 	settings: "arkini-panel-settings",
 } as const satisfies Record<MainPageTransitionPage, string>;

@@ -46,6 +46,17 @@ export const Route = createFileRoute("/game/$packageId/action/leave")({
 			)
 			.with(
 				{
+					destination: "editor",
+				},
+				() => {
+					throw redirect({
+						to: "/editor/welcome",
+						replace: true,
+					});
+				},
+			)
+			.with(
+				{
 					destination: "main-menu",
 				},
 				() => {

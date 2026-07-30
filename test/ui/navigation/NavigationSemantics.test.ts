@@ -33,6 +33,12 @@ describe("navigation semantic effects", () => {
 		expect(Effect.runSync(mainPagePanelViewTransitionNameFx(page))).toBe(panel);
 	});
 
+	it("assigns the editor welcome screen its own panel identity", () => {
+		expect(Effect.runSync(mainPagePanelViewTransitionNameFx("editor-welcome"))).toBe(
+			"arkini-panel-editor-welcome",
+		);
+	});
+
 	it("defaults unknown launcher paths to the main menu leave destination", () => {
 		expect(Effect.runSync(resolveLauncherLeaveDestinationFx("/unknown"))).toEqual({
 			destination: "main-menu",

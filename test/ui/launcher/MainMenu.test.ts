@@ -186,6 +186,10 @@ describe("MainMenu", () => {
 				(control) => !control.className.includes("ak-list-row"),
 			),
 		).toBe(true);
+		const editor = Array.from(container.querySelectorAll("a")).find(
+			(link) => link.textContent === "Editor",
+		);
+		expect(editor?.getAttribute("href")).toBe("/editor/welcome");
 		expect(container.textContent).toContain("Arkpacks");
 		expect(container.textContent).toContain("Settings");
 		expect(container.textContent).toContain("About");

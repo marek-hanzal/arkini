@@ -47,6 +47,14 @@ describe("View Transition styles", () => {
 		);
 	});
 
+	it("keeps editor navigation stable while editor content changes", () => {
+		expect(styles).toContain("::view-transition-old(arkini-editor-shell)");
+		expect(styles).toContain(
+			":root:active-view-transition-type(editor-to-editor)::view-transition-old(arkini-editor-navigation)",
+		);
+		expect(styles).toContain("::view-transition-new(arkini-editor-content)");
+	});
+
 	it("keeps page cards, action progress, and GameMenu on unrelated surfaces", () => {
 		expect(styles).toContain("::view-transition-old(arkini-panel-main-menu)");
 		expect(styles).toContain("::view-transition-new(arkini-panel-arkpacks)");

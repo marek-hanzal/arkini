@@ -83,7 +83,7 @@ export const readEditorProjectFx = Effect.fn("readEditorProjectFx")(function* ({
 	const descriptor = {
 		projectId: manifest.projectId,
 		title: manifest.title,
-		...(manifest.gameVersion === undefined ? {} : { gameVersion: manifest.gameVersion }),
+		...(manifest.game === undefined ? {} : { game: manifest.game }),
 		createdAtMs: manifest.createdAtMs,
 		updatedAtMs: manifest.updatedAtMs,
 	} as const;

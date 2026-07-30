@@ -7,8 +7,7 @@ const descriptor = {
 	contentHash: "a".repeat(64),
 	gameId: "game:test",
 	title: "Test",
-	configVersion: "1.0" as const,
-	compressedSize: 3,
+	game: "1.0" as const,
 	trust: {
 		type: "external",
 		reason: "unsigned",

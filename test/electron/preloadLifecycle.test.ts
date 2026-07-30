@@ -100,7 +100,7 @@ describe("Electron preload lifecycle", () => {
 	it("routes editor project discovery through its manifest-list channel", async () => {
 		const projects = [
 			{
-				formatVersion: 1 as const,
+				format: 1 as const,
 				projectId: "editor-test",
 				title: "Editor test",
 				createdAtMs: 100,

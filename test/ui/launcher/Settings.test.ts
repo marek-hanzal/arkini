@@ -141,8 +141,7 @@ const renderSettings = async (
 				contentHash: "content:settings",
 				gameId: "game:settings",
 				title: "Settings game",
-				configVersion: "1.0",
-				compressedSize: 0,
+				game: "1.0",
 				trust: {
 					type: "external",
 					reason: "unsigned",

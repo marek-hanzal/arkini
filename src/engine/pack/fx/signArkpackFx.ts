@@ -4,7 +4,6 @@ import { ArkpackCryptoError } from "~/engine/pack/error/ArkpackCryptoError";
 import { ArkpackInputError } from "~/engine/pack/error/ArkpackInputError";
 import { ArkpackSignatureSchema } from "~/engine/pack/schema/ArkpackSignatureSchema";
 import { createArkpackSigningPayloadFx } from "./createArkpackSigningPayloadFx";
-import { readArkpackContentHashFx } from "./readArkpackContentHashFx";
 
 export namespace signArkpackFx {
 	export interface Props {
@@ -66,15 +65,11 @@ export const signArkpackFx = Effect.fn("signArkpackFx")(function* ({
 	const signature = btoa(
 		Array.from(signatureBytes, (byte) => String.fromCharCode(byte)).join(""),
 	);
-	const contentHash = yield* readArkpackContentHashFx(bytes);
-
 	return yield* Effect.try({
 		try: () =>
 			ArkpackSignatureSchema.parse({
-				formatVersion: 1,
-				algorithm: "ed25519",
+				format: 1,
 				keyId,
-				contentHash,
 				signature,
 			}),
 		catch: (cause) =>

@@ -50,8 +50,7 @@ export const loadArkpackFx = Effect.fn("loadArkpackFx")(function* ({
 			loaded.descriptor.contentHash !== expected.contentHash ||
 			loaded.descriptor.gameId !== expected.gameId ||
 			loaded.descriptor.title !== expected.title ||
-			loaded.descriptor.configVersion !== expected.configVersion ||
-			loaded.descriptor.compressedSize !== expected.compressedSize ||
+			loaded.descriptor.game !== expected.game ||
 			!trustMatches
 		) {
 			return yield* Effect.fail(

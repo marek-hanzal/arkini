@@ -9,7 +9,7 @@ export namespace createEditorProjectManifestFileFx {
 	export interface Props {
 		readonly projectId: string;
 		readonly title: string;
-		readonly gameVersion?: string;
+		readonly game?: string;
 		readonly nowMs?: number;
 	}
 }
@@ -20,16 +20,16 @@ export const createEditorProjectManifestFileFx = Effect.fn(
 )(function* ({
 	projectId,
 	title,
-	gameVersion,
+	game,
 	nowMs = Date.now(),
 }: createEditorProjectManifestFileFx.Props) {
 	const manifest = yield* Effect.try({
 		try: () =>
 			EditorProjectManifestSchema.parse({
-				formatVersion: 1,
+				format: 1,
 				projectId,
 				title,
-				...(gameVersion === undefined ? {} : { gameVersion }),
+				...(game === undefined ? {} : { game }),
 				createdAtMs: nowMs,
 				updatedAtMs: nowMs,
 			}),
@@ -39,7 +39,7 @@ export const createEditorProjectManifestFileFx = Effect.fn(
 		descriptor: {
 			projectId: manifest.projectId,
 			title: manifest.title,
-			...(manifest.gameVersion === undefined ? {} : { gameVersion: manifest.gameVersion }),
+			...(manifest.game === undefined ? {} : { game: manifest.game }),
 			createdAtMs: manifest.createdAtMs,
 			updatedAtMs: manifest.updatedAtMs,
 		} satisfies EditorProjectDescriptor,

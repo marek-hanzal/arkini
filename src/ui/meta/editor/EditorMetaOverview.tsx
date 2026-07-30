@@ -18,7 +18,7 @@ export const EditorMetaOverview = () => {
 				<div>
 					<dt className="text-xs uppercase tracking-wider text-subtle">Version</dt>
 					<dd className="mt-1 font-medium">
-						{config?.version ?? project.gameVersion ?? "Not configured"}
+						{config?.version ?? project.game ?? "Not configured"}
 					</dd>
 				</div>
 				<div>

@@ -19,13 +19,13 @@ const createWorkspace = (readFx: EditorWorkspace["readFx"]): EditorWorkspace => 
 const createManifest = (
 	projectId: string,
 	title = "Editor test",
-	gameVersion: string | undefined = "1.0",
+	game: string | undefined = "1.0",
 ) =>
 	Effect.runPromise(
 		createEditorProjectManifestFileFx({
 			projectId,
 			title,
-			...(gameVersion === undefined ? {} : { gameVersion }),
+			...(game === undefined ? {} : { game }),
 			nowMs: 123,
 		}),
 	);
@@ -54,7 +54,7 @@ describe("readEditorProjectFx", () => {
 		expect(project).toEqual({
 			projectId: "editor-test",
 			title: "Editor test",
-			gameVersion: "1.0",
+			game: "1.0",
 			createdAtMs: 123,
 			updatedAtMs: 123,
 			config: editorTestConfig,

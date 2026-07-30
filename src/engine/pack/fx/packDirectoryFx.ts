@@ -74,14 +74,12 @@ export const packDirectoryFx = Effect.fn("packDirectoryFx")(function* ({
 		metadata === undefined
 			? undefined
 			: ArkpackMetadataSchema.parse({
-					namespace: "arkini",
 					format: 1,
 					packageId: metadata.packageId,
 					contentHash,
 					gameId: config.meta.id,
 					title: config.meta.title,
-					configVersion: config.version,
-					compressedSize: compressed.byteLength,
+					game: config.version,
 				});
 	const metadataOutput = metadata === undefined ? undefined : path.resolve(metadata.output);
 	if (metadataRecord !== undefined && metadataOutput !== undefined) {

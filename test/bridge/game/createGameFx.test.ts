@@ -18,7 +18,7 @@ import {
 } from "~test/bridge/arkpack/support/createTestArkpack";
 
 const trustedKeys = {
-	formatVersion: 1 as const,
+	format: 1 as const,
 	keys: [],
 };
 

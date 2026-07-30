@@ -5,10 +5,8 @@ import { ArkpackTrustedKeysSchema } from "~/engine/pack/schema/ArkpackTrustedKey
 import { ArkpackTrustSchema } from "~/engine/pack/schema/ArkpackTrustSchema";
 
 const validSignature = {
-	formatVersion: 1,
-	algorithm: "ed25519",
+	format: 1,
 	keyId: "arkini-official-2026-01",
-	contentHash: "a".repeat(64),
 	signature: btoa("\0".repeat(64)),
 };
 
@@ -18,13 +16,15 @@ describe("Arkpack signing schemas", () => {
 		expect(
 			ArkpackSignatureSchema.safeParse({
 				...validSignature,
-				formatVersion: 2,
+				format: 2,
 			}).success,
 		).toBe(false);
 		expect(
 			ArkpackSignatureSchema.safeParse({
 				...validSignature,
-				algorithm: "hmac",
+				formatVersion: 1,
+				algorithm: "ed25519",
+				contentHash: "a".repeat(64),
 			}).success,
 		).toBe(false);
 		expect(
@@ -57,28 +57,38 @@ describe("Arkpack signing schemas", () => {
 		expect(
 			ArkpackTrustSchema.parse({
 				type: "invalid",
-				reason: "hash-mismatch",
+				reason: "invalid-signature",
 				keyId: validSignature.keyId,
 			}),
 		).toEqual({
 			type: "invalid",
-			reason: "hash-mismatch",
+			reason: "invalid-signature",
 			keyId: validSignature.keyId,
 		});
 	});
 
 	it("rejects duplicate trusted key identities", () => {
 		const key = {
-			algorithm: "ed25519",
 			keyId: validSignature.keyId,
 			publicKey: "-----BEGIN PUBLIC KEY-----\nAAAA\n-----END PUBLIC KEY-----\n",
 		};
 		expect(
 			ArkpackTrustedKeysSchema.safeParse({
-				formatVersion: 1,
+				format: 1,
 				keys: [
 					key,
 					key,
+				],
+			}).success,
+		).toBe(false);
+		expect(
+			ArkpackTrustedKeysSchema.safeParse({
+				formatVersion: 1,
+				keys: [
+					{
+						...key,
+						algorithm: "ed25519",
+					},
 				],
 			}).success,
 		).toBe(false);

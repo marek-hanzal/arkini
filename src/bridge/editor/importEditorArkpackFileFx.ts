@@ -58,7 +58,7 @@ export const importEditorArkpackFileFx = Effect.fn("importEditorArkpackFileFx")(
 	const manifest = yield* createEditorProjectManifestFileFx({
 		projectId: plan.projectId,
 		title: plan.title,
-		gameVersion: plan.version,
+		game: plan.version,
 	});
 	const workspace = providedWorkspace ?? (yield* createEditorWorkspaceFx());
 	yield* workspace.createFx({

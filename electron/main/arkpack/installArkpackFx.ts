@@ -37,18 +37,6 @@ export const installArkpackFx = Effect.fn("installArkpackFx")(
 					}),
 				);
 			}
-			if (parsed.compressedSize !== bytes.byteLength) {
-				return yield* Effect.fail(
-					new ElectronMainError({
-						operation: "validate imported Arkpack size",
-						cause: {
-							expected: parsed.compressedSize,
-							actual: bytes.byteLength,
-						},
-					}),
-				);
-			}
-
 			yield* fileSystem.makeDirectory(root, {
 				recursive: true,
 			});

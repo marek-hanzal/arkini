@@ -41,10 +41,9 @@ describe("Arkpack signing workflow", () => {
 			),
 		);
 		const trustedKeys = ArkpackTrustedKeysSchema.parse({
-			formatVersion: 1,
+			format: 1,
 			keys: [
 				{
-					algorithm: "ed25519",
 					keyId,
 					publicKey: pair.publicKey,
 				},
@@ -63,7 +62,7 @@ describe("Arkpack signing workflow", () => {
 					output: join(root, "untrusted.game.arkpack"),
 					privateKey: pair.privateKey,
 					trustedKeys: {
-						formatVersion: 1,
+						format: 1,
 						keys: [],
 					},
 				}).pipe(Effect.provide(NodeServices.layer)),
@@ -147,7 +146,7 @@ describe("Arkpack signing workflow", () => {
 				expectedKeyId: keyId,
 				actualTrust: {
 					type: "invalid",
-					reason: "hash-mismatch",
+					reason: "invalid-signature",
 				},
 			});
 		}

@@ -115,8 +115,7 @@ describe("ArkpackSelector", () => {
 					contentHash: "a".repeat(64),
 					gameId: "arkini",
 					title: "Arkini",
-					configVersion: "1",
-					compressedSize: 1,
+					game: "1",
 					trust: {
 						type: "official",
 						keyId: "test-official",
@@ -128,8 +127,7 @@ describe("ArkpackSelector", () => {
 					contentHash: "b".repeat(64),
 					gameId: "local",
 					title: "Local package",
-					configVersion: "1",
-					compressedSize: 1,
+					game: "1",
 					trust: {
 						type: "external",
 						reason: "unsigned",
@@ -250,8 +248,7 @@ describe("ArkpackSelector", () => {
 					contentHash: "b".repeat(64),
 					gameId: "local",
 					title: "Local package",
-					configVersion: "1",
-					compressedSize: 1,
+					game: "1",
 					trust: {
 						type: "external",
 						reason: "unsigned",
@@ -335,8 +332,7 @@ describe("ArkpackSelector", () => {
 			contentHash: "c".repeat(64),
 			gameId: "imported",
 			title: "Imported package",
-			configVersion: "1",
-			compressedSize: 1,
+			game: "1",
 			trust: {
 				type: "external",
 				reason: "unsigned",
@@ -434,8 +430,7 @@ describe("ArkpackSelector", () => {
 					contentHash: "b".repeat(64),
 					gameId: "local",
 					title: "Local package",
-					configVersion: "1",
-					compressedSize: 1,
+					game: "1",
 					trust: {
 						type: "external",
 						reason: "unsigned",
@@ -481,8 +476,7 @@ describe("ArkpackSelector", () => {
 			contentHash: "c".repeat(64),
 			gameId: "imported",
 			title: "Imported package",
-			configVersion: "1",
-			compressedSize: 1,
+			game: "1",
 			trust: {
 				type: "external",
 				reason: "unsigned",

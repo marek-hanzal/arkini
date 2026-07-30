@@ -75,8 +75,7 @@ describe("Game diagnostics", () => {
 				contentHash: "content:test",
 				gameId: "game:test",
 				title: "Test",
-				configVersion: "1",
-				compressedSize: 0,
+				game: "1",
 				source: "built-in",
 				trust: {
 					type: "official",

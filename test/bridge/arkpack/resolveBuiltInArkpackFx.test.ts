@@ -10,8 +10,7 @@ const descriptor = (packageId: string, source: ArkpackDescriptor["source"]): Ark
 	contentHash: packageId.padEnd(64, "a").slice(0, 64),
 	gameId: packageId,
 	title: packageId,
-	configVersion: "1",
-	compressedSize: 1,
+	game: "1",
 	trust:
 		source === "built-in"
 			? {

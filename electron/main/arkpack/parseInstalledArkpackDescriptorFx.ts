@@ -32,8 +32,7 @@ export const parseInstalledArkpackDescriptorFx = Effect.fn("parseInstalledArkpac
 			descriptor.contentHash !== descriptor.packageId ||
 			typeof descriptor.gameId !== "string" ||
 			typeof descriptor.title !== "string" ||
-			typeof descriptor.configVersion !== "string" ||
-			typeof descriptor.compressedSize !== "number" ||
+			typeof descriptor.game !== "string" ||
 			trust === undefined ||
 			descriptor.source !== "imported"
 		) {

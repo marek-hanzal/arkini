@@ -171,8 +171,7 @@ const game = {
 		contentHash: "test-hash",
 		gameId: config.meta.id,
 		title: config.meta.title,
-		configVersion: config.version,
-		compressedSize: 0,
+		game: config.version,
 		trust: {
 			type: "external",
 			reason: "unsigned",

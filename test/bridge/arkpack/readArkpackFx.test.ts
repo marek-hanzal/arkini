@@ -12,7 +12,7 @@ import {
 import { gzipSync } from "node:zlib";
 
 const trustedKeys = {
-	formatVersion: 1 as const,
+	format: 1 as const,
 	keys: [],
 };
 
@@ -44,7 +44,7 @@ describe("readArkpackFx", () => {
 			packageId: first.descriptor.contentHash,
 			gameId: "game:bridge",
 			title: "Bridge game",
-			configVersion: "1.0",
+			game: "1.0",
 			source: "imported",
 		});
 		expect(first.descriptor.packageId).toMatch(/^[a-f0-9]{64}$/);

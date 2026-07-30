@@ -43,7 +43,7 @@ const createManifestFile = (projectId: string, updatedAtMs = 100) => ({
 	bytes: new TextEncoder().encode(
 		`${JSON.stringify(
 			{
-				formatVersion: 1,
+				format: 1,
 				projectId,
 				title: projectId,
 				createdAtMs: 100,
@@ -87,7 +87,7 @@ describe("createFilesystemEditorWorkspaceFx", () => {
 		await expect(Effect.runPromise(workspace.readFx("missing"))).resolves.toBeNull();
 		await expect(Effect.runPromise(workspace.listFx())).resolves.toEqual([
 			{
-				formatVersion: 1,
+				format: 1,
 				projectId: "arkini-test",
 				title: "arkini-test",
 				createdAtMs: 100,
@@ -126,14 +126,14 @@ describe("createFilesystemEditorWorkspaceFx", () => {
 		});
 		await expect(Effect.runPromise(workspace.listFx())).resolves.toEqual([
 			{
-				formatVersion: 1,
+				format: 1,
 				projectId: "newer-project",
 				title: "newer-project",
 				createdAtMs: 100,
 				updatedAtMs: 200,
 			},
 			{
-				formatVersion: 1,
+				format: 1,
 				projectId: "older-project",
 				title: "older-project",
 				createdAtMs: 100,

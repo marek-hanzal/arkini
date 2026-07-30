@@ -25,11 +25,11 @@ export const listEditorProjectsFx = Effect.fn("listEditorProjectsFx")(function* 
 			EditorProjectManifestSchema.array()
 				.parse(manifests)
 				.map(
-					({ projectId, title, gameVersion, createdAtMs, updatedAtMs }) =>
+					({ projectId, title, game, createdAtMs, updatedAtMs }) =>
 						({
 							projectId,
 							title,
-							...(gameVersion === undefined ? {} : { gameVersion }),
+							...(game === undefined ? {} : { game }),
 							createdAtMs,
 							updatedAtMs,
 						}) satisfies EditorProjectDescriptor,

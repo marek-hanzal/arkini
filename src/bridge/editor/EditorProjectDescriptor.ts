@@ -2,7 +2,7 @@
 export interface EditorProjectDescriptor {
 	readonly projectId: string;
 	readonly title: string;
-	readonly gameVersion?: string;
+	readonly game?: string;
 	readonly createdAtMs: number;
 	readonly updatedAtMs: number;
 }

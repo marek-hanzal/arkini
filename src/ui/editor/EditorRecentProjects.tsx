@@ -46,7 +46,7 @@ export const EditorRecentProjects = ({ blocked, projects }: EditorRecentProjects
 							<span className="block truncate text-sm font-semibold">{project.title}</span>
 							<span className="mt-1 block truncate text-xs text-subtle">
 								{project.projectId}
-								{project.gameVersion === undefined ? "" : ` · ${project.gameVersion}`}
+								{project.game === undefined ? "" : ` · ${project.game}`}
 							</span>
 						</span>
 						<time

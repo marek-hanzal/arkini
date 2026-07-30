@@ -8,8 +8,7 @@ const builtIn: ArkpackDescriptor = {
 	contentHash: "a".repeat(64),
 	gameId: "arkini",
 	title: "Arkini",
-	configVersion: "1",
-	compressedSize: 1,
+	game: "1",
 	trust: {
 		type: "official",
 		keyId: "test-official",
@@ -22,8 +21,7 @@ const imported: ArkpackDescriptor = {
 	contentHash: "b".repeat(64),
 	gameId: "imported",
 	title: "Imported",
-	configVersion: "1",
-	compressedSize: 2,
+	game: "1",
 	trust: {
 		type: "external",
 		reason: "unsigned",

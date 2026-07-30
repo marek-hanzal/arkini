@@ -61,7 +61,7 @@ export const installGameDiagnostics = ({
 		data: {
 			packageId: arkpack.packageId,
 			contentHash: arkpack.contentHash,
-			configVersion: arkpack.configVersion,
+			game: arkpack.game,
 			restored,
 		},
 	});

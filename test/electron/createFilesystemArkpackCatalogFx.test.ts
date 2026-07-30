@@ -19,8 +19,7 @@ const descriptor = {
 	contentHash: packageId,
 	gameId: "game:test",
 	title: "Test",
-	configVersion: "1.0",
-	compressedSize: 3,
+	game: "1.0",
 	trust: {
 		type: "external",
 		reason: "unsigned",
@@ -98,7 +97,7 @@ describe("createFilesystemArkpackCatalogFx", () => {
 		await expect(access(join(root, "arkini", "game", "arkpacks", packageId))).rejects.toBeDefined();
 	});
 
-	it("deduplicates exact package identities and rejects unsafe paths", async () => {
+	it("deduplicates exact package identities and rejects unsafe or incomplete records", async () => {
 		const catalog = await createCatalog();
 		await Effect.runPromise(
 			catalog.installFx({
@@ -128,6 +127,17 @@ describe("createFilesystemArkpackCatalogFx", () => {
 		await expect(Effect.runPromise(catalog.readFx("../escape"))).rejects.toThrow(
 			"Invalid imported Arkpack",
 		);
+		await expect(
+			Effect.runPromise(
+				catalog.installFx({
+					descriptor: {
+						...descriptor,
+						trust: undefined,
+					} as unknown as typeof descriptor,
+					bytes: packageBytes,
+				}),
+			),
+		).rejects.toBeDefined();
 	});
 
 	it("serializes concurrent installs of the same package identity", async () => {

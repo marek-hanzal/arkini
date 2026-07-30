@@ -1,15 +1,17 @@
 import { z } from "zod";
 
+import { IdSchema } from "~/engine/common/schema/IdSchema";
+import { TitleSchema } from "~/engine/common/schema/TitleSchema";
+import { VersionEnumSchema } from "~/engine/schema/VersionEnumSchema";
+
 export const ArkpackMetadataSchema = z
 	.object({
-		namespace: z.literal("arkini"),
 		format: z.literal(1),
-		packageId: z.string().min(1),
+		packageId: IdSchema,
 		contentHash: z.string().regex(/^[a-f0-9]{64}$/),
-		gameId: z.string().min(1),
-		title: z.string().min(1),
-		configVersion: z.string().min(1),
-		compressedSize: z.number().int().nonnegative(),
+		gameId: IdSchema,
+		title: TitleSchema,
+		game: VersionEnumSchema,
 	})
 	.strict()
 	.meta({

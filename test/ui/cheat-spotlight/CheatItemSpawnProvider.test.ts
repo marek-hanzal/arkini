@@ -55,8 +55,7 @@ const makeGame = (
 		contentHash: `content:spawn-${suffix}`,
 		gameId: `game:spawn-${suffix}`,
 		title: `Spawn ${suffix}`,
-		configVersion: "1.0",
-		compressedSize: 0,
+		game: "1.0",
 		trust: {
 			type: "external",
 			reason: "unsigned",

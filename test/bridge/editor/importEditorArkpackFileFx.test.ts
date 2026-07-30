@@ -37,7 +37,7 @@ describe("importEditorArkpackFileFx", () => {
 			expect.objectContaining({
 				projectId: "editor-test",
 				title: "Editor test",
-				gameVersion: "1.0",
+				game: "1.0",
 			}),
 		);
 		expect(descriptor.createdAtMs).toBe(descriptor.updatedAtMs);

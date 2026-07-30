@@ -100,8 +100,7 @@ describe("Cheats", () => {
 				contentHash: "content:cheats",
 				gameId: "game:cheats",
 				title: "Cheats game",
-				configVersion: "1.0",
-				compressedSize: 0,
+				game: "1.0",
 				trust: {
 					type: "external",
 					reason: "unsigned",
@@ -180,8 +179,7 @@ describe("Cheats", () => {
 				contentHash: "content:cheats-race",
 				gameId: "game:cheats-race",
 				title: "Cheats race game",
-				configVersion: "1.0",
-				compressedSize: 0,
+				game: "1.0",
 				trust: {
 					type: "external",
 					reason: "unsigned",

@@ -15,8 +15,7 @@ export const DemoArkpack = {
 		contentHash: metadata.contentHash,
 		gameId: metadata.gameId,
 		title: metadata.title,
-		configVersion: metadata.configVersion,
-		compressedSize: metadata.compressedSize,
+		game: metadata.game,
 		trust: {
 			type: "external",
 			reason: "unsigned",

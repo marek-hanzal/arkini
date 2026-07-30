@@ -166,8 +166,7 @@ export const readArkpackFx = Effect.fn("readArkpackFx")(function* ({
 			contentHash,
 			gameId: payload.config.meta.id,
 			title: payload.config.meta.title,
-			configVersion: payload.config.version,
-			compressedSize: bytes.byteLength,
+			game: payload.config.version,
 			trust: verification.trust,
 			source,
 			...(filename === undefined

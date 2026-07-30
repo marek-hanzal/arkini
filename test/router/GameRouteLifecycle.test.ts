@@ -31,8 +31,7 @@ const createGame = (
 		contentHash: "content-route",
 		gameId: testArkpackConfig.meta.id,
 		title: testArkpackConfig.meta.title,
-		configVersion: testArkpackConfig.version,
-		compressedSize: 0,
+		game: testArkpackConfig.version,
 		trust: {
 			type: "external",
 			reason: "unsigned",

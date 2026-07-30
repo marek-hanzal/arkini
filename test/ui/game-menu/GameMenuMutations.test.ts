@@ -37,8 +37,7 @@ const createGame = (explicitSaveFx: Effect.Effect<void, unknown> = Effect.void):
 		contentHash: "content:menu",
 		gameId: "game:menu",
 		title: "Menu game",
-		configVersion: "1.0",
-		compressedSize: 0,
+		game: "1.0",
 		trust: {
 			type: "external",
 			reason: "unsigned",

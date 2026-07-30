@@ -10,8 +10,7 @@ const imported = {
 	contentHash: "a".repeat(64),
 	gameId: "local",
 	title: "Local package",
-	configVersion: "1.0",
-	compressedSize: 128,
+	game: "1.0",
 	trust: {
 		type: "external",
 		reason: "unsigned",

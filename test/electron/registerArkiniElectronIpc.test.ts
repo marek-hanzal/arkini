@@ -87,10 +87,10 @@ const saveKey = {
 	contentHash: "b".repeat(64),
 } as const;
 const editorManifest = {
-	formatVersion: 1,
+	format: 1,
 	projectId: "editor-test",
 	title: "Editor test",
-	gameVersion: "1.0",
+	game: "1.0",
 	createdAtMs: 100,
 	updatedAtMs: 100,
 } as const;
@@ -168,8 +168,7 @@ const invokeArguments = new Map<string, ReadonlyArray<unknown>>([
 					contentHash: placeholderPackageId,
 					gameId: "arkini",
 					title: "Arkini",
-					configVersion: "1",
-					compressedSize: 0,
+					game: "1",
 					trust: {
 						type: "external",
 						reason: "unsigned",
@@ -462,8 +461,7 @@ describe("registerArkiniElectronIpcFx", () => {
 					contentHash: packageId,
 					gameId: "arkini-test",
 					title: "Arkini test",
-					configVersion: "1",
-					compressedSize: arkpackBytes.byteLength,
+					game: "1",
 					trust: {
 						type: "external",
 						reason: "unsigned",

@@ -4,12 +4,11 @@ const keyIdPattern = /^[a-z0-9][a-z0-9._-]{0,63}$/;
 
 export const ArkpackTrustedKeysSchema = z
 	.object({
-		formatVersion: z.literal(1).describe("The trusted-key registry format version."),
+		format: z.literal(1).describe("The trusted-key registry format version."),
 		keys: z
 			.array(
 				z
 					.object({
-						algorithm: z.literal("ed25519"),
 						keyId: z.string().regex(keyIdPattern),
 						publicKey: z
 							.string()

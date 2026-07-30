@@ -57,8 +57,7 @@ describe("MainMenu", () => {
 					contentHash: "b".repeat(64),
 					gameId: "other-game",
 					title: "Other Game",
-					configVersion: "1",
-					compressedSize: 1,
+					game: "1",
 					trust: {
 						type: "official",
 						keyId: "other-official",
@@ -70,8 +69,7 @@ describe("MainMenu", () => {
 					contentHash: "a".repeat(64),
 					gameId: "arkini",
 					title: "Arkini",
-					configVersion: "1",
-					compressedSize: 1,
+					game: "1",
 					trust: {
 						type: "official",
 						keyId: "test-official",

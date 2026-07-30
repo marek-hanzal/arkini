@@ -8,8 +8,7 @@ export interface ArkpackDescriptor {
 	readonly contentHash: string;
 	readonly gameId: string;
 	readonly title: string;
-	readonly configVersion: string;
-	readonly compressedSize: number;
+	readonly game: string;
 	readonly trust: ArkpackTrustSchema.Type;
 	readonly source: ArkpackSource;
 	readonly filename?: string;

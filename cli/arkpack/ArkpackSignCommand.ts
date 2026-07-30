@@ -28,7 +28,6 @@ const runArkpackSignFx = Effect.fn("runArkpackSignFx")(function* ({
 		privateKey: resolvedPrivateKey,
 	});
 	yield* Console.log(`Wrote ${result.signaturePath}.`);
-	yield* Console.log(`SHA-256 ${result.signature.contentHash}.`);
 });
 
 export const ArkpackSignCommand = Command.make(

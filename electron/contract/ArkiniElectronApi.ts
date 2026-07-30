@@ -46,8 +46,7 @@ export namespace ArkiniElectronApi {
 		readonly contentHash: string;
 		readonly gameId: string;
 		readonly title: string;
-		readonly configVersion: string;
-		readonly compressedSize: number;
+		readonly game: string;
 		readonly trust:
 			| {
 					readonly type: "official";
@@ -59,7 +58,7 @@ export namespace ArkiniElectronApi {
 			  }
 			| {
 					readonly type: "invalid";
-					readonly reason: "malformed-signature" | "invalid-signature" | "hash-mismatch";
+					readonly reason: "malformed-signature" | "invalid-signature";
 					readonly keyId?: string;
 			  };
 		readonly source: "imported";

@@ -7,7 +7,7 @@
 			"title": "Prospector Guild",
 			"description": "Entry-level prospecting guild that uses civic permits and knowledge to discover clay and sand deposits for advanced construction.",
 			"asset": {
-				"source": [
+				"default": [
 					"producer-prospector-guild-t1"
 				]
 			},

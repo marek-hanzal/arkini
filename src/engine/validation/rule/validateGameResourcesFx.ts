@@ -82,31 +82,32 @@ export const validateGameResourcesFx = Effect.fn("validateGameResourcesFx")(func
 
 	for (const [itemId, item] of Object.entries(config.items)) {
 		const source = provenance.items[itemId];
-		item.asset.source.forEach((id, index) => {
+		item.asset.default.forEach((id, index) => {
 			references.push({
 				id,
 				path: [
 					"items",
 					itemId,
 					"asset",
-					"source",
+					"default",
 					index,
 				],
 				source,
 			});
 		});
-		if (item.asset.composite !== undefined) {
+		item.asset.sources?.forEach((id, index) => {
 			references.push({
-				id: item.asset.composite,
+				id,
 				path: [
 					"items",
 					itemId,
 					"asset",
-					"composite",
+					"sources",
+					index,
 				],
 				source,
 			});
-		}
+		});
 	}
 
 	const referenced = new Set(references.map(({ id }) => id));

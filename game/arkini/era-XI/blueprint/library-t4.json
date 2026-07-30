@@ -7,8 +7,11 @@
 			"title": "Library IV Blueprint",
 			"description": "Build plan that upgrades Library III into Library IV.",
 			"asset": {
-				"source": [
+				"default": [
 					"blueprint",
+					"producer-library-t4"
+				],
+				"sources": [
 					"producer-library-t4"
 				]
 			},

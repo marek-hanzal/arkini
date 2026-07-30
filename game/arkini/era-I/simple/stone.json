@@ -7,7 +7,7 @@
 			"title": "Stone",
 			"description": "Basic stone material produced by quarries.",
 			"asset": {
-				"source": [
+				"default": [
 					"item-stone"
 				]
 			},

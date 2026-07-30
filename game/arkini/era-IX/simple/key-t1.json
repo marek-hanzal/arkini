@@ -7,7 +7,7 @@
 			"title": "Key I",
 			"description": "Basic goldsmith key used to open Chest I and bootstrap the gem/key expedition loop.",
 			"asset": {
-				"source": [
+				"default": [
 					"item-key-t1"
 				]
 			},

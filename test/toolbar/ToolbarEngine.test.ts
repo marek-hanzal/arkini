@@ -52,7 +52,7 @@ const configInput = {
 			title: "Water",
 			description: "Water",
 			asset: {
-				source: [
+				default: [
 					"asset:water",
 				],
 			},
@@ -67,7 +67,7 @@ const configInput = {
 			title: "Stone",
 			description: "Stone",
 			asset: {
-				source: [
+				default: [
 					"asset:stone",
 				],
 			},
@@ -82,7 +82,7 @@ const configInput = {
 			title: "Board only",
 			description: "Board only",
 			asset: {
-				source: [
+				default: [
 					"asset:board-only",
 				],
 			},
@@ -97,7 +97,7 @@ const configInput = {
 			title: "Inventory only",
 			description: "Inventory only",
 			asset: {
-				source: [
+				default: [
 					"asset:inventory-only",
 				],
 			},
@@ -112,7 +112,7 @@ const configInput = {
 			title: "Backpack",
 			description: "Backpack",
 			asset: {
-				source: [
+				default: [
 					"asset:backpack",
 				],
 			},

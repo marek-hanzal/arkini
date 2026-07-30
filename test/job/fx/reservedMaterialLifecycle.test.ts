@@ -16,7 +16,7 @@ const base = (id: string, scope: "any" | "board" = "board") => ({
 	title: id,
 	description: id,
 	asset: {
-		source: [
+		default: [
 			`asset:${id}`,
 		],
 	},

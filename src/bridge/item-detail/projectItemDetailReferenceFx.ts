@@ -3,7 +3,7 @@ import { Effect } from "effect";
 import type { GameEngine } from "~/bridge/game/GameEngine";
 import type { ItemDetailLines } from "~/bridge/item-detail/ItemDetailLines";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import { readRuntimeItemPrimaryAssetIdFx } from "~/engine/item/read/readRuntimeItemPrimaryAssetIdFx";
+import { readRuntimeItemDefaultAssetIdsFx } from "~/engine/item/read/readRuntimeItemDefaultAssetIdsFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
 export namespace projectItemDetailReferenceFx {
@@ -29,17 +29,17 @@ export const projectItemDetailReferenceFx = Effect.fn("projectItemDetailReferenc
 	const live = preferredRuntimeItemIds
 		.map((runtimeItemId) => runtime.items.find((candidate) => candidate.id === runtimeItemId))
 		.find((candidate) => candidate?.item.id === itemId);
-	const sourceAssetId = yield* readRuntimeItemPrimaryAssetIdFx({
+	const sourceAssetIds = yield* readRuntimeItemDefaultAssetIdsFx({
 		item: configured,
 	});
 	return {
 		itemId,
 		title: configured.title,
-		sourceUrl: game.getResourceUrl(sourceAssetId),
-		...(configured.asset.composite === undefined
+		sourceUrl: game.getResourceUrl(sourceAssetIds[0]),
+		...(sourceAssetIds[1] === undefined
 			? {}
 			: {
-					compositeUrl: game.getResourceUrl(configured.asset.composite),
+					compositeUrl: game.getResourceUrl(sourceAssetIds[1]),
 				}),
 		...(live === undefined
 			? {}

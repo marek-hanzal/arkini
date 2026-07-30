@@ -7,7 +7,7 @@
 			"title": "Wheat Field",
 			"description": "Movable grain deposit with 16 harvests for nearby farms.",
 			"asset": {
-				"source": [
+				"default": [
 					"item-wheat-field"
 				]
 			},

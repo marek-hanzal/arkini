@@ -7,8 +7,11 @@
 			"title": "Market II Blueprint",
 			"description": "Build plan that can upgrade Market into Market II.",
 			"asset": {
-				"source": [
+				"default": [
 					"blueprint",
+					"producer-market-t2"
+				],
+				"sources": [
 					"producer-market-t2"
 				]
 			},

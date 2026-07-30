@@ -18,7 +18,7 @@ const simpleItem = ({
 		title: id,
 		description: id,
 		asset: {
-			source: [
+			default: [
 				`asset:${id}`,
 			],
 		},

@@ -7,8 +7,11 @@
 			"title": "Prospector Guild Blueprint",
 			"description": "Build plan that can be filled with resources to construct Prospector Guild 1.",
 			"asset": {
-				"source": [
+				"default": [
 					"blueprint",
+					"producer-prospector-guild-t1"
+				],
+				"sources": [
 					"producer-prospector-guild-t1"
 				]
 			},

@@ -7,7 +7,7 @@
 			"title": "Tailor Workshop I",
 			"description": "Clothing producer that sews common and luxury clothing.",
 			"asset": {
-				"source": [
+				"default": [
 					"producer-tailor-workshop-t1"
 				]
 			},

@@ -7,7 +7,7 @@
 			"title": "Water",
 			"description": "Basic water resource produced by wells and consumed by farms.",
 			"asset": {
-				"source": [
+				"default": [
 					"item-water"
 				]
 			},

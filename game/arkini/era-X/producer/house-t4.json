@@ -7,7 +7,7 @@
 			"title": "House",
 			"description": "Prestige housing that consumes luxury goods to produce the highest morale and all lower morale tiers.",
 			"asset": {
-				"source": [
+				"default": [
 					"producer-house-t4"
 				]
 			},

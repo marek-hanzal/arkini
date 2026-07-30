@@ -7,7 +7,7 @@
 			"title": "Tavern Commission Quest",
 			"description": "A tavern quest that takes prepared drinks and payment and rewards a completed feast without handing out blueprints.",
 			"asset": {
-				"source": [
+				"default": [
 					"item-quest"
 				]
 			},

@@ -7,7 +7,7 @@
 			"title": "Chest I",
 			"description": "Locked chest returned from a short Heroes Guild expedition. Open it with a Key I.",
 			"asset": {
-				"source": [
+				"default": [
 					"item-chest-t1"
 				]
 			},

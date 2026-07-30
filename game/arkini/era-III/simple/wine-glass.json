@@ -7,7 +7,7 @@
 			"title": "Wine Glass",
 			"description": "A single glass of wine served by taverns.",
 			"asset": {
-				"source": [
+				"default": [
 					"item-wine-glass"
 				]
 			},

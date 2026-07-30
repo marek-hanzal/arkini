@@ -1,0 +1,28 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"item:grape-seed": {
+			"id": "item:grape-seed",
+			"type": "simple",
+			"title": "Grape Seed",
+			"description": "Grape seed prepared for a future crop-growing lifecycle.",
+			"asset": {
+				"default": [
+					"item-seed",
+					"item-grapes"
+				]
+			},
+			"tags": [
+				"material",
+				"food",
+				"seed",
+				"grapes",
+				"era:III",
+				"tier-3-resource"
+			],
+			"categoryId": "food",
+			"scope": "any",
+			"maxStackSize": 50
+		}
+	}
+}

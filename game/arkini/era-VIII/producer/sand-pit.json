@@ -7,7 +7,7 @@
 			"title": "Sand Pit",
 			"description": "Prepared extraction pit that produces sand near a surveyed sand deposit.",
 			"asset": {
-				"source": [
+				"default": [
 					"producer-sand-pit"
 				]
 			},

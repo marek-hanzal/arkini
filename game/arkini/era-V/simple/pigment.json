@@ -7,7 +7,7 @@
 			"title": "Pigment",
 			"description": "Concentrated natural dye powders produced by Dye Workshops for luxury textiles and stained-glass work.",
 			"asset": {
-				"source": [
+				"default": [
 					"item-pigment"
 				]
 			},

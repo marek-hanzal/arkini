@@ -7,7 +7,7 @@
 			"title": "Bakery I",
 			"description": "Consumes flour and water to bake bread.",
 			"asset": {
-				"source": [
+				"default": [
 					"producer-bakery-t1"
 				]
 			},

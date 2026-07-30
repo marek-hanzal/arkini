@@ -7,7 +7,7 @@
 			"title": "Roof Tile Factory",
 			"description": "Workshop that fires clay into sturdy roof tiles.",
 			"asset": {
-				"source": [
+				"default": [
 					"producer-roof-tile-factory"
 				]
 			},

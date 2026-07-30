@@ -3,17 +3,17 @@ import { describe, expect, it } from "vitest";
 import { AssetSchema } from "~/engine/item/schema/AssetSchema";
 
 describe("AssetSchema", () => {
-	it("requires one or more ordered source assets", () => {
+	it("requires exactly one or two ordered default layers", () => {
 		expect(
 			AssetSchema.safeParse({
-				source: [
+				default: [
 					"asset:tree",
 				],
 			}).success,
 		).toBe(true);
 		expect(
 			AssetSchema.safeParse({
-				source: [
+				default: [
 					"asset:seed",
 					"asset:sapling",
 				],
@@ -21,19 +21,49 @@ describe("AssetSchema", () => {
 		).toBe(true);
 		expect(
 			AssetSchema.safeParse({
-				source: [],
+				default: [],
+			}).success,
+		).toBe(false);
+		expect(
+			AssetSchema.safeParse({
+				default: [
+					"asset:first",
+					"asset:second",
+					"asset:third",
+				],
 			}).success,
 		).toBe(false);
 	});
 
-	it("optionally composes a secondary asset with the selected source asset", () => {
+	it("accepts optional ordered progress sources", () => {
 		expect(
 			AssetSchema.safeParse({
-				source: [
+				default: [
+					"asset:item:blueprint",
+				],
+				sources: [
+					"asset:producer:farm",
+				],
+			}).success,
+		).toBe(true);
+		expect(
+			AssetSchema.safeParse({
+				default: [
+					"asset:item:blueprint",
+				],
+				sources: [],
+			}).success,
+		).toBe(false);
+	});
+
+	it("rejects the removed composite field", () => {
+		expect(
+			AssetSchema.safeParse({
+				default: [
 					"asset:item:blueprint",
 				],
 				composite: "asset:producer:farm",
 			}).success,
-		).toBe(true);
+		).toBe(false);
 	});
 });

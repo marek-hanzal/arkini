@@ -7,8 +7,11 @@
 			"title": "Well I Blueprint",
 			"description": "Build plan that can be filled with resources to construct Well I.",
 			"asset": {
-				"source": [
+				"default": [
 					"blueprint",
+					"producer-well-t1"
+				],
+				"sources": [
 					"producer-well-t1"
 				]
 			},

@@ -8,7 +8,7 @@ const baseItem = ({ id, scope }: { id: string; scope: "any" | "board" }) => {
 		title: id,
 		description: id,
 		asset: {
-			source: [
+			default: [
 				`asset:${id}`,
 			],
 		},

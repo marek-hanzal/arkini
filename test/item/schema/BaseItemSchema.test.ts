@@ -10,7 +10,7 @@ describe("BaseItemSchema", () => {
 			title: "Tree",
 			description: "A living tree.",
 			asset: {
-				source: [
+				default: [
 					"asset:tree",
 				],
 			},
@@ -83,7 +83,7 @@ describe("BaseItemSchema", () => {
 			title: "Tree",
 			description: "A living tree.",
 			asset: {
-				source: [
+				default: [
 					"asset:tree",
 				],
 			},

@@ -82,7 +82,7 @@ const config = GameConfigSchema.parse({
 			title: "Workshop",
 			description: "Produces water.",
 			asset: {
-				source: [
+				default: [
 					"asset:workshop",
 				],
 			},
@@ -133,7 +133,7 @@ const config = GameConfigSchema.parse({
 			title: "Water",
 			description: "Water.",
 			asset: {
-				source: [
+				default: [
 					"asset:water",
 				],
 			},

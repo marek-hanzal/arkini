@@ -7,7 +7,7 @@
 			"title": "Library II",
 			"description": "Established library that researches and reissues blueprints up through Era IV.",
 			"asset": {
-				"source": [
+				"default": [
 					"producer-library-t2"
 				]
 			},

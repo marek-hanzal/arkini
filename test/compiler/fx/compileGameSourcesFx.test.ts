@@ -31,6 +31,32 @@ describe("compileGameSourcesFx", () => {
 		expect(result.diagnostics).toEqual([]);
 	});
 
+	it("preserves the complete default composition and ordered progress sources", async () => {
+		const item = {
+			...createSimpleItem("item:layered"),
+			asset: {
+				default: [
+					"asset:base",
+					"asset:overlay",
+				],
+				sources: [
+					"asset:progress-1",
+					"asset:progress-2",
+				],
+			},
+		};
+		const result = await compile(
+			createRootSource({
+				items: {
+					[item.id]: item,
+				},
+			}),
+		);
+
+		expect(result.config?.items[item.id]?.asset).toEqual(item.asset);
+		expect(result.diagnostics).toEqual([]);
+	});
+
 	it("preserves an authored default line through the compiler used by packing", async () => {
 		const item = createProducerItem({
 			id: "item:producer",

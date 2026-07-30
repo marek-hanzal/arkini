@@ -7,7 +7,7 @@
 			"title": "Sand Deposit",
 			"description": "Movable sand source used by nearby sand pits.",
 			"asset": {
-				"source": [
+				"default": [
 					"item-sand-deposit"
 				]
 			},

@@ -7,7 +7,7 @@
 			"title": "Hops",
 			"description": "Harvested hops produced by breweries when supplied with water near a hop field.",
 			"asset": {
-				"source": [
+				"default": [
 					"item-hops"
 				]
 			},

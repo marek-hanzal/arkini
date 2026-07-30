@@ -7,7 +7,7 @@
 			"title": "School",
 			"description": "Education building that turns civic support into Basic Knowledge.",
 			"asset": {
-				"source": [
+				"default": [
 					"producer-school"
 				]
 			},

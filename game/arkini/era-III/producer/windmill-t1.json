@@ -7,7 +7,7 @@
 			"title": "Windmill I",
 			"description": "Mills grain into flour.",
 			"asset": {
-				"source": [
+				"default": [
 					"producer-windmill-t1"
 				]
 			},

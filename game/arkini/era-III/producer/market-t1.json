@@ -7,7 +7,7 @@
 			"title": "Market",
 			"description": "First trade producer that converts processed food and drink into coins.",
 			"asset": {
-				"source": [
+				"default": [
 					"producer-market-t1"
 				]
 			},

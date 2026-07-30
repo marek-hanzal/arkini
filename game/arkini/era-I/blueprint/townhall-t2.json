@@ -7,8 +7,11 @@
 			"title": "Town Hall II Blueprint",
 			"description": "Build plan that can be filled with resources to construct Town Hall II.",
 			"asset": {
-				"source": [
+				"default": [
 					"blueprint",
+					"producer-townhall-t2"
+				],
+				"sources": [
 					"producer-townhall-t2"
 				]
 			},

@@ -7,7 +7,7 @@
 			"title": "Weaver Hut I",
 			"description": "Textile producer that weaves wool into common cloth.",
 			"asset": {
-				"source": [
+				"default": [
 					"producer-weaver-hut-t1"
 				]
 			},

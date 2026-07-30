@@ -7,8 +7,11 @@
 			"title": "House of Engineers Blueprint",
 			"description": "Build plan for House of Engineers, one of the mutually exclusive Choose The Path keystone buildings.",
 			"asset": {
-				"source": [
+				"default": [
 					"blueprint",
+					"producer-house-of-engineers"
+				],
+				"sources": [
 					"producer-house-of-engineers"
 				]
 			},

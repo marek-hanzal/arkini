@@ -7,7 +7,7 @@
 			"title": "Topaz",
 			"description": "A polished amber gemstone from high-tier treasure chests.",
 			"asset": {
-				"source": [
+				"default": [
 					"item-topaz"
 				]
 			},

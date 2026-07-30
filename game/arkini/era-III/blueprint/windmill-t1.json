@@ -7,8 +7,11 @@
 			"title": "Windmill I Blueprint",
 			"description": "Build plan that can be filled with resources to construct Windmill I.",
 			"asset": {
-				"source": [
+				"default": [
 					"blueprint",
+					"producer-windmill-t1"
+				],
+				"sources": [
 					"producer-windmill-t1"
 				]
 			},

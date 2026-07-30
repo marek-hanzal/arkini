@@ -36,7 +36,7 @@ const simpleItem = ({
 	title: id,
 	description: id,
 	asset: {
-		source: [
+		default: [
 			`asset:${id}`,
 		],
 	},
@@ -66,7 +66,7 @@ const blueprintItem = ({
 	title: id,
 	description: id,
 	asset: {
-		source: [
+		default: [
 			`asset:${id}`,
 		],
 	},
@@ -386,7 +386,7 @@ const blueprintConfig = GameConfigSchema.parse({
 			title: "Limited producer",
 			description: "Produces one singleton output.",
 			asset: {
-				source: [
+				default: [
 					"asset:producer:limited",
 				],
 			},
@@ -425,7 +425,7 @@ const blueprintConfig = GameConfigSchema.parse({
 			title: "Blueprint source",
 			description: "Produces one purpose-bound blueprint.",
 			asset: {
-				source: [
+				default: [
 					"asset:producer:blueprint-source",
 				],
 			},
@@ -635,7 +635,7 @@ const blueprintConfig = GameConfigSchema.parse({
 			title: "Shared source",
 			description: "Produces the shared capped item.",
 			asset: {
-				source: [
+				default: [
 					"asset:producer:shared-source",
 				],
 			},
@@ -666,7 +666,7 @@ const blueprintConfig = GameConfigSchema.parse({
 			title: "Shared consumer",
 			description: "Consumes the shared capped item without producing it.",
 			asset: {
-				source: [
+				default: [
 					"asset:producer:shared-consumer",
 				],
 			},
@@ -704,7 +704,7 @@ const blueprintConfig = GameConfigSchema.parse({
 			title: "Recycler",
 			description: "Replaces one capped item with one capped item.",
 			asset: {
-				source: [
+				default: [
 					"asset:producer:recycler",
 				],
 			},
@@ -743,7 +743,7 @@ const blueprintConfig = GameConfigSchema.parse({
 			title: "Charged stack",
 			description: "Replaces exactly one depleted stacked owner.",
 			asset: {
-				source: [
+				default: [
 					"asset:producer:charged-stack",
 				],
 			},

@@ -7,7 +7,7 @@
 			"title": "Town Hall I",
 			"description": "Starter civic hub that issues basic settlement blueprints.",
 			"asset": {
-				"source": [
+				"default": [
 					"producer-townhall-t1"
 				]
 			},

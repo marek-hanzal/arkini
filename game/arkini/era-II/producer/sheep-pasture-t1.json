@@ -7,7 +7,7 @@
 			"title": "Sheep Pasture I",
 			"description": "Consumes grain and water to produce wool.",
 			"asset": {
-				"source": [
+				"default": [
 					"producer-sheep-pasture-t1"
 				]
 			},

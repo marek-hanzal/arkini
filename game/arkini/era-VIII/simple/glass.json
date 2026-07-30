@@ -7,7 +7,7 @@
 			"title": "Glass",
 			"description": "Finished glass panels prepared for advanced building and luxury chains.",
 			"asset": {
-				"source": [
+				"default": [
 					"item-glass"
 				]
 			},

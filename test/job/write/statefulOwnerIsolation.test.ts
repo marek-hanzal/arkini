@@ -35,7 +35,7 @@ const config = GameConfigSchema.parse({
 			title: "Producer",
 			description: "Producer",
 			asset: {
-				source: [
+				default: [
 					"asset:producer",
 				],
 			},
@@ -99,7 +99,7 @@ const config = GameConfigSchema.parse({
 			title: "Limited",
 			description: "Limited",
 			asset: {
-				source: [
+				default: [
 					"asset:limited",
 				],
 			},
@@ -115,7 +115,7 @@ const config = GameConfigSchema.parse({
 			title: "Blocker",
 			description: "Blocker",
 			asset: {
-				source: [
+				default: [
 					"asset:blocker",
 				],
 			},

@@ -7,7 +7,7 @@
 			"title": "Common Cloth",
 			"description": "Plain woven cloth produced from wool by weaver huts.",
 			"asset": {
-				"source": [
+				"default": [
 					"item-common-cloth"
 				]
 			},

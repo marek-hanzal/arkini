@@ -71,7 +71,7 @@ const config = GameConfigSchema.parse({
 			title: "Producer",
 			description: "Consumes tagged material.",
 			asset: {
-				source: [
+				default: [
 					"asset:producer",
 				],
 			},
@@ -185,7 +185,7 @@ const config = GameConfigSchema.parse({
 			title: "Material",
 			description: "Eligible fuel.",
 			asset: {
-				source: [
+				default: [
 					"asset:material",
 				],
 			},

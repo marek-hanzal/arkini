@@ -7,8 +7,11 @@
 			"title": "Dairy I Blueprint",
 			"description": "Build plan that can be filled with resources to construct Dairy I.",
 			"asset": {
-				"source": [
+				"default": [
 					"blueprint",
+					"producer-dairy-t1"
+				],
+				"sources": [
 					"producer-dairy-t1"
 				]
 			},

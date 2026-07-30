@@ -7,7 +7,7 @@
 			"title": "Construction Bundle",
 			"description": "Master package of fired bricks, glass, roof tiles, permits, and prestige materials used to unlock advanced civic and guild buildings.",
 			"asset": {
-				"source": [
+				"default": [
 					"item-construction-bundle"
 				]
 			},

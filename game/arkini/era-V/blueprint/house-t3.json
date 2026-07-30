@@ -7,8 +7,11 @@
 			"title": "House III Blueprint",
 			"description": "Build plan for House III, a housing producer that generates morale.",
 			"asset": {
-				"source": [
+				"default": [
 					"blueprint",
+					"producer-house-t3"
+				],
+				"sources": [
 					"producer-house-t3"
 				]
 			},

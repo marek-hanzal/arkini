@@ -7,7 +7,7 @@
 			"title": "Feast",
 			"description": "Hearty processed food platter that proves Era III food production is complete.",
 			"asset": {
-				"source": [
+				"default": [
 					"item-feast"
 				]
 			},

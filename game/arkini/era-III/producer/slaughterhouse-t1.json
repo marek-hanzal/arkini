@@ -7,7 +7,7 @@
 			"title": "Slaughterhouse I",
 			"description": "Processes piglets into sausage and leather.",
 			"asset": {
-				"source": [
+				"default": [
 					"producer-slaughterhouse-t1"
 				]
 			},

@@ -7,7 +7,7 @@
 			"title": "Gold Ingot",
 			"description": "Refined gold produced by smelters from gold ore and coal.",
 			"asset": {
-				"source": [
+				"default": [
 					"item-gold-ingot"
 				]
 			},

@@ -7,8 +7,11 @@
 			"title": "Clay Pit Blueprint",
 			"description": "Build plan that can be filled with resources to construct a Clay Pit.",
 			"asset": {
-				"source": [
+				"default": [
 					"blueprint",
+					"producer-clay-pit"
+				],
+				"sources": [
 					"producer-clay-pit"
 				]
 			},

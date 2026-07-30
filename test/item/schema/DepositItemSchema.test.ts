@@ -9,7 +9,7 @@ describe("DepositItemSchema", () => {
 			title: "Tree",
 			description: "A finite tree.",
 			asset: {
-				source: [
+				default: [
 					"asset:tree",
 				],
 			},
@@ -40,7 +40,7 @@ describe("DepositItemSchema", () => {
 			title: "Well",
 			description: "A finite self-consuming well.",
 			asset: {
-				source: [
+				default: [
 					"asset:well",
 				],
 			},

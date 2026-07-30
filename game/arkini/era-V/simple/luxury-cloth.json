@@ -7,7 +7,7 @@
 			"title": "Luxury Cloth",
 			"description": "Refined dyed cloth used for high-status clothing and later civic luxuries.",
 			"asset": {
-				"source": [
+				"default": [
 					"item-luxury-cloth"
 				]
 			},

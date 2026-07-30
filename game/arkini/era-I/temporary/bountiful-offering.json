@@ -7,7 +7,7 @@
 			"title": "Bountiful Offering",
 			"description": "A temporary shrine blessing that later rules can use to improve production rewards while it occupies the board.",
 			"asset": {
-				"source": [
+				"default": [
 					"producer-shrine-t1"
 				]
 			},

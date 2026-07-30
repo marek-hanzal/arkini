@@ -12,7 +12,7 @@ const runtimeItem = {
 		title: "Log",
 		description: "A log.",
 		asset: {
-			source: [
+			default: [
 				"asset:log",
 			],
 		},

@@ -7,7 +7,7 @@
 			"title": "Leather",
 			"description": "Processed leather prepared by tanneries from raw hide and used by clothing and equipment chains.",
 			"asset": {
-				"source": [
+				"default": [
 					"item-leather"
 				]
 			},

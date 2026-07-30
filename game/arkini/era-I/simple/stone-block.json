@@ -7,7 +7,7 @@
 			"title": "Stone Block",
 			"description": "Processed stone material produced by stonemasons.",
 			"asset": {
-				"source": [
+				"default": [
 					"item-stone-block"
 				]
 			},

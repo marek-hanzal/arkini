@@ -7,7 +7,7 @@
 			"title": "Iron Ore Cart",
 			"description": "A mining cart loaded with iron ore. Smelters refine it into iron ingots.",
 			"asset": {
-				"source": [
+				"default": [
 					"item-iron-ore"
 				]
 			},

@@ -7,7 +7,7 @@
 			"title": "Charcoal",
 			"description": "Controlled pre-industrial fuel made from logs and used by kilns and furnaces before coal mining is unlocked.",
 			"asset": {
-				"source": [
+				"default": [
 					"item-charcoal"
 				]
 			},

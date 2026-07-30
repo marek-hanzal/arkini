@@ -7,7 +7,7 @@
 			"title": "Vegetables",
 			"description": "Fresh vegetables grown in small gardens for base food supply chains.",
 			"asset": {
-				"source": [
+				"default": [
 					"item-vegetables"
 				]
 			},

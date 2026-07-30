@@ -7,7 +7,7 @@
 			"title": "Stonemason",
 			"description": "Upgraded stonemason workshop that keeps stone block processing and adds polished marble blocks.",
 			"asset": {
-				"source": [
+				"default": [
 					"producer-stonemason-t2"
 				]
 			},

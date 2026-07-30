@@ -7,7 +7,7 @@
 			"title": "Bio-Waste Processor I",
 			"description": "Early farm cleanup building that composts bio-waste safely or burns it faster with wood at the cost of pollution risk.",
 			"asset": {
-				"source": [
+				"default": [
 					"producer-bio-waste-processor-t1"
 				]
 			},

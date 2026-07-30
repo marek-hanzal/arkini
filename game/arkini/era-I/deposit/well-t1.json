@@ -7,7 +7,7 @@
 			"title": "Well I",
 			"description": "Produces water for 30 draws before the well runs dry.",
 			"asset": {
-				"source": [
+				"default": [
 					"producer-well-t1"
 				]
 			},

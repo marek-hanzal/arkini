@@ -7,7 +7,7 @@
 			"title": "Micro-Forest",
 			"description": "Tier-3 tiny conifer forest. Nearby lumberjacks get the strongest log roll contribution from it. Harvesting it with a single-use axe removes the source and drops logs.",
 			"asset": {
-				"source": [
+				"default": [
 					"item-micro-forest"
 				]
 			},

@@ -7,8 +7,11 @@
 			"title": "Weaver Hut I Blueprint",
 			"description": "Build plan that can be filled with resources to construct Weaver Hut I.",
 			"asset": {
-				"source": [
+				"default": [
 					"blueprint",
+					"producer-weaver-hut-t1"
+				],
+				"sources": [
 					"producer-weaver-hut-t1"
 				]
 			},

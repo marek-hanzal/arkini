@@ -8,7 +8,7 @@ const item = {
 	title: "Minor Haste",
 	description: "Temporarily marks an active production-speed blessing.",
 	asset: {
-		source: [
+		default: [
 			"asset:item:effect:minor-haste",
 		],
 	},

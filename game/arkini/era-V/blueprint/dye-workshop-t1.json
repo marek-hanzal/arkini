@@ -7,8 +7,11 @@
 			"title": "Dye Workshop I Blueprint",
 			"description": "Build plan that can be filled with resources to construct Dye Workshop I.",
 			"asset": {
-				"source": [
+				"default": [
 					"blueprint",
+					"producer-dye-workshop-t1"
+				],
+				"sources": [
 					"producer-dye-workshop-t1"
 				]
 			},

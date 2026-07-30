@@ -7,7 +7,7 @@
 			"title": "Library I",
 			"description": "Early archive that researches and reissues blueprints from Era I and Era II.",
 			"asset": {
-				"source": [
+				"default": [
 					"producer-library-t1"
 				]
 			},

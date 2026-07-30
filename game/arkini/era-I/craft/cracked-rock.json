@@ -7,7 +7,7 @@
 			"title": "Cracked Rock",
 			"description": "A mined-out rocky crack. Use a Magnifying Glass to survey it for a fresh stone deposit somewhere on the board.",
 			"asset": {
-				"source": [
+				"default": [
 					"item-cracked-rock"
 				]
 			},

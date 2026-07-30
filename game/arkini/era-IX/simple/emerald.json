@@ -7,7 +7,7 @@
 			"title": "Emerald",
 			"description": "A polished green gemstone prepared for later treasure recipes.",
 			"asset": {
-				"source": [
+				"default": [
 					"item-emerald"
 				]
 			},

@@ -7,8 +7,11 @@
 			"title": "House IV Blueprint",
 			"description": "Build plan for House IV, a housing producer that generates morale.",
 			"asset": {
-				"source": [
+				"default": [
 					"blueprint",
+					"producer-house-t4"
+				],
+				"sources": [
 					"producer-house-t4"
 				]
 			},

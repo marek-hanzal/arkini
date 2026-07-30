@@ -5,7 +5,7 @@ const baseItem = ({ id, maxStackSize = 10 }: { id: string; maxStackSize?: number
 	title: id,
 	description: id,
 	asset: {
-		source: [
+		default: [
 			`asset:${id}`,
 		],
 	},

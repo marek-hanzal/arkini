@@ -7,7 +7,7 @@
 			"title": "Water",
 			"description": "Drag this water onto the tree to merge both items.",
 			"asset": {
-				"source": [
+				"default": [
 					"item-water"
 				]
 			},
@@ -35,7 +35,7 @@
 			"title": "Tree",
 			"description": "The receiving item for the demo merge.",
 			"asset": {
-				"source": [
+				"default": [
 					"item-tree"
 				]
 			},
@@ -52,7 +52,7 @@
 			"title": "Double Tree",
 			"description": "The deterministic result of the demo merge.",
 			"asset": {
-				"source": [
+				"default": [
 					"item-double-tree"
 				]
 			},

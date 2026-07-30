@@ -7,7 +7,7 @@
 			"title": "Wool",
 			"description": "Raw wool produced by sheep pastures and used as early settlement material.",
 			"asset": {
-				"source": [
+				"default": [
 					"item-wool"
 				]
 			},

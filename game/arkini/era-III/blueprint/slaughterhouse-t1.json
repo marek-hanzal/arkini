@@ -7,8 +7,11 @@
 			"title": "Slaughterhouse I Blueprint",
 			"description": "Build plan that can be filled with resources to construct Slaughterhouse I.",
 			"asset": {
-				"source": [
+				"default": [
 					"blueprint",
+					"producer-slaughterhouse-t1"
+				],
+				"sources": [
 					"producer-slaughterhouse-t1"
 				]
 			},

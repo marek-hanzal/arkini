@@ -7,7 +7,7 @@
 			"title": "Gold Ore Cart",
 			"description": "A mining cart loaded with gold ore. This is the high-value mining output that proves the settlement can reach deep mineral resources.",
 			"asset": {
-				"source": [
+				"default": [
 					"item-gold-ore"
 				]
 			},

@@ -7,7 +7,7 @@
 			"title": "Quarry I",
 			"description": "Produces stone when placed near a rock.",
 			"asset": {
-				"source": [
+				"default": [
 					"producer-quarry-t1"
 				]
 			},

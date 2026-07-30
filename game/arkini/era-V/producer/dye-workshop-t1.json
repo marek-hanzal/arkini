@@ -7,7 +7,7 @@
 			"title": "Dye Workshop I",
 			"description": "Textile producer that dyes common cloth into luxury cloth.",
 			"asset": {
-				"source": [
+				"default": [
 					"producer-dye-workshop-t1"
 				]
 			},

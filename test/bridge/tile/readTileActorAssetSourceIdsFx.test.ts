@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import type { GameEngine } from "~/bridge/game/GameEngine";
-import { readTileActorPrimaryAssetIdFx } from "~/bridge/tile/readTileActorPrimaryAssetIdFx";
+import { readTileActorAssetSourceIdsFx } from "~/bridge/tile/readTileActorAssetSourceIdsFx";
 import { readTileActorsFx } from "~/bridge/tile/readTileActorsFx";
 import { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
@@ -35,7 +35,7 @@ const config = GameConfigSchema.parse({
 			title: "Material",
 			description: "Material",
 			asset: {
-				source: [
+				default: [
 					"asset:material-primary",
 					"asset:material-unused-stage",
 				],
@@ -51,8 +51,10 @@ const config = GameConfigSchema.parse({
 			title: "Craft",
 			description: "Craft",
 			asset: {
-				source: [
+				default: [
 					"asset:stage-0",
+				],
+				sources: [
 					"asset:stage-1",
 					"asset:stage-2",
 					"asset:stage-3",
@@ -93,8 +95,11 @@ const config = GameConfigSchema.parse({
 			title: "Blueprint",
 			description: "Blueprint",
 			asset: {
-				source: [
+				default: [
 					"asset:blueprint-empty",
+					"asset:blueprint-complete",
+				],
+				sources: [
 					"asset:blueprint-complete",
 				],
 			},
@@ -220,14 +225,14 @@ const readAssetId = (nextRuntime: RuntimeSchema.Type) => {
 	const owner = nextRuntime.items.find((item) => item.id === "runtime:owner");
 	if (owner === undefined) throw new Error("Missing progress owner.");
 	return Effect.runSync(
-		readTileActorPrimaryAssetIdFx({
+		readTileActorAssetSourceIdsFx({
 			item: owner,
 			runtime: nextRuntime,
 		}),
 	);
 };
 
-describe("readTileActorPrimaryAssetIdFx", () => {
+describe("readTileActorAssetSourceIdsFx", () => {
 	it.each([
 		{
 			assetId: "asset:stage-0",
@@ -259,7 +264,9 @@ describe("readTileActorPrimaryAssetIdFx", () => {
 					storedQuantity,
 				}),
 			),
-		).toBe(assetId);
+		).toEqual([
+			assetId,
+		]);
 	});
 
 	it("ignores buffered capacity above the required line quantity", () => {
@@ -269,7 +276,9 @@ describe("readTileActorPrimaryAssetIdFx", () => {
 					storedQuantity: 9,
 				}),
 			),
-		).toBe("asset:stage-3");
+		).toEqual([
+			"asset:stage-3",
+		]);
 	});
 
 	it("keeps the final stage while a job owns the consumed inputs", () => {
@@ -279,7 +288,9 @@ describe("readTileActorPrimaryAssetIdFx", () => {
 					active: true,
 				}),
 			),
-		).toBe("asset:stage-3");
+		).toEqual([
+			"asset:stage-3",
+		]);
 	});
 
 	it("applies the same fill contract to blueprints", () => {
@@ -293,10 +304,12 @@ describe("readTileActorPrimaryAssetIdFx", () => {
 					],
 				}),
 			),
-		).toBe("asset:blueprint-complete");
+		).toEqual([
+			"asset:blueprint-complete",
+		]);
 	});
 
-	it("keeps non-progressive item kinds on their first authored source", () => {
+	it("keeps non-progressive item kinds on their complete authored default", () => {
 		const nextRuntime = runtime({});
 		const material = {
 			...nextRuntime.items[0],
@@ -305,12 +318,28 @@ describe("readTileActorPrimaryAssetIdFx", () => {
 
 		expect(
 			Effect.runSync(
-				readTileActorPrimaryAssetIdFx({
+				readTileActorAssetSourceIdsFx({
 					item: material,
 					runtime: nextRuntime,
 				}),
 			),
-		).toBe("asset:material-primary");
+		).toEqual([
+			"asset:material-primary",
+			"asset:material-unused-stage",
+		]);
+	});
+
+	it("keeps the complete blueprint default composition before progress", () => {
+		expect(
+			readAssetId(
+				runtime({
+					ownerItem: blueprintItem,
+				}),
+			),
+		).toEqual([
+			"asset:blueprint-empty",
+			"asset:blueprint-complete",
+		]);
 	});
 
 	it("projects the selected source URL through the canonical tile actor read", () => {
@@ -330,6 +359,43 @@ describe("readTileActorPrimaryAssetIdFx", () => {
 				}),
 			)[0]?.sourceUrl,
 		).toBe("resource:asset:stage-2");
+	});
+
+	it("projects both default layers and drops the overlay for a progress source", () => {
+		const game = {
+			getResourceUrl: (resourceId: string) => `resource:${resourceId}`,
+		} as GameEngine;
+		const empty = Effect.runSync(
+			readTileActorsFx({
+				game,
+				runtime: runtime({
+					ownerItem: blueprintItem,
+				}),
+				surface: "main",
+			}),
+		)[0];
+		const filled = Effect.runSync(
+			readTileActorsFx({
+				game,
+				runtime: runtime({
+					ownerItem: blueprintItem,
+					storedQuantities: [
+						3,
+						3,
+					],
+				}),
+				surface: "main",
+			}),
+		)[0];
+
+		expect(empty).toMatchObject({
+			sourceUrl: "resource:asset:blueprint-empty",
+			compositeUrl: "resource:asset:blueprint-complete",
+		});
+		expect(filled).toMatchObject({
+			sourceUrl: "resource:asset:blueprint-complete",
+		});
+		expect(filled).not.toHaveProperty("compositeUrl");
 	});
 
 	it("projects active job progress through the canonical tile actor read", () => {

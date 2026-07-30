@@ -48,11 +48,11 @@ export const useItemDetailIdentity = (itemId: IdSchema.Type): useItemDetailIdent
 					: {
 							subtitle,
 						}),
-				sourceUrl: game.getResourceUrl(identity.sourceResourceId),
-				...(identity.compositeResourceId === undefined
+				sourceUrl: game.getResourceUrl(identity.sourceResourceIds[0]),
+				...(identity.sourceResourceIds[1] === undefined
 					? {}
 					: {
-							compositeUrl: game.getResourceUrl(identity.compositeResourceId),
+							compositeUrl: game.getResourceUrl(identity.sourceResourceIds[1]),
 						}),
 			};
 		},

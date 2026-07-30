@@ -7,7 +7,7 @@
 			"title": "Gold Deposit",
 			"description": "Movable gold source used by nearby gold mines.",
 			"asset": {
-				"source": [
+				"default": [
 					"item-gold-deposit"
 				]
 			},

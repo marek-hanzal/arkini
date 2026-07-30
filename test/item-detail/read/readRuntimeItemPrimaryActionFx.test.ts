@@ -54,7 +54,7 @@ const config = GameConfigSchema.parse({
 			title: "Producer",
 			description: "Produces resources.",
 			asset: {
-				source: [
+				default: [
 					"asset:producer",
 				],
 			},
@@ -85,7 +85,7 @@ const config = GameConfigSchema.parse({
 			title: "Resource",
 			description: "One resource.",
 			asset: {
-				source: [
+				default: [
 					"asset:resource",
 				],
 			},
@@ -100,7 +100,7 @@ const config = GameConfigSchema.parse({
 			title: "Satchel",
 			description: "Opens the shared inventory.",
 			asset: {
-				source: [
+				default: [
 					"asset:satchel",
 				],
 			},

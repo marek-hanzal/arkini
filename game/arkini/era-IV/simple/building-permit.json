@@ -7,7 +7,7 @@
 			"title": "Building Permit",
 			"description": "Official construction authorization produced by the Civic Office and used as the Era IV master item.",
 			"asset": {
-				"source": [
+				"default": [
 					"item-building-permit"
 				]
 			},

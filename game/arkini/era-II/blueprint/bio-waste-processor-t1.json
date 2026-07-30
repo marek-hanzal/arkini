@@ -7,8 +7,11 @@
 			"title": "Bio-Waste Processor I Blueprint",
 			"description": "Build plan that can be filled with early farm resources to construct Bio-Waste Processor I.",
 			"asset": {
-				"source": [
+				"default": [
 					"blueprint",
+					"producer-bio-waste-processor-t1"
+				],
+				"sources": [
 					"producer-bio-waste-processor-t1"
 				]
 			},

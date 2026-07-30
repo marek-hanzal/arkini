@@ -7,7 +7,7 @@
 			"title": "Civic Office I",
 			"description": "Administration producer that converts paper, knowledge, and coins into building permits.",
 			"asset": {
-				"source": [
+				"default": [
 					"producer-civic-office-t1"
 				]
 			},

@@ -7,7 +7,7 @@
 			"title": "Pig Farm I",
 			"description": "Consumes grain and water to produce piglets.",
 			"asset": {
-				"source": [
+				"default": [
 					"producer-pig-farm-t1"
 				]
 			},

@@ -1,19 +1,19 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { readRuntimeItemPrimaryAssetIdFx } from "~/engine/item/read/readRuntimeItemPrimaryAssetIdFx";
+import { readRuntimeItemDefaultAssetIdsFx } from "~/engine/item/read/readRuntimeItemDefaultAssetIdsFx";
 import { lineRunRuntime } from "~test/line/fx/run/support/lineRunTestRuntime";
 
-describe("readRuntimeItemPrimaryAssetIdFx", () => {
-	it("reads the first authored source without a ceremonial runtime input", () => {
+describe("readRuntimeItemDefaultAssetIdsFx", () => {
+	it("reads the complete authored default without a ceremonial runtime input", () => {
 		const item = lineRunRuntime({}).items[0]?.item;
 		if (item === undefined) throw new Error("Missing test item.");
 		expect(
 			Effect.runSync(
-				readRuntimeItemPrimaryAssetIdFx({
+				readRuntimeItemDefaultAssetIdsFx({
 					item,
 				}),
 			),
-		).toBe(item.asset.source[0]);
+		).toEqual(item.asset.default);
 	});
 });

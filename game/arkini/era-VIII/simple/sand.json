@@ -7,7 +7,7 @@
 			"title": "Sand",
 			"description": "Fine sand prepared as the base material for glassmaking.",
 			"asset": {
-				"source": [
+				"default": [
 					"item-sand"
 				]
 			},

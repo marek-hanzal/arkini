@@ -56,11 +56,11 @@ export const useItemDefinitionDetail = (
 							subtitle: categoryTitle,
 							categoryTitle,
 						}),
-				sourceUrl: game.getResourceUrl(item.asset.source[0]),
-				...(item.asset.composite === undefined
+				sourceUrl: game.getResourceUrl(item.asset.default[0]),
+				...(item.asset.default[1] === undefined
 					? {}
 					: {
-							compositeUrl: game.getResourceUrl(item.asset.composite),
+							compositeUrl: game.getResourceUrl(item.asset.default[1]),
 						}),
 				description: item.description,
 				itemType: item.type,

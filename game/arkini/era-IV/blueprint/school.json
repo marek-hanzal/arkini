@@ -7,8 +7,11 @@
 			"title": "School Blueprint",
 			"description": "Build plan that can be filled with supplies to construct a School.",
 			"asset": {
-				"source": [
+				"default": [
 					"blueprint",
+					"producer-school"
+				],
+				"sources": [
 					"producer-school"
 				]
 			},

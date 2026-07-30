@@ -7,7 +7,7 @@
 			"title": "Plank",
 			"description": "Processed wood material produced by sawmills.",
 			"asset": {
-				"source": [
+				"default": [
 					"item-plank"
 				]
 			},

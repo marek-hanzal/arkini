@@ -7,7 +7,7 @@
 			"title": "Magnifying Glass",
 			"description": "Reusable survey tool used to search exhausted cracks and later other depleted deposits for fresh sources.",
 			"asset": {
-				"source": [
+				"default": [
 					"item-magnifying-glass"
 				]
 			},

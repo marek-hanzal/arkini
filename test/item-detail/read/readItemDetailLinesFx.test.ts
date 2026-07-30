@@ -980,7 +980,7 @@ describe("readItemDetailLinesFx", () => {
 					title: "Workshop",
 					description: "Produces grouped output.",
 					asset: {
-						source: [
+						default: [
 							"asset:workshop",
 						],
 					},
@@ -1056,7 +1056,7 @@ describe("readItemDetailLinesFx", () => {
 					title: "Wood",
 					description: "Wood.",
 					asset: {
-						source: [
+						default: [
 							"asset:wood",
 						],
 					},
@@ -1071,7 +1071,7 @@ describe("readItemDetailLinesFx", () => {
 					title: "Gem",
 					description: "Gem.",
 					asset: {
-						source: [
+						default: [
 							"asset:gem",
 						],
 					},

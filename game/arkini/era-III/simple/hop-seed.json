@@ -1,0 +1,28 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"item:hop-seed": {
+			"id": "item:hop-seed",
+			"type": "simple",
+			"title": "Hop Seed",
+			"description": "Hop seed prepared for a future crop-growing lifecycle.",
+			"asset": {
+				"default": [
+					"item-seed",
+					"item-hops"
+				]
+			},
+			"tags": [
+				"material",
+				"food",
+				"seed",
+				"hops",
+				"era:III",
+				"tier-3-resource"
+			],
+			"categoryId": "food",
+			"scope": "any",
+			"maxStackSize": 50
+		}
+	}
+}

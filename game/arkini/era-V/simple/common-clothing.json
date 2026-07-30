@@ -7,7 +7,7 @@
 			"title": "Common Clothing",
 			"description": "Practical clothing sewn from common cloth and leather.",
 			"asset": {
-				"source": [
+				"default": [
 					"item-common-clothing"
 				]
 			},

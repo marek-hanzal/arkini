@@ -1,0 +1,28 @@
+{
+	"$schema": "../../../schema.json",
+	"items": {
+		"item:wheat-seed": {
+			"id": "item:wheat-seed",
+			"type": "simple",
+			"title": "Wheat Seed",
+			"description": "Wheat seed prepared for a future crop-growing lifecycle.",
+			"asset": {
+				"default": [
+					"item-seed",
+					"item-grain"
+				]
+			},
+			"tags": [
+				"material",
+				"food",
+				"seed",
+				"grain",
+				"era:II",
+				"tier-1-resource"
+			],
+			"categoryId": "food",
+			"scope": "any",
+			"maxStackSize": 50
+		}
+	}
+}

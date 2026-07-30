@@ -7,8 +7,11 @@
 			"title": "Cattle Farm I Blueprint",
 			"description": "Build plan that can be filled with resources to construct Cattle Farm I.",
 			"asset": {
-				"source": [
+				"default": [
 					"blueprint",
+					"producer-cattle-farm-t1"
+				],
+				"sources": [
 					"producer-cattle-farm-t1"
 				]
 			},

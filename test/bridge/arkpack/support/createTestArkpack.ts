@@ -45,7 +45,7 @@ export const testArkpackConfig = GameConfigSchema.parse({
 			title: "Water",
 			description: "Water",
 			asset: {
-				source: [
+				default: [
 					"asset:water",
 				],
 			},

@@ -7,8 +7,11 @@
 			"title": "Mage Lodge Blueprint",
 			"description": "Build plan for Mage Lodge, one of the mutually exclusive Choose The Path keystone buildings.",
 			"asset": {
-				"source": [
+				"default": [
 					"blueprint",
+					"producer-mage-lodge"
+				],
+				"sources": [
 					"producer-mage-lodge"
 				]
 			},

@@ -7,8 +7,11 @@
 			"title": "Academy Blueprint",
 			"description": "Build plan that upgrades a School into an Academy.",
 			"asset": {
-				"source": [
+				"default": [
 					"blueprint",
+					"producer-academy"
+				],
+				"sources": [
 					"producer-academy"
 				]
 			},

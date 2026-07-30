@@ -7,7 +7,7 @@
 			"title": "Dairy I",
 			"description": "Processes milk into cheese.",
 			"asset": {
-				"source": [
+				"default": [
 					"producer-dairy-t1"
 				]
 			},

@@ -7,7 +7,7 @@
 			"title": "Cattle Farm I",
 			"description": "Consumes grain and water to produce milk.",
 			"asset": {
-				"source": [
+				"default": [
 					"producer-cattle-farm-t1"
 				]
 			},

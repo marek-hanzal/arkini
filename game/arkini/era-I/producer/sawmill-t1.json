@@ -7,7 +7,7 @@
 			"title": "Sawmill I",
 			"description": "Turns logs into planks when placed near a lumberjack.",
 			"asset": {
-				"source": [
+				"default": [
 					"producer-sawmill-t1"
 				]
 			},

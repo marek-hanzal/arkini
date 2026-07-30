@@ -7,7 +7,7 @@
 			"title": "Master Knowledge",
 			"description": "University-level scholarship used to authorize the most ambitious expeditions and future high-civic progression.",
 			"asset": {
-				"source": [
+				"default": [
 					"item-master-knowledge"
 				]
 			},

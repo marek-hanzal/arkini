@@ -7,7 +7,7 @@
 			"title": "Glassworks",
 			"description": "Furnace workshop that turns sand and charcoal into glass.",
 			"asset": {
-				"source": [
+				"default": [
 					"producer-glassworks"
 				]
 			},

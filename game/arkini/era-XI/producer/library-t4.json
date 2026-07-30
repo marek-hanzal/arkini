@@ -7,7 +7,7 @@
 			"title": "Library IV",
 			"description": "Grand library that researches and reissues every currently available blueprint through the final era.",
 			"asset": {
-				"source": [
+				"default": [
 					"producer-library-t4"
 				]
 			},

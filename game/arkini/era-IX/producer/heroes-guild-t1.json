@@ -7,7 +7,7 @@
 			"title": "Heroes Guild I",
 			"description": "Guild-era expedition hall that consumes gear, food, keys, luxury goods, and knowledge to return chests and treasure.",
 			"asset": {
-				"source": [
+				"default": [
 					"producer-heroes-guild-t1"
 				]
 			},

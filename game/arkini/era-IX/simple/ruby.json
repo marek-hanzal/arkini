@@ -7,7 +7,7 @@
 			"title": "Ruby",
 			"description": "A polished red gemstone recovered from low-tier hero loot.",
 			"asset": {
-				"source": [
+				"default": [
 					"item-ruby"
 				]
 			},

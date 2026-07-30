@@ -37,7 +37,7 @@ const config = GameConfigSchema.parse({
 			title: "Tree",
 			description: "A living tree.",
 			asset: {
-				source: [
+				default: [
 					"asset:tree",
 				],
 			},

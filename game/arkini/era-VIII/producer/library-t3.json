@@ -7,7 +7,7 @@
 			"title": "Library III",
 			"description": "Advanced library that researches and reissues blueprints up through Era VIII.",
 			"asset": {
-				"source": [
+				"default": [
 					"producer-library-t3"
 				]
 			},

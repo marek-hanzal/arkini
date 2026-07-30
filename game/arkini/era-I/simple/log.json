@@ -7,7 +7,7 @@
 			"title": "Log",
 			"description": "Basic wood material produced by lumberjacks.",
 			"asset": {
-				"source": [
+				"default": [
 					"item-log"
 				]
 			},

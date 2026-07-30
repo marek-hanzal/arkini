@@ -7,7 +7,7 @@
 			"title": "Raw Hide",
 			"description": "Untreated animal hide produced by slaughterhouses and processed by tanneries into leather.",
 			"asset": {
-				"source": [
+				"default": [
 					"item-raw-hide"
 				]
 			},

@@ -7,7 +7,7 @@
 			"title": "Vineyard",
 			"description": "Movable vineyard source used by nearby wineries.",
 			"asset": {
-				"source": [
+				"default": [
 					"item-vineyard"
 				]
 			},

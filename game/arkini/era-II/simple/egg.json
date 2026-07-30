@@ -7,7 +7,7 @@
 			"title": "Egg",
 			"description": "Fresh eggs produced by chicken coops for base food supply chains.",
 			"asset": {
-				"source": [
+				"default": [
 					"item-egg"
 				]
 			},

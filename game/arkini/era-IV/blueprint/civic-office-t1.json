@@ -7,8 +7,11 @@
 			"title": "Civic Office I Blueprint",
 			"description": "Build plan that can be filled with resources to construct Civic Office I.",
 			"asset": {
-				"source": [
+				"default": [
 					"blueprint",
+					"producer-civic-office-t1"
+				],
+				"sources": [
 					"producer-civic-office-t1"
 				]
 			},

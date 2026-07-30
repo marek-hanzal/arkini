@@ -2,15 +2,15 @@ import { Effect } from "effect";
 
 import type { GameEngine } from "~/bridge/game/GameEngine";
 import type { TileActorVisual } from "~/bridge/tile/TileActorVisual";
-import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import { readRuntimeItemPrimaryAssetIdFx } from "~/engine/item/read/readRuntimeItemPrimaryAssetIdFx";
+import type { AssetSchema } from "~/engine/item/schema/AssetSchema";
+import { readRuntimeItemDefaultAssetIdsFx } from "~/engine/item/read/readRuntimeItemDefaultAssetIdsFx";
 import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
 
 export namespace readTileActorVisualFx {
 	export interface Props {
 		readonly game: GameEngine;
 		readonly item: ItemSchema.Type;
-		readonly primaryAssetId?: IdSchema.Type;
+		readonly sourceIds?: AssetSchema.Type["default"];
 	}
 }
 
@@ -18,21 +18,21 @@ export namespace readTileActorVisualFx {
 export const readTileActorVisualFx = Effect.fn("readTileActorVisualFx")(function* ({
 	game,
 	item,
-	primaryAssetId: requestedPrimaryAssetId,
+	sourceIds: requestedSourceIds,
 }: readTileActorVisualFx.Props) {
-	const primaryAssetId =
-		requestedPrimaryAssetId ??
-		(yield* readRuntimeItemPrimaryAssetIdFx({
+	const sourceIds =
+		requestedSourceIds ??
+		(yield* readRuntimeItemDefaultAssetIdsFx({
 			item,
 		}));
 	return {
 		itemId: item.id,
 		title: item.title,
-		sourceUrl: game.getResourceUrl(primaryAssetId),
-		...(item.asset.composite === undefined
+		sourceUrl: game.getResourceUrl(sourceIds[0]),
+		...(sourceIds[1] === undefined
 			? {}
 			: {
-					compositeUrl: game.getResourceUrl(item.asset.composite),
+					compositeUrl: game.getResourceUrl(sourceIds[1]),
 				}),
 	} satisfies TileActorVisual;
 });

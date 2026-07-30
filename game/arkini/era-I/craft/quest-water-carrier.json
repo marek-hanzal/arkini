@@ -7,7 +7,7 @@
 			"title": "Water Carrier Quest",
 			"description": "A small board quest for settlement supplies, rewarding a modest early vegetable delivery from the next era.",
 			"asset": {
-				"source": [
+				"default": [
 					"item-quest"
 				]
 			},

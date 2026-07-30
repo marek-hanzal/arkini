@@ -29,7 +29,7 @@ export const readCheatItemCatalogFx = Effect.fn("readCheatItemCatalogFx")(functi
 				tags: [
 					...item.tags,
 				],
-				sourceResourceId: item.asset.source[0],
+				sourceResourceId: item.asset.default[0],
 			}),
 		)
 		.sort(

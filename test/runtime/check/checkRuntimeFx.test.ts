@@ -38,7 +38,7 @@ const config = GameConfigSchema.parse({
 			title: "Any item",
 			description: "May occupy any grid.",
 			asset: {
-				source: [
+				default: [
 					"asset:any",
 				],
 			},
@@ -53,7 +53,7 @@ const config = GameConfigSchema.parse({
 			title: "Limited item",
 			description: "Has count and stack limits.",
 			asset: {
-				source: [
+				default: [
 					"asset:limited",
 				],
 			},
@@ -69,7 +69,7 @@ const config = GameConfigSchema.parse({
 			title: "Board item",
 			description: "May occupy only the board.",
 			asset: {
-				source: [
+				default: [
 					"asset:board",
 				],
 			},

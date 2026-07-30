@@ -7,7 +7,7 @@
 			"title": "Sapphire",
 			"description": "A polished blue gemstone from better guild rewards.",
 			"asset": {
-				"source": [
+				"default": [
 					"item-sapphire"
 				]
 			},

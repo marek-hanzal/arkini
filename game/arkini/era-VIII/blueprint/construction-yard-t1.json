@@ -7,8 +7,11 @@
 			"title": "Construction Yard I Blueprint",
 			"description": "Build plan that can be filled with resources to construct Construction Yard I.",
 			"asset": {
-				"source": [
+				"default": [
 					"blueprint",
+					"producer-construction-yard-t1"
+				],
+				"sources": [
 					"producer-construction-yard-t1"
 				]
 			},

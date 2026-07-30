@@ -7,8 +7,11 @@
 			"title": "Library I Blueprint",
 			"description": "Build plan that can be filled with early resources to construct Library I.",
 			"asset": {
-				"source": [
+				"default": [
 					"blueprint",
+					"producer-library-t1"
+				],
+				"sources": [
 					"producer-library-t1"
 				]
 			},

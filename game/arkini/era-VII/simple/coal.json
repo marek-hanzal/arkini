@@ -7,7 +7,7 @@
 			"title": "Coal Cart",
 			"description": "A mining cart loaded with coal. Used as fuel by smelters.",
 			"asset": {
-				"source": [
+				"default": [
 					"item-coal"
 				]
 			},

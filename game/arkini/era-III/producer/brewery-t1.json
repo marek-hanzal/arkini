@@ -7,7 +7,7 @@
 			"title": "Brewery I",
 			"description": "Produces hops from water near a hop field, then brews hops and water into beer barrels.",
 			"asset": {
-				"source": [
+				"default": [
 					"producer-brewery-t1"
 				]
 			},

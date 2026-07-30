@@ -35,7 +35,7 @@ const config = GameConfigSchema.parse({
 			title: "Source",
 			description: "Reusable source.",
 			asset: {
-				source: [
+				default: [
 					"asset:source",
 				],
 			},
@@ -60,7 +60,7 @@ const config = GameConfigSchema.parse({
 			title: "Target",
 			description: "Remote explicit target.",
 			asset: {
-				source: [
+				default: [
 					"asset:target",
 				],
 			},

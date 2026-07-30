@@ -7,7 +7,7 @@
 			"title": "Clay",
 			"description": "Raw clay prepared for brick and ceramic production.",
 			"asset": {
-				"source": [
+				"default": [
 					"item-clay"
 				]
 			},

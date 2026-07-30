@@ -7,7 +7,7 @@
 			"title": "Farm I",
 			"description": "Consumes water and produces grain when placed near a wheat field.",
 			"asset": {
-				"source": [
+				"default": [
 					"producer-farm-t1"
 				]
 			},

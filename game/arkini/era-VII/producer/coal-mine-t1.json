@@ -7,7 +7,7 @@
 			"title": "Coal Mine I",
 			"description": "Mines coal carts from a nearby coal deposit using food and water for the crew.",
 			"asset": {
-				"source": [
+				"default": [
 					"producer-coal-mine-t1"
 				]
 			},

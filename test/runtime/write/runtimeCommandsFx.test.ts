@@ -39,7 +39,7 @@ const config = GameConfigSchema.parse({
 			title: "Log",
 			description: "A log.",
 			asset: {
-				source: [
+				default: [
 					"asset:log",
 				],
 			},
@@ -54,7 +54,7 @@ const config = GameConfigSchema.parse({
 			title: "Stone",
 			description: "A stone.",
 			asset: {
-				source: [
+				default: [
 					"asset:stone",
 				],
 			},

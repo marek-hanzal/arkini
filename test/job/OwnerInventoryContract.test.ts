@@ -32,7 +32,7 @@ const createInventoryOpenerJobConfig = () => {
 				title: "Backpack",
 				description: "Stores items.",
 				asset: {
-					source: [
+					default: [
 						"asset:backpack",
 					],
 				},

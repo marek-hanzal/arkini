@@ -22,7 +22,7 @@ const baseItem = (id: string) => ({
 	title: id,
 	description: id,
 	asset: {
-		source: [
+		default: [
 			`asset:${id}`,
 		],
 	},

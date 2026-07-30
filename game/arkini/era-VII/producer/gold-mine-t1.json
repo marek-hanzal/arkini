@@ -7,7 +7,7 @@
 			"title": "Gold Mine I",
 			"description": "Mines gold ore carts from a nearby gold deposit using richer provisions.",
 			"asset": {
-				"source": [
+				"default": [
 					"producer-gold-mine-t1"
 				]
 			},

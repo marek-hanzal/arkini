@@ -7,7 +7,7 @@
 			"title": "Key II",
 			"description": "Gem-set goldsmith key used to open Chest II and fund tougher expeditions.",
 			"asset": {
-				"source": [
+				"default": [
 					"item-key-t2"
 				]
 			},

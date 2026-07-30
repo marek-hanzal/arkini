@@ -7,7 +7,7 @@
 			"title": "Brickyard",
 			"description": "Kiln workshop that fires clay into bricks for advanced construction.",
 			"asset": {
-				"source": [
+				"default": [
 					"producer-brickyard"
 				]
 			},

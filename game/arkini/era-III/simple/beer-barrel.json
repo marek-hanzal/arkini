@@ -7,7 +7,7 @@
 			"title": "Beer Barrel",
 			"description": "A barrel of beer produced by breweries and served by taverns.",
 			"asset": {
-				"source": [
+				"default": [
 					"item-beer-barrel"
 				]
 			},

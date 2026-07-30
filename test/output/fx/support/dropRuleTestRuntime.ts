@@ -30,7 +30,7 @@ export const dropRuleTestConfig = GameConfigSchema.parse({
 			title: "Source",
 			description: "A drop origin.",
 			asset: {
-				source: [
+				default: [
 					"asset:source",
 				],
 			},
@@ -45,7 +45,7 @@ export const dropRuleTestConfig = GameConfigSchema.parse({
 			title: "Permit",
 			description: "An availability token.",
 			asset: {
-				source: [
+				default: [
 					"asset:permit",
 				],
 			},

@@ -7,8 +7,11 @@
 			"title": "Pig Farm I Blueprint",
 			"description": "Build plan that can be filled with resources to construct Pig Farm I.",
 			"asset": {
-				"source": [
+				"default": [
 					"blueprint",
+					"producer-pig-farm-t1"
+				],
+				"sources": [
 					"producer-pig-farm-t1"
 				]
 			},

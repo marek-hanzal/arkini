@@ -34,7 +34,7 @@ const config = GameConfigSchema.parse({
 			title: "Source",
 			description: "A query origin.",
 			asset: {
-				source: [
+				default: [
 					"asset:source",
 				],
 			},
@@ -49,7 +49,7 @@ const config = GameConfigSchema.parse({
 			title: "Tree",
 			description: "A living tree.",
 			asset: {
-				source: [
+				default: [
 					"asset:tree",
 				],
 			},

@@ -41,7 +41,7 @@ const configInput = {
 			title: "Water",
 			description: "Water",
 			asset: {
-				source: [
+				default: [
 					"asset:water",
 				],
 			},
@@ -56,7 +56,7 @@ const configInput = {
 			title: "Stone",
 			description: "Stone",
 			asset: {
-				source: [
+				default: [
 					"asset:stone",
 				],
 			},
@@ -71,7 +71,7 @@ const configInput = {
 			title: "Backpack",
 			description: "Backpack",
 			asset: {
-				source: [
+				default: [
 					"asset:backpack",
 				],
 			},
@@ -158,7 +158,7 @@ const replaceMergeConfig = GameConfigSchema.parse({
 			title: "Mud",
 			description: "Mud",
 			asset: {
-				source: [
+				default: [
 					"asset:mud",
 				],
 			},

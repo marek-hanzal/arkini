@@ -7,7 +7,7 @@
 			"title": "Nails",
 			"description": "Forged fasteners produced by the Blacksmith and consumed by armories and later advanced construction.",
 			"asset": {
-				"source": [
+				"default": [
 					"item-nails"
 				]
 			},

@@ -7,8 +7,11 @@
 			"title": "Sand Pit Blueprint",
 			"description": "Build plan that can be filled with resources to construct a Sand Pit.",
 			"asset": {
-				"source": [
+				"default": [
 					"blueprint",
+					"producer-sand-pit"
+				],
+				"sources": [
 					"producer-sand-pit"
 				]
 			},

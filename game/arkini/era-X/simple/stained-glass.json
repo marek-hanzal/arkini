@@ -7,7 +7,7 @@
 			"title": "Stained Glass",
 			"description": "Prestige colored glass panels finished by Glazier Workshops for later high-civic and luxury buildings.",
 			"asset": {
-				"source": [
+				"default": [
 					"item-stained-glass"
 				]
 			},

@@ -12,7 +12,7 @@ export const createSimpleItem = (id: string, tags: string[] = []) =>
 		title: id,
 		description: id,
 		asset: {
-			source: [
+			default: [
 				`asset:${id}`,
 			],
 		},

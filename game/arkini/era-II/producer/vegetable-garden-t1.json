@@ -7,7 +7,7 @@
 			"title": "Vegetable Garden I",
 			"description": "Consumes water to produce vegetables.",
 			"asset": {
-				"source": [
+				"default": [
 					"producer-vegetable-garden-t1"
 				]
 			},

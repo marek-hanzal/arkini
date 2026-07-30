@@ -7,8 +7,11 @@
 			"title": "Waste Processor II Blueprint",
 			"description": "Build plan that upgrades Waste Processor I into Waste Processor II for coal and charcoal disposal lines.",
 			"asset": {
-				"source": [
+				"default": [
 					"blueprint",
+					"producer-waste-processor-t2"
+				],
+				"sources": [
 					"producer-waste-processor-t2"
 				]
 			},

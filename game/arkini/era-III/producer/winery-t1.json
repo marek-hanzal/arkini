@@ -7,7 +7,7 @@
 			"title": "Winery I",
 			"description": "Produces grapes from water near a vineyard, then presses grapes and water into wine barrels.",
 			"asset": {
-				"source": [
+				"default": [
 					"producer-winery-t1"
 				]
 			},

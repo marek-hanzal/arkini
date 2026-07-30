@@ -7,7 +7,7 @@
 			"title": "Axe",
 			"description": "Single-use chopping tool. Drag onto tree sources to harvest logs; also still serves later expedition gear chains.",
 			"asset": {
-				"source": [
+				"default": [
 					"item-axe"
 				]
 			},

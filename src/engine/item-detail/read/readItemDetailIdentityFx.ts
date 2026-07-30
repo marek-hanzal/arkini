@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import { readRuntimeItemPrimaryAssetIdFx } from "~/engine/item/read/readRuntimeItemPrimaryAssetIdFx";
+import { readRuntimeItemDefaultAssetIdsFx } from "~/engine/item/read/readRuntimeItemDefaultAssetIdsFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
 export namespace readItemDetailIdentityFx {
@@ -16,8 +16,10 @@ export namespace readItemDetailIdentityFx {
 				readonly itemId: IdSchema.Type;
 				readonly title: string;
 				readonly categoryId: IdSchema.Type;
-				readonly sourceResourceId: IdSchema.Type;
-				readonly compositeResourceId?: IdSchema.Type;
+				readonly sourceResourceIds: readonly [
+					IdSchema.Type,
+					...IdSchema.Type[],
+				];
 		  }
 		| {
 				readonly kind: "unavailable";
@@ -40,13 +42,8 @@ export const readItemDetailIdentityFx = Effect.fn("readItemDetailIdentityFx")(fu
 		itemId: item.id,
 		title: item.item.title,
 		categoryId: item.item.categoryId,
-		sourceResourceId: yield* readRuntimeItemPrimaryAssetIdFx({
+		sourceResourceIds: yield* readRuntimeItemDefaultAssetIdsFx({
 			item: item.item,
 		}),
-		...(item.item.asset.composite === undefined
-			? {}
-			: {
-					compositeResourceId: item.item.asset.composite,
-				}),
 	} satisfies readItemDetailIdentityFx.Result;
 });

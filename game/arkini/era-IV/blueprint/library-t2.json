@@ -7,8 +7,11 @@
 			"title": "Library II Blueprint",
 			"description": "Build plan that upgrades Library I into Library II.",
 			"asset": {
-				"source": [
+				"default": [
 					"blueprint",
+					"producer-library-t2"
+				],
+				"sources": [
 					"producer-library-t2"
 				]
 			},

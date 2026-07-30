@@ -7,7 +7,7 @@
 			"title": "Tannery I",
 			"description": "Leatherworking producer that turns raw hide and water into leather.",
 			"asset": {
-				"source": [
+				"default": [
 					"producer-tannery-t1"
 				]
 			},

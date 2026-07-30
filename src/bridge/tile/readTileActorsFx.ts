@@ -3,7 +3,7 @@ import { Array, Effect } from "effect";
 import type { GameEngine } from "~/bridge/game/GameEngine";
 import type { TileActorItem } from "~/bridge/tile/TileActorItem";
 import { readTileActorBadgeCountFx } from "~/bridge/tile/readTileActorBadgeCountFx";
-import { readTileActorPrimaryAssetIdFx } from "~/bridge/tile/readTileActorPrimaryAssetIdFx";
+import { readTileActorAssetSourceIdsFx } from "~/bridge/tile/readTileActorAssetSourceIdsFx";
 import { readTileActorProgressRatioFx } from "~/bridge/tile/readTileActorProgressRatioFx";
 import { readTileActorQueueBadgeCount } from "~/bridge/tile/readTileActorQueueBadgeCount";
 import { readTileActorVisualFx } from "~/bridge/tile/readTileActorVisualFx";
@@ -58,7 +58,7 @@ export const readTileActorsFx = Effect.fnUntraced(function* ({
 			const visual = yield* readTileActorVisualFx({
 				game,
 				item: item.item,
-				primaryAssetId: yield* readTileActorPrimaryAssetIdFx({
+				sourceIds: yield* readTileActorAssetSourceIdsFx({
 					item,
 					runtime,
 				}),

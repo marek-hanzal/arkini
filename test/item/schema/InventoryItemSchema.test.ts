@@ -8,7 +8,7 @@ const item = {
 	title: "Backpack",
 	description: "Opens the shared inventory from the board.",
 	asset: {
-		source: [
+		default: [
 			"asset:item:inventory",
 		],
 	},

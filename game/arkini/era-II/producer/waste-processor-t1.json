@@ -7,7 +7,7 @@
 			"title": "Waste Processor I",
 			"description": "Early cleanup building that slowly recycles trash safely or burns it faster with wood at the cost of pollution risk.",
 			"asset": {
-				"source": [
+				"default": [
 					"producer-waste-processor-t1"
 				]
 			},

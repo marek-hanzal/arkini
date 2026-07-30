@@ -47,7 +47,7 @@ const craftCompletionConfig = GameConfigSchema.parse({
 			title: "Drop craft",
 			description: "Consumes itself and emits one ordinary output.",
 			asset: {
-				source: [
+				default: [
 					"asset:craft-drop",
 				],
 			},
@@ -103,7 +103,7 @@ const craftCompletionConfig = GameConfigSchema.parse({
 			title: "Ordered output craft",
 			description: "Emits ordered outputs when its final charge completes.",
 			asset: {
-				source: [
+				default: [
 					"asset:craft-ordered-output",
 				],
 			},
@@ -168,7 +168,7 @@ const craftCompletionConfig = GameConfigSchema.parse({
 			title: "Reserve craft",
 			description: "Returns its reserved tool after output placement.",
 			asset: {
-				source: [
+				default: [
 					"asset:craft-reserve",
 				],
 			},
@@ -233,7 +233,7 @@ const craftCompletionConfig = GameConfigSchema.parse({
 			title: "Sink craft",
 			description: "Consumes itself without output.",
 			asset: {
-				source: [
+				default: [
 					"asset:craft-sink",
 				],
 			},
@@ -267,7 +267,7 @@ const craftCompletionConfig = GameConfigSchema.parse({
 			title: "Random craft",
 			description: "Produces one deterministic two-item alternative.",
 			asset: {
-				source: [
+				default: [
 					"asset:craft-random",
 				],
 			},
@@ -340,7 +340,7 @@ const craftCompletionConfig = GameConfigSchema.parse({
 			title: "Product",
 			description: "Ordinary craft output.",
 			asset: {
-				source: [
+				default: [
 					"asset:product",
 				],
 			},
@@ -355,7 +355,7 @@ const craftCompletionConfig = GameConfigSchema.parse({
 			title: "Result",
 			description: "Craft result output.",
 			asset: {
-				source: [
+				default: [
 					"asset:result",
 				],
 			},
@@ -370,7 +370,7 @@ const craftCompletionConfig = GameConfigSchema.parse({
 			title: "Bonus",
 			description: "Additional ordinary output.",
 			asset: {
-				source: [
+				default: [
 					"asset:bonus",
 				],
 			},
@@ -385,7 +385,7 @@ const craftCompletionConfig = GameConfigSchema.parse({
 			title: "Tool",
 			description: "Reusable craft input.",
 			asset: {
-				source: [
+				default: [
 					"asset:tool",
 				],
 			},
@@ -400,7 +400,7 @@ const craftCompletionConfig = GameConfigSchema.parse({
 			title: "Blocker",
 			description: "Occupies completion capacity.",
 			asset: {
-				source: [
+				default: [
 					"asset:blocker",
 				],
 			},
@@ -415,7 +415,7 @@ const craftCompletionConfig = GameConfigSchema.parse({
 			title: "Random A",
 			description: "First deterministic alternative.",
 			asset: {
-				source: [
+				default: [
 					"asset:random-a",
 				],
 			},
@@ -430,7 +430,7 @@ const craftCompletionConfig = GameConfigSchema.parse({
 			title: "Random B",
 			description: "Second deterministic alternative.",
 			asset: {
-				source: [
+				default: [
 					"asset:random-b",
 				],
 			},

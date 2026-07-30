@@ -7,7 +7,7 @@
 			"title": "Bricks",
 			"description": "Fired clay building material prepared for sturdier construction.",
 			"asset": {
-				"source": [
+				"default": [
 					"item-bricks"
 				]
 			},

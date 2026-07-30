@@ -7,7 +7,7 @@
 			"title": "House",
 			"description": "Basic housing that turns warmth and water into early morale.",
 			"asset": {
-				"source": [
+				"default": [
 					"producer-house-t1"
 				]
 			},

@@ -7,7 +7,7 @@
 			"title": "Aquamarine",
 			"description": "A polished cyan gemstone reserved for late-game treasure economy.",
 			"asset": {
-				"source": [
+				"default": [
 					"item-aquamarine"
 				]
 			},

@@ -7,7 +7,7 @@
 			"title": "Armory I",
 			"description": "Dedicated armor workshop that turns leather, clothing, nails, and iron ingots into expedition armor.",
 			"asset": {
-				"source": [
+				"default": [
 					"producer-armory-t1"
 				]
 			},

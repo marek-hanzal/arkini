@@ -7,7 +7,7 @@
 			"title": "Advanced Knowledge",
 			"description": "Advanced civic and technical knowledge produced by academies and used to unlock prospecting, mining, and later industrial plans.",
 			"asset": {
-				"source": [
+				"default": [
 					"item-advanced-knowledge"
 				]
 			},

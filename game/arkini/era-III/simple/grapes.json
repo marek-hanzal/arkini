@@ -7,7 +7,7 @@
 			"title": "Grapes",
 			"description": "Harvested grapes produced by wineries when supplied with water near a vineyard.",
 			"asset": {
-				"source": [
+				"default": [
 					"item-grapes"
 				]
 			},

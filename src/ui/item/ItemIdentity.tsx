@@ -41,6 +41,9 @@ export const ItemIdentity = ({
 	titleTag: Title = "span",
 }: ItemIdentityProps) => {
 	const Text = Root === "span" ? "span" : "div";
+	const layered = compositeUrl !== undefined;
+	const imageClassName =
+		"absolute object-contain drop-shadow-[0_0.3rem_0.5rem_color-mix(in_srgb,var(--ak-overlay)_28%,transparent)]";
 	return (
 		<Root
 			className={`flex min-w-0 items-center gap-3 ${className}`}
@@ -51,14 +54,16 @@ export const ItemIdentity = ({
 				data-ui={artworkDataUi}
 			>
 				<img
-					className={`absolute inset-0 size-full object-contain drop-shadow-[0_0.3rem_0.5rem_color-mix(in_srgb,var(--ak-overlay)_28%,transparent)] ${artworkImageClassName}`}
+					className={`${imageClassName} ${
+						layered ? "top-0 left-0 size-3/4" : "inset-0 size-full"
+					} ${artworkImageClassName}`}
 					src={sourceUrl}
 					alt=""
 					draggable={false}
 				/>
 				{compositeUrl === undefined ? null : (
 					<img
-						className={`absolute inset-0 size-full object-contain drop-shadow-[0_0.3rem_0.5rem_color-mix(in_srgb,var(--ak-overlay)_28%,transparent)] ${artworkImageClassName}`}
+						className={`${imageClassName} right-0 bottom-0 z-10 size-3/4 ${artworkImageClassName}`}
 						src={compositeUrl}
 						alt=""
 						draggable={false}

@@ -7,7 +7,7 @@
 			"title": "Hop Field",
 			"description": "Movable hop source used by nearby breweries.",
 			"asset": {
-				"source": [
+				"default": [
 					"item-hop-field"
 				]
 			},

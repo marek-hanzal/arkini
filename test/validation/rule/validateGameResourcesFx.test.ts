@@ -23,7 +23,8 @@ describe("validateGameResourcesFx", () => {
 			startTestConfig.resources.hero,
 		]);
 		for (const item of Object.values(startTestConfig.items)) {
-			item.asset.source.forEach((id) => ids.add(id));
+			item.asset.default.forEach((id) => ids.add(id));
+			item.asset.sources?.forEach((id) => ids.add(id));
 		}
 		const diagnostics = Effect.runSync(
 			validateGameResourcesFx({
@@ -123,6 +124,71 @@ describe("validateGameResourcesFx", () => {
 		);
 	});
 
+	it("reports the exact missing default layer and progress source entries", () => {
+		const [itemId, item] = Object.entries(startTestConfig.items)[0] ?? [];
+		if (itemId === undefined || item === undefined) throw new Error("Missing test item.");
+		const config = GameConfigSchema.parse({
+			...startTestConfig,
+			items: {
+				...startTestConfig.items,
+				[itemId]: {
+					...item,
+					asset: {
+						default: [
+							"missing:base",
+							"missing:overlay",
+						],
+						sources: [
+							"missing:progress",
+						],
+					},
+				},
+			},
+		});
+		const diagnostics = Effect.runSync(
+			validateGameResourcesFx({
+				config,
+				provenance,
+				resources: [],
+			}),
+		);
+
+		expect(diagnostics).toEqual(
+			expect.arrayContaining([
+				expect.objectContaining({
+					resourceId: "missing:base",
+					path: [
+						"items",
+						itemId,
+						"asset",
+						"default",
+						0,
+					],
+				}),
+				expect.objectContaining({
+					resourceId: "missing:overlay",
+					path: [
+						"items",
+						itemId,
+						"asset",
+						"default",
+						1,
+					],
+				}),
+				expect.objectContaining({
+					resourceId: "missing:progress",
+					path: [
+						"items",
+						itemId,
+						"asset",
+						"sources",
+						0,
+					],
+				}),
+			]),
+		);
+	});
+
 	it("allows multiple blueprints to reference one explicit shared visual", () => {
 		const blueprintItem = ({
 			id,
@@ -141,7 +207,7 @@ describe("validateGameResourcesFx", () => {
 			title: id,
 			description: id,
 			asset: {
-				source: [
+				default: [
 					"blueprint",
 					targetAsset,
 				] as const,

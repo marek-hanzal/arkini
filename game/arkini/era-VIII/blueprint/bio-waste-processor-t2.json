@@ -7,8 +7,11 @@
 			"title": "Bio-Waste Processor II Blueprint",
 			"description": "Build plan that upgrades Bio-Waste Processor I into Bio-Waste Processor II for coal and charcoal disposal lines.",
 			"asset": {
-				"source": [
+				"default": [
 					"blueprint",
+					"producer-bio-waste-processor-t2"
+				],
+				"sources": [
 					"producer-bio-waste-processor-t2"
 				]
 			},

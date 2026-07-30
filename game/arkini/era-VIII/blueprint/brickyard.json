@@ -7,8 +7,11 @@
 			"title": "Brickyard Blueprint",
 			"description": "Build plan that can be filled with resources to construct a Brickyard.",
 			"asset": {
-				"source": [
+				"default": [
 					"blueprint",
+					"producer-brickyard"
+				],
+				"sources": [
 					"producer-brickyard"
 				]
 			},

@@ -7,7 +7,7 @@
 			"title": "Cheese",
 			"description": "Processed dairy food produced from milk and used by cookhouses and markets.",
 			"asset": {
-				"source": [
+				"default": [
 					"item-cheese"
 				]
 			},

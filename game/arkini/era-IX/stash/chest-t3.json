@@ -7,7 +7,7 @@
 			"title": "Chest III",
 			"description": "Locked chest returned from a dangerous Heroes Guild expedition. Open it with a Key III.",
 			"asset": {
-				"source": [
+				"default": [
 					"item-chest-t3"
 				]
 			},

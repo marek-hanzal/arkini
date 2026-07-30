@@ -7,7 +7,7 @@ const craft = {
 	title: "Craft",
 	description: "One craft item.",
 	asset: {
-		source: [
+		default: [
 			"asset:craft",
 		],
 	},

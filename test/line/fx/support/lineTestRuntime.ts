@@ -28,7 +28,7 @@ export const lineTestConfig = GameConfigSchema.parse({
 			title: "Source",
 			description: "A line origin.",
 			asset: {
-				source: [
+				default: [
 					"asset:source",
 				],
 			},
@@ -43,7 +43,7 @@ export const lineTestConfig = GameConfigSchema.parse({
 			title: "Permit",
 			description: "Allows a product line.",
 			asset: {
-				source: [
+				default: [
 					"asset:permit",
 				],
 			},
@@ -58,7 +58,7 @@ export const lineTestConfig = GameConfigSchema.parse({
 			title: "Booster",
 			description: "Changes a product-line runtime.",
 			asset: {
-				source: [
+				default: [
 					"asset:booster",
 				],
 			},
@@ -73,7 +73,7 @@ export const lineTestConfig = GameConfigSchema.parse({
 			title: "Blocker",
 			description: "Disables and hides a product line.",
 			asset: {
-				source: [
+				default: [
 					"asset:blocker",
 				],
 			},

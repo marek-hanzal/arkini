@@ -7,7 +7,7 @@
 			"title": "Basic Knowledge",
 			"description": "Foundational know-how produced by schools and used to unlock early specialized plans.",
 			"asset": {
-				"source": [
+				"default": [
 					"item-basic-knowledge"
 				]
 			},

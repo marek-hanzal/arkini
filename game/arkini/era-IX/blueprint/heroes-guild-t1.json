@@ -7,8 +7,11 @@
 			"title": "Heroes Guild I Blueprint",
 			"description": "Build plan that can be filled with late-era resources to construct Heroes Guild I.",
 			"asset": {
-				"source": [
+				"default": [
 					"blueprint",
+					"producer-heroes-guild-t1"
+				],
+				"sources": [
 					"producer-heroes-guild-t1"
 				]
 			},

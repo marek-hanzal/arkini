@@ -7,7 +7,7 @@
 			"title": "Stonemason I",
 			"description": "Turns stone into stone blocks when placed near a quarry.",
 			"asset": {
-				"source": [
+				"default": [
 					"producer-stonemason-t1"
 				]
 			},

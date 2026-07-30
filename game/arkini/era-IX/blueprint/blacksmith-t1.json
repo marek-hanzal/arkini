@@ -7,8 +7,11 @@
 			"title": "Blacksmith I Blueprint",
 			"description": "Build plan that can be filled with metalworking resources to construct Blacksmith I.",
 			"asset": {
-				"source": [
+				"default": [
 					"blueprint",
+					"producer-blacksmith-t1"
+				],
+				"sources": [
 					"producer-blacksmith-t1"
 				]
 			},

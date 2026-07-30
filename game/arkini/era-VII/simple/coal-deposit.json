@@ -7,7 +7,7 @@
 			"title": "Coal Deposit",
 			"description": "Movable coal source used by nearby coal mines.",
 			"asset": {
-				"source": [
+				"default": [
 					"item-coal-deposit"
 				]
 			},

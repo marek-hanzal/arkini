@@ -7,7 +7,7 @@
 			"title": "Iron Ingot",
 			"description": "Refined iron produced by smelters from iron ore and coal.",
 			"asset": {
-				"source": [
+				"default": [
 					"item-iron-ingot"
 				]
 			},

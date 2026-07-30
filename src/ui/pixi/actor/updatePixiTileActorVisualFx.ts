@@ -16,6 +16,31 @@ export namespace updatePixiTileActorVisualFx {
 }
 
 const tileToSlotRatio = 0.8;
+const layeredArtworkToFaceRatio = 0.75;
+
+export const readPixiTileActorArtworkLayout = ({
+	faceSize,
+	inset,
+	layered,
+}: {
+	readonly faceSize: number;
+	readonly inset: number;
+	readonly layered: boolean;
+}) => {
+	const artworkSize = layered ? faceSize * layeredArtworkToFaceRatio : faceSize;
+	return {
+		primary: {
+			x: inset,
+			y: inset,
+			size: artworkSize,
+		},
+		secondary: {
+			x: inset + faceSize - artworkSize,
+			y: inset + faceSize - artworkSize,
+			size: artworkSize,
+		},
+	} as const;
+};
 
 /** Applies one complete logical face revision to one private visual slot. */
 export const updatePixiTileActorVisualFx = Effect.fn("updatePixiTileActorVisualFx")(function* ({
@@ -33,15 +58,19 @@ export const updatePixiTileActorVisualFx = Effect.fn("updatePixiTileActorVisualF
 
 	visual.item = item;
 	visual.size = size;
-	for (const sprite of [
-		visual.primary,
-		visual.composite,
-	]) {
-		sprite.x = inset;
-		sprite.y = inset;
-		sprite.width = faceSize;
-		sprite.height = faceSize;
-	}
+	const artwork = readPixiTileActorArtworkLayout({
+		faceSize,
+		inset,
+		layered: item.compositeUrl !== undefined,
+	});
+	visual.primary.x = artwork.primary.x;
+	visual.primary.y = artwork.primary.y;
+	visual.primary.width = artwork.primary.size;
+	visual.primary.height = artwork.primary.size;
+	visual.composite.x = artwork.secondary.x;
+	visual.composite.y = artwork.secondary.y;
+	visual.composite.width = artwork.secondary.size;
+	visual.composite.height = artwork.secondary.size;
 
 	visual.titleStyle.fontSize = titleFontSize;
 	visual.title.text = yield* fitPixiSingleLineTextFx({

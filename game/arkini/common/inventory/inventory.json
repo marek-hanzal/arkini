@@ -7,7 +7,7 @@
 			"title": "Backpack",
 			"description": "A trusty backpack that opens the shared inventory from the board.",
 			"asset": {
-				"source": [
+				"default": [
 					"item-inventory"
 				]
 			},

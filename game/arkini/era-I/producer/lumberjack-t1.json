@@ -7,7 +7,7 @@
 			"title": "Lumberjack I",
 			"description": "Produces logs when placed near a tree.",
 			"asset": {
-				"source": [
+				"default": [
 					"producer-lumberjack-t1"
 				]
 			},

@@ -7,7 +7,7 @@ const simpleItem = ({ id, tags }: { id: string; tags: string[] }) => {
 		title: id,
 		description: id,
 		asset: {
-			source: [
+			default: [
 				`asset:${id}`,
 			],
 		},

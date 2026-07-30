@@ -7,7 +7,7 @@
 			"title": "Tavern I",
 			"description": "Serves finished drink items; cooking and feast prep belong to Cookhouse I.",
 			"asset": {
-				"source": [
+				"default": [
 					"producer-tavern-t1"
 				]
 			},

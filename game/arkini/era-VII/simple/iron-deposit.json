@@ -7,7 +7,7 @@
 			"title": "Iron Deposit",
 			"description": "Movable iron source used by nearby iron mines.",
 			"asset": {
-				"source": [
+				"default": [
 					"item-iron-deposit"
 				]
 			},

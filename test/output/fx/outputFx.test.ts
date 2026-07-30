@@ -37,7 +37,7 @@ const config = GameConfigSchema.parse({
 			title: "Source",
 			description: "An output origin.",
 			asset: {
-				source: [
+				default: [
 					"asset:source",
 				],
 			},

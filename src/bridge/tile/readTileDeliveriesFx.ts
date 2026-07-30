@@ -3,7 +3,7 @@ import { Effect, Option } from "effect";
 import type { GameEngine } from "~/bridge/game/GameEngine";
 import type { TileActorItem } from "~/bridge/tile/TileActorItem";
 import { readTileActorBadgeCountFx } from "~/bridge/tile/readTileActorBadgeCountFx";
-import { readTileActorPrimaryAssetIdFx } from "~/bridge/tile/readTileActorPrimaryAssetIdFx";
+import { readTileActorAssetSourceIdsFx } from "~/bridge/tile/readTileActorAssetSourceIdsFx";
 import { readTileActorVisualFx } from "~/bridge/tile/readTileActorVisualFx";
 import { ItemEnumSchema } from "~/engine/item/schema/ItemEnumSchema";
 import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
@@ -97,7 +97,7 @@ export const readTileDeliveriesFx = Effect.fnUntraced(function* ({
 		const visual = yield* readTileActorVisualFx({
 			game,
 			item: current.item,
-			primaryAssetId: yield* readTileActorPrimaryAssetIdFx({
+			sourceIds: yield* readTileActorAssetSourceIdsFx({
 				item: current,
 				runtime,
 			}),

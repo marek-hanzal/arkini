@@ -7,8 +7,11 @@
 			"title": "Glassworks Blueprint",
 			"description": "Build plan that can be filled with resources to construct Glassworks.",
 			"asset": {
-				"source": [
+				"default": [
 					"blueprint",
+					"producer-glassworks"
+				],
+				"sources": [
 					"producer-glassworks"
 				]
 			},

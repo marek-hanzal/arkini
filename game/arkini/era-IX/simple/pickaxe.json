@@ -7,7 +7,7 @@
 			"title": "Pickaxe",
 			"description": "Single-use mining tool. Drag onto a stone deposit to harvest a random pile of stones.",
 			"asset": {
-				"source": [
+				"default": [
 					"item-pickaxe"
 				]
 			},

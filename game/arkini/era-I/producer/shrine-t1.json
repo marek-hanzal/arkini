@@ -7,7 +7,7 @@
 			"title": "Wayside Shrine",
 			"description": "Turns simple offerings into temporary production blessings.",
 			"asset": {
-				"source": [
+				"default": [
 					"producer-shrine-t1"
 				]
 			},

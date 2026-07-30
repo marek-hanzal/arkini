@@ -14,7 +14,7 @@ const simpleItem = ({
 		title: id,
 		description: id,
 		asset: {
-			source: [
+			default: [
 				`asset:${id}`,
 			],
 		},
@@ -85,7 +85,7 @@ export const startTestConfig = GameConfigSchema.parse({
 			title: "Backpack",
 			description: "Backpack",
 			asset: {
-				source: [
+				default: [
 					"asset:backpack",
 				],
 			},

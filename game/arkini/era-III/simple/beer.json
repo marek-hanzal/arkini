@@ -7,7 +7,7 @@
 			"title": "Beer",
 			"description": "A single mug of beer served by taverns.",
 			"asset": {
-				"source": [
+				"default": [
 					"item-beer"
 				]
 			},

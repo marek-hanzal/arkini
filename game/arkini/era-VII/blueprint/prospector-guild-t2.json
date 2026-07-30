@@ -7,8 +7,11 @@
 			"title": "Prospector Guild Blueprint",
 			"description": "Build plan that upgrades Prospector Guild 1 into Prospector Guild 2.",
 			"asset": {
-				"source": [
+				"default": [
 					"blueprint",
+					"producer-prospector-guild-t2"
+				],
+				"sources": [
 					"producer-prospector-guild-t2"
 				]
 			},

@@ -9,6 +9,7 @@ import {
 import { shell } from "electron";
 import { Effect } from "effect";
 import { mkdirSync } from "node:fs";
+import { join } from "node:path";
 
 import type { DiagnosticRecord } from "../../contract/diagnostics/DiagnosticRecord";
 import type { DiagnosticLog } from "./DiagnosticLog";

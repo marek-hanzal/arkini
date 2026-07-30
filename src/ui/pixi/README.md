@@ -55,6 +55,8 @@ poses to motion, runs entry or exit effects, and finalizes presentation claims.
 
 - Click performs the tile's primary action; a line owner with a default line appends one explicit
   Enqueue intent through the same queue command as Item Detail.
+- Ctrl-click on a Board line owner fills its remaining canonical queue capacity through one
+  atomic engine command; waiting rows remain ordinary stable FIFO intents.
 - Right click opens Item Detail.
 - Crossing the drag threshold changes the same pointer gesture from activation to drag.
 - Press identity stays frozen for drag/drop commands, while click activation reads the latest

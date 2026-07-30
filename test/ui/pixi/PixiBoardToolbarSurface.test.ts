@@ -226,6 +226,31 @@ describe("PixiBoardToolbarSurface", () => {
 		expect(boardState.enqueueLine).not.toHaveBeenCalled();
 	});
 
+	it("suppresses the native macOS Control-click context menu without dispatching a command", async () => {
+		const host = document.createElement("div");
+		document.body.append(host);
+		const root = createRoot(host);
+		roots.push(root);
+		await act(async () => {
+			root.render(createElement(PixiBoardToolbarSurface));
+			await Promise.resolve();
+		});
+		const surface = host.querySelector<HTMLElement>('[data-ui="PixiBoardToolbarSurface"]');
+		if (surface === null) throw new Error("Missing Board surface.");
+		const contextMenu = new MouseEvent("contextmenu", {
+			bubbles: true,
+			cancelable: true,
+			button: 2,
+			ctrlKey: true,
+		});
+
+		surface.dispatchEvent(contextMenu);
+
+		expect(contextMenu.defaultPrevented).toBe(true);
+		expect(boardState.enqueueLine).not.toHaveBeenCalled();
+		expect(boardState.openItemDetail).not.toHaveBeenCalled();
+	});
+
 	it("submits an exact Board-stack split without invoking the tile primary action", async () => {
 		const host = document.createElement("div");
 		document.body.append(host);
@@ -271,7 +296,7 @@ describe("PixiBoardToolbarSurface", () => {
 		expect(boardState.openItemDetail).not.toHaveBeenCalled();
 	});
 
-	it("sends another default-line command for a running owner and lets the engine enqueue or reject it", async () => {
+	it("routes single and fill default-line intents without interpreting queue capacity", async () => {
 		const host = document.createElement("div");
 		document.body.append(host);
 		const root = createRoot(host);
@@ -297,6 +322,11 @@ describe("PixiBoardToolbarSurface", () => {
 			primaryAction: {
 				kind: "enqueue-default-line",
 				lineId: "line:default",
+				queue: {
+					available: true,
+					capacity: 5,
+					used: 2,
+				},
 			},
 			quantity: 1,
 			revision: "revision:producer:running",
@@ -310,9 +340,34 @@ describe("PixiBoardToolbarSurface", () => {
 
 		expect(boardState.enqueueLine).toHaveBeenCalledWith({
 			kind: "enqueue",
-			lineId: "line:default",
 			ownerItemId: producer.id,
 		});
+		await createProps.onActivate(
+			producer,
+			"fill-default-line-queue",
+			document.createElement("canvas"),
+		);
+
+		expect(boardState.enqueueLine).toHaveBeenLastCalledWith({
+			kind: "fill",
+			ownerItemId: producer.id,
+		});
+		await createProps.onActivate(
+			{
+				...producer,
+				location: {
+					scope: "toolbar",
+					position: {
+						x: 0,
+						y: 0,
+					},
+				},
+			},
+			"fill-default-line-queue",
+			document.createElement("canvas"),
+		);
+
+		expect(boardState.enqueueLine).toHaveBeenCalledTimes(2);
 		expect(boardState.openItemDetail).not.toHaveBeenCalled();
 	});
 

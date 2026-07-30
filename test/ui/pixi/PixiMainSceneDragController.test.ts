@@ -122,24 +122,30 @@ const keyboard = (key: string): FakeKeyboardEvent => ({
 });
 
 interface FakePointerEvent {
+	altKey: boolean;
 	button: number;
+	ctrlKey: boolean;
 	global: {
 		x: number;
 		y: number;
 	};
 	isPrimary: boolean;
+	metaKey: boolean;
 	pointerId: number;
 	shiftKey: boolean;
 	stopPropagation: () => void;
 }
 
 const pointer = (x: number, y: number, button = 0): FakePointerEvent => ({
+	altKey: false,
 	button,
+	ctrlKey: false,
 	global: {
 		x,
 		y,
 	},
 	isPrimary: true,
+	metaKey: false,
 	pointerId: 1,
 	shiftKey: false,
 	stopPropagation: vi.fn(),
@@ -819,6 +825,57 @@ describe("Pixi main-scene drag controller", () => {
 		await flushMicrotasks();
 
 		expect(onActivate).toHaveBeenLastCalledWith(item, "split-stack", expect.anything());
+	});
+
+	it("captures exactly Ctrl+primary as one fill activation at release", async () => {
+		const mounted = mountController();
+		const controlClick = pointer(10, 20);
+		controlClick.ctrlKey = true;
+
+		mounted.actorEvents.emit("pointerdown", controlClick);
+		mounted.stage.emit("pointerup", pointer(10, 20));
+		await flushMicrotasks();
+
+		expect(mounted.onActivate).toHaveBeenCalledExactlyOnceWith(
+			item,
+			"fill-default-line-queue",
+			expect.anything(),
+		);
+
+		const controlDrag = pointer(10, 20);
+		controlDrag.ctrlKey = true;
+		mounted.actorEvents.emit("pointerdown", controlDrag);
+		mounted.stage.emit("globalpointermove", pointer(30, 20));
+		mounted.stage.emit("pointerup", pointer(30, 20));
+		await flushMicrotasks();
+
+		expect(mounted.onActivate).toHaveBeenCalledOnce();
+		expect(mounted.onDrop).toHaveBeenCalledOnce();
+	});
+
+	it("does not alias additional modifiers to the Ctrl-click fill action", async () => {
+		const mounted = mountController();
+		const controlMetaClick = pointer(10, 20);
+		controlMetaClick.ctrlKey = true;
+		controlMetaClick.metaKey = true;
+		mounted.actorEvents.emit("pointerdown", controlMetaClick);
+		mounted.stage.emit("pointerup", pointer(10, 20));
+		await flushMicrotasks();
+
+		const controlShiftClick = pointer(10, 20);
+		controlShiftClick.ctrlKey = true;
+		controlShiftClick.shiftKey = true;
+		mounted.actorEvents.emit("pointerdown", controlShiftClick);
+		mounted.stage.emit("pointerup", pointer(10, 20));
+		await flushMicrotasks();
+
+		expect(mounted.onActivate).toHaveBeenNthCalledWith(1, item, "primary", expect.anything());
+		expect(mounted.onActivate).toHaveBeenNthCalledWith(
+			2,
+			item,
+			"split-stack",
+			expect.anything(),
+		);
 	});
 
 	it("allows click activation without taking transform ownership during canonical motion", async () => {

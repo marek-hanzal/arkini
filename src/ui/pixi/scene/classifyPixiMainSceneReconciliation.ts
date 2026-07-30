@@ -102,7 +102,10 @@ const isSameMainSceneVisual = (left: TileActorItem, right: TileActorItem) => {
 	if (
 		left.primaryAction.kind === "enqueue-default-line" &&
 		(right.primaryAction.kind !== "enqueue-default-line" ||
-			left.primaryAction.lineId !== right.primaryAction.lineId)
+			left.primaryAction.lineId !== right.primaryAction.lineId ||
+			left.primaryAction.queue.available !== right.primaryAction.queue.available ||
+			left.primaryAction.queue.capacity !== right.primaryAction.queue.capacity ||
+			left.primaryAction.queue.used !== right.primaryAction.queue.used)
 	)
 		return false;
 	return (

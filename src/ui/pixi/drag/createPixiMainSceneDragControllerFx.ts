@@ -835,7 +835,9 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 									? "detail"
 									: event.shiftKey
 										? "split-stack"
-										: "primary",
+										: event.ctrlKey && !event.altKey && !event.metaKey
+											? "fill-default-line-queue"
+											: "primary",
 							actor,
 							attractionEligibilityByActorId: new Map(),
 							eligibleAttractionActorIds: new Set(),

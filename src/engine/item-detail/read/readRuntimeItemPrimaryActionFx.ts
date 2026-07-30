@@ -1,6 +1,7 @@
 import { Effect, Option } from "effect";
 
 import { ItemEnumSchema } from "~/engine/item/schema/ItemEnumSchema";
+import { resolveJobQueueFx } from "~/engine/job/fx/read/resolveJobQueueFx";
 import { isLineOwnerItemFx } from "~/engine/line/read/isLineOwnerItemFx";
 import { readEffectiveDefaultLineFx } from "~/engine/line/read/readEffectiveDefaultLineFx";
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
@@ -17,6 +18,11 @@ export namespace readRuntimeItemPrimaryActionFx {
 		| {
 				readonly kind: "enqueue-default-line";
 				readonly lineId: string;
+				readonly queue: {
+					readonly available: boolean;
+					readonly capacity: number;
+					readonly used: number;
+				};
 		  };
 
 	export interface Props {
@@ -45,9 +51,18 @@ export const readRuntimeItemPrimaryActionFx = Effect.fn("readRuntimeItemPrimaryA
 			runtime,
 		});
 		if (defaultLine !== undefined) {
+			const queue = yield* resolveJobQueueFx({
+				owner: item,
+				runtime,
+			});
 			return {
 				kind: "enqueue-default-line" as const,
 				lineId: defaultLine.id,
+				queue: {
+					available: queue.available,
+					capacity: queue.capacity,
+					used: queue.used,
+				},
 			} satisfies readRuntimeItemPrimaryActionFx.Result;
 		}
 		return {

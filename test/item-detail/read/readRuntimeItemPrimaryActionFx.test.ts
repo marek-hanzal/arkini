@@ -147,6 +147,11 @@ describe("readRuntimeItemPrimaryActionFx", () => {
 		).toEqual({
 			kind: "enqueue-default-line",
 			lineId: "line:produce",
+			queue: {
+				available: true,
+				capacity: 1,
+				used: 0,
+			},
 		});
 	});
 
@@ -198,6 +203,11 @@ describe("readRuntimeItemPrimaryActionFx", () => {
 		).toEqual({
 			kind: "enqueue-default-line",
 			lineId: "line:produce",
+			queue: {
+				available: true,
+				capacity: 1,
+				used: 0,
+			},
 		});
 		expect(
 			Effect.runSync(
@@ -228,6 +238,34 @@ describe("readRuntimeItemPrimaryActionFx", () => {
 			),
 		).toEqual({
 			kind: "none",
+		});
+	});
+
+	it("projects the canonical active-job and waiting-row capacity state", () => {
+		expect(
+			Effect.runSync(
+				readRuntimeItemPrimaryActionFx({
+					item: producer,
+					runtime: {
+						...runtime,
+						jobQueue: [
+							{
+								id: "queue:producer",
+								lineId: "line:produce",
+								ownerItemId: producer.id,
+							},
+						],
+					},
+				}),
+			),
+		).toEqual({
+			kind: "enqueue-default-line",
+			lineId: "line:produce",
+			queue: {
+				available: false,
+				capacity: 1,
+				used: 1,
+			},
 		});
 	});
 });

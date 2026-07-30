@@ -20,9 +20,9 @@ import { usePixiGameRuntime } from "~/ui/pixi/usePixiGameRuntime";
 /**
  * Mounts the one Pixi-native Board + Toolbar scene into the React-owned game shell.
  *
- * Left click performs the canonical primary action, Shift+left click splits a Board stack, and
- * right click opens Item Detail. React forwards commands and overlay cancellation only; the scene
- * runtime owns pointer and display lifecycle.
+ * Left click performs the canonical primary action, Ctrl+left click fills its default-line queue,
+ * Shift+left click splits a Board stack, and right click opens Item Detail. React forwards commands
+ * and overlay cancellation only; the scene runtime owns pointer and display lifecycle.
  */
 export const PixiBoardToolbarSurface = () => {
 	const game = useGameEngine();
@@ -84,6 +84,19 @@ export const PixiBoardToolbarSurface = () => {
 				});
 				return;
 			}
+			if (intent === "fill-default-line-queue") {
+				if (
+					item.location.scope !== "board" ||
+					item.primaryAction.kind !== "enqueue-default-line"
+				) {
+					return;
+				}
+				enqueueLine({
+					kind: "fill",
+					ownerItemId: item.id,
+				});
+				return;
+			}
 			await match(item.primaryAction)
 				.with(
 					{
@@ -101,10 +114,9 @@ export const PixiBoardToolbarSurface = () => {
 					{
 						kind: "enqueue-default-line",
 					},
-					({ lineId }) => {
+					() => {
 						enqueueLine({
 							kind: "enqueue",
-							lineId,
 							ownerItemId: item.id,
 						});
 					},

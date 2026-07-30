@@ -97,7 +97,7 @@ describe("Cheats", () => {
 			...session,
 			arkpack: {
 				packageId: "package:cheats",
-				contentHash: "content:cheats",
+				hash: "content:cheats",
 				gameId: "game:cheats",
 				title: "Cheats game",
 				game: "1.0",
@@ -176,7 +176,7 @@ describe("Cheats", () => {
 			...session,
 			arkpack: {
 				packageId: "package:cheats-race",
-				contentHash: "content:cheats-race",
+				hash: "content:cheats-race",
 				gameId: "game:cheats-race",
 				title: "Cheats race game",
 				game: "1.0",

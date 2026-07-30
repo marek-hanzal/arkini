@@ -12,7 +12,7 @@ export const DemoArkpack = {
 	url: DemoGamePackUrl,
 	descriptor: {
 		packageId: metadata.packageId,
-		contentHash: metadata.contentHash,
+		hash: metadata.hash,
 		gameId: metadata.gameId,
 		title: metadata.title,
 		game: metadata.game,

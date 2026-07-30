@@ -4,7 +4,7 @@ import { ArkpackMetadataSchema } from "~/engine/pack/schema/ArkpackMetadataSchem
 
 const metadata = {
 	packageId: "arkini",
-	contentHash: "a".repeat(64),
+	hash: "a".repeat(64),
 	gameId: "arkini",
 	title: "Arkini",
 	game: "1.0",
@@ -20,6 +20,7 @@ describe("ArkpackMetadataSchema", () => {
 				namespace: "arkini",
 				configVersion: metadata.game,
 				compressedSize: 123,
+				contentHash: metadata.hash,
 			}).success,
 		).toBe(false);
 	});

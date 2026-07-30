@@ -52,7 +52,7 @@ export const importEditorArkpackFileFx = Effect.fn("importEditorArkpackFileFx")(
 		source: "imported",
 	});
 	const plan = yield* createEditorProjectPlanFx({
-		contentHash: loaded.descriptor.contentHash,
+		contentHash: loaded.descriptor.hash,
 		payload: loaded.payload,
 	});
 	const manifest = yield* createEditorProjectManifestFileFx({

@@ -5,7 +5,7 @@ type ArkpackSource = "built-in" | "imported";
 /** Stable metadata used by the package catalog without reading package payload bytes. */
 export interface ArkpackDescriptor {
 	readonly packageId: string;
-	readonly contentHash: string;
+	readonly hash: string;
 	readonly gameId: string;
 	readonly title: string;
 	readonly game: string;

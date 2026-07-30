@@ -60,7 +60,7 @@ export const createGameFx = Effect.fn("createGameFx")(function* ({
 	return yield* Effect.gen(function* () {
 		const saveKey: GameSaveStorage.Key = {
 			packageId: loaded.descriptor.packageId,
-			contentHash: loaded.descriptor.contentHash,
+			contentHash: loaded.descriptor.hash,
 		};
 		const savedBytes = yield* saveStorage.readFx(saveKey);
 		const state =

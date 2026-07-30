@@ -28,7 +28,7 @@ const makeResource = ({
 		createGameEngineResourceFx({
 			arkpack: {
 				packageId,
-				contentHash: `content:${packageId}`,
+				hash: `content:${packageId}`,
 				gameId: testArkpackConfig.meta.id,
 				title: testArkpackConfig.meta.title,
 				game: testArkpackConfig.version,

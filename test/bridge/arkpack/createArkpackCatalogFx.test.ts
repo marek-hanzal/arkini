@@ -5,7 +5,7 @@ import { createArkpackCatalogFx } from "~/bridge/arkpack/createArkpackCatalogFx"
 
 const builtIn: ArkpackDescriptor = {
 	packageId: "arkini",
-	contentHash: "a".repeat(64),
+	hash: "a".repeat(64),
 	gameId: "arkini",
 	title: "Arkini",
 	game: "1",
@@ -18,7 +18,7 @@ const builtIn: ArkpackDescriptor = {
 
 const imported: ArkpackDescriptor = {
 	packageId: "b".repeat(64),
-	contentHash: "b".repeat(64),
+	hash: "b".repeat(64),
 	gameId: "imported",
 	title: "Imported",
 	game: "1",

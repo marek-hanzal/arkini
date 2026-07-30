@@ -91,7 +91,7 @@ vi.mock("~/ui/launcher/preloadLauncherHeroFx", () => ({
 
 const builtIn = {
 	packageId: "arkini",
-	contentHash: "a".repeat(64),
+	hash: "a".repeat(64),
 	gameId: "arkini",
 	title: "Arkini",
 	game: "1.0",

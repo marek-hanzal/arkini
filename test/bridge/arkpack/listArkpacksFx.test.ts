@@ -7,7 +7,7 @@ import { listArkpacksFx } from "~/bridge/arkpack/listArkpacksFx";
 
 const imported = {
 	packageId: "a".repeat(64),
-	contentHash: "a".repeat(64),
+	hash: "a".repeat(64),
 	gameId: "local",
 	title: "Local package",
 	game: "1.0",

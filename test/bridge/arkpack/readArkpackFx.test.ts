@@ -40,7 +40,7 @@ describe("readArkpackFx", () => {
 		);
 
 		expect(first.descriptor).toMatchObject({
-			packageId: first.descriptor.contentHash,
+			packageId: first.descriptor.hash,
 			gameId: "game:bridge",
 			title: "Bridge game",
 			game: "1.0",

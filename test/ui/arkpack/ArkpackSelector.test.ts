@@ -112,7 +112,7 @@ describe("ArkpackSelector", () => {
 			arkpacks: [
 				{
 					packageId: "package:built-in",
-					contentHash: "a".repeat(64),
+					hash: "a".repeat(64),
 					gameId: "arkini",
 					title: "Arkini",
 					game: "1",
@@ -124,7 +124,7 @@ describe("ArkpackSelector", () => {
 				},
 				{
 					packageId: "package:local",
-					contentHash: "b".repeat(64),
+					hash: "b".repeat(64),
 					gameId: "local",
 					title: "Local package",
 					game: "1",
@@ -245,7 +245,7 @@ describe("ArkpackSelector", () => {
 			arkpacks: [
 				{
 					packageId: "package:local",
-					contentHash: "b".repeat(64),
+					hash: "b".repeat(64),
 					gameId: "local",
 					title: "Local package",
 					game: "1",
@@ -329,7 +329,7 @@ describe("ArkpackSelector", () => {
 		let finishImport!: (arkpack: ArkpackDescriptor) => void;
 		const imported: ArkpackDescriptor = {
 			packageId: "package:imported",
-			contentHash: "c".repeat(64),
+			hash: "c".repeat(64),
 			gameId: "imported",
 			title: "Imported package",
 			game: "1",
@@ -427,7 +427,7 @@ describe("ArkpackSelector", () => {
 			arkpacks: [
 				{
 					packageId: "package:local",
-					contentHash: "b".repeat(64),
+					hash: "b".repeat(64),
 					gameId: "local",
 					title: "Local package",
 					game: "1",
@@ -473,7 +473,7 @@ describe("ArkpackSelector", () => {
 	it("deduplicates import and releases it after rejected destination navigation", async () => {
 		const imported: ArkpackDescriptor = {
 			packageId: "package:imported",
-			contentHash: "c".repeat(64),
+			hash: "c".repeat(64),
 			gameId: "imported",
 			title: "Imported package",
 			game: "1",

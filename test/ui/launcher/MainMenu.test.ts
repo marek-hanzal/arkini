@@ -54,7 +54,7 @@ describe("MainMenu", () => {
 			arkpacks: [
 				{
 					packageId: "competing-official",
-					contentHash: "b".repeat(64),
+					hash: "b".repeat(64),
 					gameId: "other-game",
 					title: "Other Game",
 					game: "1",
@@ -66,7 +66,7 @@ describe("MainMenu", () => {
 				},
 				{
 					packageId: "arkini",
-					contentHash: "a".repeat(64),
+					hash: "a".repeat(64),
 					gameId: "arkini",
 					title: "Arkini",
 					game: "1",

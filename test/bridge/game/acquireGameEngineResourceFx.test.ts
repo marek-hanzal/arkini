@@ -17,7 +17,7 @@ const createGame = ({
 } = {}): Game => ({
 	arkpack: {
 		packageId,
-		contentHash: "content:acquire",
+		hash: "content:acquire",
 		gameId: testArkpackConfig.meta.id,
 		title: testArkpackConfig.meta.title,
 		game: testArkpackConfig.version,

@@ -22,7 +22,7 @@ describe("ArkiniArkpack", () => {
 			},
 			source: "built-in",
 		});
-		expect(ArkiniArkpack.descriptor.contentHash).toMatch(/^[a-f0-9]{64}$/);
+		expect(ArkiniArkpack.descriptor.hash).toMatch(/^[a-f0-9]{64}$/);
 		expect(ArkiniArkpack.signatureUrl).not.toMatch(/^data:/);
 	});
 

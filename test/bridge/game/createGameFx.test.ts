@@ -64,7 +64,7 @@ const createStorages = async () => {
 		packageId: record.descriptor.packageId,
 		saveKey: {
 			packageId: record.descriptor.packageId,
-			contentHash: record.descriptor.contentHash,
+			contentHash: record.descriptor.hash,
 		} satisfies GameSaveStorage.Key,
 		readSaved: () => saved,
 		setSaved: (bytes: Uint8Array | null) => {
@@ -106,7 +106,7 @@ describe("createGameFx", () => {
 			});
 			expect(game.saveKey).toEqual({
 				packageId: "demo",
-				contentHash: DemoArkpack.descriptor.contentHash,
+				contentHash: DemoArkpack.descriptor.hash,
 			});
 
 			const initial = game.getSnapshot();

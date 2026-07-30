@@ -34,7 +34,7 @@ const makeRegistry = () => {
 const createGame = (explicitSaveFx: Effect.Effect<void, unknown> = Effect.void): Game => ({
 	arkpack: {
 		packageId: "package:menu",
-		contentHash: "content:menu",
+		hash: "content:menu",
 		gameId: "game:menu",
 		title: "Menu game",
 		game: "1.0",

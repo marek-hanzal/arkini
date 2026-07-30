@@ -43,7 +43,7 @@ export namespace ArkiniElectronApi {
 
 	export interface ArkpackDescriptor {
 		readonly packageId: string;
-		readonly contentHash: string;
+		readonly hash: string;
 		readonly gameId: string;
 		readonly title: string;
 		readonly game: string;

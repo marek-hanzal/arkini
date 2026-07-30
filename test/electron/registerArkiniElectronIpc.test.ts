@@ -164,7 +164,7 @@ const invokeArguments = new Map<string, ReadonlyArray<unknown>>([
 			{
 				descriptor: {
 					packageId: placeholderPackageId,
-					contentHash: placeholderPackageId,
+					hash: placeholderPackageId,
 					gameId: "arkini",
 					title: "Arkini",
 					game: "1",
@@ -457,7 +457,7 @@ describe("registerArkiniElectronIpcFx", () => {
 			const record: ArkiniElectronApi.ArkpackRecord = {
 				descriptor: {
 					packageId,
-					contentHash: packageId,
+					hash: packageId,
 					gameId: "arkini-test",
 					title: "Arkini test",
 					game: "1",

@@ -168,7 +168,7 @@ const readOrThrowWithConfig = <Result, Error>(
 const game = {
 	arkpack: {
 		packageId: "test-package",
-		contentHash: "test-hash",
+		hash: "test-hash",
 		gameId: config.meta.id,
 		title: config.meta.title,
 		game: config.version,

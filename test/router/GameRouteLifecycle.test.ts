@@ -28,7 +28,7 @@ const createGame = (
 ): Game => ({
 	arkpack: {
 		packageId: "package-route",
-		contentHash: "content-route",
+		hash: "content-route",
 		gameId: testArkpackConfig.meta.id,
 		title: testArkpackConfig.meta.title,
 		game: testArkpackConfig.version,

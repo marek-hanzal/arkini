@@ -19,7 +19,7 @@ export const ArkiniArkpack = {
 	signatureUrl: ArkiniGamePackSignatureUrl,
 	descriptor: {
 		packageId: metadata.packageId,
-		contentHash: metadata.contentHash,
+		hash: metadata.hash,
 		gameId: metadata.gameId,
 		title: metadata.title,
 		game: metadata.game,

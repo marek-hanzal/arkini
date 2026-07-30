@@ -16,7 +16,7 @@ const packageBytes = new Uint8Array([
 const packageId = createHash("sha256").update(packageBytes).digest("hex");
 const descriptor = {
 	packageId,
-	contentHash: packageId,
+	hash: packageId,
 	gameId: "game:test",
 	title: "Test",
 	game: "1.0",

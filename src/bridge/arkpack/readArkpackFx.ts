@@ -163,7 +163,7 @@ export const readArkpackFx = Effect.fn("readArkpackFx")(function* ({
 	return {
 		descriptor: {
 			packageId: packageId ?? contentHash,
-			contentHash,
+			hash: contentHash,
 			gameId: payload.config.meta.id,
 			title: payload.config.meta.title,
 			game: payload.config.version,

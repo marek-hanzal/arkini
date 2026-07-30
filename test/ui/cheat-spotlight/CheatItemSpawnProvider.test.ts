@@ -52,7 +52,7 @@ const makeGame = (
 	...session,
 	arkpack: {
 		packageId: `package:spawn-${suffix}`,
-		contentHash: `content:spawn-${suffix}`,
+		hash: `content:spawn-${suffix}`,
 		gameId: `game:spawn-${suffix}`,
 		title: `Spawn ${suffix}`,
 		game: "1.0",

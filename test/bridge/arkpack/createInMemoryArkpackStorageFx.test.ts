@@ -4,7 +4,7 @@ import { createInMemoryArkpackStorageFx } from "~test/support/arkpack/createInMe
 
 const descriptor = {
 	packageId: "a".repeat(64),
-	contentHash: "a".repeat(64),
+	hash: "a".repeat(64),
 	gameId: "game:test",
 	title: "Test",
 	game: "1.0" as const,

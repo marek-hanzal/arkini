@@ -138,7 +138,7 @@ const renderSettings = async (
 			...session,
 			arkpack: {
 				packageId: "package:settings",
-				contentHash: "content:settings",
+				hash: "content:settings",
 				gameId: "game:settings",
 				title: "Settings game",
 				game: "1.0",

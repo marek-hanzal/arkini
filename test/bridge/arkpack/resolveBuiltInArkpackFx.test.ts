@@ -7,7 +7,7 @@ import { resolveBuiltInArkpackFx } from "~/bridge/arkpack/resolveBuiltInArkpackF
 
 const descriptor = (packageId: string, source: ArkpackDescriptor["source"]): ArkpackDescriptor => ({
 	packageId,
-	contentHash: packageId.padEnd(64, "a").slice(0, 64),
+	hash: packageId.padEnd(64, "a").slice(0, 64),
 	gameId: packageId,
 	title: packageId,
 	game: "1",

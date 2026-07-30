@@ -72,7 +72,7 @@ describe("Game diagnostics", () => {
 		const diagnostics = installGameDiagnostics({
 			arkpack: {
 				packageId: "package:test",
-				contentHash: "content:test",
+				hash: "content:test",
 				gameId: "game:test",
 				title: "Test",
 				game: "1",

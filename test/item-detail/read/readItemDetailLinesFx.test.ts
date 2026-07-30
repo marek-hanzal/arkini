@@ -24,7 +24,146 @@ const readLines = (
 		}).pipe(Effect.provideService(GameConfigFx, config)),
 	);
 
+const focusLine = (lineId: string, show = true) => ({
+	id: lineId,
+	title: lineId,
+	description: lineId,
+	show,
+	enable: true,
+	runtimeMs: 1_000,
+	input: [
+		{
+			type: "simple" as const,
+		},
+	],
+	rules: [],
+});
+
+const focusConfig = GameConfigSchema.parse({
+	...lineRunTestConfig,
+	items: {
+		...lineRunTestConfig.items,
+		workshop: {
+			...lineRunTestConfig.items.workshop,
+			lines: [
+				focusLine("line:first"),
+				focusLine("line:second"),
+				focusLine("line:hidden", false),
+			],
+		},
+	},
+});
+
+const focusRuntime = ({
+	jobQueue = [],
+	jobs = [],
+}: {
+	readonly jobQueue?: NonNullable<RuntimeSchema.Type["jobQueue"]>;
+	readonly jobs?: RuntimeSchema.Type["jobs"];
+}) => {
+	const runtime = lineRunRuntime({});
+	return {
+		...runtime,
+		items: runtime.items.map((item) =>
+			item.id === "runtime:workshop"
+				? {
+						...item,
+						item: focusConfig.items.workshop,
+					}
+				: item,
+		),
+		jobQueue,
+		jobs,
+	} satisfies RuntimeSchema.Type;
+};
+
 describe("readItemDetailLinesFx", () => {
+	it("projects the active line before the earliest queued line", () => {
+		const lines = readLines(
+			focusRuntime({
+				jobs: [
+					{
+						id: "job:active",
+						ownerItemId: "runtime:workshop",
+						lineId: "line:first",
+						durationMs: 1_000,
+						remainingMs: 500,
+					},
+				],
+				jobQueue: [
+					{
+						id: "queue:earliest",
+						ownerItemId: "runtime:workshop",
+						lineId: "line:second",
+					},
+				],
+			}),
+			"runtime:workshop",
+			focusConfig,
+		);
+
+		expect(lines).toMatchObject({
+			kind: "available",
+			focusLineId: "line:first",
+		});
+	});
+
+	it("projects the earliest queued line once under canonical FIFO order", () => {
+		const lines = readLines(
+			focusRuntime({
+				jobQueue: [
+					{
+						id: "queue:earliest",
+						ownerItemId: "runtime:workshop",
+						lineId: "line:second",
+					},
+					{
+						id: "queue:duplicate",
+						ownerItemId: "runtime:workshop",
+						lineId: "line:second",
+					},
+					{
+						id: "queue:later",
+						ownerItemId: "runtime:workshop",
+						lineId: "line:first",
+					},
+				],
+			}),
+			"runtime:workshop",
+			focusConfig,
+		);
+
+		expect(lines).toMatchObject({
+			kind: "available",
+			focusLineId: "line:second",
+		});
+	});
+
+	it("does not replace a stale earliest queue target with another visible line", () => {
+		const lines = readLines(
+			focusRuntime({
+				jobQueue: [
+					{
+						id: "queue:hidden",
+						ownerItemId: "runtime:workshop",
+						lineId: "line:hidden",
+					},
+					{
+						id: "queue:visible",
+						ownerItemId: "runtime:workshop",
+						lineId: "line:second",
+					},
+				],
+			}),
+			"runtime:workshop",
+			focusConfig,
+		);
+
+		expect(lines.kind).toBe("available");
+		if (lines.kind !== "available") throw new Error("Expected available lines.");
+		expect(lines.focusLineId).toBeUndefined();
+	});
+
 	it("uses canonical visibility, enable, input readiness, and effective runtime", () => {
 		const blocked = readLines(
 			lineRunRuntime({

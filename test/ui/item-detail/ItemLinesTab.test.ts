@@ -8,6 +8,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { useItemDetailLines } from "~/bridge/item-detail/useItemDetailLines";
 import type { ItemDetailPendingAction } from "~/ui/item-detail/ItemDetailControl";
 import { ItemLinesTab } from "~/ui/item-detail/ItemLinesTab";
+import { scrollItemDetailLineIntoView } from "~/ui/item-detail/useItemLinesAutoFocus";
 import { JobStatusEnumSchema } from "~/engine/job/schema/read/JobStatusEnumSchema";
 
 (
@@ -64,6 +65,40 @@ vi.mock("~/bridge/item-detail/useWithdrawItemDetailLine", () => ({
 }));
 
 const roots: Array<ReturnType<typeof createRoot>> = [];
+let nextFrameId = 0;
+let animationFrames = new Map<number, FrameRequestCallback>();
+
+const rect = ({
+	bottom,
+	left = 0,
+	right = 100,
+	top,
+}: {
+	readonly bottom: number;
+	readonly left?: number;
+	readonly right?: number;
+	readonly top: number;
+}): DOMRect => ({
+	bottom,
+	height: bottom - top,
+	left,
+	right,
+	top,
+	width: right - left,
+	x: left,
+	y: top,
+	toJSON: () => ({}),
+});
+
+const flushAnimationFrame = async () => {
+	const pending = [
+		...animationFrames.entries(),
+	];
+	animationFrames = new Map();
+	await act(async () => {
+		for (const [, callback] of pending) callback(performance.now());
+	});
+};
 
 const input = {
 	kind: "materials",
@@ -203,6 +238,16 @@ const projection = {
 } as const satisfies useItemDetailLines.Projection;
 
 beforeEach(() => {
+	nextFrameId = 0;
+	animationFrames = new Map();
+	vi.stubGlobal("requestAnimationFrame", (callback: FrameRequestCallback) => {
+		const frameId = ++nextFrameId;
+		animationFrames.set(frameId, callback);
+		return frameId;
+	});
+	vi.stubGlobal("cancelAnimationFrame", (frameId: number) => {
+		animationFrames.delete(frameId);
+	});
 	for (const value of Object.values(control)) value.mockReset();
 	control.readActionError.mockReturnValue(null);
 	control.readPendingAction.mockReturnValue(null);
@@ -218,6 +263,7 @@ afterEach(async () => {
 		for (const root of roots.splice(0)) root.unmount();
 	});
 	document.body.replaceChildren();
+	vi.unstubAllGlobals();
 });
 
 const renderLines = async (
@@ -283,6 +329,140 @@ const selectAvailabilityFilter = async (container: HTMLElement, value: "availabl
 };
 
 describe("ItemLinesTab", () => {
+	it("leaves a fully visible focus row and horizontal position untouched", () => {
+		const container = document.createElement("div");
+		const row = document.createElement("article");
+		container.scrollTop = 40;
+		container.scrollLeft = 17;
+		container.getBoundingClientRect = () =>
+			rect({
+				top: 0,
+				bottom: 100,
+			});
+		row.getBoundingClientRect = () =>
+			rect({
+				top: 2,
+				bottom: 98,
+			});
+
+		expect(
+			scrollItemDetailLineIntoView({
+				container,
+				row,
+			}),
+		).toBe("visible");
+		expect(container.scrollTop).toBe(40);
+		expect(container.scrollLeft).toBe(17);
+	});
+
+	it("scrolls only the Lines container by the nearest restrained distance", () => {
+		const container = document.createElement("div");
+		const row = document.createElement("article");
+		container.scrollTop = 20;
+		container.scrollLeft = 17;
+		container.getBoundingClientRect = () =>
+			rect({
+				top: 0,
+				bottom: 100,
+			});
+		row.getBoundingClientRect = () =>
+			rect({
+				top: 120,
+				bottom: 160,
+			});
+
+		expect(
+			scrollItemDetailLineIntoView({
+				container,
+				row,
+			}),
+		).toBe("scrolled");
+		expect(container.scrollTop).toBe(92);
+		expect(container.scrollLeft).toBe(17);
+	});
+
+	it("auto-focuses one projected work row once per Lines visit", async () => {
+		const focused = {
+			...projection,
+			focusLineId: "line:second",
+		} as const satisfies Extract<
+			useItemDetailLines.Projection,
+			{
+				kind: "available";
+			}
+		>;
+		const { container, rerender } = await renderLines(focused);
+		const scrollable = container.querySelector<HTMLElement>('[data-ui="Scrollable"]');
+		const row = container.querySelector<HTMLElement>('[data-line-id="line:second"]');
+		if (scrollable === null || row === null) throw new Error("Missing focused line geometry.");
+
+		await flushAnimationFrame();
+		expect(scrollable.scrollTop).toBe(0);
+		expect(animationFrames.size).toBe(1);
+
+		scrollable.getBoundingClientRect = () =>
+			rect({
+				top: 0,
+				bottom: 100,
+			});
+		row.getBoundingClientRect = () =>
+			rect({
+				top: 120,
+				bottom: 160,
+			});
+
+		await flushAnimationFrame();
+		expect(scrollable.scrollTop).toBe(72);
+
+		scrollable.scrollTop = 11;
+		await rerender({
+			...focused,
+			focusLineId: "line:first",
+			line: focused.line.map((line) =>
+				line.lineId === "line:second" && line.activeJob !== undefined
+					? {
+							...line,
+							activeJob: {
+								...line.activeJob,
+								remainingMs: 250,
+							},
+						}
+					: line,
+			),
+		});
+		await flushAnimationFrame();
+		expect(scrollable.scrollTop).toBe(11);
+	});
+
+	it("cancels a stale pending focus when the exact owner changes", async () => {
+		const { container, rerender } = await renderLines({
+			...projection,
+			focusLineId: "line:second",
+		});
+		await rerender({
+			...projection,
+			itemId: "runtime:new-owner",
+			focusLineId: "line:first",
+		});
+		const scrollable = container.querySelector<HTMLElement>('[data-ui="Scrollable"]');
+		const first = container.querySelector<HTMLElement>('[data-line-id="line:first"]');
+		if (scrollable === null || first === null) throw new Error("Missing replacement geometry.");
+		scrollable.getBoundingClientRect = () =>
+			rect({
+				top: 0,
+				bottom: 100,
+			});
+		first.getBoundingClientRect = () =>
+			rect({
+				top: 120,
+				bottom: 160,
+			});
+
+		await flushAnimationFrame();
+		expect(scrollable.scrollTop).toBe(72);
+		expect(animationFrames.size).toBe(0);
+	});
+
 	it("leaves an enqueue-ready line without a redundant readiness badge", async () => {
 		await renderLines({
 			...projection,

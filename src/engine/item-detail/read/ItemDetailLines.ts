@@ -155,6 +155,7 @@ export namespace ItemDetailLines {
 		| {
 				readonly kind: "available";
 				readonly itemId: IdSchema.Type;
+				readonly focusLineId?: IdSchema.Type;
 				readonly line: readonly Line[];
 		  }
 		| {

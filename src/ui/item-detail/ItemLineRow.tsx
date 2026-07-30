@@ -1,4 +1,5 @@
 import { AnimatePresence, motion } from "motion/react";
+import { forwardRef } from "react";
 import { match } from "ts-pattern";
 
 import { useEnqueueItemDetailLine } from "~/bridge/item-detail/useEnqueueItemDetailLine";
@@ -140,17 +141,15 @@ const ItemLineUnavailableMessage = ({
 );
 
 /** Renders one live product line with its commands, runtime, inputs, and outputs. */
-export const ItemLineRow = ({
-	disabled,
-	line,
-	ownerItemId,
-	stale = false,
-}: {
-	readonly disabled: boolean;
-	readonly line: ItemDetailLines.Line;
-	readonly ownerItemId: string;
-	readonly stale?: boolean;
-}) => {
+export const ItemLineRow = forwardRef<
+	HTMLElement,
+	{
+		readonly disabled: boolean;
+		readonly line: ItemDetailLines.Line;
+		readonly ownerItemId: string;
+		readonly stale?: boolean;
+	}
+>(function ItemLineRow({ disabled, line, ownerItemId, stale = false }, ref) {
 	const itemDetail = useItemDetailControl();
 	const pendingKey = (action: ItemDetailPendingAction) =>
 		JSON.stringify([
@@ -232,6 +231,7 @@ export const ItemLineRow = ({
 
 	return (
 		<motion.article
+			ref={ref}
 			layout
 			className={`ak-list-row overflow-hidden rounded-xl border-b border-l-2 border-line px-3 py-5 pl-4 first:pt-3 last:border-b-0 last:pb-5 ${
 				stale
@@ -425,4 +425,4 @@ export const ItemLineRow = ({
 			</AnimatePresence>
 		</motion.article>
 	);
-};
+});

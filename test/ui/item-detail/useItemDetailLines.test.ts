@@ -323,6 +323,7 @@ const Probe = ({ itemId }: { readonly itemId: string }) => {
 	const outputItem = roll?.kind === "guaranteed" ? roll.item[0] : undefined;
 	return createElement("output", {
 		"data-can-enqueue": String(canEnqueue),
+		"data-focus-line": projection.kind === "available" ? (projection.focusLineId ?? "") : "",
 		"data-disabled-message": unavailableReason?.message ?? "",
 		"data-disabled-rule":
 			unavailableReason?.kind === "line-disabled" ? unavailableReason.cause.kind : "",
@@ -393,6 +394,61 @@ afterEach(async () => {
 });
 
 describe("useItemDetailLines", () => {
+	it("publishes the authoritative active-before-FIFO focus target", async () => {
+		const owner = withoutSource.items.find((item) => item.item.id === "producer");
+		if (owner === undefined) throw new Error("Missing producer.");
+		const container = document.createElement("div");
+		document.body.append(container);
+		const root = createRoot(container);
+		roots.push(root);
+		await act(async () => {
+			root.render(
+				createElement(Probe, {
+					itemId: owner.id,
+				}),
+			);
+		});
+		const output = container.querySelector("output");
+		expect(output?.dataset.focusLine).toBe("");
+
+		await act(async () =>
+			publishRuntime({
+				...withoutSource,
+				jobQueue: [
+					{
+						id: "queue:deposit",
+						ownerItemId: owner.id,
+						lineId: "line:producer:deposit",
+					},
+				],
+			}),
+		);
+		expect(output?.dataset.focusLine).toBe("line:producer:deposit");
+
+		await act(async () =>
+			publishRuntime({
+				...withoutSource,
+				jobs: [
+					{
+						id: "job:producer",
+						ownerItemId: owner.id,
+						lineId: "line:producer",
+						durationMs: 1_000,
+						remainingMs: 500,
+					},
+				],
+				jobQueue: [
+					{
+						id: "queue:deposit",
+						ownerItemId: owner.id,
+						lineId: "line:producer:deposit",
+					},
+				],
+			}),
+		);
+		expect(output?.dataset.focusLine).toBe("line:producer");
+	});
+
 	it("publishes Autofill availability when eligible sources appear and disappear", async () => {
 		const owner = withoutSource.items.find((item) => item.item.id === "producer");
 		if (owner === undefined) throw new Error("Missing producer.");

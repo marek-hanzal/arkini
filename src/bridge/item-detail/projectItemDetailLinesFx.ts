@@ -429,6 +429,11 @@ export const projectItemDetailLinesFx = Effect.fn("projectItemDetailLinesFx")(fu
 	return {
 		kind: "available",
 		itemId: lines.itemId,
+		...(lines.focusLineId === undefined
+			? {}
+			: {
+					focusLineId: lines.focusLineId,
+				}),
 		line: yield* Effect.all(
 			lines.line.map((line) =>
 				Effect.all({

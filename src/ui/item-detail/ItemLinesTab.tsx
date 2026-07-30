@@ -11,6 +11,7 @@ import {
 	type ItemLineAvailabilityFilter,
 	useItemLineSearch,
 } from "~/ui/item-detail/useItemLineSearch";
+import { useItemLinesAutoFocus } from "~/ui/item-detail/useItemLinesAutoFocus";
 import { Scrollable } from "~/ui/scrollable/Scrollable";
 
 const availabilityOptions = [
@@ -76,6 +77,12 @@ export const ItemLinesTab = ({
 		setAvailabilityFilter,
 		setQuery,
 	} = useItemLineSearch(lines, initialQuery, stale);
+	const { registerRow, scrollContainerRef } = useItemLinesAutoFocus({
+		focusLineId: lines.focusLineId,
+		focusLineVisible: filteredLines.some((line) => line.lineId === lines.focusLineId),
+		itemId: lines.itemId,
+		stale,
+	});
 	return (
 		<div
 			className="flex min-h-0 flex-1 flex-col"
@@ -152,7 +159,10 @@ export const ItemLinesTab = ({
 					)}
 				</AnimatePresence>
 			</div>
-			<Scrollable className="flex-1 pr-1">
+			<Scrollable
+				ref={scrollContainerRef}
+				className="flex-1 pr-1"
+			>
 				<AnimatePresence
 					initial={false}
 					mode="wait"
@@ -203,6 +213,7 @@ export const ItemLinesTab = ({
 							>
 								{filteredLines.map((line) => (
 									<ItemLineRow
+										ref={(row) => registerRow(line.lineId, row)}
 										key={line.lineId}
 										disabled={disabled}
 										line={line}

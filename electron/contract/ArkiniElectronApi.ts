@@ -3,6 +3,7 @@ import type { AppearanceThemeSchema } from "./appearance/AppearanceThemeSchema";
 import type { CheatAvailabilitySchema } from "./cheat/CheatAvailabilitySchema";
 import type { LastPackageIdSchema } from "./launcher/LastPackageIdSchema";
 import type { DiagnosticRecord } from "./diagnostics/DiagnosticRecord";
+import type { EditorProjectManifest } from "./editor/EditorProjectManifest";
 import type { EditorProjectRecord } from "./editor/EditorProjectRecord";
 import type { WindowModeSchema } from "./window/WindowModeSchema";
 
@@ -12,6 +13,7 @@ export namespace ArkiniElectronApi {
 		arkpackRead: "arkini:arkpack:read",
 		arkpackInstall: "arkini:arkpack:install",
 		arkpackRemove: "arkini:arkpack:remove",
+		editorProjectList: "arkini:editor:project:list",
 		editorProjectCreate: "arkini:editor:project:create",
 		editorProjectRead: "arkini:editor:project:read",
 		editorDirectoryOpen: "arkini:editor:directory:open",
@@ -83,6 +85,7 @@ export namespace ArkiniElectronApi {
 			readonly remove: (packageId: string) => Promise<void>;
 		};
 		readonly editor: {
+			readonly listProjects: () => Promise<ReadonlyArray<EditorProjectManifest>>;
 			readonly createProject: (record: EditorProjectRecord) => Promise<void>;
 			readonly readProject: (projectId: string) => Promise<EditorProjectRecord | null>;
 			readonly openDirectory: (projectId?: string) => Promise<void>;

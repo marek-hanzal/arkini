@@ -3,6 +3,7 @@ import { useEditorProject } from "~/bridge/editor/useEditorProject";
 /** Describes the reserved engine-backed, non-persistent gameplay sandbox boundary. */
 export const EditorBoard = () => {
 	const project = useEditorProject();
+	const config = project.config;
 	return (
 		<section
 			className="grid h-full min-h-0 place-items-center overflow-y-auto"
@@ -14,29 +15,31 @@ export const EditorBoard = () => {
 					id="editor-board-title"
 					className="text-2xl font-semibold"
 				>
-					Board for {project.config.meta.title}
+					Board for {project.title}
 				</h1>
 				<p className="mx-auto mt-3 max-w-2xl text-sm leading-6 text-muted">
-					The gameplay sandbox is not enabled in this editor foundation. Its boundary is
-					reserved for the same Board, Toolbar, Inventory and game engine with durable saves
-					replaced by a temporary editor session.
+					{config === undefined
+						? "Configure the project root before the temporary gameplay sandbox can start."
+						: "The gameplay sandbox is not enabled in this editor foundation. Its boundary is reserved for the same Board, Toolbar, Inventory and game engine with durable saves replaced by a temporary editor session."}
 				</p>
-				<dl className="mx-auto mt-6 grid max-w-md grid-cols-2 gap-3 text-left text-sm">
-					<div className="rounded-xl bg-surface-raised p-3">
-						<dt className="text-xs uppercase tracking-wider text-subtle">Board</dt>
-						<dd className="mt-1 font-semibold">
-							{project.config.meta.board.width} × {project.config.meta.board.height}
-						</dd>
-					</div>
-					<div className="rounded-xl bg-surface-raised p-3">
-						<dt className="text-xs uppercase tracking-wider text-subtle">Starting tiles</dt>
-						<dd className="mt-1 font-semibold">
-							{project.config.start.board.length +
-								project.config.start.inventory.length +
-								project.config.start.toolbar.length}
-						</dd>
-					</div>
-				</dl>
+				{config === undefined ? null : (
+					<dl className="mx-auto mt-6 grid max-w-md grid-cols-2 gap-3 text-left text-sm">
+						<div className="rounded-xl bg-surface-raised p-3">
+							<dt className="text-xs uppercase tracking-wider text-subtle">Board</dt>
+							<dd className="mt-1 font-semibold">
+								{config.meta.board.width} × {config.meta.board.height}
+							</dd>
+						</div>
+						<div className="rounded-xl bg-surface-raised p-3">
+							<dt className="text-xs uppercase tracking-wider text-subtle">Starting tiles</dt>
+							<dd className="mt-1 font-semibold">
+								{config.start.board.length +
+									config.start.inventory.length +
+									config.start.toolbar.length}
+							</dd>
+						</div>
+					</dl>
+				)}
 			</article>
 		</section>
 	);

@@ -258,7 +258,7 @@ The launcher treats `.arkpack` as the playable package boundary:
 - package validation failures never expose save deletion because no save identity is trusted. When a verified package fails specifically during durable save decode or runtime hydration, the Game resource authority retains the exact `GameSaveBootstrapError`; the error page only links to `/action/recover-game-save`, whose loader resolves that verified error, clears only its exact save, discards that exact failed service state, and returns through the normal bootstrap;
 - product runtime always uses the mandatory Electron preload capabilities. In-memory package/save adapters exist only under [`test/support`](test/support) and are injected explicitly by tests;
 - Arkpacks remain data-only. The current format accepts completed config plus PNG resources, never JavaScript or HTML.
-- the integrated editor imports one validated Arkpack into `<userData>/arkini/editor/<projectId>/`, restores `game.json`, one JSON fragment per item grouped by item type, `assets/`, and shell `resources/`, and never writes editor projects into the repository or the signed application bundle.
+- the integrated editor stores projects under `<userData>/arkini/editor/<projectId>/` and discovers them only through a valid root `editor.json` manifest. The manifest owns project identity, display metadata, and modification timestamps used by the recent-project list; missing or invalid manifests are ignored. A new project may contain only `editor.json`, while Arkpack import additionally restores `game.json`, one JSON fragment per item grouped by item type, `assets/`, and shell `resources/`. Editor projects never write into the repository or the signed application bundle.
 
 ## Game authoring commands
 

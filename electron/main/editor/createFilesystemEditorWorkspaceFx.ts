@@ -3,6 +3,7 @@ import { Effect, Semaphore } from "effect";
 
 import type { EditorWorkspace } from "./EditorWorkspace";
 import { createEditorProjectFx } from "./createEditorProjectFx";
+import { listEditorProjectsFx } from "./listEditorProjectsFx";
 import { openEditorDirectoryFx } from "./openEditorDirectoryFx";
 import { readEditorProjectFx } from "./readEditorProjectFx";
 
@@ -19,6 +20,16 @@ export const createFilesystemEditorWorkspaceFx = Effect.fn(
 )(function* ({ root, fileSystem: providedFileSystem }: createFilesystemEditorWorkspaceFx.Props) {
 	const fileSystem = providedFileSystem ?? (yield* FileSystem.FileSystem);
 	const operations = yield* Semaphore.make(1);
+	const listFx: EditorWorkspace["listFx"] = Effect.fn(
+		"FilesystemEditorWorkspace.listFx",
+	)(() =>
+		operations.withPermits(1)(
+			listEditorProjectsFx({
+				root,
+				fileSystem,
+			}),
+		),
+	);
 	const createFx: EditorWorkspace["createFx"] = Effect.fn(
 		"FilesystemEditorWorkspace.createFx",
 	)((record) =>
@@ -52,6 +63,7 @@ export const createFilesystemEditorWorkspaceFx = Effect.fn(
 		),
 	);
 	return {
+		listFx,
 		createFx,
 		readFx,
 		openDirectoryFx,

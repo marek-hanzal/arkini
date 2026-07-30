@@ -68,7 +68,7 @@ export const EditorShell = ({ children }: PropsWithChildren) => {
 					</ButtonLink>
 				</nav>
 				<p className="min-w-0 flex-1 truncate px-2 text-right text-xs text-muted">
-					{project.config.meta.title} · {project.config.version}
+					{project.title} · {project.config?.version ?? project.gameVersion ?? "New project"}
 				</p>
 				<PrimaryButtonLink
 					to="/main-menu"

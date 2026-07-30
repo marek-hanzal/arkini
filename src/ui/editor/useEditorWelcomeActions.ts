@@ -1,7 +1,7 @@
 import { useAtom } from "@effect/atom-react";
 import { useNavigate } from "@tanstack/react-router";
 import { Effect } from "effect";
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect } from "react";
 
 import type { EditorProjectDescriptor } from "~/bridge/editor/EditorProjectDescriptor";
 import { EditorWelcomeCommandAtom } from "~/ui/editor/EditorWelcomeCommandAtom";
@@ -9,7 +9,6 @@ import { EditorWelcomeCommandAtom } from "~/ui/editor/EditorWelcomeCommandAtom";
 /** Owns editor-welcome navigation composition and Escape lifecycle. */
 export const useEditorWelcomeActions = () => {
 	const navigate = useNavigate();
-	const inputRef = useRef<HTMLInputElement>(null);
 	const [state, runCommand] = useAtom(EditorWelcomeCommandAtom);
 	const active = state.kind === "pending" ? state.action : null;
 	const blocked = active !== null;
@@ -32,7 +31,6 @@ export const useEditorWelcomeActions = () => {
 						catch: (cause) => cause,
 					}),
 			});
-			if (inputRef.current !== null) inputRef.current.value = "";
 		},
 		[
 			blocked,
@@ -86,7 +84,6 @@ export const useEditorWelcomeActions = () => {
 		active,
 		blocked,
 		error: state.kind === "error" ? state.error : undefined,
-		inputRef,
 		exit,
 		importFile,
 		openRoot,

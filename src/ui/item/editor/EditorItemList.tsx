@@ -6,12 +6,15 @@ import { EditorItemThumbnail } from "~/ui/item/editor/EditorItemThumbnail";
 /** Lists every item from the compiled project as the editor's default workspace. */
 export const EditorItemList = () => {
 	const project = useEditorProject();
+	const config = project.config;
 	const items = useMemo(
 		() =>
-			Object.entries(project.config.items).sort(([, left], [, right]) =>
-				left.title.localeCompare(right.title),
-			),
-		[project.config.items],
+			config === undefined
+				? []
+				: Object.entries(config.items).sort(([, left], [, right]) =>
+						left.title.localeCompare(right.title),
+					),
+		[config],
 	);
 	return (
 		<section

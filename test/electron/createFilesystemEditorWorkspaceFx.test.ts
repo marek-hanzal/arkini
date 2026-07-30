@@ -38,12 +38,30 @@ const createWorkspace = () =>
 		}).pipe(Effect.provide(NodeServices.layer)),
 	);
 
+const createManifestFile = (projectId: string, updatedAtMs = 100) => ({
+	path: "editor.json",
+	bytes: new TextEncoder().encode(
+		`${JSON.stringify(
+			{
+				formatVersion: 1,
+				projectId,
+				title: projectId,
+				createdAtMs: 100,
+				updatedAtMs,
+			},
+			null,
+			"\t",
+		)}\n`,
+	),
+});
+
 describe("createFilesystemEditorWorkspaceFx", () => {
 	it("atomically creates, reads, and opens contained editor projects", async () => {
 		const workspace = await createWorkspace();
 		const record = {
 			projectId: "arkini-test",
 			files: [
+				createManifestFile("arkini-test"),
 				{
 					path: "game.json",
 					bytes: new TextEncoder().encode("{}\n"),
@@ -67,6 +85,15 @@ describe("createFilesystemEditorWorkspaceFx", () => {
 			),
 		});
 		await expect(Effect.runPromise(workspace.readFx("missing"))).resolves.toBeNull();
+		await expect(Effect.runPromise(workspace.listFx())).resolves.toEqual([
+			{
+				formatVersion: 1,
+				projectId: "arkini-test",
+				title: "arkini-test",
+				createdAtMs: 100,
+				updatedAtMs: 100,
+			},
+		]);
 		await expect(Effect.runPromise(workspace.createFx(record))).rejects.toThrow("Create Arkini editor project");
 
 		await Effect.runPromise(workspace.openDirectoryFx());
@@ -75,12 +102,53 @@ describe("createFilesystemEditorWorkspaceFx", () => {
 		expect(electron.openPath).toHaveBeenNthCalledWith(2, join(root, record.projectId));
 	});
 
+	it("lists only valid manifest projects in descending modification order", async () => {
+		const workspace = await createWorkspace();
+		await Effect.runPromise(
+			workspace.createFx({
+				projectId: "older-project",
+				files: [createManifestFile("older-project", 100)],
+			}),
+		);
+		await Effect.runPromise(
+			workspace.createFx({
+				projectId: "newer-project",
+				files: [createManifestFile("newer-project", 200)],
+			}),
+		);
+		await mkdir(join(root, "missing-manifest"));
+		await mkdir(join(root, "broken-manifest"));
+		await writeFile(join(root, "broken-manifest", "editor.json"), "not json", "utf8");
+
+		await expect(Effect.runPromise(workspace.readFx("newer-project"))).resolves.toEqual({
+			projectId: "newer-project",
+			files: [createManifestFile("newer-project", 200)],
+		});
+		await expect(Effect.runPromise(workspace.listFx())).resolves.toEqual([
+			{
+				formatVersion: 1,
+				projectId: "newer-project",
+				title: "newer-project",
+				createdAtMs: 100,
+				updatedAtMs: 200,
+			},
+			{
+				formatVersion: 1,
+				projectId: "older-project",
+				title: "older-project",
+				createdAtMs: 100,
+				updatedAtMs: 100,
+			},
+		]);
+	});
+
 	it("rejects project identities that differ only by filesystem case", async () => {
 		const workspace = await createWorkspace();
 		await Effect.runPromise(
 			workspace.createFx({
 				projectId: "CaseProject",
 				files: [
+					createManifestFile("CaseProject"),
 					{
 						path: "game.json",
 						bytes: new TextEncoder().encode("{}\n"),
@@ -94,6 +162,7 @@ describe("createFilesystemEditorWorkspaceFx", () => {
 				workspace.createFx({
 					projectId: "caseproject",
 					files: [
+						createManifestFile("caseproject"),
 						{
 							path: "game.json",
 							bytes: new TextEncoder().encode("{}\n"),
@@ -127,6 +196,7 @@ describe("createFilesystemEditorWorkspaceFx", () => {
 			workspace.createFx({
 				projectId: "internal-symlink-project",
 				files: [
+					createManifestFile("internal-symlink-project"),
 					{
 						path: "game.json",
 						bytes: new TextEncoder().encode("{}\n"),
@@ -150,6 +220,7 @@ describe("createFilesystemEditorWorkspaceFx", () => {
 			workspace.createFx({
 				projectId: "symlink-project",
 				files: [
+					createManifestFile("symlink-project"),
 					{
 						path: "game.json",
 						bytes: new TextEncoder().encode("{}\n"),
@@ -181,6 +252,31 @@ describe("createFilesystemEditorWorkspaceFx", () => {
 		).rejects.toThrow("Open Arkini editor directory");
 	});
 
+	it("requires editor.json to match the workspace identity", async () => {
+		const workspace = await createWorkspace();
+		await expect(
+			Effect.runPromise(
+				workspace.createFx({
+					projectId: "missing-manifest",
+					files: [
+						{
+							path: "game.json",
+							bytes: new TextEncoder().encode("{}\n"),
+						},
+					],
+				}),
+			),
+		).rejects.toThrow("must contain editor.json");
+		await expect(
+			Effect.runPromise(
+				workspace.createFx({
+					projectId: "expected-project",
+					files: [createManifestFile("different-project")],
+				}),
+			),
+		).rejects.toThrow("does not match workspace expected-project");
+	});
+
 	it("rejects traversal, duplicate files, and missing project directories", async () => {
 		const workspace = await createWorkspace();
 		await expect(
@@ -201,6 +297,7 @@ describe("createFilesystemEditorWorkspaceFx", () => {
 				workspace.createFx({
 					projectId: "escape",
 					files: [
+						createManifestFile("escape"),
 						{
 							path: "../game.json",
 							bytes: new Uint8Array(),
@@ -214,6 +311,7 @@ describe("createFilesystemEditorWorkspaceFx", () => {
 				workspace.createFx({
 					projectId: "duplicate",
 					files: [
+						createManifestFile("duplicate"),
 						{
 							path: "game.json",
 							bytes: new Uint8Array(),
@@ -231,6 +329,7 @@ describe("createFilesystemEditorWorkspaceFx", () => {
 				workspace.createFx({
 					projectId: "case-collision",
 					files: [
+						createManifestFile("case-collision"),
 						{
 							path: "simple/Item.json",
 							bytes: new Uint8Array(),
@@ -274,6 +373,7 @@ describe("createFilesystemEditorWorkspaceFx", () => {
 				workspace.createFx({
 					projectId: "reserved-file",
 					files: [
+						createManifestFile("reserved-file"),
 						{
 							path: "assets/CON.png",
 							bytes: new Uint8Array(),

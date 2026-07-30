@@ -1,4 +1,7 @@
 import { Effect } from "effect";
+import {
+	EditorProjectManifestSchema,
+} from "../../../electron/contract/editor/EditorProjectManifest";
 import { EditorProjectRecordSchema } from "../../../electron/contract/editor/EditorProjectRecord";
 
 import type { EditorProject } from "~/bridge/editor/EditorProject";
@@ -15,7 +18,7 @@ export namespace readEditorProjectFx {
 	}
 }
 
-/** Reads and recompiles one project through the same source contracts used by CLI packing. */
+/** Reads one manifest-backed project and compiles game sources when they exist. */
 export const readEditorProjectFx = Effect.fn("readEditorProjectFx")(function* ({
 	projectId,
 	workspace: providedWorkspace,
@@ -47,8 +50,52 @@ export const readEditorProjectFx = Effect.fn("readEditorProjectFx")(function* ({
 			}),
 		);
 	}
+	const manifestFile = parsedRecord.files.find(({ path }) => path === "editor.json");
+	if (manifestFile === undefined) {
+		return yield* Effect.fail(
+			new EditorProjectError({
+				reason: "unsupported-project-file",
+				message: `Editor project ${projectId} does not contain editor.json.`,
+			}),
+		);
+	}
+	const manifest = yield* Effect.try({
+		try: () =>
+			EditorProjectManifestSchema.parse(
+				JSON.parse(new TextDecoder().decode(manifestFile.bytes)) as unknown,
+			),
+		catch: (cause) =>
+			new EditorProjectError({
+				reason: "unsupported-project-file",
+				message: `Editor project ${projectId} contains an invalid editor.json.`,
+				cause,
+			}),
+	});
+	if (manifest.projectId !== projectId) {
+		return yield* Effect.fail(
+			new EditorProjectError({
+				reason: "unsupported-project-file",
+				message: `Editor project ${projectId} contains manifest ${manifest.projectId}.`,
+			}),
+		);
+	}
+	const sourceRecords = parsedRecord.files.filter(({ path }) => path !== "editor.json");
+	const descriptor = {
+		projectId: manifest.projectId,
+		title: manifest.title,
+		...(manifest.gameVersion === undefined ? {} : { gameVersion: manifest.gameVersion }),
+		createdAtMs: manifest.createdAtMs,
+		updatedAtMs: manifest.updatedAtMs,
+	} as const;
+	if (!sourceRecords.some(({ path }) => path === "game.json")) {
+		return {
+			...descriptor,
+			resources: [],
+			diagnostics: [],
+		} satisfies EditorProject;
+	}
 	const files = yield* Effect.try({
-		try: () => EditorSourceFileSchema.array().parse(parsedRecord.files),
+		try: () => EditorSourceFileSchema.array().parse(sourceRecords),
 		catch: (cause) =>
 			new EditorProjectError({
 				reason: "unsupported-project-file",
@@ -58,7 +105,7 @@ export const readEditorProjectFx = Effect.fn("readEditorProjectFx")(function* ({
 	});
 	const compilation = yield* compileEditorProjectFilesFx(files);
 	return {
-		projectId,
+		...descriptor,
 		config: compilation.payload.config,
 		resources: compilation.payload.resources,
 		diagnostics: compilation.diagnostics,

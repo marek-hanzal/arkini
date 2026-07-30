@@ -86,6 +86,18 @@ const saveKey = {
 	packageId: "arkini",
 	contentHash: "b".repeat(64),
 } as const;
+const editorManifest = {
+	formatVersion: 1,
+	projectId: "editor-test",
+	title: "Editor test",
+	gameVersion: "1.0",
+	createdAtMs: 100,
+	updatedAtMs: 100,
+} as const;
+const editorManifestFile = {
+	path: "editor.json",
+	bytes: new TextEncoder().encode(`${JSON.stringify(editorManifest)}\n`),
+};
 const invokeArguments = new Map<string, ReadonlyArray<unknown>>([
 	[
 		ArkiniElectronApi.channels.appearanceRead,
@@ -175,11 +187,16 @@ const invokeArguments = new Map<string, ReadonlyArray<unknown>>([
 		],
 	],
 	[
+		ArkiniElectronApi.channels.editorProjectList,
+		[],
+	],
+	[
 		ArkiniElectronApi.channels.editorProjectCreate,
 		[
 			{
 				projectId: "editor-test",
 				files: [
+					editorManifestFile,
 					{
 						path: "game.json",
 						bytes: new Uint8Array([123, 125]),
@@ -476,6 +493,7 @@ describe("registerArkiniElectronIpcFx", () => {
 			const editorRecord = {
 				projectId: "editor-test",
 				files: [
+					editorManifestFile,
 					{
 						path: "game.json",
 						bytes: new Uint8Array([123, 125]),
@@ -485,6 +503,9 @@ describe("registerArkiniElectronIpcFx", () => {
 			await expect(
 				invoke(ArkiniElectronApi.channels.editorProjectCreate, trustedEvent, editorRecord),
 			).resolves.toBeUndefined();
+			await expect(
+				invoke(ArkiniElectronApi.channels.editorProjectList, trustedEvent),
+			).resolves.toEqual([editorManifest]);
 			await expect(
 				invoke(ArkiniElectronApi.channels.editorProjectRead, trustedEvent, "editor-test"),
 			).resolves.toEqual(editorRecord);

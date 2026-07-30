@@ -6,6 +6,7 @@ import type { EditorProjectRecord } from "../../contract/editor/EditorProjectRec
 import { ElectronMainError } from "../ElectronMainError";
 import { assertEditorProjectFilePathFx } from "./assertEditorProjectFilePathFx";
 import { assertEditorProjectIdFx } from "./assertEditorProjectIdFx";
+import { readEditorProjectManifestFx } from "./readEditorProjectManifestFx";
 
 export namespace readEditorProjectFx {
 	export interface Props {
@@ -27,6 +28,12 @@ export const readEditorProjectFx = Effect.fn("readEditorProjectFx")(function* ({
 	projectId: candidate,
 }: readEditorProjectFx.Props) {
 	const projectId = yield* assertEditorProjectIdFx(candidate);
+	const manifest = yield* readEditorProjectManifestFx({
+		root,
+		fileSystem,
+		projectId,
+	});
+	if (manifest === null) return null;
 	const projectRoot = join(root, projectId);
 	if (!(yield* fileSystem.exists(projectRoot))) return null;
 	const projectInfo = yield* fileSystem.stat(projectRoot);

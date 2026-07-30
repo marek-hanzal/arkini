@@ -12,6 +12,9 @@ export namespace createEditorWorkspaceFx {
 /** Creates the narrow renderer capability for the canonical user-data editor root. */
 export const createEditorWorkspaceFx = Effect.fn("createEditorWorkspaceFx")(
 	({ api = window.arkini.editor }: createEditorWorkspaceFx.Props = {}) => {
+		const listFx: EditorWorkspace["listFx"] = Effect.fn("EditorWorkspace.listFx")(() =>
+			invokeEditorTransportFx("list", () => api.listProjects()),
+		);
 		const createFx: EditorWorkspace["createFx"] = Effect.fn("EditorWorkspace.createFx")(
 			(record) => invokeEditorTransportFx("create", () => api.createProject(record)),
 		);
@@ -24,6 +27,7 @@ export const createEditorWorkspaceFx = Effect.fn("createEditorWorkspaceFx")(
 			invokeEditorTransportFx("open-directory", () => api.openDirectory(projectId)),
 		);
 		return Effect.succeed({
+			listFx,
 			createFx,
 			readFx,
 			openDirectoryFx,

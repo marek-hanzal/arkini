@@ -69,6 +69,7 @@ const api: ArkiniElectronApi.Api = {
 			ipcRenderer.invoke(ArkiniElectronApi.channels.launcherLastPackageIdWrite, packageId),
 	},
 	editor: {
+		listProjects: () => ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectList),
 		createProject: (record) =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectCreate, record),
 		readProject: (projectId) =>

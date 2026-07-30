@@ -225,11 +225,14 @@ Electron `userData` has one Arkini root with explicit game and editor namespaces
       appearance-accent.pending
     logs/
   editor/<projectId>/
-    game.json
+    editor.json
+    game.json                  # optional until project root configuration exists
     <item-type>/*.json
     assets/*.png
     resources/*.png
 ```
+
+`editor.json` is the sole project-discovery marker and load identity. It owns the project ID, display title, optional game version, and creation/modification timestamps. Editor welcome scans only immediate project directories, silently ignores missing or invalid manifests, and sorts valid projects by the manifest modification timestamp. `game.json` is game source content rather than project identity, so a newly created project may begin with only `editor.json`.
 
 The original validated Arkpack binary is canonical. Imported catalog listing reads only derived `descriptor.json` files. Official Arkini listing reads only its generated tracked metadata sidecar, which is emitted from the same validated pack operation as the bundled binary. Exact read loads one binary and the renderer revalidates its format, identity, config, resources, and SHA-256 before use; official exact load additionally rejects a binary whose validated descriptor differs from the sidecar. Install writes a temporary directory and atomically renames it into place. Package removal never removes saves.
 

@@ -164,6 +164,9 @@ export const registerArkiniElectronIpcFx = Effect.fn("registerArkiniElectronIpcF
 					(event, packageId: string) =>
 						runAuthorized(event, arkpacks.removeFx(packageId)),
 				);
+				ipcMain.handle(ArkiniElectronApi.channels.editorProjectList, (event) =>
+					runAuthorized(event, editor.listFx()),
+				);
 				ipcMain.handle(
 					ArkiniElectronApi.channels.editorProjectCreate,
 					(event, record: EditorProjectRecord) =>
@@ -209,6 +212,7 @@ export const registerArkiniElectronIpcFx = Effect.fn("registerArkiniElectronIpcF
 						ArkiniElectronApi.channels.arkpackRead,
 						ArkiniElectronApi.channels.arkpackInstall,
 						ArkiniElectronApi.channels.arkpackRemove,
+						ArkiniElectronApi.channels.editorProjectList,
 						ArkiniElectronApi.channels.editorProjectCreate,
 						ArkiniElectronApi.channels.editorProjectRead,
 						ArkiniElectronApi.channels.editorDirectoryOpen,

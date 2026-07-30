@@ -4,6 +4,7 @@ import { PrimaryButton } from "~/ui/button/Button";
 /** Shows the canonical project validation result and unavailable package controls. */
 export const EditorBuild = () => {
 	const project = useEditorProject();
+	const configured = project.config !== undefined;
 	return (
 		<section
 			className="grid h-full min-h-0 content-start gap-[var(--ak-viewport-gap)] overflow-y-auto overscroll-contain"
@@ -27,12 +28,19 @@ export const EditorBuild = () => {
 					<div>
 						<h2 className="text-lg font-semibold">Project validation</h2>
 						<p className="mt-1 text-sm text-muted">
-							The current project compiled successfully with {project.diagnostics.length}{" "}
-							non-blocking diagnostic{project.diagnostics.length === 1 ? "" : "s"}.
+							{configured
+								? `The current project compiled successfully with ${project.diagnostics.length} non-blocking diagnostic${project.diagnostics.length === 1 ? "" : "s"}.`
+								: "Configure the project root before validation and arkpack output become available."}
 						</p>
 					</div>
-					<span className="rounded-full bg-success/15 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-success">
-						Valid
+					<span
+						className={
+							configured
+								? "rounded-full bg-success/15 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-success"
+								: "rounded-full bg-surface-raised px-3 py-1 text-xs font-semibold uppercase tracking-wider text-muted"
+						}
+					>
+						{configured ? "Valid" : "Not configured"}
 					</span>
 				</div>
 				{project.diagnostics.length === 0 ? null : (
@@ -42,8 +50,8 @@ export const EditorBuild = () => {
 								key={`${diagnostic.code}-${diagnostic.source ?? "project"}-${index}`}
 								className="rounded-lg bg-surface-raised p-3 text-sm text-muted"
 							>
-								<span className="font-semibold text-foreground">{diagnostic.code}</span>
-								: {diagnostic.message}
+								<span className="font-semibold text-foreground">{diagnostic.code}</span>:
+								{diagnostic.message}
 							</li>
 						))}
 					</ul>

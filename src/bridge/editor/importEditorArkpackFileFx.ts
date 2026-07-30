@@ -3,6 +3,9 @@ import { Effect } from "effect";
 import { ArkiniTrustedKeys } from "~/bridge/arkpack/ArkiniTrustedKeys";
 import { ArkpackLimits } from "~/bridge/arkpack/ArkpackLimits";
 import { readArkpackFx } from "~/bridge/arkpack/readArkpackFx";
+import {
+	createEditorProjectManifestFileFx,
+} from "~/bridge/editor/createEditorProjectManifestFileFx";
 import { createEditorWorkspaceFx } from "~/bridge/editor/createEditorWorkspaceFx";
 import type { EditorProjectDescriptor } from "~/bridge/editor/EditorProjectDescriptor";
 import type { EditorWorkspace } from "~/bridge/editor/EditorWorkspace";
@@ -26,6 +29,9 @@ export const importEditorArkpackFileFx = Effect.fn("importEditorArkpackFileFx")(
 	file,
 	workspace: providedWorkspace,
 }: importEditorArkpackFileFx.Props) {
+	if (!file.name.toLowerCase().endsWith(".arkpack")) {
+		return yield* Effect.fail(new Error("Choose a .arkpack file."));
+	}
 	if (file.size > ArkpackLimits.maxCompressedBytes) {
 		return yield* Effect.fail(
 			new Error(
@@ -49,14 +55,18 @@ export const importEditorArkpackFileFx = Effect.fn("importEditorArkpackFileFx")(
 		contentHash: loaded.descriptor.contentHash,
 		payload: loaded.payload,
 	});
+	const manifest = yield* createEditorProjectManifestFileFx({
+		projectId: plan.projectId,
+		title: plan.title,
+		gameVersion: plan.version,
+	});
 	const workspace = providedWorkspace ?? (yield* createEditorWorkspaceFx());
 	yield* workspace.createFx({
 		projectId: plan.projectId,
-		files: plan.files,
+		files: [
+			manifest.file,
+			...plan.files,
+		],
 	});
-	return {
-		projectId: plan.projectId,
-		title: plan.title,
-		version: plan.version,
-	} satisfies EditorProjectDescriptor;
+	return manifest.descriptor satisfies EditorProjectDescriptor;
 });

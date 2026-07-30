@@ -3,6 +3,7 @@ import { Effect } from "effect";
 import { randomUUID } from "node:crypto";
 import { dirname, join } from "node:path";
 
+import { EditorProjectManifestSchema } from "../../contract/editor/EditorProjectManifest";
 import {
 	EditorProjectRecordSchema,
 	type EditorProjectRecord,
@@ -34,6 +35,36 @@ export const createEditorProjectFx = Effect.fn("createEditorProjectFx")(function
 			}),
 	});
 	const projectId = yield* assertEditorProjectIdFx(parsedRecord.projectId);
+	const manifestFile = parsedRecord.files.find(({ path }) => path === "editor.json");
+	if (manifestFile === undefined) {
+		return yield* Effect.fail(
+			new ElectronMainError({
+				operation: "Create Arkini editor project",
+				cause: new Error("Editor project must contain editor.json."),
+			}),
+		);
+	}
+	const manifest = yield* Effect.try({
+		try: () =>
+			EditorProjectManifestSchema.parse(
+				JSON.parse(new TextDecoder().decode(manifestFile.bytes)) as unknown,
+			),
+		catch: (cause) =>
+			new ElectronMainError({
+				operation: "Create Arkini editor project",
+				cause,
+			}),
+	});
+	if (manifest.projectId !== projectId) {
+		return yield* Effect.fail(
+			new ElectronMainError({
+				operation: "Create Arkini editor project",
+				cause: new Error(
+					`Editor manifest ${manifest.projectId} does not match workspace ${projectId}.`,
+				),
+			}),
+		);
+	}
 	yield* fileSystem.makeDirectory(root, {
 		recursive: true,
 	});

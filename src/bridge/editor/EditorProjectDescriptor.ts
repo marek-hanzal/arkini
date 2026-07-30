@@ -1,6 +1,8 @@
-/** Stable route identity and display metadata returned after an arkpack import. */
+/** Stable manifest-backed identity used by editor discovery and navigation. */
 export interface EditorProjectDescriptor {
 	readonly projectId: string;
 	readonly title: string;
-	readonly version: string;
+	readonly gameVersion?: string;
+	readonly createdAtMs: number;
+	readonly updatedAtMs: number;
 }

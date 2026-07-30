@@ -68,7 +68,6 @@ export const signArkpackFx = Effect.fn("signArkpackFx")(function* ({
 	return yield* Effect.try({
 		try: () =>
 			ArkpackSignatureSchema.parse({
-				format: 1,
 				keyId,
 				signature,
 			}),

@@ -13,11 +13,10 @@ example.game.arkpack
 example.game.arkpack.sig
 ```
 
-The strict version-one JSON sidecar is below. Format `1` is Ed25519, so repeating the algorithm in every sidecar or trusted-key entry would carry no information.
+The strict JSON sidecar is below. Ed25519 is the only supported signing algorithm, so repeating an algorithm or independent format marker in every sidecar would carry no information. Its contract ships with the game version that reads and writes the package.
 
 ```json
 {
-	"format": 1,
 	"keyId": "arkini-official-2026-01",
 	"signature": "<standard padded base64 Ed25519 signature>"
 }

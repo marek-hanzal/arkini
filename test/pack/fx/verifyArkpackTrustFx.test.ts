@@ -52,7 +52,6 @@ describe("Arkpack Ed25519 trust", () => {
 			}),
 		);
 		const trustedKeys = ArkpackTrustedKeysSchema.parse({
-			format: 1,
 			keys: [
 				{
 					keyId,
@@ -85,7 +84,6 @@ describe("Arkpack Ed25519 trust", () => {
 			}),
 		);
 		const trustedKeys = ArkpackTrustedKeysSchema.parse({
-			format: 1,
 			keys: [
 				{
 					keyId,
@@ -164,7 +162,6 @@ describe("Arkpack Ed25519 trust", () => {
 			}),
 		);
 		const wrongTrustedKeys = ArkpackTrustedKeysSchema.parse({
-			format: 1,
 			keys: [
 				{
 					keyId,
@@ -189,7 +186,6 @@ describe("Arkpack Ed25519 trust", () => {
 			}),
 		);
 		const malformedTrustedKeys = {
-			format: 1 as const,
 			keys: [
 				{
 					keyId,

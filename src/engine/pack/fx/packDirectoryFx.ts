@@ -74,7 +74,6 @@ export const packDirectoryFx = Effect.fn("packDirectoryFx")(function* ({
 		metadata === undefined
 			? undefined
 			: ArkpackMetadataSchema.parse({
-					format: 1,
 					packageId: metadata.packageId,
 					contentHash,
 					gameId: config.meta.id,

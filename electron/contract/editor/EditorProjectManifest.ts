@@ -5,7 +5,6 @@ import { EditorProjectIdSchema } from "./EditorProjectIdSchema";
 /** Canonical editor-project metadata stored as editor.json at the project root. */
 export const EditorProjectManifestSchema = z
 	.object({
-		format: z.literal(1),
 		projectId: EditorProjectIdSchema,
 		title: z.string().trim().min(1),
 		game: z.string().trim().min(1).optional(),

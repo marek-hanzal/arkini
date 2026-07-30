@@ -104,7 +104,6 @@ describe("packDirectoryFx", () => {
 		});
 		expect(packed.staleSignatureExists).toBe(false);
 		expect(packed.metadata).toEqual({
-			format: 1,
 			packageId: "arkini",
 			contentHash: packed.result.contentHash,
 			gameId: "arkini",

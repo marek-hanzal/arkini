@@ -3,7 +3,6 @@ import { describe, expect, it } from "vitest";
 import { EditorProjectManifestSchema } from "../../electron/contract/editor/EditorProjectManifest";
 
 const manifest = {
-	format: 1,
 	projectId: "arkini",
 	title: "Arkini",
 	game: "1.0",
@@ -17,7 +16,13 @@ describe("EditorProjectManifestSchema", () => {
 		expect(
 			EditorProjectManifestSchema.safeParse({
 				...manifest,
-				formatVersion: manifest.format,
+				format: 1,
+			}).success,
+		).toBe(false);
+		expect(
+			EditorProjectManifestSchema.safeParse({
+				...manifest,
+				formatVersion: 1,
 				gameVersion: manifest.game,
 			}).success,
 		).toBe(false);

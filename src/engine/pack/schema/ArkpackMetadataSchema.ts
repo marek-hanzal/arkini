@@ -6,7 +6,6 @@ import { VersionEnumSchema } from "~/engine/schema/VersionEnumSchema";
 
 export const ArkpackMetadataSchema = z
 	.object({
-		format: z.literal(1),
 		packageId: IdSchema,
 		contentHash: z.string().regex(/^[a-f0-9]{64}$/),
 		gameId: IdSchema,

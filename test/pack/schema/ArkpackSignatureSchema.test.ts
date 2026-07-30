@@ -5,18 +5,17 @@ import { ArkpackTrustedKeysSchema } from "~/engine/pack/schema/ArkpackTrustedKey
 import { ArkpackTrustSchema } from "~/engine/pack/schema/ArkpackTrustSchema";
 
 const validSignature = {
-	format: 1,
 	keyId: "arkini-official-2026-01",
 	signature: btoa("\0".repeat(64)),
 };
 
 describe("Arkpack signing schemas", () => {
-	it("accepts only the canonical version-one sidecar shape", () => {
+	it("accepts only the canonical sidecar shape", () => {
 		expect(ArkpackSignatureSchema.parse(validSignature)).toEqual(validSignature);
 		expect(
 			ArkpackSignatureSchema.safeParse({
 				...validSignature,
-				format: 2,
+				format: 1,
 			}).success,
 		).toBe(false);
 		expect(
@@ -67,18 +66,23 @@ describe("Arkpack signing schemas", () => {
 		});
 	});
 
-	it("rejects duplicate trusted key identities", () => {
+	it("rejects duplicate trusted key identities and retired registry metadata", () => {
 		const key = {
 			keyId: validSignature.keyId,
 			publicKey: "-----BEGIN PUBLIC KEY-----\nAAAA\n-----END PUBLIC KEY-----\n",
 		};
 		expect(
 			ArkpackTrustedKeysSchema.safeParse({
-				format: 1,
 				keys: [
 					key,
 					key,
 				],
+			}).success,
+		).toBe(false);
+		expect(
+			ArkpackTrustedKeysSchema.safeParse({
+				format: 1,
+				keys: [key],
 			}).success,
 		).toBe(false);
 		expect(

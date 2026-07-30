@@ -87,7 +87,6 @@ const saveKey = {
 	contentHash: "b".repeat(64),
 } as const;
 const editorManifest = {
-	format: 1,
 	projectId: "editor-test",
 	title: "Editor test",
 	game: "1.0",

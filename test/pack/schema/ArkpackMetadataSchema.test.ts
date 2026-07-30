@@ -3,7 +3,6 @@ import { describe, expect, it } from "vitest";
 import { ArkpackMetadataSchema } from "~/engine/pack/schema/ArkpackMetadataSchema";
 
 const metadata = {
-	format: 1,
 	packageId: "arkini",
 	contentHash: "a".repeat(64),
 	gameId: "arkini",
@@ -17,6 +16,7 @@ describe("ArkpackMetadataSchema", () => {
 		expect(
 			ArkpackMetadataSchema.safeParse({
 				...metadata,
+				format: 1,
 				namespace: "arkini",
 				configVersion: metadata.game,
 				compressedSize: 123,

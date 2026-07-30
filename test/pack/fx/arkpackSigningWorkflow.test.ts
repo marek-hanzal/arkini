@@ -41,7 +41,6 @@ describe("Arkpack signing workflow", () => {
 			),
 		);
 		const trustedKeys = ArkpackTrustedKeysSchema.parse({
-			format: 1,
 			keys: [
 				{
 					keyId,
@@ -62,7 +61,6 @@ describe("Arkpack signing workflow", () => {
 					output: join(root, "untrusted.game.arkpack"),
 					privateKey: pair.privateKey,
 					trustedKeys: {
-						format: 1,
 						keys: [],
 					},
 				}).pipe(Effect.provide(NodeServices.layer)),

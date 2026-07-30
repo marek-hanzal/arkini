@@ -12,7 +12,6 @@ import {
 import { gzipSync } from "node:zlib";
 
 const trustedKeys = {
-	format: 1 as const,
 	keys: [],
 };
 

@@ -4,7 +4,6 @@ const keyIdPattern = /^[a-z0-9][a-z0-9._-]{0,63}$/;
 
 export const ArkpackTrustedKeysSchema = z
 	.object({
-		format: z.literal(1).describe("The trusted-key registry format version."),
 		keys: z
 			.array(
 				z
@@ -38,7 +37,7 @@ export const ArkpackTrustedKeysSchema = z
 	.strict()
 	.meta({
 		id: "ArkpackTrustedKeysSchema",
-		description: "Versioned immutable Ed25519 public-key registry for Arkpack verification.",
+		description: "Immutable Ed25519 public-key registry for Arkpack verification.",
 	});
 
 export type ArkpackTrustedKeysSchema = typeof ArkpackTrustedKeysSchema;

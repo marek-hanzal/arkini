@@ -26,7 +26,6 @@ export const createEditorProjectManifestFileFx = Effect.fn(
 	const manifest = yield* Effect.try({
 		try: () =>
 			EditorProjectManifestSchema.parse({
-				format: 1,
 				projectId,
 				title,
 				...(game === undefined ? {} : { game }),

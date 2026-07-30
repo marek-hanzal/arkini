@@ -1,5 +1,3 @@
-import path from "node:path";
-
 import { Effect } from "effect";
 import { match, P } from "ts-pattern";
 
@@ -12,6 +10,36 @@ import { DiagnosticCodeEnumSchema } from "~/engine/validation/schema/DiagnosticC
 import { DiagnosticSeverityEnumSchema } from "~/engine/validation/schema/DiagnosticSeverityEnumSchema";
 import { DiagnosticRecordEntityEnumSchema } from "~/engine/validation/schema/DiagnosticRecordEntityEnumSchema";
 import { DiagnosticProviderEnumSchema } from "~/engine/validation/schema/DiagnosticProviderEnumSchema";
+
+const resolveSourceReference = (sourcePath: string, reference: string) => {
+	const portableSource = sourcePath.replaceAll("\\", "/");
+	const portableReference = reference.replaceAll("\\", "/");
+	const absoluteReference =
+		portableReference.startsWith("/") || /^[A-Za-z]:\//.test(portableReference);
+	const sourceDirectory = portableSource.includes("/")
+		? portableSource.slice(0, portableSource.lastIndexOf("/"))
+		: ".";
+	const unresolved = absoluteReference
+		? portableReference
+		: `${sourceDirectory}/${portableReference}`;
+	const drive = unresolved.match(/^[A-Za-z]:/)?.[0];
+	const absolute = drive !== undefined || unresolved.startsWith("/");
+	const segments: string[] = [];
+	for (const segment of unresolved.replace(/^[A-Za-z]:/, "").split("/")) {
+		if (segment === "" || segment === ".") continue;
+		if (segment === "..") {
+			if (segments.at(-1) !== undefined && segments.at(-1) !== "..") {
+				segments.pop();
+			} else if (!absolute) {
+				segments.push(segment);
+			}
+			continue;
+		}
+		segments.push(segment);
+	}
+	const prefix = drive === undefined ? (absolute ? "/" : "") : `${drive}/`;
+	return `${prefix}${segments.join("/")}` || (absolute ? prefix : ".");
+};
 
 /**
  * Assembles parsed source fragments without allowing later files to overwrite
@@ -31,7 +59,7 @@ export const assembleGameSourcesFx = Effect.fn("assembleGameSourcesFx")(function
 	for (const source of sources) {
 		const schemaReference = source.value.$schema;
 		if (schemaReference !== undefined) {
-			const resolved = path.resolve(path.dirname(source.path), schemaReference);
+			const resolved = resolveSourceReference(source.path, schemaReference);
 			const current = provenance.schema;
 			match({
 				current,

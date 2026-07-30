@@ -242,6 +242,30 @@ describe("compileGameSourcesFx", () => {
 		);
 		expect(result.config?.$schema).toBe("../schema.json");
 	});
+
+	it("accepts equivalent portable relative JSON Schema references", async () => {
+		const result = await compile(
+			createRootSource({
+				path: "game.json",
+			}),
+			GameSourceFileSchema.parse({
+				path: "simple/a.json",
+				value: {
+					$schema: "../../schema.json",
+				},
+			}),
+		);
+
+		expect(result.diagnostics).not.toEqual(
+			expect.arrayContaining([
+				expect.objectContaining({
+					code: DiagnosticCodeEnumSchema.enum.SourceSchemaReferenceConflict,
+				}),
+			]),
+		);
+		expect(result.config?.$schema).toBe("../schema.json");
+	});
+
 	it("requires explicit completed collection providers", async () => {
 		const result = await compile(
 			GameSourceFileSchema.parse({

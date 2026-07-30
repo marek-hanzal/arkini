@@ -1,8 +1,8 @@
 import { NodeServices } from "@effect/platform-node";
 import { Effect } from "effect";
-import { mkdtemp, rm } from "node:fs/promises";
+import { mkdir, mkdtemp, rm, symlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { basename, join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const electron = vi.hoisted(() => ({
@@ -60,7 +60,12 @@ describe("createFilesystemEditorWorkspaceFx", () => {
 		};
 
 		await Effect.runPromise(workspace.createFx(record));
-		await expect(Effect.runPromise(workspace.readFx(record.projectId))).resolves.toEqual(record);
+		await expect(Effect.runPromise(workspace.readFx(record.projectId))).resolves.toEqual({
+			projectId: record.projectId,
+			files: [...record.files].sort((left, right) =>
+				left.path < right.path ? -1 : left.path > right.path ? 1 : 0,
+			),
+		});
 		await expect(Effect.runPromise(workspace.readFx("missing"))).resolves.toBeNull();
 		await expect(Effect.runPromise(workspace.createFx(record))).rejects.toThrow("Create Arkini editor project");
 
@@ -68,6 +73,112 @@ describe("createFilesystemEditorWorkspaceFx", () => {
 		await Effect.runPromise(workspace.openDirectoryFx(record.projectId));
 		expect(electron.openPath).toHaveBeenNthCalledWith(1, root);
 		expect(electron.openPath).toHaveBeenNthCalledWith(2, join(root, record.projectId));
+	});
+
+	it("rejects project identities that differ only by filesystem case", async () => {
+		const workspace = await createWorkspace();
+		await Effect.runPromise(
+			workspace.createFx({
+				projectId: "CaseProject",
+				files: [
+					{
+						path: "game.json",
+						bytes: new TextEncoder().encode("{}\n"),
+					},
+				],
+			}),
+		);
+
+		await expect(
+			Effect.runPromise(
+				workspace.createFx({
+					projectId: "caseproject",
+					files: [
+						{
+							path: "game.json",
+							bytes: new TextEncoder().encode("{}\n"),
+						},
+					],
+				}),
+			),
+		).rejects.toThrow("Editor project CaseProject already exists");
+	});
+
+	it("rejects project directories that alias another location", async () => {
+		const workspace = await createWorkspace();
+		const external = join(root, "..", `${basename(root)}-external-project`);
+		await mkdir(external);
+		await symlink(external, join(root, "aliased-project"));
+		try {
+			await expect(
+				Effect.runPromise(workspace.readFx("aliased-project")),
+			).rejects.toThrow("Read Arkini editor project");
+			await expect(
+				Effect.runPromise(workspace.openDirectoryFx("aliased-project")),
+			).rejects.toThrow("Open Arkini editor directory");
+		} finally {
+			await rm(external, { recursive: true, force: true });
+		}
+	});
+
+	it("rejects project files that alias another contained file", async () => {
+		const workspace = await createWorkspace();
+		await Effect.runPromise(
+			workspace.createFx({
+				projectId: "internal-symlink-project",
+				files: [
+					{
+						path: "game.json",
+						bytes: new TextEncoder().encode("{}\n"),
+					},
+				],
+			}),
+		);
+		await symlink(
+			"game.json",
+			join(root, "internal-symlink-project", "alias.json"),
+		);
+
+		await expect(
+			Effect.runPromise(workspace.readFx("internal-symlink-project")),
+		).rejects.toThrow("Read Arkini editor project");
+	});
+
+	it("rejects project files whose symbolic-link target escapes the workspace", async () => {
+		const workspace = await createWorkspace();
+		await Effect.runPromise(
+			workspace.createFx({
+				projectId: "symlink-project",
+				files: [
+					{
+						path: "game.json",
+						bytes: new TextEncoder().encode("{}\n"),
+					},
+				],
+			}),
+		);
+		const external = join(root, "..", `${basename(root)}-external.json`);
+		await writeFile(external, "{}\n");
+		await symlink(external, join(root, "symlink-project", "external.json"));
+		try {
+			await expect(
+				Effect.runPromise(workspace.readFx("symlink-project")),
+			).rejects.toThrow("Read Arkini editor project");
+		} finally {
+			await rm(external, { force: true });
+		}
+	});
+
+	it("rejects a project identity occupied by a regular file", async () => {
+		const workspace = await createWorkspace();
+		await writeFile(join(root, "not-a-project"), "nope", "utf8");
+
+		await expect(Effect.runPromise(workspace.readFx("not-a-project"))).rejects.toThrow(
+			"Read Arkini editor project",
+		);
+		await expect(
+			Effect.runPromise(workspace.openDirectoryFx("not-a-project")),
+		).rejects.toThrow("Open Arkini editor directory");
 	});
 
 	it("rejects traversal, duplicate files, and missing project directories", async () => {
@@ -171,6 +282,8 @@ describe("createFilesystemEditorWorkspaceFx", () => {
 				}),
 			),
 		).rejects.toThrow("Invalid Arkini editor project file path");
-		await expect(Effect.runPromise(workspace.openDirectoryFx("missing"))).rejects.toThrow("Open Arkini editor directory");
+		await expect(
+			Effect.runPromise(workspace.openDirectoryFx("missing")),
+		).rejects.toThrow("Open Arkini editor directory");
 	});
 });

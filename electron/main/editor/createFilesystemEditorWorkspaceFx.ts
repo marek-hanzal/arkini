@@ -19,16 +19,19 @@ export const createFilesystemEditorWorkspaceFx = Effect.fn(
 )(function* ({ root, fileSystem: providedFileSystem }: createFilesystemEditorWorkspaceFx.Props) {
 	const fileSystem = providedFileSystem ?? (yield* FileSystem.FileSystem);
 	const operations = yield* Semaphore.make(1);
-	return {
-		createFx: (record) =>
-			operations.withPermits(1)(
-				createEditorProjectFx({
-					root,
-					fileSystem,
-					record,
-				}),
-			),
-		readFx: (projectId) =>
+	const createFx: EditorWorkspace["createFx"] = Effect.fn(
+		"FilesystemEditorWorkspace.createFx",
+	)((record) =>
+		operations.withPermits(1)(
+			createEditorProjectFx({
+				root,
+				fileSystem,
+				record,
+			}),
+		),
+	);
+	const readFx: EditorWorkspace["readFx"] = Effect.fn("FilesystemEditorWorkspace.readFx")(
+		(projectId) =>
 			operations.withPermits(1)(
 				readEditorProjectFx({
 					root,
@@ -36,13 +39,21 @@ export const createFilesystemEditorWorkspaceFx = Effect.fn(
 					projectId,
 				}),
 			),
-		openDirectoryFx: (projectId) =>
-			operations.withPermits(1)(
-				openEditorDirectoryFx({
-					root,
-					fileSystem,
-					...(projectId === undefined ? {} : { projectId }),
-				}),
-			),
+	);
+	const openDirectoryFx: EditorWorkspace["openDirectoryFx"] = Effect.fn(
+		"FilesystemEditorWorkspace.openDirectoryFx",
+	)((projectId) =>
+		operations.withPermits(1)(
+			openEditorDirectoryFx({
+				root,
+				fileSystem,
+				...(projectId === undefined ? {} : { projectId }),
+			}),
+		),
+	);
+	return {
+		createFx,
+		readFx,
+		openDirectoryFx,
 	} satisfies EditorWorkspace;
 });

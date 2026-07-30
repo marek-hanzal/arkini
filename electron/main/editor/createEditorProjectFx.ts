@@ -34,15 +34,21 @@ export const createEditorProjectFx = Effect.fn("createEditorProjectFx")(function
 			}),
 	});
 	const projectId = yield* assertEditorProjectIdFx(parsedRecord.projectId);
-	const target = join(root, projectId);
-	if (yield* fileSystem.exists(target)) {
+	yield* fileSystem.makeDirectory(root, {
+		recursive: true,
+	});
+	const existingProject = (yield* fileSystem.readDirectory(root)).find(
+		(entry) => entry.toLowerCase() === projectId.toLowerCase(),
+	);
+	if (existingProject !== undefined) {
 		return yield* Effect.fail(
 			new ElectronMainError({
 				operation: "Create Arkini editor project",
-				cause: new Error(`Editor project ${projectId} already exists.`),
+				cause: new Error(`Editor project ${existingProject} already exists.`),
 			}),
 		);
 	}
+	const target = join(root, projectId);
 	const seen = new Set<string>();
 	const files = yield* Effect.forEach(parsedRecord.files, (file) =>
 		assertEditorProjectFilePathFx(file.path).pipe(
@@ -65,9 +71,6 @@ export const createEditorProjectFx = Effect.fn("createEditorProjectFx")(function
 		),
 	);
 	const pending = join(root, `.${projectId}.${randomUUID()}.pending`);
-	yield* fileSystem.makeDirectory(root, {
-		recursive: true,
-	});
 	yield* Effect.gen(function* () {
 		yield* fileSystem.makeDirectory(pending);
 		for (const file of files) {

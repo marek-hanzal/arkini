@@ -1,6 +1,5 @@
 import { FileSystem } from "effect";
 import { Effect, Semaphore } from "effect";
-import { join } from "node:path";
 import { clearGameSaveFx } from "./clearGameSaveFx";
 import type { GameSaveFiles } from "./GameSaveFiles";
 import { readGameSaveFx } from "./readGameSaveFx";
@@ -8,7 +7,7 @@ import { writeGameSaveFx } from "./writeGameSaveFx";
 
 export namespace createFilesystemGameSaveFilesFx {
 	export interface Props {
-		readonly userDataPath: string;
+		readonly root: string;
 		readonly fileSystem?: FileSystem.FileSystem;
 	}
 }
@@ -16,11 +15,10 @@ export namespace createFilesystemGameSaveFilesFx {
 /** Creates one narrow Effect-native capability over the Electron save namespace. */
 export const createFilesystemGameSaveFilesFx = Effect.fn("createFilesystemGameSaveFilesFx")(
 	function* ({
-		userDataPath,
+		root,
 		fileSystem: providedFileSystem,
 	}: createFilesystemGameSaveFilesFx.Props) {
 		const fileSystem = providedFileSystem ?? (yield* FileSystem.FileSystem);
-		const root = join(userDataPath, "arkini", "saves");
 		// IPC callers cannot be required to share the renderer's autosave mutex.
 		// This repository therefore owns ordering around each shared pending/current namespace.
 		const operations = yield* Semaphore.make(1);

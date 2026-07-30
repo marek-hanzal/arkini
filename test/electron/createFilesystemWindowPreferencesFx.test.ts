@@ -7,14 +7,14 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { createFilesystemWindowPreferencesFx } from "../../electron/main/window/createFilesystemWindowPreferencesFx";
 
 let root = "";
-const preferenceDirectory = () => join(root, "arkini", "preferences");
+const preferenceDirectory = () => join(root, "arkini", "game", "preferences");
 const modePath = () => join(preferenceDirectory(), "window.mode");
 const pendingPath = () => join(preferenceDirectory(), "window.pending");
 
 const createPreferences = () =>
 	Effect.runPromise(
 		createFilesystemWindowPreferencesFx({
-			userDataPath: root,
+			root: preferenceDirectory(),
 		}).pipe(Effect.provide(NodeServices.layer)),
 	);
 
@@ -63,7 +63,7 @@ describe("createFilesystemWindowPreferencesFx", () => {
 			Effect.gen(function* () {
 				const fileSystem = yield* FileSystem.FileSystem;
 				return yield* createFilesystemWindowPreferencesFx({
-					userDataPath: root,
+					root: preferenceDirectory(),
 					fileSystem: {
 						...fileSystem,
 						rename: () =>

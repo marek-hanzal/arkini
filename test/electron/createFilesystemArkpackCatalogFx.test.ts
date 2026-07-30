@@ -33,7 +33,7 @@ const descriptor = {
 const createCatalog = (fileSystem?: FileSystem.FileSystem) =>
 	Effect.runPromise(
 		createFilesystemArkpackCatalogFx({
-			userDataPath: root,
+			root: join(root, "arkini", "game", "arkpacks"),
 			fileSystem,
 		}).pipe(Effect.provide(NodeServices.layer)),
 	);
@@ -76,7 +76,7 @@ describe("createFilesystemArkpackCatalogFx", () => {
 			descriptor,
 		]);
 
-		const binaryPath = join(root, "arkini", "arkpacks", packageId, "package.arkpack");
+		const binaryPath = join(root, "arkini", "game", "arkpacks", packageId, "package.arkpack");
 		await unlink(binaryPath);
 		expect(await Effect.runPromise(catalog.listFx)).toEqual([
 			descriptor,
@@ -95,7 +95,7 @@ describe("createFilesystemArkpackCatalogFx", () => {
 		});
 
 		await Effect.runPromise(catalog.removeFx(packageId));
-		await expect(access(join(root, "arkini", "arkpacks", packageId))).rejects.toBeDefined();
+		await expect(access(join(root, "arkini", "game", "arkpacks", packageId))).rejects.toBeDefined();
 	});
 
 	it("deduplicates exact package identities and rejects unsafe paths", async () => {
@@ -153,7 +153,7 @@ describe("createFilesystemArkpackCatalogFx", () => {
 		const releaseRename = createPromiseGate();
 		let blockNextInstallRename = true;
 		let removeStarted = false;
-		const installedPackagePath = join(root, "arkini", "arkpacks", packageId);
+		const installedPackagePath = join(root, "arkini", "game", "arkpacks", packageId);
 		const fileSystem = {
 			...nodeFileSystem,
 			remove: (path, options) => {

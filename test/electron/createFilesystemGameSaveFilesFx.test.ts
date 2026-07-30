@@ -24,7 +24,7 @@ const demo = {
 const createRepository = (fileSystem?: FileSystem.FileSystem) =>
 	Effect.runPromise(
 		createFilesystemGameSaveFilesFx({
-			userDataPath: root,
+			root: join(root, "arkini", "game", "saves"),
 			fileSystem,
 		}).pipe(Effect.provide(NodeServices.layer)),
 	);
@@ -76,7 +76,7 @@ describe("createFilesystemGameSaveFilesFx", () => {
 			]),
 		);
 		await expect(
-			access(join(root, "arkini", "saves", "arkini", first.contentHash, "pending.arksave")),
+			access(join(root, "arkini", "game", "saves", "arkini", first.contentHash, "pending.arksave")),
 		).rejects.toBeDefined();
 		await Effect.runPromise(repository.clearFx(first));
 		expect(await Effect.runPromise(repository.readFx(first))).toBeNull();
@@ -104,6 +104,7 @@ describe("createFilesystemGameSaveFilesFx", () => {
 					join(
 						root,
 						"arkini",
+						"game",
 						"saves",
 						demo.packageId,
 						demo.contentHash,
@@ -174,7 +175,7 @@ describe("createFilesystemGameSaveFilesFx", () => {
 			]),
 		);
 		await expect(
-			access(join(root, "arkini", "saves", "arkini", first.contentHash, "pending.arksave")),
+			access(join(root, "arkini", "game", "saves", "arkini", first.contentHash, "pending.arksave")),
 		).rejects.toBeDefined();
 	});
 
@@ -183,7 +184,7 @@ describe("createFilesystemGameSaveFilesFx", () => {
 		const renameEntered = Effect.runSync(Deferred.make<void>());
 		const releaseRename = Effect.runSync(Deferred.make<void>());
 		const clearEntered = Effect.runSync(Deferred.make<void>());
-		const saveDirectory = join(root, "arkini", "saves", first.packageId, first.contentHash);
+		const saveDirectory = join(root, "arkini", "game", "saves", first.packageId, first.contentHash);
 		const gatedFileSystem: FileSystem.FileSystem = {
 			...fileSystem,
 			rename: (oldPath, newPath) =>
@@ -236,7 +237,7 @@ describe("createFilesystemGameSaveFilesFx", () => {
 			Effect.gen(function* () {
 				const fileSystem = yield* FileSystem.FileSystem;
 				return yield* createFilesystemGameSaveFilesFx({
-					userDataPath: root,
+					root: join(root, "arkini", "game", "saves"),
 					fileSystem: {
 						...fileSystem,
 						rename: () => Effect.die(new Error("rename failed")),
@@ -262,7 +263,7 @@ describe("createFilesystemGameSaveFilesFx", () => {
 			]),
 		);
 		await expect(
-			access(join(root, "arkini", "saves", "arkini", first.contentHash, "pending.arksave")),
+			access(join(root, "arkini", "game", "saves", "arkini", first.contentHash, "pending.arksave")),
 		).rejects.toBeDefined();
 	});
 
@@ -327,7 +328,7 @@ describe("createFilesystemGameSaveFilesFx", () => {
 				]),
 			),
 		);
-		const path = join(root, "arkini", "saves", "arkini", first.contentHash, "current.arksave");
+		const path = join(root, "arkini", "game", "saves", "arkini", first.contentHash, "current.arksave");
 		expect(new Uint8Array(await readFile(path))).toEqual(
 			new Uint8Array([
 				9,

@@ -9,7 +9,6 @@ import {
 import { shell } from "electron";
 import { Effect } from "effect";
 import { mkdirSync } from "node:fs";
-import { join } from "node:path";
 
 import type { DiagnosticRecord } from "../../contract/diagnostics/DiagnosticRecord";
 import type { DiagnosticLog } from "./DiagnosticLog";
@@ -52,9 +51,8 @@ const writeRecord = (logger: Logger, record: DiagnosticRecord) => {
 	}
 };
 
-export const createDiagnosticLogFx = Effect.fn("createDiagnosticLogFx")((userDataPath: string) =>
+export const createDiagnosticLogFx = Effect.fn("createDiagnosticLogFx")((directoryPath: string) =>
 	Effect.sync((): DiagnosticLog => {
-		const directoryPath = join(userDataPath, "arkini", "logs");
 		mkdirSync(directoryPath, {
 			recursive: true,
 		});

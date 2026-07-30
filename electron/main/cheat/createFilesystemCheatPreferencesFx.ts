@@ -8,7 +8,7 @@ import type { CheatPreferences } from "./CheatPreferences";
 
 export namespace createFilesystemCheatPreferencesFx {
 	export interface Props {
-		readonly userDataPath: string;
+		readonly root: string;
 		readonly fileSystem?: FileSystem.FileSystem;
 	}
 }
@@ -16,11 +16,10 @@ export namespace createFilesystemCheatPreferencesFx {
 /** Creates one narrow Effect-native capability over application-wide cheat preferences. */
 export const createFilesystemCheatPreferencesFx = Effect.fn("createFilesystemCheatPreferencesFx")(
 	function* ({
-		userDataPath,
+		root,
 		fileSystem: providedFileSystem,
 	}: createFilesystemCheatPreferencesFx.Props) {
 		const fileSystem = providedFileSystem ?? (yield* FileSystem.FileSystem);
-		const root = join(userDataPath, "arkini", "preferences");
 		const currentPath = join(root, "cheats.available");
 		const writeSemaphore = yield* Semaphore.make(1);
 		const writeAvailableFx: CheatPreferences["writeAvailableFx"] = Effect.fn(

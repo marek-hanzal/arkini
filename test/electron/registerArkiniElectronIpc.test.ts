@@ -16,6 +16,7 @@ const electronHarness = vi.hoisted(() => {
 	const nativeThemeListeners = new Map<string, () => void>();
 	const setBackgroundColor = vi.fn();
 	const requestWindowMode = vi.fn();
+	const openPath = vi.fn(() => Promise.resolve(""));
 	const browserWindow = {
 		once: vi.fn(),
 	};
@@ -28,6 +29,7 @@ const electronHarness = vi.hoisted(() => {
 		nativeThemeListeners,
 		setBackgroundColor,
 		requestWindowMode,
+		openPath,
 		browserWindow,
 		userDataPath,
 		module: {
@@ -52,6 +54,9 @@ const electronHarness = vi.hoisted(() => {
 				) => handlers.set(channel, listener),
 				removeHandler: (channel: string) => handlers.delete(channel),
 			},
+			shell: {
+				openPath,
+			},
 			nativeTheme: {
 				on: (event: string, listener: () => void) => {
 					nativeThemeListeners.set(event, listener);
@@ -72,6 +77,7 @@ import { createFilesystemAppearancePreferencesFx } from "../../electron/main/app
 import { createFilesystemCheatPreferencesFx } from "../../electron/main/cheat/createFilesystemCheatPreferencesFx";
 import { createFilesystemLauncherPreferencesFx } from "../../electron/main/launcher/createFilesystemLauncherPreferencesFx";
 import { registerArkiniElectronIpcFx } from "../../electron/main/registerArkiniElectronIpcFx";
+import { createArkiniUserDataPathsFx } from "../../electron/main/user-data/createArkiniUserDataPathsFx";
 import { createFilesystemWindowPreferencesFx } from "../../electron/main/window/createFilesystemWindowPreferencesFx";
 import { registerWindowModeControllerFx } from "../../electron/main/window/WindowModeControllerRegistry";
 
@@ -169,6 +175,30 @@ const invokeArguments = new Map<string, ReadonlyArray<unknown>>([
 		],
 	],
 	[
+		ArkiniElectronApi.channels.editorProjectCreate,
+		[
+			{
+				projectId: "editor-test",
+				files: [
+					{
+						path: "game.json",
+						bytes: new Uint8Array([123, 125]),
+					},
+				],
+			},
+		],
+	],
+	[
+		ArkiniElectronApi.channels.editorProjectRead,
+		[
+			"editor-test",
+		],
+	],
+	[
+		ArkiniElectronApi.channels.editorDirectoryOpen,
+		[],
+	],
+	[
 		ArkiniElectronApi.channels.saveRead,
 		[
 			saveKey,
@@ -231,6 +261,7 @@ describe("registerArkiniElectronIpcFx", () => {
 	it("rejects every untrusted sender and preserves every trusted Electron capability", async () => {
 		const userDataPath = await mkdtemp(join(tmpdir(), "arkini-ipc-"));
 		electronHarness.userDataPath.value = userDataPath;
+		const userDataPaths = Effect.runSync(createArkiniUserDataPathsFx(userDataPath));
 		const assertTrustedIpcSenderFx = vi.fn((event: IpcMainInvokeEvent) =>
 			event.senderFrame?.url.startsWith("arkini://app/")
 				? Effect.void
@@ -254,16 +285,16 @@ describe("registerArkiniElectronIpcFx", () => {
 			await Effect.runPromise(
 				Effect.gen(function* () {
 					const appearancePreferences = yield* createFilesystemAppearancePreferencesFx({
-						userDataPath,
+						root: userDataPaths.game.preferences,
 					});
 					const cheatPreferences = yield* createFilesystemCheatPreferencesFx({
-						userDataPath,
+						root: userDataPaths.game.preferences,
 					});
 					const launcherPreferences = yield* createFilesystemLauncherPreferencesFx({
-						userDataPath,
+						root: userDataPaths.game.preferences,
 					});
 					const windowPreferences = yield* createFilesystemWindowPreferencesFx({
-						userDataPath,
+						root: userDataPaths.game.preferences,
 					});
 					yield* registerWindowModeControllerFx({
 						window: electronHarness.browserWindow as unknown as BrowserWindow,
@@ -287,11 +318,12 @@ describe("registerArkiniElectronIpcFx", () => {
 						launcherPreferences,
 						windowPreferences,
 						diagnostics: {
-							directoryPath: join(userDataPath, "arkini", "logs"),
+							directoryPath: userDataPaths.game.logs,
 							writeFx: (record) => Effect.sync(() => writeDiagnostic(record)),
 							openDirectoryFx: Effect.sync(openDiagnosticDirectory),
 							closeFx: Effect.void,
 						},
+						userDataPaths,
 					});
 				}).pipe(Effect.provide(NodeServices.layer)),
 			);
@@ -440,6 +472,26 @@ describe("registerArkiniElectronIpcFx", () => {
 			await expect(
 				invoke(ArkiniElectronApi.channels.arkpackRead, trustedEvent, packageId),
 			).resolves.toBeNull();
+
+			const editorRecord = {
+				projectId: "editor-test",
+				files: [
+					{
+						path: "game.json",
+						bytes: new Uint8Array([123, 125]),
+					},
+				],
+			};
+			await expect(
+				invoke(ArkiniElectronApi.channels.editorProjectCreate, trustedEvent, editorRecord),
+			).resolves.toBeUndefined();
+			await expect(
+				invoke(ArkiniElectronApi.channels.editorProjectRead, trustedEvent, "editor-test"),
+			).resolves.toEqual(editorRecord);
+			await expect(
+				invoke(ArkiniElectronApi.channels.editorDirectoryOpen, trustedEvent),
+			).resolves.toBeUndefined();
+			expect(electronHarness.openPath).toHaveBeenCalledWith(userDataPaths.editor);
 
 			const saveBytes = new Uint8Array([
 				5,

@@ -8,7 +8,7 @@ import type { WindowPreferences } from "./WindowPreferences";
 
 export namespace createFilesystemWindowPreferencesFx {
 	export interface Props {
-		readonly userDataPath: string;
+		readonly root: string;
 		readonly fileSystem?: FileSystem.FileSystem;
 	}
 }
@@ -16,11 +16,10 @@ export namespace createFilesystemWindowPreferencesFx {
 /** Creates the one persisted global window-mode capability. */
 export const createFilesystemWindowPreferencesFx = Effect.fn("createFilesystemWindowPreferencesFx")(
 	function* ({
-		userDataPath,
+		root,
 		fileSystem: providedFileSystem,
 	}: createFilesystemWindowPreferencesFx.Props) {
 		const fileSystem = providedFileSystem ?? (yield* FileSystem.FileSystem);
-		const root = join(userDataPath, "arkini", "preferences");
 		const path = join(root, "window.mode");
 		const writeSemaphore = yield* Semaphore.make(1);
 		const writeModeFx: WindowPreferences["writeModeFx"] = Effect.fn(

@@ -7,14 +7,14 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { createFilesystemCheatPreferencesFx } from "../../electron/main/cheat/createFilesystemCheatPreferencesFx";
 
 let root = "";
-const preferenceDirectory = () => join(root, "arkini", "preferences");
+const preferenceDirectory = () => join(root, "arkini", "game", "preferences");
 const currentPath = () => join(preferenceDirectory(), "cheats.available");
 const pendingPath = () => join(preferenceDirectory(), "cheats-available.pending");
 
 const createPreferences = () =>
 	Effect.runPromise(
 		createFilesystemCheatPreferencesFx({
-			userDataPath: root,
+			root: preferenceDirectory(),
 		}).pipe(Effect.provide(NodeServices.layer)),
 	);
 
@@ -60,7 +60,7 @@ describe("createFilesystemCheatPreferencesFx", () => {
 			Effect.gen(function* () {
 				const fileSystem = yield* FileSystem.FileSystem;
 				return yield* createFilesystemCheatPreferencesFx({
-					userDataPath: root,
+					root: preferenceDirectory(),
 					fileSystem: {
 						...fileSystem,
 						rename: () =>

@@ -1,6 +1,5 @@
 import { FileSystem } from "effect";
 import { Effect, Semaphore } from "effect";
-import { join } from "node:path";
 import type { ArkpackCatalog } from "./ArkpackCatalog";
 import { installArkpackFx } from "./installArkpackFx";
 import { listInstalledArkpacksFx } from "./listInstalledArkpacksFx";
@@ -9,7 +8,7 @@ import { removeInstalledArkpackFx } from "./removeInstalledArkpackFx";
 
 export namespace createFilesystemArkpackCatalogFx {
 	export interface Props {
-		readonly userDataPath: string;
+		readonly root: string;
 		readonly fileSystem?: FileSystem.FileSystem;
 	}
 }
@@ -17,11 +16,10 @@ export namespace createFilesystemArkpackCatalogFx {
 /** Creates one narrow Effect-native capability over the Electron Arkpack namespace. */
 export const createFilesystemArkpackCatalogFx = Effect.fn("createFilesystemArkpackCatalogFx")(
 	function* ({
-		userDataPath,
+		root,
 		fileSystem: providedFileSystem,
 	}: createFilesystemArkpackCatalogFx.Props) {
 		const fileSystem = providedFileSystem ?? (yield* FileSystem.FileSystem);
-		const root = join(userDataPath, "arkini", "arkpacks");
 		// Publish and removal must retain admission order even when IPC callers overlap.
 		const operations = yield* Semaphore.make(1);
 		const readFx: ArkpackCatalog["readFx"] = Effect.fn("FilesystemArkpackCatalog.readFx")(

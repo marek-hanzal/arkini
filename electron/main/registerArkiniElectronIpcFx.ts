@@ -1,12 +1,15 @@
 import { app, BrowserWindow, ipcMain, nativeTheme, type IpcMainInvokeEvent } from "electron";
 import { Effect } from "effect";
 import { ArkiniElectronApi } from "../contract/ArkiniElectronApi";
+import type { EditorProjectRecord } from "../contract/editor/EditorProjectRecord";
 import { createFilesystemArkpackCatalogFx } from "./arkpack/createFilesystemArkpackCatalogFx";
 import type { AppearancePreferences } from "./appearance/AppearancePreferences";
 import type { CheatPreferences } from "./cheat/CheatPreferences";
 import { ElectronMainRuntime } from "./ElectronMainRuntime";
 import type { LauncherPreferences } from "./launcher/LauncherPreferences";
 import { createFilesystemGameSaveFilesFx } from "./save/createFilesystemGameSaveFilesFx";
+import { createFilesystemEditorWorkspaceFx } from "./editor/createFilesystemEditorWorkspaceFx";
+import type { ArkiniUserDataPaths } from "./user-data/ArkiniUserDataPaths";
 import type { TrustedRenderer } from "./security/TrustedRenderer";
 import { DiagnosticRecordSchema } from "../contract/diagnostics/DiagnosticRecord";
 import type { DiagnosticLog } from "./diagnostics/DiagnosticLog";
@@ -24,6 +27,7 @@ export namespace registerArkiniElectronIpcFx {
 		readonly launcherPreferences: LauncherPreferences;
 		readonly windowPreferences: WindowPreferences;
 		readonly diagnostics: DiagnosticLog;
+		readonly userDataPaths: ArkiniUserDataPaths;
 	}
 }
 
@@ -36,16 +40,19 @@ export const registerArkiniElectronIpcFx = Effect.fn("registerArkiniElectronIpcF
 		launcherPreferences,
 		windowPreferences,
 		diagnostics,
+		userDataPaths,
 	}: registerArkiniElectronIpcFx.Props) =>
 		Effect.gen(function* () {
 			if (registered) return;
 			registered = true;
-			const userDataPath = app.getPath("userData");
 			const arkpacks = yield* createFilesystemArkpackCatalogFx({
-				userDataPath,
+				root: userDataPaths.game.arkpacks,
 			});
 			const saves = yield* createFilesystemGameSaveFilesFx({
-				userDataPath,
+				root: userDataPaths.game.saves,
+			});
+			const editor = yield* createFilesystemEditorWorkspaceFx({
+				root: userDataPaths.editor,
 			});
 
 			yield* Effect.sync(() => {
@@ -158,6 +165,20 @@ export const registerArkiniElectronIpcFx = Effect.fn("registerArkiniElectronIpcF
 						runAuthorized(event, arkpacks.removeFx(packageId)),
 				);
 				ipcMain.handle(
+					ArkiniElectronApi.channels.editorProjectCreate,
+					(event, record: EditorProjectRecord) =>
+						runAuthorized(event, editor.createFx(record)),
+				);
+				ipcMain.handle(
+					ArkiniElectronApi.channels.editorProjectRead,
+					(event, projectId: string) => runAuthorized(event, editor.readFx(projectId)),
+				);
+				ipcMain.handle(
+					ArkiniElectronApi.channels.editorDirectoryOpen,
+					(event, projectId?: string) =>
+						runAuthorized(event, editor.openDirectoryFx(projectId)),
+				);
+				ipcMain.handle(
 					ArkiniElectronApi.channels.saveRead,
 					(event, key: ArkiniElectronApi.SaveKey) =>
 						runAuthorized(event, saves.readFx(key)),
@@ -188,6 +209,9 @@ export const registerArkiniElectronIpcFx = Effect.fn("registerArkiniElectronIpcF
 						ArkiniElectronApi.channels.arkpackRead,
 						ArkiniElectronApi.channels.arkpackInstall,
 						ArkiniElectronApi.channels.arkpackRemove,
+						ArkiniElectronApi.channels.editorProjectCreate,
+						ArkiniElectronApi.channels.editorProjectRead,
+						ArkiniElectronApi.channels.editorDirectoryOpen,
 						ArkiniElectronApi.channels.saveRead,
 						ArkiniElectronApi.channels.saveWrite,
 						ArkiniElectronApi.channels.saveClear,

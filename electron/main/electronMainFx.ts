@@ -12,6 +12,8 @@ import { createFilesystemLauncherPreferencesFx } from "./launcher/createFilesyst
 import { createTrustedRendererFx } from "./security/createTrustedRendererFx";
 import { createDiagnosticLogFx } from "./diagnostics/createDiagnosticLogFx";
 import { createFilesystemWindowPreferencesFx } from "./window/createFilesystemWindowPreferencesFx";
+import { createArkiniUserDataPathsFx } from "./user-data/createArkiniUserDataPathsFx";
+import { migrateArkiniUserDataFx } from "./user-data/migrateArkiniUserDataFx";
 
 export const electronMainFx = Effect.fn("electronMainFx")(function* () {
 	const hasSingleInstanceLock = app.requestSingleInstanceLock();
@@ -31,7 +33,13 @@ export const electronMainFx = Effect.fn("electronMainFx")(function* () {
 	yield* registerWindowLifecycleFx(app);
 	yield* Effect.promise(() => app.whenReady());
 
-	const diagnostics = yield* createDiagnosticLogFx(app.getPath("userData")).pipe(
+	const userDataPath = app.getPath("userData");
+	const userDataPaths = yield* createArkiniUserDataPathsFx(userDataPath);
+	yield* migrateArkiniUserDataFx({
+		paths: userDataPaths,
+	});
+
+	const diagnostics = yield* createDiagnosticLogFx(userDataPaths.game.logs).pipe(
 		Effect.catch((cause) =>
 			Effect.sync(() => {
 				console.error("Arkini diagnostic log could not be initialized.", cause);
@@ -81,16 +89,16 @@ export const electronMainFx = Effect.fn("electronMainFx")(function* () {
 		});
 	});
 	const appearancePreferences = yield* createFilesystemAppearancePreferencesFx({
-		userDataPath: app.getPath("userData"),
+		root: userDataPaths.game.preferences,
 	});
 	const cheatPreferences = yield* createFilesystemCheatPreferencesFx({
-		userDataPath: app.getPath("userData"),
+		root: userDataPaths.game.preferences,
 	});
 	const launcherPreferences = yield* createFilesystemLauncherPreferencesFx({
-		userDataPath: app.getPath("userData"),
+		root: userDataPaths.game.preferences,
 	});
 	const windowPreferences = yield* createFilesystemWindowPreferencesFx({
-		userDataPath: app.getPath("userData"),
+		root: userDataPaths.game.preferences,
 	});
 	const appearanceTheme = yield* appearancePreferences.readThemeFx;
 	yield* Effect.sync(() => {
@@ -110,6 +118,7 @@ export const electronMainFx = Effect.fn("electronMainFx")(function* () {
 		launcherPreferences,
 		windowPreferences,
 		diagnostics,
+		userDataPaths,
 	});
 	const createWindowFx = windowPreferences.readModeFx.pipe(
 		Effect.flatMap((windowMode) =>

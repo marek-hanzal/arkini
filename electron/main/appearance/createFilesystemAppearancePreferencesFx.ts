@@ -9,7 +9,7 @@ import type { AppearancePreferences } from "./AppearancePreferences";
 
 export namespace createFilesystemAppearancePreferencesFx {
 	export interface Props {
-		readonly userDataPath: string;
+		readonly root: string;
 		readonly fileSystem?: FileSystem.FileSystem;
 	}
 }
@@ -18,11 +18,10 @@ export namespace createFilesystemAppearancePreferencesFx {
 export const createFilesystemAppearancePreferencesFx = Effect.fn(
 	"createFilesystemAppearancePreferencesFx",
 )(function* ({
-	userDataPath,
+	root,
 	fileSystem: providedFileSystem,
 }: createFilesystemAppearancePreferencesFx.Props) {
 	const fileSystem = providedFileSystem ?? (yield* FileSystem.FileSystem);
-	const root = join(userDataPath, "arkini", "preferences");
 	const themeWriteSemaphore = yield* Semaphore.make(1);
 	const accentWriteSemaphore = yield* Semaphore.make(1);
 	const themePath = join(root, "appearance.theme");

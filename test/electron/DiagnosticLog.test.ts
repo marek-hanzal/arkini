@@ -32,7 +32,9 @@ describe("Diagnostic log", () => {
 	it("writes parseable JSONL, opens its exact directory, and rotates before growing unbounded", async () => {
 		const userDataPath = mkdtempSync(join(tmpdir(), "arkini-diagnostics-"));
 		temporaryDirectories.push(userDataPath);
-		const diagnostics = Effect.runSync(createDiagnosticLogFx(userDataPath));
+		const diagnostics = Effect.runSync(
+			createDiagnosticLogFx(join(userDataPath, "arkini", "game", "logs")),
+		);
 
 		await Effect.runPromise(diagnostics.openDirectoryFx);
 		expect(electron.openPath).toHaveBeenCalledWith(diagnostics.directoryPath);

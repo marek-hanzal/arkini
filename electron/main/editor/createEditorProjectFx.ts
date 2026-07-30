@@ -3,7 +3,10 @@ import { Effect } from "effect";
 import { randomUUID } from "node:crypto";
 import { dirname, join } from "node:path";
 
-import type { EditorProjectRecord } from "../../contract/editor/EditorProjectRecord";
+import {
+	EditorProjectRecordSchema,
+	type EditorProjectRecord,
+} from "../../contract/editor/EditorProjectRecord";
 import { ElectronMainError } from "../ElectronMainError";
 import { assertEditorProjectFilePathFx } from "./assertEditorProjectFilePathFx";
 import { assertEditorProjectIdFx } from "./assertEditorProjectIdFx";
@@ -22,7 +25,15 @@ export const createEditorProjectFx = Effect.fn("createEditorProjectFx")(function
 	fileSystem,
 	record,
 }: createEditorProjectFx.Props) {
-	const projectId = yield* assertEditorProjectIdFx(record.projectId);
+	const parsedRecord = yield* Effect.try({
+		try: () => EditorProjectRecordSchema.parse(record),
+		catch: (cause) =>
+			new ElectronMainError({
+				operation: "Create Arkini editor project",
+				cause,
+			}),
+	});
+	const projectId = yield* assertEditorProjectIdFx(parsedRecord.projectId);
 	const target = join(root, projectId);
 	if (yield* fileSystem.exists(target)) {
 		return yield* Effect.fail(
@@ -33,10 +44,11 @@ export const createEditorProjectFx = Effect.fn("createEditorProjectFx")(function
 		);
 	}
 	const seen = new Set<string>();
-	const files = yield* Effect.forEach(record.files, (file) =>
+	const files = yield* Effect.forEach(parsedRecord.files, (file) =>
 		assertEditorProjectFilePathFx(file.path).pipe(
 			Effect.flatMap((path) => {
-				if (seen.has(path)) {
+				const collisionKey = path.toLowerCase();
+				if (seen.has(collisionKey)) {
 					return Effect.fail(
 						new ElectronMainError({
 							operation: "Create Arkini editor project",
@@ -44,7 +56,7 @@ export const createEditorProjectFx = Effect.fn("createEditorProjectFx")(function
 						}),
 					);
 				}
-				seen.add(path);
+				seen.add(collisionKey);
 				return Effect.succeed({
 					path,
 					bytes: file.bytes,
@@ -52,14 +64,6 @@ export const createEditorProjectFx = Effect.fn("createEditorProjectFx")(function
 			}),
 		),
 	);
-	if (files.length === 0) {
-		return yield* Effect.fail(
-			new ElectronMainError({
-				operation: "Create Arkini editor project",
-				cause: new Error("An editor project must contain at least one source file."),
-			}),
-		);
-	}
 	const pending = join(root, `.${projectId}.${randomUUID()}.pending`);
 	yield* fileSystem.makeDirectory(root, {
 		recursive: true,

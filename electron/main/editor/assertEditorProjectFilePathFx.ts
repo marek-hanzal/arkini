@@ -3,6 +3,14 @@ import { isAbsolute, posix } from "node:path";
 
 import { ElectronMainError } from "../ElectronMainError";
 
+const portablePathSegmentPattern = /^[A-Za-z0-9][A-Za-z0-9._-]*$/;
+const windowsDeviceNamePattern = /^(?:CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])(?:\.|$)/i;
+
+const isPortablePathSegment = (segment: string) =>
+	portablePathSegmentPattern.test(segment) &&
+	!segment.endsWith(".") &&
+	!windowsDeviceNamePattern.test(segment);
+
 /** Validates one portable project-relative JSON or PNG path before filesystem use. */
 export const assertEditorProjectFilePathFx = Effect.fn("assertEditorProjectFilePathFx")(
 	(candidate: string) =>
@@ -16,6 +24,7 @@ export const assertEditorProjectFilePathFx = Effect.fn("assertEditorProjectFileP
 				!isAbsolute(candidate) &&
 				candidate !== ".." &&
 				!candidate.startsWith("../") &&
+				candidate.split("/").every(isPortablePathSegment) &&
 				(candidate.endsWith(".json") || candidate.endsWith(".png"));
 			if (valid) return candidate;
 			return yield* Effect.fail(

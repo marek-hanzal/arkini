@@ -115,6 +115,62 @@ describe("createFilesystemEditorWorkspaceFx", () => {
 				}),
 			),
 		).rejects.toThrow("Create Arkini editor project");
+		await expect(
+			Effect.runPromise(
+				workspace.createFx({
+					projectId: "case-collision",
+					files: [
+						{
+							path: "simple/Item.json",
+							bytes: new Uint8Array(),
+						},
+						{
+							path: "simple/item.json",
+							bytes: new Uint8Array(),
+						},
+					],
+				}),
+			),
+		).rejects.toThrow("Create Arkini editor project");
+		await expect(
+			Effect.runPromise(
+				workspace.createFx({
+					projectId: "CON",
+					files: [
+						{
+							path: "game.json",
+							bytes: new Uint8Array(),
+						},
+					],
+				}),
+			),
+		).rejects.toThrow("Invalid Arkini editor project identity");
+		await expect(
+			Effect.runPromise(
+				workspace.createFx({
+					projectId: "trailing-dot.",
+					files: [
+						{
+							path: "game.json",
+							bytes: new Uint8Array(),
+						},
+					],
+				}),
+			),
+		).rejects.toThrow("Create Arkini editor project");
+		await expect(
+			Effect.runPromise(
+				workspace.createFx({
+					projectId: "reserved-file",
+					files: [
+						{
+							path: "assets/CON.png",
+							bytes: new Uint8Array(),
+						},
+					],
+				}),
+			),
+		).rejects.toThrow("Invalid Arkini editor project file path");
 		await expect(Effect.runPromise(workspace.openDirectoryFx("missing"))).rejects.toThrow("Open Arkini editor directory");
 	});
 });

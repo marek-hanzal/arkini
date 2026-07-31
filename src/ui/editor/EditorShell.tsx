@@ -1,4 +1,3 @@
-import { useAtomValue } from "@effect/atom-react";
 import { useRouter } from "@tanstack/react-router";
 import {
 	useCallback,
@@ -8,7 +7,6 @@ import {
 	type PropsWithChildren,
 } from "react";
 
-import { EditorProjectMutationPendingAtom } from "~/bridge/editor/EditorProjectMutationLane";
 import {
 	closeEditorProjectSessionFx,
 	releaseEditorProjectSession,
@@ -41,7 +39,6 @@ const readErrorMessage = (error: unknown) =>
 const EditorShellContent = ({ children }: PropsWithChildren) => {
 	const project = useEditorProject();
 	const form = useEditorFormActions();
-	const pendingMutations = useAtomValue(EditorProjectMutationPendingAtom(project.projectId));
 	const router = useRouter();
 	const [optimisticTab, setOptimisticTab] = useState<EditorTab>();
 	const [exitRequested, setExitRequested] = useState(false);
@@ -238,7 +235,7 @@ const EditorShellContent = ({ children }: PropsWithChildren) => {
 				<Button
 					className="min-h-0 shrink-0 px-4 py-2 text-sm"
 					disabled={
-						form?.isDirty !== true || form.isSaving || exitPending || pendingMutations > 0
+						form?.isDirty !== true || form.isSaving || exitPending
 					}
 					cursorIntent={form?.isSaving === true ? "progress" : undefined}
 					onClick={() => void save()}
@@ -248,7 +245,7 @@ const EditorShellContent = ({ children }: PropsWithChildren) => {
 				<PrimaryButton
 					className="min-h-0 shrink-0 px-4 py-2 text-sm"
 					disabled={exitPending}
-					cursorIntent={exitPending || pendingMutations > 0 ? "progress" : undefined}
+					cursorIntent={exitPending ? "progress" : undefined}
 					onClick={requestExit}
 				>
 					{exitPending ? "Exiting…" : "Exit"}

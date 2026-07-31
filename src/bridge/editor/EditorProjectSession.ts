@@ -3,27 +3,30 @@ import * as Atom from "effect/unstable/reactivity/Atom";
 
 import { EditorProjectFormDirtyAtom } from "~/bridge/editor/EditorProjectFormDirtyAtom";
 import {
-	beginEditorProjectCanonicalClose,
-	openEditorProjectSession as openSessionState,
-	readActiveEditorProjectId,
-	releaseEditorProjectSession as releaseSessionState,
-	resumeEditorProjectSession as resumeSessionState,
-} from "~/bridge/editor/EditorProjectSessionState";
+	closeEditorProjectMutationLaneFx,
+	openEditorProjectMutationLane,
+	releaseEditorProjectMutationLane,
+	resumeEditorProjectMutationLane,
+} from "~/bridge/editor/EditorProjectMutationLane";
+
+let activeProjectId: string | undefined;
 
 export const openEditorProjectSession = (projectId: string) => {
-	openSessionState(projectId);
+	openEditorProjectMutationLane(projectId);
+	activeProjectId = projectId;
 };
 
 /** Reopens admission after a failed close. */
 export const resumeEditorProjectSession = (projectId: string) => {
-	resumeSessionState(projectId);
+	resumeEditorProjectMutationLane(projectId);
+	activeProjectId = projectId;
 };
 
-/** Stops admission and drains every canonical mutation for one project. */
+/** Stops admission, drains canonical writes, then rejects an unresolved local form. */
 export const closeEditorProjectSessionFx = Effect.fn("closeEditorProjectSessionFx")(
 	(projectId: string) =>
 		Effect.gen(function* () {
-			yield* beginEditorProjectCanonicalClose(projectId);
+			yield* closeEditorProjectMutationLaneFx(projectId);
 			const formDirty = yield* Atom.get(EditorProjectFormDirtyAtom(projectId));
 			if (formDirty) {
 				return yield* Effect.fail(
@@ -34,7 +37,7 @@ export const closeEditorProjectSessionFx = Effect.fn("closeEditorProjectSessionF
 );
 
 export const closeActiveEditorProjectSessionFx = Effect.suspend(() => {
-	const projectId = readActiveEditorProjectId();
+	const projectId = activeProjectId;
 	return projectId === undefined
 		? Effect.void
 		: closeEditorProjectSessionFx(projectId).pipe(
@@ -47,5 +50,6 @@ export const closeActiveEditorProjectSessionFx = Effect.suspend(() => {
 });
 
 export const releaseEditorProjectSession = (projectId: string) => {
-	releaseSessionState(projectId);
+	releaseEditorProjectMutationLane(projectId);
+	if (activeProjectId === projectId) activeProjectId = undefined;
 };

@@ -13,7 +13,6 @@ import {
 	openEditorProjectSession,
 	releaseEditorProjectSession,
 } from "~/bridge/editor/EditorProjectSession";
-import { admitEditorProjectCanonicalMutation } from "~/bridge/editor/EditorProjectSessionState";
 
 const registries: AtomRegistry.AtomRegistry[] = [];
 const createRegistry = () => {
@@ -125,9 +124,23 @@ describe("EditorProjectSession", () => {
 			"Save or discard the current form",
 		);
 
-		const admission = admitEditorProjectCanonicalMutation("project");
-		expect(admission).toBeDefined();
-		admission?.();
+		await expect(
+			runInRegistry(
+				registry,
+				runEditorProjectMutationFx({
+					expectedRevision: "a".repeat(64),
+					projectId: "project",
+					run: () =>
+						Effect.succeed({
+							project: createProject("b".repeat(64)),
+							revision: "b".repeat(64),
+						}),
+				}),
+			),
+		).resolves.toMatchObject({
+			revision: "b".repeat(64),
+		});
+
 		registry.set(EditorProjectFormDirtyAtom("project"), {
 			dirty: false,
 			ownerId: "item:test",

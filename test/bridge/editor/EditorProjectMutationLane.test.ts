@@ -5,10 +5,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import type { EditorProject } from "~/bridge/editor/EditorProject";
 import { EditorProjectAtom } from "~/bridge/editor/EditorProjectAtom";
-import {
-	EditorProjectMutationPendingAtom,
-	runEditorProjectMutationFx,
-} from "~/bridge/editor/EditorProjectMutationLane";
+import { runEditorProjectMutationFx } from "~/bridge/editor/EditorProjectMutationLane";
 
 const registries: AtomRegistry.AtomRegistry[] = [];
 const createRegistry = () => {
@@ -102,7 +99,6 @@ describe("EditorProjectMutationLane", () => {
 				},
 			}),
 		);
-		expect(registry.get(EditorProjectMutationPendingAtom("project"))).toBe(3);
 		await Effect.runPromise(
 			Deferred.succeed(firstGate, {
 				project: createProject(revisionB),
@@ -128,7 +124,6 @@ describe("EditorProjectMutationLane", () => {
 			revisionC,
 		]);
 		expect(registry.get(EditorProjectAtom("project"))?.revision).toBe(revisionD);
-		expect(registry.get(EditorProjectMutationPendingAtom("project"))).toBe(0);
 	});
 
 	it("continues the lane after an ordinary mutation failure", async () => {
@@ -236,25 +231,40 @@ describe("EditorProjectMutationLane", () => {
 			revisionA,
 			revisionB,
 		]);
-		expect(registry.get(EditorProjectMutationPendingAtom("project"))).toBe(0);
 	});
 
-	it("releases its pending admission when a mutation is interrupted", async () => {
+	it("releases lane ownership when a mutation is interrupted", async () => {
 		const revisionA = "a".repeat(64);
+		const revisionB = "b".repeat(64);
 		const registry = createRegistry();
+		const entered = Effect.runSync(Deferred.make<void>());
 		const fiber = Effect.runFork(
 			runEditorProjectMutationFx({
 				expectedRevision: revisionA,
 				projectId: "project",
-				run: () => Effect.never,
+				run: () => Deferred.succeed(entered, undefined).pipe(Effect.andThen(Effect.never)),
 			}).pipe(Effect.provideService(AtomRegistry.AtomRegistry, registry)),
 		);
-		await vi.waitFor(() =>
-			expect(registry.get(EditorProjectMutationPendingAtom("project"))).toBe(1),
-		);
+		await Effect.runPromise(Deferred.await(entered));
 
 		await Effect.runPromise(Fiber.interrupt(fiber));
 
-		expect(registry.get(EditorProjectMutationPendingAtom("project"))).toBe(0);
+		await expect(
+			runInRegistry(
+				registry,
+				runEditorProjectMutationFx({
+					expectedRevision: revisionA,
+					projectId: "project",
+					run: () =>
+						Effect.succeed({
+							project: createProject(revisionB),
+							revision: revisionB,
+						}),
+				}),
+			),
+		).resolves.toEqual({
+			project: createProject(revisionB),
+			revision: revisionB,
+		});
 	});
 });

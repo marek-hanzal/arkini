@@ -7,14 +7,18 @@ import { useEditorProject } from "~/bridge/editor/useEditorProject";
 import { ButtonLink } from "~/ui/button/Button";
 import { EditorItemForm } from "~/ui/item/editor/EditorItemForm";
 
+export namespace EditorCreateItemForm {
+	export interface Props {
+		readonly itemType: EditorItemType;
+		readonly uid: string;
+	}
+}
+
 /** Owns one local create form for a preallocated immutable item UID. */
 export const EditorCreateItemForm = ({
 	itemType,
 	uid,
-}: {
-	readonly itemType: EditorItemType;
-	readonly uid: string;
-}) => {
+}: EditorCreateItemForm.Props) => {
 	const project = useEditorProject();
 	const navigate = useNavigate();
 	const initialItem = useMemo(

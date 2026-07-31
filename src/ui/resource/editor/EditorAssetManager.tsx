@@ -1,31 +1,20 @@
-import { useMutation } from "@tanstack/react-query";
+import { useAtomSet, useAtomValue } from "@effect/atom-react";
 import { useRef } from "react";
 
-import { saveEditorAssetMutationFx } from "~/bridge/editor/saveEditorAssetMutation";
-import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
+import { saveEditorAssetCommandAtom } from "~/bridge/editor/saveEditorAssetCommandAtom";
 import { useEditorProject } from "~/bridge/editor/useEditorProject";
 import { Button } from "~/ui/button/Button";
+import { readSettledAsyncResultError } from "~/ui/reactivity/readSettledAsyncResultError";
 import { EditorAssetThumbnail } from "~/ui/resource/editor/EditorAssetThumbnail";
 
 /** Lists project PNG resources and publishes selected files immediately. */
 export const EditorAssetManager = () => {
 	const project = useEditorProject();
 	const inputRef = useRef<HTMLInputElement>(null);
-	const mutation = useMutation({
-		mutationKey: [
-			"editor",
-			project.projectId,
-			"asset",
-		],
-		mutationFn: (file: File) =>
-			RendererRuntime.runPromise(
-				saveEditorAssetMutationFx({
-					expectedRevision: project.revision,
-					file,
-					projectId: project.projectId,
-				}),
-			),
-	});
+	const result = useAtomValue(saveEditorAssetCommandAtom);
+	const saveAsset = useAtomSet(saveEditorAssetCommandAtom);
+	const error = readSettledAsyncResultError(result);
+	const pending = result.waiting;
 	return (
 		<section className="grid h-full min-h-0 grid-rows-[auto_minmax(0,1fr)] gap-[var(--ak-viewport-gap)]">
 			<header className="flex min-w-0 flex-wrap items-center gap-3">
@@ -41,28 +30,30 @@ export const EditorAssetManager = () => {
 					type="file"
 					accept="image/png,.png"
 					className="sr-only"
-					disabled={mutation.isPending}
+					disabled={pending}
 					onChange={(event) => {
 						const file = event.currentTarget.files?.[0];
 						event.currentTarget.value = "";
 						if (file === undefined) return;
-						mutation.mutate(file);
+						saveAsset({
+							expectedRevision: project.revision,
+							file,
+							projectId: project.projectId,
+						});
 					}}
 				/>
 				<Button
-					disabled={mutation.isPending}
-					cursorIntent={mutation.isPending ? "progress" : undefined}
+					disabled={pending}
+					cursorIntent={pending ? "progress" : undefined}
 					onClick={() => inputRef.current?.click()}
 				>
-					{mutation.isPending ? "Saving…" : "Add or replace PNG"}
+					{pending ? "Saving…" : "Add or replace PNG"}
 				</Button>
 			</header>
 			<div className="min-h-0 overflow-y-auto overscroll-contain pr-1">
-				{mutation.error === null ? null : (
+				{error === undefined ? null : (
 					<p className="mb-3 rounded-xl border border-danger/40 bg-danger/10 p-3 text-sm text-danger">
-						{mutation.error instanceof Error
-							? mutation.error.message
-							: String(mutation.error)}
+						{error instanceof Error ? error.message : String(error)}
 					</p>
 				)}
 				<div className="ak-list grid gap-2 sm:grid-cols-2 xl:grid-cols-3">

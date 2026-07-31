@@ -9,6 +9,7 @@ import {
 	Outlet,
 	RouterProvider,
 } from "@tanstack/react-router";
+import { Effect } from "effect";
 import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 import {
 	act,
@@ -33,17 +34,13 @@ const session = vi.hoisted(() => ({
 }));
 
 vi.mock("~/bridge/editor/EditorProjectSession", () => ({
-	closeEditorProjectSessionFx: () => ({
-		type: "close-editor-project",
-	}),
+	closeEditorProjectSessionFx: () =>
+		Effect.tryPromise({
+			try: () => session.close(),
+			catch: (error) => error,
+		}),
 	releaseEditorProjectSession: session.release,
 	resumeEditorProjectSession: session.resume,
-}));
-
-vi.mock("~/bridge/runtime/RendererRuntime", () => ({
-	RendererRuntime: {
-		runPromise: () => session.close(),
-	},
 }));
 
 vi.mock("~/bridge/editor/useEditorProject", () => ({

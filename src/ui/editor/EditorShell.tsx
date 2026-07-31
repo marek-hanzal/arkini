@@ -1,3 +1,4 @@
+import { useAtomSet } from "@effect/atom-react";
 import { useRouter } from "@tanstack/react-router";
 import {
 	useCallback,
@@ -8,12 +9,11 @@ import {
 } from "react";
 
 import {
-	closeEditorProjectSessionFx,
 	releaseEditorProjectSession,
 	resumeEditorProjectSession,
 } from "~/bridge/editor/EditorProjectSession";
+import { closeEditorProjectSessionAtom } from "~/bridge/editor/closeEditorProjectSessionAtom";
 import { useEditorProject } from "~/bridge/editor/useEditorProject";
-import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import { Button, ButtonLink, PrimaryButton } from "~/ui/button/Button";
 import {
 	EditorFormActionsProvider,
@@ -40,6 +40,9 @@ const EditorShellContent = ({ children }: PropsWithChildren) => {
 	const project = useEditorProject();
 	const form = useEditorFormActions();
 	const router = useRouter();
+	const closeProjectSession = useAtomSet(closeEditorProjectSessionAtom, {
+		mode: "promise",
+	});
 	const [optimisticTab, setOptimisticTab] = useState<EditorTab>();
 	const [exitRequested, setExitRequested] = useState(false);
 	const [exitError, setExitError] = useState<unknown>();
@@ -77,7 +80,7 @@ const EditorShellContent = ({ children }: PropsWithChildren) => {
 		setExitError(undefined);
 		setExitPending(true);
 		try {
-			await RendererRuntime.runPromise(closeEditorProjectSessionFx(project.projectId));
+			await closeProjectSession(project.projectId);
 			releaseEditorProjectSession(project.projectId);
 			await router.navigate({
 				to: "/main-menu",
@@ -88,6 +91,7 @@ const EditorShellContent = ({ children }: PropsWithChildren) => {
 			setExitPending(false);
 		}
 	}, [
+		closeProjectSession,
 		exitPending,
 		project.projectId,
 		router,

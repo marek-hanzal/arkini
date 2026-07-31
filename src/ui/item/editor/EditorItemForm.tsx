@@ -18,7 +18,7 @@ import { EditorMergeFields } from "~/ui/item/editor/EditorMergeFields";
 import { EditorOptionalOutputControl } from "~/ui/item/editor/EditorOptionalOutputControl";
 import { EditorProductionFields } from "~/ui/item/editor/EditorProductionFields";
 import { useRegisterEditorFormActions } from "~/ui/editor/EditorFormActions";
-import { useSaveEditorItemMutation } from "~/ui/item/editor/useSaveEditorItemMutation";
+import { useSaveEditorItemCommand } from "~/ui/item/editor/useSaveEditorItemCommand";
 
 const scopeOptions = [
 	{
@@ -97,8 +97,9 @@ export const EditorItemForm = ({
 		ownerId,
 		setFormDirty,
 	]);
-	const mutation = useSaveEditorItemMutation({
+	const mutation = useSaveEditorItemCommand({
 		expectedRevision: project.revision,
+		itemUid: initialItem.uid,
 		projectId: project.projectId,
 	});
 	const discard = useCallback(() => {

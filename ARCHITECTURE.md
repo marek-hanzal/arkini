@@ -242,6 +242,8 @@ The editor project context contains only the last successfully persisted and com
 
 Ordinary editor navigation discards an unsubmitted local form without interception. The mounted form publishes only its command surface and dirty status to the shell, never its editable values. A fixed-height status slot below the editor navigation exposes link-like Discard and Save actions without shifting content. The shell's Save invokes the same form command. Exit is the sole guarded navigation: clean state closes immediately, while dirty state requires Save or Discard before the project session is released.
 
+Every canonical editor write enters one project mutation lane. That Effect-owned lane is the sole authority for write admission, FIFO serialization, queued revision lineage, canonical project publication, and editor close/drain. React invokes item, asset, and close operations through feature-owned `Atom.fn` commands and reads their one `AsyncResult`; it does not add React Query, a parallel pending Atom, or a second session pending counter around the lane. Form failures remain scoped to the mounted form command, while project close waits the lane itself rather than a projected UI counter.
+
 The engine's existing `StateSchema` is the complete canonical save state; creating a separate alias schema would add a second name without a second contract. `fromRuntimeFx` produces a detached state, and session construction hydrates a fresh runtime from validated state. The save codec wraps that state in exactly:
 
 ```text

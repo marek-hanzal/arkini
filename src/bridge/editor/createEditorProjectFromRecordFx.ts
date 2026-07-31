@@ -53,6 +53,7 @@ export const createEditorProjectFromRecordFx = Effect.fn(
 			}),
 		);
 	}
+	const fileIndex = Object.fromEntries(record.files.map((file) => [file.path, file]));
 	const descriptor = {
 		projectId: manifest.projectId,
 		title: manifest.title,
@@ -69,6 +70,8 @@ export const createEditorProjectFromRecordFx = Effect.fn(
 		return {
 			...descriptor,
 			revision: record.revision,
+			fileIndex,
+			itemSourcePaths: {},
 			resources: [],
 			resourceSourcePaths: {},
 			diagnostics: [],

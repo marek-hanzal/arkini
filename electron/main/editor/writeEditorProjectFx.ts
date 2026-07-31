@@ -5,31 +5,46 @@ import { dirname, join, relative } from "node:path";
 import { EditorProjectFileSchema } from "../../contract/editor/EditorProjectFile";
 import { EditorProjectManifestSchema } from "../../contract/editor/EditorProjectManifest";
 import {
+	EditorProjectRecordSchema,
+	type EditorProjectRecord,
+} from "../../contract/editor/EditorProjectRecord";
+import {
 	EditorProjectWriteSchema,
 	type EditorProjectWrite as EditorProjectWriteContract,
 } from "../../contract/editor/EditorProjectWrite";
+import {
+	EditorProjectWriteResultSchema,
+	type EditorProjectWriteResult,
+} from "../../contract/editor/EditorProjectWriteResult";
 import { ElectronMainError } from "../ElectronMainError";
 import { assertEditorProjectFilePathFx } from "./assertEditorProjectFilePathFx";
 import { assertEditorProjectIdFx } from "./assertEditorProjectIdFx";
 import { commitEditorProjectFilesFx } from "./internal/commitEditorProjectFilesFx";
-import { readEditorProjectFx } from "./readEditorProjectFx";
+import { readEditorProjectRevision } from "./readEditorProjectRevision";
 
 export namespace writeEditorProjectFx {
 	export interface Props {
 		readonly root: string;
 		readonly fileSystem: FileSystem.FileSystem;
 		readonly mutation: EditorProjectWriteContract;
+		readonly record: EditorProjectRecord;
+	}
+
+	export interface Result {
+		readonly record: EditorProjectRecord;
+		readonly write: EditorProjectWriteResult;
 	}
 }
 
 /**
- * Commits one canonical project mutation, touches editor.json, and returns the
- * exact post-write project snapshot from disk.
+ * Commits one canonical project delta against the already loaded in-memory index.
+ * The filesystem is only written; it is never rescanned after the initial load.
  */
 export const writeEditorProjectFx = Effect.fn("writeEditorProjectFx")(function* ({
 	root,
 	fileSystem,
 	mutation,
+	record: candidateRecord,
 }: writeEditorProjectFx.Props) {
 	const parsedMutation = yield* Effect.try({
 		try: () => EditorProjectWriteSchema.parse(mutation),
@@ -39,7 +54,25 @@ export const writeEditorProjectFx = Effect.fn("writeEditorProjectFx")(function* 
 				cause,
 			}),
 	});
+	const record = yield* Effect.try({
+		try: () => EditorProjectRecordSchema.parse(candidateRecord),
+		catch: (cause) =>
+			new ElectronMainError({
+				operation: "Write Arkini editor project",
+				cause,
+			}),
+	});
 	const projectId = yield* assertEditorProjectIdFx(parsedMutation.projectId);
+	if (record.projectId !== projectId) {
+		return yield* Effect.fail(
+			new ElectronMainError({
+				operation: "Write Arkini editor project",
+				cause: new Error(
+					`Loaded editor project ${record.projectId} does not match mutation ${projectId}.`,
+				),
+			}),
+		);
+	}
 	const file = EditorProjectFileSchema.parse(parsedMutation.file);
 	const portablePath = yield* assertEditorProjectFilePathFx(file.path);
 	if (portablePath.toLowerCase() === "editor.json") {
@@ -47,19 +80,6 @@ export const writeEditorProjectFx = Effect.fn("writeEditorProjectFx")(function* 
 			new ElectronMainError({
 				operation: "Write Arkini editor project",
 				cause: new Error("editor.json is owned by the canonical project writer."),
-			}),
-		);
-	}
-	const record = yield* readEditorProjectFx({
-		root,
-		fileSystem,
-		projectId,
-	});
-	if (record === null) {
-		return yield* Effect.fail(
-			new ElectronMainError({
-				operation: "Write Arkini editor project",
-				cause: new Error(`Editor project ${projectId} disappeared before validation.`),
 			}),
 		);
 	}
@@ -146,30 +166,45 @@ export const writeEditorProjectFx = Effect.fn("writeEditorProjectFx")(function* 
 		}
 	}
 
-	const manifestTarget = join(projectRoot, "editor.json");
+	const persistedFile = EditorProjectFileSchema.parse({
+		path: portablePath,
+		bytes: file.bytes,
+	});
+	const nextFiles = [
+		...record.files.filter(
+			({ path }) => path !== "editor.json" && path.toLowerCase() !== portablePath.toLowerCase(),
+		),
+		persistedFile,
+		nextManifestFile,
+	];
+	const revision = readEditorProjectRevision({
+		projectId,
+		files: nextFiles,
+	});
+	const nextRecord = EditorProjectRecordSchema.parse({
+		projectId,
+		files: nextFiles,
+		revision,
+	});
+
 	yield* commitEditorProjectFilesFx({
 		fileSystem,
 		content: {
 			target,
-			bytes: file.bytes,
+			bytes: persistedFile.bytes,
 		},
 		manifest: {
-			target: manifestTarget,
+			target: join(projectRoot, "editor.json"),
 			bytes: nextManifestFile.bytes,
 		},
 	});
-	const nextRecord = yield* readEditorProjectFx({
-		root,
-		fileSystem,
-		projectId,
-	});
-	if (nextRecord === null) {
-		return yield* Effect.fail(
-			new ElectronMainError({
-				operation: "Write Arkini editor project",
-				cause: new Error(`Editor project ${projectId} disappeared after its write.`),
-			}),
-		);
-	}
-	return nextRecord;
+	return {
+		record: nextRecord,
+		write: EditorProjectWriteResultSchema.parse({
+			projectId,
+			file: persistedFile,
+			manifest: nextManifestFile,
+			revision,
+		}),
+	} satisfies writeEditorProjectFx.Result;
 });

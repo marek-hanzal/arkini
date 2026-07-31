@@ -1,7 +1,10 @@
 import { Effect } from "effect";
+import * as Atom from "effect/unstable/reactivity/Atom";
 
+import { EditorProjectAtom } from "~/bridge/editor/EditorProjectAtom";
 import { runEditorProjectMutationFx } from "~/bridge/editor/EditorProjectMutationLane";
 import { saveEditorAssetFx } from "~/bridge/resource/editor/saveEditorAssetFx";
+import { EditorProjectError } from "~/engine/editor/error/EditorProjectError";
 
 export namespace saveEditorAssetMutation {
 	export interface Variables {
@@ -17,10 +20,21 @@ export const saveEditorAssetMutationFx = Effect.fn("saveEditorAssetMutationFx")(
 			expectedRevision: variables.expectedRevision,
 			projectId: variables.projectId,
 			run: (expectedRevision) =>
-				saveEditorAssetFx({
-					expectedRevision,
-					file: variables.file,
-					projectId: variables.projectId,
+				Effect.gen(function* () {
+					const project = yield* Atom.get(EditorProjectAtom(variables.projectId));
+					if (project === undefined) {
+						return yield* Effect.fail(
+							new EditorProjectError({
+								reason: "project-not-found",
+								message: `Editor project ${variables.projectId} is not loaded.`,
+							}),
+						);
+					}
+					return yield* saveEditorAssetFx({
+						expectedRevision,
+						file: variables.file,
+						project,
+					});
 				}),
 		}),
 );

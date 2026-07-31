@@ -6,6 +6,7 @@ import type { DiagnosticRecord } from "./diagnostics/DiagnosticRecord";
 import type { EditorProjectManifest } from "./editor/EditorProjectManifest";
 import type { EditorProjectWrite } from "./editor/EditorProjectWrite";
 import type { EditorProjectCreate, EditorProjectRecord } from "./editor/EditorProjectRecord";
+import type { EditorProjectWriteResult } from "./editor/EditorProjectWriteResult";
 import type { WindowModeSchema } from "./window/WindowModeSchema";
 
 export namespace ArkiniElectronApi {
@@ -89,7 +90,7 @@ export namespace ArkiniElectronApi {
 			readonly listProjects: () => Promise<ReadonlyArray<EditorProjectManifest>>;
 			readonly createProject: (record: EditorProjectCreate) => Promise<void>;
 			readonly readProject: (projectId: string) => Promise<EditorProjectRecord | null>;
-			readonly writeProject: (mutation: EditorProjectWrite) => Promise<EditorProjectRecord>;
+			readonly writeProject: (mutation: EditorProjectWrite) => Promise<EditorProjectWriteResult>;
 			readonly openDirectory: (projectId?: string) => Promise<void>;
 		};
 		readonly appearance: {

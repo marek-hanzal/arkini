@@ -4,18 +4,23 @@ import * as Atom from "effect/unstable/reactivity/Atom";
 import { EditorProjectAtom } from "~/bridge/editor/EditorProjectAtom";
 import { readEditorProjectFx } from "~/bridge/editor/readEditorProjectFx";
 
-/** Captures the loader CAS epoch and reads its disk snapshot in one Effect program. */
+/** Loads the project once, then reuses the canonical in-memory editor index. */
 export const loadEditorProjectFx = Effect.fn("loadEditorProjectFx")(function* ({
 	projectId,
 }: {
 	readonly projectId: string;
 }) {
-	const expectedRevision = (yield* Atom.get(EditorProjectAtom(projectId)))?.revision;
-	const project = yield* readEditorProjectFx({
-		projectId,
-	});
+	const current = yield* Atom.get(EditorProjectAtom(projectId));
+	if (current !== undefined) {
+		return {
+			expectedRevision: current.revision,
+			project: current,
+		};
+	}
 	return {
-		expectedRevision,
-		project,
+		expectedRevision: undefined,
+		project: yield* readEditorProjectFx({
+			projectId,
+		}),
 	};
 });

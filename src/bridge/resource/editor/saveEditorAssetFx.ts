@@ -1,12 +1,15 @@
 import { Effect } from "effect";
 
+import type { EditorProject } from "~/bridge/editor/EditorProject";
 import type { EditorWorkspace } from "~/bridge/editor/EditorWorkspace";
-import { createEditorProjectFromRecordFx } from "~/bridge/editor/createEditorProjectFromRecordFx";
+import { createEditorProjectFromWriteFx } from "~/bridge/editor/createEditorProjectFromWriteFx";
 import { createEditorWorkspaceFx } from "~/bridge/editor/createEditorWorkspaceFx";
 import { EditorProjectError } from "~/engine/editor/error/EditorProjectError";
 import { compileEditorProjectFilesFx } from "~/engine/editor/fx/compileEditorProjectFilesFx";
 import { EditorSourceFileSchema } from "~/engine/editor/schema/EditorSourceFileSchema";
-import { validateResourceEditorSourceIdFx } from "~/engine/resource/editor/fx/createResourceEditorSourceFilesFx";
+import {
+	validateResourceEditorSourceIdFx,
+} from "~/engine/resource/editor/fx/createResourceEditorSourceFilesFx";
 
 const pngMagic = [
 	137,
@@ -69,16 +72,16 @@ const readPngDimensionsFx = (bytes: Uint8Array, resourceId: string) =>
 		}),
 	);
 
-/** Validates and immediately publishes one PNG resource through the project CAS lane. */
+/** Validates one PNG, compiles it against memory, and persists only the asset delta. */
 export const saveEditorAssetFx = Effect.fn("saveEditorAssetFx")(function* ({
 	expectedRevision,
 	file: inputFile,
-	projectId,
+	project,
 	workspace: providedWorkspace,
 }: {
 	readonly expectedRevision: string;
 	readonly file: EditorAssetFileInput;
-	readonly projectId: string;
+	readonly project: EditorProject;
 	readonly workspace?: EditorWorkspace;
 }) {
 	if (!inputFile.name.toLowerCase().endsWith(".png") || inputFile.size > maxPngBytes) {
@@ -86,6 +89,14 @@ export const saveEditorAssetFx = Effect.fn("saveEditorAssetFx")(function* ({
 			new EditorProjectError({
 				reason: "unsupported-project-file",
 				message: `Asset ${inputFile.name} must be a PNG no larger than ${maxPngBytes} bytes.`,
+			}),
+		);
+	}
+	if (project.revision !== expectedRevision) {
+		return yield* Effect.fail(
+			new EditorProjectError({
+				reason: "unsupported-project-file",
+				message: `Editor project ${project.projectId} changed after the asset picker opened.`,
 			}),
 		);
 	}
@@ -128,17 +139,7 @@ export const saveEditorAssetFx = Effect.fn("saveEditorAssetFx")(function* ({
 			}),
 		);
 	}
-	const workspace = providedWorkspace ?? (yield* createEditorWorkspaceFx());
-	const record = yield* workspace.readFx(projectId);
-	if (record === null || record.revision !== expectedRevision) {
-		return yield* Effect.fail(
-			new EditorProjectError({
-				reason: "unsupported-project-file",
-				message: `Editor project ${projectId} changed after the asset picker opened.`,
-			}),
-		);
-	}
-	const sourcePath = record.files.find(({ path }) => {
+	const sourcePath = Object.values(project.fileIndex).find(({ path }) => {
 		if (!path.startsWith("assets/") && !path.startsWith("resources/")) return false;
 		const filename = path.slice(path.lastIndexOf("/") + 1);
 		return filename.toLowerCase() === `${proposedResourceId}.png`.toLowerCase();
@@ -154,7 +155,7 @@ export const saveEditorAssetFx = Effect.fn("saveEditorAssetFx")(function* ({
 				bytes,
 			}),
 			sourceFiles: EditorSourceFileSchema.array().parse(
-				record.files.filter(({ path }) => path !== "editor.json"),
+				Object.values(project.fileIndex).filter(({ path }) => path !== "editor.json"),
 			),
 		}),
 		catch: (cause) =>
@@ -169,17 +170,22 @@ export const saveEditorAssetFx = Effect.fn("saveEditorAssetFx")(function* ({
 		...sourceFiles.filter(({ path }) => path !== sourcePath),
 		file,
 	];
-	yield* compileEditorProjectFilesFx(candidateFiles);
-	const nextRecord = yield* workspace.writeFx({
-		projectId,
+	const compilation = yield* compileEditorProjectFilesFx(candidateFiles);
+	const workspace = providedWorkspace ?? (yield* createEditorWorkspaceFx());
+	const write = yield* workspace.writeFx({
+		projectId: project.projectId,
 		file,
 		expectedRevision,
 		mode,
 	});
-	const project = yield* createEditorProjectFromRecordFx(nextRecord);
-	return {
+	const nextProject = yield* createEditorProjectFromWriteFx({
+		compilation,
 		project,
+		write,
+	});
+	return {
+		project: nextProject,
 		resourceId,
-		revision: nextRecord.revision,
+		revision: write.revision,
 	};
 });

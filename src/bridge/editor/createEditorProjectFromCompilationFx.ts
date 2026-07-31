@@ -33,6 +33,7 @@ export const createEditorProjectFromCompilationFx = Effect.fn(
 				cause,
 			}),
 	});
+	const fileIndex = Object.fromEntries(record.files.map((file) => [file.path, file]));
 	return {
 		projectId: record.projectId,
 		title: manifest.title,
@@ -44,6 +45,8 @@ export const createEditorProjectFromCompilationFx = Effect.fn(
 		createdAtMs: manifest.createdAtMs,
 		updatedAtMs: manifest.updatedAtMs,
 		revision,
+		fileIndex,
+		itemSourcePaths: compilation.provenance.items,
 		config: compilation.payload.config,
 		resources: compilation.payload.resources,
 		resourceSourcePaths: compilation.resourcePaths,

@@ -16,22 +16,36 @@ export namespace saveEditorItemFx {
 		readonly projectId: string;
 		readonly expectedRevision: string;
 		readonly item: ItemSchema.Type;
-		readonly sourceItemId?: string;
-		readonly sourcePath?: string;
 		readonly workspace?: EditorWorkspace;
 	}
 }
 
+const createItemSourceFileFx = Effect.fn("createEditorItemSourceFileFx")(
+	(item: ItemSchema.Type) =>
+		createItemEditorSourceFilesFx({
+			[item.id]: item,
+		}).pipe(
+			Effect.flatMap((files) =>
+				files[0] === undefined
+					? Effect.fail(
+							new EditorProjectError({
+								reason: "unsupported-project-file",
+								message: `Item ${item.id} did not produce an editor source file.`,
+							}),
+						)
+					: Effect.succeed(files[0]),
+			),
+		),
+);
+
 /**
- * Validates one item in the context of the complete project before publishing
- * its one-item source fragment through the contained editor workspace.
+ * Upserts one item by immutable UID, validates the complete project candidate,
+ * then atomically publishes the owning source file.
  */
 export const saveEditorItemFx = Effect.fn("saveEditorItemFx")(function* ({
 	projectId,
 	expectedRevision,
 	item: candidate,
-	sourceItemId,
-	sourcePath,
 	workspace: providedWorkspace,
 }: saveEditorItemFx.Props) {
 	const item = yield* Effect.try({
@@ -57,7 +71,7 @@ export const saveEditorItemFx = Effect.fn("saveEditorItemFx")(function* ({
 		return yield* Effect.fail(
 			new EditorProjectError({
 				reason: "unsupported-project-file",
-				message: `Editor project ${projectId} changed after this draft was loaded.`,
+				message: `Editor project ${projectId} changed after this item was loaded.`,
 			}),
 		);
 	}
@@ -73,32 +87,25 @@ export const saveEditorItemFx = Effect.fn("saveEditorItemFx")(function* ({
 				cause,
 			}),
 	});
-	const mode = sourcePath === undefined ? "create" : "replace";
-	const file =
-		mode === "create"
-			? yield* createItemEditorSourceFilesFx({
-					[item.id]: item,
-				}).pipe(
-					Effect.flatMap((files) =>
-						files[0] === undefined
-							? Effect.fail(
-									new EditorProjectError({
-										reason: "unsupported-project-file",
-										message: `Item ${item.id} did not produce an editor source file.`,
-									}),
-								)
-							: Effect.succeed(files[0]),
-					),
-				)
+	const currentCompilation = yield* compileEditorProjectFilesFx(sourceFiles);
+	const currentEntry = Object.entries(currentCompilation.payload.config.items).find(
+		([, currentItem]) => currentItem.uid === item.uid,
+	);
+
+	const mutation =
+		currentEntry === undefined
+			? {
+					mode: "create" as const,
+					file: yield* createItemSourceFileFx(item),
+				}
 			: yield* Effect.gen(function* () {
+					const [currentItemId] = currentEntry;
+					const sourcePath = currentCompilation.provenance.items[currentItemId];
 					if (sourcePath === undefined) {
-						return yield* Effect.die("Replace mode requires an item source path.");
-					}
-					if (sourceItemId === undefined) {
 						return yield* Effect.fail(
 							new EditorProjectError({
 								reason: "unsupported-project-file",
-								message: `Editing ${item.id} requires its original source item key.`,
+								message: `Item ${currentItemId} has no source provenance.`,
 							}),
 						);
 					}
@@ -124,15 +131,20 @@ export const saveEditorItemFx = Effect.fn("saveEditorItemFx")(function* ({
 							}),
 					});
 					const items = source.items;
-					if (items === undefined || !Object.hasOwn(items, sourceItemId)) {
+					const sourceEntry = Object.entries(items ?? {}).find(
+						([, sourceItem]) => sourceItem.uid === item.uid,
+					);
+					if (items === undefined || sourceEntry === undefined) {
 						return yield* Effect.fail(
 							new EditorProjectError({
 								reason: "unsupported-project-file",
-								message: `Item source ${sourcePath} does not own ${sourceItemId}.`,
+								message: `Item source ${sourcePath} does not own UID ${item.uid}.`,
 							}),
 						);
 					}
-					if (sourceItemId !== item.id && Object.hasOwn(items, item.id)) {
+					const [sourceItemId] = sourceEntry;
+					const conflictingItem = items[item.id];
+					if (conflictingItem !== undefined && conflictingItem.uid !== item.uid) {
 						return yield* Effect.fail(
 							new EditorProjectError({
 								reason: "unsupported-project-file",
@@ -145,30 +157,34 @@ export const saveEditorItemFx = Effect.fn("saveEditorItemFx")(function* ({
 					};
 					delete nextItems[sourceItemId];
 					nextItems[item.id] = item;
-					return yield* createEditorJsonSourceFileFx({
-						path: sourcePath,
-						value: {
-							...source,
-							items: nextItems,
-						},
-					});
+					return {
+						mode: "replace" as const,
+						sourcePath,
+						file: yield* createEditorJsonSourceFileFx({
+							path: sourcePath,
+							value: {
+								...source,
+								items: nextItems,
+							},
+						}),
+					};
 				});
 	const candidateFiles =
-		mode === "replace"
+		mutation.mode === "replace"
 			? [
-					...sourceFiles.filter(({ path }) => path !== sourcePath),
-					file,
+					...sourceFiles.filter(({ path }) => path !== mutation.sourcePath),
+					mutation.file,
 				]
 			: [
 					...sourceFiles,
-					file,
+					mutation.file,
 				];
 	const compilation = yield* compileEditorProjectFilesFx(candidateFiles);
 	const revision = yield* workspace.writeFileFx({
 		projectId,
-		file,
+		file: mutation.file,
 		expectedRevision,
-		mode,
+		mode: mutation.mode,
 	});
 	const project = yield* createEditorProjectFromCompilationFx({
 		compilation,

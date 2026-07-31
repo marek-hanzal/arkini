@@ -1,7 +1,7 @@
 import { useAtomSet, useAtomValue } from "@effect/atom-react";
 import { useCallback, useMemo, useState } from "react";
 
-import type { EditorItem, EditorItemFormValues } from "~/bridge/editor/EditorItemModel";
+import type { EditorItemFormValues } from "~/bridge/editor/EditorItemModel";
 import { createSaveEditorItemCommandAtom } from "~/bridge/editor/createSaveEditorItemCommandAtom";
 import { readSettledAsyncResultError } from "~/ui/reactivity/readSettledAsyncResultError";
 
@@ -37,7 +37,7 @@ export const useSaveEditorItemCommand = ({
 	return {
 		error: readSettledAsyncResultError(result),
 		isPending: result.waiting,
-		mutateAsync: (item: EditorItemFormValues): Promise<EditorItem> =>
+		mutateAsync: (item: EditorItemFormValues) =>
 			run({
 				expectedRevision,
 				item,

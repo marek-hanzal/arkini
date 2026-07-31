@@ -6,7 +6,7 @@ import { createEditorProjectFx } from "./createEditorProjectFx";
 import { listEditorProjectsFx } from "./listEditorProjectsFx";
 import { openEditorDirectoryFx } from "./openEditorDirectoryFx";
 import { readEditorProjectFx } from "./readEditorProjectFx";
-import { writeEditorProjectFileFx } from "./writeEditorProjectFileFx";
+import { writeEditorProjectFx } from "./writeEditorProjectFx";
 
 export namespace createFilesystemEditorWorkspaceFx {
 	export interface Props {
@@ -50,11 +50,11 @@ export const createFilesystemEditorWorkspaceFx = Effect.fn("createFilesystemEdit
 					}),
 				),
 		);
-		const writeFileFx: EditorWorkspace["writeFileFx"] = Effect.fn(
-			"FilesystemEditorWorkspace.writeFileFx",
+		const writeFx: EditorWorkspace["writeFx"] = Effect.fn(
+			"FilesystemEditorWorkspace.writeFx",
 		)((mutation) =>
 			operations.withPermits(1)(
-				writeEditorProjectFileFx({
+				writeEditorProjectFx({
 					root,
 					fileSystem,
 					mutation,
@@ -80,7 +80,7 @@ export const createFilesystemEditorWorkspaceFx = Effect.fn("createFilesystemEdit
 			listFx,
 			createFx,
 			readFx,
-			writeFileFx,
+			writeFx,
 			openDirectoryFx,
 		} satisfies EditorWorkspace;
 	},

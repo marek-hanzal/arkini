@@ -21,10 +21,10 @@ export const createEditorWorkspaceFx = Effect.fn("createEditorWorkspaceFx")(
 		const readFx: EditorWorkspace["readFx"] = Effect.fn("EditorWorkspace.readFx")((projectId) =>
 			invokeEditorTransportFx("read", () => api.readProject(projectId)),
 		);
-		const writeFileFx: EditorWorkspace["writeFileFx"] = Effect.fn(
-			"EditorWorkspace.writeFileFx",
+		const writeFx: EditorWorkspace["writeFx"] = Effect.fn(
+			"EditorWorkspace.writeFx",
 		)((mutation) =>
-			invokeEditorTransportFx("write-file", () => api.writeProjectFile(mutation)),
+			invokeEditorTransportFx("write", () => api.writeProject(mutation)),
 		);
 		const openDirectoryFx: EditorWorkspace["openDirectoryFx"] = Effect.fn(
 			"EditorWorkspace.openDirectoryFx",
@@ -35,7 +35,7 @@ export const createEditorWorkspaceFx = Effect.fn("createEditorWorkspaceFx")(
 			listFx,
 			createFx,
 			readFx,
-			writeFileFx,
+			writeFx,
 			openDirectoryFx,
 		} satisfies EditorWorkspace);
 	},

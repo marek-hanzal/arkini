@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
 import type { EditorWorkspace } from "~/bridge/editor/EditorWorkspace";
-import { createEditorProjectFromCompilationFx } from "~/bridge/editor/createEditorProjectFromCompilationFx";
+import { createEditorProjectFromRecordFx } from "~/bridge/editor/createEditorProjectFromRecordFx";
 import { createEditorWorkspaceFx } from "~/bridge/editor/createEditorWorkspaceFx";
 import { EditorProjectError } from "~/engine/editor/error/EditorProjectError";
 import { compileEditorProjectFilesFx } from "~/engine/editor/fx/compileEditorProjectFilesFx";
@@ -169,21 +169,17 @@ export const saveEditorAssetFx = Effect.fn("saveEditorAssetFx")(function* ({
 		...sourceFiles.filter(({ path }) => path !== sourcePath),
 		file,
 	];
-	const compilation = yield* compileEditorProjectFilesFx(candidateFiles);
-	const revision = yield* workspace.writeFileFx({
+	yield* compileEditorProjectFilesFx(candidateFiles);
+	const nextRecord = yield* workspace.writeFx({
 		projectId,
 		file,
 		expectedRevision,
 		mode,
 	});
-	const project = yield* createEditorProjectFromCompilationFx({
-		compilation,
-		record,
-		revision,
-	});
+	const project = yield* createEditorProjectFromRecordFx(nextRecord);
 	return {
 		project,
 		resourceId,
-		revision,
+		revision: nextRecord.revision,
 	};
 });

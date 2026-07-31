@@ -1,6 +1,6 @@
 import type { Effect } from "effect";
 import type { EditorProjectManifest } from "../../../electron/contract/editor/EditorProjectManifest";
-import type { EditorProjectFileWrite } from "../../../electron/contract/editor/EditorProjectFileWrite";
+import type { EditorProjectWrite } from "../../../electron/contract/editor/EditorProjectWrite";
 import type {
 	EditorProjectCreate,
 	EditorProjectRecord,
@@ -11,6 +11,6 @@ export interface EditorWorkspace {
 	readonly listFx: () => Effect.Effect<ReadonlyArray<EditorProjectManifest>, unknown>;
 	readonly createFx: (record: EditorProjectCreate) => Effect.Effect<void, unknown>;
 	readonly readFx: (projectId: string) => Effect.Effect<EditorProjectRecord | null, unknown>;
-	readonly writeFileFx: (mutation: EditorProjectFileWrite) => Effect.Effect<string, unknown>;
+	readonly writeFx: (mutation: EditorProjectWrite) => Effect.Effect<EditorProjectRecord, unknown>;
 	readonly openDirectoryFx: (projectId?: string) => Effect.Effect<void, unknown>;
 }

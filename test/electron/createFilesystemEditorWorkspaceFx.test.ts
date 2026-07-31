@@ -69,7 +69,7 @@ describe("createFilesystemEditorWorkspaceFx", () => {
 		if (snapshot?.revision === undefined) throw new Error("Missing project revision.");
 		const write = (path: string) =>
 			Effect.runPromise(
-				workspace.writeFileFx({
+				workspace.writeFx({
 					projectId: "concurrent-project",
 					expectedRevision: snapshot.revision!,
 					mode: "create",
@@ -91,7 +91,7 @@ describe("createFilesystemEditorWorkspaceFx", () => {
 		).toHaveLength(1);
 	});
 
-	it("guards file writes with revision and exact create or replace intent", async () => {
+	it("guards project writes with revision and exact create or replace intent", async () => {
 		const workspace = await createWorkspace();
 		await Effect.runPromise(
 			workspace.createFx({
@@ -111,7 +111,7 @@ describe("createFilesystemEditorWorkspaceFx", () => {
 
 		await expect(
 			Effect.runPromise(
-				workspace.writeFileFx({
+				workspace.writeFx({
 					projectId: "write-project",
 					expectedRevision: snapshot.revision,
 					mode: "create",
@@ -128,7 +128,21 @@ describe("createFilesystemEditorWorkspaceFx", () => {
 		});
 		await expect(
 			Effect.runPromise(
-				workspace.writeFileFx({
+				workspace.writeFx({
+					projectId: "write-project",
+					expectedRevision: snapshot.revision,
+					mode: "replace",
+					file: createManifestFile("write-project", 200),
+				}),
+			),
+		).rejects.toMatchObject({
+			cause: expect.objectContaining({
+				message: expect.stringContaining("owned by the canonical project writer"),
+			}),
+		});
+		await expect(
+			Effect.runPromise(
+				workspace.writeFx({
 					projectId: "write-project",
 					expectedRevision: "0".repeat(64),
 					mode: "replace",
@@ -147,8 +161,8 @@ describe("createFilesystemEditorWorkspaceFx", () => {
 			readFile(join(root, "write-project", "simple", "water.json"), "utf8"),
 		).resolves.toBe("old");
 
-		const revision = await Effect.runPromise(
-			workspace.writeFileFx({
+		const written = await Effect.runPromise(
+			workspace.writeFx({
 				projectId: "write-project",
 				expectedRevision: snapshot.revision,
 				mode: "replace",
@@ -158,10 +172,22 @@ describe("createFilesystemEditorWorkspaceFx", () => {
 				},
 			}),
 		);
-		expect(revision).not.toBe(snapshot.revision);
+		expect(written.revision).not.toBe(snapshot.revision);
 		await expect(
 			readFile(join(root, "write-project", "simple", "water.json"), "utf8"),
 		).resolves.toBe("new");
+		const manifest = JSON.parse(
+			new TextDecoder().decode(
+				written.files.find(({ path }) => path === "editor.json")?.bytes,
+			),
+		) as { readonly updatedAtMs: number };
+		expect(manifest.updatedAtMs).toBeGreaterThan(100);
+		await expect(Effect.runPromise(workspace.listFx())).resolves.toEqual([
+			expect.objectContaining({
+				projectId: "write-project",
+				updatedAtMs: manifest.updatedAtMs,
+			}),
+		]);
 	});
 
 	it("atomically creates, reads, and opens contained editor projects", async () => {
@@ -217,6 +243,56 @@ describe("createFilesystemEditorWorkspaceFx", () => {
 			2,
 			await realpath(join(root, record.projectId)),
 		);
+	});
+
+	it("moves a successfully saved project to the front of recent projects", async () => {
+		const workspace = await createWorkspace();
+		await Effect.runPromise(
+			workspace.createFx({
+				projectId: "saved-project",
+				files: [
+					createManifestFile("saved-project", 100),
+				],
+			}),
+		);
+		await Effect.runPromise(
+			workspace.createFx({
+				projectId: "previously-newer-project",
+				files: [
+					createManifestFile("previously-newer-project", 200),
+				],
+			}),
+		);
+		const snapshot = await Effect.runPromise(workspace.readFx("saved-project"));
+		if (snapshot === null) throw new Error("Missing project revision.");
+
+		const written = await Effect.runPromise(
+			workspace.writeFx({
+				projectId: "saved-project",
+				expectedRevision: snapshot.revision,
+				mode: "create",
+				file: {
+					path: "simple/water.json",
+					bytes: new TextEncoder().encode("{}"),
+				},
+			}),
+		);
+		const manifest = JSON.parse(
+			new TextDecoder().decode(
+				written.files.find(({ path }) => path === "editor.json")?.bytes,
+			),
+		) as { readonly updatedAtMs: number };
+
+		await expect(Effect.runPromise(workspace.listFx())).resolves.toEqual([
+			expect.objectContaining({
+				projectId: "saved-project",
+				updatedAtMs: manifest.updatedAtMs,
+			}),
+			expect.objectContaining({
+				projectId: "previously-newer-project",
+				updatedAtMs: 200,
+			}),
+		]);
 	});
 
 	it("lists only valid manifest projects in descending modification order", async () => {

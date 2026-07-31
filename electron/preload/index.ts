@@ -74,8 +74,8 @@ const api: ArkiniElectronApi.Api = {
 			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectCreate, record),
 		readProject: (projectId) =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectRead, projectId),
-		writeProjectFile: (mutation) =>
-			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectFileWrite, mutation),
+		writeProject: (mutation) =>
+			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectWrite, mutation),
 		openDirectory: (projectId) =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.editorDirectoryOpen, projectId),
 	},

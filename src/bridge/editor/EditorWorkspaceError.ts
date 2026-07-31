@@ -2,7 +2,7 @@ import { Data } from "effect";
 
 /** One typed preload editor-workspace operation failed at the platform boundary. */
 export class EditorWorkspaceError extends Data.TaggedError("EditorWorkspaceError")<{
-	readonly operation: "create" | "list" | "open-directory" | "read" | "write-file";
+	readonly operation: "create" | "list" | "open-directory" | "read" | "write";
 	readonly cause: unknown;
 }> {
 	override get message(): string {

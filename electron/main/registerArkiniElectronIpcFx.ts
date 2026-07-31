@@ -1,7 +1,7 @@
 import { app, BrowserWindow, ipcMain, nativeTheme, type IpcMainInvokeEvent } from "electron";
 import { Effect } from "effect";
 import { ArkiniElectronApi } from "../contract/ArkiniElectronApi";
-import type { EditorProjectFileWrite } from "../contract/editor/EditorProjectFileWrite";
+import type { EditorProjectWrite } from "../contract/editor/EditorProjectWrite";
 import type { EditorProjectCreate } from "../contract/editor/EditorProjectRecord";
 import { createFilesystemArkpackCatalogFx } from "./arkpack/createFilesystemArkpackCatalogFx";
 import type { AppearancePreferences } from "./appearance/AppearancePreferences";
@@ -177,9 +177,9 @@ export const registerArkiniElectronIpcFx = Effect.fn("registerArkiniElectronIpcF
 					(event, projectId: string) => runAuthorized(event, editor.readFx(projectId)),
 				);
 				ipcMain.handle(
-					ArkiniElectronApi.channels.editorProjectFileWrite,
-					(event, mutation: EditorProjectFileWrite) =>
-						runAuthorized(event, editor.writeFileFx(mutation)),
+					ArkiniElectronApi.channels.editorProjectWrite,
+					(event, mutation: EditorProjectWrite) =>
+						runAuthorized(event, editor.writeFx(mutation)),
 				);
 				ipcMain.handle(
 					ArkiniElectronApi.channels.editorDirectoryOpen,
@@ -220,7 +220,7 @@ export const registerArkiniElectronIpcFx = Effect.fn("registerArkiniElectronIpcF
 						ArkiniElectronApi.channels.editorProjectList,
 						ArkiniElectronApi.channels.editorProjectCreate,
 						ArkiniElectronApi.channels.editorProjectRead,
-						ArkiniElectronApi.channels.editorProjectFileWrite,
+						ArkiniElectronApi.channels.editorProjectWrite,
 						ArkiniElectronApi.channels.editorDirectoryOpen,
 						ArkiniElectronApi.channels.saveRead,
 						ArkiniElectronApi.channels.saveWrite,

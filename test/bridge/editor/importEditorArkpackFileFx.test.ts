@@ -14,7 +14,7 @@ const createWorkspace = (createFx: EditorWorkspace["createFx"]): EditorWorkspace
 	listFx: () => Effect.succeed([]),
 	createFx,
 	readFx: () => Effect.succeed(null),
-	writeFileFx: () => Effect.succeed("0".repeat(64)),
+	writeFx: () => Effect.die("Unexpected editor project write."),
 	openDirectoryFx: () => Effect.void,
 });
 

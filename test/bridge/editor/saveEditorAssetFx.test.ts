@@ -58,24 +58,34 @@ describe("saveEditorAssetFx", () => {
 				...plan.files,
 			],
 		};
-		const write = vi.fn<EditorWorkspace["writeFileFx"]>((mutation) =>
+		const write = vi.fn<EditorWorkspace["writeFx"]>((mutation) =>
 			Effect.sync(() => {
+				const manifestFile = record.files.find(({ path }) => path === "editor.json");
+				const manifest = JSON.parse(
+					new TextDecoder().decode(manifestFile?.bytes),
+				) as Record<string, unknown>;
 				record = {
 					...record,
 					revision: "1".repeat(64),
 					files: [
-						...record.files,
+						...record.files.filter(({ path }) => path !== "editor.json"),
 						mutation.file,
+						{
+							path: "editor.json",
+							bytes: new TextEncoder().encode(
+								`${JSON.stringify({ ...manifest, updatedAtMs: 456 }, null, "\t")}\n`,
+							),
+						},
 					],
 				};
-				return "1".repeat(64);
+				return record;
 			}),
 		);
 		const workspace: EditorWorkspace = {
 			listFx: () => Effect.succeed([]),
 			createFx: () => Effect.void,
 			readFx: () => Effect.succeed(record),
-			writeFileFx: write,
+			writeFx: write,
 			openDirectoryFx: () => Effect.void,
 		};
 		const saved = await Effect.runPromise(
@@ -100,6 +110,7 @@ describe("saveEditorAssetFx", () => {
 		);
 		expect(saved.project.resources.map(({ id }) => id)).toContain("new-asset");
 		expect(saved.project.revision).toBe(saved.revision);
+		expect(saved.project.updatedAtMs).toBe(456);
 	});
 
 	it("rejects bytes that only claim a png filename", async () => {

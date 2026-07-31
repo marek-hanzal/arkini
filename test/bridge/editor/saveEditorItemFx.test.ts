@@ -64,18 +64,30 @@ const createFixture = async () => {
 		listFx: () => Effect.succeed([]),
 		createFx: () => Effect.void,
 		readFx: () => Effect.succeed(record),
-		writeFileFx: (mutation) =>
+		writeFx: (mutation) =>
 			Effect.sync(() => {
 				written = mutation.file;
+				const manifestFile = record.files.find(({ path }) => path === "editor.json");
+				const manifest = JSON.parse(
+					new TextDecoder().decode(manifestFile?.bytes),
+				) as Record<string, unknown>;
 				record = {
 					...record,
 					revision: "1".repeat(64),
 					files: [
-						...record.files.filter(({ path }) => path !== mutation.file.path),
+						...record.files.filter(
+							({ path }) => path !== mutation.file.path && path !== "editor.json",
+						),
 						mutation.file,
+						{
+							path: "editor.json",
+							bytes: new TextEncoder().encode(
+								`${JSON.stringify({ ...manifest, updatedAtMs: 456 }, null, "\t")}\n`,
+							),
+						},
 					],
 				};
-				return "1".repeat(64);
+				return record;
 			}),
 		openDirectoryFx: () => Effect.void,
 	};
@@ -116,6 +128,7 @@ describe("saveEditorItemFx", () => {
 		expect(parsed.items?.sibling).toEqual(fixture.sibling);
 		expect(saved.project.config?.items.sibling).toEqual(fixture.sibling);
 		expect(saved.revision).toBe("1".repeat(64));
+		expect(saved.project.updatedAtMs).toBe(456);
 	});
 
 	it("renames the source entry selected by UID instead of guessing from item ID", async () => {

@@ -1,44 +1,55 @@
-import { FileSystem } from "effect";
+import { Clock, FileSystem } from "effect";
 import { Effect } from "effect";
-import { randomUUID } from "node:crypto";
 import { dirname, join, relative } from "node:path";
 
 import { EditorProjectFileSchema } from "../../contract/editor/EditorProjectFile";
+import { EditorProjectManifestSchema } from "../../contract/editor/EditorProjectManifest";
 import {
-	EditorProjectFileWriteSchema,
-	type EditorProjectFileWrite as EditorProjectFileWriteContract,
-} from "../../contract/editor/EditorProjectFileWrite";
+	EditorProjectWriteSchema,
+	type EditorProjectWrite as EditorProjectWriteContract,
+} from "../../contract/editor/EditorProjectWrite";
 import { ElectronMainError } from "../ElectronMainError";
 import { assertEditorProjectFilePathFx } from "./assertEditorProjectFilePathFx";
 import { assertEditorProjectIdFx } from "./assertEditorProjectIdFx";
+import { commitEditorProjectFilesFx } from "./internal/commitEditorProjectFilesFx";
 import { readEditorProjectFx } from "./readEditorProjectFx";
-import { readEditorProjectRevision } from "./readEditorProjectRevision";
 
-export namespace writeEditorProjectFileFx {
+export namespace writeEditorProjectFx {
 	export interface Props {
 		readonly root: string;
 		readonly fileSystem: FileSystem.FileSystem;
-		readonly mutation: EditorProjectFileWriteContract;
+		readonly mutation: EditorProjectWriteContract;
 	}
 }
 
-/** Atomically replaces or creates one validated source file inside an existing project. */
-export const writeEditorProjectFileFx = Effect.fn("writeEditorProjectFileFx")(function* ({
+/**
+ * Commits one canonical project mutation, touches editor.json, and returns the
+ * exact post-write project snapshot from disk.
+ */
+export const writeEditorProjectFx = Effect.fn("writeEditorProjectFx")(function* ({
 	root,
 	fileSystem,
 	mutation,
-}: writeEditorProjectFileFx.Props) {
+}: writeEditorProjectFx.Props) {
 	const parsedMutation = yield* Effect.try({
-		try: () => EditorProjectFileWriteSchema.parse(mutation),
+		try: () => EditorProjectWriteSchema.parse(mutation),
 		catch: (cause) =>
 			new ElectronMainError({
-				operation: "Write Arkini editor project file",
+				operation: "Write Arkini editor project",
 				cause,
 			}),
 	});
 	const projectId = yield* assertEditorProjectIdFx(parsedMutation.projectId);
 	const file = EditorProjectFileSchema.parse(parsedMutation.file);
 	const portablePath = yield* assertEditorProjectFilePathFx(file.path);
+	if (portablePath.toLowerCase() === "editor.json") {
+		return yield* Effect.fail(
+			new ElectronMainError({
+				operation: "Write Arkini editor project",
+				cause: new Error("editor.json is owned by the canonical project writer."),
+			}),
+		);
+	}
 	const record = yield* readEditorProjectFx({
 		root,
 		fileSystem,
@@ -47,7 +58,7 @@ export const writeEditorProjectFileFx = Effect.fn("writeEditorProjectFileFx")(fu
 	if (record === null) {
 		return yield* Effect.fail(
 			new ElectronMainError({
-				operation: "Write Arkini editor project file",
+				operation: "Write Arkini editor project",
 				cause: new Error(`Editor project ${projectId} disappeared before validation.`),
 			}),
 		);
@@ -55,7 +66,7 @@ export const writeEditorProjectFileFx = Effect.fn("writeEditorProjectFileFx")(fu
 	if (record.revision !== parsedMutation.expectedRevision) {
 		return yield* Effect.fail(
 			new ElectronMainError({
-				operation: "Write Arkini editor project file",
+				operation: "Write Arkini editor project",
 				cause: new Error(
 					`Editor project ${projectId} changed after this mutation was validated.`,
 				),
@@ -71,7 +82,7 @@ export const writeEditorProjectFileFx = Effect.fn("writeEditorProjectFileFx")(fu
 	) {
 		return yield* Effect.fail(
 			new ElectronMainError({
-				operation: "Write Arkini editor project file",
+				operation: "Write Arkini editor project",
 				cause: new Error(
 					parsedMutation.mode === "create"
 						? `Editor project path ${portablePath} already exists.`
@@ -80,6 +91,30 @@ export const writeEditorProjectFileFx = Effect.fn("writeEditorProjectFileFx")(fu
 			}),
 		);
 	}
+
+	const manifestFile = record.files.find(({ path }) => path === "editor.json");
+	const manifest = yield* Effect.try({
+		try: () =>
+			EditorProjectManifestSchema.parse(
+				JSON.parse(
+					new TextDecoder().decode(manifestFile?.bytes ?? new Uint8Array()),
+				) as unknown,
+			),
+		catch: (cause) =>
+			new ElectronMainError({
+				operation: "Write Arkini editor project",
+				cause,
+			}),
+	});
+	const nowMs = yield* Clock.currentTimeMillis;
+	const nextManifest = EditorProjectManifestSchema.parse({
+		...manifest,
+		updatedAtMs: Math.max(nowMs, manifest.updatedAtMs + 1),
+	});
+	const nextManifestFile = EditorProjectFileSchema.parse({
+		path: "editor.json",
+		bytes: new TextEncoder().encode(`${JSON.stringify(nextManifest, null, "\t")}\n`),
+	});
 
 	const projectRoot = yield* fileSystem.realPath(join(root, projectId));
 	const target = join(projectRoot, ...portablePath.split("/"));
@@ -91,7 +126,7 @@ export const writeEditorProjectFileFx = Effect.fn("writeEditorProjectFileFx")(fu
 	if (relative(targetDirectory, canonicalDirectory) !== "") {
 		return yield* Effect.fail(
 			new ElectronMainError({
-				operation: "Write Arkini editor project file",
+				operation: "Write Arkini editor project",
 				cause: new Error(`Editor project path ${portablePath} resolves through a symlink.`),
 			}),
 		);
@@ -102,7 +137,7 @@ export const writeEditorProjectFileFx = Effect.fn("writeEditorProjectFileFx")(fu
 		if (info.type !== "File" || relative(target, canonicalTarget) !== "") {
 			return yield* Effect.fail(
 				new ElectronMainError({
-					operation: "Write Arkini editor project file",
+					operation: "Write Arkini editor project",
 					cause: new Error(
 						`Editor project path ${portablePath} is not a canonical contained file.`,
 					),
@@ -111,31 +146,30 @@ export const writeEditorProjectFileFx = Effect.fn("writeEditorProjectFileFx")(fu
 		}
 	}
 
-	const pending = join(targetDirectory, `.${randomUUID()}.pending`);
-	yield* Effect.gen(function* () {
-		yield* fileSystem.writeFile(pending, file.bytes);
-		yield* fileSystem.rename(pending, target);
-	}).pipe(
-		Effect.ensuring(
-			fileSystem
-				.remove(pending, {
-					force: true,
-				})
-				.pipe(Effect.orElseSucceed(() => void 0)),
-		),
-		Effect.mapError(
-			(cause) =>
-				new ElectronMainError({
-					operation: "Write Arkini editor project file",
-					cause,
-				}),
-		),
-	);
-	return readEditorProjectRevision({
-		projectId,
-		files: [
-			...record.files.filter(({ path }) => path !== portablePath),
-			file,
-		],
+	const manifestTarget = join(projectRoot, "editor.json");
+	yield* commitEditorProjectFilesFx({
+		fileSystem,
+		content: {
+			target,
+			bytes: file.bytes,
+		},
+		manifest: {
+			target: manifestTarget,
+			bytes: nextManifestFile.bytes,
+		},
 	});
+	const nextRecord = yield* readEditorProjectFx({
+		root,
+		fileSystem,
+		projectId,
+	});
+	if (nextRecord === null) {
+		return yield* Effect.fail(
+			new ElectronMainError({
+				operation: "Write Arkini editor project",
+				cause: new Error(`Editor project ${projectId} disappeared after its write.`),
+			}),
+		);
+	}
+	return nextRecord;
 });

@@ -1,9 +1,8 @@
 import { useNavigate } from "@tanstack/react-router";
-import { useMemo } from "react";
 
-import type { EditorItemType } from "~/bridge/item/editor/EditorItemModel";
-import { createEditorItemDraft } from "~/bridge/item/editor/createEditorItemDraft";
 import { useEditorProject } from "~/bridge/editor/useEditorProject";
+import type { EditorItemType } from "~/bridge/item/editor/EditorItemModel";
+import { useEditorItemDraft } from "~/bridge/item/editor/useEditorItemDraft";
 import { ButtonLink } from "~/ui/button/Button";
 import { EditorItemForm } from "~/ui/item/editor/EditorItemForm";
 
@@ -21,14 +20,7 @@ export const EditorCreateItemForm = ({
 }: EditorCreateItemForm.Props) => {
 	const project = useEditorProject();
 	const navigate = useNavigate();
-	const initialItem = useMemo(
-		() => createEditorItemDraft(itemType, project, uid),
-		[
-			itemType,
-			project,
-			uid,
-		],
-	);
+	const initialItem = useEditorItemDraft(itemType, uid);
 	return (
 		<EditorItemForm
 			key={uid}

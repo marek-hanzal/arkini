@@ -12,7 +12,6 @@ import {
 import type { EditorItem } from "~/bridge/item/editor/EditorItemModel";
 import { EditorProjectFormDirtyAtom } from "~/bridge/editor/EditorProjectFormDirtyAtom";
 import { useEditorProject } from "~/bridge/editor/useEditorProject";
-import { createEditorItemFormValues } from "~/bridge/item/editor/createEditorItemFormValues";
 import { EditorItemFormSchema } from "~/bridge/item/editor/EditorItemFormSchema";
 import { Button } from "~/ui/button/Button";
 import { useRegisterEditorFormActions } from "~/ui/editor/EditorFormActions";
@@ -62,7 +61,16 @@ export const EditorItemForm = ({
 }: EditorItemForm.Props) => {
 	const project = useEditorProject();
 	const canonicalItem = useMemo(
-		() => createEditorItemFormValues(initialItem),
+		() => ({
+			...initialItem,
+			tags: initialItem.tags.join(", "),
+			merge:
+				initialItem.merge === undefined
+					? undefined
+					: [
+						...initialItem.merge,
+					],
+		}),
 		[initialItem],
 	);
 	const categoryOptions = Object.values(project.config?.categories ?? {}).map((category) => ({
@@ -94,7 +102,16 @@ export const EditorItemForm = ({
 				dirty: false,
 				ownerId,
 			});
-			formApi.reset(createEditorItemFormValues(saved));
+			formApi.reset({
+				...saved,
+				tags: saved.tags.join(", "),
+				merge:
+					saved.merge === undefined
+						? undefined
+						: [
+							...saved.merge,
+						],
+			});
 			await onSaved?.(saved);
 		},
 	});

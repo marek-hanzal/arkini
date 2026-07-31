@@ -1,6 +1,5 @@
 import { useMemo } from "react";
 
-import { createEditorItemSearchTerms } from "~/bridge/item/editor/createEditorItemSearchTerms";
 import { useEditorProject } from "~/bridge/editor/useEditorProject";
 import type { EditorSearchOption } from "~/ui/form/EditorSearchCombobox";
 
@@ -18,7 +17,14 @@ export const useEditorItemSearchOptions = () => {
 							id: item.id,
 							label: item.title,
 							meta: `${item.type} · ${item.id}`,
-							terms: createEditorItemSearchTerms(item),
+							terms: [
+								item.id,
+								item.title,
+								item.description,
+								item.type,
+								item.categoryId,
+								...item.tags,
+							],
 						}) satisfies EditorSearchOption,
 				),
 		[items],

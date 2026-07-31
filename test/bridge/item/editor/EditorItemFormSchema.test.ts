@@ -1,6 +1,5 @@
 import { describe, expect, it } from "vitest";
 
-import { createEditorItemFormValues } from "~/bridge/item/editor/createEditorItemFormValues";
 import { EditorItemFormSchema } from "~/bridge/item/editor/EditorItemFormSchema";
 
 const item = {
@@ -27,14 +26,6 @@ describe("EditorItemFormSchema", () => {
 			"test",
 			"era:I",
 		]);
-	});
-
-
-	it("projects canonical tags back into the one local presentation field", () => {
-		const canonical = EditorItemFormSchema.parse(item);
-		expect(createEditorItemFormValues(canonical).tags).toBe(
-			"resource, test, era:I",
-		);
 	});
 
 	it("keeps a blank required number invalid at its exact field path", () => {

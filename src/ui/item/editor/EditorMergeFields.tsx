@@ -1,6 +1,6 @@
 import type { EditorMerge } from "~/bridge/item/editor/EditorItemModel";
-import { createEditorMergeDraft } from "~/bridge/item/editor/createEditorItemDraft";
 import { Button } from "~/ui/button/Button";
+import { EditorItemDraftDefaults } from "~/ui/item/editor/EditorItemDraftDefaults";
 import { EditorChoiceControl } from "~/ui/form/EditorValueControls";
 import { EditorFormSection } from "~/ui/form/EditorFormSection";
 import { EditorItemReferenceControl } from "~/ui/item/editor/EditorItemReferenceControl";
@@ -33,7 +33,7 @@ export const EditorMergeFields = ({
 				onClick={() =>
 					onChange([
 						...merges,
-						createEditorMergeDraft(),
+						structuredClone(EditorItemDraftDefaults.merge),
 					])
 				}
 			>

@@ -1,11 +1,12 @@
 import { match } from "ts-pattern";
 
-import type { EditorDropRule, EditorLineRule, EditorWhen } from "~/bridge/item/editor/EditorItemModel";
-import {
-	createEditorLineRuleDraft,
-	createEditorWhenDraft,
-} from "~/bridge/item/editor/createEditorItemDraft";
+import type {
+	EditorDropRule,
+	EditorLineRule,
+	EditorWhen,
+} from "~/bridge/item/editor/EditorItemModel";
 import { Button } from "~/ui/button/Button";
+import { EditorItemDraftDefaults } from "~/ui/item/editor/EditorItemDraftDefaults";
 import { EditorChoiceControl, EditorNumberControl } from "~/ui/form/EditorValueControls";
 import { EditorQueryControl } from "~/ui/item/editor/EditorQueryControl";
 
@@ -43,7 +44,27 @@ const EditorWhenControl = ({
 							value: "range",
 						},
 					]}
-					onChange={(type) => onChange(createEditorWhenDraft(type, value.query))}
+					onChange={(type) =>
+						onChange(
+							type === "exists"
+								? {
+									type,
+									query: value.query,
+								}
+								: type === "count"
+									? {
+										type,
+										query: value.query,
+										count: 1,
+									}
+									: {
+										type,
+										query: value.query,
+										min: 1,
+										max: 1,
+									},
+						)
+					}
 				/>
 			</div>
 			<Button onClick={onRemove}>Remove</Button>
@@ -140,7 +161,17 @@ export const EditorRulesControl = ({
 						onClick={() =>
 							onChange([
 								...rules,
-								createEditorLineRuleDraft(type),
+								{
+									type,
+									when: [
+										structuredClone(EditorItemDraftDefaults.when),
+									],
+									...(type === "runtime:multiplier"
+										? {
+											multiplier: 1,
+										}
+										: {}),
+								} as EditorLineRule,
 							])
 						}
 					>
@@ -164,7 +195,17 @@ export const EditorRulesControl = ({
 								value: type,
 							}))}
 							onChange={(type) => {
-								const next = createEditorLineRuleDraft(type);
+								const next = {
+									type,
+									when: [
+										structuredClone(EditorItemDraftDefaults.when),
+									],
+									...(type === "runtime:multiplier"
+										? {
+												multiplier: 1,
+											}
+										: {}),
+								} as EditorLineRule;
 								onChange(
 									rules.map((current, index) =>
 										index === ruleIndex
@@ -216,7 +257,7 @@ export const EditorRulesControl = ({
 												...current,
 												when: [
 													...current.when,
-													createEditorWhenDraft("exists"),
+													structuredClone(EditorItemDraftDefaults.when),
 												],
 											}
 										: current,

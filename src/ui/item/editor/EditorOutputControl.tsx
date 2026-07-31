@@ -6,11 +6,8 @@ import type {
 	EditorRoll,
 	EditorRollSet,
 } from "~/bridge/item/editor/EditorItemModel";
-import {
-	createEditorDropDraft,
-	createEditorRollDraft,
-} from "~/bridge/item/editor/createEditorItemDraft";
 import { Button } from "~/ui/button/Button";
+import { EditorItemDraftDefaults } from "~/ui/item/editor/EditorItemDraftDefaults";
 import { EditorChoiceControl, EditorNumberControl } from "~/ui/form/EditorValueControls";
 import { EditorItemReferenceControl } from "~/ui/item/editor/EditorItemReferenceControl";
 import { EditorQuantityControl } from "~/ui/item/editor/EditorQuantityControl";
@@ -116,7 +113,7 @@ const EditorDropList = ({
 					onClick={() =>
 						onChange([
 							...value,
-							createEditorDropDraft(),
+							structuredClone(EditorItemDraftDefaults.drop),
 						])
 					}
 				>
@@ -187,7 +184,7 @@ const EditorRollControl = ({
 						value: "weight",
 					},
 				]}
-				onChange={(type) => onChange(createEditorRollDraft(type))}
+				onChange={(type) => onChange(structuredClone(EditorItemDraftDefaults.rolls[type]))}
 			/>
 			{match(value)
 				.with(
@@ -265,7 +262,7 @@ const EditorRollControl = ({
 													{
 														weight: 1,
 														drop: [
-															createEditorDropDraft(),
+															structuredClone(EditorItemDraftDefaults.drop),
 														],
 													},
 												],
@@ -393,7 +390,7 @@ const EditorRollSetControl = ({
 							...value,
 							roll: [
 								...value.roll,
-								createEditorRollDraft("guaranteed"),
+								structuredClone(EditorItemDraftDefaults.rolls.guaranteed),
 							],
 						})
 					}
@@ -446,7 +443,7 @@ export const EditorOutputControl = ({ onChange, value }: EditorOutputControlProp
 								...value.set,
 								{
 									roll: [
-										createEditorRollDraft("guaranteed"),
+										structuredClone(EditorItemDraftDefaults.rolls.guaranteed),
 									],
 								},
 							],

@@ -1,5 +1,4 @@
 import type { EditorLine } from "~/bridge/item/editor/EditorItemModel";
-import { createEditorLineDraft } from "~/bridge/line/editor/createEditorLineDraft";
 import { Button } from "~/ui/button/Button";
 import { withFieldGroup } from "~/ui/form/EditorForm";
 import { EditorFormSection } from "~/ui/form/EditorFormSection";
@@ -53,11 +52,31 @@ export const EditorProductionFields = withFieldGroup({
 								</div>
 								<Button
 									onClick={() => {
-										const line = createEditorLineDraft({
-										existingLines: lines,
-										itemId: ownerId,
-										type: kind,
-									});
+										const lineOwnerId =
+											ownerId.replace(/^(?:item|producer):/, "") || "new-item";
+										const lineIdPrefix = `line:${lineOwnerId}`;
+										const existingIds = new Set(lines.map((line) => line.id));
+										let id = `${lineIdPrefix}:default`;
+										if (lines.length > 0 || existingIds.has(id)) {
+											let suffix = 2;
+											while (existingIds.has(`${lineIdPrefix}:${suffix}`)) suffix += 1;
+											id = `${lineIdPrefix}:${suffix}`;
+										}
+										const line: EditorLine = {
+											id,
+											title: `New ${kind} line`,
+											description: `Describe what this ${kind} line consumes and produces.`,
+											default: lines.length === 0,
+											show: true,
+											enable: true,
+											runtimeMs: 0,
+											input: [
+												{
+													type: "simple",
+												},
+											],
+											rules: [],
+										};
 										if (linesField.state.value === undefined) {
 											group.setFieldValue("lines", [
 												line,

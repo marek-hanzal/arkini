@@ -1,7 +1,6 @@
 import { useMemo, useState } from "react";
 
 import type { EditorProject } from "~/bridge/editor/EditorProject";
-import { createEditorItemSearchTerms } from "~/bridge/item/editor/createEditorItemSearchTerms";
 import { useEditorProject } from "~/bridge/editor/useEditorProject";
 import { ButtonLink, PrimaryButtonLink } from "~/ui/button/Button";
 import { EditorItemThumbnail } from "~/ui/item/editor/EditorItemThumbnail";
@@ -27,7 +26,14 @@ export const EditorItemList = () => {
 				.filter((item) => itemType === undefined || item.type === itemType)
 				.map((item) => ({
 					identity: item.uid,
-					terms: createEditorItemSearchTerms(item, item.id),
+					terms: [
+						item.id,
+						item.title,
+						item.description,
+						item.type,
+						item.categoryId,
+						...item.tags,
+					],
 				})),
 		[
 			itemType,

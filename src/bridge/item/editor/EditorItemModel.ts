@@ -34,6 +34,5 @@ export type EditorWhen = WhenSchema.Type;
 
 export const EditorItemTypes: ReadonlyArray<EditorItemType> = ItemEnumSchema.options;
 
-export const parseEditorItemType = (candidate: unknown) => ItemEnumSchema.parse(candidate);
-
-export const validateEditorItem = (candidate: unknown) => ItemSchema.safeParse(candidate);
+/** Public bridge schema used by editor route search validation. */
+export const EditorItemTypeSchema = ItemEnumSchema;

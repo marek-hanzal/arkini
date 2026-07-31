@@ -1,6 +1,6 @@
 import type { EditorLine } from "~/bridge/item/editor/EditorItemModel";
-import { createEditorOutputDraft } from "~/bridge/item/editor/createEditorItemDraft";
 import { Button } from "~/ui/button/Button";
+import { EditorItemDraftDefaults } from "~/ui/item/editor/EditorItemDraftDefaults";
 import { withFieldGroup } from "~/ui/form/EditorForm";
 import { EditorLineInputsControl } from "~/ui/item/editor/EditorLineInputsControl";
 import { EditorOutputControl } from "~/ui/item/editor/EditorOutputControl";
@@ -89,7 +89,7 @@ export const EditorLineFields = withFieldGroup({
 									group.setFieldValue(
 										"output",
 										output === undefined
-											? createEditorOutputDraft()
+											? structuredClone(EditorItemDraftDefaults.output)
 											: undefined,
 									)
 								}

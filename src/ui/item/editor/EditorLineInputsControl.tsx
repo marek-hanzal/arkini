@@ -1,8 +1,8 @@
 import { match } from "ts-pattern";
 
 import type { EditorInput, EditorLine } from "~/bridge/item/editor/EditorItemModel";
-import { createEditorInputDraft } from "~/bridge/item/editor/createEditorItemDraft";
 import { Button } from "~/ui/button/Button";
+import { EditorItemDraftDefaults } from "~/ui/item/editor/EditorItemDraftDefaults";
 import { EditorChoiceControl, EditorNumberControl } from "~/ui/form/EditorValueControls";
 import { EditorQuantityControl } from "~/ui/item/editor/EditorQuantityControl";
 import { EditorQueryControl } from "~/ui/item/editor/EditorQueryControl";
@@ -121,7 +121,7 @@ const EditorLineInput = ({
 						value: "deposit",
 					},
 				]}
-				onChange={(type) => onChange(createEditorInputDraft(type))}
+				onChange={(type) => onChange(structuredClone(EditorItemDraftDefaults.inputs[type]))}
 			/>
 			{match(input)
 				.with(
@@ -263,7 +263,7 @@ export const EditorLineInputsControl = ({ onChange, value }: EditorLineInputsCon
 							onClick={() =>
 								onChange([
 									...value,
-									createEditorInputDraft(type),
+									structuredClone(EditorItemDraftDefaults.inputs[type]),
 								])
 							}
 						>

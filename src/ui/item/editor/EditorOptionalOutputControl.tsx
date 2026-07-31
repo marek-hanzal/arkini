@@ -1,6 +1,6 @@
 import type { EditorOutput } from "~/bridge/item/editor/EditorItemModel";
-import { createEditorOutputDraft } from "~/bridge/item/editor/createEditorItemDraft";
 import { Button } from "~/ui/button/Button";
+import { EditorItemDraftDefaults } from "~/ui/item/editor/EditorItemDraftDefaults";
 import { EditorOutputControl } from "~/ui/item/editor/EditorOutputControl";
 
 export interface EditorOptionalOutputControlProps {
@@ -20,7 +20,7 @@ export const EditorOptionalOutputControl = ({
 	value === undefined ? (
 		<Button
 			className="justify-self-start"
-			onClick={() => onChange(createEditorOutputDraft())}
+			onClick={() => onChange(structuredClone(EditorItemDraftDefaults.output))}
 		>
 			{addLabel}
 		</Button>

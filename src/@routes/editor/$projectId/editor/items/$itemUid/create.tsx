@@ -1,13 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-import { parseEditorItemType } from "~/bridge/item/editor/EditorItemModel";
+import { EditorItemTypeSchema } from "~/bridge/item/editor/EditorItemModel";
 import { EditorItemCreatePage } from "~/page/editor/EditorItemCreatePage";
 
 export const Route = createFileRoute(
 	"/editor/$projectId/editor/items/$itemUid/create",
 )({
 	validateSearch: (search) => ({
-		itemType: parseEditorItemType(search.itemType),
+		itemType: EditorItemTypeSchema.parse(search.itemType),
 	}),
 	component: EditorCreateItemRoute,
 });

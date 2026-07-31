@@ -1,5 +1,4 @@
 import type { EditorQuery } from "~/bridge/item/editor/EditorItemModel";
-import { createEditorQueryDraft } from "~/bridge/item/editor/createEditorItemDraft";
 import { EditorChoiceControl } from "~/ui/form/EditorValueControls";
 import { EditorSelectorControl } from "~/ui/item/editor/EditorSelectorControl";
 
@@ -95,7 +94,18 @@ export const EditorQueryControl = (props: EditorQueryControlProps) => (
 					value={props.value.scope}
 					options={queryScopeOptions}
 					onChange={(scope) =>
-						props.onChange(createEditorQueryDraft(scope, props.value.selector))
+						props.onChange(
+							scope === "board"
+								? {
+									scope,
+									distance: "close",
+									selector: props.value.selector,
+								}
+								: {
+									scope,
+									selector: props.value.selector,
+								},
+						)
 					}
 				/>
 			)}

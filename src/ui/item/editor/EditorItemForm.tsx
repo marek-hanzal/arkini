@@ -1,15 +1,21 @@
 import { useAtomSet } from "@effect/atom-react";
-import { useStore } from "@tanstack/react-form";
+import { revalidateLogic, useStore } from "@tanstack/react-form";
 import { match } from "ts-pattern";
-import { useCallback, useLayoutEffect, useMemo, type ReactNode } from "react";
-
 import {
-	type EditorItem,
-	type EditorItemFormValues,
-} from "~/bridge/editor/EditorItemModel";
+	useCallback,
+	useLayoutEffect,
+	useMemo,
+	useRef,
+	type ReactNode,
+} from "react";
+
+import type { EditorItem } from "~/bridge/editor/EditorItemModel";
 import { EditorProjectFormDirtyAtom } from "~/bridge/editor/EditorProjectFormDirtyAtom";
 import { useEditorProject } from "~/bridge/editor/useEditorProject";
+import { createEditorItemFormValues } from "~/engine/item/editor/createEditorItemFormValues";
+import { EditorItemFormSchema } from "~/engine/item/editor/schema/EditorItemFormSchema";
 import { Button } from "~/ui/button/Button";
+import { useRegisterEditorFormActions } from "~/ui/editor/EditorFormActions";
 import { useAppForm } from "~/ui/form/EditorForm";
 import { EditorFormSection } from "~/ui/form/EditorFormSection";
 import { EditorItemArtworkFields } from "~/ui/item/editor/EditorItemArtworkFields";
@@ -17,7 +23,6 @@ import { EditorLineFields } from "~/ui/item/editor/EditorLineField";
 import { EditorMergeFields } from "~/ui/item/editor/EditorMergeFields";
 import { EditorOptionalOutputControl } from "~/ui/item/editor/EditorOptionalOutputControl";
 import { EditorProductionFields } from "~/ui/item/editor/EditorProductionFields";
-import { useRegisterEditorFormActions } from "~/ui/editor/EditorFormActions";
 import { useSaveEditorItemCommand } from "~/ui/item/editor/useSaveEditorItemCommand";
 
 const scopeOptions = [
@@ -39,16 +44,6 @@ const scopeOptions = [
 	},
 ] as const;
 
-const createEditorItemFormValues = (item: EditorItem): EditorItemFormValues => ({
-	...item,
-	merge:
-		item.merge === undefined
-			? undefined
-			: [
-					...item.merge,
-				],
-});
-
 export namespace EditorItemForm {
 	export interface Props {
 		readonly back: ReactNode;
@@ -66,7 +61,7 @@ export const EditorItemForm = ({
 	title,
 }: EditorItemForm.Props) => {
 	const project = useEditorProject();
-	const canonicalItem = useMemo<EditorItemFormValues>(
+	const canonicalItem = useMemo(
 		() => createEditorItemFormValues(initialItem),
 		[initialItem],
 	);
@@ -74,13 +69,43 @@ export const EditorItemForm = ({
 		label: category.title,
 		value: category.id,
 	}));
-	const form = useAppForm({
-		defaultValues: canonicalItem,
-	});
-	const values = useStore(form.store, (state) => state.values);
-	const dirty = useStore(form.store, (state) => state.isDirty);
 	const setFormDirty = useAtomSet(EditorProjectFormDirtyAtom(project.projectId));
 	const ownerId = `item:${initialItem.uid}`;
+	const mutation = useSaveEditorItemCommand({
+		expectedRevision: project.revision,
+		itemUid: initialItem.uid,
+		projectId: project.projectId,
+	});
+	const submitSucceeded = useRef(false);
+	const form = useAppForm({
+		defaultValues: canonicalItem,
+		validationLogic: revalidateLogic({
+			mode: "submit",
+			modeAfterSubmission: "change",
+		}),
+		validators: {
+			onDynamic: EditorItemFormSchema,
+		},
+		onSubmit: async ({ formApi, value }) => {
+			const item = EditorItemFormSchema.parse(value);
+			const saved = await mutation.mutateAsync(item);
+			submitSucceeded.current = true;
+			setFormDirty({
+				dirty: false,
+				ownerId,
+			});
+			formApi.reset(createEditorItemFormValues(saved));
+			await onSaved?.(saved);
+		},
+	});
+	const itemId = useStore(form.store, (state) => state.values.id);
+	const dirty = useStore(form.store, (state) => state.isDirty);
+	const submitting = useStore(form.store, (state) => state.isSubmitting);
+	const validationError = useStore(form.store, (state) =>
+		state.submissionAttempts > 0 && !state.isValid
+			? "Fix the highlighted item fields before saving."
+			: undefined,
+	);
 	useLayoutEffect(() => {
 		setFormDirty({
 			dirty,
@@ -97,11 +122,6 @@ export const EditorItemForm = ({
 		ownerId,
 		setFormDirty,
 	]);
-	const mutation = useSaveEditorItemCommand({
-		expectedRevision: project.revision,
-		itemUid: initialItem.uid,
-		projectId: project.projectId,
-	});
 	const discard = useCallback(() => {
 		mutation.reset();
 		setFormDirty({
@@ -117,38 +137,30 @@ export const EditorItemForm = ({
 		setFormDirty,
 	]);
 	const save = useCallback(async () => {
-		if (!dirty || mutation.isPending) return;
-		const saved = await mutation.mutateAsync(values);
-		setFormDirty({
-			dirty: false,
-			ownerId,
-		});
-		form.reset(createEditorItemFormValues(saved));
-		await onSaved?.(saved);
+		if (!dirty || submitting) return false;
+		submitSucceeded.current = false;
+		await form.handleSubmit();
+		return submitSucceeded.current;
 	}, [
 		dirty,
 		form,
-		mutation.isPending,
-		mutation.mutateAsync,
-		onSaved,
-		ownerId,
-		setFormDirty,
-		values,
+		submitting,
 	]);
 	const actions = useMemo(
 		() => ({
 			discard,
-			error: mutation.error ?? undefined,
+			error: mutation.error ?? validationError,
 			isDirty: dirty,
-			isSaving: mutation.isPending,
+			isSaving: submitting,
 			save,
 		}),
 		[
 			dirty,
 			discard,
 			mutation.error,
-			mutation.isPending,
 			save,
+			submitting,
+			validationError,
 		],
 	);
 	useRegisterEditorFormActions(actions);
@@ -173,7 +185,15 @@ export const EditorItemForm = ({
 					</p>
 				</div>
 			</header>
-			<div className="min-h-0 overflow-y-auto overscroll-contain pr-1">
+			<form
+				className="min-h-0 overflow-y-auto overscroll-contain pr-1"
+				noValidate
+				onSubmit={(event) => {
+					event.preventDefault();
+					event.stopPropagation();
+					void save();
+				}}
+			>
 				<div className="mx-auto grid w-full max-w-5xl gap-4 pb-8">
 					<EditorFormSection
 						title="Identity"
@@ -354,7 +374,7 @@ export const EditorItemForm = ({
 										lines: "lines",
 									}}
 									kind="deposit"
-									ownerId={values.id}
+									ownerId={itemId}
 								/>
 							),
 						)
@@ -370,7 +390,7 @@ export const EditorItemForm = ({
 										lines: "lines",
 									}}
 									kind="producer"
-									ownerId={values.id}
+									ownerId={itemId}
 								/>
 							),
 						)
@@ -444,7 +464,7 @@ export const EditorItemForm = ({
 						.exhaustive()}
 
 				</div>
-			</div>
+			</form>
 		</section>
 	);
 };

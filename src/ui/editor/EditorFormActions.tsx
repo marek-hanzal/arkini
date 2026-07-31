@@ -12,7 +12,7 @@ export interface EditorFormActions {
 	readonly error?: unknown;
 	readonly isDirty: boolean;
 	readonly isSaving: boolean;
-	readonly save: () => Promise<void>;
+	readonly save: () => Promise<boolean>;
 }
 
 type RegisterEditorFormActions = (actions: EditorFormActions) => () => void;

@@ -60,12 +60,12 @@ export const EditorNumberControl = ({
 	<EditorValueField label={label}>
 		<input
 			type="number"
-			value={value}
+			value={Number.isNaN(value) ? "" : value}
 			className={editorInputClassName}
 			max={max}
 			min={min}
 			step={step}
-			onChange={(event) => onChange(Number(event.currentTarget.value))}
+			onChange={(event) => onChange(event.currentTarget.valueAsNumber)}
 		/>
 	</EditorValueField>
 );

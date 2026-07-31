@@ -32,8 +32,18 @@ const readEditorTab = (pathname: string): EditorTab | undefined => {
 	return match?.[1] as EditorTab | undefined;
 };
 
-const readErrorMessage = (error: unknown) =>
-	error instanceof Error ? error.message : "Editor could not finish the requested action.";
+const readErrorMessage = (error: unknown) => {
+	if (typeof error === "string") return error;
+	if (
+		typeof error === "object" &&
+		error !== null &&
+		"message" in error &&
+		typeof error.message === "string"
+	) {
+		return error.message;
+	}
+	return "Editor could not finish the requested action.";
+};
 
 /** Keeps editor-wide navigation stable while child tools replace only the content surface. */
 const EditorShellContent = ({ children }: PropsWithChildren) => {
@@ -113,8 +123,7 @@ const EditorShellContent = ({ children }: PropsWithChildren) => {
 		if (form === undefined || form.isSaving) return;
 		setExitError(undefined);
 		try {
-			await form.save();
-			await closeAndExit();
+			if (await form.save()) await closeAndExit();
 		} catch {
 			// The form owns and publishes its exact mutation error.
 		}

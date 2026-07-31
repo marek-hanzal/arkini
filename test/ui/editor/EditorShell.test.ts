@@ -105,7 +105,7 @@ const createGate = () => {
 
 const formCalls = {
 	discard: vi.fn(),
-	save: vi.fn<() => Promise<void>>(),
+	save: vi.fn<() => Promise<boolean>>(),
 };
 
 const DirtyItemForm = () => {
@@ -121,8 +121,10 @@ const DirtyItemForm = () => {
 		setError(undefined);
 		setSaving(true);
 		try {
-			await formCalls.save();
-			setDirty(false);
+			const saved = await formCalls.save();
+			if (saved) setDirty(false);
+			else setError("Fix the highlighted item fields before saving.");
+			return saved;
 		} catch (cause) {
 			setError(cause);
 			throw cause;
@@ -278,7 +280,7 @@ const readStatusButton = (container: HTMLElement, label: string) => {
 describe("EditorShell", () => {
 	beforeEach(() => {
 		formCalls.discard.mockReset();
-		formCalls.save.mockReset().mockResolvedValue(undefined);
+		formCalls.save.mockReset().mockResolvedValue(true);
 	});
 
 	it("switches the active tab before the destination route finishes loading", async () => {
@@ -369,7 +371,7 @@ describe("EditorShell", () => {
 	it("saves dirty state before Exit and remains retryable after save failure", async () => {
 		formCalls.save
 			.mockRejectedValueOnce(new Error("Invalid item."))
-			.mockResolvedValueOnce(undefined);
+			.mockResolvedValueOnce(true);
 		const router = createTestRouter({
 			initialEntry: "/editor/editor-test/editor/items/test/edit",
 		});
@@ -395,5 +397,35 @@ describe("EditorShell", () => {
 		);
 		expect(formCalls.save).toHaveBeenCalledTimes(2);
 		expect(session.close).toHaveBeenCalledTimes(1);
+	});
+
+	it("keeps Exit open when local form validation declines the save", async () => {
+		formCalls.save.mockResolvedValueOnce(false).mockResolvedValueOnce(true);
+		const router = createTestRouter({
+			initialEntry: "/editor/editor-test/editor/items/test/edit",
+		});
+		const container = await renderRouter(router);
+
+		act(() => {
+			readButton(container, "Exit").click();
+		});
+		await act(async () => {
+			readStatusButton(container, "Save").click();
+		});
+		expect(router.state.location.pathname).toBe(
+			"/editor/editor-test/editor/items/test/edit",
+		);
+		expect(session.close).not.toHaveBeenCalled();
+		expect(container.textContent).toContain(
+			"Fix the highlighted item fields before saving.",
+		);
+
+		await act(async () => {
+			readStatusButton(container, "Save").click();
+		});
+		await vi.waitFor(() =>
+			expect(router.state.location.pathname).toBe("/main-menu"),
+		);
+		expect(formCalls.save).toHaveBeenCalledTimes(2);
 	});
 });

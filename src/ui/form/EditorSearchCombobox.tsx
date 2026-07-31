@@ -14,6 +14,7 @@ export namespace EditorSearchCombobox {
 		readonly label: string;
 		readonly description?: string;
 		readonly emptyLabel: string;
+		readonly error?: string;
 		readonly options: readonly EditorSearchOption[];
 		readonly value: string;
 		readonly onBlur?: () => void;
@@ -26,6 +27,7 @@ export namespace EditorSearchCombobox {
 export const EditorSearchCombobox = ({
 	description,
 	emptyLabel,
+	error,
 	label,
 	onBlur,
 	onChange,
@@ -98,6 +100,7 @@ export const EditorSearchCombobox = ({
 					autoComplete="off"
 					aria-expanded={open}
 					aria-controls={listboxId}
+					aria-invalid={error === undefined ? undefined : true}
 					aria-activedescendant={
 						open && matches[activeIndex] !== undefined
 							? `${listboxId}-option-${activeIndex}`
@@ -141,6 +144,9 @@ export const EditorSearchCombobox = ({
 			</span>
 			{description === undefined ? null : (
 				<span className="text-xs leading-5 text-subtle">{description}</span>
+			)}
+			{error === undefined ? null : (
+				<span className="text-xs leading-5 text-danger">{error}</span>
 			)}
 			{open ? (
 				<span

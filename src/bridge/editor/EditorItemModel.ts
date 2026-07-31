@@ -14,7 +14,6 @@ import type { RollSchema } from "~/engine/roll/schema/RollSchema";
 import type { RollSetSchema } from "~/engine/roll/schema/RollSetSchema";
 import type { SelectorSchema } from "~/engine/selector/schema/SelectorSchema";
 import type { WhenSchema } from "~/engine/when/schema/WhenSchema";
-import type { BaseItemSchema } from "~/engine/item/schema/BaseItemSchema";
 
 export type EditorItem = ItemSchema.Type;
 export type EditorItemType = ItemEnumSchema.Type;
@@ -32,15 +31,6 @@ export type EditorRoll = RollSchema.Type;
 export type EditorRollSet = RollSetSchema.Type;
 export type EditorSelector = SelectorSchema.Type;
 export type EditorWhen = WhenSchema.Type;
-export type EditorItemFormValues = Omit<BaseItemSchema.Type, "merge"> & {
-	readonly type: EditorItemType;
-	readonly durationMs?: number;
-	readonly line?: EditorLine;
-	readonly lines?: EditorLine[];
-	readonly maxQueueSize?: number;
-	readonly merge?: EditorMerge[];
-	readonly output?: EditorOutput;
-};
 
 export const EditorItemTypes: ReadonlyArray<EditorItemType> = ItemEnumSchema.options;
 

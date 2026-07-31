@@ -89,7 +89,9 @@ export const createEditorProjectFromRecordFx = Effect.fn(
 	const compilation = yield* compileEditorProjectFilesFx(files);
 	return yield* createEditorProjectFromCompilationFx({
 		compilation,
-		record,
+		fileIndex,
+		manifestFile,
+		projectId: record.projectId,
 		revision: record.revision,
 	});
 });

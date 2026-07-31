@@ -1,6 +1,5 @@
 import { Effect } from "effect";
 
-import { EditorProjectRecordSchema } from "../../../electron/contract/editor/EditorProjectRecord";
 import type { EditorProjectWriteResult } from "../../../electron/contract/editor/EditorProjectWriteResult";
 import type { EditorProject } from "~/bridge/editor/EditorProject";
 import { createEditorProjectFromCompilationFx } from "~/bridge/editor/createEditorProjectFromCompilationFx";
@@ -24,11 +23,9 @@ export const createEditorProjectFromWriteFx = Effect.fn("createEditorProjectFrom
 		};
 		return createEditorProjectFromCompilationFx({
 			compilation,
-			record: EditorProjectRecordSchema.parse({
-				projectId: project.projectId,
-				files: Object.values(fileIndex),
-				revision: write.revision,
-			}),
+			fileIndex,
+			manifestFile: write.manifest,
+			projectId: project.projectId,
 			revision: write.revision,
 		});
 	},

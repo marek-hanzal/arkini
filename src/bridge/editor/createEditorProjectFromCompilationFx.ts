@@ -1,41 +1,49 @@
 import { Effect } from "effect";
 
+import type { EditorProjectFile } from "../../../electron/contract/editor/EditorProjectFile";
 import { EditorProjectManifestSchema } from "../../../electron/contract/editor/EditorProjectManifest";
-import type { EditorProjectRecord } from "../../../electron/contract/editor/EditorProjectRecord";
 import type { EditorProject } from "~/bridge/editor/EditorProject";
 import { EditorProjectError } from "~/engine/editor/error/EditorProjectError";
 import type { EditorProjectCompilationSchema } from "~/engine/editor/schema/EditorProjectCompilationSchema";
 
-/** Joins one exact compiled source candidate with its manifest and persisted revision. */
+/** Joins one compiled candidate with its exact manifest and in-memory file index. */
 export const createEditorProjectFromCompilationFx = Effect.fn(
 	"createEditorProjectFromCompilationFx",
 )(function* ({
 	compilation,
-	record,
+	fileIndex,
+	manifestFile,
+	projectId,
 	revision,
 }: {
 	readonly compilation: EditorProjectCompilationSchema.Type;
-	readonly record: EditorProjectRecord;
+	readonly fileIndex: Readonly<Record<string, EditorProjectFile>>;
+	readonly manifestFile: EditorProjectFile;
+	readonly projectId: string;
 	readonly revision: string;
 }) {
-	const manifestFile = record.files.find(({ path }) => path === "editor.json");
 	const manifest = yield* Effect.try({
 		try: () =>
 			EditorProjectManifestSchema.parse(
-				JSON.parse(
-					new TextDecoder().decode(manifestFile?.bytes ?? new Uint8Array()),
-				) as unknown,
+				JSON.parse(new TextDecoder().decode(manifestFile.bytes)) as unknown,
 			),
 		catch: (cause) =>
 			new EditorProjectError({
 				reason: "unsupported-project-file",
-				message: `Editor project ${record.projectId} contains an invalid editor.json.`,
+				message: `Editor project ${projectId} contains an invalid editor.json.`,
 				cause,
 			}),
 	});
-	const fileIndex = Object.fromEntries(record.files.map((file) => [file.path, file]));
+	if (manifest.projectId !== projectId) {
+		return yield* Effect.fail(
+			new EditorProjectError({
+				reason: "unsupported-project-file",
+				message: `Editor project ${projectId} contains manifest ${manifest.projectId}.`,
+			}),
+		);
+	}
 	return {
-		projectId: record.projectId,
+		projectId,
 		title: manifest.title,
 		...(manifest.game === undefined
 			? {}

@@ -1,14 +1,26 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 
-import { readEditorProjectFx } from "~/bridge/editor/readEditorProjectFx";
+import { EditorProjectProvider } from "~/bridge/editor/EditorProjectProvider";
+import { loadEditorProjectFx } from "~/bridge/editor/loadEditorProjectFx";
 import { EditorProjectErrorPage } from "~/page/editor/EditorProjectErrorPage";
 import { EditorWorkspacePage } from "~/page/editor/EditorWorkspacePage";
+import { EditorProjectResourceUrlProvider } from "~/ui/resource/editor/useEditorResourceUrl";
 
-const EditorProjectRoute = () => (
-	<EditorWorkspacePage>
-		<Outlet />
-	</EditorWorkspacePage>
-);
+const EditorProjectRoute = () => {
+	const { expectedRevision, project } = Route.useLoaderData();
+	return (
+		<EditorProjectProvider
+			expectedRevision={expectedRevision}
+			loaded={project}
+		>
+			<EditorProjectResourceUrlProvider>
+				<EditorWorkspacePage>
+					<Outlet />
+				</EditorWorkspacePage>
+			</EditorProjectResourceUrlProvider>
+		</EditorProjectProvider>
+	);
+};
 
 /** Compiles the complete standalone source workspace before any editor tool mounts. */
 export const Route = createFileRoute("/editor/$projectId")({
@@ -21,16 +33,19 @@ export const Route = createFileRoute("/editor/$projectId")({
 			replace: true,
 		});
 	},
-	staleTime: Number.POSITIVE_INFINITY,
-	loader: ({ abortController, context, params }) =>
-		context.rendererRuntime.runPromise(
-			readEditorProjectFx({
-				projectId: params.projectId,
-			}),
-			{
-				signal: abortController.signal,
-			},
-		),
+	loader: {
+		handler: ({ abortController, context, params }) =>
+			context.rendererRuntime.runPromise(
+				loadEditorProjectFx({
+					projectId: params.projectId,
+				}),
+				{
+					signal: abortController.signal,
+				},
+			),
+		staleReloadMode: "blocking",
+	},
+	shouldReload: ({ cause }) => cause === "enter",
 	component: EditorProjectRoute,
 	errorComponent: EditorProjectErrorPage,
 });

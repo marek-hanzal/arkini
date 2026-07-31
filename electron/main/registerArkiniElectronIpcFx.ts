@@ -1,7 +1,8 @@
 import { app, BrowserWindow, ipcMain, nativeTheme, type IpcMainInvokeEvent } from "electron";
 import { Effect } from "effect";
 import { ArkiniElectronApi } from "../contract/ArkiniElectronApi";
-import type { EditorProjectRecord } from "../contract/editor/EditorProjectRecord";
+import type { EditorProjectFileWrite } from "../contract/editor/EditorProjectFileWrite";
+import type { EditorProjectCreate } from "../contract/editor/EditorProjectRecord";
 import { createFilesystemArkpackCatalogFx } from "./arkpack/createFilesystemArkpackCatalogFx";
 import type { AppearancePreferences } from "./appearance/AppearancePreferences";
 import type { CheatPreferences } from "./cheat/CheatPreferences";
@@ -54,7 +55,6 @@ export const registerArkiniElectronIpcFx = Effect.fn("registerArkiniElectronIpcF
 			const editor = yield* createFilesystemEditorWorkspaceFx({
 				root: userDataPaths.editor,
 			});
-
 			yield* Effect.sync(() => {
 				const synchronizeWindowBackgrounds = () => {
 					const color = nativeTheme.shouldUseDarkColors ? "#090711" : "#fbf8ff";
@@ -169,12 +169,17 @@ export const registerArkiniElectronIpcFx = Effect.fn("registerArkiniElectronIpcF
 				);
 				ipcMain.handle(
 					ArkiniElectronApi.channels.editorProjectCreate,
-					(event, record: EditorProjectRecord) =>
+					(event, record: EditorProjectCreate) =>
 						runAuthorized(event, editor.createFx(record)),
 				);
 				ipcMain.handle(
 					ArkiniElectronApi.channels.editorProjectRead,
 					(event, projectId: string) => runAuthorized(event, editor.readFx(projectId)),
+				);
+				ipcMain.handle(
+					ArkiniElectronApi.channels.editorProjectFileWrite,
+					(event, mutation: EditorProjectFileWrite) =>
+						runAuthorized(event, editor.writeFileFx(mutation)),
 				);
 				ipcMain.handle(
 					ArkiniElectronApi.channels.editorDirectoryOpen,
@@ -215,6 +220,7 @@ export const registerArkiniElectronIpcFx = Effect.fn("registerArkiniElectronIpcF
 						ArkiniElectronApi.channels.editorProjectList,
 						ArkiniElectronApi.channels.editorProjectCreate,
 						ArkiniElectronApi.channels.editorProjectRead,
+						ArkiniElectronApi.channels.editorProjectFileWrite,
 						ArkiniElectronApi.channels.editorDirectoryOpen,
 						ArkiniElectronApi.channels.saveRead,
 						ArkiniElectronApi.channels.saveWrite,

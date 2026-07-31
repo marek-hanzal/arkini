@@ -16,12 +16,6 @@ export const EditorMetaOverview = () => {
 					<dd className="mt-1 font-medium">{project.title}</dd>
 				</div>
 				<div>
-					<dt className="text-xs uppercase tracking-wider text-subtle">Version</dt>
-					<dd className="mt-1 font-medium">
-						{config?.version ?? project.game ?? "Not configured"}
-					</dd>
-				</div>
-				<div>
 					<dt className="text-xs uppercase tracking-wider text-subtle">Game ID</dt>
 					<dd className="mt-1 break-all font-mono text-xs">
 						{config?.meta.id ?? "Not configured"}

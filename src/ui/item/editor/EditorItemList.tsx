@@ -1,7 +1,9 @@
 import { useMemo, useState } from "react";
 
 import type { EditorProject } from "~/bridge/editor/EditorProject";
+import { createEditorItemSearchTerms } from "~/bridge/editor/createEditorItemSearchTerms";
 import { useEditorProject } from "~/bridge/editor/useEditorProject";
+import { ButtonLink, PrimaryButtonLink } from "~/ui/button/Button";
 import { EditorItemThumbnail } from "~/ui/item/editor/EditorItemThumbnail";
 import { useFuseSearch } from "~/ui/search/useFuseSearch";
 
@@ -30,15 +32,7 @@ export const EditorItemList = () => {
 				.filter(([, item]) => itemType === undefined || item.type === itemType)
 				.map(([id, item]) => ({
 					identity: id,
-					terms: [
-						id,
-						item.id,
-						item.title,
-						item.description,
-						item.type,
-						item.categoryId,
-						...item.tags,
-					],
+					terms: createEditorItemSearchTerms(item, id),
 				})),
 		[
 			itemType,
@@ -93,6 +87,16 @@ export const EditorItemList = () => {
 						<span aria-hidden="true">×</span>
 					</button>
 				)}
+				<PrimaryButtonLink
+					to="/editor/$projectId/editor/new"
+					params={{
+						projectId: project.projectId,
+					}}
+					className="min-h-0 shrink-0 gap-2 px-4 py-3 text-sm"
+				>
+					<span className="icon-[lucide--plus] size-4" />
+					New item
+				</PrimaryButtonLink>
 			</header>
 			<div className="ak-list grid min-h-0 content-start gap-2 overflow-y-auto overscroll-contain pr-1">
 				{items.length === 0 ? (
@@ -111,15 +115,28 @@ export const EditorItemList = () => {
 				{filteredItems.map(([id, item]) => (
 					<article
 						key={id}
-						className="ak-list-row flex min-w-0 items-center gap-4 rounded-xl p-3"
+						className="ak-list-row flex min-w-0 items-center gap-2 rounded-xl p-1"
 						data-item-id={id}
 						data-ui="EditorItemRow"
 					>
-						<EditorItemThumbnail resourceIds={item.asset.default} />
-						<div className="min-w-0 flex-1">
-							<h2 className="truncate text-base font-semibold">{item.title}</h2>
-							<p className="mt-1 truncate text-xs text-subtle">{id}</p>
-						</div>
+						<ButtonLink
+							to="/editor/$projectId/editor/item/$itemId"
+							params={{
+								projectId: project.projectId,
+								itemId: id,
+							}}
+							className="min-h-0 min-w-0 flex-1 justify-start gap-4 border-0 bg-transparent p-2 text-left shadow-none hover:bg-surface-raised"
+						>
+							<EditorItemThumbnail resourceIds={item.asset.default} />
+							<span className="min-w-0 flex-1">
+								<span className="block truncate text-base font-semibold">
+									{item.title}
+								</span>
+								<span className="mt-1 block truncate text-xs text-subtle">
+									{id}
+								</span>
+							</span>
+						</ButtonLink>
 						<button
 							type="button"
 							className="shrink-0 cursor-pointer rounded-full bg-surface-raised px-2.5 py-1 text-[0.65rem] font-semibold uppercase tracking-wider text-muted transition-colors hover:bg-accent hover:text-accent-contrast"

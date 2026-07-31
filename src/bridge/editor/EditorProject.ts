@@ -5,7 +5,10 @@ import type { EditorProjectDescriptor } from "~/bridge/editor/EditorProjectDescr
 
 /** One manifest-backed editor project with an optional compiled game source snapshot. */
 export interface EditorProject extends EditorProjectDescriptor {
+	readonly revision: string;
 	readonly config?: GameConfigSchema.Type;
 	readonly resources: ReadonlyArray<ResourceSchema.Type>;
+	readonly resourceSourcePaths: Readonly<Record<string, string>>;
+	readonly itemSourcePaths: Readonly<Record<string, string>>;
 	readonly diagnostics: GameDiagnosticsSchema.Type;
 }

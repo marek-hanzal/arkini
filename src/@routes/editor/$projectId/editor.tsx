@@ -1,7 +1,5 @@
-import { createFileRoute } from "@tanstack/react-router";
-
-import { EditorItemsPage } from "~/page/editor/EditorItemsPage";
+import { createFileRoute, Outlet } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/editor/$projectId/editor")({
-	component: EditorItemsPage,
+	component: Outlet,
 });

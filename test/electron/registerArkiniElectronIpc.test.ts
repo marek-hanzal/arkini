@@ -213,6 +213,20 @@ const invokeArguments = new Map<string, ReadonlyArray<unknown>>([
 		],
 	],
 	[
+		ArkiniElectronApi.channels.editorProjectFileWrite,
+		[
+			{
+				projectId: "editor-test",
+				expectedRevision: "0".repeat(64),
+				mode: "create",
+				file: {
+					path: "simple/water.json",
+					bytes: new TextEncoder().encode("{}"),
+				},
+			},
+		],
+	],
+	[
 		ArkiniElectronApi.channels.editorDirectoryOpen,
 		[],
 	],
@@ -511,9 +525,28 @@ describe("registerArkiniElectronIpcFx", () => {
 			).resolves.toEqual([
 				editorManifest,
 			]);
+			const readEditorRecord = (await invoke(
+				ArkiniElectronApi.channels.editorProjectRead,
+				trustedEvent,
+				"editor-test",
+			)) as typeof editorRecord & {
+				readonly revision: string;
+			};
+			expect(readEditorRecord).toEqual({
+				...editorRecord,
+				revision: expect.stringMatching(/^[a-f0-9]{64}$/),
+			});
 			await expect(
-				invoke(ArkiniElectronApi.channels.editorProjectRead, trustedEvent, "editor-test"),
-			).resolves.toEqual(editorRecord);
+				invoke(ArkiniElectronApi.channels.editorProjectFileWrite, trustedEvent, {
+					projectId: "editor-test",
+					expectedRevision: readEditorRecord.revision,
+					mode: "create",
+					file: {
+						path: "simple/water.json",
+						bytes: new TextEncoder().encode("{}"),
+					},
+				}),
+			).resolves.toMatch(/^[a-f0-9]{64}$/);
 			await expect(
 				invoke(ArkiniElectronApi.channels.editorDirectoryOpen, trustedEvent),
 			).resolves.toBeUndefined();

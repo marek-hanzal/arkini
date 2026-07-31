@@ -99,5 +99,12 @@ export const compileEditorProjectFilesFx = Effect.fn("compileEditorProjectFilesF
 			})),
 		}),
 		diagnostics,
+		provenance: compilation.provenance,
+		resourcePaths: Object.fromEntries(
+			resources.map(({ id, path }) => [
+				id,
+				path,
+			]),
+		),
 	});
 });

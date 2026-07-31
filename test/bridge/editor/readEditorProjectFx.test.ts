@@ -11,6 +11,7 @@ const createWorkspace = (readFx: EditorWorkspace["readFx"]): EditorWorkspace => 
 	listFx: () => Effect.succeed([]),
 	createFx: () => Effect.void,
 	readFx,
+	writeFileFx: () => Effect.succeed("0".repeat(64)),
 	openDirectoryFx: () => Effect.void,
 });
 
@@ -43,6 +44,7 @@ describe("readEditorProjectFx", () => {
 				workspace: createWorkspace(() =>
 					Effect.succeed({
 						projectId: plan.projectId,
+						revision: "0".repeat(64),
 						files: [
 							manifest.file,
 							...plan.files,
@@ -58,8 +60,16 @@ describe("readEditorProjectFx", () => {
 			game: "1.0",
 			createdAtMs: 123,
 			updatedAtMs: 123,
+			revision: "0".repeat(64),
 			config: editorTestConfig,
 			resources: editorTestPayload.resources,
+			resourceSourcePaths: {
+				hero: "resources/hero.png",
+				"item-water": "assets/item-water.png",
+			},
+			itemSourcePaths: {
+				water: "simple/water.json",
+			},
 			diagnostics: [],
 		});
 	});
@@ -73,6 +83,7 @@ describe("readEditorProjectFx", () => {
 					workspace: createWorkspace(() =>
 						Effect.succeed({
 							projectId: "empty-project",
+							revision: "0".repeat(64),
 							files: [
 								manifest.file,
 							],
@@ -85,7 +96,10 @@ describe("readEditorProjectFx", () => {
 			title: "Empty project",
 			createdAtMs: 123,
 			updatedAtMs: 123,
+			revision: "0".repeat(64),
 			resources: [],
+			resourceSourcePaths: {},
+			itemSourcePaths: {},
 			diagnostics: [],
 		});
 	});
@@ -99,6 +113,7 @@ describe("readEditorProjectFx", () => {
 					workspace: createWorkspace(() =>
 						Effect.succeed({
 							projectId: "partial-project",
+							revision: "0".repeat(64),
 							files: [
 								manifest.file,
 								{
@@ -119,7 +134,10 @@ describe("readEditorProjectFx", () => {
 			title: "Partial project",
 			createdAtMs: 123,
 			updatedAtMs: 123,
+			revision: "0".repeat(64),
 			resources: [],
+			resourceSourcePaths: {},
+			itemSourcePaths: {},
 			diagnostics: [],
 		});
 	});
@@ -144,6 +162,7 @@ describe("readEditorProjectFx", () => {
 					workspace: createWorkspace(() =>
 						Effect.succeed({
 							projectId: "different",
+							revision: "0".repeat(64),
 							files: [
 								manifest.file,
 							],

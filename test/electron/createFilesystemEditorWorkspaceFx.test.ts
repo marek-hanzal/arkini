@@ -1,6 +1,6 @@
 import { NodeServices } from "@effect/platform-node";
 import { Effect } from "effect";
-import { mkdir, mkdtemp, realpath, rm, symlink, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, realpath, rm, symlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { basename, join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -55,6 +55,115 @@ const createManifestFile = (projectId: string, updatedAtMs = 100) => ({
 });
 
 describe("createFilesystemEditorWorkspaceFx", () => {
+	it("serializes concurrent mutations through one project-wide revision lane", async () => {
+		const workspace = await createWorkspace();
+		await Effect.runPromise(
+			workspace.createFx({
+				projectId: "concurrent-project",
+				files: [
+					createManifestFile("concurrent-project"),
+				],
+			}),
+		);
+		const snapshot = await Effect.runPromise(workspace.readFx("concurrent-project"));
+		if (snapshot?.revision === undefined) throw new Error("Missing project revision.");
+		const write = (path: string) =>
+			Effect.runPromise(
+				workspace.writeFileFx({
+					projectId: "concurrent-project",
+					expectedRevision: snapshot.revision!,
+					mode: "create",
+					file: {
+						path,
+						bytes: new TextEncoder().encode(path),
+					},
+				}),
+			);
+		const results = await Promise.allSettled([
+			write("simple/first.json"),
+			write("simple/second.json"),
+		]);
+		expect(results.filter(({ status }) => status === "fulfilled")).toHaveLength(1);
+		expect(results.filter(({ status }) => status === "rejected")).toHaveLength(1);
+		const current = await Effect.runPromise(workspace.readFx("concurrent-project"));
+		expect(
+			current?.files.filter(({ path }) => path.startsWith("simple/")).map(({ path }) => path),
+		).toHaveLength(1);
+	});
+
+	it("guards file writes with revision and exact create or replace intent", async () => {
+		const workspace = await createWorkspace();
+		await Effect.runPromise(
+			workspace.createFx({
+				projectId: "write-project",
+				files: [
+					createManifestFile("write-project"),
+					{
+						path: "simple/water.json",
+						bytes: new TextEncoder().encode("old"),
+					},
+				],
+			}),
+		);
+		const snapshot = await Effect.runPromise(workspace.readFx("write-project"));
+		expect(snapshot?.revision).toMatch(/^[a-f0-9]{64}$/);
+		if (snapshot?.revision === undefined) throw new Error("Missing project revision.");
+
+		await expect(
+			Effect.runPromise(
+				workspace.writeFileFx({
+					projectId: "write-project",
+					expectedRevision: snapshot.revision,
+					mode: "create",
+					file: {
+						path: "SIMPLE/water.json",
+						bytes: new TextEncoder().encode("collision"),
+					},
+				}),
+			),
+		).rejects.toMatchObject({
+			cause: expect.objectContaining({
+				message: expect.stringContaining("already exists"),
+			}),
+		});
+		await expect(
+			Effect.runPromise(
+				workspace.writeFileFx({
+					projectId: "write-project",
+					expectedRevision: "0".repeat(64),
+					mode: "replace",
+					file: {
+						path: "simple/water.json",
+						bytes: new TextEncoder().encode("stale"),
+					},
+				}),
+			),
+		).rejects.toMatchObject({
+			cause: expect.objectContaining({
+				message: expect.stringContaining("changed after this mutation was validated"),
+			}),
+		});
+		await expect(
+			readFile(join(root, "write-project", "simple", "water.json"), "utf8"),
+		).resolves.toBe("old");
+
+		const revision = await Effect.runPromise(
+			workspace.writeFileFx({
+				projectId: "write-project",
+				expectedRevision: snapshot.revision,
+				mode: "replace",
+				file: {
+					path: "simple/water.json",
+					bytes: new TextEncoder().encode("new"),
+				},
+			}),
+		);
+		expect(revision).not.toBe(snapshot.revision);
+		await expect(
+			readFile(join(root, "write-project", "simple", "water.json"), "utf8"),
+		).resolves.toBe("new");
+	});
+
 	it("atomically creates, reads, and opens contained editor projects", async () => {
 		const workspace = await createWorkspace();
 		const record = {
@@ -83,6 +192,7 @@ describe("createFilesystemEditorWorkspaceFx", () => {
 		await Effect.runPromise(workspace.createFx(record));
 		await expect(Effect.runPromise(workspace.readFx(record.projectId))).resolves.toEqual({
 			projectId: record.projectId,
+			revision: expect.stringMatching(/^[a-f0-9]{64}$/),
 			files: [
 				...record.files,
 			].sort((left, right) => (left.path < right.path ? -1 : left.path > right.path ? 1 : 0)),
@@ -133,6 +243,7 @@ describe("createFilesystemEditorWorkspaceFx", () => {
 
 		await expect(Effect.runPromise(workspace.readFx("newer-project"))).resolves.toEqual({
 			projectId: "newer-project",
+			revision: expect.stringMatching(/^[a-f0-9]{64}$/),
 			files: [
 				createManifestFile("newer-project", 200),
 			],

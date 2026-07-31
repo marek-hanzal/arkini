@@ -4,7 +4,8 @@ import type { CheatAvailabilitySchema } from "./cheat/CheatAvailabilitySchema";
 import type { LastPackageIdSchema } from "./launcher/LastPackageIdSchema";
 import type { DiagnosticRecord } from "./diagnostics/DiagnosticRecord";
 import type { EditorProjectManifest } from "./editor/EditorProjectManifest";
-import type { EditorProjectRecord } from "./editor/EditorProjectRecord";
+import type { EditorProjectFileWrite } from "./editor/EditorProjectFileWrite";
+import type { EditorProjectCreate, EditorProjectRecord } from "./editor/EditorProjectRecord";
 import type { WindowModeSchema } from "./window/WindowModeSchema";
 
 export namespace ArkiniElectronApi {
@@ -16,6 +17,7 @@ export namespace ArkiniElectronApi {
 		editorProjectList: "arkini:editor:project:list",
 		editorProjectCreate: "arkini:editor:project:create",
 		editorProjectRead: "arkini:editor:project:read",
+		editorProjectFileWrite: "arkini:editor:project:file:write",
 		editorDirectoryOpen: "arkini:editor:directory:open",
 		saveRead: "arkini:save:read",
 		saveWrite: "arkini:save:write",
@@ -85,8 +87,9 @@ export namespace ArkiniElectronApi {
 		};
 		readonly editor: {
 			readonly listProjects: () => Promise<ReadonlyArray<EditorProjectManifest>>;
-			readonly createProject: (record: EditorProjectRecord) => Promise<void>;
+			readonly createProject: (record: EditorProjectCreate) => Promise<void>;
 			readonly readProject: (projectId: string) => Promise<EditorProjectRecord | null>;
+			readonly writeProjectFile: (mutation: EditorProjectFileWrite) => Promise<string>;
 			readonly openDirectory: (projectId?: string) => Promise<void>;
 		};
 		readonly appearance: {

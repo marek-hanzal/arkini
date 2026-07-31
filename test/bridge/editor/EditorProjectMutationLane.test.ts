@@ -1,0 +1,261 @@
+import { scheduleTask } from "@effect/atom-react";
+import { Deferred, Effect, Fiber } from "effect";
+import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
+import { afterEach, describe, expect, it, vi } from "vitest";
+
+import type { EditorProject } from "~/bridge/editor/EditorProject";
+import { EditorProjectAtom } from "~/bridge/editor/EditorProjectAtom";
+import {
+	EditorProjectMutationPendingAtom,
+	runEditorProjectMutationFx,
+} from "~/bridge/editor/EditorProjectMutationLane";
+
+const registries: AtomRegistry.AtomRegistry[] = [];
+const createRegistry = () => {
+	const registry = AtomRegistry.make({
+		scheduleTask,
+	});
+	registries.push(registry);
+	return registry;
+};
+
+afterEach(() => {
+	for (const registry of registries.splice(0)) registry.dispose();
+});
+
+const createProject = (revision: string): EditorProject => ({
+	projectId: "project",
+	title: "Project",
+	createdAtMs: 1,
+	updatedAtMs: 1,
+	revision,
+	resources: [],
+	resourceSourcePaths: {},
+	itemSourcePaths: {},
+	diagnostics: [],
+});
+
+const runInRegistry = <A, E>(
+	registry: AtomRegistry.AtomRegistry,
+	effect: Effect.Effect<A, E, AtomRegistry.AtomRegistry>,
+) => Effect.runPromise(effect.pipe(Effect.provideService(AtomRegistry.AtomRegistry, registry)));
+
+describe("EditorProjectMutationLane", () => {
+	it("serializes three same-revision mutations across the complete lane lineage", async () => {
+		const revisionA = "a".repeat(64);
+		const revisionB = "b".repeat(64);
+		const revisionC = "c".repeat(64);
+		const revisionD = "d".repeat(64);
+		const registry = createRegistry();
+		registry.set(EditorProjectAtom("project"), {
+			action: "refresh",
+			expectedRevision: revisionA,
+			project: createProject(revisionA),
+		});
+		const firstGate = Effect.runSync(
+			Deferred.make<{
+				readonly project: EditorProject;
+				readonly revision: string;
+			}>(),
+		);
+		const seenRevisions: string[] = [];
+		const first = runInRegistry(
+			registry,
+			runEditorProjectMutationFx({
+				expectedRevision: revisionA,
+				projectId: "project",
+				run: (expectedRevision) => {
+					seenRevisions.push(expectedRevision);
+					return Deferred.await(firstGate);
+				},
+			}),
+		);
+		await vi.waitFor(() =>
+			expect(seenRevisions).toEqual([
+				revisionA,
+			]),
+		);
+		const second = runInRegistry(
+			registry,
+			runEditorProjectMutationFx({
+				expectedRevision: revisionA,
+				projectId: "project",
+				run: (expectedRevision) => {
+					seenRevisions.push(expectedRevision);
+					return Effect.succeed({
+						project: createProject(revisionC),
+						revision: revisionC,
+					});
+				},
+			}),
+		);
+		const third = runInRegistry(
+			registry,
+			runEditorProjectMutationFx({
+				expectedRevision: revisionA,
+				projectId: "project",
+				run: (expectedRevision) => {
+					seenRevisions.push(expectedRevision);
+					return Effect.succeed({
+						project: createProject(revisionD),
+						revision: revisionD,
+					});
+				},
+			}),
+		);
+		expect(registry.get(EditorProjectMutationPendingAtom("project"))).toBe(3);
+		await Effect.runPromise(
+			Deferred.succeed(firstGate, {
+				project: createProject(revisionB),
+				revision: revisionB,
+			}),
+		);
+
+		await expect(first).resolves.toEqual({
+			project: createProject(revisionB),
+			revision: revisionB,
+		});
+		await expect(second).resolves.toEqual({
+			project: createProject(revisionC),
+			revision: revisionC,
+		});
+		await expect(third).resolves.toEqual({
+			project: createProject(revisionD),
+			revision: revisionD,
+		});
+		expect(seenRevisions).toEqual([
+			revisionA,
+			revisionB,
+			revisionC,
+		]);
+		expect(registry.get(EditorProjectAtom("project"))?.revision).toBe(revisionD);
+		expect(registry.get(EditorProjectMutationPendingAtom("project"))).toBe(0);
+	});
+
+	it("continues the lane after an ordinary mutation failure", async () => {
+		const revisionA = "a".repeat(64);
+		const revisionB = "b".repeat(64);
+		const registry = createRegistry();
+		registry.set(EditorProjectAtom("project"), {
+			action: "refresh",
+			expectedRevision: revisionA,
+			project: createProject(revisionA),
+		});
+		const firstGate = Effect.runSync(Deferred.make<void>());
+		const failure = new Error("invalid first mutation");
+		const seenRevisions: string[] = [];
+		const first = runInRegistry(
+			registry,
+			runEditorProjectMutationFx({
+				expectedRevision: revisionA,
+				projectId: "project",
+				run: (expectedRevision) => {
+					seenRevisions.push(expectedRevision);
+					return Deferred.await(firstGate).pipe(Effect.andThen(Effect.fail(failure)));
+				},
+			}),
+		);
+		await vi.waitFor(() =>
+			expect(seenRevisions).toEqual([
+				revisionA,
+			]),
+		);
+		const second = runInRegistry(
+			registry,
+			runEditorProjectMutationFx({
+				expectedRevision: revisionA,
+				projectId: "project",
+				run: (expectedRevision) => {
+					seenRevisions.push(expectedRevision);
+					return Effect.succeed({
+						project: createProject(revisionB),
+						revision: revisionB,
+					});
+				},
+			}),
+		);
+		await Effect.runPromise(Deferred.succeed(firstGate, undefined));
+
+		await expect(first).rejects.toThrow(failure);
+		await expect(second).resolves.toEqual({
+			project: createProject(revisionB),
+			revision: revisionB,
+		});
+		expect(seenRevisions).toEqual([
+			revisionA,
+			revisionA,
+		]);
+	});
+
+	it("starts a fresh queued batch after the preceding revision fails", async () => {
+		const revisionA = "a".repeat(64);
+		const revisionB = "b".repeat(64);
+		const revisionC = "c".repeat(64);
+		const registry = createRegistry();
+		const gate = Effect.runSync(Deferred.make<void>());
+		const seenRevisions: string[] = [];
+		const first = runInRegistry(
+			registry,
+			runEditorProjectMutationFx({
+				expectedRevision: revisionA,
+				projectId: "project",
+				run: (expectedRevision) => {
+					seenRevisions.push(expectedRevision);
+					return Deferred.await(gate).pipe(
+						Effect.andThen(Effect.fail(new Error("stale revision"))),
+					);
+				},
+			}),
+		);
+		await vi.waitFor(() =>
+			expect(seenRevisions).toEqual([
+				revisionA,
+			]),
+		);
+		const second = runInRegistry(
+			registry,
+			runEditorProjectMutationFx({
+				expectedRevision: revisionB,
+				projectId: "project",
+				run: (expectedRevision) => {
+					seenRevisions.push(expectedRevision);
+					return Effect.succeed({
+						project: createProject(revisionC),
+						revision: revisionC,
+					});
+				},
+			}),
+		);
+		await Effect.runPromise(Deferred.succeed(gate, undefined));
+
+		await expect(first).rejects.toThrow("stale revision");
+		await expect(second).resolves.toEqual({
+			project: createProject(revisionC),
+			revision: revisionC,
+		});
+		expect(seenRevisions).toEqual([
+			revisionA,
+			revisionB,
+		]);
+		expect(registry.get(EditorProjectMutationPendingAtom("project"))).toBe(0);
+	});
+
+	it("releases its pending admission when a mutation is interrupted", async () => {
+		const revisionA = "a".repeat(64);
+		const registry = createRegistry();
+		const fiber = Effect.runFork(
+			runEditorProjectMutationFx({
+				expectedRevision: revisionA,
+				projectId: "project",
+				run: () => Effect.never,
+			}).pipe(Effect.provideService(AtomRegistry.AtomRegistry, registry)),
+		);
+		await vi.waitFor(() =>
+			expect(registry.get(EditorProjectMutationPendingAtom("project"))).toBe(1),
+		);
+
+		await Effect.runPromise(Fiber.interrupt(fiber));
+
+		expect(registry.get(EditorProjectMutationPendingAtom("project"))).toBe(0);
+	});
+});

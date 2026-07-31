@@ -3,6 +3,7 @@
 import "pixi.js/unsafe-eval";
 import { RegistryContext } from "@effect/atom-react";
 import { RouterProvider } from "@tanstack/react-router";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { ArkiniWindowTitle } from "../shared/ArkiniAppMetadata";
@@ -53,6 +54,13 @@ const router = RendererRuntime.runSync(
 		rendererRuntime: RendererRuntime,
 	}),
 );
+const queryClient = new QueryClient({
+	defaultOptions: {
+		mutations: {
+			retry: false,
+		},
+	},
+});
 
 // Install the native handshake once at the process boundary, outside React ownership.
 RendererRuntime.runSync(
@@ -66,9 +74,11 @@ RendererRuntime.runSync(
 createRoot(rootElement).render(
 	<StrictMode>
 		<RegistryContext.Provider value={RendererAtomRegistry}>
-			<AppearanceDataset />
-			<LauncherStartupHydrator />
-			<RouterProvider router={router} />
+			<QueryClientProvider client={queryClient}>
+				<AppearanceDataset />
+				<LauncherStartupHydrator />
+				<RouterProvider router={router} />
+			</QueryClientProvider>
 		</RegistryContext.Provider>
 	</StrictMode>,
 );

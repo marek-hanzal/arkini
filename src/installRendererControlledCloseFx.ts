@@ -1,6 +1,7 @@
 import { Effect, Exit, Option } from "effect";
 
 import { claimGameEngineResourceForCloseFx } from "~/bridge/game/claimGameEngineResourceForCloseFx";
+import { closeActiveEditorProjectSessionFx } from "~/bridge/editor/EditorProjectSession";
 import { readExactCauseFailure } from "~/bridge/game/readExactCauseFailure";
 import type { ArkiniRouter } from "~/createArkiniRouterFx";
 import { waitForActionLoadingCompletionFrameFx } from "~/ui/loading/waitForActionLoadingCompletionFrameFx";
@@ -41,7 +42,10 @@ export const installRendererControlledCloseFx = Effect.fn("installRendererContro
 					throw Option.isSome(failure) ? failure.value : exit.cause;
 				}
 				const resource = exit.value;
-				if (resource === null) return;
+				if (resource === null) {
+					await rendererRuntime.runPromise(closeActiveEditorProjectSessionFx);
+					return;
+				}
 				exitPresentationRequired = true;
 				// Route ownership keeps finalization identical for UI-requested and native close.
 				await router.navigate({

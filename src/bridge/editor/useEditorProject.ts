@@ -1,6 +1,10 @@
-import { getRouteApi } from "@tanstack/react-router";
+import { useContext } from "react";
 
-const editorProjectRouteApi = getRouteApi("/editor/$projectId");
+import { EditorProjectContext } from "~/bridge/editor/EditorProjectContext";
 
-/** Reads the project snapshot compiled by the active editor project route. */
-export const useEditorProject = () => editorProjectRouteApi.useLoaderData();
+/** Reads the canonical project snapshot published once by the editor project route. */
+export const useEditorProject = () => {
+	const project = useContext(EditorProjectContext);
+	if (project === undefined) throw new Error("Editor project provider is missing.");
+	return project;
+};

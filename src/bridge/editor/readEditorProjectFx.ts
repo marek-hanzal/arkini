@@ -4,6 +4,7 @@ import { EditorProjectRecordSchema } from "../../../electron/contract/editor/Edi
 
 import type { EditorProject } from "~/bridge/editor/EditorProject";
 import type { EditorWorkspace } from "~/bridge/editor/EditorWorkspace";
+import { createEditorProjectFromCompilationFx } from "~/bridge/editor/createEditorProjectFromCompilationFx";
 import { createEditorWorkspaceFx } from "~/bridge/editor/createEditorWorkspaceFx";
 import { EditorProjectError } from "~/engine/editor/error/EditorProjectError";
 import { compileEditorProjectFilesFx } from "~/engine/editor/fx/compileEditorProjectFilesFx";
@@ -92,7 +93,10 @@ export const readEditorProjectFx = Effect.fn("readEditorProjectFx")(function* ({
 	if (!sourceRecords.some(({ path }) => path === "game.json")) {
 		const project: EditorProject = {
 			...descriptor,
+			revision: parsedRecord.revision,
 			resources: [],
+			resourceSourcePaths: {},
+			itemSourcePaths: {},
 			diagnostics: [],
 		};
 		return project;
@@ -107,11 +111,9 @@ export const readEditorProjectFx = Effect.fn("readEditorProjectFx")(function* ({
 			}),
 	});
 	const compilation = yield* compileEditorProjectFilesFx(files);
-	const project: EditorProject = {
-		...descriptor,
-		config: compilation.payload.config,
-		resources: compilation.payload.resources,
-		diagnostics: compilation.diagnostics,
-	};
-	return project;
+	return yield* createEditorProjectFromCompilationFx({
+		compilation,
+		record: parsedRecord,
+		revision: parsedRecord.revision,
+	});
 });

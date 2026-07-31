@@ -7,6 +7,7 @@ import { ElectronMainError } from "../ElectronMainError";
 import { assertEditorProjectFilePathFx } from "./assertEditorProjectFilePathFx";
 import { assertEditorProjectIdFx } from "./assertEditorProjectIdFx";
 import { readEditorProjectManifestFx } from "./readEditorProjectManifestFx";
+import { readEditorProjectRevision } from "./readEditorProjectRevision";
 
 export namespace readEditorProjectFx {
 	export interface Props {
@@ -95,5 +96,9 @@ export const readEditorProjectFx = Effect.fn("readEditorProjectFx")(function* ({
 	return {
 		projectId,
 		files,
+		revision: readEditorProjectRevision({
+			projectId,
+			files,
+		}),
 	} satisfies EditorProjectRecord;
 });

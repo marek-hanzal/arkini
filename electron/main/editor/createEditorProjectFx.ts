@@ -5,8 +5,8 @@ import { dirname, join } from "node:path";
 
 import { EditorProjectManifestSchema } from "../../contract/editor/EditorProjectManifest";
 import {
-	EditorProjectRecordSchema,
-	type EditorProjectRecord,
+	EditorProjectCreateSchema,
+	type EditorProjectCreate,
 } from "../../contract/editor/EditorProjectRecord";
 import { ElectronMainError } from "../ElectronMainError";
 import { assertEditorProjectFilePathFx } from "./assertEditorProjectFilePathFx";
@@ -16,7 +16,7 @@ export namespace createEditorProjectFx {
 	export interface Props {
 		readonly root: string;
 		readonly fileSystem: FileSystem.FileSystem;
-		readonly record: EditorProjectRecord;
+		readonly record: EditorProjectCreate;
 	}
 }
 
@@ -27,7 +27,7 @@ export const createEditorProjectFx = Effect.fn("createEditorProjectFx")(function
 	record,
 }: createEditorProjectFx.Props) {
 	const parsedRecord = yield* Effect.try({
-		try: () => EditorProjectRecordSchema.parse(record),
+		try: () => EditorProjectCreateSchema.parse(record),
 		catch: (cause) =>
 			new ElectronMainError({
 				operation: "Create Arkini editor project",

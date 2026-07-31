@@ -4,6 +4,11 @@ import { Deferred, Effect, Exit, Scope } from "effect";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { acquireGameEngineLeaseFx } from "~/bridge/game/acquireGameEngineLeaseFx";
+import {
+	openEditorProjectSession,
+	releaseEditorProjectSession,
+} from "~/bridge/editor/EditorProjectSession";
+import { EditorProjectFormDirtyAtom } from "~/bridge/editor/EditorProjectFormDirtyAtom";
 import { CriticalGameLifecycleError } from "~/bridge/game/CriticalGameLifecycleError";
 import type { GameEngineResource } from "~/bridge/game/GameEngineResource";
 import { installRendererControlledCloseFx } from "~/installRendererControlledCloseFx";
@@ -100,6 +105,7 @@ beforeEach(() => {
 afterEach(async () => {
 	vi.useRealTimers();
 	for (const runtime of runtimes.splice(0)) await runtime.dispose();
+	releaseEditorProjectSession("project");
 	vi.restoreAllMocks();
 });
 
@@ -178,6 +184,31 @@ describe("installRendererControlledClose", () => {
 
 		expect(router.navigate).not.toHaveBeenCalled();
 		expect(frames.requestAnimationFrame).not.toHaveBeenCalled();
+		remove();
+	});
+
+	it("rejects native close while the active editor has unsaved item changes", async () => {
+		const { atomRegistry, rendererRuntime } = createTestRendererRuntime({
+			createResourceFx: () => Effect.never,
+		});
+		runtimes.push(rendererRuntime);
+		openEditorProjectSession("project", atomRegistry);
+		atomRegistry.set(EditorProjectFormDirtyAtom("project"), {
+			dirty: true,
+			ownerId: "item:test",
+		});
+		const lifecycle = createLifecycle();
+		const router = createRouter();
+		const remove = rendererRuntime.runSync(
+			installRendererControlledCloseFx({
+				lifecycle: lifecycle.lifecycle,
+				rendererRuntime,
+				router: router.router,
+			}),
+		);
+
+		await expect(lifecycle.readBeforeClose()()).rejects.toThrow("Save the current item");
+		expect(router.navigate).not.toHaveBeenCalled();
 		remove();
 	});
 

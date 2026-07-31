@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 
-import { act, createElement } from "react";
+import { act, createElement, type ReactNode } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -25,6 +25,13 @@ vi.mock("~/ui/item/editor/EditorItemThumbnail", () => ({
 		createElement("span", {
 			"data-ui": "EditorItemThumbnail",
 		}),
+}));
+
+vi.mock("~/ui/button/Button", () => ({
+	ButtonLink: ({ children }: { readonly children?: ReactNode }) =>
+		createElement("a", null, children),
+	PrimaryButtonLink: ({ children }: { readonly children?: ReactNode }) =>
+		createElement("a", null, children),
 }));
 
 const roots: Array<ReturnType<typeof createRoot>> = [];

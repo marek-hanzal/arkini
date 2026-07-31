@@ -101,6 +101,7 @@ const MergeHarness = () => {
 const ProductionHarness = () => {
 	const form = useAppForm({
 		defaultValues: {
+			id: "item:ore",
 			maxQueueSize: 1,
 			lines: undefined as Array<EditorLine> | undefined,
 		},
@@ -114,11 +115,19 @@ const ProductionHarness = () => {
 				lines: "lines",
 			},
 			kind: "deposit",
-			ownerId: "item:ore",
+			ownerId: values.id,
 		});
 	return createElement(
 		Fragment,
 		null,
+		createElement(
+			"button",
+			{
+				onClick: () => form.setFieldValue("id", "item:renamed"),
+				type: "button",
+			},
+			"Rename owner",
+		),
 		createElement(Group),
 		createElement("output", null, JSON.stringify(values)),
 	);
@@ -139,10 +148,31 @@ describe("editor item field groups", () => {
 		expect(container.querySelector("output")?.textContent).toContain('"effect":"keep"');
 	});
 
-	it("creates the optional first deposit line through the array field API", async () => {
+	it("creates unique deposit lines with only the first authored as default", async () => {
 		const container = await mount(createElement(ProductionHarness));
 		await click(container, "Add line");
+		await click(container, "Add line");
 
-		expect(container.querySelector("output")?.textContent).toContain('"id":"line:ore:default"');
+		const values = JSON.parse(container.querySelector("output")?.textContent ?? "null") as {
+			readonly lines: ReadonlyArray<EditorLine>;
+		};
+		expect(values.lines.map((line) => line.id)).toEqual([
+			"line:ore:default",
+			"line:ore:2",
+		]);
+		expect(values.lines.map((line) => line.default)).toEqual([
+			true,
+			false,
+		]);
+	});
+
+	it("uses the current item ID when adding a line", async () => {
+		const container = await mount(createElement(ProductionHarness));
+		await click(container, "Rename owner");
+		await click(container, "Add line");
+
+		expect(container.querySelector("output")?.textContent).toContain(
+			'"id":"line:renamed:default"',
+		);
 	});
 });

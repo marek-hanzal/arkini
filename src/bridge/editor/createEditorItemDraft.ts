@@ -16,6 +16,7 @@ import type {
 import type { ItemEnumSchema } from "~/engine/item/schema/ItemEnumSchema";
 import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import type { LineSchema } from "~/engine/line/schema/LineSchema";
+import { createEditorLineDraft } from "~/engine/line/editor/createEditorLineDraft";
 
 export const createEditorInputDraft = (type: EditorInput["type"], itemId = ""): EditorInput =>
 	match(type)
@@ -180,25 +181,6 @@ export const createEditorLineRuleDraft = (type: EditorLineRule["type"]): EditorL
 			: {}),
 	}) as EditorLineRule;
 
-export const createEditorLineDraft = (
-	type: ItemEnumSchema.Type,
-	itemId: string,
-): LineSchema.Type => ({
-	id: `line:${itemId.replace(/^item:|^producer:/, "")}:default`,
-	title: `New ${type} line`,
-	description: `Describe what this ${type} line consumes and produces.`,
-	default: true,
-	show: true,
-	enable: true,
-	runtimeMs: 0,
-	input: [
-		{
-			type: "simple",
-		},
-	],
-	rules: [],
-});
-
 /** Creates one structurally complete initial value for the selected item schema. */
 export const createEditorItemDraft = (
 	type: ItemEnumSchema.Type,
@@ -253,7 +235,11 @@ export const createEditorItemDraft = (
 			type: matchedType,
 			maxQueueSize: 1,
 			lines: [
-				createEditorLineDraft(matchedType, itemId),
+				createEditorLineDraft({
+				existingLines: [],
+				itemId,
+				type: matchedType,
+			}),
 			] as [
 				LineSchema.Type,
 			],
@@ -261,7 +247,11 @@ export const createEditorItemDraft = (
 		.with("blueprint", "craft", "stash", (lineType) => ({
 			...base,
 			type: lineType,
-			line: createEditorLineDraft(lineType, itemId),
+			line: createEditorLineDraft({
+				existingLines: [],
+				itemId,
+				type: lineType,
+			}),
 		}))
 		.exhaustive();
 };

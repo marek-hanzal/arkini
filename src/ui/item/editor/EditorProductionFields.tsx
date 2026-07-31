@@ -1,5 +1,5 @@
 import type { EditorLine } from "~/bridge/editor/EditorItemModel";
-import { createEditorLineDraft } from "~/bridge/editor/createEditorItemDraft";
+import { createEditorLineDraft } from "~/engine/line/editor/createEditorLineDraft";
 import { Button } from "~/ui/button/Button";
 import { withFieldGroup } from "~/ui/form/EditorForm";
 import { EditorFormSection } from "~/ui/form/EditorFormSection";
@@ -53,7 +53,11 @@ export const EditorProductionFields = withFieldGroup({
 								</div>
 								<Button
 									onClick={() => {
-										const line = createEditorLineDraft(kind, ownerId);
+										const line = createEditorLineDraft({
+										existingLines: lines,
+										itemId: ownerId,
+										type: kind,
+									});
 										if (linesField.state.value === undefined) {
 											group.setFieldValue("lines", [
 												line,

@@ -12,6 +12,8 @@ const project: EditorProject = {
 	createdAtMs: 1,
 	updatedAtMs: 1,
 	revision: "a".repeat(64),
+	fileIndex: {},
+	itemSourcePaths: {},
 	config: editorTestConfig,
 	resources: editorTestPayload.resources,
 	resourceSourcePaths: {},

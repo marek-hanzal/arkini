@@ -54,6 +54,7 @@ describe("readEditorProjectFx", () => {
 			}),
 		);
 
+		const files = [manifest.file, ...plan.files];
 		expect(project).toEqual({
 			projectId: "editor-test",
 			title: "Editor test",
@@ -61,6 +62,10 @@ describe("readEditorProjectFx", () => {
 			createdAtMs: 123,
 			updatedAtMs: 123,
 			revision: "0".repeat(64),
+			fileIndex: Object.fromEntries(files.map((file) => [file.path, file])),
+			itemSourcePaths: {
+				water: "simple/water.json",
+			},
 			config: editorTestConfig,
 			resources: editorTestPayload.resources,
 			resourceSourcePaths: {
@@ -94,6 +99,10 @@ describe("readEditorProjectFx", () => {
 			createdAtMs: 123,
 			updatedAtMs: 123,
 			revision: "0".repeat(64),
+			fileIndex: {
+				"editor.json": manifest.file,
+			},
+			itemSourcePaths: {},
 			resources: [],
 			resourceSourcePaths: {},
 			diagnostics: [],
@@ -131,6 +140,14 @@ describe("readEditorProjectFx", () => {
 			createdAtMs: 123,
 			updatedAtMs: 123,
 			revision: "0".repeat(64),
+			fileIndex: {
+				"editor.json": manifest.file,
+				"assets/hero.png": {
+					path: "assets/hero.png",
+					bytes: new Uint8Array([1, 2, 3]),
+				},
+			},
+			itemSourcePaths: {},
 			resources: [],
 			resourceSourcePaths: {},
 			diagnostics: [],

@@ -1,8 +1,9 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import type { EditorProjectFile } from "../../../electron/contract/editor/EditorProjectFile";
-import type { EditorProjectRecord } from "../../../electron/contract/editor/EditorProjectRecord";
+import type { EditorProjectFile } from "../../../../electron/contract/editor/EditorProjectFile";
+import type { EditorProjectRecord } from "../../../../electron/contract/editor/EditorProjectRecord";
+import { createEditorProjectFromRecordFx } from "~/bridge/editor/createEditorProjectFromRecordFx";
 import { createEditorProjectManifestFileFx } from "~/bridge/editor/createEditorProjectManifestFileFx";
 import type { EditorWorkspace } from "~/bridge/editor/EditorWorkspace";
 import { saveEditorItemFx } from "~/bridge/item/editor/saveEditorItemFx";
@@ -59,11 +60,12 @@ const createFixture = async () => {
 			groupedSource,
 		],
 	};
+	const project = await Effect.runPromise(createEditorProjectFromRecordFx(record));
 	let written: EditorProjectFile | undefined;
 	const workspace: EditorWorkspace = {
 		listFx: () => Effect.succeed([]),
 		createFx: () => Effect.void,
-		readFx: () => Effect.succeed(record),
+		readFx: () => Effect.die("Save must not reload the editor project."),
 		writeFx: (mutation) =>
 			Effect.sync(() => {
 				written = mutation.file;
@@ -71,6 +73,12 @@ const createFixture = async () => {
 				const manifest = JSON.parse(
 					new TextDecoder().decode(manifestFile?.bytes),
 				) as Record<string, unknown>;
+				const nextManifest = {
+					path: "editor.json",
+					bytes: new TextEncoder().encode(
+						`${JSON.stringify({ ...manifest, updatedAtMs: 456 }, null, "\t")}\n`,
+					),
+				};
 				record = {
 					...record,
 					revision: "1".repeat(64),
@@ -79,19 +87,20 @@ const createFixture = async () => {
 							({ path }) => path !== mutation.file.path && path !== "editor.json",
 						),
 						mutation.file,
-						{
-							path: "editor.json",
-							bytes: new TextEncoder().encode(
-								`${JSON.stringify({ ...manifest, updatedAtMs: 456 }, null, "\t")}\n`,
-							),
-						},
+						nextManifest,
 					],
 				};
-				return record;
+				return {
+					projectId: record.projectId,
+					file: mutation.file,
+					manifest: nextManifest,
+					revision: record.revision,
+				};
 			}),
 		openDirectoryFx: () => Effect.void,
 	};
 	return {
+		project,
 		plan,
 		sibling,
 		waterPath,
@@ -112,7 +121,7 @@ describe("saveEditorItemFx", () => {
 		const fixture = await createFixture();
 		const saved = await Effect.runPromise(
 			saveEditorItemFx({
-				projectId: fixture.plan.projectId,
+				project: fixture.project,
 				expectedRevision: "0".repeat(64),
 				item: {
 					...editorTestConfig.items.water,
@@ -129,6 +138,7 @@ describe("saveEditorItemFx", () => {
 		expect(saved.project.config?.items.sibling).toEqual(fixture.sibling);
 		expect(saved.revision).toBe("1".repeat(64));
 		expect(saved.project.updatedAtMs).toBe(456);
+		expect(saved.project.fileIndex[fixture.waterPath]).toEqual(fixture.readWritten());
 	});
 
 	it("renames the source entry selected by UID instead of guessing from item ID", async () => {
@@ -140,7 +150,7 @@ describe("saveEditorItemFx", () => {
 		};
 		const saved = await Effect.runPromise(
 			saveEditorItemFx({
-				projectId: fixture.plan.projectId,
+				project: fixture.project,
 				expectedRevision: "0".repeat(64),
 				item: renamed,
 				workspace: fixture.workspace,
@@ -165,7 +175,7 @@ describe("saveEditorItemFx", () => {
 		};
 		const saved = await Effect.runPromise(
 			saveEditorItemFx({
-				projectId: fixture.plan.projectId,
+				project: fixture.project,
 				expectedRevision: "0".repeat(64),
 				item: created,
 				workspace: fixture.workspace,

@@ -173,13 +173,14 @@ describe("createFilesystemEditorWorkspaceFx", () => {
 			}),
 		);
 		expect(written.revision).not.toBe(snapshot.revision);
+		expect(written.file.path).toBe("simple/water.json");
+		expect(written.manifest.path).toBe("editor.json");
+		expect("files" in written).toBe(false);
 		await expect(
 			readFile(join(root, "write-project", "simple", "water.json"), "utf8"),
 		).resolves.toBe("new");
 		const manifest = JSON.parse(
-			new TextDecoder().decode(
-				written.files.find(({ path }) => path === "editor.json")?.bytes,
-			),
+			new TextDecoder().decode(written.manifest.bytes),
 		) as { readonly updatedAtMs: number };
 		expect(manifest.updatedAtMs).toBeGreaterThan(100);
 		await expect(Effect.runPromise(workspace.listFx())).resolves.toEqual([
@@ -278,9 +279,7 @@ describe("createFilesystemEditorWorkspaceFx", () => {
 			}),
 		);
 		const manifest = JSON.parse(
-			new TextDecoder().decode(
-				written.files.find(({ path }) => path === "editor.json")?.bytes,
-			),
+			new TextDecoder().decode(written.manifest.bytes),
 		) as { readonly updatedAtMs: number };
 
 		await expect(Effect.runPromise(workspace.listFx())).resolves.toEqual([

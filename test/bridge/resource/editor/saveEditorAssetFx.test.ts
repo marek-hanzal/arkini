@@ -1,7 +1,8 @@
 import { Effect } from "effect";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { EditorProjectRecord } from "../../../electron/contract/editor/EditorProjectRecord";
+import type { EditorProjectRecord } from "../../../../electron/contract/editor/EditorProjectRecord";
+import { createEditorProjectFromRecordFx } from "~/bridge/editor/createEditorProjectFromRecordFx";
 import { createEditorProjectManifestFileFx } from "~/bridge/editor/createEditorProjectManifestFileFx";
 import type { EditorWorkspace } from "~/bridge/editor/EditorWorkspace";
 import { saveEditorAssetFx } from "~/bridge/resource/editor/saveEditorAssetFx";
@@ -58,39 +59,48 @@ describe("saveEditorAssetFx", () => {
 				...plan.files,
 			],
 		};
+		const project = await Effect.runPromise(createEditorProjectFromRecordFx(record));
 		const write = vi.fn<EditorWorkspace["writeFx"]>((mutation) =>
 			Effect.sync(() => {
 				const manifestFile = record.files.find(({ path }) => path === "editor.json");
 				const manifest = JSON.parse(
 					new TextDecoder().decode(manifestFile?.bytes),
 				) as Record<string, unknown>;
+				const nextManifest = {
+					path: "editor.json",
+					bytes: new TextEncoder().encode(
+						`${JSON.stringify({ ...manifest, updatedAtMs: 456 }, null, "\t")}\n`,
+					),
+				};
 				record = {
 					...record,
 					revision: "1".repeat(64),
 					files: [
-						...record.files.filter(({ path }) => path !== "editor.json"),
+						...record.files.filter(
+							({ path }) => path !== mutation.file.path && path !== "editor.json",
+						),
 						mutation.file,
-						{
-							path: "editor.json",
-							bytes: new TextEncoder().encode(
-								`${JSON.stringify({ ...manifest, updatedAtMs: 456 }, null, "\t")}\n`,
-							),
-						},
+						nextManifest,
 					],
 				};
-				return record;
+				return {
+					projectId: record.projectId,
+					file: mutation.file,
+					manifest: nextManifest,
+					revision: record.revision,
+				};
 			}),
 		);
 		const workspace: EditorWorkspace = {
 			listFx: () => Effect.succeed([]),
 			createFx: () => Effect.void,
-			readFx: () => Effect.succeed(record),
+			readFx: () => Effect.die("Save must not reload the editor project."),
 			writeFx: write,
 			openDirectoryFx: () => Effect.void,
 		};
 		const saved = await Effect.runPromise(
 			saveEditorAssetFx({
-				projectId: plan.projectId,
+				project,
 				expectedRevision: "0".repeat(64),
 				file: {
 					name: "new-asset.png",
@@ -111,9 +121,22 @@ describe("saveEditorAssetFx", () => {
 		expect(saved.project.resources.map(({ id }) => id)).toContain("new-asset");
 		expect(saved.project.revision).toBe(saved.revision);
 		expect(saved.project.updatedAtMs).toBe(456);
+		expect(saved.project.fileIndex["assets/new-asset.png"]?.bytes).toEqual(createPng());
 	});
 
 	it("rejects bytes that only claim a png filename", async () => {
+		const project = {
+			projectId: "project",
+			title: "Project",
+			createdAtMs: 1,
+			updatedAtMs: 1,
+			revision: "0".repeat(64),
+			fileIndex: {},
+			itemSourcePaths: {},
+			resources: [],
+			resourceSourcePaths: {},
+			diagnostics: [],
+		} as const;
 		vi.mocked(createImageBitmap).mockRejectedValueOnce(new Error("decode failed"));
 		const fakePng = new Uint8Array(24);
 		fakePng.set([
@@ -132,7 +155,7 @@ describe("saveEditorAssetFx", () => {
 		await expect(
 			Effect.runPromise(
 				saveEditorAssetFx({
-					projectId: "project",
+					project,
 					expectedRevision: "0".repeat(64),
 					file: {
 						name: "fake.png",
@@ -147,6 +170,18 @@ describe("saveEditorAssetFx", () => {
 	});
 
 	it("releases the decoded bitmap when dimension validation fails", async () => {
+		const project = {
+			projectId: "project",
+			title: "Project",
+			createdAtMs: 1,
+			updatedAtMs: 1,
+			revision: "0".repeat(64),
+			fileIndex: {},
+			itemSourcePaths: {},
+			resources: [],
+			resourceSourcePaths: {},
+			diagnostics: [],
+		} as const;
 		vi.mocked(createImageBitmap).mockResolvedValueOnce({
 			width: 9000,
 			height: 1,
@@ -160,7 +195,7 @@ describe("saveEditorAssetFx", () => {
 		await expect(
 			Effect.runPromise(
 				saveEditorAssetFx({
-					projectId: "project",
+					project,
 					expectedRevision: "0".repeat(64),
 					file: {
 						name: "oversized.png",

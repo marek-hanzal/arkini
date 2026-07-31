@@ -550,10 +550,8 @@ describe("registerArkiniElectronIpcFx", () => {
 				expect.objectContaining({
 					projectId: "editor-test",
 					revision: expect.stringMatching(/^[a-f0-9]{64}$/),
-					files: expect.arrayContaining([
-						expect.objectContaining({ path: "editor.json" }),
-						expect.objectContaining({ path: "simple/water.json" }),
-					]),
+					file: expect.objectContaining({ path: "simple/water.json" }),
+					manifest: expect.objectContaining({ path: "editor.json" }),
 				}),
 			);
 			await expect(

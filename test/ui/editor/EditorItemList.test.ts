@@ -20,6 +20,15 @@ vi.mock("~/bridge/editor/useEditorProject", () => ({
 	useEditorProject: () => state.project,
 }));
 
+vi.mock("~/ui/item/editor/useVisibleEditorItems", () => ({
+	useVisibleEditorItems: () =>
+		(state.project as {
+			readonly config?: {
+				readonly items?: Readonly<Record<string, unknown>>;
+			};
+		}).config?.items ?? {},
+}));
+
 vi.mock("~/ui/item/editor/EditorItemThumbnail", () => ({
 	EditorItemThumbnail: () =>
 		createElement("span", {

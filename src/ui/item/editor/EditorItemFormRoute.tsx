@@ -1,5 +1,6 @@
 import type { EditorItemType } from "~/bridge/editor/EditorItemModel";
 import { useEditorProject } from "~/bridge/editor/useEditorProject";
+import { useEditorProjectDraft } from "~/bridge/editor/useEditorProjectDraft";
 import { ButtonLink } from "~/ui/button/Button";
 import { EditorItemForm } from "~/ui/item/editor/EditorItemForm";
 
@@ -18,9 +19,10 @@ export namespace EditorItemFormRoute {
 		  };
 }
 
-/** Resolves one stable in-memory item form session against the compiled project. */
+/** Resolves one form session against canonical sources plus an explicit staged item. */
 export const EditorItemFormRoute = (props: EditorItemFormRoute.Props) => {
 	const project = useEditorProject();
+	const staged = useEditorProjectDraft(project.projectId);
 	if (props.mode === "create") {
 		return (
 			<EditorItemForm
@@ -30,8 +32,14 @@ export const EditorItemFormRoute = (props: EditorItemFormRoute.Props) => {
 			/>
 		);
 	}
-	const item = project.config?.items[props.itemId];
-	const sourcePath = project.itemSourcePaths[props.itemId];
+	const stagedChange = Object.values(staged).find(
+		(change) => change.item.id === props.itemId,
+	);
+	const canonicalItem = project.config?.items[props.itemId];
+	const item = stagedChange?.item ?? canonicalItem;
+	const sourcePath = stagedChange?.sourcePath ?? project.itemSourcePaths[props.itemId];
+	const sourceItemId =
+		stagedChange?.sourceItemId ?? (canonicalItem === undefined ? undefined : props.itemId);
 	if (item !== undefined) {
 		return (
 			<EditorItemForm
@@ -39,7 +47,7 @@ export const EditorItemFormRoute = (props: EditorItemFormRoute.Props) => {
 				item={item}
 				itemType={item.type}
 				sessionId={`${project.projectId}:${sourcePath ?? `item:${props.itemId}`}`}
-				sourceItemId={props.itemId}
+				sourceItemId={sourceItemId}
 				sourcePath={sourcePath}
 			/>
 		);

@@ -1,16 +1,15 @@
 import { useMemo } from "react";
 
 import { createEditorItemSearchTerms } from "~/bridge/editor/createEditorItemSearchTerms";
-import { useEditorProject } from "~/bridge/editor/useEditorProject";
 import type { EditorSearchOption } from "~/ui/form/EditorSearchCombobox";
+import { useVisibleEditorItems } from "~/ui/item/editor/useVisibleEditorItems";
 
-/** Builds the one canonical Fuse corpus used by every editor item reference picker. */
+/** Builds one visible-item Fuse corpus used by every editor item reference picker. */
 export const useEditorItemSearchOptions = () => {
-	const project = useEditorProject();
-	const items = project.config?.items;
+	const items = useVisibleEditorItems();
 	const options = useMemo(
 		() =>
-			Object.values(items ?? {})
+			Object.values(items)
 				.sort((left, right) => left.title.localeCompare(right.title))
 				.map(
 					(item) =>

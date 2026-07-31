@@ -5,26 +5,23 @@ import { createEditorItemSearchTerms } from "~/bridge/editor/createEditorItemSea
 import { useEditorProject } from "~/bridge/editor/useEditorProject";
 import { ButtonLink, PrimaryButtonLink } from "~/ui/button/Button";
 import { EditorItemThumbnail } from "~/ui/item/editor/EditorItemThumbnail";
+import { useVisibleEditorItems } from "~/ui/item/editor/useVisibleEditorItems";
 import { useFuseSearch } from "~/ui/search/useFuseSearch";
 
 type EditorItemType = NonNullable<EditorProject["config"]>["items"][string]["type"];
 
-/** Lists every item from the compiled project as the editor's default workspace. */
+/** Lists canonical and staged items as the editor's default authoring workspace. */
 export const EditorItemList = () => {
 	const project = useEditorProject();
-	const config = project.config;
+	const visibleItems = useVisibleEditorItems();
 	const [query, setQuery] = useState("");
 	const [itemType, setItemType] = useState<EditorItemType>();
 	const items = useMemo(
 		() =>
-			config === undefined
-				? []
-				: Object.entries(config.items).sort(([, left], [, right]) =>
-						left.title.localeCompare(right.title),
-					),
-		[
-			config,
-		],
+			Object.entries(visibleItems).sort(([, left], [, right]) =>
+				left.title.localeCompare(right.title),
+			),
+		[visibleItems],
 	);
 	const searchCandidates = useMemo(
 		() =>

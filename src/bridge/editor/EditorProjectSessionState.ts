@@ -5,7 +5,6 @@ interface EditorProjectSessionState {
 	canonicalPending: number;
 	canonicalIdle: Deferred.Deferred<void>;
 	failure?: unknown;
-	releaseDraft?: () => void;
 }
 
 const sessions = new Map<string, EditorProjectSessionState>();
@@ -24,11 +23,10 @@ const readSession = (projectId: string) => {
 	return created;
 };
 
-export const openEditorProjectSession = (projectId: string, mountDraft: () => () => void) => {
+export const openEditorProjectSession = (projectId: string) => {
 	const session = readSession(projectId);
 	session.acceptingCanonical = true;
 	session.failure = undefined;
-	session.releaseDraft ??= mountDraft();
 	activeProjectId = projectId;
 };
 
@@ -78,7 +76,6 @@ export const readEditorProjectSessionFailure = (projectId: string) =>
 export const releaseEditorProjectSession = (projectId: string) => {
 	const session = sessions.get(projectId);
 	if (session?.canonicalPending === 0) {
-		session.releaseDraft?.();
 		sessions.delete(projectId);
 	}
 	if (activeProjectId === projectId) activeProjectId = undefined;

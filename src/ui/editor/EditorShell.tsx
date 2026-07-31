@@ -1,26 +1,26 @@
-import { RegistryContext, useAtomValue } from "@effect/atom-react";
-import { useMutation } from "@tanstack/react-query";
-import { useBlocker, useRouter } from "@tanstack/react-router";
+import { useAtomValue } from "@effect/atom-react";
+import { useRouter } from "@tanstack/react-router";
 import {
-	useContext,
+	useCallback,
 	useEffect,
 	useState,
 	type MouseEventHandler,
 	type PropsWithChildren,
 } from "react";
 
-import { EditorProjectDraftAtom } from "~/bridge/editor/EditorProjectDraftAtom";
-import { EditorProjectFormDirtyAtom } from "~/bridge/editor/EditorProjectFormDirtyAtom";
 import { EditorProjectMutationPendingAtom } from "~/bridge/editor/EditorProjectMutationLane";
 import {
 	closeEditorProjectSessionFx,
 	releaseEditorProjectSession,
 	resumeEditorProjectSession,
 } from "~/bridge/editor/EditorProjectSession";
-import { persistEditorProjectMutationFx } from "~/bridge/editor/persistEditorProjectMutation";
-import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import { useEditorProject } from "~/bridge/editor/useEditorProject";
+import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import { Button, ButtonLink, PrimaryButton } from "~/ui/button/Button";
+import {
+	EditorFormActionsProvider,
+	useEditorFormActions,
+} from "~/ui/editor/EditorFormActions";
 
 const tabClassName =
 	"min-h-0 border-transparent bg-transparent px-3 py-2 text-sm shadow-none hover:bg-surface-raised";
@@ -34,29 +34,23 @@ const readEditorTab = (pathname: string): EditorTab | undefined => {
 	return match?.[1] as EditorTab | undefined;
 };
 
+const readErrorMessage = (error: unknown) =>
+	error instanceof Error ? error.message : "Editor could not finish the requested action.";
+
 /** Keeps editor-wide navigation stable while child tools replace only the content surface. */
 const EditorShellContent = ({ children }: PropsWithChildren) => {
 	const project = useEditorProject();
-	const registry = useContext(RegistryContext);
-	const staged = useAtomValue(EditorProjectDraftAtom(project.projectId));
-	const stagedCount = Object.keys(staged).length;
+	const form = useEditorFormActions();
 	const pendingMutations = useAtomValue(EditorProjectMutationPendingAtom(project.projectId));
-	const formDirtyAtom = EditorProjectFormDirtyAtom(project.projectId);
-	useAtomValue(formDirtyAtom);
 	const router = useRouter();
 	const [optimisticTab, setOptimisticTab] = useState<EditorTab>();
+	const [exitRequested, setExitRequested] = useState(false);
 	const [exitError, setExitError] = useState<unknown>();
 	const [exitPending, setExitPending] = useState(false);
-	const persist = useMutation({
-		mutationKey: [
-			"editor",
-			project.projectId,
-			"persist",
-		],
-		mutationFn: () =>
-			RendererRuntime.runPromise(persistEditorProjectMutationFx(project.projectId)),
-	});
-	const projectRoot = `/editor/${project.projectId}`;
+	const params = {
+		projectId: project.projectId,
+	};
+
 	useEffect(
 		() =>
 			window.arkini.lifecycle.onCloseFailed((error) => {
@@ -65,33 +59,10 @@ const EditorShellContent = ({ children }: PropsWithChildren) => {
 			}),
 		[],
 	);
-	useBlocker({
-		enableBeforeUnload: false,
-		shouldBlockFn: async ({ next }) => {
-			if (next.pathname === projectRoot || next.pathname.startsWith(`${projectRoot}/`)) {
-				if (registry.get(formDirtyAtom)) {
-					setExitError(new Error("Save the current form before leaving it."));
-					return true;
-				}
-				return false;
-			}
-			setExitError(undefined);
-			setExitPending(true);
-			try {
-				await RendererRuntime.runPromise(closeEditorProjectSessionFx(project.projectId));
-				releaseEditorProjectSession(project.projectId);
-				return false;
-			} catch (error) {
-				resumeEditorProjectSession(project.projectId);
-				setExitError(error);
-				setExitPending(false);
-				return true;
-			}
-		},
-	});
-	const params = {
-		projectId: project.projectId,
-	};
+	useEffect(() => {
+		if (form?.isDirty === true) return;
+		setExitRequested(false);
+	}, [form?.isDirty]);
 	useEffect(
 		() =>
 			router.subscribe("onResolved", ({ toLocation }) => {
@@ -101,10 +72,74 @@ const EditorShellContent = ({ children }: PropsWithChildren) => {
 						: current,
 				);
 			}),
-		[
-			router,
-		],
+		[router],
 	);
+
+	const closeAndExit = useCallback(async () => {
+		if (exitPending) return;
+		setExitError(undefined);
+		setExitPending(true);
+		try {
+			await RendererRuntime.runPromise(closeEditorProjectSessionFx(project.projectId));
+			releaseEditorProjectSession(project.projectId);
+			await router.navigate({
+				to: "/main-menu",
+			});
+		} catch (error) {
+			resumeEditorProjectSession(project.projectId);
+			setExitError(error);
+			setExitPending(false);
+		}
+	}, [
+		exitPending,
+		project.projectId,
+		router,
+	]);
+	const save = useCallback(async () => {
+		if (form === undefined || !form.isDirty || form.isSaving) return;
+		setExitError(undefined);
+		try {
+			await form.save();
+		} catch {
+			// The form owns and publishes its exact mutation error.
+		}
+	}, [form]);
+	const discard = useCallback(() => {
+		form?.discard();
+		setExitError(undefined);
+	}, [form]);
+	const saveAndExit = useCallback(async () => {
+		if (form === undefined || form.isSaving) return;
+		setExitError(undefined);
+		try {
+			await form.save();
+			await closeAndExit();
+		} catch {
+			// The form owns and publishes its exact mutation error.
+		}
+	}, [
+		closeAndExit,
+		form,
+	]);
+	const discardAndExit = useCallback(async () => {
+		form?.discard();
+		await closeAndExit();
+	}, [
+		closeAndExit,
+		form,
+	]);
+	const requestExit = useCallback(() => {
+		setExitError(undefined);
+		if (form?.isDirty === true) {
+			setExitRequested(true);
+			return;
+		}
+		void closeAndExit();
+	}, [
+		closeAndExit,
+		form?.isDirty,
+	]);
+
 	const readTabClassName = (tab: EditorTab) =>
 		optimisticTab === tab ? `${tabClassName} ${activeTabProps.className}` : tabClassName;
 	const readActiveTabProps = () =>
@@ -122,17 +157,22 @@ const EditorShellContent = ({ children }: PropsWithChildren) => {
 			) {
 				return;
 			}
-			if (registry.get(formDirtyAtom)) {
-				event.preventDefault();
-				setExitError(new Error("Save the current form before leaving it."));
-				return;
-			}
 			setExitError(undefined);
+			setExitRequested(false);
 			setOptimisticTab(tab);
 		};
+	const statusError = form?.error ?? exitError;
+	const statusVisible = form?.isDirty === true || statusError !== undefined;
+	const statusCopy =
+		statusError !== undefined
+			? readErrorMessage(statusError)
+			: exitRequested
+				? "This form has unsaved changes. Save or discard them before exiting."
+				: "This form has unsaved changes.";
+
 	return (
 		<div
-			className="grid h-dvh min-h-0 grid-rows-[auto_minmax(0,1fr)] overflow-hidden bg-[var(--ak-game-shell-background)] text-foreground"
+			className="grid h-dvh min-h-0 grid-rows-[auto_2.5rem_minmax(0,1fr)] overflow-hidden bg-[var(--ak-game-shell-background)] text-foreground"
 			data-ui="EditorShell"
 			style={{
 				viewTransitionName: "arkini-editor-shell",
@@ -145,12 +185,9 @@ const EditorShellContent = ({ children }: PropsWithChildren) => {
 					viewTransitionName: "arkini-editor-navigation",
 				}}
 			>
-				<nav
-					className="flex min-w-0 flex-wrap items-center gap-1"
-					aria-label="Editor tools"
-				>
+				<nav className="flex min-w-0 flex-wrap items-center gap-1" aria-label="Editor tools">
 					<ButtonLink
-						to="/editor/$projectId/editor"
+						to="/editor/$projectId/editor/items/list"
 						params={params}
 						className={readTabClassName("editor")}
 						activeProps={readActiveTabProps()}
@@ -200,64 +237,64 @@ const EditorShellContent = ({ children }: PropsWithChildren) => {
 				</p>
 				<Button
 					className="min-h-0 shrink-0 px-4 py-2 text-sm"
-					disabled={stagedCount === 0 || persist.isPending || exitPending}
-					cursorIntent={persist.isPending ? "progress" : undefined}
-					onClick={() => {
-						setExitError(undefined);
-						persist.mutate(undefined, {
-							onError: setExitError,
-						});
-					}}
+					disabled={
+						form?.isDirty !== true || form.isSaving || exitPending || pendingMutations > 0
+					}
+					cursorIntent={form?.isSaving === true ? "progress" : undefined}
+					onClick={() => void save()}
 				>
-					{persist.isPending
-						? "Saving…"
-						: stagedCount > 0
-							? `Save (${stagedCount})`
-							: "Save"}
+					{form?.isSaving === true ? "Saving…" : "Save"}
 				</Button>
 				<PrimaryButton
 					className="min-h-0 shrink-0 px-4 py-2 text-sm"
 					disabled={exitPending}
 					cursorIntent={exitPending || pendingMutations > 0 ? "progress" : undefined}
-					onClick={() => {
-						if (exitPending) return;
-						setExitError(undefined);
-						if (stagedCount > 0) {
-							setExitPending(true);
-							void persist
-								.mutateAsync()
-								.then(() =>
-									router.navigate({
-										to: "/main-menu",
-									}),
-								)
-								.catch((error: unknown) => {
-									setExitError(error);
-									setExitPending(false);
-								});
-							return;
-						}
-						void router.navigate({
-							to: "/main-menu",
-						});
-					}}
+					onClick={requestExit}
 				>
-					{exitPending || pendingMutations > 0 ? "Saving…" : "Save & exit"}
+					{exitPending ? "Exiting…" : "Exit"}
 				</PrimaryButton>
-				{exitError === undefined && persist.error === null ? null : (
-					<p
-						className="basis-full text-right text-xs text-danger"
-						role="alert"
-					>
-						{(() => {
-							const error = exitError ?? persist.error;
-							return error instanceof Error
-								? error.message
-								: "Editor could not finish saving. Try again.";
-						})()}
-					</p>
-				)}
 			</header>
+			<div
+				className="relative z-10 h-10 border-b border-transparent px-[var(--ak-viewport-padding)]"
+				data-ui="EditorFormStatusSlot"
+			>
+				<div
+					className={`flex h-full min-w-0 items-center gap-3 rounded-b-xl border-x border-b px-4 text-sm transition-[opacity,transform,background-color,border-color] duration-200 ${
+						statusVisible
+							? "translate-y-0 border-accent/45 bg-accent/10 opacity-100"
+							: "pointer-events-none -translate-y-1 border-transparent opacity-0"
+					}`}
+					aria-hidden={!statusVisible}
+					role={statusError === undefined ? "status" : "alert"}
+				>
+					<p className={`min-w-0 flex-1 truncate ${statusError === undefined ? "text-foreground" : "text-danger"}`}>
+						{statusCopy}
+					</p>
+					{form?.isDirty === true ? (
+						<>
+							<button
+								type="button"
+								className="cursor-pointer text-sm font-semibold text-muted underline decoration-transparent underline-offset-4 transition-colors hover:text-foreground hover:decoration-current disabled:cursor-not-allowed disabled:opacity-60"
+								disabled={form.isSaving || exitPending}
+								onClick={() => {
+									if (exitRequested) void discardAndExit();
+									else discard();
+								}}
+							>
+								Discard
+							</button>
+							<button
+								type="button"
+								className="cursor-pointer text-sm font-semibold text-accent underline decoration-transparent underline-offset-4 transition-colors hover:text-accent-hover hover:decoration-current disabled:cursor-not-allowed disabled:opacity-60"
+								disabled={form.isSaving || exitPending}
+								onClick={() => void (exitRequested ? saveAndExit() : save())}
+							>
+								{form.isSaving ? "Saving…" : "Save"}
+							</button>
+						</>
+					) : null}
+				</div>
+			</div>
 			<main
 				className="min-h-0 min-w-0 overflow-hidden p-[var(--ak-viewport-padding)]"
 				data-ui="EditorContent"
@@ -271,4 +308,8 @@ const EditorShellContent = ({ children }: PropsWithChildren) => {
 	);
 };
 
-export const EditorShell = EditorShellContent;
+export const EditorShell = ({ children }: PropsWithChildren) => (
+	<EditorFormActionsProvider>
+		<EditorShellContent>{children}</EditorShellContent>
+	</EditorFormActionsProvider>
+);

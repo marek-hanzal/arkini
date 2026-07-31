@@ -31,7 +31,6 @@ const createProject = (revision: string): EditorProject => ({
 	revision,
 	resources: [],
 	resourceSourcePaths: {},
-	itemSourcePaths: {},
 	diagnostics: [],
 });
 

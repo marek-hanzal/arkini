@@ -1,19 +1,15 @@
 import { useAtomSet } from "@effect/atom-react";
-import { createId } from "@paralleldrive/cuid2";
 import { useStore } from "@tanstack/react-form";
-import { useRouter } from "@tanstack/react-router";
 import { match } from "ts-pattern";
-import { useLayoutEffect, useMemo, useRef } from "react";
+import { useCallback, useLayoutEffect, useMemo, type ReactNode } from "react";
 
 import {
 	type EditorItem,
 	type EditorItemFormValues,
-	type EditorItemType,
 } from "~/bridge/editor/EditorItemModel";
 import { EditorProjectFormDirtyAtom } from "~/bridge/editor/EditorProjectFormDirtyAtom";
-import { createEditorItemDraft } from "~/bridge/editor/createEditorItemDraft";
 import { useEditorProject } from "~/bridge/editor/useEditorProject";
-import { Button, ButtonLink, PrimaryButton } from "~/ui/button/Button";
+import { Button } from "~/ui/button/Button";
 import { useAppForm } from "~/ui/form/EditorForm";
 import { EditorFormSection } from "~/ui/form/EditorFormSection";
 import { EditorItemArtworkFields } from "~/ui/item/editor/EditorItemArtworkFields";
@@ -21,7 +17,8 @@ import { EditorLineFields } from "~/ui/item/editor/EditorLineField";
 import { EditorMergeFields } from "~/ui/item/editor/EditorMergeFields";
 import { EditorOptionalOutputControl } from "~/ui/item/editor/EditorOptionalOutputControl";
 import { EditorProductionFields } from "~/ui/item/editor/EditorProductionFields";
-import { useStageEditorItemMutation } from "~/ui/item/editor/useStageEditorItemMutation";
+import { useRegisterEditorFormActions } from "~/ui/editor/EditorFormActions";
+import { useSaveEditorItemMutation } from "~/ui/item/editor/useSaveEditorItemMutation";
 
 const scopeOptions = [
 	{
@@ -54,89 +51,106 @@ const createEditorItemFormValues = (item: EditorItem): EditorItemFormValues => (
 
 export namespace EditorItemForm {
 	export interface Props {
-		readonly item?: EditorItem;
-		readonly itemType: EditorItemType;
-		readonly sessionId: string;
-		readonly sourceItemId?: string;
-		readonly sourcePath?: string;
+		readonly back: ReactNode;
+		readonly initialItem: EditorItem;
+		readonly onSaved?: (item: EditorItem) => void | Promise<void>;
+		readonly title: string;
 	}
 }
 
-/** Creates or edits one schema-discriminated item through shared application fields. */
+/** Edits one item locally and publishes only a validated, persisted canonical result. */
 export const EditorItemForm = ({
-	item,
-	itemType,
-	sessionId,
-	sourceItemId,
-	sourcePath,
+	back,
+	initialItem,
+	onSaved,
+	title,
 }: EditorItemForm.Props) => {
 	const project = useEditorProject();
-	const router = useRouter();
-	const generatedItemUidRef = useRef<string | undefined>(undefined);
-	const generatedItemUid =
-		item?.uid ?? (generatedItemUidRef.current ??= createId());
 	const canonicalItem = useMemo<EditorItemFormValues>(
-		() =>
-			createEditorItemFormValues(
-				item ?? createEditorItemDraft(itemType, project, generatedItemUid),
-			),
-		[
-			item,
-			itemType,
-			generatedItemUid,
-			project,
-		],
+		() => createEditorItemFormValues(initialItem),
+		[initialItem],
 	);
 	const categoryOptions = Object.values(project.config?.categories ?? {}).map((category) => ({
 		label: category.title,
 		value: category.id,
 	}));
-	const initialItem: EditorItemFormValues = canonicalItem;
 	const form = useAppForm({
-		defaultValues: initialItem,
+		defaultValues: canonicalItem,
 	});
 	const values = useStore(form.store, (state) => state.values);
 	const dirty = useStore(form.store, (state) => state.isDirty);
 	const setFormDirty = useAtomSet(EditorProjectFormDirtyAtom(project.projectId));
+	const ownerId = `item:${initialItem.uid}`;
 	useLayoutEffect(() => {
 		setFormDirty({
 			dirty,
-			ownerId: sessionId,
+			ownerId,
 		});
 		return () => {
 			setFormDirty({
 				dirty: false,
-				ownerId: sessionId,
+				ownerId,
 			});
 		};
 	}, [
 		dirty,
-		project.projectId,
-		sessionId,
+		ownerId,
 		setFormDirty,
 	]);
-	const mutation = useStageEditorItemMutation({
+	const mutation = useSaveEditorItemMutation({
+		expectedRevision: project.revision,
 		projectId: project.projectId,
-		sessionId,
-		sourceItemId,
-		sourcePath,
-		onSuccess: (saved) => {
-			setFormDirty({
-				dirty: false,
-				ownerId: sessionId,
-			});
-			form.reset(createEditorItemFormValues(saved));
-			if (item !== undefined) return;
-			void router.navigate({
-				to: "/editor/$projectId/editor/item/$itemId",
-				params: {
-					projectId: project.projectId,
-					itemId: saved.id,
-				},
-				replace: true,
-			});
-		},
 	});
+	const discard = useCallback(() => {
+		mutation.reset();
+		setFormDirty({
+			dirty: false,
+			ownerId,
+		});
+		form.reset(canonicalItem);
+	}, [
+		canonicalItem,
+		form,
+		mutation.reset,
+		ownerId,
+		setFormDirty,
+	]);
+	const save = useCallback(async () => {
+		if (!dirty || mutation.isPending) return;
+		const saved = await mutation.mutateAsync(values);
+		setFormDirty({
+			dirty: false,
+			ownerId,
+		});
+		form.reset(createEditorItemFormValues(saved));
+		await onSaved?.(saved);
+	}, [
+		dirty,
+		form,
+		mutation.isPending,
+		mutation.mutateAsync,
+		onSaved,
+		ownerId,
+		setFormDirty,
+		values,
+	]);
+	const actions = useMemo(
+		() => ({
+			discard,
+			error: mutation.error ?? undefined,
+			isDirty: dirty,
+			isSaving: mutation.isPending,
+			save,
+		}),
+		[
+			dirty,
+			discard,
+			mutation.error,
+			mutation.isPending,
+			save,
+		],
+	);
+	useRegisterEditorFormActions(actions);
 
 	return (
 		<section
@@ -145,14 +159,17 @@ export const EditorItemForm = ({
 			data-ui="EditorItemForm"
 		>
 			<header className="flex min-w-0 flex-wrap items-center gap-3">
+				{back}
 				<div className="min-w-0 flex-1">
 					<h1
 						id="editor-item-form-title"
 						className="truncate text-xl font-semibold"
 					>
-						{item === undefined ? `New ${itemType}` : item.title}
+						{title}
 					</h1>
-					<p className="mt-1 text-xs uppercase tracking-wider text-muted">{itemType}</p>
+					<p className="mt-1 text-xs uppercase tracking-wider text-muted">
+						{initialItem.type}
+					</p>
 				</div>
 			</header>
 			<div className="min-h-0 overflow-y-auto overscroll-contain pr-1">
@@ -168,7 +185,6 @@ export const EditorItemForm = ({
 										label="Item ID"
 										description="Changing an existing ID also changes every reference you must update elsewhere."
 										placeholder="item:example"
-										readOnly={item !== undefined}
 									/>
 								)}
 							</form.AppField>
@@ -192,14 +208,14 @@ export const EditorItemForm = ({
 									)
 								}
 							</form.AppField>
-							{initialItem.type === "inventory" ||
-							initialItem.type === "temporary" ? (
+							{canonicalItem.type === "inventory" ||
+							canonicalItem.type === "temporary" ? (
 								<div className="grid content-start gap-1.5 text-sm">
 									<span className="font-semibold text-foreground">
 										Storage scope
 									</span>
 									<span className="rounded-lg border border-line bg-canvas/50 px-3 py-2 text-muted">
-										Board — fixed by {initialItem.type} contract
+										Board — fixed by {canonicalItem.type} contract
 									</span>
 								</div>
 							) : (
@@ -233,7 +249,7 @@ export const EditorItemForm = ({
 						/>
 					</EditorFormSection>
 
-					{initialItem.type === "inventory" ? null : (
+					{canonicalItem.type === "inventory" ? null : (
 						<EditorFormSection
 							title="Limits"
 							description="Configured global and per-stack quantity constraints."
@@ -249,7 +265,7 @@ export const EditorItemForm = ({
 										/>
 									)}
 								</form.AppField>
-								{initialItem.type === "temporary" ? null : (
+								{canonicalItem.type === "temporary" ? null : (
 									<form.AppField name="maxStackSize">
 										{(field) => (
 											<field.NumberField
@@ -324,7 +340,7 @@ export const EditorItemForm = ({
 						)}
 					</form.Subscribe>
 
-					{match(initialItem)
+					{match(canonicalItem)
 						.with(
 							{
 								type: "deposit",
@@ -337,7 +353,7 @@ export const EditorItemForm = ({
 										lines: "lines",
 									}}
 									kind="deposit"
-									ownerId={initialItem.id}
+									ownerId={values.id}
 								/>
 							),
 						)
@@ -353,7 +369,7 @@ export const EditorItemForm = ({
 										lines: "lines",
 									}}
 									kind="producer"
-									ownerId={initialItem.id}
+									ownerId={values.id}
 								/>
 							),
 						)
@@ -426,32 +442,6 @@ export const EditorItemForm = ({
 						)
 						.exhaustive()}
 
-					{mutation.error === null ? null : (
-						<p className="rounded-xl border border-danger/40 bg-danger/10 p-3 text-sm text-danger">
-							{mutation.error instanceof Error
-								? mutation.error.message
-								: String(mutation.error)}
-						</p>
-					)}
-					<div className="sticky bottom-0 flex items-center justify-between gap-3 border-t border-line bg-[var(--ak-game-shell-background)] py-4">
-						<ButtonLink
-							to="/editor/$projectId/editor"
-							params={{
-								projectId: project.projectId,
-							}}
-							aria-disabled={dirty || mutation.isPending}
-						>
-							<span className="icon-[lucide--arrow-left] mr-2 size-4" />
-							Back
-						</ButtonLink>
-						<PrimaryButton
-							disabled={!dirty || mutation.isPending}
-							cursorIntent={mutation.isPending ? "progress" : undefined}
-							onClick={() => mutation.mutate(values)}
-						>
-							{mutation.isPending ? "Saving…" : "Save"}
-						</PrimaryButton>
-					</div>
 				</div>
 			</div>
 		</section>

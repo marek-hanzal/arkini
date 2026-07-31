@@ -9,6 +9,5 @@ export interface EditorProject extends EditorProjectDescriptor {
 	readonly config?: GameConfigSchema.Type;
 	readonly resources: ReadonlyArray<ResourceSchema.Type>;
 	readonly resourceSourcePaths: Readonly<Record<string, string>>;
-	readonly itemSourcePaths: Readonly<Record<string, string>>;
 	readonly diagnostics: GameDiagnosticsSchema.Type;
 }

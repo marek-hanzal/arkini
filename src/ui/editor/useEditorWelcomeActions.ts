@@ -23,7 +23,7 @@ export const useEditorWelcomeActions = () => {
 					Effect.tryPromise({
 						try: () =>
 							navigate({
-								to: "/editor/$projectId/editor",
+								to: "/editor/$projectId/editor/items/list",
 								params: {
 									projectId: project.projectId,
 								},

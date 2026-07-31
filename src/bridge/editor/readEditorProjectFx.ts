@@ -96,7 +96,6 @@ export const readEditorProjectFx = Effect.fn("readEditorProjectFx")(function* ({
 			revision: parsedRecord.revision,
 			resources: [],
 			resourceSourcePaths: {},
-			itemSourcePaths: {},
 			diagnostics: [],
 		};
 		return project;

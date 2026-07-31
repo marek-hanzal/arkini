@@ -1,7 +1,11 @@
-import { createFileRoute } from "@tanstack/react-router";
-
-import { EditorItemsPage } from "~/page/editor/EditorItemsPage";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/editor/$projectId/editor/")({
-	component: EditorItemsPage,
+	loader: ({ params }) => {
+		throw redirect({
+			to: "/editor/$projectId/editor/items/list",
+			params,
+			replace: true,
+		});
+	},
 });

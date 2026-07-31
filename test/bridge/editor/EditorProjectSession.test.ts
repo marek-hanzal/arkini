@@ -38,7 +38,6 @@ const createProject = (revision: string): EditorProject => ({
 	updatedAtMs: 1,
 	resources: [],
 	resourceSourcePaths: {},
-	itemSourcePaths: {},
 	diagnostics: [],
 });
 
@@ -57,7 +56,7 @@ describe("EditorProjectSession", () => {
 			expectedRevision: undefined,
 			project: createProject(revisionA),
 		});
-		openEditorProjectSession("project", registry);
+		openEditorProjectSession("project");
 		const mutationEntered = Effect.runSync(Deferred.make<void>());
 		const finishMutation = Effect.runSync(Deferred.make<void>());
 		const mutation = runInRegistry(
@@ -101,13 +100,13 @@ describe("EditorProjectSession", () => {
 
 	it("reports persistence failure on close and clears it when reopened", async () => {
 		const registry = createRegistry();
-		openEditorProjectSession("project", registry);
+		openEditorProjectSession("project");
 		reportEditorProjectSessionFailure("project", new Error("write failed"));
 		await expect(
 			runInRegistry(registry, closeEditorProjectSessionFx("project")),
 		).rejects.toThrow("write failed");
 
-		openEditorProjectSession("project", registry);
+		openEditorProjectSession("project");
 		await expect(
 			runInRegistry(registry, closeEditorProjectSessionFx("project")),
 		).resolves.toBeUndefined();
@@ -115,7 +114,7 @@ describe("EditorProjectSession", () => {
 
 	it("resumes canonical admission after native close fails", async () => {
 		const registry = createRegistry();
-		openEditorProjectSession("project", registry);
+		openEditorProjectSession("project");
 		reportEditorProjectSessionFailure("project", new Error("write failed"));
 		await expect(runInRegistry(registry, closeActiveEditorProjectSessionFx)).rejects.toThrow(
 			"write failed",
@@ -128,13 +127,13 @@ describe("EditorProjectSession", () => {
 
 	it("rejects close while an in-memory item is dirty and allows it after save", async () => {
 		const registry = createRegistry();
-		openEditorProjectSession("project", registry);
+		openEditorProjectSession("project");
 		registry.set(EditorProjectFormDirtyAtom("project"), {
 			dirty: true,
 			ownerId: "item:test",
 		});
 		await expect(runInRegistry(registry, closeActiveEditorProjectSessionFx)).rejects.toThrow(
-			"Save the current item",
+			"Save or discard the current form",
 		);
 
 		const admission = admitEditorProjectCanonicalMutation("project");

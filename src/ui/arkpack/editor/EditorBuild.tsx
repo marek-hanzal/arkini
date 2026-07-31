@@ -1,14 +1,10 @@
 import { useEditorProject } from "~/bridge/editor/useEditorProject";
-import { useEditorProjectDraft } from "~/bridge/editor/useEditorProjectDraft";
 import { PrimaryButton } from "~/ui/button/Button";
 
-/** Shows the canonical project validation result and unavailable package controls. */
+/** Shows the canonical saved project validation result and unavailable package controls. */
 export const EditorBuild = () => {
 	const project = useEditorProject();
-	const staged = useEditorProjectDraft(project.projectId);
-	const stagedCount = Object.keys(staged).length;
 	const configured = project.config !== undefined;
-	const stale = configured && stagedCount > 0;
 	return (
 		<section
 			className="grid h-full min-h-0 content-start gap-[var(--ak-viewport-gap)] overflow-y-auto overscroll-contain"
@@ -16,10 +12,7 @@ export const EditorBuild = () => {
 			data-ui="EditorBuild"
 		>
 			<header>
-				<h1
-					id="editor-build-title"
-					className="text-2xl font-semibold"
-				>
+				<h1 id="editor-build-title" className="text-2xl font-semibold">
 					Build
 				</h1>
 				<p className="mt-1 text-sm text-muted">
@@ -32,46 +25,33 @@ export const EditorBuild = () => {
 					<div>
 						<h2 className="text-lg font-semibold">Project validation</h2>
 						<p className="mt-1 text-sm text-muted">
-							{!configured
-								? "Configure the project root before validation and arkpack output become available."
-								: stale
-									? `${stagedCount} staged item change${stagedCount === 1 ? " is" : "s are"} not included in this validation result. Save the project before building.`
-									: `The saved project compiled successfully with ${project.diagnostics.length} non-blocking diagnostic${project.diagnostics.length === 1 ? "" : "s"}.`}
+							{configured
+								? `The saved project compiled successfully with ${project.diagnostics.length} non-blocking diagnostic${project.diagnostics.length === 1 ? "" : "s"}.`
+								: "Configure the project root before validation and arkpack output become available."}
 						</p>
 					</div>
 					<span
 						className={
-							!configured
-								? "rounded-full bg-surface-raised px-3 py-1 text-xs font-semibold uppercase tracking-wider text-muted"
-								: stale
-									? "rounded-full bg-warning/15 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-warning"
-									: "rounded-full bg-success/15 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-success"
+							configured
+								? "rounded-full bg-success/15 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-success"
+								: "rounded-full bg-surface-raised px-3 py-1 text-xs font-semibold uppercase tracking-wider text-muted"
 						}
 					>
-						{!configured ? "Not configured" : stale ? "Drafts pending" : "Valid"}
+						{configured ? "Valid" : "Not configured"}
 					</span>
 				</div>
 				{project.diagnostics.length === 0 ? null : (
-					<div className="mt-4 grid gap-2">
-						{stale ? (
-							<p className="text-xs font-semibold uppercase tracking-wider text-muted">
-								Diagnostics from the last saved revision
-							</p>
-						) : null}
-						<ul className="grid gap-2">
-							{project.diagnostics.map((diagnostic, index) => (
-								<li
-									key={`${diagnostic.code}-${diagnostic.source ?? "project"}-${index}`}
-									className="rounded-lg bg-surface-raised p-3 text-sm text-muted"
-								>
-									<span className="font-semibold text-foreground">
-										{diagnostic.code}
-									</span>
-									:{diagnostic.message}
-								</li>
-							))}
-						</ul>
-					</div>
+					<ul className="mt-4 grid gap-2">
+						{project.diagnostics.map((diagnostic, index) => (
+							<li
+								key={`${diagnostic.code}-${diagnostic.source ?? "project"}-${index}`}
+								className="rounded-lg bg-surface-raised p-3 text-sm text-muted"
+							>
+								<span className="font-semibold text-foreground">{diagnostic.code}</span>:
+								{diagnostic.message}
+							</li>
+						))}
+					</ul>
 				)}
 			</article>
 			<article className="rounded-2xl border border-line bg-surface/85 p-5">
@@ -87,10 +67,7 @@ export const EditorBuild = () => {
 						aria-label="Signing key"
 						className="block min-w-0 w-full text-sm text-muted disabled:cursor-not-allowed disabled:opacity-60"
 					/>
-					<PrimaryButton
-						disabled
-						cursorIntent="not-allowed"
-					>
+					<PrimaryButton disabled cursorIntent="not-allowed">
 						Build arkpack
 					</PrimaryButton>
 				</div>

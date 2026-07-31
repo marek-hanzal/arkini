@@ -5,7 +5,7 @@ export interface EditorProjectFormDirtyCommand {
 	readonly ownerId: string;
 }
 
-/** Tracks raw, un-staged form edits that must not be discarded by navigation. */
+/** Projects active local-form dirtiness into editor exit and controlled-close policy. */
 export const EditorProjectFormDirtyAtom = Atom.family((projectId: string) => {
 	const ownersAtom = Atom.make<ReadonlySet<string>>(new Set<string>());
 	return Atom.writable(

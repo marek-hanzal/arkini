@@ -15,7 +15,6 @@ const project: EditorProject = {
 	config: editorTestConfig,
 	resources: editorTestPayload.resources,
 	resourceSourcePaths: {},
-	itemSourcePaths: {},
 	diagnostics: [],
 };
 

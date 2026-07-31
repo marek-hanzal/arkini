@@ -47,7 +47,6 @@ export const createEditorProjectFromCompilationFx = Effect.fn(
 		config: compilation.payload.config,
 		resources: compilation.payload.resources,
 		resourceSourcePaths: compilation.resourcePaths,
-		itemSourcePaths: compilation.provenance.items,
 		diagnostics: compilation.diagnostics,
 	} satisfies EditorProject;
 });

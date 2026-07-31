@@ -5,52 +5,42 @@ import { createEditorItemSearchTerms } from "~/bridge/editor/createEditorItemSea
 import { useEditorProject } from "~/bridge/editor/useEditorProject";
 import { ButtonLink, PrimaryButtonLink } from "~/ui/button/Button";
 import { EditorItemThumbnail } from "~/ui/item/editor/EditorItemThumbnail";
-import { useVisibleEditorItems } from "~/ui/item/editor/useVisibleEditorItems";
 import { useFuseSearch } from "~/ui/search/useFuseSearch";
 
 type EditorItemType = NonNullable<EditorProject["config"]>["items"][string]["type"];
 
-/** Lists canonical and staged items as the editor's default authoring workspace. */
+/** Lists the canonical saved item registry as the editor's default workspace. */
 export const EditorItemList = () => {
 	const project = useEditorProject();
-	const visibleItems = useVisibleEditorItems();
 	const [query, setQuery] = useState("");
 	const [itemType, setItemType] = useState<EditorItemType>();
 	const items = useMemo(
 		() =>
-			Object.entries(visibleItems).sort(([, left], [, right]) =>
+			Object.values(project.config?.items ?? {}).sort((left, right) =>
 				left.title.localeCompare(right.title),
 			),
-		[visibleItems],
+		[project.config?.items],
 	);
 	const searchCandidates = useMemo(
 		() =>
 			items
-				.filter(([, item]) => itemType === undefined || item.type === itemType)
-				.map(([id, item]) => ({
-					identity: id,
-					terms: createEditorItemSearchTerms(item, id),
+				.filter((item) => itemType === undefined || item.type === itemType)
+				.map((item) => ({
+					identity: item.uid,
+					terms: createEditorItemSearchTerms(item, item.id),
 				})),
 		[
 			itemType,
 			items,
 		],
 	);
-	const matchingItemIds = useFuseSearch(searchCandidates, query);
-	const itemsById = useMemo(
-		() =>
-			new Map(
-				items.map((entry) => [
-					entry[0],
-					entry,
-				]),
-			),
-		[
-			items,
-		],
+	const matchingItemUids = useFuseSearch(searchCandidates, query);
+	const itemsByUid = useMemo(
+		() => new Map(items.map((item) => [item.uid, item])),
+		[items],
 	);
-	const filteredItems = matchingItemIds.flatMap((id) => {
-		const item = itemsById.get(id);
+	const filteredItems = matchingItemUids.flatMap((uid) => {
+		const item = itemsByUid.get(uid);
 		return item === undefined
 			? []
 			: [
@@ -78,6 +68,7 @@ export const EditorItemList = () => {
 						className="inline-flex min-h-[var(--ak-control-min-height)] cursor-pointer items-center gap-2 rounded-full bg-accent px-3 py-2 text-[0.7rem] font-semibold uppercase tracking-wider text-accent-contrast hover:bg-accent-hover"
 						aria-label={`Clear ${itemType} item filter`}
 						data-ui="EditorItemTypeFilter"
+						aria-pressed="true"
 						onClick={() => setItemType(undefined)}
 					>
 						{itemType}
@@ -85,7 +76,7 @@ export const EditorItemList = () => {
 					</button>
 				)}
 				<PrimaryButtonLink
-					to="/editor/$projectId/editor/new"
+					to="/editor/$projectId/editor/items/new/select"
 					params={{
 						projectId: project.projectId,
 					}}
@@ -109,18 +100,19 @@ export const EditorItemList = () => {
 						No items match the current search and type filter.
 					</p>
 				) : null}
-				{filteredItems.map(([id, item]) => (
+				{filteredItems.map((item) => (
 					<article
-						key={id}
+						key={item.uid}
 						className="ak-list-row flex min-w-0 items-center gap-2 rounded-xl p-1"
-						data-item-id={id}
+						data-item-id={item.id}
+						data-item-uid={item.uid}
 						data-ui="EditorItemRow"
 					>
 						<ButtonLink
-							to="/editor/$projectId/editor/item/$itemId"
+							to="/editor/$projectId/editor/items/$itemUid/view"
 							params={{
 								projectId: project.projectId,
-								itemId: id,
+								itemUid: item.uid,
 							}}
 							className="min-h-0 min-w-0 flex-1 justify-start gap-4 border-0 bg-transparent p-2 text-left shadow-none hover:bg-surface-raised"
 						>
@@ -130,7 +122,7 @@ export const EditorItemList = () => {
 									{item.title}
 								</span>
 								<span className="mt-1 block truncate text-xs text-subtle">
-									{id}
+									{item.id}
 								</span>
 							</span>
 						</ButtonLink>

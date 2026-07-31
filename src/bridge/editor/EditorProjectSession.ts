@@ -1,8 +1,6 @@
 import { Effect } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
-import type * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 
-import { EditorProjectDraftAtom } from "~/bridge/editor/EditorProjectDraftAtom";
 import { EditorProjectFormDirtyAtom } from "~/bridge/editor/EditorProjectFormDirtyAtom";
 import {
 	beginEditorProjectCanonicalClose,
@@ -13,11 +11,8 @@ import {
 	resumeEditorProjectSession as resumeSessionState,
 } from "~/bridge/editor/EditorProjectSessionState";
 
-export const openEditorProjectSession = (
-	projectId: string,
-	registry: AtomRegistry.AtomRegistry,
-) => {
-	openSessionState(projectId, () => registry.mount(EditorProjectDraftAtom(projectId)));
+export const openEditorProjectSession = (projectId: string) => {
+	openSessionState(projectId);
 };
 
 /** Reopens admission after a failed close without forgetting the failure being retried. */
@@ -25,16 +20,15 @@ export const resumeEditorProjectSession = (projectId: string) => {
 	resumeSessionState(projectId);
 };
 
-/** Stops admission and drains every canonical and recovery mutation for one project. */
+/** Stops admission and drains every canonical mutation for one project. */
 export const closeEditorProjectSessionFx = Effect.fn("closeEditorProjectSessionFx")(
 	(projectId: string) =>
 		Effect.gen(function* () {
 			yield* beginEditorProjectCanonicalClose(projectId);
 			const formDirty = yield* Atom.get(EditorProjectFormDirtyAtom(projectId));
-			const staged = yield* Atom.get(EditorProjectDraftAtom(projectId));
-			if (formDirty || Object.keys(staged).length > 0) {
+			if (formDirty) {
 				return yield* Effect.fail(
-					new Error("Save the current item before closing the editor."),
+					new Error("Save or discard the current form before closing the editor."),
 				);
 			}
 			const failure = readEditorProjectSessionFailure(projectId);

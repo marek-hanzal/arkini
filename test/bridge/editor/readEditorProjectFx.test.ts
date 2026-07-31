@@ -67,9 +67,6 @@ describe("readEditorProjectFx", () => {
 				hero: "resources/hero.png",
 				"item-water": "assets/item-water.png",
 			},
-			itemSourcePaths: {
-				water: "simple/water.json",
-			},
 			diagnostics: [],
 		});
 	});
@@ -99,7 +96,6 @@ describe("readEditorProjectFx", () => {
 			revision: "0".repeat(64),
 			resources: [],
 			resourceSourcePaths: {},
-			itemSourcePaths: {},
 			diagnostics: [],
 		});
 	});
@@ -137,7 +133,6 @@ describe("readEditorProjectFx", () => {
 			revision: "0".repeat(64),
 			resources: [],
 			resourceSourcePaths: {},
-			itemSourcePaths: {},
 			diagnostics: [],
 		});
 	});

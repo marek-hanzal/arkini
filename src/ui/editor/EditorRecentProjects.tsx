@@ -35,7 +35,7 @@ export const EditorRecentProjects = ({ blocked, projects }: EditorRecentProjects
 				{projects.map((project) => (
 					<ButtonLink
 						key={project.projectId}
-						to="/editor/$projectId/editor"
+						to="/editor/$projectId/editor/items/list"
 						params={{
 							projectId: project.projectId,
 						}}

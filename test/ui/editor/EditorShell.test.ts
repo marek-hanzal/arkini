@@ -1,5 +1,6 @@
 // @vitest-environment jsdom
 
+import { RegistryContext, scheduleTask } from "@effect/atom-react";
 import {
 	createMemoryHistory,
 	createRootRoute,
@@ -8,37 +9,42 @@ import {
 	Outlet,
 	RouterProvider,
 } from "@tanstack/react-router";
-import { RegistryContext, scheduleTask } from "@effect/atom-react";
 import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { act, createElement } from "react";
+import {
+	act,
+	createElement,
+	useCallback,
+	useMemo,
+	useState,
+} from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import {
+	type EditorFormActions,
+	useRegisterEditorFormActions,
+} from "~/ui/editor/EditorFormActions";
 import { EditorShell } from "~/ui/editor/EditorShell";
-import { EditorProjectDraftAtom } from "~/bridge/editor/EditorProjectDraftAtom";
-import { EditorProjectFormDirtyAtom } from "~/bridge/editor/EditorProjectFormDirtyAtom";
 
-const persists = vi.hoisted(() => ({
-	run: vi.fn(),
+const session = vi.hoisted(() => ({
+	close: vi.fn<() => Promise<void>>(),
+	release: vi.fn(),
+	resume: vi.fn(),
 }));
 
-vi.mock("~/bridge/editor/persistEditorProjectMutation", async () => {
-	const { Effect } = await import("effect");
-	return {
-		persistEditorProjectMutationFx: () =>
-			Effect.tryPromise({
-				try: () => persists.run(),
-				catch: (error) => error,
-			}),
-	};
-});
+vi.mock("~/bridge/editor/EditorProjectSession", () => ({
+	closeEditorProjectSessionFx: () => ({
+		type: "close-editor-project",
+	}),
+	releaseEditorProjectSession: session.release,
+	resumeEditorProjectSession: session.resume,
+}));
 
-(
-	globalThis as {
-		IS_REACT_ACT_ENVIRONMENT?: boolean;
-	}
-).IS_REACT_ACT_ENVIRONMENT = true;
+vi.mock("~/bridge/runtime/RendererRuntime", () => ({
+	RendererRuntime: {
+		runPromise: () => session.close(),
+	},
+}));
 
 vi.mock("~/bridge/editor/useEditorProject", () => ({
 	useEditorProject: () => ({
@@ -47,11 +53,20 @@ vi.mock("~/bridge/editor/useEditorProject", () => ({
 	}),
 }));
 
+(
+	globalThis as {
+		IS_REACT_ACT_ENVIRONMENT?: boolean;
+	}
+).IS_REACT_ACT_ENVIRONMENT = true;
+
 const roots: Array<ReturnType<typeof createRoot>> = [];
 const registries: AtomRegistry.AtomRegistry[] = [];
 let closeFailedListener: ((error: unknown) => void) | undefined;
 
 beforeEach(() => {
+	session.close.mockReset().mockResolvedValue(undefined);
+	session.release.mockReset();
+	session.resume.mockReset();
 	Object.defineProperty(window, "scrollTo", {
 		configurable: true,
 		value: vi.fn(),
@@ -91,6 +106,152 @@ const createGate = () => {
 	};
 };
 
+const formCalls = {
+	discard: vi.fn(),
+	save: vi.fn<() => Promise<void>>(),
+};
+
+const DirtyItemForm = () => {
+	const [dirty, setDirty] = useState(true);
+	const [error, setError] = useState<unknown>();
+	const [saving, setSaving] = useState(false);
+	const discard = useCallback(() => {
+		formCalls.discard();
+		setError(undefined);
+		setDirty(false);
+	}, []);
+	const save = useCallback(async () => {
+		setError(undefined);
+		setSaving(true);
+		try {
+			await formCalls.save();
+			setDirty(false);
+		} catch (cause) {
+			setError(cause);
+			throw cause;
+		} finally {
+			setSaving(false);
+		}
+	}, []);
+	const actions = useMemo<EditorFormActions>(
+		() => ({
+			discard,
+			error,
+			isDirty: dirty,
+			isSaving: saving,
+			save,
+		}),
+		[
+			dirty,
+			discard,
+			error,
+			save,
+			saving,
+		],
+	);
+	useRegisterEditorFormActions(actions);
+	return createElement("p", null, "Item form");
+};
+
+interface TestRouterOptions {
+	readonly initialEntry: string;
+	readonly projectLoader?: () => Promise<void>;
+}
+
+const createTestRouter = ({ initialEntry, projectLoader }: TestRouterOptions) => {
+	const rootRoute = createRootRoute();
+	const editorRoute = createRoute({
+		getParentRoute: () => rootRoute,
+		path: "/editor/$projectId",
+		component: () => createElement(EditorShell, null, createElement(Outlet)),
+	});
+	const editorListRoute = createRoute({
+		getParentRoute: () => editorRoute,
+		path: "editor/items/list",
+		component: () => createElement("p", null, "Editor destination"),
+	});
+	const itemEditRoute = createRoute({
+		getParentRoute: () => editorRoute,
+		path: "editor/items/test/edit",
+		component: DirtyItemForm,
+	});
+	const assetsRoute = createRoute({
+		getParentRoute: () => editorRoute,
+		path: "assets",
+		component: () => createElement("p", null, "Assets destination"),
+	});
+	const projectRoute = createRoute({
+		getParentRoute: () => editorRoute,
+		path: "project",
+		...(projectLoader === undefined
+			? {}
+			: {
+					loader: projectLoader,
+				}),
+		component: () => createElement("p", null, "Project destination"),
+	});
+	const buildRoute = createRoute({
+		getParentRoute: () => editorRoute,
+		path: "build",
+		component: () => createElement("p", null, "Build destination"),
+	});
+	const boardRoute = createRoute({
+		getParentRoute: () => editorRoute,
+		path: "board",
+		component: () => createElement("p", null, "Board destination"),
+	});
+	const mainMenuRoute = createRoute({
+		getParentRoute: () => rootRoute,
+		path: "/main-menu",
+		component: () => createElement("p", null, "Main menu"),
+	});
+	return createRouter({
+		routeTree: rootRoute.addChildren([
+			editorRoute.addChildren([
+				editorListRoute,
+				itemEditRoute,
+				assetsRoute,
+				projectRoute,
+				buildRoute,
+				boardRoute,
+			]),
+			mainMenuRoute,
+		]),
+		history: createMemoryHistory({
+			initialEntries: [
+				initialEntry,
+			],
+		}),
+		defaultPendingMs: 60_000,
+	});
+};
+
+const renderRouter = async (router: ReturnType<typeof createTestRouter>) => {
+	await router.load();
+	const registry = AtomRegistry.make({
+		scheduleTask,
+	});
+	registries.push(registry);
+	const container = document.createElement("div");
+	document.body.append(container);
+	const root = createRoot(container);
+	roots.push(root);
+	await act(async () => {
+		root.render(
+			createElement(
+				RegistryContext.Provider,
+				{
+					value: registry,
+				},
+				createElement(RouterProvider, {
+					router,
+				}),
+			),
+		);
+	});
+	return container;
+};
+
 const readLink = (container: HTMLElement, label: string) => {
 	const link = [
 		...container.querySelectorAll<HTMLAnchorElement>("a"),
@@ -99,136 +260,45 @@ const readLink = (container: HTMLElement, label: string) => {
 	return link;
 };
 
-const createRegistry = (staged = false) => {
-	const registry = AtomRegistry.make({
-		scheduleTask,
-	});
-	registries.push(registry);
-	if (staged) {
-		registry.set(EditorProjectDraftAtom("editor-test"), {
-			action: "stage",
-			change: {
-				item: {
-					uid: "item:test",
-					id: "item:test",
-					type: "simple",
-					title: "Test",
-					description: "Test.",
-					asset: {
-						default: [
-							"test",
-						],
-					},
-					tags: [],
-					categoryId: "category:test",
-					scope: "any",
-					maxStackSize: 1,
-				},
-			},
-			key: "item:test",
-		});
-	}
-	return registry;
+const readButton = (container: HTMLElement, label: string) => {
+	const button = [
+		...container.querySelectorAll<HTMLButtonElement>("button"),
+	].find((candidate) => candidate.textContent === label);
+	if (button === undefined) throw new Error(`Missing ${label} editor action.`);
+	return button;
 };
 
-const withQueryClient = (child: React.ReactNode, registry: AtomRegistry.AtomRegistry) =>
-	createElement(
-		RegistryContext.Provider,
-		{
-			value: registry,
-		},
-		createElement(
-			QueryClientProvider,
-			{
-				client: new QueryClient({
-					defaultOptions: {
-						mutations: {
-							retry: false,
-						},
-					},
-				}),
-			},
-			child,
-		),
-	);
+const readStatusButton = (container: HTMLElement, label: string) => {
+	const slot = container.querySelector('[data-ui="EditorFormStatusSlot"]');
+	if (slot === null) throw new Error("Missing editor form status slot.");
+	const button = [
+		...slot.querySelectorAll<HTMLButtonElement>("button"),
+	].find((candidate) => candidate.textContent === label);
+	if (button === undefined) throw new Error(`Missing ${label} status action.`);
+	return button;
+};
 
 describe("EditorShell", () => {
+	beforeEach(() => {
+		formCalls.discard.mockReset();
+		formCalls.save.mockReset().mockResolvedValue(undefined);
+	});
+
 	it("switches the active tab before the destination route finishes loading", async () => {
 		const projectLoader = createGate();
-		const rootRoute = createRootRoute();
-		const editorRoute = createRoute({
-			getParentRoute: () => rootRoute,
-			path: "/editor/$projectId",
-			component: () => createElement(EditorShell, null, createElement(Outlet)),
+		const router = createTestRouter({
+			initialEntry: "/editor/editor-test/build",
+			projectLoader: () => projectLoader.promise,
 		});
-		const editorIndexRoute = createRoute({
-			getParentRoute: () => editorRoute,
-			path: "editor",
-			component: () => createElement("p", null, "Editor destination"),
-		});
-		const projectRoute = createRoute({
-			getParentRoute: () => editorRoute,
-			path: "project",
-			loader: () => projectLoader.promise,
-			component: () => createElement("p", null, "Project destination"),
-		});
-		const buildRoute = createRoute({
-			getParentRoute: () => editorRoute,
-			path: "build",
-			component: () => createElement("p", null, "Build destination"),
-		});
-		const boardRoute = createRoute({
-			getParentRoute: () => editorRoute,
-			path: "board",
-			component: () => createElement("p", null, "Board destination"),
-		});
-		const mainMenuRoute = createRoute({
-			getParentRoute: () => rootRoute,
-			path: "/main-menu",
-			component: () => createElement("p", null, "Main menu"),
-		});
-		const router = createRouter({
-			routeTree: rootRoute.addChildren([
-				editorRoute.addChildren([
-					editorIndexRoute,
-					projectRoute,
-					buildRoute,
-					boardRoute,
-				]),
-				mainMenuRoute,
-			]),
-			history: createMemoryHistory({
-				initialEntries: [
-					"/editor/editor-test/build",
-				],
-			}),
-			defaultPendingMs: 60_000,
-		});
-		await router.load();
-		const container = document.createElement("div");
-		document.body.append(container);
-		const root = createRoot(container);
-		roots.push(root);
-		await act(async () => {
-			root.render(
-				withQueryClient(
-					createElement(RouterProvider, {
-						router,
-					}),
-					createRegistry(),
-				),
-			);
-		});
-
+		const container = await renderRouter(router);
 		const projectLink = readLink(container, "Project");
 		const buildLink = readLink(container, "Build");
+
 		expect(buildLink.className).toContain("bg-accent");
 		expect(projectLink.className).not.toContain("bg-accent");
-
 		act(() => {
 			projectLink.click();
 		});
-
 		expect(container.textContent).toContain("Build destination");
 		expect(projectLink.className).toContain("bg-accent");
 		expect(buildLink.className).not.toContain("bg-accent");
@@ -237,153 +307,96 @@ describe("EditorShell", () => {
 			projectLoader.resolve();
 			await projectLoader.promise;
 		});
-
 		act(() => {
-			closeFailedListener?.(new Error("Save the current item before closing."));
+			closeFailedListener?.(new Error("Native close failed."));
 		});
-		expect(container.textContent).toContain("Save the current item before closing.");
+		expect(container.textContent).toContain("Native close failed.");
 	});
 
-	it("keeps Save & exit retryable after failure and navigates once after success", async () => {
-		vi.useRealTimers();
-		persists.run
-			.mockRejectedValueOnce(new Error("Invalid item."))
-			.mockResolvedValueOnce(undefined);
-		const rootRoute = createRootRoute();
-		const editorRoute = createRoute({
-			getParentRoute: () => rootRoute,
-			path: "/editor/$projectId",
-			component: () => createElement(EditorShell, null, createElement(Outlet)),
+	it("exposes one shared Save action and the reserved dirty-form status bar", async () => {
+		const router = createTestRouter({
+			initialEntry: "/editor/editor-test/editor/items/test/edit",
 		});
-		const editorIndexRoute = createRoute({
-			getParentRoute: () => editorRoute,
-			path: "editor",
-			component: () => createElement("p", null, "Item form"),
-		});
-		const mainMenuRoute = createRoute({
-			getParentRoute: () => rootRoute,
-			path: "/main-menu",
-			component: () => createElement("p", null, "Main menu"),
-		});
-		const router = createRouter({
-			routeTree: rootRoute.addChildren([
-				editorRoute.addChildren([
-					editorIndexRoute,
-				]),
-				mainMenuRoute,
-			]),
-			history: createMemoryHistory({
-				initialEntries: [
-					"/editor/editor-test/editor",
-				],
-			}),
-		});
-		await router.load();
-		const container = document.createElement("div");
-		document.body.append(container);
-		const root = createRoot(container);
-		roots.push(root);
+		const container = await renderRouter(router);
+
+		expect(container.textContent).toContain("This form has unsaved changes.");
+		expect(container.querySelector('[data-ui="EditorFormStatusSlot"]')).not.toBeNull();
 		await act(async () => {
-			root.render(
-				withQueryClient(
-					createElement(RouterProvider, {
-						router,
-					}),
-					createRegistry(true),
-				),
-			);
+			readButton(container, "Save").click();
 		});
-		const saveAndExit = () =>
-			[
-				...container.querySelectorAll<HTMLButtonElement>("button"),
-			].find((button) => button.textContent === "Save & exit");
-
-		act(() => {
-			saveAndExit()?.click();
-		});
-		await vi.waitFor(() => expect(container.textContent).toContain("Invalid item."));
-		expect(router.state.location.pathname).toBe("/editor/editor-test/editor");
-		expect(saveAndExit()?.disabled).toBe(false);
-
-		act(() => {
-			saveAndExit()?.click();
-		});
-		await vi.waitFor(() => expect(router.state.location.pathname).toBe("/main-menu"));
-		expect(container.textContent).toContain("Main menu");
+		expect(formCalls.save).toHaveBeenCalledTimes(1);
+		await vi.waitFor(() =>
+			expect(container.textContent).not.toContain("This form has unsaved changes."),
+		);
 	});
 
-	it("blocks raw form edits but allows staged changes and a synchronously cleared form", async () => {
-		const rootRoute = createRootRoute();
-		const editorRoute = createRoute({
-			getParentRoute: () => rootRoute,
-			path: "/editor/$projectId",
-			component: () => createElement(EditorShell, null, createElement(Outlet)),
+	it("lets ordinary editor navigation discard local form state without a prompt", async () => {
+		const router = createTestRouter({
+			initialEntry: "/editor/editor-test/editor/items/test/edit",
 		});
-		const editorIndexRoute = createRoute({
-			getParentRoute: () => editorRoute,
-			path: "editor",
-			component: () => createElement("p", null, "Dirty form"),
-		});
-		const projectRoute = createRoute({
-			getParentRoute: () => editorRoute,
-			path: "project",
-			component: () => createElement("p", null, "Project destination"),
-		});
-		const router = createRouter({
-			routeTree: rootRoute.addChildren([
-				editorRoute.addChildren([
-					editorIndexRoute,
-					projectRoute,
-				]),
-			]),
-			history: createMemoryHistory({
-				initialEntries: [
-					"/editor/editor-test/editor",
-				],
-			}),
-		});
-		await router.load();
-		const registry = createRegistry(true);
-		registry.set(EditorProjectFormDirtyAtom("editor-test"), {
-			dirty: true,
-			ownerId: "item-form",
-		});
-		const container = document.createElement("div");
-		document.body.append(container);
-		const root = createRoot(container);
-		roots.push(root);
-		await act(async () => {
-			root.render(
-				withQueryClient(
-					createElement(RouterProvider, {
-						router,
-					}),
-					registry,
-				),
-			);
-		});
+		const container = await renderRouter(router);
 
 		await act(async () => {
 			readLink(container, "Project").click();
 		});
-		expect(router.state.location.pathname).toBe("/editor/editor-test/editor");
-		await vi.waitFor(() =>
-			expect(container.textContent).toContain("Save the current form before leaving it."),
-		);
-
-		await act(async () => {
-			registry.set(EditorProjectFormDirtyAtom("editor-test"), {
-				dirty: false,
-				ownerId: "item-form",
-			});
-			await router.navigate({
-				to: "/editor/$projectId/project",
-				params: {
-					projectId: "editor-test",
-				},
-			});
-		});
 		expect(router.state.location.pathname).toBe("/editor/editor-test/project");
 		expect(container.textContent).toContain("Project destination");
+		expect(formCalls.save).not.toHaveBeenCalled();
+		expect(formCalls.discard).not.toHaveBeenCalled();
+	});
+
+	it("asks only Exit to resolve dirty state and discards before leaving", async () => {
+		const router = createTestRouter({
+			initialEntry: "/editor/editor-test/editor/items/test/edit",
+		});
+		const container = await renderRouter(router);
+
+		act(() => {
+			readButton(container, "Exit").click();
+		});
+		expect(session.close).not.toHaveBeenCalled();
+		expect(container.textContent).toContain(
+			"Save or discard them before exiting.",
+		);
+		await act(async () => {
+			readStatusButton(container, "Discard").click();
+		});
+		await vi.waitFor(() =>
+			expect(router.state.location.pathname).toBe("/main-menu"),
+		);
+		expect(formCalls.discard).toHaveBeenCalledTimes(1);
+		expect(session.close).toHaveBeenCalledTimes(1);
+		expect(session.release).toHaveBeenCalledWith("editor-test");
+	});
+
+	it("saves dirty state before Exit and remains retryable after save failure", async () => {
+		formCalls.save
+			.mockRejectedValueOnce(new Error("Invalid item."))
+			.mockResolvedValueOnce(undefined);
+		const router = createTestRouter({
+			initialEntry: "/editor/editor-test/editor/items/test/edit",
+		});
+		const container = await renderRouter(router);
+
+		act(() => {
+			readButton(container, "Exit").click();
+		});
+		await act(async () => {
+			readStatusButton(container, "Save").click();
+		});
+		await vi.waitFor(() => expect(container.textContent).toContain("Invalid item."));
+		expect(router.state.location.pathname).toBe(
+			"/editor/editor-test/editor/items/test/edit",
+		);
+		expect(session.close).not.toHaveBeenCalled();
+
+		await act(async () => {
+			readStatusButton(container, "Save").click();
+		});
+		await vi.waitFor(() =>
+			expect(router.state.location.pathname).toBe("/main-menu"),
+		);
+		expect(formCalls.save).toHaveBeenCalledTimes(2);
+		expect(session.close).toHaveBeenCalledTimes(1);
 	});
 });

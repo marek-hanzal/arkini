@@ -1,3 +1,4 @@
+import { createId } from "@paralleldrive/cuid2";
 import { useMemo } from "react";
 
 import { useEditorProject } from "~/bridge/editor/useEditorProject";
@@ -48,12 +49,12 @@ const itemTypePresentation = {
 /** Starts item creation from the authoritative item discriminator enum. */
 export const EditorItemTypePicker = () => {
 	const project = useEditorProject();
-	const draftIds = useMemo(
+	const itemUids = useMemo(
 		() =>
 			Object.fromEntries(
 				EditorItemTypes.map((type) => [
 					type,
-					crypto.randomUUID(),
+					createId(),
 				]),
 			),
 		[],
@@ -66,7 +67,7 @@ export const EditorItemTypePicker = () => {
 		>
 			<header className="flex min-w-0 flex-wrap items-center gap-3">
 				<ButtonLink
-					to="/editor/$projectId/editor"
+					to="/editor/$projectId/editor/items/list"
 					params={{
 						projectId: project.projectId,
 					}}
@@ -93,13 +94,13 @@ export const EditorItemTypePicker = () => {
 					return (
 						<ButtonLink
 							key={type}
-							to="/editor/$projectId/editor/new/$itemType"
+							to="/editor/$projectId/editor/items/$itemUid/create"
 							params={{
 								projectId: project.projectId,
-								itemType: type,
+								itemUid: itemUids[type],
 							}}
 							search={{
-								draft: draftIds[type],
+								itemType: type,
 							}}
 							className="ak-list-row min-h-32 justify-start gap-4 rounded-xl p-4 text-left"
 							data-item-type={type}

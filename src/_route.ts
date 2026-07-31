@@ -35,10 +35,14 @@ import { Route as GamePackageIdActionLeaveRouteImport } from "./@routes/game/$pa
 import { Route as GamePackageIdActionExitRouteImport } from "./@routes/game/$packageId/action/exit"
 import { Route as GamePackageIdSceneInventoryRouteImport } from "./@routes/game/$packageId/_scene/inventory"
 import { Route as GamePackageIdSceneBoardRouteImport } from "./@routes/game/$packageId/_scene/board"
-import { Route as EditorProjectIdEditorNewRouteImport } from "./@routes/editor/$projectId/editor/new"
-import { Route as EditorProjectIdEditorNewIndexRouteImport } from "./@routes/editor/$projectId/editor/new/index"
-import { Route as EditorProjectIdEditorNewItemTypeRouteImport } from "./@routes/editor/$projectId/editor/new/$itemType"
-import { Route as EditorProjectIdEditorItemItemIdRouteImport } from "./@routes/editor/$projectId/editor/item/$itemId"
+import { Route as EditorProjectIdEditorItemsRouteImport } from "./@routes/editor/$projectId/editor/items"
+import { Route as EditorProjectIdEditorItemsListRouteImport } from "./@routes/editor/$projectId/editor/items/list"
+import { Route as EditorProjectIdEditorItemsItemUidRouteImport } from "./@routes/editor/$projectId/editor/items/$itemUid"
+import { Route as EditorProjectIdEditorItemsItemUidCreateRouteImport } from "./@routes/editor/$projectId/editor/items/$itemUid/create"
+import { Route as EditorProjectIdEditorItemsItemUidEditRouteImport } from "./@routes/editor/$projectId/editor/items/$itemUid/edit"
+import { Route as EditorProjectIdEditorItemsItemUidViewRouteImport } from "./@routes/editor/$projectId/editor/items/$itemUid/view"
+import { Route as EditorProjectIdEditorItemsNewRouteImport } from "./@routes/editor/$projectId/editor/items/new"
+import { Route as EditorProjectIdEditorItemsNewSelectRouteImport } from "./@routes/editor/$projectId/editor/items/new/select"
 
 const EditorRoute = EditorRouteImport.update({
   id: "/editor",
@@ -138,256 +142,294 @@ const ActionLoadGamePackageIdRoute = ActionLoadGamePackageIdRouteImport.update({
   path: "/action/load-game/$packageId",
   getParentRoute: () => rootRouteImport,
 } as any)
-const EditorProjectIdEditorIndexRoute =
-  EditorProjectIdEditorIndexRouteImport.update({
-    id: "/",
-    path: "/",
-    getParentRoute: () => EditorProjectIdEditorRoute,
-  } as any)
-const GamePackageIdActionResetRoute =
-  GamePackageIdActionResetRouteImport.update({
-    id: "/action/reset",
-    path: "/action/reset",
-    getParentRoute: () => GamePackageIdRoute,
-  } as any)
-const GamePackageIdActionLeaveRoute =
-  GamePackageIdActionLeaveRouteImport.update({
-    id: "/action/leave",
-    path: "/action/leave",
-    getParentRoute: () => GamePackageIdRoute,
-  } as any)
+const EditorProjectIdEditorIndexRoute = EditorProjectIdEditorIndexRouteImport.update({
+  id: "/",
+  path: "/",
+  getParentRoute: () => EditorProjectIdEditorRoute,
+} as any)
+const GamePackageIdActionResetRoute = GamePackageIdActionResetRouteImport.update({
+  id: "/action/reset",
+  path: "/action/reset",
+  getParentRoute: () => GamePackageIdRoute,
+} as any)
+const GamePackageIdActionLeaveRoute = GamePackageIdActionLeaveRouteImport.update({
+  id: "/action/leave",
+  path: "/action/leave",
+  getParentRoute: () => GamePackageIdRoute,
+} as any)
 const GamePackageIdActionExitRoute = GamePackageIdActionExitRouteImport.update({
   id: "/action/exit",
   path: "/action/exit",
   getParentRoute: () => GamePackageIdRoute,
 } as any)
-const GamePackageIdSceneInventoryRoute =
-  GamePackageIdSceneInventoryRouteImport.update({
-    id: "/inventory",
-    path: "/inventory",
-    getParentRoute: () => GamePackageIdSceneRoute,
-  } as any)
+const GamePackageIdSceneInventoryRoute = GamePackageIdSceneInventoryRouteImport.update({
+  id: "/inventory",
+  path: "/inventory",
+  getParentRoute: () => GamePackageIdSceneRoute,
+} as any)
 const GamePackageIdSceneBoardRoute = GamePackageIdSceneBoardRouteImport.update({
   id: "/board",
   path: "/board",
   getParentRoute: () => GamePackageIdSceneRoute,
 } as any)
-const EditorProjectIdEditorNewRoute =
-  EditorProjectIdEditorNewRouteImport.update({
-    id: "/new",
-    path: "/new",
-    getParentRoute: () => EditorProjectIdEditorRoute,
-  } as any)
-const EditorProjectIdEditorNewIndexRoute =
-  EditorProjectIdEditorNewIndexRouteImport.update({
-    id: "/",
-    path: "/",
-    getParentRoute: () => EditorProjectIdEditorNewRoute,
-  } as any)
-const EditorProjectIdEditorNewItemTypeRoute =
-  EditorProjectIdEditorNewItemTypeRouteImport.update({
-    id: "/$itemType",
-    path: "/$itemType",
-    getParentRoute: () => EditorProjectIdEditorNewRoute,
-  } as any)
-const EditorProjectIdEditorItemItemIdRoute =
-  EditorProjectIdEditorItemItemIdRouteImport.update({
-    id: "/item/$itemId",
-    path: "/item/$itemId",
-    getParentRoute: () => EditorProjectIdEditorRoute,
-  } as any)
+const EditorProjectIdEditorItemsRoute = EditorProjectIdEditorItemsRouteImport.update({
+  id: "/items",
+  path: "/items",
+  getParentRoute: () => EditorProjectIdEditorRoute,
+} as any)
+const EditorProjectIdEditorItemsListRoute = EditorProjectIdEditorItemsListRouteImport.update({
+  id: "/list",
+  path: "/list",
+  getParentRoute: () => EditorProjectIdEditorItemsRoute,
+} as any)
+const EditorProjectIdEditorItemsItemUidRoute = EditorProjectIdEditorItemsItemUidRouteImport.update({
+  id: "/$itemUid",
+  path: "/$itemUid",
+  getParentRoute: () => EditorProjectIdEditorItemsRoute,
+} as any)
+const EditorProjectIdEditorItemsItemUidCreateRoute = EditorProjectIdEditorItemsItemUidCreateRouteImport.update({
+  id: "/create",
+  path: "/create",
+  getParentRoute: () => EditorProjectIdEditorItemsItemUidRoute,
+} as any)
+const EditorProjectIdEditorItemsItemUidEditRoute = EditorProjectIdEditorItemsItemUidEditRouteImport.update({
+  id: "/edit",
+  path: "/edit",
+  getParentRoute: () => EditorProjectIdEditorItemsItemUidRoute,
+} as any)
+const EditorProjectIdEditorItemsItemUidViewRoute = EditorProjectIdEditorItemsItemUidViewRouteImport.update({
+  id: "/view",
+  path: "/view",
+  getParentRoute: () => EditorProjectIdEditorItemsItemUidRoute,
+} as any)
+const EditorProjectIdEditorItemsNewRoute = EditorProjectIdEditorItemsNewRouteImport.update({
+  id: "/new",
+  path: "/new",
+  getParentRoute: () => EditorProjectIdEditorItemsRoute,
+} as any)
+const EditorProjectIdEditorItemsNewSelectRoute = EditorProjectIdEditorItemsNewSelectRouteImport.update({
+  id: "/select",
+  path: "/select",
+  getParentRoute: () => EditorProjectIdEditorItemsNewRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
-  "/": typeof IndexRoute
   "/editor": typeof EditorRouteWithChildren
-  "/about": typeof LauncherAboutRoute
-  "/arkpacks": typeof LauncherArkpacksRoute
-  "/main-menu": typeof LauncherMainMenuRoute
-  "/settings": typeof LauncherSettingsRoute
-  "/action/discard-failed-game": typeof ActionDiscardFailedGameRoute
-  "/action/recover-game-save": typeof ActionRecoverGameSaveRoute
-  "/editor/$projectId": typeof EditorProjectIdRouteWithChildren
-  "/editor/welcome": typeof EditorWelcomeRoute
+  "/": typeof IndexRoute
   "/game/$packageId": typeof GamePackageIdRouteWithChildren
-  "/action/load-game/$packageId": typeof ActionLoadGamePackageIdRoute
-  "/editor/$projectId/assets": typeof EditorProjectIdAssetsRoute
-  "/editor/$projectId/board": typeof EditorProjectIdBoardRoute
-  "/editor/$projectId/build": typeof EditorProjectIdBuildRoute
-  "/editor/$projectId/editor": typeof EditorProjectIdEditorRouteWithChildren
-  "/editor/$projectId/project": typeof EditorProjectIdProjectRoute
+  "/editor/welcome": typeof EditorWelcomeRoute
+  "/editor/$projectId": typeof EditorProjectIdRouteWithChildren
+  "/action/recover-game-save": typeof ActionRecoverGameSaveRoute
+  "/action/discard-failed-game": typeof ActionDiscardFailedGameRoute
+  "/settings": typeof LauncherSettingsRoute
+  "/main-menu": typeof LauncherMainMenuRoute
+  "/arkpacks": typeof LauncherArkpacksRoute
+  "/about": typeof LauncherAboutRoute
   "/game/$packageId/cheats": typeof GamePackageIdCheatsRoute
-  "/editor/$projectId/editor/new": typeof EditorProjectIdEditorNewRouteWithChildren
-  "/game/$packageId/board": typeof GamePackageIdSceneBoardRoute
-  "/game/$packageId/inventory": typeof GamePackageIdSceneInventoryRoute
-  "/game/$packageId/action/exit": typeof GamePackageIdActionExitRoute
-  "/game/$packageId/action/leave": typeof GamePackageIdActionLeaveRoute
-  "/game/$packageId/action/reset": typeof GamePackageIdActionResetRoute
+  "/editor/$projectId/project": typeof EditorProjectIdProjectRoute
+  "/editor/$projectId/editor": typeof EditorProjectIdEditorRouteWithChildren
+  "/editor/$projectId/build": typeof EditorProjectIdBuildRoute
+  "/editor/$projectId/board": typeof EditorProjectIdBoardRoute
+  "/editor/$projectId/assets": typeof EditorProjectIdAssetsRoute
+  "/action/load-game/$packageId": typeof ActionLoadGamePackageIdRoute
   "/editor/$projectId/editor/": typeof EditorProjectIdEditorIndexRoute
-  "/editor/$projectId/editor/item/$itemId": typeof EditorProjectIdEditorItemItemIdRoute
-  "/editor/$projectId/editor/new/$itemType": typeof EditorProjectIdEditorNewItemTypeRoute
-  "/editor/$projectId/editor/new/": typeof EditorProjectIdEditorNewIndexRoute
+  "/game/$packageId/action/reset": typeof GamePackageIdActionResetRoute
+  "/game/$packageId/action/leave": typeof GamePackageIdActionLeaveRoute
+  "/game/$packageId/action/exit": typeof GamePackageIdActionExitRoute
+  "/game/$packageId/inventory": typeof GamePackageIdSceneInventoryRoute
+  "/game/$packageId/board": typeof GamePackageIdSceneBoardRoute
+  "/editor/$projectId/editor/items": typeof EditorProjectIdEditorItemsRouteWithChildren
+  "/editor/$projectId/editor/items/list": typeof EditorProjectIdEditorItemsListRoute
+  "/editor/$projectId/editor/items/$itemUid": typeof EditorProjectIdEditorItemsItemUidRouteWithChildren
+  "/editor/$projectId/editor/items/$itemUid/create": typeof EditorProjectIdEditorItemsItemUidCreateRoute
+  "/editor/$projectId/editor/items/$itemUid/edit": typeof EditorProjectIdEditorItemsItemUidEditRoute
+  "/editor/$projectId/editor/items/$itemUid/view": typeof EditorProjectIdEditorItemsItemUidViewRoute
+  "/editor/$projectId/editor/items/new": typeof EditorProjectIdEditorItemsNewRouteWithChildren
+  "/editor/$projectId/editor/items/new/select": typeof EditorProjectIdEditorItemsNewSelectRoute
 }
 export interface FileRoutesByTo {
-  "/": typeof IndexRoute
   "/editor": typeof EditorRouteWithChildren
-  "/about": typeof LauncherAboutRoute
-  "/arkpacks": typeof LauncherArkpacksRoute
-  "/main-menu": typeof LauncherMainMenuRoute
-  "/settings": typeof LauncherSettingsRoute
-  "/action/discard-failed-game": typeof ActionDiscardFailedGameRoute
-  "/action/recover-game-save": typeof ActionRecoverGameSaveRoute
-  "/editor/$projectId": typeof EditorProjectIdRouteWithChildren
-  "/editor/welcome": typeof EditorWelcomeRoute
+  "/": typeof IndexRoute
   "/game/$packageId": typeof GamePackageIdRouteWithChildren
-  "/action/load-game/$packageId": typeof ActionLoadGamePackageIdRoute
-  "/editor/$projectId/assets": typeof EditorProjectIdAssetsRoute
-  "/editor/$projectId/board": typeof EditorProjectIdBoardRoute
-  "/editor/$projectId/build": typeof EditorProjectIdBuildRoute
-  "/editor/$projectId/project": typeof EditorProjectIdProjectRoute
+  "/editor/welcome": typeof EditorWelcomeRoute
+  "/editor/$projectId": typeof EditorProjectIdRouteWithChildren
+  "/action/recover-game-save": typeof ActionRecoverGameSaveRoute
+  "/action/discard-failed-game": typeof ActionDiscardFailedGameRoute
+  "/settings": typeof LauncherSettingsRoute
+  "/main-menu": typeof LauncherMainMenuRoute
+  "/arkpacks": typeof LauncherArkpacksRoute
+  "/about": typeof LauncherAboutRoute
   "/game/$packageId/cheats": typeof GamePackageIdCheatsRoute
-  "/game/$packageId/board": typeof GamePackageIdSceneBoardRoute
-  "/game/$packageId/inventory": typeof GamePackageIdSceneInventoryRoute
-  "/game/$packageId/action/exit": typeof GamePackageIdActionExitRoute
-  "/game/$packageId/action/leave": typeof GamePackageIdActionLeaveRoute
-  "/game/$packageId/action/reset": typeof GamePackageIdActionResetRoute
+  "/editor/$projectId/project": typeof EditorProjectIdProjectRoute
+  "/editor/$projectId/build": typeof EditorProjectIdBuildRoute
+  "/editor/$projectId/board": typeof EditorProjectIdBoardRoute
+  "/editor/$projectId/assets": typeof EditorProjectIdAssetsRoute
+  "/action/load-game/$packageId": typeof ActionLoadGamePackageIdRoute
   "/editor/$projectId/editor": typeof EditorProjectIdEditorIndexRoute
-  "/editor/$projectId/editor/item/$itemId": typeof EditorProjectIdEditorItemItemIdRoute
-  "/editor/$projectId/editor/new/$itemType": typeof EditorProjectIdEditorNewItemTypeRoute
-  "/editor/$projectId/editor/new": typeof EditorProjectIdEditorNewIndexRoute
+  "/game/$packageId/action/reset": typeof GamePackageIdActionResetRoute
+  "/game/$packageId/action/leave": typeof GamePackageIdActionLeaveRoute
+  "/game/$packageId/action/exit": typeof GamePackageIdActionExitRoute
+  "/game/$packageId/inventory": typeof GamePackageIdSceneInventoryRoute
+  "/game/$packageId/board": typeof GamePackageIdSceneBoardRoute
+  "/editor/$projectId/editor/items": typeof EditorProjectIdEditorItemsRouteWithChildren
+  "/editor/$projectId/editor/items/list": typeof EditorProjectIdEditorItemsListRoute
+  "/editor/$projectId/editor/items/$itemUid": typeof EditorProjectIdEditorItemsItemUidRouteWithChildren
+  "/editor/$projectId/editor/items/$itemUid/create": typeof EditorProjectIdEditorItemsItemUidCreateRoute
+  "/editor/$projectId/editor/items/$itemUid/edit": typeof EditorProjectIdEditorItemsItemUidEditRoute
+  "/editor/$projectId/editor/items/$itemUid/view": typeof EditorProjectIdEditorItemsItemUidViewRoute
+  "/editor/$projectId/editor/items/new": typeof EditorProjectIdEditorItemsNewRouteWithChildren
+  "/editor/$projectId/editor/items/new/select": typeof EditorProjectIdEditorItemsNewSelectRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  "/": typeof IndexRoute
-  "/_launcher": typeof LauncherRouteWithChildren
   "/editor": typeof EditorRouteWithChildren
-  "/_launcher/about": typeof LauncherAboutRoute
-  "/_launcher/arkpacks": typeof LauncherArkpacksRoute
-  "/_launcher/main-menu": typeof LauncherMainMenuRoute
-  "/_launcher/settings": typeof LauncherSettingsRoute
-  "/action/discard-failed-game": typeof ActionDiscardFailedGameRoute
-  "/action/recover-game-save": typeof ActionRecoverGameSaveRoute
-  "/editor/$projectId": typeof EditorProjectIdRouteWithChildren
-  "/editor/welcome": typeof EditorWelcomeRoute
+  "/_launcher": typeof LauncherRouteWithChildren
+  "/": typeof IndexRoute
   "/game/$packageId": typeof GamePackageIdRouteWithChildren
-  "/action/load-game/$packageId": typeof ActionLoadGamePackageIdRoute
-  "/editor/$projectId/assets": typeof EditorProjectIdAssetsRoute
-  "/editor/$projectId/board": typeof EditorProjectIdBoardRoute
-  "/editor/$projectId/build": typeof EditorProjectIdBuildRoute
-  "/editor/$projectId/editor": typeof EditorProjectIdEditorRouteWithChildren
-  "/editor/$projectId/project": typeof EditorProjectIdProjectRoute
-  "/game/$packageId/_scene": typeof GamePackageIdSceneRouteWithChildren
+  "/editor/welcome": typeof EditorWelcomeRoute
+  "/editor/$projectId": typeof EditorProjectIdRouteWithChildren
+  "/action/recover-game-save": typeof ActionRecoverGameSaveRoute
+  "/action/discard-failed-game": typeof ActionDiscardFailedGameRoute
+  "/_launcher/settings": typeof LauncherSettingsRoute
+  "/_launcher/main-menu": typeof LauncherMainMenuRoute
+  "/_launcher/arkpacks": typeof LauncherArkpacksRoute
+  "/_launcher/about": typeof LauncherAboutRoute
   "/game/$packageId/cheats": typeof GamePackageIdCheatsRoute
-  "/editor/$projectId/editor/new": typeof EditorProjectIdEditorNewRouteWithChildren
-  "/game/$packageId/_scene/board": typeof GamePackageIdSceneBoardRoute
-  "/game/$packageId/_scene/inventory": typeof GamePackageIdSceneInventoryRoute
-  "/game/$packageId/action/exit": typeof GamePackageIdActionExitRoute
-  "/game/$packageId/action/leave": typeof GamePackageIdActionLeaveRoute
-  "/game/$packageId/action/reset": typeof GamePackageIdActionResetRoute
+  "/game/$packageId/_scene": typeof GamePackageIdSceneRouteWithChildren
+  "/editor/$projectId/project": typeof EditorProjectIdProjectRoute
+  "/editor/$projectId/editor": typeof EditorProjectIdEditorRouteWithChildren
+  "/editor/$projectId/build": typeof EditorProjectIdBuildRoute
+  "/editor/$projectId/board": typeof EditorProjectIdBoardRoute
+  "/editor/$projectId/assets": typeof EditorProjectIdAssetsRoute
+  "/action/load-game/$packageId": typeof ActionLoadGamePackageIdRoute
   "/editor/$projectId/editor/": typeof EditorProjectIdEditorIndexRoute
-  "/editor/$projectId/editor/item/$itemId": typeof EditorProjectIdEditorItemItemIdRoute
-  "/editor/$projectId/editor/new/$itemType": typeof EditorProjectIdEditorNewItemTypeRoute
-  "/editor/$projectId/editor/new/": typeof EditorProjectIdEditorNewIndexRoute
+  "/game/$packageId/action/reset": typeof GamePackageIdActionResetRoute
+  "/game/$packageId/action/leave": typeof GamePackageIdActionLeaveRoute
+  "/game/$packageId/action/exit": typeof GamePackageIdActionExitRoute
+  "/game/$packageId/_scene/inventory": typeof GamePackageIdSceneInventoryRoute
+  "/game/$packageId/_scene/board": typeof GamePackageIdSceneBoardRoute
+  "/editor/$projectId/editor/items": typeof EditorProjectIdEditorItemsRouteWithChildren
+  "/editor/$projectId/editor/items/list": typeof EditorProjectIdEditorItemsListRoute
+  "/editor/$projectId/editor/items/$itemUid": typeof EditorProjectIdEditorItemsItemUidRouteWithChildren
+  "/editor/$projectId/editor/items/$itemUid/create": typeof EditorProjectIdEditorItemsItemUidCreateRoute
+  "/editor/$projectId/editor/items/$itemUid/edit": typeof EditorProjectIdEditorItemsItemUidEditRoute
+  "/editor/$projectId/editor/items/$itemUid/view": typeof EditorProjectIdEditorItemsItemUidViewRoute
+  "/editor/$projectId/editor/items/new": typeof EditorProjectIdEditorItemsNewRouteWithChildren
+  "/editor/$projectId/editor/items/new/select": typeof EditorProjectIdEditorItemsNewSelectRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    | "/"
     | "/editor"
-    | "/about"
-    | "/arkpacks"
-    | "/main-menu"
-    | "/settings"
-    | "/action/discard-failed-game"
-    | "/action/recover-game-save"
-    | "/editor/$projectId"
-    | "/editor/welcome"
+    | "/"
     | "/game/$packageId"
-    | "/action/load-game/$packageId"
-    | "/editor/$projectId/assets"
-    | "/editor/$projectId/board"
-    | "/editor/$projectId/build"
-    | "/editor/$projectId/editor"
-    | "/editor/$projectId/project"
+    | "/editor/welcome"
+    | "/editor/$projectId"
+    | "/action/recover-game-save"
+    | "/action/discard-failed-game"
+    | "/settings"
+    | "/main-menu"
+    | "/arkpacks"
+    | "/about"
     | "/game/$packageId/cheats"
-    | "/editor/$projectId/editor/new"
-    | "/game/$packageId/board"
-    | "/game/$packageId/inventory"
-    | "/game/$packageId/action/exit"
-    | "/game/$packageId/action/leave"
-    | "/game/$packageId/action/reset"
+    | "/editor/$projectId/project"
+    | "/editor/$projectId/editor"
+    | "/editor/$projectId/build"
+    | "/editor/$projectId/board"
+    | "/editor/$projectId/assets"
+    | "/action/load-game/$packageId"
     | "/editor/$projectId/editor/"
-    | "/editor/$projectId/editor/item/$itemId"
-    | "/editor/$projectId/editor/new/$itemType"
-    | "/editor/$projectId/editor/new/"
+    | "/game/$packageId/action/reset"
+    | "/game/$packageId/action/leave"
+    | "/game/$packageId/action/exit"
+    | "/game/$packageId/inventory"
+    | "/game/$packageId/board"
+    | "/editor/$projectId/editor/items"
+    | "/editor/$projectId/editor/items/list"
+    | "/editor/$projectId/editor/items/$itemUid"
+    | "/editor/$projectId/editor/items/$itemUid/create"
+    | "/editor/$projectId/editor/items/$itemUid/edit"
+    | "/editor/$projectId/editor/items/$itemUid/view"
+    | "/editor/$projectId/editor/items/new"
+    | "/editor/$projectId/editor/items/new/select"
   fileRoutesByTo: FileRoutesByTo
   to:
-    | "/"
     | "/editor"
-    | "/about"
-    | "/arkpacks"
-    | "/main-menu"
-    | "/settings"
-    | "/action/discard-failed-game"
-    | "/action/recover-game-save"
-    | "/editor/$projectId"
-    | "/editor/welcome"
+    | "/"
     | "/game/$packageId"
-    | "/action/load-game/$packageId"
-    | "/editor/$projectId/assets"
-    | "/editor/$projectId/board"
-    | "/editor/$projectId/build"
-    | "/editor/$projectId/project"
+    | "/editor/welcome"
+    | "/editor/$projectId"
+    | "/action/recover-game-save"
+    | "/action/discard-failed-game"
+    | "/settings"
+    | "/main-menu"
+    | "/arkpacks"
+    | "/about"
     | "/game/$packageId/cheats"
-    | "/game/$packageId/board"
-    | "/game/$packageId/inventory"
-    | "/game/$packageId/action/exit"
-    | "/game/$packageId/action/leave"
-    | "/game/$packageId/action/reset"
+    | "/editor/$projectId/project"
+    | "/editor/$projectId/build"
+    | "/editor/$projectId/board"
+    | "/editor/$projectId/assets"
+    | "/action/load-game/$packageId"
     | "/editor/$projectId/editor"
-    | "/editor/$projectId/editor/item/$itemId"
-    | "/editor/$projectId/editor/new/$itemType"
-    | "/editor/$projectId/editor/new"
+    | "/game/$packageId/action/reset"
+    | "/game/$packageId/action/leave"
+    | "/game/$packageId/action/exit"
+    | "/game/$packageId/inventory"
+    | "/game/$packageId/board"
+    | "/editor/$projectId/editor/items"
+    | "/editor/$projectId/editor/items/list"
+    | "/editor/$projectId/editor/items/$itemUid"
+    | "/editor/$projectId/editor/items/$itemUid/create"
+    | "/editor/$projectId/editor/items/$itemUid/edit"
+    | "/editor/$projectId/editor/items/$itemUid/view"
+    | "/editor/$projectId/editor/items/new"
+    | "/editor/$projectId/editor/items/new/select"
   id:
     | "__root__"
-    | "/"
-    | "/_launcher"
     | "/editor"
-    | "/_launcher/about"
-    | "/_launcher/arkpacks"
-    | "/_launcher/main-menu"
-    | "/_launcher/settings"
-    | "/action/discard-failed-game"
-    | "/action/recover-game-save"
-    | "/editor/$projectId"
-    | "/editor/welcome"
+    | "/_launcher"
+    | "/"
     | "/game/$packageId"
-    | "/action/load-game/$packageId"
-    | "/editor/$projectId/assets"
-    | "/editor/$projectId/board"
-    | "/editor/$projectId/build"
-    | "/editor/$projectId/editor"
-    | "/editor/$projectId/project"
-    | "/game/$packageId/_scene"
+    | "/editor/welcome"
+    | "/editor/$projectId"
+    | "/action/recover-game-save"
+    | "/action/discard-failed-game"
+    | "/_launcher/settings"
+    | "/_launcher/main-menu"
+    | "/_launcher/arkpacks"
+    | "/_launcher/about"
     | "/game/$packageId/cheats"
-    | "/editor/$projectId/editor/new"
-    | "/game/$packageId/_scene/board"
-    | "/game/$packageId/_scene/inventory"
-    | "/game/$packageId/action/exit"
-    | "/game/$packageId/action/leave"
-    | "/game/$packageId/action/reset"
+    | "/game/$packageId/_scene"
+    | "/editor/$projectId/project"
+    | "/editor/$projectId/editor"
+    | "/editor/$projectId/build"
+    | "/editor/$projectId/board"
+    | "/editor/$projectId/assets"
+    | "/action/load-game/$packageId"
     | "/editor/$projectId/editor/"
-    | "/editor/$projectId/editor/item/$itemId"
-    | "/editor/$projectId/editor/new/$itemType"
-    | "/editor/$projectId/editor/new/"
+    | "/game/$packageId/action/reset"
+    | "/game/$packageId/action/leave"
+    | "/game/$packageId/action/exit"
+    | "/game/$packageId/_scene/inventory"
+    | "/game/$packageId/_scene/board"
+    | "/editor/$projectId/editor/items"
+    | "/editor/$projectId/editor/items/list"
+    | "/editor/$projectId/editor/items/$itemUid"
+    | "/editor/$projectId/editor/items/$itemUid/create"
+    | "/editor/$projectId/editor/items/$itemUid/edit"
+    | "/editor/$projectId/editor/items/$itemUid/view"
+    | "/editor/$projectId/editor/items/new"
+    | "/editor/$projectId/editor/items/new/select"
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
-  LauncherRoute: typeof LauncherRouteWithChildren
   EditorRoute: typeof EditorRouteWithChildren
-  ActionDiscardFailedGameRoute: typeof ActionDiscardFailedGameRoute
-  ActionRecoverGameSaveRoute: typeof ActionRecoverGameSaveRoute
+  LauncherRoute: typeof LauncherRouteWithChildren
+  IndexRoute: typeof IndexRoute
   GamePackageIdRoute: typeof GamePackageIdRouteWithChildren
+  ActionRecoverGameSaveRoute: typeof ActionRecoverGameSaveRoute
+  ActionDiscardFailedGameRoute: typeof ActionDiscardFailedGameRoute
   ActionLoadGamePackageIdRoute: typeof ActionLoadGamePackageIdRoute
 }
 
@@ -575,149 +617,203 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof GamePackageIdSceneBoardRouteImport
       parentRoute: typeof GamePackageIdSceneRoute
     }
-    "/editor/$projectId/editor/new": {
-      id: "/editor/$projectId/editor/new"
+    "/editor/$projectId/editor/items": {
+      id: "/editor/$projectId/editor/items"
+      path: "/items"
+      fullPath: "/editor/$projectId/editor/items"
+      preLoaderRoute: typeof EditorProjectIdEditorItemsRouteImport
+      parentRoute: typeof EditorProjectIdEditorRoute
+    }
+    "/editor/$projectId/editor/items/list": {
+      id: "/editor/$projectId/editor/items/list"
+      path: "/list"
+      fullPath: "/editor/$projectId/editor/items/list"
+      preLoaderRoute: typeof EditorProjectIdEditorItemsListRouteImport
+      parentRoute: typeof EditorProjectIdEditorItemsRoute
+    }
+    "/editor/$projectId/editor/items/$itemUid": {
+      id: "/editor/$projectId/editor/items/$itemUid"
+      path: "/$itemUid"
+      fullPath: "/editor/$projectId/editor/items/$itemUid"
+      preLoaderRoute: typeof EditorProjectIdEditorItemsItemUidRouteImport
+      parentRoute: typeof EditorProjectIdEditorItemsRoute
+    }
+    "/editor/$projectId/editor/items/$itemUid/create": {
+      id: "/editor/$projectId/editor/items/$itemUid/create"
+      path: "/create"
+      fullPath: "/editor/$projectId/editor/items/$itemUid/create"
+      preLoaderRoute: typeof EditorProjectIdEditorItemsItemUidCreateRouteImport
+      parentRoute: typeof EditorProjectIdEditorItemsItemUidRoute
+    }
+    "/editor/$projectId/editor/items/$itemUid/edit": {
+      id: "/editor/$projectId/editor/items/$itemUid/edit"
+      path: "/edit"
+      fullPath: "/editor/$projectId/editor/items/$itemUid/edit"
+      preLoaderRoute: typeof EditorProjectIdEditorItemsItemUidEditRouteImport
+      parentRoute: typeof EditorProjectIdEditorItemsItemUidRoute
+    }
+    "/editor/$projectId/editor/items/$itemUid/view": {
+      id: "/editor/$projectId/editor/items/$itemUid/view"
+      path: "/view"
+      fullPath: "/editor/$projectId/editor/items/$itemUid/view"
+      preLoaderRoute: typeof EditorProjectIdEditorItemsItemUidViewRouteImport
+      parentRoute: typeof EditorProjectIdEditorItemsItemUidRoute
+    }
+    "/editor/$projectId/editor/items/new": {
+      id: "/editor/$projectId/editor/items/new"
       path: "/new"
-      fullPath: "/editor/$projectId/editor/new"
-      preLoaderRoute: typeof EditorProjectIdEditorNewRouteImport
-      parentRoute: typeof EditorProjectIdEditorRoute
+      fullPath: "/editor/$projectId/editor/items/new"
+      preLoaderRoute: typeof EditorProjectIdEditorItemsNewRouteImport
+      parentRoute: typeof EditorProjectIdEditorItemsRoute
     }
-    "/editor/$projectId/editor/new/": {
-      id: "/editor/$projectId/editor/new/"
-      path: "/"
-      fullPath: "/editor/$projectId/editor/new/"
-      preLoaderRoute: typeof EditorProjectIdEditorNewIndexRouteImport
-      parentRoute: typeof EditorProjectIdEditorNewRoute
-    }
-    "/editor/$projectId/editor/new/$itemType": {
-      id: "/editor/$projectId/editor/new/$itemType"
-      path: "/$itemType"
-      fullPath: "/editor/$projectId/editor/new/$itemType"
-      preLoaderRoute: typeof EditorProjectIdEditorNewItemTypeRouteImport
-      parentRoute: typeof EditorProjectIdEditorNewRoute
-    }
-    "/editor/$projectId/editor/item/$itemId": {
-      id: "/editor/$projectId/editor/item/$itemId"
-      path: "/item/$itemId"
-      fullPath: "/editor/$projectId/editor/item/$itemId"
-      preLoaderRoute: typeof EditorProjectIdEditorItemItemIdRouteImport
-      parentRoute: typeof EditorProjectIdEditorRoute
+    "/editor/$projectId/editor/items/new/select": {
+      id: "/editor/$projectId/editor/items/new/select"
+      path: "/select"
+      fullPath: "/editor/$projectId/editor/items/new/select"
+      preLoaderRoute: typeof EditorProjectIdEditorItemsNewSelectRouteImport
+      parentRoute: typeof EditorProjectIdEditorItemsNewRoute
     }
   }
 }
 
-interface LauncherRouteChildren {
-  LauncherAboutRoute: typeof LauncherAboutRoute
-  LauncherArkpacksRoute: typeof LauncherArkpacksRoute
-  LauncherMainMenuRoute: typeof LauncherMainMenuRoute
-  LauncherSettingsRoute: typeof LauncherSettingsRoute
+interface EditorProjectIdEditorItemsItemUidRouteChildren {
+  EditorProjectIdEditorItemsItemUidCreateRoute: typeof EditorProjectIdEditorItemsItemUidCreateRoute
+  EditorProjectIdEditorItemsItemUidEditRoute: typeof EditorProjectIdEditorItemsItemUidEditRoute
+  EditorProjectIdEditorItemsItemUidViewRoute: typeof EditorProjectIdEditorItemsItemUidViewRoute
 }
 
-const LauncherRouteChildren: LauncherRouteChildren = {
-  LauncherAboutRoute: LauncherAboutRoute,
-  LauncherArkpacksRoute: LauncherArkpacksRoute,
-  LauncherMainMenuRoute: LauncherMainMenuRoute,
-  LauncherSettingsRoute: LauncherSettingsRoute,
+const EditorProjectIdEditorItemsItemUidRouteChildren: EditorProjectIdEditorItemsItemUidRouteChildren = {
+  EditorProjectIdEditorItemsItemUidCreateRoute: EditorProjectIdEditorItemsItemUidCreateRoute,
+  EditorProjectIdEditorItemsItemUidEditRoute: EditorProjectIdEditorItemsItemUidEditRoute,
+  EditorProjectIdEditorItemsItemUidViewRoute: EditorProjectIdEditorItemsItemUidViewRoute,
 }
 
-const LauncherRouteWithChildren = LauncherRoute._addFileChildren(
-  LauncherRouteChildren,
+const EditorProjectIdEditorItemsItemUidRouteWithChildren = EditorProjectIdEditorItemsItemUidRoute._addFileChildren(
+  EditorProjectIdEditorItemsItemUidRouteChildren,
 )
 
-interface EditorProjectIdEditorNewRouteChildren {
-  EditorProjectIdEditorNewItemTypeRoute: typeof EditorProjectIdEditorNewItemTypeRoute
-  EditorProjectIdEditorNewIndexRoute: typeof EditorProjectIdEditorNewIndexRoute
+interface EditorProjectIdEditorItemsNewRouteChildren {
+  EditorProjectIdEditorItemsNewSelectRoute: typeof EditorProjectIdEditorItemsNewSelectRoute
 }
 
-const EditorProjectIdEditorNewRouteChildren: EditorProjectIdEditorNewRouteChildren =
-  {
-    EditorProjectIdEditorNewItemTypeRoute:
-      EditorProjectIdEditorNewItemTypeRoute,
-    EditorProjectIdEditorNewIndexRoute: EditorProjectIdEditorNewIndexRoute,
-  }
+const EditorProjectIdEditorItemsNewRouteChildren: EditorProjectIdEditorItemsNewRouteChildren = {
+  EditorProjectIdEditorItemsNewSelectRoute: EditorProjectIdEditorItemsNewSelectRoute,
+}
 
-const EditorProjectIdEditorNewRouteWithChildren =
-  EditorProjectIdEditorNewRoute._addFileChildren(
-    EditorProjectIdEditorNewRouteChildren,
-  )
+const EditorProjectIdEditorItemsNewRouteWithChildren = EditorProjectIdEditorItemsNewRoute._addFileChildren(
+  EditorProjectIdEditorItemsNewRouteChildren,
+)
+
+interface EditorProjectIdEditorItemsRouteChildren {
+  EditorProjectIdEditorItemsListRoute: typeof EditorProjectIdEditorItemsListRoute
+  EditorProjectIdEditorItemsItemUidRoute: typeof EditorProjectIdEditorItemsItemUidRouteWithChildren
+  EditorProjectIdEditorItemsNewRoute: typeof EditorProjectIdEditorItemsNewRouteWithChildren
+}
+
+const EditorProjectIdEditorItemsRouteChildren: EditorProjectIdEditorItemsRouteChildren = {
+  EditorProjectIdEditorItemsListRoute: EditorProjectIdEditorItemsListRoute,
+  EditorProjectIdEditorItemsItemUidRoute: EditorProjectIdEditorItemsItemUidRouteWithChildren,
+  EditorProjectIdEditorItemsNewRoute: EditorProjectIdEditorItemsNewRouteWithChildren,
+}
+
+const EditorProjectIdEditorItemsRouteWithChildren = EditorProjectIdEditorItemsRoute._addFileChildren(
+  EditorProjectIdEditorItemsRouteChildren,
+)
 
 interface EditorProjectIdEditorRouteChildren {
-  EditorProjectIdEditorNewRoute: typeof EditorProjectIdEditorNewRouteWithChildren
   EditorProjectIdEditorIndexRoute: typeof EditorProjectIdEditorIndexRoute
-  EditorProjectIdEditorItemItemIdRoute: typeof EditorProjectIdEditorItemItemIdRoute
+  EditorProjectIdEditorItemsRoute: typeof EditorProjectIdEditorItemsRouteWithChildren
 }
 
 const EditorProjectIdEditorRouteChildren: EditorProjectIdEditorRouteChildren = {
-  EditorProjectIdEditorNewRoute: EditorProjectIdEditorNewRouteWithChildren,
   EditorProjectIdEditorIndexRoute: EditorProjectIdEditorIndexRoute,
-  EditorProjectIdEditorItemItemIdRoute: EditorProjectIdEditorItemItemIdRoute,
+  EditorProjectIdEditorItemsRoute: EditorProjectIdEditorItemsRouteWithChildren,
 }
 
-const EditorProjectIdEditorRouteWithChildren =
-  EditorProjectIdEditorRoute._addFileChildren(
-    EditorProjectIdEditorRouteChildren,
-  )
+const EditorProjectIdEditorRouteWithChildren = EditorProjectIdEditorRoute._addFileChildren(
+  EditorProjectIdEditorRouteChildren,
+)
 
 interface EditorProjectIdRouteChildren {
-  EditorProjectIdAssetsRoute: typeof EditorProjectIdAssetsRoute
-  EditorProjectIdBoardRoute: typeof EditorProjectIdBoardRoute
-  EditorProjectIdBuildRoute: typeof EditorProjectIdBuildRoute
-  EditorProjectIdEditorRoute: typeof EditorProjectIdEditorRouteWithChildren
   EditorProjectIdProjectRoute: typeof EditorProjectIdProjectRoute
+  EditorProjectIdEditorRoute: typeof EditorProjectIdEditorRouteWithChildren
+  EditorProjectIdBuildRoute: typeof EditorProjectIdBuildRoute
+  EditorProjectIdBoardRoute: typeof EditorProjectIdBoardRoute
+  EditorProjectIdAssetsRoute: typeof EditorProjectIdAssetsRoute
 }
 
 const EditorProjectIdRouteChildren: EditorProjectIdRouteChildren = {
-  EditorProjectIdAssetsRoute: EditorProjectIdAssetsRoute,
-  EditorProjectIdBoardRoute: EditorProjectIdBoardRoute,
-  EditorProjectIdBuildRoute: EditorProjectIdBuildRoute,
-  EditorProjectIdEditorRoute: EditorProjectIdEditorRouteWithChildren,
   EditorProjectIdProjectRoute: EditorProjectIdProjectRoute,
+  EditorProjectIdEditorRoute: EditorProjectIdEditorRouteWithChildren,
+  EditorProjectIdBuildRoute: EditorProjectIdBuildRoute,
+  EditorProjectIdBoardRoute: EditorProjectIdBoardRoute,
+  EditorProjectIdAssetsRoute: EditorProjectIdAssetsRoute,
 }
 
 const EditorProjectIdRouteWithChildren = EditorProjectIdRoute._addFileChildren(
   EditorProjectIdRouteChildren,
 )
 
-interface EditorRouteChildren {
-  EditorProjectIdRoute: typeof EditorProjectIdRouteWithChildren
-  EditorWelcomeRoute: typeof EditorWelcomeRoute
-}
-
-const EditorRouteChildren: EditorRouteChildren = {
-  EditorProjectIdRoute: EditorProjectIdRouteWithChildren,
-  EditorWelcomeRoute: EditorWelcomeRoute,
-}
-
-const EditorRouteWithChildren =
-  EditorRoute._addFileChildren(EditorRouteChildren)
-
 interface GamePackageIdSceneRouteChildren {
-  GamePackageIdSceneBoardRoute: typeof GamePackageIdSceneBoardRoute
   GamePackageIdSceneInventoryRoute: typeof GamePackageIdSceneInventoryRoute
+  GamePackageIdSceneBoardRoute: typeof GamePackageIdSceneBoardRoute
 }
 
 const GamePackageIdSceneRouteChildren: GamePackageIdSceneRouteChildren = {
-  GamePackageIdSceneBoardRoute: GamePackageIdSceneBoardRoute,
   GamePackageIdSceneInventoryRoute: GamePackageIdSceneInventoryRoute,
+  GamePackageIdSceneBoardRoute: GamePackageIdSceneBoardRoute,
 }
 
-const GamePackageIdSceneRouteWithChildren =
-  GamePackageIdSceneRoute._addFileChildren(GamePackageIdSceneRouteChildren)
+const GamePackageIdSceneRouteWithChildren = GamePackageIdSceneRoute._addFileChildren(
+  GamePackageIdSceneRouteChildren,
+)
+
+interface EditorRouteChildren {
+  EditorWelcomeRoute: typeof EditorWelcomeRoute
+  EditorProjectIdRoute: typeof EditorProjectIdRouteWithChildren
+}
+
+const EditorRouteChildren: EditorRouteChildren = {
+  EditorWelcomeRoute: EditorWelcomeRoute,
+  EditorProjectIdRoute: EditorProjectIdRouteWithChildren,
+}
+
+const EditorRouteWithChildren = EditorRoute._addFileChildren(
+  EditorRouteChildren,
+)
+
+interface LauncherRouteChildren {
+  LauncherSettingsRoute: typeof LauncherSettingsRoute
+  LauncherMainMenuRoute: typeof LauncherMainMenuRoute
+  LauncherArkpacksRoute: typeof LauncherArkpacksRoute
+  LauncherAboutRoute: typeof LauncherAboutRoute
+}
+
+const LauncherRouteChildren: LauncherRouteChildren = {
+  LauncherSettingsRoute: LauncherSettingsRoute,
+  LauncherMainMenuRoute: LauncherMainMenuRoute,
+  LauncherArkpacksRoute: LauncherArkpacksRoute,
+  LauncherAboutRoute: LauncherAboutRoute,
+}
+
+const LauncherRouteWithChildren = LauncherRoute._addFileChildren(
+  LauncherRouteChildren,
+)
 
 interface GamePackageIdRouteChildren {
-  GamePackageIdSceneRoute: typeof GamePackageIdSceneRouteWithChildren
   GamePackageIdCheatsRoute: typeof GamePackageIdCheatsRoute
-  GamePackageIdActionExitRoute: typeof GamePackageIdActionExitRoute
-  GamePackageIdActionLeaveRoute: typeof GamePackageIdActionLeaveRoute
+  GamePackageIdSceneRoute: typeof GamePackageIdSceneRouteWithChildren
   GamePackageIdActionResetRoute: typeof GamePackageIdActionResetRoute
+  GamePackageIdActionLeaveRoute: typeof GamePackageIdActionLeaveRoute
+  GamePackageIdActionExitRoute: typeof GamePackageIdActionExitRoute
 }
 
 const GamePackageIdRouteChildren: GamePackageIdRouteChildren = {
-  GamePackageIdSceneRoute: GamePackageIdSceneRouteWithChildren,
   GamePackageIdCheatsRoute: GamePackageIdCheatsRoute,
-  GamePackageIdActionExitRoute: GamePackageIdActionExitRoute,
-  GamePackageIdActionLeaveRoute: GamePackageIdActionLeaveRoute,
+  GamePackageIdSceneRoute: GamePackageIdSceneRouteWithChildren,
   GamePackageIdActionResetRoute: GamePackageIdActionResetRoute,
+  GamePackageIdActionLeaveRoute: GamePackageIdActionLeaveRoute,
+  GamePackageIdActionExitRoute: GamePackageIdActionExitRoute,
 }
 
 const GamePackageIdRouteWithChildren = GamePackageIdRoute._addFileChildren(
@@ -725,12 +821,12 @@ const GamePackageIdRouteWithChildren = GamePackageIdRoute._addFileChildren(
 )
 
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
-  LauncherRoute: LauncherRouteWithChildren,
   EditorRoute: EditorRouteWithChildren,
-  ActionDiscardFailedGameRoute: ActionDiscardFailedGameRoute,
-  ActionRecoverGameSaveRoute: ActionRecoverGameSaveRoute,
+  LauncherRoute: LauncherRouteWithChildren,
+  IndexRoute: IndexRoute,
   GamePackageIdRoute: GamePackageIdRouteWithChildren,
+  ActionRecoverGameSaveRoute: ActionRecoverGameSaveRoute,
+  ActionDiscardFailedGameRoute: ActionDiscardFailedGameRoute,
   ActionLoadGamePackageIdRoute: ActionLoadGamePackageIdRoute,
 }
 export const routeTree = rootRouteImport

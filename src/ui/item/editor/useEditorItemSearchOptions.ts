@@ -1,12 +1,13 @@
 import { useMemo } from "react";
 
 import { createEditorItemSearchTerms } from "~/bridge/editor/createEditorItemSearchTerms";
+import { useEditorProject } from "~/bridge/editor/useEditorProject";
 import type { EditorSearchOption } from "~/ui/form/EditorSearchCombobox";
-import { useVisibleEditorItems } from "~/ui/item/editor/useVisibleEditorItems";
 
-/** Builds one visible-item Fuse corpus used by every editor item reference picker. */
+/** Builds one canonical-item Fuse corpus used by every item reference picker. */
 export const useEditorItemSearchOptions = () => {
-	const items = useVisibleEditorItems();
+	const project = useEditorProject();
+	const items = project.config?.items ?? {};
 	const options = useMemo(
 		() =>
 			Object.values(items)
@@ -20,9 +21,7 @@ export const useEditorItemSearchOptions = () => {
 							terms: createEditorItemSearchTerms(item),
 						}) satisfies EditorSearchOption,
 				),
-		[
-			items,
-		],
+		[items],
 	);
 	return {
 		items,

@@ -28,7 +28,7 @@ export const Route = createFileRoute("/editor/$projectId")({
 		const projectRoot = `/editor/${params.projectId}`;
 		if (location.pathname !== projectRoot && location.pathname !== `${projectRoot}/`) return;
 		throw redirect({
-			to: "/editor/$projectId/editor",
+			to: "/editor/$projectId/editor/items/list",
 			params,
 			replace: true,
 		});

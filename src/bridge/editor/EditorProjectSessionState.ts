@@ -4,7 +4,6 @@ interface EditorProjectSessionState {
 	acceptingCanonical: boolean;
 	canonicalPending: number;
 	canonicalIdle: Deferred.Deferred<void>;
-	failure?: unknown;
 }
 
 const sessions = new Map<string, EditorProjectSessionState>();
@@ -26,7 +25,6 @@ const readSession = (projectId: string) => {
 export const openEditorProjectSession = (projectId: string) => {
 	const session = readSession(projectId);
 	session.acceptingCanonical = true;
-	session.failure = undefined;
 	activeProjectId = projectId;
 };
 
@@ -56,22 +54,11 @@ export const admitEditorProjectCanonicalMutation = (projectId: string) => {
 	};
 };
 
-export const reportEditorProjectSessionFailure = (projectId: string, failure: unknown) => {
-	readSession(projectId).failure = failure;
-};
-
-export const clearEditorProjectSessionFailure = (projectId: string) => {
-	readSession(projectId).failure = undefined;
-};
-
 export const beginEditorProjectCanonicalClose = (projectId: string) => {
 	const session = readSession(projectId);
 	session.acceptingCanonical = false;
 	return session.canonicalPending === 0 ? Effect.void : Deferred.await(session.canonicalIdle);
 };
-
-export const readEditorProjectSessionFailure = (projectId: string) =>
-	readSession(projectId).failure;
 
 export const releaseEditorProjectSession = (projectId: string) => {
 	const session = sessions.get(projectId);

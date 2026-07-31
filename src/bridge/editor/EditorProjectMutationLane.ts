@@ -4,11 +4,7 @@ import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 
 import type { EditorProject } from "~/bridge/editor/EditorProject";
 import { EditorProjectAtom } from "~/bridge/editor/EditorProjectAtom";
-import {
-	admitEditorProjectCanonicalMutation,
-	clearEditorProjectSessionFailure,
-	reportEditorProjectSessionFailure,
-} from "~/bridge/editor/EditorProjectSessionState";
+import { admitEditorProjectCanonicalMutation } from "~/bridge/editor/EditorProjectSessionState";
 import { EditorProjectError } from "~/engine/editor/error/EditorProjectError";
 
 export interface EditorProjectMutationResult {
@@ -104,13 +100,11 @@ export const runEditorProjectMutationFx = Effect.fn("runEditorProjectMutationFx"
 				const revision = lane.headRevision;
 				const exit = yield* Effect.exit(run(revision));
 				if (Exit.isFailure(exit)) {
-					reportEditorProjectSessionFailure(projectId, exit.cause);
 					lane.headRevision = undefined;
 					lane.lineage.clear();
 					return yield* Effect.failCause(exit.cause);
 				}
 				const result = exit.value;
-				clearEditorProjectSessionFailure(projectId);
 				lane.headRevision = result.revision;
 				lane.lineage.add(result.revision);
 				yield* Atom.set(EditorProjectAtom(projectId), {

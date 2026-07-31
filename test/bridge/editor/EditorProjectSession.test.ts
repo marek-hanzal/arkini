@@ -13,10 +13,7 @@ import {
 	openEditorProjectSession,
 	releaseEditorProjectSession,
 } from "~/bridge/editor/EditorProjectSession";
-import {
-	admitEditorProjectCanonicalMutation,
-	reportEditorProjectSessionFailure,
-} from "~/bridge/editor/EditorProjectSessionState";
+import { admitEditorProjectCanonicalMutation } from "~/bridge/editor/EditorProjectSessionState";
 
 const registries: AtomRegistry.AtomRegistry[] = [];
 const createRegistry = () => {
@@ -98,31 +95,23 @@ describe("EditorProjectSession", () => {
 		).rejects.toThrow("no longer accepts mutations");
 	});
 
-	it("reports persistence failure on close and clears it when reopened", async () => {
+	it("does not poison a clean session after a mutation failure", async () => {
 		const registry = createRegistry();
 		openEditorProjectSession("project");
-		reportEditorProjectSessionFailure("project", new Error("write failed"));
 		await expect(
-			runInRegistry(registry, closeEditorProjectSessionFx("project")),
+			runInRegistry(
+				registry,
+				runEditorProjectMutationFx({
+					expectedRevision: "a".repeat(64),
+					projectId: "project",
+					run: () => Effect.fail(new Error("write failed")),
+				}),
+			),
 		).rejects.toThrow("write failed");
 
-		openEditorProjectSession("project");
 		await expect(
 			runInRegistry(registry, closeEditorProjectSessionFx("project")),
 		).resolves.toBeUndefined();
-	});
-
-	it("resumes canonical admission after native close fails", async () => {
-		const registry = createRegistry();
-		openEditorProjectSession("project");
-		reportEditorProjectSessionFailure("project", new Error("write failed"));
-		await expect(runInRegistry(registry, closeActiveEditorProjectSessionFx)).rejects.toThrow(
-			"write failed",
-		);
-
-		const admission = admitEditorProjectCanonicalMutation("project");
-		expect(admission).toBeDefined();
-		admission?.();
 	});
 
 	it("rejects close while an in-memory item is dirty and allows it after save", async () => {

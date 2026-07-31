@@ -6,7 +6,6 @@ import {
 	beginEditorProjectCanonicalClose,
 	openEditorProjectSession as openSessionState,
 	readActiveEditorProjectId,
-	readEditorProjectSessionFailure,
 	releaseEditorProjectSession as releaseSessionState,
 	resumeEditorProjectSession as resumeSessionState,
 } from "~/bridge/editor/EditorProjectSessionState";
@@ -15,7 +14,7 @@ export const openEditorProjectSession = (projectId: string) => {
 	openSessionState(projectId);
 };
 
-/** Reopens admission after a failed close without forgetting the failure being retried. */
+/** Reopens admission after a failed close. */
 export const resumeEditorProjectSession = (projectId: string) => {
 	resumeSessionState(projectId);
 };
@@ -31,8 +30,6 @@ export const closeEditorProjectSessionFx = Effect.fn("closeEditorProjectSessionF
 					new Error("Save or discard the current form before closing the editor."),
 				);
 			}
-			const failure = readEditorProjectSessionFailure(projectId);
-			if (failure !== undefined) return yield* Effect.fail(failure);
 		}),
 );
 

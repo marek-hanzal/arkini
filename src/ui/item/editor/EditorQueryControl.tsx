@@ -1,5 +1,5 @@
-import type { EditorQuery } from "~/bridge/editor/EditorItemModel";
-import { createEditorQueryDraft } from "~/bridge/editor/createEditorItemDraft";
+import type { EditorQuery } from "~/bridge/item/editor/EditorItemModel";
+import { createEditorQueryDraft } from "~/bridge/item/editor/createEditorItemDraft";
 import { EditorChoiceControl } from "~/ui/form/EditorValueControls";
 import { EditorSelectorControl } from "~/ui/item/editor/EditorSelectorControl";
 

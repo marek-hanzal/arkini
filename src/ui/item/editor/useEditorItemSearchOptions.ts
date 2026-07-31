@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 
-import { createEditorItemSearchTerms } from "~/bridge/editor/createEditorItemSearchTerms";
+import { createEditorItemSearchTerms } from "~/bridge/item/editor/createEditorItemSearchTerms";
 import { useEditorProject } from "~/bridge/editor/useEditorProject";
 import type { EditorSearchOption } from "~/ui/form/EditorSearchCombobox";
 

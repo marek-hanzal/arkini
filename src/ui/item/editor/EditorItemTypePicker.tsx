@@ -2,7 +2,7 @@ import { createId } from "@paralleldrive/cuid2";
 import { useMemo } from "react";
 
 import { useEditorProject } from "~/bridge/editor/useEditorProject";
-import { EditorItemTypes, type EditorItemType } from "~/bridge/editor/EditorItemModel";
+import { EditorItemTypes, type EditorItemType } from "~/bridge/item/editor/EditorItemModel";
 import { ButtonLink } from "~/ui/button/Button";
 
 const itemTypePresentation = {

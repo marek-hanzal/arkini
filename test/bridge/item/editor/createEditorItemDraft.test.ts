@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 
-import { EditorItemTypes, validateEditorItem } from "~/bridge/editor/EditorItemModel";
+import { EditorItemTypes, validateEditorItem } from "~/bridge/item/editor/EditorItemModel";
 import type { EditorProject } from "~/bridge/editor/EditorProject";
-import { createEditorItemDraft } from "~/bridge/editor/createEditorItemDraft";
+import { createEditorItemDraft } from "~/bridge/item/editor/createEditorItemDraft";
 import { editorTestConfig, editorTestPayload } from "~test/editor/support/editorTestPayload";
 
 const project: EditorProject = {

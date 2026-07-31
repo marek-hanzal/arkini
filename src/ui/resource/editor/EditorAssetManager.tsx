@@ -1,7 +1,7 @@
 import { useAtomSet, useAtomValue } from "@effect/atom-react";
 import { useRef } from "react";
 
-import { saveEditorAssetCommandAtom } from "~/bridge/editor/saveEditorAssetCommandAtom";
+import { saveEditorAssetCommandAtom } from "~/bridge/resource/editor/saveEditorAssetCommandAtom";
 import { useEditorProject } from "~/bridge/editor/useEditorProject";
 import { Button } from "~/ui/button/Button";
 import { readSettledAsyncResultError } from "~/ui/reactivity/readSettledAsyncResultError";

@@ -1,7 +1,7 @@
 import { match } from "ts-pattern";
 
-import type { EditorInput, EditorLine } from "~/bridge/editor/EditorItemModel";
-import { createEditorInputDraft } from "~/bridge/editor/createEditorItemDraft";
+import type { EditorInput, EditorLine } from "~/bridge/item/editor/EditorItemModel";
+import { createEditorInputDraft } from "~/bridge/item/editor/createEditorItemDraft";
 import { Button } from "~/ui/button/Button";
 import { EditorChoiceControl, EditorNumberControl } from "~/ui/form/EditorValueControls";
 import { EditorQuantityControl } from "~/ui/item/editor/EditorQuantityControl";

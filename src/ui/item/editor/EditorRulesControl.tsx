@@ -1,10 +1,10 @@
 import { match } from "ts-pattern";
 
-import type { EditorDropRule, EditorLineRule, EditorWhen } from "~/bridge/editor/EditorItemModel";
+import type { EditorDropRule, EditorLineRule, EditorWhen } from "~/bridge/item/editor/EditorItemModel";
 import {
 	createEditorLineRuleDraft,
 	createEditorWhenDraft,
-} from "~/bridge/editor/createEditorItemDraft";
+} from "~/bridge/item/editor/createEditorItemDraft";
 import { Button } from "~/ui/button/Button";
 import { EditorChoiceControl, EditorNumberControl } from "~/ui/form/EditorValueControls";
 import { EditorQueryControl } from "~/ui/item/editor/EditorQueryControl";

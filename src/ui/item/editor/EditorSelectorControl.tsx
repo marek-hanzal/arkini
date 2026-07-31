@@ -1,6 +1,6 @@
 import { match } from "ts-pattern";
 
-import type { EditorSelector } from "~/bridge/editor/EditorItemModel";
+import type { EditorSelector } from "~/bridge/item/editor/EditorItemModel";
 import { EditorChoiceControl, EditorTextControl } from "~/ui/form/EditorValueControls";
 import { EditorItemReferenceControl } from "~/ui/item/editor/EditorItemReferenceControl";
 

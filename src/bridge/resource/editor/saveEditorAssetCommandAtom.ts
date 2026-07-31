@@ -1,7 +1,7 @@
 import * as Atom from "effect/unstable/reactivity/Atom";
 
-import type { saveEditorAssetMutation } from "~/bridge/editor/saveEditorAssetMutation";
-import { saveEditorAssetMutationFx } from "~/bridge/editor/saveEditorAssetMutation";
+import type { saveEditorAssetMutation } from "~/bridge/resource/editor/saveEditorAssetMutation";
+import { saveEditorAssetMutationFx } from "~/bridge/resource/editor/saveEditorAssetMutation";
 
 /** Owns the mounted asset-library write command and its exact Effect result state. */
 export const saveEditorAssetCommandAtom = Atom.fn(

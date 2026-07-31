@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 
 import type { EditorProject } from "~/bridge/editor/EditorProject";
-import { createEditorItemSearchTerms } from "~/bridge/editor/createEditorItemSearchTerms";
+import { createEditorItemSearchTerms } from "~/bridge/item/editor/createEditorItemSearchTerms";
 import { useEditorProject } from "~/bridge/editor/useEditorProject";
 import { ButtonLink, PrimaryButtonLink } from "~/ui/button/Button";
 import { EditorItemThumbnail } from "~/ui/item/editor/EditorItemThumbnail";

@@ -1,8 +1,8 @@
 import { useNavigate } from "@tanstack/react-router";
 import { useMemo } from "react";
 
-import type { EditorItemType } from "~/bridge/editor/EditorItemModel";
-import { createEditorItemDraft } from "~/bridge/editor/createEditorItemDraft";
+import type { EditorItemType } from "~/bridge/item/editor/EditorItemModel";
+import { createEditorItemDraft } from "~/bridge/item/editor/createEditorItemDraft";
 import { useEditorProject } from "~/bridge/editor/useEditorProject";
 import { ButtonLink } from "~/ui/button/Button";
 import { EditorItemForm } from "~/ui/item/editor/EditorItemForm";

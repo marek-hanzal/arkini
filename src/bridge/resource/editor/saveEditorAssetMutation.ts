@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 
 import { runEditorProjectMutationFx } from "~/bridge/editor/EditorProjectMutationLane";
-import { saveEditorAssetFx } from "~/bridge/editor/saveEditorAssetFx";
+import { saveEditorAssetFx } from "~/bridge/resource/editor/saveEditorAssetFx";
 
 export namespace saveEditorAssetMutation {
 	export interface Variables {

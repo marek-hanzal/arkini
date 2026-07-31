@@ -4,7 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { EditorProjectRecord } from "../../../electron/contract/editor/EditorProjectRecord";
 import { createEditorProjectManifestFileFx } from "~/bridge/editor/createEditorProjectManifestFileFx";
 import type { EditorWorkspace } from "~/bridge/editor/EditorWorkspace";
-import { saveEditorAssetFx } from "~/bridge/editor/saveEditorAssetFx";
+import { saveEditorAssetFx } from "~/bridge/resource/editor/saveEditorAssetFx";
 import { createEditorProjectPlanFx } from "~/engine/editor/fx/createEditorProjectPlanFx";
 import { editorTestPayload } from "~test/editor/support/editorTestPayload";
 

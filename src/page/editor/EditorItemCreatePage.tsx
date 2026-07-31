@@ -1,4 +1,4 @@
-import type { EditorItemType } from "~/bridge/editor/EditorItemModel";
+import type { EditorItemType } from "~/bridge/item/editor/EditorItemModel";
 import { EditorCreateItemForm } from "~/ui/item/editor/EditorCreateItemForm";
 
 export const EditorItemCreatePage = ({

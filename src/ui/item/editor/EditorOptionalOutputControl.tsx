@@ -1,5 +1,5 @@
-import type { EditorOutput } from "~/bridge/editor/EditorItemModel";
-import { createEditorOutputDraft } from "~/bridge/editor/createEditorItemDraft";
+import type { EditorOutput } from "~/bridge/item/editor/EditorItemModel";
+import { createEditorOutputDraft } from "~/bridge/item/editor/createEditorItemDraft";
 import { Button } from "~/ui/button/Button";
 import { EditorOutputControl } from "~/ui/item/editor/EditorOutputControl";
 

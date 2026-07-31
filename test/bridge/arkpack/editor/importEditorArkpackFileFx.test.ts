@@ -3,7 +3,7 @@ import { Effect } from "effect";
 import { describe, expect, it, vi } from "vitest";
 
 import type { EditorWorkspace } from "~/bridge/editor/EditorWorkspace";
-import { importEditorArkpackFileFx } from "~/bridge/editor/importEditorArkpackFileFx";
+import { importEditorArkpackFileFx } from "~/bridge/arkpack/editor/importEditorArkpackFileFx";
 import { encodeFx } from "~/engine/pack/fx/encodeFx";
 import { editorTestPayload } from "~test/editor/support/editorTestPayload";
 

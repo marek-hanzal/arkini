@@ -1,5 +1,5 @@
-import type { EditorMerge } from "~/bridge/editor/EditorItemModel";
-import { createEditorMergeDraft } from "~/bridge/editor/createEditorItemDraft";
+import type { EditorMerge } from "~/bridge/item/editor/EditorItemModel";
+import { createEditorMergeDraft } from "~/bridge/item/editor/createEditorItemDraft";
 import { Button } from "~/ui/button/Button";
 import { EditorChoiceControl } from "~/ui/form/EditorValueControls";
 import { EditorFormSection } from "~/ui/form/EditorFormSection";

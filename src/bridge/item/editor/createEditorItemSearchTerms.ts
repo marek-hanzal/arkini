@@ -1,4 +1,4 @@
-import type { EditorItem } from "~/bridge/editor/EditorItemModel";
+import type { EditorItem } from "~/bridge/item/editor/EditorItemModel";
 
 /** Keeps every Fuse-backed editor item picker on the same searchable corpus. */
 export const createEditorItemSearchTerms = (item: EditorItem, sourceId = item.id) => [

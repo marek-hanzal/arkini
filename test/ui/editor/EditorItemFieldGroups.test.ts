@@ -15,7 +15,7 @@ vi.mock("~/ui/item/editor/EditorSelectorControl", () => ({
 }));
 
 import { useAppForm } from "~/ui/form/EditorForm";
-import type { EditorLine, EditorMerge } from "~/bridge/editor/EditorItemModel";
+import type { EditorLine, EditorMerge } from "~/bridge/item/editor/EditorItemModel";
 import { EditorItemArtworkFields } from "~/ui/item/editor/EditorItemArtworkFields";
 import { EditorMergeFields } from "~/ui/item/editor/EditorMergeFields";
 import { EditorProductionFields } from "~/ui/item/editor/EditorProductionFields";

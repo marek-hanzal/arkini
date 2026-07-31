@@ -12,7 +12,7 @@ import type {
 	EditorRoll,
 	EditorSelector,
 	EditorWhen,
-} from "~/bridge/editor/EditorItemModel";
+} from "~/bridge/item/editor/EditorItemModel";
 import type { ItemEnumSchema } from "~/engine/item/schema/ItemEnumSchema";
 import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import type { LineSchema } from "~/engine/line/schema/LineSchema";

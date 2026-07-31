@@ -5,7 +5,7 @@ import type { EditorProjectFile } from "../../../electron/contract/editor/Editor
 import type { EditorProjectRecord } from "../../../electron/contract/editor/EditorProjectRecord";
 import { createEditorProjectManifestFileFx } from "~/bridge/editor/createEditorProjectManifestFileFx";
 import type { EditorWorkspace } from "~/bridge/editor/EditorWorkspace";
-import { saveEditorItemFx } from "~/bridge/editor/saveEditorItemFx";
+import { saveEditorItemFx } from "~/bridge/item/editor/saveEditorItemFx";
 import { createEditorProjectPlanFx } from "~/engine/editor/fx/createEditorProjectPlanFx";
 import { GameSourceSchema } from "~/engine/schema/GameSourceSchema";
 import { editorTestConfig, editorTestPayload } from "~test/editor/support/editorTestPayload";

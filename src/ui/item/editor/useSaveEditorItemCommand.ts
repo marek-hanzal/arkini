@@ -1,8 +1,8 @@
 import { useAtomSet, useAtomValue } from "@effect/atom-react";
 import { useCallback, useMemo, useState } from "react";
 
-import type { EditorItem } from "~/bridge/editor/EditorItemModel";
-import { createSaveEditorItemCommandAtom } from "~/bridge/editor/createSaveEditorItemCommandAtom";
+import type { EditorItem } from "~/bridge/item/editor/EditorItemModel";
+import { createSaveEditorItemCommandAtom } from "~/bridge/item/editor/createSaveEditorItemCommandAtom";
 import { readSettledAsyncResultError } from "~/ui/reactivity/readSettledAsyncResultError";
 
 /** Owns one mounted item-form save command without duplicating pending or failure state. */

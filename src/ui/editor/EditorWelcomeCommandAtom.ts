@@ -3,7 +3,7 @@ import * as Atom from "effect/unstable/reactivity/Atom";
 import { match } from "ts-pattern";
 
 import type { EditorProjectDescriptor } from "~/bridge/editor/EditorProjectDescriptor";
-import { importEditorArkpackFileAtom } from "~/bridge/editor/importEditorArkpackFileAtom";
+import { importEditorArkpackFileAtom } from "~/bridge/arkpack/editor/importEditorArkpackFileAtom";
 import { openEditorDirectoryAtom } from "~/bridge/editor/openEditorDirectoryAtom";
 import { readExactCauseFailure } from "~/bridge/game/readExactCauseFailure";
 

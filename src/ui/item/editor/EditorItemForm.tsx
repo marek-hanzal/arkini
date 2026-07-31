@@ -9,7 +9,7 @@ import {
 	type ReactNode,
 } from "react";
 
-import type { EditorItem } from "~/bridge/editor/EditorItemModel";
+import type { EditorItem } from "~/bridge/item/editor/EditorItemModel";
 import { EditorProjectFormDirtyAtom } from "~/bridge/editor/EditorProjectFormDirtyAtom";
 import { useEditorProject } from "~/bridge/editor/useEditorProject";
 import { createEditorItemFormValues } from "~/engine/item/editor/createEditorItemFormValues";

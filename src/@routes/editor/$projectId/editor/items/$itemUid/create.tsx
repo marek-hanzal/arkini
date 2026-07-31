@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-import { parseEditorItemType } from "~/bridge/editor/EditorItemModel";
+import { parseEditorItemType } from "~/bridge/item/editor/EditorItemModel";
 import { EditorItemCreatePage } from "~/page/editor/EditorItemCreatePage";
 
 export const Route = createFileRoute(

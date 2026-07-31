@@ -1,6 +1,6 @@
 import { match } from "ts-pattern";
 
-import type { EditorQuantity } from "~/bridge/editor/EditorItemModel";
+import type { EditorQuantity } from "~/bridge/item/editor/EditorItemModel";
 import { EditorChoiceControl, EditorNumberControl } from "~/ui/form/EditorValueControls";
 
 export interface EditorQuantityControlProps {

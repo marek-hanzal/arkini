@@ -1,8 +1,8 @@
 import { Effect } from "effect";
 
-import type { EditorItem } from "~/bridge/editor/EditorItemModel";
+import type { EditorItem } from "~/bridge/item/editor/EditorItemModel";
 import { runEditorProjectMutationFx } from "~/bridge/editor/EditorProjectMutationLane";
-import { saveEditorItemFx } from "~/bridge/editor/saveEditorItemFx";
+import { saveEditorItemFx } from "~/bridge/item/editor/saveEditorItemFx";
 
 export namespace saveEditorItemMutation {
 	export interface Variables {

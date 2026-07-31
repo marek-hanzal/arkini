@@ -1,4 +1,4 @@
-import type { EditorItem } from "~/bridge/editor/EditorItemModel";
+import type { EditorItem } from "~/bridge/item/editor/EditorItemModel";
 import { Button } from "~/ui/button/Button";
 import { withFieldGroup } from "~/ui/form/EditorForm";
 

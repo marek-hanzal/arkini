@@ -5,11 +5,11 @@ import type {
 	EditorOutput,
 	EditorRoll,
 	EditorRollSet,
-} from "~/bridge/editor/EditorItemModel";
+} from "~/bridge/item/editor/EditorItemModel";
 import {
 	createEditorDropDraft,
 	createEditorRollDraft,
-} from "~/bridge/editor/createEditorItemDraft";
+} from "~/bridge/item/editor/createEditorItemDraft";
 import { Button } from "~/ui/button/Button";
 import { EditorChoiceControl, EditorNumberControl } from "~/ui/form/EditorValueControls";
 import { EditorItemReferenceControl } from "~/ui/item/editor/EditorItemReferenceControl";

@@ -64,6 +64,7 @@ const config = GameConfigSchema.parse({
 	categories: {},
 	items: {
 		producer: {
+			uid: "producer",
 			id: "producer",
 			type: "producer",
 			title: "Producer",
@@ -109,6 +110,7 @@ const createStackConfig = ({ boardWidth }: { readonly boardWidth: number }) =>
 		categories: {},
 		items: {
 			producer: {
+				uid: "producer",
 				id: "producer",
 				type: "producer",
 				title: "Producer",
@@ -128,6 +130,7 @@ const createStackConfig = ({ boardWidth }: { readonly boardWidth: number }) =>
 				],
 			},
 			blocker: {
+				uid: "blocker",
 				id: "blocker",
 				type: "simple",
 				title: "Blocker",

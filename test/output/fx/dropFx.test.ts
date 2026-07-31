@@ -30,6 +30,7 @@ const config = GameConfigSchema.parse({
 	categories: {},
 	items: {
 		source: {
+			uid: "source",
 			id: "source",
 			title: "Source",
 			description: "A drop origin.",

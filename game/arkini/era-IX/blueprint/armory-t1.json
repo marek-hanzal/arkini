@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:blueprint-armory-t1": {
+			"uid": "wid2a4shqrxhxpmthyp235fo",
 			"id": "item:blueprint-armory-t1",
 			"type": "blueprint",
 			"title": "Armory I Blueprint",

@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import { TemporaryItemSchema } from "~/engine/item/schema/TemporaryItemSchema";
 
 const item = {
+	uid: "item:effect:minor-haste",
 	id: "item:effect:minor-haste",
 	type: "temporary",
 	title: "Minor Haste",

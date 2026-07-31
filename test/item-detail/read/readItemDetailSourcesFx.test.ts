@@ -15,6 +15,7 @@ vi.mock("~/engine/item-detail/read/readItemDetailLinesFx", () => ({
 }));
 
 const item = (id: string) => ({
+	uid: id,
 	id,
 	type: "simple" as const,
 	title: id,

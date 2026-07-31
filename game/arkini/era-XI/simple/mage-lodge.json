@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"producer:mage-lodge": {
+			"uid": "kyqpu2kd0tpyw8gj9bqfq6zx",
 			"id": "producer:mage-lodge",
 			"type": "simple",
 			"title": "Mage Lodge",

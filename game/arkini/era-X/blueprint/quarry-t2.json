@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:blueprint-quarry-t2": {
+			"uid": "czpd8igowswg2cs5eimyx28r",
 			"id": "item:blueprint-quarry-t2",
 			"type": "blueprint",
 			"title": "Quarry Blueprint",

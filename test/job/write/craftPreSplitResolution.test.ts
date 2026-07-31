@@ -31,6 +31,7 @@ const config = GameConfigSchema.parse({
 	categories: {},
 	items: {
 		craft: {
+			uid: "craft",
 			id: "craft",
 			title: "Craft",
 			description: "A stackable craft.",

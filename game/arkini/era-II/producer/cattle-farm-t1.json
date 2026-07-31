@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"producer:cattle-farm-t1": {
+			"uid": "o36dhfzntwgwad4wxogz8w8h",
 			"id": "producer:cattle-farm-t1",
 			"type": "producer",
 			"title": "Cattle Farm I",

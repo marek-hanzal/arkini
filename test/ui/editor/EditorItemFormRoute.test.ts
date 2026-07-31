@@ -62,6 +62,7 @@ afterEach(async () => {
 describe("EditorItemFormRoute", () => {
 	it("resolves a staged item explicitly without publishing it as canonical project config", async () => {
 		const item = {
+			uid: "item:new",
 			id: "item:new",
 			type: "simple",
 			title: "Staged item",

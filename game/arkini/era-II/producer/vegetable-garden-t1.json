@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"producer:vegetable-garden-t1": {
+			"uid": "x0gaosb8xxm4nupoh6hjqs2l",
 			"id": "producer:vegetable-garden-t1",
 			"type": "producer",
 			"title": "Vegetable Garden I",

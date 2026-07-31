@@ -440,6 +440,7 @@ describe("readItemDetailLinesFx", () => {
 				...lineRunTestConfig.items,
 				pump: {
 					...lineRunTestConfig.items.workshop,
+					uid: "pump",
 					id: "pump",
 					title: "Pump",
 					description: "Produces water.",
@@ -1114,6 +1115,7 @@ describe("readItemDetailLinesFx", () => {
 			categories: {},
 			items: {
 				workshop: {
+					uid: "workshop",
 					id: "workshop",
 					type: "producer",
 					title: "Workshop",
@@ -1190,6 +1192,7 @@ describe("readItemDetailLinesFx", () => {
 					],
 				},
 				wood: {
+					uid: "wood",
 					id: "wood",
 					type: "simple",
 					title: "Wood",
@@ -1205,6 +1208,7 @@ describe("readItemDetailLinesFx", () => {
 					maxStackSize: 10,
 				},
 				gem: {
+					uid: "gem",
 					id: "gem",
 					type: "simple",
 					title: "Gem",

@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"producer:library-t2": {
+			"uid": "pqfylq3f2kvfchgwi2wmv3kx",
 			"id": "producer:library-t2",
 			"type": "producer",
 			"title": "Library II",

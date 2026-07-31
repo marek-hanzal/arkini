@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:blueprint-roof-tile-factory": {
+			"uid": "w3l430usiz2d331n1yfum0su",
 			"id": "item:blueprint-roof-tile-factory",
 			"type": "blueprint",
 			"title": "Roof Tile Factory Blueprint",

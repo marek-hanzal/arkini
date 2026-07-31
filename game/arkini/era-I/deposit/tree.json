@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:tree": {
+			"uid": "b4o95tfii7qk0tv2ht2roxbb",
 			"id": "item:tree",
 			"type": "deposit",
 			"title": "Tree",

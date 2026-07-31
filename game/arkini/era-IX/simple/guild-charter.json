@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:guild-charter": {
+			"uid": "k014dcemj0k36t5fy5sk1u6d",
 			"id": "item:guild-charter",
 			"type": "simple",
 			"title": "Guild Charter",

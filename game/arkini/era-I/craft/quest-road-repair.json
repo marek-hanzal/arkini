@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:quest:road-repair": {
+			"uid": "lta0s6g1gnv8gq63oscoc54l",
 			"id": "item:quest:road-repair",
 			"type": "craft",
 			"title": "Road Repair Quest",

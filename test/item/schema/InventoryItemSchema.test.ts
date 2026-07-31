@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import { InventoryItemSchema } from "~/engine/item/schema/InventoryItemSchema";
 
 const item = {
+	uid: "item:inventory",
 	id: "item:inventory",
 	type: "inventory",
 	title: "Backpack",

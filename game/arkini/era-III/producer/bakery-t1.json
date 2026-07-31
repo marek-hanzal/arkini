@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"producer:bakery-t1": {
+			"uid": "upkwcst8czsb9cblg8gv21fj",
 			"id": "producer:bakery-t1",
 			"type": "producer",
 			"title": "Bakery I",

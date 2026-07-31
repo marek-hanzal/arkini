@@ -20,6 +20,7 @@ const simpleItem = ({
 	scope?: "any" | "board" | "inventory";
 	tags?: string[];
 }) => ({
+	uid: id,
 	id,
 	title: id,
 	description: id,

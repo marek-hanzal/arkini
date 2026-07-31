@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"producer:smelter-t1": {
+			"uid": "ibbf8wejqf493tycwrur63h4",
 			"id": "producer:smelter-t1",
 			"type": "producer",
 			"title": "Smelter I",

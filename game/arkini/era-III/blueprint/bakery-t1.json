@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:blueprint-bakery-t1": {
+			"uid": "dcsi6phaq2dfkk86rdoppnyx",
 			"id": "item:blueprint-bakery-t1",
 			"type": "blueprint",
 			"title": "Bakery I Blueprint",

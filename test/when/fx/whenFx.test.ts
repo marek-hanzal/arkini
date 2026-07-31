@@ -30,6 +30,7 @@ const config = GameConfigSchema.parse({
 	categories: {},
 	items: {
 		source: {
+			uid: "source",
 			id: "source",
 			title: "Source",
 			description: "A query origin.",
@@ -45,6 +46,7 @@ const config = GameConfigSchema.parse({
 			type: "simple",
 		},
 		tree: {
+			uid: "tree",
 			id: "tree",
 			title: "Tree",
 			description: "A living tree.",

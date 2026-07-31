@@ -19,9 +19,18 @@ import { ChargeSchema } from "./ChargeSchema";
 export const BaseItemSchema = z
 	.object({
 		/**
-		 * Stable ID of this canonical game item.
+		 * Stable low-level identity of this canonical game item.
+		 *
+		 * The editor generates this CUID2 exactly once. Renaming the human-readable
+		 * `id` never changes this identity.
 		 */
-		id: IdSchema.describe("The stable ID of this canonical game item."),
+		uid: IdSchema.describe(
+			"The immutable CUID2 identity of this canonical game item.",
+		),
+		/**
+		 * Stable authoring ID of this canonical game item.
+		 */
+		id: IdSchema.describe("The stable authoring ID of this canonical game item."),
 		/**
 		 * Human-readable title of this item.
 		 */

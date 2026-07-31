@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:cracked-rock": {
+			"uid": "hd2culd66o1e08wla59xznei",
 			"id": "item:cracked-rock",
 			"type": "craft",
 			"title": "Cracked Rock",

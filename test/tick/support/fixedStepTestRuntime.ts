@@ -19,12 +19,14 @@ export const createFixedStepTestConfig = () => {
 			...base.items,
 			permit: {
 				...base.items.tool,
+				uid: "permit",
 				id: "permit",
 				title: "Permit",
 				description: "Enables the dependent producer.",
 			},
 			enabler: {
 				...forge,
+				uid: "enabler",
 				id: "enabler",
 				title: "Enabler",
 				description: "Produces the permit at the end of one step.",
@@ -67,6 +69,7 @@ export const createFixedStepTestConfig = () => {
 			},
 			dependent: {
 				...forge,
+				uid: "dependent",
 				id: "dependent",
 				title: "Dependent",
 				description: "Runs only while the permit exists.",

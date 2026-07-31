@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:hop-field": {
+			"uid": "lq6pb4ch99bdk2t8mcbd8np6",
 			"id": "item:hop-field",
 			"type": "simple",
 			"title": "Hop Field",

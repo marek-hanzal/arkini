@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"producer:glassworks": {
+			"uid": "a0qthc5k46xhjxewp4oalaez",
 			"id": "producer:glassworks",
 			"type": "producer",
 			"title": "Glassworks",

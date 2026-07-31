@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:key-t4": {
+			"uid": "dz4wttvmo0ozh381t419h7kh",
 			"id": "item:key-t4",
 			"type": "simple",
 			"title": "Key IV",

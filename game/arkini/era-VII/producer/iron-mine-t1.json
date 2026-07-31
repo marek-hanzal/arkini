@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"producer:iron-mine-t1": {
+			"uid": "pgxhiut7rka185xjnpih57yr",
 			"id": "producer:iron-mine-t1",
 			"type": "producer",
 			"title": "Iron Mine I",

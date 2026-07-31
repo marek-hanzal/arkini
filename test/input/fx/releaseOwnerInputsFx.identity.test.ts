@@ -10,6 +10,7 @@ import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import type { StateSchema } from "~/engine/state/schema/StateSchema";
 
 const baseItem = ({ id, maxStackSize = 1 }: { id: string; maxStackSize?: number }) => ({
+	uid: id,
 	id,
 	title: id,
 	description: id,

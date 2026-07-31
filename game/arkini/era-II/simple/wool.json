@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:wool": {
+			"uid": "lri9noxoiihg7xokehx4bttp",
 			"id": "item:wool",
 			"type": "simple",
 			"title": "Wool",

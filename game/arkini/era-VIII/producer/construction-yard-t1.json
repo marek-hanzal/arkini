@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"producer:construction-yard-t1": {
+			"uid": "hik4qejjk1tzi2vlspf6jnqd",
 			"id": "producer:construction-yard-t1",
 			"type": "producer",
 			"title": "Construction Yard I",

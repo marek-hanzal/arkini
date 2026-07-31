@@ -8,6 +8,7 @@ import { PlacementPlanSchema } from "~/engine/placement/schema/PlacementPlanSche
 const runtimeItem = {
 	id: "runtime:log",
 	item: {
+		uid: "log",
 		id: "log",
 		title: "Log",
 		description: "A log.",

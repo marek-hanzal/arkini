@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:gold-ingot": {
+			"uid": "qgogdz6h0ojke23ut4wdwuky",
 			"id": "item:gold-ingot",
 			"type": "simple",
 			"title": "Gold Ingot",

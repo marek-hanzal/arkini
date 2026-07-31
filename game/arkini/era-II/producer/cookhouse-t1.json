@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"producer:cookhouse-t1": {
+			"uid": "pyhgsa0cri0gkeff0yyfkyrg",
 			"id": "producer:cookhouse-t1",
 			"type": "producer",
 			"title": "Cookhouse I",

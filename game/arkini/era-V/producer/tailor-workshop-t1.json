@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"producer:tailor-workshop-t1": {
+			"uid": "tp9f5ogehey3e7n7l5my3od7",
 			"id": "producer:tailor-workshop-t1",
 			"type": "producer",
 			"title": "Tailor Workshop I",

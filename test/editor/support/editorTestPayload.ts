@@ -37,6 +37,7 @@ export const editorTestConfig = GameConfigSchema.parse({
 	},
 	items: {
 		water: {
+			uid: "water",
 			id: "water",
 			type: "simple",
 			title: "Water",

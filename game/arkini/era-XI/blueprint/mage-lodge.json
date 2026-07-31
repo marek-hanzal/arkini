@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:blueprint-mage-lodge": {
+			"uid": "ytyyx8aowxa232hkdzywrne1",
 			"id": "item:blueprint-mage-lodge",
 			"type": "blueprint",
 			"title": "Mage Lodge Blueprint",

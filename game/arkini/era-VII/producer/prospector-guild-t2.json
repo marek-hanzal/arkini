@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"producer:prospector-guild-t2": {
+			"uid": "e1nfjtp9jz80zpa7xdcd5tfx",
 			"id": "producer:prospector-guild-t2",
 			"type": "producer",
 			"title": "Prospector Guild",

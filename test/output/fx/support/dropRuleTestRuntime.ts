@@ -26,6 +26,7 @@ export const dropRuleTestConfig = GameConfigSchema.parse({
 	categories: {},
 	items: {
 		source: {
+			uid: "source",
 			id: "source",
 			title: "Source",
 			description: "A drop origin.",
@@ -41,6 +42,7 @@ export const dropRuleTestConfig = GameConfigSchema.parse({
 			type: "simple",
 		},
 		permit: {
+			uid: "permit",
 			id: "permit",
 			title: "Permit",
 			description: "An availability token.",

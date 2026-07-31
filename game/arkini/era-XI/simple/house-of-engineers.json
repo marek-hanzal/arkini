@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"producer:house-of-engineers": {
+			"uid": "syn6kezjtgcwq1zo9r9vxara",
 			"id": "producer:house-of-engineers",
 			"type": "simple",
 			"title": "House of Engineers",

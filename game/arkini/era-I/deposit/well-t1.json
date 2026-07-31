@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"producer:well-t1": {
+			"uid": "uuygn0nyyrs689pfaxqyz953",
 			"id": "producer:well-t1",
 			"type": "deposit",
 			"title": "Well I",

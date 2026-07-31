@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"producer:tavern-t1": {
+			"uid": "klvaeoxy3qsro2cawsauswz2",
 			"id": "producer:tavern-t1",
 			"type": "producer",
 			"title": "Tavern I",

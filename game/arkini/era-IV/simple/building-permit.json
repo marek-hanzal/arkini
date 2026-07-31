@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:building-permit": {
+			"uid": "unys1l4wiu35fp3k9xvmqi9r",
 			"id": "item:building-permit",
 			"type": "simple",
 			"title": "Building Permit",

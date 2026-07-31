@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"producer:tannery-t1": {
+			"uid": "wdvm404kn9ttx6s7o6vn4n1e",
 			"id": "producer:tannery-t1",
 			"type": "producer",
 			"title": "Tannery I",

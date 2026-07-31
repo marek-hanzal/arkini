@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:blueprint-dairy-t1": {
+			"uid": "m6wvpfkwbz7kf24pfp985abz",
 			"id": "item:blueprint-dairy-t1",
 			"type": "blueprint",
 			"title": "Dairy I Blueprint",

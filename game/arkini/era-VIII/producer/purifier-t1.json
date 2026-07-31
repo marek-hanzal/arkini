@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"producer:purifier-t1": {
+			"uid": "pij3k7p5envete8vtw79wdml",
 			"id": "producer:purifier-t1",
 			"type": "producer",
 			"title": "Purifier I",

@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"producer:townhall-t2": {
+			"uid": "kx7epra9l7cnju8cxgdfz7qz",
 			"id": "producer:townhall-t2",
 			"type": "producer",
 			"title": "Town Hall II",

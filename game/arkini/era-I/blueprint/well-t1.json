@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:blueprint-well-t1": {
+			"uid": "vj3rwvic2udrz2e015mau9eb",
 			"id": "item:blueprint-well-t1",
 			"type": "blueprint",
 			"title": "Well I Blueprint",

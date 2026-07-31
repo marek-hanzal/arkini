@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:blueprint-tailor-workshop-t1": {
+			"uid": "ykvmsujix9w0jjj5at3ytl7j",
 			"id": "item:blueprint-tailor-workshop-t1",
 			"type": "blueprint",
 			"title": "Tailor Workshop I Blueprint",

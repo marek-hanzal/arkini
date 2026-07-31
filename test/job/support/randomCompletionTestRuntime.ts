@@ -34,6 +34,7 @@ export const createRandomCompletionConfig = () => {
 			...base.items,
 			blocker: {
 				...base.items.tool,
+				uid: "blocker",
 				id: "blocker",
 				title: "Blocker",
 				description: "Fills completion capacity.",
@@ -41,12 +42,14 @@ export const createRandomCompletionConfig = () => {
 			},
 			outputA: {
 				...base.items.tool,
+				uid: "outputA",
 				id: "outputA",
 				title: "Output A",
 				description: "First deterministic completion alternative.",
 			},
 			outputB: {
 				...base.items.tool,
+				uid: "outputB",
 				id: "outputB",
 				title: "Output B",
 				description: "Second deterministic completion alternative.",

@@ -31,6 +31,7 @@ describe("saveEditorItemFx", () => {
 		if (source === undefined) throw new Error("Missing water source.");
 		const sibling = {
 			...editorTestConfig.items.water,
+			uid: "sibling",
 			id: "sibling",
 			title: "Sibling",
 		};

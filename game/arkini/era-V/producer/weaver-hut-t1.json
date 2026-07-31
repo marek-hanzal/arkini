@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"producer:weaver-hut-t1": {
+			"uid": "vd5rw4hgbxqmhh90mhw332rd",
 			"id": "producer:weaver-hut-t1",
 			"type": "producer",
 			"title": "Weaver Hut I",

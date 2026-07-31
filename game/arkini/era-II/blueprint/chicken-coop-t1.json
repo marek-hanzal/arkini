@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:blueprint-chicken-coop-t1": {
+			"uid": "jzungtl7l11wq5bnyq11cebx",
 			"id": "item:blueprint-chicken-coop-t1",
 			"type": "blueprint",
 			"title": "Chicken Coop I Blueprint",

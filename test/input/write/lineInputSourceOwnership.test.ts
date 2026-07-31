@@ -14,6 +14,7 @@ import { runTickRuntimeByFx } from "~/engine/tick/fx/runTickRuntimeByFx";
 
 const baseItem = (id: string) =>
 	({
+		uid: id,
 		id,
 		title: id,
 		description: id,

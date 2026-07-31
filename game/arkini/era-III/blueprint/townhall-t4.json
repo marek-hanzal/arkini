@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:blueprint-townhall-t4": {
+			"uid": "rkgh8lrkajwmipwtxy80ym7l",
 			"id": "item:blueprint-townhall-t4",
 			"type": "blueprint",
 			"title": "Town Hall IV Blueprint",

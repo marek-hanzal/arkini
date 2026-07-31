@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:aquamarine": {
+			"uid": "qf9j29gbir1cp925t2yzcw48",
 			"id": "item:aquamarine",
 			"type": "simple",
 			"title": "Aquamarine",

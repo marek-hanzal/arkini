@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:blueprint-house-t4": {
+			"uid": "jwmoynir8nhhdfr98400p1qc",
 			"id": "item:blueprint-house-t4",
 			"type": "blueprint",
 			"title": "House IV Blueprint",

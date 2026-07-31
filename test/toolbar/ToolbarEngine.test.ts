@@ -47,6 +47,7 @@ const configInput = {
 	categories: {},
 	items: {
 		water: {
+			uid: "water",
 			id: "water",
 			type: "simple",
 			title: "Water",
@@ -62,6 +63,7 @@ const configInput = {
 			maxStackSize: 10,
 		},
 		stone: {
+			uid: "stone",
 			id: "stone",
 			type: "simple",
 			title: "Stone",
@@ -77,6 +79,7 @@ const configInput = {
 			maxStackSize: 10,
 		},
 		boardOnly: {
+			uid: "boardOnly",
 			id: "boardOnly",
 			type: "simple",
 			title: "Board only",
@@ -92,6 +95,7 @@ const configInput = {
 			maxStackSize: 1,
 		},
 		inventoryOnly: {
+			uid: "inventoryOnly",
 			id: "inventoryOnly",
 			type: "simple",
 			title: "Inventory only",
@@ -107,6 +111,7 @@ const configInput = {
 			maxStackSize: 1,
 		},
 		backpack: {
+			uid: "backpack",
 			id: "backpack",
 			type: "inventory",
 			title: "Backpack",

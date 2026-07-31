@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:master-knowledge": {
+			"uid": "k2ektomsyls4a54fri8zyrg1",
 			"id": "item:master-knowledge",
 			"type": "simple",
 			"title": "Master Knowledge",

@@ -36,6 +36,7 @@ const output = {
 };
 
 const base = (id: string) => ({
+	uid: id,
 	id,
 	title: id,
 	description: id,

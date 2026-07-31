@@ -30,6 +30,7 @@ const config = GameConfigSchema.parse({
 	categories: {},
 	items: {
 		material: {
+			uid: "material",
 			id: "material",
 			type: "simple",
 			title: "Material",
@@ -46,6 +47,7 @@ const config = GameConfigSchema.parse({
 			maxStackSize: 10,
 		},
 		craft: {
+			uid: "craft",
 			id: "craft",
 			type: "craft",
 			title: "Craft",
@@ -90,6 +92,7 @@ const config = GameConfigSchema.parse({
 			},
 		},
 		blueprint: {
+			uid: "blueprint",
 			id: "blueprint",
 			type: "blueprint",
 			title: "Blueprint",

@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"producer:goldsmith-t1": {
+			"uid": "ztp04jc0azlpe0o11019d25y",
 			"id": "producer:goldsmith-t1",
 			"type": "producer",
 			"title": "Goldsmith I",

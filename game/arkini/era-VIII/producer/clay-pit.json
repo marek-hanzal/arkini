@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"producer:clay-pit": {
+			"uid": "h81o2faokhesse9gdcjeoazv",
 			"id": "producer:clay-pit",
 			"type": "producer",
 			"title": "Clay Pit",

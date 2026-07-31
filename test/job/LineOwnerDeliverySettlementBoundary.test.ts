@@ -18,6 +18,7 @@ const ownerKinds = [
 ] as const;
 
 const baseItem = (id: string) => ({
+	uid: id,
 	id,
 	title: id,
 	description: id,

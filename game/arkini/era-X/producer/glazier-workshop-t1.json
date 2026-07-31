@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"producer:glazier-workshop-t1": {
+			"uid": "c53wmdoovpgq6kl1jc176x5a",
 			"id": "producer:glazier-workshop-t1",
 			"type": "producer",
 			"title": "Glazier Workshop I",

@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:blueprint-university": {
+			"uid": "zg9t3ysr63bcyzzor7kccb4g",
 			"id": "item:blueprint-university",
 			"type": "blueprint",
 			"title": "University Blueprint",

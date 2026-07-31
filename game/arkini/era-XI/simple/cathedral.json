@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"producer:cathedral": {
+			"uid": "d8b2sxnl9sqvlckmiqzlb7c0",
 			"id": "producer:cathedral",
 			"type": "simple",
 			"title": "Cathedral",

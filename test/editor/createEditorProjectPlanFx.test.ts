@@ -103,10 +103,12 @@ describe("createEditorProjectPlanFx", () => {
 				items: {
 					"item:water": {
 						...editorTestPayload.config.items.water,
+						uid: "item-water",
 						id: "item:water",
 					},
 					"item:water?": {
 						...editorTestPayload.config.items.water,
+						uid: "item-water-question",
 						id: "item:water?",
 					},
 				},
@@ -189,6 +191,7 @@ describe("createEditorProjectPlanFx", () => {
 				items: {
 					Water: {
 						...editorTestPayload.config.items.water,
+						uid: "water-upper",
 						id: "Water",
 					},
 					water: editorTestPayload.config.items.water,

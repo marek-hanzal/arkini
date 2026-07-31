@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:blueprint-waste-processor-t1": {
+			"uid": "oap2pi7i6zb5eywu0sgepjs3",
 			"id": "item:blueprint-waste-processor-t1",
 			"type": "blueprint",
 			"title": "Waste Processor I Blueprint",

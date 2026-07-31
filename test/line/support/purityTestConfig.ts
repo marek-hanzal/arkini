@@ -1,6 +1,7 @@
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 
 const baseItem = ({ id, maxStackSize = 10 }: { id: string; maxStackSize?: number }) => ({
+	uid: id,
 	id,
 	title: id,
 	description: id,

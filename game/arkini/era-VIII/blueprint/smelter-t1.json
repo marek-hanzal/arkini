@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:blueprint-smelter-t1": {
+			"uid": "y6xd4pcgcvd9gk9f6o8a6krf",
 			"id": "item:blueprint-smelter-t1",
 			"type": "blueprint",
 			"title": "Smelter I Blueprint",

@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:blueprint-brickyard": {
+			"uid": "xwhf24cdj4ky5i7mxr3o2ugn",
 			"id": "item:blueprint-brickyard",
 			"type": "blueprint",
 			"title": "Brickyard Blueprint",

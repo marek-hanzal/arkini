@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:blueprint-market-t2": {
+			"uid": "ee9b089wuzwi3guo03wlzpy4",
 			"id": "item:blueprint-market-t2",
 			"type": "blueprint",
 			"title": "Market II Blueprint",

@@ -203,10 +203,12 @@ export const createEditorLineDraft = (
 export const createEditorItemDraft = (
 	type: ItemEnumSchema.Type,
 	project: EditorProject,
+	uid: string,
 ): ItemSchema.Type => {
 	const itemId = type === "producer" ? "producer:new-item" : "item:new-item";
 	const resourceId = project.resources[0]?.id ?? "missing-asset";
 	const base = {
+		uid,
 		id: itemId,
 		title: "",
 		description: "",

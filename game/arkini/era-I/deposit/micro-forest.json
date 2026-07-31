@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:micro-forest": {
+			"uid": "n68j71cgmi7e8zppoxet85r2",
 			"id": "item:micro-forest",
 			"type": "deposit",
 			"title": "Micro-Forest",

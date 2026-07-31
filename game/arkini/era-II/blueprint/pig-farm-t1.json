@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:blueprint-pig-farm-t1": {
+			"uid": "o8tlrl7cf6d2frk9qj4ziqt5",
 			"id": "item:blueprint-pig-farm-t1",
 			"type": "blueprint",
 			"title": "Pig Farm I Blueprint",

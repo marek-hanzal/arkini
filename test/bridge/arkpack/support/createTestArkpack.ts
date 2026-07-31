@@ -40,6 +40,7 @@ export const testArkpackConfig = GameConfigSchema.parse({
 	},
 	items: {
 		water: {
+			uid: "water",
 			id: "water",
 			type: "simple",
 			title: "Water",

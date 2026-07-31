@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:blueprint-prospector-guild-t2": {
+			"uid": "pjuyrwhxj8cm8lew1gmag1sk",
 			"id": "item:blueprint-prospector-guild-t2",
 			"type": "blueprint",
 			"title": "Prospector Guild Blueprint",

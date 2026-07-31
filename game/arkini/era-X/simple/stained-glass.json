@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:stained-glass": {
+			"uid": "y288d43q1216dcnjgqielbqg",
 			"id": "item:stained-glass",
 			"type": "simple",
 			"title": "Stained Glass",

@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:blueprint-heroes-guild-t1": {
+			"uid": "jjrsj31xvo6tq4tvbye0xbf7",
 			"id": "item:blueprint-heroes-guild-t1",
 			"type": "blueprint",
 			"title": "Heroes Guild I Blueprint",

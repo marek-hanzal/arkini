@@ -24,6 +24,7 @@ export const lineTestConfig = GameConfigSchema.parse({
 	categories: {},
 	items: {
 		source: {
+			uid: "source",
 			id: "source",
 			title: "Source",
 			description: "A line origin.",
@@ -39,6 +40,7 @@ export const lineTestConfig = GameConfigSchema.parse({
 			type: "simple",
 		},
 		permit: {
+			uid: "permit",
 			id: "permit",
 			title: "Permit",
 			description: "Allows a product line.",
@@ -54,6 +56,7 @@ export const lineTestConfig = GameConfigSchema.parse({
 			type: "simple",
 		},
 		booster: {
+			uid: "booster",
 			id: "booster",
 			title: "Booster",
 			description: "Changes a product-line runtime.",
@@ -69,6 +72,7 @@ export const lineTestConfig = GameConfigSchema.parse({
 			type: "simple",
 		},
 		blocker: {
+			uid: "blocker",
 			id: "blocker",
 			title: "Blocker",
 			description: "Disables and hides a product line.",

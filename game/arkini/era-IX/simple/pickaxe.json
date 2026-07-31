@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:pickaxe": {
+			"uid": "ori9p6dhr8pg85grl2yfpsyj",
 			"id": "item:pickaxe",
 			"type": "simple",
 			"title": "Pickaxe",

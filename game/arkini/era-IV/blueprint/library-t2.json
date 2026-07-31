@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:blueprint-library-t2": {
+			"uid": "o0iknkx3wtdm67zv7iy62r9e",
 			"id": "item:blueprint-library-t2",
 			"type": "blueprint",
 			"title": "Library II Blueprint",

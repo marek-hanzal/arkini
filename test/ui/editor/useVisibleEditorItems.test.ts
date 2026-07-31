@@ -28,6 +28,7 @@ vi.mock("~/bridge/editor/useEditorProjectDraft", () => ({
 const roots: Array<ReturnType<typeof createRoot>> = [];
 
 const createItem = (id: string, title: string) => ({
+	uid: id,
 	id,
 	type: "simple" as const,
 	title,

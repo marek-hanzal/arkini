@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"producer:windmill-t1": {
+			"uid": "fna5bzx5xnyuwaf3qtjg5vid",
 			"id": "producer:windmill-t1",
 			"type": "producer",
 			"title": "Windmill I",

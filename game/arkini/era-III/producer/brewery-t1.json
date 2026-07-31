@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"producer:brewery-t1": {
+			"uid": "qbr34mxtrlf9giol6bloctwj",
 			"id": "producer:brewery-t1",
 			"type": "producer",
 			"title": "Brewery I",

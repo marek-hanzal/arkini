@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:gold-deposit": {
+			"uid": "sfth3rrohi761qtxczw0nx5r",
 			"id": "item:gold-deposit",
 			"type": "simple",
 			"title": "Gold Deposit",

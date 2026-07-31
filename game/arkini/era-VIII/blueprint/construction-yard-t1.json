@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:blueprint-construction-yard-t1": {
+			"uid": "zvn41mcupjxb15re6517ytvx",
 			"id": "item:blueprint-construction-yard-t1",
 			"type": "blueprint",
 			"title": "Construction Yard I Blueprint",

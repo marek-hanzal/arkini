@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:blueprint-cattle-farm-t1": {
+			"uid": "iwkbfn7iy49mw68aftkgblyd",
 			"id": "item:blueprint-cattle-farm-t1",
 			"type": "blueprint",
 			"title": "Cattle Farm I Blueprint",

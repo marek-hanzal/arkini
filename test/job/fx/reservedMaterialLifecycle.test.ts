@@ -12,6 +12,7 @@ import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { runTickRuntimeByFx } from "~/engine/tick/fx/runTickRuntimeByFx";
 
 const base = (id: string, scope: "any" | "board" = "board") => ({
+	uid: id,
 	id,
 	title: id,
 	description: id,

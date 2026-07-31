@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:blueprint-sand-pit": {
+			"uid": "b3zvj5zzh1xznija1datnafi",
 			"id": "item:blueprint-sand-pit",
 			"type": "blueprint",
 			"title": "Sand Pit Blueprint",

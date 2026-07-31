@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"producer:sheep-pasture-t1": {
+			"uid": "jeqhw1v464hx39os7wb6ste4",
 			"id": "producer:sheep-pasture-t1",
 			"type": "producer",
 			"title": "Sheep Pasture I",

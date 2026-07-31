@@ -8,6 +8,7 @@ import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 
 const baseItem = (id: string) => ({
+	uid: id,
 	id,
 	title: id,
 	description: id,

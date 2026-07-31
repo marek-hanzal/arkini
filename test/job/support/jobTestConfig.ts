@@ -5,6 +5,7 @@ import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 
 const baseItem = ({ id, scope }: { id: string; scope: "any" | "board" }) => ({
+	uid: id,
 	id,
 	title: id,
 	description: id,

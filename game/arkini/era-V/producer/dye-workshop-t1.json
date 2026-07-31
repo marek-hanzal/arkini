@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"producer:dye-workshop-t1": {
+			"uid": "jm6zwcekld8vjbvuzpssv9uo",
 			"id": "producer:dye-workshop-t1",
 			"type": "producer",
 			"title": "Dye Workshop I",

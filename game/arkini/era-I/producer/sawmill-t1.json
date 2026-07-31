@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"producer:sawmill-t1": {
+			"uid": "s18awkeukj377bwscreimf0j",
 			"id": "producer:sawmill-t1",
 			"type": "producer",
 			"title": "Sawmill I",

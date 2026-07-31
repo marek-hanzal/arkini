@@ -34,6 +34,7 @@ const config = GameConfigSchema.parse({
 	categories: {},
 	items: {
 		any: {
+			uid: "any",
 			id: "any",
 			title: "Any item",
 			description: "May occupy any grid.",
@@ -49,6 +50,7 @@ const config = GameConfigSchema.parse({
 			type: "simple",
 		},
 		limited: {
+			uid: "limited",
 			id: "limited",
 			title: "Limited item",
 			description: "Has count and stack limits.",
@@ -65,6 +67,7 @@ const config = GameConfigSchema.parse({
 			type: "simple",
 		},
 		board: {
+			uid: "board",
 			id: "board",
 			title: "Board item",
 			description: "May occupy only the board.",

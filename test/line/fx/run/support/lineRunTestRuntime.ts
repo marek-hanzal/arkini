@@ -4,6 +4,7 @@ import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
 const baseItem = ({ id, scope }: { id: string; scope: "any" | "board" }) => {
 	return {
+		uid: id,
 		id,
 		title: id,
 		description: id,

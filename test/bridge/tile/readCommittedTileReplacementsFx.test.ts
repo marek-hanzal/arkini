@@ -30,6 +30,7 @@ const config = GameConfigSchema.parse({
 	categories: {},
 	items: {
 		stone: {
+			uid: "stone",
 			id: "stone",
 			type: "simple",
 			title: "Stone",
@@ -45,6 +46,7 @@ const config = GameConfigSchema.parse({
 			maxStackSize: 10,
 		},
 		mud: {
+			uid: "mud",
 			id: "mud",
 			type: "simple",
 			title: "Mud",

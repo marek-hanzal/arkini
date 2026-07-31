@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:blueprint-winery-t1": {
+			"uid": "kt2ivyi6ngtx2lyf41q95x38",
 			"id": "item:blueprint-winery-t1",
 			"type": "blueprint",
 			"title": "Winery I Blueprint",

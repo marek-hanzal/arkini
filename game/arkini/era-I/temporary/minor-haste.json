@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:effect:minor-haste": {
+			"uid": "ic9cvuxqozhilgpqqin6wduf",
 			"id": "item:effect:minor-haste",
 			"type": "temporary",
 			"title": "Minor Haste",

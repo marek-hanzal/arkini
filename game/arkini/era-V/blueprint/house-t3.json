@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:blueprint-house-t3": {
+			"uid": "r8z8xfbjt2wi0w3kftc080h5",
 			"id": "item:blueprint-house-t3",
 			"type": "blueprint",
 			"title": "House III Blueprint",

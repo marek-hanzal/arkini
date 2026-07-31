@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:blueprint-house-of-engineers": {
+			"uid": "hrya1rosi5qpl7wdv8icbirb",
 			"id": "item:blueprint-house-of-engineers",
 			"type": "blueprint",
 			"title": "House of Engineers Blueprint",

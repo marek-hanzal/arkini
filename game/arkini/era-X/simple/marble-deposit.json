@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:marble-deposit": {
+			"uid": "vu62v3pwt5olkj8jt5nl6lww",
 			"id": "item:marble-deposit",
 			"type": "simple",
 			"title": "Marble Deposit",

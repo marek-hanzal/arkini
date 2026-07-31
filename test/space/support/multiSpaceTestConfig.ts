@@ -9,6 +9,7 @@ const baseItem = ({
 	maxStackSize?: number;
 	scope?: "any" | "board";
 }) => ({
+	uid: id,
 	id,
 	title: id,
 	description: id,

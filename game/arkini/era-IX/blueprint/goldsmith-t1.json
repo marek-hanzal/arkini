@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:blueprint-goldsmith-t1": {
+			"uid": "fr748t4pkjgi1pss3g42uy2t",
 			"id": "item:blueprint-goldsmith-t1",
 			"type": "blueprint",
 			"title": "Goldsmith I Blueprint",

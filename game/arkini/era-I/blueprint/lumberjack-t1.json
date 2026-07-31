@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:blueprint-lumberjack-t1": {
+			"uid": "koa2df5du6dedtwr7qqj3fc7",
 			"id": "item:blueprint-lumberjack-t1",
 			"type": "blueprint",
 			"title": "Lumberjack I Blueprint",

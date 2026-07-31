@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:blueprint-paper-mill-t1": {
+			"uid": "fuw9obolu081vngel9cau6jm",
 			"id": "item:blueprint-paper-mill-t1",
 			"type": "blueprint",
 			"title": "Paper Mill I Blueprint",

@@ -35,6 +35,7 @@ const config = GameConfigSchema.parse({
 	categories: {},
 	items: {
 		log: {
+			uid: "log",
 			id: "log",
 			title: "Log",
 			description: "A log.",
@@ -50,6 +51,7 @@ const config = GameConfigSchema.parse({
 			type: "simple",
 		},
 		stone: {
+			uid: "stone",
 			id: "stone",
 			title: "Stone",
 			description: "A stone.",

@@ -109,6 +109,7 @@ const createRegistry = (staged = false) => {
 			action: "stage",
 			change: {
 				item: {
+					uid: "item:test",
 					id: "item:test",
 					type: "simple",
 					title: "Test",

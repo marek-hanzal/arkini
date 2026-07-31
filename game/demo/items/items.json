@@ -2,6 +2,7 @@
 	"$schema": "../../schema.json",
 	"items": {
 		"item:water": {
+			"uid": "wzie2c8sd0dawn04slk1oxml",
 			"id": "item:water",
 			"type": "simple",
 			"title": "Water",
@@ -30,6 +31,7 @@
 			]
 		},
 		"item:tree": {
+			"uid": "x5vg6n45vdlw55ypfb7cerws",
 			"id": "item:tree",
 			"type": "simple",
 			"title": "Tree",
@@ -47,6 +49,7 @@
 			"maxStackSize": 8
 		},
 		"item:double-tree": {
+			"uid": "ftutiy8j16h3g4vcvun8is8b",
 			"id": "item:double-tree",
 			"type": "simple",
 			"title": "Double Tree",

@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"producer:gold-mine-t1": {
+			"uid": "x58umov2si3huizr98dz5w05",
 			"id": "producer:gold-mine-t1",
 			"type": "producer",
 			"title": "Gold Mine I",

@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"producer:chicken-coop-t1": {
+			"uid": "eki4huiwwi9omeih3cdoqssw",
 			"id": "producer:chicken-coop-t1",
 			"type": "producer",
 			"title": "Chicken Coop I",

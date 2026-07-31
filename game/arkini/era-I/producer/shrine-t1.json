@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"producer:shrine-t1": {
+			"uid": "gj2lgf3liprvpu390sbw7dhl",
 			"id": "producer:shrine-t1",
 			"type": "producer",
 			"title": "Wayside Shrine",

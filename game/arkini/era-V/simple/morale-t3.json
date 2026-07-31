@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:morale-t3": {
+			"uid": "vjehh501rp85jdv9uqdu288p",
 			"id": "item:morale-t3",
 			"type": "simple",
 			"title": "Morale III",

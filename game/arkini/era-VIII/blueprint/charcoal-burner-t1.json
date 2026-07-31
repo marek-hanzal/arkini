@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:blueprint-charcoal-burner-t1": {
+			"uid": "ujzgay6ok9kaeikz7wuqww4e",
 			"id": "item:blueprint-charcoal-burner-t1",
 			"type": "blueprint",
 			"title": "Charcoal Burner I Blueprint",

@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:effect:bountiful-offering": {
+			"uid": "djmt7gc1en2was1s6ofrarv7",
 			"id": "item:effect:bountiful-offering",
 			"type": "temporary",
 			"title": "Bountiful Offering",

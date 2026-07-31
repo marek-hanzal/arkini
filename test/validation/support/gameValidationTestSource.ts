@@ -8,6 +8,7 @@ import type { StartSchema } from "~/engine/start/schema/StartSchema";
 
 export const createSimpleItem = (id: string, tags: string[] = []) =>
 	SimpleItemSchema.parse({
+		uid: id,
 		id,
 		title: id,
 		description: id,

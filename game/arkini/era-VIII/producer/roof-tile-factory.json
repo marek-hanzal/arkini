@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"producer:roof-tile-factory": {
+			"uid": "v6qynizplrlgthxvd9uwnfzy",
 			"id": "producer:roof-tile-factory",
 			"type": "producer",
 			"title": "Roof Tile Factory",

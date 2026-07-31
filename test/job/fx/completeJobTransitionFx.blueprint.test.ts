@@ -31,6 +31,7 @@ const simpleItem = ({
 	scope?: "any" | "board";
 	maxStackSize?: number;
 }) => ({
+	uid: id,
 	id,
 	type: "simple" as const,
 	title: id,
@@ -58,6 +59,7 @@ const blueprintItem = ({
 	output?: unknown;
 	reserveTool?: boolean;
 }) => ({
+	uid: id,
 	id,
 	type: "blueprint" as const,
 	charges: {
@@ -381,6 +383,7 @@ const blueprintConfig = GameConfigSchema.parse({
 			maxCount: 2,
 		}),
 		"producer:limited": {
+			uid: "producer:limited",
 			id: "producer:limited",
 			type: "producer",
 			title: "Limited producer",
@@ -420,6 +423,7 @@ const blueprintConfig = GameConfigSchema.parse({
 			],
 		},
 		"producer:blueprint-source": {
+			uid: "producer:blueprint-source",
 			id: "producer:blueprint-source",
 			type: "producer",
 			title: "Blueprint source",
@@ -630,6 +634,7 @@ const blueprintConfig = GameConfigSchema.parse({
 			],
 		},
 		"producer:shared-source": {
+			uid: "producer:shared-source",
 			id: "producer:shared-source",
 			type: "producer",
 			title: "Shared source",
@@ -661,6 +666,7 @@ const blueprintConfig = GameConfigSchema.parse({
 			],
 		},
 		"producer:shared-consumer": {
+			uid: "producer:shared-consumer",
 			id: "producer:shared-consumer",
 			type: "producer",
 			title: "Shared consumer",
@@ -699,6 +705,7 @@ const blueprintConfig = GameConfigSchema.parse({
 			],
 		},
 		"producer:recycler": {
+			uid: "producer:recycler",
 			id: "producer:recycler",
 			type: "producer",
 			title: "Recycler",
@@ -738,6 +745,7 @@ const blueprintConfig = GameConfigSchema.parse({
 			],
 		},
 		"producer:charged-stack": {
+			uid: "producer:charged-stack",
 			id: "producer:charged-stack",
 			type: "producer",
 			title: "Charged stack",

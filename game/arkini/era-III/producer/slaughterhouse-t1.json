@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"producer:slaughterhouse-t1": {
+			"uid": "f7sulwjde764bzinntz2jrm2",
 			"id": "producer:slaughterhouse-t1",
 			"type": "producer",
 			"title": "Slaughterhouse I",

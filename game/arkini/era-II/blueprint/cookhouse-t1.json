@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:blueprint-cookhouse-t1": {
+			"uid": "cltc5mvp8k6hqaxy5984y7co",
 			"id": "item:blueprint-cookhouse-t1",
 			"type": "blueprint",
 			"title": "Cookhouse I Blueprint",

@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:double-tree": {
+			"uid": "h5qt0w6rztnt2bar0edxo8b6",
 			"id": "item:double-tree",
 			"type": "deposit",
 			"title": "Double Tree",

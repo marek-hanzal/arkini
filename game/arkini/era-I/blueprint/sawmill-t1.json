@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:blueprint-sawmill-t1": {
+			"uid": "ripcjib8sr6ly0559sdisyi1",
 			"id": "item:blueprint-sawmill-t1",
 			"type": "blueprint",
 			"title": "Sawmill I Blueprint",

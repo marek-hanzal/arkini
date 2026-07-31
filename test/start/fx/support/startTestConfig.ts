@@ -10,6 +10,7 @@ const simpleItem = ({
 	scope: "any" | "board" | "inventory";
 }) => {
 	return {
+		uid: id,
 		id,
 		title: id,
 		description: id,
@@ -80,6 +81,7 @@ export const startTestConfig = GameConfigSchema.parse({
 			scope: "inventory",
 		}),
 		backpack: {
+			uid: "backpack",
 			id: "backpack",
 			type: "inventory",
 			title: "Backpack",

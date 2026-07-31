@@ -33,6 +33,7 @@ const config = GameConfigSchema.parse({
 	categories: {},
 	items: {
 		tree: {
+			uid: "tree",
 			id: "tree",
 			title: "Tree",
 			description: "A living tree.",

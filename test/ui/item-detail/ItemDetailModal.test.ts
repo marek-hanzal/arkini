@@ -77,6 +77,7 @@ const config = GameConfigSchema.parse({
 	categories: {},
 	items: {
 		workshop: {
+			uid: "workshop",
 			id: "workshop",
 			type: "producer",
 			title: "Workshop",
@@ -128,6 +129,7 @@ const config = GameConfigSchema.parse({
 			],
 		},
 		water: {
+			uid: "water",
 			id: "water",
 			type: "simple",
 			title: "Water",

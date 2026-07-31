@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:blueprint-glassworks": {
+			"uid": "biprpeguezk8rmzciwx510vn",
 			"id": "item:blueprint-glassworks",
 			"type": "blueprint",
 			"title": "Glassworks Blueprint",

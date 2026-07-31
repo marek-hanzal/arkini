@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:blueprint-purifier-t1": {
+			"uid": "oo1sxn3m2kopwyzgc05j1w61",
 			"id": "item:blueprint-purifier-t1",
 			"type": "blueprint",
 			"title": "Purifier I Blueprint",

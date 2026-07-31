@@ -39,6 +39,7 @@ const craftCompletionConfig = GameConfigSchema.parse({
 	categories: {},
 	items: {
 		"craft:drop": {
+			uid: "craft:drop",
 			id: "craft:drop",
 			type: "craft",
 			charges: {
@@ -95,6 +96,7 @@ const craftCompletionConfig = GameConfigSchema.parse({
 			},
 		},
 		"craft:ordered-output": {
+			uid: "craft:ordered-output",
 			id: "craft:ordered-output",
 			type: "craft",
 			charges: {
@@ -160,6 +162,7 @@ const craftCompletionConfig = GameConfigSchema.parse({
 			},
 		},
 		"craft:reserve": {
+			uid: "craft:reserve",
 			id: "craft:reserve",
 			type: "craft",
 			charges: {
@@ -225,6 +228,7 @@ const craftCompletionConfig = GameConfigSchema.parse({
 			},
 		},
 		"craft:sink": {
+			uid: "craft:sink",
 			id: "craft:sink",
 			type: "craft",
 			charges: {
@@ -259,6 +263,7 @@ const craftCompletionConfig = GameConfigSchema.parse({
 			},
 		},
 		"craft:random": {
+			uid: "craft:random",
 			id: "craft:random",
 			type: "craft",
 			charges: {
@@ -335,6 +340,7 @@ const craftCompletionConfig = GameConfigSchema.parse({
 			},
 		},
 		"item:product": {
+			uid: "item:product",
 			id: "item:product",
 			type: "simple",
 			title: "Product",
@@ -350,6 +356,7 @@ const craftCompletionConfig = GameConfigSchema.parse({
 			maxStackSize: 1,
 		},
 		"item:result": {
+			uid: "item:result",
 			id: "item:result",
 			type: "simple",
 			title: "Result",
@@ -365,6 +372,7 @@ const craftCompletionConfig = GameConfigSchema.parse({
 			maxStackSize: 1,
 		},
 		"item:bonus": {
+			uid: "item:bonus",
 			id: "item:bonus",
 			type: "simple",
 			title: "Bonus",
@@ -380,6 +388,7 @@ const craftCompletionConfig = GameConfigSchema.parse({
 			maxStackSize: 1,
 		},
 		"item:tool": {
+			uid: "item:tool",
 			id: "item:tool",
 			type: "simple",
 			title: "Tool",
@@ -395,6 +404,7 @@ const craftCompletionConfig = GameConfigSchema.parse({
 			maxStackSize: 1,
 		},
 		"item:blocker": {
+			uid: "item:blocker",
 			id: "item:blocker",
 			type: "simple",
 			title: "Blocker",
@@ -410,6 +420,7 @@ const craftCompletionConfig = GameConfigSchema.parse({
 			maxStackSize: 1,
 		},
 		"item:random-a": {
+			uid: "item:random-a",
 			id: "item:random-a",
 			type: "simple",
 			title: "Random A",
@@ -425,6 +436,7 @@ const craftCompletionConfig = GameConfigSchema.parse({
 			maxStackSize: 1,
 		},
 		"item:random-b": {
+			uid: "item:random-b",
 			id: "item:random-b",
 			type: "simple",
 			title: "Random B",

@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"producer:waste-processor-t2": {
+			"uid": "a65km6c7ysawjlwiviorbary",
 			"id": "producer:waste-processor-t2",
 			"type": "producer",
 			"title": "Waste Processor II",

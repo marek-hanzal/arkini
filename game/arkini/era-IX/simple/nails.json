@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:nails": {
+			"uid": "lydms21xchmf26hx8rhfvg2v",
 			"id": "item:nails",
 			"type": "simple",
 			"title": "Nails",

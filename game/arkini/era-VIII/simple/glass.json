@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:glass": {
+			"uid": "gp3wl1fs4h16tunsz08nqs89",
 			"id": "item:glass",
 			"type": "simple",
 			"title": "Glass",

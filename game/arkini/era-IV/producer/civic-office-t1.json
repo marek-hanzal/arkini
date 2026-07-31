@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"producer:civic-office-t1": {
+			"uid": "v3k4j7rmwczdseftfjkw3gwd",
 			"id": "producer:civic-office-t1",
 			"type": "producer",
 			"title": "Civic Office I",

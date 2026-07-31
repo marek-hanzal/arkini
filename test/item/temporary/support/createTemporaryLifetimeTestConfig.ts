@@ -9,6 +9,7 @@ const baseItem = ({
 	maxStackSize?: number;
 	maxCount?: number;
 }) => ({
+	uid: id,
 	id,
 	title: id,
 	description: id,

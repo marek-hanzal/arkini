@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:pigment": {
+			"uid": "z3ccuolqihndvgedqq96rb5x",
 			"id": "item:pigment",
 			"type": "simple",
 			"title": "Pigment",

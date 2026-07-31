@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:iron-armor": {
+			"uid": "o46anzi47wpm3mdaprnilcrd",
 			"id": "item:iron-armor",
 			"type": "simple",
 			"title": "Iron Armor",

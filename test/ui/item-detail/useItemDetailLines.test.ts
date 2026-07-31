@@ -66,6 +66,7 @@ const config = GameConfigSchema.parse({
 	categories: {},
 	items: {
 		producer: {
+			uid: "producer",
 			id: "producer",
 			type: "producer",
 			title: "Producer",
@@ -180,6 +181,7 @@ const config = GameConfigSchema.parse({
 			],
 		},
 		material: {
+			uid: "material",
 			id: "material",
 			type: "simple",
 			title: "Material",

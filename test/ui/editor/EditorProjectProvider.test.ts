@@ -87,6 +87,7 @@ describe("EditorProjectProvider", () => {
 	it("keeps staged item changes out of the canonical project context", async () => {
 		const revision = "a".repeat(64);
 		const canonicalItem: EditorItem = {
+			uid: "item:test",
 			id: "item:test",
 			type: "simple",
 			title: "Canonical",

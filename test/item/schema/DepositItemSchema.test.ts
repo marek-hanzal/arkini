@@ -5,6 +5,7 @@ import { DepositItemSchema } from "~/engine/item/schema/DepositItemSchema";
 describe("DepositItemSchema", () => {
 	it("accepts the shared positive item charge contract", () => {
 		const item = {
+			uid: "deposit:tree",
 			id: "deposit:tree",
 			title: "Tree",
 			description: "A finite tree.",
@@ -36,6 +37,7 @@ describe("DepositItemSchema", () => {
 
 	it("accepts optional production lines on a finite deposit", () => {
 		const result = DepositItemSchema.parse({
+			uid: "deposit:well",
 			id: "deposit:well",
 			title: "Well",
 			description: "A finite self-consuming well.",

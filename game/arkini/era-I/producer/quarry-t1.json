@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"producer:quarry-t1": {
+			"uid": "ndf2prv7bmc70zv8ulnuqlul",
 			"id": "producer:quarry-t1",
 			"type": "producer",
 			"title": "Quarry I",

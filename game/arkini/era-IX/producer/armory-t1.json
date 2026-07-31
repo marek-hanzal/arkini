@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"producer:armory-t1": {
+			"uid": "c1r17y878mojojyld1pv05dv",
 			"id": "producer:armory-t1",
 			"type": "producer",
 			"title": "Armory I",

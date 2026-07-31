@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"producer:charcoal-burner-t1": {
+			"uid": "crzmb3085oyefdxmiym70y8c",
 			"id": "producer:charcoal-burner-t1",
 			"type": "producer",
 			"title": "Charcoal Burner I",

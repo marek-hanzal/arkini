@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:blueprint-slaughterhouse-t1": {
+			"uid": "x38e4vzmmkleg5rk91mjckz8",
 			"id": "item:blueprint-slaughterhouse-t1",
 			"type": "blueprint",
 			"title": "Slaughterhouse I Blueprint",

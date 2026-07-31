@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import { CraftItemSchema } from "~/engine/item/schema/CraftItemSchema";
 
 const craft = {
+	uid: "item:craft",
 	id: "item:craft",
 	title: "Craft",
 	description: "One craft item.",

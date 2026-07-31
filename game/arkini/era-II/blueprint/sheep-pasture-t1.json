@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:blueprint-sheep-pasture-t1": {
+			"uid": "klpyrin9sowztu7c17tzo7x2",
 			"id": "item:blueprint-sheep-pasture-t1",
 			"type": "blueprint",
 			"title": "Sheep Pasture I Blueprint",

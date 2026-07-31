@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:bio-waste": {
+			"uid": "l82fifyipbdcjwvl94uc3pyg",
 			"id": "item:bio-waste",
 			"type": "simple",
 			"title": "Bio Waste",

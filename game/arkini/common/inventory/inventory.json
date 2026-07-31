@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:inventory": {
+			"uid": "lmc22aqfo14nbctsyncsb8ud",
 			"id": "item:inventory",
 			"type": "inventory",
 			"title": "Backpack",

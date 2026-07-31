@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"producer:coal-mine-t1": {
+			"uid": "d960xiwhnjizb8381c9nbc0q",
 			"id": "producer:coal-mine-t1",
 			"type": "producer",
 			"title": "Coal Mine I",

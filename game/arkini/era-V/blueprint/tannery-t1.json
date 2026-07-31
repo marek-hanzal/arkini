@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:blueprint-tannery-t1": {
+			"uid": "sexeowxa9cvlx2v4hnz891z5",
 			"id": "item:blueprint-tannery-t1",
 			"type": "blueprint",
 			"title": "Tannery I Blueprint",

@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:feast-plate": {
+			"uid": "udc7lewgrjfo5cn9ac32h3qp",
 			"id": "item:feast-plate",
 			"type": "craft",
 			"title": "Feast Plate",

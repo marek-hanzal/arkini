@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:wheat-field": {
+			"uid": "n2exfiffcwc0nsfxn1x6z0hy",
 			"id": "item:wheat-field",
 			"type": "deposit",
 			"title": "Wheat Field",

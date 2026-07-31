@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:blueprint-bio-waste-processor-t2": {
+			"uid": "ue37t7u511pdnib2mccgbveh",
 			"id": "item:blueprint-bio-waste-processor-t2",
 			"type": "blueprint",
 			"title": "Bio-Waste Processor II Blueprint",

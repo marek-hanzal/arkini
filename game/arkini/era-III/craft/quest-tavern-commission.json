@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:quest:tavern-commission": {
+			"uid": "sk4emw3mvfazitj1xcelb09p",
 			"id": "item:quest:tavern-commission",
 			"type": "craft",
 			"title": "Tavern Commission Quest",

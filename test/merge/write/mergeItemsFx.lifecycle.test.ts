@@ -9,6 +9,7 @@ import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import type { StateSchema } from "~/engine/state/schema/StateSchema";
 
 const baseItem = ({ id, tags = [] }: { id: string; tags?: string[] }) => ({
+	uid: id,
 	id,
 	title: id,
 	description: id,

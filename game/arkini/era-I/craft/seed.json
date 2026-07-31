@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:seed": {
+			"uid": "zbg1sz4539aaqe2ibx4mjmwl",
 			"id": "item:seed",
 			"type": "craft",
 			"title": "Seed",

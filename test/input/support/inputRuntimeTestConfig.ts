@@ -10,6 +10,7 @@ const baseItem = ({
 	scope: "any" | "board" | "inventory";
 }) => {
 	return {
+		uid: id,
 		id,
 		title: id,
 		description: id,

@@ -1,8 +1,9 @@
 import { useAtomSet } from "@effect/atom-react";
+import { createId } from "@paralleldrive/cuid2";
 import { useStore } from "@tanstack/react-form";
 import { useRouter } from "@tanstack/react-router";
 import { match } from "ts-pattern";
-import { useLayoutEffect, useMemo } from "react";
+import { useLayoutEffect, useMemo, useRef } from "react";
 
 import {
 	type EditorItem,
@@ -71,11 +72,18 @@ export const EditorItemForm = ({
 }: EditorItemForm.Props) => {
 	const project = useEditorProject();
 	const router = useRouter();
+	const generatedItemUidRef = useRef<string | undefined>(undefined);
+	const generatedItemUid =
+		item?.uid ?? (generatedItemUidRef.current ??= createId());
 	const canonicalItem = useMemo<EditorItemFormValues>(
-		() => createEditorItemFormValues(item ?? createEditorItemDraft(itemType, project)),
+		() =>
+			createEditorItemFormValues(
+				item ?? createEditorItemDraft(itemType, project, generatedItemUid),
+			),
 		[
 			item,
 			itemType,
+			generatedItemUid,
 			project,
 		],
 	);

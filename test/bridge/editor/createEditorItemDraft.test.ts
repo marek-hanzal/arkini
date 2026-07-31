@@ -23,7 +23,8 @@ describe("createEditorItemDraft", () => {
 	it.each(
 		EditorItemTypes,
 	)("creates a schema-valid %s form value after required copy is entered", (type) => {
-		const draft = createEditorItemDraft(type, project);
+		const uid = `draft-${type}`;
+		const draft = createEditorItemDraft(type, project, uid);
 		const parsed = validateEditorItem({
 			...draft,
 			title: `New ${type}`,
@@ -31,6 +32,7 @@ describe("createEditorItemDraft", () => {
 		});
 
 		expect(parsed.success).toBe(true);
+		expect(draft.uid).toBe(uid);
 		expect(draft.type).toBe(type);
 	});
 });

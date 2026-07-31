@@ -31,6 +31,7 @@ const config = GameConfigSchema.parse({
 	categories: {},
 	items: {
 		source: {
+			uid: "source",
 			id: "source",
 			title: "Source",
 			description: "Reusable source.",
@@ -56,6 +57,7 @@ const config = GameConfigSchema.parse({
 			],
 		},
 		target: {
+			uid: "target",
 			id: "target",
 			title: "Target",
 			description: "Remote explicit target.",

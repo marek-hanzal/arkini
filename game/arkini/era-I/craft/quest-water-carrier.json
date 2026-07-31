@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:quest:water-carrier": {
+			"uid": "u2hph8gp960et5w56mz3lwou",
 			"id": "item:quest:water-carrier",
 			"type": "craft",
 			"title": "Water Carrier Quest",

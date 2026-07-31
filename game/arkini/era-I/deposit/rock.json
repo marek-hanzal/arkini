@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:rock": {
+			"uid": "he8aisc3u1e16hmh8fpkcuqf",
 			"id": "item:rock",
 			"type": "deposit",
 			"title": "Stone Deposit",

@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"producer:market-t1": {
+			"uid": "blahusbsywixnp9x3hw5ngso",
 			"id": "producer:market-t1",
 			"type": "producer",
 			"title": "Market",

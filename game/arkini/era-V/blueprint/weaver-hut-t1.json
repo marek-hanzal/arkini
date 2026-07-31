@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:blueprint-weaver-hut-t1": {
+			"uid": "hsyronnsn0hmu1yg04lmrk3d",
 			"id": "item:blueprint-weaver-hut-t1",
 			"type": "blueprint",
 			"title": "Weaver Hut I Blueprint",

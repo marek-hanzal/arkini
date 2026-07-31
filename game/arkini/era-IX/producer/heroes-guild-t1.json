@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"producer:heroes-guild-t1": {
+			"uid": "eikw8maukmbqzdpyomxtpir9",
 			"id": "producer:heroes-guild-t1",
 			"type": "producer",
 			"title": "Heroes Guild I",

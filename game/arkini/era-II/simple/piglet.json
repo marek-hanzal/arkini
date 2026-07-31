@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:piglet": {
+			"uid": "wpcd60x4w7porpotkd56ueoz",
 			"id": "item:piglet",
 			"type": "simple",
 			"title": "Piglet",

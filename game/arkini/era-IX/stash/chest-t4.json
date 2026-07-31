@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:chest-t4": {
+			"uid": "ovdnt7bzfq7yiwomk9gofoqr",
 			"id": "item:chest-t4",
 			"type": "stash",
 			"title": "Chest IV",

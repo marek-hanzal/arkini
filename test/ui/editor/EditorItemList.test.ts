@@ -57,6 +57,7 @@ beforeEach(() => {
 		readonly type: "deposit" | "producer" | "simple";
 		readonly tags?: readonly string[];
 	}) => ({
+		uid: id,
 		id,
 		title,
 		type,

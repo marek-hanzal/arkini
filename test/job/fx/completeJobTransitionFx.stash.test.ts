@@ -57,6 +57,7 @@ const output = (
 });
 
 const simpleItem = (id: string, scope: "any" | "board" = "any") => ({
+	uid: id,
 	id,
 	type: "simple" as const,
 	title: id,
@@ -81,6 +82,7 @@ const stashItem = ({
 	lineId: string;
 	lineOutput: ReturnType<typeof output>;
 }) => ({
+	uid: id,
 	id,
 	type: "stash" as const,
 	charges: {

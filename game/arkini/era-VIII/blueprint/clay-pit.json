@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:blueprint-clay-pit": {
+			"uid": "dxvajxwjzx9q0iptl6zgdzea",
 			"id": "item:blueprint-clay-pit",
 			"type": "blueprint",
 			"title": "Clay Pit Blueprint",

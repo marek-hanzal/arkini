@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"producer:sand-pit": {
+			"uid": "xwafpmwy0eqtjyo9phhwrnoz",
 			"id": "producer:sand-pit",
 			"type": "producer",
 			"title": "Sand Pit",

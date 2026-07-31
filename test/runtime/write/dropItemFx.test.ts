@@ -36,6 +36,7 @@ const configInput = {
 	categories: {},
 	items: {
 		water: {
+			uid: "water",
 			id: "water",
 			type: "simple",
 			title: "Water",
@@ -51,6 +52,7 @@ const configInput = {
 			maxStackSize: 10,
 		},
 		stone: {
+			uid: "stone",
 			id: "stone",
 			type: "simple",
 			title: "Stone",
@@ -66,6 +68,7 @@ const configInput = {
 			maxStackSize: 10,
 		},
 		backpack: {
+			uid: "backpack",
 			id: "backpack",
 			type: "inventory",
 			title: "Backpack",
@@ -154,6 +157,7 @@ const replaceMergeConfig = GameConfigSchema.parse({
 		},
 		mud: {
 			...configInput.items.stone,
+			uid: "mud",
 			id: "mud",
 			title: "Mud",
 			description: "Mud",

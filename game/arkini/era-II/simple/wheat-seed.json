@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:wheat-seed": {
+			"uid": "olapvslbvoq7czinfdxicc12",
 			"id": "item:wheat-seed",
 			"type": "simple",
 			"title": "Wheat Seed",

@@ -3,6 +3,7 @@ import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchem
 
 const simpleItem = ({ id, tags }: { id: string; tags: string[] }) => {
 	return SimpleItemSchema.parse({
+		uid: id,
 		id,
 		title: id,
 		description: id,

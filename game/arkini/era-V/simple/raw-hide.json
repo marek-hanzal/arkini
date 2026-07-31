@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:raw-hide": {
+			"uid": "e0l14l9ow0mlz3y4r7n7u1uh",
 			"id": "item:raw-hide",
 			"type": "simple",
 			"title": "Raw Hide",

@@ -5,6 +5,7 @@ import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import { selectItemsFx } from "~/engine/selector/fx/selectItemsFx";
 
 const item = {
+	uid: "tree",
 	id: "tree",
 	title: "Tree",
 	description: "A living tree.",
@@ -25,6 +26,7 @@ const item = {
 
 const stone = {
 	...item,
+	uid: "stone",
 	id: "stone",
 	title: "Stone",
 	tags: [

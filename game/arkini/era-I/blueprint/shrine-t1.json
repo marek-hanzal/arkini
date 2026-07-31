@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:blueprint-shrine-t1": {
+			"uid": "b9z1ucwann02xh8tw0ny6xwt",
 			"id": "item:blueprint-shrine-t1",
 			"type": "blueprint",
 			"title": "Wayside Shrine Blueprint",

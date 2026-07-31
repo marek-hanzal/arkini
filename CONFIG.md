@@ -57,6 +57,7 @@ Provider rules:
 - `meta`, `resources`, `start`, and `version` each have exactly one provider across all fragments;
 - category IDs are unique across all fragments;
 - item IDs are unique across all fragments;
+- item UIDs are unique across the completed catalog;
 - later files never silently overwrite earlier providers;
 - conflicts are diagnostics with source provenance;
 - the first deterministic provider remains the assembly candidate while every conflict is reported.
@@ -92,6 +93,7 @@ References are explicit. Do not derive target IDs, asset IDs, or line IDs from f
 Every item shares these core fields:
 
 ```text
+uid
 id
  type
  title
@@ -122,6 +124,8 @@ cheat-inventory
 ```
 
 Type-specific schemas own their additional behavior. Do not add one giant optional-field item object.
+
+`uid` is the immutable low-level identity generated once as CUID2 when an item is created. It survives authoring-ID renames, editor import/export, and Arkpack rebuilds unchanged. `id` remains the human-readable authoring identity used by configuration references. Completed-game validation rejects duplicate item UIDs.
 
 ### Storage and query scope
 

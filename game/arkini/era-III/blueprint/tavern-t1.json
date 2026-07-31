@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:blueprint-tavern-t1": {
+			"uid": "kmq9t7cxq3uo6qaombz2wp2m",
 			"id": "item:blueprint-tavern-t1",
 			"type": "blueprint",
 			"title": "Tavern I Blueprint",

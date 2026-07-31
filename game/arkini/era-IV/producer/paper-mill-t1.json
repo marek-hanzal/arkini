@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"producer:paper-mill-t1": {
+			"uid": "or6m4ez148yc8rdfa11e2xyj",
 			"id": "producer:paper-mill-t1",
 			"type": "producer",
 			"title": "Paper Mill I",

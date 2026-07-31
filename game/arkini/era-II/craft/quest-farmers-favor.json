@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:quest:farmers-favor": {
+			"uid": "r77ojoi0x3f4n6e4s5iw1sxd",
 			"id": "item:quest:farmers-favor",
 			"type": "craft",
 			"title": "Farmers' Favor Quest",

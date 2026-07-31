@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:hop-seed": {
+			"uid": "ei5b64persvilbuginnz24xv",
 			"id": "item:hop-seed",
 			"type": "simple",
 			"title": "Hop Seed",

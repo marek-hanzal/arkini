@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"producer:stonemason-t1": {
+			"uid": "ucasmt6vovguz1qrshw9ubvc",
 			"id": "producer:stonemason-t1",
 			"type": "producer",
 			"title": "Stonemason I",

@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:blueprint-windmill-t1": {
+			"uid": "qsss9z45v1dl75ctk0jg6iud",
 			"id": "item:blueprint-windmill-t1",
 			"type": "blueprint",
 			"title": "Windmill I Blueprint",

@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"producer:lumberjack-t1": {
+			"uid": "z1lca3niy4gvs8muow4xbewf",
 			"id": "producer:lumberjack-t1",
 			"type": "producer",
 			"title": "Lumberjack I",

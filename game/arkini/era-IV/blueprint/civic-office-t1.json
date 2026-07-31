@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:blueprint-civic-office-t1": {
+			"uid": "eddr7nx03grhsdybcfutle64",
 			"id": "item:blueprint-civic-office-t1",
 			"type": "blueprint",
 			"title": "Civic Office I Blueprint",

@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"producer:brickyard": {
+			"uid": "hxlrgok9jecla07o43ti2fpr",
 			"id": "producer:brickyard",
 			"type": "producer",
 			"title": "Brickyard",

@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:wine-barrel": {
+			"uid": "segwxrf9hjdaz3f040o0935w",
 			"id": "item:wine-barrel",
 			"type": "simple",
 			"title": "Wine Barrel",

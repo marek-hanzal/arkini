@@ -199,6 +199,7 @@ describe("validateGameResourcesFx", () => {
 			targetId: string;
 			targetAsset: string;
 		}) => ({
+			uid: id,
 			id,
 			type: "blueprint" as const,
 			charges: {

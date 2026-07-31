@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"producer:house-t3": {
+			"uid": "irieg8yemofsqa4pyoggzsfj",
 			"id": "producer:house-t3",
 			"type": "producer",
 			"title": "House",

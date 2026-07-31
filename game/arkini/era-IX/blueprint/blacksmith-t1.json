@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:blueprint-blacksmith-t1": {
+			"uid": "sa3om8h7or1kypkq1arsao2p",
 			"id": "item:blueprint-blacksmith-t1",
 			"type": "blueprint",
 			"title": "Blacksmith I Blueprint",

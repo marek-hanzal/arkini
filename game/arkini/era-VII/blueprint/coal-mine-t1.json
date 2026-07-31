@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:blueprint-coal-mine-t1": {
+			"uid": "b6mxc7cnfymnxdhx41ewbp7p",
 			"id": "item:blueprint-coal-mine-t1",
 			"type": "blueprint",
 			"title": "Coal Mine I Blueprint",

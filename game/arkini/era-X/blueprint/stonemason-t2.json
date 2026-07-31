@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:blueprint-stonemason-t2": {
+			"uid": "elk2zf7iu5a7ywjlrmf4z4hb",
 			"id": "item:blueprint-stonemason-t2",
 			"type": "blueprint",
 			"title": "Stonemason Blueprint",

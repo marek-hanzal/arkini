@@ -40,6 +40,7 @@ const runInRegistry = <A, E>(
 ) => Effect.runPromise(effect.pipe(Effect.provideService(AtomRegistry.AtomRegistry, registry)));
 
 const createItem = (id: string, title: string): EditorItem => ({
+	uid: id,
 	id,
 	type: "simple",
 	title,

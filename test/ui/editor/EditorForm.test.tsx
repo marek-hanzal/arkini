@@ -16,7 +16,7 @@ vi.mock("~/ui/item/editor/EditorItemAutocompleteField", () => ({
 }));
 
 import type { EditorItem } from "~/bridge/item/editor/EditorItemModel";
-import { EditorItemFormSchema } from "~/engine/item/editor/schema/EditorItemFormSchema";
+import { EditorItemFormSchema } from "~/bridge/item/editor/EditorItemFormSchema";
 import { useAppForm } from "~/ui/form/EditorForm";
 
 (

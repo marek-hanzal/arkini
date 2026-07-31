@@ -12,8 +12,8 @@ import {
 import type { EditorItem } from "~/bridge/item/editor/EditorItemModel";
 import { EditorProjectFormDirtyAtom } from "~/bridge/editor/EditorProjectFormDirtyAtom";
 import { useEditorProject } from "~/bridge/editor/useEditorProject";
-import { createEditorItemFormValues } from "~/engine/item/editor/createEditorItemFormValues";
-import { EditorItemFormSchema } from "~/engine/item/editor/schema/EditorItemFormSchema";
+import { createEditorItemFormValues } from "~/bridge/item/editor/createEditorItemFormValues";
+import { EditorItemFormSchema } from "~/bridge/item/editor/EditorItemFormSchema";
 import { Button } from "~/ui/button/Button";
 import { useRegisterEditorFormActions } from "~/ui/editor/EditorFormActions";
 import { useAppForm } from "~/ui/form/EditorForm";

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { createEditorLineDraft } from "~/engine/line/editor/createEditorLineDraft";
+import { createEditorLineDraft } from "~/bridge/line/editor/createEditorLineDraft";
 
 describe("createEditorLineDraft", () => {
 	it("creates the first line as the sole authored default", () => {

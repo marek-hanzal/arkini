@@ -1,5 +1,5 @@
 import type { EditorLine } from "~/bridge/item/editor/EditorItemModel";
-import { createEditorLineDraft } from "~/engine/line/editor/createEditorLineDraft";
+import { createEditorLineDraft } from "~/bridge/line/editor/createEditorLineDraft";
 import { Button } from "~/ui/button/Button";
 import { withFieldGroup } from "~/ui/form/EditorForm";
 import { EditorFormSection } from "~/ui/form/EditorFormSection";

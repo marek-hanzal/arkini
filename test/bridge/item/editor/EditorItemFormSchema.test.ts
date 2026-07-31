@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
-import { createEditorItemFormValues } from "~/engine/item/editor/createEditorItemFormValues";
-import { EditorItemFormSchema } from "~/engine/item/editor/schema/EditorItemFormSchema";
+import { createEditorItemFormValues } from "~/bridge/item/editor/createEditorItemFormValues";
+import { EditorItemFormSchema } from "~/bridge/item/editor/EditorItemFormSchema";
 
 const item = {
 	uid: "q12cmsx5ussy30wyjiea8yaw",

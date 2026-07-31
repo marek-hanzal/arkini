@@ -16,7 +16,7 @@ import type {
 import type { ItemEnumSchema } from "~/engine/item/schema/ItemEnumSchema";
 import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import type { LineSchema } from "~/engine/line/schema/LineSchema";
-import { createEditorLineDraft } from "~/engine/line/editor/createEditorLineDraft";
+import { createEditorLineDraft } from "~/bridge/line/editor/createEditorLineDraft";
 
 export const createEditorInputDraft = (type: EditorInput["type"], itemId = ""): EditorInput =>
 	match(type)

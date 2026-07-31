@@ -20,7 +20,7 @@ import { ElectronMainError } from "../ElectronMainError";
 import { assertEditorProjectFilePathFx } from "./assertEditorProjectFilePathFx";
 import { assertEditorProjectIdFx } from "./assertEditorProjectIdFx";
 import { commitEditorProjectFilesFx } from "./internal/commitEditorProjectFilesFx";
-import { readEditorProjectRevision } from "./readEditorProjectRevision";
+import { readEditorProjectRevisionFx } from "./readEditorProjectRevisionFx";
 
 export namespace writeEditorProjectFx {
 	export interface Props {
@@ -177,7 +177,7 @@ export const writeEditorProjectFx = Effect.fn("writeEditorProjectFx")(function* 
 		persistedFile,
 		nextManifestFile,
 	];
-	const revision = readEditorProjectRevision({
+	const revision = yield* readEditorProjectRevisionFx({
 		projectId,
 		files: nextFiles,
 	});

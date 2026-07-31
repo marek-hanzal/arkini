@@ -8,10 +8,8 @@ import {
 	type PropsWithChildren,
 } from "react";
 
-import {
-	releaseEditorProjectSession,
-	resumeEditorProjectSession,
-} from "~/bridge/editor/EditorProjectSession";
+import { openEditorProjectSessionAtom } from "~/bridge/editor/openEditorProjectSessionAtom";
+import { releaseEditorProjectSessionAtom } from "~/bridge/editor/releaseEditorProjectSessionAtom";
 import { closeEditorProjectSessionAtom } from "~/bridge/editor/closeEditorProjectSessionAtom";
 import { useEditorProject } from "~/bridge/editor/useEditorProject";
 import { Button, ButtonLink, PrimaryButton } from "~/ui/button/Button";
@@ -53,6 +51,12 @@ const EditorShellContent = ({ children }: PropsWithChildren) => {
 	const closeProjectSession = useAtomSet(closeEditorProjectSessionAtom, {
 		mode: "promise",
 	});
+	const openProjectSession = useAtomSet(openEditorProjectSessionAtom, {
+		mode: "promise",
+	});
+	const releaseProjectSession = useAtomSet(releaseEditorProjectSessionAtom, {
+		mode: "promise",
+	});
 	const [optimisticTab, setOptimisticTab] = useState<EditorTab>();
 	const [exitRequested, setExitRequested] = useState(false);
 	const [exitError, setExitError] = useState<unknown>();
@@ -91,19 +95,21 @@ const EditorShellContent = ({ children }: PropsWithChildren) => {
 		setExitPending(true);
 		try {
 			await closeProjectSession(project.projectId);
-			releaseEditorProjectSession(project.projectId);
+			await releaseProjectSession(project.projectId);
 			await router.navigate({
 				to: "/main-menu",
 			});
 		} catch (error) {
-			resumeEditorProjectSession(project.projectId);
+			await openProjectSession(project.projectId);
 			setExitError(error);
 			setExitPending(false);
 		}
 	}, [
 		closeProjectSession,
 		exitPending,
+		openProjectSession,
 		project.projectId,
+		releaseProjectSession,
 		router,
 	]);
 	const save = useCallback(async () => {

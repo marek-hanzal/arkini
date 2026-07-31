@@ -6,13 +6,11 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import type { EditorProject } from "~/bridge/editor/EditorProject";
 import { EditorProjectAtom } from "~/bridge/editor/EditorProjectAtom";
 import { EditorProjectFormDirtyAtom } from "~/bridge/editor/EditorProjectFormDirtyAtom";
-import { runEditorProjectMutationFx } from "~/bridge/editor/EditorProjectMutationLane";
-import {
-	closeActiveEditorProjectSessionFx,
-	closeEditorProjectSessionFx,
-	openEditorProjectSession,
-	releaseEditorProjectSession,
-} from "~/bridge/editor/EditorProjectSession";
+import { closeActiveEditorProjectSessionFx } from "~/bridge/editor/closeActiveEditorProjectSessionFx";
+import { closeEditorProjectSessionFx } from "~/bridge/editor/closeEditorProjectSessionFx";
+import { openEditorProjectSessionFx } from "~/bridge/editor/openEditorProjectSessionFx";
+import { releaseEditorProjectSessionFx } from "~/bridge/editor/releaseEditorProjectSessionFx";
+import { runEditorProjectMutationFx } from "~/bridge/editor/runEditorProjectMutationFx";
 
 const registries: AtomRegistry.AtomRegistry[] = [];
 const createRegistry = () => {
@@ -41,7 +39,7 @@ const createProject = (revision: string): EditorProject => ({
 
 afterEach(() => {
 	for (const registry of registries.splice(0)) registry.dispose();
-	releaseEditorProjectSession("project");
+	Effect.runSync(releaseEditorProjectSessionFx("project"));
 });
 
 describe("EditorProjectSession", () => {
@@ -54,7 +52,7 @@ describe("EditorProjectSession", () => {
 			expectedRevision: undefined,
 			project: createProject(revisionA),
 		});
-		openEditorProjectSession("project");
+		Effect.runSync(openEditorProjectSessionFx("project"));
 		const mutationEntered = Effect.runSync(Deferred.make<void>());
 		const finishMutation = Effect.runSync(Deferred.make<void>());
 		const mutation = runInRegistry(
@@ -98,7 +96,7 @@ describe("EditorProjectSession", () => {
 
 	it("does not poison a clean session after a mutation failure", async () => {
 		const registry = createRegistry();
-		openEditorProjectSession("project");
+		Effect.runSync(openEditorProjectSessionFx("project"));
 		await expect(
 			runInRegistry(
 				registry,
@@ -117,7 +115,7 @@ describe("EditorProjectSession", () => {
 
 	it("rejects close while an in-memory item is dirty and allows it after save", async () => {
 		const registry = createRegistry();
-		openEditorProjectSession("project");
+		Effect.runSync(openEditorProjectSessionFx("project"));
 		registry.set(EditorProjectFormDirtyAtom("project"), {
 			dirty: true,
 			ownerId: "item:test",

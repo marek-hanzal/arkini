@@ -4,10 +4,8 @@ import { Deferred, Effect, Exit, Scope } from "effect";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { acquireGameEngineLeaseFx } from "~/bridge/game/acquireGameEngineLeaseFx";
-import {
-	openEditorProjectSession,
-	releaseEditorProjectSession,
-} from "~/bridge/editor/EditorProjectSession";
+import { openEditorProjectSessionFx } from "~/bridge/editor/openEditorProjectSessionFx";
+import { releaseEditorProjectSessionFx } from "~/bridge/editor/releaseEditorProjectSessionFx";
 import { EditorProjectFormDirtyAtom } from "~/bridge/editor/EditorProjectFormDirtyAtom";
 import { CriticalGameLifecycleError } from "~/bridge/game/CriticalGameLifecycleError";
 import type { GameEngineResource } from "~/bridge/game/GameEngineResource";
@@ -105,7 +103,7 @@ beforeEach(() => {
 afterEach(async () => {
 	vi.useRealTimers();
 	for (const runtime of runtimes.splice(0)) await runtime.dispose();
-	releaseEditorProjectSession("project");
+	Effect.runSync(releaseEditorProjectSessionFx("project"));
 	vi.restoreAllMocks();
 });
 
@@ -192,7 +190,7 @@ describe("installRendererControlledClose", () => {
 			createResourceFx: () => Effect.never,
 		});
 		runtimes.push(rendererRuntime);
-		openEditorProjectSession("project", atomRegistry);
+		rendererRuntime.runSync(openEditorProjectSessionFx("project"));
 		atomRegistry.set(EditorProjectFormDirtyAtom("project"), {
 			dirty: true,
 			ownerId: "item:test",
@@ -207,7 +205,7 @@ describe("installRendererControlledClose", () => {
 			}),
 		);
 
-		await expect(lifecycle.readBeforeClose()()).rejects.toThrow("Save the current item");
+		await expect(lifecycle.readBeforeClose()()).rejects.toThrow("Save or discard the current form");
 		expect(router.navigate).not.toHaveBeenCalled();
 		remove();
 	});

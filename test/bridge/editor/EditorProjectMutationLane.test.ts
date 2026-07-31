@@ -5,7 +5,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import type { EditorProject } from "~/bridge/editor/EditorProject";
 import { EditorProjectAtom } from "~/bridge/editor/EditorProjectAtom";
-import { runEditorProjectMutationFx } from "~/bridge/editor/EditorProjectMutationLane";
+import { runEditorProjectMutationFx } from "~/bridge/editor/runEditorProjectMutationFx";
 
 const registries: AtomRegistry.AtomRegistry[] = [];
 const createRegistry = () => {

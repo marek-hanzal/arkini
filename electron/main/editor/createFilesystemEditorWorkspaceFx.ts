@@ -13,7 +13,7 @@ import { createEditorProjectFx } from "./createEditorProjectFx";
 import { listEditorProjectsFx } from "./listEditorProjectsFx";
 import { openEditorDirectoryFx } from "./openEditorDirectoryFx";
 import { readEditorProjectFx } from "./readEditorProjectFx";
-import { readEditorProjectRevision } from "./readEditorProjectRevision";
+import { readEditorProjectRevisionFx } from "./readEditorProjectRevisionFx";
 import { writeEditorProjectFx } from "./writeEditorProjectFx";
 
 export namespace createFilesystemEditorWorkspaceFx {
@@ -58,7 +58,7 @@ export const createFilesystemEditorWorkspaceFx = Effect.fn("createFilesystemEdit
 					});
 					projectIndex.set(record.projectId, {
 						...record,
-						revision: readEditorProjectRevision({
+						revision: yield* readEditorProjectRevisionFx({
 							projectId: record.projectId,
 							files: record.files,
 						}),

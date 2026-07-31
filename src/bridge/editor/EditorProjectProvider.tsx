@@ -1,10 +1,10 @@
-import { useAtom } from "@effect/atom-react";
+import { useAtom, useAtomSet } from "@effect/atom-react";
 import { useLayoutEffect, type PropsWithChildren } from "react";
 
 import type { EditorProject } from "~/bridge/editor/EditorProject";
 import { EditorProjectAtom } from "~/bridge/editor/EditorProjectAtom";
 import { EditorProjectContext } from "~/bridge/editor/EditorProjectContext";
-import { openEditorProjectSession } from "~/bridge/editor/EditorProjectSession";
+import { openEditorProjectSessionAtom } from "~/bridge/editor/openEditorProjectSessionAtom";
 
 /** Publishes each route-loader epoch once and exposes the canonical project snapshot. */
 export const EditorProjectProvider = ({
@@ -16,9 +16,10 @@ export const EditorProjectProvider = ({
 	readonly loaded: EditorProject;
 }>) => {
 	const [project, publish] = useAtom(EditorProjectAtom(loaded.projectId));
+	const openProjectSession = useAtomSet(openEditorProjectSessionAtom);
 	useLayoutEffect(() => {
-		openEditorProjectSession(loaded.projectId);
-	}, [loaded.projectId]);
+		openProjectSession(loaded.projectId);
+	}, [loaded.projectId, openProjectSession]);
 	useLayoutEffect(() => {
 		publish({
 			action: "refresh",

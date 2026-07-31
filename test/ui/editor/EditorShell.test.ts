@@ -33,14 +33,20 @@ const session = vi.hoisted(() => ({
 	resume: vi.fn(),
 }));
 
-vi.mock("~/bridge/editor/EditorProjectSession", () => ({
+vi.mock("~/bridge/editor/closeEditorProjectSessionFx", () => ({
 	closeEditorProjectSessionFx: () =>
 		Effect.tryPromise({
 			try: () => session.close(),
 			catch: (error) => error,
 		}),
-	releaseEditorProjectSession: session.release,
-	resumeEditorProjectSession: session.resume,
+}));
+
+vi.mock("~/bridge/editor/openEditorProjectSessionFx", () => ({
+	openEditorProjectSessionFx: () => Effect.sync(session.resume),
+}));
+
+vi.mock("~/bridge/editor/releaseEditorProjectSessionFx", () => ({
+	releaseEditorProjectSessionFx: () => Effect.sync(session.release),
 }));
 
 vi.mock("~/bridge/editor/useEditorProject", () => ({

@@ -1,7 +1,7 @@
 import { Effect, Exit, Option } from "effect";
 
 import { claimGameEngineResourceForCloseFx } from "~/bridge/game/claimGameEngineResourceForCloseFx";
-import { closeActiveEditorProjectSessionFx } from "~/bridge/editor/EditorProjectSession";
+import { closeActiveEditorProjectSessionFx } from "~/bridge/editor/closeActiveEditorProjectSessionFx";
 import { readExactCauseFailure } from "~/bridge/game/readExactCauseFailure";
 import type { ArkiniRouter } from "~/createArkiniRouterFx";
 import { waitForActionLoadingCompletionFrameFx } from "~/ui/loading/waitForActionLoadingCompletionFrameFx";

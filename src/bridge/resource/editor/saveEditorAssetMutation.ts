@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
 
 import { EditorProjectAtom } from "~/bridge/editor/EditorProjectAtom";
-import { runEditorProjectMutationFx } from "~/bridge/editor/EditorProjectMutationLane";
+import { runEditorProjectMutationFx } from "~/bridge/editor/runEditorProjectMutationFx";
 import { saveEditorAssetFx } from "~/bridge/resource/editor/saveEditorAssetFx";
 import { EditorProjectError } from "~/engine/editor/error/EditorProjectError";
 

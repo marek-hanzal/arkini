@@ -5,7 +5,6 @@ import { useCallback, useEffect, useState, type PropsWithChildren } from "react"
 import { useEditorProject } from "~/bridge/editor/useEditorProject";
 import { waitForEditorProjectWritesCommandAtom } from "~/bridge/editor/waitForEditorProjectWritesCommandAtom";
 import { ButtonLink, PrimaryButton } from "~/ui/button/Button";
-import { EditorFormActionsProvider, useEditorFormActions } from "~/ui/editor/EditorFormActions";
 import {
 	EditorWorkspaceRoutes,
 	type EditorWorkspaceId,
@@ -18,61 +17,29 @@ const activeTabProps = {
 	className: "border-accent bg-accent text-accent-contrast hover:bg-accent-hover",
 } as const;
 
-const readErrorMessage = (error: unknown) => {
-	if (typeof error === "string") return error;
-	if (
-		typeof error === "object" &&
-		error !== null &&
-		"message" in error &&
-		typeof error.message === "string"
-	) {
-		return error.message;
-	}
-	return "Editor could not finish the requested action.";
-};
-
 /** Keeps editor-wide navigation stable while child tools replace only the content surface. */
-const EditorShellContent = ({ children }: PropsWithChildren) => {
+export const EditorShell = ({ children }: PropsWithChildren) => {
 	const project = useEditorProject();
-	const form = useEditorFormActions();
 	const router = useRouter();
 	const waitForProjectWrites = useAtomSet(waitForEditorProjectWritesCommandAtom, {
 		mode: "promise",
 	});
 	const activeWorkspace = useEditorActiveWorkspace(project.projectId);
-	const [exitRequested, setExitRequested] = useState(false);
-	const [exitError, setExitError] = useState<unknown>();
 	const [exitPending, setExitPending] = useState(false);
 	const params = {
 		projectId: project.projectId,
 	};
 
-	useEffect(
-		() =>
-			window.arkini.lifecycle.onCloseFailed((error) => {
-				setExitError(error);
-				setExitPending(false);
-			}),
-		[],
-	);
-	useEffect(() => {
-		if (form?.isDirty === true) return;
-		setExitRequested(false);
-	}, [
-		form?.isDirty,
-	]);
-
+	useEffect(() => window.arkini.lifecycle.onCloseFailed(() => setExitPending(false)), []);
 	const closeAndExit = useCallback(async () => {
 		if (exitPending) return;
-		setExitError(undefined);
 		setExitPending(true);
 		try {
 			await waitForProjectWrites(undefined);
 			await router.navigate({
 				to: "/main-menu",
 			});
-		} catch (error) {
-			setExitError(error);
+		} catch {
 			setExitPending(false);
 		}
 	}, [
@@ -80,55 +47,6 @@ const EditorShellContent = ({ children }: PropsWithChildren) => {
 		router,
 		waitForProjectWrites,
 	]);
-	const saveForm = useCallback(async () => {
-		if (form === undefined || !form.isDirty || form.isSaving) return;
-		setExitError(undefined);
-		try {
-			await form.save();
-		} catch {
-			// The form command owns and publishes its exact mutation error.
-		}
-	}, [
-		form,
-	]);
-	const discard = useCallback(() => {
-		form?.discard();
-		setExitError(undefined);
-	}, [
-		form,
-	]);
-	const saveAndExit = useCallback(async () => {
-		if (form?.isSaving === true) return;
-		setExitError(undefined);
-		try {
-			if (form?.isDirty === true && !(await form.save())) return;
-			await closeAndExit();
-		} catch {
-			// The form command owns and publishes its exact mutation error.
-		}
-	}, [
-		closeAndExit,
-		form,
-	]);
-	const discardAndExit = useCallback(async () => {
-		form?.discard();
-		await closeAndExit();
-	}, [
-		closeAndExit,
-		form,
-	]);
-	const requestExit = useCallback(() => {
-		setExitError(undefined);
-		if (form?.isDirty === true) {
-			setExitRequested(true);
-			return;
-		}
-		void closeAndExit();
-	}, [
-		closeAndExit,
-		form?.isDirty,
-	]);
-
 	const readTabProps = (workspace: EditorWorkspaceId) =>
 		activeWorkspace === workspace
 			? {
@@ -138,23 +56,10 @@ const EditorShellContent = ({ children }: PropsWithChildren) => {
 			: {
 					className: tabClassName,
 				};
-	const statusError = form?.error ?? exitError;
-	const hasStatusSlot = form !== undefined || statusError !== undefined;
-	const statusVisible = form?.isDirty === true || exitRequested || statusError !== undefined;
-	const statusCopy =
-		statusError !== undefined
-			? readErrorMessage(statusError)
-			: exitRequested
-				? "The editor has unsaved form changes. Save or discard them before exiting."
-				: "This form has unsaved changes.";
 
 	return (
 		<div
-			className={`grid h-dvh min-h-0 overflow-hidden bg-[var(--ak-game-shell-background)] text-foreground ${
-				hasStatusSlot
-					? "grid-rows-[auto_2.5rem_minmax(0,1fr)]"
-					: "grid-rows-[auto_minmax(0,1fr)]"
-			}`}
+			className="grid h-dvh min-h-0 grid-rows-[auto_minmax(0,1fr)] overflow-hidden bg-[var(--ak-game-shell-background)] text-foreground"
 			data-ui="EditorShell"
 			style={{
 				viewTransitionName: "arkini-editor-shell",
@@ -187,56 +92,13 @@ const EditorShellContent = ({ children }: PropsWithChildren) => {
 				</p>
 				<PrimaryButton
 					className="min-h-0 shrink-0 px-4 py-2 text-sm"
-					disabled={exitPending || form?.isSaving === true}
-					cursorIntent={exitPending || form?.isSaving === true ? "progress" : undefined}
-					onClick={requestExit}
+					disabled={exitPending}
+					cursorIntent={exitPending ? "progress" : undefined}
+					onClick={() => void closeAndExit()}
 				>
 					{exitPending ? "Exiting…" : "Exit"}
 				</PrimaryButton>
 			</header>
-			{hasStatusSlot ? (
-				<div
-					className="relative z-10 h-10 border-b border-transparent px-[var(--ak-viewport-padding)]"
-					data-ui="EditorFormStatusSlot"
-				>
-					<div
-						className={`flex h-full min-w-0 items-center gap-3 rounded-b-xl border-x border-b px-4 text-sm transition-[opacity,transform,background-color,border-color] duration-200 ${statusVisible ? "translate-y-0 border-accent/45 bg-accent/10 opacity-100" : "pointer-events-none -translate-y-1 border-transparent opacity-0"}`}
-						aria-hidden={!statusVisible}
-						role={statusError === undefined ? "status" : "alert"}
-					>
-						<p
-							className={`min-w-0 flex-1 truncate ${statusError === undefined ? "text-foreground" : "text-danger"}`}
-						>
-							{statusCopy}
-						</p>
-						{form?.isDirty === true ? (
-							<>
-								<button
-									type="button"
-									className="cursor-pointer text-sm font-semibold text-muted underline decoration-transparent underline-offset-4 transition-colors hover:text-foreground hover:decoration-current disabled:cursor-not-allowed disabled:opacity-60"
-									disabled={form.isSaving || exitPending}
-									onClick={() => {
-										if (exitRequested) void discardAndExit();
-										else discard();
-									}}
-								>
-									Discard
-								</button>
-								<button
-									type="button"
-									className="cursor-pointer text-sm font-semibold text-accent underline decoration-transparent underline-offset-4 transition-colors hover:text-accent-hover hover:decoration-current disabled:cursor-not-allowed disabled:opacity-60"
-									disabled={form.isSaving || exitPending}
-									onClick={() =>
-										void (exitRequested ? saveAndExit() : saveForm())
-									}
-								>
-									{form.isSaving ? "Saving…" : "Save"}
-								</button>
-							</>
-						) : null}
-					</div>
-				</div>
-			) : null}
 			<main
 				className="min-h-0 min-w-0 overflow-hidden px-[var(--ak-viewport-padding)] py-[var(--ak-viewport-gap)]"
 				data-ui="EditorContent"
@@ -249,9 +111,3 @@ const EditorShellContent = ({ children }: PropsWithChildren) => {
 		</div>
 	);
 };
-
-export const EditorShell = ({ children }: PropsWithChildren) => (
-	<EditorFormActionsProvider>
-		<EditorShellContent>{children}</EditorShellContent>
-	</EditorFormActionsProvider>
-);

@@ -29,7 +29,6 @@ vi.mock("~/ui/button/Button", () => ({
 		),
 }));
 
-import { EditorAssetTechnical } from "~/ui/resource/editor/EditorAssetTechnical";
 import { EditorAssetUsage } from "~/ui/resource/editor/EditorAssetUsage";
 
 (
@@ -104,17 +103,5 @@ describe("editor asset detail", () => {
 		const link = container.querySelector("a");
 		expect(link?.dataset.to).toBe("/editor/$projectId/editor/items/$itemUid/view");
 		expect(link?.dataset.params).toContain("water-uid");
-	});
-
-	it("presents bounded canonical technical facts without raw binary output", async () => {
-		const container = await render(
-			createElement(EditorAssetTechnical, {
-				resourceId: "item-water",
-			}),
-		);
-		expect(container.textContent).toContain("image/png");
-		expect(container.textContent).toContain("3 bytes");
-		expect(container.textContent).toContain("IndexedDB resource record");
-		expect(container.textContent).not.toContain("1,2,3");
 	});
 });

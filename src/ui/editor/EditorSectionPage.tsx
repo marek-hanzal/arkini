@@ -11,7 +11,13 @@ export const EditorSectionPage = ({
 		className="grid h-full min-h-0 grid-rows-[auto_minmax(0,1fr)] gap-4"
 		data-ui="EditorSectionPage"
 	>
-		{tabs}
+		<div
+			style={{
+				viewTransitionName: "arkini-editor-section-navigation",
+			}}
+		>
+			{tabs}
+		</div>
 		<div className="min-h-0 overflow-y-auto overscroll-contain pr-1">
 			<div className="mx-auto w-full max-w-5xl pb-8">{children}</div>
 		</div>

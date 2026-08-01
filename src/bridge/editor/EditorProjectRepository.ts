@@ -24,6 +24,13 @@ export namespace EditorProjectRepository {
 		readonly config: GameConfigSchema.Type;
 	}
 
+	export interface ReplaceResourceProps {
+		readonly config: GameConfigSchema.Type;
+		readonly currentId: string;
+		readonly projectId: string;
+		readonly resource: ResourceSchema.Type;
+	}
+
 	export interface UpsertResourcesProps {
 		readonly projectId: string;
 		readonly resources: ReadonlyArray<ResourceSchema.Type>;
@@ -46,6 +53,9 @@ export interface EditorProjectRepositoryService {
 	readonly replaceConfigFx: (
 		props: EditorProjectRepository.ReplaceConfigProps,
 	) => Effect.Effect<EditorProjectCommit, EditorProjectRepositoryError>;
+	readonly replaceResourceFx: (
+		props: EditorProjectRepository.ReplaceResourceProps,
+	) => Effect.Effect<EditorProject, EditorProjectRepositoryError>;
 	readonly upsertItemFx: (
 		props: EditorProjectRepository.UpsertItemProps,
 	) => Effect.Effect<EditorProjectCommit, EditorProjectRepositoryError>;

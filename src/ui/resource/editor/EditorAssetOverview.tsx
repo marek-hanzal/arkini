@@ -43,12 +43,6 @@ export const EditorAssetOverview = ({ resourceId }: { readonly resourceId: strin
 				</div>
 				<div>
 					<dt className="text-xs font-semibold uppercase tracking-wide text-subtle">
-						Type
-					</dt>
-					<dd className="mt-1 text-sm text-foreground">PNG image</dd>
-				</div>
-				<div>
-					<dt className="text-xs font-semibold uppercase tracking-wide text-subtle">
 						Dimensions
 					</dt>
 					<dd className="mt-1 text-sm text-foreground">

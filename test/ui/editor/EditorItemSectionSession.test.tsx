@@ -45,10 +45,6 @@ vi.mock("~/bridge/editor/useEditorProject", () => ({
 	}),
 }));
 
-vi.mock("~/ui/editor/EditorFormActions", () => ({
-	useRegisterEditorFormActions: () => undefined,
-}));
-
 vi.mock("~/bridge/item/editor/saveEditorItemCommandAtom", () => ({
 	saveEditorItemCommandAtom: () => ({
 		id: "save-editor-item",

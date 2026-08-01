@@ -1,7 +1,7 @@
 import type { PropsWithChildren } from "react";
 
 import { useEditorProject } from "~/bridge/editor/useEditorProject";
-import { ButtonLink } from "~/ui/button/Button";
+import { ButtonLink, PrimaryButtonLink } from "~/ui/button/Button";
 import { EditorSectionPage } from "~/ui/editor/EditorSectionPage";
 import { EditorSectionTabs } from "~/ui/editor/EditorSectionTabs";
 import { EditorAssetDetailTab } from "~/ui/resource/editor/EditorAssetDetailTab";
@@ -37,13 +37,9 @@ export const EditorAssetDetail = ({
 							filter,
 							query,
 						}}
-						className="gap-2"
+						className="min-h-0 px-3 py-2"
 					>
-						<span
-							className="icon-[lucide--arrow-left] size-4"
-							aria-hidden="true"
-						/>
-						Back
+						<span className="icon-[lucide--arrow-left] size-4" />
 					</ButtonLink>
 				}
 			/>
@@ -63,20 +59,33 @@ export const EditorAssetDetail = ({
 								filter,
 								query,
 							}}
-							className="min-h-0 shrink-0 gap-2 px-3 py-2 text-sm"
+							className="min-h-0 shrink-0 px-3 py-2"
+						>
+							<span className="icon-[lucide--arrow-left] size-4" />
+						</ButtonLink>
+						<div className="min-w-0 flex-1">
+							<h1 className="truncate text-xl font-semibold">{resource.id}</h1>
+						</div>
+						<PrimaryButtonLink
+							to="/editor/$projectId/assets/$resourceId/edit"
+							params={{
+								projectId: project.projectId,
+								resourceId,
+							}}
+							search={{
+								filter,
+								query,
+							}}
+							className="min-h-0 gap-2 px-4 py-2 text-sm"
 						>
 							<span
-								className="icon-[lucide--arrow-left] size-4"
+								className="icon-[lucide--pencil] size-4"
 								aria-hidden="true"
 							/>
-							Back
-						</ButtonLink>
-						<div className="min-w-0">
-							<h1 className="truncate text-xl font-semibold">{resource.id}</h1>
-							<p className="mt-1 text-sm text-muted">Asset detail</p>
-						</div>
+							Edit
+						</PrimaryButtonLink>
 					</header>
-					<EditorSectionTabs label="Asset detail sections">
+					<EditorSectionTabs label="Asset sections">
 						<EditorAssetDetailTab
 							filter={filter}
 							label="Overview"
@@ -92,14 +101,6 @@ export const EditorAssetDetail = ({
 							query={query}
 							resourceId={resourceId}
 							to="/editor/$projectId/assets/$resourceId/detail/usage"
-						/>
-						<EditorAssetDetailTab
-							filter={filter}
-							label="Technical"
-							projectId={project.projectId}
-							query={query}
-							resourceId={resourceId}
-							to="/editor/$projectId/assets/$resourceId/detail/technical"
 						/>
 					</EditorSectionTabs>
 				</div>

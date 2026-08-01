@@ -209,6 +209,39 @@ describe("createIndexedDbEditorProjectRepositoryFx", () => {
 		);
 	});
 
+	it("atomically renames one resource with its canonical config", async () => {
+		const databaseName = createDatabaseName();
+		await runWithRepository(databaseName, (repository) =>
+			repository.createProjectFx({
+				projectId: "project-one",
+				config: editorTestPayload.config,
+				resources: editorTestPayload.resources,
+			}),
+		);
+		const changed = await runWithRepository(databaseName, (repository) =>
+			repository.replaceResourceFx({
+				projectId: "project-one",
+				currentId: "hero",
+				config: {
+					...editorTestPayload.config,
+					resources: {
+						...editorTestPayload.config.resources,
+						hero: "new-hero",
+					},
+				},
+				resource: {
+					...editorTestPayload.resources[0],
+					id: "new-hero",
+				},
+			}),
+		);
+
+		expect(changed.revision).toBe(1);
+		expect(changed.config.resources.hero).toBe("new-hero");
+		expect(changed.resources.some(({ id }) => id === "hero")).toBe(false);
+		expect(changed.resources.some(({ id }) => id === "new-hero")).toBe(true);
+	});
+
 	it("atomically replaces the complete canonical config", async () => {
 		const databaseName = createDatabaseName();
 		const created = await runWithRepository(databaseName, (repository) =>

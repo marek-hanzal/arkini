@@ -28,7 +28,7 @@ export const EditorAssetCard = ({
 			className="group grid min-h-0 min-w-0 grid-rows-[minmax(8rem,1fr)_auto] overflow-hidden rounded-xl border-line bg-surface p-0 text-left shadow-none hover:border-line-strong hover:bg-surface-raised"
 			data-ui="EditorAssetCard"
 		>
-			<span className="grid min-h-32 place-items-center overflow-hidden bg-canvas/70 p-4">
+			<span className="grid min-h-32 place-items-center overflow-hidden p-4">
 				{url === undefined ? (
 					<span
 						className="icon-[lucide--image] size-8 text-subtle"
@@ -44,9 +44,8 @@ export const EditorAssetCard = ({
 					/>
 				)}
 			</span>
-			<span className="grid min-w-0 gap-1 border-t border-line px-3 py-2.5">
-				<span className="truncate font-semibold">{resource.id}</span>
-				<span className="truncate text-xs text-muted">PNG · {resource.mime}</span>
+			<span className="min-w-0 px-3 py-2.5">
+				<span className="block truncate font-semibold">{resource.id}</span>
 			</span>
 		</ButtonLink>
 	);

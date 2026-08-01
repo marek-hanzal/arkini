@@ -36,6 +36,7 @@ const UnavailableEditorProjectRepository: EditorProjectRepositoryService = {
 	listProjectsFx: unavailableEditorProjectRepositoryFx("list-projects"),
 	readProjectFx: () => unavailableEditorProjectRepositoryFx("read-project"),
 	replaceConfigFx: () => unavailableEditorProjectRepositoryFx("replace-config"),
+	replaceResourceFx: () => unavailableEditorProjectRepositoryFx("replace-resource"),
 	upsertItemFx: () => unavailableEditorProjectRepositoryFx("upsert-item"),
 	upsertResourcesFx: () => unavailableEditorProjectRepositoryFx("upsert-resource"),
 };

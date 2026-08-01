@@ -1,9 +1,7 @@
 import { useAtomSet, useAtomValue } from "@effect/atom-react";
 import { revalidateLogic, useStore } from "@tanstack/react-form";
-import * as Atom from "effect/unstable/reactivity/Atom";
-import { useCallback, useLayoutEffect, useMemo, useRef } from "react";
+import { useCallback, useMemo, useRef } from "react";
 
-import { EditorFormDirtyAtom } from "~/bridge/editor/EditorFormDirtyAtom";
 import { useEditorProject } from "~/bridge/editor/useEditorProject";
 import {
 	EditorItemFormSchema,
@@ -11,7 +9,6 @@ import {
 } from "~/bridge/item/editor/EditorItemFormSchema";
 import type { EditorItem } from "~/bridge/item/editor/EditorItemModel";
 import { saveEditorItemCommandAtom } from "~/bridge/item/editor/saveEditorItemCommandAtom";
-import { useRegisterEditorFormActions } from "~/ui/editor/EditorFormActions";
 import { useAppForm } from "~/ui/form/EditorForm";
 import {
 	readEditorItemSectionForPath,
@@ -53,14 +50,11 @@ export const useEditorItemFormController = ({
 		label: category.title,
 		value: category.id,
 	}));
-	const setFormDirty = useAtomSet(EditorFormDirtyAtom);
-	const ownerId = `item:${initialItem.uid}`;
 	const saveItemAtom = saveEditorItemCommandAtom(project.projectId);
 	const saveItemResult = useAtomValue(saveItemAtom);
 	const saveItem = useAtomSet(saveItemAtom, {
 		mode: "promise",
 	});
-	const resetSaveItem = useAtomSet(saveItemAtom);
 	const submitSucceeded = useRef(false);
 	const form = useAppForm({
 		defaultValues: canonicalItem,
@@ -75,10 +69,6 @@ export const useEditorItemFormController = ({
 			const item = EditorItemFormSchema.parse(value);
 			const saved = await saveItem(item);
 			submitSucceeded.current = true;
-			setFormDirty({
-				dirty: false,
-				ownerId,
-			});
 			formApi.reset({
 				...saved,
 				tags: saved.tags.join(", "),
@@ -100,36 +90,6 @@ export const useEditorItemFormController = ({
 			? "Fix the highlighted item fields before saving."
 			: undefined,
 	);
-	useLayoutEffect(() => {
-		setFormDirty({
-			dirty,
-			ownerId,
-		});
-		return () => {
-			setFormDirty({
-				dirty: false,
-				ownerId,
-			});
-		};
-	}, [
-		dirty,
-		ownerId,
-		setFormDirty,
-	]);
-	const discard = useCallback(() => {
-		resetSaveItem(Atom.Reset);
-		setFormDirty({
-			dirty: false,
-			ownerId,
-		});
-		form.reset(canonicalItem);
-	}, [
-		canonicalItem,
-		form,
-		ownerId,
-		resetSaveItem,
-		setFormDirty,
-	]);
 	const save = useCallback(async () => {
 		if (!dirty || submitting) return false;
 		submitSucceeded.current = false;
@@ -155,28 +115,10 @@ export const useEditorItemFormController = ({
 		onInvalidSection,
 		submitting,
 	]);
-	const actions = useMemo(
-		() => ({
-			discard,
-			error: readSettledAsyncResultError(saveItemResult) ?? validationError,
-			isDirty: dirty,
-			isSaving: submitting,
-			save,
-		}),
-		[
-			dirty,
-			discard,
-			saveItemResult,
-			save,
-			submitting,
-			validationError,
-		],
-	);
-	useRegisterEditorFormActions(actions);
-
 	return {
 		canonicalItem,
 		categoryOptions,
+		error: readSettledAsyncResultError(saveItemResult) ?? validationError,
 		isDirty: dirty,
 		isSaving: submitting,
 		form,

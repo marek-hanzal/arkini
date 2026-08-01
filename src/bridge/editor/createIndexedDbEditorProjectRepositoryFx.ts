@@ -446,12 +446,104 @@ export const createIndexedDbEditorProjectRepositoryFx = Effect.fn(
 		);
 	});
 
+	const replaceResourceFx: EditorProjectRepositoryService["replaceResourceFx"] = Effect.fn(
+		"IndexedDbEditorProjectRepository.replaceResourceFx",
+	)(function* ({ config: candidateConfig, currentId, projectId, resource: candidateResource }) {
+		const config = yield* Effect.try({
+			try: () => GameConfigSchema.parse(candidateConfig),
+			catch: (cause) =>
+				createRepositoryError(
+					"replace-resource",
+					"The resource references are invalid.",
+					cause,
+				),
+		});
+		const resource = yield* Effect.try({
+			try: () => ResourceSchema.parse(candidateResource),
+			catch: (cause) =>
+				createRepositoryError(
+					"replace-resource",
+					"The replacement resource is invalid.",
+					cause,
+				),
+		});
+		const nowMs = yield* Clock.currentTimeMillis;
+		return yield* writeLock.withPermits(1)(
+			Effect.tryPromise({
+				try: () =>
+					database.transaction("rw", projects, resources, async () => {
+						const candidate = await projects.get(projectId);
+						if (candidate === undefined)
+							throw createRepositoryError(
+								"replace-resource",
+								`Editor project ${projectId} does not exist.`,
+							);
+						const existing = await resources.get([
+							projectId,
+							currentId,
+						]);
+						if (existing === undefined)
+							throw createRepositoryError(
+								"replace-resource",
+								`Resource ${currentId} does not exist.`,
+							);
+						if (
+							resource.id !== currentId &&
+							(await resources.get([
+								projectId,
+								resource.id,
+							])) !== undefined
+						) {
+							throw createRepositoryError(
+								"replace-resource",
+								`Resource ID ${resource.id} already exists.`,
+							);
+						}
+						const current = parseProjectRecord(candidate, "replace-resource");
+						const record = parseProjectRecord(
+							{
+								...current,
+								config,
+								revision: current.revision + 1,
+								updatedAtMs: Math.max(nowMs, current.updatedAtMs + 1),
+							},
+							"replace-resource",
+						);
+						await resources.put({
+							projectId,
+							...resource,
+						});
+						if (resource.id !== currentId)
+							await resources.delete([
+								projectId,
+								currentId,
+							]);
+						await projects.put(record);
+						return materializeProject(
+							record,
+							parseResourceRecords(
+								await resources.where("projectId").equals(projectId).toArray(),
+								"replace-resource",
+							),
+						);
+					}),
+				catch: (cause) =>
+					createRepositoryError(
+						"replace-resource",
+						`Resource ${currentId} could not be updated.`,
+						cause,
+					),
+			}).pipe(Effect.uninterruptible),
+		);
+	});
+
 	return {
 		awaitIdleFx: writeLock.withPermits(1)(Effect.void),
 		createProjectFx,
 		listProjectsFx,
 		readProjectFx,
 		replaceConfigFx,
+		replaceResourceFx,
 		upsertItemFx,
 		upsertResourcesFx,
 	} satisfies EditorProjectRepositoryService;

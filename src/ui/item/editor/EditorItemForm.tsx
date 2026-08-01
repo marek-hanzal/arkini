@@ -86,7 +86,7 @@ const EditorItemFormSession = ({
 	return (
 		<EditorItemFormProvider value={context}>
 			<section
-				className="grid h-full min-h-0 grid-rows-[auto_minmax(0,1fr)] gap-[var(--ak-viewport-gap)]"
+				className="flex h-full min-h-0 flex-col gap-[var(--ak-viewport-gap)]"
 				aria-labelledby="editor-item-form-title"
 				data-ui="EditorItemForm"
 			>
@@ -136,8 +136,15 @@ const EditorItemFormSession = ({
 						{controller.isSaving ? "Saving…" : "Save"}
 					</PrimaryButton>
 				</header>
+				{controller.error === undefined ? null : (
+					<p className="rounded-lg border border-danger/40 bg-danger/10 px-4 py-3 text-sm text-danger">
+						{controller.error instanceof Error
+							? controller.error.message
+							: String(controller.error)}
+					</p>
+				)}
 				<form
-					className="min-h-0"
+					className="min-h-0 flex-1"
 					noValidate
 					onSubmit={(event) => {
 						event.preventDefault();

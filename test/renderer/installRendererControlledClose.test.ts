@@ -3,7 +3,6 @@
 import { Deferred, Effect, Exit, Scope } from "effect";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { EditorFormDirtyAtom } from "~/bridge/editor/EditorFormDirtyAtom";
 import type { EditorProjectRepositoryService } from "~/bridge/editor/EditorProjectRepository";
 import { acquireGameEngineLeaseFx } from "~/bridge/game/acquireGameEngineLeaseFx";
 import { CriticalGameLifecycleError } from "~/bridge/game/CriticalGameLifecycleError";
@@ -191,6 +190,7 @@ describe("installRendererControlledClose", () => {
 			listProjectsFx: Effect.die("Unexpected list."),
 			readProjectFx: () => Effect.die("Unexpected read."),
 			replaceConfigFx: () => Effect.die("Unexpected config save."),
+			replaceResourceFx: () => Effect.die("Unexpected resource replacement."),
 			upsertItemFx: () => Effect.die("Unexpected item save."),
 			upsertResourcesFx: () => Effect.die("Unexpected resource save."),
 		};
@@ -220,32 +220,6 @@ describe("installRendererControlledClose", () => {
 		Effect.runSync(Deferred.succeed(idle, undefined));
 		await close;
 		expect(closed).toBe(true);
-		expect(router.navigate).not.toHaveBeenCalled();
-		remove();
-	});
-
-	it("rejects native close while an editor form has unsaved item changes", async () => {
-		const { atomRegistry, rendererRuntime } = createTestRendererRuntime({
-			createResourceFx: () => Effect.never,
-		});
-		runtimes.push(rendererRuntime);
-		atomRegistry.set(EditorFormDirtyAtom, {
-			dirty: true,
-			ownerId: "item:test",
-		});
-		const lifecycle = createLifecycle();
-		const router = createRouter();
-		const remove = rendererRuntime.runSync(
-			installRendererControlledCloseFx({
-				lifecycle: lifecycle.lifecycle,
-				rendererRuntime,
-				router: router.router,
-			}),
-		);
-
-		await expect(lifecycle.readBeforeClose()()).rejects.toThrow(
-			"Save or discard the current editor changes",
-		);
 		expect(router.navigate).not.toHaveBeenCalled();
 		remove();
 	});

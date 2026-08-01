@@ -74,8 +74,9 @@ export namespace saveEditorAssetsFx {
 	}
 }
 
-const validateEditorAssetFileFx = Effect.fn("validateEditorAssetFileFx")(function* (
+export const validateEditorAssetFileFx = Effect.fn("validateEditorAssetFileFx")(function* (
 	inputFile: EditorAssetFileInput,
+	resourceIdOverride?: string,
 ) {
 	if (!inputFile.name.toLowerCase().endsWith(".png") || inputFile.size > maxPngBytes) {
 		return yield* Effect.fail(
@@ -86,7 +87,7 @@ const validateEditorAssetFileFx = Effect.fn("validateEditorAssetFileFx")(functio
 		);
 	}
 	const resourceId = yield* Effect.try({
-		try: () => IdSchema.parse(readResourceId(inputFile.name)),
+		try: () => IdSchema.parse(resourceIdOverride ?? readResourceId(inputFile.name)),
 		catch: (cause) =>
 			new EditorProjectError({
 				reason: "invalid-resource-id",
@@ -150,7 +151,7 @@ export const saveEditorAssetsFx = Effect.fn("saveEditorAssetsFx")(function* ({
 			}),
 		);
 	}
-	const resources = yield* Effect.forEach(files, validateEditorAssetFileFx, {
+	const resources = yield* Effect.forEach(files, (file) => validateEditorAssetFileFx(file), {
 		concurrency: "unbounded",
 	});
 	const resourceIds = new Set<string>();

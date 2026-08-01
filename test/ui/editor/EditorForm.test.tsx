@@ -47,8 +47,10 @@ const mount = async (element: ReactNode) => {
 };
 
 const changeInput = async (input: HTMLInputElement, value: string) => {
+	const valueSetter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")?.set;
+	if (valueSetter === undefined) throw new Error("Expected native input value setter.");
 	await act(async () => {
-		input.value = value;
+		valueSetter.call(input, value);
 		input.dispatchEvent(
 			new Event("input", {
 				bubbles: true,
@@ -57,6 +59,8 @@ const changeInput = async (input: HTMLInputElement, value: string) => {
 	});
 };
 
+let resetLocalValues: () => void = () => undefined;
+
 const LocalValueHarness = () => {
 	const form = useAppForm({
 		defaultValues: {
@@ -64,6 +68,7 @@ const LocalValueHarness = () => {
 			tags: "resource, original",
 		},
 	});
+	resetLocalValues = () => form.reset();
 	const values = useStore(form.store, (state) => state.values);
 	return (
 		<>
@@ -71,17 +76,6 @@ const LocalValueHarness = () => {
 			<form.AppField name="amount">
 				{(field) => <field.NumberField label="Amount" />}
 			</form.AppField>
-			<button
-				type="button"
-				onClick={() =>
-					form.reset({
-						amount: 4,
-						tags: "resource, reset",
-					})
-				}
-			>
-				Reset
-			</button>
 			<output data-testid="values">
 				{values.tags}|{Number.isNaN(values.amount) ? "NaN" : values.amount}
 			</output>
@@ -152,12 +146,16 @@ describe("editor form fields", () => {
 		);
 
 		await act(async () => {
-			container.querySelector<HTMLButtonElement>("button")?.click();
+			resetLocalValues();
 		});
-		expect(tags.value).toBe("resource, reset");
-		expect(container.querySelector('[data-testid="values"]')?.textContent).toBe(
-			"resource, reset|4",
-		);
+		await vi.waitFor(() => {
+			expect(container.querySelector<HTMLInputElement>('input[name="tags"]')?.value).toBe(
+				"resource, original",
+			);
+			expect(container.querySelector('[data-testid="values"]')?.textContent).toBe(
+				"resource, original|4",
+			);
+		});
 	});
 
 	it("maps canonical schema issues to fields and submits only a valid item", async () => {

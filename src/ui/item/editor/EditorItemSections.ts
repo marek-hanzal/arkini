@@ -11,6 +11,12 @@ export const EditorItemSectionIds = [
 
 export type EditorItemSectionId = (typeof EditorItemSectionIds)[number];
 
+export const parseEditorItemSectionId = (candidate: string): EditorItemSectionId => {
+	const section = EditorItemSectionIds.find((id) => id === candidate);
+	if (section === undefined) throw new Error(`Unknown editor item section ${candidate}.`);
+	return section;
+};
+
 export interface EditorItemSectionDescriptor {
 	readonly id: EditorItemSectionId;
 	readonly label: string;

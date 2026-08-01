@@ -1,5 +1,5 @@
-import type { EditorItemType } from "~/bridge/item/editor/EditorItemModel";
 import { ButtonLink } from "~/ui/button/Button";
+import type { EditorItemType } from "~/bridge/item/editor/EditorItemModel";
 import type { EditorItemSectionDescriptor } from "~/ui/item/editor/EditorItemSections";
 
 const className =
@@ -12,186 +12,36 @@ const inactiveProps = {
 	"aria-selected": false,
 } as const;
 
-interface CommonProps {
-	readonly itemUid: string;
-	readonly projectId: string;
-	readonly section: EditorItemSectionDescriptor;
-}
-
-const EditorCreateItemSectionLink = ({
+export const EditorItemSectionLink = ({
 	itemType,
 	itemUid,
 	projectId,
 	section,
-}: CommonProps & {
-	readonly itemType: EditorItemType;
-}) => {
-	const props = {
-		activeProps,
-		inactiveProps,
-		className,
-		params: {
+}: {
+	readonly itemType?: EditorItemType;
+	readonly itemUid: string;
+	readonly projectId: string;
+	readonly section: EditorItemSectionDescriptor;
+}) => (
+	<ButtonLink
+		to="/editor/$projectId/editor/items/$itemUid/form/$sectionId"
+		params={{
 			projectId,
 			itemUid,
-		},
-		role: "tab",
-		search: {
-			itemType,
-		},
-	} as const;
-	switch (section.id) {
-		case "identity":
-			return (
-				<ButtonLink
-					{...props}
-					to="/editor/$projectId/editor/items/$itemUid/create/identity"
-				>
-					{section.label}
-				</ButtonLink>
-			);
-		case "artwork":
-			return (
-				<ButtonLink
-					{...props}
-					to="/editor/$projectId/editor/items/$itemUid/create/artwork"
-				>
-					{section.label}
-				</ButtonLink>
-			);
-		case "limits":
-			return (
-				<ButtonLink
-					{...props}
-					to="/editor/$projectId/editor/items/$itemUid/create/limits"
-				>
-					{section.label}
-				</ButtonLink>
-			);
-		case "charges":
-			return (
-				<ButtonLink
-					{...props}
-					to="/editor/$projectId/editor/items/$itemUid/create/charges"
-				>
-					{section.label}
-				</ButtonLink>
-			);
-		case "merges":
-			return (
-				<ButtonLink
-					{...props}
-					to="/editor/$projectId/editor/items/$itemUid/create/merges"
-				>
-					{section.label}
-				</ButtonLink>
-			);
-		case "production":
-			return (
-				<ButtonLink
-					{...props}
-					to="/editor/$projectId/editor/items/$itemUid/create/production"
-				>
-					{section.label}
-				</ButtonLink>
-			);
-	}
-};
-
-const EditorEditItemSectionLink = ({ itemUid, projectId, section }: CommonProps) => {
-	const props = {
-		activeProps,
-		inactiveProps,
-		className,
-		params: {
-			projectId,
-			itemUid,
-		},
-		role: "tab",
-	} as const;
-	switch (section.id) {
-		case "identity":
-			return (
-				<ButtonLink
-					{...props}
-					to="/editor/$projectId/editor/items/$itemUid/edit/identity"
-				>
-					{section.label}
-				</ButtonLink>
-			);
-		case "artwork":
-			return (
-				<ButtonLink
-					{...props}
-					to="/editor/$projectId/editor/items/$itemUid/edit/artwork"
-				>
-					{section.label}
-				</ButtonLink>
-			);
-		case "limits":
-			return (
-				<ButtonLink
-					{...props}
-					to="/editor/$projectId/editor/items/$itemUid/edit/limits"
-				>
-					{section.label}
-				</ButtonLink>
-			);
-		case "charges":
-			return (
-				<ButtonLink
-					{...props}
-					to="/editor/$projectId/editor/items/$itemUid/edit/charges"
-				>
-					{section.label}
-				</ButtonLink>
-			);
-		case "merges":
-			return (
-				<ButtonLink
-					{...props}
-					to="/editor/$projectId/editor/items/$itemUid/edit/merges"
-				>
-					{section.label}
-				</ButtonLink>
-			);
-		case "production":
-			return (
-				<ButtonLink
-					{...props}
-					to="/editor/$projectId/editor/items/$itemUid/edit/production"
-				>
-					{section.label}
-				</ButtonLink>
-			);
-	}
-};
-
-export const EditorItemSectionLink = ({
-	itemUid,
-	projectId,
-	route,
-	section,
-}: CommonProps & {
-	readonly route:
-		| {
-				readonly kind: "create";
-				readonly itemType: EditorItemType;
-		  }
-		| {
-				readonly kind: "edit";
-		  };
-}) =>
-	route.kind === "create" ? (
-		<EditorCreateItemSectionLink
-			itemType={route.itemType}
-			itemUid={itemUid}
-			projectId={projectId}
-			section={section}
-		/>
-	) : (
-		<EditorEditItemSectionLink
-			itemUid={itemUid}
-			projectId={projectId}
-			section={section}
-		/>
-	);
+			sectionId: section.id,
+		}}
+		search={
+			itemType === undefined
+				? {}
+				: {
+						itemType,
+					}
+		}
+		activeProps={activeProps}
+		inactiveProps={inactiveProps}
+		className={className}
+		role="tab"
+	>
+		{section.label}
+	</ButtonLink>
+);

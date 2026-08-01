@@ -4,8 +4,8 @@ import { act, createElement, type ReactNode } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { EditorCreateItemForm } from "~/ui/item/editor/EditorCreateItemForm";
-import { EditorEditItemForm } from "~/ui/item/editor/EditorEditItemForm";
+import { EditorItemFormPage } from "~/page/editor/EditorItemFormPage";
+import { EditorItemTypePicker } from "~/ui/item/editor/EditorItemTypePicker";
 import { EditorItemView } from "~/ui/item/editor/EditorItemView";
 
 (
@@ -16,17 +16,8 @@ import { EditorItemView } from "~/ui/item/editor/EditorItemView";
 
 const state = vi.hoisted(() => ({
 	formProps: undefined as unknown,
-	navigate: vi.fn(),
 	project: undefined as unknown,
 }));
-
-vi.mock("@tanstack/react-router", async (importOriginal) => {
-	const original = await importOriginal<typeof import("@tanstack/react-router")>();
-	return {
-		...original,
-		useNavigate: () => state.navigate,
-	};
-});
 
 vi.mock("~/bridge/editor/useEditorProject", () => ({
 	useEditorProject: () => state.project,
@@ -49,11 +40,12 @@ vi.mock("~/ui/item/editor/EditorItemThumbnail", () => ({
 }));
 
 vi.mock("~/ui/button/Button", () => {
-	const RenderLink = ({ children, params, to }: Record<string, unknown>) =>
+	const RenderLink = ({ children, params, search, to }: Record<string, unknown>) =>
 		createElement(
 			"a",
 			{
 				"data-params": JSON.stringify(params),
+				"data-search": JSON.stringify(search),
 				"data-to": to,
 			},
 			children as ReactNode,
@@ -84,7 +76,6 @@ const item = {
 
 beforeEach(() => {
 	state.formProps = undefined;
-	state.navigate.mockReset().mockResolvedValue(undefined);
 	state.project = {
 		projectId: "editor-test",
 		title: "Editor test",
@@ -127,82 +118,54 @@ const render = async (element: ReactNode) => {
 };
 
 describe("editor item flow", () => {
-	it("opens canonical items in read-only view before offering explicit Edit", async () => {
+	it("opens canonical items in read-only view before offering the unified form", async () => {
 		const container = await render(
 			createElement(EditorItemView, {
 				uid: item.uid,
 			}),
 		);
 		const edit = container.querySelector<HTMLAnchorElement>(
-			'[data-to="/editor/$projectId/editor/items/$itemUid/edit/identity"]',
+			'[data-to="/editor/$projectId/editor/items/$itemUid/form/$sectionId"]',
 		);
 
 		expect(container.textContent).toContain("Water");
 		expect(container.textContent).toContain("Fresh water.");
 		expect(edit?.dataset.params).toContain(item.uid);
+		expect(edit?.dataset.params).toContain("identity");
 	});
 
-	it("initializes edit from the canonical UID and returns to its view after save", async () => {
+	it("passes both new and persisted items through one form page", async () => {
 		await render(
-			createElement(EditorEditItemForm, {
+			createElement(EditorItemFormPage, {
 				uid: item.uid,
 			}),
 		);
-		const props = state.formProps as {
-			readonly initialItem: typeof item;
-			readonly onSaved: (saved: typeof item) => Promise<void>;
-			readonly route: {
-				readonly kind: "edit";
-			};
-		};
-
-		expect(props.initialItem).toBe(item);
-		expect(props.route).toEqual({
-			kind: "edit",
+		expect(state.formProps).toMatchObject({
+			uid: item.uid,
 		});
-		await props.onSaved(item);
-		expect(state.navigate).toHaveBeenCalledWith({
-			to: "/editor/$projectId/editor/items/$itemUid/view",
-			params: {
-				projectId: "editor-test",
-				itemUid: item.uid,
-			},
-			replace: true,
-		});
-	});
 
-	it("creates only a local form value until the new UID is saved", async () => {
 		await render(
-			createElement(EditorCreateItemForm, {
+			createElement(EditorItemFormPage, {
 				itemType: "simple",
 				uid: "new-item-uid",
 			}),
 		);
-		const props = state.formProps as {
-			readonly initialItem: typeof item;
-			readonly onSaved: (saved: typeof item) => Promise<void>;
-			readonly route: {
-				readonly kind: "create";
-				readonly itemType: "simple";
-			};
-		};
-
-		expect(props.initialItem.uid).toBe("new-item-uid");
-		expect(props.route).toEqual({
-			kind: "create",
+		expect(state.formProps).toMatchObject({
 			itemType: "simple",
+			uid: "new-item-uid",
 		});
-		expect(props.initialItem.type).toBe("simple");
-		expect(
-			(
-				state.project as {
-					readonly config: {
-						readonly items: Record<string, unknown>;
-					};
-				}
-			).config.items,
-		).toEqual({
-			[item.id]: item,
-		});
+	});
+
+	it("starts every new item type in the unified identity section", async () => {
+		const container = await render(createElement(EditorItemTypePicker));
+		const links = [
+			...container.querySelectorAll<HTMLAnchorElement>(
+				'[data-to="/editor/$projectId/editor/items/$itemUid/form/$sectionId"]',
+			),
+		];
+
+		expect(links).toHaveLength(8);
+		expect(links.every((link) => link.dataset.params?.includes("identity"))).toBe(true);
+		expect(links.every((link) => link.dataset.search?.includes("itemType"))).toBe(true);
 	});
 });

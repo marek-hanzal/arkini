@@ -98,5 +98,8 @@ export const runEditorProjectMutationFx = Effect.fn("runEditorProjectMutationFx"
 			return result;
 		}),
 	);
-	return yield* runMutation.pipe(Effect.ensuring(Effect.sync(releaseAdmission)));
+	return yield* runMutation.pipe(
+		Effect.uninterruptible,
+		Effect.ensuring(Effect.sync(releaseAdmission)),
+	);
 });

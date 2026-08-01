@@ -6,6 +6,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("@effect/atom-react", () => ({
 	useAtomSet: () => vi.fn(),
+	useAtomValue: () => state.canonical,
 }));
 
 vi.mock("@tanstack/react-router", async (importOriginal) => {
@@ -15,6 +16,17 @@ vi.mock("@tanstack/react-router", async (importOriginal) => {
 		useNavigate: () => vi.fn().mockResolvedValue(undefined),
 	};
 });
+
+vi.mock("~/ui/button/Button", () => ({
+	ButtonLink: ({ children }: { readonly children?: ReactNode }) =>
+		createElement("a", null, children),
+}));
+
+const state = vi.hoisted(() => ({
+	canonical: undefined as unknown,
+	draft: undefined as unknown,
+	persisted: undefined as unknown,
+}));
 
 vi.mock("~/bridge/editor/useEditorProject", () => ({
 	useEditorProject: () => ({
@@ -35,12 +47,20 @@ vi.mock("~/ui/editor/EditorFormActions", () => ({
 	useRegisterEditorFormActions: () => undefined,
 }));
 
-vi.mock("~/ui/item/editor/useSaveEditorItemCommand", () => ({
-	useSaveEditorItemCommand: () => ({
+vi.mock("~/ui/item/editor/useStageEditorItemCommand", () => ({
+	useStageEditorItemCommand: () => ({
 		error: undefined,
 		mutateAsync: vi.fn(),
 		reset: vi.fn(),
 	}),
+}));
+
+vi.mock("~/bridge/item/editor/useEditorItemDraft", () => ({
+	useEditorItemDraft: () => state.draft,
+}));
+
+vi.mock("~/ui/item/editor/useEditorItemByUid", () => ({
+	useEditorItemByUid: () => state.persisted,
 }));
 
 vi.mock("~/ui/resource/editor/EditorAssetAutocompleteField", () => ({
@@ -81,7 +101,18 @@ const item: EditorItem = {
 	maxStackSize: 1,
 };
 
-beforeEach(() => vi.clearAllMocks());
+beforeEach(() => {
+	vi.clearAllMocks();
+	state.canonical = {
+		config: {
+			items: {
+				[item.id]: item,
+			},
+		},
+	};
+	state.draft = item;
+	state.persisted = item;
+});
 
 afterEach(async () => {
 	await act(async () => {
@@ -90,7 +121,7 @@ afterEach(async () => {
 	document.body.replaceChildren();
 });
 
-const render = async (children: ReactNode) => {
+const render = async (children: ReactNode, itemType?: "simple") => {
 	const container = document.createElement("div");
 	document.body.append(container);
 	const root = createRoot(container);
@@ -99,12 +130,8 @@ const render = async (children: ReactNode) => {
 		await act(async () => {
 			root.render(
 				<EditorItemForm
-					back={null}
-					initialItem={item}
-					route={{
-						kind: "edit",
-					}}
-					title="Water"
+					itemType={itemType}
+					uid={item.uid}
 				>
 					{next}
 				</EditorItemForm>,
@@ -119,8 +146,10 @@ const render = async (children: ReactNode) => {
 };
 
 const changeInput = async (input: HTMLInputElement, value: string) => {
+	const valueSetter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")?.set;
+	if (valueSetter === undefined) throw new Error("Expected native input value setter.");
 	await act(async () => {
-		input.value = value;
+		valueSetter.call(input, value);
 		input.dispatchEvent(
 			new Event("input", {
 				bubbles: true,
@@ -142,6 +171,29 @@ describe("item section form session", () => {
 
 		expect(container.querySelector<HTMLInputElement>('input[name="title"]')?.value).toBe(
 			"Changed water",
+		);
+	});
+
+	it("keeps a persisted item ID read-only", async () => {
+		const { container } = await render(<EditorItemIdentitySection />);
+
+		expect(container.querySelector('input[name="id"]')).toBeNull();
+		expect(container.textContent).toContain("item:water");
+		expect(container.textContent).toContain("Immutable after the item is first saved.");
+	});
+
+	it("allows a staged new item ID to change before its first disk persist", async () => {
+		state.canonical = {
+			config: {
+				items: {},
+			},
+		};
+		const { container } = await render(<EditorItemIdentitySection />, "simple");
+
+		const id = container.querySelector<HTMLInputElement>('input[name="id"]');
+		expect(id?.value).toBe("item:water");
+		expect(container.textContent).toContain(
+			"The source ID becomes immutable after the first save.",
 		);
 	});
 });

@@ -1,140 +1,89 @@
+import { useAtomValue } from "@effect/atom-react";
 import { useNavigate } from "@tanstack/react-router";
-import { useCallback, useMemo, type PropsWithChildren, type ReactNode } from "react";
+import { useCallback, useMemo, type PropsWithChildren } from "react";
 
+import { EditorProjectAtom } from "~/bridge/editor/EditorProjectAtom";
 import { useEditorProject } from "~/bridge/editor/useEditorProject";
-import type { EditorItem } from "~/bridge/item/editor/EditorItemModel";
-import {
-	EditorItemFormProvider,
-	type EditorItemFormRoute,
-} from "~/ui/item/editor/EditorItemFormContext";
+import type { EditorItem, EditorItemType } from "~/bridge/item/editor/EditorItemModel";
+import { useEditorItemDraft } from "~/bridge/item/editor/useEditorItemDraft";
+import { ButtonLink } from "~/ui/button/Button";
+import { EditorItemFormProvider } from "~/ui/item/editor/EditorItemFormContext";
+import { EditorItemNotFound } from "~/ui/item/editor/EditorItemNotFound";
 import type { EditorItemSectionId } from "~/ui/item/editor/EditorItemSections";
+import { useEditorItemByUid } from "~/ui/item/editor/useEditorItemByUid";
 import { useEditorItemFormController } from "~/ui/item/editor/useEditorItemFormController";
 
 export namespace EditorItemForm {
 	export interface Props extends PropsWithChildren {
-		readonly back: ReactNode;
-		readonly initialItem: EditorItem;
-		readonly onSaved?: (item: EditorItem) => void | Promise<void>;
-		readonly route: EditorItemFormRoute;
-		readonly title: string;
+		readonly itemType?: EditorItemType;
+		readonly uid: string;
 	}
 }
 
-/** Owns one local item form above every explicit create/edit section leaf. */
-export const EditorItemForm = ({
-	back,
+interface EditorItemFormSessionProps extends PropsWithChildren {
+	readonly initialItem: EditorItem;
+	readonly isNew: boolean;
+	readonly itemType?: EditorItemType;
+}
+
+/** Owns the single local form lifecycle used by both new and persisted items. */
+const EditorItemFormSession = ({
 	children,
 	initialItem,
-	onSaved,
-	route,
-	title,
-}: EditorItemForm.Props) => {
+	isNew,
+	itemType,
+}: EditorItemFormSessionProps) => {
 	const navigate = useNavigate();
 	const project = useEditorProject();
 	const onInvalidSection = useCallback(
-		(section: EditorItemSectionId) => {
-			const params = {
-				projectId: project.projectId,
-				itemUid: initialItem.uid,
-			};
-			if (route.kind === "create") {
-				const search = {
-					itemType: route.itemType,
-				};
-				switch (section) {
-					case "identity":
-						return navigate({
-							to: "/editor/$projectId/editor/items/$itemUid/create/identity",
-							params,
-							search,
-						});
-					case "artwork":
-						return navigate({
-							to: "/editor/$projectId/editor/items/$itemUid/create/artwork",
-							params,
-							search,
-						});
-					case "limits":
-						return navigate({
-							to: "/editor/$projectId/editor/items/$itemUid/create/limits",
-							params,
-							search,
-						});
-					case "charges":
-						return navigate({
-							to: "/editor/$projectId/editor/items/$itemUid/create/charges",
-							params,
-							search,
-						});
-					case "merges":
-						return navigate({
-							to: "/editor/$projectId/editor/items/$itemUid/create/merges",
-							params,
-							search,
-						});
-					case "production":
-						return navigate({
-							to: "/editor/$projectId/editor/items/$itemUid/create/production",
-							params,
-							search,
-						});
-				}
-			}
-			switch (section) {
-				case "identity":
-					return navigate({
-						to: "/editor/$projectId/editor/items/$itemUid/edit/identity",
-						params,
-					});
-				case "artwork":
-					return navigate({
-						to: "/editor/$projectId/editor/items/$itemUid/edit/artwork",
-						params,
-					});
-				case "limits":
-					return navigate({
-						to: "/editor/$projectId/editor/items/$itemUid/edit/limits",
-						params,
-					});
-				case "charges":
-					return navigate({
-						to: "/editor/$projectId/editor/items/$itemUid/edit/charges",
-						params,
-					});
-				case "merges":
-					return navigate({
-						to: "/editor/$projectId/editor/items/$itemUid/edit/merges",
-						params,
-					});
-				case "production":
-					return navigate({
-						to: "/editor/$projectId/editor/items/$itemUid/edit/production",
-						params,
-					});
-			}
-		},
+		(sectionId: EditorItemSectionId) =>
+			navigate({
+				to: "/editor/$projectId/editor/items/$itemUid/form/$sectionId",
+				params: {
+					projectId: project.projectId,
+					itemUid: initialItem.uid,
+					sectionId,
+				},
+				search:
+					itemType === undefined
+						? {}
+						: {
+								itemType,
+							},
+			}),
 		[
 			initialItem.uid,
+			itemType,
 			navigate,
 			project.projectId,
-			route,
 		],
 	);
 	const controller = useEditorItemFormController({
 		initialItem,
 		onInvalidSection,
-		onSaved,
+		onSaved: (saved) =>
+			navigate({
+				to: "/editor/$projectId/editor/items/$itemUid/view",
+				params: {
+					projectId: project.projectId,
+					itemUid: saved.uid,
+				},
+				replace: true,
+			}),
 	});
 	const context = useMemo(
 		() => ({
 			...controller,
-			route,
+			isNew,
+			itemType,
 		}),
 		[
 			controller,
-			route,
+			isNew,
+			itemType,
 		],
 	);
+	const title = isNew ? `New ${initialItem.type}` : initialItem.title || initialItem.id;
 
 	return (
 		<EditorItemFormProvider value={context}>
@@ -144,7 +93,30 @@ export const EditorItemForm = ({
 				data-ui="EditorItemForm"
 			>
 				<header className="flex min-w-0 flex-wrap items-center gap-3">
-					{back}
+					{isNew ? (
+						<ButtonLink
+							to="/editor/$projectId/editor/items/list"
+							params={{
+								projectId: project.projectId,
+							}}
+							className="min-h-0 px-3 py-2"
+							aria-label="Back to items"
+						>
+							<span className="icon-[lucide--arrow-left] size-4" />
+						</ButtonLink>
+					) : (
+						<ButtonLink
+							to="/editor/$projectId/editor/items/$itemUid/view"
+							params={{
+								projectId: project.projectId,
+								itemUid: initialItem.uid,
+							}}
+							className="min-h-0 px-3 py-2"
+							aria-label="Back to item"
+						>
+							<span className="icon-[lucide--arrow-left] size-4" />
+						</ButtonLink>
+					)}
 					<div className="min-w-0 flex-1">
 						<h1
 							id="editor-item-form-title"
@@ -170,5 +142,29 @@ export const EditorItemForm = ({
 				</form>
 			</section>
 		</EditorItemFormProvider>
+	);
+};
+
+/** Resolves a canonical item by UID or seeds its first local form from itemType. */
+export const EditorItemForm = ({ children, itemType, uid }: EditorItemForm.Props) => {
+	const project = useEditorProject();
+	const canonicalProject = useAtomValue(EditorProjectAtom(project.projectId));
+	const persistedItem = useEditorItemByUid(uid);
+	const draft = useEditorItemDraft(itemType ?? persistedItem?.type ?? "simple", uid);
+	if (persistedItem === undefined && itemType === undefined)
+		return <EditorItemNotFound uid={uid} />;
+	const initialItem = persistedItem ?? draft;
+	const isNew = !Object.values(canonicalProject?.config?.items ?? {}).some(
+		(item) => item.uid === uid,
+	);
+	return (
+		<EditorItemFormSession
+			key={initialItem.uid}
+			initialItem={initialItem}
+			isNew={isNew}
+			itemType={isNew ? itemType : undefined}
+		>
+			{children}
+		</EditorItemFormSession>
 	);
 };

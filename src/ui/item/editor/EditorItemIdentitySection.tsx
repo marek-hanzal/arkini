@@ -21,22 +21,34 @@ const scopeOptions = [
 ] as const;
 
 export const EditorItemIdentitySection = () => {
-	const { canonicalItem, categoryOptions, form } = useEditorItemFormSession();
+	const { canonicalItem, categoryOptions, form, isNew } = useEditorItemFormSession();
 	return (
 		<EditorFormSection
 			title="Identity"
 			description="Stable source identity and player-facing copy."
 		>
 			<div className="grid gap-4 md:grid-cols-2">
-				<form.AppField name="id">
-					{(field) => (
-						<field.TextField
-							label="Item ID"
-							description="Changing an existing ID also changes every reference you must update elsewhere."
-							placeholder="item:example"
-						/>
-					)}
-				</form.AppField>
+				{isNew ? (
+					<form.AppField name="id">
+						{(field) => (
+							<field.TextField
+								label="Item ID"
+								description="The source ID becomes immutable after the first save."
+								placeholder="item:example"
+							/>
+						)}
+					</form.AppField>
+				) : (
+					<div className="grid content-start gap-1.5 text-sm">
+						<span className="font-semibold text-foreground">Item ID</span>
+						<span className="rounded-lg border border-line bg-canvas/50 px-3 py-2 font-mono text-muted">
+							{canonicalItem.id}
+						</span>
+						<span className="text-xs text-muted">
+							Immutable after the item is first saved.
+						</span>
+					</div>
+				)}
 				<form.AppField name="title">
 					{(field) => <field.TextField label="Title" />}
 				</form.AppField>

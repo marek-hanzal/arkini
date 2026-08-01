@@ -235,38 +235,56 @@ describe("EditorProjectMutationLane", () => {
 		]);
 	});
 
-	it("releases lane ownership when a mutation is interrupted", async () => {
+	it("finishes an admitted mutation after its caller is interrupted", async () => {
 		const revisionA = "a".repeat(64);
 		const revisionB = "b".repeat(64);
+		const revisionC = "c".repeat(64);
 		const registry = createRegistry();
 		const entered = Effect.runSync(Deferred.make<void>());
+		const finish = Effect.runSync(Deferred.make<void>());
 		const fiber = Effect.runFork(
 			runEditorProjectMutationFx({
 				expectedRevision: revisionA,
 				projectId: "project",
-				run: () => Deferred.succeed(entered, undefined).pipe(Effect.andThen(Effect.never)),
+				run: () =>
+					Deferred.succeed(entered, undefined).pipe(
+						Effect.andThen(Deferred.await(finish)),
+						Effect.as({
+							project: createProject(revisionB),
+							revision: revisionB,
+						}),
+					),
 			}).pipe(Effect.provideService(AtomRegistry.AtomRegistry, registry)),
 		);
 		await Effect.runPromise(Deferred.await(entered));
 
-		await Effect.runPromise(Fiber.interrupt(fiber));
+		let interruptSettled = false;
+		const interrupted = Effect.runPromise(Fiber.interrupt(fiber)).then((exit) => {
+			interruptSettled = true;
+			return exit;
+		});
+		await vi.waitFor(() => expect(interruptSettled).toBe(false));
+
+		Effect.runSync(Deferred.succeed(finish, undefined));
+		await interrupted;
+		expect(registry.get(EditorProjectAtom("project"))?.revision).toBe(revisionB);
 
 		await expect(
 			runInRegistry(
 				registry,
 				runEditorProjectMutationFx({
-					expectedRevision: revisionA,
+					expectedRevision: revisionB,
 					projectId: "project",
 					run: () =>
 						Effect.succeed({
-							project: createProject(revisionB),
-							revision: revisionB,
+							project: createProject(revisionC),
+							revision: revisionC,
 						}),
 				}),
 			),
 		).resolves.toEqual({
-			project: createProject(revisionB),
-			revision: revisionB,
+			project: createProject(revisionC),
+			revision: revisionC,
 		});
 	});
 });

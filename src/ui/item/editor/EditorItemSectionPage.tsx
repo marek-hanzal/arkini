@@ -46,9 +46,9 @@ export const EditorItemSectionPage = ({ section }: { readonly section: EditorIte
 					{sections.map((candidate) => (
 						<EditorItemSectionLink
 							key={candidate.id}
+							itemType={session.itemType}
 							itemUid={params.itemUid}
 							projectId={params.projectId}
-							route={session.route}
 							section={candidate}
 						/>
 					))}

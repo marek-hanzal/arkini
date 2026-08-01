@@ -14,7 +14,7 @@ export default defineConfig({
 		fileParallelism: false,
 		isolate: true,
 		include: [
-			"test/**/*.test.ts",
+			"test/**/*.test.{ts,tsx}",
 		],
 		maxWorkers: 1,
 		pool: "threads",

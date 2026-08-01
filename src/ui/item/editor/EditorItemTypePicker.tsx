@@ -94,10 +94,11 @@ export const EditorItemTypePicker = () => {
 					return (
 						<ButtonLink
 							key={type}
-							to="/editor/$projectId/editor/items/$itemUid/create/identity"
+							to="/editor/$projectId/editor/items/$itemUid/form/$sectionId"
 							params={{
 								projectId: project.projectId,
 								itemUid: itemUids[type],
+								sectionId: "identity",
 							}}
 							search={{
 								itemType: type,

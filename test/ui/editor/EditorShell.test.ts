@@ -44,6 +44,10 @@ vi.mock("~/bridge/editor/releaseEditorProjectSessionFx", () => ({
 		Effect.sync(() => session.release(projectId)),
 }));
 
+vi.mock("~/bridge/editor/persistEditorProjectMutation", () => ({
+	persistEditorProjectMutationFx: () => Effect.void,
+}));
+
 vi.mock("~/bridge/editor/useEditorProject", () => ({
 	useEditorProject: () => ({
 		projectId: "editor-test",
@@ -172,7 +176,7 @@ const createTestRouter = ({ initialEntry, projectLoader }: TestRouterOptions) =>
 	});
 	const itemEditRoute = createRoute({
 		getParentRoute: () => editorRoute,
-		path: "editor/items/test/edit",
+		path: "editor/items/test/form/identity",
 		component: DirtyItemForm,
 	});
 	const assetsRoute = createRoute({
@@ -331,16 +335,16 @@ describe("EditorShell", () => {
 		expect(container.textContent).toContain("Native close failed.");
 	});
 
-	it("exposes one shared Save action and the reserved dirty-form status bar", async () => {
+	it("stages the active form from its status Save action", async () => {
 		const router = createTestRouter({
-			initialEntry: "/editor/editor-test/editor/items/test/edit",
+			initialEntry: "/editor/editor-test/editor/items/test/form/identity",
 		});
 		const container = await renderRouter(router);
 
 		expect(container.textContent).toContain("This form has unsaved changes.");
 		expect(container.querySelector('[data-ui="EditorFormStatusSlot"]')).not.toBeNull();
 		await act(async () => {
-			readButton(container, "Save").click();
+			readStatusButton(container, "Save").click();
 		});
 		expect(formCalls.save).toHaveBeenCalledTimes(1);
 		await vi.waitFor(() => {
@@ -351,7 +355,7 @@ describe("EditorShell", () => {
 
 	it("lets ordinary editor navigation discard local form state without a prompt", async () => {
 		const router = createTestRouter({
-			initialEntry: "/editor/editor-test/editor/items/test/edit",
+			initialEntry: "/editor/editor-test/editor/items/test/form/identity",
 		});
 		const container = await renderRouter(router);
 
@@ -366,7 +370,7 @@ describe("EditorShell", () => {
 
 	it("asks only Exit to resolve dirty state and discards before leaving", async () => {
 		const router = createTestRouter({
-			initialEntry: "/editor/editor-test/editor/items/test/edit",
+			initialEntry: "/editor/editor-test/editor/items/test/form/identity",
 		});
 		const container = await renderRouter(router);
 
@@ -389,7 +393,7 @@ describe("EditorShell", () => {
 			.mockRejectedValueOnce(new Error("Invalid item."))
 			.mockResolvedValueOnce(true);
 		const router = createTestRouter({
-			initialEntry: "/editor/editor-test/editor/items/test/edit",
+			initialEntry: "/editor/editor-test/editor/items/test/form/identity",
 		});
 		const container = await renderRouter(router);
 
@@ -400,7 +404,9 @@ describe("EditorShell", () => {
 			readStatusButton(container, "Save").click();
 		});
 		await vi.waitFor(() => expect(container.textContent).toContain("Invalid item."));
-		expect(router.state.location.pathname).toBe("/editor/editor-test/editor/items/test/edit");
+		expect(router.state.location.pathname).toBe(
+			"/editor/editor-test/editor/items/test/form/identity",
+		);
 		expect(session.close).not.toHaveBeenCalled();
 
 		await act(async () => {
@@ -414,7 +420,7 @@ describe("EditorShell", () => {
 	it("keeps Exit open when local form validation declines the save", async () => {
 		formCalls.save.mockResolvedValueOnce(false).mockResolvedValueOnce(true);
 		const router = createTestRouter({
-			initialEntry: "/editor/editor-test/editor/items/test/edit",
+			initialEntry: "/editor/editor-test/editor/items/test/form/identity",
 		});
 		const container = await renderRouter(router);
 
@@ -424,7 +430,9 @@ describe("EditorShell", () => {
 		await act(async () => {
 			readStatusButton(container, "Save").click();
 		});
-		expect(router.state.location.pathname).toBe("/editor/editor-test/editor/items/test/edit");
+		expect(router.state.location.pathname).toBe(
+			"/editor/editor-test/editor/items/test/form/identity",
+		);
 		expect(session.close).not.toHaveBeenCalled();
 		expect(container.textContent).toContain("Fix the highlighted item fields before saving.");
 

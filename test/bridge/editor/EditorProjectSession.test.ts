@@ -121,7 +121,7 @@ describe("EditorProjectSession", () => {
 			ownerId: "item:test",
 		});
 		await expect(runInRegistry(registry, closeActiveEditorProjectSessionFx)).rejects.toThrow(
-			"Save or discard the current form",
+			"Save or discard the current editor changes",
 		);
 
 		await expect(

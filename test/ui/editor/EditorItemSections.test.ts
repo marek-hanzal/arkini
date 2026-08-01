@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import type { EditorItem } from "~/bridge/item/editor/EditorItemModel";
 import {
+	parseEditorItemSectionId,
 	readEditorItemSectionForPath,
 	readEditorItemSections,
 } from "~/ui/item/editor/EditorItemSections";
@@ -12,6 +13,13 @@ const item = (type: EditorItem["type"]) =>
 	}) as Pick<EditorItem, "type">;
 
 describe("EditorItemSections", () => {
+	it("parses only supported dynamic route sections", () => {
+		expect(parseEditorItemSectionId("artwork")).toBe("artwork");
+		expect(() => parseEditorItemSectionId("unknown")).toThrow(
+			"Unknown editor item section unknown.",
+		);
+	});
+
 	it("keeps the canonical shared sections and adds only type-owned concerns", () => {
 		expect(readEditorItemSections(item("simple")).map(({ id }) => id)).toEqual([
 			"identity",

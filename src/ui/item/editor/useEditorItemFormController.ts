@@ -15,7 +15,7 @@ import {
 	readEditorItemSectionForPath,
 	type EditorItemSectionId,
 } from "~/ui/item/editor/EditorItemSections";
-import { useSaveEditorItemCommand } from "~/ui/item/editor/useSaveEditorItemCommand";
+import { useStageEditorItemCommand } from "~/ui/item/editor/useStageEditorItemCommand";
 
 export namespace useEditorItemFormController {
 	export interface Props {
@@ -53,8 +53,7 @@ export const useEditorItemFormController = ({
 	}));
 	const setFormDirty = useAtomSet(EditorProjectFormDirtyAtom(project.projectId));
 	const ownerId = `item:${initialItem.uid}`;
-	const mutation = useSaveEditorItemCommand({
-		expectedRevision: project.revision,
+	const mutation = useStageEditorItemCommand({
 		itemUid: initialItem.uid,
 		projectId: project.projectId,
 	});

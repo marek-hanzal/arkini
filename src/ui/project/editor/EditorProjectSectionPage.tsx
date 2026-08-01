@@ -1,3 +1,4 @@
+import { EditorSectionNavigation } from "~/ui/editor/EditorSectionNavigation";
 import { EditorSectionPage } from "~/ui/editor/EditorSectionPage";
 import { EditorSectionTabs } from "~/ui/editor/EditorSectionTabs";
 import { EditorFormContent } from "~/ui/form/EditorFormContent";
@@ -33,7 +34,7 @@ export const EditorProjectSectionPage = ({
 	return (
 		<EditorSectionPage
 			tabs={
-				<div className="grid gap-[var(--ak-viewport-gap)]">
+				<EditorSectionNavigation>
 					<header className="flex min-w-0 items-center gap-3">
 						<h1 className="min-w-0 flex-1 truncate text-xl font-semibold">Project</h1>
 						<EditorFormSaveButton
@@ -51,7 +52,7 @@ export const EditorProjectSectionPage = ({
 							/>
 						))}
 					</EditorSectionTabs>
-				</div>
+				</EditorSectionNavigation>
 			}
 		>
 			<div className="grid gap-[var(--ak-viewport-gap)]">

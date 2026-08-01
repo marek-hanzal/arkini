@@ -2,6 +2,7 @@ import type { PropsWithChildren } from "react";
 
 import { useEditorProject } from "~/bridge/editor/useEditorProject";
 import { ButtonLink, PrimaryButtonLink } from "~/ui/button/Button";
+import { EditorSectionNavigation } from "~/ui/editor/EditorSectionNavigation";
 import { EditorSectionPage } from "~/ui/editor/EditorSectionPage";
 import { EditorSectionTabs } from "~/ui/editor/EditorSectionTabs";
 import { EditorAssetDetailTab } from "~/ui/resource/editor/EditorAssetDetailTab";
@@ -48,7 +49,7 @@ export const EditorAssetDetail = ({
 	return (
 		<EditorSectionPage
 			tabs={
-				<div className="grid gap-3">
+				<EditorSectionNavigation>
 					<header className="flex min-w-0 flex-wrap items-center gap-3">
 						<ButtonLink
 							to="/editor/$projectId/assets"
@@ -103,7 +104,7 @@ export const EditorAssetDetail = ({
 							to="/editor/$projectId/assets/$resourceId/detail/usage"
 						/>
 					</EditorSectionTabs>
-				</div>
+				</EditorSectionNavigation>
 			}
 		>
 			{children}

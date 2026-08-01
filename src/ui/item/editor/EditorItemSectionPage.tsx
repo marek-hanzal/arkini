@@ -1,3 +1,4 @@
+import { EditorSectionNavigation } from "~/ui/editor/EditorSectionNavigation";
 import { EditorSectionPage } from "~/ui/editor/EditorSectionPage";
 import { EditorSectionTabs } from "~/ui/editor/EditorSectionTabs";
 import { EditorItemArtworkSection } from "~/ui/item/editor/EditorItemArtworkSection";
@@ -42,17 +43,19 @@ export const EditorItemSectionPage = ({ section }: { readonly section: EditorIte
 	return (
 		<EditorSectionPage
 			tabs={
-				<EditorSectionTabs label="Item sections">
-					{sections.map((candidate) => (
-						<EditorItemSectionLink
-							key={candidate.id}
-							itemType={session.itemType}
-							itemUid={params.itemUid}
-							projectId={params.projectId}
-							section={candidate}
-						/>
-					))}
-				</EditorSectionTabs>
+				<EditorSectionNavigation>
+					<EditorSectionTabs label="Item sections">
+						{sections.map((candidate) => (
+							<EditorItemSectionLink
+								key={candidate.id}
+								itemType={session.itemType}
+								itemUid={params.itemUid}
+								projectId={params.projectId}
+								section={candidate}
+							/>
+						))}
+					</EditorSectionTabs>
+				</EditorSectionNavigation>
 			}
 		>
 			{available ? (

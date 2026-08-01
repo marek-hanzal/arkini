@@ -86,17 +86,6 @@ const saveKey = {
 	packageId: "arkini",
 	contentHash: "b".repeat(64),
 } as const;
-const editorManifest = {
-	projectId: "editor-test",
-	title: "Editor test",
-	game: "1.0",
-	createdAtMs: 100,
-	updatedAtMs: 100,
-} as const;
-const editorManifestFile = {
-	path: "editor.json",
-	bytes: new TextEncoder().encode(`${JSON.stringify(editorManifest)}\n`),
-};
 const invokeArguments = new Map<string, ReadonlyArray<unknown>>([
 	[
 		ArkiniElectronApi.channels.appearanceRead,
@@ -183,52 +172,6 @@ const invokeArguments = new Map<string, ReadonlyArray<unknown>>([
 		[
 			placeholderPackageId,
 		],
-	],
-	[
-		ArkiniElectronApi.channels.editorProjectList,
-		[],
-	],
-	[
-		ArkiniElectronApi.channels.editorProjectCreate,
-		[
-			{
-				projectId: "editor-test",
-				files: [
-					editorManifestFile,
-					{
-						path: "game.json",
-						bytes: new Uint8Array([
-							123,
-							125,
-						]),
-					},
-				],
-			},
-		],
-	],
-	[
-		ArkiniElectronApi.channels.editorProjectRead,
-		[
-			"editor-test",
-		],
-	],
-	[
-		ArkiniElectronApi.channels.editorProjectWrite,
-		[
-			{
-				projectId: "editor-test",
-				expectedRevision: "0".repeat(64),
-				mode: "create",
-				file: {
-					path: "simple/water.json",
-					bytes: new TextEncoder().encode("{}"),
-				},
-			},
-		],
-	],
-	[
-		ArkiniElectronApi.channels.editorDirectoryOpen,
-		[],
 	],
 	[
 		ArkiniElectronApi.channels.saveRead,
@@ -503,65 +446,6 @@ describe("registerArkiniElectronIpcFx", () => {
 			await expect(
 				invoke(ArkiniElectronApi.channels.arkpackRead, trustedEvent, packageId),
 			).resolves.toBeNull();
-
-			const editorRecord = {
-				projectId: "editor-test",
-				files: [
-					editorManifestFile,
-					{
-						path: "game.json",
-						bytes: new Uint8Array([
-							123,
-							125,
-						]),
-					},
-				],
-			};
-			await expect(
-				invoke(ArkiniElectronApi.channels.editorProjectCreate, trustedEvent, editorRecord),
-			).resolves.toBeUndefined();
-			await expect(
-				invoke(ArkiniElectronApi.channels.editorProjectList, trustedEvent),
-			).resolves.toEqual([
-				editorManifest,
-			]);
-			const readEditorRecord = (await invoke(
-				ArkiniElectronApi.channels.editorProjectRead,
-				trustedEvent,
-				"editor-test",
-			)) as typeof editorRecord & {
-				readonly revision: string;
-			};
-			expect(readEditorRecord).toEqual({
-				...editorRecord,
-				revision: expect.stringMatching(/^[a-f0-9]{64}$/),
-			});
-			await expect(
-				invoke(ArkiniElectronApi.channels.editorProjectWrite, trustedEvent, {
-					projectId: "editor-test",
-					expectedRevision: readEditorRecord.revision,
-					mode: "create",
-					file: {
-						path: "simple/water.json",
-						bytes: new TextEncoder().encode("{}"),
-					},
-				}),
-			).resolves.toEqual(
-				expect.objectContaining({
-					projectId: "editor-test",
-					revision: expect.stringMatching(/^[a-f0-9]{64}$/),
-					file: expect.objectContaining({
-						path: "simple/water.json",
-					}),
-					manifest: expect.objectContaining({
-						path: "editor.json",
-					}),
-				}),
-			);
-			await expect(
-				invoke(ArkiniElectronApi.channels.editorDirectoryOpen, trustedEvent),
-			).resolves.toBeUndefined();
-			expect(electronHarness.openPath).toHaveBeenCalledWith(userDataPaths.editor);
 
 			const saveBytes = new Uint8Array([
 				5,

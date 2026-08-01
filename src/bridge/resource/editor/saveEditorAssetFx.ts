@@ -1,13 +1,10 @@
 import { Effect } from "effect";
+import * as Atom from "effect/unstable/reactivity/Atom";
 
-import type { EditorProject } from "~/bridge/editor/EditorProject";
-import type { EditorWorkspace } from "~/bridge/editor/EditorWorkspace";
-import { createEditorProjectFromWriteFx } from "~/bridge/editor/createEditorProjectFromWriteFx";
-import { createEditorWorkspaceFx } from "~/bridge/editor/createEditorWorkspaceFx";
+import { EditorProjectAtom } from "~/bridge/editor/EditorProjectAtom";
+import { EditorProjectRepository } from "~/bridge/editor/EditorProjectRepository";
+import { IdSchema } from "~/engine/common/schema/IdSchema";
 import { EditorProjectError } from "~/engine/editor/error/EditorProjectError";
-import { compileEditorProjectFilesFx } from "~/engine/editor/fx/compileEditorProjectFilesFx";
-import { EditorSourceFileSchema } from "~/engine/editor/schema/EditorSourceFileSchema";
-import { validateResourceEditorSourceIdFx } from "~/engine/resource/editor/fx/validateResourceEditorSourceIdFx";
 
 const pngMagic = [
 	137,
@@ -56,7 +53,7 @@ const readPngDimensionsFx = (bytes: Uint8Array, resourceId: string) =>
 						),
 					catch: (cause) =>
 						new EditorProjectError({
-							reason: "unsupported-project-file",
+							reason: "invalid-asset",
 							message: `Asset ${resourceId} must decode as a valid PNG image.`,
 							cause,
 						}),
@@ -70,43 +67,41 @@ const readPngDimensionsFx = (bytes: Uint8Array, resourceId: string) =>
 		}),
 	);
 
-/** Validates one PNG, compiles it against memory, and persists only the asset delta. */
+export namespace saveEditorAssetFx {
+	export interface Props {
+		readonly file: EditorAssetFileInput;
+		readonly projectId: string;
+	}
+}
+
+/** Validates one PNG and saves it directly into the canonical project repository. */
 export const saveEditorAssetFx = Effect.fn("saveEditorAssetFx")(function* ({
-	expectedRevision,
 	file: inputFile,
-	project,
-	workspace: providedWorkspace,
-}: {
-	readonly expectedRevision: string;
-	readonly file: EditorAssetFileInput;
-	readonly project: EditorProject;
-	readonly workspace?: EditorWorkspace;
-}) {
+	projectId,
+}: saveEditorAssetFx.Props) {
 	if (!inputFile.name.toLowerCase().endsWith(".png") || inputFile.size > maxPngBytes) {
 		return yield* Effect.fail(
 			new EditorProjectError({
-				reason: "unsupported-project-file",
+				reason: "invalid-asset",
 				message: `Asset ${inputFile.name} must be a PNG no larger than ${maxPngBytes} bytes.`,
 			}),
 		);
 	}
-	if (project.revision !== expectedRevision) {
-		return yield* Effect.fail(
+	const resourceId = yield* Effect.try({
+		try: () => IdSchema.parse(readResourceId(inputFile.name)),
+		catch: (cause) =>
 			new EditorProjectError({
-				reason: "unsupported-project-file",
-				message: `Editor project ${project.projectId} changed after the asset picker opened.`,
+				reason: "invalid-resource-id",
+				message: `Asset ${inputFile.name} does not produce a valid resource ID.`,
+				cause,
 			}),
-		);
-	}
-	const proposedResourceId = yield* validateResourceEditorSourceIdFx(
-		readResourceId(inputFile.name),
-	);
+	});
 	const bytes = yield* Effect.tryPromise({
 		try: async () => new Uint8Array(await inputFile.arrayBuffer()),
 		catch: (cause) =>
 			new EditorProjectError({
-				reason: "unsupported-project-file",
-				message: `Asset ${proposedResourceId} could not be read.`,
+				reason: "invalid-asset",
+				message: `Asset ${resourceId} could not be read.`,
 				cause,
 			}),
 	});
@@ -117,12 +112,12 @@ export const saveEditorAssetFx = Effect.fn("saveEditorAssetFx")(function* ({
 	if (!hasPngEnvelope) {
 		return yield* Effect.fail(
 			new EditorProjectError({
-				reason: "unsupported-project-file",
-				message: `Asset ${proposedResourceId} must be a valid bounded PNG image.`,
+				reason: "invalid-asset",
+				message: `Asset ${resourceId} must be a valid bounded PNG image.`,
 			}),
 		);
 	}
-	const { height, width } = yield* readPngDimensionsFx(bytes, proposedResourceId);
+	const { height, width } = yield* readPngDimensionsFx(bytes, resourceId);
 	if (
 		width < 1 ||
 		height < 1 ||
@@ -132,58 +127,30 @@ export const saveEditorAssetFx = Effect.fn("saveEditorAssetFx")(function* ({
 	) {
 		return yield* Effect.fail(
 			new EditorProjectError({
-				reason: "unsupported-project-file",
-				message: `Asset ${proposedResourceId} exceeds the supported PNG dimensions.`,
+				reason: "invalid-asset",
+				message: `Asset ${resourceId} exceeds the supported PNG dimensions.`,
 			}),
 		);
 	}
-	const sourcePath = Object.values(project.fileIndex).find(({ path }) => {
-		if (!path.startsWith("assets/") && !path.startsWith("resources/")) return false;
-		const filename = path.slice(path.lastIndexOf("/") + 1);
-		return filename.toLowerCase() === `${proposedResourceId}.png`.toLowerCase();
-	})?.path;
-	const resourceId =
-		sourcePath === undefined
-			? proposedResourceId
-			: sourcePath.slice(sourcePath.lastIndexOf("/") + 1, -".png".length);
-	const { file, sourceFiles } = yield* Effect.try({
-		try: () => ({
-			file: EditorSourceFileSchema.parse({
-				path: sourcePath ?? `assets/${resourceId}.png`,
-				bytes,
-			}),
-			sourceFiles: EditorSourceFileSchema.array().parse(
-				Object.values(project.fileIndex).filter(({ path }) => path !== "editor.json"),
-			),
+	const repository = yield* EditorProjectRepository;
+	yield* Effect.yieldNow;
+	return yield* Effect.uninterruptible(
+		Effect.gen(function* () {
+			const project = yield* repository.upsertResourceFx({
+				projectId,
+				resource: {
+					id: resourceId,
+					mime: "image/png",
+					bytes,
+				},
+			});
+			yield* Atom.set(EditorProjectAtom(projectId), {
+				project,
+			});
+			return {
+				project,
+				resourceId,
+			};
 		}),
-		catch: (cause) =>
-			new EditorProjectError({
-				reason: "unsupported-project-file",
-				message: `Asset ${resourceId} cannot be represented in this project.`,
-				cause,
-			}),
-	});
-	const mode = sourcePath === undefined ? "create" : "replace";
-	const candidateFiles = [
-		...sourceFiles.filter(({ path }) => path !== sourcePath),
-		file,
-	];
-	const compilation = yield* compileEditorProjectFilesFx(candidateFiles);
-	const workspace = providedWorkspace ?? (yield* createEditorWorkspaceFx());
-	const write = yield* workspace.writeFx({
-		projectId: project.projectId,
-		file,
-		expectedRevision,
-		mode,
-	});
-	const nextProject = yield* createEditorProjectFromWriteFx({
-		compilation,
-		project,
-		write,
-	});
-	return {
-		project: nextProject,
-		resourceId,
-		revision: write.revision,
-	};
+	);
 });

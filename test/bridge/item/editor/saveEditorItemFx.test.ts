@@ -1,195 +1,118 @@
+import { scheduleTask } from "@effect/atom-react";
 import { Effect } from "effect";
-import { describe, expect, it } from "vitest";
+import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
-import type { EditorProjectFile } from "../../../../electron/contract/editor/EditorProjectFile";
-import type { EditorProjectRecord } from "../../../../electron/contract/editor/EditorProjectRecord";
-import { createEditorProjectFromRecordFx } from "~/bridge/editor/createEditorProjectFromRecordFx";
-import { createEditorProjectManifestFileFx } from "~/bridge/editor/createEditorProjectManifestFileFx";
-import type { EditorWorkspace } from "~/bridge/editor/EditorWorkspace";
+import type { EditorProject } from "~/bridge/editor/EditorProject";
+import { EditorProjectAtom } from "~/bridge/editor/EditorProjectAtom";
+import {
+	EditorProjectRepository,
+	type EditorProjectRepositoryService,
+} from "~/bridge/editor/EditorProjectRepository";
 import { saveEditorItemFx } from "~/bridge/item/editor/saveEditorItemFx";
-import { createEditorProjectPlanFx } from "~/engine/editor/fx/createEditorProjectPlanFx";
-import { GameSourceSchema } from "~/engine/schema/GameSourceSchema";
-import { editorTestConfig, editorTestPayload } from "~test/editor/support/editorTestPayload";
+import { editorTestPayload } from "~test/editor/support/editorTestPayload";
 
-const createFixture = async () => {
-	const plan = await Effect.runPromise(
-		createEditorProjectPlanFx({
-			contentHash: "a".repeat(64),
-			payload: editorTestPayload,
-		}),
-	);
-	const manifest = await Effect.runPromise(
-		createEditorProjectManifestFileFx({
-			projectId: plan.projectId,
-			title: plan.title,
-			game: plan.version,
-			nowMs: 123,
-		}),
-	);
-	const waterPath = "simple/water.json";
-	const source = plan.files.find(({ path }) => path === waterPath);
-	if (source === undefined) throw new Error("Missing water source.");
-	const sibling = {
-		...editorTestConfig.items.water,
-		uid: "sibling-uid",
-		id: "sibling",
-		title: "Sibling",
-	};
-	const groupedSource = {
-		...source,
-		bytes: new TextEncoder().encode(
-			`${JSON.stringify(
-				{
-					$schema: "https://example.invalid/game-source.schema.json",
-					items: {
-						water: editorTestConfig.items.water,
-						sibling,
-					},
+const registries: AtomRegistry.AtomRegistry[] = [];
+
+const createProject = (revision = 0): EditorProject => ({
+	projectId: "project",
+	title: editorTestPayload.config.meta.title,
+	game: editorTestPayload.config.version,
+	createdAtMs: 1,
+	updatedAtMs: revision + 1,
+	revision,
+	config: editorTestPayload.config,
+	resources: editorTestPayload.resources,
+});
+
+const createFixture = () => {
+	const registry = AtomRegistry.make({
+		scheduleTask,
+	});
+	registries.push(registry);
+	const upsertItemFx = vi.fn<EditorProjectRepositoryService["upsertItemFx"]>(({ item }) => {
+		const { resources: _resources, ...commit } = createProject(1);
+		return Effect.succeed({
+			...commit,
+			config: {
+				...editorTestPayload.config,
+				items: {
+					...editorTestPayload.config.items,
+					[item.id]: item,
 				},
-				null,
-				"\t",
-			)}\n`,
-		),
-	};
-	let record: EditorProjectRecord = {
-		projectId: plan.projectId,
-		revision: "0".repeat(64),
-		files: [
-			manifest.file,
-			...plan.files.filter(({ path }) => path !== waterPath),
-			groupedSource,
-		],
-	};
-	const project = await Effect.runPromise(createEditorProjectFromRecordFx(record));
-	let written: EditorProjectFile | undefined;
-	const workspace: EditorWorkspace = {
-		listFx: () => Effect.succeed([]),
-		createFx: () => Effect.void,
-		readFx: () => Effect.die("Save must not reload the editor project."),
-		writeFx: (mutation) =>
-			Effect.sync(() => {
-				written = mutation.file;
-				const manifestFile = record.files.find(({ path }) => path === "editor.json");
-				const manifest = JSON.parse(
-					new TextDecoder().decode(manifestFile?.bytes),
-				) as Record<string, unknown>;
-				const nextManifest = {
-					path: "editor.json",
-					bytes: new TextEncoder().encode(
-						`${JSON.stringify(
-							{
-								...manifest,
-								updatedAtMs: 456,
-							},
-							null,
-							"\t",
-						)}\n`,
-					),
-				};
-				record = {
-					...record,
-					revision: "1".repeat(64),
-					files: [
-						...record.files.filter(
-							({ path }) => path !== mutation.file.path && path !== "editor.json",
-						),
-						mutation.file,
-						nextManifest,
-					],
-				};
-				return {
-					projectId: record.projectId,
-					file: mutation.file,
-					manifest: nextManifest,
-					revision: record.revision,
-				};
-			}),
-		openDirectoryFx: () => Effect.void,
+			},
+		});
+	});
+	const repository: EditorProjectRepositoryService = {
+		awaitIdleFx: Effect.void,
+		createProjectFx: () => Effect.die("Unexpected create."),
+		listProjectsFx: Effect.die("Unexpected list."),
+		readProjectFx: () => Effect.die("Unexpected read."),
+		upsertItemFx,
+		upsertResourceFx: () => Effect.die("Unexpected resource save."),
 	};
 	return {
-		project,
-		plan,
-		sibling,
-		waterPath,
-		workspace,
-		readWritten: () => written,
+		registry,
+		repository,
+		upsertItemFx,
 	};
 };
 
-const parseWrittenSource = (file: EditorProjectFile | undefined) => {
-	if (file === undefined) throw new Error("The source was not written.");
-	return GameSourceSchema.parse(JSON.parse(new TextDecoder().decode(file.bytes)) as unknown);
-};
+afterEach(() => {
+	for (const registry of registries.splice(0)) registry.dispose();
+});
 
 describe("saveEditorItemFx", () => {
-	it("updates one source-owned item by UID without deleting sibling definitions", async () => {
-		const fixture = await createFixture();
-		const saved = await Effect.runPromise(
-			saveEditorItemFx({
-				project: fixture.project,
-				expectedRevision: "0".repeat(64),
-				item: {
-					...editorTestConfig.items.water,
-					title: "Edited water",
-				},
-				workspace: fixture.workspace,
-			}),
-		);
-		const parsed = parseWrittenSource(fixture.readWritten());
-
-		expect(parsed.$schema).toBe("https://example.invalid/game-source.schema.json");
-		expect(parsed.items?.water?.title).toBe("Edited water");
-		expect(parsed.items?.sibling).toEqual(fixture.sibling);
-		expect(saved.project.config?.items.sibling).toEqual(fixture.sibling);
-		expect(saved.revision).toBe("1".repeat(64));
-		expect(saved.project.updatedAtMs).toBe(456);
-		expect(saved.project.fileIndex[fixture.waterPath]).toEqual(fixture.readWritten());
-	});
-
-	it("renames the source entry selected by UID instead of guessing from item ID", async () => {
-		const fixture = await createFixture();
-		const renamed = {
-			...fixture.sibling,
-			id: "renamed-sibling",
-			title: "Renamed sibling",
+	it("validates, commits and publishes one explicit item save", async () => {
+		const fixture = createFixture();
+		const resources = editorTestPayload.resources;
+		const projectAtom = EditorProjectAtom("project");
+		fixture.registry.mount(projectAtom);
+		fixture.registry.set(projectAtom, {
+			project: {
+				...createProject(),
+				resources,
+			},
+		});
+		const item = {
+			...editorTestPayload.config.items.water,
+			title: "Edited water",
 		};
 		const saved = await Effect.runPromise(
 			saveEditorItemFx({
-				project: fixture.project,
-				expectedRevision: "0".repeat(64),
-				item: renamed,
-				workspace: fixture.workspace,
-			}),
+				projectId: "project",
+				item,
+			}).pipe(
+				Effect.provideService(EditorProjectRepository, fixture.repository),
+				Effect.provideService(AtomRegistry.AtomRegistry, fixture.registry),
+			),
 		);
-		const parsed = parseWrittenSource(fixture.readWritten());
 
-		expect(fixture.readWritten()?.path).toBe(fixture.waterPath);
-		expect(parsed.items?.sibling).toBeUndefined();
-		expect(parsed.items?.[renamed.id]).toEqual(renamed);
-		expect(parsed.items?.water).toEqual(editorTestConfig.items.water);
-		expect(saved.project.config?.items[renamed.id]).toEqual(renamed);
+		expect(saved).toEqual(item);
+		expect(fixture.upsertItemFx).toHaveBeenCalledWith({
+			projectId: "project",
+			item,
+		});
+		expect(fixture.registry.get(projectAtom)?.revision).toBe(1);
+		expect(fixture.registry.get(projectAtom)?.resources).toBe(resources);
 	});
 
-	it("creates a new source entry when no canonical item owns the UID", async () => {
-		const fixture = await createFixture();
-		const created = {
-			...editorTestConfig.items.water,
-			uid: "new-item-uid",
-			id: "item:new-water",
-			title: "New water",
-		};
-		const saved = await Effect.runPromise(
-			saveEditorItemFx({
-				project: fixture.project,
-				expectedRevision: "0".repeat(64),
-				item: created,
-				workspace: fixture.workspace,
-			}),
-		);
-		const parsed = parseWrittenSource(fixture.readWritten());
-
-		expect(fixture.readWritten()?.path).toBe("simple/new-water.json");
-		expect(parsed.items?.[created.id]).toEqual(created);
-		expect(saved.project.config?.items[created.id]).toEqual(created);
+	it("rejects an invalid item before repository admission", async () => {
+		const fixture = createFixture();
+		await expect(
+			Effect.runPromise(
+				saveEditorItemFx({
+					projectId: "project",
+					item: {
+						...editorTestPayload.config.items.water,
+						id: "",
+					},
+				}).pipe(
+					Effect.provideService(EditorProjectRepository, fixture.repository),
+					Effect.provideService(AtomRegistry.AtomRegistry, fixture.registry),
+				),
+			),
+		).rejects.toThrow("does not satisfy");
+		expect(fixture.upsertItemFx).not.toHaveBeenCalled();
 	});
 });

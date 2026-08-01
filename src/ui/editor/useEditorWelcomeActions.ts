@@ -39,16 +39,6 @@ export const useEditorWelcomeActions = () => {
 		],
 	);
 
-	const openRoot = useCallback(() => {
-		if (blocked) return;
-		runCommand({
-			action: "open-directory",
-		});
-	}, [
-		blocked,
-		runCommand,
-	]);
-
 	const exit = useCallback(() => {
 		if (blocked) return;
 		runCommand({
@@ -86,6 +76,5 @@ export const useEditorWelcomeActions = () => {
 		error: state.kind === "error" ? state.error : undefined,
 		exit,
 		importFile,
-		openRoot,
 	};
 };

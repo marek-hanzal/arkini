@@ -10,7 +10,7 @@ export namespace EditorWelcome {
 	}
 }
 
-/** Starts or reopens one local manifest-backed editor project. */
+/** Starts or reopens one local editor project. */
 export const EditorWelcome = ({ recentProjects }: EditorWelcome.Props) => {
 	const actions = useEditorWelcomeActions();
 	return (
@@ -26,7 +26,7 @@ export const EditorWelcome = ({ recentProjects }: EditorWelcome.Props) => {
 					Arkpack editor
 				</h1>
 				<p className="mt-2 text-sm leading-6 text-muted">
-					Import an existing package or continue a project stored in Arkini user data.
+					Import an existing package or continue a project stored by the editor.
 				</p>
 			</header>
 
@@ -58,14 +58,7 @@ export const EditorWelcome = ({ recentProjects }: EditorWelcome.Props) => {
 				projects={recentProjects}
 			/>
 
-			<footer className="flex flex-wrap justify-between gap-3">
-				<Button
-					disabled={actions.blocked}
-					cursorIntent={actions.active === "open-directory" ? "progress" : undefined}
-					onClick={actions.openRoot}
-				>
-					{actions.active === "open-directory" ? "Opening folder…" : "Open editor folder"}
-				</Button>
+			<footer className="flex justify-end">
 				<Button
 					disabled={actions.blocked}
 					cursorIntent={actions.active === "exit" ? "progress" : undefined}

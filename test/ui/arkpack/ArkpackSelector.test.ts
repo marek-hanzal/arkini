@@ -138,9 +138,11 @@ describe("ArkpackSelector", () => {
 			],
 		};
 		const catalog: ArkpackCatalog = {
+			awaitIdleFx: Effect.void,
 			state: Effect.runSync(SubscriptionRef.make<ArkpackCatalog.State>(catalogState)),
 			refreshFx: Effect.void,
 			importFileFx: () => Effect.die("unused"),
+			installFx: () => Effect.die("unused"),
 			removeFx: () => Effect.die("unused"),
 		};
 		const registry = AtomRegistry.make({
@@ -259,9 +261,11 @@ describe("ArkpackSelector", () => {
 			],
 		};
 		const catalog: ArkpackCatalog = {
+			awaitIdleFx: Effect.void,
 			state: Effect.runSync(SubscriptionRef.make<ArkpackCatalog.State>(catalogState)),
 			refreshFx: Effect.void,
 			importFileFx,
+			installFx: () => Effect.die("unused"),
 			removeFx,
 		};
 		const { container, router } = await renderSelector(catalog);
@@ -352,9 +356,11 @@ describe("ArkpackSelector", () => {
 			],
 		};
 		const catalog: ArkpackCatalog = {
+			awaitIdleFx: Effect.void,
 			state: Effect.runSync(SubscriptionRef.make<ArkpackCatalog.State>(catalogState)),
 			refreshFx: Effect.void,
 			importFileFx,
+			installFx: () => Effect.die("unused"),
 			removeFx,
 		};
 		const { container, router } = await renderSelector(catalog);
@@ -441,9 +447,11 @@ describe("ArkpackSelector", () => {
 			],
 		};
 		const catalog: ArkpackCatalog = {
+			awaitIdleFx: Effect.void,
 			state: Effect.runSync(SubscriptionRef.make<ArkpackCatalog.State>(catalogState)),
 			refreshFx: Effect.void,
 			importFileFx: () => Effect.die("Unexpected import."),
+			installFx: () => Effect.die("unused"),
 			removeFx,
 		};
 		const { container } = await renderSelector(catalog);
@@ -492,9 +500,11 @@ describe("ArkpackSelector", () => {
 			],
 		};
 		const catalog: ArkpackCatalog = {
+			awaitIdleFx: Effect.void,
 			state: Effect.runSync(SubscriptionRef.make<ArkpackCatalog.State>(catalogState)),
 			refreshFx: Effect.void,
 			importFileFx,
+			installFx: () => Effect.die("unused"),
 			removeFx: () => Effect.die("Unexpected removal."),
 		};
 		const { container, router } = await renderSelector(catalog);

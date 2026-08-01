@@ -97,24 +97,6 @@ describe("Electron preload lifecycle", () => {
 		);
 	});
 
-	it("routes editor project discovery through its manifest-list channel", async () => {
-		const projects = [
-			{
-				projectId: "editor-test",
-				title: "Editor test",
-				createdAtMs: 100,
-				updatedAtMs: 200,
-			},
-		];
-		electron.ipcRenderer.invoke.mockResolvedValueOnce(projects);
-		const api = await loadPreload();
-
-		await expect(api.editor.listProjects()).resolves.toEqual(projects);
-		expect(electron.ipcRenderer.invoke).toHaveBeenCalledWith(
-			ArkiniElectronContract.channels.editorProjectList,
-		);
-	});
-
 	it("routes bounded diagnostics through dedicated IPC channels", async () => {
 		electron.ipcRenderer.invoke.mockResolvedValue(undefined);
 		const api = await loadPreload();

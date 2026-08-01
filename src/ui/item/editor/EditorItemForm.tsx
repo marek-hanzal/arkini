@@ -1,12 +1,10 @@
-import { useAtomValue } from "@effect/atom-react";
 import { useNavigate } from "@tanstack/react-router";
 import { useCallback, useMemo, type PropsWithChildren } from "react";
 
-import { EditorProjectAtom } from "~/bridge/editor/EditorProjectAtom";
 import { useEditorProject } from "~/bridge/editor/useEditorProject";
 import type { EditorItem, EditorItemType } from "~/bridge/item/editor/EditorItemModel";
 import { useEditorItemDraft } from "~/bridge/item/editor/useEditorItemDraft";
-import { ButtonLink } from "~/ui/button/Button";
+import { ButtonLink, PrimaryButton } from "~/ui/button/Button";
 import { EditorItemFormProvider } from "~/ui/item/editor/EditorItemFormContext";
 import { EditorItemNotFound } from "~/ui/item/editor/EditorItemNotFound";
 import type { EditorItemSectionId } from "~/ui/item/editor/EditorItemSections";
@@ -128,6 +126,15 @@ const EditorItemFormSession = ({
 							{initialItem.type}
 						</p>
 					</div>
+					<PrimaryButton
+						type="button"
+						className="min-h-0 px-4 py-2"
+						disabled={!controller.isDirty || controller.isSaving}
+						cursorIntent={controller.isSaving ? "progress" : undefined}
+						onClick={() => void controller.save().catch(() => undefined)}
+					>
+						{controller.isSaving ? "Saving…" : "Save"}
+					</PrimaryButton>
 				</header>
 				<form
 					className="min-h-0"
@@ -147,16 +154,12 @@ const EditorItemFormSession = ({
 
 /** Resolves a canonical item by UID or seeds its first local form from itemType. */
 export const EditorItemForm = ({ children, itemType, uid }: EditorItemForm.Props) => {
-	const project = useEditorProject();
-	const canonicalProject = useAtomValue(EditorProjectAtom(project.projectId));
 	const persistedItem = useEditorItemByUid(uid);
 	const draft = useEditorItemDraft(itemType ?? persistedItem?.type ?? "simple", uid);
 	if (persistedItem === undefined && itemType === undefined)
 		return <EditorItemNotFound uid={uid} />;
 	const initialItem = persistedItem ?? draft;
-	const isNew = !Object.values(canonicalProject?.config?.items ?? {}).some(
-		(item) => item.uid === uid,
-	);
+	const isNew = persistedItem === undefined;
 	return (
 		<EditorItemFormSession
 			key={initialItem.uid}

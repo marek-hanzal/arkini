@@ -2,13 +2,11 @@ import { Effect } from "effect";
 
 import { ArkpackLimits } from "~/bridge/arkpack/ArkpackLimits";
 import { assertExpectedArkpackTrustFx } from "~/bridge/arkpack/assertExpectedArkpackTrustFx";
+import { validateArkpackPayloadFx } from "~/bridge/arkpack/validateArkpackPayloadFx";
 import { decodeFx } from "~/engine/pack/fx/decodeFx";
 import { verifyArkpackTrustFx } from "~/engine/pack/fx/verifyArkpackTrustFx";
 import type { ArkpackTrustedKeysSchema } from "~/engine/pack/schema/ArkpackTrustedKeysSchema";
-import type { GameSourceProvenanceSchema } from "~/engine/source/schema/GameSourceProvenanceSchema";
 import { GameValidationError } from "~/engine/validation/error/GameValidationError";
-import { validateGameConfigFx } from "~/engine/validation/fx/validateGameConfigFx";
-import { validateGameResourcesFx } from "~/engine/validation/rule/validateGameResourcesFx";
 import { DiagnosticSeverityEnumSchema } from "~/engine/validation/schema/DiagnosticSeverityEnumSchema";
 
 export namespace readArkpackFx {
@@ -67,32 +65,6 @@ const decompressArkpackFx = Effect.fn("decompressArkpackFx")((bytes: Uint8Array)
 	}),
 );
 
-const createPackProvenance = (
-	gameId: string,
-	categories: Readonly<Record<string, unknown>>,
-	items: Readonly<Record<string, unknown>>,
-): GameSourceProvenanceSchema.Type => {
-	const source = `arkpack:${gameId}`;
-	return {
-		meta: source,
-		resources: source,
-		start: source,
-		version: source,
-		categories: Object.fromEntries(
-			Object.keys(categories).map((id) => [
-				id,
-				source,
-			]),
-		),
-		items: Object.fromEntries(
-			Object.keys(items).map((id) => [
-				id,
-				source,
-			]),
-		),
-	};
-};
-
 /** Decodes, schema-validates and semantically validates one compressed arkpack binary. */
 export const readArkpackFx = Effect.fn("readArkpackFx")(function* ({
 	bytes,
@@ -120,35 +92,7 @@ export const readArkpackFx = Effect.fn("readArkpackFx")(function* ({
 	});
 	const contentHash = verification.contentHash;
 	const payload = yield* decodeFx(yield* decompressArkpackFx(bytes));
-	for (const resource of payload.resources) {
-		if (resource.mime !== "image/png") {
-			return yield* Effect.fail(
-				new Error(
-					`Unsupported arkpack resource MIME ${resource.mime}; only image/png is allowed.`,
-				),
-			);
-		}
-	}
-	const provenance = createPackProvenance(
-		payload.config.meta.id,
-		payload.config.categories,
-		payload.config.items,
-	);
-	const diagnostics = [
-		...(yield* validateGameConfigFx({
-			config: payload.config,
-			provenance,
-		})),
-		...(yield* validateGameResourcesFx({
-			config: payload.config,
-			provenance,
-			resources: payload.resources.map((resource) => ({
-				id: resource.id,
-				mime: "image/png" as const,
-				path: `arkpack:${resource.id}`,
-			})),
-		})),
-	];
+	const diagnostics = yield* validateArkpackPayloadFx(payload);
 	const errors = diagnostics.filter(
 		({ severity }) => severity === DiagnosticSeverityEnumSchema.enum.Error,
 	);

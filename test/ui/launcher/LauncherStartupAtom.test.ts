@@ -21,6 +21,7 @@ import { retryLauncherStartupAtom } from "~/ui/launcher/retryLauncherStartupAtom
 
 const registries: AtomRegistry.AtomRegistry[] = [];
 const catalog: ArkpackCatalog = {
+	awaitIdleFx: Effect.void,
 	state: Effect.runSync(
 		SubscriptionRef.make<ArkpackCatalog.State>({
 			type: "loading",
@@ -28,6 +29,7 @@ const catalog: ArkpackCatalog = {
 	),
 	refreshFx: Effect.void,
 	importFileFx: () => Effect.die("unused"),
+	installFx: () => Effect.die("unused"),
 	removeFx: () => Effect.die("unused"),
 };
 

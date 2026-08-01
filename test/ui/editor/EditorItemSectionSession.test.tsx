@@ -20,6 +20,8 @@ vi.mock("@tanstack/react-router", async (importOriginal) => {
 vi.mock("~/ui/button/Button", () => ({
 	ButtonLink: ({ children }: { readonly children?: ReactNode }) =>
 		createElement("a", null, children),
+	PrimaryButton: ({ children }: { readonly children?: ReactNode }) =>
+		createElement("button", null, children),
 }));
 
 const state = vi.hoisted(() => ({
@@ -47,11 +49,9 @@ vi.mock("~/ui/editor/EditorFormActions", () => ({
 	useRegisterEditorFormActions: () => undefined,
 }));
 
-vi.mock("~/ui/item/editor/useStageEditorItemCommand", () => ({
-	useStageEditorItemCommand: () => ({
-		error: undefined,
-		mutateAsync: vi.fn(),
-		reset: vi.fn(),
+vi.mock("~/bridge/item/editor/saveEditorItemCommandAtom", () => ({
+	saveEditorItemCommandAtom: () => ({
+		id: "save-editor-item",
 	}),
 }));
 
@@ -182,12 +182,13 @@ describe("item section form session", () => {
 		expect(container.textContent).toContain("Immutable after the item is first saved.");
 	});
 
-	it("allows a staged new item ID to change before its first disk persist", async () => {
+	it("allows a new item ID to change before its first repository save", async () => {
 		state.canonical = {
 			config: {
 				items: {},
 			},
 		};
+		state.persisted = undefined;
 		const { container } = await render(<EditorItemIdentitySection />, "simple");
 
 		const id = container.querySelector<HTMLInputElement>('input[name="id"]');

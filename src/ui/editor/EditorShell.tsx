@@ -1,4 +1,4 @@
-import { useAtomSet, useAtomValue } from "@effect/atom-react";
+import { useAtomSet } from "@effect/atom-react";
 import { useRouter } from "@tanstack/react-router";
 import {
 	useCallback,
@@ -8,15 +8,10 @@ import {
 	type PropsWithChildren,
 } from "react";
 
-import { openEditorProjectSessionAtom } from "~/bridge/editor/openEditorProjectSessionAtom";
-import { releaseEditorProjectSessionAtom } from "~/bridge/editor/releaseEditorProjectSessionAtom";
-import { closeEditorProjectSessionAtom } from "~/bridge/editor/closeEditorProjectSessionAtom";
-import { EditorProjectDraftAtom } from "~/bridge/editor/EditorProjectDraftAtom";
-import { persistEditorProjectCommandAtom } from "~/bridge/editor/persistEditorProjectCommandAtom";
 import { useEditorProject } from "~/bridge/editor/useEditorProject";
-import { Button, ButtonLink, PrimaryButton } from "~/ui/button/Button";
+import { waitForEditorProjectWritesCommandAtom } from "~/bridge/editor/waitForEditorProjectWritesCommandAtom";
+import { ButtonLink, PrimaryButton } from "~/ui/button/Button";
 import { EditorFormActionsProvider, useEditorFormActions } from "~/ui/editor/EditorFormActions";
-import { readSettledAsyncResultError } from "~/ui/reactivity/readSettledAsyncResultError";
 
 const tabClassName =
 	"min-h-0 border-transparent bg-transparent px-3 py-2 text-sm shadow-none hover:bg-surface-raised";
@@ -48,19 +43,7 @@ const EditorShellContent = ({ children }: PropsWithChildren) => {
 	const project = useEditorProject();
 	const form = useEditorFormActions();
 	const router = useRouter();
-	const closeProjectSession = useAtomSet(closeEditorProjectSessionAtom, {
-		mode: "promise",
-	});
-	const openProjectSession = useAtomSet(openEditorProjectSessionAtom, {
-		mode: "promise",
-	});
-	const releaseProjectSession = useAtomSet(releaseEditorProjectSessionAtom, {
-		mode: "promise",
-	});
-	const staged = useAtomValue(EditorProjectDraftAtom(project.projectId));
-	const updateStaged = useAtomSet(EditorProjectDraftAtom(project.projectId));
-	const persistResult = useAtomValue(persistEditorProjectCommandAtom(project.projectId));
-	const persistProject = useAtomSet(persistEditorProjectCommandAtom(project.projectId), {
+	const waitForProjectWrites = useAtomSet(waitForEditorProjectWritesCommandAtom, {
 		mode: "promise",
 	});
 	const [optimisticTab, setOptimisticTab] = useState<EditorTab>();
@@ -104,23 +87,18 @@ const EditorShellContent = ({ children }: PropsWithChildren) => {
 		setExitError(undefined);
 		setExitPending(true);
 		try {
-			await closeProjectSession(project.projectId);
-			await releaseProjectSession(project.projectId);
+			await waitForProjectWrites(undefined);
 			await router.navigate({
 				to: "/main-menu",
 			});
 		} catch (error) {
-			await openProjectSession(project.projectId);
 			setExitError(error);
 			setExitPending(false);
 		}
 	}, [
-		closeProjectSession,
 		exitPending,
-		openProjectSession,
-		project.projectId,
-		releaseProjectSession,
 		router,
+		waitForProjectWrites,
 	]);
 	const saveForm = useCallback(async () => {
 		if (form === undefined || !form.isDirty || form.isSaving) return;
@@ -128,25 +106,10 @@ const EditorShellContent = ({ children }: PropsWithChildren) => {
 		try {
 			await form.save();
 		} catch {
-			// The form or project command owns and publishes its exact mutation error.
+			// The form command owns and publishes its exact mutation error.
 		}
 	}, [
 		form,
-	]);
-	const persist = useCallback(async () => {
-		if (persistResult.waiting || Object.keys(staged).length === 0) return false;
-		setExitError(undefined);
-		try {
-			await persistProject();
-			return true;
-		} catch {
-			// The command result owns and publishes its exact mutation error.
-			return false;
-		}
-	}, [
-		persistProject,
-		persistResult.waiting,
-		staged,
 	]);
 	const discard = useCallback(() => {
 		form?.discard();
@@ -155,35 +118,28 @@ const EditorShellContent = ({ children }: PropsWithChildren) => {
 		form,
 	]);
 	const saveAndExit = useCallback(async () => {
-		if (form?.isSaving === true || persistResult.waiting) return;
+		if (form?.isSaving === true) return;
 		setExitError(undefined);
 		try {
 			if (form?.isDirty === true && !(await form.save())) return;
-			await persistProject();
 			await closeAndExit();
 		} catch {
-			// The form owns and publishes its exact mutation error.
+			// The form command owns and publishes its exact mutation error.
 		}
 	}, [
 		closeAndExit,
 		form,
-		persistProject,
-		persistResult.waiting,
 	]);
 	const discardAndExit = useCallback(async () => {
 		form?.discard();
-		updateStaged({
-			action: "clear",
-		});
 		await closeAndExit();
 	}, [
 		closeAndExit,
 		form,
-		updateStaged,
 	]);
 	const requestExit = useCallback(() => {
 		setExitError(undefined);
-		if (form?.isDirty === true || Object.keys(staged).length > 0) {
+		if (form?.isDirty === true) {
 			setExitRequested(true);
 			return;
 		}
@@ -191,7 +147,6 @@ const EditorShellContent = ({ children }: PropsWithChildren) => {
 	}, [
 		closeAndExit,
 		form?.isDirty,
-		staged,
 	]);
 
 	const readTabClassName = (tab: EditorTab) =>
@@ -215,18 +170,15 @@ const EditorShellContent = ({ children }: PropsWithChildren) => {
 			setExitRequested(false);
 			setOptimisticTab(tab);
 		};
-	const persistError = readSettledAsyncResultError(persistResult);
-	const statusError = form?.error ?? persistError ?? exitError;
-	const hasStatusSlot =
-		form !== undefined || Object.keys(staged).length > 0 || statusError !== undefined;
+	const statusError = form?.error ?? exitError;
+	const hasStatusSlot = form !== undefined || statusError !== undefined;
 	const statusVisible = form?.isDirty === true || exitRequested || statusError !== undefined;
 	const statusCopy =
 		statusError !== undefined
 			? readErrorMessage(statusError)
 			: exitRequested
-				? "The editor has unsaved changes. Save or discard them before exiting."
+				? "The editor has unsaved form changes. Save or discard them before exiting."
 				: "This form has unsaved changes.";
-	const stagedCount = Object.keys(staged).length;
 
 	return (
 		<div
@@ -300,31 +252,10 @@ const EditorShellContent = ({ children }: PropsWithChildren) => {
 				<p className="min-w-0 flex-1 truncate px-2 text-right text-xs text-muted">
 					{project.title}
 				</p>
-				<Button
-					className="min-h-0 shrink-0 px-4 py-2 text-sm"
-					disabled={
-						stagedCount === 0 ||
-						form?.isDirty === true ||
-						persistResult.waiting ||
-						exitPending
-					}
-					cursorIntent={persistResult.waiting ? "progress" : undefined}
-					onClick={() => void persist()}
-				>
-					{persistResult.waiting
-						? "Saving…"
-						: stagedCount > 0
-							? `Save (${stagedCount})`
-							: "Save"}
-				</Button>
 				<PrimaryButton
 					className="min-h-0 shrink-0 px-4 py-2 text-sm"
-					disabled={exitPending || form?.isSaving === true || persistResult.waiting}
-					cursorIntent={
-						exitPending || form?.isSaving === true || persistResult.waiting
-							? "progress"
-							: undefined
-					}
+					disabled={exitPending || form?.isSaving === true}
+					cursorIntent={exitPending || form?.isSaving === true ? "progress" : undefined}
 					onClick={requestExit}
 				>
 					{exitPending ? "Exiting…" : "Exit"}
@@ -336,31 +267,21 @@ const EditorShellContent = ({ children }: PropsWithChildren) => {
 					data-ui="EditorFormStatusSlot"
 				>
 					<div
-						className={`flex h-full min-w-0 items-center gap-3 rounded-b-xl border-x border-b px-4 text-sm transition-[opacity,transform,background-color,border-color] duration-200 ${
-							statusVisible
-								? "translate-y-0 border-accent/45 bg-accent/10 opacity-100"
-								: "pointer-events-none -translate-y-1 border-transparent opacity-0"
-						}`}
+						className={`flex h-full min-w-0 items-center gap-3 rounded-b-xl border-x border-b px-4 text-sm transition-[opacity,transform,background-color,border-color] duration-200 ${statusVisible ? "translate-y-0 border-accent/45 bg-accent/10 opacity-100" : "pointer-events-none -translate-y-1 border-transparent opacity-0"}`}
 						aria-hidden={!statusVisible}
 						role={statusError === undefined ? "status" : "alert"}
 					>
 						<p
-							className={`min-w-0 flex-1 truncate ${
-								statusError === undefined ? "text-foreground" : "text-danger"
-							}`}
+							className={`min-w-0 flex-1 truncate ${statusError === undefined ? "text-foreground" : "text-danger"}`}
 						>
 							{statusCopy}
 						</p>
-						{form?.isDirty === true || (exitRequested && stagedCount > 0) ? (
+						{form?.isDirty === true ? (
 							<>
 								<button
 									type="button"
 									className="cursor-pointer text-sm font-semibold text-muted underline decoration-transparent underline-offset-4 transition-colors hover:text-foreground hover:decoration-current disabled:cursor-not-allowed disabled:opacity-60"
-									disabled={
-										form?.isSaving === true ||
-										persistResult.waiting ||
-										exitPending
-									}
+									disabled={form.isSaving || exitPending}
 									onClick={() => {
 										if (exitRequested) void discardAndExit();
 										else discard();
@@ -371,18 +292,12 @@ const EditorShellContent = ({ children }: PropsWithChildren) => {
 								<button
 									type="button"
 									className="cursor-pointer text-sm font-semibold text-accent underline decoration-transparent underline-offset-4 transition-colors hover:text-accent-hover hover:decoration-current disabled:cursor-not-allowed disabled:opacity-60"
-									disabled={
-										form?.isSaving === true ||
-										persistResult.waiting ||
-										exitPending
-									}
+									disabled={form.isSaving || exitPending}
 									onClick={() =>
 										void (exitRequested ? saveAndExit() : saveForm())
 									}
 								>
-									{form?.isSaving === true || persistResult.waiting
-										? "Saving…"
-										: "Save"}
+									{form.isSaving ? "Saving…" : "Save"}
 								</button>
 							</>
 						) : null}

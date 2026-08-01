@@ -8,5 +8,4 @@ export interface ArkiniUserDataPaths {
 		readonly preferences: string;
 		readonly saves: string;
 	};
-	readonly editor: string;
 }

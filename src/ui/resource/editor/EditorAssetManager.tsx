@@ -36,7 +36,6 @@ export const EditorAssetManager = () => {
 						event.currentTarget.value = "";
 						if (file === undefined) return;
 						saveAsset({
-							expectedRevision: project.revision,
 							file,
 							projectId: project.projectId,
 						});

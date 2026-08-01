@@ -28,13 +28,9 @@ const project: EditorProject = {
 	game: "1.0",
 	createdAtMs: 1,
 	updatedAtMs: 1,
-	revision: "a".repeat(64),
-	fileIndex: {},
-	itemSourcePaths: {},
+	revision: 0,
 	config: editorTestConfig,
 	resources: editorTestPayload.resources,
-	resourceSourcePaths: {},
-	diagnostics: [],
 };
 
 const DraftProbe = ({ type, uid }: { readonly type: EditorItemType; readonly uid: string }) => {

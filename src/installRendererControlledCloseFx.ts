@@ -1,7 +1,10 @@
 import { Effect, Exit, Option } from "effect";
+import * as Atom from "effect/unstable/reactivity/Atom";
 
+import { ArkpackCatalogOwnerAtom } from "~/bridge/arkpack/ArkpackCatalogOwnerAtom";
+import { EditorFormDirtyAtom } from "~/bridge/editor/EditorFormDirtyAtom";
+import { EditorProjectRepository } from "~/bridge/editor/EditorProjectRepository";
 import { claimGameEngineResourceForCloseFx } from "~/bridge/game/claimGameEngineResourceForCloseFx";
-import { closeActiveEditorProjectSessionFx } from "~/bridge/editor/closeActiveEditorProjectSessionFx";
 import { readExactCauseFailure } from "~/bridge/game/readExactCauseFailure";
 import type { ArkiniRouter } from "~/createArkiniRouterFx";
 import { waitForActionLoadingCompletionFrameFx } from "~/ui/loading/waitForActionLoadingCompletionFrameFx";
@@ -43,7 +46,25 @@ export const installRendererControlledCloseFx = Effect.fn("installRendererContro
 				}
 				const resource = exit.value;
 				if (resource === null) {
-					await rendererRuntime.runPromise(closeActiveEditorProjectSessionFx);
+					const formDirty = await rendererRuntime.runPromise(
+						Atom.get(EditorFormDirtyAtom),
+					);
+					if (formDirty) {
+						throw new Error(
+							"Save or discard the current editor changes before closing.",
+						);
+					}
+					await rendererRuntime.runPromise(
+						Effect.flatMap(
+							EditorProjectRepository,
+							(repository) => repository.awaitIdleFx,
+						),
+					);
+					const catalog = await rendererRuntime.runPromise(
+						Atom.get(ArkpackCatalogOwnerAtom),
+					);
+					if (catalog !== undefined)
+						await rendererRuntime.runPromise(catalog.awaitIdleFx);
 					return;
 				}
 				exitPresentationRequired = true;

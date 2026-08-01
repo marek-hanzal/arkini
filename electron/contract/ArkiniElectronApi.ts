@@ -3,10 +3,6 @@ import type { AppearanceThemeSchema } from "./appearance/AppearanceThemeSchema";
 import type { CheatAvailabilitySchema } from "./cheat/CheatAvailabilitySchema";
 import type { LastPackageIdSchema } from "./launcher/LastPackageIdSchema";
 import type { DiagnosticRecord } from "./diagnostics/DiagnosticRecord";
-import type { EditorProjectManifest } from "./editor/EditorProjectManifest";
-import type { EditorProjectWrite } from "./editor/EditorProjectWrite";
-import type { EditorProjectCreate, EditorProjectRecord } from "./editor/EditorProjectRecord";
-import type { EditorProjectWriteResult } from "./editor/EditorProjectWriteResult";
 import type { WindowModeSchema } from "./window/WindowModeSchema";
 
 export namespace ArkiniElectronApi {
@@ -15,11 +11,6 @@ export namespace ArkiniElectronApi {
 		arkpackRead: "arkini:arkpack:read",
 		arkpackInstall: "arkini:arkpack:install",
 		arkpackRemove: "arkini:arkpack:remove",
-		editorProjectList: "arkini:editor:project:list",
-		editorProjectCreate: "arkini:editor:project:create",
-		editorProjectRead: "arkini:editor:project:read",
-		editorProjectWrite: "arkini:editor:project:write",
-		editorDirectoryOpen: "arkini:editor:directory:open",
 		saveRead: "arkini:save:read",
 		saveWrite: "arkini:save:write",
 		saveClear: "arkini:save:clear",
@@ -85,15 +76,6 @@ export namespace ArkiniElectronApi {
 			readonly read: (packageId: string) => Promise<ArkpackRecord | null>;
 			readonly install: (record: ArkpackRecord) => Promise<void>;
 			readonly remove: (packageId: string) => Promise<void>;
-		};
-		readonly editor: {
-			readonly listProjects: () => Promise<ReadonlyArray<EditorProjectManifest>>;
-			readonly createProject: (record: EditorProjectCreate) => Promise<void>;
-			readonly readProject: (projectId: string) => Promise<EditorProjectRecord | null>;
-			readonly writeProject: (
-				mutation: EditorProjectWrite,
-			) => Promise<EditorProjectWriteResult>;
-			readonly openDirectory: (projectId?: string) => Promise<void>;
 		};
 		readonly appearance: {
 			readonly read: () => Promise<AppearanceThemeSchema.Type>;

@@ -68,17 +68,6 @@ const api: ArkiniElectronApi.Api = {
 		writeLastPackageId: (packageId) =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.launcherLastPackageIdWrite, packageId),
 	},
-	editor: {
-		listProjects: () => ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectList),
-		createProject: (record) =>
-			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectCreate, record),
-		readProject: (projectId) =>
-			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectRead, projectId),
-		writeProject: (mutation) =>
-			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectWrite, mutation),
-		openDirectory: (projectId) =>
-			ipcRenderer.invoke(ArkiniElectronApi.channels.editorDirectoryOpen, projectId),
-	},
 	arkpack: {
 		list: () => ipcRenderer.invoke(ArkiniElectronApi.channels.arkpackList),
 		read: (packageId) => ipcRenderer.invoke(ArkiniElectronApi.channels.arkpackRead, packageId),

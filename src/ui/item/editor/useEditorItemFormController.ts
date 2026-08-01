@@ -1,21 +1,23 @@
-import { useAtomSet } from "@effect/atom-react";
+import { useAtomSet, useAtomValue } from "@effect/atom-react";
 import { revalidateLogic, useStore } from "@tanstack/react-form";
+import * as Atom from "effect/unstable/reactivity/Atom";
 import { useCallback, useLayoutEffect, useMemo, useRef } from "react";
 
-import { EditorProjectFormDirtyAtom } from "~/bridge/editor/EditorProjectFormDirtyAtom";
+import { EditorFormDirtyAtom } from "~/bridge/editor/EditorFormDirtyAtom";
 import { useEditorProject } from "~/bridge/editor/useEditorProject";
 import {
 	EditorItemFormSchema,
 	type EditorItemFormValues,
 } from "~/bridge/item/editor/EditorItemFormSchema";
 import type { EditorItem } from "~/bridge/item/editor/EditorItemModel";
+import { saveEditorItemCommandAtom } from "~/bridge/item/editor/saveEditorItemCommandAtom";
 import { useRegisterEditorFormActions } from "~/ui/editor/EditorFormActions";
 import { useAppForm } from "~/ui/form/EditorForm";
 import {
 	readEditorItemSectionForPath,
 	type EditorItemSectionId,
 } from "~/ui/item/editor/EditorItemSections";
-import { useStageEditorItemCommand } from "~/ui/item/editor/useStageEditorItemCommand";
+import { readSettledAsyncResultError } from "~/ui/reactivity/readSettledAsyncResultError";
 
 export namespace useEditorItemFormController {
 	export interface Props {
@@ -47,16 +49,18 @@ export const useEditorItemFormController = ({
 			initialItem,
 		],
 	);
-	const categoryOptions = Object.values(project.config?.categories ?? {}).map((category) => ({
+	const categoryOptions = Object.values(project.config.categories).map((category) => ({
 		label: category.title,
 		value: category.id,
 	}));
-	const setFormDirty = useAtomSet(EditorProjectFormDirtyAtom(project.projectId));
+	const setFormDirty = useAtomSet(EditorFormDirtyAtom);
 	const ownerId = `item:${initialItem.uid}`;
-	const mutation = useStageEditorItemCommand({
-		itemUid: initialItem.uid,
-		projectId: project.projectId,
+	const saveItemAtom = saveEditorItemCommandAtom(project.projectId);
+	const saveItemResult = useAtomValue(saveItemAtom);
+	const saveItem = useAtomSet(saveItemAtom, {
+		mode: "promise",
 	});
+	const resetSaveItem = useAtomSet(saveItemAtom);
 	const submitSucceeded = useRef(false);
 	const form = useAppForm({
 		defaultValues: canonicalItem,
@@ -69,7 +73,7 @@ export const useEditorItemFormController = ({
 		},
 		onSubmit: async ({ formApi, value }) => {
 			const item = EditorItemFormSchema.parse(value);
-			const saved = await mutation.mutateAsync(item);
+			const saved = await saveItem(item);
 			submitSucceeded.current = true;
 			setFormDirty({
 				dirty: false,
@@ -113,7 +117,7 @@ export const useEditorItemFormController = ({
 		setFormDirty,
 	]);
 	const discard = useCallback(() => {
-		mutation.reset();
+		resetSaveItem(Atom.Reset);
 		setFormDirty({
 			dirty: false,
 			ownerId,
@@ -122,8 +126,8 @@ export const useEditorItemFormController = ({
 	}, [
 		canonicalItem,
 		form,
-		mutation.reset,
 		ownerId,
+		resetSaveItem,
 		setFormDirty,
 	]);
 	const save = useCallback(async () => {
@@ -154,7 +158,7 @@ export const useEditorItemFormController = ({
 	const actions = useMemo(
 		() => ({
 			discard,
-			error: mutation.error ?? validationError,
+			error: readSettledAsyncResultError(saveItemResult) ?? validationError,
 			isDirty: dirty,
 			isSaving: submitting,
 			save,
@@ -162,7 +166,7 @@ export const useEditorItemFormController = ({
 		[
 			dirty,
 			discard,
-			mutation.error,
+			saveItemResult,
 			save,
 			submitting,
 			validationError,
@@ -173,6 +177,8 @@ export const useEditorItemFormController = ({
 	return {
 		canonicalItem,
 		categoryOptions,
+		isDirty: dirty,
+		isSaving: submitting,
 		form,
 		initialItem,
 		itemId,

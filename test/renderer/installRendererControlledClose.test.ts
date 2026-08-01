@@ -3,10 +3,9 @@
 import { Deferred, Effect, Exit, Scope } from "effect";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import { EditorFormDirtyAtom } from "~/bridge/editor/EditorFormDirtyAtom";
+import type { EditorProjectRepositoryService } from "~/bridge/editor/EditorProjectRepository";
 import { acquireGameEngineLeaseFx } from "~/bridge/game/acquireGameEngineLeaseFx";
-import { openEditorProjectSessionFx } from "~/bridge/editor/openEditorProjectSessionFx";
-import { releaseEditorProjectSessionFx } from "~/bridge/editor/releaseEditorProjectSessionFx";
-import { EditorProjectFormDirtyAtom } from "~/bridge/editor/EditorProjectFormDirtyAtom";
 import { CriticalGameLifecycleError } from "~/bridge/game/CriticalGameLifecycleError";
 import type { GameEngineResource } from "~/bridge/game/GameEngineResource";
 import { installRendererControlledCloseFx } from "~/installRendererControlledCloseFx";
@@ -103,7 +102,6 @@ beforeEach(() => {
 afterEach(async () => {
 	vi.useRealTimers();
 	for (const runtime of runtimes.splice(0)) await runtime.dispose();
-	Effect.runSync(releaseEditorProjectSessionFx("project"));
 	vi.restoreAllMocks();
 });
 
@@ -185,13 +183,52 @@ describe("installRendererControlledClose", () => {
 		remove();
 	});
 
-	it("rejects native close while the active editor has unsaved item changes", async () => {
+	it("waits for admitted editor repository writes before native close", async () => {
+		const idle = Effect.runSync(Deferred.make<void>());
+		const repository: EditorProjectRepositoryService = {
+			awaitIdleFx: Deferred.await(idle),
+			createProjectFx: () => Effect.die("Unexpected create."),
+			listProjectsFx: Effect.die("Unexpected list."),
+			readProjectFx: () => Effect.die("Unexpected read."),
+			upsertItemFx: () => Effect.die("Unexpected item save."),
+			upsertResourceFx: () => Effect.die("Unexpected resource save."),
+		};
+		const { rendererRuntime } = createTestRendererRuntime({
+			createResourceFx: () => Effect.never,
+			editorProjectRepository: repository,
+		});
+		runtimes.push(rendererRuntime);
+		const lifecycle = createLifecycle();
+		const router = createRouter();
+		const remove = rendererRuntime.runSync(
+			installRendererControlledCloseFx({
+				lifecycle: lifecycle.lifecycle,
+				rendererRuntime,
+				router: router.router,
+			}),
+		);
+
+		let closed = false;
+		const close = lifecycle
+			.readBeforeClose()()
+			.then(() => {
+				closed = true;
+			});
+		await Promise.resolve();
+		expect(closed).toBe(false);
+		Effect.runSync(Deferred.succeed(idle, undefined));
+		await close;
+		expect(closed).toBe(true);
+		expect(router.navigate).not.toHaveBeenCalled();
+		remove();
+	});
+
+	it("rejects native close while an editor form has unsaved item changes", async () => {
 		const { atomRegistry, rendererRuntime } = createTestRendererRuntime({
 			createResourceFx: () => Effect.never,
 		});
 		runtimes.push(rendererRuntime);
-		rendererRuntime.runSync(openEditorProjectSessionFx("project"));
-		atomRegistry.set(EditorProjectFormDirtyAtom("project"), {
+		atomRegistry.set(EditorFormDirtyAtom, {
 			dirty: true,
 			ownerId: "item:test",
 		});

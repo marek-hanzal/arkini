@@ -1,13 +1,15 @@
+import { scheduleTask } from "@effect/atom-react";
 import { Effect } from "effect";
+import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { EditorProjectRecord } from "../../../../electron/contract/editor/EditorProjectRecord";
 import type { EditorProject } from "~/bridge/editor/EditorProject";
-import { createEditorProjectFromRecordFx } from "~/bridge/editor/createEditorProjectFromRecordFx";
-import { createEditorProjectManifestFileFx } from "~/bridge/editor/createEditorProjectManifestFileFx";
-import type { EditorWorkspace } from "~/bridge/editor/EditorWorkspace";
+import { EditorProjectAtom } from "~/bridge/editor/EditorProjectAtom";
+import {
+	EditorProjectRepository,
+	type EditorProjectRepositoryService,
+} from "~/bridge/editor/EditorProjectRepository";
 import { saveEditorAssetFx } from "~/bridge/resource/editor/saveEditorAssetFx";
-import { createEditorProjectPlanFx } from "~/engine/editor/fx/createEditorProjectPlanFx";
 import { editorTestPayload } from "~test/editor/support/editorTestPayload";
 
 const createPng = () =>
@@ -17,8 +19,48 @@ const createPng = () =>
 			"base64",
 		),
 	);
-
+const createProject = (revision = 0): EditorProject => ({
+	projectId: "project",
+	title: editorTestPayload.config.meta.title,
+	game: editorTestPayload.config.version,
+	createdAtMs: 1,
+	updatedAtMs: revision + 1,
+	revision,
+	config: editorTestPayload.config,
+	resources: editorTestPayload.resources,
+});
 const bitmapClose = vi.fn();
+const registries: AtomRegistry.AtomRegistry[] = [];
+
+const createFixture = () => {
+	const registry = AtomRegistry.make({
+		scheduleTask,
+	});
+	registries.push(registry);
+	const upsertResourceFx = vi.fn<EditorProjectRepositoryService["upsertResourceFx"]>(
+		({ resource }) =>
+			Effect.succeed({
+				...createProject(1),
+				resources: [
+					...editorTestPayload.resources,
+					resource,
+				],
+			}),
+	);
+	const repository: EditorProjectRepositoryService = {
+		awaitIdleFx: Effect.void,
+		createProjectFx: () => Effect.die("Unexpected create."),
+		listProjectsFx: Effect.die("Unexpected list."),
+		readProjectFx: () => Effect.die("Unexpected read."),
+		upsertItemFx: () => Effect.die("Unexpected item save."),
+		upsertResourceFx,
+	};
+	return {
+		registry,
+		repository,
+		upsertResourceFx,
+	};
+};
 
 beforeEach(() => {
 	bitmapClose.mockReset();
@@ -33,118 +75,43 @@ beforeEach(() => {
 });
 
 afterEach(() => {
+	for (const registry of registries.splice(0)) registry.dispose();
 	vi.unstubAllGlobals();
 });
 
 describe("saveEditorAssetFx", () => {
-	it("validates and publishes one immediate PNG mutation", async () => {
-		const plan = await Effect.runPromise(
-			createEditorProjectPlanFx({
-				contentHash: "a".repeat(64),
-				payload: editorTestPayload,
-			}),
-		);
-		const manifest = await Effect.runPromise(
-			createEditorProjectManifestFileFx({
-				projectId: plan.projectId,
-				title: plan.title,
-				game: plan.version,
-				nowMs: 123,
-			}),
-		);
-		let record: EditorProjectRecord = {
-			projectId: plan.projectId,
-			revision: "0".repeat(64),
-			files: [
-				manifest.file,
-				...plan.files,
-			],
-		};
-		const project = await Effect.runPromise(createEditorProjectFromRecordFx(record));
-		const write = vi.fn<EditorWorkspace["writeFx"]>((mutation) =>
-			Effect.sync(() => {
-				const manifestFile = record.files.find(({ path }) => path === "editor.json");
-				const manifest = JSON.parse(
-					new TextDecoder().decode(manifestFile?.bytes),
-				) as Record<string, unknown>;
-				const nextManifest = {
-					path: "editor.json",
-					bytes: new TextEncoder().encode(
-						`${JSON.stringify(
-							{
-								...manifest,
-								updatedAtMs: 456,
-							},
-							null,
-							"\t",
-						)}\n`,
-					),
-				};
-				record = {
-					...record,
-					revision: "1".repeat(64),
-					files: [
-						...record.files.filter(
-							({ path }) => path !== mutation.file.path && path !== "editor.json",
-						),
-						mutation.file,
-						nextManifest,
-					],
-				};
-				return {
-					projectId: record.projectId,
-					file: mutation.file,
-					manifest: nextManifest,
-					revision: record.revision,
-				};
-			}),
-		);
-		const workspace: EditorWorkspace = {
-			listFx: () => Effect.succeed([]),
-			createFx: () => Effect.void,
-			readFx: () => Effect.die("Save must not reload the editor project."),
-			writeFx: write,
-			openDirectoryFx: () => Effect.void,
-		};
+	it("validates, commits and publishes one PNG resource", async () => {
+		const fixture = createFixture();
+		const png = createPng();
 		const saved = await Effect.runPromise(
 			saveEditorAssetFx({
-				project,
-				expectedRevision: "0".repeat(64),
+				projectId: "project",
 				file: {
-					name: "new-asset.png",
-					size: createPng().byteLength,
-					arrayBuffer: async () => createPng().buffer,
+					name: "New Asset.png",
+					size: png.byteLength,
+					arrayBuffer: async () => png.buffer,
 				},
-				workspace,
-			}),
+			}).pipe(
+				Effect.provideService(EditorProjectRepository, fixture.repository),
+				Effect.provideService(AtomRegistry.AtomRegistry, fixture.registry),
+			),
 		);
-		expect(write).toHaveBeenCalledWith(
-			expect.objectContaining({
-				mode: "create",
-				file: expect.objectContaining({
-					path: "assets/new-asset.png",
-				}),
-			}),
-		);
-		expect(saved.project.resources.map(({ id }) => id)).toContain("new-asset");
-		expect(saved.project.revision).toBe(saved.revision);
-		expect(saved.project.updatedAtMs).toBe(456);
-		expect(saved.project.fileIndex["assets/new-asset.png"]?.bytes).toEqual(createPng());
+
+		expect(saved.resourceId).toBe("new-asset");
+		expect(fixture.upsertResourceFx).toHaveBeenCalledWith({
+			projectId: "project",
+			resource: {
+				id: "new-asset",
+				mime: "image/png",
+				bytes: png,
+			},
+		});
+		expect(fixture.registry.get(EditorProjectAtom("project"))?.revision).toBe(1);
+		expect(bitmapClose).toHaveBeenCalledOnce();
 	});
 
-	it("rejects bytes that only claim a png filename", async () => {
-		const project: EditorProject = {
-			projectId: "project",
-			title: "Project",
-			createdAtMs: 1,
-			updatedAtMs: 1,
-			revision: "0".repeat(64),
-			fileIndex: {},
-			itemSourcePaths: {},
-			resources: [],
-			resourceSourcePaths: {},
-			diagnostics: [],
-		};
+	it("rejects bytes that only claim a PNG filename before repository admission", async () => {
+		const fixture = createFixture();
 		vi.mocked(createImageBitmap).mockRejectedValueOnce(new Error("decode failed"));
 		const fakePng = new Uint8Array(24);
 		fakePng.set([
@@ -157,64 +124,50 @@ describe("saveEditorAssetFx", () => {
 			26,
 			10,
 		]);
-		const workspace = {
-			readFx: vi.fn(),
-		} as unknown as EditorWorkspace;
+
 		await expect(
 			Effect.runPromise(
 				saveEditorAssetFx({
-					project,
-					expectedRevision: "0".repeat(64),
+					projectId: "project",
 					file: {
 						name: "fake.png",
 						size: fakePng.byteLength,
 						arrayBuffer: async () => fakePng.buffer,
 					},
-					workspace,
-				}),
+				}).pipe(
+					Effect.provideService(EditorProjectRepository, fixture.repository),
+					Effect.provideService(AtomRegistry.AtomRegistry, fixture.registry),
+				),
 			),
 		).rejects.toThrow("must decode as a valid PNG image");
-		expect(workspace.readFx).not.toHaveBeenCalled();
+		expect(fixture.upsertResourceFx).not.toHaveBeenCalled();
 	});
 
 	it("releases the decoded bitmap when dimension validation fails", async () => {
-		const project: EditorProject = {
-			projectId: "project",
-			title: "Project",
-			createdAtMs: 1,
-			updatedAtMs: 1,
-			revision: "0".repeat(64),
-			fileIndex: {},
-			itemSourcePaths: {},
-			resources: [],
-			resourceSourcePaths: {},
-			diagnostics: [],
-		};
+		const fixture = createFixture();
 		vi.mocked(createImageBitmap).mockResolvedValueOnce({
 			width: 9000,
 			height: 1,
 			close: bitmapClose,
 		} as unknown as ImageBitmap);
 		const png = createPng();
-		const workspace = {
-			readFx: vi.fn(),
-		} as unknown as EditorWorkspace;
 
 		await expect(
 			Effect.runPromise(
 				saveEditorAssetFx({
-					project,
-					expectedRevision: "0".repeat(64),
+					projectId: "project",
 					file: {
 						name: "oversized.png",
 						size: png.byteLength,
 						arrayBuffer: async () => png.buffer,
 					},
-					workspace,
-				}),
+				}).pipe(
+					Effect.provideService(EditorProjectRepository, fixture.repository),
+					Effect.provideService(AtomRegistry.AtomRegistry, fixture.registry),
+				),
 			),
 		).rejects.toThrow("exceeds the supported PNG dimensions");
 		expect(bitmapClose).toHaveBeenCalledOnce();
-		expect(workspace.readFx).not.toHaveBeenCalled();
+		expect(fixture.upsertResourceFx).not.toHaveBeenCalled();
 	});
 });

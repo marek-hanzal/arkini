@@ -9,7 +9,6 @@ import {
 	Outlet,
 	RouterProvider,
 } from "@tanstack/react-router";
-import { Effect } from "effect";
 import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 import { act, createElement, useCallback, useMemo, useState } from "react";
 import { createRoot } from "react-dom/client";
@@ -20,33 +19,6 @@ import {
 	useRegisterEditorFormActions,
 } from "~/ui/editor/EditorFormActions";
 import { EditorShell } from "~/ui/editor/EditorShell";
-
-const session = vi.hoisted(() => ({
-	close: vi.fn<() => Promise<void>>(),
-	release: vi.fn(),
-	resume: vi.fn(),
-}));
-
-vi.mock("~/bridge/editor/closeEditorProjectSessionFx", () => ({
-	closeEditorProjectSessionFx: () =>
-		Effect.tryPromise({
-			try: () => session.close(),
-			catch: (error) => error,
-		}),
-}));
-
-vi.mock("~/bridge/editor/openEditorProjectSessionFx", () => ({
-	openEditorProjectSessionFx: () => Effect.sync(session.resume),
-}));
-
-vi.mock("~/bridge/editor/releaseEditorProjectSessionFx", () => ({
-	releaseEditorProjectSessionFx: (projectId: string) =>
-		Effect.sync(() => session.release(projectId)),
-}));
-
-vi.mock("~/bridge/editor/persistEditorProjectMutation", () => ({
-	persistEditorProjectMutationFx: () => Effect.void,
-}));
 
 vi.mock("~/bridge/editor/useEditorProject", () => ({
 	useEditorProject: () => ({
@@ -66,9 +38,6 @@ const registries: AtomRegistry.AtomRegistry[] = [];
 let closeFailedListener: ((error: unknown) => void) | undefined;
 
 beforeEach(() => {
-	session.close.mockReset().mockResolvedValue(undefined);
-	session.release.mockReset();
-	session.resume.mockReset();
 	Object.defineProperty(window, "scrollTo", {
 		configurable: true,
 		value: vi.fn(),
@@ -335,7 +304,7 @@ describe("EditorShell", () => {
 		expect(container.textContent).toContain("Native close failed.");
 	});
 
-	it("stages the active form from its status Save action", async () => {
+	it("saves the active form from its status Save action", async () => {
 		const router = createTestRouter({
 			initialEntry: "/editor/editor-test/editor/items/test/form/identity",
 		});
@@ -377,15 +346,12 @@ describe("EditorShell", () => {
 		act(() => {
 			readButton(container, "Exit").click();
 		});
-		expect(session.close).not.toHaveBeenCalled();
 		expect(container.textContent).toContain("Save or discard them before exiting.");
 		await act(async () => {
 			readStatusButton(container, "Discard").click();
 		});
 		await vi.waitFor(() => expect(router.state.location.pathname).toBe("/main-menu"));
 		expect(formCalls.discard).toHaveBeenCalledTimes(1);
-		expect(session.close).toHaveBeenCalledTimes(1);
-		expect(session.release).toHaveBeenCalledWith("editor-test");
 	});
 
 	it("saves dirty state before Exit and remains retryable after save failure", async () => {
@@ -407,14 +373,12 @@ describe("EditorShell", () => {
 		expect(router.state.location.pathname).toBe(
 			"/editor/editor-test/editor/items/test/form/identity",
 		);
-		expect(session.close).not.toHaveBeenCalled();
 
 		await act(async () => {
 			readStatusButton(container, "Save").click();
 		});
 		await vi.waitFor(() => expect(router.state.location.pathname).toBe("/main-menu"));
 		expect(formCalls.save).toHaveBeenCalledTimes(2);
-		expect(session.close).toHaveBeenCalledTimes(1);
 	});
 
 	it("keeps Exit open when local form validation declines the save", async () => {
@@ -433,7 +397,6 @@ describe("EditorShell", () => {
 		expect(router.state.location.pathname).toBe(
 			"/editor/editor-test/editor/items/test/form/identity",
 		);
-		expect(session.close).not.toHaveBeenCalled();
 		expect(container.textContent).toContain("Fix the highlighted item fields before saving.");
 
 		await act(async () => {

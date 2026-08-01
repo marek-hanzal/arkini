@@ -1,14 +1,12 @@
 import { Cause, Effect, Exit, Option } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
-import { match } from "ts-pattern";
 
 import type { EditorProjectDescriptor } from "~/bridge/editor/EditorProjectDescriptor";
 import { importEditorArkpackFileAtom } from "~/bridge/arkpack/editor/importEditorArkpackFileAtom";
-import { openEditorDirectoryAtom } from "~/bridge/editor/openEditorDirectoryAtom";
 import { readExactCauseFailure } from "~/bridge/game/readExactCauseFailure";
 
 export namespace EditorWelcomeCommandAtom {
-	export type Action = "exit" | "import" | "open-directory";
+	export type Action = "exit" | "import";
 
 	export type Command =
 		| {
@@ -21,9 +19,6 @@ export namespace EditorWelcomeCommandAtom {
 				readonly navigateFx: (
 					project: EditorProjectDescriptor,
 				) => Effect.Effect<void, unknown>;
-		  }
-		| {
-				readonly action: "open-directory";
 		  };
 
 	export type State =
@@ -47,29 +42,12 @@ const EditorWelcomeCommandStateAtom = Atom.make<EditorWelcomeCommandAtom.State>(
 const EditorWelcomeCommandRunnerAtom = Atom.fn(
 	(command: EditorWelcomeCommandAtom.Command, get) =>
 		Effect.gen(function* () {
-			const operation = match(command)
-				.with(
-					{
-						action: "exit",
-					},
-					({ navigateFx }) => navigateFx,
-				)
-				.with(
-					{
-						action: "import",
-					},
-					({ file, navigateFx }) =>
-						get
-							.setResult(importEditorArkpackFileAtom, file)
-							.pipe(Effect.flatMap(navigateFx)),
-				)
-				.with(
-					{
-						action: "open-directory",
-					},
-					() => get.setResult(openEditorDirectoryAtom, undefined),
-				)
-				.exhaustive();
+			const operation =
+				command.action === "exit"
+					? command.navigateFx
+					: get
+							.setResult(importEditorArkpackFileAtom, command.file)
+							.pipe(Effect.flatMap(command.navigateFx));
 			const result = yield* Effect.exit(operation);
 			if (Exit.isFailure(result)) {
 				if (Cause.hasInterruptsOnly(result.cause)) {

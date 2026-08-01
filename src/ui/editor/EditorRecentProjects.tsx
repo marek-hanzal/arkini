@@ -13,7 +13,7 @@ export namespace EditorRecentProjects {
 	}
 }
 
-/** Renders manifest-backed projects in the order supplied by the workspace authority. */
+/** Renders canonical projects in repository-supplied recent order. */
 export const EditorRecentProjects = ({ blocked, projects }: EditorRecentProjects.Props) => {
 	if (projects.length === 0) return null;
 	return (
@@ -49,8 +49,7 @@ export const EditorRecentProjects = ({ blocked, projects }: EditorRecentProjects
 								{project.title}
 							</span>
 							<span className="mt-1 block truncate text-xs text-subtle">
-								{project.projectId}
-								{project.game === undefined ? "" : ` · ${project.game}`}
+								{project.projectId} · {project.game}
 							</span>
 						</span>
 						<time

@@ -1,12 +1,8 @@
 import { Data } from "effect";
 
-/** A validated arkpack cannot be represented safely as an editable source workspace. */
+/** One editor project operation could not safely validate or address its requested value. */
 export class EditorProjectError extends Data.TaggedError("EditorProjectError")<{
-	readonly reason:
-		| "path-collision"
-		| "project-not-found"
-		| "unsafe-resource-id"
-		| "unsupported-project-file";
+	readonly reason: "invalid-asset" | "invalid-item" | "invalid-resource-id" | "project-not-found";
 	readonly message: string;
 	readonly cause?: unknown;
 }> {}

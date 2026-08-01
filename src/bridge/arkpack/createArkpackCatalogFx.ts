@@ -1,6 +1,7 @@
 import { Cause, Effect, Option, Semaphore, SubscriptionRef } from "effect";
 import type { ArkpackCatalog } from "~/bridge/arkpack/ArkpackCatalog";
 import { importArkpackFileFx } from "~/bridge/arkpack/importArkpackFileFx";
+import { importArkpackFx } from "~/bridge/arkpack/importArkpackFx";
 import { listArkpacksFx } from "~/bridge/arkpack/listArkpacksFx";
 import { removeArkpackFx } from "~/bridge/arkpack/removeArkpackFx";
 
@@ -19,6 +20,14 @@ export const createArkpackCatalogFx = Effect.fn("createArkpackCatalogFx")(
 					((file: File) =>
 						importArkpackFileFx({
 							file,
+						})),
+			);
+			const installDependencyFx = Effect.fn("ArkpackCatalog.installDependencyFx")(
+				props.installFx ??
+					(({ bytes, filename }) =>
+						importArkpackFx({
+							bytes,
+							filename,
 						})),
 			);
 			const removeDependencyFx = Effect.fn("ArkpackCatalog.removeDependencyFx")(
@@ -67,10 +76,14 @@ export const createArkpackCatalogFx = Effect.fn("createArkpackCatalogFx")(
 				);
 
 			return {
+				awaitIdleFx: lock.withPermits(1)(Effect.void),
 				state,
 				refreshFx: runCatalogOperationFx(Effect.void),
 				importFileFx: Effect.fn("ArkpackCatalog.importFileFx")((file: File) =>
 					runCatalogOperationFx(importFileDependencyFx(file)),
+				),
+				installFx: Effect.fn("ArkpackCatalog.installFx")((install) =>
+					runCatalogOperationFx(installDependencyFx(install)),
 				),
 				removeFx: Effect.fn("ArkpackCatalog.removeFx")((packageId: string) =>
 					runCatalogOperationFx(removeDependencyFx(packageId)),

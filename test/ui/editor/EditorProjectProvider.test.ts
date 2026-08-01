@@ -10,6 +10,7 @@ import type { EditorProject } from "~/bridge/editor/EditorProject";
 import { EditorProjectAtom } from "~/bridge/editor/EditorProjectAtom";
 import { EditorProjectProvider } from "~/bridge/editor/EditorProjectProvider";
 import { useEditorProject } from "~/bridge/editor/useEditorProject";
+import { editorTestPayload } from "~test/editor/support/editorTestPayload";
 
 (
 	globalThis as {
@@ -28,30 +29,26 @@ afterEach(async () => {
 	document.body.replaceChildren();
 });
 
-const createProject = (revision: string): EditorProject => ({
+const createProject = (revision: number): EditorProject => ({
 	projectId: "project",
-	title: `Project ${revision[0]}`,
+	title: `Project ${revision}`,
+	game: "1.0",
 	createdAtMs: 1,
 	updatedAtMs: 1,
 	revision,
-	fileIndex: {},
-	itemSourcePaths: {},
-	resources: [],
-	resourceSourcePaths: {},
-	diagnostics: [],
+	config: editorTestPayload.config,
+	resources: editorTestPayload.resources,
 });
 
 describe("EditorProjectProvider", () => {
 	it("replaces a retained project snapshot with the fresh remount loader result", async () => {
-		const revisionA = "a".repeat(64);
-		const revisionB = "b".repeat(64);
+		const revisionA = 1;
+		const revisionB = 2;
 		const registry = AtomRegistry.make({
 			scheduleTask,
 		});
 		registries.push(registry);
 		registry.set(EditorProjectAtom("project"), {
-			action: "refresh",
-			expectedRevision: revisionA,
 			project: createProject(revisionA),
 		});
 		const Probe = () => createElement("output", null, useEditorProject().revision);
@@ -70,7 +67,6 @@ describe("EditorProjectProvider", () => {
 					createElement(
 						EditorProjectProvider,
 						{
-							expectedRevision: revisionA,
 							loaded: createProject(revisionB),
 						},
 						createElement(Probe),
@@ -79,25 +75,21 @@ describe("EditorProjectProvider", () => {
 			);
 		});
 
-		expect(container.textContent).toBe(revisionB);
+		expect(container.textContent).toBe(String(revisionB));
 		expect(registry.get(EditorProjectAtom("project"))?.revision).toBe(revisionB);
 	});
 
 	it("rejects a loader result when a newer project was published after loading began", async () => {
-		const revisionB = "b".repeat(64);
-		const revisionC = "c".repeat(64);
+		const revisionB = 2;
+		const revisionC = 3;
 		const registry = AtomRegistry.make({
 			scheduleTask,
 		});
 		registries.push(registry);
 		registry.set(EditorProjectAtom("project"), {
-			action: "refresh",
-			expectedRevision: revisionB,
 			project: createProject(revisionB),
 		});
 		registry.set(EditorProjectAtom("project"), {
-			action: "publish",
-			expectedRevision: revisionB,
 			project: createProject(revisionC),
 		});
 		const Probe = () => createElement("output", null, useEditorProject().revision);
@@ -116,7 +108,6 @@ describe("EditorProjectProvider", () => {
 					createElement(
 						EditorProjectProvider,
 						{
-							expectedRevision: revisionB,
 							loaded: createProject(revisionB),
 						},
 						createElement(Probe),
@@ -125,7 +116,7 @@ describe("EditorProjectProvider", () => {
 			);
 		});
 
-		expect(container.textContent).toBe(revisionC);
+		expect(container.textContent).toBe(String(revisionC));
 		expect(registry.get(EditorProjectAtom("project"))?.revision).toBe(revisionC);
 	});
 });

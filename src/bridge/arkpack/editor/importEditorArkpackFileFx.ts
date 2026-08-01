@@ -3,11 +3,9 @@ import { Effect } from "effect";
 import { ArkiniTrustedKeys } from "~/bridge/arkpack/ArkiniTrustedKeys";
 import { ArkpackLimits } from "~/bridge/arkpack/ArkpackLimits";
 import { readArkpackFx } from "~/bridge/arkpack/readArkpackFx";
-import { createEditorProjectManifestFileFx } from "~/bridge/editor/createEditorProjectManifestFileFx";
-import { createEditorWorkspaceFx } from "~/bridge/editor/createEditorWorkspaceFx";
+import { EditorProjectRepository } from "~/bridge/editor/EditorProjectRepository";
 import type { EditorProjectDescriptor } from "~/bridge/editor/EditorProjectDescriptor";
-import type { EditorWorkspace } from "~/bridge/editor/EditorWorkspace";
-import { createEditorProjectPlanFx } from "~/engine/editor/fx/createEditorProjectPlanFx";
+import { createEditorProjectIdFx } from "~/engine/editor/fx/createEditorProjectIdFx";
 
 interface EditorArkpackFileInput {
 	readonly name: string;
@@ -18,14 +16,12 @@ interface EditorArkpackFileInput {
 export namespace importEditorArkpackFileFx {
 	export interface Props {
 		readonly file: EditorArkpackFileInput;
-		readonly workspace?: EditorWorkspace;
 	}
 }
 
-/** Validates one arkpack and atomically expands it into the user-data editor workspace. */
+/** Validates one arkpack and atomically creates one canonical IndexedDB project. */
 export const importEditorArkpackFileFx = Effect.fn("importEditorArkpackFileFx")(function* ({
 	file,
-	workspace: providedWorkspace,
 }: importEditorArkpackFileFx.Props) {
 	if (!file.name.toLowerCase().endsWith(".arkpack")) {
 		return yield* Effect.fail(new Error("Choose a .arkpack file."));
@@ -49,22 +45,15 @@ export const importEditorArkpackFileFx = Effect.fn("importEditorArkpackFileFx")(
 		},
 		source: "imported",
 	});
-	const plan = yield* createEditorProjectPlanFx({
+	const projectId = yield* createEditorProjectIdFx({
+		gameId: loaded.payload.config.meta.id,
 		contentHash: loaded.descriptor.hash,
-		payload: loaded.payload,
 	});
-	const manifest = yield* createEditorProjectManifestFileFx({
-		projectId: plan.projectId,
-		title: plan.title,
-		game: plan.version,
+	const repository = yield* EditorProjectRepository;
+	const project = yield* repository.createProjectFx({
+		projectId,
+		config: loaded.payload.config,
+		resources: loaded.payload.resources,
 	});
-	const workspace = providedWorkspace ?? (yield* createEditorWorkspaceFx());
-	yield* workspace.createFx({
-		projectId: plan.projectId,
-		files: [
-			manifest.file,
-			...plan.files,
-		],
-	});
-	return manifest.descriptor satisfies EditorProjectDescriptor;
+	return project satisfies EditorProjectDescriptor;
 });

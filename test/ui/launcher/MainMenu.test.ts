@@ -79,9 +79,11 @@ describe("MainMenu", () => {
 			],
 		};
 		const catalog: ArkpackCatalog = {
+			awaitIdleFx: Effect.void,
 			state: Effect.runSync(SubscriptionRef.make<ArkpackCatalog.State>(catalogState)),
 			refreshFx: Effect.void,
 			importFileFx: () => Effect.die("unused"),
+			installFx: () => Effect.die("unused"),
 			removeFx: () => Effect.die("unused"),
 		};
 		const registry = AtomRegistry.make({

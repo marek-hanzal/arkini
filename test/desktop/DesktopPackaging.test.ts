@@ -2,16 +2,18 @@ import { createHash } from "node:crypto";
 import { mkdtemp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { createPackage } from "@electron/asar";
 import { NodeServices } from "@effect/platform-node";
 import { Effect } from "effect";
 import packageJson from "../../package.json" with { type: "json" };
 import { afterEach, describe, expect, it } from "vitest";
 import { createDesktopChecksumsFx } from "../../cli/desktop/createDesktopChecksumsFx";
 import { verifyDesktopArtifactsFx } from "../../cli/desktop/verifyDesktopArtifactsFx";
+import { verifyDesktopPackageStructureFx } from "../../cli/desktop/verifyDesktopPackageStructureFx";
 
 const temporaryDirectories: string[] = [];
 
-const createReleaseFixture = async () => {
+const createReleaseFixture = async ({ includeNodeModules = false } = {}) => {
 	const directory = await mkdtemp(join(tmpdir(), "arkini-desktop-release-"));
 	temporaryDirectories.push(directory);
 	const artifacts = [
@@ -25,7 +27,16 @@ const createReleaseFixture = async () => {
 	await mkdir(resources, {
 		recursive: true,
 	});
-	await writeFile(join(resources, "app.asar"), "fixture asar");
+	const asarSource = join(directory, "asar-source");
+	await mkdir(asarSource);
+	await writeFile(join(asarSource, "package.json"), "{}\n");
+	if (includeNodeModules) {
+		await mkdir(join(asarSource, "node_modules", "fixture"), {
+			recursive: true,
+		});
+		await writeFile(join(asarSource, "node_modules", "fixture", "index.js"), "export {};\n");
+	}
+	await createPackage(asarSource, join(resources, "app.asar"));
 	return {
 		directory,
 		artifacts,
@@ -93,7 +104,30 @@ describe("desktop packaging artifacts", () => {
 			}),
 		});
 	});
-	it("stages only the production build and a dependency-free package manifest", async () => {
+
+	it("rejects packaged node_modules", async () => {
+		const fixture = await createReleaseFixture({
+			includeNodeModules: true,
+		});
+
+		await expect(
+			Effect.runPromise(
+				Effect.flip(
+					verifyDesktopPackageStructureFx({
+						directory: fixture.directory,
+					}).pipe(Effect.provide(NodeServices.layer)),
+				),
+			),
+		).resolves.toMatchObject({
+			_tag: "DesktopPackagingError",
+			operation: "verify packaged desktop structure",
+			cause: expect.objectContaining({
+				message: "Packaged app.asar contains node_modules.",
+			}),
+		});
+	});
+
+	it("stages the optimized production build with its Electron entrypoint", async () => {
 		const source = await mkdtemp(join(tmpdir(), "arkini-desktop-build-"));
 		const stage = await mkdtemp(join(tmpdir(), "arkini-desktop-stage-"));
 		temporaryDirectories.push(source, stage);
@@ -119,7 +153,6 @@ describe("desktop packaging artifacts", () => {
 			type: "module",
 			main: "app/main/index.js",
 		});
-		expect(stagedPackage.dependencies).toBeUndefined();
 		expect(await readFile(join(stage, "app", "main", "index.js"), "utf8")).toBe("export {};\n");
 	});
 });

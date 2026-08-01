@@ -17,6 +17,8 @@ export default defineConfig(({ command }) => {
 	return {
 		main: {
 			build: {
+				externalizeDeps: false,
+				minify: true,
 				outDir: resolve(ProjectOutputPaths.desktop.build, "main"),
 				rollupOptions: {
 					input: resolve("electron/main/index.ts"),
@@ -25,6 +27,8 @@ export default defineConfig(({ command }) => {
 		},
 		preload: {
 			build: {
+				externalizeDeps: false,
+				minify: true,
 				outDir: resolve(ProjectOutputPaths.desktop.build, "preload"),
 				rollupOptions: {
 					input: resolve("electron/preload/index.ts"),

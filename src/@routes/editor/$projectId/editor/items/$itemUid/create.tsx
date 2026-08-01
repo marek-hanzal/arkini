@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Outlet } from "@tanstack/react-router";
 
 import { EditorItemTypeSchema } from "~/bridge/item/editor/EditorItemModel";
 import { EditorItemCreatePage } from "~/page/editor/EditorItemCreatePage";
@@ -16,9 +16,8 @@ function EditorCreateItemRoute() {
 	const { itemUid } = Route.useParams();
 	const { itemType } = Route.useSearch();
 	return (
-		<EditorItemCreatePage
-			itemType={itemType}
-			uid={itemUid}
-		/>
+		<EditorItemCreatePage itemType={itemType} uid={itemUid}>
+			<Outlet />
+		</EditorItemCreatePage>
 	);
 }

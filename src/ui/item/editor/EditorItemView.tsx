@@ -48,7 +48,7 @@ export const EditorItemView = ({ uid }: { readonly uid: string }) => {
 					<p className="mt-1 text-xs uppercase tracking-wider text-muted">{item.type}</p>
 				</div>
 				<PrimaryButtonLink
-					to="/editor/$projectId/editor/items/$itemUid/edit"
+					to="/editor/$projectId/editor/items/$itemUid/edit/identity"
 					params={{
 						projectId: project.projectId,
 						itemUid: item.uid,

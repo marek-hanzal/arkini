@@ -137,7 +137,7 @@ describe("editor item flow", () => {
 	it("opens canonical items in read-only view before offering explicit Edit", async () => {
 		const container = await render(createElement(EditorItemView, { uid: item.uid }));
 		const edit = container.querySelector<HTMLAnchorElement>(
-			'[data-to="/editor/$projectId/editor/items/$itemUid/edit"]',
+			'[data-to="/editor/$projectId/editor/items/$itemUid/edit/identity"]',
 		);
 
 		expect(container.textContent).toContain("Water");
@@ -150,9 +150,11 @@ describe("editor item flow", () => {
 		const props = state.formProps as {
 			readonly initialItem: typeof item;
 			readonly onSaved: (saved: typeof item) => Promise<void>;
+			readonly route: { readonly kind: "edit" };
 		};
 
 		expect(props.initialItem).toBe(item);
+		expect(props.route).toEqual({ kind: "edit" });
 		await props.onSaved(item);
 		expect(state.navigate).toHaveBeenCalledWith({
 			to: "/editor/$projectId/editor/items/$itemUid/view",
@@ -174,9 +176,11 @@ describe("editor item flow", () => {
 		const props = state.formProps as {
 			readonly initialItem: typeof item;
 			readonly onSaved: (saved: typeof item) => Promise<void>;
+			readonly route: { readonly kind: "create"; readonly itemType: "simple" };
 		};
 
 		expect(props.initialItem.uid).toBe("new-item-uid");
+		expect(props.route).toEqual({ kind: "create", itemType: "simple" });
 		expect(props.initialItem.type).toBe("simple");
 		expect(
 			(state.project as { readonly config: { readonly items: Record<string, unknown> } })

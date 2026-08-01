@@ -1,4 +1,5 @@
 import { useNavigate } from "@tanstack/react-router";
+import type { PropsWithChildren } from "react";
 
 import { useEditorProject } from "~/bridge/editor/useEditorProject";
 import type { EditorItemType } from "~/bridge/item/editor/EditorItemModel";
@@ -7,7 +8,7 @@ import { ButtonLink } from "~/ui/button/Button";
 import { EditorItemForm } from "~/ui/item/editor/EditorItemForm";
 
 export namespace EditorCreateItemForm {
-	export interface Props {
+	export interface Props extends PropsWithChildren {
 		readonly itemType: EditorItemType;
 		readonly uid: string;
 	}
@@ -15,6 +16,7 @@ export namespace EditorCreateItemForm {
 
 /** Owns one local create form for a preallocated immutable item UID. */
 export const EditorCreateItemForm = ({
+	children,
 	itemType,
 	uid,
 }: EditorCreateItemForm.Props) => {
@@ -35,6 +37,7 @@ export const EditorCreateItemForm = ({
 				</ButtonLink>
 			}
 			initialItem={initialItem}
+			route={{ kind: "create", itemType }}
 			title={`New ${itemType}`}
 			onSaved={(saved) =>
 				navigate({
@@ -46,6 +49,8 @@ export const EditorCreateItemForm = ({
 					replace: true,
 				})
 			}
-		/>
+		>
+			{children}
+		</EditorItemForm>
 	);
 };

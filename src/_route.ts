@@ -40,6 +40,20 @@ import { Route as EditorProjectIdEditorItemsListRouteImport } from "./@routes/ed
 import { Route as EditorProjectIdEditorItemsItemUidRouteImport } from "./@routes/editor/$projectId/editor/items/$itemUid"
 import { Route as EditorProjectIdEditorItemsItemUidCreateRouteImport } from "./@routes/editor/$projectId/editor/items/$itemUid/create"
 import { Route as EditorProjectIdEditorItemsItemUidEditRouteImport } from "./@routes/editor/$projectId/editor/items/$itemUid/edit"
+import { Route as EditorProjectIdEditorItemsItemUidCreateIndexRouteImport } from "./@routes/editor/$projectId/editor/items/$itemUid/create/index"
+import { Route as EditorProjectIdEditorItemsItemUidCreateIdentityRouteImport } from "./@routes/editor/$projectId/editor/items/$itemUid/create/identity"
+import { Route as EditorProjectIdEditorItemsItemUidCreateArtworkRouteImport } from "./@routes/editor/$projectId/editor/items/$itemUid/create/artwork"
+import { Route as EditorProjectIdEditorItemsItemUidCreateLimitsRouteImport } from "./@routes/editor/$projectId/editor/items/$itemUid/create/limits"
+import { Route as EditorProjectIdEditorItemsItemUidCreateChargesRouteImport } from "./@routes/editor/$projectId/editor/items/$itemUid/create/charges"
+import { Route as EditorProjectIdEditorItemsItemUidCreateMergesRouteImport } from "./@routes/editor/$projectId/editor/items/$itemUid/create/merges"
+import { Route as EditorProjectIdEditorItemsItemUidCreateProductionRouteImport } from "./@routes/editor/$projectId/editor/items/$itemUid/create/production"
+import { Route as EditorProjectIdEditorItemsItemUidEditIndexRouteImport } from "./@routes/editor/$projectId/editor/items/$itemUid/edit/index"
+import { Route as EditorProjectIdEditorItemsItemUidEditIdentityRouteImport } from "./@routes/editor/$projectId/editor/items/$itemUid/edit/identity"
+import { Route as EditorProjectIdEditorItemsItemUidEditArtworkRouteImport } from "./@routes/editor/$projectId/editor/items/$itemUid/edit/artwork"
+import { Route as EditorProjectIdEditorItemsItemUidEditLimitsRouteImport } from "./@routes/editor/$projectId/editor/items/$itemUid/edit/limits"
+import { Route as EditorProjectIdEditorItemsItemUidEditChargesRouteImport } from "./@routes/editor/$projectId/editor/items/$itemUid/edit/charges"
+import { Route as EditorProjectIdEditorItemsItemUidEditMergesRouteImport } from "./@routes/editor/$projectId/editor/items/$itemUid/edit/merges"
+import { Route as EditorProjectIdEditorItemsItemUidEditProductionRouteImport } from "./@routes/editor/$projectId/editor/items/$itemUid/edit/production"
 import { Route as EditorProjectIdEditorItemsItemUidViewRouteImport } from "./@routes/editor/$projectId/editor/items/$itemUid/view"
 import { Route as EditorProjectIdEditorItemsNewRouteImport } from "./@routes/editor/$projectId/editor/items/new"
 import { Route as EditorProjectIdEditorItemsNewSelectRouteImport } from "./@routes/editor/$projectId/editor/items/new/select"
@@ -197,6 +211,77 @@ const EditorProjectIdEditorItemsItemUidEditRoute = EditorProjectIdEditorItemsIte
   path: "/edit",
   getParentRoute: () => EditorProjectIdEditorItemsItemUidRoute,
 } as any)
+
+const EditorProjectIdEditorItemsItemUidCreateIndexRoute = EditorProjectIdEditorItemsItemUidCreateIndexRouteImport.update({
+  id: "/",
+  path: "/",
+  getParentRoute: () => EditorProjectIdEditorItemsItemUidCreateRoute,
+} as any)
+const EditorProjectIdEditorItemsItemUidCreateIdentityRoute = EditorProjectIdEditorItemsItemUidCreateIdentityRouteImport.update({
+  id: "/identity",
+  path: "/identity",
+  getParentRoute: () => EditorProjectIdEditorItemsItemUidCreateRoute,
+} as any)
+const EditorProjectIdEditorItemsItemUidCreateArtworkRoute = EditorProjectIdEditorItemsItemUidCreateArtworkRouteImport.update({
+  id: "/artwork",
+  path: "/artwork",
+  getParentRoute: () => EditorProjectIdEditorItemsItemUidCreateRoute,
+} as any)
+const EditorProjectIdEditorItemsItemUidCreateLimitsRoute = EditorProjectIdEditorItemsItemUidCreateLimitsRouteImport.update({
+  id: "/limits",
+  path: "/limits",
+  getParentRoute: () => EditorProjectIdEditorItemsItemUidCreateRoute,
+} as any)
+const EditorProjectIdEditorItemsItemUidCreateChargesRoute = EditorProjectIdEditorItemsItemUidCreateChargesRouteImport.update({
+  id: "/charges",
+  path: "/charges",
+  getParentRoute: () => EditorProjectIdEditorItemsItemUidCreateRoute,
+} as any)
+const EditorProjectIdEditorItemsItemUidCreateMergesRoute = EditorProjectIdEditorItemsItemUidCreateMergesRouteImport.update({
+  id: "/merges",
+  path: "/merges",
+  getParentRoute: () => EditorProjectIdEditorItemsItemUidCreateRoute,
+} as any)
+const EditorProjectIdEditorItemsItemUidCreateProductionRoute = EditorProjectIdEditorItemsItemUidCreateProductionRouteImport.update({
+  id: "/production",
+  path: "/production",
+  getParentRoute: () => EditorProjectIdEditorItemsItemUidCreateRoute,
+} as any)
+const EditorProjectIdEditorItemsItemUidEditIndexRoute = EditorProjectIdEditorItemsItemUidEditIndexRouteImport.update({
+  id: "/",
+  path: "/",
+  getParentRoute: () => EditorProjectIdEditorItemsItemUidEditRoute,
+} as any)
+const EditorProjectIdEditorItemsItemUidEditIdentityRoute = EditorProjectIdEditorItemsItemUidEditIdentityRouteImport.update({
+  id: "/identity",
+  path: "/identity",
+  getParentRoute: () => EditorProjectIdEditorItemsItemUidEditRoute,
+} as any)
+const EditorProjectIdEditorItemsItemUidEditArtworkRoute = EditorProjectIdEditorItemsItemUidEditArtworkRouteImport.update({
+  id: "/artwork",
+  path: "/artwork",
+  getParentRoute: () => EditorProjectIdEditorItemsItemUidEditRoute,
+} as any)
+const EditorProjectIdEditorItemsItemUidEditLimitsRoute = EditorProjectIdEditorItemsItemUidEditLimitsRouteImport.update({
+  id: "/limits",
+  path: "/limits",
+  getParentRoute: () => EditorProjectIdEditorItemsItemUidEditRoute,
+} as any)
+const EditorProjectIdEditorItemsItemUidEditChargesRoute = EditorProjectIdEditorItemsItemUidEditChargesRouteImport.update({
+  id: "/charges",
+  path: "/charges",
+  getParentRoute: () => EditorProjectIdEditorItemsItemUidEditRoute,
+} as any)
+const EditorProjectIdEditorItemsItemUidEditMergesRoute = EditorProjectIdEditorItemsItemUidEditMergesRouteImport.update({
+  id: "/merges",
+  path: "/merges",
+  getParentRoute: () => EditorProjectIdEditorItemsItemUidEditRoute,
+} as any)
+const EditorProjectIdEditorItemsItemUidEditProductionRoute = EditorProjectIdEditorItemsItemUidEditProductionRouteImport.update({
+  id: "/production",
+  path: "/production",
+  getParentRoute: () => EditorProjectIdEditorItemsItemUidEditRoute,
+} as any)
 const EditorProjectIdEditorItemsItemUidViewRoute = EditorProjectIdEditorItemsItemUidViewRouteImport.update({
   id: "/view",
   path: "/view",
@@ -241,8 +326,22 @@ export interface FileRoutesByFullPath {
   "/editor/$projectId/editor/items": typeof EditorProjectIdEditorItemsRouteWithChildren
   "/editor/$projectId/editor/items/list": typeof EditorProjectIdEditorItemsListRoute
   "/editor/$projectId/editor/items/$itemUid": typeof EditorProjectIdEditorItemsItemUidRouteWithChildren
-  "/editor/$projectId/editor/items/$itemUid/create": typeof EditorProjectIdEditorItemsItemUidCreateRoute
-  "/editor/$projectId/editor/items/$itemUid/edit": typeof EditorProjectIdEditorItemsItemUidEditRoute
+  "/editor/$projectId/editor/items/$itemUid/create": typeof EditorProjectIdEditorItemsItemUidCreateRouteWithChildren
+  "/editor/$projectId/editor/items/$itemUid/edit": typeof EditorProjectIdEditorItemsItemUidEditRouteWithChildren
+  "/editor/$projectId/editor/items/$itemUid/create/": typeof EditorProjectIdEditorItemsItemUidCreateIndexRoute
+  "/editor/$projectId/editor/items/$itemUid/create/identity": typeof EditorProjectIdEditorItemsItemUidCreateIdentityRoute
+  "/editor/$projectId/editor/items/$itemUid/create/artwork": typeof EditorProjectIdEditorItemsItemUidCreateArtworkRoute
+  "/editor/$projectId/editor/items/$itemUid/create/limits": typeof EditorProjectIdEditorItemsItemUidCreateLimitsRoute
+  "/editor/$projectId/editor/items/$itemUid/create/charges": typeof EditorProjectIdEditorItemsItemUidCreateChargesRoute
+  "/editor/$projectId/editor/items/$itemUid/create/merges": typeof EditorProjectIdEditorItemsItemUidCreateMergesRoute
+  "/editor/$projectId/editor/items/$itemUid/create/production": typeof EditorProjectIdEditorItemsItemUidCreateProductionRoute
+  "/editor/$projectId/editor/items/$itemUid/edit/": typeof EditorProjectIdEditorItemsItemUidEditIndexRoute
+  "/editor/$projectId/editor/items/$itemUid/edit/identity": typeof EditorProjectIdEditorItemsItemUidEditIdentityRoute
+  "/editor/$projectId/editor/items/$itemUid/edit/artwork": typeof EditorProjectIdEditorItemsItemUidEditArtworkRoute
+  "/editor/$projectId/editor/items/$itemUid/edit/limits": typeof EditorProjectIdEditorItemsItemUidEditLimitsRoute
+  "/editor/$projectId/editor/items/$itemUid/edit/charges": typeof EditorProjectIdEditorItemsItemUidEditChargesRoute
+  "/editor/$projectId/editor/items/$itemUid/edit/merges": typeof EditorProjectIdEditorItemsItemUidEditMergesRoute
+  "/editor/$projectId/editor/items/$itemUid/edit/production": typeof EditorProjectIdEditorItemsItemUidEditProductionRoute
   "/editor/$projectId/editor/items/$itemUid/view": typeof EditorProjectIdEditorItemsItemUidViewRoute
   "/editor/$projectId/editor/items/new": typeof EditorProjectIdEditorItemsNewRouteWithChildren
   "/editor/$projectId/editor/items/new/select": typeof EditorProjectIdEditorItemsNewSelectRoute
@@ -274,8 +373,20 @@ export interface FileRoutesByTo {
   "/editor/$projectId/editor/items": typeof EditorProjectIdEditorItemsRouteWithChildren
   "/editor/$projectId/editor/items/list": typeof EditorProjectIdEditorItemsListRoute
   "/editor/$projectId/editor/items/$itemUid": typeof EditorProjectIdEditorItemsItemUidRouteWithChildren
-  "/editor/$projectId/editor/items/$itemUid/create": typeof EditorProjectIdEditorItemsItemUidCreateRoute
-  "/editor/$projectId/editor/items/$itemUid/edit": typeof EditorProjectIdEditorItemsItemUidEditRoute
+  "/editor/$projectId/editor/items/$itemUid/create": typeof EditorProjectIdEditorItemsItemUidCreateIndexRoute
+  "/editor/$projectId/editor/items/$itemUid/edit": typeof EditorProjectIdEditorItemsItemUidEditIndexRoute
+  "/editor/$projectId/editor/items/$itemUid/create/identity": typeof EditorProjectIdEditorItemsItemUidCreateIdentityRoute
+  "/editor/$projectId/editor/items/$itemUid/create/artwork": typeof EditorProjectIdEditorItemsItemUidCreateArtworkRoute
+  "/editor/$projectId/editor/items/$itemUid/create/limits": typeof EditorProjectIdEditorItemsItemUidCreateLimitsRoute
+  "/editor/$projectId/editor/items/$itemUid/create/charges": typeof EditorProjectIdEditorItemsItemUidCreateChargesRoute
+  "/editor/$projectId/editor/items/$itemUid/create/merges": typeof EditorProjectIdEditorItemsItemUidCreateMergesRoute
+  "/editor/$projectId/editor/items/$itemUid/create/production": typeof EditorProjectIdEditorItemsItemUidCreateProductionRoute
+  "/editor/$projectId/editor/items/$itemUid/edit/identity": typeof EditorProjectIdEditorItemsItemUidEditIdentityRoute
+  "/editor/$projectId/editor/items/$itemUid/edit/artwork": typeof EditorProjectIdEditorItemsItemUidEditArtworkRoute
+  "/editor/$projectId/editor/items/$itemUid/edit/limits": typeof EditorProjectIdEditorItemsItemUidEditLimitsRoute
+  "/editor/$projectId/editor/items/$itemUid/edit/charges": typeof EditorProjectIdEditorItemsItemUidEditChargesRoute
+  "/editor/$projectId/editor/items/$itemUid/edit/merges": typeof EditorProjectIdEditorItemsItemUidEditMergesRoute
+  "/editor/$projectId/editor/items/$itemUid/edit/production": typeof EditorProjectIdEditorItemsItemUidEditProductionRoute
   "/editor/$projectId/editor/items/$itemUid/view": typeof EditorProjectIdEditorItemsItemUidViewRoute
   "/editor/$projectId/editor/items/new": typeof EditorProjectIdEditorItemsNewRouteWithChildren
   "/editor/$projectId/editor/items/new/select": typeof EditorProjectIdEditorItemsNewSelectRoute
@@ -311,8 +422,22 @@ export interface FileRoutesById {
   "/editor/$projectId/editor/items": typeof EditorProjectIdEditorItemsRouteWithChildren
   "/editor/$projectId/editor/items/list": typeof EditorProjectIdEditorItemsListRoute
   "/editor/$projectId/editor/items/$itemUid": typeof EditorProjectIdEditorItemsItemUidRouteWithChildren
-  "/editor/$projectId/editor/items/$itemUid/create": typeof EditorProjectIdEditorItemsItemUidCreateRoute
-  "/editor/$projectId/editor/items/$itemUid/edit": typeof EditorProjectIdEditorItemsItemUidEditRoute
+  "/editor/$projectId/editor/items/$itemUid/create": typeof EditorProjectIdEditorItemsItemUidCreateRouteWithChildren
+  "/editor/$projectId/editor/items/$itemUid/edit": typeof EditorProjectIdEditorItemsItemUidEditRouteWithChildren
+  "/editor/$projectId/editor/items/$itemUid/create/": typeof EditorProjectIdEditorItemsItemUidCreateIndexRoute
+  "/editor/$projectId/editor/items/$itemUid/create/identity": typeof EditorProjectIdEditorItemsItemUidCreateIdentityRoute
+  "/editor/$projectId/editor/items/$itemUid/create/artwork": typeof EditorProjectIdEditorItemsItemUidCreateArtworkRoute
+  "/editor/$projectId/editor/items/$itemUid/create/limits": typeof EditorProjectIdEditorItemsItemUidCreateLimitsRoute
+  "/editor/$projectId/editor/items/$itemUid/create/charges": typeof EditorProjectIdEditorItemsItemUidCreateChargesRoute
+  "/editor/$projectId/editor/items/$itemUid/create/merges": typeof EditorProjectIdEditorItemsItemUidCreateMergesRoute
+  "/editor/$projectId/editor/items/$itemUid/create/production": typeof EditorProjectIdEditorItemsItemUidCreateProductionRoute
+  "/editor/$projectId/editor/items/$itemUid/edit/": typeof EditorProjectIdEditorItemsItemUidEditIndexRoute
+  "/editor/$projectId/editor/items/$itemUid/edit/identity": typeof EditorProjectIdEditorItemsItemUidEditIdentityRoute
+  "/editor/$projectId/editor/items/$itemUid/edit/artwork": typeof EditorProjectIdEditorItemsItemUidEditArtworkRoute
+  "/editor/$projectId/editor/items/$itemUid/edit/limits": typeof EditorProjectIdEditorItemsItemUidEditLimitsRoute
+  "/editor/$projectId/editor/items/$itemUid/edit/charges": typeof EditorProjectIdEditorItemsItemUidEditChargesRoute
+  "/editor/$projectId/editor/items/$itemUid/edit/merges": typeof EditorProjectIdEditorItemsItemUidEditMergesRoute
+  "/editor/$projectId/editor/items/$itemUid/edit/production": typeof EditorProjectIdEditorItemsItemUidEditProductionRoute
   "/editor/$projectId/editor/items/$itemUid/view": typeof EditorProjectIdEditorItemsItemUidViewRoute
   "/editor/$projectId/editor/items/new": typeof EditorProjectIdEditorItemsNewRouteWithChildren
   "/editor/$projectId/editor/items/new/select": typeof EditorProjectIdEditorItemsNewSelectRoute
@@ -349,6 +474,20 @@ export interface FileRouteTypes {
     | "/editor/$projectId/editor/items/$itemUid"
     | "/editor/$projectId/editor/items/$itemUid/create"
     | "/editor/$projectId/editor/items/$itemUid/edit"
+    | "/editor/$projectId/editor/items/$itemUid/create/"
+    | "/editor/$projectId/editor/items/$itemUid/create/identity"
+    | "/editor/$projectId/editor/items/$itemUid/create/artwork"
+    | "/editor/$projectId/editor/items/$itemUid/create/limits"
+    | "/editor/$projectId/editor/items/$itemUid/create/charges"
+    | "/editor/$projectId/editor/items/$itemUid/create/merges"
+    | "/editor/$projectId/editor/items/$itemUid/create/production"
+    | "/editor/$projectId/editor/items/$itemUid/edit/"
+    | "/editor/$projectId/editor/items/$itemUid/edit/identity"
+    | "/editor/$projectId/editor/items/$itemUid/edit/artwork"
+    | "/editor/$projectId/editor/items/$itemUid/edit/limits"
+    | "/editor/$projectId/editor/items/$itemUid/edit/charges"
+    | "/editor/$projectId/editor/items/$itemUid/edit/merges"
+    | "/editor/$projectId/editor/items/$itemUid/edit/production"
     | "/editor/$projectId/editor/items/$itemUid/view"
     | "/editor/$projectId/editor/items/new"
     | "/editor/$projectId/editor/items/new/select"
@@ -382,6 +521,18 @@ export interface FileRouteTypes {
     | "/editor/$projectId/editor/items/$itemUid"
     | "/editor/$projectId/editor/items/$itemUid/create"
     | "/editor/$projectId/editor/items/$itemUid/edit"
+    | "/editor/$projectId/editor/items/$itemUid/create/identity"
+    | "/editor/$projectId/editor/items/$itemUid/create/artwork"
+    | "/editor/$projectId/editor/items/$itemUid/create/limits"
+    | "/editor/$projectId/editor/items/$itemUid/create/charges"
+    | "/editor/$projectId/editor/items/$itemUid/create/merges"
+    | "/editor/$projectId/editor/items/$itemUid/create/production"
+    | "/editor/$projectId/editor/items/$itemUid/edit/identity"
+    | "/editor/$projectId/editor/items/$itemUid/edit/artwork"
+    | "/editor/$projectId/editor/items/$itemUid/edit/limits"
+    | "/editor/$projectId/editor/items/$itemUid/edit/charges"
+    | "/editor/$projectId/editor/items/$itemUid/edit/merges"
+    | "/editor/$projectId/editor/items/$itemUid/edit/production"
     | "/editor/$projectId/editor/items/$itemUid/view"
     | "/editor/$projectId/editor/items/new"
     | "/editor/$projectId/editor/items/new/select"
@@ -418,6 +569,20 @@ export interface FileRouteTypes {
     | "/editor/$projectId/editor/items/$itemUid"
     | "/editor/$projectId/editor/items/$itemUid/create"
     | "/editor/$projectId/editor/items/$itemUid/edit"
+    | "/editor/$projectId/editor/items/$itemUid/create/"
+    | "/editor/$projectId/editor/items/$itemUid/create/identity"
+    | "/editor/$projectId/editor/items/$itemUid/create/artwork"
+    | "/editor/$projectId/editor/items/$itemUid/create/limits"
+    | "/editor/$projectId/editor/items/$itemUid/create/charges"
+    | "/editor/$projectId/editor/items/$itemUid/create/merges"
+    | "/editor/$projectId/editor/items/$itemUid/create/production"
+    | "/editor/$projectId/editor/items/$itemUid/edit/"
+    | "/editor/$projectId/editor/items/$itemUid/edit/identity"
+    | "/editor/$projectId/editor/items/$itemUid/edit/artwork"
+    | "/editor/$projectId/editor/items/$itemUid/edit/limits"
+    | "/editor/$projectId/editor/items/$itemUid/edit/charges"
+    | "/editor/$projectId/editor/items/$itemUid/edit/merges"
+    | "/editor/$projectId/editor/items/$itemUid/edit/production"
     | "/editor/$projectId/editor/items/$itemUid/view"
     | "/editor/$projectId/editor/items/new"
     | "/editor/$projectId/editor/items/new/select"
@@ -652,6 +817,104 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof EditorProjectIdEditorItemsItemUidEditRouteImport
       parentRoute: typeof EditorProjectIdEditorItemsItemUidRoute
     }
+    "/editor/$projectId/editor/items/$itemUid/create/": {
+      id: "/editor/$projectId/editor/items/$itemUid/create/"
+      path: "/"
+      fullPath: "/editor/$projectId/editor/items/$itemUid/create/"
+      preLoaderRoute: typeof EditorProjectIdEditorItemsItemUidCreateIndexRouteImport
+      parentRoute: typeof EditorProjectIdEditorItemsItemUidCreateRoute
+    }
+    "/editor/$projectId/editor/items/$itemUid/create/identity": {
+      id: "/editor/$projectId/editor/items/$itemUid/create/identity"
+      path: "/identity"
+      fullPath: "/editor/$projectId/editor/items/$itemUid/create/identity"
+      preLoaderRoute: typeof EditorProjectIdEditorItemsItemUidCreateIdentityRouteImport
+      parentRoute: typeof EditorProjectIdEditorItemsItemUidCreateRoute
+    }
+    "/editor/$projectId/editor/items/$itemUid/create/artwork": {
+      id: "/editor/$projectId/editor/items/$itemUid/create/artwork"
+      path: "/artwork"
+      fullPath: "/editor/$projectId/editor/items/$itemUid/create/artwork"
+      preLoaderRoute: typeof EditorProjectIdEditorItemsItemUidCreateArtworkRouteImport
+      parentRoute: typeof EditorProjectIdEditorItemsItemUidCreateRoute
+    }
+    "/editor/$projectId/editor/items/$itemUid/create/limits": {
+      id: "/editor/$projectId/editor/items/$itemUid/create/limits"
+      path: "/limits"
+      fullPath: "/editor/$projectId/editor/items/$itemUid/create/limits"
+      preLoaderRoute: typeof EditorProjectIdEditorItemsItemUidCreateLimitsRouteImport
+      parentRoute: typeof EditorProjectIdEditorItemsItemUidCreateRoute
+    }
+    "/editor/$projectId/editor/items/$itemUid/create/charges": {
+      id: "/editor/$projectId/editor/items/$itemUid/create/charges"
+      path: "/charges"
+      fullPath: "/editor/$projectId/editor/items/$itemUid/create/charges"
+      preLoaderRoute: typeof EditorProjectIdEditorItemsItemUidCreateChargesRouteImport
+      parentRoute: typeof EditorProjectIdEditorItemsItemUidCreateRoute
+    }
+    "/editor/$projectId/editor/items/$itemUid/create/merges": {
+      id: "/editor/$projectId/editor/items/$itemUid/create/merges"
+      path: "/merges"
+      fullPath: "/editor/$projectId/editor/items/$itemUid/create/merges"
+      preLoaderRoute: typeof EditorProjectIdEditorItemsItemUidCreateMergesRouteImport
+      parentRoute: typeof EditorProjectIdEditorItemsItemUidCreateRoute
+    }
+    "/editor/$projectId/editor/items/$itemUid/create/production": {
+      id: "/editor/$projectId/editor/items/$itemUid/create/production"
+      path: "/production"
+      fullPath: "/editor/$projectId/editor/items/$itemUid/create/production"
+      preLoaderRoute: typeof EditorProjectIdEditorItemsItemUidCreateProductionRouteImport
+      parentRoute: typeof EditorProjectIdEditorItemsItemUidCreateRoute
+    }
+    "/editor/$projectId/editor/items/$itemUid/edit/": {
+      id: "/editor/$projectId/editor/items/$itemUid/edit/"
+      path: "/"
+      fullPath: "/editor/$projectId/editor/items/$itemUid/edit/"
+      preLoaderRoute: typeof EditorProjectIdEditorItemsItemUidEditIndexRouteImport
+      parentRoute: typeof EditorProjectIdEditorItemsItemUidEditRoute
+    }
+    "/editor/$projectId/editor/items/$itemUid/edit/identity": {
+      id: "/editor/$projectId/editor/items/$itemUid/edit/identity"
+      path: "/identity"
+      fullPath: "/editor/$projectId/editor/items/$itemUid/edit/identity"
+      preLoaderRoute: typeof EditorProjectIdEditorItemsItemUidEditIdentityRouteImport
+      parentRoute: typeof EditorProjectIdEditorItemsItemUidEditRoute
+    }
+    "/editor/$projectId/editor/items/$itemUid/edit/artwork": {
+      id: "/editor/$projectId/editor/items/$itemUid/edit/artwork"
+      path: "/artwork"
+      fullPath: "/editor/$projectId/editor/items/$itemUid/edit/artwork"
+      preLoaderRoute: typeof EditorProjectIdEditorItemsItemUidEditArtworkRouteImport
+      parentRoute: typeof EditorProjectIdEditorItemsItemUidEditRoute
+    }
+    "/editor/$projectId/editor/items/$itemUid/edit/limits": {
+      id: "/editor/$projectId/editor/items/$itemUid/edit/limits"
+      path: "/limits"
+      fullPath: "/editor/$projectId/editor/items/$itemUid/edit/limits"
+      preLoaderRoute: typeof EditorProjectIdEditorItemsItemUidEditLimitsRouteImport
+      parentRoute: typeof EditorProjectIdEditorItemsItemUidEditRoute
+    }
+    "/editor/$projectId/editor/items/$itemUid/edit/charges": {
+      id: "/editor/$projectId/editor/items/$itemUid/edit/charges"
+      path: "/charges"
+      fullPath: "/editor/$projectId/editor/items/$itemUid/edit/charges"
+      preLoaderRoute: typeof EditorProjectIdEditorItemsItemUidEditChargesRouteImport
+      parentRoute: typeof EditorProjectIdEditorItemsItemUidEditRoute
+    }
+    "/editor/$projectId/editor/items/$itemUid/edit/merges": {
+      id: "/editor/$projectId/editor/items/$itemUid/edit/merges"
+      path: "/merges"
+      fullPath: "/editor/$projectId/editor/items/$itemUid/edit/merges"
+      preLoaderRoute: typeof EditorProjectIdEditorItemsItemUidEditMergesRouteImport
+      parentRoute: typeof EditorProjectIdEditorItemsItemUidEditRoute
+    }
+    "/editor/$projectId/editor/items/$itemUid/edit/production": {
+      id: "/editor/$projectId/editor/items/$itemUid/edit/production"
+      path: "/production"
+      fullPath: "/editor/$projectId/editor/items/$itemUid/edit/production"
+      preLoaderRoute: typeof EditorProjectIdEditorItemsItemUidEditProductionRouteImport
+      parentRoute: typeof EditorProjectIdEditorItemsItemUidEditRoute
+    }
     "/editor/$projectId/editor/items/$itemUid/view": {
       id: "/editor/$projectId/editor/items/$itemUid/view"
       path: "/view"
@@ -676,15 +939,63 @@ declare module "@tanstack/react-router" {
   }
 }
 
+interface EditorProjectIdEditorItemsItemUidCreateRouteChildren {
+  EditorProjectIdEditorItemsItemUidCreateIndexRoute: typeof EditorProjectIdEditorItemsItemUidCreateIndexRoute
+  EditorProjectIdEditorItemsItemUidCreateIdentityRoute: typeof EditorProjectIdEditorItemsItemUidCreateIdentityRoute
+  EditorProjectIdEditorItemsItemUidCreateArtworkRoute: typeof EditorProjectIdEditorItemsItemUidCreateArtworkRoute
+  EditorProjectIdEditorItemsItemUidCreateLimitsRoute: typeof EditorProjectIdEditorItemsItemUidCreateLimitsRoute
+  EditorProjectIdEditorItemsItemUidCreateChargesRoute: typeof EditorProjectIdEditorItemsItemUidCreateChargesRoute
+  EditorProjectIdEditorItemsItemUidCreateMergesRoute: typeof EditorProjectIdEditorItemsItemUidCreateMergesRoute
+  EditorProjectIdEditorItemsItemUidCreateProductionRoute: typeof EditorProjectIdEditorItemsItemUidCreateProductionRoute
+}
+
+const EditorProjectIdEditorItemsItemUidCreateRouteChildren: EditorProjectIdEditorItemsItemUidCreateRouteChildren = {
+  EditorProjectIdEditorItemsItemUidCreateIndexRoute: EditorProjectIdEditorItemsItemUidCreateIndexRoute,
+  EditorProjectIdEditorItemsItemUidCreateIdentityRoute: EditorProjectIdEditorItemsItemUidCreateIdentityRoute,
+  EditorProjectIdEditorItemsItemUidCreateArtworkRoute: EditorProjectIdEditorItemsItemUidCreateArtworkRoute,
+  EditorProjectIdEditorItemsItemUidCreateLimitsRoute: EditorProjectIdEditorItemsItemUidCreateLimitsRoute,
+  EditorProjectIdEditorItemsItemUidCreateChargesRoute: EditorProjectIdEditorItemsItemUidCreateChargesRoute,
+  EditorProjectIdEditorItemsItemUidCreateMergesRoute: EditorProjectIdEditorItemsItemUidCreateMergesRoute,
+  EditorProjectIdEditorItemsItemUidCreateProductionRoute: EditorProjectIdEditorItemsItemUidCreateProductionRoute,
+}
+
+const EditorProjectIdEditorItemsItemUidCreateRouteWithChildren = EditorProjectIdEditorItemsItemUidCreateRoute._addFileChildren(
+  EditorProjectIdEditorItemsItemUidCreateRouteChildren,
+)
+
+interface EditorProjectIdEditorItemsItemUidEditRouteChildren {
+  EditorProjectIdEditorItemsItemUidEditIndexRoute: typeof EditorProjectIdEditorItemsItemUidEditIndexRoute
+  EditorProjectIdEditorItemsItemUidEditIdentityRoute: typeof EditorProjectIdEditorItemsItemUidEditIdentityRoute
+  EditorProjectIdEditorItemsItemUidEditArtworkRoute: typeof EditorProjectIdEditorItemsItemUidEditArtworkRoute
+  EditorProjectIdEditorItemsItemUidEditLimitsRoute: typeof EditorProjectIdEditorItemsItemUidEditLimitsRoute
+  EditorProjectIdEditorItemsItemUidEditChargesRoute: typeof EditorProjectIdEditorItemsItemUidEditChargesRoute
+  EditorProjectIdEditorItemsItemUidEditMergesRoute: typeof EditorProjectIdEditorItemsItemUidEditMergesRoute
+  EditorProjectIdEditorItemsItemUidEditProductionRoute: typeof EditorProjectIdEditorItemsItemUidEditProductionRoute
+}
+
+const EditorProjectIdEditorItemsItemUidEditRouteChildren: EditorProjectIdEditorItemsItemUidEditRouteChildren = {
+  EditorProjectIdEditorItemsItemUidEditIndexRoute: EditorProjectIdEditorItemsItemUidEditIndexRoute,
+  EditorProjectIdEditorItemsItemUidEditIdentityRoute: EditorProjectIdEditorItemsItemUidEditIdentityRoute,
+  EditorProjectIdEditorItemsItemUidEditArtworkRoute: EditorProjectIdEditorItemsItemUidEditArtworkRoute,
+  EditorProjectIdEditorItemsItemUidEditLimitsRoute: EditorProjectIdEditorItemsItemUidEditLimitsRoute,
+  EditorProjectIdEditorItemsItemUidEditChargesRoute: EditorProjectIdEditorItemsItemUidEditChargesRoute,
+  EditorProjectIdEditorItemsItemUidEditMergesRoute: EditorProjectIdEditorItemsItemUidEditMergesRoute,
+  EditorProjectIdEditorItemsItemUidEditProductionRoute: EditorProjectIdEditorItemsItemUidEditProductionRoute,
+}
+
+const EditorProjectIdEditorItemsItemUidEditRouteWithChildren = EditorProjectIdEditorItemsItemUidEditRoute._addFileChildren(
+  EditorProjectIdEditorItemsItemUidEditRouteChildren,
+)
+
 interface EditorProjectIdEditorItemsItemUidRouteChildren {
-  EditorProjectIdEditorItemsItemUidCreateRoute: typeof EditorProjectIdEditorItemsItemUidCreateRoute
-  EditorProjectIdEditorItemsItemUidEditRoute: typeof EditorProjectIdEditorItemsItemUidEditRoute
+  EditorProjectIdEditorItemsItemUidCreateRoute: typeof EditorProjectIdEditorItemsItemUidCreateRouteWithChildren
+  EditorProjectIdEditorItemsItemUidEditRoute: typeof EditorProjectIdEditorItemsItemUidEditRouteWithChildren
   EditorProjectIdEditorItemsItemUidViewRoute: typeof EditorProjectIdEditorItemsItemUidViewRoute
 }
 
 const EditorProjectIdEditorItemsItemUidRouteChildren: EditorProjectIdEditorItemsItemUidRouteChildren = {
-  EditorProjectIdEditorItemsItemUidCreateRoute: EditorProjectIdEditorItemsItemUidCreateRoute,
-  EditorProjectIdEditorItemsItemUidEditRoute: EditorProjectIdEditorItemsItemUidEditRoute,
+  EditorProjectIdEditorItemsItemUidCreateRoute: EditorProjectIdEditorItemsItemUidCreateRouteWithChildren,
+  EditorProjectIdEditorItemsItemUidEditRoute: EditorProjectIdEditorItemsItemUidEditRouteWithChildren,
   EditorProjectIdEditorItemsItemUidViewRoute: EditorProjectIdEditorItemsItemUidViewRoute,
 }
 

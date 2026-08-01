@@ -1,5 +1,6 @@
 import type { EditorProjectDescriptor } from "~/bridge/editor/EditorProjectDescriptor";
 import { EditorArkpackImportDropZone } from "~/ui/arkpack/editor/EditorArkpackImportDropZone";
+import { BackButton } from "~/ui/button/BackButton";
 import { Button } from "~/ui/button/Button";
 import { EditorRecentProjects } from "~/ui/editor/EditorRecentProjects";
 import { useEditorWelcomeActions } from "~/ui/editor/useEditorWelcomeActions";
@@ -23,11 +24,8 @@ export const EditorWelcome = ({ recentProjects }: EditorWelcome.Props) => {
 					id="editor-welcome-title"
 					className="text-2xl font-semibold"
 				>
-					Arkpack editor
+					Editor
 				</h1>
-				<p className="mt-2 text-sm leading-6 text-muted">
-					Import an existing package or continue a project stored by the editor.
-				</p>
 			</header>
 
 			<section className="grid gap-3 sm:grid-cols-2">
@@ -58,14 +56,14 @@ export const EditorWelcome = ({ recentProjects }: EditorWelcome.Props) => {
 				projects={recentProjects}
 			/>
 
-			<footer className="flex justify-end">
-				<Button
+			<footer className="flex justify-center">
+				<BackButton
 					disabled={actions.blocked}
 					cursorIntent={actions.active === "exit" ? "progress" : undefined}
 					onClick={actions.exit}
 				>
-					{actions.active === "exit" ? "Returning…" : "Return to main menu"}
-				</Button>
+					{actions.active === "exit" ? "Returning…" : "Back"}
+				</BackButton>
 			</footer>
 		</div>
 	);

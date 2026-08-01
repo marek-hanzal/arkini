@@ -281,17 +281,17 @@ body {
 	--ak-control-padding-inline: clamp(0.75rem, 3cqw, 1.25rem);
 	--ak-control-padding-block: clamp(0.375rem, 1.5cqh, 0.625rem);
 	--ak-control-font-size: clamp(0.8125rem, 2.4cqmin, 1rem);
-	--ak-compact-hero-width: min(74cqw, 40rem, 51cqh);
+	--ak-compact-hero-width: min(55.5cqw, 30rem, 38.25cqh);
 	--ak-full-hero-width: min(88cqw, 56rem, 87cqh);
 }
 
 [data-ui="LauncherSceneLayout"][data-layout="fixed-hero"] {
-	grid-template-rows: minmax(0, 2fr) minmax(0, 3fr);
+	grid-template-rows: minmax(0, 1fr) minmax(0, 2fr);
 }
 
 @container (max-height: 36rem) {
 	[data-ui="LauncherSceneLayout"] {
-		--ak-compact-hero-width: min(74cqw, 40rem, 44cqh);
+		--ak-compact-hero-width: min(55.5cqw, 30rem, 33cqh);
 	}
 
 	[data-ui="LauncherSceneLayout"][data-layout="fixed-hero"] {

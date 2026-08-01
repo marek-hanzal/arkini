@@ -193,7 +193,7 @@ const EditorShellContent = ({ children }: PropsWithChildren) => {
 			}}
 		>
 			<header
-				className="relative z-20 flex min-w-0 flex-wrap items-center gap-2 border-b border-line bg-surface/95 px-[var(--ak-viewport-padding)] py-3 shadow-lg backdrop-blur-xl"
+				className="relative z-20 flex min-w-0 flex-wrap items-center gap-2 border-b border-line bg-surface/95 px-[var(--ak-viewport-padding)] py-3 shadow-lg"
 				data-ui="EditorNavigation"
 				style={{
 					viewTransitionName: "arkini-editor-navigation",

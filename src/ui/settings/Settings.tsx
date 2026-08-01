@@ -3,7 +3,8 @@ import { match } from "ts-pattern";
 
 import type { AppearanceTheme } from "~/bridge/appearance/AppearanceTheme";
 import type { WindowMode } from "~/bridge/window/WindowMode";
-import { Button, PrimaryButton } from "~/ui/button/Button";
+import { BackButton } from "~/ui/button/BackButton";
+import { Button } from "~/ui/button/Button";
 import { useSettingsModel } from "~/ui/settings/useSettingsModel";
 
 const ThemeOptions: ReadonlyArray<{
@@ -287,14 +288,13 @@ export const Settings = ({ onBackFx }: Settings.Props) => {
 					.exhaustive()}
 			</div>
 
-			<PrimaryButton
-				className="mx-auto"
+			<BackButton
 				cursorIntent={model.blocked ? "progress" : undefined}
 				disabled={model.blocked}
 				onClick={model.goBack}
 			>
 				{model.exitPending ? "Returning…" : "Back"}
-			</PrimaryButton>
+			</BackButton>
 		</section>
 	);
 };

@@ -226,7 +226,8 @@ describe("ArkpackSelector", () => {
 		expect(layout?.lastElementChild?.tagName).toBe("FOOTER");
 		expect(layout?.lastElementChild?.className).toContain("justify-center");
 		const returnButton = layout?.lastElementChild?.querySelector("button");
-		expect(returnButton?.textContent).toBe("Return to main menu");
+		expect(returnButton?.textContent).toBe("Back");
+		expect(returnButton?.querySelector('[class*="icon-[lucide--arrow-left]"]')).not.toBeNull();
 		expect(returnButton?.className).toContain("bg-accent");
 
 		await act(async () => returnButton?.click());

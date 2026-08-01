@@ -49,7 +49,7 @@ const createFixture = () => {
 		listProjectsFx: Effect.die("Unexpected list."),
 		readProjectFx: () => Effect.die("Unexpected read."),
 		upsertItemFx,
-		upsertResourceFx: () => Effect.die("Unexpected resource save."),
+		upsertResourcesFx: () => Effect.die("Unexpected resource save."),
 	};
 	return {
 		registry,

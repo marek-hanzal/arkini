@@ -191,7 +191,7 @@ describe("installRendererControlledClose", () => {
 			listProjectsFx: Effect.die("Unexpected list."),
 			readProjectFx: () => Effect.die("Unexpected read."),
 			upsertItemFx: () => Effect.die("Unexpected item save."),
-			upsertResourceFx: () => Effect.die("Unexpected resource save."),
+			upsertResourcesFx: () => Effect.die("Unexpected resource save."),
 		};
 		const { rendererRuntime } = createTestRendererRuntime({
 			createResourceFx: () => Effect.never,

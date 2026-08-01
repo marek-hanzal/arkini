@@ -36,7 +36,7 @@ const UnavailableEditorProjectRepository: EditorProjectRepositoryService = {
 	listProjectsFx: unavailableEditorProjectRepositoryFx("list-projects"),
 	readProjectFx: () => unavailableEditorProjectRepositoryFx("read-project"),
 	upsertItemFx: () => unavailableEditorProjectRepositoryFx("upsert-item"),
-	upsertResourceFx: () => unavailableEditorProjectRepositoryFx("upsert-resource"),
+	upsertResourcesFx: () => unavailableEditorProjectRepositoryFx("upsert-resource"),
 };
 
 /** Creates one isolated renderer runtime with fresh Atom and Game lifecycle authorities. */

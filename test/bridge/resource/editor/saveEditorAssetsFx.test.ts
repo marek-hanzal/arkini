@@ -9,7 +9,7 @@ import {
 	EditorProjectRepository,
 	type EditorProjectRepositoryService,
 } from "~/bridge/editor/EditorProjectRepository";
-import { saveEditorAssetFx } from "~/bridge/resource/editor/saveEditorAssetFx";
+import { saveEditorAssetsFx } from "~/bridge/resource/editor/saveEditorAssetsFx";
 import { editorTestPayload } from "~test/editor/support/editorTestPayload";
 
 const createPng = () =>
@@ -37,13 +37,13 @@ const createFixture = () => {
 		scheduleTask,
 	});
 	registries.push(registry);
-	const upsertResourceFx = vi.fn<EditorProjectRepositoryService["upsertResourceFx"]>(
-		({ resource }) =>
+	const upsertResourcesFx = vi.fn<EditorProjectRepositoryService["upsertResourcesFx"]>(
+		({ resources }) =>
 			Effect.succeed({
 				...createProject(1),
 				resources: [
 					...editorTestPayload.resources,
-					resource,
+					...resources,
 				],
 			}),
 	);
@@ -53,12 +53,12 @@ const createFixture = () => {
 		listProjectsFx: Effect.die("Unexpected list."),
 		readProjectFx: () => Effect.die("Unexpected read."),
 		upsertItemFx: () => Effect.die("Unexpected item save."),
-		upsertResourceFx,
+		upsertResourcesFx,
 	};
 	return {
 		registry,
 		repository,
-		upsertResourceFx,
+		upsertResourcesFx,
 	};
 };
 
@@ -79,35 +79,52 @@ afterEach(() => {
 	vi.unstubAllGlobals();
 });
 
-describe("saveEditorAssetFx", () => {
-	it("validates, commits and publishes one PNG resource", async () => {
+describe("saveEditorAssetsFx", () => {
+	it("validates, atomically commits and publishes one PNG batch", async () => {
 		const fixture = createFixture();
 		const png = createPng();
 		const saved = await Effect.runPromise(
-			saveEditorAssetFx({
+			saveEditorAssetsFx({
 				projectId: "project",
-				file: {
-					name: "New Asset.png",
-					size: png.byteLength,
-					arrayBuffer: async () => png.buffer,
-				},
+				files: [
+					{
+						name: "New Asset.png",
+						size: png.byteLength,
+						arrayBuffer: async () => png.buffer,
+					},
+					{
+						name: "Other Asset.png",
+						size: png.byteLength,
+						arrayBuffer: async () => png.buffer,
+					},
+				],
 			}).pipe(
 				Effect.provideService(EditorProjectRepository, fixture.repository),
 				Effect.provideService(AtomRegistry.AtomRegistry, fixture.registry),
 			),
 		);
 
-		expect(saved.resourceId).toBe("new-asset");
-		expect(fixture.upsertResourceFx).toHaveBeenCalledWith({
+		expect(saved.resourceIds).toEqual([
+			"new-asset",
+			"other-asset",
+		]);
+		expect(fixture.upsertResourcesFx).toHaveBeenCalledWith({
 			projectId: "project",
-			resource: {
-				id: "new-asset",
-				mime: "image/png",
-				bytes: png,
-			},
+			resources: [
+				{
+					id: "new-asset",
+					mime: "image/png",
+					bytes: png,
+				},
+				{
+					id: "other-asset",
+					mime: "image/png",
+					bytes: png,
+				},
+			],
 		});
 		expect(fixture.registry.get(EditorProjectAtom("project"))?.revision).toBe(1);
-		expect(bitmapClose).toHaveBeenCalledOnce();
+		expect(bitmapClose).toHaveBeenCalledTimes(2);
 	});
 
 	it("rejects bytes that only claim a PNG filename before repository admission", async () => {
@@ -127,20 +144,52 @@ describe("saveEditorAssetFx", () => {
 
 		await expect(
 			Effect.runPromise(
-				saveEditorAssetFx({
+				saveEditorAssetsFx({
 					projectId: "project",
-					file: {
-						name: "fake.png",
-						size: fakePng.byteLength,
-						arrayBuffer: async () => fakePng.buffer,
-					},
+					files: [
+						{
+							name: "fake.png",
+							size: fakePng.byteLength,
+							arrayBuffer: async () => fakePng.buffer,
+						},
+					],
 				}).pipe(
 					Effect.provideService(EditorProjectRepository, fixture.repository),
 					Effect.provideService(AtomRegistry.AtomRegistry, fixture.registry),
 				),
 			),
 		).rejects.toThrow("must decode as a valid PNG image");
-		expect(fixture.upsertResourceFx).not.toHaveBeenCalled();
+		expect(fixture.upsertResourcesFx).not.toHaveBeenCalled();
+	});
+
+	it("rejects colliding generated IDs before the atomic repository transaction", async () => {
+		const fixture = createFixture();
+		const png = createPng();
+
+		await expect(
+			Effect.runPromise(
+				saveEditorAssetsFx({
+					projectId: "project",
+					files: [
+						{
+							name: "Same Asset.png",
+							size: png.byteLength,
+							arrayBuffer: async () => png.buffer,
+						},
+						{
+							name: "same asset.PNG",
+							size: png.byteLength,
+							arrayBuffer: async () => png.buffer,
+						},
+					],
+				}).pipe(
+					Effect.provideService(EditorProjectRepository, fixture.repository),
+					Effect.provideService(AtomRegistry.AtomRegistry, fixture.registry),
+				),
+			),
+		).rejects.toThrow("occurs more than once in the selected batch");
+		expect(fixture.upsertResourcesFx).not.toHaveBeenCalled();
+		expect(bitmapClose).toHaveBeenCalledTimes(2);
 	});
 
 	it("releases the decoded bitmap when dimension validation fails", async () => {
@@ -154,13 +203,15 @@ describe("saveEditorAssetFx", () => {
 
 		await expect(
 			Effect.runPromise(
-				saveEditorAssetFx({
+				saveEditorAssetsFx({
 					projectId: "project",
-					file: {
-						name: "oversized.png",
-						size: png.byteLength,
-						arrayBuffer: async () => png.buffer,
-					},
+					files: [
+						{
+							name: "oversized.png",
+							size: png.byteLength,
+							arrayBuffer: async () => png.buffer,
+						},
+					],
 				}).pipe(
 					Effect.provideService(EditorProjectRepository, fixture.repository),
 					Effect.provideService(AtomRegistry.AtomRegistry, fixture.registry),
@@ -168,6 +219,6 @@ describe("saveEditorAssetFx", () => {
 			),
 		).rejects.toThrow("exceeds the supported PNG dimensions");
 		expect(bitmapClose).toHaveBeenCalledOnce();
-		expect(fixture.upsertResourceFx).not.toHaveBeenCalled();
+		expect(fixture.upsertResourcesFx).not.toHaveBeenCalled();
 	});
 });

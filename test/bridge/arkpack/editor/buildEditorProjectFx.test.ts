@@ -28,7 +28,7 @@ const createRepository = (project: EditorProject | null): EditorProjectRepositor
 	listProjectsFx: Effect.die("Unexpected list."),
 	readProjectFx: () => Effect.succeed(project),
 	upsertItemFx: () => Effect.die("Unexpected item save."),
-	upsertResourceFx: () => Effect.die("Unexpected resource save."),
+	upsertResourcesFx: () => Effect.die("Unexpected resource save."),
 });
 
 describe("buildEditorProjectFx", () => {

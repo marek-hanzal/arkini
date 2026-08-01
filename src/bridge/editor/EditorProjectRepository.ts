@@ -19,9 +19,9 @@ export namespace EditorProjectRepository {
 		readonly item: ItemSchema.Type;
 	}
 
-	export interface UpsertResourceProps {
+	export interface UpsertResourcesProps {
 		readonly projectId: string;
-		readonly resource: ResourceSchema.Type;
+		readonly resources: ReadonlyArray<ResourceSchema.Type>;
 	}
 }
 
@@ -41,8 +41,8 @@ export interface EditorProjectRepositoryService {
 	readonly upsertItemFx: (
 		props: EditorProjectRepository.UpsertItemProps,
 	) => Effect.Effect<EditorProjectCommit, EditorProjectRepositoryError>;
-	readonly upsertResourceFx: (
-		props: EditorProjectRepository.UpsertResourceProps,
+	readonly upsertResourcesFx: (
+		props: EditorProjectRepository.UpsertResourcesProps,
 	) => Effect.Effect<EditorProject, EditorProjectRepositoryError>;
 }
 

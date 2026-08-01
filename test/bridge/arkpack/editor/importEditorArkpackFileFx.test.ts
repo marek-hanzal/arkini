@@ -22,7 +22,7 @@ const createRepository = (
 	listProjectsFx: Effect.die("Unexpected project list."),
 	readProjectFx: () => Effect.die("Unexpected project read."),
 	upsertItemFx: () => Effect.die("Unexpected item save."),
-	upsertResourceFx: () => Effect.die("Unexpected resource save."),
+	upsertResourcesFx: () => Effect.die("Unexpected resource save."),
 });
 
 const runImport = (

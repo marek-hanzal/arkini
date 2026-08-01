@@ -182,17 +182,19 @@ describe("createIndexedDbEditorProjectRepositoryFx", () => {
 			}),
 		);
 		const changed = await runWithRepository(databaseName, (repository) =>
-			repository.upsertResourceFx({
+			repository.upsertResourcesFx({
 				projectId: "project-one",
-				resource: {
-					id: "hero",
-					mime: "image/png",
-					bytes: new Uint8Array([
-						9,
-						8,
-						7,
-					]),
-				},
+				resources: [
+					{
+						id: "hero",
+						mime: "image/png",
+						bytes: new Uint8Array([
+							9,
+							8,
+							7,
+						]),
+					},
+				],
 			}),
 		);
 
@@ -232,15 +234,17 @@ describe("createIndexedDbEditorProjectRepositoryFx", () => {
 									title: "Oil",
 								},
 							}),
-							repository.upsertResourceFx({
+							repository.upsertResourcesFx({
 								projectId: "project-one",
-								resource: {
-									id: "item-oil",
-									mime: "image/png",
-									bytes: new Uint8Array([
-										5,
-									]),
-								},
+								resources: [
+									{
+										id: "item-oil",
+										mime: "image/png",
+										bytes: new Uint8Array([
+											5,
+										]),
+									},
+								],
 							}),
 						] as const,
 						{

@@ -67,18 +67,16 @@ const readPngDimensionsFx = (bytes: Uint8Array, resourceId: string) =>
 		}),
 	);
 
-export namespace saveEditorAssetFx {
+export namespace saveEditorAssetsFx {
 	export interface Props {
-		readonly file: EditorAssetFileInput;
+		readonly files: ReadonlyArray<EditorAssetFileInput>;
 		readonly projectId: string;
 	}
 }
 
-/** Validates one PNG and saves it directly into the canonical project repository. */
-export const saveEditorAssetFx = Effect.fn("saveEditorAssetFx")(function* ({
-	file: inputFile,
-	projectId,
-}: saveEditorAssetFx.Props) {
+const validateEditorAssetFileFx = Effect.fn("validateEditorAssetFileFx")(function* (
+	inputFile: EditorAssetFileInput,
+) {
 	if (!inputFile.name.toLowerCase().endsWith(".png") || inputFile.size > maxPngBytes) {
 		return yield* Effect.fail(
 			new EditorProjectError({
@@ -132,24 +130,55 @@ export const saveEditorAssetFx = Effect.fn("saveEditorAssetFx")(function* ({
 			}),
 		);
 	}
+	return {
+		id: resourceId,
+		mime: "image/png",
+		bytes,
+	} as const;
+});
+
+/** Validates one selected PNG batch and atomically saves it into the canonical project. */
+export const saveEditorAssetsFx = Effect.fn("saveEditorAssetsFx")(function* ({
+	files,
+	projectId,
+}: saveEditorAssetsFx.Props) {
+	if (files.length === 0) {
+		return yield* Effect.fail(
+			new EditorProjectError({
+				reason: "invalid-asset",
+				message: "Select at least one PNG asset to import.",
+			}),
+		);
+	}
+	const resources = yield* Effect.forEach(files, validateEditorAssetFileFx, {
+		concurrency: "unbounded",
+	});
+	const resourceIds = new Set<string>();
+	for (const resource of resources) {
+		if (resourceIds.has(resource.id)) {
+			return yield* Effect.fail(
+				new EditorProjectError({
+					reason: "invalid-resource-id",
+					message: `Asset ID ${resource.id} occurs more than once in the selected batch.`,
+				}),
+			);
+		}
+		resourceIds.add(resource.id);
+	}
 	const repository = yield* EditorProjectRepository;
 	yield* Effect.yieldNow;
 	return yield* Effect.uninterruptible(
 		Effect.gen(function* () {
-			const project = yield* repository.upsertResourceFx({
+			const project = yield* repository.upsertResourcesFx({
 				projectId,
-				resource: {
-					id: resourceId,
-					mime: "image/png",
-					bytes,
-				},
+				resources,
 			});
 			yield* Atom.set(EditorProjectAtom(projectId), {
 				project,
 			});
 			return {
 				project,
-				resourceId,
+				resourceIds: resources.map(({ id }) => id),
 			};
 		}),
 	);

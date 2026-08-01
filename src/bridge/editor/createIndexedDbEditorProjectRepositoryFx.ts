@@ -331,14 +331,30 @@ export const createIndexedDbEditorProjectRepositoryFx = Effect.fn(
 		);
 	});
 
-	const upsertResourceFx: EditorProjectRepositoryService["upsertResourceFx"] = Effect.fn(
-		"IndexedDbEditorProjectRepository.upsertResourceFx",
-	)(function* ({ projectId, resource: candidateResource }) {
-		const resource = yield* Effect.try({
-			try: () => ResourceSchema.parse(candidateResource),
+	const upsertResourcesFx: EditorProjectRepositoryService["upsertResourcesFx"] = Effect.fn(
+		"IndexedDbEditorProjectRepository.upsertResourcesFx",
+	)(function* ({ projectId, resources: candidateResources }) {
+		const parsedResources = yield* Effect.try({
+			try: () => ResourceSchema.array().min(1).parse(candidateResources),
 			catch: (cause) =>
-				createRepositoryError("upsert-resource", "The editor resource is invalid.", cause),
+				createRepositoryError(
+					"upsert-resource",
+					"The editor resources are invalid.",
+					cause,
+				),
 		});
+		const resourceIds = new Set<string>();
+		for (const resource of parsedResources) {
+			if (resourceIds.has(resource.id)) {
+				return yield* Effect.fail(
+					createRepositoryError(
+						"upsert-resource",
+						`Resource ${resource.id} occurs more than once in the same editor transaction.`,
+					),
+				);
+			}
+			resourceIds.add(resource.id);
+		}
 		const nowMs = yield* Clock.currentTimeMillis;
 		return yield* writeLock.withPermits(1)(
 			Effect.tryPromise({
@@ -360,10 +376,12 @@ export const createIndexedDbEditorProjectRepositoryFx = Effect.fn(
 							},
 							"upsert-resource",
 						);
-						await resources.put({
-							projectId,
-							...resource,
-						});
+						await resources.bulkPut(
+							parsedResources.map((resource) => ({
+								projectId,
+								...resource,
+							})),
+						);
 						await projects.put(record);
 						const resourceRecords = parseResourceRecords(
 							await resources.where("projectId").equals(projectId).toArray(),
@@ -374,7 +392,7 @@ export const createIndexedDbEditorProjectRepositoryFx = Effect.fn(
 				catch: (cause) =>
 					createRepositoryError(
 						"upsert-resource",
-						`Resource ${resource.id} could not be saved in project ${projectId}.`,
+						`Resources could not be saved in project ${projectId}.`,
 						cause,
 					),
 			}).pipe(Effect.uninterruptible),
@@ -387,6 +405,6 @@ export const createIndexedDbEditorProjectRepositoryFx = Effect.fn(
 		listProjectsFx,
 		readProjectFx,
 		upsertItemFx,
-		upsertResourceFx,
+		upsertResourcesFx,
 	} satisfies EditorProjectRepositoryService;
 });

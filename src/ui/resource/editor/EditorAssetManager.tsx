@@ -1,7 +1,7 @@
 import { useAtomSet, useAtomValue } from "@effect/atom-react";
 import { useRef } from "react";
 
-import { saveEditorAssetCommandAtom } from "~/bridge/resource/editor/saveEditorAssetCommandAtom";
+import { saveEditorAssetsCommandAtom } from "~/bridge/resource/editor/saveEditorAssetsCommandAtom";
 import { useEditorProject } from "~/bridge/editor/useEditorProject";
 import { Button } from "~/ui/button/Button";
 import { readSettledAsyncResultError } from "~/ui/reactivity/readSettledAsyncResultError";
@@ -11,8 +11,8 @@ import { EditorAssetThumbnail } from "~/ui/resource/editor/EditorAssetThumbnail"
 export const EditorAssetManager = () => {
 	const project = useEditorProject();
 	const inputRef = useRef<HTMLInputElement>(null);
-	const result = useAtomValue(saveEditorAssetCommandAtom);
-	const saveAsset = useAtomSet(saveEditorAssetCommandAtom);
+	const result = useAtomValue(saveEditorAssetsCommandAtom);
+	const saveAssets = useAtomSet(saveEditorAssetsCommandAtom);
 	const error = readSettledAsyncResultError(result);
 	const pending = result.waiting;
 	return (
@@ -29,14 +29,15 @@ export const EditorAssetManager = () => {
 					ref={inputRef}
 					type="file"
 					accept="image/png,.png"
+					multiple
 					className="sr-only"
 					disabled={pending}
 					onChange={(event) => {
-						const file = event.currentTarget.files?.[0];
+						const files = Array.from(event.currentTarget.files ?? []);
 						event.currentTarget.value = "";
-						if (file === undefined) return;
-						saveAsset({
-							file,
+						if (files.length === 0) return;
+						saveAssets({
+							files,
 							projectId: project.projectId,
 						});
 					}}
@@ -46,7 +47,7 @@ export const EditorAssetManager = () => {
 					cursorIntent={pending ? "progress" : undefined}
 					onClick={() => inputRef.current?.click()}
 				>
-					{pending ? "Saving…" : "Add or replace PNG"}
+					{pending ? "Importing…" : "Import assets"}
 				</Button>
 			</header>
 			<div className="min-h-0 overflow-y-auto overscroll-contain pr-1">

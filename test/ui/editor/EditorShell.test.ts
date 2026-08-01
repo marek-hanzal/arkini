@@ -289,6 +289,24 @@ describe("EditorShell", () => {
 		formCalls.save.mockReset().mockResolvedValue(true);
 	});
 
+	it("labels the item workspace as Items without reserving an empty form-status row", async () => {
+		const router = createTestRouter({
+			initialEntry: "/editor/editor-test/editor/items/list",
+		});
+		const container = await renderRouter(router);
+
+		expect(readLink(container, "Items").className).toContain("bg-accent");
+		expect(
+			[...container.querySelectorAll("a")].some(
+				(link) => link.textContent === "Editor",
+			),
+		).toBe(false);
+		expect(container.querySelector('[data-ui="EditorFormStatusSlot"]')).toBeNull();
+		expect(container.querySelector('[data-ui="EditorContent"]')?.className).toContain(
+			"py-[var(--ak-viewport-gap)]",
+		);
+	});
+
 	it("switches the active tab before the destination route finishes loading", async () => {
 		const projectLoader = createGate();
 		const router = createTestRouter({

@@ -5,6 +5,7 @@ import { useEditorProject } from "~/bridge/editor/useEditorProject";
 import { ButtonLink, PrimaryButtonLink } from "~/ui/button/Button";
 import { EditorItemThumbnail } from "~/ui/item/editor/EditorItemThumbnail";
 import { useFuseSearch } from "~/ui/search/useFuseSearch";
+import { Status } from "~/ui/status/Status";
 
 type EditorItemType = NonNullable<EditorProject["config"]>["items"][string]["type"];
 
@@ -45,6 +46,7 @@ export const EditorItemList = () => {
 		() => new Map(items.map((item) => [item.uid, item])),
 		[items],
 	);
+	const empty = items.length === 0;
 	const filteredItems = matchingItemUids.flatMap((uid) => {
 		const item = itemsByUid.get(uid);
 		return item === undefined
@@ -56,7 +58,7 @@ export const EditorItemList = () => {
 	return (
 		<section
 			className="grid h-full min-h-0 grid-rows-[auto_minmax(0,1fr)] gap-[var(--ak-viewport-gap)]"
-			aria-label="Editor items"
+			aria-label="Items"
 			data-ui="EditorItemList"
 		>
 			<header className="flex min-w-0 flex-wrap items-center gap-2">
@@ -65,7 +67,7 @@ export const EditorItemList = () => {
 					value={query}
 					className="min-w-64 flex-1 rounded-lg border border-line-strong bg-surface px-4 py-3 text-sm text-foreground outline-none placeholder:text-muted"
 					placeholder="Search item title, ID, type or tag…"
-					aria-label="Search editor items"
+					aria-label="Search items"
 					onChange={(event) => setQuery(event.currentTarget.value)}
 				/>
 				{itemType === undefined ? null : (
@@ -81,24 +83,41 @@ export const EditorItemList = () => {
 						<span aria-hidden="true">×</span>
 					</button>
 				)}
-				<PrimaryButtonLink
-					to="/editor/$projectId/editor/items/new/select"
-					params={{
-						projectId: project.projectId,
-					}}
-					className="min-h-0 shrink-0 gap-2 px-4 py-3 text-sm"
-				>
-					<span className="icon-[lucide--plus] size-4" />
-					New item
-				</PrimaryButtonLink>
+				{empty ? null : (
+					<PrimaryButtonLink
+						to="/editor/$projectId/editor/items/new/select"
+						params={{
+							projectId: project.projectId,
+						}}
+						className="min-h-0 shrink-0 gap-2 px-4 py-3 text-sm"
+					>
+						<span className="icon-[lucide--plus] size-4" />
+						New item
+					</PrimaryButtonLink>
+				)}
 			</header>
 			<div className="ak-list grid min-h-0 content-start gap-2 overflow-y-auto overscroll-contain pr-1">
-				{items.length === 0 ? (
-					<p className="rounded-xl border border-line bg-surface/80 p-4 text-sm text-muted">
-						This project does not define any items yet.
-					</p>
+				{empty ? (
+					<Status
+						dataUi="EditorItemsEmpty"
+						description="Create the first item to start authoring this game."
+						icon="icon-[lucide--package-open]"
+						title="No items yet"
+						action={
+							<PrimaryButtonLink
+								to="/editor/$projectId/editor/items/new/select"
+								params={{
+									projectId: project.projectId,
+								}}
+								className="gap-2"
+							>
+								<span className="icon-[lucide--plus] size-4" />
+								New item
+							</PrimaryButtonLink>
+						}
+					/>
 				) : null}
-				{items.length > 0 && filteredItems.length === 0 ? (
+				{!empty && filteredItems.length === 0 ? (
 					<p
 						className="rounded-xl border border-line bg-surface/80 p-4 text-sm text-muted"
 						data-ui="EditorItemSearchEmpty"

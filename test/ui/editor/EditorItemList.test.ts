@@ -27,11 +27,27 @@ vi.mock("~/ui/item/editor/EditorItemThumbnail", () => ({
 		}),
 }));
 
+const renderLink = ({
+	children,
+	params,
+	to,
+}: {
+	readonly children?: ReactNode;
+	readonly params?: unknown;
+	readonly to?: string;
+}) =>
+	createElement(
+		"a",
+		{
+			"data-params": JSON.stringify(params),
+			"data-to": to,
+		},
+		children,
+	);
+
 vi.mock("~/ui/button/Button", () => ({
-	ButtonLink: ({ children }: { readonly children?: ReactNode }) =>
-		createElement("a", null, children),
-	PrimaryButtonLink: ({ children }: { readonly children?: ReactNode }) =>
-		createElement("a", null, children),
+	ButtonLink: renderLink,
+	PrimaryButtonLink: renderLink,
 }));
 
 const roots: Array<ReturnType<typeof createRoot>> = [];
@@ -108,7 +124,7 @@ const renderItemList = async () => {
 };
 
 const setSearch = async (container: HTMLElement, value: string) => {
-	const input = container.querySelector<HTMLInputElement>('[aria-label="Search editor items"]');
+	const input = container.querySelector<HTMLInputElement>('[aria-label="Search items"]');
 	if (input === null) throw new Error("Missing editor item search.");
 	const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")?.set;
 	if (setter === undefined) throw new Error("Missing native input value setter.");
@@ -167,5 +183,32 @@ describe("EditorItemList", () => {
 		expect(readVisibleItemIds(container)).toEqual([
 			"bakery",
 		]);
+	});
+
+	it("renders the package-empty Status with one canonical New item action", async () => {
+		state.project = {
+			projectId: "editor-test",
+			title: "Editor test",
+			config: {
+				items: {},
+			},
+		};
+		const container = await renderItemList();
+
+		expect(container.querySelector('[data-ui="EditorItemsEmpty"]')).not.toBeNull();
+		expect(container.textContent).toContain("No items yet");
+		expect(container.textContent).toContain(
+			"Create the first item to start authoring this game.",
+		);
+		const newItemLinks = [...container.querySelectorAll("a")].filter(
+			(link) => link.textContent === "New item",
+		);
+		expect(newItemLinks).toHaveLength(1);
+		expect(newItemLinks[0]?.dataset.to).toBe(
+			"/editor/$projectId/editor/items/new/select",
+		);
+		expect(newItemLinks[0]?.dataset.params).toContain("editor-test");
+		expect(container.querySelector('[aria-label="Search items"]')).not.toBeNull();
+		expect(container.querySelector('[data-ui="EditorItemSearchEmpty"]')).toBeNull();
 	});
 });

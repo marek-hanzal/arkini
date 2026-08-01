@@ -178,6 +178,7 @@ const EditorShellContent = ({ children }: PropsWithChildren) => {
 			setOptimisticTab(tab);
 		};
 	const statusError = form?.error ?? exitError;
+	const hasStatusSlot = form !== undefined || exitError !== undefined;
 	const statusVisible = form?.isDirty === true || statusError !== undefined;
 	const statusCopy =
 		statusError !== undefined
@@ -188,7 +189,11 @@ const EditorShellContent = ({ children }: PropsWithChildren) => {
 
 	return (
 		<div
-			className="grid h-dvh min-h-0 grid-rows-[auto_2.5rem_minmax(0,1fr)] overflow-hidden bg-[var(--ak-game-shell-background)] text-foreground"
+			className={`grid h-dvh min-h-0 overflow-hidden bg-[var(--ak-game-shell-background)] text-foreground ${
+				hasStatusSlot
+					? "grid-rows-[auto_2.5rem_minmax(0,1fr)]"
+					: "grid-rows-[auto_minmax(0,1fr)]"
+			}`}
 			data-ui="EditorShell"
 			style={{
 				viewTransitionName: "arkini-editor-shell",
@@ -209,7 +214,7 @@ const EditorShellContent = ({ children }: PropsWithChildren) => {
 						activeProps={readActiveTabProps()}
 						onClick={createTabClickHandler("editor")}
 					>
-						Editor
+						Items
 					</ButtonLink>
 					<ButtonLink
 						to="/editor/$projectId/assets"
@@ -270,49 +275,55 @@ const EditorShellContent = ({ children }: PropsWithChildren) => {
 					{exitPending ? "Exiting…" : "Exit"}
 				</PrimaryButton>
 			</header>
-			<div
-				className="relative z-10 h-10 border-b border-transparent px-[var(--ak-viewport-padding)]"
-				data-ui="EditorFormStatusSlot"
-			>
+			{hasStatusSlot ? (
 				<div
-					className={`flex h-full min-w-0 items-center gap-3 rounded-b-xl border-x border-b px-4 text-sm transition-[opacity,transform,background-color,border-color] duration-200 ${
-						statusVisible
-							? "translate-y-0 border-accent/45 bg-accent/10 opacity-100"
-							: "pointer-events-none -translate-y-1 border-transparent opacity-0"
-					}`}
-					aria-hidden={!statusVisible}
-					role={statusError === undefined ? "status" : "alert"}
+					className="relative z-10 h-10 border-b border-transparent px-[var(--ak-viewport-padding)]"
+					data-ui="EditorFormStatusSlot"
 				>
-					<p className={`min-w-0 flex-1 truncate ${statusError === undefined ? "text-foreground" : "text-danger"}`}>
-						{statusCopy}
-					</p>
-					{form?.isDirty === true ? (
-						<>
-							<button
-								type="button"
-								className="cursor-pointer text-sm font-semibold text-muted underline decoration-transparent underline-offset-4 transition-colors hover:text-foreground hover:decoration-current disabled:cursor-not-allowed disabled:opacity-60"
-								disabled={form.isSaving || exitPending}
-								onClick={() => {
-									if (exitRequested) void discardAndExit();
-									else discard();
-								}}
-							>
-								Discard
-							</button>
-							<button
-								type="button"
-								className="cursor-pointer text-sm font-semibold text-accent underline decoration-transparent underline-offset-4 transition-colors hover:text-accent-hover hover:decoration-current disabled:cursor-not-allowed disabled:opacity-60"
-								disabled={form.isSaving || exitPending}
-								onClick={() => void (exitRequested ? saveAndExit() : save())}
-							>
-								{form.isSaving ? "Saving…" : "Save"}
-							</button>
-						</>
-					) : null}
+					<div
+						className={`flex h-full min-w-0 items-center gap-3 rounded-b-xl border-x border-b px-4 text-sm transition-[opacity,transform,background-color,border-color] duration-200 ${
+							statusVisible
+								? "translate-y-0 border-accent/45 bg-accent/10 opacity-100"
+								: "pointer-events-none -translate-y-1 border-transparent opacity-0"
+						}`}
+						aria-hidden={!statusVisible}
+						role={statusError === undefined ? "status" : "alert"}
+					>
+						<p
+							className={`min-w-0 flex-1 truncate ${
+								statusError === undefined ? "text-foreground" : "text-danger"
+							}`}
+						>
+							{statusCopy}
+						</p>
+						{form?.isDirty === true ? (
+							<>
+								<button
+									type="button"
+									className="cursor-pointer text-sm font-semibold text-muted underline decoration-transparent underline-offset-4 transition-colors hover:text-foreground hover:decoration-current disabled:cursor-not-allowed disabled:opacity-60"
+									disabled={form.isSaving || exitPending}
+									onClick={() => {
+										if (exitRequested) void discardAndExit();
+										else discard();
+									}}
+								>
+									Discard
+								</button>
+								<button
+									type="button"
+									className="cursor-pointer text-sm font-semibold text-accent underline decoration-transparent underline-offset-4 transition-colors hover:text-accent-hover hover:decoration-current disabled:cursor-not-allowed disabled:opacity-60"
+									disabled={form.isSaving || exitPending}
+									onClick={() => void (exitRequested ? saveAndExit() : save())}
+								>
+									{form.isSaving ? "Saving…" : "Save"}
+								</button>
+							</>
+						) : null}
+					</div>
 				</div>
-			</div>
+			) : null}
 			<main
-				className="min-h-0 min-w-0 overflow-hidden p-[var(--ak-viewport-padding)]"
+				className="min-h-0 min-w-0 overflow-hidden px-[var(--ak-viewport-padding)] py-[var(--ak-viewport-gap)]"
 				data-ui="EditorContent"
 				style={{
 					viewTransitionName: "arkini-editor-content",

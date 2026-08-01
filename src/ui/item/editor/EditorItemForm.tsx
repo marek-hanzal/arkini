@@ -4,7 +4,9 @@ import { useCallback, useMemo, type PropsWithChildren } from "react";
 import { useEditorProject } from "~/bridge/editor/useEditorProject";
 import type { EditorItem, EditorItemType } from "~/bridge/item/editor/EditorItemModel";
 import { useEditorItemDraft } from "~/bridge/item/editor/useEditorItemDraft";
-import { ButtonLink, PrimaryButton } from "~/ui/button/Button";
+import { ButtonLink } from "~/ui/button/Button";
+import { EditorFormContent } from "~/ui/form/EditorFormContent";
+import { EditorFormSaveButton } from "~/ui/form/EditorFormSaveButton";
 import { EditorItemFormProvider } from "~/ui/item/editor/EditorItemFormContext";
 import { EditorItemNotFound } from "~/ui/item/editor/EditorItemNotFound";
 import type { EditorItemSectionId } from "~/ui/item/editor/EditorItemSections";
@@ -126,34 +128,18 @@ const EditorItemFormSession = ({
 							{initialItem.type}
 						</p>
 					</div>
-					<PrimaryButton
-						type="button"
-						className="min-h-0 px-4 py-2"
-						disabled={!controller.isDirty || controller.isSaving}
-						cursorIntent={controller.isSaving ? "progress" : undefined}
-						onClick={() => void controller.save().catch(() => undefined)}
-					>
-						{controller.isSaving ? "Saving…" : "Save"}
-					</PrimaryButton>
+					<EditorFormSaveButton
+						dirty={controller.isDirty}
+						saving={controller.isSaving}
+						save={controller.save}
+					/>
 				</header>
-				{controller.error === undefined ? null : (
-					<p className="rounded-lg border border-danger/40 bg-danger/10 px-4 py-3 text-sm text-danger">
-						{controller.error instanceof Error
-							? controller.error.message
-							: String(controller.error)}
-					</p>
-				)}
-				<form
-					className="min-h-0 flex-1"
-					noValidate
-					onSubmit={(event) => {
-						event.preventDefault();
-						event.stopPropagation();
-						void controller.save().catch(() => undefined);
-					}}
+				<EditorFormContent
+					error={controller.error}
+					save={controller.save}
 				>
 					{children}
-				</form>
+				</EditorFormContent>
 			</section>
 		</EditorItemFormProvider>
 	);

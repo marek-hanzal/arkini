@@ -208,6 +208,17 @@ describe("EditorShell", () => {
 		expect(readLink(container, "Items").getAttribute("aria-current")).toBe("page");
 		expect(
 			[
+				...container.querySelectorAll('[data-ui="EditorNavigation"] nav a'),
+			].map((link) => link.textContent),
+		).toEqual([
+			"Project",
+			"Items",
+			"Assets",
+			"Build",
+			"Board",
+		]);
+		expect(
+			[
 				...container.querySelectorAll("a"),
 			].some((link) => link.textContent === "Editor"),
 		).toBe(false);

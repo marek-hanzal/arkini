@@ -1,9 +1,7 @@
 export const EditorProjectSectionIds = [
 	"general",
 	"appearance",
-	"board",
-	"toolbar",
-	"inventory",
+	"surfaces",
 ] as const;
 
 export type EditorProjectSectionId = (typeof EditorProjectSectionIds)[number];
@@ -23,16 +21,8 @@ export const EditorProjectSections = [
 		label: "Appearance",
 	},
 	{
-		id: "board",
-		label: "Board",
-	},
-	{
-		id: "toolbar",
-		label: "Toolbar",
-	},
-	{
-		id: "inventory",
-		label: "Inventory",
+		id: "surfaces",
+		label: "Surfaces",
 	},
 ] as const satisfies ReadonlyArray<EditorProjectSectionDescriptor>;
 
@@ -50,11 +40,9 @@ export const readEditorProjectSectionForPath = (
 		case "avatars":
 			return "appearance";
 		case "board":
-			return "board";
 		case "toolbarSize":
-			return "toolbar";
 		case "inventory":
-			return "inventory";
+			return "surfaces";
 		default:
 			return "general";
 	}

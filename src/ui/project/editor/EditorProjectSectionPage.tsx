@@ -1,16 +1,16 @@
 import { EditorSectionPage } from "~/ui/editor/EditorSectionPage";
 import { EditorSectionTabs } from "~/ui/editor/EditorSectionTabs";
+import { EditorFormContent } from "~/ui/form/EditorFormContent";
+import { EditorFormSaveButton } from "~/ui/form/EditorFormSaveButton";
 import { EditorProjectAppearanceSection } from "~/ui/project/editor/EditorProjectAppearanceSection";
-import { EditorProjectBoardSection } from "~/ui/project/editor/EditorProjectBoardSection";
 import { useEditorProjectFormSession } from "~/ui/project/editor/EditorProjectFormContext";
 import { EditorProjectGeneralSection } from "~/ui/project/editor/EditorProjectGeneralSection";
-import { EditorProjectInventorySection } from "~/ui/project/editor/EditorProjectInventorySection";
 import { EditorProjectSectionLink } from "~/ui/project/editor/EditorProjectSectionLink";
 import {
 	EditorProjectSections,
 	type EditorProjectSectionId,
 } from "~/ui/project/editor/EditorProjectSections";
-import { EditorProjectToolbarSection } from "~/ui/project/editor/EditorProjectToolbarSection";
+import { EditorProjectSurfacesSection } from "~/ui/project/editor/EditorProjectSurfacesSection";
 
 const renderSection = (section: EditorProjectSectionId) => {
 	switch (section) {
@@ -18,12 +18,8 @@ const renderSection = (section: EditorProjectSectionId) => {
 			return <EditorProjectGeneralSection />;
 		case "appearance":
 			return <EditorProjectAppearanceSection />;
-		case "board":
-			return <EditorProjectBoardSection />;
-		case "toolbar":
-			return <EditorProjectToolbarSection />;
-		case "inventory":
-			return <EditorProjectInventorySection />;
+		case "surfaces":
+			return <EditorProjectSurfacesSection />;
 	}
 };
 
@@ -33,22 +29,39 @@ export const EditorProjectSectionPage = ({
 }: {
 	readonly section: EditorProjectSectionId;
 }) => {
-	const { project } = useEditorProjectFormSession();
+	const controller = useEditorProjectFormSession();
 	return (
 		<EditorSectionPage
 			tabs={
-				<EditorSectionTabs label="Project sections">
-					{EditorProjectSections.map((candidate) => (
-						<EditorProjectSectionLink
-							key={candidate.id}
-							projectId={project.projectId}
-							section={candidate}
+				<div className="grid gap-[var(--ak-viewport-gap)]">
+					<header className="flex min-w-0 items-center gap-3">
+						<h1 className="min-w-0 flex-1 truncate text-xl font-semibold">Project</h1>
+						<EditorFormSaveButton
+							dirty={controller.isDirty}
+							saving={controller.isSaving}
+							save={controller.save}
 						/>
-					))}
-				</EditorSectionTabs>
+					</header>
+					<EditorSectionTabs label="Project sections">
+						{EditorProjectSections.map((candidate) => (
+							<EditorProjectSectionLink
+								key={candidate.id}
+								projectId={controller.project.projectId}
+								section={candidate}
+							/>
+						))}
+					</EditorSectionTabs>
+				</div>
 			}
 		>
-			{renderSection(section)}
+			<div className="grid gap-[var(--ak-viewport-gap)]">
+				<EditorFormContent
+					error={controller.error}
+					save={controller.save}
+				>
+					{renderSection(section)}
+				</EditorFormContent>
+			</div>
 		</EditorSectionPage>
 	);
 };

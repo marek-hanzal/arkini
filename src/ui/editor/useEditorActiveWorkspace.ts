@@ -2,6 +2,12 @@ import { useMatchRoute } from "@tanstack/react-router";
 
 export const EditorWorkspaceRoutes = [
 	{
+		id: "project",
+		label: "Project",
+		matchTo: "/editor/$projectId/project",
+		to: "/editor/$projectId/project",
+	},
+	{
 		id: "items",
 		label: "Items",
 		matchTo: "/editor/$projectId/editor",
@@ -12,12 +18,6 @@ export const EditorWorkspaceRoutes = [
 		label: "Assets",
 		matchTo: "/editor/$projectId/assets",
 		to: "/editor/$projectId/assets",
-	},
-	{
-		id: "project",
-		label: "Project",
-		matchTo: "/editor/$projectId/project",
-		to: "/editor/$projectId/project",
 	},
 	{
 		id: "build",

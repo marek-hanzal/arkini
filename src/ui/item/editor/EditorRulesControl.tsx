@@ -48,21 +48,21 @@ const EditorWhenControl = ({
 						onChange(
 							type === "exists"
 								? {
-									type,
-									query: value.query,
-								}
+										type,
+										query: value.query,
+									}
 								: type === "count"
 									? {
-										type,
-										query: value.query,
-										count: 1,
-									}
+											type,
+											query: value.query,
+											count: 1,
+										}
 									: {
-										type,
-										query: value.query,
-										min: 1,
-										max: 1,
-									},
+											type,
+											query: value.query,
+											min: 1,
+											max: 1,
+										},
 						)
 					}
 				/>
@@ -168,8 +168,8 @@ export const EditorRulesControl = ({
 									],
 									...(type === "runtime:multiplier"
 										? {
-											multiplier: 1,
-										}
+												multiplier: 1,
+											}
 										: {}),
 								} as EditorLineRule,
 							])

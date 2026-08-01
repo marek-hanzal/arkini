@@ -76,7 +76,14 @@ const createFixture = async () => {
 				const nextManifest = {
 					path: "editor.json",
 					bytes: new TextEncoder().encode(
-						`${JSON.stringify({ ...manifest, updatedAtMs: 456 }, null, "\t")}\n`,
+						`${JSON.stringify(
+							{
+								...manifest,
+								updatedAtMs: 456,
+							},
+							null,
+							"\t",
+						)}\n`,
 					),
 				};
 				record = {
@@ -111,9 +118,7 @@ const createFixture = async () => {
 
 const parseWrittenSource = (file: EditorProjectFile | undefined) => {
 	if (file === undefined) throw new Error("The source was not written.");
-	return GameSourceSchema.parse(
-		JSON.parse(new TextDecoder().decode(file.bytes)) as unknown,
-	);
+	return GameSourceSchema.parse(JSON.parse(new TextDecoder().decode(file.bytes)) as unknown);
 };
 
 describe("saveEditorItemFx", () => {

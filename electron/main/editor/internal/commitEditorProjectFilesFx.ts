@@ -19,7 +19,10 @@ export namespace commitEditorProjectFilesFx {
 }
 
 const ignoreFailure = <A, E>(effect: Effect.Effect<A, E>) =>
-	effect.pipe(Effect.asVoid, Effect.orElseSucceed(() => void 0));
+	effect.pipe(
+		Effect.asVoid,
+		Effect.orElseSucceed(() => void 0),
+	);
 
 /** Publishes one content file and editor.json together with rollback on runtime failure. */
 export const commitEditorProjectFilesFx = Effect.fn("commitEditorProjectFilesFx")(function* ({
@@ -45,16 +48,28 @@ export const commitEditorProjectFilesFx = Effect.fn("commitEditorProjectFilesFx"
 				fileSystem.writeFile(contentPending, content.bytes),
 				fileSystem.writeFile(manifestPending, manifest.bytes),
 			],
-			{ concurrency: 1 },
+			{
+				concurrency: 1,
+			},
 		),
 	);
 	if (Exit.isFailure(stageExit)) {
 		yield* Effect.all(
 			[
-				ignoreFailure(fileSystem.remove(contentPending, { force: true })),
-				ignoreFailure(fileSystem.remove(manifestPending, { force: true })),
+				ignoreFailure(
+					fileSystem.remove(contentPending, {
+						force: true,
+					}),
+				),
+				ignoreFailure(
+					fileSystem.remove(manifestPending, {
+						force: true,
+					}),
+				),
 			],
-			{ concurrency: 1 },
+			{
+				concurrency: 1,
+			},
 		);
 		return yield* Effect.fail(
 			new ElectronMainError({
@@ -82,28 +97,56 @@ export const commitEditorProjectFilesFx = Effect.fn("commitEditorProjectFilesFx"
 		yield* Effect.all(
 			[
 				manifestPublished
-					? ignoreFailure(fileSystem.remove(manifest.target, { force: true }))
+					? ignoreFailure(
+							fileSystem.remove(manifest.target, {
+								force: true,
+							}),
+						)
 					: Effect.void,
 				manifestBackedUp
 					? ignoreFailure(fileSystem.rename(manifestBackup, manifest.target))
 					: Effect.void,
 				contentPublished
-					? ignoreFailure(fileSystem.remove(content.target, { force: true }))
+					? ignoreFailure(
+							fileSystem.remove(content.target, {
+								force: true,
+							}),
+						)
 					: Effect.void,
 				contentBackedUp
 					? ignoreFailure(fileSystem.rename(contentBackup, content.target))
 					: Effect.void,
 			],
-			{ concurrency: 1 },
+			{
+				concurrency: 1,
+			},
 		);
 		yield* Effect.all(
 			[
-				ignoreFailure(fileSystem.remove(contentPending, { force: true })),
-				ignoreFailure(fileSystem.remove(manifestPending, { force: true })),
-				ignoreFailure(fileSystem.remove(contentBackup, { force: true })),
-				ignoreFailure(fileSystem.remove(manifestBackup, { force: true })),
+				ignoreFailure(
+					fileSystem.remove(contentPending, {
+						force: true,
+					}),
+				),
+				ignoreFailure(
+					fileSystem.remove(manifestPending, {
+						force: true,
+					}),
+				),
+				ignoreFailure(
+					fileSystem.remove(contentBackup, {
+						force: true,
+					}),
+				),
+				ignoreFailure(
+					fileSystem.remove(manifestBackup, {
+						force: true,
+					}),
+				),
 			],
-			{ concurrency: 1 },
+			{
+				concurrency: 1,
+			},
 		);
 		return yield* Effect.fail(
 			new ElectronMainError({
@@ -115,9 +158,19 @@ export const commitEditorProjectFilesFx = Effect.fn("commitEditorProjectFilesFx"
 
 	yield* Effect.all(
 		[
-			ignoreFailure(fileSystem.remove(contentBackup, { force: true })),
-			ignoreFailure(fileSystem.remove(manifestBackup, { force: true })),
+			ignoreFailure(
+				fileSystem.remove(contentBackup, {
+					force: true,
+				}),
+			),
+			ignoreFailure(
+				fileSystem.remove(manifestBackup, {
+					force: true,
+				}),
+			),
 		],
-		{ concurrency: 1 },
+		{
+			concurrency: 1,
+		},
 	);
 });

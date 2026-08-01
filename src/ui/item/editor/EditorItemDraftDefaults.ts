@@ -25,14 +25,18 @@ const rolls = {
 		type: "guaranteed",
 		drop: [
 			drop,
-		] as [EditorDrop],
+		] as [
+			EditorDrop,
+		],
 	},
 	chance: {
 		type: "chance",
 		chance: 0.5,
 		drop: [
 			drop,
-		] as [EditorDrop],
+		] as [
+			EditorDrop,
+		],
 	},
 	weight: {
 		type: "weight",
@@ -45,15 +49,23 @@ const rolls = {
 				weight: 1,
 				drop: [
 					structuredClone(drop),
-				] as [EditorDrop],
+				] as [
+					EditorDrop,
+				],
 			},
 			{
 				weight: 1,
 				drop: [
 					structuredClone(drop),
-				] as [EditorDrop],
+				] as [
+					EditorDrop,
+				],
 			},
-		] as [EditorDropWeight, EditorDropWeight, ...EditorDropWeight[]],
+		] as [
+			EditorDropWeight,
+			EditorDropWeight,
+			...EditorDropWeight[],
+		],
 	},
 } satisfies Record<EditorRoll["type"], EditorRoll>;
 
@@ -103,9 +115,13 @@ export const EditorItemDraftDefaults = {
 			{
 				roll: [
 					rolls.guaranteed,
-				] as [EditorRoll],
+				] as [
+					EditorRoll,
+				],
 			},
-		] as [EditorRollSet],
+		] as [
+			EditorRollSet,
+		],
 	} satisfies EditorOutput,
 	merge: {
 		target: {

@@ -27,28 +27,21 @@ vi.mock("~/ui/item/editor/EditorItemThumbnail", () => ({
 		}),
 }));
 
-const renderLink = ({
-	children,
-	params,
-	to,
-}: {
-	readonly children?: ReactNode;
-	readonly params?: unknown;
-	readonly to?: string;
-}) =>
-	createElement(
-		"a",
-		{
-			"data-params": JSON.stringify(params),
-			"data-to": to,
-		},
-		children,
-	);
-
-vi.mock("~/ui/button/Button", () => ({
-	ButtonLink: renderLink,
-	PrimaryButtonLink: renderLink,
-}));
+vi.mock("~/ui/button/Button", () => {
+	const RenderLink = ({ children, params, to }: Record<string, unknown>) =>
+		createElement(
+			"a",
+			{
+				"data-params": JSON.stringify(params),
+				"data-to": to,
+			},
+			children as ReactNode,
+		);
+	return {
+		ButtonLink: RenderLink,
+		PrimaryButtonLink: RenderLink,
+	};
+});
 
 const roots: Array<ReturnType<typeof createRoot>> = [];
 
@@ -200,13 +193,11 @@ describe("EditorItemList", () => {
 		expect(container.textContent).toContain(
 			"Create the first item to start authoring this game.",
 		);
-		const newItemLinks = [...container.querySelectorAll("a")].filter(
-			(link) => link.textContent === "New item",
-		);
+		const newItemLinks = [
+			...container.querySelectorAll("a"),
+		].filter((link) => link.textContent === "New item");
 		expect(newItemLinks).toHaveLength(1);
-		expect(newItemLinks[0]?.dataset.to).toBe(
-			"/editor/$projectId/editor/items/new/select",
-		);
+		expect(newItemLinks[0]?.dataset.to).toBe("/editor/$projectId/editor/items/new/select");
 		expect(newItemLinks[0]?.dataset.params).toContain("editor-test");
 		expect(container.querySelector('[aria-label="Search items"]')).not.toBeNull();
 		expect(container.querySelector('[data-ui="EditorItemSearchEmpty"]')).toBeNull();

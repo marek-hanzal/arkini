@@ -3,10 +3,7 @@ import { useMemo } from "react";
 import { useEditorProject } from "~/bridge/editor/useEditorProject";
 import { useFieldContext } from "~/ui/form/EditorFormContexts";
 import { readEditorFieldError } from "~/ui/form/readEditorFieldError";
-import {
-	EditorSearchCombobox,
-	type EditorSearchOption,
-} from "~/ui/form/EditorSearchCombobox";
+import { EditorSearchCombobox, type EditorSearchOption } from "~/ui/form/EditorSearchCombobox";
 import { EditorAssetThumbnail } from "~/ui/resource/editor/EditorAssetThumbnail";
 
 export interface EditorAssetAutocompleteFieldProps {

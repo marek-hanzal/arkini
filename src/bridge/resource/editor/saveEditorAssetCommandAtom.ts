@@ -4,6 +4,6 @@ import type { saveEditorAssetMutation } from "~/bridge/resource/editor/saveEdito
 import { saveEditorAssetMutationFx } from "~/bridge/resource/editor/saveEditorAssetMutation";
 
 /** Owns the mounted asset-library write command and its exact Effect result state. */
-export const saveEditorAssetCommandAtom = Atom.fn(
-	(variables: saveEditorAssetMutation.Variables) => saveEditorAssetMutationFx(variables),
+export const saveEditorAssetCommandAtom = Atom.fn((variables: saveEditorAssetMutation.Variables) =>
+	saveEditorAssetMutationFx(variables),
 ).pipe(Atom.withLabel("EditorAssetSave"), Atom.setIdleTTL(0));

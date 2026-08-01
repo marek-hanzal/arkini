@@ -6,7 +6,10 @@ import {
 	readEditorItemSections,
 } from "~/ui/item/editor/EditorItemSections";
 
-const item = (type: EditorItem["type"]) => ({ type }) as Pick<EditorItem, "type">;
+const item = (type: EditorItem["type"]) =>
+	({
+		type,
+	}) as Pick<EditorItem, "type">;
 
 describe("EditorItemSections", () => {
 	it("keeps the canonical shared sections and adds only type-owned concerns", () => {
@@ -34,11 +37,41 @@ describe("EditorItemSections", () => {
 	});
 
 	it("routes schema issues to the section that owns their top-level field", () => {
-		expect(readEditorItemSectionForPath(["title"])).toBe("identity");
-		expect(readEditorItemSectionForPath(["asset", "default", 0])).toBe("artwork");
-		expect(readEditorItemSectionForPath(["maxStackSize"])).toBe("limits");
-		expect(readEditorItemSectionForPath(["charges", "amount"])).toBe("charges");
-		expect(readEditorItemSectionForPath(["merge", 0])).toBe("merges");
-		expect(readEditorItemSectionForPath(["lines", 1, "output"])).toBe("production");
+		expect(
+			readEditorItemSectionForPath([
+				"title",
+			]),
+		).toBe("identity");
+		expect(
+			readEditorItemSectionForPath([
+				"asset",
+				"default",
+				0,
+			]),
+		).toBe("artwork");
+		expect(
+			readEditorItemSectionForPath([
+				"maxStackSize",
+			]),
+		).toBe("limits");
+		expect(
+			readEditorItemSectionForPath([
+				"charges",
+				"amount",
+			]),
+		).toBe("charges");
+		expect(
+			readEditorItemSectionForPath([
+				"merge",
+				0,
+			]),
+		).toBe("merges");
+		expect(
+			readEditorItemSectionForPath([
+				"lines",
+				1,
+				"output",
+			]),
+		).toBe("production");
 	});
 });

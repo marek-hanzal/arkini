@@ -19,8 +19,7 @@ export const EditorProjectWriteSchema = z
 	.strict()
 	.meta({
 		id: "EditorProjectWriteSchema",
-		description:
-			"A revision-guarded editor project commit that also updates editor.json.",
+		description: "A revision-guarded editor project commit that also updates editor.json.",
 	});
 
 export type EditorProjectWrite = z.infer<typeof EditorProjectWriteSchema>;

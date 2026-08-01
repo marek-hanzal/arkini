@@ -36,8 +36,8 @@ describe("EditorItemFormSchema", () => {
 
 		expect(parsed.success).toBe(false);
 		if (parsed.success) return;
-		expect(
-			parsed.error.issues.some((issue) => issue.path.join(".") === "maxStackSize"),
-		).toBe(true);
+		expect(parsed.error.issues.some((issue) => issue.path.join(".") === "maxStackSize")).toBe(
+			true,
+		);
 	});
 });

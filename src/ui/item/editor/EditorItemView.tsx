@@ -1,5 +1,6 @@
 import { useEditorProject } from "~/bridge/editor/useEditorProject";
 import { ButtonLink, PrimaryButtonLink } from "~/ui/button/Button";
+import { EditorItemNotFound } from "~/ui/item/editor/EditorItemNotFound";
 import { EditorItemThumbnail } from "~/ui/item/editor/EditorItemThumbnail";
 import { useEditorItemByUid } from "~/ui/item/editor/useEditorItemByUid";
 
@@ -7,25 +8,7 @@ import { useEditorItemByUid } from "~/ui/item/editor/useEditorItemByUid";
 export const EditorItemView = ({ uid }: { readonly uid: string }) => {
 	const project = useEditorProject();
 	const item = useEditorItemByUid(uid);
-	if (item === undefined) {
-		return (
-		<section className="grid h-full place-items-center" data-ui="EditorItemNotFound">
-			<div className="max-w-lg rounded-2xl border border-line bg-surface/85 p-6 text-center">
-				<h1 className="text-xl font-semibold">Item not found</h1>
-				<p className="mt-2 text-sm text-muted">
-					No saved item owns UID {uid}.
-				</p>
-				<ButtonLink
-					to="/editor/$projectId/editor/items/list"
-					params={{ projectId: project.projectId }}
-					className="mt-5"
-				>
-					Back to items
-				</ButtonLink>
-			</div>
-		</section>
-		);
-	}
+	if (item === undefined) return <EditorItemNotFound uid={uid} />;
 	return (
 		<section
 			className="grid h-full min-h-0 grid-rows-[auto_minmax(0,1fr)] gap-[var(--ak-viewport-gap)]"
@@ -35,14 +18,19 @@ export const EditorItemView = ({ uid }: { readonly uid: string }) => {
 			<header className="flex min-w-0 flex-wrap items-center gap-3">
 				<ButtonLink
 					to="/editor/$projectId/editor/items/list"
-					params={{ projectId: project.projectId }}
+					params={{
+						projectId: project.projectId,
+					}}
 					className="min-h-0 px-3 py-2"
 					aria-label="Back to items"
 				>
 					<span className="icon-[lucide--arrow-left] size-4" />
 				</ButtonLink>
 				<div className="min-w-0 flex-1">
-					<h1 id="editor-item-view-title" className="truncate text-xl font-semibold">
+					<h1
+						id="editor-item-view-title"
+						className="truncate text-xl font-semibold"
+					>
 						{item.title || item.id}
 					</h1>
 					<p className="mt-1 text-xs uppercase tracking-wider text-muted">{item.type}</p>
@@ -69,19 +57,31 @@ export const EditorItemView = ({ uid }: { readonly uid: string }) => {
 							</p>
 							<dl className="mt-4 grid gap-3 text-sm sm:grid-cols-2">
 								<div>
-									<dt className="text-xs uppercase tracking-wider text-subtle">ID</dt>
-									<dd className="mt-1 break-all font-mono text-foreground">{item.id}</dd>
+									<dt className="text-xs uppercase tracking-wider text-subtle">
+										ID
+									</dt>
+									<dd className="mt-1 break-all font-mono text-foreground">
+										{item.id}
+									</dd>
 								</div>
 								<div>
-									<dt className="text-xs uppercase tracking-wider text-subtle">UID</dt>
-									<dd className="mt-1 break-all font-mono text-foreground">{item.uid}</dd>
+									<dt className="text-xs uppercase tracking-wider text-subtle">
+										UID
+									</dt>
+									<dd className="mt-1 break-all font-mono text-foreground">
+										{item.uid}
+									</dd>
 								</div>
 								<div>
-									<dt className="text-xs uppercase tracking-wider text-subtle">Category</dt>
+									<dt className="text-xs uppercase tracking-wider text-subtle">
+										Category
+									</dt>
 									<dd className="mt-1 text-foreground">{item.categoryId}</dd>
 								</div>
 								<div>
-									<dt className="text-xs uppercase tracking-wider text-subtle">Scope</dt>
+									<dt className="text-xs uppercase tracking-wider text-subtle">
+										Scope
+									</dt>
 									<dd className="mt-1 text-foreground">{item.scope}</dd>
 								</div>
 							</dl>

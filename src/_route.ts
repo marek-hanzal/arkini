@@ -36,27 +36,27 @@ import { Route as GamePackageIdActionExitRouteImport } from "./@routes/game/$pac
 import { Route as GamePackageIdSceneInventoryRouteImport } from "./@routes/game/$packageId/_scene/inventory"
 import { Route as GamePackageIdSceneBoardRouteImport } from "./@routes/game/$packageId/_scene/board"
 import { Route as EditorProjectIdEditorItemsRouteImport } from "./@routes/editor/$projectId/editor/items"
+import { Route as EditorProjectIdEditorItemsNewRouteImport } from "./@routes/editor/$projectId/editor/items/new"
 import { Route as EditorProjectIdEditorItemsListRouteImport } from "./@routes/editor/$projectId/editor/items/list"
 import { Route as EditorProjectIdEditorItemsItemUidRouteImport } from "./@routes/editor/$projectId/editor/items/$itemUid"
-import { Route as EditorProjectIdEditorItemsItemUidCreateRouteImport } from "./@routes/editor/$projectId/editor/items/$itemUid/create"
-import { Route as EditorProjectIdEditorItemsItemUidEditRouteImport } from "./@routes/editor/$projectId/editor/items/$itemUid/edit"
-import { Route as EditorProjectIdEditorItemsItemUidCreateIndexRouteImport } from "./@routes/editor/$projectId/editor/items/$itemUid/create/index"
-import { Route as EditorProjectIdEditorItemsItemUidCreateIdentityRouteImport } from "./@routes/editor/$projectId/editor/items/$itemUid/create/identity"
-import { Route as EditorProjectIdEditorItemsItemUidCreateArtworkRouteImport } from "./@routes/editor/$projectId/editor/items/$itemUid/create/artwork"
-import { Route as EditorProjectIdEditorItemsItemUidCreateLimitsRouteImport } from "./@routes/editor/$projectId/editor/items/$itemUid/create/limits"
-import { Route as EditorProjectIdEditorItemsItemUidCreateChargesRouteImport } from "./@routes/editor/$projectId/editor/items/$itemUid/create/charges"
-import { Route as EditorProjectIdEditorItemsItemUidCreateMergesRouteImport } from "./@routes/editor/$projectId/editor/items/$itemUid/create/merges"
-import { Route as EditorProjectIdEditorItemsItemUidCreateProductionRouteImport } from "./@routes/editor/$projectId/editor/items/$itemUid/create/production"
-import { Route as EditorProjectIdEditorItemsItemUidEditIndexRouteImport } from "./@routes/editor/$projectId/editor/items/$itemUid/edit/index"
-import { Route as EditorProjectIdEditorItemsItemUidEditIdentityRouteImport } from "./@routes/editor/$projectId/editor/items/$itemUid/edit/identity"
-import { Route as EditorProjectIdEditorItemsItemUidEditArtworkRouteImport } from "./@routes/editor/$projectId/editor/items/$itemUid/edit/artwork"
-import { Route as EditorProjectIdEditorItemsItemUidEditLimitsRouteImport } from "./@routes/editor/$projectId/editor/items/$itemUid/edit/limits"
-import { Route as EditorProjectIdEditorItemsItemUidEditChargesRouteImport } from "./@routes/editor/$projectId/editor/items/$itemUid/edit/charges"
-import { Route as EditorProjectIdEditorItemsItemUidEditMergesRouteImport } from "./@routes/editor/$projectId/editor/items/$itemUid/edit/merges"
-import { Route as EditorProjectIdEditorItemsItemUidEditProductionRouteImport } from "./@routes/editor/$projectId/editor/items/$itemUid/edit/production"
-import { Route as EditorProjectIdEditorItemsItemUidViewRouteImport } from "./@routes/editor/$projectId/editor/items/$itemUid/view"
-import { Route as EditorProjectIdEditorItemsNewRouteImport } from "./@routes/editor/$projectId/editor/items/new"
 import { Route as EditorProjectIdEditorItemsNewSelectRouteImport } from "./@routes/editor/$projectId/editor/items/new/select"
+import { Route as EditorProjectIdEditorItemsItemUidViewRouteImport } from "./@routes/editor/$projectId/editor/items/$itemUid/view"
+import { Route as EditorProjectIdEditorItemsItemUidEditRouteImport } from "./@routes/editor/$projectId/editor/items/$itemUid/edit"
+import { Route as EditorProjectIdEditorItemsItemUidCreateRouteImport } from "./@routes/editor/$projectId/editor/items/$itemUid/create"
+import { Route as EditorProjectIdEditorItemsItemUidEditIndexRouteImport } from "./@routes/editor/$projectId/editor/items/$itemUid/edit/index"
+import { Route as EditorProjectIdEditorItemsItemUidCreateIndexRouteImport } from "./@routes/editor/$projectId/editor/items/$itemUid/create/index"
+import { Route as EditorProjectIdEditorItemsItemUidEditProductionRouteImport } from "./@routes/editor/$projectId/editor/items/$itemUid/edit/production"
+import { Route as EditorProjectIdEditorItemsItemUidEditMergesRouteImport } from "./@routes/editor/$projectId/editor/items/$itemUid/edit/merges"
+import { Route as EditorProjectIdEditorItemsItemUidEditLimitsRouteImport } from "./@routes/editor/$projectId/editor/items/$itemUid/edit/limits"
+import { Route as EditorProjectIdEditorItemsItemUidEditIdentityRouteImport } from "./@routes/editor/$projectId/editor/items/$itemUid/edit/identity"
+import { Route as EditorProjectIdEditorItemsItemUidEditChargesRouteImport } from "./@routes/editor/$projectId/editor/items/$itemUid/edit/charges"
+import { Route as EditorProjectIdEditorItemsItemUidEditArtworkRouteImport } from "./@routes/editor/$projectId/editor/items/$itemUid/edit/artwork"
+import { Route as EditorProjectIdEditorItemsItemUidCreateProductionRouteImport } from "./@routes/editor/$projectId/editor/items/$itemUid/create/production"
+import { Route as EditorProjectIdEditorItemsItemUidCreateMergesRouteImport } from "./@routes/editor/$projectId/editor/items/$itemUid/create/merges"
+import { Route as EditorProjectIdEditorItemsItemUidCreateLimitsRouteImport } from "./@routes/editor/$projectId/editor/items/$itemUid/create/limits"
+import { Route as EditorProjectIdEditorItemsItemUidCreateIdentityRouteImport } from "./@routes/editor/$projectId/editor/items/$itemUid/create/identity"
+import { Route as EditorProjectIdEditorItemsItemUidCreateChargesRouteImport } from "./@routes/editor/$projectId/editor/items/$itemUid/create/charges"
+import { Route as EditorProjectIdEditorItemsItemUidCreateArtworkRouteImport } from "./@routes/editor/$projectId/editor/items/$itemUid/create/artwork"
 
 const EditorRoute = EditorRouteImport.update({
   id: "/editor",
@@ -156,445 +156,470 @@ const ActionLoadGamePackageIdRoute = ActionLoadGamePackageIdRouteImport.update({
   path: "/action/load-game/$packageId",
   getParentRoute: () => rootRouteImport,
 } as any)
-const EditorProjectIdEditorIndexRoute = EditorProjectIdEditorIndexRouteImport.update({
-  id: "/",
-  path: "/",
-  getParentRoute: () => EditorProjectIdEditorRoute,
-} as any)
-const GamePackageIdActionResetRoute = GamePackageIdActionResetRouteImport.update({
-  id: "/action/reset",
-  path: "/action/reset",
-  getParentRoute: () => GamePackageIdRoute,
-} as any)
-const GamePackageIdActionLeaveRoute = GamePackageIdActionLeaveRouteImport.update({
-  id: "/action/leave",
-  path: "/action/leave",
-  getParentRoute: () => GamePackageIdRoute,
-} as any)
+const EditorProjectIdEditorIndexRoute =
+  EditorProjectIdEditorIndexRouteImport.update({
+    id: "/",
+    path: "/",
+    getParentRoute: () => EditorProjectIdEditorRoute,
+  } as any)
+const GamePackageIdActionResetRoute =
+  GamePackageIdActionResetRouteImport.update({
+    id: "/action/reset",
+    path: "/action/reset",
+    getParentRoute: () => GamePackageIdRoute,
+  } as any)
+const GamePackageIdActionLeaveRoute =
+  GamePackageIdActionLeaveRouteImport.update({
+    id: "/action/leave",
+    path: "/action/leave",
+    getParentRoute: () => GamePackageIdRoute,
+  } as any)
 const GamePackageIdActionExitRoute = GamePackageIdActionExitRouteImport.update({
   id: "/action/exit",
   path: "/action/exit",
   getParentRoute: () => GamePackageIdRoute,
 } as any)
-const GamePackageIdSceneInventoryRoute = GamePackageIdSceneInventoryRouteImport.update({
-  id: "/inventory",
-  path: "/inventory",
-  getParentRoute: () => GamePackageIdSceneRoute,
-} as any)
+const GamePackageIdSceneInventoryRoute =
+  GamePackageIdSceneInventoryRouteImport.update({
+    id: "/inventory",
+    path: "/inventory",
+    getParentRoute: () => GamePackageIdSceneRoute,
+  } as any)
 const GamePackageIdSceneBoardRoute = GamePackageIdSceneBoardRouteImport.update({
   id: "/board",
   path: "/board",
   getParentRoute: () => GamePackageIdSceneRoute,
 } as any)
-const EditorProjectIdEditorItemsRoute = EditorProjectIdEditorItemsRouteImport.update({
-  id: "/items",
-  path: "/items",
-  getParentRoute: () => EditorProjectIdEditorRoute,
-} as any)
-const EditorProjectIdEditorItemsListRoute = EditorProjectIdEditorItemsListRouteImport.update({
-  id: "/list",
-  path: "/list",
-  getParentRoute: () => EditorProjectIdEditorItemsRoute,
-} as any)
-const EditorProjectIdEditorItemsItemUidRoute = EditorProjectIdEditorItemsItemUidRouteImport.update({
-  id: "/$itemUid",
-  path: "/$itemUid",
-  getParentRoute: () => EditorProjectIdEditorItemsRoute,
-} as any)
-const EditorProjectIdEditorItemsItemUidCreateRoute = EditorProjectIdEditorItemsItemUidCreateRouteImport.update({
-  id: "/create",
-  path: "/create",
-  getParentRoute: () => EditorProjectIdEditorItemsItemUidRoute,
-} as any)
-const EditorProjectIdEditorItemsItemUidEditRoute = EditorProjectIdEditorItemsItemUidEditRouteImport.update({
-  id: "/edit",
-  path: "/edit",
-  getParentRoute: () => EditorProjectIdEditorItemsItemUidRoute,
-} as any)
-
-const EditorProjectIdEditorItemsItemUidCreateIndexRoute = EditorProjectIdEditorItemsItemUidCreateIndexRouteImport.update({
-  id: "/",
-  path: "/",
-  getParentRoute: () => EditorProjectIdEditorItemsItemUidCreateRoute,
-} as any)
-const EditorProjectIdEditorItemsItemUidCreateIdentityRoute = EditorProjectIdEditorItemsItemUidCreateIdentityRouteImport.update({
-  id: "/identity",
-  path: "/identity",
-  getParentRoute: () => EditorProjectIdEditorItemsItemUidCreateRoute,
-} as any)
-const EditorProjectIdEditorItemsItemUidCreateArtworkRoute = EditorProjectIdEditorItemsItemUidCreateArtworkRouteImport.update({
-  id: "/artwork",
-  path: "/artwork",
-  getParentRoute: () => EditorProjectIdEditorItemsItemUidCreateRoute,
-} as any)
-const EditorProjectIdEditorItemsItemUidCreateLimitsRoute = EditorProjectIdEditorItemsItemUidCreateLimitsRouteImport.update({
-  id: "/limits",
-  path: "/limits",
-  getParentRoute: () => EditorProjectIdEditorItemsItemUidCreateRoute,
-} as any)
-const EditorProjectIdEditorItemsItemUidCreateChargesRoute = EditorProjectIdEditorItemsItemUidCreateChargesRouteImport.update({
-  id: "/charges",
-  path: "/charges",
-  getParentRoute: () => EditorProjectIdEditorItemsItemUidCreateRoute,
-} as any)
-const EditorProjectIdEditorItemsItemUidCreateMergesRoute = EditorProjectIdEditorItemsItemUidCreateMergesRouteImport.update({
-  id: "/merges",
-  path: "/merges",
-  getParentRoute: () => EditorProjectIdEditorItemsItemUidCreateRoute,
-} as any)
-const EditorProjectIdEditorItemsItemUidCreateProductionRoute = EditorProjectIdEditorItemsItemUidCreateProductionRouteImport.update({
-  id: "/production",
-  path: "/production",
-  getParentRoute: () => EditorProjectIdEditorItemsItemUidCreateRoute,
-} as any)
-const EditorProjectIdEditorItemsItemUidEditIndexRoute = EditorProjectIdEditorItemsItemUidEditIndexRouteImport.update({
-  id: "/",
-  path: "/",
-  getParentRoute: () => EditorProjectIdEditorItemsItemUidEditRoute,
-} as any)
-const EditorProjectIdEditorItemsItemUidEditIdentityRoute = EditorProjectIdEditorItemsItemUidEditIdentityRouteImport.update({
-  id: "/identity",
-  path: "/identity",
-  getParentRoute: () => EditorProjectIdEditorItemsItemUidEditRoute,
-} as any)
-const EditorProjectIdEditorItemsItemUidEditArtworkRoute = EditorProjectIdEditorItemsItemUidEditArtworkRouteImport.update({
-  id: "/artwork",
-  path: "/artwork",
-  getParentRoute: () => EditorProjectIdEditorItemsItemUidEditRoute,
-} as any)
-const EditorProjectIdEditorItemsItemUidEditLimitsRoute = EditorProjectIdEditorItemsItemUidEditLimitsRouteImport.update({
-  id: "/limits",
-  path: "/limits",
-  getParentRoute: () => EditorProjectIdEditorItemsItemUidEditRoute,
-} as any)
-const EditorProjectIdEditorItemsItemUidEditChargesRoute = EditorProjectIdEditorItemsItemUidEditChargesRouteImport.update({
-  id: "/charges",
-  path: "/charges",
-  getParentRoute: () => EditorProjectIdEditorItemsItemUidEditRoute,
-} as any)
-const EditorProjectIdEditorItemsItemUidEditMergesRoute = EditorProjectIdEditorItemsItemUidEditMergesRouteImport.update({
-  id: "/merges",
-  path: "/merges",
-  getParentRoute: () => EditorProjectIdEditorItemsItemUidEditRoute,
-} as any)
-const EditorProjectIdEditorItemsItemUidEditProductionRoute = EditorProjectIdEditorItemsItemUidEditProductionRouteImport.update({
-  id: "/production",
-  path: "/production",
-  getParentRoute: () => EditorProjectIdEditorItemsItemUidEditRoute,
-} as any)
-const EditorProjectIdEditorItemsItemUidViewRoute = EditorProjectIdEditorItemsItemUidViewRouteImport.update({
-  id: "/view",
-  path: "/view",
-  getParentRoute: () => EditorProjectIdEditorItemsItemUidRoute,
-} as any)
-const EditorProjectIdEditorItemsNewRoute = EditorProjectIdEditorItemsNewRouteImport.update({
-  id: "/new",
-  path: "/new",
-  getParentRoute: () => EditorProjectIdEditorItemsRoute,
-} as any)
-const EditorProjectIdEditorItemsNewSelectRoute = EditorProjectIdEditorItemsNewSelectRouteImport.update({
-  id: "/select",
-  path: "/select",
-  getParentRoute: () => EditorProjectIdEditorItemsNewRoute,
-} as any)
+const EditorProjectIdEditorItemsRoute =
+  EditorProjectIdEditorItemsRouteImport.update({
+    id: "/items",
+    path: "/items",
+    getParentRoute: () => EditorProjectIdEditorRoute,
+  } as any)
+const EditorProjectIdEditorItemsNewRoute =
+  EditorProjectIdEditorItemsNewRouteImport.update({
+    id: "/new",
+    path: "/new",
+    getParentRoute: () => EditorProjectIdEditorItemsRoute,
+  } as any)
+const EditorProjectIdEditorItemsListRoute =
+  EditorProjectIdEditorItemsListRouteImport.update({
+    id: "/list",
+    path: "/list",
+    getParentRoute: () => EditorProjectIdEditorItemsRoute,
+  } as any)
+const EditorProjectIdEditorItemsItemUidRoute =
+  EditorProjectIdEditorItemsItemUidRouteImport.update({
+    id: "/$itemUid",
+    path: "/$itemUid",
+    getParentRoute: () => EditorProjectIdEditorItemsRoute,
+  } as any)
+const EditorProjectIdEditorItemsNewSelectRoute =
+  EditorProjectIdEditorItemsNewSelectRouteImport.update({
+    id: "/select",
+    path: "/select",
+    getParentRoute: () => EditorProjectIdEditorItemsNewRoute,
+  } as any)
+const EditorProjectIdEditorItemsItemUidViewRoute =
+  EditorProjectIdEditorItemsItemUidViewRouteImport.update({
+    id: "/view",
+    path: "/view",
+    getParentRoute: () => EditorProjectIdEditorItemsItemUidRoute,
+  } as any)
+const EditorProjectIdEditorItemsItemUidEditRoute =
+  EditorProjectIdEditorItemsItemUidEditRouteImport.update({
+    id: "/edit",
+    path: "/edit",
+    getParentRoute: () => EditorProjectIdEditorItemsItemUidRoute,
+  } as any)
+const EditorProjectIdEditorItemsItemUidCreateRoute =
+  EditorProjectIdEditorItemsItemUidCreateRouteImport.update({
+    id: "/create",
+    path: "/create",
+    getParentRoute: () => EditorProjectIdEditorItemsItemUidRoute,
+  } as any)
+const EditorProjectIdEditorItemsItemUidEditIndexRoute =
+  EditorProjectIdEditorItemsItemUidEditIndexRouteImport.update({
+    id: "/",
+    path: "/",
+    getParentRoute: () => EditorProjectIdEditorItemsItemUidEditRoute,
+  } as any)
+const EditorProjectIdEditorItemsItemUidCreateIndexRoute =
+  EditorProjectIdEditorItemsItemUidCreateIndexRouteImport.update({
+    id: "/",
+    path: "/",
+    getParentRoute: () => EditorProjectIdEditorItemsItemUidCreateRoute,
+  } as any)
+const EditorProjectIdEditorItemsItemUidEditProductionRoute =
+  EditorProjectIdEditorItemsItemUidEditProductionRouteImport.update({
+    id: "/production",
+    path: "/production",
+    getParentRoute: () => EditorProjectIdEditorItemsItemUidEditRoute,
+  } as any)
+const EditorProjectIdEditorItemsItemUidEditMergesRoute =
+  EditorProjectIdEditorItemsItemUidEditMergesRouteImport.update({
+    id: "/merges",
+    path: "/merges",
+    getParentRoute: () => EditorProjectIdEditorItemsItemUidEditRoute,
+  } as any)
+const EditorProjectIdEditorItemsItemUidEditLimitsRoute =
+  EditorProjectIdEditorItemsItemUidEditLimitsRouteImport.update({
+    id: "/limits",
+    path: "/limits",
+    getParentRoute: () => EditorProjectIdEditorItemsItemUidEditRoute,
+  } as any)
+const EditorProjectIdEditorItemsItemUidEditIdentityRoute =
+  EditorProjectIdEditorItemsItemUidEditIdentityRouteImport.update({
+    id: "/identity",
+    path: "/identity",
+    getParentRoute: () => EditorProjectIdEditorItemsItemUidEditRoute,
+  } as any)
+const EditorProjectIdEditorItemsItemUidEditChargesRoute =
+  EditorProjectIdEditorItemsItemUidEditChargesRouteImport.update({
+    id: "/charges",
+    path: "/charges",
+    getParentRoute: () => EditorProjectIdEditorItemsItemUidEditRoute,
+  } as any)
+const EditorProjectIdEditorItemsItemUidEditArtworkRoute =
+  EditorProjectIdEditorItemsItemUidEditArtworkRouteImport.update({
+    id: "/artwork",
+    path: "/artwork",
+    getParentRoute: () => EditorProjectIdEditorItemsItemUidEditRoute,
+  } as any)
+const EditorProjectIdEditorItemsItemUidCreateProductionRoute =
+  EditorProjectIdEditorItemsItemUidCreateProductionRouteImport.update({
+    id: "/production",
+    path: "/production",
+    getParentRoute: () => EditorProjectIdEditorItemsItemUidCreateRoute,
+  } as any)
+const EditorProjectIdEditorItemsItemUidCreateMergesRoute =
+  EditorProjectIdEditorItemsItemUidCreateMergesRouteImport.update({
+    id: "/merges",
+    path: "/merges",
+    getParentRoute: () => EditorProjectIdEditorItemsItemUidCreateRoute,
+  } as any)
+const EditorProjectIdEditorItemsItemUidCreateLimitsRoute =
+  EditorProjectIdEditorItemsItemUidCreateLimitsRouteImport.update({
+    id: "/limits",
+    path: "/limits",
+    getParentRoute: () => EditorProjectIdEditorItemsItemUidCreateRoute,
+  } as any)
+const EditorProjectIdEditorItemsItemUidCreateIdentityRoute =
+  EditorProjectIdEditorItemsItemUidCreateIdentityRouteImport.update({
+    id: "/identity",
+    path: "/identity",
+    getParentRoute: () => EditorProjectIdEditorItemsItemUidCreateRoute,
+  } as any)
+const EditorProjectIdEditorItemsItemUidCreateChargesRoute =
+  EditorProjectIdEditorItemsItemUidCreateChargesRouteImport.update({
+    id: "/charges",
+    path: "/charges",
+    getParentRoute: () => EditorProjectIdEditorItemsItemUidCreateRoute,
+  } as any)
+const EditorProjectIdEditorItemsItemUidCreateArtworkRoute =
+  EditorProjectIdEditorItemsItemUidCreateArtworkRouteImport.update({
+    id: "/artwork",
+    path: "/artwork",
+    getParentRoute: () => EditorProjectIdEditorItemsItemUidCreateRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
-  "/editor": typeof EditorRouteWithChildren
   "/": typeof IndexRoute
-  "/game/$packageId": typeof GamePackageIdRouteWithChildren
-  "/editor/welcome": typeof EditorWelcomeRoute
-  "/editor/$projectId": typeof EditorProjectIdRouteWithChildren
-  "/action/recover-game-save": typeof ActionRecoverGameSaveRoute
-  "/action/discard-failed-game": typeof ActionDiscardFailedGameRoute
-  "/settings": typeof LauncherSettingsRoute
-  "/main-menu": typeof LauncherMainMenuRoute
-  "/arkpacks": typeof LauncherArkpacksRoute
+  "/editor": typeof EditorRouteWithChildren
   "/about": typeof LauncherAboutRoute
-  "/game/$packageId/cheats": typeof GamePackageIdCheatsRoute
-  "/editor/$projectId/project": typeof EditorProjectIdProjectRoute
-  "/editor/$projectId/editor": typeof EditorProjectIdEditorRouteWithChildren
-  "/editor/$projectId/build": typeof EditorProjectIdBuildRoute
-  "/editor/$projectId/board": typeof EditorProjectIdBoardRoute
-  "/editor/$projectId/assets": typeof EditorProjectIdAssetsRoute
+  "/arkpacks": typeof LauncherArkpacksRoute
+  "/main-menu": typeof LauncherMainMenuRoute
+  "/settings": typeof LauncherSettingsRoute
+  "/action/discard-failed-game": typeof ActionDiscardFailedGameRoute
+  "/action/recover-game-save": typeof ActionRecoverGameSaveRoute
+  "/editor/$projectId": typeof EditorProjectIdRouteWithChildren
+  "/editor/welcome": typeof EditorWelcomeRoute
+  "/game/$packageId": typeof GamePackageIdRouteWithChildren
   "/action/load-game/$packageId": typeof ActionLoadGamePackageIdRoute
-  "/editor/$projectId/editor/": typeof EditorProjectIdEditorIndexRoute
-  "/game/$packageId/action/reset": typeof GamePackageIdActionResetRoute
-  "/game/$packageId/action/leave": typeof GamePackageIdActionLeaveRoute
-  "/game/$packageId/action/exit": typeof GamePackageIdActionExitRoute
-  "/game/$packageId/inventory": typeof GamePackageIdSceneInventoryRoute
-  "/game/$packageId/board": typeof GamePackageIdSceneBoardRoute
+  "/editor/$projectId/assets": typeof EditorProjectIdAssetsRoute
+  "/editor/$projectId/board": typeof EditorProjectIdBoardRoute
+  "/editor/$projectId/build": typeof EditorProjectIdBuildRoute
+  "/editor/$projectId/editor": typeof EditorProjectIdEditorRouteWithChildren
+  "/editor/$projectId/project": typeof EditorProjectIdProjectRoute
+  "/game/$packageId/cheats": typeof GamePackageIdCheatsRoute
   "/editor/$projectId/editor/items": typeof EditorProjectIdEditorItemsRouteWithChildren
-  "/editor/$projectId/editor/items/list": typeof EditorProjectIdEditorItemsListRoute
+  "/game/$packageId/board": typeof GamePackageIdSceneBoardRoute
+  "/game/$packageId/inventory": typeof GamePackageIdSceneInventoryRoute
+  "/game/$packageId/action/exit": typeof GamePackageIdActionExitRoute
+  "/game/$packageId/action/leave": typeof GamePackageIdActionLeaveRoute
+  "/game/$packageId/action/reset": typeof GamePackageIdActionResetRoute
+  "/editor/$projectId/editor/": typeof EditorProjectIdEditorIndexRoute
   "/editor/$projectId/editor/items/$itemUid": typeof EditorProjectIdEditorItemsItemUidRouteWithChildren
+  "/editor/$projectId/editor/items/list": typeof EditorProjectIdEditorItemsListRoute
+  "/editor/$projectId/editor/items/new": typeof EditorProjectIdEditorItemsNewRouteWithChildren
   "/editor/$projectId/editor/items/$itemUid/create": typeof EditorProjectIdEditorItemsItemUidCreateRouteWithChildren
   "/editor/$projectId/editor/items/$itemUid/edit": typeof EditorProjectIdEditorItemsItemUidEditRouteWithChildren
-  "/editor/$projectId/editor/items/$itemUid/create/": typeof EditorProjectIdEditorItemsItemUidCreateIndexRoute
-  "/editor/$projectId/editor/items/$itemUid/create/identity": typeof EditorProjectIdEditorItemsItemUidCreateIdentityRoute
+  "/editor/$projectId/editor/items/$itemUid/view": typeof EditorProjectIdEditorItemsItemUidViewRoute
+  "/editor/$projectId/editor/items/new/select": typeof EditorProjectIdEditorItemsNewSelectRoute
   "/editor/$projectId/editor/items/$itemUid/create/artwork": typeof EditorProjectIdEditorItemsItemUidCreateArtworkRoute
-  "/editor/$projectId/editor/items/$itemUid/create/limits": typeof EditorProjectIdEditorItemsItemUidCreateLimitsRoute
   "/editor/$projectId/editor/items/$itemUid/create/charges": typeof EditorProjectIdEditorItemsItemUidCreateChargesRoute
+  "/editor/$projectId/editor/items/$itemUid/create/identity": typeof EditorProjectIdEditorItemsItemUidCreateIdentityRoute
+  "/editor/$projectId/editor/items/$itemUid/create/limits": typeof EditorProjectIdEditorItemsItemUidCreateLimitsRoute
   "/editor/$projectId/editor/items/$itemUid/create/merges": typeof EditorProjectIdEditorItemsItemUidCreateMergesRoute
   "/editor/$projectId/editor/items/$itemUid/create/production": typeof EditorProjectIdEditorItemsItemUidCreateProductionRoute
-  "/editor/$projectId/editor/items/$itemUid/edit/": typeof EditorProjectIdEditorItemsItemUidEditIndexRoute
-  "/editor/$projectId/editor/items/$itemUid/edit/identity": typeof EditorProjectIdEditorItemsItemUidEditIdentityRoute
   "/editor/$projectId/editor/items/$itemUid/edit/artwork": typeof EditorProjectIdEditorItemsItemUidEditArtworkRoute
-  "/editor/$projectId/editor/items/$itemUid/edit/limits": typeof EditorProjectIdEditorItemsItemUidEditLimitsRoute
   "/editor/$projectId/editor/items/$itemUid/edit/charges": typeof EditorProjectIdEditorItemsItemUidEditChargesRoute
+  "/editor/$projectId/editor/items/$itemUid/edit/identity": typeof EditorProjectIdEditorItemsItemUidEditIdentityRoute
+  "/editor/$projectId/editor/items/$itemUid/edit/limits": typeof EditorProjectIdEditorItemsItemUidEditLimitsRoute
   "/editor/$projectId/editor/items/$itemUid/edit/merges": typeof EditorProjectIdEditorItemsItemUidEditMergesRoute
   "/editor/$projectId/editor/items/$itemUid/edit/production": typeof EditorProjectIdEditorItemsItemUidEditProductionRoute
-  "/editor/$projectId/editor/items/$itemUid/view": typeof EditorProjectIdEditorItemsItemUidViewRoute
-  "/editor/$projectId/editor/items/new": typeof EditorProjectIdEditorItemsNewRouteWithChildren
-  "/editor/$projectId/editor/items/new/select": typeof EditorProjectIdEditorItemsNewSelectRoute
+  "/editor/$projectId/editor/items/$itemUid/create/": typeof EditorProjectIdEditorItemsItemUidCreateIndexRoute
+  "/editor/$projectId/editor/items/$itemUid/edit/": typeof EditorProjectIdEditorItemsItemUidEditIndexRoute
 }
 export interface FileRoutesByTo {
-  "/editor": typeof EditorRouteWithChildren
   "/": typeof IndexRoute
-  "/game/$packageId": typeof GamePackageIdRouteWithChildren
-  "/editor/welcome": typeof EditorWelcomeRoute
-  "/editor/$projectId": typeof EditorProjectIdRouteWithChildren
-  "/action/recover-game-save": typeof ActionRecoverGameSaveRoute
-  "/action/discard-failed-game": typeof ActionDiscardFailedGameRoute
-  "/settings": typeof LauncherSettingsRoute
-  "/main-menu": typeof LauncherMainMenuRoute
-  "/arkpacks": typeof LauncherArkpacksRoute
+  "/editor": typeof EditorRouteWithChildren
   "/about": typeof LauncherAboutRoute
-  "/game/$packageId/cheats": typeof GamePackageIdCheatsRoute
-  "/editor/$projectId/project": typeof EditorProjectIdProjectRoute
-  "/editor/$projectId/build": typeof EditorProjectIdBuildRoute
-  "/editor/$projectId/board": typeof EditorProjectIdBoardRoute
-  "/editor/$projectId/assets": typeof EditorProjectIdAssetsRoute
+  "/arkpacks": typeof LauncherArkpacksRoute
+  "/main-menu": typeof LauncherMainMenuRoute
+  "/settings": typeof LauncherSettingsRoute
+  "/action/discard-failed-game": typeof ActionDiscardFailedGameRoute
+  "/action/recover-game-save": typeof ActionRecoverGameSaveRoute
+  "/editor/$projectId": typeof EditorProjectIdRouteWithChildren
+  "/editor/welcome": typeof EditorWelcomeRoute
+  "/game/$packageId": typeof GamePackageIdRouteWithChildren
   "/action/load-game/$packageId": typeof ActionLoadGamePackageIdRoute
-  "/editor/$projectId/editor": typeof EditorProjectIdEditorIndexRoute
-  "/game/$packageId/action/reset": typeof GamePackageIdActionResetRoute
-  "/game/$packageId/action/leave": typeof GamePackageIdActionLeaveRoute
-  "/game/$packageId/action/exit": typeof GamePackageIdActionExitRoute
-  "/game/$packageId/inventory": typeof GamePackageIdSceneInventoryRoute
-  "/game/$packageId/board": typeof GamePackageIdSceneBoardRoute
+  "/editor/$projectId/assets": typeof EditorProjectIdAssetsRoute
+  "/editor/$projectId/board": typeof EditorProjectIdBoardRoute
+  "/editor/$projectId/build": typeof EditorProjectIdBuildRoute
+  "/editor/$projectId/project": typeof EditorProjectIdProjectRoute
+  "/game/$packageId/cheats": typeof GamePackageIdCheatsRoute
   "/editor/$projectId/editor/items": typeof EditorProjectIdEditorItemsRouteWithChildren
-  "/editor/$projectId/editor/items/list": typeof EditorProjectIdEditorItemsListRoute
+  "/game/$packageId/board": typeof GamePackageIdSceneBoardRoute
+  "/game/$packageId/inventory": typeof GamePackageIdSceneInventoryRoute
+  "/game/$packageId/action/exit": typeof GamePackageIdActionExitRoute
+  "/game/$packageId/action/leave": typeof GamePackageIdActionLeaveRoute
+  "/game/$packageId/action/reset": typeof GamePackageIdActionResetRoute
+  "/editor/$projectId/editor": typeof EditorProjectIdEditorIndexRoute
   "/editor/$projectId/editor/items/$itemUid": typeof EditorProjectIdEditorItemsItemUidRouteWithChildren
-  "/editor/$projectId/editor/items/$itemUid/create": typeof EditorProjectIdEditorItemsItemUidCreateIndexRoute
-  "/editor/$projectId/editor/items/$itemUid/edit": typeof EditorProjectIdEditorItemsItemUidEditIndexRoute
-  "/editor/$projectId/editor/items/$itemUid/create/identity": typeof EditorProjectIdEditorItemsItemUidCreateIdentityRoute
+  "/editor/$projectId/editor/items/list": typeof EditorProjectIdEditorItemsListRoute
+  "/editor/$projectId/editor/items/new": typeof EditorProjectIdEditorItemsNewRouteWithChildren
+  "/editor/$projectId/editor/items/$itemUid/view": typeof EditorProjectIdEditorItemsItemUidViewRoute
+  "/editor/$projectId/editor/items/new/select": typeof EditorProjectIdEditorItemsNewSelectRoute
   "/editor/$projectId/editor/items/$itemUid/create/artwork": typeof EditorProjectIdEditorItemsItemUidCreateArtworkRoute
-  "/editor/$projectId/editor/items/$itemUid/create/limits": typeof EditorProjectIdEditorItemsItemUidCreateLimitsRoute
   "/editor/$projectId/editor/items/$itemUid/create/charges": typeof EditorProjectIdEditorItemsItemUidCreateChargesRoute
+  "/editor/$projectId/editor/items/$itemUid/create/identity": typeof EditorProjectIdEditorItemsItemUidCreateIdentityRoute
+  "/editor/$projectId/editor/items/$itemUid/create/limits": typeof EditorProjectIdEditorItemsItemUidCreateLimitsRoute
   "/editor/$projectId/editor/items/$itemUid/create/merges": typeof EditorProjectIdEditorItemsItemUidCreateMergesRoute
   "/editor/$projectId/editor/items/$itemUid/create/production": typeof EditorProjectIdEditorItemsItemUidCreateProductionRoute
-  "/editor/$projectId/editor/items/$itemUid/edit/identity": typeof EditorProjectIdEditorItemsItemUidEditIdentityRoute
   "/editor/$projectId/editor/items/$itemUid/edit/artwork": typeof EditorProjectIdEditorItemsItemUidEditArtworkRoute
-  "/editor/$projectId/editor/items/$itemUid/edit/limits": typeof EditorProjectIdEditorItemsItemUidEditLimitsRoute
   "/editor/$projectId/editor/items/$itemUid/edit/charges": typeof EditorProjectIdEditorItemsItemUidEditChargesRoute
+  "/editor/$projectId/editor/items/$itemUid/edit/identity": typeof EditorProjectIdEditorItemsItemUidEditIdentityRoute
+  "/editor/$projectId/editor/items/$itemUid/edit/limits": typeof EditorProjectIdEditorItemsItemUidEditLimitsRoute
   "/editor/$projectId/editor/items/$itemUid/edit/merges": typeof EditorProjectIdEditorItemsItemUidEditMergesRoute
   "/editor/$projectId/editor/items/$itemUid/edit/production": typeof EditorProjectIdEditorItemsItemUidEditProductionRoute
-  "/editor/$projectId/editor/items/$itemUid/view": typeof EditorProjectIdEditorItemsItemUidViewRoute
-  "/editor/$projectId/editor/items/new": typeof EditorProjectIdEditorItemsNewRouteWithChildren
-  "/editor/$projectId/editor/items/new/select": typeof EditorProjectIdEditorItemsNewSelectRoute
+  "/editor/$projectId/editor/items/$itemUid/create": typeof EditorProjectIdEditorItemsItemUidCreateIndexRoute
+  "/editor/$projectId/editor/items/$itemUid/edit": typeof EditorProjectIdEditorItemsItemUidEditIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  "/editor": typeof EditorRouteWithChildren
-  "/_launcher": typeof LauncherRouteWithChildren
   "/": typeof IndexRoute
-  "/game/$packageId": typeof GamePackageIdRouteWithChildren
-  "/editor/welcome": typeof EditorWelcomeRoute
-  "/editor/$projectId": typeof EditorProjectIdRouteWithChildren
-  "/action/recover-game-save": typeof ActionRecoverGameSaveRoute
-  "/action/discard-failed-game": typeof ActionDiscardFailedGameRoute
-  "/_launcher/settings": typeof LauncherSettingsRoute
-  "/_launcher/main-menu": typeof LauncherMainMenuRoute
-  "/_launcher/arkpacks": typeof LauncherArkpacksRoute
+  "/_launcher": typeof LauncherRouteWithChildren
+  "/editor": typeof EditorRouteWithChildren
   "/_launcher/about": typeof LauncherAboutRoute
-  "/game/$packageId/cheats": typeof GamePackageIdCheatsRoute
-  "/game/$packageId/_scene": typeof GamePackageIdSceneRouteWithChildren
-  "/editor/$projectId/project": typeof EditorProjectIdProjectRoute
-  "/editor/$projectId/editor": typeof EditorProjectIdEditorRouteWithChildren
-  "/editor/$projectId/build": typeof EditorProjectIdBuildRoute
-  "/editor/$projectId/board": typeof EditorProjectIdBoardRoute
-  "/editor/$projectId/assets": typeof EditorProjectIdAssetsRoute
+  "/_launcher/arkpacks": typeof LauncherArkpacksRoute
+  "/_launcher/main-menu": typeof LauncherMainMenuRoute
+  "/_launcher/settings": typeof LauncherSettingsRoute
+  "/action/discard-failed-game": typeof ActionDiscardFailedGameRoute
+  "/action/recover-game-save": typeof ActionRecoverGameSaveRoute
+  "/editor/$projectId": typeof EditorProjectIdRouteWithChildren
+  "/editor/welcome": typeof EditorWelcomeRoute
+  "/game/$packageId": typeof GamePackageIdRouteWithChildren
   "/action/load-game/$packageId": typeof ActionLoadGamePackageIdRoute
-  "/editor/$projectId/editor/": typeof EditorProjectIdEditorIndexRoute
-  "/game/$packageId/action/reset": typeof GamePackageIdActionResetRoute
-  "/game/$packageId/action/leave": typeof GamePackageIdActionLeaveRoute
-  "/game/$packageId/action/exit": typeof GamePackageIdActionExitRoute
-  "/game/$packageId/_scene/inventory": typeof GamePackageIdSceneInventoryRoute
-  "/game/$packageId/_scene/board": typeof GamePackageIdSceneBoardRoute
+  "/editor/$projectId/assets": typeof EditorProjectIdAssetsRoute
+  "/editor/$projectId/board": typeof EditorProjectIdBoardRoute
+  "/editor/$projectId/build": typeof EditorProjectIdBuildRoute
+  "/editor/$projectId/editor": typeof EditorProjectIdEditorRouteWithChildren
+  "/editor/$projectId/project": typeof EditorProjectIdProjectRoute
+  "/game/$packageId/_scene": typeof GamePackageIdSceneRouteWithChildren
+  "/game/$packageId/cheats": typeof GamePackageIdCheatsRoute
   "/editor/$projectId/editor/items": typeof EditorProjectIdEditorItemsRouteWithChildren
-  "/editor/$projectId/editor/items/list": typeof EditorProjectIdEditorItemsListRoute
+  "/game/$packageId/_scene/board": typeof GamePackageIdSceneBoardRoute
+  "/game/$packageId/_scene/inventory": typeof GamePackageIdSceneInventoryRoute
+  "/game/$packageId/action/exit": typeof GamePackageIdActionExitRoute
+  "/game/$packageId/action/leave": typeof GamePackageIdActionLeaveRoute
+  "/game/$packageId/action/reset": typeof GamePackageIdActionResetRoute
+  "/editor/$projectId/editor/": typeof EditorProjectIdEditorIndexRoute
   "/editor/$projectId/editor/items/$itemUid": typeof EditorProjectIdEditorItemsItemUidRouteWithChildren
+  "/editor/$projectId/editor/items/list": typeof EditorProjectIdEditorItemsListRoute
+  "/editor/$projectId/editor/items/new": typeof EditorProjectIdEditorItemsNewRouteWithChildren
   "/editor/$projectId/editor/items/$itemUid/create": typeof EditorProjectIdEditorItemsItemUidCreateRouteWithChildren
   "/editor/$projectId/editor/items/$itemUid/edit": typeof EditorProjectIdEditorItemsItemUidEditRouteWithChildren
-  "/editor/$projectId/editor/items/$itemUid/create/": typeof EditorProjectIdEditorItemsItemUidCreateIndexRoute
-  "/editor/$projectId/editor/items/$itemUid/create/identity": typeof EditorProjectIdEditorItemsItemUidCreateIdentityRoute
+  "/editor/$projectId/editor/items/$itemUid/view": typeof EditorProjectIdEditorItemsItemUidViewRoute
+  "/editor/$projectId/editor/items/new/select": typeof EditorProjectIdEditorItemsNewSelectRoute
   "/editor/$projectId/editor/items/$itemUid/create/artwork": typeof EditorProjectIdEditorItemsItemUidCreateArtworkRoute
-  "/editor/$projectId/editor/items/$itemUid/create/limits": typeof EditorProjectIdEditorItemsItemUidCreateLimitsRoute
   "/editor/$projectId/editor/items/$itemUid/create/charges": typeof EditorProjectIdEditorItemsItemUidCreateChargesRoute
+  "/editor/$projectId/editor/items/$itemUid/create/identity": typeof EditorProjectIdEditorItemsItemUidCreateIdentityRoute
+  "/editor/$projectId/editor/items/$itemUid/create/limits": typeof EditorProjectIdEditorItemsItemUidCreateLimitsRoute
   "/editor/$projectId/editor/items/$itemUid/create/merges": typeof EditorProjectIdEditorItemsItemUidCreateMergesRoute
   "/editor/$projectId/editor/items/$itemUid/create/production": typeof EditorProjectIdEditorItemsItemUidCreateProductionRoute
-  "/editor/$projectId/editor/items/$itemUid/edit/": typeof EditorProjectIdEditorItemsItemUidEditIndexRoute
-  "/editor/$projectId/editor/items/$itemUid/edit/identity": typeof EditorProjectIdEditorItemsItemUidEditIdentityRoute
   "/editor/$projectId/editor/items/$itemUid/edit/artwork": typeof EditorProjectIdEditorItemsItemUidEditArtworkRoute
-  "/editor/$projectId/editor/items/$itemUid/edit/limits": typeof EditorProjectIdEditorItemsItemUidEditLimitsRoute
   "/editor/$projectId/editor/items/$itemUid/edit/charges": typeof EditorProjectIdEditorItemsItemUidEditChargesRoute
+  "/editor/$projectId/editor/items/$itemUid/edit/identity": typeof EditorProjectIdEditorItemsItemUidEditIdentityRoute
+  "/editor/$projectId/editor/items/$itemUid/edit/limits": typeof EditorProjectIdEditorItemsItemUidEditLimitsRoute
   "/editor/$projectId/editor/items/$itemUid/edit/merges": typeof EditorProjectIdEditorItemsItemUidEditMergesRoute
   "/editor/$projectId/editor/items/$itemUid/edit/production": typeof EditorProjectIdEditorItemsItemUidEditProductionRoute
-  "/editor/$projectId/editor/items/$itemUid/view": typeof EditorProjectIdEditorItemsItemUidViewRoute
-  "/editor/$projectId/editor/items/new": typeof EditorProjectIdEditorItemsNewRouteWithChildren
-  "/editor/$projectId/editor/items/new/select": typeof EditorProjectIdEditorItemsNewSelectRoute
+  "/editor/$projectId/editor/items/$itemUid/create/": typeof EditorProjectIdEditorItemsItemUidCreateIndexRoute
+  "/editor/$projectId/editor/items/$itemUid/edit/": typeof EditorProjectIdEditorItemsItemUidEditIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    | "/editor"
     | "/"
-    | "/game/$packageId"
-    | "/editor/welcome"
-    | "/editor/$projectId"
-    | "/action/recover-game-save"
-    | "/action/discard-failed-game"
-    | "/settings"
-    | "/main-menu"
-    | "/arkpacks"
+    | "/editor"
     | "/about"
-    | "/game/$packageId/cheats"
-    | "/editor/$projectId/project"
-    | "/editor/$projectId/editor"
-    | "/editor/$projectId/build"
-    | "/editor/$projectId/board"
-    | "/editor/$projectId/assets"
+    | "/arkpacks"
+    | "/main-menu"
+    | "/settings"
+    | "/action/discard-failed-game"
+    | "/action/recover-game-save"
+    | "/editor/$projectId"
+    | "/editor/welcome"
+    | "/game/$packageId"
     | "/action/load-game/$packageId"
-    | "/editor/$projectId/editor/"
-    | "/game/$packageId/action/reset"
-    | "/game/$packageId/action/leave"
-    | "/game/$packageId/action/exit"
-    | "/game/$packageId/inventory"
-    | "/game/$packageId/board"
+    | "/editor/$projectId/assets"
+    | "/editor/$projectId/board"
+    | "/editor/$projectId/build"
+    | "/editor/$projectId/editor"
+    | "/editor/$projectId/project"
+    | "/game/$packageId/cheats"
     | "/editor/$projectId/editor/items"
-    | "/editor/$projectId/editor/items/list"
+    | "/game/$packageId/board"
+    | "/game/$packageId/inventory"
+    | "/game/$packageId/action/exit"
+    | "/game/$packageId/action/leave"
+    | "/game/$packageId/action/reset"
+    | "/editor/$projectId/editor/"
     | "/editor/$projectId/editor/items/$itemUid"
+    | "/editor/$projectId/editor/items/list"
+    | "/editor/$projectId/editor/items/new"
     | "/editor/$projectId/editor/items/$itemUid/create"
     | "/editor/$projectId/editor/items/$itemUid/edit"
-    | "/editor/$projectId/editor/items/$itemUid/create/"
-    | "/editor/$projectId/editor/items/$itemUid/create/identity"
+    | "/editor/$projectId/editor/items/$itemUid/view"
+    | "/editor/$projectId/editor/items/new/select"
     | "/editor/$projectId/editor/items/$itemUid/create/artwork"
-    | "/editor/$projectId/editor/items/$itemUid/create/limits"
     | "/editor/$projectId/editor/items/$itemUid/create/charges"
+    | "/editor/$projectId/editor/items/$itemUid/create/identity"
+    | "/editor/$projectId/editor/items/$itemUid/create/limits"
     | "/editor/$projectId/editor/items/$itemUid/create/merges"
     | "/editor/$projectId/editor/items/$itemUid/create/production"
-    | "/editor/$projectId/editor/items/$itemUid/edit/"
-    | "/editor/$projectId/editor/items/$itemUid/edit/identity"
     | "/editor/$projectId/editor/items/$itemUid/edit/artwork"
-    | "/editor/$projectId/editor/items/$itemUid/edit/limits"
     | "/editor/$projectId/editor/items/$itemUid/edit/charges"
+    | "/editor/$projectId/editor/items/$itemUid/edit/identity"
+    | "/editor/$projectId/editor/items/$itemUid/edit/limits"
     | "/editor/$projectId/editor/items/$itemUid/edit/merges"
     | "/editor/$projectId/editor/items/$itemUid/edit/production"
-    | "/editor/$projectId/editor/items/$itemUid/view"
-    | "/editor/$projectId/editor/items/new"
-    | "/editor/$projectId/editor/items/new/select"
+    | "/editor/$projectId/editor/items/$itemUid/create/"
+    | "/editor/$projectId/editor/items/$itemUid/edit/"
   fileRoutesByTo: FileRoutesByTo
   to:
-    | "/editor"
     | "/"
-    | "/game/$packageId"
-    | "/editor/welcome"
-    | "/editor/$projectId"
-    | "/action/recover-game-save"
-    | "/action/discard-failed-game"
-    | "/settings"
-    | "/main-menu"
-    | "/arkpacks"
+    | "/editor"
     | "/about"
-    | "/game/$packageId/cheats"
-    | "/editor/$projectId/project"
-    | "/editor/$projectId/build"
-    | "/editor/$projectId/board"
-    | "/editor/$projectId/assets"
+    | "/arkpacks"
+    | "/main-menu"
+    | "/settings"
+    | "/action/discard-failed-game"
+    | "/action/recover-game-save"
+    | "/editor/$projectId"
+    | "/editor/welcome"
+    | "/game/$packageId"
     | "/action/load-game/$packageId"
-    | "/editor/$projectId/editor"
-    | "/game/$packageId/action/reset"
-    | "/game/$packageId/action/leave"
-    | "/game/$packageId/action/exit"
-    | "/game/$packageId/inventory"
-    | "/game/$packageId/board"
+    | "/editor/$projectId/assets"
+    | "/editor/$projectId/board"
+    | "/editor/$projectId/build"
+    | "/editor/$projectId/project"
+    | "/game/$packageId/cheats"
     | "/editor/$projectId/editor/items"
-    | "/editor/$projectId/editor/items/list"
+    | "/game/$packageId/board"
+    | "/game/$packageId/inventory"
+    | "/game/$packageId/action/exit"
+    | "/game/$packageId/action/leave"
+    | "/game/$packageId/action/reset"
+    | "/editor/$projectId/editor"
     | "/editor/$projectId/editor/items/$itemUid"
-    | "/editor/$projectId/editor/items/$itemUid/create"
-    | "/editor/$projectId/editor/items/$itemUid/edit"
-    | "/editor/$projectId/editor/items/$itemUid/create/identity"
+    | "/editor/$projectId/editor/items/list"
+    | "/editor/$projectId/editor/items/new"
+    | "/editor/$projectId/editor/items/$itemUid/view"
+    | "/editor/$projectId/editor/items/new/select"
     | "/editor/$projectId/editor/items/$itemUid/create/artwork"
-    | "/editor/$projectId/editor/items/$itemUid/create/limits"
     | "/editor/$projectId/editor/items/$itemUid/create/charges"
+    | "/editor/$projectId/editor/items/$itemUid/create/identity"
+    | "/editor/$projectId/editor/items/$itemUid/create/limits"
     | "/editor/$projectId/editor/items/$itemUid/create/merges"
     | "/editor/$projectId/editor/items/$itemUid/create/production"
-    | "/editor/$projectId/editor/items/$itemUid/edit/identity"
     | "/editor/$projectId/editor/items/$itemUid/edit/artwork"
-    | "/editor/$projectId/editor/items/$itemUid/edit/limits"
     | "/editor/$projectId/editor/items/$itemUid/edit/charges"
+    | "/editor/$projectId/editor/items/$itemUid/edit/identity"
+    | "/editor/$projectId/editor/items/$itemUid/edit/limits"
     | "/editor/$projectId/editor/items/$itemUid/edit/merges"
     | "/editor/$projectId/editor/items/$itemUid/edit/production"
-    | "/editor/$projectId/editor/items/$itemUid/view"
-    | "/editor/$projectId/editor/items/new"
-    | "/editor/$projectId/editor/items/new/select"
+    | "/editor/$projectId/editor/items/$itemUid/create"
+    | "/editor/$projectId/editor/items/$itemUid/edit"
   id:
     | "__root__"
-    | "/editor"
-    | "/_launcher"
     | "/"
-    | "/game/$packageId"
-    | "/editor/welcome"
-    | "/editor/$projectId"
-    | "/action/recover-game-save"
-    | "/action/discard-failed-game"
-    | "/_launcher/settings"
-    | "/_launcher/main-menu"
-    | "/_launcher/arkpacks"
+    | "/_launcher"
+    | "/editor"
     | "/_launcher/about"
-    | "/game/$packageId/cheats"
-    | "/game/$packageId/_scene"
-    | "/editor/$projectId/project"
-    | "/editor/$projectId/editor"
-    | "/editor/$projectId/build"
-    | "/editor/$projectId/board"
-    | "/editor/$projectId/assets"
+    | "/_launcher/arkpacks"
+    | "/_launcher/main-menu"
+    | "/_launcher/settings"
+    | "/action/discard-failed-game"
+    | "/action/recover-game-save"
+    | "/editor/$projectId"
+    | "/editor/welcome"
+    | "/game/$packageId"
     | "/action/load-game/$packageId"
-    | "/editor/$projectId/editor/"
-    | "/game/$packageId/action/reset"
-    | "/game/$packageId/action/leave"
-    | "/game/$packageId/action/exit"
-    | "/game/$packageId/_scene/inventory"
-    | "/game/$packageId/_scene/board"
+    | "/editor/$projectId/assets"
+    | "/editor/$projectId/board"
+    | "/editor/$projectId/build"
+    | "/editor/$projectId/editor"
+    | "/editor/$projectId/project"
+    | "/game/$packageId/_scene"
+    | "/game/$packageId/cheats"
     | "/editor/$projectId/editor/items"
-    | "/editor/$projectId/editor/items/list"
+    | "/game/$packageId/_scene/board"
+    | "/game/$packageId/_scene/inventory"
+    | "/game/$packageId/action/exit"
+    | "/game/$packageId/action/leave"
+    | "/game/$packageId/action/reset"
+    | "/editor/$projectId/editor/"
     | "/editor/$projectId/editor/items/$itemUid"
+    | "/editor/$projectId/editor/items/list"
+    | "/editor/$projectId/editor/items/new"
     | "/editor/$projectId/editor/items/$itemUid/create"
     | "/editor/$projectId/editor/items/$itemUid/edit"
-    | "/editor/$projectId/editor/items/$itemUid/create/"
-    | "/editor/$projectId/editor/items/$itemUid/create/identity"
+    | "/editor/$projectId/editor/items/$itemUid/view"
+    | "/editor/$projectId/editor/items/new/select"
     | "/editor/$projectId/editor/items/$itemUid/create/artwork"
-    | "/editor/$projectId/editor/items/$itemUid/create/limits"
     | "/editor/$projectId/editor/items/$itemUid/create/charges"
+    | "/editor/$projectId/editor/items/$itemUid/create/identity"
+    | "/editor/$projectId/editor/items/$itemUid/create/limits"
     | "/editor/$projectId/editor/items/$itemUid/create/merges"
     | "/editor/$projectId/editor/items/$itemUid/create/production"
-    | "/editor/$projectId/editor/items/$itemUid/edit/"
-    | "/editor/$projectId/editor/items/$itemUid/edit/identity"
     | "/editor/$projectId/editor/items/$itemUid/edit/artwork"
-    | "/editor/$projectId/editor/items/$itemUid/edit/limits"
     | "/editor/$projectId/editor/items/$itemUid/edit/charges"
+    | "/editor/$projectId/editor/items/$itemUid/edit/identity"
+    | "/editor/$projectId/editor/items/$itemUid/edit/limits"
     | "/editor/$projectId/editor/items/$itemUid/edit/merges"
     | "/editor/$projectId/editor/items/$itemUid/edit/production"
-    | "/editor/$projectId/editor/items/$itemUid/view"
-    | "/editor/$projectId/editor/items/new"
-    | "/editor/$projectId/editor/items/new/select"
+    | "/editor/$projectId/editor/items/$itemUid/create/"
+    | "/editor/$projectId/editor/items/$itemUid/edit/"
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  EditorRoute: typeof EditorRouteWithChildren
-  LauncherRoute: typeof LauncherRouteWithChildren
   IndexRoute: typeof IndexRoute
-  GamePackageIdRoute: typeof GamePackageIdRouteWithChildren
-  ActionRecoverGameSaveRoute: typeof ActionRecoverGameSaveRoute
+  LauncherRoute: typeof LauncherRouteWithChildren
+  EditorRoute: typeof EditorRouteWithChildren
   ActionDiscardFailedGameRoute: typeof ActionDiscardFailedGameRoute
+  ActionRecoverGameSaveRoute: typeof ActionRecoverGameSaveRoute
+  GamePackageIdRoute: typeof GamePackageIdRouteWithChildren
   ActionLoadGamePackageIdRoute: typeof ActionLoadGamePackageIdRoute
 }
 
@@ -789,6 +814,13 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof EditorProjectIdEditorItemsRouteImport
       parentRoute: typeof EditorProjectIdEditorRoute
     }
+    "/editor/$projectId/editor/items/new": {
+      id: "/editor/$projectId/editor/items/new"
+      path: "/new"
+      fullPath: "/editor/$projectId/editor/items/new"
+      preLoaderRoute: typeof EditorProjectIdEditorItemsNewRouteImport
+      parentRoute: typeof EditorProjectIdEditorItemsRoute
+    }
     "/editor/$projectId/editor/items/list": {
       id: "/editor/$projectId/editor/items/list"
       path: "/list"
@@ -803,11 +835,18 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof EditorProjectIdEditorItemsItemUidRouteImport
       parentRoute: typeof EditorProjectIdEditorItemsRoute
     }
-    "/editor/$projectId/editor/items/$itemUid/create": {
-      id: "/editor/$projectId/editor/items/$itemUid/create"
-      path: "/create"
-      fullPath: "/editor/$projectId/editor/items/$itemUid/create"
-      preLoaderRoute: typeof EditorProjectIdEditorItemsItemUidCreateRouteImport
+    "/editor/$projectId/editor/items/new/select": {
+      id: "/editor/$projectId/editor/items/new/select"
+      path: "/select"
+      fullPath: "/editor/$projectId/editor/items/new/select"
+      preLoaderRoute: typeof EditorProjectIdEditorItemsNewSelectRouteImport
+      parentRoute: typeof EditorProjectIdEditorItemsNewRoute
+    }
+    "/editor/$projectId/editor/items/$itemUid/view": {
+      id: "/editor/$projectId/editor/items/$itemUid/view"
+      path: "/view"
+      fullPath: "/editor/$projectId/editor/items/$itemUid/view"
+      preLoaderRoute: typeof EditorProjectIdEditorItemsItemUidViewRouteImport
       parentRoute: typeof EditorProjectIdEditorItemsItemUidRoute
     }
     "/editor/$projectId/editor/items/$itemUid/edit": {
@@ -817,54 +856,12 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof EditorProjectIdEditorItemsItemUidEditRouteImport
       parentRoute: typeof EditorProjectIdEditorItemsItemUidRoute
     }
-    "/editor/$projectId/editor/items/$itemUid/create/": {
-      id: "/editor/$projectId/editor/items/$itemUid/create/"
-      path: "/"
-      fullPath: "/editor/$projectId/editor/items/$itemUid/create/"
-      preLoaderRoute: typeof EditorProjectIdEditorItemsItemUidCreateIndexRouteImport
-      parentRoute: typeof EditorProjectIdEditorItemsItemUidCreateRoute
-    }
-    "/editor/$projectId/editor/items/$itemUid/create/identity": {
-      id: "/editor/$projectId/editor/items/$itemUid/create/identity"
-      path: "/identity"
-      fullPath: "/editor/$projectId/editor/items/$itemUid/create/identity"
-      preLoaderRoute: typeof EditorProjectIdEditorItemsItemUidCreateIdentityRouteImport
-      parentRoute: typeof EditorProjectIdEditorItemsItemUidCreateRoute
-    }
-    "/editor/$projectId/editor/items/$itemUid/create/artwork": {
-      id: "/editor/$projectId/editor/items/$itemUid/create/artwork"
-      path: "/artwork"
-      fullPath: "/editor/$projectId/editor/items/$itemUid/create/artwork"
-      preLoaderRoute: typeof EditorProjectIdEditorItemsItemUidCreateArtworkRouteImport
-      parentRoute: typeof EditorProjectIdEditorItemsItemUidCreateRoute
-    }
-    "/editor/$projectId/editor/items/$itemUid/create/limits": {
-      id: "/editor/$projectId/editor/items/$itemUid/create/limits"
-      path: "/limits"
-      fullPath: "/editor/$projectId/editor/items/$itemUid/create/limits"
-      preLoaderRoute: typeof EditorProjectIdEditorItemsItemUidCreateLimitsRouteImport
-      parentRoute: typeof EditorProjectIdEditorItemsItemUidCreateRoute
-    }
-    "/editor/$projectId/editor/items/$itemUid/create/charges": {
-      id: "/editor/$projectId/editor/items/$itemUid/create/charges"
-      path: "/charges"
-      fullPath: "/editor/$projectId/editor/items/$itemUid/create/charges"
-      preLoaderRoute: typeof EditorProjectIdEditorItemsItemUidCreateChargesRouteImport
-      parentRoute: typeof EditorProjectIdEditorItemsItemUidCreateRoute
-    }
-    "/editor/$projectId/editor/items/$itemUid/create/merges": {
-      id: "/editor/$projectId/editor/items/$itemUid/create/merges"
-      path: "/merges"
-      fullPath: "/editor/$projectId/editor/items/$itemUid/create/merges"
-      preLoaderRoute: typeof EditorProjectIdEditorItemsItemUidCreateMergesRouteImport
-      parentRoute: typeof EditorProjectIdEditorItemsItemUidCreateRoute
-    }
-    "/editor/$projectId/editor/items/$itemUid/create/production": {
-      id: "/editor/$projectId/editor/items/$itemUid/create/production"
-      path: "/production"
-      fullPath: "/editor/$projectId/editor/items/$itemUid/create/production"
-      preLoaderRoute: typeof EditorProjectIdEditorItemsItemUidCreateProductionRouteImport
-      parentRoute: typeof EditorProjectIdEditorItemsItemUidCreateRoute
+    "/editor/$projectId/editor/items/$itemUid/create": {
+      id: "/editor/$projectId/editor/items/$itemUid/create"
+      path: "/create"
+      fullPath: "/editor/$projectId/editor/items/$itemUid/create"
+      preLoaderRoute: typeof EditorProjectIdEditorItemsItemUidCreateRouteImport
+      parentRoute: typeof EditorProjectIdEditorItemsItemUidRoute
     }
     "/editor/$projectId/editor/items/$itemUid/edit/": {
       id: "/editor/$projectId/editor/items/$itemUid/edit/"
@@ -873,32 +870,18 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof EditorProjectIdEditorItemsItemUidEditIndexRouteImport
       parentRoute: typeof EditorProjectIdEditorItemsItemUidEditRoute
     }
-    "/editor/$projectId/editor/items/$itemUid/edit/identity": {
-      id: "/editor/$projectId/editor/items/$itemUid/edit/identity"
-      path: "/identity"
-      fullPath: "/editor/$projectId/editor/items/$itemUid/edit/identity"
-      preLoaderRoute: typeof EditorProjectIdEditorItemsItemUidEditIdentityRouteImport
-      parentRoute: typeof EditorProjectIdEditorItemsItemUidEditRoute
+    "/editor/$projectId/editor/items/$itemUid/create/": {
+      id: "/editor/$projectId/editor/items/$itemUid/create/"
+      path: "/"
+      fullPath: "/editor/$projectId/editor/items/$itemUid/create/"
+      preLoaderRoute: typeof EditorProjectIdEditorItemsItemUidCreateIndexRouteImport
+      parentRoute: typeof EditorProjectIdEditorItemsItemUidCreateRoute
     }
-    "/editor/$projectId/editor/items/$itemUid/edit/artwork": {
-      id: "/editor/$projectId/editor/items/$itemUid/edit/artwork"
-      path: "/artwork"
-      fullPath: "/editor/$projectId/editor/items/$itemUid/edit/artwork"
-      preLoaderRoute: typeof EditorProjectIdEditorItemsItemUidEditArtworkRouteImport
-      parentRoute: typeof EditorProjectIdEditorItemsItemUidEditRoute
-    }
-    "/editor/$projectId/editor/items/$itemUid/edit/limits": {
-      id: "/editor/$projectId/editor/items/$itemUid/edit/limits"
-      path: "/limits"
-      fullPath: "/editor/$projectId/editor/items/$itemUid/edit/limits"
-      preLoaderRoute: typeof EditorProjectIdEditorItemsItemUidEditLimitsRouteImport
-      parentRoute: typeof EditorProjectIdEditorItemsItemUidEditRoute
-    }
-    "/editor/$projectId/editor/items/$itemUid/edit/charges": {
-      id: "/editor/$projectId/editor/items/$itemUid/edit/charges"
-      path: "/charges"
-      fullPath: "/editor/$projectId/editor/items/$itemUid/edit/charges"
-      preLoaderRoute: typeof EditorProjectIdEditorItemsItemUidEditChargesRouteImport
+    "/editor/$projectId/editor/items/$itemUid/edit/production": {
+      id: "/editor/$projectId/editor/items/$itemUid/edit/production"
+      path: "/production"
+      fullPath: "/editor/$projectId/editor/items/$itemUid/edit/production"
+      preLoaderRoute: typeof EditorProjectIdEditorItemsItemUidEditProductionRouteImport
       parentRoute: typeof EditorProjectIdEditorItemsItemUidEditRoute
     }
     "/editor/$projectId/editor/items/$itemUid/edit/merges": {
@@ -908,84 +891,162 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof EditorProjectIdEditorItemsItemUidEditMergesRouteImport
       parentRoute: typeof EditorProjectIdEditorItemsItemUidEditRoute
     }
-    "/editor/$projectId/editor/items/$itemUid/edit/production": {
-      id: "/editor/$projectId/editor/items/$itemUid/edit/production"
-      path: "/production"
-      fullPath: "/editor/$projectId/editor/items/$itemUid/edit/production"
-      preLoaderRoute: typeof EditorProjectIdEditorItemsItemUidEditProductionRouteImport
+    "/editor/$projectId/editor/items/$itemUid/edit/limits": {
+      id: "/editor/$projectId/editor/items/$itemUid/edit/limits"
+      path: "/limits"
+      fullPath: "/editor/$projectId/editor/items/$itemUid/edit/limits"
+      preLoaderRoute: typeof EditorProjectIdEditorItemsItemUidEditLimitsRouteImport
       parentRoute: typeof EditorProjectIdEditorItemsItemUidEditRoute
     }
-    "/editor/$projectId/editor/items/$itemUid/view": {
-      id: "/editor/$projectId/editor/items/$itemUid/view"
-      path: "/view"
-      fullPath: "/editor/$projectId/editor/items/$itemUid/view"
-      preLoaderRoute: typeof EditorProjectIdEditorItemsItemUidViewRouteImport
-      parentRoute: typeof EditorProjectIdEditorItemsItemUidRoute
+    "/editor/$projectId/editor/items/$itemUid/edit/identity": {
+      id: "/editor/$projectId/editor/items/$itemUid/edit/identity"
+      path: "/identity"
+      fullPath: "/editor/$projectId/editor/items/$itemUid/edit/identity"
+      preLoaderRoute: typeof EditorProjectIdEditorItemsItemUidEditIdentityRouteImport
+      parentRoute: typeof EditorProjectIdEditorItemsItemUidEditRoute
     }
-    "/editor/$projectId/editor/items/new": {
-      id: "/editor/$projectId/editor/items/new"
-      path: "/new"
-      fullPath: "/editor/$projectId/editor/items/new"
-      preLoaderRoute: typeof EditorProjectIdEditorItemsNewRouteImport
-      parentRoute: typeof EditorProjectIdEditorItemsRoute
+    "/editor/$projectId/editor/items/$itemUid/edit/charges": {
+      id: "/editor/$projectId/editor/items/$itemUid/edit/charges"
+      path: "/charges"
+      fullPath: "/editor/$projectId/editor/items/$itemUid/edit/charges"
+      preLoaderRoute: typeof EditorProjectIdEditorItemsItemUidEditChargesRouteImport
+      parentRoute: typeof EditorProjectIdEditorItemsItemUidEditRoute
     }
-    "/editor/$projectId/editor/items/new/select": {
-      id: "/editor/$projectId/editor/items/new/select"
-      path: "/select"
-      fullPath: "/editor/$projectId/editor/items/new/select"
-      preLoaderRoute: typeof EditorProjectIdEditorItemsNewSelectRouteImport
-      parentRoute: typeof EditorProjectIdEditorItemsNewRoute
+    "/editor/$projectId/editor/items/$itemUid/edit/artwork": {
+      id: "/editor/$projectId/editor/items/$itemUid/edit/artwork"
+      path: "/artwork"
+      fullPath: "/editor/$projectId/editor/items/$itemUid/edit/artwork"
+      preLoaderRoute: typeof EditorProjectIdEditorItemsItemUidEditArtworkRouteImport
+      parentRoute: typeof EditorProjectIdEditorItemsItemUidEditRoute
+    }
+    "/editor/$projectId/editor/items/$itemUid/create/production": {
+      id: "/editor/$projectId/editor/items/$itemUid/create/production"
+      path: "/production"
+      fullPath: "/editor/$projectId/editor/items/$itemUid/create/production"
+      preLoaderRoute: typeof EditorProjectIdEditorItemsItemUidCreateProductionRouteImport
+      parentRoute: typeof EditorProjectIdEditorItemsItemUidCreateRoute
+    }
+    "/editor/$projectId/editor/items/$itemUid/create/merges": {
+      id: "/editor/$projectId/editor/items/$itemUid/create/merges"
+      path: "/merges"
+      fullPath: "/editor/$projectId/editor/items/$itemUid/create/merges"
+      preLoaderRoute: typeof EditorProjectIdEditorItemsItemUidCreateMergesRouteImport
+      parentRoute: typeof EditorProjectIdEditorItemsItemUidCreateRoute
+    }
+    "/editor/$projectId/editor/items/$itemUid/create/limits": {
+      id: "/editor/$projectId/editor/items/$itemUid/create/limits"
+      path: "/limits"
+      fullPath: "/editor/$projectId/editor/items/$itemUid/create/limits"
+      preLoaderRoute: typeof EditorProjectIdEditorItemsItemUidCreateLimitsRouteImport
+      parentRoute: typeof EditorProjectIdEditorItemsItemUidCreateRoute
+    }
+    "/editor/$projectId/editor/items/$itemUid/create/identity": {
+      id: "/editor/$projectId/editor/items/$itemUid/create/identity"
+      path: "/identity"
+      fullPath: "/editor/$projectId/editor/items/$itemUid/create/identity"
+      preLoaderRoute: typeof EditorProjectIdEditorItemsItemUidCreateIdentityRouteImport
+      parentRoute: typeof EditorProjectIdEditorItemsItemUidCreateRoute
+    }
+    "/editor/$projectId/editor/items/$itemUid/create/charges": {
+      id: "/editor/$projectId/editor/items/$itemUid/create/charges"
+      path: "/charges"
+      fullPath: "/editor/$projectId/editor/items/$itemUid/create/charges"
+      preLoaderRoute: typeof EditorProjectIdEditorItemsItemUidCreateChargesRouteImport
+      parentRoute: typeof EditorProjectIdEditorItemsItemUidCreateRoute
+    }
+    "/editor/$projectId/editor/items/$itemUid/create/artwork": {
+      id: "/editor/$projectId/editor/items/$itemUid/create/artwork"
+      path: "/artwork"
+      fullPath: "/editor/$projectId/editor/items/$itemUid/create/artwork"
+      preLoaderRoute: typeof EditorProjectIdEditorItemsItemUidCreateArtworkRouteImport
+      parentRoute: typeof EditorProjectIdEditorItemsItemUidCreateRoute
     }
   }
 }
 
+interface LauncherRouteChildren {
+  LauncherAboutRoute: typeof LauncherAboutRoute
+  LauncherArkpacksRoute: typeof LauncherArkpacksRoute
+  LauncherMainMenuRoute: typeof LauncherMainMenuRoute
+  LauncherSettingsRoute: typeof LauncherSettingsRoute
+}
+
+const LauncherRouteChildren: LauncherRouteChildren = {
+  LauncherAboutRoute: LauncherAboutRoute,
+  LauncherArkpacksRoute: LauncherArkpacksRoute,
+  LauncherMainMenuRoute: LauncherMainMenuRoute,
+  LauncherSettingsRoute: LauncherSettingsRoute,
+}
+
+const LauncherRouteWithChildren = LauncherRoute._addFileChildren(
+  LauncherRouteChildren,
+)
+
 interface EditorProjectIdEditorItemsItemUidCreateRouteChildren {
-  EditorProjectIdEditorItemsItemUidCreateIndexRoute: typeof EditorProjectIdEditorItemsItemUidCreateIndexRoute
-  EditorProjectIdEditorItemsItemUidCreateIdentityRoute: typeof EditorProjectIdEditorItemsItemUidCreateIdentityRoute
   EditorProjectIdEditorItemsItemUidCreateArtworkRoute: typeof EditorProjectIdEditorItemsItemUidCreateArtworkRoute
-  EditorProjectIdEditorItemsItemUidCreateLimitsRoute: typeof EditorProjectIdEditorItemsItemUidCreateLimitsRoute
   EditorProjectIdEditorItemsItemUidCreateChargesRoute: typeof EditorProjectIdEditorItemsItemUidCreateChargesRoute
+  EditorProjectIdEditorItemsItemUidCreateIdentityRoute: typeof EditorProjectIdEditorItemsItemUidCreateIdentityRoute
+  EditorProjectIdEditorItemsItemUidCreateLimitsRoute: typeof EditorProjectIdEditorItemsItemUidCreateLimitsRoute
   EditorProjectIdEditorItemsItemUidCreateMergesRoute: typeof EditorProjectIdEditorItemsItemUidCreateMergesRoute
   EditorProjectIdEditorItemsItemUidCreateProductionRoute: typeof EditorProjectIdEditorItemsItemUidCreateProductionRoute
+  EditorProjectIdEditorItemsItemUidCreateIndexRoute: typeof EditorProjectIdEditorItemsItemUidCreateIndexRoute
 }
 
-const EditorProjectIdEditorItemsItemUidCreateRouteChildren: EditorProjectIdEditorItemsItemUidCreateRouteChildren = {
-  EditorProjectIdEditorItemsItemUidCreateIndexRoute: EditorProjectIdEditorItemsItemUidCreateIndexRoute,
-  EditorProjectIdEditorItemsItemUidCreateIdentityRoute: EditorProjectIdEditorItemsItemUidCreateIdentityRoute,
-  EditorProjectIdEditorItemsItemUidCreateArtworkRoute: EditorProjectIdEditorItemsItemUidCreateArtworkRoute,
-  EditorProjectIdEditorItemsItemUidCreateLimitsRoute: EditorProjectIdEditorItemsItemUidCreateLimitsRoute,
-  EditorProjectIdEditorItemsItemUidCreateChargesRoute: EditorProjectIdEditorItemsItemUidCreateChargesRoute,
-  EditorProjectIdEditorItemsItemUidCreateMergesRoute: EditorProjectIdEditorItemsItemUidCreateMergesRoute,
-  EditorProjectIdEditorItemsItemUidCreateProductionRoute: EditorProjectIdEditorItemsItemUidCreateProductionRoute,
-}
+const EditorProjectIdEditorItemsItemUidCreateRouteChildren: EditorProjectIdEditorItemsItemUidCreateRouteChildren =
+  {
+    EditorProjectIdEditorItemsItemUidCreateArtworkRoute:
+      EditorProjectIdEditorItemsItemUidCreateArtworkRoute,
+    EditorProjectIdEditorItemsItemUidCreateChargesRoute:
+      EditorProjectIdEditorItemsItemUidCreateChargesRoute,
+    EditorProjectIdEditorItemsItemUidCreateIdentityRoute:
+      EditorProjectIdEditorItemsItemUidCreateIdentityRoute,
+    EditorProjectIdEditorItemsItemUidCreateLimitsRoute:
+      EditorProjectIdEditorItemsItemUidCreateLimitsRoute,
+    EditorProjectIdEditorItemsItemUidCreateMergesRoute:
+      EditorProjectIdEditorItemsItemUidCreateMergesRoute,
+    EditorProjectIdEditorItemsItemUidCreateProductionRoute:
+      EditorProjectIdEditorItemsItemUidCreateProductionRoute,
+    EditorProjectIdEditorItemsItemUidCreateIndexRoute:
+      EditorProjectIdEditorItemsItemUidCreateIndexRoute,
+  }
 
-const EditorProjectIdEditorItemsItemUidCreateRouteWithChildren = EditorProjectIdEditorItemsItemUidCreateRoute._addFileChildren(
-  EditorProjectIdEditorItemsItemUidCreateRouteChildren,
-)
+const EditorProjectIdEditorItemsItemUidCreateRouteWithChildren =
+  EditorProjectIdEditorItemsItemUidCreateRoute._addFileChildren(
+    EditorProjectIdEditorItemsItemUidCreateRouteChildren,
+  )
 
 interface EditorProjectIdEditorItemsItemUidEditRouteChildren {
-  EditorProjectIdEditorItemsItemUidEditIndexRoute: typeof EditorProjectIdEditorItemsItemUidEditIndexRoute
-  EditorProjectIdEditorItemsItemUidEditIdentityRoute: typeof EditorProjectIdEditorItemsItemUidEditIdentityRoute
   EditorProjectIdEditorItemsItemUidEditArtworkRoute: typeof EditorProjectIdEditorItemsItemUidEditArtworkRoute
-  EditorProjectIdEditorItemsItemUidEditLimitsRoute: typeof EditorProjectIdEditorItemsItemUidEditLimitsRoute
   EditorProjectIdEditorItemsItemUidEditChargesRoute: typeof EditorProjectIdEditorItemsItemUidEditChargesRoute
+  EditorProjectIdEditorItemsItemUidEditIdentityRoute: typeof EditorProjectIdEditorItemsItemUidEditIdentityRoute
+  EditorProjectIdEditorItemsItemUidEditLimitsRoute: typeof EditorProjectIdEditorItemsItemUidEditLimitsRoute
   EditorProjectIdEditorItemsItemUidEditMergesRoute: typeof EditorProjectIdEditorItemsItemUidEditMergesRoute
   EditorProjectIdEditorItemsItemUidEditProductionRoute: typeof EditorProjectIdEditorItemsItemUidEditProductionRoute
+  EditorProjectIdEditorItemsItemUidEditIndexRoute: typeof EditorProjectIdEditorItemsItemUidEditIndexRoute
 }
 
-const EditorProjectIdEditorItemsItemUidEditRouteChildren: EditorProjectIdEditorItemsItemUidEditRouteChildren = {
-  EditorProjectIdEditorItemsItemUidEditIndexRoute: EditorProjectIdEditorItemsItemUidEditIndexRoute,
-  EditorProjectIdEditorItemsItemUidEditIdentityRoute: EditorProjectIdEditorItemsItemUidEditIdentityRoute,
-  EditorProjectIdEditorItemsItemUidEditArtworkRoute: EditorProjectIdEditorItemsItemUidEditArtworkRoute,
-  EditorProjectIdEditorItemsItemUidEditLimitsRoute: EditorProjectIdEditorItemsItemUidEditLimitsRoute,
-  EditorProjectIdEditorItemsItemUidEditChargesRoute: EditorProjectIdEditorItemsItemUidEditChargesRoute,
-  EditorProjectIdEditorItemsItemUidEditMergesRoute: EditorProjectIdEditorItemsItemUidEditMergesRoute,
-  EditorProjectIdEditorItemsItemUidEditProductionRoute: EditorProjectIdEditorItemsItemUidEditProductionRoute,
-}
+const EditorProjectIdEditorItemsItemUidEditRouteChildren: EditorProjectIdEditorItemsItemUidEditRouteChildren =
+  {
+    EditorProjectIdEditorItemsItemUidEditArtworkRoute:
+      EditorProjectIdEditorItemsItemUidEditArtworkRoute,
+    EditorProjectIdEditorItemsItemUidEditChargesRoute:
+      EditorProjectIdEditorItemsItemUidEditChargesRoute,
+    EditorProjectIdEditorItemsItemUidEditIdentityRoute:
+      EditorProjectIdEditorItemsItemUidEditIdentityRoute,
+    EditorProjectIdEditorItemsItemUidEditLimitsRoute:
+      EditorProjectIdEditorItemsItemUidEditLimitsRoute,
+    EditorProjectIdEditorItemsItemUidEditMergesRoute:
+      EditorProjectIdEditorItemsItemUidEditMergesRoute,
+    EditorProjectIdEditorItemsItemUidEditProductionRoute:
+      EditorProjectIdEditorItemsItemUidEditProductionRoute,
+    EditorProjectIdEditorItemsItemUidEditIndexRoute:
+      EditorProjectIdEditorItemsItemUidEditIndexRoute,
+  }
 
-const EditorProjectIdEditorItemsItemUidEditRouteWithChildren = EditorProjectIdEditorItemsItemUidEditRoute._addFileChildren(
-  EditorProjectIdEditorItemsItemUidEditRouteChildren,
-)
+const EditorProjectIdEditorItemsItemUidEditRouteWithChildren =
+  EditorProjectIdEditorItemsItemUidEditRoute._addFileChildren(
+    EditorProjectIdEditorItemsItemUidEditRouteChildren,
+  )
 
 interface EditorProjectIdEditorItemsItemUidRouteChildren {
   EditorProjectIdEditorItemsItemUidCreateRoute: typeof EditorProjectIdEditorItemsItemUidCreateRouteWithChildren
@@ -993,138 +1054,131 @@ interface EditorProjectIdEditorItemsItemUidRouteChildren {
   EditorProjectIdEditorItemsItemUidViewRoute: typeof EditorProjectIdEditorItemsItemUidViewRoute
 }
 
-const EditorProjectIdEditorItemsItemUidRouteChildren: EditorProjectIdEditorItemsItemUidRouteChildren = {
-  EditorProjectIdEditorItemsItemUidCreateRoute: EditorProjectIdEditorItemsItemUidCreateRouteWithChildren,
-  EditorProjectIdEditorItemsItemUidEditRoute: EditorProjectIdEditorItemsItemUidEditRouteWithChildren,
-  EditorProjectIdEditorItemsItemUidViewRoute: EditorProjectIdEditorItemsItemUidViewRoute,
-}
+const EditorProjectIdEditorItemsItemUidRouteChildren: EditorProjectIdEditorItemsItemUidRouteChildren =
+  {
+    EditorProjectIdEditorItemsItemUidCreateRoute:
+      EditorProjectIdEditorItemsItemUidCreateRouteWithChildren,
+    EditorProjectIdEditorItemsItemUidEditRoute:
+      EditorProjectIdEditorItemsItemUidEditRouteWithChildren,
+    EditorProjectIdEditorItemsItemUidViewRoute:
+      EditorProjectIdEditorItemsItemUidViewRoute,
+  }
 
-const EditorProjectIdEditorItemsItemUidRouteWithChildren = EditorProjectIdEditorItemsItemUidRoute._addFileChildren(
-  EditorProjectIdEditorItemsItemUidRouteChildren,
-)
+const EditorProjectIdEditorItemsItemUidRouteWithChildren =
+  EditorProjectIdEditorItemsItemUidRoute._addFileChildren(
+    EditorProjectIdEditorItemsItemUidRouteChildren,
+  )
 
 interface EditorProjectIdEditorItemsNewRouteChildren {
   EditorProjectIdEditorItemsNewSelectRoute: typeof EditorProjectIdEditorItemsNewSelectRoute
 }
 
-const EditorProjectIdEditorItemsNewRouteChildren: EditorProjectIdEditorItemsNewRouteChildren = {
-  EditorProjectIdEditorItemsNewSelectRoute: EditorProjectIdEditorItemsNewSelectRoute,
-}
+const EditorProjectIdEditorItemsNewRouteChildren: EditorProjectIdEditorItemsNewRouteChildren =
+  {
+    EditorProjectIdEditorItemsNewSelectRoute:
+      EditorProjectIdEditorItemsNewSelectRoute,
+  }
 
-const EditorProjectIdEditorItemsNewRouteWithChildren = EditorProjectIdEditorItemsNewRoute._addFileChildren(
-  EditorProjectIdEditorItemsNewRouteChildren,
-)
+const EditorProjectIdEditorItemsNewRouteWithChildren =
+  EditorProjectIdEditorItemsNewRoute._addFileChildren(
+    EditorProjectIdEditorItemsNewRouteChildren,
+  )
 
 interface EditorProjectIdEditorItemsRouteChildren {
-  EditorProjectIdEditorItemsListRoute: typeof EditorProjectIdEditorItemsListRoute
   EditorProjectIdEditorItemsItemUidRoute: typeof EditorProjectIdEditorItemsItemUidRouteWithChildren
+  EditorProjectIdEditorItemsListRoute: typeof EditorProjectIdEditorItemsListRoute
   EditorProjectIdEditorItemsNewRoute: typeof EditorProjectIdEditorItemsNewRouteWithChildren
 }
 
-const EditorProjectIdEditorItemsRouteChildren: EditorProjectIdEditorItemsRouteChildren = {
-  EditorProjectIdEditorItemsListRoute: EditorProjectIdEditorItemsListRoute,
-  EditorProjectIdEditorItemsItemUidRoute: EditorProjectIdEditorItemsItemUidRouteWithChildren,
-  EditorProjectIdEditorItemsNewRoute: EditorProjectIdEditorItemsNewRouteWithChildren,
-}
+const EditorProjectIdEditorItemsRouteChildren: EditorProjectIdEditorItemsRouteChildren =
+  {
+    EditorProjectIdEditorItemsItemUidRoute:
+      EditorProjectIdEditorItemsItemUidRouteWithChildren,
+    EditorProjectIdEditorItemsListRoute: EditorProjectIdEditorItemsListRoute,
+    EditorProjectIdEditorItemsNewRoute:
+      EditorProjectIdEditorItemsNewRouteWithChildren,
+  }
 
-const EditorProjectIdEditorItemsRouteWithChildren = EditorProjectIdEditorItemsRoute._addFileChildren(
-  EditorProjectIdEditorItemsRouteChildren,
-)
+const EditorProjectIdEditorItemsRouteWithChildren =
+  EditorProjectIdEditorItemsRoute._addFileChildren(
+    EditorProjectIdEditorItemsRouteChildren,
+  )
 
 interface EditorProjectIdEditorRouteChildren {
-  EditorProjectIdEditorIndexRoute: typeof EditorProjectIdEditorIndexRoute
   EditorProjectIdEditorItemsRoute: typeof EditorProjectIdEditorItemsRouteWithChildren
+  EditorProjectIdEditorIndexRoute: typeof EditorProjectIdEditorIndexRoute
 }
 
 const EditorProjectIdEditorRouteChildren: EditorProjectIdEditorRouteChildren = {
-  EditorProjectIdEditorIndexRoute: EditorProjectIdEditorIndexRoute,
   EditorProjectIdEditorItemsRoute: EditorProjectIdEditorItemsRouteWithChildren,
+  EditorProjectIdEditorIndexRoute: EditorProjectIdEditorIndexRoute,
 }
 
-const EditorProjectIdEditorRouteWithChildren = EditorProjectIdEditorRoute._addFileChildren(
-  EditorProjectIdEditorRouteChildren,
-)
+const EditorProjectIdEditorRouteWithChildren =
+  EditorProjectIdEditorRoute._addFileChildren(
+    EditorProjectIdEditorRouteChildren,
+  )
 
 interface EditorProjectIdRouteChildren {
-  EditorProjectIdProjectRoute: typeof EditorProjectIdProjectRoute
-  EditorProjectIdEditorRoute: typeof EditorProjectIdEditorRouteWithChildren
-  EditorProjectIdBuildRoute: typeof EditorProjectIdBuildRoute
-  EditorProjectIdBoardRoute: typeof EditorProjectIdBoardRoute
   EditorProjectIdAssetsRoute: typeof EditorProjectIdAssetsRoute
+  EditorProjectIdBoardRoute: typeof EditorProjectIdBoardRoute
+  EditorProjectIdBuildRoute: typeof EditorProjectIdBuildRoute
+  EditorProjectIdEditorRoute: typeof EditorProjectIdEditorRouteWithChildren
+  EditorProjectIdProjectRoute: typeof EditorProjectIdProjectRoute
 }
 
 const EditorProjectIdRouteChildren: EditorProjectIdRouteChildren = {
-  EditorProjectIdProjectRoute: EditorProjectIdProjectRoute,
-  EditorProjectIdEditorRoute: EditorProjectIdEditorRouteWithChildren,
-  EditorProjectIdBuildRoute: EditorProjectIdBuildRoute,
-  EditorProjectIdBoardRoute: EditorProjectIdBoardRoute,
   EditorProjectIdAssetsRoute: EditorProjectIdAssetsRoute,
+  EditorProjectIdBoardRoute: EditorProjectIdBoardRoute,
+  EditorProjectIdBuildRoute: EditorProjectIdBuildRoute,
+  EditorProjectIdEditorRoute: EditorProjectIdEditorRouteWithChildren,
+  EditorProjectIdProjectRoute: EditorProjectIdProjectRoute,
 }
 
 const EditorProjectIdRouteWithChildren = EditorProjectIdRoute._addFileChildren(
   EditorProjectIdRouteChildren,
 )
 
-interface GamePackageIdSceneRouteChildren {
-  GamePackageIdSceneInventoryRoute: typeof GamePackageIdSceneInventoryRoute
-  GamePackageIdSceneBoardRoute: typeof GamePackageIdSceneBoardRoute
-}
-
-const GamePackageIdSceneRouteChildren: GamePackageIdSceneRouteChildren = {
-  GamePackageIdSceneInventoryRoute: GamePackageIdSceneInventoryRoute,
-  GamePackageIdSceneBoardRoute: GamePackageIdSceneBoardRoute,
-}
-
-const GamePackageIdSceneRouteWithChildren = GamePackageIdSceneRoute._addFileChildren(
-  GamePackageIdSceneRouteChildren,
-)
-
 interface EditorRouteChildren {
-  EditorWelcomeRoute: typeof EditorWelcomeRoute
   EditorProjectIdRoute: typeof EditorProjectIdRouteWithChildren
+  EditorWelcomeRoute: typeof EditorWelcomeRoute
 }
 
 const EditorRouteChildren: EditorRouteChildren = {
-  EditorWelcomeRoute: EditorWelcomeRoute,
   EditorProjectIdRoute: EditorProjectIdRouteWithChildren,
+  EditorWelcomeRoute: EditorWelcomeRoute,
 }
 
-const EditorRouteWithChildren = EditorRoute._addFileChildren(
-  EditorRouteChildren,
-)
+const EditorRouteWithChildren =
+  EditorRoute._addFileChildren(EditorRouteChildren)
 
-interface LauncherRouteChildren {
-  LauncherSettingsRoute: typeof LauncherSettingsRoute
-  LauncherMainMenuRoute: typeof LauncherMainMenuRoute
-  LauncherArkpacksRoute: typeof LauncherArkpacksRoute
-  LauncherAboutRoute: typeof LauncherAboutRoute
+interface GamePackageIdSceneRouteChildren {
+  GamePackageIdSceneBoardRoute: typeof GamePackageIdSceneBoardRoute
+  GamePackageIdSceneInventoryRoute: typeof GamePackageIdSceneInventoryRoute
 }
 
-const LauncherRouteChildren: LauncherRouteChildren = {
-  LauncherSettingsRoute: LauncherSettingsRoute,
-  LauncherMainMenuRoute: LauncherMainMenuRoute,
-  LauncherArkpacksRoute: LauncherArkpacksRoute,
-  LauncherAboutRoute: LauncherAboutRoute,
+const GamePackageIdSceneRouteChildren: GamePackageIdSceneRouteChildren = {
+  GamePackageIdSceneBoardRoute: GamePackageIdSceneBoardRoute,
+  GamePackageIdSceneInventoryRoute: GamePackageIdSceneInventoryRoute,
 }
 
-const LauncherRouteWithChildren = LauncherRoute._addFileChildren(
-  LauncherRouteChildren,
-)
+const GamePackageIdSceneRouteWithChildren =
+  GamePackageIdSceneRoute._addFileChildren(GamePackageIdSceneRouteChildren)
 
 interface GamePackageIdRouteChildren {
-  GamePackageIdCheatsRoute: typeof GamePackageIdCheatsRoute
   GamePackageIdSceneRoute: typeof GamePackageIdSceneRouteWithChildren
-  GamePackageIdActionResetRoute: typeof GamePackageIdActionResetRoute
-  GamePackageIdActionLeaveRoute: typeof GamePackageIdActionLeaveRoute
+  GamePackageIdCheatsRoute: typeof GamePackageIdCheatsRoute
   GamePackageIdActionExitRoute: typeof GamePackageIdActionExitRoute
+  GamePackageIdActionLeaveRoute: typeof GamePackageIdActionLeaveRoute
+  GamePackageIdActionResetRoute: typeof GamePackageIdActionResetRoute
 }
 
 const GamePackageIdRouteChildren: GamePackageIdRouteChildren = {
-  GamePackageIdCheatsRoute: GamePackageIdCheatsRoute,
   GamePackageIdSceneRoute: GamePackageIdSceneRouteWithChildren,
-  GamePackageIdActionResetRoute: GamePackageIdActionResetRoute,
-  GamePackageIdActionLeaveRoute: GamePackageIdActionLeaveRoute,
+  GamePackageIdCheatsRoute: GamePackageIdCheatsRoute,
   GamePackageIdActionExitRoute: GamePackageIdActionExitRoute,
+  GamePackageIdActionLeaveRoute: GamePackageIdActionLeaveRoute,
+  GamePackageIdActionResetRoute: GamePackageIdActionResetRoute,
 }
 
 const GamePackageIdRouteWithChildren = GamePackageIdRoute._addFileChildren(
@@ -1132,12 +1186,12 @@ const GamePackageIdRouteWithChildren = GamePackageIdRoute._addFileChildren(
 )
 
 const rootRouteChildren: RootRouteChildren = {
-  EditorRoute: EditorRouteWithChildren,
-  LauncherRoute: LauncherRouteWithChildren,
   IndexRoute: IndexRoute,
-  GamePackageIdRoute: GamePackageIdRouteWithChildren,
-  ActionRecoverGameSaveRoute: ActionRecoverGameSaveRoute,
+  LauncherRoute: LauncherRouteWithChildren,
+  EditorRoute: EditorRouteWithChildren,
   ActionDiscardFailedGameRoute: ActionDiscardFailedGameRoute,
+  ActionRecoverGameSaveRoute: ActionRecoverGameSaveRoute,
+  GamePackageIdRoute: GamePackageIdRouteWithChildren,
   ActionLoadGamePackageIdRoute: ActionLoadGamePackageIdRoute,
 }
 export const routeTree = rootRouteImport

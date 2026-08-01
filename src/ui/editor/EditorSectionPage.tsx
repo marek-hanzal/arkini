@@ -4,7 +4,9 @@ import type { PropsWithChildren, ReactNode } from "react";
 export const EditorSectionPage = ({
 	children,
 	tabs,
-}: PropsWithChildren<{ readonly tabs: ReactNode }>) => (
+}: PropsWithChildren<{
+	readonly tabs: ReactNode;
+}>) => (
 	<div
 		className="grid h-full min-h-0 grid-rows-[auto_minmax(0,1fr)] gap-4"
 		data-ui="EditorSectionPage"

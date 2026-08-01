@@ -53,13 +53,15 @@ export const EditorProductionFields = withFieldGroup({
 								<Button
 									onClick={() => {
 										const lineOwnerId =
-											ownerId.replace(/^(?:item|producer):/, "") || "new-item";
+											ownerId.replace(/^(?:item|producer):/, "") ||
+											"new-item";
 										const lineIdPrefix = `line:${lineOwnerId}`;
 										const existingIds = new Set(lines.map((line) => line.id));
 										let id = `${lineIdPrefix}:default`;
 										if (lines.length > 0 || existingIds.has(id)) {
 											let suffix = 2;
-											while (existingIds.has(`${lineIdPrefix}:${suffix}`)) suffix += 1;
+											while (existingIds.has(`${lineIdPrefix}:${suffix}`))
+												suffix += 1;
 											id = `${lineIdPrefix}:${suffix}`;
 										}
 										const line: EditorLine = {

@@ -2,10 +2,22 @@ import { EditorFormSection } from "~/ui/form/EditorFormSection";
 import { useEditorItemFormSession } from "~/ui/item/editor/EditorItemFormContext";
 
 const scopeOptions = [
-	{ label: "Any", value: "any" },
-	{ label: "Board", value: "board" },
-	{ label: "Inventory", value: "inventory" },
-	{ label: "Toolbar", value: "toolbar" },
+	{
+		label: "Any",
+		value: "any",
+	},
+	{
+		label: "Board",
+		value: "board",
+	},
+	{
+		label: "Inventory",
+		value: "inventory",
+	},
+	{
+		label: "Toolbar",
+		value: "toolbar",
+	},
 ] as const;
 
 export const EditorItemIdentitySection = () => {
@@ -38,7 +50,10 @@ export const EditorItemIdentitySection = () => {
 						categoryOptions.length === 0 ? (
 							<field.TextField label="Category ID" />
 						) : (
-							<field.ChoiceField label="Category" options={categoryOptions} />
+							<field.ChoiceField
+								label="Category"
+								options={categoryOptions}
+							/>
 						)
 					}
 				</form.AppField>
@@ -52,7 +67,10 @@ export const EditorItemIdentitySection = () => {
 				) : (
 					<form.AppField name="scope">
 						{(field) => (
-							<field.ChoiceField label="Storage scope" options={scopeOptions} />
+							<field.ChoiceField
+								label="Storage scope"
+								options={scopeOptions}
+							/>
 						)}
 					</form.AppField>
 				)}

@@ -23,7 +23,9 @@ export const useEditorItemDraft = (type: EditorItemType, uid: string): EditorIte
 			asset: {
 				default: [
 					resourceId,
-				] as [string],
+				] as [
+					string,
+				],
 			},
 			tags: [],
 			categoryId: Object.keys(project.config?.categories ?? {})[0] ?? "default",
@@ -40,7 +42,9 @@ export const useEditorItemDraft = (type: EditorItemType, uid: string): EditorIte
 				{
 					type: "simple",
 				},
-			] as [EditorInput],
+			] as [
+				EditorInput,
+			],
 			rules: [],
 		} satisfies Omit<EditorLine, "description" | "title">;
 		return match(type)
@@ -77,7 +81,9 @@ export const useEditorItemDraft = (type: EditorItemType, uid: string): EditorIte
 						title: `New ${matchedType} line`,
 						description: `Describe what this ${matchedType} line consumes and produces.`,
 					},
-				] as [EditorLine],
+				] as [
+					EditorLine,
+				],
 			}))
 			.with("blueprint", "craft", "stash", (lineType) => ({
 				...base,
@@ -89,5 +95,10 @@ export const useEditorItemDraft = (type: EditorItemType, uid: string): EditorIte
 				},
 			}))
 			.exhaustive();
-	}, [project.config?.categories, project.resources, type, uid]);
+	}, [
+		project.config?.categories,
+		project.resources,
+		type,
+		uid,
+	]);
 };

@@ -25,9 +25,7 @@ export const useSaveEditorItemCommand = ({
 	const mutationAtom = useMemo(
 		() =>
 			Atom.fn((variables: saveEditorItemMutation.Variables) =>
-				saveEditorItemMutationFx(variables).pipe(
-					Effect.map((result) => result.item),
-				),
+				saveEditorItemMutationFx(variables).pipe(Effect.map((result) => result.item)),
 			).pipe(
 				Atom.withLabel(`EditorItemSave:${projectId}:${itemUid}:${generation}`),
 				Atom.setIdleTTL(0),

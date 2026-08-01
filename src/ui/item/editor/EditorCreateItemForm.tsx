@@ -15,11 +15,7 @@ export namespace EditorCreateItemForm {
 }
 
 /** Owns one local create form for a preallocated immutable item UID. */
-export const EditorCreateItemForm = ({
-	children,
-	itemType,
-	uid,
-}: EditorCreateItemForm.Props) => {
+export const EditorCreateItemForm = ({ children, itemType, uid }: EditorCreateItemForm.Props) => {
 	const project = useEditorProject();
 	const navigate = useNavigate();
 	const initialItem = useEditorItemDraft(itemType, uid);
@@ -29,7 +25,9 @@ export const EditorCreateItemForm = ({
 			back={
 				<ButtonLink
 					to="/editor/$projectId/editor/items/list"
-					params={{ projectId: project.projectId }}
+					params={{
+						projectId: project.projectId,
+					}}
 					className="min-h-0 px-3 py-2"
 					aria-label="Back to items"
 				>
@@ -37,7 +35,10 @@ export const EditorCreateItemForm = ({
 				</ButtonLink>
 			}
 			initialItem={initialItem}
-			route={{ kind: "create", itemType }}
+			route={{
+				kind: "create",
+				itemType,
+			}}
 			title={`New ${itemType}`}
 			onSaved={(saved) =>
 				navigate({

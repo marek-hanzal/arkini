@@ -22,7 +22,9 @@ const createProject = (): EditorProject => ({
 
 describe("loadEditorProjectFx", () => {
 	it("reuses the canonical in-memory project without reading Electron again", async () => {
-		const registry = AtomRegistry.make({ scheduleTask });
+		const registry = AtomRegistry.make({
+			scheduleTask,
+		});
 		const project = createProject();
 		registry.set(EditorProjectAtom(project.projectId), {
 			action: "refresh",
@@ -32,9 +34,9 @@ describe("loadEditorProjectFx", () => {
 
 		await expect(
 			Effect.runPromise(
-				loadEditorProjectFx({ projectId: project.projectId }).pipe(
-					Effect.provideService(AtomRegistry.AtomRegistry, registry),
-				),
+				loadEditorProjectFx({
+					projectId: project.projectId,
+				}).pipe(Effect.provideService(AtomRegistry.AtomRegistry, registry)),
 			),
 		).resolves.toEqual({
 			expectedRevision: project.revision,

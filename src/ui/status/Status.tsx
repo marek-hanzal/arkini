@@ -11,13 +11,7 @@ export namespace Status {
 }
 
 /** Presents one deliberate empty or unavailable product state with an optional canonical action. */
-export const Status = ({
-	action,
-	dataUi = "Status",
-	description,
-	icon,
-	title,
-}: Status.Props) => (
+export const Status = ({ action, dataUi = "Status", description, icon, title }: Status.Props) => (
 	<section
 		className="grid min-h-48 place-items-center rounded-2xl border border-line bg-surface/70 p-[var(--ak-panel-padding)] text-center"
 		data-ui={dataUi}

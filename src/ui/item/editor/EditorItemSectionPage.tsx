@@ -58,7 +58,10 @@ export const EditorItemSectionPage = ({ section }: { readonly section: EditorIte
 			{available ? (
 				renderSection(section)
 			) : (
-				<section className="grid gap-2 py-8 text-center" data-ui="EditorItemSectionUnavailable">
+				<section
+					className="grid gap-2 py-8 text-center"
+					data-ui="EditorItemSectionUnavailable"
+				>
 					<h2 className="text-lg font-semibold">Section unavailable</h2>
 					<p className="text-sm text-muted">
 						This item type does not use the {section} section.

@@ -12,7 +12,10 @@ export const EditorBuild = () => {
 			data-ui="EditorBuild"
 		>
 			<header>
-				<h1 id="editor-build-title" className="text-2xl font-semibold">
+				<h1
+					id="editor-build-title"
+					className="text-2xl font-semibold"
+				>
 					Build
 				</h1>
 				<p className="mt-1 text-sm text-muted">
@@ -47,8 +50,10 @@ export const EditorBuild = () => {
 								key={`${diagnostic.code}-${diagnostic.source ?? "project"}-${index}`}
 								className="rounded-lg bg-surface-raised p-3 text-sm text-muted"
 							>
-								<span className="font-semibold text-foreground">{diagnostic.code}</span>:
-								{diagnostic.message}
+								<span className="font-semibold text-foreground">
+									{diagnostic.code}
+								</span>
+								:{diagnostic.message}
 							</li>
 						))}
 					</ul>
@@ -67,7 +72,10 @@ export const EditorBuild = () => {
 						aria-label="Signing key"
 						className="block min-w-0 w-full text-sm text-muted disabled:cursor-not-allowed disabled:opacity-60"
 					/>
-					<PrimaryButton disabled cursorIntent="not-allowed">
+					<PrimaryButton
+						disabled
+						cursorIntent="not-allowed"
+					>
 						Build arkpack
 					</PrimaryButton>
 				</div>

@@ -27,7 +27,9 @@ export const useEditorItemSearchOptions = () => {
 							],
 						}) satisfies EditorSearchOption,
 				),
-		[items],
+		[
+			items,
+		],
 	);
 	return {
 		items,

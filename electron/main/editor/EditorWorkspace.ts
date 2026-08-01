@@ -12,6 +12,8 @@ export interface EditorWorkspace {
 	readonly listFx: () => Effect.Effect<ReadonlyArray<EditorProjectManifest>, unknown>;
 	readonly createFx: (record: EditorProjectCreate) => Effect.Effect<void, unknown>;
 	readonly readFx: (projectId: string) => Effect.Effect<EditorProjectRecord | null, unknown>;
-	readonly writeFx: (mutation: EditorProjectWrite) => Effect.Effect<EditorProjectWriteResult, unknown>;
+	readonly writeFx: (
+		mutation: EditorProjectWrite,
+	) => Effect.Effect<EditorProjectWriteResult, unknown>;
 	readonly openDirectoryFx: (projectId?: string) => Effect.Effect<void, unknown>;
 }

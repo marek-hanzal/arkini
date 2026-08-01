@@ -83,40 +83,39 @@ export const createFilesystemEditorWorkspaceFx = Effect.fn("createFilesystemEdit
 					),
 				),
 		);
-		const writeFx: EditorWorkspace["writeFx"] = Effect.fn(
-			"FilesystemEditorWorkspace.writeFx",
-		)((candidate) =>
-			operations.withPermits(1)(
-				Effect.gen(function* () {
-					const mutation = yield* Effect.try({
-						try: () => EditorProjectWriteSchema.parse(candidate),
-						catch: (cause) =>
-							new ElectronMainError({
-								operation: "Write Arkini editor project",
-								cause,
-							}),
-					});
-					const record = projectIndex.get(mutation.projectId);
-					if (record === undefined) {
-						return yield* Effect.fail(
-							new ElectronMainError({
-								operation: "Write Arkini editor project",
-								cause: new Error(
-									`Editor project ${mutation.projectId} must be loaded before it can be written.`,
-								),
-							}),
-						);
-					}
-					const result = yield* writeEditorProjectFx({
-						root,
-						fileSystem,
-						mutation,
-						record,
-					});
-					projectIndex.set(mutation.projectId, result.record);
-					return result.write;
-				}),
-			),
+		const writeFx: EditorWorkspace["writeFx"] = Effect.fn("FilesystemEditorWorkspace.writeFx")(
+			(candidate) =>
+				operations.withPermits(1)(
+					Effect.gen(function* () {
+						const mutation = yield* Effect.try({
+							try: () => EditorProjectWriteSchema.parse(candidate),
+							catch: (cause) =>
+								new ElectronMainError({
+									operation: "Write Arkini editor project",
+									cause,
+								}),
+						});
+						const record = projectIndex.get(mutation.projectId);
+						if (record === undefined) {
+							return yield* Effect.fail(
+								new ElectronMainError({
+									operation: "Write Arkini editor project",
+									cause: new Error(
+										`Editor project ${mutation.projectId} must be loaded before it can be written.`,
+									),
+								}),
+							);
+						}
+						const result = yield* writeEditorProjectFx({
+							root,
+							fileSystem,
+							mutation,
+							record,
+						});
+						projectIndex.set(mutation.projectId, result.record);
+						return result.write;
+					}),
+				),
 		);
 		const openDirectoryFx: EditorWorkspace["openDirectoryFx"] = Effect.fn(
 			"FilesystemEditorWorkspace.openDirectoryFx",

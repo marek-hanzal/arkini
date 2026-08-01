@@ -172,7 +172,8 @@ export const writeEditorProjectFx = Effect.fn("writeEditorProjectFx")(function* 
 	});
 	const nextFiles = [
 		...record.files.filter(
-			({ path }) => path !== "editor.json" && path.toLowerCase() !== portablePath.toLowerCase(),
+			({ path }) =>
+				path !== "editor.json" && path.toLowerCase() !== portablePath.toLowerCase(),
 		),
 		persistedFile,
 		nextManifestFile,

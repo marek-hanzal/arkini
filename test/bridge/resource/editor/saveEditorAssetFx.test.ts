@@ -2,6 +2,7 @@ import { Effect } from "effect";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { EditorProjectRecord } from "../../../../electron/contract/editor/EditorProjectRecord";
+import type { EditorProject } from "~/bridge/editor/EditorProject";
 import { createEditorProjectFromRecordFx } from "~/bridge/editor/createEditorProjectFromRecordFx";
 import { createEditorProjectManifestFileFx } from "~/bridge/editor/createEditorProjectManifestFileFx";
 import type { EditorWorkspace } from "~/bridge/editor/EditorWorkspace";
@@ -69,7 +70,14 @@ describe("saveEditorAssetFx", () => {
 				const nextManifest = {
 					path: "editor.json",
 					bytes: new TextEncoder().encode(
-						`${JSON.stringify({ ...manifest, updatedAtMs: 456 }, null, "\t")}\n`,
+						`${JSON.stringify(
+							{
+								...manifest,
+								updatedAtMs: 456,
+							},
+							null,
+							"\t",
+						)}\n`,
 					),
 				};
 				record = {
@@ -125,7 +133,7 @@ describe("saveEditorAssetFx", () => {
 	});
 
 	it("rejects bytes that only claim a png filename", async () => {
-		const project = {
+		const project: EditorProject = {
 			projectId: "project",
 			title: "Project",
 			createdAtMs: 1,
@@ -136,7 +144,7 @@ describe("saveEditorAssetFx", () => {
 			resources: [],
 			resourceSourcePaths: {},
 			diagnostics: [],
-		} as const;
+		};
 		vi.mocked(createImageBitmap).mockRejectedValueOnce(new Error("decode failed"));
 		const fakePng = new Uint8Array(24);
 		fakePng.set([
@@ -170,7 +178,7 @@ describe("saveEditorAssetFx", () => {
 	});
 
 	it("releases the decoded bitmap when dimension validation fails", async () => {
-		const project = {
+		const project: EditorProject = {
 			projectId: "project",
 			title: "Project",
 			createdAtMs: 1,
@@ -181,7 +189,7 @@ describe("saveEditorAssetFx", () => {
 			resources: [],
 			resourceSourcePaths: {},
 			diagnostics: [],
-		} as const;
+		};
 		vi.mocked(createImageBitmap).mockResolvedValueOnce({
 			width: 9000,
 			height: 1,

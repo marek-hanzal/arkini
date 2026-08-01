@@ -21,9 +21,9 @@ const EditorItemFormContext = createContext<EditorItemFormSession | undefined>(u
 export const EditorItemFormProvider = ({
 	children,
 	value,
-}: PropsWithChildren<{ readonly value: EditorItemFormSession }>) => (
-	<EditorItemFormContext value={value}>{children}</EditorItemFormContext>
-);
+}: PropsWithChildren<{
+	readonly value: EditorItemFormSession;
+}>) => <EditorItemFormContext value={value}>{children}</EditorItemFormContext>;
 
 /** Reads the exact local item form session owned by the create/edit parent route. */
 export const useEditorItemFormSession = () => {

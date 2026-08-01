@@ -21,22 +21,21 @@ export namespace saveEditorItemFx {
 	}
 }
 
-const createItemSourceFileFx = Effect.fn("createEditorItemSourceFileFx")(
-	(item: ItemSchema.Type) =>
-		createItemEditorSourceFilesFx({
-			[item.id]: item,
-		}).pipe(
-			Effect.flatMap((files) =>
-				files[0] === undefined
-					? Effect.fail(
-							new EditorProjectError({
-								reason: "unsupported-project-file",
-								message: `Item ${item.id} did not produce an editor source file.`,
-							}),
-						)
-					: Effect.succeed(files[0]),
-			),
+const createItemSourceFileFx = Effect.fn("createEditorItemSourceFileFx")((item: ItemSchema.Type) =>
+	createItemEditorSourceFilesFx({
+		[item.id]: item,
+	}).pipe(
+		Effect.flatMap((files) =>
+			files[0] === undefined
+				? Effect.fail(
+						new EditorProjectError({
+							reason: "unsupported-project-file",
+							message: `Item ${item.id} did not produce an editor source file.`,
+						}),
+					)
+				: Effect.succeed(files[0]),
 		),
+	),
 );
 
 /** Upserts one item against the already loaded project index and persists only its source delta. */
@@ -141,7 +140,9 @@ export const saveEditorItemFx = Effect.fn("saveEditorItemFx")(function* ({
 							}),
 						);
 					}
-					const nextItems = { ...items };
+					const nextItems = {
+						...items,
+					};
 					delete nextItems[sourceItemId];
 					nextItems[item.id] = item;
 					return {

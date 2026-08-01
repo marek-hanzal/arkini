@@ -23,14 +23,21 @@ const EditorCreateItemSectionLink = ({
 	itemUid,
 	projectId,
 	section,
-}: CommonProps & { readonly itemType: EditorItemType }) => {
+}: CommonProps & {
+	readonly itemType: EditorItemType;
+}) => {
 	const props = {
 		activeProps,
 		inactiveProps,
 		className,
-		params: { projectId, itemUid },
+		params: {
+			projectId,
+			itemUid,
+		},
 		role: "tab",
-		search: { itemType },
+		search: {
+			itemType,
+		},
 	} as const;
 	switch (section.id) {
 		case "identity":
@@ -95,7 +102,10 @@ const EditorEditItemSectionLink = ({ itemUid, projectId, section }: CommonProps)
 		activeProps,
 		inactiveProps,
 		className,
-		params: { projectId, itemUid },
+		params: {
+			projectId,
+			itemUid,
+		},
 		role: "tab",
 	} as const;
 	switch (section.id) {
@@ -163,8 +173,13 @@ export const EditorItemSectionLink = ({
 	section,
 }: CommonProps & {
 	readonly route:
-		| { readonly kind: "create"; readonly itemType: EditorItemType }
-		| { readonly kind: "edit" };
+		| {
+				readonly kind: "create";
+				readonly itemType: EditorItemType;
+		  }
+		| {
+				readonly kind: "edit";
+		  };
 }) =>
 	route.kind === "create" ? (
 		<EditorCreateItemSectionLink

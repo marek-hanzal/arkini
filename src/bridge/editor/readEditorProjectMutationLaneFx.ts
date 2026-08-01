@@ -12,20 +12,19 @@ const createCompletedIdle = () => {
 };
 
 /** Reads or creates the process-local canonical mutation lane for one editor project. */
-export const readEditorProjectMutationLaneFx = Effect.fn(
-	"readEditorProjectMutationLaneFx",
-)((projectId: string) =>
-	Effect.sync((): EditorProjectMutationLane => {
-		const existing = EditorProjectMutationLanes.get(projectId);
-		if (existing !== undefined) return existing;
-		const created: EditorProjectMutationLane = {
-			accepting: true,
-			idle: createCompletedIdle(),
-			lineage: new Set(),
-			pendingCount: 0,
-			semaphore: Semaphore.makeUnsafe(1),
-		};
-		EditorProjectMutationLanes.set(projectId, created);
-		return created;
-	}),
+export const readEditorProjectMutationLaneFx = Effect.fn("readEditorProjectMutationLaneFx")(
+	(projectId: string) =>
+		Effect.sync((): EditorProjectMutationLane => {
+			const existing = EditorProjectMutationLanes.get(projectId);
+			if (existing !== undefined) return existing;
+			const created: EditorProjectMutationLane = {
+				accepting: true,
+				idle: createCompletedIdle(),
+				lineage: new Set(),
+				pendingCount: 0,
+				semaphore: Semaphore.makeUnsafe(1),
+			};
+			EditorProjectMutationLanes.set(projectId, created);
+			return created;
+		}),
 );

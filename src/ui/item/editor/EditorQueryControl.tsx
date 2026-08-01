@@ -97,14 +97,14 @@ export const EditorQueryControl = (props: EditorQueryControlProps) => (
 						props.onChange(
 							scope === "board"
 								? {
-									scope,
-									distance: "close",
-									selector: props.value.selector,
-								}
+										scope,
+										distance: "close",
+										selector: props.value.selector,
+									}
 								: {
-									scope,
-									selector: props.value.selector,
-								},
+										scope,
+										selector: props.value.selector,
+									},
 						)
 					}
 				/>

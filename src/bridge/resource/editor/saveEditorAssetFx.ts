@@ -7,8 +7,7 @@ import { createEditorWorkspaceFx } from "~/bridge/editor/createEditorWorkspaceFx
 import { EditorProjectError } from "~/engine/editor/error/EditorProjectError";
 import { compileEditorProjectFilesFx } from "~/engine/editor/fx/compileEditorProjectFilesFx";
 import { EditorSourceFileSchema } from "~/engine/editor/schema/EditorSourceFileSchema";
-import { validateResourceEditorSourceIdFx } from
-	"~/engine/resource/editor/fx/validateResourceEditorSourceIdFx";
+import { validateResourceEditorSourceIdFx } from "~/engine/resource/editor/fx/validateResourceEditorSourceIdFx";
 
 const pngMagic = [
 	137,

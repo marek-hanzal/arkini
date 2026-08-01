@@ -18,9 +18,9 @@ export interface EditorFormActions {
 type RegisterEditorFormActions = (actions: EditorFormActions) => () => void;
 
 const EditorFormActionsContext = createContext<EditorFormActions | undefined>(undefined);
-const RegisterEditorFormActionsContext = createContext<
-	RegisterEditorFormActions | undefined
->(undefined);
+const RegisterEditorFormActionsContext = createContext<RegisterEditorFormActions | undefined>(
+	undefined,
+);
 
 /** Owns only the active form command surface, never its editable values. */
 export const EditorFormActionsProvider = ({ children }: PropsWithChildren) => {
@@ -33,9 +33,7 @@ export const EditorFormActionsProvider = ({ children }: PropsWithChildren) => {
 	}, []);
 	return (
 		<RegisterEditorFormActionsContext value={register}>
-			<EditorFormActionsContext value={actions}>
-				{children}
-			</EditorFormActionsContext>
+			<EditorFormActionsContext value={actions}>{children}</EditorFormActionsContext>
 		</RegisterEditorFormActionsContext>
 	);
 };
@@ -49,8 +47,11 @@ export const useRegisterEditorFormActions = (actions: EditorFormActions) => {
 	if (register === undefined) {
 		throw new Error("Editor form actions require EditorFormActionsProvider.");
 	}
-	useLayoutEffect(() => register(actions), [
-		actions,
-		register,
-	]);
+	useLayoutEffect(
+		() => register(actions),
+		[
+			actions,
+			register,
+		],
+	);
 };

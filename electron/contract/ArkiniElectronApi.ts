@@ -90,7 +90,9 @@ export namespace ArkiniElectronApi {
 			readonly listProjects: () => Promise<ReadonlyArray<EditorProjectManifest>>;
 			readonly createProject: (record: EditorProjectCreate) => Promise<void>;
 			readonly readProject: (projectId: string) => Promise<EditorProjectRecord | null>;
-			readonly writeProject: (mutation: EditorProjectWrite) => Promise<EditorProjectWriteResult>;
+			readonly writeProject: (
+				mutation: EditorProjectWrite,
+			) => Promise<EditorProjectWriteResult>;
 			readonly openDirectory: (projectId?: string) => Promise<void>;
 		};
 		readonly appearance: {

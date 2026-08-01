@@ -48,28 +48,21 @@ vi.mock("~/ui/item/editor/EditorItemThumbnail", () => ({
 		}),
 }));
 
-const renderLink = ({
-	children,
-	params,
-	to,
-}: {
-	readonly children?: ReactNode;
-	readonly params?: unknown;
-	readonly to?: string;
-}) =>
-	createElement(
-		"a",
-		{
-			"data-params": JSON.stringify(params),
-			"data-to": to,
-		},
-		children,
-	);
-
-vi.mock("~/ui/button/Button", () => ({
-	ButtonLink: renderLink,
-	PrimaryButtonLink: renderLink,
-}));
+vi.mock("~/ui/button/Button", () => {
+	const RenderLink = ({ children, params, to }: Record<string, unknown>) =>
+		createElement(
+			"a",
+			{
+				"data-params": JSON.stringify(params),
+				"data-to": to,
+			},
+			children as ReactNode,
+		);
+	return {
+		ButtonLink: RenderLink,
+		PrimaryButtonLink: RenderLink,
+	};
+});
 
 const roots: Array<ReturnType<typeof createRoot>> = [];
 const item = {
@@ -135,7 +128,11 @@ const render = async (element: ReactNode) => {
 
 describe("editor item flow", () => {
 	it("opens canonical items in read-only view before offering explicit Edit", async () => {
-		const container = await render(createElement(EditorItemView, { uid: item.uid }));
+		const container = await render(
+			createElement(EditorItemView, {
+				uid: item.uid,
+			}),
+		);
 		const edit = container.querySelector<HTMLAnchorElement>(
 			'[data-to="/editor/$projectId/editor/items/$itemUid/edit/identity"]',
 		);
@@ -146,15 +143,23 @@ describe("editor item flow", () => {
 	});
 
 	it("initializes edit from the canonical UID and returns to its view after save", async () => {
-		await render(createElement(EditorEditItemForm, { uid: item.uid }));
+		await render(
+			createElement(EditorEditItemForm, {
+				uid: item.uid,
+			}),
+		);
 		const props = state.formProps as {
 			readonly initialItem: typeof item;
 			readonly onSaved: (saved: typeof item) => Promise<void>;
-			readonly route: { readonly kind: "edit" };
+			readonly route: {
+				readonly kind: "edit";
+			};
 		};
 
 		expect(props.initialItem).toBe(item);
-		expect(props.route).toEqual({ kind: "edit" });
+		expect(props.route).toEqual({
+			kind: "edit",
+		});
 		await props.onSaved(item);
 		expect(state.navigate).toHaveBeenCalledWith({
 			to: "/editor/$projectId/editor/items/$itemUid/view",
@@ -176,15 +181,26 @@ describe("editor item flow", () => {
 		const props = state.formProps as {
 			readonly initialItem: typeof item;
 			readonly onSaved: (saved: typeof item) => Promise<void>;
-			readonly route: { readonly kind: "create"; readonly itemType: "simple" };
+			readonly route: {
+				readonly kind: "create";
+				readonly itemType: "simple";
+			};
 		};
 
 		expect(props.initialItem.uid).toBe("new-item-uid");
-		expect(props.route).toEqual({ kind: "create", itemType: "simple" });
+		expect(props.route).toEqual({
+			kind: "create",
+			itemType: "simple",
+		});
 		expect(props.initialItem.type).toBe("simple");
 		expect(
-			(state.project as { readonly config: { readonly items: Record<string, unknown> } })
-				.config.items,
+			(
+				state.project as {
+					readonly config: {
+						readonly items: Record<string, unknown>;
+					};
+				}
+			).config.items,
 		).toEqual({
 			[item.id]: item,
 		});

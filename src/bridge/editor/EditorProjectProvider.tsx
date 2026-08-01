@@ -19,7 +19,10 @@ export const EditorProjectProvider = ({
 	const openProjectSession = useAtomSet(openEditorProjectSessionAtom);
 	useLayoutEffect(() => {
 		openProjectSession(loaded.projectId);
-	}, [loaded.projectId, openProjectSession]);
+	}, [
+		loaded.projectId,
+		openProjectSession,
+	]);
 	useLayoutEffect(() => {
 		publish({
 			action: "refresh",

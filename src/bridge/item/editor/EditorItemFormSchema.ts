@@ -8,10 +8,7 @@ import type { MergeSchema } from "~/engine/merge/schema/MergeSchema";
 import type { OutputSchema } from "~/engine/output/schema/OutputSchema";
 
 /** Local presentation values owned only by one mounted item form. */
-export type EditorItemFormValues = Omit<
-	BaseItemSchema.Type,
-	"merge" | "tags"
-> & {
+export type EditorItemFormValues = Omit<BaseItemSchema.Type, "merge" | "tags"> & {
 	readonly tags: string;
 	readonly type: ItemEnumSchema.Type;
 	readonly durationMs?: number;
@@ -29,32 +26,38 @@ export type EditorItemFormValues = Omit<
  * required numbers remain `NaN`, so the canonical ItemSchema reports them at
  * their exact field path instead of silently coercing them to zero.
  */
-export const EditorItemFormSchema = z.preprocess<
-	z.input<typeof ItemSchema>,
-	typeof ItemSchema,
-	EditorItemFormValues
->(
-	(candidate) => {
-		if (
-			typeof candidate !== "object" ||
-			candidate === null ||
-			Array.isArray(candidate)
-		) {
-			return candidate as z.input<typeof ItemSchema>;
+export const EditorItemFormSchema = z
+	.custom<EditorItemFormValues>(
+		(candidate) =>
+			typeof candidate === "object" &&
+			candidate !== null &&
+			!Array.isArray(candidate) &&
+			typeof (candidate as Readonly<Record<string, unknown>>).tags === "string",
+		{
+			error: "Item form values must contain an editable tags string.",
+		},
+	)
+	.transform((candidate) => ({
+		candidate,
+		tags: candidate.tags
+			.split(",")
+			.map((tag) => tag.trim())
+			.filter((tag) => tag !== ""),
+	}))
+	.transform(({ candidate, tags }, context) => {
+		const result = ItemSchema.safeParse({
+			...candidate,
+			tags,
+		});
+		if (result.success) return result.data;
+		for (const issue of result.error.issues) {
+			context.addIssue({
+				code: "custom",
+				message: issue.message,
+				path: issue.path,
+			});
 		}
-		const record = candidate as Readonly<Record<string, unknown>>;
-		if (typeof record.tags !== "string") {
-			return candidate as z.input<typeof ItemSchema>;
-		}
-		return {
-			...record,
-			tags: record.tags
-				.split(",")
-				.map((tag) => tag.trim())
-				.filter((tag) => tag !== ""),
-		} as z.input<typeof ItemSchema>;
-	},
-	ItemSchema,
-);
+		return z.NEVER;
+	});
 
 export type EditorItemFormSchema = typeof EditorItemFormSchema;

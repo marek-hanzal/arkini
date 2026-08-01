@@ -13,10 +13,7 @@ import { releaseEditorProjectSessionAtom } from "~/bridge/editor/releaseEditorPr
 import { closeEditorProjectSessionAtom } from "~/bridge/editor/closeEditorProjectSessionAtom";
 import { useEditorProject } from "~/bridge/editor/useEditorProject";
 import { Button, ButtonLink, PrimaryButton } from "~/ui/button/Button";
-import {
-	EditorFormActionsProvider,
-	useEditorFormActions,
-} from "~/ui/editor/EditorFormActions";
+import { EditorFormActionsProvider, useEditorFormActions } from "~/ui/editor/EditorFormActions";
 
 const tabClassName =
 	"min-h-0 border-transparent bg-transparent px-3 py-2 text-sm shadow-none hover:bg-surface-raised";
@@ -76,7 +73,9 @@ const EditorShellContent = ({ children }: PropsWithChildren) => {
 	useEffect(() => {
 		if (form?.isDirty === true) return;
 		setExitRequested(false);
-	}, [form?.isDirty]);
+	}, [
+		form?.isDirty,
+	]);
 	useEffect(
 		() =>
 			router.subscribe("onResolved", ({ toLocation }) => {
@@ -86,7 +85,9 @@ const EditorShellContent = ({ children }: PropsWithChildren) => {
 						: current,
 				);
 			}),
-		[router],
+		[
+			router,
+		],
 	);
 
 	const closeAndExit = useCallback(async () => {
@@ -120,11 +121,15 @@ const EditorShellContent = ({ children }: PropsWithChildren) => {
 		} catch {
 			// The form owns and publishes its exact mutation error.
 		}
-	}, [form]);
+	}, [
+		form,
+	]);
 	const discard = useCallback(() => {
 		form?.discard();
 		setExitError(undefined);
-	}, [form]);
+	}, [
+		form,
+	]);
 	const saveAndExit = useCallback(async () => {
 		if (form === undefined || form.isSaving) return;
 		setExitError(undefined);
@@ -206,7 +211,10 @@ const EditorShellContent = ({ children }: PropsWithChildren) => {
 					viewTransitionName: "arkini-editor-navigation",
 				}}
 			>
-				<nav className="flex min-w-0 flex-wrap items-center gap-1" aria-label="Editor tools">
+				<nav
+					className="flex min-w-0 flex-wrap items-center gap-1"
+					aria-label="Editor tools"
+				>
 					<ButtonLink
 						to="/editor/$projectId/editor/items/list"
 						params={params}
@@ -258,9 +266,7 @@ const EditorShellContent = ({ children }: PropsWithChildren) => {
 				</p>
 				<Button
 					className="min-h-0 shrink-0 px-4 py-2 text-sm"
-					disabled={
-						form?.isDirty !== true || form.isSaving || exitPending
-					}
+					disabled={form?.isDirty !== true || form.isSaving || exitPending}
 					cursorIntent={form?.isSaving === true ? "progress" : undefined}
 					onClick={() => void save()}
 				>

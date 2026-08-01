@@ -21,7 +21,12 @@ export const EditorItemLimitsSection = () => {
 				</form.AppField>
 				{canonicalItem.type === "temporary" ? null : (
 					<form.AppField name="maxStackSize">
-						{(field) => <field.NumberField label="Maximum stack size" min={1} />}
+						{(field) => (
+							<field.NumberField
+								label="Maximum stack size"
+								min={1}
+							/>
+						)}
 					</form.AppField>
 				)}
 			</div>

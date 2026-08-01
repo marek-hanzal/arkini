@@ -1,10 +1,5 @@
 import { useNavigate } from "@tanstack/react-router";
-import {
-	useCallback,
-	useMemo,
-	type PropsWithChildren,
-	type ReactNode,
-} from "react";
+import { useCallback, useMemo, type PropsWithChildren, type ReactNode } from "react";
 
 import { useEditorProject } from "~/bridge/editor/useEditorProject";
 import type { EditorItem } from "~/bridge/item/editor/EditorItemModel";
@@ -118,7 +113,12 @@ export const EditorItemForm = ({
 					});
 			}
 		},
-		[initialItem.uid, navigate, project.projectId, route],
+		[
+			initialItem.uid,
+			navigate,
+			project.projectId,
+			route,
+		],
 	);
 	const controller = useEditorItemFormController({
 		initialItem,
@@ -130,7 +130,10 @@ export const EditorItemForm = ({
 			...controller,
 			route,
 		}),
-		[controller, route],
+		[
+			controller,
+			route,
+		],
 	);
 
 	return (

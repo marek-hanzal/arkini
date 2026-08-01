@@ -16,7 +16,10 @@ vi.mock("~/ui/item/editor/EditorItemAutocompleteField", () => ({
 }));
 
 import type { EditorItem } from "~/bridge/item/editor/EditorItemModel";
-import { EditorItemFormSchema } from "~/bridge/item/editor/EditorItemFormSchema";
+import {
+	EditorItemFormSchema,
+	type EditorItemFormValues,
+} from "~/bridge/item/editor/EditorItemFormSchema";
 import { useAppForm } from "~/ui/form/EditorForm";
 
 (
@@ -46,9 +49,11 @@ const mount = async (element: ReactNode) => {
 const changeInput = async (input: HTMLInputElement, value: string) => {
 	await act(async () => {
 		input.value = value;
-		input.dispatchEvent(new Event("input", {
-			bubbles: true,
-		}));
+		input.dispatchEvent(
+			new Event("input", {
+				bubbles: true,
+			}),
+		);
 	});
 };
 
@@ -62,9 +67,7 @@ const LocalValueHarness = () => {
 	const values = useStore(form.store, (state) => state.values);
 	return (
 		<>
-			<form.AppField name="tags">
-				{(field) => <field.TagsField label="Tags" />}
-			</form.AppField>
+			<form.AppField name="tags">{(field) => <field.TagsField label="Tags" />}</form.AppField>
 			<form.AppField name="amount">
 				{(field) => <field.NumberField label="Amount" />}
 			</form.AppField>
@@ -88,24 +91,26 @@ const LocalValueHarness = () => {
 
 const submittedItems: EditorItem[] = [];
 
+const validationDefaults: EditorItemFormValues = {
+	uid: "q12cmsx5ussy30wyjiea8yaw",
+	id: "item:test",
+	type: "simple",
+	title: "Test item",
+	description: "A valid item used by the editor form test.",
+	asset: {
+		default: [
+			"item-test",
+		],
+	},
+	tags: "resource, form",
+	categoryId: "resource",
+	scope: "any",
+	maxStackSize: 1,
+};
+
 const ValidationHarness = () => {
 	const form = useAppForm({
-		defaultValues: {
-			uid: "q12cmsx5ussy30wyjiea8yaw",
-			id: "item:test",
-			type: "simple" as const,
-			title: "Test item",
-			description: "A valid item used by the editor form test.",
-			asset: {
-				default: [
-					"item-test",
-				] as [string],
-			},
-			tags: "resource, form",
-			categoryId: "resource",
-			scope: "any" as const,
-			maxStackSize: 1,
-		},
+		defaultValues: validationDefaults,
 		validationLogic: revalidateLogic({
 			mode: "submit",
 			modeAfterSubmission: "change",

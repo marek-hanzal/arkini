@@ -15,7 +15,11 @@ export const EditorItemChargesSection = () => {
 					charges === undefined ? (
 						<Button
 							className="justify-self-start"
-							onClick={() => form.setFieldValue("charges", { amount: 1 })}
+							onClick={() =>
+								form.setFieldValue("charges", {
+									amount: 1,
+								})
+							}
 						>
 							Enable charges
 						</Button>
@@ -24,7 +28,12 @@ export const EditorItemChargesSection = () => {
 							<div className="flex items-end gap-3">
 								<div className="min-w-0 flex-1">
 									<form.AppField name="charges.amount">
-										{(field) => <field.NumberField label="Initial charges" min={1} />}
+										{(field) => (
+											<field.NumberField
+												label="Initial charges"
+												min={1}
+											/>
+										)}
 									</form.AppField>
 								</div>
 								<Button onClick={() => form.setFieldValue("charges", undefined)}>

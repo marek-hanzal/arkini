@@ -17,12 +17,30 @@ export interface EditorItemSectionDescriptor {
 }
 
 const EditorItemSections = [
-	{ id: "identity", label: "Identity" },
-	{ id: "artwork", label: "Artwork" },
-	{ id: "limits", label: "Limits" },
-	{ id: "charges", label: "Charges" },
-	{ id: "merges", label: "Merges" },
-	{ id: "production", label: "Production" },
+	{
+		id: "identity",
+		label: "Identity",
+	},
+	{
+		id: "artwork",
+		label: "Artwork",
+	},
+	{
+		id: "limits",
+		label: "Limits",
+	},
+	{
+		id: "charges",
+		label: "Charges",
+	},
+	{
+		id: "merges",
+		label: "Merges",
+	},
+	{
+		id: "production",
+		label: "Production",
+	},
 ] as const satisfies ReadonlyArray<EditorItemSectionDescriptor>;
 
 const ProductionItemTypes = new Set<EditorItemType>([

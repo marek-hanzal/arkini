@@ -179,9 +179,9 @@ describe("createFilesystemEditorWorkspaceFx", () => {
 		await expect(
 			readFile(join(root, "write-project", "simple", "water.json"), "utf8"),
 		).resolves.toBe("new");
-		const manifest = JSON.parse(
-			new TextDecoder().decode(written.manifest.bytes),
-		) as { readonly updatedAtMs: number };
+		const manifest = JSON.parse(new TextDecoder().decode(written.manifest.bytes)) as {
+			readonly updatedAtMs: number;
+		};
 		expect(manifest.updatedAtMs).toBeGreaterThan(100);
 		await expect(Effect.runPromise(workspace.listFx())).resolves.toEqual([
 			expect.objectContaining({
@@ -278,9 +278,9 @@ describe("createFilesystemEditorWorkspaceFx", () => {
 				},
 			}),
 		);
-		const manifest = JSON.parse(
-			new TextDecoder().decode(written.manifest.bytes),
-		) as { readonly updatedAtMs: number };
+		const manifest = JSON.parse(new TextDecoder().decode(written.manifest.bytes)) as {
+			readonly updatedAtMs: number;
+		};
 
 		await expect(Effect.runPromise(workspace.listFx())).resolves.toEqual([
 			expect.objectContaining({

@@ -9,7 +9,10 @@ export const EditorItemArtworkSection = () => {
 			title="Artwork"
 			description="The default composition supports one or two layered PNG assets."
 		>
-			<EditorItemArtworkFields form={form} fields="asset" />
+			<EditorItemArtworkFields
+				form={form}
+				fields="asset"
+			/>
 		</EditorFormSection>
 	);
 };

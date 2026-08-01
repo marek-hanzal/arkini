@@ -205,7 +205,9 @@ describe("installRendererControlledClose", () => {
 			}),
 		);
 
-		await expect(lifecycle.readBeforeClose()()).rejects.toThrow("Save or discard the current form");
+		await expect(lifecycle.readBeforeClose()()).rejects.toThrow(
+			"Save or discard the current form",
+		);
 		expect(router.navigate).not.toHaveBeenCalled();
 		remove();
 	});

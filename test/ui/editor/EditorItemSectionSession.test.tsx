@@ -101,7 +101,9 @@ const render = async (children: ReactNode) => {
 				<EditorItemForm
 					back={null}
 					initialItem={item}
-					route={{ kind: "edit" }}
+					route={{
+						kind: "edit",
+					}}
 					title="Water"
 				>
 					{next}
@@ -110,13 +112,20 @@ const render = async (children: ReactNode) => {
 		});
 	};
 	await renderForm(children);
-	return { container, renderForm };
+	return {
+		container,
+		renderForm,
+	};
 };
 
 const changeInput = async (input: HTMLInputElement, value: string) => {
 	await act(async () => {
 		input.value = value;
-		input.dispatchEvent(new Event("input", { bubbles: true }));
+		input.dispatchEvent(
+			new Event("input", {
+				bubbles: true,
+			}),
+		);
 	});
 };
 

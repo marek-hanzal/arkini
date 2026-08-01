@@ -262,7 +262,9 @@ const EditorRollControl = ({
 													{
 														weight: 1,
 														drop: [
-															structuredClone(EditorItemDraftDefaults.drop),
+															structuredClone(
+																EditorItemDraftDefaults.drop,
+															),
 														],
 													},
 												],

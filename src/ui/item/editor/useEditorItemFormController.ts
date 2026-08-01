@@ -4,11 +4,17 @@ import { useCallback, useLayoutEffect, useMemo, useRef } from "react";
 
 import { EditorProjectFormDirtyAtom } from "~/bridge/editor/EditorProjectFormDirtyAtom";
 import { useEditorProject } from "~/bridge/editor/useEditorProject";
-import { EditorItemFormSchema } from "~/bridge/item/editor/EditorItemFormSchema";
+import {
+	EditorItemFormSchema,
+	type EditorItemFormValues,
+} from "~/bridge/item/editor/EditorItemFormSchema";
 import type { EditorItem } from "~/bridge/item/editor/EditorItemModel";
 import { useRegisterEditorFormActions } from "~/ui/editor/EditorFormActions";
 import { useAppForm } from "~/ui/form/EditorForm";
-import { readEditorItemSectionForPath, type EditorItemSectionId } from "~/ui/item/editor/EditorItemSections";
+import {
+	readEditorItemSectionForPath,
+	type EditorItemSectionId,
+} from "~/ui/item/editor/EditorItemSections";
 import { useSaveEditorItemCommand } from "~/ui/item/editor/useSaveEditorItemCommand";
 
 export namespace useEditorItemFormController {
@@ -26,7 +32,7 @@ export const useEditorItemFormController = ({
 	onSaved,
 }: useEditorItemFormController.Props) => {
 	const project = useEditorProject();
-	const canonicalItem = useMemo(
+	const canonicalItem = useMemo<EditorItemFormValues>(
 		() => ({
 			...initialItem,
 			tags: initialItem.tags.join(", "),
@@ -37,7 +43,9 @@ export const useEditorItemFormController = ({
 							...initialItem.merge,
 						],
 		}),
-		[initialItem],
+		[
+			initialItem,
+		],
 	);
 	const categoryOptions = Object.values(project.config?.categories ?? {}).map((category) => ({
 		label: category.title,
@@ -100,7 +108,11 @@ export const useEditorItemFormController = ({
 				ownerId,
 			});
 		};
-	}, [dirty, ownerId, setFormDirty]);
+	}, [
+		dirty,
+		ownerId,
+		setFormDirty,
+	]);
 	const discard = useCallback(() => {
 		mutation.reset();
 		setFormDirty({
@@ -108,7 +120,13 @@ export const useEditorItemFormController = ({
 			ownerId,
 		});
 		form.reset(canonicalItem);
-	}, [canonicalItem, form, mutation.reset, ownerId, setFormDirty]);
+	}, [
+		canonicalItem,
+		form,
+		mutation.reset,
+		ownerId,
+		setFormDirty,
+	]);
 	const save = useCallback(async () => {
 		if (!dirty || submitting) return false;
 		submitSucceeded.current = false;
@@ -128,7 +146,12 @@ export const useEditorItemFormController = ({
 			}
 		}
 		return submitSucceeded.current;
-	}, [dirty, form, onInvalidSection, submitting]);
+	}, [
+		dirty,
+		form,
+		onInvalidSection,
+		submitting,
+	]);
 	const actions = useMemo(
 		() => ({
 			discard,
@@ -137,7 +160,14 @@ export const useEditorItemFormController = ({
 			isSaving: submitting,
 			save,
 		}),
-		[dirty, discard, mutation.error, save, submitting, validationError],
+		[
+			dirty,
+			discard,
+			mutation.error,
+			save,
+			submitting,
+			validationError,
+		],
 	);
 	useRegisterEditorFormActions(actions);
 

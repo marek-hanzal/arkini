@@ -11,13 +11,7 @@ import {
 } from "@tanstack/react-router";
 import { Effect } from "effect";
 import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
-import {
-	act,
-	createElement,
-	useCallback,
-	useMemo,
-	useState,
-} from "react";
+import { act, createElement, useCallback, useMemo, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -46,7 +40,8 @@ vi.mock("~/bridge/editor/openEditorProjectSessionFx", () => ({
 }));
 
 vi.mock("~/bridge/editor/releaseEditorProjectSessionFx", () => ({
-	releaseEditorProjectSessionFx: () => Effect.sync(session.release),
+	releaseEditorProjectSessionFx: (projectId: string) =>
+		Effect.sync(() => session.release(projectId)),
 }));
 
 vi.mock("~/bridge/editor/useEditorProject", () => ({
@@ -297,9 +292,9 @@ describe("EditorShell", () => {
 
 		expect(readLink(container, "Items").className).toContain("bg-accent");
 		expect(
-			[...container.querySelectorAll("a")].some(
-				(link) => link.textContent === "Editor",
-			),
+			[
+				...container.querySelectorAll("a"),
+			].some((link) => link.textContent === "Editor"),
 		).toBe(false);
 		expect(container.querySelector('[data-ui="EditorFormStatusSlot"]')).toBeNull();
 		expect(container.querySelector('[data-ui="EditorContent"]')?.className).toContain(
@@ -348,9 +343,10 @@ describe("EditorShell", () => {
 			readButton(container, "Save").click();
 		});
 		expect(formCalls.save).toHaveBeenCalledTimes(1);
-		await vi.waitFor(() =>
-			expect(container.textContent).not.toContain("This form has unsaved changes."),
-		);
+		await vi.waitFor(() => {
+			const status = container.querySelector('[data-ui="EditorFormStatusSlot"] > div');
+			expect(status?.getAttribute("aria-hidden")).toBe("true");
+		});
 	});
 
 	it("lets ordinary editor navigation discard local form state without a prompt", async () => {
@@ -378,15 +374,11 @@ describe("EditorShell", () => {
 			readButton(container, "Exit").click();
 		});
 		expect(session.close).not.toHaveBeenCalled();
-		expect(container.textContent).toContain(
-			"Save or discard them before exiting.",
-		);
+		expect(container.textContent).toContain("Save or discard them before exiting.");
 		await act(async () => {
 			readStatusButton(container, "Discard").click();
 		});
-		await vi.waitFor(() =>
-			expect(router.state.location.pathname).toBe("/main-menu"),
-		);
+		await vi.waitFor(() => expect(router.state.location.pathname).toBe("/main-menu"));
 		expect(formCalls.discard).toHaveBeenCalledTimes(1);
 		expect(session.close).toHaveBeenCalledTimes(1);
 		expect(session.release).toHaveBeenCalledWith("editor-test");
@@ -408,17 +400,13 @@ describe("EditorShell", () => {
 			readStatusButton(container, "Save").click();
 		});
 		await vi.waitFor(() => expect(container.textContent).toContain("Invalid item."));
-		expect(router.state.location.pathname).toBe(
-			"/editor/editor-test/editor/items/test/edit",
-		);
+		expect(router.state.location.pathname).toBe("/editor/editor-test/editor/items/test/edit");
 		expect(session.close).not.toHaveBeenCalled();
 
 		await act(async () => {
 			readStatusButton(container, "Save").click();
 		});
-		await vi.waitFor(() =>
-			expect(router.state.location.pathname).toBe("/main-menu"),
-		);
+		await vi.waitFor(() => expect(router.state.location.pathname).toBe("/main-menu"));
 		expect(formCalls.save).toHaveBeenCalledTimes(2);
 		expect(session.close).toHaveBeenCalledTimes(1);
 	});
@@ -436,20 +424,14 @@ describe("EditorShell", () => {
 		await act(async () => {
 			readStatusButton(container, "Save").click();
 		});
-		expect(router.state.location.pathname).toBe(
-			"/editor/editor-test/editor/items/test/edit",
-		);
+		expect(router.state.location.pathname).toBe("/editor/editor-test/editor/items/test/edit");
 		expect(session.close).not.toHaveBeenCalled();
-		expect(container.textContent).toContain(
-			"Fix the highlighted item fields before saving.",
-		);
+		expect(container.textContent).toContain("Fix the highlighted item fields before saving.");
 
 		await act(async () => {
 			readStatusButton(container, "Save").click();
 		});
-		await vi.waitFor(() =>
-			expect(router.state.location.pathname).toBe("/main-menu"),
-		);
+		await vi.waitFor(() => expect(router.state.location.pathname).toBe("/main-menu"));
 		expect(formCalls.save).toHaveBeenCalledTimes(2);
 	});
 });

@@ -19,7 +19,9 @@ export const EditorItemList = () => {
 			Object.values(project.config?.items ?? {}).sort((left, right) =>
 				left.title.localeCompare(right.title),
 			),
-		[project.config?.items],
+		[
+			project.config?.items,
+		],
 	);
 	const searchCandidates = useMemo(
 		() =>
@@ -43,8 +45,16 @@ export const EditorItemList = () => {
 	);
 	const matchingItemUids = useFuseSearch(searchCandidates, query);
 	const itemsByUid = useMemo(
-		() => new Map(items.map((item) => [item.uid, item])),
-		[items],
+		() =>
+			new Map(
+				items.map((item) => [
+					item.uid,
+					item,
+				]),
+			),
+		[
+			items,
+		],
 	);
 	const empty = items.length === 0;
 	const filteredItems = matchingItemUids.flatMap((uid) => {

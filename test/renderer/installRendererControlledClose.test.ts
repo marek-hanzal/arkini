@@ -190,6 +190,7 @@ describe("installRendererControlledClose", () => {
 			createProjectFx: () => Effect.die("Unexpected create."),
 			listProjectsFx: Effect.die("Unexpected list."),
 			readProjectFx: () => Effect.die("Unexpected read."),
+			replaceConfigFx: () => Effect.die("Unexpected config save."),
 			upsertItemFx: () => Effect.die("Unexpected item save."),
 			upsertResourcesFx: () => Effect.die("Unexpected resource save."),
 		};

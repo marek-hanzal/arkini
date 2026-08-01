@@ -4,6 +4,7 @@ export type EditorProjectRepositoryOperation =
 	| "create-project"
 	| "list-projects"
 	| "read-project"
+	| "replace-config"
 	| "upsert-item"
 	| "upsert-resource";
 

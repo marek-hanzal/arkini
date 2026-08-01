@@ -209,6 +209,39 @@ describe("createIndexedDbEditorProjectRepositoryFx", () => {
 		);
 	});
 
+	it("atomically replaces the complete canonical config", async () => {
+		const databaseName = createDatabaseName();
+		const created = await runWithRepository(databaseName, (repository) =>
+			repository.createProjectFx({
+				projectId: "project-one",
+				config: editorTestPayload.config,
+				resources: editorTestPayload.resources,
+			}),
+		);
+		const changed = await runWithRepository(databaseName, (repository) =>
+			repository.replaceConfigFx({
+				projectId: "project-one",
+				config: {
+					...editorTestPayload.config,
+					meta: {
+						...editorTestPayload.config.meta,
+						title: "Changed project",
+					},
+				},
+			}),
+		);
+
+		expect(changed.revision).toBe(created.revision + 1);
+		expect(changed.config.meta.title).toBe("Changed project");
+		expect(
+			(
+				await runWithRepository(databaseName, (repository) =>
+					repository.readProjectFx("project-one"),
+				)
+			)?.config.meta.title,
+		).toBe("Changed project");
+	});
+
 	it("serializes concurrent item and resource transactions without losing either revision", async () => {
 		const databaseName = createDatabaseName();
 		await runWithRepository(databaseName, (repository) =>

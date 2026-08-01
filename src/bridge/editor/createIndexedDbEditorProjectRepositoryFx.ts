@@ -331,6 +331,53 @@ export const createIndexedDbEditorProjectRepositoryFx = Effect.fn(
 		);
 	});
 
+	const replaceConfigFx: EditorProjectRepositoryService["replaceConfigFx"] = Effect.fn(
+		"IndexedDbEditorProjectRepository.replaceConfigFx",
+	)(function* ({ projectId, config: candidateConfig }) {
+		const config = yield* Effect.try({
+			try: () => GameConfigSchema.parse(candidateConfig),
+			catch: (cause) =>
+				createRepositoryError(
+					"replace-config",
+					"The editor project config is invalid.",
+					cause,
+				),
+		});
+		const nowMs = yield* Clock.currentTimeMillis;
+		return yield* writeLock.withPermits(1)(
+			Effect.tryPromise({
+				try: () =>
+					database.transaction("rw", projects, async () => {
+						const candidate = await projects.get(projectId);
+						if (candidate === undefined) {
+							throw createRepositoryError(
+								"replace-config",
+								`Editor project ${projectId} does not exist.`,
+							);
+						}
+						const current = parseProjectRecord(candidate, "replace-config");
+						const record = parseProjectRecord(
+							{
+								...current,
+								config,
+								revision: current.revision + 1,
+								updatedAtMs: Math.max(nowMs, current.updatedAtMs + 1),
+							},
+							"replace-config",
+						);
+						await projects.put(record);
+						return materializeProjectCommit(record);
+					}),
+				catch: (cause) =>
+					createRepositoryError(
+						"replace-config",
+						`Project ${projectId} configuration could not be saved.`,
+						cause,
+					),
+			}).pipe(Effect.uninterruptible),
+		);
+	});
+
 	const upsertResourcesFx: EditorProjectRepositoryService["upsertResourcesFx"] = Effect.fn(
 		"IndexedDbEditorProjectRepository.upsertResourcesFx",
 	)(function* ({ projectId, resources: candidateResources }) {
@@ -404,6 +451,7 @@ export const createIndexedDbEditorProjectRepositoryFx = Effect.fn(
 		createProjectFx,
 		listProjectsFx,
 		readProjectFx,
+		replaceConfigFx,
 		upsertItemFx,
 		upsertResourcesFx,
 	} satisfies EditorProjectRepositoryService;

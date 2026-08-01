@@ -27,6 +27,7 @@ const createRepository = (
 	createProjectFx: () => Effect.die("Unexpected project create."),
 	listProjectsFx: Effect.die("Unexpected project list."),
 	readProjectFx,
+	replaceConfigFx: () => Effect.die("Unexpected config save."),
 	upsertItemFx: () => Effect.die("Unexpected item save."),
 	upsertResourcesFx: () => Effect.die("Unexpected resource save."),
 });

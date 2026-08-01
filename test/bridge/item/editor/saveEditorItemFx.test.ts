@@ -48,6 +48,7 @@ const createFixture = () => {
 		createProjectFx: () => Effect.die("Unexpected create."),
 		listProjectsFx: Effect.die("Unexpected list."),
 		readProjectFx: () => Effect.die("Unexpected read."),
+		replaceConfigFx: () => Effect.die("Unexpected config save."),
 		upsertItemFx,
 		upsertResourcesFx: () => Effect.die("Unexpected resource save."),
 	};

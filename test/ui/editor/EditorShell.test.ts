@@ -337,6 +337,30 @@ describe("EditorShell", () => {
 		expect(container.textContent).toContain("Native close failed.");
 	});
 
+	it("marks an accepted link transition synchronously on click", async () => {
+		const projectLoader = createGate();
+		const router = createTestRouter({
+			initialEntry: "/editor/editor-test/build",
+			projectLoader: () => projectLoader.promise,
+		});
+		const container = await renderRouter(router);
+		const projectLink = readLink(container, "Project");
+
+		act(() => {
+			projectLink.click();
+		});
+
+		expect(projectLink.getAttribute("data-transitioning")).toBe("transitioning");
+		expect(projectLink.className).toContain("ak-editor-workspace-tab");
+		expect(projectLink.className).toContain("transition-none");
+		expect(projectLink.closest("nav")?.className).toContain("ak-editor-workspace-tabs");
+
+		await act(async () => {
+			projectLoader.resolve();
+			await projectLoader.promise;
+		});
+	});
+
 	it("projects only the latest accepted destination during rapid navigation", async () => {
 		const projectLoader = createGate();
 		const assetsLoader = createGate();

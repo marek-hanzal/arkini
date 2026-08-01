@@ -13,7 +13,7 @@ import {
 } from "~/ui/editor/useEditorActiveWorkspace";
 
 const tabClassName =
-	"min-h-0 border-transparent bg-transparent px-3 py-2 text-sm shadow-none hover:bg-surface-raised";
+	"ak-editor-workspace-tab min-h-0 border-transparent bg-transparent px-3 py-2 text-sm shadow-none transition-none hover:bg-surface-raised";
 const activeTabProps = {
 	className: "border-accent bg-accent text-accent-contrast hover:bg-accent-hover",
 } as const;
@@ -168,7 +168,7 @@ const EditorShellContent = ({ children }: PropsWithChildren) => {
 				}}
 			>
 				<nav
-					className="flex min-w-0 flex-wrap items-center gap-1"
+					className="ak-editor-workspace-tabs flex min-w-0 flex-wrap items-center gap-1"
 					aria-label="Editor tools"
 				>
 					{EditorWorkspaceRoutes.map(({ id, label, to }) => (

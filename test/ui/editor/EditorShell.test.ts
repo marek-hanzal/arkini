@@ -7,7 +7,9 @@ import {
 	createRoute,
 	createRouter,
 	Outlet,
+	redirect,
 	RouterProvider,
+	useBlocker,
 } from "@tanstack/react-router";
 import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 import { act, createElement, useCallback, useMemo, useState } from "react";
@@ -126,12 +128,27 @@ const DirtyItemForm = () => {
 	return createElement("p", null, "Item form");
 };
 
+const BlockingDestination = () => {
+	useBlocker({
+		enableBeforeUnload: false,
+		shouldBlockFn: () => true,
+	});
+	return createElement("p", null, "Build destination");
+};
+
 interface TestRouterOptions {
+	readonly assetsLoader?: () => Promise<void>;
+	readonly blockNavigation?: boolean;
 	readonly initialEntry: string;
-	readonly projectLoader?: () => Promise<void>;
+	readonly projectLoader?: () => Promise<void> | void;
 }
 
-const createTestRouter = ({ initialEntry, projectLoader }: TestRouterOptions) => {
+const createTestRouter = ({
+	assetsLoader,
+	blockNavigation = false,
+	initialEntry,
+	projectLoader,
+}: TestRouterOptions) => {
 	const rootRoute = createRootRoute();
 	const editorRoute = createRoute({
 		getParentRoute: () => rootRoute,
@@ -151,6 +168,11 @@ const createTestRouter = ({ initialEntry, projectLoader }: TestRouterOptions) =>
 	const assetsRoute = createRoute({
 		getParentRoute: () => editorRoute,
 		path: "assets",
+		...(assetsLoader === undefined
+			? {}
+			: {
+					loader: assetsLoader,
+				}),
 		component: () => createElement("p", null, "Assets destination"),
 	});
 	const projectRoute = createRoute({
@@ -166,7 +188,9 @@ const createTestRouter = ({ initialEntry, projectLoader }: TestRouterOptions) =>
 	const buildRoute = createRoute({
 		getParentRoute: () => editorRoute,
 		path: "build",
-		component: () => createElement("p", null, "Build destination"),
+		component: blockNavigation
+			? BlockingDestination
+			: () => createElement("p", null, "Build destination"),
 	});
 	const boardRoute = createRoute({
 		getParentRoute: () => editorRoute,
@@ -264,6 +288,7 @@ describe("EditorShell", () => {
 		const container = await renderRouter(router);
 
 		expect(readLink(container, "Items").className).toContain("bg-accent");
+		expect(readLink(container, "Items").getAttribute("aria-current")).toBe("page");
 		expect(
 			[
 				...container.querySelectorAll("a"),
@@ -275,7 +300,7 @@ describe("EditorShell", () => {
 		);
 	});
 
-	it("switches the active tab before the destination route finishes loading", async () => {
+	it("projects programmatic pending navigation before the destination finishes loading", async () => {
 		const projectLoader = createGate();
 		const router = createTestRouter({
 			initialEntry: "/editor/editor-test/build",
@@ -287,21 +312,119 @@ describe("EditorShell", () => {
 
 		expect(buildLink.className).toContain("bg-accent");
 		expect(projectLink.className).not.toContain("bg-accent");
+		let navigation!: Promise<void>;
 		act(() => {
-			projectLink.click();
+			navigation = router.navigate({
+				to: "/editor/$projectId/project",
+				params: {
+					projectId: "editor-test",
+				},
+			});
 		});
 		expect(container.textContent).toContain("Build destination");
 		expect(projectLink.className).toContain("bg-accent");
+		expect(projectLink.getAttribute("aria-current")).toBe("page");
 		expect(buildLink.className).not.toContain("bg-accent");
+		expect(buildLink.getAttribute("aria-current")).toBeNull();
 
 		await act(async () => {
 			projectLoader.resolve();
-			await projectLoader.promise;
+			await navigation;
 		});
 		act(() => {
 			closeFailedListener?.(new Error("Native close failed."));
 		});
 		expect(container.textContent).toContain("Native close failed.");
+	});
+
+	it("projects only the latest accepted destination during rapid navigation", async () => {
+		const projectLoader = createGate();
+		const assetsLoader = createGate();
+		const router = createTestRouter({
+			assetsLoader: () => assetsLoader.promise,
+			initialEntry: "/editor/editor-test/build",
+			projectLoader: () => projectLoader.promise,
+		});
+		const container = await renderRouter(router);
+		const assetsLink = readLink(container, "Assets");
+		const projectLink = readLink(container, "Project");
+
+		let projectNavigation!: Promise<void>;
+		act(() => {
+			projectNavigation = router.navigate({
+				to: "/editor/$projectId/project",
+				params: {
+					projectId: "editor-test",
+				},
+			});
+		});
+		expect(projectLink.getAttribute("aria-current")).toBe("page");
+
+		let assetsNavigation!: Promise<void>;
+		act(() => {
+			assetsNavigation = router.navigate({
+				to: "/editor/$projectId/assets",
+				params: {
+					projectId: "editor-test",
+				},
+			});
+		});
+		expect(assetsLink.getAttribute("aria-current")).toBe("page");
+		expect(projectLink.getAttribute("aria-current")).toBeNull();
+
+		await act(async () => {
+			assetsLoader.resolve();
+			await assetsNavigation;
+			projectLoader.resolve();
+			await projectNavigation;
+		});
+		expect(router.state.location.pathname).toBe("/editor/editor-test/assets");
+		expect(assetsLink.getAttribute("aria-current")).toBe("page");
+	});
+
+	it("converges the active workspace to the final redirected destination", async () => {
+		const router = createTestRouter({
+			initialEntry: "/editor/editor-test/build",
+			projectLoader: () => {
+				throw redirect({
+					href: "/editor/editor-test/assets",
+				});
+			},
+		});
+		const container = await renderRouter(router);
+
+		await act(async () => {
+			await router.navigate({
+				to: "/editor/$projectId/project",
+				params: {
+					projectId: "editor-test",
+				},
+			});
+		});
+
+		expect(router.state.location.pathname).toBe("/editor/editor-test/assets");
+		expect(readLink(container, "Assets").getAttribute("aria-current")).toBe("page");
+		expect(readLink(container, "Project").getAttribute("aria-current")).toBeNull();
+	});
+
+	it("retains the committed workspace when navigation is blocked before acceptance", async () => {
+		const projectLoader = vi.fn();
+		const router = createTestRouter({
+			blockNavigation: true,
+			initialEntry: "/editor/editor-test/build",
+			projectLoader,
+		});
+		const container = await renderRouter(router);
+
+		await act(async () => {
+			readLink(container, "Project").click();
+			await Promise.resolve();
+		});
+
+		expect(router.state.location.pathname).toBe("/editor/editor-test/build");
+		expect(projectLoader).not.toHaveBeenCalled();
+		expect(readLink(container, "Build").getAttribute("aria-current")).toBe("page");
+		expect(readLink(container, "Project").getAttribute("aria-current")).toBeNull();
 	});
 
 	it("saves the active form from its status Save action", async () => {
@@ -310,6 +433,7 @@ describe("EditorShell", () => {
 		});
 		const container = await renderRouter(router);
 
+		expect(readLink(container, "Items").getAttribute("aria-current")).toBe("page");
 		expect(container.textContent).toContain("This form has unsaved changes.");
 		expect(container.querySelector('[data-ui="EditorFormStatusSlot"]')).not.toBeNull();
 		await act(async () => {

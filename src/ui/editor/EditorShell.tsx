@@ -1,29 +1,22 @@
 import { useAtomSet } from "@effect/atom-react";
 import { useRouter } from "@tanstack/react-router";
-import {
-	useCallback,
-	useEffect,
-	useState,
-	type MouseEventHandler,
-	type PropsWithChildren,
-} from "react";
+import { useCallback, useEffect, useState, type PropsWithChildren } from "react";
 
 import { useEditorProject } from "~/bridge/editor/useEditorProject";
 import { waitForEditorProjectWritesCommandAtom } from "~/bridge/editor/waitForEditorProjectWritesCommandAtom";
 import { ButtonLink, PrimaryButton } from "~/ui/button/Button";
 import { EditorFormActionsProvider, useEditorFormActions } from "~/ui/editor/EditorFormActions";
+import {
+	EditorWorkspaceRoutes,
+	type EditorWorkspaceId,
+	useEditorActiveWorkspace,
+} from "~/ui/editor/useEditorActiveWorkspace";
 
 const tabClassName =
 	"min-h-0 border-transparent bg-transparent px-3 py-2 text-sm shadow-none hover:bg-surface-raised";
 const activeTabProps = {
 	className: "border-accent bg-accent text-accent-contrast hover:bg-accent-hover",
 } as const;
-const inactiveTabProps = {} as const;
-type EditorTab = "assets" | "board" | "build" | "editor" | "project";
-const readEditorTab = (pathname: string): EditorTab | undefined => {
-	const match = pathname.match(/\/editor\/[^/]+\/(assets|board|build|editor|project)(?:\/|$)/);
-	return match?.[1] as EditorTab | undefined;
-};
 
 const readErrorMessage = (error: unknown) => {
 	if (typeof error === "string") return error;
@@ -46,7 +39,7 @@ const EditorShellContent = ({ children }: PropsWithChildren) => {
 	const waitForProjectWrites = useAtomSet(waitForEditorProjectWritesCommandAtom, {
 		mode: "promise",
 	});
-	const [optimisticTab, setOptimisticTab] = useState<EditorTab>();
+	const activeWorkspace = useEditorActiveWorkspace(project.projectId);
 	const [exitRequested, setExitRequested] = useState(false);
 	const [exitError, setExitError] = useState<unknown>();
 	const [exitPending, setExitPending] = useState(false);
@@ -68,19 +61,6 @@ const EditorShellContent = ({ children }: PropsWithChildren) => {
 	}, [
 		form?.isDirty,
 	]);
-	useEffect(
-		() =>
-			router.subscribe("onResolved", ({ toLocation }) => {
-				setOptimisticTab((current) =>
-					current !== undefined && readEditorTab(toLocation.pathname) === current
-						? undefined
-						: current,
-				);
-			}),
-		[
-			router,
-		],
-	);
 
 	const closeAndExit = useCallback(async () => {
 		if (exitPending) return;
@@ -149,27 +129,15 @@ const EditorShellContent = ({ children }: PropsWithChildren) => {
 		form?.isDirty,
 	]);
 
-	const readTabClassName = (tab: EditorTab) =>
-		optimisticTab === tab ? `${tabClassName} ${activeTabProps.className}` : tabClassName;
-	const readActiveTabProps = () =>
-		optimisticTab === undefined ? activeTabProps : inactiveTabProps;
-	const createTabClickHandler =
-		(tab: EditorTab): MouseEventHandler<HTMLAnchorElement> =>
-		(event) => {
-			if (
-				event.defaultPrevented ||
-				event.button !== 0 ||
-				event.metaKey ||
-				event.altKey ||
-				event.ctrlKey ||
-				event.shiftKey
-			) {
-				return;
-			}
-			setExitError(undefined);
-			setExitRequested(false);
-			setOptimisticTab(tab);
-		};
+	const readTabProps = (workspace: EditorWorkspaceId) =>
+		activeWorkspace === workspace
+			? {
+					"aria-current": "page" as const,
+					className: `${tabClassName} ${activeTabProps.className}`,
+				}
+			: {
+					className: tabClassName,
+				};
 	const statusError = form?.error ?? exitError;
 	const hasStatusSlot = form !== undefined || statusError !== undefined;
 	const statusVisible = form?.isDirty === true || exitRequested || statusError !== undefined;
@@ -203,51 +171,16 @@ const EditorShellContent = ({ children }: PropsWithChildren) => {
 					className="flex min-w-0 flex-wrap items-center gap-1"
 					aria-label="Editor tools"
 				>
-					<ButtonLink
-						to="/editor/$projectId/editor/items/list"
-						params={params}
-						className={readTabClassName("editor")}
-						activeProps={readActiveTabProps()}
-						onClick={createTabClickHandler("editor")}
-					>
-						Items
-					</ButtonLink>
-					<ButtonLink
-						to="/editor/$projectId/assets"
-						params={params}
-						className={readTabClassName("assets")}
-						activeProps={readActiveTabProps()}
-						onClick={createTabClickHandler("assets")}
-					>
-						Assets
-					</ButtonLink>
-					<ButtonLink
-						to="/editor/$projectId/project"
-						params={params}
-						className={readTabClassName("project")}
-						activeProps={readActiveTabProps()}
-						onClick={createTabClickHandler("project")}
-					>
-						Project
-					</ButtonLink>
-					<ButtonLink
-						to="/editor/$projectId/build"
-						params={params}
-						className={readTabClassName("build")}
-						activeProps={readActiveTabProps()}
-						onClick={createTabClickHandler("build")}
-					>
-						Build
-					</ButtonLink>
-					<ButtonLink
-						to="/editor/$projectId/board"
-						params={params}
-						className={readTabClassName("board")}
-						activeProps={readActiveTabProps()}
-						onClick={createTabClickHandler("board")}
-					>
-						Board
-					</ButtonLink>
+					{EditorWorkspaceRoutes.map(({ id, label, to }) => (
+						<ButtonLink
+							key={id}
+							to={to}
+							params={params}
+							{...readTabProps(id)}
+						>
+							{label}
+						</ButtonLink>
+					))}
 				</nav>
 				<p className="min-w-0 flex-1 truncate px-2 text-right text-xs text-muted">
 					{project.title}

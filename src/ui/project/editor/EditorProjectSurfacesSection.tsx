@@ -5,7 +5,7 @@ import { EditorProjectToolbarSection } from "~/ui/project/editor/EditorProjectTo
 export const EditorProjectSurfacesSection = () => (
 	<div className="grid gap-6">
 		<EditorProjectBoardSection />
-		<EditorProjectToolbarSection />
 		<EditorProjectInventorySection />
+		<EditorProjectToolbarSection />
 	</div>
 );

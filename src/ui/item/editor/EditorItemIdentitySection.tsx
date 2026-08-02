@@ -1,4 +1,3 @@
-import { EditorFormSection } from "~/ui/form/EditorFormSection";
 import { useEditorItemFormSession } from "~/ui/item/editor/EditorItemFormContext";
 
 const scopeOptions = [
@@ -23,10 +22,7 @@ const scopeOptions = [
 export const EditorItemIdentitySection = () => {
 	const { canonicalItem, categoryOptions, form, isNew } = useEditorItemFormSession();
 	return (
-		<EditorFormSection
-			title="Identity"
-			description="Stable source identity and player-facing copy."
-		>
+		<div className="grid gap-4">
 			<div className="grid gap-4 md:grid-cols-2">
 				{isNew ? (
 					<form.AppField name="id">
@@ -95,6 +91,6 @@ export const EditorItemIdentitySection = () => {
 					/>
 				)}
 			</form.AppField>
-		</EditorFormSection>
+		</div>
 	);
 };

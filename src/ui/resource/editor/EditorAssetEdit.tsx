@@ -81,8 +81,8 @@ export const EditorAssetEdit = ({
 	return (
 		<EditorSectionPage
 			tabs={
-				<EditorSectionNavigation>
-					<header className="flex min-w-0 items-center gap-3">
+				<EditorSectionNavigation
+					leading={
 						<ButtonLink
 							to="/editor/$projectId/assets/$resourceId/detail/overview"
 							params={{
@@ -97,9 +97,9 @@ export const EditorAssetEdit = ({
 						>
 							<span className="icon-[lucide--arrow-left] size-4" />
 						</ButtonLink>
-						<h1 className="min-w-0 flex-1 truncate text-xl font-semibold">
-							Edit {resourceId}
-						</h1>
+					}
+					title={<h1 className="truncate text-xl font-semibold">Edit {resourceId}</h1>}
+					action={
 						<PrimaryButton
 							disabled={!dirty || result.waiting}
 							cursorIntent={result.waiting ? "progress" : undefined}
@@ -108,8 +108,8 @@ export const EditorAssetEdit = ({
 						>
 							{result.waiting ? "Saving…" : "Save"}
 						</PrimaryButton>
-					</header>
-				</EditorSectionNavigation>
+					}
+				/>
 			}
 		>
 			<form

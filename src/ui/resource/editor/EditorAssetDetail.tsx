@@ -49,8 +49,8 @@ export const EditorAssetDetail = ({
 	return (
 		<EditorSectionPage
 			tabs={
-				<EditorSectionNavigation>
-					<header className="flex min-w-0 flex-wrap items-center gap-3">
+				<EditorSectionNavigation
+					leading={
 						<ButtonLink
 							to="/editor/$projectId/assets"
 							params={{
@@ -64,9 +64,29 @@ export const EditorAssetDetail = ({
 						>
 							<span className="icon-[lucide--arrow-left] size-4" />
 						</ButtonLink>
-						<div className="min-w-0 flex-1">
-							<h1 className="truncate text-xl font-semibold">{resource.id}</h1>
-						</div>
+					}
+					title={<h1 className="truncate text-xl font-semibold">{resource.id}</h1>}
+					tabs={
+						<EditorSectionTabs label="Asset sections">
+							<EditorAssetDetailTab
+								filter={filter}
+								label="Overview"
+								projectId={project.projectId}
+								query={query}
+								resourceId={resourceId}
+								to="/editor/$projectId/assets/$resourceId/detail/overview"
+							/>
+							<EditorAssetDetailTab
+								filter={filter}
+								label="Usage"
+								projectId={project.projectId}
+								query={query}
+								resourceId={resourceId}
+								to="/editor/$projectId/assets/$resourceId/detail/usage"
+							/>
+						</EditorSectionTabs>
+					}
+					action={
 						<PrimaryButtonLink
 							to="/editor/$projectId/assets/$resourceId/edit"
 							params={{
@@ -85,26 +105,8 @@ export const EditorAssetDetail = ({
 							/>
 							Edit
 						</PrimaryButtonLink>
-					</header>
-					<EditorSectionTabs label="Asset sections">
-						<EditorAssetDetailTab
-							filter={filter}
-							label="Overview"
-							projectId={project.projectId}
-							query={query}
-							resourceId={resourceId}
-							to="/editor/$projectId/assets/$resourceId/detail/overview"
-						/>
-						<EditorAssetDetailTab
-							filter={filter}
-							label="Usage"
-							projectId={project.projectId}
-							query={query}
-							resourceId={resourceId}
-							to="/editor/$projectId/assets/$resourceId/detail/usage"
-						/>
-					</EditorSectionTabs>
-				</EditorSectionNavigation>
+					}
+				/>
 			}
 		>
 			{children}

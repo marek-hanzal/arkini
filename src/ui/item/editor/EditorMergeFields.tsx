@@ -2,7 +2,6 @@ import type { EditorMerge } from "~/bridge/item/editor/EditorItemModel";
 import { Button } from "~/ui/button/Button";
 import { EditorItemDraftDefaults } from "~/ui/item/editor/EditorItemDraftDefaults";
 import { EditorChoiceControl } from "~/ui/form/EditorValueControls";
-import { EditorFormSection } from "~/ui/form/EditorFormSection";
 import { EditorItemReferenceControl } from "~/ui/item/editor/EditorItemReferenceControl";
 import { EditorOptionalOutputControl } from "~/ui/item/editor/EditorOptionalOutputControl";
 import { EditorSelectorControl } from "~/ui/item/editor/EditorSelectorControl";
@@ -24,10 +23,7 @@ export const EditorMergeFields = ({
 		onChange(next);
 	};
 	return (
-		<EditorFormSection
-			title="Merges"
-			description="Directional interactions initiated by dropping this item onto a target."
-		>
+		<div className="grid gap-4">
 			<Button
 				className="justify-self-start"
 				onClick={() =>
@@ -147,6 +143,6 @@ export const EditorMergeFields = ({
 					/>
 				</article>
 			))}
-		</EditorFormSection>
+		</div>
 	);
 };

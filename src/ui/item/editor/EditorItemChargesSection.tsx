@@ -1,15 +1,11 @@
 import { Button } from "~/ui/button/Button";
-import { EditorFormSection } from "~/ui/form/EditorFormSection";
 import { useEditorItemFormSession } from "~/ui/item/editor/EditorItemFormContext";
 import { EditorOptionalOutputControl } from "~/ui/item/editor/EditorOptionalOutputControl";
 
 export const EditorItemChargesSection = () => {
 	const { form } = useEditorItemFormSession();
 	return (
-		<EditorFormSection
-			title="Charges"
-			description="Optional finite lifetime shared by every fresh instance."
-		>
+		<div className="grid gap-4">
 			<form.Subscribe selector={(state) => state.values.charges}>
 				{(charges) =>
 					charges === undefined ? (
@@ -50,6 +46,6 @@ export const EditorItemChargesSection = () => {
 					)
 				}
 			</form.Subscribe>
-		</EditorFormSection>
+		</div>
 	);
 };

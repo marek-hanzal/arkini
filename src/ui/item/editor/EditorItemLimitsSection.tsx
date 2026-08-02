@@ -1,13 +1,9 @@
-import { EditorFormSection } from "~/ui/form/EditorFormSection";
 import { useEditorItemFormSession } from "~/ui/item/editor/EditorItemFormContext";
 
 export const EditorItemLimitsSection = () => {
 	const { canonicalItem, form } = useEditorItemFormSession();
 	return (
-		<EditorFormSection
-			title="Limits"
-			description="Configured global and per-stack quantity constraints."
-		>
+		<div className="grid gap-4">
 			<div className="grid gap-4 md:grid-cols-2">
 				<form.AppField name="maxCount">
 					{(field) => (
@@ -30,6 +26,6 @@ export const EditorItemLimitsSection = () => {
 					</form.AppField>
 				)}
 			</div>
-		</EditorFormSection>
+		</div>
 	);
 };

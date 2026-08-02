@@ -1,7 +1,6 @@
 import type { EditorLine } from "~/bridge/item/editor/EditorItemModel";
 import { Button } from "~/ui/button/Button";
 import { withFieldGroup } from "~/ui/form/EditorForm";
-import { EditorFormSection } from "~/ui/form/EditorFormSection";
 import { EditorLineFields } from "~/ui/item/editor/EditorLineField";
 
 interface EditorProductionFieldValues {
@@ -22,7 +21,7 @@ export const EditorProductionFields = withFieldGroup({
 		ownerId: "",
 	},
 	render: ({ group, kind, ownerId }) => (
-		<EditorFormSection title={kind === "deposit" ? "Deposit" : "Producer"}>
+		<div className="grid gap-4">
 			<group.AppField name="maxQueueSize">
 				{(field) => (
 					<field.NumberField
@@ -121,6 +120,6 @@ export const EditorProductionFields = withFieldGroup({
 					);
 				}}
 			</group.AppField>
-		</EditorFormSection>
+		</div>
 	),
 });

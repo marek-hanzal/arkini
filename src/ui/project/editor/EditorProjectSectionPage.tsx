@@ -34,25 +34,27 @@ export const EditorProjectSectionPage = ({
 	return (
 		<EditorSectionPage
 			tabs={
-				<EditorSectionNavigation>
-					<header className="flex min-w-0 items-center gap-3">
-						<h1 className="min-w-0 flex-1 truncate text-xl font-semibold">Project</h1>
+				<EditorSectionNavigation
+					title={<h1 className="truncate text-xl font-semibold">Project</h1>}
+					tabs={
+						<EditorSectionTabs label="Project sections">
+							{EditorProjectSections.map((candidate) => (
+								<EditorProjectSectionLink
+									key={candidate.id}
+									projectId={controller.project.projectId}
+									section={candidate}
+								/>
+							))}
+						</EditorSectionTabs>
+					}
+					action={
 						<EditorFormSaveButton
 							dirty={controller.isDirty}
 							saving={controller.isSaving}
 							save={controller.save}
 						/>
-					</header>
-					<EditorSectionTabs label="Project sections">
-						{EditorProjectSections.map((candidate) => (
-							<EditorProjectSectionLink
-								key={candidate.id}
-								projectId={controller.project.projectId}
-								section={candidate}
-							/>
-						))}
-					</EditorSectionTabs>
-				</EditorSectionNavigation>
+					}
+				/>
 			}
 		>
 			<div className="grid gap-[var(--ak-viewport-gap)]">

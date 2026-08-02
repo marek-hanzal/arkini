@@ -13,18 +13,24 @@ const inactiveProps = {
 } as const;
 
 export const EditorItemSectionLink = ({
+	destination = "form",
 	itemType,
 	itemUid,
 	projectId,
 	section,
 }: {
+	readonly destination?: "detail" | "form";
 	readonly itemType?: EditorItemType;
 	readonly itemUid: string;
 	readonly projectId: string;
 	readonly section: EditorItemSectionDescriptor;
 }) => (
 	<ButtonLink
-		to="/editor/$projectId/editor/items/$itemUid/form/$sectionId"
+		to={
+			destination === "detail"
+				? "/editor/$projectId/editor/items/$itemUid/detail/$sectionId"
+				: "/editor/$projectId/editor/items/$itemUid/form/$sectionId"
+		}
 		params={{
 			projectId,
 			itemUid,

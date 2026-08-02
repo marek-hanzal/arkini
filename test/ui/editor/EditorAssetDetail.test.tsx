@@ -101,7 +101,8 @@ describe("editor asset detail", () => {
 		expect(container.textContent).toContain("Water");
 		expect(container.textContent).toContain("Default artwork 1");
 		const link = container.querySelector("a");
-		expect(link?.dataset.to).toBe("/editor/$projectId/editor/items/$itemUid/view");
+		expect(link?.dataset.to).toBe("/editor/$projectId/editor/items/$itemUid/detail/$sectionId");
+		expect(link?.dataset.params).toContain("artwork");
 		expect(link?.dataset.params).toContain("water-uid");
 	});
 });

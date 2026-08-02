@@ -11,6 +11,33 @@ export const EditorItemSectionIds = [
 
 export type EditorItemSectionId = (typeof EditorItemSectionIds)[number];
 
+type EditorItemField = EditorItem extends infer Member
+	? Member extends EditorItem
+		? keyof Member
+		: never
+	: never;
+
+/** Compile-time audit assigning every canonical top-level item field to one detail section. */
+export const EditorItemFieldSections = {
+	uid: "identity",
+	id: "identity",
+	type: "identity",
+	title: "identity",
+	description: "identity",
+	tags: "identity",
+	scope: "identity",
+	asset: "artwork",
+	maxCount: "limits",
+	maxStackSize: "limits",
+	charges: "charges",
+	merge: "merges",
+	durationMs: "production",
+	output: "production",
+	maxQueueSize: "production",
+	line: "production",
+	lines: "production",
+} as const satisfies Record<EditorItemField, EditorItemSectionId>;
+
 export const parseEditorItemSectionId = (candidate: string): EditorItemSectionId => {
 	const section = EditorItemSectionIds.find((id) => id === candidate);
 	if (section === undefined) throw new Error(`Unknown editor item section ${candidate}.`);

@@ -5,8 +5,9 @@ import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { EditorItemFormPage } from "~/page/editor/EditorItemFormPage";
+import { EditorItemDetail } from "~/ui/item/editor/EditorItemDetail";
+import { EditorItemDetailSectionPage } from "~/ui/item/editor/EditorItemDetailSectionPage";
 import { EditorItemTypePicker } from "~/ui/item/editor/EditorItemTypePicker";
-import { EditorItemView } from "~/ui/item/editor/EditorItemView";
 
 (
 	globalThis as {
@@ -111,11 +112,19 @@ const render = async (element: ReactNode) => {
 };
 
 describe("editor item flow", () => {
-	it("opens canonical items in read-only view before offering the unified form", async () => {
+	it("opens canonical items in a sectioned read-only detail before offering the form", async () => {
 		const container = await render(
-			createElement(EditorItemView, {
-				uid: item.uid,
-			}),
+			createElement(
+				EditorItemDetail,
+				{
+					sectionId: "identity",
+					uid: item.uid,
+				},
+				createElement(EditorItemDetailSectionPage, {
+					sectionId: "identity",
+					uid: item.uid,
+				}),
+			),
 		);
 		const edit = container.querySelector<HTMLAnchorElement>(
 			'[data-to="/editor/$projectId/editor/items/$itemUid/form/$sectionId"]',
@@ -123,6 +132,7 @@ describe("editor item flow", () => {
 
 		expect(container.textContent).toContain("Water");
 		expect(container.textContent).toContain("Fresh water.");
+		expect(container.textContent).not.toContain('"maxStackSize"');
 		expect(edit?.dataset.params).toContain(item.uid);
 		expect(edit?.dataset.params).toContain("identity");
 	});
@@ -147,6 +157,94 @@ describe("editor item flow", () => {
 			itemType: "simple",
 			uid: "new-item-uid",
 		});
+	});
+
+	it("presents nested production data without a raw-definition escape hatch", async () => {
+		const producer = {
+			...item,
+			uid: "producer-uid",
+			id: "producer:well",
+			type: "producer",
+			title: "Well",
+			maxQueueSize: 2,
+			lines: [
+				{
+					id: "line:water",
+					title: "Draw water",
+					description: "Produces water.",
+					default: true,
+					show: true,
+					enable: true,
+					runtimeMs: 500,
+					input: [
+						{
+							type: "materials",
+							selector: {
+								type: "item",
+								itemId: "item:bucket",
+							},
+							mode: "reserve",
+							quantity: {
+								type: "value",
+								value: 1,
+							},
+							capacity: 0,
+						},
+					],
+					output: {
+						set: [
+							{
+								roll: [
+									{
+										type: "chance",
+										chance: 0.5,
+										drop: [
+											{
+												itemId: "item:water",
+												quantity: {
+													type: "value",
+													value: 1,
+												},
+												placement: "drop",
+												rules: [],
+											},
+										],
+									},
+								],
+							},
+						],
+					},
+					rules: [],
+				},
+			],
+		} as const;
+		state.project = {
+			projectId: "editor-test",
+			title: "Editor test",
+			resources: [
+				{
+					id: "asset:water",
+					bytes: new Uint8Array(),
+				},
+			],
+			config: {
+				items: {
+					[producer.id]: producer,
+				},
+			},
+		};
+		const container = await render(
+			createElement(EditorItemDetailSectionPage, {
+				sectionId: "production",
+				uid: producer.uid,
+			}),
+		);
+
+		expect(container.textContent).toContain("Draw water");
+		expect(container.textContent).toContain("Item item:bucket");
+		expect(container.textContent).toContain("chance · 50%");
+		expect(container.textContent).toContain("item:water");
+		expect(container.querySelector("pre")).toBeNull();
 	});
 
 	it("starts every new item type in the unified identity section", async () => {

@@ -49,9 +49,12 @@ import { Route as EditorProjectIdAssetsResourceIdDetailIndexRouteImport } from "
 import { Route as EditorProjectIdEditorItemsNewSelectRouteImport } from "./@routes/editor/$projectId/editor/items/new/select"
 import { Route as EditorProjectIdEditorItemsItemUidViewRouteImport } from "./@routes/editor/$projectId/editor/items/$itemUid/view"
 import { Route as EditorProjectIdEditorItemsItemUidFormRouteImport } from "./@routes/editor/$projectId/editor/items/$itemUid/form"
+import { Route as EditorProjectIdEditorItemsItemUidDetailRouteImport } from "./@routes/editor/$projectId/editor/items/$itemUid/detail"
 import { Route as EditorProjectIdAssetsResourceIdDetailUsageRouteImport } from "./@routes/editor/$projectId/assets/$resourceId/detail/usage"
 import { Route as EditorProjectIdAssetsResourceIdDetailOverviewRouteImport } from "./@routes/editor/$projectId/assets/$resourceId/detail/overview"
+import { Route as EditorProjectIdEditorItemsItemUidDetailIndexRouteImport } from "./@routes/editor/$projectId/editor/items/$itemUid/detail/index"
 import { Route as EditorProjectIdEditorItemsItemUidFormSectionIdRouteImport } from "./@routes/editor/$projectId/editor/items/$itemUid/form/$sectionId"
+import { Route as EditorProjectIdEditorItemsItemUidDetailSectionIdRouteImport } from "./@routes/editor/$projectId/editor/items/$itemUid/detail/$sectionId"
 
 const EditorRoute = EditorRouteImport.update({
   id: "/editor",
@@ -269,6 +272,12 @@ const EditorProjectIdEditorItemsItemUidFormRoute =
     path: "/form",
     getParentRoute: () => EditorProjectIdEditorItemsItemUidRoute,
   } as any)
+const EditorProjectIdEditorItemsItemUidDetailRoute =
+  EditorProjectIdEditorItemsItemUidDetailRouteImport.update({
+    id: "/detail",
+    path: "/detail",
+    getParentRoute: () => EditorProjectIdEditorItemsItemUidRoute,
+  } as any)
 const EditorProjectIdAssetsResourceIdDetailUsageRoute =
   EditorProjectIdAssetsResourceIdDetailUsageRouteImport.update({
     id: "/usage",
@@ -281,11 +290,23 @@ const EditorProjectIdAssetsResourceIdDetailOverviewRoute =
     path: "/overview",
     getParentRoute: () => EditorProjectIdAssetsResourceIdDetailRoute,
   } as any)
+const EditorProjectIdEditorItemsItemUidDetailIndexRoute =
+  EditorProjectIdEditorItemsItemUidDetailIndexRouteImport.update({
+    id: "/",
+    path: "/",
+    getParentRoute: () => EditorProjectIdEditorItemsItemUidDetailRoute,
+  } as any)
 const EditorProjectIdEditorItemsItemUidFormSectionIdRoute =
   EditorProjectIdEditorItemsItemUidFormSectionIdRouteImport.update({
     id: "/$sectionId",
     path: "/$sectionId",
     getParentRoute: () => EditorProjectIdEditorItemsItemUidFormRoute,
+  } as any)
+const EditorProjectIdEditorItemsItemUidDetailSectionIdRoute =
+  EditorProjectIdEditorItemsItemUidDetailSectionIdRouteImport.update({
+    id: "/$sectionId",
+    path: "/$sectionId",
+    getParentRoute: () => EditorProjectIdEditorItemsItemUidDetailRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
@@ -325,11 +346,14 @@ export interface FileRoutesByFullPath {
   "/editor/$projectId/editor/items/new": typeof EditorProjectIdEditorItemsNewRouteWithChildren
   "/editor/$projectId/assets/$resourceId/detail/overview": typeof EditorProjectIdAssetsResourceIdDetailOverviewRoute
   "/editor/$projectId/assets/$resourceId/detail/usage": typeof EditorProjectIdAssetsResourceIdDetailUsageRoute
+  "/editor/$projectId/editor/items/$itemUid/detail": typeof EditorProjectIdEditorItemsItemUidDetailRouteWithChildren
   "/editor/$projectId/editor/items/$itemUid/form": typeof EditorProjectIdEditorItemsItemUidFormRouteWithChildren
   "/editor/$projectId/editor/items/$itemUid/view": typeof EditorProjectIdEditorItemsItemUidViewRoute
   "/editor/$projectId/editor/items/new/select": typeof EditorProjectIdEditorItemsNewSelectRoute
   "/editor/$projectId/assets/$resourceId/detail/": typeof EditorProjectIdAssetsResourceIdDetailIndexRoute
+  "/editor/$projectId/editor/items/$itemUid/detail/$sectionId": typeof EditorProjectIdEditorItemsItemUidDetailSectionIdRoute
   "/editor/$projectId/editor/items/$itemUid/form/$sectionId": typeof EditorProjectIdEditorItemsItemUidFormSectionIdRoute
+  "/editor/$projectId/editor/items/$itemUid/detail/": typeof EditorProjectIdEditorItemsItemUidDetailIndexRoute
 }
 export interface FileRoutesByTo {
   "/": typeof IndexRoute
@@ -368,7 +392,9 @@ export interface FileRoutesByTo {
   "/editor/$projectId/editor/items/$itemUid/view": typeof EditorProjectIdEditorItemsItemUidViewRoute
   "/editor/$projectId/editor/items/new/select": typeof EditorProjectIdEditorItemsNewSelectRoute
   "/editor/$projectId/assets/$resourceId/detail": typeof EditorProjectIdAssetsResourceIdDetailIndexRoute
+  "/editor/$projectId/editor/items/$itemUid/detail/$sectionId": typeof EditorProjectIdEditorItemsItemUidDetailSectionIdRoute
   "/editor/$projectId/editor/items/$itemUid/form/$sectionId": typeof EditorProjectIdEditorItemsItemUidFormSectionIdRoute
+  "/editor/$projectId/editor/items/$itemUid/detail": typeof EditorProjectIdEditorItemsItemUidDetailIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -410,11 +436,14 @@ export interface FileRoutesById {
   "/editor/$projectId/editor/items/new": typeof EditorProjectIdEditorItemsNewRouteWithChildren
   "/editor/$projectId/assets/$resourceId/detail/overview": typeof EditorProjectIdAssetsResourceIdDetailOverviewRoute
   "/editor/$projectId/assets/$resourceId/detail/usage": typeof EditorProjectIdAssetsResourceIdDetailUsageRoute
+  "/editor/$projectId/editor/items/$itemUid/detail": typeof EditorProjectIdEditorItemsItemUidDetailRouteWithChildren
   "/editor/$projectId/editor/items/$itemUid/form": typeof EditorProjectIdEditorItemsItemUidFormRouteWithChildren
   "/editor/$projectId/editor/items/$itemUid/view": typeof EditorProjectIdEditorItemsItemUidViewRoute
   "/editor/$projectId/editor/items/new/select": typeof EditorProjectIdEditorItemsNewSelectRoute
   "/editor/$projectId/assets/$resourceId/detail/": typeof EditorProjectIdAssetsResourceIdDetailIndexRoute
+  "/editor/$projectId/editor/items/$itemUid/detail/$sectionId": typeof EditorProjectIdEditorItemsItemUidDetailSectionIdRoute
   "/editor/$projectId/editor/items/$itemUid/form/$sectionId": typeof EditorProjectIdEditorItemsItemUidFormSectionIdRoute
+  "/editor/$projectId/editor/items/$itemUid/detail/": typeof EditorProjectIdEditorItemsItemUidDetailIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -455,11 +484,14 @@ export interface FileRouteTypes {
     | "/editor/$projectId/editor/items/new"
     | "/editor/$projectId/assets/$resourceId/detail/overview"
     | "/editor/$projectId/assets/$resourceId/detail/usage"
+    | "/editor/$projectId/editor/items/$itemUid/detail"
     | "/editor/$projectId/editor/items/$itemUid/form"
     | "/editor/$projectId/editor/items/$itemUid/view"
     | "/editor/$projectId/editor/items/new/select"
     | "/editor/$projectId/assets/$resourceId/detail/"
+    | "/editor/$projectId/editor/items/$itemUid/detail/$sectionId"
     | "/editor/$projectId/editor/items/$itemUid/form/$sectionId"
+    | "/editor/$projectId/editor/items/$itemUid/detail/"
   fileRoutesByTo: FileRoutesByTo
   to:
     | "/"
@@ -498,7 +530,9 @@ export interface FileRouteTypes {
     | "/editor/$projectId/editor/items/$itemUid/view"
     | "/editor/$projectId/editor/items/new/select"
     | "/editor/$projectId/assets/$resourceId/detail"
+    | "/editor/$projectId/editor/items/$itemUid/detail/$sectionId"
     | "/editor/$projectId/editor/items/$itemUid/form/$sectionId"
+    | "/editor/$projectId/editor/items/$itemUid/detail"
   id:
     | "__root__"
     | "/"
@@ -539,11 +573,14 @@ export interface FileRouteTypes {
     | "/editor/$projectId/editor/items/new"
     | "/editor/$projectId/assets/$resourceId/detail/overview"
     | "/editor/$projectId/assets/$resourceId/detail/usage"
+    | "/editor/$projectId/editor/items/$itemUid/detail"
     | "/editor/$projectId/editor/items/$itemUid/form"
     | "/editor/$projectId/editor/items/$itemUid/view"
     | "/editor/$projectId/editor/items/new/select"
     | "/editor/$projectId/assets/$resourceId/detail/"
+    | "/editor/$projectId/editor/items/$itemUid/detail/$sectionId"
     | "/editor/$projectId/editor/items/$itemUid/form/$sectionId"
+    | "/editor/$projectId/editor/items/$itemUid/detail/"
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -838,6 +875,13 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof EditorProjectIdEditorItemsItemUidFormRouteImport
       parentRoute: typeof EditorProjectIdEditorItemsItemUidRoute
     }
+    "/editor/$projectId/editor/items/$itemUid/detail": {
+      id: "/editor/$projectId/editor/items/$itemUid/detail"
+      path: "/detail"
+      fullPath: "/editor/$projectId/editor/items/$itemUid/detail"
+      preLoaderRoute: typeof EditorProjectIdEditorItemsItemUidDetailRouteImport
+      parentRoute: typeof EditorProjectIdEditorItemsItemUidRoute
+    }
     "/editor/$projectId/assets/$resourceId/detail/usage": {
       id: "/editor/$projectId/assets/$resourceId/detail/usage"
       path: "/usage"
@@ -852,12 +896,26 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof EditorProjectIdAssetsResourceIdDetailOverviewRouteImport
       parentRoute: typeof EditorProjectIdAssetsResourceIdDetailRoute
     }
+    "/editor/$projectId/editor/items/$itemUid/detail/": {
+      id: "/editor/$projectId/editor/items/$itemUid/detail/"
+      path: "/"
+      fullPath: "/editor/$projectId/editor/items/$itemUid/detail/"
+      preLoaderRoute: typeof EditorProjectIdEditorItemsItemUidDetailIndexRouteImport
+      parentRoute: typeof EditorProjectIdEditorItemsItemUidDetailRoute
+    }
     "/editor/$projectId/editor/items/$itemUid/form/$sectionId": {
       id: "/editor/$projectId/editor/items/$itemUid/form/$sectionId"
       path: "/$sectionId"
       fullPath: "/editor/$projectId/editor/items/$itemUid/form/$sectionId"
       preLoaderRoute: typeof EditorProjectIdEditorItemsItemUidFormSectionIdRouteImport
       parentRoute: typeof EditorProjectIdEditorItemsItemUidFormRoute
+    }
+    "/editor/$projectId/editor/items/$itemUid/detail/$sectionId": {
+      id: "/editor/$projectId/editor/items/$itemUid/detail/$sectionId"
+      path: "/$sectionId"
+      fullPath: "/editor/$projectId/editor/items/$itemUid/detail/$sectionId"
+      preLoaderRoute: typeof EditorProjectIdEditorItemsItemUidDetailSectionIdRouteImport
+      parentRoute: typeof EditorProjectIdEditorItemsItemUidDetailRoute
     }
   }
 }
@@ -935,6 +993,24 @@ const EditorProjectIdAssetsRouteWithChildren =
     EditorProjectIdAssetsRouteChildren,
   )
 
+interface EditorProjectIdEditorItemsItemUidDetailRouteChildren {
+  EditorProjectIdEditorItemsItemUidDetailSectionIdRoute: typeof EditorProjectIdEditorItemsItemUidDetailSectionIdRoute
+  EditorProjectIdEditorItemsItemUidDetailIndexRoute: typeof EditorProjectIdEditorItemsItemUidDetailIndexRoute
+}
+
+const EditorProjectIdEditorItemsItemUidDetailRouteChildren: EditorProjectIdEditorItemsItemUidDetailRouteChildren =
+  {
+    EditorProjectIdEditorItemsItemUidDetailSectionIdRoute:
+      EditorProjectIdEditorItemsItemUidDetailSectionIdRoute,
+    EditorProjectIdEditorItemsItemUidDetailIndexRoute:
+      EditorProjectIdEditorItemsItemUidDetailIndexRoute,
+  }
+
+const EditorProjectIdEditorItemsItemUidDetailRouteWithChildren =
+  EditorProjectIdEditorItemsItemUidDetailRoute._addFileChildren(
+    EditorProjectIdEditorItemsItemUidDetailRouteChildren,
+  )
+
 interface EditorProjectIdEditorItemsItemUidFormRouteChildren {
   EditorProjectIdEditorItemsItemUidFormSectionIdRoute: typeof EditorProjectIdEditorItemsItemUidFormSectionIdRoute
 }
@@ -951,12 +1027,15 @@ const EditorProjectIdEditorItemsItemUidFormRouteWithChildren =
   )
 
 interface EditorProjectIdEditorItemsItemUidRouteChildren {
+  EditorProjectIdEditorItemsItemUidDetailRoute: typeof EditorProjectIdEditorItemsItemUidDetailRouteWithChildren
   EditorProjectIdEditorItemsItemUidFormRoute: typeof EditorProjectIdEditorItemsItemUidFormRouteWithChildren
   EditorProjectIdEditorItemsItemUidViewRoute: typeof EditorProjectIdEditorItemsItemUidViewRoute
 }
 
 const EditorProjectIdEditorItemsItemUidRouteChildren: EditorProjectIdEditorItemsItemUidRouteChildren =
   {
+    EditorProjectIdEditorItemsItemUidDetailRoute:
+      EditorProjectIdEditorItemsItemUidDetailRouteWithChildren,
     EditorProjectIdEditorItemsItemUidFormRoute:
       EditorProjectIdEditorItemsItemUidFormRouteWithChildren,
     EditorProjectIdEditorItemsItemUidViewRoute:

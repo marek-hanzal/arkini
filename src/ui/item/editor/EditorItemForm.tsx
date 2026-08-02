@@ -20,6 +20,7 @@ import { useEditorItemFormController } from "~/ui/item/editor/useEditorItemFormC
 export namespace EditorItemForm {
 	export interface Props extends PropsWithChildren {
 		readonly itemType?: EditorItemType;
+		readonly sectionId?: EditorItemSectionId;
 		readonly uid: string;
 	}
 }
@@ -28,6 +29,7 @@ interface EditorItemFormSessionProps extends PropsWithChildren {
 	readonly initialItem: EditorItem;
 	readonly isNew: boolean;
 	readonly itemType?: EditorItemType;
+	readonly sectionId: EditorItemSectionId;
 }
 
 /** Owns the single local form lifecycle used by both new and persisted items. */
@@ -36,6 +38,7 @@ const EditorItemFormSession = ({
 	initialItem,
 	isNew,
 	itemType,
+	sectionId,
 }: EditorItemFormSessionProps) => {
 	const navigate = useNavigate();
 	const project = useEditorProject();
@@ -67,10 +70,11 @@ const EditorItemFormSession = ({
 		onInvalidSection,
 		onSaved: (saved) =>
 			navigate({
-				to: "/editor/$projectId/editor/items/$itemUid/view",
+				to: "/editor/$projectId/editor/items/$itemUid/detail/$sectionId",
 				params: {
 					projectId: project.projectId,
 					itemUid: saved.uid,
+					sectionId,
 				},
 				replace: true,
 			}),
@@ -117,8 +121,11 @@ const EditorItemFormSession = ({
 							</ButtonLink>
 						) : (
 							<ButtonLink
-								to="/editor/$projectId/editor/items/$itemUid/view"
-								params={params}
+								to="/editor/$projectId/editor/items/$itemUid/detail/$sectionId"
+								params={{
+									...params,
+									sectionId,
+								}}
 								className="min-h-0 px-3 py-2"
 							>
 								<span className="icon-[lucide--arrow-left] size-4" />
@@ -155,7 +162,12 @@ const EditorItemFormSession = ({
 };
 
 /** Resolves a canonical item by UID or seeds its first local form from itemType. */
-export const EditorItemForm = ({ children, itemType, uid }: EditorItemForm.Props) => {
+export const EditorItemForm = ({
+	children,
+	itemType,
+	sectionId = "identity",
+	uid,
+}: EditorItemForm.Props) => {
 	const persistedItem = useEditorItemByUid(uid);
 	const draft = useEditorItemDraft(itemType ?? persistedItem?.type ?? "simple", uid);
 	if (persistedItem === undefined && itemType === undefined)
@@ -168,6 +180,7 @@ export const EditorItemForm = ({ children, itemType, uid }: EditorItemForm.Props
 			initialItem={initialItem}
 			isNew={isNew}
 			itemType={isNew ? itemType : undefined}
+			sectionId={sectionId}
 		>
 			{children}
 		</EditorItemFormSession>

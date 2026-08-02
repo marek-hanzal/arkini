@@ -143,10 +143,11 @@ export const EditorItemList = () => {
 						data-ui="EditorItemRow"
 					>
 						<ButtonLink
-							to="/editor/$projectId/editor/items/$itemUid/view"
+							to="/editor/$projectId/editor/items/$itemUid/detail/$sectionId"
 							params={{
 								projectId: project.projectId,
 								itemUid: item.uid,
+								sectionId: "identity",
 							}}
 							className="min-h-0 min-w-0 flex-1 justify-start gap-4 border-0 bg-transparent p-2 text-left shadow-none hover:bg-surface-raised"
 						>

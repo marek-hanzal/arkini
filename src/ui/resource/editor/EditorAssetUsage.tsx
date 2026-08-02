@@ -36,10 +36,11 @@ export const EditorAssetUsage = ({ resourceId }: { readonly resourceId: string }
 				return usage.owner === "item" ? (
 					<ButtonLink
 						key={`${usage.ownerId}:${usage.roleLabel}`}
-						to="/editor/$projectId/editor/items/$itemUid/view"
+						to="/editor/$projectId/editor/items/$itemUid/detail/$sectionId"
 						params={{
 							projectId: project.projectId,
 							itemUid: usage.ownerUid,
+							sectionId: "artwork",
 						}}
 						className="min-h-0 min-w-0 justify-start gap-3 p-4 text-left shadow-none"
 					>

@@ -25,5 +25,6 @@ export const EditorCapabilityStatus = ({
 		description={description}
 		icon={icon}
 		title={title}
+		variant="flat"
 	/>
 );

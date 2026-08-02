@@ -12,7 +12,7 @@ export const EditorBooleanSwitch = ({
 	label,
 	onChange,
 }: EditorBooleanSwitchProps) => (
-	<div className="flex min-w-0 items-start justify-between gap-4 rounded-xl border border-line bg-canvas/45 p-3">
+	<div className="flex min-w-0 items-start justify-between gap-4">
 		<div className="min-w-0">
 			<p className="text-sm font-semibold text-foreground">{label}</p>
 			{description === undefined ? null : (

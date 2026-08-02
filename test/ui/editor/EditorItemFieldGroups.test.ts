@@ -47,7 +47,7 @@ const mount = async (element: ReactNode) => {
 const click = async (container: HTMLElement, label: string) => {
 	const button = [
 		...container.querySelectorAll("button"),
-	].find((candidate) => candidate.textContent === label);
+	].find((candidate) => candidate.textContent === label || candidate.title === label);
 	if (button === undefined) throw new Error(`Expected ${label} button.`);
 	await act(async () => button.click());
 };

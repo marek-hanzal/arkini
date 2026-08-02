@@ -1,6 +1,6 @@
 import type { EditorMerge } from "~/bridge/item/editor/EditorItemModel";
-import { Button } from "~/ui/button/Button";
 import { EditorCapabilityStatus } from "~/ui/form/EditorCapabilityStatus";
+import { EditorCollectionTabs } from "~/ui/form/EditorCollectionTabs";
 import { EditorItemDraftDefaults } from "~/ui/item/editor/EditorItemDraftDefaults";
 import { EditorChoiceControl } from "~/ui/form/EditorValueControls";
 import { EditorItemReferenceControl } from "~/ui/item/editor/EditorItemReferenceControl";
@@ -38,129 +38,127 @@ export const EditorMergeFields = ({
 					title="Merges are disabled"
 				/>
 			) : (
-				<Button
-					className="justify-self-start"
-					onClick={() =>
+				<EditorCollectionTabs
+					addLabel="Add merge"
+					count={merges.length}
+					itemLabel={(index) => `Merge ${index + 1}`}
+					label="Merges"
+					onAdd={() =>
 						onChange([
 							...merges,
 							structuredClone(EditorItemDraftDefaults.merge),
 						])
 					}
+					onRemove={(index) => {
+						const next = merges.filter((_merge, candidate) => candidate !== index);
+						onChange(next.length === 0 ? undefined : next);
+					}}
+					removeLabel="Remove merge"
 				>
-					Add merge
-				</Button>
-			)}
-			{merges.map((merge, index) => (
-				<article
-					key={`${index}:${merge.effect}`}
-					className="grid gap-4 rounded-xl border border-line bg-canvas/35 p-3"
-				>
-					<header className="flex items-center justify-between gap-3">
-						<h3 className="text-sm font-semibold">Merge {index + 1}</h3>
-						<Button
-							onClick={() => {
-								const next = merges.filter((_, candidate) => candidate !== index);
-								onChange(next.length === 0 ? undefined : next);
-							}}
-						>
-							Remove merge
-						</Button>
-					</header>
-					<EditorSelectorControl
-						value={merge.target}
-						onChange={(target) =>
-							update(index, {
-								...merge,
-								target,
-							})
-						}
-					/>
-					<div className="grid gap-3 sm:grid-cols-2">
-						<EditorChoiceControl
-							label="Source action"
-							value={merge.action}
-							options={[
-								{
-									label: "Use",
-									value: "use",
-								},
-								{
-									label: "Consume",
-									value: "consume",
-								},
-							]}
-							onChange={(action) =>
-								update(index, {
-									...merge,
-									action,
-								})
-							}
-						/>
-						<EditorChoiceControl
-							label="Target effect"
-							value={merge.effect}
-							options={[
-								{
-									label: "Keep",
-									value: "keep",
-								},
-								{
-									label: "Remove",
-									value: "remove",
-								},
-								{
-									label: "Replace",
-									value: "replace",
-								},
-							]}
-							onChange={(effect) =>
-								update(
-									index,
-									effect === "replace"
-										? {
-												...merge,
-												effect,
-												result:
-													merge.effect === "replace" ? merge.result : "",
-											}
-										: {
-												action: merge.action,
-												effect,
-												output: merge.output,
-												target: merge.target,
+					{(index) => {
+						const merge = merges[index];
+						return (
+							<article className="grid gap-4">
+								<EditorSelectorControl
+									value={merge.target}
+									onChange={(target) =>
+										update(index, {
+											...merge,
+											target,
+										})
+									}
+								/>
+								<div className="grid gap-3 sm:grid-cols-2">
+									<EditorChoiceControl
+										label="Source action"
+										value={merge.action}
+										options={[
+											{
+												label: "Use",
+												value: "use",
 											},
-								)
-							}
-						/>
-					</div>
-					{merge.effect !== "replace" ? null : (
-						<EditorItemReferenceControl
-							label="Replacement item"
-							value={merge.result}
-							onChange={(result) =>
-								update(index, {
-									...merge,
-									result,
-								})
-							}
-						/>
-					)}
-					<EditorOptionalOutputControl
-						addLabel="Enable merge output"
-						emptyDescription="The merge currently changes only its source and target. Enable an output to emit additional items when it resolves."
-						emptyIcon="icon-[lucide--package-plus]"
-						emptyTitle="No merge output"
-						removeLabel="Remove merge output"
-						value={merge.output}
-						onChange={(output) =>
-							update(index, {
-								...merge,
-								output,
-							})
-						}
-					/>
-				</article>
-			))}
+											{
+												label: "Consume",
+												value: "consume",
+											},
+										]}
+										onChange={(action) =>
+											update(index, {
+												...merge,
+												action,
+											})
+										}
+									/>
+									<EditorChoiceControl
+										label="Target effect"
+										value={merge.effect}
+										options={[
+											{
+												label: "Keep",
+												value: "keep",
+											},
+											{
+												label: "Remove",
+												value: "remove",
+											},
+											{
+												label: "Replace",
+												value: "replace",
+											},
+										]}
+										onChange={(effect) =>
+											update(
+												index,
+												effect === "replace"
+													? {
+															...merge,
+															effect,
+															result:
+																merge.effect === "replace"
+																	? merge.result
+																	: "",
+														}
+													: {
+															action: merge.action,
+															effect,
+															output: merge.output,
+															target: merge.target,
+														},
+											)
+										}
+									/>
+								</div>
+								{merge.effect !== "replace" ? null : (
+									<EditorItemReferenceControl
+										label="Replacement item"
+										value={merge.result}
+										onChange={(result) =>
+											update(index, {
+												...merge,
+												result,
+											})
+										}
+									/>
+								)}
+								<EditorOptionalOutputControl
+									addLabel="Enable merge output"
+									emptyDescription="The merge currently changes only its source and target. Enable an output to emit additional items when it resolves."
+									emptyIcon="icon-[lucide--package-plus]"
+									emptyTitle="No merge output"
+									removeLabel="Remove merge output"
+									value={merge.output}
+									onChange={(output) =>
+										update(index, {
+											...merge,
+											output,
+										})
+									}
+								/>
+							</article>
+						);
+					}}
+				</EditorCollectionTabs>
+			)}
 		</div>
 	);
 };

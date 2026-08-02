@@ -5,7 +5,7 @@ import type {
 	EditorLineRule,
 	EditorWhen,
 } from "~/bridge/item/editor/EditorItemModel";
-import { Button } from "~/ui/button/Button";
+import { EditorCollectionTabs } from "~/ui/form/EditorCollectionTabs";
 import { EditorItemDraftDefaults } from "~/ui/item/editor/EditorItemDraftDefaults";
 import { EditorChoiceControl, EditorNumberControl } from "~/ui/form/EditorValueControls";
 import { EditorQueryControl } from "~/ui/item/editor/EditorQueryControl";
@@ -14,61 +14,52 @@ type EditorRule = EditorLineRule | EditorDropRule;
 type EditorRuleType = EditorLineRule["type"];
 
 const EditorWhenControl = ({
-	index,
 	onChange,
-	onRemove,
 	value,
 }: {
-	readonly index: number;
 	readonly onChange: (when: EditorWhen) => void;
-	readonly onRemove: () => void;
 	readonly value: EditorWhen;
 }) => (
-	<div className="grid gap-3 rounded-lg border border-line p-3">
-		<div className="flex items-end gap-3">
-			<div className="min-w-0 flex-1">
-				<EditorChoiceControl
-					label={`Condition ${index + 1}`}
-					value={value.type}
-					options={[
-						{
-							label: "Exists",
-							value: "exists",
-						},
-						{
-							label: "Exact count",
-							value: "count",
-						},
-						{
-							label: "Count range",
-							value: "range",
-						},
-					]}
-					onChange={(type) =>
-						onChange(
-							type === "exists"
-								? {
-										type,
-										query: value.query,
-									}
-								: type === "count"
-									? {
-											type,
-											query: value.query,
-											count: 1,
-										}
-									: {
-											type,
-											query: value.query,
-											min: 1,
-											max: 1,
-										},
-						)
-					}
-				/>
-			</div>
-			<Button onClick={onRemove}>Remove</Button>
-		</div>
+	<div className="grid gap-3">
+		<EditorChoiceControl
+			label="Condition type"
+			value={value.type}
+			options={[
+				{
+					label: "Exists",
+					value: "exists",
+				},
+				{
+					label: "Exact count",
+					value: "count",
+				},
+				{
+					label: "Count range",
+					value: "range",
+				},
+			]}
+			onChange={(type) =>
+				onChange(
+					type === "exists"
+						? {
+								type,
+								query: value.query,
+							}
+						: type === "count"
+							? {
+									type,
+									query: value.query,
+									count: 1,
+								}
+							: {
+									type,
+									query: value.query,
+									min: 1,
+									max: 1,
+								},
+				)
+			}
+		/>
 		<EditorQueryControl
 			value={value.query}
 			onChange={(query) =>
@@ -147,168 +138,164 @@ export const EditorRulesControl = ({
 	readonly allowedTypes: ReadonlyArray<EditorRuleType>;
 	readonly onChange: (rules: EditorRule[]) => void;
 	readonly rules: ReadonlyArray<EditorRule>;
-}) => (
-	<section className="grid gap-3 border-t border-line pt-4">
-		<header className="flex flex-wrap items-center justify-between gap-3">
-			<div>
+}) => {
+	const createRule = (type: EditorRuleType): EditorLineRule =>
+		({
+			type,
+			when: [
+				structuredClone(EditorItemDraftDefaults.when),
+			],
+			...(type === "runtime:multiplier"
+				? {
+						multiplier: 1,
+					}
+				: {}),
+		}) as EditorLineRule;
+	return (
+		<section className="grid gap-3 border-t border-line pt-4">
+			<header>
 				<h4 className="text-sm font-semibold">Rules</h4>
 				<p className="mt-1 text-xs text-muted">All conditions within one rule must pass.</p>
-			</div>
-			<div className="flex flex-wrap gap-2">
-				{allowedTypes.map((type) => (
-					<Button
-						key={type}
-						onClick={() =>
-							onChange([
-								...rules,
-								{
-									type,
-									when: [
-										structuredClone(EditorItemDraftDefaults.when),
-									],
-									...(type === "runtime:multiplier"
-										? {
-												multiplier: 1,
-											}
-										: {}),
-								} as EditorLineRule,
-							])
-						}
-					>
-						Add {type}
-					</Button>
-				))}
-			</div>
-		</header>
-		{rules.map((rule, ruleIndex) => (
-			<article
-				key={`${ruleIndex}:${rule.type}`}
-				className="grid gap-3 rounded-xl border border-line bg-surface/50 p-3"
+			</header>
+			<EditorCollectionTabs
+				addLabel="Add rule"
+				count={rules.length}
+				itemLabel={(ruleIndex) => `Rule ${ruleIndex + 1}`}
+				label="Rules"
+				onAdd={() =>
+					onChange([
+						...rules,
+						createRule(allowedTypes[0]),
+					])
+				}
+				onRemove={(ruleIndex) =>
+					onChange(rules.filter((_current, index) => index !== ruleIndex))
+				}
+				removeLabel="Remove rule"
 			>
-				<div className="flex items-end gap-3">
-					<div className="min-w-0 flex-1">
-						<EditorChoiceControl
-							label={`Rule ${ruleIndex + 1}`}
-							value={rule.type}
-							options={allowedTypes.map((type) => ({
-								label: type,
-								value: type,
-							}))}
-							onChange={(type) => {
-								const next = {
-									type,
-									when: [
-										structuredClone(EditorItemDraftDefaults.when),
-									],
-									...(type === "runtime:multiplier"
-										? {
-												multiplier: 1,
-											}
-										: {}),
-								} as EditorLineRule;
-								onChange(
-									rules.map((current, index) =>
-										index === ruleIndex
-											? {
-													...next,
-													when: current.when,
-												}
-											: current,
-									),
-								);
-							}}
-						/>
-					</div>
-					<Button
-						onClick={() =>
-							onChange(rules.filter((_current, index) => index !== ruleIndex))
-						}
-					>
-						Remove rule
-					</Button>
-				</div>
-				{rule.type !== "runtime:multiplier" ? null : (
-					<EditorNumberControl
-						label="Runtime multiplier"
-						value={rule.multiplier}
-						min={0.01}
-						step={0.01}
-						onChange={(multiplier) =>
-							onChange(
-								rules.map((current, index) =>
-									index === ruleIndex && current.type === "runtime:multiplier"
-										? {
-												...current,
-												multiplier,
-											}
-										: current,
-								),
-							)
-						}
-					/>
-				)}
-				<div className="flex justify-end">
-					<Button
-						onClick={() =>
-							onChange(
-								rules.map((current, index) =>
-									index === ruleIndex
-										? {
-												...current,
-												when: [
-													...current.when,
-													structuredClone(EditorItemDraftDefaults.when),
-												],
-											}
-										: current,
-								),
-							)
-						}
-					>
-						Add condition
-					</Button>
-				</div>
-				{rule.when.map((when, whenIndex) => (
-					<EditorWhenControl
-						key={`${whenIndex}:${when.type}`}
-						index={whenIndex}
-						value={when}
-						onChange={(next) =>
-							onChange(
-								rules.map((current, index) =>
-									index === ruleIndex
-										? {
-												...current,
-												when: current.when.map(
-													(candidate, candidateIndex) =>
-														candidateIndex === whenIndex
-															? next
-															: candidate,
-												) as typeof current.when,
-											}
-										: current,
-								),
-							)
-						}
-						onRemove={() => {
-							if (rule.when.length === 1) return;
-							onChange(
-								rules.map((current, index) =>
-									index === ruleIndex
-										? {
-												...current,
-												when: current.when.filter(
-													(_candidate, candidateIndex) =>
-														candidateIndex !== whenIndex,
-												) as typeof current.when,
-											}
-										: current,
-								),
-							);
-						}}
-					/>
-				))}
-			</article>
-		))}
-	</section>
-);
+				{(ruleIndex) => {
+					const rule = rules[ruleIndex];
+					return (
+						<article className="grid gap-3">
+							<div className="flex items-end gap-3">
+								<div className="min-w-0 flex-1">
+									<EditorChoiceControl
+										label="Rule type"
+										value={rule.type}
+										options={allowedTypes.map((type) => ({
+											label: type,
+											value: type,
+										}))}
+										onChange={(type) => {
+											const next = createRule(type);
+											onChange(
+												rules.map((current, index) =>
+													index === ruleIndex
+														? {
+																...next,
+																when: current.when,
+															}
+														: current,
+												),
+											);
+										}}
+									/>
+								</div>
+							</div>
+							{rule.type !== "runtime:multiplier" ? null : (
+								<EditorNumberControl
+									label="Runtime multiplier"
+									value={rule.multiplier}
+									min={0.01}
+									step={0.01}
+									onChange={(multiplier) =>
+										onChange(
+											rules.map((current, index) =>
+												index === ruleIndex &&
+												current.type === "runtime:multiplier"
+													? {
+															...current,
+															multiplier,
+														}
+													: current,
+											),
+										)
+									}
+								/>
+							)}
+							<EditorCollectionTabs
+								addLabel="Add condition"
+								count={rule.when.length}
+								itemLabel={(whenIndex) => `Condition ${whenIndex + 1}`}
+								label={`Rule ${ruleIndex + 1} conditions`}
+								onAdd={() =>
+									onChange(
+										rules.map((current, index) =>
+											index === ruleIndex
+												? {
+														...current,
+														when: [
+															...current.when,
+															structuredClone(
+																EditorItemDraftDefaults.when,
+															),
+														],
+													}
+												: current,
+										),
+									)
+								}
+								onRemove={
+									rule.when.length === 1
+										? undefined
+										: (whenIndex) =>
+												onChange(
+													rules.map((current, index) =>
+														index === ruleIndex
+															? {
+																	...current,
+																	when: current.when.filter(
+																		(
+																			_candidate,
+																			candidateIndex,
+																		) =>
+																			candidateIndex !==
+																			whenIndex,
+																	) as typeof current.when,
+																}
+															: current,
+													),
+												)
+								}
+								removeLabel="Remove condition"
+							>
+								{(whenIndex) => (
+									<EditorWhenControl
+										value={rule.when[whenIndex]}
+										onChange={(next) =>
+											onChange(
+												rules.map((current, index) =>
+													index === ruleIndex
+														? {
+																...current,
+																when: current.when.map(
+																	(candidate, candidateIndex) =>
+																		candidateIndex === whenIndex
+																			? next
+																			: candidate,
+																) as typeof current.when,
+															}
+														: current,
+												),
+											)
+										}
+									/>
+								)}
+							</EditorCollectionTabs>
+						</article>
+					);
+				}}
+			</EditorCollectionTabs>
+		</section>
+	);
+};

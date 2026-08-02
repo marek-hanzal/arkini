@@ -1,6 +1,6 @@
 import type { EditorLine } from "~/bridge/item/editor/EditorItemModel";
-import { Button } from "~/ui/button/Button";
 import { EditorCapabilityStatus } from "~/ui/form/EditorCapabilityStatus";
+import { EditorCollectionTabs } from "~/ui/form/EditorCollectionTabs";
 import { withFieldGroup } from "~/ui/form/EditorForm";
 import { EditorLineFields } from "~/ui/item/editor/EditorLineField";
 
@@ -85,7 +85,7 @@ export const EditorProductionFields = withFieldGroup({
 						);
 					return (
 						<div className="grid gap-4 border-t border-line pt-4">
-							<div className="flex items-center justify-between gap-3">
+							<header>
 								<div>
 									<h3 className="text-sm font-semibold">
 										{kind === "deposit" ? "Production lines" : "Product lines"}
@@ -96,34 +96,38 @@ export const EditorProductionFields = withFieldGroup({
 										</p>
 									)}
 								</div>
-								<Button onClick={addLine}>Add line</Button>
-							</div>
-							{lines.map((_line, index) => (
-								<div
-									key={`${index}`}
-									className="grid gap-3 rounded-xl border border-line p-3"
-								>
-									<EditorLineFields
-										form={group}
-										fields={`lines[${index}]`}
-										label={`${kind === "deposit" ? "Deposit" : "Producer"} line ${index + 1}`}
-									/>
-									<Button
-										className="justify-self-end"
-										disabled={kind === "producer" && lines.length === 1}
-										onClick={() => {
-											if (kind === "producer" && lines.length === 1) return;
-											if (kind === "deposit" && lines.length === 1) {
-												group.setFieldValue("lines", undefined);
-												return;
+							</header>
+							<EditorCollectionTabs
+								addLabel="Add line"
+								count={lines.length}
+								itemLabel={(index) =>
+									`${kind === "deposit" ? "Production" : "Product"} line ${index + 1}`
+								}
+								label={`${kind === "deposit" ? "Production" : "Product"} lines`}
+								onAdd={addLine}
+								onRemove={
+									kind === "producer" && lines.length === 1
+										? undefined
+										: (index) => {
+												if (kind === "deposit" && lines.length === 1) {
+													group.setFieldValue("lines", undefined);
+													return;
+												}
+												linesField.removeValue(index);
 											}
-											linesField.removeValue(index);
-										}}
-									>
-										Remove line
-									</Button>
-								</div>
-							))}
+								}
+								removeLabel="Remove line"
+							>
+								{(index) => (
+									<div className="grid gap-3">
+										<EditorLineFields
+											form={group}
+											fields={`lines[${index}]`}
+											label={null}
+										/>
+									</div>
+								)}
+							</EditorCollectionTabs>
 						</div>
 					);
 				}}

@@ -9,6 +9,7 @@ import { EditorSectionNavigation } from "~/ui/editor/EditorSectionNavigation";
 import { EditorSectionPage } from "~/ui/editor/EditorSectionPage";
 import { editorBackLinkClassName, EditorBackIcon } from "~/ui/editor/EditorBackIcon";
 import { editorInputClassName } from "~/ui/form/EditorInputClassName";
+import { EditorFormContent } from "~/ui/form/EditorFormContent";
 import { readSettledAsyncResultError } from "~/ui/reactivity/readSettledAsyncResultError";
 import { EditorAssetImageDropZone } from "~/ui/resource/editor/EditorAssetImageDropZone";
 import { useEditorAssetById } from "~/ui/resource/editor/useEditorAssetById";
@@ -113,33 +114,25 @@ export const EditorAssetEdit = ({
 				/>
 			}
 		>
-			<form
-				onSubmit={(event) => {
-					event.preventDefault();
-					void save();
-				}}
+			<EditorFormContent
+				className="mx-auto max-w-3xl"
+				error={error}
+				save={save}
 			>
-				<div className="mx-auto grid max-w-3xl gap-5">
-					{error === undefined ? null : (
-						<p className="rounded-lg border border-danger/40 bg-danger/10 px-4 py-3 text-sm text-danger">
-							{error instanceof Error ? error.message : String(error)}
-						</p>
-					)}
-					<label className="grid gap-1.5 text-sm font-semibold">
-						Asset ID
-						<input
-							className={editorInputClassName}
-							value={nextId}
-							onChange={(event) => setNextId(event.currentTarget.value)}
-						/>
-					</label>
-					<EditorAssetImageDropZone
-						currentUrl={currentUrl}
-						file={file}
-						onFile={setFile}
+				<label className="grid gap-1.5 text-sm font-semibold">
+					Asset ID
+					<input
+						className={editorInputClassName}
+						value={nextId}
+						onChange={(event) => setNextId(event.currentTarget.value)}
 					/>
-				</div>
-			</form>
+				</label>
+				<EditorAssetImageDropZone
+					currentUrl={currentUrl}
+					file={file}
+					onFile={setFile}
+				/>
+			</EditorFormContent>
 		</EditorSectionPage>
 	);
 };

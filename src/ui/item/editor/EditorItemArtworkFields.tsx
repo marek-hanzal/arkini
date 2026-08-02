@@ -1,6 +1,7 @@
 import type { EditorItem } from "~/bridge/item/editor/EditorItemModel";
 import { Button } from "~/ui/button/Button";
 import { EditorCapabilityStatus } from "~/ui/form/EditorCapabilityStatus";
+import { EditorCollectionTabs } from "~/ui/form/EditorCollectionTabs";
 import { withFieldGroup } from "~/ui/form/EditorForm";
 
 const defaultArtwork: EditorItem["asset"] = {
@@ -69,42 +70,23 @@ export const EditorItemArtworkFields = withFieldGroup({
 									title="Progress artwork is disabled"
 								/>
 							) : (
-								<>
-									<div className="flex items-center justify-between gap-3">
-										<div>
-											<h3 className="text-sm font-semibold">
-												Progress assets
-											</h3>
-											<p className="mt-1 text-xs text-muted">
-												Ordered single-image states shown after the default
-												composition.
-											</p>
-										</div>
-										<Button onClick={() => sourcesField.pushValue("")}>
-											Add progress asset
-										</Button>
-									</div>
-									{sources.map((_, index) => (
-										<div
-											key={`${index}`}
-											className="grid gap-2 md:grid-cols-[minmax(0,1fr)_auto]"
-										>
+								<EditorCollectionTabs
+									addLabel="Add progress asset"
+									count={sources.length}
+									itemLabel={(index) => `Progress asset ${index + 1}`}
+									label="Progress assets"
+									onAdd={() => sourcesField.pushValue("")}
+									onRemove={(index) => sourcesField.removeValue(index)}
+									removeLabel="Remove progress asset"
+								>
+									{(index) => (
+										<div className="grid gap-2">
 											<group.AppField name={`sources[${index}]`}>
-												{(field) => (
-													<field.AssetField
-														label={`Progress asset ${index + 1}`}
-													/>
-												)}
+												{(field) => <field.AssetField label="Asset" />}
 											</group.AppField>
-											<Button
-												className="self-end"
-												onClick={() => sourcesField.removeValue(index)}
-											>
-												Remove
-											</Button>
 										</div>
-									))}
-								</>
+									)}
+								</EditorCollectionTabs>
 							)}
 						</div>
 					);

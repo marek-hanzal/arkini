@@ -77,7 +77,7 @@ const EditorBoardDistanceControl = ({
 
 /** Shared selector, scope and board-distance editor for every authored query. */
 export const EditorQueryControl = (props: EditorQueryControlProps) => (
-	<div className="grid gap-3 rounded-lg border border-line bg-canvas/35 p-3">
+	<div className="grid gap-3">
 		<EditorSelectorControl
 			value={props.value.selector}
 			onChange={(selector) =>

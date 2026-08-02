@@ -7,13 +7,23 @@ export namespace Status {
 		readonly description: string;
 		readonly icon: string;
 		readonly title: string;
+		readonly variant?: "card" | "flat";
 	}
 }
 
 /** Presents one deliberate empty or unavailable product state with an optional canonical action. */
-export const Status = ({ action, dataUi = "Status", description, icon, title }: Status.Props) => (
+export const Status = ({
+	action,
+	dataUi = "Status",
+	description,
+	icon,
+	title,
+	variant = "card",
+}: Status.Props) => (
 	<section
-		className="grid min-h-48 place-items-center rounded-2xl border border-line bg-surface/70 p-[var(--ak-panel-padding)] text-center"
+		className={`grid min-h-48 place-items-center p-[var(--ak-panel-padding)] text-center ${
+			variant === "card" ? "rounded-2xl border border-line bg-surface/70" : ""
+		}`}
 		data-ui={dataUi}
 	>
 		<div className="grid max-w-md justify-items-center gap-3">

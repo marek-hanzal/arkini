@@ -3,6 +3,7 @@ import { match } from "ts-pattern";
 import type { EditorInput, EditorLine } from "~/bridge/item/editor/EditorItemModel";
 import { Button } from "~/ui/button/Button";
 import { EditorCapabilityStatus } from "~/ui/form/EditorCapabilityStatus";
+import { EditorCollectionTabs } from "~/ui/form/EditorCollectionTabs";
 import { EditorItemDraftDefaults } from "~/ui/item/editor/EditorItemDraftDefaults";
 import { EditorChoiceControl, EditorNumberControl } from "~/ui/form/EditorValueControls";
 import { EditorQuantityControl } from "~/ui/item/editor/EditorQuantityControl";
@@ -101,22 +102,14 @@ const EditorInputCharges = ({
 };
 
 const EditorLineInput = ({
-	index,
 	input,
 	onChange,
-	onRemove,
 }: {
-	readonly index: number;
 	readonly input: EditorInput;
 	readonly onChange: (input: EditorInput) => void;
-	readonly onRemove: () => void;
 }) => {
 	return (
-		<article className="grid gap-4 rounded-xl border border-line bg-canvas/35 p-3">
-			<header className="flex items-center justify-between gap-3">
-				<h3 className="text-sm font-semibold">Input {index + 1}</h3>
-				<Button onClick={onRemove}>Remove</Button>
-			</header>
+		<article className="grid gap-4">
 			<EditorChoiceControl
 				label="Input type"
 				value={input.type}
@@ -142,7 +135,7 @@ const EditorLineInput = ({
 						type: "simple",
 					},
 					() => (
-						<p className="rounded-lg border border-line bg-surface/60 p-3 text-xs text-muted">
+						<p className="text-xs text-muted">
 							This marker has no consumable resource requirement.
 						</p>
 					),
@@ -256,51 +249,42 @@ export const EditorLineInputsControl = ({ onChange, value }: EditorLineInputsCon
 	};
 	return (
 		<section className="grid gap-3 border-t border-line pt-4">
-			<header className="flex flex-wrap items-center justify-between gap-3">
-				<div>
-					<h3 className="text-sm font-semibold">Inputs</h3>
-					<p className="mt-1 text-xs text-muted">
-						At least one explicit input contract is required.
-					</p>
-				</div>
-				<div className="flex flex-wrap gap-2">
-					{(
-						[
-							"simple",
-							"materials",
-							"deposit",
-						] as const
-					).map((type) => (
-						<Button
-							key={type}
-							onClick={() =>
-								onChange([
-									...value,
-									structuredClone(EditorItemDraftDefaults.inputs[type]),
-								])
-							}
-						>
-							Add {type}
-						</Button>
-					))}
-				</div>
+			<header>
+				<h3 className="text-sm font-semibold">Inputs</h3>
+				<p className="mt-1 text-xs text-muted">
+					At least one explicit input contract is required.
+				</p>
 			</header>
-			{value.map((input, index) => (
-				<EditorLineInput
-					key={`${index}:${input.type}`}
-					index={index}
-					input={input}
-					onChange={(next) => replaceAt(index, next)}
-					onRemove={() => {
-						if (value.length === 1) return;
-						onChange(
-							value.filter(
-								(_current, currentIndex) => currentIndex !== index,
-							) as EditorLine["input"],
-						);
-					}}
-				/>
-			))}
+			<EditorCollectionTabs
+				addLabel="Add input"
+				count={value.length}
+				itemLabel={(index) => `Input ${index + 1}`}
+				label="Line inputs"
+				onAdd={() =>
+					onChange([
+						...value,
+						structuredClone(EditorItemDraftDefaults.inputs.simple),
+					])
+				}
+				onRemove={
+					value.length === 1
+						? undefined
+						: (index) =>
+								onChange(
+									value.filter(
+										(_current, currentIndex) => currentIndex !== index,
+									) as EditorLine["input"],
+								)
+				}
+				removeLabel="Remove input"
+			>
+				{(index) => (
+					<EditorLineInput
+						input={value[index]}
+						onChange={(next) => replaceAt(index, next)}
+					/>
+				)}
+			</EditorCollectionTabs>
 		</section>
 	);
 };

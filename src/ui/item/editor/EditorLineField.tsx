@@ -27,11 +27,11 @@ const defaultLine: EditorLine = {
 export const EditorLineFields = withFieldGroup({
 	defaultValues: defaultLine,
 	props: {
-		label: undefined as string | undefined,
+		label: undefined as string | null | undefined,
 	},
 	render: ({ group, label = "Product line" }) => (
 		<div className="grid gap-4">
-			<h3 className="text-sm font-semibold">{label}</h3>
+			{label === null ? null : <h3 className="text-sm font-semibold">{label}</h3>}
 			<div className="grid gap-3 md:grid-cols-2">
 				<group.AppField name="id">
 					{(field) => <field.TextField label="Line ID" />}

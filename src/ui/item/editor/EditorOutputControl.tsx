@@ -7,6 +7,7 @@ import type {
 	EditorRollSet,
 } from "~/bridge/item/editor/EditorItemModel";
 import { Button } from "~/ui/button/Button";
+import { EditorCollectionTabs } from "~/ui/form/EditorCollectionTabs";
 import { EditorItemDraftDefaults } from "~/ui/item/editor/EditorItemDraftDefaults";
 import { EditorChoiceControl, EditorNumberControl } from "~/ui/form/EditorValueControls";
 import { EditorItemReferenceControl } from "~/ui/item/editor/EditorItemReferenceControl";
@@ -14,23 +15,13 @@ import { EditorQuantityControl } from "~/ui/item/editor/EditorQuantityControl";
 import { EditorRulesControl } from "~/ui/item/editor/EditorRulesControl";
 
 const EditorDropControl = ({
-	index,
 	onChange,
-	onRemove,
 	value,
 }: {
-	readonly index: number;
 	readonly onChange: (drop: EditorDrop) => void;
-	readonly onRemove: () => void;
 	readonly value: EditorDrop;
 }) => (
-	<article className="grid gap-3 rounded-lg border border-line bg-surface/60 p-3">
-		<header className="flex items-center justify-between gap-3">
-			<h5 className="text-xs font-semibold uppercase tracking-wider text-muted">
-				Drop {index + 1}
-			</h5>
-			<Button onClick={onRemove}>Remove</Button>
-		</header>
+	<div className="grid gap-3">
 		<EditorItemReferenceControl
 			label="Dropped item"
 			value={value.itemId}
@@ -85,7 +76,7 @@ const EditorDropControl = ({
 				})
 			}
 		/>
-	</article>
+	</div>
 );
 
 const EditorDropList = ({
@@ -106,25 +97,35 @@ const EditorDropList = ({
 	];
 }) => {
 	return (
-		<div className="grid gap-3">
-			<div className="flex items-center justify-between gap-3">
-				<h4 className="text-sm font-semibold">Drops</h4>
-				<Button
-					onClick={() =>
-						onChange([
-							...value,
-							structuredClone(EditorItemDraftDefaults.drop),
-						])
-					}
-				>
-					Add drop
-				</Button>
-			</div>
-			{value.map((drop, index) => (
+		<EditorCollectionTabs
+			addLabel="Add drop"
+			count={value.length}
+			itemLabel={(index) => `Drop ${index + 1}`}
+			label="Drops"
+			onAdd={() =>
+				onChange([
+					...value,
+					structuredClone(EditorItemDraftDefaults.drop),
+				])
+			}
+			onRemove={
+				value.length <= minimum
+					? undefined
+					: (index) =>
+							onChange(
+								value.filter(
+									(_current, currentIndex) => currentIndex !== index,
+								) as [
+									EditorDrop,
+									...EditorDrop[],
+								],
+							)
+			}
+			removeLabel="Remove drop"
+		>
+			{(index) => (
 				<EditorDropControl
-					key={`${index}:${drop.itemId}`}
-					index={index}
-					value={drop}
+					value={value[index]}
 					onChange={(next) =>
 						onChange(
 							value.map((current, currentIndex) =>
@@ -135,38 +136,21 @@ const EditorDropList = ({
 							],
 						)
 					}
-					onRemove={() => {
-						if (value.length <= minimum) return;
-						onChange(
-							value.filter((_current, currentIndex) => currentIndex !== index) as [
-								EditorDrop,
-								...EditorDrop[],
-							],
-						);
-					}}
 				/>
-			))}
-		</div>
+			)}
+		</EditorCollectionTabs>
 	);
 };
 
 const EditorRollControl = ({
-	index,
 	onChange,
-	onRemove,
 	value,
 }: {
-	readonly index: number;
 	readonly onChange: (roll: EditorRoll) => void;
-	readonly onRemove: () => void;
 	readonly value: EditorRoll;
 }) => {
 	return (
-		<article className="grid gap-4 rounded-xl border border-line bg-canvas/35 p-3">
-			<header className="flex items-center justify-between gap-3">
-				<h4 className="text-sm font-semibold">Roll {index + 1}</h4>
-				<Button onClick={onRemove}>Remove</Button>
-			</header>
+		<div className="grid gap-4">
 			<EditorChoiceControl
 				label="Roll type"
 				value={value.type}
@@ -250,114 +234,108 @@ const EditorRollControl = ({
 									})
 								}
 							/>
-							<div className="grid gap-3">
-								<div className="flex items-center justify-between gap-3">
-									<h4 className="text-sm font-semibold">Weighted candidates</h4>
-									<Button
-										onClick={() =>
-											onChange({
-												...roll,
+							<EditorCollectionTabs
+								addLabel="Add weighted candidate"
+								count={roll.drop.length}
+								itemLabel={(candidateIndex) => `Candidate ${candidateIndex + 1}`}
+								label="Weighted candidates"
+								onAdd={() =>
+									onChange({
+										...roll,
+										drop: [
+											...roll.drop,
+											{
+												weight: 1,
 												drop: [
-													...roll.drop,
-													{
-														weight: 1,
-														drop: [
-															structuredClone(
-																EditorItemDraftDefaults.drop,
-															),
-														],
-													},
+													structuredClone(EditorItemDraftDefaults.drop),
 												],
-											})
-										}
-									>
-										Add candidate
-									</Button>
-								</div>
-								{roll.drop.map((candidate, candidateIndex) => (
-									<div
-										key={`${candidateIndex}`}
-										className="grid gap-3 rounded-xl border border-line p-3"
-									>
-										<div className="flex items-end gap-3">
-											<div className="min-w-0 flex-1">
-												<EditorNumberControl
-													label={`Candidate ${candidateIndex + 1} weight`}
-													value={candidate.weight}
-													min={1}
-													onChange={(weight) =>
-														onChange({
-															...roll,
-															drop: roll.drop.map(
-																(current, currentIndex) =>
-																	currentIndex === candidateIndex
-																		? {
-																				...current,
-																				weight,
-																			}
-																		: current,
-															) as typeof roll.drop,
-														})
-													}
-												/>
-											</div>
-											<Button
-												onClick={() => {
-													if (roll.drop.length <= 2) return;
-													onChange({
-														...roll,
-														drop: roll.drop.filter(
-															(_current, currentIndex) =>
-																currentIndex !== candidateIndex,
-														) as typeof roll.drop,
-													});
-												}}
-											>
-												Remove candidate
-											</Button>
-										</div>
-										<EditorDropList
-											value={candidate.drop}
-											onChange={(drop) =>
+											},
+										],
+									})
+								}
+								onRemove={
+									roll.drop.length <= 2
+										? undefined
+										: (candidateIndex) =>
 												onChange({
 													...roll,
-													drop: roll.drop.map((current, currentIndex) =>
-														currentIndex === candidateIndex
-															? {
-																	...current,
-																	drop,
-																}
-															: current,
+													drop: roll.drop.filter(
+														(_current, currentIndex) =>
+															currentIndex !== candidateIndex,
 													) as typeof roll.drop,
 												})
-											}
-										/>
-									</div>
-								))}
-							</div>
+								}
+								removeLabel="Remove weighted candidate"
+							>
+								{(candidateIndex) => {
+									const candidate = roll.drop[candidateIndex];
+									return (
+										<div className="grid gap-3">
+											<div className="flex items-end gap-3">
+												<div className="min-w-0 flex-1">
+													<EditorNumberControl
+														label={`Candidate ${candidateIndex + 1} weight`}
+														value={candidate.weight}
+														min={1}
+														onChange={(weight) =>
+															onChange({
+																...roll,
+																drop: roll.drop.map(
+																	(current, currentIndex) =>
+																		currentIndex ===
+																		candidateIndex
+																			? {
+																					...current,
+																					weight,
+																				}
+																			: current,
+																) as typeof roll.drop,
+															})
+														}
+													/>
+												</div>
+											</div>
+											<EditorDropList
+												value={candidate.drop}
+												onChange={(drop) =>
+													onChange({
+														...roll,
+														drop: roll.drop.map(
+															(current, currentIndex) =>
+																currentIndex === candidateIndex
+																	? {
+																			...current,
+																			drop,
+																		}
+																	: current,
+														) as typeof roll.drop,
+													})
+												}
+											/>
+										</div>
+									);
+								}}
+							</EditorCollectionTabs>
 						</div>
 					),
 				)
 				.exhaustive()}
-		</article>
+		</div>
 	);
 };
 
 const EditorRollSetControl = ({
 	index,
 	onChange,
-	onRemove,
 	value,
 }: {
 	readonly index: number;
 	readonly onChange: (set: EditorRollSet) => void;
-	readonly onRemove: () => void;
 	readonly value: EditorRollSet;
 }) => {
 	return (
-		<section className="grid gap-3 rounded-xl border border-line-strong bg-surface/50 p-3">
-			<header className="flex flex-wrap items-center justify-between gap-3">
-				<h3 className="text-sm font-semibold">Output set {index + 1}</h3>
+		<section className="grid gap-3">
+			<header className="flex flex-wrap items-center justify-end gap-3">
 				<div className="flex items-center gap-2">
 					<Button
 						onClick={() =>
@@ -369,7 +347,6 @@ const EditorRollSetControl = ({
 					>
 						{value.weight === undefined ? "Add set weight" : "Remove set weight"}
 					</Button>
-					<Button onClick={onRemove}>Remove set</Button>
 				</div>
 			</header>
 			{value.weight === undefined ? null : (
@@ -385,45 +362,47 @@ const EditorRollSetControl = ({
 					}
 				/>
 			)}
-			<div className="flex justify-end">
-				<Button
-					onClick={() =>
-						onChange({
-							...value,
-							roll: [
-								...value.roll,
-								structuredClone(EditorItemDraftDefaults.rolls.guaranteed),
-							],
-						})
-					}
-				>
-					Add roll
-				</Button>
-			</div>
-			{value.roll.map((roll, rollIndex) => (
-				<EditorRollControl
-					key={`${rollIndex}:${roll.type}`}
-					index={rollIndex}
-					value={roll}
-					onChange={(next) =>
-						onChange({
-							...value,
-							roll: value.roll.map((current, currentIndex) =>
-								currentIndex === rollIndex ? next : current,
-							) as typeof value.roll,
-						})
-					}
-					onRemove={() => {
-						if (value.roll.length === 1) return;
-						onChange({
-							...value,
-							roll: value.roll.filter(
-								(_current, currentIndex) => currentIndex !== rollIndex,
-							) as typeof value.roll,
-						});
-					}}
-				/>
-			))}
+			<EditorCollectionTabs
+				addLabel="Add roll"
+				count={value.roll.length}
+				itemLabel={(rollIndex) => `Roll ${rollIndex + 1}`}
+				label={`Output set ${index + 1} rolls`}
+				onAdd={() =>
+					onChange({
+						...value,
+						roll: [
+							...value.roll,
+							structuredClone(EditorItemDraftDefaults.rolls.guaranteed),
+						],
+					})
+				}
+				onRemove={
+					value.roll.length === 1
+						? undefined
+						: (rollIndex) =>
+								onChange({
+									...value,
+									roll: value.roll.filter(
+										(_current, currentIndex) => currentIndex !== rollIndex,
+									) as typeof value.roll,
+								})
+				}
+				removeLabel="Remove roll"
+			>
+				{(rollIndex) => (
+					<EditorRollControl
+						value={value.roll[rollIndex]}
+						onChange={(next) =>
+							onChange({
+								...value,
+								roll: value.roll.map((current, currentIndex) =>
+									currentIndex === rollIndex ? next : current,
+								) as typeof value.roll,
+							})
+						}
+					/>
+				)}
+			</EditorCollectionTabs>
 		</section>
 	);
 };
@@ -436,30 +415,39 @@ export interface EditorOutputControlProps {
 /** Edits weighted output sets, discriminated rolls, and their canonical item drops. */
 export const EditorOutputControl = ({ onChange, value }: EditorOutputControlProps) => {
 	return (
-		<div className="grid gap-3">
-			<div className="flex justify-end">
-				<Button
-					onClick={() =>
-						onChange({
-							set: [
-								...value.set,
-								{
-									roll: [
-										structuredClone(EditorItemDraftDefaults.rolls.guaranteed),
-									],
-								},
+		<EditorCollectionTabs
+			addLabel="Add output set"
+			count={value.set.length}
+			itemLabel={(index) => `Output set ${index + 1}`}
+			label="Output sets"
+			onAdd={() =>
+				onChange({
+					set: [
+						...value.set,
+						{
+							roll: [
+								structuredClone(EditorItemDraftDefaults.rolls.guaranteed),
 							],
-						})
-					}
-				>
-					Add output set
-				</Button>
-			</div>
-			{value.set.map((set, index) => (
+						},
+					],
+				})
+			}
+			onRemove={
+				value.set.length === 1
+					? undefined
+					: (index) =>
+							onChange({
+								set: value.set.filter(
+									(_current, currentIndex) => currentIndex !== index,
+								) as typeof value.set,
+							})
+			}
+			removeLabel="Remove output set"
+		>
+			{(index) => (
 				<EditorRollSetControl
-					key={`${index}`}
 					index={index}
-					value={set}
+					value={value.set[index]}
 					onChange={(next) =>
 						onChange({
 							set: value.set.map((current, currentIndex) =>
@@ -467,16 +455,8 @@ export const EditorOutputControl = ({ onChange, value }: EditorOutputControlProp
 							) as typeof value.set,
 						})
 					}
-					onRemove={() => {
-						if (value.set.length === 1) return;
-						onChange({
-							set: value.set.filter(
-								(_current, currentIndex) => currentIndex !== index,
-							) as typeof value.set,
-						});
-					}}
 				/>
-			))}
-		</div>
+			)}
+		</EditorCollectionTabs>
 	);
 };

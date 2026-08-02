@@ -13,7 +13,6 @@ const craft = {
 		],
 	},
 	tags: [],
-	categoryId: "resource",
 	scope: "any",
 	maxStackSize: 10,
 	type: "craft",

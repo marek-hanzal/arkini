@@ -8,7 +8,7 @@ describe("Quest default lines", () => {
 		let questCount = 0;
 
 		for (const item of Object.values(config.items)) {
-			if (item.type !== "craft" || item.categoryId !== "quest") {
+			if (item.type !== "craft" || !item.tags.includes("quest")) {
 				continue;
 			}
 

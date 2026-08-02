@@ -19,7 +19,6 @@ const baseItem = ({ id, tags = [] }: { id: string; tags?: string[] }) => ({
 		],
 	},
 	tags,
-	categoryId: "resource",
 	scope: "any" as const,
 	maxStackSize: 1,
 });
@@ -162,7 +161,6 @@ const createLifecycleConfig = ({
 		start: {
 			currentSpace: 0,
 		},
-		categories: {},
 		items: {
 			source,
 			target,

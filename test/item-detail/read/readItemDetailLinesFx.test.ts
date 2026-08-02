@@ -1112,7 +1112,6 @@ describe("readItemDetailLinesFx", () => {
 					},
 				],
 			},
-			categories: {},
 			items: {
 				workshop: {
 					uid: "workshop",
@@ -1126,7 +1125,6 @@ describe("readItemDetailLinesFx", () => {
 						],
 					},
 					tags: [],
-					categoryId: "building",
 					scope: "board",
 					maxStackSize: 1,
 					maxQueueSize: 1,
@@ -1203,7 +1201,6 @@ describe("readItemDetailLinesFx", () => {
 						],
 					},
 					tags: [],
-					categoryId: "resource",
 					scope: "any",
 					maxStackSize: 10,
 				},
@@ -1219,7 +1216,6 @@ describe("readItemDetailLinesFx", () => {
 						],
 					},
 					tags: [],
-					categoryId: "resource",
 					scope: "any",
 					maxStackSize: 10,
 				},

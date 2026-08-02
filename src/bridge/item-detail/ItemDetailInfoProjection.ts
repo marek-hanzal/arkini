@@ -9,7 +9,6 @@ export type ItemDetailInfoProjection =
 			readonly itemId: IdSchema.Type;
 			readonly description: string;
 			readonly itemType: ItemEnumSchema.Type;
-			readonly categoryTitle?: string;
 			readonly tags: readonly string[];
 			readonly storageScope: StorageScopeEnumSchema.Type;
 			readonly location: readItemDetailInfoFx.Location;

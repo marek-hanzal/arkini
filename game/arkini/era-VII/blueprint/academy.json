@@ -23,7 +23,6 @@
 				"knowledge",
 				"era:VII"
 			],
-			"categoryId": "blueprint",
 			"scope": "any",
 			"maxStackSize": 1,
 			"line": {

@@ -21,27 +21,6 @@ export const validateCanonicalIdsFx = Effect.fn("validateCanonicalIdsFx")(functi
 }: validateCanonicalIdsFx.Props) {
 	const diagnostics: GameDiagnosticsSchema.Type = [];
 
-	for (const [key, category] of Object.entries(config.categories)) {
-		if (category.id === key) {
-			continue;
-		}
-
-		diagnostics.push({
-			code: DiagnosticCodeEnumSchema.enum.ConfigKeyIdMismatch,
-			severity: DiagnosticSeverityEnumSchema.enum.Error,
-			path: [
-				"categories",
-				key,
-				"id",
-			],
-			source: provenance.categories[key],
-			message: `Category record key ${key} differs from embedded ID ${category.id}.`,
-			entity: DiagnosticRecordEntityEnumSchema.enum.Category,
-			key,
-			id: category.id,
-		});
-	}
-
 	for (const [key, item] of Object.entries(config.items)) {
 		if (item.id === key) {
 			continue;

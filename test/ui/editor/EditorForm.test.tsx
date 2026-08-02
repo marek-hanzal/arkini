@@ -97,7 +97,6 @@ const validationDefaults: EditorItemFormValues = {
 		],
 	},
 	tags: "resource, form",
-	categoryId: "resource",
 	scope: "any",
 	maxStackSize: 1,
 };

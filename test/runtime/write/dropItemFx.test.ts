@@ -33,7 +33,6 @@ const configInput = {
 	start: {
 		currentSpace: 0,
 	},
-	categories: {},
 	items: {
 		water: {
 			uid: "water",
@@ -47,7 +46,6 @@ const configInput = {
 				],
 			},
 			tags: [],
-			categoryId: "resource",
 			scope: "any",
 			maxStackSize: 10,
 		},
@@ -63,7 +61,6 @@ const configInput = {
 				],
 			},
 			tags: [],
-			categoryId: "resource",
 			scope: "any",
 			maxStackSize: 10,
 		},
@@ -79,7 +76,6 @@ const configInput = {
 				],
 			},
 			tags: [],
-			categoryId: "utility",
 		},
 	},
 } as const;

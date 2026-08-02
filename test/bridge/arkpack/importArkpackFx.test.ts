@@ -35,12 +35,12 @@ describe("importArkpackFx", () => {
 		const storage = Effect.runSync(createInMemoryArkpackStorageFx());
 		const invalid = {
 			...testArkpackConfig,
-			items: {
-				...testArkpackConfig.items,
-				water: {
-					...testArkpackConfig.items.water,
-					categoryId: "missing",
-				},
+			start: {
+				...testArkpackConfig.start,
+				board: testArkpackConfig.start.board.map((entry) => ({
+					...entry,
+					itemId: "missing",
+				})),
 			},
 		};
 		const encoded = Effect.runSync(

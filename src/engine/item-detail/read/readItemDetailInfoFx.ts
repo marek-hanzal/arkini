@@ -44,7 +44,6 @@ export namespace readItemDetailInfoFx {
 				readonly itemId: IdSchema.Type;
 				readonly description: string;
 				readonly itemType: ItemEnumSchema.Type;
-				readonly categoryId: IdSchema.Type;
 				readonly tags: readonly string[];
 				readonly storageScope: StorageScopeEnumSchema.Type;
 				readonly location: Location;
@@ -139,7 +138,6 @@ export const readItemDetailInfoFx = Effect.fn("readItemDetailInfoFx")(
 				itemId: item.id,
 				description: item.item.description,
 				itemType: item.item.type,
-				categoryId: item.item.categoryId,
 				tags: [
 					...item.item.tags,
 				],

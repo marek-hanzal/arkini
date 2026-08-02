@@ -15,7 +15,6 @@ const baseItem = ({ id, scope }: { id: string; scope: "any" | "board" }) => ({
 		],
 	},
 	tags: [],
-	categoryId: "resource",
 	scope,
 	maxStackSize: 10,
 });
@@ -45,7 +44,6 @@ export const createJobTestConfig = (
 		start: {
 			currentSpace: 0,
 		},
-		categories: {},
 		items: {
 			forge: {
 				...baseItem({

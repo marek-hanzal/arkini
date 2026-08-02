@@ -24,7 +24,6 @@ const baseItem = (id: string) =>
 			],
 		},
 		tags: [],
-		categoryId: "test",
 		scope: "any",
 		maxStackSize: 1,
 	}) as const;
@@ -62,7 +61,6 @@ const config = GameConfigSchema.parse({
 	start: {
 		currentSpace: 0,
 	},
-	categories: {},
 	items: {
 		[workerItemId]: {
 			...baseItem(workerItemId),

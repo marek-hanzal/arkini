@@ -22,7 +22,6 @@ const base = (id: string, scope: "any" | "board" = "board") => ({
 		],
 	},
 	tags: [],
-	categoryId: "test",
 	scope,
 	maxStackSize: 1,
 });
@@ -61,7 +60,6 @@ const config = GameConfigSchema.parse({
 	start: {
 		currentSpace: 0,
 	},
-	categories: {},
 	items: {
 		"producer:employer": {
 			...base("producer:employer"),

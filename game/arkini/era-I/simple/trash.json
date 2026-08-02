@@ -19,7 +19,6 @@
 				"cleanup",
 				"era:I"
 			],
-			"categoryId": "waste",
 			"scope": "board",
 			"maxStackSize": 1
 		}

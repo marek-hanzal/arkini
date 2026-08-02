@@ -19,7 +19,6 @@
 				"glass",
 				"era:VI"
 			],
-			"categoryId": "source",
 			"scope": "any",
 			"maxStackSize": 1
 		}

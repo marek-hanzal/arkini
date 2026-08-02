@@ -34,7 +34,6 @@ export const EditorItemList = () => {
 						item.title,
 						item.description,
 						item.type,
-						item.categoryId,
 						...item.tags,
 					],
 				})),

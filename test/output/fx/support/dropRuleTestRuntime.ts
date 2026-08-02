@@ -23,7 +23,6 @@ export const dropRuleTestConfig = GameConfigSchema.parse({
 	start: {
 		currentSpace: 0,
 	},
-	categories: {},
 	items: {
 		source: {
 			uid: "source",
@@ -36,7 +35,6 @@ export const dropRuleTestConfig = GameConfigSchema.parse({
 				],
 			},
 			tags: [],
-			categoryId: "resource",
 			scope: "board",
 			maxStackSize: 1,
 			type: "simple",
@@ -52,7 +50,6 @@ export const dropRuleTestConfig = GameConfigSchema.parse({
 				],
 			},
 			tags: [],
-			categoryId: "resource",
 			scope: "any",
 			maxStackSize: 10,
 			type: "simple",

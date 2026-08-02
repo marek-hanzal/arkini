@@ -16,7 +16,6 @@ const item = {
 	tags: [
 		"utility",
 	],
-	categoryId: "utility",
 };
 
 describe("InventoryItemSchema", () => {

@@ -48,38 +48,7 @@ describe("completed config reference validation", () => {
 		);
 	});
 
-	it("reports category record key and embedded ID mismatches", async () => {
-		const root = createRootSource();
-		const result = await Effect.runPromise(
-			compileGameSourcesFx([
-				{
-					...root,
-					value: {
-						...root.value,
-						categories: {
-							"category:key": {
-								id: "category:embedded",
-								title: "Embedded",
-							},
-						},
-					},
-				},
-			]),
-		);
-
-		expect(result.diagnostics).toEqual(
-			expect.arrayContaining([
-				expect.objectContaining({
-					code: DiagnosticCodeEnumSchema.enum.ConfigKeyIdMismatch,
-					entity: DiagnosticRecordEntityEnumSchema.enum.Category,
-					key: "category:key",
-					id: "category:embedded",
-				}),
-			]),
-		);
-	});
-
-	it("reports missing start, category, selector, and output item references together", async () => {
+	it("reports missing start, selector, and output item references together", async () => {
 		const producer = {
 			...createProducerItem({
 				id: "item:producer",
@@ -104,7 +73,6 @@ describe("completed config reference validation", () => {
 					},
 				]),
 			}),
-			categoryId: "category:missing",
 		};
 		const result = await compileItems(
 			{
@@ -133,10 +101,6 @@ describe("completed config reference validation", () => {
 				expect.objectContaining({
 					reference: DiagnosticRecordEntityEnumSchema.enum.Item,
 					referenceId: "item:missing-start",
-				}),
-				expect.objectContaining({
-					reference: DiagnosticRecordEntityEnumSchema.enum.Category,
-					referenceId: "category:missing",
 				}),
 				expect.objectContaining({
 					reference: DiagnosticRecordEntityEnumSchema.enum.Item,

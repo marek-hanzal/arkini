@@ -88,12 +88,12 @@ describe("readArkpackFx", () => {
 	it("rejects semantically invalid packages before persistence", async () => {
 		const invalid = {
 			...testArkpackConfig,
-			items: {
-				...testArkpackConfig.items,
-				water: {
-					...testArkpackConfig.items.water,
-					categoryId: "missing-category",
-				},
+			start: {
+				...testArkpackConfig.start,
+				board: testArkpackConfig.start.board.map((entry) => ({
+					...entry,
+					itemId: "missing",
+				})),
 			},
 		};
 		const encoded = Effect.runSync(

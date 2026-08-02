@@ -74,7 +74,6 @@ const config = GameConfigSchema.parse({
 			},
 		],
 	},
-	categories: {},
 	items: {
 		workshop: {
 			uid: "workshop",
@@ -88,7 +87,6 @@ const config = GameConfigSchema.parse({
 				],
 			},
 			tags: [],
-			categoryId: "building",
 			scope: "any",
 			maxStackSize: 1,
 			maxQueueSize: 2,
@@ -140,7 +138,6 @@ const config = GameConfigSchema.parse({
 				],
 			},
 			tags: [],
-			categoryId: "resource",
 			scope: "any",
 			maxStackSize: 10,
 		},

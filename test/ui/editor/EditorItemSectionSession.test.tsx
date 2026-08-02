@@ -34,14 +34,7 @@ vi.mock("~/bridge/editor/useEditorProject", () => ({
 	useEditorProject: () => ({
 		projectId: "editor-test",
 		revision: "revision-1",
-		config: {
-			categories: {
-				resource: {
-					id: "resource",
-					title: "Resource",
-				},
-			},
-		},
+		config: {},
 	}),
 }));
 
@@ -92,7 +85,6 @@ const item: EditorItem = {
 		],
 	},
 	tags: [],
-	categoryId: "resource",
 	scope: "any",
 	maxStackSize: 1,
 };

@@ -20,7 +20,6 @@
 				"era:III",
 				"tier-3-resource"
 			],
-			"categoryId": "food",
 			"scope": "any",
 			"maxStackSize": 50
 		}

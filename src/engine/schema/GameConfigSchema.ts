@@ -1,7 +1,6 @@
 import { z } from "zod";
 
 import { ItemSchema } from "~/engine/item/schema/ItemSchema";
-import { CategorySchema } from "~/engine/category/schema/CategorySchema";
 import { MetaSchema } from "~/engine/meta/schema/MetaSchema";
 import { StartSchema } from "~/engine/start/schema/StartSchema";
 import { IdSchema } from "~/engine/common/schema/IdSchema";
@@ -39,12 +38,6 @@ export const GameConfigSchema = z
 		start: StartSchema.describe(
 			"The initial board, inventory, and toolbar contents created for a new game.",
 		),
-		/**
-		 * Canonical UI-facing categories keyed by their stable identifier.
-		 */
-		categories: z
-			.record(IdSchema, CategorySchema)
-			.describe("Canonical UI-facing categories keyed by a non-empty identifier."),
 		/**
 		 * Version of this game configuration's schema contract.
 		 */

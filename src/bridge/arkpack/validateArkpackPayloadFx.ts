@@ -7,7 +7,6 @@ import { validateGameResourcesFx } from "~/engine/validation/rule/validateGameRe
 
 const createPackProvenance = (
 	gameId: string,
-	categories: Readonly<Record<string, unknown>>,
 	items: Readonly<Record<string, unknown>>,
 ): GameSourceProvenanceSchema.Type => {
 	const source = `arkpack:${gameId}`;
@@ -16,12 +15,6 @@ const createPackProvenance = (
 		resources: source,
 		start: source,
 		version: source,
-		categories: Object.fromEntries(
-			Object.keys(categories).map((id) => [
-				id,
-				source,
-			]),
-		),
 		items: Object.fromEntries(
 			Object.keys(items).map((id) => [
 				id,
@@ -44,11 +37,7 @@ export const validateArkpackPayloadFx = Effect.fn("validateArkpackPayloadFx")(fu
 			);
 		}
 	}
-	const provenance = createPackProvenance(
-		payload.config.meta.id,
-		payload.config.categories,
-		payload.config.items,
-	);
+	const provenance = createPackProvenance(payload.config.meta.id, payload.config.items);
 	return [
 		...(yield* validateGameConfigFx({
 			config: payload.config,

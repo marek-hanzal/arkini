@@ -14,7 +14,6 @@ const item = {
 		],
 	},
 	tags: "resource, test, era:I",
-	categoryId: "resource",
 	scope: "any",
 	maxStackSize: 1,
 } as const;

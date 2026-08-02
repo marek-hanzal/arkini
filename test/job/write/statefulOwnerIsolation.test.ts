@@ -28,7 +28,6 @@ const config = GameConfigSchema.parse({
 	start: {
 		currentSpace: 0,
 	},
-	categories: {},
 	items: {
 		producer: {
 			uid: "producer",
@@ -41,7 +40,6 @@ const config = GameConfigSchema.parse({
 				],
 			},
 			tags: [],
-			categoryId: "resource",
 			scope: "any",
 			maxStackSize: 10,
 			type: "producer",
@@ -106,7 +104,6 @@ const config = GameConfigSchema.parse({
 				],
 			},
 			tags: [],
-			categoryId: "resource",
 			scope: "board",
 			maxStackSize: 10,
 			maxCount: 4,
@@ -123,7 +120,6 @@ const config = GameConfigSchema.parse({
 				],
 			},
 			tags: [],
-			categoryId: "resource",
 			scope: "any",
 			maxStackSize: 10,
 			type: "simple",

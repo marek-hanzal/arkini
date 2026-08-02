@@ -28,7 +28,6 @@ const baseItem = (id: string) => ({
 		],
 	},
 	tags: [],
-	categoryId: "test",
 	scope: "any" as const,
 	maxStackSize: 1,
 });
@@ -74,7 +73,6 @@ const config = GameConfigSchema.parse({
 	start: {
 		currentSpace: 0,
 	},
-	categories: {},
 	items: {
 		material: {
 			...baseItem("material"),

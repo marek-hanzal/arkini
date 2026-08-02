@@ -34,11 +34,5 @@
 		"toolbar": [],
 		"currentSpace": 0
 	},
-	"categories": {
-		"demo": {
-			"id": "demo",
-			"title": "Demo"
-		}
-	},
 	"version": "1.0"
 }

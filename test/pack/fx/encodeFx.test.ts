@@ -31,7 +31,6 @@ describe("encodeFx", () => {
 						inventory: [],
 						toolbar: [],
 					},
-					categories: {},
 					items: {},
 				},
 				resources: [
@@ -72,7 +71,6 @@ describe("encodeFx", () => {
 					inventory: [],
 					toolbar: [],
 				},
-				categories: {},
 				items: {},
 			},
 			resources: [

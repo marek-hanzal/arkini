@@ -19,7 +19,6 @@
 				"era:VIII",
 				"tier-6-resource"
 			],
-			"categoryId": "material",
 			"scope": "any",
 			"maxStackSize": 20
 		}

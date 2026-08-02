@@ -17,7 +17,6 @@ const item = {
 		"effect",
 		"buff",
 	],
-	categoryId: "utility",
 	durationMs: 300_000,
 };
 

@@ -69,7 +69,6 @@ const item = {
 		],
 	},
 	tags: [],
-	categoryId: "resource",
 	scope: "any",
 	maxStackSize: 1,
 } as const;
@@ -86,12 +85,6 @@ beforeEach(() => {
 			},
 		],
 		config: {
-			categories: {
-				resource: {
-					id: "resource",
-					title: "Resource",
-				},
-			},
 			items: {
 				[item.id]: item,
 			},

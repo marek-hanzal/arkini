@@ -57,7 +57,6 @@ describe("tile identity and Info projections", () => {
 			kind: "available",
 			itemId: owner.id,
 			title: "workshop",
-			categoryId: "resource",
 			sourceResourceIds: [
 				"asset:workshop",
 			],
@@ -74,7 +73,6 @@ describe("tile identity and Info projections", () => {
 			itemId: owner.id,
 			description: "workshop",
 			itemType: "producer",
-			categoryId: "resource",
 			tags: [
 				"producer",
 				"era:I",

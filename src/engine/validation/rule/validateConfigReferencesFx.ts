@@ -22,7 +22,7 @@ export namespace validateConfigReferencesFx {
 	}
 }
 
-/** Validates explicit canonical item and category references across a completed config. */
+/** Validates explicit canonical item references across a completed config. */
 export const validateConfigReferencesFx = Effect.fn("validateConfigReferencesFx")(function* ({
 	config,
 	provenance,
@@ -91,22 +91,6 @@ export const validateConfigReferencesFx = Effect.fn("validateConfigReferencesFx"
 
 	for (const [itemId, item] of Object.entries(config.items)) {
 		const source = provenance.items[itemId];
-		if (config.categories[item.categoryId] === undefined) {
-			diagnostics.push({
-				code: DiagnosticCodeEnumSchema.enum.ConfigMissingReference,
-				severity: DiagnosticSeverityEnumSchema.enum.Error,
-				path: [
-					"items",
-					itemId,
-					"categoryId",
-				],
-				source,
-				message: `Item ${itemId} references missing category ${item.categoryId}.`,
-				reference: DiagnosticRecordEntityEnumSchema.enum.Category,
-				referenceId: item.categoryId,
-			});
-		}
-
 		for (const [mergeIndex, merge] of (item.merge ?? []).entries()) {
 			diagnostics.push(
 				...(yield* validateSelectorReferenceFx({

@@ -13,7 +13,6 @@ export namespace useItemDetailIdentity {
 				readonly kind: "available";
 				readonly itemId: IdSchema.Type;
 				readonly title: string;
-				readonly subtitle?: string;
 				readonly sourceUrl: string;
 				readonly compositeUrl?: string;
 		  }
@@ -38,16 +37,10 @@ export const useItemDetailIdentity = (itemId: IdSchema.Type): useItemDetailIdent
 				}),
 			);
 			if (identity.kind === "unavailable") return unavailable;
-			const subtitle = game.config.categories[identity.categoryId]?.title;
 			return {
 				kind: "available",
 				itemId: identity.itemId,
 				title: identity.title,
-				...(subtitle === undefined
-					? {}
-					: {
-							subtitle,
-						}),
 				sourceUrl: game.getResourceUrl(identity.sourceResourceIds[0]),
 				...(identity.sourceResourceIds[1] === undefined
 					? {}

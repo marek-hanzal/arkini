@@ -30,7 +30,6 @@ const config = GameConfigSchema.parse({
 	start: {
 		currentSpace: 0,
 	},
-	categories: {},
 	items: {
 		tree: {
 			uid: "tree",
@@ -46,7 +45,6 @@ const config = GameConfigSchema.parse({
 				"nature",
 				"forest",
 			],
-			categoryId: "resource",
 			scope: "any",
 			maxStackSize: 10,
 			type: "simple",

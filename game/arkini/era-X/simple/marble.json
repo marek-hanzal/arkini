@@ -21,7 +21,6 @@
 				"era:X",
 				"tier-10-resource"
 			],
-			"categoryId": "material",
 			"scope": "any",
 			"maxStackSize": 40
 		}

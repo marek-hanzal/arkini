@@ -32,12 +32,6 @@ export const testArkpackConfig = GameConfigSchema.parse({
 			},
 		],
 	},
-	categories: {
-		resource: {
-			id: "resource",
-			title: "Resources",
-		},
-	},
 	items: {
 		water: {
 			uid: "water",
@@ -51,7 +45,6 @@ export const testArkpackConfig = GameConfigSchema.parse({
 				],
 			},
 			tags: [],
-			categoryId: "resource",
 			scope: "any",
 			maxStackSize: 10,
 		},

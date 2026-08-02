@@ -20,7 +20,6 @@
 				"era:III",
 				"unique"
 			],
-			"categoryId": "building",
 			"scope": "any",
 			"maxCount": 1,
 			"maxStackSize": 1,

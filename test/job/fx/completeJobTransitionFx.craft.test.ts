@@ -36,7 +36,6 @@ const craftCompletionConfig = GameConfigSchema.parse({
 	start: {
 		currentSpace: 0,
 	},
-	categories: {},
 	items: {
 		"craft:drop": {
 			uid: "craft:drop",
@@ -53,7 +52,6 @@ const craftCompletionConfig = GameConfigSchema.parse({
 				],
 			},
 			tags: [],
-			categoryId: "test",
 			scope: "any",
 			maxStackSize: 3,
 			line: {
@@ -110,7 +108,6 @@ const craftCompletionConfig = GameConfigSchema.parse({
 				],
 			},
 			tags: [],
-			categoryId: "test",
 			scope: "any",
 			maxStackSize: 3,
 			line: {
@@ -176,7 +173,6 @@ const craftCompletionConfig = GameConfigSchema.parse({
 				],
 			},
 			tags: [],
-			categoryId: "test",
 			scope: "any",
 			maxStackSize: 1,
 			line: {
@@ -242,7 +238,6 @@ const craftCompletionConfig = GameConfigSchema.parse({
 				],
 			},
 			tags: [],
-			categoryId: "test",
 			scope: "any",
 			maxStackSize: 1,
 			line: {
@@ -277,7 +272,6 @@ const craftCompletionConfig = GameConfigSchema.parse({
 				],
 			},
 			tags: [],
-			categoryId: "test",
 			scope: "any",
 			maxStackSize: 1,
 			line: {
@@ -351,7 +345,6 @@ const craftCompletionConfig = GameConfigSchema.parse({
 				],
 			},
 			tags: [],
-			categoryId: "test",
 			scope: "any",
 			maxStackSize: 1,
 		},
@@ -367,7 +360,6 @@ const craftCompletionConfig = GameConfigSchema.parse({
 				],
 			},
 			tags: [],
-			categoryId: "test",
 			scope: "board",
 			maxStackSize: 1,
 		},
@@ -383,7 +375,6 @@ const craftCompletionConfig = GameConfigSchema.parse({
 				],
 			},
 			tags: [],
-			categoryId: "test",
 			scope: "board",
 			maxStackSize: 1,
 		},
@@ -399,7 +390,6 @@ const craftCompletionConfig = GameConfigSchema.parse({
 				],
 			},
 			tags: [],
-			categoryId: "test",
 			scope: "any",
 			maxStackSize: 1,
 		},
@@ -415,7 +405,6 @@ const craftCompletionConfig = GameConfigSchema.parse({
 				],
 			},
 			tags: [],
-			categoryId: "test",
 			scope: "any",
 			maxStackSize: 1,
 		},
@@ -431,7 +420,6 @@ const craftCompletionConfig = GameConfigSchema.parse({
 				],
 			},
 			tags: [],
-			categoryId: "test",
 			scope: "any",
 			maxStackSize: 1,
 		},
@@ -447,7 +435,6 @@ const craftCompletionConfig = GameConfigSchema.parse({
 				],
 			},
 			tags: [],
-			categoryId: "test",
 			scope: "any",
 			maxStackSize: 1,
 		},

@@ -24,7 +24,6 @@
 				"permit",
 				"era:IV"
 			],
-			"categoryId": "blueprint",
 			"scope": "any",
 			"maxStackSize": 1,
 			"line": {

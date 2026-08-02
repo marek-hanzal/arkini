@@ -60,7 +60,6 @@ const base = ({
 		],
 	},
 	tags: [],
-	categoryId: "test",
 	scope,
 	maxStackSize,
 });
@@ -85,7 +84,6 @@ const chargesConfig = GameConfigSchema.parse({
 	start: {
 		currentSpace: 0,
 	},
-	categories: {},
 	items: {
 		"producer:shrine": {
 			...base({

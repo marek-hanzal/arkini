@@ -30,7 +30,6 @@ const simpleItem = ({
 		],
 	},
 	tags,
-	categoryId: "resource",
 	scope,
 	maxCount,
 	maxStackSize,
@@ -92,7 +91,6 @@ export const createMergeTestConfig = ({
 		start: {
 			currentSpace: 0,
 		},
-		categories: {},
 		items: {
 			source: simpleItem({
 				id: "source",

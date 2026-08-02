@@ -29,12 +29,6 @@ export const editorTestConfig = GameConfigSchema.parse({
 			},
 		],
 	},
-	categories: {
-		resource: {
-			id: "resource",
-			title: "Resources",
-		},
-	},
 	items: {
 		water: {
 			uid: "water",
@@ -48,7 +42,6 @@ export const editorTestConfig = GameConfigSchema.parse({
 				],
 			},
 			tags: [],
-			categoryId: "resource",
 			scope: "any",
 			maxStackSize: 10,
 		},

@@ -19,7 +19,6 @@ const baseItem = ({
 		],
 	},
 	tags: [],
-	categoryId: "test",
 	scope,
 	maxStackSize,
 });
@@ -67,7 +66,6 @@ export const multiSpaceTestConfig = GameConfigSchema.parse({
 	start: {
 		currentSpace: 0,
 	},
-	categories: {},
 	items: {
 		origin: {
 			...baseItem({

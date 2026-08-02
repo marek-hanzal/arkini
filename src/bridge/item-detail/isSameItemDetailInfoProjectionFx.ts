@@ -18,7 +18,6 @@ export const isSameItemDetailInfoProjectionFx = Effect.fn("isSameItemDetailInfoP
 				left.itemId === right.itemId &&
 				left.description === right.description &&
 				left.itemType === right.itemType &&
-				left.categoryTitle === right.categoryTitle &&
 				left.tags.length === right.tags.length &&
 				left.tags.every((tag, index) => tag === right.tags[index]) &&
 				left.storageScope === right.storageScope &&

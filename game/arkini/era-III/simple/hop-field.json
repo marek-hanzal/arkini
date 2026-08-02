@@ -19,7 +19,6 @@
 				"hops",
 				"era:III"
 			],
-			"categoryId": "source",
 			"scope": "any",
 			"maxStackSize": 1
 		}

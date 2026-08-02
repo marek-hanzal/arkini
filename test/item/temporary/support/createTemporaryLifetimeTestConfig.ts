@@ -19,7 +19,6 @@ const baseItem = ({
 		],
 	},
 	tags: [],
-	categoryId: "resource",
 	scope: "board" as const,
 	maxStackSize,
 	maxCount,
@@ -86,7 +85,6 @@ export const createTemporaryLifetimeTestConfig = () =>
 		start: {
 			currentSpace: 0,
 		},
-		categories: {},
 		items: {
 			transformer: {
 				...baseItem({

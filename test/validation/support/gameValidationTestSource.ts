@@ -18,7 +18,6 @@ export const createSimpleItem = (id: string, tags: string[] = []) =>
 			],
 		},
 		tags,
-		categoryId: "category:test",
 		scope: "any",
 		maxStackSize: 10,
 		type: "simple",
@@ -134,12 +133,6 @@ export const createRootSource = ({
 				},
 			},
 			start,
-			categories: {
-				"category:test": {
-					id: "category:test",
-					title: "Test",
-				},
-			},
 			items,
 		},
 	});

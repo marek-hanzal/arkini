@@ -51,7 +51,6 @@ export const assembleGameSourcesFx = Effect.fn("assembleGameSourcesFx")(function
 ) {
 	const value: GameSourceSchema.Type = {};
 	const provenance: GameSourceProvenanceSchema.Type = {
-		categories: {},
 		items: {},
 	};
 	const diagnostics: GameDiagnosticsSchema.Type = [];
@@ -168,35 +167,6 @@ export const assembleGameSourcesFx = Effect.fn("assembleGameSourcesFx")(function
 					value.version = source.value.version;
 				})
 				.exhaustive();
-		}
-
-		const categories =
-			source.value.categories === undefined ? undefined : (value.categories ??= {});
-
-		for (const [key, category] of Object.entries(source.value.categories ?? {})) {
-			const previousPath = provenance.categories[key];
-			if (previousPath !== undefined) {
-				diagnostics.push({
-					code: DiagnosticCodeEnumSchema.enum.SourceDuplicateRecord,
-					severity: DiagnosticSeverityEnumSchema.enum.Error,
-					path: [
-						"categories",
-						key,
-					],
-					source: source.path,
-					message: `Category ${key} is provided by more than one source fragment.`,
-					entity: DiagnosticRecordEntityEnumSchema.enum.Category,
-					key,
-					sources: [
-						previousPath,
-						source.path,
-					],
-				});
-				continue;
-			}
-
-			provenance.categories[key] = source.path;
-			categories![key] = category;
 		}
 
 		const items = source.value.items === undefined ? undefined : (value.items ??= {});

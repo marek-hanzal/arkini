@@ -14,7 +14,6 @@ const baseItem = ({ id, scope }: { id: string; scope: "any" | "board" }) => {
 			],
 		},
 		tags: [],
-		categoryId: "resource",
 		scope,
 		maxStackSize: 10,
 	} as const;
@@ -53,7 +52,6 @@ export const lineRunTestConfig = GameConfigSchema.parse({
 	start: {
 		currentSpace: 0,
 	},
-	categories: {},
 	items: {
 		workshop: {
 			...baseItem({

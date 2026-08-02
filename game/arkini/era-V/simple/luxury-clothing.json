@@ -20,7 +20,6 @@
 				"era:V",
 				"tier-5-resource"
 			],
-			"categoryId": "clothing",
 			"scope": "any",
 			"maxStackSize": 20
 		}

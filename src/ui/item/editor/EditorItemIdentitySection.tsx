@@ -20,7 +20,7 @@ const scopeOptions = [
 ] as const;
 
 export const EditorItemIdentitySection = () => {
-	const { canonicalItem, categoryOptions, form, isNew } = useEditorItemFormSession();
+	const { canonicalItem, form, isNew } = useEditorItemFormSession();
 	return (
 		<div className="grid gap-4">
 			<div className="grid gap-4 md:grid-cols-2">
@@ -52,19 +52,7 @@ export const EditorItemIdentitySection = () => {
 			<form.AppField name="description">
 				{(field) => <field.TextAreaField label="Description" />}
 			</form.AppField>
-			<div className="grid gap-4 md:grid-cols-2">
-				<form.AppField name="categoryId">
-					{(field) =>
-						categoryOptions.length === 0 ? (
-							<field.TextField label="Category ID" />
-						) : (
-							<field.ChoiceField
-								label="Category"
-								options={categoryOptions}
-							/>
-						)
-					}
-				</form.AppField>
+			<div>
 				{canonicalItem.type === "inventory" || canonicalItem.type === "temporary" ? (
 					<div className="grid content-start gap-1.5 text-sm">
 						<span className="font-semibold text-foreground">Storage scope</span>

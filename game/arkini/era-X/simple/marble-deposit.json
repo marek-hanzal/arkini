@@ -22,7 +22,6 @@
 				"prestige",
 				"era:X"
 			],
-			"categoryId": "source",
 			"scope": "any",
 			"maxStackSize": 1
 		}

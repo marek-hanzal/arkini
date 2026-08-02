@@ -18,7 +18,6 @@ const item = {
 		"nature",
 		"forest",
 	],
-	categoryId: "resource",
 	scope: "board",
 	maxStackSize: 1,
 	type: "simple",

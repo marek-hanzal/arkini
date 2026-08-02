@@ -18,7 +18,6 @@
 				"currency",
 				"era:X"
 			],
-			"categoryId": "morale",
 			"scope": "any",
 			"maxStackSize": 50
 		}

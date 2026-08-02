@@ -20,7 +20,6 @@
 				"tree:t2",
 				"era:I"
 			],
-			"categoryId": "source",
 			"scope": "any",
 			"maxStackSize": 1,
 			"charges": {

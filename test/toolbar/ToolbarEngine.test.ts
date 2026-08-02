@@ -44,7 +44,6 @@ const configInput = {
 	start: {
 		currentSpace: 0,
 	},
-	categories: {},
 	items: {
 		water: {
 			uid: "water",
@@ -58,7 +57,6 @@ const configInput = {
 				],
 			},
 			tags: [],
-			categoryId: "resource",
 			scope: "any",
 			maxStackSize: 10,
 		},
@@ -74,7 +72,6 @@ const configInput = {
 				],
 			},
 			tags: [],
-			categoryId: "resource",
 			scope: "any",
 			maxStackSize: 10,
 		},
@@ -90,7 +87,6 @@ const configInput = {
 				],
 			},
 			tags: [],
-			categoryId: "resource",
 			scope: "board",
 			maxStackSize: 1,
 		},
@@ -106,7 +102,6 @@ const configInput = {
 				],
 			},
 			tags: [],
-			categoryId: "resource",
 			scope: "inventory",
 			maxStackSize: 1,
 		},
@@ -122,7 +117,6 @@ const configInput = {
 				],
 			},
 			tags: [],
-			categoryId: "resource",
 		},
 	},
 } as const;

@@ -46,7 +46,6 @@ const base = (id: string) => ({
 		],
 	},
 	tags: [],
-	categoryId: "test",
 	scope: "board" as const,
 	maxStackSize: 1,
 });
@@ -71,7 +70,6 @@ const lifecycleConfig = GameConfigSchema.parse({
 	start: {
 		currentSpace: 0,
 	},
-	categories: {},
 	items: {
 		"producer:trader": {
 			...base("producer:trader"),

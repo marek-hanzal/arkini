@@ -8,7 +8,6 @@ import { DiagnosticCodeEnumSchema } from "~/engine/validation/schema/DiagnosticC
 
 const provenance = {
 	resources: "game.json",
-	categories: {},
 	items: Object.fromEntries(
 		Object.keys(startTestConfig.items).map((id) => [
 			id,
@@ -214,7 +213,6 @@ describe("validateGameResourcesFx", () => {
 				] as const,
 			},
 			tags: [],
-			categoryId: "blueprint",
 			scope: "any" as const,
 			maxStackSize: 1,
 			line: {

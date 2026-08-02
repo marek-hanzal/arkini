@@ -20,7 +20,6 @@ const baseItem = ({ id, maxStackSize = 1 }: { id: string; maxStackSize?: number 
 		],
 	},
 	tags: [],
-	categoryId: "test",
 	scope: "any" as const,
 	maxStackSize,
 });
@@ -59,7 +58,6 @@ const config = GameConfigSchema.parse({
 	start: {
 		currentSpace: 0,
 	},
-	categories: {},
 	items: {
 		outer: {
 			...baseItem({

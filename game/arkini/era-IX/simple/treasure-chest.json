@@ -20,7 +20,6 @@
 				"master",
 				"era:IX"
 			],
-			"categoryId": "treasure",
 			"scope": "any",
 			"maxStackSize": 5
 		}

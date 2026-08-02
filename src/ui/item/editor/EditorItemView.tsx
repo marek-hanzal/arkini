@@ -75,12 +75,6 @@ export const EditorItemView = ({ uid }: { readonly uid: string }) => {
 								</div>
 								<div>
 									<dt className="text-xs uppercase tracking-wider text-subtle">
-										Category
-									</dt>
-									<dd className="mt-1 text-foreground">{item.categoryId}</dd>
-								</div>
-								<div>
-									<dt className="text-xs uppercase tracking-wider text-subtle">
 										Scope
 									</dt>
 									<dd className="mt-1 text-foreground">{item.scope}</dd>

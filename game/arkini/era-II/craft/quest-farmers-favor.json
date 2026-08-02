@@ -18,7 +18,6 @@
 				"request",
 				"era:II"
 			],
-			"categoryId": "quest",
 			"scope": "any",
 			"maxStackSize": 1,
 			"line": {

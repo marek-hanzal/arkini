@@ -20,7 +20,6 @@
 				"deposit-search",
 				"era:I"
 			],
-			"categoryId": "equipment",
 			"scope": "any",
 			"maxStackSize": 1
 		}

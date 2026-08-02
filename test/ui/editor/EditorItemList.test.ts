@@ -63,7 +63,6 @@ beforeEach(() => {
 		type,
 		tags,
 		description: `${title} description`,
-		categoryId: "resource",
 		asset: {
 			default: [
 				`asset:${id}`,

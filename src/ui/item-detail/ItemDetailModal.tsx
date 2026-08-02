@@ -44,7 +44,6 @@ const tabLabel = {
 
 interface HeaderIdentity {
 	readonly title: string;
-	readonly subtitle?: string;
 	readonly sourceUrl: string;
 	readonly compositeUrl?: string;
 }
@@ -65,16 +64,11 @@ const ItemDetailHeader = ({
 				artworkDataUi="ItemDetailHeaderArtwork"
 				compositeUrl={identity.compositeUrl}
 				description={
-					<>
-						{identity.subtitle === undefined ? null : (
-							<p className="mt-1 truncate text-sm text-muted">{identity.subtitle}</p>
-						)}
-						{stale ? (
-							<p className="mt-1 text-xs font-medium text-warning">
-								This item no longer exists. Showing the last known detail.
-							</p>
-						) : null}
-					</>
+					stale ? (
+						<p className="mt-1 text-xs font-medium text-warning">
+							This item no longer exists. Showing the last known detail.
+						</p>
+					) : null
 				}
 				size="lg"
 				sourceUrl={identity.sourceUrl}
@@ -194,7 +188,6 @@ const ItemInfoContent = ({
 			inert={disabled}
 		>
 			<ItemInfoTab
-				identity={identity}
 				info={info}
 				stale={stale}
 			/>

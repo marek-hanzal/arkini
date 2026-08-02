@@ -26,7 +26,6 @@ const item = (id: string) => ({
 		],
 	},
 	tags: [],
-	categoryId: "resource",
 	scope: "any" as const,
 	maxStackSize: 10,
 });
@@ -170,7 +169,6 @@ const config = GameConfigSchema.parse({
 	start: {
 		currentSpace: 0,
 	},
-	categories: {},
 	items: {
 		target: item("target"),
 		byproduct: item("byproduct"),

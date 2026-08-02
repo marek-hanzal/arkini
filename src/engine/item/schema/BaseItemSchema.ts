@@ -52,12 +52,6 @@ export const BaseItemSchema = z
 				"The semantic labels used to classify this item for content and future rules.",
 			),
 		/**
-		 * ID of the canonical UI-facing group shared with similar items.
-		 */
-		categoryId: IdSchema.describe(
-			"The ID of the canonical UI-facing group shared with similar items.",
-		),
-		/**
 		 * Part of game state in which this item may be stored.
 		 */
 		scope: StorageScopeEnumSchema.describe(

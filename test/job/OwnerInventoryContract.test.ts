@@ -38,7 +38,6 @@ const createInventoryOpenerJobConfig = () => {
 					],
 				},
 				tags: [],
-				categoryId: "utility",
 			},
 		},
 	});

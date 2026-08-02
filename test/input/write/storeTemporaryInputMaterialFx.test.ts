@@ -18,7 +18,6 @@ const baseItem = (id: string) => ({
 		],
 	},
 	tags: [],
-	categoryId: "resource",
 	scope: "board" as const,
 	maxStackSize: 1,
 });
@@ -43,7 +42,6 @@ const config = GameConfigSchema.parse({
 	start: {
 		currentSpace: 0,
 	},
-	categories: {},
 	items: {
 		owner: {
 			...baseItem("owner"),

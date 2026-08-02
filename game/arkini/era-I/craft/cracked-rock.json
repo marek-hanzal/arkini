@@ -20,7 +20,6 @@
 				"era:I",
 				"stone-deposit"
 			],
-			"categoryId": "source",
 			"scope": "board",
 			"maxStackSize": 1,
 			"line": {

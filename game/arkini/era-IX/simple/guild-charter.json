@@ -19,7 +19,6 @@
 				"permit",
 				"era:IX"
 			],
-			"categoryId": "material",
 			"scope": "any",
 			"maxStackSize": 20
 		}

@@ -29,7 +29,6 @@ const config = GameConfigSchema.parse({
 	start: {
 		currentSpace: 0,
 	},
-	categories: {},
 	items: {
 		limited: {
 			uid: "limited",
@@ -42,7 +41,6 @@ const config = GameConfigSchema.parse({
 				],
 			},
 			tags: [],
-			categoryId: "test",
 			scope: "board",
 			maxStackSize: 10,
 			maxCount: 3,
@@ -59,7 +57,6 @@ const config = GameConfigSchema.parse({
 				],
 			},
 			tags: [],
-			categoryId: "test",
 			scope: "board",
 			maxStackSize: 1,
 			type: "producer",

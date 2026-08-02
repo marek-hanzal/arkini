@@ -19,7 +19,6 @@
 				"university",
 				"era:IX"
 			],
-			"categoryId": "knowledge",
 			"scope": "any",
 			"maxStackSize": 50
 		}

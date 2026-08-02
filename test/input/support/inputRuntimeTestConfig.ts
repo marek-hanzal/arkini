@@ -20,7 +20,6 @@ const baseItem = ({
 			],
 		},
 		tags: [],
-		categoryId: "resource",
 		scope,
 		maxStackSize,
 	} as const;
@@ -46,7 +45,6 @@ export const inputRuntimeTestConfig = GameConfigSchema.parse({
 	start: {
 		currentSpace: 0,
 	},
-	categories: {},
 	items: {
 		workshop: {
 			...baseItem({

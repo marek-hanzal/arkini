@@ -50,12 +50,10 @@ const definition = {
 	kind: "available",
 	itemId: "target",
 	title: "Target",
-	subtitle: "Materials",
 	sourceUrl: "resource:target",
 	compositeUrl: "resource:target-composite",
 	description: "A target item.",
 	itemType: "simple",
-	categoryTitle: "Materials",
 	tags: [
 		"material",
 	],
@@ -70,7 +68,6 @@ const identity = {
 	kind: "available",
 	itemId: "runtime:target",
 	title: "Target",
-	subtitle: "Materials",
 	sourceUrl: "resource:target",
 	compositeUrl: "resource:target-composite",
 } as const satisfies useItemDetailIdentity.Projection;

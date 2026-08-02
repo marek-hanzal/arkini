@@ -18,7 +18,6 @@
 				"topaz",
 				"era:IX"
 			],
-			"categoryId": "treasure",
 			"scope": "any",
 			"maxStackSize": 20
 		}

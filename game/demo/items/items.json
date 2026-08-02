@@ -15,7 +15,6 @@
 			"tags": [
 				"demo"
 			],
-			"categoryId": "demo",
 			"scope": "any",
 			"maxStackSize": 8,
 			"merge": [
@@ -44,7 +43,6 @@
 			"tags": [
 				"demo"
 			],
-			"categoryId": "demo",
 			"scope": "any",
 			"maxStackSize": 8
 		},
@@ -62,7 +60,6 @@
 			"tags": [
 				"demo"
 			],
-			"categoryId": "demo",
 			"scope": "any",
 			"maxStackSize": 8
 		}

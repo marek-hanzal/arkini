@@ -61,7 +61,6 @@ const config = GameConfigSchema.parse({
 			},
 		],
 	},
-	categories: {},
 	items: {
 		producer: {
 			uid: "producer",
@@ -75,7 +74,6 @@ const config = GameConfigSchema.parse({
 				],
 			},
 			tags: [],
-			categoryId: "building",
 			scope: "board",
 			maxStackSize: 1,
 			maxQueueSize: 1,
@@ -107,7 +105,6 @@ const createStackConfig = ({ boardWidth }: { readonly boardWidth: number }) =>
 		start: {
 			currentSpace: 0,
 		},
-		categories: {},
 		items: {
 			producer: {
 				uid: "producer",
@@ -121,7 +118,6 @@ const createStackConfig = ({ boardWidth }: { readonly boardWidth: number }) =>
 					],
 				},
 				tags: [],
-				categoryId: "building",
 				scope: "any",
 				maxStackSize: 3,
 				maxQueueSize: 1,
@@ -141,7 +137,6 @@ const createStackConfig = ({ boardWidth }: { readonly boardWidth: number }) =>
 					],
 				},
 				tags: [],
-				categoryId: "resource",
 				scope: "any",
 				maxStackSize: 1,
 			},

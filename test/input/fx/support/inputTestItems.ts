@@ -13,7 +13,6 @@ const simpleItem = ({ id, tags }: { id: string; tags: string[] }) => {
 			],
 		},
 		tags,
-		categoryId: "resource",
 		scope: "any",
 		maxStackSize: 10,
 		type: "simple",

@@ -18,7 +18,6 @@
 				"era:II",
 				"tier-2-resource"
 			],
-			"categoryId": "material",
 			"scope": "any",
 			"maxStackSize": 50
 		}

@@ -46,10 +46,6 @@ export const useEditorItemFormController = ({
 			initialItem,
 		],
 	);
-	const categoryOptions = Object.values(project.config.categories).map((category) => ({
-		label: category.title,
-		value: category.id,
-	}));
 	const saveItemAtom = saveEditorItemCommandAtom(project.projectId);
 	const saveItemResult = useAtomValue(saveItemAtom);
 	const saveItem = useAtomSet(saveItemAtom, {
@@ -117,7 +113,6 @@ export const useEditorItemFormController = ({
 	]);
 	return {
 		canonicalItem,
-		categoryOptions,
 		error: readSettledAsyncResultError(saveItemResult) ?? validationError,
 		isDirty: dirty,
 		isSaving: submitting,

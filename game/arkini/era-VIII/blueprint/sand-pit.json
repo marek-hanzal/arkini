@@ -26,7 +26,6 @@
 				"era:VIII",
 				"industry"
 			],
-			"categoryId": "blueprint",
 			"scope": "any",
 			"maxStackSize": 1,
 			"line": {

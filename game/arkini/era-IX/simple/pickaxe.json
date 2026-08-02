@@ -21,7 +21,6 @@
 				"single-use",
 				"era:IX"
 			],
-			"categoryId": "equipment",
 			"scope": "any",
 			"maxStackSize": 20,
 			"merge": [

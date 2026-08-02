@@ -24,7 +24,6 @@
 				"equipment",
 				"era:IX"
 			],
-			"categoryId": "blueprint",
 			"scope": "any",
 			"maxStackSize": 1,
 			"line": {

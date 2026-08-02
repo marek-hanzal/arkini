@@ -11,7 +11,6 @@ const baseItem = ({ id, maxStackSize = 10 }: { id: string; maxStackSize?: number
 		],
 	},
 	tags: [],
-	categoryId: "resource",
 	scope: "any" as const,
 	maxStackSize,
 });
@@ -36,7 +35,6 @@ export const purityTestConfig = GameConfigSchema.parse({
 	start: {
 		currentSpace: 0,
 	},
-	categories: {},
 	items: {
 		material: {
 			...baseItem({

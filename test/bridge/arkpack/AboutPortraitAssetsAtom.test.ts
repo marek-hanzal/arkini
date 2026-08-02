@@ -45,7 +45,6 @@ const payload = {
 		start: {
 			currentSpace: 0,
 		},
-		categories: {},
 		items: {},
 	}),
 	resources: [

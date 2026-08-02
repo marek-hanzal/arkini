@@ -62,7 +62,6 @@ describe("packDirectoryFx", () => {
 							board: [],
 							inventory: [],
 						},
-						categories: {},
 					}),
 				);
 				yield* fileSystem.writeFileString(
@@ -156,7 +155,6 @@ describe("packDirectoryFx", () => {
 						resources: {
 							hero: "hero",
 						},
-						categories: {},
 						items: {},
 					}),
 				);

@@ -18,7 +18,6 @@ const runtimeItem = {
 			],
 		},
 		tags: [],
-		categoryId: "resource",
 		scope: "any",
 		maxStackSize: 10,
 		type: "simple",

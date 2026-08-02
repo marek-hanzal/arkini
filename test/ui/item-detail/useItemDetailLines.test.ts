@@ -63,7 +63,6 @@ const config = GameConfigSchema.parse({
 			},
 		],
 	},
-	categories: {},
 	items: {
 		producer: {
 			uid: "producer",
@@ -77,7 +76,6 @@ const config = GameConfigSchema.parse({
 				],
 			},
 			tags: [],
-			categoryId: "building",
 			scope: "board",
 			maxStackSize: 1,
 			maxQueueSize: 1,
@@ -194,7 +192,6 @@ const config = GameConfigSchema.parse({
 			tags: [
 				"fuel",
 			],
-			categoryId: "resource",
 			scope: "any",
 			maxCount: 1,
 			maxStackSize: 10,

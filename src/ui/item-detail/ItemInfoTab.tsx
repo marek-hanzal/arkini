@@ -1,6 +1,5 @@
 import { match } from "ts-pattern";
 
-import type { useItemDetailIdentity } from "~/bridge/item-detail/useItemDetailIdentity";
 import type { useItemDetailInfo } from "~/bridge/item-detail/useItemDetailInfo";
 import { Scrollable } from "~/ui/scrollable/Scrollable";
 
@@ -126,16 +125,9 @@ const TagLabel = ({ tag }: { readonly tag: string }) => {
 
 /** Renders the broad first-pass item facts shared by every canonical item definition. */
 export const ItemInfoTab = ({
-	identity,
 	info,
 	stale = false,
 }: {
-	readonly identity: Extract<
-		useItemDetailIdentity.Projection,
-		{
-			readonly kind: "available";
-		}
-	>;
 	readonly info: Extract<
 		useItemDetailInfo.Projection,
 		{
@@ -159,10 +151,6 @@ export const ItemInfoTab = ({
 
 		<section className="border-t border-line pt-2">
 			<dl className="grid min-w-0 grid-cols-2 gap-x-8 max-[48rem]:grid-cols-1">
-				<InfoFact
-					label="Category"
-					value={info.categoryTitle ?? identity.subtitle ?? "Uncategorized"}
-				/>
 				<InfoFact
 					label="Type"
 					value={itemTypeLabel[info.itemType]}

@@ -18,7 +18,6 @@
 				"pollution",
 				"era:VIII"
 			],
-			"categoryId": "waste",
 			"scope": "board",
 			"maxStackSize": 1
 		}

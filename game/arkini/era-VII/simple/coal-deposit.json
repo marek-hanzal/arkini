@@ -19,7 +19,6 @@
 				"coal",
 				"era:VII"
 			],
-			"categoryId": "source",
 			"scope": "any",
 			"maxStackSize": 1
 		}

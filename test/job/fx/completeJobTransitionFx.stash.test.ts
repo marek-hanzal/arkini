@@ -68,7 +68,6 @@ const simpleItem = (id: string, scope: "any" | "board" = "any") => ({
 		],
 	},
 	tags: [],
-	categoryId: "test",
 	scope,
 	maxStackSize: 1,
 });
@@ -96,7 +95,6 @@ const stashItem = ({
 		],
 	},
 	tags: [],
-	categoryId: "test",
 	scope: "board" as const,
 	maxStackSize: 1,
 	line: {
@@ -143,7 +141,6 @@ const stashConfig = GameConfigSchema.parse({
 	start: {
 		currentSpace: 0,
 	},
-	categories: {},
 	items: {
 		"stash:guaranteed": stashItem({
 			id: "stash:guaranteed",

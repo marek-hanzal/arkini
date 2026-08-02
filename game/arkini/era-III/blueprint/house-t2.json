@@ -24,7 +24,6 @@
 				"morale",
 				"era:III"
 			],
-			"categoryId": "blueprint",
 			"scope": "any",
 			"maxStackSize": 1,
 			"line": {

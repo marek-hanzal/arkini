@@ -38,7 +38,6 @@ vi.mock("~/bridge/cheat/useCheatItemCatalog", () => ({
 		{
 			itemId: "item:alpha",
 			title: "Alpha",
-			categoryId: "resource",
 			tags: [],
 			sourceResourceId: "alpha",
 			sourceUrl: "blob:alpha",
@@ -46,7 +45,6 @@ vi.mock("~/bridge/cheat/useCheatItemCatalog", () => ({
 		{
 			itemId: "item:beta",
 			title: "Beta",
-			categoryId: "resource",
 			tags: [
 				"timber",
 			],
@@ -203,7 +201,7 @@ describe("CheatItemSpotlight", () => {
 		);
 		expect(selectedOption?.className).toContain("ak-spotlight-option");
 		expect(selectedOption?.className).not.toContain("ak-list-row");
-		expect(selectedOption?.querySelectorAll(".ak-spotlight-option-secondary")).toHaveLength(2);
+		expect(selectedOption?.querySelectorAll(".ak-spotlight-option-secondary")).toHaveLength(1);
 		const options = Array.from(container.querySelectorAll<HTMLButtonElement>("button"));
 		const lastOption = options.at(-1);
 		if (lastOption === undefined) throw new Error("Expected Spotlight options.");

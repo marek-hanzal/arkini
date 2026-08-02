@@ -19,7 +19,6 @@
 				"goldsmith",
 				"era:IX"
 			],
-			"categoryId": "currency",
 			"scope": "any",
 			"maxStackSize": 50
 		}

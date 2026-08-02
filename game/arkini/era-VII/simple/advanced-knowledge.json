@@ -18,7 +18,6 @@
 				"research",
 				"era:VII"
 			],
-			"categoryId": "knowledge",
 			"scope": "any",
 			"maxStackSize": 50
 		}

@@ -28,7 +28,6 @@ export const useEditorItemDraft = (type: EditorItemType, uid: string): EditorIte
 				],
 			},
 			tags: [],
-			categoryId: Object.keys(project.config?.categories ?? {})[0] ?? "default",
 			scope: "any" as const,
 			maxStackSize: 1,
 		};
@@ -96,7 +95,6 @@ export const useEditorItemDraft = (type: EditorItemType, uid: string): EditorIte
 			}))
 			.exhaustive();
 	}, [
-		project.config?.categories,
 		project.resources,
 		type,
 		uid,

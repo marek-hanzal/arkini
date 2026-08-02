@@ -20,9 +20,6 @@ const readSourcePath = (
 	if (root === "items" && typeof key === "string") {
 		return provenance.items[key];
 	}
-	if (root === "categories" && typeof key === "string") {
-		return provenance.categories[key];
-	}
 	if (root === "meta") {
 		return provenance.meta;
 	}

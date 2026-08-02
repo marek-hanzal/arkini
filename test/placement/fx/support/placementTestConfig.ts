@@ -24,7 +24,6 @@ const simpleItem = ({
 			],
 		},
 		tags: [],
-		categoryId: "resource",
 		scope,
 		maxCount,
 		maxStackSize,
@@ -52,7 +51,6 @@ export const placementTestConfig = GameConfigSchema.parse({
 	start: {
 		currentSpace: 0,
 	},
-	categories: {},
 	items: {
 		origin: simpleItem({
 			id: "origin",

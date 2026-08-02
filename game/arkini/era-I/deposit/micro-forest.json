@@ -21,7 +21,6 @@
 				"forest",
 				"era:I"
 			],
-			"categoryId": "source",
 			"scope": "any",
 			"maxStackSize": 1,
 			"charges": {

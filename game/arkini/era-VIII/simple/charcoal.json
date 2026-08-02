@@ -20,7 +20,6 @@
 				"industry",
 				"tier-6-resource"
 			],
-			"categoryId": "material",
 			"scope": "any",
 			"maxStackSize": 50
 		}

@@ -22,7 +22,6 @@
 				"woodcutting",
 				"single-use"
 			],
-			"categoryId": "equipment",
 			"scope": "any",
 			"maxStackSize": 20,
 			"merge": [

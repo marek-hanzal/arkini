@@ -21,7 +21,6 @@ export const lineTestConfig = GameConfigSchema.parse({
 	start: {
 		currentSpace: 0,
 	},
-	categories: {},
 	items: {
 		source: {
 			uid: "source",
@@ -34,7 +33,6 @@ export const lineTestConfig = GameConfigSchema.parse({
 				],
 			},
 			tags: [],
-			categoryId: "resource",
 			scope: "board",
 			maxStackSize: 1,
 			type: "simple",
@@ -50,7 +48,6 @@ export const lineTestConfig = GameConfigSchema.parse({
 				],
 			},
 			tags: [],
-			categoryId: "resource",
 			scope: "any",
 			maxStackSize: 1,
 			type: "simple",
@@ -66,7 +63,6 @@ export const lineTestConfig = GameConfigSchema.parse({
 				],
 			},
 			tags: [],
-			categoryId: "resource",
 			scope: "any",
 			maxStackSize: 1,
 			type: "simple",
@@ -82,7 +78,6 @@ export const lineTestConfig = GameConfigSchema.parse({
 				],
 			},
 			tags: [],
-			categoryId: "resource",
 			scope: "any",
 			maxStackSize: 1,
 			type: "simple",

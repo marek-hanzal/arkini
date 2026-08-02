@@ -157,6 +157,7 @@ const changeInput = async (input: HTMLInputElement, value: string) => {
 describe("item section form session", () => {
 	it("preserves one local form while routed section content changes", async () => {
 		const { container, renderForm } = await render(<EditorItemIdentitySection />);
+		const navigation = container.querySelector('[data-ui="EditorSectionNavigation"]');
 		const title = container.querySelector<HTMLInputElement>('input[name="title"]');
 		if (title === null) throw new Error("Missing title input.");
 
@@ -165,6 +166,7 @@ describe("item section form session", () => {
 		expect(container.querySelector('[data-ui="ArtworkSection"]')).not.toBeNull();
 		await renderForm(<EditorItemIdentitySection />);
 
+		expect(container.querySelector('[data-ui="EditorSectionNavigation"]')).toBe(navigation);
 		expect(container.querySelector<HTMLInputElement>('input[name="title"]')?.value).toBe(
 			"Changed water",
 		);

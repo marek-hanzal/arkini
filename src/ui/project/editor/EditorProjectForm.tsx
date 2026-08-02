@@ -2,8 +2,14 @@ import { useNavigate } from "@tanstack/react-router";
 import { useCallback, type PropsWithChildren } from "react";
 
 import { useEditorProject } from "~/bridge/editor/useEditorProject";
+import { EditorSectionTabs } from "~/ui/editor/EditorSectionTabs";
+import { EditorFormSectionPage } from "~/ui/form/EditorFormSectionPage";
 import { EditorProjectFormProvider } from "~/ui/project/editor/EditorProjectFormContext";
-import type { EditorProjectSectionId } from "~/ui/project/editor/EditorProjectSections";
+import { EditorProjectSectionLink } from "~/ui/project/editor/EditorProjectSectionLink";
+import {
+	EditorProjectSections,
+	type EditorProjectSectionId,
+} from "~/ui/project/editor/EditorProjectSections";
 import { useEditorProjectFormController } from "~/ui/project/editor/useEditorProjectFormController";
 
 export const EditorProjectForm = ({ children }: PropsWithChildren) => {
@@ -32,7 +38,26 @@ export const EditorProjectForm = ({ children }: PropsWithChildren) => {
 				className="h-full min-h-0"
 				data-ui="EditorProjectForm"
 			>
-				{children}
+				<EditorFormSectionPage
+					dirty={controller.isDirty}
+					error={controller.error}
+					save={controller.save}
+					saving={controller.isSaving}
+					title={<h1 className="truncate text-xl font-semibold">Project</h1>}
+					tabs={
+						<EditorSectionTabs label="Project sections">
+							{EditorProjectSections.map((candidate) => (
+								<EditorProjectSectionLink
+									key={candidate.id}
+									projectId={project.projectId}
+									section={candidate}
+								/>
+							))}
+						</EditorSectionTabs>
+					}
+				>
+					{children}
+				</EditorFormSectionPage>
 			</section>
 		</EditorProjectFormProvider>
 	);

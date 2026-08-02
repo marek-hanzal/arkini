@@ -18,6 +18,8 @@ vi.mock("@tanstack/react-router", async (importOriginal) => {
 });
 
 vi.mock("~/ui/button/Button", () => ({
+	ButtonLink: ({ children }: { readonly children?: ReactNode }) =>
+		createElement("a", null, children),
 	PrimaryButton: ({ children }: { readonly children?: ReactNode }) =>
 		createElement("button", null, children),
 }));
@@ -106,12 +108,14 @@ describe("project section form session", () => {
 		};
 
 		await renderSection(<EditorProjectGeneralSection />);
+		const navigation = container.querySelector('[data-ui="EditorSectionNavigation"]');
 		const title = container.querySelector<HTMLInputElement>('input[name="title"]');
 		if (title === null) throw new Error("Missing project title input.");
 		await changeInput(title, "Changed project");
 		await renderSection(<div data-ui="AppearanceSection">Appearance</div>);
 		await renderSection(<EditorProjectGeneralSection />);
 
+		expect(container.querySelector('[data-ui="EditorSectionNavigation"]')).toBe(navigation);
 		expect(container.querySelector<HTMLInputElement>('input[name="title"]')?.value).toBe(
 			"Changed project",
 		);

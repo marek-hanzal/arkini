@@ -43,7 +43,6 @@ export const EditorProjectForm = ({ children }: PropsWithChildren) => {
 					error={controller.error}
 					save={controller.save}
 					saving={controller.isSaving}
-					title={<h1 className="truncate text-xl font-semibold">Project</h1>}
 					tabs={
 						<EditorSectionTabs label="Project sections">
 							{EditorProjectSections.map((candidate) => (

@@ -136,21 +136,24 @@ const ProductionHarness = () => {
 describe("editor item field groups", () => {
 	it("adds a second registered artwork layer", async () => {
 		const container = await mount(createElement(ArtworkHarness));
-		await click(container, "Add composite layer");
+		expect(container.textContent).toContain("Composite artwork is disabled");
+		await click(container, "Enable composite artwork");
 
 		expect(container.querySelector("output")?.textContent).toContain('"default":["base",""]');
 	});
 
 	it("creates the first registered merge entry", async () => {
 		const container = await mount(createElement(MergeHarness));
-		await click(container, "Add merge");
+		expect(container.textContent).toContain("Merges are disabled");
+		await click(container, "Enable merges");
 
 		expect(container.querySelector("output")?.textContent).toContain('"effect":"keep"');
 	});
 
 	it("creates unique deposit lines with only the first authored as default", async () => {
 		const container = await mount(createElement(ProductionHarness));
-		await click(container, "Add line");
+		expect(container.textContent).toContain("Production lines are disabled");
+		await click(container, "Enable production lines");
 		await click(container, "Add line");
 
 		const values = JSON.parse(container.querySelector("output")?.textContent ?? "null") as {
@@ -169,7 +172,7 @@ describe("editor item field groups", () => {
 	it("uses the current item ID when adding a line", async () => {
 		const container = await mount(createElement(ProductionHarness));
 		await click(container, "Rename owner");
-		await click(container, "Add line");
+		await click(container, "Enable production lines");
 
 		expect(container.querySelector("output")?.textContent).toContain(
 			'"id":"line:renamed:default"',

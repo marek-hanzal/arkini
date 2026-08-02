@@ -1,6 +1,7 @@
 import type { EditorLine } from "~/bridge/item/editor/EditorItemModel";
 import { Button } from "~/ui/button/Button";
 import { EditorItemDraftDefaults } from "~/ui/item/editor/EditorItemDraftDefaults";
+import { EditorCapabilityStatus } from "~/ui/form/EditorCapabilityStatus";
 import { withFieldGroup } from "~/ui/form/EditorForm";
 import { EditorLineInputsControl } from "~/ui/item/editor/EditorLineInputsControl";
 import { EditorOutputControl } from "~/ui/item/editor/EditorOutputControl";
@@ -77,31 +78,39 @@ export const EditorLineFields = withFieldGroup({
 			<group.Subscribe selector={(state) => state.values.output}>
 				{(output) => (
 					<section className="grid gap-3 border-t border-line pt-4">
-						<header className="flex items-center justify-between gap-3">
-							<div>
-								<h3 className="text-sm font-semibold">Output</h3>
-								<p className="mt-1 text-xs text-muted">
-									Optional weighted sets, rolls and item drops.
-								</p>
-							</div>
-							<Button
-								onClick={() =>
+						{output === undefined ? (
+							<EditorCapabilityStatus
+								actionLabel="Enable line output"
+								description="This line currently only applies its input and runtime behavior. Enable an output to emit weighted items when the job completes."
+								icon="icon-[lucide--package-plus]"
+								onEnable={() =>
 									group.setFieldValue(
 										"output",
-										output === undefined
-											? structuredClone(EditorItemDraftDefaults.output)
-											: undefined,
+										structuredClone(EditorItemDraftDefaults.output),
 									)
 								}
-							>
-								{output === undefined ? "Add output" : "Remove output"}
-							</Button>
-						</header>
-						{output === undefined ? null : (
-							<EditorOutputControl
-								value={output}
-								onChange={(next) => group.setFieldValue("output", next)}
+								title="Line output is disabled"
 							/>
+						) : (
+							<>
+								<header className="flex items-center justify-between gap-3">
+									<div>
+										<h3 className="text-sm font-semibold">Output</h3>
+										<p className="mt-1 text-xs text-muted">
+											Optional weighted sets, rolls and item drops.
+										</p>
+									</div>
+									<Button
+										onClick={() => group.setFieldValue("output", undefined)}
+									>
+										Disable output
+									</Button>
+								</header>
+								<EditorOutputControl
+									value={output}
+									onChange={(next) => group.setFieldValue("output", next)}
+								/>
+							</>
 						)}
 					</section>
 				)}

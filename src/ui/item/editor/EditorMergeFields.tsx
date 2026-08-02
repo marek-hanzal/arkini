@@ -1,5 +1,6 @@
 import type { EditorMerge } from "~/bridge/item/editor/EditorItemModel";
 import { Button } from "~/ui/button/Button";
+import { EditorCapabilityStatus } from "~/ui/form/EditorCapabilityStatus";
 import { EditorItemDraftDefaults } from "~/ui/item/editor/EditorItemDraftDefaults";
 import { EditorChoiceControl } from "~/ui/form/EditorValueControls";
 import { EditorItemReferenceControl } from "~/ui/item/editor/EditorItemReferenceControl";
@@ -24,17 +25,31 @@ export const EditorMergeFields = ({
 	};
 	return (
 		<div className="grid gap-4">
-			<Button
-				className="justify-self-start"
-				onClick={() =>
-					onChange([
-						...merges,
-						structuredClone(EditorItemDraftDefaults.merge),
-					])
-				}
-			>
-				Add merge
-			</Button>
+			{merges.length === 0 ? (
+				<EditorCapabilityStatus
+					actionLabel="Enable merges"
+					description="Merges let dropping this item onto a matching target consume or retain the source, change the target and optionally emit an output."
+					icon="icon-[lucide--combine]"
+					onEnable={() =>
+						onChange([
+							structuredClone(EditorItemDraftDefaults.merge),
+						])
+					}
+					title="Merges are disabled"
+				/>
+			) : (
+				<Button
+					className="justify-self-start"
+					onClick={() =>
+						onChange([
+							...merges,
+							structuredClone(EditorItemDraftDefaults.merge),
+						])
+					}
+				>
+					Add merge
+				</Button>
+			)}
 			{merges.map((merge, index) => (
 				<article
 					key={`${index}:${merge.effect}`}
@@ -131,7 +146,10 @@ export const EditorMergeFields = ({
 						/>
 					)}
 					<EditorOptionalOutputControl
-						addLabel="Add merge output"
+						addLabel="Enable merge output"
+						emptyDescription="The merge currently changes only its source and target. Enable an output to emit additional items when it resolves."
+						emptyIcon="icon-[lucide--package-plus]"
+						emptyTitle="No merge output"
 						removeLabel="Remove merge output"
 						value={merge.output}
 						onChange={(output) =>

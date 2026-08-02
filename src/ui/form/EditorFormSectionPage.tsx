@@ -22,7 +22,7 @@ export const EditorFormSectionPage = ({
 	readonly save: () => Promise<boolean>;
 	readonly saving: boolean;
 	readonly tabs: ReactNode;
-	readonly title: ReactNode;
+	readonly title?: ReactNode;
 }>) => (
 	<EditorSectionPage
 		tabs={

@@ -2,6 +2,7 @@ import { EditorProjectAvatarKeys } from "~/bridge/project/editor/EditorProjectFo
 import { Button } from "~/ui/button/Button";
 import { EditorFormSection } from "~/ui/form/EditorFormSection";
 import { useEditorProjectFormSession } from "~/ui/project/editor/EditorProjectFormContext";
+import { EditorAssetThumbnail } from "~/ui/resource/editor/EditorAssetThumbnail";
 
 export const EditorProjectAppearanceSection = () => {
 	const { form } = useEditorProjectFormSession();
@@ -12,12 +13,20 @@ export const EditorProjectAppearanceSection = () => {
 				description="The package-owned image shown by the launcher and game shell."
 			>
 				<form.AppField name="hero">
-					{(field) => <field.AssetField label="Hero asset" />}
+					{(field) => (
+						<div className="grid items-end gap-3 md:grid-cols-[auto_minmax(0,1fr)]">
+							<EditorAssetThumbnail
+								resourceId={field.state.value}
+								size="lg"
+							/>
+							<field.AssetField label="Hero asset" />
+						</div>
+					)}
 				</form.AppField>
 			</EditorFormSection>
 			<EditorFormSection
-				title="Default avatars"
-				description="Ordered package-owned images available to new players."
+				title="About avatars"
+				description="Ordered package-owned images revealed on the /about screen as an easter egg."
 			>
 				<form.AppField
 					name="avatars"
@@ -28,11 +37,16 @@ export const EditorProjectAppearanceSection = () => {
 							{avatarsField.state.value.map((_, index) => (
 								<div
 									key={`${index}`}
-									className="grid gap-2 md:grid-cols-[minmax(0,1fr)_auto]"
+									className="grid items-end gap-2 md:grid-cols-[auto_minmax(0,1fr)_auto]"
 								>
 									<form.AppField name={`avatars[${index}]`}>
 										{(field) => (
-											<field.AssetField label={`Avatar ${index + 1}`} />
+											<>
+												<EditorAssetThumbnail
+													resourceId={field.state.value}
+												/>
+												<field.AssetField label={`Avatar ${index + 1}`} />
+											</>
 										)}
 									</form.AppField>
 									<div className="flex items-end gap-2">
@@ -68,7 +82,9 @@ export const EditorProjectAppearanceSection = () => {
 								</Button>
 							)}
 							{avatarsField.state.value.length === 0 ? (
-								<p className="text-sm text-muted">No default avatars configured.</p>
+								<p className="text-sm text-muted">
+									No /about easter-egg avatars configured.
+								</p>
 							) : null}
 						</div>
 					)}

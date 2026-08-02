@@ -62,7 +62,10 @@ export const EditorItemProductionSection = () => {
 					>
 						{(output) => (
 							<EditorOptionalOutputControl
-								addLabel="Add expiry output"
+								addLabel="Enable expiry output"
+								emptyDescription="Without an output, the temporary item simply disappears when its duration ends. Enable one to emit configured items at expiry."
+								emptyIcon="icon-[lucide--package-plus]"
+								emptyTitle="No expiry output"
 								removeLabel="Remove expiry output"
 								value={output}
 								onChange={(next) => form.setFieldValue("output", next)}

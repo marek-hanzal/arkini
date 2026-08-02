@@ -6,6 +6,7 @@ import type { EditorItem, EditorItemType } from "~/bridge/item/editor/EditorItem
 import { useEditorItemDraft } from "~/bridge/item/editor/useEditorItemDraft";
 import { ButtonLink } from "~/ui/button/Button";
 import { EditorSectionTabs } from "~/ui/editor/EditorSectionTabs";
+import { editorBackLinkClassName, EditorBackIcon } from "~/ui/editor/EditorBackIcon";
 import { EditorFormSectionPage } from "~/ui/form/EditorFormSectionPage";
 import { EditorItemFormProvider } from "~/ui/item/editor/EditorItemFormContext";
 import { EditorItemNotFound } from "~/ui/item/editor/EditorItemNotFound";
@@ -115,9 +116,9 @@ const EditorItemFormSession = ({
 								params={{
 									projectId: params.projectId,
 								}}
-								className="min-h-0 px-3 py-2"
+								className={editorBackLinkClassName}
 							>
-								<span className="icon-[lucide--arrow-left] size-4" />
+								<EditorBackIcon />
 							</ButtonLink>
 						) : (
 							<ButtonLink
@@ -126,9 +127,9 @@ const EditorItemFormSession = ({
 									...params,
 									sectionId,
 								}}
-								className="min-h-0 px-3 py-2"
+								className={editorBackLinkClassName}
 							>
-								<span className="icon-[lucide--arrow-left] size-4" />
+								<EditorBackIcon />
 							</ButtonLink>
 						)
 					}

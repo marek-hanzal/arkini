@@ -7,6 +7,7 @@ import { editEditorAssetCommandAtom } from "~/bridge/resource/editor/editEditorA
 import { ButtonLink, PrimaryButton } from "~/ui/button/Button";
 import { EditorSectionNavigation } from "~/ui/editor/EditorSectionNavigation";
 import { EditorSectionPage } from "~/ui/editor/EditorSectionPage";
+import { editorBackLinkClassName, EditorBackIcon } from "~/ui/editor/EditorBackIcon";
 import { editorInputClassName } from "~/ui/form/EditorInputClassName";
 import { readSettledAsyncResultError } from "~/ui/reactivity/readSettledAsyncResultError";
 import { EditorAssetImageDropZone } from "~/ui/resource/editor/EditorAssetImageDropZone";
@@ -93,9 +94,9 @@ export const EditorAssetEdit = ({
 								filter,
 								query,
 							}}
-							className="min-h-0 px-3 py-2"
+							className={editorBackLinkClassName}
 						>
-							<span className="icon-[lucide--arrow-left] size-4" />
+							<EditorBackIcon />
 						</ButtonLink>
 					}
 					title={<h1 className="truncate text-xl font-semibold">Edit {resourceId}</h1>}

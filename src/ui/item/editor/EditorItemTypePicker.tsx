@@ -4,6 +4,7 @@ import { useMemo } from "react";
 import { useEditorProject } from "~/bridge/editor/useEditorProject";
 import { EditorItemTypes, type EditorItemType } from "~/bridge/item/editor/EditorItemModel";
 import { ButtonLink } from "~/ui/button/Button";
+import { editorBackLinkClassName, EditorBackIcon } from "~/ui/editor/EditorBackIcon";
 
 const itemTypePresentation = {
 	blueprint: {
@@ -71,10 +72,10 @@ export const EditorItemTypePicker = () => {
 					params={{
 						projectId: project.projectId,
 					}}
-					className="min-h-0 px-3 py-2"
+					className={editorBackLinkClassName}
 					aria-label="Back to items"
 				>
-					<span className="icon-[lucide--arrow-left] size-4" />
+					<EditorBackIcon />
 				</ButtonLink>
 				<div>
 					<h1

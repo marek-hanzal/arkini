@@ -1,5 +1,6 @@
 import type { EditorLine } from "~/bridge/item/editor/EditorItemModel";
 import { Button } from "~/ui/button/Button";
+import { EditorCapabilityStatus } from "~/ui/form/EditorCapabilityStatus";
 import { withFieldGroup } from "~/ui/form/EditorForm";
 import { EditorLineFields } from "~/ui/item/editor/EditorLineField";
 
@@ -36,6 +37,52 @@ export const EditorProductionFields = withFieldGroup({
 			>
 				{(linesField) => {
 					const lines = linesField.state.value ?? [];
+					const addLine = () => {
+						const lineOwnerId =
+							ownerId.replace(/^(?:item|producer):/, "") || "new-item";
+						const lineIdPrefix = `line:${lineOwnerId}`;
+						const existingIds = new Set(lines.map((line) => line.id));
+						let id = `${lineIdPrefix}:default`;
+						if (lines.length > 0 || existingIds.has(id)) {
+							let suffix = 2;
+							while (existingIds.has(`${lineIdPrefix}:${suffix}`)) suffix += 1;
+							id = `${lineIdPrefix}:${suffix}`;
+						}
+						const line: EditorLine = {
+							id,
+							title: `New ${kind} line`,
+							description: `Describe what this ${kind} line consumes and produces.`,
+							default: lines.length === 0,
+							show: true,
+							enable: true,
+							runtimeMs: 0,
+							input: [
+								{
+									type: "simple",
+								},
+							],
+							rules: [],
+						};
+						if (linesField.state.value === undefined) {
+							group.setFieldValue("lines", [
+								line,
+							]);
+							return;
+						}
+						linesField.pushValue(line);
+					};
+					if (kind === "deposit" && lines.length === 0)
+						return (
+							<div className="border-t border-line pt-4">
+								<EditorCapabilityStatus
+									actionLabel="Enable production lines"
+									description="This deposit currently only supplies matching deposit inputs. Production lines add self-consuming jobs that can transform the deposit and emit outputs."
+									icon="icon-[lucide--factory]"
+									onEnable={addLine}
+									title="Production lines are disabled"
+								/>
+							</div>
+						);
 					return (
 						<div className="grid gap-4 border-t border-line pt-4">
 							<div className="flex items-center justify-between gap-3">
@@ -49,46 +96,7 @@ export const EditorProductionFields = withFieldGroup({
 										</p>
 									)}
 								</div>
-								<Button
-									onClick={() => {
-										const lineOwnerId =
-											ownerId.replace(/^(?:item|producer):/, "") ||
-											"new-item";
-										const lineIdPrefix = `line:${lineOwnerId}`;
-										const existingIds = new Set(lines.map((line) => line.id));
-										let id = `${lineIdPrefix}:default`;
-										if (lines.length > 0 || existingIds.has(id)) {
-											let suffix = 2;
-											while (existingIds.has(`${lineIdPrefix}:${suffix}`))
-												suffix += 1;
-											id = `${lineIdPrefix}:${suffix}`;
-										}
-										const line: EditorLine = {
-											id,
-											title: `New ${kind} line`,
-											description: `Describe what this ${kind} line consumes and produces.`,
-											default: lines.length === 0,
-											show: true,
-											enable: true,
-											runtimeMs: 0,
-											input: [
-												{
-													type: "simple",
-												},
-											],
-											rules: [],
-										};
-										if (linesField.state.value === undefined) {
-											group.setFieldValue("lines", [
-												line,
-											]);
-											return;
-										}
-										linesField.pushValue(line);
-									}}
-								>
-									Add line
-								</Button>
+								<Button onClick={addLine}>Add line</Button>
 							</div>
 							{lines.map((_line, index) => (
 								<div

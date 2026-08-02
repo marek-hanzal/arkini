@@ -2,6 +2,7 @@ import type { PropsWithChildren } from "react";
 
 import { useEditorProject } from "~/bridge/editor/useEditorProject";
 import { ButtonLink, PrimaryButtonLink } from "~/ui/button/Button";
+import { editorBackLinkClassName, EditorBackIcon } from "~/ui/editor/EditorBackIcon";
 import { EditorSectionNavigation } from "~/ui/editor/EditorSectionNavigation";
 import { EditorSectionPage } from "~/ui/editor/EditorSectionPage";
 import { EditorSectionTabs } from "~/ui/editor/EditorSectionTabs";
@@ -39,9 +40,9 @@ export const EditorItemDetail = ({
 							params={{
 								projectId: project.projectId,
 							}}
-							className="min-h-0 shrink-0 px-3 py-2"
+							className={editorBackLinkClassName}
 						>
-							<span className="icon-[lucide--arrow-left] size-4" />
+							<EditorBackIcon />
 						</ButtonLink>
 					}
 					title={

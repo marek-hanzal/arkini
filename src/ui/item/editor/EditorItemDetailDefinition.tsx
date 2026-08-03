@@ -3,8 +3,6 @@ import type { ReactNode } from "react";
 import type {
 	EditorDrop,
 	EditorDropRule,
-	EditorInput,
-	EditorLine,
 	EditorLineRule,
 	EditorOutput,
 	EditorQuery,
@@ -213,106 +211,5 @@ export const OutputDetail = ({ output }: { readonly output?: EditorOutput }) =>
 			))}
 		</div>
 	);
-
-const InputDetail = ({ input }: { readonly input: EditorInput }) => (
-	<li className="border-t border-line py-3 first:border-0 first:pt-0 last:pb-0">
-		<p className="font-medium capitalize">{input.type}</p>
-		<div className="mt-2">
-			<DetailFacts>
-				{input.type === "materials" ? (
-					<>
-						<DetailFact
-							label="Selector"
-							value={formatSelector(input.selector)}
-						/>
-						<DetailFact
-							label="Mode"
-							value={input.mode}
-						/>
-						<DetailFact
-							label="Quantity"
-							value={formatQuantity(input.quantity)}
-						/>
-						<DetailFact
-							label="Extra capacity"
-							value={input.capacity}
-						/>
-					</>
-				) : null}
-				{input.type === "deposit" ? (
-					<DetailFact
-						label="Query"
-						value={<QueryDetail query={input.query} />}
-					/>
-				) : null}
-				{input.charges === undefined ? null : (
-					<DetailFact
-						label="Charge cost"
-						value={`${input.charges.cost} from ${input.charges.from}`}
-					/>
-				)}
-			</DetailFacts>
-		</div>
-	</li>
-);
-
-export const LineDetail = ({ line }: { readonly line: EditorLine }) => (
-	<article className="grid gap-5 border-b border-line pb-6 last:border-0 last:pb-0">
-		<header>
-			<div className="flex flex-wrap items-baseline gap-2">
-				<h3 className="text-base font-semibold">{line.title}</h3>
-				<span className="font-mono text-xs text-muted">{line.id}</span>
-			</div>
-			<p className="mt-1 text-sm text-muted">{line.description || "No description."}</p>
-		</header>
-		<DetailFacts>
-			<DetailFact
-				label="Default"
-				value={line.default ? "Yes" : "No"}
-			/>
-			<DetailFact
-				label="Visible"
-				value={line.show ? "Yes" : "No"}
-			/>
-			<DetailFact
-				label="Enabled"
-				value={line.enable ? "Yes" : "No"}
-			/>
-			<DetailFact
-				label="Runtime"
-				value={`${line.runtimeMs} ms`}
-			/>
-		</DetailFacts>
-		<section>
-			<h4 className="border-b border-line pb-2 text-xs font-semibold uppercase tracking-[0.08em] text-muted">
-				Inputs
-			</h4>
-			<ul className="divide-y divide-line/60">
-				{line.input.map((input, index) => (
-					<InputDetail
-						input={input}
-						key={`${input.type}-${index}`}
-					/>
-				))}
-			</ul>
-		</section>
-		<section>
-			<h4 className="border-b border-line pb-2 text-xs font-semibold uppercase tracking-[0.08em] text-muted">
-				Output
-			</h4>
-			<div className="pt-3">
-				<OutputDetail output={line.output} />
-			</div>
-		</section>
-		<section>
-			<h4 className="border-b border-line pb-2 text-xs font-semibold uppercase tracking-[0.08em] text-muted">
-				Rules
-			</h4>
-			<div className="pt-3">
-				<RulesDetail rules={line.rules} />
-			</div>
-		</section>
-	</article>
-);
 
 export { formatSelector };

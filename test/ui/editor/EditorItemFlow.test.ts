@@ -164,6 +164,12 @@ describe("editor item flow", () => {
 	});
 
 	it("presents nested production data without a raw-definition escape hatch", async () => {
+		const bucket = {
+			...item,
+			uid: "bucket-uid",
+			id: "item:bucket",
+			title: "Bucket",
+		} as const;
 		const producer = {
 			...item,
 			uid: "producer-uid",
@@ -233,21 +239,44 @@ describe("editor item flow", () => {
 			],
 			config: {
 				items: {
+					[bucket.id]: bucket,
 					[producer.id]: producer,
+					[item.id]: item,
 				},
 			},
 		};
 		const container = await render(
-			createElement(EditorItemDetailSectionPage, {
-				sectionId: "production",
-				uid: producer.uid,
-			}),
+			createElement(
+				EditorItemDetail,
+				{
+					sectionId: "production",
+					uid: producer.uid,
+				},
+				createElement(EditorItemDetailSectionPage, {
+					sectionId: "production",
+					uid: producer.uid,
+				}),
+			),
 		);
 
 		expect(container.textContent).toContain("Draw water");
-		expect(container.textContent).toContain("Item item:bucket");
-		expect(container.textContent).toContain("chance · 50%");
-		expect(container.textContent).toContain("item:water");
+		expect(container.textContent).toContain("Produces water.");
+		expect(container.textContent).toContain("Runtime");
+		expect(container.textContent).toContain("0.5 s");
+		expect(container.textContent).toContain("Inputs");
+		expect(container.textContent).toContain("Bucket");
+		expect(container.textContent).toContain("×1 required");
+		expect(container.textContent).toContain("Outputs");
+		expect(container.textContent).toContain("50% chance");
+		expect(container.textContent).toContain("Water");
+		expect(container.querySelector('[data-ui="EditorProductionLineDetail"]')).not.toBeNull();
+		expect(
+			container.querySelector('[data-ui="EditorProductionLineFlowChevron"]'),
+		).not.toBeNull();
+		expect(container.querySelector('[data-ui="TileLineProgress"]')).toBeNull();
+		expect(container.querySelector('[data-ui="TileLineEnqueueButton"]')).toBeNull();
+		expect(container.querySelector('[data-ui="TileLineSetDefaultButton"]')).toBeNull();
+		expect(container.querySelector('[data-ui="EditorItemDetailCard"]')).toBeNull();
 		expect(container.querySelector("pre")).toBeNull();
 	});
 

@@ -85,7 +85,11 @@ export const EditorItemDetail = ({
 				/>
 			}
 		>
-			<EditorRootCard dataUi="EditorItemDetailCard">{children}</EditorRootCard>
+			{sectionId === "production" ? (
+				children
+			) : (
+				<EditorRootCard dataUi="EditorItemDetailCard">{children}</EditorRootCard>
+			)}
 		</EditorSectionPage>
 	);
 };

@@ -12,7 +12,6 @@ import {
 	DetailSection,
 	EmptyDetail,
 	formatSelector,
-	LineDetail,
 	OutputDetail,
 } from "~/ui/item/editor/EditorItemDetailDefinition";
 import { EditorItemNotFound } from "~/ui/item/editor/EditorItemNotFound";
@@ -21,6 +20,7 @@ import {
 	type EditorItemSectionId,
 } from "~/ui/item/editor/EditorItemSections";
 import { EditorItemThumbnail } from "~/ui/item/editor/EditorItemThumbnail";
+import { EditorProductionLineDetail } from "~/ui/item/editor/EditorProductionLineDetail";
 import { useEditorItemByUid } from "~/ui/item/editor/useEditorItemByUid";
 
 const IdentityDetail = ({ item }: { readonly item: EditorItem }) => (
@@ -215,16 +215,20 @@ const readProductionLines = (item: EditorItem): ReadonlyArray<EditorLine> => {
 
 const ProductionDetail = ({ item }: { readonly item: EditorItem }) => {
 	const lines = readProductionLines(item);
+	if (lines.length > 0) {
+		return (
+			<div className="ak-list grid gap-1">
+				{lines.map((line) => (
+					<EditorProductionLineDetail
+						key={line.id}
+						line={line}
+					/>
+				))}
+			</div>
+		);
+	}
 	return (
 		<div className="grid gap-6">
-			{"maxQueueSize" in item ? (
-				<DetailSection title="Queue">
-					<DetailFact
-						label="Maximum concurrent jobs"
-						value={item.maxQueueSize}
-					/>
-				</DetailSection>
-			) : null}
 			{"durationMs" in item ? (
 				<>
 					<DetailSection title="Lifetime">
@@ -238,18 +242,6 @@ const ProductionDetail = ({ item }: { readonly item: EditorItem }) => {
 					</DetailSection>
 				</>
 			) : null}
-			{lines.length === 0 ? null : (
-				<DetailSection title={lines.length === 1 ? "Production line" : "Production lines"}>
-					<div className="grid gap-6">
-						{lines.map((line) => (
-							<LineDetail
-								key={line.id}
-								line={line}
-							/>
-						))}
-					</div>
-				</DetailSection>
-			)}
 		</div>
 	);
 };

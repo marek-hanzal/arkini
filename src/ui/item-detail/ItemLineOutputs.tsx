@@ -1,4 +1,5 @@
 import { match } from "ts-pattern";
+import type { ReactNode } from "react";
 
 import type { ItemDetailLines } from "~/bridge/item-detail/ItemDetailLines";
 import { ItemReferenceButton } from "~/ui/item-detail/ItemReferenceButton";
@@ -6,15 +7,19 @@ import { ItemReferenceButton } from "~/ui/item-detail/ItemReferenceButton";
 const ItemLineOutputItem = ({
 	disabled,
 	item,
+	renderItem,
 }: {
 	readonly disabled: boolean;
 	readonly item: ItemDetailLines.OutputItem;
+	readonly renderItem?: (item: ItemDetailLines.OutputItem) => ReactNode;
 }) => (
 	<div
 		className="flex min-w-0 items-center justify-between gap-4 text-sm"
 		data-ui="TileLineOutputItem"
 	>
-		{item.sourceUrl === undefined ? (
+		{renderItem !== undefined ? (
+			renderItem(item)
+		) : item.sourceUrl === undefined ? (
 			<span className="truncate font-medium text-foreground">{item.title}</span>
 		) : (
 			<ItemReferenceButton
@@ -38,9 +43,11 @@ const ItemLineOutputItem = ({
 const ItemLineOutputItems = ({
 	disabled,
 	items,
+	renderItem,
 }: {
 	readonly disabled: boolean;
 	readonly items: readonly ItemDetailLines.OutputItem[];
+	readonly renderItem?: (item: ItemDetailLines.OutputItem) => ReactNode;
 }) => (
 	<div className="space-y-1.5">
 		{items.map((item) => (
@@ -48,6 +55,7 @@ const ItemLineOutputItems = ({
 				key={item.itemId}
 				disabled={disabled}
 				item={item}
+				renderItem={renderItem}
 			/>
 		))}
 	</div>
@@ -56,9 +64,11 @@ const ItemLineOutputItems = ({
 const ItemLineOutputRoll = ({
 	disabled,
 	roll,
+	renderItem,
 }: {
 	readonly disabled: boolean;
 	readonly roll: ItemDetailLines.OutputRoll;
+	readonly renderItem?: (item: ItemDetailLines.OutputItem) => ReactNode;
 }) =>
 	match(roll)
 		.with(
@@ -77,6 +87,7 @@ const ItemLineOutputRoll = ({
 					<ItemLineOutputItems
 						disabled={disabled}
 						items={guaranteed.item}
+						renderItem={renderItem}
 					/>
 				</div>
 			),
@@ -97,6 +108,7 @@ const ItemLineOutputRoll = ({
 					<ItemLineOutputItems
 						disabled={disabled}
 						items={chance.item}
+						renderItem={renderItem}
 					/>
 				</div>
 			),
@@ -126,6 +138,7 @@ const ItemLineOutputRoll = ({
 							<ItemLineOutputItems
 								disabled={disabled}
 								items={option.item}
+								renderItem={renderItem}
 							/>
 						</div>
 					))}
@@ -138,9 +151,11 @@ const ItemLineOutputRoll = ({
 export const ItemLineOutputs = ({
 	disabled,
 	output,
+	renderItem,
 }: {
 	readonly disabled: boolean;
 	readonly output: readonly ItemDetailLines.OutputSet[];
+	readonly renderItem?: (item: ItemDetailLines.OutputItem) => ReactNode;
 }) => (
 	<section className="min-w-0">
 		<h4 className="border-b border-line pb-2 text-xs font-semibold uppercase tracking-[0.08em] text-muted">
@@ -166,6 +181,7 @@ export const ItemLineOutputs = ({
 									key={`${roll.kind}:${rollIndex}`}
 									disabled={disabled}
 									roll={roll}
+									renderItem={renderItem}
 								/>
 							))}
 						</div>

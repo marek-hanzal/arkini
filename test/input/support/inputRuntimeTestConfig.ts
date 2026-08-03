@@ -66,8 +66,8 @@ export const inputRuntimeTestConfig = GameConfigSchema.parse({
 								itemId: "water",
 							},
 							quantity: {
-								type: "value",
-								value: 3,
+								min: 3,
+								max: 3,
 							},
 							capacity: 2,
 						},

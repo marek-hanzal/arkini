@@ -5,7 +5,10 @@ import type { RootContext } from "~/ui/root/RootContext";
 import { resolveRouteViewTransitionTypesFx } from "~/ui/navigation/resolveRouteViewTransitionTypesFx";
 
 const isSkippedViewTransition = (error: unknown) =>
-	typeof error === "object" && error !== null && "name" in error && error.name === "AbortError";
+	typeof error === "object" &&
+	error !== null &&
+	"name" in error &&
+	(error.name === "AbortError" || error.name === "InvalidStateError");
 
 const observeSkippedViewTransition = (transition: ViewTransition) => {
 	void transition.ready.catch((error: unknown) => {

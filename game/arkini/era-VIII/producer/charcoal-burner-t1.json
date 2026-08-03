@@ -30,8 +30,8 @@
 								"itemId": "item:log"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 2
+								"min": 2,
+								"max": 2
 							},
 							"capacity": 8
 						}
@@ -64,8 +64,8 @@
 											{
 												"itemId": "item:charcoal",
 												"quantity": {
-													"type": "value",
-													"value": 3
+													"min": 3,
+													"max": 3
 												},
 												"rules": []
 											}
@@ -78,8 +78,8 @@
 											{
 												"itemId": "item:charcoal",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -92,8 +92,8 @@
 											{
 												"itemId": "item:pollution",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -106,8 +106,8 @@
 											{
 												"itemId": "item:pollution",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}

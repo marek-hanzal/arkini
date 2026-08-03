@@ -1,21 +1,22 @@
 import { z } from "zod";
 
-import { QuantityRangeSchema } from "./QuantityRangeSchema";
-import { QuantityValueSchema } from "./QuantityValueSchema";
+import { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
 
 /**
- * The positive quantity of an item emitted by a drop.
- *
- * A quantity is selected by its explicit `type` discriminator.
+ * Inclusive positive bounds resolved by one input, output, or weighted roll.
  */
 export const QuantitySchema = z
-	.discriminatedUnion("type", [
-		QuantityValueSchema,
-		QuantityRangeSchema,
-	])
+	.object({
+		min: PositiveIntegerSchema.describe("The smallest quantity that may resolve."),
+		max: PositiveIntegerSchema.describe("The largest quantity that may resolve."),
+	})
+	.strict()
+	.refine((quantity) => quantity.max >= quantity.min, {
+		message: "max must be greater than or equal to min",
+	})
 	.meta({
 		id: "QuantitySchema",
-		description: "A fixed or inclusive range quantity selected by its type.",
+		description: "The inclusive positive bounds resolved by one quantity contract.",
 	});
 
 export type QuantitySchema = typeof QuantitySchema;

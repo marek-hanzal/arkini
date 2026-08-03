@@ -27,8 +27,8 @@
 							"itemId": "item:key-t3"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 1
+							"min": 1,
+							"max": 1
 						},
 						"charges": {
 							"cost": 1,
@@ -47,7 +47,6 @@
 										{
 											"itemId": "item:coin",
 											"quantity": {
-												"type": "range",
 												"min": 7,
 												"max": 10
 											},
@@ -62,8 +61,8 @@
 										{
 											"itemId": "item:emerald",
 											"quantity": {
-												"type": "value",
-												"value": 1
+												"min": 1,
+												"max": 1
 											},
 											"rules": []
 										}
@@ -76,8 +75,8 @@
 										{
 											"itemId": "item:sapphire",
 											"quantity": {
-												"type": "value",
-												"value": 1
+												"min": 1,
+												"max": 1
 											},
 											"rules": []
 										}
@@ -90,8 +89,8 @@
 										{
 											"itemId": "item:topaz",
 											"quantity": {
-												"type": "value",
-												"value": 1
+												"min": 1,
+												"max": 1
 											},
 											"rules": []
 										}

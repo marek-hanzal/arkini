@@ -9,8 +9,8 @@ const createDrop = (itemId: string): DropSchema.Type => {
 	return {
 		itemId,
 		quantity: {
-			type: "value",
-			value: 1,
+			min: 1,
+			max: 1,
 		},
 		placement: "drop",
 		rules: [],

@@ -92,8 +92,8 @@ const config = GameConfigSchema.parse({
 								itemId: "item:fuel",
 							},
 							quantity: {
-								type: "value",
-								value: 1,
+								min: 1,
+								max: 1,
 							},
 							capacity: 0,
 							mode: "consume",
@@ -162,8 +162,8 @@ const config = GameConfigSchema.parse({
 											{
 												itemId: "material",
 												quantity: {
-													type: "value",
-													value: 1,
+													min: 1,
+													max: 1,
 												},
 												rules: [],
 											},

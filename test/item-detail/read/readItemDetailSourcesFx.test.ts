@@ -63,8 +63,8 @@ const line = ({
 									{
 										itemId: "target",
 										quantity: {
-											type: "value" as const,
-											value: 2,
+											min: 2,
+											max: 2,
 										},
 										rules: [],
 									},
@@ -77,7 +77,6 @@ const line = ({
 									{
 										itemId: "target",
 										quantity: {
-											type: "range" as const,
 											min: 1,
 											max: 4,
 										},
@@ -96,8 +95,8 @@ const line = ({
 									{
 										itemId: "byproduct",
 										quantity: {
-											type: "value" as const,
-											value: 1,
+											min: 1,
+											max: 1,
 										},
 										rules: [],
 									},
@@ -115,8 +114,8 @@ const line = ({
 									{
 										itemId: "byproduct",
 										quantity: {
-											type: "value" as const,
-											value: 1,
+											min: 1,
+											max: 1,
 										},
 										rules: [],
 									},

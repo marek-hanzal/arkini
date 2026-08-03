@@ -27,8 +27,8 @@
 							"itemId": "item:key-t1"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 1
+							"min": 1,
+							"max": 1
 						},
 						"charges": {
 							"cost": 1,
@@ -47,7 +47,6 @@
 										{
 											"itemId": "item:coin",
 											"quantity": {
-												"type": "range",
 												"min": 2,
 												"max": 4
 											},
@@ -62,8 +61,8 @@
 										{
 											"itemId": "item:ruby",
 											"quantity": {
-												"type": "value",
-												"value": 1
+												"min": 1,
+												"max": 1
 											},
 											"rules": []
 										}
@@ -76,8 +75,8 @@
 										{
 											"itemId": "item:emerald",
 											"quantity": {
-												"type": "value",
-												"value": 1
+												"min": 1,
+												"max": 1
 											},
 											"rules": []
 										}

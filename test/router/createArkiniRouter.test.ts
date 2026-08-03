@@ -341,14 +341,23 @@ describe("createArkiniRouterFx", () => {
 		await vi.waitFor(() => expect(update).toHaveBeenCalledOnce());
 	});
 
-	it("handles the expected AbortError when an overlapping view transition is skipped", async () => {
+	it.each([
+		[
+			"AbortError",
+			"Transition was skipped",
+		],
+		[
+			"InvalidStateError",
+			"Transition was aborted because of invalid state",
+		],
+	])("handles the expected %s when a view transition is skipped", async (name, message) => {
 		Object.defineProperty(window, "CSS", {
 			configurable: true,
 			value: {
 				supports: vi.fn(() => true),
 			},
 		});
-		const ready = Promise.reject(new DOMException("Transition was skipped", "AbortError"));
+		const ready = Promise.reject(new DOMException(message, name));
 		const catchReady = vi.spyOn(ready, "catch");
 		Object.defineProperty(document, "startViewTransition", {
 			configurable: true,

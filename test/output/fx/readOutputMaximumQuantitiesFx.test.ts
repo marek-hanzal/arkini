@@ -5,11 +5,10 @@ import { readOutputMaximumQuantitiesFx } from "~/engine/output/fx/readOutputMaxi
 import type { OutputSchema } from "~/engine/output/schema/OutputSchema";
 
 const value = (amount: number) => ({
-	type: "value" as const,
-	value: amount,
+	min: amount,
+	max: amount,
 });
 const range = (min: number, max: number) => ({
-	type: "range" as const,
 	min,
 	max,
 });

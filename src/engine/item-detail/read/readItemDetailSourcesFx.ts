@@ -89,26 +89,7 @@ const unavailable = {
 } as const satisfies readItemDetailSourcesFx.Result;
 
 const quantityBounds = (quantity: QuantitySchema.Type): readItemDetailSourcesFx.QuantityBounds =>
-	match(quantity)
-		.with(
-			{
-				type: "value",
-			},
-			({ value }) => ({
-				min: value,
-				max: value,
-			}),
-		)
-		.with(
-			{
-				type: "range",
-			},
-			({ max, min }) => ({
-				min,
-				max,
-			}),
-		)
-		.exhaustive();
+	quantity;
 
 const targetQuantity = ({
 	drop,

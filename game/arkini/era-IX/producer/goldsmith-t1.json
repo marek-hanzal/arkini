@@ -30,8 +30,8 @@
 								"itemId": "item:gold-ingot"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 2
+								"min": 2,
+								"max": 2
 							},
 							"capacity": 4
 						},
@@ -42,8 +42,8 @@
 								"itemId": "item:charcoal"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 5
 						}
@@ -76,8 +76,8 @@
 											{
 												"itemId": "item:coin-stack",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -90,8 +90,8 @@
 											{
 												"itemId": "item:pollution",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -104,8 +104,8 @@
 											{
 												"itemId": "item:pollution",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -129,8 +129,8 @@
 								"itemId": "item:gold-ingot"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 5
 						},
@@ -141,8 +141,8 @@
 								"itemId": "item:iron-ingot"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 5
 						},
@@ -153,8 +153,8 @@
 								"itemId": "item:advanced-knowledge"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 3
 						},
@@ -165,8 +165,8 @@
 								"itemId": "item:charcoal"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 5
 						}
@@ -199,8 +199,8 @@
 											{
 												"itemId": "item:key-t1",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -213,8 +213,8 @@
 											{
 												"itemId": "item:pollution",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -227,8 +227,8 @@
 											{
 												"itemId": "item:pollution",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -252,8 +252,8 @@
 								"itemId": "item:key-t1"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 3
 						},
@@ -264,8 +264,8 @@
 								"itemId": "item:gold-ingot"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 5
 						},
@@ -276,8 +276,8 @@
 								"itemId": "item:ruby"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 3
 						},
@@ -288,8 +288,8 @@
 								"itemId": "item:charcoal"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 5
 						}
@@ -322,8 +322,8 @@
 											{
 												"itemId": "item:key-t2",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -336,8 +336,8 @@
 											{
 												"itemId": "item:pollution",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -350,8 +350,8 @@
 											{
 												"itemId": "item:pollution",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -375,8 +375,8 @@
 								"itemId": "item:key-t2"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 3
 						},
@@ -387,8 +387,8 @@
 								"itemId": "item:gold-ingot"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 5
 						},
@@ -399,8 +399,8 @@
 								"itemId": "item:emerald"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 3
 						},
@@ -411,8 +411,8 @@
 								"itemId": "item:charcoal"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 5
 						}
@@ -445,8 +445,8 @@
 											{
 												"itemId": "item:key-t3",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -459,8 +459,8 @@
 											{
 												"itemId": "item:pollution",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -473,8 +473,8 @@
 											{
 												"itemId": "item:pollution",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -498,8 +498,8 @@
 								"itemId": "item:key-t3"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 3
 						},
@@ -510,8 +510,8 @@
 								"itemId": "item:gold-ingot"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 5
 						},
@@ -522,8 +522,8 @@
 								"itemId": "item:sapphire"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 3
 						},
@@ -534,8 +534,8 @@
 								"itemId": "item:charcoal"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 5
 						}
@@ -568,8 +568,8 @@
 											{
 												"itemId": "item:key-t4",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -582,8 +582,8 @@
 											{
 												"itemId": "item:pollution",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -596,8 +596,8 @@
 											{
 												"itemId": "item:pollution",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}

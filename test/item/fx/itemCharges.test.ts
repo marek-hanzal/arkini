@@ -20,8 +20,8 @@ import { RuntimeCheckIssueEnumSchema } from "~/engine/runtime/schema/check/Runti
 import { ItemChargesIssueReasonEnumSchema } from "~/engine/runtime/schema/check/ItemChargesIssueReasonEnumSchema";
 
 const value = (value: number) => ({
-	type: "value" as const,
-	value,
+	min: value,
+	max: value,
 });
 const drop = (itemId: string) => ({
 	itemId,

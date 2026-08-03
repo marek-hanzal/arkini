@@ -30,8 +30,8 @@
 								"itemId": "item:luxury-clothing"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 3
 						},
@@ -42,8 +42,8 @@
 								"itemId": "item:feast"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 3
 						},
@@ -54,8 +54,8 @@
 								"itemId": "item:wine-glass"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 3
 						},
@@ -66,8 +66,8 @@
 								"itemId": "item:coin-stack"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 5
 						}
@@ -83,32 +83,32 @@
 											{
 												"itemId": "item:morale-t4",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											},
 											{
 												"itemId": "item:morale-t3",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											},
 											{
 												"itemId": "item:morale-t2",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											},
 											{
 												"itemId": "item:morale-t1",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}

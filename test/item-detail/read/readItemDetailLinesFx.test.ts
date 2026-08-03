@@ -467,8 +467,8 @@ describe("readItemDetailLinesFx", () => {
 													{
 														itemId: "water",
 														quantity: {
-															type: "value",
-															value: 1,
+															min: 1,
+															max: 1,
 														},
 														rules: [],
 													},
@@ -1151,15 +1151,14 @@ describe("readItemDetailLinesFx", () => {
 													{
 														itemId: "wood",
 														quantity: {
-															type: "value",
-															value: 2,
+															min: 2,
+															max: 2,
 														},
 														rules: [],
 													},
 													{
 														itemId: "wood",
 														quantity: {
-															type: "range",
 															min: 1,
 															max: 3,
 														},
@@ -1174,8 +1173,8 @@ describe("readItemDetailLinesFx", () => {
 													{
 														itemId: "gem",
 														quantity: {
-															type: "value",
-															value: 1,
+															min: 1,
+															max: 1,
 														},
 														rules: [],
 													},

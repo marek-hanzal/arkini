@@ -60,8 +60,8 @@ export const purityTestConfig = GameConfigSchema.parse({
 								itemId: "material",
 							},
 							quantity: {
-								type: "value",
-								value: 1,
+								min: 1,
+								max: 1,
 							},
 						},
 					],
@@ -80,8 +80,8 @@ export const purityTestConfig = GameConfigSchema.parse({
 								itemId: "material",
 							},
 							quantity: {
-								type: "value",
-								value: 1,
+								min: 1,
+								max: 1,
 							},
 							capacity: 2,
 						},
@@ -111,8 +111,8 @@ export const purityTestConfig = GameConfigSchema.parse({
 							itemId: "material",
 						},
 						quantity: {
-							type: "value",
-							value: 1,
+							min: 1,
+							max: 1,
 						},
 					},
 				],
@@ -140,8 +140,8 @@ export const purityTestConfig = GameConfigSchema.parse({
 							itemId: "material",
 						},
 						quantity: {
-							type: "value",
-							value: 1,
+							min: 1,
+							max: 1,
 						},
 					},
 				],

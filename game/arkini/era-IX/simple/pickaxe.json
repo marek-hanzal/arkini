@@ -32,7 +32,6 @@
 											{
 												"itemId": "item:stone",
 												"quantity": {
-													"type": "range",
 													"min": 1,
 													"max": 4
 												},

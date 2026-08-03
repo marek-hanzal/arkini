@@ -16,8 +16,8 @@ describe("DropResultSchema", () => {
 				itemId: "item:log",
 				placement: "drop",
 				quantity: {
-					type: "value",
-					value: 2,
+					min: 2,
+					max: 2,
 				},
 			}).success,
 		).toBe(false);

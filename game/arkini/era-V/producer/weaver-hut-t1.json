@@ -30,8 +30,8 @@
 								"itemId": "item:wool"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 2
+								"min": 2,
+								"max": 2
 							},
 							"capacity": 4
 						}
@@ -47,8 +47,8 @@
 											{
 												"itemId": "item:common-cloth",
 												"quantity": {
-													"type": "value",
-													"value": 3
+													"min": 3,
+													"max": 3
 												},
 												"rules": []
 											}

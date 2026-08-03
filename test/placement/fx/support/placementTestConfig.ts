@@ -131,8 +131,8 @@ export const configuredDrop = ({
 		itemId,
 		placement,
 		quantity: {
-			type: "value",
-			value: quantity,
+			min: quantity,
+			max: quantity,
 		},
 		rules,
 	} satisfies DropSchema.Type;

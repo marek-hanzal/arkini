@@ -44,8 +44,8 @@ const makeLine = (lineId: string) => ({
 				itemId: "material",
 			},
 			quantity: {
-				type: "value" as const,
-				value: 2,
+				min: 2,
+				max: 2,
 			},
 		},
 	],

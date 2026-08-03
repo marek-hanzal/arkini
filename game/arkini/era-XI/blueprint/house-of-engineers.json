@@ -32,8 +32,8 @@
 							"itemId": "item:construction-bundle"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 1
+							"min": 1,
+							"max": 1
 						},
 						"charges": {
 							"cost": 1,
@@ -47,8 +47,8 @@
 							"itemId": "item:guild-charter"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 1
+							"min": 1,
+							"max": 1
 						}
 					},
 					{
@@ -58,8 +58,8 @@
 							"itemId": "item:treasure-chest"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 1
+							"min": 1,
+							"max": 1
 						}
 					},
 					{
@@ -69,8 +69,8 @@
 							"itemId": "item:marble-block"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 1
+							"min": 1,
+							"max": 1
 						}
 					},
 					{
@@ -80,8 +80,8 @@
 							"itemId": "item:stained-glass"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 1
+							"min": 1,
+							"max": 1
 						}
 					},
 					{
@@ -91,8 +91,8 @@
 							"itemId": "item:iron-ingot"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 3
+							"min": 3,
+							"max": 3
 						}
 					},
 					{
@@ -102,8 +102,8 @@
 							"itemId": "item:gold-ingot"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 1
+							"min": 1,
+							"max": 1
 						}
 					},
 					{
@@ -113,8 +113,8 @@
 							"itemId": "item:nails"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 4
+							"min": 4,
+							"max": 4
 						}
 					},
 					{
@@ -124,8 +124,8 @@
 							"itemId": "item:coin-stack"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 3
+							"min": 3,
+							"max": 3
 						}
 					},
 					{
@@ -135,8 +135,8 @@
 							"itemId": "item:morale-t4"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 1
+							"min": 1,
+							"max": 1
 						}
 					},
 					{
@@ -146,8 +146,8 @@
 							"itemId": "item:morale-t3"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 1
+							"min": 1,
+							"max": 1
 						}
 					}
 				],
@@ -248,8 +248,8 @@
 										{
 											"itemId": "producer:house-of-engineers",
 											"quantity": {
-												"type": "value",
-												"value": 1
+												"min": 1,
+												"max": 1
 											},
 											"placement": "drop",
 											"rules": []

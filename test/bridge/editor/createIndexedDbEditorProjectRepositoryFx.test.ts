@@ -45,6 +45,45 @@ afterEach(async () => {
 });
 
 describe("createIndexedDbEditorProjectRepositoryFx", () => {
+	it("clears projects persisted before the required quantity-bounds contract", async () => {
+		const databaseName = createDatabaseName();
+		const database = new Dexie(databaseName, {
+			indexedDB,
+			IDBKeyRange,
+		});
+		database.version(1).stores({
+			projects: "&projectId, updatedAtMs",
+			resources: "&[projectId+id], projectId",
+		});
+		await database.table("projects").put({
+			projectId: "legacy-project",
+			config: editorTestPayload.config,
+			revision: 0,
+			createdAtMs: 1,
+			updatedAtMs: 1,
+		});
+		await database.table("resources").put({
+			projectId: "legacy-project",
+			...editorTestPayload.resources[0],
+		});
+		database.close();
+
+		expect(
+			await runWithRepository(databaseName, (repository) => repository.listProjectsFx),
+		).toEqual([]);
+
+		const reopened = new Dexie(databaseName, {
+			indexedDB,
+			IDBKeyRange,
+		});
+		reopened.version(2).stores({
+			projects: "&projectId, updatedAtMs",
+			resources: "&[projectId+id], projectId",
+		});
+		expect(await reopened.table("resources").count()).toBe(0);
+		reopened.close();
+	});
+
 	it("atomically creates, lists and reloads one canonical project", async () => {
 		const databaseName = createDatabaseName();
 		const created = await runWithRepository(databaseName, (repository) =>
@@ -346,7 +385,7 @@ describe("createIndexedDbEditorProjectRepositoryFx", () => {
 			indexedDB,
 			IDBKeyRange,
 		});
-		database.version(1).stores({
+		database.version(2).stores({
 			projects: "&projectId, updatedAtMs",
 			resources: "&[projectId+id], projectId",
 		});

@@ -27,22 +27,16 @@ const guaranteedOutput = ({
 	itemId,
 	placement = "drop",
 	quantity = {
-		type: "value" as const,
-		value: 1,
+		min: 1,
+		max: 1,
 	},
 }: {
 	itemId: string;
 	placement?: "drop" | "random";
-	quantity?:
-		| {
-				type: "value";
-				value: number;
-		  }
-		| {
-				type: "range";
-				min: number;
-				max: number;
-		  };
+	quantity?: {
+		min: number;
+		max: number;
+	};
 }) => ({
 	set: [
 		{
@@ -148,7 +142,6 @@ export const createTemporaryLifetimeTestConfig = () =>
 					itemId: "result",
 					placement: "random",
 					quantity: {
-						type: "range",
 						min: 2,
 						max: 3,
 					},

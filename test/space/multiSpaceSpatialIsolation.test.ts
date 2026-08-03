@@ -32,8 +32,8 @@ const drop = (placement: "drop" | "random", quantity = 1) => ({
 	itemId: "log",
 	placement,
 	quantity: {
-		type: "value" as const,
-		value: quantity,
+		min: quantity,
+		max: quantity,
 	},
 	rules: [],
 });

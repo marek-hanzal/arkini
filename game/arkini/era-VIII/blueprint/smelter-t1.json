@@ -32,8 +32,8 @@
 							"itemId": "item:stone-block"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 5
+							"min": 5,
+							"max": 5
 						},
 						"charges": {
 							"cost": 1,
@@ -47,8 +47,8 @@
 							"itemId": "item:bricks"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 4
+							"min": 4,
+							"max": 4
 						}
 					},
 					{
@@ -58,8 +58,8 @@
 							"itemId": "item:coal"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 3
+							"min": 3,
+							"max": 3
 						}
 					},
 					{
@@ -69,8 +69,8 @@
 							"itemId": "item:building-permit"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 1
+							"min": 1,
+							"max": 1
 						}
 					}
 				],
@@ -121,8 +121,8 @@
 										{
 											"itemId": "producer:smelter-t1",
 											"quantity": {
-												"type": "value",
-												"value": 1
+												"min": 1,
+												"max": 1
 											},
 											"placement": "drop",
 											"rules": []

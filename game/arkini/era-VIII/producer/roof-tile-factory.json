@@ -30,8 +30,8 @@
 								"itemId": "item:clay"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 2
+								"min": 2,
+								"max": 2
 							},
 							"capacity": 8
 						},
@@ -42,8 +42,8 @@
 								"itemId": "item:charcoal"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 6
 						},
@@ -54,8 +54,8 @@
 								"itemId": "item:water"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 4
 						}
@@ -104,8 +104,8 @@
 											{
 												"itemId": "item:roof-tiles",
 												"quantity": {
-													"type": "value",
-													"value": 4
+													"min": 4,
+													"max": 4
 												},
 												"rules": []
 											}
@@ -118,8 +118,8 @@
 											{
 												"itemId": "item:pollution",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -132,8 +132,8 @@
 											{
 												"itemId": "item:pollution",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}

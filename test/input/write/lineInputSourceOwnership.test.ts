@@ -91,8 +91,8 @@ const config = GameConfigSchema.parse({
 								itemId: fuelItemId,
 							},
 							quantity: {
-								type: "value",
-								value: 1,
+								min: 1,
+								max: 1,
 							},
 						},
 					],
@@ -116,8 +116,8 @@ const config = GameConfigSchema.parse({
 							itemId: workerItemId,
 						},
 						quantity: {
-							type: "value",
-							value: 1,
+							min: 1,
+							max: 1,
 						},
 					},
 				],

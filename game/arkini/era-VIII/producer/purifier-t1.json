@@ -30,7 +30,6 @@
 								"itemId": "item:pollution"
 							},
 							"quantity": {
-								"type": "range",
 								"min": 1,
 								"max": 4
 							}

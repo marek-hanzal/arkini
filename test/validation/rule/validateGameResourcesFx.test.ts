@@ -234,8 +234,8 @@ describe("validateGameResourcesFx", () => {
 										{
 											itemId: targetId,
 											quantity: {
-												type: "value" as const,
-												value: 1,
+												min: 1,
+												max: 1,
 											},
 											placement: "drop" as const,
 											rules: [],

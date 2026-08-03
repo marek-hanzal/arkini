@@ -30,8 +30,8 @@
 								"itemId": "item:grain"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 2
+								"min": 2,
+								"max": 2
 							},
 							"capacity": 4
 						},
@@ -42,8 +42,8 @@
 								"itemId": "item:water"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 4
 						}
@@ -59,8 +59,8 @@
 											{
 												"itemId": "item:piglet",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -73,8 +73,8 @@
 											{
 												"itemId": "item:piglet",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -87,8 +87,8 @@
 											{
 												"itemId": "item:bio-waste",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -101,8 +101,8 @@
 											{
 												"itemId": "item:trash",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}

@@ -85,8 +85,8 @@ export const createOutput = (
 						drop: drops.map(({ itemId, placement = "drop" }) => ({
 							itemId,
 							quantity: {
-								type: "value",
-								value: 1,
+								min: 1,
+								max: 1,
 							},
 							placement,
 							rules: [],

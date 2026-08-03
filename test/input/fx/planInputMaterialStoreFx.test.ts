@@ -12,8 +12,8 @@ const input = InputMaterialSchema.parse({
 		itemId: "item:water",
 	},
 	quantity: {
-		type: "value",
-		value: 3,
+		min: 3,
+		max: 3,
 	},
 	capacity: 2,
 });

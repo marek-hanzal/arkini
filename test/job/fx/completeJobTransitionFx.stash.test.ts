@@ -14,8 +14,8 @@ import { runTickRuntimeByFx } from "~/engine/tick/fx/runTickRuntimeByFx";
 import { completeJobRuntimeForTestFx } from "~test/job/support/completeJobRuntimeForTestFx";
 
 const value = (value: number) => ({
-	type: "value" as const,
-	value,
+	min: value,
+	max: value,
 });
 
 const output = (

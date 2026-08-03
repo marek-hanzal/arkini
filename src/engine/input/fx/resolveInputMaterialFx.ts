@@ -3,7 +3,6 @@ import { Effect } from "effect";
 import type { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeIntegerSchema";
 import type { InputMaterialSchema } from "~/engine/input/schema/InputMaterialSchema";
 import type { InputMaterialResolutionSchema } from "~/engine/input/schema/resolution/InputMaterialResolutionSchema";
-import { readQuantityBoundsFx } from "~/engine/quantity/fx/readQuantityBoundsFx";
 
 export namespace resolveInputMaterialFx {
 	export interface Props {
@@ -19,9 +18,7 @@ export const resolveInputMaterialFx = Effect.fn("resolveInputMaterialFx")(functi
 	input,
 	storedQuantity,
 }: resolveInputMaterialFx.Props) {
-	const required = yield* readQuantityBoundsFx({
-		quantity: input.quantity,
-	});
+	const required = input.quantity;
 	const ready = storedQuantity >= required.min;
 	const maxStoredQuantity = required.max + input.capacity;
 

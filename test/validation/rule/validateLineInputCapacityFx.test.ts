@@ -19,8 +19,8 @@ const bufferedInput = (capacity: number): ReadonlyArray<InputSchema.Type> => [
 			itemId: "item:material",
 		},
 		quantity: {
-			type: "value",
-			value: 1,
+			min: 1,
+			max: 1,
 		},
 		capacity,
 		mode: "consume",

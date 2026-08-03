@@ -77,8 +77,8 @@ const craftCompletionConfig = GameConfigSchema.parse({
 										{
 											itemId: "item:product",
 											quantity: {
-												type: "value",
-												value: 1,
+												min: 1,
+												max: 1,
 											},
 											placement: "drop",
 											rules: [],
@@ -132,8 +132,8 @@ const craftCompletionConfig = GameConfigSchema.parse({
 										{
 											itemId: "item:bonus",
 											quantity: {
-												type: "value",
-												value: 1,
+												min: 1,
+												max: 1,
 											},
 											placement: "drop",
 											rules: [],
@@ -141,8 +141,8 @@ const craftCompletionConfig = GameConfigSchema.parse({
 										{
 											itemId: "item:result",
 											quantity: {
-												type: "value",
-												value: 1,
+												min: 1,
+												max: 1,
 											},
 											placement: "drop",
 											rules: [],
@@ -190,8 +190,8 @@ const craftCompletionConfig = GameConfigSchema.parse({
 						},
 						mode: "reserve",
 						quantity: {
-							type: "value",
-							value: 1,
+							min: 1,
+							max: 1,
 						},
 					},
 				],
@@ -205,8 +205,8 @@ const craftCompletionConfig = GameConfigSchema.parse({
 										{
 											itemId: "item:product",
 											quantity: {
-												type: "value",
-												value: 1,
+												min: 1,
+												max: 1,
 											},
 											placement: "drop",
 											rules: [],
@@ -294,8 +294,8 @@ const craftCompletionConfig = GameConfigSchema.parse({
 										{
 											itemId: "item:random-a",
 											quantity: {
-												type: "value",
-												value: 2,
+												min: 2,
+												max: 2,
 											},
 											placement: "random",
 											rules: [],
@@ -313,8 +313,8 @@ const craftCompletionConfig = GameConfigSchema.parse({
 										{
 											itemId: "item:random-b",
 											quantity: {
-												type: "value",
-												value: 2,
+												min: 2,
+												max: 2,
 											},
 											placement: "random",
 											rules: [],

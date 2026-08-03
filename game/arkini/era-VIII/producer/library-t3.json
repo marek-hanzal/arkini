@@ -30,8 +30,8 @@
 								"itemId": "item:log"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 1
 						},
@@ -42,8 +42,8 @@
 								"itemId": "item:stone"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 1
 						}
@@ -59,8 +59,8 @@
 											{
 												"itemId": "item:blueprint-lumberjack-t1",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -84,8 +84,8 @@
 								"itemId": "item:log"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 1
 						},
@@ -96,8 +96,8 @@
 								"itemId": "item:stone"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 1
 						}
@@ -113,8 +113,8 @@
 											{
 												"itemId": "item:blueprint-quarry-t1",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -138,8 +138,8 @@
 								"itemId": "item:log"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 1
 						},
@@ -150,8 +150,8 @@
 								"itemId": "item:stone"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 1
 						}
@@ -167,8 +167,8 @@
 											{
 												"itemId": "item:blueprint-sawmill-t1",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -192,8 +192,8 @@
 								"itemId": "item:log"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 1
 						},
@@ -204,8 +204,8 @@
 								"itemId": "item:stone"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 1
 						}
@@ -221,8 +221,8 @@
 											{
 												"itemId": "item:blueprint-shrine-t1",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -246,8 +246,8 @@
 								"itemId": "item:log"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 1
 						},
@@ -258,8 +258,8 @@
 								"itemId": "item:stone"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 1
 						}
@@ -275,8 +275,8 @@
 											{
 												"itemId": "item:blueprint-stonemason-t1",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -300,8 +300,8 @@
 								"itemId": "item:log"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 1
 						},
@@ -312,8 +312,8 @@
 								"itemId": "item:stone"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 1
 						}
@@ -329,8 +329,8 @@
 											{
 												"itemId": "item:blueprint-townhall-t2",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -354,8 +354,8 @@
 								"itemId": "item:log"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 1
 						},
@@ -366,8 +366,8 @@
 								"itemId": "item:stone"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 1
 						}
@@ -383,8 +383,8 @@
 											{
 												"itemId": "item:blueprint-well-t1",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -416,8 +416,8 @@
 											{
 												"itemId": "item:blueprint-bio-waste-processor-t1",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -449,8 +449,8 @@
 											{
 												"itemId": "item:blueprint-cattle-farm-t1",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -482,8 +482,8 @@
 											{
 												"itemId": "item:blueprint-chicken-coop-t1",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -515,8 +515,8 @@
 											{
 												"itemId": "item:blueprint-cookhouse-t1",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -548,8 +548,8 @@
 											{
 												"itemId": "item:blueprint-farm-t1",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -573,8 +573,8 @@
 								"itemId": "item:feast"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 4
 						}
@@ -590,8 +590,8 @@
 											{
 												"itemId": "item:blueprint-house-t1",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -615,8 +615,8 @@
 								"itemId": "item:log"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 1
 						},
@@ -627,8 +627,8 @@
 								"itemId": "item:stone"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 1
 						}
@@ -644,8 +644,8 @@
 											{
 												"itemId": "item:blueprint-library-t1",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -677,8 +677,8 @@
 											{
 												"itemId": "item:blueprint-pig-farm-t1",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -710,8 +710,8 @@
 											{
 												"itemId": "item:blueprint-sheep-pasture-t1",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -743,8 +743,8 @@
 											{
 												"itemId": "item:blueprint-townhall-t3",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -776,8 +776,8 @@
 											{
 												"itemId": "item:blueprint-vegetable-garden-t1",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -809,8 +809,8 @@
 											{
 												"itemId": "item:blueprint-waste-processor-t1",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -842,8 +842,8 @@
 											{
 												"itemId": "item:blueprint-bakery-t1",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -875,8 +875,8 @@
 											{
 												"itemId": "item:blueprint-brewery-t1",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -908,8 +908,8 @@
 											{
 												"itemId": "item:blueprint-dairy-t1",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -933,8 +933,8 @@
 								"itemId": "item:beer"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 4
 						}
@@ -950,8 +950,8 @@
 											{
 												"itemId": "item:blueprint-house-t2",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -983,8 +983,8 @@
 											{
 												"itemId": "item:blueprint-market-t1",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -1016,8 +1016,8 @@
 											{
 												"itemId": "item:blueprint-slaughterhouse-t1",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -1049,8 +1049,8 @@
 											{
 												"itemId": "item:blueprint-tavern-t1",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -1074,8 +1074,8 @@
 								"itemId": "item:feast"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 4
 						}
@@ -1091,8 +1091,8 @@
 											{
 												"itemId": "item:blueprint-townhall-t4",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -1124,8 +1124,8 @@
 											{
 												"itemId": "item:blueprint-windmill-t1",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -1157,8 +1157,8 @@
 											{
 												"itemId": "item:blueprint-winery-t1",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -1190,8 +1190,8 @@
 											{
 												"itemId": "item:blueprint-civic-office-t1",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -1223,8 +1223,8 @@
 											{
 												"itemId": "item:blueprint-library-t2",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -1256,8 +1256,8 @@
 											{
 												"itemId": "item:blueprint-market-t2",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -1289,8 +1289,8 @@
 											{
 												"itemId": "item:blueprint-paper-mill-t1",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -1322,8 +1322,8 @@
 											{
 												"itemId": "item:blueprint-prospector-guild-t1",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -1355,8 +1355,8 @@
 											{
 												"itemId": "item:blueprint-school",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -1388,8 +1388,8 @@
 											{
 												"itemId": "item:blueprint-dye-workshop-t1",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -1421,8 +1421,8 @@
 											{
 												"itemId": "item:blueprint-house-t3",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -1454,8 +1454,8 @@
 											{
 												"itemId": "item:blueprint-tailor-workshop-t1",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -1487,8 +1487,8 @@
 											{
 												"itemId": "item:blueprint-tannery-t1",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -1520,8 +1520,8 @@
 											{
 												"itemId": "item:blueprint-weaver-hut-t1",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -1545,8 +1545,8 @@
 								"itemId": "item:basic-knowledge"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 2
+								"min": 2,
+								"max": 2
 							},
 							"capacity": 2
 						},
@@ -1557,8 +1557,8 @@
 								"itemId": "item:paper"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 2
+								"min": 2,
+								"max": 2
 							},
 							"capacity": 2
 						}
@@ -1574,8 +1574,8 @@
 											{
 												"itemId": "item:blueprint-academy",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -1599,8 +1599,8 @@
 								"itemId": "item:advanced-knowledge"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 3
 						},
@@ -1611,8 +1611,8 @@
 								"itemId": "item:paper"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 3
 						}
@@ -1628,8 +1628,8 @@
 											{
 												"itemId": "item:blueprint-coal-mine-t1",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -1653,8 +1653,8 @@
 								"itemId": "item:advanced-knowledge"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 3
 						},
@@ -1665,8 +1665,8 @@
 								"itemId": "item:paper"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 3
 						}
@@ -1682,8 +1682,8 @@
 											{
 												"itemId": "item:blueprint-gold-mine-t1",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -1707,8 +1707,8 @@
 								"itemId": "item:advanced-knowledge"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 3
 						},
@@ -1719,8 +1719,8 @@
 								"itemId": "item:paper"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 3
 						}
@@ -1736,8 +1736,8 @@
 											{
 												"itemId": "item:blueprint-iron-mine-t1",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -1761,8 +1761,8 @@
 								"itemId": "item:advanced-knowledge"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 3
 						},
@@ -1773,8 +1773,8 @@
 								"itemId": "item:paper"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 2
+								"min": 2,
+								"max": 2
 							},
 							"capacity": 2
 						}
@@ -1790,8 +1790,8 @@
 											{
 												"itemId": "item:blueprint-prospector-guild-t2",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -1815,8 +1815,8 @@
 								"itemId": "item:advanced-knowledge"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 3
 						}
@@ -1832,8 +1832,8 @@
 											{
 												"itemId": "item:blueprint-bio-waste-processor-t2",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -1857,8 +1857,8 @@
 								"itemId": "item:advanced-knowledge"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 3
 						}
@@ -1874,8 +1874,8 @@
 											{
 												"itemId": "item:blueprint-brickyard",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -1899,8 +1899,8 @@
 								"itemId": "item:advanced-knowledge"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 3
 						},
@@ -1911,8 +1911,8 @@
 								"itemId": "item:paper"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 3
 						}
@@ -1928,8 +1928,8 @@
 											{
 												"itemId": "item:blueprint-charcoal-burner-t1",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -1953,8 +1953,8 @@
 								"itemId": "item:advanced-knowledge"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 3
 						},
@@ -1965,8 +1965,8 @@
 								"itemId": "item:clay-deposit"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 3
 						}
@@ -1982,8 +1982,8 @@
 											{
 												"itemId": "item:blueprint-clay-pit",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -2007,8 +2007,8 @@
 								"itemId": "item:advanced-knowledge"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 3
 						}
@@ -2024,8 +2024,8 @@
 											{
 												"itemId": "item:blueprint-construction-yard-t1",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -2049,8 +2049,8 @@
 								"itemId": "item:advanced-knowledge"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 3
 						}
@@ -2066,8 +2066,8 @@
 											{
 												"itemId": "item:blueprint-glassworks",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -2099,8 +2099,8 @@
 											{
 												"itemId": "item:blueprint-library-t3",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -2124,8 +2124,8 @@
 								"itemId": "item:advanced-knowledge"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 3
 						}
@@ -2141,8 +2141,8 @@
 											{
 												"itemId": "item:blueprint-purifier-t1",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -2166,8 +2166,8 @@
 								"itemId": "item:advanced-knowledge"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 3
 						}
@@ -2183,8 +2183,8 @@
 											{
 												"itemId": "item:blueprint-roof-tile-factory",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -2208,8 +2208,8 @@
 								"itemId": "item:advanced-knowledge"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 3
 						},
@@ -2220,8 +2220,8 @@
 								"itemId": "item:sand-deposit"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 3
 						}
@@ -2237,8 +2237,8 @@
 											{
 												"itemId": "item:blueprint-sand-pit",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -2262,8 +2262,8 @@
 								"itemId": "item:advanced-knowledge"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 3
 						}
@@ -2279,8 +2279,8 @@
 											{
 												"itemId": "item:blueprint-smelter-t1",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -2304,8 +2304,8 @@
 								"itemId": "item:advanced-knowledge"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 3
 						}
@@ -2321,8 +2321,8 @@
 											{
 												"itemId": "item:blueprint-waste-processor-t2",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}

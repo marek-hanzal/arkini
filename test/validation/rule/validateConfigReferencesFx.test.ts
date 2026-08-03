@@ -60,8 +60,8 @@ describe("completed config reference validation", () => {
 							itemId: "item:missing-input",
 						},
 						quantity: {
-							type: "value" as const,
-							value: 1,
+							min: 1,
+							max: 1,
 						},
 						capacity: 0,
 						mode: "consume" as const,

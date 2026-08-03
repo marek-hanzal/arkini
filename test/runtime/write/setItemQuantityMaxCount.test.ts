@@ -79,8 +79,8 @@ const config = GameConfigSchema.parse({
 											{
 												itemId: "limited",
 												quantity: {
-													type: "value",
-													value: 1,
+													min: 1,
+													max: 1,
 												},
 												placement: "drop",
 												rules: [],

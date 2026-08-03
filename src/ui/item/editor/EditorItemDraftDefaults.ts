@@ -13,8 +13,8 @@ import type {
 const drop = {
 	itemId: "",
 	quantity: {
-		type: "value",
-		value: 1,
+		min: 1,
+		max: 1,
 	},
 	placement: "drop",
 	rules: [],
@@ -41,8 +41,8 @@ const rolls = {
 	weight: {
 		type: "weight",
 		quantity: {
-			type: "value",
-			value: 1,
+			min: 1,
+			max: 1,
 		},
 		drop: [
 			{
@@ -91,8 +91,8 @@ export const EditorItemDraftDefaults = {
 			},
 			mode: "consume",
 			quantity: {
-				type: "value",
-				value: 1,
+				min: 1,
+				max: 1,
 			},
 			capacity: 0,
 		},

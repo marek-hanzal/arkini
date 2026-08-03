@@ -32,8 +32,8 @@
 							"itemId": "producer:townhall-t3"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 1
+							"min": 1,
+							"max": 1
 						},
 						"charges": {
 							"cost": 1,
@@ -47,8 +47,8 @@
 							"itemId": "item:plank"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 5
+							"min": 5,
+							"max": 5
 						}
 					},
 					{
@@ -58,8 +58,8 @@
 							"itemId": "item:stone-block"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 5
+							"min": 5,
+							"max": 5
 						}
 					},
 					{
@@ -69,8 +69,8 @@
 							"itemId": "item:feast"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 1
+							"min": 1,
+							"max": 1
 						}
 					},
 					{
@@ -80,8 +80,8 @@
 							"itemId": "item:coin"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 2
+							"min": 2,
+							"max": 2
 						}
 					},
 					{
@@ -91,8 +91,8 @@
 							"itemId": "item:morale-t2"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 1
+							"min": 1,
+							"max": 1
 						}
 					},
 					{
@@ -102,8 +102,8 @@
 							"itemId": "item:morale-t1"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 1
+							"min": 1,
+							"max": 1
 						}
 					}
 				],
@@ -234,8 +234,8 @@
 										{
 											"itemId": "producer:townhall-t4",
 											"quantity": {
-												"type": "value",
-												"value": 1
+												"min": 1,
+												"max": 1
 											},
 											"placement": "drop",
 											"rules": []

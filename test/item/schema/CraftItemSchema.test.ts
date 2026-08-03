@@ -31,8 +31,8 @@ const craft = {
 					itemId: "material",
 				},
 				quantity: {
-					type: "value",
-					value: 1,
+					min: 1,
+					max: 1,
 				},
 			},
 		],

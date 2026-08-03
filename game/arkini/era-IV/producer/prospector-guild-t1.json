@@ -30,8 +30,8 @@
 								"itemId": "item:building-permit"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 3
 						},
@@ -42,8 +42,8 @@
 								"itemId": "item:basic-knowledge"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 3
 						},
@@ -54,8 +54,8 @@
 								"itemId": "item:coin"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 7
 						}
@@ -71,8 +71,8 @@
 											{
 												"itemId": "item:clay-deposit",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -96,8 +96,8 @@
 								"itemId": "item:building-permit"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 3
 						},
@@ -108,8 +108,8 @@
 								"itemId": "item:basic-knowledge"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 3
 						},
@@ -120,8 +120,8 @@
 								"itemId": "item:coin"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 7
 						}
@@ -137,8 +137,8 @@
 											{
 												"itemId": "item:sand-deposit",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}

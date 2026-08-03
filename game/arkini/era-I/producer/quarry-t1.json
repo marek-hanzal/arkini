@@ -50,8 +50,8 @@
 											{
 												"itemId": "item:stone",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -64,8 +64,8 @@
 											{
 												"itemId": "item:stone",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -78,8 +78,8 @@
 											{
 												"itemId": "item:stone",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -92,8 +92,8 @@
 											{
 												"itemId": "item:quest:road-repair",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}

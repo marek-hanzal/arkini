@@ -30,8 +30,8 @@ const materialInput = (itemId: string) => ({
 		itemId,
 	},
 	quantity: {
-		type: "value" as const,
-		value: 1,
+		min: 1,
+		max: 1,
 	},
 	capacity: 1,
 	mode: "reserve" as const,
@@ -77,8 +77,8 @@ const config = GameConfigSchema.parse({
 							...materialInput("material"),
 							capacity: 3,
 							quantity: {
-								type: "value",
-								value: 3,
+								min: 3,
+								max: 3,
 							},
 						},
 					],

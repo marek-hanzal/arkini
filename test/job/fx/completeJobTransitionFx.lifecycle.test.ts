@@ -22,8 +22,8 @@ const output = {
 						{
 							itemId: "item:gift",
 							quantity: {
-								type: "value" as const,
-								value: 1,
+								min: 1,
+								max: 1,
 							},
 							placement: "drop" as const,
 							rules: [],
@@ -95,8 +95,8 @@ const lifecycleConfig = GameConfigSchema.parse({
 								itemId: "item:material",
 							},
 							quantity: {
-								type: "value",
-								value: 1,
+								min: 1,
+								max: 1,
 							},
 							capacity: 1,
 						},
@@ -139,8 +139,8 @@ const lifecycleConfig = GameConfigSchema.parse({
 											{
 												itemId: "producer:phoenix",
 												quantity: {
-													type: "value",
-													value: 1,
+													min: 1,
+													max: 1,
 												},
 												placement: "drop",
 												rules: [],

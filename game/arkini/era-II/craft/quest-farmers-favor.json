@@ -28,8 +28,8 @@
 							"itemId": "item:grain"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 2
+							"min": 2,
+							"max": 2
 						},
 						"charges": {
 							"cost": 1,
@@ -43,8 +43,8 @@
 							"itemId": "item:water"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 2
+							"min": 2,
+							"max": 2
 						}
 					},
 					{
@@ -54,8 +54,8 @@
 							"itemId": "item:egg"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 1
+							"min": 1,
+							"max": 1
 						}
 					}
 				],
@@ -70,16 +70,16 @@
 										{
 											"itemId": "item:cheese",
 											"quantity": {
-												"type": "value",
-												"value": 1
+												"min": 1,
+												"max": 1
 											},
 											"rules": []
 										},
 										{
 											"itemId": "item:coin",
 											"quantity": {
-												"type": "value",
-												"value": 1
+												"min": 1,
+												"max": 1
 											},
 											"rules": []
 										}
@@ -96,16 +96,16 @@
 										{
 											"itemId": "item:beer",
 											"quantity": {
-												"type": "value",
-												"value": 1
+												"min": 1,
+												"max": 1
 											},
 											"rules": []
 										},
 										{
 											"itemId": "item:coin",
 											"quantity": {
-												"type": "value",
-												"value": 1
+												"min": 1,
+												"max": 1
 											},
 											"rules": []
 										}

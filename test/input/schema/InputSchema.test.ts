@@ -21,8 +21,8 @@ describe("InputSchema", () => {
 				itemId: "item:water",
 			},
 			quantity: {
-				type: "value",
-				value: 1,
+				min: 1,
+				max: 1,
 			},
 		});
 
@@ -61,8 +61,8 @@ describe("InputSchema", () => {
 					itemId: "item:water",
 				},
 				quantity: {
-					type: "value",
-					value: 1,
+					min: 1,
+					max: 1,
 				},
 			}).success,
 		).toBe(false);

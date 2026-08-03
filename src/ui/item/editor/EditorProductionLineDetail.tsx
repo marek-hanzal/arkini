@@ -21,16 +21,7 @@ import { useEditorProductionLineInlineEdit } from "~/ui/item/editor/useEditorPro
 
 type EditorItemRegistry = Record<string, EditorItem>;
 
-const readQuantityBounds = (quantity: EditorQuantity) =>
-	quantity.type === "value"
-		? {
-				max: quantity.value,
-				min: quantity.value,
-			}
-		: {
-				max: quantity.max,
-				min: quantity.min,
-			};
+const readQuantityBounds = (quantity: EditorQuantity) => quantity;
 
 const formatQuantity = (quantity: EditorQuantity) => {
 	const bounds = readQuantityBounds(quantity);

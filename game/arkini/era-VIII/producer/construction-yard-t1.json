@@ -30,8 +30,8 @@
 								"itemId": "item:bricks"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 2
+								"min": 2,
+								"max": 2
 							},
 							"capacity": 8
 						},
@@ -42,8 +42,8 @@
 								"itemId": "item:glass"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 6
 						},
@@ -54,8 +54,8 @@
 								"itemId": "item:roof-tiles"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 2
+								"min": 2,
+								"max": 2
 							},
 							"capacity": 8
 						},
@@ -66,8 +66,8 @@
 								"itemId": "item:building-permit"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 4
 						},
@@ -78,8 +78,8 @@
 								"itemId": "item:luxury-clothing"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 4
 						},
@@ -90,8 +90,8 @@
 								"itemId": "item:coin"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 3
+								"min": 3,
+								"max": 3
 							},
 							"capacity": 12
 						}
@@ -107,8 +107,8 @@
 											{
 												"itemId": "item:construction-bundle",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -132,8 +132,8 @@
 								"itemId": "item:bricks"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 2
+								"min": 2,
+								"max": 2
 							},
 							"capacity": 8
 						},
@@ -144,8 +144,8 @@
 								"itemId": "item:glass"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 6
 						},
@@ -156,8 +156,8 @@
 								"itemId": "item:roof-tiles"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 2
+								"min": 2,
+								"max": 2
 							},
 							"capacity": 8
 						},
@@ -168,8 +168,8 @@
 								"itemId": "item:building-permit"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 4
 						},
@@ -180,8 +180,8 @@
 								"itemId": "item:luxury-clothing"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 4
 						},
@@ -192,8 +192,8 @@
 								"itemId": "item:coin"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 3
+								"min": 3,
+								"max": 3
 							},
 							"capacity": 12
 						},
@@ -204,8 +204,8 @@
 								"itemId": "item:morale-t3"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 4
 						}
@@ -221,8 +221,8 @@
 											{
 												"itemId": "item:construction-bundle",
 												"quantity": {
-													"type": "value",
-													"value": 2
+													"min": 2,
+													"max": 2
 												},
 												"rules": []
 											}

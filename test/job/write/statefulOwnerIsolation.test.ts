@@ -75,7 +75,6 @@ const config = GameConfigSchema.parse({
 											{
 												itemId: "limited",
 												quantity: {
-													type: "range",
 													min: 1,
 													max: 5,
 												},

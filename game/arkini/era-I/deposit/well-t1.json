@@ -53,8 +53,8 @@
 											{
 												"itemId": "item:water",
 												"quantity": {
-													"type": "value",
-													"value": 2
+													"min": 2,
+													"max": 2
 												},
 												"rules": []
 											}
@@ -67,8 +67,8 @@
 											{
 												"itemId": "item:water",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -81,8 +81,8 @@
 											{
 												"itemId": "item:quest:water-carrier",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}

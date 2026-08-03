@@ -28,8 +28,8 @@
 							"itemId": "item:log"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 2
+							"min": 2,
+							"max": 2
 						},
 						"charges": {
 							"cost": 1,
@@ -43,8 +43,8 @@
 							"itemId": "item:stone"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 2
+							"min": 2,
+							"max": 2
 						}
 					}
 				],
@@ -59,16 +59,16 @@
 										{
 											"itemId": "item:plank",
 											"quantity": {
-												"type": "value",
-												"value": 1
+												"min": 1,
+												"max": 1
 											},
 											"rules": []
 										},
 										{
 											"itemId": "item:coin",
 											"quantity": {
-												"type": "value",
-												"value": 1
+												"min": 1,
+												"max": 1
 											},
 											"rules": []
 										}
@@ -85,16 +85,16 @@
 										{
 											"itemId": "item:stone-block",
 											"quantity": {
-												"type": "value",
-												"value": 1
+												"min": 1,
+												"max": 1
 											},
 											"rules": []
 										},
 										{
 											"itemId": "item:coin",
 											"quantity": {
-												"type": "value",
-												"value": 1
+												"min": 1,
+												"max": 1
 											},
 											"rules": []
 										}

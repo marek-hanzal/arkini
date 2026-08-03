@@ -5,7 +5,6 @@ import { InputEnumSchema } from "~/engine/input/schema/InputEnumSchema";
 import { InputModeEnumSchema } from "~/engine/input/schema/InputModeEnumSchema";
 import type { LineSchema } from "~/engine/line/schema/LineSchema";
 import { readOutputMaximumQuantitiesFx } from "~/engine/output/fx/readOutputMaximumQuantitiesFx";
-import { readQuantityBoundsFx } from "~/engine/quantity/fx/readQuantityBoundsFx";
 
 /** Reads conservative net authored output after guaranteed exact-item consumption. */
 export const readLineNetMaximumOutputQuantitiesFx = Effect.fn(
@@ -26,10 +25,10 @@ export const readLineNetMaximumOutputQuantitiesFx = Effect.fn(
 		) {
 			continue;
 		}
-		const bounds = yield* readQuantityBoundsFx({
-			quantity: input.quantity,
-		});
-		const netQuantity = Math.max(0, (quantities.get(input.selector.itemId) ?? 0) - bounds.min);
+		const netQuantity = Math.max(
+			0,
+			(quantities.get(input.selector.itemId) ?? 0) - input.quantity.min,
+		);
 		if (netQuantity === 0) quantities.delete(input.selector.itemId);
 		else quantities.set(input.selector.itemId, netQuantity);
 	}

@@ -12,7 +12,6 @@ import { EffectEnumSchema } from "~/engine/merge/schema/EffectEnumSchema";
 import { RuleEnumSchema as OutputRuleEnumSchema } from "~/engine/output/schema/drop/rule/RuleEnumSchema";
 import { PlacementEnumSchema } from "~/engine/placement/schema/PlacementEnumSchema";
 import { PlacementFailureReasonEnumSchema } from "~/engine/placement/schema/PlacementFailureReasonEnumSchema";
-import { QuantityEnumSchema } from "~/engine/quantity/schema/QuantityEnumSchema";
 import { QueryScopeEnumSchema } from "~/engine/query/schema/QueryScopeEnumSchema";
 import { RollEnumSchema } from "~/engine/roll/schema/RollEnumSchema";
 import { StorageScopeEnumSchema } from "~/engine/scope/schema/StorageScopeEnumSchema";
@@ -84,10 +83,6 @@ describe("business enum schemas", () => {
 			PlacementFailureReasonEnumSchema.enum.BoardFull,
 			PlacementFailureReasonEnumSchema.enum.InventoryFull,
 			PlacementFailureReasonEnumSchema.enum.ToolbarFull,
-		]);
-		expect(QuantityEnumSchema.options).toEqual([
-			QuantityEnumSchema.enum.Value,
-			QuantityEnumSchema.enum.Range,
 		]);
 		expect(RollEnumSchema.options).toEqual([
 			RollEnumSchema.enum.Guaranteed,

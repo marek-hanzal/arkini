@@ -38,8 +38,8 @@
 											{
 												"itemId": "item:blueprint-paper-mill-t1",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -71,8 +71,8 @@
 											{
 												"itemId": "item:blueprint-school",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -104,8 +104,8 @@
 											{
 												"itemId": "item:blueprint-library-t2",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -137,8 +137,8 @@
 											{
 												"itemId": "item:blueprint-library-t3",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -170,8 +170,8 @@
 											{
 												"itemId": "item:blueprint-library-t4",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -203,8 +203,8 @@
 											{
 												"itemId": "item:blueprint-civic-office-t1",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -236,8 +236,8 @@
 											{
 												"itemId": "item:blueprint-market-t2",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -269,8 +269,8 @@
 											{
 												"itemId": "item:blueprint-prospector-guild-t1",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -302,8 +302,8 @@
 											{
 												"itemId": "item:blueprint-tannery-t1",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -335,8 +335,8 @@
 											{
 												"itemId": "item:blueprint-weaver-hut-t1",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -368,8 +368,8 @@
 											{
 												"itemId": "item:blueprint-dye-workshop-t1",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -401,8 +401,8 @@
 											{
 												"itemId": "item:blueprint-tailor-workshop-t1",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -434,8 +434,8 @@
 											{
 												"itemId": "item:blueprint-house-t3",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}

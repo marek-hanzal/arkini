@@ -30,8 +30,8 @@
 								"itemId": "item:water"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 2
+								"min": 2,
+								"max": 2
 							},
 							"capacity": 4
 						},
@@ -62,8 +62,8 @@
 											{
 												"itemId": "item:grain",
 												"quantity": {
-													"type": "value",
-													"value": 2
+													"min": 2,
+													"max": 2
 												},
 												"rules": []
 											}
@@ -76,8 +76,8 @@
 											{
 												"itemId": "item:grain",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -90,8 +90,8 @@
 											{
 												"itemId": "item:quest:farmers-favor",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -115,8 +115,8 @@
 								"itemId": "item:water"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 2
+								"min": 2,
+								"max": 2
 							},
 							"capacity": 4
 						},
@@ -127,8 +127,8 @@
 								"itemId": "item:morale-t1"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 4
 						},
@@ -159,8 +159,8 @@
 											{
 												"itemId": "item:grain",
 												"quantity": {
-													"type": "value",
-													"value": 4
+													"min": 4,
+													"max": 4
 												},
 												"rules": []
 											}
@@ -173,8 +173,8 @@
 											{
 												"itemId": "item:grain",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}

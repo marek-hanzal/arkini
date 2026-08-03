@@ -147,8 +147,8 @@ export const guaranteedMergeOutput = ({
 							itemId,
 							placement,
 							quantity: {
-								type: "value",
-								value: quantity,
+								min: quantity,
+								max: quantity,
 							},
 							rules: [],
 						},
@@ -171,8 +171,8 @@ export const weightedMergeOutput = (): OutputSchema.Type => ({
 							itemId: "output:a",
 							placement: "drop",
 							quantity: {
-								type: "value",
-								value: 2,
+								min: 2,
+								max: 2,
 							},
 							rules: [],
 						},
@@ -190,8 +190,8 @@ export const weightedMergeOutput = (): OutputSchema.Type => ({
 							itemId: "output:b",
 							placement: "drop",
 							quantity: {
-								type: "value",
-								value: 2,
+								min: 2,
+								max: 2,
 							},
 							rules: [],
 						},

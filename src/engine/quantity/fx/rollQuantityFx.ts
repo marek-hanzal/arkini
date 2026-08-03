@@ -1,11 +1,6 @@
-import { Effect } from "effect";
-import { match } from "ts-pattern";
+import { Effect, Random } from "effect";
 
-import { QuantityEnumSchema } from "~/engine/quantity/schema/QuantityEnumSchema";
 import type { QuantitySchema } from "~/engine/quantity/schema/QuantitySchema";
-
-import { rollQuantityRangeFx } from "./rollQuantityRangeFx";
-import { rollQuantityValueFx } from "./rollQuantityValueFx";
 
 export namespace rollQuantityFx {
 	export interface Props {
@@ -14,31 +9,12 @@ export namespace rollQuantityFx {
 }
 
 /**
- * Dispatches a quantity configuration to its specialized resolver.
+ * Selects one integer from the configured inclusive quantity bounds.
  */
 export const rollQuantityFx = Effect.fn("rollQuantityFx")(function* ({
 	quantity,
 }: rollQuantityFx.Props) {
-	return yield* match(quantity)
-		.with(
-			{
-				type: QuantityEnumSchema.enum.Value,
-			},
-			(quantity) => {
-				return rollQuantityValueFx({
-					quantity,
-				});
-			},
-		)
-		.with(
-			{
-				type: QuantityEnumSchema.enum.Range,
-			},
-			(quantity) => {
-				return rollQuantityRangeFx({
-					quantity,
-				});
-			},
-		)
-		.exhaustive();
+	if (quantity.min === quantity.max) return quantity.min;
+
+	return yield* Random.nextIntBetween(quantity.min, quantity.max);
 });

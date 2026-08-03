@@ -194,8 +194,8 @@ describe("editor item flow", () => {
 							},
 							mode: "reserve",
 							quantity: {
-								type: "value",
-								value: 1,
+								min: 1,
+								max: 1,
 							},
 							capacity: 0,
 						},
@@ -211,8 +211,8 @@ describe("editor item flow", () => {
 											{
 												itemId: "item:water",
 												quantity: {
-													type: "value",
-													value: 1,
+													min: 1,
+													max: 1,
 												},
 												placement: "drop",
 												rules: [],

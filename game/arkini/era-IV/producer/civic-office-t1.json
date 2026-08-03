@@ -30,8 +30,8 @@
 								"itemId": "item:paper"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 3
 						},
@@ -42,8 +42,8 @@
 								"itemId": "item:basic-knowledge"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 3
 						},
@@ -54,8 +54,8 @@
 								"itemId": "item:coin"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 7
 						}
@@ -71,8 +71,8 @@
 											{
 												"itemId": "item:building-permit",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -96,8 +96,8 @@
 								"itemId": "item:paper"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 3
 						},
@@ -108,8 +108,8 @@
 								"itemId": "item:basic-knowledge"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 3
 						},
@@ -120,8 +120,8 @@
 								"itemId": "item:coin"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 7
 						},
@@ -132,8 +132,8 @@
 								"itemId": "item:morale-t2"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 3
 						}
@@ -149,8 +149,8 @@
 											{
 												"itemId": "item:building-permit",
 												"quantity": {
-													"type": "value",
-													"value": 2
+													"min": 2,
+													"max": 2
 												},
 												"rules": []
 											}
@@ -174,8 +174,8 @@
 								"itemId": "item:basic-knowledge"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 2
+								"min": 2,
+								"max": 2
 							},
 							"capacity": 2
 						},
@@ -186,8 +186,8 @@
 								"itemId": "item:paper"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 2
+								"min": 2,
+								"max": 2
 							},
 							"capacity": 2
 						}
@@ -203,8 +203,8 @@
 											{
 												"itemId": "item:blueprint-academy",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -228,8 +228,8 @@
 								"itemId": "item:construction-bundle"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 3
 						},
@@ -240,8 +240,8 @@
 								"itemId": "item:advanced-knowledge"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 3
 						},
@@ -252,8 +252,8 @@
 								"itemId": "item:building-permit"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 3
 						},
@@ -264,8 +264,8 @@
 								"itemId": "item:luxury-clothing"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 3
 						},
@@ -276,8 +276,8 @@
 								"itemId": "item:coin"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 8
+								"min": 8,
+								"max": 8
 							},
 							"capacity": 12
 						}
@@ -293,8 +293,8 @@
 											{
 												"itemId": "item:guild-charter",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}

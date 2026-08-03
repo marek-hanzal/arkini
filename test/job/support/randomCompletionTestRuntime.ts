@@ -77,7 +77,6 @@ export const createRandomCompletionConfig = () => {
 													itemId: "outputA",
 													placement: "random",
 													quantity: {
-														type: "range",
 														min: 1,
 														max: 3,
 													},
@@ -97,7 +96,6 @@ export const createRandomCompletionConfig = () => {
 													itemId: "outputB",
 													placement: "random",
 													quantity: {
-														type: "range",
 														min: 1,
 														max: 3,
 													},

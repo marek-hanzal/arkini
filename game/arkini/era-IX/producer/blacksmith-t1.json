@@ -30,8 +30,8 @@
 								"itemId": "item:iron-ingot"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 6
 						},
@@ -42,8 +42,8 @@
 								"itemId": "item:charcoal"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 6
 						}
@@ -76,8 +76,8 @@
 											{
 												"itemId": "item:nails",
 												"quantity": {
-													"type": "value",
-													"value": 6
+													"min": 6,
+													"max": 6
 												},
 												"rules": []
 											}
@@ -90,8 +90,8 @@
 											{
 												"itemId": "item:pollution",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -104,8 +104,8 @@
 											{
 												"itemId": "item:pollution",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -129,8 +129,8 @@
 								"itemId": "item:iron-ingot"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 6
 						},
@@ -141,8 +141,8 @@
 								"itemId": "item:plank"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 6
 						},
@@ -153,8 +153,8 @@
 								"itemId": "item:charcoal"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 6
 						}
@@ -187,8 +187,8 @@
 											{
 												"itemId": "item:axe",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -201,8 +201,8 @@
 											{
 												"itemId": "item:pollution",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -215,8 +215,8 @@
 											{
 												"itemId": "item:pollution",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -240,8 +240,8 @@
 								"itemId": "item:iron-ingot"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 6
 						},
@@ -252,8 +252,8 @@
 								"itemId": "item:plank"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 6
 						},
@@ -264,8 +264,8 @@
 								"itemId": "item:charcoal"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 6
 						}
@@ -298,8 +298,8 @@
 											{
 												"itemId": "item:pickaxe",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -312,8 +312,8 @@
 											{
 												"itemId": "item:pollution",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -326,8 +326,8 @@
 											{
 												"itemId": "item:pollution",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -351,8 +351,8 @@
 								"itemId": "item:iron-ingot"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 2
+								"min": 2,
+								"max": 2
 							},
 							"capacity": 6
 						},
@@ -363,8 +363,8 @@
 								"itemId": "item:leather"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 6
 						},
@@ -375,8 +375,8 @@
 								"itemId": "item:charcoal"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 6
 						}
@@ -409,8 +409,8 @@
 											{
 												"itemId": "item:sword",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -423,8 +423,8 @@
 											{
 												"itemId": "item:pollution",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -437,8 +437,8 @@
 											{
 												"itemId": "item:pollution",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}

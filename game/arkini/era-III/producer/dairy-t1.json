@@ -30,8 +30,8 @@
 								"itemId": "item:milk"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 3
+								"min": 3,
+								"max": 3
 							},
 							"capacity": 4
 						}
@@ -47,8 +47,8 @@
 											{
 												"itemId": "item:cheese",
 												"quantity": {
-													"type": "value",
-													"value": 2
+													"min": 2,
+													"max": 2
 												},
 												"rules": []
 											}

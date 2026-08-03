@@ -20,6 +20,10 @@ import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { ResourceSchema } from "~/engine/pack/schema/ResourceSchema";
 
 const databaseName = "arkini-editor";
+const stores = {
+	projects: "&projectId, updatedAtMs",
+	resources: "&[projectId+id], projectId",
+};
 
 const createRepositoryError = (
 	operation: EditorProjectRepositoryOperation,
@@ -121,10 +125,14 @@ export const createIndexedDbEditorProjectRepositoryFx = Effect.fn(
 					IDBKeyRange,
 				}),
 	});
-	database.version(1).stores({
-		projects: "&projectId, updatedAtMs",
-		resources: "&[projectId+id], projectId",
-	});
+	database.version(1).stores(stores);
+	database
+		.version(2)
+		.stores(stores)
+		.upgrade(async (transaction) => {
+			await transaction.table("resources").clear();
+			await transaction.table("projects").clear();
+		});
 	const projects = database.table<EditorProjectRecordSchemaType.Type, string>("projects");
 	const resources = database.table<
 		EditorProjectResourceRecordSchemaType.Type,

@@ -30,8 +30,8 @@
 								"itemId": "item:paper"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 2
+								"min": 2,
+								"max": 2
 							},
 							"capacity": 2
 						},
@@ -42,8 +42,8 @@
 								"itemId": "item:coin"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 7
 						}
@@ -59,8 +59,8 @@
 											{
 												"itemId": "item:basic-knowledge",
 												"quantity": {
-													"type": "value",
-													"value": 2
+													"min": 2,
+													"max": 2
 												},
 												"rules": []
 											}
@@ -84,8 +84,8 @@
 								"itemId": "item:paper"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 2
+								"min": 2,
+								"max": 2
 							},
 							"capacity": 2
 						},
@@ -96,8 +96,8 @@
 								"itemId": "item:coin"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 7
 						},
@@ -108,8 +108,8 @@
 								"itemId": "item:morale-t2"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 3
 						}
@@ -125,8 +125,8 @@
 											{
 												"itemId": "item:basic-knowledge",
 												"quantity": {
-													"type": "value",
-													"value": 4
+													"min": 4,
+													"max": 4
 												},
 												"rules": []
 											}

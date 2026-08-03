@@ -31,8 +31,8 @@ const materialInput = (itemId: string) => ({
 		itemId,
 	},
 	quantity: {
-		type: "value" as const,
-		value: 1,
+		min: 1,
+		max: 1,
 	},
 	capacity: 0,
 	mode: "consume" as const,
@@ -59,8 +59,8 @@ const line = (id: string, itemId: string, outputItemId?: string) => ({
 										{
 											itemId: outputItemId,
 											quantity: {
-												type: "value" as const,
-												value: 1,
+												min: 1,
+												max: 1,
 											},
 											placement: "drop" as const,
 											rules: [],

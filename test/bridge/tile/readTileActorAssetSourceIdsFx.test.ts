@@ -77,8 +77,8 @@ const config = GameConfigSchema.parse({
 							itemId: "material",
 						},
 						quantity: {
-							type: "value",
-							value: 6,
+							min: 6,
+							max: 6,
 						},
 						capacity: 3,
 					},
@@ -119,8 +119,8 @@ const config = GameConfigSchema.parse({
 							itemId: "material",
 						},
 						quantity: {
-							type: "value",
-							value: 3,
+							min: 3,
+							max: 3,
 						},
 					},
 					{
@@ -130,8 +130,8 @@ const config = GameConfigSchema.parse({
 							itemId: "material",
 						},
 						quantity: {
-							type: "value",
-							value: 3,
+							min: 3,
+							max: 3,
 						},
 					},
 				],

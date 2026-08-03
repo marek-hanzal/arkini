@@ -63,8 +63,8 @@ describe("TemporaryItemSchema", () => {
 										{
 											itemId: "item:ash",
 											quantity: {
-												type: "value",
-												value: 1,
+												min: 1,
+												max: 1,
 											},
 											rules: [],
 										},

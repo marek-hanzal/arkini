@@ -20,6 +20,7 @@ import {
 	type EditorItemSectionId,
 } from "~/ui/item/editor/EditorItemSections";
 import { EditorItemThumbnail } from "~/ui/item/editor/EditorItemThumbnail";
+import { EditorProductionLineInlineCreate } from "~/ui/item/editor/EditorProductionLineInlineCreate";
 import { EditorProductionLineDetail } from "~/ui/item/editor/EditorProductionLineDetail";
 import { useEditorItemByUid } from "~/ui/item/editor/useEditorItemByUid";
 
@@ -215,11 +216,29 @@ const readProductionLines = (item: EditorItem): ReadonlyArray<EditorLine> => {
 
 const ProductionDetail = ({ item }: { readonly item: EditorItem }) => {
 	const lines = readProductionLines(item);
-	if (lines.length > 0) {
+	if (item.type === "deposit" || item.type === "producer") {
 		return (
 			<div className="ak-list grid gap-1">
 				{lines.map((line) => (
 					<EditorProductionLineDetail
+						item={item}
+						key={line.id}
+						line={line}
+					/>
+				))}
+				<EditorProductionLineInlineCreate item={item} />
+			</div>
+		);
+	}
+	if (
+		(item.type === "blueprint" || item.type === "craft" || item.type === "stash") &&
+		lines.length > 0
+	) {
+		return (
+			<div className="ak-list grid gap-1">
+				{lines.map((line) => (
+					<EditorProductionLineDetail
+						item={item}
 						key={line.id}
 						line={line}
 					/>

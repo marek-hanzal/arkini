@@ -10,12 +10,15 @@ import type {
 	EditorQuantity,
 	EditorSelector,
 } from "~/bridge/item/editor/EditorItemModel";
+import type { EditorLineOwnerItem } from "~/bridge/item/editor/replaceEditorItemLineFx";
 import type { ItemDetailLines } from "~/bridge/item-detail/ItemDetailLines";
 import { ButtonLink } from "~/ui/button/Button";
 import { readItemTraitLabel } from "~/ui/item-detail/ItemInfoPresentation";
 import { ItemLineOutputs } from "~/ui/item-detail/ItemLineOutputs";
 import { formatItemDuration } from "~/ui/item-detail/ItemRuntime";
 import { EditorItemThumbnail } from "~/ui/item/editor/EditorItemThumbnail";
+import { EditorProductionLineInlineFields } from "~/ui/item/editor/EditorProductionLineInlineFields";
+import { useEditorProductionLineInlineEdit } from "~/ui/item/editor/useEditorProductionLineInlineEdit";
 
 type EditorItemRegistry = Record<string, EditorItem>;
 
@@ -250,37 +253,81 @@ const renderOutputItem = (
 };
 
 /** Mirrors the game's product-line overview without runtime commands, state, progress, or motion. */
-export const EditorProductionLineDetail = ({ line }: { readonly line: EditorLine }) => {
+export const EditorProductionLineDetail = ({
+	item,
+	line,
+}: {
+	readonly item: EditorLineOwnerItem;
+	readonly line: EditorLine;
+}) => {
 	const project = useEditorProject();
 	const items = project.config?.items ?? {};
+	const { discard, draft, errors, mutationError, pending, save, start, updateDraft } =
+		useEditorProductionLineInlineEdit(item, line);
 	return (
 		<article
 			className="ak-list-row overflow-hidden rounded-xl border-b border-l-2 border-line border-l-line/55 px-3 py-5 pl-4 first:pt-3 last:border-b-0 last:pb-5"
 			data-ui="EditorProductionLineDetail"
 			data-line-id={line.id}
 		>
-			<div className="relative z-[1] flex flex-wrap items-start justify-between gap-4">
-				<div className="min-w-0 flex-1">
-					<div className="flex flex-wrap items-center gap-2">
-						<h3 className="text-lg font-semibold leading-tight text-foreground">
-							{line.title}
-						</h3>
-						{!line.enable ? (
-							<span className="rounded-full border border-danger/35 bg-danger/10 px-2.5 py-1 text-xs font-semibold text-foreground">
-								Disabled
-							</span>
-						) : null}
-						{line.default ? (
-							<span className="rounded-full border border-accent/35 bg-accent/10 px-2.5 py-1 text-xs font-semibold text-foreground">
-								Default
-							</span>
-						) : null}
+			<div className="relative z-[1]">
+				{draft === undefined ? (
+					<div className="flex flex-wrap items-start justify-between gap-4">
+						<div className="min-w-0 flex-1">
+							<div className="flex flex-wrap items-center gap-2">
+								<button
+									type="button"
+									className="cursor-pointer text-left text-lg font-semibold leading-tight text-accent hover:text-accent-hover"
+									onClick={start}
+								>
+									{line.title}
+								</button>
+								{!line.enable ? (
+									<span className="rounded-full border border-danger/35 bg-danger/10 px-2.5 py-1 text-xs font-semibold text-foreground">
+										Disabled
+									</span>
+								) : null}
+								{line.default ? (
+									<span className="rounded-full border border-accent/35 bg-accent/10 px-2.5 py-1 text-xs font-semibold text-foreground">
+										Default
+									</span>
+								) : null}
+							</div>
+							<p className="mt-2 max-w-3xl text-sm leading-relaxed text-muted">
+								{line.description}
+							</p>
+						</div>
+						<EditorLineRuntime runtimeMs={line.runtimeMs} />
 					</div>
-					<p className="mt-2 max-w-3xl text-sm leading-relaxed text-muted">
-						{line.description}
-					</p>
-				</div>
-				<EditorLineRuntime runtimeMs={line.runtimeMs} />
+				) : (
+					<>
+						<div className="flex justify-end gap-4 text-sm font-semibold">
+							<button
+								type="button"
+								className="cursor-pointer text-muted hover:text-foreground"
+								disabled={pending}
+								onClick={discard}
+							>
+								Discard
+							</button>
+							<button
+								type="button"
+								className="cursor-pointer text-accent hover:text-accent-hover disabled:opacity-60"
+								disabled={pending}
+								onClick={() => void save()}
+							>
+								{pending ? "Saving…" : "Save"}
+							</button>
+						</div>
+						<div className="mt-2">
+							<EditorProductionLineInlineFields
+								draft={draft}
+								errors={errors}
+								updateDraft={updateDraft}
+							/>
+						</div>
+					</>
+				)}
 			</div>
 			<div className="relative z-[1] mt-4 grid min-w-0 grid-cols-[minmax(0,1fr)_2rem_minmax(0,1fr)] gap-x-4">
 				<EditorLineInputs
@@ -300,6 +347,11 @@ export const EditorProductionLineDetail = ({ line }: { readonly line: EditorLine
 					renderItem={(item) => renderOutputItem(item, items, project.projectId)}
 				/>
 			</div>
+			{mutationError === undefined ? null : (
+				<p className="relative z-[1] mt-3 text-sm text-danger">
+					{mutationError instanceof Error ? mutationError.message : String(mutationError)}
+				</p>
+			)}
 		</article>
 	);
 };

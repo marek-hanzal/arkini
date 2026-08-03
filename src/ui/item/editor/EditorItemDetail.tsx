@@ -6,6 +6,7 @@ import { editorBackLinkClassName, EditorBackIcon } from "~/ui/editor/EditorBackI
 import { EditorSectionNavigation } from "~/ui/editor/EditorSectionNavigation";
 import { EditorSectionPage } from "~/ui/editor/EditorSectionPage";
 import { EditorSectionTabs } from "~/ui/editor/EditorSectionTabs";
+import { EditorRootCard } from "~/ui/editor/EditorRootCard";
 import { EditorItemNotFound } from "~/ui/item/editor/EditorItemNotFound";
 import { EditorItemSectionLink } from "~/ui/item/editor/EditorItemSectionLink";
 import {
@@ -84,7 +85,7 @@ export const EditorItemDetail = ({
 				/>
 			}
 		>
-			{children}
+			<EditorRootCard dataUi="EditorItemDetailCard">{children}</EditorRootCard>
 		</EditorSectionPage>
 	);
 };

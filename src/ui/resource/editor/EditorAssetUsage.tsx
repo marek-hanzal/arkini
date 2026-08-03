@@ -13,12 +13,13 @@ export const EditorAssetUsage = ({ resourceId }: { readonly resourceId: string }
 				description="No saved project or item currently references this asset."
 				icon="icon-[lucide--unlink]"
 				title="This asset is not used"
+				variant="flat"
 			/>
 		);
 	}
 	return (
 		<section
-			className="grid gap-2"
+			className="ak-list grid gap-2"
 			aria-label="Asset usage"
 		>
 			{usages.map((usage) => {
@@ -42,14 +43,14 @@ export const EditorAssetUsage = ({ resourceId }: { readonly resourceId: string }
 							itemUid: usage.ownerUid,
 							sectionId: "artwork",
 						}}
-						className="min-h-0 min-w-0 justify-start gap-3 p-4 text-left shadow-none"
+						className="ak-list-row ak-list-row-interactive min-h-0 min-w-0 justify-start gap-3 border-0 p-4 text-left shadow-none"
 					>
 						{content}
 					</ButtonLink>
 				) : (
 					<div
 						key={`project:${usage.roleLabel}`}
-						className="flex min-w-0 items-center gap-3 rounded-lg border border-line bg-surface/70 p-4"
+						className="ak-list-row flex min-w-0 items-center gap-3 rounded-lg p-4"
 					>
 						{content}
 					</div>

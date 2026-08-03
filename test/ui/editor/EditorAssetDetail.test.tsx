@@ -17,8 +17,8 @@ vi.mock("~/bridge/resource/editor/useEditorResourceUsages", () => ({
 	useEditorResourceUsages: () => state.usages,
 }));
 
-vi.mock("~/ui/button/Button", () => ({
-	ButtonLink: ({ children, params, to }: Record<string, unknown>) =>
+vi.mock("~/ui/button/Button", () => {
+	const RenderLink = ({ children, params, to }: Record<string, unknown>) =>
 		createElement(
 			"a",
 			{
@@ -26,9 +26,14 @@ vi.mock("~/ui/button/Button", () => ({
 				"data-to": to,
 			},
 			children as ReactNode,
-		),
-}));
+		);
+	return {
+		ButtonLink: RenderLink,
+		PrimaryButtonLink: RenderLink,
+	};
+});
 
+import { EditorAssetDetail } from "~/ui/resource/editor/EditorAssetDetail";
 import { EditorAssetUsage } from "~/ui/resource/editor/EditorAssetUsage";
 
 (
@@ -74,6 +79,25 @@ const render = async (node: ReactNode) => {
 };
 
 describe("editor asset detail", () => {
+	it("owns one root card around the active detail section", async () => {
+		const container = await render(
+			createElement(
+				EditorAssetDetail,
+				{
+					filter: "all",
+					query: "",
+					resourceId: "item-water",
+				},
+				createElement("span", null, "Overview body"),
+			),
+		);
+
+		expect(container.querySelectorAll('[data-ui="EditorAssetDetailCard"]')).toHaveLength(1);
+		expect(container.querySelector('[data-ui="EditorAssetDetailCard"]')?.textContent).toContain(
+			"Overview body",
+		);
+	});
+
 	it("distinguishes an unused asset from saved item references", async () => {
 		let container = await render(
 			createElement(EditorAssetUsage, {

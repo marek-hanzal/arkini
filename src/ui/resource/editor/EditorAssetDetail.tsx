@@ -5,6 +5,7 @@ import { ButtonLink, PrimaryButtonLink } from "~/ui/button/Button";
 import { EditorSectionNavigation } from "~/ui/editor/EditorSectionNavigation";
 import { EditorSectionPage } from "~/ui/editor/EditorSectionPage";
 import { EditorSectionTabs } from "~/ui/editor/EditorSectionTabs";
+import { EditorRootCard } from "~/ui/editor/EditorRootCard";
 import { editorBackLinkClassName, EditorBackIcon } from "~/ui/editor/EditorBackIcon";
 import { EditorAssetDetailTab } from "~/ui/resource/editor/EditorAssetDetailTab";
 import { useEditorAssetById } from "~/ui/resource/editor/useEditorAssetById";
@@ -110,7 +111,7 @@ export const EditorAssetDetail = ({
 				/>
 			}
 		>
-			{children}
+			<EditorRootCard dataUi="EditorAssetDetailCard">{children}</EditorRootCard>
 		</EditorSectionPage>
 	);
 };

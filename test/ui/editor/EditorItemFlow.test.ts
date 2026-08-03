@@ -132,6 +132,10 @@ describe("editor item flow", () => {
 
 		expect(container.textContent).toContain("Water");
 		expect(container.textContent).toContain("Fresh water.");
+		expect(container.textContent).toContain("Simple item");
+		expect(container.textContent).toContain("Board, Inventory & Toolbar");
+		expect(container.textContent).toContain("Single item");
+		expect(container.querySelectorAll('[data-ui="EditorItemDetailCard"]')).toHaveLength(1);
 		expect(container.textContent).not.toContain('"maxStackSize"');
 		expect(edit?.dataset.params).toContain(item.uid);
 		expect(edit?.dataset.params).toContain("identity");

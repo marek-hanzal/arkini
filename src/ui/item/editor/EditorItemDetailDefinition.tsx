@@ -13,6 +13,7 @@ import type {
 	EditorSelector,
 	EditorWhen,
 } from "~/bridge/item/editor/EditorItemModel";
+import { ItemInfoFact, ItemInfoFacts } from "~/ui/item-detail/ItemInfoPresentation";
 
 export const DetailSection = ({
 	children,
@@ -23,7 +24,7 @@ export const DetailSection = ({
 	readonly description?: string;
 	readonly title: string;
 }) => (
-	<section className="grid gap-4 border-b border-line pb-6 last:border-0 last:pb-0">
+	<section className="grid gap-4 border-t border-line pt-5 first:border-t-0 first:pt-0">
 		<header>
 			<h2 className="text-lg font-semibold">{title}</h2>
 			{description === undefined ? null : (
@@ -35,7 +36,7 @@ export const DetailSection = ({
 );
 
 export const DetailFacts = ({ children }: { readonly children: ReactNode }) => (
-	<dl className="grid gap-x-6 gap-y-4 sm:grid-cols-2">{children}</dl>
+	<ItemInfoFacts>{children}</ItemInfoFacts>
 );
 
 export const DetailFact = ({
@@ -47,12 +48,11 @@ export const DetailFact = ({
 	readonly mono?: boolean;
 	readonly value: ReactNode;
 }) => (
-	<div className="min-w-0">
-		<dt className="text-xs uppercase tracking-wider text-subtle">{label}</dt>
-		<dd className={`mt-1 break-words text-sm text-foreground ${mono ? "font-mono" : ""}`}>
-			{value}
-		</dd>
-	</div>
+	<ItemInfoFact
+		label={label}
+		mono={mono}
+		value={value}
+	/>
 );
 
 export const EmptyDetail = ({ children }: { readonly children: ReactNode }) => (
@@ -82,7 +82,7 @@ const WhenDetail = ({ when }: { readonly when: EditorWhen }) => (
 );
 
 const RuleDetail = ({ rule }: { readonly rule: EditorDropRule | EditorLineRule }) => (
-	<li className="border-t border-line py-3 first:border-0 first:pt-0 last:pb-0">
+	<li className="py-3 first:pt-0 last:pb-0">
 		<p className="font-medium capitalize">
 			{rule.type}
 			{"multiplier" in rule ? ` × ${rule.multiplier}` : ""}
@@ -117,7 +117,7 @@ const RulesDetail = ({
 	);
 
 const DropDetail = ({ drop }: { readonly drop: EditorDrop }) => (
-	<li className="border-t border-line py-3 first:border-0 first:pt-0 last:pb-0">
+	<li className="py-3 first:pt-0 last:pb-0">
 		<DetailFacts>
 			<DetailFact
 				label="Item"
@@ -145,18 +145,18 @@ const DropDetail = ({ drop }: { readonly drop: EditorDrop }) => (
 const RollDetail = ({ roll }: { readonly roll: EditorRoll }) => {
 	if (roll.type === "weight") {
 		return (
-			<li className="border-t border-line py-3 first:border-0 first:pt-0 last:pb-0">
-				<p className="font-medium capitalize">
+			<li className="grid gap-3 py-3 first:pt-0 last:pb-0">
+				<p className="text-xs font-medium uppercase tracking-[0.08em] text-muted">
 					{roll.type} · {formatQuantity(roll.quantity)} picks
 				</p>
-				<ul className="mt-2 border-l border-line pl-4">
+				<ul className="grid gap-3">
 					{roll.drop.map((candidate, index) => (
 						<li
-							className="border-t border-line py-3 first:border-0 first:pt-0"
+							className="border-l border-line pl-3"
 							key={`${candidate.weight}-${index}`}
 						>
 							<p className="text-sm text-muted">Weight {candidate.weight}</p>
-							<ul className="mt-2 border-l border-line pl-4">
+							<ul className="mt-2 divide-y divide-line/60">
 								{candidate.drop.map((drop, dropIndex) => (
 									<DropDetail
 										drop={drop}
@@ -171,12 +171,12 @@ const RollDetail = ({ roll }: { readonly roll: EditorRoll }) => {
 		);
 	}
 	return (
-		<li className="border-t border-line py-3 first:border-0 first:pt-0 last:pb-0">
-			<p className="font-medium capitalize">
+		<li className="grid gap-2 py-3 first:pt-0 last:pb-0">
+			<p className="text-xs font-medium uppercase tracking-[0.08em] text-muted">
 				{roll.type}
 				{roll.type === "chance" ? ` · ${Math.round(roll.chance * 100)}%` : ""}
 			</p>
-			<ul className="mt-2 border-l border-line pl-4">
+			<ul className="divide-y divide-line/60">
 				{roll.drop.map((drop, index) => (
 					<DropDetail
 						drop={drop}
@@ -192,16 +192,16 @@ export const OutputDetail = ({ output }: { readonly output?: EditorOutput }) =>
 	output === undefined ? (
 		<EmptyDetail>No output.</EmptyDetail>
 	) : (
-		<div className="grid gap-3">
+		<div className="divide-y divide-line/60">
 			{output.set.map((set, index) => (
 				<section
-					className="border-t border-line pt-3 first:border-0 first:pt-0"
+					className="py-2 first:pt-0 last:pb-0"
 					key={`set-${index}`}
 				>
 					<p className="text-sm font-medium">
 						Set {index + 1} · weight {set.weight ?? 1}
 					</p>
-					<ul className="mt-2 border-l border-line pl-4">
+					<ul className="mt-2 divide-y divide-line/60">
 						{set.roll.map((roll, rollIndex) => (
 							<RollDetail
 								key={`${roll.type}-${rollIndex}`}
@@ -257,7 +257,7 @@ const InputDetail = ({ input }: { readonly input: EditorInput }) => (
 );
 
 export const LineDetail = ({ line }: { readonly line: EditorLine }) => (
-	<article className="grid gap-4 border-b border-line pb-6 last:border-0 last:pb-0">
+	<article className="grid gap-5 border-b border-line pb-6 last:border-0 last:pb-0">
 		<header>
 			<div className="flex flex-wrap items-baseline gap-2">
 				<h3 className="text-base font-semibold">{line.title}</h3>
@@ -284,8 +284,10 @@ export const LineDetail = ({ line }: { readonly line: EditorLine }) => (
 			/>
 		</DetailFacts>
 		<section>
-			<h4 className="text-sm font-semibold">Inputs</h4>
-			<ul className="mt-2 border-l border-line pl-4">
+			<h4 className="border-b border-line pb-2 text-xs font-semibold uppercase tracking-[0.08em] text-muted">
+				Inputs
+			</h4>
+			<ul className="divide-y divide-line/60">
 				{line.input.map((input, index) => (
 					<InputDetail
 						input={input}
@@ -295,14 +297,18 @@ export const LineDetail = ({ line }: { readonly line: EditorLine }) => (
 			</ul>
 		</section>
 		<section>
-			<h4 className="text-sm font-semibold">Output</h4>
-			<div className="mt-2 border-l border-line pl-4">
+			<h4 className="border-b border-line pb-2 text-xs font-semibold uppercase tracking-[0.08em] text-muted">
+				Output
+			</h4>
+			<div className="pt-3">
 				<OutputDetail output={line.output} />
 			</div>
 		</section>
 		<section>
-			<h4 className="text-sm font-semibold">Rules</h4>
-			<div className="mt-2 border-l border-line pl-4">
+			<h4 className="border-b border-line pb-2 text-xs font-semibold uppercase tracking-[0.08em] text-muted">
+				Rules
+			</h4>
+			<div className="pt-3">
 				<RulesDetail rules={line.rules} />
 			</div>
 		</section>

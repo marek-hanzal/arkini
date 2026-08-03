@@ -1,5 +1,12 @@
 import type { EditorItem, EditorLine, EditorMerge } from "~/bridge/item/editor/EditorItemModel";
 import {
+	ItemInfoFact,
+	ItemInfoFacts,
+	ItemStorageScopeLabel,
+	ItemTraits,
+	ItemTypeLabel,
+} from "~/ui/item-detail/ItemInfoPresentation";
+import {
 	DetailFact,
 	DetailFacts,
 	DetailSection,
@@ -17,54 +24,50 @@ import { EditorItemThumbnail } from "~/ui/item/editor/EditorItemThumbnail";
 import { useEditorItemByUid } from "~/ui/item/editor/useEditorItemByUid";
 
 const IdentityDetail = ({ item }: { readonly item: EditorItem }) => (
-	<div className="grid gap-6">
-		<DetailSection title="Identity">
-			<DetailFacts>
-				<DetailFact
+	<div>
+		<section className="pb-5">
+			<p className="max-w-4xl text-pretty text-base leading-relaxed text-muted">
+				{item.description || "No player-facing description."}
+			</p>
+		</section>
+		<section className="border-t border-line pt-2">
+			<ItemInfoFacts>
+				<ItemInfoFact
+					label="Type"
+					value={ItemTypeLabel[item.type]}
+				/>
+				<ItemInfoFact
+					label="Storage"
+					value={ItemStorageScopeLabel[item.scope]}
+				/>
+				<ItemInfoFact
+					label="Stack capacity"
+					value={item.maxStackSize === 1 ? "Single item" : `${item.maxStackSize} items`}
+				/>
+				<ItemInfoFact
+					label="Game limit"
+					value={item.maxCount === undefined ? "No configured limit" : item.maxCount}
+				/>
+				<ItemInfoFact
 					label="Item ID"
 					mono
 					value={item.id}
 				/>
-				<DetailFact
+				<ItemInfoFact
 					label="UID"
 					mono
 					value={item.uid}
 				/>
-				<DetailFact
-					label="Type"
-					value={item.type}
-				/>
-				<DetailFact
-					label="Title"
-					value={item.title}
-				/>
-				<DetailFact
-					label="Storage scope"
-					value={item.scope}
-				/>
-			</DetailFacts>
-		</DetailSection>
-		<DetailSection title="Description">
-			<p className="text-sm leading-6 text-foreground">
-				{item.description || "No player-facing description."}
-			</p>
-		</DetailSection>
-		<DetailSection title="Tags">
-			{item.tags.length === 0 ? (
-				<EmptyDetail>No tags.</EmptyDetail>
-			) : (
-				<div className="flex flex-wrap gap-2">
-					{item.tags.map((tag) => (
-						<span
-							className="rounded-full bg-surface-raised px-2.5 py-1 text-xs text-muted"
-							key={tag}
-						>
-							{tag}
-						</span>
-					))}
+			</ItemInfoFacts>
+		</section>
+		{item.tags.length === 0 ? null : (
+			<section className="border-t border-line pt-5">
+				<h2 className="text-sm font-semibold">Traits</h2>
+				<div className="mt-3">
+					<ItemTraits tags={item.tags} />
 				</div>
-			)}
-		</DetailSection>
+			</section>
+		)}
 	</div>
 );
 
@@ -134,7 +137,7 @@ const ChargesDetail = ({ item }: { readonly item: EditorItem }) => (
 				/>
 				<div>
 					<h3 className="text-sm font-semibold">Depletion output</h3>
-					<div className="mt-2 border-l border-line pl-4">
+					<div className="mt-2 border-t border-line pt-3">
 						<OutputDetail output={item.charges.output} />
 					</div>
 				</div>
@@ -169,7 +172,7 @@ const MergeDetail = ({ index, merge }: { readonly index: number; readonly merge:
 		</DetailFacts>
 		<div>
 			<h4 className="text-sm font-semibold">Extra output</h4>
-			<div className="mt-2 border-l border-line pl-4">
+			<div className="mt-2 border-t border-line pt-3">
 				<OutputDetail output={merge.output} />
 			</div>
 		</div>

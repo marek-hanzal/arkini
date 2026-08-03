@@ -1,5 +1,6 @@
 import type { PropsWithChildren } from "react";
-import { twMerge } from "tailwind-merge";
+
+import { EditorRootCard } from "~/ui/editor/EditorRootCard";
 
 /** Provides the single root surface shared by every editor form. */
 export const EditorFormCard = ({
@@ -8,13 +9,10 @@ export const EditorFormCard = ({
 }: PropsWithChildren<{
 	readonly className?: string;
 }>) => (
-	<div
-		className={twMerge(
-			"grid gap-5 rounded-2xl border border-line bg-surface/70 p-[var(--ak-panel-padding)]",
-			className,
-		)}
-		data-ui="EditorFormCard"
+	<EditorRootCard
+		className={className}
+		dataUi="EditorFormCard"
 	>
 		{children}
-	</div>
+	</EditorRootCard>
 );

@@ -137,7 +137,7 @@ export const EditorItemList = () => {
 				{filteredItems.map((item) => (
 					<article
 						key={item.uid}
-						className="ak-list-row flex min-w-0 items-center gap-2 rounded-xl p-1"
+						className="ak-list-row ak-list-row-interactive flex min-w-0 items-center gap-4 rounded-xl p-3"
 						data-item-id={item.id}
 						data-item-uid={item.uid}
 						data-ui="EditorItemRow"
@@ -149,7 +149,7 @@ export const EditorItemList = () => {
 								itemUid: item.uid,
 								sectionId: "identity",
 							}}
-							className="min-h-0 min-w-0 flex-1 justify-start gap-4 border-0 bg-transparent p-2 text-left shadow-none hover:bg-surface-raised"
+							className="min-h-0 min-w-0 flex-1 justify-start gap-4 border-0 bg-transparent p-0 text-left shadow-none before:absolute before:inset-0 before:content-[''] hover:bg-transparent"
 						>
 							<EditorItemThumbnail resourceIds={item.asset.default} />
 							<span className="min-w-0 flex-1">
@@ -163,7 +163,7 @@ export const EditorItemList = () => {
 						</ButtonLink>
 						<button
 							type="button"
-							className="shrink-0 cursor-pointer rounded-full bg-surface-raised px-2.5 py-1 text-[0.65rem] font-semibold uppercase tracking-wider text-muted transition-colors hover:bg-accent hover:text-accent-contrast"
+							className="relative z-10 shrink-0 cursor-pointer rounded-full bg-surface-raised px-2.5 py-1 text-[0.65rem] font-semibold uppercase tracking-wider text-muted hover:bg-accent hover:text-accent-contrast"
 							aria-label={`Filter items by ${item.type}`}
 							aria-pressed={itemType === item.type}
 							onClick={() => setItemType(item.type)}

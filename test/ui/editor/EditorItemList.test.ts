@@ -28,10 +28,11 @@ vi.mock("~/ui/item/editor/EditorItemThumbnail", () => ({
 }));
 
 vi.mock("~/ui/button/Button", () => {
-	const RenderLink = ({ children, params, to }: Record<string, unknown>) =>
+	const RenderLink = ({ children, className, params, to }: Record<string, unknown>) =>
 		createElement(
 			"a",
 			{
+				className,
 				"data-params": JSON.stringify(params),
 				"data-to": to,
 			},
@@ -143,6 +144,18 @@ const readVisibleItemIds = (container: HTMLElement) =>
 	].map((row) => row.dataset.itemId);
 
 describe("EditorItemList", () => {
+	it("renders each item as one consistently padded interactive row", async () => {
+		const container = await renderItemList();
+		const row = container.querySelector<HTMLElement>('[data-ui="EditorItemRow"]');
+		if (row === null) throw new Error("Missing item row.");
+
+		expect(row.className).toContain("ak-list-row-interactive");
+		expect(row.className).toContain("p-3");
+		expect(row.querySelector(":scope > a")?.className).toContain("before:inset-0");
+		expect(row.querySelector(":scope > button")?.className).toContain("relative z-10");
+		expect(row.children).toHaveLength(2);
+	});
+
 	it("replaces the placeholder heading with shared Fuse search and a removable type filter", async () => {
 		const container = await renderItemList();
 

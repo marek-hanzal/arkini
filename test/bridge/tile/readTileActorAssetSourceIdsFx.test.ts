@@ -40,7 +40,6 @@ const config = GameConfigSchema.parse({
 					"asset:material-unused-stage",
 				],
 			},
-			tags: [],
 			scope: "any",
 			maxStackSize: 10,
 		},
@@ -60,7 +59,6 @@ const config = GameConfigSchema.parse({
 					"asset:stage-3",
 				],
 			},
-			tags: [],
 			scope: "any",
 			maxStackSize: 1,
 			charges: {
@@ -103,7 +101,6 @@ const config = GameConfigSchema.parse({
 					"asset:blueprint-complete",
 				],
 			},
-			tags: [],
 			scope: "any",
 			maxStackSize: 1,
 			charges: {

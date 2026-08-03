@@ -12,15 +12,6 @@
 					"producer-prospector-guild-t2"
 				]
 			},
-			"tags": [
-				"producer",
-				"building",
-				"prospecting",
-				"guild",
-				"industry",
-				"unique",
-				"era:VII"
-			],
 			"scope": "any",
 			"maxCount": 1,
 			"maxStackSize": 1,

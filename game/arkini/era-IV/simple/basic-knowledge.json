@@ -12,12 +12,6 @@
 					"item-basic-knowledge"
 				]
 			},
-			"tags": [
-				"knowledge",
-				"education",
-				"research",
-				"era:IV"
-			],
 			"scope": "any",
 			"maxStackSize": 50
 		}

@@ -15,9 +15,6 @@ describe("BaseItemSchema", () => {
 					"asset:tree",
 				],
 			},
-			tags: [
-				"nature",
-			],
 			scope: "board",
 			maxStackSize: 1,
 		};
@@ -45,12 +42,6 @@ describe("BaseItemSchema", () => {
 			BaseItemSchema.safeParse({
 				...item,
 				title: "",
-			}).success,
-		).toBe(false);
-		expect(
-			BaseItemSchema.safeParse({
-				...item,
-				tags: undefined,
 			}).success,
 		).toBe(false);
 		expect(
@@ -88,7 +79,6 @@ describe("BaseItemSchema", () => {
 					"asset:tree",
 				],
 			},
-			tags: [],
 			scope: "board",
 			type: "simple",
 			maxStackSize: 1,

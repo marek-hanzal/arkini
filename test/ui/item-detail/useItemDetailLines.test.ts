@@ -75,7 +75,6 @@ const config = GameConfigSchema.parse({
 					"asset:producer",
 				],
 			},
-			tags: [],
 			scope: "board",
 			maxStackSize: 1,
 			maxQueueSize: 1,
@@ -89,8 +88,8 @@ const config = GameConfigSchema.parse({
 						{
 							type: "materials",
 							selector: {
-								type: "tag",
-								tag: "fuel",
+								type: "item",
+								itemId: "item:fuel",
 							},
 							quantity: {
 								type: "value",
@@ -189,9 +188,6 @@ const config = GameConfigSchema.parse({
 					"asset:material",
 				],
 			},
-			tags: [
-				"fuel",
-			],
 			scope: "any",
 			maxCount: 1,
 			maxStackSize: 10,

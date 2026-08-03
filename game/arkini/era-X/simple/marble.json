@@ -12,15 +12,6 @@
 					"item-marble"
 				]
 			},
-			"tags": [
-				"material",
-				"stone",
-				"marble",
-				"luxury",
-				"prestige",
-				"era:X",
-				"tier-10-resource"
-			],
 			"scope": "any",
 			"maxStackSize": 40
 		}

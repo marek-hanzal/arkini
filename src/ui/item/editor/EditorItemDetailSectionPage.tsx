@@ -3,7 +3,6 @@ import {
 	ItemInfoFact,
 	ItemInfoFacts,
 	ItemStorageScopeLabel,
-	ItemTraits,
 	ItemTypeLabel,
 } from "~/ui/item-detail/ItemInfoPresentation";
 import {
@@ -61,14 +60,6 @@ const IdentityDetail = ({ item }: { readonly item: EditorItem }) => (
 				/>
 			</ItemInfoFacts>
 		</section>
-		{item.tags.length === 0 ? null : (
-			<section className="border-t border-line pt-5">
-				<h2 className="text-sm font-semibold">Traits</h2>
-				<div className="mt-3">
-					<ItemTraits tags={item.tags} />
-				</div>
-			</section>
-		)}
 	</div>
 );
 

@@ -12,14 +12,6 @@
 					"item-treasure-chest"
 				]
 			},
-			"tags": [
-				"treasure",
-				"chest",
-				"gem",
-				"gold",
-				"master",
-				"era:IX"
-			],
 			"scope": "any",
 			"maxStackSize": 5
 		}

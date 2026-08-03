@@ -7,7 +7,6 @@ import { StorageScopeEnumSchema } from "~/engine/scope/schema/StorageScopeEnumSc
 export interface CheatItemCatalogEntry {
 	readonly itemId: IdSchema.Type;
 	readonly title: string;
-	readonly tags: readonly string[];
 	readonly sourceResourceId: IdSchema.Type;
 }
 
@@ -24,9 +23,6 @@ export const readCheatItemCatalogFx = Effect.fn("readCheatItemCatalogFx")(functi
 			(item): CheatItemCatalogEntry => ({
 				itemId: item.id,
 				title: item.title,
-				tags: [
-					...item.tags,
-				],
 				sourceResourceId: item.asset.default[0],
 			}),
 		)

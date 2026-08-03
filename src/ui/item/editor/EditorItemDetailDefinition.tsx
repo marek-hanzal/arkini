@@ -60,8 +60,7 @@ export const EmptyDetail = ({ children }: { readonly children: ReactNode }) => (
 const formatQuantity = (quantity: EditorQuantity) =>
 	quantity.type === "value" ? String(quantity.value) : `${quantity.min}–${quantity.max}`;
 
-const formatSelector = (selector: EditorSelector) =>
-	selector.type === "item" ? `Item ${selector.itemId}` : `Tag ${selector.tag}`;
+const formatSelector = (selector: EditorSelector) => `Item ${selector.itemId}`;
 
 const QueryDetail = ({ query }: { readonly query: EditorQuery }) => (
 	<span>

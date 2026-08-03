@@ -16,14 +16,6 @@
 					"producer-paper-mill-t1"
 				]
 			},
-			"tags": [
-				"blueprint",
-				"building",
-				"craft-target",
-				"paper",
-				"civic",
-				"era:IV"
-			],
 			"scope": "any",
 			"maxStackSize": 1,
 			"line": {

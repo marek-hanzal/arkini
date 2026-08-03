@@ -141,14 +141,11 @@ const projectDisabledConditionFx = Effect.fn("projectDisabledConditionFx")(funct
 		selector: when.query.selector,
 	});
 	const locationLabel = readQueryLocationLabel(when.query);
-	const detail =
-		when.query.selector.type === "item"
-			? yield* projectItemDetailReferenceFx({
-					game,
-					itemId: when.query.selector.itemId,
-					runtime,
-				})
-			: undefined;
+	const detail = yield* projectItemDetailReferenceFx({
+		game,
+		itemId: when.query.selector.itemId,
+		runtime,
+	});
 	return match(when)
 		.with(
 			{
@@ -306,14 +303,11 @@ const projectAvailabilityFx = Effect.fn("projectItemDetailLineAvailabilityFx")(f
 						game,
 						selector: reason.selector,
 					});
-					const detail =
-						reason.selector.type === "item"
-							? yield* projectItemDetailReferenceFx({
-									game,
-									itemId: reason.selector.itemId,
-									runtime,
-								})
-							: undefined;
+					const detail = yield* projectItemDetailReferenceFx({
+						game,
+						itemId: reason.selector.itemId,
+						runtime,
+					});
 					const messageBeforeDetail = "Requires ";
 					const messageAfterDetail = ` · None available (Board · ${reason.distance}).`;
 					return {

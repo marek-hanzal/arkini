@@ -12,15 +12,6 @@
 					"item-gold-ore"
 				]
 			},
-			"tags": [
-				"material",
-				"industry",
-				"ore",
-				"gold",
-				"era:VII",
-				"master",
-				"tier-7-resource"
-			],
 			"scope": "any",
 			"maxStackSize": 20
 		}

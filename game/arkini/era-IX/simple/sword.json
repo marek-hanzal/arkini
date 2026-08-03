@@ -12,13 +12,6 @@
 					"item-sword"
 				]
 			},
-			"tags": [
-				"equipment",
-				"weapon",
-				"blacksmith",
-				"hero",
-				"era:IX"
-			],
 			"scope": "any",
 			"maxStackSize": 20
 		}

@@ -12,13 +12,6 @@
 					"producer-townhall-t2"
 				]
 			},
-			"tags": [
-				"producer",
-				"townhall",
-				"civic",
-				"unique",
-				"era:II"
-			],
 			"scope": "any",
 			"maxCount": 1,
 			"maxStackSize": 1,

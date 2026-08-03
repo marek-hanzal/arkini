@@ -12,12 +12,6 @@
 					"item-key-t4"
 				]
 			},
-			"tags": [
-				"key",
-				"goldsmith",
-				"gem",
-				"era:IX"
-			],
 			"scope": "any",
 			"maxStackSize": 20
 		}

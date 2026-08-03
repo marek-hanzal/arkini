@@ -17,8 +17,8 @@ describe("InputSchema", () => {
 		const input = InputSchema.parse({
 			type: "materials",
 			selector: {
-				type: "tag",
-				tag: "liquid",
+				type: "item",
+				itemId: "item:water",
 			},
 			quantity: {
 				type: "value",
@@ -41,8 +41,8 @@ describe("InputSchema", () => {
 					scope: "board",
 					distance: "near",
 					selector: {
-						type: "tag",
-						tag: "wood-source",
+						type: "item",
+						itemId: "deposit:tree",
 					},
 				},
 				charges: {

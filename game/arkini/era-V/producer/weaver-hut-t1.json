@@ -12,14 +12,6 @@
 					"producer-weaver-hut-t1"
 				]
 			},
-			"tags": [
-				"producer",
-				"building",
-				"cloth",
-				"textile",
-				"era:V",
-				"unique"
-			],
 			"scope": "any",
 			"maxCount": 1,
 			"maxStackSize": 1,

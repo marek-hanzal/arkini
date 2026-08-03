@@ -12,13 +12,6 @@
 					"item-feast"
 				]
 			},
-			"tags": [
-				"food",
-				"master",
-				"feast",
-				"era:III",
-				"tier-4-resource"
-			],
 			"scope": "any",
 			"maxStackSize": 20
 		}

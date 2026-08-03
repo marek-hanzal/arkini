@@ -13,9 +13,6 @@ const item = {
 			"asset:item:inventory",
 		],
 	},
-	tags: [
-		"utility",
-	],
 };
 
 describe("InventoryItemSchema", () => {

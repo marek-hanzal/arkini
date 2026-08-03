@@ -12,13 +12,6 @@
 					"producer-shrine-t1"
 				]
 			},
-			"tags": [
-				"effect",
-				"buff",
-				"shrine",
-				"haste",
-				"era:I"
-			],
 			"durationMs": 300000
 		}
 	}

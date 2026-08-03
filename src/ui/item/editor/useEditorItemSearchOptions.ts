@@ -22,7 +22,6 @@ export const useEditorItemSearchOptions = () => {
 								item.title,
 								item.description,
 								item.type,
-								...item.tags,
 							],
 						}) satisfies EditorSearchOption,
 				),

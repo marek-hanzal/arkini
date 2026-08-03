@@ -16,7 +16,6 @@ import { QuantityEnumSchema } from "~/engine/quantity/schema/QuantityEnumSchema"
 import { QueryScopeEnumSchema } from "~/engine/query/schema/QueryScopeEnumSchema";
 import { RollEnumSchema } from "~/engine/roll/schema/RollEnumSchema";
 import { StorageScopeEnumSchema } from "~/engine/scope/schema/StorageScopeEnumSchema";
-import { SelectorEnumSchema } from "~/engine/selector/schema/SelectorEnumSchema";
 import { WhenEnumSchema } from "~/engine/when/schema/WhenEnumSchema";
 
 describe("business enum schemas", () => {
@@ -107,10 +106,6 @@ describe("business enum schemas", () => {
 			QueryScopeEnumSchema.enum.Toolbar,
 			QueryScopeEnumSchema.enum.Any,
 			QueryScopeEnumSchema.enum.Universe,
-		]);
-		expect(SelectorEnumSchema.options).toEqual([
-			SelectorEnumSchema.enum.Item,
-			SelectorEnumSchema.enum.Tag,
 		]);
 		expect(WhenEnumSchema.options).toEqual([
 			WhenEnumSchema.enum.Exists,

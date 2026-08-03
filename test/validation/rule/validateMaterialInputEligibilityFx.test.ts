@@ -10,25 +10,18 @@ import {
 } from "~test/validation/support/gameValidationTestSource";
 import { DiagnosticCodeEnumSchema } from "~/engine/validation/schema/DiagnosticCodeEnumSchema";
 
-const temporaryItem = (id: string, tags: string[] = []) => ({
-	...createSimpleItem(id, tags),
+const temporaryItem = (id: string) => ({
+	...createSimpleItem(id),
 	type: "temporary" as const,
 	scope: "board" as const,
 	maxStackSize: 1,
 	durationMs: 600,
 });
 
-const materialInput = (
-	selector:
-		| {
-				type: "item";
-				itemId: string;
-		  }
-		| {
-				type: "tag";
-				tag: string;
-		  },
-): ReadonlyArray<InputSchema.Type> => [
+const materialInput = (selector: {
+	type: "item";
+	itemId: string;
+}): ReadonlyArray<InputSchema.Type> => [
 	{
 		type: "materials",
 		selector,
@@ -75,34 +68,6 @@ describe("validateMaterialInputEligibilityFx", () => {
 				ownerItemId: owner.id,
 				lineId: "line:test",
 				inputIndex: 0,
-				candidateItemId: temporary.id,
-			}),
-		]);
-	});
-
-	it("rejects a tag selector when any matched candidate is ineligible", async () => {
-		const owner = createProducerItem({
-			id: "producer:test",
-			input: materialInput({
-				type: "tag",
-				tag: "material:test",
-			}),
-		});
-		const ordinary = createSimpleItem("item:ordinary", [
-			"material:test",
-		]);
-		const temporary = temporaryItem("temporary:test", [
-			"material:test",
-		]);
-
-		expect(
-			await diagnostics({
-				[owner.id]: owner,
-				[ordinary.id]: ordinary,
-				[temporary.id]: temporary,
-			}),
-		).toEqual([
-			expect.objectContaining({
 				candidateItemId: temporary.id,
 			}),
 		]);

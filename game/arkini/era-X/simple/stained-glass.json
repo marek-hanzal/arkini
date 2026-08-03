@@ -12,16 +12,6 @@
 					"item-stained-glass"
 				]
 			},
-			"tags": [
-				"material",
-				"construction",
-				"luxury",
-				"glass",
-				"prestige",
-				"master",
-				"era:X",
-				"tier-10-resource"
-			],
 			"scope": "any",
 			"maxStackSize": 20
 		}

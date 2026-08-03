@@ -19,7 +19,6 @@ const baseItem = ({ id, maxStackSize = 1 }: { id: string; maxStackSize?: number 
 			`asset:${id}`,
 		],
 	},
-	tags: [],
 	scope: "any" as const,
 	maxStackSize,
 });

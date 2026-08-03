@@ -12,14 +12,6 @@
 					"item-grapes"
 				]
 			},
-			"tags": [
-				"material",
-				"food",
-				"wine",
-				"grapes",
-				"era:III",
-				"tier-3-resource"
-			],
 			"scope": "any",
 			"maxStackSize": 50
 		}

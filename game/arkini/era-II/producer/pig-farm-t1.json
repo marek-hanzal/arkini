@@ -12,13 +12,6 @@
 					"producer-pig-farm-t1"
 				]
 			},
-			"tags": [
-				"producer",
-				"food",
-				"pig",
-				"era:II",
-				"unique"
-			],
 			"scope": "any",
 			"maxCount": 1,
 			"maxStackSize": 1,

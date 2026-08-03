@@ -27,7 +27,6 @@ const baseItem = (id: string) => ({
 			`asset:${id}`,
 		],
 	},
-	tags: [],
 	scope: "any" as const,
 	maxStackSize: 1,
 });

@@ -12,12 +12,6 @@
 					"item-wheat-field"
 				]
 			},
-			"tags": [
-				"source",
-				"food",
-				"grain",
-				"era:II"
-			],
 			"scope": "any",
 			"maxStackSize": 1,
 			"charges": {

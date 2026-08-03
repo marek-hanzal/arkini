@@ -12,15 +12,6 @@
 					"producer-house-t4"
 				]
 			},
-			"tags": [
-				"producer",
-				"building",
-				"house",
-				"housing",
-				"morale",
-				"era:X",
-				"unique"
-			],
 			"scope": "any",
 			"maxCount": 1,
 			"maxStackSize": 1,

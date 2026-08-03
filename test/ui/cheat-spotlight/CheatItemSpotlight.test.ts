@@ -38,16 +38,12 @@ vi.mock("~/bridge/cheat/useCheatItemCatalog", () => ({
 		{
 			itemId: "item:alpha",
 			title: "Alpha",
-			tags: [],
 			sourceResourceId: "alpha",
 			sourceUrl: "blob:alpha",
 		},
 		{
 			itemId: "item:beta",
 			title: "Beta",
-			tags: [
-				"timber",
-			],
 			sourceResourceId: "beta",
 			sourceUrl: "blob:beta",
 		},
@@ -484,7 +480,7 @@ describe("CheatItemSpotlight", () => {
 		const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")?.set;
 		if (setter === undefined) throw new Error("Expected native input setter.");
 		await act(async () => {
-			setter.call(input, "timber");
+			setter.call(input, "item:beta");
 			input.dispatchEvent(
 				new Event("input", {
 					bubbles: true,

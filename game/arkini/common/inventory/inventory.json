@@ -11,12 +11,7 @@
 				"default": [
 					"item-inventory"
 				]
-			},
-			"tags": [
-				"special:inventory",
-				"utility",
-				"ui"
-			]
+			}
 		}
 	}
 }

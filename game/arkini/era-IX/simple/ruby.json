@@ -12,12 +12,6 @@
 					"item-ruby"
 				]
 			},
-			"tags": [
-				"treasure",
-				"gem",
-				"ruby",
-				"era:IX"
-			],
 			"scope": "any",
 			"maxStackSize": 20
 		}

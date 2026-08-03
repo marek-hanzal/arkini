@@ -41,6 +41,21 @@ const output = (...itemIds: string[]) => ({
 		},
 	],
 });
+const targetChargeInput = (itemId: string) => ({
+	type: "deposit" as const,
+	query: {
+		scope: "board" as const,
+		selector: {
+			type: "item" as const,
+			itemId,
+		},
+		distance: "close" as const,
+	},
+	charges: {
+		from: "target" as const,
+		cost: 1,
+	},
+});
 const base = ({
 	id,
 	maxStackSize = 1,
@@ -59,7 +74,6 @@ const base = ({
 			`asset:${id}`,
 		],
 	},
-	tags: [],
 	scope,
 	maxStackSize,
 });
@@ -129,36 +143,19 @@ const chargesConfig = GameConfigSchema.parse({
 					description: "Spend two target costs.",
 					runtimeMs: 200,
 					input: [
-						{
-							type: "deposit",
-							query: {
-								scope: "board",
-								selector: {
-									type: "tag",
-									tag: "wood-source",
-								},
-								distance: "close",
-							},
-							charges: {
-								from: "target",
-								cost: 1,
-							},
-						},
-						{
-							type: "deposit",
-							query: {
-								scope: "board",
-								selector: {
-									type: "tag",
-									tag: "wood-source",
-								},
-								distance: "close",
-							},
-							charges: {
-								from: "target",
-								cost: 1,
-							},
-						},
+						targetChargeInput("deposit:tree"),
+						targetChargeInput("deposit:tree"),
+					],
+					rules: [],
+				},
+				{
+					id: "line:double-target:saplings",
+					title: "Double sapling work",
+					description: "Spend two sapling target costs.",
+					runtimeMs: 200,
+					input: [
+						targetChargeInput("deposit:sapling"),
+						targetChargeInput("deposit:sapling"),
 					],
 					rules: [],
 				},
@@ -256,21 +253,29 @@ const chargesConfig = GameConfigSchema.parse({
 					description: "Spend one nearby target charge.",
 					runtimeMs: 200,
 					input: [
-						{
-							type: "deposit",
-							query: {
-								scope: "board",
-								selector: {
-									type: "tag",
-									tag: "wood-source",
-								},
-								distance: "close",
-							},
-							charges: {
-								from: "target",
-								cost: 1,
-							},
-						},
+						targetChargeInput("deposit:tree"),
+					],
+					output: output("item:log"),
+					rules: [],
+				},
+				{
+					id: "line:lumberjack:sapling",
+					title: "Sapling work",
+					description: "Spend one nearby sapling charge.",
+					runtimeMs: 200,
+					input: [
+						targetChargeInput("deposit:sapling"),
+					],
+					output: output("item:log"),
+					rules: [],
+				},
+				{
+					id: "line:lumberjack:messy",
+					title: "Messy work",
+					description: "Spend one nearby messy deposit charge.",
+					runtimeMs: 200,
+					input: [
+						targetChargeInput("deposit:messy"),
 					],
 					output: output("item:log"),
 					rules: [],
@@ -383,9 +388,6 @@ const chargesConfig = GameConfigSchema.parse({
 				maxStackSize: 3,
 			}),
 			type: "deposit",
-			tags: [
-				"wood-source",
-			],
 			charges: {
 				amount: 2,
 			},
@@ -396,9 +398,6 @@ const chargesConfig = GameConfigSchema.parse({
 				maxStackSize: 3,
 			}),
 			type: "deposit",
-			tags: [
-				"wood-source",
-			],
 			charges: {
 				amount: 1,
 				output: output("item:seed"),
@@ -428,9 +427,6 @@ const chargesConfig = GameConfigSchema.parse({
 				id: "deposit:messy",
 			}),
 			type: "deposit",
-			tags: [
-				"wood-source",
-			],
 			charges: {
 				amount: 1,
 				output: output("item:seed", "item:trash"),
@@ -758,7 +754,7 @@ describe("item charges", () => {
 				});
 				yield* startLineFx({
 					ownerItemId: owner.id,
-					lineId: "line:lumberjack:work",
+					lineId: "line:lumberjack:sapling",
 				});
 				return {
 					runtime: yield* readRuntimeFx(),
@@ -795,7 +791,7 @@ describe("item charges", () => {
 				});
 				const [, runtime, events] = yield* startLineRuntimeFx({
 					ownerItemId: owner.id,
-					lineId: "line:lumberjack:work",
+					lineId: "line:lumberjack:sapling",
 					runtime: yield* readRuntimeFx(),
 				});
 				const seed = runtime.items.find((item) => item.item.id === "item:seed");
@@ -852,7 +848,7 @@ describe("item charges", () => {
 				});
 				const [, runtime, events] = yield* startLineRuntimeFx({
 					ownerItemId: owner.id,
-					lineId: "line:lumberjack:work",
+					lineId: "line:lumberjack:sapling",
 					runtime: yield* readRuntimeFx(),
 				});
 				return {
@@ -941,7 +937,7 @@ describe("item charges", () => {
 				const attempt = yield* Effect.result(
 					startLineFx({
 						ownerItemId: owner.id,
-						lineId: "line:lumberjack:work",
+						lineId: "line:lumberjack:messy",
 					}),
 				);
 				return {
@@ -1124,7 +1120,7 @@ describe("item charges", () => {
 				});
 				yield* startLineFx({
 					ownerItemId: owner.id,
-					lineId: "line:double-target:work",
+					lineId: "line:double-target:saplings",
 				});
 				return yield* readRuntimeFx();
 			}),

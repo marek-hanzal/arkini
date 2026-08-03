@@ -34,7 +34,6 @@ export const useItemDetailInfo = (itemId: IdSchema.Type): useItemDetailInfo.Proj
 				itemId: info.itemId,
 				description: info.description,
 				itemType: info.itemType,
-				tags: info.tags,
 				storageScope: info.storageScope,
 				location: info.location,
 				quantity: info.quantity,

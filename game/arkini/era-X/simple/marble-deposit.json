@@ -12,16 +12,6 @@
 					"item-marble-deposit"
 				]
 			},
-			"tags": [
-				"source",
-				"construction",
-				"stone",
-				"marble",
-				"deposit",
-				"luxury",
-				"prestige",
-				"era:X"
-			],
 			"scope": "any",
 			"maxStackSize": 1
 		}

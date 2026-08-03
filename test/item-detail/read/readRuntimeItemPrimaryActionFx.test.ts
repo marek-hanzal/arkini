@@ -58,7 +58,6 @@ const config = GameConfigSchema.parse({
 					"asset:producer",
 				],
 			},
-			tags: [],
 			scope: "board",
 			maxStackSize: 1,
 			maxQueueSize: 1,
@@ -89,7 +88,6 @@ const config = GameConfigSchema.parse({
 					"asset:resource",
 				],
 			},
-			tags: [],
 			scope: "any",
 			maxStackSize: 10,
 		},
@@ -104,7 +102,6 @@ const config = GameConfigSchema.parse({
 					"asset:satchel",
 				],
 			},
-			tags: [],
 		},
 	},
 });

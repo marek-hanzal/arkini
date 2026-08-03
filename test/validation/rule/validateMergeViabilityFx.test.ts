@@ -29,15 +29,10 @@ const mergeSource = ({
 	effect?: "keep" | "replace";
 	maxCount?: number;
 	result?: string;
-	target:
-		| {
-				type: "item";
-				itemId: string;
-		  }
-		| {
-				type: "tag";
-				tag: string;
-		  };
+	target: {
+		type: "item";
+		itemId: string;
+	};
 }) => ({
 	...createSimpleItem("source"),
 	maxCount,
@@ -89,61 +84,6 @@ describe("validateMergeViabilityFx", () => {
 		]);
 	});
 
-	it("rejects a tag selector matching only inventory-only targets", async () => {
-		const source = mergeSource({
-			target: {
-				type: "tag",
-				tag: "target",
-			},
-		});
-		const target = {
-			...createSimpleItem("target", [
-				"target",
-			]),
-			scope: "inventory" as const,
-		};
-
-		expect(
-			await mergeDiagnostics({
-				[source.id]: source,
-				[target.id]: target,
-			}),
-		).toEqual([
-			expect.objectContaining({
-				reason: InvalidMergeReasonEnumSchema.enum.TargetUnavailable,
-			}),
-		]);
-	});
-
-	it("accepts a selector with at least one board-capable target", async () => {
-		const source = mergeSource({
-			target: {
-				type: "tag",
-				tag: "target",
-			},
-		});
-		const inventoryTarget = {
-			...createSimpleItem("target:inventory", [
-				"target",
-			]),
-			scope: "inventory" as const,
-		};
-		const boardTarget = {
-			...createSimpleItem("target:board", [
-				"target",
-			]),
-			scope: "board" as const,
-		};
-
-		expect(
-			await mergeDiagnostics({
-				[source.id]: source,
-				[inventoryTarget.id]: inventoryTarget,
-				[boardTarget.id]: boardTarget,
-			}),
-		).toEqual([]);
-	});
-
 	it("rejects an exact self-target when maxCount allows only one identity", async () => {
 		const source = mergeSource({
 			maxCount: 1,
@@ -176,31 +116,6 @@ describe("validateMergeViabilityFx", () => {
 		expect(
 			await mergeDiagnostics({
 				[source.id]: source,
-			}),
-		).toEqual([]);
-	});
-
-	it("keeps a tag selector viable when it includes another board target", async () => {
-		const source = {
-			...mergeSource({
-				maxCount: 1,
-				target: {
-					type: "tag",
-					tag: "target",
-				},
-			}),
-			tags: [
-				"target",
-			],
-		};
-		const target = createSimpleItem("target", [
-			"target",
-		]);
-
-		expect(
-			await mergeDiagnostics({
-				[source.id]: source,
-				[target.id]: target,
 			}),
 		).toEqual([]);
 	});

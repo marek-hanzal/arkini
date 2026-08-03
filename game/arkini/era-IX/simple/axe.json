@@ -12,16 +12,6 @@
 					"item-axe"
 				]
 			},
-			"tags": [
-				"equipment",
-				"weapon",
-				"tool",
-				"blacksmith",
-				"hero",
-				"era:IX",
-				"woodcutting",
-				"single-use"
-			],
 			"scope": "any",
 			"maxStackSize": 20,
 			"merge": [

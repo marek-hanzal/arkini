@@ -12,13 +12,6 @@
 					"item-building-permit"
 				]
 			},
-			"tags": [
-				"resource",
-				"master",
-				"permit",
-				"civic",
-				"era:IV"
-			],
 			"scope": "any",
 			"maxStackSize": 20
 		}

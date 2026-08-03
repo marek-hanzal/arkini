@@ -8,8 +8,7 @@ import type { MergeSchema } from "~/engine/merge/schema/MergeSchema";
 import type { OutputSchema } from "~/engine/output/schema/OutputSchema";
 
 /** Local presentation values owned only by one mounted item form. */
-export type EditorItemFormValues = Omit<BaseItemSchema.Type, "merge" | "tags"> & {
-	readonly tags: string;
+export type EditorItemFormValues = Omit<BaseItemSchema.Type, "merge"> & {
 	readonly type: ItemEnumSchema.Type;
 	readonly durationMs?: number;
 	readonly line?: LineSchema.Type;
@@ -22,33 +21,13 @@ export type EditorItemFormValues = Omit<BaseItemSchema.Type, "merge" | "tags"> &
 /**
  * Validates the local item-form representation and emits one canonical item.
  *
- * Tags remain one editable comma-separated string in the form store. Blank
- * required numbers remain `NaN`, so the canonical ItemSchema reports them at
- * their exact field path instead of silently coercing them to zero.
+ * Blank required numbers remain `NaN`, so the canonical ItemSchema reports them
+ * at their exact field path instead of silently coercing them to zero.
  */
 export const EditorItemFormSchema = z
-	.custom<EditorItemFormValues>(
-		(candidate) =>
-			typeof candidate === "object" &&
-			candidate !== null &&
-			!Array.isArray(candidate) &&
-			typeof (candidate as Readonly<Record<string, unknown>>).tags === "string",
-		{
-			error: "Item form values must contain an editable tags string.",
-		},
-	)
-	.transform((candidate) => ({
-		candidate,
-		tags: candidate.tags
-			.split(",")
-			.map((tag) => tag.trim())
-			.filter((tag) => tag !== ""),
-	}))
-	.transform(({ candidate, tags }, context) => {
-		const result = ItemSchema.safeParse({
-			...candidate,
-			tags,
-		});
+	.custom<EditorItemFormValues>()
+	.transform((candidate, context) => {
+		const result = ItemSchema.safeParse(candidate);
 		if (result.success) return result.data;
 		for (const issue of result.error.issues) {
 			context.addIssue({

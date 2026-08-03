@@ -38,7 +38,6 @@ const config = GameConfigSchema.parse({
 					"asset:source",
 				],
 			},
-			tags: [],
 			scope: "board",
 			maxStackSize: 1,
 			type: "simple",

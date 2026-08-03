@@ -12,9 +12,6 @@
 					"item-water"
 				]
 			},
-			"tags": [
-				"demo"
-			],
 			"scope": "any",
 			"maxStackSize": 8,
 			"merge": [
@@ -40,9 +37,6 @@
 					"item-tree"
 				]
 			},
-			"tags": [
-				"demo"
-			],
 			"scope": "any",
 			"maxStackSize": 8
 		},
@@ -57,9 +51,6 @@
 					"item-double-tree"
 				]
 			},
-			"tags": [
-				"demo"
-			],
 			"scope": "any",
 			"maxStackSize": 8
 		}

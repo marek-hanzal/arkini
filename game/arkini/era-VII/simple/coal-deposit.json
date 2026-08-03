@@ -12,13 +12,6 @@
 					"item-coal-deposit"
 				]
 			},
-			"tags": [
-				"source",
-				"industry",
-				"mine",
-				"coal",
-				"era:VII"
-			],
 			"scope": "any",
 			"maxStackSize": 1
 		}

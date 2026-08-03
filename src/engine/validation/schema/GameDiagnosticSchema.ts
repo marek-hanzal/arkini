@@ -4,7 +4,6 @@ import { ConfigSchemaDiagnosticSchema } from "./diagnostic/ConfigSchemaDiagnosti
 import { DuplicateItemUidDiagnosticSchema } from "./diagnostic/DuplicateItemUidDiagnosticSchema";
 import { DuplicateLineIdDiagnosticSchema } from "./diagnostic/DuplicateLineIdDiagnosticSchema";
 import { DuplicateProviderDiagnosticSchema } from "./diagnostic/DuplicateProviderDiagnosticSchema";
-import { EmptyMaterialTagDiagnosticSchema } from "./diagnostic/EmptyMaterialTagDiagnosticSchema";
 import { UnusedResourceDiagnosticSchema } from "./diagnostic/UnusedResourceDiagnosticSchema";
 import { UnsupportedInputCapacityDiagnosticSchema } from "./diagnostic/UnsupportedInputCapacityDiagnosticSchema";
 import { MissingResourceDiagnosticSchema } from "./diagnostic/MissingResourceDiagnosticSchema";
@@ -48,7 +47,6 @@ export const GameDiagnosticSchema = z
 		DuplicateItemUidDiagnosticSchema,
 		DuplicateLineIdDiagnosticSchema,
 		MultipleDefaultLinesDiagnosticSchema,
-		EmptyMaterialTagDiagnosticSchema,
 	])
 	.meta({
 		id: "GameDiagnosticSchema",

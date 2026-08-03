@@ -12,17 +12,6 @@
 					"item-marble-block"
 				]
 			},
-			"tags": [
-				"material",
-				"construction",
-				"stone",
-				"marble",
-				"luxury",
-				"prestige",
-				"master",
-				"era:X",
-				"tier-10-resource"
-			],
 			"scope": "any",
 			"maxStackSize": 30
 		}

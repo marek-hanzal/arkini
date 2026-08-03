@@ -6,7 +6,6 @@ import { IdSchema } from "~/engine/common/schema/IdSchema";
 import { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
 import { TitleSchema } from "~/engine/common/schema/TitleSchema";
 import { MergeSchema } from "~/engine/merge/schema/MergeSchema";
-import { TagSchema } from "~/engine/tag/schema/TagSchema";
 import { AssetSchema } from "./AssetSchema";
 import { ChargeSchema } from "./ChargeSchema";
 
@@ -43,14 +42,6 @@ export const BaseItemSchema = z
 		 * Visual asset definition used to render this item.
 		 */
 		asset: AssetSchema.describe("The visual asset definition used to render this item."),
-		/**
-		 * Semantic labels used to classify this item for content and future rules.
-		 */
-		tags: z
-			.array(TagSchema)
-			.describe(
-				"The semantic labels used to classify this item for content and future rules.",
-			),
 		/**
 		 * Part of game state in which this item may be stored.
 		 */

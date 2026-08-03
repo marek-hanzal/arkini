@@ -12,17 +12,6 @@
 					"producer-quarry-t2"
 				]
 			},
-			"tags": [
-				"producer",
-				"building",
-				"stone",
-				"marble",
-				"quarry",
-				"luxury",
-				"prestige",
-				"era:X",
-				"unique"
-			],
 			"scope": "any",
 			"maxCount": 1,
 			"maxStackSize": 1,

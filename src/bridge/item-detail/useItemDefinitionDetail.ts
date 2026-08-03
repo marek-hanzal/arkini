@@ -18,7 +18,6 @@ export namespace useItemDefinitionDetail {
 				readonly compositeUrl?: string;
 				readonly description: string;
 				readonly itemType: ItemEnumSchema.Type;
-				readonly tags: readonly string[];
 				readonly storageScope: StorageScopeEnumSchema.Type;
 				readonly maxStackSize: number;
 				readonly ownedQuantity: number;
@@ -55,9 +54,6 @@ export const useItemDefinitionDetail = (
 						}),
 				description: item.description,
 				itemType: item.type,
-				tags: [
-					...item.tags,
-				],
 				storageScope: item.scope,
 				maxStackSize: item.maxStackSize,
 				ownedQuantity: runtime.items.reduce(

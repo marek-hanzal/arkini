@@ -12,14 +12,6 @@
 					"item-coal"
 				]
 			},
-			"tags": [
-				"material",
-				"industry",
-				"fuel",
-				"coal",
-				"era:VII",
-				"tier-7-resource"
-			],
 			"scope": "any",
 			"maxStackSize": 20
 		}

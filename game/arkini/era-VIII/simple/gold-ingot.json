@@ -12,14 +12,6 @@
 					"item-gold-ingot"
 				]
 			},
-			"tags": [
-				"material",
-				"industry",
-				"ingot",
-				"gold",
-				"era:VIII",
-				"tier-7-resource"
-			],
 			"scope": "any",
 			"maxStackSize": 50
 		}

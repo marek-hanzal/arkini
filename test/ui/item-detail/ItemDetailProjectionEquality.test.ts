@@ -54,9 +54,6 @@ const definition = {
 	compositeUrl: "resource:target-composite",
 	description: "A target item.",
 	itemType: "simple",
-	tags: [
-		"material",
-	],
 	storageScope: "any",
 	maxStackSize: 10,
 	ownedQuantity: 2,
@@ -235,16 +232,6 @@ describe("Item Detail projection structural equality", () => {
 			{
 				...definition,
 				description: "Changed.",
-			},
-		],
-		[
-			"definition tag",
-			definition,
-			{
-				...definition,
-				tags: [
-					"other",
-				],
 			},
 		],
 		[

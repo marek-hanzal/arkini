@@ -12,14 +12,6 @@
 					"item-luxury-clothing"
 				]
 			},
-			"tags": [
-				"clothing",
-				"luxury",
-				"master",
-				"textile",
-				"era:V",
-				"tier-5-resource"
-			],
 			"scope": "any",
 			"maxStackSize": 20
 		}

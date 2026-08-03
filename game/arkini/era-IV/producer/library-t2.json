@@ -12,15 +12,6 @@
 					"producer-library-t2"
 				]
 			},
-			"tags": [
-				"producer",
-				"building",
-				"library",
-				"blueprint",
-				"knowledge",
-				"unique",
-				"era:IV"
-			],
 			"scope": "any",
 			"maxCount": 1,
 			"maxStackSize": 1,

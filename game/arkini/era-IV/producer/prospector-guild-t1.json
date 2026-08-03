@@ -12,15 +12,6 @@
 					"producer-prospector-guild-t1"
 				]
 			},
-			"tags": [
-				"producer",
-				"building",
-				"prospecting",
-				"guild",
-				"civic",
-				"unique",
-				"era:IV"
-			],
 			"scope": "any",
 			"maxCount": 1,
 			"maxStackSize": 1,

@@ -12,15 +12,6 @@
 					"item-micro-forest"
 				]
 			},
-			"tags": [
-				"source",
-				"wood",
-				"wood-source",
-				"tree",
-				"tree:t3",
-				"forest",
-				"era:I"
-			],
 			"scope": "any",
 			"maxStackSize": 1,
 			"charges": {

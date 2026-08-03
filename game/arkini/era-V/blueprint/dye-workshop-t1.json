@@ -16,14 +16,6 @@
 					"producer-dye-workshop-t1"
 				]
 			},
-			"tags": [
-				"blueprint",
-				"building",
-				"craft-target",
-				"dye",
-				"textile",
-				"era:V"
-			],
 			"scope": "any",
 			"maxStackSize": 1,
 			"line": {

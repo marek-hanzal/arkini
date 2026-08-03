@@ -12,16 +12,6 @@
 					"producer-glazier-workshop-t1"
 				]
 			},
-			"tags": [
-				"producer",
-				"building",
-				"glass",
-				"luxury",
-				"prestige",
-				"construction",
-				"era:X",
-				"unique"
-			],
 			"scope": "any",
 			"maxCount": 1,
 			"maxStackSize": 1,

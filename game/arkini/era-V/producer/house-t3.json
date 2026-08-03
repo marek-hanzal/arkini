@@ -12,15 +12,6 @@
 					"producer-house-t3"
 				]
 			},
-			"tags": [
-				"producer",
-				"building",
-				"house",
-				"housing",
-				"morale",
-				"era:V",
-				"unique"
-			],
 			"scope": "any",
 			"maxCount": 1,
 			"maxStackSize": 1,

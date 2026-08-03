@@ -60,7 +60,6 @@ export const CheatItemSpotlight = ({
 				terms: [
 					item.itemId,
 					item.title,
-					...item.tags,
 				],
 			})),
 		[

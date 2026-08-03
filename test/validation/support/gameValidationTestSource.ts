@@ -6,7 +6,7 @@ import { OutputSchema } from "~/engine/output/schema/OutputSchema";
 import type { InputSchema } from "~/engine/input/schema/InputSchema";
 import type { StartSchema } from "~/engine/start/schema/StartSchema";
 
-export const createSimpleItem = (id: string, tags: string[] = []) =>
+export const createSimpleItem = (id: string) =>
 	SimpleItemSchema.parse({
 		uid: id,
 		id,
@@ -17,7 +17,6 @@ export const createSimpleItem = (id: string, tags: string[] = []) =>
 				`asset:${id}`,
 			],
 		},
-		tags,
 		scope: "any",
 		maxStackSize: 10,
 		type: "simple",

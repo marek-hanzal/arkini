@@ -65,7 +65,6 @@ const config = GameConfigSchema.parse({
 					"asset:water",
 				],
 			},
-			tags: [],
 			scope: "any",
 			maxStackSize: 10,
 		},
@@ -80,7 +79,6 @@ const config = GameConfigSchema.parse({
 					"asset:inventory",
 				],
 			},
-			tags: [],
 		},
 	},
 });

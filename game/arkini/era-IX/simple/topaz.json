@@ -12,12 +12,6 @@
 					"item-topaz"
 				]
 			},
-			"tags": [
-				"treasure",
-				"gem",
-				"topaz",
-				"era:IX"
-			],
 			"scope": "any",
 			"maxStackSize": 20
 		}

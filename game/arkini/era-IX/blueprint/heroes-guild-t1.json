@@ -16,14 +16,6 @@
 					"producer-heroes-guild-t1"
 				]
 			},
-			"tags": [
-				"blueprint",
-				"building",
-				"craft-target",
-				"hero",
-				"guild",
-				"era:IX"
-			],
 			"scope": "any",
 			"maxStackSize": 1,
 			"line": {

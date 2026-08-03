@@ -12,12 +12,6 @@
 					"item-rock"
 				]
 			},
-			"tags": [
-				"source",
-				"stone",
-				"era:I",
-				"stone-deposit"
-			],
 			"scope": "any",
 			"maxStackSize": 1,
 			"charges": {

@@ -16,14 +16,6 @@
 					"producer-weaver-hut-t1"
 				]
 			},
-			"tags": [
-				"blueprint",
-				"building",
-				"craft-target",
-				"cloth",
-				"textile",
-				"era:V"
-			],
 			"scope": "any",
 			"maxStackSize": 1,
 			"line": {

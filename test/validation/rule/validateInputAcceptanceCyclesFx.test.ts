@@ -162,40 +162,6 @@ describe("validateInputAcceptanceCyclesFx", () => {
 		).toEqual([]);
 	});
 
-	it("detects a cycle introduced through expanded tag selectors", async () => {
-		const a = {
-			...createProducerItem({
-				id: "item:a",
-				input: materials({
-					type: "tag",
-					tag: "tag:b",
-				}),
-			}),
-			tags: [
-				"tag:a",
-			],
-		};
-		const b = {
-			...createProducerItem({
-				id: "item:b",
-				input: materials({
-					type: "tag",
-					tag: "tag:a",
-				}),
-			}),
-			tags: [
-				"tag:b",
-			],
-		};
-
-		expect(
-			await cycleDiagnostics({
-				[a.id]: a,
-				[b.id]: b,
-			}),
-		).toHaveLength(1);
-	});
-
 	it("preserves source and input paths for every cycle edge", async () => {
 		const a = createProducerItem({
 			id: "item:a",

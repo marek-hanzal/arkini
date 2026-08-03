@@ -12,12 +12,6 @@
 					"item-stone-block"
 				]
 			},
-			"tags": [
-				"material",
-				"stone",
-				"era:I",
-				"tier-2-resource"
-			],
 			"scope": "any",
 			"maxStackSize": 50
 		}

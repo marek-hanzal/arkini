@@ -99,7 +99,6 @@ id
  title
  description
  asset
- tags
  categoryId
  scope
  maxCount?
@@ -217,7 +216,7 @@ Every input may optionally author a charge cost:
 }
 ```
 
-`from: "self"` charges the line owner. `from: "target"` is valid only on a deposit input and charges the board item resolved by its query. `deposit` is the interaction kind for one external board payer, not a required item type. Validation therefore requires the selector to match at least one sufficiently charged item whose scope is `board` or `any`. For exact-item target selectors, validation also sums unavoidable costs within one line and rejects totals above `charges.amount × finite maxCount`; broader selector feasibility remains deliberately outside this lightweight proof. A deposit input must author a target charge cost and never moves the target into an input buffer.
+`from: "self"` charges the line owner. `from: "target"` is valid only on a deposit input and charges the board item resolved by its query. `deposit` is the interaction kind for one external board payer, not a required item type. Validation therefore requires the selected item to have sufficient charges and a scope of `board` or `any`. Validation also sums unavoidable costs within one line and rejects totals above `charges.amount × finite maxCount`. A deposit input must author a target charge cost and never moves the target into an input buffer.
 
 Material mode:
 
@@ -228,7 +227,7 @@ reserve
 
 Both modes commit the accepted quantity to the active job. Reserved inputs move the same live runtime instance into `reserved` scope, retain identity and state, remember no historical location, and return through canonical existing-item placement. Pure reserved items may normalize into ordinary stacks; impure reserved items preserve identity and require an exclusive cell. Consumed inputs are destructive conversion: their passive owned state is discarded when the job actually starts, only the root remains inaccessible in `job` scope, and completion discards it permanently. Merely storing material in the input does not destroy anything. Jobs are not cancellable.
 
-A material selector describes the complete accepted candidate set. Every canonical item matched by an exact or tag selector must be capable of entering material-input storage; temporary items are board-bound and therefore make the selector invalid rather than being silently filtered at runtime.
+A material selector references one exact canonical item. That item must be capable of entering material-input storage; temporary items are board-bound and therefore invalid material inputs.
 
 Quantity is explicit through value or bounded quantity schemas. `capacity` describes extra material buffering above the required amount; it is not an alternative quantity mode. While a line runs, capacity zero closes that material input and positive capacity keeps it open as storage.
 
@@ -295,7 +294,7 @@ A capability becomes implemented only when it has a canonical command/path and f
 
 ## 9. Merge authoring and execution
 
-The authored source item owns an ordered list of directional merge rules. The first rule whose selector matches the concrete board target wins; reverse matching is never inferred. Semantic validation requires every target selector to match at least one board-capable canonical item, every replacement result to allow board presence, and an exact self-target merge to permit at least two live identities when `maxCount` is finite.
+The authored source item owns an ordered list of directional merge rules. The first rule whose exact item selector matches the concrete board target wins; reverse matching is never inferred. Semantic validation requires every target item to be board-capable, every replacement result to allow board presence, and a self-target merge to permit at least two live identities when `maxCount` is finite.
 
 Each rule describes:
 

@@ -16,12 +16,6 @@
 					"producer-townhall-t2"
 				]
 			},
-			"tags": [
-				"blueprint",
-				"building",
-				"craft-target",
-				"era:I"
-			],
 			"scope": "any",
 			"maxStackSize": 1,
 			"line": {

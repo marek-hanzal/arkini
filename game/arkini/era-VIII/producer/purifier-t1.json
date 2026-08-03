@@ -12,14 +12,6 @@
 					"producer-purifier-t1"
 				]
 			},
-			"tags": [
-				"producer",
-				"industry",
-				"purifier",
-				"pollution",
-				"era:VIII",
-				"unique"
-			],
 			"scope": "any",
 			"maxCount": 1,
 			"maxStackSize": 1,

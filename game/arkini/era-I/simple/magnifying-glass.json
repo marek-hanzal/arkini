@@ -12,14 +12,6 @@
 					"item-magnifying-glass"
 				]
 			},
-			"tags": [
-				"equipment",
-				"tool",
-				"search",
-				"survey",
-				"deposit-search",
-				"era:I"
-			],
 			"scope": "any",
 			"maxStackSize": 1
 		}

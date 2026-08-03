@@ -1,7 +1,5 @@
 import { Effect } from "effect";
-import { match } from "ts-pattern";
 
-import { SelectorEnumSchema } from "~/engine/selector/schema/SelectorEnumSchema";
 import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import type { SelectorSchema } from "~/engine/selector/schema/SelectorSchema";
 
@@ -19,21 +17,7 @@ export const matchesItemSelector = ({
 }: {
 	readonly item: ItemSchema.Type;
 	readonly selector: SelectorSchema.Type;
-}) =>
-	match(selector)
-		.with(
-			{
-				type: SelectorEnumSchema.enum.Item,
-			},
-			({ itemId }) => itemId === item.id,
-		)
-		.with(
-			{
-				type: SelectorEnumSchema.enum.Tag,
-			},
-			({ tag }) => item.tags.includes(tag),
-		)
-		.exhaustive();
+}) => selector.itemId === item.id;
 
 /** Selects canonical items through the one exhaustive selector grammar. */
 export const selectItemsFx = Effect.fn("selectItemsFx")(function* ({

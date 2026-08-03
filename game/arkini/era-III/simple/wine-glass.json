@@ -12,12 +12,6 @@
 					"item-wine-glass"
 				]
 			},
-			"tags": [
-				"food",
-				"wine",
-				"era:III",
-				"tier-4-resource"
-			],
 			"scope": "any",
 			"maxStackSize": 50
 		}

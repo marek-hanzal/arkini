@@ -16,14 +16,6 @@
 					"producer-civic-office-t1"
 				]
 			},
-			"tags": [
-				"blueprint",
-				"building",
-				"craft-target",
-				"civic",
-				"permit",
-				"era:IV"
-			],
 			"scope": "any",
 			"maxStackSize": 1,
 			"line": {

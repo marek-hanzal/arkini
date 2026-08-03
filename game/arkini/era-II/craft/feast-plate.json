@@ -17,13 +17,6 @@
 					"item-feast"
 				]
 			},
-			"tags": [
-				"food",
-				"feast",
-				"craft-target",
-				"era:II",
-				"tier-4-resource"
-			],
 			"scope": "any",
 			"maxStackSize": 1,
 			"line": {

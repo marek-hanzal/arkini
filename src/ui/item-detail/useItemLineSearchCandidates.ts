@@ -14,14 +14,6 @@ export const useItemLineSearchCandidates = (
 	>,
 ) =>
 	useMemo(() => {
-		const humanizeTag = (tag: string) =>
-			tag
-				.replaceAll(":", " ")
-				.replaceAll("-", " ")
-				.replaceAll("_", " ")
-				.replace(/\b\p{L}/gu, (letter) => letter.toUpperCase());
-		const selectorLabel = (selector: ItemDetailLines.Selector) =>
-			selector.kind === "tag" ? humanizeTag(selector.label) : selector.label;
 		const chargeSearchTerms = (charges: ItemDetailLines.ChargeCost | undefined) =>
 			charges === undefined
 				? []
@@ -49,7 +41,6 @@ export const useItemLineSearchCandidates = (
 						"materials",
 						materials.selector.kind,
 						materials.selector.label,
-						selectorLabel(materials.selector),
 						materials.mode,
 						materials.mode === "consume" ? "consumed" : "reserved",
 						"stored",
@@ -73,7 +64,6 @@ export const useItemLineSearchCandidates = (
 						"board",
 						deposit.selector.kind,
 						deposit.selector.label,
-						selectorLabel(deposit.selector),
 						deposit.distance,
 						deposit.ready ? "ready" : "missing inputs",
 						...deposit.targetTitles,

@@ -8,7 +8,6 @@ const simpleItem = ({
 	maxStackSize = 10,
 	merge,
 	scope = "any",
-	tags = [],
 }: {
 	id: string;
 	maxCount?: number;
@@ -18,7 +17,6 @@ const simpleItem = ({
 		...MergeSchema.Type[],
 	];
 	scope?: "any" | "board" | "inventory";
-	tags?: string[];
 }) => ({
 	uid: id,
 	id,
@@ -29,7 +27,6 @@ const simpleItem = ({
 			`asset:${id}`,
 		],
 	},
-	tags,
 	scope,
 	maxCount,
 	maxStackSize,
@@ -53,7 +50,6 @@ export const createMergeTestConfig = ({
 	sourceMaxStackSize = 10,
 	sourceScope = "any",
 	targetMaxStackSize = 10,
-	targetTags = [],
 }: {
 	board?: {
 		width: number;
@@ -75,7 +71,6 @@ export const createMergeTestConfig = ({
 	sourceMaxStackSize?: number;
 	sourceScope?: "any" | "board" | "inventory";
 	targetMaxStackSize?: number;
-	targetTags?: string[];
 }) =>
 	GameConfigSchema.parse({
 		version: "1.0",
@@ -109,7 +104,6 @@ export const createMergeTestConfig = ({
 			target: simpleItem({
 				id: "target",
 				maxStackSize: targetMaxStackSize,
-				tags: targetTags,
 			}),
 			result: simpleItem({
 				id: "result",

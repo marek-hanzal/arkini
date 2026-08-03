@@ -16,16 +16,6 @@
 					"producer-quarry-t2"
 				]
 			},
-			"tags": [
-				"blueprint",
-				"building",
-				"craft-target",
-				"stone",
-				"marble",
-				"luxury",
-				"prestige",
-				"era:X"
-			],
 			"scope": "any",
 			"maxStackSize": 1,
 			"line": {

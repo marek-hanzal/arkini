@@ -38,7 +38,6 @@ const config = GameConfigSchema.parse({
 					"asset:source",
 				],
 			},
-			tags: [],
 			scope: "board",
 			maxStackSize: 1,
 			type: "simple",
@@ -53,9 +52,6 @@ const config = GameConfigSchema.parse({
 					"asset:tree",
 				],
 			},
-			tags: [
-				"forest",
-			],
 			scope: "any",
 			maxStackSize: 10,
 			type: "simple",
@@ -147,8 +143,8 @@ describe("whenFx", () => {
 						query: {
 							scope: "inventory",
 							selector: {
-								tag: "forest",
-								type: "tag",
+								itemId: "tree",
+								type: "item",
 							},
 						},
 						type: "exists",

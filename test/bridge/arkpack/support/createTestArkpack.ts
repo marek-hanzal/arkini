@@ -44,7 +44,6 @@ export const testArkpackConfig = GameConfigSchema.parse({
 					"asset:water",
 				],
 			},
-			tags: [],
 			scope: "any",
 			maxStackSize: 10,
 		},

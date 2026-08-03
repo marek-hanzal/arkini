@@ -12,12 +12,6 @@
 					"item-aquamarine"
 				]
 			},
-			"tags": [
-				"treasure",
-				"gem",
-				"aquamarine",
-				"era:IX"
-			],
 			"scope": "any",
 			"maxStackSize": 20
 		}

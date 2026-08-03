@@ -12,14 +12,6 @@
 					"item-clay"
 				]
 			},
-			"tags": [
-				"material",
-				"construction",
-				"earth",
-				"era:VIII",
-				"industry",
-				"tier-3-resource"
-			],
 			"scope": "any",
 			"maxStackSize": 50
 		}

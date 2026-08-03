@@ -12,13 +12,6 @@
 					"item-piglet"
 				]
 			},
-			"tags": [
-				"animal",
-				"food",
-				"pig",
-				"era:II",
-				"tier-2-resource"
-			],
 			"scope": "any",
 			"maxStackSize": 20
 		}

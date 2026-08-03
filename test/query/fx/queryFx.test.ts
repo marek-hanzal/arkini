@@ -44,9 +44,6 @@ const config = GameConfigSchema.parse({
 					"asset:tree",
 				],
 			},
-			tags: [
-				"forest",
-			],
 			scope: "any",
 			maxStackSize: 10,
 			type: "simple",
@@ -143,8 +140,8 @@ describe("queryFx", () => {
 						distance: "self",
 						scope: "board",
 						selector: {
-							tag: "forest",
-							type: "tag",
+							itemId: "tree",
+							type: "item",
 						},
 					},
 				});
@@ -158,8 +155,8 @@ describe("queryFx", () => {
 						distance: "close",
 						scope: "board",
 						selector: {
-							tag: "forest",
-							type: "tag",
+							itemId: "tree",
+							type: "item",
 						},
 					},
 				});
@@ -173,8 +170,8 @@ describe("queryFx", () => {
 						distance: "near",
 						scope: "board",
 						selector: {
-							tag: "forest",
-							type: "tag",
+							itemId: "tree",
+							type: "item",
 						},
 					},
 				});
@@ -188,8 +185,8 @@ describe("queryFx", () => {
 						distance: "far",
 						scope: "board",
 						selector: {
-							tag: "forest",
-							type: "tag",
+							itemId: "tree",
+							type: "item",
 						},
 					},
 				});

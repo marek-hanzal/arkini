@@ -16,14 +16,6 @@
 					"producer-library-t2"
 				]
 			},
-			"tags": [
-				"blueprint",
-				"building",
-				"craft-target",
-				"library",
-				"knowledge",
-				"era:IV"
-			],
 			"scope": "any",
 			"maxStackSize": 1,
 			"line": {

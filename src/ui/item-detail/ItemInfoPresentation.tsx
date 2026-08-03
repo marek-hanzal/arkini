@@ -48,35 +48,3 @@ export const ItemInfoFact = ({
 		</dd>
 	</div>
 );
-
-export const readItemTraitLabel = (tag: string) => {
-	const era = /^era:(.+)$/u.exec(tag);
-	if (era?.[1] !== undefined) return `Era ${era[1]}`;
-	return tag
-		.replaceAll(":", " ")
-		.replaceAll("-", " ")
-		.replaceAll("_", " ")
-		.replace(/\b\p{L}/gu, (letter) => letter.toUpperCase());
-};
-
-export const ItemTraits = ({
-	dataUi,
-	tags,
-}: {
-	readonly dataUi?: string;
-	readonly tags: readonly string[];
-}) => (
-	<div
-		className="flex flex-wrap gap-2"
-		data-ui={dataUi}
-	>
-		{tags.map((tag) => (
-			<span
-				key={tag}
-				className="rounded-full border border-line bg-surface px-3 py-1 text-xs font-medium text-muted"
-			>
-				{readItemTraitLabel(tag)}
-			</span>
-		))}
-	</div>
-);

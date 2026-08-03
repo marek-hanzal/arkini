@@ -18,7 +18,6 @@ const baseItem = ({
 			`asset:${id}`,
 		],
 	},
-	tags: [],
 	scope: "board" as const,
 	maxStackSize,
 	maxCount,

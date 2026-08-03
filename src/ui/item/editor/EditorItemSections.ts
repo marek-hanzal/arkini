@@ -24,7 +24,6 @@ export const EditorItemFieldSections = {
 	type: "identity",
 	title: "identity",
 	description: "identity",
-	tags: "identity",
 	scope: "identity",
 	asset: "artwork",
 	maxCount: "limits",

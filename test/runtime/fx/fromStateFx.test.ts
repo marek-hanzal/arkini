@@ -41,10 +41,6 @@ const config = GameConfigSchema.parse({
 					"asset:tree",
 				],
 			},
-			tags: [
-				"nature",
-				"forest",
-			],
 			scope: "any",
 			maxStackSize: 10,
 			type: "simple",

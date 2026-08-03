@@ -12,13 +12,6 @@
 					"item-clay-deposit"
 				]
 			},
-			"tags": [
-				"source",
-				"construction",
-				"clay",
-				"deposit",
-				"era:VI"
-			],
 			"scope": "any",
 			"maxStackSize": 1
 		}

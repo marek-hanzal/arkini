@@ -16,15 +16,6 @@
 					"producer-cathedral"
 				]
 			},
-			"tags": [
-				"blueprint",
-				"building",
-				"path",
-				"keystone",
-				"faith",
-				"cathedral",
-				"era:XI"
-			],
 			"scope": "any",
 			"maxStackSize": 1,
 			"line": {

@@ -16,14 +16,6 @@
 					"producer-armory-t1"
 				]
 			},
-			"tags": [
-				"blueprint",
-				"building",
-				"craft-target",
-				"armory",
-				"equipment",
-				"era:IX"
-			],
 			"scope": "any",
 			"maxStackSize": 1,
 			"line": {

@@ -69,7 +69,6 @@ const item = {
 			"asset:water",
 		],
 	},
-	tags: [],
 	scope: "any",
 	maxStackSize: 1,
 } as const;

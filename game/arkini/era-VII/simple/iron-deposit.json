@@ -12,13 +12,6 @@
 					"item-iron-deposit"
 				]
 			},
-			"tags": [
-				"source",
-				"industry",
-				"mine",
-				"iron",
-				"era:VII"
-			],
 			"scope": "any",
 			"maxStackSize": 1
 		}

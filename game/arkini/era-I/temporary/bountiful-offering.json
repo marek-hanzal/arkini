@@ -12,13 +12,6 @@
 					"producer-shrine-t1"
 				]
 			},
-			"tags": [
-				"effect",
-				"buff",
-				"shrine",
-				"bountiful",
-				"era:I"
-			],
 			"durationMs": 180000
 		}
 	}

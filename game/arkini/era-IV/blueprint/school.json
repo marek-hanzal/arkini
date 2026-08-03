@@ -16,13 +16,6 @@
 					"producer-school"
 				]
 			},
-			"tags": [
-				"blueprint",
-				"building",
-				"education",
-				"knowledge",
-				"era:IV"
-			],
 			"scope": "any",
 			"maxStackSize": 1,
 			"line": {

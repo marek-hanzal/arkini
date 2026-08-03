@@ -16,15 +16,6 @@
 					"producer-glassworks"
 				]
 			},
-			"tags": [
-				"blueprint",
-				"building",
-				"construction",
-				"glass",
-				"craft-target",
-				"era:VIII",
-				"industry"
-			],
 			"scope": "any",
 			"maxStackSize": 1,
 			"line": {

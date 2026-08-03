@@ -12,12 +12,6 @@
 					"item-quest"
 				]
 			},
-			"tags": [
-				"quest",
-				"craft-target",
-				"request",
-				"era:I"
-			],
 			"scope": "any",
 			"maxStackSize": 1,
 			"line": {

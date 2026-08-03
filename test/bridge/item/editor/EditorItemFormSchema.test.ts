@@ -13,18 +13,13 @@ const item = {
 			"item-test",
 		],
 	},
-	tags: "resource, test, era:I",
 	scope: "any",
 	maxStackSize: 1,
 } as const;
 
 describe("EditorItemFormSchema", () => {
-	it("normalizes the one raw tags field into canonical item tags", () => {
-		expect(EditorItemFormSchema.parse(item).tags).toEqual([
-			"resource",
-			"test",
-			"era:I",
-		]);
+	it("emits the canonical item without presentation-only form fields", () => {
+		expect(EditorItemFormSchema.parse(item)).toEqual(item);
 	});
 
 	it("keeps a blank required number invalid at its exact field path", () => {

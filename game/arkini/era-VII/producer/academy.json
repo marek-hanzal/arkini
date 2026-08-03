@@ -12,14 +12,6 @@
 					"producer-academy"
 				]
 			},
-			"tags": [
-				"producer",
-				"building",
-				"education",
-				"knowledge",
-				"unique",
-				"era:VII"
-			],
 			"scope": "any",
 			"maxCount": 1,
 			"maxStackSize": 1,

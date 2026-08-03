@@ -12,14 +12,6 @@
 					"producer-windmill-t1"
 				]
 			},
-			"tags": [
-				"producer",
-				"food",
-				"grain",
-				"flour",
-				"era:III",
-				"unique"
-			],
 			"scope": "any",
 			"maxCount": 1,
 			"maxStackSize": 1,

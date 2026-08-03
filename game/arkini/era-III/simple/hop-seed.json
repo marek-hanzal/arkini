@@ -13,14 +13,6 @@
 					"item-hops"
 				]
 			},
-			"tags": [
-				"material",
-				"food",
-				"seed",
-				"hops",
-				"era:III",
-				"tier-3-resource"
-			],
 			"scope": "any",
 			"maxStackSize": 50
 		}

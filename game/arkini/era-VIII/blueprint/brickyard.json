@@ -16,15 +16,6 @@
 					"producer-brickyard"
 				]
 			},
-			"tags": [
-				"blueprint",
-				"building",
-				"construction",
-				"clay",
-				"craft-target",
-				"era:VIII",
-				"industry"
-			],
 			"scope": "any",
 			"maxStackSize": 1,
 			"line": {

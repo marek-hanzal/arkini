@@ -13,10 +13,6 @@ const item = {
 			"asset:item:effect:minor-haste",
 		],
 	},
-	tags: [
-		"effect",
-		"buff",
-	],
 	durationMs: 300_000,
 };
 

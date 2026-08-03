@@ -45,7 +45,6 @@ const configInput = {
 					"asset:water",
 				],
 			},
-			tags: [],
 			scope: "any",
 			maxStackSize: 10,
 		},
@@ -60,7 +59,6 @@ const configInput = {
 					"asset:stone",
 				],
 			},
-			tags: [],
 			scope: "any",
 			maxStackSize: 10,
 		},
@@ -75,7 +73,6 @@ const configInput = {
 					"asset:backpack",
 				],
 			},
-			tags: [],
 		},
 	},
 } as const;

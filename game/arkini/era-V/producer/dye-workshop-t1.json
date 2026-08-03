@@ -12,15 +12,6 @@
 					"producer-dye-workshop-t1"
 				]
 			},
-			"tags": [
-				"producer",
-				"building",
-				"dye",
-				"cloth",
-				"textile",
-				"era:V",
-				"unique"
-			],
 			"scope": "any",
 			"maxCount": 1,
 			"maxStackSize": 1,

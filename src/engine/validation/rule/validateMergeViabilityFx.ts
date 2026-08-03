@@ -9,7 +9,6 @@ import { DiagnosticCodeEnumSchema } from "~/engine/validation/schema/DiagnosticC
 import { DiagnosticSeverityEnumSchema } from "~/engine/validation/schema/DiagnosticSeverityEnumSchema";
 import { InvalidMergeReasonEnumSchema } from "~/engine/validation/schema/InvalidMergeReasonEnumSchema";
 import { StorageScopeEnumSchema } from "~/engine/scope/schema/StorageScopeEnumSchema";
-import { SelectorEnumSchema } from "~/engine/selector/schema/SelectorEnumSchema";
 
 export namespace validateMergeViabilityFx {
 	export interface Props {
@@ -27,12 +26,9 @@ export const validateMergeViabilityFx = Effect.fn("validateMergeViabilityFx")(fu
 
 	for (const [ownerItemId, owner] of Object.entries(config.items)) {
 		for (const [mergeIndex, merge] of (owner.merge ?? []).entries()) {
-			const missingExactTarget =
-				merge.target.type === SelectorEnumSchema.enum.Item &&
-				config.items[merge.target.itemId] === undefined;
+			const missingExactTarget = config.items[merge.target.itemId] === undefined;
 			if (!missingExactTarget) {
 				const exactSelfTargetUnavailable =
-					merge.target.type === SelectorEnumSchema.enum.Item &&
 					merge.target.itemId === ownerItemId &&
 					owner.maxCount === 1 &&
 					(owner.scope === StorageScopeEnumSchema.enum.Board ||

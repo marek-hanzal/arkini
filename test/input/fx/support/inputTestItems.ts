@@ -1,7 +1,7 @@
 import { SimpleItemSchema } from "~/engine/item/schema/SimpleItemSchema";
 import type { RuntimeItemSchema } from "~/engine/runtime/schema/RuntimeItemSchema";
 
-const simpleItem = ({ id, tags }: { id: string; tags: string[] }) => {
+const simpleItem = ({ id }: { id: string }) => {
 	return SimpleItemSchema.parse({
 		uid: id,
 		id,
@@ -12,7 +12,6 @@ const simpleItem = ({ id, tags }: { id: string; tags: string[] }) => {
 				`asset:${id}`,
 			],
 		},
-		tags,
 		scope: "any",
 		maxStackSize: 10,
 		type: "simple",
@@ -22,15 +21,9 @@ const simpleItem = ({ id, tags }: { id: string; tags: string[] }) => {
 export const inputTestItems = {
 	water: simpleItem({
 		id: "item:water",
-		tags: [
-			"liquid",
-		],
 	}),
 	log: simpleItem({
 		id: "item:log",
-		tags: [
-			"wood",
-		],
 	}),
 };
 

@@ -12,12 +12,6 @@
 					"item-key-t3"
 				]
 			},
-			"tags": [
-				"key",
-				"goldsmith",
-				"gem",
-				"era:IX"
-			],
 			"scope": "any",
 			"maxStackSize": 20
 		}

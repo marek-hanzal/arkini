@@ -12,13 +12,6 @@
 					"item-paper"
 				]
 			},
-			"tags": [
-				"resource",
-				"paper",
-				"civic",
-				"era:IV",
-				"tier-4-resource"
-			],
 			"scope": "any",
 			"maxStackSize": 50
 		}

@@ -13,10 +13,6 @@ describe("tile identity and Info projections", () => {
 		if (owner === undefined) throw new Error("Missing test owner.");
 		const item = {
 			...owner.item,
-			tags: [
-				"producer",
-				"era:I",
-			],
 			maxCount: 2,
 			charges: {
 				amount: 4,
@@ -73,10 +69,6 @@ describe("tile identity and Info projections", () => {
 			itemId: owner.id,
 			description: "workshop",
 			itemType: "producer",
-			tags: [
-				"producer",
-				"era:I",
-			],
 			storageScope: "board",
 			location: {
 				kind: "board",

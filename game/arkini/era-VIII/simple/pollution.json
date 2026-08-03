@@ -12,12 +12,6 @@
 					"item-pollution"
 				]
 			},
-			"tags": [
-				"danger",
-				"industry",
-				"pollution",
-				"era:VIII"
-			],
 			"scope": "board",
 			"maxStackSize": 1
 		}

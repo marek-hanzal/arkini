@@ -16,12 +16,6 @@
 					"producer-goldsmith-t1"
 				]
 			},
-			"tags": [
-				"blueprint",
-				"building",
-				"craft-target",
-				"era:IX"
-			],
 			"scope": "any",
 			"maxStackSize": 1,
 			"line": {

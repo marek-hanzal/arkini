@@ -12,13 +12,6 @@
 					"item-wine-barrel"
 				]
 			},
-			"tags": [
-				"material",
-				"food",
-				"wine",
-				"era:III",
-				"tier-3-resource"
-			],
 			"scope": "any",
 			"maxStackSize": 20
 		}

@@ -16,13 +16,6 @@
 					"producer-university"
 				]
 			},
-			"tags": [
-				"blueprint",
-				"building",
-				"education",
-				"knowledge",
-				"era:IX"
-			],
 			"scope": "any",
 			"maxStackSize": 1,
 			"line": {

@@ -71,14 +71,6 @@ export const EditorItemIdentitySection = () => {
 					</form.AppField>
 				)}
 			</div>
-			<form.AppField name="tags">
-				{(field) => (
-					<field.TagsField
-						label="Tags"
-						description="Comma-separated semantic tags used by selectors and search."
-					/>
-				)}
-			</form.AppField>
 		</div>
 	);
 };

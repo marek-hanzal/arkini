@@ -12,12 +12,6 @@
 					"item-coin"
 				]
 			},
-			"tags": [
-				"currency",
-				"coin",
-				"trade",
-				"era:III"
-			],
 			"scope": "any",
 			"maxStackSize": 100
 		}

@@ -12,13 +12,6 @@
 					"item-master-knowledge"
 				]
 			},
-			"tags": [
-				"knowledge",
-				"education",
-				"research",
-				"university",
-				"era:IX"
-			],
 			"scope": "any",
 			"maxStackSize": 50
 		}

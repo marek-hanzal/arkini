@@ -12,12 +12,6 @@
 					"item-advanced-knowledge"
 				]
 			},
-			"tags": [
-				"knowledge",
-				"education",
-				"research",
-				"era:VII"
-			],
 			"scope": "any",
 			"maxStackSize": 50
 		}

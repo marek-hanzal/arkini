@@ -12,12 +12,6 @@
 					"producer-quarry-t1"
 				]
 			},
-			"tags": [
-				"producer",
-				"stone",
-				"era:I",
-				"unique"
-			],
 			"scope": "any",
 			"maxCount": 1,
 			"maxStackSize": 1,

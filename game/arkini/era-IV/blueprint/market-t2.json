@@ -16,14 +16,6 @@
 					"producer-market-t2"
 				]
 			},
-			"tags": [
-				"blueprint",
-				"building",
-				"craft-target",
-				"market",
-				"trade",
-				"era:IV"
-			],
 			"scope": "any",
 			"maxStackSize": 1,
 			"line": {

@@ -12,13 +12,6 @@
 					"item-coin-stack"
 				]
 			},
-			"tags": [
-				"currency",
-				"coin",
-				"trade",
-				"goldsmith",
-				"era:IX"
-			],
 			"scope": "any",
 			"maxStackSize": 50
 		}

@@ -12,15 +12,6 @@
 					"producer-heroes-guild-t1"
 				]
 			},
-			"tags": [
-				"producer",
-				"hero",
-				"guild",
-				"expedition",
-				"master",
-				"unique",
-				"era:IX"
-			],
 			"scope": "any",
 			"maxCount": 1,
 			"maxStackSize": 1,

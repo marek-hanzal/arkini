@@ -12,14 +12,6 @@
 					"item-flour"
 				]
 			},
-			"tags": [
-				"material",
-				"food",
-				"grain",
-				"flour",
-				"era:III",
-				"tier-3-resource"
-			],
 			"scope": "any",
 			"maxStackSize": 50
 		}

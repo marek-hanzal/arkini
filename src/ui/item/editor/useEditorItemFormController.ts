@@ -34,7 +34,6 @@ export const useEditorItemFormController = ({
 	const canonicalItem = useMemo<EditorItemFormValues>(
 		() => ({
 			...initialItem,
-			tags: initialItem.tags.join(", "),
 			merge:
 				initialItem.merge === undefined
 					? undefined
@@ -67,7 +66,6 @@ export const useEditorItemFormController = ({
 			submitSucceeded.current = true;
 			formApi.reset({
 				...saved,
-				tags: saved.tags.join(", "),
 				merge:
 					saved.merge === undefined
 						? undefined

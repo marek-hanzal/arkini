@@ -5,7 +5,6 @@ import {
 	ItemInfoFact,
 	ItemInfoFacts,
 	ItemStorageScopeLabel,
-	ItemTraits,
 	ItemTypeLabel,
 } from "~/ui/item-detail/ItemInfoPresentation";
 import { Scrollable } from "~/ui/scrollable/Scrollable";
@@ -142,17 +141,5 @@ export const ItemInfoTab = ({
 				)}
 			</ItemInfoFacts>
 		</section>
-
-		{info.tags.length === 0 ? null : (
-			<section className="border-t border-line pt-5">
-				<h3 className="text-sm font-semibold">Traits</h3>
-				<div className="mt-3">
-					<ItemTraits
-						dataUi="TileInfoTraits"
-						tags={info.tags}
-					/>
-				</div>
-			</section>
-		)}
 	</Scrollable>
 );

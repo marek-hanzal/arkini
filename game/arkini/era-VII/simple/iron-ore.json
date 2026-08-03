@@ -12,14 +12,6 @@
 					"item-iron-ore"
 				]
 			},
-			"tags": [
-				"material",
-				"industry",
-				"ore",
-				"iron",
-				"era:VII",
-				"tier-7-resource"
-			],
 			"scope": "any",
 			"maxStackSize": 20
 		}

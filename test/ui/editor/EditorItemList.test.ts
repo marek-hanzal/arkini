@@ -51,18 +51,15 @@ beforeEach(() => {
 		id,
 		title,
 		type,
-		tags = [],
 	}: {
 		readonly id: string;
 		readonly title: string;
 		readonly type: "deposit" | "producer" | "simple";
-		readonly tags?: readonly string[];
 	}) => ({
 		uid: id,
 		id,
 		title,
 		type,
-		tags,
 		description: `${title} description`,
 		asset: {
 			default: [
@@ -79,9 +76,6 @@ beforeEach(() => {
 					id: "water",
 					title: "Water",
 					type: "simple",
-					tags: [
-						"hydration",
-					],
 				}),
 				well: createItem({
 					id: "well",
@@ -167,7 +161,7 @@ describe("EditorItemList", () => {
 			"well",
 		]);
 
-		await setSearch(container, "hydration");
+		await setSearch(container, "water");
 		expect(readVisibleItemIds(container)).toEqual([
 			"water",
 		]);

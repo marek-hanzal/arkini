@@ -16,13 +16,6 @@
 					"producer-blacksmith-t1"
 				]
 			},
-			"tags": [
-				"blueprint",
-				"building",
-				"craft-target",
-				"blacksmith",
-				"era:IX"
-			],
 			"scope": "any",
 			"maxStackSize": 1,
 			"line": {

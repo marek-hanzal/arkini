@@ -16,12 +16,6 @@
 					"producer-coal-mine-t1"
 				]
 			},
-			"tags": [
-				"blueprint",
-				"building",
-				"craft-target",
-				"era:VII"
-			],
 			"scope": "any",
 			"maxStackSize": 1,
 			"line": {

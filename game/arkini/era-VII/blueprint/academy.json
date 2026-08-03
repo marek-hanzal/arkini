@@ -16,13 +16,6 @@
 					"producer-academy"
 				]
 			},
-			"tags": [
-				"blueprint",
-				"building",
-				"education",
-				"knowledge",
-				"era:VII"
-			],
 			"scope": "any",
 			"maxStackSize": 1,
 			"line": {

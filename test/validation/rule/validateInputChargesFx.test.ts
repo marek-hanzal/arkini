@@ -22,20 +22,23 @@ const chargeDiagnostics = async (items: Record<string, unknown>) =>
 		)
 	).diagnostics.filter(({ code }) => code === DiagnosticCodeEnumSchema.enum.InputChargesInvalid);
 
-const depositInput = ({
-	cost = 1,
-	from = "target",
-}: {
-	cost?: number;
-	from?: "self" | "target";
-} = {}) => ({
+const depositInput = (
+	itemId: string,
+	{
+		cost = 1,
+		from = "target",
+	}: {
+		cost?: number;
+		from?: "self" | "target";
+	} = {},
+) => ({
 	type: "deposit" as const,
 	query: {
 		scope: "board" as const,
 		distance: "close" as const,
 		selector: {
-			type: "tag" as const,
-			tag: "source",
+			type: "item" as const,
+			itemId,
 		},
 	},
 	charges: {
@@ -126,8 +129,8 @@ describe("validateInputChargesFx", () => {
 						scope: "board",
 						distance: "close",
 						selector: {
-							type: "tag",
-							tag: "source",
+							type: "item",
+							itemId: "source",
 						},
 					},
 				},
@@ -260,7 +263,7 @@ describe("validateInputChargesFx", () => {
 			...createProducerItem({
 				id: "deposit-self",
 				input: [
-					depositInput({
+					depositInput("material", {
 						from: "self",
 					}),
 				],
@@ -319,13 +322,11 @@ describe("validateInputChargesFx", () => {
 		const producer = createProducerItem({
 			id: "inventory-selector-target",
 			input: [
-				depositInput(),
+				depositInput("inventory-source"),
 			],
 		});
 		const target = {
-			...createSimpleItem("inventory-source", [
-				"source",
-			]),
+			...createSimpleItem("inventory-source"),
 			scope: "inventory" as const,
 			charges: {
 				amount: 1,
@@ -345,25 +346,27 @@ describe("validateInputChargesFx", () => {
 	});
 
 	it("accepts board and any external payer scopes", async () => {
-		const producer = createProducerItem({
+		const boardProducer = createProducerItem({
 			id: "board-capable-target",
 			input: [
-				depositInput(),
+				depositInput("board-source"),
+			],
+		});
+		const anyProducer = createProducerItem({
+			id: "any-capable-target",
+			input: [
+				depositInput("any-source"),
 			],
 		});
 		const boardTarget = {
-			...createSimpleItem("board-source", [
-				"source",
-			]),
+			...createSimpleItem("board-source"),
 			scope: "board" as const,
 			charges: {
 				amount: 1,
 			},
 		};
 		const anyTarget = {
-			...createSimpleItem("any-source", [
-				"source",
-			]),
+			...createSimpleItem("any-source"),
 			charges: {
 				amount: 1,
 			},
@@ -371,49 +374,14 @@ describe("validateInputChargesFx", () => {
 
 		expect(
 			await chargeDiagnostics({
-				[producer.id]: producer,
+				[boardProducer.id]: boardProducer,
 				[boardTarget.id]: boardTarget,
 			}),
 		).toEqual([]);
 		expect(
 			await chargeDiagnostics({
-				[producer.id]: producer,
+				[anyProducer.id]: anyProducer,
 				[anyTarget.id]: anyTarget,
-			}),
-		).toEqual([]);
-	});
-
-	it("accepts a mixed selector when at least one charged match is board-capable", async () => {
-		const producer = createProducerItem({
-			id: "mixed-selector-target",
-			input: [
-				depositInput(),
-			],
-		});
-		const inventoryTarget = {
-			...createSimpleItem("inventory-source", [
-				"source",
-			]),
-			scope: "inventory" as const,
-			charges: {
-				amount: 1,
-			},
-		};
-		const boardTarget = {
-			...createSimpleItem("board-source", [
-				"source",
-			]),
-			scope: "board" as const,
-			charges: {
-				amount: 1,
-			},
-		};
-
-		expect(
-			await chargeDiagnostics({
-				[producer.id]: producer,
-				[inventoryTarget.id]: inventoryTarget,
-				[boardTarget.id]: boardTarget,
 			}),
 		).toEqual([]);
 	});
@@ -422,15 +390,13 @@ describe("validateInputChargesFx", () => {
 		const producer = createProducerItem({
 			id: "producer",
 			input: [
-				depositInput({
+				depositInput("weak", {
 					cost: 2,
 				}),
 			],
 		});
 		const weak = {
-			...createSimpleItem("weak", [
-				"source",
-			]),
+			...createSimpleItem("weak"),
 			scope: "board" as const,
 			charges: {
 				amount: 1,
@@ -554,7 +520,7 @@ describe("validateInputChargesFx", () => {
 							cost: 2,
 						},
 					},
-					depositInput({
+					depositInput("target", {
 						cost: 2,
 					}),
 				],
@@ -564,9 +530,7 @@ describe("validateInputChargesFx", () => {
 			},
 		};
 		const target = {
-			...createSimpleItem("target", [
-				"source",
-			]),
+			...createSimpleItem("target"),
 			charges: {
 				amount: 2,
 			},

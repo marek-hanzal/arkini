@@ -12,14 +12,6 @@
 					"item-leather"
 				]
 			},
-			"tags": [
-				"material",
-				"leather",
-				"animal",
-				"textile",
-				"era:V",
-				"tier-5-resource"
-			],
 			"scope": "any",
 			"maxStackSize": 50
 		}

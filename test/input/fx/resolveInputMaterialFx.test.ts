@@ -63,8 +63,8 @@ describe("resolveInputMaterialFx", () => {
 		const input = InputMaterialSchema.parse({
 			type: "materials",
 			selector: {
-				type: "tag",
-				tag: "fuel",
+				type: "item",
+				itemId: "item:fuel",
 			},
 			mode: "reserve",
 			quantity: {

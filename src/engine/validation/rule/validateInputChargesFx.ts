@@ -12,7 +12,6 @@ import { DiagnosticSeverityEnumSchema } from "~/engine/validation/schema/Diagnos
 import { InvalidInputChargesReasonEnumSchema } from "~/engine/validation/schema/InvalidInputChargesReasonEnumSchema";
 import { StorageScopeEnumSchema } from "~/engine/scope/schema/StorageScopeEnumSchema";
 import { InputEnumSchema } from "~/engine/input/schema/InputEnumSchema";
-import { SelectorEnumSchema } from "~/engine/selector/schema/SelectorEnumSchema";
 
 import { readItemLineEntriesFx } from "../fx/readItemLineEntriesFx";
 
@@ -154,14 +153,12 @@ export const validateInputChargesFx = Effect.fn("validateInputChargesFx")(functi
 					continue;
 				}
 
-				if (input.query.selector.type === SelectorEnumSchema.enum.Item) {
-					const payerItemId = input.query.selector.itemId;
-					const current = exactTargetCosts.get(payerItemId);
-					exactTargetCosts.set(payerItemId, {
-						cost: (current?.cost ?? 0) + input.charges.cost,
-						inputIndex,
-					});
-				}
+				const payerItemId = input.query.selector.itemId;
+				const current = exactTargetCosts.get(payerItemId);
+				exactTargetCosts.set(payerItemId, {
+					cost: (current?.cost ?? 0) + input.charges.cost,
+					inputIndex,
+				});
 
 				const targetChargeCost = input.charges.cost;
 				const matchedCandidates = yield* selectItemsFx({

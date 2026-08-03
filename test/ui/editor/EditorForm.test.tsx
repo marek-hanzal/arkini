@@ -65,19 +65,19 @@ const LocalValueHarness = () => {
 	const form = useAppForm({
 		defaultValues: {
 			amount: 4,
-			tags: "resource, original",
+			name: "Original",
 		},
 	});
 	resetLocalValues = () => form.reset();
 	const values = useStore(form.store, (state) => state.values);
 	return (
 		<>
-			<form.AppField name="tags">{(field) => <field.TagsField label="Tags" />}</form.AppField>
+			<form.AppField name="name">{(field) => <field.TextField label="Name" />}</form.AppField>
 			<form.AppField name="amount">
 				{(field) => <field.NumberField label="Amount" />}
 			</form.AppField>
 			<output data-testid="values">
-				{values.tags}|{Number.isNaN(values.amount) ? "NaN" : values.amount}
+				{values.name}|{Number.isNaN(values.amount) ? "NaN" : values.amount}
 			</output>
 		</>
 	);
@@ -96,7 +96,6 @@ const validationDefaults: EditorItemFormValues = {
 			"item-test",
 		],
 	},
-	tags: "resource, form",
 	scope: "any",
 	maxStackSize: 1,
 };
@@ -131,28 +130,26 @@ const ValidationHarness = () => {
 };
 
 describe("editor form fields", () => {
-	it("keeps raw tags in the form store and resets the visible value from that store", async () => {
+	it("keeps local values in the form store and resets the visible controls", async () => {
 		const container = await mount(createElement(LocalValueHarness));
 		const inputs = container.querySelectorAll<HTMLInputElement>("input");
-		const tags = inputs[0];
+		const name = inputs[0];
 		const amount = inputs[1];
-		if (tags === undefined || amount === undefined) throw new Error("Missing form inputs.");
+		if (name === undefined || amount === undefined) throw new Error("Missing form inputs.");
 
-		await changeInput(tags, "resource, changed,");
+		await changeInput(name, "Changed");
 		await changeInput(amount, "");
-		expect(container.querySelector('[data-testid="values"]')?.textContent).toBe(
-			"resource, changed,|NaN",
-		);
+		expect(container.querySelector('[data-testid="values"]')?.textContent).toBe("Changed|NaN");
 
 		await act(async () => {
 			resetLocalValues();
 		});
 		await vi.waitFor(() => {
-			expect(container.querySelector<HTMLInputElement>('input[name="tags"]')?.value).toBe(
-				"resource, original",
+			expect(container.querySelector<HTMLInputElement>('input[name="name"]')?.value).toBe(
+				"Original",
 			);
 			expect(container.querySelector('[data-testid="values"]')?.textContent).toBe(
-				"resource, original|4",
+				"Original|4",
 			);
 		});
 	});
@@ -173,9 +170,6 @@ describe("editor form fields", () => {
 		expect(title.getAttribute("aria-invalid")).toBeNull();
 		await act(async () => submit.click());
 		expect(submittedItems).toHaveLength(1);
-		expect(submittedItems[0]?.tags).toEqual([
-			"resource",
-			"form",
-		]);
+		expect(submittedItems[0]?.title).toBe("Valid title");
 	});
 });

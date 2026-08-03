@@ -34,7 +34,6 @@ export const EditorItemList = () => {
 						item.title,
 						item.description,
 						item.type,
-						...item.tags,
 					],
 				})),
 		[
@@ -75,7 +74,7 @@ export const EditorItemList = () => {
 					type="search"
 					value={query}
 					className="min-w-64 flex-1 rounded-lg border border-line-strong bg-surface px-4 py-3 text-sm text-foreground outline-none placeholder:text-muted"
-					placeholder="Search item title, ID, type or tag…"
+					placeholder="Search item title, ID or type…"
 					aria-label="Search items"
 					onChange={(event) => setQuery(event.currentTarget.value)}
 				/>

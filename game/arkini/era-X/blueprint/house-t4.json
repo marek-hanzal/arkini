@@ -16,14 +16,6 @@
 					"producer-house-t4"
 				]
 			},
-			"tags": [
-				"blueprint",
-				"building",
-				"house",
-				"housing",
-				"morale",
-				"era:X"
-			],
 			"scope": "any",
 			"maxStackSize": 1,
 			"line": {

@@ -12,12 +12,6 @@
 					"item-sapphire"
 				]
 			},
-			"tags": [
-				"treasure",
-				"gem",
-				"sapphire",
-				"era:IX"
-			],
 			"scope": "any",
 			"maxStackSize": 20
 		}

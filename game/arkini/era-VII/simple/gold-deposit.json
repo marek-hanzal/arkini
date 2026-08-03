@@ -12,13 +12,6 @@
 					"item-gold-deposit"
 				]
 			},
-			"tags": [
-				"source",
-				"industry",
-				"mine",
-				"gold",
-				"era:VII"
-			],
 			"scope": "any",
 			"maxStackSize": 1
 		}

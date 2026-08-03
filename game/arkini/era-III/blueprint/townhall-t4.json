@@ -16,12 +16,6 @@
 					"producer-townhall-t4"
 				]
 			},
-			"tags": [
-				"blueprint",
-				"building",
-				"craft-target",
-				"era:III"
-			],
 			"scope": "any",
 			"maxStackSize": 1,
 			"line": {

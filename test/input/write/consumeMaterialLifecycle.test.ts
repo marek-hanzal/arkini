@@ -20,7 +20,6 @@ const base = (id: string) => ({
 			`asset:${id}`,
 		],
 	},
-	tags: [],
 	scope: "board" as const,
 	maxStackSize: 1,
 });

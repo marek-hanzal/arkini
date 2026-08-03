@@ -1757,8 +1757,8 @@ describe("ItemLinesTab", () => {
 		const advancedInput = {
 			...input,
 			selector: {
-				kind: "tag",
-				label: "knowledge:advanced",
+				kind: "item",
+				label: "Knowledge Advanced",
 			},
 			detail: undefined,
 			ready: false,

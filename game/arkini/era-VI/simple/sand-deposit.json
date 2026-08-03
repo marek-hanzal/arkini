@@ -12,13 +12,6 @@
 					"item-sand-deposit"
 				]
 			},
-			"tags": [
-				"source",
-				"construction",
-				"sand",
-				"glass",
-				"era:VI"
-			],
 			"scope": "any",
 			"maxStackSize": 1
 		}

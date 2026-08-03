@@ -17,7 +17,6 @@ const runtimeItem = {
 				"asset:log",
 			],
 		},
-		tags: [],
 		scope: "any",
 		maxStackSize: 10,
 		type: "simple",

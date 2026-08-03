@@ -12,13 +12,6 @@
 					"item-hop-field"
 				]
 			},
-			"tags": [
-				"source",
-				"food",
-				"beer",
-				"hops",
-				"era:III"
-			],
 			"scope": "any",
 			"maxStackSize": 1
 		}

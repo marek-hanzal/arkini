@@ -11,11 +11,9 @@ import { SelectorSchema } from "~/engine/selector/schema/SelectorSchema";
 export const BaseQuerySchema = z
 	.object({
 		/**
-		 * Item or tag matching strategy used to select query candidates.
+		 * Canonical item used to select query candidates.
 		 */
-		selector: SelectorSchema.describe(
-			"The item or tag matching strategy used to select query candidates.",
-		),
+		selector: SelectorSchema.describe("The canonical item used to select query candidates."),
 	})
 	.strict()
 	.meta({

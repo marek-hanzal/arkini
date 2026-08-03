@@ -27,7 +27,6 @@ export const useEditorItemDraft = (type: EditorItemType, uid: string): EditorIte
 					string,
 				],
 			},
-			tags: [],
 			scope: "any" as const,
 			maxStackSize: 1,
 		};

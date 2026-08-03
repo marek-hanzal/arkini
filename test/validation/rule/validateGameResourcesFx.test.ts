@@ -212,7 +212,6 @@ describe("validateGameResourcesFx", () => {
 					targetAsset,
 				] as const,
 			},
-			tags: [],
 			scope: "any" as const,
 			maxStackSize: 1,
 			line: {

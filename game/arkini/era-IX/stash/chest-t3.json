@@ -12,13 +12,6 @@
 					"item-chest-t3"
 				]
 			},
-			"tags": [
-				"chest",
-				"locked",
-				"stash",
-				"guild",
-				"era:IX"
-			],
 			"scope": "any",
 			"maxStackSize": 1,
 			"line": {

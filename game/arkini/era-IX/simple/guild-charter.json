@@ -12,13 +12,6 @@
 					"item-guild-charter"
 				]
 			},
-			"tags": [
-				"civic",
-				"charter",
-				"guild",
-				"permit",
-				"era:IX"
-			],
 			"scope": "any",
 			"maxStackSize": 20
 		}

@@ -12,14 +12,6 @@
 					"item-cracked-rock"
 				]
 			},
-			"tags": [
-				"source",
-				"stone",
-				"depleted",
-				"craft-target",
-				"era:I",
-				"stone-deposit"
-			],
 			"scope": "board",
 			"maxStackSize": 1,
 			"line": {

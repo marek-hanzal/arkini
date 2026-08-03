@@ -12,13 +12,6 @@
 					"item-sausage"
 				]
 			},
-			"tags": [
-				"food",
-				"meat",
-				"sausage",
-				"era:III",
-				"tier-3-resource"
-			],
 			"scope": "any",
 			"maxStackSize": 50
 		}

@@ -23,7 +23,6 @@ const simpleItem = ({
 				`asset:${id}`,
 			],
 		},
-		tags: [],
 		scope,
 		maxCount,
 		maxStackSize,

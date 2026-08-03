@@ -16,15 +16,6 @@
 					"producer-glazier-workshop-t1"
 				]
 			},
-			"tags": [
-				"blueprint",
-				"building",
-				"craft-target",
-				"glass",
-				"luxury",
-				"prestige",
-				"era:X"
-			],
 			"scope": "any",
 			"maxStackSize": 1,
 			"line": {

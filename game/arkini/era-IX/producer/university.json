@@ -12,15 +12,6 @@
 					"producer-university"
 				]
 			},
-			"tags": [
-				"producer",
-				"building",
-				"education",
-				"knowledge",
-				"university",
-				"unique",
-				"era:IX"
-			],
 			"scope": "any",
 			"maxCount": 1,
 			"maxStackSize": 1,

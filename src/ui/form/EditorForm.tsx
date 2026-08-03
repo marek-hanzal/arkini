@@ -216,34 +216,6 @@ const EditorBoolSwitch = ({ description, label }: EditorBoolSwitchProps) => {
 	);
 };
 
-export interface EditorTagsFieldProps {
-	readonly description?: string;
-	readonly label: string;
-}
-
-const EditorTagsField = ({ description, label }: EditorTagsFieldProps) => {
-	const field = useFieldContext<string>();
-	const error = readEditorFieldError(field.state.meta.errors);
-	return (
-		<EditorField
-			label={label}
-			description={description}
-			error={error}
-		>
-			<input
-				type="text"
-				name={field.name}
-				value={field.state.value}
-				aria-invalid={error === undefined ? undefined : true}
-				className={editorInputClassName}
-				placeholder="resource, era:I, building"
-				onBlur={field.handleBlur}
-				onChange={(event) => field.handleChange(event.currentTarget.value)}
-			/>
-		</EditorField>
-	);
-};
-
 export const { useAppForm, withFieldGroup } = createFormHook({
 	fieldComponents: {
 		AssetField: EditorAssetAutocompleteField,
@@ -251,7 +223,6 @@ export const { useAppForm, withFieldGroup } = createFormHook({
 		ChoiceField: EditorChoiceField,
 		ItemField: EditorItemAutocompleteField,
 		NumberField: EditorNumberField,
-		TagsField: EditorTagsField,
 		TextAreaField: EditorTextAreaField,
 		TextField: EditorTextField,
 	},

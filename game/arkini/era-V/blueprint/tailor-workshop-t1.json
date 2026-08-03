@@ -16,14 +16,6 @@
 					"producer-tailor-workshop-t1"
 				]
 			},
-			"tags": [
-				"blueprint",
-				"building",
-				"craft-target",
-				"clothing",
-				"textile",
-				"era:V"
-			],
 			"scope": "any",
 			"maxStackSize": 1,
 			"line": {

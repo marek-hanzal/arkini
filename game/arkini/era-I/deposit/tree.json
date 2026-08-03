@@ -12,14 +12,6 @@
 					"item-tree"
 				]
 			},
-			"tags": [
-				"source",
-				"wood",
-				"era:I",
-				"wood-source",
-				"tree",
-				"tree:t1"
-			],
 			"scope": "any",
 			"maxStackSize": 1,
 			"charges": {

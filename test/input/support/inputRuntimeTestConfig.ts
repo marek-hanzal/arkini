@@ -19,7 +19,6 @@ const baseItem = ({
 				`asset:${id}`,
 			],
 		},
-		tags: [],
 		scope,
 		maxStackSize,
 	} as const;

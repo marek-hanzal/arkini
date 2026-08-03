@@ -19,7 +19,6 @@ const simpleItem = ({
 				`asset:${id}`,
 			],
 		},
-		tags: [],
 		scope,
 		maxStackSize,
 		type: "simple",
@@ -89,7 +88,6 @@ export const startTestConfig = GameConfigSchema.parse({
 					"asset:backpack",
 				],
 			},
-			tags: [],
 		},
 	},
 });

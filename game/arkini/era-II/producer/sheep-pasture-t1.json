@@ -12,13 +12,6 @@
 					"producer-sheep-pasture-t1"
 				]
 			},
-			"tags": [
-				"producer",
-				"animal",
-				"wool",
-				"era:II",
-				"unique"
-			],
 			"scope": "any",
 			"maxCount": 1,
 			"maxStackSize": 1,

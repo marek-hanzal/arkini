@@ -37,7 +37,6 @@ const createInventoryOpenerJobConfig = () => {
 						"asset:backpack",
 					],
 				},
-				tags: [],
 			},
 		},
 	});

@@ -12,12 +12,6 @@
 					"item-vegetables"
 				]
 			},
-			"tags": [
-				"food",
-				"vegetable",
-				"era:II",
-				"tier-1-resource"
-			],
 			"scope": "any",
 			"maxStackSize": 50
 		}

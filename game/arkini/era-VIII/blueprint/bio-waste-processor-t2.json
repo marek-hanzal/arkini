@@ -16,16 +16,6 @@
 					"producer-bio-waste-processor-t2"
 				]
 			},
-			"tags": [
-				"blueprint",
-				"building",
-				"craft-target",
-				"cleanup",
-				"bio-waste",
-				"farm",
-				"industry",
-				"era:VIII"
-			],
 			"scope": "any",
 			"maxStackSize": 1,
 			"line": {

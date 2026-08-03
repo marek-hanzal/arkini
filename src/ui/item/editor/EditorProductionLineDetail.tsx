@@ -13,7 +13,6 @@ import type {
 import type { EditorLineOwnerItem } from "~/bridge/item/editor/replaceEditorItemLineFx";
 import type { ItemDetailLines } from "~/bridge/item-detail/ItemDetailLines";
 import { ButtonLink } from "~/ui/button/Button";
-import { readItemTraitLabel } from "~/ui/item-detail/ItemInfoPresentation";
 import { ItemLineOutputs } from "~/ui/item-detail/ItemLineOutputs";
 import { formatItemDuration } from "~/ui/item-detail/ItemRuntime";
 import { EditorItemThumbnail } from "~/ui/item/editor/EditorItemThumbnail";
@@ -51,9 +50,7 @@ const formatChargeCost = (input: EditorInput) => {
 };
 
 const readSelectorLabel = (selector: EditorSelector, items: EditorItemRegistry) =>
-	selector.type === "item"
-		? (items[selector.itemId]?.title ?? selector.itemId)
-		: readItemTraitLabel(selector.tag);
+	items[selector.itemId]?.title ?? selector.itemId;
 
 const EditorItemDetailReference = ({
 	item,
@@ -129,7 +126,7 @@ const EditorLineInputReference = ({
 	readonly projectId: string;
 	readonly selector: EditorSelector;
 }) => {
-	const item = selector.type === "item" ? items[selector.itemId] : undefined;
+	const item = items[selector.itemId];
 	return item === undefined ? (
 		<p className="truncate font-medium text-foreground">{readSelectorLabel(selector, items)}</p>
 	) : (

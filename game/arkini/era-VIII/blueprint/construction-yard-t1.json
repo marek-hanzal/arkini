@@ -16,13 +16,6 @@
 					"producer-construction-yard-t1"
 				]
 			},
-			"tags": [
-				"blueprint",
-				"building",
-				"craft-target",
-				"era:VIII",
-				"industry"
-			],
 			"scope": "any",
 			"maxStackSize": 1,
 			"line": {

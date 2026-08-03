@@ -12,14 +12,6 @@
 					"item-bio-waste"
 				]
 			},
-			"tags": [
-				"byproduct",
-				"waste",
-				"bio-waste",
-				"farm",
-				"cleanup",
-				"era:II"
-			],
 			"scope": "board",
 			"maxStackSize": 1
 		}

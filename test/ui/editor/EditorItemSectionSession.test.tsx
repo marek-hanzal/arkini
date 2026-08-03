@@ -84,7 +84,6 @@ const item: EditorItem = {
 			"asset:water",
 		],
 	},
-	tags: [],
 	scope: "any",
 	maxStackSize: 1,
 };

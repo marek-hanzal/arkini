@@ -12,12 +12,6 @@
 					"item-morale-t4"
 				]
 			},
-			"tags": [
-				"morale",
-				"housing",
-				"currency",
-				"era:X"
-			],
 			"scope": "any",
 			"maxStackSize": 50
 		}

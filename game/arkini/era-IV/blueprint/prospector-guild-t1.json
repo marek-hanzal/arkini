@@ -16,15 +16,6 @@
 					"producer-prospector-guild-t1"
 				]
 			},
-			"tags": [
-				"blueprint",
-				"building",
-				"craft-target",
-				"prospecting",
-				"guild",
-				"civic",
-				"era:IV"
-			],
 			"scope": "any",
 			"maxStackSize": 1,
 			"line": {

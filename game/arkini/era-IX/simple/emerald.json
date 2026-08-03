@@ -12,12 +12,6 @@
 					"item-emerald"
 				]
 			},
-			"tags": [
-				"treasure",
-				"gem",
-				"emerald",
-				"era:IX"
-			],
 			"scope": "any",
 			"maxStackSize": 20
 		}

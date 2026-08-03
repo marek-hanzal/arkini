@@ -1,7 +1,5 @@
 import { Effect } from "effect";
-import { match } from "ts-pattern";
 
-import { SelectorEnumSchema } from "~/engine/selector/schema/SelectorEnumSchema";
 import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import type { SelectorSchema } from "~/engine/selector/schema/SelectorSchema";
 import type { GameDiagnosticsSchema } from "~/engine/validation/schema/GameDiagnosticsSchema";
@@ -28,37 +26,19 @@ export const validateSelectorReferenceFx = Effect.fn("validateSelectorReferenceF
 	path,
 	source,
 }: validateSelectorReferenceFx.Props) {
-	return match(selector)
-		.with(
-			{
-				type: SelectorEnumSchema.enum.Tag,
-			},
-			() => [] as GameDiagnosticsSchema.Type,
-		)
-		.with(
-			{
-				type: SelectorEnumSchema.enum.Item,
-			},
-			({ itemId }) => {
-				if (config.items[itemId] !== undefined) {
-					return [] as GameDiagnosticsSchema.Type;
-				}
-
-				return [
-					{
-						code: DiagnosticCodeEnumSchema.enum.ConfigMissingReference,
-						severity: DiagnosticSeverityEnumSchema.enum.Error,
-						path: [
-							...path,
-							"itemId",
-						],
-						source,
-						message: `Selector references missing item ${itemId}.`,
-						reference: DiagnosticRecordEntityEnumSchema.enum.Item,
-						referenceId: itemId,
-					} satisfies GameDiagnosticSchema.Type,
-				];
-			},
-		)
-		.exhaustive();
+	if (config.items[selector.itemId] !== undefined) return [] as GameDiagnosticsSchema.Type;
+	return [
+		{
+			code: DiagnosticCodeEnumSchema.enum.ConfigMissingReference,
+			severity: DiagnosticSeverityEnumSchema.enum.Error,
+			path: [
+				...path,
+				"itemId",
+			],
+			source,
+			message: `Selector references missing item ${selector.itemId}.`,
+			reference: DiagnosticRecordEntityEnumSchema.enum.Item,
+			referenceId: selector.itemId,
+		} satisfies GameDiagnosticSchema.Type,
+	];
 });

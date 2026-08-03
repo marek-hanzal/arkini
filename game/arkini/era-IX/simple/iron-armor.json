@@ -12,13 +12,6 @@
 					"item-iron-armor"
 				]
 			},
-			"tags": [
-				"equipment",
-				"armor",
-				"armory",
-				"hero",
-				"era:IX"
-			],
 			"scope": "any",
 			"maxStackSize": 1
 		}

@@ -8,7 +8,7 @@ import { readRuntimeFx } from "~/engine/runtime/read/readRuntimeFx";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import type { StateSchema } from "~/engine/state/schema/StateSchema";
 
-const baseItem = ({ id, tags = [] }: { id: string; tags?: string[] }) => ({
+const baseItem = ({ id }: { id: string }) => ({
 	uid: id,
 	id,
 	title: id,
@@ -18,7 +18,6 @@ const baseItem = ({ id, tags = [] }: { id: string; tags?: string[] }) => ({
 			`asset:${id}`,
 		],
 	},
-	tags,
 	scope: "any" as const,
 	maxStackSize: 1,
 });
@@ -26,20 +25,17 @@ const baseItem = ({ id, tags = [] }: { id: string; tags?: string[] }) => ({
 const producerItem = ({
 	id,
 	merge,
-	selectorTag = "material",
+	selectorItemId = "material",
 }: {
 	id: string;
 	merge?: [
 		MergeSchema.Type,
 		...MergeSchema.Type[],
 	];
-	selectorTag?: string;
+	selectorItemId?: string;
 }) => ({
 	...baseItem({
 		id,
-		tags: [
-			"participant",
-		],
 	}),
 	type: "producer" as const,
 	maxQueueSize: 2,
@@ -54,8 +50,8 @@ const producerItem = ({
 				{
 					type: "materials" as const,
 					selector: {
-						type: "tag" as const,
-						tag: selectorTag,
+						type: "item" as const,
+						itemId: selectorItemId,
 					},
 					quantity: {
 						type: "value" as const,
@@ -77,6 +73,7 @@ const createLifecycleConfig = ({
 	targetProducer = false,
 	resultCharges,
 	targetCharges,
+	ownerInputItemId = "material",
 }: {
 	action?: "consume" | "use";
 	effect?: "keep" | "remove" | "replace";
@@ -84,6 +81,7 @@ const createLifecycleConfig = ({
 	sourceProducer?: boolean;
 	targetCharges?: number;
 	targetProducer?: boolean;
+	ownerInputItemId?: string;
 } = {}) => {
 	const targetSelector = {
 		type: "item" as const,
@@ -112,9 +110,6 @@ const createLifecycleConfig = ({
 		: {
 				...baseItem({
 					id: "source",
-					tags: [
-						"participant",
-					],
 				}),
 				type: "simple" as const,
 				merge: [
@@ -128,9 +123,6 @@ const createLifecycleConfig = ({
 		: {
 				...baseItem({
 					id: "target",
-					tags: [
-						"participant",
-					],
 				}),
 				charges:
 					targetCharges === undefined
@@ -179,10 +171,6 @@ const createLifecycleConfig = ({
 			material: {
 				...baseItem({
 					id: "material",
-					tags: [
-						"material",
-						"participant",
-					],
 				}),
 				charges: {
 					amount: 2,
@@ -191,7 +179,7 @@ const createLifecycleConfig = ({
 			},
 			owner: producerItem({
 				id: "owner",
-				selectorTag: "participant",
+				selectorItemId: ownerInputItemId,
 			}),
 		},
 	});
@@ -295,7 +283,9 @@ describe("mergeItemsFx participant lifecycle", () => {
 				const result = Effect.runSync(
 					attemptMergeFx().pipe(
 						useGameFx({
-							config: createLifecycleConfig(),
+							config: createLifecycleConfig({
+								ownerInputItemId: participant,
+							}),
 							state,
 						}),
 					),

@@ -12,11 +12,6 @@
 					"item-key-t1"
 				]
 			},
-			"tags": [
-				"key",
-				"goldsmith",
-				"era:IX"
-			],
 			"scope": "any",
 			"maxStackSize": 20
 		}

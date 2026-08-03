@@ -12,12 +12,6 @@
 					"item-log"
 				]
 			},
-			"tags": [
-				"material",
-				"wood",
-				"era:I",
-				"tier-1-resource"
-			],
 			"scope": "any",
 			"maxStackSize": 24
 		}

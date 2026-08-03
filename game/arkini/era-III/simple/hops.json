@@ -12,14 +12,6 @@
 					"item-hops"
 				]
 			},
-			"tags": [
-				"material",
-				"food",
-				"beer",
-				"hops",
-				"era:III",
-				"tier-3-resource"
-			],
 			"scope": "any",
 			"maxStackSize": 50
 		}

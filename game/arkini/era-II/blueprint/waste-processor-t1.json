@@ -16,14 +16,6 @@
 					"producer-waste-processor-t1"
 				]
 			},
-			"tags": [
-				"blueprint",
-				"building",
-				"craft-target",
-				"cleanup",
-				"waste",
-				"era:II"
-			],
 			"scope": "any",
 			"maxStackSize": 1,
 			"line": {

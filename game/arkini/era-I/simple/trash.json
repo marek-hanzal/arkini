@@ -12,13 +12,6 @@
 					"item-trash"
 				]
 			},
-			"tags": [
-				"byproduct",
-				"waste",
-				"trash",
-				"cleanup",
-				"era:I"
-			],
 			"scope": "board",
 			"maxStackSize": 1
 		}

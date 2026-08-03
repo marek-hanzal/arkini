@@ -16,16 +16,6 @@
 					"producer-sand-pit"
 				]
 			},
-			"tags": [
-				"blueprint",
-				"building",
-				"construction",
-				"sand",
-				"glass",
-				"craft-target",
-				"era:VIII",
-				"industry"
-			],
 			"scope": "any",
 			"maxStackSize": 1,
 			"line": {

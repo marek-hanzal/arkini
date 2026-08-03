@@ -12,13 +12,6 @@
 					"item-vineyard"
 				]
 			},
-			"tags": [
-				"source",
-				"food",
-				"wine",
-				"grapes",
-				"era:III"
-			],
 			"scope": "any",
 			"maxStackSize": 1
 		}

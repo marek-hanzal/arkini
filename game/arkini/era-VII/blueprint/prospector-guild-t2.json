@@ -16,15 +16,6 @@
 					"producer-prospector-guild-t2"
 				]
 			},
-			"tags": [
-				"blueprint",
-				"building",
-				"craft-target",
-				"prospecting",
-				"guild",
-				"industry",
-				"era:VII"
-			],
 			"scope": "any",
 			"maxStackSize": 1,
 			"line": {

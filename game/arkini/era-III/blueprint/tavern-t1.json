@@ -16,12 +16,6 @@
 					"producer-tavern-t1"
 				]
 			},
-			"tags": [
-				"blueprint",
-				"building",
-				"craft-target",
-				"era:III"
-			],
 			"scope": "any",
 			"maxStackSize": 1,
 			"line": {

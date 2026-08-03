@@ -17,16 +17,6 @@ describe("MergeSchema", () => {
 		expect(
 			MergeSchema.safeParse({
 				target: {
-					type: "tag",
-					tag: "tree",
-				},
-				action: "consume",
-				effect: "remove",
-			}).success,
-		).toBe(true);
-		expect(
-			MergeSchema.safeParse({
-				target: {
 					type: "item",
 					itemId: "tree",
 				},

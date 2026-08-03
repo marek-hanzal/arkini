@@ -67,7 +67,6 @@ const simpleItem = (id: string, scope: "any" | "board" = "any") => ({
 			`asset:${id}`,
 		],
 	},
-	tags: [],
 	scope,
 	maxStackSize: 1,
 });
@@ -94,7 +93,6 @@ const stashItem = ({
 			`asset:${id}`,
 		],
 	},
-	tags: [],
 	scope: "board" as const,
 	maxStackSize: 1,
 	line: {

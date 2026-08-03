@@ -12,15 +12,6 @@
 					"item-pickaxe"
 				]
 			},
-			"tags": [
-				"equipment",
-				"tool",
-				"mining",
-				"stone",
-				"blacksmith",
-				"single-use",
-				"era:IX"
-			],
 			"scope": "any",
 			"maxStackSize": 20,
 			"merge": [

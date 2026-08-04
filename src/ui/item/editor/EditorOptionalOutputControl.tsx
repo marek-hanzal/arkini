@@ -9,6 +9,7 @@ export interface EditorOptionalOutputControlProps {
 	readonly emptyIcon: string;
 	readonly emptyTitle: string;
 	readonly onChange: (output: EditorOutput | undefined) => void;
+	readonly separated?: boolean;
 	readonly value: EditorOutput | undefined;
 }
 
@@ -19,6 +20,7 @@ export const EditorOptionalOutputControl = ({
 	emptyIcon,
 	emptyTitle,
 	onChange,
+	separated = true,
 	value,
 }: EditorOptionalOutputControlProps) =>
 	value === undefined ? (
@@ -30,7 +32,7 @@ export const EditorOptionalOutputControl = ({
 			title={emptyTitle}
 		/>
 	) : (
-		<div className="grid gap-3 border-t border-line pt-4">
+		<div className={`grid gap-3 ${separated ? "border-t border-line pt-4" : ""}`}>
 			<EditorOutputControl
 				value={value}
 				onChange={onChange}

@@ -21,10 +21,13 @@ describe("EditorItemSections", () => {
 	});
 
 	it("keeps the canonical shared sections and adds only type-owned concerns", () => {
+		expect(readEditorItemSections(item("simple"))[0]).toEqual({
+			id: "identity",
+			label: "Item",
+		});
 		expect(readEditorItemSections(item("simple")).map(({ id }) => id)).toEqual([
 			"identity",
 			"artwork",
-			"limits",
 			"charges",
 			"merges",
 		]);
@@ -37,7 +40,6 @@ describe("EditorItemSections", () => {
 		expect(readEditorItemSections(item("producer")).map(({ id }) => id)).toEqual([
 			"identity",
 			"artwork",
-			"limits",
 			"charges",
 			"merges",
 			"production",
@@ -61,7 +63,7 @@ describe("EditorItemSections", () => {
 			readEditorItemSectionForPath([
 				"maxStackSize",
 			]),
-		).toBe("limits");
+		).toBe("identity");
 		expect(
 			readEditorItemSectionForPath([
 				"charges",

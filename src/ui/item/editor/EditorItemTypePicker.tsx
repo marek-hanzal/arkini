@@ -62,11 +62,11 @@ export const EditorItemTypePicker = () => {
 	);
 	return (
 		<section
-			className="grid h-full min-h-0 grid-rows-[auto_minmax(0,1fr)] gap-[var(--ak-viewport-gap)]"
+			className="grid h-full min-h-0 grid-rows-[auto_minmax(0,1fr)] gap-3"
 			aria-labelledby="editor-new-item-title"
 			data-ui="EditorItemTypePicker"
 		>
-			<header className="flex min-w-0 flex-wrap items-center gap-3">
+			<header className="flex min-w-0 flex-wrap items-center gap-3 px-3 pt-3">
 				<ButtonLink
 					to="/editor/$projectId/editor/items/list"
 					params={{
@@ -77,19 +77,14 @@ export const EditorItemTypePicker = () => {
 				>
 					<EditorBackIcon />
 				</ButtonLink>
-				<div>
-					<h1
-						id="editor-new-item-title"
-						className="text-xl font-semibold"
-					>
-						New item
-					</h1>
-					<p className="mt-1 text-sm text-muted">
-						Choose the gameplay contract this item will use.
-					</p>
-				</div>
+				<h1
+					id="editor-new-item-title"
+					className="text-xl font-semibold"
+				>
+					New item
+				</h1>
 			</header>
-			<div className="ak-list grid min-h-0 content-start gap-2 overflow-y-auto overscroll-contain pr-1 sm:grid-cols-2 xl:grid-cols-3">
+			<div className="ak-list grid min-h-0 content-start gap-2 overflow-y-auto overscroll-contain px-3 pb-3 sm:grid-cols-2 xl:grid-cols-3">
 				{EditorItemTypes.map((type) => {
 					const presentation = itemTypePresentation[type];
 					return (

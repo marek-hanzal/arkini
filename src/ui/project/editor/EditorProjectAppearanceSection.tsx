@@ -3,7 +3,6 @@ import { Button } from "~/ui/button/Button";
 import { EditorCollectionSelector } from "~/ui/form/EditorCollectionSelector";
 import { EditorFormSection } from "~/ui/form/EditorFormSection";
 import { useEditorProjectFormSession } from "~/ui/project/editor/EditorProjectFormContext";
-import { EditorAssetThumbnail } from "~/ui/resource/editor/EditorAssetThumbnail";
 
 export const EditorProjectAppearanceSection = () => {
 	const { form } = useEditorProjectFormSession();
@@ -14,15 +13,7 @@ export const EditorProjectAppearanceSection = () => {
 				description="The package-owned image shown by the launcher and game shell."
 			>
 				<form.AppField name="hero">
-					{(field) => (
-						<div className="grid items-end gap-3 md:grid-cols-[auto_minmax(0,1fr)]">
-							<EditorAssetThumbnail
-								resourceId={field.state.value}
-								size="lg"
-							/>
-							<field.AssetField label="Hero asset" />
-						</div>
-					)}
+					{(field) => <field.AssetField label="Hero asset" />}
 				</form.AppField>
 			</EditorFormSection>
 			<EditorFormSection
@@ -50,16 +41,9 @@ export const EditorProjectAppearanceSection = () => {
 								removeLabel="Remove avatar"
 							>
 								{(index, selectIndex) => (
-									<div className="grid items-end gap-2 md:grid-cols-[auto_minmax(0,1fr)_auto]">
+									<div className="grid items-end gap-2 md:grid-cols-[minmax(0,1fr)_auto]">
 										<form.AppField name={`avatars[${index}]`}>
-											{(field) => (
-												<>
-													<EditorAssetThumbnail
-														resourceId={field.state.value}
-													/>
-													<field.AssetField label="Asset" />
-												</>
-											)}
+											{(field) => <field.AssetField label="Asset" />}
 										</form.AppField>
 										<div className="flex items-end gap-2">
 											<Button

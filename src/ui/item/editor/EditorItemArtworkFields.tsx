@@ -1,7 +1,10 @@
 import type { EditorItem } from "~/bridge/item/editor/EditorItemModel";
 import { Button } from "~/ui/button/Button";
 import { EditorCapabilityStatus } from "~/ui/form/EditorCapabilityStatus";
-import { EditorCollectionSelector } from "~/ui/form/EditorCollectionSelector";
+import {
+	editorCollectionActionClassName,
+	EditorCollectionSelector,
+} from "~/ui/form/EditorCollectionSelector";
 import { withFieldGroup } from "~/ui/form/EditorForm";
 
 const defaultArtwork: EditorItem["asset"] = {
@@ -35,19 +38,20 @@ export const EditorItemArtworkFields = withFieldGroup({
 							title="Composite artwork is disabled"
 						/>
 					) : (
-						<div className="grid gap-3">
+						<div className="grid grid-cols-[minmax(0,1fr)_auto] items-end gap-2">
 							<group.AppField name="default[1]">
 								{(field) => <field.AssetField label="Overlay asset" />}
 							</group.AppField>
 							<Button
-								className="justify-self-start"
+								className={editorCollectionActionClassName}
+								title="Remove composite layer"
 								onClick={() =>
 									group.setFieldValue("default", [
 										assets[0],
 									])
 								}
 							>
-								Remove composite layer
+								<span className="icon-[lucide--trash-2] size-4" />
 							</Button>
 						</div>
 					)

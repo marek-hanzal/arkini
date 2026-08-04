@@ -168,7 +168,6 @@ export const EditorRulesControl = ({
 					<h4 className="text-sm font-semibold">Rules</h4>
 					<EditorInfoTooltip content={description} />
 				</div>
-				<p className="mt-1 text-xs text-muted">All conditions within one rule must pass.</p>
 			</header>
 			<EditorCollectionSelector
 				addLabel="Add rule"

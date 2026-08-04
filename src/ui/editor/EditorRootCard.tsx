@@ -12,7 +12,7 @@ export const EditorRootCard = ({
 }>) => (
 	<div
 		className={twMerge(
-			"grid gap-5 rounded-2xl border border-line bg-surface/70 p-[var(--ak-panel-padding)]",
+			"grid gap-5 rounded-2xl border border-l-2 border-line-strong bg-surface-raised/60 p-[var(--ak-panel-padding)]",
 			className,
 		)}
 		data-ui={dataUi}

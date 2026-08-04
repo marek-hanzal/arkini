@@ -1,5 +1,5 @@
 import { EditorSearchCombobox } from "~/ui/form/EditorSearchCombobox";
-import { EditorItemThumbnail } from "~/ui/item/editor/EditorItemThumbnail";
+import { EditorItemSearchThumbnail } from "~/ui/item/editor/EditorItemThumbnail";
 import { useEditorItemSearchOptions } from "~/ui/item/editor/useEditorItemSearchOptions";
 
 export interface EditorItemReferenceControlProps {
@@ -22,12 +22,13 @@ export const EditorItemReferenceControl = ({
 			options={options}
 			value={value}
 			onChange={onChange}
-			renderPreview={(option) => {
-				const item = items?.[option.id];
-				return item === undefined ? null : (
-					<EditorItemThumbnail resourceIds={item.asset.default} />
-				);
-			}}
+			renderPreview={(option) => <EditorItemSearchThumbnail item={items?.[option.id]} />}
+			renderSelectedPreview={(option) => (
+				<EditorItemSearchThumbnail
+					item={items?.[option.id]}
+					selected
+				/>
+			)}
 		/>
 	);
 };

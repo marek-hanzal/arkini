@@ -1,4 +1,8 @@
 import { ButtonLink } from "~/ui/button/Button";
+import {
+	editorSectionTabActiveClassName,
+	editorSectionTabClassName,
+} from "~/ui/editor/EditorSectionTabs";
 
 export const EditorAssetDetailTab = ({
 	filter,
@@ -32,12 +36,12 @@ export const EditorAssetDetailTab = ({
 		}}
 		activeProps={{
 			"aria-selected": true,
-			className: "border-accent bg-accent text-accent-contrast hover:bg-accent-hover",
+			className: editorSectionTabActiveClassName,
 		}}
 		inactiveProps={{
 			"aria-selected": false,
 		}}
-		className="min-h-0 rounded-b-none border-transparent bg-transparent px-4 py-2 text-sm shadow-none"
+		className={editorSectionTabClassName}
 		role="tab"
 	>
 		{label}

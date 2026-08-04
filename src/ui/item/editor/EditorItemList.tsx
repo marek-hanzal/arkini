@@ -65,15 +65,15 @@ export const EditorItemList = () => {
 	});
 	return (
 		<section
-			className="grid h-full min-h-0 grid-rows-[auto_minmax(0,1fr)] gap-[var(--ak-viewport-gap)]"
+			className="grid h-full min-h-0 grid-rows-[auto_minmax(0,1fr)] gap-3"
 			aria-label="Items"
 			data-ui="EditorItemList"
 		>
-			<header className="flex min-w-0 flex-wrap items-center gap-2">
+			<header className="flex min-w-0 flex-wrap items-center gap-2 px-3 pt-3">
 				<input
 					type="search"
 					value={query}
-					className="min-w-64 flex-1 rounded-lg border border-line-strong bg-surface px-4 py-3 text-sm text-foreground outline-none placeholder:text-muted"
+					className="h-12 min-w-64 flex-1 rounded-lg border border-line-strong bg-surface px-4 text-sm text-foreground outline-none placeholder:text-muted"
 					placeholder="Search item title, ID or type…"
 					aria-label="Search items"
 					onChange={(event) => setQuery(event.currentTarget.value)}
@@ -81,7 +81,7 @@ export const EditorItemList = () => {
 				{itemType === undefined ? null : (
 					<button
 						type="button"
-						className="inline-flex min-h-[var(--ak-control-min-height)] cursor-pointer items-center gap-2 rounded-full bg-accent px-3 py-2 text-[0.7rem] font-semibold uppercase tracking-wider text-accent-contrast hover:bg-accent-hover"
+						className="inline-flex h-12 cursor-pointer items-center gap-2 rounded-full border border-line-strong bg-surface-raised px-3 text-[0.7rem] font-semibold uppercase tracking-wider text-foreground"
 						aria-label={`Clear ${itemType} item filter`}
 						data-ui="EditorItemTypeFilter"
 						aria-pressed="true"
@@ -97,14 +97,14 @@ export const EditorItemList = () => {
 						params={{
 							projectId: project.projectId,
 						}}
-						className="min-h-0 shrink-0 gap-2 px-4 py-3 text-sm"
+						className="h-12 min-h-0 shrink-0 gap-2 px-4 text-sm"
 					>
 						<span className="icon-[lucide--plus] size-4" />
 						New item
 					</PrimaryButtonLink>
 				)}
 			</header>
-			<div className="ak-list grid min-h-0 content-start gap-2 overflow-y-auto overscroll-contain pr-1">
+			<div className="ak-list grid min-h-0 content-start gap-2 overflow-y-auto overscroll-contain px-3 pb-3">
 				{empty ? (
 					<Status
 						dataUi="EditorItemsEmpty"
@@ -162,7 +162,7 @@ export const EditorItemList = () => {
 						</ButtonLink>
 						<button
 							type="button"
-							className="relative z-10 shrink-0 cursor-pointer rounded-full bg-surface-raised px-2.5 py-1 text-[0.65rem] font-semibold uppercase tracking-wider text-muted hover:bg-accent hover:text-accent-contrast"
+							className={`relative z-10 shrink-0 cursor-pointer rounded-full border px-2.5 py-1 text-[0.65rem] font-semibold uppercase tracking-wider ${itemType === item.type ? "border-success/45 bg-secondary text-secondary-foreground" : "border-transparent bg-surface-raised text-muted hover:text-foreground"}`}
 							aria-label={`Filter items by ${item.type}`}
 							aria-pressed={itemType === item.type}
 							onClick={() => setItemType(item.type)}

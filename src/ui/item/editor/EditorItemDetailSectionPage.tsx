@@ -101,21 +101,6 @@ const ArtworkDetail = ({ item }: { readonly item: EditorItem }) => (
 	</div>
 );
 
-const LimitsDetail = ({ item }: { readonly item: EditorItem }) => (
-	<DetailSection title="Limits">
-		<DetailFacts>
-			<DetailFact
-				label="Maximum count"
-				value={item.maxCount ?? "Unlimited"}
-			/>
-			<DetailFact
-				label="Maximum stack size"
-				value={item.maxStackSize}
-			/>
-		</DetailFacts>
-	</DetailSection>
-);
-
 const ChargesDetail = ({ item }: { readonly item: EditorItem }) => (
 	<DetailSection title="Charges">
 		{item.charges === undefined ? (
@@ -208,7 +193,7 @@ const ProductionDetail = ({ item }: { readonly item: EditorItem }) => {
 	const lines = readProductionLines(item);
 	if (lines.length > 0) {
 		return (
-			<div className="ak-list grid gap-1">
+			<div className="ak-list grid gap-3">
 				{lines.map((line) => (
 					<EditorProductionLineDetail
 						key={line.id}
@@ -266,8 +251,6 @@ export const EditorItemDetailSectionPage = ({
 			return <IdentityDetail item={item} />;
 		case "artwork":
 			return <ArtworkDetail item={item} />;
-		case "limits":
-			return <LimitsDetail item={item} />;
 		case "charges":
 			return <ChargesDetail item={item} />;
 		case "merges":

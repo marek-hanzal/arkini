@@ -25,7 +25,7 @@ export const EditorAssetCard = ({
 				filter,
 				query,
 			}}
-			className="group grid min-h-0 min-w-0 grid-rows-[minmax(8rem,1fr)_auto] overflow-hidden rounded-xl border-line bg-surface p-0 text-left shadow-none hover:border-line-strong hover:bg-surface-raised"
+			className="group grid min-h-0 min-w-0 grid-rows-[minmax(8rem,1fr)_auto] overflow-hidden rounded-xl border-0 border-l-2 border-line-strong bg-surface-raised/60 p-0 text-left shadow-none hover:bg-surface-raised"
 			data-ui="EditorAssetCard"
 		>
 			<span className="grid min-h-32 place-items-center overflow-hidden p-4">

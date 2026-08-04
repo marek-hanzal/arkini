@@ -38,7 +38,7 @@ export const EditorAssetManager = ({
 		<PrimaryButton
 			disabled={pending}
 			cursorIntent={pending ? "progress" : undefined}
-			className="shrink-0 gap-2"
+			className="h-12 min-h-0 shrink-0 gap-2"
 			onClick={() => inputRef.current?.click()}
 		>
 			<span
@@ -50,11 +50,11 @@ export const EditorAssetManager = ({
 	);
 	return (
 		<section
-			className="grid h-full min-h-0 grid-rows-[auto_minmax(0,1fr)] gap-[var(--ak-viewport-gap)]"
+			className="grid h-full min-h-0 grid-rows-[auto_minmax(0,1fr)] gap-3"
 			aria-label="Assets"
 			data-ui="EditorAssetManager"
 		>
-			<header className="flex min-w-0 flex-wrap items-center gap-2">
+			<header className="flex min-w-0 flex-wrap items-center gap-2 px-3 pt-3">
 				<input
 					ref={inputRef}
 					type="file"
@@ -75,13 +75,13 @@ export const EditorAssetManager = ({
 				<input
 					type="search"
 					value={query}
-					className="min-w-64 flex-1 rounded-lg border border-line-strong bg-surface px-4 py-3 text-sm text-foreground outline-none placeholder:text-muted"
+					className="h-12 min-w-64 flex-1 rounded-lg border border-line-strong bg-surface px-4 text-sm text-foreground outline-none placeholder:text-muted"
 					placeholder="Search assets…"
 					aria-label="Search assets"
 					onChange={(event) => onQueryChange(event.currentTarget.value)}
 				/>
 				<div
-					className="inline-flex min-h-[var(--ak-control-min-height)] rounded-lg border border-line bg-surface p-1"
+					className="inline-flex h-12 rounded-lg border border-line bg-surface p-1"
 					aria-label="Asset usage filter"
 					role="group"
 				>
@@ -94,7 +94,7 @@ export const EditorAssetManager = ({
 						<button
 							key={value}
 							type="button"
-							className={`cursor-pointer rounded-md px-3 py-2 text-sm font-semibold ${filter === value ? "bg-accent text-accent-contrast" : "text-muted hover:bg-surface-raised hover:text-foreground"}`}
+							className={`cursor-pointer rounded-md px-3 py-2 text-sm font-semibold ${filter === value ? "bg-secondary text-secondary-foreground" : "text-muted hover:bg-surface-raised hover:text-foreground"}`}
 							aria-pressed={filter === value}
 							onClick={() => onFilterChange(value)}
 						>
@@ -104,7 +104,7 @@ export const EditorAssetManager = ({
 				</div>
 				{empty ? null : importButton}
 			</header>
-			<div className="min-h-0 overflow-y-auto overscroll-contain pr-1">
+			<div className="min-h-0 overflow-y-auto overscroll-contain px-3 pb-3">
 				{error === undefined ? null : (
 					<p className="mb-3 rounded-xl border border-danger/40 bg-danger/10 p-3 text-sm text-danger">
 						{error instanceof Error ? error.message : String(error)}

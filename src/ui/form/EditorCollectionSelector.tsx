@@ -5,7 +5,7 @@ import { Button } from "~/ui/button/Button";
 import { EditorFormCard } from "~/ui/form/EditorFormCard";
 import { EditorSearchCombobox } from "~/ui/form/EditorSearchCombobox";
 
-const collectionActionClassName =
+export const editorCollectionActionClassName =
 	"size-[var(--ak-control-min-height)] shrink-0 border-0 bg-transparent p-0 shadow-none hover:border-transparent hover:bg-surface-raised active:bg-surface-raised";
 
 export interface EditorCollectionSelectorProps {
@@ -73,7 +73,7 @@ export const EditorCollectionSelector = ({
 				<div className="flex shrink-0 items-center gap-2">
 					{onAdd === undefined ? null : (
 						<Button
-							className={collectionActionClassName}
+							className={editorCollectionActionClassName}
 							title={addLabel}
 							onClick={() => {
 								onAdd();
@@ -85,7 +85,7 @@ export const EditorCollectionSelector = ({
 					)}
 					{onRemove === undefined || activeIndex === undefined ? null : (
 						<Button
-							className={collectionActionClassName}
+							className={editorCollectionActionClassName}
 							title={removeLabel}
 							onClick={() => {
 								onRemove(activeIndex);

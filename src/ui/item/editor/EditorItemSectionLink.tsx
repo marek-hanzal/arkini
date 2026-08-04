@@ -1,12 +1,14 @@
 import { ButtonLink } from "~/ui/button/Button";
 import type { EditorItemType } from "~/bridge/item/editor/EditorItemModel";
+import {
+	editorSectionTabActiveClassName,
+	editorSectionTabClassName,
+} from "~/ui/editor/EditorSectionTabs";
 import type { EditorItemSectionDescriptor } from "~/ui/item/editor/EditorItemSections";
 
-const className =
-	"min-h-0 rounded-b-none border-transparent bg-transparent px-3 py-2 text-sm shadow-none hover:bg-surface-raised";
 const activeProps = {
 	"aria-selected": true,
-	className: "border-accent bg-accent text-accent-contrast hover:bg-accent-hover",
+	className: editorSectionTabActiveClassName,
 } as const;
 const inactiveProps = {
 	"aria-selected": false,
@@ -45,7 +47,7 @@ export const EditorItemSectionLink = ({
 		}
 		activeProps={activeProps}
 		inactiveProps={inactiveProps}
-		className={className}
+		className={editorSectionTabClassName}
 		role="tab"
 	>
 		{section.label}

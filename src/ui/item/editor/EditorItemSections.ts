@@ -3,7 +3,6 @@ import type { EditorItem, EditorItemType } from "~/bridge/item/editor/EditorItem
 export const EditorItemSectionIds = [
 	"identity",
 	"artwork",
-	"limits",
 	"charges",
 	"merges",
 	"production",
@@ -26,8 +25,8 @@ export const EditorItemFieldSections = {
 	description: "identity",
 	scope: "identity",
 	asset: "artwork",
-	maxCount: "limits",
-	maxStackSize: "limits",
+	maxCount: "identity",
+	maxStackSize: "identity",
 	charges: "charges",
 	merge: "merges",
 	durationMs: "production",
@@ -51,15 +50,11 @@ export interface EditorItemSectionDescriptor {
 const EditorItemSections = [
 	{
 		id: "identity",
-		label: "Identity",
+		label: "Item",
 	},
 	{
 		id: "artwork",
 		label: "Artwork",
-	},
-	{
-		id: "limits",
-		label: "Limits",
 	},
 	{
 		id: "charges",
@@ -90,8 +85,6 @@ export const readEditorItemSections = (
 ): ReadonlyArray<EditorItemSectionDescriptor> =>
 	EditorItemSections.filter((section) => {
 		switch (section.id) {
-			case "limits":
-				return item.type !== "inventory";
 			case "production":
 				return ProductionItemTypes.has(item.type);
 			default:
@@ -109,7 +102,7 @@ export const readEditorItemSectionForPath = (
 			return "artwork";
 		case "maxCount":
 		case "maxStackSize":
-			return "limits";
+			return "identity";
 		case "charges":
 			return "charges";
 		case "merge":

@@ -1,4 +1,8 @@
 import { ButtonLink } from "~/ui/button/Button";
+import {
+	editorSectionTabActiveClassName,
+	editorSectionTabClassName,
+} from "~/ui/editor/EditorSectionTabs";
 import type { EditorProjectSectionDescriptor } from "~/ui/project/editor/EditorProjectSections";
 
 export const EditorProjectSectionLink = ({
@@ -18,9 +22,9 @@ export const EditorProjectSectionLink = ({
 			exact: true,
 		}}
 		activeProps={{
-			className: "border-accent bg-accent text-accent-contrast hover:bg-accent-hover",
+			className: editorSectionTabActiveClassName,
 		}}
-		className="min-h-0 rounded-b-none border-transparent bg-transparent px-3 py-2 text-sm shadow-none"
+		className={editorSectionTabClassName}
 	>
 		{section.label}
 	</ButtonLink>

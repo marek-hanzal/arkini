@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 
+import { EditorInfoTooltip } from "~/ui/form/EditorInfoTooltip";
 import { editorInputClassName } from "~/ui/form/EditorInputClassName";
 
 const EditorValueField = ({
@@ -12,11 +13,11 @@ const EditorValueField = ({
 	readonly label: string;
 }) => (
 	<label className="grid min-w-0 content-start gap-1.5 text-sm">
-		<span className="font-semibold text-foreground">{label}</span>
+		<span className="flex min-w-0 items-center gap-1">
+			<span className="font-semibold text-foreground">{label}</span>
+			{description === undefined ? null : <EditorInfoTooltip content={description} />}
+		</span>
 		{children}
-		{description === undefined ? null : (
-			<span className="text-xs leading-5 text-subtle">{description}</span>
-		)}
 	</label>
 );
 
@@ -71,11 +72,13 @@ export const EditorNumberControl = ({
 );
 
 export const EditorChoiceControl = <Value extends string>({
+	description,
 	label,
 	onChange,
 	options,
 	value,
 }: {
+	readonly description?: string;
 	readonly label: string;
 	readonly onChange: (value: Value) => void;
 	readonly options: ReadonlyArray<{
@@ -85,7 +88,12 @@ export const EditorChoiceControl = <Value extends string>({
 	readonly value: Value;
 }) => (
 	<fieldset className="grid min-w-0 content-start gap-1.5 text-sm">
-		<legend className="font-semibold text-foreground">{label}</legend>
+		<legend>
+			<span className="flex min-w-0 items-center gap-1">
+				<span className="font-semibold text-foreground">{label}</span>
+				{description === undefined ? null : <EditorInfoTooltip content={description} />}
+			</span>
+		</legend>
 		<div className="flex min-w-0 flex-wrap gap-2">
 			{options.map((option) => (
 				<button
@@ -94,7 +102,7 @@ export const EditorChoiceControl = <Value extends string>({
 					aria-pressed={option.value === value}
 					className={`min-h-9 cursor-pointer rounded-lg border px-3 py-1.5 text-xs font-semibold uppercase tracking-wide transition-colors ${
 						option.value === value
-							? "border-accent bg-accent text-accent-contrast"
+							? "border-success/45 bg-secondary text-secondary-foreground"
 							: "border-line bg-canvas/70 text-muted hover:border-line-strong hover:text-foreground"
 					}`}
 					onClick={() => onChange(option.value)}

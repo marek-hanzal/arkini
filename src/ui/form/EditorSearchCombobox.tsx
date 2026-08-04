@@ -9,6 +9,7 @@ import {
 } from "@floating-ui/react";
 import { useEffect, useId, useMemo, useState, type ReactNode } from "react";
 
+import { EditorInfoTooltip } from "~/ui/form/EditorInfoTooltip";
 import { useFuseSearch } from "~/ui/search/useFuseSearch";
 
 export interface EditorSearchOption {
@@ -31,6 +32,7 @@ export namespace EditorSearchCombobox {
 		readonly onBlur?: () => void;
 		readonly onChange: (value: string) => void;
 		readonly renderPreview: (option: EditorSearchOption) => ReactNode;
+		readonly renderSelectedPreview?: (option: EditorSearchOption) => ReactNode;
 	}
 }
 
@@ -46,8 +48,12 @@ export const EditorSearchCombobox = ({
 	onChange,
 	options,
 	renderPreview,
+	renderSelectedPreview,
 	value,
 }: EditorSearchCombobox.Props) => {
+	const selectedOption = options.find((option) => option.id === value);
+	const selectedPreview =
+		selectedOption === undefined ? undefined : renderSelectedPreview?.(selectedOption);
 	const selectedLabel = displaySelectedLabel
 		? (options.find((option) => option.id === value)?.label ?? value)
 		: value;
@@ -126,78 +132,94 @@ export const EditorSearchCombobox = ({
 
 	return (
 		<label className="grid min-w-0 content-start gap-1.5 text-sm">
-			{labelVisible ? <span className="font-semibold text-foreground">{label}</span> : null}
-			<span
-				ref={refs.setReference}
-				className="relative"
-			>
-				<span className="icon-[lucide--search] pointer-events-none absolute top-1/2 left-3 z-10 size-4 -translate-y-1/2 text-subtle" />
-				<input
-					type="search"
-					role="combobox"
-					value={query}
-					autoComplete="off"
-					aria-expanded={open}
-					aria-controls={listboxId}
-					aria-invalid={error === undefined ? undefined : true}
-					aria-activedescendant={
-						open && matches[activeIndex] !== undefined
-							? `${listboxId}-option-${activeIndex}`
-							: undefined
-					}
-					aria-label={label}
-					className="ak-editor-search-input min-h-[var(--ak-control-min-height)] w-full rounded-lg border border-line-strong bg-canvas/70 py-2 pr-12 pl-9 text-sm text-foreground outline-none transition-colors placeholder:text-subtle"
-					placeholder={`Search ${label.toLocaleLowerCase()}…`}
-					onBlur={() => {
-						setOpen(false);
-						setQuery(selectedLabel);
-						onBlur?.();
-					}}
-					onChange={(event) => {
-						setQuery(event.currentTarget.value);
-						setOpen(true);
-					}}
-					onFocus={() => setOpen(true)}
-					onKeyDown={(event) => {
-						if (event.key === "Escape") {
+			{labelVisible ? (
+				<span className="flex min-w-0 items-center gap-1">
+					<span className="font-semibold text-foreground">{label}</span>
+					{description === undefined ? null : <EditorInfoTooltip content={description} />}
+				</span>
+			) : null}
+			<span className="flex min-w-0 items-center gap-2">
+				{selectedPreview === undefined || selectedPreview === null ? null : (
+					<span
+						className="shrink-0"
+						data-ui="EditorSearchSelectedPreview"
+					>
+						{selectedPreview}
+					</span>
+				)}
+				<span
+					ref={refs.setReference}
+					className="relative min-w-0 flex-1"
+				>
+					<span className="icon-[lucide--search] pointer-events-none absolute top-1/2 left-3 z-10 size-4 -translate-y-1/2 text-subtle" />
+					<input
+						type="search"
+						role="combobox"
+						value={query}
+						autoComplete="off"
+						aria-expanded={open}
+						aria-controls={listboxId}
+						aria-invalid={error === undefined ? undefined : true}
+						aria-activedescendant={
+							open && matches[activeIndex] !== undefined
+								? `${listboxId}-option-${activeIndex}`
+								: undefined
+						}
+						aria-label={label}
+						className="ak-editor-search-input min-h-[var(--ak-control-min-height)] w-full rounded-lg border border-line-strong bg-canvas/70 py-2 pr-12 pl-9 text-sm text-foreground outline-none transition-colors placeholder:text-subtle"
+						placeholder={`Search ${label.toLocaleLowerCase()}…`}
+						onBlur={() => {
 							setOpen(false);
 							setQuery(selectedLabel);
-							return;
-						}
-						if (event.key === "ArrowDown" || event.key === "ArrowUp") {
-							event.preventDefault();
-							setOpen(true);
-							setActiveIndex((current) => {
-								if (matches.length === 0) return 0;
-								const offset = event.key === "ArrowDown" ? 1 : -1;
-								return (current + offset + matches.length) % matches.length;
-							});
-							return;
-						}
-						if (event.key === "Enter" && open && matches[activeIndex] !== undefined) {
-							event.preventDefault();
-							choose(matches[activeIndex]);
-						}
-					}}
-				/>
-				{query.length === 0 ? null : (
-					<button
-						type="button"
-						className="absolute inset-y-0 right-0 grid w-12 cursor-pointer place-items-center rounded-r-lg text-muted hover:bg-surface-raised hover:text-foreground"
-						title="Clear search"
-						onMouseDown={(event) => event.preventDefault()}
-						onClick={() => {
-							setQuery("");
+							onBlur?.();
+						}}
+						onChange={(event) => {
+							setQuery(event.currentTarget.value);
 							setOpen(true);
 						}}
-					>
-						<span className="icon-[lucide--x] size-5" />
-					</button>
-				)}
+						onFocus={() => setOpen(true)}
+						onKeyDown={(event) => {
+							if (event.key === "Escape") {
+								setOpen(false);
+								setQuery(selectedLabel);
+								return;
+							}
+							if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+								event.preventDefault();
+								setOpen(true);
+								setActiveIndex((current) => {
+									if (matches.length === 0) return 0;
+									const offset = event.key === "ArrowDown" ? 1 : -1;
+									return (current + offset + matches.length) % matches.length;
+								});
+								return;
+							}
+							if (
+								event.key === "Enter" &&
+								open &&
+								matches[activeIndex] !== undefined
+							) {
+								event.preventDefault();
+								choose(matches[activeIndex]);
+							}
+						}}
+					/>
+					{query.length === 0 ? null : (
+						<button
+							type="button"
+							className="absolute inset-y-0 right-0 grid w-12 cursor-pointer place-items-center rounded-r-lg text-muted hover:bg-surface-raised hover:text-foreground"
+							title="Clear search"
+							onMouseDown={(event) => event.preventDefault()}
+							onClick={() => {
+								setQuery("");
+								setOpen(true);
+							}}
+						>
+							<span className="icon-[lucide--x] size-5" />
+						</button>
+					)}
+				</span>
 			</span>
-			{description === undefined ? null : (
-				<span className="text-xs leading-5 text-subtle">{description}</span>
-			)}
 			{error === undefined ? null : (
 				<span className="text-xs leading-5 text-danger">{error}</span>
 			)}

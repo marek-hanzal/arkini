@@ -9,7 +9,7 @@ export const EditorItemNotFound = ({ uid }: { readonly uid: string }) => {
 			className="grid h-full place-items-center"
 			data-ui="EditorItemNotFound"
 		>
-			<div className="max-w-lg rounded-2xl border border-line bg-surface/85 p-6 text-center">
+			<div className="max-w-lg rounded-2xl border-l-2 border-line-strong bg-surface-raised/60 p-6 text-center">
 				<h1 className="text-xl font-semibold">Item not found</h1>
 				<p className="mt-2 text-sm text-muted">No saved item owns UID {uid}.</p>
 				<ButtonLink

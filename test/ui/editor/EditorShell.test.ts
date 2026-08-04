@@ -192,13 +192,13 @@ const renderRouter = async (router: ReturnType<typeof createTestRouter>) => {
 const readLink = (container: HTMLElement, label: string) => {
 	const link = [
 		...container.querySelectorAll<HTMLAnchorElement>("a"),
-	].find((candidate) => candidate.textContent === label);
+	].find((candidate) => candidate.getAttribute("aria-label") === label);
 	if (link === undefined) throw new Error(`Missing ${label} editor tab.`);
 	return link;
 };
 
 describe("EditorShell", () => {
-	it("labels the item workspace as Items without reserving an empty form-status row", async () => {
+	it("renders an icon-only workspace rail without a global page header", async () => {
 		const router = createTestRouter({
 			initialEntry: "/editor/editor-test/editor/items/list",
 		});
@@ -209,7 +209,7 @@ describe("EditorShell", () => {
 		expect(
 			[
 				...container.querySelectorAll('[data-ui="EditorNavigation"] nav a'),
-			].map((link) => link.textContent),
+			].map((link) => link.getAttribute("aria-label")),
 		).toEqual([
 			"Project",
 			"Items",
@@ -219,12 +219,29 @@ describe("EditorShell", () => {
 		]);
 		expect(
 			[
+				...container.querySelectorAll('[data-ui="EditorNavigation"] nav a'),
+			].every((link) => link.textContent === ""),
+		).toBe(true);
+		expect(container.querySelector('[data-ui="EditorNavigation"]')?.tagName).toBe("ASIDE");
+		expect(container.querySelector('[data-ui="EditorShell"]')?.className).toContain(
+			"grid-cols-[auto_minmax(0,1fr)]",
+		);
+		expect(container.textContent).not.toContain("Editor test");
+		expect(container.querySelector('[data-ui="EditorExit"]')?.textContent).toBe("");
+		expect(container.querySelector('[data-ui="EditorExit"]')?.className).not.toContain(
+			"bg-accent",
+		);
+		expect(
+			[
 				...container.querySelectorAll("a"),
 			].some((link) => link.textContent === "Editor"),
 		).toBe(false);
 		expect(container.querySelector('[data-ui="EditorFormStatusSlot"]')).toBeNull();
+		expect(container.querySelector('[data-ui="EditorContent"]')?.className).not.toContain(
+			"px-[var(--ak-viewport-padding)]",
+		);
 		expect(container.querySelector('[data-ui="EditorContent"]')?.className).toContain(
-			"py-[var(--ak-viewport-gap)]",
+			"bg-surface",
 		);
 	});
 

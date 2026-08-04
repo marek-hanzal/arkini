@@ -168,7 +168,10 @@ describe("item section form session", () => {
 
 		expect(container.querySelector('input[name="id"]')).toBeNull();
 		expect(container.textContent).toContain("item:water");
-		expect(container.textContent).toContain("Immutable after the item is first saved.");
+		expect(container.textContent).not.toContain("Immutable after the item is first saved.");
+		expect(container.querySelector('[data-ui="EditorInfoTooltip"]')).not.toBeNull();
+		expect(container.querySelector('input[name="maxCount"]')).not.toBeNull();
+		expect(container.querySelector('input[name="maxStackSize"]')).not.toBeNull();
 	});
 
 	it("allows a new item ID to change before its first repository save", async () => {
@@ -182,8 +185,9 @@ describe("item section form session", () => {
 
 		const id = container.querySelector<HTMLInputElement>('input[name="id"]');
 		expect(id?.value).toBe("item:water");
-		expect(container.textContent).toContain(
+		expect(container.textContent).not.toContain(
 			"The source ID becomes immutable after the first save.",
 		);
+		expect(container.querySelector('[data-ui="EditorInfoTooltip"]')).not.toBeNull();
 	});
 });

@@ -85,10 +85,9 @@ const LocalValueHarness = () => {
 				{(field) => (
 					<field.BoolToggle
 						checkedIcon="icon-[lucide--circle-check]"
-						checkedLabel="Enabled"
 						description="Controls whether this value is enabled."
+						label="Enabled"
 						uncheckedIcon="icon-[lucide--circle-x]"
-						uncheckedLabel="Disabled"
 					/>
 				)}
 			</form.AppField>
@@ -166,6 +165,8 @@ describe("editor form fields", () => {
 		expect(container.querySelector('[data-testid="values"]')?.textContent).toBe(
 			"Changed|NaN|1250|disabled",
 		);
+		expect(enabled.textContent).toBe("Enabled");
+		expect(enabled.className).toContain("bg-surface-raised");
 
 		await act(async () => {
 			resetLocalValues();
@@ -178,6 +179,8 @@ describe("editor form fields", () => {
 				"Original|4|24000|enabled",
 			);
 			expect(runtime.value).toBe("24");
+			expect(enabled.textContent).toBe("Enabled");
+			expect(enabled.className).toContain("bg-secondary");
 		});
 	});
 

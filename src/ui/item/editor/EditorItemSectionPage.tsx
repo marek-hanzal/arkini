@@ -2,7 +2,6 @@ import { EditorItemArtworkSection } from "~/ui/item/editor/EditorItemArtworkSect
 import { EditorItemChargesSection } from "~/ui/item/editor/EditorItemChargesSection";
 import { useEditorItemFormSession } from "~/ui/item/editor/EditorItemFormContext";
 import { EditorItemIdentitySection } from "~/ui/item/editor/EditorItemIdentitySection";
-import { EditorItemLimitsSection } from "~/ui/item/editor/EditorItemLimitsSection";
 import { EditorItemMergesSection } from "~/ui/item/editor/EditorItemMergesSection";
 import { EditorItemProductionSection } from "~/ui/item/editor/EditorItemProductionSection";
 import {
@@ -16,8 +15,6 @@ const renderSection = (section: EditorItemSectionId) => {
 			return <EditorItemIdentitySection />;
 		case "artwork":
 			return <EditorItemArtworkSection />;
-		case "limits":
-			return <EditorItemLimitsSection />;
 		case "charges":
 			return <EditorItemChargesSection />;
 		case "merges":

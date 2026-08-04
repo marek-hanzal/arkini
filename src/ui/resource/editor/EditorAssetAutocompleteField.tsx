@@ -51,6 +51,12 @@ export const EditorAssetAutocompleteField = ({
 			onBlur={field.handleBlur}
 			onChange={field.handleChange}
 			renderPreview={(option) => <EditorAssetThumbnail resourceId={option.id} />}
+			renderSelectedPreview={(option) => (
+				<EditorAssetThumbnail
+					resourceId={option.id}
+					size="sm"
+				/>
+			)}
 		/>
 	);
 };

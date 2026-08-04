@@ -63,10 +63,9 @@ export const EditorLineFields = withFieldGroup({
 						{(field) => (
 							<field.BoolToggle
 								checkedIcon="icon-[lucide--star]"
-								checkedLabel="Default"
 								description="The default line is selected first when this item starts production."
+								label="Default"
 								uncheckedIcon="icon-[lucide--star-off]"
-								uncheckedLabel="Non-default"
 							/>
 						)}
 					</group.AppField>
@@ -74,10 +73,9 @@ export const EditorLineFields = withFieldGroup({
 						{(field) => (
 							<field.BoolToggle
 								checkedIcon="icon-[lucide--eye]"
-								checkedLabel="Visible"
 								description="Visible lines are shown to the player before runtime rules alter their visibility."
+								label="Visible"
 								uncheckedIcon="icon-[lucide--eye-off]"
-								uncheckedLabel="Invisible"
 							/>
 						)}
 					</group.AppField>
@@ -85,10 +83,9 @@ export const EditorLineFields = withFieldGroup({
 						{(field) => (
 							<field.BoolToggle
 								checkedIcon="icon-[lucide--circle-check]"
-								checkedLabel="Enabled"
 								description="Enabled lines can accept production jobs before runtime rules alter their availability."
+								label="Enabled"
 								uncheckedIcon="icon-[lucide--circle-x]"
-								uncheckedLabel="Disabled"
 							/>
 						)}
 					</group.AppField>
@@ -152,11 +149,8 @@ export const EditorLineFields = withFieldGroup({
 													<h3 className="text-sm font-semibold">
 														Output
 													</h3>
-													<EditorInfoTooltip content="Output belongs only to this production line. Its weighted sets and rolls resolve after a completed job and emit the selected item drops." />
+													<EditorInfoTooltip content="Optional weighted sets, rolls and item drops belonging only to this production line. They resolve after a completed job and emit the selected item drops." />
 												</div>
-												<p className="mt-1 text-xs text-muted">
-													Optional weighted sets, rolls and item drops.
-												</p>
 											</div>
 										</header>
 										<EditorOutputControl

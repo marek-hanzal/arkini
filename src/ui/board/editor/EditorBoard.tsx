@@ -6,11 +6,11 @@ export const EditorBoard = () => {
 	const config = project.config;
 	return (
 		<section
-			className="grid h-full min-h-0 place-items-center overflow-y-auto"
+			className="grid h-full min-h-0 place-items-center overflow-y-auto p-3"
 			aria-labelledby="editor-board-title"
 			data-ui="EditorBoard"
 		>
-			<article className="w-full max-w-3xl rounded-2xl border border-line bg-surface/90 p-6 text-center shadow-xl">
+			<article className="w-full max-w-3xl rounded-2xl border-l-2 border-line-strong bg-surface-raised/60 p-6 text-center shadow-xl">
 				<h1
 					id="editor-board-title"
 					className="text-2xl font-semibold"

@@ -1,5 +1,6 @@
 import { createFormHook } from "@tanstack/react-form";
 import type { PropsWithChildren } from "react";
+import { twMerge } from "tailwind-merge";
 
 import { EditorBooleanToggleBadge } from "~/ui/form/EditorBooleanToggleBadge";
 import { EditorInfoTooltip } from "~/ui/form/EditorInfoTooltip";
@@ -11,6 +12,7 @@ import { EditorAssetAutocompleteField } from "~/ui/resource/editor/EditorAssetAu
 
 const EditorField = ({
 	children,
+	className,
 	description,
 	error,
 	label,
@@ -18,16 +20,14 @@ const EditorField = ({
 	readonly description?: string;
 	readonly error?: string;
 	readonly label: string;
+	readonly className?: string;
 }>) => (
-	<label className="grid min-w-0 content-start gap-1.5 text-sm">
+	<label className={twMerge("grid min-w-0 content-start gap-1.5 text-sm", className)}>
 		<span className="flex min-w-0 items-center gap-1">
 			<span className="font-semibold text-foreground">{label}</span>
 			{description === undefined ? null : <EditorInfoTooltip content={description} />}
 		</span>
 		{children}
-		{description === undefined ? null : (
-			<span className="text-xs leading-5 text-subtle">{description}</span>
-		)}
 		{error === undefined ? null : (
 			<span className="text-xs leading-5 text-danger">{error}</span>
 		)}
@@ -75,6 +75,7 @@ const EditorTextField = ({
 
 export interface EditorTextAreaFieldProps {
 	readonly description?: string;
+	readonly fill?: boolean;
 	readonly label: string;
 	readonly placeholder?: string;
 	readonly rows?: number;
@@ -82,6 +83,7 @@ export interface EditorTextAreaFieldProps {
 
 const EditorTextAreaField = ({
 	description,
+	fill = false,
 	label,
 	placeholder,
 	rows = 4,
@@ -90,6 +92,7 @@ const EditorTextAreaField = ({
 	const error = readEditorFieldError(field.state.meta.errors);
 	return (
 		<EditorField
+			className={fill ? "h-full grid-rows-[auto_minmax(0,1fr)] content-stretch" : undefined}
 			label={label}
 			description={description}
 			error={error}
@@ -98,7 +101,7 @@ const EditorTextAreaField = ({
 				name={field.name}
 				value={field.state.value}
 				aria-invalid={error === undefined ? undefined : true}
-				className={`${editorInputClassName} resize-y leading-6`}
+				className={`${editorInputClassName} ${fill ? "h-full resize-none" : "resize-y"} leading-6`}
 				placeholder={placeholder}
 				rows={rows}
 				onBlur={field.handleBlur}
@@ -218,7 +221,7 @@ const EditorChoiceField = ({ description, label, options }: EditorChoiceFieldPro
 							type="button"
 							className={`min-h-9 cursor-pointer rounded-lg border px-3 py-1.5 text-xs font-semibold uppercase tracking-wide transition-colors ${
 								selected
-									? "border-accent bg-accent text-accent-contrast"
+									? "border-success/45 bg-secondary text-secondary-foreground"
 									: "border-line bg-canvas/70 text-muted hover:border-line-strong hover:text-foreground"
 							}`}
 							aria-pressed={selected}
@@ -229,9 +232,6 @@ const EditorChoiceField = ({ description, label, options }: EditorChoiceFieldPro
 					);
 				})}
 			</div>
-			{description === undefined ? null : (
-				<span className="text-xs leading-5 text-subtle">{description}</span>
-			)}
 			{error === undefined ? null : (
 				<span className="text-xs leading-5 text-danger">{error}</span>
 			)}
@@ -241,29 +241,26 @@ const EditorChoiceField = ({ description, label, options }: EditorChoiceFieldPro
 
 export interface EditorBoolToggleProps {
 	readonly checkedIcon: string;
-	readonly checkedLabel: string;
 	readonly description: string;
+	readonly label: string;
 	readonly uncheckedIcon: string;
-	readonly uncheckedLabel: string;
 }
 
 const EditorBoolToggle = ({
 	checkedIcon,
-	checkedLabel,
 	description,
+	label,
 	uncheckedIcon,
-	uncheckedLabel,
 }: EditorBoolToggleProps) => {
 	const field = useFieldContext<boolean>();
 	return (
 		<EditorBooleanToggleBadge
 			checked={field.state.value}
 			checkedIcon={checkedIcon}
-			checkedLabel={checkedLabel}
 			description={description}
+			label={label}
 			onChange={field.handleChange}
 			uncheckedIcon={uncheckedIcon}
-			uncheckedLabel={uncheckedLabel}
 		/>
 	);
 };

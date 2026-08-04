@@ -1,7 +1,7 @@
 import { useFieldContext } from "~/ui/form/EditorFormContexts";
 import { readEditorFieldError } from "~/ui/form/readEditorFieldError";
 import { EditorSearchCombobox } from "~/ui/form/EditorSearchCombobox";
-import { EditorItemThumbnail } from "~/ui/item/editor/EditorItemThumbnail";
+import { EditorItemSearchThumbnail } from "~/ui/item/editor/EditorItemThumbnail";
 import { useEditorItemSearchOptions } from "~/ui/item/editor/useEditorItemSearchOptions";
 
 export interface EditorItemAutocompleteFieldProps {
@@ -27,12 +27,13 @@ export const EditorItemAutocompleteField = ({
 			value={field.state.value}
 			onBlur={field.handleBlur}
 			onChange={field.handleChange}
-			renderPreview={(option) => {
-				const item = items?.[option.id];
-				return item === undefined ? null : (
-					<EditorItemThumbnail resourceIds={item.asset.default} />
-				);
-			}}
+			renderPreview={(option) => <EditorItemSearchThumbnail item={items?.[option.id]} />}
+			renderSelectedPreview={(option) => (
+				<EditorItemSearchThumbnail
+					item={items?.[option.id]}
+					selected
+				/>
+			)}
 		/>
 	);
 };

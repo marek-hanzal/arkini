@@ -15,6 +15,9 @@
 	--color-accent-contrast: var(--ak-accent-contrast);
 	--color-info: var(--ak-info);
 	--color-info-contrast: var(--ak-info-contrast);
+	--color-secondary: var(--ak-secondary);
+	--color-secondary-hover: var(--ak-secondary-hover);
+	--color-secondary-foreground: var(--ak-secondary-foreground);
 	--color-success: var(--ak-success);
 	--color-warning: var(--ak-warning);
 	--color-danger: var(--ak-danger);
@@ -51,6 +54,15 @@
 	--ak-info: light-dark(#4b4da8, #8e90f8);
 	--ak-info-contrast: light-dark(#fff, #0c1030);
 	--ak-success: light-dark(#147864, #57d7b2);
+	--ak-secondary: light-dark(
+		color-mix(in srgb, var(--ak-success) 28%, var(--ak-surface)),
+		color-mix(in srgb, var(--ak-success) 24%, var(--ak-surface))
+	);
+	--ak-secondary-hover: light-dark(
+		color-mix(in srgb, var(--ak-success) 38%, var(--ak-surface)),
+		color-mix(in srgb, var(--ak-success) 34%, var(--ak-surface))
+	);
+	--ak-secondary-foreground: var(--ak-success);
 	--ak-warning: light-dark(#985a12, #f1b45e);
 	--ak-danger: light-dark(#b72b63, #ff6c9f);
 	--ak-danger-contrast: light-dark(#fff9fc, #310914);
@@ -111,8 +123,8 @@
 	);
 
 	--ak-list-row-surface: light-dark(
-		color-mix(in srgb, var(--ak-surface) 92%, var(--ak-surface-raised)),
-		color-mix(in srgb, var(--ak-surface) 90%, var(--ak-surface-raised))
+		color-mix(in srgb, var(--ak-surface-raised) 72%, var(--ak-surface)),
+		color-mix(in srgb, var(--ak-surface-raised) 68%, var(--ak-surface))
 	);
 	--ak-list-row-interactive-surface: light-dark(
 		color-mix(in srgb, var(--ak-accent) 10%, var(--ak-surface-raised)),
@@ -221,6 +233,17 @@
 
 .ak-editor-search-input::-webkit-search-cancel-button {
 	display: none;
+}
+
+/* A complete two-column fact row must not draw a separator below either cell. */
+.ak-item-info-facts > :nth-last-child(2):nth-child(odd) {
+	border-bottom-width: 0;
+}
+
+@media (max-width: 48rem) {
+	.ak-item-info-facts > :nth-last-child(2):nth-child(odd) {
+		border-bottom-width: 1px;
+	}
 }
 
 @media (forced-colors: none) {
@@ -347,7 +370,7 @@ select {
 .ak-list-row {
 	position: relative;
 	background-color: var(--ak-list-row-surface);
-	box-shadow: inset 0 0 0 1px transparent;
+	box-shadow: inset 0 0 0 1px var(--ak-line);
 	transition:
 		background-color var(--ak-list-row-transition-duration) var(--ak-list-row-transition-easing),
 		border-color var(--ak-list-row-transition-duration) var(--ak-list-row-transition-easing),

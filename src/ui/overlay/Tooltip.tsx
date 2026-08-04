@@ -10,21 +10,23 @@ import {
 	useHover,
 	useInteractions,
 	useRole,
+	type Placement,
 } from "@floating-ui/react";
 import { cloneElement, type ReactElement, type ReactNode, useState } from "react";
 
 export interface TooltipProps {
 	readonly children: ReactElement;
 	readonly content: ReactNode;
+	readonly placement?: Placement;
 }
 
 /** Positions short contextual help without coupling callers to Floating UI. */
-export const Tooltip = ({ children, content }: TooltipProps) => {
+export const Tooltip = ({ children, content, placement = "top" }: TooltipProps) => {
 	const [open, setOpen] = useState(false);
 	const { context, floatingStyles, refs } = useFloating({
 		open,
 		onOpenChange: setOpen,
-		placement: "top",
+		placement,
 		middleware: [
 			offset(8),
 			flip({

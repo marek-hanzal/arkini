@@ -19,7 +19,9 @@ export const ItemStorageScopeLabel = {
 } as const;
 
 export const ItemInfoFacts = ({ children }: { readonly children: ReactNode }) => (
-	<dl className="grid min-w-0 grid-cols-2 gap-x-8 max-[48rem]:grid-cols-1">{children}</dl>
+	<dl className="ak-item-info-facts grid min-w-0 grid-cols-2 gap-x-8 max-[48rem]:grid-cols-1">
+		{children}
+	</dl>
 );
 
 export const ItemInfoFact = ({

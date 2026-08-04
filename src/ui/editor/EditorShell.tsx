@@ -4,15 +4,16 @@ import { useCallback, useEffect, useState, type PropsWithChildren } from "react"
 
 import { useEditorProject } from "~/bridge/editor/useEditorProject";
 import { waitForEditorProjectWritesCommandAtom } from "~/bridge/editor/waitForEditorProjectWritesCommandAtom";
-import { ButtonLink, PrimaryButton } from "~/ui/button/Button";
+import { Button, ButtonLink } from "~/ui/button/Button";
 import {
 	EditorWorkspaceRoutes,
 	type EditorWorkspaceId,
 	useEditorActiveWorkspace,
 } from "~/ui/editor/useEditorActiveWorkspace";
+import { Tooltip } from "~/ui/overlay/Tooltip";
 
 const tabClassName =
-	"ak-editor-workspace-tab min-h-0 gap-2 border-transparent bg-transparent px-3 py-2 text-sm shadow-none transition-none hover:bg-surface-raised";
+	"ak-editor-workspace-tab size-11 min-h-0 shrink-0 border-transparent bg-transparent p-0 shadow-none transition-none hover:bg-surface-raised";
 const activeTabProps = {
 	className: "border-accent bg-accent text-accent-contrast hover:bg-accent-hover",
 } as const;
@@ -59,52 +60,61 @@ export const EditorShell = ({ children }: PropsWithChildren) => {
 
 	return (
 		<div
-			className="grid h-dvh min-h-0 grid-rows-[auto_minmax(0,1fr)] overflow-hidden bg-[var(--ak-game-shell-background)] text-foreground"
+			className="grid h-dvh min-h-0 grid-cols-[auto_minmax(0,1fr)] overflow-hidden bg-surface text-foreground"
 			data-ui="EditorShell"
 			style={{
 				viewTransitionName: "arkini-editor-shell",
 			}}
 		>
-			<header
-				className="relative z-20 flex min-w-0 flex-wrap items-center gap-2 border-b border-line bg-surface/95 px-[var(--ak-viewport-padding)] py-3 shadow-lg"
+			<aside
+				className="relative z-20 flex min-h-0 w-16 flex-col items-center gap-2 border-r border-line bg-surface p-2 shadow-lg"
 				data-ui="EditorNavigation"
 				style={{
 					viewTransitionName: "arkini-editor-navigation",
 				}}
 			>
 				<nav
-					className="ak-editor-workspace-tabs flex min-w-0 flex-wrap items-center gap-1"
+					className="ak-editor-workspace-tabs flex min-h-0 flex-col items-center gap-1"
 					aria-label="Editor tools"
 				>
 					{EditorWorkspaceRoutes.map(({ icon, id, label, to }) => (
-						<ButtonLink
+						<Tooltip
 							key={id}
-							to={to}
-							params={params}
-							{...readTabProps(id)}
+							content={label}
+							placement="right"
 						>
-							<span className={`${icon} size-4`} />
-							{label}
-						</ButtonLink>
+							<ButtonLink
+								to={to}
+								params={params}
+								aria-label={label}
+								data-workspace-id={id}
+								{...readTabProps(id)}
+							>
+								<span className={`${icon} size-5`} />
+							</ButtonLink>
+						</Tooltip>
 					))}
 				</nav>
-				<p className="min-w-0 flex-1 truncate px-2 text-right text-xs text-muted">
-					{project.title}
-				</p>
-				<PrimaryButton
-					className="min-h-0 shrink-0 gap-2 px-4 py-2 text-sm"
-					disabled={exitPending}
-					cursorIntent={exitPending ? "progress" : undefined}
-					onClick={() => void closeAndExit()}
+				<Tooltip
+					content={exitPending ? "Exiting…" : "Exit"}
+					placement="right"
 				>
-					<span
-						className={`${exitPending ? "icon-[lucide--loader-circle] animate-spin" : "icon-[lucide--log-out]"} size-4`}
-					/>
-					{exitPending ? "Exiting…" : "Exit"}
-				</PrimaryButton>
-			</header>
+					<Button
+						className="mt-auto size-11 min-h-0 shrink-0 border-transparent bg-transparent p-0 shadow-none hover:border-transparent hover:bg-surface-raised"
+						data-ui="EditorExit"
+						aria-label={exitPending ? "Exiting…" : "Exit"}
+						disabled={exitPending}
+						cursorIntent={exitPending ? "progress" : undefined}
+						onClick={() => void closeAndExit()}
+					>
+						<span
+							className={`${exitPending ? "icon-[lucide--loader-circle] animate-spin" : "icon-[lucide--log-out]"} size-5`}
+						/>
+					</Button>
+				</Tooltip>
+			</aside>
 			<main
-				className="min-h-0 min-w-0 overflow-hidden px-[var(--ak-viewport-padding)] py-[var(--ak-viewport-gap)]"
+				className="min-h-0 min-w-0 overflow-hidden bg-surface"
 				data-ui="EditorContent"
 				style={{
 					viewTransitionName: "arkini-editor-content",

@@ -114,17 +114,11 @@ export const EditorProductionFields = withFieldGroup({
 											<EditorInfoTooltip
 												content={
 													kind === "deposit"
-														? "Each production line is an independent job contract owned by this deposit, with its own inputs, output, runtime and rules."
+														? "Optional self-consuming jobs exposed by this deposit. Each production line is an independent job contract with its own inputs, output, runtime and rules."
 														: "Each product line is an independent job contract owned by this producer, with its own inputs, output, runtime and rules."
 												}
 											/>
 										</div>
-										{kind !== "deposit" ? null : (
-											<p className="mt-1 text-xs text-muted">
-												Optional self-consuming jobs exposed by this
-												deposit.
-											</p>
-										)}
 									</div>
 								</header>
 							}

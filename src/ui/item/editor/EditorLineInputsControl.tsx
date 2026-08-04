@@ -41,11 +41,9 @@ const EditorInputCharges = ({
 			) : (
 				<>
 					<div className="flex items-center justify-between gap-3">
-						<div>
+						<div className="flex items-center gap-1">
 							<h4 className="text-sm font-semibold">Charge cost</h4>
-							<p className="mt-1 text-xs text-muted">
-								Optional charge payment when this input starts a job.
-							</p>
+							<EditorInfoTooltip content="Optional charge payment when this input starts a job." />
 						</div>
 						<Button
 							onClick={() =>
@@ -114,6 +112,7 @@ const EditorLineInput = ({
 		<article className="grid gap-4">
 			<EditorChoiceControl
 				label="Input type"
+				description="Simple explicitly requires no consumable resource. Materials consume or reserve an item, while Deposit targets a matching board deposit."
 				value={input.type}
 				options={[
 					{
@@ -136,11 +135,7 @@ const EditorLineInput = ({
 					{
 						type: "simple",
 					},
-					() => (
-						<p className="text-xs text-muted">
-							This marker has no consumable resource requirement.
-						</p>
-					),
+					() => null,
 				)
 				.with(
 					{
@@ -255,11 +250,8 @@ export const EditorLineInputsControl = ({ onChange, value }: EditorLineInputsCon
 			<header>
 				<div className="flex items-center gap-1">
 					<h3 className="text-sm font-semibold">Inputs</h3>
-					<EditorInfoTooltip content="Inputs belong only to this production line. Every configured input contract must be satisfiable before a job can start; a Simple input explicitly requires no material." />
+					<EditorInfoTooltip content="Inputs belong only to this production line. At least one explicit input contract is required, and every configured contract must be satisfiable before a job can start. A Simple input explicitly requires no material." />
 				</div>
-				<p className="mt-1 text-xs text-muted">
-					At least one explicit input contract is required.
-				</p>
 			</header>
 			<EditorCollectionSelector
 				addLabel="Add input"

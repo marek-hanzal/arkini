@@ -7,6 +7,7 @@ export const EditorInfoTooltip = ({ content }: { readonly content: ReactNode }) 
 	<Tooltip content={content}>
 		<button
 			type="button"
+			data-ui="EditorInfoTooltip"
 			className="grid size-8 shrink-0 cursor-help place-items-center rounded-full text-muted hover:text-foreground"
 			onClick={(event) => {
 				event.preventDefault();

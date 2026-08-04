@@ -114,7 +114,7 @@ const ItemDetailTabs = ({
 	const itemDetail = useItemDetailControl();
 	return (
 		<nav
-			className="flex min-w-0 gap-1 overflow-x-auto border-b border-line py-2"
+			className="flex min-w-0 gap-2 overflow-x-auto py-2"
 			aria-label="Item detail tabs"
 			data-ui="ItemDetailTabs"
 		>
@@ -122,7 +122,7 @@ const ItemDetailTabs = ({
 				<button
 					key={tab}
 					type="button"
-					className="inline-flex shrink-0 cursor-pointer items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium text-muted transition-colors hover:bg-accent/10 hover:text-foreground aria-selected:bg-accent/15 aria-selected:text-foreground disabled:cursor-not-allowed"
+					className="inline-flex shrink-0 cursor-pointer items-center gap-1.5 rounded-lg border border-transparent bg-surface-raised/35 px-3 py-2 text-sm font-medium text-muted transition-colors hover:bg-surface-raised hover:text-foreground aria-selected:border-success/45 aria-selected:bg-secondary aria-selected:text-secondary-foreground disabled:cursor-not-allowed"
 					aria-selected={tab === active}
 					disabled={disabled}
 					data-tab={tab}

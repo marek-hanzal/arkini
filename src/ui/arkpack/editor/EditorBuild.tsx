@@ -33,7 +33,7 @@ export const EditorBuild = () => {
 
 	return (
 		<section
-			className="grid h-full min-h-0 content-start gap-[var(--ak-viewport-gap)] overflow-y-auto overscroll-contain"
+			className="grid h-full min-h-0 content-start gap-3 overflow-y-auto overscroll-contain p-3"
 			aria-labelledby="editor-build-title"
 			data-ui="EditorBuild"
 		>
@@ -48,7 +48,7 @@ export const EditorBuild = () => {
 					Validate one exact saved project snapshot and produce immutable Arkpack bytes.
 				</p>
 			</header>
-			<article className="rounded-2xl border border-line bg-surface/85 p-5">
+			<article className="rounded-2xl border-l-2 border-line-strong bg-surface-raised/60 p-5">
 				<div className="flex flex-wrap items-center justify-between gap-3">
 					<div>
 						<h2 className="text-lg font-semibold">Project validation</h2>
@@ -102,7 +102,7 @@ export const EditorBuild = () => {
 				</PrimaryButton>
 			</article>
 			{artifact === undefined ? null : (
-				<article className="rounded-2xl border border-line bg-surface/85 p-5">
+				<article className="rounded-2xl border-l-2 border-line-strong bg-surface-raised/60 p-5">
 					<h2 className="text-lg font-semibold">Build output</h2>
 					<p className="mt-2 break-all text-sm text-muted">
 						{artifact.filename} · {artifact.bytes.byteLength} bytes ·{" "}

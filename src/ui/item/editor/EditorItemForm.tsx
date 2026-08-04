@@ -13,7 +13,7 @@ import { EditorItemFormProvider } from "~/ui/item/editor/EditorItemFormContext";
 import { EditorItemNotFound } from "~/ui/item/editor/EditorItemNotFound";
 import { EditorItemSectionLink } from "~/ui/item/editor/EditorItemSectionLink";
 import {
-	readEditorItemSections,
+	readEditorItemFormSections,
 	type EditorItemOptionalCapability,
 	type EditorItemSectionId,
 } from "~/ui/item/editor/EditorItemSections";
@@ -98,7 +98,7 @@ const EditorItemFormSession = ({
 			itemType,
 		],
 	);
-	const sections = readEditorItemSections(initialItem);
+	const sections = readEditorItemFormSections(initialItem);
 	const params = {
 		projectId: project.projectId,
 		itemUid: initialItem.uid,

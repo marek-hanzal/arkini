@@ -30,12 +30,14 @@ describe("EditorItemSections", () => {
 			"artwork",
 			"charges",
 			"merges",
+			"flow",
 		]);
 		expect(readEditorItemSections(item("inventory")).map(({ id }) => id)).toEqual([
 			"identity",
 			"artwork",
 			"charges",
 			"merges",
+			"flow",
 		]);
 		expect(readEditorItemSections(item("producer")).map(({ id }) => id)).toEqual([
 			"identity",
@@ -43,6 +45,7 @@ describe("EditorItemSections", () => {
 			"charges",
 			"merges",
 			"production",
+			"flow",
 		]);
 	});
 

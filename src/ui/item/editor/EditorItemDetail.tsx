@@ -35,6 +35,7 @@ export const EditorItemDetail = ({
 		projectId: project.projectId,
 		itemUid: item.uid,
 	};
+	const editableSectionId = sectionId === "flow" ? "identity" : sectionId;
 	return (
 		<EditorSectionPage
 			tabs={
@@ -88,7 +89,7 @@ export const EditorItemDetail = ({
 								to="/editor/$projectId/editor/items/$itemUid/form/$sectionId"
 								params={{
 									...params,
-									sectionId,
+									sectionId: editableSectionId,
 								}}
 								className="min-h-0 gap-2 px-4 py-2 text-sm"
 							>
@@ -100,7 +101,7 @@ export const EditorItemDetail = ({
 				/>
 			}
 		>
-			{sectionId === "production" ? (
+			{sectionId === "production" || sectionId === "flow" ? (
 				children
 			) : (
 				<EditorRootCard dataUi="EditorItemDetailCard">{children}</EditorRootCard>

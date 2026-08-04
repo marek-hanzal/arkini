@@ -115,6 +115,11 @@ const createTestRouter = ({
 				}),
 		component: () => createElement("p", null, "Assets destination"),
 	});
+	const flowRoute = createRoute({
+		getParentRoute: () => editorRoute,
+		path: "flow",
+		component: () => createElement("p", null, "Flow destination"),
+	});
 	const projectRoute = createRoute({
 		getParentRoute: () => editorRoute,
 		path: "project",
@@ -148,6 +153,7 @@ const createTestRouter = ({
 				editorListRoute,
 				itemEditRoute,
 				assetsRoute,
+				flowRoute,
 				projectRoute,
 				buildRoute,
 				boardRoute,
@@ -214,6 +220,7 @@ describe("EditorShell", () => {
 			"Project",
 			"Items",
 			"Assets",
+			"Flow",
 			"Build",
 			"Board",
 		]);

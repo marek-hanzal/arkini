@@ -6,6 +6,7 @@ export const EditorItemSectionIds = [
 	"charges",
 	"merges",
 	"production",
+	"flow",
 ] as const;
 
 export type EditorItemSectionId = (typeof EditorItemSectionIds)[number];
@@ -70,6 +71,10 @@ const EditorItemSections = [
 		id: "production",
 		label: "Production",
 	},
+	{
+		id: "flow",
+		label: "Flow",
+	},
 ] as const satisfies ReadonlyArray<EditorItemSectionDescriptor>;
 
 const ProductionItemTypes = new Set<EditorItemType>([
@@ -93,6 +98,12 @@ export const readEditorItemSections = (
 				return true;
 		}
 	});
+
+/** Returns only canonical sections that own editable item fields. */
+export const readEditorItemFormSections = (
+	item: Pick<EditorItem, "type">,
+): ReadonlyArray<EditorItemSectionDescriptor> =>
+	readEditorItemSections(item).filter((section) => section.id !== "flow");
 
 /** Maps one canonical item-schema path to its route-owned form section. */
 export const readEditorItemSectionForPath = (

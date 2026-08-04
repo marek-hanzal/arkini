@@ -5,7 +5,7 @@ import { EditorItemIdentitySection } from "~/ui/item/editor/EditorItemIdentitySe
 import { EditorItemMergesSection } from "~/ui/item/editor/EditorItemMergesSection";
 import { EditorItemProductionSection } from "~/ui/item/editor/EditorItemProductionSection";
 import {
-	readEditorItemSections,
+	readEditorItemFormSections,
 	type EditorItemSectionId,
 } from "~/ui/item/editor/EditorItemSections";
 
@@ -21,13 +21,15 @@ const renderSection = (section: EditorItemSectionId) => {
 			return <EditorItemMergesSection />;
 		case "production":
 			return <EditorItemProductionSection />;
+		case "flow":
+			return null;
 	}
 };
 
 /** Renders one explicit item-form section from the shared parent form session. */
 export const EditorItemSectionPage = ({ section }: { readonly section: EditorItemSectionId }) => {
 	const session = useEditorItemFormSession();
-	const sections = readEditorItemSections(session.initialItem);
+	const sections = readEditorItemFormSections(session.initialItem);
 	const available = sections.some((candidate) => candidate.id === section);
 	return available ? (
 		renderSection(section)

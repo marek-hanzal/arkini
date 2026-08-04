@@ -21,6 +21,7 @@ import {
 	type EditorItemSectionId,
 } from "~/ui/item/editor/EditorItemSections";
 import { EditorItemArtworkTimeline } from "~/ui/item/editor/EditorItemArtworkTimeline";
+import { EditorItemFlowSection } from "~/ui/item/editor/EditorItemFlowSection";
 import { EditorItemThumbnail } from "~/ui/item/editor/EditorItemThumbnail";
 import { EditorProductionLineDetail } from "~/ui/item/editor/EditorProductionLineDetail";
 import { useEditorItemByUid } from "~/ui/item/editor/useEditorItemByUid";
@@ -313,5 +314,7 @@ export const EditorItemDetailSectionPage = ({
 			return <MergesDetail item={item} />;
 		case "production":
 			return <ProductionDetail item={item} />;
+		case "flow":
+			return <EditorItemFlowSection itemId={item.id} />;
 	}
 };

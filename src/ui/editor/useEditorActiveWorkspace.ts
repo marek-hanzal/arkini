@@ -23,6 +23,13 @@ export const EditorWorkspaceRoutes = [
 		to: "/editor/$projectId/assets",
 	},
 	{
+		id: "flow",
+		icon: "icon-[lucide--git-fork]",
+		label: "Flow",
+		matchTo: "/editor/$projectId/flow",
+		to: "/editor/$projectId/flow",
+	},
+	{
 		id: "build",
 		icon: "icon-[lucide--package-check]",
 		label: "Build",

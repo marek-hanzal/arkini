@@ -219,6 +219,10 @@
 	user-select: none;
 }
 
+.ak-editor-search-input::-webkit-search-cancel-button {
+	display: none;
+}
+
 @media (forced-colors: none) {
 	* {
 		scrollbar-color: var(--ak-scrollbar-thumb) var(--ak-scrollbar-track);

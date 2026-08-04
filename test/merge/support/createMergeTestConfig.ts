@@ -139,6 +139,7 @@ export const guaranteedMergeOutput = ({
 } = {}): OutputSchema.Type => ({
 	set: [
 		{
+			weight: 1,
 			roll: [
 				{
 					type: "guaranteed",

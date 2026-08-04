@@ -3,6 +3,7 @@ import { z } from "zod";
 import { RuleDisableSchema } from "./RuleDisableSchema";
 import { RuleEnableSchema } from "./RuleEnableSchema";
 import { RuleHideSchema } from "./RuleHideSchema";
+import { RuleRuntimeAdjustSchema } from "./RuleRuntimeAdjustSchema";
 import { RuleRuntimeMultiplierSchema } from "./RuleRuntimeMultiplierSchema";
 import { RuleShowSchema } from "./RuleShowSchema";
 
@@ -18,6 +19,7 @@ export const RuleSchema = z
 		RuleHideSchema,
 		RuleEnableSchema,
 		RuleDisableSchema,
+		RuleRuntimeAdjustSchema,
 		RuleRuntimeMultiplierSchema,
 	])
 	.meta({

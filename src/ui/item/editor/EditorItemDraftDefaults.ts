@@ -113,6 +113,7 @@ export const EditorItemDraftDefaults = {
 	output: {
 		set: [
 			{
+				weight: 1,
 				roll: [
 					rolls.guaranteed,
 				] as [

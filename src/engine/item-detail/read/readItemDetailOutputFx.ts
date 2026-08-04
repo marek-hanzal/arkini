@@ -15,7 +15,7 @@ export const readItemDetailOutputFx = Effect.fn("readItemDetailOutputFx")(functi
 			roll.push(yield* readItemDetailOutputRollFx(configuredRoll));
 		}
 		output.push({
-			weight: set.weight ?? 1,
+			weight: set.weight,
 			roll,
 		});
 	}

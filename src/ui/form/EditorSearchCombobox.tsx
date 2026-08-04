@@ -146,7 +146,7 @@ export const EditorSearchCombobox = ({
 							: undefined
 					}
 					aria-label={label}
-					className="min-h-[var(--ak-control-min-height)] w-full rounded-lg border border-line-strong bg-canvas/70 py-2 pr-3 pl-9 text-sm text-foreground outline-none transition-colors placeholder:text-subtle"
+					className="ak-editor-search-input min-h-[var(--ak-control-min-height)] w-full rounded-lg border border-line-strong bg-canvas/70 py-2 pr-12 pl-9 text-sm text-foreground outline-none transition-colors placeholder:text-subtle"
 					placeholder={`Search ${label.toLocaleLowerCase()}…`}
 					onBlur={() => {
 						setOpen(false);
@@ -180,6 +180,20 @@ export const EditorSearchCombobox = ({
 						}
 					}}
 				/>
+				{query.length === 0 ? null : (
+					<button
+						type="button"
+						className="absolute inset-y-0 right-0 grid w-12 cursor-pointer place-items-center rounded-r-lg text-muted hover:bg-surface-raised hover:text-foreground"
+						title="Clear search"
+						onMouseDown={(event) => event.preventDefault()}
+						onClick={() => {
+							setQuery("");
+							setOpen(true);
+						}}
+					>
+						<span className="icon-[lucide--x] size-5" />
+					</button>
+				)}
 			</span>
 			{description === undefined ? null : (
 				<span className="text-xs leading-5 text-subtle">{description}</span>

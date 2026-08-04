@@ -25,6 +25,7 @@ describe("rollSetFx", () => {
 		const result = Effect.runSync(
 			rollSetFx({
 				rollSet: {
+					weight: 1,
 					roll: [
 						{
 							type: "guaranteed",
@@ -55,6 +56,7 @@ describe("rollSetFx", () => {
 		const result = Effect.runSync(
 			rollSetFx({
 				rollSet: {
+					weight: 1,
 					roll: [
 						{
 							type: "chance",

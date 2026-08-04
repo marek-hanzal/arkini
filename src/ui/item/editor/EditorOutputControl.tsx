@@ -6,7 +6,6 @@ import type {
 	EditorRoll,
 	EditorRollSet,
 } from "~/bridge/item/editor/EditorItemModel";
-import { Button } from "~/ui/button/Button";
 import { EditorCollectionSelector } from "~/ui/form/EditorCollectionSelector";
 import { EditorItemDraftDefaults } from "~/ui/item/editor/EditorItemDraftDefaults";
 import { EditorChoiceControl, EditorNumberControl } from "~/ui/form/EditorValueControls";
@@ -69,6 +68,7 @@ const EditorDropControl = ({
 		</div>
 		<EditorRulesControl
 			rules={value.rules}
+			description="These rules belong only to this item drop. Every condition inside a rule must pass. Enable rules gate this drop and any matching disable rule vetoes it when the roll resolves."
 			allowedTypes={[
 				"enable",
 				"disable",
@@ -360,33 +360,17 @@ const EditorRollSetControl = ({
 	const readItemLabel = useEditorItemOptionLabel();
 	return (
 		<section className="grid gap-3">
-			<header className="flex flex-wrap items-center justify-end gap-3">
-				<div className="flex items-center gap-2">
-					<Button
-						onClick={() =>
-							onChange({
-								...value,
-								weight: value.weight === undefined ? 1 : undefined,
-							})
-						}
-					>
-						{value.weight === undefined ? "Add set weight" : "Remove set weight"}
-					</Button>
-				</div>
-			</header>
-			{value.weight === undefined ? null : (
-				<EditorNumberControl
-					label="Set weight"
-					value={value.weight}
-					min={1}
-					onChange={(weight) =>
-						onChange({
-							...value,
-							weight,
-						})
-					}
-				/>
-			)}
+			<EditorNumberControl
+				label="Relative set weight"
+				value={value.weight}
+				min={1}
+				onChange={(weight) =>
+					onChange({
+						...value,
+						weight,
+					})
+				}
+			/>
 			<EditorCollectionSelector
 				addLabel="Add roll"
 				count={value.roll.length}
@@ -474,6 +458,7 @@ export const EditorOutputControl = ({ onChange, value }: EditorOutputControlProp
 					set: [
 						...value.set,
 						{
+							weight: 1,
 							roll: [
 								structuredClone(EditorItemDraftDefaults.rolls.guaranteed),
 							],

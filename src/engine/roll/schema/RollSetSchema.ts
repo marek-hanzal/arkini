@@ -12,12 +12,12 @@ import { RollSchema } from "./RollSchema";
 export const RollSetSchema = z
 	.object({
 		/**
-		 * Optional relative likelihood of selecting this roll set.
+		 * Relative likelihood of selecting this roll set.
 		 *
-		 * When omitted, runtime selection treats this set with weight one.
+		 * Authored shorthand without a value is normalized to weight one.
 		 */
-		weight: PositiveIntegerSchema.optional().describe(
-			"The optional positive relative weight used to select this roll set.",
+		weight: PositiveIntegerSchema.default(1).describe(
+			"The positive relative weight used to select this roll set.",
 		),
 		/**
 		 * One or more rolls evaluated after this set is selected.

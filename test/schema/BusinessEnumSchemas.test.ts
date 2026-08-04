@@ -59,6 +59,7 @@ describe("business enum schemas", () => {
 			LineRuleEnumSchema.enum.Hide,
 			LineRuleEnumSchema.enum.Enable,
 			LineRuleEnumSchema.enum.Disable,
+			LineRuleEnumSchema.enum.RuntimeAdjust,
 			LineRuleEnumSchema.enum.RuntimeMultiplier,
 		]);
 		expect(ActionEnumSchema.options).toEqual([

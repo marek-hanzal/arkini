@@ -18,6 +18,7 @@ describe("readOutputMaximumQuantitiesFx", () => {
 		const output: OutputSchema.Type = {
 			set: [
 				{
+					weight: 1,
 					roll: [
 						{
 							type: "chance",
@@ -51,6 +52,7 @@ describe("readOutputMaximumQuantitiesFx", () => {
 		const output: OutputSchema.Type = {
 			set: [
 				{
+					weight: 1,
 					roll: [
 						{
 							type: "guaranteed",
@@ -84,6 +86,7 @@ describe("readOutputMaximumQuantitiesFx", () => {
 					],
 				},
 				{
+					weight: 1,
 					roll: [
 						{
 							type: "guaranteed",
@@ -123,6 +126,7 @@ describe("readOutputMaximumQuantitiesFx", () => {
 		const output: OutputSchema.Type = {
 			set: [
 				{
+					weight: 1,
 					roll: [
 						{
 							type: "weight",

@@ -3,6 +3,7 @@ import { EditorCapabilityStatus } from "~/ui/form/EditorCapabilityStatus";
 import { EditorCollectionSelector } from "~/ui/form/EditorCollectionSelector";
 import { withFieldGroup } from "~/ui/form/EditorForm";
 import { EditorFormCard } from "~/ui/form/EditorFormCard";
+import { EditorInfoTooltip } from "~/ui/form/EditorInfoTooltip";
 import { EditorLineFields } from "~/ui/item/editor/EditorLineField";
 
 interface EditorProductionFieldValues {
@@ -29,6 +30,7 @@ export const EditorProductionFields = withFieldGroup({
 					{(field) => (
 						<field.NumberField
 							label="Maximum parallel jobs"
+							description="Maximum number of jobs this item may run concurrently across its production lines."
 							min={1}
 						/>
 					)}
@@ -91,11 +93,20 @@ export const EditorProductionFields = withFieldGroup({
 							<div className="grid gap-4">
 								<header>
 									<div>
-										<h3 className="text-sm font-semibold">
-											{kind === "deposit"
-												? "Production lines"
-												: "Product lines"}
-										</h3>
+										<div className="flex items-center gap-1">
+											<h3 className="text-sm font-semibold">
+												{kind === "deposit"
+													? "Production lines"
+													: "Product lines"}
+											</h3>
+											<EditorInfoTooltip
+												content={
+													kind === "deposit"
+														? "Each production line is an independent job contract owned by this deposit, with its own inputs, output, runtime and rules."
+														: "Each product line is an independent job contract owned by this producer, with its own inputs, output, runtime and rules."
+												}
+											/>
+										</div>
 										{kind !== "deposit" ? null : (
 											<p className="mt-1 text-xs text-muted">
 												Optional self-consuming jobs exposed by this

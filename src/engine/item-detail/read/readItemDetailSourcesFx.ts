@@ -124,11 +124,11 @@ const readMatchingFacts = ({
 	readonly targetDefinitionItemId: IdSchema.Type;
 }): readonly readItemDetailSourcesFx.OutputFact[] => {
 	if (output === undefined) return [];
-	const totalSetWeight = output.set.reduce((total, set) => total + (set.weight ?? 1), 0);
+	const totalSetWeight = output.set.reduce((total, set) => total + set.weight, 0);
 	const facts: readItemDetailSourcesFx.OutputFact[] = [];
 
 	for (const set of output.set) {
-		const setWeight = set.weight ?? 1;
+		const setWeight = set.weight;
 		for (const roll of set.roll) {
 			match(roll)
 				.with(

@@ -1,4 +1,4 @@
-import { Tooltip } from "~/ui/overlay/Tooltip";
+import { EditorInfoTooltip } from "~/ui/form/EditorInfoTooltip";
 
 export interface EditorBooleanToggleBadgeProps {
 	readonly checked: boolean;
@@ -33,13 +33,6 @@ export const EditorBooleanToggleBadge = ({
 			<span className={`${checked ? checkedIcon : uncheckedIcon} size-4`} />
 			{checked ? checkedLabel : uncheckedLabel}
 		</button>
-		<Tooltip content={description}>
-			<button
-				type="button"
-				className="grid size-8 shrink-0 cursor-help place-items-center rounded-full text-muted hover:text-foreground"
-			>
-				<span className="icon-[lucide--info] size-4" />
-			</button>
-		</Tooltip>
+		<EditorInfoTooltip content={description} />
 	</div>
 );

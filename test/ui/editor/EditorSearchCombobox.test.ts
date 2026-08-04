@@ -82,4 +82,31 @@ describe("EditorSearchCombobox", () => {
 		expect(onChange).toHaveBeenCalledWith("second");
 		expect(input.getAttribute("aria-controls")).not.toBeNull();
 	});
+
+	it("uses a full-height custom clear action instead of the native search control", async () => {
+		const container = document.createElement("div");
+		document.body.append(container);
+		const root = createRoot(container);
+		roots.push(root);
+		await act(async () => {
+			root.render(
+				createElement(EditorSearchCombobox, {
+					label: "Item",
+					emptyLabel: "Empty",
+					options: [],
+					value: "selected-item",
+					onChange: vi.fn(),
+					renderPreview: () => null,
+				}),
+			);
+		});
+		const input = container.querySelector("input");
+		const clear = container.querySelector<HTMLButtonElement>('button[title="Clear search"]');
+		if (input === null || clear === null) throw new Error("Expected search clear action.");
+
+		await act(async () => clear.click());
+
+		expect(input.value).toBe("");
+		expect(clear.className).toContain("inset-y-0");
+	});
 });

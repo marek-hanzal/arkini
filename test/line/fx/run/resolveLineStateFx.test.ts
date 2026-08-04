@@ -109,4 +109,31 @@ describe("line run rule projections", () => {
 			),
 		).toBe(76);
 	});
+
+	it("adds signed active adjustments after multipliers and clamps at zero", () => {
+		const resolve = (adjustMs: number) =>
+			Effect.runSync(
+				resolveLineRuntimeFx({
+					line: {
+						runtimeMs: 1_000,
+					},
+					rules: [
+						{
+							type: "runtime:multiplier",
+							active: true,
+							multiplier: 0.5,
+						},
+						{
+							type: "runtime:adjust",
+							active: true,
+							adjustMs,
+						},
+					],
+				}),
+			);
+
+		expect(resolve(250)).toBe(750);
+		expect(resolve(-250)).toBe(250);
+		expect(resolve(-1_000)).toBe(0);
+	});
 });

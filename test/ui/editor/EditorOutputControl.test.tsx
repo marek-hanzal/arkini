@@ -70,6 +70,21 @@ const readOutput = (container: HTMLElement) =>
 	JSON.parse(container.querySelector("output")?.textContent ?? "null") as EditorOutput;
 
 describe("EditorOutputControl", () => {
+	it("keeps every output set explicitly weighted without a weight mode toggle", async () => {
+		const container = await mount();
+		const weightLabel = [
+			...container.querySelectorAll("label"),
+		].find((label) => label.textContent?.includes("Relative set weight"));
+
+		expect(weightLabel?.querySelector("input")?.value).toBe("1");
+		expect(container.textContent).not.toContain("Add set weight");
+		expect(container.textContent).not.toContain("Remove set weight");
+
+		await click(container, "Add output set");
+
+		expect(readOutput(container).set[1].weight).toBe(1);
+	});
+
 	it("keeps nested output collections behind one active form at each level", async () => {
 		const container = await mount();
 		expect(container.querySelectorAll('[data-ui="EditorCollectionSelector"]')).toHaveLength(4);

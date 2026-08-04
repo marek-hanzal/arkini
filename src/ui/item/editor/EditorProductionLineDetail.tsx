@@ -102,7 +102,7 @@ const projectOutput = (
 						kind: "chance",
 					};
 		}),
-		weight: set.weight ?? 1,
+		weight: set.weight,
 	})) ?? [];
 
 const EditorLineInputReference = ({

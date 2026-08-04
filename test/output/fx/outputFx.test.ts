@@ -120,11 +120,7 @@ const createRollSet = ({
 	weight?: number;
 }): RollSetSchema.Type => {
 	return {
-		...(weight === undefined
-			? {}
-			: {
-					weight,
-				}),
+		weight: weight ?? 1,
 		roll: [
 			roll,
 		],

@@ -4,6 +4,7 @@ import type { EditorInput, EditorLine } from "~/bridge/item/editor/EditorItemMod
 import { Button } from "~/ui/button/Button";
 import { EditorCapabilityStatus } from "~/ui/form/EditorCapabilityStatus";
 import { EditorCollectionSelector } from "~/ui/form/EditorCollectionSelector";
+import { EditorInfoTooltip } from "~/ui/form/EditorInfoTooltip";
 import { EditorItemDraftDefaults } from "~/ui/item/editor/EditorItemDraftDefaults";
 import { EditorChoiceControl, EditorNumberControl } from "~/ui/form/EditorValueControls";
 import { EditorQuantityControl } from "~/ui/item/editor/EditorQuantityControl";
@@ -252,7 +253,10 @@ export const EditorLineInputsControl = ({ onChange, value }: EditorLineInputsCon
 	return (
 		<section className="grid min-w-0 content-start gap-3">
 			<header>
-				<h3 className="text-sm font-semibold">Inputs</h3>
+				<div className="flex items-center gap-1">
+					<h3 className="text-sm font-semibold">Inputs</h3>
+					<EditorInfoTooltip content="Inputs belong only to this production line. Every configured input contract must be satisfiable before a job can start; a Simple input explicitly requires no material." />
+				</div>
 				<p className="mt-1 text-xs text-muted">
 					At least one explicit input contract is required.
 				</p>

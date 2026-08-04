@@ -6,6 +6,7 @@ import type {
 	EditorWhen,
 } from "~/bridge/item/editor/EditorItemModel";
 import { EditorCollectionSelector } from "~/ui/form/EditorCollectionSelector";
+import { EditorInfoTooltip } from "~/ui/form/EditorInfoTooltip";
 import { EditorItemDraftDefaults } from "~/ui/item/editor/EditorItemDraftDefaults";
 import { EditorChoiceControl, EditorNumberControl } from "~/ui/form/EditorValueControls";
 import { EditorQueryControl } from "~/ui/item/editor/EditorQueryControl";
@@ -132,10 +133,12 @@ const EditorWhenControl = ({
 /** Edits the shared conditional core used by both line and selected-drop rules. */
 export const EditorRulesControl = ({
 	allowedTypes,
+	description,
 	onChange,
 	rules,
 }: {
 	readonly allowedTypes: ReadonlyArray<EditorRuleType>;
+	readonly description: string;
 	readonly onChange: (rules: EditorRule[]) => void;
 	readonly rules: ReadonlyArray<EditorRule>;
 }) => {
@@ -149,12 +152,19 @@ export const EditorRulesControl = ({
 				? {
 						multiplier: 1,
 					}
-				: {}),
+				: type === "runtime:adjust"
+					? {
+							adjustMs: 0,
+						}
+					: {}),
 		}) as EditorLineRule;
 	return (
 		<section className="grid gap-3 border-t border-line pt-4">
 			<header>
-				<h4 className="text-sm font-semibold">Rules</h4>
+				<div className="flex items-center gap-1">
+					<h4 className="text-sm font-semibold">Rules</h4>
+					<EditorInfoTooltip content={description} />
+				</div>
 				<p className="mt-1 text-xs text-muted">All conditions within one rule must pass.</p>
 			</header>
 			<EditorCollectionSelector
@@ -216,6 +226,28 @@ export const EditorRulesControl = ({
 													? {
 															...current,
 															multiplier,
+														}
+													: current,
+											),
+										)
+									}
+								/>
+							)}
+							{rule.type !== "runtime:adjust" ? null : (
+								<EditorNumberControl
+									label="Runtime adjustment (seconds)"
+									value={rule.adjustMs / 1_000}
+									step={0.001}
+									onChange={(adjustSeconds) =>
+										onChange(
+											rules.map((current, index) =>
+												index === ruleIndex &&
+												current.type === "runtime:adjust"
+													? {
+															...current,
+															adjustMs: Math.round(
+																adjustSeconds * 1_000,
+															),
 														}
 													: current,
 											),

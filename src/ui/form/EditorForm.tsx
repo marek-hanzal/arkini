@@ -2,6 +2,7 @@ import { createFormHook } from "@tanstack/react-form";
 import type { PropsWithChildren } from "react";
 
 import { EditorBooleanToggleBadge } from "~/ui/form/EditorBooleanToggleBadge";
+import { EditorInfoTooltip } from "~/ui/form/EditorInfoTooltip";
 import { fieldContext, formContext, useFieldContext } from "~/ui/form/EditorFormContexts";
 import { editorInputClassName } from "~/ui/form/EditorInputClassName";
 import { readEditorFieldError } from "~/ui/form/readEditorFieldError";
@@ -19,7 +20,10 @@ const EditorField = ({
 	readonly label: string;
 }>) => (
 	<label className="grid min-w-0 content-start gap-1.5 text-sm">
-		<span className="font-semibold text-foreground">{label}</span>
+		<span className="flex min-w-0 items-center gap-1">
+			<span className="font-semibold text-foreground">{label}</span>
+			{description === undefined ? null : <EditorInfoTooltip content={description} />}
+		</span>
 		{children}
 		{description === undefined ? null : (
 			<span className="text-xs leading-5 text-subtle">{description}</span>
@@ -199,7 +203,12 @@ const EditorChoiceField = ({ description, label, options }: EditorChoiceFieldPro
 			className="grid min-w-0 content-start gap-1.5 text-sm"
 			aria-invalid={error === undefined ? undefined : true}
 		>
-			<legend className="font-semibold text-foreground">{label}</legend>
+			<legend>
+				<span className="flex items-center gap-1">
+					<span className="font-semibold text-foreground">{label}</span>
+					{description === undefined ? null : <EditorInfoTooltip content={description} />}
+				</span>
+			</legend>
 			<div className="flex min-w-0 flex-wrap gap-2">
 				{options.map((option) => {
 					const selected = field.state.value === option.value;

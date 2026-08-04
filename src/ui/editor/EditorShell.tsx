@@ -12,7 +12,7 @@ import {
 } from "~/ui/editor/useEditorActiveWorkspace";
 
 const tabClassName =
-	"ak-editor-workspace-tab min-h-0 border-transparent bg-transparent px-3 py-2 text-sm shadow-none transition-none hover:bg-surface-raised";
+	"ak-editor-workspace-tab min-h-0 gap-2 border-transparent bg-transparent px-3 py-2 text-sm shadow-none transition-none hover:bg-surface-raised";
 const activeTabProps = {
 	className: "border-accent bg-accent text-accent-contrast hover:bg-accent-hover",
 } as const;
@@ -76,13 +76,14 @@ export const EditorShell = ({ children }: PropsWithChildren) => {
 					className="ak-editor-workspace-tabs flex min-w-0 flex-wrap items-center gap-1"
 					aria-label="Editor tools"
 				>
-					{EditorWorkspaceRoutes.map(({ id, label, to }) => (
+					{EditorWorkspaceRoutes.map(({ icon, id, label, to }) => (
 						<ButtonLink
 							key={id}
 							to={to}
 							params={params}
 							{...readTabProps(id)}
 						>
+							<span className={`${icon} size-4`} />
 							{label}
 						</ButtonLink>
 					))}
@@ -91,11 +92,14 @@ export const EditorShell = ({ children }: PropsWithChildren) => {
 					{project.title}
 				</p>
 				<PrimaryButton
-					className="min-h-0 shrink-0 px-4 py-2 text-sm"
+					className="min-h-0 shrink-0 gap-2 px-4 py-2 text-sm"
 					disabled={exitPending}
 					cursorIntent={exitPending ? "progress" : undefined}
 					onClick={() => void closeAndExit()}
 				>
+					<span
+						className={`${exitPending ? "icon-[lucide--loader-circle] animate-spin" : "icon-[lucide--log-out]"} size-4`}
+					/>
 					{exitPending ? "Exiting…" : "Exit"}
 				</PrimaryButton>
 			</header>

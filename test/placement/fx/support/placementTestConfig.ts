@@ -147,6 +147,7 @@ export const configuredOutput = (
 	return {
 		set: [
 			{
+				weight: 1,
 				roll: [
 					{
 						drop,

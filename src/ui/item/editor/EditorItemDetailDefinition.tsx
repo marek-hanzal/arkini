@@ -83,6 +83,9 @@ const RuleDetail = ({ rule }: { readonly rule: EditorDropRule | EditorLineRule }
 		<p className="font-medium capitalize">
 			{rule.type}
 			{"multiplier" in rule ? ` × ${rule.multiplier}` : ""}
+			{"adjustMs" in rule
+				? ` ${rule.adjustMs >= 0 ? "+" : ""}${rule.adjustMs / 1_000} s`
+				: ""}
 		</p>
 		<ul className="mt-1 grid gap-1 pl-4 text-sm text-muted">
 			{rule.when.map((when, index) => (
@@ -196,7 +199,7 @@ export const OutputDetail = ({ output }: { readonly output?: EditorOutput }) =>
 					key={`set-${index}`}
 				>
 					<p className="text-sm font-medium">
-						Set {index + 1} · weight {set.weight ?? 1}
+						Set {index + 1} · weight {set.weight}
 					</p>
 					<ul className="mt-2 divide-y divide-line/60">
 						{set.roll.map((roll, rollIndex) => (

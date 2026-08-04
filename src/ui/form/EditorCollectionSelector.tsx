@@ -20,7 +20,9 @@ export interface EditorCollectionSelectorProps {
 	readonly navigationHeader?: ReactNode;
 	readonly onAdd?: () => void;
 	readonly onRemove?: (activeIndex: number) => void;
+	readonly onSelectedIndexChange?: (index: number) => void;
 	readonly removeLabel?: string;
+	readonly selectedIndex?: number;
 }
 
 /** Keeps one form-owned collection item mounted behind a compact local selector. */
@@ -36,9 +38,16 @@ export const EditorCollectionSelector = ({
 	navigationHeader,
 	onAdd,
 	onRemove,
+	onSelectedIndexChange,
 	removeLabel = "Remove item",
+	selectedIndex,
 }: EditorCollectionSelectorProps) => {
-	const [requestedIndex, setRequestedIndex] = useState(0);
+	const [internalSelectedIndex, setInternalSelectedIndex] = useState(0);
+	const requestedIndex = selectedIndex ?? internalSelectedIndex;
+	const selectIndex = (index: number) => {
+		setInternalSelectedIndex(index);
+		onSelectedIndexChange?.(index);
+	};
 	const activeIndex = count === 0 ? undefined : Math.min(requestedIndex, count - 1);
 	const navigation = (
 		<>
@@ -67,7 +76,7 @@ export const EditorCollectionSelector = ({
 						)}
 						renderPreview={() => null}
 						value={activeIndex === undefined ? "" : String(activeIndex)}
-						onChange={(index) => setRequestedIndex(Number(index))}
+						onChange={(index) => selectIndex(Number(index))}
 					/>
 				</div>
 				<div className="flex shrink-0 items-center gap-2">
@@ -77,7 +86,7 @@ export const EditorCollectionSelector = ({
 							title={addLabel}
 							onClick={() => {
 								onAdd();
-								setRequestedIndex(count);
+								selectIndex(count);
 							}}
 						>
 							<span className="icon-[lucide--plus] size-5" />
@@ -89,7 +98,7 @@ export const EditorCollectionSelector = ({
 							title={removeLabel}
 							onClick={() => {
 								onRemove(activeIndex);
-								setRequestedIndex(Math.max(0, activeIndex - 1));
+								selectIndex(Math.max(0, activeIndex - 1));
 							}}
 						>
 							<span className="icon-[lucide--trash-2] size-4" />
@@ -106,7 +115,7 @@ export const EditorCollectionSelector = ({
 		>
 			{navigationCard ? <EditorFormCard>{navigation}</EditorFormCard> : navigation}
 			{activeIndex === undefined ? null : (
-				<div key={activeIndex}>{children(activeIndex, setRequestedIndex)}</div>
+				<div key={activeIndex}>{children(activeIndex, selectIndex)}</div>
 			)}
 		</section>
 	);

@@ -61,36 +61,7 @@ const readUnavailableDependency = (reason: ItemDetailLines.DisabledReason) => {
 					status: `Required · None available (Board · ${reason.distance})`,
 				};
 	}
-	if (reason.kind !== "line-disabled" || reason.cause.kind !== "enable-rule") {
-		return undefined;
-	}
-	const detail = reason.cause.condition.detail;
-	return detail === undefined
-		? undefined
-		: {
-				detail,
-				status: match(reason.cause.condition)
-					.with(
-						{
-							kind: "exists",
-						},
-						({ locationLabel }) => `Required · ${locationLabel}`,
-					)
-					.with(
-						{
-							kind: "count",
-						},
-						({ count, locationLabel }) => `Required ${count} · ${locationLabel}`,
-					)
-					.with(
-						{
-							kind: "range",
-						},
-						({ locationLabel, max, min }) =>
-							`Required ${min}-${max} · ${locationLabel}`,
-					)
-					.exhaustive(),
-			};
+	return undefined;
 };
 
 const ItemLineUnavailableDependency = ({
@@ -139,6 +110,27 @@ const ItemLineUnavailableMessage = ({
 		<ItemLineUnavailableReason reason={reason} />
 	</div>
 );
+
+const ItemLineRuleHints = ({ hints }: { readonly hints: readonly string[] }) =>
+	hints.length === 0 ? null : (
+		<ul
+			className="mt-3 grid gap-1.5 text-sm text-muted"
+			data-ui="TileLineRuleHints"
+		>
+			{hints.map((hint, index) => (
+				<li
+					className="flex min-w-0 items-start gap-2"
+					key={`${hint}-${index}`}
+				>
+					<span
+						className="icon-[lucide--info] mt-0.5 size-4 shrink-0 text-secondary-foreground"
+						aria-hidden="true"
+					/>
+					<span>{hint}</span>
+				</li>
+			))}
+		</ul>
+	);
 
 /** Renders one live product line with its commands, runtime, inputs, and outputs. */
 export const ItemLineRow = forwardRef<
@@ -198,6 +190,16 @@ export const ItemLineRow = forwardRef<
 			: undefined;
 	const showUnavailableReason = !stale && unavailable && line.activeJob === undefined;
 	const queued = !stale && line.activeJob === undefined && line.queuedRequestCount > 0;
+	const disclosedDisabledHint =
+		line.availability.kind === "unavailable" &&
+		line.availability.reason.kind === "line-disabled" &&
+		line.availability.reason.cause.kind !== "static"
+			? line.availability.reason.message
+			: undefined;
+	const activeRuleHints =
+		disclosedDisabledHint === undefined
+			? line.activeRuleHints
+			: line.activeRuleHints.filter((hint) => hint !== disclosedDisabledHint);
 	const contentReadOnly = disabled || line.activeJob !== undefined;
 	const lineWithdraw =
 		!stale &&
@@ -282,6 +284,7 @@ export const ItemLineRow = forwardRef<
 						line={line}
 						stale={stale}
 					/>
+					{stale ? null : <ItemLineRuleHints hints={activeRuleHints} />}
 					<AnimatePresence initial={false}>
 						{queued ? (
 							<motion.p

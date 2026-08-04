@@ -5,6 +5,7 @@ import {
 	editorCollectionActionClassName,
 	EditorCollectionSelector,
 } from "~/ui/form/EditorCollectionSelector";
+import { EditorFormSectionDivider } from "~/ui/form/EditorFormSectionDivider";
 import { withFieldGroup } from "~/ui/form/EditorForm";
 
 const defaultArtwork: EditorItem["asset"] = {
@@ -17,8 +18,17 @@ const defaultArtwork: EditorItem["asset"] = {
 /** Owns the complete artwork subtree through TanStack's registered field-group API. */
 export const EditorItemArtworkFields = withFieldGroup({
 	defaultValues: defaultArtwork,
-	render: ({ group }) => (
+	props: {
+		onSelectedProgressIndexChange: undefined as ((index: number) => void) | undefined,
+		selectedProgressIndex: undefined as number | undefined,
+	},
+	render: ({ group, onSelectedProgressIndexChange, selectedProgressIndex }) => (
 		<>
+			<EditorFormSectionDivider
+				description="The default visual composition shown before any runtime progress artwork applies."
+				title="Default artwork"
+				variant="secondary"
+			/>
 			<group.AppField name="default[0]">
 				{(field) => <field.AssetField label="Base asset" />}
 			</group.AppField>
@@ -64,7 +74,12 @@ export const EditorItemArtworkFields = withFieldGroup({
 				{(sourcesField) => {
 					const sources = sourcesField.state.value ?? [];
 					return (
-						<div className="grid gap-3 border-t border-line pt-4">
+						<div className="grid gap-3">
+							<EditorFormSectionDivider
+								description="Ordered visual states shown as the item advances through runtime progress."
+								title="Progress artwork"
+								variant="secondary"
+							/>
 							{sources.length === 0 ? (
 								<EditorCapabilityStatus
 									actionLabel="Enable progress artwork"
@@ -87,7 +102,9 @@ export const EditorItemArtworkFields = withFieldGroup({
 											? group.setFieldValue("sources", undefined)
 											: sourcesField.removeValue(index)
 									}
+									onSelectedIndexChange={onSelectedProgressIndexChange}
 									removeLabel="Remove progress asset"
+									selectedIndex={selectedProgressIndex ?? 0}
 								>
 									{(index) => (
 										<div className="grid gap-2">

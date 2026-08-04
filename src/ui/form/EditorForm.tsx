@@ -6,6 +6,10 @@ import { EditorBooleanToggleBadge } from "~/ui/form/EditorBooleanToggleBadge";
 import { EditorInfoTooltip } from "~/ui/form/EditorInfoTooltip";
 import { fieldContext, formContext, useFieldContext } from "~/ui/form/EditorFormContexts";
 import { editorInputClassName } from "~/ui/form/EditorInputClassName";
+import {
+	selectableActiveClassName,
+	selectableInactiveClassName,
+} from "~/ui/form/SelectableStateClassName";
 import { readEditorFieldError } from "~/ui/form/readEditorFieldError";
 import { EditorItemAutocompleteField } from "~/ui/item/editor/EditorItemAutocompleteField";
 import { EditorAssetAutocompleteField } from "~/ui/resource/editor/EditorAssetAutocompleteField";
@@ -220,9 +224,7 @@ const EditorChoiceField = ({ description, label, options }: EditorChoiceFieldPro
 							key={option.value}
 							type="button"
 							className={`min-h-9 cursor-pointer rounded-lg border px-3 py-1.5 text-xs font-semibold uppercase tracking-wide transition-colors ${
-								selected
-									? "border-success/45 bg-secondary text-secondary-foreground"
-									: "border-line bg-canvas/70 text-muted hover:border-line-strong hover:text-foreground"
+								selected ? selectableActiveClassName : selectableInactiveClassName
 							}`}
 							aria-pressed={selected}
 							onClick={() => field.handleChange(option.value)}

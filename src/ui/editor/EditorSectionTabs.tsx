@@ -1,10 +1,10 @@
 import type { PropsWithChildren } from "react";
 
 export const editorSectionTabClassName =
-	"min-h-9 rounded-lg border border-l-2 border-accent/20 border-l-accent/35 bg-accent/5 px-3 py-2 text-sm text-foreground shadow-none hover:bg-accent/10";
+	"min-h-9 rounded-lg border border-b-2 border-accent/20 border-b-accent/35 bg-accent/5 px-3 py-2 text-sm text-foreground shadow-none hover:bg-accent/10";
 
 export const editorSectionTabActiveClassName =
-	"border-accent/40 border-l-accent/75 bg-accent/15 text-accent hover:bg-accent/20";
+	"border-accent/40 border-b-accent/75 bg-accent/15 text-accent hover:bg-accent/20";
 
 /** Provides one compact route-backed tab row without owning domain state. */
 export const EditorSectionTabs = ({

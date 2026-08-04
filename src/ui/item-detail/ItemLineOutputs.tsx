@@ -14,29 +14,44 @@ const ItemLineOutputItem = ({
 	readonly renderItem?: (item: ItemDetailLines.OutputItem) => ReactNode;
 }) => (
 	<div
-		className="flex min-w-0 items-center justify-between gap-4 text-sm"
+		className="grid gap-1.5"
 		data-ui="TileLineOutputItem"
 	>
-		{renderItem !== undefined ? (
-			renderItem(item)
-		) : item.sourceUrl === undefined ? (
-			<span className="truncate font-medium text-foreground">{item.title}</span>
-		) : (
-			<ItemReferenceButton
-				compositeUrl={item.compositeUrl}
-				dataUi="TileLineOutputDetailLink"
-				definitionItemId={item.definitionItemId}
-				disabled={disabled}
-				label={item.title}
-				sourceUrl={item.sourceUrl}
-			/>
-		)}
-		<span className="shrink-0 text-muted">
-			×
-			{item.quantity.min === item.quantity.max
-				? item.quantity.min
-				: `${item.quantity.min}–${item.quantity.max}`}
-		</span>
+		<div className="flex min-w-0 items-center justify-between gap-4 text-sm">
+			{renderItem !== undefined ? (
+				renderItem(item)
+			) : item.sourceUrl === undefined ? (
+				<span className="truncate font-medium text-foreground">{item.title}</span>
+			) : (
+				<ItemReferenceButton
+					compositeUrl={item.compositeUrl}
+					dataUi="TileLineOutputDetailLink"
+					definitionItemId={item.definitionItemId}
+					disabled={disabled}
+					label={item.title}
+					sourceUrl={item.sourceUrl}
+				/>
+			)}
+			<span className="shrink-0 text-muted">
+				×
+				{item.quantity.min === item.quantity.max
+					? item.quantity.min
+					: `${item.quantity.min}–${item.quantity.max}`}
+			</span>
+		</div>
+		{item.activeRuleHints.map((hint, index) => (
+			<p
+				className="flex items-start gap-1.5 text-xs text-muted"
+				data-ui="TileLineOutputRuleHint"
+				key={`${hint}-${index}`}
+			>
+				<span
+					className="icon-[lucide--info] mt-px size-3.5 shrink-0 text-secondary-foreground"
+					aria-hidden="true"
+				/>
+				<span>{hint}</span>
+			</p>
+		))}
 	</div>
 );
 

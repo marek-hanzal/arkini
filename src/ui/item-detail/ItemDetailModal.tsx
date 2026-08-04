@@ -12,6 +12,10 @@ import { useItemDetailSources } from "~/bridge/item-detail/useItemDetailSources"
 import { useItemDetailTabs } from "~/bridge/item-detail/useItemDetailTabs";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import { BadgeCount } from "~/ui/badge/BadgeCount";
+import {
+	selectableActiveClassName,
+	selectableInactiveClassName,
+} from "~/ui/form/SelectableStateClassName";
 import { ItemIdentity } from "~/ui/item/ItemIdentity";
 import { ItemDefinitionInfoTab } from "~/ui/item-detail/ItemDefinitionInfoTab";
 import type { ItemDetailState, ItemDetailTarget } from "~/ui/item-detail/ItemDetailControl";
@@ -122,7 +126,7 @@ const ItemDetailTabs = ({
 				<button
 					key={tab}
 					type="button"
-					className="inline-flex shrink-0 cursor-pointer items-center gap-1.5 rounded-lg border border-transparent bg-surface-raised/35 px-3 py-2 text-sm font-medium text-muted transition-colors hover:bg-surface-raised hover:text-foreground aria-selected:border-success/45 aria-selected:bg-secondary aria-selected:text-secondary-foreground disabled:cursor-not-allowed"
+					className={`inline-flex shrink-0 cursor-pointer items-center gap-1.5 rounded-lg border px-3 py-2 text-sm font-medium disabled:cursor-not-allowed ${tab === active ? selectableActiveClassName : selectableInactiveClassName}`}
 					aria-selected={tab === active}
 					disabled={disabled}
 					data-tab={tab}

@@ -21,6 +21,7 @@ import {
 	type EditorItemFormValues,
 } from "~/bridge/item/editor/EditorItemFormSchema";
 import { useAppForm } from "~/ui/form/EditorForm";
+import { EditorFormSectionDivider } from "~/ui/form/EditorFormSectionDivider";
 
 (
 	globalThis as {
@@ -146,6 +147,29 @@ const ValidationHarness = () => {
 };
 
 describe("editor form fields", () => {
+	it("distinguishes root and local form sections with optional contextual help", async () => {
+		const container = await mount(
+			<>
+				<EditorFormSectionDivider
+					description="Explains the root section."
+					title="Root section"
+				/>
+				<EditorFormSectionDivider
+					title="Local section"
+					variant="secondary"
+				/>
+			</>,
+		);
+		const dividers = container.querySelectorAll('[data-ui="EditorFormSectionDivider"]');
+		expect(dividers).toHaveLength(2);
+		expect(dividers[0]?.getAttribute("data-variant")).toBe("primary");
+		expect(dividers[0]?.textContent).toContain("Root section");
+		expect(dividers[0]?.querySelector('[data-ui="EditorInfoTooltip"]')).not.toBeNull();
+		expect(dividers[1]?.getAttribute("data-variant")).toBe("secondary");
+		expect(dividers[1]?.textContent).toContain("Local section");
+		expect(dividers[1]?.querySelector('[data-ui="EditorInfoTooltip"]')).toBeNull();
+	});
+
 	it("keeps local values in the form store and resets the visible controls", async () => {
 		const container = await mount(createElement(LocalValueHarness));
 		const name = container.querySelector<HTMLInputElement>('input[name="name"]');
@@ -166,7 +190,9 @@ describe("editor form fields", () => {
 			"Changed|NaN|1250|disabled",
 		);
 		expect(enabled.textContent).toBe("Enabled");
-		expect(enabled.className).toContain("bg-surface-raised");
+		expect(enabled.closest('[data-ui="EditorBooleanToggleBadge"]')?.className).toContain(
+			"bg-secondary-subtle",
+		);
 
 		await act(async () => {
 			resetLocalValues();
@@ -180,7 +206,9 @@ describe("editor form fields", () => {
 			);
 			expect(runtime.value).toBe("24");
 			expect(enabled.textContent).toBe("Enabled");
-			expect(enabled.className).toContain("bg-secondary");
+			expect(enabled.closest('[data-ui="EditorBooleanToggleBadge"]')?.className).toContain(
+				"bg-secondary-selected",
+			);
 		});
 	});
 

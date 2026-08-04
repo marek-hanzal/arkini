@@ -73,6 +73,47 @@ const Harness = () => {
 };
 
 describe("EditorRulesControl", () => {
+	it("authors an optional player hint without persisting blank copy", async () => {
+		const container = document.createElement("div");
+		document.body.append(container);
+		const root = createRoot(container);
+		roots.push(root);
+		await act(async () => root.render(createElement(Harness)));
+
+		const field = [
+			...container.querySelectorAll("label"),
+		].find((label) => label.textContent?.includes("Player hint"));
+		const input = field?.querySelector("input");
+		if (input === undefined || input === null) throw new Error("Expected hint input.");
+		const valueSetter = Object.getOwnPropertyDescriptor(
+			HTMLInputElement.prototype,
+			"value",
+		)?.set;
+		if (valueSetter === undefined) throw new Error("Expected native input value setter.");
+
+		await act(async () => {
+			valueSetter.call(input, "Nearby knowledge reduces runtime.");
+			input.dispatchEvent(
+				new Event("input", {
+					bubbles: true,
+				}),
+			);
+		});
+		expect(container.querySelector("output")?.textContent).toContain(
+			'"hint":"Nearby knowledge reduces runtime."',
+		);
+
+		await act(async () => {
+			valueSetter.call(input, "   ");
+			input.dispatchEvent(
+				new Event("input", {
+					bubbles: true,
+				}),
+			);
+		});
+		expect(container.querySelector("output")?.textContent).not.toContain('"hint"');
+	});
+
 	it("edits runtime adjustments in seconds while storing whole milliseconds", async () => {
 		const container = document.createElement("div");
 		document.body.append(container);

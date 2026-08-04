@@ -1,4 +1,6 @@
 import type { EditorItem, EditorLine, EditorMerge } from "~/bridge/item/editor/EditorItemModel";
+import { useEditorProject } from "~/bridge/editor/useEditorProject";
+import { PrimaryButtonLink } from "~/ui/button/Button";
 import {
 	ItemInfoFact,
 	ItemInfoFacts,
@@ -9,18 +11,62 @@ import {
 	DetailFact,
 	DetailFacts,
 	DetailSection,
-	EmptyDetail,
 	formatSelector,
 	OutputDetail,
 } from "~/ui/item/editor/EditorItemDetailDefinition";
 import { EditorItemNotFound } from "~/ui/item/editor/EditorItemNotFound";
 import {
 	readEditorItemSections,
+	type EditorItemOptionalCapability,
 	type EditorItemSectionId,
 } from "~/ui/item/editor/EditorItemSections";
+import { EditorItemArtworkTimeline } from "~/ui/item/editor/EditorItemArtworkTimeline";
 import { EditorItemThumbnail } from "~/ui/item/editor/EditorItemThumbnail";
 import { EditorProductionLineDetail } from "~/ui/item/editor/EditorProductionLineDetail";
 import { useEditorItemByUid } from "~/ui/item/editor/useEditorItemByUid";
+import { EditorAssetDetailLink } from "~/ui/resource/editor/EditorAssetDetailLink";
+import { Status } from "~/ui/status/Status";
+
+const DisabledCapabilityDetail = ({
+	actionLabel,
+	capability,
+	description,
+	icon,
+	itemUid,
+	title,
+}: {
+	readonly actionLabel: string;
+	readonly capability: EditorItemOptionalCapability;
+	readonly description: string;
+	readonly icon: string;
+	readonly itemUid: string;
+	readonly title: string;
+}) => {
+	const project = useEditorProject();
+	return (
+		<Status
+			action={
+				<PrimaryButtonLink
+					to="/editor/$projectId/editor/items/$itemUid/form/$sectionId"
+					params={{
+						projectId: project.projectId,
+						itemUid,
+						sectionId: capability,
+					}}
+					search={{
+						enable: capability,
+					}}
+				>
+					{actionLabel}
+				</PrimaryButtonLink>
+			}
+			description={description}
+			icon={icon}
+			title={title}
+			variant="flat"
+		/>
+	);
+};
 
 const IdentityDetail = ({ item }: { readonly item: EditorItem }) => (
 	<div>
@@ -72,40 +118,39 @@ const ArtworkDetail = ({ item }: { readonly item: EditorItem }) => (
 				<EditorItemThumbnail resourceIds={item.asset.default} />
 				<ol className="grid gap-1 text-sm">
 					{item.asset.default.map((resourceId, index) => (
-						<li
-							className="font-mono"
-							key={resourceId}
-						>
-							{index + 1}. {resourceId}
+						<li key={resourceId}>
+							<EditorAssetDetailLink
+								className="font-mono text-sm"
+								resourceId={resourceId}
+							>
+								{index + 1}. {resourceId}
+							</EditorAssetDetailLink>
 						</li>
 					))}
 				</ol>
 			</div>
 		</DetailSection>
 		<DetailSection title="Progress artwork">
-			{item.asset.sources === undefined ? (
-				<EmptyDetail>No progress artwork.</EmptyDetail>
-			) : (
-				<ol className="grid gap-2 text-sm">
-					{item.asset.sources.map((resourceId, index) => (
-						<li
-							className="font-mono"
-							key={`${resourceId}-${index}`}
-						>
-							{index + 1}. {resourceId}
-						</li>
-					))}
-				</ol>
-			)}
+			<EditorItemArtworkTimeline
+				asset={item.asset}
+				linkAssets
+			/>
 		</DetailSection>
 	</div>
 );
 
-const ChargesDetail = ({ item }: { readonly item: EditorItem }) => (
-	<DetailSection title="Charges">
-		{item.charges === undefined ? (
-			<EmptyDetail>This item does not use charges.</EmptyDetail>
-		) : (
+const ChargesDetail = ({ item }: { readonly item: EditorItem }) =>
+	item.charges === undefined ? (
+		<DisabledCapabilityDetail
+			actionLabel="Enable charges"
+			capability="charges"
+			description="Charges give this item a finite number of uses. Spending the last charge depletes it and may emit a configured output."
+			icon="icon-[lucide--battery-charging]"
+			itemUid={item.uid}
+			title="Charges are disabled"
+		/>
+	) : (
+		<DetailSection title="Charges">
 			<div className="grid gap-5">
 				<DetailFact
 					label="Initial charges"
@@ -118,9 +163,8 @@ const ChargesDetail = ({ item }: { readonly item: EditorItem }) => (
 					</div>
 				</div>
 			</div>
-		)}
-	</DetailSection>
-);
+		</DetailSection>
+	);
 
 const MergeDetail = ({ index, merge }: { readonly index: number; readonly merge: EditorMerge }) => (
 	<article className="grid gap-4 border-b border-line pb-6 last:border-0 last:pb-0">
@@ -155,11 +199,18 @@ const MergeDetail = ({ index, merge }: { readonly index: number; readonly merge:
 	</article>
 );
 
-const MergesDetail = ({ item }: { readonly item: EditorItem }) => (
-	<DetailSection title="Merges">
-		{item.merge === undefined ? (
-			<EmptyDetail>This item has no merge behavior.</EmptyDetail>
-		) : (
+const MergesDetail = ({ item }: { readonly item: EditorItem }) =>
+	item.merge === undefined || item.merge.length === 0 ? (
+		<DisabledCapabilityDetail
+			actionLabel="Enable merges"
+			capability="merges"
+			description="Merges define what happens when this item is dropped onto a matching target, including source consumption, target changes and optional output."
+			icon="icon-[lucide--combine]"
+			itemUid={item.uid}
+			title="Merges are disabled"
+		/>
+	) : (
+		<DetailSection title="Merges">
 			<div className="grid gap-6">
 				{item.merge.map((merge, index) => (
 					<MergeDetail
@@ -169,9 +220,8 @@ const MergesDetail = ({ item }: { readonly item: EditorItem }) => (
 					/>
 				))}
 			</div>
-		)}
-	</DetailSection>
-);
+		</DetailSection>
+	);
 
 const readProductionLines = (item: EditorItem): ReadonlyArray<EditorLine> => {
 	switch (item.type) {

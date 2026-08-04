@@ -2,7 +2,7 @@ import type { EditorMerge } from "~/bridge/item/editor/EditorItemModel";
 import { EditorCapabilityStatus } from "~/ui/form/EditorCapabilityStatus";
 import { EditorCollectionSelector } from "~/ui/form/EditorCollectionSelector";
 import { EditorFormCard } from "~/ui/form/EditorFormCard";
-import { EditorFormSeparator } from "~/ui/form/EditorFormSeparator";
+import { EditorFormSectionDivider } from "~/ui/form/EditorFormSectionDivider";
 import { EditorItemDraftDefaults } from "~/ui/item/editor/EditorItemDraftDefaults";
 import { EditorChoiceControl } from "~/ui/form/EditorValueControls";
 import { EditorItemReferenceControl } from "~/ui/item/editor/EditorItemReferenceControl";
@@ -44,139 +44,148 @@ export const EditorMergeFields = ({
 					/>
 				</EditorFormCard>
 			) : (
-				<EditorCollectionSelector
-					addLabel="Add merge"
-					count={merges.length}
-					itemLabel={(index) => {
-						const itemId = merges[index].target.itemId;
-						return readItemLabel(itemId, `Merge ${index + 1}`);
-					}}
-					label="Merges"
-					navigationCard
-					onAdd={() =>
-						onChange([
-							...merges,
-							structuredClone(EditorItemDraftDefaults.merge),
-						])
-					}
-					onRemove={(index) => {
-						const next = merges.filter((_merge, candidate) => candidate !== index);
-						onChange(next.length === 0 ? undefined : next);
-					}}
-					removeLabel="Remove merge"
-				>
-					{(index) => {
-						const merge = merges[index];
-						return (
-							<div className="grid gap-[var(--ak-viewport-gap)]">
-								<EditorFormCard>
-									<article className="grid grid-cols-2 gap-[var(--ak-panel-padding)]">
-										<div className="grid content-start gap-4">
-											<EditorSelectorControl
-												value={merge.target}
-												onChange={(target) =>
-													update(index, {
-														...merge,
-														target,
-													})
-												}
-											/>
-											<EditorChoiceControl
-												label="Source action"
-												value={merge.action}
-												options={[
-													{
-														label: "Use",
-														value: "use",
-													},
-													{
-														label: "Consume",
-														value: "consume",
-													},
-												]}
-												onChange={(action) =>
-													update(index, {
-														...merge,
-														action,
-													})
-												}
-											/>
-										</div>
-										<div className="grid content-start gap-4">
-											<EditorChoiceControl
-												label="Target effect"
-												value={merge.effect}
-												options={[
-													{
-														label: "Keep",
-														value: "keep",
-													},
-													{
-														label: "Remove",
-														value: "remove",
-													},
-													{
-														label: "Replace",
-														value: "replace",
-													},
-												]}
-												onChange={(effect) =>
-													update(
-														index,
-														effect === "replace"
-															? {
-																	...merge,
-																	effect,
-																	result:
-																		merge.effect === "replace"
-																			? merge.result
-																			: "",
-																}
-															: {
-																	action: merge.action,
-																	effect,
-																	output: merge.output,
-																	target: merge.target,
-																},
-													)
-												}
-											/>
-											{merge.effect !== "replace" ? null : (
-												<EditorItemReferenceControl
-													label="Replacement item"
-													value={merge.result}
-													onChange={(result) =>
+				<>
+					<EditorFormSectionDivider
+						description="Interactions triggered when this item is dropped onto a matching target."
+						title="Merges"
+					/>
+					<EditorCollectionSelector
+						addLabel="Add merge"
+						count={merges.length}
+						itemLabel={(index) => {
+							const itemId = merges[index].target.itemId;
+							return readItemLabel(itemId, `Merge ${index + 1}`);
+						}}
+						label="Merges"
+						navigationCard
+						onAdd={() =>
+							onChange([
+								...merges,
+								structuredClone(EditorItemDraftDefaults.merge),
+							])
+						}
+						onRemove={(index) => {
+							const next = merges.filter((_merge, candidate) => candidate !== index);
+							onChange(next.length === 0 ? undefined : next);
+						}}
+						removeLabel="Remove merge"
+					>
+						{(index) => {
+							const merge = merges[index];
+							return (
+								<div className="grid gap-[var(--ak-viewport-gap)]">
+									<EditorFormCard>
+										<article className="grid grid-cols-2 gap-[var(--ak-panel-padding)]">
+											<div className="grid content-start gap-4">
+												<EditorSelectorControl
+													value={merge.target}
+													onChange={(target) =>
 														update(index, {
 															...merge,
-															result,
+															target,
 														})
 													}
 												/>
-											)}
-										</div>
-									</article>
-								</EditorFormCard>
-								<EditorFormSeparator />
-								<EditorFormCard>
-									<EditorOptionalOutputControl
-										addLabel="Enable merge output"
-										emptyDescription="The merge currently changes only its source and target. Enable an output to emit additional items when it resolves."
-										emptyIcon="icon-[lucide--package-plus]"
-										emptyTitle="No merge output"
-										separated={false}
-										value={merge.output}
-										onChange={(output) =>
-											update(index, {
-												...merge,
-												output,
-											})
-										}
+												<EditorChoiceControl
+													label="Source action"
+													value={merge.action}
+													options={[
+														{
+															label: "Use",
+															value: "use",
+														},
+														{
+															label: "Consume",
+															value: "consume",
+														},
+													]}
+													onChange={(action) =>
+														update(index, {
+															...merge,
+															action,
+														})
+													}
+												/>
+											</div>
+											<div className="grid content-start gap-4">
+												<EditorChoiceControl
+													label="Target effect"
+													value={merge.effect}
+													options={[
+														{
+															label: "Keep",
+															value: "keep",
+														},
+														{
+															label: "Remove",
+															value: "remove",
+														},
+														{
+															label: "Replace",
+															value: "replace",
+														},
+													]}
+													onChange={(effect) =>
+														update(
+															index,
+															effect === "replace"
+																? {
+																		...merge,
+																		effect,
+																		result:
+																			merge.effect ===
+																			"replace"
+																				? merge.result
+																				: "",
+																	}
+																: {
+																		action: merge.action,
+																		effect,
+																		output: merge.output,
+																		target: merge.target,
+																	},
+														)
+													}
+												/>
+												{merge.effect !== "replace" ? null : (
+													<EditorItemReferenceControl
+														label="Replacement item"
+														value={merge.result}
+														onChange={(result) =>
+															update(index, {
+																...merge,
+																result,
+															})
+														}
+													/>
+												)}
+											</div>
+										</article>
+									</EditorFormCard>
+									<EditorFormSectionDivider
+										description="Optional items emitted after this merge resolves."
+										title="Merge output"
 									/>
-								</EditorFormCard>
-							</div>
-						);
-					}}
-				</EditorCollectionSelector>
+									<EditorFormCard>
+										<EditorOptionalOutputControl
+											addLabel="Enable merge output"
+											emptyDescription="The merge currently changes only its source and target. Enable an output to emit additional items when it resolves."
+											emptyIcon="icon-[lucide--package-plus]"
+											emptyTitle="No merge output"
+											value={merge.output}
+											onChange={(output) =>
+												update(index, {
+													...merge,
+													output,
+												})
+											}
+										/>
+									</EditorFormCard>
+								</div>
+							);
+						}}
+					</EditorCollectionSelector>
+				</>
 			)}
 		</div>
 	);

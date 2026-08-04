@@ -74,6 +74,8 @@ const ArtworkHarness = () => {
 		EditorItemArtworkFields({
 			form,
 			fields: "asset",
+			onSelectedProgressIndexChange: undefined,
+			selectedProgressIndex: undefined,
 		});
 	return createElement(
 		Fragment,
@@ -159,7 +161,11 @@ describe("editor item field groups", () => {
 		expect(container.textContent).toContain("Production lines are disabled");
 		await click(container, "Enable production lines");
 		expect(container.querySelectorAll('[data-ui="EditorFormCard"]')).toHaveLength(5);
-		expect(container.querySelectorAll('[data-ui="EditorFormSeparator"]')).toHaveLength(1);
+		expect(
+			container.querySelectorAll(
+				'[data-ui="EditorFormSectionDivider"][data-variant="primary"]',
+			),
+		).toHaveLength(1);
 		await click(container, "Add line");
 
 		const values = JSON.parse(container.querySelector("output")?.textContent ?? "null") as {

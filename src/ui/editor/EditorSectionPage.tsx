@@ -8,19 +8,17 @@ export const EditorSectionPage = ({
 	readonly tabs: ReactNode;
 }>) => (
 	<div
-		className="grid h-full min-h-0 grid-rows-[auto_minmax(0,1fr)] gap-3"
+		className="h-full min-h-0 overflow-y-auto overscroll-contain"
 		data-ui="EditorSectionPage"
 	>
 		<div
-			className="relative z-10 px-3 pt-3"
+			className="ak-editor-page-header px-3 py-3"
 			style={{
 				viewTransitionName: "arkini-editor-section-navigation",
 			}}
 		>
 			{tabs}
 		</div>
-		<div className="min-h-0 overflow-y-auto overscroll-contain">
-			<div className="w-full px-3 pb-3">{children}</div>
-		</div>
+		<div className="w-full px-3 pt-3 pb-3">{children}</div>
 	</div>
 );

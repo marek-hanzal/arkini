@@ -1,6 +1,6 @@
 import { useAtomSet, useAtomValue } from "@effect/atom-react";
 import { revalidateLogic, useStore } from "@tanstack/react-form";
-import { useCallback, useMemo, useRef } from "react";
+import { useCallback, useLayoutEffect, useMemo, useRef } from "react";
 
 import { useEditorProject } from "~/bridge/editor/useEditorProject";
 import {
@@ -12,12 +12,15 @@ import { saveEditorItemCommandAtom } from "~/bridge/item/editor/saveEditorItemCo
 import { useAppForm } from "~/ui/form/EditorForm";
 import {
 	readEditorItemSectionForPath,
+	type EditorItemOptionalCapability,
 	type EditorItemSectionId,
 } from "~/ui/item/editor/EditorItemSections";
+import { EditorItemDraftDefaults } from "~/ui/item/editor/EditorItemDraftDefaults";
 import { readSettledAsyncResultError } from "~/ui/reactivity/readSettledAsyncResultError";
 
 export namespace useEditorItemFormController {
 	export interface Props {
+		readonly enableCapability?: EditorItemOptionalCapability;
 		readonly initialItem: EditorItem;
 		readonly onInvalidSection: (section: EditorItemSectionId) => void | Promise<void>;
 		readonly onSaved?: (item: EditorItem) => void | Promise<void>;
@@ -26,6 +29,7 @@ export namespace useEditorItemFormController {
 
 /** Owns the one local TanStack Form session shared by all item section leaves. */
 export const useEditorItemFormController = ({
+	enableCapability,
 	initialItem,
 	onInvalidSection,
 	onSaved,
@@ -76,6 +80,30 @@ export const useEditorItemFormController = ({
 			await onSaved?.(saved);
 		},
 	});
+	const initializedCapability = useRef(false);
+	useLayoutEffect(() => {
+		if (initializedCapability.current || enableCapability === undefined) return;
+		initializedCapability.current = true;
+		switch (enableCapability) {
+			case "charges":
+				if (form.state.values.charges === undefined) {
+					form.setFieldValue("charges", {
+						amount: 1,
+					});
+				}
+				break;
+			case "merges":
+				if (form.state.values.merge === undefined || form.state.values.merge.length === 0) {
+					form.setFieldValue("merge", [
+						structuredClone(EditorItemDraftDefaults.merge),
+					]);
+				}
+				break;
+		}
+	}, [
+		enableCapability,
+		form,
+	]);
 	const itemId = useStore(form.store, (state) => state.values.id);
 	const dirty = useStore(form.store, (state) => state.isDirty);
 	const submitting = useStore(form.store, (state) => state.isSubmitting);

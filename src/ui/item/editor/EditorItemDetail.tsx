@@ -49,14 +49,7 @@ export const EditorItemDetail = ({
 						</ButtonLink>
 					}
 					title={
-						<div className="flex min-w-0 items-baseline gap-2">
-							<h1 className="truncate text-xl font-semibold">
-								{item.title || item.id}
-							</h1>
-							<span className="shrink-0 text-xs uppercase tracking-wider text-muted">
-								{item.type}
-							</span>
-						</div>
+						<h1 className="truncate text-xl font-semibold">{item.title || item.id}</h1>
 					}
 					tabs={
 						<EditorSectionTabs label="Item sections">

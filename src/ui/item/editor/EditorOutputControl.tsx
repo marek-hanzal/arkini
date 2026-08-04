@@ -7,6 +7,7 @@ import type {
 	EditorRollSet,
 } from "~/bridge/item/editor/EditorItemModel";
 import { EditorCollectionSelector } from "~/ui/form/EditorCollectionSelector";
+import { EditorFormSectionDivider } from "~/ui/form/EditorFormSectionDivider";
 import { EditorItemDraftDefaults } from "~/ui/item/editor/EditorItemDraftDefaults";
 import { EditorChoiceControl, EditorNumberControl } from "~/ui/form/EditorValueControls";
 import { EditorItemReferenceControl } from "~/ui/item/editor/EditorItemReferenceControl";
@@ -102,45 +103,54 @@ const EditorDropList = ({
 }) => {
 	const readItemLabel = useEditorItemOptionLabel();
 	return (
-		<EditorCollectionSelector
-			addLabel="Add drop"
-			count={value.length}
-			itemLabel={(index) => readItemLabel(value[index].itemId, `Drop ${index + 1}`)}
-			label="Drops"
-			onAdd={() =>
-				onChange([
-					...value,
-					structuredClone(EditorItemDraftDefaults.drop),
-				])
-			}
-			onRemove={(index) =>
-				value.length === 1
-					? onChange(undefined)
-					: onChange(
-							value.filter((_current, currentIndex) => currentIndex !== index) as [
-								EditorDrop,
-								...EditorDrop[],
-							],
-						)
-			}
-			removeLabel="Remove drop"
-		>
-			{(index) => (
-				<EditorDropControl
-					value={value[index]}
-					onChange={(next) =>
-						onChange(
-							value.map((current, currentIndex) =>
-								currentIndex === index ? next : current,
-							) as [
-								EditorDrop,
-								...EditorDrop[],
-							],
-						)
-					}
-				/>
-			)}
-		</EditorCollectionSelector>
+		<section className="grid gap-3">
+			<EditorFormSectionDivider
+				description="Items emitted by the currently selected roll."
+				title="Drops"
+				variant="secondary"
+			/>
+			<EditorCollectionSelector
+				addLabel="Add drop"
+				count={value.length}
+				itemLabel={(index) => readItemLabel(value[index].itemId, `Drop ${index + 1}`)}
+				label="Drops"
+				onAdd={() =>
+					onChange([
+						...value,
+						structuredClone(EditorItemDraftDefaults.drop),
+					])
+				}
+				onRemove={(index) =>
+					value.length === 1
+						? onChange(undefined)
+						: onChange(
+								value.filter(
+									(_current, currentIndex) => currentIndex !== index,
+								) as [
+									EditorDrop,
+									...EditorDrop[],
+								],
+							)
+				}
+				removeLabel="Remove drop"
+			>
+				{(index) => (
+					<EditorDropControl
+						value={value[index]}
+						onChange={(next) =>
+							onChange(
+								value.map((current, currentIndex) =>
+									currentIndex === index ? next : current,
+								) as [
+									EditorDrop,
+									...EditorDrop[],
+								],
+							)
+						}
+					/>
+				)}
+			</EditorCollectionSelector>
+		</section>
 	);
 };
 
@@ -240,6 +250,11 @@ const EditorRollControl = ({
 										quantity,
 									})
 								}
+							/>
+							<EditorFormSectionDivider
+								description="Relative weighted alternatives considered by this roll."
+								title="Weighted candidates"
+								variant="secondary"
 							/>
 							<EditorCollectionSelector
 								addLabel="Add weighted candidate"
@@ -371,6 +386,11 @@ const EditorRollSetControl = ({
 					})
 				}
 			/>
+			<EditorFormSectionDivider
+				description="Independent rolls resolved by this weighted output set."
+				title="Rolls"
+				variant="secondary"
+			/>
 			<EditorCollectionSelector
 				addLabel="Add roll"
 				count={value.roll.length}
@@ -441,63 +461,70 @@ export interface EditorOutputControlProps {
 export const EditorOutputControl = ({ onChange, value }: EditorOutputControlProps) => {
 	const readItemLabel = useEditorItemOptionLabel();
 	return (
-		<EditorCollectionSelector
-			addLabel="Add output set"
-			count={value.set.length}
-			itemLabel={(index) => {
-				const roll = value.set[index].roll[0];
-				const itemId = roll === undefined ? undefined : readFirstRollItemId(roll);
-				return `Output set ${index + 1} — ${readItemLabel(
-					itemId ?? "",
-					"No item selected",
-				)}`;
-			}}
-			label="Output sets"
-			onAdd={() =>
-				onChange({
-					set: [
-						...value.set,
-						{
-							weight: 1,
-							roll: [
-								structuredClone(EditorItemDraftDefaults.rolls.guaranteed),
-							],
-						},
-					],
-				})
-			}
-			onRemove={(index) =>
-				value.set.length === 1
-					? onChange(undefined)
-					: onChange({
-							set: value.set.filter(
-								(_current, currentIndex) => currentIndex !== index,
-							) as typeof value.set,
-						})
-			}
-			removeLabel="Remove output set"
-		>
-			{(index) => (
-				<EditorRollSetControl
-					index={index}
-					value={value.set[index]}
-					onChange={(next) =>
-						next === undefined
-							? value.set.length === 1
-								? onChange(undefined)
+		<section className="grid gap-3">
+			<EditorFormSectionDivider
+				description="Weighted alternatives resolved when this output runs. A weight of one is the neutral default."
+				title="Output sets"
+				variant="secondary"
+			/>
+			<EditorCollectionSelector
+				addLabel="Add output set"
+				count={value.set.length}
+				itemLabel={(index) => {
+					const roll = value.set[index].roll[0];
+					const itemId = roll === undefined ? undefined : readFirstRollItemId(roll);
+					return `Output set ${index + 1} — ${readItemLabel(
+						itemId ?? "",
+						"No item selected",
+					)}`;
+				}}
+				label="Output sets"
+				onAdd={() =>
+					onChange({
+						set: [
+							...value.set,
+							{
+								weight: 1,
+								roll: [
+									structuredClone(EditorItemDraftDefaults.rolls.guaranteed),
+								],
+							},
+						],
+					})
+				}
+				onRemove={(index) =>
+					value.set.length === 1
+						? onChange(undefined)
+						: onChange({
+								set: value.set.filter(
+									(_current, currentIndex) => currentIndex !== index,
+								) as typeof value.set,
+							})
+				}
+				removeLabel="Remove output set"
+			>
+				{(index) => (
+					<EditorRollSetControl
+						index={index}
+						value={value.set[index]}
+						onChange={(next) =>
+							next === undefined
+								? value.set.length === 1
+									? onChange(undefined)
+									: onChange({
+											set: value.set.filter(
+												(_current, currentIndex) => currentIndex !== index,
+											) as typeof value.set,
+										})
 								: onChange({
-										set: value.set.filter(
-											(_current, currentIndex) => currentIndex !== index,
+										set: value.set.map((current, currentIndex) =>
+											currentIndex === index ? next : current,
 										) as typeof value.set,
 									})
-							: onChange({
-									set: value.set.map((current, currentIndex) =>
-										currentIndex === index ? next : current,
-									) as typeof value.set,
-								})
-					}
-				/>
-			)}
-		</EditorCollectionSelector>
+						}
+					/>
+				)}
+			</EditorCollectionSelector>
+		</section>
 	);
 };

@@ -10,6 +10,8 @@ export const EditorItemSectionIds = [
 
 export type EditorItemSectionId = (typeof EditorItemSectionIds)[number];
 
+export type EditorItemOptionalCapability = Extract<EditorItemSectionId, "charges" | "merges">;
+
 type EditorItemField = EditorItem extends infer Member
 	? Member extends EditorItem
 		? keyof Member

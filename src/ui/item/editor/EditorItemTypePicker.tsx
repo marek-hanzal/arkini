@@ -62,11 +62,11 @@ export const EditorItemTypePicker = () => {
 	);
 	return (
 		<section
-			className="grid h-full min-h-0 grid-rows-[auto_minmax(0,1fr)] gap-3"
+			className="h-full min-h-0 overflow-y-auto overscroll-contain"
 			aria-labelledby="editor-new-item-title"
 			data-ui="EditorItemTypePicker"
 		>
-			<header className="flex min-w-0 flex-wrap items-center gap-3 px-3 pt-3">
+			<header className="ak-editor-page-header flex min-w-0 flex-wrap items-center gap-3 p-3">
 				<ButtonLink
 					to="/editor/$projectId/editor/items/list"
 					params={{
@@ -84,7 +84,7 @@ export const EditorItemTypePicker = () => {
 					New item
 				</h1>
 			</header>
-			<div className="ak-list grid min-h-0 content-start gap-2 overflow-y-auto overscroll-contain px-3 pb-3 sm:grid-cols-2 xl:grid-cols-3">
+			<div className="ak-list grid content-start gap-2 px-3 pt-3 pb-3 sm:grid-cols-2 xl:grid-cols-3">
 				{EditorItemTypes.map((type) => {
 					const presentation = itemTypePresentation[type];
 					return (

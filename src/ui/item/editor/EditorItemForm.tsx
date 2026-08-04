@@ -13,6 +13,7 @@ import { EditorItemNotFound } from "~/ui/item/editor/EditorItemNotFound";
 import { EditorItemSectionLink } from "~/ui/item/editor/EditorItemSectionLink";
 import {
 	readEditorItemSections,
+	type EditorItemOptionalCapability,
 	type EditorItemSectionId,
 } from "~/ui/item/editor/EditorItemSections";
 import { useEditorItemByUid } from "~/ui/item/editor/useEditorItemByUid";
@@ -20,6 +21,7 @@ import { useEditorItemFormController } from "~/ui/item/editor/useEditorItemFormC
 
 export namespace EditorItemForm {
 	export interface Props extends PropsWithChildren {
+		readonly enableCapability?: EditorItemOptionalCapability;
 		readonly itemType?: EditorItemType;
 		readonly sectionId?: EditorItemSectionId;
 		readonly uid: string;
@@ -27,6 +29,7 @@ export namespace EditorItemForm {
 }
 
 interface EditorItemFormSessionProps extends PropsWithChildren {
+	readonly enableCapability?: EditorItemOptionalCapability;
 	readonly initialItem: EditorItem;
 	readonly isNew: boolean;
 	readonly itemType?: EditorItemType;
@@ -36,6 +39,7 @@ interface EditorItemFormSessionProps extends PropsWithChildren {
 /** Owns the single local form lifecycle used by both new and persisted items. */
 const EditorItemFormSession = ({
 	children,
+	enableCapability,
 	initialItem,
 	isNew,
 	itemType,
@@ -67,6 +71,7 @@ const EditorItemFormSession = ({
 		],
 	);
 	const controller = useEditorItemFormController({
+		enableCapability,
 		initialItem,
 		onInvalidSection,
 		onSaved: (saved) =>
@@ -139,14 +144,7 @@ const EditorItemFormSession = ({
 							</ButtonLink>
 						)
 					}
-					title={
-						<div className="flex min-w-0 items-baseline gap-2">
-							<h1 className="truncate text-xl font-semibold">{title}</h1>
-							<span className="shrink-0 text-xs uppercase tracking-wider text-muted">
-								{initialItem.type}
-							</span>
-						</div>
-					}
+					title={<h1 className="truncate text-xl font-semibold">{title}</h1>}
 					tabs={
 						<EditorSectionTabs label="Item sections">
 							{sections.map((candidate) => (
@@ -171,6 +169,7 @@ const EditorItemFormSession = ({
 /** Resolves a canonical item by UID or seeds its first local form from itemType. */
 export const EditorItemForm = ({
 	children,
+	enableCapability,
 	itemType,
 	sectionId = "identity",
 	uid,
@@ -184,6 +183,7 @@ export const EditorItemForm = ({
 	return (
 		<EditorItemFormSession
 			key={initialItem.uid}
+			enableCapability={enableCapability}
 			initialItem={initialItem}
 			isNew={isNew}
 			itemType={isNew ? itemType : undefined}

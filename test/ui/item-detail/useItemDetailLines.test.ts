@@ -459,11 +459,11 @@ describe("useItemDetailLines", () => {
 		});
 		const output = container.querySelector("output");
 		expect(output?.dataset.canEnqueue).toBe("false");
-		expect(output?.dataset.disabledMessage).toBe("Requires Material (Board · close).");
-		expect(output?.dataset.disabledRule).toBe("enable-rule");
-		expect(output?.dataset.disabledRuleDetail).toBe("material");
-		expect(output?.dataset.disabledRuleBefore).toBe("Requires ");
-		expect(output?.dataset.disabledRuleAfter).toBe(" · Board · close.");
+		expect(output?.dataset.disabledMessage).toBe("This line is currently disabled.");
+		expect(output?.dataset.disabledRule).toBe("static");
+		expect(output?.dataset.disabledRuleDetail).toBe("");
+		expect(output?.dataset.disabledRuleBefore).toBeUndefined();
+		expect(output?.dataset.disabledRuleAfter).toBeUndefined();
 		expect(output?.dataset.outputHasRuntimeTarget).toBe("false");
 
 		await act(async () => publishRuntime(withSource));

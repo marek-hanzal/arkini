@@ -1,14 +1,23 @@
 import type { ReactNode } from "react";
+import { twMerge } from "tailwind-merge";
 
 import { Tooltip } from "~/ui/overlay/Tooltip";
 
+export interface EditorInfoTooltipProps {
+	readonly className?: string;
+	readonly content: ReactNode;
+}
+
 /** Renders the canonical contextual-help affordance used by editor forms. */
-export const EditorInfoTooltip = ({ content }: { readonly content: ReactNode }) => (
+export const EditorInfoTooltip = ({ className, content }: EditorInfoTooltipProps) => (
 	<Tooltip content={content}>
 		<button
 			type="button"
 			data-ui="EditorInfoTooltip"
-			className="grid size-8 shrink-0 cursor-help place-items-center rounded-full text-muted hover:text-foreground"
+			className={twMerge(
+				"grid size-8 shrink-0 cursor-help place-items-center rounded-full text-muted hover:text-foreground",
+				className,
+			)}
 			onClick={(event) => {
 				event.preventDefault();
 				event.stopPropagation();

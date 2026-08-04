@@ -1,7 +1,7 @@
 import { Button } from "~/ui/button/Button";
 import { EditorCapabilityStatus } from "~/ui/form/EditorCapabilityStatus";
 import { EditorFormCard } from "~/ui/form/EditorFormCard";
-import { EditorFormSeparator } from "~/ui/form/EditorFormSeparator";
+import { EditorFormSectionDivider } from "~/ui/form/EditorFormSectionDivider";
 import { useEditorItemFormSession } from "~/ui/item/editor/EditorItemFormContext";
 import { EditorOptionalOutputControl } from "~/ui/item/editor/EditorOptionalOutputControl";
 
@@ -29,6 +29,11 @@ export const EditorItemChargesSection = () => {
 					) : (
 						<>
 							<EditorFormCard>
+								<EditorFormSectionDivider
+									description="The finite number of uses available before this item is depleted."
+									title="Charge settings"
+									variant="secondary"
+								/>
 								<div className="flex items-end gap-3">
 									<div className="min-w-0 flex-1">
 										<form.AppField name="charges.amount">
@@ -47,14 +52,16 @@ export const EditorItemChargesSection = () => {
 									</Button>
 								</div>
 							</EditorFormCard>
-							<EditorFormSeparator />
+							<EditorFormSectionDivider
+								description="Optional items emitted when the final charge is spent."
+								title="Depletion output"
+							/>
 							<EditorFormCard>
 								<EditorOptionalOutputControl
 									addLabel="Enable depletion output"
 									emptyDescription="Without an output, the item simply disappears when its last charge is spent. Enable one to emit configured items at depletion."
 									emptyIcon="icon-[lucide--package-plus]"
 									emptyTitle="No depletion output"
-									separated={false}
 									value={charges.output}
 									onChange={(output) =>
 										form.setFieldValue("charges.output", output)

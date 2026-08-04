@@ -7,9 +7,13 @@ import type {
 } from "~/bridge/item/editor/EditorItemModel";
 import { twMerge } from "tailwind-merge";
 import { EditorCollectionSelector } from "~/ui/form/EditorCollectionSelector";
-import { EditorInfoTooltip } from "~/ui/form/EditorInfoTooltip";
+import { EditorFormSectionDivider } from "~/ui/form/EditorFormSectionDivider";
 import { EditorItemDraftDefaults } from "~/ui/item/editor/EditorItemDraftDefaults";
-import { EditorChoiceControl, EditorNumberControl } from "~/ui/form/EditorValueControls";
+import {
+	EditorChoiceControl,
+	EditorNumberControl,
+	EditorTextControl,
+} from "~/ui/form/EditorValueControls";
 import { EditorQueryControl } from "~/ui/item/editor/EditorQueryControl";
 
 type EditorRule = EditorLineRule | EditorDropRule;
@@ -162,13 +166,12 @@ export const EditorRulesControl = ({
 					: {}),
 		}) as EditorLineRule;
 	return (
-		<section className={twMerge("grid gap-3 border-t border-line pt-4", className)}>
-			<header>
-				<div className="flex items-center gap-1">
-					<h4 className="text-sm font-semibold">Rules</h4>
-					<EditorInfoTooltip content={description} />
-				</div>
-			</header>
+		<section className={twMerge("grid gap-3", className)}>
+			<EditorFormSectionDivider
+				description={description}
+				title="Rules"
+				variant="secondary"
+			/>
 			<EditorCollectionSelector
 				addLabel="Add rule"
 				count={rules.length}
@@ -205,6 +208,11 @@ export const EditorRulesControl = ({
 													index === ruleIndex
 														? {
 																...next,
+																...(current.hint === undefined
+																	? {}
+																	: {
+																			hint: current.hint,
+																		}),
 																when: current.when,
 															}
 														: current,
@@ -214,6 +222,29 @@ export const EditorRulesControl = ({
 									/>
 								</div>
 							</div>
+							<EditorTextControl
+								label="Player hint"
+								placeholder="Optional explanation shown while this rule applies"
+								value={rule.hint ?? ""}
+								onChange={(hint) =>
+									onChange(
+										rules.map((current, index) =>
+											index === ruleIndex
+												? {
+														...current,
+														...(hint.trim() === ""
+															? {
+																	hint: undefined,
+																}
+															: {
+																	hint,
+																}),
+													}
+												: current,
+										),
+									)
+								}
+							/>
 							{rule.type !== "runtime:multiplier" ? null : (
 								<EditorNumberControl
 									label="Runtime multiplier"

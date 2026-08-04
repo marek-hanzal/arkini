@@ -75,6 +75,7 @@ export namespace ItemDetailLines {
 		readonly itemId: string;
 		readonly title: string;
 		readonly quantity: QuantityBounds;
+		readonly activeRuleHints: readonly string[];
 		readonly sourceUrl?: string;
 		readonly compositeUrl?: string;
 		readonly definitionItemId?: string;
@@ -118,12 +119,14 @@ export namespace ItemDetailLines {
 					  }
 					| {
 							readonly kind: "enable-rule";
+							readonly hint: string;
 							readonly ruleIndex: number;
 							readonly whenIndex: number;
 							readonly condition: DisabledCondition;
 					  }
 					| {
 							readonly kind: "disable-rule";
+							readonly hint: string;
 							readonly ruleIndex: number;
 							readonly condition: readonly DisabledCondition[];
 					  };
@@ -193,6 +196,7 @@ export namespace ItemDetailLines {
 		readonly baseRuntimeMs: number;
 		readonly effectiveRuntimeMs: number;
 		readonly availability: Availability;
+		readonly activeRuleHints: readonly string[];
 		readonly isDefault: boolean;
 		readonly queuedRequestCount: number;
 		readonly actions: LineActions;

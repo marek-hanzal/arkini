@@ -4,6 +4,10 @@ import * as AsyncResult from "effect/unstable/reactivity/AsyncResult";
 
 import { saveEditorAssetsCommandAtom } from "~/bridge/resource/editor/saveEditorAssetsCommandAtom";
 import { PrimaryButton } from "~/ui/button/Button";
+import {
+	selectableActiveClassName,
+	selectableInactiveClassName,
+} from "~/ui/form/SelectableStateClassName";
 import { readSettledAsyncResultError } from "~/ui/reactivity/readSettledAsyncResultError";
 import { EditorAssetCard } from "~/ui/resource/editor/EditorAssetCard";
 import { useEditorAssetLibrary } from "~/ui/resource/editor/useEditorAssetLibrary";
@@ -50,11 +54,11 @@ export const EditorAssetManager = ({
 	);
 	return (
 		<section
-			className="grid h-full min-h-0 grid-rows-[auto_minmax(0,1fr)] gap-3"
+			className="h-full min-h-0 overflow-y-auto overscroll-contain"
 			aria-label="Assets"
 			data-ui="EditorAssetManager"
 		>
-			<header className="flex min-w-0 flex-wrap items-center gap-2 px-3 pt-3">
+			<header className="ak-editor-page-header flex min-w-0 flex-wrap items-center gap-2 p-3">
 				<input
 					ref={inputRef}
 					type="file"
@@ -94,7 +98,7 @@ export const EditorAssetManager = ({
 						<button
 							key={value}
 							type="button"
-							className={`cursor-pointer rounded-md px-3 py-2 text-sm font-semibold ${filter === value ? "bg-secondary text-secondary-foreground" : "text-muted hover:bg-surface-raised hover:text-foreground"}`}
+							className={`cursor-pointer rounded-md border px-3 py-2 text-sm font-semibold ${filter === value ? selectableActiveClassName : selectableInactiveClassName}`}
 							aria-pressed={filter === value}
 							onClick={() => onFilterChange(value)}
 						>
@@ -104,7 +108,7 @@ export const EditorAssetManager = ({
 				</div>
 				{empty ? null : importButton}
 			</header>
-			<div className="min-h-0 overflow-y-auto overscroll-contain px-3 pb-3">
+			<div className="px-3 pt-3 pb-3">
 				{error === undefined ? null : (
 					<p className="mb-3 rounded-xl border border-danger/40 bg-danger/10 p-3 text-sm text-danger">
 						{error instanceof Error ? error.message : String(error)}

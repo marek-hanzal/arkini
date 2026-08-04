@@ -1,4 +1,8 @@
 import { EditorInfoTooltip } from "~/ui/form/EditorInfoTooltip";
+import {
+	selectableActiveClassName,
+	selectableInactiveClassName,
+} from "~/ui/form/SelectableStateClassName";
 
 export interface EditorBooleanToggleBadgeProps {
 	readonly checked: boolean;
@@ -18,19 +22,23 @@ export const EditorBooleanToggleBadge = ({
 	onChange,
 	uncheckedIcon,
 }: EditorBooleanToggleBadgeProps) => (
-	<div className="flex min-w-0 items-center gap-2">
+	<div
+		className={`inline-flex min-w-0 items-center rounded-full border ${
+			checked ? selectableActiveClassName : selectableInactiveClassName
+		}`}
+		data-ui="EditorBooleanToggleBadge"
+	>
 		<button
 			type="button"
-			className={`inline-flex min-h-9 cursor-pointer items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold ${
-				checked
-					? "border-success/45 bg-secondary text-secondary-foreground"
-					: "border-line-strong bg-surface-raised text-muted"
-			}`}
+			className="inline-flex min-h-9 cursor-pointer items-center gap-2 py-1.5 pl-3 pr-1 text-xs font-semibold text-inherit"
 			onClick={() => onChange(!checked)}
 		>
 			<span className={`${checked ? checkedIcon : uncheckedIcon} size-4`} />
 			{label}
 		</button>
-		<EditorInfoTooltip content={description} />
+		<EditorInfoTooltip
+			className="size-8 text-current hover:text-current"
+			content={description}
+		/>
 	</div>
 );

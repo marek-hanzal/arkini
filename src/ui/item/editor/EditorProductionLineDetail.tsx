@@ -72,6 +72,7 @@ const projectDrop = (drop: EditorDrop, items: EditorItemRegistry): ItemDetailLin
 		itemId: drop.itemId,
 		quantity: readQuantityBounds(drop.quantity),
 		title: item?.title ?? drop.itemId,
+		activeRuleHints: [],
 	};
 };
 

@@ -4,7 +4,7 @@ import type { EditorInput, EditorLine } from "~/bridge/item/editor/EditorItemMod
 import { Button } from "~/ui/button/Button";
 import { EditorCapabilityStatus } from "~/ui/form/EditorCapabilityStatus";
 import { EditorCollectionSelector } from "~/ui/form/EditorCollectionSelector";
-import { EditorInfoTooltip } from "~/ui/form/EditorInfoTooltip";
+import { EditorFormSectionDivider } from "~/ui/form/EditorFormSectionDivider";
 import { EditorItemDraftDefaults } from "~/ui/item/editor/EditorItemDraftDefaults";
 import { EditorChoiceControl, EditorNumberControl } from "~/ui/form/EditorValueControls";
 import { EditorQuantityControl } from "~/ui/item/editor/EditorQuantityControl";
@@ -21,7 +21,12 @@ const EditorInputCharges = ({
 }) => {
 	const charges = input.charges;
 	return (
-		<div className="grid gap-3 border-t border-line pt-3">
+		<div className="grid gap-3">
+			<EditorFormSectionDivider
+				description="Optional charge payment when this input starts a job."
+				title="Charge cost"
+				variant="secondary"
+			/>
 			{charges === undefined ? (
 				<EditorCapabilityStatus
 					actionLabel="Enable charge cost"
@@ -40,11 +45,7 @@ const EditorInputCharges = ({
 				/>
 			) : (
 				<>
-					<div className="flex items-center justify-between gap-3">
-						<div className="flex items-center gap-1">
-							<h4 className="text-sm font-semibold">Charge cost</h4>
-							<EditorInfoTooltip content="Optional charge payment when this input starts a job." />
-						</div>
+					<div className="flex items-center justify-end gap-3">
 						<Button
 							onClick={() =>
 								onChange({
@@ -247,12 +248,11 @@ export const EditorLineInputsControl = ({ onChange, value }: EditorLineInputsCon
 	};
 	return (
 		<section className="grid min-w-0 content-start gap-3">
-			<header>
-				<div className="flex items-center gap-1">
-					<h3 className="text-sm font-semibold">Inputs</h3>
-					<EditorInfoTooltip content="Inputs belong only to this production line. At least one explicit input contract is required, and every configured contract must be satisfiable before a job can start. A Simple input explicitly requires no material." />
-				</div>
-			</header>
+			<EditorFormSectionDivider
+				description="Inputs belong only to this production line. At least one explicit input contract is required, and every configured contract must be satisfiable before a job can start. A Simple input explicitly requires no material."
+				title="Inputs"
+				variant="secondary"
+			/>
 			<EditorCollectionSelector
 				addLabel="Add input"
 				count={value.length}

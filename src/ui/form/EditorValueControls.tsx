@@ -2,6 +2,10 @@ import type { ReactNode } from "react";
 
 import { EditorInfoTooltip } from "~/ui/form/EditorInfoTooltip";
 import { editorInputClassName } from "~/ui/form/EditorInputClassName";
+import {
+	selectableActiveClassName,
+	selectableInactiveClassName,
+} from "~/ui/form/SelectableStateClassName";
 
 const EditorValueField = ({
 	children,
@@ -102,8 +106,8 @@ export const EditorChoiceControl = <Value extends string>({
 					aria-pressed={option.value === value}
 					className={`min-h-9 cursor-pointer rounded-lg border px-3 py-1.5 text-xs font-semibold uppercase tracking-wide transition-colors ${
 						option.value === value
-							? "border-success/45 bg-secondary text-secondary-foreground"
-							: "border-line bg-canvas/70 text-muted hover:border-line-strong hover:text-foreground"
+							? selectableActiveClassName
+							: selectableInactiveClassName
 					}`}
 					onClick={() => onChange(option.value)}
 				>

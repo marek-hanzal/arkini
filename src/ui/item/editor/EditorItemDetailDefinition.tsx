@@ -87,6 +87,9 @@ const RuleDetail = ({ rule }: { readonly rule: EditorDropRule | EditorLineRule }
 				? ` ${rule.adjustMs >= 0 ? "+" : ""}${rule.adjustMs / 1_000} s`
 				: ""}
 		</p>
+		{rule.hint === undefined ? null : (
+			<p className="mt-1 text-sm text-muted">Player hint: {rule.hint}</p>
+		)}
 		<ul className="mt-1 grid gap-1 pl-4 text-sm text-muted">
 			{rule.when.map((when, index) => (
 				<WhenDetail

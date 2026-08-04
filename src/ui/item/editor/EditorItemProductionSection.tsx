@@ -1,7 +1,7 @@
 import { match } from "ts-pattern";
 
-import { EditorFormSection } from "~/ui/form/EditorFormSection";
 import { EditorFormCard } from "~/ui/form/EditorFormCard";
+import { EditorFormSectionDivider } from "~/ui/form/EditorFormSectionDivider";
 import { useEditorItemFormSession } from "~/ui/item/editor/EditorItemFormContext";
 import { EditorLineFields } from "~/ui/item/editor/EditorLineField";
 import { EditorOptionalOutputControl } from "~/ui/item/editor/EditorOptionalOutputControl";
@@ -47,16 +47,22 @@ export const EditorItemProductionSection = () => {
 				type: "temporary",
 			},
 			() => (
-				<EditorFormCard>
-					<EditorFormSection title="Temporary lifetime">
+				<div className="grid gap-[var(--ak-viewport-gap)]">
+					<EditorFormCard>
+						<EditorFormSectionDivider
+							description="How long this temporary item remains active before expiring."
+							title="Temporary lifetime"
+							variant="secondary"
+						/>
 						<form.AppField name="durationMs">
-							{(field) => (
-								<field.NumberField
-									label="Duration (milliseconds)"
-									min={500}
-								/>
-							)}
+							{(field) => <field.SecondsField label="Duration (seconds)" />}
 						</form.AppField>
+					</EditorFormCard>
+					<EditorFormSectionDivider
+						description="Optional items emitted when the temporary item expires."
+						title="Expiry output"
+					/>
+					<EditorFormCard>
 						<form.Subscribe
 							selector={(state) =>
 								state.values.type === "temporary" ? state.values.output : undefined
@@ -73,8 +79,8 @@ export const EditorItemProductionSection = () => {
 								/>
 							)}
 						</form.Subscribe>
-					</EditorFormSection>
-				</EditorFormCard>
+					</EditorFormCard>
+				</div>
 			),
 		)
 		.with(

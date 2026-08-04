@@ -3,8 +3,7 @@ import { EditorCapabilityStatus } from "~/ui/form/EditorCapabilityStatus";
 import { EditorCollectionSelector } from "~/ui/form/EditorCollectionSelector";
 import { withFieldGroup } from "~/ui/form/EditorForm";
 import { EditorFormCard } from "~/ui/form/EditorFormCard";
-import { EditorFormSeparator } from "~/ui/form/EditorFormSeparator";
-import { EditorInfoTooltip } from "~/ui/form/EditorInfoTooltip";
+import { EditorFormSectionDivider } from "~/ui/form/EditorFormSectionDivider";
 import { EditorLineFields } from "~/ui/item/editor/EditorLineField";
 
 interface EditorProductionFieldValues {
@@ -37,7 +36,14 @@ export const EditorProductionFields = withFieldGroup({
 					)}
 				</group.AppField>
 			</EditorFormCard>
-			<EditorFormSeparator />
+			<EditorFormSectionDivider
+				description={
+					kind === "deposit"
+						? "Optional self-consuming jobs exposed by this deposit. Each production line is an independent job contract with its own inputs, output, runtime and rules."
+						: "Each product line is an independent job contract owned by this producer, with its own inputs, output, runtime and rules."
+				}
+				title={kind === "deposit" ? "Production lines" : "Product lines"}
+			/>
 			<group.AppField
 				name="lines"
 				mode="array"
@@ -102,26 +108,6 @@ export const EditorProductionFields = withFieldGroup({
 							}}
 							label={`${kind === "deposit" ? "Production" : "Product"} lines`}
 							navigationCard
-							navigationHeader={
-								<header>
-									<div>
-										<div className="flex items-center gap-1">
-											<h3 className="text-sm font-semibold">
-												{kind === "deposit"
-													? "Production lines"
-													: "Product lines"}
-											</h3>
-											<EditorInfoTooltip
-												content={
-													kind === "deposit"
-														? "Optional self-consuming jobs exposed by this deposit. Each production line is an independent job contract with its own inputs, output, runtime and rules."
-														: "Each product line is an independent job contract owned by this producer, with its own inputs, output, runtime and rules."
-												}
-											/>
-										</div>
-									</div>
-								</header>
-							}
 							onAdd={addLine}
 							onRemove={
 								kind === "producer" && lines.length === 1

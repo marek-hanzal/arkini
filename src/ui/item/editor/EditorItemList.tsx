@@ -3,6 +3,10 @@ import { useMemo, useState } from "react";
 import type { EditorProject } from "~/bridge/editor/EditorProject";
 import { useEditorProject } from "~/bridge/editor/useEditorProject";
 import { ButtonLink, PrimaryButtonLink } from "~/ui/button/Button";
+import {
+	selectableActiveClassName,
+	selectableInactiveClassName,
+} from "~/ui/form/SelectableStateClassName";
 import { EditorItemThumbnail } from "~/ui/item/editor/EditorItemThumbnail";
 import { useFuseSearch } from "~/ui/search/useFuseSearch";
 import { Status } from "~/ui/status/Status";
@@ -65,11 +69,11 @@ export const EditorItemList = () => {
 	});
 	return (
 		<section
-			className="grid h-full min-h-0 grid-rows-[auto_minmax(0,1fr)] gap-3"
+			className="h-full min-h-0 overflow-y-auto overscroll-contain"
 			aria-label="Items"
 			data-ui="EditorItemList"
 		>
-			<header className="flex min-w-0 flex-wrap items-center gap-2 px-3 pt-3">
+			<header className="ak-editor-page-header flex min-w-0 flex-wrap items-center gap-2 p-3">
 				<input
 					type="search"
 					value={query}
@@ -104,7 +108,7 @@ export const EditorItemList = () => {
 					</PrimaryButtonLink>
 				)}
 			</header>
-			<div className="ak-list grid min-h-0 content-start gap-2 overflow-y-auto overscroll-contain px-3 pb-3">
+			<div className="ak-list grid content-start gap-2 px-3 pt-3 pb-3">
 				{empty ? (
 					<Status
 						dataUi="EditorItemsEmpty"
@@ -162,7 +166,7 @@ export const EditorItemList = () => {
 						</ButtonLink>
 						<button
 							type="button"
-							className={`relative z-10 shrink-0 cursor-pointer rounded-full border px-2.5 py-1 text-[0.65rem] font-semibold uppercase tracking-wider ${itemType === item.type ? "border-success/45 bg-secondary text-secondary-foreground" : "border-transparent bg-surface-raised text-muted hover:text-foreground"}`}
+							className={`relative z-10 shrink-0 cursor-pointer rounded-full border px-2.5 py-1 text-[0.65rem] font-semibold uppercase tracking-wider ${itemType === item.type ? selectableActiveClassName : selectableInactiveClassName}`}
 							aria-label={`Filter items by ${item.type}`}
 							aria-pressed={itemType === item.type}
 							onClick={() => setItemType(item.type)}

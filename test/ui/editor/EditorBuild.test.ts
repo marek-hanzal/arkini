@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 
 import * as AsyncResult from "effect/unstable/reactivity/AsyncResult";
-import { act, createElement, type ButtonHTMLAttributes } from "react";
+import { act, createElement, type AnchorHTMLAttributes, type ButtonHTMLAttributes } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -49,6 +49,26 @@ vi.mock("~/ui/button/Button", () => ({
 		createElement("button", props, children),
 	PrimaryButton: ({ children, ...props }: ButtonHTMLAttributes<HTMLButtonElement>) =>
 		createElement("button", props, children),
+	ButtonLink: ({
+		children,
+		to,
+		params,
+		...props
+	}: AnchorHTMLAttributes<HTMLAnchorElement> & {
+		readonly to: string;
+		readonly params: Record<string, string>;
+	}) =>
+		createElement(
+			"a",
+			{
+				...props,
+				href: Object.entries(params).reduce(
+					(path, [key, value]) => path.replace(`$${key}`, value),
+					to,
+				),
+			},
+			children,
+		),
 }));
 
 import { EditorBuild } from "~/ui/arkpack/editor/EditorBuild";
@@ -78,6 +98,7 @@ beforeEach(() => {
 		config: {
 			items: {},
 		},
+		resources: [],
 		revision: 0,
 	};
 	state.buildResult = AsyncResult.initial();
@@ -161,5 +182,51 @@ describe("EditorBuild", () => {
 		expect(
 			Array.from(container.querySelectorAll("button"), (button) => button.textContent),
 		).toContain("Install");
+	});
+
+	it("renders actionable structured diagnostics instead of a code-only message", async () => {
+		state.project = {
+			...(state.project as Record<string, unknown>),
+			config: {
+				items: {
+					"producer:academy": {
+						uid: "academy-uid",
+						title: "Academy",
+					},
+				},
+			},
+		};
+		state.buildResult = AsyncResult.success({
+			...createArtifact("a".repeat(64), 0),
+			diagnostics: [
+				{
+					code: "input:capacity-unsupported",
+					severity: "error",
+					path: [
+						"items",
+						"producer:academy",
+						"lines",
+						0,
+						"inputs",
+						0,
+					],
+					message: "This input buffer is only supported by producer lines.",
+					ownerItemId: "producer:academy",
+					lineId: "line:academy:knowledge",
+					inputIndex: 0,
+					capacity: 2,
+				},
+			],
+		});
+
+		const { container } = await renderBuild();
+
+		expect(container.textContent).toContain("Unsupported input capacity");
+		expect(container.textContent).toContain(
+			"This input buffer is only supported by producer lines.",
+		);
+		expect(container.querySelector("a")?.getAttribute("href")).toBe(
+			"/editor/editor-test/editor/items/academy-uid/form/production",
+		);
 	});
 });

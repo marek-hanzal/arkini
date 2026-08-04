@@ -109,4 +109,50 @@ describe("EditorSearchCombobox", () => {
 		expect(input.value).toBe("");
 		expect(clear.className).toContain("inset-y-0");
 	});
+
+	it("temporarily clears the selected label while switching and restores it on blur", async () => {
+		const container = document.createElement("div");
+		document.body.append(container);
+		const root = createRoot(container);
+		roots.push(root);
+		await act(async () => {
+			root.render(
+				createElement(EditorSearchCombobox, {
+					displaySelectedLabel: true,
+					label: "Input",
+					emptyLabel: "Empty",
+					options: [
+						{
+							id: "first",
+							label: "First input",
+							terms: [
+								"First input",
+							],
+						},
+						{
+							id: "second",
+							label: "Second input",
+							terms: [
+								"Second input",
+							],
+						},
+					],
+					value: "first",
+					onChange: vi.fn(),
+					renderPreview: () => null,
+				}),
+			);
+		});
+		const input = container.querySelector<HTMLInputElement>("input");
+		if (input === null) throw new Error("Expected combobox input.");
+
+		await act(async () => input.focus());
+
+		expect(input.value).toBe("");
+		expect(document.querySelectorAll('[role="option"]')).toHaveLength(2);
+
+		await act(async () => input.blur());
+
+		expect(input.value).toBe("First input");
+	});
 });

@@ -6,6 +6,7 @@ import { installBuiltEditorArkpackCommandAtom } from "~/bridge/arkpack/editor/in
 import { readEditorBuildDiagnostics } from "~/bridge/arkpack/editor/readEditorBuildDiagnostics";
 import { saveBuiltEditorArkpackCommandAtom } from "~/bridge/arkpack/editor/saveBuiltEditorArkpackCommandAtom";
 import { useEditorProject } from "~/bridge/editor/useEditorProject";
+import { EditorBuildDiagnostics } from "~/ui/arkpack/editor/EditorBuildDiagnostics";
 import { formatByteSize } from "~/ui/arkpack/editor/formatByteSize";
 import { Button, PrimaryButton } from "~/ui/button/Button";
 import { readSettledAsyncResultError } from "~/ui/reactivity/readSettledAsyncResultError";
@@ -79,19 +80,10 @@ export const EditorBuild = () => {
 					</p>
 				) : null}
 				{diagnostics.length === 0 ? null : (
-					<ul className="mt-4 grid gap-2">
-						{diagnostics.map((diagnostic, index) => (
-							<li
-								key={`${diagnostic.code}-${diagnostic.source ?? "project"}-${index}`}
-								className="rounded-lg bg-surface-raised p-3 text-sm text-muted"
-							>
-								<span className="font-semibold text-foreground">
-									{diagnostic.code}
-								</span>
-								: {diagnostic.message}
-							</li>
-						))}
-					</ul>
+					<EditorBuildDiagnostics
+						diagnostics={diagnostics}
+						project={project}
+					/>
 				)}
 				<PrimaryButton
 					className="mt-4"

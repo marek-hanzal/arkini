@@ -9,7 +9,7 @@ import { EditorProductionFields } from "~/ui/item/editor/EditorProductionFields"
 
 export const EditorItemProductionSection = () => {
 	const { canonicalItem, form, itemId } = useEditorItemFormSession();
-	return match(canonicalItem)
+	const content = match(canonicalItem)
 		.with(
 			{
 				type: "deposit",
@@ -111,4 +111,14 @@ export const EditorItemProductionSection = () => {
 			() => null,
 		)
 		.exhaustive();
+	if (content === null) return null;
+	return (
+		<div className="grid gap-[var(--ak-viewport-gap)]">
+			<EditorFormSectionDivider
+				description="Defines this item's timed behavior, including concurrency, production lines, inputs, outputs, runtime and rules where supported."
+				title="Production"
+			/>
+			{content}
+		</div>
+	);
 };

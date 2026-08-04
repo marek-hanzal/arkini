@@ -1,7 +1,7 @@
 import { Console, Effect } from "effect";
 
 import { packDirectoryFx } from "~/engine/pack/fx/packDirectoryFx";
-import { renderGameDiagnosticsFx } from "~/engine/validation/fx/renderGameDiagnosticsFx";
+import { printGameDiagnosticsForCliFx } from "~/engine/validation/printer/printGameDiagnosticsForCliFx";
 
 export namespace packDemoGameFx {
 	export interface Props {
@@ -21,9 +21,11 @@ export const packDemoGameFx = Effect.fn("packDemoGameFx")(function* ({
 		},
 	}).pipe(
 		Effect.catchTag("GameValidationError", (error) =>
-			renderGameDiagnosticsFx(error.diagnostics).pipe(Effect.andThen(Effect.fail(error))),
+			printGameDiagnosticsForCliFx(error.diagnostics).pipe(
+				Effect.andThen(Effect.fail(error)),
+			),
 		),
 	);
-	yield* renderGameDiagnosticsFx(packed.diagnostics);
+	yield* printGameDiagnosticsForCliFx(packed.diagnostics);
 	yield* Console.log(`Packed unsigned ${packed.output} for the desktop build.`);
 });

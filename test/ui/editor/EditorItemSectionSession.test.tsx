@@ -362,6 +362,31 @@ describe("item section form session", () => {
 		expect(container.textContent).not.toContain("Merges are disabled");
 	});
 
+	it("explains when a deposit has no production lines", async () => {
+		state.persisted = {
+			...item,
+			id: "deposit:tree",
+			type: "deposit",
+			scope: "board",
+			charges: {
+				amount: 3,
+			},
+		};
+
+		const container = await renderStandalone(
+			<EditorItemDetailSectionPage
+				sectionId="production"
+				uid={item.uid}
+			/>,
+		);
+
+		expect(container.textContent).toContain("Production lines are disabled");
+		expect(container.textContent).toContain("cannot run production jobs");
+		expect(
+			container.querySelector('[data-ui="EditorProductionLinesDisabledStatus"]'),
+		).not.toBeNull();
+	});
+
 	it("allows a new item ID to change before its first repository save", async () => {
 		state.canonical = {
 			config: {

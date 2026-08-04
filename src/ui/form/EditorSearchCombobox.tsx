@@ -129,6 +129,10 @@ export const EditorSearchCombobox = ({
 		setQuery(displaySelectedLabel ? option.label : option.id);
 		setOpen(false);
 	};
+	const beginSearch = () => {
+		if (!open && query === selectedLabel) setQuery("");
+		setOpen(true);
+	};
 
 	return (
 		<label className="grid min-w-0 content-start gap-1.5 text-sm">
@@ -177,7 +181,8 @@ export const EditorSearchCombobox = ({
 							setQuery(event.currentTarget.value);
 							setOpen(true);
 						}}
-						onFocus={() => setOpen(true)}
+						onClick={beginSearch}
+						onFocus={beginSearch}
 						onKeyDown={(event) => {
 							if (event.key === "Escape") {
 								setOpen(false);

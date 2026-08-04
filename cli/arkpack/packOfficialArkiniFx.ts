@@ -2,7 +2,7 @@ import { Console, Effect } from "effect";
 import { packSignedDirectoryFx } from "~/engine/pack/fx/packSignedDirectoryFx";
 import { readArkpackPrivateKeyFx } from "~/engine/pack/fx/readArkpackPrivateKeyFx";
 import { readArkpackTrustedKeysFx } from "~/engine/pack/fx/readArkpackTrustedKeysFx";
-import { renderGameDiagnosticsFx } from "~/engine/validation/fx/renderGameDiagnosticsFx";
+import { printGameDiagnosticsForCliFx } from "~/engine/validation/printer/printGameDiagnosticsForCliFx";
 import { ArkiniOfficialArkpackSigning } from "./ArkiniOfficialArkpackSigning";
 
 export namespace packOfficialArkiniFx {
@@ -31,7 +31,7 @@ export const packOfficialArkiniFx = Effect.fn("packOfficialArkiniFx")(function* 
 		privateKey,
 		trustedKeys,
 	});
-	yield* renderGameDiagnosticsFx(result.packed.diagnostics);
+	yield* printGameDiagnosticsForCliFx(result.packed.diagnostics);
 	yield* Console.log(
 		`Packed, signed, and verified ${result.packed.output} with ${ArkiniOfficialArkpackSigning.keyId}.`,
 	);

@@ -2,7 +2,7 @@ import { Argument, Command } from "effect/unstable/cli";
 import { Console, Effect } from "effect";
 
 import { packDirectoryFx } from "~/engine/pack/fx/packDirectoryFx";
-import { renderGameDiagnosticsFx } from "~/engine/validation/fx/renderGameDiagnosticsFx";
+import { printGameDiagnosticsForCliFx } from "~/engine/validation/printer/printGameDiagnosticsForCliFx";
 
 export namespace PackCommand {
 	export interface Props {
@@ -31,10 +31,12 @@ const runPackCommandFx = Effect.fn("runPackCommandFx")(function* ({
 		metadata,
 	}).pipe(
 		Effect.catchTag("GameValidationError", (error) =>
-			renderGameDiagnosticsFx(error.diagnostics).pipe(Effect.andThen(Effect.fail(error))),
+			printGameDiagnosticsForCliFx(error.diagnostics).pipe(
+				Effect.andThen(Effect.fail(error)),
+			),
 		),
 	);
-	yield* renderGameDiagnosticsFx(result.diagnostics);
+	yield* printGameDiagnosticsForCliFx(result.diagnostics);
 
 	yield* Console.log(`Packed ${result.json} JSON sources and ${result.png} PNG assets.`);
 	yield* Console.log(`Wrote ${result.output} (${result.bytes} bytes).`);

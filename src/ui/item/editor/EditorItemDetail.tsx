@@ -8,6 +8,7 @@ import { EditorSectionPage } from "~/ui/editor/EditorSectionPage";
 import { EditorSectionTabs } from "~/ui/editor/EditorSectionTabs";
 import { EditorRootCard } from "~/ui/editor/EditorRootCard";
 import { useEditorEditShortcut } from "~/ui/editor/useEditorEditShortcut";
+import { ItemTypeLabel } from "~/ui/item-detail/ItemInfoPresentation";
 import { EditorItemNotFound } from "~/ui/item/editor/EditorItemNotFound";
 import { EditorItemConvertMenu } from "~/ui/item/editor/EditorItemConvertMenu";
 import { EditorItemSectionLink } from "~/ui/item/editor/EditorItemSectionLink";
@@ -50,7 +51,17 @@ export const EditorItemDetail = ({
 						</ButtonLink>
 					}
 					title={
-						<h1 className="truncate text-xl font-semibold">{item.title || item.id}</h1>
+						<div className="grid min-w-0 gap-0.5">
+							<h1 className="truncate text-xl font-semibold">
+								{item.title || item.id}
+							</h1>
+							<span
+								className="truncate text-xs font-medium uppercase tracking-[0.08em] text-muted"
+								data-ui="EditorItemType"
+							>
+								{ItemTypeLabel[item.type]}
+							</span>
+						</div>
 					}
 					tabs={
 						<EditorSectionTabs label="Item sections">

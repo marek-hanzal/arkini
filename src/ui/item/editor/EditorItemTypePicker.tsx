@@ -2,50 +2,10 @@ import { createId } from "@paralleldrive/cuid2";
 import { useMemo } from "react";
 
 import { useEditorProject } from "~/bridge/editor/useEditorProject";
-import { EditorItemTypes, type EditorItemType } from "~/bridge/item/editor/EditorItemModel";
+import { EditorItemTypes } from "~/bridge/item/editor/EditorItemModel";
 import { ButtonLink } from "~/ui/button/Button";
 import { editorBackLinkClassName, EditorBackIcon } from "~/ui/editor/EditorBackIcon";
-
-const itemTypePresentation = {
-	blueprint: {
-		description: "A build plan with one construction line.",
-		icon: "icon-[lucide--scroll-text]",
-	},
-	craft: {
-		description: "A consumable or quest-like item with one product line.",
-		icon: "icon-[lucide--hammer]",
-	},
-	deposit: {
-		description: "A board resource source with optional finite production lines.",
-		icon: "icon-[lucide--mountain]",
-	},
-	inventory: {
-		description: "The singleton item that opens the shared inventory.",
-		icon: "icon-[lucide--backpack]",
-	},
-	producer: {
-		description: "A building or actor with one or more selectable product lines.",
-		icon: "icon-[lucide--factory]",
-	},
-	simple: {
-		description: "A regular stackable item without specialized behavior.",
-		icon: "icon-[lucide--box]",
-	},
-	stash: {
-		description: "A chest or reward container with one opening line.",
-		icon: "icon-[lucide--package-open]",
-	},
-	temporary: {
-		description: "A board-only effect that expires after an authored duration.",
-		icon: "icon-[lucide--timer]",
-	},
-} as const satisfies Record<
-	EditorItemType,
-	{
-		readonly description: string;
-		readonly icon: string;
-	}
->;
+import { EditorItemTypePresentation } from "~/ui/item/editor/EditorItemTypePresentation";
 
 /** Starts item creation from the authoritative item discriminator enum. */
 export const EditorItemTypePicker = () => {
@@ -86,7 +46,7 @@ export const EditorItemTypePicker = () => {
 			</header>
 			<div className="ak-list grid content-start gap-2 px-3 pt-3 pb-3 sm:grid-cols-2 xl:grid-cols-3">
 				{EditorItemTypes.map((type) => {
-					const presentation = itemTypePresentation[type];
+					const presentation = EditorItemTypePresentation[type];
 					return (
 						<ButtonLink
 							key={type}

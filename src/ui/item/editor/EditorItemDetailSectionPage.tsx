@@ -253,21 +253,27 @@ const ProductionDetail = ({ item }: { readonly item: EditorItem }) => {
 			</div>
 		);
 	}
+	if (!("durationMs" in item)) {
+		return (
+			<Status
+				dataUi="EditorProductionLinesDisabledStatus"
+				description="This item has no production lines, so it cannot run production jobs or transform inputs into outputs. Configure a production-capable item to add that behavior."
+				icon="icon-[lucide--factory]"
+				title="Production lines are disabled"
+			/>
+		);
+	}
 	return (
 		<div className="grid gap-6">
-			{"durationMs" in item ? (
-				<>
-					<DetailSection title="Lifetime">
-						<DetailFact
-							label="Duration"
-							value={`${item.durationMs} ms`}
-						/>
-					</DetailSection>
-					<DetailSection title="Expiry output">
-						<OutputDetail output={item.output} />
-					</DetailSection>
-				</>
-			) : null}
+			<DetailSection title="Lifetime">
+				<DetailFact
+					label="Duration"
+					value={`${item.durationMs} ms`}
+				/>
+			</DetailSection>
+			<DetailSection title="Expiry output">
+				<OutputDetail output={item.output} />
+			</DetailSection>
 		</div>
 	);
 };

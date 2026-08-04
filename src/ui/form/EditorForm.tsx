@@ -1,7 +1,7 @@
 import { createFormHook } from "@tanstack/react-form";
 import type { PropsWithChildren } from "react";
 
-import { EditorBooleanSwitch } from "~/ui/form/EditorBooleanSwitch";
+import { EditorBooleanToggleBadge } from "~/ui/form/EditorBooleanToggleBadge";
 import { fieldContext, formContext, useFieldContext } from "~/ui/form/EditorFormContexts";
 import { editorInputClassName } from "~/ui/form/EditorInputClassName";
 import { readEditorFieldError } from "~/ui/form/readEditorFieldError";
@@ -151,6 +151,37 @@ const EditorNumberField = ({
 	);
 };
 
+export interface EditorSecondsFieldProps {
+	readonly description?: string;
+	readonly label: string;
+}
+
+const EditorSecondsField = ({ description, label }: EditorSecondsFieldProps) => {
+	const field = useFieldContext<number>();
+	const error = readEditorFieldError(field.state.meta.errors);
+	const seconds = field.state.value / 1_000;
+	return (
+		<EditorField
+			label={label}
+			description={description}
+			error={error}
+		>
+			<input
+				type="number"
+				name={field.name}
+				value={Number.isNaN(seconds) ? "" : seconds}
+				className={editorInputClassName}
+				min={0}
+				step={0.001}
+				onBlur={field.handleBlur}
+				onChange={(event) =>
+					field.handleChange(Math.round(event.currentTarget.valueAsNumber * 1_000))
+				}
+			/>
+		</EditorField>
+	);
+};
+
 export interface EditorChoiceFieldProps {
 	readonly description?: string;
 	readonly label: string;
@@ -199,19 +230,31 @@ const EditorChoiceField = ({ description, label, options }: EditorChoiceFieldPro
 	);
 };
 
-export interface EditorBoolSwitchProps {
-	readonly description?: string;
-	readonly label: string;
+export interface EditorBoolToggleProps {
+	readonly checkedIcon: string;
+	readonly checkedLabel: string;
+	readonly description: string;
+	readonly uncheckedIcon: string;
+	readonly uncheckedLabel: string;
 }
 
-const EditorBoolSwitch = ({ description, label }: EditorBoolSwitchProps) => {
+const EditorBoolToggle = ({
+	checkedIcon,
+	checkedLabel,
+	description,
+	uncheckedIcon,
+	uncheckedLabel,
+}: EditorBoolToggleProps) => {
 	const field = useFieldContext<boolean>();
 	return (
-		<EditorBooleanSwitch
+		<EditorBooleanToggleBadge
 			checked={field.state.value}
+			checkedIcon={checkedIcon}
+			checkedLabel={checkedLabel}
 			description={description}
-			label={label}
 			onChange={field.handleChange}
+			uncheckedIcon={uncheckedIcon}
+			uncheckedLabel={uncheckedLabel}
 		/>
 	);
 };
@@ -219,10 +262,11 @@ const EditorBoolSwitch = ({ description, label }: EditorBoolSwitchProps) => {
 export const { useAppForm, withFieldGroup } = createFormHook({
 	fieldComponents: {
 		AssetField: EditorAssetAutocompleteField,
-		BoolSwitch: EditorBoolSwitch,
+		BoolToggle: EditorBoolToggle,
 		ChoiceField: EditorChoiceField,
 		ItemField: EditorItemAutocompleteField,
 		NumberField: EditorNumberField,
+		SecondsField: EditorSecondsField,
 		TextAreaField: EditorTextAreaField,
 		TextField: EditorTextField,
 	},

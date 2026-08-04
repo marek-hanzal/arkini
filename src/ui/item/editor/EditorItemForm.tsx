@@ -107,6 +107,7 @@ const EditorItemFormSession = ({
 				<EditorFormSectionPage
 					dirty={controller.isDirty}
 					error={controller.error}
+					rootCard={sectionId !== "production"}
 					save={controller.save}
 					saving={controller.isSaving}
 					leading={

@@ -7,12 +7,16 @@ import type {
 	EditorRollSet,
 } from "~/bridge/item/editor/EditorItemModel";
 import { Button } from "~/ui/button/Button";
-import { EditorCollectionTabs } from "~/ui/form/EditorCollectionTabs";
+import { EditorCollectionSelector } from "~/ui/form/EditorCollectionSelector";
 import { EditorItemDraftDefaults } from "~/ui/item/editor/EditorItemDraftDefaults";
 import { EditorChoiceControl, EditorNumberControl } from "~/ui/form/EditorValueControls";
 import { EditorItemReferenceControl } from "~/ui/item/editor/EditorItemReferenceControl";
 import { EditorQuantityControl } from "~/ui/item/editor/EditorQuantityControl";
 import { EditorRulesControl } from "~/ui/item/editor/EditorRulesControl";
+import { useEditorItemOptionLabel } from "~/ui/item/editor/useEditorItemOptionLabel";
+
+const readFirstRollItemId = (roll: EditorRoll): string | undefined =>
+	roll.type === "weight" ? roll.drop[0]?.drop[0]?.itemId : roll.drop[0]?.itemId;
 
 const EditorDropControl = ({
 	onChange,
@@ -80,27 +84,28 @@ const EditorDropControl = ({
 );
 
 const EditorDropList = ({
-	minimum = 1,
 	onChange,
 	value,
 }: {
-	readonly minimum?: number;
 	readonly onChange: (
-		drops: [
-			EditorDrop,
-			...EditorDrop[],
-		],
+		drops:
+			| [
+					EditorDrop,
+					...EditorDrop[],
+			  ]
+			| undefined,
 	) => void;
 	readonly value: [
 		EditorDrop,
 		...EditorDrop[],
 	];
 }) => {
+	const readItemLabel = useEditorItemOptionLabel();
 	return (
-		<EditorCollectionTabs
+		<EditorCollectionSelector
 			addLabel="Add drop"
 			count={value.length}
-			itemLabel={(index) => `Drop ${index + 1}`}
+			itemLabel={(index) => readItemLabel(value[index].itemId, `Drop ${index + 1}`)}
 			label="Drops"
 			onAdd={() =>
 				onChange([
@@ -108,18 +113,15 @@ const EditorDropList = ({
 					structuredClone(EditorItemDraftDefaults.drop),
 				])
 			}
-			onRemove={
-				value.length <= minimum
-					? undefined
-					: (index) =>
-							onChange(
-								value.filter(
-									(_current, currentIndex) => currentIndex !== index,
-								) as [
-									EditorDrop,
-									...EditorDrop[],
-								],
-							)
+			onRemove={(index) =>
+				value.length === 1
+					? onChange(undefined)
+					: onChange(
+							value.filter((_current, currentIndex) => currentIndex !== index) as [
+								EditorDrop,
+								...EditorDrop[],
+							],
+						)
 			}
 			removeLabel="Remove drop"
 		>
@@ -138,7 +140,7 @@ const EditorDropList = ({
 					}
 				/>
 			)}
-		</EditorCollectionTabs>
+		</EditorCollectionSelector>
 	);
 };
 
@@ -146,9 +148,10 @@ const EditorRollControl = ({
 	onChange,
 	value,
 }: {
-	readonly onChange: (roll: EditorRoll) => void;
+	readonly onChange: (roll: EditorRoll | undefined) => void;
 	readonly value: EditorRoll;
 }) => {
+	const readItemLabel = useEditorItemOptionLabel();
 	return (
 		<div className="grid gap-4">
 			<EditorChoiceControl
@@ -179,10 +182,12 @@ const EditorRollControl = ({
 						<EditorDropList
 							value={roll.drop}
 							onChange={(drop) =>
-								onChange({
-									...roll,
-									drop,
-								})
+								drop === undefined
+									? onChange(undefined)
+									: onChange({
+											...roll,
+											drop,
+										})
 							}
 						/>
 					),
@@ -209,10 +214,12 @@ const EditorRollControl = ({
 							<EditorDropList
 								value={roll.drop}
 								onChange={(drop) =>
-									onChange({
-										...roll,
-										drop,
-									})
+									drop === undefined
+										? onChange(undefined)
+										: onChange({
+												...roll,
+												drop,
+											})
 								}
 							/>
 						</div>
@@ -234,10 +241,16 @@ const EditorRollControl = ({
 									})
 								}
 							/>
-							<EditorCollectionTabs
+							<EditorCollectionSelector
 								addLabel="Add weighted candidate"
 								count={roll.drop.length}
-								itemLabel={(candidateIndex) => `Candidate ${candidateIndex + 1}`}
+								itemLabel={(candidateIndex) => {
+									const itemId = roll.drop[candidateIndex].drop[0]?.itemId;
+									return readItemLabel(
+										itemId ?? "",
+										`Candidate ${candidateIndex + 1}`,
+									);
+								}}
 								label="Weighted candidates"
 								onAdd={() =>
 									onChange({
@@ -253,17 +266,16 @@ const EditorRollControl = ({
 										],
 									})
 								}
-								onRemove={
+								onRemove={(candidateIndex) =>
 									roll.drop.length <= 2
-										? undefined
-										: (candidateIndex) =>
-												onChange({
-													...roll,
-													drop: roll.drop.filter(
-														(_current, currentIndex) =>
-															currentIndex !== candidateIndex,
-													) as typeof roll.drop,
-												})
+										? onChange(undefined)
+										: onChange({
+												...roll,
+												drop: roll.drop.filter(
+													(_current, currentIndex) =>
+														currentIndex !== candidateIndex,
+												) as typeof roll.drop,
+											})
 								}
 								removeLabel="Remove weighted candidate"
 							>
@@ -298,24 +310,36 @@ const EditorRollControl = ({
 											<EditorDropList
 												value={candidate.drop}
 												onChange={(drop) =>
-													onChange({
-														...roll,
-														drop: roll.drop.map(
-															(current, currentIndex) =>
-																currentIndex === candidateIndex
-																	? {
-																			...current,
-																			drop,
-																		}
-																	: current,
-														) as typeof roll.drop,
-													})
+													drop === undefined
+														? roll.drop.length <= 2
+															? onChange(undefined)
+															: onChange({
+																	...roll,
+																	drop: roll.drop.filter(
+																		(_current, currentIndex) =>
+																			currentIndex !==
+																			candidateIndex,
+																	) as typeof roll.drop,
+																})
+														: onChange({
+																...roll,
+																drop: roll.drop.map(
+																	(current, currentIndex) =>
+																		currentIndex ===
+																		candidateIndex
+																			? {
+																					...current,
+																					drop,
+																				}
+																			: current,
+																) as typeof roll.drop,
+															})
 												}
 											/>
 										</div>
 									);
 								}}
-							</EditorCollectionTabs>
+							</EditorCollectionSelector>
 						</div>
 					),
 				)
@@ -330,9 +354,10 @@ const EditorRollSetControl = ({
 	value,
 }: {
 	readonly index: number;
-	readonly onChange: (set: EditorRollSet) => void;
+	readonly onChange: (set: EditorRollSet | undefined) => void;
 	readonly value: EditorRollSet;
 }) => {
+	const readItemLabel = useEditorItemOptionLabel();
 	return (
 		<section className="grid gap-3">
 			<header className="flex flex-wrap items-center justify-end gap-3">
@@ -362,10 +387,17 @@ const EditorRollSetControl = ({
 					}
 				/>
 			)}
-			<EditorCollectionTabs
+			<EditorCollectionSelector
 				addLabel="Add roll"
 				count={value.roll.length}
-				itemLabel={(rollIndex) => `Roll ${rollIndex + 1}`}
+				itemLabel={(rollIndex) => {
+					const roll = value.roll[rollIndex];
+					const itemId = readFirstRollItemId(roll);
+					return `${roll.type} roll ${rollIndex + 1} — ${readItemLabel(
+						itemId ?? "",
+						"No item selected",
+					)}`;
+				}}
 				label={`Output set ${index + 1} rolls`}
 				onAdd={() =>
 					onChange({
@@ -376,16 +408,15 @@ const EditorRollSetControl = ({
 						],
 					})
 				}
-				onRemove={
+				onRemove={(rollIndex) =>
 					value.roll.length === 1
-						? undefined
-						: (rollIndex) =>
-								onChange({
-									...value,
-									roll: value.roll.filter(
-										(_current, currentIndex) => currentIndex !== rollIndex,
-									) as typeof value.roll,
-								})
+						? onChange(undefined)
+						: onChange({
+								...value,
+								roll: value.roll.filter(
+									(_current, currentIndex) => currentIndex !== rollIndex,
+								) as typeof value.roll,
+							})
 				}
 				removeLabel="Remove roll"
 			>
@@ -393,32 +424,50 @@ const EditorRollSetControl = ({
 					<EditorRollControl
 						value={value.roll[rollIndex]}
 						onChange={(next) =>
-							onChange({
-								...value,
-								roll: value.roll.map((current, currentIndex) =>
-									currentIndex === rollIndex ? next : current,
-								) as typeof value.roll,
-							})
+							next === undefined
+								? value.roll.length === 1
+									? onChange(undefined)
+									: onChange({
+											...value,
+											roll: value.roll.filter(
+												(_current, currentIndex) =>
+													currentIndex !== rollIndex,
+											) as typeof value.roll,
+										})
+								: onChange({
+										...value,
+										roll: value.roll.map((current, currentIndex) =>
+											currentIndex === rollIndex ? next : current,
+										) as typeof value.roll,
+									})
 						}
 					/>
 				)}
-			</EditorCollectionTabs>
+			</EditorCollectionSelector>
 		</section>
 	);
 };
 
 export interface EditorOutputControlProps {
-	readonly onChange: (output: EditorOutput) => void;
+	readonly onChange: (output: EditorOutput | undefined) => void;
 	readonly value: EditorOutput;
 }
 
 /** Edits weighted output sets, discriminated rolls, and their canonical item drops. */
 export const EditorOutputControl = ({ onChange, value }: EditorOutputControlProps) => {
+	const readItemLabel = useEditorItemOptionLabel();
 	return (
-		<EditorCollectionTabs
+		<EditorCollectionSelector
 			addLabel="Add output set"
 			count={value.set.length}
-			itemLabel={(index) => `Output set ${index + 1}`}
+			itemLabel={(index) => {
+				const roll = value.set[index].roll[0];
+				const itemId = roll === undefined ? undefined : readFirstRollItemId(roll);
+				return `Output set ${index + 1} — ${readItemLabel(
+					itemId ?? "",
+					"No item selected",
+				)}`;
+			}}
 			label="Output sets"
 			onAdd={() =>
 				onChange({
@@ -432,15 +481,14 @@ export const EditorOutputControl = ({ onChange, value }: EditorOutputControlProp
 					],
 				})
 			}
-			onRemove={
+			onRemove={(index) =>
 				value.set.length === 1
-					? undefined
-					: (index) =>
-							onChange({
-								set: value.set.filter(
-									(_current, currentIndex) => currentIndex !== index,
-								) as typeof value.set,
-							})
+					? onChange(undefined)
+					: onChange({
+							set: value.set.filter(
+								(_current, currentIndex) => currentIndex !== index,
+							) as typeof value.set,
+						})
 			}
 			removeLabel="Remove output set"
 		>
@@ -449,14 +497,22 @@ export const EditorOutputControl = ({ onChange, value }: EditorOutputControlProp
 					index={index}
 					value={value.set[index]}
 					onChange={(next) =>
-						onChange({
-							set: value.set.map((current, currentIndex) =>
-								currentIndex === index ? next : current,
-							) as typeof value.set,
-						})
+						next === undefined
+							? value.set.length === 1
+								? onChange(undefined)
+								: onChange({
+										set: value.set.filter(
+											(_current, currentIndex) => currentIndex !== index,
+										) as typeof value.set,
+									})
+							: onChange({
+									set: value.set.map((current, currentIndex) =>
+										currentIndex === index ? next : current,
+									) as typeof value.set,
+								})
 					}
 				/>
 			)}
-		</EditorCollectionTabs>
+		</EditorCollectionSelector>
 	);
 };

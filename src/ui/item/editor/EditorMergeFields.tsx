@@ -1,11 +1,12 @@
 import type { EditorMerge } from "~/bridge/item/editor/EditorItemModel";
 import { EditorCapabilityStatus } from "~/ui/form/EditorCapabilityStatus";
-import { EditorCollectionTabs } from "~/ui/form/EditorCollectionTabs";
+import { EditorCollectionSelector } from "~/ui/form/EditorCollectionSelector";
 import { EditorItemDraftDefaults } from "~/ui/item/editor/EditorItemDraftDefaults";
 import { EditorChoiceControl } from "~/ui/form/EditorValueControls";
 import { EditorItemReferenceControl } from "~/ui/item/editor/EditorItemReferenceControl";
 import { EditorOptionalOutputControl } from "~/ui/item/editor/EditorOptionalOutputControl";
 import { EditorSelectorControl } from "~/ui/item/editor/EditorSelectorControl";
+import { useEditorItemOptionLabel } from "~/ui/item/editor/useEditorItemOptionLabel";
 
 /** Edits the optional non-empty merge array without coupling it to one form API. */
 export const EditorMergeFields = ({
@@ -15,6 +16,7 @@ export const EditorMergeFields = ({
 	readonly onChange: (value: EditorMerge[] | undefined) => void;
 	readonly value: EditorMerge[] | undefined;
 }) => {
+	const readItemLabel = useEditorItemOptionLabel();
 	const merges = value ?? [];
 	const update = (index: number, merge: EditorMerge) => {
 		const next = [
@@ -38,10 +40,13 @@ export const EditorMergeFields = ({
 					title="Merges are disabled"
 				/>
 			) : (
-				<EditorCollectionTabs
+				<EditorCollectionSelector
 					addLabel="Add merge"
 					count={merges.length}
-					itemLabel={(index) => `Merge ${index + 1}`}
+					itemLabel={(index) => {
+						const itemId = merges[index].target.itemId;
+						return readItemLabel(itemId, `Merge ${index + 1}`);
+					}}
 					label="Merges"
 					onAdd={() =>
 						onChange([
@@ -145,7 +150,6 @@ export const EditorMergeFields = ({
 									emptyDescription="The merge currently changes only its source and target. Enable an output to emit additional items when it resolves."
 									emptyIcon="icon-[lucide--package-plus]"
 									emptyTitle="No merge output"
-									removeLabel="Remove merge output"
 									value={merge.output}
 									onChange={(output) =>
 										update(index, {
@@ -157,7 +161,7 @@ export const EditorMergeFields = ({
 							</article>
 						);
 					}}
-				</EditorCollectionTabs>
+				</EditorCollectionSelector>
 			)}
 		</div>
 	);

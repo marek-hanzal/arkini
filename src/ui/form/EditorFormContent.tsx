@@ -6,10 +6,12 @@ export const EditorFormContent = ({
 	children,
 	className,
 	error,
+	rootCard = true,
 	save,
 }: PropsWithChildren<{
 	readonly className?: string;
 	readonly error: unknown;
+	readonly rootCard?: boolean;
 	readonly save: () => Promise<boolean>;
 }>) => (
 	<form
@@ -21,13 +23,24 @@ export const EditorFormContent = ({
 			void save().catch(() => undefined);
 		}}
 	>
-		<EditorFormCard className={className}>
-			{error === undefined ? null : (
-				<p className="rounded-lg border border-danger/40 bg-danger/10 px-4 py-3 text-sm text-danger">
-					{error instanceof Error ? error.message : String(error)}
-				</p>
-			)}
-			{children}
-		</EditorFormCard>
+		{rootCard ? (
+			<EditorFormCard className={className}>
+				{error === undefined ? null : (
+					<p className="rounded-lg border border-danger/40 bg-danger/10 px-4 py-3 text-sm text-danger">
+						{error instanceof Error ? error.message : String(error)}
+					</p>
+				)}
+				{children}
+			</EditorFormCard>
+		) : (
+			<div className={className}>
+				{error === undefined ? null : (
+					<p className="rounded-lg border border-danger/40 bg-danger/10 px-4 py-3 text-sm text-danger">
+						{error instanceof Error ? error.message : String(error)}
+					</p>
+				)}
+				{children}
+			</div>
+		)}
 	</form>
 );

@@ -12,6 +12,7 @@ export const EditorSectionPage = ({
 		data-ui="EditorSectionPage"
 	>
 		<div
+			className="relative z-10"
 			style={{
 				viewTransitionName: "arkini-editor-section-navigation",
 			}}
@@ -19,7 +20,7 @@ export const EditorSectionPage = ({
 			{tabs}
 		</div>
 		<div className="min-h-0 overflow-y-auto overscroll-contain pr-1">
-			<div className="mx-auto w-full max-w-5xl pb-8">{children}</div>
+			<div className="w-full pb-8">{children}</div>
 		</div>
 	</div>
 );

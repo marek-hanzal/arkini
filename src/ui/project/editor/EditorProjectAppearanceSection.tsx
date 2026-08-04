@@ -1,6 +1,6 @@
 import { EditorProjectAvatarKeys } from "~/bridge/project/editor/EditorProjectFormSchema";
 import { Button } from "~/ui/button/Button";
-import { EditorCollectionTabs } from "~/ui/form/EditorCollectionTabs";
+import { EditorCollectionSelector } from "~/ui/form/EditorCollectionSelector";
 import { EditorFormSection } from "~/ui/form/EditorFormSection";
 import { useEditorProjectFormSession } from "~/ui/project/editor/EditorProjectFormContext";
 import { EditorAssetThumbnail } from "~/ui/resource/editor/EditorAssetThumbnail";
@@ -36,10 +36,10 @@ export const EditorProjectAppearanceSection = () => {
 					{(avatarsField) => {
 						const avatars = avatarsField.state.value;
 						return (
-							<EditorCollectionTabs
+							<EditorCollectionSelector
 								addLabel="Add avatar"
 								count={avatars.length}
-								itemLabel={(index) => `Avatar ${index + 1}`}
+								itemLabel={(index) => avatars[index] || `Avatar ${index + 1}`}
 								label="About avatars"
 								onAdd={
 									avatars.length >= EditorProjectAvatarKeys.length
@@ -83,7 +83,7 @@ export const EditorProjectAppearanceSection = () => {
 										</div>
 									</div>
 								)}
-							</EditorCollectionTabs>
+							</EditorCollectionSelector>
 						);
 					}}
 				</form.AppField>

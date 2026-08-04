@@ -1,5 +1,4 @@
 import type { EditorLine } from "~/bridge/item/editor/EditorItemModel";
-import { Button } from "~/ui/button/Button";
 import { EditorItemDraftDefaults } from "~/ui/item/editor/EditorItemDraftDefaults";
 import { EditorCapabilityStatus } from "~/ui/form/EditorCapabilityStatus";
 import { withFieldGroup } from "~/ui/form/EditorForm";
@@ -50,71 +49,87 @@ export const EditorLineFields = withFieldGroup({
 			</group.AppField>
 			<div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
 				<group.AppField name="runtimeMs">
+					{(field) => <field.SecondsField label="Runtime (seconds)" />}
+				</group.AppField>
+				<group.AppField name="default">
 					{(field) => (
-						<field.NumberField
-							label="Runtime (milliseconds)"
-							min={0}
+						<field.BoolToggle
+							checkedIcon="icon-[lucide--star]"
+							checkedLabel="Default"
+							description="The default line is selected first when this item starts production."
+							uncheckedIcon="icon-[lucide--star-off]"
+							uncheckedLabel="Non-default"
 						/>
 					)}
 				</group.AppField>
-				<group.AppField name="default">
-					{(field) => <field.BoolSwitch label="Default line" />}
-				</group.AppField>
 				<group.AppField name="show">
-					{(field) => <field.BoolSwitch label="Visible by default" />}
+					{(field) => (
+						<field.BoolToggle
+							checkedIcon="icon-[lucide--eye]"
+							checkedLabel="Visible"
+							description="Visible lines are shown to the player before runtime rules alter their visibility."
+							uncheckedIcon="icon-[lucide--eye-off]"
+							uncheckedLabel="Invisible"
+						/>
+					)}
 				</group.AppField>
 				<group.AppField name="enable">
-					{(field) => <field.BoolSwitch label="Enabled by default" />}
+					{(field) => (
+						<field.BoolToggle
+							checkedIcon="icon-[lucide--circle-check]"
+							checkedLabel="Enabled"
+							description="Enabled lines can accept production jobs before runtime rules alter their availability."
+							uncheckedIcon="icon-[lucide--circle-x]"
+							uncheckedLabel="Disabled"
+						/>
+					)}
 				</group.AppField>
 			</div>
-			<group.Subscribe selector={(state) => state.values.input}>
-				{(input) => (
-					<EditorLineInputsControl
-						value={input}
-						onChange={(next) => group.setFieldValue("input", next)}
-					/>
-				)}
-			</group.Subscribe>
-			<group.Subscribe selector={(state) => state.values.output}>
-				{(output) => (
-					<section className="grid gap-3 border-t border-line pt-4">
-						{output === undefined ? (
-							<EditorCapabilityStatus
-								actionLabel="Enable line output"
-								description="This line currently only applies its input and runtime behavior. Enable an output to emit weighted items when the job completes."
-								icon="icon-[lucide--package-plus]"
-								onEnable={() =>
-									group.setFieldValue(
-										"output",
-										structuredClone(EditorItemDraftDefaults.output),
-									)
-								}
-								title="Line output is disabled"
-							/>
-						) : (
-							<>
-								<header className="flex items-center justify-between gap-3">
-									<div>
-										<h3 className="text-sm font-semibold">Output</h3>
-										<p className="mt-1 text-xs text-muted">
-											Optional weighted sets, rolls and item drops.
-										</p>
-									</div>
-									<Button
-										onClick={() => group.setFieldValue("output", undefined)}
-									>
-										Disable output
-									</Button>
-								</header>
-								<EditorOutputControl
-									value={output}
-									onChange={(next) => group.setFieldValue("output", next)}
+			<div className="grid min-w-0 grid-cols-2 gap-4 border-t border-line pt-4">
+				<group.Subscribe selector={(state) => state.values.input}>
+					{(input) => (
+						<EditorLineInputsControl
+							value={input}
+							onChange={(next) => group.setFieldValue("input", next)}
+						/>
+					)}
+				</group.Subscribe>
+				<group.Subscribe selector={(state) => state.values.output}>
+					{(output) => (
+						<section className="grid min-w-0 content-start gap-3">
+							{output === undefined ? (
+								<EditorCapabilityStatus
+									actionLabel="Enable line output"
+									description="This line currently only applies its input and runtime behavior. Enable an output to emit weighted items when the job completes."
+									icon="icon-[lucide--package-plus]"
+									onEnable={() =>
+										group.setFieldValue(
+											"output",
+											structuredClone(EditorItemDraftDefaults.output),
+										)
+									}
+									title="Line output is disabled"
 								/>
-							</>
-						)}
-					</section>
-				)}
-			</group.Subscribe>
+							) : (
+								<>
+									<header>
+										<div>
+											<h3 className="text-sm font-semibold">Output</h3>
+											<p className="mt-1 text-xs text-muted">
+												Optional weighted sets, rolls and item drops.
+											</p>
+										</div>
+									</header>
+									<EditorOutputControl
+										value={output}
+										onChange={(next) => group.setFieldValue("output", next)}
+									/>
+								</>
+							)}
+						</section>
+					)}
+				</group.Subscribe>
+			</div>
 			<group.Subscribe selector={(state) => state.values.rules}>
 				{(rules) => (
 					<EditorRulesControl

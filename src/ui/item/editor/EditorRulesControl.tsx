@@ -5,7 +5,7 @@ import type {
 	EditorLineRule,
 	EditorWhen,
 } from "~/bridge/item/editor/EditorItemModel";
-import { EditorCollectionTabs } from "~/ui/form/EditorCollectionTabs";
+import { EditorCollectionSelector } from "~/ui/form/EditorCollectionSelector";
 import { EditorItemDraftDefaults } from "~/ui/item/editor/EditorItemDraftDefaults";
 import { EditorChoiceControl, EditorNumberControl } from "~/ui/form/EditorValueControls";
 import { EditorQueryControl } from "~/ui/item/editor/EditorQueryControl";
@@ -157,10 +157,10 @@ export const EditorRulesControl = ({
 				<h4 className="text-sm font-semibold">Rules</h4>
 				<p className="mt-1 text-xs text-muted">All conditions within one rule must pass.</p>
 			</header>
-			<EditorCollectionTabs
+			<EditorCollectionSelector
 				addLabel="Add rule"
 				count={rules.length}
-				itemLabel={(ruleIndex) => `Rule ${ruleIndex + 1}`}
+				itemLabel={(ruleIndex) => `Rule ${ruleIndex + 1} — ${rules[ruleIndex].type}`}
 				label="Rules"
 				onAdd={() =>
 					onChange([
@@ -223,10 +223,12 @@ export const EditorRulesControl = ({
 									}
 								/>
 							)}
-							<EditorCollectionTabs
+							<EditorCollectionSelector
 								addLabel="Add condition"
 								count={rule.when.length}
-								itemLabel={(whenIndex) => `Condition ${whenIndex + 1}`}
+								itemLabel={(whenIndex) =>
+									`Condition ${whenIndex + 1} — ${rule.when[whenIndex].type}`
+								}
 								label={`Rule ${ruleIndex + 1} conditions`}
 								onAdd={() =>
 									onChange(
@@ -291,11 +293,11 @@ export const EditorRulesControl = ({
 										}
 									/>
 								)}
-							</EditorCollectionTabs>
+							</EditorCollectionSelector>
 						</article>
 					);
 				}}
-			</EditorCollectionTabs>
+			</EditorCollectionSelector>
 		</section>
 	);
 };

@@ -1,3 +1,12 @@
+import {
+	autoUpdate,
+	flip,
+	FloatingPortal,
+	offset,
+	shift,
+	size,
+	useFloating,
+} from "@floating-ui/react";
 import { useEffect, useId, useMemo, useState, type ReactNode } from "react";
 
 import { useFuseSearch } from "~/ui/search/useFuseSearch";
@@ -5,13 +14,15 @@ import { useFuseSearch } from "~/ui/search/useFuseSearch";
 export interface EditorSearchOption {
 	readonly id: string;
 	readonly label: string;
-	readonly meta: string;
+	readonly meta?: string;
 	readonly terms: readonly string[];
 }
 
 export namespace EditorSearchCombobox {
 	export interface Props {
+		readonly displaySelectedLabel?: boolean;
 		readonly label: string;
+		readonly labelVisible?: boolean;
 		readonly description?: string;
 		readonly emptyLabel: string;
 		readonly error?: string;
@@ -26,19 +37,44 @@ export namespace EditorSearchCombobox {
 /** One keyboard-friendly Fuse-backed picker shared by item and asset form fields. */
 export const EditorSearchCombobox = ({
 	description,
+	displaySelectedLabel = false,
 	emptyLabel,
 	error,
 	label,
+	labelVisible = true,
 	onBlur,
 	onChange,
 	options,
 	renderPreview,
 	value,
 }: EditorSearchCombobox.Props) => {
-	const [query, setQuery] = useState(value);
+	const selectedLabel = displaySelectedLabel
+		? (options.find((option) => option.id === value)?.label ?? value)
+		: value;
+	const [query, setQuery] = useState(selectedLabel);
 	const [open, setOpen] = useState(false);
 	const [activeIndex, setActiveIndex] = useState(0);
 	const listboxId = useId();
+	const { floatingStyles, refs } = useFloating({
+		open,
+		onOpenChange: setOpen,
+		placement: "bottom-start",
+		middleware: [
+			offset(4),
+			flip(),
+			shift({
+				padding: 8,
+			}),
+			size({
+				padding: 8,
+				apply: ({ availableHeight, elements, rects }) => {
+					elements.floating.style.width = `${rects.reference.width}px`;
+					elements.floating.style.maxHeight = `${Math.min(288, availableHeight)}px`;
+				},
+			}),
+		],
+		whileElementsMounted: autoUpdate,
+	});
 	const candidates = useMemo(
 		() =>
 			options.map(({ id, terms }) => ({
@@ -72,9 +108,9 @@ export const EditorSearchCombobox = ({
 	});
 
 	useEffect(() => {
-		setQuery(value);
+		setQuery(selectedLabel);
 	}, [
-		value,
+		selectedLabel,
 	]);
 	useEffect(() => {
 		setActiveIndex(0);
@@ -84,14 +120,17 @@ export const EditorSearchCombobox = ({
 
 	const choose = (option: EditorSearchOption) => {
 		onChange(option.id);
-		setQuery(option.id);
+		setQuery(displaySelectedLabel ? option.label : option.id);
 		setOpen(false);
 	};
 
 	return (
-		<label className="relative grid min-w-0 content-start gap-1.5 text-sm">
-			<span className="font-semibold text-foreground">{label}</span>
-			<span className="relative">
+		<label className="grid min-w-0 content-start gap-1.5 text-sm">
+			{labelVisible ? <span className="font-semibold text-foreground">{label}</span> : null}
+			<span
+				ref={refs.setReference}
+				className="relative"
+			>
 				<span className="icon-[lucide--search] pointer-events-none absolute top-1/2 left-3 z-10 size-4 -translate-y-1/2 text-subtle" />
 				<input
 					type="search"
@@ -111,7 +150,7 @@ export const EditorSearchCombobox = ({
 					placeholder={`Search ${label.toLocaleLowerCase()}…`}
 					onBlur={() => {
 						setOpen(false);
-						setQuery(value);
+						setQuery(selectedLabel);
 						onBlur?.();
 					}}
 					onChange={(event) => {
@@ -122,7 +161,7 @@ export const EditorSearchCombobox = ({
 					onKeyDown={(event) => {
 						if (event.key === "Escape") {
 							setOpen(false);
-							setQuery(value);
+							setQuery(selectedLabel);
 							return;
 						}
 						if (event.key === "ArrowDown" || event.key === "ArrowUp") {
@@ -149,45 +188,51 @@ export const EditorSearchCombobox = ({
 				<span className="text-xs leading-5 text-danger">{error}</span>
 			)}
 			{open ? (
-				<span
-					role="listbox"
-					id={listboxId}
-					className="absolute top-full right-0 left-0 z-40 mt-1 grid max-h-72 gap-1 overflow-y-auto rounded-xl border border-line-strong bg-surface p-1.5 shadow-2xl"
-				>
-					{matches.length === 0 ? (
-						<span className="px-3 py-4 text-center text-xs text-muted">
-							{emptyLabel}
-						</span>
-					) : null}
-					{matches.map((option, index) => (
-						<button
-							key={option.id}
-							id={`${listboxId}-option-${index}`}
-							type="button"
-							role="option"
-							aria-selected={option.id === value}
-							className={`flex min-w-0 cursor-pointer items-center gap-3 rounded-lg px-2.5 py-2 text-left hover:bg-surface-raised ${
-								index === activeIndex ? "bg-surface-raised" : ""
-							}`}
-							onMouseDown={(event) => event.preventDefault()}
-							onMouseEnter={() => setActiveIndex(index)}
-							onClick={() => choose(option)}
-						>
-							{renderPreview(option)}
-							<span className="min-w-0 flex-1">
-								<span className="block truncate text-sm font-semibold text-foreground">
-									{option.label}
-								</span>
-								<span className="mt-0.5 block truncate text-xs text-subtle">
-									{option.meta}
-								</span>
+				<FloatingPortal>
+					<span
+						ref={refs.setFloating}
+						role="listbox"
+						id={listboxId}
+						style={floatingStyles}
+						className="z-50 grid gap-1 overflow-y-auto rounded-xl border border-line-strong bg-surface p-1.5 shadow-2xl"
+					>
+						{matches.length === 0 ? (
+							<span className="px-3 py-4 text-center text-xs text-muted">
+								{emptyLabel}
 							</span>
-							{option.id === value ? (
-								<span className="icon-[lucide--check] size-4 shrink-0 text-accent" />
-							) : null}
-						</button>
-					))}
-				</span>
+						) : null}
+						{matches.map((option, index) => (
+							<button
+								key={option.id}
+								id={`${listboxId}-option-${index}`}
+								type="button"
+								role="option"
+								aria-selected={option.id === value}
+								className={`flex min-w-0 cursor-pointer items-center gap-3 rounded-lg px-2.5 py-2 text-left hover:bg-surface-raised ${
+									index === activeIndex ? "bg-surface-raised" : ""
+								}`}
+								onMouseDown={(event) => event.preventDefault()}
+								onMouseEnter={() => setActiveIndex(index)}
+								onClick={() => choose(option)}
+							>
+								{renderPreview(option)}
+								<span className="min-w-0 flex-1">
+									<span className="block truncate text-sm font-semibold text-foreground">
+										{option.label}
+									</span>
+									{option.meta === undefined ? null : (
+										<span className="mt-0.5 block truncate text-xs text-subtle">
+											{option.meta}
+										</span>
+									)}
+								</span>
+								{option.id === value ? (
+									<span className="icon-[lucide--check] size-4 shrink-0 text-accent" />
+								) : null}
+							</button>
+						))}
+					</span>
+				</FloatingPortal>
 			) : null}
 		</label>
 	);

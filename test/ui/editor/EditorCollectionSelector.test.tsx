@@ -4,7 +4,7 @@ import { act, createElement, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it } from "vitest";
 
-import { EditorCollectionTabs } from "~/ui/form/EditorCollectionTabs";
+import { EditorCollectionSelector } from "~/ui/form/EditorCollectionSelector";
 
 (
 	globalThis as {
@@ -26,11 +26,11 @@ const Harness = () => {
 		"First",
 		"Second",
 	]);
-	return createElement(EditorCollectionTabs, {
+	return createElement(EditorCollectionSelector, {
 		addLabel: "Add entry",
 		children: (index: number) => createElement("output", null, items[index]),
 		count: items.length,
-		itemLabel: (index) => `Entry ${index + 1}`,
+		itemLabel: (index) => items[index],
 		label: "Entries",
 		onAdd: () =>
 			setItems((current) => [
@@ -60,12 +60,35 @@ const click = async (container: HTMLElement, label: string) => {
 	await act(async () => button.click());
 };
 
-describe("EditorCollectionTabs", () => {
+const select = async (container: HTMLElement, query: string) => {
+	const element = container.querySelector("input");
+	if (element === null) throw new Error("Expected collection search.");
+	const valueSetter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")?.set;
+	if (valueSetter === undefined) throw new Error("Expected native input value setter.");
+	await act(async () => {
+		valueSetter.call(element, query);
+		element.dispatchEvent(
+			new Event("input", {
+				bubbles: true,
+			}),
+		);
+	});
+	await act(async () => {
+		element.dispatchEvent(
+			new KeyboardEvent("keydown", {
+				key: "Enter",
+				bubbles: true,
+			}),
+		);
+	});
+};
+
+describe("EditorCollectionSelector", () => {
 	it("selects one item while keeping sibling forms out of the DOM", async () => {
 		const container = await mount();
 		expect(container.querySelector("output")?.textContent).toBe("First");
 
-		await click(container, "Entry 2");
+		await select(container, "Second");
 		expect(container.querySelector("output")?.textContent).toBe("Second");
 		expect(container.querySelectorAll("output")).toHaveLength(1);
 	});
@@ -74,6 +97,7 @@ describe("EditorCollectionTabs", () => {
 		const container = await mount();
 		await click(container, "Add entry");
 		expect(container.querySelector("output")?.textContent).toBe("Entry 3");
+		expect(container.querySelector("input")?.value).toBe("Entry 3");
 
 		await click(container, "Remove active");
 		expect(container.querySelector("output")?.textContent).toBe("Second");

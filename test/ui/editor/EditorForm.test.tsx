@@ -65,7 +65,9 @@ const LocalValueHarness = () => {
 	const form = useAppForm({
 		defaultValues: {
 			amount: 4,
+			enabled: true,
 			name: "Original",
+			runtimeMs: 24_000,
 		},
 	});
 	resetLocalValues = () => form.reset();
@@ -76,8 +78,23 @@ const LocalValueHarness = () => {
 			<form.AppField name="amount">
 				{(field) => <field.NumberField label="Amount" />}
 			</form.AppField>
+			<form.AppField name="runtimeMs">
+				{(field) => <field.SecondsField label="Runtime (seconds)" />}
+			</form.AppField>
+			<form.AppField name="enabled">
+				{(field) => (
+					<field.BoolToggle
+						checkedIcon="icon-[lucide--circle-check]"
+						checkedLabel="Enabled"
+						description="Controls whether this value is enabled."
+						uncheckedIcon="icon-[lucide--circle-x]"
+						uncheckedLabel="Disabled"
+					/>
+				)}
+			</form.AppField>
 			<output data-testid="values">
-				{values.name}|{Number.isNaN(values.amount) ? "NaN" : values.amount}
+				{values.name}|{Number.isNaN(values.amount) ? "NaN" : values.amount}|
+				{values.runtimeMs}|{values.enabled ? "enabled" : "disabled"}
 			</output>
 		</>
 	);
@@ -132,14 +149,23 @@ const ValidationHarness = () => {
 describe("editor form fields", () => {
 	it("keeps local values in the form store and resets the visible controls", async () => {
 		const container = await mount(createElement(LocalValueHarness));
-		const inputs = container.querySelectorAll<HTMLInputElement>("input");
-		const name = inputs[0];
-		const amount = inputs[1];
-		if (name === undefined || amount === undefined) throw new Error("Missing form inputs.");
+		const name = container.querySelector<HTMLInputElement>('input[name="name"]');
+		const amount = container.querySelector<HTMLInputElement>('input[name="amount"]');
+		const runtime = container.querySelector<HTMLInputElement>('input[name="runtimeMs"]');
+		const enabled = Array.from(container.querySelectorAll("button")).find(
+			(button) => button.textContent === "Enabled",
+		);
+		if (name === null || amount === null || runtime === null || enabled === undefined) {
+			throw new Error("Missing form inputs.");
+		}
 
 		await changeInput(name, "Changed");
 		await changeInput(amount, "");
-		expect(container.querySelector('[data-testid="values"]')?.textContent).toBe("Changed|NaN");
+		await changeInput(runtime, "1.25");
+		await act(async () => enabled.click());
+		expect(container.querySelector('[data-testid="values"]')?.textContent).toBe(
+			"Changed|NaN|1250|disabled",
+		);
 
 		await act(async () => {
 			resetLocalValues();
@@ -149,8 +175,9 @@ describe("editor form fields", () => {
 				"Original",
 			);
 			expect(container.querySelector('[data-testid="values"]')?.textContent).toBe(
-				"Original|4",
+				"Original|4|24000|enabled",
 			);
+			expect(runtime.value).toBe("24");
 		});
 	});
 

@@ -1,5 +1,4 @@
 import type { EditorOutput } from "~/bridge/item/editor/EditorItemModel";
-import { Button } from "~/ui/button/Button";
 import { EditorCapabilityStatus } from "~/ui/form/EditorCapabilityStatus";
 import { EditorItemDraftDefaults } from "~/ui/item/editor/EditorItemDraftDefaults";
 import { EditorOutputControl } from "~/ui/item/editor/EditorOutputControl";
@@ -10,7 +9,6 @@ export interface EditorOptionalOutputControlProps {
 	readonly emptyIcon: string;
 	readonly emptyTitle: string;
 	readonly onChange: (output: EditorOutput | undefined) => void;
-	readonly removeLabel: string;
 	readonly value: EditorOutput | undefined;
 }
 
@@ -21,7 +19,6 @@ export const EditorOptionalOutputControl = ({
 	emptyIcon,
 	emptyTitle,
 	onChange,
-	removeLabel,
 	value,
 }: EditorOptionalOutputControlProps) =>
 	value === undefined ? (
@@ -38,11 +35,5 @@ export const EditorOptionalOutputControl = ({
 				value={value}
 				onChange={onChange}
 			/>
-			<Button
-				className="justify-self-end"
-				onClick={() => onChange(undefined)}
-			>
-				{removeLabel}
-			</Button>
 		</div>
 	);

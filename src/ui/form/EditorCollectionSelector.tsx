@@ -2,33 +2,34 @@ import { useState, type ReactNode } from "react";
 import { twMerge } from "tailwind-merge";
 
 import { Button } from "~/ui/button/Button";
+import { EditorSearchCombobox } from "~/ui/form/EditorSearchCombobox";
 
-export interface EditorCollectionTabsProps {
+export interface EditorCollectionSelectorProps {
 	readonly addLabel?: string;
 	readonly children: (activeIndex: number, selectIndex: (index: number) => void) => ReactNode;
 	readonly className?: string;
 	readonly count: number;
 	readonly dataUi?: string;
-	readonly itemLabel: (index: number) => ReactNode;
+	readonly itemLabel: (index: number) => string;
 	readonly label: string;
 	readonly onAdd?: () => void;
 	readonly onRemove?: (activeIndex: number) => void;
 	readonly removeLabel?: string;
 }
 
-/** Projects one form-owned collection into locally selected, horizontally scrollable editor tabs. */
-export const EditorCollectionTabs = ({
+/** Keeps one form-owned collection item mounted behind a compact local selector. */
+export const EditorCollectionSelector = ({
 	addLabel = "Add item",
 	children,
 	className,
 	count,
-	dataUi = "EditorCollectionTabs",
+	dataUi = "EditorCollectionSelector",
 	itemLabel,
 	label,
 	onAdd,
 	onRemove,
 	removeLabel = "Remove item",
-}: EditorCollectionTabsProps) => {
+}: EditorCollectionSelectorProps) => {
 	const [requestedIndex, setRequestedIndex] = useState(0);
 	const activeIndex = count === 0 ? undefined : Math.min(requestedIndex, count - 1);
 	return (
@@ -36,32 +37,37 @@ export const EditorCollectionTabs = ({
 			className={twMerge("grid min-w-0 gap-4", className)}
 			data-ui={dataUi}
 		>
-			<nav
-				className="min-w-0 overflow-x-auto overscroll-x-contain border-b border-line"
-				aria-label={label}
-			>
-				<div className="flex min-w-max items-end gap-1">
-					{Array.from(
-						{
-							length: count,
-						},
-						(_, index) => (
-							<Button
-								key={index}
-								className={twMerge(
-									"min-h-0 rounded-b-none border-transparent bg-transparent px-3 py-2 text-sm shadow-none",
-									index === activeIndex &&
-										"border-accent bg-accent text-accent-contrast hover:bg-accent-hover",
-								)}
-								onClick={() => setRequestedIndex(index)}
-							>
-								{itemLabel(index)}
-							</Button>
-						),
-					)}
+			<nav className="flex min-w-0 items-center gap-2">
+				<div className="min-w-0 flex-1">
+					<EditorSearchCombobox
+						displaySelectedLabel
+						emptyLabel={`No ${label.toLocaleLowerCase()} match this search.`}
+						label={label}
+						labelVisible={false}
+						options={Array.from(
+							{
+								length: count,
+							},
+							(_, index) => {
+								const optionLabel = itemLabel(index);
+								return {
+									id: String(index),
+									label: optionLabel,
+									terms: [
+										optionLabel,
+									],
+								};
+							},
+						)}
+						renderPreview={() => null}
+						value={activeIndex === undefined ? "" : String(activeIndex)}
+						onChange={(index) => setRequestedIndex(Number(index))}
+					/>
+				</div>
+				<div className="flex shrink-0 items-center gap-2">
 					{onAdd === undefined ? null : (
 						<Button
-							className="min-h-0 rounded-b-none border-transparent bg-transparent px-3 py-2 shadow-none"
+							className="size-[var(--ak-control-min-height)] shrink-0 p-0"
 							title={addLabel}
 							onClick={() => {
 								onAdd();
@@ -73,7 +79,7 @@ export const EditorCollectionTabs = ({
 					)}
 					{onRemove === undefined || activeIndex === undefined ? null : (
 						<Button
-							className="min-h-0 rounded-b-none border-transparent bg-transparent px-3 py-2 shadow-none"
+							className="size-[var(--ak-control-min-height)] shrink-0 p-0"
 							title={removeLabel}
 							onClick={() => {
 								onRemove(activeIndex);

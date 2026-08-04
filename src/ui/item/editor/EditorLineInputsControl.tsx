@@ -3,12 +3,13 @@ import { match } from "ts-pattern";
 import type { EditorInput, EditorLine } from "~/bridge/item/editor/EditorItemModel";
 import { Button } from "~/ui/button/Button";
 import { EditorCapabilityStatus } from "~/ui/form/EditorCapabilityStatus";
-import { EditorCollectionTabs } from "~/ui/form/EditorCollectionTabs";
+import { EditorCollectionSelector } from "~/ui/form/EditorCollectionSelector";
 import { EditorItemDraftDefaults } from "~/ui/item/editor/EditorItemDraftDefaults";
 import { EditorChoiceControl, EditorNumberControl } from "~/ui/form/EditorValueControls";
 import { EditorQuantityControl } from "~/ui/item/editor/EditorQuantityControl";
 import { EditorQueryControl } from "~/ui/item/editor/EditorQueryControl";
 import { EditorSelectorControl } from "~/ui/item/editor/EditorSelectorControl";
+import { useEditorItemOptionLabel } from "~/ui/item/editor/useEditorItemOptionLabel";
 
 const EditorInputCharges = ({
 	input,
@@ -241,6 +242,7 @@ export interface EditorLineInputsControlProps {
 
 /** Edits every discriminated input requirement owned by one product line. */
 export const EditorLineInputsControl = ({ onChange, value }: EditorLineInputsControlProps) => {
+	const readItemLabel = useEditorItemOptionLabel();
 	const replaceAt = (index: number, input: EditorInput) => {
 		const next = value.map((current, currentIndex) =>
 			currentIndex === index ? input : current,
@@ -248,17 +250,24 @@ export const EditorLineInputsControl = ({ onChange, value }: EditorLineInputsCon
 		onChange(next);
 	};
 	return (
-		<section className="grid gap-3 border-t border-line pt-4">
+		<section className="grid min-w-0 content-start gap-3">
 			<header>
 				<h3 className="text-sm font-semibold">Inputs</h3>
 				<p className="mt-1 text-xs text-muted">
 					At least one explicit input contract is required.
 				</p>
 			</header>
-			<EditorCollectionTabs
+			<EditorCollectionSelector
 				addLabel="Add input"
 				count={value.length}
-				itemLabel={(index) => `Input ${index + 1}`}
+				itemLabel={(index) => {
+					const input = value[index];
+					if (input.type === "materials")
+						return `${readItemLabel(input.selector.itemId, `Material input ${index + 1}`)} — Materials`;
+					if (input.type === "deposit")
+						return `${readItemLabel(input.query.selector.itemId, `Deposit input ${index + 1}`)} — Deposit`;
+					return `Simple input ${index + 1}`;
+				}}
 				label="Line inputs"
 				onAdd={() =>
 					onChange([
@@ -284,7 +293,7 @@ export const EditorLineInputsControl = ({ onChange, value }: EditorLineInputsCon
 						onChange={(next) => replaceAt(index, next)}
 					/>
 				)}
-			</EditorCollectionTabs>
+			</EditorCollectionSelector>
 		</section>
 	);
 };

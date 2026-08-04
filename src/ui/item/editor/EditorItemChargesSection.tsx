@@ -44,7 +44,6 @@ export const EditorItemChargesSection = () => {
 								emptyDescription="Without an output, the item simply disappears when its last charge is spent. Enable one to emit configured items at depletion."
 								emptyIcon="icon-[lucide--package-plus]"
 								emptyTitle="No depletion output"
-								removeLabel="Remove output"
 								value={charges.output}
 								onChange={(output) => form.setFieldValue("charges.output", output)}
 							/>

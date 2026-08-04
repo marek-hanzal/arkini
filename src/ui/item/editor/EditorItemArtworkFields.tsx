@@ -1,7 +1,7 @@
 import type { EditorItem } from "~/bridge/item/editor/EditorItemModel";
 import { Button } from "~/ui/button/Button";
 import { EditorCapabilityStatus } from "~/ui/form/EditorCapabilityStatus";
-import { EditorCollectionTabs } from "~/ui/form/EditorCollectionTabs";
+import { EditorCollectionSelector } from "~/ui/form/EditorCollectionSelector";
 import { withFieldGroup } from "~/ui/form/EditorForm";
 
 const defaultArtwork: EditorItem["asset"] = {
@@ -70,13 +70,19 @@ export const EditorItemArtworkFields = withFieldGroup({
 									title="Progress artwork is disabled"
 								/>
 							) : (
-								<EditorCollectionTabs
+								<EditorCollectionSelector
 									addLabel="Add progress asset"
 									count={sources.length}
-									itemLabel={(index) => `Progress asset ${index + 1}`}
+									itemLabel={(index) =>
+										sources[index] || `Progress asset ${index + 1}`
+									}
 									label="Progress assets"
 									onAdd={() => sourcesField.pushValue("")}
-									onRemove={(index) => sourcesField.removeValue(index)}
+									onRemove={(index) =>
+										sources.length === 1
+											? group.setFieldValue("sources", undefined)
+											: sourcesField.removeValue(index)
+									}
 									removeLabel="Remove progress asset"
 								>
 									{(index) => (
@@ -86,7 +92,7 @@ export const EditorItemArtworkFields = withFieldGroup({
 											</group.AppField>
 										</div>
 									)}
-								</EditorCollectionTabs>
+								</EditorCollectionSelector>
 							)}
 						</div>
 					);

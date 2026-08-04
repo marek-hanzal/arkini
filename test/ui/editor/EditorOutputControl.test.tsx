@@ -9,6 +9,10 @@ vi.mock("~/ui/item/editor/EditorItemReferenceControl", () => ({
 		createElement("span", null, label),
 }));
 
+vi.mock("~/ui/item/editor/useEditorItemOptionLabel", () => ({
+	useEditorItemOptionLabel: () => (itemId: string, fallback: string) => itemId || fallback,
+}));
+
 import type { EditorOutput } from "~/bridge/item/editor/EditorItemModel";
 import { EditorItemDraftDefaults } from "~/ui/item/editor/EditorItemDraftDefaults";
 import { EditorOutputControl } from "~/ui/item/editor/EditorOutputControl";
@@ -29,17 +33,19 @@ afterEach(async () => {
 });
 
 const Harness = () => {
-	const [output, setOutput] = useState<EditorOutput>(() =>
+	const [output, setOutput] = useState<EditorOutput | undefined>(() =>
 		structuredClone(EditorItemDraftDefaults.output),
 	);
 	return createElement(
 		Fragment,
 		null,
-		createElement(EditorOutputControl, {
-			onChange: setOutput,
-			value: output,
-		}),
-		createElement("output", null, JSON.stringify(output)),
+		output === undefined
+			? null
+			: createElement(EditorOutputControl, {
+					onChange: setOutput,
+					value: output,
+				}),
+		createElement("output", null, JSON.stringify(output ?? null)),
 	);
 };
 
@@ -66,27 +72,52 @@ const readOutput = (container: HTMLElement) =>
 describe("EditorOutputControl", () => {
 	it("keeps nested output collections behind one active form at each level", async () => {
 		const container = await mount();
-		expect(container.querySelectorAll('[data-ui="EditorCollectionTabs"]')).toHaveLength(4);
-		expect(container.textContent).toContain("Output set 1");
-		expect(container.textContent).toContain("Roll 1");
-		expect(container.textContent).toContain("Drop 1");
+		expect(container.querySelectorAll('[data-ui="EditorCollectionSelector"]')).toHaveLength(4);
+		const readCollectionQueries = () =>
+			Array.from(container.querySelectorAll<HTMLInputElement>('input[type="search"]')).map(
+				(input) => input.value,
+			);
+		expect(readCollectionQueries()).toEqual(
+			expect.arrayContaining([
+				"Output set 1 — No item selected",
+				"guaranteed roll 1 — No item selected",
+				"Drop 1",
+			]),
+		);
 
 		await click(container, "Add output set");
 		expect(readOutput(container).set).toHaveLength(2);
-		expect(
-			[
-				...container.querySelectorAll("button"),
-			].some((button) => button.textContent === "Output set 2"),
-		).toBe(true);
+		expect(container.querySelector("input")?.value).toContain("Output set 2");
 
-		await click(container, "Output set 1");
+		const outputSets = container.querySelector<HTMLInputElement>('input[type="search"]');
+		if (outputSets === null) throw new Error("Expected output set selector.");
+		const valueSetter = Object.getOwnPropertyDescriptor(
+			HTMLInputElement.prototype,
+			"value",
+		)?.set;
+		if (valueSetter === undefined) throw new Error("Expected native input value setter.");
+		await act(async () => {
+			valueSetter.call(outputSets, "Output set 1");
+			outputSets.dispatchEvent(
+				new Event("input", {
+					bubbles: true,
+				}),
+			);
+		});
+		await act(async () => {
+			outputSets.dispatchEvent(
+				new KeyboardEvent("keydown", {
+					key: "Enter",
+					bubbles: true,
+				}),
+			);
+		});
 		await click(container, "Add roll");
 		expect(readOutput(container).set[0].roll).toHaveLength(2);
-		expect(container.textContent).toContain("Roll 2");
+		expect(readCollectionQueries()).toContain("guaranteed roll 2 — No item selected");
 
 		await click(container, "Weighted");
-		expect(container.textContent).toContain("Candidate 1");
-		expect(container.textContent).toContain("Candidate 2");
+		expect(readCollectionQueries()).toContain("Candidate 1");
 		await click(container, "Add weighted candidate");
 		expect(readOutput(container).set[0].roll[1]).toMatchObject({
 			type: "weight",
@@ -96,5 +127,14 @@ describe("EditorOutputControl", () => {
 				{},
 			],
 		});
+	});
+
+	it("removes the optional output when its final item drop is removed", async () => {
+		const container = await mount();
+
+		await click(container, "Remove drop");
+
+		expect(container.querySelector("output")?.textContent).toBe("null");
+		expect(container.querySelector('[data-ui="EditorCollectionSelector"]')).toBeNull();
 	});
 });

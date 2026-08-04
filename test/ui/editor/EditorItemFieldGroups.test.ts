@@ -14,6 +14,10 @@ vi.mock("~/ui/item/editor/EditorSelectorControl", () => ({
 	EditorSelectorControl: () => createElement("span", null, "Selector"),
 }));
 
+vi.mock("~/ui/item/editor/useEditorItemOptionLabel", () => ({
+	useEditorItemOptionLabel: () => (itemId: string, fallback: string) => itemId || fallback,
+}));
+
 import { useAppForm } from "~/ui/form/EditorForm";
 import type { EditorLine, EditorMerge } from "~/bridge/item/editor/EditorItemModel";
 import { EditorItemArtworkFields } from "~/ui/item/editor/EditorItemArtworkFields";

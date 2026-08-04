@@ -27,112 +27,116 @@ const EditorWhenControl = ({
 	readonly onChange: (when: EditorWhen) => void;
 	readonly value: EditorWhen;
 }) => (
-	<div className="grid gap-3">
-		<EditorChoiceControl
-			label="Condition type"
-			value={value.type}
-			options={[
-				{
-					label: "Exists",
-					value: "exists",
-				},
-				{
-					label: "Exact count",
-					value: "count",
-				},
-				{
-					label: "Count range",
-					value: "range",
-				},
-			]}
-			onChange={(type) =>
-				onChange(
-					type === "exists"
-						? {
-								type,
-								query: value.query,
-							}
-						: type === "count"
+	<div className="grid grid-cols-2 gap-[var(--ak-panel-padding)]">
+		<div className="grid min-w-0 content-start gap-3">
+			<EditorChoiceControl
+				label="Condition type"
+				value={value.type}
+				options={[
+					{
+						label: "Exists",
+						value: "exists",
+					},
+					{
+						label: "Exact count",
+						value: "count",
+					},
+					{
+						label: "Count range",
+						value: "range",
+					},
+				]}
+				onChange={(type) =>
+					onChange(
+						type === "exists"
 							? {
 									type,
 									query: value.query,
-									count: 1,
 								}
-							: {
-									type,
-									query: value.query,
-									min: 1,
-									max: 1,
-								},
+							: type === "count"
+								? {
+										type,
+										query: value.query,
+										count: 1,
+									}
+								: {
+										type,
+										query: value.query,
+										min: 1,
+										max: 1,
+									},
+					)
+				}
+			/>
+			<EditorQueryControl
+				value={value.query}
+				onChange={(query) =>
+					onChange({
+						...value,
+						query,
+					})
+				}
+			/>
+		</div>
+		<div className="grid min-w-0 content-start gap-3">
+			{match(value)
+				.with(
+					{
+						type: "exists",
+					},
+					() => null,
 				)
-			}
-		/>
-		<EditorQueryControl
-			value={value.query}
-			onChange={(query) =>
-				onChange({
-					...value,
-					query,
-				})
-			}
-		/>
-		{match(value)
-			.with(
-				{
-					type: "exists",
-				},
-				() => null,
-			)
-			.with(
-				{
-					type: "count",
-				},
-				(when) => (
-					<EditorNumberControl
-						label="Exact count"
-						value={when.count}
-						min={0}
-						onChange={(count) =>
-							onChange({
-								...when,
-								count,
-							})
-						}
-					/>
-				),
-			)
-			.with(
-				{
-					type: "range",
-				},
-				(when) => (
-					<div className="grid gap-3 sm:grid-cols-2">
+				.with(
+					{
+						type: "count",
+					},
+					(when) => (
 						<EditorNumberControl
-							label="Minimum count"
-							value={when.min}
+							label="Exact count"
+							value={when.count}
 							min={0}
-							onChange={(min) =>
+							onChange={(count) =>
 								onChange({
 									...when,
-									min,
+									count,
 								})
 							}
 						/>
-						<EditorNumberControl
-							label="Maximum count"
-							value={when.max}
-							min={when.min}
-							onChange={(max) =>
-								onChange({
-									...when,
-									max,
-								})
-							}
-						/>
-					</div>
-				),
-			)
-			.exhaustive()}
+					),
+				)
+				.with(
+					{
+						type: "range",
+					},
+					(when) => (
+						<div className="grid grid-cols-2 gap-3">
+							<EditorNumberControl
+								label="Minimum count"
+								value={when.min}
+								min={0}
+								onChange={(min) =>
+									onChange({
+										...when,
+										min,
+									})
+								}
+							/>
+							<EditorNumberControl
+								label="Maximum count"
+								value={when.max}
+								min={when.min}
+								onChange={(max) =>
+									onChange({
+										...when,
+										max,
+									})
+								}
+							/>
+						</div>
+					),
+				)
+				.exhaustive()}
+		</div>
 	</div>
 );
 
@@ -193,6 +197,29 @@ export const EditorRulesControl = ({
 					const rule = rules[ruleIndex];
 					return (
 						<article className="grid gap-3">
+							<EditorTextControl
+								label="Hint"
+								placeholder="Optional explanation shown while this rule applies"
+								value={rule.hint ?? ""}
+								onChange={(hint) =>
+									onChange(
+										rules.map((current, index) =>
+											index === ruleIndex
+												? {
+														...current,
+														...(hint.trim() === ""
+															? {
+																	hint: undefined,
+																}
+															: {
+																	hint,
+																}),
+													}
+												: current,
+										),
+									)
+								}
+							/>
 							<div className="flex items-end gap-3">
 								<div className="min-w-0 flex-1">
 									<EditorChoiceControl
@@ -223,29 +250,6 @@ export const EditorRulesControl = ({
 									/>
 								</div>
 							</div>
-							<EditorTextControl
-								label="Player hint"
-								placeholder="Optional explanation shown while this rule applies"
-								value={rule.hint ?? ""}
-								onChange={(hint) =>
-									onChange(
-										rules.map((current, index) =>
-											index === ruleIndex
-												? {
-														...current,
-														...(hint.trim() === ""
-															? {
-																	hint: undefined,
-																}
-															: {
-																	hint,
-																}),
-													}
-												: current,
-										),
-									)
-								}
-							/>
 							{rule.type !== "runtime:multiplier" ? null : (
 								<EditorNumberControl
 									label="Runtime multiplier"

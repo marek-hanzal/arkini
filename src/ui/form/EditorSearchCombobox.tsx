@@ -212,7 +212,7 @@ export const EditorSearchCombobox = ({
 					{query.length === 0 ? null : (
 						<button
 							type="button"
-							className="absolute inset-y-0 right-0 grid w-12 cursor-pointer place-items-center rounded-r-lg text-muted hover:bg-surface-raised hover:text-foreground"
+							className="absolute inset-y-0 right-0 grid w-12 cursor-pointer place-items-center rounded-r-lg border-y border-r border-transparent text-muted hover:border-line-strong hover:bg-surface-raised hover:text-foreground"
 							title="Clear search"
 							onMouseDown={(event) => event.preventDefault()}
 							onClick={() => {

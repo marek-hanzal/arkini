@@ -21,7 +21,7 @@ export const EditorFormSectionDivider = ({
 		<header
 			className={twMerge(
 				"flex min-w-0 items-center gap-3",
-				primary ? "py-1" : "py-0.5",
+				primary ? "my-[clamp(-1rem,-1.375cqmin,-0.25rem)] py-1" : "py-0.5",
 				className,
 			)}
 			data-ui="EditorFormSectionDivider"

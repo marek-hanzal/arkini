@@ -91,7 +91,7 @@ export const EditorItemDetail = ({
 									...params,
 									sectionId: editableSectionId,
 								}}
-								className="min-h-0 gap-2 px-4 py-2 text-sm"
+								className="min-h-9 gap-2 px-3 py-2 text-sm"
 							>
 								<span className="icon-[lucide--pencil] size-4" />
 								Edit

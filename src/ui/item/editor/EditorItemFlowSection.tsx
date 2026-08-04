@@ -298,6 +298,10 @@ export const EditorOriginFlowSection = ({ itemId, mode }: EditorOriginFlowSectio
 						id: node.id,
 						initialHeight: 76,
 						initialWidth: 224,
+						origin: [
+							0,
+							0.5,
+						],
 						position,
 						type: "item" as const,
 					};
@@ -311,6 +315,10 @@ export const EditorOriginFlowSection = ({ itemId, mode }: EditorOriginFlowSectio
 					id: node.id,
 					initialHeight: 96,
 					initialWidth: 256,
+					origin: [
+						0,
+						0.5,
+					],
 					position,
 					type: "source" as const,
 				};

@@ -7,6 +7,7 @@ import { EditorSectionNavigation } from "~/ui/editor/EditorSectionNavigation";
 import { EditorSectionPage } from "~/ui/editor/EditorSectionPage";
 import { EditorSectionTabs } from "~/ui/editor/EditorSectionTabs";
 import { EditorRootCard } from "~/ui/editor/EditorRootCard";
+import { useEditorEditShortcut } from "~/ui/editor/useEditorEditShortcut";
 import { EditorItemNotFound } from "~/ui/item/editor/EditorItemNotFound";
 import { EditorItemSectionLink } from "~/ui/item/editor/EditorItemSectionLink";
 import {
@@ -25,6 +26,7 @@ export const EditorItemDetail = ({
 	readonly uid: string;
 }>) => {
 	const project = useEditorProject();
+	const editActionRef = useEditorEditShortcut();
 	const item = useEditorItemByUid(uid);
 	if (item === undefined) return <EditorItemNotFound uid={uid} />;
 	const params = {
@@ -71,6 +73,7 @@ export const EditorItemDetail = ({
 					}
 					action={
 						<PrimaryButtonLink
+							ref={editActionRef}
 							to="/editor/$projectId/editor/items/$itemUid/form/$sectionId"
 							params={{
 								...params,

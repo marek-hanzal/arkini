@@ -7,6 +7,7 @@ import { EditorSectionPage } from "~/ui/editor/EditorSectionPage";
 import { EditorSectionTabs } from "~/ui/editor/EditorSectionTabs";
 import { EditorRootCard } from "~/ui/editor/EditorRootCard";
 import { editorBackLinkClassName, EditorBackIcon } from "~/ui/editor/EditorBackIcon";
+import { useEditorEditShortcut } from "~/ui/editor/useEditorEditShortcut";
 import { EditorAssetDetailTab } from "~/ui/resource/editor/EditorAssetDetailTab";
 import { useEditorAssetById } from "~/ui/resource/editor/useEditorAssetById";
 import { Status } from "~/ui/status/Status";
@@ -22,6 +23,7 @@ export const EditorAssetDetail = ({
 	readonly resourceId: string;
 }>) => {
 	const project = useEditorProject();
+	const editActionRef = useEditorEditShortcut();
 	const resource = useEditorAssetById(resourceId);
 	if (resource === undefined) {
 		return (
@@ -90,6 +92,7 @@ export const EditorAssetDetail = ({
 					}
 					action={
 						<PrimaryButtonLink
+							ref={editActionRef}
 							to="/editor/$projectId/assets/$resourceId/edit"
 							params={{
 								projectId: project.projectId,

@@ -4,6 +4,9 @@ import { twMerge } from "tailwind-merge";
 import { Button } from "~/ui/button/Button";
 import { EditorSearchCombobox } from "~/ui/form/EditorSearchCombobox";
 
+const collectionActionClassName =
+	"size-[var(--ak-control-min-height)] shrink-0 border-0 bg-transparent p-0 shadow-none hover:border-transparent hover:bg-surface-raised active:bg-surface-raised";
+
 export interface EditorCollectionSelectorProps {
 	readonly addLabel?: string;
 	readonly children: (activeIndex: number, selectIndex: (index: number) => void) => ReactNode;
@@ -67,7 +70,7 @@ export const EditorCollectionSelector = ({
 				<div className="flex shrink-0 items-center gap-2">
 					{onAdd === undefined ? null : (
 						<Button
-							className="size-[var(--ak-control-min-height)] shrink-0 p-0"
+							className={collectionActionClassName}
 							title={addLabel}
 							onClick={() => {
 								onAdd();
@@ -79,7 +82,7 @@ export const EditorCollectionSelector = ({
 					)}
 					{onRemove === undefined || activeIndex === undefined ? null : (
 						<Button
-							className="size-[var(--ak-control-min-height)] shrink-0 p-0"
+							className={collectionActionClassName}
 							title={removeLabel}
 							onClick={() => {
 								onRemove(activeIndex);

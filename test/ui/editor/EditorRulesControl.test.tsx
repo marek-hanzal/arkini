@@ -82,7 +82,7 @@ describe("EditorRulesControl", () => {
 
 		const field = [
 			...container.querySelectorAll("label"),
-		].find((label) => label.textContent?.includes("Player hint"));
+		].find((label) => label.textContent?.includes("Hint"));
 		const input = field?.querySelector("input");
 		if (input === undefined || input === null) throw new Error("Expected hint input.");
 		const valueSetter = Object.getOwnPropertyDescriptor(

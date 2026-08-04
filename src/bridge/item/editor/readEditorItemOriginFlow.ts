@@ -282,107 +282,96 @@ const reportProgress = (
 		phase,
 	});
 
-interface DirectOriginPath {
+interface OriginSubgraph {
 	readonly cycleItemIds: ReadonlySet<string>;
-	/** Target first, starter root last. */
-	readonly itemIds: ReadonlyArray<string>;
-	/** Source at index N produces item N and is owned by item N + 1. */
+	readonly edges: ReadonlyArray<EditorItemOriginEdge>;
+	readonly itemDepths: ReadonlyMap<string, number>;
 	readonly sources: ReadonlyArray<OutputSource>;
 }
 
-interface PendingOriginPath {
-	readonly itemIds: ReadonlyArray<string>;
-	readonly sources: ReadonlyArray<OutputSource>;
-}
-
-/**
- * Chooses one readable provenance chain instead of exposing the complete dependency graph.
- *
- * A source's first requirement is its owner. Other requirements still participate in the
- * reachability result, but belong in source detail rather than this origin overview.
- */
-const readDirectOriginPath = (
+/** Collects every upstream acquisition branch while keeping operation nodes explicit. */
+const readOriginSubgraph = (
 	targetItemId: string,
 	starters: ReadonlyMap<string, ReadonlySet<string>>,
 	sourcesByOutput: ReadonlyMap<string, ReadonlyArray<OutputSource>>,
-	reachableSources: ReadonlySet<string>,
-): DirectOriginPath => {
-	const pending: PendingOriginPath[] = [
-		{
-			itemIds: [
-				targetItemId,
-			],
-			sources: [],
-		},
+): OriginSubgraph => {
+	const pending = [
+		targetItemId,
 	];
-	const shortestDepth = new Map([
+	const itemDepths = new Map([
 		[
 			targetItemId,
 			0,
 		],
 	]);
-	let bestPartial = pending[0]!;
-	let cycleFallback:
-		| {
-				readonly itemIds: ReadonlyArray<string>;
-				readonly sources: ReadonlyArray<OutputSource>;
-				readonly cycleItemIds: ReadonlySet<string>;
-		  }
-		| undefined;
+	const visitedItems = new Set<string>();
+	const includedSources = new Map<string, OutputSource>();
+	const edges = new Map<string, EditorItemOriginEdge>();
+	const upstream = new Map<string, Set<string>>();
 
 	while (pending.length > 0) {
-		const path = pending.shift();
-		if (path === undefined) break;
-		if (path.itemIds.length > bestPartial.itemIds.length) bestPartial = path;
-		const itemId = path.itemIds.at(-1)!;
-		if (starters.has(itemId)) {
-			return {
-				...path,
-				cycleItemIds: new Set(),
+		const itemId = pending.shift();
+		if (itemId === undefined || visitedItems.has(itemId)) continue;
+		visitedItems.add(itemId);
+		if (itemId !== targetItemId && starters.has(itemId)) continue;
+		const itemDepth = itemDepths.get(itemId) ?? 0;
+		for (const source of sourcesByOutput.get(itemId) ?? []) {
+			includedSources.set(source.id, source);
+			const outputEdge: EditorItemOriginEdge = {
+				id: `${source.id}->item:${itemId}`,
+				source: source.id,
+				target: `item:${itemId}`,
 			};
-		}
-
-		const candidates = [
-			...(sourcesByOutput.get(itemId) ?? []),
-		].sort(
-			(left, right) =>
-				Number(reachableSources.has(right.id)) - Number(reachableSources.has(left.id)),
-		);
-		for (const source of candidates) {
-			const ownerItemId = source.requirementItemIds[0];
-			if (ownerItemId === undefined) continue;
-			const cycleStart = path.itemIds.indexOf(ownerItemId);
-			if (cycleStart >= 0) {
-				cycleFallback ??= {
-					...path,
-					cycleItemIds: new Set(path.itemIds.slice(cycleStart)),
+			edges.set(outputEdge.id, outputEdge);
+			for (const requirementItemId of unique(source.requirementItemIds)) {
+				const requirementEdge: EditorItemOriginEdge = {
+					id: `item:${requirementItemId}->${source.id}`,
+					source: `item:${requirementItemId}`,
+					target: source.id,
 				};
-				continue;
+				edges.set(requirementEdge.id, requirementEdge);
+				const dependencies = upstream.get(itemId) ?? new Set();
+				dependencies.add(requirementItemId);
+				upstream.set(itemId, dependencies);
+				itemDepths.set(
+					requirementItemId,
+					Math.max(itemDepths.get(requirementItemId) ?? 0, itemDepth + 2),
+				);
+				if (!visitedItems.has(requirementItemId)) pending.push(requirementItemId);
 			}
-			const nextDepth = path.sources.length + 1;
-			if ((shortestDepth.get(ownerItemId) ?? Number.POSITIVE_INFINITY) < nextDepth) {
-				continue;
-			}
-			shortestDepth.set(ownerItemId, nextDepth);
-			pending.push({
-				itemIds: [
-					...path.itemIds,
-					ownerItemId,
-				],
-				sources: [
-					...path.sources,
-					source,
-				],
-			});
 		}
 	}
 
-	return (
-		cycleFallback ?? {
-			...bestPartial,
-			cycleItemIds: new Set(),
+	const cycleItemIds = new Set<string>();
+	const visited = new Set<string>();
+	const active = new Set<string>();
+	const stack: string[] = [];
+	const visit = (itemId: string) => {
+		if (active.has(itemId)) {
+			const cycleStart = stack.lastIndexOf(itemId);
+			for (const cycleItemId of stack.slice(cycleStart)) cycleItemIds.add(cycleItemId);
+			return;
 		}
-	);
+		if (visited.has(itemId)) return;
+		visited.add(itemId);
+		active.add(itemId);
+		stack.push(itemId);
+		for (const dependency of upstream.get(itemId) ?? []) visit(dependency);
+		stack.pop();
+		active.delete(itemId);
+	};
+	visit(targetItemId);
+
+	return {
+		cycleItemIds,
+		edges: [
+			...edges.values(),
+		],
+		itemDepths,
+		sources: [
+			...includedSources.values(),
+		],
+	};
 };
 
 /**
@@ -504,20 +493,15 @@ export const readEditorItemOriginFlowFx = Effect.fn("readEditorItemOriginFlowFx"
 			await yieldToRenderer(signal);
 
 			reportProgress(onProgress, "tracing", 80);
-			const directPath =
+			const originSubgraph =
 				targetItemId === undefined
 					? undefined
-					: readDirectOriginPath(
-							targetItemId,
-							starters,
-							sourcesByOutput,
-							reachableSources,
-						);
+					: readOriginSubgraph(targetItemId, starters, sourcesByOutput);
 			reportProgress(onProgress, "finalizing", 92);
 			await yieldToRenderer(signal);
 
 			const flow: EditorItemOriginFlow =
-				directPath === undefined
+				originSubgraph === undefined
 					? {
 							edges: sources.flatMap((source) => [
 								...unique(source.requirementItemIds).map((requirementItemId) => ({
@@ -544,37 +528,22 @@ export const readEditorItemOriginFlowFx = Effect.fn("readEditorItemOriginFlowFx"
 							obtainable: undefined,
 						}
 					: {
-							edges: directPath.sources.flatMap((source, index) => {
-								const outputItemId = directPath.itemIds[index];
-								const ownerItemId = directPath.itemIds[index + 1];
-								if (outputItemId === undefined || ownerItemId === undefined)
-									return [];
-								return [
-									{
-										id: `${source.id}->item:${outputItemId}`,
-										source: source.id,
-										target: `item:${outputItemId}`,
-									},
-									{
-										id: `item:${ownerItemId}->${source.id}`,
-										source: `item:${ownerItemId}`,
-										target: source.id,
-									},
-								];
-							}),
+							edges: originSubgraph.edges,
 							nodes: [
-								...directPath.itemIds.map((itemId, index) =>
+								...[
+									...originSubgraph.itemDepths.entries(),
+								].map(([itemId, depth]) =>
 									readItemNode(
 										itemId,
-										index * 2,
+										depth,
 										items,
 										starters,
 										reachableItems,
-										directPath.cycleItemIds,
+										originSubgraph.cycleItemIds,
 									),
 								),
-								...directPath.sources.map((source, index) =>
-									readSourceNode(source, index * 2 + 1, reachableSources),
+								...originSubgraph.sources.map((source) =>
+									readSourceNode(source, 1, reachableSources),
 								),
 							],
 							obtainable:
@@ -609,10 +578,10 @@ const readItemNode = (
 		],
 		status: starters.has(itemId)
 			? "starter"
-			: reachableItems.has(itemId)
-				? "reachable"
-				: cycleItemIds.has(itemId)
-					? "cycle"
+			: cycleItemIds.has(itemId)
+				? "cycle"
+				: reachableItems.has(itemId)
+					? "reachable"
 					: "blocked",
 		title: item?.title || itemId,
 		type: item?.type ?? "missing",

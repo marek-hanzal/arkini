@@ -15,13 +15,13 @@ import { useMemo } from "react";
 
 import { useEditorProject } from "~/bridge/editor/useEditorProject";
 import {
-	type EditorItemOriginFlow,
 	type EditorItemOriginItemNode,
 	type EditorItemOriginNodeStatus,
 	type EditorItemOriginSourceNode,
 } from "~/bridge/item/editor/readEditorItemOriginFlow";
 import { ItemTypeLabel } from "~/ui/item-detail/ItemInfoPresentation";
 import { EditorItemThumbnail } from "~/ui/item/editor/EditorItemThumbnail";
+import { layoutEditorItemOriginFlow } from "~/ui/item/editor/layoutEditorItemOriginFlow";
 import { useEditorItemOriginFlow } from "~/ui/item/editor/useEditorItemOriginFlow";
 import { Tooltip } from "~/ui/overlay/Tooltip";
 
@@ -61,12 +61,12 @@ const FlowHandles = () => (
 	<>
 		<Handle
 			className="opacity-0"
-			position={Position.Right}
+			position={Position.Left}
 			type="target"
 		/>
 		<Handle
 			className="opacity-0"
-			position={Position.Left}
+			position={Position.Right}
 			type="source"
 		/>
 	</>
@@ -214,39 +214,7 @@ interface EditorOriginFlowSectionProps {
 	readonly mode: "all" | "item";
 }
 
-const readGlobalDepths = (flow: EditorItemOriginFlow) => {
-	const depths = new Map<string, number>();
-	const pending = flow.nodes
-		.filter((node) => node.kind === "item" && node.starterScopes.length > 0)
-		.map((node) => node.id);
-	for (const id of pending) depths.set(id, 0);
-	const outgoing = new Map<string, string[]>();
-	for (const edge of flow.edges) {
-		outgoing.set(edge.source, [
-			...(outgoing.get(edge.source) ?? []),
-			edge.target,
-		]);
-	}
-	while (pending.length > 0) {
-		const source = pending.shift();
-		if (source === undefined) break;
-		const nextDepth = (depths.get(source) ?? 0) + 1;
-		for (const target of outgoing.get(source) ?? []) {
-			if (depths.has(target)) continue;
-			depths.set(target, nextDepth);
-			pending.push(target);
-		}
-	}
-	const maxDepth = Math.max(0, ...depths.values());
-	return new Map(
-		flow.nodes.map((node) => [
-			node.id,
-			maxDepth - (depths.get(node.id) ?? maxDepth),
-		]),
-	);
-};
-
-/** Visualizes either the complete game graph or one direct provenance path to a starter root. */
+/** Visualizes either the complete game graph or every provenance path to starter roots. */
 export const EditorOriginFlowSection = ({ itemId, mode }: EditorOriginFlowSectionProps) => {
 	const navigate = useNavigate();
 	const project = useEditorProject();
@@ -266,67 +234,55 @@ export const EditorOriginFlowSection = ({ itemId, mode }: EditorOriginFlowSectio
 	);
 	const nodes = useMemo<FlowNode[]>(() => {
 		if (flow === undefined) return [];
-		const globalDepths = mode === "all" ? readGlobalDepths(flow) : undefined;
-		const layers = new Map<number, typeof flow.nodes>();
-		for (const node of flow.nodes) {
-			const depth = globalDepths?.get(node.id) ?? node.depth;
-			const layer = layers.get(depth) ?? [];
-			layers.set(depth, [
-				...layer,
-				node,
-			]);
-		}
-		return [
-			...layers.entries(),
-		].flatMap(([depth, layer]) =>
-			layer.map((node, index) => {
-				const position = {
-					x: depth * 330,
-					y: (index - (layer.length - 1) / 2) * 150,
-				};
-				if (node.kind === "item") {
-					return {
-						data: {
-							itemId: node.itemId,
-							resourceIds: node.resourceIds,
-							starterScopes: node.starterScopes,
-							status: node.status,
-							title: node.title,
-							typeLabel:
-								node.type === "missing" ? "Missing item" : ItemTypeLabel[node.type],
-						},
-						id: node.id,
-						initialHeight: 76,
-						initialWidth: 224,
-						origin: [
-							0,
-							0.5,
-						],
-						position,
-						type: "item" as const,
-					};
-				}
+		const positions = layoutEditorItemOriginFlow(flow);
+		return flow.nodes.map((node) => {
+			const layoutNode = positions.get(node.id);
+			if (layoutNode === undefined) throw new Error(`Missing layout for ${node.id}.`);
+			const position = {
+				x: layoutNode.x,
+				y: layoutNode.y,
+			};
+			if (node.kind === "item") {
 				return {
 					data: {
-						label: node.label,
-						originBadges: readOriginBadges(node),
+						itemId: node.itemId,
+						resourceIds: node.resourceIds,
+						starterScopes: node.starterScopes,
 						status: node.status,
+						title: node.title,
+						typeLabel:
+							node.type === "missing" ? "Missing item" : ItemTypeLabel[node.type],
 					},
 					id: node.id,
-					initialHeight: 96,
-					initialWidth: 256,
+					initialHeight: layoutNode.height,
+					initialWidth: layoutNode.width,
 					origin: [
 						0,
-						0.5,
+						0,
 					],
 					position,
-					type: "source" as const,
+					type: "item" as const,
 				};
-			}),
-		);
+			}
+			return {
+				data: {
+					label: node.label,
+					originBadges: readOriginBadges(node),
+					status: node.status,
+				},
+				id: node.id,
+				initialHeight: layoutNode.height,
+				initialWidth: layoutNode.width,
+				origin: [
+					0,
+					0,
+				],
+				position,
+				type: "source" as const,
+			};
+		});
 	}, [
 		flow,
-		mode,
 	]);
 	const edges = useMemo<Edge[]>(
 		() =>
@@ -339,7 +295,7 @@ export const EditorOriginFlowSection = ({ itemId, mode }: EditorOriginFlowSectio
 					stroke: "#8b5a9f",
 					strokeWidth: 2,
 				},
-				type: "straight",
+				type: "smoothstep",
 			})),
 		[
 			flow,
@@ -358,8 +314,8 @@ export const EditorOriginFlowSection = ({ itemId, mode }: EditorOriginFlowSectio
 					</h2>
 					<p className="text-sm text-muted">
 						{mode === "all"
-							? "Shows every item source and dependency in the current project."
-							: "Shows one direct origin path back to a starter board, inventory or toolbar item."}
+							? "Shows every item and the operations that connect its inputs to outputs."
+							: "Shows every acquisition path back to starter board, inventory or toolbar items."}
 					</p>
 				</div>
 				<span
@@ -386,12 +342,12 @@ export const EditorOriginFlowSection = ({ itemId, mode }: EditorOriginFlowSectio
 				<div className="relative min-h-0">
 					<ReactFlow<FlowNode, Edge>
 						defaultViewport={{
-							x: 64,
-							y: 260,
-							zoom: 0.85,
+							x: 24,
+							y: 24,
+							zoom: 0.75,
 						}}
 						edges={edges}
-						fitView={mode === "all"}
+						fitView={mode === "item"}
 						fitViewOptions={{
 							padding: 0.12,
 						}}

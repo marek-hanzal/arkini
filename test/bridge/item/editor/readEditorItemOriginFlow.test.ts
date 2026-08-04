@@ -138,7 +138,7 @@ describe("readEditorItemOriginFlow", () => {
 		);
 	});
 
-	it("shows one direct provenance path without material-input branches", async () => {
+	it("shows every provenance branch back to starter items", async () => {
 		const progress: EditorItemOriginFlowProgress[] = [];
 		const flow = await Effect.runPromise(
 			readEditorItemOriginFlowFx({
@@ -149,15 +149,14 @@ describe("readEditorItemOriginFlow", () => {
 		);
 
 		expect(flow.obtainable).toBe(true);
-		expect(flow.nodes.filter(({ kind }) => kind === "item").map(({ id }) => id)).toEqual([
-			"item:ingot",
-			"item:forge",
-		]);
-		expect(flow.nodes).not.toEqual(
-			expect.arrayContaining([
-				expect.objectContaining({
-					id: "item:tool",
-				}),
+		expect(
+			new Set(flow.nodes.filter(({ kind }) => kind === "item").map(({ id }) => id)),
+		).toEqual(
+			new Set([
+				"item:ingot",
+				"item:forge",
+				"item:water",
+				"item:tool",
 			]),
 		);
 		expect(flow.nodes.filter(({ kind }) => kind === "source")).toEqual([
@@ -183,9 +182,23 @@ describe("readEditorItemOriginFlow", () => {
 					id: "item:ingot",
 					status: "reachable",
 				}),
+				expect.objectContaining({
+					id: "item:water",
+					starterScopes: [
+						"Inventory",
+					],
+					status: "starter",
+				}),
+				expect.objectContaining({
+					id: "item:tool",
+					starterScopes: [
+						"Inventory",
+					],
+					status: "starter",
+				}),
 			]),
 		);
-		expect(flow.edges).toHaveLength(2);
+		expect(flow.edges).toHaveLength(4);
 		expect(progress[0]).toMatchObject({
 			percent: 0,
 			phase: "indexing",
@@ -199,6 +212,66 @@ describe("readEditorItemOriginFlow", () => {
 				(update, index) => index === 0 || update.percent >= progress[index - 1]!.percent,
 			),
 		).toBe(true);
+	});
+
+	it("keeps every producer path that can generate the target item", async () => {
+		const base = createReachabilityConfig(true);
+		const forge = base.items.forge;
+		if (forge.type !== "producer") throw new Error("Expected producer fixture.");
+		const config = GameConfigSchema.parse({
+			...base,
+			start: {
+				...base.start,
+				board: [
+					...base.start.board,
+					{
+						itemId: "kiln",
+						space: 0,
+						x: 1,
+						y: 0,
+					},
+				],
+			},
+			items: {
+				...base.items,
+				kiln: {
+					...forge,
+					uid: "kiln",
+					id: "kiln",
+					title: "Kiln",
+					lines: forge.lines.map((line) => ({
+						...line,
+						id: `kiln:${line.id}`,
+						output: outputOf("ingot"),
+					})),
+				},
+			},
+		});
+
+		const flow = await Effect.runPromise(
+			readEditorItemOriginFlowFx({
+				config,
+				targetItemId: "ingot",
+			}),
+		);
+		const sourceNodes = flow.nodes.filter(({ kind }) => kind === "source");
+		const sourceIds = new Set(sourceNodes.map(({ id }) => id));
+
+		expect(sourceNodes).toHaveLength(2);
+		expect([
+			...sourceIds,
+		]).toEqual(
+			expect.arrayContaining([
+				expect.stringContaining("source:forge:line:"),
+				expect.stringContaining("source:kiln:line:"),
+			]),
+		);
+		expect(
+			flow.edges.filter(
+				({ source, target }) => sourceIds.has(source) && target === "item:ingot",
+			),
+		).toHaveLength(2);
+		expect(flow.obtainable).toBe(true);
 	});
 
 	it("keeps chance, random placement and depletion semantics on the exact source", async () => {
@@ -287,7 +360,7 @@ describe("readEditorItemOriginFlow", () => {
 		);
 	});
 
-	it("marks the direct source blocked without drawing its missing input branch", async () => {
+	it("marks missing upstream requirements blocked", async () => {
 		const flow = await Effect.runPromise(
 			readEditorItemOriginFlowFx({
 				config: createReachabilityConfig(false),
@@ -296,14 +369,24 @@ describe("readEditorItemOriginFlow", () => {
 		);
 
 		expect(flow.obtainable).toBe(false);
-		expect(flow.nodes.filter(({ kind }) => kind === "item").map(({ id }) => id)).toEqual([
-			"item:ingot",
-			"item:forge",
-		]);
+		expect(
+			new Set(flow.nodes.filter(({ kind }) => kind === "item").map(({ id }) => id)),
+		).toEqual(
+			new Set([
+				"item:ingot",
+				"item:forge",
+				"item:water",
+				"item:tool",
+			]),
+		);
 		expect(flow.nodes).toEqual(
 			expect.arrayContaining([
 				expect.objectContaining({
 					id: "item:ingot",
+					status: "blocked",
+				}),
+				expect.objectContaining({
+					id: "item:tool",
 					status: "blocked",
 				}),
 				expect.objectContaining({
@@ -312,6 +395,7 @@ describe("readEditorItemOriginFlow", () => {
 				}),
 			]),
 		);
+		expect(flow.edges).toHaveLength(4);
 	});
 
 	it("terminates cyclic acquisition paths and exposes the cycle", async () => {

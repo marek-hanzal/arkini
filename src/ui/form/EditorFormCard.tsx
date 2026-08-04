@@ -2,7 +2,7 @@ import type { PropsWithChildren } from "react";
 
 import { EditorRootCard } from "~/ui/editor/EditorRootCard";
 
-/** Provides the single root surface shared by every editor form. */
+/** Provides a consistent root-object surface shared by editor forms. */
 export const EditorFormCard = ({
 	children,
 	className,

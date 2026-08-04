@@ -158,6 +158,8 @@ describe("editor item field groups", () => {
 		const container = await mount(createElement(ProductionHarness));
 		expect(container.textContent).toContain("Production lines are disabled");
 		await click(container, "Enable production lines");
+		expect(container.querySelectorAll('[data-ui="EditorFormCard"]')).toHaveLength(5);
+		expect(container.querySelectorAll('[data-ui="EditorFormSeparator"]')).toHaveLength(1);
 		await click(container, "Add line");
 
 		const values = JSON.parse(container.querySelector("output")?.textContent ?? "null") as {

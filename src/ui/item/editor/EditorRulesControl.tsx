@@ -5,6 +5,7 @@ import type {
 	EditorLineRule,
 	EditorWhen,
 } from "~/bridge/item/editor/EditorItemModel";
+import { twMerge } from "tailwind-merge";
 import { EditorCollectionSelector } from "~/ui/form/EditorCollectionSelector";
 import { EditorInfoTooltip } from "~/ui/form/EditorInfoTooltip";
 import { EditorItemDraftDefaults } from "~/ui/item/editor/EditorItemDraftDefaults";
@@ -133,11 +134,13 @@ const EditorWhenControl = ({
 /** Edits the shared conditional core used by both line and selected-drop rules. */
 export const EditorRulesControl = ({
 	allowedTypes,
+	className,
 	description,
 	onChange,
 	rules,
 }: {
 	readonly allowedTypes: ReadonlyArray<EditorRuleType>;
+	readonly className?: string;
 	readonly description: string;
 	readonly onChange: (rules: EditorRule[]) => void;
 	readonly rules: ReadonlyArray<EditorRule>;
@@ -159,7 +162,7 @@ export const EditorRulesControl = ({
 					: {}),
 		}) as EditorLineRule;
 	return (
-		<section className="grid gap-3 border-t border-line pt-4">
+		<section className={twMerge("grid gap-3 border-t border-line pt-4", className)}>
 			<header>
 				<div className="flex items-center gap-1">
 					<h4 className="text-sm font-semibold">Rules</h4>

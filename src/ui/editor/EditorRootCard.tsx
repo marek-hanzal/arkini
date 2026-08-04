@@ -1,7 +1,7 @@
 import type { PropsWithChildren } from "react";
 import { twMerge } from "tailwind-merge";
 
-/** Provides the one root content surface shared by editor forms and details. */
+/** Provides the root-object content surface shared by editor forms and details. */
 export const EditorRootCard = ({
 	children,
 	className,

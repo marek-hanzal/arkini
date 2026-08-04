@@ -88,18 +88,11 @@ export const EditorItemProductionSection = () => {
 				type: "stash",
 			},
 			() => (
-				<EditorFormCard>
-					<EditorFormSection
-						title="Product line"
-						description="Inputs, outputs and base behavior owned by this item."
-					>
-						<EditorLineFields
-							form={form}
-							fields="line"
-							label="Product line"
-						/>
-					</EditorFormSection>
-				</EditorFormCard>
+				<EditorLineFields
+					form={form}
+					fields="line"
+					label="Product line"
+				/>
 			),
 		)
 		.with(

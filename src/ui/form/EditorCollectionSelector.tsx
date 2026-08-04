@@ -2,6 +2,7 @@ import { useState, type ReactNode } from "react";
 import { twMerge } from "tailwind-merge";
 
 import { Button } from "~/ui/button/Button";
+import { EditorFormCard } from "~/ui/form/EditorFormCard";
 import { EditorSearchCombobox } from "~/ui/form/EditorSearchCombobox";
 
 const collectionActionClassName =
@@ -15,6 +16,8 @@ export interface EditorCollectionSelectorProps {
 	readonly dataUi?: string;
 	readonly itemLabel: (index: number) => string;
 	readonly label: string;
+	readonly navigationCard?: boolean;
+	readonly navigationHeader?: ReactNode;
 	readonly onAdd?: () => void;
 	readonly onRemove?: (activeIndex: number) => void;
 	readonly removeLabel?: string;
@@ -29,17 +32,17 @@ export const EditorCollectionSelector = ({
 	dataUi = "EditorCollectionSelector",
 	itemLabel,
 	label,
+	navigationCard = false,
+	navigationHeader,
 	onAdd,
 	onRemove,
 	removeLabel = "Remove item",
 }: EditorCollectionSelectorProps) => {
 	const [requestedIndex, setRequestedIndex] = useState(0);
 	const activeIndex = count === 0 ? undefined : Math.min(requestedIndex, count - 1);
-	return (
-		<section
-			className={twMerge("grid min-w-0 gap-4", className)}
-			data-ui={dataUi}
-		>
+	const navigation = (
+		<>
+			{navigationHeader}
 			<nav className="flex min-w-0 items-center gap-2">
 				<div className="min-w-0 flex-1">
 					<EditorSearchCombobox
@@ -94,6 +97,14 @@ export const EditorCollectionSelector = ({
 					)}
 				</div>
 			</nav>
+		</>
+	);
+	return (
+		<section
+			className={twMerge("grid min-w-0 gap-4", className)}
+			data-ui={dataUi}
+		>
+			{navigationCard ? <EditorFormCard>{navigation}</EditorFormCard> : navigation}
 			{activeIndex === undefined ? null : (
 				<div key={activeIndex}>{children(activeIndex, setRequestedIndex)}</div>
 			)}

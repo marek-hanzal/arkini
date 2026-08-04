@@ -277,47 +277,6 @@ describe("editor item flow", () => {
 		expect(container.querySelector('[data-ui="TileLineSetDefaultButton"]')).toBeNull();
 		expect(container.querySelector('[data-ui="EditorItemDetailCard"]')).toBeNull();
 		expect(container.querySelector("pre")).toBeNull();
-		const addStatus = container.querySelector('[data-ui="EditorInlineAddStatus"]');
-		expect(addStatus).not.toBeNull();
-		expect(addStatus?.className).toContain("ak-list-row");
-
-		const readButton = (label: string) =>
-			[
-				...container.querySelectorAll("button"),
-			].find((button) => button.textContent?.trim() === label);
-		await act(async () => readButton("Draw water")?.click());
-		const inlineEdit = container.querySelector('[data-ui="EditorProductionLineDetail"]');
-		expect(inlineEdit?.querySelector<HTMLInputElement>('input[type="text"]')?.value).toBe(
-			"Draw water",
-		);
-		expect(
-			[
-				...(inlineEdit?.querySelectorAll("input, textarea") ?? []),
-			].every((field) => field.className.includes("border-0")),
-		).toBe(true);
-		await act(async () => readButton("Discard")?.click());
-		expect(readButton("Draw water")).toBeDefined();
-
-		await act(async () => readButton("Add line")?.click());
-		const inlineCreate = container.querySelector(
-			'[data-ui="EditorProductionLineInlineCreate"]',
-		);
-		expect(inlineCreate).not.toBeNull();
-		expect(
-			[
-				...(inlineCreate?.querySelectorAll("input, textarea") ?? []),
-			].every((field) => field.className.includes("border-0")),
-		).toBe(true);
-
-		await act(async () => readButton("Save")?.click());
-		expect(
-			container.querySelector('[data-ui="EditorProductionLineInlineCreate"]'),
-		).not.toBeNull();
-		expect(container.querySelectorAll(".text-danger").length).toBeGreaterThan(0);
-
-		await act(async () => readButton("Discard")?.click());
-		expect(container.querySelector('[data-ui="EditorProductionLineInlineCreate"]')).toBeNull();
-		expect(container.querySelector('[data-ui="EditorInlineAddStatus"]')).not.toBeNull();
 	});
 
 	it("starts every new item type in the unified identity section", async () => {

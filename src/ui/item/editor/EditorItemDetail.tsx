@@ -9,6 +9,7 @@ import { EditorSectionTabs } from "~/ui/editor/EditorSectionTabs";
 import { EditorRootCard } from "~/ui/editor/EditorRootCard";
 import { useEditorEditShortcut } from "~/ui/editor/useEditorEditShortcut";
 import { EditorItemNotFound } from "~/ui/item/editor/EditorItemNotFound";
+import { EditorItemConvertMenu } from "~/ui/item/editor/EditorItemConvertMenu";
 import { EditorItemSectionLink } from "~/ui/item/editor/EditorItemSectionLink";
 import {
 	readEditorItemSections,
@@ -65,18 +66,25 @@ export const EditorItemDetail = ({
 						</EditorSectionTabs>
 					}
 					action={
-						<PrimaryButtonLink
-							ref={editActionRef}
-							to="/editor/$projectId/editor/items/$itemUid/form/$sectionId"
-							params={{
-								...params,
-								sectionId,
-							}}
-							className="min-h-0 gap-2 px-4 py-2 text-sm"
-						>
-							<span className="icon-[lucide--pencil] size-4" />
-							Edit
-						</PrimaryButtonLink>
+						<div className="flex items-center gap-2">
+							<EditorItemConvertMenu
+								itemType={item.type}
+								itemUid={item.uid}
+								projectId={project.projectId}
+							/>
+							<PrimaryButtonLink
+								ref={editActionRef}
+								to="/editor/$projectId/editor/items/$itemUid/form/$sectionId"
+								params={{
+									...params,
+									sectionId,
+								}}
+								className="min-h-0 gap-2 px-4 py-2 text-sm"
+							>
+								<span className="icon-[lucide--pencil] size-4" />
+								Edit
+							</PrimaryButtonLink>
+						</div>
 					}
 				/>
 			}

@@ -6,6 +6,7 @@ import { installBuiltEditorArkpackCommandAtom } from "~/bridge/arkpack/editor/in
 import { readEditorBuildDiagnostics } from "~/bridge/arkpack/editor/readEditorBuildDiagnostics";
 import { saveBuiltEditorArkpackCommandAtom } from "~/bridge/arkpack/editor/saveBuiltEditorArkpackCommandAtom";
 import { useEditorProject } from "~/bridge/editor/useEditorProject";
+import { formatByteSize } from "~/ui/arkpack/editor/formatByteSize";
 import { Button, PrimaryButton } from "~/ui/button/Button";
 import { readSettledAsyncResultError } from "~/ui/reactivity/readSettledAsyncResultError";
 
@@ -105,7 +106,7 @@ export const EditorBuild = () => {
 				<article className="rounded-2xl border-l-2 border-line-strong bg-surface-raised/60 p-5">
 					<h2 className="text-lg font-semibold">Build output</h2>
 					<p className="mt-2 break-all text-sm text-muted">
-						{artifact.filename} · {artifact.bytes.byteLength} bytes ·{" "}
+						{artifact.filename} · {formatByteSize(artifact.bytes.byteLength)} ·{" "}
 						{artifact.contentHash}
 					</p>
 					<div className="mt-4 flex flex-wrap gap-3">
@@ -121,7 +122,7 @@ export const EditorBuild = () => {
 							cursorIntent={installResult.waiting ? "progress" : undefined}
 							onClick={() => install(artifact)}
 						>
-							{installResult.waiting ? "Installing…" : "Install to game catalog"}
+							{installResult.waiting ? "Installing…" : "Install"}
 						</PrimaryButton>
 					</div>
 					{saveError === undefined ? null : (

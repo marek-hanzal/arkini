@@ -4,6 +4,7 @@ import { useCallback, useMemo, type PropsWithChildren } from "react";
 import { useEditorProject } from "~/bridge/editor/useEditorProject";
 import type { EditorItem, EditorItemType } from "~/bridge/item/editor/EditorItemModel";
 import { useEditorItemDraft } from "~/bridge/item/editor/useEditorItemDraft";
+import { convertEditorItem } from "~/bridge/item/editor/convertEditorItem";
 import { ButtonLink } from "~/ui/button/Button";
 import { EditorSectionTabs } from "~/ui/editor/EditorSectionTabs";
 import { editorBackLinkClassName, EditorBackIcon } from "~/ui/editor/EditorBackIcon";
@@ -178,15 +179,20 @@ export const EditorItemForm = ({
 	const draft = useEditorItemDraft(itemType ?? persistedItem?.type ?? "simple", uid);
 	if (persistedItem === undefined && itemType === undefined)
 		return <EditorItemNotFound uid={uid} />;
-	const initialItem = persistedItem ?? draft;
+	const initialItem =
+		persistedItem === undefined
+			? draft
+			: itemType === undefined
+				? persistedItem
+				: convertEditorItem(persistedItem, itemType);
 	const isNew = persistedItem === undefined;
 	return (
 		<EditorItemFormSession
-			key={initialItem.uid}
+			key={`${initialItem.uid}:${initialItem.type}`}
 			enableCapability={enableCapability}
 			initialItem={initialItem}
 			isNew={isNew}
-			itemType={isNew ? itemType : undefined}
+			itemType={itemType}
 			sectionId={sectionId}
 		>
 			{children}

@@ -150,4 +150,16 @@ describe("EditorBuild", () => {
 		expect(container.textContent).not.toContain(`Installed as ${firstHash}`);
 		expect(container.textContent).not.toContain("Installed as");
 	});
+
+	it("uses concise output actions and a human-readable artifact size", async () => {
+		state.buildResult = AsyncResult.success(createArtifact("a".repeat(64), 0));
+		const { container } = await renderBuild();
+
+		expect(container.textContent).toContain("2 bytes");
+		expect(container.textContent).not.toContain("Install to game catalog");
+		expect(container.querySelector("button")?.textContent).not.toBe("Install");
+		expect(
+			Array.from(container.querySelectorAll("button"), (button) => button.textContent),
+		).toContain("Install");
+	});
 });

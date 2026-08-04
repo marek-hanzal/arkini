@@ -52,6 +52,8 @@ vi.mock("~/ui/button/Button", () => {
 			children as ReactNode,
 		);
 	return {
+		Button: ({ children, ...props }: Record<string, unknown>) =>
+			createElement("button", props, children as ReactNode),
 		ButtonLink: RenderLink,
 		PrimaryButtonLink: RenderLink,
 	};
@@ -138,6 +140,7 @@ describe("editor item flow", () => {
 		expect(container.textContent).not.toContain('"maxStackSize"');
 		expect(edit?.dataset.params).toContain(item.uid);
 		expect(edit?.dataset.params).toContain("identity");
+		expect(container.textContent).toContain("Convert");
 	});
 
 	it("passes both new and persisted items through one form page", async () => {

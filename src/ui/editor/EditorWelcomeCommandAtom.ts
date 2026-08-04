@@ -1,14 +1,21 @@
 import { Cause, Effect, Exit, Option } from "effect";
 import * as Atom from "effect/unstable/reactivity/Atom";
 
-import type { EditorProjectDescriptor } from "~/bridge/editor/EditorProjectDescriptor";
 import { importEditorArkpackFileAtom } from "~/bridge/arkpack/editor/importEditorArkpackFileAtom";
+import { createFreshEditorProjectAtom } from "~/bridge/editor/createFreshEditorProjectAtom";
+import type { EditorProjectDescriptor } from "~/bridge/editor/EditorProjectDescriptor";
 import { readExactCauseFailure } from "~/bridge/game/readExactCauseFailure";
 
 export namespace EditorWelcomeCommandAtom {
-	export type Action = "exit" | "import";
+	export type Action = "create" | "exit" | "import";
 
 	export type Command =
+		| {
+				readonly action: "create";
+				readonly navigateFx: (
+					project: EditorProjectDescriptor,
+				) => Effect.Effect<void, unknown>;
+		  }
 		| {
 				readonly action: "exit";
 				readonly navigateFx: Effect.Effect<void, unknown>;
@@ -45,9 +52,13 @@ const EditorWelcomeCommandRunnerAtom = Atom.fn(
 			const operation =
 				command.action === "exit"
 					? command.navigateFx
-					: get
-							.setResult(importEditorArkpackFileAtom, command.file)
-							.pipe(Effect.flatMap(command.navigateFx));
+					: command.action === "create"
+						? get
+								.setResult(createFreshEditorProjectAtom, undefined)
+								.pipe(Effect.flatMap(command.navigateFx))
+						: get
+								.setResult(importEditorArkpackFileAtom, command.file)
+								.pipe(Effect.flatMap(command.navigateFx));
 			const result = yield* Effect.exit(operation);
 			if (Exit.isFailure(result)) {
 				if (Cause.hasInterruptsOnly(result.cause)) {

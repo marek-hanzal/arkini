@@ -35,13 +35,18 @@ export const EditorWelcome = ({ recentProjects }: EditorWelcome.Props) => {
 					onFile={actions.importFile}
 				/>
 				<Button
-					disabled
-					cursorIntent="not-allowed"
+					disabled={actions.blocked}
+					cursorIntent={actions.active === "create" ? "progress" : undefined}
 					className="min-h-44 flex-col gap-3 rounded-2xl"
+					onClick={actions.createProject}
 				>
 					<span className="icon-[lucide--file-plus-2] size-9" />
-					<span className="text-lg">New arkpack</span>
-					<span className="text-xs font-medium opacity-75">Not available yet</span>
+					<span className="text-lg">
+						{actions.active === "create" ? "Creating…" : "New project"}
+					</span>
+					<span className="text-xs font-medium opacity-75">
+						Start with an empty project
+					</span>
 				</Button>
 			</section>
 

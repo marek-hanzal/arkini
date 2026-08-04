@@ -127,6 +127,7 @@ describe("EditorRulesControl", () => {
 		const input = field?.querySelector("input");
 		if (input === undefined || input === null) throw new Error("Expected adjustment input.");
 		expect(input.value).toBe("-1.5");
+		expect(field?.querySelector('[data-ui="EditorDurationHint"]')?.textContent).toBe("-1.5s");
 
 		const valueSetter = Object.getOwnPropertyDescriptor(
 			HTMLInputElement.prototype,
@@ -143,5 +144,6 @@ describe("EditorRulesControl", () => {
 		});
 
 		expect(container.querySelector("output")?.textContent).toContain('"adjustMs":2250');
+		expect(field?.querySelector('[data-ui="EditorDurationHint"]')?.textContent).toBe("2.25s");
 	});
 });

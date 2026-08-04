@@ -3,6 +3,7 @@ import type { PropsWithChildren } from "react";
 import { twMerge } from "tailwind-merge";
 
 import { EditorBooleanToggleBadge } from "~/ui/form/EditorBooleanToggleBadge";
+import { EditorDurationHint } from "~/ui/form/EditorDurationHint";
 import { EditorInfoTooltip } from "~/ui/form/EditorInfoTooltip";
 import { fieldContext, formContext, useFieldContext } from "~/ui/form/EditorFormContexts";
 import { editorInputClassName } from "~/ui/form/EditorInputClassName";
@@ -189,6 +190,7 @@ const EditorSecondsField = ({ description, label }: EditorSecondsFieldProps) => 
 					field.handleChange(Math.round(event.currentTarget.valueAsNumber * 1_000))
 				}
 			/>
+			<EditorDurationHint seconds={seconds} />
 		</EditorField>
 	);
 };

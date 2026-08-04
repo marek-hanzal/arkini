@@ -12,6 +12,35 @@ export const useEditorWelcomeActions = () => {
 	const [state, runCommand] = useAtom(EditorWelcomeCommandAtom);
 	const active = state.kind === "pending" ? state.action : null;
 	const blocked = active !== null;
+	const openProjectSettingsFx = useCallback(
+		(project: EditorProjectDescriptor) =>
+			Effect.tryPromise({
+				try: () =>
+					navigate({
+						to: "/editor/$projectId/project/$sectionId",
+						params: {
+							projectId: project.projectId,
+							sectionId: "general",
+						},
+					}),
+				catch: (cause) => cause,
+			}),
+		[
+			navigate,
+		],
+	);
+
+	const createProject = useCallback(() => {
+		if (blocked) return;
+		runCommand({
+			action: "create",
+			navigateFx: openProjectSettingsFx,
+		});
+	}, [
+		blocked,
+		openProjectSettingsFx,
+		runCommand,
+	]);
 
 	const importFile = useCallback(
 		(file: File | undefined) => {
@@ -73,6 +102,7 @@ export const useEditorWelcomeActions = () => {
 	return {
 		active,
 		blocked,
+		createProject,
 		error: state.kind === "error" ? state.error : undefined,
 		exit,
 		importFile,

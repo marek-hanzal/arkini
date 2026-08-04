@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 
+import { EditorDurationHint } from "~/ui/form/EditorDurationHint";
 import { EditorInfoTooltip } from "~/ui/form/EditorInfoTooltip";
 import { editorInputClassName } from "~/ui/form/EditorInputClassName";
 import {
@@ -72,6 +73,38 @@ export const EditorNumberControl = ({
 			step={step}
 			onChange={(event) => onChange(event.currentTarget.valueAsNumber)}
 		/>
+	</EditorValueField>
+);
+
+export const EditorSecondsControl = ({
+	description,
+	label,
+	max,
+	min,
+	onChange,
+	value,
+}: {
+	readonly description?: string;
+	readonly label: string;
+	readonly max?: number;
+	readonly min?: number;
+	readonly onChange: (value: number) => void;
+	readonly value: number;
+}) => (
+	<EditorValueField
+		description={description}
+		label={label}
+	>
+		<input
+			type="number"
+			value={Number.isNaN(value) ? "" : value}
+			className={editorInputClassName}
+			max={max}
+			min={min}
+			step={0.001}
+			onChange={(event) => onChange(event.currentTarget.valueAsNumber)}
+		/>
+		<EditorDurationHint seconds={value} />
 	</EditorValueField>
 );
 

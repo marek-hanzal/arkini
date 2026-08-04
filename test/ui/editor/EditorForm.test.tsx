@@ -175,12 +175,14 @@ describe("editor form fields", () => {
 		const name = container.querySelector<HTMLInputElement>('input[name="name"]');
 		const amount = container.querySelector<HTMLInputElement>('input[name="amount"]');
 		const runtime = container.querySelector<HTMLInputElement>('input[name="runtimeMs"]');
+		const durationHint = container.querySelector('[data-ui="EditorDurationHint"]');
 		const enabled = Array.from(container.querySelectorAll("button")).find(
 			(button) => button.textContent === "Enabled",
 		);
 		if (name === null || amount === null || runtime === null || enabled === undefined) {
 			throw new Error("Missing form inputs.");
 		}
+		expect(durationHint?.textContent).toBe("24s");
 
 		await changeInput(name, "Changed");
 		await changeInput(amount, "");
@@ -189,6 +191,7 @@ describe("editor form fields", () => {
 		expect(container.querySelector('[data-testid="values"]')?.textContent).toBe(
 			"Changed|NaN|1250|disabled",
 		);
+		expect(durationHint?.textContent).toBe("1.25s");
 		expect(enabled.textContent).toBe("Enabled");
 		expect(enabled.closest('[data-ui="EditorBooleanToggleBadge"]')?.className).toContain(
 			"bg-secondary-subtle",
@@ -205,6 +208,7 @@ describe("editor form fields", () => {
 				"Original|4|24000|enabled",
 			);
 			expect(runtime.value).toBe("24");
+			expect(durationHint?.textContent).toBe("24s");
 			expect(enabled.textContent).toBe("Enabled");
 			expect(enabled.closest('[data-ui="EditorBooleanToggleBadge"]')?.className).toContain(
 				"bg-secondary-selected",

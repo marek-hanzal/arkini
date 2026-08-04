@@ -12,6 +12,7 @@ import { EditorItemDraftDefaults } from "~/ui/item/editor/EditorItemDraftDefault
 import {
 	EditorChoiceControl,
 	EditorNumberControl,
+	EditorSecondsControl,
 	EditorTextControl,
 } from "~/ui/form/EditorValueControls";
 import { EditorQueryControl } from "~/ui/item/editor/EditorQueryControl";
@@ -267,10 +268,9 @@ export const EditorRulesControl = ({
 								/>
 							)}
 							{rule.type !== "runtime:adjust" ? null : (
-								<EditorNumberControl
+								<EditorSecondsControl
 									label="Runtime adjustment (seconds)"
 									value={rule.adjustMs / 1_000}
-									step={0.001}
 									onChange={(adjustSeconds) =>
 										onChange(
 											rules.map((current, index) =>

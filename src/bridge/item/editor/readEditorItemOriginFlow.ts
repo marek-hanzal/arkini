@@ -67,6 +67,8 @@ interface OutputSource {
 	readonly kind: EditorItemOriginSourceNode["sourceKind"];
 	readonly label: string;
 	readonly outputItemIds: ReadonlyArray<string>;
+	/** Item whose authored behavior owns this source and forms the readable acquisition backbone. */
+	readonly ownerItemId: string;
 	readonly placement: EditorItemOriginSourceNode["placement"];
 	readonly requirementItemIds: ReadonlyArray<string>;
 	readonly selectionKind: EditorItemOriginSourceNode["selectionKind"];
@@ -109,6 +111,7 @@ const groupOutputOccurrences = (
 	idPrefix: string,
 	kind: OutputSource["kind"],
 	label: string,
+	ownerItemId: string,
 	requirementItemIds: ReadonlyArray<string>,
 	occurrences: ReadonlyArray<OutputOccurrence>,
 ): OutputSource[] => {
@@ -127,6 +130,7 @@ const groupOutputOccurrences = (
 		kind,
 		label,
 		outputItemIds: unique(grouped.map(({ itemId }) => itemId)),
+		ownerItemId,
 		placement: grouped[0]?.placement,
 		requirementItemIds,
 		selectionKind: grouped[0]?.selectionKind ?? "guaranteed",
@@ -151,6 +155,7 @@ const readLineSources = (item: EditorItem, lines: ReadonlyArray<EditorLine>): Ou
 			`source:${item.id}:line:${line.id || index}`,
 			"line",
 			line.title || `${item.title || item.id} production line`,
+			item.id,
 			[
 				item.id,
 				...line.input.map(readInputItemId).filter((id): id is string => id !== undefined),
@@ -181,6 +186,7 @@ const readItemSources = (item: EditorItem): OutputSource[] => {
 			`source:${item.id}:charges`,
 			"charges",
 			`${item.title || item.id} depletion`,
+			item.id,
 			[
 				item.id,
 			],
@@ -193,6 +199,7 @@ const readItemSources = (item: EditorItem): OutputSource[] => {
 				`source:${item.id}:expiry`,
 				"expiry",
 				`${item.title || item.id} expiry`,
+				item.id,
 				[
 					item.id,
 				],
@@ -210,6 +217,7 @@ const readItemSources = (item: EditorItem): OutputSource[] => {
 				`source:${item.id}:merge:${index}`,
 				"merge",
 				`${item.title || item.id} merge`,
+				item.id,
 				requirementItemIds,
 				readOutputOccurrences(merge.output),
 			),
@@ -222,6 +230,7 @@ const readItemSources = (item: EditorItem): OutputSource[] => {
 				outputItemIds: [
 					merge.result,
 				],
+				ownerItemId: item.id,
 				placement: undefined,
 				requirementItemIds,
 				selectionKind: "replace",
@@ -289,33 +298,63 @@ interface OriginSubgraph {
 	readonly sources: ReadonlyArray<OutputSource>;
 }
 
-/** Collects every upstream acquisition branch while keeping operation nodes explicit. */
+/**
+ * Keeps every direct producer of the target, then follows one concrete acquisition witness for
+ * each prerequisite. Expanding every alternative recursively turns common resources into almost
+ * the complete game graph and makes a focused item flow both unreadable and expensive to lay out.
+ */
 const readOriginSubgraph = (
 	targetItemId: string,
 	starters: ReadonlyMap<string, ReadonlySet<string>>,
 	sourcesByOutput: ReadonlyMap<string, ReadonlyArray<OutputSource>>,
+	sourcesById: ReadonlyMap<string, OutputSource>,
+	acquisitionSourceByItem: ReadonlyMap<string, string>,
+	reachableItems: ReadonlySet<string>,
 ): OriginSubgraph => {
-	const pending = [
-		targetItemId,
-	];
 	const itemDepths = new Map([
 		[
 			targetItemId,
 			0,
 		],
 	]);
-	const visitedItems = new Set<string>();
+	const tracedItems = new Set<string>();
 	const includedSources = new Map<string, OutputSource>();
 	const edges = new Map<string, EditorItemOriginEdge>();
-	const upstream = new Map<string, Set<string>>();
+	const cycleItemIds = new Set<string>();
 
-	while (pending.length > 0) {
-		const itemId = pending.shift();
-		if (itemId === undefined || visitedItems.has(itemId)) continue;
-		visitedItems.add(itemId);
-		if (itemId !== targetItemId && starters.has(itemId)) continue;
-		const itemDepth = itemDepths.get(itemId) ?? 0;
-		for (const source of sourcesByOutput.get(itemId) ?? []) {
+	const traceItem = (
+		itemId: string,
+		depth: number,
+		activePath: ReadonlyArray<string>,
+		includeEveryDirectSource = false,
+	) => {
+		itemDepths.set(itemId, Math.max(itemDepths.get(itemId) ?? 0, depth));
+		const cycleStart = activePath.lastIndexOf(itemId);
+		if (cycleStart >= 0) {
+			for (const cycleItemId of activePath.slice(cycleStart)) cycleItemIds.add(cycleItemId);
+			cycleItemIds.add(itemId);
+			return;
+		}
+		if (tracedItems.has(itemId)) return;
+		tracedItems.add(itemId);
+		if (!includeEveryDirectSource && starters.has(itemId)) return;
+
+		const witnessedSourceId = acquisitionSourceByItem.get(itemId);
+		const witnessedSource =
+			witnessedSourceId === undefined ? undefined : sourcesById.get(witnessedSourceId);
+		const candidateSources = includeEveryDirectSource
+			? (sourcesByOutput.get(itemId) ?? [])
+			: witnessedSource === undefined
+				? (sourcesByOutput.get(itemId) ?? []).slice(0, 1)
+				: [
+						witnessedSource,
+					];
+		const nextPath = [
+			...activePath,
+			itemId,
+		];
+
+		for (const source of candidateSources) {
 			includedSources.set(source.id, source);
 			const outputEdge: EditorItemOriginEdge = {
 				id: `${source.id}->item:${itemId}`,
@@ -323,44 +362,27 @@ const readOriginSubgraph = (
 				target: `item:${itemId}`,
 			};
 			edges.set(outputEdge.id, outputEdge);
-			for (const requirementItemId of unique(source.requirementItemIds)) {
+			const requirementItemIds = unique(source.requirementItemIds);
+			const blockingRequirementItemId = requirementItemIds.find(
+				(candidate) => !reachableItems.has(candidate),
+			);
+			const requirementItemId =
+				blockingRequirementItemId ??
+				(source.ownerItemId === itemId
+					? requirementItemIds.find((candidate) => candidate !== itemId)
+					: source.ownerItemId);
+			if (requirementItemId !== undefined) {
 				const requirementEdge: EditorItemOriginEdge = {
 					id: `item:${requirementItemId}->${source.id}`,
 					source: `item:${requirementItemId}`,
 					target: source.id,
 				};
 				edges.set(requirementEdge.id, requirementEdge);
-				const dependencies = upstream.get(itemId) ?? new Set();
-				dependencies.add(requirementItemId);
-				upstream.set(itemId, dependencies);
-				itemDepths.set(
-					requirementItemId,
-					Math.max(itemDepths.get(requirementItemId) ?? 0, itemDepth + 2),
-				);
-				if (!visitedItems.has(requirementItemId)) pending.push(requirementItemId);
+				traceItem(requirementItemId, depth + 2, nextPath);
 			}
 		}
-	}
-
-	const cycleItemIds = new Set<string>();
-	const visited = new Set<string>();
-	const active = new Set<string>();
-	const stack: string[] = [];
-	const visit = (itemId: string) => {
-		if (active.has(itemId)) {
-			const cycleStart = stack.lastIndexOf(itemId);
-			for (const cycleItemId of stack.slice(cycleStart)) cycleItemIds.add(cycleItemId);
-			return;
-		}
-		if (visited.has(itemId)) return;
-		visited.add(itemId);
-		active.add(itemId);
-		stack.push(itemId);
-		for (const dependency of upstream.get(itemId) ?? []) visit(dependency);
-		stack.pop();
-		active.delete(itemId);
 	};
-	visit(targetItemId);
+	traceItem(targetItemId, 0, [], true);
 
 	return {
 		cycleItemIds,
@@ -417,6 +439,12 @@ export const readEditorItemOriginFlowFx = Effect.fn("readEditorItemOriginFlowFx"
 				}
 			}
 			const sourcesByOutput = new Map<string, OutputSource[]>();
+			const sourcesById = new Map(
+				sources.map((source) => [
+					source.id,
+					source,
+				]),
+			);
 			for (const [index, source] of sources.entries()) {
 				for (const outputItemId of unique(source.outputItemIds)) {
 					const matches = sourcesByOutput.get(outputItemId) ?? [];
@@ -437,10 +465,18 @@ export const readEditorItemOriginFlowFx = Effect.fn("readEditorItemOriginFlowFx"
 			await yieldToRenderer(signal);
 			const reachableItems = new Set<string>();
 			const reachableSources = new Set<string>();
+			const acquisitionSourceByItem = new Map<string, string>();
 			const waitingSources = new Map<string, OutputSource[]>();
 			const remainingRequirements = new Map<string, number>();
-			const pendingReachableItems = [
-				...starters.keys(),
+			const pendingReachableItems: Array<{
+				readonly itemId: string;
+				readonly sourceId?: string;
+			}> = [
+				...[
+					...starters.keys(),
+				].map((itemId) => ({
+					itemId,
+				})),
 			];
 			for (const [index, source] of sources.entries()) {
 				const requirementItemIds = unique(source.requirementItemIds);
@@ -452,7 +488,12 @@ export const readEditorItemOriginFlowFx = Effect.fn("readEditorItemOriginFlowFx"
 				}
 				if (requirementItemIds.length === 0) {
 					reachableSources.add(source.id);
-					pendingReachableItems.push(...unique(source.outputItemIds));
+					pendingReachableItems.push(
+						...unique(source.outputItemIds).map((itemId) => ({
+							itemId,
+							sourceId: source.id,
+						})),
+					);
 				}
 				if ((index + 1) % 64 === 0) {
 					reportProgress(
@@ -465,16 +506,25 @@ export const readEditorItemOriginFlowFx = Effect.fn("readEditorItemOriginFlowFx"
 			}
 			let resolvedItemCount = 0;
 			while (pendingReachableItems.length > 0) {
-				const reachableItemId = pendingReachableItems.shift();
-				if (reachableItemId === undefined || reachableItems.has(reachableItemId)) continue;
+				const pendingItem = pendingReachableItems.shift();
+				if (pendingItem === undefined || reachableItems.has(pendingItem.itemId)) continue;
+				const reachableItemId = pendingItem.itemId;
 				reachableItems.add(reachableItemId);
+				if (pendingItem.sourceId !== undefined) {
+					acquisitionSourceByItem.set(reachableItemId, pendingItem.sourceId);
+				}
 				for (const source of waitingSources.get(reachableItemId) ?? []) {
 					if (reachableSources.has(source.id)) continue;
 					const remaining = (remainingRequirements.get(source.id) ?? 1) - 1;
 					remainingRequirements.set(source.id, remaining);
 					if (remaining !== 0) continue;
 					reachableSources.add(source.id);
-					pendingReachableItems.push(...unique(source.outputItemIds));
+					pendingReachableItems.push(
+						...unique(source.outputItemIds).map((itemId) => ({
+							itemId,
+							sourceId: source.id,
+						})),
+					);
 				}
 				resolvedItemCount += 1;
 				if (resolvedItemCount % 32 === 0) {
@@ -496,7 +546,14 @@ export const readEditorItemOriginFlowFx = Effect.fn("readEditorItemOriginFlowFx"
 			const originSubgraph =
 				targetItemId === undefined
 					? undefined
-					: readOriginSubgraph(targetItemId, starters, sourcesByOutput);
+					: readOriginSubgraph(
+							targetItemId,
+							starters,
+							sourcesByOutput,
+							sourcesById,
+							acquisitionSourceByItem,
+							reachableItems,
+						);
 			reportProgress(onProgress, "finalizing", 92);
 			await yieldToRenderer(signal);
 

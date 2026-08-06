@@ -138,7 +138,7 @@ describe("readEditorItemOriginFlow", () => {
 		);
 	});
 
-	it("shows every provenance branch back to starter items", async () => {
+	it("shows one readable acquisition backbone back to a starter item", async () => {
 		const progress: EditorItemOriginFlowProgress[] = [];
 		const flow = await Effect.runPromise(
 			readEditorItemOriginFlowFx({
@@ -155,8 +155,6 @@ describe("readEditorItemOriginFlow", () => {
 			new Set([
 				"item:ingot",
 				"item:forge",
-				"item:water",
-				"item:tool",
 			]),
 		);
 		expect(flow.nodes.filter(({ kind }) => kind === "source")).toEqual([
@@ -182,23 +180,9 @@ describe("readEditorItemOriginFlow", () => {
 					id: "item:ingot",
 					status: "reachable",
 				}),
-				expect.objectContaining({
-					id: "item:water",
-					starterScopes: [
-						"Inventory",
-					],
-					status: "starter",
-				}),
-				expect.objectContaining({
-					id: "item:tool",
-					starterScopes: [
-						"Inventory",
-					],
-					status: "starter",
-				}),
 			]),
 		);
-		expect(flow.edges).toHaveLength(4);
+		expect(flow.edges).toHaveLength(2);
 		expect(progress[0]).toMatchObject({
 			percent: 0,
 			phase: "indexing",
@@ -374,8 +358,6 @@ describe("readEditorItemOriginFlow", () => {
 		).toEqual(
 			new Set([
 				"item:ingot",
-				"item:forge",
-				"item:water",
 				"item:tool",
 			]),
 		);
@@ -395,7 +377,7 @@ describe("readEditorItemOriginFlow", () => {
 				}),
 			]),
 		);
-		expect(flow.edges).toHaveLength(4);
+		expect(flow.edges).toHaveLength(2);
 	});
 
 	it("terminates cyclic acquisition paths and exposes the cycle", async () => {

@@ -37,6 +37,7 @@ export type EditorItemOriginNode = EditorItemOriginItemNode | EditorItemOriginSo
 
 export interface EditorItemOriginEdge {
 	readonly id: string;
+	readonly role: "input" | "output" | "owner";
 	readonly source: string;
 	readonly target: string;
 }
@@ -358,6 +359,7 @@ const readOriginSubgraph = (
 			includedSources.set(source.id, source);
 			const outputEdge: EditorItemOriginEdge = {
 				id: `${source.id}->item:${itemId}`,
+				role: "output",
 				source: source.id,
 				target: `item:${itemId}`,
 			};
@@ -374,6 +376,7 @@ const readOriginSubgraph = (
 			if (requirementItemId !== undefined) {
 				const requirementEdge: EditorItemOriginEdge = {
 					id: `item:${requirementItemId}->${source.id}`,
+					role: requirementItemId === source.ownerItemId ? "owner" : "input",
 					source: `item:${requirementItemId}`,
 					target: source.id,
 				};
@@ -505,8 +508,12 @@ export const readEditorItemOriginFlowFx = Effect.fn("readEditorItemOriginFlowFx"
 				}
 			}
 			let resolvedItemCount = 0;
-			while (pendingReachableItems.length > 0) {
-				const pendingItem = pendingReachableItems.shift();
+			for (
+				let pendingIndex = 0;
+				pendingIndex < pendingReachableItems.length;
+				pendingIndex += 1
+			) {
+				const pendingItem = pendingReachableItems[pendingIndex];
 				if (pendingItem === undefined || reachableItems.has(pendingItem.itemId)) continue;
 				const reachableItemId = pendingItem.itemId;
 				reachableItems.add(reachableItemId);
@@ -533,7 +540,13 @@ export const readEditorItemOriginFlowFx = Effect.fn("readEditorItemOriginFlowFx"
 						"resolving",
 						54 +
 							(resolvedItemCount /
-								Math.max(1, resolvedItemCount + pendingReachableItems.length)) *
+								Math.max(
+									1,
+									resolvedItemCount +
+										pendingReachableItems.length -
+										pendingIndex -
+										1,
+								)) *
 								18,
 					);
 					await yieldToRenderer(signal);
@@ -563,11 +576,16 @@ export const readEditorItemOriginFlowFx = Effect.fn("readEditorItemOriginFlowFx"
 							edges: sources.flatMap((source) => [
 								...unique(source.requirementItemIds).map((requirementItemId) => ({
 									id: `item:${requirementItemId}->${source.id}`,
+									role:
+										requirementItemId === source.ownerItemId
+											? ("owner" as const)
+											: ("input" as const),
 									source: `item:${requirementItemId}`,
 									target: source.id,
 								})),
 								...unique(source.outputItemIds).map((outputItemId) => ({
 									id: `${source.id}->item:${outputItemId}`,
+									role: "output" as const,
 									source: source.id,
 									target: `item:${outputItemId}`,
 								})),

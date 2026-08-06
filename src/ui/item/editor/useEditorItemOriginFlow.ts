@@ -7,6 +7,8 @@ import {
 	type EditorItemOriginFlowProgress,
 	type EditorItemOriginFlowRequest,
 } from "~/bridge/item/editor/readEditorItemOriginFlow";
+import { makeEditorItemOriginFlowLayoutWorkerOwnerFx } from "~/ui/item/editor/EditorItemOriginFlowLayoutWorker";
+import type { EditorItemOriginFlowLayoutNode } from "~/ui/item/editor/layoutEditorItemOriginFlow";
 
 type EditorItemOriginFlowState =
 	| {
@@ -16,6 +18,7 @@ type EditorItemOriginFlowState =
 	  }
 	| {
 			readonly flow: EditorItemOriginFlow;
+			readonly positions: ReadonlyMap<string, EditorItemOriginFlowLayoutNode>;
 			readonly progress: EditorItemOriginFlowProgress;
 			readonly status: "ready";
 	  }
@@ -50,30 +53,55 @@ export const useEditorItemOriginFlow = (
 			status: "loading",
 		});
 		void Effect.runPromise(
-			readEditorItemOriginFlowFx({
-				config,
-				...(itemId === undefined
-					? {}
-					: {
-							targetItemId: itemId,
-						}),
-				onProgress: (progress) => {
-					if (controller.signal.aborted) return;
-					setState({
-						flow: undefined,
-						progress,
-						status: "loading",
+			Effect.scoped(
+				Effect.gen(function* () {
+					const flow = yield* readEditorItemOriginFlowFx({
+						config,
+						...(itemId === undefined
+							? {}
+							: {
+									targetItemId: itemId,
+								}),
+						onProgress: (progress) => {
+							if (controller.signal.aborted) return;
+							setState({
+								flow: undefined,
+								progress: {
+									...progress,
+									percent: Math.round(progress.percent * 0.9),
+								},
+								status: "loading",
+							});
+						},
 					});
-				},
-			}),
+					if (!controller.signal.aborted) {
+						setState({
+							flow: undefined,
+							progress: {
+								label: "Laying out acquisition graph",
+								percent: 95,
+								phase: "finalizing",
+							},
+							status: "loading",
+						});
+					}
+					const owner = yield* makeEditorItemOriginFlowLayoutWorkerOwnerFx();
+					const positions = yield* owner.layoutFx(flow);
+					return {
+						flow,
+						positions,
+					};
+				}),
+			),
 			{
 				signal: controller.signal,
 			},
 		)
-			.then((flow) => {
+			.then(({ flow, positions }) => {
 				if (controller.signal.aborted) return;
 				setState({
 					flow,
+					positions,
 					progress: {
 						label: "Acquisition graph ready",
 						percent: 100,
@@ -84,11 +112,11 @@ export const useEditorItemOriginFlow = (
 			})
 			.catch((cause) => {
 				if (controller.signal.aborted) return;
-				console.error("Acquisition graph build failed.", cause);
+				console.error("Acquisition graph preparation failed.", cause);
 				setState({
 					flow: undefined,
 					progress: {
-						label: "Acquisition graph could not be built",
+						label: "Acquisition graph could not be prepared",
 						percent: 0,
 						phase: "finalizing",
 					},

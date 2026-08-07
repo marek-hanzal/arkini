@@ -15,13 +15,21 @@ export interface EditorOriginFlowHighlight {
 	readonly nodeIds: ReadonlySet<string>;
 }
 
-/** Reads the directed downstream branch selected by a node or connection. */
+interface FlowNodePosition {
+	readonly x: number;
+}
+
+/** Reads the visually forward branch selected by a node or connection. */
 export const readEditorOriginFlowHighlight = (
 	flow: EditorItemOriginFlow,
+	positions: ReadonlyMap<string, FlowNodePosition>,
 	selection: EditorOriginFlowSelection,
 ): EditorOriginFlowHighlight => {
 	const edgesBySource = new Map<string, Array<EditorItemOriginFlow["edges"][number]>>();
 	for (const edge of flow.edges) {
+		const source = positions.get(edge.source);
+		const target = positions.get(edge.target);
+		if (source === undefined || target === undefined || target.x <= source.x) continue;
 		const outgoing = edgesBySource.get(edge.source);
 		if (outgoing === undefined)
 			edgesBySource.set(edge.source, [

@@ -50,9 +50,42 @@ const flow = {
 	],
 } as unknown as EditorItemOriginFlow;
 
+const positions = new Map([
+	[
+		"a",
+		{
+			x: 0,
+		},
+	],
+	[
+		"b",
+		{
+			x: 1,
+		},
+	],
+	[
+		"c",
+		{
+			x: 2,
+		},
+	],
+	[
+		"d",
+		{
+			x: 2,
+		},
+	],
+	[
+		"x",
+		{
+			x: 0,
+		},
+	],
+]);
+
 describe("readEditorOriginFlowHighlight", () => {
-	it("includes every downstream branch from a selected node and terminates at cycles", () => {
-		const highlight = readEditorOriginFlowHighlight(flow, {
+	it("follows only visually forward branches from a selected node", () => {
+		const highlight = readEditorOriginFlowHighlight(flow, positions, {
 			id: "b",
 			kind: "node",
 		});
@@ -69,12 +102,25 @@ describe("readEditorOriginFlowHighlight", () => {
 		]).toEqual([
 			"b-c",
 			"b-d",
-			"d-b",
 		]);
 	});
 
+	it("does not re-enter an earlier layout layer through a cycle edge", () => {
+		const highlight = readEditorOriginFlowHighlight(flow, positions, {
+			id: "d",
+			kind: "node",
+		});
+
+		expect(highlight.nodeIds).toEqual(
+			new Set([
+				"d",
+			]),
+		);
+		expect(highlight.edgeIds).toEqual(new Set());
+	});
+
 	it("starts an edge selection at that connection without including sibling inputs", () => {
-		const highlight = readEditorOriginFlowHighlight(flow, {
+		const highlight = readEditorOriginFlowHighlight(flow, positions, {
 			id: "a-b",
 			kind: "edge",
 		});
@@ -92,13 +138,12 @@ describe("readEditorOriginFlowHighlight", () => {
 				"a-b",
 				"b-c",
 				"b-d",
-				"d-b",
 			]),
 		);
 	});
 
-	it("keeps a selected cycle connection before continuing from its target", () => {
-		const highlight = readEditorOriginFlowHighlight(flow, {
+	it("keeps a selected backward connection before continuing forward from its target", () => {
+		const highlight = readEditorOriginFlowHighlight(flow, positions, {
 			id: "d-b",
 			kind: "edge",
 		});
@@ -121,7 +166,7 @@ describe("readEditorOriginFlowHighlight", () => {
 
 	it("returns an empty highlight for a stale selection", () => {
 		expect(
-			readEditorOriginFlowHighlight(flow, {
+			readEditorOriginFlowHighlight(flow, positions, {
 				id: "missing",
 				kind: "node",
 			}),

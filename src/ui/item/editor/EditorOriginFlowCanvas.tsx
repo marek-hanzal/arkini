@@ -564,9 +564,12 @@ export const EditorOriginFlowCanvas = ({
 	const paletteRef = useRef<CanvasPalette | undefined>(undefined);
 	const highlight = useMemo(
 		() =>
-			selection === undefined ? undefined : readEditorOriginFlowHighlight(flow, selection),
+			selection === undefined
+				? undefined
+				: readEditorOriginFlowHighlight(flow, positions, selection),
 		[
 			flow,
+			positions,
 			selection,
 		],
 	);

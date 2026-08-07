@@ -296,7 +296,7 @@ describe("layoutEditorItemOriginFlow", () => {
 		}
 		expect(geometryFailure).toBeUndefined();
 
-		const winery = readEditorOriginFlowHighlight(flow, {
+		const winery = readEditorOriginFlowHighlight(flow, layout.positions, {
 			id: "item:item:blueprint-winery-t1",
 			kind: "node",
 		});

@@ -29,7 +29,9 @@ export const EditorOriginFlowSection = ({
 	mode,
 }: EditorOriginFlowSectionProps) => {
 	const project = useEditorProject();
-	const flowState = useEditorItemOriginFlow(project.config, itemId, direction);
+	const flowDirection: EditorItemOriginFlowDirection =
+		direction ?? (itemId === undefined ? "outcome" : "income");
+	const flowState = useEditorItemOriginFlow(project.config, itemId, flowDirection);
 	const flow = flowState.flow;
 	const positions = flowState.status === "ready" ? flowState.positions : EmptyFlowPositions;
 	const routes = flowState.status === "ready" ? flowState.routes : EmptyFlowRoutes;
@@ -49,6 +51,7 @@ export const EditorOriginFlowSection = ({
 			{isReady ? (
 				<div className="relative h-full min-h-0 bg-canvas">
 					<EditorOriginFlowCanvas
+						direction={flowDirection}
 						fitContent={mode === "item"}
 						flow={flow}
 						onSelectionChange={setSelection}

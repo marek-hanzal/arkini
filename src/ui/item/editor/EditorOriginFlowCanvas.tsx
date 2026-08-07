@@ -10,6 +10,7 @@ import {
 import type {
 	EditorItemOriginEdge,
 	EditorItemOriginFlow,
+	EditorItemOriginFlowDirection,
 	EditorItemOriginItemNode,
 	EditorItemOriginNode,
 	EditorItemOriginSourceNode,
@@ -49,6 +50,7 @@ interface PanState {
 }
 
 interface EditorOriginFlowCanvasProps {
+	readonly direction: EditorItemOriginFlowDirection;
 	readonly fitContent: boolean;
 	readonly flow: EditorItemOriginFlow;
 	readonly positions: ReadonlyMap<string, EditorItemOriginFlowLayoutNode>;
@@ -943,6 +945,7 @@ const readNodeHighlight = (
 
 /** Renders the passive item flow directly to Canvas with imperative pan and zoom. */
 export const EditorOriginFlowCanvas = ({
+	direction,
 	fitContent,
 	flow,
 	onSelectionChange,
@@ -970,22 +973,24 @@ export const EditorOriginFlowCanvas = ({
 		() =>
 			selection === undefined
 				? undefined
-				: readEditorOriginFlowHighlight(flow, positions, selection),
+				: readEditorOriginFlowHighlight(flow, positions, selection, direction),
 		[
 			flow,
 			positions,
 			selection,
+			direction,
 		],
 	);
 	const navigationNodeIds = useMemo(
 		() =>
 			selection?.kind === "node"
-				? readEditorOriginFlowNavigation(flow, positions, selection.id)
+				? readEditorOriginFlowNavigation(flow, positions, selection.id, direction)
 				: [],
 		[
 			flow,
 			positions,
 			selection,
+			direction,
 		],
 	);
 	const renderStateRef = useRef<RenderState>({

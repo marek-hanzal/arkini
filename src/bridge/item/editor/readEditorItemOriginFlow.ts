@@ -303,17 +303,17 @@ interface OriginSubgraph {
 }
 
 /**
- * Keeps every direct producer of the target, then follows one concrete acquisition witness for
- * each prerequisite. Expanding every alternative recursively turns common resources into almost
- * the complete game graph and makes a focused item flow both unreadable and expensive to lay out.
+ * Builds one deterministic acquisition proof for the target. Every mandatory requirement of the
+ * chosen source is retained, while each prerequisite follows its own concrete acquisition witness
+ * until the proof reaches starter items. This keeps the selected target terminal instead of mixing
+ * later re-use or circular alternative producers back into its prerequisites.
  */
-const readOriginSubgraph = (
+const readIncomeSubgraph = (
 	targetItemId: string,
 	starters: ReadonlyMap<string, ReadonlySet<string>>,
 	sourcesByOutput: ReadonlyMap<string, ReadonlyArray<OutputSource>>,
 	sourcesById: ReadonlyMap<string, OutputSource>,
 	acquisitionSourceByItem: ReadonlyMap<string, string>,
-	reachableItems: ReadonlySet<string>,
 ): OriginSubgraph => {
 	const itemDepths = new Map([
 		[
@@ -326,12 +326,7 @@ const readOriginSubgraph = (
 	const edges = new Map<string, EditorItemOriginEdge>();
 	const cycleItemIds = new Set<string>();
 
-	const traceItem = (
-		itemId: string,
-		depth: number,
-		activePath: ReadonlyArray<string>,
-		includeEveryDirectSource = false,
-	) => {
+	const traceItem = (itemId: string, depth: number, activePath: ReadonlyArray<string>) => {
 		itemDepths.set(itemId, Math.max(itemDepths.get(itemId) ?? 0, depth));
 		const cycleStart = activePath.lastIndexOf(itemId);
 		if (cycleStart >= 0) {
@@ -341,15 +336,17 @@ const readOriginSubgraph = (
 		}
 		if (tracedItems.has(itemId)) return;
 		tracedItems.add(itemId);
-		if (!includeEveryDirectSource && starters.has(itemId)) return;
+		if (starters.has(itemId)) return;
 
 		const witnessedSourceId = acquisitionSourceByItem.get(itemId);
 		const witnessedSource =
 			witnessedSourceId === undefined ? undefined : sourcesById.get(witnessedSourceId);
-		const candidateSources = includeEveryDirectSource
-			? (sourcesByOutput.get(itemId) ?? [])
-			: witnessedSource === undefined
-				? (sourcesByOutput.get(itemId) ?? []).slice(0, 1)
+		const directSources = [
+			...(sourcesByOutput.get(itemId) ?? []),
+		].sort((left, right) => left.id.localeCompare(right.id));
+		const candidateSources =
+			witnessedSource === undefined
+				? directSources.slice(0, 1)
 				: [
 						witnessedSource,
 					];
@@ -367,16 +364,9 @@ const readOriginSubgraph = (
 				target: `item:${itemId}`,
 			};
 			edges.set(outputEdge.id, outputEdge);
-			const requirementItemIds = unique(source.requirementItemIds);
-			const blockingRequirementItemId = requirementItemIds.find(
-				(candidate) => !reachableItems.has(candidate),
-			);
-			const requirementItemId =
-				blockingRequirementItemId ??
-				(source.ownerItemId === itemId
-					? requirementItemIds.find((candidate) => candidate !== itemId)
-					: source.ownerItemId);
-			if (requirementItemId !== undefined) {
+			for (const requirementItemId of unique(source.requirementItemIds).sort((left, right) =>
+				left.localeCompare(right),
+			)) {
 				const requirementEdge: EditorItemOriginEdge = {
 					id: `item:${requirementItemId}->${source.id}`,
 					role: requirementItemId === source.ownerItemId ? "owner" : "input",
@@ -388,7 +378,7 @@ const readOriginSubgraph = (
 			}
 		}
 	};
-	traceItem(targetItemId, 0, [], true);
+	traceItem(targetItemId, 0, []);
 
 	return {
 		cycleItemIds,
@@ -473,18 +463,6 @@ const readOutcomeSubgraph = (
 	};
 };
 
-const orientEdges = (
-	edges: ReadonlyArray<EditorItemOriginEdge>,
-	direction: EditorItemOriginFlowDirection,
-): ReadonlyArray<EditorItemOriginEdge> =>
-	direction === "outcome"
-		? edges
-		: edges.map((edge) => ({
-				...edge,
-				source: edge.target,
-				target: edge.source,
-			}));
-
 /** Builds one directed editor flow cooperatively without blocking renderer-sized work batches. */
 export const readEditorItemOriginFlowFx = Effect.fn("readEditorItemOriginFlowFx")(
 	({ config, direction, onProgress, targetItemId }: EditorItemOriginFlowRequest) =>
@@ -522,6 +500,7 @@ export const readEditorItemOriginFlowFx = Effect.fn("readEditorItemOriginFlowFx"
 					await yieldToRenderer(signal);
 				}
 			}
+			sources.sort((left, right) => left.id.localeCompare(right.id));
 			const sourcesByOutput = new Map<string, OutputSource[]>();
 			const sourcesByRequirement = new Map<string, OutputSource[]>();
 			const sourcesById = new Map(
@@ -643,18 +622,19 @@ export const readEditorItemOriginFlowFx = Effect.fn("readEditorItemOriginFlowFx"
 			await yieldToRenderer(signal);
 
 			reportProgress(onProgress, "tracing", 80);
+			const effectiveDirection: EditorItemOriginFlowDirection =
+				direction ?? (targetItemId === undefined ? "outcome" : "income");
 			const originSubgraph =
 				targetItemId === undefined
 					? undefined
-					: direction === "outcome"
+					: effectiveDirection === "outcome"
 						? readOutcomeSubgraph(targetItemId, sourcesByRequirement)
-						: readOriginSubgraph(
+						: readIncomeSubgraph(
 								targetItemId,
 								starters,
 								sourcesByOutput,
 								sourcesById,
 								acquisitionSourceByItem,
-								reachableItems,
 							);
 			reportProgress(onProgress, "finalizing", 92);
 			await yieldToRenderer(signal);
@@ -662,28 +642,23 @@ export const readEditorItemOriginFlowFx = Effect.fn("readEditorItemOriginFlowFx"
 			const flow: EditorItemOriginFlow =
 				originSubgraph === undefined
 					? {
-							edges: orientEdges(
-								sources.flatMap((source) => [
-									...unique(source.requirementItemIds).map(
-										(requirementItemId) => ({
-											id: `item:${requirementItemId}->${source.id}`,
-											role:
-												requirementItemId === source.ownerItemId
-													? ("owner" as const)
-													: ("input" as const),
-											source: `item:${requirementItemId}`,
-											target: source.id,
-										}),
-									),
-									...unique(source.outputItemIds).map((outputItemId) => ({
-										id: `${source.id}->item:${outputItemId}`,
-										role: "output" as const,
-										source: source.id,
-										target: `item:${outputItemId}`,
-									})),
-								]),
-								direction ?? "outcome",
-							),
+							edges: sources.flatMap((source) => [
+								...unique(source.requirementItemIds).map((requirementItemId) => ({
+									id: `item:${requirementItemId}->${source.id}`,
+									role:
+										requirementItemId === source.ownerItemId
+											? ("owner" as const)
+											: ("input" as const),
+									source: `item:${requirementItemId}`,
+									target: source.id,
+								})),
+								...unique(source.outputItemIds).map((outputItemId) => ({
+									id: `${source.id}->item:${outputItemId}`,
+									role: "output" as const,
+									source: source.id,
+									target: `item:${outputItemId}`,
+								})),
+							]),
 							nodes: [
 								...[
 									...items.keys(),
@@ -697,7 +672,7 @@ export const readEditorItemOriginFlowFx = Effect.fn("readEditorItemOriginFlowFx"
 							obtainable: undefined,
 						}
 					: {
-							edges: orientEdges(originSubgraph.edges, direction ?? "outcome"),
+							edges: originSubgraph.edges,
 							nodes: [
 								...[
 									...originSubgraph.itemDepths.entries(),

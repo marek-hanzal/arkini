@@ -1,4 +1,7 @@
-import type { EditorItemOriginFlow } from "~/bridge/item/editor/readEditorItemOriginFlow";
+import type {
+	EditorItemOriginFlow,
+	EditorItemOriginFlowDirection,
+} from "~/bridge/item/editor/readEditorItemOriginFlow";
 
 export type EditorOriginFlowSelection =
 	| {
@@ -19,24 +22,39 @@ interface FlowNodePosition {
 	readonly flowOrder: number;
 }
 
-/** Reads the cycle-broken forward branch selected by a node or connection. */
+/** Reads the cycle-broken branch selected by a node or connection in the active flow direction. */
 export const readEditorOriginFlowHighlight = (
 	flow: EditorItemOriginFlow,
 	positions: ReadonlyMap<string, FlowNodePosition>,
 	selection: EditorOriginFlowSelection,
+	direction: EditorItemOriginFlowDirection = "outcome",
 ): EditorOriginFlowHighlight => {
 	const edgesBySource = new Map<string, Array<EditorItemOriginFlow["edges"][number]>>();
 	for (const edge of flow.edges) {
-		const source = positions.get(edge.source);
-		const target = positions.get(edge.target);
-		if (source === undefined || target === undefined || target.flowOrder <= source.flowOrder)
-			continue;
-		const outgoing = edgesBySource.get(edge.source);
+		const traversalSourceId = direction === "income" ? edge.target : edge.source;
+		const traversalTargetId = direction === "income" ? edge.source : edge.target;
+		const source = positions.get(traversalSourceId);
+		const target = positions.get(traversalTargetId);
+		if (source === undefined || target === undefined) continue;
+		const movesForward =
+			direction === "income"
+				? target.flowOrder < source.flowOrder
+				: target.flowOrder > source.flowOrder;
+		if (!movesForward) continue;
+		const traversedEdge =
+			direction === "income"
+				? {
+						...edge,
+						source: traversalSourceId,
+						target: traversalTargetId,
+					}
+				: edge;
+		const outgoing = edgesBySource.get(traversalSourceId);
 		if (outgoing === undefined)
-			edgesBySource.set(edge.source, [
-				edge,
+			edgesBySource.set(traversalSourceId, [
+				traversedEdge,
 			]);
-		else outgoing.push(edge);
+		else outgoing.push(traversedEdge);
 	}
 
 	const nodeIds = new Set<string>();
@@ -60,7 +78,7 @@ export const readEditorOriginFlowHighlight = (
 		edgeIds.add(selectedEdge.id);
 		nodeIds.add(selectedEdge.source);
 		nodeIds.add(selectedEdge.target);
-		pendingNodeIds.push(selectedEdge.target);
+		pendingNodeIds.push(direction === "income" ? selectedEdge.source : selectedEdge.target);
 	}
 
 	while (pendingNodeIds.length > 0) {

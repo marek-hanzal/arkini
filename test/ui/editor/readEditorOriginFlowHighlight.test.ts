@@ -105,6 +105,32 @@ describe("readEditorOriginFlowHighlight", () => {
 		]);
 	});
 
+	it("walks toward prerequisites when Income is selected", () => {
+		const highlight = readEditorOriginFlowHighlight(
+			flow,
+			positions,
+			{
+				id: "b",
+				kind: "node",
+			},
+			"income",
+		);
+
+		expect(highlight.nodeIds).toEqual(
+			new Set([
+				"b",
+				"a",
+				"x",
+			]),
+		);
+		expect(highlight.edgeIds).toEqual(
+			new Set([
+				"a-b",
+				"x-b",
+			]),
+		);
+	});
+
 	it("does not re-enter an earlier flow order through a cycle edge", () => {
 		const highlight = readEditorOriginFlowHighlight(flow, positions, {
 			id: "d",

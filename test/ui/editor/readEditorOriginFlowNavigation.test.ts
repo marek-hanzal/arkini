@@ -92,6 +92,65 @@ describe("readEditorOriginFlowNavigation", () => {
 		]);
 	});
 
+	it("walks backward through prerequisites in Income mode", () => {
+		expect(readEditorOriginFlowNavigation(flow, positions, "end", "income")).toEqual([
+			"end",
+			"side",
+			"a",
+			"root",
+		]);
+	});
+
+	it("prefers the nearest upstream flow layer when Income branches equally", () => {
+		const branchedFlow = {
+			edges: [
+				{
+					id: "near-target",
+					source: "near",
+					target: "target",
+				},
+				{
+					id: "far-target",
+					source: "far",
+					target: "target",
+				},
+			],
+			nodes: [
+				{
+					id: "target",
+				},
+				{
+					id: "near",
+				},
+				{
+					id: "far",
+				},
+			],
+		} as unknown as EditorItemOriginFlow;
+		const branchedPositions = new Map([
+			[
+				"target",
+				position(5, 200, 0),
+			],
+			[
+				"near",
+				position(4, 100, -50),
+			],
+			[
+				"far",
+				position(1, 100, 50),
+			],
+		]);
+
+		expect(
+			readEditorOriginFlowNavigation(branchedFlow, branchedPositions, "target", "income"),
+		).toEqual([
+			"target",
+			"near",
+			"far",
+		]);
+	});
+
 	it("ignores feedback edges and input ordering", () => {
 		const shuffled = {
 			...flow,

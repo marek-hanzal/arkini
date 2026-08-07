@@ -28,6 +28,7 @@ export namespace EditorSearchCombobox {
 		readonly emptyLabel: string;
 		readonly error?: string;
 		readonly options: readonly EditorSearchOption[];
+		readonly placeholder?: string;
 		readonly value: string;
 		readonly onBlur?: () => void;
 		readonly onChange: (value: string) => void;
@@ -47,6 +48,7 @@ export const EditorSearchCombobox = ({
 	onBlur,
 	onChange,
 	options,
+	placeholder,
 	renderPreview,
 	renderSelectedPreview,
 	value,
@@ -171,7 +173,7 @@ export const EditorSearchCombobox = ({
 						}
 						aria-label={label}
 						className="ak-editor-search-input min-h-[var(--ak-control-min-height)] w-full rounded-lg border border-line-strong bg-canvas/70 py-2 pr-12 pl-9 text-sm text-foreground outline-none transition-colors placeholder:text-subtle"
-						placeholder={`Search ${label.toLocaleLowerCase()}…`}
+						placeholder={placeholder ?? `Search ${label.toLocaleLowerCase()}…`}
 						onBlur={() => {
 							setOpen(false);
 							setQuery(selectedLabel);

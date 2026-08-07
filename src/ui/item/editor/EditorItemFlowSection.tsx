@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 
 import { useEditorProject } from "~/bridge/editor/useEditorProject";
+import type { EditorItemOriginFlowDirection } from "~/bridge/item/editor/readEditorItemOriginFlow";
 import type { EditorOriginFlowSelection } from "~/ui/item/editor/readEditorOriginFlowHighlight";
 import { EditorOriginFlowCanvas } from "~/ui/item/editor/EditorOriginFlowCanvas";
 import type {
@@ -16,14 +17,19 @@ const EmptyFlowRoutes: ReadonlyMap<
 > = new Map();
 
 interface EditorOriginFlowSectionProps {
+	readonly direction?: EditorItemOriginFlowDirection;
 	readonly itemId?: string;
 	readonly mode: "all" | "item";
 }
 
-/** Visualizes either the complete game graph or every provenance path to starter roots. */
-export const EditorOriginFlowSection = ({ itemId, mode }: EditorOriginFlowSectionProps) => {
+/** Visualizes either the complete game flow or one directed item flow. */
+export const EditorOriginFlowSection = ({
+	direction,
+	itemId,
+	mode,
+}: EditorOriginFlowSectionProps) => {
 	const project = useEditorProject();
-	const flowState = useEditorItemOriginFlow(project.config, itemId);
+	const flowState = useEditorItemOriginFlow(project.config, itemId, direction);
 	const flow = flowState.flow;
 	const positions = flowState.status === "ready" ? flowState.positions : EmptyFlowPositions;
 	const routes = flowState.status === "ready" ? flowState.routes : EmptyFlowRoutes;
@@ -62,13 +68,7 @@ export const EditorOriginFlowSection = ({ itemId, mode }: EditorOriginFlowSectio
 							} size-9`}
 						/>
 						<strong>
-							{flowState.status === "error"
-								? mode === "all"
-									? "Game graph build failed"
-									: "Acquisition graph build failed"
-								: mode === "all"
-									? "Building game graph"
-									: "Building acquisition graph"}
+							{flowState.status === "error" ? "Flow failed" : "Building flow"}
 						</strong>
 						<span className="text-sm text-muted">{flowState.progress.label}</span>
 						{flowState.status === "loading" ? (

@@ -24,6 +24,7 @@ import {
 	type EditorOriginFlowSelection,
 	readEditorOriginFlowHighlight,
 } from "~/ui/item/editor/readEditorOriginFlowHighlight";
+import { readEditorOriginFlowNavigation } from "~/ui/item/editor/readEditorOriginFlowNavigation";
 import { useEditorResourceUrls } from "~/ui/resource/editor/useEditorResourceUrl";
 
 interface Viewport {
@@ -72,7 +73,7 @@ const DefaultViewport: Viewport = {
 	y: 24,
 	zoom: 0.75,
 };
-const MinZoom = 0.2;
+const MinZoom = 0.025;
 const MaxZoom = 1.4;
 const FitPaddingRatio = 0.12;
 const ClickThreshold = 5;
@@ -233,6 +234,70 @@ const readFitViewport = (
 		y: (height - contentHeight * zoom) / 2 - bounds.minY * zoom,
 		zoom,
 	};
+};
+
+const readNodeViewport = (
+	position: EditorItemOriginFlowLayoutNode,
+	width: number,
+	height: number,
+	zoom: number,
+): Viewport => ({
+	x: width / 2 - (position.x + position.width / 2) * zoom,
+	y: height / 2 - (position.y + position.height / 2) * zoom,
+	zoom,
+});
+
+const readInitialFocusPosition = (
+	flow: EditorItemOriginFlow,
+	positions: ReadonlyMap<string, EditorItemOriginFlowLayoutNode>,
+) => {
+	const candidates = flow.nodes
+		.filter(
+			(node): node is EditorItemOriginItemNode =>
+				node.kind === "item" && node.starterScopes.length > 0,
+		)
+		.map((node) => ({
+			id: node.id,
+			position: positions.get(node.id),
+		}))
+		.filter(
+			(
+				candidate,
+			): candidate is {
+				readonly id: string;
+				readonly position: EditorItemOriginFlowLayoutNode;
+			} => candidate.position !== undefined,
+		)
+		.sort(
+			(left, right) =>
+				left.position.flowOrder - right.position.flowOrder ||
+				left.id.localeCompare(right.id),
+		);
+	if (candidates[0] !== undefined) return candidates[0].position;
+	return [
+		...positions.entries(),
+	].sort(
+		([leftId, left], [rightId, right]) =>
+			left.flowOrder - right.flowOrder || leftId.localeCompare(rightId),
+	)[0]?.[1];
+};
+
+const isNextNodeShortcutKey = (event: KeyboardEvent) => {
+	const target = event.target;
+	return (
+		!event.repeat &&
+		event.key.toLowerCase() === "n" &&
+		!event.altKey &&
+		!event.ctrlKey &&
+		!event.metaKey &&
+		!(
+			target instanceof HTMLElement &&
+			(target.isContentEditable ||
+				target.tagName === "INPUT" ||
+				target.tagName === "SELECT" ||
+				target.tagName === "TEXTAREA")
+		)
+	);
 };
 
 const isNodeVisible = (
@@ -876,7 +941,7 @@ const readNodeHighlight = (
 	return "idle" as const;
 };
 
-/** Renders the passive acquisition graph directly to Canvas with imperative pan and zoom. */
+/** Renders the passive item flow directly to Canvas with imperative pan and zoom. */
 export const EditorOriginFlowCanvas = ({
 	fitContent,
 	flow,
@@ -899,12 +964,24 @@ export const EditorOriginFlowCanvas = ({
 	const panRef = useRef<PanState | undefined>(undefined);
 	const frameRef = useRef<number | undefined>(undefined);
 	const resetViewportRef = useRef(true);
+	const navigationIndexRef = useRef(0);
 	const paletteRef = useRef<CanvasPalette | undefined>(undefined);
 	const highlight = useMemo(
 		() =>
 			selection === undefined
 				? undefined
 				: readEditorOriginFlowHighlight(flow, positions, selection),
+		[
+			flow,
+			positions,
+			selection,
+		],
+	);
+	const navigationNodeIds = useMemo(
+		() =>
+			selection?.kind === "node"
+				? readEditorOriginFlowNavigation(flow, positions, selection.id)
+				: [],
 		[
 			flow,
 			positions,
@@ -949,9 +1026,17 @@ export const EditorOriginFlowCanvas = ({
 		}
 		const state = renderStateRef.current;
 		if (resetViewportRef.current) {
+			const initialPosition = readInitialFocusPosition(state.flow, state.positions);
 			viewportRef.current = state.fitContent
 				? readFitViewport(state.positions, rect.width, rect.height)
-				: DefaultViewport;
+				: initialPosition === undefined
+					? DefaultViewport
+					: readNodeViewport(
+							initialPosition,
+							rect.width,
+							rect.height,
+							DefaultViewport.zoom,
+						);
 			resetViewportRef.current = false;
 		}
 		const viewport = viewportRef.current;
@@ -1025,6 +1110,38 @@ export const EditorOriginFlowCanvas = ({
 		resourceUrls,
 		scheduleDraw,
 		selection,
+	]);
+
+	useEffect(() => {
+		navigationIndexRef.current = 0;
+	}, [
+		navigationNodeIds,
+	]);
+
+	useEffect(() => {
+		if (navigationNodeIds.length === 0) return;
+		const handleKeyDown = (event: KeyboardEvent) => {
+			if (!isNextNodeShortcutKey(event)) return;
+			const canvas = canvasRef.current;
+			if (canvas === null) return;
+			event.preventDefault();
+			const nextIndex = (navigationIndexRef.current + 1) % navigationNodeIds.length;
+			const nodeId = navigationNodeIds[nextIndex];
+			if (nodeId === undefined) return;
+			const position = positions.get(nodeId);
+			if (position === undefined) return;
+			const rect = canvas.getBoundingClientRect();
+			const zoom = Math.max(viewportRef.current.zoom, DefaultViewport.zoom);
+			viewportRef.current = readNodeViewport(position, rect.width, rect.height, zoom);
+			navigationIndexRef.current = nextIndex;
+			scheduleDraw();
+		};
+		window.addEventListener("keydown", handleKeyDown);
+		return () => window.removeEventListener("keydown", handleKeyDown);
+	}, [
+		navigationNodeIds,
+		positions,
+		scheduleDraw,
 	]);
 
 	useEffect(() => {
@@ -1150,7 +1267,7 @@ export const EditorOriginFlowCanvas = ({
 
 	return (
 		<canvas
-			aria-label="Item acquisition graph"
+			aria-label="Item flow"
 			className="block size-full touch-none cursor-grab text-foreground"
 			data-ui="EditorOriginFlowCanvas"
 			onPointerCancel={(event) => finishPan(event, true)}

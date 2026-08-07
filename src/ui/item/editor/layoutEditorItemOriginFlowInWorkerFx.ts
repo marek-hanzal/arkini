@@ -66,7 +66,7 @@ const readTopology = (flow: EditorItemOriginFlow): EditorItemOriginFlowLayoutInp
 	})),
 });
 
-/** Computes one acquisition-flow layout off the renderer thread and terminates its worker on exit. */
+/** Computes one flow layout off the renderer thread and terminates its worker on exit. */
 export const layoutEditorItemOriginFlowInWorkerFx = Effect.fn(
 	"layoutEditorItemOriginFlowInWorkerFx",
 )(

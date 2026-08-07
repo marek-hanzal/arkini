@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import {
 	readEditorItemOriginFlowFx,
 	type EditorItemOriginFlow,
+	type EditorItemOriginFlowDirection,
 	type EditorItemOriginFlowProgress,
 	type EditorItemOriginFlowRequest,
 } from "~/bridge/item/editor/readEditorItemOriginFlow";
@@ -36,15 +37,16 @@ type EditorItemOriginFlowState =
 	  };
 
 const InitialProgress: EditorItemOriginFlowProgress = {
-	label: "Preparing acquisition graph",
+	label: "Preparing flow",
 	percent: 0,
 	phase: "indexing",
 };
 
-/** Owns one interruptible acquisition-flow build for the currently routed item. */
+/** Owns one interruptible flow build for the currently routed item. */
 export const useEditorItemOriginFlow = (
 	config: EditorItemOriginFlowRequest["config"],
 	itemId?: string,
+	direction?: EditorItemOriginFlowDirection,
 ): EditorItemOriginFlowState => {
 	const [state, setState] = useState<EditorItemOriginFlowState>({
 		flow: undefined,
@@ -64,6 +66,7 @@ export const useEditorItemOriginFlow = (
 				Effect.gen(function* () {
 					const flow = yield* readEditorItemOriginFlowFx({
 						config,
+						direction,
 						...(itemId === undefined
 							? {}
 							: {
@@ -85,7 +88,7 @@ export const useEditorItemOriginFlow = (
 						setState({
 							flow: undefined,
 							progress: {
-								label: "Laying out acquisition graph",
+								label: "Laying out flow",
 								percent: 95,
 								phase: "finalizing",
 							},
@@ -110,7 +113,7 @@ export const useEditorItemOriginFlow = (
 					positions: layout.positions,
 					routes: layout.routes,
 					progress: {
-						label: "Acquisition graph ready",
+						label: "Flow ready",
 						percent: 100,
 						phase: "finalizing",
 					},
@@ -119,11 +122,11 @@ export const useEditorItemOriginFlow = (
 			})
 			.catch((cause) => {
 				if (controller.signal.aborted) return;
-				console.error("Acquisition graph preparation failed.", cause);
+				console.error("Flow preparation failed.", cause);
 				setState({
 					flow: undefined,
 					progress: {
-						label: "Acquisition graph could not be prepared",
+						label: "Flow failed",
 						percent: 0,
 						phase: "finalizing",
 					},
@@ -134,6 +137,7 @@ export const useEditorItemOriginFlow = (
 		return () => controller.abort();
 	}, [
 		config,
+		direction,
 		itemId,
 	]);
 

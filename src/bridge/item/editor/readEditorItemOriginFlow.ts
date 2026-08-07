@@ -58,10 +58,13 @@ export interface EditorItemOriginFlowProgress {
 
 export interface EditorItemOriginFlowRequest {
 	readonly config: GameConfigSchema.Type;
+	readonly direction?: EditorItemOriginFlowDirection;
 	readonly onProgress?: (progress: EditorItemOriginFlowProgress) => void;
 	/** When omitted, the complete game graph is returned. */
 	readonly targetItemId?: string;
 }
+
+export type EditorItemOriginFlowDirection = "income" | "outcome";
 
 interface OutputSource {
 	readonly id: string;
@@ -247,9 +250,9 @@ const unique = <Value>(values: ReadonlyArray<Value>): Value[] => [
 ];
 
 const ProgressLabels: Record<EditorItemOriginFlowPhase, string> = {
-	indexing: "Indexing item sources",
-	tracing: "Tracing acquisition paths",
-	resolving: "Resolving starter reachability",
+	indexing: "Indexing sources",
+	tracing: "Tracing flow",
+	resolving: "Resolving reachability",
 	finalizing: "Preparing flow",
 };
 
@@ -399,14 +402,92 @@ const readOriginSubgraph = (
 	};
 };
 
-/**
- * Builds one upstream acquisition flow cooperatively.
- *
- * Work is split into renderer-sized batches. Effect interruption cancels obsolete builds when
- * navigation or project revisions replace the request, while progress remains UI-owned.
- */
+/** Follows every authored consumer/output branch reachable from one selected item. */
+const readOutcomeSubgraph = (
+	targetItemId: string,
+	sourcesByRequirement: ReadonlyMap<string, ReadonlyArray<OutputSource>>,
+): OriginSubgraph => {
+	const itemDepths = new Map([
+		[
+			targetItemId,
+			0,
+		],
+	]);
+	const tracedItems = new Set<string>();
+	const includedSources = new Map<string, OutputSource>();
+	const edges = new Map<string, EditorItemOriginEdge>();
+	const cycleItemIds = new Set<string>();
+
+	const traceItem = (itemId: string, depth: number, activePath: ReadonlyArray<string>) => {
+		itemDepths.set(itemId, Math.max(itemDepths.get(itemId) ?? 0, depth));
+		const cycleStart = activePath.lastIndexOf(itemId);
+		if (cycleStart >= 0) {
+			for (const cycleItemId of activePath.slice(cycleStart)) cycleItemIds.add(cycleItemId);
+			cycleItemIds.add(itemId);
+			return;
+		}
+		if (tracedItems.has(itemId)) return;
+		tracedItems.add(itemId);
+		const nextPath = [
+			...activePath,
+			itemId,
+		];
+
+		for (const source of [
+			...(sourcesByRequirement.get(itemId) ?? []),
+		].sort((left, right) => left.id.localeCompare(right.id))) {
+			includedSources.set(source.id, source);
+			const requirementEdge: EditorItemOriginEdge = {
+				id: `item:${itemId}->${source.id}`,
+				role: itemId === source.ownerItemId ? "owner" : "input",
+				source: `item:${itemId}`,
+				target: source.id,
+			};
+			edges.set(requirementEdge.id, requirementEdge);
+
+			for (const outputItemId of unique(source.outputItemIds).sort((left, right) =>
+				left.localeCompare(right),
+			)) {
+				const outputEdge: EditorItemOriginEdge = {
+					id: `${source.id}->item:${outputItemId}`,
+					role: "output",
+					source: source.id,
+					target: `item:${outputItemId}`,
+				};
+				edges.set(outputEdge.id, outputEdge);
+				traceItem(outputItemId, depth + 2, nextPath);
+			}
+		}
+	};
+	traceItem(targetItemId, 0, []);
+
+	return {
+		cycleItemIds,
+		edges: [
+			...edges.values(),
+		],
+		itemDepths,
+		sources: [
+			...includedSources.values(),
+		],
+	};
+};
+
+const orientEdges = (
+	edges: ReadonlyArray<EditorItemOriginEdge>,
+	direction: EditorItemOriginFlowDirection,
+): ReadonlyArray<EditorItemOriginEdge> =>
+	direction === "outcome"
+		? edges
+		: edges.map((edge) => ({
+				...edge,
+				source: edge.target,
+				target: edge.source,
+			}));
+
+/** Builds one directed editor flow cooperatively without blocking renderer-sized work batches. */
 export const readEditorItemOriginFlowFx = Effect.fn("readEditorItemOriginFlowFx")(
-	({ config, onProgress, targetItemId }: EditorItemOriginFlowRequest) =>
+	({ config, direction, onProgress, targetItemId }: EditorItemOriginFlowRequest) =>
 		Effect.promise(async (signal): Promise<EditorItemOriginFlow> => {
 			reportProgress(onProgress, "indexing", 0);
 			await yieldToRenderer(signal);
@@ -442,6 +523,7 @@ export const readEditorItemOriginFlowFx = Effect.fn("readEditorItemOriginFlowFx"
 				}
 			}
 			const sourcesByOutput = new Map<string, OutputSource[]>();
+			const sourcesByRequirement = new Map<string, OutputSource[]>();
 			const sourcesById = new Map(
 				sources.map((source) => [
 					source.id,
@@ -453,6 +535,11 @@ export const readEditorItemOriginFlowFx = Effect.fn("readEditorItemOriginFlowFx"
 					const matches = sourcesByOutput.get(outputItemId) ?? [];
 					matches.push(source);
 					sourcesByOutput.set(outputItemId, matches);
+				}
+				for (const requirementItemId of unique(source.requirementItemIds)) {
+					const matches = sourcesByRequirement.get(requirementItemId) ?? [];
+					matches.push(source);
+					sourcesByRequirement.set(requirementItemId, matches);
 				}
 				if ((index + 1) % 64 === 0) {
 					reportProgress(
@@ -559,37 +646,44 @@ export const readEditorItemOriginFlowFx = Effect.fn("readEditorItemOriginFlowFx"
 			const originSubgraph =
 				targetItemId === undefined
 					? undefined
-					: readOriginSubgraph(
-							targetItemId,
-							starters,
-							sourcesByOutput,
-							sourcesById,
-							acquisitionSourceByItem,
-							reachableItems,
-						);
+					: direction === "outcome"
+						? readOutcomeSubgraph(targetItemId, sourcesByRequirement)
+						: readOriginSubgraph(
+								targetItemId,
+								starters,
+								sourcesByOutput,
+								sourcesById,
+								acquisitionSourceByItem,
+								reachableItems,
+							);
 			reportProgress(onProgress, "finalizing", 92);
 			await yieldToRenderer(signal);
 
 			const flow: EditorItemOriginFlow =
 				originSubgraph === undefined
 					? {
-							edges: sources.flatMap((source) => [
-								...unique(source.requirementItemIds).map((requirementItemId) => ({
-									id: `item:${requirementItemId}->${source.id}`,
-									role:
-										requirementItemId === source.ownerItemId
-											? ("owner" as const)
-											: ("input" as const),
-									source: `item:${requirementItemId}`,
-									target: source.id,
-								})),
-								...unique(source.outputItemIds).map((outputItemId) => ({
-									id: `${source.id}->item:${outputItemId}`,
-									role: "output" as const,
-									source: source.id,
-									target: `item:${outputItemId}`,
-								})),
-							]),
+							edges: orientEdges(
+								sources.flatMap((source) => [
+									...unique(source.requirementItemIds).map(
+										(requirementItemId) => ({
+											id: `item:${requirementItemId}->${source.id}`,
+											role:
+												requirementItemId === source.ownerItemId
+													? ("owner" as const)
+													: ("input" as const),
+											source: `item:${requirementItemId}`,
+											target: source.id,
+										}),
+									),
+									...unique(source.outputItemIds).map((outputItemId) => ({
+										id: `${source.id}->item:${outputItemId}`,
+										role: "output" as const,
+										source: source.id,
+										target: `item:${outputItemId}`,
+									})),
+								]),
+								direction ?? "outcome",
+							),
 							nodes: [
 								...[
 									...items.keys(),
@@ -603,7 +697,7 @@ export const readEditorItemOriginFlowFx = Effect.fn("readEditorItemOriginFlowFx"
 							obtainable: undefined,
 						}
 					: {
-							edges: originSubgraph.edges,
+							edges: orientEdges(originSubgraph.edges, direction ?? "outcome"),
 							nodes: [
 								...[
 									...originSubgraph.itemDepths.entries(),

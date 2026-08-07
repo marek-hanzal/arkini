@@ -198,6 +198,64 @@ describe("readEditorItemOriginFlow", () => {
 		).toBe(true);
 	});
 
+	it("orients Income from the selected item toward its requirements", async () => {
+		const flow = await Effect.runPromise(
+			readEditorItemOriginFlowFx({
+				config: createReachabilityConfig(true),
+				direction: "income",
+				targetItemId: "ingot",
+			}),
+		);
+		const source = flow.nodes.find(({ kind }) => kind === "source");
+		if (source === undefined) throw new Error("Expected source node.");
+
+		expect(flow.edges).toEqual(
+			expect.arrayContaining([
+				expect.objectContaining({
+					source: "item:ingot",
+					target: source.id,
+				}),
+				expect.objectContaining({
+					source: source.id,
+					target: "item:forge",
+				}),
+			]),
+		);
+	});
+
+	it("traces Outcome from the selected item toward every reachable result", async () => {
+		const flow = await Effect.runPromise(
+			readEditorItemOriginFlowFx({
+				config: createReachabilityConfig(true),
+				direction: "outcome",
+				targetItemId: "forge",
+			}),
+		);
+		const source = flow.nodes.find(({ kind }) => kind === "source");
+		if (source === undefined) throw new Error("Expected source node.");
+
+		expect(
+			new Set(flow.nodes.filter(({ kind }) => kind === "item").map(({ id }) => id)),
+		).toEqual(
+			new Set([
+				"item:forge",
+				"item:ingot",
+			]),
+		);
+		expect(flow.edges).toEqual(
+			expect.arrayContaining([
+				expect.objectContaining({
+					source: "item:forge",
+					target: source.id,
+				}),
+				expect.objectContaining({
+					source: source.id,
+					target: "item:ingot",
+				}),
+			]),
+		);
+	});
+
 	it("keeps every producer path that can generate the target item", async () => {
 		const base = createReachabilityConfig(true);
 		const forge = base.items.forge;

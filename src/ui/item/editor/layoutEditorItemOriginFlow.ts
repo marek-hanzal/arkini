@@ -29,29 +29,33 @@ export interface EditorItemOriginFlowLayout {
 	readonly routes: ReadonlyMap<string, ReadonlyArray<EditorItemOriginFlowLayoutPoint>>;
 }
 
+const GoldenRatio = (1 + Math.sqrt(5)) / 2;
+const NodeWidth = 224;
+const NodeHeight = Math.round(NodeWidth / GoldenRatio);
 const NodeSize = {
 	item: {
-		height: 76,
-		width: 224,
+		height: NodeHeight,
+		width: NodeWidth,
 	},
 	source: {
-		height: 144,
-		width: 256,
+		height: NodeHeight,
+		width: NodeWidth,
 	},
 } as const;
 
 const LayoutOptions = {
 	"elk.algorithm": "layered",
 	"elk.direction": "RIGHT",
-	"elk.edgeRouting": "ORTHOGONAL",
-	"elk.layered.spacing.edgeEdgeBetweenLayers": "24",
-	"elk.layered.spacing.edgeNodeBetweenLayers": "40",
-	"elk.layered.spacing.nodeNodeBetweenLayers": "160",
-	"elk.padding": "[top=32,left=32,bottom=32,right=32]",
+	"elk.edgeRouting": "SPLINES",
+	"elk.layered.edgeRouting.splines.mode": "CONSERVATIVE",
+	"elk.layered.spacing.edgeEdgeBetweenLayers": "14",
+	"elk.layered.spacing.edgeNodeBetweenLayers": "20",
+	"elk.layered.spacing.nodeNodeBetweenLayers": "72",
+	"elk.padding": "[top=20,left=20,bottom=20,right=20]",
 	"elk.randomSeed": "1",
-	"elk.spacing.edgeEdge": "24",
-	"elk.spacing.edgeNode": "40",
-	"elk.spacing.nodeNode": "96",
+	"elk.spacing.edgeEdge": "14",
+	"elk.spacing.edgeNode": "20",
+	"elk.spacing.nodeNode": "36",
 } as const;
 
 type EditorItemOriginFlowElkLayout = (graph: ElkNode) => Promise<ElkNode>;
@@ -101,10 +105,12 @@ const readRoute = (edge: ElkExtendedEdge): ReadonlyArray<ElkPoint> => {
 	}
 	if (remaining.size > 0)
 		throw new Error(`ELK returned disconnected sections for edge ${edge.id}.`);
+	if (route.length < 4 || (route.length - 1) % 3 !== 0)
+		throw new Error(`ELK returned a malformed cubic spline for edge ${edge.id}.`);
 	return route;
 };
 
-/** Computes deterministic node placement and obstacle-avoiding orthogonal edge routes. */
+/** Computes deterministic golden-ratio cards and obstacle-avoiding cubic spline routes. */
 export const layoutEditorItemOriginFlow = async (
 	flow: EditorItemOriginFlowLayoutInput,
 	layout: EditorItemOriginFlowElkLayout,

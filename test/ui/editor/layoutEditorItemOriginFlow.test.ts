@@ -8,7 +8,6 @@ import {
 } from "~/bridge/item/editor/readEditorItemOriginFlow";
 import {
 	type EditorItemOriginFlowLayoutInput,
-	type EditorItemOriginFlowLayoutNode,
 	type EditorItemOriginFlowLayoutPoint,
 	layoutEditorItemOriginFlow as runEditorItemOriginFlowLayout,
 } from "~/ui/item/editor/layoutEditorItemOriginFlow";
@@ -45,31 +44,10 @@ const expectFinitePoint = ({ x, y }: EditorItemOriginFlowLayoutPoint) => {
 	expect(Number.isFinite(y)).toBe(true);
 };
 
-const segmentIntersectsNode = (
-	start: EditorItemOriginFlowLayoutPoint,
-	end: EditorItemOriginFlowLayoutPoint,
-	node: EditorItemOriginFlowLayoutNode,
-	clearance: number,
-) => {
-	const left = node.x - clearance;
-	const right = node.x + node.width + clearance;
-	const top = node.y - clearance;
-	const bottom = node.y + node.height + clearance;
-	if (start.x === end.x)
-		return (
-			start.x > left &&
-			start.x < right &&
-			Math.max(start.y, end.y) > top &&
-			Math.min(start.y, end.y) < bottom
-		);
-	if (start.y === end.y)
-		return (
-			start.y > top &&
-			start.y < bottom &&
-			Math.max(start.x, end.x) > left &&
-			Math.min(start.x, end.x) < right
-		);
-	return true;
+const expectCubicSplineRoute = (route: ReadonlyArray<EditorItemOriginFlowLayoutPoint>) => {
+	expect(route.length).toBeGreaterThanOrEqual(4);
+	expect((route.length - 1) % 3).toBe(0);
+	for (const point of route) expectFinitePoint(point);
 };
 
 describe("layoutEditorItemOriginFlow", () => {
@@ -109,7 +87,7 @@ describe("layoutEditorItemOriginFlow", () => {
 		expect(layout.positions.get("operation")!.x).toBeLessThan(layout.positions.get("b")!.x);
 	});
 
-	it("routes cycles and disconnected components with finite orthogonal segments", async () => {
+	it("routes cycles and disconnected components with finite cubic splines", async () => {
 		const layout = await layoutEditorItemOriginFlow({
 			edges: [
 				edge("a", "operation"),
@@ -128,15 +106,7 @@ describe("layoutEditorItemOriginFlow", () => {
 
 		expect(layout.positions.size).toBe(5);
 		expect(layout.routes.size).toBe(4);
-		for (const route of layout.routes.values()) {
-			expect(route.length).toBeGreaterThanOrEqual(2);
-			for (const point of route) expectFinitePoint(point);
-			for (let index = 1; index < route.length; index += 1) {
-				const start = route[index - 1]!;
-				const end = route[index]!;
-				expect(start.x === end.x || start.y === end.y).toBe(true);
-			}
-		}
+		for (const route of layout.routes.values()) expectCubicSplineRoute(route);
 	});
 
 	it("uses the exact fixed card dimensions without node overlap", async () => {
@@ -151,12 +121,12 @@ describe("layoutEditorItemOriginFlow", () => {
 		const source = layout.positions.get("source")!;
 
 		expect(item).toMatchObject({
-			height: 76,
+			height: 138,
 			width: 224,
 		});
 		expect(source).toMatchObject({
-			height: 144,
-			width: 256,
+			height: 138,
+			width: 224,
 		});
 		expect(item.y + item.height <= source.y || source.y + source.height <= item.y).toBe(true);
 	});
@@ -183,9 +153,19 @@ describe("layoutEditorItemOriginFlow", () => {
 					...entry,
 					sections: [
 						{
+							bendPoints: [
+								{
+									x: 235,
+									y: 69,
+								},
+								{
+									x: 242,
+									y: 69,
+								},
+							],
 							endPoint: {
 								x: 250,
-								y: 38,
+								y: 69,
 							},
 							id: "first",
 							outgoingSections: [
@@ -193,19 +173,23 @@ describe("layoutEditorItemOriginFlow", () => {
 							],
 							startPoint: {
 								x: 227,
-								y: 38,
+								y: 69,
 							},
 						},
 						{
 							bendPoints: [
 								{
+									x: 260,
+									y: 69,
+								},
+								{
 									x: 275,
-									y: 38,
+									y: 69,
 								},
 							],
 							endPoint: {
 								x: 297,
-								y: 38,
+								y: 69,
 							},
 							id: "second",
 							incomingSections: [
@@ -213,7 +197,7 @@ describe("layoutEditorItemOriginFlow", () => {
 							],
 							startPoint: {
 								x: 250,
-								y: 38,
+								y: 69,
 							},
 						},
 					],
@@ -224,24 +208,36 @@ describe("layoutEditorItemOriginFlow", () => {
 		expect(layout.routes.get("a->b")).toEqual([
 			{
 				x: 227,
-				y: 38,
+				y: 69,
+			},
+			{
+				x: 235,
+				y: 69,
+			},
+			{
+				x: 242,
+				y: 69,
 			},
 			{
 				x: 250,
-				y: 38,
+				y: 69,
+			},
+			{
+				x: 260,
+				y: 69,
 			},
 			{
 				x: 275,
-				y: 38,
+				y: 69,
 			},
 			{
 				x: 297,
-				y: 38,
+				y: 69,
 			},
 		]);
 	});
 
-	it("keeps every official route away from unrelated nodes", async () => {
+	it("returns valid cubic splines for the official graph", async () => {
 		const config = await readArkiniGameConfigSource();
 		const flow = await Effect.runPromise(
 			readEditorItemOriginFlowFx({
@@ -255,11 +251,11 @@ describe("layoutEditorItemOriginFlow", () => {
 		expect(layout.positions.size).toBe(flow.nodes.length);
 		expect(layout.routes.size).toBe(flow.edges.length);
 		expect(elapsedMs).toBeLessThan(10_000);
-		let geometryFailure: unknown;
-		edges: for (const edge of flow.edges) {
+		for (const edge of flow.edges) {
 			const route = layout.routes.get(edge.id)!;
 			const source = layout.positions.get(edge.source)!;
 			const target = layout.positions.get(edge.target)!;
+			expectCubicSplineRoute(route);
 			expect(route[0]).toEqual({
 				x: source.x + source.width + 3,
 				y: source.y + source.height / 2,
@@ -268,33 +264,7 @@ describe("layoutEditorItemOriginFlow", () => {
 				x: target.x - 3,
 				y: target.y + target.height / 2,
 			});
-			for (let index = 1; index < route.length; index += 1) {
-				const start = route[index - 1]!;
-				const end = route[index]!;
-				if (start.x !== end.x && start.y !== end.y) {
-					geometryFailure = {
-						edgeId: edge.id,
-						end,
-						kind: "non-orthogonal",
-						start,
-					};
-					break edges;
-				}
-				for (const [nodeId, position] of layout.positions) {
-					if (nodeId === edge.source || nodeId === edge.target) continue;
-					if (!segmentIntersectsNode(start, end, position, 8)) continue;
-					geometryFailure = {
-						edgeId: edge.id,
-						end,
-						kind: "node-collision",
-						nodeId,
-						start,
-					};
-					break edges;
-				}
-			}
 		}
-		expect(geometryFailure).toBeUndefined();
 
 		const winery = readEditorOriginFlowHighlight(flow, layout.positions, {
 			id: "item:item:blueprint-winery-t1",

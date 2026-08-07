@@ -31,6 +31,13 @@ interface Viewport {
 	zoom: number;
 }
 
+interface Bounds {
+	readonly maxX: number;
+	readonly maxY: number;
+	readonly minX: number;
+	readonly minY: number;
+}
+
 interface PanState {
 	moved: boolean;
 	pointerId: number;
@@ -54,6 +61,7 @@ interface RenderState {
 	readonly highlight: ReturnType<typeof readEditorOriginFlowHighlight> | undefined;
 	readonly positions: ReadonlyMap<string, EditorItemOriginFlowLayoutNode>;
 	readonly resourceUrls: ReadonlyMap<string, string>;
+	readonly routeBounds: ReadonlyMap<string, Bounds>;
 	readonly routes: ReadonlyMap<string, ReadonlyArray<EditorItemOriginFlowLayoutPoint>>;
 	readonly selection: EditorOriginFlowSelection | undefined;
 }
@@ -68,6 +76,7 @@ const MaxZoom = 1.4;
 const FitPaddingRatio = 0.12;
 const ClickThreshold = 5;
 const EdgeHitRadiusPx = 9;
+const EdgeCullPaddingPx = 20;
 const MaxCachedImages = 96;
 
 interface CanvasPalette {
@@ -251,6 +260,46 @@ const isNodeVisible = (
 	return right >= 0 && bottom >= 0 && left <= width && top <= height;
 };
 
+const readRouteBounds = (
+	routes: ReadonlyMap<string, ReadonlyArray<EditorItemOriginFlowLayoutPoint>>,
+) =>
+	new Map(
+		[
+			...routes,
+		].map(([id, route]) => {
+			let minX = Number.POSITIVE_INFINITY;
+			let minY = Number.POSITIVE_INFINITY;
+			let maxX = Number.NEGATIVE_INFINITY;
+			let maxY = Number.NEGATIVE_INFINITY;
+			for (const point of route) {
+				minX = Math.min(minX, point.x);
+				minY = Math.min(minY, point.y);
+				maxX = Math.max(maxX, point.x);
+				maxY = Math.max(maxY, point.y);
+			}
+			return [
+				id,
+				{
+					maxX,
+					maxY,
+					minX,
+					minY,
+				} satisfies Bounds,
+			] as const;
+		}),
+	);
+
+const isRouteVisible = (bounds: Bounds, viewport: Viewport, width: number, height: number) => {
+	const padding = EdgeCullPaddingPx / viewport.zoom;
+	const left = -viewport.x / viewport.zoom - padding;
+	const top = -viewport.y / viewport.zoom - padding;
+	const right = (width - viewport.x) / viewport.zoom + padding;
+	const bottom = (height - viewport.y) / viewport.zoom + padding;
+	return (
+		bounds.maxX >= left && bounds.maxY >= top && bounds.minX <= right && bounds.minY <= bottom
+	);
+};
+
 const drawRoundedRect = (
 	context: CanvasRenderingContext2D,
 	x: number,
@@ -429,12 +478,13 @@ const drawItemNode = (
 
 	const textX = artworkX + artworkSize + 12;
 	const maxTextWidth = position.x + position.width - 12 - textX;
+	const textCenterY = position.y + position.height / 2;
 	context.fillStyle = palette.foreground;
 	context.font = "600 14px Inter, ui-sans-serif, system-ui, sans-serif";
-	context.fillText(fitText(context, node.title, maxTextWidth), textX, position.y + 24);
+	context.fillText(fitText(context, node.title, maxTextWidth), textX, textCenterY - 12);
 	context.fillStyle = palette.muted;
 	context.font = "12px ui-monospace, SFMono-Regular, Menlo, monospace";
-	context.fillText(fitText(context, node.itemId, maxTextWidth), textX, position.y + 43);
+	context.fillText(fitText(context, node.itemId, maxTextWidth), textX, textCenterY + 8);
 	context.font = "600 10px Inter, ui-sans-serif, system-ui, sans-serif";
 	const label =
 		node.starterScopes.length > 0
@@ -442,7 +492,7 @@ const drawItemNode = (
 			: node.type === "missing"
 				? "Missing item"
 				: ItemTypeLabel[node.type];
-	context.fillText(fitText(context, label.toUpperCase(), maxTextWidth), textX, position.y + 61);
+	context.fillText(fitText(context, label.toUpperCase(), maxTextWidth), textX, textCenterY + 28);
 	context.restore();
 };
 
@@ -524,11 +574,12 @@ const drawSourceNode = (
 	const maxTextWidth = position.x + position.width - 18 - textX;
 	context.fillStyle = palette.foreground;
 	context.font = "600 14px Inter, ui-sans-serif, system-ui, sans-serif";
-	context.fillText(fitText(context, node.label, maxTextWidth), textX, position.y + 63);
+	const textCenterY = position.y + position.height / 2;
+	context.fillText(fitText(context, node.label, maxTextWidth), textX, textCenterY - 4);
 	context.fillStyle = palette.muted;
 	context.font = "600 11px Inter, ui-sans-serif, system-ui, sans-serif";
 	const summary = readSourceSummary(node);
-	context.fillText(fitText(context, summary, maxTextWidth), textX, position.y + 84);
+	context.fillText(fitText(context, summary, maxTextWidth), textX, textCenterY + 17);
 	context.restore();
 };
 
@@ -573,7 +624,12 @@ const drawEdge = (
 	context.lineCap = "round";
 	context.beginPath();
 	context.moveTo(route[0]!.x, route[0]!.y);
-	for (const point of route.slice(1)) context.lineTo(point.x, point.y);
+	for (let index = 1; index + 2 < route.length; index += 3) {
+		const controlA = route[index]!;
+		const controlB = route[index + 1]!;
+		const end = route[index + 2]!;
+		context.bezierCurveTo(controlA.x, controlA.y, controlB.x, controlB.y, end.x, end.y);
+	}
 	context.stroke();
 	drawArrow(context, route.at(-2)!, route.at(-1)!);
 	context.restore();
@@ -620,6 +676,59 @@ const distanceToSegment = (
 	return Math.hypot(x - (start.x + t * dx), y - (start.y + t * dy));
 };
 
+const readCubicPoint = (
+	start: EditorItemOriginFlowLayoutPoint,
+	controlA: EditorItemOriginFlowLayoutPoint,
+	controlB: EditorItemOriginFlowLayoutPoint,
+	end: EditorItemOriginFlowLayoutPoint,
+	t: number,
+): EditorItemOriginFlowLayoutPoint => {
+	const inverse = 1 - t;
+	const startWeight = inverse * inverse * inverse;
+	const controlAWeight = 3 * inverse * inverse * t;
+	const controlBWeight = 3 * inverse * t * t;
+	const endWeight = t * t * t;
+	return {
+		x:
+			start.x * startWeight +
+			controlA.x * controlAWeight +
+			controlB.x * controlBWeight +
+			end.x * endWeight,
+		y:
+			start.y * startWeight +
+			controlA.y * controlAWeight +
+			controlB.y * controlBWeight +
+			end.y * endWeight,
+	};
+};
+
+const distanceToSpline = (
+	x: number,
+	y: number,
+	route: ReadonlyArray<EditorItemOriginFlowLayoutPoint>,
+) => {
+	let distance = Number.POSITIVE_INFINITY;
+	let start = route[0]!;
+	for (let index = 1; index + 2 < route.length; index += 3) {
+		const controlA = route[index]!;
+		const controlB = route[index + 1]!;
+		const end = route[index + 2]!;
+		const controlLength =
+			Math.hypot(controlA.x - start.x, controlA.y - start.y) +
+			Math.hypot(controlB.x - controlA.x, controlB.y - controlA.y) +
+			Math.hypot(end.x - controlB.x, end.y - controlB.y);
+		const steps = Math.max(8, Math.min(40, Math.ceil(controlLength / 24)));
+		let previous = start;
+		for (let step = 1; step <= steps; step += 1) {
+			const point = readCubicPoint(start, controlA, controlB, end, step / steps);
+			distance = Math.min(distance, distanceToSegment(x, y, previous, point));
+			previous = point;
+		}
+		start = end;
+	}
+	return distance;
+};
+
 const hitTest = (
 	flow: EditorItemOriginFlow,
 	positions: ReadonlyMap<string, EditorItemOriginFlowLayoutNode>,
@@ -647,13 +756,11 @@ const hitTest = (
 	for (const edge of flow.edges) {
 		const route = routes.get(edge.id);
 		if (route === undefined) continue;
-		for (let index = 1; index < route.length; index += 1) {
-			if (distanceToSegment(x, y, route[index - 1]!, route[index]!) <= tolerance)
-				return {
-					id: edge.id,
-					kind: "edge",
-				};
-		}
+		if (distanceToSpline(x, y, route) <= tolerance)
+			return {
+				id: edge.id,
+				kind: "edge",
+			};
 	}
 	return undefined;
 };
@@ -678,6 +785,12 @@ export const EditorOriginFlowCanvas = ({
 	selection,
 }: EditorOriginFlowCanvasProps) => {
 	const resourceUrls = useEditorResourceUrls();
+	const routeBounds = useMemo(
+		() => readRouteBounds(routes),
+		[
+			routes,
+		],
+	);
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 	const imageCacheRef = useRef<Map<string, HTMLImageElement>>(new Map());
 	const scheduleDrawRef = useRef<() => void>(() => undefined);
@@ -703,6 +816,7 @@ export const EditorOriginFlowCanvas = ({
 		highlight,
 		positions,
 		resourceUrls,
+		routeBounds,
 		routes,
 		selection,
 	});
@@ -712,6 +826,7 @@ export const EditorOriginFlowCanvas = ({
 		highlight,
 		positions,
 		resourceUrls,
+		routeBounds,
 		routes,
 		selection,
 	};
@@ -751,6 +866,9 @@ export const EditorOriginFlowCanvas = ({
 		for (const edge of state.flow.edges) {
 			const route = state.routes.get(edge.id);
 			if (route === undefined) throw new Error(`Missing routed path for ${edge.id}.`);
+			const bounds = state.routeBounds.get(edge.id);
+			if (bounds === undefined) throw new Error(`Missing route bounds for ${edge.id}.`);
+			if (!isRouteVisible(bounds, viewport, rect.width, rect.height)) continue;
 			drawEdge(context, edge, route, state.selection, state.highlight, palette);
 		}
 		for (const node of state.flow.nodes) {

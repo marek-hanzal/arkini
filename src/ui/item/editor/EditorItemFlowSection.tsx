@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { useEditorProject } from "~/bridge/editor/useEditorProject";
 import type { EditorOriginFlowSelection } from "~/ui/item/editor/readEditorOriginFlowHighlight";
@@ -34,39 +34,6 @@ export const EditorOriginFlowSection = ({ itemId, mode }: EditorOriginFlowSectio
 		flow,
 	]);
 	const isReady = flowState.status === "ready" && flow !== undefined;
-	const badge = useMemo(() => {
-		if (isReady) {
-			if (mode === "all")
-				return {
-					label: `${flow.nodes.filter(({ kind }) => kind === "item").length} items`,
-					toneClass: "border-violet-400 bg-violet-100 text-violet-900",
-				};
-			return flow.obtainable
-				? {
-						label: "Obtainable",
-						toneClass: "border-violet-400 bg-violet-100 text-violet-900",
-					}
-				: {
-						label: "No complete starter path",
-						toneClass: "border-rose-300 bg-rose-50 text-rose-800",
-					};
-		}
-		return flowState.status === "error"
-			? {
-					label: "Build failed",
-					toneClass: "border-rose-300 bg-rose-50 text-rose-800",
-				}
-			: {
-					label: `${flowState.progress.percent}%`,
-					toneClass: "border-violet-200 bg-violet-50 text-violet-800",
-				};
-	}, [
-		flow,
-		flowState.progress.percent,
-		flowState.status,
-		isReady,
-		mode,
-	]);
 
 	return (
 		<section
@@ -75,13 +42,6 @@ export const EditorOriginFlowSection = ({ itemId, mode }: EditorOriginFlowSectio
 		>
 			{isReady ? (
 				<div className="relative h-full min-h-0 bg-canvas">
-					<div className="pointer-events-none absolute right-3 top-3 z-10">
-						<span
-							className={`rounded-full border px-3 py-1 text-sm font-semibold shadow-sm ${badge.toneClass}`}
-						>
-							{badge.label}
-						</span>
-					</div>
 					<EditorOriginFlowCanvas
 						fitContent={mode === "item"}
 						flow={flow}

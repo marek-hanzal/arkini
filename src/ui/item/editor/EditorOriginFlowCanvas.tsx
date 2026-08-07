@@ -72,12 +72,12 @@ interface CanvasPalette {
 	readonly danger: string;
 	readonly foreground: string;
 	readonly info: string;
+	readonly itemSurfaces: Readonly<Record<EditorItemOriginItemNode["type"], string>>;
 	readonly line: string;
 	readonly lineStrong: string;
 	readonly muted: string;
+	readonly sourceSurfaces: Readonly<Record<EditorItemOriginSourceNode["sourceKind"], string>>;
 	readonly success: string;
-	readonly surface: string;
-	readonly surfaceRaised: string;
 	readonly warning: string;
 }
 
@@ -95,12 +95,27 @@ const readCanvasPalette = (host: HTMLElement): CanvasPalette => {
 			danger: read("--ak-danger"),
 			foreground: read("--ak-foreground"),
 			info: read("--ak-info"),
+			itemSurfaces: {
+				blueprint: read("--ak-flow-item-blueprint-surface"),
+				craft: read("--ak-flow-item-craft-surface"),
+				deposit: read("--ak-flow-item-deposit-surface"),
+				inventory: read("--ak-flow-item-inventory-surface"),
+				missing: read("--ak-flow-item-missing-surface"),
+				producer: read("--ak-flow-item-producer-surface"),
+				simple: read("--ak-flow-item-simple-surface"),
+				stash: read("--ak-flow-item-stash-surface"),
+				temporary: read("--ak-flow-item-temporary-surface"),
+			},
 			line: read("--ak-line"),
 			lineStrong: read("--ak-line-strong"),
 			muted: read("--ak-muted"),
+			sourceSurfaces: {
+				charges: read("--ak-flow-source-charges-surface"),
+				expiry: read("--ak-flow-source-expiry-surface"),
+				line: read("--ak-flow-source-line-surface"),
+				merge: read("--ak-flow-source-merge-surface"),
+			},
 			success: read("--ak-success"),
-			surface: read("--ak-surface"),
-			surfaceRaised: read("--ak-surface-raised"),
 			warning: read("--ak-warning"),
 		};
 	} finally {
@@ -295,8 +310,9 @@ const drawItemNode = (
 	const statusColor = readStatusColor(palette, node.status);
 	context.save();
 	context.globalAlpha = selectionActive && highlight === "idle" ? 0.2 : 1;
-	drawRoundedRect(context, position.x, position.y, position.width, position.height, 4);
-	context.fillStyle = withAlpha(typeColor, 0.14);
+	context.beginPath();
+	context.rect(position.x, position.y, position.width, position.height);
+	context.fillStyle = palette.itemSurfaces[node.type];
 	context.fill();
 	context.lineWidth = 2;
 	context.strokeStyle = withAlpha(typeColor, 0.8);
@@ -308,14 +324,8 @@ const drawItemNode = (
 	if (highlight !== "idle") {
 		context.lineWidth = highlight === "selected" ? 4 : 2.5;
 		context.strokeStyle = palette.accent;
-		drawRoundedRect(
-			context,
-			position.x - 3,
-			position.y - 3,
-			position.width + 6,
-			position.height + 6,
-			6,
-		);
+		context.beginPath();
+		context.rect(position.x - 3, position.y - 3, position.width + 6, position.height + 6);
 		context.stroke();
 	}
 
@@ -365,7 +375,7 @@ const drawSourceNode = (
 	context.save();
 	context.globalAlpha = selectionActive && highlight === "idle" ? 0.2 : 1;
 	drawRoundedRect(context, position.x, position.y, position.width, position.height, 18);
-	context.fillStyle = withAlpha(kindColor, 0.14);
+	context.fillStyle = palette.sourceSurfaces[node.sourceKind];
 	context.fill();
 	context.lineWidth = 2;
 	context.strokeStyle = withAlpha(kindColor, 0.9);
@@ -431,9 +441,8 @@ const drawEdge = (
 	palette: CanvasPalette,
 ) => {
 	if (route.length < 2) return;
-	const selected =
-		selection?.kind === "graph" || (selection?.kind === "edge" && selection.id === edge.id);
-	const active = selection?.kind === "graph" ? true : (highlight?.edgeIds.has(edge.id) ?? false);
+	const selected = selection?.kind === "edge" && selection.id === edge.id;
+	const active = highlight?.edgeIds.has(edge.id) ?? false;
 	context.save();
 	context.globalAlpha = selection === undefined ? 0.5 : active ? 1 : 0.1;
 	context.strokeStyle = palette.accent;
@@ -533,7 +542,6 @@ const readNodeHighlight = (
 	selection: EditorOriginFlowSelection | undefined,
 	highlight: ReturnType<typeof readEditorOriginFlowHighlight> | undefined,
 ) => {
-	if (selection?.kind === "graph") return "selected" as const;
 	if (selection?.kind === "node" && selection.id === node.id) return "selected" as const;
 	if (highlight?.nodeIds.has(node.id)) return "active" as const;
 	return "idle" as const;
@@ -748,15 +756,14 @@ export const EditorOriginFlowCanvas = ({
 		const worldX = (event.clientX - rect.left - viewport.x) / viewport.zoom;
 		const worldY = (event.clientY - rect.top - viewport.y) / viewport.zoom;
 		const hit = hitTest(flow, positions, routes, worldX, worldY, viewport.zoom);
-		if (hit === undefined) {
+		if (
+			hit !== undefined &&
+			selection !== undefined &&
+			hit.kind === selection.kind &&
+			hit.id === selection.id
+		)
 			onSelectionChange(undefined);
-			return;
-		}
-		if (selection?.kind === "graph") onSelectionChange(undefined);
-		else
-			onSelectionChange({
-				kind: "graph",
-			});
+		else onSelectionChange(hit);
 	};
 
 	const handlePointerDown = (event: ReactPointerEvent<HTMLCanvasElement>) => {

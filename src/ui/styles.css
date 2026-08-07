@@ -64,6 +64,19 @@
 	--ak-warning: light-dark(#985a12, #f1b45e);
 	--ak-danger: light-dark(#b72b63, #ff6c9f);
 	--ak-danger-contrast: light-dark(#fff9fc, #310914);
+	--ak-flow-item-blueprint-surface: light-dark(#f2e2ff, #342044);
+	--ak-flow-item-craft-surface: light-dark(#fff0cf, #3b2b17);
+	--ak-flow-item-deposit-surface: light-dark(#e1f3e7, #193326);
+	--ak-flow-item-inventory-surface: light-dark(#e4eaff, #202849);
+	--ak-flow-item-producer-surface: light-dark(#f9dfef, #412039);
+	--ak-flow-item-simple-surface: light-dark(#f1edf3, #29232d);
+	--ak-flow-item-stash-surface: light-dark(#dff4f2, #173635);
+	--ak-flow-item-temporary-surface: light-dark(#f9e1df, #422322);
+	--ak-flow-item-missing-surface: light-dark(#ffdce7, #481b2b);
+	--ak-flow-source-line-surface: light-dark(#e7e2ff, #292247);
+	--ak-flow-source-charges-surface: light-dark(#ffebce, #3c2916);
+	--ak-flow-source-merge-surface: light-dark(#dbf3e9, #17362b);
+	--ak-flow-source-expiry-surface: light-dark(#f9dfe8, #421e2d);
 	--ak-overlay: light-dark(#1a1124, #090611);
 	--ak-overlay-foreground: light-dark(#fff9ff, #fff9ff);
 

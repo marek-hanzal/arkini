@@ -60,7 +60,6 @@
 		"@tanstack/react-form": "^1.33.2",
 		"@tanstack/react-hotkeys": "^0.10.0",
 		"@tanstack/react-router": "1.170.15",
-		"@xyflow/react": "^12.11.2",
 		"dexie": "^4.4.4",
 		"effect": "4.0.0-beta.101",
 		"elkjs": "0.12.0",

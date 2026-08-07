@@ -7,11 +7,11 @@ import {
 	type EditorItemOriginFlowProgress,
 	type EditorItemOriginFlowRequest,
 } from "~/bridge/item/editor/readEditorItemOriginFlow";
-import {
-	type EditorItemOriginFlowLayoutNode,
-	type EditorItemOriginFlowLayoutPoint,
-	layoutEditorItemOriginFlow,
-} from "~/ui/item/editor/layoutEditorItemOriginFlow";
+import { layoutEditorItemOriginFlowInWorkerFx } from "~/ui/item/editor/layoutEditorItemOriginFlowInWorkerFx";
+import type {
+	EditorItemOriginFlowLayoutNode,
+	EditorItemOriginFlowLayoutRouteSegment,
+} from "~/ui/item/editor/layoutEditorItemOriginFlowFx";
 
 type EditorItemOriginFlowState =
 	| {
@@ -22,7 +22,10 @@ type EditorItemOriginFlowState =
 	| {
 			readonly flow: EditorItemOriginFlow;
 			readonly positions: ReadonlyMap<string, EditorItemOriginFlowLayoutNode>;
-			readonly routes: ReadonlyMap<string, ReadonlyArray<EditorItemOriginFlowLayoutPoint>>;
+			readonly routes: ReadonlyMap<
+				string,
+				ReadonlyArray<EditorItemOriginFlowLayoutRouteSegment>
+			>;
 			readonly progress: EditorItemOriginFlowProgress;
 			readonly status: "ready";
 	  }
@@ -89,17 +92,7 @@ export const useEditorItemOriginFlow = (
 							status: "loading",
 						});
 					}
-					const layout = layoutEditorItemOriginFlow({
-						edges: flow.edges.map(({ id, source, target }) => ({
-							id,
-							source,
-							target,
-						})),
-						nodes: flow.nodes.map(({ id, kind }) => ({
-							id,
-							kind,
-						})),
-					});
+					const layout = yield* layoutEditorItemOriginFlowInWorkerFx(flow);
 					return {
 						flow,
 						layout,

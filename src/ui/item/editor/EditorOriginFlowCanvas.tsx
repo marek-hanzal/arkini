@@ -18,7 +18,8 @@ import { ItemTypeLabel } from "~/ui/item-detail/ItemInfoPresentation";
 import type {
 	EditorItemOriginFlowLayoutNode,
 	EditorItemOriginFlowLayoutPoint,
-} from "~/ui/item/editor/layoutEditorItemOriginFlow";
+	EditorItemOriginFlowLayoutRouteSegment,
+} from "~/ui/item/editor/layoutEditorItemOriginFlowFx";
 import {
 	type EditorOriginFlowSelection,
 	readEditorOriginFlowHighlight,
@@ -50,7 +51,7 @@ interface EditorOriginFlowCanvasProps {
 	readonly fitContent: boolean;
 	readonly flow: EditorItemOriginFlow;
 	readonly positions: ReadonlyMap<string, EditorItemOriginFlowLayoutNode>;
-	readonly routes: ReadonlyMap<string, ReadonlyArray<EditorItemOriginFlowLayoutPoint>>;
+	readonly routes: ReadonlyMap<string, ReadonlyArray<EditorItemOriginFlowLayoutRouteSegment>>;
 	readonly selection: EditorOriginFlowSelection | undefined;
 	readonly onSelectionChange: (selection: EditorOriginFlowSelection | undefined) => void;
 }
@@ -62,7 +63,7 @@ interface RenderState {
 	readonly positions: ReadonlyMap<string, EditorItemOriginFlowLayoutNode>;
 	readonly resourceUrls: ReadonlyMap<string, string>;
 	readonly routeBounds: ReadonlyMap<string, Bounds>;
-	readonly routes: ReadonlyMap<string, ReadonlyArray<EditorItemOriginFlowLayoutPoint>>;
+	readonly routes: ReadonlyMap<string, ReadonlyArray<EditorItemOriginFlowLayoutRouteSegment>>;
 	readonly selection: EditorOriginFlowSelection | undefined;
 }
 
@@ -248,7 +249,7 @@ const isNodeVisible = (
 };
 
 const readRouteBounds = (
-	routes: ReadonlyMap<string, ReadonlyArray<EditorItemOriginFlowLayoutPoint>>,
+	routes: ReadonlyMap<string, ReadonlyArray<EditorItemOriginFlowLayoutRouteSegment>>,
 ) =>
 	new Map(
 		[
@@ -258,11 +259,25 @@ const readRouteBounds = (
 			let minY = Number.POSITIVE_INFINITY;
 			let maxX = Number.NEGATIVE_INFINITY;
 			let maxY = Number.NEGATIVE_INFINITY;
-			for (const point of route) {
-				minX = Math.min(minX, point.x);
-				minY = Math.min(minY, point.y);
-				maxX = Math.max(maxX, point.x);
-				maxY = Math.max(maxY, point.y);
+			for (const segment of route) {
+				const points =
+					segment.kind === "line"
+						? [
+								segment.from,
+								segment.to,
+							]
+						: [
+								segment.from,
+								segment.control1,
+								segment.control2,
+								segment.to,
+							];
+				for (const point of points) {
+					minX = Math.min(minX, point.x);
+					minY = Math.min(minY, point.y);
+					maxX = Math.max(maxX, point.x);
+					maxY = Math.max(maxY, point.y);
+				}
 			}
 			return [
 				id,
@@ -677,12 +692,13 @@ const drawArrow = (
 const drawEdge = (
 	context: CanvasRenderingContext2D,
 	edge: EditorItemOriginEdge,
-	route: ReadonlyArray<EditorItemOriginFlowLayoutPoint>,
+	route: ReadonlyArray<EditorItemOriginFlowLayoutRouteSegment>,
 	selection: EditorOriginFlowSelection | undefined,
 	highlight: ReturnType<typeof readEditorOriginFlowHighlight> | undefined,
 	palette: CanvasPalette,
 ) => {
-	if (route.length < 2) return;
+	const first = route[0];
+	if (first === undefined) return;
 	const selected = selection?.kind === "edge" && selection.id === edge.id;
 	const active = highlight?.edgeIds.has(edge.id) ?? false;
 	context.save();
@@ -693,15 +709,22 @@ const drawEdge = (
 	context.lineJoin = "round";
 	context.lineCap = "round";
 	context.beginPath();
-	context.moveTo(route[0]!.x, route[0]!.y);
-	for (let index = 1; index + 2 < route.length; index += 3) {
-		const controlA = route[index]!;
-		const controlB = route[index + 1]!;
-		const end = route[index + 2]!;
-		context.bezierCurveTo(controlA.x, controlA.y, controlB.x, controlB.y, end.x, end.y);
+	context.moveTo(first.from.x, first.from.y);
+	for (const segment of route) {
+		if (segment.kind === "line") context.lineTo(segment.to.x, segment.to.y);
+		else
+			context.bezierCurveTo(
+				segment.control1.x,
+				segment.control1.y,
+				segment.control2.x,
+				segment.control2.y,
+				segment.to.x,
+				segment.to.y,
+			);
 	}
 	context.stroke();
-	drawArrow(context, route.at(-2)!, route.at(-1)!);
+	const last = route.at(-1)!;
+	drawArrow(context, last.kind === "line" ? last.from : last.control2, last.to);
 	context.restore();
 };
 
@@ -772,29 +795,37 @@ const readCubicPoint = (
 	};
 };
 
-const distanceToSpline = (
+const distanceToRoute = (
 	x: number,
 	y: number,
-	route: ReadonlyArray<EditorItemOriginFlowLayoutPoint>,
+	route: ReadonlyArray<EditorItemOriginFlowLayoutRouteSegment>,
 ) => {
 	let distance = Number.POSITIVE_INFINITY;
-	let start = route[0]!;
-	for (let index = 1; index + 2 < route.length; index += 3) {
-		const controlA = route[index]!;
-		const controlB = route[index + 1]!;
-		const end = route[index + 2]!;
+	for (const segment of route) {
+		if (segment.kind === "line") {
+			distance = Math.min(distance, distanceToSegment(x, y, segment.from, segment.to));
+			continue;
+		}
 		const controlLength =
-			Math.hypot(controlA.x - start.x, controlA.y - start.y) +
-			Math.hypot(controlB.x - controlA.x, controlB.y - controlA.y) +
-			Math.hypot(end.x - controlB.x, end.y - controlB.y);
+			Math.hypot(segment.control1.x - segment.from.x, segment.control1.y - segment.from.y) +
+			Math.hypot(
+				segment.control2.x - segment.control1.x,
+				segment.control2.y - segment.control1.y,
+			) +
+			Math.hypot(segment.to.x - segment.control2.x, segment.to.y - segment.control2.y);
 		const steps = Math.max(8, Math.min(40, Math.ceil(controlLength / 24)));
-		let previous = start;
+		let previous = segment.from;
 		for (let step = 1; step <= steps; step += 1) {
-			const point = readCubicPoint(start, controlA, controlB, end, step / steps);
+			const point = readCubicPoint(
+				segment.from,
+				segment.control1,
+				segment.control2,
+				segment.to,
+				step / steps,
+			);
 			distance = Math.min(distance, distanceToSegment(x, y, previous, point));
 			previous = point;
 		}
-		start = end;
 	}
 	return distance;
 };
@@ -802,7 +833,7 @@ const distanceToSpline = (
 const hitTest = (
 	flow: EditorItemOriginFlow,
 	positions: ReadonlyMap<string, EditorItemOriginFlowLayoutNode>,
-	routes: ReadonlyMap<string, ReadonlyArray<EditorItemOriginFlowLayoutPoint>>,
+	routes: ReadonlyMap<string, ReadonlyArray<EditorItemOriginFlowLayoutRouteSegment>>,
 	x: number,
 	y: number,
 	zoom: number,
@@ -826,7 +857,7 @@ const hitTest = (
 	for (const edge of flow.edges) {
 		const route = routes.get(edge.id);
 		if (route === undefined) continue;
-		if (distanceToSpline(x, y, route) <= tolerance)
+		if (distanceToRoute(x, y, route) <= tolerance)
 			return {
 				id: edge.id,
 				kind: "edge",
@@ -845,7 +876,7 @@ const readNodeHighlight = (
 	return "idle" as const;
 };
 
-/** Renders the passive ELK graph directly to Canvas with imperative pan and zoom. */
+/** Renders the passive acquisition graph directly to Canvas with imperative pan and zoom. */
 export const EditorOriginFlowCanvas = ({
 	fitContent,
 	flow,

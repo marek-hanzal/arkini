@@ -5,14 +5,14 @@ import type { EditorOriginFlowSelection } from "~/ui/item/editor/readEditorOrigi
 import { EditorOriginFlowCanvas } from "~/ui/item/editor/EditorOriginFlowCanvas";
 import type {
 	EditorItemOriginFlowLayoutNode,
-	EditorItemOriginFlowLayoutPoint,
-} from "~/ui/item/editor/layoutEditorItemOriginFlow";
+	EditorItemOriginFlowLayoutRouteSegment,
+} from "~/ui/item/editor/layoutEditorItemOriginFlowFx";
 import { useEditorItemOriginFlow } from "~/ui/item/editor/useEditorItemOriginFlow";
 
 const EmptyFlowPositions: ReadonlyMap<string, EditorItemOriginFlowLayoutNode> = new Map();
 const EmptyFlowRoutes: ReadonlyMap<
 	string,
-	ReadonlyArray<EditorItemOriginFlowLayoutPoint>
+	ReadonlyArray<EditorItemOriginFlowLayoutRouteSegment>
 > = new Map();
 
 interface EditorOriginFlowSectionProps {

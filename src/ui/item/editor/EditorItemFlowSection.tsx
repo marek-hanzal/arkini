@@ -1,11 +1,13 @@
 import {
 	Background,
+	BaseEdge,
 	Controls,
 	Handle,
 	MarkerType,
 	Position,
 	ReactFlow,
 	type Edge,
+	type EdgeProps,
 	type Node,
 	type NodeProps,
 } from "@xyflow/react";
@@ -20,7 +22,10 @@ import {
 } from "~/bridge/item/editor/readEditorItemOriginFlow";
 import { ItemTypeLabel } from "~/ui/item-detail/ItemInfoPresentation";
 import { EditorItemThumbnail } from "~/ui/item/editor/EditorItemThumbnail";
-import type { EditorItemOriginFlowLayoutNode } from "~/ui/item/editor/layoutEditorItemOriginFlow";
+import type {
+	EditorItemOriginFlowLayoutNode,
+	EditorItemOriginFlowLayoutPoint,
+} from "~/ui/item/editor/layoutEditorItemOriginFlow";
 import {
 	type EditorOriginFlowSelection,
 	readEditorOriginFlowHighlight,
@@ -55,9 +60,17 @@ interface OriginBadgeData {
 type ItemFlowNode = Node<ItemNodeData, "item">;
 type SourceFlowNode = Node<SourceNodeData, "source">;
 type FlowNode = ItemFlowNode | SourceFlowNode;
+interface RoutedEdgeData extends Record<string, unknown> {
+	readonly path: string;
+}
+type FlowEdge = Edge<RoutedEdgeData, "routed">;
 type FlowNodeHighlight = "active" | "idle" | "selected";
 
 const EmptyFlowPositions: ReadonlyMap<string, EditorItemOriginFlowLayoutNode> = new Map();
+const EmptyFlowRoutes: ReadonlyMap<
+	string,
+	ReadonlyArray<EditorItemOriginFlowLayoutPoint>
+> = new Map();
 const DefaultFlowViewport = {
 	x: 24,
 	y: 24,
@@ -146,7 +159,7 @@ const readFlowNodeHandles = ({
 
 const ItemNode = ({ data }: NodeProps<ItemFlowNode>) => (
 	<div
-		className={`ak-flow-node-card min-h-[4.75rem] w-56 rounded-lg border border-l-2 p-3 shadow-sm transition-[opacity,outline] ${ItemTypeClassName[data.itemType]} ${ItemStatusClassName[data.status]} ${FlowNodeHighlightClassName[data.highlight]}`}
+		className={`ak-flow-node-card h-[4.75rem] w-56 overflow-hidden rounded-lg border border-l-2 p-3 shadow-sm transition-[opacity,outline] ${ItemTypeClassName[data.itemType]} ${ItemStatusClassName[data.status]} ${FlowNodeHighlightClassName[data.highlight]}`}
 		data-ui="EditorItemFlowItemNode"
 	>
 		<FlowHandles />
@@ -158,7 +171,7 @@ const ItemNode = ({ data }: NodeProps<ItemFlowNode>) => (
 			<div className="min-w-0">
 				<strong className="block truncate text-sm">{data.title}</strong>
 				<span className="block truncate font-mono text-xs text-muted">{data.itemId}</span>
-				<span className="block text-[0.65rem] font-semibold uppercase tracking-wider text-muted">
+				<span className="block truncate text-[0.65rem] font-semibold uppercase tracking-wider text-muted">
 					{data.starterScopes.length > 0
 						? `Starter: ${data.starterScopes.join(", ")}`
 						: data.typeLabel}
@@ -179,7 +192,7 @@ const OriginBadge = ({ icon, label, tooltip }: OriginBadgeData) => (
 
 const SourceNode = ({ data }: NodeProps<SourceFlowNode>) => (
 	<div
-		className={`ak-flow-node-card min-h-28 w-64 rounded-2xl border border-l-2 px-4 py-3 shadow-sm transition-[opacity,outline] ${SourceStatusClassName[data.status]} ${FlowNodeHighlightClassName[data.highlight]}`}
+		className={`ak-flow-node-card h-36 w-64 rounded-2xl border border-l-2 px-4 py-3 shadow-sm transition-[opacity,outline] ${SourceStatusClassName[data.status]} ${FlowNodeHighlightClassName[data.highlight]}`}
 		data-ui="EditorItemFlowSourceNode"
 	>
 		<FlowHandles />
@@ -198,6 +211,22 @@ const SourceNode = ({ data }: NodeProps<SourceFlowNode>) => (
 const nodeTypes = {
 	item: ItemNode,
 	source: SourceNode,
+};
+
+const RoutedEdge = ({ data, interactionWidth, markerEnd, style }: EdgeProps<FlowEdge>) => {
+	if (data === undefined) return null;
+	return (
+		<BaseEdge
+			interactionWidth={interactionWidth}
+			markerEnd={markerEnd}
+			path={data.path}
+			style={style}
+		/>
+	);
+};
+
+const edgeTypes = {
+	routed: RoutedEdge,
 };
 
 const SourceKindBadge: Record<"line" | "charges" | "merge" | "expiry", OriginBadgeData> = {
@@ -292,6 +321,7 @@ export const EditorOriginFlowSection = ({ itemId, mode }: EditorOriginFlowSectio
 	const flowState = useEditorItemOriginFlow(project.config, itemId);
 	const flow = flowState.flow;
 	const positions = flowState.status === "ready" ? flowState.positions : EmptyFlowPositions;
+	const routes = flowState.status === "ready" ? flowState.routes : EmptyFlowRoutes;
 	const [selection, setSelection] = useState<EditorOriginFlowSelection>();
 	const [moving, setMoving] = useState(false);
 	useEffect(() => {
@@ -304,10 +334,9 @@ export const EditorOriginFlowSection = ({ itemId, mode }: EditorOriginFlowSectio
 		() =>
 			flow === undefined || selection === undefined
 				? undefined
-				: readEditorOriginFlowHighlight(flow, positions, selection),
+				: readEditorOriginFlowHighlight(flow, selection),
 		[
 			flow,
-			positions,
 			selection,
 		],
 	);
@@ -388,26 +417,36 @@ export const EditorOriginFlowSection = ({ itemId, mode }: EditorOriginFlowSectio
 		highlight,
 		selection,
 	]);
-	const baseEdges = useMemo<Edge[]>(
+	const baseEdges = useMemo<FlowEdge[]>(
 		() =>
-			(flow?.edges ?? []).map((edge) => ({
-				...edge,
-				className: "ak-flow-edge cursor-pointer opacity-50",
-				markerEnd: {
-					color: "#7c3aed",
-					type: MarkerType.ArrowClosed,
-				},
-				style: {
-					stroke: "#7c3aed",
-					strokeWidth: 1.5,
-				},
-				type: "smoothstep",
-			})),
+			(flow?.edges ?? []).map((edge) => {
+				const points = routes.get(edge.id);
+				if (points === undefined) throw new Error(`Missing routed path for ${edge.id}.`);
+				return {
+					...edge,
+					className: "ak-flow-edge cursor-pointer opacity-50",
+					data: {
+						path: points
+							.map(({ x, y }, index) => `${index === 0 ? "M" : "L"} ${x} ${y}`)
+							.join(" "),
+					},
+					markerEnd: {
+						color: "#7c3aed",
+						type: MarkerType.ArrowClosed,
+					},
+					style: {
+						stroke: "#7c3aed",
+						strokeWidth: 1.5,
+					},
+					type: "routed" as const,
+				};
+			}),
 		[
 			flow,
+			routes,
 		],
 	);
-	const edges = useMemo<Edge[]>(() => {
+	const edges = useMemo<FlowEdge[]>(() => {
 		if (highlight === undefined) return baseEdges;
 		return baseEdges.map((edge) => {
 			if (!highlight.edgeIds.has(edge.id)) return edge;
@@ -481,7 +520,7 @@ export const EditorOriginFlowSection = ({ itemId, mode }: EditorOriginFlowSectio
 			</header>
 			{isReady ? (
 				<div className="relative min-h-0">
-					<ReactFlow<FlowNode, Edge>
+					<ReactFlow<FlowNode, FlowEdge>
 						defaultViewport={DefaultFlowViewport}
 						edges={renderedEdges}
 						fitView={mode === "item"}
@@ -491,6 +530,7 @@ export const EditorOriginFlowSection = ({ itemId, mode }: EditorOriginFlowSectio
 						maxZoom={1.4}
 						minZoom={0.2}
 						nodes={nodes}
+						edgeTypes={edgeTypes}
 						elementsSelectable={false}
 						nodesConnectable={false}
 						nodesDraggable={false}

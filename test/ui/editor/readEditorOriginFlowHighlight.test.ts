@@ -50,42 +50,9 @@ const flow = {
 	],
 } as unknown as EditorItemOriginFlow;
 
-const positions = new Map([
-	[
-		"a",
-		{
-			x: 0,
-		},
-	],
-	[
-		"b",
-		{
-			x: 1,
-		},
-	],
-	[
-		"c",
-		{
-			x: 2,
-		},
-	],
-	[
-		"d",
-		{
-			x: 2,
-		},
-	],
-	[
-		"x",
-		{
-			x: 0,
-		},
-	],
-]);
-
 describe("readEditorOriginFlowHighlight", () => {
 	it("includes every downstream branch from a selected node and terminates at cycles", () => {
-		const highlight = readEditorOriginFlowHighlight(flow, positions, {
+		const highlight = readEditorOriginFlowHighlight(flow, {
 			id: "b",
 			kind: "node",
 		});
@@ -102,11 +69,12 @@ describe("readEditorOriginFlowHighlight", () => {
 		]).toEqual([
 			"b-c",
 			"b-d",
+			"d-b",
 		]);
 	});
 
 	it("starts an edge selection at that connection without including sibling inputs", () => {
-		const highlight = readEditorOriginFlowHighlight(flow, positions, {
+		const highlight = readEditorOriginFlowHighlight(flow, {
 			id: "a-b",
 			kind: "edge",
 		});
@@ -124,12 +92,13 @@ describe("readEditorOriginFlowHighlight", () => {
 				"a-b",
 				"b-c",
 				"b-d",
+				"d-b",
 			]),
 		);
 	});
 
-	it("keeps a selected backward connection before continuing forward from its target", () => {
-		const highlight = readEditorOriginFlowHighlight(flow, positions, {
+	it("keeps a selected cycle connection before continuing from its target", () => {
+		const highlight = readEditorOriginFlowHighlight(flow, {
 			id: "d-b",
 			kind: "edge",
 		});
@@ -152,7 +121,7 @@ describe("readEditorOriginFlowHighlight", () => {
 
 	it("returns an empty highlight for a stale selection", () => {
 		expect(
-			readEditorOriginFlowHighlight(flow, positions, {
+			readEditorOriginFlowHighlight(flow, {
 				id: "missing",
 				kind: "node",
 			}),

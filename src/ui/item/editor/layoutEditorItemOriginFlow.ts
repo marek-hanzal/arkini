@@ -1,13 +1,14 @@
+import type { ElkEdgeSection, ElkExtendedEdge, ElkNode, ElkPoint } from "elkjs/lib/elk-api.js";
+
 export interface EditorItemOriginFlowLayoutInput {
 	readonly edges: ReadonlyArray<{
-		readonly role: "input" | "output" | "owner";
+		readonly id: string;
 		readonly source: string;
 		readonly target: string;
 	}>;
 	readonly nodes: ReadonlyArray<{
 		readonly id: string;
 		readonly kind: "item" | "source";
-		readonly starter: boolean;
 	}>;
 }
 
@@ -18,192 +19,163 @@ export interface EditorItemOriginFlowLayoutNode {
 	readonly y: number;
 }
 
-const Margin = 32;
-const NodeSeparation = 128;
-const RankSeparation = 320;
-const OrderingSweeps = 4;
+export interface EditorItemOriginFlowLayoutPoint {
+	readonly x: number;
+	readonly y: number;
+}
 
-const readNodeSize = (kind: "item" | "source") =>
-	kind === "item"
-		? {
-				height: 76,
-				width: 224,
-			}
-		: {
-				height: 112,
-				width: 256,
-			};
+export interface EditorItemOriginFlowLayout {
+	readonly positions: ReadonlyMap<string, EditorItemOriginFlowLayoutNode>;
+	readonly routes: ReadonlyMap<string, ReadonlyArray<EditorItemOriginFlowLayoutPoint>>;
+}
 
-const addAdjacentNode = (adjacency: Map<string, string[]>, source: string, target: string) => {
-	const adjacent = adjacency.get(source);
-	if (adjacent === undefined)
-		adjacency.set(source, [
-			target,
-		]);
-	else adjacent.push(target);
+const NodeSize = {
+	item: {
+		height: 76,
+		width: 224,
+	},
+	source: {
+		height: 144,
+		width: 256,
+	},
+} as const;
+
+const LayoutOptions = {
+	"elk.algorithm": "layered",
+	"elk.direction": "RIGHT",
+	"elk.edgeRouting": "ORTHOGONAL",
+	"elk.layered.spacing.edgeEdgeBetweenLayers": "24",
+	"elk.layered.spacing.edgeNodeBetweenLayers": "40",
+	"elk.layered.spacing.nodeNodeBetweenLayers": "160",
+	"elk.padding": "[top=32,left=32,bottom=32,right=32]",
+	"elk.randomSeed": "1",
+	"elk.spacing.edgeEdge": "24",
+	"elk.spacing.edgeNode": "40",
+	"elk.spacing.nodeNode": "96",
+} as const;
+
+type EditorItemOriginFlowElkLayout = (graph: ElkNode) => Promise<ElkNode>;
+
+const readInputPortId = (nodeId: string) => `${nodeId}:input`;
+const readOutputPortId = (nodeId: string) => `${nodeId}:output`;
+
+const readNumber = (value: number | undefined, label: string) => {
+	if (value === undefined || !Number.isFinite(value)) throw new Error(`ELK omitted ${label}.`);
+	return value;
 };
 
-const readRanks = (
-	flow: EditorItemOriginFlowLayoutInput,
-	outgoing: ReadonlyMap<string, ReadonlyArray<string>>,
-	incoming: ReadonlyMap<string, ReadonlyArray<string>>,
-) => {
-	const nodeIds = [
-		...new Set(flow.nodes.map(({ id }) => id)),
-	].sort();
-	const ranks = new Map<string, number>();
-	const pending: string[] = [];
-	const expand = () => {
-		for (let index = 0; index < pending.length; index += 1) {
-			const source = pending[index];
-			if (source === undefined) continue;
-			const nextRank = (ranks.get(source) ?? 0) + 1;
-			for (const target of outgoing.get(source) ?? []) {
-				if (ranks.has(target)) continue;
-				ranks.set(target, nextRank);
-				pending.push(target);
-			}
-		}
-		pending.length = 0;
-	};
-	const seed = (nodeIds: ReadonlyArray<string>) => {
-		for (const nodeId of nodeIds) {
-			if (ranks.has(nodeId)) continue;
-			ranks.set(nodeId, 0);
-			pending.push(nodeId);
-		}
-		expand();
-	};
+const pointsEqual = (left: ElkPoint, right: ElkPoint) => left.x === right.x && left.y === right.y;
 
-	seed(
-		flow.nodes
-			.filter(({ starter }) => starter)
-			.map(({ id }) => id)
-			.sort(),
-	);
-	while (ranks.size < nodeIds.length) {
-		const remaining = nodeIds.filter((id) => !ranks.has(id));
-		const roots = remaining.filter((id) =>
-			(incoming.get(id) ?? []).every((source) => ranks.has(source)),
-		);
-		seed(
-			roots.length > 0
-				? roots
-				: [
-						remaining[0] as string,
-					],
-		);
-	}
-	return ranks;
-};
-
-const orderRanks = (
-	groups: Map<number, string[]>,
-	ranks: ReadonlyMap<string, number>,
-	outgoing: ReadonlyMap<string, ReadonlyArray<string>>,
-	incoming: ReadonlyMap<string, ReadonlyArray<string>>,
-) => {
-	const rankIds = [
-		...groups.keys(),
-	].sort((left, right) => left - right);
-	for (let sweep = 0; sweep < OrderingSweeps; sweep += 1) {
-		const forward = sweep % 2 === 0;
-		const orderedRankIds = forward
-			? rankIds
-			: [
-					...rankIds,
-				].reverse();
-		const positions = new Map<string, number>();
-		for (const nodeIds of groups.values()) {
-			for (const [index, nodeId] of nodeIds.entries()) positions.set(nodeId, index);
-		}
-		for (const rank of orderedRankIds) {
-			const nodeIds = groups.get(rank);
-			if (nodeIds === undefined) continue;
-			const barycenter = (nodeId: string) => {
-				const adjacent = (forward ? incoming : outgoing).get(nodeId) ?? [];
-				const relevant = adjacent.filter((candidate) =>
-					forward
-						? (ranks.get(candidate) ?? rank) < rank
-						: (ranks.get(candidate) ?? rank) > rank,
-				);
-				if (relevant.length === 0) return positions.get(nodeId) ?? 0;
-				return (
-					relevant.reduce(
-						(total, candidate) => total + (positions.get(candidate) ?? 0),
-						0,
-					) / relevant.length
-				);
-			};
-			nodeIds.sort((left, right) => {
-				const distance = barycenter(left) - barycenter(right);
-				if (distance !== 0) return distance;
-				return left < right ? -1 : left > right ? 1 : 0;
-			});
-			for (const [index, nodeId] of nodeIds.entries()) positions.set(nodeId, index);
-		}
-	}
-};
-
-/** Lays out the item/source graph in deterministic progression ranks without routing edges. */
-export const layoutEditorItemOriginFlow = (
-	flow: EditorItemOriginFlowLayoutInput,
-): ReadonlyMap<string, EditorItemOriginFlowLayoutNode> => {
-	const nodeKinds = new Map(
-		flow.nodes.map(({ id, kind }) => [
-			id,
-			kind,
+const readRoute = (edge: ElkExtendedEdge): ReadonlyArray<ElkPoint> => {
+	const sections = edge.sections ?? [];
+	if (sections.length === 0) throw new Error(`ELK omitted the route for edge ${edge.id}.`);
+	const remaining = new Map(
+		sections.map((section) => [
+			section.id,
+			section,
 		]),
 	);
-	const outgoing = new Map<string, string[]>();
-	const incoming = new Map<string, string[]>();
-	const progressionOutgoing = new Map<string, string[]>();
-	const progressionIncoming = new Map<string, string[]>();
-	for (const { role, source, target } of flow.edges) {
-		if (!nodeKinds.has(source) || !nodeKinds.has(target)) continue;
-		addAdjacentNode(outgoing, source, target);
-		addAdjacentNode(incoming, target, source);
-		if (role !== "input") {
-			addAdjacentNode(progressionOutgoing, source, target);
-			addAdjacentNode(progressionIncoming, target, source);
-		}
-	}
-	const ranks = readRanks(flow, progressionOutgoing, progressionIncoming);
-	const groups = new Map<number, string[]>();
-	for (const { id } of flow.nodes) {
-		const rank = ranks.get(id) ?? 0;
-		const group = groups.get(rank);
-		if (group === undefined)
-			groups.set(rank, [
-				id,
-			]);
-		else group.push(id);
-	}
-	for (const group of groups.values()) group.sort();
-	orderRanks(groups, ranks, outgoing, incoming);
+	let section: ElkEdgeSection | undefined =
+		sections.find(({ incomingSections }) => (incomingSections?.length ?? 0) === 0) ??
+		sections[0];
+	const route: ElkPoint[] = [];
+	while (section !== undefined) {
+		remaining.delete(section.id);
+		const points = [
+			section.startPoint,
+			...(section.bendPoints ?? []),
+			section.endPoint,
+		];
+		if (route.length > 0 && !pointsEqual(route.at(-1)!, points[0]!))
+			throw new Error(`ELK returned disconnected sections for edge ${edge.id}.`);
+		route.push(...(route.length === 0 ? points : points.slice(1)));
 
-	const rankIds = [
-		...groups.keys(),
-	].sort((left, right) => left - right);
-	const positions = new Map<string, EditorItemOriginFlowLayoutNode>();
-	let x = Margin;
-	for (const rank of rankIds) {
-		const nodeIds = groups.get(rank) ?? [];
-		const rankWidth = Math.max(
-			0,
-			...nodeIds.map((id) => readNodeSize(nodeKinds.get(id) ?? "item").width),
-		);
-		let y = Margin;
-		for (const id of nodeIds) {
-			const size = readNodeSize(nodeKinds.get(id) ?? "item");
-			positions.set(id, {
-				...size,
-				x,
-				y,
-			});
-			y += size.height + NodeSeparation;
-		}
-		x += rankWidth + RankSeparation;
+		const outgoing: ReadonlyArray<string> = section.outgoingSections ?? [];
+		if (outgoing.length > 1)
+			throw new Error(`ELK returned branching sections for edge ${edge.id}.`);
+		section =
+			(outgoing[0] === undefined ? undefined : remaining.get(outgoing[0])) ??
+			[
+				...remaining.values(),
+			].find((candidate) => pointsEqual(candidate.startPoint, route.at(-1)!));
 	}
-	return positions;
+	if (remaining.size > 0)
+		throw new Error(`ELK returned disconnected sections for edge ${edge.id}.`);
+	return route;
+};
+
+/** Computes deterministic node placement and obstacle-avoiding orthogonal edge routes. */
+export const layoutEditorItemOriginFlow = async (
+	flow: EditorItemOriginFlowLayoutInput,
+	layout: EditorItemOriginFlowElkLayout,
+): Promise<EditorItemOriginFlowLayout> => {
+	const graph = await layout({
+		children: [
+			...flow.nodes,
+		]
+			.sort((left, right) => left.id.localeCompare(right.id))
+			.map(({ id, kind }) => {
+				const size = NodeSize[kind];
+				return {
+					...size,
+					id,
+					layoutOptions: {
+						"elk.portConstraints": "FIXED_POS",
+					},
+					ports: [
+						{
+							height: 6,
+							id: readInputPortId(id),
+							width: 6,
+							x: -3,
+							y: size.height / 2 - 3,
+						},
+						{
+							height: 6,
+							id: readOutputPortId(id),
+							width: 6,
+							x: size.width - 3,
+							y: size.height / 2 - 3,
+						},
+					],
+				};
+			}),
+		edges: [
+			...flow.edges,
+		]
+			.sort((left, right) => left.id.localeCompare(right.id))
+			.map(({ id, source, target }) => ({
+				id,
+				sources: [
+					readOutputPortId(source),
+				],
+				targets: [
+					readInputPortId(target),
+				],
+			})),
+		id: "root",
+		layoutOptions: LayoutOptions,
+	} satisfies ElkNode);
+
+	const positions = new Map<string, EditorItemOriginFlowLayoutNode>();
+	for (const node of graph.children ?? []) {
+		positions.set(node.id, {
+			height: readNumber(node.height, `height for node ${node.id}`),
+			width: readNumber(node.width, `width for node ${node.id}`),
+			x: readNumber(node.x, `x for node ${node.id}`),
+			y: readNumber(node.y, `y for node ${node.id}`),
+		});
+	}
+	if (positions.size !== flow.nodes.length)
+		throw new Error(`ELK returned ${positions.size} of ${flow.nodes.length} nodes.`);
+
+	const routes = new Map<string, ReadonlyArray<EditorItemOriginFlowLayoutPoint>>();
+	for (const edge of graph.edges ?? []) routes.set(edge.id, readRoute(edge));
+	if (routes.size !== flow.edges.length)
+		throw new Error(`ELK returned ${routes.size} of ${flow.edges.length} edge routes.`);
+
+	return {
+		positions,
+		routes,
+	};
 };

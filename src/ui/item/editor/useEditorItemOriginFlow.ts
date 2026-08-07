@@ -7,8 +7,11 @@ import {
 	type EditorItemOriginFlowProgress,
 	type EditorItemOriginFlowRequest,
 } from "~/bridge/item/editor/readEditorItemOriginFlow";
-import { makeEditorItemOriginFlowLayoutWorkerOwnerFx } from "~/ui/item/editor/EditorItemOriginFlowLayoutWorker";
-import type { EditorItemOriginFlowLayoutNode } from "~/ui/item/editor/layoutEditorItemOriginFlow";
+import { layoutEditorItemOriginFlowInWorkerFx } from "~/ui/item/editor/EditorItemOriginFlowLayoutWorker";
+import type {
+	EditorItemOriginFlowLayoutNode,
+	EditorItemOriginFlowLayoutPoint,
+} from "~/ui/item/editor/layoutEditorItemOriginFlow";
 
 type EditorItemOriginFlowState =
 	| {
@@ -19,6 +22,7 @@ type EditorItemOriginFlowState =
 	| {
 			readonly flow: EditorItemOriginFlow;
 			readonly positions: ReadonlyMap<string, EditorItemOriginFlowLayoutNode>;
+			readonly routes: ReadonlyMap<string, ReadonlyArray<EditorItemOriginFlowLayoutPoint>>;
 			readonly progress: EditorItemOriginFlowProgress;
 			readonly status: "ready";
 	  }
@@ -85,11 +89,10 @@ export const useEditorItemOriginFlow = (
 							status: "loading",
 						});
 					}
-					const owner = yield* makeEditorItemOriginFlowLayoutWorkerOwnerFx();
-					const positions = yield* owner.layoutFx(flow);
+					const layout = yield* layoutEditorItemOriginFlowInWorkerFx(flow);
 					return {
 						flow,
-						positions,
+						layout,
 					};
 				}),
 			),
@@ -97,11 +100,12 @@ export const useEditorItemOriginFlow = (
 				signal: controller.signal,
 			},
 		)
-			.then(({ flow, positions }) => {
+			.then(({ flow, layout }) => {
 				if (controller.signal.aborted) return;
 				setState({
 					flow,
-					positions,
+					positions: layout.positions,
+					routes: layout.routes,
 					progress: {
 						label: "Acquisition graph ready",
 						percent: 100,

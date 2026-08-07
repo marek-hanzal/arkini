@@ -28,9 +28,8 @@ export interface EditorItemOriginFlowLayout {
 	readonly routes: ReadonlyMap<string, ReadonlyArray<EditorItemOriginFlowLayoutPoint>>;
 }
 
-const GoldenRatio = (1 + Math.sqrt(5)) / 2;
-const NodeWidth = 224;
-const NodeHeight = Math.round(NodeWidth / GoldenRatio);
+const NodeWidth = 420;
+const NodeHeight = 176;
 const RowGap = 24;
 const ColumnGap = 96;
 const Padding = 20;

@@ -170,19 +170,6 @@ const readSourceKindColor = (
 	}
 };
 
-const SourceKindLabel: Record<EditorItemOriginSourceNode["sourceKind"], string> = {
-	line: "Production",
-	charges: "Depletion",
-	merge: "Merge",
-	expiry: "Expiry",
-};
-const SelectionKindLabel: Record<EditorItemOriginSourceNode["selectionKind"], string> = {
-	guaranteed: "Guaranteed",
-	chance: "Chance",
-	weighted: "Weighted",
-	replace: "Replacement",
-};
-
 const SourceKindIconPath: Record<EditorItemOriginSourceNode["sourceKind"], string> = {
 	line: "M12 16h.01M16 16h.01M3 19a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8.5a.5.5 0 0 0-.769-.422l-4.462 2.844A.5.5 0 0 1 15 10.5v-2a.5.5 0 0 0-.769-.422L9.77 10.922A.5.5 0 0 1 9 10.5V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2zm5-3h.01",
 	charges:
@@ -323,6 +310,98 @@ const fitText = (context: CanvasRenderingContext2D, value: string, maxWidth: num
 	return "";
 };
 
+const wrapText = (
+	context: CanvasRenderingContext2D,
+	value: string,
+	maxWidth: number,
+	maxLines: number,
+) => {
+	const words = value.trim().split(/\s+/).filter(Boolean);
+	if (words.length === 0) return [] as string[];
+	const lines: string[] = [];
+	let current = "";
+	for (let index = 0; index < words.length; index += 1) {
+		const word = words[index]!;
+		const candidate = current.length === 0 ? word : `${current} ${word}`;
+		if (context.measureText(candidate).width <= maxWidth) {
+			current = candidate;
+			continue;
+		}
+		if (current.length > 0) {
+			lines.push(current);
+			current = word;
+		} else {
+			lines.push(fitText(context, word, maxWidth));
+			current = "";
+		}
+		if (lines.length === maxLines) {
+			const remainder = [
+				current,
+				...words.slice(index + 1),
+			]
+				.filter(Boolean)
+				.join(" ");
+			if (remainder.length > 0)
+				lines[maxLines - 1] = fitText(
+					context,
+					`${lines[maxLines - 1]} ${remainder}`,
+					maxWidth,
+				);
+			return lines;
+		}
+	}
+	if (current.length > 0 && lines.length < maxLines) lines.push(current);
+	return lines;
+};
+
+const wrapIdentifier = (
+	context: CanvasRenderingContext2D,
+	value: string,
+	maxWidth: number,
+	maxLines: number,
+) => {
+	const lines: string[] = [];
+	let remaining = value.trim();
+	while (remaining.length > 0 && lines.length < maxLines) {
+		if (context.measureText(remaining).width <= maxWidth) {
+			lines.push(remaining);
+			break;
+		}
+
+		let end = 1;
+		while (
+			end < remaining.length &&
+			context.measureText(remaining.slice(0, end + 1)).width <= maxWidth
+		)
+			end += 1;
+		if (lines.length === maxLines - 1) {
+			lines.push(fitText(context, remaining, maxWidth));
+			break;
+		}
+
+		let breakAt = end;
+		for (let index = end - 1; index >= Math.floor(end * 0.55); index -= 1) {
+			if (":/-_.".includes(remaining[index]!)) {
+				breakAt = index + 1;
+				break;
+			}
+		}
+		lines.push(remaining.slice(0, breakAt));
+		remaining = remaining.slice(breakAt);
+	}
+	return lines;
+};
+
+const drawTextLines = (
+	context: CanvasRenderingContext2D,
+	lines: ReadonlyArray<string>,
+	x: number,
+	y: number,
+	lineHeight: number,
+) => {
+	for (const [index, line] of lines.entries()) context.fillText(line, x, y + index * lineHeight);
+};
+
 const drawNodeFrame = (
 	context: CanvasRenderingContext2D,
 	position: EditorItemOriginFlowLayoutNode,
@@ -461,8 +540,8 @@ const drawItemNode = (
 		palette,
 	);
 
-	const artworkSize = 52;
-	const artworkX = position.x + 12;
+	const artworkSize = 68;
+	const artworkX = position.x + 16;
 	const artworkY = position.y + (position.height - artworkSize) / 2;
 	drawItemArtwork(
 		context,
@@ -476,15 +555,21 @@ const drawItemNode = (
 		palette,
 	);
 
-	const textX = artworkX + artworkSize + 12;
-	const maxTextWidth = position.x + position.width - 12 - textX;
-	const textCenterY = position.y + position.height / 2;
+	const textX = artworkX + artworkSize + 18;
+	const maxTextWidth = position.x + position.width - 18 - textX;
+	let textY = position.y + 33;
 	context.fillStyle = palette.foreground;
-	context.font = "600 14px Inter, ui-sans-serif, system-ui, sans-serif";
-	context.fillText(fitText(context, node.title, maxTextWidth), textX, textCenterY - 12);
+	context.font = "600 15px Inter, ui-sans-serif, system-ui, sans-serif";
+	const titleLines = wrapText(context, node.title, maxTextWidth, 2);
+	drawTextLines(context, titleLines, textX, textY, 19);
+	textY += titleLines.length * 19 + 10;
+
 	context.fillStyle = palette.muted;
 	context.font = "12px ui-monospace, SFMono-Regular, Menlo, monospace";
-	context.fillText(fitText(context, node.itemId, maxTextWidth), textX, textCenterY + 8);
+	const idLines = wrapIdentifier(context, node.itemId, maxTextWidth, 2);
+	drawTextLines(context, idLines, textX, textY, 16);
+	textY += idLines.length * 16 + 10;
+
 	context.font = "600 10px Inter, ui-sans-serif, system-ui, sans-serif";
 	const label =
 		node.starterScopes.length > 0
@@ -492,7 +577,7 @@ const drawItemNode = (
 			: node.type === "missing"
 				? "Missing item"
 				: ItemTypeLabel[node.type];
-	context.fillText(fitText(context, label.toUpperCase(), maxTextWidth), textX, textCenterY + 28);
+	context.fillText(fitText(context, label.toUpperCase(), maxTextWidth), textX, textY);
 	context.restore();
 };
 
@@ -530,20 +615,6 @@ const drawSourceIcon = (
 	context.restore();
 };
 
-const readSourceSummary = (node: EditorItemOriginSourceNode) =>
-	[
-		SourceKindLabel[node.sourceKind],
-		node.weightedSet ? "Weighted set" : undefined,
-		SelectionKindLabel[node.selectionKind],
-		node.placement === "random"
-			? "Random board"
-			: node.placement === "drop"
-				? "Local drop"
-				: undefined,
-	]
-		.filter((value): value is string => value !== undefined)
-		.join(" · ");
-
 const drawSourceNode = (
 	context: CanvasRenderingContext2D,
 	node: EditorItemOriginSourceNode,
@@ -565,21 +636,20 @@ const drawSourceNode = (
 		palette,
 	);
 
-	const iconSize = 40;
-	const iconX = position.x + 18;
+	const iconSize = 48;
+	const iconX = position.x + 20;
 	const iconY = position.y + (position.height - iconSize) / 2;
 	drawSourceIcon(context, node.sourceKind, iconX, iconY, iconSize, kindColor);
 
-	const textX = iconX + iconSize + 18;
-	const maxTextWidth = position.x + position.width - 18 - textX;
+	const textX = iconX + iconSize + 20;
+	const maxTextWidth = position.x + position.width - 24 - textX;
 	context.fillStyle = palette.foreground;
-	context.font = "600 14px Inter, ui-sans-serif, system-ui, sans-serif";
-	const textCenterY = position.y + position.height / 2;
-	context.fillText(fitText(context, node.label, maxTextWidth), textX, textCenterY - 4);
-	context.fillStyle = palette.muted;
-	context.font = "600 11px Inter, ui-sans-serif, system-ui, sans-serif";
-	const summary = readSourceSummary(node);
-	context.fillText(fitText(context, summary, maxTextWidth), textX, textCenterY + 17);
+	context.font = "600 16px Inter, ui-sans-serif, system-ui, sans-serif";
+	const titleLines = wrapText(context, node.label, maxTextWidth, 3);
+	const lineHeight = 21;
+	const titleHeight = Math.max(1, titleLines.length) * lineHeight;
+	const titleY = position.y + (position.height - titleHeight) / 2 + 16;
+	drawTextLines(context, titleLines, textX, titleY, lineHeight);
 	context.restore();
 };
 

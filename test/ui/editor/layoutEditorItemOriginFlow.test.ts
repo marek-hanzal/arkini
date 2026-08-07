@@ -129,7 +129,7 @@ describe("layoutEditorItemOriginFlow", () => {
 		}
 	});
 
-	it("uses one golden-ratio card size without overlap", () => {
+	it("uses one wide card size without overlap", () => {
 		const layout = layoutEditorItemOriginFlow({
 			edges: [],
 			nodes: Array.from(
@@ -144,8 +144,8 @@ describe("layoutEditorItemOriginFlow", () => {
 		];
 		for (const position of positions)
 			expect(position).toMatchObject({
-				height: 138,
-				width: 224,
+				height: 176,
+				width: 420,
 			});
 		for (let leftIndex = 0; leftIndex < positions.length; leftIndex += 1) {
 			const left = positions[leftIndex]!;
@@ -203,7 +203,7 @@ describe("layoutEditorItemOriginFlow", () => {
 		expect(layout.positions.size).toBe(flow.nodes.length);
 		expect(layout.routes.size).toBe(flow.edges.length);
 		expect(elapsedMs).toBeLessThan(1_000);
-		expect(bounds.width).toBeLessThan(10_000);
+		expect(bounds.width).toBeLessThan(13_000);
 		expect(bounds.height).toBeLessThan(7_000);
 		expect(bounds.width / bounds.height).toBeGreaterThan(1.3);
 		expect(bounds.width / bounds.height).toBeLessThan(2.1);

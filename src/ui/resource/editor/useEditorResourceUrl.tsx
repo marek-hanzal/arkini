@@ -107,6 +107,9 @@ export const EditorProjectResourceUrlProvider = ({ children }: PropsWithChildren
 	return <EditorResourceUrlProvider resources={resources}>{children}</EditorResourceUrlProvider>;
 };
 
+/** Reads the project-scoped resource URL index without allocating object URLs. */
+export const useEditorResourceUrls = () => useContext(EditorResourceUrlContext);
+
 /** Resolves the project-scoped URL without allocating per mounted thumbnail. */
 export const useEditorResourceUrl = (resourceId: string | undefined) =>
-	useContext(EditorResourceUrlContext).get(resourceId ?? "");
+	useEditorResourceUrls().get(resourceId ?? "");

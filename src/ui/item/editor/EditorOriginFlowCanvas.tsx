@@ -23,6 +23,7 @@ import {
 	type EditorOriginFlowSelection,
 	readEditorOriginFlowHighlight,
 } from "~/ui/item/editor/readEditorOriginFlowHighlight";
+import { useEditorResourceUrls } from "~/ui/resource/editor/useEditorResourceUrl";
 
 interface Viewport {
 	x: number;
@@ -52,6 +53,7 @@ interface RenderState {
 	readonly flow: EditorItemOriginFlow;
 	readonly highlight: ReturnType<typeof readEditorOriginFlowHighlight> | undefined;
 	readonly positions: ReadonlyMap<string, EditorItemOriginFlowLayoutNode>;
+	readonly resourceUrls: ReadonlyMap<string, string>;
 	readonly routes: ReadonlyMap<string, ReadonlyArray<EditorItemOriginFlowLayoutPoint>>;
 	readonly selection: EditorOriginFlowSelection | undefined;
 }
@@ -66,6 +68,7 @@ const MaxZoom = 1.4;
 const FitPaddingRatio = 0.12;
 const ClickThreshold = 5;
 const EdgeHitRadiusPx = 9;
+const MaxCachedImages = 96;
 
 interface CanvasPalette {
 	readonly accent: string;
@@ -142,33 +145,6 @@ const readItemTypeColor = (palette: CanvasPalette, type: EditorItemOriginItemNod
 	}
 };
 
-const readStatusColor = (palette: CanvasPalette, status: EditorItemOriginItemNode["status"]) => {
-	switch (status) {
-		case "starter":
-			return palette.accent;
-		case "reachable":
-			return palette.line;
-		case "blocked":
-			return palette.danger;
-		case "cycle":
-			return palette.warning;
-	}
-};
-
-const readSourceStatusColor = (
-	palette: CanvasPalette,
-	status: EditorItemOriginSourceNode["status"],
-) => {
-	switch (status) {
-		case "reachable":
-			return palette.success;
-		case "blocked":
-			return palette.danger;
-		case "cycle":
-			return palette.warning;
-	}
-};
-
 const readSourceKindColor = (
 	palette: CanvasPalette,
 	kind: EditorItemOriginSourceNode["sourceKind"],
@@ -185,15 +161,6 @@ const readSourceKindColor = (
 	}
 };
 
-const withAlpha = (color: string, alpha: number) => {
-	const channels = [
-		...color.matchAll(/\d+(?:\.\d+)?/g),
-	].map(([value]) => Number(value));
-	if (channels.length < 3) return color;
-	const [red, green, blue] = channels;
-	return `rgba(${red}, ${green}, ${blue}, ${alpha})`;
-};
-
 const SourceKindLabel: Record<EditorItemOriginSourceNode["sourceKind"], string> = {
 	line: "Production",
 	charges: "Depletion",
@@ -206,6 +173,15 @@ const SelectionKindLabel: Record<EditorItemOriginSourceNode["selectionKind"], st
 	weighted: "Weighted",
 	replace: "Replacement",
 };
+
+const SourceKindIconPath: Record<EditorItemOriginSourceNode["sourceKind"], string> = {
+	line: "M12 16h.01M16 16h.01M3 19a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8.5a.5.5 0 0 0-.769-.422l-4.462 2.844A.5.5 0 0 1 15 10.5v-2a.5.5 0 0 0-.769-.422L9.77 10.922A.5.5 0 0 1 9 10.5V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2zm5-3h.01",
+	charges:
+		"m11 7-3 5h4l-3 5m5.856-11H16a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-2.935M22 14v-4M5.14 18H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h2.936",
+	merge: "M14 3a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1m5-7a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1M7 15l3 3m-3 3 3-3H5a2 2 0 0 1-2-2v-2",
+	expiry: "M10 2h4m-2 12 3-3",
+};
+const sourceIconPathCache = new Map<EditorItemOriginSourceNode["sourceKind"], Path2D>();
 
 const clampZoom = (zoom: number) => Math.max(MinZoom, Math.min(MaxZoom, zoom));
 
@@ -298,6 +274,120 @@ const fitText = (context: CanvasRenderingContext2D, value: string, maxWidth: num
 	return "";
 };
 
+const drawNodeFrame = (
+	context: CanvasRenderingContext2D,
+	position: EditorItemOriginFlowLayoutNode,
+	radius: number,
+	background: string,
+	idleBorder: string,
+	highlight: "active" | "idle" | "selected",
+	palette: CanvasPalette,
+) => {
+	if (radius === 0) {
+		context.beginPath();
+		context.rect(position.x, position.y, position.width, position.height);
+	} else
+		drawRoundedRect(context, position.x, position.y, position.width, position.height, radius);
+	context.fillStyle = background;
+	context.fill();
+	context.lineWidth = highlight === "selected" ? 4 : highlight === "active" ? 2.5 : 2;
+	context.strokeStyle = highlight === "idle" ? idleBorder : palette.accent;
+	context.stroke();
+};
+
+const readReadyImage = (
+	cache: Map<string, HTMLImageElement>,
+	url: string | undefined,
+	onReady: () => void,
+) => {
+	if (url === undefined) return undefined;
+	const existing = cache.get(url);
+	if (existing !== undefined) {
+		cache.delete(url);
+		cache.set(url, existing);
+		return existing.complete && existing.naturalWidth > 0 ? existing : undefined;
+	}
+	const image = new Image();
+	image.decoding = "async";
+	image.onload = onReady;
+	image.onerror = onReady;
+	cache.set(url, image);
+	while (cache.size > MaxCachedImages) {
+		const oldestUrl = cache.keys().next().value;
+		if (oldestUrl === undefined) break;
+		const oldest = cache.get(oldestUrl);
+		if (oldest !== undefined) oldest.src = "";
+		cache.delete(oldestUrl);
+	}
+	image.src = url;
+	return undefined;
+};
+
+const drawContainedImage = (
+	context: CanvasRenderingContext2D,
+	image: HTMLImageElement,
+	x: number,
+	y: number,
+	width: number,
+	height: number,
+) => {
+	const scale = Math.min(width / image.naturalWidth, height / image.naturalHeight);
+	const drawWidth = image.naturalWidth * scale;
+	const drawHeight = image.naturalHeight * scale;
+	context.drawImage(
+		image,
+		x + (width - drawWidth) / 2,
+		y + (height - drawHeight) / 2,
+		drawWidth,
+		drawHeight,
+	);
+};
+
+const drawItemArtwork = (
+	context: CanvasRenderingContext2D,
+	node: EditorItemOriginItemNode,
+	resourceUrls: ReadonlyMap<string, string>,
+	imageCache: Map<string, HTMLImageElement>,
+	onImageReady: () => void,
+	x: number,
+	y: number,
+	size: number,
+	palette: CanvasPalette,
+) => {
+	const background = readReadyImage(
+		imageCache,
+		resourceUrls.get(node.resourceIds[0]),
+		onImageReady,
+	);
+	const foreground = readReadyImage(
+		imageCache,
+		resourceUrls.get(node.resourceIds[1] ?? ""),
+		onImageReady,
+	);
+	if (background === undefined) {
+		context.fillStyle = palette.muted;
+		context.font = "600 22px Inter, ui-sans-serif, system-ui, sans-serif";
+		context.textAlign = "center";
+		context.fillText("?", x + size / 2, y + size / 2 + 8);
+		context.textAlign = "start";
+		return;
+	}
+	if (foreground === undefined) {
+		drawContainedImage(context, background, x, y, size, size);
+		return;
+	}
+	const layerSize = size * 0.74;
+	drawContainedImage(context, background, x, y, layerSize, layerSize);
+	drawContainedImage(
+		context,
+		foreground,
+		x + size - layerSize,
+		y + size - layerSize,
+		layerSize,
+		layerSize,
+	);
+};
+
 const drawItemNode = (
 	context: CanvasRenderingContext2D,
 	node: EditorItemOriginItemNode,
@@ -305,32 +395,40 @@ const drawItemNode = (
 	highlight: "active" | "idle" | "selected",
 	selectionActive: boolean,
 	palette: CanvasPalette,
+	resourceUrls: ReadonlyMap<string, string>,
+	imageCache: Map<string, HTMLImageElement>,
+	onImageReady: () => void,
 ) => {
 	const typeColor = readItemTypeColor(palette, node.type);
-	const statusColor = readStatusColor(palette, node.status);
 	context.save();
 	context.globalAlpha = selectionActive && highlight === "idle" ? 0.2 : 1;
-	context.beginPath();
-	context.rect(position.x, position.y, position.width, position.height);
-	context.fillStyle = palette.itemSurfaces[node.type];
-	context.fill();
-	context.lineWidth = 2;
-	context.strokeStyle = withAlpha(typeColor, 0.8);
-	context.stroke();
+	drawNodeFrame(
+		context,
+		position,
+		0,
+		palette.itemSurfaces[node.type],
+		typeColor,
+		highlight,
+		palette,
+	);
 
-	context.fillStyle = statusColor;
-	context.fillRect(position.x + 1, position.y + 1, position.width - 2, 5);
+	const artworkSize = 52;
+	const artworkX = position.x + 12;
+	const artworkY = position.y + (position.height - artworkSize) / 2;
+	drawItemArtwork(
+		context,
+		node,
+		resourceUrls,
+		imageCache,
+		onImageReady,
+		artworkX,
+		artworkY,
+		artworkSize,
+		palette,
+	);
 
-	if (highlight !== "idle") {
-		context.lineWidth = highlight === "selected" ? 4 : 2.5;
-		context.strokeStyle = palette.accent;
-		context.beginPath();
-		context.rect(position.x - 3, position.y - 3, position.width + 6, position.height + 6);
-		context.stroke();
-	}
-
-	const textX = position.x + 13;
-	const maxTextWidth = position.width - 26;
+	const textX = artworkX + artworkSize + 12;
+	const maxTextWidth = position.x + position.width - 12 - textX;
 	context.fillStyle = palette.foreground;
 	context.font = "600 14px Inter, ui-sans-serif, system-ui, sans-serif";
 	context.fillText(fitText(context, node.title, maxTextWidth), textX, position.y + 24);
@@ -345,6 +443,40 @@ const drawItemNode = (
 				? "Missing item"
 				: ItemTypeLabel[node.type];
 	context.fillText(fitText(context, label.toUpperCase(), maxTextWidth), textX, position.y + 61);
+	context.restore();
+};
+
+const drawSourceIcon = (
+	context: CanvasRenderingContext2D,
+	kind: EditorItemOriginSourceNode["sourceKind"],
+	x: number,
+	y: number,
+	size: number,
+	color: string,
+) => {
+	let path = sourceIconPathCache.get(kind);
+	if (path === undefined) {
+		path = new Path2D(SourceKindIconPath[kind]);
+		sourceIconPathCache.set(kind, path);
+	}
+	context.save();
+	context.translate(x, y);
+	context.scale(size / 24, size / 24);
+	context.strokeStyle = color;
+	context.lineWidth = 2;
+	context.lineCap = "round";
+	context.lineJoin = "round";
+	context.stroke(path);
+	if (kind === "merge") {
+		context.beginPath();
+		context.roundRect(14, 14, 7, 7, 1);
+		context.roundRect(3, 3, 7, 7, 1);
+		context.stroke();
+	} else if (kind === "expiry") {
+		context.beginPath();
+		context.arc(12, 14, 8, 0, Math.PI * 2);
+		context.stroke();
+	}
 	context.restore();
 };
 
@@ -371,43 +503,32 @@ const drawSourceNode = (
 	palette: CanvasPalette,
 ) => {
 	const kindColor = readSourceKindColor(palette, node.sourceKind);
-	const statusColor = readSourceStatusColor(palette, node.status);
 	context.save();
 	context.globalAlpha = selectionActive && highlight === "idle" ? 0.2 : 1;
-	drawRoundedRect(context, position.x, position.y, position.width, position.height, 18);
-	context.fillStyle = palette.sourceSurfaces[node.sourceKind];
-	context.fill();
-	context.lineWidth = 2;
-	context.strokeStyle = withAlpha(kindColor, 0.9);
-	context.stroke();
+	drawNodeFrame(
+		context,
+		position,
+		18,
+		palette.sourceSurfaces[node.sourceKind],
+		kindColor,
+		highlight,
+		palette,
+	);
 
-	context.fillStyle = withAlpha(statusColor, 0.18);
-	drawRoundedRect(context, position.x + 10, position.y + 10, position.width - 20, 18, 9);
-	context.fill();
+	const iconSize = 40;
+	const iconX = position.x + 18;
+	const iconY = position.y + (position.height - iconSize) / 2;
+	drawSourceIcon(context, node.sourceKind, iconX, iconY, iconSize, kindColor);
 
-	if (highlight !== "idle") {
-		context.lineWidth = highlight === "selected" ? 4 : 2.5;
-		context.strokeStyle = palette.accent;
-		drawRoundedRect(
-			context,
-			position.x - 3,
-			position.y - 3,
-			position.width + 6,
-			position.height + 6,
-			21,
-		);
-		context.stroke();
-	}
-
-	const textX = position.x + 16;
-	const maxTextWidth = position.width - 32;
+	const textX = iconX + iconSize + 18;
+	const maxTextWidth = position.x + position.width - 18 - textX;
 	context.fillStyle = palette.foreground;
 	context.font = "600 14px Inter, ui-sans-serif, system-ui, sans-serif";
-	context.fillText(fitText(context, node.label, maxTextWidth), textX, position.y + 27);
+	context.fillText(fitText(context, node.label, maxTextWidth), textX, position.y + 63);
 	context.fillStyle = palette.muted;
 	context.font = "600 11px Inter, ui-sans-serif, system-ui, sans-serif";
 	const summary = readSourceSummary(node);
-	context.fillText(fitText(context, summary, maxTextWidth), textX, position.y + 52);
+	context.fillText(fitText(context, summary, maxTextWidth), textX, position.y + 84);
 	context.restore();
 };
 
@@ -556,7 +677,10 @@ export const EditorOriginFlowCanvas = ({
 	routes,
 	selection,
 }: EditorOriginFlowCanvasProps) => {
+	const resourceUrls = useEditorResourceUrls();
 	const canvasRef = useRef<HTMLCanvasElement>(null);
+	const imageCacheRef = useRef<Map<string, HTMLImageElement>>(new Map());
+	const scheduleDrawRef = useRef<() => void>(() => undefined);
 	const viewportRef = useRef<Viewport>(DefaultViewport);
 	const panRef = useRef<PanState | undefined>(undefined);
 	const frameRef = useRef<number | undefined>(undefined);
@@ -578,6 +702,7 @@ export const EditorOriginFlowCanvas = ({
 		flow,
 		highlight,
 		positions,
+		resourceUrls,
 		routes,
 		selection,
 	});
@@ -586,6 +711,7 @@ export const EditorOriginFlowCanvas = ({
 		flow,
 		highlight,
 		positions,
+		resourceUrls,
 		routes,
 		selection,
 	};
@@ -640,6 +766,9 @@ export const EditorOriginFlowCanvas = ({
 					nodeHighlight,
 					state.selection !== undefined,
 					palette,
+					state.resourceUrls,
+					imageCacheRef.current,
+					scheduleDrawRef.current,
 				);
 			else
 				drawSourceNode(
@@ -660,6 +789,7 @@ export const EditorOriginFlowCanvas = ({
 	}, [
 		draw,
 	]);
+	scheduleDrawRef.current = scheduleDraw;
 
 	useLayoutEffect(() => {
 		resetViewportRef.current = true;
@@ -673,6 +803,7 @@ export const EditorOriginFlowCanvas = ({
 	useEffect(() => {
 		scheduleDraw();
 	}, [
+		resourceUrls,
 		scheduleDraw,
 		selection,
 	]);
@@ -741,6 +872,8 @@ export const EditorOriginFlowCanvas = ({
 	useEffect(
 		() => () => {
 			if (frameRef.current !== undefined) cancelAnimationFrame(frameRef.current);
+			for (const image of imageCacheRef.current.values()) image.src = "";
+			imageCacheRef.current.clear();
 		},
 		[],
 	);

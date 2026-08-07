@@ -2,6 +2,9 @@ import type { EditorItemOriginFlow } from "~/bridge/item/editor/readEditorItemOr
 
 export type EditorOriginFlowSelection =
 	| {
+			readonly kind: "graph";
+	  }
+	| {
 			readonly id: string;
 			readonly kind: "edge";
 	  }
@@ -20,6 +23,12 @@ export const readEditorOriginFlowHighlight = (
 	flow: EditorItemOriginFlow,
 	selection: EditorOriginFlowSelection,
 ): EditorOriginFlowHighlight => {
+	if (selection.kind === "graph")
+		return {
+			edgeIds: new Set(flow.edges.map(({ id }) => id)),
+			nodeIds: new Set(flow.nodes.map(({ id }) => id)),
+		};
+
 	const edgesBySource = new Map<string, Array<EditorItemOriginFlow["edges"][number]>>();
 	for (const edge of flow.edges) {
 		const outgoing = edgesBySource.get(edge.source);

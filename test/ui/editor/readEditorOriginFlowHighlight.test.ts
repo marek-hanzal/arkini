@@ -119,6 +119,31 @@ describe("readEditorOriginFlowHighlight", () => {
 		);
 	});
 
+	it("returns the whole graph for a graph selection", () => {
+		const highlight = readEditorOriginFlowHighlight(flow, {
+			kind: "graph",
+		});
+
+		expect(highlight.nodeIds).toEqual(
+			new Set([
+				"a",
+				"b",
+				"c",
+				"d",
+				"x",
+			]),
+		);
+		expect(highlight.edgeIds).toEqual(
+			new Set([
+				"a-b",
+				"b-c",
+				"b-d",
+				"d-b",
+				"x-b",
+			]),
+		);
+	});
+
 	it("returns an empty highlight for a stale selection", () => {
 		expect(
 			readEditorOriginFlowHighlight(flow, {

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { useEditorProject } from "~/bridge/editor/useEditorProject";
 import type { EditorOriginFlowSelection } from "~/ui/item/editor/readEditorOriginFlowHighlight";
@@ -34,44 +34,54 @@ export const EditorOriginFlowSection = ({ itemId, mode }: EditorOriginFlowSectio
 		flow,
 	]);
 	const isReady = flowState.status === "ready" && flow !== undefined;
+	const badge = useMemo(() => {
+		if (isReady) {
+			if (mode === "all")
+				return {
+					label: `${flow.nodes.filter(({ kind }) => kind === "item").length} items`,
+					toneClass: "border-violet-400 bg-violet-100 text-violet-900",
+				};
+			return flow.obtainable
+				? {
+						label: "Obtainable",
+						toneClass: "border-violet-400 bg-violet-100 text-violet-900",
+					}
+				: {
+						label: "No complete starter path",
+						toneClass: "border-rose-300 bg-rose-50 text-rose-800",
+					};
+		}
+		return flowState.status === "error"
+			? {
+					label: "Build failed",
+					toneClass: "border-rose-300 bg-rose-50 text-rose-800",
+				}
+			: {
+					label: `${flowState.progress.percent}%`,
+					toneClass: "border-violet-200 bg-violet-50 text-violet-800",
+				};
+	}, [
+		flow,
+		flowState.progress.percent,
+		flowState.status,
+		isReady,
+		mode,
+	]);
+
 	return (
 		<section
-			className="grid h-full min-h-[34rem] grid-rows-[auto_1fr] overflow-hidden rounded-lg border border-l-2 border-line bg-surface-raised"
+			className="h-full min-h-[34rem] overflow-hidden rounded-lg border border-l-2 border-line bg-surface-raised"
 			data-ui="EditorOriginFlowSection"
 		>
-			<header className="flex items-center justify-between gap-4 border-b border-line px-5 py-3">
-				<div>
-					<h2 className="font-semibold">
-						{mode === "all" ? "Game flow" : "Acquisition flow"}
-					</h2>
-					<p className="text-sm text-muted">
-						{mode === "all"
-							? "Shows every item and the operations that connect its inputs to outputs. Select a node or connection to trace it forward."
-							: "Shows every acquisition path back to starter board, inventory or toolbar items. Select a node or connection to trace it forward."}
-					</p>
-				</div>
-				<span
-					className={`rounded-full border px-3 py-1 text-sm font-semibold ${
-						isReady && flow?.obtainable
-							? "border-violet-400 bg-violet-100 text-violet-900"
-							: isReady
-								? "border-rose-300 bg-rose-50 text-rose-800"
-								: "border-violet-200 bg-violet-50 text-violet-800"
-					}`}
-				>
-					{isReady
-						? mode === "all"
-							? `${flow.nodes.filter(({ kind }) => kind === "item").length} items`
-							: flow.obtainable
-								? "Obtainable"
-								: "No complete starter path"
-						: flowState.status === "error"
-							? "Build failed"
-							: `${flowState.progress.percent}%`}
-				</span>
-			</header>
 			{isReady ? (
-				<div className="relative min-h-0 bg-canvas">
+				<div className="relative h-full min-h-0 bg-canvas">
+					<div className="pointer-events-none absolute right-3 top-3 z-10">
+						<span
+							className={`rounded-full border px-3 py-1 text-sm font-semibold shadow-sm ${badge.toneClass}`}
+						>
+							{badge.label}
+						</span>
+					</div>
 					<EditorOriginFlowCanvas
 						fitContent={mode === "item"}
 						flow={flow}
@@ -82,7 +92,7 @@ export const EditorOriginFlowSection = ({ itemId, mode }: EditorOriginFlowSectio
 					/>
 				</div>
 			) : (
-				<div className="grid place-items-center p-8">
+				<div className="grid h-full place-items-center p-8">
 					<div className="flex max-w-md flex-col items-center gap-3 text-center">
 						<span
 							className={`${
@@ -93,8 +103,12 @@ export const EditorOriginFlowSection = ({ itemId, mode }: EditorOriginFlowSectio
 						/>
 						<strong>
 							{flowState.status === "error"
-								? "Acquisition graph build failed"
-								: "Building acquisition graph"}
+								? mode === "all"
+									? "Game graph build failed"
+									: "Acquisition graph build failed"
+								: mode === "all"
+									? "Building game graph"
+									: "Building acquisition graph"}
 						</strong>
 						<span className="text-sm text-muted">{flowState.progress.label}</span>
 						{flowState.status === "loading" ? (

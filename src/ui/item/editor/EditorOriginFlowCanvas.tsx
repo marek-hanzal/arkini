@@ -154,6 +154,31 @@ const readSourceStatusColor = (
 	}
 };
 
+const readSourceKindColor = (
+	palette: CanvasPalette,
+	kind: EditorItemOriginSourceNode["sourceKind"],
+) => {
+	switch (kind) {
+		case "line":
+			return palette.accent;
+		case "charges":
+			return palette.warning;
+		case "merge":
+			return palette.success;
+		case "expiry":
+			return palette.danger;
+	}
+};
+
+const withAlpha = (color: string, alpha: number) => {
+	const channels = [
+		...color.matchAll(/\d+(?:\.\d+)?/g),
+	].map(([value]) => Number(value));
+	if (channels.length < 3) return color;
+	const [red, green, blue] = channels;
+	return `rgba(${red}, ${green}, ${blue}, ${alpha})`;
+};
+
 const SourceKindLabel: Record<EditorItemOriginSourceNode["sourceKind"], string> = {
 	line: "Production",
 	charges: "Depletion",
@@ -267,35 +292,21 @@ const drawItemNode = (
 	palette: CanvasPalette,
 ) => {
 	const typeColor = readItemTypeColor(palette, node.type);
+	const statusColor = readStatusColor(palette, node.status);
 	context.save();
 	context.globalAlpha = selectionActive && highlight === "idle" ? 0.2 : 1;
-	drawRoundedRect(context, position.x, position.y, position.width, position.height, 8);
-	context.fillStyle = palette.surface;
+	drawRoundedRect(context, position.x, position.y, position.width, position.height, 4);
+	context.fillStyle = withAlpha(typeColor, 0.14);
 	context.fill();
 	context.lineWidth = 2;
-	context.strokeStyle = palette.line;
+	context.strokeStyle = withAlpha(typeColor, 0.8);
 	context.stroke();
 
-	context.beginPath();
-	context.moveTo(position.x + 1, position.y + 8);
-	context.lineTo(position.x + 1, position.y + position.height - 8);
-	context.lineWidth = 3;
-	context.strokeStyle = typeColor;
-	context.stroke();
+	context.fillStyle = statusColor;
+	context.fillRect(position.x + 1, position.y + 1, position.width - 2, 5);
 
-	context.lineWidth = node.status === "reachable" ? 1 : 2;
-	context.strokeStyle = readStatusColor(palette, node.status);
-	drawRoundedRect(
-		context,
-		position.x + 3,
-		position.y + 3,
-		position.width - 6,
-		position.height - 6,
-		6,
-	);
-	context.stroke();
 	if (highlight !== "idle") {
-		context.lineWidth = highlight === "selected" ? 4 : 2;
+		context.lineWidth = highlight === "selected" ? 4 : 2.5;
 		context.strokeStyle = palette.accent;
 		drawRoundedRect(
 			context,
@@ -303,7 +314,7 @@ const drawItemNode = (
 			position.y - 3,
 			position.width + 6,
 			position.height + 6,
-			10,
+			6,
 		);
 		context.stroke();
 	}
@@ -312,10 +323,10 @@ const drawItemNode = (
 	const maxTextWidth = position.width - 26;
 	context.fillStyle = palette.foreground;
 	context.font = "600 14px Inter, ui-sans-serif, system-ui, sans-serif";
-	context.fillText(fitText(context, node.title, maxTextWidth), textX, position.y + 23);
+	context.fillText(fitText(context, node.title, maxTextWidth), textX, position.y + 24);
 	context.fillStyle = palette.muted;
 	context.font = "12px ui-monospace, SFMono-Regular, Menlo, monospace";
-	context.fillText(fitText(context, node.itemId, maxTextWidth), textX, position.y + 42);
+	context.fillText(fitText(context, node.itemId, maxTextWidth), textX, position.y + 43);
 	context.font = "600 10px Inter, ui-sans-serif, system-ui, sans-serif";
 	const label =
 		node.starterScopes.length > 0
@@ -323,7 +334,7 @@ const drawItemNode = (
 			: node.type === "missing"
 				? "Missing item"
 				: ItemTypeLabel[node.type];
-	context.fillText(fitText(context, label.toUpperCase(), maxTextWidth), textX, position.y + 60);
+	context.fillText(fitText(context, label.toUpperCase(), maxTextWidth), textX, position.y + 61);
 	context.restore();
 };
 
@@ -349,17 +360,23 @@ const drawSourceNode = (
 	selectionActive: boolean,
 	palette: CanvasPalette,
 ) => {
+	const kindColor = readSourceKindColor(palette, node.sourceKind);
 	const statusColor = readSourceStatusColor(palette, node.status);
 	context.save();
 	context.globalAlpha = selectionActive && highlight === "idle" ? 0.2 : 1;
-	drawRoundedRect(context, position.x, position.y, position.width, position.height, 16);
-	context.fillStyle = palette.surfaceRaised;
+	drawRoundedRect(context, position.x, position.y, position.width, position.height, 18);
+	context.fillStyle = withAlpha(kindColor, 0.14);
 	context.fill();
 	context.lineWidth = 2;
-	context.strokeStyle = statusColor;
+	context.strokeStyle = withAlpha(kindColor, 0.9);
 	context.stroke();
+
+	context.fillStyle = withAlpha(statusColor, 0.18);
+	drawRoundedRect(context, position.x + 10, position.y + 10, position.width - 20, 18, 9);
+	context.fill();
+
 	if (highlight !== "idle") {
-		context.lineWidth = highlight === "selected" ? 4 : 2;
+		context.lineWidth = highlight === "selected" ? 4 : 2.5;
 		context.strokeStyle = palette.accent;
 		drawRoundedRect(
 			context,
@@ -367,7 +384,7 @@ const drawSourceNode = (
 			position.y - 3,
 			position.width + 6,
 			position.height + 6,
-			19,
+			21,
 		);
 		context.stroke();
 	}
@@ -414,8 +431,9 @@ const drawEdge = (
 	palette: CanvasPalette,
 ) => {
 	if (route.length < 2) return;
-	const selected = selection?.kind === "edge" && selection.id === edge.id;
-	const active = highlight?.edgeIds.has(edge.id) ?? false;
+	const selected =
+		selection?.kind === "graph" || (selection?.kind === "edge" && selection.id === edge.id);
+	const active = selection?.kind === "graph" ? true : (highlight?.edgeIds.has(edge.id) ?? false);
 	context.save();
 	context.globalAlpha = selection === undefined ? 0.5 : active ? 1 : 0.1;
 	context.strokeStyle = palette.accent;
@@ -515,6 +533,7 @@ const readNodeHighlight = (
 	selection: EditorOriginFlowSelection | undefined,
 	highlight: ReturnType<typeof readEditorOriginFlowHighlight> | undefined,
 ) => {
+	if (selection?.kind === "graph") return "selected" as const;
 	if (selection?.kind === "node" && selection.id === node.id) return "selected" as const;
 	if (highlight?.nodeIds.has(node.id)) return "active" as const;
 	return "idle" as const;
@@ -729,14 +748,15 @@ export const EditorOriginFlowCanvas = ({
 		const worldX = (event.clientX - rect.left - viewport.x) / viewport.zoom;
 		const worldY = (event.clientY - rect.top - viewport.y) / viewport.zoom;
 		const hit = hitTest(flow, positions, routes, worldX, worldY, viewport.zoom);
-		if (
-			hit !== undefined &&
-			selection !== undefined &&
-			hit.kind === selection.kind &&
-			hit.id === selection.id
-		)
+		if (hit === undefined) {
 			onSelectionChange(undefined);
-		else onSelectionChange(hit);
+			return;
+		}
+		if (selection?.kind === "graph") onSelectionChange(undefined);
+		else
+			onSelectionChange({
+				kind: "graph",
+			});
 	};
 
 	const handlePointerDown = (event: ReactPointerEvent<HTMLCanvasElement>) => {

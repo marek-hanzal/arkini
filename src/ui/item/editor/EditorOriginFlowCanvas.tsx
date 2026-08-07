@@ -616,10 +616,10 @@ const drawEdge = (
 	const selected = selection?.kind === "edge" && selection.id === edge.id;
 	const active = highlight?.edgeIds.has(edge.id) ?? false;
 	context.save();
-	context.globalAlpha = selection === undefined ? 0.5 : active ? 1 : 0.1;
+	context.globalAlpha = selection === undefined ? 0.18 : active ? 1 : 0.05;
 	context.strokeStyle = palette.accent;
 	context.fillStyle = palette.accent;
-	context.lineWidth = selected ? 5 : active ? 4 : 1.5;
+	context.lineWidth = selected ? 5 : active ? 4 : 1.2;
 	context.lineJoin = "round";
 	context.lineCap = "round";
 	context.beginPath();

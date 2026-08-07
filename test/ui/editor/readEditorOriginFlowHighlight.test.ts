@@ -54,37 +54,37 @@ const positions = new Map([
 	[
 		"a",
 		{
-			x: 0,
+			flowOrder: 0,
 		},
 	],
 	[
 		"b",
 		{
-			x: 1,
+			flowOrder: 1,
 		},
 	],
 	[
 		"c",
 		{
-			x: 2,
+			flowOrder: 2,
 		},
 	],
 	[
 		"d",
 		{
-			x: 2,
+			flowOrder: 3,
 		},
 	],
 	[
 		"x",
 		{
-			x: 0,
+			flowOrder: 0,
 		},
 	],
 ]);
 
 describe("readEditorOriginFlowHighlight", () => {
-	it("follows only visually forward branches from a selected node", () => {
+	it("follows only cycle-broken forward branches from a selected node", () => {
 		const highlight = readEditorOriginFlowHighlight(flow, positions, {
 			id: "b",
 			kind: "node",
@@ -105,7 +105,7 @@ describe("readEditorOriginFlowHighlight", () => {
 		]);
 	});
 
-	it("does not re-enter an earlier layout layer through a cycle edge", () => {
+	it("does not re-enter an earlier flow order through a cycle edge", () => {
 		const highlight = readEditorOriginFlowHighlight(flow, positions, {
 			id: "d",
 			kind: "node",

@@ -7,10 +7,10 @@ import {
 	type EditorItemOriginFlowProgress,
 	type EditorItemOriginFlowRequest,
 } from "~/bridge/item/editor/readEditorItemOriginFlow";
-import { layoutEditorItemOriginFlowInWorkerFx } from "~/ui/item/editor/EditorItemOriginFlowLayoutWorker";
-import type {
-	EditorItemOriginFlowLayoutNode,
-	EditorItemOriginFlowLayoutPoint,
+import {
+	type EditorItemOriginFlowLayoutNode,
+	type EditorItemOriginFlowLayoutPoint,
+	layoutEditorItemOriginFlow,
 } from "~/ui/item/editor/layoutEditorItemOriginFlow";
 
 type EditorItemOriginFlowState =
@@ -89,7 +89,17 @@ export const useEditorItemOriginFlow = (
 							status: "loading",
 						});
 					}
-					const layout = yield* layoutEditorItemOriginFlowInWorkerFx(flow);
+					const layout = layoutEditorItemOriginFlow({
+						edges: flow.edges.map(({ id, source, target }) => ({
+							id,
+							source,
+							target,
+						})),
+						nodes: flow.nodes.map(({ id, kind }) => ({
+							id,
+							kind,
+						})),
+					});
 					return {
 						flow,
 						layout,

@@ -1,5 +1,4 @@
 import { Effect } from "effect";
-import ELK from "elkjs/lib/elk.bundled.js";
 import { describe, expect, it } from "vitest";
 
 import {
@@ -9,14 +8,10 @@ import {
 import {
 	type EditorItemOriginFlowLayoutInput,
 	type EditorItemOriginFlowLayoutPoint,
-	layoutEditorItemOriginFlow as runEditorItemOriginFlowLayout,
+	layoutEditorItemOriginFlow,
 } from "~/ui/item/editor/layoutEditorItemOriginFlow";
 import { readEditorOriginFlowHighlight } from "~/ui/item/editor/readEditorOriginFlowHighlight";
 import { readArkiniGameConfigSource } from "~test/schema/support/readArkiniGameConfigSource";
-
-const elk = new ELK();
-const layoutEditorItemOriginFlow = (flow: EditorItemOriginFlowLayoutInput) =>
-	runEditorItemOriginFlowLayout(flow, (graph) => elk.layout(graph));
 
 const node = (id: string, kind: "item" | "source" = "item") => ({
 	id,
@@ -44,14 +39,30 @@ const expectFinitePoint = ({ x, y }: EditorItemOriginFlowLayoutPoint) => {
 	expect(Number.isFinite(y)).toBe(true);
 };
 
-const expectCubicSplineRoute = (route: ReadonlyArray<EditorItemOriginFlowLayoutPoint>) => {
-	expect(route.length).toBeGreaterThanOrEqual(4);
-	expect((route.length - 1) % 3).toBe(0);
+const expectCubicRoute = (route: ReadonlyArray<EditorItemOriginFlowLayoutPoint>) => {
+	expect(route).toHaveLength(4);
 	for (const point of route) expectFinitePoint(point);
 };
 
+const readBounds = (layout: ReturnType<typeof layoutEditorItemOriginFlow>) => {
+	let minX = Number.POSITIVE_INFINITY;
+	let minY = Number.POSITIVE_INFINITY;
+	let maxX = Number.NEGATIVE_INFINITY;
+	let maxY = Number.NEGATIVE_INFINITY;
+	for (const position of layout.positions.values()) {
+		minX = Math.min(minX, position.x);
+		minY = Math.min(minY, position.y);
+		maxX = Math.max(maxX, position.x + position.width);
+		maxY = Math.max(maxY, position.y + position.height);
+	}
+	return {
+		height: maxY - minY,
+		width: maxX - minX,
+	};
+};
+
 describe("layoutEditorItemOriginFlow", () => {
-	it("lays out and routes a progression chain deterministically", async () => {
+	it("lays out a progression chain deterministically in forward flow order", () => {
 		const flow: EditorItemOriginFlowLayoutInput = {
 			edges: [
 				edge("a", "operation"),
@@ -63,8 +74,8 @@ describe("layoutEditorItemOriginFlow", () => {
 				node("operation", "source"),
 			],
 		};
-		const layout = await layoutEditorItemOriginFlow(flow);
-		const shuffled = await layoutEditorItemOriginFlow({
+		const layout = layoutEditorItemOriginFlow(flow);
+		const shuffled = layoutEditorItemOriginFlow({
 			edges: [
 				...flow.edges,
 			].reverse(),
@@ -83,12 +94,17 @@ describe("layoutEditorItemOriginFlow", () => {
 		]).toEqual([
 			...shuffled.routes,
 		]);
-		expect(layout.positions.get("a")!.x).toBeLessThan(layout.positions.get("operation")!.x);
-		expect(layout.positions.get("operation")!.x).toBeLessThan(layout.positions.get("b")!.x);
+		expect(layout.positions.get("a")!.flowOrder).toBeLessThan(
+			layout.positions.get("operation")!.flowOrder,
+		);
+		expect(layout.positions.get("operation")!.flowOrder).toBeLessThan(
+			layout.positions.get("b")!.flowOrder,
+		);
+		for (const route of layout.routes.values()) expectCubicRoute(route);
 	});
 
-	it("routes cycles and disconnected components with finite cubic splines", async () => {
-		const layout = await layoutEditorItemOriginFlow({
+	it("keeps cycles and disconnected components finite", () => {
+		const layout = layoutEditorItemOriginFlow({
 			edges: [
 				edge("a", "operation"),
 				edge("operation", "a"),
@@ -106,138 +122,73 @@ describe("layoutEditorItemOriginFlow", () => {
 
 		expect(layout.positions.size).toBe(5);
 		expect(layout.routes.size).toBe(4);
-		for (const route of layout.routes.values()) expectCubicSplineRoute(route);
+		for (const route of layout.routes.values()) expectCubicRoute(route);
+		for (const position of layout.positions.values()) {
+			expect(Number.isFinite(position.x)).toBe(true);
+			expect(Number.isFinite(position.y)).toBe(true);
+		}
 	});
 
-	it("uses the exact fixed card dimensions without node overlap", async () => {
-		const layout = await layoutEditorItemOriginFlow({
+	it("uses one golden-ratio card size without overlap", () => {
+		const layout = layoutEditorItemOriginFlow({
 			edges: [],
-			nodes: [
-				node("item"),
-				node("source", "source"),
-			],
+			nodes: Array.from(
+				{
+					length: 80,
+				},
+				(_, index) => node(`node-${index}`),
+			),
 		});
-		const item = layout.positions.get("item")!;
-		const source = layout.positions.get("source")!;
-
-		expect(item).toMatchObject({
-			height: 138,
-			width: 224,
-		});
-		expect(source).toMatchObject({
-			height: 138,
-			width: 224,
-		});
-		expect(item.y + item.height <= source.y || source.y + source.height <= item.y).toBe(true);
+		const positions = [
+			...layout.positions.values(),
+		];
+		for (const position of positions)
+			expect(position).toMatchObject({
+				height: 138,
+				width: 224,
+			});
+		for (let leftIndex = 0; leftIndex < positions.length; leftIndex += 1) {
+			const left = positions[leftIndex]!;
+			for (let rightIndex = leftIndex + 1; rightIndex < positions.length; rightIndex += 1) {
+				const right = positions[rightIndex]!;
+				const overlaps =
+					left.x < right.x + right.width &&
+					left.x + left.width > right.x &&
+					left.y < right.y + right.height &&
+					left.y + left.height > right.y;
+				expect(overlaps).toBe(false);
+			}
+		}
 	});
 
-	it("joins a multi-section ELK edge into one continuous route", async () => {
-		const layout = await runEditorItemOriginFlowLayout(
+	it("routes same-column edges around the outside of the cards", () => {
+		const nodes = Array.from(
 			{
-				edges: [
-					edge("a", "b"),
-				],
-				nodes: [
-					node("a"),
-					node("b"),
-				],
+				length: 20,
 			},
-			async (graph) => ({
-				...graph,
-				children: graph.children?.map((child, index) => ({
-					...child,
-					x: index * 300,
-					y: 0,
-				})),
-				edges: graph.edges?.map((entry) => ({
-					...entry,
-					sections: [
-						{
-							bendPoints: [
-								{
-									x: 235,
-									y: 69,
-								},
-								{
-									x: 242,
-									y: 69,
-								},
-							],
-							endPoint: {
-								x: 250,
-								y: 69,
-							},
-							id: "first",
-							outgoingSections: [
-								"second",
-							],
-							startPoint: {
-								x: 227,
-								y: 69,
-							},
-						},
-						{
-							bendPoints: [
-								{
-									x: 260,
-									y: 69,
-								},
-								{
-									x: 275,
-									y: 69,
-								},
-							],
-							endPoint: {
-								x: 297,
-								y: 69,
-							},
-							id: "second",
-							incomingSections: [
-								"first",
-							],
-							startPoint: {
-								x: 250,
-								y: 69,
-							},
-						},
-					],
-				})),
-			}),
+			(_, index) => node(`node-${index}`),
 		);
-
-		expect(layout.routes.get("a->b")).toEqual([
-			{
-				x: 227,
-				y: 69,
-			},
-			{
-				x: 235,
-				y: 69,
-			},
-			{
-				x: 242,
-				y: 69,
-			},
-			{
-				x: 250,
-				y: 69,
-			},
-			{
-				x: 260,
-				y: 69,
-			},
-			{
-				x: 275,
-				y: 69,
-			},
-			{
-				x: 297,
-				y: 69,
-			},
-		]);
+		const edges = nodes
+			.slice(0, -1)
+			.map((current, index) => edge(current.id, nodes[index + 1]!.id));
+		const layout = layoutEditorItemOriginFlow({
+			edges,
+			nodes,
+		});
+		const sameColumnEdge = edges.find(
+			({ source, target }) =>
+				layout.positions.get(source)!.x === layout.positions.get(target)!.x,
+		);
+		expect(sameColumnEdge).toBeDefined();
+		const source = layout.positions.get(sameColumnEdge!.source)!;
+		const route = layout.routes.get(sameColumnEdge!.id)!;
+		expectCubicRoute(route);
+		const outsideRight = route[1]!.x > source.x + source.width;
+		const outsideLeft = route[1]!.x < source.x;
+		expect(outsideRight || outsideLeft).toBe(true);
 	});
 
-	it("returns valid cubic splines for the official graph", async () => {
+	it("packs the official graph into a landscape canvas with few feedback edges", async () => {
 		const config = await readArkiniGameConfigSource();
 		const flow = await Effect.runPromise(
 			readEditorItemOriginFlowFx({
@@ -245,26 +196,26 @@ describe("layoutEditorItemOriginFlow", () => {
 			}),
 		);
 		const startedAt = performance.now();
-		const layout = await layoutEditorItemOriginFlow(readTopology(flow));
+		const layout = layoutEditorItemOriginFlow(readTopology(flow));
 		const elapsedMs = performance.now() - startedAt;
+		const bounds = readBounds(layout);
 
 		expect(layout.positions.size).toBe(flow.nodes.length);
 		expect(layout.routes.size).toBe(flow.edges.length);
-		expect(elapsedMs).toBeLessThan(10_000);
+		expect(elapsedMs).toBeLessThan(1_000);
+		expect(bounds.width).toBeLessThan(10_000);
+		expect(bounds.height).toBeLessThan(7_000);
+		expect(bounds.width / bounds.height).toBeGreaterThan(1.3);
+		expect(bounds.width / bounds.height).toBeLessThan(2.1);
+		for (const route of layout.routes.values()) expectCubicRoute(route);
+
+		let feedbackEdges = 0;
 		for (const edge of flow.edges) {
-			const route = layout.routes.get(edge.id)!;
 			const source = layout.positions.get(edge.source)!;
 			const target = layout.positions.get(edge.target)!;
-			expectCubicSplineRoute(route);
-			expect(route[0]).toEqual({
-				x: source.x + source.width + 3,
-				y: source.y + source.height / 2,
-			});
-			expect(route.at(-1)).toEqual({
-				x: target.x - 3,
-				y: target.y + target.height / 2,
-			});
+			if (target.flowOrder <= source.flowOrder) feedbackEdges += 1;
 		}
+		expect(feedbackEdges).toBeLessThan(150);
 
 		const winery = readEditorOriginFlowHighlight(flow, layout.positions, {
 			id: "item:item:blueprint-winery-t1",

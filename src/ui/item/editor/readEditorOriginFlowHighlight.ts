@@ -16,10 +16,10 @@ export interface EditorOriginFlowHighlight {
 }
 
 interface FlowNodePosition {
-	readonly x: number;
+	readonly flowOrder: number;
 }
 
-/** Reads the visually forward branch selected by a node or connection. */
+/** Reads the cycle-broken forward branch selected by a node or connection. */
 export const readEditorOriginFlowHighlight = (
 	flow: EditorItemOriginFlow,
 	positions: ReadonlyMap<string, FlowNodePosition>,
@@ -29,7 +29,8 @@ export const readEditorOriginFlowHighlight = (
 	for (const edge of flow.edges) {
 		const source = positions.get(edge.source);
 		const target = positions.get(edge.target);
-		if (source === undefined || target === undefined || target.x <= source.x) continue;
+		if (source === undefined || target === undefined || target.flowOrder <= source.flowOrder)
+			continue;
 		const outgoing = edgesBySource.get(edge.source);
 		if (outgoing === undefined)
 			edgesBySource.set(edge.source, [

@@ -63,7 +63,6 @@
 		"@tanstack/react-router": "1.170.15",
 		"dexie": "^4.4.4",
 		"effect": "4.0.0-beta.101",
-		"elkjs": "0.12.0",
 		"fuse.js": "^7.4.2",
 		"motion": "^12.42.2",
 		"pixi.js": "^8.19.0",

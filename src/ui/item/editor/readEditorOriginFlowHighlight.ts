@@ -1,9 +1,7 @@
 import type {
 	EditorItemOriginEdge,
 	EditorItemOriginFlow,
-	EditorItemOriginFlowDirection,
 	EditorItemOriginItemNode,
-	EditorItemOriginNode,
 } from "~/bridge/item/editor/readEditorItemOriginFlow";
 
 export type EditorOriginFlowSelection =
@@ -25,11 +23,7 @@ interface FlowNodePosition {
 	readonly flowOrder: number;
 }
 
-/**
- * Reads one concrete acquisition proof from the complete graph. The bridge chooses the canonical
- * acquisition source for reachable items; the UI only follows that witness and keeps every
- * mandatory requirement attached to it.
- */
+/** Reads one deterministic acquisition proof through operations embedded in their owning item nodes. */
 const readIncomeProofHighlight = (
 	flow: EditorItemOriginFlow,
 	startNode: EditorItemOriginItemNode,
@@ -43,17 +37,17 @@ const readIncomeProofHighlight = (
 				] as const,
 		),
 	);
-	const outputEdgesByItem = new Map<string, EditorItemOriginEdge[]>();
-	const requirementEdgesBySource = new Map<string, EditorItemOriginEdge[]>();
+	const outputEdgesByTarget = new Map<string, EditorItemOriginEdge[]>();
+	const inputEdgesByOperation = new Map<string, EditorItemOriginEdge[]>();
 	for (const edge of flow.edges) {
 		if (edge.role === "output") {
-			const edges = outputEdgesByItem.get(edge.target) ?? [];
+			const edges = outputEdgesByTarget.get(edge.target) ?? [];
 			edges.push(edge);
-			outputEdgesByItem.set(edge.target, edges);
+			outputEdgesByTarget.set(edge.target, edges);
 		} else {
-			const edges = requirementEdgesBySource.get(edge.target) ?? [];
+			const edges = inputEdgesByOperation.get(edge.operationId) ?? [];
 			edges.push(edge);
-			requirementEdgesBySource.set(edge.target, edges);
+			inputEdgesByOperation.set(edge.operationId, edges);
 		}
 	}
 
@@ -67,34 +61,31 @@ const readIncomeProofHighlight = (
 		tracedItems.add(itemNode.id);
 
 		const directOutputEdges = [
-			...(outputEdgesByItem.get(itemNode.id) ?? []),
-		].sort((left, right) => left.source.localeCompare(right.source));
+			...(outputEdgesByTarget.get(itemNode.id) ?? []),
+		].sort(
+			(left, right) =>
+				left.operationId.localeCompare(right.operationId) ||
+				left.id.localeCompare(right.id),
+		);
 		const outputEdge =
 			itemNode.acquisitionSourceId === undefined
 				? directOutputEdges[0]
-				: directOutputEdges.find(({ source }) => source === itemNode.acquisitionSourceId);
+				: directOutputEdges.find(
+						({ operationId }) => operationId === itemNode.acquisitionSourceId,
+					);
 		if (outputEdge === undefined) return;
-		const sourceNode = nodeById.get(outputEdge.source);
-		if (sourceNode?.kind !== "source") return;
 
 		edgeIds.add(outputEdge.id);
-		nodeIds.add(sourceNode.id);
 		const nextActive = new Set(activeItemIds);
 		nextActive.add(itemNode.id);
+		const ownerNode = nodeById.get(outputEdge.source);
+		if (ownerNode !== undefined) traceItem(ownerNode, nextActive);
 		for (const edge of [
-			...(requirementEdgesBySource.get(sourceNode.id) ?? []),
-		].sort(
-			(left, right) =>
-				(left.role === "owner" ? -1 : 0) - (right.role === "owner" ? -1 : 0) ||
-				left.source.localeCompare(right.source),
-		)) {
+			...(inputEdgesByOperation.get(outputEdge.operationId) ?? []),
+		].sort((left, right) => left.source.localeCompare(right.source))) {
 			edgeIds.add(edge.id);
 			const requirementNode = nodeById.get(edge.source);
-			if (requirementNode?.kind !== "item") {
-				if (requirementNode !== undefined) nodeIds.add(requirementNode.id);
-				continue;
-			}
-			traceItem(requirementNode, nextActive);
+			if (requirementNode !== undefined) traceItem(requirementNode, nextActive);
 		}
 	};
 	traceItem(startNode, new Set());
@@ -104,93 +95,48 @@ const readIncomeProofHighlight = (
 	};
 };
 
-const readDirectionalHighlight = (
-	flow: EditorItemOriginFlow,
-	positions: ReadonlyMap<string, FlowNodePosition>,
-	selection: EditorOriginFlowSelection,
-	direction: EditorItemOriginFlowDirection,
-): EditorOriginFlowHighlight => {
-	const edgesBySource = new Map<string, Array<EditorItemOriginFlow["edges"][number]>>();
-	for (const edge of flow.edges) {
-		const traversalSourceId = direction === "income" ? edge.target : edge.source;
-		const traversalTargetId = direction === "income" ? edge.source : edge.target;
-		const source = positions.get(traversalSourceId);
-		const target = positions.get(traversalTargetId);
-		if (source === undefined || target === undefined) continue;
-		const movesForward =
-			direction === "income"
-				? target.flowOrder < source.flowOrder
-				: target.flowOrder > source.flowOrder;
-		if (!movesForward) continue;
-		const traversedEdge =
-			direction === "income"
-				? {
-						...edge,
-						source: traversalSourceId,
-						target: traversalTargetId,
-					}
-				: edge;
-		const outgoing = edgesBySource.get(traversalSourceId);
-		if (outgoing === undefined)
-			edgesBySource.set(traversalSourceId, [
-				traversedEdge,
-			]);
-		else outgoing.push(traversedEdge);
-	}
-
-	const nodeIds = new Set<string>();
-	const edgeIds = new Set<string>();
-	const pendingNodeIds: string[] = [];
-	if (selection.kind === "node") {
-		if (!flow.nodes.some(({ id }) => id === selection.id))
-			return {
-				edgeIds,
-				nodeIds,
-			};
-		nodeIds.add(selection.id);
-		pendingNodeIds.push(selection.id);
-	} else {
-		const selectedEdge = flow.edges.find(({ id }) => id === selection.id);
-		if (selectedEdge === undefined)
-			return {
-				edgeIds,
-				nodeIds,
-			};
-		edgeIds.add(selectedEdge.id);
-		nodeIds.add(selectedEdge.source);
-		nodeIds.add(selectedEdge.target);
-		pendingNodeIds.push(direction === "income" ? selectedEdge.source : selectedEdge.target);
-	}
-
-	while (pendingNodeIds.length > 0) {
-		const source = pendingNodeIds.pop();
-		if (source === undefined) continue;
-		for (const edge of edgesBySource.get(source) ?? []) {
-			edgeIds.add(edge.id);
-			if (nodeIds.has(edge.target)) continue;
-			nodeIds.add(edge.target);
-			pendingNodeIds.push(edge.target);
-		}
-	}
-
-	return {
-		edgeIds,
-		nodeIds,
-	};
-};
-
-/** Reads the active branch selected by a node or connection in the chosen flow direction. */
+/** Reads the Income branch selected by an item or connection. */
 export const readEditorOriginFlowHighlight = (
 	flow: EditorItemOriginFlow,
-	positions: ReadonlyMap<string, FlowNodePosition>,
+	_positions: ReadonlyMap<string, FlowNodePosition>,
 	selection: EditorOriginFlowSelection,
-	direction: EditorItemOriginFlowDirection = "outcome",
 ): EditorOriginFlowHighlight => {
-	if (direction === "income" && selection.kind === "node") {
-		const selectedNode: EditorItemOriginNode | undefined = flow.nodes.find(
-			({ id }) => id === selection.id,
-		);
-		if (selectedNode?.kind === "item") return readIncomeProofHighlight(flow, selectedNode);
+	if (selection.kind === "node") {
+		const selectedNode = flow.nodes.find(({ id }) => id === selection.id);
+		return selectedNode === undefined
+			? {
+					edgeIds: new Set(),
+					nodeIds: new Set(),
+				}
+			: readIncomeProofHighlight(flow, selectedNode);
 	}
-	return readDirectionalHighlight(flow, positions, selection, direction);
+
+	const selectedEdge = flow.edges.find(({ id }) => id === selection.id);
+	if (selectedEdge === undefined)
+		return {
+			edgeIds: new Set(),
+			nodeIds: new Set(),
+		};
+	const startNode = flow.nodes.find(({ id }) => id === selectedEdge.source);
+	if (startNode === undefined)
+		return {
+			edgeIds: new Set([
+				selectedEdge.id,
+			]),
+			nodeIds: new Set([
+				selectedEdge.source,
+				selectedEdge.target,
+			]),
+		};
+	const highlight = readIncomeProofHighlight(flow, startNode);
+	return {
+		edgeIds: new Set([
+			selectedEdge.id,
+			...highlight.edgeIds,
+		]),
+		nodeIds: new Set([
+			selectedEdge.target,
+			...highlight.nodeIds,
+		]),
+	};
 };

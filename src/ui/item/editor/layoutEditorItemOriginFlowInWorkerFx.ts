@@ -6,6 +6,7 @@ import type {
 	EditorItemOriginFlowLayout,
 	EditorItemOriginFlowLayoutInput,
 } from "~/ui/item/editor/layoutEditorItemOriginFlowFx";
+import { readEditorOriginFlowNodeMetrics } from "~/ui/item/editor/readEditorOriginFlowNodeMetrics";
 
 class EditorItemOriginFlowLayoutWorkerError extends Data.TaggedError(
 	"EditorItemOriginFlowLayoutWorkerError",
@@ -55,15 +56,28 @@ const runLayout = (
 	});
 
 const readTopology = (flow: EditorItemOriginFlow): EditorItemOriginFlowLayoutInput => ({
-	edges: flow.edges.map(({ id, source, target }) => ({
+	edges: flow.edges.map(({ id, source, sourcePortId, target, targetPortId }) => ({
 		id,
 		source,
+		sourcePortId,
 		target,
+		targetPortId,
 	})),
-	nodes: flow.nodes.map(({ id, kind }) => ({
-		id,
-		kind,
-	})),
+	nodes: flow.nodes.map((node) => {
+		const metrics = readEditorOriginFlowNodeMetrics(node);
+		return {
+			height: metrics.height,
+			id: node.id,
+			ports: [
+				...metrics.portOffsets,
+			].map(([id, offset]) => ({
+				id,
+				x: offset.x,
+				y: offset.y,
+			})),
+			width: metrics.width,
+		};
+	}),
 });
 
 /** Computes one flow layout off the renderer thread and terminates its worker on exit. */

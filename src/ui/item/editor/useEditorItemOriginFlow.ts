@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import {
 	readEditorItemOriginFlowFx,
 	type EditorItemOriginFlow,
-	type EditorItemOriginFlowDirection,
 	type EditorItemOriginFlowProgress,
 	type EditorItemOriginFlowRequest,
 } from "~/bridge/item/editor/readEditorItemOriginFlow";
@@ -46,7 +45,6 @@ const InitialProgress: EditorItemOriginFlowProgress = {
 export const useEditorItemOriginFlow = (
 	config: EditorItemOriginFlowRequest["config"],
 	itemId?: string,
-	direction?: EditorItemOriginFlowDirection,
 ): EditorItemOriginFlowState => {
 	const [state, setState] = useState<EditorItemOriginFlowState>({
 		flow: undefined,
@@ -66,7 +64,6 @@ export const useEditorItemOriginFlow = (
 				Effect.gen(function* () {
 					const flow = yield* readEditorItemOriginFlowFx({
 						config,
-						direction,
 						...(itemId === undefined
 							? {}
 							: {
@@ -137,7 +134,6 @@ export const useEditorItemOriginFlow = (
 		return () => controller.abort();
 	}, [
 		config,
-		direction,
 		itemId,
 	]);
 

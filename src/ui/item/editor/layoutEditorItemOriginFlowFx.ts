@@ -1,5 +1,7 @@
 import {
 	BezierSeg,
+	Cdt,
+	corridorRoute,
 	Curve,
 	CurveFactory,
 	Edge,
@@ -9,10 +11,15 @@ import {
 	GeomGraph,
 	GeomNode,
 	Graph,
+	InteractiveObstacleCalculator,
 	type ICurve,
 	LineSegment,
 	Node,
 	Point,
+	Polyline,
+	Rectangle,
+	RelativeFloatingPort,
+	SmoothedPolyline,
 	layoutGeomGraph,
 } from "@msagl/core";
 import { Effect } from "effect";
@@ -21,11 +28,19 @@ export interface EditorItemOriginFlowLayoutInput {
 	readonly edges: ReadonlyArray<{
 		readonly id: string;
 		readonly source: string;
+		readonly sourcePortId?: string;
 		readonly target: string;
+		readonly targetPortId?: string;
 	}>;
 	readonly nodes: ReadonlyArray<{
+		readonly height: number;
 		readonly id: string;
-		readonly kind: "item" | "source";
+		readonly ports: ReadonlyArray<{
+			readonly id: string;
+			readonly x: number;
+			readonly y: number;
+		}>;
+		readonly width: number;
 	}>;
 }
 
@@ -61,11 +76,10 @@ export interface EditorItemOriginFlowLayout {
 	readonly routes: ReadonlyMap<string, ReadonlyArray<EditorItemOriginFlowLayoutRouteSegment>>;
 }
 
-const NodeWidth = 420;
-const NodeHeight = 176;
 const NodeSeparation = 24;
 const PackingAspectRatio = 1.6;
 const EdgePadding = 8;
+const PortEscape = EdgePadding + 4;
 
 interface WeightedGraph {
 	readonly incoming: ReadonlyMap<string, ReadonlyMap<string, number>>;
@@ -221,6 +235,94 @@ const readCurveSegments = (curve: ICurve): EditorItemOriginFlowLayoutRouteSegmen
 	throw new Error(`MSAGL returned unsupported route geometry: ${curve.constructor.name}.`);
 };
 
+const smoothRoute = (polyline: Polyline): EditorItemOriginFlowLayoutRouteSegment[] => {
+	const points = [
+		...polyline,
+	];
+	if (points.length < 3) return readCurveSegments(polyline.toCurve());
+	const smoothed = SmoothedPolyline.mkFromPoints(points);
+	const maxCornerCut = EdgePadding * 0.45;
+	for (
+		let site = smoothed.headSite.next;
+		site?.next !== undefined && site.next !== null;
+		site = site.next
+	) {
+		const previousLength = Math.hypot(
+			site.point.x - site.prev.point.x,
+			site.point.y - site.prev.point.y,
+		);
+		const nextLength = Math.hypot(
+			site.next.point.x - site.point.x,
+			site.next.point.y - site.point.y,
+		);
+		if (previousLength < 0.01 || nextLength < 0.01) continue;
+		const cut = Math.min(maxCornerCut, previousLength * 0.2, nextLength * 0.2);
+		site.previouisBezierCoefficient = cut / previousLength;
+		site.nextBezierCoefficient = cut / nextLength;
+	}
+	return readCurveSegments(smoothed.createCurve());
+};
+
+const pointClose = (left: Point, right: Point) =>
+	Math.hypot(left.x - right.x, left.y - right.y) < 0.01;
+
+const appendDistinctPoint = (points: Point[], point: Point) => {
+	if (points.length === 0 || !pointClose(points[points.length - 1] as Point, point))
+		points.push(point);
+};
+
+const routePortAwareEdges = (
+	flow: EditorItemOriginFlowLayoutInput,
+	geomNodes: ReadonlyMap<string, GeomNode>,
+	geomEdges: ReadonlyMap<string, GeomEdge>,
+): ReadonlyMap<string, ReadonlyArray<EditorItemOriginFlowLayoutRouteSegment>> => {
+	const obstacles: Polyline[] = [];
+	const bounds = Rectangle.mkEmpty();
+	for (const geomNode of geomNodes.values()) {
+		const obstacle = InteractiveObstacleCalculator.PaddedPolylineBoundaryOfNode(
+			geomNode.boundaryCurve,
+			EdgePadding,
+		);
+		obstacles.push(obstacle);
+		bounds.addRecSelf(obstacle.boundingBox);
+	}
+	bounds.pad(Math.max(bounds.diagonal / 4, 100));
+	obstacles.push(bounds.perimeter());
+
+	const cdt = new Cdt([], obstacles, []);
+	cdt.run();
+
+	const routes = new Map<string, ReadonlyArray<EditorItemOriginFlowLayoutRouteSegment>>();
+	for (const input of [
+		...flow.edges,
+	].sort((left, right) => left.id.localeCompare(right.id))) {
+		const geomEdge = geomEdges.get(input.id);
+		if (geomEdge?.sourcePort === undefined || geomEdge.targetPort === undefined)
+			throw new Error(`Flow edge ${input.id} is missing port geometry.`);
+
+		const source = geomEdge.sourcePort.Location;
+		const target = geomEdge.targetPort.Location;
+		const sourceEscape = source.add(new Point(PortEscape, 0));
+		const targetEscape = target.add(new Point(-PortEscape, 0));
+		const routed = corridorRoute(cdt, sourceEscape, targetEscape);
+		if (routed === null)
+			throw new Error(`MSAGL could not route edge ${input.id} between its ports.`);
+
+		const points: Point[] = [];
+		appendDistinctPoint(points, source);
+		appendDistinctPoint(points, sourceEscape);
+		for (const point of routed) appendDistinctPoint(points, point);
+		appendDistinctPoint(points, targetEscape);
+		appendDistinctPoint(points, target);
+		const simplified = Polyline.mkFromPoints(points).RemoveCollinearVertices();
+		const route = smoothRoute(simplified);
+		if (route.length === 0)
+			throw new Error(`MSAGL returned an empty route for edge ${input.id}.`);
+		routes.set(input.id, route);
+	}
+	return routes;
+};
+
 const runLayout = (flow: EditorItemOriginFlowLayoutInput): EditorItemOriginFlowLayout => {
 	if (flow.nodes.length === 0)
 		return {
@@ -233,6 +335,8 @@ const runLayout = (flow: EditorItemOriginFlowLayoutInput): EditorItemOriginFlowL
 	const graph = new Graph("arkini-editor-origin-flow");
 	const geomGraph = new GeomGraph(graph);
 	const nodes = new Map<string, Node>();
+	const geomNodes = new Map<string, GeomNode>();
+	const ports = new Map<string, RelativeFloatingPort>();
 	const geomEdges = new Map<string, GeomEdge>();
 
 	for (const input of [
@@ -241,7 +345,21 @@ const runLayout = (flow: EditorItemOriginFlowLayoutInput): EditorItemOriginFlowL
 		const node = new Node(input.id);
 		graph.addNode(node);
 		nodes.set(input.id, node);
-		GeomNode.mkNode(CurveFactory.createRectangle(NodeWidth, NodeHeight, new Point(0, 0)), node);
+		const geomNode = GeomNode.mkNode(
+			CurveFactory.createRectangle(input.width, input.height, new Point(0, 0)),
+			node,
+		);
+		geomNodes.set(input.id, geomNode);
+		for (const port of input.ports) {
+			ports.set(
+				`${input.id}:${port.id}`,
+				new RelativeFloatingPort(
+					() => geomNode.boundaryCurve,
+					() => geomNode.center,
+					new Point(port.x, port.y),
+				),
+			);
+		}
 	}
 	for (const input of [
 		...flow.edges,
@@ -252,16 +370,39 @@ const runLayout = (flow: EditorItemOriginFlowLayoutInput): EditorItemOriginFlowL
 			throw new Error(
 				`Flow edge references an unknown node: ${input.source} -> ${input.target}.`,
 			);
-		geomEdges.set(input.id, new GeomEdge(new Edge(source, target)));
+		const geomEdge = new GeomEdge(new Edge(source, target));
+		const sourceGeomNode = geomNodes.get(input.source);
+		const targetGeomNode = geomNodes.get(input.target);
+		if (sourceGeomNode === undefined || targetGeomNode === undefined)
+			throw new Error(`Missing flow geometry for ${input.source} -> ${input.target}.`);
+		const sourcePort =
+			input.sourcePortId === undefined
+				? new RelativeFloatingPort(
+						() => sourceGeomNode.boundaryCurve,
+						() => sourceGeomNode.center,
+						new Point(sourceGeomNode.boundingBox.width / 2, 0),
+					)
+				: ports.get(`${input.source}:${input.sourcePortId}`);
+		const targetPort =
+			input.targetPortId === undefined
+				? new RelativeFloatingPort(
+						() => targetGeomNode.boundaryCurve,
+						() => targetGeomNode.center,
+						new Point(-targetGeomNode.boundingBox.width / 2, 0),
+					)
+				: ports.get(`${input.target}:${input.targetPortId}`);
+		if (sourcePort === undefined || targetPort === undefined)
+			throw new Error(`Flow edge ${input.id} references an unknown port.`);
+		geomEdge.sourcePort = sourcePort;
+		geomEdge.targetPort = targetPort;
+		geomEdges.set(input.id, geomEdge);
 	}
 
 	const settings = new FastIncrementalLayoutSettings();
 	settings.AvoidOverlaps = true;
 	settings.NodeSeparation = NodeSeparation;
 	settings.PackingAspectRatio = PackingAspectRatio;
-	settings.edgeRoutingSettings.EdgeRoutingMode = EdgeRoutingMode.Corridor;
-	settings.edgeRoutingSettings.Padding = EdgePadding;
-	settings.edgeRoutingSettings.smoothCorners = true;
+	settings.edgeRoutingSettings.EdgeRoutingMode = EdgeRoutingMode.None;
 	geomGraph.layoutSettings = settings;
 	layoutGeomGraph(geomGraph);
 
@@ -281,18 +422,7 @@ const runLayout = (flow: EditorItemOriginFlowLayoutInput): EditorItemOriginFlowL
 	if (positions.size !== flow.nodes.length)
 		throw new Error(`MSAGL returned ${positions.size} of ${flow.nodes.length} nodes.`);
 
-	const routes = new Map<string, ReadonlyArray<EditorItemOriginFlowLayoutRouteSegment>>();
-	for (const input of [
-		...flow.edges,
-	].sort((left, right) => left.id.localeCompare(right.id))) {
-		const curve = geomEdges.get(input.id)?.curve;
-		if (curve === undefined || curve === null)
-			throw new Error(`MSAGL omitted the route for edge ${input.id}.`);
-		const route = readCurveSegments(curve);
-		if (route.length === 0)
-			throw new Error(`MSAGL returned an empty route for edge ${input.id}.`);
-		routes.set(input.id, route);
-	}
+	const routes = routePortAwareEdges(flow, geomNodes, geomEdges);
 	if (routes.size !== flow.edges.length)
 		throw new Error(`MSAGL returned ${routes.size} of ${flow.edges.length} edge routes.`);
 
@@ -302,7 +432,7 @@ const runLayout = (flow: EditorItemOriginFlowLayoutInput): EditorItemOriginFlowL
 	};
 };
 
-/** Computes deterministic organic MSAGL positions and obstacle-aware curved routes. */
+/** Computes deterministic organic MSAGL positions and exact port-aware obstacle routes. */
 export const layoutEditorItemOriginFlowFx = Effect.fn("layoutEditorItemOriginFlowFx")(
 	(flow: EditorItemOriginFlowLayoutInput) => Effect.sync(() => runLayout(flow)),
 );

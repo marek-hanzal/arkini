@@ -1,7 +1,4 @@
-import type {
-	EditorItemOriginFlow,
-	EditorItemOriginFlowDirection,
-} from "~/bridge/item/editor/readEditorItemOriginFlow";
+import type { EditorItemOriginFlow } from "~/bridge/item/editor/readEditorItemOriginFlow";
 
 interface FlowNavigationPosition {
 	readonly flowOrder: number;
@@ -43,12 +40,11 @@ const readTurnCost = (
 	return 1 - Math.max(-1, Math.min(1, cosine));
 };
 
-/** Reads one stable depth-first walk, preferring the visually straightest branch in the active flow direction. */
+/** Reads one stable depth-first Income walk by reversing the active acquisition edges. */
 export const readEditorOriginFlowNavigation = (
 	flow: EditorItemOriginFlow,
 	positions: ReadonlyMap<string, FlowNavigationPosition>,
 	startNodeId: string,
-	direction: EditorItemOriginFlowDirection = "outcome",
 	allowedEdgeIds?: ReadonlySet<string>,
 ): ReadonlyArray<string> => {
 	if (!flow.nodes.some(({ id }) => id === startNodeId) || !positions.has(startNodeId)) return [];
@@ -56,17 +52,13 @@ export const readEditorOriginFlowNavigation = (
 	const targetsBySource = new Map<string, Set<string>>();
 	for (const edge of flow.edges) {
 		if (allowedEdgeIds !== undefined && !allowedEdgeIds.has(edge.id)) continue;
-		const sourceId = direction === "income" ? edge.target : edge.source;
-		const targetId = direction === "income" ? edge.source : edge.target;
+		const sourceId = edge.target;
+		const targetId = edge.source;
 		const source = positions.get(sourceId);
 		const target = positions.get(targetId);
 		if (source === undefined || target === undefined) continue;
-		const movesForward =
-			allowedEdgeIds !== undefined ||
-			(direction === "income"
-				? target.flowOrder < source.flowOrder
-				: target.flowOrder > source.flowOrder);
-		if (!movesForward) continue;
+		const movesUpstream = allowedEdgeIds !== undefined || target.flowOrder < source.flowOrder;
+		if (!movesUpstream) continue;
 		const targets = targetsBySource.get(sourceId) ?? new Set<string>();
 		targets.add(targetId);
 		targetsBySource.set(sourceId, targets);

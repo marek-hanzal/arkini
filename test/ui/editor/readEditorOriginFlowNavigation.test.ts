@@ -11,14 +11,14 @@ const flow = {
 			target: "a",
 		},
 		{
-			id: "a-side",
-			source: "a",
-			target: "side",
-		},
-		{
 			id: "a-straight",
 			source: "a",
 			target: "straight",
+		},
+		{
+			id: "a-side",
+			source: "a",
+			target: "side",
 		},
 		{
 			id: "side-end",
@@ -82,18 +82,8 @@ const positions = new Map([
 ]);
 
 describe("readEditorOriginFlowNavigation", () => {
-	it("walks one deterministic branch at a time and prefers the straight continuation", () => {
-		expect(readEditorOriginFlowNavigation(flow, positions, "root")).toEqual([
-			"root",
-			"a",
-			"straight",
-			"side",
-			"end",
-		]);
-	});
-
-	it("walks backward through prerequisites in Income mode", () => {
-		expect(readEditorOriginFlowNavigation(flow, positions, "end", "income")).toEqual([
+	it("walks backward through Income prerequisites", () => {
+		expect(readEditorOriginFlowNavigation(flow, positions, "end")).toEqual([
 			"end",
 			"side",
 			"a",
@@ -142,12 +132,71 @@ describe("readEditorOriginFlowNavigation", () => {
 			],
 		]);
 
-		expect(
-			readEditorOriginFlowNavigation(branchedFlow, branchedPositions, "target", "income"),
-		).toEqual([
+		expect(readEditorOriginFlowNavigation(branchedFlow, branchedPositions, "target")).toEqual([
 			"target",
 			"near",
 			"far",
+		]);
+	});
+
+	it("uses geometry to prefer the straighter upstream continuation", () => {
+		const branchedFlow = {
+			edges: [
+				{
+					id: "root-a",
+					source: "root",
+					target: "a",
+				},
+				{
+					id: "left-root",
+					source: "left",
+					target: "root",
+				},
+				{
+					id: "up-root",
+					source: "up",
+					target: "root",
+				},
+			],
+			nodes: [
+				{
+					id: "a",
+				},
+				{
+					id: "root",
+				},
+				{
+					id: "left",
+				},
+				{
+					id: "up",
+				},
+			],
+		} as unknown as EditorItemOriginFlow;
+		const branchedPositions = new Map([
+			[
+				"a",
+				position(3, 300, 0),
+			],
+			[
+				"root",
+				position(2, 200, 0),
+			],
+			[
+				"left",
+				position(1, 100, 0),
+			],
+			[
+				"up",
+				position(1, 200, -100),
+			],
+		]);
+
+		expect(readEditorOriginFlowNavigation(branchedFlow, branchedPositions, "a")).toEqual([
+			"a",
+			"root",
+			"left",
+			"up",
 		]);
 	});
 
@@ -160,30 +209,28 @@ describe("readEditorOriginFlowNavigation", () => {
 			nodes: [
 				...flow.nodes,
 			].reverse(),
-		};
+		} as EditorItemOriginFlow;
 
-		expect(readEditorOriginFlowNavigation(shuffled, positions, "root")).toEqual(
-			readEditorOriginFlowNavigation(flow, positions, "root"),
+		expect(readEditorOriginFlowNavigation(shuffled, positions, "end")).toEqual(
+			readEditorOriginFlowNavigation(flow, positions, "end"),
 		);
 	});
-	it("stays inside an explicitly selected branch", () => {
+
+	it("stays inside the highlighted Income proof when allowed edges are supplied", () => {
 		expect(
 			readEditorOriginFlowNavigation(
 				flow,
 				positions,
-				"root",
-				"outcome",
+				"end",
 				new Set([
-					"root-a",
-					"a-side",
 					"side-end",
+					"a-side",
 				]),
 			),
 		).toEqual([
-			"root",
-			"a",
-			"side",
 			"end",
+			"side",
+			"a",
 		]);
 	});
 });

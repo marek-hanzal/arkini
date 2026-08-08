@@ -1,198 +1,384 @@
 import { describe, expect, it } from "vitest";
 
-import type { EditorItemOriginFlow } from "~/bridge/item/editor/readEditorItemOriginFlow";
+import type {
+	EditorItemOriginFlow,
+	EditorItemOriginItemNode,
+	EditorItemOriginOperation,
+} from "~/bridge/item/editor/readEditorItemOriginFlow";
 import { readEditorOriginFlowHighlight } from "~/ui/item/editor/readEditorOriginFlowHighlight";
 
-const flow = {
+const operation = (
+	id: string,
+	{
+		inputs = [],
+		outputs = [],
+	}: {
+		readonly inputs?: ReadonlyArray<string>;
+		readonly outputs?: ReadonlyArray<string>;
+	} = {},
+): EditorItemOriginOperation => ({
+	id,
+	inputs: inputs.map((itemId) => ({
+		id: `${id}:input:${itemId}`,
+		itemId,
+		label: itemId,
+	})),
+	kind: "line",
+	label: id,
+	outputs: outputs.map((itemId, index) => ({
+		id: `${id}:output:${index}:${itemId}`,
+		itemId,
+		label: itemId,
+		placement: "drop",
+		selectionKind: "guaranteed",
+		weightedSet: false,
+	})),
+	status: "reachable",
+});
+
+const item = (
+	itemId: string,
+	{
+		acquisitionSourceId,
+		operations = [],
+		starter = false,
+	}: {
+		readonly acquisitionSourceId?: string;
+		readonly operations?: ReadonlyArray<EditorItemOriginOperation>;
+		readonly starter?: boolean;
+	} = {},
+): EditorItemOriginItemNode => ({
+	acquisitionSourceId,
+	depth: 0,
+	id: `item:${itemId}`,
+	itemId,
+	kind: "item",
+	operations,
+	resourceIds: [],
+	starterScopes: starter
+		? [
+				"Board",
+			]
+		: [],
+	status: starter ? "starter" : "reachable",
+	title: itemId,
+	type: "simple",
+});
+
+const incomeFlow: EditorItemOriginFlow = {
 	edges: [
 		{
-			id: "a-b",
-			source: "a",
-			target: "b",
+			id: "tool-forge",
+			operationId: "op:forge",
+			role: "input",
+			source: "item:tool",
+			target: "item:forge",
+			targetPortId: "op:forge:input:tool",
 		},
 		{
-			id: "b-c",
-			source: "b",
-			target: "c",
+			id: "water-forge",
+			operationId: "op:forge",
+			role: "input",
+			source: "item:water",
+			target: "item:forge",
+			targetPortId: "op:forge:input:water",
 		},
 		{
-			id: "b-d",
-			source: "b",
-			target: "d",
+			id: "forge-target",
+			operationId: "op:forge",
+			role: "output",
+			source: "item:forge",
+			sourcePortId: "op:forge:output:0:target",
+			target: "item:target",
 		},
 		{
-			id: "d-b",
-			source: "d",
-			target: "b",
-		},
-		{
-			id: "x-b",
-			source: "x",
-			target: "b",
+			id: "loop-target",
+			operationId: "op:loop",
+			role: "output",
+			source: "item:loop",
+			target: "item:target",
 		},
 	],
 	nodes: [
-		{
-			id: "a",
-		},
-		{
-			id: "b",
-		},
-		{
-			id: "c",
-		},
-		{
-			id: "d",
-		},
-		{
-			id: "x",
-		},
+		item("target", {
+			acquisitionSourceId: "op:forge",
+		}),
+		item("forge", {
+			operations: [
+				operation("op:forge", {
+					inputs: [
+						"tool",
+						"water",
+					],
+					outputs: [
+						"target",
+					],
+				}),
+			],
+			starter: true,
+		}),
+		item("tool", {
+			starter: true,
+		}),
+		item("water", {
+			starter: true,
+		}),
+		item("loop", {
+			operations: [
+				operation("op:loop", {
+					outputs: [
+						"target",
+					],
+				}),
+			],
+		}),
 	],
-} as unknown as EditorItemOriginFlow;
+	obtainable: true,
+};
 
-const positions = new Map([
-	[
-		"a",
-		{
-			flowOrder: 0,
-		},
-	],
-	[
-		"b",
-		{
-			flowOrder: 1,
-		},
-	],
-	[
-		"c",
-		{
-			flowOrder: 2,
-		},
-	],
-	[
-		"d",
-		{
-			flowOrder: 3,
-		},
-	],
-	[
-		"x",
-		{
-			flowOrder: 0,
-		},
-	],
-]);
+const positions = new Map(
+	incomeFlow.nodes.map(
+		(node, index) =>
+			[
+				node.id,
+				{
+					flowOrder: index,
+				},
+			] as const,
+	),
+);
 
 describe("readEditorOriginFlowHighlight", () => {
-	it("follows only cycle-broken forward branches from a selected node", () => {
-		const highlight = readEditorOriginFlowHighlight(flow, positions, {
-			id: "b",
-			kind: "node",
-		});
-
-		expect([
-			...highlight.nodeIds,
-		]).toEqual([
-			"b",
-			"c",
-			"d",
-		]);
-		expect([
-			...highlight.edgeIds,
-		]).toEqual([
-			"b-c",
-			"b-d",
-		]);
-	});
-
-	it("walks toward prerequisites when Income is selected", () => {
-		const highlight = readEditorOriginFlowHighlight(
-			flow,
-			positions,
-			{
-				id: "b",
-				kind: "node",
-			},
-			"income",
-		);
-
-		expect(highlight.nodeIds).toEqual(
-			new Set([
-				"b",
-				"a",
-				"x",
-			]),
-		);
-		expect(highlight.edgeIds).toEqual(
-			new Set([
-				"a-b",
-				"x-b",
-			]),
-		);
-	});
-
-	it("does not re-enter an earlier flow order through a cycle edge", () => {
-		const highlight = readEditorOriginFlowHighlight(flow, positions, {
-			id: "d",
+	it("builds one concrete Income proof with every mandatory prerequisite", () => {
+		const highlight = readEditorOriginFlowHighlight(incomeFlow, positions, {
+			id: "item:target",
 			kind: "node",
 		});
 
 		expect(highlight.nodeIds).toEqual(
 			new Set([
-				"d",
-			]),
-		);
-		expect(highlight.edgeIds).toEqual(new Set());
-	});
-
-	it("starts an edge selection at that connection without including sibling inputs", () => {
-		const highlight = readEditorOriginFlowHighlight(flow, positions, {
-			id: "a-b",
-			kind: "edge",
-		});
-
-		expect(highlight.nodeIds).toEqual(
-			new Set([
-				"a",
-				"b",
-				"c",
-				"d",
+				"item:target",
+				"item:forge",
+				"item:tool",
+				"item:water",
 			]),
 		);
 		expect(highlight.edgeIds).toEqual(
 			new Set([
-				"a-b",
-				"b-c",
-				"b-d",
+				"forge-target",
+				"tool-forge",
+				"water-forge",
 			]),
 		);
+		expect(highlight.nodeIds.has("item:loop")).toBe(false);
+		expect(highlight.edgeIds.has("loop-target")).toBe(false);
 	});
 
-	it("keeps a selected backward connection before continuing forward from its target", () => {
-		const highlight = readEditorOriginFlowHighlight(flow, positions, {
-			id: "d-b",
-			kind: "edge",
+	it("stops tracing when the selected item is already a starter", () => {
+		const highlight = readEditorOriginFlowHighlight(incomeFlow, positions, {
+			id: "item:tool",
+			kind: "node",
 		});
+		expect(highlight).toEqual({
+			edgeIds: new Set(),
+			nodeIds: new Set([
+				"item:tool",
+			]),
+		});
+	});
 
+	it("recurses through upstream acquisition operations", () => {
+		const flow: EditorItemOriginFlow = {
+			edges: [
+				{
+					id: "ore-tool",
+					operationId: "op:tool",
+					role: "input",
+					source: "item:ore",
+					target: "item:smith",
+				},
+				{
+					id: "smith-tool",
+					operationId: "op:tool",
+					role: "output",
+					source: "item:smith",
+					target: "item:tool",
+				},
+				{
+					id: "tool-target",
+					operationId: "op:target",
+					role: "input",
+					source: "item:tool",
+					target: "item:bench",
+				},
+				{
+					id: "bench-target",
+					operationId: "op:target",
+					role: "output",
+					source: "item:bench",
+					target: "item:target",
+				},
+			],
+			nodes: [
+				item("target", {
+					acquisitionSourceId: "op:target",
+				}),
+				item("bench", {
+					operations: [
+						operation("op:target", {
+							inputs: [
+								"tool",
+							],
+							outputs: [
+								"target",
+							],
+						}),
+					],
+					starter: true,
+				}),
+				item("tool", {
+					acquisitionSourceId: "op:tool",
+				}),
+				item("smith", {
+					operations: [
+						operation("op:tool", {
+							inputs: [
+								"ore",
+							],
+							outputs: [
+								"tool",
+							],
+						}),
+					],
+					starter: true,
+				}),
+				item("ore", {
+					starter: true,
+				}),
+			],
+			obtainable: true,
+		};
+		const layout = new Map(
+			flow.nodes.map(
+				(node, index) =>
+					[
+						node.id,
+						{
+							flowOrder: index,
+						},
+					] as const,
+			),
+		);
+
+		const highlight = readEditorOriginFlowHighlight(flow, layout, {
+			id: "item:target",
+			kind: "node",
+		});
 		expect(highlight.nodeIds).toEqual(
 			new Set([
-				"d",
-				"b",
-				"c",
+				"item:target",
+				"item:bench",
+				"item:tool",
+				"item:smith",
+				"item:ore",
 			]),
 		);
 		expect(highlight.edgeIds).toEqual(
 			new Set([
-				"d-b",
-				"b-c",
-				"b-d",
+				"bench-target",
+				"tool-target",
+				"smith-tool",
+				"ore-tool",
+			]),
+		);
+	});
+
+	it("keeps an explicitly selected connection and traces from its source", () => {
+		const highlight = readEditorOriginFlowHighlight(incomeFlow, positions, {
+			id: "tool-forge",
+			kind: "edge",
+		});
+		expect(highlight).toEqual({
+			edgeIds: new Set([
+				"tool-forge",
+			]),
+			nodeIds: new Set([
+				"item:forge",
+				"item:tool",
+			]),
+		});
+	});
+
+	it("terminates a circular acquisition proof", () => {
+		const flow: EditorItemOriginFlow = {
+			edges: [
+				{
+					id: "target-a",
+					operationId: "op:a",
+					role: "input",
+					source: "item:target",
+					target: "item:a",
+				},
+				{
+					id: "a-target",
+					operationId: "op:a",
+					role: "output",
+					source: "item:a",
+					target: "item:target",
+				},
+			],
+			nodes: [
+				item("target", {
+					acquisitionSourceId: "op:a",
+				}),
+				item("a", {
+					operations: [
+						operation("op:a", {
+							inputs: [
+								"target",
+							],
+							outputs: [
+								"target",
+							],
+						}),
+					],
+				}),
+			],
+			obtainable: false,
+		};
+		const layout = new Map(
+			flow.nodes.map(
+				(node, index) =>
+					[
+						node.id,
+						{
+							flowOrder: index,
+						},
+					] as const,
+			),
+		);
+		const highlight = readEditorOriginFlowHighlight(flow, layout, {
+			id: "item:target",
+			kind: "node",
+		});
+
+		expect(highlight.nodeIds).toEqual(
+			new Set([
+				"item:target",
+				"item:a",
+			]),
+		);
+		expect(highlight.edgeIds).toEqual(
+			new Set([
+				"a-target",
+				"target-a",
 			]),
 		);
 	});
 
 	it("returns an empty highlight for a stale selection", () => {
 		expect(
-			readEditorOriginFlowHighlight(flow, positions, {
+			readEditorOriginFlowHighlight(incomeFlow, positions, {
 				id: "missing",
 				kind: "node",
 			}),
@@ -200,162 +386,5 @@ describe("readEditorOriginFlowHighlight", () => {
 			edgeIds: new Set(),
 			nodeIds: new Set(),
 		});
-	});
-	it("builds one concrete Income proof with every mandatory prerequisite", () => {
-		const acquisitionFlow = {
-			edges: [
-				{
-					id: "target-cycle",
-					role: "owner",
-					source: "item:target",
-					target: "source:a-cycle",
-				},
-				{
-					id: "cycle-target",
-					role: "output",
-					source: "source:a-cycle",
-					target: "item:target",
-				},
-				{
-					id: "wood-good",
-					role: "input",
-					source: "item:wood",
-					target: "source:z-good",
-				},
-				{
-					id: "stone-good",
-					role: "input",
-					source: "item:stone",
-					target: "source:z-good",
-				},
-				{
-					id: "good-target",
-					role: "output",
-					source: "source:z-good",
-					target: "item:target",
-				},
-			],
-			nodes: [
-				{
-					acquisitionSourceId: "source:z-good",
-					depth: 0,
-					id: "item:target",
-					itemId: "target",
-					kind: "item",
-					resourceIds: [],
-					starterScopes: [],
-					status: "reachable",
-					title: "Target",
-					type: "simple",
-				},
-				{
-					depth: 0,
-					id: "item:wood",
-					itemId: "wood",
-					kind: "item",
-					resourceIds: [],
-					starterScopes: [
-						"Board",
-					],
-					status: "starter",
-					title: "Wood",
-					type: "simple",
-				},
-				{
-					depth: 0,
-					id: "item:stone",
-					itemId: "stone",
-					kind: "item",
-					resourceIds: [],
-					starterScopes: [
-						"Board",
-					],
-					status: "starter",
-					title: "Stone",
-					type: "simple",
-				},
-				{
-					depth: 1,
-					id: "source:a-cycle",
-					kind: "source",
-					label: "Circular route",
-					placement: undefined,
-					selectionKind: "guaranteed",
-					status: "reachable",
-					sourceKind: "line",
-					weightedSet: false,
-				},
-				{
-					depth: 1,
-					id: "source:z-good",
-					kind: "source",
-					label: "Good route",
-					placement: undefined,
-					selectionKind: "guaranteed",
-					status: "reachable",
-					sourceKind: "merge",
-					weightedSet: false,
-				},
-			],
-			obtainable: true,
-		} as const satisfies EditorItemOriginFlow;
-		const acquisitionPositions = new Map([
-			[
-				"item:wood",
-				{
-					flowOrder: 0,
-				},
-			],
-			[
-				"item:stone",
-				{
-					flowOrder: 0,
-				},
-			],
-			[
-				"source:a-cycle",
-				{
-					flowOrder: 1,
-				},
-			],
-			[
-				"source:z-good",
-				{
-					flowOrder: 1,
-				},
-			],
-			[
-				"item:target",
-				{
-					flowOrder: 2,
-				},
-			],
-		]);
-
-		const highlight = readEditorOriginFlowHighlight(
-			acquisitionFlow,
-			acquisitionPositions,
-			{
-				id: "item:target",
-				kind: "node",
-			},
-			"income",
-		);
-
-		expect(highlight.nodeIds).toEqual(
-			new Set([
-				"item:target",
-				"source:z-good",
-				"item:wood",
-				"item:stone",
-			]),
-		);
-		expect(highlight.edgeIds).toEqual(
-			new Set([
-				"good-target",
-				"wood-good",
-				"stone-good",
-			]),
-		);
 	});
 });

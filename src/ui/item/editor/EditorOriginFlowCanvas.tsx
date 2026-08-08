@@ -10,10 +10,8 @@ import {
 import type {
 	EditorItemOriginEdge,
 	EditorItemOriginFlow,
-	EditorItemOriginFlowDirection,
 	EditorItemOriginItemNode,
-	EditorItemOriginNode,
-	EditorItemOriginSourceNode,
+	EditorItemOriginOperationKind,
 } from "~/bridge/item/editor/readEditorItemOriginFlow";
 import { ItemTypeLabel } from "~/ui/item-detail/ItemInfoPresentation";
 import type {
@@ -26,6 +24,10 @@ import {
 	readEditorOriginFlowHighlight,
 } from "~/ui/item/editor/readEditorOriginFlowHighlight";
 import { readEditorOriginFlowNavigation } from "~/ui/item/editor/readEditorOriginFlowNavigation";
+import {
+	EditorOriginFlowOperationSidePadding,
+	readEditorOriginFlowNodeMetrics,
+} from "~/ui/item/editor/readEditorOriginFlowNodeMetrics";
 import { useEditorResourceUrls } from "~/ui/resource/editor/useEditorResourceUrl";
 
 interface Viewport {
@@ -50,7 +52,6 @@ interface PanState {
 }
 
 interface EditorOriginFlowCanvasProps {
-	readonly direction: EditorItemOriginFlowDirection;
 	readonly fitContent: boolean;
 	readonly flow: EditorItemOriginFlow;
 	readonly focusNodeId?: string;
@@ -82,6 +83,7 @@ const SearchFocusZoom = 1;
 const FitPaddingRatio = 0.12;
 const ClickThreshold = 5;
 const EdgeHitRadiusPx = 9;
+const PortHitRadiusPx = 11;
 const EdgeCullPaddingPx = 20;
 const MaxCachedImages = 96;
 
@@ -94,7 +96,7 @@ interface CanvasPalette {
 	readonly line: string;
 	readonly lineStrong: string;
 	readonly muted: string;
-	readonly sourceSurfaces: Readonly<Record<EditorItemOriginSourceNode["sourceKind"], string>>;
+	readonly sourceSurfaces: Readonly<Record<EditorItemOriginOperationKind, string>>;
 	readonly success: string;
 	readonly warning: string;
 }
@@ -160,10 +162,7 @@ const readItemTypeColor = (palette: CanvasPalette, type: EditorItemOriginItemNod
 	}
 };
 
-const readSourceKindColor = (
-	palette: CanvasPalette,
-	kind: EditorItemOriginSourceNode["sourceKind"],
-) => {
+const readSourceKindColor = (palette: CanvasPalette, kind: EditorItemOriginOperationKind) => {
 	switch (kind) {
 		case "line":
 			return palette.accent;
@@ -176,14 +175,14 @@ const readSourceKindColor = (
 	}
 };
 
-const SourceKindIconPath: Record<EditorItemOriginSourceNode["sourceKind"], string> = {
+const SourceKindIconPath: Record<EditorItemOriginOperationKind, string> = {
 	line: "M12 16h.01M16 16h.01M3 19a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8.5a.5.5 0 0 0-.769-.422l-4.462 2.844A.5.5 0 0 1 15 10.5v-2a.5.5 0 0 0-.769-.422L9.77 10.922A.5.5 0 0 1 9 10.5V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2zm5-3h.01",
 	charges:
 		"m11 7-3 5h4l-3 5m5.856-11H16a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-2.935M22 14v-4M5.14 18H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h2.936",
 	merge: "M14 3a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1m5-7a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1M7 15l3 3m-3 3 3-3H5a2 2 0 0 1-2-2v-2",
 	expiry: "M10 2h4m-2 12 3-3",
 };
-const sourceIconPathCache = new Map<EditorItemOriginSourceNode["sourceKind"], Path2D>();
+const sourceIconPathCache = new Map<EditorItemOriginOperationKind, Path2D>();
 
 const clampZoom = (zoom: number) => Math.max(MinZoom, Math.min(MaxZoom, zoom));
 
@@ -610,89 +609,9 @@ const drawItemArtwork = (
 	);
 };
 
-const drawItemNode = (
-	context: CanvasRenderingContext2D,
-	node: EditorItemOriginItemNode,
-	position: EditorItemOriginFlowLayoutNode,
-	highlight: "active" | "idle" | "selected",
-	selectionActive: boolean,
-	palette: CanvasPalette,
-	resourceUrls: ReadonlyMap<string, string>,
-	imageCache: Map<string, HTMLImageElement>,
-	onImageReady: () => void,
-) => {
-	const typeColor = readItemTypeColor(palette, node.type);
-	context.save();
-	context.globalAlpha = selectionActive && highlight === "idle" ? 0.2 : 1;
-	drawNodeFrame(
-		context,
-		position,
-		0,
-		palette.itemSurfaces[node.type],
-		typeColor,
-		highlight,
-		palette,
-	);
-
-	const artworkSize = 68;
-	const artworkX = position.x + 16;
-	const artworkY = position.y + (position.height - artworkSize) / 2;
-	drawItemArtwork(
-		context,
-		node,
-		resourceUrls,
-		imageCache,
-		onImageReady,
-		artworkX,
-		artworkY,
-		artworkSize,
-		palette,
-	);
-
-	const textX = artworkX + artworkSize + 18;
-	const maxTextWidth = position.x + position.width - 18 - textX;
-	const titleLineHeight = 19;
-	const idLineHeight = 16;
-	const labelLineHeight = 12;
-	const blockGap = 8;
-	context.textBaseline = "top";
-	context.fillStyle = palette.foreground;
-	context.font = "600 15px Inter, ui-sans-serif, system-ui, sans-serif";
-	const titleLines = wrapText(context, node.title, maxTextWidth, 2);
-	context.font = "12px ui-monospace, SFMono-Regular, Menlo, monospace";
-	const idLines = wrapIdentifier(context, node.itemId, maxTextWidth, 2);
-	const textHeight =
-		titleLines.length * titleLineHeight +
-		blockGap +
-		idLines.length * idLineHeight +
-		blockGap +
-		labelLineHeight;
-	let textY = position.y + (position.height - textHeight) / 2;
-
-	context.fillStyle = palette.foreground;
-	context.font = "600 15px Inter, ui-sans-serif, system-ui, sans-serif";
-	drawTextLines(context, titleLines, textX, textY, titleLineHeight);
-	textY += titleLines.length * titleLineHeight + blockGap;
-
-	context.fillStyle = palette.muted;
-	context.font = "12px ui-monospace, SFMono-Regular, Menlo, monospace";
-	drawTextLines(context, idLines, textX, textY, idLineHeight);
-	textY += idLines.length * idLineHeight + blockGap;
-
-	context.font = "600 10px Inter, ui-sans-serif, system-ui, sans-serif";
-	const label =
-		node.starterScopes.length > 0
-			? `Starter: ${node.starterScopes.join(", ")}`
-			: node.type === "missing"
-				? "Missing item"
-				: ItemTypeLabel[node.type];
-	context.fillText(fitText(context, label.toUpperCase(), maxTextWidth), textX, textY);
-	context.restore();
-};
-
 const drawSourceIcon = (
 	context: CanvasRenderingContext2D,
-	kind: EditorItemOriginSourceNode["sourceKind"],
+	kind: EditorItemOriginOperationKind,
 	x: number,
 	y: number,
 	size: number,
@@ -724,42 +643,183 @@ const drawSourceIcon = (
 	context.restore();
 };
 
-const drawSourceNode = (
+const drawOperationPort = (
 	context: CanvasRenderingContext2D,
-	node: EditorItemOriginSourceNode,
+	x: number,
+	y: number,
+	color: string,
+	background: string,
+) => {
+	context.beginPath();
+	context.arc(x, y, 6, 0, Math.PI * 2);
+	context.fillStyle = background;
+	context.fill();
+	context.lineWidth = 2.5;
+	context.strokeStyle = color;
+	context.stroke();
+};
+
+const drawItemNode = (
+	context: CanvasRenderingContext2D,
+	node: EditorItemOriginItemNode,
 	position: EditorItemOriginFlowLayoutNode,
 	highlight: "active" | "idle" | "selected",
 	selectionActive: boolean,
 	palette: CanvasPalette,
+	resourceUrls: ReadonlyMap<string, string>,
+	imageCache: Map<string, HTMLImageElement>,
+	onImageReady: () => void,
 ) => {
-	const kindColor = readSourceKindColor(palette, node.sourceKind);
+	const typeColor = readItemTypeColor(palette, node.type);
+	const metrics = readEditorOriginFlowNodeMetrics(node);
 	context.save();
 	context.globalAlpha = selectionActive && highlight === "idle" ? 0.2 : 1;
 	drawNodeFrame(
 		context,
 		position,
-		18,
-		palette.sourceSurfaces[node.sourceKind],
-		kindColor,
+		0,
+		palette.itemSurfaces[node.type],
+		typeColor,
 		highlight,
 		palette,
 	);
 
-	const iconSize = 48;
-	const iconX = position.x + 20;
-	const iconY = position.y + (position.height - iconSize) / 2;
-	drawSourceIcon(context, node.sourceKind, iconX, iconY, iconSize, kindColor);
+	const artworkSize = 68;
+	const artworkX = position.x + 16;
+	const artworkY = position.y + (metrics.headerHeight - artworkSize) / 2;
+	drawItemArtwork(
+		context,
+		node,
+		resourceUrls,
+		imageCache,
+		onImageReady,
+		artworkX,
+		artworkY,
+		artworkSize,
+		palette,
+	);
 
-	const textX = iconX + iconSize + 20;
-	const maxTextWidth = position.x + position.width - 24 - textX;
-	context.fillStyle = palette.foreground;
-	context.font = "600 16px Inter, ui-sans-serif, system-ui, sans-serif";
+	const textX = artworkX + artworkSize + 18;
+	const maxTextWidth = position.x + position.width - 18 - textX;
+	const titleLineHeight = 19;
+	const idLineHeight = 16;
+	const labelLineHeight = 12;
+	const blockGap = 7;
 	context.textBaseline = "top";
-	const titleLines = wrapText(context, node.label, maxTextWidth, 3);
-	const lineHeight = 21;
-	const titleHeight = titleLines.length * lineHeight;
-	const titleY = position.y + (position.height - titleHeight) / 2;
-	drawTextLines(context, titleLines, textX, titleY, lineHeight);
+	context.fillStyle = palette.foreground;
+	context.font = "600 15px Inter, ui-sans-serif, system-ui, sans-serif";
+	const titleLines = wrapText(context, node.title, maxTextWidth, 2);
+	context.font = "12px ui-monospace, SFMono-Regular, Menlo, monospace";
+	const idLines = wrapIdentifier(context, node.itemId, maxTextWidth, 2);
+	const textHeight =
+		titleLines.length * titleLineHeight +
+		blockGap +
+		idLines.length * idLineHeight +
+		blockGap +
+		labelLineHeight;
+	let textY = position.y + (metrics.headerHeight - textHeight) / 2;
+
+	context.fillStyle = palette.foreground;
+	context.font = "600 15px Inter, ui-sans-serif, system-ui, sans-serif";
+	drawTextLines(context, titleLines, textX, textY, titleLineHeight);
+	textY += titleLines.length * titleLineHeight + blockGap;
+
+	context.fillStyle = palette.muted;
+	context.font = "12px ui-monospace, SFMono-Regular, Menlo, monospace";
+	drawTextLines(context, idLines, textX, textY, idLineHeight);
+	textY += idLines.length * idLineHeight + blockGap;
+
+	context.font = "600 10px Inter, ui-sans-serif, system-ui, sans-serif";
+	const label =
+		node.starterScopes.length > 0
+			? `Starter: ${node.starterScopes.join(", ")}`
+			: node.type === "missing"
+				? "Missing item"
+				: ItemTypeLabel[node.type];
+	context.fillText(fitText(context, label.toUpperCase(), maxTextWidth), textX, textY);
+
+	if (node.operations.length > 0) {
+		context.beginPath();
+		context.moveTo(position.x + 12, position.y + metrics.headerHeight - 1);
+		context.lineTo(position.x + position.width - 12, position.y + metrics.headerHeight - 1);
+		context.strokeStyle = palette.lineStrong;
+		context.globalAlpha *= 0.35;
+		context.lineWidth = 1;
+		context.stroke();
+		context.globalAlpha = selectionActive && highlight === "idle" ? 0.2 : 1;
+	}
+
+	for (const [operationIndex, operation] of node.operations.entries()) {
+		const operationMetrics = metrics.operations[operationIndex];
+		if (operationMetrics === undefined) continue;
+		const kindColor = readSourceKindColor(palette, operation.kind);
+		const rowX = position.x + EditorOriginFlowOperationSidePadding;
+		const rowY = position.y + operationMetrics.top;
+		const rowWidth = position.width - EditorOriginFlowOperationSidePadding * 2;
+		const rowHeight = operationMetrics.height;
+		drawRoundedRect(context, rowX, rowY, rowWidth, rowHeight, 10);
+		context.fillStyle = palette.sourceSurfaces[operation.kind];
+		context.fill();
+		context.globalAlpha *= 0.7;
+		context.strokeStyle = kindColor;
+		context.lineWidth = 1.25;
+		context.stroke();
+		context.globalAlpha = selectionActive && highlight === "idle" ? 0.2 : 1;
+
+		const centerX = position.x + position.width / 2;
+		const iconSize = 22;
+		const labelMaxWidth = 112;
+		context.font = "600 12px Inter, ui-sans-serif, system-ui, sans-serif";
+		const operationLabel = fitText(context, operation.label, labelMaxWidth);
+		const labelWidth = context.measureText(operationLabel).width;
+		const groupWidth = iconSize + 8 + labelWidth;
+		const groupX = centerX - groupWidth / 2;
+		const groupY = rowY + (rowHeight - iconSize) / 2;
+		drawSourceIcon(context, operation.kind, groupX, groupY, iconSize, kindColor);
+		context.fillStyle = palette.foreground;
+		context.textBaseline = "middle";
+		context.textAlign = "left";
+		context.fillText(operationLabel, groupX + iconSize + 8, rowY + rowHeight / 2);
+
+		context.font = "500 11px Inter, ui-sans-serif, system-ui, sans-serif";
+		for (const input of operation.inputs) {
+			const portY = operationMetrics.inputPortYs.get(input.id);
+			if (portY === undefined) continue;
+			const worldY = position.y + portY;
+			drawOperationPort(
+				context,
+				position.x,
+				worldY,
+				kindColor,
+				palette.itemSurfaces[node.type],
+			);
+			context.fillStyle = palette.foreground;
+			context.textAlign = "left";
+			context.textBaseline = "middle";
+			context.fillText(fitText(context, input.label, 104), position.x + 12, worldY);
+		}
+		for (const output of operation.outputs) {
+			const portY = operationMetrics.outputPortYs.get(output.id);
+			if (portY === undefined) continue;
+			const worldY = position.y + portY;
+			drawOperationPort(
+				context,
+				position.x + position.width,
+				worldY,
+				kindColor,
+				palette.itemSurfaces[node.type],
+			);
+			context.fillStyle = palette.foreground;
+			context.textAlign = "right";
+			context.textBaseline = "middle";
+			context.fillText(
+				fitText(context, output.label, 104),
+				position.x + position.width - 12,
+				worldY,
+			);
+		}
+	}
+	context.textAlign = "start";
 	context.restore();
 };
 
@@ -925,6 +985,13 @@ const distanceToRoute = (
 	return distance;
 };
 
+type FlowHit =
+	| EditorOriginFlowSelection
+	| {
+			readonly kind: "port";
+			readonly targetNodeId: string;
+	  };
+
 const hitTest = (
 	flow: EditorItemOriginFlow,
 	positions: ReadonlyMap<string, EditorItemOriginFlowLayoutNode>,
@@ -932,7 +999,46 @@ const hitTest = (
 	x: number,
 	y: number,
 	zoom: number,
-): EditorOriginFlowSelection | undefined => {
+): FlowHit | undefined => {
+	const portTolerance = PortHitRadiusPx / zoom;
+	for (let index = flow.nodes.length - 1; index >= 0; index -= 1) {
+		const node = flow.nodes[index]!;
+		const position = positions.get(node.id);
+		if (position === undefined) continue;
+		const metrics = readEditorOriginFlowNodeMetrics(node);
+		for (const [operationIndex, operation] of node.operations.entries()) {
+			const operationMetrics = metrics.operations[operationIndex];
+			if (operationMetrics === undefined) continue;
+			for (const input of operation.inputs) {
+				const localY = operationMetrics.inputPortYs.get(input.id);
+				if (localY === undefined) continue;
+				if (Math.hypot(x - position.x, y - (position.y + localY)) <= portTolerance) {
+					const targetNodeId = `item:${input.itemId}`;
+					if (positions.has(targetNodeId))
+						return {
+							kind: "port",
+							targetNodeId,
+						};
+				}
+			}
+			for (const output of operation.outputs) {
+				const localY = operationMetrics.outputPortYs.get(output.id);
+				if (localY === undefined) continue;
+				if (
+					Math.hypot(x - (position.x + position.width), y - (position.y + localY)) <=
+					portTolerance
+				) {
+					const targetNodeId = `item:${output.itemId}`;
+					if (positions.has(targetNodeId))
+						return {
+							kind: "port",
+							targetNodeId,
+						};
+				}
+			}
+		}
+	}
+
 	for (let index = flow.nodes.length - 1; index >= 0; index -= 1) {
 		const node = flow.nodes[index]!;
 		const position = positions.get(node.id);
@@ -962,7 +1068,7 @@ const hitTest = (
 };
 
 const readNodeHighlight = (
-	node: EditorItemOriginNode,
+	node: EditorItemOriginItemNode,
 	selection: EditorOriginFlowSelection | undefined,
 	highlight: ReturnType<typeof readEditorOriginFlowHighlight> | undefined,
 ) => {
@@ -973,7 +1079,6 @@ const readNodeHighlight = (
 
 /** Renders the passive item flow directly to Canvas with imperative pan and zoom. */
 export const EditorOriginFlowCanvas = ({
-	direction,
 	fitContent,
 	flow,
 	focusNodeId,
@@ -1002,30 +1107,22 @@ export const EditorOriginFlowCanvas = ({
 		() =>
 			selection === undefined
 				? undefined
-				: readEditorOriginFlowHighlight(flow, positions, selection, direction),
+				: readEditorOriginFlowHighlight(flow, positions, selection),
 		[
 			flow,
 			positions,
 			selection,
-			direction,
 		],
 	);
 	const navigationNodeIds = useMemo(
 		() =>
 			selection?.kind === "node"
-				? readEditorOriginFlowNavigation(
-						flow,
-						positions,
-						selection.id,
-						direction,
-						highlight?.edgeIds,
-					)
+				? readEditorOriginFlowNavigation(flow, positions, selection.id, highlight?.edgeIds)
 				: [],
 		[
 			flow,
 			positions,
 			selection,
-			direction,
 			highlight,
 		],
 	);
@@ -1103,27 +1200,17 @@ export const EditorOriginFlowCanvas = ({
 			if (position === undefined) throw new Error(`Missing layout for ${node.id}.`);
 			if (!isNodeVisible(position, viewport, rect.width, rect.height)) continue;
 			const nodeHighlight = readNodeHighlight(node, state.selection, state.highlight);
-			if (node.kind === "item")
-				drawItemNode(
-					context,
-					node,
-					position,
-					nodeHighlight,
-					state.selection !== undefined,
-					palette,
-					state.resourceUrls,
-					imageCacheRef.current,
-					scheduleDrawRef.current,
-				);
-			else
-				drawSourceNode(
-					context,
-					node,
-					position,
-					nodeHighlight,
-					state.selection !== undefined,
-					palette,
-				);
+			drawItemNode(
+				context,
+				node,
+				position,
+				nodeHighlight,
+				state.selection !== undefined,
+				palette,
+				state.resourceUrls,
+				imageCacheRef.current,
+				scheduleDrawRef.current,
+			);
 		}
 		context.restore();
 	}, []);
@@ -1313,6 +1400,23 @@ export const EditorOriginFlowCanvas = ({
 		const worldX = (event.clientX - rect.left - viewport.x) / viewport.zoom;
 		const worldY = (event.clientY - rect.top - viewport.y) / viewport.zoom;
 		const hit = hitTest(flow, positions, routes, worldX, worldY, viewport.zoom);
+		if (hit?.kind === "port") {
+			const targetPosition = positions.get(hit.targetNodeId);
+			if (targetPosition === undefined) return;
+			viewportRef.current = readNodeViewport(
+				targetPosition,
+				rect.width,
+				rect.height,
+				Math.max(viewport.zoom, DefaultViewport.zoom),
+			);
+			navigationIndexRef.current = 0;
+			onSelectionChange({
+				id: hit.targetNodeId,
+				kind: "node",
+			});
+			scheduleDraw();
+			return;
+		}
 		if (
 			hit !== undefined &&
 			selection !== undefined &&

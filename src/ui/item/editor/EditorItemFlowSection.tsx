@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 
 import { useEditorProject } from "~/bridge/editor/useEditorProject";
-import type { EditorItemOriginFlowDirection } from "~/bridge/item/editor/readEditorItemOriginFlow";
 import type { EditorOriginFlowSelection } from "~/ui/item/editor/readEditorOriginFlowHighlight";
 import { EditorOriginFlowCanvas } from "~/ui/item/editor/EditorOriginFlowCanvas";
 import type {
@@ -17,7 +16,6 @@ const EmptyFlowRoutes: ReadonlyMap<
 > = new Map();
 
 interface EditorOriginFlowSectionProps {
-	readonly direction?: EditorItemOriginFlowDirection;
 	readonly focusItemId?: string;
 	readonly itemId?: string;
 	readonly mode: "all" | "item";
@@ -25,19 +23,12 @@ interface EditorOriginFlowSectionProps {
 
 /** Visualizes either the complete game flow or one directed item flow. */
 export const EditorOriginFlowSection = ({
-	direction,
 	focusItemId,
 	itemId,
 	mode,
 }: EditorOriginFlowSectionProps) => {
 	const project = useEditorProject();
-	const flowDirection: EditorItemOriginFlowDirection =
-		direction ?? (itemId === undefined ? "outcome" : "income");
-	const flowState = useEditorItemOriginFlow(
-		project.config,
-		mode === "item" ? itemId : undefined,
-		mode === "item" ? flowDirection : undefined,
-	);
+	const flowState = useEditorItemOriginFlow(project.config, mode === "item" ? itemId : undefined);
 	const flow = flowState.flow;
 	const positions = flowState.status === "ready" ? flowState.positions : EmptyFlowPositions;
 	const routes = flowState.status === "ready" ? flowState.routes : EmptyFlowRoutes;
@@ -74,7 +65,6 @@ export const EditorOriginFlowSection = ({
 			{isReady ? (
 				<div className="relative h-full min-h-0 bg-canvas">
 					<EditorOriginFlowCanvas
-						direction={flowDirection}
 						fitContent={mode === "item"}
 						flow={flow}
 						focusNodeId={focusNodeId}

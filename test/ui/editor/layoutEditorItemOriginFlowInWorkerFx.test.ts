@@ -12,10 +12,12 @@ const flow: EditorItemOriginFlow = {
 	edges: [],
 	nodes: [
 		{
+			acquisitionSourceId: undefined,
 			depth: 0,
 			id: "item:wine",
 			itemId: "wine",
 			kind: "item",
+			operations: [],
 			resourceIds: [
 				"wine",
 			],
@@ -73,8 +75,10 @@ describe("layoutEditorItemOriginFlowInWorkerFx", () => {
 			edges: [],
 			nodes: [
 				{
+					height: 176,
 					id: "item:wine",
-					kind: "item",
+					ports: [],
+					width: 420,
 				},
 			],
 		});

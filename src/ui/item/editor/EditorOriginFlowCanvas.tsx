@@ -106,35 +106,6 @@ const PortHitRadiusPx = 11;
 const EdgeCullPaddingPx = 32;
 const MaxCachedImages = 96;
 
-const IncomeBranchColors = [
-	"#2e91e5",
-	"#e15f99",
-	"#1ca71c",
-	"#fb0d0d",
-	"#da16ff",
-	"#6b7280",
-	"#b68100",
-	"#750d86",
-	"#eb663b",
-	"#511cfb",
-	"#00a08b",
-	"#fb00d1",
-] as const;
-
-const hashString = (value: string) => {
-	let hash = 2166136261;
-	for (let index = 0; index < value.length; index += 1) {
-		hash ^= value.charCodeAt(index);
-		hash = Math.imul(hash, 16777619);
-	}
-	return hash >>> 0;
-};
-
-const readIncomeBranchColor = (selectionId: string, branchIndex: number) => {
-	const offset = hashString(selectionId) % IncomeBranchColors.length;
-	return IncomeBranchColors[(offset + branchIndex) % IncomeBranchColors.length]!;
-};
-
 const traceOrthogonalPath = (
 	context: CanvasRenderingContext2D,
 	points: ReadonlyArray<EditorItemOriginFlowLayoutPoint>,
@@ -967,25 +938,15 @@ const drawEdge = (
 	if (first === undefined) return;
 	const selected = selection?.kind === "edge" && selection.id === edge.id;
 	const active = highlight?.edgeIds.has(edge.id) ?? false;
-	const selectedNodeId = selection?.kind === "node" ? selection.id : undefined;
-	const branchIndexes =
-		selectedNodeId !== undefined && active
-			? (highlight?.branchIndexesByEdgeId.get(edge.id) ?? [])
-			: [];
-	const alpha = selection === undefined ? 0.6 : active ? 1 : 0.6;
-	const branchIndex = branchIndexes[0];
-	const edgeColor =
-		branchIndex === undefined || selectedNodeId === undefined
-			? palette.accent
-			: readIncomeBranchColor(selectedNodeId, branchIndex);
+	const emphasized = selected || active;
 
 	context.save();
-	context.globalAlpha = alpha;
+	context.globalAlpha = emphasized ? 1 : 0.6;
 	context.lineJoin = "round";
 	context.lineCap = "round";
-	context.strokeStyle = edgeColor;
-	context.fillStyle = edgeColor;
-	context.lineWidth = selected ? 4.8 : active ? 4 : 2;
+	context.strokeStyle = emphasized ? palette.accent : palette.lineStrong;
+	context.fillStyle = emphasized ? palette.accent : palette.lineStrong;
+	context.lineWidth = 1;
 	context.beginPath();
 	traceOrthogonalPath(context, backbone);
 	context.stroke();

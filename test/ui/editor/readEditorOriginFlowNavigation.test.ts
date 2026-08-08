@@ -1,7 +1,10 @@
 import { describe, expect, it } from "vitest";
 
 import type { EditorItemOriginFlow } from "~/bridge/item/editor/readEditorItemOriginFlow";
-import { readEditorOriginFlowNavigation } from "~/ui/item/editor/readEditorOriginFlowNavigation";
+import {
+	readEditorOriginFlowNavigation,
+	readEditorOriginFlowProducerNavigation,
+} from "~/ui/item/editor/readEditorOriginFlowNavigation";
 
 const flow = {
 	edges: [
@@ -209,7 +212,7 @@ describe("readEditorOriginFlowNavigation", () => {
 			nodes: [
 				...flow.nodes,
 			].reverse(),
-		} as EditorItemOriginFlow;
+		} as unknown as EditorItemOriginFlow;
 
 		expect(readEditorOriginFlowNavigation(shuffled, positions, "end")).toEqual(
 			readEditorOriginFlowNavigation(flow, positions, "end"),
@@ -232,5 +235,103 @@ describe("readEditorOriginFlowNavigation", () => {
 			"side",
 			"a",
 		]);
+	});
+	describe("producer navigation", () => {
+		it("returns each item that outputs the selected item once in a stable order", () => {
+			const producerFlow = {
+				edges: [
+					{
+						id: "z-output",
+						operationId: "line:z",
+						role: "output",
+						source: "item:z",
+						target: "item:log",
+					},
+					{
+						id: "a-output-1",
+						operationId: "line:a:1",
+						role: "output",
+						source: "item:a",
+						target: "item:log",
+					},
+					{
+						id: "a-output-2",
+						operationId: "line:a:2",
+						role: "output",
+						source: "item:a",
+						target: "item:log",
+					},
+					{
+						id: "input",
+						operationId: "line:a:1",
+						role: "input",
+						source: "item:log",
+						target: "item:a",
+					},
+				],
+				nodes: [
+					{
+						id: "item:log",
+						itemId: "item:log",
+						title: "Log",
+					},
+					{
+						id: "item:z",
+						itemId: "producer:z",
+						title: "Zeta Mill",
+					},
+					{
+						id: "item:a",
+						itemId: "producer:a",
+						title: "Alpha Mill",
+					},
+				],
+			} as unknown as EditorItemOriginFlow;
+
+			const expected = [
+				"item:a",
+				"item:z",
+			];
+			expect(readEditorOriginFlowProducerNavigation(producerFlow, "item:log")).toEqual(
+				expected,
+			);
+			expect(
+				readEditorOriginFlowProducerNavigation(
+					{
+						...producerFlow,
+						edges: [
+							...producerFlow.edges,
+						].reverse(),
+						nodes: [
+							...producerFlow.nodes,
+						].reverse(),
+					},
+					"item:log",
+				),
+			).toEqual(expected);
+		});
+
+		it("ignores self-output loops", () => {
+			const producerFlow = {
+				edges: [
+					{
+						id: "self-output",
+						operationId: "line:self",
+						role: "output",
+						source: "item:loop",
+						target: "item:loop",
+					},
+				],
+				nodes: [
+					{
+						id: "item:loop",
+						itemId: "item:loop",
+						title: "Loop",
+					},
+				],
+			} as unknown as EditorItemOriginFlow;
+
+			expect(readEditorOriginFlowProducerNavigation(producerFlow, "item:loop")).toEqual([]);
+		});
 	});
 });

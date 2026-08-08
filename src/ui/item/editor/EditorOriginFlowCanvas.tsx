@@ -4,6 +4,7 @@ import {
 	useLayoutEffect,
 	useMemo,
 	useRef,
+	useState,
 	type PointerEvent as ReactPointerEvent,
 } from "react";
 
@@ -23,7 +24,11 @@ import {
 	type EditorOriginFlowSelection,
 	readEditorOriginFlowHighlight,
 } from "~/ui/item/editor/readEditorOriginFlowHighlight";
-import { readEditorOriginFlowNavigation } from "~/ui/item/editor/readEditorOriginFlowNavigation";
+import {
+	readEditorOriginFlowNavigation,
+	readEditorOriginFlowProducerNavigation,
+} from "~/ui/item/editor/readEditorOriginFlowNavigation";
+import { EditorOriginFlowShortcutHelp } from "~/ui/item/editor/EditorOriginFlowShortcutHelp";
 import {
 	EditorOriginFlowOperationContentPadding,
 	EditorOriginFlowOperationHeaderHeight,
@@ -287,7 +292,7 @@ const readInitialFocusPosition = (
 	)[0]?.[1];
 };
 
-type FlowNavigationShortcut = "home" | "next" | "previous";
+type FlowNavigationShortcut = "help" | "home" | "next" | "previous" | "producers";
 
 const readFlowNavigationShortcut = (event: KeyboardEvent): FlowNavigationShortcut | undefined => {
 	const target = event.target;
@@ -310,6 +315,10 @@ const readFlowNavigationShortcut = (event: KeyboardEvent): FlowNavigationShortcu
 			return "previous";
 		case "h":
 			return "home";
+		case "i":
+			return "producers";
+		case "?":
+			return "help";
 		default:
 			return undefined;
 	}
@@ -1090,9 +1099,11 @@ const readNodeHighlight = (
 	node: EditorItemOriginItemNode,
 	selection: EditorOriginFlowSelection | undefined,
 	highlight: ReturnType<typeof readEditorOriginFlowHighlight> | undefined,
+	navigationFocusNodeId: string | undefined,
 ) => {
 	if (selection?.kind === "node" && selection.id === node.id) return "selected" as const;
-	if (highlight?.nodeIds.has(node.id)) return "active" as const;
+	if (navigationFocusNodeId === node.id || highlight?.nodeIds.has(node.id))
+		return "active" as const;
 	return "idle" as const;
 };
 
@@ -1121,6 +1132,9 @@ export const EditorOriginFlowCanvas = ({
 	const frameRef = useRef<number | undefined>(undefined);
 	const resetViewportRef = useRef(true);
 	const navigationIndexRef = useRef(0);
+	const producerNavigationIndexRef = useRef(-1);
+	const producerNavigationFocusNodeIdRef = useRef<string | undefined>(undefined);
+	const [helpOpen, setHelpOpen] = useState(false);
 	const paletteRef = useRef<CanvasPalette | undefined>(undefined);
 	const highlight = useMemo(
 		() =>
@@ -1143,6 +1157,16 @@ export const EditorOriginFlowCanvas = ({
 			positions,
 			selection,
 			highlight,
+		],
+	);
+	const producerNavigationNodeIds = useMemo(
+		() =>
+			selection?.kind === "node"
+				? readEditorOriginFlowProducerNavigation(flow, selection.id)
+				: [],
+		[
+			flow,
+			selection,
 		],
 	);
 	const renderStateRef = useRef<RenderState>({
@@ -1218,7 +1242,12 @@ export const EditorOriginFlowCanvas = ({
 			const position = state.positions.get(node.id);
 			if (position === undefined) throw new Error(`Missing layout for ${node.id}.`);
 			if (!isNodeVisible(position, viewport, rect.width, rect.height)) continue;
-			const nodeHighlight = readNodeHighlight(node, state.selection, state.highlight);
+			const nodeHighlight = readNodeHighlight(
+				node,
+				state.selection,
+				state.highlight,
+				producerNavigationFocusNodeIdRef.current,
+			);
 			drawItemNode(
 				context,
 				node,
@@ -1284,6 +1313,18 @@ export const EditorOriginFlowCanvas = ({
 	]);
 
 	useEffect(() => {
+		producerNavigationIndexRef.current = -1;
+	}, [
+		producerNavigationNodeIds,
+	]);
+
+	useEffect(() => {
+		producerNavigationFocusNodeIdRef.current = undefined;
+	}, [
+		selection,
+	]);
+
+	useEffect(() => {
 		const focusPosition = (position: EditorItemOriginFlowLayoutNode, zoom: number) => {
 			const canvas = canvasRef.current;
 			if (canvas === null) return false;
@@ -1293,11 +1334,24 @@ export const EditorOriginFlowCanvas = ({
 			return true;
 		};
 		const handleKeyDown = (event: KeyboardEvent) => {
+			if (helpOpen) {
+				if (event.key === "Escape" || event.key === "?") {
+					event.preventDefault();
+					setHelpOpen(false);
+				}
+				return;
+			}
 			const shortcut = readFlowNavigationShortcut(event);
 			if (shortcut === undefined) return;
 			event.preventDefault();
 
+			if (shortcut === "help") {
+				setHelpOpen(true);
+				return;
+			}
+
 			if (shortcut === "home") {
+				producerNavigationFocusNodeIdRef.current = undefined;
 				const homeNodeId = navigationNodeIds[0];
 				const homePosition =
 					homeNodeId === undefined
@@ -1314,6 +1368,26 @@ export const EditorOriginFlowCanvas = ({
 				return;
 			}
 
+			if (shortcut === "producers") {
+				if (producerNavigationNodeIds.length === 0) return;
+				const nextIndex =
+					(producerNavigationIndexRef.current + 1) % producerNavigationNodeIds.length;
+				const nodeId = producerNavigationNodeIds[nextIndex];
+				if (nodeId === undefined) return;
+				const position = positions.get(nodeId);
+				if (position === undefined) return;
+				producerNavigationFocusNodeIdRef.current = nodeId;
+				if (
+					focusPosition(
+						position,
+						Math.max(viewportRef.current.zoom, DefaultViewport.zoom),
+					)
+				)
+					producerNavigationIndexRef.current = nextIndex;
+				return;
+			}
+
+			producerNavigationFocusNodeIdRef.current = undefined;
 			if (navigationNodeIds.length === 0) return;
 			const offset = shortcut === "next" ? 1 : -1;
 			const nextIndex =
@@ -1330,8 +1404,10 @@ export const EditorOriginFlowCanvas = ({
 		return () => window.removeEventListener("keydown", handleKeyDown);
 	}, [
 		flow,
+		helpOpen,
 		navigationNodeIds,
 		positions,
+		producerNavigationNodeIds,
 		scheduleDraw,
 	]);
 
@@ -1474,15 +1550,18 @@ export const EditorOriginFlowCanvas = ({
 	};
 
 	return (
-		<canvas
-			aria-label="Item flow"
-			className="block size-full touch-none cursor-grab text-foreground"
-			data-ui="EditorOriginFlowCanvas"
-			onPointerCancel={(event) => finishPan(event, true)}
-			onPointerDown={handlePointerDown}
-			onPointerMove={handlePointerMove}
-			onPointerUp={(event) => finishPan(event, false)}
-			ref={canvasRef}
-		/>
+		<>
+			<canvas
+				aria-label="Item flow"
+				className="block size-full touch-none cursor-grab text-foreground"
+				data-ui="EditorOriginFlowCanvas"
+				onPointerCancel={(event) => finishPan(event, true)}
+				onPointerDown={handlePointerDown}
+				onPointerMove={handlePointerMove}
+				onPointerUp={(event) => finishPan(event, false)}
+				ref={canvasRef}
+			/>
+			{helpOpen ? <EditorOriginFlowShortcutHelp onClose={() => setHelpOpen(false)} /> : null}
+		</>
 	);
 };

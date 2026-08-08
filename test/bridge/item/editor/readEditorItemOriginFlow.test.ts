@@ -2,6 +2,8 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import {
+	EditorItemOriginItemInputPortId,
+	EditorItemOriginItemOutputPortId,
 	readEditorItemOriginFlowFx,
 	type EditorItemOriginFlowProgress,
 } from "~/bridge/item/editor/readEditorItemOriginFlow";
@@ -154,6 +156,7 @@ describe("readEditorItemOriginFlow", () => {
 				expect.objectContaining({
 					role: "input",
 					source: "item:tool",
+					sourcePortId: EditorItemOriginItemOutputPortId,
 					target: "item:forge",
 					targetPortId: expect.any(String),
 				}),
@@ -168,6 +171,7 @@ describe("readEditorItemOriginFlow", () => {
 					source: "item:forge",
 					target: "item:ingot",
 					sourcePortId: expect.any(String),
+					targetPortId: EditorItemOriginItemInputPortId,
 				}),
 			]),
 		);

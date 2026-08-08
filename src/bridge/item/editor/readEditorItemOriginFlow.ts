@@ -12,6 +12,9 @@ export type EditorItemOriginNodeStatus = "starter" | "reachable" | "blocked" | "
 export type EditorItemOriginOperationKind = "line" | "charges" | "merge" | "expiry";
 export type EditorItemOriginOutputKind = "guaranteed" | "chance" | "weighted" | "replace";
 
+export const EditorItemOriginItemInputPortId = "item:self:input";
+export const EditorItemOriginItemOutputPortId = "item:self:output";
+
 export interface EditorItemOriginOperationPort {
 	readonly id: string;
 	readonly itemId: string;
@@ -440,6 +443,7 @@ const readEdges = (
 				operationId: source.id,
 				role: "input",
 				source: `item:${requirementItemId}`,
+				sourcePortId: EditorItemOriginItemOutputPortId,
 				target: `item:${source.ownerItemId}`,
 				targetPortId,
 			});
@@ -454,6 +458,7 @@ const readEdges = (
 				source: `item:${source.ownerItemId}`,
 				sourcePortId,
 				target: `item:${output.itemId}`,
+				targetPortId: EditorItemOriginItemInputPortId,
 			});
 		}
 	}

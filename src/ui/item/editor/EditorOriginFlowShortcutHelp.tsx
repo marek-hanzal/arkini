@@ -22,6 +22,10 @@ const ShortcutRows = [
 		"Cycle through items whose operations output the selected item.",
 	],
 	[
+		"Z",
+		"Go back through recently clicked items.",
+	],
+	[
 		"?",
 		"Open or close this help.",
 	],

@@ -113,6 +113,7 @@ export const EditorOriginFlowSection = ({
 export const EditorItemFlowSection = ({ itemId }: { readonly itemId: string }) => (
 	<div className="h-[calc(100vh-7rem)]">
 		<EditorOriginFlowSection
+			focusItemId={itemId}
 			itemId={itemId}
 			mode="item"
 		/>

@@ -33,8 +33,13 @@ import {
 	EditorOriginFlowOperationContentPadding,
 	EditorOriginFlowOperationHeaderHeight,
 	EditorOriginFlowOperationSidePadding,
+	readEditorOriginFlowItemPortY,
 	readEditorOriginFlowNodeMetrics,
 } from "~/ui/item/editor/readEditorOriginFlowNodeMetrics";
+import {
+	popEditorOriginFlowVisit,
+	pushEditorOriginFlowVisit,
+} from "~/ui/item/editor/readEditorOriginFlowVisitHistory";
 import { useEditorResourceUrls } from "~/ui/resource/editor/useEditorResourceUrl";
 
 interface Viewport {
@@ -70,6 +75,7 @@ interface EditorOriginFlowCanvasProps {
 
 interface RenderState {
 	readonly fitContent: boolean;
+	readonly focusNodeId?: string;
 	readonly flow: EditorItemOriginFlow;
 	readonly highlight: ReturnType<typeof readEditorOriginFlowHighlight> | undefined;
 	readonly positions: ReadonlyMap<string, EditorItemOriginFlowLayoutNode>;
@@ -292,7 +298,7 @@ const readInitialFocusPosition = (
 	)[0]?.[1];
 };
 
-type FlowNavigationShortcut = "help" | "home" | "next" | "previous" | "producers";
+type FlowNavigationShortcut = "back" | "help" | "home" | "next" | "previous" | "producers";
 
 const readFlowNavigationShortcut = (event: KeyboardEvent): FlowNavigationShortcut | undefined => {
 	const target = event.target;
@@ -317,6 +323,8 @@ const readFlowNavigationShortcut = (event: KeyboardEvent): FlowNavigationShortcu
 			return "home";
 		case "i":
 			return "producers";
+		case "z":
+			return "back";
 		case "?":
 			return "help";
 		default:
@@ -654,7 +662,7 @@ const drawSourceIcon = (
 	context.restore();
 };
 
-const drawOperationPort = (
+const drawFlowPort = (
 	context: CanvasRenderingContext2D,
 	x: number,
 	y: number,
@@ -693,6 +701,20 @@ const drawItemNode = (
 		typeColor,
 		highlight,
 		palette,
+	);
+	drawFlowPort(
+		context,
+		position.x,
+		position.y + readEditorOriginFlowItemPortY(metrics.headerHeight),
+		typeColor,
+		palette.itemSurfaces[node.type],
+	);
+	drawFlowPort(
+		context,
+		position.x + position.width,
+		position.y + readEditorOriginFlowItemPortY(metrics.headerHeight),
+		typeColor,
+		palette.itemSurfaces[node.type],
 	);
 
 	const artworkSize = 68;
@@ -810,13 +832,7 @@ const drawItemNode = (
 			const portY = operationMetrics.inputPortYs.get(input.id);
 			if (portY === undefined) continue;
 			const worldY = position.y + portY;
-			drawOperationPort(
-				context,
-				position.x,
-				worldY,
-				kindColor,
-				palette.itemSurfaces[node.type],
-			);
+			drawFlowPort(context, position.x, worldY, kindColor, palette.itemSurfaces[node.type]);
 			context.fillStyle = palette.foreground;
 			context.textAlign = "left";
 			context.textBaseline = "middle";
@@ -830,7 +846,7 @@ const drawItemNode = (
 			const portY = operationMetrics.outputPortYs.get(output.id);
 			if (portY === undefined) continue;
 			const worldY = position.y + portY;
-			drawOperationPort(
+			drawFlowPort(
 				context,
 				position.x + position.width,
 				worldY,
@@ -1134,6 +1150,7 @@ export const EditorOriginFlowCanvas = ({
 	const navigationIndexRef = useRef(0);
 	const producerNavigationIndexRef = useRef(-1);
 	const producerNavigationFocusNodeIdRef = useRef<string | undefined>(undefined);
+	const visitHistoryRef = useRef<ReadonlyArray<string>>([]);
 	const [helpOpen, setHelpOpen] = useState(false);
 	const paletteRef = useRef<CanvasPalette | undefined>(undefined);
 	const highlight = useMemo(
@@ -1172,6 +1189,7 @@ export const EditorOriginFlowCanvas = ({
 	const renderStateRef = useRef<RenderState>({
 		fitContent,
 		flow,
+		focusNodeId,
 		highlight,
 		positions,
 		resourceUrls,
@@ -1182,6 +1200,7 @@ export const EditorOriginFlowCanvas = ({
 	renderStateRef.current = {
 		fitContent,
 		flow,
+		focusNodeId,
 		highlight,
 		positions,
 		resourceUrls,
@@ -1207,17 +1226,29 @@ export const EditorOriginFlowCanvas = ({
 		}
 		const state = renderStateRef.current;
 		if (resetViewportRef.current) {
+			const explicitFocusPosition =
+				state.focusNodeId === undefined
+					? undefined
+					: state.positions.get(state.focusNodeId);
 			const initialPosition = readInitialFocusPosition(state.flow, state.positions);
-			viewportRef.current = state.fitContent
-				? readFitViewport(state.positions, rect.width, rect.height)
-				: initialPosition === undefined
-					? DefaultViewport
-					: readNodeViewport(
-							initialPosition,
+			viewportRef.current =
+				explicitFocusPosition !== undefined
+					? readNodeViewport(
+							explicitFocusPosition,
 							rect.width,
 							rect.height,
-							DefaultViewport.zoom,
-						);
+							SearchFocusZoom,
+						)
+					: state.fitContent
+						? readFitViewport(state.positions, rect.width, rect.height)
+						: initialPosition === undefined
+							? DefaultViewport
+							: readNodeViewport(
+									initialPosition,
+									rect.width,
+									rect.height,
+									DefaultViewport.zoom,
+								);
 			resetViewportRef.current = false;
 		}
 		const viewport = viewportRef.current;
@@ -1325,6 +1356,12 @@ export const EditorOriginFlowCanvas = ({
 	]);
 
 	useEffect(() => {
+		visitHistoryRef.current = [];
+	}, [
+		flow,
+	]);
+
+	useEffect(() => {
 		const focusPosition = (position: EditorItemOriginFlowLayoutNode, zoom: number) => {
 			const canvas = canvasRef.current;
 			if (canvas === null) return false;
@@ -1347,6 +1384,22 @@ export const EditorOriginFlowCanvas = ({
 
 			if (shortcut === "help") {
 				setHelpOpen(true);
+				return;
+			}
+
+			if (shortcut === "back") {
+				const back = popEditorOriginFlowVisit(visitHistoryRef.current);
+				if (back.nodeId === undefined) return;
+				const position = positions.get(back.nodeId);
+				if (position === undefined) return;
+				visitHistoryRef.current = back.history;
+				producerNavigationFocusNodeIdRef.current = undefined;
+				navigationIndexRef.current = 0;
+				onSelectionChange({
+					id: back.nodeId,
+					kind: "node",
+				});
+				focusPosition(position, Math.max(viewportRef.current.zoom, DefaultViewport.zoom));
 				return;
 			}
 
@@ -1406,6 +1459,7 @@ export const EditorOriginFlowCanvas = ({
 		flow,
 		helpOpen,
 		navigationNodeIds,
+		onSelectionChange,
 		positions,
 		producerNavigationNodeIds,
 		scheduleDraw,
@@ -1505,12 +1559,22 @@ export const EditorOriginFlowCanvas = ({
 				Math.max(viewport.zoom, DefaultViewport.zoom),
 			);
 			navigationIndexRef.current = 0;
+			let visitHistory = visitHistoryRef.current;
+			if (selection?.kind === "node")
+				visitHistory = pushEditorOriginFlowVisit(visitHistory, selection.id);
+			visitHistoryRef.current = pushEditorOriginFlowVisit(visitHistory, hit.targetNodeId);
 			onSelectionChange({
 				id: hit.targetNodeId,
 				kind: "node",
 			});
 			scheduleDraw();
 			return;
+		}
+		if (hit?.kind === "node") {
+			let visitHistory = visitHistoryRef.current;
+			if (selection?.kind === "node")
+				visitHistory = pushEditorOriginFlowVisit(visitHistory, selection.id);
+			visitHistoryRef.current = pushEditorOriginFlowVisit(visitHistory, hit.id);
 		}
 		if (
 			hit !== undefined &&

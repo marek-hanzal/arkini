@@ -1,6 +1,8 @@
-import type {
-	EditorItemOriginItemNode,
-	EditorItemOriginOperation,
+import {
+	EditorItemOriginItemInputPortId,
+	EditorItemOriginItemOutputPortId,
+	type EditorItemOriginItemNode,
+	type EditorItemOriginOperation,
 } from "~/bridge/item/editor/readEditorItemOriginFlow";
 
 export const EditorOriginFlowNodeWidth = 420;
@@ -14,6 +16,10 @@ export const EditorOriginFlowOperationHeaderGap = 8;
 
 const PortLineHeight = 26;
 const NodeBottomPadding = 12;
+const EditorOriginFlowItemPortBaseY = 45;
+
+export const readEditorOriginFlowItemPortY = (headerHeight: number) =>
+	EditorOriginFlowItemPortBaseY + (headerHeight - EditorOriginFlowNodeHeaderHeight) / 2;
 
 export interface EditorOriginFlowOperationMetrics {
 	readonly height: number;
@@ -73,7 +79,26 @@ export const readEditorOriginFlowNodeMetrics = (
 			headerHeight: EditorOriginFlowNodeMinHeight,
 			height: EditorOriginFlowNodeMinHeight,
 			operations: [],
-			portOffsets: new Map(),
+			portOffsets: new Map([
+				[
+					EditorItemOriginItemInputPortId,
+					{
+						x: -EditorOriginFlowNodeWidth / 2,
+						y:
+							readEditorOriginFlowItemPortY(EditorOriginFlowNodeMinHeight) -
+							EditorOriginFlowNodeMinHeight / 2,
+					},
+				],
+				[
+					EditorItemOriginItemOutputPortId,
+					{
+						x: EditorOriginFlowNodeWidth / 2,
+						y:
+							readEditorOriginFlowItemPortY(EditorOriginFlowNodeMinHeight) -
+							EditorOriginFlowNodeMinHeight / 2,
+					},
+				],
+			]),
 			width: EditorOriginFlowNodeWidth,
 		};
 	}
@@ -108,6 +133,14 @@ export const readEditorOriginFlowNodeMetrics = (
 			readonly y: number;
 		}
 	>();
+	portOffsets.set(EditorItemOriginItemInputPortId, {
+		x: -EditorOriginFlowNodeWidth / 2,
+		y: readEditorOriginFlowItemPortY(EditorOriginFlowNodeHeaderHeight) - height / 2,
+	});
+	portOffsets.set(EditorItemOriginItemOutputPortId, {
+		x: EditorOriginFlowNodeWidth / 2,
+		y: readEditorOriginFlowItemPortY(EditorOriginFlowNodeHeaderHeight) - height / 2,
+	});
 	for (const operation of operations) {
 		for (const [portId, y] of operation.inputPortYs) {
 			portOffsets.set(portId, {

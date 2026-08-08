@@ -16,6 +16,14 @@ const MinimumLaneSegmentLength = 40;
 const NodeClearance = 8;
 const Epsilon = 0.01;
 const AxisEpsilon = 0.1;
+const HubBusThreshold = 10;
+const HubBusEdgesPerBus = 10;
+const HubBusMaxCount = 5;
+const HubBusBaseDistance = 72;
+const HubBusPreferredSpacing = 24;
+const HubBusMinimumSpacing = 10;
+const HubBusMaxWidth = 180;
+const HubBusVerticalReach = 180;
 
 type SegmentAxis = "horizontal" | "vertical";
 
@@ -232,8 +240,8 @@ const readTrackSegments = (
 			const axis = readAxis(from, to);
 			if (
 				axis === undefined ||
-				index === 1 ||
-				index === backbone.length - 1 ||
+				index <= 2 ||
+				index >= backbone.length - 2 ||
 				distance(from, to) < MinimumLaneSegmentLength
 			)
 				continue;
@@ -441,6 +449,262 @@ const readOffsetPolyline = (
 	return simplifyOrthogonalPoints(points, protectedPoints);
 };
 
+const readTerminalVerticalSegmentIndex = (
+	points: ReadonlyArray<EditorItemOriginFlowLayoutPoint>,
+	side: "source" | "target",
+) => {
+	if (side === "source") {
+		for (let index = 2; index <= Math.min(points.length - 1, 6); index += 1)
+			if (readAxis(points[index - 1]!, points[index]!) === "vertical") return index;
+		return undefined;
+	}
+	for (let index = points.length - 2; index >= Math.max(1, points.length - 6); index -= 1)
+		if (readAxis(points[index - 1]!, points[index]!) === "vertical") return index;
+	return undefined;
+};
+
+const readTerminalBusRange = (
+	points: ReadonlyArray<EditorItemOriginFlowLayoutPoint>,
+	side: "source" | "target",
+) => {
+	const index = readTerminalVerticalSegmentIndex(points, side);
+	if (index === undefined) return undefined;
+	const from = points[index - 1]!;
+	const to = points[index]!;
+	const verticalLength = Math.abs(to.y - from.y);
+	const reach = Math.min(HubBusVerticalReach, verticalLength);
+	const joinY =
+		side === "source"
+			? from.y + (Math.sign(to.y - from.y) || 1) * reach
+			: to.y + (Math.sign(from.y - to.y) || 1) * reach;
+	const terminalY = side === "source" ? from.y : to.y;
+	return {
+		max: Math.max(terminalY, joinY),
+		min: Math.min(terminalY, joinY),
+	};
+};
+
+const readBusSideClearance = (
+	nodeId: string,
+	position: EditorItemOriginFlowLayoutNode,
+	side: "left" | "right",
+	yMin: number,
+	yMax: number,
+	positions: ReadonlyMap<string, EditorItemOriginFlowLayoutNode>,
+) => {
+	const borderX = side === "left" ? position.x : position.x + position.width;
+	let clearance = HubBusBaseDistance + HubBusMaxWidth + NodeClearance;
+	for (const [otherId, other] of positions) {
+		if (otherId === nodeId) continue;
+		const otherTop = other.y - NodeClearance;
+		const otherBottom = other.y + other.height + NodeClearance;
+		if (otherBottom <= yMin || otherTop >= yMax) continue;
+		if (side === "left") {
+			const otherRight = other.x + other.width + NodeClearance;
+			if (otherRight > borderX) continue;
+			clearance = Math.min(clearance, borderX - otherRight);
+		} else {
+			const otherLeft = other.x - NodeClearance;
+			if (otherLeft < borderX) continue;
+			clearance = Math.min(clearance, otherLeft - borderX);
+		}
+	}
+	return Math.max(0, clearance);
+};
+
+const routeTerminalViaBus = (
+	points: ReadonlyArray<EditorItemOriginFlowLayoutPoint>,
+	side: "source" | "target",
+	busX: number,
+) => {
+	const index = readTerminalVerticalSegmentIndex(points, side);
+	if (index === undefined) return points;
+	const from = points[index - 1]!;
+	const to = points[index]!;
+	if (Math.abs(from.x - busX) < Epsilon) return points;
+	const verticalLength = Math.abs(to.y - from.y);
+	const reach = Math.min(HubBusVerticalReach, verticalLength);
+	const candidate: EditorItemOriginFlowLayoutPoint[] = [];
+	for (let pointIndex = 0; pointIndex < points.length; pointIndex += 1) {
+		const point = points[pointIndex]!;
+		appendDistinctPoint(candidate, point);
+		if (pointIndex !== index - 1) continue;
+		if (side === "source") {
+			const direction = Math.sign(to.y - from.y) || 1;
+			const joinY = from.y + direction * reach;
+			appendDistinctPoint(candidate, {
+				x: busX,
+				y: from.y,
+			});
+			appendDistinctPoint(candidate, {
+				x: busX,
+				y: joinY,
+			});
+			appendDistinctPoint(candidate, {
+				x: from.x,
+				y: joinY,
+			});
+		} else {
+			const direction = Math.sign(from.y - to.y) || 1;
+			const joinY = to.y + direction * reach;
+			appendDistinctPoint(candidate, {
+				x: from.x,
+				y: joinY,
+			});
+			appendDistinctPoint(candidate, {
+				x: busX,
+				y: joinY,
+			});
+			appendDistinctPoint(candidate, {
+				x: busX,
+				y: to.y,
+			});
+		}
+	}
+	const protectedPoints = new Set<string>();
+	if (candidate[1] !== undefined) protectedPoints.add(pointKey(candidate[1]));
+	if (candidate.at(-2) !== undefined) protectedPoints.add(pointKey(candidate.at(-2)!));
+	return simplifyOrthogonalPoints(candidate, protectedPoints);
+};
+
+/** Collapses dense multi-port fanout into a bounded set of local terminal buses. */
+const bundleHubTerminals = (
+	edges: ReadonlyArray<EditorItemOriginFlowBackboneEdge>,
+	backbones: ReadonlyMap<string, ReadonlyArray<EditorItemOriginFlowLayoutPoint>>,
+	positions: ReadonlyMap<string, EditorItemOriginFlowLayoutNode>,
+) => {
+	const edgeById = new Map(
+		edges.map(
+			(edge) =>
+				[
+					edge.id,
+					edge,
+				] as const,
+		),
+	);
+	const groups = new Map<
+		string,
+		{
+			nodeId: string;
+			side: "left" | "right";
+			edgeIds: string[];
+		}
+	>();
+	for (const edge of edges) {
+		for (const [nodeId, side] of [
+			[
+				edge.source,
+				"right",
+			],
+			[
+				edge.target,
+				"left",
+			],
+		] as const) {
+			const key = `${nodeId}:${side}`;
+			const group = groups.get(key) ?? {
+				nodeId,
+				side,
+				edgeIds: [],
+			};
+			group.edgeIds.push(edge.id);
+			groups.set(key, group);
+		}
+	}
+	const result = new Map(backbones);
+	for (const group of groups.values()) {
+		if (group.edgeIds.length < HubBusThreshold) continue;
+		const position = positions.get(group.nodeId);
+		if (position === undefined) continue;
+		const terminalSide = group.side === "left" ? "target" : "source";
+		const sorted = group.edgeIds
+			.map((edgeId) => {
+				const points = result.get(edgeId);
+				if (points === undefined) return undefined;
+				const range = readTerminalBusRange(points, terminalSide);
+				if (range === undefined) return undefined;
+				return {
+					edgeId,
+					portY: group.side === "left" ? points.at(-1)!.y : points[0]!.y,
+					range,
+				};
+			})
+			.filter(
+				(
+					entry,
+				): entry is {
+					edgeId: string;
+					portY: number;
+					range: {
+						readonly max: number;
+						readonly min: number;
+					};
+				} => entry !== undefined,
+			)
+			.sort(
+				(left, right) =>
+					left.portY - right.portY || left.edgeId.localeCompare(right.edgeId),
+			);
+		const busCount = Math.min(HubBusMaxCount, Math.ceil(sorted.length / HubBusEdgesPerBus));
+		if (busCount === 0) continue;
+		const busGroups = Array.from(
+			{
+				length: busCount,
+			},
+			() => [] as typeof sorted,
+		);
+		for (const [index, entry] of sorted.entries()) {
+			const busIndex = Math.min(busCount - 1, Math.floor((index * busCount) / sorted.length));
+			busGroups[busIndex]!.push(entry);
+		}
+		const busDistances = busGroups.map((entries, busIndex) => {
+			const yMin = Math.min(...entries.map(({ range }) => range.min));
+			const yMax = Math.max(...entries.map(({ range }) => range.max));
+			const clearance = readBusSideClearance(
+				group.nodeId,
+				position,
+				group.side,
+				yMin,
+				yMax,
+				positions,
+			);
+			const desired = HubBusBaseDistance + busIndex * HubBusPreferredSpacing;
+			const maximum = Math.max(0, clearance - NodeClearance);
+			return Math.min(desired, HubBusBaseDistance + HubBusMaxWidth, maximum);
+		});
+		for (const [busIndex, entries] of busGroups.entries()) {
+			const busDistance = busDistances[busIndex]!;
+			if (busDistance < HubBusMinimumSpacing) continue;
+			const busX =
+				group.side === "left"
+					? position.x - busDistance
+					: position.x + position.width + busDistance;
+			for (const entry of entries) {
+				const current = result.get(entry.edgeId);
+				const edge = edgeById.get(entry.edgeId);
+				if (current === undefined || edge === undefined) continue;
+				for (const scale of [
+					1,
+					0.75,
+					0.5,
+					0.25,
+					0,
+				] as const) {
+					const terminalIndex = readTerminalVerticalSegmentIndex(current, terminalSide);
+					if (terminalIndex === undefined) break;
+					const originalX = current[terminalIndex - 1]!.x;
+					const x = originalX + (busX - originalX) * scale;
+					const candidate = routeTerminalViaBus(current, terminalSide, x);
+					if (!polylineIsClear(candidate, positions, edge.source, edge.target)) continue;
+					result.set(entry.edgeId, candidate);
+					break;
+				}
+			}
+		}
+	}
+	return result;
+};
+
 /** Gives every physical edge one stable lane through each overlapping orthogonal corridor. */
 export const spreadEditorOriginFlowBackbones = (
 	edges: ReadonlyArray<EditorItemOriginFlowBackboneEdge>,
@@ -471,5 +735,5 @@ export const spreadEditorOriginFlowBackbones = (
 		}
 		spread.set(edge.id, points);
 	}
-	return spread;
+	return bundleHubTerminals(edges, spread, positions);
 };

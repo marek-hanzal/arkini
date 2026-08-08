@@ -337,11 +337,51 @@ describe("layoutEditorItemOriginFlowFx", () => {
 			}
 		}
 		expect(maximumEndpointStub).toBeLessThan(500);
-		expect(
-			[
-				...sharedLongSegments.values(),
-			].filter((count) => count > 1).length,
-		).toBeLessThanOrEqual(1);
+		const sharedMultiplicities = [
+			...sharedLongSegments.values(),
+		].filter((count) => count > 1);
+		expect(Math.max(0, ...sharedMultiplicities)).toBeLessThanOrEqual(16);
+
+		const readTerminalTrackCount = (title: string, side: "left" | "right") => {
+			const node = flow.nodes.find((candidate) => candidate.title === title);
+			expect(node).toBeDefined();
+			const position = layout.positions.get(node!.id)!;
+			const borderX = side === "left" ? position.x : position.x + position.width;
+			const tracks = new Set<string>();
+			for (const flowEdge of flow.edges) {
+				if (side === "left" ? flowEdge.target !== node!.id : flowEdge.source !== node!.id)
+					continue;
+				const backbone = layout.backbones.get(flowEdge.id)!;
+				const indexes =
+					side === "left"
+						? Array.from(
+								{
+									length: Math.min(5, Math.max(0, backbone.length - 2)),
+								},
+								(_, offset) => backbone.length - 2 - offset,
+							)
+						: Array.from(
+								{
+									length: Math.min(5, Math.max(0, backbone.length - 2)),
+								},
+								(_, offset) => 2 + offset,
+							);
+				for (const index of indexes) {
+					if (index <= 0 || index >= backbone.length) continue;
+					const from = backbone[index - 1]!;
+					const to = backbone[index]!;
+					if (Math.abs(from.x - to.x) >= 0.1) continue;
+					if (Math.abs(from.x - borderX) > 320) continue;
+					tracks.add(((from.x + to.x) / 2).toFixed(1));
+					break;
+				}
+			}
+			return tracks.size;
+		};
+		expect(readTerminalTrackCount("Academy", "left")).toBeLessThanOrEqual(5);
+		expect(readTerminalTrackCount("Academy", "right")).toBeLessThanOrEqual(5);
+		expect(readTerminalTrackCount("Library IV", "left")).toBeLessThanOrEqual(6);
+		expect(readTerminalTrackCount("Library IV", "right")).toBeLessThanOrEqual(8);
 
 		for (const flowEdge of flow.edges) {
 			const source = layout.positions.get(flowEdge.source)!;

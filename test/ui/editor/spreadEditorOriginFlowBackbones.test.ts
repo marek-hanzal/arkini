@@ -155,6 +155,82 @@ describe("spreadEditorOriginFlowBackbones", () => {
 		expect(readLongestHorizontalY(first)).not.toBeCloseTo(readLongestHorizontalY(second)!, 5);
 	});
 
+	it("bundles dense hub terminals into a bounded number of local tracks", () => {
+		const hubEdges = Array.from(
+			{
+				length: 20,
+			},
+			(_, index) => ({
+				id: `edge:${index}`,
+				source: `source:${index}`,
+				target: "hub",
+			}),
+		);
+		const hubBackbones = new Map(
+			hubEdges.map((edge, index) => {
+				const portY = 30 + index * 30;
+				const sourceY = -240 + index * 58;
+				return [
+					edge.id,
+					[
+						{
+							x: 0,
+							y: sourceY,
+						},
+						{
+							x: 56,
+							y: sourceY,
+						},
+						{
+							x: 300,
+							y: sourceY,
+						},
+						{
+							x: 300,
+							y: portY,
+						},
+						{
+							x: 444,
+							y: portY,
+						},
+						{
+							x: 500,
+							y: portY,
+						},
+					],
+				] as const;
+			}),
+		);
+		const hubPositions = new Map([
+			[
+				"hub",
+				{
+					...position(500, 0),
+					height: 660,
+				},
+			],
+		]);
+
+		const spread = spreadEditorOriginFlowBackbones(hubEdges, hubBackbones, hubPositions);
+		const tracks = new Set<string>();
+		for (const edge of hubEdges) {
+			const points = spread.get(edge.id)!;
+			for (
+				let index = points.length - 2;
+				index >= Math.max(1, points.length - 6);
+				index -= 1
+			) {
+				const from = points[index - 1]!;
+				const to = points[index]!;
+				if (Math.abs(from.x - to.x) >= 0.1 || Math.abs(from.x - 500) > 240) continue;
+				tracks.add(from.x.toFixed(1));
+				break;
+			}
+		}
+
+		expect(tracks.size).toBeLessThanOrEqual(2);
+	});
+
 	it("is deterministic", () => {
 		const first = spreadEditorOriginFlowBackbones(edges, backbones, positions);
 		const second = spreadEditorOriginFlowBackbones(

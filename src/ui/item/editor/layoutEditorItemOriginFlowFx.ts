@@ -64,6 +64,9 @@ export interface EditorItemOriginFlowLayout {
 const NodeSeparation = 144;
 const PackingAspectRatio = 1.6;
 const EdgePadding = 40;
+const HubRoutingHaloPortThreshold = 12;
+const HubRoutingHaloPerPort = 2;
+const HubRoutingHaloMax = 120;
 const PortEscape = EdgePadding + 16;
 const CorridorCongestionBasePenalty = 72;
 const CorridorCongestionLengthFactor = 0.11;
@@ -85,6 +88,12 @@ interface WeightedGraph {
 const addWeight = (map: Map<string, number>, id: string) => {
 	map.set(id, (map.get(id) ?? 0) + 1);
 };
+
+const readRoutingHalo = (portCount: number) =>
+	Math.min(
+		HubRoutingHaloMax,
+		Math.max(0, portCount - HubRoutingHaloPortThreshold) * HubRoutingHaloPerPort,
+	);
 
 const readWeightedGraph = (flow: EditorItemOriginFlowLayoutInput): WeightedGraph => {
 	const incoming = new Map<string, Map<string, number>>();
@@ -483,6 +492,34 @@ const routePortAwareEdges = (
 	geomEdges: ReadonlyMap<string, GeomEdge>,
 ): ReadonlyMap<string, ReadonlyArray<EditorItemOriginFlowLayoutPoint>> => {
 	const obstacles: Polyline[] = [];
+	const connectedPortsByNodeId = new Map<string, Set<string>>();
+	for (const edge of flow.edges) {
+		for (const [nodeId, side, portId] of [
+			[
+				edge.source,
+				"source",
+				edge.sourcePortId,
+			],
+			[
+				edge.target,
+				"target",
+				edge.targetPortId,
+			],
+		] as const) {
+			const ports = connectedPortsByNodeId.get(nodeId) ?? new Set<string>();
+			ports.add(`${side}:${portId ?? "default"}`);
+			connectedPortsByNodeId.set(nodeId, ports);
+		}
+	}
+	const routingHaloByNodeId = new Map(
+		flow.nodes.map(
+			({ id }) =>
+				[
+					id,
+					readRoutingHalo(connectedPortsByNodeId.get(id)?.size ?? 0),
+				] as const,
+		),
+	);
 	const nodeObstaclesById = new Map(
 		[
 			...geomNodes,
@@ -494,11 +531,12 @@ const routePortAwareEdges = (
 				] as const,
 		),
 	);
+
 	const bounds = Rectangle.mkEmpty();
-	for (const geomNode of geomNodes.values()) {
+	for (const [nodeId, geomNode] of geomNodes) {
 		const obstacle = InteractiveObstacleCalculator.PaddedPolylineBoundaryOfNode(
 			geomNode.boundaryCurve,
-			EdgePadding,
+			EdgePadding + (routingHaloByNodeId.get(nodeId) ?? 0),
 		);
 		obstacles.push(obstacle);
 		bounds.addRecSelf(obstacle.boundingBox);
@@ -520,8 +558,12 @@ const routePortAwareEdges = (
 
 		const source = geomEdge.sourcePort.Location;
 		const target = geomEdge.targetPort.Location;
-		const sourceEscape = source.add(new Point(PortEscape, 0));
-		const targetEscape = target.add(new Point(-PortEscape, 0));
+		const sourceEscape = source.add(
+			new Point(PortEscape + (routingHaloByNodeId.get(input.source) ?? 0), 0),
+		);
+		const targetEscape = target.add(
+			new Point(-(PortEscape + (routingHaloByNodeId.get(input.target) ?? 0)), 0),
+		);
 		const routed = routeCongestionAwareCorridor(cdt, sourceEscape, targetEscape, corridorUsage);
 		if (routed === undefined)
 			throw new Error(`MSAGL could not route edge ${input.id} between its ports.`);

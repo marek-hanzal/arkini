@@ -108,22 +108,18 @@ const EdgeCullPaddingPx = 20;
 const MaxCachedImages = 96;
 
 const IncomeBranchColors = [
-	"hsl(350 78% 45%)",
-	"hsl(170 78% 38%)",
-	"hsl(80 78% 36%)",
-	"hsl(260 78% 52%)",
-	"hsl(35 88% 46%)",
-	"hsl(215 82% 48%)",
-	"hsl(125 65% 38%)",
-	"hsl(305 72% 46%)",
-	"hsl(190 82% 40%)",
-	"hsl(10 82% 48%)",
-	"hsl(240 68% 54%)",
-	"hsl(100 62% 38%)",
-	"hsl(325 76% 45%)",
-	"hsl(55 82% 38%)",
-	"hsl(145 68% 36%)",
-	"hsl(285 70% 48%)",
+	"#2e91e5",
+	"#e15f99",
+	"#1ca71c",
+	"#fb0d0d",
+	"#da16ff",
+	"#6b7280",
+	"#b68100",
+	"#750d86",
+	"#eb663b",
+	"#511cfb",
+	"#00a08b",
+	"#fb00d1",
 ] as const;
 
 const hashString = (value: string) => {
@@ -138,6 +134,67 @@ const hashString = (value: string) => {
 const readIncomeBranchColor = (selectionId: string, branchIndex: number) => {
 	const offset = hashString(selectionId) % IncomeBranchColors.length;
 	return IncomeBranchColors[(offset + branchIndex) % IncomeBranchColors.length]!;
+};
+
+const traceEdgeRoute = (
+	context: CanvasRenderingContext2D,
+	route: ReadonlyArray<EditorItemOriginFlowLayoutRouteSegment>,
+	offsetX = 0,
+	offsetY = 0,
+) => {
+	const first = route[0];
+	if (first === undefined) return;
+	context.moveTo(first.from.x, first.from.y);
+	if (offsetX !== 0 || offsetY !== 0)
+		context.lineTo(first.from.x + offsetX, first.from.y + offsetY);
+	for (const segment of route) {
+		if (segment.kind === "line") context.lineTo(segment.to.x + offsetX, segment.to.y + offsetY);
+		else
+			context.bezierCurveTo(
+				segment.control1.x + offsetX,
+				segment.control1.y + offsetY,
+				segment.control2.x + offsetX,
+				segment.control2.y + offsetY,
+				segment.to.x + offsetX,
+				segment.to.y + offsetY,
+			);
+	}
+	const last = route.at(-1);
+	if (last !== undefined && (offsetX !== 0 || offsetY !== 0))
+		context.lineTo(last.to.x, last.to.y);
+};
+
+const readBundleOffset = (
+	route: ReadonlyArray<EditorItemOriginFlowLayoutRouteSegment>,
+	laneIndex: number,
+	laneCount: number,
+) => {
+	if (laneCount <= 1)
+		return {
+			x: 0,
+			y: 0,
+		};
+	const first = route[0];
+	const last = route.at(-1);
+	if (first === undefined || last === undefined)
+		return {
+			x: 0,
+			y: 0,
+		};
+	const dx = last.to.x - first.from.x;
+	const dy = last.to.y - first.from.y;
+	const length = Math.hypot(dx, dy);
+	if (length < 0.001)
+		return {
+			x: 0,
+			y: 0,
+		};
+	const spacing = Math.min(3, 20 / (laneCount - 1));
+	const distance = (laneIndex - (laneCount - 1) / 2) * spacing;
+	return {
+		x: (-dy / length) * distance,
+		y: (dx / length) * distance,
+	};
 };
 
 interface CanvasPalette {
@@ -952,37 +1009,48 @@ const drawEdge = (
 	const selected = selection?.kind === "edge" && selection.id === edge.id;
 	const active = highlight?.edgeIds.has(edge.id) ?? false;
 	const selectedNodeId = selection?.kind === "node" ? selection.id : undefined;
-	const branchIndex =
+	const branchIndexes =
 		selectedNodeId !== undefined && active
-			? highlight?.branchIndexByEdgeId.get(edge.id)
-			: undefined;
-	const edgeColor =
-		branchIndex === undefined || selectedNodeId === undefined
-			? palette.accent
-			: readIncomeBranchColor(selectedNodeId, branchIndex);
+			? (highlight?.branchIndexesByEdgeId.get(edge.id) ?? [])
+			: [];
+	const alpha = selection === undefined ? 0.12 : active ? 1 : 0.025;
+
 	context.save();
-	context.globalAlpha = selection === undefined ? 0.12 : active ? 1 : 0.025;
-	context.strokeStyle = edgeColor;
-	context.fillStyle = edgeColor;
-	context.lineWidth = selected ? 5 : active ? 4 : 1.2;
+	context.globalAlpha = alpha;
 	context.lineJoin = "round";
 	context.lineCap = "round";
-	context.beginPath();
-	context.moveTo(first.from.x, first.from.y);
-	for (const segment of route) {
-		if (segment.kind === "line") context.lineTo(segment.to.x, segment.to.y);
-		else
-			context.bezierCurveTo(
-				segment.control1.x,
-				segment.control1.y,
-				segment.control2.x,
-				segment.control2.y,
-				segment.to.x,
-				segment.to.y,
-			);
+
+	if (branchIndexes.length <= 1) {
+		const branchIndex = branchIndexes[0];
+		const edgeColor =
+			branchIndex === undefined || selectedNodeId === undefined
+				? palette.accent
+				: readIncomeBranchColor(selectedNodeId, branchIndex);
+		context.strokeStyle = edgeColor;
+		context.fillStyle = edgeColor;
+		context.lineWidth = selected ? 5 : active ? 4 : 1.2;
+		context.beginPath();
+		traceEdgeRoute(context, route);
+		context.stroke();
+	} else {
+		for (const [laneIndex, branchIndex] of branchIndexes.entries()) {
+			const offset = readBundleOffset(route, laneIndex, branchIndexes.length);
+			const edgeColor = readIncomeBranchColor(selectedNodeId!, branchIndex);
+			context.strokeStyle = edgeColor;
+			context.fillStyle = edgeColor;
+			context.lineWidth = selected ? 3.2 : 2.4;
+			context.beginPath();
+			traceEdgeRoute(context, route, offset.x, offset.y);
+			context.stroke();
+		}
 	}
-	context.stroke();
+
 	const last = route.at(-1)!;
+	const arrowColor =
+		branchIndexes.length === 1 && selectedNodeId !== undefined
+			? readIncomeBranchColor(selectedNodeId, branchIndexes[0]!)
+			: palette.accent;
+	context.fillStyle = arrowColor;
 	drawArrow(context, last.kind === "line" ? last.from : last.control2, last.to);
 	context.restore();
 };

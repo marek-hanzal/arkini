@@ -185,23 +185,31 @@ describe("readEditorOriginFlowHighlight", () => {
 				"loop-target",
 			]),
 		);
-		expect(highlight.branchIndexByEdgeId).toEqual(
+		expect(highlight.branchIndexesByEdgeId).toEqual(
 			new Map([
 				[
 					"forge-target",
-					0,
+					[
+						0,
+					],
 				],
 				[
 					"tool-forge",
-					0,
+					[
+						0,
+					],
 				],
 				[
 					"water-forge",
-					0,
+					[
+						0,
+					],
 				],
 				[
 					"loop-target",
-					1,
+					[
+						1,
+					],
 				],
 			]),
 		);
@@ -223,13 +231,150 @@ describe("readEditorOriginFlowHighlight", () => {
 		}
 	});
 
+	it("keeps shared upstream edges in every branch that uses them", () => {
+		const sharedFlow: EditorItemOriginFlow = {
+			edges: [
+				{
+					id: "common-a",
+					operationId: "op:a",
+					role: "input",
+					source: "item:common",
+					target: "item:a",
+					targetPortId: "op:a:input:common",
+				},
+				{
+					id: "a-target",
+					operationId: "op:a",
+					role: "output",
+					source: "item:a",
+					sourcePortId: "op:a:output:0:target",
+					target: "item:target",
+				},
+				{
+					id: "common-b",
+					operationId: "op:b",
+					role: "input",
+					source: "item:common",
+					target: "item:b",
+					targetPortId: "op:b:input:common",
+				},
+				{
+					id: "b-target",
+					operationId: "op:b",
+					role: "output",
+					source: "item:b",
+					sourcePortId: "op:b:output:0:target",
+					target: "item:target",
+				},
+				{
+					id: "seed-common-owner",
+					operationId: "op:common",
+					role: "input",
+					source: "item:seed",
+					target: "item:common-owner",
+					targetPortId: "op:common:input:seed",
+				},
+				{
+					id: "common-owner-common",
+					operationId: "op:common",
+					role: "output",
+					source: "item:common-owner",
+					sourcePortId: "op:common:output:0:common",
+					target: "item:common",
+				},
+			],
+			nodes: [
+				item("target"),
+				item("a", {
+					operations: [
+						operation("op:a", {
+							inputs: [
+								"common",
+							],
+							outputs: [
+								"target",
+							],
+						}),
+					],
+					starter: true,
+				}),
+				item("b", {
+					operations: [
+						operation("op:b", {
+							inputs: [
+								"common",
+							],
+							outputs: [
+								"target",
+							],
+						}),
+					],
+					starter: true,
+				}),
+				item("common"),
+				item("common-owner", {
+					operations: [
+						operation("op:common", {
+							inputs: [
+								"seed",
+							],
+							outputs: [
+								"common",
+							],
+						}),
+					],
+					starter: true,
+				}),
+				item("seed", {
+					starter: true,
+				}),
+			],
+			obtainable: true,
+		};
+		const sharedPositions = new Map(
+			sharedFlow.nodes.map(
+				(node, index) =>
+					[
+						node.id,
+						{
+							flowOrder: index,
+							height: 40,
+							width: 40,
+							x: index * 100,
+							y: 0,
+						},
+					] as const,
+			),
+		);
+
+		const highlight = readEditorOriginFlowHighlight(sharedFlow, sharedPositions, {
+			id: "item:target",
+			kind: "node",
+		});
+
+		expect(highlight.branchIndexesByEdgeId.get("a-target")).toEqual([
+			0,
+		]);
+		expect(highlight.branchIndexesByEdgeId.get("b-target")).toEqual([
+			1,
+		]);
+		expect(highlight.branchIndexesByEdgeId.get("common-owner-common")).toEqual([
+			0,
+			1,
+		]);
+		expect(highlight.branchIndexesByEdgeId.get("seed-common-owner")).toEqual([
+			0,
+			1,
+		]);
+	});
+
 	it("stops tracing when the selected item is already a starter", () => {
 		const highlight = readEditorOriginFlowHighlight(incomeFlow, positions, {
 			id: "item:tool",
 			kind: "node",
 		});
 		expect(highlight).toEqual({
-			branchIndexByEdgeId: new Map(),
+			branchIndexesByEdgeId: new Map(),
 			edgeIds: new Set(),
 			nodeIds: new Set([
 				"item:tool",
@@ -349,7 +494,7 @@ describe("readEditorOriginFlowHighlight", () => {
 			kind: "edge",
 		});
 		expect(highlight).toEqual({
-			branchIndexByEdgeId: new Map(),
+			branchIndexesByEdgeId: new Map(),
 			edgeIds: new Set([
 				"tool-forge",
 			]),
@@ -457,14 +602,23 @@ describe("readEditorOriginFlowHighlight", () => {
 		const directCoinOutputEdges = flow.edges.filter(
 			(edge) => edge.role === "output" && edge.target === coinNodeId,
 		);
-		const directOperationIds = new Set(
-			directCoinOutputEdges.map(({ operationId }) => operationId),
-		);
-		const directBranchIndexes = new Set(
-			directCoinOutputEdges.map(({ id }) => highlight.branchIndexByEdgeId.get(id)),
-		);
-		expect(directBranchIndexes.has(undefined)).toBe(false);
-		expect(directBranchIndexes.size).toBe(directOperationIds.size);
+		const directProducerIds = new Set(directCoinOutputEdges.map(({ source }) => source));
+		const branchIndexByProducerId = new Map<string, number>();
+		for (const edge of directCoinOutputEdges) {
+			const branchIndexes = highlight.branchIndexesByEdgeId.get(edge.id);
+			expect(branchIndexes?.length).toBe(1);
+			const branchIndex = branchIndexes?.[0];
+			expect(branchIndex).toBeDefined();
+			const existing = branchIndexByProducerId.get(edge.source);
+			if (existing === undefined) branchIndexByProducerId.set(edge.source, branchIndex!);
+			else expect(branchIndex).toBe(existing);
+		}
+		expect(new Set(branchIndexByProducerId.values()).size).toBe(directProducerIds.size);
+		expect(
+			[
+				...highlight.branchIndexesByEdgeId.values(),
+			].some((indexes) => indexes.length > 1),
+		).toBe(true);
 
 		const producerNodeIds = readEditorOriginFlowProducerNavigation(flow, coinNodeId);
 		const navigationNodeIds = readEditorOriginFlowNavigation(
@@ -496,7 +650,7 @@ describe("readEditorOriginFlowHighlight", () => {
 				kind: "node",
 			}),
 		).toEqual({
-			branchIndexByEdgeId: new Map(),
+			branchIndexesByEdgeId: new Map(),
 			edgeIds: new Set(),
 			nodeIds: new Set(),
 		});

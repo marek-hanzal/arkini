@@ -972,7 +972,7 @@ const drawEdge = (
 		selectedNodeId !== undefined && active
 			? (highlight?.branchIndexesByEdgeId.get(edge.id) ?? [])
 			: [];
-	const alpha = selection === undefined ? 0.12 : active ? 1 : 0.025;
+	const alpha = selection === undefined ? 0.6 : active ? 1 : 0.6;
 	const branchIndex = branchIndexes[0];
 	const edgeColor =
 		branchIndex === undefined || selectedNodeId === undefined
@@ -985,7 +985,7 @@ const drawEdge = (
 	context.lineCap = "round";
 	context.strokeStyle = edgeColor;
 	context.fillStyle = edgeColor;
-	context.lineWidth = selected ? 5 : active ? 4 : 1.2;
+	context.lineWidth = selected ? 4.8 : active ? 4 : 2;
 	context.beginPath();
 	traceOrthogonalPath(context, backbone);
 	context.stroke();

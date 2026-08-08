@@ -9,9 +9,9 @@ export interface EditorItemOriginFlowBackboneEdge {
 	readonly target: string;
 }
 
-const PreferredLaneSpacing = 12;
-const MinimumLaneSpacing = 7;
-const MaxLaneOffset = 280;
+const PreferredLaneSpacing = 18;
+const MinimumLaneSpacing = 11;
+const MaxLaneOffset = 360;
 const MinimumLaneSegmentLength = 40;
 const NodeClearance = 8;
 const Epsilon = 0.01;

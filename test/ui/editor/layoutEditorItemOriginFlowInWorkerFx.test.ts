@@ -62,7 +62,6 @@ describe("layoutEditorItemOriginFlowInWorkerFx", () => {
 					},
 				],
 			]),
-			routes: new Map(),
 		};
 
 		const result = await Effect.runPromise(

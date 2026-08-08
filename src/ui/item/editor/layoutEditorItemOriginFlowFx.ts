@@ -1,9 +1,7 @@
 import {
-	BezierSeg,
 	Cdt,
 	findContainingTriangle,
 	funnelFromDiagonals,
-	Curve,
 	CurveFactory,
 	Edge,
 	EdgeRoutingMode,
@@ -22,6 +20,8 @@ import {
 	layoutGeomGraph,
 } from "@msagl/core";
 import { Effect } from "effect";
+
+import { spreadEditorOriginFlowBackbones } from "~/ui/item/editor/spreadEditorOriginFlowBackbones";
 
 export interface EditorItemOriginFlowLayoutInput {
 	readonly edges: ReadonlyArray<{
@@ -56,33 +56,21 @@ export interface EditorItemOriginFlowLayoutPoint {
 	readonly y: number;
 }
 
-export type EditorItemOriginFlowLayoutRouteSegment =
-	| {
-			readonly from: EditorItemOriginFlowLayoutPoint;
-			readonly kind: "line";
-			readonly to: EditorItemOriginFlowLayoutPoint;
-	  }
-	| {
-			readonly control1: EditorItemOriginFlowLayoutPoint;
-			readonly control2: EditorItemOriginFlowLayoutPoint;
-			readonly from: EditorItemOriginFlowLayoutPoint;
-			readonly kind: "cubic";
-			readonly to: EditorItemOriginFlowLayoutPoint;
-	  };
-
 export interface EditorItemOriginFlowLayout {
 	readonly backbones: ReadonlyMap<string, ReadonlyArray<EditorItemOriginFlowLayoutPoint>>;
 	readonly positions: ReadonlyMap<string, EditorItemOriginFlowLayoutNode>;
-	readonly routes: ReadonlyMap<string, ReadonlyArray<EditorItemOriginFlowLayoutRouteSegment>>;
 }
 
 const NodeSeparation = 144;
 const PackingAspectRatio = 1.6;
 const EdgePadding = 40;
 const PortEscape = EdgePadding + 16;
-const CorridorCongestionBasePenalty = 84;
-const CorridorCongestionLengthFactor = 0.18;
-const CorridorCongestionCap = 12;
+const CorridorCongestionBasePenalty = 72;
+const CorridorCongestionLengthFactor = 0.11;
+const CorridorCongestionExponent = 1.55;
+const CorridorCongestionCap = 18;
+const CorridorMaxDetourFactor = 1.55;
+const CorridorMaxDetourPadding = 420;
 const OrthogonalSafetyPadding = 10;
 const OrthogonalEpsilon = 0.1;
 
@@ -220,142 +208,7 @@ const toLayoutPoint = ({ x, y }: Point): EditorItemOriginFlowLayoutPoint => ({
 	y,
 });
 
-const SplineSafetyPadding = 8;
-const SplineTensions = [
-	1,
-	0.82,
-	0.64,
-	0.46,
-	0.28,
-] as const;
-
-const readLineSegment = (from: Point, to: Point): EditorItemOriginFlowLayoutRouteSegment => ({
-	from: toLayoutPoint(from),
-	kind: "line",
-	to: toLayoutPoint(to),
-});
-
 const distance = (left: Point, right: Point) => Math.hypot(right.x - left.x, right.y - left.y);
-
-const normalize = (vector: Point) => {
-	const length = Math.hypot(vector.x, vector.y);
-	return length < 0.001 ? new Point(1, 0) : new Point(vector.x / length, vector.y / length);
-};
-
-const readSplineTangent = (
-	points: ReadonlyArray<Point>,
-	index: number,
-	startDirection: Point,
-	endDirection: Point,
-) => {
-	if (index === 0) return startDirection;
-	if (index === points.length - 1) return endDirection;
-	const previous = points[index - 1] as Point;
-	const next = points[index + 1] as Point;
-	return normalize(next.sub(previous));
-};
-
-const readSplineSegments = (
-	points: ReadonlyArray<Point>,
-	startDirection: Point,
-	endDirection: Point,
-	tension: number,
-): EditorItemOriginFlowLayoutRouteSegment[] => {
-	if (points.length < 2) return [];
-	const tangents = points.map((_, index) =>
-		readSplineTangent(points, index, startDirection, endDirection),
-	);
-	const segments: EditorItemOriginFlowLayoutRouteSegment[] = [];
-	for (let index = 0; index < points.length - 1; index += 1) {
-		const from = points[index] as Point;
-		const to = points[index + 1] as Point;
-		const chord = distance(from, to);
-		if (chord < 0.01) continue;
-		const neighboringDistance = Math.min(
-			distance(points[Math.max(0, index - 1)] as Point, to),
-			distance(from, points[Math.min(points.length - 1, index + 2)] as Point),
-		);
-		const controlDistance =
-			Math.min(260, Math.max(28, Math.min(chord * 0.48, neighboringDistance * 0.32))) *
-			tension;
-		const control1 = from.add((tangents[index] as Point).mul(controlDistance));
-		const control2 = to.sub((tangents[index + 1] as Point).mul(controlDistance));
-		segments.push({
-			control1: toLayoutPoint(control1),
-			control2: toLayoutPoint(control2),
-			from: toLayoutPoint(from),
-			kind: "cubic",
-			to: toLayoutPoint(to),
-		});
-	}
-	return segments;
-};
-
-const splineIsClear = (
-	segments: ReadonlyArray<EditorItemOriginFlowLayoutRouteSegment>,
-	obstacles: ReadonlyArray<Rectangle>,
-) => {
-	for (const segment of segments) {
-		if (segment.kind !== "cubic") continue;
-		const bezier = new BezierSeg(
-			new Point(segment.from.x, segment.from.y),
-			new Point(segment.control1.x, segment.control1.y),
-			new Point(segment.control2.x, segment.control2.y),
-			new Point(segment.to.x, segment.to.y),
-		);
-		for (const obstacle of obstacles) {
-			const padded = obstacle.clone();
-			padded.pad(SplineSafetyPadding);
-			if (!padded.intersects(bezier.boundingBox)) continue;
-			if (padded.contains(bezier.start) || padded.contains(bezier.end)) return false;
-			if (Curve.getAllIntersections(bezier, padded.perimeter(), false).length > 0)
-				return false;
-		}
-	}
-	return true;
-};
-
-const readDirectSpline = (
-	from: Point,
-	to: Point,
-	startDirection: Point,
-	endDirection: Point,
-	tension: number,
-): EditorItemOriginFlowLayoutRouteSegment[] => {
-	const chord = distance(from, to);
-	if (chord < 0.01) return [];
-	const controlDistance = Math.min(420, Math.max(80, chord * 0.46)) * tension;
-	return [
-		{
-			control1: toLayoutPoint(from.add(startDirection.mul(controlDistance))),
-			control2: toLayoutPoint(to.sub(endDirection.mul(controlDistance))),
-			from: toLayoutPoint(from),
-			kind: "cubic",
-			to: toLayoutPoint(to),
-		},
-	];
-};
-
-const smoothRoute = (
-	points: ReadonlyArray<Point>,
-	startDirection: Point,
-	endDirection: Point,
-	obstacles: ReadonlyArray<Rectangle>,
-): EditorItemOriginFlowLayoutRouteSegment[] => {
-	if (points.length >= 2) {
-		const from = points[0] as Point;
-		const to = points[points.length - 1] as Point;
-		for (const tension of SplineTensions) {
-			const direct = readDirectSpline(from, to, startDirection, endDirection, tension);
-			if (splineIsClear(direct, obstacles)) return direct;
-		}
-	}
-	for (const tension of SplineTensions) {
-		const spline = readSplineSegments(points, startDirection, endDirection, tension);
-		if (splineIsClear(spline, obstacles)) return spline;
-	}
-	return points.slice(1).map((point, index) => readLineSegment(points[index] as Point, point));
-};
 
 const pointClose = (left: Point, right: Point) =>
 	Math.hypot(left.x - right.x, left.y - right.y) < 0.01;
@@ -520,7 +373,13 @@ const readCongestionSleeve = (
 	source: Point,
 	target: Point,
 	usage: ReadonlyMap<CorridorEdge, number>,
-): CorridorFrontEdge[] | undefined => {
+	maxTravelDistance = Number.POSITIVE_INFINITY,
+):
+	| {
+			readonly sleeve: CorridorFrontEdge[];
+			readonly travelDistance: number;
+	  }
+	| undefined => {
 	const sourceTriangle = findContainingTriangle(cdt, source);
 	if (sourceTriangle === null) return undefined;
 	const scores = new Map<CorridorTriangle, number>([
@@ -533,11 +392,13 @@ const readCongestionSleeve = (
 	const open: Array<{
 		readonly cost: number;
 		readonly score: number;
+		readonly travelDistance: number;
 		readonly triangle: CorridorTriangle;
 	}> = [
 		{
 			cost: 0,
 			score: distance(triangleCenter(sourceTriangle), target),
+			travelDistance: 0,
 			triangle: sourceTriangle,
 		},
 	];
@@ -546,11 +407,14 @@ const readCongestionSleeve = (
 		let bestIndex = 0;
 		for (let index = 1; index < open.length; index += 1)
 			if (open[index]!.score < open[bestIndex]!.score) bestIndex = index;
-		const [{ cost, triangle }] = open.splice(bestIndex, 1);
+		const [{ cost, travelDistance, triangle }] = open.splice(bestIndex, 1);
 		const currentScore = scores.get(triangle);
 		if (currentScore === undefined || cost > currentScore) continue;
 		if (triangle.containsPoint(target))
-			return recoverCongestionSleeve(sourceTriangle, triangle, parentEdges);
+			return {
+				sleeve: recoverCongestionSleeve(sourceTriangle, triangle, parentEdges),
+				travelDistance,
+			};
 
 		const entryEdge = parentEdges.get(triangle);
 		const entry =
@@ -570,10 +434,13 @@ const readCongestionSleeve = (
 				(edge.lowerSite.point.y + edge.upperSite.point.y) / 2,
 			);
 			const segmentLength = distance(entry, midpoint);
+			const candidateTravelDistance = travelDistance + segmentLength;
+			if (candidateTravelDistance > maxTravelDistance) continue;
 			const edgeUsage = Math.min(CorridorCongestionCap, usage.get(edge) ?? 0);
+			const congestionWeight = edgeUsage ** CorridorCongestionExponent;
 			const congestionPenalty =
-				edgeUsage * CorridorCongestionBasePenalty +
-				segmentLength * edgeUsage * CorridorCongestionLengthFactor;
+				congestionWeight * CorridorCongestionBasePenalty +
+				segmentLength * congestionWeight * CorridorCongestionLengthFactor;
 			const candidateScore = currentScore + segmentLength + congestionPenalty;
 			if (candidateScore >= (scores.get(next) ?? Number.POSITIVE_INFINITY)) continue;
 			scores.set(next, candidateScore);
@@ -581,6 +448,7 @@ const readCongestionSleeve = (
 			open.push({
 				cost: candidateScore,
 				score: candidateScore + distance(midpoint, target),
+				travelDistance: candidateTravelDistance,
 				triangle: next,
 			});
 		}
@@ -594,15 +462,18 @@ const routeCongestionAwareCorridor = (
 	target: Point,
 	usage: Map<CorridorEdge, number>,
 ) => {
-	const sleeve = readCongestionSleeve(cdt, source, target, usage);
-	if (sleeve === undefined) return undefined;
-	for (const { edge } of sleeve) usage.set(edge, (usage.get(edge) ?? 0) + 1);
-	if (sleeve.length === 0)
+	const baseline = readCongestionSleeve(cdt, source, target, new Map());
+	if (baseline === undefined) return undefined;
+	const maxTravelDistance =
+		baseline.travelDistance * CorridorMaxDetourFactor + CorridorMaxDetourPadding;
+	const routed = readCongestionSleeve(cdt, source, target, usage, maxTravelDistance) ?? baseline;
+	for (const { edge } of routed.sleeve) usage.set(edge, (usage.get(edge) ?? 0) + 1);
+	if (routed.sleeve.length === 0)
 		return [
 			source,
 			target,
 		];
-	const diagonals = sleeveToDiagonals(sleeve);
+	const diagonals = sleeveToDiagonals(routed.sleeve);
 	return funnelFromDiagonals(source, target, diagonals);
 };
 
@@ -610,10 +481,7 @@ const routePortAwareEdges = (
 	flow: EditorItemOriginFlowLayoutInput,
 	geomNodes: ReadonlyMap<string, GeomNode>,
 	geomEdges: ReadonlyMap<string, GeomEdge>,
-): {
-	readonly backbones: ReadonlyMap<string, ReadonlyArray<EditorItemOriginFlowLayoutPoint>>;
-	readonly routes: ReadonlyMap<string, ReadonlyArray<EditorItemOriginFlowLayoutRouteSegment>>;
-} => {
+): ReadonlyMap<string, ReadonlyArray<EditorItemOriginFlowLayoutPoint>> => {
 	const obstacles: Polyline[] = [];
 	const nodeObstaclesById = new Map(
 		[
@@ -626,9 +494,6 @@ const routePortAwareEdges = (
 				] as const,
 		),
 	);
-	const nodeObstacles = [
-		...nodeObstaclesById.values(),
-	];
 	const bounds = Rectangle.mkEmpty();
 	for (const geomNode of geomNodes.values()) {
 		const obstacle = InteractiveObstacleCalculator.PaddedPolylineBoundaryOfNode(
@@ -645,7 +510,6 @@ const routePortAwareEdges = (
 	cdt.run();
 
 	const backbones = new Map<string, ReadonlyArray<EditorItemOriginFlowLayoutPoint>>();
-	const routes = new Map<string, ReadonlyArray<EditorItemOriginFlowLayoutRouteSegment>>();
 	const corridorUsage = new Map<CorridorEdge, number>();
 	for (const input of [
 		...flow.edges,
@@ -669,32 +533,14 @@ const routePortAwareEdges = (
 		const simplifiedCore = [
 			...Polyline.mkFromPoints(corePoints).RemoveCollinearVertices(),
 		];
+		const orthogonalCore = readOrthogonalBackbone(simplifiedCore, nodeObstaclesById);
 		const backbonePoints: Point[] = [];
 		appendDistinctPoint(backbonePoints, source);
-		for (const point of simplifiedCore) appendDistinctPoint(backbonePoints, point);
+		for (const point of orthogonalCore) appendDistinctPoint(backbonePoints, point);
 		appendDistinctPoint(backbonePoints, target);
-		const orthogonalBackbone = readOrthogonalBackbone(backbonePoints, nodeObstaclesById);
-		backbones.set(input.id, orthogonalBackbone.map(toLayoutPoint));
-
-		const route: EditorItemOriginFlowLayoutRouteSegment[] = [];
-		if (!pointClose(source, sourceEscape)) route.push(readLineSegment(source, sourceEscape));
-		route.push(
-			...smoothRoute(
-				simplifiedCore,
-				normalize(sourceEscape.sub(source)),
-				normalize(target.sub(targetEscape)),
-				nodeObstacles,
-			),
-		);
-		if (!pointClose(targetEscape, target)) route.push(readLineSegment(targetEscape, target));
-		if (route.length === 0)
-			throw new Error(`MSAGL returned an empty route for edge ${input.id}.`);
-		routes.set(input.id, route);
+		backbones.set(input.id, backbonePoints.map(toLayoutPoint));
 	}
-	return {
-		backbones,
-		routes,
-	};
+	return backbones;
 };
 
 const runLayout = (flow: EditorItemOriginFlowLayoutInput): EditorItemOriginFlowLayout => {
@@ -702,7 +548,6 @@ const runLayout = (flow: EditorItemOriginFlowLayoutInput): EditorItemOriginFlowL
 		return {
 			backbones: new Map(),
 			positions: new Map(),
-			routes: new Map(),
 		};
 
 	const weightedGraph = readWeightedGraph(flow);
@@ -800,16 +645,20 @@ const runLayout = (flow: EditorItemOriginFlowLayoutInput): EditorItemOriginFlowL
 	if (positions.size !== flow.nodes.length)
 		throw new Error(`MSAGL returned ${positions.size} of ${flow.nodes.length} nodes.`);
 
-	const { backbones, routes } = routePortAwareEdges(flow, geomNodes, geomEdges);
-	if (routes.size !== flow.edges.length)
-		throw new Error(`MSAGL returned ${routes.size} of ${flow.edges.length} edge routes.`);
+	const rawBackbones = routePortAwareEdges(flow, geomNodes, geomEdges);
+	if (rawBackbones.size !== flow.edges.length)
+		throw new Error(
+			`MSAGL returned ${rawBackbones.size} of ${flow.edges.length} edge backbones.`,
+		);
+	const backbones = spreadEditorOriginFlowBackbones(flow.edges, rawBackbones, positions);
 	if (backbones.size !== flow.edges.length)
-		throw new Error(`MSAGL returned ${backbones.size} of ${flow.edges.length} edge backbones.`);
+		throw new Error(
+			`Flow lane allocator returned ${backbones.size} of ${flow.edges.length} edge backbones.`,
+		);
 
 	return {
 		backbones,
 		positions,
-		routes,
 	};
 };
 

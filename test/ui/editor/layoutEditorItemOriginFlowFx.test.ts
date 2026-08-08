@@ -10,7 +10,6 @@ import {
 	type EditorItemOriginFlowLayoutInput,
 	type EditorItemOriginFlowLayoutNode,
 	type EditorItemOriginFlowLayoutPoint,
-	type EditorItemOriginFlowLayoutRouteSegment,
 	layoutEditorItemOriginFlowFx,
 } from "~/ui/item/editor/layoutEditorItemOriginFlowFx";
 import { readEditorOriginFlowHighlight } from "~/ui/item/editor/readEditorOriginFlowHighlight";
@@ -82,24 +81,6 @@ const expectFinitePoint = ({ x, y }: EditorItemOriginFlowLayoutPoint) => {
 	expect(Number.isFinite(y)).toBe(true);
 };
 
-const expectValidRoute = (route: ReadonlyArray<EditorItemOriginFlowLayoutRouteSegment>) => {
-	expect(route.length).toBeGreaterThan(0);
-	let previous: EditorItemOriginFlowLayoutPoint | undefined;
-	for (const segment of route) {
-		expectFinitePoint(segment.from);
-		expectFinitePoint(segment.to);
-		if (segment.kind === "cubic") {
-			expectFinitePoint(segment.control1);
-			expectFinitePoint(segment.control2);
-		}
-		if (previous !== undefined) {
-			expect(segment.from.x).toBeCloseTo(previous.x, 5);
-			expect(segment.from.y).toBeCloseTo(previous.y, 5);
-		}
-		previous = segment.to;
-	}
-};
-
 const readBounds = (layout: EditorItemOriginFlowLayout) => {
 	let minX = Number.POSITIVE_INFINITY;
 	let minY = Number.POSITIVE_INFINITY;
@@ -154,9 +135,9 @@ describe("layoutEditorItemOriginFlowFx", () => {
 			...shuffled.positions,
 		]);
 		expect([
-			...layout.routes,
+			...layout.backbones,
 		]).toEqual([
-			...shuffled.routes,
+			...shuffled.backbones,
 		]);
 		expect(layout.positions.get("a")!.flowOrder).toBeLessThan(
 			layout.positions.get("b")!.flowOrder,
@@ -164,9 +145,9 @@ describe("layoutEditorItemOriginFlowFx", () => {
 		expect(layout.positions.get("b")!.flowOrder).toBeLessThan(
 			layout.positions.get("c")!.flowOrder,
 		);
-		for (const route of layout.routes.values()) {
-			expectValidRoute(route);
-			expect(route.some(({ kind }) => kind === "cubic")).toBe(true);
+		for (const backbone of layout.backbones.values()) {
+			expect(backbone.length).toBeGreaterThan(1);
+			for (const point of backbone) expectFinitePoint(point);
 		}
 	});
 
@@ -190,10 +171,10 @@ describe("layoutEditorItemOriginFlowFx", () => {
 		);
 
 		expect(layout.positions.size).toBe(5);
-		expect(layout.routes.size).toBe(4);
-		for (const route of layout.routes.values()) {
-			expectValidRoute(route);
-			expect(route.some(({ kind }) => kind === "cubic")).toBe(true);
+		expect(layout.backbones.size).toBe(4);
+		for (const backbone of layout.backbones.values()) {
+			expect(backbone.length).toBeGreaterThan(1);
+			for (const point of backbone) expectFinitePoint(point);
 		}
 		for (const position of layout.positions.values()) {
 			expect(Number.isFinite(position.x)).toBe(true);
@@ -274,9 +255,9 @@ describe("layoutEditorItemOriginFlowFx", () => {
 		);
 		const source = layout.positions.get("source")!;
 		const target = layout.positions.get("target")!;
-		const route = layout.routes.get("source->target")!;
-		const start = route[0]!.from;
-		const end = route.at(-1)!.to;
+		const backbone = layout.backbones.get("source->target")!;
+		const start = backbone[0]!;
+		const end = backbone.at(-1)!;
 
 		expect(start.x).toBeCloseTo(source.x + source.width, 5);
 		expect(start.y).toBeCloseTo(source.y + source.height / 2 + 62, 5);
@@ -310,17 +291,12 @@ describe("layoutEditorItemOriginFlowFx", () => {
 		expect(flow.edges.length).toBe(1384);
 		expect(flow.nodes.every(({ kind }) => kind === "item")).toBe(true);
 		expect(layout.positions.size).toBe(flow.nodes.length);
-		expect(layout.routes.size).toBe(flow.edges.length);
 		expect(layout.backbones.size).toBe(flow.edges.length);
 		expect(elapsedMs).toBeLessThan(5_000);
 		expect(bounds.width).toBeLessThan(24_000);
 		expect(bounds.height).toBeLessThan(22_000);
 		expect(bounds.width / bounds.height).toBeGreaterThan(0.8);
 		expect(bounds.width / bounds.height).toBeLessThan(1.5);
-		for (const route of layout.routes.values()) {
-			expectValidRoute(route);
-			expect(route.some(({ kind }) => kind === "cubic")).toBe(true);
-		}
 		let backboneSegments = 0;
 		let orthogonalBackboneSegments = 0;
 		for (const backbone of layout.backbones.values()) {
@@ -333,6 +309,39 @@ describe("layoutEditorItemOriginFlowFx", () => {
 			}
 		}
 		expect(orthogonalBackboneSegments / backboneSegments).toBeGreaterThan(0.98);
+
+		const sharedLongSegments = new Map<string, number>();
+		let maximumEndpointStub = 0;
+		for (const backbone of layout.backbones.values()) {
+			if (backbone.length >= 2) {
+				maximumEndpointStub = Math.max(
+					maximumEndpointStub,
+					Math.hypot(backbone[1]!.x - backbone[0]!.x, backbone[1]!.y - backbone[0]!.y),
+					Math.hypot(
+						backbone.at(-1)!.x - backbone.at(-2)!.x,
+						backbone.at(-1)!.y - backbone.at(-2)!.y,
+					),
+				);
+			}
+			for (let index = 1; index < backbone.length; index += 1) {
+				const from = backbone[index - 1]!;
+				const to = backbone[index]!;
+				if (Math.hypot(to.x - from.x, to.y - from.y) <= 100) continue;
+				const horizontal = Math.abs(from.y - to.y) < 0.1;
+				const vertical = Math.abs(from.x - to.x) < 0.1;
+				if (!horizontal && !vertical) continue;
+				const key = horizontal
+					? `h:${from.y.toFixed(1)}:${Math.min(from.x, to.x).toFixed(1)}:${Math.max(from.x, to.x).toFixed(1)}`
+					: `v:${from.x.toFixed(1)}:${Math.min(from.y, to.y).toFixed(1)}:${Math.max(from.y, to.y).toFixed(1)}`;
+				sharedLongSegments.set(key, (sharedLongSegments.get(key) ?? 0) + 1);
+			}
+		}
+		expect(maximumEndpointStub).toBeLessThan(500);
+		expect(
+			[
+				...sharedLongSegments.values(),
+			].filter((count) => count > 1).length,
+		).toBeLessThanOrEqual(1);
 
 		for (const flowEdge of flow.edges) {
 			const source = layout.positions.get(flowEdge.source)!;
@@ -353,12 +362,9 @@ describe("layoutEditorItemOriginFlowFx", () => {
 							y: 0,
 						}
 					: targetMetrics.portOffsets.get(flowEdge.targetPortId)!;
-			const route = layout.routes.get(flowEdge.id)!;
 			const backbone = layout.backbones.get(flowEdge.id)!;
-			const first = route[0]!.from;
-			const last = route.at(-1)!.to;
-			expect(backbone[0]).toEqual(first);
-			expect(backbone.at(-1)).toEqual(last);
+			const first = backbone[0]!;
+			const last = backbone.at(-1)!;
 			expect(first.x).toBeCloseTo(source.x + source.width / 2 + sourceOffset.x, 5);
 			expect(first.y).toBeCloseTo(source.y + source.height / 2 + sourceOffset.y, 5);
 			expect(last.x).toBeCloseTo(target.x + target.width / 2 + targetOffset.x, 5);

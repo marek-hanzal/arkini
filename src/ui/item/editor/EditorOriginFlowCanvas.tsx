@@ -31,10 +31,6 @@ import {
 } from "~/ui/item/editor/readEditorOriginFlowNavigation";
 import { EditorOriginFlowShortcutHelp } from "~/ui/item/editor/EditorOriginFlowShortcutHelp";
 import {
-	type EditorOriginFlowBranchLanes,
-	readEditorOriginFlowBranchLanes,
-} from "~/ui/item/editor/readEditorOriginFlowBranchLanes";
-import {
 	type EditorOriginFlowConnectedPorts,
 	readEditorOriginFlowConnectedPorts,
 } from "~/ui/item/editor/readEditorOriginFlowConnectedPorts";
@@ -84,7 +80,6 @@ interface EditorOriginFlowCanvasProps {
 
 interface RenderState {
 	readonly backbones: ReadonlyMap<string, ReadonlyArray<EditorItemOriginFlowLayoutPoint>>;
-	readonly branchLanes: EditorOriginFlowBranchLanes;
 	readonly connectedPorts: EditorOriginFlowConnectedPorts;
 	readonly fitContent: boolean;
 	readonly focusNodeId?: string;
@@ -109,7 +104,6 @@ const ClickThreshold = 5;
 const EdgeHitRadiusPx = 9;
 const PortHitRadiusPx = 11;
 const EdgeCullPaddingPx = 32;
-const EdgeLaneCullPaddingWorld = 160;
 const MaxCachedImages = 96;
 
 const IncomeBranchColors = [
@@ -451,7 +445,7 @@ const readBackboneBounds = (
 	);
 
 const isEdgeVisible = (bounds: Bounds, viewport: Viewport, width: number, height: number) => {
-	const padding = EdgeCullPaddingPx / viewport.zoom + EdgeLaneCullPaddingWorld;
+	const padding = EdgeCullPaddingPx / viewport.zoom;
 	const left = -viewport.x / viewport.zoom - padding;
 	const top = -viewport.y / viewport.zoom - padding;
 	const right = (width - viewport.x) / viewport.zoom + padding;
@@ -961,38 +955,10 @@ const drawArrow = (
 	context.fill();
 };
 
-const drawEdgeLaneUnderlay = (
-	context: CanvasRenderingContext2D,
-	edge: EditorItemOriginEdge,
-	branchLanes: ReadonlyMap<number, ReadonlyArray<EditorItemOriginFlowLayoutPoint>> | undefined,
-	selection: EditorOriginFlowSelection | undefined,
-	highlight: ReturnType<typeof readEditorOriginFlowHighlight> | undefined,
-	palette: CanvasPalette,
-) => {
-	if (selection?.kind !== "node" || highlight?.edgeIds.has(edge.id) !== true) return;
-	const branchIndexes = highlight.branchIndexesByEdgeId.get(edge.id) ?? [];
-	if (branchIndexes.length === 0 || branchLanes === undefined) return;
-	context.save();
-	context.globalAlpha = 0.96;
-	context.strokeStyle = palette.canvas;
-	context.lineJoin = "round";
-	context.lineCap = "round";
-	for (const branchIndex of branchIndexes) {
-		const points = branchLanes.get(branchIndex);
-		if (points === undefined) continue;
-		context.lineWidth = (branchIndexes.length === 1 ? 4 : 2.6) + 4;
-		context.beginPath();
-		traceOrthogonalPath(context, points);
-		context.stroke();
-	}
-	context.restore();
-};
-
 const drawEdge = (
 	context: CanvasRenderingContext2D,
 	edge: EditorItemOriginEdge,
 	backbone: ReadonlyArray<EditorItemOriginFlowLayoutPoint>,
-	branchLanes: ReadonlyMap<number, ReadonlyArray<EditorItemOriginFlowLayoutPoint>> | undefined,
 	selection: EditorOriginFlowSelection | undefined,
 	highlight: ReturnType<typeof readEditorOriginFlowHighlight> | undefined,
 	palette: CanvasPalette,
@@ -1007,47 +973,25 @@ const drawEdge = (
 			? (highlight?.branchIndexesByEdgeId.get(edge.id) ?? [])
 			: [];
 	const alpha = selection === undefined ? 0.12 : active ? 1 : 0.025;
+	const branchIndex = branchIndexes[0];
+	const edgeColor =
+		branchIndex === undefined || selectedNodeId === undefined
+			? palette.accent
+			: readIncomeBranchColor(selectedNodeId, branchIndex);
 
 	context.save();
 	context.globalAlpha = alpha;
 	context.lineJoin = "round";
 	context.lineCap = "round";
-
-	const hasLaneGeometry =
-		selectedNodeId !== undefined && branchIndexes.length > 0 && branchLanes !== undefined;
-	if (hasLaneGeometry) {
-		for (const branchIndex of branchIndexes) {
-			const points = branchLanes.get(branchIndex);
-			if (points === undefined) continue;
-			const edgeColor = readIncomeBranchColor(selectedNodeId, branchIndex);
-			context.strokeStyle = edgeColor;
-			context.fillStyle = edgeColor;
-			context.lineWidth = selected ? 3.6 : branchIndexes.length === 1 ? 4 : 2.6;
-			context.beginPath();
-			traceOrthogonalPath(context, points);
-			context.stroke();
-		}
-	} else {
-		const branchIndex = branchIndexes[0];
-		const edgeColor =
-			branchIndex === undefined || selectedNodeId === undefined
-				? palette.accent
-				: readIncomeBranchColor(selectedNodeId, branchIndex);
-		context.strokeStyle = edgeColor;
-		context.fillStyle = edgeColor;
-		context.lineWidth = selected ? 5 : active ? 4 : 1.2;
-		context.beginPath();
-		traceOrthogonalPath(context, backbone);
-		context.stroke();
-	}
+	context.strokeStyle = edgeColor;
+	context.fillStyle = edgeColor;
+	context.lineWidth = selected ? 5 : active ? 4 : 1.2;
+	context.beginPath();
+	traceOrthogonalPath(context, backbone);
+	context.stroke();
 
 	const last = backbone.at(-1)!;
 	const previous = backbone.at(-2) ?? first;
-	const arrowColor =
-		branchIndexes.length === 1 && selectedNodeId !== undefined
-			? readIncomeBranchColor(selectedNodeId, branchIndexes[0]!)
-			: palette.accent;
-	context.fillStyle = arrowColor;
 	drawArrow(context, previous, last);
 	context.restore();
 };
@@ -1116,7 +1060,6 @@ const hitTest = (
 	connectedPorts: EditorOriginFlowConnectedPorts,
 	positions: ReadonlyMap<string, EditorItemOriginFlowLayoutNode>,
 	backbones: ReadonlyMap<string, ReadonlyArray<EditorItemOriginFlowLayoutPoint>>,
-	branchLanes: EditorOriginFlowBranchLanes,
 	x: number,
 	y: number,
 	zoom: number,
@@ -1180,17 +1123,6 @@ const hitTest = (
 	}
 	const tolerance = EdgeHitRadiusPx / zoom;
 	for (const edge of flow.edges) {
-		const lanes = branchLanes.get(edge.id);
-		if (lanes !== undefined) {
-			for (const points of lanes.values()) {
-				if (distanceToPolyline(x, y, points) > tolerance) continue;
-				return {
-					id: edge.id,
-					kind: "edge",
-				};
-			}
-			continue;
-		}
 		const backbone = backbones.get(edge.id);
 		if (backbone === undefined || distanceToPolyline(x, y, backbone) > tolerance) continue;
 		return {
@@ -1260,15 +1192,6 @@ export const EditorOriginFlowCanvas = ({
 			selection,
 		],
 	);
-	const branchLanes = useMemo(
-		() => readEditorOriginFlowBranchLanes(flow.edges, backbones, positions, highlight),
-		[
-			backbones,
-			flow.edges,
-			highlight,
-			positions,
-		],
-	);
 	const navigationNodeIds = useMemo(
 		() =>
 			selection?.kind === "node"
@@ -1293,7 +1216,6 @@ export const EditorOriginFlowCanvas = ({
 	);
 	const renderStateRef = useRef<RenderState>({
 		backbones,
-		branchLanes,
 		connectedPorts,
 		fitContent,
 		flow,
@@ -1306,7 +1228,6 @@ export const EditorOriginFlowCanvas = ({
 	});
 	renderStateRef.current = {
 		backbones,
-		branchLanes,
 		connectedPorts,
 		fitContent,
 		flow,
@@ -1371,33 +1292,12 @@ export const EditorOriginFlowCanvas = ({
 		context.translate(viewport.x, viewport.y);
 		context.scale(viewport.zoom, viewport.zoom);
 		for (const edge of state.flow.edges) {
-			const bounds = state.edgeBounds.get(edge.id);
-			if (bounds === undefined) throw new Error(`Missing edge bounds for ${edge.id}.`);
-			if (!isEdgeVisible(bounds, viewport, rect.width, rect.height)) continue;
-			drawEdgeLaneUnderlay(
-				context,
-				edge,
-				state.branchLanes.get(edge.id),
-				state.selection,
-				state.highlight,
-				palette,
-			);
-		}
-		for (const edge of state.flow.edges) {
 			const backbone = state.backbones.get(edge.id);
 			if (backbone === undefined) throw new Error(`Missing routed backbone for ${edge.id}.`);
 			const bounds = state.edgeBounds.get(edge.id);
 			if (bounds === undefined) throw new Error(`Missing edge bounds for ${edge.id}.`);
 			if (!isEdgeVisible(bounds, viewport, rect.width, rect.height)) continue;
-			drawEdge(
-				context,
-				edge,
-				backbone,
-				state.branchLanes.get(edge.id),
-				state.selection,
-				state.highlight,
-				palette,
-			);
+			drawEdge(context, edge, backbone, state.selection, state.highlight, palette);
 		}
 		for (const node of state.flow.nodes) {
 			const position = state.positions.get(node.id);
@@ -1462,7 +1362,6 @@ export const EditorOriginFlowCanvas = ({
 	useEffect(() => {
 		scheduleDraw();
 	}, [
-		branchLanes,
 		connectedPorts,
 		flow,
 		highlight,
@@ -1687,7 +1586,6 @@ export const EditorOriginFlowCanvas = ({
 			connectedPorts,
 			positions,
 			backbones,
-			branchLanes,
 			worldX,
 			worldY,
 			viewport.zoom,

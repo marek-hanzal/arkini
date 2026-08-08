@@ -11,7 +11,6 @@ import { layoutEditorItemOriginFlowInWorkerFx } from "~/ui/item/editor/layoutEdi
 import type {
 	EditorItemOriginFlowLayoutNode,
 	EditorItemOriginFlowLayoutPoint,
-	EditorItemOriginFlowLayoutRouteSegment,
 } from "~/ui/item/editor/layoutEditorItemOriginFlowFx";
 
 type EditorItemOriginFlowState =
@@ -24,10 +23,6 @@ type EditorItemOriginFlowState =
 			readonly backbones: ReadonlyMap<string, ReadonlyArray<EditorItemOriginFlowLayoutPoint>>;
 			readonly flow: EditorItemOriginFlow;
 			readonly positions: ReadonlyMap<string, EditorItemOriginFlowLayoutNode>;
-			readonly routes: ReadonlyMap<
-				string,
-				ReadonlyArray<EditorItemOriginFlowLayoutRouteSegment>
-			>;
 			readonly progress: EditorItemOriginFlowProgress;
 			readonly status: "ready";
 	  }
@@ -111,7 +106,6 @@ export const useEditorItemOriginFlow = (
 					backbones: layout.backbones,
 					flow,
 					positions: layout.positions,
-					routes: layout.routes,
 					progress: {
 						label: "Flow ready",
 						percent: 100,

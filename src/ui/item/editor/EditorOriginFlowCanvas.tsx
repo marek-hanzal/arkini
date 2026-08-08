@@ -8,11 +8,13 @@ import {
 	type PointerEvent as ReactPointerEvent,
 } from "react";
 
-import type {
-	EditorItemOriginEdge,
-	EditorItemOriginFlow,
-	EditorItemOriginItemNode,
-	EditorItemOriginOperationKind,
+import {
+	EditorItemOriginItemInputPortId,
+	EditorItemOriginItemOutputPortId,
+	type EditorItemOriginEdge,
+	type EditorItemOriginFlow,
+	type EditorItemOriginItemNode,
+	type EditorItemOriginOperationKind,
 } from "~/bridge/item/editor/readEditorItemOriginFlow";
 import { ItemTypeLabel } from "~/ui/item-detail/ItemInfoPresentation";
 import type {
@@ -29,6 +31,10 @@ import {
 	readEditorOriginFlowProducerNavigation,
 } from "~/ui/item/editor/readEditorOriginFlowNavigation";
 import { EditorOriginFlowShortcutHelp } from "~/ui/item/editor/EditorOriginFlowShortcutHelp";
+import {
+	type EditorOriginFlowConnectedPorts,
+	readEditorOriginFlowConnectedPorts,
+} from "~/ui/item/editor/readEditorOriginFlowConnectedPorts";
 import {
 	EditorOriginFlowOperationContentPadding,
 	EditorOriginFlowOperationHeaderHeight,
@@ -74,6 +80,7 @@ interface EditorOriginFlowCanvasProps {
 }
 
 interface RenderState {
+	readonly connectedPorts: EditorOriginFlowConnectedPorts;
 	readonly fitContent: boolean;
 	readonly focusNodeId?: string;
 	readonly flow: EditorItemOriginFlow;
@@ -688,6 +695,7 @@ const drawItemNode = (
 	resourceUrls: ReadonlyMap<string, string>,
 	imageCache: Map<string, HTMLImageElement>,
 	onImageReady: () => void,
+	connectedPortIds: ReadonlySet<string> | undefined,
 ) => {
 	const typeColor = readItemTypeColor(palette, node.type);
 	const metrics = readEditorOriginFlowNodeMetrics(node);
@@ -702,20 +710,22 @@ const drawItemNode = (
 		highlight,
 		palette,
 	);
-	drawFlowPort(
-		context,
-		position.x,
-		position.y + readEditorOriginFlowItemPortY(metrics.headerHeight),
-		typeColor,
-		palette.itemSurfaces[node.type],
-	);
-	drawFlowPort(
-		context,
-		position.x + position.width,
-		position.y + readEditorOriginFlowItemPortY(metrics.headerHeight),
-		typeColor,
-		palette.itemSurfaces[node.type],
-	);
+	if (connectedPortIds?.has(EditorItemOriginItemInputPortId) === true)
+		drawFlowPort(
+			context,
+			position.x,
+			position.y + readEditorOriginFlowItemPortY(metrics.headerHeight),
+			typeColor,
+			palette.itemSurfaces[node.type],
+		);
+	if (connectedPortIds?.has(EditorItemOriginItemOutputPortId) === true)
+		drawFlowPort(
+			context,
+			position.x + position.width,
+			position.y + readEditorOriginFlowItemPortY(metrics.headerHeight),
+			typeColor,
+			palette.itemSurfaces[node.type],
+		);
 
 	const artworkSize = 68;
 	const artworkX = position.x + 16;
@@ -832,7 +842,14 @@ const drawItemNode = (
 			const portY = operationMetrics.inputPortYs.get(input.id);
 			if (portY === undefined) continue;
 			const worldY = position.y + portY;
-			drawFlowPort(context, position.x, worldY, kindColor, palette.itemSurfaces[node.type]);
+			if (connectedPortIds?.has(input.id) === true)
+				drawFlowPort(
+					context,
+					position.x,
+					worldY,
+					kindColor,
+					palette.itemSurfaces[node.type],
+				);
 			context.fillStyle = palette.foreground;
 			context.textAlign = "left";
 			context.textBaseline = "middle";
@@ -846,13 +863,14 @@ const drawItemNode = (
 			const portY = operationMetrics.outputPortYs.get(output.id);
 			if (portY === undefined) continue;
 			const worldY = position.y + portY;
-			drawFlowPort(
-				context,
-				position.x + position.width,
-				worldY,
-				kindColor,
-				palette.itemSurfaces[node.type],
-			);
+			if (connectedPortIds?.has(output.id) === true)
+				drawFlowPort(
+					context,
+					position.x + position.width,
+					worldY,
+					kindColor,
+					palette.itemSurfaces[node.type],
+				);
 			context.fillStyle = palette.foreground;
 			context.textAlign = "right";
 			context.textBaseline = "middle";
@@ -1038,6 +1056,7 @@ type FlowHit =
 
 const hitTest = (
 	flow: EditorItemOriginFlow,
+	connectedPorts: EditorOriginFlowConnectedPorts,
 	positions: ReadonlyMap<string, EditorItemOriginFlowLayoutNode>,
 	routes: ReadonlyMap<string, ReadonlyArray<EditorItemOriginFlowLayoutRouteSegment>>,
 	x: number,
@@ -1050,10 +1069,12 @@ const hitTest = (
 		const position = positions.get(node.id);
 		if (position === undefined) continue;
 		const metrics = readEditorOriginFlowNodeMetrics(node);
+		const connectedPortIds = connectedPorts.get(node.id);
 		for (const [operationIndex, operation] of node.operations.entries()) {
 			const operationMetrics = metrics.operations[operationIndex];
 			if (operationMetrics === undefined) continue;
 			for (const input of operation.inputs) {
+				if (connectedPortIds?.has(input.id) !== true) continue;
 				const localY = operationMetrics.inputPortYs.get(input.id);
 				if (localY === undefined) continue;
 				if (Math.hypot(x - position.x, y - (position.y + localY)) <= portTolerance) {
@@ -1066,6 +1087,7 @@ const hitTest = (
 				}
 			}
 			for (const output of operation.outputs) {
+				if (connectedPortIds?.has(output.id) !== true) continue;
 				const localY = operationMetrics.outputPortYs.get(output.id);
 				if (localY === undefined) continue;
 				if (
@@ -1140,6 +1162,12 @@ export const EditorOriginFlowCanvas = ({
 			routes,
 		],
 	);
+	const connectedPorts = useMemo(
+		() => readEditorOriginFlowConnectedPorts(flow.edges),
+		[
+			flow.edges,
+		],
+	);
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 	const imageCacheRef = useRef<Map<string, HTMLImageElement>>(new Map());
 	const scheduleDrawRef = useRef<() => void>(() => undefined);
@@ -1187,6 +1215,7 @@ export const EditorOriginFlowCanvas = ({
 		],
 	);
 	const renderStateRef = useRef<RenderState>({
+		connectedPorts,
 		fitContent,
 		flow,
 		focusNodeId,
@@ -1198,6 +1227,7 @@ export const EditorOriginFlowCanvas = ({
 		selection,
 	});
 	renderStateRef.current = {
+		connectedPorts,
 		fitContent,
 		flow,
 		focusNodeId,
@@ -1289,6 +1319,7 @@ export const EditorOriginFlowCanvas = ({
 				state.resourceUrls,
 				imageCacheRef.current,
 				scheduleDrawRef.current,
+				state.connectedPorts.get(node.id),
 			);
 		}
 		context.restore();
@@ -1331,8 +1362,11 @@ export const EditorOriginFlowCanvas = ({
 	useEffect(() => {
 		scheduleDraw();
 	}, [
+		connectedPorts,
+		flow,
 		highlight,
 		resourceUrls,
+		routes,
 		scheduleDraw,
 		selection,
 	]);
@@ -1548,7 +1582,7 @@ export const EditorOriginFlowCanvas = ({
 		const viewport = viewportRef.current;
 		const worldX = (event.clientX - rect.left - viewport.x) / viewport.zoom;
 		const worldY = (event.clientY - rect.top - viewport.y) / viewport.zoom;
-		const hit = hitTest(flow, positions, routes, worldX, worldY, viewport.zoom);
+		const hit = hitTest(flow, connectedPorts, positions, routes, worldX, worldY, viewport.zoom);
 		if (hit?.kind === "port") {
 			const targetPosition = positions.get(hit.targetNodeId);
 			if (targetPosition === undefined) return;

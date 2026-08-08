@@ -185,6 +185,26 @@ describe("readEditorOriginFlowHighlight", () => {
 				"loop-target",
 			]),
 		);
+		expect(highlight.branchIndexByEdgeId).toEqual(
+			new Map([
+				[
+					"forge-target",
+					0,
+				],
+				[
+					"tool-forge",
+					0,
+				],
+				[
+					"water-forge",
+					0,
+				],
+				[
+					"loop-target",
+					1,
+				],
+			]),
+		);
 
 		const producerNodeIds = readEditorOriginFlowProducerNavigation(incomeFlow, "item:target");
 		const navigationNodeIds = readEditorOriginFlowNavigation(
@@ -209,6 +229,7 @@ describe("readEditorOriginFlowHighlight", () => {
 			kind: "node",
 		});
 		expect(highlight).toEqual({
+			branchIndexByEdgeId: new Map(),
 			edgeIds: new Set(),
 			nodeIds: new Set([
 				"item:tool",
@@ -328,6 +349,7 @@ describe("readEditorOriginFlowHighlight", () => {
 			kind: "edge",
 		});
 		expect(highlight).toEqual({
+			branchIndexByEdgeId: new Map(),
 			edgeIds: new Set([
 				"tool-forge",
 			]),
@@ -432,6 +454,18 @@ describe("readEditorOriginFlowHighlight", () => {
 			id: coinNodeId,
 			kind: "node",
 		});
+		const directCoinOutputEdges = flow.edges.filter(
+			(edge) => edge.role === "output" && edge.target === coinNodeId,
+		);
+		const directOperationIds = new Set(
+			directCoinOutputEdges.map(({ operationId }) => operationId),
+		);
+		const directBranchIndexes = new Set(
+			directCoinOutputEdges.map(({ id }) => highlight.branchIndexByEdgeId.get(id)),
+		);
+		expect(directBranchIndexes.has(undefined)).toBe(false);
+		expect(directBranchIndexes.size).toBe(directOperationIds.size);
+
 		const producerNodeIds = readEditorOriginFlowProducerNavigation(flow, coinNodeId);
 		const navigationNodeIds = readEditorOriginFlowNavigation(
 			flow,
@@ -462,6 +496,7 @@ describe("readEditorOriginFlowHighlight", () => {
 				kind: "node",
 			}),
 		).toEqual({
+			branchIndexByEdgeId: new Map(),
 			edgeIds: new Set(),
 			nodeIds: new Set(),
 		});

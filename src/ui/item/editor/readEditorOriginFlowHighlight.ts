@@ -15,6 +15,7 @@ export type EditorOriginFlowSelection =
 	  };
 
 export interface EditorOriginFlowHighlight {
+	readonly branchIndexByEdgeId: ReadonlyMap<string, number>;
 	readonly edgeIds: ReadonlySet<string>;
 	readonly nodeIds: ReadonlySet<string>;
 }
@@ -22,6 +23,20 @@ export interface EditorOriginFlowHighlight {
 interface FlowNodePosition {
 	readonly flowOrder: number;
 }
+
+const readEmptyHighlight = (): EditorOriginFlowHighlight => ({
+	branchIndexByEdgeId: new Map(),
+	edgeIds: new Set(),
+	nodeIds: new Set(),
+});
+
+const sortEdges = (edges: ReadonlyArray<EditorItemOriginEdge>) =>
+	[
+		...edges,
+	].sort(
+		(left, right) =>
+			left.operationId.localeCompare(right.operationId) || left.id.localeCompare(right.id),
+	);
 
 /** Reads the complete Income ancestry through operations embedded in their owning item nodes. */
 const readIncomeHighlight = (
@@ -51,43 +66,66 @@ const readIncomeHighlight = (
 		}
 	}
 
-	const nodeIds = new Set<string>();
+	const nodeIds = new Set<string>([
+		startNode.id,
+	]);
 	const edgeIds = new Set<string>();
-	const tracedItems = new Set<string>();
+	const branchIndexByEdgeId = new Map<string, number>();
+	if (startNode.starterScopes.length > 0)
+		return {
+			branchIndexByEdgeId,
+			edgeIds,
+			nodeIds,
+		};
+
+	const directOutputEdges = sortEdges(outputEdgesByTarget.get(startNode.id) ?? []);
+	const directEdgesByOperation = new Map<string, EditorItemOriginEdge[]>();
+	for (const edge of directOutputEdges) {
+		const edges = directEdgesByOperation.get(edge.operationId) ?? [];
+		edges.push(edge);
+		directEdgesByOperation.set(edge.operationId, edges);
+	}
+	const directBranches = [
+		...directEdgesByOperation.entries(),
+	].sort(([leftId], [rightId]) => leftId.localeCompare(rightId));
+
+	const tracedItems = new Set<string>([
+		startNode.id,
+	]);
 	const tracedOperations = new Set<string>();
-	const traceItem = (itemNode: EditorItemOriginItemNode) => {
+	const markEdge = (edge: EditorItemOriginEdge, branchIndex: number) => {
+		edgeIds.add(edge.id);
+		if (!branchIndexByEdgeId.has(edge.id)) branchIndexByEdgeId.set(edge.id, branchIndex);
+	};
+	const traceOperation = (outputEdge: EditorItemOriginEdge, branchIndex: number) => {
+		if (tracedOperations.has(outputEdge.operationId)) return;
+		tracedOperations.add(outputEdge.operationId);
+		const ownerNode = nodeById.get(outputEdge.source);
+		if (ownerNode !== undefined) traceItem(ownerNode, branchIndex);
+		for (const edge of sortEdges(inputEdgesByOperation.get(outputEdge.operationId) ?? [])) {
+			markEdge(edge, branchIndex);
+			const requirementNode = nodeById.get(edge.source);
+			if (requirementNode !== undefined) traceItem(requirementNode, branchIndex);
+		}
+	};
+	const traceItem = (itemNode: EditorItemOriginItemNode, branchIndex: number) => {
 		nodeIds.add(itemNode.id);
 		if (itemNode.starterScopes.length > 0 || tracedItems.has(itemNode.id)) return;
 		tracedItems.add(itemNode.id);
-
-		const directOutputEdges = [
-			...(outputEdgesByTarget.get(itemNode.id) ?? []),
-		].sort(
-			(left, right) =>
-				left.operationId.localeCompare(right.operationId) ||
-				left.id.localeCompare(right.id),
-		);
-		for (const outputEdge of directOutputEdges) {
-			edgeIds.add(outputEdge.id);
-			if (tracedOperations.has(outputEdge.operationId)) continue;
-			tracedOperations.add(outputEdge.operationId);
-
-			const ownerNode = nodeById.get(outputEdge.source);
-			if (ownerNode !== undefined) traceItem(ownerNode);
-			for (const edge of [
-				...(inputEdgesByOperation.get(outputEdge.operationId) ?? []),
-			].sort(
-				(left, right) =>
-					left.source.localeCompare(right.source) || left.id.localeCompare(right.id),
-			)) {
-				edgeIds.add(edge.id);
-				const requirementNode = nodeById.get(edge.source);
-				if (requirementNode !== undefined) traceItem(requirementNode);
-			}
+		for (const outputEdge of sortEdges(outputEdgesByTarget.get(itemNode.id) ?? [])) {
+			markEdge(outputEdge, branchIndex);
+			traceOperation(outputEdge, branchIndex);
 		}
 	};
-	traceItem(startNode);
+
+	for (const [branchIndex, [, branchOutputEdges]] of directBranches.entries()) {
+		for (const outputEdge of branchOutputEdges) markEdge(outputEdge, branchIndex);
+		const representative = branchOutputEdges[0];
+		if (representative !== undefined) traceOperation(representative, branchIndex);
+	}
+
 	return {
+		branchIndexByEdgeId,
 		edgeIds,
 		nodeIds,
 	};
@@ -102,22 +140,16 @@ export const readEditorOriginFlowHighlight = (
 	if (selection.kind === "node") {
 		const selectedNode = flow.nodes.find(({ id }) => id === selection.id);
 		return selectedNode === undefined
-			? {
-					edgeIds: new Set(),
-					nodeIds: new Set(),
-				}
+			? readEmptyHighlight()
 			: readIncomeHighlight(flow, selectedNode);
 	}
 
 	const selectedEdge = flow.edges.find(({ id }) => id === selection.id);
-	if (selectedEdge === undefined)
-		return {
-			edgeIds: new Set(),
-			nodeIds: new Set(),
-		};
+	if (selectedEdge === undefined) return readEmptyHighlight();
 	const startNode = flow.nodes.find(({ id }) => id === selectedEdge.source);
 	if (startNode === undefined)
 		return {
+			branchIndexByEdgeId: new Map(),
 			edgeIds: new Set([
 				selectedEdge.id,
 			]),
@@ -128,6 +160,7 @@ export const readEditorOriginFlowHighlight = (
 		};
 	const highlight = readIncomeHighlight(flow, startNode);
 	return {
+		branchIndexByEdgeId: new Map(),
 		edgeIds: new Set([
 			selectedEdge.id,
 			...highlight.edgeIds,

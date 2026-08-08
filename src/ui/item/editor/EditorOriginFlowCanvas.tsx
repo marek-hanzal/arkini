@@ -107,6 +107,39 @@ const PortHitRadiusPx = 11;
 const EdgeCullPaddingPx = 20;
 const MaxCachedImages = 96;
 
+const IncomeBranchColors = [
+	"hsl(350 78% 45%)",
+	"hsl(170 78% 38%)",
+	"hsl(80 78% 36%)",
+	"hsl(260 78% 52%)",
+	"hsl(35 88% 46%)",
+	"hsl(215 82% 48%)",
+	"hsl(125 65% 38%)",
+	"hsl(305 72% 46%)",
+	"hsl(190 82% 40%)",
+	"hsl(10 82% 48%)",
+	"hsl(240 68% 54%)",
+	"hsl(100 62% 38%)",
+	"hsl(325 76% 45%)",
+	"hsl(55 82% 38%)",
+	"hsl(145 68% 36%)",
+	"hsl(285 70% 48%)",
+] as const;
+
+const hashString = (value: string) => {
+	let hash = 2166136261;
+	for (let index = 0; index < value.length; index += 1) {
+		hash ^= value.charCodeAt(index);
+		hash = Math.imul(hash, 16777619);
+	}
+	return hash >>> 0;
+};
+
+const readIncomeBranchColor = (selectionId: string, branchIndex: number) => {
+	const offset = hashString(selectionId) % IncomeBranchColors.length;
+	return IncomeBranchColors[(offset + branchIndex) % IncomeBranchColors.length]!;
+};
+
 interface CanvasPalette {
 	readonly accent: string;
 	readonly danger: string;
@@ -918,10 +951,19 @@ const drawEdge = (
 	if (first === undefined) return;
 	const selected = selection?.kind === "edge" && selection.id === edge.id;
 	const active = highlight?.edgeIds.has(edge.id) ?? false;
+	const selectedNodeId = selection?.kind === "node" ? selection.id : undefined;
+	const branchIndex =
+		selectedNodeId !== undefined && active
+			? highlight?.branchIndexByEdgeId.get(edge.id)
+			: undefined;
+	const edgeColor =
+		branchIndex === undefined || selectedNodeId === undefined
+			? palette.accent
+			: readIncomeBranchColor(selectedNodeId, branchIndex);
 	context.save();
 	context.globalAlpha = selection === undefined ? 0.12 : active ? 1 : 0.025;
-	context.strokeStyle = palette.accent;
-	context.fillStyle = palette.accent;
+	context.strokeStyle = edgeColor;
+	context.fillStyle = edgeColor;
 	context.lineWidth = selected ? 5 : active ? 4 : 1.2;
 	context.lineJoin = "round";
 	context.lineCap = "round";

@@ -35,14 +35,11 @@ export const projectItemDetailInputFx = Effect.fn("projectItemDetailInputFx")(fu
 						game,
 						selector: materials.selector,
 					});
-					const detail =
-						materials.selector.type === "item"
-							? yield* projectItemDetailReferenceFx({
-									game,
-									itemId: materials.selector.itemId,
-									runtime,
-								})
-							: undefined;
+					const detail = yield* projectItemDetailReferenceFx({
+						game,
+						itemId: materials.selector.itemId,
+						runtime,
+					});
 					return {
 						...materials,
 						selector,
@@ -66,28 +63,17 @@ export const projectItemDetailInputFx = Effect.fn("projectItemDetailInputFx")(fu
 					});
 					const exactTargetId =
 						deposit.targetItemIds.length === 1 ? deposit.targetItemIds[0] : undefined;
-					const exactTarget =
-						exactTargetId === undefined
-							? undefined
-							: runtime.items.find((item) => item.id === exactTargetId);
-					const configuredItemId =
-						deposit.selector.type === "item"
-							? deposit.selector.itemId
-							: exactTarget?.item.id;
-					const detail =
-						configuredItemId === undefined
-							? undefined
-							: yield* projectItemDetailReferenceFx({
-									game,
-									itemId: configuredItemId,
-									preferredRuntimeItemIds:
-										exactTargetId === undefined
-											? []
-											: [
-													exactTargetId,
-												],
-									runtime,
-								});
+					const detail = yield* projectItemDetailReferenceFx({
+						game,
+						itemId: deposit.selector.itemId,
+						preferredRuntimeItemIds:
+							exactTargetId === undefined
+								? []
+								: [
+										exactTargetId,
+									],
+						runtime,
+					});
 					return {
 						kind: deposit.kind,
 						selector,

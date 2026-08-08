@@ -3,6 +3,7 @@ import { z } from "zod";
 import { RuleDisableResultSchema } from "./RuleDisableResultSchema";
 import { RuleEnableResultSchema } from "./RuleEnableResultSchema";
 import { RuleHideResultSchema } from "./RuleHideResultSchema";
+import { RuleRuntimeAdjustResultSchema } from "./RuleRuntimeAdjustResultSchema";
 import { RuleRuntimeMultiplierResultSchema } from "./RuleRuntimeMultiplierResultSchema";
 import { RuleShowResultSchema } from "./RuleShowResultSchema";
 
@@ -15,6 +16,7 @@ export const RuleResultSchema = z
 		RuleHideResultSchema,
 		RuleEnableResultSchema,
 		RuleDisableResultSchema,
+		RuleRuntimeAdjustResultSchema,
 		RuleRuntimeMultiplierResultSchema,
 	])
 	.meta({

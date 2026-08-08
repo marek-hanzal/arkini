@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:chest-t4": {
+			"uid": "ovdnt7bzfq7yiwomk9gofoqr",
 			"id": "item:chest-t4",
 			"type": "stash",
 			"title": "Chest IV",
@@ -11,14 +12,6 @@
 					"item-chest-t4"
 				]
 			},
-			"tags": [
-				"chest",
-				"locked",
-				"stash",
-				"guild",
-				"era:IX"
-			],
-			"categoryId": "treasure",
 			"scope": "any",
 			"maxStackSize": 1,
 			"line": {
@@ -34,8 +27,8 @@
 							"itemId": "item:key-t4"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 1
+							"min": 1,
+							"max": 1
 						},
 						"charges": {
 							"cost": 1,
@@ -54,7 +47,6 @@
 										{
 											"itemId": "item:coin",
 											"quantity": {
-												"type": "range",
 												"min": 10,
 												"max": 15
 											},
@@ -69,8 +61,8 @@
 										{
 											"itemId": "item:sapphire",
 											"quantity": {
-												"type": "value",
-												"value": 1
+												"min": 1,
+												"max": 1
 											},
 											"rules": []
 										}
@@ -83,8 +75,8 @@
 										{
 											"itemId": "item:topaz",
 											"quantity": {
-												"type": "value",
-												"value": 1
+												"min": 1,
+												"max": 1
 											},
 											"rules": []
 										}
@@ -97,8 +89,8 @@
 										{
 											"itemId": "item:aquamarine",
 											"quantity": {
-												"type": "value",
-												"value": 1
+												"min": 1,
+												"max": 1
 											},
 											"rules": []
 										}

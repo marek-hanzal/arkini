@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"producer:chicken-coop-t1": {
+			"uid": "eki4huiwwi9omeih3cdoqssw",
 			"id": "producer:chicken-coop-t1",
 			"type": "producer",
 			"title": "Chicken Coop I",
@@ -11,14 +12,6 @@
 					"producer-chicken-coop-t1"
 				]
 			},
-			"tags": [
-				"producer",
-				"food",
-				"egg",
-				"era:II",
-				"unique"
-			],
-			"categoryId": "building",
 			"scope": "any",
 			"maxCount": 1,
 			"maxStackSize": 1,
@@ -37,8 +30,8 @@
 								"itemId": "item:grain"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 4
 						},
@@ -49,8 +42,8 @@
 								"itemId": "item:water"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 2
+								"min": 2,
+								"max": 2
 							},
 							"capacity": 4
 						}
@@ -66,8 +59,8 @@
 											{
 												"itemId": "item:egg",
 												"quantity": {
-													"type": "value",
-													"value": 2
+													"min": 2,
+													"max": 2
 												},
 												"rules": []
 											}
@@ -80,8 +73,8 @@
 											{
 												"itemId": "item:egg",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -94,8 +87,8 @@
 											{
 												"itemId": "item:quest:farmers-favor",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -108,8 +101,8 @@
 											{
 												"itemId": "item:bio-waste",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -122,8 +115,8 @@
 											{
 												"itemId": "item:trash",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}

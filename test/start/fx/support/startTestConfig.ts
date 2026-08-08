@@ -10,6 +10,7 @@ const simpleItem = ({
 	scope: "any" | "board" | "inventory";
 }) => {
 	return {
+		uid: id,
 		id,
 		title: id,
 		description: id,
@@ -18,8 +19,6 @@ const simpleItem = ({
 				`asset:${id}`,
 			],
 		},
-		tags: [],
-		categoryId: "resource",
 		scope,
 		maxStackSize,
 		type: "simple",
@@ -62,7 +61,6 @@ export const startTestConfig = GameConfigSchema.parse({
 		],
 		toolbar: [],
 	},
-	categories: {},
 	items: {
 		tree: simpleItem({
 			id: "tree",
@@ -80,6 +78,7 @@ export const startTestConfig = GameConfigSchema.parse({
 			scope: "inventory",
 		}),
 		backpack: {
+			uid: "backpack",
 			id: "backpack",
 			type: "inventory",
 			title: "Backpack",
@@ -89,8 +88,6 @@ export const startTestConfig = GameConfigSchema.parse({
 					"asset:backpack",
 				],
 			},
-			tags: [],
-			categoryId: "resource",
 		},
 	},
 });

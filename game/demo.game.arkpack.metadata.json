@@ -1,10 +1,7 @@
 {
-	"namespace": "arkini",
-	"format": 1,
 	"packageId": "demo",
-	"contentHash": "8eb82b41ea9f4bb44cb025605902c8573db62602a00645edafc1c580ce47a673",
+	"hash": "ddaad091258b158b104de2e1b47f27a52419af91101d1f30c3f0aad997090f1e",
 	"gameId": "demo",
 	"title": "Arkini Trust Demo",
-	"configVersion": "1.0",
-	"compressedSize": 59471
+	"game": "1.0"
 }

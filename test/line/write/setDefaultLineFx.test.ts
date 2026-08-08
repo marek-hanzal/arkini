@@ -61,9 +61,9 @@ const config = GameConfigSchema.parse({
 			},
 		],
 	},
-	categories: {},
 	items: {
 		producer: {
+			uid: "producer",
 			id: "producer",
 			type: "producer",
 			title: "Producer",
@@ -73,8 +73,6 @@ const config = GameConfigSchema.parse({
 					"asset:producer",
 				],
 			},
-			tags: [],
-			categoryId: "building",
 			scope: "board",
 			maxStackSize: 1,
 			maxQueueSize: 1,
@@ -106,9 +104,9 @@ const createStackConfig = ({ boardWidth }: { readonly boardWidth: number }) =>
 		start: {
 			currentSpace: 0,
 		},
-		categories: {},
 		items: {
 			producer: {
+				uid: "producer",
 				id: "producer",
 				type: "producer",
 				title: "Producer",
@@ -118,8 +116,6 @@ const createStackConfig = ({ boardWidth }: { readonly boardWidth: number }) =>
 						"asset:producer",
 					],
 				},
-				tags: [],
-				categoryId: "building",
 				scope: "any",
 				maxStackSize: 3,
 				maxQueueSize: 1,
@@ -128,6 +124,7 @@ const createStackConfig = ({ boardWidth }: { readonly boardWidth: number }) =>
 				],
 			},
 			blocker: {
+				uid: "blocker",
 				id: "blocker",
 				type: "simple",
 				title: "Blocker",
@@ -137,8 +134,6 @@ const createStackConfig = ({ boardWidth }: { readonly boardWidth: number }) =>
 						"asset:blocker",
 					],
 				},
-				tags: [],
-				categoryId: "resource",
 				scope: "any",
 				maxStackSize: 1,
 			},

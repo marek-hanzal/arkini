@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"producer:market-t2": {
+			"uid": "xet024w1x49qrhjfj014xuth",
 			"id": "producer:market-t2",
 			"type": "producer",
 			"title": "Market II",
@@ -11,15 +12,6 @@
 					"producer-market-t2"
 				]
 			},
-			"tags": [
-				"producer",
-				"trade",
-				"market",
-				"civic",
-				"unique",
-				"era:IV"
-			],
-			"categoryId": "building",
 			"scope": "any",
 			"maxCount": 1,
 			"maxStackSize": 1,
@@ -38,8 +30,8 @@
 								"itemId": "item:paper"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 3
+								"min": 3,
+								"max": 3
 							},
 							"capacity": 5
 						}
@@ -55,8 +47,8 @@
 											{
 												"itemId": "item:coin",
 												"quantity": {
-													"type": "value",
-													"value": 2
+													"min": 2,
+													"max": 2
 												},
 												"rules": []
 											}
@@ -80,8 +72,8 @@
 								"itemId": "item:feast"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 3
 						}
@@ -97,8 +89,8 @@
 											{
 												"itemId": "item:coin",
 												"quantity": {
-													"type": "value",
-													"value": 7
+													"min": 7,
+													"max": 7
 												},
 												"rules": []
 											}
@@ -122,8 +114,8 @@
 								"itemId": "item:common-clothing"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 3
 						}
@@ -139,8 +131,8 @@
 											{
 												"itemId": "item:coin",
 												"quantity": {
-													"type": "value",
-													"value": 5
+													"min": 5,
+													"max": 5
 												},
 												"rules": []
 											}
@@ -164,8 +156,8 @@
 								"itemId": "item:luxury-clothing"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 3
 						}
@@ -181,8 +173,8 @@
 											{
 												"itemId": "item:coin",
 												"quantity": {
-													"type": "value",
-													"value": 8
+													"min": 8,
+													"max": 8
 												},
 												"rules": []
 											}

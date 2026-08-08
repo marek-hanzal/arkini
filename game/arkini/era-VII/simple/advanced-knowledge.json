@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:advanced-knowledge": {
+			"uid": "bnzvw6f7gno51nia1znqlsrb",
 			"id": "item:advanced-knowledge",
 			"type": "simple",
 			"title": "Advanced Knowledge",
@@ -11,13 +12,6 @@
 					"item-advanced-knowledge"
 				]
 			},
-			"tags": [
-				"knowledge",
-				"education",
-				"research",
-				"era:VII"
-			],
-			"categoryId": "knowledge",
 			"scope": "any",
 			"maxStackSize": 50
 		}

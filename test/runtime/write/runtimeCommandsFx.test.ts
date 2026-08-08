@@ -32,9 +32,9 @@ const config = GameConfigSchema.parse({
 	start: {
 		currentSpace: 0,
 	},
-	categories: {},
 	items: {
 		log: {
+			uid: "log",
 			id: "log",
 			title: "Log",
 			description: "A log.",
@@ -43,13 +43,12 @@ const config = GameConfigSchema.parse({
 					"asset:log",
 				],
 			},
-			tags: [],
-			categoryId: "resource",
 			scope: "any",
 			maxStackSize: 10,
 			type: "simple",
 		},
 		stone: {
+			uid: "stone",
 			id: "stone",
 			title: "Stone",
 			description: "A stone.",
@@ -58,8 +57,6 @@ const config = GameConfigSchema.parse({
 					"asset:stone",
 				],
 			},
-			tags: [],
-			categoryId: "resource",
 			scope: "any",
 			maxStackSize: 10,
 			type: "simple",

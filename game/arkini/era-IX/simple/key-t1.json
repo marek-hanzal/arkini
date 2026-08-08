@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:key-t1": {
+			"uid": "kca4372si0oimuanh9v4ucxq",
 			"id": "item:key-t1",
 			"type": "simple",
 			"title": "Key I",
@@ -11,12 +12,6 @@
 					"item-key-t1"
 				]
 			},
-			"tags": [
-				"key",
-				"goldsmith",
-				"era:IX"
-			],
-			"categoryId": "equipment",
 			"scope": "any",
 			"maxStackSize": 20
 		}

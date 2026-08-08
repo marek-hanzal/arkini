@@ -36,9 +36,9 @@ const craftCompletionConfig = GameConfigSchema.parse({
 	start: {
 		currentSpace: 0,
 	},
-	categories: {},
 	items: {
 		"craft:drop": {
+			uid: "craft:drop",
 			id: "craft:drop",
 			type: "craft",
 			charges: {
@@ -51,8 +51,6 @@ const craftCompletionConfig = GameConfigSchema.parse({
 					"asset:craft-drop",
 				],
 			},
-			tags: [],
-			categoryId: "test",
 			scope: "any",
 			maxStackSize: 3,
 			line: {
@@ -79,8 +77,8 @@ const craftCompletionConfig = GameConfigSchema.parse({
 										{
 											itemId: "item:product",
 											quantity: {
-												type: "value",
-												value: 1,
+												min: 1,
+												max: 1,
 											},
 											placement: "drop",
 											rules: [],
@@ -95,6 +93,7 @@ const craftCompletionConfig = GameConfigSchema.parse({
 			},
 		},
 		"craft:ordered-output": {
+			uid: "craft:ordered-output",
 			id: "craft:ordered-output",
 			type: "craft",
 			charges: {
@@ -107,8 +106,6 @@ const craftCompletionConfig = GameConfigSchema.parse({
 					"asset:craft-ordered-output",
 				],
 			},
-			tags: [],
-			categoryId: "test",
 			scope: "any",
 			maxStackSize: 3,
 			line: {
@@ -135,8 +132,8 @@ const craftCompletionConfig = GameConfigSchema.parse({
 										{
 											itemId: "item:bonus",
 											quantity: {
-												type: "value",
-												value: 1,
+												min: 1,
+												max: 1,
 											},
 											placement: "drop",
 											rules: [],
@@ -144,8 +141,8 @@ const craftCompletionConfig = GameConfigSchema.parse({
 										{
 											itemId: "item:result",
 											quantity: {
-												type: "value",
-												value: 1,
+												min: 1,
+												max: 1,
 											},
 											placement: "drop",
 											rules: [],
@@ -160,6 +157,7 @@ const craftCompletionConfig = GameConfigSchema.parse({
 			},
 		},
 		"craft:reserve": {
+			uid: "craft:reserve",
 			id: "craft:reserve",
 			type: "craft",
 			charges: {
@@ -172,8 +170,6 @@ const craftCompletionConfig = GameConfigSchema.parse({
 					"asset:craft-reserve",
 				],
 			},
-			tags: [],
-			categoryId: "test",
 			scope: "any",
 			maxStackSize: 1,
 			line: {
@@ -194,8 +190,8 @@ const craftCompletionConfig = GameConfigSchema.parse({
 						},
 						mode: "reserve",
 						quantity: {
-							type: "value",
-							value: 1,
+							min: 1,
+							max: 1,
 						},
 					},
 				],
@@ -209,8 +205,8 @@ const craftCompletionConfig = GameConfigSchema.parse({
 										{
 											itemId: "item:product",
 											quantity: {
-												type: "value",
-												value: 1,
+												min: 1,
+												max: 1,
 											},
 											placement: "drop",
 											rules: [],
@@ -225,6 +221,7 @@ const craftCompletionConfig = GameConfigSchema.parse({
 			},
 		},
 		"craft:sink": {
+			uid: "craft:sink",
 			id: "craft:sink",
 			type: "craft",
 			charges: {
@@ -237,8 +234,6 @@ const craftCompletionConfig = GameConfigSchema.parse({
 					"asset:craft-sink",
 				],
 			},
-			tags: [],
-			categoryId: "test",
 			scope: "any",
 			maxStackSize: 1,
 			line: {
@@ -259,6 +254,7 @@ const craftCompletionConfig = GameConfigSchema.parse({
 			},
 		},
 		"craft:random": {
+			uid: "craft:random",
 			id: "craft:random",
 			type: "craft",
 			charges: {
@@ -271,8 +267,6 @@ const craftCompletionConfig = GameConfigSchema.parse({
 					"asset:craft-random",
 				],
 			},
-			tags: [],
-			categoryId: "test",
 			scope: "any",
 			maxStackSize: 1,
 			line: {
@@ -300,8 +294,8 @@ const craftCompletionConfig = GameConfigSchema.parse({
 										{
 											itemId: "item:random-a",
 											quantity: {
-												type: "value",
-												value: 2,
+												min: 2,
+												max: 2,
 											},
 											placement: "random",
 											rules: [],
@@ -319,8 +313,8 @@ const craftCompletionConfig = GameConfigSchema.parse({
 										{
 											itemId: "item:random-b",
 											quantity: {
-												type: "value",
-												value: 2,
+												min: 2,
+												max: 2,
 											},
 											placement: "random",
 											rules: [],
@@ -335,6 +329,7 @@ const craftCompletionConfig = GameConfigSchema.parse({
 			},
 		},
 		"item:product": {
+			uid: "item:product",
 			id: "item:product",
 			type: "simple",
 			title: "Product",
@@ -344,12 +339,11 @@ const craftCompletionConfig = GameConfigSchema.parse({
 					"asset:product",
 				],
 			},
-			tags: [],
-			categoryId: "test",
 			scope: "any",
 			maxStackSize: 1,
 		},
 		"item:result": {
+			uid: "item:result",
 			id: "item:result",
 			type: "simple",
 			title: "Result",
@@ -359,12 +353,11 @@ const craftCompletionConfig = GameConfigSchema.parse({
 					"asset:result",
 				],
 			},
-			tags: [],
-			categoryId: "test",
 			scope: "board",
 			maxStackSize: 1,
 		},
 		"item:bonus": {
+			uid: "item:bonus",
 			id: "item:bonus",
 			type: "simple",
 			title: "Bonus",
@@ -374,12 +367,11 @@ const craftCompletionConfig = GameConfigSchema.parse({
 					"asset:bonus",
 				],
 			},
-			tags: [],
-			categoryId: "test",
 			scope: "board",
 			maxStackSize: 1,
 		},
 		"item:tool": {
+			uid: "item:tool",
 			id: "item:tool",
 			type: "simple",
 			title: "Tool",
@@ -389,12 +381,11 @@ const craftCompletionConfig = GameConfigSchema.parse({
 					"asset:tool",
 				],
 			},
-			tags: [],
-			categoryId: "test",
 			scope: "any",
 			maxStackSize: 1,
 		},
 		"item:blocker": {
+			uid: "item:blocker",
 			id: "item:blocker",
 			type: "simple",
 			title: "Blocker",
@@ -404,12 +395,11 @@ const craftCompletionConfig = GameConfigSchema.parse({
 					"asset:blocker",
 				],
 			},
-			tags: [],
-			categoryId: "test",
 			scope: "any",
 			maxStackSize: 1,
 		},
 		"item:random-a": {
+			uid: "item:random-a",
 			id: "item:random-a",
 			type: "simple",
 			title: "Random A",
@@ -419,12 +409,11 @@ const craftCompletionConfig = GameConfigSchema.parse({
 					"asset:random-a",
 				],
 			},
-			tags: [],
-			categoryId: "test",
 			scope: "any",
 			maxStackSize: 1,
 		},
 		"item:random-b": {
+			uid: "item:random-b",
 			id: "item:random-b",
 			type: "simple",
 			title: "Random B",
@@ -434,8 +423,6 @@ const craftCompletionConfig = GameConfigSchema.parse({
 					"asset:random-b",
 				],
 			},
-			tags: [],
-			categoryId: "test",
 			scope: "any",
 			maxStackSize: 1,
 		},

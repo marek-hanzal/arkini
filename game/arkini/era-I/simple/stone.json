@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:stone": {
+			"uid": "ncasueyzu754nmujz90zrw9b",
 			"id": "item:stone",
 			"type": "simple",
 			"title": "Stone",
@@ -11,13 +12,6 @@
 					"item-stone"
 				]
 			},
-			"tags": [
-				"material",
-				"stone",
-				"era:I",
-				"tier-1-resource"
-			],
-			"categoryId": "material",
 			"scope": "any",
 			"maxStackSize": 16
 		}

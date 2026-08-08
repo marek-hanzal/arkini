@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"producer:well-t1": {
+			"uid": "uuygn0nyyrs689pfaxqyz953",
 			"id": "producer:well-t1",
 			"type": "deposit",
 			"title": "Well I",
@@ -11,14 +12,6 @@
 					"producer-well-t1"
 				]
 			},
-			"tags": [
-				"deposit",
-				"food",
-				"water",
-				"era:I",
-				"unique"
-			],
-			"categoryId": "building",
 			"scope": "any",
 			"maxCount": 1,
 			"maxStackSize": 1,
@@ -60,8 +53,8 @@
 											{
 												"itemId": "item:water",
 												"quantity": {
-													"type": "value",
-													"value": 2
+													"min": 2,
+													"max": 2
 												},
 												"rules": []
 											}
@@ -74,8 +67,8 @@
 											{
 												"itemId": "item:water",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -88,8 +81,8 @@
 											{
 												"itemId": "item:quest:water-carrier",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}

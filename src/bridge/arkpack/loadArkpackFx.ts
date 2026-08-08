@@ -47,11 +47,10 @@ export const loadArkpackFx = Effect.fn("loadArkpackFx")(function* ({
 			expected: expected.trust,
 		});
 		if (
-			loaded.descriptor.contentHash !== expected.contentHash ||
+			loaded.descriptor.hash !== expected.hash ||
 			loaded.descriptor.gameId !== expected.gameId ||
 			loaded.descriptor.title !== expected.title ||
-			loaded.descriptor.configVersion !== expected.configVersion ||
-			loaded.descriptor.compressedSize !== expected.compressedSize ||
+			loaded.descriptor.game !== expected.game ||
 			!trustMatches
 		) {
 			return yield* Effect.fail(
@@ -78,7 +77,7 @@ export const loadArkpackFx = Effect.fn("loadArkpackFx")(function* ({
 			},
 			source: "imported",
 		});
-		if (loaded.descriptor.contentHash !== packageId) {
+		if (loaded.descriptor.hash !== packageId) {
 			return yield* Effect.fail(
 				new Error(`Arkpack ${packageId} failed its content hash check.`),
 			);

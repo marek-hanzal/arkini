@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:construction-bundle": {
+			"uid": "zkeib1tefdesw7jwhfa53fxj",
 			"id": "item:construction-bundle",
 			"type": "simple",
 			"title": "Construction Bundle",
@@ -11,14 +12,6 @@
 					"item-construction-bundle"
 				]
 			},
-			"tags": [
-				"material",
-				"construction",
-				"master",
-				"era:VIII",
-				"tier-6-resource"
-			],
-			"categoryId": "material",
 			"scope": "any",
 			"maxStackSize": 20
 		}

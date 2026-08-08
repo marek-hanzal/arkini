@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:micro-forest": {
+			"uid": "n68j71cgmi7e8zppoxet85r2",
 			"id": "item:micro-forest",
 			"type": "deposit",
 			"title": "Micro-Forest",
@@ -11,16 +12,6 @@
 					"item-micro-forest"
 				]
 			},
-			"tags": [
-				"source",
-				"wood",
-				"wood-source",
-				"tree",
-				"tree:t3",
-				"forest",
-				"era:I"
-			],
-			"categoryId": "source",
 			"scope": "any",
 			"maxStackSize": 1,
 			"charges": {
@@ -35,8 +26,8 @@
 										{
 											"itemId": "item:seed",
 											"quantity": {
-												"type": "value",
-												"value": 1
+												"min": 1,
+												"max": 1
 											},
 											"rules": []
 										}

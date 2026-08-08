@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:blueprint-goldsmith-t1": {
+			"uid": "fr748t4pkjgi1pss3g42uy2t",
 			"id": "item:blueprint-goldsmith-t1",
 			"type": "blueprint",
 			"title": "Goldsmith I Blueprint",
@@ -15,13 +16,6 @@
 					"producer-goldsmith-t1"
 				]
 			},
-			"tags": [
-				"blueprint",
-				"building",
-				"craft-target",
-				"era:IX"
-			],
-			"categoryId": "blueprint",
 			"scope": "any",
 			"maxStackSize": 1,
 			"line": {
@@ -38,8 +32,8 @@
 							"itemId": "item:construction-bundle"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 1
+							"min": 1,
+							"max": 1
 						},
 						"charges": {
 							"cost": 1,
@@ -53,8 +47,8 @@
 							"itemId": "item:guild-charter"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 1
+							"min": 1,
+							"max": 1
 						}
 					},
 					{
@@ -64,8 +58,8 @@
 							"itemId": "item:glass"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 2
+							"min": 2,
+							"max": 2
 						}
 					},
 					{
@@ -75,8 +69,8 @@
 							"itemId": "item:gold-ingot"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 2
+							"min": 2,
+							"max": 2
 						}
 					},
 					{
@@ -86,8 +80,8 @@
 							"itemId": "item:charcoal"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 1
+							"min": 1,
+							"max": 1
 						}
 					},
 					{
@@ -97,8 +91,8 @@
 							"itemId": "item:coin"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 8
+							"min": 8,
+							"max": 8
 						}
 					}
 				],
@@ -149,8 +143,8 @@
 										{
 											"itemId": "producer:goldsmith-t1",
 											"quantity": {
-												"type": "value",
-												"value": 1
+												"min": 1,
+												"max": 1
 											},
 											"placement": "drop",
 											"rules": []

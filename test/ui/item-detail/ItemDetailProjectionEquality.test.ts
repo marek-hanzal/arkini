@@ -50,15 +50,10 @@ const definition = {
 	kind: "available",
 	itemId: "target",
 	title: "Target",
-	subtitle: "Materials",
 	sourceUrl: "resource:target",
 	compositeUrl: "resource:target-composite",
 	description: "A target item.",
 	itemType: "simple",
-	categoryTitle: "Materials",
-	tags: [
-		"material",
-	],
 	storageScope: "any",
 	maxStackSize: 10,
 	ownedQuantity: 2,
@@ -70,7 +65,6 @@ const identity = {
 	kind: "available",
 	itemId: "runtime:target",
 	title: "Target",
-	subtitle: "Materials",
 	sourceUrl: "resource:target",
 	compositeUrl: "resource:target-composite",
 } as const satisfies useItemDetailIdentity.Projection;
@@ -238,16 +232,6 @@ describe("Item Detail projection structural equality", () => {
 			{
 				...definition,
 				description: "Changed.",
-			},
-		],
-		[
-			"definition tag",
-			definition,
-			{
-				...definition,
-				tags: [
-					"other",
-				],
 			},
 		],
 		[

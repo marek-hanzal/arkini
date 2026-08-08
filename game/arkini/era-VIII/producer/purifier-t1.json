@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"producer:purifier-t1": {
+			"uid": "pij3k7p5envete8vtw79wdml",
 			"id": "producer:purifier-t1",
 			"type": "producer",
 			"title": "Purifier I",
@@ -11,15 +12,6 @@
 					"producer-purifier-t1"
 				]
 			},
-			"tags": [
-				"producer",
-				"industry",
-				"purifier",
-				"pollution",
-				"era:VIII",
-				"unique"
-			],
-			"categoryId": "building",
 			"scope": "any",
 			"maxCount": 1,
 			"maxStackSize": 1,
@@ -38,7 +30,6 @@
 								"itemId": "item:pollution"
 							},
 							"quantity": {
-								"type": "range",
 								"min": 1,
 								"max": 4
 							}

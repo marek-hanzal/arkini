@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"producer:sheep-pasture-t1": {
+			"uid": "jeqhw1v464hx39os7wb6ste4",
 			"id": "producer:sheep-pasture-t1",
 			"type": "producer",
 			"title": "Sheep Pasture I",
@@ -11,14 +12,6 @@
 					"producer-sheep-pasture-t1"
 				]
 			},
-			"tags": [
-				"producer",
-				"animal",
-				"wool",
-				"era:II",
-				"unique"
-			],
-			"categoryId": "building",
 			"scope": "any",
 			"maxCount": 1,
 			"maxStackSize": 1,
@@ -37,8 +30,8 @@
 								"itemId": "item:grain"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 4
 						},
@@ -49,8 +42,8 @@
 								"itemId": "item:water"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 4
 						}
@@ -66,8 +59,8 @@
 											{
 												"itemId": "item:wool",
 												"quantity": {
-													"type": "value",
-													"value": 2
+													"min": 2,
+													"max": 2
 												},
 												"rules": []
 											}
@@ -80,8 +73,8 @@
 											{
 												"itemId": "item:bio-waste",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -94,8 +87,8 @@
 											{
 												"itemId": "item:trash",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}

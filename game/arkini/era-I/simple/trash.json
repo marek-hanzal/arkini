@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:trash": {
+			"uid": "gnmhk3qxn0aww8i2fcf1w64t",
 			"id": "item:trash",
 			"type": "simple",
 			"title": "Trash",
@@ -11,14 +12,6 @@
 					"item-trash"
 				]
 			},
-			"tags": [
-				"byproduct",
-				"waste",
-				"trash",
-				"cleanup",
-				"era:I"
-			],
-			"categoryId": "waste",
 			"scope": "board",
 			"maxStackSize": 1
 		}

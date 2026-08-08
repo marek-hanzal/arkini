@@ -9,8 +9,8 @@ describe("QuerySchema", () => {
 				scope: "board",
 				distance: "near",
 				selector: {
-					type: "tag",
-					tag: "wood-source",
+					type: "item",
+					itemId: "deposit:tree",
 				},
 			}).success,
 		).toBe(true);
@@ -18,8 +18,8 @@ describe("QuerySchema", () => {
 			QuerySchema.safeParse({
 				scope: "board",
 				selector: {
-					type: "tag",
-					tag: "wood-source",
+					type: "item",
+					itemId: "deposit:tree",
 				},
 			}).success,
 		).toBe(false);

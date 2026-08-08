@@ -28,11 +28,10 @@ const createGame = (
 ): Game => ({
 	arkpack: {
 		packageId: "package-route",
-		contentHash: "content-route",
+		hash: "content-route",
 		gameId: testArkpackConfig.meta.id,
 		title: testArkpackConfig.meta.title,
-		configVersion: testArkpackConfig.version,
-		compressedSize: 0,
+		game: testArkpackConfig.version,
 		trust: {
 			type: "external",
 			reason: "unsigned",
@@ -211,6 +210,24 @@ describe("game route lifecycle", () => {
 		expect(
 			rendererRuntime.runSync(readCurrentGameEngineResourceFx())?.game.arkpack.packageId,
 		).toBe("package-route");
+	});
+
+	it("releases the active Game before opening the editor", async () => {
+		vi.useFakeTimers();
+		const dispose = vi.fn();
+		const game = createGame(Effect.sync(dispose));
+		const { rendererRuntime, router } = await createHarness("/game/package-route/board", game);
+		await router.load();
+
+		const navigation = router.navigate({
+			to: "/editor/welcome",
+		});
+		await vi.advanceTimersByTimeAsync(2_500);
+		await navigation;
+
+		expect(dispose).toHaveBeenCalledOnce();
+		expect(rendererRuntime.runSync(readCurrentGameEngineResourceFx())).toBeNull();
+		expect(router.state.location.pathname).toBe("/editor/welcome");
 	});
 
 	it("keeps one parent Game while moving from board into its action sibling", async () => {

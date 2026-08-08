@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:blueprint-school": {
+			"uid": "yichn76im0nxd6at98e3jeak",
 			"id": "item:blueprint-school",
 			"type": "blueprint",
 			"title": "School Blueprint",
@@ -15,14 +16,6 @@
 					"producer-school"
 				]
 			},
-			"tags": [
-				"blueprint",
-				"building",
-				"education",
-				"knowledge",
-				"era:IV"
-			],
-			"categoryId": "blueprint",
 			"scope": "any",
 			"maxStackSize": 1,
 			"line": {
@@ -39,8 +32,8 @@
 							"itemId": "item:plank"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 3
+							"min": 3,
+							"max": 3
 						},
 						"charges": {
 							"cost": 1,
@@ -54,8 +47,8 @@
 							"itemId": "item:stone-block"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 2
+							"min": 2,
+							"max": 2
 						}
 					},
 					{
@@ -65,8 +58,8 @@
 							"itemId": "item:paper"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 2
+							"min": 2,
+							"max": 2
 						}
 					},
 					{
@@ -76,8 +69,8 @@
 							"itemId": "item:coin"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 1
+							"min": 1,
+							"max": 1
 						}
 					}
 				],
@@ -108,8 +101,8 @@
 										{
 											"itemId": "producer:school",
 											"quantity": {
-												"type": "value",
-												"value": 1
+												"min": 1,
+												"max": 1
 											},
 											"placement": "drop",
 											"rules": []

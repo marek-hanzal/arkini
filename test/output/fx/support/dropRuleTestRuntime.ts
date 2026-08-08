@@ -23,9 +23,9 @@ export const dropRuleTestConfig = GameConfigSchema.parse({
 	start: {
 		currentSpace: 0,
 	},
-	categories: {},
 	items: {
 		source: {
+			uid: "source",
 			id: "source",
 			title: "Source",
 			description: "A drop origin.",
@@ -34,13 +34,12 @@ export const dropRuleTestConfig = GameConfigSchema.parse({
 					"asset:source",
 				],
 			},
-			tags: [],
-			categoryId: "resource",
 			scope: "board",
 			maxStackSize: 1,
 			type: "simple",
 		},
 		permit: {
+			uid: "permit",
 			id: "permit",
 			title: "Permit",
 			description: "An availability token.",
@@ -49,8 +48,6 @@ export const dropRuleTestConfig = GameConfigSchema.parse({
 					"asset:permit",
 				],
 			},
-			tags: [],
-			categoryId: "resource",
 			scope: "any",
 			maxStackSize: 10,
 			type: "simple",

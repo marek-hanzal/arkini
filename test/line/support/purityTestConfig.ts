@@ -1,6 +1,7 @@
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 
 const baseItem = ({ id, maxStackSize = 10 }: { id: string; maxStackSize?: number }) => ({
+	uid: id,
 	id,
 	title: id,
 	description: id,
@@ -9,8 +10,6 @@ const baseItem = ({ id, maxStackSize = 10 }: { id: string; maxStackSize?: number
 			`asset:${id}`,
 		],
 	},
-	tags: [],
-	categoryId: "resource",
 	scope: "any" as const,
 	maxStackSize,
 });
@@ -35,7 +34,6 @@ export const purityTestConfig = GameConfigSchema.parse({
 	start: {
 		currentSpace: 0,
 	},
-	categories: {},
 	items: {
 		material: {
 			...baseItem({
@@ -62,8 +60,8 @@ export const purityTestConfig = GameConfigSchema.parse({
 								itemId: "material",
 							},
 							quantity: {
-								type: "value",
-								value: 1,
+								min: 1,
+								max: 1,
 							},
 						},
 					],
@@ -82,8 +80,8 @@ export const purityTestConfig = GameConfigSchema.parse({
 								itemId: "material",
 							},
 							quantity: {
-								type: "value",
-								value: 1,
+								min: 1,
+								max: 1,
 							},
 							capacity: 2,
 						},
@@ -113,8 +111,8 @@ export const purityTestConfig = GameConfigSchema.parse({
 							itemId: "material",
 						},
 						quantity: {
-							type: "value",
-							value: 1,
+							min: 1,
+							max: 1,
 						},
 					},
 				],
@@ -142,8 +140,8 @@ export const purityTestConfig = GameConfigSchema.parse({
 							itemId: "material",
 						},
 						quantity: {
-							type: "value",
-							value: 1,
+							min: 1,
+							max: 1,
 						},
 					},
 				],

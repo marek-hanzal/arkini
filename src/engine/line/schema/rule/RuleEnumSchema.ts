@@ -9,6 +9,7 @@ export const RuleEnumSchema = z
 		Hide: "hide",
 		Enable: "enable",
 		Disable: "disable",
+		RuntimeAdjust: "runtime:adjust",
 		RuntimeMultiplier: "runtime:multiplier",
 	})
 	.meta({

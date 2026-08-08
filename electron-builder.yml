@@ -1,7 +1,12 @@
 appId: dev.marekhanzal.arkini
 productName: Arkini
 asar: true
-npmRebuild: false
+npmRebuild: true
+beforeBuild: ./electron/builder/beforeBuild.mjs
+electronLanguages:
+  - en-US
+  - en-GB
+  - en_GB
 artifactName: ${productName}-${version}-${os}-${arch}.${ext}
 directories:
   app: .out/desktop/stage

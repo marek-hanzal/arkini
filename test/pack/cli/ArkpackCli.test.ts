@@ -46,10 +46,8 @@ describe("Arkpack signing CLI", () => {
 			registryPath,
 			`${JSON.stringify(
 				{
-					formatVersion: 1,
 					keys: [
 						{
-							algorithm: "ed25519",
 							keyId,
 							publicKey,
 						},

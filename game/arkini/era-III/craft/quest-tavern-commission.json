@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:quest:tavern-commission": {
+			"uid": "sk4emw3mvfazitj1xcelb09p",
 			"id": "item:quest:tavern-commission",
 			"type": "craft",
 			"title": "Tavern Commission Quest",
@@ -11,13 +12,6 @@
 					"item-quest"
 				]
 			},
-			"tags": [
-				"quest",
-				"craft-target",
-				"request",
-				"era:III"
-			],
-			"categoryId": "quest",
 			"scope": "any",
 			"maxStackSize": 1,
 			"line": {
@@ -34,8 +28,8 @@
 							"itemId": "item:beer"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 2
+							"min": 2,
+							"max": 2
 						},
 						"charges": {
 							"cost": 1,
@@ -49,8 +43,8 @@
 							"itemId": "item:wine-glass"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 1
+							"min": 1,
+							"max": 1
 						}
 					},
 					{
@@ -60,8 +54,8 @@
 							"itemId": "item:coin"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 1
+							"min": 1,
+							"max": 1
 						}
 					}
 				],
@@ -76,16 +70,16 @@
 										{
 											"itemId": "item:feast",
 											"quantity": {
-												"type": "value",
-												"value": 1
+												"min": 1,
+												"max": 1
 											},
 											"rules": []
 										},
 										{
 											"itemId": "item:cheese",
 											"quantity": {
-												"type": "value",
-												"value": 1
+												"min": 1,
+												"max": 1
 											},
 											"rules": []
 										}
@@ -102,16 +96,16 @@
 										{
 											"itemId": "item:feast",
 											"quantity": {
-												"type": "value",
-												"value": 1
+												"min": 1,
+												"max": 1
 											},
 											"rules": []
 										},
 										{
 											"itemId": "item:stone-block",
 											"quantity": {
-												"type": "value",
-												"value": 1
+												"min": 1,
+												"max": 1
 											},
 											"rules": []
 										}

@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:log": {
+			"uid": "b1utqudwe6ljr9n3i0z4ew7p",
 			"id": "item:log",
 			"type": "simple",
 			"title": "Log",
@@ -11,13 +12,6 @@
 					"item-log"
 				]
 			},
-			"tags": [
-				"material",
-				"wood",
-				"era:I",
-				"tier-1-resource"
-			],
-			"categoryId": "material",
 			"scope": "any",
 			"maxStackSize": 24
 		}

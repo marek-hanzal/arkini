@@ -43,6 +43,7 @@ const makeProjection = (
 				kind: "unavailable",
 				reason,
 			},
+			activeRuleHints: [],
 			isDefault: false,
 			queuedRequestCount: 0,
 			actions: {
@@ -61,6 +62,7 @@ const lineDisabledReason = {
 	kind: "line-disabled",
 	cause: {
 		kind: "enable-rule",
+		hint: "Requires material.",
 		ruleIndex: 0,
 		whenIndex: 0,
 		condition: {

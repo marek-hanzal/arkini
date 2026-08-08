@@ -25,7 +25,6 @@ export const ArkpackTrustSchema = z
 				reason: z.enum([
 					"malformed-signature",
 					"invalid-signature",
-					"hash-mismatch",
 				]),
 				keyId: z.string().regex(keyIdPattern).optional(),
 			})

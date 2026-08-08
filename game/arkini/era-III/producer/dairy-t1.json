@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"producer:dairy-t1": {
+			"uid": "rcgzetshf78vpjve7i7wezu3",
 			"id": "producer:dairy-t1",
 			"type": "producer",
 			"title": "Dairy I",
@@ -11,14 +12,6 @@
 					"producer-dairy-t1"
 				]
 			},
-			"tags": [
-				"producer",
-				"food",
-				"dairy",
-				"era:III",
-				"unique"
-			],
-			"categoryId": "building",
 			"scope": "any",
 			"maxCount": 1,
 			"maxStackSize": 1,
@@ -37,8 +30,8 @@
 								"itemId": "item:milk"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 3
+								"min": 3,
+								"max": 3
 							},
 							"capacity": 4
 						}
@@ -54,8 +47,8 @@
 											{
 												"itemId": "item:cheese",
 												"quantity": {
-													"type": "value",
-													"value": 2
+													"min": 2,
+													"max": 2
 												},
 												"rules": []
 											}

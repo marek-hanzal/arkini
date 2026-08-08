@@ -8,19 +8,11 @@ export namespace parseArkpackTrustFx {
 	}
 }
 
-/** Parses persisted trust metadata while preserving legacy unsigned imports. */
+/** Parses persisted imported-Arkpack trust metadata. */
 export const parseArkpackTrustFx = Effect.fn("parseArkpackTrustFx")(
 	({ value }: parseArkpackTrustFx.Props) =>
 		Effect.succeed(
 			match(value)
-				.with(
-					undefined,
-					() =>
-						({
-							type: "external",
-							reason: "unsigned",
-						}) as const,
-				)
 				.with(
 					{
 						type: "official",
@@ -48,11 +40,7 @@ export const parseArkpackTrustFx = Effect.fn("parseArkpackTrustFx")(
 				.with(
 					{
 						type: "invalid",
-						reason: P.union(
-							"malformed-signature",
-							"invalid-signature",
-							"hash-mismatch",
-						),
+						reason: P.union("malformed-signature", "invalid-signature"),
 						keyId: P.optional(P.string),
 					},
 					(trust) =>

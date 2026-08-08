@@ -8,7 +8,7 @@ import type { LauncherPreferences } from "./LauncherPreferences";
 
 export namespace createFilesystemLauncherPreferencesFx {
 	export interface Props {
-		readonly userDataPath: string;
+		readonly root: string;
 		readonly fileSystem?: FileSystem.FileSystem;
 	}
 }
@@ -17,11 +17,10 @@ export namespace createFilesystemLauncherPreferencesFx {
 export const createFilesystemLauncherPreferencesFx = Effect.fn(
 	"createFilesystemLauncherPreferencesFx",
 )(function* ({
-	userDataPath,
+	root,
 	fileSystem: providedFileSystem,
 }: createFilesystemLauncherPreferencesFx.Props) {
 	const fileSystem = providedFileSystem ?? (yield* FileSystem.FileSystem);
-	const root = join(userDataPath, "arkini", "preferences");
 	const currentPath = join(root, "launcher.last-package");
 	// The fixed pending path makes operation ordering part of this repository's contract.
 	const operations = yield* Semaphore.make(1);

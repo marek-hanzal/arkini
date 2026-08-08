@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:sand-deposit": {
+			"uid": "fcpor5wssd88wompolskbzrl",
 			"id": "item:sand-deposit",
 			"type": "simple",
 			"title": "Sand Deposit",
@@ -11,14 +12,6 @@
 					"item-sand-deposit"
 				]
 			},
-			"tags": [
-				"source",
-				"construction",
-				"sand",
-				"glass",
-				"era:VI"
-			],
-			"categoryId": "source",
 			"scope": "any",
 			"maxStackSize": 1
 		}

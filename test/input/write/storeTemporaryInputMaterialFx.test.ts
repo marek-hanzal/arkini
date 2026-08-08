@@ -8,6 +8,7 @@ import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 
 const baseItem = (id: string) => ({
+	uid: id,
 	id,
 	title: id,
 	description: id,
@@ -16,8 +17,6 @@ const baseItem = (id: string) => ({
 			`asset:${id}`,
 		],
 	},
-	tags: [],
-	categoryId: "resource",
 	scope: "board" as const,
 	maxStackSize: 1,
 });
@@ -42,7 +41,6 @@ const config = GameConfigSchema.parse({
 	start: {
 		currentSpace: 0,
 	},
-	categories: {},
 	items: {
 		owner: {
 			...baseItem("owner"),
@@ -61,8 +59,8 @@ const config = GameConfigSchema.parse({
 								itemId: "temporary",
 							},
 							quantity: {
-								type: "value",
-								value: 1,
+								min: 1,
+								max: 1,
 							},
 							capacity: 0,
 							mode: "consume",

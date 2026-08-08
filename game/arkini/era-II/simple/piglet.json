@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:piglet": {
+			"uid": "wpcd60x4w7porpotkd56ueoz",
 			"id": "item:piglet",
 			"type": "simple",
 			"title": "Piglet",
@@ -11,14 +12,6 @@
 					"item-piglet"
 				]
 			},
-			"tags": [
-				"animal",
-				"food",
-				"pig",
-				"era:II",
-				"tier-2-resource"
-			],
-			"categoryId": "food",
 			"scope": "any",
 			"maxStackSize": 20
 		}

@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:grain": {
+			"uid": "ujchpeh2nppa2vx3rrh4p6bi",
 			"id": "item:grain",
 			"type": "simple",
 			"title": "Grain",
@@ -11,14 +12,6 @@
 					"item-grain"
 				]
 			},
-			"tags": [
-				"material",
-				"food",
-				"grain",
-				"era:II",
-				"tier-1-resource"
-			],
-			"categoryId": "food",
 			"scope": "any",
 			"maxStackSize": 50
 		}

@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:blueprint-stonemason-t2": {
+			"uid": "elk2zf7iu5a7ywjlrmf4z4hb",
 			"id": "item:blueprint-stonemason-t2",
 			"type": "blueprint",
 			"title": "Stonemason Blueprint",
@@ -15,18 +16,6 @@
 					"producer-stonemason-t2"
 				]
 			},
-			"tags": [
-				"blueprint",
-				"building",
-				"craft-target",
-				"stone",
-				"marble",
-				"masonry",
-				"luxury",
-				"prestige",
-				"era:X"
-			],
-			"categoryId": "blueprint",
 			"scope": "any",
 			"maxStackSize": 1,
 			"line": {
@@ -43,8 +32,8 @@
 							"itemId": "producer:stonemason-t1"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 1
+							"min": 1,
+							"max": 1
 						},
 						"charges": {
 							"cost": 1,
@@ -58,8 +47,8 @@
 							"itemId": "item:construction-bundle"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 1
+							"min": 1,
+							"max": 1
 						}
 					},
 					{
@@ -69,8 +58,8 @@
 							"itemId": "item:guild-charter"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 1
+							"min": 1,
+							"max": 1
 						}
 					},
 					{
@@ -80,8 +69,8 @@
 							"itemId": "item:stained-glass"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 1
+							"min": 1,
+							"max": 1
 						}
 					},
 					{
@@ -91,8 +80,8 @@
 							"itemId": "item:coin-stack"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 1
+							"min": 1,
+							"max": 1
 						}
 					}
 				],
@@ -133,8 +122,8 @@
 										{
 											"itemId": "producer:stonemason-t2",
 											"quantity": {
-												"type": "value",
-												"value": 1
+												"min": 1,
+												"max": 1
 											},
 											"placement": "drop",
 											"rules": []

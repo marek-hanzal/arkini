@@ -15,7 +15,6 @@ export namespace readItemDetailIdentityFx {
 				readonly kind: "available";
 				readonly itemId: IdSchema.Type;
 				readonly title: string;
-				readonly categoryId: IdSchema.Type;
 				readonly sourceResourceIds: readonly [
 					IdSchema.Type,
 					...IdSchema.Type[],
@@ -41,7 +40,6 @@ export const readItemDetailIdentityFx = Effect.fn("readItemDetailIdentityFx")(fu
 		kind: "available" as const,
 		itemId: item.id,
 		title: item.item.title,
-		categoryId: item.item.categoryId,
 		sourceResourceIds: yield* readRuntimeItemDefaultAssetIdsFx({
 			item: item.item,
 		}),

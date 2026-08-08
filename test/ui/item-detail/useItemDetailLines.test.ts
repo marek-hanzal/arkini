@@ -63,9 +63,9 @@ const config = GameConfigSchema.parse({
 			},
 		],
 	},
-	categories: {},
 	items: {
 		producer: {
+			uid: "producer",
 			id: "producer",
 			type: "producer",
 			title: "Producer",
@@ -75,8 +75,6 @@ const config = GameConfigSchema.parse({
 					"asset:producer",
 				],
 			},
-			tags: [],
-			categoryId: "building",
 			scope: "board",
 			maxStackSize: 1,
 			maxQueueSize: 1,
@@ -90,12 +88,12 @@ const config = GameConfigSchema.parse({
 						{
 							type: "materials",
 							selector: {
-								type: "tag",
-								tag: "fuel",
+								type: "item",
+								itemId: "item:fuel",
 							},
 							quantity: {
-								type: "value",
-								value: 1,
+								min: 1,
+								max: 1,
 							},
 							capacity: 0,
 							mode: "consume",
@@ -164,8 +162,8 @@ const config = GameConfigSchema.parse({
 											{
 												itemId: "material",
 												quantity: {
-													type: "value",
-													value: 1,
+													min: 1,
+													max: 1,
 												},
 												rules: [],
 											},
@@ -180,6 +178,7 @@ const config = GameConfigSchema.parse({
 			],
 		},
 		material: {
+			uid: "material",
 			id: "material",
 			type: "simple",
 			title: "Material",
@@ -189,10 +188,6 @@ const config = GameConfigSchema.parse({
 					"asset:material",
 				],
 			},
-			tags: [
-				"fuel",
-			],
-			categoryId: "resource",
 			scope: "any",
 			maxCount: 1,
 			maxStackSize: 10,
@@ -274,11 +269,10 @@ const readOrThrowWithConfig = <Result, Error>(
 const game = {
 	arkpack: {
 		packageId: "test-package",
-		contentHash: "test-hash",
+		hash: "test-hash",
 		gameId: config.meta.id,
 		title: config.meta.title,
-		configVersion: config.version,
-		compressedSize: 0,
+		game: config.version,
 		trust: {
 			type: "external",
 			reason: "unsigned",
@@ -465,11 +459,11 @@ describe("useItemDetailLines", () => {
 		});
 		const output = container.querySelector("output");
 		expect(output?.dataset.canEnqueue).toBe("false");
-		expect(output?.dataset.disabledMessage).toBe("Requires Material (Board · close).");
-		expect(output?.dataset.disabledRule).toBe("enable-rule");
-		expect(output?.dataset.disabledRuleDetail).toBe("material");
-		expect(output?.dataset.disabledRuleBefore).toBe("Requires ");
-		expect(output?.dataset.disabledRuleAfter).toBe(" · Board · close.");
+		expect(output?.dataset.disabledMessage).toBe("This line is currently disabled.");
+		expect(output?.dataset.disabledRule).toBe("static");
+		expect(output?.dataset.disabledRuleDetail).toBe("");
+		expect(output?.dataset.disabledRuleBefore).toBeUndefined();
+		expect(output?.dataset.disabledRuleAfter).toBeUndefined();
 		expect(output?.dataset.outputHasRuntimeTarget).toBe("false");
 
 		await act(async () => publishRuntime(withSource));

@@ -3,6 +3,7 @@
 import { Deferred, Effect, Exit, Scope } from "effect";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import type { EditorProjectRepositoryService } from "~/bridge/editor/EditorProjectRepository";
 import { acquireGameEngineLeaseFx } from "~/bridge/game/acquireGameEngineLeaseFx";
 import { CriticalGameLifecycleError } from "~/bridge/game/CriticalGameLifecycleError";
 import type { GameEngineResource } from "~/bridge/game/GameEngineResource";
@@ -178,6 +179,48 @@ describe("installRendererControlledClose", () => {
 
 		expect(router.navigate).not.toHaveBeenCalled();
 		expect(frames.requestAnimationFrame).not.toHaveBeenCalled();
+		remove();
+	});
+
+	it("waits for admitted editor repository writes before native close", async () => {
+		const idle = Effect.runSync(Deferred.make<void>());
+		const repository: EditorProjectRepositoryService = {
+			awaitIdleFx: Deferred.await(idle),
+			createProjectFx: () => Effect.die("Unexpected create."),
+			listProjectsFx: Effect.die("Unexpected list."),
+			readProjectFx: () => Effect.die("Unexpected read."),
+			replaceConfigFx: () => Effect.die("Unexpected config save."),
+			replaceResourceFx: () => Effect.die("Unexpected resource replacement."),
+			upsertItemFx: () => Effect.die("Unexpected item save."),
+			upsertResourcesFx: () => Effect.die("Unexpected resource save."),
+		};
+		const { rendererRuntime } = createTestRendererRuntime({
+			createResourceFx: () => Effect.never,
+			editorProjectRepository: repository,
+		});
+		runtimes.push(rendererRuntime);
+		const lifecycle = createLifecycle();
+		const router = createRouter();
+		const remove = rendererRuntime.runSync(
+			installRendererControlledCloseFx({
+				lifecycle: lifecycle.lifecycle,
+				rendererRuntime,
+				router: router.router,
+			}),
+		);
+
+		let closed = false;
+		const close = lifecycle
+			.readBeforeClose()()
+			.then(() => {
+				closed = true;
+			});
+		await Promise.resolve();
+		expect(closed).toBe(false);
+		Effect.runSync(Deferred.succeed(idle, undefined));
+		await close;
+		expect(closed).toBe(true);
+		expect(router.navigate).not.toHaveBeenCalled();
 		remove();
 	});
 

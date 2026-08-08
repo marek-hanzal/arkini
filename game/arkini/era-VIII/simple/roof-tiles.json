@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:roof-tiles": {
+			"uid": "dk7trmp81m1ruixd1xk0qlu2",
 			"id": "item:roof-tiles",
 			"type": "simple",
 			"title": "Roof Tiles",
@@ -11,16 +12,6 @@
 					"item-roof-tiles"
 				]
 			},
-			"tags": [
-				"material",
-				"construction",
-				"clay",
-				"roof",
-				"era:VIII",
-				"industry",
-				"tier-4-resource"
-			],
-			"categoryId": "material",
 			"scope": "any",
 			"maxStackSize": 50
 		}

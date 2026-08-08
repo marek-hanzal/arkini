@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:wine-barrel": {
+			"uid": "segwxrf9hjdaz3f040o0935w",
 			"id": "item:wine-barrel",
 			"type": "simple",
 			"title": "Wine Barrel",
@@ -11,14 +12,6 @@
 					"item-wine-barrel"
 				]
 			},
-			"tags": [
-				"material",
-				"food",
-				"wine",
-				"era:III",
-				"tier-3-resource"
-			],
-			"categoryId": "food",
 			"scope": "any",
 			"maxStackSize": 20
 		}

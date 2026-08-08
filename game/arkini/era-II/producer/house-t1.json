@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"producer:house-t1": {
+			"uid": "n3845pcj8db3amoedy8v9tni",
 			"id": "producer:house-t1",
 			"type": "producer",
 			"title": "House",
@@ -11,16 +12,6 @@
 					"producer-house-t1"
 				]
 			},
-			"tags": [
-				"producer",
-				"building",
-				"house",
-				"housing",
-				"morale",
-				"era:II",
-				"unique"
-			],
-			"categoryId": "building",
 			"scope": "any",
 			"maxCount": 1,
 			"maxStackSize": 1,
@@ -39,8 +30,8 @@
 								"itemId": "item:water"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 3
 						},
@@ -51,8 +42,8 @@
 								"itemId": "item:log"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 3
 						}
@@ -68,8 +59,8 @@
 											{
 												"itemId": "item:morale-t1",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}

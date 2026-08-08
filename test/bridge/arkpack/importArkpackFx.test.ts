@@ -27,7 +27,7 @@ describe("importArkpackFx", () => {
 				storage,
 			}),
 		);
-		expect(loaded.descriptor.contentHash).toBe(descriptor.packageId);
+		expect(loaded.descriptor.hash).toBe(descriptor.packageId);
 		expect(loaded.payload.config).toEqual(testArkpackConfig);
 	});
 
@@ -35,12 +35,12 @@ describe("importArkpackFx", () => {
 		const storage = Effect.runSync(createInMemoryArkpackStorageFx());
 		const invalid = {
 			...testArkpackConfig,
-			items: {
-				...testArkpackConfig.items,
-				water: {
-					...testArkpackConfig.items.water,
-					categoryId: "missing",
-				},
+			start: {
+				...testArkpackConfig.start,
+				board: testArkpackConfig.start.board.map((entry) => ({
+					...entry,
+					itemId: "missing",
+				})),
 			},
 		};
 		const encoded = Effect.runSync(

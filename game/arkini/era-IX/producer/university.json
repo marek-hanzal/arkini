@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"producer:university": {
+			"uid": "fg9hh7cc77mr4pmkvlvp11qw",
 			"id": "producer:university",
 			"type": "producer",
 			"title": "University",
@@ -11,16 +12,6 @@
 					"producer-university"
 				]
 			},
-			"tags": [
-				"producer",
-				"building",
-				"education",
-				"knowledge",
-				"university",
-				"unique",
-				"era:IX"
-			],
-			"categoryId": "building",
 			"scope": "any",
 			"maxCount": 1,
 			"maxStackSize": 1,
@@ -39,8 +30,8 @@
 								"itemId": "item:bread"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 4
 						}
@@ -56,8 +47,8 @@
 											{
 												"itemId": "item:basic-knowledge",
 												"quantity": {
-													"type": "value",
-													"value": 4
+													"min": 4,
+													"max": 4
 												},
 												"rules": []
 											}
@@ -81,8 +72,8 @@
 								"itemId": "item:basic-knowledge"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 4
 						},
@@ -93,8 +84,8 @@
 								"itemId": "item:coin"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 4
 						}
@@ -110,8 +101,8 @@
 											{
 												"itemId": "item:advanced-knowledge",
 												"quantity": {
-													"type": "value",
-													"value": 3
+													"min": 3,
+													"max": 3
 												},
 												"rules": []
 											}
@@ -135,8 +126,8 @@
 								"itemId": "item:advanced-knowledge"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 3
+								"min": 3,
+								"max": 3
 							},
 							"capacity": 6
 						},
@@ -147,8 +138,8 @@
 								"itemId": "item:paper"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 3
+								"min": 3,
+								"max": 3
 							},
 							"capacity": 6
 						},
@@ -159,8 +150,8 @@
 								"itemId": "item:glass"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 2
+								"min": 2,
+								"max": 2
 							},
 							"capacity": 4
 						},
@@ -171,8 +162,8 @@
 								"itemId": "item:coin-stack"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 4
 						}
@@ -188,8 +179,8 @@
 											{
 												"itemId": "item:master-knowledge",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -213,8 +204,8 @@
 								"itemId": "item:advanced-knowledge"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 3
+								"min": 3,
+								"max": 3
 							},
 							"capacity": 6
 						},
@@ -225,8 +216,8 @@
 								"itemId": "item:paper"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 3
+								"min": 3,
+								"max": 3
 							},
 							"capacity": 6
 						},
@@ -237,8 +228,8 @@
 								"itemId": "item:glass"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 2
+								"min": 2,
+								"max": 2
 							},
 							"capacity": 4
 						},
@@ -249,8 +240,8 @@
 								"itemId": "item:coin-stack"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 4
 						},
@@ -261,8 +252,8 @@
 								"itemId": "item:morale-t4"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 4
 						}
@@ -278,8 +269,8 @@
 											{
 												"itemId": "item:master-knowledge",
 												"quantity": {
-													"type": "value",
-													"value": 2
+													"min": 2,
+													"max": 2
 												},
 												"rules": []
 											}
@@ -303,8 +294,8 @@
 								"itemId": "item:master-knowledge"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 4
 						}
@@ -320,8 +311,8 @@
 											{
 												"itemId": "item:blueprint-heroes-guild-t1",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -345,8 +336,8 @@
 								"itemId": "item:master-knowledge"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 4
 						}
@@ -362,8 +353,8 @@
 											{
 												"itemId": "item:blueprint-glazier-workshop-t1",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -387,8 +378,8 @@
 								"itemId": "item:master-knowledge"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 4
 						}
@@ -404,8 +395,8 @@
 											{
 												"itemId": "item:blueprint-quarry-t2",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -429,8 +420,8 @@
 								"itemId": "item:master-knowledge"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 4
 						}
@@ -446,8 +437,8 @@
 											{
 												"itemId": "item:blueprint-stonemason-t2",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -471,8 +462,8 @@
 								"itemId": "item:master-knowledge"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 4
 						}
@@ -488,8 +479,8 @@
 											{
 												"itemId": "item:blueprint-house-t4",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -513,8 +504,8 @@
 								"itemId": "item:master-knowledge"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 4
 						}
@@ -561,8 +552,8 @@
 											{
 												"itemId": "item:blueprint-house-of-engineers",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -586,8 +577,8 @@
 								"itemId": "item:master-knowledge"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 4
 						},
@@ -598,8 +589,8 @@
 								"itemId": "item:paper"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 2
+								"min": 2,
+								"max": 2
 							},
 							"capacity": 4
 						}
@@ -646,8 +637,8 @@
 											{
 												"itemId": "item:blueprint-cathedral",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -671,8 +662,8 @@
 								"itemId": "item:master-knowledge"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 4
 						}
@@ -719,8 +710,8 @@
 											{
 												"itemId": "item:blueprint-mage-lodge",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}

@@ -28,9 +28,9 @@ const config = GameConfigSchema.parse({
 	start: {
 		currentSpace: 0,
 	},
-	categories: {},
 	items: {
 		producer: {
+			uid: "producer",
 			id: "producer",
 			title: "Producer",
 			description: "Producer",
@@ -39,8 +39,6 @@ const config = GameConfigSchema.parse({
 					"asset:producer",
 				],
 			},
-			tags: [],
-			categoryId: "resource",
 			scope: "any",
 			maxStackSize: 10,
 			type: "producer",
@@ -77,7 +75,6 @@ const config = GameConfigSchema.parse({
 											{
 												itemId: "limited",
 												quantity: {
-													type: "range",
 													min: 1,
 													max: 5,
 												},
@@ -95,6 +92,7 @@ const config = GameConfigSchema.parse({
 			],
 		},
 		limited: {
+			uid: "limited",
 			id: "limited",
 			title: "Limited",
 			description: "Limited",
@@ -103,14 +101,13 @@ const config = GameConfigSchema.parse({
 					"asset:limited",
 				],
 			},
-			tags: [],
-			categoryId: "resource",
 			scope: "board",
 			maxStackSize: 10,
 			maxCount: 4,
 			type: "simple",
 		},
 		blocker: {
+			uid: "blocker",
 			id: "blocker",
 			title: "Blocker",
 			description: "Blocker",
@@ -119,8 +116,6 @@ const config = GameConfigSchema.parse({
 					"asset:blocker",
 				],
 			},
-			tags: [],
-			categoryId: "resource",
 			scope: "any",
 			maxStackSize: 10,
 			type: "simple",

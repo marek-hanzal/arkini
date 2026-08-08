@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:blueprint-armory-t1": {
+			"uid": "wid2a4shqrxhxpmthyp235fo",
 			"id": "item:blueprint-armory-t1",
 			"type": "blueprint",
 			"title": "Armory I Blueprint",
@@ -15,15 +16,6 @@
 					"producer-armory-t1"
 				]
 			},
-			"tags": [
-				"blueprint",
-				"building",
-				"craft-target",
-				"armory",
-				"equipment",
-				"era:IX"
-			],
-			"categoryId": "blueprint",
 			"scope": "any",
 			"maxStackSize": 1,
 			"line": {
@@ -40,8 +32,8 @@
 							"itemId": "item:construction-bundle"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 1
+							"min": 1,
+							"max": 1
 						},
 						"charges": {
 							"cost": 1,
@@ -55,8 +47,8 @@
 							"itemId": "item:guild-charter"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 1
+							"min": 1,
+							"max": 1
 						}
 					},
 					{
@@ -66,8 +58,8 @@
 							"itemId": "item:nails"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 2
+							"min": 2,
+							"max": 2
 						}
 					},
 					{
@@ -77,8 +69,8 @@
 							"itemId": "item:leather"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 2
+							"min": 2,
+							"max": 2
 						}
 					},
 					{
@@ -88,8 +80,8 @@
 							"itemId": "item:common-clothing"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 1
+							"min": 1,
+							"max": 1
 						}
 					},
 					{
@@ -99,8 +91,8 @@
 							"itemId": "item:iron-ingot"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 1
+							"min": 1,
+							"max": 1
 						}
 					}
 				],
@@ -151,8 +143,8 @@
 										{
 											"itemId": "producer:armory-t1",
 											"quantity": {
-												"type": "value",
-												"value": 1
+												"min": 1,
+												"max": 1
 											},
 											"placement": "drop",
 											"rules": []

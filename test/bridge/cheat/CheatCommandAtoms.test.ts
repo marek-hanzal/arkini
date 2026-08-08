@@ -29,11 +29,10 @@ const makeRegistry = () => {
 const createGame = (commandFx: Effect.Effect<unknown, unknown> = Effect.void): Game => ({
 	arkpack: {
 		packageId: "package:cheat-command",
-		contentHash: "content:cheat-command",
+		hash: "content:cheat-command",
 		gameId: "game:cheat-command",
 		title: "Cheat command game",
-		configVersion: "1.0",
-		compressedSize: 0,
+		game: "1.0",
 		trust: {
 			type: "external",
 			reason: "unsigned",

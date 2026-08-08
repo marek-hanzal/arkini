@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"producer:windmill-t1": {
+			"uid": "fna5bzx5xnyuwaf3qtjg5vid",
 			"id": "producer:windmill-t1",
 			"type": "producer",
 			"title": "Windmill I",
@@ -11,15 +12,6 @@
 					"producer-windmill-t1"
 				]
 			},
-			"tags": [
-				"producer",
-				"food",
-				"grain",
-				"flour",
-				"era:III",
-				"unique"
-			],
-			"categoryId": "building",
 			"scope": "any",
 			"maxCount": 1,
 			"maxStackSize": 1,
@@ -38,8 +30,8 @@
 								"itemId": "item:grain"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 2
+								"min": 2,
+								"max": 2
 							},
 							"capacity": 4
 						}
@@ -55,8 +47,8 @@
 											{
 												"itemId": "item:flour",
 												"quantity": {
-													"type": "value",
-													"value": 3
+													"min": 3,
+													"max": 3
 												},
 												"rules": []
 											}

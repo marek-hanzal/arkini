@@ -4,11 +4,10 @@ import { createInMemoryArkpackStorageFx } from "~test/support/arkpack/createInMe
 
 const descriptor = {
 	packageId: "a".repeat(64),
-	contentHash: "a".repeat(64),
+	hash: "a".repeat(64),
 	gameId: "game:test",
 	title: "Test",
-	configVersion: "1.0" as const,
-	compressedSize: 3,
+	game: "1.0" as const,
 	trust: {
 		type: "external",
 		reason: "unsigned",

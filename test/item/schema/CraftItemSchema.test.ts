@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import { CraftItemSchema } from "~/engine/item/schema/CraftItemSchema";
 
 const craft = {
+	uid: "item:craft",
 	id: "item:craft",
 	title: "Craft",
 	description: "One craft item.",
@@ -11,8 +12,6 @@ const craft = {
 			"asset:craft",
 		],
 	},
-	tags: [],
-	categoryId: "resource",
 	scope: "any",
 	maxStackSize: 10,
 	type: "craft",
@@ -32,8 +31,8 @@ const craft = {
 					itemId: "material",
 				},
 				quantity: {
-					type: "value",
-					value: 1,
+					min: 1,
+					max: 1,
 				},
 			},
 		],

@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:leather": {
+			"uid": "m936pos7oktzu8dfocu576v3",
 			"id": "item:leather",
 			"type": "simple",
 			"title": "Leather",
@@ -11,15 +12,6 @@
 					"item-leather"
 				]
 			},
-			"tags": [
-				"material",
-				"leather",
-				"animal",
-				"textile",
-				"era:V",
-				"tier-5-resource"
-			],
-			"categoryId": "material",
 			"scope": "any",
 			"maxStackSize": 50
 		}

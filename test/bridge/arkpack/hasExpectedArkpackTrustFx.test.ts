@@ -14,7 +14,7 @@ const external: ArkpackTrustSchema.Type = {
 };
 const invalid: ArkpackTrustSchema.Type = {
 	type: "invalid",
-	reason: "hash-mismatch",
+	reason: "invalid-signature",
 	keyId: "test-key",
 };
 

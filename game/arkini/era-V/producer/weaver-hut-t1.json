@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"producer:weaver-hut-t1": {
+			"uid": "vd5rw4hgbxqmhh90mhw332rd",
 			"id": "producer:weaver-hut-t1",
 			"type": "producer",
 			"title": "Weaver Hut I",
@@ -11,15 +12,6 @@
 					"producer-weaver-hut-t1"
 				]
 			},
-			"tags": [
-				"producer",
-				"building",
-				"cloth",
-				"textile",
-				"era:V",
-				"unique"
-			],
-			"categoryId": "building",
 			"scope": "any",
 			"maxCount": 1,
 			"maxStackSize": 1,
@@ -38,8 +30,8 @@
 								"itemId": "item:wool"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 2
+								"min": 2,
+								"max": 2
 							},
 							"capacity": 4
 						}
@@ -55,8 +47,8 @@
 											{
 												"itemId": "item:common-cloth",
 												"quantity": {
-													"type": "value",
-													"value": 3
+													"min": 3,
+													"max": 3
 												},
 												"rules": []
 											}

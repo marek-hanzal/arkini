@@ -12,7 +12,6 @@ import {
 import { gzipSync } from "node:zlib";
 
 const trustedKeys = {
-	formatVersion: 1 as const,
 	keys: [],
 };
 
@@ -41,10 +40,10 @@ describe("readArkpackFx", () => {
 		);
 
 		expect(first.descriptor).toMatchObject({
-			packageId: first.descriptor.contentHash,
+			packageId: first.descriptor.hash,
 			gameId: "game:bridge",
 			title: "Bridge game",
-			configVersion: "1.0",
+			game: "1.0",
 			source: "imported",
 		});
 		expect(first.descriptor.packageId).toMatch(/^[a-f0-9]{64}$/);
@@ -89,12 +88,12 @@ describe("readArkpackFx", () => {
 	it("rejects semantically invalid packages before persistence", async () => {
 		const invalid = {
 			...testArkpackConfig,
-			items: {
-				...testArkpackConfig.items,
-				water: {
-					...testArkpackConfig.items.water,
-					categoryId: "missing-category",
-				},
+			start: {
+				...testArkpackConfig.start,
+				board: testArkpackConfig.start.board.map((entry) => ({
+					...entry,
+					itemId: "missing",
+				})),
 			},
 		};
 		const encoded = Effect.runSync(

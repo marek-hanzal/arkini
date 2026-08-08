@@ -8,8 +8,8 @@ import { rollFx } from "~/engine/roll/fx/rollFx";
 const logDrop: DropSchema.Type = {
 	itemId: "item:log",
 	quantity: {
-		type: "value",
-		value: 1,
+		min: 1,
+		max: 1,
 	},
 	placement: "drop",
 	rules: [],
@@ -18,8 +18,8 @@ const logDrop: DropSchema.Type = {
 const stoneDrop: DropSchema.Type = {
 	itemId: "item:stone",
 	quantity: {
-		type: "value",
-		value: 1,
+		min: 1,
+		max: 1,
 	},
 	placement: "drop",
 	rules: [],
@@ -74,8 +74,8 @@ describe("rollFx", () => {
 				roll: {
 					type: "weight",
 					quantity: {
-						type: "value",
-						value: 2,
+						min: 2,
+						max: 2,
 					},
 					drop: [
 						{

@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:blueprint-market-t1": {
+			"uid": "c75u9r23gd46zf97ujlotsxo",
 			"id": "item:blueprint-market-t1",
 			"type": "blueprint",
 			"title": "Market Blueprint",
@@ -15,15 +16,6 @@
 					"producer-market-t1"
 				]
 			},
-			"tags": [
-				"blueprint",
-				"building",
-				"craft-target",
-				"market",
-				"trade",
-				"era:III"
-			],
-			"categoryId": "blueprint",
 			"scope": "any",
 			"maxStackSize": 1,
 			"line": {
@@ -40,8 +32,8 @@
 							"itemId": "item:plank"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 4
+							"min": 4,
+							"max": 4
 						},
 						"charges": {
 							"cost": 1,
@@ -55,8 +47,8 @@
 							"itemId": "item:stone-block"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 2
+							"min": 2,
+							"max": 2
 						}
 					},
 					{
@@ -66,8 +58,8 @@
 							"itemId": "item:bread"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 1
+							"min": 1,
+							"max": 1
 						}
 					},
 					{
@@ -77,8 +69,8 @@
 							"itemId": "item:sausage"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 1
+							"min": 1,
+							"max": 1
 						}
 					}
 				],
@@ -93,8 +85,8 @@
 										{
 											"itemId": "producer:market-t1",
 											"quantity": {
-												"type": "value",
-												"value": 1
+												"min": 1,
+												"max": 1
 											},
 											"placement": "drop",
 											"rules": []

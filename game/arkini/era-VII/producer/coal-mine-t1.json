@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"producer:coal-mine-t1": {
+			"uid": "d960xiwhnjizb8381c9nbc0q",
 			"id": "producer:coal-mine-t1",
 			"type": "producer",
 			"title": "Coal Mine I",
@@ -11,15 +12,6 @@
 					"producer-coal-mine-t1"
 				]
 			},
-			"tags": [
-				"producer",
-				"industry",
-				"mine",
-				"coal",
-				"era:VII",
-				"unique"
-			],
-			"categoryId": "building",
 			"scope": "any",
 			"maxCount": 1,
 			"maxStackSize": 1,
@@ -38,8 +30,8 @@
 								"itemId": "item:bread"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 2
+								"min": 2,
+								"max": 2
 							},
 							"capacity": 4
 						},
@@ -50,8 +42,8 @@
 								"itemId": "item:water"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 4
 						},
@@ -62,8 +54,8 @@
 								"itemId": "item:common-clothing"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 4
 						}
@@ -96,8 +88,8 @@
 											{
 												"itemId": "item:coal",
 												"quantity": {
-													"type": "value",
-													"value": 2
+													"min": 2,
+													"max": 2
 												},
 												"rules": []
 											}

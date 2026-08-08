@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"producer:tailor-workshop-t1": {
+			"uid": "tp9f5ogehey3e7n7l5my3od7",
 			"id": "producer:tailor-workshop-t1",
 			"type": "producer",
 			"title": "Tailor Workshop I",
@@ -11,15 +12,6 @@
 					"producer-tailor-workshop-t1"
 				]
 			},
-			"tags": [
-				"producer",
-				"building",
-				"clothing",
-				"textile",
-				"era:V",
-				"unique"
-			],
-			"categoryId": "building",
 			"scope": "any",
 			"maxCount": 1,
 			"maxStackSize": 1,
@@ -38,8 +30,8 @@
 								"itemId": "item:common-cloth"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 2
+								"min": 2,
+								"max": 2
 							},
 							"capacity": 4
 						},
@@ -50,8 +42,8 @@
 								"itemId": "item:leather"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 4
 						}
@@ -67,8 +59,8 @@
 											{
 												"itemId": "item:common-clothing",
 												"quantity": {
-													"type": "value",
-													"value": 2
+													"min": 2,
+													"max": 2
 												},
 												"rules": []
 											}
@@ -92,8 +84,8 @@
 								"itemId": "item:luxury-cloth"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 2
+								"min": 2,
+								"max": 2
 							},
 							"capacity": 4
 						},
@@ -104,8 +96,8 @@
 								"itemId": "item:leather"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 4
 						},
@@ -116,8 +108,8 @@
 								"itemId": "item:coin"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 8
 						}
@@ -133,8 +125,8 @@
 											{
 												"itemId": "item:luxury-clothing",
 												"quantity": {
-													"type": "value",
-													"value": 2
+													"min": 2,
+													"max": 2
 												},
 												"rules": []
 											}
@@ -158,8 +150,8 @@
 								"itemId": "item:luxury-cloth"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 2
+								"min": 2,
+								"max": 2
 							},
 							"capacity": 4
 						},
@@ -170,8 +162,8 @@
 								"itemId": "item:leather"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 4
 						},
@@ -182,8 +174,8 @@
 								"itemId": "item:coin"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 8
 						},
@@ -194,8 +186,8 @@
 								"itemId": "item:morale-t3"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 4
 						}
@@ -211,8 +203,8 @@
 											{
 												"itemId": "item:luxury-clothing",
 												"quantity": {
-													"type": "value",
-													"value": 3
+													"min": 3,
+													"max": 3
 												},
 												"rules": []
 											}

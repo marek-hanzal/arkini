@@ -62,7 +62,6 @@ describe("packDirectoryFx", () => {
 							board: [],
 							inventory: [],
 						},
-						categories: {},
 					}),
 				);
 				yield* fileSystem.writeFileString(
@@ -104,14 +103,11 @@ describe("packDirectoryFx", () => {
 		});
 		expect(packed.staleSignatureExists).toBe(false);
 		expect(packed.metadata).toEqual({
-			namespace: "arkini",
-			format: 1,
 			packageId: "arkini",
-			contentHash: packed.result.contentHash,
+			hash: packed.result.contentHash,
 			gameId: "arkini",
 			title: "Arkini",
-			configVersion: "1.0",
-			compressedSize: packed.result.bytes,
+			game: "1.0",
 		});
 		expect(packed.payload.resources).toEqual(
 			expect.arrayContaining([
@@ -159,7 +155,6 @@ describe("packDirectoryFx", () => {
 						resources: {
 							hero: "hero",
 						},
-						categories: {},
 						items: {},
 					}),
 				);

@@ -27,9 +27,9 @@ const config = GameConfigSchema.parse({
 	start: {
 		currentSpace: 0,
 	},
-	categories: {},
 	items: {
 		source: {
+			uid: "source",
 			id: "source",
 			title: "Source",
 			description: "A drop origin.",
@@ -38,8 +38,6 @@ const config = GameConfigSchema.parse({
 					"asset:source",
 				],
 			},
-			tags: [],
-			categoryId: "resource",
 			scope: "board",
 			maxStackSize: 1,
 			type: "simple",
@@ -96,8 +94,8 @@ describe("dropFx", () => {
 						itemId: "item:log",
 						placement: "random",
 						quantity: {
-							type: "value",
-							value: 3,
+							min: 3,
+							max: 3,
 						},
 						rules: [],
 					},
@@ -130,8 +128,8 @@ describe("dropFx", () => {
 						itemId: "item:log",
 						placement: "drop",
 						quantity: {
-							type: "value",
-							value: 1,
+							min: 1,
+							max: 1,
 						},
 						rules: [
 							{
@@ -153,8 +151,8 @@ describe("dropFx", () => {
 						itemId: "item:stone",
 						placement: "drop",
 						quantity: {
-							type: "value",
-							value: 1,
+							min: 1,
+							max: 1,
 						},
 						rules: [
 							{
@@ -198,8 +196,8 @@ describe("dropFx", () => {
 						itemId: "item:accepted",
 						placement: "drop",
 						quantity: {
-							type: "value",
-							value: 1,
+							min: 1,
+							max: 1,
 						},
 						rules: [
 							{
@@ -227,8 +225,8 @@ describe("dropFx", () => {
 						itemId: "item:rejected",
 						placement: "drop",
 						quantity: {
-							type: "value",
-							value: 1,
+							min: 1,
+							max: 1,
 						},
 						rules: [
 							{
@@ -282,7 +280,6 @@ describe("dropFx", () => {
 						itemId: "item:rejected",
 						placement: "drop",
 						quantity: {
-							type: "range",
 							min: 2,
 							max: 4,
 						},
@@ -306,7 +303,6 @@ describe("dropFx", () => {
 						itemId: "item:accepted",
 						placement: "random",
 						quantity: {
-							type: "range",
 							min: 2,
 							max: 4,
 						},

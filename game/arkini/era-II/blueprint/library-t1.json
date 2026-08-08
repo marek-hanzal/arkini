@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:blueprint-library-t1": {
+			"uid": "l7mcjt2wevkyj1utdf1o8fep",
 			"id": "item:blueprint-library-t1",
 			"type": "blueprint",
 			"title": "Library I Blueprint",
@@ -15,15 +16,6 @@
 					"producer-library-t1"
 				]
 			},
-			"tags": [
-				"blueprint",
-				"building",
-				"craft-target",
-				"library",
-				"knowledge",
-				"era:II"
-			],
-			"categoryId": "blueprint",
 			"scope": "any",
 			"maxStackSize": 1,
 			"line": {
@@ -40,8 +32,8 @@
 							"itemId": "item:log"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 2
+							"min": 2,
+							"max": 2
 						},
 						"charges": {
 							"cost": 1,
@@ -55,8 +47,8 @@
 							"itemId": "item:stone"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 2
+							"min": 2,
+							"max": 2
 						}
 					},
 					{
@@ -66,8 +58,8 @@
 							"itemId": "item:water"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 1
+							"min": 1,
+							"max": 1
 						}
 					}
 				],
@@ -82,8 +74,8 @@
 										{
 											"itemId": "producer:library-t1",
 											"quantity": {
-												"type": "value",
-												"value": 1
+												"min": 1,
+												"max": 1
 											},
 											"placement": "drop",
 											"rules": []

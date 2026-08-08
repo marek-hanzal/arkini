@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:blueprint-stonemason-t1": {
+			"uid": "u9usdnk6oznjoskhoqxldqeo",
 			"id": "item:blueprint-stonemason-t1",
 			"type": "blueprint",
 			"title": "Stonemason I Blueprint",
@@ -15,13 +16,6 @@
 					"producer-stonemason-t1"
 				]
 			},
-			"tags": [
-				"blueprint",
-				"building",
-				"craft-target",
-				"era:I"
-			],
-			"categoryId": "blueprint",
 			"scope": "any",
 			"maxStackSize": 1,
 			"line": {
@@ -38,8 +32,8 @@
 							"itemId": "item:log"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 1
+							"min": 1,
+							"max": 1
 						},
 						"charges": {
 							"cost": 1,
@@ -53,8 +47,8 @@
 							"itemId": "item:stone"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 2
+							"min": 2,
+							"max": 2
 						}
 					}
 				],
@@ -69,8 +63,8 @@
 										{
 											"itemId": "producer:stonemason-t1",
 											"quantity": {
-												"type": "value",
-												"value": 1
+												"min": 1,
+												"max": 1
 											},
 											"placement": "drop",
 											"rules": []

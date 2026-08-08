@@ -28,6 +28,7 @@ const createDisabledJobConfig = () => {
 			...base.items,
 			permit: {
 				...base.items.tool,
+				uid: "permit",
 				id: "permit",
 			},
 			forge: {

@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:topaz": {
+			"uid": "bqvh0a2il0py7kux8iedo969",
 			"id": "item:topaz",
 			"type": "simple",
 			"title": "Topaz",
@@ -11,13 +12,6 @@
 					"item-topaz"
 				]
 			},
-			"tags": [
-				"treasure",
-				"gem",
-				"topaz",
-				"era:IX"
-			],
-			"categoryId": "treasure",
 			"scope": "any",
 			"maxStackSize": 20
 		}

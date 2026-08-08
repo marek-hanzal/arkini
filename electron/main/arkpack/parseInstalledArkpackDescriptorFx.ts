@@ -29,11 +29,10 @@ export const parseInstalledArkpackDescriptorFx = Effect.fn("parseInstalledArkpac
 		yield* assertImportedArkpackPackageIdFx(descriptor.packageId ?? "");
 		if (
 			(expectedPackageId !== undefined && descriptor.packageId !== expectedPackageId) ||
-			descriptor.contentHash !== descriptor.packageId ||
+			descriptor.hash !== descriptor.packageId ||
 			typeof descriptor.gameId !== "string" ||
 			typeof descriptor.title !== "string" ||
-			typeof descriptor.configVersion !== "string" ||
-			typeof descriptor.compressedSize !== "number" ||
+			typeof descriptor.game !== "string" ||
 			trust === undefined ||
 			descriptor.source !== "imported"
 		) {

@@ -26,11 +26,9 @@ export const InputMaterialSchema = z
 			"Materials",
 		]).describe("Identifies this input as a directly delivered material item."),
 		/**
-		 * Item or tag matching strategy for materials accepted by this input.
+		 * Canonical item accepted by this input.
 		 */
-		selector: SelectorSchema.describe(
-			"The item or tag matching strategy for materials accepted by this input.",
-		),
+		selector: SelectorSchema.describe("The canonical item accepted by this input."),
 		/**
 		 * Whether this input is consumed or temporarily reserved by the line.
 		 *

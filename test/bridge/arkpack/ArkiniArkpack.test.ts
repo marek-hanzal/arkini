@@ -15,15 +15,14 @@ describe("ArkiniArkpack", () => {
 			packageId: "arkini",
 			gameId: "arkini",
 			title: "Arkini",
-			configVersion: "1.0",
+			game: "1.0",
 			trust: {
 				type: "official",
 				keyId: signature.keyId,
 			},
 			source: "built-in",
 		});
-		expect(ArkiniArkpack.descriptor.contentHash).toMatch(/^[a-f0-9]{64}$/);
-		expect(ArkiniArkpack.descriptor.compressedSize).toBeGreaterThan(0);
+		expect(ArkiniArkpack.descriptor.hash).toMatch(/^[a-f0-9]{64}$/);
 		expect(ArkiniArkpack.signatureUrl).not.toMatch(/^data:/);
 	});
 

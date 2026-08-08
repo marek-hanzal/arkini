@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:blueprint-cathedral": {
+			"uid": "npkksyfygaze47j3dattzff6",
 			"id": "item:blueprint-cathedral",
 			"type": "blueprint",
 			"title": "Cathedral Blueprint",
@@ -15,16 +16,6 @@
 					"producer-cathedral"
 				]
 			},
-			"tags": [
-				"blueprint",
-				"building",
-				"path",
-				"keystone",
-				"faith",
-				"cathedral",
-				"era:XI"
-			],
-			"categoryId": "blueprint",
 			"scope": "any",
 			"maxStackSize": 1,
 			"line": {
@@ -41,8 +32,8 @@
 							"itemId": "item:construction-bundle"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 1
+							"min": 1,
+							"max": 1
 						},
 						"charges": {
 							"cost": 1,
@@ -56,8 +47,8 @@
 							"itemId": "item:guild-charter"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 1
+							"min": 1,
+							"max": 1
 						}
 					},
 					{
@@ -67,8 +58,8 @@
 							"itemId": "item:treasure-chest"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 1
+							"min": 1,
+							"max": 1
 						}
 					},
 					{
@@ -78,8 +69,8 @@
 							"itemId": "item:marble-block"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 3
+							"min": 3,
+							"max": 3
 						}
 					},
 					{
@@ -89,8 +80,8 @@
 							"itemId": "item:stained-glass"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 3
+							"min": 3,
+							"max": 3
 						}
 					},
 					{
@@ -100,8 +91,8 @@
 							"itemId": "item:luxury-clothing"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 2
+							"min": 2,
+							"max": 2
 						}
 					},
 					{
@@ -111,8 +102,8 @@
 							"itemId": "item:coin-stack"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 3
+							"min": 3,
+							"max": 3
 						}
 					},
 					{
@@ -122,8 +113,8 @@
 							"itemId": "item:morale-t4"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 1
+							"min": 1,
+							"max": 1
 						}
 					},
 					{
@@ -133,8 +124,8 @@
 							"itemId": "item:morale-t3"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 1
+							"min": 1,
+							"max": 1
 						}
 					}
 				],
@@ -235,8 +226,8 @@
 										{
 											"itemId": "producer:cathedral",
 											"quantity": {
-												"type": "value",
-												"value": 1
+												"min": 1,
+												"max": 1
 											},
 											"placement": "drop",
 											"rules": []

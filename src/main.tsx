@@ -53,7 +53,6 @@ const router = RendererRuntime.runSync(
 		rendererRuntime: RendererRuntime,
 	}),
 );
-
 // Install the native handshake once at the process boundary, outside React ownership.
 RendererRuntime.runSync(
 	installRendererControlledCloseFx({

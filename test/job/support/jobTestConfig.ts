@@ -5,6 +5,7 @@ import { spawnItemFx } from "~/engine/runtime/write/spawnItemFx";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 
 const baseItem = ({ id, scope }: { id: string; scope: "any" | "board" }) => ({
+	uid: id,
 	id,
 	title: id,
 	description: id,
@@ -13,8 +14,6 @@ const baseItem = ({ id, scope }: { id: string; scope: "any" | "board" }) => ({
 			`asset:${id}`,
 		],
 	},
-	tags: [],
-	categoryId: "resource",
 	scope,
 	maxStackSize: 10,
 });
@@ -44,7 +43,6 @@ export const createJobTestConfig = (
 		start: {
 			currentSpace: 0,
 		},
-		categories: {},
 		items: {
 			forge: {
 				...baseItem({
@@ -68,8 +66,8 @@ export const createJobTestConfig = (
 									itemId: "water",
 								},
 								quantity: {
-									type: "value",
-									value: 3,
+									min: 3,
+									max: 3,
 								},
 								capacity: 3,
 								mode: "consume",
@@ -81,8 +79,8 @@ export const createJobTestConfig = (
 									itemId: "tool",
 								},
 								quantity: {
-									type: "value",
-									value: 1,
+									min: 1,
+									max: 1,
 								},
 								capacity: 1,
 								mode: "reserve",

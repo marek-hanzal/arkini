@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"producer:clay-pit": {
+			"uid": "h81o2faokhesse9gdcjeoazv",
 			"id": "producer:clay-pit",
 			"type": "producer",
 			"title": "Clay Pit",
@@ -11,16 +12,6 @@
 					"producer-clay-pit"
 				]
 			},
-			"tags": [
-				"building",
-				"producer",
-				"construction",
-				"clay",
-				"era:VIII",
-				"industry",
-				"unique"
-			],
-			"categoryId": "building",
 			"scope": "any",
 			"maxCount": 1,
 			"maxStackSize": 1,
@@ -39,8 +30,8 @@
 								"itemId": "item:water"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 4
 						}
@@ -73,8 +64,8 @@
 											{
 												"itemId": "item:clay",
 												"quantity": {
-													"type": "value",
-													"value": 2
+													"min": 2,
+													"max": 2
 												},
 												"rules": []
 											}
@@ -87,8 +78,8 @@
 											{
 												"itemId": "item:clay",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}

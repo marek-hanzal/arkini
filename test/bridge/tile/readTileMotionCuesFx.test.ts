@@ -53,9 +53,9 @@ const config = GameConfigSchema.parse({
 			},
 		],
 	},
-	categories: {},
 	items: {
 		water: {
+			uid: "water",
 			id: "water",
 			type: "simple",
 			title: "Water",
@@ -65,12 +65,11 @@ const config = GameConfigSchema.parse({
 					"asset:water",
 				],
 			},
-			tags: [],
-			categoryId: "resource",
 			scope: "any",
 			maxStackSize: 10,
 		},
 		inventory: {
+			uid: "inventory",
 			id: "inventory",
 			type: "inventory",
 			title: "Inventory",
@@ -80,8 +79,6 @@ const config = GameConfigSchema.parse({
 					"asset:inventory",
 				],
 			},
-			tags: [],
-			categoryId: "utility",
 		},
 	},
 });

@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:pickaxe": {
+			"uid": "ori9p6dhr8pg85grl2yfpsyj",
 			"id": "item:pickaxe",
 			"type": "simple",
 			"title": "Pickaxe",
@@ -11,16 +12,6 @@
 					"item-pickaxe"
 				]
 			},
-			"tags": [
-				"equipment",
-				"tool",
-				"mining",
-				"stone",
-				"blacksmith",
-				"single-use",
-				"era:IX"
-			],
-			"categoryId": "equipment",
 			"scope": "any",
 			"maxStackSize": 20,
 			"merge": [
@@ -41,7 +32,6 @@
 											{
 												"itemId": "item:stone",
 												"quantity": {
-													"type": "range",
 													"min": 1,
 													"max": 4
 												},

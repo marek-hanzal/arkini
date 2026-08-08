@@ -28,9 +28,9 @@ const config = GameConfigSchema.parse({
 	start: {
 		currentSpace: 0,
 	},
-	categories: {},
 	items: {
 		craft: {
+			uid: "craft",
 			id: "craft",
 			title: "Craft",
 			description: "A stackable craft.",
@@ -39,8 +39,6 @@ const config = GameConfigSchema.parse({
 					"asset:craft",
 				],
 			},
-			tags: [],
-			categoryId: "resource",
 			scope: "any",
 			maxStackSize: 10,
 			type: "craft",

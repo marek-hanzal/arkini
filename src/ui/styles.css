@@ -15,6 +15,11 @@
 	--color-accent-contrast: var(--ak-accent-contrast);
 	--color-info: var(--ak-info);
 	--color-info-contrast: var(--ak-info-contrast);
+	--color-secondary-subtle: var(--ak-secondary-subtle);
+	--color-secondary-hover: var(--ak-secondary-hover);
+	--color-secondary-selected: var(--ak-secondary-selected);
+	--color-secondary-border: var(--ak-secondary-border);
+	--color-secondary-foreground: var(--ak-secondary-foreground);
 	--color-success: var(--ak-success);
 	--color-warning: var(--ak-warning);
 	--color-danger: var(--ak-danger);
@@ -50,10 +55,28 @@
 	--ak-accent-contrast: light-dark(#fff9fc, #2a0a1d);
 	--ak-info: light-dark(#4b4da8, #8e90f8);
 	--ak-info-contrast: light-dark(#fff, #0c1030);
-	--ak-success: light-dark(#147864, #57d7b2);
+	--ak-success: light-dark(#75508c, #caa9df);
+	--ak-secondary-subtle: light-dark(#f6eef9, #241b2c);
+	--ak-secondary-hover: light-dark(#ead9f0, #392943);
+	--ak-secondary-selected: light-dark(#dcc0e6, #50365e);
+	--ak-secondary-border: light-dark(#ad82bd, #9d70b0);
+	--ak-secondary-foreground: light-dark(#60336f, #f0d7fa);
 	--ak-warning: light-dark(#985a12, #f1b45e);
 	--ak-danger: light-dark(#b72b63, #ff6c9f);
 	--ak-danger-contrast: light-dark(#fff9fc, #310914);
+	--ak-flow-item-blueprint-surface: light-dark(#f2e2ff, #342044);
+	--ak-flow-item-craft-surface: light-dark(#fff0cf, #3b2b17);
+	--ak-flow-item-deposit-surface: light-dark(#e1f3e7, #193326);
+	--ak-flow-item-inventory-surface: light-dark(#e4eaff, #202849);
+	--ak-flow-item-producer-surface: light-dark(#f9dfef, #412039);
+	--ak-flow-item-simple-surface: light-dark(#f1edf3, #29232d);
+	--ak-flow-item-stash-surface: light-dark(#dff4f2, #173635);
+	--ak-flow-item-temporary-surface: light-dark(#f9e1df, #422322);
+	--ak-flow-item-missing-surface: light-dark(#ffdce7, #481b2b);
+	--ak-flow-source-line-surface: light-dark(#e7e2ff, #292247);
+	--ak-flow-source-charges-surface: light-dark(#ffebce, #3c2916);
+	--ak-flow-source-merge-surface: light-dark(#dbf3e9, #17362b);
+	--ak-flow-source-expiry-surface: light-dark(#f9dfe8, #421e2d);
 	--ak-overlay: light-dark(#1a1124, #090611);
 	--ak-overlay-foreground: light-dark(#fff9ff, #fff9ff);
 
@@ -111,8 +134,8 @@
 	);
 
 	--ak-list-row-surface: light-dark(
-		color-mix(in srgb, var(--ak-surface) 92%, var(--ak-surface-raised)),
-		color-mix(in srgb, var(--ak-surface) 90%, var(--ak-surface-raised))
+		color-mix(in srgb, var(--ak-surface-raised) 72%, var(--ak-surface)),
+		color-mix(in srgb, var(--ak-surface-raised) 68%, var(--ak-surface))
 	);
 	--ak-list-row-interactive-surface: light-dark(
 		color-mix(in srgb, var(--ak-accent) 10%, var(--ak-surface-raised)),
@@ -170,6 +193,23 @@
 	background: var(--ak-canvas);
 }
 
+.ak-editor-page-header {
+	position: sticky;
+	top: 0;
+	z-index: 20;
+	border-bottom: 1px solid color-mix(in srgb, var(--ak-line-strong) 64%, transparent);
+	background: linear-gradient(
+		180deg,
+		color-mix(in srgb, var(--ak-surface) 94%, transparent),
+		color-mix(in srgb, var(--ak-surface-raised) 90%, transparent)
+	);
+	box-shadow:
+		inset 0 1px 0 color-mix(in srgb, white 38%, transparent),
+		0 12px 24px -24px var(--ak-overlay);
+	backdrop-filter: blur(18px) saturate(115%);
+	-webkit-backdrop-filter: blur(18px) saturate(115%);
+}
+
 :root[data-accent="rose"] {
 	--ak-accent: light-dark(#b9247d, #f05bb8);
 	--ak-accent-hover: light-dark(#9e1969, #ff7ccc);
@@ -217,6 +257,21 @@
 *::after {
 	box-sizing: border-box;
 	user-select: none;
+}
+
+.ak-editor-search-input::-webkit-search-cancel-button {
+	display: none;
+}
+
+/* A complete two-column fact row must not draw a separator below either cell. */
+.ak-item-info-facts > :nth-last-child(2):nth-child(odd) {
+	border-bottom-width: 0;
+}
+
+@media (max-width: 48rem) {
+	.ak-item-info-facts > :nth-last-child(2):nth-child(odd) {
+		border-bottom-width: 1px;
+	}
 }
 
 @media (forced-colors: none) {
@@ -281,17 +336,17 @@ body {
 	--ak-control-padding-inline: clamp(0.75rem, 3cqw, 1.25rem);
 	--ak-control-padding-block: clamp(0.375rem, 1.5cqh, 0.625rem);
 	--ak-control-font-size: clamp(0.8125rem, 2.4cqmin, 1rem);
-	--ak-compact-hero-width: min(74cqw, 40rem, 51cqh);
+	--ak-compact-hero-width: min(55.5cqw, 30rem, 38.25cqh);
 	--ak-full-hero-width: min(88cqw, 56rem, 87cqh);
 }
 
 [data-ui="LauncherSceneLayout"][data-layout="fixed-hero"] {
-	grid-template-rows: minmax(0, 2fr) minmax(0, 3fr);
+	grid-template-rows: minmax(0, 1fr) minmax(0, 2fr);
 }
 
 @container (max-height: 36rem) {
 	[data-ui="LauncherSceneLayout"] {
-		--ak-compact-hero-width: min(74cqw, 40rem, 44cqh);
+		--ak-compact-hero-width: min(55.5cqw, 30rem, 33cqh);
 	}
 
 	[data-ui="LauncherSceneLayout"][data-layout="fixed-hero"] {
@@ -310,6 +365,23 @@ select {
 	font: inherit;
 }
 
+.ak-editor-workspace-tab {
+	transition: none;
+}
+
+.ak-editor-workspace-tabs:has(.ak-editor-workspace-tab[data-transitioning])
+	.ak-editor-workspace-tab[aria-current="page"]:not([data-transitioning]) {
+	color: var(--ak-foreground);
+	background-color: transparent;
+	border-color: transparent;
+}
+
+.ak-editor-workspace-tabs .ak-editor-workspace-tab[data-transitioning] {
+	color: var(--ak-accent-contrast);
+	background-color: var(--ak-accent);
+	border-color: var(--ak-accent);
+}
+
 :where(:focus, :focus-visible) {
 	outline: none !important;
 }
@@ -326,7 +398,7 @@ select {
 .ak-list-row {
 	position: relative;
 	background-color: var(--ak-list-row-surface);
-	box-shadow: inset 0 0 0 1px transparent;
+	box-shadow: inset 0 0 0 1px var(--ak-line);
 	transition:
 		background-color var(--ak-list-row-transition-duration) var(--ak-list-row-transition-easing),
 		border-color var(--ak-list-row-transition-duration) var(--ak-list-row-transition-easing),
@@ -598,10 +670,15 @@ select {
 ::view-transition-group(arkini-panel-settings),
 ::view-transition-group(arkini-panel-about),
 ::view-transition-group(arkini-panel-arkpacks),
+::view-transition-group(arkini-panel-editor-welcome),
 ::view-transition-group(arkini-action-panel),
 ::view-transition-group(arkini-action-progress),
 ::view-transition-group(arkini-startup-content),
 ::view-transition-group(arkini-game-board),
+::view-transition-group(arkini-editor-shell),
+::view-transition-group(arkini-editor-navigation),
+::view-transition-group(arkini-editor-section-navigation),
+::view-transition-group(arkini-editor-content),
 ::view-transition-group(arkini-game-menu-backdrop),
 ::view-transition-group(arkini-game-menu-dialog) {
 	animation-duration: 520ms;
@@ -612,7 +689,8 @@ select {
 	z-index: 0;
 }
 
-::view-transition-group(arkini-game-board) {
+::view-transition-group(arkini-game-board),
+::view-transition-group(arkini-editor-shell) {
 	z-index: 10;
 }
 
@@ -630,11 +708,24 @@ select {
 ::view-transition-group(arkini-panel-settings),
 ::view-transition-group(arkini-panel-about),
 ::view-transition-group(arkini-panel-arkpacks),
+::view-transition-group(arkini-panel-editor-welcome),
 ::view-transition-group(arkini-action-panel),
 ::view-transition-group(arkini-action-progress),
 ::view-transition-group(arkini-startup-content) {
 	z-index: 40;
 	overflow: visible;
+}
+
+::view-transition-group(arkini-editor-navigation) {
+	z-index: 30;
+}
+
+::view-transition-group(arkini-editor-section-navigation) {
+	z-index: 25;
+}
+
+::view-transition-group(arkini-editor-content) {
+	z-index: 20;
 }
 
 ::view-transition-group(arkini-game-menu-backdrop) {
@@ -660,6 +751,8 @@ select {
 ::view-transition-new(arkini-panel-about),
 ::view-transition-old(arkini-panel-arkpacks),
 ::view-transition-new(arkini-panel-arkpacks),
+::view-transition-old(arkini-panel-editor-welcome),
+::view-transition-new(arkini-panel-editor-welcome),
 ::view-transition-old(arkini-action-panel),
 ::view-transition-new(arkini-action-panel),
 ::view-transition-old(arkini-action-progress),
@@ -668,6 +761,14 @@ select {
 ::view-transition-new(arkini-startup-content),
 ::view-transition-old(arkini-game-board),
 ::view-transition-new(arkini-game-board),
+::view-transition-old(arkini-editor-shell),
+::view-transition-new(arkini-editor-shell),
+::view-transition-old(arkini-editor-navigation),
+::view-transition-new(arkini-editor-navigation),
+::view-transition-old(arkini-editor-section-navigation),
+::view-transition-new(arkini-editor-section-navigation),
+::view-transition-old(arkini-editor-content),
+::view-transition-new(arkini-editor-content),
 ::view-transition-old(arkini-game-menu-backdrop),
 ::view-transition-new(arkini-game-menu-backdrop),
 ::view-transition-old(arkini-game-menu-dialog),
@@ -707,6 +808,7 @@ select {
 ::view-transition-old(arkini-panel-settings),
 ::view-transition-old(arkini-panel-about),
 ::view-transition-old(arkini-panel-arkpacks),
+::view-transition-old(arkini-panel-editor-welcome),
 ::view-transition-old(arkini-action-panel) {
 	animation: arkini-vt-surface-out 180ms cubic-bezier(0.4, 0, 1, 1) both;
 }
@@ -715,6 +817,7 @@ select {
 ::view-transition-new(arkini-panel-settings),
 ::view-transition-new(arkini-panel-about),
 ::view-transition-new(arkini-panel-arkpacks),
+::view-transition-new(arkini-panel-editor-welcome),
 ::view-transition-new(arkini-action-panel) {
 	animation: arkini-vt-surface-in 320ms 190ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
@@ -743,6 +846,61 @@ select {
 
 ::view-transition-new(arkini-game-board) {
 	animation: arkini-vt-board-in 360ms 190ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+::view-transition-old(arkini-editor-shell) {
+	animation: arkini-vt-board-out 240ms cubic-bezier(0.4, 0, 1, 1) both;
+}
+
+::view-transition-new(arkini-editor-shell) {
+	animation: arkini-vt-board-in 360ms 190ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+::view-transition-old(arkini-editor-navigation),
+::view-transition-old(arkini-editor-content) {
+	animation: arkini-vt-fade-out 150ms cubic-bezier(0.4, 0, 1, 1) both;
+}
+
+::view-transition-new(arkini-editor-navigation),
+::view-transition-new(arkini-editor-content) {
+	animation: arkini-vt-fade-in 260ms 150ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+:root:active-view-transition-type(editor-to-editor)::view-transition-old(arkini-editor-shell),
+:root:active-view-transition-type(editor-to-editor)::view-transition-old(arkini-editor-navigation) {
+	animation: none;
+	opacity: 1;
+}
+
+:root:active-view-transition-type(editor-to-editor)::view-transition-new(arkini-editor-shell),
+:root:active-view-transition-type(editor-to-editor)::view-transition-new(arkini-editor-navigation) {
+	animation: none;
+	opacity: 0;
+}
+
+/* Routed section chrome updates immediately; only the section body crossfades. */
+:root:active-view-transition-type(editor-to-editor)::view-transition-group(
+	arkini-editor-section-navigation
+),
+:root:active-view-transition-type(editor-to-editor)::view-transition-old(
+	arkini-editor-section-navigation
+),
+:root:active-view-transition-type(editor-to-editor)::view-transition-new(
+	arkini-editor-section-navigation
+) {
+	animation: none;
+}
+
+:root:active-view-transition-type(editor-to-editor)::view-transition-old(
+	arkini-editor-section-navigation
+) {
+	opacity: 0;
+}
+
+:root:active-view-transition-type(editor-to-editor)::view-transition-new(
+	arkini-editor-section-navigation
+) {
+	opacity: 1;
 }
 
 :root:active-view-transition-type(hero-to-board)::view-transition-old(arkini-launcher-backdrop) {

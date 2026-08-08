@@ -33,9 +33,9 @@ const configInput = {
 	start: {
 		currentSpace: 0,
 	},
-	categories: {},
 	items: {
 		water: {
+			uid: "water",
 			id: "water",
 			type: "simple",
 			title: "Water",
@@ -45,12 +45,11 @@ const configInput = {
 					"asset:water",
 				],
 			},
-			tags: [],
-			categoryId: "resource",
 			scope: "any",
 			maxStackSize: 10,
 		},
 		stone: {
+			uid: "stone",
 			id: "stone",
 			type: "simple",
 			title: "Stone",
@@ -60,12 +59,11 @@ const configInput = {
 					"asset:stone",
 				],
 			},
-			tags: [],
-			categoryId: "resource",
 			scope: "any",
 			maxStackSize: 10,
 		},
 		backpack: {
+			uid: "backpack",
 			id: "backpack",
 			type: "inventory",
 			title: "Backpack",
@@ -75,8 +73,6 @@ const configInput = {
 					"asset:backpack",
 				],
 			},
-			tags: [],
-			categoryId: "utility",
 		},
 	},
 } as const;
@@ -154,6 +150,7 @@ const replaceMergeConfig = GameConfigSchema.parse({
 		},
 		mud: {
 			...configInput.items.stone,
+			uid: "mud",
 			id: "mud",
 			title: "Mud",
 			description: "Mud",

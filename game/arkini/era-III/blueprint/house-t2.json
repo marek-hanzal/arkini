@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:blueprint-house-t2": {
+			"uid": "tgnofn1tytyib9q0w6ea5m3w",
 			"id": "item:blueprint-house-t2",
 			"type": "blueprint",
 			"title": "House II Blueprint",
@@ -15,15 +16,6 @@
 					"producer-house-t2"
 				]
 			},
-			"tags": [
-				"blueprint",
-				"building",
-				"house",
-				"housing",
-				"morale",
-				"era:III"
-			],
-			"categoryId": "blueprint",
 			"scope": "any",
 			"maxStackSize": 1,
 			"line": {
@@ -40,8 +32,8 @@
 							"itemId": "producer:house-t1"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 1
+							"min": 1,
+							"max": 1
 						},
 						"charges": {
 							"cost": 1,
@@ -55,8 +47,8 @@
 							"itemId": "item:plank"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 3
+							"min": 3,
+							"max": 3
 						}
 					},
 					{
@@ -66,8 +58,8 @@
 							"itemId": "item:stone-block"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 2
+							"min": 2,
+							"max": 2
 						}
 					},
 					{
@@ -77,8 +69,8 @@
 							"itemId": "item:bread"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 1
+							"min": 1,
+							"max": 1
 						}
 					},
 					{
@@ -88,8 +80,8 @@
 							"itemId": "item:coin"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 2
+							"min": 2,
+							"max": 2
 						}
 					},
 					{
@@ -99,8 +91,8 @@
 							"itemId": "item:morale-t1"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 1
+							"min": 1,
+							"max": 1
 						}
 					}
 				],
@@ -141,8 +133,8 @@
 										{
 											"itemId": "producer:house-t2",
 											"quantity": {
-												"type": "value",
-												"value": 1
+												"min": 1,
+												"max": 1
 											},
 											"placement": "drop",
 											"rules": []

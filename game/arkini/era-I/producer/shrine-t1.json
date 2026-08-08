@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"producer:shrine-t1": {
+			"uid": "gj2lgf3liprvpu390sbw7dhl",
 			"id": "producer:shrine-t1",
 			"type": "producer",
 			"title": "Wayside Shrine",
@@ -11,15 +12,6 @@
 					"producer-shrine-t1"
 				]
 			},
-			"tags": [
-				"building",
-				"producer",
-				"shrine",
-				"effect-source",
-				"unique",
-				"era:I"
-			],
-			"categoryId": "building",
 			"scope": "any",
 			"maxCount": 1,
 			"maxStackSize": 1,
@@ -38,8 +30,8 @@
 								"itemId": "item:water"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 4
 						},
@@ -50,8 +42,8 @@
 								"itemId": "item:stone"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 4
 						}
@@ -66,8 +58,8 @@
 											{
 												"itemId": "item:effect:minor-haste",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -92,8 +84,8 @@
 								"itemId": "item:log"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 4
 						},
@@ -104,8 +96,8 @@
 								"itemId": "item:stone"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 4
 						},
@@ -116,8 +108,8 @@
 								"itemId": "item:water"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 4
 						}
@@ -132,8 +124,8 @@
 											{
 												"itemId": "item:effect:bountiful-offering",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}

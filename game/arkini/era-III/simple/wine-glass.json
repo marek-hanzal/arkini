@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:wine-glass": {
+			"uid": "omp8cdbs2g7xvw94qk9xgui8",
 			"id": "item:wine-glass",
 			"type": "simple",
 			"title": "Wine Glass",
@@ -11,13 +12,6 @@
 					"item-wine-glass"
 				]
 			},
-			"tags": [
-				"food",
-				"wine",
-				"era:III",
-				"tier-4-resource"
-			],
-			"categoryId": "food",
 			"scope": "any",
 			"maxStackSize": 50
 		}

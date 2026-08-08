@@ -112,11 +112,10 @@ describe("ArkpackSelector", () => {
 			arkpacks: [
 				{
 					packageId: "package:built-in",
-					contentHash: "a".repeat(64),
+					hash: "a".repeat(64),
 					gameId: "arkini",
 					title: "Arkini",
-					configVersion: "1",
-					compressedSize: 1,
+					game: "1",
 					trust: {
 						type: "official",
 						keyId: "test-official",
@@ -125,11 +124,10 @@ describe("ArkpackSelector", () => {
 				},
 				{
 					packageId: "package:local",
-					contentHash: "b".repeat(64),
+					hash: "b".repeat(64),
 					gameId: "local",
 					title: "Local package",
-					configVersion: "1",
-					compressedSize: 1,
+					game: "1",
 					trust: {
 						type: "external",
 						reason: "unsigned",
@@ -140,9 +138,11 @@ describe("ArkpackSelector", () => {
 			],
 		};
 		const catalog: ArkpackCatalog = {
+			awaitIdleFx: Effect.void,
 			state: Effect.runSync(SubscriptionRef.make<ArkpackCatalog.State>(catalogState)),
 			refreshFx: Effect.void,
 			importFileFx: () => Effect.die("unused"),
+			installFx: () => Effect.die("unused"),
 			removeFx: () => Effect.die("unused"),
 		};
 		const registry = AtomRegistry.make({
@@ -226,7 +226,8 @@ describe("ArkpackSelector", () => {
 		expect(layout?.lastElementChild?.tagName).toBe("FOOTER");
 		expect(layout?.lastElementChild?.className).toContain("justify-center");
 		const returnButton = layout?.lastElementChild?.querySelector("button");
-		expect(returnButton?.textContent).toBe("Return to main menu");
+		expect(returnButton?.textContent).toBe("Back");
+		expect(returnButton?.querySelector('[class*="icon-[lucide--arrow-left]"]')).not.toBeNull();
 		expect(returnButton?.className).toContain("bg-accent");
 
 		await act(async () => returnButton?.click());
@@ -247,11 +248,10 @@ describe("ArkpackSelector", () => {
 			arkpacks: [
 				{
 					packageId: "package:local",
-					contentHash: "b".repeat(64),
+					hash: "b".repeat(64),
 					gameId: "local",
 					title: "Local package",
-					configVersion: "1",
-					compressedSize: 1,
+					game: "1",
 					trust: {
 						type: "external",
 						reason: "unsigned",
@@ -262,9 +262,11 @@ describe("ArkpackSelector", () => {
 			],
 		};
 		const catalog: ArkpackCatalog = {
+			awaitIdleFx: Effect.void,
 			state: Effect.runSync(SubscriptionRef.make<ArkpackCatalog.State>(catalogState)),
 			refreshFx: Effect.void,
 			importFileFx,
+			installFx: () => Effect.die("unused"),
 			removeFx,
 		};
 		const { container, router } = await renderSelector(catalog);
@@ -332,11 +334,10 @@ describe("ArkpackSelector", () => {
 		let finishImport!: (arkpack: ArkpackDescriptor) => void;
 		const imported: ArkpackDescriptor = {
 			packageId: "package:imported",
-			contentHash: "c".repeat(64),
+			hash: "c".repeat(64),
 			gameId: "imported",
 			title: "Imported package",
-			configVersion: "1",
-			compressedSize: 1,
+			game: "1",
 			trust: {
 				type: "external",
 				reason: "unsigned",
@@ -356,9 +357,11 @@ describe("ArkpackSelector", () => {
 			],
 		};
 		const catalog: ArkpackCatalog = {
+			awaitIdleFx: Effect.void,
 			state: Effect.runSync(SubscriptionRef.make<ArkpackCatalog.State>(catalogState)),
 			refreshFx: Effect.void,
 			importFileFx,
+			installFx: () => Effect.die("unused"),
 			removeFx,
 		};
 		const { container, router } = await renderSelector(catalog);
@@ -431,11 +434,10 @@ describe("ArkpackSelector", () => {
 			arkpacks: [
 				{
 					packageId: "package:local",
-					contentHash: "b".repeat(64),
+					hash: "b".repeat(64),
 					gameId: "local",
 					title: "Local package",
-					configVersion: "1",
-					compressedSize: 1,
+					game: "1",
 					trust: {
 						type: "external",
 						reason: "unsigned",
@@ -446,9 +448,11 @@ describe("ArkpackSelector", () => {
 			],
 		};
 		const catalog: ArkpackCatalog = {
+			awaitIdleFx: Effect.void,
 			state: Effect.runSync(SubscriptionRef.make<ArkpackCatalog.State>(catalogState)),
 			refreshFx: Effect.void,
 			importFileFx: () => Effect.die("Unexpected import."),
+			installFx: () => Effect.die("unused"),
 			removeFx,
 		};
 		const { container } = await renderSelector(catalog);
@@ -478,11 +482,10 @@ describe("ArkpackSelector", () => {
 	it("deduplicates import and releases it after rejected destination navigation", async () => {
 		const imported: ArkpackDescriptor = {
 			packageId: "package:imported",
-			contentHash: "c".repeat(64),
+			hash: "c".repeat(64),
 			gameId: "imported",
 			title: "Imported package",
-			configVersion: "1",
-			compressedSize: 1,
+			game: "1",
 			trust: {
 				type: "external",
 				reason: "unsigned",
@@ -498,9 +501,11 @@ describe("ArkpackSelector", () => {
 			],
 		};
 		const catalog: ArkpackCatalog = {
+			awaitIdleFx: Effect.void,
 			state: Effect.runSync(SubscriptionRef.make<ArkpackCatalog.State>(catalogState)),
 			refreshFx: Effect.void,
 			importFileFx,
+			installFx: () => Effect.die("unused"),
 			removeFx: () => Effect.die("Unexpected removal."),
 		};
 		const { container, router } = await renderSelector(catalog);

@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:milk": {
+			"uid": "l9supm5zubu6wyq5yiqtoh8c",
 			"id": "item:milk",
 			"type": "simple",
 			"title": "Milk",
@@ -11,13 +12,6 @@
 					"item-milk"
 				]
 			},
-			"tags": [
-				"food",
-				"dairy",
-				"era:II",
-				"tier-2-resource"
-			],
-			"categoryId": "food",
 			"scope": "any",
 			"maxStackSize": 50
 		}

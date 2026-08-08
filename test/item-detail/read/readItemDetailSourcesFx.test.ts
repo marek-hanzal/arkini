@@ -15,6 +15,7 @@ vi.mock("~/engine/item-detail/read/readItemDetailLinesFx", () => ({
 }));
 
 const item = (id: string) => ({
+	uid: id,
 	id,
 	type: "simple" as const,
 	title: id,
@@ -24,8 +25,6 @@ const item = (id: string) => ({
 			`asset:${id}`,
 		],
 	},
-	tags: [],
-	categoryId: "resource",
 	scope: "any" as const,
 	maxStackSize: 10,
 });
@@ -64,8 +63,8 @@ const line = ({
 									{
 										itemId: "target",
 										quantity: {
-											type: "value" as const,
-											value: 2,
+											min: 2,
+											max: 2,
 										},
 										rules: [],
 									},
@@ -78,7 +77,6 @@ const line = ({
 									{
 										itemId: "target",
 										quantity: {
-											type: "range" as const,
 											min: 1,
 											max: 4,
 										},
@@ -97,8 +95,8 @@ const line = ({
 									{
 										itemId: "byproduct",
 										quantity: {
-											type: "value" as const,
-											value: 1,
+											min: 1,
+											max: 1,
 										},
 										rules: [],
 									},
@@ -116,8 +114,8 @@ const line = ({
 									{
 										itemId: "byproduct",
 										quantity: {
-											type: "value" as const,
-											value: 1,
+											min: 1,
+											max: 1,
 										},
 										rules: [],
 									},
@@ -169,7 +167,6 @@ const config = GameConfigSchema.parse({
 	start: {
 		currentSpace: 0,
 	},
-	categories: {},
 	items: {
 		target: item("target"),
 		byproduct: item("byproduct"),

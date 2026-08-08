@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:blueprint-vegetable-garden-t1": {
+			"uid": "y2jjgcbx4kziztbx47k53chs",
 			"id": "item:blueprint-vegetable-garden-t1",
 			"type": "blueprint",
 			"title": "Vegetable Garden I Blueprint",
@@ -15,13 +16,6 @@
 					"producer-vegetable-garden-t1"
 				]
 			},
-			"tags": [
-				"blueprint",
-				"building",
-				"craft-target",
-				"era:II"
-			],
-			"categoryId": "blueprint",
 			"scope": "any",
 			"maxStackSize": 1,
 			"line": {
@@ -38,8 +32,8 @@
 							"itemId": "item:plank"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 1
+							"min": 1,
+							"max": 1
 						},
 						"charges": {
 							"cost": 1,
@@ -53,8 +47,8 @@
 							"itemId": "item:water"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 2
+							"min": 2,
+							"max": 2
 						}
 					}
 				],
@@ -69,8 +63,8 @@
 										{
 											"itemId": "producer:vegetable-garden-t1",
 											"quantity": {
-												"type": "value",
-												"value": 1
+												"min": 1,
+												"max": 1
 											},
 											"placement": "drop",
 											"rules": []

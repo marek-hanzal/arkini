@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import { TemporaryItemSchema } from "~/engine/item/schema/TemporaryItemSchema";
 
 const item = {
+	uid: "item:effect:minor-haste",
 	id: "item:effect:minor-haste",
 	type: "temporary",
 	title: "Minor Haste",
@@ -12,11 +13,6 @@ const item = {
 			"asset:item:effect:minor-haste",
 		],
 	},
-	tags: [
-		"effect",
-		"buff",
-	],
-	categoryId: "utility",
 	durationMs: 300_000,
 };
 
@@ -67,8 +63,8 @@ describe("TemporaryItemSchema", () => {
 										{
 											itemId: "item:ash",
 											quantity: {
-												type: "value",
-												value: 1,
+												min: 1,
+												max: 1,
 											},
 											rules: [],
 										},

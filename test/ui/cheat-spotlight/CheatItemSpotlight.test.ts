@@ -38,18 +38,12 @@ vi.mock("~/bridge/cheat/useCheatItemCatalog", () => ({
 		{
 			itemId: "item:alpha",
 			title: "Alpha",
-			categoryId: "resource",
-			tags: [],
 			sourceResourceId: "alpha",
 			sourceUrl: "blob:alpha",
 		},
 		{
 			itemId: "item:beta",
 			title: "Beta",
-			categoryId: "resource",
-			tags: [
-				"timber",
-			],
 			sourceResourceId: "beta",
 			sourceUrl: "blob:beta",
 		},
@@ -203,7 +197,7 @@ describe("CheatItemSpotlight", () => {
 		);
 		expect(selectedOption?.className).toContain("ak-spotlight-option");
 		expect(selectedOption?.className).not.toContain("ak-list-row");
-		expect(selectedOption?.querySelectorAll(".ak-spotlight-option-secondary")).toHaveLength(2);
+		expect(selectedOption?.querySelectorAll(".ak-spotlight-option-secondary")).toHaveLength(1);
 		const options = Array.from(container.querySelectorAll<HTMLButtonElement>("button"));
 		const lastOption = options.at(-1);
 		if (lastOption === undefined) throw new Error("Expected Spotlight options.");
@@ -486,7 +480,7 @@ describe("CheatItemSpotlight", () => {
 		const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")?.set;
 		if (setter === undefined) throw new Error("Expected native input setter.");
 		await act(async () => {
-			setter.call(input, "timber");
+			setter.call(input, "item:beta");
 			input.dispatchEvent(
 				new Event("input", {
 					bubbles: true,

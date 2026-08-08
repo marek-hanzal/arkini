@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:gold-ore": {
+			"uid": "gnezjbsfks6iikvfa7oauyzo",
 			"id": "item:gold-ore",
 			"type": "simple",
 			"title": "Gold Ore Cart",
@@ -11,16 +12,6 @@
 					"item-gold-ore"
 				]
 			},
-			"tags": [
-				"material",
-				"industry",
-				"ore",
-				"gold",
-				"era:VII",
-				"master",
-				"tier-7-resource"
-			],
-			"categoryId": "material",
 			"scope": "any",
 			"maxStackSize": 20
 		}

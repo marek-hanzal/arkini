@@ -37,7 +37,7 @@ export const toDiagnosticValue = (
 	if (value instanceof Error) {
 		const error: Record<string, DiagnosticValue> = {
 			name: value.name,
-			message: value.message,
+			message: value.message.slice(0, 8_192),
 			...(value.stack === undefined
 				? {}
 				: {

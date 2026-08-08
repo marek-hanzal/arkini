@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:key-t2": {
+			"uid": "xtzdd8b4j6cg4hdsxt07hi1h",
 			"id": "item:key-t2",
 			"type": "simple",
 			"title": "Key II",
@@ -11,13 +12,6 @@
 					"item-key-t2"
 				]
 			},
-			"tags": [
-				"key",
-				"goldsmith",
-				"gem",
-				"era:IX"
-			],
-			"categoryId": "treasure",
 			"scope": "any",
 			"maxStackSize": 20
 		}

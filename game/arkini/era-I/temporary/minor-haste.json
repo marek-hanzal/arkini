@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:effect:minor-haste": {
+			"uid": "ic9cvuxqozhilgpqqin6wduf",
 			"id": "item:effect:minor-haste",
 			"type": "temporary",
 			"title": "Minor Haste",
@@ -11,14 +12,6 @@
 					"producer-shrine-t1"
 				]
 			},
-			"tags": [
-				"effect",
-				"buff",
-				"shrine",
-				"haste",
-				"era:I"
-			],
-			"categoryId": "utility",
 			"durationMs": 300000
 		}
 	}

@@ -4,7 +4,6 @@ import { z } from "zod";
 export const DiagnosticRecordEntityEnumSchema = z
 	.enum({
 		Item: "item",
-		Category: "category",
 	})
 	.meta({
 		id: "DiagnosticRecordEntityEnumSchema",

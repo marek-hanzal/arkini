@@ -1,6 +1,6 @@
 import { ArkpackCatalogList } from "~/ui/arkpack/ArkpackCatalogList";
 import { useArkpackSelectorActions } from "~/ui/arkpack/useArkpackSelectorActions";
-import { PrimaryButton } from "~/ui/button/Button";
+import { BackButton } from "~/ui/button/BackButton";
 
 /** Selects a bundled or locally imported game package without uploading it anywhere. */
 export const ArkpackSelector = () => {
@@ -56,13 +56,13 @@ export const ArkpackSelector = () => {
 			</section>
 
 			<footer className="flex justify-center pb-[env(safe-area-inset-bottom)]">
-				<PrimaryButton
+				<BackButton
 					cursorIntent={blocked ? "progress" : undefined}
 					disabled={blocked}
 					onClick={actions.requestMainMenu}
 				>
-					{actions.exitPending ? "Returning…" : "Return to main menu"}
-				</PrimaryButton>
+					{actions.exitPending ? "Returning…" : "Back"}
+				</BackButton>
 			</footer>
 		</div>
 	);

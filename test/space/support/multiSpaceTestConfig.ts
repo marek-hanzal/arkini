@@ -9,6 +9,7 @@ const baseItem = ({
 	maxStackSize?: number;
 	scope?: "any" | "board";
 }) => ({
+	uid: id,
 	id,
 	title: id,
 	description: id,
@@ -17,8 +18,6 @@ const baseItem = ({
 			`asset:${id}`,
 		],
 	},
-	tags: [],
-	categoryId: "test",
 	scope,
 	maxStackSize,
 });
@@ -33,8 +32,8 @@ const guaranteedOutput = (itemId: string) => ({
 						{
 							itemId,
 							quantity: {
-								type: "value" as const,
-								value: 1,
+								min: 1,
+								max: 1,
 							},
 							placement: "drop" as const,
 							rules: [],
@@ -66,7 +65,6 @@ export const multiSpaceTestConfig = GameConfigSchema.parse({
 	start: {
 		currentSpace: 0,
 	},
-	categories: {},
 	items: {
 		origin: {
 			...baseItem({
@@ -143,8 +141,8 @@ export const multiSpaceTestConfig = GameConfigSchema.parse({
 								itemId: "log",
 							},
 							quantity: {
-								type: "value",
-								value: 1,
+								min: 1,
+								max: 1,
 							},
 							capacity: 1,
 							mode: "consume",

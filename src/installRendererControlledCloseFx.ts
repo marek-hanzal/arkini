@@ -1,5 +1,8 @@
 import { Effect, Exit, Option } from "effect";
+import * as Atom from "effect/unstable/reactivity/Atom";
 
+import { ArkpackCatalogOwnerAtom } from "~/bridge/arkpack/ArkpackCatalogOwnerAtom";
+import { EditorProjectRepository } from "~/bridge/editor/EditorProjectRepository";
 import { claimGameEngineResourceForCloseFx } from "~/bridge/game/claimGameEngineResourceForCloseFx";
 import { readExactCauseFailure } from "~/bridge/game/readExactCauseFailure";
 import type { ArkiniRouter } from "~/createArkiniRouterFx";
@@ -41,7 +44,20 @@ export const installRendererControlledCloseFx = Effect.fn("installRendererContro
 					throw Option.isSome(failure) ? failure.value : exit.cause;
 				}
 				const resource = exit.value;
-				if (resource === null) return;
+				if (resource === null) {
+					await rendererRuntime.runPromise(
+						Effect.flatMap(
+							EditorProjectRepository,
+							(repository) => repository.awaitIdleFx,
+						),
+					);
+					const catalog = await rendererRuntime.runPromise(
+						Atom.get(ArkpackCatalogOwnerAtom),
+					);
+					if (catalog !== undefined)
+						await rendererRuntime.runPromise(catalog.awaitIdleFx);
+					return;
+				}
 				exitPresentationRequired = true;
 				// Route ownership keeps finalization identical for UI-requested and native close.
 				await router.navigate({

@@ -30,8 +30,8 @@ describe("OutputResultSchema", () => {
 						itemId: "item:log",
 						placement: "drop",
 						quantity: {
-							type: "value",
-							value: 2,
+							min: 2,
+							max: 2,
 						},
 					},
 				],

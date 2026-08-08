@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:blueprint-quarry-t2": {
+			"uid": "czpd8igowswg2cs5eimyx28r",
 			"id": "item:blueprint-quarry-t2",
 			"type": "blueprint",
 			"title": "Quarry Blueprint",
@@ -15,17 +16,6 @@
 					"producer-quarry-t2"
 				]
 			},
-			"tags": [
-				"blueprint",
-				"building",
-				"craft-target",
-				"stone",
-				"marble",
-				"luxury",
-				"prestige",
-				"era:X"
-			],
-			"categoryId": "blueprint",
 			"scope": "any",
 			"maxStackSize": 1,
 			"line": {
@@ -42,8 +32,8 @@
 							"itemId": "producer:quarry-t1"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 1
+							"min": 1,
+							"max": 1
 						},
 						"charges": {
 							"cost": 1,
@@ -57,8 +47,8 @@
 							"itemId": "item:construction-bundle"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 1
+							"min": 1,
+							"max": 1
 						}
 					},
 					{
@@ -68,8 +58,8 @@
 							"itemId": "item:guild-charter"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 1
+							"min": 1,
+							"max": 1
 						}
 					},
 					{
@@ -79,8 +69,8 @@
 							"itemId": "item:iron-ingot"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 1
+							"min": 1,
+							"max": 1
 						}
 					},
 					{
@@ -90,8 +80,8 @@
 							"itemId": "item:coin-stack"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 1
+							"min": 1,
+							"max": 1
 						}
 					}
 				],
@@ -132,8 +122,8 @@
 										{
 											"itemId": "producer:quarry-t2",
 											"quantity": {
-												"type": "value",
-												"value": 1
+												"min": 1,
+												"max": 1
 											},
 											"placement": "drop",
 											"rules": []

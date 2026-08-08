@@ -6,8 +6,9 @@ import { OutputSchema } from "~/engine/output/schema/OutputSchema";
 import type { InputSchema } from "~/engine/input/schema/InputSchema";
 import type { StartSchema } from "~/engine/start/schema/StartSchema";
 
-export const createSimpleItem = (id: string, tags: string[] = []) =>
+export const createSimpleItem = (id: string) =>
 	SimpleItemSchema.parse({
+		uid: id,
 		id,
 		title: id,
 		description: id,
@@ -16,8 +17,6 @@ export const createSimpleItem = (id: string, tags: string[] = []) =>
 				`asset:${id}`,
 			],
 		},
-		tags,
-		categoryId: "category:test",
 		scope: "any",
 		maxStackSize: 10,
 		type: "simple",
@@ -86,8 +85,8 @@ export const createOutput = (
 						drop: drops.map(({ itemId, placement = "drop" }) => ({
 							itemId,
 							quantity: {
-								type: "value",
-								value: 1,
+								min: 1,
+								max: 1,
 							},
 							placement,
 							rules: [],
@@ -133,12 +132,6 @@ export const createRootSource = ({
 				},
 			},
 			start,
-			categories: {
-				"category:test": {
-					id: "category:test",
-					title: "Test",
-				},
-			},
 			items,
 		},
 	});

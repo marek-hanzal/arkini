@@ -1,6 +1,7 @@
 import { Effect, Layer, ManagedRuntime } from "effect";
 
 import { acquireGameEngineResourceFx } from "~/bridge/game/acquireGameEngineResourceFx";
+import { EditorProjectRepositoryLayer } from "~/bridge/editor/EditorProjectRepositoryLayer";
 import { GameEngineResourceLayer } from "~/bridge/game/GameEngineResourceLayer";
 import { RendererAtomRegistryLayer } from "~/bridge/reactivity/RendererAtomRegistry";
 import type { GameSaveStorage } from "~/bridge/save/GameSaveStorage";
@@ -15,6 +16,7 @@ import { deleteGameSaveFx } from "~/bridge/save/deleteGameSaveFx";
 export const RendererRuntime = ManagedRuntime.make(
 	Layer.mergeAll(
 		RendererAtomRegistryLayer,
+		EditorProjectRepositoryLayer(),
 		GameEngineResourceLayer({
 			clearSaveFx: Effect.fn("RendererRuntime.clearSaveFx")((key: GameSaveStorage.Key) =>
 				deleteGameSaveFx({

@@ -1,10 +1,7 @@
 {
-	"namespace": "arkini",
-	"format": 1,
 	"packageId": "arkini",
-	"contentHash": "2d5dad7a25ade35a02326f99823f17e18b771eabfab9ccd08107d0d774913891",
+	"hash": "514ee036b82396df7eb7fe1e1537583e483630f2e51ccf296f24d9ba5c89af15",
 	"gameId": "arkini",
 	"title": "Arkini",
-	"configVersion": "1.0",
-	"compressedSize": 7879427
+	"game": "1.0"
 }

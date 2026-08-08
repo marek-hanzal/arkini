@@ -8,6 +8,7 @@ import type { BoardLocationSchema } from "~/engine/location/schema/BoardLocation
 import { lineRuleDisableFx } from "./lineRuleDisableFx";
 import { lineRuleEnableFx } from "./lineRuleEnableFx";
 import { lineRuleHideFx } from "./lineRuleHideFx";
+import { lineRuleRuntimeAdjustFx } from "./lineRuleRuntimeAdjustFx";
 import { lineRuleRuntimeMultiplierFx } from "./lineRuleRuntimeMultiplierFx";
 import { lineRuleShowFx } from "./lineRuleShowFx";
 
@@ -62,6 +63,17 @@ export const lineRuleFx = Effect.fn("lineRuleFx")(function* ({ origin, rule }: l
 			},
 			(rule) => {
 				return lineRuleDisableFx({
+					origin,
+					rule,
+				});
+			},
+		)
+		.with(
+			{
+				type: RuleEnumSchema.enum.RuntimeAdjust,
+			},
+			(rule) => {
+				return lineRuleRuntimeAdjustFx({
 					origin,
 					rule,
 				});

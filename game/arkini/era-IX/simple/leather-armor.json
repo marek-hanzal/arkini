@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:leather-armor": {
+			"uid": "wfkw70aj08m3fij8epwp7q91",
 			"id": "item:leather-armor",
 			"type": "simple",
 			"title": "Leather Armor",
@@ -11,14 +12,6 @@
 					"item-leather-armor"
 				]
 			},
-			"tags": [
-				"equipment",
-				"armor",
-				"armory",
-				"hero",
-				"era:IX"
-			],
-			"categoryId": "equipment",
 			"scope": "any",
 			"maxStackSize": 1
 		}

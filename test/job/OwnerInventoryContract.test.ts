@@ -27,6 +27,7 @@ const createInventoryOpenerJobConfig = () => {
 		items: {
 			...base.items,
 			backpack: {
+				uid: "backpack",
 				id: "backpack",
 				type: "inventory",
 				title: "Backpack",
@@ -36,8 +37,6 @@ const createInventoryOpenerJobConfig = () => {
 						"asset:backpack",
 					],
 				},
-				tags: [],
-				categoryId: "utility",
 			},
 		},
 	});

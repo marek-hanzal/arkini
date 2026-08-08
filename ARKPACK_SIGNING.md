@@ -13,14 +13,11 @@ example.game.arkpack
 example.game.arkpack.sig
 ```
 
-The strict version-one JSON sidecar is:
+The strict JSON sidecar is below. Ed25519 is the only supported signing algorithm, so repeating an algorithm or independent format marker in every sidecar would carry no information. Its contract ships with the game version that reads and writes the package.
 
 ```json
 {
-	"formatVersion": 1,
-	"algorithm": "ed25519",
 	"keyId": "arkini-official-2026-01",
-	"contentHash": "<64 lowercase SHA-256 hex characters>",
 	"signature": "<standard padded base64 Ed25519 signature>"
 }
 ```
@@ -31,14 +28,14 @@ The signed payload is the exact byte concatenation:
 UTF-8("arkini:arkpack:v1\0") || exact final .arkpack bytes
 ```
 
-There is no JSON canonicalization and no decode/re-encode step. SHA-256 is the package identity and a useful mismatch diagnostic; the Ed25519 signature is the authorship proof.
+There is no JSON canonicalization and no decode/re-encode step. SHA-256 remains the independently derived package identity; the Ed25519 signature is the authorship proof.
 
 ## Trust states
 
-- `official` means the signature is structurally valid, its hash claim matches the exact bytes, its `keyId` exists in the explicit registry, and Ed25519 verification succeeds.
+- `official` means the signature is structurally valid, its `keyId` exists in the explicit registry, and Ed25519 verification succeeds.
 - `external / unsigned` means no sidecar was supplied. The package may still be decoded and played.
 - `external / unknown-key` means a well-formed signature names a key outside the official registry. It is not silently promoted to official.
-- `invalid` means the supplied sidecar is malformed, claims the wrong content hash, or fails cryptographic verification. Invalid is never downgraded to unsigned.
+- `invalid` means the supplied sidecar is malformed or fails cryptographic verification. Invalid is never downgraded to unsigned.
 
 The generic byte loader accepts unsigned external content and returns this explicit trust union. A caller expecting bundled official content supplies the expected `keyId`; that path fails before package decompression when official verification is not established.
 
@@ -85,7 +82,7 @@ npm run arkpack:verify -- \
 	--trusted-keys game/arkini.arkpack.keys.json
 ```
 
-Verification prints the content hash and explicit trust JSON. It exits non-zero for malformed, hash-mismatched, or cryptographically invalid signatures. Unsigned and unknown-key packages remain successful explicit external results.
+Verification prints the content hash and explicit trust JSON. It exits non-zero for malformed or cryptographically invalid signatures. Unsigned and unknown-key packages remain successful explicit external results.
 
 Build, sign, and post-verify the official package in one operation:
 

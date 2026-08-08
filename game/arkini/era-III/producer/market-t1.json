@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"producer:market-t1": {
+			"uid": "blahusbsywixnp9x3hw5ngso",
 			"id": "producer:market-t1",
 			"type": "producer",
 			"title": "Market",
@@ -11,14 +12,6 @@
 					"producer-market-t1"
 				]
 			},
-			"tags": [
-				"producer",
-				"trade",
-				"market",
-				"unique",
-				"era:III"
-			],
-			"categoryId": "building",
 			"scope": "any",
 			"maxCount": 1,
 			"maxStackSize": 1,
@@ -37,8 +30,8 @@
 								"itemId": "item:bread"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 2
+								"min": 2,
+								"max": 2
 							},
 							"capacity": 2
 						}
@@ -54,8 +47,8 @@
 											{
 												"itemId": "item:coin",
 												"quantity": {
-													"type": "value",
-													"value": 3
+													"min": 3,
+													"max": 3
 												},
 												"rules": []
 											}
@@ -79,8 +72,8 @@
 								"itemId": "item:sausage"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 3
 						}
@@ -96,8 +89,8 @@
 											{
 												"itemId": "item:coin",
 												"quantity": {
-													"type": "value",
-													"value": 2
+													"min": 2,
+													"max": 2
 												},
 												"rules": []
 											}
@@ -121,8 +114,8 @@
 								"itemId": "item:cheese"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 3
 						}
@@ -138,8 +131,8 @@
 											{
 												"itemId": "item:coin",
 												"quantity": {
-													"type": "value",
-													"value": 2
+													"min": 2,
+													"max": 2
 												},
 												"rules": []
 											}
@@ -163,8 +156,8 @@
 								"itemId": "item:beer"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 2
+								"min": 2,
+								"max": 2
 							},
 							"capacity": 2
 						}
@@ -180,8 +173,8 @@
 											{
 												"itemId": "item:coin",
 												"quantity": {
-													"type": "value",
-													"value": 3
+													"min": 3,
+													"max": 3
 												},
 												"rules": []
 											}
@@ -205,8 +198,8 @@
 								"itemId": "item:wine-glass"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 2
+								"min": 2,
+								"max": 2
 							},
 							"capacity": 2
 						}
@@ -222,8 +215,8 @@
 											{
 												"itemId": "item:coin",
 												"quantity": {
-													"type": "value",
-													"value": 4
+													"min": 4,
+													"max": 4
 												},
 												"rules": []
 											}
@@ -247,8 +240,8 @@
 								"itemId": "item:feast"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 3
 						}
@@ -264,8 +257,8 @@
 											{
 												"itemId": "item:coin",
 												"quantity": {
-													"type": "value",
-													"value": 5
+													"min": 5,
+													"max": 5
 												},
 												"rules": []
 											}

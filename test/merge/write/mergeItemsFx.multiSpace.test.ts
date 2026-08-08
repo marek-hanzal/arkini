@@ -28,9 +28,9 @@ const config = GameConfigSchema.parse({
 	start: {
 		currentSpace: 0,
 	},
-	categories: {},
 	items: {
 		source: {
+			uid: "source",
 			id: "source",
 			title: "Source",
 			description: "Reusable source.",
@@ -39,8 +39,6 @@ const config = GameConfigSchema.parse({
 					"asset:source",
 				],
 			},
-			tags: [],
-			categoryId: "resource",
 			scope: "any",
 			maxStackSize: 1,
 			type: "simple",
@@ -56,6 +54,7 @@ const config = GameConfigSchema.parse({
 			],
 		},
 		target: {
+			uid: "target",
 			id: "target",
 			title: "Target",
 			description: "Remote explicit target.",
@@ -64,8 +63,6 @@ const config = GameConfigSchema.parse({
 					"asset:target",
 				],
 			},
-			tags: [],
-			categoryId: "resource",
 			scope: "board",
 			maxStackSize: 1,
 			type: "simple",

@@ -29,9 +29,9 @@ const config = GameConfigSchema.parse({
 	start: {
 		currentSpace: 0,
 	},
-	categories: {},
 	items: {
 		limited: {
+			uid: "limited",
 			id: "limited",
 			title: "Limited",
 			description: "Limited",
@@ -40,14 +40,13 @@ const config = GameConfigSchema.parse({
 					"asset:limited",
 				],
 			},
-			tags: [],
-			categoryId: "test",
 			scope: "board",
 			maxStackSize: 10,
 			maxCount: 3,
 			type: "simple",
 		},
 		producer: {
+			uid: "producer",
 			id: "producer",
 			title: "Producer",
 			description: "Producer",
@@ -56,8 +55,6 @@ const config = GameConfigSchema.parse({
 					"asset:producer",
 				],
 			},
-			tags: [],
-			categoryId: "test",
 			scope: "board",
 			maxStackSize: 1,
 			type: "producer",
@@ -82,8 +79,8 @@ const config = GameConfigSchema.parse({
 											{
 												itemId: "limited",
 												quantity: {
-													type: "value",
-													value: 1,
+													min: 1,
+													max: 1,
 												},
 												placement: "drop",
 												rules: [],

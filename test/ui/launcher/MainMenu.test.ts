@@ -54,11 +54,10 @@ describe("MainMenu", () => {
 			arkpacks: [
 				{
 					packageId: "competing-official",
-					contentHash: "b".repeat(64),
+					hash: "b".repeat(64),
 					gameId: "other-game",
 					title: "Other Game",
-					configVersion: "1",
-					compressedSize: 1,
+					game: "1",
 					trust: {
 						type: "official",
 						keyId: "other-official",
@@ -67,11 +66,10 @@ describe("MainMenu", () => {
 				},
 				{
 					packageId: "arkini",
-					contentHash: "a".repeat(64),
+					hash: "a".repeat(64),
 					gameId: "arkini",
 					title: "Arkini",
-					configVersion: "1",
-					compressedSize: 1,
+					game: "1",
 					trust: {
 						type: "official",
 						keyId: "test-official",
@@ -81,9 +79,11 @@ describe("MainMenu", () => {
 			],
 		};
 		const catalog: ArkpackCatalog = {
+			awaitIdleFx: Effect.void,
 			state: Effect.runSync(SubscriptionRef.make<ArkpackCatalog.State>(catalogState)),
 			refreshFx: Effect.void,
 			importFileFx: () => Effect.die("unused"),
+			installFx: () => Effect.die("unused"),
 			removeFx: () => Effect.die("unused"),
 		};
 		const registry = AtomRegistry.make({
@@ -186,6 +186,10 @@ describe("MainMenu", () => {
 				(control) => !control.className.includes("ak-list-row"),
 			),
 		).toBe(true);
+		const editor = Array.from(container.querySelectorAll("a")).find(
+			(link) => link.textContent === "Editor",
+		);
+		expect(editor?.getAttribute("href")).toBe("/editor/welcome");
 		expect(container.textContent).toContain("Arkpacks");
 		expect(container.textContent).toContain("Settings");
 		expect(container.textContent).toContain("About");

@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"producer:waste-processor-t1": {
+			"uid": "rghvle2hoir6l02a4lfuep7u",
 			"id": "producer:waste-processor-t1",
 			"type": "producer",
 			"title": "Waste Processor I",
@@ -11,16 +12,6 @@
 					"producer-waste-processor-t1"
 				]
 			},
-			"tags": [
-				"producer",
-				"building",
-				"cleanup",
-				"waste",
-				"trash",
-				"era:II",
-				"unique"
-			],
-			"categoryId": "building",
 			"scope": "any",
 			"maxCount": 1,
 			"maxStackSize": 1,
@@ -39,7 +30,6 @@
 								"itemId": "item:trash"
 							},
 							"quantity": {
-								"type": "range",
 								"min": 1,
 								"max": 4
 							}
@@ -60,7 +50,6 @@
 								"itemId": "item:trash"
 							},
 							"quantity": {
-								"type": "range",
 								"min": 1,
 								"max": 4
 							}
@@ -72,8 +61,8 @@
 								"itemId": "item:log"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 4
 						}
@@ -90,8 +79,8 @@
 											{
 												"itemId": "item:pollution",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -104,8 +93,8 @@
 											{
 												"itemId": "item:pollution",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}

@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"producer:townhall-t1": {
+			"uid": "bmj5rp54o4qp60ihlkjvf8pn",
 			"id": "producer:townhall-t1",
 			"type": "producer",
 			"title": "Town Hall I",
@@ -11,14 +12,6 @@
 					"producer-townhall-t1"
 				]
 			},
-			"tags": [
-				"producer",
-				"townhall",
-				"civic",
-				"unique",
-				"era:I"
-			],
-			"categoryId": "building",
 			"scope": "any",
 			"maxCount": 1,
 			"maxStackSize": 1,
@@ -37,8 +30,8 @@
 								"itemId": "item:log"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 1
 						},
@@ -49,8 +42,8 @@
 								"itemId": "item:stone"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 1
 						}
@@ -66,8 +59,8 @@
 											{
 												"itemId": "item:blueprint-sawmill-t1",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -91,8 +84,8 @@
 								"itemId": "item:log"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 1
 						},
@@ -103,8 +96,8 @@
 								"itemId": "item:stone"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 1
 						}
@@ -120,8 +113,8 @@
 											{
 												"itemId": "item:blueprint-stonemason-t1",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -145,8 +138,8 @@
 								"itemId": "item:log"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 1
 						},
@@ -157,8 +150,8 @@
 								"itemId": "item:stone"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 1
 						}
@@ -174,8 +167,8 @@
 											{
 												"itemId": "item:blueprint-shrine-t1",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -199,8 +192,8 @@
 								"itemId": "item:log"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 1
 						},
@@ -211,8 +204,8 @@
 								"itemId": "item:stone"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 1
 						}
@@ -228,8 +221,8 @@
 											{
 												"itemId": "item:blueprint-well-t1",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -253,8 +246,8 @@
 								"itemId": "item:log"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 1
 						},
@@ -265,8 +258,8 @@
 								"itemId": "item:stone"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 1
 						}
@@ -282,8 +275,8 @@
 											{
 												"itemId": "item:blueprint-library-t1",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -307,8 +300,8 @@
 								"itemId": "item:log"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 1
 						},
@@ -319,8 +312,8 @@
 								"itemId": "item:stone"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 1
 						}
@@ -336,8 +329,8 @@
 											{
 												"itemId": "item:blueprint-townhall-t2",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}

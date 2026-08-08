@@ -8,7 +8,6 @@ import { DiagnosticCodeEnumSchema } from "~/engine/validation/schema/DiagnosticC
 
 const provenance = {
 	start: "start.json",
-	categories: {},
 	items: {},
 };
 

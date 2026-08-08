@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"producer:quarry-t2": {
+			"uid": "q30e8ts0nqqhlgvzhvog57ry",
 			"id": "producer:quarry-t2",
 			"type": "producer",
 			"title": "Quarry",
@@ -11,18 +12,6 @@
 					"producer-quarry-t2"
 				]
 			},
-			"tags": [
-				"producer",
-				"building",
-				"stone",
-				"marble",
-				"quarry",
-				"luxury",
-				"prestige",
-				"era:X",
-				"unique"
-			],
-			"categoryId": "building",
 			"scope": "any",
 			"maxCount": 1,
 			"maxStackSize": 1,
@@ -66,8 +55,8 @@
 											{
 												"itemId": "item:stone",
 												"quantity": {
-													"type": "value",
-													"value": 2
+													"min": 2,
+													"max": 2
 												},
 												"rules": []
 											}
@@ -80,8 +69,8 @@
 											{
 												"itemId": "item:stone",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -130,8 +119,8 @@
 											{
 												"itemId": "item:marble",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -144,8 +133,8 @@
 											{
 												"itemId": "item:marble",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}

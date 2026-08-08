@@ -7,6 +7,8 @@ type VisualRouteId =
 	| "arkpacks"
 	| "board"
 	| "cheats"
+	| "editor"
+	| "editor-welcome"
 	| "inventory"
 	| "main-menu"
 	| "settings"
@@ -16,6 +18,8 @@ const gameBoardPattern = /^\/game\/[^/]+\/board\/?$/;
 const gameActionPattern = /^\/game\/[^/]+\/action\/[^/]+\/?$/;
 const gameCheatsPattern = /^\/game\/[^/]+\/cheats\/?$/;
 const gameInventoryPattern = /^\/game\/[^/]+\/inventory\/?$/;
+const editorWelcomePattern = /^\/editor(?:\/welcome)?\/?$/;
+const editorProjectPattern = /^\/editor\/(?!welcome(?:\/|$))[^/]+(?:\/.*)?$/;
 
 const resolveVisualRouteId = (pathname: string): VisualRouteId => {
 	if (pathname === "/") return "startup";
@@ -23,6 +27,8 @@ const resolveVisualRouteId = (pathname: string): VisualRouteId => {
 	if (pathname === "/settings") return "settings";
 	if (pathname === "/about") return "about";
 	if (pathname === "/arkpacks") return "arkpacks";
+	if (editorWelcomePattern.test(pathname)) return "editor-welcome";
+	if (editorProjectPattern.test(pathname)) return "editor";
 	if (gameBoardPattern.test(pathname)) return "board";
 	if (gameCheatsPattern.test(pathname)) return "cheats";
 	if (gameInventoryPattern.test(pathname)) return "inventory";
@@ -31,7 +37,7 @@ const resolveVisualRouteId = (pathname: string): VisualRouteId => {
 };
 
 const isHeroRoute = (route: VisualRouteId) =>
-	route !== "board" && route !== "cheats" && route !== "inventory";
+	route !== "board" && route !== "cheats" && route !== "editor" && route !== "inventory";
 
 /** Selects one explicit pair plus one broad scene relationship for every visible route change. */
 export const resolveRouteViewTransitionTypesFx = Effect.fn("resolveRouteViewTransitionTypesFx")(

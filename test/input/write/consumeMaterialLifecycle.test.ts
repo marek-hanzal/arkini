@@ -11,6 +11,7 @@ import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { runTickRuntimeByFx } from "~/engine/tick/fx/runTickRuntimeByFx";
 
 const base = (id: string) => ({
+	uid: id,
 	id,
 	title: id,
 	description: id,
@@ -19,8 +20,6 @@ const base = (id: string) => ({
 			`asset:${id}`,
 		],
 	},
-	tags: [],
-	categoryId: "test",
 	scope: "board" as const,
 	maxStackSize: 1,
 });
@@ -32,8 +31,8 @@ const materialInput = (itemId: string) => ({
 		itemId,
 	},
 	quantity: {
-		type: "value" as const,
-		value: 1,
+		min: 1,
+		max: 1,
 	},
 	capacity: 0,
 	mode: "consume" as const,
@@ -60,8 +59,8 @@ const line = (id: string, itemId: string, outputItemId?: string) => ({
 										{
 											itemId: outputItemId,
 											quantity: {
-												type: "value" as const,
-												value: 1,
+												min: 1,
+												max: 1,
 											},
 											placement: "drop" as const,
 											rules: [],
@@ -95,7 +94,6 @@ const config = GameConfigSchema.parse({
 	start: {
 		currentSpace: 0,
 	},
-	categories: {},
 	items: {
 		"producer:converter": {
 			...base("producer:converter"),

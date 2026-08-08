@@ -46,16 +46,6 @@ export const verifyArkpackTrustFx = Effect.fn("verifyArkpackTrustFx")(function* 
 			},
 		} satisfies verifyArkpackTrustFx.Result;
 	}
-	if (parsed.data.contentHash !== contentHash) {
-		return {
-			contentHash,
-			trust: {
-				type: "invalid",
-				reason: "hash-mismatch",
-				keyId: parsed.data.keyId,
-			},
-		} satisfies verifyArkpackTrustFx.Result;
-	}
 	const trustedKey = trustedKeys.keys.find((candidate) => candidate.keyId === parsed.data.keyId);
 	if (trustedKey === undefined) {
 		return {

@@ -52,11 +52,10 @@ const makeGame = (
 	...session,
 	arkpack: {
 		packageId: `package:spawn-${suffix}`,
-		contentHash: `content:spawn-${suffix}`,
+		hash: `content:spawn-${suffix}`,
 		gameId: `game:spawn-${suffix}`,
 		title: `Spawn ${suffix}`,
-		configVersion: "1.0",
-		compressedSize: 0,
+		game: "1.0",
 		trust: {
 			type: "external",
 			reason: "unsigned",

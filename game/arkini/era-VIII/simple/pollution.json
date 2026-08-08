@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:pollution": {
+			"uid": "ollssb7biy2hpbzlvjo6i9fq",
 			"id": "item:pollution",
 			"type": "simple",
 			"title": "Pollution",
@@ -11,13 +12,6 @@
 					"item-pollution"
 				]
 			},
-			"tags": [
-				"danger",
-				"industry",
-				"pollution",
-				"era:VIII"
-			],
-			"categoryId": "waste",
 			"scope": "board",
 			"maxStackSize": 1
 		}

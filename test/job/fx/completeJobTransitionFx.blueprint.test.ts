@@ -31,6 +31,7 @@ const simpleItem = ({
 	scope?: "any" | "board";
 	maxStackSize?: number;
 }) => ({
+	uid: id,
 	id,
 	type: "simple" as const,
 	title: id,
@@ -40,8 +41,6 @@ const simpleItem = ({
 			`asset:${id}`,
 		],
 	},
-	tags: [],
-	categoryId: "test",
 	scope,
 	maxCount,
 	maxStackSize,
@@ -58,6 +57,7 @@ const blueprintItem = ({
 	output?: unknown;
 	reserveTool?: boolean;
 }) => ({
+	uid: id,
 	id,
 	type: "blueprint" as const,
 	charges: {
@@ -70,8 +70,6 @@ const blueprintItem = ({
 			`asset:${id}`,
 		],
 	},
-	tags: [],
-	categoryId: "test",
 	scope: "board" as const,
 	maxStackSize: 1,
 	line: {
@@ -93,8 +91,8 @@ const blueprintItem = ({
 						},
 						mode: "reserve" as const,
 						quantity: {
-							type: "value" as const,
-							value: 1,
+							min: 1,
+							max: 1,
 						},
 					},
 				]
@@ -147,8 +145,8 @@ const blueprintOutput = (
 		{
 			itemId: primaryItemId,
 			quantity: {
-				type: "value" as const,
-				value: 1,
+				min: 1,
+				max: 1,
 			},
 			placement: "drop",
 		},
@@ -175,7 +173,6 @@ const blueprintConfig = GameConfigSchema.parse({
 	start: {
 		currentSpace: 0,
 	},
-	categories: {},
 	items: {
 		"blueprint:plain": blueprintItem({
 			id: "blueprint:plain",
@@ -197,8 +194,8 @@ const blueprintConfig = GameConfigSchema.parse({
 				{
 					itemId: "item:byproduct",
 					quantity: {
-						type: "value",
-						value: 1,
+						min: 1,
+						max: 1,
 					},
 				},
 			]),
@@ -210,8 +207,8 @@ const blueprintConfig = GameConfigSchema.parse({
 				{
 					itemId: "item:byproduct",
 					quantity: {
-						type: "value",
-						value: 1,
+						min: 1,
+						max: 1,
 					},
 				},
 			]),
@@ -224,7 +221,6 @@ const blueprintConfig = GameConfigSchema.parse({
 				{
 					itemId: "item:limited",
 					quantity: {
-						type: "range",
 						min: 1,
 						max: 5,
 					},
@@ -272,8 +268,8 @@ const blueprintConfig = GameConfigSchema.parse({
 								{
 									type: "weight",
 									quantity: {
-										type: "value",
-										value: 1,
+										min: 1,
+										max: 1,
 									},
 									drop: [
 										{
@@ -282,8 +278,8 @@ const blueprintConfig = GameConfigSchema.parse({
 												{
 													itemId: "item:target-unlimited",
 													quantity: {
-														type: "value",
-														value: 1,
+														min: 1,
+														max: 1,
 													},
 													placement: "drop",
 													rules: [],
@@ -296,8 +292,8 @@ const blueprintConfig = GameConfigSchema.parse({
 												{
 													itemId: "item:depletion-product",
 													quantity: {
-														type: "value",
-														value: 1,
+														min: 1,
+														max: 1,
 													},
 													placement: "drop",
 													rules: [],
@@ -333,15 +329,15 @@ const blueprintConfig = GameConfigSchema.parse({
 				{
 					itemId: "blueprint:hop-a",
 					quantity: {
-						type: "value",
-						value: 1,
+						min: 1,
+						max: 1,
 					},
 				},
 				{
 					itemId: "item:target",
 					quantity: {
-						type: "value",
-						value: 1,
+						min: 1,
+						max: 1,
 					},
 				},
 			]),
@@ -381,6 +377,7 @@ const blueprintConfig = GameConfigSchema.parse({
 			maxCount: 2,
 		}),
 		"producer:limited": {
+			uid: "producer:limited",
 			id: "producer:limited",
 			type: "producer",
 			title: "Limited producer",
@@ -390,8 +387,6 @@ const blueprintConfig = GameConfigSchema.parse({
 					"asset:producer:limited",
 				],
 			},
-			tags: [],
-			categoryId: "test",
 			scope: "board",
 			maxStackSize: 1,
 			maxQueueSize: 2,
@@ -410,8 +405,8 @@ const blueprintConfig = GameConfigSchema.parse({
 						{
 							itemId: "item:queue-product",
 							quantity: {
-								type: "value",
-								value: 1,
+								min: 1,
+								max: 1,
 							},
 						},
 					]),
@@ -420,6 +415,7 @@ const blueprintConfig = GameConfigSchema.parse({
 			],
 		},
 		"producer:blueprint-source": {
+			uid: "producer:blueprint-source",
 			id: "producer:blueprint-source",
 			type: "producer",
 			title: "Blueprint source",
@@ -429,8 +425,6 @@ const blueprintConfig = GameConfigSchema.parse({
 					"asset:producer:blueprint-source",
 				],
 			},
-			tags: [],
-			categoryId: "test",
 			scope: "board",
 			maxStackSize: 1,
 			maxQueueSize: 2,
@@ -504,8 +498,8 @@ const blueprintConfig = GameConfigSchema.parse({
 									{
 										type: "weight",
 										quantity: {
-											type: "value",
-											value: 1,
+											min: 1,
+											max: 1,
 										},
 										drop: [
 											{
@@ -514,8 +508,8 @@ const blueprintConfig = GameConfigSchema.parse({
 													{
 														itemId: "item:target-unlimited",
 														quantity: {
-															type: "value",
-															value: 1,
+															min: 1,
+															max: 1,
 														},
 														placement: "drop",
 														rules: [],
@@ -528,8 +522,8 @@ const blueprintConfig = GameConfigSchema.parse({
 													{
 														itemId: "blueprint:plain",
 														quantity: {
-															type: "value",
-															value: 1,
+															min: 1,
+															max: 1,
 														},
 														placement: "drop",
 														rules: [],
@@ -561,8 +555,8 @@ const blueprintConfig = GameConfigSchema.parse({
 									{
 										type: "weight",
 										quantity: {
-											type: "value",
-											value: 1,
+											min: 1,
+											max: 1,
 										},
 										drop: [
 											{
@@ -571,8 +565,8 @@ const blueprintConfig = GameConfigSchema.parse({
 													{
 														itemId: "blueprint:plain",
 														quantity: {
-															type: "value",
-															value: 1,
+															min: 1,
+															max: 1,
 														},
 														placement: "drop",
 														rules: [],
@@ -585,8 +579,8 @@ const blueprintConfig = GameConfigSchema.parse({
 													{
 														itemId: "item:target",
 														quantity: {
-															type: "value",
-															value: 1,
+															min: 1,
+															max: 1,
 														},
 														placement: "drop",
 														rules: [],
@@ -630,6 +624,7 @@ const blueprintConfig = GameConfigSchema.parse({
 			],
 		},
 		"producer:shared-source": {
+			uid: "producer:shared-source",
 			id: "producer:shared-source",
 			type: "producer",
 			title: "Shared source",
@@ -639,8 +634,6 @@ const blueprintConfig = GameConfigSchema.parse({
 					"asset:producer:shared-source",
 				],
 			},
-			tags: [],
-			categoryId: "test",
 			scope: "board",
 			maxStackSize: 1,
 			maxQueueSize: 1,
@@ -661,6 +654,7 @@ const blueprintConfig = GameConfigSchema.parse({
 			],
 		},
 		"producer:shared-consumer": {
+			uid: "producer:shared-consumer",
 			id: "producer:shared-consumer",
 			type: "producer",
 			title: "Shared consumer",
@@ -670,8 +664,6 @@ const blueprintConfig = GameConfigSchema.parse({
 					"asset:producer:shared-consumer",
 				],
 			},
-			tags: [],
-			categoryId: "test",
 			scope: "board",
 			maxStackSize: 1,
 			maxQueueSize: 1,
@@ -689,8 +681,8 @@ const blueprintConfig = GameConfigSchema.parse({
 								itemId: "item:shared",
 							},
 							quantity: {
-								type: "value",
-								value: 1,
+								min: 1,
+								max: 1,
 							},
 						},
 					],
@@ -699,6 +691,7 @@ const blueprintConfig = GameConfigSchema.parse({
 			],
 		},
 		"producer:recycler": {
+			uid: "producer:recycler",
 			id: "producer:recycler",
 			type: "producer",
 			title: "Recycler",
@@ -708,8 +701,6 @@ const blueprintConfig = GameConfigSchema.parse({
 					"asset:producer:recycler",
 				],
 			},
-			tags: [],
-			categoryId: "test",
 			scope: "board",
 			maxStackSize: 1,
 			maxQueueSize: 1,
@@ -727,8 +718,8 @@ const blueprintConfig = GameConfigSchema.parse({
 								itemId: "item:target",
 							},
 							quantity: {
-								type: "value",
-								value: 1,
+								min: 1,
+								max: 1,
 							},
 						},
 					],
@@ -738,6 +729,7 @@ const blueprintConfig = GameConfigSchema.parse({
 			],
 		},
 		"producer:charged-stack": {
+			uid: "producer:charged-stack",
 			id: "producer:charged-stack",
 			type: "producer",
 			title: "Charged stack",
@@ -747,8 +739,6 @@ const blueprintConfig = GameConfigSchema.parse({
 					"asset:producer:charged-stack",
 				],
 			},
-			tags: [],
-			categoryId: "test",
 			scope: "board",
 			maxStackSize: 3,
 			maxCount: 3,
@@ -1107,8 +1097,8 @@ describe("blueprint job completion transition", () => {
 					drop: {
 						itemId: "item:target",
 						quantity: {
-							type: "value",
-							value: 1,
+							min: 1,
+							max: 1,
 						},
 						placement: "drop",
 						rules: [],

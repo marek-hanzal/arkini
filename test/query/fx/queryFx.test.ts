@@ -33,9 +33,9 @@ const config = GameConfigSchema.parse({
 	start: {
 		currentSpace: 0,
 	},
-	categories: {},
 	items: {
 		tree: {
+			uid: "tree",
 			id: "tree",
 			title: "Tree",
 			description: "A living tree.",
@@ -44,10 +44,6 @@ const config = GameConfigSchema.parse({
 					"asset:tree",
 				],
 			},
-			tags: [
-				"forest",
-			],
-			categoryId: "resource",
 			scope: "any",
 			maxStackSize: 10,
 			type: "simple",
@@ -144,8 +140,8 @@ describe("queryFx", () => {
 						distance: "self",
 						scope: "board",
 						selector: {
-							tag: "forest",
-							type: "tag",
+							itemId: "tree",
+							type: "item",
 						},
 					},
 				});
@@ -159,8 +155,8 @@ describe("queryFx", () => {
 						distance: "close",
 						scope: "board",
 						selector: {
-							tag: "forest",
-							type: "tag",
+							itemId: "tree",
+							type: "item",
 						},
 					},
 				});
@@ -174,8 +170,8 @@ describe("queryFx", () => {
 						distance: "near",
 						scope: "board",
 						selector: {
-							tag: "forest",
-							type: "tag",
+							itemId: "tree",
+							type: "item",
 						},
 					},
 				});
@@ -189,8 +185,8 @@ describe("queryFx", () => {
 						distance: "far",
 						scope: "board",
 						selector: {
-							tag: "forest",
-							type: "tag",
+							itemId: "tree",
+							type: "item",
 						},
 					},
 				});

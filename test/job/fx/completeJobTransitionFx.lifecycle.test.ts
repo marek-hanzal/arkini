@@ -22,8 +22,8 @@ const output = {
 						{
 							itemId: "item:gift",
 							quantity: {
-								type: "value" as const,
-								value: 1,
+								min: 1,
+								max: 1,
 							},
 							placement: "drop" as const,
 							rules: [],
@@ -36,6 +36,7 @@ const output = {
 };
 
 const base = (id: string) => ({
+	uid: id,
 	id,
 	title: id,
 	description: id,
@@ -44,8 +45,6 @@ const base = (id: string) => ({
 			`asset:${id}`,
 		],
 	},
-	tags: [],
-	categoryId: "test",
 	scope: "board" as const,
 	maxStackSize: 1,
 });
@@ -70,7 +69,6 @@ const lifecycleConfig = GameConfigSchema.parse({
 	start: {
 		currentSpace: 0,
 	},
-	categories: {},
 	items: {
 		"producer:trader": {
 			...base("producer:trader"),
@@ -97,8 +95,8 @@ const lifecycleConfig = GameConfigSchema.parse({
 								itemId: "item:material",
 							},
 							quantity: {
-								type: "value",
-								value: 1,
+								min: 1,
+								max: 1,
 							},
 							capacity: 1,
 						},
@@ -141,8 +139,8 @@ const lifecycleConfig = GameConfigSchema.parse({
 											{
 												itemId: "producer:phoenix",
 												quantity: {
-													type: "value",
-													value: 1,
+													min: 1,
+													max: 1,
 												},
 												placement: "drop",
 												rules: [],

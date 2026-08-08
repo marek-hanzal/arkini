@@ -46,9 +46,9 @@ const config = GameConfigSchema.parse({
 			},
 		],
 	},
-	categories: {},
 	items: {
 		producer: {
+			uid: "producer",
 			id: "producer",
 			type: "producer",
 			title: "Producer",
@@ -58,8 +58,6 @@ const config = GameConfigSchema.parse({
 					"asset:producer",
 				],
 			},
-			tags: [],
-			categoryId: "building",
 			scope: "board",
 			maxStackSize: 1,
 			maxQueueSize: 1,
@@ -80,6 +78,7 @@ const config = GameConfigSchema.parse({
 			],
 		},
 		resource: {
+			uid: "resource",
 			id: "resource",
 			type: "simple",
 			title: "Resource",
@@ -89,12 +88,11 @@ const config = GameConfigSchema.parse({
 					"asset:resource",
 				],
 			},
-			tags: [],
-			categoryId: "resource",
 			scope: "any",
 			maxStackSize: 10,
 		},
 		"satchel-control": {
+			uid: "satchel-control",
 			id: "satchel-control",
 			type: "inventory",
 			title: "Satchel",
@@ -104,8 +102,6 @@ const config = GameConfigSchema.parse({
 					"asset:satchel",
 				],
 			},
-			tags: [],
-			categoryId: "utility",
 		},
 	},
 });

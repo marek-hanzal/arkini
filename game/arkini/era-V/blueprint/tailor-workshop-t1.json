@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:blueprint-tailor-workshop-t1": {
+			"uid": "ykvmsujix9w0jjj5at3ytl7j",
 			"id": "item:blueprint-tailor-workshop-t1",
 			"type": "blueprint",
 			"title": "Tailor Workshop I Blueprint",
@@ -15,15 +16,6 @@
 					"producer-tailor-workshop-t1"
 				]
 			},
-			"tags": [
-				"blueprint",
-				"building",
-				"craft-target",
-				"clothing",
-				"textile",
-				"era:V"
-			],
-			"categoryId": "blueprint",
 			"scope": "any",
 			"maxStackSize": 1,
 			"line": {
@@ -40,8 +32,8 @@
 							"itemId": "item:plank"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 3
+							"min": 3,
+							"max": 3
 						},
 						"charges": {
 							"cost": 1,
@@ -55,8 +47,8 @@
 							"itemId": "item:common-cloth"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 1
+							"min": 1,
+							"max": 1
 						}
 					},
 					{
@@ -66,8 +58,8 @@
 							"itemId": "item:leather"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 1
+							"min": 1,
+							"max": 1
 						}
 					},
 					{
@@ -77,8 +69,8 @@
 							"itemId": "item:building-permit"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 1
+							"min": 1,
+							"max": 1
 						}
 					},
 					{
@@ -88,8 +80,8 @@
 							"itemId": "item:coin"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 2
+							"min": 2,
+							"max": 2
 						}
 					}
 				],
@@ -130,8 +122,8 @@
 										{
 											"itemId": "producer:tailor-workshop-t1",
 											"quantity": {
-												"type": "value",
-												"value": 1
+												"min": 1,
+												"max": 1
 											},
 											"placement": "drop",
 											"rules": []

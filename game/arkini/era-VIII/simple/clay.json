@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:clay": {
+			"uid": "c5nizod4yfvkrk33384ekexq",
 			"id": "item:clay",
 			"type": "simple",
 			"title": "Clay",
@@ -11,15 +12,6 @@
 					"item-clay"
 				]
 			},
-			"tags": [
-				"material",
-				"construction",
-				"earth",
-				"era:VIII",
-				"industry",
-				"tier-3-resource"
-			],
-			"categoryId": "material",
 			"scope": "any",
 			"maxStackSize": 50
 		}

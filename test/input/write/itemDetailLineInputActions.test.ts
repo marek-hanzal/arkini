@@ -43,8 +43,8 @@ const twoInputTestConfig = GameConfigSchema.parse({
 							itemId: "stone",
 						},
 						quantity: {
-							type: "value",
-							value: 2,
+							min: 2,
+							max: 2,
 						},
 						capacity: 0,
 					},
@@ -95,7 +95,6 @@ const rangeInputTestConfig = GameConfigSchema.parse({
 							itemId: "water",
 						},
 						quantity: {
-							type: "range",
 							min: 1,
 							max: 4,
 						},
@@ -123,7 +122,6 @@ const competingRangeInputTestConfig = GameConfigSchema.parse({
 							itemId: "water",
 						},
 						quantity: {
-							type: "range",
 							min: 1,
 							max: 4,
 						},
@@ -135,8 +133,8 @@ const competingRangeInputTestConfig = GameConfigSchema.parse({
 							itemId: "water",
 						},
 						quantity: {
-							type: "value",
-							value: 2,
+							min: 2,
+							max: 2,
 						},
 					},
 					...line.input.slice(1),

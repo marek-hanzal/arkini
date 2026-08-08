@@ -8,7 +8,6 @@ const simpleItem = ({
 	maxStackSize = 10,
 	merge,
 	scope = "any",
-	tags = [],
 }: {
 	id: string;
 	maxCount?: number;
@@ -18,8 +17,8 @@ const simpleItem = ({
 		...MergeSchema.Type[],
 	];
 	scope?: "any" | "board" | "inventory";
-	tags?: string[];
 }) => ({
+	uid: id,
 	id,
 	title: id,
 	description: id,
@@ -28,8 +27,6 @@ const simpleItem = ({
 			`asset:${id}`,
 		],
 	},
-	tags,
-	categoryId: "resource",
 	scope,
 	maxCount,
 	maxStackSize,
@@ -53,7 +50,6 @@ export const createMergeTestConfig = ({
 	sourceMaxStackSize = 10,
 	sourceScope = "any",
 	targetMaxStackSize = 10,
-	targetTags = [],
 }: {
 	board?: {
 		width: number;
@@ -75,7 +71,6 @@ export const createMergeTestConfig = ({
 	sourceMaxStackSize?: number;
 	sourceScope?: "any" | "board" | "inventory";
 	targetMaxStackSize?: number;
-	targetTags?: string[];
 }) =>
 	GameConfigSchema.parse({
 		version: "1.0",
@@ -91,7 +86,6 @@ export const createMergeTestConfig = ({
 		start: {
 			currentSpace: 0,
 		},
-		categories: {},
 		items: {
 			source: simpleItem({
 				id: "source",
@@ -110,7 +104,6 @@ export const createMergeTestConfig = ({
 			target: simpleItem({
 				id: "target",
 				maxStackSize: targetMaxStackSize,
-				tags: targetTags,
 			}),
 			result: simpleItem({
 				id: "result",
@@ -146,6 +139,7 @@ export const guaranteedMergeOutput = ({
 } = {}): OutputSchema.Type => ({
 	set: [
 		{
+			weight: 1,
 			roll: [
 				{
 					type: "guaranteed",
@@ -154,8 +148,8 @@ export const guaranteedMergeOutput = ({
 							itemId,
 							placement,
 							quantity: {
-								type: "value",
-								value: quantity,
+								min: quantity,
+								max: quantity,
 							},
 							rules: [],
 						},
@@ -178,8 +172,8 @@ export const weightedMergeOutput = (): OutputSchema.Type => ({
 							itemId: "output:a",
 							placement: "drop",
 							quantity: {
-								type: "value",
-								value: 2,
+								min: 2,
+								max: 2,
 							},
 							rules: [],
 						},
@@ -197,8 +191,8 @@ export const weightedMergeOutput = (): OutputSchema.Type => ({
 							itemId: "output:b",
 							placement: "drop",
 							quantity: {
-								type: "value",
-								value: 2,
+								min: 2,
+								max: 2,
 							},
 							rules: [],
 						},

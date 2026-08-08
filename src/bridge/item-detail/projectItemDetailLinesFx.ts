@@ -32,56 +32,6 @@ type ProjectedLineDisabledCause = Extract<
 	}
 >["cause"];
 
-const readDisabledConditionPhrase = (condition: ItemDetailLines.DisabledCondition) =>
-	match(condition)
-		.with(
-			{
-				kind: "exists",
-			},
-			({ locationLabel, selector }) => `${selector.label} (${locationLabel})`,
-		)
-		.with(
-			{
-				kind: "count",
-			},
-			({ count, locationLabel, selector }) => `${count} ${selector.label} (${locationLabel})`,
-		)
-		.with(
-			{
-				kind: "range",
-			},
-			({ locationLabel, max, min, selector }) =>
-				`${min}-${max} ${selector.label} (${locationLabel})`,
-		)
-		.exhaustive();
-
-const readEnableConditionMarkup = (condition: ItemDetailLines.DisabledCondition) => {
-	if (condition.detail === undefined) return undefined;
-	return {
-		messageBeforeDetail: match(condition)
-			.with(
-				{
-					kind: "exists",
-				},
-				() => "Requires ",
-			)
-			.with(
-				{
-					kind: "count",
-				},
-				({ count }) => `Requires ${count} `,
-			)
-			.with(
-				{
-					kind: "range",
-				},
-				({ max, min }) => `Requires ${min}-${max} `,
-			)
-			.exhaustive(),
-		messageAfterDetail: ` · ${condition.locationLabel}.`,
-	};
-};
-
 const readQueryLocationLabel = (query: WhenSchema.Type["query"]) =>
 	match(query)
 		.with(
@@ -141,14 +91,11 @@ const projectDisabledConditionFx = Effect.fn("projectDisabledConditionFx")(funct
 		selector: when.query.selector,
 	});
 	const locationLabel = readQueryLocationLabel(when.query);
-	const detail =
-		when.query.selector.type === "item"
-			? yield* projectItemDetailReferenceFx({
-					game,
-					itemId: when.query.selector.itemId,
-					runtime,
-				})
-			: undefined;
+	const detail = yield* projectItemDetailReferenceFx({
+		game,
+		itemId: when.query.selector.itemId,
+		runtime,
+	});
 	return match(when)
 		.with(
 			{
@@ -250,6 +197,7 @@ const projectAvailabilityFx = Effect.fn("projectItemDetailLineAvailabilityFx")(f
 						});
 						cause = {
 							kind: reason.cause.kind,
+							hint: reason.cause.hint,
 							ruleIndex: reason.cause.ruleIndex,
 							whenIndex: reason.cause.whenIndex,
 							condition: projected.condition,
@@ -266,28 +214,18 @@ const projectAvailabilityFx = Effect.fn("projectItemDetailLineAvailabilityFx")(f
 						);
 						cause = {
 							kind: reason.cause.kind,
+							hint: reason.cause.hint,
 							ruleIndex: reason.cause.ruleIndex,
 							condition: projected.map(({ condition }) => condition),
 						};
 					}
 					const message =
-						cause.kind === "static"
-							? "This line is currently disabled."
-							: cause.kind === "enable-rule"
-								? `Requires ${readDisabledConditionPhrase(cause.condition)}.`
-								: `Unavailable while ${cause.condition
-										.map(readDisabledConditionPhrase)
-										.join(" and ")} match.`;
-					const markup =
-						cause.kind === "enable-rule"
-							? readEnableConditionMarkup(cause.condition)
-							: undefined;
+						cause.kind === "static" ? "This line is currently disabled." : cause.hint;
 					return {
 						kind: "unavailable",
 						reason: {
 							kind: "line-disabled",
 							cause,
-							...(markup === undefined ? {} : markup),
 							message,
 						},
 					} as const;
@@ -306,14 +244,11 @@ const projectAvailabilityFx = Effect.fn("projectItemDetailLineAvailabilityFx")(f
 						game,
 						selector: reason.selector,
 					});
-					const detail =
-						reason.selector.type === "item"
-							? yield* projectItemDetailReferenceFx({
-									game,
-									itemId: reason.selector.itemId,
-									runtime,
-								})
-							: undefined;
+					const detail = yield* projectItemDetailReferenceFx({
+						game,
+						itemId: reason.selector.itemId,
+						runtime,
+					});
 					const messageBeforeDetail = "Requires ";
 					const messageAfterDetail = ` · None available (Board · ${reason.distance}).`;
 					return {

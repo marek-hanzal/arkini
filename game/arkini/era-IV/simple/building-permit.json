@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:building-permit": {
+			"uid": "unys1l4wiu35fp3k9xvmqi9r",
 			"id": "item:building-permit",
 			"type": "simple",
 			"title": "Building Permit",
@@ -11,14 +12,6 @@
 					"item-building-permit"
 				]
 			},
-			"tags": [
-				"resource",
-				"master",
-				"permit",
-				"civic",
-				"era:IV"
-			],
-			"categoryId": "material",
 			"scope": "any",
 			"maxStackSize": 20
 		}

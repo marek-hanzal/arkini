@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:marble": {
+			"uid": "w0dlddommfuipxzz6xie0lpl",
 			"id": "item:marble",
 			"type": "simple",
 			"title": "Marble",
@@ -11,16 +12,6 @@
 					"item-marble"
 				]
 			},
-			"tags": [
-				"material",
-				"stone",
-				"marble",
-				"luxury",
-				"prestige",
-				"era:X",
-				"tier-10-resource"
-			],
-			"categoryId": "material",
 			"scope": "any",
 			"maxStackSize": 40
 		}

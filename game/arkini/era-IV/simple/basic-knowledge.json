@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:basic-knowledge": {
+			"uid": "vf38s8fjec67ie3ss6cho4g5",
 			"id": "item:basic-knowledge",
 			"type": "simple",
 			"title": "Basic Knowledge",
@@ -11,13 +12,6 @@
 					"item-basic-knowledge"
 				]
 			},
-			"tags": [
-				"knowledge",
-				"education",
-				"research",
-				"era:IV"
-			],
-			"categoryId": "knowledge",
 			"scope": "any",
 			"maxStackSize": 50
 		}

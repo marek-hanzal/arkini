@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:flour": {
+			"uid": "dm1u6uur3u1jyyttil5cu0qj",
 			"id": "item:flour",
 			"type": "simple",
 			"title": "Flour",
@@ -11,15 +12,6 @@
 					"item-flour"
 				]
 			},
-			"tags": [
-				"material",
-				"food",
-				"grain",
-				"flour",
-				"era:III",
-				"tier-3-resource"
-			],
-			"categoryId": "food",
 			"scope": "any",
 			"maxStackSize": 50
 		}

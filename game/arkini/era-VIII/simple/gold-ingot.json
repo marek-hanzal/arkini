@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:gold-ingot": {
+			"uid": "qgogdz6h0ojke23ut4wdwuky",
 			"id": "item:gold-ingot",
 			"type": "simple",
 			"title": "Gold Ingot",
@@ -11,15 +12,6 @@
 					"item-gold-ingot"
 				]
 			},
-			"tags": [
-				"material",
-				"industry",
-				"ingot",
-				"gold",
-				"era:VIII",
-				"tier-7-resource"
-			],
-			"categoryId": "material",
 			"scope": "any",
 			"maxStackSize": 50
 		}

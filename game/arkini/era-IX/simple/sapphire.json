@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:sapphire": {
+			"uid": "ifbhjw7n3dithzkj8foocurd",
 			"id": "item:sapphire",
 			"type": "simple",
 			"title": "Sapphire",
@@ -11,13 +12,6 @@
 					"item-sapphire"
 				]
 			},
-			"tags": [
-				"treasure",
-				"gem",
-				"sapphire",
-				"era:IX"
-			],
-			"categoryId": "treasure",
 			"scope": "any",
 			"maxStackSize": 20
 		}

@@ -89,26 +89,7 @@ const unavailable = {
 } as const satisfies readItemDetailSourcesFx.Result;
 
 const quantityBounds = (quantity: QuantitySchema.Type): readItemDetailSourcesFx.QuantityBounds =>
-	match(quantity)
-		.with(
-			{
-				type: "value",
-			},
-			({ value }) => ({
-				min: value,
-				max: value,
-			}),
-		)
-		.with(
-			{
-				type: "range",
-			},
-			({ max, min }) => ({
-				min,
-				max,
-			}),
-		)
-		.exhaustive();
+	quantity;
 
 const targetQuantity = ({
 	drop,
@@ -143,11 +124,11 @@ const readMatchingFacts = ({
 	readonly targetDefinitionItemId: IdSchema.Type;
 }): readonly readItemDetailSourcesFx.OutputFact[] => {
 	if (output === undefined) return [];
-	const totalSetWeight = output.set.reduce((total, set) => total + (set.weight ?? 1), 0);
+	const totalSetWeight = output.set.reduce((total, set) => total + set.weight, 0);
 	const facts: readItemDetailSourcesFx.OutputFact[] = [];
 
 	for (const set of output.set) {
-		const setWeight = set.weight ?? 1;
+		const setWeight = set.weight;
 		for (const roll of set.roll) {
 			match(roll)
 				.with(

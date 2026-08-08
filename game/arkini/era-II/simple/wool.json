@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:wool": {
+			"uid": "lri9noxoiihg7xokehx4bttp",
 			"id": "item:wool",
 			"type": "simple",
 			"title": "Wool",
@@ -11,13 +12,6 @@
 					"item-wool"
 				]
 			},
-			"tags": [
-				"material",
-				"animal",
-				"era:II",
-				"tier-2-resource"
-			],
-			"categoryId": "material",
 			"scope": "any",
 			"maxStackSize": 50
 		}

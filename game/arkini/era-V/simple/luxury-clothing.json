@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:luxury-clothing": {
+			"uid": "x7r0osuka2xlvgeuhdeb59ek",
 			"id": "item:luxury-clothing",
 			"type": "simple",
 			"title": "Luxury Clothing",
@@ -11,15 +12,6 @@
 					"item-luxury-clothing"
 				]
 			},
-			"tags": [
-				"clothing",
-				"luxury",
-				"master",
-				"textile",
-				"era:V",
-				"tier-5-resource"
-			],
-			"categoryId": "clothing",
 			"scope": "any",
 			"maxStackSize": 20
 		}

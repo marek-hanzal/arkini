@@ -12,11 +12,9 @@ import { EffectEnumSchema } from "~/engine/merge/schema/EffectEnumSchema";
 import { RuleEnumSchema as OutputRuleEnumSchema } from "~/engine/output/schema/drop/rule/RuleEnumSchema";
 import { PlacementEnumSchema } from "~/engine/placement/schema/PlacementEnumSchema";
 import { PlacementFailureReasonEnumSchema } from "~/engine/placement/schema/PlacementFailureReasonEnumSchema";
-import { QuantityEnumSchema } from "~/engine/quantity/schema/QuantityEnumSchema";
 import { QueryScopeEnumSchema } from "~/engine/query/schema/QueryScopeEnumSchema";
 import { RollEnumSchema } from "~/engine/roll/schema/RollEnumSchema";
 import { StorageScopeEnumSchema } from "~/engine/scope/schema/StorageScopeEnumSchema";
-import { SelectorEnumSchema } from "~/engine/selector/schema/SelectorEnumSchema";
 import { WhenEnumSchema } from "~/engine/when/schema/WhenEnumSchema";
 
 describe("business enum schemas", () => {
@@ -61,6 +59,7 @@ describe("business enum schemas", () => {
 			LineRuleEnumSchema.enum.Hide,
 			LineRuleEnumSchema.enum.Enable,
 			LineRuleEnumSchema.enum.Disable,
+			LineRuleEnumSchema.enum.RuntimeAdjust,
 			LineRuleEnumSchema.enum.RuntimeMultiplier,
 		]);
 		expect(ActionEnumSchema.options).toEqual([
@@ -86,10 +85,6 @@ describe("business enum schemas", () => {
 			PlacementFailureReasonEnumSchema.enum.InventoryFull,
 			PlacementFailureReasonEnumSchema.enum.ToolbarFull,
 		]);
-		expect(QuantityEnumSchema.options).toEqual([
-			QuantityEnumSchema.enum.Value,
-			QuantityEnumSchema.enum.Range,
-		]);
 		expect(RollEnumSchema.options).toEqual([
 			RollEnumSchema.enum.Guaranteed,
 			RollEnumSchema.enum.Chance,
@@ -107,10 +102,6 @@ describe("business enum schemas", () => {
 			QueryScopeEnumSchema.enum.Toolbar,
 			QueryScopeEnumSchema.enum.Any,
 			QueryScopeEnumSchema.enum.Universe,
-		]);
-		expect(SelectorEnumSchema.options).toEqual([
-			SelectorEnumSchema.enum.Item,
-			SelectorEnumSchema.enum.Tag,
 		]);
 		expect(WhenEnumSchema.options).toEqual([
 			WhenEnumSchema.enum.Exists,

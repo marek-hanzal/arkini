@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:hops": {
+			"uid": "a9r7txedhby8v7nzkyazzzms",
 			"id": "item:hops",
 			"type": "simple",
 			"title": "Hops",
@@ -11,15 +12,6 @@
 					"item-hops"
 				]
 			},
-			"tags": [
-				"material",
-				"food",
-				"beer",
-				"hops",
-				"era:III",
-				"tier-3-resource"
-			],
-			"categoryId": "food",
 			"scope": "any",
 			"maxStackSize": 50
 		}

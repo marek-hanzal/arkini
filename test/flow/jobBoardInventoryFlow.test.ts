@@ -34,6 +34,7 @@ const createFlowConfig = (inventoryWidth = 2) => {
 			...base.items,
 			blocker: {
 				...base.items.tool,
+				uid: "blocker",
 				id: "blocker",
 				title: "Blocker",
 				description: "Occupies board capacity during completion.",
@@ -42,6 +43,7 @@ const createFlowConfig = (inventoryWidth = 2) => {
 			},
 			ingot: {
 				...base.items.tool,
+				uid: "ingot",
 				id: "ingot",
 				title: "Ingot",
 				description: "Produced by the forge.",
@@ -60,8 +62,8 @@ const createFlowConfig = (inventoryWidth = 2) => {
 											{
 												itemId: "ingot",
 												quantity: {
-													type: "value",
-													value: 1,
+													min: 1,
+													max: 1,
 												},
 												placement: "drop",
 												rules: [],
@@ -88,6 +90,7 @@ const createPausedFlowConfig = () => {
 			...base.items,
 			permit: {
 				...base.items.tool,
+				uid: "permit",
 				id: "permit",
 				title: "Permit",
 				description: "Keeps the forge runnable.",

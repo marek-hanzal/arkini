@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:vegetables": {
+			"uid": "hh4ytzcqiikbrkwladt09sv4",
 			"id": "item:vegetables",
 			"type": "simple",
 			"title": "Vegetables",
@@ -11,13 +12,6 @@
 					"item-vegetables"
 				]
 			},
-			"tags": [
-				"food",
-				"vegetable",
-				"era:II",
-				"tier-1-resource"
-			],
-			"categoryId": "food",
 			"scope": "any",
 			"maxStackSize": 50
 		}

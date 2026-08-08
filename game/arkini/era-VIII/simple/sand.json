@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:sand": {
+			"uid": "tdvgzkzaosctyleu65rjeutn",
 			"id": "item:sand",
 			"type": "simple",
 			"title": "Sand",
@@ -11,15 +12,6 @@
 					"item-sand"
 				]
 			},
-			"tags": [
-				"material",
-				"construction",
-				"glass",
-				"era:VIII",
-				"industry",
-				"tier-4-resource"
-			],
-			"categoryId": "material",
 			"scope": "any",
 			"maxStackSize": 50
 		}

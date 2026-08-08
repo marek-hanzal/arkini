@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:axe": {
+			"uid": "ue6mabezgf1zbvb2cyrsz8aq",
 			"id": "item:axe",
 			"type": "simple",
 			"title": "Axe",
@@ -11,17 +12,6 @@
 					"item-axe"
 				]
 			},
-			"tags": [
-				"equipment",
-				"weapon",
-				"tool",
-				"blacksmith",
-				"hero",
-				"era:IX",
-				"woodcutting",
-				"single-use"
-			],
-			"categoryId": "equipment",
 			"scope": "any",
 			"maxStackSize": 20,
 			"merge": [
@@ -42,8 +32,8 @@
 											{
 												"itemId": "item:log",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -71,7 +61,6 @@
 											{
 												"itemId": "item:log",
 												"quantity": {
-													"type": "range",
 													"min": 1,
 													"max": 2
 												},
@@ -101,7 +90,6 @@
 											{
 												"itemId": "item:log",
 												"quantity": {
-													"type": "range",
 													"min": 1,
 													"max": 3
 												},

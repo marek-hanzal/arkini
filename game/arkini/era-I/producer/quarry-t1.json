@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"producer:quarry-t1": {
+			"uid": "ndf2prv7bmc70zv8ulnuqlul",
 			"id": "producer:quarry-t1",
 			"type": "producer",
 			"title": "Quarry I",
@@ -11,13 +12,6 @@
 					"producer-quarry-t1"
 				]
 			},
-			"tags": [
-				"producer",
-				"stone",
-				"era:I",
-				"unique"
-			],
-			"categoryId": "building",
 			"scope": "any",
 			"maxCount": 1,
 			"maxStackSize": 1,
@@ -56,8 +50,8 @@
 											{
 												"itemId": "item:stone",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -70,8 +64,8 @@
 											{
 												"itemId": "item:stone",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -84,8 +78,8 @@
 											{
 												"itemId": "item:stone",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -98,8 +92,8 @@
 											{
 												"itemId": "item:quest:road-repair",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}

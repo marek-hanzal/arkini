@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:blueprint-construction-yard-t1": {
+			"uid": "zvn41mcupjxb15re6517ytvx",
 			"id": "item:blueprint-construction-yard-t1",
 			"type": "blueprint",
 			"title": "Construction Yard I Blueprint",
@@ -15,14 +16,6 @@
 					"producer-construction-yard-t1"
 				]
 			},
-			"tags": [
-				"blueprint",
-				"building",
-				"craft-target",
-				"era:VIII",
-				"industry"
-			],
-			"categoryId": "blueprint",
 			"scope": "any",
 			"maxStackSize": 1,
 			"line": {
@@ -39,8 +32,8 @@
 							"itemId": "item:plank"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 4
+							"min": 4,
+							"max": 4
 						},
 						"charges": {
 							"cost": 1,
@@ -54,8 +47,8 @@
 							"itemId": "item:stone-block"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 4
+							"min": 4,
+							"max": 4
 						}
 					},
 					{
@@ -65,8 +58,8 @@
 							"itemId": "item:bricks"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 2
+							"min": 2,
+							"max": 2
 						}
 					},
 					{
@@ -76,8 +69,8 @@
 							"itemId": "item:glass"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 1
+							"min": 1,
+							"max": 1
 						}
 					},
 					{
@@ -87,8 +80,8 @@
 							"itemId": "item:roof-tiles"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 2
+							"min": 2,
+							"max": 2
 						}
 					},
 					{
@@ -98,8 +91,8 @@
 							"itemId": "item:gold-ingot"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 1
+							"min": 1,
+							"max": 1
 						}
 					},
 					{
@@ -109,8 +102,8 @@
 							"itemId": "item:building-permit"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 1
+							"min": 1,
+							"max": 1
 						}
 					},
 					{
@@ -120,8 +113,8 @@
 							"itemId": "item:luxury-clothing"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 1
+							"min": 1,
+							"max": 1
 						}
 					},
 					{
@@ -131,8 +124,8 @@
 							"itemId": "item:morale-t3"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 1
+							"min": 1,
+							"max": 1
 						}
 					}
 				],
@@ -193,8 +186,8 @@
 										{
 											"itemId": "producer:construction-yard-t1",
 											"quantity": {
-												"type": "value",
-												"value": 1
+												"min": 1,
+												"max": 1
 											},
 											"placement": "drop",
 											"rules": []

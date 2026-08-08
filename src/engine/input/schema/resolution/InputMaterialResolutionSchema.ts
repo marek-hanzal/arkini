@@ -4,7 +4,7 @@ import { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeInte
 import { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
 import { InputEnumSchema } from "~/engine/input/schema/InputEnumSchema";
 import { InputModeEnumSchema } from "~/engine/input/schema/InputModeEnumSchema";
-import { QuantityBoundsSchema } from "~/engine/quantity/schema/QuantityBoundsSchema";
+import { QuantitySchema } from "~/engine/quantity/schema/QuantitySchema";
 
 /**
  * Current readiness and storage limits of one material input slot.
@@ -26,7 +26,7 @@ export const InputMaterialResolutionSchema = z
 		/**
 		 * Inclusive quantity accepted by one line run.
 		 */
-		required: QuantityBoundsSchema.describe(
+		required: QuantitySchema.describe(
 			"The inclusive material quantity accepted by one line run.",
 		),
 		/**

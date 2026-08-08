@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:plank": {
+			"uid": "ha6318z8vxlj63wfv607yknu",
 			"id": "item:plank",
 			"type": "simple",
 			"title": "Plank",
@@ -11,13 +12,6 @@
 					"item-plank"
 				]
 			},
-			"tags": [
-				"material",
-				"wood",
-				"era:I",
-				"tier-2-resource"
-			],
-			"categoryId": "material",
 			"scope": "any",
 			"maxStackSize": 50
 		}

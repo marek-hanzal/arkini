@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:emerald": {
+			"uid": "fzsiqo1vlvi05sb3bfulelmc",
 			"id": "item:emerald",
 			"type": "simple",
 			"title": "Emerald",
@@ -11,13 +12,6 @@
 					"item-emerald"
 				]
 			},
-			"tags": [
-				"treasure",
-				"gem",
-				"emerald",
-				"era:IX"
-			],
-			"categoryId": "treasure",
 			"scope": "any",
 			"maxStackSize": 20
 		}

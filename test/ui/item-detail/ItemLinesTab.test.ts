@@ -141,6 +141,7 @@ const output = {
 						min: 1,
 						max: 1,
 					},
+					activeRuleHints: [],
 					sourceUrl: "resource:log",
 					definitionItemId: "log",
 				},
@@ -195,6 +196,7 @@ const line = ({
 		kind: "available",
 		readiness: "ready",
 	},
+	activeRuleHints: [],
 	isDefault,
 	queuedRequestCount: 0,
 	actions: {
@@ -1482,7 +1484,7 @@ describe("ItemLinesTab", () => {
 		});
 	});
 
-	it("opens projected dependency artwork without reconstructing its identity", async () => {
+	it("shows the authored hint instead of exposing rule internals", async () => {
 		const dependency = {
 			...projection.line[0],
 			availability: {
@@ -1491,6 +1493,7 @@ describe("ItemLinesTab", () => {
 					kind: "line-disabled",
 					cause: {
 						kind: "enable-rule",
+						hint: "Build a stonemason first.",
 						ruleIndex: 0,
 						whenIndex: 0,
 						condition: {
@@ -1508,9 +1511,7 @@ describe("ItemLinesTab", () => {
 							},
 						},
 					},
-					messageBeforeDetail: "Requires ",
-					messageAfterDetail: " · Board · close.",
-					message: "Requires Stonemason I (Board · close).",
+					message: "Build a stonemason first.",
 				},
 			},
 			actions: {
@@ -1526,19 +1527,10 @@ describe("ItemLinesTab", () => {
 				dependency,
 			],
 		});
-		const link = document.querySelector<HTMLButtonElement>(
-			'[data-ui="TileLineUnavailableDependencyLink"]',
-		);
-
-		expect(link?.textContent).toContain("Stonemason I");
-		expect(link?.querySelector("img")?.getAttribute("src")).toBe("resource:stonemason");
 		const reason = document.querySelector('[data-ui="TileLineUnavailableReason"]');
-		expect(reason?.textContent).toBe("Stonemason IRequired · Board · close");
+		expect(reason?.textContent).toBe("Build a stonemason first.");
 		expect(reason?.className).not.toContain("border-t");
-		await act(async () => link?.click());
-		expect(control.openItemDetailFx).toHaveBeenCalledWith({
-			itemId: "runtime:stonemason",
-		});
+		expect(document.querySelector('[data-ui="TileLineUnavailableDependencyLink"]')).toBeNull();
 	});
 
 	it("keeps authored order, toggles default state, and reserves active border geometry", async () => {
@@ -1757,8 +1749,8 @@ describe("ItemLinesTab", () => {
 		const advancedInput = {
 			...input,
 			selector: {
-				kind: "tag",
-				label: "knowledge:advanced",
+				kind: "item",
+				label: "Knowledge Advanced",
 			},
 			detail: undefined,
 			ready: false,
@@ -1777,6 +1769,7 @@ describe("ItemLinesTab", () => {
 								min: 1,
 								max: 4,
 							},
+							activeRuleHints: [],
 						},
 					],
 				},

@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:bricks": {
+			"uid": "sflqmeq9us23cfz4h6jr5sfa",
 			"id": "item:bricks",
 			"type": "simple",
 			"title": "Bricks",
@@ -11,15 +12,6 @@
 					"item-bricks"
 				]
 			},
-			"tags": [
-				"material",
-				"construction",
-				"clay",
-				"era:VIII",
-				"industry",
-				"tier-3-resource"
-			],
-			"categoryId": "material",
 			"scope": "any",
 			"maxStackSize": 50
 		}

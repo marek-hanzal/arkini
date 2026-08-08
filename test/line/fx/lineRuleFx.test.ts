@@ -47,6 +47,13 @@ describe("lineRuleFx", () => {
 						],
 					},
 					{
+						type: "runtime:adjust",
+						when: [
+							existsWhen("permit"),
+						],
+						adjustMs: -2_000,
+					},
+					{
 						type: "runtime:multiplier",
 						when: [
 							existsWhen("permit"),
@@ -89,6 +96,11 @@ describe("lineRuleFx", () => {
 			{
 				active: true,
 				type: "disable",
+			},
+			{
+				active: true,
+				adjustMs: -2_000,
+				type: "runtime:adjust",
 			},
 			{
 				active: true,

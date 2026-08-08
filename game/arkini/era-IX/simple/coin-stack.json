@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:coin-stack": {
+			"uid": "gon79k4looainbezqivstq35",
 			"id": "item:coin-stack",
 			"type": "simple",
 			"title": "Coin Stack",
@@ -11,14 +12,6 @@
 					"item-coin-stack"
 				]
 			},
-			"tags": [
-				"currency",
-				"coin",
-				"trade",
-				"goldsmith",
-				"era:IX"
-			],
-			"categoryId": "currency",
 			"scope": "any",
 			"maxStackSize": 50
 		}

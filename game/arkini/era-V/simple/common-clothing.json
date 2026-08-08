@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:common-clothing": {
+			"uid": "lwktxsy9j9tqy0mehwnos1o3",
 			"id": "item:common-clothing",
 			"type": "simple",
 			"title": "Common Clothing",
@@ -11,13 +12,6 @@
 					"item-common-clothing"
 				]
 			},
-			"tags": [
-				"clothing",
-				"textile",
-				"era:V",
-				"tier-5-resource"
-			],
-			"categoryId": "clothing",
 			"scope": "any",
 			"maxStackSize": 30
 		}

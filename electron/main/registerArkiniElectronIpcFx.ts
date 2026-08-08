@@ -7,6 +7,7 @@ import type { CheatPreferences } from "./cheat/CheatPreferences";
 import { ElectronMainRuntime } from "./ElectronMainRuntime";
 import type { LauncherPreferences } from "./launcher/LauncherPreferences";
 import { createFilesystemGameSaveFilesFx } from "./save/createFilesystemGameSaveFilesFx";
+import type { ArkiniUserDataPaths } from "./user-data/ArkiniUserDataPaths";
 import type { TrustedRenderer } from "./security/TrustedRenderer";
 import { DiagnosticRecordSchema } from "../contract/diagnostics/DiagnosticRecord";
 import type { DiagnosticLog } from "./diagnostics/DiagnosticLog";
@@ -24,6 +25,7 @@ export namespace registerArkiniElectronIpcFx {
 		readonly launcherPreferences: LauncherPreferences;
 		readonly windowPreferences: WindowPreferences;
 		readonly diagnostics: DiagnosticLog;
+		readonly userDataPaths: ArkiniUserDataPaths;
 	}
 }
 
@@ -36,18 +38,17 @@ export const registerArkiniElectronIpcFx = Effect.fn("registerArkiniElectronIpcF
 		launcherPreferences,
 		windowPreferences,
 		diagnostics,
+		userDataPaths,
 	}: registerArkiniElectronIpcFx.Props) =>
 		Effect.gen(function* () {
 			if (registered) return;
 			registered = true;
-			const userDataPath = app.getPath("userData");
 			const arkpacks = yield* createFilesystemArkpackCatalogFx({
-				userDataPath,
+				root: userDataPaths.game.arkpacks,
 			});
 			const saves = yield* createFilesystemGameSaveFilesFx({
-				userDataPath,
+				root: userDataPaths.game.saves,
 			});
-
 			yield* Effect.sync(() => {
 				const synchronizeWindowBackgrounds = () => {
 					const color = nativeTheme.shouldUseDarkColors ? "#090711" : "#fbf8ff";

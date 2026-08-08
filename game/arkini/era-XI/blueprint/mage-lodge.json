@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:blueprint-mage-lodge": {
+			"uid": "ytyyx8aowxa232hkdzywrne1",
 			"id": "item:blueprint-mage-lodge",
 			"type": "blueprint",
 			"title": "Mage Lodge Blueprint",
@@ -15,17 +16,6 @@
 					"producer-mage-lodge"
 				]
 			},
-			"tags": [
-				"blueprint",
-				"building",
-				"path",
-				"keystone",
-				"mages",
-				"magic",
-				"arcane",
-				"era:XI"
-			],
-			"categoryId": "blueprint",
 			"scope": "any",
 			"maxStackSize": 1,
 			"line": {
@@ -42,8 +32,8 @@
 							"itemId": "item:construction-bundle"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 1
+							"min": 1,
+							"max": 1
 						},
 						"charges": {
 							"cost": 1,
@@ -57,8 +47,8 @@
 							"itemId": "item:guild-charter"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 1
+							"min": 1,
+							"max": 1
 						}
 					},
 					{
@@ -68,8 +58,8 @@
 							"itemId": "item:treasure-chest"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 1
+							"min": 1,
+							"max": 1
 						}
 					},
 					{
@@ -79,8 +69,8 @@
 							"itemId": "item:marble-block"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 2
+							"min": 2,
+							"max": 2
 						}
 					},
 					{
@@ -90,8 +80,8 @@
 							"itemId": "item:stained-glass"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 3
+							"min": 3,
+							"max": 3
 						}
 					},
 					{
@@ -101,8 +91,8 @@
 							"itemId": "item:pigment"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 3
+							"min": 3,
+							"max": 3
 						}
 					},
 					{
@@ -112,8 +102,8 @@
 							"itemId": "item:sapphire"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 1
+							"min": 1,
+							"max": 1
 						}
 					},
 					{
@@ -123,8 +113,8 @@
 							"itemId": "item:aquamarine"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 1
+							"min": 1,
+							"max": 1
 						}
 					},
 					{
@@ -134,8 +124,8 @@
 							"itemId": "item:coin-stack"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 3
+							"min": 3,
+							"max": 3
 						}
 					},
 					{
@@ -145,8 +135,8 @@
 							"itemId": "item:morale-t4"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 1
+							"min": 1,
+							"max": 1
 						}
 					},
 					{
@@ -156,8 +146,8 @@
 							"itemId": "item:morale-t3"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 1
+							"min": 1,
+							"max": 1
 						}
 					}
 				],
@@ -258,8 +248,8 @@
 										{
 											"itemId": "producer:mage-lodge",
 											"quantity": {
-												"type": "value",
-												"value": 1
+												"min": 1,
+												"max": 1
 											},
 											"placement": "drop",
 											"rules": []

@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"producer:mage-lodge": {
+			"uid": "kyqpu2kd0tpyw8gj9bqfq6zx",
 			"id": "producer:mage-lodge",
 			"type": "simple",
 			"title": "Mage Lodge",
@@ -11,18 +12,6 @@
 					"producer-mage-lodge"
 				]
 			},
-			"tags": [
-				"building",
-				"producer",
-				"path",
-				"keystone",
-				"mages",
-				"magic",
-				"arcane",
-				"unique",
-				"era:XI"
-			],
-			"categoryId": "material",
 			"scope": "any",
 			"maxCount": 1,
 			"maxStackSize": 1

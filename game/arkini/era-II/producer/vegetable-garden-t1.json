@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"producer:vegetable-garden-t1": {
+			"uid": "x0gaosb8xxm4nupoh6hjqs2l",
 			"id": "producer:vegetable-garden-t1",
 			"type": "producer",
 			"title": "Vegetable Garden I",
@@ -11,14 +12,6 @@
 					"producer-vegetable-garden-t1"
 				]
 			},
-			"tags": [
-				"producer",
-				"food",
-				"vegetable",
-				"era:II",
-				"unique"
-			],
-			"categoryId": "building",
 			"scope": "any",
 			"maxCount": 1,
 			"maxStackSize": 1,
@@ -37,8 +30,8 @@
 								"itemId": "item:water"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 4
 						}
@@ -54,8 +47,8 @@
 											{
 												"itemId": "item:vegetables",
 												"quantity": {
-													"type": "value",
-													"value": 2
+													"min": 2,
+													"max": 2
 												},
 												"rules": []
 											}
@@ -68,8 +61,8 @@
 											{
 												"itemId": "item:vegetables",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}

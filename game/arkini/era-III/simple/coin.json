@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:coin": {
+			"uid": "gdx2v2b9josshcyohg9rtlxy",
 			"id": "item:coin",
 			"type": "simple",
 			"title": "Coin",
@@ -11,13 +12,6 @@
 					"item-coin"
 				]
 			},
-			"tags": [
-				"currency",
-				"coin",
-				"trade",
-				"era:III"
-			],
-			"categoryId": "currency",
 			"scope": "any",
 			"maxStackSize": 100
 		}

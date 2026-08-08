@@ -12,6 +12,10 @@ import { useItemDetailSources } from "~/bridge/item-detail/useItemDetailSources"
 import { useItemDetailTabs } from "~/bridge/item-detail/useItemDetailTabs";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import { BadgeCount } from "~/ui/badge/BadgeCount";
+import {
+	selectableActiveClassName,
+	selectableInactiveClassName,
+} from "~/ui/form/SelectableStateClassName";
 import { ItemIdentity } from "~/ui/item/ItemIdentity";
 import { ItemDefinitionInfoTab } from "~/ui/item-detail/ItemDefinitionInfoTab";
 import type { ItemDetailState, ItemDetailTarget } from "~/ui/item-detail/ItemDetailControl";
@@ -44,7 +48,6 @@ const tabLabel = {
 
 interface HeaderIdentity {
 	readonly title: string;
-	readonly subtitle?: string;
 	readonly sourceUrl: string;
 	readonly compositeUrl?: string;
 }
@@ -65,16 +68,11 @@ const ItemDetailHeader = ({
 				artworkDataUi="ItemDetailHeaderArtwork"
 				compositeUrl={identity.compositeUrl}
 				description={
-					<>
-						{identity.subtitle === undefined ? null : (
-							<p className="mt-1 truncate text-sm text-muted">{identity.subtitle}</p>
-						)}
-						{stale ? (
-							<p className="mt-1 text-xs font-medium text-warning">
-								This item no longer exists. Showing the last known detail.
-							</p>
-						) : null}
-					</>
+					stale ? (
+						<p className="mt-1 text-xs font-medium text-warning">
+							This item no longer exists. Showing the last known detail.
+						</p>
+					) : null
 				}
 				size="lg"
 				sourceUrl={identity.sourceUrl}
@@ -120,7 +118,7 @@ const ItemDetailTabs = ({
 	const itemDetail = useItemDetailControl();
 	return (
 		<nav
-			className="flex min-w-0 gap-1 overflow-x-auto border-b border-line py-2"
+			className="flex min-w-0 gap-2 overflow-x-auto py-2"
 			aria-label="Item detail tabs"
 			data-ui="ItemDetailTabs"
 		>
@@ -128,7 +126,7 @@ const ItemDetailTabs = ({
 				<button
 					key={tab}
 					type="button"
-					className="inline-flex shrink-0 cursor-pointer items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium text-muted transition-colors hover:bg-accent/10 hover:text-foreground aria-selected:bg-accent/15 aria-selected:text-foreground disabled:cursor-not-allowed"
+					className={`inline-flex shrink-0 cursor-pointer items-center gap-1.5 rounded-lg border px-3 py-2 text-sm font-medium disabled:cursor-not-allowed ${tab === active ? selectableActiveClassName : selectableInactiveClassName}`}
 					aria-selected={tab === active}
 					disabled={disabled}
 					data-tab={tab}
@@ -194,7 +192,6 @@ const ItemInfoContent = ({
 			inert={disabled}
 		>
 			<ItemInfoTab
-				identity={identity}
 				info={info}
 				stale={stale}
 			/>

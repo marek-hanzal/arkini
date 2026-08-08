@@ -5,11 +5,10 @@ import { createArkpackCatalogFx } from "~/bridge/arkpack/createArkpackCatalogFx"
 
 const builtIn: ArkpackDescriptor = {
 	packageId: "arkini",
-	contentHash: "a".repeat(64),
+	hash: "a".repeat(64),
 	gameId: "arkini",
 	title: "Arkini",
-	configVersion: "1",
-	compressedSize: 1,
+	game: "1",
 	trust: {
 		type: "official",
 		keyId: "test-official",
@@ -19,11 +18,10 @@ const builtIn: ArkpackDescriptor = {
 
 const imported: ArkpackDescriptor = {
 	packageId: "b".repeat(64),
-	contentHash: "b".repeat(64),
+	hash: "b".repeat(64),
 	gameId: "imported",
 	title: "Imported",
-	configVersion: "1",
-	compressedSize: 2,
+	game: "1",
 	trust: {
 		type: "external",
 		reason: "unsigned",
@@ -37,6 +35,20 @@ describe("createArkpackCatalogFx", () => {
 			builtIn,
 		];
 		const list = vi.fn(() => descriptors);
+		const install = vi.fn(({ bytes }: { readonly bytes: Uint8Array }) =>
+			Effect.sync(() => {
+				expect(bytes).toEqual(
+					new Uint8Array([
+						1,
+					]),
+				);
+				descriptors = [
+					builtIn,
+					imported,
+				];
+				return imported;
+			}),
+		);
 		const catalog = Effect.runSync(
 			createArkpackCatalogFx({
 				listFx: Effect.sync(list),
@@ -48,6 +60,7 @@ describe("createArkpackCatalogFx", () => {
 						];
 						return imported;
 					}),
+				installFx: install,
 				removeFx: () =>
 					Effect.sync(() => {
 						descriptors = [
@@ -57,7 +70,7 @@ describe("createArkpackCatalogFx", () => {
 			}),
 		);
 		const observed = Effect.runPromise(
-			SubscriptionRef.changes(catalog.state).pipe(Stream.take(6), Stream.runCollect),
+			SubscriptionRef.changes(catalog.state).pipe(Stream.take(8), Stream.runCollect),
 		);
 		await Effect.runPromise(catalog.refreshFx);
 		expect(Effect.runSync(SubscriptionRef.get(catalog.state))).toEqual({
@@ -84,8 +97,34 @@ describe("createArkpackCatalogFx", () => {
 				builtIn,
 			],
 		});
-		expect(list).toHaveBeenCalledTimes(3);
+
+		await expect(
+			Effect.runPromise(
+				catalog.installFx({
+					bytes: new Uint8Array([
+						1,
+					]),
+					filename: "built.arkpack",
+				}),
+			),
+		).resolves.toBe(imported);
+		expect(install).toHaveBeenCalledWith({
+			bytes: new Uint8Array([
+				1,
+			]),
+			filename: "built.arkpack",
+		});
+		expect(Effect.runSync(SubscriptionRef.get(catalog.state))).toEqual({
+			type: "ready",
+			arkpacks: [
+				builtIn,
+				imported,
+			],
+		});
+		expect(list).toHaveBeenCalledTimes(4);
 		expect((await observed).map((state) => state.type)).toEqual([
+			"loading",
+			"ready",
 			"loading",
 			"ready",
 			"loading",
@@ -206,8 +245,16 @@ describe("createArkpackCatalogFx", () => {
 		expect(Effect.runSync(SubscriptionRef.get(catalog.state))).toEqual({
 			type: "loading",
 		});
+		let idle = false;
+		const waitingForIdle = Effect.runPromise(catalog.awaitIdleFx).then(() => {
+			idle = true;
+		});
+		await Promise.resolve();
+		expect(idle).toBe(false);
 		Effect.runSync(Deferred.succeed(finishImport, undefined));
 		await expect(importing).resolves.toBe(imported);
+		await waitingForIdle;
+		expect(idle).toBe(true);
 		expect(Effect.runSync(SubscriptionRef.get(catalog.state))).toEqual({
 			type: "ready",
 			arkpacks: [

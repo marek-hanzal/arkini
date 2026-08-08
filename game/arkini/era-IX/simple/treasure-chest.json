@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:treasure-chest": {
+			"uid": "sx48npmi1t94ri222i9ane35",
 			"id": "item:treasure-chest",
 			"type": "simple",
 			"title": "Treasure Chest",
@@ -11,15 +12,6 @@
 					"item-treasure-chest"
 				]
 			},
-			"tags": [
-				"treasure",
-				"chest",
-				"gem",
-				"gold",
-				"master",
-				"era:IX"
-			],
-			"categoryId": "treasure",
 			"scope": "any",
 			"maxStackSize": 5
 		}

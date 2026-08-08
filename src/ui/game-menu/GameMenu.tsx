@@ -96,7 +96,7 @@ const GameMenuDialog = ({
 						Return to game
 					</PrimaryButton>
 					<Button
-						className="w-full shadow-none backdrop-blur-none"
+						className="w-full shadow-none"
 						cursorIntent={actionCursorIntent}
 						disabled={actions.actionDisabled}
 						onClick={actions.requestSettings}
@@ -105,7 +105,7 @@ const GameMenuDialog = ({
 					</Button>
 					{cheatAvailability.available ? (
 						<Button
-							className="w-full shadow-none backdrop-blur-none"
+							className="w-full shadow-none"
 							cursorIntent={actionCursorIntent}
 							disabled={actions.actionDisabled}
 							onClick={actions.requestCheats}
@@ -114,7 +114,7 @@ const GameMenuDialog = ({
 						</Button>
 					) : null}
 					<Button
-						className="w-full shadow-none backdrop-blur-none"
+						className="w-full shadow-none"
 						cursorIntent={actionCursorIntent}
 						disabled={actions.actionDisabled}
 						onClick={actions.requestMainMenu}
@@ -125,7 +125,7 @@ const GameMenuDialog = ({
 					<div className="my-2 border-t border-line" />
 
 					<Button
-						className="w-full shadow-none backdrop-blur-none"
+						className="w-full shadow-none"
 						cursorIntent={actionCursorIntent}
 						disabled={actions.actionDisabled}
 						onClick={actions.requestSave}
@@ -133,7 +133,7 @@ const GameMenuDialog = ({
 						Save
 					</Button>
 					<Button
-						className="w-full shadow-none backdrop-blur-none"
+						className="w-full shadow-none"
 						cursorIntent={actionCursorIntent}
 						disabled={actions.actionDisabled}
 						onClick={actions.requestSaveAndExit}
@@ -161,7 +161,7 @@ const GameMenuDialog = ({
 								</p>
 								<div className="grid grid-cols-2 gap-2">
 									<Button
-										className="min-h-0 px-3 py-2 shadow-none backdrop-blur-none"
+										className="min-h-0 px-3 py-2 shadow-none"
 										cursorIntent={actionCursorIntent}
 										disabled={actions.actionDisabled}
 										onClick={() => actions.setConfirmingDestroy(false)}

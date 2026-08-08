@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"producer:townhall-t3": {
+			"uid": "xtlo582dvjp13v50g3620lb6",
 			"id": "producer:townhall-t3",
 			"type": "producer",
 			"title": "Town Hall III",
@@ -11,14 +12,6 @@
 					"producer-townhall-t3"
 				]
 			},
-			"tags": [
-				"producer",
-				"townhall",
-				"civic",
-				"unique",
-				"era:III"
-			],
-			"categoryId": "building",
 			"scope": "any",
 			"maxCount": 1,
 			"maxStackSize": 1,
@@ -45,8 +38,8 @@
 											{
 												"itemId": "item:blueprint-windmill-t1",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -78,8 +71,8 @@
 											{
 												"itemId": "item:blueprint-bakery-t1",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -111,8 +104,8 @@
 											{
 												"itemId": "item:blueprint-slaughterhouse-t1",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -144,8 +137,8 @@
 											{
 												"itemId": "item:blueprint-dairy-t1",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -169,8 +162,8 @@
 								"itemId": "item:grain"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 4
 						},
@@ -181,8 +174,8 @@
 								"itemId": "item:water"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 4
 						}
@@ -198,8 +191,8 @@
 											{
 												"itemId": "item:hop-field",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -231,8 +224,8 @@
 											{
 												"itemId": "item:blueprint-brewery-t1",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -264,8 +257,8 @@
 											{
 												"itemId": "item:blueprint-tavern-t1",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -289,8 +282,8 @@
 								"itemId": "item:grain"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 4
 						},
@@ -301,8 +294,8 @@
 								"itemId": "item:water"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 4
 						}
@@ -318,8 +311,8 @@
 											{
 												"itemId": "item:vineyard",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -351,8 +344,8 @@
 											{
 												"itemId": "item:blueprint-winery-t1",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -384,8 +377,8 @@
 											{
 												"itemId": "item:blueprint-market-t1",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -409,8 +402,8 @@
 								"itemId": "item:beer"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 4
 						}
@@ -426,8 +419,8 @@
 											{
 												"itemId": "item:blueprint-house-t2",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -451,8 +444,8 @@
 								"itemId": "item:feast"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 4
 						}
@@ -468,8 +461,8 @@
 											{
 												"itemId": "item:blueprint-townhall-t4",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}

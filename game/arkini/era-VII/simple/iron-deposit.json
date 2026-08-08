@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:iron-deposit": {
+			"uid": "xzj5ij48y47uatscblhe1psa",
 			"id": "item:iron-deposit",
 			"type": "simple",
 			"title": "Iron Deposit",
@@ -11,14 +12,6 @@
 					"item-iron-deposit"
 				]
 			},
-			"tags": [
-				"source",
-				"industry",
-				"mine",
-				"iron",
-				"era:VII"
-			],
-			"categoryId": "source",
 			"scope": "any",
 			"maxStackSize": 1
 		}

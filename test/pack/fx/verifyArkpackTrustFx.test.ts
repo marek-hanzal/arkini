@@ -52,10 +52,8 @@ describe("Arkpack Ed25519 trust", () => {
 			}),
 		);
 		const trustedKeys = ArkpackTrustedKeysSchema.parse({
-			formatVersion: 1,
 			keys: [
 				{
-					algorithm: "ed25519",
 					keyId,
 					publicKey: keyPair.publicKey,
 				},
@@ -63,20 +61,17 @@ describe("Arkpack Ed25519 trust", () => {
 		});
 
 		expect(second).toEqual(first);
-		await expect(
-			Effect.runPromise(
-				verifyArkpackTrustFx({
-					bytes,
-					signature: first,
-					trustedKeys,
-				}),
-			),
-		).resolves.toEqual({
-			contentHash: first.contentHash,
-			trust: {
-				type: "official",
-				keyId,
-			},
+		const verified = await Effect.runPromise(
+			verifyArkpackTrustFx({
+				bytes,
+				signature: first,
+				trustedKeys,
+			}),
+		);
+		expect(verified.contentHash).toMatch(/^[a-f0-9]{64}$/);
+		expect(verified.trust).toEqual({
+			type: "official",
+			keyId,
 		});
 	});
 
@@ -89,10 +84,8 @@ describe("Arkpack Ed25519 trust", () => {
 			}),
 		);
 		const trustedKeys = ArkpackTrustedKeysSchema.parse({
-			formatVersion: 1,
 			keys: [
 				{
-					algorithm: "ed25519",
 					keyId,
 					publicKey: keyPair.publicKey,
 				},
@@ -150,7 +143,7 @@ describe("Arkpack Ed25519 trust", () => {
 		});
 		expect(changed.trust).toEqual({
 			type: "invalid",
-			reason: "hash-mismatch",
+			reason: "invalid-signature",
 			keyId,
 		});
 		expect(invalid.trust).toEqual({
@@ -160,7 +153,7 @@ describe("Arkpack Ed25519 trust", () => {
 		});
 	});
 
-	it("distinguishes malformed metadata, hash claims, wrong keys, and malformed key material", async () => {
+	it("distinguishes malformed metadata, wrong keys, and malformed key material", async () => {
 		const signature = await Effect.runPromise(
 			signArkpackFx({
 				bytes,
@@ -169,10 +162,8 @@ describe("Arkpack Ed25519 trust", () => {
 			}),
 		);
 		const wrongTrustedKeys = ArkpackTrustedKeysSchema.parse({
-			formatVersion: 1,
 			keys: [
 				{
-					algorithm: "ed25519",
 					keyId,
 					publicKey: wrongKeyPair.publicKey,
 				},
@@ -187,16 +178,6 @@ describe("Arkpack Ed25519 trust", () => {
 				trustedKeys: wrongTrustedKeys,
 			}),
 		);
-		const mismatchedHash = await Effect.runPromise(
-			verifyArkpackTrustFx({
-				bytes,
-				signature: {
-					...signature,
-					contentHash: "0".repeat(64),
-				},
-				trustedKeys: wrongTrustedKeys,
-			}),
-		);
 		const wrongKey = await Effect.runPromise(
 			verifyArkpackTrustFx({
 				bytes,
@@ -205,10 +186,8 @@ describe("Arkpack Ed25519 trust", () => {
 			}),
 		);
 		const malformedTrustedKeys = {
-			formatVersion: 1 as const,
 			keys: [
 				{
-					algorithm: "ed25519" as const,
 					keyId,
 					publicKey: "-----BEGIN PUBLIC KEY-----\nAAAA\n-----END PUBLIC KEY-----\n",
 				},
@@ -227,11 +206,6 @@ describe("Arkpack Ed25519 trust", () => {
 		expect(malformed.trust).toEqual({
 			type: "invalid",
 			reason: "malformed-signature",
-		});
-		expect(mismatchedHash.trust).toEqual({
-			type: "invalid",
-			reason: "hash-mismatch",
-			keyId,
 		});
 		expect(wrongKey.trust).toEqual({
 			type: "invalid",

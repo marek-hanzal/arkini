@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:iron-ingot": {
+			"uid": "kpepp9h7wsorwpjxxevr5opa",
 			"id": "item:iron-ingot",
 			"type": "simple",
 			"title": "Iron Ingot",
@@ -11,15 +12,6 @@
 					"item-iron-ingot"
 				]
 			},
-			"tags": [
-				"material",
-				"industry",
-				"ingot",
-				"iron",
-				"era:VIII",
-				"tier-7-resource"
-			],
-			"categoryId": "material",
 			"scope": "any",
 			"maxStackSize": 50
 		}

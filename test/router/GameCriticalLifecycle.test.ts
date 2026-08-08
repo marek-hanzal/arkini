@@ -38,11 +38,10 @@ const createGame = ({
 } = {}): Game => ({
 	arkpack: {
 		packageId,
-		contentHash: "content-critical",
+		hash: "content-critical",
 		gameId: testArkpackConfig.meta.id,
 		title: testArkpackConfig.meta.title,
-		configVersion: testArkpackConfig.version,
-		compressedSize: 0,
+		game: testArkpackConfig.version,
 		trust: {
 			type: "external",
 			reason: "unsigned",

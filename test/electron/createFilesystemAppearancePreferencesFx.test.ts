@@ -7,7 +7,7 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { createFilesystemAppearancePreferencesFx } from "../../electron/main/appearance/createFilesystemAppearancePreferencesFx";
 
 let root = "";
-const preferenceDirectory = () => join(root, "arkini", "preferences");
+const preferenceDirectory = () => join(root, "arkini", "game", "preferences");
 const themePath = () => join(preferenceDirectory(), "appearance.theme");
 const themePendingPath = () => join(preferenceDirectory(), "appearance.pending");
 const accentPath = () => join(preferenceDirectory(), "appearance.accent");
@@ -16,7 +16,7 @@ const accentPendingPath = () => join(preferenceDirectory(), "appearance-accent.p
 const createPreferences = () =>
 	Effect.runPromise(
 		createFilesystemAppearancePreferencesFx({
-			userDataPath: root,
+			root: preferenceDirectory(),
 		}).pipe(Effect.provide(NodeServices.layer)),
 	);
 
@@ -81,7 +81,7 @@ describe("createFilesystemAppearancePreferencesFx", () => {
 			Effect.gen(function* () {
 				const fileSystem = yield* FileSystem.FileSystem;
 				return yield* createFilesystemAppearancePreferencesFx({
-					userDataPath: root,
+					root: preferenceDirectory(),
 					fileSystem: {
 						...fileSystem,
 						rename: () =>

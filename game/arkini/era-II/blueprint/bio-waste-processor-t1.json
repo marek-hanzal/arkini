@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:blueprint-bio-waste-processor-t1": {
+			"uid": "c5g9y5ln58d22wf4nb2vlzw6",
 			"id": "item:blueprint-bio-waste-processor-t1",
 			"type": "blueprint",
 			"title": "Bio-Waste Processor I Blueprint",
@@ -15,16 +16,6 @@
 					"producer-bio-waste-processor-t1"
 				]
 			},
-			"tags": [
-				"blueprint",
-				"building",
-				"craft-target",
-				"cleanup",
-				"bio-waste",
-				"farm",
-				"era:II"
-			],
-			"categoryId": "blueprint",
 			"scope": "any",
 			"maxStackSize": 1,
 			"line": {
@@ -41,8 +32,8 @@
 							"itemId": "item:plank"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 2
+							"min": 2,
+							"max": 2
 						},
 						"charges": {
 							"cost": 1,
@@ -56,8 +47,8 @@
 							"itemId": "item:stone"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 2
+							"min": 2,
+							"max": 2
 						}
 					},
 					{
@@ -67,8 +58,8 @@
 							"itemId": "item:grain"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 1
+							"min": 1,
+							"max": 1
 						}
 					},
 					{
@@ -78,8 +69,8 @@
 							"itemId": "item:water"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 1
+							"min": 1,
+							"max": 1
 						}
 					}
 				],
@@ -94,8 +85,8 @@
 										{
 											"itemId": "producer:bio-waste-processor-t1",
 											"quantity": {
-												"type": "value",
-												"value": 1
+												"min": 1,
+												"max": 1
 											},
 											"placement": "drop",
 											"rules": []

@@ -10,6 +10,7 @@ import {
 import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it } from "vitest";
+import { BackButton } from "~/ui/button/BackButton";
 import {
 	Button,
 	ButtonLink,
@@ -48,6 +49,22 @@ const elementByText = <T extends Element>(
 };
 
 describe("Button primitives", () => {
+	it("renders the canonical primary back action with a directional icon", async () => {
+		const container = document.createElement("div");
+		document.body.append(container);
+		const root = createRoot(container);
+		roots.push(root);
+		await act(async () => {
+			root.render(createElement(BackButton));
+		});
+
+		const backButton = elementByText<HTMLButtonElement>(container, "button", "Back");
+		expect(backButton.className).toContain("bg-accent");
+		expect(backButton.className).toContain("mx-auto");
+		expect(backButton.className).toContain("gap-2");
+		expect(backButton.querySelector('[class*="icon-[lucide--arrow-left]"]')).not.toBeNull();
+	});
+
 	it("renders the shared inline-link action without button chrome", async () => {
 		const container = document.createElement("div");
 		document.body.append(container);
@@ -195,6 +212,8 @@ describe("Button primitives", () => {
 
 		expect(neutralLink.className).toContain("bg-surface/75");
 		expect(neutralButton.className).toContain("bg-surface/75");
+		expect(neutralLink.className).not.toContain("backdrop-");
+		expect(neutralButton.className).not.toContain("backdrop-");
 		expect(primaryLink.className).toBe(primaryButton.className);
 		expect(dangerLink.className).toBe(dangerButton.className);
 		expect(neutralLink.className).not.toBe(primaryLink.className);

@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:cheese": {
+			"uid": "km2e6ghecnw36izu8c2apdvq",
 			"id": "item:cheese",
 			"type": "simple",
 			"title": "Cheese",
@@ -11,14 +12,6 @@
 					"item-cheese"
 				]
 			},
-			"tags": [
-				"food",
-				"dairy",
-				"cheese",
-				"era:III",
-				"tier-3-resource"
-			],
-			"categoryId": "food",
 			"scope": "any",
 			"maxStackSize": 50
 		}

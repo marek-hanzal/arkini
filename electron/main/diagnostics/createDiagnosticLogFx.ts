@@ -52,9 +52,8 @@ const writeRecord = (logger: Logger, record: DiagnosticRecord) => {
 	}
 };
 
-export const createDiagnosticLogFx = Effect.fn("createDiagnosticLogFx")((userDataPath: string) =>
+export const createDiagnosticLogFx = Effect.fn("createDiagnosticLogFx")((directoryPath: string) =>
 	Effect.sync((): DiagnosticLog => {
-		const directoryPath = join(userDataPath, "arkini", "logs");
 		mkdirSync(directoryPath, {
 			recursive: true,
 		});

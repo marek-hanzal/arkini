@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"producer:sawmill-t1": {
+			"uid": "s18awkeukj377bwscreimf0j",
 			"id": "producer:sawmill-t1",
 			"type": "producer",
 			"title": "Sawmill I",
@@ -11,13 +12,6 @@
 					"producer-sawmill-t1"
 				]
 			},
-			"tags": [
-				"producer",
-				"wood",
-				"era:I",
-				"unique"
-			],
-			"categoryId": "building",
 			"scope": "any",
 			"maxCount": 1,
 			"maxStackSize": 1,
@@ -36,8 +30,8 @@
 								"itemId": "item:log"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 4
 						}
@@ -70,8 +64,8 @@
 											{
 												"itemId": "item:plank",
 												"quantity": {
-													"type": "value",
-													"value": 2
+													"min": 2,
+													"max": 2
 												},
 												"rules": []
 											}
@@ -84,8 +78,8 @@
 											{
 												"itemId": "item:plank",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}

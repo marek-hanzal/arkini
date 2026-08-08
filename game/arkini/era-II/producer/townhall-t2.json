@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"producer:townhall-t2": {
+			"uid": "kx7epra9l7cnju8cxgdfz7qz",
 			"id": "producer:townhall-t2",
 			"type": "producer",
 			"title": "Town Hall II",
@@ -11,14 +12,6 @@
 					"producer-townhall-t2"
 				]
 			},
-			"tags": [
-				"producer",
-				"townhall",
-				"civic",
-				"unique",
-				"era:II"
-			],
-			"categoryId": "building",
 			"scope": "any",
 			"maxCount": 1,
 			"maxStackSize": 1,
@@ -37,8 +30,8 @@
 								"itemId": "item:water"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 4
 						}
@@ -54,8 +47,8 @@
 											{
 												"itemId": "item:wheat-field",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -87,8 +80,8 @@
 											{
 												"itemId": "item:blueprint-farm-t1",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -120,8 +113,8 @@
 											{
 												"itemId": "item:blueprint-pig-farm-t1",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -153,8 +146,8 @@
 											{
 												"itemId": "item:blueprint-cattle-farm-t1",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -186,8 +179,8 @@
 											{
 												"itemId": "item:blueprint-chicken-coop-t1",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -219,8 +212,8 @@
 											{
 												"itemId": "item:blueprint-sheep-pasture-t1",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -252,8 +245,8 @@
 											{
 												"itemId": "item:blueprint-vegetable-garden-t1",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -285,8 +278,8 @@
 											{
 												"itemId": "item:blueprint-cookhouse-t1",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -318,8 +311,8 @@
 											{
 												"itemId": "item:blueprint-waste-processor-t1",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -351,8 +344,8 @@
 											{
 												"itemId": "item:blueprint-bio-waste-processor-t1",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -376,8 +369,8 @@
 								"itemId": "item:feast"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 4
 						}
@@ -393,8 +386,8 @@
 											{
 												"itemId": "item:blueprint-house-t1",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -426,8 +419,8 @@
 											{
 												"itemId": "item:blueprint-townhall-t3",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}

@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:feast-plate": {
+			"uid": "udc7lewgrjfo5cn9ac32h3qp",
 			"id": "item:feast-plate",
 			"type": "craft",
 			"title": "Feast Plate",
@@ -16,14 +17,6 @@
 					"item-feast"
 				]
 			},
-			"tags": [
-				"food",
-				"feast",
-				"craft-target",
-				"era:II",
-				"tier-4-resource"
-			],
-			"categoryId": "food",
 			"scope": "any",
 			"maxStackSize": 1,
 			"line": {
@@ -39,8 +32,8 @@
 							"itemId": "item:grain"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 1
+							"min": 1,
+							"max": 1
 						},
 						"charges": {
 							"cost": 1,
@@ -54,8 +47,8 @@
 							"itemId": "item:piglet"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 1
+							"min": 1,
+							"max": 1
 						}
 					},
 					{
@@ -65,8 +58,8 @@
 							"itemId": "item:milk"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 1
+							"min": 1,
+							"max": 1
 						}
 					},
 					{
@@ -76,8 +69,8 @@
 							"itemId": "item:egg"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 1
+							"min": 1,
+							"max": 1
 						}
 					},
 					{
@@ -87,8 +80,8 @@
 							"itemId": "item:vegetables"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 1
+							"min": 1,
+							"max": 1
 						}
 					}
 				],
@@ -102,8 +95,8 @@
 										{
 											"itemId": "item:feast",
 											"quantity": {
-												"type": "value",
-												"value": 1
+												"min": 1,
+												"max": 1
 											},
 											"rules": [],
 											"placement": "drop"

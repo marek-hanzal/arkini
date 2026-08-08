@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:quest:road-repair": {
+			"uid": "lta0s6g1gnv8gq63oscoc54l",
 			"id": "item:quest:road-repair",
 			"type": "craft",
 			"title": "Road Repair Quest",
@@ -11,13 +12,6 @@
 					"item-quest"
 				]
 			},
-			"tags": [
-				"quest",
-				"craft-target",
-				"request",
-				"era:I"
-			],
-			"categoryId": "quest",
 			"scope": "any",
 			"maxStackSize": 1,
 			"line": {
@@ -34,8 +28,8 @@
 							"itemId": "item:log"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 2
+							"min": 2,
+							"max": 2
 						},
 						"charges": {
 							"cost": 1,
@@ -49,8 +43,8 @@
 							"itemId": "item:stone"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 2
+							"min": 2,
+							"max": 2
 						}
 					}
 				],
@@ -65,16 +59,16 @@
 										{
 											"itemId": "item:plank",
 											"quantity": {
-												"type": "value",
-												"value": 1
+												"min": 1,
+												"max": 1
 											},
 											"rules": []
 										},
 										{
 											"itemId": "item:coin",
 											"quantity": {
-												"type": "value",
-												"value": 1
+												"min": 1,
+												"max": 1
 											},
 											"rules": []
 										}
@@ -91,16 +85,16 @@
 										{
 											"itemId": "item:stone-block",
 											"quantity": {
-												"type": "value",
-												"value": 1
+												"min": 1,
+												"max": 1
 											},
 											"rules": []
 										},
 										{
 											"itemId": "item:coin",
 											"quantity": {
-												"type": "value",
-												"value": 1
+												"min": 1,
+												"max": 1
 											},
 											"rules": []
 										}

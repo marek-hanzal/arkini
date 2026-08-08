@@ -29,18 +29,11 @@ export const useItemDetailInfo = (itemId: IdSchema.Type): useItemDetailInfo.Proj
 				}),
 			);
 			if (info.kind === "unavailable") return unavailable;
-			const categoryTitle = game.config.categories[info.categoryId]?.title;
 			return {
 				kind: "available",
 				itemId: info.itemId,
 				description: info.description,
 				itemType: info.itemType,
-				...(categoryTitle === undefined
-					? {}
-					: {
-							categoryTitle,
-						}),
-				tags: info.tags,
 				storageScope: info.storageScope,
 				location: info.location,
 				quantity: info.quantity,
@@ -59,7 +52,6 @@ export const useItemDetailInfo = (itemId: IdSchema.Type): useItemDetailInfo.Proj
 			};
 		},
 		[
-			game.config.categories,
 			itemId,
 		],
 	);

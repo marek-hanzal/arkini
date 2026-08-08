@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:blueprint-sand-pit": {
+			"uid": "b3zvj5zzh1xznija1datnafi",
 			"id": "item:blueprint-sand-pit",
 			"type": "blueprint",
 			"title": "Sand Pit Blueprint",
@@ -15,17 +16,6 @@
 					"producer-sand-pit"
 				]
 			},
-			"tags": [
-				"blueprint",
-				"building",
-				"construction",
-				"sand",
-				"glass",
-				"craft-target",
-				"era:VIII",
-				"industry"
-			],
-			"categoryId": "blueprint",
 			"scope": "any",
 			"maxStackSize": 1,
 			"line": {
@@ -42,8 +32,8 @@
 							"itemId": "item:plank"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 3
+							"min": 3,
+							"max": 3
 						},
 						"charges": {
 							"cost": 1,
@@ -57,8 +47,8 @@
 							"itemId": "item:stone-block"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 2
+							"min": 2,
+							"max": 2
 						}
 					},
 					{
@@ -68,8 +58,8 @@
 							"itemId": "item:building-permit"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 1
+							"min": 1,
+							"max": 1
 						}
 					}
 				],
@@ -110,8 +100,8 @@
 										{
 											"itemId": "producer:sand-pit",
 											"quantity": {
-												"type": "value",
-												"value": 1
+												"min": 1,
+												"max": 1
 											},
 											"placement": "drop",
 											"rules": []

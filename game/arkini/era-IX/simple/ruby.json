@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:ruby": {
+			"uid": "obw73e4c033bret3o98utltd",
 			"id": "item:ruby",
 			"type": "simple",
 			"title": "Ruby",
@@ -11,13 +12,6 @@
 					"item-ruby"
 				]
 			},
-			"tags": [
-				"treasure",
-				"gem",
-				"ruby",
-				"era:IX"
-			],
-			"categoryId": "treasure",
 			"scope": "any",
 			"maxStackSize": 20
 		}

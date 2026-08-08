@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:quest:farmers-favor": {
+			"uid": "r77ojoi0x3f4n6e4s5iw1sxd",
 			"id": "item:quest:farmers-favor",
 			"type": "craft",
 			"title": "Farmers' Favor Quest",
@@ -11,13 +12,6 @@
 					"item-quest"
 				]
 			},
-			"tags": [
-				"quest",
-				"craft-target",
-				"request",
-				"era:II"
-			],
-			"categoryId": "quest",
 			"scope": "any",
 			"maxStackSize": 1,
 			"line": {
@@ -34,8 +28,8 @@
 							"itemId": "item:grain"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 2
+							"min": 2,
+							"max": 2
 						},
 						"charges": {
 							"cost": 1,
@@ -49,8 +43,8 @@
 							"itemId": "item:water"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 2
+							"min": 2,
+							"max": 2
 						}
 					},
 					{
@@ -60,8 +54,8 @@
 							"itemId": "item:egg"
 						},
 						"quantity": {
-							"type": "value",
-							"value": 1
+							"min": 1,
+							"max": 1
 						}
 					}
 				],
@@ -76,16 +70,16 @@
 										{
 											"itemId": "item:cheese",
 											"quantity": {
-												"type": "value",
-												"value": 1
+												"min": 1,
+												"max": 1
 											},
 											"rules": []
 										},
 										{
 											"itemId": "item:coin",
 											"quantity": {
-												"type": "value",
-												"value": 1
+												"min": 1,
+												"max": 1
 											},
 											"rules": []
 										}
@@ -102,16 +96,16 @@
 										{
 											"itemId": "item:beer",
 											"quantity": {
-												"type": "value",
-												"value": 1
+												"min": 1,
+												"max": 1
 											},
 											"rules": []
 										},
 										{
 											"itemId": "item:coin",
 											"quantity": {
-												"type": "value",
-												"value": 1
+												"min": 1,
+												"max": 1
 											},
 											"rules": []
 										}

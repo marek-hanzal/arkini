@@ -13,7 +13,7 @@ export namespace resolveLineRuntimeFx {
 }
 
 /**
- * Applies every active runtime multiplier to one line's configured runtime.
+ * Applies active multipliers and then signed millisecond adjustments.
  */
 export const resolveLineRuntimeFx = Effect.fn("resolveLineRuntimeFx")(function* ({
 	line,
@@ -24,6 +24,14 @@ export const resolveLineRuntimeFx = Effect.fn("resolveLineRuntimeFx")(function* 
 			? value * rule.multiplier
 			: value;
 	}, 1);
+	const adjustmentMs = rules.reduce((value, rule) => {
+		return rule.type === RuleEnumSchema.enum.RuntimeAdjust && rule.active
+			? value + rule.adjustMs
+			: value;
+	}, 0);
 
-	return Math.ceil(line.runtimeMs * multiplier) satisfies TimeSchema.Type;
+	return Math.max(
+		0,
+		Math.ceil(line.runtimeMs * multiplier + adjustmentMs),
+	) satisfies TimeSchema.Type;
 });

@@ -5,7 +5,6 @@ import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { InputEnumSchema } from "~/engine/input/schema/InputEnumSchema";
 import type { LineSchema } from "~/engine/line/schema/LineSchema";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
-import { readQuantityBoundsFx } from "~/engine/quantity/fx/readQuantityBoundsFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
 export namespace readRuntimeLineFillProgressFx {
@@ -41,9 +40,7 @@ export const readRuntimeLineFillProgressFx = Effect.fn("readRuntimeLineFillProgr
 				},
 				(materialInput) =>
 					Effect.gen(function* () {
-						const required = yield* readQuantityBoundsFx({
-							quantity: materialInput.quantity,
-						});
+						const required = materialInput.quantity;
 						const storedQuantity = runtime.items.reduce((total, item) => {
 							if (item.location.scope !== LocationScopeEnumSchema.enum.Input) {
 								return total;

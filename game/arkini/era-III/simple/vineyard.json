@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:vineyard": {
+			"uid": "vfsnt98x1i11prx6tp6jpyqz",
 			"id": "item:vineyard",
 			"type": "simple",
 			"title": "Vineyard",
@@ -11,14 +12,6 @@
 					"item-vineyard"
 				]
 			},
-			"tags": [
-				"source",
-				"food",
-				"wine",
-				"grapes",
-				"era:III"
-			],
-			"categoryId": "source",
 			"scope": "any",
 			"maxStackSize": 1
 		}

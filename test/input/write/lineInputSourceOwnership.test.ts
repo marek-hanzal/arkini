@@ -14,6 +14,7 @@ import { runTickRuntimeByFx } from "~/engine/tick/fx/runTickRuntimeByFx";
 
 const baseItem = (id: string) =>
 	({
+		uid: id,
 		id,
 		title: id,
 		description: id,
@@ -22,8 +23,6 @@ const baseItem = (id: string) =>
 				`asset:${id}`,
 			],
 		},
-		tags: [],
-		categoryId: "test",
 		scope: "any",
 		maxStackSize: 1,
 	}) as const;
@@ -61,7 +60,6 @@ const config = GameConfigSchema.parse({
 	start: {
 		currentSpace: 0,
 	},
-	categories: {},
 	items: {
 		[workerItemId]: {
 			...baseItem(workerItemId),
@@ -93,8 +91,8 @@ const config = GameConfigSchema.parse({
 								itemId: fuelItemId,
 							},
 							quantity: {
-								type: "value",
-								value: 1,
+								min: 1,
+								max: 1,
 							},
 						},
 					],
@@ -118,8 +116,8 @@ const config = GameConfigSchema.parse({
 							itemId: workerItemId,
 						},
 						quantity: {
-							type: "value",
-							value: 1,
+							min: 1,
+							max: 1,
 						},
 					},
 				],

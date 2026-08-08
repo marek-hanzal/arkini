@@ -18,6 +18,7 @@ const ownerKinds = [
 ] as const;
 
 const baseItem = (id: string) => ({
+	uid: id,
 	id,
 	title: id,
 	description: id,
@@ -26,8 +27,6 @@ const baseItem = (id: string) => ({
 			`asset:${id}`,
 		],
 	},
-	tags: [],
-	categoryId: "test",
 	scope: "any" as const,
 	maxStackSize: 1,
 });
@@ -45,8 +44,8 @@ const makeLine = (lineId: string) => ({
 				itemId: "material",
 			},
 			quantity: {
-				type: "value" as const,
-				value: 2,
+				min: 2,
+				max: 2,
 			},
 		},
 	],
@@ -73,7 +72,6 @@ const config = GameConfigSchema.parse({
 	start: {
 		currentSpace: 0,
 	},
-	categories: {},
 	items: {
 		material: {
 			...baseItem("material"),

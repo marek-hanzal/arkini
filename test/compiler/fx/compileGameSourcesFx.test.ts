@@ -137,7 +137,6 @@ describe("compileGameSourcesFx", () => {
 							height: 1,
 						},
 					},
-					categories: {},
 					items: {},
 				},
 			}),
@@ -242,6 +241,30 @@ describe("compileGameSourcesFx", () => {
 		);
 		expect(result.config?.$schema).toBe("../schema.json");
 	});
+
+	it("accepts equivalent portable relative JSON Schema references", async () => {
+		const result = await compile(
+			createRootSource({
+				path: "game.json",
+			}),
+			GameSourceFileSchema.parse({
+				path: "simple/a.json",
+				value: {
+					$schema: "../../schema.json",
+				},
+			}),
+		);
+
+		expect(result.diagnostics).not.toEqual(
+			expect.arrayContaining([
+				expect.objectContaining({
+					code: DiagnosticCodeEnumSchema.enum.SourceSchemaReferenceConflict,
+				}),
+			]),
+		);
+		expect(result.config?.$schema).toBe("../schema.json");
+	});
+
 	it("requires explicit completed collection providers", async () => {
 		const result = await compile(
 			GameSourceFileSchema.parse({
@@ -275,12 +298,6 @@ describe("compileGameSourcesFx", () => {
 				expect.objectContaining({
 					code: DiagnosticCodeEnumSchema.enum.ConfigSchema,
 					path: [
-						"categories",
-					],
-				}),
-				expect.objectContaining({
-					code: DiagnosticCodeEnumSchema.enum.ConfigSchema,
-					path: [
 						"items",
 					],
 				}),
@@ -291,44 +308,7 @@ describe("compileGameSourcesFx", () => {
 	it("accepts explicit empty completed collections", async () => {
 		const result = await compile(createRootSource());
 
-		expect(result.config?.categories).toEqual({
-			"category:test": {
-				id: "category:test",
-				title: "Test",
-			},
-		});
 		expect(result.config?.items).toEqual({});
-	});
-
-	it("reports duplicate category keys with both source paths", async () => {
-		const result = await compile(
-			createRootSource(),
-			GameSourceFileSchema.parse({
-				path: "/game/categories/test.json",
-				value: {
-					categories: {
-						"category:test": {
-							id: "category:test",
-							title: "Other",
-						},
-					},
-				},
-			}),
-		);
-
-		expect(result.diagnostics).toEqual(
-			expect.arrayContaining([
-				expect.objectContaining({
-					code: DiagnosticCodeEnumSchema.enum.SourceDuplicateRecord,
-					entity: DiagnosticRecordEntityEnumSchema.enum.Category,
-					key: "category:test",
-					sources: [
-						"/game/game.json",
-						"/game/categories/test.json",
-					],
-				}),
-			]),
-		);
 	});
 
 	it("reports JSON Schema references resolving to different targets", async () => {

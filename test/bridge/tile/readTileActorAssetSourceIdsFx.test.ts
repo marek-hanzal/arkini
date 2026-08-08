@@ -27,9 +27,9 @@ const config = GameConfigSchema.parse({
 	start: {
 		currentSpace: 0,
 	},
-	categories: {},
 	items: {
 		material: {
+			uid: "material",
 			id: "material",
 			type: "simple",
 			title: "Material",
@@ -40,12 +40,11 @@ const config = GameConfigSchema.parse({
 					"asset:material-unused-stage",
 				],
 			},
-			tags: [],
-			categoryId: "resource",
 			scope: "any",
 			maxStackSize: 10,
 		},
 		craft: {
+			uid: "craft",
 			id: "craft",
 			type: "craft",
 			title: "Craft",
@@ -60,8 +59,6 @@ const config = GameConfigSchema.parse({
 					"asset:stage-3",
 				],
 			},
-			tags: [],
-			categoryId: "resource",
 			scope: "any",
 			maxStackSize: 1,
 			charges: {
@@ -80,8 +77,8 @@ const config = GameConfigSchema.parse({
 							itemId: "material",
 						},
 						quantity: {
-							type: "value",
-							value: 6,
+							min: 6,
+							max: 6,
 						},
 						capacity: 3,
 					},
@@ -90,6 +87,7 @@ const config = GameConfigSchema.parse({
 			},
 		},
 		blueprint: {
+			uid: "blueprint",
 			id: "blueprint",
 			type: "blueprint",
 			title: "Blueprint",
@@ -103,8 +101,6 @@ const config = GameConfigSchema.parse({
 					"asset:blueprint-complete",
 				],
 			},
-			tags: [],
-			categoryId: "resource",
 			scope: "any",
 			maxStackSize: 1,
 			charges: {
@@ -123,8 +119,8 @@ const config = GameConfigSchema.parse({
 							itemId: "material",
 						},
 						quantity: {
-							type: "value",
-							value: 3,
+							min: 3,
+							max: 3,
 						},
 					},
 					{
@@ -134,8 +130,8 @@ const config = GameConfigSchema.parse({
 							itemId: "material",
 						},
 						quantity: {
-							type: "value",
-							value: 3,
+							min: 3,
+							max: 3,
 						},
 					},
 				],

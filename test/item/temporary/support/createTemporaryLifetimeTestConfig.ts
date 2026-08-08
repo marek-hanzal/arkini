@@ -9,6 +9,7 @@ const baseItem = ({
 	maxStackSize?: number;
 	maxCount?: number;
 }) => ({
+	uid: id,
 	id,
 	title: id,
 	description: id,
@@ -17,8 +18,6 @@ const baseItem = ({
 			`asset:${id}`,
 		],
 	},
-	tags: [],
-	categoryId: "resource",
 	scope: "board" as const,
 	maxStackSize,
 	maxCount,
@@ -28,22 +27,16 @@ const guaranteedOutput = ({
 	itemId,
 	placement = "drop",
 	quantity = {
-		type: "value" as const,
-		value: 1,
+		min: 1,
+		max: 1,
 	},
 }: {
 	itemId: string;
 	placement?: "drop" | "random";
-	quantity?:
-		| {
-				type: "value";
-				value: number;
-		  }
-		| {
-				type: "range";
-				min: number;
-				max: number;
-		  };
+	quantity?: {
+		min: number;
+		max: number;
+	};
 }) => ({
 	set: [
 		{
@@ -85,7 +78,6 @@ export const createTemporaryLifetimeTestConfig = () =>
 		start: {
 			currentSpace: 0,
 		},
-		categories: {},
 		items: {
 			transformer: {
 				...baseItem({
@@ -150,7 +142,6 @@ export const createTemporaryLifetimeTestConfig = () =>
 					itemId: "result",
 					placement: "random",
 					quantity: {
-						type: "range",
 						min: 2,
 						max: 3,
 					},

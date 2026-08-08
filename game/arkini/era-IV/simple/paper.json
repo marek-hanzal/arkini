@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:paper": {
+			"uid": "ob4kk4b4ef6x2f8pww7pj6v0",
 			"id": "item:paper",
 			"type": "simple",
 			"title": "Paper",
@@ -11,14 +12,6 @@
 					"item-paper"
 				]
 			},
-			"tags": [
-				"resource",
-				"paper",
-				"civic",
-				"era:IV",
-				"tier-4-resource"
-			],
-			"categoryId": "material",
 			"scope": "any",
 			"maxStackSize": 50
 		}

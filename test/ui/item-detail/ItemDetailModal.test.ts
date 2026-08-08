@@ -74,9 +74,9 @@ const config = GameConfigSchema.parse({
 			},
 		],
 	},
-	categories: {},
 	items: {
 		workshop: {
+			uid: "workshop",
 			id: "workshop",
 			type: "producer",
 			title: "Workshop",
@@ -86,8 +86,6 @@ const config = GameConfigSchema.parse({
 					"asset:workshop",
 				],
 			},
-			tags: [],
-			categoryId: "building",
 			scope: "any",
 			maxStackSize: 1,
 			maxQueueSize: 2,
@@ -112,8 +110,8 @@ const config = GameConfigSchema.parse({
 											{
 												itemId: "water",
 												quantity: {
-													type: "value",
-													value: 1,
+													min: 1,
+													max: 1,
 												},
 												rules: [],
 											},
@@ -128,6 +126,7 @@ const config = GameConfigSchema.parse({
 			],
 		},
 		water: {
+			uid: "water",
 			id: "water",
 			type: "simple",
 			title: "Water",
@@ -137,8 +136,6 @@ const config = GameConfigSchema.parse({
 					"asset:water",
 				],
 			},
-			tags: [],
-			categoryId: "resource",
 			scope: "any",
 			maxStackSize: 10,
 		},
@@ -168,11 +165,10 @@ const readOrThrowWithConfig = <Result, Error>(
 const game = {
 	arkpack: {
 		packageId: "test-package",
-		contentHash: "test-hash",
+		hash: "test-hash",
 		gameId: config.meta.id,
 		title: config.meta.title,
-		configVersion: config.version,
-		compressedSize: 0,
+		game: config.version,
 		trust: {
 			type: "external",
 			reason: "unsigned",

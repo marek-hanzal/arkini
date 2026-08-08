@@ -15,6 +15,7 @@ export const createTickFailureTestConfig = () => {
 			...base.items,
 			inventoryOutput: {
 				...base.items.tool,
+				uid: "inventoryOutput",
 				id: "inventoryOutput",
 				title: "Tick failure output",
 				description: "Removed after start by the test.",
@@ -40,8 +41,8 @@ export const createTickFailureTestConfig = () => {
 												{
 													itemId: "inventoryOutput",
 													quantity: {
-														type: "value",
-														value: 1,
+														min: 1,
+														max: 1,
 													},
 													placement: "drop",
 													rules: [],

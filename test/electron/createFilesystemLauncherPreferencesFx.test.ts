@@ -7,14 +7,14 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { createFilesystemLauncherPreferencesFx } from "../../electron/main/launcher/createFilesystemLauncherPreferencesFx";
 
 let root = "";
-const preferenceDirectory = () => join(root, "arkini", "preferences");
+const preferenceDirectory = () => join(root, "arkini", "game", "preferences");
 const currentPath = () => join(preferenceDirectory(), "launcher.last-package");
 const pendingPath = () => join(preferenceDirectory(), "launcher-last-package.pending");
 
 const createPreferences = (fileSystem?: FileSystem.FileSystem) =>
 	Effect.runPromise(
 		createFilesystemLauncherPreferencesFx({
-			userDataPath: root,
+			root: preferenceDirectory(),
 			fileSystem,
 		}).pipe(Effect.provide(NodeServices.layer)),
 	);
@@ -100,7 +100,7 @@ describe("createFilesystemLauncherPreferencesFx", () => {
 			Effect.gen(function* () {
 				const fileSystem = yield* FileSystem.FileSystem;
 				return yield* createFilesystemLauncherPreferencesFx({
-					userDataPath: root,
+					root: preferenceDirectory(),
 					fileSystem: {
 						...fileSystem,
 						rename: () =>

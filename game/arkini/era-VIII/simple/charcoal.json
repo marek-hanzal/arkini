@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:charcoal": {
+			"uid": "ucp6o75mu67uqlfik8m2t7si",
 			"id": "item:charcoal",
 			"type": "simple",
 			"title": "Charcoal",
@@ -11,15 +12,6 @@
 					"item-charcoal"
 				]
 			},
-			"tags": [
-				"material",
-				"fuel",
-				"construction",
-				"era:VIII",
-				"industry",
-				"tier-6-resource"
-			],
-			"categoryId": "material",
 			"scope": "any",
 			"maxStackSize": 50
 		}

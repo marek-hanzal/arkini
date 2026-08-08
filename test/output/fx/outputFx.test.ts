@@ -30,9 +30,9 @@ const config = GameConfigSchema.parse({
 	start: {
 		currentSpace: 0,
 	},
-	categories: {},
 	items: {
 		source: {
+			uid: "source",
 			id: "source",
 			title: "Source",
 			description: "An output origin.",
@@ -41,8 +41,6 @@ const config = GameConfigSchema.parse({
 					"asset:source",
 				],
 			},
-			tags: [],
-			categoryId: "resource",
 			scope: "board",
 			maxStackSize: 1,
 			type: "simple",
@@ -70,8 +68,8 @@ const createDrop = ({
 	itemId,
 	placement = "drop",
 	quantity = {
-		type: "value",
-		value: 1,
+		min: 1,
+		max: 1,
 	},
 	rules = [],
 }: {
@@ -122,11 +120,7 @@ const createRollSet = ({
 	weight?: number;
 }): RollSetSchema.Type => {
 	return {
-		...(weight === undefined
-			? {}
-			: {
-					weight,
-				}),
+		weight: weight ?? 1,
 		roll: [
 			roll,
 		],
@@ -172,8 +166,8 @@ describe("outputFx", () => {
 									createDrop({
 										itemId: "item:log",
 										quantity: {
-											type: "value",
-											value: 2,
+											min: 2,
+											max: 2,
 										},
 									}),
 									createDrop({
@@ -232,7 +226,6 @@ describe("outputFx", () => {
 									createDrop({
 										itemId: "item:rejected",
 										quantity: {
-											type: "range",
 											min: 2,
 											max: 4,
 										},
@@ -249,7 +242,6 @@ describe("outputFx", () => {
 										itemId: "item:accepted",
 										placement: "random",
 										quantity: {
-											type: "range",
 											min: 2,
 											max: 4,
 										},

@@ -45,7 +45,6 @@ export const makeAboutPortraitPayloadFx = Effect.fn("makeAboutPortraitPayloadFx"
 					start: {
 						currentSpace: 0,
 					},
-					categories: {},
 					items: {},
 				}),
 				resources: [

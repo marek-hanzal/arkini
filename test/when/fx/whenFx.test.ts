@@ -27,9 +27,9 @@ const config = GameConfigSchema.parse({
 	start: {
 		currentSpace: 0,
 	},
-	categories: {},
 	items: {
 		source: {
+			uid: "source",
 			id: "source",
 			title: "Source",
 			description: "A query origin.",
@@ -38,13 +38,12 @@ const config = GameConfigSchema.parse({
 					"asset:source",
 				],
 			},
-			tags: [],
-			categoryId: "resource",
 			scope: "board",
 			maxStackSize: 1,
 			type: "simple",
 		},
 		tree: {
+			uid: "tree",
 			id: "tree",
 			title: "Tree",
 			description: "A living tree.",
@@ -53,10 +52,6 @@ const config = GameConfigSchema.parse({
 					"asset:tree",
 				],
 			},
-			tags: [
-				"forest",
-			],
-			categoryId: "resource",
 			scope: "any",
 			maxStackSize: 10,
 			type: "simple",
@@ -148,8 +143,8 @@ describe("whenFx", () => {
 						query: {
 							scope: "inventory",
 							selector: {
-								tag: "forest",
-								type: "tag",
+								itemId: "tree",
+								type: "item",
 							},
 						},
 						type: "exists",

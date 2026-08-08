@@ -14,6 +14,7 @@ const simpleItem = ({
 	scope: "any" | "board" | "inventory";
 }) => {
 	return {
+		uid: id,
 		id,
 		title: id,
 		description: id,
@@ -22,8 +23,6 @@ const simpleItem = ({
 				`asset:${id}`,
 			],
 		},
-		tags: [],
-		categoryId: "resource",
 		scope,
 		maxCount,
 		maxStackSize,
@@ -51,7 +50,6 @@ export const placementTestConfig = GameConfigSchema.parse({
 	start: {
 		currentSpace: 0,
 	},
-	categories: {},
 	items: {
 		origin: simpleItem({
 			id: "origin",
@@ -133,8 +131,8 @@ export const configuredDrop = ({
 		itemId,
 		placement,
 		quantity: {
-			type: "value",
-			value: quantity,
+			min: quantity,
+			max: quantity,
 		},
 		rules,
 	} satisfies DropSchema.Type;
@@ -149,6 +147,7 @@ export const configuredOutput = (
 	return {
 		set: [
 			{
+				weight: 1,
 				roll: [
 					{
 						drop,

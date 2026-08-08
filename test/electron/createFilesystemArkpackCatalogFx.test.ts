@@ -16,11 +16,10 @@ const packageBytes = new Uint8Array([
 const packageId = createHash("sha256").update(packageBytes).digest("hex");
 const descriptor = {
 	packageId,
-	contentHash: packageId,
+	hash: packageId,
 	gameId: "game:test",
 	title: "Test",
-	configVersion: "1.0",
-	compressedSize: 3,
+	game: "1.0",
 	trust: {
 		type: "external",
 		reason: "unsigned",
@@ -33,7 +32,7 @@ const descriptor = {
 const createCatalog = (fileSystem?: FileSystem.FileSystem) =>
 	Effect.runPromise(
 		createFilesystemArkpackCatalogFx({
-			userDataPath: root,
+			root: join(root, "arkini", "game", "arkpacks"),
 			fileSystem,
 		}).pipe(Effect.provide(NodeServices.layer)),
 	);
@@ -76,7 +75,7 @@ describe("createFilesystemArkpackCatalogFx", () => {
 			descriptor,
 		]);
 
-		const binaryPath = join(root, "arkini", "arkpacks", packageId, "package.arkpack");
+		const binaryPath = join(root, "arkini", "game", "arkpacks", packageId, "package.arkpack");
 		await unlink(binaryPath);
 		expect(await Effect.runPromise(catalog.listFx)).toEqual([
 			descriptor,
@@ -95,10 +94,12 @@ describe("createFilesystemArkpackCatalogFx", () => {
 		});
 
 		await Effect.runPromise(catalog.removeFx(packageId));
-		await expect(access(join(root, "arkini", "arkpacks", packageId))).rejects.toBeDefined();
+		await expect(
+			access(join(root, "arkini", "game", "arkpacks", packageId)),
+		).rejects.toBeDefined();
 	});
 
-	it("deduplicates exact package identities and rejects unsafe paths", async () => {
+	it("deduplicates exact package identities and rejects unsafe or incomplete records", async () => {
 		const catalog = await createCatalog();
 		await Effect.runPromise(
 			catalog.installFx({
@@ -128,6 +129,17 @@ describe("createFilesystemArkpackCatalogFx", () => {
 		await expect(Effect.runPromise(catalog.readFx("../escape"))).rejects.toThrow(
 			"Invalid imported Arkpack",
 		);
+		await expect(
+			Effect.runPromise(
+				catalog.installFx({
+					descriptor: {
+						...descriptor,
+						trust: undefined,
+					} as unknown as typeof descriptor,
+					bytes: packageBytes,
+				}),
+			),
+		).rejects.toBeDefined();
 	});
 
 	it("serializes concurrent installs of the same package identity", async () => {
@@ -153,7 +165,7 @@ describe("createFilesystemArkpackCatalogFx", () => {
 		const releaseRename = createPromiseGate();
 		let blockNextInstallRename = true;
 		let removeStarted = false;
-		const installedPackagePath = join(root, "arkini", "arkpacks", packageId);
+		const installedPackagePath = join(root, "arkini", "game", "arkpacks", packageId);
 		const fileSystem = {
 			...nodeFileSystem,
 			remove: (path, options) => {

@@ -60,8 +60,8 @@ export const installGameDiagnostics = ({
 		sessionId,
 		data: {
 			packageId: arkpack.packageId,
-			contentHash: arkpack.contentHash,
-			configVersion: arkpack.configVersion,
+			contentHash: arkpack.hash,
+			game: arkpack.game,
 			restored,
 		},
 	});

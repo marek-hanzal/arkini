@@ -8,6 +8,7 @@ import { PlacementPlanSchema } from "~/engine/placement/schema/PlacementPlanSche
 const runtimeItem = {
 	id: "runtime:log",
 	item: {
+		uid: "log",
 		id: "log",
 		title: "Log",
 		description: "A log.",
@@ -16,8 +17,6 @@ const runtimeItem = {
 				"asset:log",
 			],
 		},
-		tags: [],
-		categoryId: "resource",
 		scope: "any",
 		maxStackSize: 10,
 		type: "simple",

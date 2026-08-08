@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"producer:armory-t1": {
+			"uid": "c1r17y878mojojyld1pv05dv",
 			"id": "producer:armory-t1",
 			"type": "producer",
 			"title": "Armory I",
@@ -11,16 +12,6 @@
 					"producer-armory-t1"
 				]
 			},
-			"tags": [
-				"producer",
-				"armory",
-				"equipment",
-				"armor",
-				"guild",
-				"era:IX",
-				"unique"
-			],
-			"categoryId": "building",
 			"scope": "any",
 			"maxCount": 1,
 			"maxStackSize": 1,
@@ -39,8 +30,8 @@
 								"itemId": "item:leather"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 2
+								"min": 2,
+								"max": 2
 							},
 							"capacity": 6
 						},
@@ -51,8 +42,8 @@
 								"itemId": "item:common-clothing"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 3
 						},
@@ -63,8 +54,8 @@
 								"itemId": "item:nails"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 7
 						}
@@ -80,8 +71,8 @@
 											{
 												"itemId": "item:leather-armor",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -105,8 +96,8 @@
 								"itemId": "item:leather-armor"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 3
 						},
@@ -117,8 +108,8 @@
 								"itemId": "item:iron-ingot"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 2
+								"min": 2,
+								"max": 2
 							},
 							"capacity": 6
 						},
@@ -129,8 +120,8 @@
 								"itemId": "item:nails"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 2
+								"min": 2,
+								"max": 2
 							},
 							"capacity": 6
 						},
@@ -141,8 +132,8 @@
 								"itemId": "item:charcoal"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 5
 						}
@@ -175,8 +166,8 @@
 											{
 												"itemId": "item:iron-armor",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -189,8 +180,8 @@
 											{
 												"itemId": "item:pollution",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -203,8 +194,8 @@
 											{
 												"itemId": "item:pollution",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}

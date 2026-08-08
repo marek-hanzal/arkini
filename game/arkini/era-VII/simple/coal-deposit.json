@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:coal-deposit": {
+			"uid": "g4g8a0vgbdfk7yhed4a4xbrz",
 			"id": "item:coal-deposit",
 			"type": "simple",
 			"title": "Coal Deposit",
@@ -11,14 +12,6 @@
 					"item-coal-deposit"
 				]
 			},
-			"tags": [
-				"source",
-				"industry",
-				"mine",
-				"coal",
-				"era:VII"
-			],
-			"categoryId": "source",
 			"scope": "any",
 			"maxStackSize": 1
 		}

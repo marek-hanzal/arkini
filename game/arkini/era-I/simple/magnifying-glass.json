@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:magnifying-glass": {
+			"uid": "qzser9sc8dhka4mjm9vqudrd",
 			"id": "item:magnifying-glass",
 			"type": "simple",
 			"title": "Magnifying Glass",
@@ -11,15 +12,6 @@
 					"item-magnifying-glass"
 				]
 			},
-			"tags": [
-				"equipment",
-				"tool",
-				"search",
-				"survey",
-				"deposit-search",
-				"era:I"
-			],
-			"categoryId": "equipment",
 			"scope": "any",
 			"maxStackSize": 1
 		}

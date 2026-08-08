@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:water": {
+			"uid": "q12cmsx5ussy30wyjiea8yaw",
 			"id": "item:water",
 			"type": "simple",
 			"title": "Water",
@@ -11,14 +12,6 @@
 					"item-water"
 				]
 			},
-			"tags": [
-				"material",
-				"food",
-				"water",
-				"era:I",
-				"tier-1-resource"
-			],
-			"categoryId": "material",
 			"scope": "any",
 			"maxStackSize": 8,
 			"merge": [
@@ -58,8 +51,8 @@
 											{
 												"itemId": "item:seed",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}

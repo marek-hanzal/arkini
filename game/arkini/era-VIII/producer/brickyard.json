@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"producer:brickyard": {
+			"uid": "hxlrgok9jecla07o43ti2fpr",
 			"id": "producer:brickyard",
 			"type": "producer",
 			"title": "Brickyard",
@@ -11,16 +12,6 @@
 					"producer-brickyard"
 				]
 			},
-			"tags": [
-				"building",
-				"producer",
-				"construction",
-				"clay",
-				"era:VIII",
-				"industry",
-				"unique"
-			],
-			"categoryId": "building",
 			"scope": "any",
 			"maxCount": 1,
 			"maxStackSize": 1,
@@ -39,8 +30,8 @@
 								"itemId": "item:clay"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 2
+								"min": 2,
+								"max": 2
 							},
 							"capacity": 8
 						},
@@ -51,8 +42,8 @@
 								"itemId": "item:charcoal"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 6
 						},
@@ -63,8 +54,8 @@
 								"itemId": "item:water"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 4
 						}
@@ -113,8 +104,8 @@
 											{
 												"itemId": "item:bricks",
 												"quantity": {
-													"type": "value",
-													"value": 4
+													"min": 4,
+													"max": 4
 												},
 												"rules": []
 											}
@@ -127,8 +118,8 @@
 											{
 												"itemId": "item:pollution",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -141,8 +132,8 @@
 											{
 												"itemId": "item:pollution",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}

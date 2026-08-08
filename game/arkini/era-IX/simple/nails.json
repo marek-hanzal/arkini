@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:nails": {
+			"uid": "lydms21xchmf26hx8rhfvg2v",
 			"id": "item:nails",
 			"type": "simple",
 			"title": "Nails",
@@ -11,15 +12,6 @@
 					"item-nails"
 				]
 			},
-			"tags": [
-				"material",
-				"construction",
-				"metal",
-				"blacksmith",
-				"era:IX",
-				"tier-4-resource"
-			],
-			"categoryId": "material",
 			"scope": "any",
 			"maxStackSize": 50
 		}

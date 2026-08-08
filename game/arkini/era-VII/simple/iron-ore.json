@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:iron-ore": {
+			"uid": "ktis42tgr9fuftdm0gyyfgxi",
 			"id": "item:iron-ore",
 			"type": "simple",
 			"title": "Iron Ore Cart",
@@ -11,15 +12,6 @@
 					"item-iron-ore"
 				]
 			},
-			"tags": [
-				"material",
-				"industry",
-				"ore",
-				"iron",
-				"era:VII",
-				"tier-7-resource"
-			],
-			"categoryId": "material",
 			"scope": "any",
 			"maxStackSize": 20
 		}

@@ -91,11 +91,10 @@ vi.mock("~/ui/launcher/preloadLauncherHeroFx", () => ({
 
 const builtIn = {
 	packageId: "arkini",
-	contentHash: "a".repeat(64),
+	hash: "a".repeat(64),
 	gameId: "arkini",
 	title: "Arkini",
-	configVersion: "1.0",
-	compressedSize: 1,
+	game: "1.0",
 	trust: {
 		type: "official" as const,
 		keyId: "arkini-test",
@@ -103,6 +102,7 @@ const builtIn = {
 	source: "built-in" as const,
 };
 const catalog: ArkpackCatalog = {
+	awaitIdleFx: Effect.void,
 	state: Effect.runSync(
 		SubscriptionRef.make<ArkpackCatalog.State>({
 			type: "ready",
@@ -113,6 +113,7 @@ const catalog: ArkpackCatalog = {
 	),
 	refreshFx: Effect.void,
 	importFileFx: () => Effect.die("unused"),
+	installFx: () => Effect.die("unused"),
 	removeFx: () => Effect.die("unused"),
 };
 const lifecycle = Effect.runSync(

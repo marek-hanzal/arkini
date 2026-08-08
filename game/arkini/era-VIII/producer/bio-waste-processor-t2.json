@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"producer:bio-waste-processor-t2": {
+			"uid": "n6cdutm5r2qli50zi2zgev5m",
 			"id": "producer:bio-waste-processor-t2",
 			"type": "producer",
 			"title": "Bio-Waste Processor II",
@@ -11,18 +12,6 @@
 					"producer-bio-waste-processor-t2"
 				]
 			},
-			"tags": [
-				"producer",
-				"building",
-				"cleanup",
-				"waste",
-				"bio-waste",
-				"farm",
-				"industry",
-				"era:VIII",
-				"unique"
-			],
-			"categoryId": "building",
 			"scope": "any",
 			"maxCount": 1,
 			"maxStackSize": 1,
@@ -41,7 +30,6 @@
 								"itemId": "item:bio-waste"
 							},
 							"quantity": {
-								"type": "range",
 								"min": 1,
 								"max": 4
 							}
@@ -62,7 +50,6 @@
 								"itemId": "item:bio-waste"
 							},
 							"quantity": {
-								"type": "range",
 								"min": 1,
 								"max": 4
 							}
@@ -74,8 +61,8 @@
 								"itemId": "item:log"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 4
 						}
@@ -92,8 +79,8 @@
 											{
 												"itemId": "item:pollution",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -106,8 +93,8 @@
 											{
 												"itemId": "item:pollution",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -131,7 +118,6 @@
 								"itemId": "item:bio-waste"
 							},
 							"quantity": {
-								"type": "range",
 								"min": 1,
 								"max": 4
 							}
@@ -143,8 +129,8 @@
 								"itemId": "item:charcoal"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 4
 						}
@@ -161,8 +147,8 @@
 											{
 												"itemId": "item:pollution",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -175,8 +161,8 @@
 											{
 												"itemId": "item:pollution",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -200,7 +186,6 @@
 								"itemId": "item:bio-waste"
 							},
 							"quantity": {
-								"type": "range",
 								"min": 1,
 								"max": 4
 							}
@@ -212,8 +197,8 @@
 								"itemId": "item:coal"
 							},
 							"quantity": {
-								"type": "value",
-								"value": 1
+								"min": 1,
+								"max": 1
 							},
 							"capacity": 4
 						}
@@ -230,8 +215,8 @@
 											{
 												"itemId": "item:pollution",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}
@@ -244,8 +229,8 @@
 											{
 												"itemId": "item:pollution",
 												"quantity": {
-													"type": "value",
-													"value": 1
+													"min": 1,
+													"max": 1
 												},
 												"rules": []
 											}

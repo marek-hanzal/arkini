@@ -2,6 +2,7 @@
 	"$schema": "../../../schema.json",
 	"items": {
 		"item:bread": {
+			"uid": "lp7qhbt1cga0n9sb0qp57yte",
 			"id": "item:bread",
 			"type": "simple",
 			"title": "Bread",
@@ -11,13 +12,6 @@
 					"item-bread"
 				]
 			},
-			"tags": [
-				"food",
-				"bread",
-				"era:III",
-				"tier-3-resource"
-			],
-			"categoryId": "food",
 			"scope": "any",
 			"maxStackSize": 50
 		}

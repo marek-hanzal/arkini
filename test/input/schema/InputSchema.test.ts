@@ -17,12 +17,12 @@ describe("InputSchema", () => {
 		const input = InputSchema.parse({
 			type: "materials",
 			selector: {
-				type: "tag",
-				tag: "liquid",
+				type: "item",
+				itemId: "item:water",
 			},
 			quantity: {
-				type: "value",
-				value: 1,
+				min: 1,
+				max: 1,
 			},
 		});
 
@@ -41,8 +41,8 @@ describe("InputSchema", () => {
 					scope: "board",
 					distance: "near",
 					selector: {
-						type: "tag",
-						tag: "wood-source",
+						type: "item",
+						itemId: "deposit:tree",
 					},
 				},
 				charges: {
@@ -61,8 +61,8 @@ describe("InputSchema", () => {
 					itemId: "item:water",
 				},
 				quantity: {
-					type: "value",
-					value: 1,
+					min: 1,
+					max: 1,
 				},
 			}).success,
 		).toBe(false);

@@ -25,6 +25,7 @@ export const projectItemDetailOutputItemFx = Effect.fn("projectItemDetailOutputI
 			itemId: item.itemId,
 			title: item.itemId,
 			quantity: item.quantity,
+			activeRuleHints: item.activeRuleHints,
 		} satisfies projectItemDetailOutputItemFx.Result;
 	}
 	const sourceAssetIds = yield* readRuntimeItemDefaultAssetIdsFx({
@@ -34,6 +35,7 @@ export const projectItemDetailOutputItemFx = Effect.fn("projectItemDetailOutputI
 		itemId: item.itemId,
 		title: configured.title,
 		quantity: item.quantity,
+		activeRuleHints: item.activeRuleHints,
 		sourceUrl: game.getResourceUrl(sourceAssetIds[0]),
 		...(sourceAssetIds[1] === undefined
 			? {}

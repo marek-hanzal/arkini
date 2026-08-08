@@ -60,8 +60,6 @@ export const CheatItemSpotlight = ({
 				terms: [
 					item.itemId,
 					item.title,
-					item.categoryId,
-					...item.tags,
 				],
 			})),
 		[
@@ -329,9 +327,6 @@ export const CheatItemSpotlight = ({
 									<span className="ak-spotlight-option-secondary block truncate text-xs">
 										{item.itemId}
 									</span>
-								</span>
-								<span className="ak-spotlight-option-secondary text-xs">
-									{item.categoryId}
 								</span>
 							</button>
 						))

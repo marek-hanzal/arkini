@@ -74,6 +74,7 @@ const createLiveRuleConfig = () => {
 			...base.items,
 			permit: {
 				...base.items.tool,
+				uid: "permit",
 				id: "permit",
 				title: "Permit",
 				description: "Keeps the forge enabled.",

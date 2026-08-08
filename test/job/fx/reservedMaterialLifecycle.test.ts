@@ -12,6 +12,7 @@ import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { runTickRuntimeByFx } from "~/engine/tick/fx/runTickRuntimeByFx";
 
 const base = (id: string, scope: "any" | "board" = "board") => ({
+	uid: id,
 	id,
 	title: id,
 	description: id,
@@ -20,8 +21,6 @@ const base = (id: string, scope: "any" | "board" = "board") => ({
 			`asset:${id}`,
 		],
 	},
-	tags: [],
-	categoryId: "test",
 	scope,
 	maxStackSize: 1,
 });
@@ -33,8 +32,8 @@ const reserveInput = (itemId: string) => ({
 		itemId,
 	},
 	quantity: {
-		type: "value" as const,
-		value: 1,
+		min: 1,
+		max: 1,
 	},
 	capacity: 0,
 	mode: "reserve" as const,
@@ -60,7 +59,6 @@ const config = GameConfigSchema.parse({
 	start: {
 		currentSpace: 0,
 	},
-	categories: {},
 	items: {
 		"producer:employer": {
 			...base("producer:employer"),

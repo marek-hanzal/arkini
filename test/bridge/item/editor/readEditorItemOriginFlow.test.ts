@@ -104,6 +104,11 @@ describe("readEditorItemOriginFlow", () => {
 		);
 
 		expect(flow.obtainable).toBeUndefined();
+		expect(flow.nodes.find((node) => node.kind === "item" && node.id === "item:ingot")).toEqual(
+			expect.objectContaining({
+				acquisitionSourceId: expect.stringContaining("source:forge:line:"),
+			}),
+		);
 		expect(flow.nodes).toEqual(
 			expect.arrayContaining([
 				expect.objectContaining({
@@ -183,6 +188,11 @@ describe("readEditorItemOriginFlow", () => {
 					status: "reachable",
 				}),
 			]),
+		);
+		expect(flow.nodes.find((node) => node.kind === "item" && node.id === "item:ingot")).toEqual(
+			expect.objectContaining({
+				acquisitionSourceId: expect.stringContaining("source:forge:line:"),
+			}),
 		);
 		expect(flow.edges).toHaveLength(4);
 		expect(progress[0]).toMatchObject({

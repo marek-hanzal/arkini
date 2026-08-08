@@ -15,7 +15,7 @@ import { Tooltip } from "~/ui/overlay/Tooltip";
 const GraphFilterDescription =
 	"Choose an item. Income shows what it needs; Outcome shows what it leads to.";
 
-/** Shows the complete authored game graph and optionally narrows it to one acquisition path. */
+/** Shows the complete authored game graph and lets search navigate to one selected item. */
 export const EditorGameFlow = () => {
 	const [itemId, setItemId] = useState("");
 	const [direction, setDirection] = useState<EditorItemOriginFlowDirection>("income");
@@ -58,13 +58,13 @@ export const EditorGameFlow = () => {
 						/>
 					</div>
 					{itemId.length === 0 ? null : (
-						<Tooltip content="Clear filter">
+						<Tooltip content="Clear search">
 							<button
 								type="button"
 								className="grid min-h-[var(--ak-control-min-height)] min-w-[var(--ak-control-min-height)] cursor-pointer place-items-center rounded-lg border border-line-strong bg-surface-raised text-muted hover:text-foreground"
 								onClick={() => setItemId("")}
 							>
-								<span className="icon-[lucide--filter-x] size-5" />
+								<span className="icon-[lucide--x] size-5" />
 							</button>
 						</Tooltip>
 					)}
@@ -93,9 +93,9 @@ export const EditorGameFlow = () => {
 				</div>
 			</div>
 			<EditorOriginFlowSection
-				direction={itemId.length === 0 ? undefined : direction}
-				itemId={itemId || undefined}
-				mode={itemId.length === 0 ? "all" : "item"}
+				direction={direction}
+				focusItemId={itemId || undefined}
+				mode="all"
 			/>
 		</section>
 	);

@@ -201,4 +201,161 @@ describe("readEditorOriginFlowHighlight", () => {
 			nodeIds: new Set(),
 		});
 	});
+	it("builds one concrete Income proof with every mandatory prerequisite", () => {
+		const acquisitionFlow = {
+			edges: [
+				{
+					id: "target-cycle",
+					role: "owner",
+					source: "item:target",
+					target: "source:a-cycle",
+				},
+				{
+					id: "cycle-target",
+					role: "output",
+					source: "source:a-cycle",
+					target: "item:target",
+				},
+				{
+					id: "wood-good",
+					role: "input",
+					source: "item:wood",
+					target: "source:z-good",
+				},
+				{
+					id: "stone-good",
+					role: "input",
+					source: "item:stone",
+					target: "source:z-good",
+				},
+				{
+					id: "good-target",
+					role: "output",
+					source: "source:z-good",
+					target: "item:target",
+				},
+			],
+			nodes: [
+				{
+					acquisitionSourceId: "source:z-good",
+					depth: 0,
+					id: "item:target",
+					itemId: "target",
+					kind: "item",
+					resourceIds: [],
+					starterScopes: [],
+					status: "reachable",
+					title: "Target",
+					type: "simple",
+				},
+				{
+					depth: 0,
+					id: "item:wood",
+					itemId: "wood",
+					kind: "item",
+					resourceIds: [],
+					starterScopes: [
+						"Board",
+					],
+					status: "starter",
+					title: "Wood",
+					type: "simple",
+				},
+				{
+					depth: 0,
+					id: "item:stone",
+					itemId: "stone",
+					kind: "item",
+					resourceIds: [],
+					starterScopes: [
+						"Board",
+					],
+					status: "starter",
+					title: "Stone",
+					type: "simple",
+				},
+				{
+					depth: 1,
+					id: "source:a-cycle",
+					kind: "source",
+					label: "Circular route",
+					placement: undefined,
+					selectionKind: "guaranteed",
+					status: "reachable",
+					sourceKind: "line",
+					weightedSet: false,
+				},
+				{
+					depth: 1,
+					id: "source:z-good",
+					kind: "source",
+					label: "Good route",
+					placement: undefined,
+					selectionKind: "guaranteed",
+					status: "reachable",
+					sourceKind: "merge",
+					weightedSet: false,
+				},
+			],
+			obtainable: true,
+		} as const satisfies EditorItemOriginFlow;
+		const acquisitionPositions = new Map([
+			[
+				"item:wood",
+				{
+					flowOrder: 0,
+				},
+			],
+			[
+				"item:stone",
+				{
+					flowOrder: 0,
+				},
+			],
+			[
+				"source:a-cycle",
+				{
+					flowOrder: 1,
+				},
+			],
+			[
+				"source:z-good",
+				{
+					flowOrder: 1,
+				},
+			],
+			[
+				"item:target",
+				{
+					flowOrder: 2,
+				},
+			],
+		]);
+
+		const highlight = readEditorOriginFlowHighlight(
+			acquisitionFlow,
+			acquisitionPositions,
+			{
+				id: "item:target",
+				kind: "node",
+			},
+			"income",
+		);
+
+		expect(highlight.nodeIds).toEqual(
+			new Set([
+				"item:target",
+				"source:z-good",
+				"item:wood",
+				"item:stone",
+			]),
+		);
+		expect(highlight.edgeIds).toEqual(
+			new Set([
+				"good-target",
+				"wood-good",
+				"stone-good",
+			]),
+		);
+	});
 });

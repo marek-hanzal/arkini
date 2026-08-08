@@ -53,6 +53,7 @@ interface EditorOriginFlowCanvasProps {
 	readonly direction: EditorItemOriginFlowDirection;
 	readonly fitContent: boolean;
 	readonly flow: EditorItemOriginFlow;
+	readonly focusNodeId?: string;
 	readonly positions: ReadonlyMap<string, EditorItemOriginFlowLayoutNode>;
 	readonly routes: ReadonlyMap<string, ReadonlyArray<EditorItemOriginFlowLayoutRouteSegment>>;
 	readonly selection: EditorOriginFlowSelection | undefined;
@@ -77,6 +78,7 @@ const DefaultViewport: Viewport = {
 };
 const MinZoom = 0.025;
 const MaxZoom = 1.4;
+const SearchFocusZoom = 1;
 const FitPaddingRatio = 0.12;
 const ClickThreshold = 5;
 const EdgeHitRadiusPx = 9;
@@ -284,22 +286,32 @@ const readInitialFocusPosition = (
 	)[0]?.[1];
 };
 
-const isNextNodeShortcutKey = (event: KeyboardEvent) => {
+type FlowNavigationShortcut = "home" | "next" | "previous";
+
+const readFlowNavigationShortcut = (event: KeyboardEvent): FlowNavigationShortcut | undefined => {
 	const target = event.target;
-	return (
-		!event.repeat &&
-		event.key.toLowerCase() === "n" &&
-		!event.altKey &&
-		!event.ctrlKey &&
-		!event.metaKey &&
-		!(
-			target instanceof HTMLElement &&
+	if (
+		event.repeat ||
+		event.altKey ||
+		event.ctrlKey ||
+		event.metaKey ||
+		(target instanceof HTMLElement &&
 			(target.isContentEditable ||
 				target.tagName === "INPUT" ||
 				target.tagName === "SELECT" ||
-				target.tagName === "TEXTAREA")
-		)
-	);
+				target.tagName === "TEXTAREA"))
+	)
+		return undefined;
+	switch (event.key.toLowerCase()) {
+		case "n":
+			return "next";
+		case "p":
+			return "previous";
+		case "h":
+			return "home";
+		default:
+			return undefined;
+	}
 };
 
 const isNodeVisible = (
@@ -639,18 +651,33 @@ const drawItemNode = (
 
 	const textX = artworkX + artworkSize + 18;
 	const maxTextWidth = position.x + position.width - 18 - textX;
-	let textY = position.y + 33;
+	const titleLineHeight = 19;
+	const idLineHeight = 16;
+	const labelLineHeight = 12;
+	const blockGap = 8;
+	context.textBaseline = "top";
 	context.fillStyle = palette.foreground;
 	context.font = "600 15px Inter, ui-sans-serif, system-ui, sans-serif";
 	const titleLines = wrapText(context, node.title, maxTextWidth, 2);
-	drawTextLines(context, titleLines, textX, textY, 19);
-	textY += titleLines.length * 19 + 10;
+	context.font = "12px ui-monospace, SFMono-Regular, Menlo, monospace";
+	const idLines = wrapIdentifier(context, node.itemId, maxTextWidth, 2);
+	const textHeight =
+		titleLines.length * titleLineHeight +
+		blockGap +
+		idLines.length * idLineHeight +
+		blockGap +
+		labelLineHeight;
+	let textY = position.y + (position.height - textHeight) / 2;
+
+	context.fillStyle = palette.foreground;
+	context.font = "600 15px Inter, ui-sans-serif, system-ui, sans-serif";
+	drawTextLines(context, titleLines, textX, textY, titleLineHeight);
+	textY += titleLines.length * titleLineHeight + blockGap;
 
 	context.fillStyle = palette.muted;
 	context.font = "12px ui-monospace, SFMono-Regular, Menlo, monospace";
-	const idLines = wrapIdentifier(context, node.itemId, maxTextWidth, 2);
-	drawTextLines(context, idLines, textX, textY, 16);
-	textY += idLines.length * 16 + 10;
+	drawTextLines(context, idLines, textX, textY, idLineHeight);
+	textY += idLines.length * idLineHeight + blockGap;
 
 	context.font = "600 10px Inter, ui-sans-serif, system-ui, sans-serif";
 	const label =
@@ -727,10 +754,11 @@ const drawSourceNode = (
 	const maxTextWidth = position.x + position.width - 24 - textX;
 	context.fillStyle = palette.foreground;
 	context.font = "600 16px Inter, ui-sans-serif, system-ui, sans-serif";
+	context.textBaseline = "top";
 	const titleLines = wrapText(context, node.label, maxTextWidth, 3);
 	const lineHeight = 21;
-	const titleHeight = Math.max(1, titleLines.length) * lineHeight;
-	const titleY = position.y + (position.height - titleHeight) / 2 + 16;
+	const titleHeight = titleLines.length * lineHeight;
+	const titleY = position.y + (position.height - titleHeight) / 2;
 	drawTextLines(context, titleLines, textX, titleY, lineHeight);
 	context.restore();
 };
@@ -948,6 +976,7 @@ export const EditorOriginFlowCanvas = ({
 	direction,
 	fitContent,
 	flow,
+	focusNodeId,
 	onSelectionChange,
 	positions,
 	routes,
@@ -984,13 +1013,20 @@ export const EditorOriginFlowCanvas = ({
 	const navigationNodeIds = useMemo(
 		() =>
 			selection?.kind === "node"
-				? readEditorOriginFlowNavigation(flow, positions, selection.id, direction)
+				? readEditorOriginFlowNavigation(
+						flow,
+						positions,
+						selection.id,
+						direction,
+						highlight?.edgeIds,
+					)
 				: [],
 		[
 			flow,
 			positions,
 			selection,
 			direction,
+			highlight,
 		],
 	);
 	const renderStateRef = useRef<RenderState>({
@@ -1110,8 +1146,26 @@ export const EditorOriginFlowCanvas = ({
 	]);
 
 	useEffect(() => {
+		if (focusNodeId === undefined) return;
+		const canvas = canvasRef.current;
+		const position = positions.get(focusNodeId);
+		if (canvas === null || position === undefined) return;
+		const rect = canvas.getBoundingClientRect();
+		if (rect.width <= 0 || rect.height <= 0) return;
+		viewportRef.current = readNodeViewport(position, rect.width, rect.height, SearchFocusZoom);
+		navigationIndexRef.current = 0;
+		resetViewportRef.current = false;
 		scheduleDraw();
 	}, [
+		focusNodeId,
+		positions,
+		scheduleDraw,
+	]);
+
+	useEffect(() => {
+		scheduleDraw();
+	}, [
+		highlight,
 		resourceUrls,
 		scheduleDraw,
 		selection,
@@ -1124,26 +1178,52 @@ export const EditorOriginFlowCanvas = ({
 	]);
 
 	useEffect(() => {
-		if (navigationNodeIds.length === 0) return;
-		const handleKeyDown = (event: KeyboardEvent) => {
-			if (!isNextNodeShortcutKey(event)) return;
+		const focusPosition = (position: EditorItemOriginFlowLayoutNode, zoom: number) => {
 			const canvas = canvasRef.current;
-			if (canvas === null) return;
+			if (canvas === null) return false;
+			const rect = canvas.getBoundingClientRect();
+			viewportRef.current = readNodeViewport(position, rect.width, rect.height, zoom);
+			scheduleDraw();
+			return true;
+		};
+		const handleKeyDown = (event: KeyboardEvent) => {
+			const shortcut = readFlowNavigationShortcut(event);
+			if (shortcut === undefined) return;
 			event.preventDefault();
-			const nextIndex = (navigationIndexRef.current + 1) % navigationNodeIds.length;
+
+			if (shortcut === "home") {
+				const homeNodeId = navigationNodeIds[0];
+				const homePosition =
+					homeNodeId === undefined
+						? readInitialFocusPosition(flow, positions)
+						: positions.get(homeNodeId);
+				if (homePosition === undefined) return;
+				if (
+					focusPosition(
+						homePosition,
+						Math.max(viewportRef.current.zoom, DefaultViewport.zoom),
+					)
+				)
+					navigationIndexRef.current = 0;
+				return;
+			}
+
+			if (navigationNodeIds.length === 0) return;
+			const offset = shortcut === "next" ? 1 : -1;
+			const nextIndex =
+				(navigationIndexRef.current + offset + navigationNodeIds.length) %
+				navigationNodeIds.length;
 			const nodeId = navigationNodeIds[nextIndex];
 			if (nodeId === undefined) return;
 			const position = positions.get(nodeId);
 			if (position === undefined) return;
-			const rect = canvas.getBoundingClientRect();
-			const zoom = Math.max(viewportRef.current.zoom, DefaultViewport.zoom);
-			viewportRef.current = readNodeViewport(position, rect.width, rect.height, zoom);
-			navigationIndexRef.current = nextIndex;
-			scheduleDraw();
+			if (focusPosition(position, Math.max(viewportRef.current.zoom, DefaultViewport.zoom)))
+				navigationIndexRef.current = nextIndex;
 		};
 		window.addEventListener("keydown", handleKeyDown);
 		return () => window.removeEventListener("keydown", handleKeyDown);
 	}, [
+		flow,
 		navigationNodeIds,
 		positions,
 		scheduleDraw,

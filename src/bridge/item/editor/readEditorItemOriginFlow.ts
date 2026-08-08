@@ -10,6 +10,7 @@ import type {
 export type EditorItemOriginNodeStatus = "starter" | "reachable" | "blocked" | "cycle";
 
 export interface EditorItemOriginItemNode {
+	readonly acquisitionSourceId?: string;
 	readonly depth: number;
 	readonly id: string;
 	readonly itemId: string;
@@ -663,7 +664,14 @@ export const readEditorItemOriginFlowFx = Effect.fn("readEditorItemOriginFlowFx"
 								...[
 									...items.keys(),
 								].map((itemId) =>
-									readItemNode(itemId, 0, items, starters, reachableItems),
+									readItemNode(
+										itemId,
+										0,
+										items,
+										starters,
+										reachableItems,
+										acquisitionSourceByItem,
+									),
 								),
 								...sources.map((source) =>
 									readSourceNode(source, 1, reachableSources),
@@ -683,6 +691,7 @@ export const readEditorItemOriginFlowFx = Effect.fn("readEditorItemOriginFlowFx"
 										items,
 										starters,
 										reachableItems,
+										acquisitionSourceByItem,
 										originSubgraph.cycleItemIds,
 									),
 								),
@@ -706,10 +715,12 @@ const readItemNode = (
 	items: ReadonlyMap<string, EditorItem>,
 	starters: ReadonlyMap<string, ReadonlySet<EditorItemOriginItemNode["starterScopes"][number]>>,
 	reachableItems: ReadonlySet<string>,
+	acquisitionSourceByItem: ReadonlyMap<string, string> = new Map(),
 	cycleItemIds: ReadonlySet<string> = new Set(),
 ): EditorItemOriginItemNode => {
 	const item = items.get(itemId);
 	return {
+		acquisitionSourceId: acquisitionSourceByItem.get(itemId),
 		depth,
 		id: `item:${itemId}`,
 		itemId,

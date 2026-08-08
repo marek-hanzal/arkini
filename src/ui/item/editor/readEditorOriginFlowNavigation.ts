@@ -49,20 +49,23 @@ export const readEditorOriginFlowNavigation = (
 	positions: ReadonlyMap<string, FlowNavigationPosition>,
 	startNodeId: string,
 	direction: EditorItemOriginFlowDirection = "outcome",
+	allowedEdgeIds?: ReadonlySet<string>,
 ): ReadonlyArray<string> => {
 	if (!flow.nodes.some(({ id }) => id === startNodeId) || !positions.has(startNodeId)) return [];
 
 	const targetsBySource = new Map<string, Set<string>>();
 	for (const edge of flow.edges) {
+		if (allowedEdgeIds !== undefined && !allowedEdgeIds.has(edge.id)) continue;
 		const sourceId = direction === "income" ? edge.target : edge.source;
 		const targetId = direction === "income" ? edge.source : edge.target;
 		const source = positions.get(sourceId);
 		const target = positions.get(targetId);
 		if (source === undefined || target === undefined) continue;
 		const movesForward =
-			direction === "income"
+			allowedEdgeIds !== undefined ||
+			(direction === "income"
 				? target.flowOrder < source.flowOrder
-				: target.flowOrder > source.flowOrder;
+				: target.flowOrder > source.flowOrder);
 		if (!movesForward) continue;
 		const targets = targetsBySource.get(sourceId) ?? new Set<string>();
 		targets.add(targetId);

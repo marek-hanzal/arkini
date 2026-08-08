@@ -166,4 +166,24 @@ describe("readEditorOriginFlowNavigation", () => {
 			readEditorOriginFlowNavigation(flow, positions, "root"),
 		);
 	});
+	it("stays inside an explicitly selected branch", () => {
+		expect(
+			readEditorOriginFlowNavigation(
+				flow,
+				positions,
+				"root",
+				"outcome",
+				new Set([
+					"root-a",
+					"a-side",
+					"side-end",
+				]),
+			),
+		).toEqual([
+			"root",
+			"a",
+			"side",
+			"end",
+		]);
+	});
 });

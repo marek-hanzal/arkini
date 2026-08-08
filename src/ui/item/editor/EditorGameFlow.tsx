@@ -8,7 +8,7 @@ import { useEditorItemSearchOptions } from "~/ui/item/editor/useEditorItemSearch
 import { Tooltip } from "~/ui/overlay/Tooltip";
 
 const GraphFilterDescription =
-	"Search selects an item; its Income path shows what is required to obtain it.";
+	"Search selects an item; Income highlights everything that can produce it.";
 
 /** Shows the complete authored game graph and lets search navigate to one selected item. */
 export const EditorGameFlow = () => {

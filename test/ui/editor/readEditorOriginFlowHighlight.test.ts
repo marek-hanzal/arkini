@@ -1,11 +1,18 @@
+import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import type {
-	EditorItemOriginFlow,
-	EditorItemOriginItemNode,
-	EditorItemOriginOperation,
+import {
+	readEditorItemOriginFlowFx,
+	type EditorItemOriginFlow,
+	type EditorItemOriginItemNode,
+	type EditorItemOriginOperation,
 } from "~/bridge/item/editor/readEditorItemOriginFlow";
 import { readEditorOriginFlowHighlight } from "~/ui/item/editor/readEditorOriginFlowHighlight";
+import {
+	readEditorOriginFlowNavigation,
+	readEditorOriginFlowProducerNavigation,
+} from "~/ui/item/editor/readEditorOriginFlowNavigation";
+import { readArkiniGameConfigSource } from "~test/schema/support/readArkiniGameConfigSource";
 
 const operation = (
 	id: string,
@@ -54,7 +61,9 @@ const item = (
 	itemId,
 	kind: "item",
 	operations,
-	resourceIds: [],
+	resourceIds: [
+		"missing",
+	],
 	starterScopes: starter
 		? [
 				"Board",
@@ -143,13 +152,17 @@ const positions = new Map(
 				node.id,
 				{
 					flowOrder: index,
+					height: 40,
+					width: 40,
+					x: index * 100,
+					y: 0,
 				},
 			] as const,
 	),
 );
 
 describe("readEditorOriginFlowHighlight", () => {
-	it("builds one concrete Income proof with every mandatory prerequisite", () => {
+	it("includes every producer branch with its mandatory prerequisites", () => {
 		const highlight = readEditorOriginFlowHighlight(incomeFlow, positions, {
 			id: "item:target",
 			kind: "node",
@@ -161,6 +174,7 @@ describe("readEditorOriginFlowHighlight", () => {
 				"item:forge",
 				"item:tool",
 				"item:water",
+				"item:loop",
 			]),
 		);
 		expect(highlight.edgeIds).toEqual(
@@ -168,10 +182,25 @@ describe("readEditorOriginFlowHighlight", () => {
 				"forge-target",
 				"tool-forge",
 				"water-forge",
+				"loop-target",
 			]),
 		);
-		expect(highlight.nodeIds.has("item:loop")).toBe(false);
-		expect(highlight.edgeIds.has("loop-target")).toBe(false);
+
+		const producerNodeIds = readEditorOriginFlowProducerNavigation(incomeFlow, "item:target");
+		const navigationNodeIds = readEditorOriginFlowNavigation(
+			incomeFlow,
+			positions,
+			"item:target",
+			highlight.edgeIds,
+		);
+		expect(producerNodeIds).toEqual([
+			"item:forge",
+			"item:loop",
+		]);
+		for (const producerNodeId of producerNodeIds) {
+			expect(highlight.nodeIds.has(producerNodeId)).toBe(true);
+			expect(navigationNodeIds).toContain(producerNodeId);
+		}
 	});
 
 	it("stops tracing when the selected item is already a starter", () => {
@@ -374,6 +403,56 @@ describe("readEditorOriginFlowHighlight", () => {
 				"target-a",
 			]),
 		);
+	});
+
+	it("keeps every official Coin producer in the highlighted Income navigation", async () => {
+		const config = await readArkiniGameConfigSource();
+		const flow = await Effect.runPromise(
+			readEditorItemOriginFlowFx({
+				config,
+			}),
+		);
+		const coinNodeId = "item:item:coin";
+		const layout = new Map(
+			flow.nodes.map(
+				(node, index) =>
+					[
+						node.id,
+						{
+							flowOrder: index,
+							height: 40,
+							width: 40,
+							x: index * 50,
+							y: 0,
+						},
+					] as const,
+			),
+		);
+		const highlight = readEditorOriginFlowHighlight(flow, layout, {
+			id: coinNodeId,
+			kind: "node",
+		});
+		const producerNodeIds = readEditorOriginFlowProducerNavigation(flow, coinNodeId);
+		const navigationNodeIds = readEditorOriginFlowNavigation(
+			flow,
+			layout,
+			coinNodeId,
+			highlight.edgeIds,
+		);
+
+		expect(producerNodeIds.length).toBeGreaterThan(5);
+		expect(producerNodeIds).toEqual(
+			expect.arrayContaining([
+				"item:item:chest-t1",
+				"item:item:chest-t2",
+				"item:item:chest-t3",
+				"item:item:chest-t4",
+			]),
+		);
+		for (const producerNodeId of producerNodeIds) {
+			expect(highlight.nodeIds.has(producerNodeId)).toBe(true);
+			expect(navigationNodeIds).toContain(producerNodeId);
+		}
 	});
 
 	it("returns an empty highlight for a stale selection", () => {

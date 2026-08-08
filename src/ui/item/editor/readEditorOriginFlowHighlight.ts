@@ -23,8 +23,8 @@ interface FlowNodePosition {
 	readonly flowOrder: number;
 }
 
-/** Reads one deterministic acquisition proof through operations embedded in their owning item nodes. */
-const readIncomeProofHighlight = (
+/** Reads the complete Income ancestry through operations embedded in their owning item nodes. */
+const readIncomeHighlight = (
 	flow: EditorItemOriginFlow,
 	startNode: EditorItemOriginItemNode,
 ): EditorOriginFlowHighlight => {
@@ -54,10 +54,10 @@ const readIncomeProofHighlight = (
 	const nodeIds = new Set<string>();
 	const edgeIds = new Set<string>();
 	const tracedItems = new Set<string>();
-	const traceItem = (itemNode: EditorItemOriginItemNode, activeItemIds: ReadonlySet<string>) => {
+	const tracedOperations = new Set<string>();
+	const traceItem = (itemNode: EditorItemOriginItemNode) => {
 		nodeIds.add(itemNode.id);
-		if (itemNode.starterScopes.length > 0 || activeItemIds.has(itemNode.id)) return;
-		if (tracedItems.has(itemNode.id)) return;
+		if (itemNode.starterScopes.length > 0 || tracedItems.has(itemNode.id)) return;
 		tracedItems.add(itemNode.id);
 
 		const directOutputEdges = [
@@ -67,35 +67,33 @@ const readIncomeProofHighlight = (
 				left.operationId.localeCompare(right.operationId) ||
 				left.id.localeCompare(right.id),
 		);
-		const outputEdge =
-			itemNode.acquisitionSourceId === undefined
-				? directOutputEdges[0]
-				: directOutputEdges.find(
-						({ operationId }) => operationId === itemNode.acquisitionSourceId,
-					);
-		if (outputEdge === undefined) return;
+		for (const outputEdge of directOutputEdges) {
+			edgeIds.add(outputEdge.id);
+			if (tracedOperations.has(outputEdge.operationId)) continue;
+			tracedOperations.add(outputEdge.operationId);
 
-		edgeIds.add(outputEdge.id);
-		const nextActive = new Set(activeItemIds);
-		nextActive.add(itemNode.id);
-		const ownerNode = nodeById.get(outputEdge.source);
-		if (ownerNode !== undefined) traceItem(ownerNode, nextActive);
-		for (const edge of [
-			...(inputEdgesByOperation.get(outputEdge.operationId) ?? []),
-		].sort((left, right) => left.source.localeCompare(right.source))) {
-			edgeIds.add(edge.id);
-			const requirementNode = nodeById.get(edge.source);
-			if (requirementNode !== undefined) traceItem(requirementNode, nextActive);
+			const ownerNode = nodeById.get(outputEdge.source);
+			if (ownerNode !== undefined) traceItem(ownerNode);
+			for (const edge of [
+				...(inputEdgesByOperation.get(outputEdge.operationId) ?? []),
+			].sort(
+				(left, right) =>
+					left.source.localeCompare(right.source) || left.id.localeCompare(right.id),
+			)) {
+				edgeIds.add(edge.id);
+				const requirementNode = nodeById.get(edge.source);
+				if (requirementNode !== undefined) traceItem(requirementNode);
+			}
 		}
 	};
-	traceItem(startNode, new Set());
+	traceItem(startNode);
 	return {
 		edgeIds,
 		nodeIds,
 	};
 };
 
-/** Reads the Income branch selected by an item or connection. */
+/** Reads the complete Income ancestry selected by an item or connection. */
 export const readEditorOriginFlowHighlight = (
 	flow: EditorItemOriginFlow,
 	_positions: ReadonlyMap<string, FlowNodePosition>,
@@ -108,7 +106,7 @@ export const readEditorOriginFlowHighlight = (
 					edgeIds: new Set(),
 					nodeIds: new Set(),
 				}
-			: readIncomeProofHighlight(flow, selectedNode);
+			: readIncomeHighlight(flow, selectedNode);
 	}
 
 	const selectedEdge = flow.edges.find(({ id }) => id === selection.id);
@@ -128,7 +126,7 @@ export const readEditorOriginFlowHighlight = (
 				selectedEdge.target,
 			]),
 		};
-	const highlight = readIncomeProofHighlight(flow, startNode);
+	const highlight = readIncomeHighlight(flow, startNode);
 	return {
 		edgeIds: new Set([
 			selectedEdge.id,

@@ -7,11 +7,11 @@ interface EditorOriginFlowShortcutHelpProps {
 const ShortcutRows = [
 	[
 		"N",
-		"Next item in the selected Income path.",
+		"Next item in the selected Income graph.",
 	],
 	[
 		"P",
-		"Previous item in the selected Income path.",
+		"Previous item in the selected Income graph.",
 	],
 	[
 		"H",

@@ -8,10 +8,11 @@ export const EditorOriginFlowNodeMinHeight = 176;
 export const EditorOriginFlowNodeHeaderHeight = 132;
 export const EditorOriginFlowOperationGap = 8;
 export const EditorOriginFlowOperationSidePadding = 12;
+export const EditorOriginFlowOperationContentPadding = 12;
+export const EditorOriginFlowOperationHeaderHeight = 22;
+export const EditorOriginFlowOperationHeaderGap = 8;
 
-const OperationVerticalPadding = 12;
 const PortLineHeight = 26;
-const OperationMinHeight = 54;
 const NodeBottomPadding = 12;
 
 export interface EditorOriginFlowOperationMetrics {
@@ -36,12 +37,14 @@ export interface EditorOriginFlowNodeMetrics {
 	readonly width: number;
 }
 
+const readOperationBodyHeight = (operation: EditorItemOriginOperation) =>
+	Math.max(1, operation.inputs.length, operation.outputs.length) * PortLineHeight;
+
 const readOperationHeight = (operation: EditorItemOriginOperation) =>
-	Math.max(
-		OperationMinHeight,
-		OperationVerticalPadding * 2 +
-			Math.max(1, operation.inputs.length, operation.outputs.length) * PortLineHeight,
-	);
+	EditorOriginFlowOperationContentPadding * 2 +
+	EditorOriginFlowOperationHeaderHeight +
+	EditorOriginFlowOperationHeaderGap +
+	readOperationBodyHeight(operation);
 
 const readPortYs = (
 	ports: ReadonlyArray<{
@@ -79,11 +82,17 @@ export const readEditorOriginFlowNodeMetrics = (
 	const operations: EditorOriginFlowOperationMetrics[] = [];
 	for (const operation of node.operations) {
 		const height = readOperationHeight(operation);
+		const bodyHeight = readOperationBodyHeight(operation);
+		const bodyTop =
+			top +
+			EditorOriginFlowOperationContentPadding +
+			EditorOriginFlowOperationHeaderHeight +
+			EditorOriginFlowOperationHeaderGap;
 		operations.push({
 			height,
 			id: operation.id,
-			inputPortYs: readPortYs(operation.inputs, top, height),
-			outputPortYs: readPortYs(operation.outputs, top, height),
+			inputPortYs: readPortYs(operation.inputs, bodyTop, bodyHeight),
+			outputPortYs: readPortYs(operation.outputs, bodyTop, bodyHeight),
 			top,
 		});
 		top += height + EditorOriginFlowOperationGap;

@@ -25,6 +25,8 @@ import {
 } from "~/ui/item/editor/readEditorOriginFlowHighlight";
 import { readEditorOriginFlowNavigation } from "~/ui/item/editor/readEditorOriginFlowNavigation";
 import {
+	EditorOriginFlowOperationContentPadding,
+	EditorOriginFlowOperationHeaderHeight,
 	EditorOriginFlowOperationSidePadding,
 	readEditorOriginFlowNodeMetrics,
 } from "~/ui/item/editor/readEditorOriginFlowNodeMetrics";
@@ -766,20 +768,33 @@ const drawItemNode = (
 		context.stroke();
 		context.globalAlpha = selectionActive && highlight === "idle" ? 0.2 : 1;
 
-		const centerX = position.x + position.width / 2;
-		const iconSize = 22;
-		const labelMaxWidth = 112;
-		context.font = "600 12px Inter, ui-sans-serif, system-ui, sans-serif";
-		const operationLabel = fitText(context, operation.label, labelMaxWidth);
-		const labelWidth = context.measureText(operationLabel).width;
-		const groupWidth = iconSize + 8 + labelWidth;
-		const groupX = centerX - groupWidth / 2;
-		const groupY = rowY + (rowHeight - iconSize) / 2;
-		drawSourceIcon(context, operation.kind, groupX, groupY, iconSize, kindColor);
+		const iconSize = 18;
+		const headerX = rowX + EditorOriginFlowOperationContentPadding;
+		const headerCenterY =
+			rowY +
+			EditorOriginFlowOperationContentPadding +
+			EditorOriginFlowOperationHeaderHeight / 2;
+		drawSourceIcon(
+			context,
+			operation.kind,
+			headerX,
+			headerCenterY - iconSize / 2,
+			iconSize,
+			kindColor,
+		);
 		context.fillStyle = palette.foreground;
+		context.font = "600 12px Inter, ui-sans-serif, system-ui, sans-serif";
 		context.textBaseline = "middle";
 		context.textAlign = "left";
-		context.fillText(operationLabel, groupX + iconSize + 8, rowY + rowHeight / 2);
+		context.fillText(
+			fitText(
+				context,
+				operation.label,
+				rowWidth - EditorOriginFlowOperationContentPadding * 2 - iconSize - 8,
+			),
+			headerX + iconSize + 8,
+			headerCenterY,
+		);
 
 		context.font = "500 11px Inter, ui-sans-serif, system-ui, sans-serif";
 		for (const input of operation.inputs) {
@@ -796,7 +811,11 @@ const drawItemNode = (
 			context.fillStyle = palette.foreground;
 			context.textAlign = "left";
 			context.textBaseline = "middle";
-			context.fillText(fitText(context, input.label, 104), position.x + 12, worldY);
+			context.fillText(
+				fitText(context, input.label, 104),
+				rowX + EditorOriginFlowOperationContentPadding,
+				worldY,
+			);
 		}
 		for (const output of operation.outputs) {
 			const portY = operationMetrics.outputPortYs.get(output.id);
@@ -814,7 +833,7 @@ const drawItemNode = (
 			context.textBaseline = "middle";
 			context.fillText(
 				fitText(context, output.label, 104),
-				position.x + position.width - 12,
+				rowX + rowWidth - EditorOriginFlowOperationContentPadding,
 				worldY,
 			);
 		}

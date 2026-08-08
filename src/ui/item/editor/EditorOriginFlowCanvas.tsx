@@ -876,7 +876,7 @@ const drawEdge = (
 	const selected = selection?.kind === "edge" && selection.id === edge.id;
 	const active = highlight?.edgeIds.has(edge.id) ?? false;
 	context.save();
-	context.globalAlpha = selection === undefined ? 0.18 : active ? 1 : 0.05;
+	context.globalAlpha = selection === undefined ? 0.12 : active ? 1 : 0.025;
 	context.strokeStyle = palette.accent;
 	context.fillStyle = palette.accent;
 	context.lineWidth = selected ? 5 : active ? 4 : 1.2;

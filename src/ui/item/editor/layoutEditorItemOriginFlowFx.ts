@@ -12,14 +12,11 @@ import {
 	GeomNode,
 	Graph,
 	InteractiveObstacleCalculator,
-	type ICurve,
-	LineSegment,
 	Node,
 	Point,
 	Polyline,
 	Rectangle,
 	RelativeFloatingPort,
-	SmoothedPolyline,
 	layoutGeomGraph,
 } from "@msagl/core";
 import { Effect } from "effect";
@@ -76,10 +73,10 @@ export interface EditorItemOriginFlowLayout {
 	readonly routes: ReadonlyMap<string, ReadonlyArray<EditorItemOriginFlowLayoutRouteSegment>>;
 }
 
-const NodeSeparation = 24;
+const NodeSeparation = 144;
 const PackingAspectRatio = 1.6;
-const EdgePadding = 8;
-const PortEscape = EdgePadding + 4;
+const EdgePadding = 40;
+const PortEscape = EdgePadding + 16;
 
 interface WeightedGraph {
 	readonly incoming: ReadonlyMap<string, ReadonlyMap<string, number>>;
@@ -212,55 +209,141 @@ const toLayoutPoint = ({ x, y }: Point): EditorItemOriginFlowLayoutPoint => ({
 	y,
 });
 
-const readCurveSegments = (curve: ICurve): EditorItemOriginFlowLayoutRouteSegment[] => {
-	if (curve instanceof LineSegment)
-		return [
-			{
-				from: toLayoutPoint(curve.start),
-				kind: "line",
-				to: toLayoutPoint(curve.end),
-			},
-		];
-	if (curve instanceof BezierSeg)
-		return [
-			{
-				control1: toLayoutPoint(curve.B(1)),
-				control2: toLayoutPoint(curve.B(2)),
-				from: toLayoutPoint(curve.B(0)),
-				kind: "cubic",
-				to: toLayoutPoint(curve.B(3)),
-			},
-		];
-	if (curve instanceof Curve) return curve.segs.flatMap(readCurveSegments);
-	throw new Error(`MSAGL returned unsupported route geometry: ${curve.constructor.name}.`);
+const SplineSafetyPadding = 8;
+const SplineTensions = [
+	1,
+	0.82,
+	0.64,
+	0.46,
+	0.28,
+] as const;
+
+const readLineSegment = (from: Point, to: Point): EditorItemOriginFlowLayoutRouteSegment => ({
+	from: toLayoutPoint(from),
+	kind: "line",
+	to: toLayoutPoint(to),
+});
+
+const distance = (left: Point, right: Point) => Math.hypot(right.x - left.x, right.y - left.y);
+
+const normalize = (vector: Point) => {
+	const length = Math.hypot(vector.x, vector.y);
+	return length < 0.001 ? new Point(1, 0) : new Point(vector.x / length, vector.y / length);
 };
 
-const smoothRoute = (polyline: Polyline): EditorItemOriginFlowLayoutRouteSegment[] => {
-	const points = [
-		...polyline,
-	];
-	if (points.length < 3) return readCurveSegments(polyline.toCurve());
-	const smoothed = SmoothedPolyline.mkFromPoints(points);
-	const maxCornerCut = EdgePadding * 0.45;
-	for (
-		let site = smoothed.headSite.next;
-		site?.next !== undefined && site.next !== null;
-		site = site.next
-	) {
-		const previousLength = Math.hypot(
-			site.point.x - site.prev.point.x,
-			site.point.y - site.prev.point.y,
+const readSplineTangent = (
+	points: ReadonlyArray<Point>,
+	index: number,
+	startDirection: Point,
+	endDirection: Point,
+) => {
+	if (index === 0) return startDirection;
+	if (index === points.length - 1) return endDirection;
+	const previous = points[index - 1] as Point;
+	const next = points[index + 1] as Point;
+	return normalize(next.sub(previous));
+};
+
+const readSplineSegments = (
+	points: ReadonlyArray<Point>,
+	startDirection: Point,
+	endDirection: Point,
+	tension: number,
+): EditorItemOriginFlowLayoutRouteSegment[] => {
+	if (points.length < 2) return [];
+	const tangents = points.map((_, index) =>
+		readSplineTangent(points, index, startDirection, endDirection),
+	);
+	const segments: EditorItemOriginFlowLayoutRouteSegment[] = [];
+	for (let index = 0; index < points.length - 1; index += 1) {
+		const from = points[index] as Point;
+		const to = points[index + 1] as Point;
+		const chord = distance(from, to);
+		if (chord < 0.01) continue;
+		const neighboringDistance = Math.min(
+			distance(points[Math.max(0, index - 1)] as Point, to),
+			distance(from, points[Math.min(points.length - 1, index + 2)] as Point),
 		);
-		const nextLength = Math.hypot(
-			site.next.point.x - site.point.x,
-			site.next.point.y - site.point.y,
-		);
-		if (previousLength < 0.01 || nextLength < 0.01) continue;
-		const cut = Math.min(maxCornerCut, previousLength * 0.2, nextLength * 0.2);
-		site.previouisBezierCoefficient = cut / previousLength;
-		site.nextBezierCoefficient = cut / nextLength;
+		const controlDistance =
+			Math.min(260, Math.max(28, Math.min(chord * 0.48, neighboringDistance * 0.32))) *
+			tension;
+		const control1 = from.add((tangents[index] as Point).mul(controlDistance));
+		const control2 = to.sub((tangents[index + 1] as Point).mul(controlDistance));
+		segments.push({
+			control1: toLayoutPoint(control1),
+			control2: toLayoutPoint(control2),
+			from: toLayoutPoint(from),
+			kind: "cubic",
+			to: toLayoutPoint(to),
+		});
 	}
-	return readCurveSegments(smoothed.createCurve());
+	return segments;
+};
+
+const splineIsClear = (
+	segments: ReadonlyArray<EditorItemOriginFlowLayoutRouteSegment>,
+	obstacles: ReadonlyArray<Rectangle>,
+) => {
+	for (const segment of segments) {
+		if (segment.kind !== "cubic") continue;
+		const bezier = new BezierSeg(
+			new Point(segment.from.x, segment.from.y),
+			new Point(segment.control1.x, segment.control1.y),
+			new Point(segment.control2.x, segment.control2.y),
+			new Point(segment.to.x, segment.to.y),
+		);
+		for (const obstacle of obstacles) {
+			const padded = obstacle.clone();
+			padded.pad(SplineSafetyPadding);
+			if (!padded.intersects(bezier.boundingBox)) continue;
+			if (padded.contains(bezier.start) || padded.contains(bezier.end)) return false;
+			if (Curve.getAllIntersections(bezier, padded.perimeter(), false).length > 0)
+				return false;
+		}
+	}
+	return true;
+};
+
+const readDirectSpline = (
+	from: Point,
+	to: Point,
+	startDirection: Point,
+	endDirection: Point,
+	tension: number,
+): EditorItemOriginFlowLayoutRouteSegment[] => {
+	const chord = distance(from, to);
+	if (chord < 0.01) return [];
+	const controlDistance = Math.min(420, Math.max(80, chord * 0.46)) * tension;
+	return [
+		{
+			control1: toLayoutPoint(from.add(startDirection.mul(controlDistance))),
+			control2: toLayoutPoint(to.sub(endDirection.mul(controlDistance))),
+			from: toLayoutPoint(from),
+			kind: "cubic",
+			to: toLayoutPoint(to),
+		},
+	];
+};
+
+const smoothRoute = (
+	points: ReadonlyArray<Point>,
+	startDirection: Point,
+	endDirection: Point,
+	obstacles: ReadonlyArray<Rectangle>,
+): EditorItemOriginFlowLayoutRouteSegment[] => {
+	if (points.length >= 2) {
+		const from = points[0] as Point;
+		const to = points[points.length - 1] as Point;
+		for (const tension of SplineTensions) {
+			const direct = readDirectSpline(from, to, startDirection, endDirection, tension);
+			if (splineIsClear(direct, obstacles)) return direct;
+		}
+	}
+	for (const tension of SplineTensions) {
+		const spline = readSplineSegments(points, startDirection, endDirection, tension);
+		if (splineIsClear(spline, obstacles)) return spline;
+	}
+	return points.slice(1).map((point, index) => readLineSegment(points[index] as Point, point));
 };
 
 const pointClose = (left: Point, right: Point) =>
@@ -277,6 +360,9 @@ const routePortAwareEdges = (
 	geomEdges: ReadonlyMap<string, GeomEdge>,
 ): ReadonlyMap<string, ReadonlyArray<EditorItemOriginFlowLayoutRouteSegment>> => {
 	const obstacles: Polyline[] = [];
+	const nodeObstacles = [
+		...geomNodes.values(),
+	].map((geomNode) => geomNode.boundingBox.clone());
 	const bounds = Rectangle.mkEmpty();
 	for (const geomNode of geomNodes.values()) {
 		const obstacle = InteractiveObstacleCalculator.PaddedPolylineBoundaryOfNode(
@@ -308,14 +394,24 @@ const routePortAwareEdges = (
 		if (routed === null)
 			throw new Error(`MSAGL could not route edge ${input.id} between its ports.`);
 
-		const points: Point[] = [];
-		appendDistinctPoint(points, source);
-		appendDistinctPoint(points, sourceEscape);
-		for (const point of routed) appendDistinctPoint(points, point);
-		appendDistinctPoint(points, targetEscape);
-		appendDistinctPoint(points, target);
-		const simplified = Polyline.mkFromPoints(points).RemoveCollinearVertices();
-		const route = smoothRoute(simplified);
+		const corePoints: Point[] = [];
+		appendDistinctPoint(corePoints, sourceEscape);
+		for (const point of routed) appendDistinctPoint(corePoints, point);
+		appendDistinctPoint(corePoints, targetEscape);
+		const simplifiedCore = [
+			...Polyline.mkFromPoints(corePoints).RemoveCollinearVertices(),
+		];
+		const route: EditorItemOriginFlowLayoutRouteSegment[] = [];
+		if (!pointClose(source, sourceEscape)) route.push(readLineSegment(source, sourceEscape));
+		route.push(
+			...smoothRoute(
+				simplifiedCore,
+				normalize(sourceEscape.sub(source)),
+				normalize(target.sub(targetEscape)),
+				nodeObstacles,
+			),
+		);
+		if (!pointClose(targetEscape, target)) route.push(readLineSegment(targetEscape, target));
 		if (route.length === 0)
 			throw new Error(`MSAGL returned an empty route for edge ${input.id}.`);
 		routes.set(input.id, route);
@@ -402,6 +498,9 @@ const runLayout = (flow: EditorItemOriginFlowLayoutInput): EditorItemOriginFlowL
 	settings.AvoidOverlaps = true;
 	settings.NodeSeparation = NodeSeparation;
 	settings.PackingAspectRatio = PackingAspectRatio;
+	settings.RepulsiveForceConstant = 2.8;
+	settings.AttractiveForceConstant = 0.72;
+	settings.GravityConstant = 0.65;
 	settings.edgeRoutingSettings.EdgeRoutingMode = EdgeRoutingMode.None;
 	geomGraph.layoutSettings = settings;
 	layoutGeomGraph(geomGraph);

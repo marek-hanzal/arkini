@@ -164,7 +164,10 @@ describe("layoutEditorItemOriginFlowFx", () => {
 		expect(layout.positions.get("b")!.flowOrder).toBeLessThan(
 			layout.positions.get("c")!.flowOrder,
 		);
-		for (const route of layout.routes.values()) expectValidRoute(route);
+		for (const route of layout.routes.values()) {
+			expectValidRoute(route);
+			expect(route.some(({ kind }) => kind === "cubic")).toBe(true);
+		}
 	});
 
 	it("keeps cycles and disconnected components finite", () => {
@@ -188,7 +191,10 @@ describe("layoutEditorItemOriginFlowFx", () => {
 
 		expect(layout.positions.size).toBe(5);
 		expect(layout.routes.size).toBe(4);
-		for (const route of layout.routes.values()) expectValidRoute(route);
+		for (const route of layout.routes.values()) {
+			expectValidRoute(route);
+			expect(route.some(({ kind }) => kind === "cubic")).toBe(true);
+		}
 		for (const position of layout.positions.values()) {
 			expect(Number.isFinite(position.x)).toBe(true);
 			expect(Number.isFinite(position.y)).toBe(true);
@@ -310,7 +316,10 @@ describe("layoutEditorItemOriginFlowFx", () => {
 		expect(bounds.height).toBeLessThan(22_000);
 		expect(bounds.width / bounds.height).toBeGreaterThan(0.8);
 		expect(bounds.width / bounds.height).toBeLessThan(1.5);
-		for (const route of layout.routes.values()) expectValidRoute(route);
+		for (const route of layout.routes.values()) {
+			expectValidRoute(route);
+			expect(route.some(({ kind }) => kind === "cubic")).toBe(true);
+		}
 
 		for (const flowEdge of flow.edges) {
 			const source = layout.positions.get(flowEdge.source)!;

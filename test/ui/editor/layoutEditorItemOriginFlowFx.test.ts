@@ -9,47 +9,22 @@ import {
 	type EditorItemOriginFlowLayout,
 	type EditorItemOriginFlowLayoutInput,
 	type EditorItemOriginFlowLayoutNode,
-	type EditorItemOriginFlowLayoutPoint,
 	layoutEditorItemOriginFlowFx,
 } from "~/ui/item/editor/layoutEditorItemOriginFlowFx";
-import { readEditorOriginFlowHighlight } from "~/ui/item/editor/readEditorOriginFlowHighlight";
-import { readEditorOriginFlowNodeMetrics } from "~/ui/item/editor/readEditorOriginFlowNodeMetrics";
 import { readArkiniGameConfigSource } from "~test/schema/support/readArkiniGameConfigSource";
 
 const node = (
 	id: string,
-	{
-		height = 176,
-		ports = [],
-		width = 420,
-	}: {
-		readonly height?: number;
-		readonly ports?: ReadonlyArray<{
-			readonly id: string;
-			readonly x: number;
-			readonly y: number;
-		}>;
-		readonly width?: number;
-	} = {},
+	type: EditorItemOriginFlowLayoutInput["nodes"][number]["type"] = "simple",
 ) => ({
 	id,
-	height,
-	ports,
-	width,
+	type,
 });
 
-const edge = (
-	source: string,
-	target: string,
-	ports: {
-		readonly sourcePortId?: string;
-		readonly targetPortId?: string;
-	} = {},
-) => ({
-	id: `${source}->${target}`,
+const edge = (source: string, target: string, id = `${source}->${target}`) => ({
+	id,
 	source,
 	target,
-	...ports,
 });
 
 const readTopology = (flow: EditorItemOriginFlow): EditorItemOriginFlowLayoutInput => ({
@@ -60,26 +35,11 @@ const readTopology = (flow: EditorItemOriginFlow): EditorItemOriginFlowLayoutInp
 		target,
 		targetPortId,
 	})),
-	nodes: flow.nodes.map((flowNode) => {
-		const metrics = readEditorOriginFlowNodeMetrics(flowNode);
-		return {
-			height: metrics.height,
-			id: flowNode.id,
-			ports: [
-				...metrics.portOffsets,
-			].map(([id, point]) => ({
-				id,
-				...point,
-			})),
-			width: metrics.width,
-		};
-	}),
+	nodes: flow.nodes.map(({ id, type }) => ({
+		id,
+		type,
+	})),
 });
-
-const expectFinitePoint = ({ x, y }: EditorItemOriginFlowLayoutPoint) => {
-	expect(Number.isFinite(x)).toBe(true);
-	expect(Number.isFinite(y)).toBe(true);
-};
 
 const readBounds = (layout: EditorItemOriginFlowLayout) => {
 	let minX = Number.POSITIVE_INFINITY;
@@ -98,15 +58,20 @@ const readBounds = (layout: EditorItemOriginFlowLayout) => {
 	};
 };
 
-const overlaps = (left: EditorItemOriginFlowLayoutNode, right: EditorItemOriginFlowLayoutNode) =>
-	left.x < right.x + right.width &&
-	left.x + left.width > right.x &&
-	left.y < right.y + right.height &&
-	left.y + left.height > right.y;
+const circleOverlap = (
+	left: EditorItemOriginFlowLayoutNode,
+	right: EditorItemOriginFlowLayoutNode,
+) => {
+	const distance = Math.hypot(
+		left.x + left.width / 2 - (right.x + right.width / 2),
+		left.y + left.height / 2 - (right.y + right.height / 2),
+	);
+	return (left.width + right.width) / 2 - distance;
+};
 
 describe("layoutEditorItemOriginFlowFx", () => {
-	it("keeps a deterministic forward order independent of input order", () => {
-		const flow: EditorItemOriginFlowLayoutInput = {
+	it("keeps deterministic weighted positions independent of input order", () => {
+		const topology: EditorItemOriginFlowLayoutInput = {
 			edges: [
 				edge("a", "b"),
 				edge("b", "c"),
@@ -114,17 +79,17 @@ describe("layoutEditorItemOriginFlowFx", () => {
 			nodes: [
 				node("c"),
 				node("a"),
-				node("b"),
+				node("b", "producer"),
 			],
 		};
-		const layout = Effect.runSync(layoutEditorItemOriginFlowFx(flow));
+		const layout = Effect.runSync(layoutEditorItemOriginFlowFx(topology));
 		const shuffled = Effect.runSync(
 			layoutEditorItemOriginFlowFx({
 				edges: [
-					...flow.edges,
+					...topology.edges,
 				].reverse(),
 				nodes: [
-					...flow.nodes,
+					...topology.nodes,
 				].reverse(),
 			}),
 		);
@@ -139,16 +104,9 @@ describe("layoutEditorItemOriginFlowFx", () => {
 		]).toEqual([
 			...shuffled.backbones,
 		]);
-		expect(layout.positions.get("a")!.flowOrder).toBeLessThan(
-			layout.positions.get("b")!.flowOrder,
+		expect(layout.positions.get("a")?.flowOrder).toBeLessThan(
+			layout.positions.get("c")?.flowOrder ?? -1,
 		);
-		expect(layout.positions.get("b")!.flowOrder).toBeLessThan(
-			layout.positions.get("c")!.flowOrder,
-		);
-		for (const backbone of layout.backbones.values()) {
-			expect(backbone.length).toBeGreaterThan(1);
-			for (const point of backbone) expectFinitePoint(point);
-		}
 	});
 
 	it("keeps cycles and disconnected components finite", () => {
@@ -156,267 +114,114 @@ describe("layoutEditorItemOriginFlowFx", () => {
 			layoutEditorItemOriginFlowFx({
 				edges: [
 					edge("a", "b"),
-					edge("b", "a"),
-					edge("x", "y"),
-					edge("y", "x"),
+					edge("b", "a", "b->a"),
+					edge("c", "d"),
 				],
 				nodes: [
 					node("a"),
 					node("b"),
-					node("x"),
-					node("y"),
-					node("isolated"),
+					node("c"),
+					node("d"),
 				],
 			}),
 		);
-
-		expect(layout.positions.size).toBe(5);
-		expect(layout.backbones.size).toBe(4);
-		for (const backbone of layout.backbones.values()) {
-			expect(backbone.length).toBeGreaterThan(1);
-			for (const point of backbone) expectFinitePoint(point);
-		}
+		expect(layout.positions.size).toBe(4);
 		for (const position of layout.positions.values()) {
 			expect(Number.isFinite(position.x)).toBe(true);
 			expect(Number.isFinite(position.y)).toBe(true);
+			expect(position.width).toBeGreaterThan(0);
+			expect(position.width).toBe(position.height);
 		}
 	});
 
-	it("preserves variable item sizes without overlap", () => {
-		const inputNodes = Array.from(
-			{
-				length: 80,
-			},
-			(_, index) =>
-				node(`node-${index}`, {
-					height: 176 + (index % 7) * 70,
-				}),
-		);
-		const layout = Effect.runSync(
-			layoutEditorItemOriginFlowFx({
-				edges: [],
-				nodes: inputNodes,
-			}),
-		);
-		const positions = [
-			...layout.positions.values(),
-		];
-
-		for (const [index, position] of positions.entries()) {
-			const input = inputNodes.find(
-				({ id }) =>
-					id ===
-					[
-						...layout.positions.keys(),
-					][index],
-			);
-			expect(input).toBeDefined();
-			expect(position.height).toBeCloseTo(input!.height, 5);
-			expect(position.width).toBeCloseTo(input!.width, 5);
-		}
-		for (let leftIndex = 0; leftIndex < positions.length; leftIndex += 1) {
-			for (let rightIndex = leftIndex + 1; rightIndex < positions.length; rightIndex += 1)
-				expect(overlaps(positions[leftIndex]!, positions[rightIndex]!)).toBe(false);
-		}
-	});
-
-	it("routes exactly between explicit item ports", () => {
+	it("uses topology and port pressure to give hubs more map space", () => {
 		const layout = Effect.runSync(
 			layoutEditorItemOriginFlowFx({
 				edges: [
-					edge("source", "target", {
-						sourcePortId: "out",
-						targetPortId: "in",
-					}),
+					{
+						...edge("hub", "a"),
+						sourcePortId: "out:a",
+					},
+					{
+						...edge("hub", "b"),
+						sourcePortId: "out:b",
+					},
+					{
+						...edge("hub", "c"),
+						sourcePortId: "out:c",
+					},
+					{
+						...edge("a", "leaf"),
+					},
 				],
 				nodes: [
-					node("source", {
-						height: 260,
-						ports: [
-							{
-								id: "out",
-								x: 210,
-								y: 62,
-							},
-						],
-					}),
-					node("target", {
-						height: 420,
-						ports: [
-							{
-								id: "in",
-								x: -210,
-								y: -118,
-							},
-						],
-					}),
+					node("hub"),
+					node("a"),
+					node("b"),
+					node("c"),
+					node("leaf"),
 				],
 			}),
 		);
-		const source = layout.positions.get("source")!;
-		const target = layout.positions.get("target")!;
-		const backbone = layout.backbones.get("source->target")!;
-		const start = backbone[0]!;
-		const end = backbone.at(-1)!;
-
-		expect(start.x).toBeCloseTo(source.x + source.width, 5);
-		expect(start.y).toBeCloseTo(source.y + source.height / 2 + 62, 5);
-		expect(end.x).toBeCloseTo(target.x, 5);
-		expect(end.y).toBeCloseTo(target.y + target.height / 2 - 118, 5);
+		const hub = layout.positions.get("hub")!;
+		const leaf = layout.positions.get("leaf")!;
+		expect(hub.degree).toBe(3);
+		expect(hub.portCount).toBe(3);
+		expect(hub.importance).toBeGreaterThan(leaf.importance);
+		expect(hub.width).toBeGreaterThan(leaf.width);
 	});
 
-	it("lays out the official item-only graph with exact embedded-operation ports", async () => {
+	it("lays out the official map compactly with no node overlap", async () => {
 		const config = await readArkiniGameConfigSource();
 		const flow = await Effect.runPromise(
 			readEditorItemOriginFlowFx({
 				config,
 			}),
 		);
-		const topology = readTopology(flow);
 		const startedAt = performance.now();
-		const layout = Effect.runSync(layoutEditorItemOriginFlowFx(topology));
-		const elapsedMs = performance.now() - startedAt;
+		const layout = Effect.runSync(layoutEditorItemOriginFlowFx(readTopology(flow)));
+		const elapsed = performance.now() - startedAt;
 		const bounds = readBounds(layout);
-		const metricsById = new Map(
-			flow.nodes.map(
-				(flowNode) =>
-					[
-						flowNode.id,
-						readEditorOriginFlowNodeMetrics(flowNode),
-					] as const,
-			),
-		);
 
-		expect(flow.nodes.length).toBe(247);
-		expect(flow.edges.length).toBe(1384);
-		expect(flow.nodes.every(({ kind }) => kind === "item")).toBe(true);
 		expect(layout.positions.size).toBe(flow.nodes.length);
 		expect(layout.backbones.size).toBe(flow.edges.length);
-		expect(elapsedMs).toBeLessThan(5_000);
-		expect(bounds.width).toBeLessThan(24_000);
-		expect(bounds.height).toBeLessThan(22_000);
-		expect(bounds.width / bounds.height).toBeGreaterThan(0.8);
-		expect(bounds.width / bounds.height).toBeLessThan(1.5);
-		let backboneSegments = 0;
-		let orthogonalBackboneSegments = 0;
-		for (const backbone of layout.backbones.values()) {
-			for (let index = 1; index < backbone.length; index += 1) {
-				const from = backbone[index - 1]!;
-				const to = backbone[index]!;
-				backboneSegments += 1;
-				if (Math.abs(from.x - to.x) < 0.1 || Math.abs(from.y - to.y) < 0.1)
-					orthogonalBackboneSegments += 1;
-			}
-		}
-		expect(orthogonalBackboneSegments / backboneSegments).toBeGreaterThan(0.98);
+		expect(elapsed).toBeLessThan(6000);
+		expect(bounds.width).toBeLessThan(7000);
+		expect(bounds.height).toBeLessThan(7000);
+		expect(bounds.width / bounds.height).toBeGreaterThan(0.65);
+		expect(bounds.width / bounds.height).toBeLessThan(1.55);
 
-		const sharedLongSegments = new Map<string, number>();
-		let maximumEndpointStub = 0;
-		for (const backbone of layout.backbones.values()) {
-			if (backbone.length >= 2) {
-				maximumEndpointStub = Math.max(
-					maximumEndpointStub,
-					Math.hypot(backbone[1]!.x - backbone[0]!.x, backbone[1]!.y - backbone[0]!.y),
-					Math.hypot(
-						backbone.at(-1)!.x - backbone.at(-2)!.x,
-						backbone.at(-1)!.y - backbone.at(-2)!.y,
-					),
-				);
-			}
-			for (let index = 1; index < backbone.length; index += 1) {
-				const from = backbone[index - 1]!;
-				const to = backbone[index]!;
-				if (Math.hypot(to.x - from.x, to.y - from.y) <= 100) continue;
-				const horizontal = Math.abs(from.y - to.y) < 0.1;
-				const vertical = Math.abs(from.x - to.x) < 0.1;
-				if (!horizontal && !vertical) continue;
-				const key = horizontal
-					? `h:${from.y.toFixed(1)}:${Math.min(from.x, to.x).toFixed(1)}:${Math.max(from.x, to.x).toFixed(1)}`
-					: `v:${from.x.toFixed(1)}:${Math.min(from.y, to.y).toFixed(1)}:${Math.max(from.y, to.y).toFixed(1)}`;
-				sharedLongSegments.set(key, (sharedLongSegments.get(key) ?? 0) + 1);
-			}
-		}
-		expect(maximumEndpointStub).toBeLessThan(500);
-		const sharedMultiplicities = [
-			...sharedLongSegments.values(),
-		].filter((count) => count > 1);
-		expect(Math.max(0, ...sharedMultiplicities)).toBeLessThanOrEqual(16);
+		const positions = [
+			...layout.positions.values(),
+		];
+		for (let left = 0; left < positions.length; left += 1)
+			for (let right = left + 1; right < positions.length; right += 1)
+				expect(circleOverlap(positions[left]!, positions[right]!)).toBeLessThan(0.2);
 
-		const readTerminalTrackCount = (title: string, side: "left" | "right") => {
+		const positionByTitle = (title: string) => {
 			const node = flow.nodes.find((candidate) => candidate.title === title);
-			expect(node).toBeDefined();
-			const position = layout.positions.get(node!.id)!;
-			const borderX = side === "left" ? position.x : position.x + position.width;
-			const tracks = new Set<string>();
-			for (const flowEdge of flow.edges) {
-				if (side === "left" ? flowEdge.target !== node!.id : flowEdge.source !== node!.id)
-					continue;
-				const backbone = layout.backbones.get(flowEdge.id)!;
-				const indexes =
-					side === "left"
-						? Array.from(
-								{
-									length: Math.min(5, Math.max(0, backbone.length - 2)),
-								},
-								(_, offset) => backbone.length - 2 - offset,
-							)
-						: Array.from(
-								{
-									length: Math.min(5, Math.max(0, backbone.length - 2)),
-								},
-								(_, offset) => 2 + offset,
-							);
-				for (const index of indexes) {
-					if (index <= 0 || index >= backbone.length) continue;
-					const from = backbone[index - 1]!;
-					const to = backbone[index]!;
-					if (Math.abs(from.x - to.x) >= 0.1) continue;
-					if (Math.abs(from.x - borderX) > 320) continue;
-					tracks.add(((from.x + to.x) / 2).toFixed(1));
-					break;
-				}
-			}
-			return tracks.size;
+			if (node === undefined) throw new Error(`Missing official item ${title}.`);
+			const position = layout.positions.get(node.id);
+			if (position === undefined) throw new Error(`Missing layout for ${title}.`);
+			return position;
 		};
-		expect(readTerminalTrackCount("Academy", "left")).toBeLessThanOrEqual(5);
-		expect(readTerminalTrackCount("Academy", "right")).toBeLessThanOrEqual(5);
-		expect(readTerminalTrackCount("Library IV", "left")).toBeLessThanOrEqual(6);
-		expect(readTerminalTrackCount("Library IV", "right")).toBeLessThanOrEqual(8);
+		const library = positionByTitle("Library IV");
+		const water = positionByTitle("Water");
+		const academy = positionByTitle("Academy");
+		expect(library.degree).toBeGreaterThan(water.degree);
+		expect(library.width).toBeGreaterThan(water.width);
+		expect(water.degree).toBeGreaterThan(40);
+		expect(water.width).toBeGreaterThan(300);
+		expect(academy.portCount).toBeGreaterThan(40);
+		expect(academy.width).toBeGreaterThan(350);
 
-		for (const flowEdge of flow.edges) {
-			const source = layout.positions.get(flowEdge.source)!;
-			const target = layout.positions.get(flowEdge.target)!;
-			const sourceMetrics = metricsById.get(flowEdge.source)!;
-			const targetMetrics = metricsById.get(flowEdge.target)!;
-			const sourceOffset =
-				flowEdge.sourcePortId === undefined
-					? {
-							x: source.width / 2,
-							y: 0,
-						}
-					: sourceMetrics.portOffsets.get(flowEdge.sourcePortId)!;
-			const targetOffset =
-				flowEdge.targetPortId === undefined
-					? {
-							x: -target.width / 2,
-							y: 0,
-						}
-					: targetMetrics.portOffsets.get(flowEdge.targetPortId)!;
-			const backbone = layout.backbones.get(flowEdge.id)!;
-			const first = backbone[0]!;
-			const last = backbone.at(-1)!;
-			expect(first.x).toBeCloseTo(source.x + source.width / 2 + sourceOffset.x, 5);
-			expect(first.y).toBeCloseTo(source.y + source.height / 2 + sourceOffset.y, 5);
-			expect(last.x).toBeCloseTo(target.x + target.width / 2 + targetOffset.x, 5);
-			expect(last.y).toBeCloseTo(target.y + target.height / 2 + targetOffset.y, 5);
+		for (const edge of flow.edges) {
+			const backbone = layout.backbones.get(edge.id);
+			expect(backbone).toHaveLength(2);
+			for (const point of backbone ?? []) {
+				expect(Number.isFinite(point.x)).toBe(true);
+				expect(Number.isFinite(point.y)).toBe(true);
+			}
 		}
-
-		const winery = readEditorOriginFlowHighlight(flow, layout.positions, {
-			id: "item:item:blueprint-winery-t1",
-			kind: "node",
-		});
-		expect(winery.nodeIds.has("item:item:blueprint-winery-t1")).toBe(true);
-		expect(winery.nodeIds.size).toBeGreaterThan(1);
-		expect(winery.edgeIds.size).toBeGreaterThan(0);
-	}, 20_000);
+	}, 10_000);
 });

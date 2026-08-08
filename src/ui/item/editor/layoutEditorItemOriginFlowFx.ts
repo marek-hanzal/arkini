@@ -1,27 +1,10 @@
-import {
-	Cdt,
-	findContainingTriangle,
-	funnelFromDiagonals,
-	CurveFactory,
-	Edge,
-	EdgeRoutingMode,
-	FastIncrementalLayoutSettings,
-	GeomEdge,
-	GeomGraph,
-	GeomNode,
-	Graph,
-	InteractiveObstacleCalculator,
-	Node,
-	Point,
-	Polyline,
-	Rectangle,
-	RelativeFloatingPort,
-	sleeveToDiagonals,
-	layoutGeomGraph,
-} from "@msagl/core";
+import cytoscape, { type CollectionReturnValue, type ElementDefinition } from "cytoscape";
+import fcose from "cytoscape-fcose";
 import { Effect } from "effect";
 
-import { spreadEditorOriginFlowBackbones } from "~/ui/item/editor/spreadEditorOriginFlowBackbones";
+import type { EditorItemOriginItemNode } from "~/bridge/item/editor/readEditorItemOriginFlow";
+
+cytoscape.use(fcose);
 
 export interface EditorItemOriginFlowLayoutInput {
 	readonly edges: ReadonlyArray<{
@@ -32,20 +15,17 @@ export interface EditorItemOriginFlowLayoutInput {
 		readonly targetPortId?: string;
 	}>;
 	readonly nodes: ReadonlyArray<{
-		readonly height: number;
 		readonly id: string;
-		readonly ports: ReadonlyArray<{
-			readonly id: string;
-			readonly x: number;
-			readonly y: number;
-		}>;
-		readonly width: number;
+		readonly type: EditorItemOriginItemNode["type"];
 	}>;
 }
 
 export interface EditorItemOriginFlowLayoutNode {
+	readonly degree: number;
 	readonly flowOrder: number;
 	readonly height: number;
+	readonly importance: number;
+	readonly portCount: number;
 	readonly width: number;
 	readonly x: number;
 	readonly y: number;
@@ -61,39 +41,45 @@ export interface EditorItemOriginFlowLayout {
 	readonly positions: ReadonlyMap<string, EditorItemOriginFlowLayoutNode>;
 }
 
-const NodeSeparation = 144;
-const PackingAspectRatio = 1.6;
-const EdgePadding = 40;
-const HubRoutingHaloPortThreshold = 12;
-const HubRoutingHaloPerPort = 2;
-const HubRoutingHaloMax = 120;
-const PortEscape = EdgePadding + 16;
-const CorridorCongestionBasePenalty = 72;
-const CorridorCongestionLengthFactor = 0.11;
-const CorridorCongestionExponent = 1.55;
-const CorridorCongestionCap = 18;
-const CorridorMaxDetourFactor = 1.55;
-const CorridorMaxDetourPadding = 420;
-const OrthogonalSafetyPadding = 10;
-const OrthogonalEpsilon = 0.1;
-
-type CorridorTriangle = NonNullable<ReturnType<typeof findContainingTriangle>>;
-type CorridorEdge = ReturnType<CorridorTriangle["Edges"]["getItem"]>;
-
 interface WeightedGraph {
 	readonly incoming: ReadonlyMap<string, ReadonlyMap<string, number>>;
 	readonly outgoing: ReadonlyMap<string, ReadonlyMap<string, number>>;
 }
 
+interface LayoutProfile {
+	readonly degree: number;
+	readonly diameter: number;
+	readonly importance: number;
+	readonly portCount: number;
+}
+
+interface PairEdge {
+	readonly a: string;
+	readonly b: string;
+	readonly multiplicity: number;
+}
+
+interface MutableNodePosition {
+	readonly diameter: number;
+	readonly id: string;
+	readonly importance: number;
+	x: number;
+	y: number;
+}
+
+const LayoutMargin = 96;
+const OverlapGap = 28;
+const OverlapIterations = 900;
+const OverlapTolerance = 0.15;
+const MinimumNodeDiameter = 135;
+const ImportanceDiameter = 300;
+const PortPressureDiameter = 90;
+const CommunityMinimumSize = 3;
+const RandomSeed = 0xc011a95e;
+
 const addWeight = (map: Map<string, number>, id: string) => {
 	map.set(id, (map.get(id) ?? 0) + 1);
 };
-
-const readRoutingHalo = (portCount: number) =>
-	Math.min(
-		HubRoutingHaloMax,
-		Math.max(0, portCount - HubRoutingHaloPortThreshold) * HubRoutingHaloPerPort,
-	);
 
 const readWeightedGraph = (flow: EditorItemOriginFlowLayoutInput): WeightedGraph => {
 	const incoming = new Map<string, Map<string, number>>();
@@ -212,377 +198,420 @@ const readFlowOrder = (
 	);
 };
 
-const toLayoutPoint = ({ x, y }: Point): EditorItemOriginFlowLayoutPoint => ({
-	x,
-	y,
-});
-
-const distance = (left: Point, right: Point) => Math.hypot(right.x - left.x, right.y - left.y);
-
-const pointClose = (left: Point, right: Point) =>
-	Math.hypot(left.x - right.x, left.y - right.y) < 0.01;
-
-const appendDistinctPoint = (points: Point[], point: Point) => {
-	if (points.length === 0 || !pointClose(points[points.length - 1] as Point, point))
-		points.push(point);
-};
-
-const closeCoordinate = (left: number, right: number) => Math.abs(left - right) < OrthogonalEpsilon;
-
-const axisSegmentIntersectsRectangle = (from: Point, to: Point, rectangle: Rectangle) => {
-	const padded = rectangle.clone();
-	padded.pad(OrthogonalSafetyPadding);
-	if (closeCoordinate(from.y, to.y))
-		return (
-			from.y > padded.bottom &&
-			from.y < padded.top &&
-			Math.max(from.x, to.x) > padded.left &&
-			Math.min(from.x, to.x) < padded.right
-		);
-	if (closeCoordinate(from.x, to.x))
-		return (
-			from.x > padded.left &&
-			from.x < padded.right &&
-			Math.max(from.y, to.y) > padded.bottom &&
-			Math.min(from.y, to.y) < padded.top
-		);
-	return false;
-};
-
-const orthogonalCandidateIsClear = (
-	points: ReadonlyArray<Point>,
-	obstacles: ReadonlyMap<string, Rectangle>,
-) => {
-	for (let index = 1; index < points.length; index += 1) {
-		const from = points[index - 1] as Point;
-		const to = points[index] as Point;
-		for (const obstacle of obstacles.values())
-			if (axisSegmentIntersectsRectangle(from, to, obstacle)) return false;
-	}
-	return true;
-};
-
-const simplifyOrthogonalPoints = (points: ReadonlyArray<Point>) => {
-	const simplified: Point[] = [];
-	for (const point of points) {
-		const previous = simplified.at(-1);
-		if (previous !== undefined && pointClose(previous, point)) continue;
-		while (simplified.length >= 2) {
-			const left = simplified.at(-2) as Point;
-			const middle = simplified.at(-1) as Point;
-			if (
-				(closeCoordinate(left.x, middle.x) && closeCoordinate(middle.x, point.x)) ||
-				(closeCoordinate(left.y, middle.y) && closeCoordinate(middle.y, point.y))
-			)
-				simplified.pop();
-			else break;
-		}
-		simplified.push(point);
-	}
-	return simplified;
-};
-
-/** Converts safe corridor waypoints to a Manhattan backbone, preserving a safe diagonal fallback per segment. */
-const readOrthogonalBackbone = (
-	points: ReadonlyArray<Point>,
-	obstacles: ReadonlyMap<string, Rectangle>,
-) => {
-	if (points.length < 2) return points;
-	const result: Point[] = [
-		points[0] as Point,
-	];
-	for (let index = 1; index < points.length; index += 1) {
-		const from = result.at(-1) as Point;
-		const to = points[index] as Point;
-		if (closeCoordinate(from.x, to.x) || closeCoordinate(from.y, to.y)) {
-			appendDistinctPoint(result, to);
-			continue;
-		}
-		const middleX = (from.x + to.x) / 2;
-		const middleY = (from.y + to.y) / 2;
-		const candidates: ReadonlyArray<ReadonlyArray<Point>> = [
-			[
-				from,
-				new Point(to.x, from.y),
-				to,
-			],
-			[
-				from,
-				new Point(from.x, to.y),
-				to,
-			],
-			[
-				from,
-				new Point(middleX, from.y),
-				new Point(middleX, to.y),
-				to,
-			],
-			[
-				from,
-				new Point(from.x, middleY),
-				new Point(to.x, middleY),
-				to,
-			],
-		];
-		const candidate = candidates.find((path) => orthogonalCandidateIsClear(path, obstacles));
-		if (candidate === undefined) {
-			appendDistinctPoint(result, to);
-			continue;
-		}
-		for (const point of candidate.slice(1)) appendDistinctPoint(result, point);
-	}
-	return simplifyOrthogonalPoints(result);
-};
-
-interface CorridorFrontEdge {
-	readonly edge: CorridorEdge;
-	readonly source: CorridorTriangle;
-}
-
-const triangleCenter = (triangle: CorridorTriangle) => {
-	const a = triangle.Sites.getItem(0).point;
-	const b = triangle.Sites.getItem(1).point;
-	const c = triangle.Sites.getItem(2).point;
-	return new Point((a.x + b.x + c.x) / 3, (a.y + b.y + c.y) / 3);
-};
-
-const triangleInsideObstacle = (triangle: CorridorTriangle) => {
-	const firstOwner = triangle.Sites.getItem(0).Owner;
-	return (
-		firstOwner !== undefined &&
-		firstOwner !== null &&
-		triangle.Sites.getItem(1).Owner === firstOwner &&
-		triangle.Sites.getItem(2).Owner === firstOwner
-	);
-};
-
-const recoverCongestionSleeve = (
-	source: CorridorTriangle,
-	target: CorridorTriangle,
-	parentEdges: ReadonlyMap<CorridorTriangle, CorridorEdge>,
-): CorridorFrontEdge[] => {
-	const sleeve: CorridorFrontEdge[] = [];
-	for (let current = target; current !== source; ) {
-		const edge = parentEdges.get(current);
-		if (edge === undefined) return [];
-		const parent = edge.GetOtherTriangle_T(current);
-		if (parent === undefined || parent === null) return [];
-		sleeve.push({
-			edge,
-			source: parent,
-		});
-		current = parent;
-	}
-	return sleeve.reverse();
-};
-
-/** Spreads traffic across obstacle-safe CDT corridors before the selected-flow lane allocator runs. */
-const readCongestionSleeve = (
-	cdt: Cdt,
-	source: Point,
-	target: Point,
-	usage: ReadonlyMap<CorridorEdge, number>,
-	maxTravelDistance = Number.POSITIVE_INFINITY,
-):
-	| {
-			readonly sleeve: CorridorFrontEdge[];
-			readonly travelDistance: number;
-	  }
-	| undefined => {
-	const sourceTriangle = findContainingTriangle(cdt, source);
-	if (sourceTriangle === null) return undefined;
-	const scores = new Map<CorridorTriangle, number>([
-		[
-			sourceTriangle,
-			0,
-		],
-	]);
-	const parentEdges = new Map<CorridorTriangle, CorridorEdge>();
-	const open: Array<{
-		readonly cost: number;
-		readonly score: number;
-		readonly travelDistance: number;
-		readonly triangle: CorridorTriangle;
-	}> = [
-		{
-			cost: 0,
-			score: distance(triangleCenter(sourceTriangle), target),
-			travelDistance: 0,
-			triangle: sourceTriangle,
-		},
-	];
-
-	while (open.length > 0) {
-		let bestIndex = 0;
-		for (let index = 1; index < open.length; index += 1)
-			if (open[index]!.score < open[bestIndex]!.score) bestIndex = index;
-		const [{ cost, travelDistance, triangle }] = open.splice(bestIndex, 1);
-		const currentScore = scores.get(triangle);
-		if (currentScore === undefined || cost > currentScore) continue;
-		if (triangle.containsPoint(target))
-			return {
-				sleeve: recoverCongestionSleeve(sourceTriangle, triangle, parentEdges),
-				travelDistance,
-			};
-
-		const entryEdge = parentEdges.get(triangle);
-		const entry =
-			entryEdge === undefined
-				? triangleCenter(triangle)
-				: new Point(
-						(entryEdge.lowerSite.point.x + entryEdge.upperSite.point.x) / 2,
-						(entryEdge.lowerSite.point.y + entryEdge.upperSite.point.y) / 2,
-					);
-		for (const edge of triangle.Edges) {
-			if (edge === entryEdge) continue;
-			const next = edge.GetOtherTriangle_T(triangle);
-			if (next === undefined || next === null) continue;
-			if (triangleInsideObstacle(next) && !next.containsPoint(target)) continue;
-			const midpoint = new Point(
-				(edge.lowerSite.point.x + edge.upperSite.point.x) / 2,
-				(edge.lowerSite.point.y + edge.upperSite.point.y) / 2,
-			);
-			const segmentLength = distance(entry, midpoint);
-			const candidateTravelDistance = travelDistance + segmentLength;
-			if (candidateTravelDistance > maxTravelDistance) continue;
-			const edgeUsage = Math.min(CorridorCongestionCap, usage.get(edge) ?? 0);
-			const congestionWeight = edgeUsage ** CorridorCongestionExponent;
-			const congestionPenalty =
-				congestionWeight * CorridorCongestionBasePenalty +
-				segmentLength * congestionWeight * CorridorCongestionLengthFactor;
-			const candidateScore = currentScore + segmentLength + congestionPenalty;
-			if (candidateScore >= (scores.get(next) ?? Number.POSITIVE_INFINITY)) continue;
-			scores.set(next, candidateScore);
-			parentEdges.set(next, edge);
-			open.push({
-				cost: candidateScore,
-				score: candidateScore + distance(midpoint, target),
-				travelDistance: candidateTravelDistance,
-				triangle: next,
-			});
-		}
-	}
-	return undefined;
-};
-
-const routeCongestionAwareCorridor = (
-	cdt: Cdt,
-	source: Point,
-	target: Point,
-	usage: Map<CorridorEdge, number>,
-) => {
-	const baseline = readCongestionSleeve(cdt, source, target, new Map());
-	if (baseline === undefined) return undefined;
-	const maxTravelDistance =
-		baseline.travelDistance * CorridorMaxDetourFactor + CorridorMaxDetourPadding;
-	const routed = readCongestionSleeve(cdt, source, target, usage, maxTravelDistance) ?? baseline;
-	for (const { edge } of routed.sleeve) usage.set(edge, (usage.get(edge) ?? 0) + 1);
-	if (routed.sleeve.length === 0)
-		return [
-			source,
-			target,
-		];
-	const diagonals = sleeveToDiagonals(routed.sleeve);
-	return funnelFromDiagonals(source, target, diagonals);
-};
-
-const routePortAwareEdges = (
-	flow: EditorItemOriginFlowLayoutInput,
-	geomNodes: ReadonlyMap<string, GeomNode>,
-	geomEdges: ReadonlyMap<string, GeomEdge>,
-): ReadonlyMap<string, ReadonlyArray<EditorItemOriginFlowLayoutPoint>> => {
-	const obstacles: Polyline[] = [];
-	const connectedPortsByNodeId = new Map<string, Set<string>>();
+const readPairEdges = (flow: EditorItemOriginFlowLayoutInput): ReadonlyArray<PairEdge> => {
+	const pairs = new Map<string, PairEdge>();
 	for (const edge of flow.edges) {
-		for (const [nodeId, side, portId] of [
-			[
-				edge.source,
-				"source",
-				edge.sourcePortId,
-			],
-			[
-				edge.target,
-				"target",
-				edge.targetPortId,
-			],
-		] as const) {
-			const ports = connectedPortsByNodeId.get(nodeId) ?? new Set<string>();
-			ports.add(`${side}:${portId ?? "default"}`);
-			connectedPortsByNodeId.set(nodeId, ports);
-		}
+		const [a, b] =
+			edge.source.localeCompare(edge.target) <= 0
+				? [
+						edge.source,
+						edge.target,
+					]
+				: [
+						edge.target,
+						edge.source,
+					];
+		const key = `${a}\u0000${b}`;
+		const existing = pairs.get(key);
+		pairs.set(key, {
+			a,
+			b,
+			multiplicity: (existing?.multiplicity ?? 0) + 1,
+		});
 	}
-	const routingHaloByNodeId = new Map(
+	return [
+		...pairs.values(),
+	].sort((left, right) => left.a.localeCompare(right.a) || left.b.localeCompare(right.b));
+};
+
+const readProfiles = (
+	flow: EditorItemOriginFlowLayoutInput,
+	pairs: ReadonlyArray<PairEdge>,
+): ReadonlyMap<string, LayoutProfile> => {
+	const neighbors = new Map(
 		flow.nodes.map(
 			({ id }) =>
 				[
 					id,
-					readRoutingHalo(connectedPortsByNodeId.get(id)?.size ?? 0),
+					new Set<string>(),
 				] as const,
 		),
 	);
-	const nodeObstaclesById = new Map(
-		[
-			...geomNodes,
-		].map(
-			([nodeId, geomNode]) =>
+	const connectedPorts = new Map(
+		flow.nodes.map(
+			({ id }) =>
 				[
-					nodeId,
-					geomNode.boundingBox.clone(),
+					id,
+					new Set<string>(),
 				] as const,
 		),
 	);
-
-	const bounds = Rectangle.mkEmpty();
-	for (const [nodeId, geomNode] of geomNodes) {
-		const obstacle = InteractiveObstacleCalculator.PaddedPolylineBoundaryOfNode(
-			geomNode.boundaryCurve,
-			EdgePadding + (routingHaloByNodeId.get(nodeId) ?? 0),
-		);
-		obstacles.push(obstacle);
-		bounds.addRecSelf(obstacle.boundingBox);
+	for (const { a, b } of pairs) {
+		neighbors.get(a)?.add(b);
+		neighbors.get(b)?.add(a);
 	}
-	bounds.pad(Math.max(bounds.diagonal / 4, 100));
-	obstacles.push(bounds.perimeter());
+	for (const edge of flow.edges) {
+		connectedPorts.get(edge.source)?.add(`source:${edge.sourcePortId ?? "item"}`);
+		connectedPorts.get(edge.target)?.add(`target:${edge.targetPortId ?? "item"}`);
+	}
+	const maximumDegree = Math.max(
+		1,
+		...[
+			...neighbors.values(),
+		].map((value) => value.size),
+	);
+	const maximumPortCount = Math.max(
+		1,
+		...[
+			...connectedPorts.values(),
+		].map((value) => value.size),
+	);
+	return new Map(
+		flow.nodes.map((node) => {
+			const degree = neighbors.get(node.id)?.size ?? 0;
+			const portCount = connectedPorts.get(node.id)?.size ?? 0;
+			const degreePressure = Math.sqrt(degree / maximumDegree);
+			const portPressure = Math.sqrt(portCount / maximumPortCount);
+			const importance = Math.min(1, 0.82 * degreePressure + 0.18 * portPressure);
+			const typeDiameter = node.type === "producer" ? 25 : node.type === "blueprint" ? 12 : 0;
+			const diameter = Math.round(
+				MinimumNodeDiameter +
+					ImportanceDiameter * importance ** 1.15 +
+					PortPressureDiameter * portPressure +
+					typeDiameter,
+			);
+			return [
+				node.id,
+				{
+					degree,
+					diameter,
+					importance,
+					portCount,
+				},
+			] as const;
+		}),
+	);
+};
 
-	const cdt = new Cdt([], obstacles, []);
-	cdt.run();
+interface MclCollection extends CollectionReturnValue {
+	mcl(options: {
+		readonly inflateFactor: number;
+		readonly maxIterations: number;
+	}): ReadonlyArray<CollectionReturnValue>;
+}
 
-	const backbones = new Map<string, ReadonlyArray<EditorItemOriginFlowLayoutPoint>>();
-	const corridorUsage = new Map<CorridorEdge, number>();
-	for (const input of [
-		...flow.edges,
+const readCommunities = (flow: EditorItemOriginFlowLayoutInput, pairs: ReadonlyArray<PairEdge>) => {
+	const raw = cytoscape({
+		elements: [
+			...flow.nodes.map(({ id }) => ({
+				data: {
+					id,
+				},
+			})),
+			...pairs.map((pair, index) => ({
+				data: {
+					id: `community-pair:${index}`,
+					source: pair.a,
+					target: pair.b,
+				},
+			})),
+		],
+		headless: true,
+	});
+	try {
+		const clusters = (raw.elements() as MclCollection).mcl({
+			inflateFactor: 2,
+			maxIterations: 20,
+		});
+		const canonicalClusters = clusters
+			.map((cluster) =>
+				cluster
+					.nodes()
+					.map((node) => node.id())
+					.sort((left, right) => left.localeCompare(right)),
+			)
+			.filter((ids) => ids.length >= CommunityMinimumSize)
+			.sort((left, right) => (left[0] ?? "").localeCompare(right[0] ?? ""));
+		const communityByNodeId = new Map<string, number>();
+		const validCommunityIds = new Set<number>();
+		for (const [index, ids] of canonicalClusters.entries()) {
+			validCommunityIds.add(index);
+			for (const id of ids) communityByNodeId.set(id, index);
+		}
+		return {
+			communityByNodeId,
+			validCommunityIds,
+		};
+	} finally {
+		raw.destroy();
+	}
+};
+
+const seededRandom = (seed: number) => {
+	let state = seed >>> 0;
+	return () => {
+		state = (Math.imul(1664525, state) + 1013904223) >>> 0;
+		return state / 4294967296;
+	};
+};
+
+const deterministicUnit = (leftId: string, rightId: string) => {
+	let hash = 2166136261;
+	for (const char of `${leftId}\u0000${rightId}`) {
+		hash ^= char.charCodeAt(0);
+		hash = Math.imul(hash, 16777619);
+	}
+	const angle = ((hash >>> 0) / 4294967296) * Math.PI * 2;
+	return {
+		x: Math.cos(angle),
+		y: Math.sin(angle),
+	};
+};
+
+const relaxOverlaps = (nodes: MutableNodePosition[]) => {
+	for (let iteration = 0; iteration < OverlapIterations; iteration += 1) {
+		let maximumOverlap = 0;
+		for (let leftIndex = 0; leftIndex < nodes.length; leftIndex += 1) {
+			const left = nodes[leftIndex]!;
+			for (let rightIndex = leftIndex + 1; rightIndex < nodes.length; rightIndex += 1) {
+				const right = nodes[rightIndex]!;
+				let dx = right.x - left.x;
+				let dy = right.y - left.y;
+				let actualDistance = Math.hypot(dx, dy);
+				if (actualDistance < 0.001) {
+					const unit = deterministicUnit(left.id, right.id);
+					dx = unit.x;
+					dy = unit.y;
+					actualDistance = 1;
+				}
+				const desiredDistance = (left.diameter + right.diameter) / 2 + OverlapGap;
+				const overlap = desiredDistance - actualDistance;
+				if (overlap <= 0) continue;
+				maximumOverlap = Math.max(maximumOverlap, overlap);
+				const unitX = dx / actualDistance;
+				const unitY = dy / actualDistance;
+				const leftInverseMass = 1 / (1 + 18 * left.importance ** 2);
+				const rightInverseMass = 1 / (1 + 18 * right.importance ** 2);
+				const inverseMass = leftInverseMass + rightInverseMass;
+				const leftMove = overlap * (leftInverseMass / inverseMass);
+				const rightMove = overlap * (rightInverseMass / inverseMass);
+				left.x -= unitX * leftMove;
+				left.y -= unitY * leftMove;
+				right.x += unitX * rightMove;
+				right.y += unitY * rightMove;
+			}
+		}
+		if (maximumOverlap < OverlapTolerance) break;
+	}
+};
+
+const runFcose = (
+	flow: EditorItemOriginFlowLayoutInput,
+	pairs: ReadonlyArray<PairEdge>,
+	profiles: ReadonlyMap<string, LayoutProfile>,
+) => {
+	const { communityByNodeId, validCommunityIds } = readCommunities(flow, pairs);
+	const types = [
+		...new Set(flow.nodes.map(({ type }) => type)),
+	].sort((left, right) => left.localeCompare(right));
+	const elements: ElementDefinition[] = [];
+	for (const communityId of [
+		...validCommunityIds,
+	].sort((left, right) => left - right))
+		elements.push({
+			data: {
+				anchorKind: "community",
+				id: `community:${communityId}`,
+				isAnchor: true,
+			},
+		});
+	for (const type of types)
+		elements.push({
+			data: {
+				anchorKind: "type",
+				id: `type:${type}`,
+				isAnchor: true,
+			},
+		});
+
+	for (const node of [
+		...flow.nodes,
 	].sort((left, right) => left.id.localeCompare(right.id))) {
-		const geomEdge = geomEdges.get(input.id);
-		if (geomEdge?.sourcePort === undefined || geomEdge.targetPort === undefined)
-			throw new Error(`Flow edge ${input.id} is missing port geometry.`);
-
-		const source = geomEdge.sourcePort.Location;
-		const target = geomEdge.targetPort.Location;
-		const sourceEscape = source.add(
-			new Point(PortEscape + (routingHaloByNodeId.get(input.source) ?? 0), 0),
-		);
-		const targetEscape = target.add(
-			new Point(-(PortEscape + (routingHaloByNodeId.get(input.target) ?? 0)), 0),
-		);
-		const routed = routeCongestionAwareCorridor(cdt, sourceEscape, targetEscape, corridorUsage);
-		if (routed === undefined)
-			throw new Error(`MSAGL could not route edge ${input.id} between its ports.`);
-
-		const corePoints: Point[] = [];
-		appendDistinctPoint(corePoints, sourceEscape);
-		for (const point of routed) appendDistinctPoint(corePoints, point);
-		appendDistinctPoint(corePoints, targetEscape);
-		const simplifiedCore = [
-			...Polyline.mkFromPoints(corePoints).RemoveCollinearVertices(),
-		];
-		const orthogonalCore = readOrthogonalBackbone(simplifiedCore, nodeObstaclesById);
-		const backbonePoints: Point[] = [];
-		appendDistinctPoint(backbonePoints, source);
-		for (const point of orthogonalCore) appendDistinctPoint(backbonePoints, point);
-		appendDistinctPoint(backbonePoints, target);
-		backbones.set(input.id, backbonePoints.map(toLayoutPoint));
+		const profile = profiles.get(node.id);
+		if (profile === undefined) throw new Error(`Missing flow layout profile for ${node.id}.`);
+		elements.push({
+			data: {
+				degree: profile.degree,
+				diameter: profile.diameter,
+				id: node.id,
+				importance: profile.importance,
+				isAnchor: false,
+				portCount: profile.portCount,
+				type: node.type,
+			},
+		});
+		const communityId = communityByNodeId.get(node.id);
+		if (communityId !== undefined && validCommunityIds.has(communityId))
+			elements.push({
+				data: {
+					id: `community-edge:${node.id}`,
+					importance: profile.importance,
+					source: node.id,
+					target: `community:${communityId}`,
+					virtualKind: "community",
+				},
+			});
+		elements.push({
+			data: {
+				id: `type-edge:${node.id}`,
+				importance: profile.importance,
+				source: node.id,
+				target: `type:${node.type}`,
+				virtualKind: "type",
+			},
+		});
 	}
-	return backbones;
+
+	for (const [index, pair] of pairs.entries()) {
+		const sourceProfile = profiles.get(pair.a);
+		const targetProfile = profiles.get(pair.b);
+		if (sourceProfile === undefined || targetProfile === undefined)
+			throw new Error(`Missing flow layout profile for ${pair.a} -> ${pair.b}.`);
+		elements.push({
+			data: {
+				id: `pair:${index}`,
+				multiplicity: pair.multiplicity,
+				pressure: Math.max(sourceProfile.importance, targetProfile.importance),
+				source: pair.a,
+				target: pair.b,
+				virtualKind: "pair",
+			},
+		});
+	}
+
+	const graph = cytoscape({
+		elements,
+		headless: true,
+		style: [
+			{
+				selector: "node[!isAnchor]",
+				style: {
+					height: "data(diameter)",
+					shape: "ellipse",
+					width: "data(diameter)",
+				},
+			},
+			{
+				selector: "node[?isAnchor]",
+				style: {
+					height: 20,
+					shape: "ellipse",
+					width: 20,
+				},
+			},
+		],
+		styleEnabled: true,
+	});
+	const previousRandom = Math.random;
+	Math.random = seededRandom(RandomSeed);
+	try {
+		graph
+			.layout({
+				animate: false,
+				edgeElasticity: (edge: cytoscape.EdgeSingular) => {
+					const kind = edge.data("virtualKind") as string | undefined;
+					const importance = Number(edge.data("importance") ?? 0);
+					if (kind === "community") return 0.02 + 0.11 * (1 - importance) ** 1.6;
+					if (kind === "type") return 0.008 + 0.035 * (1 - importance) ** 1.5;
+					const pressure = Number(edge.data("pressure") ?? 0);
+					const multiplicity = Math.sqrt(Number(edge.data("multiplicity") ?? 1));
+					return Math.min(
+						0.62,
+						(0.34 / (1 + 0.7 * pressure)) * Math.min(1.8, multiplicity),
+					);
+				},
+				fit: false,
+				gravity: 0.06,
+				gravityRange: 5.2,
+				idealEdgeLength: (edge: cytoscape.EdgeSingular) => {
+					const kind = edge.data("virtualKind") as string | undefined;
+					if (kind === "community") return 500;
+					if (kind === "type") return 850;
+					return 95 + 200 * Number(edge.data("pressure") ?? 0) ** 1.25;
+				},
+				name: "fcose",
+				nodeRepulsion: (node: cytoscape.NodeSingular) => {
+					if (node.data("isAnchor") === true)
+						return node.data("anchorKind") === "community" ? 19000 : 23000;
+					const profile = profiles.get(node.id());
+					return profile === undefined
+						? 4800
+						: 4800 * (1 + 7 * profile.importance ** 1.5);
+				},
+				nodeSeparation: 130,
+				numIter: 4500,
+				packComponents: false,
+				quality: "default",
+				randomize: true,
+				tile: true,
+				tilingPaddingHorizontal: 35,
+				tilingPaddingVertical: 35,
+			} as cytoscape.LayoutOptions)
+			.run();
+	} finally {
+		Math.random = previousRandom;
+	}
+
+	try {
+		return [
+			...flow.nodes,
+		]
+			.sort((left, right) => left.id.localeCompare(right.id))
+			.map((node): MutableNodePosition => {
+				const profile = profiles.get(node.id);
+				if (profile === undefined)
+					throw new Error(`Missing flow layout profile for ${node.id}.`);
+				const position = graph.getElementById(node.id).position();
+				return {
+					diameter: profile.diameter,
+					id: node.id,
+					importance: profile.importance,
+					x: position.x,
+					y: position.y,
+				};
+			});
+	} finally {
+		graph.destroy();
+	}
+};
+
+const readBackbone = (
+	source: EditorItemOriginFlowLayoutNode,
+	target: EditorItemOriginFlowLayoutNode,
+): ReadonlyArray<EditorItemOriginFlowLayoutPoint> => {
+	const sourceCenter = {
+		x: source.x + source.width / 2,
+		y: source.y + source.height / 2,
+	};
+	const targetCenter = {
+		x: target.x + target.width / 2,
+		y: target.y + target.height / 2,
+	};
+	const dx = targetCenter.x - sourceCenter.x;
+	const dy = targetCenter.y - sourceCenter.y;
+	const length = Math.max(0.001, Math.hypot(dx, dy));
+	const unitX = dx / length;
+	const unitY = dy / length;
+	return [
+		{
+			x: sourceCenter.x + unitX * (source.width / 2),
+			y: sourceCenter.y + unitY * (source.height / 2),
+		},
+		{
+			x: targetCenter.x - unitX * (target.width / 2),
+			y: targetCenter.y - unitY * (target.height / 2),
+		},
+	];
 };
 
 const runLayout = (flow: EditorItemOriginFlowLayoutInput): EditorItemOriginFlowLayout => {
@@ -591,120 +620,63 @@ const runLayout = (flow: EditorItemOriginFlowLayoutInput): EditorItemOriginFlowL
 			backbones: new Map(),
 			positions: new Map(),
 		};
+	const nodeIds = new Set(flow.nodes.map(({ id }) => id));
+	for (const edge of flow.edges)
+		if (!nodeIds.has(edge.source) || !nodeIds.has(edge.target))
+			throw new Error(
+				`Flow edge references an unknown node: ${edge.source} -> ${edge.target}.`,
+			);
 
 	const weightedGraph = readWeightedGraph(flow);
 	const flowOrder = readFlowOrder(flow, weightedGraph);
-	const graph = new Graph("arkini-editor-origin-flow");
-	const geomGraph = new GeomGraph(graph);
-	const nodes = new Map<string, Node>();
-	const geomNodes = new Map<string, GeomNode>();
-	const ports = new Map<string, RelativeFloatingPort>();
-	const geomEdges = new Map<string, GeomEdge>();
+	const pairs = readPairEdges(flow);
+	const profiles = readProfiles(flow, pairs);
+	const relaxed = runFcose(flow, pairs, profiles);
+	relaxOverlaps(relaxed);
 
-	for (const input of [
-		...flow.nodes,
-	].sort((left, right) => left.id.localeCompare(right.id))) {
-		const node = new Node(input.id);
-		graph.addNode(node);
-		nodes.set(input.id, node);
-		const geomNode = GeomNode.mkNode(
-			CurveFactory.createRectangle(input.width, input.height, new Point(0, 0)),
-			node,
-		);
-		geomNodes.set(input.id, geomNode);
-		for (const port of input.ports) {
-			ports.set(
-				`${input.id}:${port.id}`,
-				new RelativeFloatingPort(
-					() => geomNode.boundaryCurve,
-					() => geomNode.center,
-					new Point(port.x, port.y),
-				),
-			);
-		}
+	let minimumX = Number.POSITIVE_INFINITY;
+	let minimumY = Number.POSITIVE_INFINITY;
+	for (const node of relaxed) {
+		minimumX = Math.min(minimumX, node.x - node.diameter / 2);
+		minimumY = Math.min(minimumY, node.y - node.diameter / 2);
 	}
-	for (const input of [
-		...flow.edges,
-	].sort((left, right) => left.id.localeCompare(right.id))) {
-		const source = nodes.get(input.source);
-		const target = nodes.get(input.target);
-		if (source === undefined || target === undefined)
-			throw new Error(
-				`Flow edge references an unknown node: ${input.source} -> ${input.target}.`,
-			);
-		const geomEdge = new GeomEdge(new Edge(source, target));
-		const sourceGeomNode = geomNodes.get(input.source);
-		const targetGeomNode = geomNodes.get(input.target);
-		if (sourceGeomNode === undefined || targetGeomNode === undefined)
-			throw new Error(`Missing flow geometry for ${input.source} -> ${input.target}.`);
-		const sourcePort =
-			input.sourcePortId === undefined
-				? new RelativeFloatingPort(
-						() => sourceGeomNode.boundaryCurve,
-						() => sourceGeomNode.center,
-						new Point(sourceGeomNode.boundingBox.width / 2, 0),
-					)
-				: ports.get(`${input.source}:${input.sourcePortId}`);
-		const targetPort =
-			input.targetPortId === undefined
-				? new RelativeFloatingPort(
-						() => targetGeomNode.boundaryCurve,
-						() => targetGeomNode.center,
-						new Point(-targetGeomNode.boundingBox.width / 2, 0),
-					)
-				: ports.get(`${input.target}:${input.targetPortId}`);
-		if (sourcePort === undefined || targetPort === undefined)
-			throw new Error(`Flow edge ${input.id} references an unknown port.`);
-		geomEdge.sourcePort = sourcePort;
-		geomEdge.targetPort = targetPort;
-		geomEdges.set(input.id, geomEdge);
-	}
-
-	const settings = new FastIncrementalLayoutSettings();
-	settings.AvoidOverlaps = true;
-	settings.NodeSeparation = NodeSeparation;
-	settings.PackingAspectRatio = PackingAspectRatio;
-	settings.RepulsiveForceConstant = 2.8;
-	settings.AttractiveForceConstant = 0.72;
-	settings.GravityConstant = 0.65;
-	settings.edgeRoutingSettings.EdgeRoutingMode = EdgeRoutingMode.None;
-	geomGraph.layoutSettings = settings;
-	layoutGeomGraph(geomGraph);
-
+	const shiftX = LayoutMargin - minimumX;
+	const shiftY = LayoutMargin - minimumY;
 	const positions = new Map<string, EditorItemOriginFlowLayoutNode>();
-	for (const geomNode of geomGraph.shallowNodes) {
-		const order = flowOrder.get(geomNode.id);
-		if (order === undefined) throw new Error(`Missing flow order for ${geomNode.id}.`);
-		const bounds = geomNode.boundingBox;
-		positions.set(geomNode.id, {
+	for (const node of relaxed) {
+		const profile = profiles.get(node.id);
+		const order = flowOrder.get(node.id);
+		if (profile === undefined || order === undefined)
+			throw new Error(`Missing final flow layout data for ${node.id}.`);
+		positions.set(node.id, {
+			degree: profile.degree,
 			flowOrder: order,
-			height: bounds.height,
-			width: bounds.width,
-			x: bounds.left,
-			y: bounds.bottom,
+			height: node.diameter,
+			importance: profile.importance,
+			portCount: profile.portCount,
+			width: node.diameter,
+			x: node.x - node.diameter / 2 + shiftX,
+			y: node.y - node.diameter / 2 + shiftY,
 		});
 	}
-	if (positions.size !== flow.nodes.length)
-		throw new Error(`MSAGL returned ${positions.size} of ${flow.nodes.length} nodes.`);
 
-	const rawBackbones = routePortAwareEdges(flow, geomNodes, geomEdges);
-	if (rawBackbones.size !== flow.edges.length)
-		throw new Error(
-			`MSAGL returned ${rawBackbones.size} of ${flow.edges.length} edge backbones.`,
-		);
-	const backbones = spreadEditorOriginFlowBackbones(flow.edges, rawBackbones, positions);
-	if (backbones.size !== flow.edges.length)
-		throw new Error(
-			`Flow lane allocator returned ${backbones.size} of ${flow.edges.length} edge backbones.`,
-		);
-
+	const backbones = new Map<string, ReadonlyArray<EditorItemOriginFlowLayoutPoint>>();
+	for (const edge of [
+		...flow.edges,
+	].sort((left, right) => left.id.localeCompare(right.id))) {
+		const source = positions.get(edge.source);
+		const target = positions.get(edge.target);
+		if (source === undefined || target === undefined)
+			throw new Error(`Missing flow layout for ${edge.source} -> ${edge.target}.`);
+		backbones.set(edge.id, readBackbone(source, target));
+	}
 	return {
 		backbones,
 		positions,
 	};
 };
 
-/** Computes deterministic organic MSAGL positions and exact port-aware obstacle routes. */
+/** Computes one deterministic weighted map layout using topology first and semantics second. */
 export const layoutEditorItemOriginFlowFx = Effect.fn("layoutEditorItemOriginFlowFx")(
 	(flow: EditorItemOriginFlowLayoutInput) => Effect.sync(() => runLayout(flow)),
 );

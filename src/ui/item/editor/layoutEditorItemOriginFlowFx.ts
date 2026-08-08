@@ -1,7 +1,8 @@
 import {
 	BezierSeg,
 	Cdt,
-	corridorRoute,
+	findContainingTriangle,
+	funnelFromDiagonals,
 	Curve,
 	CurveFactory,
 	Edge,
@@ -17,6 +18,7 @@ import {
 	Polyline,
 	Rectangle,
 	RelativeFloatingPort,
+	sleeveToDiagonals,
 	layoutGeomGraph,
 } from "@msagl/core";
 import { Effect } from "effect";
@@ -69,6 +71,7 @@ export type EditorItemOriginFlowLayoutRouteSegment =
 	  };
 
 export interface EditorItemOriginFlowLayout {
+	readonly backbones: ReadonlyMap<string, ReadonlyArray<EditorItemOriginFlowLayoutPoint>>;
 	readonly positions: ReadonlyMap<string, EditorItemOriginFlowLayoutNode>;
 	readonly routes: ReadonlyMap<string, ReadonlyArray<EditorItemOriginFlowLayoutRouteSegment>>;
 }
@@ -77,6 +80,14 @@ const NodeSeparation = 144;
 const PackingAspectRatio = 1.6;
 const EdgePadding = 40;
 const PortEscape = EdgePadding + 16;
+const CorridorCongestionBasePenalty = 84;
+const CorridorCongestionLengthFactor = 0.18;
+const CorridorCongestionCap = 12;
+const OrthogonalSafetyPadding = 10;
+const OrthogonalEpsilon = 0.1;
+
+type CorridorTriangle = NonNullable<ReturnType<typeof findContainingTriangle>>;
+type CorridorEdge = ReturnType<CorridorTriangle["Edges"]["getItem"]>;
 
 interface WeightedGraph {
 	readonly incoming: ReadonlyMap<string, ReadonlyMap<string, number>>;
@@ -354,15 +365,270 @@ const appendDistinctPoint = (points: Point[], point: Point) => {
 		points.push(point);
 };
 
+const closeCoordinate = (left: number, right: number) => Math.abs(left - right) < OrthogonalEpsilon;
+
+const axisSegmentIntersectsRectangle = (from: Point, to: Point, rectangle: Rectangle) => {
+	const padded = rectangle.clone();
+	padded.pad(OrthogonalSafetyPadding);
+	if (closeCoordinate(from.y, to.y))
+		return (
+			from.y > padded.bottom &&
+			from.y < padded.top &&
+			Math.max(from.x, to.x) > padded.left &&
+			Math.min(from.x, to.x) < padded.right
+		);
+	if (closeCoordinate(from.x, to.x))
+		return (
+			from.x > padded.left &&
+			from.x < padded.right &&
+			Math.max(from.y, to.y) > padded.bottom &&
+			Math.min(from.y, to.y) < padded.top
+		);
+	return false;
+};
+
+const orthogonalCandidateIsClear = (
+	points: ReadonlyArray<Point>,
+	obstacles: ReadonlyMap<string, Rectangle>,
+) => {
+	for (let index = 1; index < points.length; index += 1) {
+		const from = points[index - 1] as Point;
+		const to = points[index] as Point;
+		for (const obstacle of obstacles.values())
+			if (axisSegmentIntersectsRectangle(from, to, obstacle)) return false;
+	}
+	return true;
+};
+
+const simplifyOrthogonalPoints = (points: ReadonlyArray<Point>) => {
+	const simplified: Point[] = [];
+	for (const point of points) {
+		const previous = simplified.at(-1);
+		if (previous !== undefined && pointClose(previous, point)) continue;
+		while (simplified.length >= 2) {
+			const left = simplified.at(-2) as Point;
+			const middle = simplified.at(-1) as Point;
+			if (
+				(closeCoordinate(left.x, middle.x) && closeCoordinate(middle.x, point.x)) ||
+				(closeCoordinate(left.y, middle.y) && closeCoordinate(middle.y, point.y))
+			)
+				simplified.pop();
+			else break;
+		}
+		simplified.push(point);
+	}
+	return simplified;
+};
+
+/** Converts safe corridor waypoints to a Manhattan backbone, preserving a safe diagonal fallback per segment. */
+const readOrthogonalBackbone = (
+	points: ReadonlyArray<Point>,
+	obstacles: ReadonlyMap<string, Rectangle>,
+) => {
+	if (points.length < 2) return points;
+	const result: Point[] = [
+		points[0] as Point,
+	];
+	for (let index = 1; index < points.length; index += 1) {
+		const from = result.at(-1) as Point;
+		const to = points[index] as Point;
+		if (closeCoordinate(from.x, to.x) || closeCoordinate(from.y, to.y)) {
+			appendDistinctPoint(result, to);
+			continue;
+		}
+		const middleX = (from.x + to.x) / 2;
+		const middleY = (from.y + to.y) / 2;
+		const candidates: ReadonlyArray<ReadonlyArray<Point>> = [
+			[
+				from,
+				new Point(to.x, from.y),
+				to,
+			],
+			[
+				from,
+				new Point(from.x, to.y),
+				to,
+			],
+			[
+				from,
+				new Point(middleX, from.y),
+				new Point(middleX, to.y),
+				to,
+			],
+			[
+				from,
+				new Point(from.x, middleY),
+				new Point(to.x, middleY),
+				to,
+			],
+		];
+		const candidate = candidates.find((path) => orthogonalCandidateIsClear(path, obstacles));
+		if (candidate === undefined) {
+			appendDistinctPoint(result, to);
+			continue;
+		}
+		for (const point of candidate.slice(1)) appendDistinctPoint(result, point);
+	}
+	return simplifyOrthogonalPoints(result);
+};
+
+interface CorridorFrontEdge {
+	readonly edge: CorridorEdge;
+	readonly source: CorridorTriangle;
+}
+
+const triangleCenter = (triangle: CorridorTriangle) => {
+	const a = triangle.Sites.getItem(0).point;
+	const b = triangle.Sites.getItem(1).point;
+	const c = triangle.Sites.getItem(2).point;
+	return new Point((a.x + b.x + c.x) / 3, (a.y + b.y + c.y) / 3);
+};
+
+const triangleInsideObstacle = (triangle: CorridorTriangle) => {
+	const firstOwner = triangle.Sites.getItem(0).Owner;
+	return (
+		firstOwner !== undefined &&
+		firstOwner !== null &&
+		triangle.Sites.getItem(1).Owner === firstOwner &&
+		triangle.Sites.getItem(2).Owner === firstOwner
+	);
+};
+
+const recoverCongestionSleeve = (
+	source: CorridorTriangle,
+	target: CorridorTriangle,
+	parentEdges: ReadonlyMap<CorridorTriangle, CorridorEdge>,
+): CorridorFrontEdge[] => {
+	const sleeve: CorridorFrontEdge[] = [];
+	for (let current = target; current !== source; ) {
+		const edge = parentEdges.get(current);
+		if (edge === undefined) return [];
+		const parent = edge.GetOtherTriangle_T(current);
+		if (parent === undefined || parent === null) return [];
+		sleeve.push({
+			edge,
+			source: parent,
+		});
+		current = parent;
+	}
+	return sleeve.reverse();
+};
+
+/** Spreads traffic across obstacle-safe CDT corridors before the selected-flow lane allocator runs. */
+const readCongestionSleeve = (
+	cdt: Cdt,
+	source: Point,
+	target: Point,
+	usage: ReadonlyMap<CorridorEdge, number>,
+): CorridorFrontEdge[] | undefined => {
+	const sourceTriangle = findContainingTriangle(cdt, source);
+	if (sourceTriangle === null) return undefined;
+	const scores = new Map<CorridorTriangle, number>([
+		[
+			sourceTriangle,
+			0,
+		],
+	]);
+	const parentEdges = new Map<CorridorTriangle, CorridorEdge>();
+	const open: Array<{
+		readonly cost: number;
+		readonly score: number;
+		readonly triangle: CorridorTriangle;
+	}> = [
+		{
+			cost: 0,
+			score: distance(triangleCenter(sourceTriangle), target),
+			triangle: sourceTriangle,
+		},
+	];
+
+	while (open.length > 0) {
+		let bestIndex = 0;
+		for (let index = 1; index < open.length; index += 1)
+			if (open[index]!.score < open[bestIndex]!.score) bestIndex = index;
+		const [{ cost, triangle }] = open.splice(bestIndex, 1);
+		const currentScore = scores.get(triangle);
+		if (currentScore === undefined || cost > currentScore) continue;
+		if (triangle.containsPoint(target))
+			return recoverCongestionSleeve(sourceTriangle, triangle, parentEdges);
+
+		const entryEdge = parentEdges.get(triangle);
+		const entry =
+			entryEdge === undefined
+				? triangleCenter(triangle)
+				: new Point(
+						(entryEdge.lowerSite.point.x + entryEdge.upperSite.point.x) / 2,
+						(entryEdge.lowerSite.point.y + entryEdge.upperSite.point.y) / 2,
+					);
+		for (const edge of triangle.Edges) {
+			if (edge === entryEdge) continue;
+			const next = edge.GetOtherTriangle_T(triangle);
+			if (next === undefined || next === null) continue;
+			if (triangleInsideObstacle(next) && !next.containsPoint(target)) continue;
+			const midpoint = new Point(
+				(edge.lowerSite.point.x + edge.upperSite.point.x) / 2,
+				(edge.lowerSite.point.y + edge.upperSite.point.y) / 2,
+			);
+			const segmentLength = distance(entry, midpoint);
+			const edgeUsage = Math.min(CorridorCongestionCap, usage.get(edge) ?? 0);
+			const congestionPenalty =
+				edgeUsage * CorridorCongestionBasePenalty +
+				segmentLength * edgeUsage * CorridorCongestionLengthFactor;
+			const candidateScore = currentScore + segmentLength + congestionPenalty;
+			if (candidateScore >= (scores.get(next) ?? Number.POSITIVE_INFINITY)) continue;
+			scores.set(next, candidateScore);
+			parentEdges.set(next, edge);
+			open.push({
+				cost: candidateScore,
+				score: candidateScore + distance(midpoint, target),
+				triangle: next,
+			});
+		}
+	}
+	return undefined;
+};
+
+const routeCongestionAwareCorridor = (
+	cdt: Cdt,
+	source: Point,
+	target: Point,
+	usage: Map<CorridorEdge, number>,
+) => {
+	const sleeve = readCongestionSleeve(cdt, source, target, usage);
+	if (sleeve === undefined) return undefined;
+	for (const { edge } of sleeve) usage.set(edge, (usage.get(edge) ?? 0) + 1);
+	if (sleeve.length === 0)
+		return [
+			source,
+			target,
+		];
+	const diagonals = sleeveToDiagonals(sleeve);
+	return funnelFromDiagonals(source, target, diagonals);
+};
+
 const routePortAwareEdges = (
 	flow: EditorItemOriginFlowLayoutInput,
 	geomNodes: ReadonlyMap<string, GeomNode>,
 	geomEdges: ReadonlyMap<string, GeomEdge>,
-): ReadonlyMap<string, ReadonlyArray<EditorItemOriginFlowLayoutRouteSegment>> => {
+): {
+	readonly backbones: ReadonlyMap<string, ReadonlyArray<EditorItemOriginFlowLayoutPoint>>;
+	readonly routes: ReadonlyMap<string, ReadonlyArray<EditorItemOriginFlowLayoutRouteSegment>>;
+} => {
 	const obstacles: Polyline[] = [];
+	const nodeObstaclesById = new Map(
+		[
+			...geomNodes,
+		].map(
+			([nodeId, geomNode]) =>
+				[
+					nodeId,
+					geomNode.boundingBox.clone(),
+				] as const,
+		),
+	);
 	const nodeObstacles = [
-		...geomNodes.values(),
-	].map((geomNode) => geomNode.boundingBox.clone());
+		...nodeObstaclesById.values(),
+	];
 	const bounds = Rectangle.mkEmpty();
 	for (const geomNode of geomNodes.values()) {
 		const obstacle = InteractiveObstacleCalculator.PaddedPolylineBoundaryOfNode(
@@ -378,7 +644,9 @@ const routePortAwareEdges = (
 	const cdt = new Cdt([], obstacles, []);
 	cdt.run();
 
+	const backbones = new Map<string, ReadonlyArray<EditorItemOriginFlowLayoutPoint>>();
 	const routes = new Map<string, ReadonlyArray<EditorItemOriginFlowLayoutRouteSegment>>();
+	const corridorUsage = new Map<CorridorEdge, number>();
 	for (const input of [
 		...flow.edges,
 	].sort((left, right) => left.id.localeCompare(right.id))) {
@@ -390,8 +658,8 @@ const routePortAwareEdges = (
 		const target = geomEdge.targetPort.Location;
 		const sourceEscape = source.add(new Point(PortEscape, 0));
 		const targetEscape = target.add(new Point(-PortEscape, 0));
-		const routed = corridorRoute(cdt, sourceEscape, targetEscape);
-		if (routed === null)
+		const routed = routeCongestionAwareCorridor(cdt, sourceEscape, targetEscape, corridorUsage);
+		if (routed === undefined)
 			throw new Error(`MSAGL could not route edge ${input.id} between its ports.`);
 
 		const corePoints: Point[] = [];
@@ -401,6 +669,13 @@ const routePortAwareEdges = (
 		const simplifiedCore = [
 			...Polyline.mkFromPoints(corePoints).RemoveCollinearVertices(),
 		];
+		const backbonePoints: Point[] = [];
+		appendDistinctPoint(backbonePoints, source);
+		for (const point of simplifiedCore) appendDistinctPoint(backbonePoints, point);
+		appendDistinctPoint(backbonePoints, target);
+		const orthogonalBackbone = readOrthogonalBackbone(backbonePoints, nodeObstaclesById);
+		backbones.set(input.id, orthogonalBackbone.map(toLayoutPoint));
+
 		const route: EditorItemOriginFlowLayoutRouteSegment[] = [];
 		if (!pointClose(source, sourceEscape)) route.push(readLineSegment(source, sourceEscape));
 		route.push(
@@ -416,12 +691,16 @@ const routePortAwareEdges = (
 			throw new Error(`MSAGL returned an empty route for edge ${input.id}.`);
 		routes.set(input.id, route);
 	}
-	return routes;
+	return {
+		backbones,
+		routes,
+	};
 };
 
 const runLayout = (flow: EditorItemOriginFlowLayoutInput): EditorItemOriginFlowLayout => {
 	if (flow.nodes.length === 0)
 		return {
+			backbones: new Map(),
 			positions: new Map(),
 			routes: new Map(),
 		};
@@ -521,11 +800,14 @@ const runLayout = (flow: EditorItemOriginFlowLayoutInput): EditorItemOriginFlowL
 	if (positions.size !== flow.nodes.length)
 		throw new Error(`MSAGL returned ${positions.size} of ${flow.nodes.length} nodes.`);
 
-	const routes = routePortAwareEdges(flow, geomNodes, geomEdges);
+	const { backbones, routes } = routePortAwareEdges(flow, geomNodes, geomEdges);
 	if (routes.size !== flow.edges.length)
 		throw new Error(`MSAGL returned ${routes.size} of ${flow.edges.length} edge routes.`);
+	if (backbones.size !== flow.edges.length)
+		throw new Error(`MSAGL returned ${backbones.size} of ${flow.edges.length} edge backbones.`);
 
 	return {
+		backbones,
 		positions,
 		routes,
 	};

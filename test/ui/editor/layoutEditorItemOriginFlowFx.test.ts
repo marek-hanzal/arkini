@@ -311,6 +311,7 @@ describe("layoutEditorItemOriginFlowFx", () => {
 		expect(flow.nodes.every(({ kind }) => kind === "item")).toBe(true);
 		expect(layout.positions.size).toBe(flow.nodes.length);
 		expect(layout.routes.size).toBe(flow.edges.length);
+		expect(layout.backbones.size).toBe(flow.edges.length);
 		expect(elapsedMs).toBeLessThan(5_000);
 		expect(bounds.width).toBeLessThan(24_000);
 		expect(bounds.height).toBeLessThan(22_000);
@@ -320,6 +321,18 @@ describe("layoutEditorItemOriginFlowFx", () => {
 			expectValidRoute(route);
 			expect(route.some(({ kind }) => kind === "cubic")).toBe(true);
 		}
+		let backboneSegments = 0;
+		let orthogonalBackboneSegments = 0;
+		for (const backbone of layout.backbones.values()) {
+			for (let index = 1; index < backbone.length; index += 1) {
+				const from = backbone[index - 1]!;
+				const to = backbone[index]!;
+				backboneSegments += 1;
+				if (Math.abs(from.x - to.x) < 0.1 || Math.abs(from.y - to.y) < 0.1)
+					orthogonalBackboneSegments += 1;
+			}
+		}
+		expect(orthogonalBackboneSegments / backboneSegments).toBeGreaterThan(0.98);
 
 		for (const flowEdge of flow.edges) {
 			const source = layout.positions.get(flowEdge.source)!;
@@ -341,8 +354,11 @@ describe("layoutEditorItemOriginFlowFx", () => {
 						}
 					: targetMetrics.portOffsets.get(flowEdge.targetPortId)!;
 			const route = layout.routes.get(flowEdge.id)!;
+			const backbone = layout.backbones.get(flowEdge.id)!;
 			const first = route[0]!.from;
 			const last = route.at(-1)!.to;
+			expect(backbone[0]).toEqual(first);
+			expect(backbone.at(-1)).toEqual(last);
 			expect(first.x).toBeCloseTo(source.x + source.width / 2 + sourceOffset.x, 5);
 			expect(first.y).toBeCloseTo(source.y + source.height / 2 + sourceOffset.y, 5);
 			expect(last.x).toBeCloseTo(target.x + target.width / 2 + targetOffset.x, 5);

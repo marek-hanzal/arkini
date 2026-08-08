@@ -10,6 +10,7 @@ import {
 import { layoutEditorItemOriginFlowInWorkerFx } from "~/ui/item/editor/layoutEditorItemOriginFlowInWorkerFx";
 import type {
 	EditorItemOriginFlowLayoutNode,
+	EditorItemOriginFlowLayoutPoint,
 	EditorItemOriginFlowLayoutRouteSegment,
 } from "~/ui/item/editor/layoutEditorItemOriginFlowFx";
 
@@ -20,6 +21,7 @@ type EditorItemOriginFlowState =
 			readonly status: "loading";
 	  }
 	| {
+			readonly backbones: ReadonlyMap<string, ReadonlyArray<EditorItemOriginFlowLayoutPoint>>;
 			readonly flow: EditorItemOriginFlow;
 			readonly positions: ReadonlyMap<string, EditorItemOriginFlowLayoutNode>;
 			readonly routes: ReadonlyMap<
@@ -106,6 +108,7 @@ export const useEditorItemOriginFlow = (
 			.then(({ flow, layout }) => {
 				if (controller.signal.aborted) return;
 				setState({
+					backbones: layout.backbones,
 					flow,
 					positions: layout.positions,
 					routes: layout.routes,

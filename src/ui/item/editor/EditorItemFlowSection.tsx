@@ -5,10 +5,15 @@ import type { EditorOriginFlowSelection } from "~/ui/item/editor/readEditorOrigi
 import { EditorOriginFlowCanvas } from "~/ui/item/editor/EditorOriginFlowCanvas";
 import type {
 	EditorItemOriginFlowLayoutNode,
+	EditorItemOriginFlowLayoutPoint,
 	EditorItemOriginFlowLayoutRouteSegment,
 } from "~/ui/item/editor/layoutEditorItemOriginFlowFx";
 import { useEditorItemOriginFlow } from "~/ui/item/editor/useEditorItemOriginFlow";
 
+const EmptyFlowBackbones: ReadonlyMap<
+	string,
+	ReadonlyArray<EditorItemOriginFlowLayoutPoint>
+> = new Map();
 const EmptyFlowPositions: ReadonlyMap<string, EditorItemOriginFlowLayoutNode> = new Map();
 const EmptyFlowRoutes: ReadonlyMap<
 	string,
@@ -30,6 +35,7 @@ export const EditorOriginFlowSection = ({
 	const project = useEditorProject();
 	const flowState = useEditorItemOriginFlow(project.config, mode === "item" ? itemId : undefined);
 	const flow = flowState.flow;
+	const backbones = flowState.status === "ready" ? flowState.backbones : EmptyFlowBackbones;
 	const positions = flowState.status === "ready" ? flowState.positions : EmptyFlowPositions;
 	const routes = flowState.status === "ready" ? flowState.routes : EmptyFlowRoutes;
 	const [selection, setSelection] = useState<EditorOriginFlowSelection>();
@@ -65,6 +71,7 @@ export const EditorOriginFlowSection = ({
 			{isReady ? (
 				<div className="relative h-full min-h-0 bg-canvas">
 					<EditorOriginFlowCanvas
+						backbones={backbones}
 						fitContent={mode === "item"}
 						flow={flow}
 						focusNodeId={focusNodeId}

@@ -49,6 +49,7 @@ describe("layoutEditorItemOriginFlowInWorkerFx", () => {
 		const worker = new TestWorker();
 		let received: EditorItemOriginFlowLayoutInput | undefined;
 		const layout: EditorItemOriginFlowLayout = {
+			backbones: new Map(),
 			positions: new Map([
 				[
 					"item:wine",

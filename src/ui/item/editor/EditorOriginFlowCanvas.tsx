@@ -20,7 +20,6 @@ import { ItemTypeLabel } from "~/ui/item-detail/ItemInfoPresentation";
 import type {
 	EditorItemOriginFlowLayoutNode,
 	EditorItemOriginFlowLayoutPoint,
-	EditorItemOriginFlowLayoutRouteSegment,
 } from "~/ui/item/editor/layoutEditorItemOriginFlowFx";
 import {
 	type EditorOriginFlowSelection,
@@ -79,12 +78,12 @@ interface EditorOriginFlowCanvasProps {
 	readonly flow: EditorItemOriginFlow;
 	readonly focusNodeId?: string;
 	readonly positions: ReadonlyMap<string, EditorItemOriginFlowLayoutNode>;
-	readonly routes: ReadonlyMap<string, ReadonlyArray<EditorItemOriginFlowLayoutRouteSegment>>;
 	readonly selection: EditorOriginFlowSelection | undefined;
 	readonly onSelectionChange: (selection: EditorOriginFlowSelection | undefined) => void;
 }
 
 interface RenderState {
+	readonly backbones: ReadonlyMap<string, ReadonlyArray<EditorItemOriginFlowLayoutPoint>>;
 	readonly branchLanes: EditorOriginFlowBranchLanes;
 	readonly connectedPorts: EditorOriginFlowConnectedPorts;
 	readonly fitContent: boolean;
@@ -93,8 +92,7 @@ interface RenderState {
 	readonly highlight: ReturnType<typeof readEditorOriginFlowHighlight> | undefined;
 	readonly positions: ReadonlyMap<string, EditorItemOriginFlowLayoutNode>;
 	readonly resourceUrls: ReadonlyMap<string, string>;
-	readonly routeBounds: ReadonlyMap<string, Bounds>;
-	readonly routes: ReadonlyMap<string, ReadonlyArray<EditorItemOriginFlowLayoutRouteSegment>>;
+	readonly edgeBounds: ReadonlyMap<string, Bounds>;
 	readonly selection: EditorOriginFlowSelection | undefined;
 }
 
@@ -143,28 +141,7 @@ const readIncomeBranchColor = (selectionId: string, branchIndex: number) => {
 	return IncomeBranchColors[(offset + branchIndex) % IncomeBranchColors.length]!;
 };
 
-const traceEdgeRoute = (
-	context: CanvasRenderingContext2D,
-	route: ReadonlyArray<EditorItemOriginFlowLayoutRouteSegment>,
-) => {
-	const first = route[0];
-	if (first === undefined) return;
-	context.moveTo(first.from.x, first.from.y);
-	for (const segment of route) {
-		if (segment.kind === "line") context.lineTo(segment.to.x, segment.to.y);
-		else
-			context.bezierCurveTo(
-				segment.control1.x,
-				segment.control1.y,
-				segment.control2.x,
-				segment.control2.y,
-				segment.to.x,
-				segment.to.y,
-			);
-	}
-};
-
-const traceBranchLane = (
+const traceOrthogonalPath = (
 	context: CanvasRenderingContext2D,
 	points: ReadonlyArray<EditorItemOriginFlowLayoutPoint>,
 ) => {
@@ -444,39 +421,18 @@ const isNodeVisible = (
 	return right >= 0 && bottom >= 0 && left <= width && top <= height;
 };
 
-const readRouteBounds = (
-	routes: ReadonlyMap<string, ReadonlyArray<EditorItemOriginFlowLayoutRouteSegment>>,
+const readBackboneBounds = (
 	backbones: ReadonlyMap<string, ReadonlyArray<EditorItemOriginFlowLayoutPoint>>,
 ) =>
 	new Map(
 		[
-			...routes,
-		].map(([id, route]) => {
+			...backbones,
+		].map(([id, backbone]) => {
 			let minX = Number.POSITIVE_INFINITY;
 			let minY = Number.POSITIVE_INFINITY;
 			let maxX = Number.NEGATIVE_INFINITY;
 			let maxY = Number.NEGATIVE_INFINITY;
-			for (const segment of route) {
-				const points =
-					segment.kind === "line"
-						? [
-								segment.from,
-								segment.to,
-							]
-						: [
-								segment.from,
-								segment.control1,
-								segment.control2,
-								segment.to,
-							];
-				for (const point of points) {
-					minX = Math.min(minX, point.x);
-					minY = Math.min(minY, point.y);
-					maxX = Math.max(maxX, point.x);
-					maxY = Math.max(maxY, point.y);
-				}
-			}
-			for (const point of backbones.get(id) ?? []) {
+			for (const point of backbone) {
 				minX = Math.min(minX, point.x);
 				minY = Math.min(minY, point.y);
 				maxX = Math.max(maxX, point.x);
@@ -494,7 +450,7 @@ const readRouteBounds = (
 		}),
 	);
 
-const isRouteVisible = (bounds: Bounds, viewport: Viewport, width: number, height: number) => {
+const isEdgeVisible = (bounds: Bounds, viewport: Viewport, width: number, height: number) => {
 	const padding = EdgeCullPaddingPx / viewport.zoom + EdgeLaneCullPaddingWorld;
 	const left = -viewport.x / viewport.zoom - padding;
 	const top = -viewport.y / viewport.zoom - padding;
@@ -1026,7 +982,7 @@ const drawEdgeLaneUnderlay = (
 		if (points === undefined) continue;
 		context.lineWidth = (branchIndexes.length === 1 ? 4 : 2.6) + 4;
 		context.beginPath();
-		traceBranchLane(context, points);
+		traceOrthogonalPath(context, points);
 		context.stroke();
 	}
 	context.restore();
@@ -1035,13 +991,13 @@ const drawEdgeLaneUnderlay = (
 const drawEdge = (
 	context: CanvasRenderingContext2D,
 	edge: EditorItemOriginEdge,
-	route: ReadonlyArray<EditorItemOriginFlowLayoutRouteSegment>,
+	backbone: ReadonlyArray<EditorItemOriginFlowLayoutPoint>,
 	branchLanes: ReadonlyMap<number, ReadonlyArray<EditorItemOriginFlowLayoutPoint>> | undefined,
 	selection: EditorOriginFlowSelection | undefined,
 	highlight: ReturnType<typeof readEditorOriginFlowHighlight> | undefined,
 	palette: CanvasPalette,
 ) => {
-	const first = route[0];
+	const first = backbone[0];
 	if (first === undefined) return;
 	const selected = selection?.kind === "edge" && selection.id === edge.id;
 	const active = highlight?.edgeIds.has(edge.id) ?? false;
@@ -1068,7 +1024,7 @@ const drawEdge = (
 			context.fillStyle = edgeColor;
 			context.lineWidth = selected ? 3.6 : branchIndexes.length === 1 ? 4 : 2.6;
 			context.beginPath();
-			traceBranchLane(context, points);
+			traceOrthogonalPath(context, points);
 			context.stroke();
 		}
 	} else {
@@ -1081,17 +1037,18 @@ const drawEdge = (
 		context.fillStyle = edgeColor;
 		context.lineWidth = selected ? 5 : active ? 4 : 1.2;
 		context.beginPath();
-		traceEdgeRoute(context, route);
+		traceOrthogonalPath(context, backbone);
 		context.stroke();
 	}
 
-	const last = route.at(-1)!;
+	const last = backbone.at(-1)!;
+	const previous = backbone.at(-2) ?? first;
 	const arrowColor =
 		branchIndexes.length === 1 && selectedNodeId !== undefined
 			? readIncomeBranchColor(selectedNodeId, branchIndexes[0]!)
 			: palette.accent;
 	context.fillStyle = arrowColor;
-	drawArrow(context, last.kind === "line" ? last.from : last.control2, last.to);
+	drawArrow(context, previous, last);
 	context.restore();
 };
 
@@ -1136,67 +1093,6 @@ const distanceToSegment = (
 	return Math.hypot(x - (start.x + t * dx), y - (start.y + t * dy));
 };
 
-const readCubicPoint = (
-	start: EditorItemOriginFlowLayoutPoint,
-	controlA: EditorItemOriginFlowLayoutPoint,
-	controlB: EditorItemOriginFlowLayoutPoint,
-	end: EditorItemOriginFlowLayoutPoint,
-	t: number,
-): EditorItemOriginFlowLayoutPoint => {
-	const inverse = 1 - t;
-	const startWeight = inverse * inverse * inverse;
-	const controlAWeight = 3 * inverse * inverse * t;
-	const controlBWeight = 3 * inverse * t * t;
-	const endWeight = t * t * t;
-	return {
-		x:
-			start.x * startWeight +
-			controlA.x * controlAWeight +
-			controlB.x * controlBWeight +
-			end.x * endWeight,
-		y:
-			start.y * startWeight +
-			controlA.y * controlAWeight +
-			controlB.y * controlBWeight +
-			end.y * endWeight,
-	};
-};
-
-const distanceToRoute = (
-	x: number,
-	y: number,
-	route: ReadonlyArray<EditorItemOriginFlowLayoutRouteSegment>,
-) => {
-	let distance = Number.POSITIVE_INFINITY;
-	for (const segment of route) {
-		if (segment.kind === "line") {
-			distance = Math.min(distance, distanceToSegment(x, y, segment.from, segment.to));
-			continue;
-		}
-		const controlLength =
-			Math.hypot(segment.control1.x - segment.from.x, segment.control1.y - segment.from.y) +
-			Math.hypot(
-				segment.control2.x - segment.control1.x,
-				segment.control2.y - segment.control1.y,
-			) +
-			Math.hypot(segment.to.x - segment.control2.x, segment.to.y - segment.control2.y);
-		const steps = Math.max(8, Math.min(40, Math.ceil(controlLength / 24)));
-		let previous = segment.from;
-		for (let step = 1; step <= steps; step += 1) {
-			const point = readCubicPoint(
-				segment.from,
-				segment.control1,
-				segment.control2,
-				segment.to,
-				step / steps,
-			);
-			distance = Math.min(distance, distanceToSegment(x, y, previous, point));
-			previous = point;
-		}
-	}
-	return distance;
-};
-
 const distanceToPolyline = (
 	x: number,
 	y: number,
@@ -1219,7 +1115,7 @@ const hitTest = (
 	flow: EditorItemOriginFlow,
 	connectedPorts: EditorOriginFlowConnectedPorts,
 	positions: ReadonlyMap<string, EditorItemOriginFlowLayoutNode>,
-	routes: ReadonlyMap<string, ReadonlyArray<EditorItemOriginFlowLayoutRouteSegment>>,
+	backbones: ReadonlyMap<string, ReadonlyArray<EditorItemOriginFlowLayoutPoint>>,
 	branchLanes: EditorOriginFlowBranchLanes,
 	x: number,
 	y: number,
@@ -1295,8 +1191,8 @@ const hitTest = (
 			}
 			continue;
 		}
-		const route = routes.get(edge.id);
-		if (route === undefined || distanceToRoute(x, y, route) > tolerance) continue;
+		const backbone = backbones.get(edge.id);
+		if (backbone === undefined || distanceToPolyline(x, y, backbone) > tolerance) continue;
 		return {
 			id: edge.id,
 			kind: "edge",
@@ -1325,15 +1221,13 @@ export const EditorOriginFlowCanvas = ({
 	focusNodeId,
 	onSelectionChange,
 	positions,
-	routes,
 	selection,
 }: EditorOriginFlowCanvasProps) => {
 	const resourceUrls = useEditorResourceUrls();
-	const routeBounds = useMemo(
-		() => readRouteBounds(routes, backbones),
+	const edgeBounds = useMemo(
+		() => readBackboneBounds(backbones),
 		[
 			backbones,
-			routes,
 		],
 	);
 	const connectedPorts = useMemo(
@@ -1398,6 +1292,7 @@ export const EditorOriginFlowCanvas = ({
 		],
 	);
 	const renderStateRef = useRef<RenderState>({
+		backbones,
 		branchLanes,
 		connectedPorts,
 		fitContent,
@@ -1406,11 +1301,11 @@ export const EditorOriginFlowCanvas = ({
 		highlight,
 		positions,
 		resourceUrls,
-		routeBounds,
-		routes,
+		edgeBounds,
 		selection,
 	});
 	renderStateRef.current = {
+		backbones,
 		branchLanes,
 		connectedPorts,
 		fitContent,
@@ -1419,8 +1314,7 @@ export const EditorOriginFlowCanvas = ({
 		highlight,
 		positions,
 		resourceUrls,
-		routeBounds,
-		routes,
+		edgeBounds,
 		selection,
 	};
 
@@ -1477,9 +1371,9 @@ export const EditorOriginFlowCanvas = ({
 		context.translate(viewport.x, viewport.y);
 		context.scale(viewport.zoom, viewport.zoom);
 		for (const edge of state.flow.edges) {
-			const bounds = state.routeBounds.get(edge.id);
-			if (bounds === undefined) throw new Error(`Missing route bounds for ${edge.id}.`);
-			if (!isRouteVisible(bounds, viewport, rect.width, rect.height)) continue;
+			const bounds = state.edgeBounds.get(edge.id);
+			if (bounds === undefined) throw new Error(`Missing edge bounds for ${edge.id}.`);
+			if (!isEdgeVisible(bounds, viewport, rect.width, rect.height)) continue;
 			drawEdgeLaneUnderlay(
 				context,
 				edge,
@@ -1490,15 +1384,15 @@ export const EditorOriginFlowCanvas = ({
 			);
 		}
 		for (const edge of state.flow.edges) {
-			const route = state.routes.get(edge.id);
-			if (route === undefined) throw new Error(`Missing routed path for ${edge.id}.`);
-			const bounds = state.routeBounds.get(edge.id);
-			if (bounds === undefined) throw new Error(`Missing route bounds for ${edge.id}.`);
-			if (!isRouteVisible(bounds, viewport, rect.width, rect.height)) continue;
+			const backbone = state.backbones.get(edge.id);
+			if (backbone === undefined) throw new Error(`Missing routed backbone for ${edge.id}.`);
+			const bounds = state.edgeBounds.get(edge.id);
+			if (bounds === undefined) throw new Error(`Missing edge bounds for ${edge.id}.`);
+			if (!isEdgeVisible(bounds, viewport, rect.width, rect.height)) continue;
 			drawEdge(
 				context,
 				edge,
-				route,
+				backbone,
 				state.branchLanes.get(edge.id),
 				state.selection,
 				state.highlight,
@@ -1573,7 +1467,6 @@ export const EditorOriginFlowCanvas = ({
 		flow,
 		highlight,
 		resourceUrls,
-		routes,
 		scheduleDraw,
 		selection,
 	]);
@@ -1793,7 +1686,7 @@ export const EditorOriginFlowCanvas = ({
 			flow,
 			connectedPorts,
 			positions,
-			routes,
+			backbones,
 			branchLanes,
 			worldX,
 			worldY,

@@ -6,7 +6,6 @@ import { EditorOriginFlowCanvas } from "~/ui/item/editor/EditorOriginFlowCanvas"
 import type {
 	EditorItemOriginFlowLayoutNode,
 	EditorItemOriginFlowLayoutPoint,
-	EditorItemOriginFlowLayoutRouteSegment,
 } from "~/ui/item/editor/layoutEditorItemOriginFlowFx";
 import { useEditorItemOriginFlow } from "~/ui/item/editor/useEditorItemOriginFlow";
 
@@ -15,11 +14,6 @@ const EmptyFlowBackbones: ReadonlyMap<
 	ReadonlyArray<EditorItemOriginFlowLayoutPoint>
 > = new Map();
 const EmptyFlowPositions: ReadonlyMap<string, EditorItemOriginFlowLayoutNode> = new Map();
-const EmptyFlowRoutes: ReadonlyMap<
-	string,
-	ReadonlyArray<EditorItemOriginFlowLayoutRouteSegment>
-> = new Map();
-
 interface EditorOriginFlowSectionProps {
 	readonly focusItemId?: string;
 	readonly itemId?: string;
@@ -37,7 +31,6 @@ export const EditorOriginFlowSection = ({
 	const flow = flowState.flow;
 	const backbones = flowState.status === "ready" ? flowState.backbones : EmptyFlowBackbones;
 	const positions = flowState.status === "ready" ? flowState.positions : EmptyFlowPositions;
-	const routes = flowState.status === "ready" ? flowState.routes : EmptyFlowRoutes;
 	const [selection, setSelection] = useState<EditorOriginFlowSelection>();
 	useEffect(() => {
 		setSelection(undefined);
@@ -77,7 +70,6 @@ export const EditorOriginFlowSection = ({
 						focusNodeId={focusNodeId}
 						onSelectionChange={setSelection}
 						positions={positions}
-						routes={routes}
 						selection={selection}
 					/>
 				</div>

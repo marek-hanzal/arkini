@@ -2,6 +2,7 @@ import {
 	createContext,
 	useContext,
 	useLayoutEffect,
+	useMemo,
 	useRef,
 	useState,
 	type PropsWithChildren,
@@ -11,52 +12,44 @@ import type { EditorProject } from "~/bridge/editor/EditorProject";
 import { useEditorProject } from "~/bridge/editor/useEditorProject";
 
 const emptyResourceUrls: ReadonlyMap<string, string> = new Map();
-const EditorResourceUrlContext = createContext<ReadonlyMap<string, string>>(emptyResourceUrls);
+type EditorResource = EditorProject["resources"][number];
+type ResourceUrlListener = () => void;
 
 interface ResourceUrlEntry {
-	readonly bytes: Uint8Array;
-	readonly mime: string;
-	readonly url: string;
+	bytes: Uint8Array;
+	mime: string;
+	url: string;
 }
 
-const haveEqualBytes = (left: Uint8Array, right: Uint8Array) => {
-	if (left === right) return true;
-	if (left.byteLength !== right.byteLength) return false;
-	for (let index = 0; index < left.byteLength; index += 1) {
-		if (left[index] !== right[index]) return false;
-	}
-	return true;
-};
+interface EditorResourceUrlStore {
+	readonly read: (resourceId: string) => string | undefined;
+	readonly subscribe: (resourceId: string, listener: ResourceUrlListener) => () => void;
+	readonly sync: (resources: EditorProject["resources"]) => void;
+	readonly dispose: () => void;
+}
 
-/** Owns exactly one object URL per resource for the lifetime of one project snapshot. */
+const EditorResourceUrlContext = createContext<EditorResourceUrlStore | undefined>(undefined);
+
+/** Owns shared object URLs only while mounted consumers request them. */
 export const EditorResourceUrlProvider = ({
 	children,
 	resources,
 }: PropsWithChildren<{
 	readonly resources: EditorProject["resources"];
 }>) => {
-	const [snapshot, setSnapshot] = useState<{
-		readonly resources: EditorProject["resources"];
-		readonly urls: ReadonlyMap<string, string>;
-	}>({
-		resources,
-		urls: emptyResourceUrls,
-	});
-	const entriesRef = useRef<ReadonlyMap<string, ResourceUrlEntry>>(new Map());
-	useLayoutEffect(() => {
-		const previous = entriesRef.current;
+	const storeRef = useRef<EditorResourceUrlStore | undefined>(undefined);
+	if (storeRef.current === undefined) {
+		let resourcesById = new Map<string, EditorResource>();
 		const entries = new Map<string, ResourceUrlEntry>();
-		for (const resource of resources) {
-			const existing = previous.get(resource.id);
-			if (
-				existing !== undefined &&
-				existing.mime === resource.mime &&
-				haveEqualBytes(existing.bytes, resource.bytes)
-			) {
-				entries.set(resource.id, existing);
-				continue;
-			}
-			entries.set(resource.id, {
+		const listenersById = new Map<string, Set<ResourceUrlListener>>();
+		const revokeEntry = (resourceId: string) => {
+			const entry = entries.get(resourceId);
+			if (entry === undefined) return;
+			entries.delete(resourceId);
+			URL.revokeObjectURL(entry.url);
+		};
+		const createEntry = (resource: EditorResource) => {
+			const entry: ResourceUrlEntry = {
 				bytes: resource.bytes,
 				mime: resource.mime,
 				url: URL.createObjectURL(
@@ -69,36 +62,93 @@ export const EditorResourceUrlProvider = ({
 						},
 					),
 				),
-			});
-		}
-		for (const [resourceId, entry] of previous) {
-			if (entries.get(resourceId) !== entry) URL.revokeObjectURL(entry.url);
-		}
-		entriesRef.current = entries;
-		const urls = new Map(
-			[
-				...entries,
-			].map(([resourceId, entry]) => [
-				resourceId,
-				entry.url,
-			]),
-		);
-		setSnapshot({
-			resources,
-			urls,
-		});
+			};
+			entries.set(resource.id, entry);
+			return entry;
+		};
+		storeRef.current = {
+			read: (resourceId) => entries.get(resourceId)?.url,
+			subscribe: (resourceId, listener) => {
+				let listeners = listenersById.get(resourceId);
+				if (listeners === undefined) {
+					listeners = new Set();
+					listenersById.set(resourceId, listeners);
+				}
+				listeners.add(listener);
+				if (!entries.has(resourceId)) {
+					const resource = resourcesById.get(resourceId);
+					if (resource !== undefined) createEntry(resource);
+				}
+				return () => {
+					const currentListeners = listenersById.get(resourceId);
+					currentListeners?.delete(listener);
+					if (currentListeners !== undefined && currentListeners.size > 0) return;
+					listenersById.delete(resourceId);
+					revokeEntry(resourceId);
+				};
+			},
+			sync: (nextResources) => {
+				resourcesById = new Map(
+					nextResources.map((resource) => [
+						resource.id,
+						resource,
+					]),
+				);
+				const changedListeners = new Set<ResourceUrlListener>();
+				for (const [resourceId, listeners] of listenersById) {
+					const resource = resourcesById.get(resourceId);
+					const entry = entries.get(resourceId);
+					if (resource === undefined) {
+						if (entry === undefined) continue;
+						revokeEntry(resourceId);
+						for (const listener of listeners) changedListeners.add(listener);
+						continue;
+					}
+					if (entry === undefined) {
+						createEntry(resource);
+						for (const listener of listeners) changedListeners.add(listener);
+						continue;
+					}
+					const equalBytes =
+						entry.bytes === resource.bytes ||
+						(entry.bytes.byteLength === resource.bytes.byteLength &&
+							entry.bytes.every((byte, index) => byte === resource.bytes[index]));
+					if (entry.mime === resource.mime && equalBytes) {
+						entry.bytes = resource.bytes;
+						continue;
+					}
+					revokeEntry(resourceId);
+					createEntry(resource);
+					for (const listener of listeners) changedListeners.add(listener);
+				}
+				for (const listener of changedListeners) listener();
+			},
+			dispose: () => {
+				for (const resourceId of [
+					...entries.keys(),
+				])
+					revokeEntry(resourceId);
+				listenersById.clear();
+				resourcesById.clear();
+			},
+		};
+	}
+	const store = storeRef.current;
+	useLayoutEffect(() => {
+		store.sync(resources);
 	}, [
 		resources,
+		store,
 	]);
 	useLayoutEffect(
 		() => () => {
-			for (const entry of entriesRef.current.values()) URL.revokeObjectURL(entry.url);
-			entriesRef.current = new Map();
+			store.dispose();
 		},
-		[],
+		[
+			store,
+		],
 	);
-	const urls = snapshot.resources === resources ? snapshot.urls : emptyResourceUrls;
-	return <EditorResourceUrlContext value={urls}>{children}</EditorResourceUrlContext>;
+	return <EditorResourceUrlContext value={store}>{children}</EditorResourceUrlContext>;
 };
 
 /** Binds URL ownership to the current canonical project snapshot. */
@@ -107,9 +157,74 @@ export const EditorProjectResourceUrlProvider = ({ children }: PropsWithChildren
 	return <EditorResourceUrlProvider resources={resources}>{children}</EditorResourceUrlProvider>;
 };
 
-/** Reads the project-scoped resource URL index without allocating object URLs. */
-export const useEditorResourceUrls = () => useContext(EditorResourceUrlContext);
+/** Resolves one lazily acquired project-scoped resource URL. */
+export const useEditorResourceUrl = (resourceId: string | undefined) => {
+	const store = useContext(EditorResourceUrlContext);
+	const [url, setUrl] = useState<string>();
+	useLayoutEffect(() => {
+		if (store === undefined || resourceId === undefined) {
+			setUrl(undefined);
+			return;
+		}
+		const update = () => setUrl(store.read(resourceId));
+		const release = store.subscribe(resourceId, update);
+		update();
+		return release;
+	}, [
+		resourceId,
+		store,
+	]);
+	return url;
+};
 
-/** Resolves the project-scoped URL without allocating per mounted thumbnail. */
-export const useEditorResourceUrl = (resourceId: string | undefined) =>
-	useEditorResourceUrls().get(resourceId ?? "");
+/** Resolves only the project-scoped resource URLs requested by one mounted consumer. */
+export const useEditorResourceUrls = (resourceIds: ReadonlyArray<string>) => {
+	const store = useContext(EditorResourceUrlContext);
+	const requestedIds = useMemo(
+		() => [
+			...new Set(resourceIds),
+		],
+		[
+			resourceIds,
+		],
+	);
+	const [snapshot, setSnapshot] = useState<{
+		readonly ids: ReadonlyArray<string>;
+		readonly urls: ReadonlyMap<string, string>;
+	}>({
+		ids: requestedIds,
+		urls: emptyResourceUrls,
+	});
+	useLayoutEffect(() => {
+		if (store === undefined || requestedIds.length === 0) {
+			setSnapshot({
+				ids: requestedIds,
+				urls: emptyResourceUrls,
+			});
+			return;
+		}
+		let active = true;
+		const update = () => {
+			if (!active) return;
+			const urls = new Map<string, string>();
+			for (const resourceId of requestedIds) {
+				const url = store.read(resourceId);
+				if (url !== undefined) urls.set(resourceId, url);
+			}
+			setSnapshot({
+				ids: requestedIds,
+				urls,
+			});
+		};
+		const releases = requestedIds.map((resourceId) => store.subscribe(resourceId, update));
+		update();
+		return () => {
+			active = false;
+			for (const release of releases) release();
+		};
+	}, [
+		requestedIds,
+		store,
+	]);
+	return snapshot.ids === requestedIds ? snapshot.urls : emptyResourceUrls;
+};

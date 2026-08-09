@@ -30,7 +30,7 @@ export const saveEditorAssetsFx = Effect.fn("saveEditorAssetsFx")(function* ({
 		);
 	}
 	const resources = yield* Effect.forEach(files, (file) => validateEditorAssetFileFx(file), {
-		concurrency: "unbounded",
+		concurrency: 4,
 	});
 	const resourceIds = new Set<string>();
 	for (const resource of resources) {

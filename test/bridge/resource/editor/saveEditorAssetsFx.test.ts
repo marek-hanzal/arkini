@@ -129,6 +129,66 @@ describe("saveEditorAssetsFx", () => {
 		expect(bitmapClose).toHaveBeenCalledTimes(2);
 	});
 
+	it("bounds concurrent PNG decodes while preserving the selected file order", async () => {
+		const fixture = createFixture();
+		const png = createPng();
+		let active = 0;
+		let maxActive = 0;
+		let started = 0;
+		const pending: Array<() => void> = [];
+		vi.mocked(createImageBitmap).mockImplementation(
+			() =>
+				new Promise<ImageBitmap>((resolve) => {
+					active += 1;
+					started += 1;
+					maxActive = Math.max(maxActive, active);
+					pending.push(() => {
+						active -= 1;
+						resolve({
+							width: 1,
+							height: 1,
+							close: bitmapClose,
+						} as unknown as ImageBitmap);
+					});
+				}),
+		);
+		const files = Array.from(
+			{
+				length: 9,
+			},
+			(_, index) => ({
+				name: `Asset ${index}.png`,
+				size: png.byteLength,
+				arrayBuffer: async () => png.buffer,
+			}),
+		);
+		const saving = Effect.runPromise(
+			saveEditorAssetsFx({
+				projectId: "project",
+				files,
+			}).pipe(
+				Effect.provideService(EditorProjectRepository, fixture.repository),
+				Effect.provideService(AtomRegistry.AtomRegistry, fixture.registry),
+			),
+		);
+
+		await vi.waitFor(() => expect(started).toBe(4));
+		expect(maxActive).toBe(4);
+		while (started < files.length) {
+			await vi.waitFor(() => expect(pending.length).toBeGreaterThan(0));
+			const previousStarted = started;
+			for (const release of pending.splice(0)) release();
+			await vi.waitFor(() => expect(started).toBeGreaterThan(previousStarted));
+		}
+		await vi.waitFor(() => expect(pending.length).toBeGreaterThan(0));
+		for (const release of pending.splice(0)) release();
+		const saved = await saving;
+
+		expect(maxActive).toBe(4);
+		expect(saved.resourceIds).toEqual(files.map((_, index) => `asset-${index}`));
+		expect(bitmapClose).toHaveBeenCalledTimes(files.length);
+	});
+
 	it("rejects bytes that only claim a PNG filename before repository admission", async () => {
 		const fixture = createFixture();
 		vi.mocked(createImageBitmap).mockRejectedValueOnce(new Error("decode failed"));

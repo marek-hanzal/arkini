@@ -1187,7 +1187,15 @@ export const EditorOriginFlowCanvas = ({
 	positions,
 	selection,
 }: EditorOriginFlowCanvasProps) => {
-	const resourceUrls = useEditorResourceUrls();
+	const resourceIds = useMemo(
+		() => [
+			...new Set(flow.nodes.flatMap((node) => node.resourceIds)),
+		],
+		[
+			flow.nodes,
+		],
+	);
+	const resourceUrls = useEditorResourceUrls(resourceIds);
 	const edgeBounds = useMemo(
 		() => readBackboneBounds(backbones),
 		[

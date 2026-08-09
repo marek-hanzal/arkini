@@ -13,14 +13,14 @@ describe("EditorOriginFlowShortcutHelp", () => {
 			}),
 		);
 
-		expect(html).toContain(">+</kbd>");
-		expect(html).toContain(">-</kbd>");
+		expect(html).toContain(">K</kbd>");
+		expect(html).toContain(">L</kbd>");
 		expect(html).toContain(">0</kbd>");
 		expect(html).toContain(">S</kbd>");
 		expect(html).toContain("Show one more hidden level of the selected graph.");
 		expect(html).toContain("Hide the farthest visible level of the selected graph.");
 		expect(html).toContain(
-			"Restore the default selected graph and return to the selected item.",
+			"Restore the default two-level view and return to the selected item.",
 		);
 		expect(html).toContain(
 			"Cycle terminal/root items of the selected graph to verify where the chain starts or ends.",

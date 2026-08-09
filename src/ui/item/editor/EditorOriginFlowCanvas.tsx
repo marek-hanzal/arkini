@@ -419,6 +419,8 @@ type FlowNavigationShortcut =
 	| "previous"
 	| "roots";
 
+const DefaultHighlightDepth = 2;
+
 const readFlowNavigationShortcut = (event: KeyboardEvent): FlowNavigationShortcut | undefined => {
 	const target = event.target;
 	if (
@@ -434,9 +436,9 @@ const readFlowNavigationShortcut = (event: KeyboardEvent): FlowNavigationShortcu
 	)
 		return undefined;
 	switch (event.key.toLowerCase()) {
-		case "+":
+		case "k":
 			return "depth-more";
-		case "-":
+		case "l":
 			return "depth-less";
 		case "0":
 			return "depth-reset";
@@ -1319,6 +1321,7 @@ export const EditorOriginFlowCanvas = ({
 	const [helpOpen, setHelpOpen] = useState(false);
 	const [highlightDepth, setHighlightDepth] = useState<
 		| {
+				readonly direction: EditorOriginFlowDirection;
 				readonly limit: number;
 				readonly nodeId: string;
 		  }
@@ -1348,16 +1351,21 @@ export const EditorOriginFlowCanvas = ({
 		],
 	);
 	const highlightDepthLimit =
-		selection?.kind === "node" &&
-		highlightDepth?.nodeId === selection.id &&
-		highlightDepth.limit < maxHighlightLevel
-			? highlightDepth.limit
+		selection?.kind === "node"
+			? Math.min(
+					highlightDepth?.nodeId === selection.id &&
+						highlightDepth.direction === direction
+						? highlightDepth.limit
+						: DefaultHighlightDepth,
+					maxHighlightLevel,
+				)
 			: undefined;
 	const highlight = useMemo(
 		() =>
 			selection?.kind !== "node" ||
 			completeHighlight === undefined ||
-			highlightDepthLimit === undefined
+			highlightDepthLimit === undefined ||
+			highlightDepthLimit >= maxHighlightLevel
 				? completeHighlight
 				: RendererRuntime.runSync(
 						readEditorOriginFlowVisibleHighlightFx(
@@ -1730,8 +1738,11 @@ export const EditorOriginFlowCanvas = ({
 				if (shortcut === "depth-less") {
 					setHighlightDepth((current) => {
 						const currentLimit =
-							current?.nodeId === selection.id ? current.limit : maxHighlightLevel;
+							current?.nodeId === selection.id && current.direction === direction
+								? current.limit
+								: Math.min(DefaultHighlightDepth, maxHighlightLevel);
 						return {
+							direction,
 							limit: Math.max(0, currentLimit - 1),
 							nodeId: selection.id,
 						};
@@ -1740,14 +1751,15 @@ export const EditorOriginFlowCanvas = ({
 				}
 				if (shortcut === "depth-more") {
 					setHighlightDepth((current) => {
-						if (current?.nodeId !== selection.id) return current;
-						const next = current.limit + 1;
-						return next >= maxHighlightLevel
-							? undefined
-							: {
-									limit: next,
-									nodeId: selection.id,
-								};
+						const currentLimit =
+							current?.nodeId === selection.id && current.direction === direction
+								? current.limit
+								: Math.min(DefaultHighlightDepth, maxHighlightLevel);
+						return {
+							direction,
+							limit: Math.min(maxHighlightLevel, currentLimit + 1),
+							nodeId: selection.id,
+						};
 					});
 					return;
 				}
@@ -1829,7 +1841,11 @@ export const EditorOriginFlowCanvas = ({
 
 			if (shortcut === "roots") {
 				if (selection?.kind !== "node" || rootNavigationNodeIds.length === 0) return;
-				setHighlightDepth(undefined);
+				setHighlightDepth({
+					direction,
+					limit: maxHighlightLevel,
+					nodeId: selection.id,
+				});
 				const nextIndex =
 					(rootNavigationIndexRef.current + 1) % rootNavigationNodeIds.length;
 				const nodeId = rootNavigationNodeIds[nextIndex];

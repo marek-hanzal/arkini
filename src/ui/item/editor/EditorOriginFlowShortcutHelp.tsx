@@ -22,16 +22,16 @@ const readShortcutRows = (direction: EditorOriginFlowDirection) =>
 			"Return to the selected item, or the graph start when nothing is selected.",
 		],
 		[
-			"+",
+			"K",
 			"Show one more hidden level of the selected graph.",
 		],
 		[
-			"-",
+			"L",
 			"Hide the farthest visible level of the selected graph.",
 		],
 		[
 			"0",
-			"Restore the default selected graph and return to the selected item.",
+			"Restore the default two-level view and return to the selected item.",
 		],
 		[
 			"S",

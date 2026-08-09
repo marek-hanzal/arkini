@@ -10,7 +10,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import type {
 	EditorItemOriginFlow,
 	EditorItemOriginFlowRequest,
-} from "~/bridge/item/editor/readEditorItemOriginFlow";
+} from "~/bridge/item/editor/readEditorItemOriginFlowFx";
 import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import type { EditorItemOriginFlowLayout } from "~/ui/item/editor/editorItemOriginFlowLayout";
 
@@ -19,7 +19,7 @@ const mocks = vi.hoisted(() => ({
 	read: vi.fn(),
 }));
 
-vi.mock("~/bridge/item/editor/readEditorItemOriginFlow", async (importOriginal) => ({
+vi.mock("~/bridge/item/editor/readEditorItemOriginFlowFx", async (importOriginal) => ({
 	...(await importOriginal()),
 	readEditorItemOriginFlowFx: mocks.read,
 }));

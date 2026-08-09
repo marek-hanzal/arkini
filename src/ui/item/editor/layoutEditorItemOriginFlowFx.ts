@@ -3,11 +3,10 @@ import fcose from "cytoscape-fcose";
 import { Effect } from "effect";
 
 import type {
-	EditorItemOriginFlowLayout,
 	EditorItemOriginFlowLayoutInput,
 	EditorItemOriginFlowLayoutNode,
 } from "~/ui/item/editor/editorItemOriginFlowLayout";
-import { routeEditorItemOriginFlow } from "~/ui/item/editor/routeEditorItemOriginFlow";
+import { routeEditorItemOriginFlowFx } from "~/ui/item/editor/routeEditorItemOriginFlowFx";
 
 cytoscape.use(fcose);
 
@@ -688,12 +687,10 @@ const runFcose = (
 	}
 };
 
-const runLayout = (flow: EditorItemOriginFlowLayoutInput): EditorItemOriginFlowLayout => {
-	if (flow.nodes.length === 0)
-		return {
-			backbones: new Map(),
-			positions: new Map(),
-		};
+const runLayoutPositions = (
+	flow: EditorItemOriginFlowLayoutInput,
+): ReadonlyMap<string, EditorItemOriginFlowLayoutNode> => {
+	if (flow.nodes.length === 0) return new Map();
 	const nodeById = new Map(
 		flow.nodes.map(
 			(node) =>
@@ -740,13 +737,17 @@ const runLayout = (flow: EditorItemOriginFlowLayoutInput): EditorItemOriginFlowL
 		});
 	}
 
-	return {
-		backbones: routeEditorItemOriginFlow(flow, positions),
-		positions,
-	};
+	return positions;
 };
 
 /** Computes one deterministic rich-node flow map using topology first and semantics second. */
-export const layoutEditorItemOriginFlowFx = Effect.fn("layoutEditorItemOriginFlowFx")(
-	(flow: EditorItemOriginFlowLayoutInput) => Effect.sync(() => runLayout(flow)),
-);
+export const layoutEditorItemOriginFlowFx = Effect.fn("layoutEditorItemOriginFlowFx")(function* (
+	flow: EditorItemOriginFlowLayoutInput,
+) {
+	const positions = yield* Effect.sync(() => runLayoutPositions(flow));
+	const backbones = yield* routeEditorItemOriginFlowFx(flow, positions);
+	return {
+		backbones,
+		positions,
+	};
+});

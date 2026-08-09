@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import {
 	type EditorItemOriginFlow,
 	readEditorItemOriginFlowFx,
-} from "~/bridge/item/editor/readEditorItemOriginFlow";
+} from "~/bridge/item/editor/readEditorItemOriginFlowFx";
 import type {
 	EditorItemOriginFlowLayout,
 	EditorItemOriginFlowLayoutInput,
@@ -12,8 +12,8 @@ import type {
 	EditorItemOriginFlowLayoutPoint,
 } from "~/ui/item/editor/editorItemOriginFlowLayout";
 import { layoutEditorItemOriginFlowFx } from "~/ui/item/editor/layoutEditorItemOriginFlowFx";
-import { readEditorOriginFlowHighlight } from "~/ui/item/editor/readEditorOriginFlowHighlight";
-import { readEditorOriginFlowNodeMetrics } from "~/ui/item/editor/readEditorOriginFlowNodeMetrics";
+import { readEditorOriginFlowHighlightFx } from "~/ui/item/editor/readEditorOriginFlowHighlightFx";
+import { readEditorOriginFlowNodeMetricsFx } from "~/ui/item/editor/readEditorOriginFlowNodeMetricsFx";
 import { readArkiniGameConfigSource } from "~test/schema/support/readArkiniGameConfigSource";
 
 const node = (
@@ -62,7 +62,7 @@ const readTopology = (flow: EditorItemOriginFlow): EditorItemOriginFlowLayoutInp
 		targetPortId,
 	})),
 	nodes: flow.nodes.map((flowNode) => {
-		const metrics = readEditorOriginFlowNodeMetrics(flowNode);
+		const metrics = Effect.runSync(readEditorOriginFlowNodeMetricsFx(flowNode));
 		return {
 			height: metrics.height,
 			id: flowNode.id,
@@ -255,7 +255,7 @@ describe("layoutEditorItemOriginFlowFx", () => {
 				(flowNode) =>
 					[
 						flowNode.id,
-						readEditorOriginFlowNodeMetrics(flowNode),
+						Effect.runSync(readEditorOriginFlowNodeMetricsFx(flowNode)),
 					] as const,
 			),
 		);
@@ -308,10 +308,12 @@ describe("layoutEditorItemOriginFlowFx", () => {
 			expect(last.y).toBeCloseTo(target.y + target.height / 2 + targetOffset.y, 5);
 		}
 
-		const winery = readEditorOriginFlowHighlight(flow, {
-			id: "item:item:blueprint-winery-t1",
-			kind: "node",
-		});
+		const winery = Effect.runSync(
+			readEditorOriginFlowHighlightFx(flow, {
+				id: "item:item:blueprint-winery-t1",
+				kind: "node",
+			}),
+		);
 		expect(winery.nodeIds.has("item:item:blueprint-winery-t1")).toBe(true);
 		expect(winery.nodeIds.size).toBeGreaterThan(1);
 		expect(winery.edgeIds.size).toBeGreaterThan(0);

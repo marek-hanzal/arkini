@@ -1,7 +1,8 @@
+import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import type { EditorItemOriginEdge } from "~/bridge/item/editor/readEditorItemOriginFlow";
-import { readEditorOriginFlowConnectedPorts } from "~/ui/item/editor/readEditorOriginFlowConnectedPorts";
+import type { EditorItemOriginEdge } from "~/bridge/item/editor/readEditorItemOriginFlowFx";
+import { readEditorOriginFlowConnectedPortsFx } from "~/ui/item/editor/readEditorOriginFlowConnectedPortsFx";
 
 const edge = (
 	id: string,
@@ -21,10 +22,12 @@ const edge = (
 
 describe("readEditorOriginFlowConnectedPorts", () => {
 	it("includes only ports referenced by an edge", () => {
-		const connected = readEditorOriginFlowConnectedPorts([
-			edge("one", "item:a", "a:out", "item:b", "b:in"),
-			edge("two", "item:a", "a:out-2", "item:c", undefined),
-		]);
+		const connected = Effect.runSync(
+			readEditorOriginFlowConnectedPortsFx([
+				edge("one", "item:a", "a:out", "item:b", "b:in"),
+				edge("two", "item:a", "a:out-2", "item:c", undefined),
+			]),
+		);
 
 		expect(
 			[

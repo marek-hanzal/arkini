@@ -3,7 +3,7 @@ import * as Atom from "effect/unstable/reactivity/Atom";
 
 import { EditorProjectAtom } from "~/bridge/editor/EditorProjectAtom";
 import { EditorProjectRepository } from "~/bridge/editor/EditorProjectRepository";
-import { validateEditorAssetFileFx } from "~/bridge/resource/editor/saveEditorAssetsFx";
+import { validateEditorAssetFileFx } from "~/bridge/resource/editor/validateEditorAssetFileFx";
 import { IdSchema } from "~/engine/common/schema/IdSchema";
 import { EditorProjectError } from "~/engine/editor/error/EditorProjectError";
 import { renameGameResourceFx } from "~/engine/resource/renameGameResourceFx";

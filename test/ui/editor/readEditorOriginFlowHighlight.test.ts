@@ -6,10 +6,13 @@ import {
 	type EditorItemOriginFlow,
 	type EditorItemOriginItemNode,
 	type EditorItemOriginOperation,
-} from "~/bridge/item/editor/readEditorItemOriginFlow";
-import { readEditorOriginFlowHighlight } from "~/ui/item/editor/readEditorOriginFlowHighlight";
-import { readEditorOriginFlowNavigation } from "~/ui/item/editor/readEditorOriginFlowNavigation";
-import { readEditorOriginFlowRelationNavigation } from "~/ui/item/editor/readEditorOriginFlowRelationNavigation";
+} from "~/bridge/item/editor/readEditorItemOriginFlowFx";
+import {
+	type EditorOriginFlowSelection,
+	readEditorOriginFlowHighlightFx,
+} from "~/ui/item/editor/readEditorOriginFlowHighlightFx";
+import { readEditorOriginFlowNavigationFx } from "~/ui/item/editor/readEditorOriginFlowNavigationFx";
+import { readEditorOriginFlowRelationNavigationFx } from "~/ui/item/editor/readEditorOriginFlowRelationNavigationFx";
 import { readArkiniGameConfigSource } from "~test/schema/support/readArkiniGameConfigSource";
 
 const operation = (
@@ -151,9 +154,32 @@ const positions = new Map(
 	),
 );
 
+const runHighlight = (flow: EditorItemOriginFlow, selection: EditorOriginFlowSelection) =>
+	Effect.runSync(readEditorOriginFlowHighlightFx(flow, selection));
+
+const runRelationNavigation = (
+	input: Parameters<typeof readEditorOriginFlowRelationNavigationFx>[0],
+) => Effect.runSync(readEditorOriginFlowRelationNavigationFx(input));
+
+const runNavigation = (
+	flow: EditorItemOriginFlow,
+	positions: ReadonlyMap<
+		string,
+		{
+			readonly flowOrder: number;
+			readonly height: number;
+			readonly width: number;
+			readonly x: number;
+			readonly y: number;
+		}
+	>,
+	startNodeId: string,
+	allowedEdgeIds?: ReadonlySet<string>,
+) => Effect.runSync(readEditorOriginFlowNavigationFx(flow, positions, startNodeId, allowedEdgeIds));
+
 describe("readEditorOriginFlowHighlight", () => {
 	it("includes every producer branch with its mandatory prerequisites", () => {
-		const highlight = readEditorOriginFlowHighlight(incomeFlow, {
+		const highlight = runHighlight(incomeFlow, {
 			id: "item:target",
 			kind: "node",
 		});
@@ -176,12 +202,12 @@ describe("readEditorOriginFlowHighlight", () => {
 			]),
 		);
 
-		const producerNodeIds = readEditorOriginFlowRelationNavigation({
+		const producerNodeIds = runRelationNavigation({
 			flow: incomeFlow,
 			selectedNodeId: "item:target",
 			selectedRole: "output",
 		});
-		const navigationNodeIds = readEditorOriginFlowNavigation(
+		const navigationNodeIds = runNavigation(
 			incomeFlow,
 			positions,
 			"item:target",
@@ -297,7 +323,7 @@ describe("readEditorOriginFlowHighlight", () => {
 			],
 		};
 
-		const highlight = readEditorOriginFlowHighlight(sharedFlow, {
+		const highlight = runHighlight(sharedFlow, {
 			id: "item:target",
 			kind: "node",
 		});
@@ -315,7 +341,7 @@ describe("readEditorOriginFlowHighlight", () => {
 	});
 
 	it("stops tracing when the selected item is already a starter", () => {
-		const highlight = readEditorOriginFlowHighlight(incomeFlow, {
+		const highlight = runHighlight(incomeFlow, {
 			id: "item:tool",
 			kind: "node",
 		});
@@ -398,7 +424,7 @@ describe("readEditorOriginFlowHighlight", () => {
 			],
 		};
 
-		const highlight = readEditorOriginFlowHighlight(flow, {
+		const highlight = runHighlight(flow, {
 			id: "item:target",
 			kind: "node",
 		});
@@ -422,7 +448,7 @@ describe("readEditorOriginFlowHighlight", () => {
 	});
 
 	it("keeps an explicitly selected connection and traces from its source", () => {
-		const highlight = readEditorOriginFlowHighlight(incomeFlow, {
+		const highlight = runHighlight(incomeFlow, {
 			id: "tool-forge",
 			kind: "edge",
 		});
@@ -473,7 +499,7 @@ describe("readEditorOriginFlowHighlight", () => {
 				}),
 			],
 		};
-		const highlight = readEditorOriginFlowHighlight(flow, {
+		const highlight = runHighlight(flow, {
 			id: "item:target",
 			kind: "node",
 		});
@@ -515,7 +541,7 @@ describe("readEditorOriginFlowHighlight", () => {
 					] as const,
 			),
 		);
-		const highlight = readEditorOriginFlowHighlight(flow, {
+		const highlight = runHighlight(flow, {
 			id: coinNodeId,
 			kind: "node",
 		});
@@ -524,17 +550,12 @@ describe("readEditorOriginFlowHighlight", () => {
 				.filter((edge) => edge.role === "output" && edge.target === coinNodeId)
 				.map(({ source }) => source),
 		);
-		const producerNodeIds = readEditorOriginFlowRelationNavigation({
+		const producerNodeIds = runRelationNavigation({
 			flow,
 			selectedNodeId: coinNodeId,
 			selectedRole: "output",
 		});
-		const navigationNodeIds = readEditorOriginFlowNavigation(
-			flow,
-			layout,
-			coinNodeId,
-			highlight.edgeIds,
-		);
+		const navigationNodeIds = runNavigation(flow, layout, coinNodeId, highlight.edgeIds);
 
 		expect(new Set(producerNodeIds)).toEqual(directProducerIds);
 		expect(producerNodeIds.length).toBeGreaterThan(5);
@@ -554,7 +575,7 @@ describe("readEditorOriginFlowHighlight", () => {
 
 	it("returns an empty highlight for a stale selection", () => {
 		expect(
-			readEditorOriginFlowHighlight(incomeFlow, {
+			runHighlight(incomeFlow, {
 				id: "missing",
 				kind: "node",
 			}),

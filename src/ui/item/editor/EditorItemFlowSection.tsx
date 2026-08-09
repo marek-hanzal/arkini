@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 
 import { useEditorProject } from "~/bridge/editor/useEditorProject";
-import type { EditorOriginFlowSelection } from "~/ui/item/editor/readEditorOriginFlowHighlight";
+import type { EditorOriginFlowSelection } from "~/ui/item/editor/readEditorOriginFlowHighlightFx";
 import { EditorOriginFlowCanvas } from "~/ui/item/editor/EditorOriginFlowCanvas";
 import type {
 	EditorItemOriginFlowLayoutNode,

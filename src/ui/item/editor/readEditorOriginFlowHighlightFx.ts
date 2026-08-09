@@ -1,8 +1,10 @@
+import { Effect } from "effect";
+
 import type {
 	EditorItemOriginEdge,
 	EditorItemOriginFlow,
 	EditorItemOriginItemNode,
-} from "~/bridge/item/editor/readEditorItemOriginFlow";
+} from "~/bridge/item/editor/readEditorItemOriginFlowFx";
 
 export type EditorOriginFlowSelection =
 	| {
@@ -164,39 +166,39 @@ const readIncomeHighlight = (
 };
 
 /** Reads the complete Income ancestry selected by an item or connection. */
-export const readEditorOriginFlowHighlight = (
-	flow: EditorItemOriginFlow,
-	selection: EditorOriginFlowSelection,
-): EditorOriginFlowHighlight => {
-	if (selection.kind === "node") {
-		const selectedNode = flow.nodes.find(({ id }) => id === selection.id);
-		return selectedNode === undefined
-			? readEmptyHighlight()
-			: readIncomeHighlight(flow, selectedNode);
-	}
+export const readEditorOriginFlowHighlightFx = Effect.fn("readEditorOriginFlowHighlightFx")(
+	(flow: EditorItemOriginFlow, selection: EditorOriginFlowSelection) =>
+		Effect.sync((): EditorOriginFlowHighlight => {
+			if (selection.kind === "node") {
+				const selectedNode = flow.nodes.find(({ id }) => id === selection.id);
+				return selectedNode === undefined
+					? readEmptyHighlight()
+					: readIncomeHighlight(flow, selectedNode);
+			}
 
-	const selectedEdge = flow.edges.find(({ id }) => id === selection.id);
-	if (selectedEdge === undefined) return readEmptyHighlight();
-	const startNode = flow.nodes.find(({ id }) => id === selectedEdge.source);
-	if (startNode === undefined)
-		return {
-			edgeIds: new Set([
-				selectedEdge.id,
-			]),
-			nodeIds: new Set([
-				selectedEdge.source,
-				selectedEdge.target,
-			]),
-		};
-	const highlight = readIncomeHighlight(flow, startNode);
-	return {
-		edgeIds: new Set([
-			selectedEdge.id,
-			...highlight.edgeIds,
-		]),
-		nodeIds: new Set([
-			selectedEdge.target,
-			...highlight.nodeIds,
-		]),
-	};
-};
+			const selectedEdge = flow.edges.find(({ id }) => id === selection.id);
+			if (selectedEdge === undefined) return readEmptyHighlight();
+			const startNode = flow.nodes.find(({ id }) => id === selectedEdge.source);
+			if (startNode === undefined)
+				return {
+					edgeIds: new Set([
+						selectedEdge.id,
+					]),
+					nodeIds: new Set([
+						selectedEdge.source,
+						selectedEdge.target,
+					]),
+				};
+			const highlight = readIncomeHighlight(flow, startNode);
+			return {
+				edgeIds: new Set([
+					selectedEdge.id,
+					...highlight.edgeIds,
+				]),
+				nodeIds: new Set([
+					selectedEdge.target,
+					...highlight.nodeIds,
+				]),
+			};
+		}),
+);

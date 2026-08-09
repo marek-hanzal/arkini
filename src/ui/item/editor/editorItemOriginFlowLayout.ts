@@ -1,4 +1,4 @@
-import type { EditorItemOriginItemNode } from "~/bridge/item/editor/readEditorItemOriginFlow";
+import type { EditorItemOriginItemNode } from "~/bridge/item/editor/readEditorItemOriginFlowFx";
 
 export interface EditorItemOriginFlowLayoutInput {
 	readonly edges: ReadonlyArray<{

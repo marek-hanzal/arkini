@@ -1,6 +1,6 @@
 import { Data, Effect } from "effect";
 
-import type { EditorItemOriginFlow } from "~/bridge/item/editor/readEditorItemOriginFlow";
+import type { EditorItemOriginFlow } from "~/bridge/item/editor/readEditorItemOriginFlowFx";
 import LayoutWorker from "~/ui/item/editor/editorItemOriginFlowLayout.worker.ts?worker";
 import type {
 	EditorItemOriginFlowLayout,
@@ -10,7 +10,7 @@ import type {
 	EditorItemOriginFlowLayoutWorkerRequest,
 	EditorItemOriginFlowLayoutWorkerResponse,
 } from "~/ui/item/editor/editorItemOriginFlowLayoutWorkerProtocol";
-import { readEditorOriginFlowNodeMetrics } from "~/ui/item/editor/readEditorOriginFlowNodeMetrics";
+import { readEditorOriginFlowNodeMetricsFx } from "~/ui/item/editor/readEditorOriginFlowNodeMetricsFx";
 
 class EditorItemOriginFlowLayoutWorkerError extends Data.TaggedError(
 	"EditorItemOriginFlowLayoutWorkerError",
@@ -51,31 +51,37 @@ const runLayout = (
 		} satisfies EditorItemOriginFlowLayoutWorkerRequest);
 	});
 
-const readTopology = (flow: EditorItemOriginFlow): EditorItemOriginFlowLayoutInput => ({
-	edges: flow.edges.map(({ id, source, sourcePortId, target, targetPortId }) => ({
-		id,
-		source,
-		sourcePortId,
-		target,
-		targetPortId,
-	})),
-	nodes: flow.nodes.map((node) => {
-		const metrics = readEditorOriginFlowNodeMetrics(node);
+const readTopologyFx = (flow: EditorItemOriginFlow) =>
+	Effect.gen(function* () {
+		const nodes = yield* Effect.forEach(flow.nodes, (node) =>
+			Effect.gen(function* () {
+				const metrics = yield* readEditorOriginFlowNodeMetricsFx(node);
+				return {
+					height: metrics.height,
+					id: node.id,
+					ports: [
+						...metrics.portOffsets,
+					].map(([id, offset]) => ({
+						id,
+						x: offset.x,
+						y: offset.y,
+					})),
+					type: node.type,
+					width: metrics.width,
+				};
+			}),
+		);
 		return {
-			height: metrics.height,
-			id: node.id,
-			ports: [
-				...metrics.portOffsets,
-			].map(([id, offset]) => ({
+			edges: flow.edges.map(({ id, source, sourcePortId, target, targetPortId }) => ({
 				id,
-				x: offset.x,
-				y: offset.y,
+				source,
+				sourcePortId,
+				target,
+				targetPortId,
 			})),
-			type: node.type,
-			width: metrics.width,
-		};
-	}),
-});
+			nodes,
+		} satisfies EditorItemOriginFlowLayoutInput;
+	});
 
 /** Computes one flow layout off the renderer thread and terminates its worker on exit. */
 export const layoutEditorItemOriginFlowInWorkerFx = Effect.fn(
@@ -88,24 +94,27 @@ export const layoutEditorItemOriginFlowInWorkerFx = Effect.fn(
 			readonly spawn?: () => Worker;
 		} = {},
 	) =>
-		Effect.acquireUseRelease(
-			Effect.try({
-				try: options.spawn ?? (() => new LayoutWorker()),
-				catch: (cause) =>
-					new EditorItemOriginFlowLayoutWorkerError({
-						cause,
-						message: "Could not start the flow layout worker.",
-					}),
-			}),
-			(worker) =>
-				Effect.tryPromise({
-					try: () => (options.runLayout ?? runLayout)(readTopology(flow), worker),
+		Effect.gen(function* () {
+			const topology = yield* readTopologyFx(flow);
+			return yield* Effect.acquireUseRelease(
+				Effect.try({
+					try: options.spawn ?? (() => new LayoutWorker()),
 					catch: (cause) =>
 						new EditorItemOriginFlowLayoutWorkerError({
 							cause,
-							message: cause instanceof Error ? cause.message : String(cause),
+							message: "Could not start the flow layout worker.",
 						}),
 				}),
-			(worker) => Effect.sync(() => worker.terminate()),
-		),
+				(worker) =>
+					Effect.tryPromise({
+						try: () => (options.runLayout ?? runLayout)(topology, worker),
+						catch: (cause) =>
+							new EditorItemOriginFlowLayoutWorkerError({
+								cause,
+								message: cause instanceof Error ? cause.message : String(cause),
+							}),
+					}),
+				(worker) => Effect.sync(() => worker.terminate()),
+			);
+		}),
 );

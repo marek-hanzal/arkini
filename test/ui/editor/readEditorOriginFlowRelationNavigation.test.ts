@@ -1,7 +1,8 @@
+import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import type { EditorItemOriginFlow } from "~/bridge/item/editor/readEditorItemOriginFlow";
-import { readEditorOriginFlowRelationNavigation } from "~/ui/item/editor/readEditorOriginFlowRelationNavigation";
+import type { EditorItemOriginFlow } from "~/bridge/item/editor/readEditorItemOriginFlowFx";
+import { readEditorOriginFlowRelationNavigationFx } from "~/ui/item/editor/readEditorOriginFlowRelationNavigationFx";
 
 const relationFlow = {
 	edges: [
@@ -72,11 +73,13 @@ const runNavigation = (
 	selectedRole: "input" | "output",
 	selectedNodeId = "item:log",
 ) =>
-	readEditorOriginFlowRelationNavigation({
-		flow,
-		selectedNodeId,
-		selectedRole,
-	});
+	Effect.runSync(
+		readEditorOriginFlowRelationNavigationFx({
+			flow,
+			selectedNodeId,
+			selectedRole,
+		}),
+	);
 
 describe("readEditorOriginFlowRelationNavigation", () => {
 	it("finds each node that uses the selected item as input once in stable order", () => {

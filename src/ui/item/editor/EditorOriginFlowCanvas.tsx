@@ -1,3 +1,4 @@
+import { Effect } from "effect";
 import {
 	useCallback,
 	useEffect,
@@ -14,34 +15,34 @@ import {
 	type EditorItemOriginFlow,
 	type EditorItemOriginItemNode,
 	type EditorItemOriginOperationKind,
-} from "~/bridge/item/editor/readEditorItemOriginFlow";
+} from "~/bridge/item/editor/readEditorItemOriginFlowFx";
+import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import { ItemTypeLabel } from "~/ui/item-detail/ItemInfoPresentation";
 import type {
 	EditorItemOriginFlowLayoutNode,
 	EditorItemOriginFlowLayoutPoint,
 } from "~/ui/item/editor/editorItemOriginFlowLayout";
 import {
+	type EditorOriginFlowHighlight,
 	type EditorOriginFlowSelection,
-	readEditorOriginFlowHighlight,
-} from "~/ui/item/editor/readEditorOriginFlowHighlight";
-import { readEditorOriginFlowNavigation } from "~/ui/item/editor/readEditorOriginFlowNavigation";
-import { readEditorOriginFlowRelationNavigation } from "~/ui/item/editor/readEditorOriginFlowRelationNavigation";
+	readEditorOriginFlowHighlightFx,
+} from "~/ui/item/editor/readEditorOriginFlowHighlightFx";
+import { readEditorOriginFlowNavigationFx } from "~/ui/item/editor/readEditorOriginFlowNavigationFx";
+import { readEditorOriginFlowRelationNavigationFx } from "~/ui/item/editor/readEditorOriginFlowRelationNavigationFx";
 import { EditorOriginFlowShortcutHelp } from "~/ui/item/editor/EditorOriginFlowShortcutHelp";
 import {
 	type EditorOriginFlowConnectedPorts,
-	readEditorOriginFlowConnectedPorts,
-} from "~/ui/item/editor/readEditorOriginFlowConnectedPorts";
+	readEditorOriginFlowConnectedPortsFx,
+} from "~/ui/item/editor/readEditorOriginFlowConnectedPortsFx";
 import {
 	EditorOriginFlowOperationContentPadding,
 	EditorOriginFlowOperationHeaderHeight,
 	EditorOriginFlowOperationSidePadding,
-	readEditorOriginFlowItemPortY,
-	readEditorOriginFlowNodeMetrics,
-} from "~/ui/item/editor/readEditorOriginFlowNodeMetrics";
-import {
-	popEditorOriginFlowVisit,
-	pushEditorOriginFlowVisit,
-} from "~/ui/item/editor/readEditorOriginFlowVisitHistory";
+	type EditorOriginFlowNodeMetrics,
+	readEditorOriginFlowNodeMetricsFx,
+} from "~/ui/item/editor/readEditorOriginFlowNodeMetricsFx";
+import { popEditorOriginFlowVisitFx } from "~/ui/item/editor/popEditorOriginFlowVisitFx";
+import { pushEditorOriginFlowVisitFx } from "~/ui/item/editor/pushEditorOriginFlowVisitFx";
 import { useEditorResourceUrls } from "~/ui/resource/editor/useEditorResourceUrl";
 
 interface Viewport {
@@ -56,8 +57,6 @@ interface Bounds {
 	readonly minX: number;
 	readonly minY: number;
 }
-
-type EditorOriginFlowNodeMetrics = ReturnType<typeof readEditorOriginFlowNodeMetrics>;
 
 interface PanState {
 	moved: boolean;
@@ -83,7 +82,7 @@ interface RenderState {
 	readonly fitContent: boolean;
 	readonly focusNodeId?: string;
 	readonly flow: EditorItemOriginFlow;
-	readonly highlight: ReturnType<typeof readEditorOriginFlowHighlight> | undefined;
+	readonly highlight: EditorOriginFlowHighlight | undefined;
 	readonly positions: ReadonlyMap<string, EditorItemOriginFlowLayoutNode>;
 	readonly nodeMetrics: ReadonlyMap<string, EditorOriginFlowNodeMetrics>;
 	readonly resourceUrls: ReadonlyMap<string, string>;
@@ -143,7 +142,7 @@ const hashText = (value: string) => {
 const readHighlightedEdgeColors = (
 	flow: EditorItemOriginFlow,
 	selection: EditorOriginFlowSelection | undefined,
-	highlight: ReturnType<typeof readEditorOriginFlowHighlight> | undefined,
+	highlight: EditorOriginFlowHighlight | undefined,
 ) => {
 	if (selection === undefined) return new Map<string, string>();
 	const highlightedIds = new Set(highlight?.edgeIds ?? []);
@@ -803,7 +802,7 @@ const drawItemNode = (
 		drawFlowPort(
 			context,
 			position.x,
-			position.y + readEditorOriginFlowItemPortY(metrics.headerHeight),
+			position.y + metrics.itemPortY,
 			typeColor,
 			palette.itemSurfaces[node.type],
 			highlightedPortColors?.get(EditorItemOriginItemInputPortId),
@@ -812,7 +811,7 @@ const drawItemNode = (
 		drawFlowPort(
 			context,
 			position.x + position.width,
-			position.y + readEditorOriginFlowItemPortY(metrics.headerHeight),
+			position.y + metrics.itemPortY,
 			typeColor,
 			palette.itemSurfaces[node.type],
 			highlightedPortColors?.get(EditorItemOriginItemOutputPortId),
@@ -1169,7 +1168,7 @@ const hitTest = (
 const readNodeHighlight = (
 	node: EditorItemOriginItemNode,
 	selection: EditorOriginFlowSelection | undefined,
-	highlight: ReturnType<typeof readEditorOriginFlowHighlight> | undefined,
+	highlight: EditorOriginFlowHighlight | undefined,
 	navigationFocusNodeId: string | undefined,
 ) => {
 	if (selection?.kind === "node" && selection.id === node.id) return "selected" as const;
@@ -1196,7 +1195,7 @@ export const EditorOriginFlowCanvas = ({
 		],
 	);
 	const connectedPorts = useMemo(
-		() => readEditorOriginFlowConnectedPorts(flow.edges),
+		() => RendererRuntime.runSync(readEditorOriginFlowConnectedPortsFx(flow.edges)),
 		[
 			flow.edges,
 		],
@@ -1204,10 +1203,18 @@ export const EditorOriginFlowCanvas = ({
 	const nodeMetrics = useMemo(
 		() =>
 			new Map(
-				flow.nodes.map((node) => [
-					node.id,
-					readEditorOriginFlowNodeMetrics(node),
-				]),
+				RendererRuntime.runSync(
+					Effect.forEach(flow.nodes, (node) =>
+						Effect.map(
+							readEditorOriginFlowNodeMetricsFx(node),
+							(metrics) =>
+								[
+									node.id,
+									metrics,
+								] as const,
+						),
+					),
+				),
 			),
 		[
 			flow.nodes,
@@ -1229,7 +1236,9 @@ export const EditorOriginFlowCanvas = ({
 	const paletteRef = useRef<CanvasPalette | undefined>(undefined);
 	const highlight = useMemo(
 		() =>
-			selection === undefined ? undefined : readEditorOriginFlowHighlight(flow, selection),
+			selection === undefined
+				? undefined
+				: RendererRuntime.runSync(readEditorOriginFlowHighlightFx(flow, selection)),
 		[
 			flow,
 			selection,
@@ -1253,7 +1262,14 @@ export const EditorOriginFlowCanvas = ({
 	const navigationNodeIds = useMemo(
 		() =>
 			selection?.kind === "node"
-				? readEditorOriginFlowNavigation(flow, positions, selection.id, highlight?.edgeIds)
+				? RendererRuntime.runSync(
+						readEditorOriginFlowNavigationFx(
+							flow,
+							positions,
+							selection.id,
+							highlight?.edgeIds,
+						),
+					)
 				: [],
 		[
 			flow,
@@ -1265,11 +1281,13 @@ export const EditorOriginFlowCanvas = ({
 	const inputNavigationNodeIds = useMemo(
 		() =>
 			selection?.kind === "node"
-				? readEditorOriginFlowRelationNavigation({
-						flow,
-						selectedNodeId: selection.id,
-						selectedRole: "input",
-					})
+				? RendererRuntime.runSync(
+						readEditorOriginFlowRelationNavigationFx({
+							flow,
+							selectedNodeId: selection.id,
+							selectedRole: "input",
+						}),
+					)
 				: [],
 		[
 			flow,
@@ -1279,11 +1297,13 @@ export const EditorOriginFlowCanvas = ({
 	const outputNavigationNodeIds = useMemo(
 		() =>
 			selection?.kind === "node"
-				? readEditorOriginFlowRelationNavigation({
-						flow,
-						selectedNodeId: selection.id,
-						selectedRole: "output",
-					})
+				? RendererRuntime.runSync(
+						readEditorOriginFlowRelationNavigationFx({
+							flow,
+							selectedNodeId: selection.id,
+							selectedRole: "output",
+						}),
+					)
 				: [],
 		[
 			flow,
@@ -1529,7 +1549,9 @@ export const EditorOriginFlowCanvas = ({
 			}
 
 			if (shortcut === "back") {
-				const back = popEditorOriginFlowVisit(visitHistoryRef.current);
+				const back = RendererRuntime.runSync(
+					popEditorOriginFlowVisitFx(visitHistoryRef.current),
+				);
 				if (back.nodeId === undefined) return;
 				const position = positions.get(back.nodeId);
 				if (position === undefined) return;
@@ -1715,8 +1737,12 @@ export const EditorOriginFlowCanvas = ({
 			navigationIndexRef.current = 0;
 			let visitHistory = visitHistoryRef.current;
 			if (selection?.kind === "node")
-				visitHistory = pushEditorOriginFlowVisit(visitHistory, selection.id);
-			visitHistoryRef.current = pushEditorOriginFlowVisit(visitHistory, hit.targetNodeId);
+				visitHistory = RendererRuntime.runSync(
+					pushEditorOriginFlowVisitFx(visitHistory, selection.id),
+				);
+			visitHistoryRef.current = RendererRuntime.runSync(
+				pushEditorOriginFlowVisitFx(visitHistory, hit.targetNodeId),
+			);
 			onSelectionChange({
 				id: hit.targetNodeId,
 				kind: "node",
@@ -1727,8 +1753,12 @@ export const EditorOriginFlowCanvas = ({
 		if (hit?.kind === "node") {
 			let visitHistory = visitHistoryRef.current;
 			if (selection?.kind === "node")
-				visitHistory = pushEditorOriginFlowVisit(visitHistory, selection.id);
-			visitHistoryRef.current = pushEditorOriginFlowVisit(visitHistory, hit.id);
+				visitHistory = RendererRuntime.runSync(
+					pushEditorOriginFlowVisitFx(visitHistory, selection.id),
+				);
+			visitHistoryRef.current = RendererRuntime.runSync(
+				pushEditorOriginFlowVisitFx(visitHistory, hit.id),
+			);
 		}
 		if (
 			hit !== undefined &&

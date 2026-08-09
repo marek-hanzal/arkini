@@ -1,3 +1,4 @@
+import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import type {
@@ -5,7 +6,7 @@ import type {
 	EditorItemOriginFlowLayoutNode,
 	EditorItemOriginFlowLayoutPoint,
 } from "~/ui/item/editor/editorItemOriginFlowLayout";
-import { routeEditorItemOriginFlow } from "~/ui/item/editor/routeEditorItemOriginFlow";
+import { routeEditorItemOriginFlowFx } from "~/ui/item/editor/routeEditorItemOriginFlowFx";
 
 const node = (
 	id: string,
@@ -127,7 +128,9 @@ describe("routeEditorItemOriginFlow", () => {
 				}),
 			],
 		]);
-		const route = routeEditorItemOriginFlow(flow, positions).get("source->target")!;
+		const route = Effect.runSync(routeEditorItemOriginFlowFx(flow, positions)).get(
+			"source->target",
+		)!;
 		const start = route[0]!;
 		const end = route.at(-1)!;
 
@@ -187,7 +190,7 @@ describe("routeEditorItemOriginFlow", () => {
 				position(1_000, 176),
 			],
 		]);
-		const routes = routeEditorItemOriginFlow(flow, positions);
+		const routes = Effect.runSync(routeEditorItemOriginFlowFx(flow, positions));
 		const trunkA = readLongestHorizontalSegment(routes.get("a")!)!;
 		const trunkB = readLongestHorizontalSegment(routes.get("b")!)!;
 
@@ -219,7 +222,7 @@ describe("routeEditorItemOriginFlow", () => {
 				position(0, 260),
 			],
 		]);
-		const route = routeEditorItemOriginFlow(flow, positions).get("back")!;
+		const route = Effect.runSync(routeEditorItemOriginFlowFx(flow, positions)).get("back")!;
 		const middleY = route[2]!.y;
 		const top = Math.min(260, 300);
 		const bottom = Math.max(260 + 176, 300 + 176);

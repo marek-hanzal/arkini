@@ -9,7 +9,7 @@ import {
 	type EditorItemOriginFlow,
 	type EditorItemOriginFlowProgress,
 	type EditorItemOriginFlowRequest,
-} from "~/bridge/item/editor/readEditorItemOriginFlow";
+} from "~/bridge/item/editor/readEditorItemOriginFlowFx";
 import type {
 	EditorItemOriginFlowLayoutNode,
 	EditorItemOriginFlowLayoutPoint,

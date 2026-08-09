@@ -1,7 +1,8 @@
+import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import type { EditorItemOriginFlow } from "~/bridge/item/editor/readEditorItemOriginFlow";
-import { readEditorOriginFlowNavigation } from "~/ui/item/editor/readEditorOriginFlowNavigation";
+import type { EditorItemOriginFlow } from "~/bridge/item/editor/readEditorItemOriginFlowFx";
+import { readEditorOriginFlowNavigationFx } from "~/ui/item/editor/readEditorOriginFlowNavigationFx";
 
 const flow = {
 	edges: [
@@ -81,9 +82,19 @@ const positions = new Map([
 	],
 ]);
 
+const runNavigation = (
+	flowInput: EditorItemOriginFlow,
+	positionInput: typeof positions,
+	startNodeId: string,
+	allowedEdgeIds?: ReadonlySet<string>,
+) =>
+	Effect.runSync(
+		readEditorOriginFlowNavigationFx(flowInput, positionInput, startNodeId, allowedEdgeIds),
+	);
+
 describe("readEditorOriginFlowNavigation", () => {
 	it("walks backward through Income prerequisites", () => {
-		expect(readEditorOriginFlowNavigation(flow, positions, "end")).toEqual([
+		expect(runNavigation(flow, positions, "end")).toEqual([
 			"end",
 			"side",
 			"a",
@@ -132,7 +143,7 @@ describe("readEditorOriginFlowNavigation", () => {
 			],
 		]);
 
-		expect(readEditorOriginFlowNavigation(branchedFlow, branchedPositions, "target")).toEqual([
+		expect(runNavigation(branchedFlow, branchedPositions, "target")).toEqual([
 			"target",
 			"near",
 			"far",
@@ -192,7 +203,7 @@ describe("readEditorOriginFlowNavigation", () => {
 			],
 		]);
 
-		expect(readEditorOriginFlowNavigation(branchedFlow, branchedPositions, "a")).toEqual([
+		expect(runNavigation(branchedFlow, branchedPositions, "a")).toEqual([
 			"a",
 			"root",
 			"left",
@@ -211,14 +222,14 @@ describe("readEditorOriginFlowNavigation", () => {
 			].reverse(),
 		} as unknown as EditorItemOriginFlow;
 
-		expect(readEditorOriginFlowNavigation(shuffled, positions, "end")).toEqual(
-			readEditorOriginFlowNavigation(flow, positions, "end"),
+		expect(runNavigation(shuffled, positions, "end")).toEqual(
+			runNavigation(flow, positions, "end"),
 		);
 	});
 
 	it("stays inside the highlighted Income proof when allowed edges are supplied", () => {
 		expect(
-			readEditorOriginFlowNavigation(
+			runNavigation(
 				flow,
 				positions,
 				"end",

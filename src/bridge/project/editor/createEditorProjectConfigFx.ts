@@ -40,6 +40,7 @@ export const createEditorProjectConfigFx = Effect.fn("createEditorProjectConfigF
 					hero: value.hero,
 					...avatarResources,
 				},
+				start: value.start,
 			});
 		}),
 );

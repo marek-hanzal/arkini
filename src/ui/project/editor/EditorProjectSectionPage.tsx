@@ -1,7 +1,9 @@
 import { EditorProjectAppearanceSection } from "~/ui/project/editor/EditorProjectAppearanceSection";
+import { EditorProjectBoardSection } from "~/ui/project/editor/EditorProjectBoardSection";
 import { EditorProjectGeneralSection } from "~/ui/project/editor/EditorProjectGeneralSection";
+import { EditorProjectInventorySection } from "~/ui/project/editor/EditorProjectInventorySection";
 import type { EditorProjectSectionId } from "~/ui/project/editor/EditorProjectSections";
-import { EditorProjectSurfacesSection } from "~/ui/project/editor/EditorProjectSurfacesSection";
+import { EditorProjectToolbarSection } from "~/ui/project/editor/EditorProjectToolbarSection";
 
 const renderSection = (section: EditorProjectSectionId) => {
 	switch (section) {
@@ -9,8 +11,12 @@ const renderSection = (section: EditorProjectSectionId) => {
 			return <EditorProjectGeneralSection />;
 		case "appearance":
 			return <EditorProjectAppearanceSection />;
-		case "surfaces":
-			return <EditorProjectSurfacesSection />;
+		case "board":
+			return <EditorProjectBoardSection />;
+		case "toolbar":
+			return <EditorProjectToolbarSection />;
+		case "inventory":
+			return <EditorProjectInventorySection />;
 	}
 };
 

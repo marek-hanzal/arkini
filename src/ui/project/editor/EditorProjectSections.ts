@@ -1,7 +1,9 @@
 export const EditorProjectSectionIds = [
 	"general",
 	"appearance",
-	"surfaces",
+	"board",
+	"toolbar",
+	"inventory",
 ] as const;
 
 export type EditorProjectSectionId = (typeof EditorProjectSectionIds)[number];
@@ -21,7 +23,15 @@ export const EditorProjectSections = [
 		label: "Appearance",
 	},
 	{
-		id: "surfaces",
-		label: "Surfaces",
+		id: "board",
+		label: "Board",
+	},
+	{
+		id: "toolbar",
+		label: "Toolbar",
+	},
+	{
+		id: "inventory",
+		label: "Inventory",
 	},
 ] as const satisfies ReadonlyArray<EditorProjectSectionDescriptor>;

@@ -2,20 +2,17 @@ import { Effect } from "effect";
 
 import type { EditorProjectSectionId } from "~/ui/project/editor/EditorProjectSections";
 
-/** Maps one canonical Project-schema path to its route-owned section. */
+/** Maps one Project form issue path to the routed section that owns it. */
 export const readEditorProjectSectionForPathFx = Effect.fn("readEditorProjectSectionForPathFx")(
 	(path: ReadonlyArray<PropertyKey>) =>
 		Effect.sync((): EditorProjectSectionId => {
-			switch (path[0]) {
-				case "hero":
-				case "avatars":
-					return "appearance";
-				case "board":
-				case "toolbarSize":
-				case "inventory":
-					return "surfaces";
-				default:
-					return "general";
-			}
+			const [head, second] = path;
+			if (head === "hero" || head === "avatars") return "appearance";
+			if (head === "board" || (head === "start" && second === "board")) return "board";
+			if (head === "toolbarSize" || (head === "start" && second === "toolbar"))
+				return "toolbar";
+			if (head === "inventory" || (head === "start" && second === "inventory"))
+				return "inventory";
+			return "general";
 		}),
 );

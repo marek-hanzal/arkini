@@ -2,6 +2,8 @@ import { Effect } from "effect";
 
 import type { EditorProject } from "~/bridge/editor/EditorProject";
 import { EditorProjectFormBaseSchema } from "~/bridge/project/editor/EditorProjectFormSchema";
+import { isItemLocationScopeAllowed } from "~/engine/location/read/isItemLocationScopeAllowedFx";
+import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 
 /** Adds project-local resource and authored-start invariants to canonical field schemas. */
 export const createEditorProjectFormSchemaFx = Effect.fn("createEditorProjectFormSchemaFx")(
@@ -42,56 +44,140 @@ export const createEditorProjectFormSchemaFx = Effect.fn("createEditorProjectFor
 					}
 					seenAvatars.add(avatar);
 				});
-				for (const startItem of project.config.start.board) {
-					if (startItem.x < value.board.width && startItem.y < value.board.height)
-						continue;
-					context.addIssue({
-						code: "custom",
-						message: `Initial board item ${startItem.itemId} at ${startItem.x}, ${startItem.y} does not fit inside the new board.`,
-						path: [
-							"board",
-						],
-					});
-					break;
-				}
-				for (const startItem of project.config.start.toolbar) {
-					if (startItem.position.y === 0 && startItem.position.x < value.toolbarSize)
-						continue;
-					context.addIssue({
-						code: "custom",
-						message: `Initial toolbar item ${startItem.itemId} at slot ${startItem.position.x + 1} does not fit inside the new toolbar.`,
-						path: [
-							"toolbarSize",
-						],
-					});
-					break;
-				}
-				const inventoryQuantities = new Map<string, number>();
-				for (const startItem of project.config.start.inventory) {
-					inventoryQuantities.set(
+
+				const validateItem = (
+					itemId: string,
+					quantity: number,
+					scope:
+						| typeof LocationScopeEnumSchema.enum.Board
+						| typeof LocationScopeEnumSchema.enum.Inventory
+						| typeof LocationScopeEnumSchema.enum.Toolbar,
+					path: (string | number)[],
+				) => {
+					const item = project.config.items[itemId];
+					if (item === undefined) {
+						context.addIssue({
+							code: "custom",
+							message: `Initial item ${itemId} does not exist in this project.`,
+							path,
+						});
+						return;
+					}
+					if (
+						!isItemLocationScopeAllowed({
+							item,
+							locationScope: scope,
+						})
+					) {
+						context.addIssue({
+							code: "custom",
+							message: `${item.title} cannot be stored in ${scope}.`,
+							path,
+						});
+					}
+					if (quantity > item.maxStackSize) {
+						context.addIssue({
+							code: "custom",
+							message: `${item.title} stack may contain at most ${item.maxStackSize}.`,
+							path,
+						});
+					}
+				};
+
+				const boardLocations = new Set<string>();
+				value.start.board.forEach((startItem, index) => {
+					const path = [
+						"start",
+						"board",
+						index,
+					];
+					validateItem(
 						startItem.itemId,
-						(inventoryQuantities.get(startItem.itemId) ?? 0) + startItem.quantity,
+						startItem.quantity,
+						LocationScopeEnumSchema.enum.Board,
+						path,
 					);
-				}
-				const requiredInventorySlots = Array.from(inventoryQuantities).reduce(
-					(total, [itemId, quantity]) => {
-						const item = project.config.items[itemId];
-						return item === undefined
-							? total
-							: total + Math.ceil(quantity / item.maxStackSize);
-					},
-					0,
-				);
-				const inventorySlots = value.inventory.width * value.inventory.height;
-				if (requiredInventorySlots > inventorySlots) {
-					context.addIssue({
-						code: "custom",
-						message: `Initial inventory needs ${requiredInventorySlots} slots but the new inventory has ${inventorySlots}.`,
-						path: [
-							"inventory",
-						],
-					});
-				}
+					if (startItem.x >= value.board.width || startItem.y >= value.board.height) {
+						context.addIssue({
+							code: "custom",
+							message: `Initial board item ${startItem.itemId} at ${startItem.x}, ${startItem.y} does not fit inside the board.`,
+							path,
+						});
+					}
+					const key = `${startItem.space}:${startItem.x}:${startItem.y}`;
+					if (boardLocations.has(key)) {
+						context.addIssue({
+							code: "custom",
+							message: `Initial board slot ${startItem.x}, ${startItem.y} in space ${startItem.space} is used more than once.`,
+							path,
+						});
+					}
+					boardLocations.add(key);
+				});
+
+				const toolbarLocations = new Set<number>();
+				value.start.toolbar.forEach((startItem, index) => {
+					const path = [
+						"start",
+						"toolbar",
+						index,
+					];
+					validateItem(
+						startItem.itemId,
+						startItem.quantity,
+						LocationScopeEnumSchema.enum.Toolbar,
+						path,
+					);
+					if (startItem.position.y !== 0 || startItem.position.x >= value.toolbarSize) {
+						context.addIssue({
+							code: "custom",
+							message: `Initial toolbar item ${startItem.itemId} at slot ${startItem.position.x + 1} does not fit inside the toolbar.`,
+							path,
+						});
+					}
+					if (toolbarLocations.has(startItem.position.x)) {
+						context.addIssue({
+							code: "custom",
+							message: `Initial toolbar slot ${startItem.position.x + 1} is used more than once.`,
+							path,
+						});
+					}
+					toolbarLocations.add(startItem.position.x);
+				});
+
+				const inventoryLocations = new Set<string>();
+				value.start.inventory.forEach((startItem, index) => {
+					const path = [
+						"start",
+						"inventory",
+						index,
+					];
+					validateItem(
+						startItem.itemId,
+						startItem.quantity,
+						LocationScopeEnumSchema.enum.Inventory,
+						path,
+					);
+					if (
+						startItem.position.x >= value.inventory.width ||
+						startItem.position.y >= value.inventory.height
+					) {
+						context.addIssue({
+							code: "custom",
+							message: `Initial inventory item ${startItem.itemId} at ${startItem.position.x}, ${startItem.position.y} does not fit inside the inventory.`,
+							path,
+						});
+					}
+					const key = `${startItem.position.x}:${startItem.position.y}`;
+					if (inventoryLocations.has(key)) {
+						context.addIssue({
+							code: "custom",
+							message: `Initial inventory slot ${startItem.position.x}, ${startItem.position.y} is used more than once.`,
+							path,
+						});
+					}
+					inventoryLocations.add(key);
+				});
 			});
 		}),
 );

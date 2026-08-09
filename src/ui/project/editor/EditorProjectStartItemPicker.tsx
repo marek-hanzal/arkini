@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 
-import { isItemLocationScopeAllowed } from "~/engine/location/read/isItemLocationScopeAllowedFx";
-import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
+import type { EditorProjectStartScope } from "~/bridge/project/editor/EditorProjectStartScope";
+import { readEditorProjectStartItemIdsFx } from "~/bridge/project/editor/readEditorProjectStartItemIdsFx";
+import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import { EditorItemSearchThumbnail } from "~/ui/item/editor/EditorItemThumbnail";
 import { useEditorItemSearchOptions } from "~/ui/item/editor/useEditorItemSearchOptions";
 import { useFuseSearch } from "~/ui/search/useFuseSearch";
@@ -9,7 +10,7 @@ import { useFuseSearch } from "~/ui/search/useFuseSearch";
 export interface EditorProjectStartItemPickerProps {
 	readonly onClose: () => void;
 	readonly onSelect: (itemId: string) => void;
-	readonly scope: GridLocationSchema.Type["scope"];
+	readonly scope: EditorProjectStartScope;
 }
 
 /** Selects one canonical item allowed in the requested initial grid scope. */
@@ -22,21 +23,24 @@ export const EditorProjectStartItemPicker = ({
 	const inputRef = useRef<HTMLInputElement>(null);
 	const [query, setQuery] = useState("");
 	const [selectedIndex, setSelectedIndex] = useState(0);
-	const allowedOptions = useMemo(
+	const allowedItemIds = useMemo(
 		() =>
-			options.filter((option) => {
-				const item = items[option.id];
-				return item === undefined
-					? false
-					: isItemLocationScopeAllowed({
-							item,
-							locationScope: scope,
-						});
-			}),
+			RendererRuntime.runSync(
+				readEditorProjectStartItemIdsFx({
+					items,
+					scope,
+				}),
+			),
 		[
 			items,
-			options,
 			scope,
+		],
+	);
+	const allowedOptions = useMemo(
+		() => options.filter(({ id }) => allowedItemIds.has(id)),
+		[
+			allowedItemIds,
+			options,
 		],
 	);
 	const candidates = useMemo(

@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import type { GridLocationSchema } from "~/engine/location/schema/GridLocationSchema";
+import type { EditorProjectStartScope } from "~/bridge/project/editor/EditorProjectStartScope";
 import { EditorItemThumbnail } from "~/ui/item/editor/EditorItemThumbnail";
 import { useEditorItemSearchOptions } from "~/ui/item/editor/useEditorItemSearchOptions";
 import { EditorProjectStartItemPicker } from "~/ui/project/editor/EditorProjectStartItemPicker";
@@ -18,7 +18,7 @@ interface EditorProjectStartGridProps {
 	readonly onDecrement: (x: number, y: number) => void;
 	readonly onIncrement: (x: number, y: number) => void;
 	readonly onSet: (x: number, y: number, itemId: string) => void;
-	readonly scope: GridLocationSchema.Type["scope"];
+	readonly scope: EditorProjectStartScope;
 	readonly width: number;
 }
 

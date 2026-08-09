@@ -15,8 +15,15 @@ export interface EditorItemOriginFlowLayoutInput {
 		readonly targetPortId?: string;
 	}>;
 	readonly nodes: ReadonlyArray<{
+		readonly height: number;
 		readonly id: string;
+		readonly ports: ReadonlyArray<{
+			readonly id: string;
+			readonly x: number;
+			readonly y: number;
+		}>;
 		readonly type: EditorItemOriginItemNode["type"];
+		readonly width: number;
 	}>;
 }
 
@@ -37,6 +44,7 @@ export interface EditorItemOriginFlowLayoutPoint {
 }
 
 export interface EditorItemOriginFlowLayout {
+	/** Four points encode one cubic Bézier: start, control1, control2, end. */
 	readonly backbones: ReadonlyMap<string, ReadonlyArray<EditorItemOriginFlowLayoutPoint>>;
 	readonly positions: ReadonlyMap<string, EditorItemOriginFlowLayoutNode>;
 }
@@ -48,7 +56,8 @@ interface WeightedGraph {
 
 interface LayoutProfile {
 	readonly degree: number;
-	readonly diameter: number;
+	readonly haloX: number;
+	readonly haloY: number;
 	readonly importance: number;
 	readonly portCount: number;
 }
@@ -59,23 +68,31 @@ interface PairEdge {
 	readonly multiplicity: number;
 }
 
+interface DirectedPairEdge {
+	readonly source: string;
+	readonly target: string;
+}
+
 interface MutableNodePosition {
-	readonly diameter: number;
+	readonly haloX: number;
+	readonly haloY: number;
+	readonly height: number;
 	readonly id: string;
 	readonly importance: number;
+	readonly width: number;
 	x: number;
 	y: number;
 }
 
 const LayoutMargin = 96;
-const OverlapGap = 28;
-const OverlapIterations = 900;
-const OverlapTolerance = 0.15;
-const MinimumNodeDiameter = 135;
-const ImportanceDiameter = 300;
-const PortPressureDiameter = 90;
+const RandomSeed = 0x4444bbbb;
+const HorizontalScale = 2.1;
+const VerticalScale = 0.9;
+const RankShift = 260;
+const OverlapGap = 26;
+const OverlapIterations = 1800;
+const OverlapTolerance = 0.2;
 const CommunityMinimumSize = 3;
-const RandomSeed = 0xc011a95e;
 
 const addWeight = (map: Map<string, number>, id: string) => {
 	map.set(id, (map.get(id) ?? 0) + 1);
@@ -201,6 +218,7 @@ const readFlowOrder = (
 const readPairEdges = (flow: EditorItemOriginFlowLayoutInput): ReadonlyArray<PairEdge> => {
 	const pairs = new Map<string, PairEdge>();
 	for (const edge of flow.edges) {
+		if (edge.source === edge.target) continue;
 		const [a, b] =
 			edge.source.localeCompare(edge.target) <= 0
 				? [
@@ -222,6 +240,27 @@ const readPairEdges = (flow: EditorItemOriginFlowLayoutInput): ReadonlyArray<Pai
 	return [
 		...pairs.values(),
 	].sort((left, right) => left.a.localeCompare(right.a) || left.b.localeCompare(right.b));
+};
+
+const readDirectedPairs = (
+	flow: EditorItemOriginFlowLayoutInput,
+): ReadonlyArray<DirectedPairEdge> => {
+	const pairs = new Map<string, DirectedPairEdge>();
+	for (const edge of flow.edges) {
+		if (edge.source === edge.target) continue;
+		const key = `${edge.source}\u0000${edge.target}`;
+		if (!pairs.has(key))
+			pairs.set(key, {
+				source: edge.source,
+				target: edge.target,
+			});
+	}
+	return [
+		...pairs.values(),
+	].sort(
+		(left, right) =>
+			left.source.localeCompare(right.source) || left.target.localeCompare(right.target),
+	);
 };
 
 const readProfiles = (
@@ -272,24 +311,139 @@ const readProfiles = (
 			const portCount = connectedPorts.get(node.id)?.size ?? 0;
 			const degreePressure = Math.sqrt(degree / maximumDegree);
 			const portPressure = Math.sqrt(portCount / maximumPortCount);
-			const importance = Math.min(1, 0.82 * degreePressure + 0.18 * portPressure);
-			const typeDiameter = node.type === "producer" ? 25 : node.type === "blueprint" ? 12 : 0;
-			const diameter = Math.round(
-				MinimumNodeDiameter +
-					ImportanceDiameter * importance ** 1.15 +
-					PortPressureDiameter * portPressure +
-					typeDiameter,
-			);
+			const importance = Math.min(1, 0.75 * degreePressure + 0.25 * portPressure);
 			return [
 				node.id,
 				{
 					degree,
-					diameter,
+					haloX: 30 + 150 * importance ** 1.2 + 28 * Math.log2(1 + degree),
+					haloY: 24 + 90 * importance ** 1.2 + 12 * Math.log2(1 + portCount),
 					importance,
 					portCount,
 				},
 			] as const;
 		}),
+	);
+};
+
+const readStrongComponentRanks = (
+	flow: EditorItemOriginFlowLayoutInput,
+	directedPairs: ReadonlyArray<DirectedPairEdge>,
+): ReadonlyMap<string, number> => {
+	const nodeIds = flow.nodes.map(({ id }) => id).sort((left, right) => left.localeCompare(right));
+	const outgoing = new Map(
+		nodeIds.map(
+			(id) =>
+				[
+					id,
+					[] as string[],
+				] as const,
+		),
+	);
+	for (const pair of directedPairs) outgoing.get(pair.source)?.push(pair.target);
+	for (const targets of outgoing.values())
+		targets.sort((left, right) => left.localeCompare(right));
+
+	let nextIndex = 0;
+	const stack: string[] = [];
+	const onStack = new Set<string>();
+	const indexById = new Map<string, number>();
+	const lowById = new Map<string, number>();
+	const componentById = new Map<string, number>();
+	const components: string[][] = [];
+
+	const visit = (id: string) => {
+		indexById.set(id, nextIndex);
+		lowById.set(id, nextIndex);
+		nextIndex += 1;
+		stack.push(id);
+		onStack.add(id);
+		for (const target of outgoing.get(id) ?? []) {
+			if (!indexById.has(target)) {
+				visit(target);
+				lowById.set(id, Math.min(lowById.get(id)!, lowById.get(target)!));
+			} else if (onStack.has(target)) {
+				lowById.set(id, Math.min(lowById.get(id)!, indexById.get(target)!));
+			}
+		}
+		if (lowById.get(id) !== indexById.get(id)) return;
+		const members: string[] = [];
+		while (stack.length > 0) {
+			const member = stack.pop()!;
+			onStack.delete(member);
+			members.push(member);
+			componentById.set(member, components.length);
+			if (member === id) break;
+		}
+		members.sort((left, right) => left.localeCompare(right));
+		components.push(members);
+	};
+	for (const id of nodeIds) if (!indexById.has(id)) visit(id);
+
+	const dag = new Map(
+		components.map(
+			(_, index) =>
+				[
+					index,
+					new Set<number>(),
+				] as const,
+		),
+	);
+	const inDegree = new Map<number, number>(
+		components.map(
+			(_, index) =>
+				[
+					index,
+					0,
+				] as const,
+		),
+	);
+	for (const pair of directedPairs) {
+		const source = componentById.get(pair.source)!;
+		const target = componentById.get(pair.target)!;
+		if (source === target || dag.get(source)!.has(target)) continue;
+		dag.get(source)!.add(target);
+		inDegree.set(target, inDegree.get(target)! + 1);
+	}
+	const queue = [
+		...inDegree,
+	]
+		.filter(([, value]) => value === 0)
+		.map(([component]) => component)
+		.sort((left, right) => left - right);
+	const rankByComponent = new Map<number, number>(
+		components.map(
+			(_, index) =>
+				[
+					index,
+					0,
+				] as const,
+		),
+	);
+	while (queue.length > 0) {
+		const component = queue.shift()!;
+		for (const target of [
+			...dag.get(component)!,
+		].sort((left, right) => left - right)) {
+			rankByComponent.set(
+				target,
+				Math.max(rankByComponent.get(target)!, rankByComponent.get(component)! + 1),
+			);
+			inDegree.set(target, inDegree.get(target)! - 1);
+			if (inDegree.get(target) === 0) {
+				queue.push(target);
+				queue.sort((left, right) => left - right);
+			}
+		}
+	}
+	return new Map(
+		nodeIds.map(
+			(id) =>
+				[
+					id,
+					rankByComponent.get(componentById.get(id)!) ?? 0,
+				] as const,
+		),
 	);
 };
 
@@ -301,7 +455,7 @@ interface MclCollection extends CollectionReturnValue {
 }
 
 const readCommunities = (flow: EditorItemOriginFlowLayoutInput, pairs: ReadonlyArray<PairEdge>) => {
-	const raw = cytoscape({
+	const graph = cytoscape({
 		elements: [
 			...flow.nodes.map(({ id }) => ({
 				data: {
@@ -319,11 +473,11 @@ const readCommunities = (flow: EditorItemOriginFlowLayoutInput, pairs: ReadonlyA
 		headless: true,
 	});
 	try {
-		const clusters = (raw.elements() as MclCollection).mcl({
+		const clusters = (graph.elements() as MclCollection).mcl({
 			inflateFactor: 2,
 			maxIterations: 20,
 		});
-		const canonicalClusters = clusters
+		const canonical = clusters
 			.map((cluster) =>
 				cluster
 					.nodes()
@@ -333,24 +487,21 @@ const readCommunities = (flow: EditorItemOriginFlowLayoutInput, pairs: ReadonlyA
 			.filter((ids) => ids.length >= CommunityMinimumSize)
 			.sort((left, right) => (left[0] ?? "").localeCompare(right[0] ?? ""));
 		const communityByNodeId = new Map<string, number>();
-		const validCommunityIds = new Set<number>();
-		for (const [index, ids] of canonicalClusters.entries()) {
-			validCommunityIds.add(index);
-			for (const id of ids) communityByNodeId.set(id, index);
-		}
+		for (const [communityId, ids] of canonical.entries())
+			for (const id of ids) communityByNodeId.set(id, communityId);
 		return {
+			communities: canonical,
 			communityByNodeId,
-			validCommunityIds,
 		};
 	} finally {
-		raw.destroy();
+		graph.destroy();
 	}
 };
 
 const seededRandom = (seed: number) => {
 	let state = seed >>> 0;
 	return () => {
-		state = (Math.imul(1664525, state) + 1013904223) >>> 0;
+		state = (Math.imul(state, 1664525) + 1013904223) >>> 0;
 		return state / 4294967296;
 	};
 };
@@ -375,30 +526,42 @@ const relaxOverlaps = (nodes: MutableNodePosition[]) => {
 			const left = nodes[leftIndex]!;
 			for (let rightIndex = leftIndex + 1; rightIndex < nodes.length; rightIndex += 1) {
 				const right = nodes[rightIndex]!;
-				let dx = right.x - left.x;
-				let dy = right.y - left.y;
-				let actualDistance = Math.hypot(dx, dy);
-				if (actualDistance < 0.001) {
-					const unit = deterministicUnit(left.id, right.id);
-					dx = unit.x;
-					dy = unit.y;
-					actualDistance = 1;
-				}
-				const desiredDistance = (left.diameter + right.diameter) / 2 + OverlapGap;
-				const overlap = desiredDistance - actualDistance;
-				if (overlap <= 0) continue;
-				maximumOverlap = Math.max(maximumOverlap, overlap);
-				const unitX = dx / actualDistance;
-				const unitY = dy / actualDistance;
+				const leftX = left.x - left.haloX;
+				const leftY = left.y - left.haloY;
+				const leftWidth = left.width + left.haloX * 2;
+				const leftHeight = left.height + left.haloY * 2;
+				const rightX = right.x - right.haloX;
+				const rightY = right.y - right.haloY;
+				const rightWidth = right.width + right.haloX * 2;
+				const rightHeight = right.height + right.haloY * 2;
+				const overlapX =
+					Math.min(leftX + leftWidth, rightX + rightWidth) - Math.max(leftX, rightX);
+				const overlapY =
+					Math.min(leftY + leftHeight, rightY + rightHeight) - Math.max(leftY, rightY);
+				if (overlapX <= 0 || overlapY <= 0) continue;
+				maximumOverlap = Math.max(maximumOverlap, Math.min(overlapX, overlapY));
 				const leftInverseMass = 1 / (1 + 18 * left.importance ** 2);
 				const rightInverseMass = 1 / (1 + 18 * right.importance ** 2);
 				const inverseMass = leftInverseMass + rightInverseMass;
-				const leftMove = overlap * (leftInverseMass / inverseMass);
-				const rightMove = overlap * (rightInverseMass / inverseMass);
-				left.x -= unitX * leftMove;
-				left.y -= unitY * leftMove;
-				right.x += unitX * rightMove;
-				right.y += unitY * rightMove;
+				if (overlapX < overlapY) {
+					let direction = Math.sign(
+						right.x + right.width / 2 - (left.x + left.width / 2),
+					);
+					if (direction === 0)
+						direction = deterministicUnit(left.id, right.id).x >= 0 ? 1 : -1;
+					const movement = overlapX + OverlapGap;
+					left.x -= direction * movement * (leftInverseMass / inverseMass);
+					right.x += direction * movement * (rightInverseMass / inverseMass);
+				} else {
+					let direction = Math.sign(
+						right.y + right.height / 2 - (left.y + left.height / 2),
+					);
+					if (direction === 0)
+						direction = deterministicUnit(left.id, right.id).y >= 0 ? 1 : -1;
+					const movement = overlapY + OverlapGap;
+					left.y -= direction * movement * (leftInverseMass / inverseMass);
+					right.y += direction * movement * (rightInverseMass / inverseMass);
+				}
 			}
 		}
 		if (maximumOverlap < OverlapTolerance) break;
@@ -409,28 +572,27 @@ const runFcose = (
 	flow: EditorItemOriginFlowLayoutInput,
 	pairs: ReadonlyArray<PairEdge>,
 	profiles: ReadonlyMap<string, LayoutProfile>,
+	ranks: ReadonlyMap<string, number>,
 ) => {
-	const { communityByNodeId, validCommunityIds } = readCommunities(flow, pairs);
+	const { communities, communityByNodeId } = readCommunities(flow, pairs);
 	const types = [
 		...new Set(flow.nodes.map(({ type }) => type)),
 	].sort((left, right) => left.localeCompare(right));
 	const elements: ElementDefinition[] = [];
-	for (const communityId of [
-		...validCommunityIds,
-	].sort((left, right) => left - right))
+	for (const communityId of communities.keys())
 		elements.push({
 			data: {
+				anchor: true,
 				anchorKind: "community",
 				id: `community:${communityId}`,
-				isAnchor: true,
 			},
 		});
 	for (const type of types)
 		elements.push({
 			data: {
+				anchor: true,
 				anchorKind: "type",
 				id: `type:${type}`,
-				isAnchor: true,
 			},
 		});
 
@@ -441,17 +603,14 @@ const runFcose = (
 		if (profile === undefined) throw new Error(`Missing flow layout profile for ${node.id}.`);
 		elements.push({
 			data: {
-				degree: profile.degree,
-				diameter: profile.diameter,
+				h: node.height + profile.haloY * 2,
 				id: node.id,
 				importance: profile.importance,
-				isAnchor: false,
-				portCount: profile.portCount,
-				type: node.type,
+				w: node.width + profile.haloX * 2,
 			},
 		});
 		const communityId = communityByNodeId.get(node.id);
-		if (communityId !== undefined && validCommunityIds.has(communityId))
+		if (communityId !== undefined)
 			elements.push({
 				data: {
 					id: `community-edge:${node.id}`,
@@ -471,17 +630,16 @@ const runFcose = (
 			},
 		});
 	}
-
 	for (const [index, pair] of pairs.entries()) {
-		const sourceProfile = profiles.get(pair.a);
-		const targetProfile = profiles.get(pair.b);
-		if (sourceProfile === undefined || targetProfile === undefined)
+		const source = profiles.get(pair.a);
+		const target = profiles.get(pair.b);
+		if (source === undefined || target === undefined)
 			throw new Error(`Missing flow layout profile for ${pair.a} -> ${pair.b}.`);
 		elements.push({
 			data: {
 				id: `pair:${index}`,
 				multiplicity: pair.multiplicity,
-				pressure: Math.max(sourceProfile.importance, targetProfile.importance),
+				pressure: Math.max(source.importance, target.importance),
 				source: pair.a,
 				target: pair.b,
 				virtualKind: "pair",
@@ -494,18 +652,17 @@ const runFcose = (
 		headless: true,
 		style: [
 			{
-				selector: "node[!isAnchor]",
+				selector: "node[!anchor]",
 				style: {
-					height: "data(diameter)",
-					shape: "ellipse",
-					width: "data(diameter)",
+					height: "data(h)",
+					shape: "rectangle",
+					width: "data(w)",
 				},
 			},
 			{
-				selector: "node[?isAnchor]",
+				selector: "node[?anchor]",
 				style: {
 					height: 20,
-					shape: "ellipse",
 					width: 20,
 				},
 			},
@@ -521,41 +678,33 @@ const runFcose = (
 				edgeElasticity: (edge: cytoscape.EdgeSingular) => {
 					const kind = edge.data("virtualKind") as string | undefined;
 					const importance = Number(edge.data("importance") ?? 0);
-					if (kind === "community") return 0.02 + 0.11 * (1 - importance) ** 1.6;
-					if (kind === "type") return 0.008 + 0.035 * (1 - importance) ** 1.5;
-					const pressure = Number(edge.data("pressure") ?? 0);
-					const multiplicity = Math.sqrt(Number(edge.data("multiplicity") ?? 1));
-					return Math.min(
-						0.62,
-						(0.34 / (1 + 0.7 * pressure)) * Math.min(1.8, multiplicity),
-					);
+					if (kind === "community") return 0.02 + 0.08 * (1 - importance);
+					if (kind === "type") return 0.006 + 0.025 * (1 - importance);
+					return 0.28 / (1 + Number(edge.data("pressure") ?? 0));
 				},
 				fit: false,
-				gravity: 0.06,
-				gravityRange: 5.2,
+				gravity: 0.045,
+				gravityRange: 5.5,
 				idealEdgeLength: (edge: cytoscape.EdgeSingular) => {
 					const kind = edge.data("virtualKind") as string | undefined;
-					if (kind === "community") return 500;
-					if (kind === "type") return 850;
-					return 95 + 200 * Number(edge.data("pressure") ?? 0) ** 1.25;
+					if (kind === "community") return 480;
+					if (kind === "type") return 760;
+					return 130 + 250 * Number(edge.data("pressure") ?? 0) ** 1.2;
 				},
 				name: "fcose",
 				nodeRepulsion: (node: cytoscape.NodeSingular) => {
-					if (node.data("isAnchor") === true)
-						return node.data("anchorKind") === "community" ? 19000 : 23000;
+					if (node.data("anchor") === true) return 18000;
 					const profile = profiles.get(node.id());
 					return profile === undefined
-						? 4800
-						: 4800 * (1 + 7 * profile.importance ** 1.5);
+						? 7000
+						: 7000 * (1 + 5 * profile.importance ** 1.4);
 				},
-				nodeSeparation: 130,
-				numIter: 4500,
+				nodeSeparation: 120,
+				numIter: 5000,
 				packComponents: false,
 				quality: "default",
 				randomize: true,
 				tile: true,
-				tilingPaddingHorizontal: 35,
-				tilingPaddingVertical: 35,
 			} as cytoscape.LayoutOptions)
 			.run();
 	} finally {
@@ -571,13 +720,17 @@ const runFcose = (
 				const profile = profiles.get(node.id);
 				if (profile === undefined)
 					throw new Error(`Missing flow layout profile for ${node.id}.`);
+				const rank = ranks.get(node.id) ?? 0;
 				const position = graph.getElementById(node.id).position();
 				return {
-					diameter: profile.diameter,
+					haloX: profile.haloX,
+					haloY: profile.haloY,
+					height: node.height,
 					id: node.id,
 					importance: profile.importance,
-					x: position.x,
-					y: position.y,
+					width: node.width,
+					x: position.x * HorizontalScale - node.width / 2 + rank * RankShift,
+					y: position.y * VerticalScale - node.height / 2,
 				};
 			});
 	} finally {
@@ -585,32 +738,61 @@ const runFcose = (
 	}
 };
 
-const readBackbone = (
-	source: EditorItemOriginFlowLayoutNode,
-	target: EditorItemOriginFlowLayoutNode,
+const readPortPoint = (
+	node: EditorItemOriginFlowLayoutInput["nodes"][number],
+	position: EditorItemOriginFlowLayoutNode,
+	portId: string | undefined,
+	side: "source" | "target",
+): EditorItemOriginFlowLayoutPoint => {
+	const port = portId === undefined ? undefined : node.ports.find(({ id }) => id === portId);
+	if (port !== undefined)
+		return {
+			x: position.x + position.width / 2 + port.x,
+			y: position.y + position.height / 2 + port.y,
+		};
+	return {
+		x: side === "source" ? position.x + position.width : position.x,
+		y: position.y + position.height / 2,
+	};
+};
+
+const readCubicRoute = (
+	source: EditorItemOriginFlowLayoutPoint,
+	target: EditorItemOriginFlowLayoutPoint,
+	edgeId: string,
 ): ReadonlyArray<EditorItemOriginFlowLayoutPoint> => {
-	const sourceCenter = {
-		x: source.x + source.width / 2,
-		y: source.y + source.height / 2,
-	};
-	const targetCenter = {
-		x: target.x + target.width / 2,
-		y: target.y + target.height / 2,
-	};
-	const dx = targetCenter.x - sourceCenter.x;
-	const dy = targetCenter.y - sourceCenter.y;
-	const length = Math.max(0.001, Math.hypot(dx, dy));
-	const unitX = dx / length;
-	const unitY = dy / length;
+	const dx = target.x - source.x;
+	const dy = target.y - source.y;
+	if (Math.abs(dx) >= 48) {
+		const direction = Math.sign(dx) || 1;
+		const handle = Math.min(520, Math.max(84, Math.abs(dx) * 0.42));
+		const jitter = (deterministicUnit(edgeId, "route").y || 0) * 10;
+		return [
+			source,
+			{
+				x: source.x + direction * handle,
+				y: source.y + jitter,
+			},
+			{
+				x: target.x - direction * handle,
+				y: target.y - jitter,
+			},
+			target,
+		];
+	}
+	const direction = Math.sign(dy) || 1;
+	const handle = Math.min(420, Math.max(90, Math.abs(dy) * 0.38));
 	return [
+		source,
 		{
-			x: sourceCenter.x + unitX * (source.width / 2),
-			y: sourceCenter.y + unitY * (source.height / 2),
+			x: source.x,
+			y: source.y + direction * handle,
 		},
 		{
-			x: targetCenter.x - unitX * (target.width / 2),
-			y: targetCenter.y - unitY * (target.height / 2),
+			x: target.x,
+			y: target.y - direction * handle,
 		},
+		target,
 	];
 };
 
@@ -620,9 +802,17 @@ const runLayout = (flow: EditorItemOriginFlowLayoutInput): EditorItemOriginFlowL
 			backbones: new Map(),
 			positions: new Map(),
 		};
-	const nodeIds = new Set(flow.nodes.map(({ id }) => id));
+	const nodeById = new Map(
+		flow.nodes.map(
+			(node) =>
+				[
+					node.id,
+					node,
+				] as const,
+		),
+	);
 	for (const edge of flow.edges)
-		if (!nodeIds.has(edge.source) || !nodeIds.has(edge.target))
+		if (!nodeById.has(edge.source) || !nodeById.has(edge.target))
 			throw new Error(
 				`Flow edge references an unknown node: ${edge.source} -> ${edge.target}.`,
 			);
@@ -631,14 +821,15 @@ const runLayout = (flow: EditorItemOriginFlowLayoutInput): EditorItemOriginFlowL
 	const flowOrder = readFlowOrder(flow, weightedGraph);
 	const pairs = readPairEdges(flow);
 	const profiles = readProfiles(flow, pairs);
-	const relaxed = runFcose(flow, pairs, profiles);
+	const ranks = readStrongComponentRanks(flow, readDirectedPairs(flow));
+	const relaxed = runFcose(flow, pairs, profiles, ranks);
 	relaxOverlaps(relaxed);
 
 	let minimumX = Number.POSITIVE_INFINITY;
 	let minimumY = Number.POSITIVE_INFINITY;
 	for (const node of relaxed) {
-		minimumX = Math.min(minimumX, node.x - node.diameter / 2);
-		minimumY = Math.min(minimumY, node.y - node.diameter / 2);
+		minimumX = Math.min(minimumX, node.x);
+		minimumY = Math.min(minimumY, node.y);
 	}
 	const shiftX = LayoutMargin - minimumX;
 	const shiftY = LayoutMargin - minimumY;
@@ -651,12 +842,12 @@ const runLayout = (flow: EditorItemOriginFlowLayoutInput): EditorItemOriginFlowL
 		positions.set(node.id, {
 			degree: profile.degree,
 			flowOrder: order,
-			height: node.diameter,
+			height: node.height,
 			importance: profile.importance,
 			portCount: profile.portCount,
-			width: node.diameter,
-			x: node.x - node.diameter / 2 + shiftX,
-			y: node.y - node.diameter / 2 + shiftY,
+			width: node.width,
+			x: node.x + shiftX,
+			y: node.y + shiftY,
 		});
 	}
 
@@ -664,11 +855,13 @@ const runLayout = (flow: EditorItemOriginFlowLayoutInput): EditorItemOriginFlowL
 	for (const edge of [
 		...flow.edges,
 	].sort((left, right) => left.id.localeCompare(right.id))) {
-		const source = positions.get(edge.source);
-		const target = positions.get(edge.target);
-		if (source === undefined || target === undefined)
-			throw new Error(`Missing flow layout for ${edge.source} -> ${edge.target}.`);
-		backbones.set(edge.id, readBackbone(source, target));
+		const sourceNode = nodeById.get(edge.source)!;
+		const targetNode = nodeById.get(edge.target)!;
+		const sourcePosition = positions.get(edge.source)!;
+		const targetPosition = positions.get(edge.target)!;
+		const source = readPortPoint(sourceNode, sourcePosition, edge.sourcePortId, "source");
+		const target = readPortPoint(targetNode, targetPosition, edge.targetPortId, "target");
+		backbones.set(edge.id, readCubicRoute(source, target, edge.id));
 	}
 	return {
 		backbones,
@@ -676,7 +869,7 @@ const runLayout = (flow: EditorItemOriginFlowLayoutInput): EditorItemOriginFlowL
 	};
 };
 
-/** Computes one deterministic weighted map layout using topology first and semantics second. */
+/** Computes one deterministic rich-node flow map using topology first and semantics second. */
 export const layoutEditorItemOriginFlowFx = Effect.fn("layoutEditorItemOriginFlowFx")(
 	(flow: EditorItemOriginFlowLayoutInput) => Effect.sync(() => runLayout(flow)),
 );

@@ -1,7 +1,11 @@
 import { Cause, Effect, Exit, Fiber, Option } from "effect";
 import { describe, expect, it } from "vitest";
 
-import type { EditorItemOriginFlow } from "~/bridge/item/editor/readEditorItemOriginFlow";
+import {
+	EditorItemOriginItemInputPortId,
+	EditorItemOriginItemOutputPortId,
+	type EditorItemOriginFlow,
+} from "~/bridge/item/editor/readEditorItemOriginFlow";
 import { layoutEditorItemOriginFlowInWorkerFx } from "~/ui/item/editor/layoutEditorItemOriginFlowInWorkerFx";
 import type {
 	EditorItemOriginFlowLayout,
@@ -52,10 +56,10 @@ describe("layoutEditorItemOriginFlowInWorkerFx", () => {
 					{
 						degree: 0,
 						flowOrder: 0,
-						height: 160,
+						height: 176,
 						importance: 0,
 						portCount: 0,
-						width: 160,
+						width: 420,
 						x: 12,
 						y: 24,
 					},
@@ -78,8 +82,22 @@ describe("layoutEditorItemOriginFlowInWorkerFx", () => {
 			edges: [],
 			nodes: [
 				{
+					height: 176,
 					id: "item:wine",
+					ports: [
+						{
+							id: EditorItemOriginItemInputPortId,
+							x: -210,
+							y: -21,
+						},
+						{
+							id: EditorItemOriginItemOutputPortId,
+							x: 210,
+							y: -21,
+						},
+					],
 					type: "producer",
+					width: 420,
 				},
 			],
 		});

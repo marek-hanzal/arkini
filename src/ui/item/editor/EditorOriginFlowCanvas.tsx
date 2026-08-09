@@ -29,6 +29,7 @@ import {
 } from "~/ui/item/editor/readEditorOriginFlowHighlightFx";
 import { readEditorOriginFlowNavigationFx } from "~/ui/item/editor/readEditorOriginFlowNavigationFx";
 import { readEditorOriginFlowRelationNavigationFx } from "~/ui/item/editor/readEditorOriginFlowRelationNavigationFx";
+import { readEditorOriginFlowVisibleHighlightFx } from "~/ui/item/editor/readEditorOriginFlowVisibleHighlightFx";
 import { readEditorOriginFlowMetroBackbonesFx } from "~/ui/item/editor/readEditorOriginFlowMetroBackbonesFx";
 import { EditorOriginFlowShortcutHelp } from "~/ui/item/editor/EditorOriginFlowShortcutHelp";
 import {
@@ -402,7 +403,17 @@ const readInitialFocusPosition = (
 	)[0]?.[1];
 };
 
-type FlowNavigationShortcut = "back" | "help" | "home" | "inputs" | "next" | "outputs" | "previous";
+type FlowNavigationShortcut =
+	| "back"
+	| "depth-less"
+	| "depth-more"
+	| "depth-reset"
+	| "help"
+	| "home"
+	| "inputs"
+	| "next"
+	| "outputs"
+	| "previous";
 
 const readFlowNavigationShortcut = (event: KeyboardEvent): FlowNavigationShortcut | undefined => {
 	const target = event.target;
@@ -419,6 +430,12 @@ const readFlowNavigationShortcut = (event: KeyboardEvent): FlowNavigationShortcu
 	)
 		return undefined;
 	switch (event.key.toLowerCase()) {
+		case "+":
+			return "depth-more";
+		case "-":
+			return "depth-less";
+		case "0":
+			return "depth-reset";
 		case "n":
 			return "next";
 		case "p":
@@ -1292,14 +1309,54 @@ export const EditorOriginFlowCanvas = ({
 	const relationNavigationFocusNodeIdRef = useRef<string | undefined>(undefined);
 	const visitHistoryRef = useRef<ReadonlyArray<string>>([]);
 	const [helpOpen, setHelpOpen] = useState(false);
+	const [highlightDepth, setHighlightDepth] = useState<
+		| {
+				readonly limit: number;
+				readonly nodeId: string;
+		  }
+		| undefined
+	>(undefined);
 	const paletteRef = useRef<CanvasPalette | undefined>(undefined);
-	const highlight = useMemo(
+	const completeHighlight = useMemo(
 		() =>
 			selection === undefined
 				? undefined
 				: RendererRuntime.runSync(readEditorOriginFlowHighlightFx(flow, selection)),
 		[
 			flow,
+			selection,
+		],
+	);
+	const maxHighlightLevel = useMemo(
+		() =>
+			completeHighlight === undefined
+				? 0
+				: Math.max(0, ...completeHighlight.nodeLevels.values()),
+		[
+			completeHighlight,
+		],
+	);
+	const highlightDepthLimit =
+		selection?.kind === "node" &&
+		highlightDepth?.nodeId === selection.id &&
+		highlightDepth.limit < maxHighlightLevel
+			? highlightDepth.limit
+			: undefined;
+	const highlight = useMemo(
+		() =>
+			selection?.kind !== "node" ||
+			completeHighlight === undefined ||
+			highlightDepthLimit === undefined
+				? completeHighlight
+				: RendererRuntime.runSync(
+						readEditorOriginFlowVisibleHighlightFx(
+							completeHighlight,
+							highlightDepthLimit,
+						),
+					),
+		[
+			completeHighlight,
+			highlightDepthLimit,
 			selection,
 		],
 	);
@@ -1600,6 +1657,7 @@ export const EditorOriginFlowCanvas = ({
 
 	useEffect(() => {
 		relationNavigationFocusNodeIdRef.current = undefined;
+		setHighlightDepth(undefined);
 	}, [
 		selection,
 	]);
@@ -1630,6 +1688,50 @@ export const EditorOriginFlowCanvas = ({
 			const shortcut = readFlowNavigationShortcut(event);
 			if (shortcut === undefined) return;
 			event.preventDefault();
+
+			if (
+				shortcut === "depth-less" ||
+				shortcut === "depth-more" ||
+				shortcut === "depth-reset"
+			) {
+				if (selection?.kind !== "node") return;
+				relationNavigationFocusNodeIdRef.current = undefined;
+				if (shortcut === "depth-less") {
+					setHighlightDepth((current) => {
+						const currentLimit =
+							current?.nodeId === selection.id ? current.limit : maxHighlightLevel;
+						return {
+							limit: Math.max(0, currentLimit - 1),
+							nodeId: selection.id,
+						};
+					});
+					return;
+				}
+				if (shortcut === "depth-more") {
+					setHighlightDepth((current) => {
+						if (current?.nodeId !== selection.id) return current;
+						const next = current.limit + 1;
+						return next >= maxHighlightLevel
+							? undefined
+							: {
+									limit: next,
+									nodeId: selection.id,
+								};
+					});
+					return;
+				}
+				setHighlightDepth(undefined);
+				const position = positions.get(selection.id);
+				if (
+					position !== undefined &&
+					focusPosition(
+						position,
+						Math.max(viewportRef.current.zoom, DefaultViewport.zoom),
+					)
+				)
+					navigationIndexRef.current = 0;
+				return;
+			}
 
 			if (shortcut === "help") {
 				setHelpOpen(true);
@@ -1713,11 +1815,13 @@ export const EditorOriginFlowCanvas = ({
 		flow,
 		helpOpen,
 		inputNavigationNodeIds,
+		maxHighlightLevel,
 		navigationNodeIds,
 		onSelectionChange,
 		outputNavigationNodeIds,
 		positions,
 		scheduleDraw,
+		selection,
 	]);
 
 	useEffect(() => {

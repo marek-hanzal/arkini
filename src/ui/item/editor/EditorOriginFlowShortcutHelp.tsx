@@ -18,6 +18,18 @@ const ShortcutRows = [
 		"Return to the selected item, or the graph start when nothing is selected.",
 	],
 	[
+		"+",
+		"Show one more hidden level of the selected Income graph.",
+	],
+	[
+		"-",
+		"Hide the farthest visible level of the selected Income graph.",
+	],
+	[
+		"0",
+		"Restore the default selected Income view and return to the selected item.",
+	],
+	[
 		"I",
 		"Cycle through items whose operations use the selected item as an input.",
 	],

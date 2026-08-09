@@ -106,6 +106,14 @@ const EdgeHitRadiusPx = 9;
 const PortHitRadiusPx = 11;
 const EdgeCullPaddingPx = 32;
 const MaxCachedImages = 96;
+const SelectionBackgroundOpacity = 0.18;
+const HighlightMinimumOpacity = 0.4;
+const HighlightOpacityStep = 0.1;
+
+const readHighlightOpacity = (level: number | undefined) =>
+	level === undefined
+		? 1
+		: Math.max(HighlightMinimumOpacity, 1 - Math.max(0, level) * HighlightOpacityStep);
 
 const HighlightRouteColors = Array.from(
 	{
@@ -778,7 +786,7 @@ const drawItemNode = (
 	position: EditorItemOriginFlowLayoutNode,
 	metrics: EditorOriginFlowNodeMetrics,
 	highlight: "active" | "idle" | "selected",
-	selectionActive: boolean,
+	opacity: number,
 	palette: CanvasPalette,
 	resourceUrls: ReadonlyMap<string, string>,
 	imageCache: Map<string, HTMLImageElement>,
@@ -788,7 +796,7 @@ const drawItemNode = (
 ) => {
 	const typeColor = readItemTypeColor(palette, node.type);
 	context.save();
-	context.globalAlpha = selectionActive && highlight === "idle" ? 0.2 : 1;
+	context.globalAlpha = opacity;
 	drawNodeFrame(
 		context,
 		position,
@@ -879,7 +887,7 @@ const drawItemNode = (
 		context.globalAlpha *= 0.35;
 		context.lineWidth = 1;
 		context.stroke();
-		context.globalAlpha = selectionActive && highlight === "idle" ? 0.2 : 1;
+		context.globalAlpha = opacity;
 	}
 
 	for (const [operationIndex, operation] of node.operations.entries()) {
@@ -897,7 +905,7 @@ const drawItemNode = (
 		context.strokeStyle = kindColor;
 		context.lineWidth = 1.25;
 		context.stroke();
-		context.globalAlpha = selectionActive && highlight === "idle" ? 0.2 : 1;
+		context.globalAlpha = opacity;
 
 		const iconSize = 18;
 		const headerX = rowX + EditorOriginFlowOperationContentPadding;
@@ -1002,6 +1010,7 @@ const drawEdge = (
 	context: CanvasRenderingContext2D,
 	backbone: ReadonlyArray<EditorItemOriginFlowLayoutPoint>,
 	highlightColor: string | undefined,
+	opacity: number,
 	palette: CanvasPalette,
 ) => {
 	const first = backbone[0];
@@ -1010,7 +1019,7 @@ const drawEdge = (
 	const edgeColor = highlightColor ?? palette.lineStrong;
 
 	context.save();
-	context.globalAlpha = emphasized ? 1 : 0.6;
+	context.globalAlpha = opacity;
 	context.lineJoin = "miter";
 	context.lineCap = "butt";
 	context.strokeStyle = edgeColor;
@@ -1175,6 +1184,30 @@ const readNodeHighlight = (
 	if (navigationFocusNodeId === node.id || highlight?.nodeIds.has(node.id))
 		return "active" as const;
 	return "idle" as const;
+};
+
+const readNodeOpacity = (
+	nodeId: string,
+	selection: EditorOriginFlowSelection | undefined,
+	highlight: EditorOriginFlowHighlight | undefined,
+	navigationFocusNodeId: string | undefined,
+) => {
+	if (selection === undefined) return 1;
+	if (selection.kind === "edge") return highlight?.nodeIds.has(nodeId) === true ? 1 : 0.2;
+	if (selection.id === nodeId || navigationFocusNodeId === nodeId) return 1;
+	const level = highlight?.nodeLevels.get(nodeId);
+	return level === undefined ? SelectionBackgroundOpacity : readHighlightOpacity(level);
+};
+
+const readEdgeOpacity = (
+	edgeId: string,
+	highlighted: boolean,
+	selection: EditorOriginFlowSelection | undefined,
+	highlight: EditorOriginFlowHighlight | undefined,
+) => {
+	if (!highlighted) return selection?.kind === "node" ? SelectionBackgroundOpacity : 0.6;
+	if (selection?.kind !== "node") return 1;
+	return readHighlightOpacity(highlight?.edgeLevels.get(edgeId));
 };
 
 /** Renders the passive item flow directly to Canvas with imperative pan and zoom. */
@@ -1421,7 +1454,13 @@ export const EditorOriginFlowCanvas = ({
 				const bounds = state.edgeBounds.get(edge.id);
 				if (bounds === undefined) throw new Error(`Missing edge bounds for ${edge.id}.`);
 				if (!isEdgeVisible(bounds, visibleEdges)) continue;
-				drawEdge(context, backbone, highlightColor, palette);
+				drawEdge(
+					context,
+					backbone,
+					highlightColor,
+					readEdgeOpacity(edge.id, highlighted, state.selection, state.highlight),
+					palette,
+				);
 			}
 		}
 		for (const node of state.flow.nodes) {
@@ -1442,7 +1481,12 @@ export const EditorOriginFlowCanvas = ({
 				position,
 				metrics,
 				nodeHighlight,
-				state.selection !== undefined,
+				readNodeOpacity(
+					node.id,
+					state.selection,
+					state.highlight,
+					relationNavigationFocusNodeIdRef.current,
+				),
 				palette,
 				state.resourceUrls,
 				imageCacheRef.current,

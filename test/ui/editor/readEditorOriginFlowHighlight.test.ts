@@ -201,6 +201,50 @@ describe("readEditorOriginFlowHighlight", () => {
 				"loop-target",
 			]),
 		);
+		expect(highlight.nodeLevels).toEqual(
+			new Map([
+				[
+					"item:target",
+					0,
+				],
+				[
+					"item:forge",
+					1,
+				],
+				[
+					"item:loop",
+					1,
+				],
+				[
+					"item:tool",
+					2,
+				],
+				[
+					"item:water",
+					2,
+				],
+			]),
+		);
+		expect(highlight.edgeLevels).toEqual(
+			new Map([
+				[
+					"tool-forge",
+					2,
+				],
+				[
+					"water-forge",
+					2,
+				],
+				[
+					"forge-target",
+					1,
+				],
+				[
+					"loop-target",
+					1,
+				],
+			]),
+		);
 
 		const producerNodeIds = runRelationNavigation({
 			flow: incomeFlow,
@@ -347,8 +391,15 @@ describe("readEditorOriginFlowHighlight", () => {
 		});
 		expect(highlight).toEqual({
 			edgeIds: new Set(),
+			edgeLevels: new Map(),
 			nodeIds: new Set([
 				"item:tool",
+			]),
+			nodeLevels: new Map([
+				[
+					"item:tool",
+					0,
+				],
 			]),
 		});
 	});
@@ -456,10 +507,12 @@ describe("readEditorOriginFlowHighlight", () => {
 			edgeIds: new Set([
 				"tool-forge",
 			]),
+			edgeLevels: new Map(),
 			nodeIds: new Set([
 				"item:forge",
 				"item:tool",
 			]),
+			nodeLevels: new Map(),
 		});
 	});
 
@@ -581,7 +634,9 @@ describe("readEditorOriginFlowHighlight", () => {
 			}),
 		).toEqual({
 			edgeIds: new Set(),
+			edgeLevels: new Map(),
 			nodeIds: new Set(),
+			nodeLevels: new Map(),
 		});
 	});
 });

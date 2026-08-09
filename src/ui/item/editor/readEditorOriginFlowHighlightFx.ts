@@ -18,12 +18,16 @@ export type EditorOriginFlowSelection =
 
 export interface EditorOriginFlowHighlight {
 	readonly edgeIds: ReadonlySet<string>;
+	readonly edgeLevels: ReadonlyMap<string, number>;
 	readonly nodeIds: ReadonlySet<string>;
+	readonly nodeLevels: ReadonlyMap<string, number>;
 }
 
 const readEmptyHighlight = (): EditorOriginFlowHighlight => ({
 	edgeIds: new Set(),
+	edgeLevels: new Map(),
 	nodeIds: new Set(),
+	nodeLevels: new Map(),
 });
 
 const sortEdges = (edges: ReadonlyArray<EditorItemOriginEdge>) =>
@@ -74,7 +78,9 @@ const readIncomeHighlight = (
 	if (startNode.starterScopes.length > 0)
 		return {
 			edgeIds,
+			edgeLevels: new Map(),
 			nodeIds,
+			nodeLevels: new Map(),
 		};
 
 	const directEdgesByProducer = new Map<string, EditorItemOriginEdge[]>();
@@ -161,7 +167,61 @@ const readIncomeHighlight = (
 
 	return {
 		edgeIds,
+		edgeLevels: new Map(),
 		nodeIds,
+		nodeLevels: new Map(),
+	};
+};
+
+const readHighlightLevels = (
+	flow: EditorItemOriginFlow,
+	highlight: EditorOriginFlowHighlight,
+	rootNodeId: string,
+): EditorOriginFlowHighlight => {
+	const edges = flow.edges.filter(({ id }) => highlight.edgeIds.has(id));
+	const adjacency = new Map<string, string[]>();
+	const connect = (left: string, right: string) => {
+		const neighbors = adjacency.get(left) ?? [];
+		neighbors.push(right);
+		adjacency.set(left, neighbors);
+	};
+	for (const edge of edges) {
+		if (edge.source === edge.target) continue;
+		connect(edge.source, edge.target);
+		connect(edge.target, edge.source);
+	}
+
+	const nodeLevels = new Map<string, number>([
+		[
+			rootNodeId,
+			0,
+		],
+	]);
+	const queue = [
+		rootNodeId,
+	];
+	for (let index = 0; index < queue.length; index += 1) {
+		const nodeId = queue[index]!;
+		const nextLevel = nodeLevels.get(nodeId)! + 1;
+		for (const neighborId of adjacency.get(nodeId) ?? []) {
+			if (!highlight.nodeIds.has(neighborId) || nodeLevels.has(neighborId)) continue;
+			nodeLevels.set(neighborId, nextLevel);
+			queue.push(neighborId);
+		}
+	}
+
+	const edgeLevels = new Map<string, number>();
+	for (const edge of edges) {
+		const sourceLevel = nodeLevels.get(edge.source);
+		const targetLevel = nodeLevels.get(edge.target);
+		if (sourceLevel === undefined || targetLevel === undefined) continue;
+		edgeLevels.set(edge.id, Math.max(sourceLevel, targetLevel));
+	}
+
+	return {
+		...highlight,
+		edgeLevels,
+		nodeLevels,
 	};
 };
 
@@ -173,7 +233,11 @@ export const readEditorOriginFlowHighlightFx = Effect.fn("readEditorOriginFlowHi
 				const selectedNode = flow.nodes.find(({ id }) => id === selection.id);
 				return selectedNode === undefined
 					? readEmptyHighlight()
-					: readIncomeHighlight(flow, selectedNode);
+					: readHighlightLevels(
+							flow,
+							readIncomeHighlight(flow, selectedNode),
+							selectedNode.id,
+						);
 			}
 
 			const selectedEdge = flow.edges.find(({ id }) => id === selection.id);
@@ -184,10 +248,12 @@ export const readEditorOriginFlowHighlightFx = Effect.fn("readEditorOriginFlowHi
 					edgeIds: new Set([
 						selectedEdge.id,
 					]),
+					edgeLevels: new Map(),
 					nodeIds: new Set([
 						selectedEdge.source,
 						selectedEdge.target,
 					]),
+					nodeLevels: new Map(),
 				};
 			const highlight = readIncomeHighlight(flow, startNode);
 			return {
@@ -195,10 +261,12 @@ export const readEditorOriginFlowHighlightFx = Effect.fn("readEditorOriginFlowHi
 					selectedEdge.id,
 					...highlight.edgeIds,
 				]),
+				edgeLevels: new Map(),
 				nodeIds: new Set([
 					selectedEdge.target,
 					...highlight.nodeIds,
 				]),
+				nodeLevels: new Map(),
 			};
 		}),
 );

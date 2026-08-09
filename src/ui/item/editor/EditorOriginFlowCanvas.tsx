@@ -419,7 +419,7 @@ type FlowNavigationShortcut =
 	| "previous"
 	| "roots";
 
-const DefaultHighlightDepth = 2;
+const DefaultHighlightDepth = 1;
 
 const readFlowNavigationShortcut = (event: KeyboardEvent): FlowNavigationShortcut | undefined => {
 	const target = event.target;

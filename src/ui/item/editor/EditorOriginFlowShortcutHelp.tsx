@@ -31,7 +31,7 @@ const readShortcutRows = (direction: EditorOriginFlowDirection) =>
 		],
 		[
 			"0",
-			"Restore the default two-level view and return to the selected item.",
+			"Restore the default one-level view and return to the selected item.",
 		],
 		[
 			"S",

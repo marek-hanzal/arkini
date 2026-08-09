@@ -106,9 +106,8 @@ const EdgeHitRadiusPx = 9;
 const PortHitRadiusPx = 11;
 const EdgeCullPaddingPx = 32;
 const MaxCachedImages = 96;
-const SelectionBackgroundOpacity = 0.18;
-const HighlightMinimumOpacity = 0.4;
-const HighlightOpacityStep = 0.1;
+const HighlightMinimumOpacity = 0.28;
+const HighlightOpacityStep = 0.12;
 
 const readHighlightOpacity = (level: number | undefined) =>
 	level === undefined
@@ -1100,13 +1099,20 @@ const hitTest = (
 	positions: ReadonlyMap<string, EditorItemOriginFlowLayoutNode>,
 	nodeMetrics: ReadonlyMap<string, EditorOriginFlowNodeMetrics>,
 	backbones: ReadonlyMap<string, ReadonlyArray<EditorItemOriginFlowLayoutPoint>>,
+	selection: EditorOriginFlowSelection | undefined,
+	highlight: EditorOriginFlowHighlight | undefined,
 	x: number,
 	y: number,
 	zoom: number,
 ): FlowHit | undefined => {
+	const isNodeRelevant = (nodeId: string) =>
+		selection?.kind !== "node" || highlight?.nodeIds.has(nodeId) === true;
+	const isEdgeRelevant = (edgeId: string) =>
+		selection?.kind !== "node" || highlight?.edgeIds.has(edgeId) === true;
 	const portTolerance = PortHitRadiusPx / zoom;
 	for (let index = flow.nodes.length - 1; index >= 0; index -= 1) {
 		const node = flow.nodes[index]!;
+		if (!isNodeRelevant(node.id)) continue;
 		const position = positions.get(node.id);
 		if (position === undefined) continue;
 		const metrics = nodeMetrics.get(node.id);
@@ -1149,6 +1155,7 @@ const hitTest = (
 
 	for (let index = flow.nodes.length - 1; index >= 0; index -= 1) {
 		const node = flow.nodes[index]!;
+		if (!isNodeRelevant(node.id)) continue;
 		const position = positions.get(node.id);
 		if (position === undefined) continue;
 		if (
@@ -1164,6 +1171,7 @@ const hitTest = (
 	}
 	const tolerance = EdgeHitRadiusPx / zoom;
 	for (const edge of flow.edges) {
+		if (!isEdgeRelevant(edge.id)) continue;
 		const backbone = backbones.get(edge.id);
 		if (backbone === undefined || distanceToRoute(x, y, backbone) > tolerance) continue;
 		return {
@@ -1196,7 +1204,7 @@ const readNodeOpacity = (
 	if (selection.kind === "edge") return highlight?.nodeIds.has(nodeId) === true ? 1 : 0.2;
 	if (selection.id === nodeId || navigationFocusNodeId === nodeId) return 1;
 	const level = highlight?.nodeLevels.get(nodeId);
-	return level === undefined ? SelectionBackgroundOpacity : readHighlightOpacity(level);
+	return level === undefined ? 0 : readHighlightOpacity(level);
 };
 
 const readEdgeOpacity = (
@@ -1205,7 +1213,7 @@ const readEdgeOpacity = (
 	selection: EditorOriginFlowSelection | undefined,
 	highlight: EditorOriginFlowHighlight | undefined,
 ) => {
-	if (!highlighted) return selection?.kind === "node" ? SelectionBackgroundOpacity : 0.6;
+	if (!highlighted) return selection?.kind === "node" ? 0 : 0.6;
 	if (selection?.kind !== "node") return 1;
 	return readHighlightOpacity(highlight?.edgeLevels.get(edgeId));
 };
@@ -1773,6 +1781,8 @@ export const EditorOriginFlowCanvas = ({
 			positions,
 			nodeMetrics,
 			backbones,
+			selection,
+			highlight,
 			worldX,
 			worldY,
 			viewport.zoom,

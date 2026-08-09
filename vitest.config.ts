@@ -18,13 +18,6 @@ export default defineConfig({
 		],
 		maxWorkers: 1,
 		pool: "threads",
-		server: {
-			deps: {
-				inline: [
-					"@msagl/core",
-				],
-			},
-		},
 		watch: false,
 	},
 });

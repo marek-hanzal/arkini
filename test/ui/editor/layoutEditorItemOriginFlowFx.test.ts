@@ -122,6 +122,27 @@ const expectOrthogonalRoute = (
 	}
 };
 
+const readLongestHorizontalSegment = (points: ReadonlyArray<EditorItemOriginFlowLayoutPoint>) => {
+	let longest:
+		| {
+				readonly length: number;
+				readonly y: number;
+		  }
+		| undefined;
+	for (let index = 1; index < points.length; index += 1) {
+		const from = points[index - 1]!;
+		const to = points[index]!;
+		if (Math.abs(from.y - to.y) >= 0.01) continue;
+		const length = Math.abs(to.x - from.x);
+		if (longest === undefined || length > longest.length)
+			longest = {
+				length,
+				y: from.y,
+			};
+	}
+	return longest;
+};
+
 describe("layoutEditorItemOriginFlowFx", () => {
 	it("keeps a deterministic forward order independent of input order", () => {
 		const flow: EditorItemOriginFlowLayoutInput = {
@@ -286,6 +307,50 @@ describe("layoutEditorItemOriginFlowFx", () => {
 		expect(backbone[1]!.y).toBeCloseTo(start.y, 5);
 		expect(end.x - backbone.at(-2)!.x).toBeCloseTo(56, 5);
 		expect(backbone.at(-2)!.y).toBeCloseTo(end.y, 5);
+	});
+
+	it("fans overlapping long cables into stable readable lanes", () => {
+		const edges = Array.from(
+			{
+				length: 20,
+			},
+			(_, index) => ({
+				id: `parallel-${index.toString().padStart(2, "0")}`,
+				source: "source",
+				target: "target",
+			}),
+		);
+		const flow: EditorItemOriginFlowLayoutInput = {
+			edges,
+			nodes: [
+				node("source"),
+				node("target"),
+			],
+		};
+		const layout = Effect.runSync(layoutEditorItemOriginFlowFx(flow));
+		const shuffled = Effect.runSync(
+			layoutEditorItemOriginFlowFx({
+				edges: [
+					...edges,
+				].reverse(),
+				nodes: [
+					...flow.nodes,
+				].reverse(),
+			}),
+		);
+
+		expect([
+			...layout.backbones,
+		]).toEqual([
+			...shuffled.backbones,
+		]);
+		const laneYs = edges
+			.map(({ id }) => readLongestHorizontalSegment(layout.backbones.get(id)!)?.y)
+			.filter((value): value is number => value !== undefined)
+			.sort((left, right) => left - right);
+		expect(laneYs).toHaveLength(edges.length);
+		for (let index = 1; index < laneYs.length; index += 1)
+			expect(laneYs[index]! - laneYs[index - 1]!).toBeGreaterThanOrEqual(27.9);
 	});
 
 	it("lays out the official item-only graph with exact embedded-operation ports", async () => {

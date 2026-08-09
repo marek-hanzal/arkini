@@ -758,6 +758,31 @@ const readPortPoint = (
 
 const RouteEscape = 56;
 const RouteDetourGap = 84;
+const RouteLaneSpacing = 28;
+const RouteLaneMinimumOverlap = 56;
+const RouteLaneMaxOffset = 560;
+
+interface OrthogonalRoutePlan {
+	readonly edgeId: string;
+	readonly maximumLaneY?: number;
+	readonly maximumX: number;
+	readonly minimumLaneY?: number;
+	readonly minimumX: number;
+	readonly preferredY: number;
+	readonly source: EditorItemOriginFlowLayoutPoint;
+	readonly sourceEscape: EditorItemOriginFlowLayoutPoint;
+	readonly target: EditorItemOriginFlowLayoutPoint;
+	readonly targetEscape: EditorItemOriginFlowLayoutPoint;
+}
+
+interface RouteLaneInterval {
+	readonly maximum: number;
+	readonly minimum: number;
+}
+
+interface AssignedRouteLane extends RouteLaneInterval {
+	readonly y: number;
+}
 
 const appendRoutePoint = (
 	points: EditorItemOriginFlowLayoutPoint[],
@@ -772,13 +797,13 @@ const appendRoutePoint = (
 		points.push(point);
 };
 
-const readOrthogonalRoute = (
+const readOrthogonalRoutePlan = (
 	source: EditorItemOriginFlowLayoutPoint,
 	target: EditorItemOriginFlowLayoutPoint,
 	sourcePosition: EditorItemOriginFlowLayoutNode,
 	targetPosition: EditorItemOriginFlowLayoutNode,
 	edgeId: string,
-): ReadonlyArray<EditorItemOriginFlowLayoutPoint> => {
+): OrthogonalRoutePlan => {
 	const sourceEscape = {
 		x: source.x + RouteEscape,
 		y: source.y,
@@ -787,51 +812,176 @@ const readOrthogonalRoute = (
 		x: target.x - RouteEscape,
 		y: target.y,
 	};
-	const points: EditorItemOriginFlowLayoutPoint[] = [
-		source,
-	];
-	appendRoutePoint(points, sourceEscape);
 
 	if (sourceEscape.x <= targetEscape.x) {
 		const jitter = deterministicUnit(edgeId, "ortho").y * 28;
 		const minimumY = Math.min(source.y, target.y);
 		const maximumY = Math.max(source.y, target.y);
-		const middleY = Math.max(minimumY, Math.min(maximumY, (source.y + target.y) / 2 + jitter));
-		appendRoutePoint(points, {
-			x: sourceEscape.x,
-			y: middleY,
-		});
-		appendRoutePoint(points, {
-			x: targetEscape.x,
-			y: middleY,
-		});
-	} else {
-		const upperY =
-			Math.min(sourcePosition.y, targetPosition.y) -
-			RouteDetourGap -
-			Math.abs(deterministicUnit(edgeId, "upper").y) * 32;
-		const lowerY =
-			Math.max(
-				sourcePosition.y + sourcePosition.height,
-				targetPosition.y + targetPosition.height,
-			) +
-			RouteDetourGap +
-			Math.abs(deterministicUnit(edgeId, "lower").y) * 32;
-		const upperCost = Math.abs(source.y - upperY) + Math.abs(target.y - upperY);
-		const lowerCost = Math.abs(source.y - lowerY) + Math.abs(target.y - lowerY);
-		const routeY = upperCost <= lowerCost ? upperY : lowerY;
-		appendRoutePoint(points, {
-			x: sourceEscape.x,
-			y: routeY,
-		});
-		appendRoutePoint(points, {
-			x: targetEscape.x,
-			y: routeY,
-		});
+		return {
+			edgeId,
+			maximumX: targetEscape.x,
+			minimumX: sourceEscape.x,
+			preferredY: Math.max(minimumY, Math.min(maximumY, (source.y + target.y) / 2 + jitter)),
+			source,
+			sourceEscape,
+			target,
+			targetEscape,
+		};
 	}
 
-	appendRoutePoint(points, targetEscape);
-	appendRoutePoint(points, target);
+	const upperBoundary = Math.min(sourcePosition.y, targetPosition.y) - RouteDetourGap;
+	const lowerBoundary =
+		Math.max(
+			sourcePosition.y + sourcePosition.height,
+			targetPosition.y + targetPosition.height,
+		) + RouteDetourGap;
+	const upperY = upperBoundary - Math.abs(deterministicUnit(edgeId, "upper").y) * 32;
+	const lowerY = lowerBoundary + Math.abs(deterministicUnit(edgeId, "lower").y) * 32;
+	const upperCost = Math.abs(source.y - upperY) + Math.abs(target.y - upperY);
+	const lowerCost = Math.abs(source.y - lowerY) + Math.abs(target.y - lowerY);
+	return upperCost <= lowerCost
+		? {
+				edgeId,
+				maximumLaneY: upperBoundary,
+				maximumX: sourceEscape.x,
+				minimumX: targetEscape.x,
+				preferredY: upperY,
+				source,
+				sourceEscape,
+				target,
+				targetEscape,
+			}
+		: {
+				edgeId,
+				maximumX: sourceEscape.x,
+				minimumLaneY: lowerBoundary,
+				minimumX: targetEscape.x,
+				preferredY: lowerY,
+				source,
+				sourceEscape,
+				target,
+				targetEscape,
+			};
+};
+
+const readIntervalOverlap = (left: RouteLaneInterval, right: RouteLaneInterval) =>
+	Math.max(0, Math.min(left.maximum, right.maximum) - Math.max(left.minimum, right.minimum));
+
+const intervalsOverlap = (left: RouteLaneInterval, right: RouteLaneInterval) =>
+	readIntervalOverlap(left, right) >= RouteLaneMinimumOverlap;
+
+const laneIsAllowed = (plan: OrthogonalRoutePlan, laneY: number) =>
+	(plan.maximumLaneY === undefined || laneY <= plan.maximumLaneY) &&
+	(plan.minimumLaneY === undefined || laneY >= plan.minimumLaneY);
+
+const readLaneConflictPenalty = (
+	y: number,
+	interval: RouteLaneInterval,
+	conflicts: ReadonlyArray<AssignedRouteLane>,
+) => {
+	let penalty = 0;
+	for (const other of conflicts) {
+		const missingClearance = RouteLaneSpacing - Math.abs(y - other.y);
+		if (missingClearance <= 0) continue;
+		penalty += missingClearance * Math.max(1, readIntervalOverlap(interval, other));
+	}
+	return penalty;
+};
+
+/** Spreads long shared corridors inside a bounded window without querying node obstacles. */
+const readRouteLaneYs = (
+	plans: ReadonlyArray<OrthogonalRoutePlan>,
+): ReadonlyMap<string, number> => {
+	const assigned: AssignedRouteLane[] = [];
+	const laneYByEdgeId = new Map<string, number>();
+	const ordered = [
+		...plans,
+	].sort(
+		(left, right) =>
+			right.maximumX - right.minimumX - (left.maximumX - left.minimumX) ||
+			left.preferredY - right.preferredY ||
+			left.edgeId.localeCompare(right.edgeId),
+	);
+
+	for (const plan of ordered) {
+		const interval = {
+			maximum: plan.maximumX,
+			minimum: plan.minimumX,
+		};
+		const conflicts = assigned.filter((other) => intervalsOverlap(interval, other));
+		const minimumY = Math.max(
+			plan.preferredY - RouteLaneMaxOffset,
+			plan.minimumLaneY ?? Number.NEGATIVE_INFINITY,
+		);
+		const maximumY = Math.min(
+			plan.preferredY + RouteLaneMaxOffset,
+			plan.maximumLaneY ?? Number.POSITIVE_INFINITY,
+		);
+		const clamp = (y: number) => Math.max(minimumY, Math.min(maximumY, y));
+		const candidates = new Set<number>([
+			clamp(plan.preferredY),
+			minimumY,
+			maximumY,
+		]);
+		for (const other of conflicts) {
+			candidates.add(clamp(other.y - RouteLaneSpacing));
+			candidates.add(clamp(other.y + RouteLaneSpacing));
+		}
+		const direction = deterministicUnit(plan.edgeId, "lane").y >= 0 ? 1 : -1;
+		const orderedCandidates = [
+			...candidates,
+		]
+			.filter((y) => Number.isFinite(y) && laneIsAllowed(plan, y))
+			.sort(
+				(left, right) =>
+					Math.abs(left - plan.preferredY) - Math.abs(right - plan.preferredY) ||
+					direction * (right - left),
+			);
+		let routeY = orderedCandidates.find((candidate) =>
+			conflicts.every((other) => Math.abs(candidate - other.y) >= RouteLaneSpacing - 0.01),
+		);
+		if (routeY === undefined) {
+			let bestPenalty = Number.POSITIVE_INFINITY;
+			let bestDistance = Number.POSITIVE_INFINITY;
+			for (const candidate of orderedCandidates) {
+				const penalty = readLaneConflictPenalty(candidate, interval, conflicts);
+				const distance = Math.abs(candidate - plan.preferredY);
+				if (penalty < bestPenalty || (penalty === bestPenalty && distance < bestDistance)) {
+					routeY = candidate;
+					bestPenalty = penalty;
+					bestDistance = distance;
+				}
+			}
+		}
+		if (routeY === undefined)
+			throw new Error(`Could not allocate an orthogonal route lane for ${plan.edgeId}.`);
+		assigned.push({
+			...interval,
+			y: routeY,
+		});
+		laneYByEdgeId.set(plan.edgeId, routeY);
+	}
+	return laneYByEdgeId;
+};
+
+const readOrthogonalRoute = (
+	plan: OrthogonalRoutePlan,
+	routeY: number,
+): ReadonlyArray<EditorItemOriginFlowLayoutPoint> => {
+	const points: EditorItemOriginFlowLayoutPoint[] = [
+		plan.source,
+	];
+	appendRoutePoint(points, plan.sourceEscape);
+	appendRoutePoint(points, {
+		x: plan.sourceEscape.x,
+		y: routeY,
+	});
+	appendRoutePoint(points, {
+		x: plan.targetEscape.x,
+		y: routeY,
+	});
+	appendRoutePoint(points, plan.targetEscape);
+	appendRoutePoint(points, plan.target);
 	return points;
 };
 
@@ -890,7 +1040,7 @@ const runLayout = (flow: EditorItemOriginFlowLayoutInput): EditorItemOriginFlowL
 		});
 	}
 
-	const backbones = new Map<string, ReadonlyArray<EditorItemOriginFlowLayoutPoint>>();
+	const plans: OrthogonalRoutePlan[] = [];
 	for (const edge of [
 		...flow.edges,
 	].sort((left, right) => left.id.localeCompare(right.id))) {
@@ -900,10 +1050,16 @@ const runLayout = (flow: EditorItemOriginFlowLayoutInput): EditorItemOriginFlowL
 		const targetPosition = positions.get(edge.target)!;
 		const source = readPortPoint(sourceNode, sourcePosition, edge.sourcePortId, "source");
 		const target = readPortPoint(targetNode, targetPosition, edge.targetPortId, "target");
-		backbones.set(
-			edge.id,
-			readOrthogonalRoute(source, target, sourcePosition, targetPosition, edge.id),
+		plans.push(
+			readOrthogonalRoutePlan(source, target, sourcePosition, targetPosition, edge.id),
 		);
+	}
+	const laneYs = readRouteLaneYs(plans);
+	const backbones = new Map<string, ReadonlyArray<EditorItemOriginFlowLayoutPoint>>();
+	for (const plan of plans) {
+		const routeY = laneYs.get(plan.edgeId);
+		if (routeY === undefined) throw new Error(`Missing route lane for ${plan.edgeId}.`);
+		backbones.set(plan.edgeId, readOrthogonalRoute(plan, routeY));
 	}
 	return {
 		backbones,

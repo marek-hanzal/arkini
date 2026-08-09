@@ -5,6 +5,7 @@ import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("@effect/atom-react", () => ({
+	scheduleTask: vi.fn(),
 	useAtomSet: () => vi.fn(),
 	useAtomValue: () => undefined,
 }));

@@ -12,20 +12,38 @@ export namespace EditorWelcomeCommandAtom {
 	export type Command =
 		| {
 				readonly action: "create";
-				readonly navigateFx: (
-					project: EditorProjectDescriptor,
-				) => Effect.Effect<void, unknown>;
 		  }
 		| {
 				readonly action: "exit";
-				readonly navigateFx: Effect.Effect<void, unknown>;
 		  }
 		| {
 				readonly action: "import";
 				readonly file: File;
-				readonly navigateFx: (
-					project: EditorProjectDescriptor,
-				) => Effect.Effect<void, unknown>;
+		  };
+
+	export type NavigationEvent =
+		| {
+				readonly action: "navigation-started";
+		  }
+		| {
+				readonly action: "navigation-complete";
+		  }
+		| {
+				readonly action: "navigation-failed";
+				readonly error: unknown;
+		  };
+
+	export type Input = Command | NavigationEvent;
+
+	export type ReadyState =
+		| {
+				readonly kind: "ready";
+				readonly action: "create" | "import";
+				readonly project: EditorProjectDescriptor;
+		  }
+		| {
+				readonly kind: "ready";
+				readonly action: "exit";
 		  };
 
 	export type State =
@@ -34,6 +52,11 @@ export namespace EditorWelcomeCommandAtom {
 		  }
 		| {
 				readonly kind: "pending";
+				readonly action: Action;
+		  }
+		| ReadyState
+		| {
+				readonly kind: "navigating";
 				readonly action: Action;
 		  }
 		| {
@@ -49,16 +72,17 @@ const EditorWelcomeCommandStateAtom = Atom.make<EditorWelcomeCommandAtom.State>(
 const EditorWelcomeCommandRunnerAtom = Atom.fn(
 	(command: EditorWelcomeCommandAtom.Command, get) =>
 		Effect.gen(function* () {
+			if (command.action === "exit") {
+				yield* Atom.set(EditorWelcomeCommandStateAtom, {
+					kind: "ready",
+					action: "exit",
+				});
+				return;
+			}
 			const operation =
-				command.action === "exit"
-					? command.navigateFx
-					: command.action === "create"
-						? get
-								.setResult(createFreshEditorProjectAtom, undefined)
-								.pipe(Effect.flatMap(command.navigateFx))
-						: get
-								.setResult(importEditorArkpackFileAtom, command.file)
-								.pipe(Effect.flatMap(command.navigateFx));
+				command.action === "create"
+					? get.setResult(createFreshEditorProjectAtom, undefined)
+					: get.setResult(importEditorArkpackFileAtom, command.file);
 			const result = yield* Effect.exit(operation);
 			if (Exit.isFailure(result)) {
 				if (Cause.hasInterruptsOnly(result.cause)) {
@@ -72,7 +96,9 @@ const EditorWelcomeCommandRunnerAtom = Atom.fn(
 				return;
 			}
 			yield* Atom.set(EditorWelcomeCommandStateAtom, {
-				kind: "idle",
+				kind: "ready",
+				action: command.action,
+				project: result.value,
 			});
 		}),
 	{
@@ -80,15 +106,42 @@ const EditorWelcomeCommandRunnerAtom = Atom.fn(
 	},
 ).pipe(Atom.keepAlive);
 
+const isCommandActive = (state: EditorWelcomeCommandAtom.State) =>
+	state.kind === "pending" || state.kind === "ready" || state.kind === "navigating";
+
 /** Owns one synchronous editor-welcome command across React remounts. */
 export const EditorWelcomeCommandAtom = Atom.writable(
 	(get) => get(EditorWelcomeCommandStateAtom),
-	(context, command: EditorWelcomeCommandAtom.Command) => {
-		if (context.get(EditorWelcomeCommandStateAtom).kind === "pending") return;
+	(context, input: EditorWelcomeCommandAtom.Input) => {
+		const state = context.get(EditorWelcomeCommandStateAtom);
+		if (input.action === "navigation-started") {
+			if (state.kind !== "ready") return;
+			context.set(EditorWelcomeCommandStateAtom, {
+				kind: "navigating",
+				action: state.action,
+			});
+			return;
+		}
+		if (input.action === "navigation-complete") {
+			if (state.kind !== "navigating") return;
+			context.set(EditorWelcomeCommandStateAtom, {
+				kind: "idle",
+			});
+			return;
+		}
+		if (input.action === "navigation-failed") {
+			if (state.kind !== "navigating") return;
+			context.set(EditorWelcomeCommandStateAtom, {
+				kind: "error",
+				error: input.error,
+			});
+			return;
+		}
+		if (isCommandActive(state)) return;
 		context.set(EditorWelcomeCommandStateAtom, {
 			kind: "pending",
-			action: command.action,
+			action: input.action,
 		});
-		context.set(EditorWelcomeCommandRunnerAtom, command);
+		context.set(EditorWelcomeCommandRunnerAtom, input);
 	},
 ).pipe(Atom.keepAlive);

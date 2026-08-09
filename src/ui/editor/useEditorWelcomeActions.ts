@@ -1,44 +1,67 @@
 import { useAtom } from "@effect/atom-react";
 import { useNavigate } from "@tanstack/react-router";
-import { Effect } from "effect";
 import { useCallback, useEffect } from "react";
 
-import type { EditorProjectDescriptor } from "~/bridge/editor/EditorProjectDescriptor";
 import { EditorWelcomeCommandAtom } from "~/ui/editor/EditorWelcomeCommandAtom";
 
 /** Owns editor-welcome navigation composition and Escape lifecycle. */
 export const useEditorWelcomeActions = () => {
 	const navigate = useNavigate();
 	const [state, runCommand] = useAtom(EditorWelcomeCommandAtom);
-	const active = state.kind === "pending" ? state.action : null;
+	const active =
+		state.kind === "pending" || state.kind === "ready" || state.kind === "navigating"
+			? state.action
+			: null;
 	const blocked = active !== null;
-	const openProjectSettingsFx = useCallback(
-		(project: EditorProjectDescriptor) =>
-			Effect.tryPromise({
-				try: () =>
-					navigate({
-						to: "/editor/$projectId/project/$sectionId",
-						params: {
-							projectId: project.projectId,
-							sectionId: "general",
-						},
-					}),
-				catch: (cause) => cause,
-			}),
-		[
-			navigate,
-		],
-	);
+
+	useEffect(() => {
+		if (state.kind !== "ready") return;
+		runCommand({
+			action: "navigation-started",
+		});
+		const navigation =
+			state.action === "exit"
+				? navigate({
+						to: "/main-menu",
+					})
+				: state.action === "create"
+					? navigate({
+							to: "/editor/$projectId/project/$sectionId",
+							params: {
+								projectId: state.project.projectId,
+								sectionId: "general",
+							},
+						})
+					: navigate({
+							to: "/editor/$projectId/editor/items/list",
+							params: {
+								projectId: state.project.projectId,
+							},
+						});
+		void navigation.then(
+			() =>
+				runCommand({
+					action: "navigation-complete",
+				}),
+			(error: unknown) =>
+				runCommand({
+					action: "navigation-failed",
+					error,
+				}),
+		);
+	}, [
+		navigate,
+		runCommand,
+		state,
+	]);
 
 	const createProject = useCallback(() => {
 		if (blocked) return;
 		runCommand({
 			action: "create",
-			navigateFx: openProjectSettingsFx,
 		});
 	}, [
 		blocked,
-		openProjectSettingsFx,
 		runCommand,
 	]);
 
@@ -48,22 +71,10 @@ export const useEditorWelcomeActions = () => {
 			runCommand({
 				action: "import",
 				file,
-				navigateFx: (project: EditorProjectDescriptor) =>
-					Effect.tryPromise({
-						try: () =>
-							navigate({
-								to: "/editor/$projectId/editor/items/list",
-								params: {
-									projectId: project.projectId,
-								},
-							}),
-						catch: (cause) => cause,
-					}),
 			});
 		},
 		[
 			blocked,
-			navigate,
 			runCommand,
 		],
 	);
@@ -72,17 +83,9 @@ export const useEditorWelcomeActions = () => {
 		if (blocked) return;
 		runCommand({
 			action: "exit",
-			navigateFx: Effect.tryPromise({
-				try: () =>
-					navigate({
-						to: "/main-menu",
-					}),
-				catch: (cause) => cause,
-			}),
 		});
 	}, [
 		blocked,
-		navigate,
 		runCommand,
 	]);
 

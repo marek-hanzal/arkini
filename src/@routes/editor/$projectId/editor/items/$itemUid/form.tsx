@@ -2,9 +2,10 @@ import { createFileRoute, Outlet, useParams } from "@tanstack/react-router";
 
 import { EditorItemTypeSchema, type EditorItemType } from "~/bridge/item/editor/EditorItemModel";
 import { EditorItemFormPage } from "~/page/editor/EditorItemFormPage";
-import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
-import type { EditorItemOptionalCapability } from "~/ui/item/editor/EditorItemSections";
-import { parseEditorItemSectionIdFx } from "~/ui/item/editor/parseEditorItemSectionIdFx";
+import {
+	type EditorItemOptionalCapability,
+	type EditorItemSectionId,
+} from "~/ui/item/editor/EditorItemSections";
 
 interface EditorItemFormSearch {
 	readonly enable?: EditorItemOptionalCapability;
@@ -33,15 +34,14 @@ function EditorItemFormRoute() {
 	const params = useParams({
 		strict: false,
 	});
+	const sectionId = (
+		typeof params.sectionId === "string" ? params.sectionId : "identity"
+	) as EditorItemSectionId;
 	return (
 		<EditorItemFormPage
 			enableCapability={enable}
 			itemType={itemType}
-			sectionId={RendererRuntime.runSync(
-				parseEditorItemSectionIdFx(
-					typeof params.sectionId === "string" ? params.sectionId : "identity",
-				),
-			)}
+			sectionId={sectionId}
 			uid={itemUid}
 		>
 			<Outlet />

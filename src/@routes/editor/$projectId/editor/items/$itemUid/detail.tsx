@@ -1,8 +1,7 @@
 import { createFileRoute, Outlet, useParams } from "@tanstack/react-router";
 
+import type { EditorItemSectionId } from "~/ui/item/editor/EditorItemSections";
 import { EditorItemDetail } from "~/ui/item/editor/EditorItemDetail";
-import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
-import { parseEditorItemSectionIdFx } from "~/ui/item/editor/parseEditorItemSectionIdFx";
 
 export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/detail")({
 	component: EditorItemDetailRoute,
@@ -13,11 +12,9 @@ function EditorItemDetailRoute() {
 	const params = useParams({
 		strict: false,
 	});
-	const sectionId = RendererRuntime.runSync(
-		parseEditorItemSectionIdFx(
-			typeof params.sectionId === "string" ? params.sectionId : "identity",
-		),
-	);
+	const sectionId = (
+		typeof params.sectionId === "string" ? params.sectionId : "identity"
+	) as EditorItemSectionId;
 	return (
 		<EditorItemDetail
 			sectionId={sectionId}

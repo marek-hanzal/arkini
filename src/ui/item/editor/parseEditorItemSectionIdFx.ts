@@ -7,10 +7,10 @@ import {
 
 /** Parses one explicit item section route segment. */
 export const parseEditorItemSectionIdFx = Effect.fn("parseEditorItemSectionIdFx")(
-	(candidate: string) =>
-		Effect.sync((): EditorItemSectionId => {
-			const section = EditorItemSectionIds.find((id) => id === candidate);
-			if (section === undefined) throw new Error(`Unknown editor item section ${candidate}.`);
-			return section;
-		}),
+	(candidate: string): Effect.Effect<EditorItemSectionId, Error> => {
+		const section = EditorItemSectionIds.find((id) => id === candidate);
+		return section === undefined
+			? Effect.fail(new Error(`Unknown editor item section ${candidate}.`))
+			: Effect.succeed(section);
+	},
 );

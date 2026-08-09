@@ -12,6 +12,7 @@ import {
 	type readTileDropPreviewFx as ReadTileDropPreviewFx,
 } from "~/bridge/tile/readTileDropPreviewFx";
 import type { runTileDropAtom } from "~/bridge/tile/runTileDropAtom";
+import { PointerDragThreshold } from "~/ui/drag/PointerDragThreshold";
 import type { PixiInventoryActorStore } from "~/ui/pixi/actor/PixiInventoryActorStore";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
 import { readPixiTileActorCursorFx } from "~/ui/pixi/actor/readPixiTileActorCursorFx";
@@ -60,7 +61,6 @@ interface ActiveInventoryDrag {
 	target: PixiInventoryDropTarget | null;
 }
 
-const dragThreshold = 6;
 const expectedActivationFailureTags = new Set([
 	"InventoryOpenerUnavailableError",
 	"ItemLocationConflictError",
@@ -321,7 +321,8 @@ export const createPixiInventoryDragControllerFx = Effect.fn("createPixiInventor
 			const pointer = readPixiDragPointerOffset(event, activeDrag);
 			if (pointer === null) return;
 			const { drag, offsetX, offsetY } = pointer;
-			if (drag.phase === "pressed" && Math.hypot(offsetX, offsetY) < dragThreshold) return;
+			if (drag.phase === "pressed" && Math.hypot(offsetX, offsetY) < PointerDragThreshold)
+				return;
 			if (drag.phase === "pressed" && drag.openDetail) {
 				releasePointerCapture(drag.pointerId);
 				activeDrag = null;

@@ -8,6 +8,7 @@ import type { TileActorItem } from "~/bridge/tile/TileActorItem";
 import { isSameTileActorLocation } from "~/bridge/tile/isSameTileActorLocation";
 import { DropItemResultKindEnumSchema } from "~/bridge/tile/DropItemResultKindEnumSchema";
 import { readTileDropPreviewFx } from "~/bridge/tile/readTileDropPreviewFx";
+import { PointerDragThreshold } from "~/ui/drag/PointerDragThreshold";
 import type { PixiMainSceneActorStore } from "~/ui/pixi/actor/PixiMainSceneActorStore";
 import type { PixiTileActor } from "~/ui/pixi/actor/PixiTileActor";
 import { readPixiTileActorCursorFx } from "~/ui/pixi/actor/readPixiTileActorCursorFx";
@@ -50,8 +51,6 @@ export namespace createPixiMainSceneDragControllerFx {
 		readonly surface: PixiMainSceneSurface;
 	}
 }
-
-const dragThreshold = 6;
 
 interface PixiDragPointerSample {
 	readonly pointerId: number;
@@ -501,7 +500,7 @@ export const createPixiMainSceneDragControllerFx = Effect.fn("createPixiMainScen
 				return;
 			}
 			thresholdCrossed =
-				Math.hypot(sample.x - drag.pressX, sample.y - drag.pressY) >= dragThreshold;
+				Math.hypot(sample.x - drag.pressX, sample.y - drag.pressY) >= PointerDragThreshold;
 		};
 
 		const recoverPointerFailure = (cause: unknown, fallbackDrag?: PixiMainSceneActiveDrag) => {

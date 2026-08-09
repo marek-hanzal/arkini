@@ -22,6 +22,31 @@ export const EditorProjectBoardSection = () => {
 		startBoard.findIndex(
 			(entry) => entry.space === currentSpace && entry.x === x && entry.y === y,
 		);
+
+	const moveStack = (sourceX: number, sourceY: number, targetX: number, targetY: number) => {
+		if (sourceX === targetX && sourceY === targetY) return;
+		const sourceIndex = findIndex(sourceX, sourceY);
+		const source = startBoard[sourceIndex];
+		if (source === undefined) return;
+		form.setFieldValue(
+			"start.board",
+			startBoard.flatMap((entry, index) => {
+				if (index === sourceIndex)
+					return [
+						{
+							...entry,
+							x: targetX,
+							y: targetY,
+						},
+					];
+				if (entry.space === currentSpace && entry.x === targetX && entry.y === targetY)
+					return [];
+				return [
+					entry,
+				];
+			}),
+		);
+	};
 	return (
 		<div className="grid gap-6">
 			<EditorFormSection
@@ -56,6 +81,7 @@ export const EditorProjectBoardSection = () => {
 					height={height}
 					scope="board"
 					width={width}
+					onMove={moveStack}
 					onSet={(x, y, itemId) =>
 						form.setFieldValue("start.board", [
 							...startBoard,

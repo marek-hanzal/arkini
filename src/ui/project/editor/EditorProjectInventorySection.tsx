@@ -17,6 +17,32 @@ export const EditorProjectInventorySection = () => {
 	}));
 	const findIndex = (x: number, y: number) =>
 		startInventory.findIndex((entry) => entry.position.x === x && entry.position.y === y);
+
+	const moveStack = (sourceX: number, sourceY: number, targetX: number, targetY: number) => {
+		if (sourceX === targetX && sourceY === targetY) return;
+		const sourceIndex = findIndex(sourceX, sourceY);
+		const source = startInventory[sourceIndex];
+		if (source === undefined) return;
+		form.setFieldValue(
+			"start.inventory",
+			startInventory.flatMap((entry, index) => {
+				if (index === sourceIndex)
+					return [
+						{
+							...entry,
+							position: {
+								x: targetX,
+								y: targetY,
+							},
+						},
+					];
+				if (entry.position.x === targetX && entry.position.y === targetY) return [];
+				return [
+					entry,
+				];
+			}),
+		);
+	};
 	return (
 		<div className="grid gap-6">
 			<EditorFormSection
@@ -51,6 +77,7 @@ export const EditorProjectInventorySection = () => {
 					height={height}
 					scope="inventory"
 					width={width}
+					onMove={moveStack}
 					onSet={(x, y, itemId) =>
 						form.setFieldValue("start.inventory", [
 							...startInventory,

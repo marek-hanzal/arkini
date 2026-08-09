@@ -75,6 +75,7 @@ const renderGrid = async ({
 	cells = [],
 	onDecrement = vi.fn(),
 	onIncrement = vi.fn(),
+	onMove = vi.fn(),
 	onSet = vi.fn(),
 }: {
 	readonly cells?: ReadonlyArray<{
@@ -85,6 +86,9 @@ const renderGrid = async ({
 	}>;
 	readonly onDecrement?: ReturnType<typeof vi.fn<(x: number, y: number) => void>>;
 	readonly onIncrement?: ReturnType<typeof vi.fn<(x: number, y: number) => void>>;
+	readonly onMove?: ReturnType<
+		typeof vi.fn<(sourceX: number, sourceY: number, targetX: number, targetY: number) => void>
+	>;
 	readonly onSet?: ReturnType<typeof vi.fn<(x: number, y: number, itemId: string) => void>>;
 } = {}) => {
 	const container = document.createElement("div");
@@ -98,6 +102,7 @@ const renderGrid = async ({
 				height={1}
 				onDecrement={onDecrement}
 				onIncrement={onIncrement}
+				onMove={onMove}
 				onSet={onSet}
 				scope="board"
 				width={2}
@@ -108,8 +113,41 @@ const renderGrid = async ({
 		container,
 		onDecrement,
 		onIncrement,
+		onMove,
 		onSet,
 	};
+};
+
+const dispatchPointer = (
+	target: EventTarget,
+	type: "pointerdown" | "pointermove" | "pointerup",
+	{
+		altKey = false,
+		clientX = 0,
+		clientY = 0,
+		metaKey = false,
+		pointerId = 1,
+	}: {
+		readonly altKey?: boolean;
+		readonly clientX?: number;
+		readonly clientY?: number;
+		readonly metaKey?: boolean;
+		readonly pointerId?: number;
+	} = {},
+) => {
+	const event = new MouseEvent(type, {
+		altKey,
+		bubbles: true,
+		button: 0,
+		cancelable: true,
+		clientX,
+		clientY,
+		metaKey,
+	});
+	Object.defineProperty(event, "pointerId", {
+		value: pointerId,
+	});
+	target.dispatchEvent(event);
 };
 
 describe("EditorProjectStartGrid", () => {
@@ -130,6 +168,79 @@ describe("EditorProjectStartGrid", () => {
 
 		expect(onSet).toHaveBeenCalledWith(0, 0, "wood");
 		expect(container.querySelector('[data-ui="MockStartPicker"]')).toBeNull();
+	});
+
+	it.each([
+		{
+			label: "Alt",
+			modifier: {
+				altKey: true,
+			},
+		},
+		{
+			label: "Cmd",
+			modifier: {
+				metaKey: true,
+			},
+		},
+	])("moves a whole stack with $label drag onto an occupied slot", async ({ modifier }) => {
+		const onMove =
+			vi.fn<(sourceX: number, sourceY: number, targetX: number, targetY: number) => void>();
+		const onIncrement = vi.fn<(x: number, y: number) => void>();
+		const { container } = await renderGrid({
+			cells: [
+				{
+					itemId: "wood",
+					quantity: 2,
+					x: 0,
+					y: 0,
+				},
+				{
+					itemId: "wood",
+					quantity: 3,
+					x: 1,
+					y: 0,
+				},
+			],
+			onIncrement,
+			onMove,
+		});
+		const source = container.querySelector<HTMLButtonElement>(
+			'button[data-start-grid-cell][data-x="0"]',
+		);
+		const target = container.querySelector<HTMLButtonElement>(
+			'button[data-start-grid-cell][data-x="1"]',
+		);
+		if (source === null || target === null) throw new Error("Missing drag fixture slots.");
+
+		await act(async () => {
+			dispatchPointer(source, "pointerdown", {
+				...modifier,
+				clientX: 10,
+				clientY: 10,
+			});
+			dispatchPointer(target, "pointermove", {
+				...modifier,
+				clientX: 30,
+				clientY: 10,
+			});
+		});
+
+		expect(
+			container.querySelector('[data-ui="EditorProjectStartGridDragPreview"]'),
+		).not.toBeNull();
+		expect(target.className).toContain("ring-2");
+
+		await act(async () => {
+			dispatchPointer(target, "pointerup", {
+				clientX: 30,
+				clientY: 10,
+			});
+		});
+
+		expect(onMove).toHaveBeenCalledWith(0, 0, 1, 0);
+		expect(onIncrement).not.toHaveBeenCalled();
+		expect(container.querySelector('[data-ui="EditorProjectStartGridDragPreview"]')).toBeNull();
 	});
 
 	it("increments with left click, decrements with right click, and respects max stack", async () => {

@@ -16,6 +16,32 @@ export const EditorProjectToolbarSection = () => {
 	}));
 	const findIndex = (x: number) =>
 		startToolbar.findIndex((entry) => entry.position.x === x && entry.position.y === 0);
+
+	const moveStack = (sourceX: number, _sourceY: number, targetX: number) => {
+		if (sourceX === targetX) return;
+		const sourceIndex = findIndex(sourceX);
+		const source = startToolbar[sourceIndex];
+		if (source === undefined) return;
+		form.setFieldValue(
+			"start.toolbar",
+			startToolbar.flatMap((entry, index) => {
+				if (index === sourceIndex)
+					return [
+						{
+							...entry,
+							position: {
+								x: targetX,
+								y: 0,
+							},
+						},
+					];
+				if (entry.position.x === targetX && entry.position.y === 0) return [];
+				return [
+					entry,
+				];
+			}),
+		);
+	};
 	return (
 		<div className="grid gap-6">
 			<EditorFormSection
@@ -44,6 +70,7 @@ export const EditorProjectToolbarSection = () => {
 						height={1}
 						scope="toolbar"
 						width={size}
+						onMove={moveStack}
 						onSet={(x, _y, itemId) =>
 							form.setFieldValue("start.toolbar", [
 								...startToolbar,

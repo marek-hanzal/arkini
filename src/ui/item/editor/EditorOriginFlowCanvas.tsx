@@ -29,6 +29,7 @@ import {
 } from "~/ui/item/editor/readEditorOriginFlowHighlightFx";
 import { readEditorOriginFlowNavigationFx } from "~/ui/item/editor/readEditorOriginFlowNavigationFx";
 import { readEditorOriginFlowRelationNavigationFx } from "~/ui/item/editor/readEditorOriginFlowRelationNavigationFx";
+import { readEditorOriginFlowMetroBackbonesFx } from "~/ui/item/editor/readEditorOriginFlowMetroBackbonesFx";
 import { EditorOriginFlowShortcutHelp } from "~/ui/item/editor/EditorOriginFlowShortcutHelp";
 import {
 	type EditorOriginFlowConnectedPorts,
@@ -89,6 +90,7 @@ interface RenderState {
 	readonly edgeBounds: ReadonlyMap<string, Bounds>;
 	readonly highlightedEdgeColors: ReadonlyMap<string, string>;
 	readonly highlightedPortColors: ReadonlyMap<string, ReadonlyMap<string, string>>;
+	readonly metroBackbones: ReadonlyMap<string, ReadonlyArray<EditorItemOriginFlowLayoutPoint>>;
 	readonly selection: EditorOriginFlowSelection | undefined;
 }
 
@@ -104,7 +106,7 @@ const FitPaddingRatio = 0.12;
 const ClickThreshold = 5;
 const EdgeHitRadiusPx = 9;
 const PortHitRadiusPx = 11;
-const EdgeCullPaddingPx = 32;
+const EdgeCullPaddingPx = 64;
 const MaxCachedImages = 96;
 const HighlightMinimumOpacity = 0.28;
 const HighlightOpacityStep = 0.12;
@@ -1099,6 +1101,7 @@ const hitTest = (
 	positions: ReadonlyMap<string, EditorItemOriginFlowLayoutNode>,
 	nodeMetrics: ReadonlyMap<string, EditorOriginFlowNodeMetrics>,
 	backbones: ReadonlyMap<string, ReadonlyArray<EditorItemOriginFlowLayoutPoint>>,
+	metroBackbones: ReadonlyMap<string, ReadonlyArray<EditorItemOriginFlowLayoutPoint>>,
 	selection: EditorOriginFlowSelection | undefined,
 	highlight: EditorOriginFlowHighlight | undefined,
 	x: number,
@@ -1170,14 +1173,21 @@ const hitTest = (
 			};
 	}
 	const tolerance = EdgeHitRadiusPx / zoom;
-	for (const edge of flow.edges) {
-		if (!isEdgeRelevant(edge.id)) continue;
-		const backbone = backbones.get(edge.id);
-		if (backbone === undefined || distanceToRoute(x, y, backbone) > tolerance) continue;
-		return {
-			id: edge.id,
-			kind: "edge",
-		};
+	for (const metroFirst of [
+		true,
+		false,
+	]) {
+		for (const edge of flow.edges) {
+			if (!isEdgeRelevant(edge.id)) continue;
+			const metroBackbone = metroBackbones.get(edge.id);
+			if ((metroBackbone !== undefined) !== metroFirst) continue;
+			const backbone = metroBackbone ?? backbones.get(edge.id);
+			if (backbone === undefined || distanceToRoute(x, y, backbone) > tolerance) continue;
+			return {
+				id: edge.id,
+				kind: "edge",
+			};
+		}
 	}
 	return undefined;
 };
@@ -1301,6 +1311,18 @@ export const EditorOriginFlowCanvas = ({
 			highlight,
 		],
 	);
+	const metroBackbones = useMemo(
+		() =>
+			RendererRuntime.runSync(
+				readEditorOriginFlowMetroBackbonesFx(backbones, [
+					...highlightedEdgeColors.keys(),
+				]),
+			),
+		[
+			backbones,
+			highlightedEdgeColors,
+		],
+	);
 	const highlightedPortColors = useMemo(
 		() => readHighlightedPortColors(flow, highlightedEdgeColors),
 		[
@@ -1372,6 +1394,7 @@ export const EditorOriginFlowCanvas = ({
 		edgeBounds,
 		highlightedEdgeColors,
 		highlightedPortColors,
+		metroBackbones,
 		selection,
 	});
 	renderStateRef.current = {
@@ -1387,6 +1410,7 @@ export const EditorOriginFlowCanvas = ({
 		edgeBounds,
 		highlightedEdgeColors,
 		highlightedPortColors,
+		metroBackbones,
 		selection,
 	};
 
@@ -1456,9 +1480,13 @@ export const EditorOriginFlowCanvas = ({
 			for (const edge of state.flow.edges) {
 				const highlightColor = state.highlightedEdgeColors.get(edge.id);
 				if ((highlightColor !== undefined) !== highlighted) continue;
-				const backbone = state.backbones.get(edge.id);
-				if (backbone === undefined)
+				const routedBackbone = state.backbones.get(edge.id);
+				if (routedBackbone === undefined)
 					throw new Error(`Missing routed backbone for ${edge.id}.`);
+				const backbone =
+					highlightColor === undefined
+						? routedBackbone
+						: (state.metroBackbones.get(edge.id) ?? routedBackbone);
 				const bounds = state.edgeBounds.get(edge.id);
 				if (bounds === undefined) throw new Error(`Missing edge bounds for ${edge.id}.`);
 				if (!isEdgeVisible(bounds, visibleEdges)) continue;
@@ -1781,6 +1809,7 @@ export const EditorOriginFlowCanvas = ({
 			positions,
 			nodeMetrics,
 			backbones,
+			metroBackbones,
 			selection,
 			highlight,
 			worldX,

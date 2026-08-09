@@ -3,12 +3,11 @@ import { Effect } from "effect";
 import { resolveItemFx } from "~/engine/item/fx/resolveItemFx";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 import { planInventoryPlacementFx } from "~/engine/placement/fx/planInventoryPlacementFx";
-import { planSpawnPlacementFx } from "~/engine/placement/fx/planSpawnPlacementFx";
 import { readPlacementPlanQuantityFx } from "~/engine/placement/fx/readPlacementPlanQuantityFx";
 import type { PlacementPlanSchema } from "~/engine/placement/schema/PlacementPlanSchema";
+import { planStartExactGridStackFx } from "~/engine/start/fx/planStartExactGridStackFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { StartInventoryUnavailableError } from "~/engine/start/error/StartInventoryUnavailableError";
-import { StartSlotUnavailableError } from "~/engine/start/error/StartSlotUnavailableError";
 import type { InventoryItemSchema } from "~/engine/start/schema/InventoryItemSchema";
 
 export namespace planStartInventoryItemFx {
@@ -25,45 +24,29 @@ export const planStartInventoryItemFx = Effect.fn("planStartInventoryItemFx")(fu
 	item: startItem,
 	runtime,
 }: planStartInventoryItemFx.Props) {
+	if (startItem.position !== undefined) {
+		return yield* planStartExactGridStackFx({
+			itemId: startItem.itemId,
+			location: {
+				position: startItem.position,
+				scope: LocationScopeEnumSchema.enum.Inventory,
+			},
+			quantity: startItem.quantity,
+		});
+	}
 	const item = yield* resolveItemFx({
 		itemId: startItem.itemId,
 	});
-	const plan =
-		startItem.position === undefined
-			? yield* planInventoryPlacementFx({
-					item,
-					quantity: startItem.quantity,
-					runtime,
-				})
-			: ({
-					remove: [],
-					spawn: yield* planSpawnPlacementFx({
-						item,
-						locations: [
-							{
-								position: startItem.position,
-								scope: LocationScopeEnumSchema.enum.Inventory,
-							},
-						],
-						quantity: startItem.quantity,
-					}),
-					stack: [],
-				} satisfies PlacementPlanSchema.Type);
+	const plan = yield* planInventoryPlacementFx({
+		item,
+		quantity: startItem.quantity,
+		runtime,
+	});
 	const placedQuantity = yield* readPlacementPlanQuantityFx({
 		plan,
 	});
 	const remainingQuantity = startItem.quantity - placedQuantity;
 	if (remainingQuantity > 0) {
-		if (startItem.position !== undefined) {
-			return yield* Effect.fail(
-				new StartSlotUnavailableError({
-					itemId: startItem.itemId,
-					quantity: startItem.quantity,
-					remainingQuantity,
-					scope: LocationScopeEnumSchema.enum.Inventory,
-				}),
-			);
-		}
 		return yield* Effect.fail(
 			new StartInventoryUnavailableError({
 				itemId: startItem.itemId,

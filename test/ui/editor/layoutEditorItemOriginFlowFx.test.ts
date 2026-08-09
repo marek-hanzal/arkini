@@ -106,6 +106,22 @@ const overlaps = (left: EditorItemOriginFlowLayoutNode, right: EditorItemOriginF
 	left.y < right.y + right.height &&
 	left.y + left.height > right.y;
 
+const expectOrthogonalRoute = (
+	points: ReadonlyArray<{
+		readonly x: number;
+		readonly y: number;
+	}>,
+) => {
+	expect(points.length).toBeGreaterThanOrEqual(4);
+	for (let index = 1; index < points.length; index += 1) {
+		const previous = points[index - 1]!;
+		const current = points[index]!;
+		expect(
+			Math.abs(previous.x - current.x) < 0.01 || Math.abs(previous.y - current.y) < 0.01,
+		).toBe(true);
+	}
+};
+
 describe("layoutEditorItemOriginFlowFx", () => {
 	it("keeps a deterministic forward order independent of input order", () => {
 		const flow: EditorItemOriginFlowLayoutInput = {
@@ -148,7 +164,7 @@ describe("layoutEditorItemOriginFlowFx", () => {
 			layout.positions.get("c")!.flowOrder,
 		);
 		for (const backbone of layout.backbones.values()) {
-			expect(backbone.length).toBeGreaterThan(1);
+			expectOrthogonalRoute(backbone);
 			for (const point of backbone) expectFinitePoint(point);
 		}
 	});
@@ -175,7 +191,7 @@ describe("layoutEditorItemOriginFlowFx", () => {
 		expect(layout.positions.size).toBe(5);
 		expect(layout.backbones.size).toBe(4);
 		for (const backbone of layout.backbones.values()) {
-			expect(backbone.length).toBeGreaterThan(1);
+			expectOrthogonalRoute(backbone);
 			for (const point of backbone) expectFinitePoint(point);
 		}
 		for (const position of layout.positions.values()) {
@@ -265,6 +281,11 @@ describe("layoutEditorItemOriginFlowFx", () => {
 		expect(start.y).toBeCloseTo(source.y + source.height / 2 + 62, 5);
 		expect(end.x).toBeCloseTo(target.x, 5);
 		expect(end.y).toBeCloseTo(target.y + target.height / 2 - 118, 5);
+		expectOrthogonalRoute(backbone);
+		expect(backbone[1]!.x - start.x).toBeCloseTo(56, 5);
+		expect(backbone[1]!.y).toBeCloseTo(start.y, 5);
+		expect(end.x - backbone.at(-2)!.x).toBeCloseTo(56, 5);
+		expect(backbone.at(-2)!.y).toBeCloseTo(end.y, 5);
 	});
 
 	it("lays out the official item-only graph with exact embedded-operation ports", async () => {
@@ -300,7 +321,7 @@ describe("layoutEditorItemOriginFlowFx", () => {
 		expect(bounds.width / bounds.height).toBeGreaterThan(0.8);
 		expect(bounds.width / bounds.height).toBeLessThan(1.5);
 		for (const backbone of layout.backbones.values()) {
-			expect(backbone).toHaveLength(4);
+			expectOrthogonalRoute(backbone);
 			for (const point of backbone) expectFinitePoint(point);
 		}
 

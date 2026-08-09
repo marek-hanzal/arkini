@@ -44,7 +44,7 @@ export interface EditorItemOriginFlowLayoutPoint {
 }
 
 export interface EditorItemOriginFlowLayout {
-	/** Four points encode one cubic Bézier: start, control1, control2, end. */
+	/** Orthogonal port-to-port routes with explicit terminal escape segments. */
 	readonly backbones: ReadonlyMap<string, ReadonlyArray<EditorItemOriginFlowLayoutPoint>>;
 	readonly positions: ReadonlyMap<string, EditorItemOriginFlowLayoutNode>;
 }
@@ -86,10 +86,10 @@ interface MutableNodePosition {
 
 const LayoutMargin = 96;
 const RandomSeed = 0x4444bbbb;
-const HorizontalScale = 2.1;
-const VerticalScale = 0.9;
-const RankShift = 260;
-const OverlapGap = 26;
+const HorizontalScale = 2.2;
+const VerticalScale = 0.95;
+const RankShift = 280;
+const OverlapGap = 32;
 const OverlapIterations = 1800;
 const OverlapTolerance = 0.2;
 const CommunityMinimumSize = 3;
@@ -699,7 +699,7 @@ const runFcose = (
 						? 7000
 						: 7000 * (1 + 5 * profile.importance ** 1.4);
 				},
-				nodeSeparation: 120,
+				nodeSeparation: 140,
 				numIter: 5000,
 				packComponents: false,
 				quality: "default",
@@ -756,44 +756,83 @@ const readPortPoint = (
 	};
 };
 
-const readCubicRoute = (
+const RouteEscape = 56;
+const RouteDetourGap = 84;
+
+const appendRoutePoint = (
+	points: EditorItemOriginFlowLayoutPoint[],
+	point: EditorItemOriginFlowLayoutPoint,
+) => {
+	const previous = points.at(-1);
+	if (
+		previous === undefined ||
+		Math.abs(previous.x - point.x) > 0.01 ||
+		Math.abs(previous.y - point.y) > 0.01
+	)
+		points.push(point);
+};
+
+const readOrthogonalRoute = (
 	source: EditorItemOriginFlowLayoutPoint,
 	target: EditorItemOriginFlowLayoutPoint,
+	sourcePosition: EditorItemOriginFlowLayoutNode,
+	targetPosition: EditorItemOriginFlowLayoutNode,
 	edgeId: string,
 ): ReadonlyArray<EditorItemOriginFlowLayoutPoint> => {
-	const dx = target.x - source.x;
-	const dy = target.y - source.y;
-	if (Math.abs(dx) >= 48) {
-		const direction = Math.sign(dx) || 1;
-		const handle = Math.min(520, Math.max(84, Math.abs(dx) * 0.42));
-		const jitter = (deterministicUnit(edgeId, "route").y || 0) * 10;
-		return [
-			source,
-			{
-				x: source.x + direction * handle,
-				y: source.y + jitter,
-			},
-			{
-				x: target.x - direction * handle,
-				y: target.y - jitter,
-			},
-			target,
-		];
-	}
-	const direction = Math.sign(dy) || 1;
-	const handle = Math.min(420, Math.max(90, Math.abs(dy) * 0.38));
-	return [
+	const sourceEscape = {
+		x: source.x + RouteEscape,
+		y: source.y,
+	};
+	const targetEscape = {
+		x: target.x - RouteEscape,
+		y: target.y,
+	};
+	const points: EditorItemOriginFlowLayoutPoint[] = [
 		source,
-		{
-			x: source.x,
-			y: source.y + direction * handle,
-		},
-		{
-			x: target.x,
-			y: target.y - direction * handle,
-		},
-		target,
 	];
+	appendRoutePoint(points, sourceEscape);
+
+	if (sourceEscape.x <= targetEscape.x) {
+		const jitter = deterministicUnit(edgeId, "ortho").y * 28;
+		const minimumY = Math.min(source.y, target.y);
+		const maximumY = Math.max(source.y, target.y);
+		const middleY = Math.max(minimumY, Math.min(maximumY, (source.y + target.y) / 2 + jitter));
+		appendRoutePoint(points, {
+			x: sourceEscape.x,
+			y: middleY,
+		});
+		appendRoutePoint(points, {
+			x: targetEscape.x,
+			y: middleY,
+		});
+	} else {
+		const upperY =
+			Math.min(sourcePosition.y, targetPosition.y) -
+			RouteDetourGap -
+			Math.abs(deterministicUnit(edgeId, "upper").y) * 32;
+		const lowerY =
+			Math.max(
+				sourcePosition.y + sourcePosition.height,
+				targetPosition.y + targetPosition.height,
+			) +
+			RouteDetourGap +
+			Math.abs(deterministicUnit(edgeId, "lower").y) * 32;
+		const upperCost = Math.abs(source.y - upperY) + Math.abs(target.y - upperY);
+		const lowerCost = Math.abs(source.y - lowerY) + Math.abs(target.y - lowerY);
+		const routeY = upperCost <= lowerCost ? upperY : lowerY;
+		appendRoutePoint(points, {
+			x: sourceEscape.x,
+			y: routeY,
+		});
+		appendRoutePoint(points, {
+			x: targetEscape.x,
+			y: routeY,
+		});
+	}
+
+	appendRoutePoint(points, targetEscape);
+	appendRoutePoint(points, target);
+	return points;
 };
 
 const runLayout = (flow: EditorItemOriginFlowLayoutInput): EditorItemOriginFlowLayout => {
@@ -861,7 +900,10 @@ const runLayout = (flow: EditorItemOriginFlowLayoutInput): EditorItemOriginFlowL
 		const targetPosition = positions.get(edge.target)!;
 		const source = readPortPoint(sourceNode, sourcePosition, edge.sourcePortId, "source");
 		const target = readPortPoint(targetNode, targetPosition, edge.targetPortId, "target");
-		backbones.set(edge.id, readCubicRoute(source, target, edge.id));
+		backbones.set(
+			edge.id,
+			readOrthogonalRoute(source, target, sourcePosition, targetPosition, edge.id),
+		);
 	}
 	return {
 		backbones,

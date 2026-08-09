@@ -11,7 +11,6 @@ import {
 import {
 	EditorItemOriginItemInputPortId,
 	EditorItemOriginItemOutputPortId,
-	type EditorItemOriginEdge,
 	type EditorItemOriginFlow,
 	type EditorItemOriginItemNode,
 	type EditorItemOriginOperationKind,
@@ -88,6 +87,8 @@ interface RenderState {
 	readonly positions: ReadonlyMap<string, EditorItemOriginFlowLayoutNode>;
 	readonly resourceUrls: ReadonlyMap<string, string>;
 	readonly edgeBounds: ReadonlyMap<string, Bounds>;
+	readonly highlightedEdgeColors: ReadonlyMap<string, string>;
+	readonly highlightedPortColors: ReadonlyMap<string, ReadonlyMap<string, string>>;
 	readonly selection: EditorOriginFlowSelection | undefined;
 }
 
@@ -106,6 +107,85 @@ const PortHitRadiusPx = 11;
 const EdgeCullPaddingPx = 32;
 const MaxCachedImages = 96;
 
+const HighlightRouteColors = Array.from(
+	{
+		length: 64,
+	},
+	(_, index) => {
+		const hue = (index * 137.50776405003785) % 360;
+		const band = index % 4;
+		const saturation = [
+			88,
+			76,
+			94,
+			70,
+		][band]!;
+		const lightness = [
+			38,
+			48,
+			32,
+			56,
+		][band]!;
+		return `hsl(${hue.toFixed(1)}, ${saturation}%, ${lightness}%)`;
+	},
+);
+
+const hashText = (value: string) => {
+	let hash = 2166136261;
+	for (let index = 0; index < value.length; index += 1) {
+		hash ^= value.charCodeAt(index);
+		hash = Math.imul(hash, 16777619);
+	}
+	return hash >>> 0;
+};
+
+const readHighlightedEdgeColors = (
+	flow: EditorItemOriginFlow,
+	selection: EditorOriginFlowSelection | undefined,
+	highlight: ReturnType<typeof readEditorOriginFlowHighlight> | undefined,
+) => {
+	if (selection === undefined) return new Map<string, string>();
+	const highlightedIds = new Set(highlight?.edgeIds ?? []);
+	if (selection.kind === "edge") highlightedIds.add(selection.id);
+	const edgeIds = flow.edges
+		.map(({ id }) => id)
+		.filter((id) => highlightedIds.has(id))
+		.sort((left, right) => left.localeCompare(right));
+	const offset = hashText(selection.id) % HighlightRouteColors.length;
+	return new Map(
+		edgeIds.map(
+			(edgeId, index) =>
+				[
+					edgeId,
+					HighlightRouteColors[(offset + index) % HighlightRouteColors.length]!,
+				] as const,
+		),
+	);
+};
+
+const readHighlightedPortColors = (
+	flow: EditorItemOriginFlow,
+	edgeColors: ReadonlyMap<string, string>,
+) => {
+	const byNodeId = new Map<string, Map<string, string>>();
+	const write = (nodeId: string, portId: string | undefined, color: string) => {
+		if (portId === undefined) return;
+		let colors = byNodeId.get(nodeId);
+		if (colors === undefined) {
+			colors = new Map();
+			byNodeId.set(nodeId, colors);
+		}
+		if (!colors.has(portId)) colors.set(portId, color);
+	};
+	for (const edge of flow.edges) {
+		const color = edgeColors.get(edge.id);
+		if (color === undefined) continue;
+		write(edge.source, edge.sourcePortId, color);
+		write(edge.target, edge.targetPortId, color);
+	}
+	return byNodeId as ReadonlyMap<string, ReadonlyMap<string, string>>;
+};
+
 const traceFlowRoute = (
 	context: CanvasRenderingContext2D,
 	points: ReadonlyArray<EditorItemOriginFlowLayoutPoint>,
@@ -113,13 +193,6 @@ const traceFlowRoute = (
 	const first = points[0];
 	if (first === undefined) return;
 	context.moveTo(first.x, first.y);
-	if (points.length === 4) {
-		const control1 = points[1]!;
-		const control2 = points[2]!;
-		const target = points[3]!;
-		context.bezierCurveTo(control1.x, control1.y, control2.x, control2.y, target.x, target.y);
-		return;
-	}
 	for (const point of points.slice(1)) context.lineTo(point.x, point.y);
 };
 
@@ -679,13 +752,14 @@ const drawFlowPort = (
 	y: number,
 	color: string,
 	background: string,
+	highlightColor?: string,
 ) => {
 	context.beginPath();
 	context.arc(x, y, 6, 0, Math.PI * 2);
-	context.fillStyle = background;
+	context.fillStyle = highlightColor ?? background;
 	context.fill();
 	context.lineWidth = 2.5;
-	context.strokeStyle = color;
+	context.strokeStyle = highlightColor ?? color;
 	context.stroke();
 };
 
@@ -700,6 +774,7 @@ const drawItemNode = (
 	imageCache: Map<string, HTMLImageElement>,
 	onImageReady: () => void,
 	connectedPortIds: ReadonlySet<string> | undefined,
+	highlightedPortColors: ReadonlyMap<string, string> | undefined,
 ) => {
 	const typeColor = readItemTypeColor(palette, node.type);
 	const metrics = readEditorOriginFlowNodeMetrics(node);
@@ -721,6 +796,7 @@ const drawItemNode = (
 			position.y + readEditorOriginFlowItemPortY(metrics.headerHeight),
 			typeColor,
 			palette.itemSurfaces[node.type],
+			highlightedPortColors?.get(EditorItemOriginItemInputPortId),
 		);
 	if (connectedPortIds?.has(EditorItemOriginItemOutputPortId) === true)
 		drawFlowPort(
@@ -729,6 +805,7 @@ const drawItemNode = (
 			position.y + readEditorOriginFlowItemPortY(metrics.headerHeight),
 			typeColor,
 			palette.itemSurfaces[node.type],
+			highlightedPortColors?.get(EditorItemOriginItemOutputPortId),
 		);
 
 	const artworkSize = 68;
@@ -853,6 +930,7 @@ const drawItemNode = (
 					worldY,
 					kindColor,
 					palette.itemSurfaces[node.type],
+					highlightedPortColors?.get(input.id),
 				);
 			context.fillStyle = palette.foreground;
 			context.textAlign = "left";
@@ -874,6 +952,7 @@ const drawItemNode = (
 					worldY,
 					kindColor,
 					palette.itemSurfaces[node.type],
+					highlightedPortColors?.get(output.id),
 				);
 			context.fillStyle = palette.foreground;
 			context.textAlign = "right";
@@ -912,25 +991,22 @@ const drawArrow = (
 
 const drawEdge = (
 	context: CanvasRenderingContext2D,
-	edge: EditorItemOriginEdge,
 	backbone: ReadonlyArray<EditorItemOriginFlowLayoutPoint>,
-	selection: EditorOriginFlowSelection | undefined,
-	highlight: ReturnType<typeof readEditorOriginFlowHighlight> | undefined,
+	highlightColor: string | undefined,
 	palette: CanvasPalette,
 ) => {
 	const first = backbone[0];
 	if (first === undefined) return;
-	const selected = selection?.kind === "edge" && selection.id === edge.id;
-	const active = highlight?.edgeIds.has(edge.id) ?? false;
-	const emphasized = selected || active;
+	const emphasized = highlightColor !== undefined;
+	const edgeColor = highlightColor ?? palette.lineStrong;
 
 	context.save();
 	context.globalAlpha = emphasized ? 1 : 0.6;
-	context.lineJoin = "round";
-	context.lineCap = "round";
-	context.strokeStyle = emphasized ? palette.accent : palette.lineStrong;
-	context.fillStyle = emphasized ? palette.accent : palette.lineStrong;
-	context.lineWidth = 1;
+	context.lineJoin = "miter";
+	context.lineCap = "butt";
+	context.strokeStyle = edgeColor;
+	context.fillStyle = edgeColor;
+	context.lineWidth = emphasized ? 2 : 1;
 	context.beginPath();
 	traceFlowRoute(context, backbone);
 	context.stroke();
@@ -982,39 +1058,11 @@ const distanceToSegment = (
 	return Math.hypot(x - (start.x + t * dx), y - (start.y + t * dy));
 };
 
-const cubicPoint = (
-	start: EditorItemOriginFlowLayoutPoint,
-	control1: EditorItemOriginFlowLayoutPoint,
-	control2: EditorItemOriginFlowLayoutPoint,
-	end: EditorItemOriginFlowLayoutPoint,
-	t: number,
-): EditorItemOriginFlowLayoutPoint => {
-	const inverse = 1 - t;
-	const a = inverse ** 3;
-	const b = 3 * inverse ** 2 * t;
-	const c = 3 * inverse * t ** 2;
-	const d = t ** 3;
-	return {
-		x: a * start.x + b * control1.x + c * control2.x + d * end.x,
-		y: a * start.y + b * control1.y + c * control2.y + d * end.y,
-	};
-};
-
 const distanceToRoute = (
 	x: number,
 	y: number,
 	points: ReadonlyArray<EditorItemOriginFlowLayoutPoint>,
 ) => {
-	if (points.length === 4) {
-		let distance = Number.POSITIVE_INFINITY;
-		let previous = points[0]!;
-		for (let step = 1; step <= 24; step += 1) {
-			const current = cubicPoint(points[0]!, points[1]!, points[2]!, points[3]!, step / 24);
-			distance = Math.min(distance, distanceToSegment(x, y, previous, current));
-			previous = current;
-		}
-		return distance;
-	}
 	let distance = Number.POSITIVE_INFINITY;
 	for (let index = 1; index < points.length; index += 1)
 		distance = Math.min(distance, distanceToSegment(x, y, points[index - 1]!, points[index]!));
@@ -1165,6 +1213,21 @@ export const EditorOriginFlowCanvas = ({
 			selection,
 		],
 	);
+	const highlightedEdgeColors = useMemo(
+		() => readHighlightedEdgeColors(flow, selection, highlight),
+		[
+			flow,
+			selection,
+			highlight,
+		],
+	);
+	const highlightedPortColors = useMemo(
+		() => readHighlightedPortColors(flow, highlightedEdgeColors),
+		[
+			flow,
+			highlightedEdgeColors,
+		],
+	);
 	const navigationNodeIds = useMemo(
 		() =>
 			selection?.kind === "node"
@@ -1197,6 +1260,8 @@ export const EditorOriginFlowCanvas = ({
 		positions,
 		resourceUrls,
 		edgeBounds,
+		highlightedEdgeColors,
+		highlightedPortColors,
 		selection,
 	});
 	renderStateRef.current = {
@@ -1209,6 +1274,8 @@ export const EditorOriginFlowCanvas = ({
 		positions,
 		resourceUrls,
 		edgeBounds,
+		highlightedEdgeColors,
+		highlightedPortColors,
 		selection,
 	};
 
@@ -1270,7 +1337,7 @@ export const EditorOriginFlowCanvas = ({
 			const bounds = state.edgeBounds.get(edge.id);
 			if (bounds === undefined) throw new Error(`Missing edge bounds for ${edge.id}.`);
 			if (!isEdgeVisible(bounds, viewport, rect.width, rect.height)) continue;
-			drawEdge(context, edge, backbone, state.selection, state.highlight, palette);
+			drawEdge(context, backbone, state.highlightedEdgeColors.get(edge.id), palette);
 		}
 		for (const node of state.flow.nodes) {
 			const position = state.positions.get(node.id);
@@ -1293,6 +1360,7 @@ export const EditorOriginFlowCanvas = ({
 				imageCacheRef.current,
 				scheduleDrawRef.current,
 				state.connectedPorts.get(node.id),
+				state.highlightedPortColors.get(node.id),
 			);
 		}
 		context.restore();

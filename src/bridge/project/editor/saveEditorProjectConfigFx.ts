@@ -9,6 +9,7 @@ import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 export namespace saveEditorProjectConfigFx {
 	export interface Props {
 		readonly config: GameConfigSchema.Type;
+		readonly expectedRevision: number;
 		readonly projectId: string;
 	}
 }
@@ -16,6 +17,7 @@ export namespace saveEditorProjectConfigFx {
 /** Atomically replaces one complete canonical project config and publishes its revision. */
 export const saveEditorProjectConfigFx = Effect.fn("saveEditorProjectConfigFx")(function* ({
 	config: candidate,
+	expectedRevision,
 	projectId,
 }: saveEditorProjectConfigFx.Props) {
 	const config = yield* Effect.try({
@@ -33,6 +35,7 @@ export const saveEditorProjectConfigFx = Effect.fn("saveEditorProjectConfigFx")(
 		Effect.gen(function* () {
 			const commit = yield* repository.replaceConfigFx({
 				config,
+				expectedRevision,
 				projectId,
 			});
 			yield* Atom.set(EditorProjectAtom(projectId), {

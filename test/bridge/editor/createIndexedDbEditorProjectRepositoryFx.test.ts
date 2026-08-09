@@ -261,6 +261,7 @@ describe("createIndexedDbEditorProjectRepositoryFx", () => {
 			repository.replaceResourceFx({
 				projectId: "project-one",
 				currentId: "hero",
+				expectedRevision: 0,
 				config: {
 					...editorTestPayload.config,
 					resources: {
@@ -293,6 +294,7 @@ describe("createIndexedDbEditorProjectRepositoryFx", () => {
 		const changed = await runWithRepository(databaseName, (repository) =>
 			repository.replaceConfigFx({
 				projectId: "project-one",
+				expectedRevision: created.revision,
 				config: {
 					...editorTestPayload.config,
 					meta: {
@@ -312,6 +314,151 @@ describe("createIndexedDbEditorProjectRepositoryFx", () => {
 				)
 			)?.config.meta.title,
 		).toBe("Changed project");
+	});
+
+	it("rejects a stale complete config without erasing a newer item commit", async () => {
+		const databaseName = createDatabaseName();
+		const created = await runWithRepository(databaseName, (repository) =>
+			repository.createProjectFx({
+				projectId: "project-one",
+				config: editorTestPayload.config,
+				resources: editorTestPayload.resources,
+			}),
+		);
+		const water = editorTestPayload.config.items.water;
+		await runWithRepository(databaseName, (repository) =>
+			repository.upsertItemFx({
+				projectId: "project-one",
+				item: {
+					...water,
+					uid: "oil",
+					id: "oil",
+					title: "Oil",
+				},
+			}),
+		);
+
+		await expect(
+			runWithRepository(databaseName, (repository) =>
+				repository.replaceConfigFx({
+					projectId: "project-one",
+					expectedRevision: created.revision,
+					config: {
+						...created.config,
+						meta: {
+							...created.config.meta,
+							title: "Stale project title",
+						},
+					},
+				}),
+			),
+		).rejects.toThrow("changed from revision 0 to 1");
+
+		const canonical = await runWithRepository(databaseName, (repository) =>
+			repository.readProjectFx("project-one"),
+		);
+		expect(canonical?.revision).toBe(1);
+		expect(canonical?.config.meta.title).toBe(created.config.meta.title);
+		expect(canonical?.config.items.oil?.uid).toBe("oil");
+	});
+
+	it("rejects the second complete-config save when both were based on one revision", async () => {
+		const databaseName = createDatabaseName();
+		const created = await runWithRepository(databaseName, (repository) =>
+			repository.createProjectFx({
+				projectId: "project-one",
+				config: editorTestPayload.config,
+				resources: editorTestPayload.resources,
+			}),
+		);
+		await runWithRepository(databaseName, (repository) =>
+			repository.replaceConfigFx({
+				projectId: "project-one",
+				expectedRevision: created.revision,
+				config: {
+					...created.config,
+					meta: {
+						...created.config.meta,
+						title: "First project title",
+					},
+				},
+			}),
+		);
+
+		await expect(
+			runWithRepository(databaseName, (repository) =>
+				repository.replaceConfigFx({
+					projectId: "project-one",
+					expectedRevision: created.revision,
+					config: {
+						...created.config,
+						meta: {
+							...created.config.meta,
+							title: "Second stale project title",
+						},
+					},
+				}),
+			),
+		).rejects.toThrow("changed from revision 0 to 1");
+
+		const canonical = await runWithRepository(databaseName, (repository) =>
+			repository.readProjectFx("project-one"),
+		);
+		expect(canonical?.revision).toBe(1);
+		expect(canonical?.config.meta.title).toBe("First project title");
+	});
+
+	it("rejects a stale resource replacement without erasing a newer item commit", async () => {
+		const databaseName = createDatabaseName();
+		const created = await runWithRepository(databaseName, (repository) =>
+			repository.createProjectFx({
+				projectId: "project-one",
+				config: editorTestPayload.config,
+				resources: editorTestPayload.resources,
+			}),
+		);
+		const water = editorTestPayload.config.items.water;
+		await runWithRepository(databaseName, (repository) =>
+			repository.upsertItemFx({
+				projectId: "project-one",
+				item: {
+					...water,
+					uid: "oil",
+					id: "oil",
+					title: "Oil",
+				},
+			}),
+		);
+
+		await expect(
+			runWithRepository(databaseName, (repository) =>
+				repository.replaceResourceFx({
+					projectId: "project-one",
+					currentId: "hero",
+					expectedRevision: created.revision,
+					config: {
+						...created.config,
+						resources: {
+							...created.config.resources,
+							hero: "new-hero",
+						},
+					},
+					resource: {
+						...editorTestPayload.resources[0],
+						id: "new-hero",
+					},
+				}),
+			),
+		).rejects.toThrow("changed from revision 0 to 1");
+
+		const canonical = await runWithRepository(databaseName, (repository) =>
+			repository.readProjectFx("project-one"),
+		);
+		expect(canonical?.revision).toBe(1);
+		expect(canonical?.config.resources.hero).toBe("hero");
+		expect(canonical?.config.items.oil?.uid).toBe("oil");
+		expect(canonical?.resources.some(({ id }) => id === "hero")).toBe(true);
+		expect(canonical?.resources.some(({ id }) => id === "new-hero")).toBe(false);
 	});
 
 	it("serializes concurrent item and resource transactions without losing either revision", async () => {

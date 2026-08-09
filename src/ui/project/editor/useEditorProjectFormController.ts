@@ -52,7 +52,10 @@ export const useEditorProjectFormController = ({
 		onSubmit: async ({ formApi, value }) => {
 			const parsed = schema.parse(value);
 			const config = createEditorProjectConfig(project, parsed);
-			await saveConfig(config);
+			await saveConfig({
+				config,
+				expectedRevision: project.revision,
+			});
 			submitSucceeded.current = true;
 			formApi.reset(parsed);
 		},

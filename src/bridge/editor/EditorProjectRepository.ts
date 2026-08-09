@@ -21,12 +21,14 @@ export namespace EditorProjectRepository {
 
 	export interface ReplaceConfigProps {
 		readonly projectId: string;
+		readonly expectedRevision: number;
 		readonly config: GameConfigSchema.Type;
 	}
 
 	export interface ReplaceResourceProps {
 		readonly config: GameConfigSchema.Type;
 		readonly currentId: string;
+		readonly expectedRevision: number;
 		readonly projectId: string;
 		readonly resource: ResourceSchema.Type;
 	}

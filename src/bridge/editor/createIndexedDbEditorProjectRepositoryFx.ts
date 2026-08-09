@@ -97,6 +97,18 @@ const materializeProjectCommit = (
 	config: record.config,
 });
 
+const assertExpectedRevision = (
+	record: EditorProjectRecordSchemaType.Type,
+	expectedRevision: number,
+	operation: EditorProjectRepositoryOperation,
+) => {
+	if (record.revision === expectedRevision) return;
+	throw createRepositoryError(
+		operation,
+		`Editor project ${record.projectId} changed from revision ${expectedRevision} to ${record.revision} before this write could commit.`,
+	);
+};
+
 export namespace createIndexedDbEditorProjectRepositoryFx {
 	export interface Props {
 		readonly databaseName?: string;
@@ -341,7 +353,7 @@ export const createIndexedDbEditorProjectRepositoryFx = Effect.fn(
 
 	const replaceConfigFx: EditorProjectRepositoryService["replaceConfigFx"] = Effect.fn(
 		"IndexedDbEditorProjectRepository.replaceConfigFx",
-	)(function* ({ projectId, config: candidateConfig }) {
+	)(function* ({ projectId, expectedRevision, config: candidateConfig }) {
 		const config = yield* Effect.try({
 			try: () => GameConfigSchema.parse(candidateConfig),
 			catch: (cause) =>
@@ -364,6 +376,7 @@ export const createIndexedDbEditorProjectRepositoryFx = Effect.fn(
 							);
 						}
 						const current = parseProjectRecord(candidate, "replace-config");
+						assertExpectedRevision(current, expectedRevision, "replace-config");
 						const record = parseProjectRecord(
 							{
 								...current,
@@ -456,7 +469,13 @@ export const createIndexedDbEditorProjectRepositoryFx = Effect.fn(
 
 	const replaceResourceFx: EditorProjectRepositoryService["replaceResourceFx"] = Effect.fn(
 		"IndexedDbEditorProjectRepository.replaceResourceFx",
-	)(function* ({ config: candidateConfig, currentId, projectId, resource: candidateResource }) {
+	)(function* ({
+		config: candidateConfig,
+		currentId,
+		expectedRevision,
+		projectId,
+		resource: candidateResource,
+	}) {
 		const config = yield* Effect.try({
 			try: () => GameConfigSchema.parse(candidateConfig),
 			catch: (cause) =>
@@ -486,6 +505,8 @@ export const createIndexedDbEditorProjectRepositoryFx = Effect.fn(
 								"replace-resource",
 								`Editor project ${projectId} does not exist.`,
 							);
+						const current = parseProjectRecord(candidate, "replace-resource");
+						assertExpectedRevision(current, expectedRevision, "replace-resource");
 						const existing = await resources.get([
 							projectId,
 							currentId,
@@ -507,7 +528,6 @@ export const createIndexedDbEditorProjectRepositoryFx = Effect.fn(
 								`Resource ID ${resource.id} already exists.`,
 							);
 						}
-						const current = parseProjectRecord(candidate, "replace-resource");
 						const record = parseProjectRecord(
 							{
 								...current,

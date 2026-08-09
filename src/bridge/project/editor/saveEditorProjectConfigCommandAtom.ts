@@ -9,9 +9,9 @@ import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 export const saveEditorProjectConfigCommandAtom = RendererRuntime.runSync(
 	Effect.map(EditorProjectRepository, (repository) =>
 		Atom.family((projectId: string) =>
-			Atom.fn((config: saveEditorProjectConfigFx.Props["config"]) =>
+			Atom.fn((props: Omit<saveEditorProjectConfigFx.Props, "projectId">) =>
 				saveEditorProjectConfigFx({
-					config,
+					...props,
 					projectId,
 				}).pipe(Effect.provideService(EditorProjectRepository, repository)),
 			).pipe(Atom.setIdleTTL(0)),

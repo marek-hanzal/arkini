@@ -62,6 +62,7 @@ export const editEditorAssetFx = Effect.fn("editEditorAssetFx")(function* ({
 			const saved = yield* repository.replaceResourceFx({
 				config,
 				currentId,
+				expectedRevision: project.revision,
 				projectId,
 				resource,
 			});

@@ -5,6 +5,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import type { EditorProject } from "~/bridge/editor/EditorProject";
 import { EditorProjectAtom } from "~/bridge/editor/EditorProjectAtom";
+import { EditorProjectRepositoryError } from "~/bridge/editor/EditorProjectRepositoryError";
 import {
 	EditorProjectRepository,
 	type EditorProjectRepositoryService,
@@ -72,6 +73,7 @@ describe("saveEditorProjectConfigFx", () => {
 			Effect.runPromise(
 				saveEditorProjectConfigFx({
 					config,
+					expectedRevision: 0,
 					projectId: "project",
 				}).pipe(
 					Effect.provideService(EditorProjectRepository, repository),
@@ -81,11 +83,63 @@ describe("saveEditorProjectConfigFx", () => {
 		).resolves.toEqual(config);
 		expect(replaceConfigFx).toHaveBeenCalledWith({
 			config,
+			expectedRevision: 0,
 			projectId: "project",
 		});
 		expect(registry.get(projectAtom)?.revision).toBe(1);
 		expect(registry.get(projectAtom)?.config.meta.title).toBe("Edited project");
 		expect(registry.get(projectAtom)?.resources).toBe(editorTestPayload.resources);
+	});
+
+	it("does not publish a fake revision when the repository rejects a stale save", async () => {
+		const registry = AtomRegistry.make({
+			scheduleTask,
+		});
+		registries.push(registry);
+		const projectAtom = EditorProjectAtom("project");
+		registry.mount(projectAtom);
+		registry.set(projectAtom, {
+			project: createProject(1),
+		});
+		const repository: EditorProjectRepositoryService = {
+			awaitIdleFx: Effect.void,
+			createProjectFx: () => Effect.die("Unexpected create."),
+			listProjectsFx: Effect.die("Unexpected list."),
+			readProjectFx: () => Effect.die("Unexpected read."),
+			replaceConfigFx: () =>
+				Effect.fail(
+					new EditorProjectRepositoryError({
+						operation: "replace-config",
+						message: "stale revision",
+					}),
+				),
+			replaceResourceFx: () => Effect.die("Unexpected resource replacement."),
+			upsertItemFx: () => Effect.die("Unexpected item save."),
+			upsertResourcesFx: () => Effect.die("Unexpected resource save."),
+		};
+
+		await expect(
+			Effect.runPromise(
+				saveEditorProjectConfigFx({
+					config: {
+						...editorTestPayload.config,
+						meta: {
+							...editorTestPayload.config.meta,
+							title: "Stale edit",
+						},
+					},
+					expectedRevision: 0,
+					projectId: "project",
+				}).pipe(
+					Effect.provideService(EditorProjectRepository, repository),
+					Effect.provideService(AtomRegistry.AtomRegistry, registry),
+				),
+			),
+		).rejects.toThrow("stale revision");
+		expect(registry.get(projectAtom)?.revision).toBe(1);
+		expect(registry.get(projectAtom)?.config.meta.title).toBe(
+			editorTestPayload.config.meta.title,
+		);
 	});
 
 	it("rejects invalid config before repository admission", async () => {
@@ -107,6 +161,7 @@ describe("saveEditorProjectConfigFx", () => {
 							title: "",
 						},
 					},
+					expectedRevision: 0,
 					projectId: "project",
 				}).pipe(
 					Effect.provideService(EditorProjectRepository, repository),

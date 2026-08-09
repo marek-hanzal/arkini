@@ -1,5 +1,4 @@
-import { Effect } from "effect";
-
+import { EditorItemOriginFlowWorkerRuntime } from "~/ui/item/editor/EditorItemOriginFlowWorkerRuntime";
 import { layoutEditorItemOriginFlowFx } from "~/ui/item/editor/layoutEditorItemOriginFlowFx";
 import type {
 	EditorItemOriginFlowLayoutWorkerRequest,
@@ -10,7 +9,9 @@ self.addEventListener(
 	"message",
 	({ data }: MessageEvent<EditorItemOriginFlowLayoutWorkerRequest>) => {
 		try {
-			const layout = Effect.runSync(layoutEditorItemOriginFlowFx(data.topology));
+			const layout = EditorItemOriginFlowWorkerRuntime.runSync(
+				layoutEditorItemOriginFlowFx(data.topology),
+			);
 			self.postMessage({
 				layout,
 				status: "success",

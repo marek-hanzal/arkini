@@ -1,5 +1,8 @@
+import { useAtom, useAtomValue } from "@effect/atom-react";
 import { Effect } from "effect";
-import { useEffect, useState } from "react";
+import * as AsyncResult from "effect/unstable/reactivity/AsyncResult";
+import * as Atom from "effect/unstable/reactivity/Atom";
+import { useEffect, useMemo } from "react";
 
 import {
 	readEditorItemOriginFlowFx,
@@ -7,11 +10,11 @@ import {
 	type EditorItemOriginFlowProgress,
 	type EditorItemOriginFlowRequest,
 } from "~/bridge/item/editor/readEditorItemOriginFlow";
-import { layoutEditorItemOriginFlowInWorkerFx } from "~/ui/item/editor/layoutEditorItemOriginFlowInWorkerFx";
 import type {
 	EditorItemOriginFlowLayoutNode,
 	EditorItemOriginFlowLayoutPoint,
 } from "~/ui/item/editor/editorItemOriginFlowLayout";
+import { layoutEditorItemOriginFlowInWorkerFx } from "~/ui/item/editor/layoutEditorItemOriginFlowInWorkerFx";
 
 type EditorItemOriginFlowState =
 	| {
@@ -32,103 +35,130 @@ type EditorItemOriginFlowState =
 			readonly status: "error";
 	  };
 
+interface EditorItemOriginFlowCommandRequest {
+	readonly config: EditorItemOriginFlowRequest["config"];
+	readonly itemId?: string;
+}
+
+interface EditorItemOriginFlowProgressState {
+	readonly progress: EditorItemOriginFlowProgress;
+	readonly request?: EditorItemOriginFlowCommandRequest;
+}
+
 const InitialProgress: EditorItemOriginFlowProgress = {
 	label: "Preparing flow",
 	percent: 0,
 };
 
-/** Owns one interruptible flow build for the currently routed item. */
+const FailedProgress: EditorItemOriginFlowProgress = {
+	label: "Flow failed",
+	percent: 0,
+};
+
+const EditorItemOriginFlowProgressAtom = Atom.make<EditorItemOriginFlowProgressState>({
+	progress: InitialProgress,
+}).pipe(Atom.setIdleTTL(0));
+
+const EditorItemOriginFlowCommandAtom = Atom.fn(
+	(request: EditorItemOriginFlowCommandRequest, get) =>
+		Effect.gen(function* () {
+			get.set(EditorItemOriginFlowProgressAtom, {
+				progress: InitialProgress,
+				request,
+			});
+			const flow = yield* readEditorItemOriginFlowFx({
+				config: request.config,
+				...(request.itemId === undefined
+					? {}
+					: {
+							targetItemId: request.itemId,
+						}),
+				onProgress: (progress) => {
+					get.set(EditorItemOriginFlowProgressAtom, {
+						progress: {
+							...progress,
+							percent: Math.round(progress.percent * 0.9),
+						},
+						request,
+					});
+				},
+			});
+			get.set(EditorItemOriginFlowProgressAtom, {
+				progress: {
+					label: "Laying out flow",
+					percent: 95,
+				},
+				request,
+			});
+			const layout = yield* layoutEditorItemOriginFlowInWorkerFx(flow);
+			get.set(EditorItemOriginFlowProgressAtom, {
+				progress: {
+					label: "Flow ready",
+					percent: 100,
+				},
+				request,
+			});
+			return {
+				backbones: layout.backbones,
+				flow,
+				positions: layout.positions,
+				request,
+			};
+		}),
+).pipe(Atom.setIdleTTL(0));
+
+/** Owns one subscription-scoped flow build for the currently routed item. */
 export const useEditorItemOriginFlow = (
 	config: EditorItemOriginFlowRequest["config"],
 	itemId?: string,
 ): EditorItemOriginFlowState => {
-	const [state, setState] = useState<EditorItemOriginFlowState>({
-		flow: undefined,
-		progress: InitialProgress,
-		status: "loading",
-	});
+	const request = useMemo<EditorItemOriginFlowCommandRequest>(
+		() => ({
+			config,
+			...(itemId === undefined
+				? {}
+				: {
+						itemId,
+					}),
+		}),
+		[
+			config,
+			itemId,
+		],
+	);
+	const [result, runFlow] = useAtom(EditorItemOriginFlowCommandAtom);
+	const progressState = useAtomValue(EditorItemOriginFlowProgressAtom);
 
 	useEffect(() => {
-		const controller = new AbortController();
-		setState({
-			flow: undefined,
-			progress: InitialProgress,
-			status: "loading",
-		});
-		void Effect.runPromise(
-			Effect.scoped(
-				Effect.gen(function* () {
-					const flow = yield* readEditorItemOriginFlowFx({
-						config,
-						...(itemId === undefined
-							? {}
-							: {
-									targetItemId: itemId,
-								}),
-						onProgress: (progress) => {
-							if (controller.signal.aborted) return;
-							setState({
-								flow: undefined,
-								progress: {
-									...progress,
-									percent: Math.round(progress.percent * 0.9),
-								},
-								status: "loading",
-							});
-						},
-					});
-					if (!controller.signal.aborted) {
-						setState({
-							flow: undefined,
-							progress: {
-								label: "Laying out flow",
-								percent: 95,
-							},
-							status: "loading",
-						});
-					}
-					const layout = yield* layoutEditorItemOriginFlowInWorkerFx(flow);
-					return {
-						flow,
-						layout,
-					};
-				}),
-			),
-			{
-				signal: controller.signal,
-			},
-		)
-			.then(({ flow, layout }) => {
-				if (controller.signal.aborted) return;
-				setState({
-					backbones: layout.backbones,
-					flow,
-					positions: layout.positions,
-					progress: {
-						label: "Flow ready",
-						percent: 100,
-					},
-					status: "ready",
-				});
-			})
-			.catch((cause) => {
-				if (controller.signal.aborted) return;
-				console.error("Flow preparation failed.", cause);
-				setState({
-					flow: undefined,
-					progress: {
-						label: "Flow failed",
-						percent: 0,
-					},
-					status: "error",
-				});
-			});
-
-		return () => controller.abort();
+		runFlow(request);
 	}, [
-		config,
-		itemId,
+		request,
+		runFlow,
 	]);
 
-	return state;
+	const progress = progressState.request === request ? progressState.progress : InitialProgress;
+	if (AsyncResult.isSuccess(result) && !result.waiting && result.value.request === request) {
+		return {
+			backbones: result.value.backbones,
+			flow: result.value.flow,
+			positions: result.value.positions,
+			progress: {
+				label: "Flow ready",
+				percent: 100,
+			},
+			status: "ready",
+		};
+	}
+	if (AsyncResult.isFailure(result) && !result.waiting && progressState.request === request) {
+		return {
+			flow: undefined,
+			progress: FailedProgress,
+			status: "error",
+		};
+	}
+	return {
+		flow: undefined,
+		progress,
+		status: "loading",
+	};
 };

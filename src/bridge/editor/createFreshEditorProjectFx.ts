@@ -3,7 +3,7 @@ import { Effect } from "effect";
 
 import { EditorProjectRepository } from "~/bridge/editor/EditorProjectRepository";
 import type { EditorProjectDescriptor } from "~/bridge/editor/EditorProjectDescriptor";
-import { EditorProjectIdSchema } from "~/engine/editor/schema/EditorProjectIdSchema";
+import { IdSchema } from "~/engine/common/schema/IdSchema";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 
 const placeholderHeroBytes = Uint8Array.from(
@@ -15,9 +15,7 @@ const placeholderHeroBytes = Uint8Array.from(
 
 /** Creates one schema-valid empty project through the canonical IndexedDB repository. */
 export const createFreshEditorProjectFx = Effect.fn("createFreshEditorProjectFx")(function* () {
-	const projectId = yield* Effect.sync(() =>
-		EditorProjectIdSchema.parse(`project-${createId()}`),
-	);
+	const projectId = yield* Effect.sync(() => IdSchema.parse(`project-${createId()}`));
 	const config = GameConfigSchema.parse({
 		version: "1.0",
 		meta: {

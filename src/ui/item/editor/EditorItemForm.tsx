@@ -4,7 +4,8 @@ import { useCallback, useMemo, type PropsWithChildren } from "react";
 import { useEditorProject } from "~/bridge/editor/useEditorProject";
 import type { EditorItem, EditorItemType } from "~/bridge/item/editor/EditorItemModel";
 import { useEditorItemDraft } from "~/bridge/item/editor/useEditorItemDraft";
-import { convertEditorItem } from "~/bridge/item/editor/convertEditorItem";
+import { convertEditorItemFx } from "~/bridge/item/editor/convertEditorItemFx";
+import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import { ButtonLink } from "~/ui/button/Button";
 import { EditorSectionTabs } from "~/ui/editor/EditorSectionTabs";
 import { editorBackLinkClassName, EditorBackIcon } from "~/ui/editor/EditorBackIcon";
@@ -184,7 +185,7 @@ export const EditorItemForm = ({
 			? draft
 			: itemType === undefined
 				? persistedItem
-				: convertEditorItem(persistedItem, itemType);
+				: RendererRuntime.runSync(convertEditorItemFx(persistedItem, itemType));
 	const isNew = persistedItem === undefined;
 	return (
 		<EditorItemFormSession

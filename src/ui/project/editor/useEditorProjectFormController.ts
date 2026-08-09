@@ -3,11 +3,10 @@ import { revalidateLogic, useStore } from "@tanstack/react-form";
 import { useCallback, useMemo, useRef } from "react";
 
 import { useEditorProject } from "~/bridge/editor/useEditorProject";
-import { createEditorProjectConfig } from "~/bridge/project/editor/createEditorProjectConfig";
-import {
-	createEditorProjectFormSchema,
-	readEditorProjectFormValues,
-} from "~/bridge/project/editor/EditorProjectFormSchema";
+import { createEditorProjectConfigFx } from "~/bridge/project/editor/createEditorProjectConfigFx";
+import { createEditorProjectFormSchemaFx } from "~/bridge/project/editor/createEditorProjectFormSchemaFx";
+import { readEditorProjectFormValuesFx } from "~/bridge/project/editor/readEditorProjectFormValuesFx";
+import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import { saveEditorProjectConfigCommandAtom } from "~/bridge/project/editor/saveEditorProjectConfigCommandAtom";
 import { useAppForm } from "~/ui/form/EditorForm";
 import {
@@ -23,13 +22,13 @@ export const useEditorProjectFormController = ({
 }) => {
 	const project = useEditorProject();
 	const canonicalValues = useMemo(
-		() => readEditorProjectFormValues(project),
+		() => RendererRuntime.runSync(readEditorProjectFormValuesFx(project)),
 		[
 			project,
 		],
 	);
 	const schema = useMemo(
-		() => createEditorProjectFormSchema(project),
+		() => RendererRuntime.runSync(createEditorProjectFormSchemaFx(project)),
 		[
 			project,
 		],
@@ -51,7 +50,7 @@ export const useEditorProjectFormController = ({
 		},
 		onSubmit: async ({ formApi, value }) => {
 			const parsed = schema.parse(value);
-			const config = createEditorProjectConfig(project, parsed);
+			const config = RendererRuntime.runSync(createEditorProjectConfigFx(project, parsed));
 			await saveConfig({
 				config,
 				expectedRevision: project.revision,

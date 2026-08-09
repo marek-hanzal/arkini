@@ -1,12 +1,12 @@
 import { z } from "zod";
 
-import { EditorProjectIdSchema } from "~/engine/editor/schema/EditorProjectIdSchema";
+import { IdSchema } from "~/engine/common/schema/IdSchema";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 
 /** Canonical project row persisted in IndexedDB without duplicated display metadata. */
 export const EditorProjectRecordSchema = z
 	.object({
-		projectId: EditorProjectIdSchema,
+		projectId: IdSchema,
 		config: GameConfigSchema,
 		revision: z.number().int().nonnegative(),
 		createdAtMs: z.number().int().nonnegative(),

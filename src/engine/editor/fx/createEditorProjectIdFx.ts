@@ -1,13 +1,17 @@
 import { Effect } from "effect";
 
-import { EditorProjectIdSchema } from "~/engine/editor/schema/EditorProjectIdSchema";
+import { IdSchema } from "~/engine/common/schema/IdSchema";
 
 /** Preserves safe game IDs and derives one readable hash-qualified fallback otherwise. */
 export const createEditorProjectIdFx = Effect.fn("createEditorProjectIdFx")(
 	({ gameId, contentHash }: { readonly gameId: string; readonly contentHash: string }) =>
 		Effect.sync(() => {
-			const portableGameId = EditorProjectIdSchema.safeParse(gameId);
-			if (portableGameId.success) return portableGameId.data;
+			const portableGameId =
+				/^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$/.test(gameId) &&
+				gameId !== "." &&
+				gameId !== ".." &&
+				!gameId.endsWith(".");
+			if (portableGameId) return IdSchema.parse(gameId);
 
 			const slug = gameId
 				.normalize("NFKD")
@@ -18,6 +22,6 @@ export const createEditorProjectIdFx = Effect.fn("createEditorProjectIdFx")(
 				.replace(/[.-]+$/g, "");
 			const readableSlug =
 				slug === "" || !/^[A-Za-z0-9]/.test(slug) ? `project-${slug || "workspace"}` : slug;
-			return EditorProjectIdSchema.parse(`${readableSlug}-${contentHash.slice(0, 12)}`);
+			return IdSchema.parse(`${readableSlug}-${contentHash.slice(0, 12)}`);
 		}),
 );

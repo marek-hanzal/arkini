@@ -1,11 +1,11 @@
 import { z } from "zod";
 
-import { EditorProjectIdSchema } from "~/engine/editor/schema/EditorProjectIdSchema";
+import { IdSchema } from "~/engine/common/schema/IdSchema";
 import { ResourceSchema } from "~/engine/pack/schema/ResourceSchema";
 
 /** One project-owned resource row persisted separately from the project config. */
 export const EditorProjectResourceRecordSchema = ResourceSchema.extend({
-	projectId: EditorProjectIdSchema,
+	projectId: IdSchema,
 })
 	.strict()
 	.meta({

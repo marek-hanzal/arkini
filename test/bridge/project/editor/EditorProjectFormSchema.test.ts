@@ -1,11 +1,10 @@
+import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import type { EditorProject } from "~/bridge/editor/EditorProject";
-import { createEditorProjectConfig } from "~/bridge/project/editor/createEditorProjectConfig";
-import {
-	createEditorProjectFormSchema,
-	readEditorProjectFormValues,
-} from "~/bridge/project/editor/EditorProjectFormSchema";
+import { createEditorProjectConfigFx } from "~/bridge/project/editor/createEditorProjectConfigFx";
+import { createEditorProjectFormSchemaFx } from "~/bridge/project/editor/createEditorProjectFormSchemaFx";
+import { readEditorProjectFormValuesFx } from "~/bridge/project/editor/readEditorProjectFormValuesFx";
 import { editorTestPayload } from "~test/editor/support/editorTestPayload";
 
 const createProject = (overrides?: Partial<EditorProject>): EditorProject => ({
@@ -36,7 +35,7 @@ describe("EditorProjectFormSchema", () => {
 			},
 		});
 
-		expect(readEditorProjectFormValues(project)).toEqual({
+		expect(Effect.runSync(readEditorProjectFormValuesFx(project))).toEqual({
 			title: "Editor test",
 			hero: "hero",
 			avatars: [
@@ -65,15 +64,17 @@ describe("EditorProjectFormSchema", () => {
 				},
 			},
 		});
-		const config = createEditorProjectConfig(project, {
-			...readEditorProjectFormValues(project),
-			title: "Updated project",
-			hero: "item-water",
-			avatars: [
-				"hero",
-			],
-			toolbarSize: 3,
-		});
+		const config = Effect.runSync(
+			createEditorProjectConfigFx(project, {
+				...Effect.runSync(readEditorProjectFormValuesFx(project)),
+				title: "Updated project",
+				hero: "item-water",
+				avatars: [
+					"hero",
+				],
+				toolbarSize: 3,
+			}),
+		);
 
 		expect(config.meta.title).toBe("Updated project");
 		expect(config.meta.id).toBe(project.config.meta.id);
@@ -88,8 +89,8 @@ describe("EditorProjectFormSchema", () => {
 
 	it("rejects missing and duplicate appearance resources", () => {
 		const project = createProject();
-		const result = createEditorProjectFormSchema(project).safeParse({
-			...readEditorProjectFormValues(project),
+		const result = Effect.runSync(createEditorProjectFormSchemaFx(project)).safeParse({
+			...Effect.runSync(readEditorProjectFormValuesFx(project)),
 			hero: "missing",
 			avatars: [
 				"item-water",
@@ -136,8 +137,8 @@ describe("EditorProjectFormSchema", () => {
 				},
 			},
 		});
-		const result = createEditorProjectFormSchema(project).safeParse({
-			...readEditorProjectFormValues(project),
+		const result = Effect.runSync(createEditorProjectFormSchemaFx(project)).safeParse({
+			...Effect.runSync(readEditorProjectFormValuesFx(project)),
 			board: {
 				width: 1,
 				height: 1,
@@ -172,8 +173,8 @@ describe("EditorProjectFormSchema", () => {
 				},
 			},
 		});
-		const result = createEditorProjectFormSchema(project).safeParse(
-			readEditorProjectFormValues(project),
+		const result = Effect.runSync(createEditorProjectFormSchemaFx(project)).safeParse(
+			Effect.runSync(readEditorProjectFormValuesFx(project)),
 		);
 
 		expect(result.success).toBe(false);

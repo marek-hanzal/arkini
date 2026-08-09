@@ -1,54 +1,65 @@
 import { Fragment } from "react";
 
+import type { EditorOriginFlowDirection } from "~/ui/item/editor/readEditorOriginFlowHighlightFx";
+
 interface EditorOriginFlowShortcutHelpProps {
+	readonly direction: EditorOriginFlowDirection;
 	readonly onClose: () => void;
 }
 
-const ShortcutRows = [
+const readShortcutRows = (direction: EditorOriginFlowDirection) =>
 	[
-		"N",
-		"Next item in the selected Income graph.",
-	],
-	[
-		"P",
-		"Previous item in the selected Income graph.",
-	],
-	[
-		"H",
-		"Return to the selected item, or the graph start when nothing is selected.",
-	],
-	[
-		"+",
-		"Show one more hidden level of the selected Income graph.",
-	],
-	[
-		"-",
-		"Hide the farthest visible level of the selected Income graph.",
-	],
-	[
-		"0",
-		"Restore the default selected Income view and return to the selected item.",
-	],
-	[
-		"I",
-		"Cycle through items whose operations use the selected item as an input.",
-	],
-	[
-		"O",
-		"Cycle through items whose operations output the selected item.",
-	],
-	[
-		"Z",
-		"Go back through recently clicked items.",
-	],
-	[
-		"?",
-		"Open or close this help.",
-	],
-] as const;
+		[
+			"N",
+			`Next item in the selected ${direction === "income" ? "Income" : "Outcome"} graph.`,
+		],
+		[
+			"P",
+			`Previous item in the selected ${direction === "income" ? "Income" : "Outcome"} graph.`,
+		],
+		[
+			"H",
+			"Return to the selected item, or the graph start when nothing is selected.",
+		],
+		[
+			"+",
+			"Show one more hidden level of the selected graph.",
+		],
+		[
+			"-",
+			"Hide the farthest visible level of the selected graph.",
+		],
+		[
+			"0",
+			"Restore the default selected graph and return to the selected item.",
+		],
+		[
+			"S",
+			"Cycle terminal/root items of the selected graph to verify where the chain starts or ends.",
+		],
+		[
+			"I",
+			"Cycle through items whose operations use the selected item as an input.",
+		],
+		[
+			"O",
+			"Cycle through items whose operations output the selected item.",
+		],
+		[
+			"Z",
+			"Go back through recently clicked items.",
+		],
+		[
+			"?",
+			"Open or close this help.",
+		],
+	] as const;
 
 /** Explains the keyboard navigation available on the Game Flow canvas. */
-export const EditorOriginFlowShortcutHelp = ({ onClose }: EditorOriginFlowShortcutHelpProps) => (
+export const EditorOriginFlowShortcutHelp = ({
+	direction,
+	onClose,
+}: EditorOriginFlowShortcutHelpProps) => (
 	<div
 		aria-labelledby="flow-shortcuts-title"
 		aria-modal="true"
@@ -81,7 +92,7 @@ export const EditorOriginFlowShortcutHelp = ({ onClose }: EditorOriginFlowShortc
 				</button>
 			</div>
 			<div className="mt-5 grid grid-cols-[auto_1fr] gap-x-4 gap-y-3 text-sm">
-				{ShortcutRows.map(([key, description]) => (
+				{readShortcutRows(direction).map(([key, description]) => (
 					<Fragment key={key}>
 						<kbd className="min-w-8 rounded border border-line bg-surface px-2 py-1 text-center font-mono font-semibold">
 							{key}

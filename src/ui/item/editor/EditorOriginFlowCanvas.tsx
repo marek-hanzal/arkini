@@ -23,12 +23,14 @@ import type {
 	EditorItemOriginFlowLayoutPoint,
 } from "~/ui/item/editor/editorItemOriginFlowLayout";
 import {
+	type EditorOriginFlowDirection,
 	type EditorOriginFlowHighlight,
 	type EditorOriginFlowSelection,
 	readEditorOriginFlowHighlightFx,
 } from "~/ui/item/editor/readEditorOriginFlowHighlightFx";
 import { readEditorOriginFlowNavigationFx } from "~/ui/item/editor/readEditorOriginFlowNavigationFx";
 import { readEditorOriginFlowRelationNavigationFx } from "~/ui/item/editor/readEditorOriginFlowRelationNavigationFx";
+import { readEditorOriginFlowRootNavigationFx } from "~/ui/item/editor/readEditorOriginFlowRootNavigationFx";
 import { readEditorOriginFlowVisibleHighlightFx } from "~/ui/item/editor/readEditorOriginFlowVisibleHighlightFx";
 import { readEditorOriginFlowMetroBackbonesFx } from "~/ui/item/editor/readEditorOriginFlowMetroBackbonesFx";
 import { EditorOriginFlowShortcutHelp } from "~/ui/item/editor/EditorOriginFlowShortcutHelp";
@@ -70,6 +72,7 @@ interface PanState {
 
 interface EditorOriginFlowCanvasProps {
 	readonly backbones: ReadonlyMap<string, ReadonlyArray<EditorItemOriginFlowLayoutPoint>>;
+	readonly direction?: EditorOriginFlowDirection;
 	readonly fitContent: boolean;
 	readonly flow: EditorItemOriginFlow;
 	readonly focusNodeId?: string;
@@ -413,7 +416,8 @@ type FlowNavigationShortcut =
 	| "inputs"
 	| "next"
 	| "outputs"
-	| "previous";
+	| "previous"
+	| "roots";
 
 const readFlowNavigationShortcut = (event: KeyboardEvent): FlowNavigationShortcut | undefined => {
 	const target = event.target;
@@ -446,6 +450,8 @@ const readFlowNavigationShortcut = (event: KeyboardEvent): FlowNavigationShortcu
 			return "inputs";
 		case "o":
 			return "outputs";
+		case "s":
+			return "roots";
 		case "z":
 			return "back";
 		case "?":
@@ -1248,6 +1254,7 @@ const readEdgeOpacity = (
 /** Renders the passive item flow directly to Canvas with imperative pan and zoom. */
 export const EditorOriginFlowCanvas = ({
 	backbones,
+	direction = "income",
 	fitContent,
 	flow,
 	focusNodeId,
@@ -1306,6 +1313,7 @@ export const EditorOriginFlowCanvas = ({
 	const navigationIndexRef = useRef(0);
 	const inputNavigationIndexRef = useRef(-1);
 	const outputNavigationIndexRef = useRef(-1);
+	const rootNavigationIndexRef = useRef(-1);
 	const relationNavigationFocusNodeIdRef = useRef<string | undefined>(undefined);
 	const visitHistoryRef = useRef<ReadonlyArray<string>>([]);
 	const [helpOpen, setHelpOpen] = useState(false);
@@ -1321,8 +1329,11 @@ export const EditorOriginFlowCanvas = ({
 		() =>
 			selection === undefined
 				? undefined
-				: RendererRuntime.runSync(readEditorOriginFlowHighlightFx(flow, selection)),
+				: RendererRuntime.runSync(
+						readEditorOriginFlowHighlightFx(flow, selection, direction),
+					),
 		[
+			direction,
 			flow,
 			selection,
 		],
@@ -1434,6 +1445,19 @@ export const EditorOriginFlowCanvas = ({
 					)
 				: [],
 		[
+			flow,
+			selection,
+		],
+	);
+	const rootNavigationNodeIds = useMemo(
+		() =>
+			selection?.kind === "node" && completeHighlight !== undefined
+				? RendererRuntime.runSync(
+						readEditorOriginFlowRootNavigationFx(flow, completeHighlight),
+					)
+				: [],
+		[
+			completeHighlight,
 			flow,
 			selection,
 		],
@@ -1656,9 +1680,16 @@ export const EditorOriginFlowCanvas = ({
 	]);
 
 	useEffect(() => {
+		rootNavigationIndexRef.current = -1;
+	}, [
+		rootNavigationNodeIds,
+	]);
+
+	useEffect(() => {
 		relationNavigationFocusNodeIdRef.current = undefined;
 		setHighlightDepth(undefined);
 	}, [
+		direction,
 		selection,
 	]);
 
@@ -1796,6 +1827,26 @@ export const EditorOriginFlowCanvas = ({
 				return;
 			}
 
+			if (shortcut === "roots") {
+				if (selection?.kind !== "node" || rootNavigationNodeIds.length === 0) return;
+				setHighlightDepth(undefined);
+				const nextIndex =
+					(rootNavigationIndexRef.current + 1) % rootNavigationNodeIds.length;
+				const nodeId = rootNavigationNodeIds[nextIndex];
+				if (nodeId === undefined) return;
+				const position = positions.get(nodeId);
+				if (position === undefined) return;
+				relationNavigationFocusNodeIdRef.current = nodeId;
+				if (
+					focusPosition(
+						position,
+						Math.max(viewportRef.current.zoom, DefaultViewport.zoom),
+					)
+				)
+					rootNavigationIndexRef.current = nextIndex;
+				return;
+			}
+
 			relationNavigationFocusNodeIdRef.current = undefined;
 			if (navigationNodeIds.length === 0) return;
 			const offset = shortcut === "next" ? 1 : -1;
@@ -1820,6 +1871,7 @@ export const EditorOriginFlowCanvas = ({
 		onSelectionChange,
 		outputNavigationNodeIds,
 		positions,
+		rootNavigationNodeIds,
 		scheduleDraw,
 		selection,
 	]);
@@ -2004,7 +2056,12 @@ export const EditorOriginFlowCanvas = ({
 				onPointerUp={(event) => finishPan(event, false)}
 				ref={canvasRef}
 			/>
-			{helpOpen ? <EditorOriginFlowShortcutHelp onClose={() => setHelpOpen(false)} /> : null}
+			{helpOpen ? (
+				<EditorOriginFlowShortcutHelp
+					direction={direction}
+					onClose={() => setHelpOpen(false)}
+				/>
+			) : null}
 		</>
 	);
 };

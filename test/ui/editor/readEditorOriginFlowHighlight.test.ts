@@ -8,11 +8,13 @@ import {
 	type EditorItemOriginOperation,
 } from "~/bridge/item/editor/readEditorItemOriginFlowFx";
 import {
+	type EditorOriginFlowDirection,
 	type EditorOriginFlowSelection,
 	readEditorOriginFlowHighlightFx,
 } from "~/ui/item/editor/readEditorOriginFlowHighlightFx";
 import { readEditorOriginFlowNavigationFx } from "~/ui/item/editor/readEditorOriginFlowNavigationFx";
 import { readEditorOriginFlowRelationNavigationFx } from "~/ui/item/editor/readEditorOriginFlowRelationNavigationFx";
+import { readEditorOriginFlowRootNavigationFx } from "~/ui/item/editor/readEditorOriginFlowRootNavigationFx";
 import { readArkiniGameConfigSource } from "~test/schema/support/readArkiniGameConfigSource";
 
 const operation = (
@@ -154,8 +156,11 @@ const positions = new Map(
 	),
 );
 
-const runHighlight = (flow: EditorItemOriginFlow, selection: EditorOriginFlowSelection) =>
-	Effect.runSync(readEditorOriginFlowHighlightFx(flow, selection));
+const runHighlight = (
+	flow: EditorItemOriginFlow,
+	selection: EditorOriginFlowSelection,
+	direction: EditorOriginFlowDirection = "income",
+) => Effect.runSync(readEditorOriginFlowHighlightFx(flow, selection, direction));
 
 const runRelationNavigation = (
 	input: Parameters<typeof readEditorOriginFlowRelationNavigationFx>[0],
@@ -265,6 +270,61 @@ describe("readEditorOriginFlowHighlight", () => {
 			expect(highlight.nodeIds.has(producerNodeId)).toBe(true);
 			expect(navigationNodeIds).toContain(producerNodeId);
 		}
+	});
+
+	it("traces Outcome forward without pulling unrelated co-input branches", () => {
+		const highlight = runHighlight(
+			incomeFlow,
+			{
+				id: "item:tool",
+				kind: "node",
+			},
+			"outcome",
+		);
+
+		expect(highlight.nodeIds).toEqual(
+			new Set([
+				"item:tool",
+				"item:forge",
+				"item:target",
+			]),
+		);
+		expect(highlight.edgeIds).toEqual(
+			new Set([
+				"tool-forge",
+				"forge-target",
+			]),
+		);
+		expect(highlight.nodeLevels).toEqual(
+			new Map([
+				[
+					"item:tool",
+					0,
+				],
+				[
+					"item:forge",
+					1,
+				],
+				[
+					"item:target",
+					2,
+				],
+			]),
+		);
+	});
+
+	it("finds every terminal/root node in the selected proof, farthest first", () => {
+		const highlight = runHighlight(incomeFlow, {
+			id: "item:target",
+			kind: "node",
+		});
+		const roots = Effect.runSync(readEditorOriginFlowRootNavigationFx(incomeFlow, highlight));
+
+		expect(roots).toEqual([
+			"item:tool",
+			"item:water",
+			"item:loop",
+		]);
 	});
 
 	it("includes shared upstream edges once when multiple producer branches use them", () => {
@@ -507,12 +567,26 @@ describe("readEditorOriginFlowHighlight", () => {
 			edgeIds: new Set([
 				"tool-forge",
 			]),
-			edgeLevels: new Map(),
-			nodeIds: new Set([
-				"item:forge",
-				"item:tool",
+			edgeLevels: new Map([
+				[
+					"tool-forge",
+					1,
+				],
 			]),
-			nodeLevels: new Map(),
+			nodeIds: new Set([
+				"item:tool",
+				"item:forge",
+			]),
+			nodeLevels: new Map([
+				[
+					"item:tool",
+					0,
+				],
+				[
+					"item:forge",
+					1,
+				],
+			]),
 		});
 	});
 

@@ -1,7 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
 
 import { useEditorProject } from "~/bridge/editor/useEditorProject";
-import type { EditorOriginFlowSelection } from "~/ui/item/editor/readEditorOriginFlowHighlightFx";
+import type {
+	EditorOriginFlowDirection,
+	EditorOriginFlowSelection,
+} from "~/ui/item/editor/readEditorOriginFlowHighlightFx";
 import { EditorOriginFlowCanvas } from "~/ui/item/editor/EditorOriginFlowCanvas";
 import type {
 	EditorItemOriginFlowLayoutNode,
@@ -15,6 +18,7 @@ const EmptyFlowBackbones: ReadonlyMap<
 > = new Map();
 const EmptyFlowPositions: ReadonlyMap<string, EditorItemOriginFlowLayoutNode> = new Map();
 interface EditorOriginFlowSectionProps {
+	readonly direction?: EditorOriginFlowDirection;
 	readonly focusItemId?: string;
 	readonly itemId?: string;
 	readonly mode: "all" | "item";
@@ -22,6 +26,7 @@ interface EditorOriginFlowSectionProps {
 
 /** Visualizes either the complete game flow or one directed item flow. */
 export const EditorOriginFlowSection = ({
+	direction = "income",
 	focusItemId,
 	itemId,
 	mode,
@@ -65,6 +70,7 @@ export const EditorOriginFlowSection = ({
 				<div className="relative h-full min-h-0 bg-canvas">
 					<EditorOriginFlowCanvas
 						backbones={backbones}
+						direction={direction}
 						fitContent={mode === "item"}
 						flow={flow}
 						focusNodeId={focusNodeId}

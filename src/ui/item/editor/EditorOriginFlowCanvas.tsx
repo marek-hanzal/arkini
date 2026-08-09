@@ -192,6 +192,15 @@ const traceFlowRoute = (
 	const first = points[0];
 	if (first === undefined) return;
 	context.moveTo(first.x, first.y);
+	if (points.length >= 4 && (points.length - 1) % 3 === 0) {
+		for (let index = 1; index + 2 < points.length; index += 3) {
+			const controlA = points[index]!;
+			const controlB = points[index + 1]!;
+			const end = points[index + 2]!;
+			context.bezierCurveTo(controlA.x, controlA.y, controlB.x, controlB.y, end.x, end.y);
+		}
+		return;
+	}
 	for (const point of points.slice(1)) context.lineTo(point.x, point.y);
 };
 
@@ -1003,8 +1012,8 @@ const drawEdge = (
 
 	context.save();
 	context.globalAlpha = emphasized ? 1 : 0.6;
-	context.lineJoin = "miter";
-	context.lineCap = "butt";
+	context.lineJoin = "round";
+	context.lineCap = "round";
 	context.strokeStyle = edgeColor;
 	context.fillStyle = edgeColor;
 	context.lineWidth = emphasized ? 2 : 1;
@@ -1059,12 +1068,64 @@ const distanceToSegment = (
 	return Math.hypot(x - (start.x + t * dx), y - (start.y + t * dy));
 };
 
+const readCubicPoint = (
+	start: EditorItemOriginFlowLayoutPoint,
+	controlA: EditorItemOriginFlowLayoutPoint,
+	controlB: EditorItemOriginFlowLayoutPoint,
+	end: EditorItemOriginFlowLayoutPoint,
+	t: number,
+): EditorItemOriginFlowLayoutPoint => {
+	const inverse = 1 - t;
+	const startWeight = inverse * inverse * inverse;
+	const controlAWeight = 3 * inverse * inverse * t;
+	const controlBWeight = 3 * inverse * t * t;
+	const endWeight = t * t * t;
+	return {
+		x:
+			start.x * startWeight +
+			controlA.x * controlAWeight +
+			controlB.x * controlBWeight +
+			end.x * endWeight,
+		y:
+			start.y * startWeight +
+			controlA.y * controlAWeight +
+			controlB.y * controlBWeight +
+			end.y * endWeight,
+	};
+};
+
 const distanceToRoute = (
 	x: number,
 	y: number,
 	points: ReadonlyArray<EditorItemOriginFlowLayoutPoint>,
 ) => {
 	let distance = Number.POSITIVE_INFINITY;
+	if (points.length >= 4 && (points.length - 1) % 3 === 0) {
+		let previous = points[0]!;
+		for (let index = 1; index + 2 < points.length; index += 3) {
+			const start = points[index - 1]!;
+			const controlA = points[index]!;
+			const controlB = points[index + 1]!;
+			const end = points[index + 2]!;
+			const controlLength =
+				Math.hypot(controlA.x - start.x, controlA.y - start.y) +
+				Math.hypot(controlB.x - controlA.x, controlB.y - controlA.y) +
+				Math.hypot(end.x - controlB.x, end.y - controlB.y);
+			const samplesPerCurve = Math.max(8, Math.min(32, Math.ceil(controlLength / 80)));
+			for (let sample = 1; sample <= samplesPerCurve; sample += 1) {
+				const current = readCubicPoint(
+					start,
+					controlA,
+					controlB,
+					end,
+					sample / samplesPerCurve,
+				);
+				distance = Math.min(distance, distanceToSegment(x, y, previous, current));
+				previous = current;
+			}
+		}
+		return distance;
+	}
 	for (let index = 1; index < points.length; index += 1)
 		distance = Math.min(distance, distanceToSegment(x, y, points[index - 1]!, points[index]!));
 	return distance;

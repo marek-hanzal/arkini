@@ -44,7 +44,7 @@ export interface EditorItemOriginFlowLayoutPoint {
 }
 
 export interface EditorItemOriginFlowLayout {
-	/** Orthogonal port-to-port routes with explicit terminal escape segments. */
+	/** Piecewise cubic port-to-port routes with deterministic terminal fan-out. */
 	readonly backbones: ReadonlyMap<string, ReadonlyArray<EditorItemOriginFlowLayoutPoint>>;
 	readonly positions: ReadonlyMap<string, EditorItemOriginFlowLayoutNode>;
 }
@@ -756,232 +756,192 @@ const readPortPoint = (
 	};
 };
 
-const RouteEscape = 56;
-const RouteDetourGap = 84;
-const RouteLaneSpacing = 28;
-const RouteLaneMinimumOverlap = 56;
-const RouteLaneMaxOffset = 560;
+const CurveTerminalRun = 92;
+const CurveTerminalControl = 0.38;
+const CurveFanSpacing = 24;
+const CurveFanMaxSpread = 240;
+const CurveMidpointJitter = 34;
+const CurveForwardHandleRatio = 0.42;
+const CurveForwardHandleMinimum = 28;
+const CurveForwardHandleMaximum = 320;
+const CurveReverseGap = 132;
+const CurveReverseOutHandle = 180;
+const CurveReverseMidHandle = 120;
 
-interface OrthogonalRoutePlan {
+interface CurvedRoutePlan {
 	readonly edgeId: string;
-	readonly maximumLaneY?: number;
-	readonly maximumX: number;
-	readonly minimumLaneY?: number;
-	readonly minimumX: number;
-	readonly preferredY: number;
 	readonly source: EditorItemOriginFlowLayoutPoint;
-	readonly sourceEscape: EditorItemOriginFlowLayoutPoint;
+	readonly sourceKey: string;
+	readonly sourcePosition: EditorItemOriginFlowLayoutNode;
 	readonly target: EditorItemOriginFlowLayoutPoint;
-	readonly targetEscape: EditorItemOriginFlowLayoutPoint;
+	readonly targetKey: string;
+	readonly targetPosition: EditorItemOriginFlowLayoutNode;
 }
 
-interface RouteLaneInterval {
-	readonly maximum: number;
-	readonly minimum: number;
-}
-
-interface AssignedRouteLane extends RouteLaneInterval {
-	readonly y: number;
-}
-
-const appendRoutePoint = (
+const appendCubic = (
 	points: EditorItemOriginFlowLayoutPoint[],
-	point: EditorItemOriginFlowLayoutPoint,
+	controlA: EditorItemOriginFlowLayoutPoint,
+	controlB: EditorItemOriginFlowLayoutPoint,
+	end: EditorItemOriginFlowLayoutPoint,
 ) => {
-	const previous = points.at(-1);
-	if (
-		previous === undefined ||
-		Math.abs(previous.x - point.x) > 0.01 ||
-		Math.abs(previous.y - point.y) > 0.01
-	)
-		points.push(point);
+	points.push(controlA, controlB, end);
 };
 
-const readOrthogonalRoutePlan = (
-	source: EditorItemOriginFlowLayoutPoint,
-	target: EditorItemOriginFlowLayoutPoint,
-	sourcePosition: EditorItemOriginFlowLayoutNode,
-	targetPosition: EditorItemOriginFlowLayoutNode,
-	edgeId: string,
-): OrthogonalRoutePlan => {
-	const sourceEscape = {
-		x: source.x + RouteEscape,
-		y: source.y,
-	};
-	const targetEscape = {
-		x: target.x - RouteEscape,
-		y: target.y,
-	};
-
-	if (sourceEscape.x <= targetEscape.x) {
-		const jitter = deterministicUnit(edgeId, "ortho").y * 28;
-		const minimumY = Math.min(source.y, target.y);
-		const maximumY = Math.max(source.y, target.y);
-		return {
-			edgeId,
-			maximumX: targetEscape.x,
-			minimumX: sourceEscape.x,
-			preferredY: Math.max(minimumY, Math.min(maximumY, (source.y + target.y) / 2 + jitter)),
-			source,
-			sourceEscape,
-			target,
-			targetEscape,
-		};
-	}
-
-	const upperBoundary = Math.min(sourcePosition.y, targetPosition.y) - RouteDetourGap;
-	const lowerBoundary =
-		Math.max(
-			sourcePosition.y + sourcePosition.height,
-			targetPosition.y + targetPosition.height,
-		) + RouteDetourGap;
-	const upperY = upperBoundary - Math.abs(deterministicUnit(edgeId, "upper").y) * 32;
-	const lowerY = lowerBoundary + Math.abs(deterministicUnit(edgeId, "lower").y) * 32;
-	const upperCost = Math.abs(source.y - upperY) + Math.abs(target.y - upperY);
-	const lowerCost = Math.abs(source.y - lowerY) + Math.abs(target.y - lowerY);
-	return upperCost <= lowerCost
-		? {
-				edgeId,
-				maximumLaneY: upperBoundary,
-				maximumX: sourceEscape.x,
-				minimumX: targetEscape.x,
-				preferredY: upperY,
-				source,
-				sourceEscape,
-				target,
-				targetEscape,
-			}
-		: {
-				edgeId,
-				maximumX: sourceEscape.x,
-				minimumLaneY: lowerBoundary,
-				minimumX: targetEscape.x,
-				preferredY: lowerY,
-				source,
-				sourceEscape,
-				target,
-				targetEscape,
-			};
-};
-
-const readIntervalOverlap = (left: RouteLaneInterval, right: RouteLaneInterval) =>
-	Math.max(0, Math.min(left.maximum, right.maximum) - Math.max(left.minimum, right.minimum));
-
-const intervalsOverlap = (left: RouteLaneInterval, right: RouteLaneInterval) =>
-	readIntervalOverlap(left, right) >= RouteLaneMinimumOverlap;
-
-const laneIsAllowed = (plan: OrthogonalRoutePlan, laneY: number) =>
-	(plan.maximumLaneY === undefined || laneY <= plan.maximumLaneY) &&
-	(plan.minimumLaneY === undefined || laneY >= plan.minimumLaneY);
-
-const readLaneConflictPenalty = (
-	y: number,
-	interval: RouteLaneInterval,
-	conflicts: ReadonlyArray<AssignedRouteLane>,
-) => {
-	let penalty = 0;
-	for (const other of conflicts) {
-		const missingClearance = RouteLaneSpacing - Math.abs(y - other.y);
-		if (missingClearance <= 0) continue;
-		penalty += missingClearance * Math.max(1, readIntervalOverlap(interval, other));
-	}
-	return penalty;
-};
-
-/** Spreads long shared corridors inside a bounded window without querying node obstacles. */
-const readRouteLaneYs = (
-	plans: ReadonlyArray<OrthogonalRoutePlan>,
+const readFanOffsets = (
+	plans: ReadonlyArray<CurvedRoutePlan>,
+	side: "source" | "target",
 ): ReadonlyMap<string, number> => {
-	const assigned: AssignedRouteLane[] = [];
-	const laneYByEdgeId = new Map<string, number>();
-	const ordered = [
-		...plans,
-	].sort(
-		(left, right) =>
-			right.maximumX - right.minimumX - (left.maximumX - left.minimumX) ||
-			left.preferredY - right.preferredY ||
-			left.edgeId.localeCompare(right.edgeId),
+	const groups = new Map<string, CurvedRoutePlan[]>();
+	for (const plan of plans) {
+		const key = side === "source" ? plan.sourceKey : plan.targetKey;
+		const group = groups.get(key) ?? [];
+		group.push(plan);
+		groups.set(key, group);
+	}
+
+	const offsets = new Map<string, number>();
+	for (const group of groups.values()) {
+		group.sort((left, right) => {
+			const leftOpposite = side === "source" ? left.target : left.source;
+			const rightOpposite = side === "source" ? right.target : right.source;
+			return (
+				leftOpposite.y - rightOpposite.y ||
+				leftOpposite.x - rightOpposite.x ||
+				left.edgeId.localeCompare(right.edgeId)
+			);
+		});
+		const spacing =
+			group.length <= 1
+				? 0
+				: Math.min(CurveFanSpacing, (CurveFanMaxSpread * 2) / (group.length - 1));
+		const center = (group.length - 1) / 2;
+		for (const [index, plan] of group.entries())
+			offsets.set(plan.edgeId, (index - center) * spacing);
+	}
+	return offsets;
+};
+
+const readForwardHandle = (distance: number) =>
+	Math.max(
+		CurveForwardHandleMinimum,
+		Math.min(CurveForwardHandleMaximum, Math.abs(distance) * CurveForwardHandleRatio),
 	);
 
-	for (const plan of ordered) {
-		const interval = {
-			maximum: plan.maximumX,
-			minimum: plan.minimumX,
-		};
-		const conflicts = assigned.filter((other) => intervalsOverlap(interval, other));
-		const minimumY = Math.max(
-			plan.preferredY - RouteLaneMaxOffset,
-			plan.minimumLaneY ?? Number.NEGATIVE_INFINITY,
-		);
-		const maximumY = Math.min(
-			plan.preferredY + RouteLaneMaxOffset,
-			plan.maximumLaneY ?? Number.POSITIVE_INFINITY,
-		);
-		const clamp = (y: number) => Math.max(minimumY, Math.min(maximumY, y));
-		const candidates = new Set<number>([
-			clamp(plan.preferredY),
-			minimumY,
-			maximumY,
-		]);
-		for (const other of conflicts) {
-			candidates.add(clamp(other.y - RouteLaneSpacing));
-			candidates.add(clamp(other.y + RouteLaneSpacing));
-		}
-		const direction = deterministicUnit(plan.edgeId, "lane").y >= 0 ? 1 : -1;
-		const orderedCandidates = [
-			...candidates,
-		]
-			.filter((y) => Number.isFinite(y) && laneIsAllowed(plan, y))
-			.sort(
-				(left, right) =>
-					Math.abs(left - plan.preferredY) - Math.abs(right - plan.preferredY) ||
-					direction * (right - left),
-			);
-		let routeY = orderedCandidates.find((candidate) =>
-			conflicts.every((other) => Math.abs(candidate - other.y) >= RouteLaneSpacing - 0.01),
-		);
-		if (routeY === undefined) {
-			let bestPenalty = Number.POSITIVE_INFINITY;
-			let bestDistance = Number.POSITIVE_INFINITY;
-			for (const candidate of orderedCandidates) {
-				const penalty = readLaneConflictPenalty(candidate, interval, conflicts);
-				const distance = Math.abs(candidate - plan.preferredY);
-				if (penalty < bestPenalty || (penalty === bestPenalty && distance < bestDistance)) {
-					routeY = candidate;
-					bestPenalty = penalty;
-					bestDistance = distance;
-				}
-			}
-		}
-		if (routeY === undefined)
-			throw new Error(`Could not allocate an orthogonal route lane for ${plan.edgeId}.`);
-		assigned.push({
-			...interval,
-			y: routeY,
-		});
-		laneYByEdgeId.set(plan.edgeId, routeY);
-	}
-	return laneYByEdgeId;
+const appendForwardCurve = (
+	points: EditorItemOriginFlowLayoutPoint[],
+	from: EditorItemOriginFlowLayoutPoint,
+	to: EditorItemOriginFlowLayoutPoint,
+) => {
+	const handle = readForwardHandle(to.x - from.x);
+	appendCubic(
+		points,
+		{
+			x: from.x + handle,
+			y: from.y,
+		},
+		{
+			x: to.x - handle,
+			y: to.y,
+		},
+		to,
+	);
 };
 
-const readOrthogonalRoute = (
-	plan: OrthogonalRoutePlan,
-	routeY: number,
+const readCurvedRoute = (
+	plan: CurvedRoutePlan,
+	sourceFanOffset: number,
+	targetFanOffset: number,
 ): ReadonlyArray<EditorItemOriginFlowLayoutPoint> => {
+	const sourceExit = {
+		x: plan.source.x + CurveTerminalRun,
+		y: plan.source.y + sourceFanOffset,
+	};
+	const targetEntry = {
+		x: plan.target.x - CurveTerminalRun,
+		y: plan.target.y + targetFanOffset,
+	};
 	const points: EditorItemOriginFlowLayoutPoint[] = [
 		plan.source,
 	];
-	appendRoutePoint(points, plan.sourceEscape);
-	appendRoutePoint(points, {
-		x: plan.sourceEscape.x,
-		y: routeY,
-	});
-	appendRoutePoint(points, {
-		x: plan.targetEscape.x,
-		y: routeY,
-	});
-	appendRoutePoint(points, plan.targetEscape);
-	appendRoutePoint(points, plan.target);
+	appendCubic(
+		points,
+		{
+			x: plan.source.x + CurveTerminalRun * CurveTerminalControl,
+			y: plan.source.y,
+		},
+		{
+			x: sourceExit.x - CurveTerminalRun * CurveTerminalControl,
+			y: sourceExit.y,
+		},
+		sourceExit,
+	);
+
+	if (sourceExit.x <= targetEntry.x) {
+		const midpoint = {
+			x: (sourceExit.x + targetEntry.x) / 2,
+			y:
+				(sourceExit.y + targetEntry.y) / 2 +
+				deterministicUnit(plan.edgeId, "curve-midpoint").y * CurveMidpointJitter,
+		};
+		appendForwardCurve(points, sourceExit, midpoint);
+		appendForwardCurve(points, midpoint, targetEntry);
+	} else {
+		const upperY =
+			Math.min(plan.sourcePosition.y, plan.targetPosition.y) -
+			CurveReverseGap -
+			Math.abs(deterministicUnit(plan.edgeId, "curve-upper").y) * CurveMidpointJitter;
+		const lowerY =
+			Math.max(
+				plan.sourcePosition.y + plan.sourcePosition.height,
+				plan.targetPosition.y + plan.targetPosition.height,
+			) +
+			CurveReverseGap +
+			Math.abs(deterministicUnit(plan.edgeId, "curve-lower").y) * CurveMidpointJitter;
+		const upperCost = Math.abs(sourceExit.y - upperY) + Math.abs(targetEntry.y - upperY);
+		const lowerCost = Math.abs(sourceExit.y - lowerY) + Math.abs(targetEntry.y - lowerY);
+		const detourY = upperCost <= lowerCost ? upperY : lowerY;
+		const midpoint = {
+			x: (sourceExit.x + targetEntry.x) / 2,
+			y: detourY,
+		};
+		appendCubic(
+			points,
+			{
+				x: sourceExit.x + CurveReverseOutHandle,
+				y: sourceExit.y,
+			},
+			{
+				x: midpoint.x + CurveReverseMidHandle,
+				y: midpoint.y,
+			},
+			midpoint,
+		);
+		appendCubic(
+			points,
+			{
+				x: midpoint.x - CurveReverseMidHandle,
+				y: midpoint.y,
+			},
+			{
+				x: targetEntry.x - CurveReverseOutHandle,
+				y: targetEntry.y,
+			},
+			targetEntry,
+		);
+	}
+
+	appendCubic(
+		points,
+		{
+			x: targetEntry.x + CurveTerminalRun * CurveTerminalControl,
+			y: targetEntry.y,
+		},
+		{
+			x: plan.target.x - CurveTerminalRun * CurveTerminalControl,
+			y: plan.target.y,
+		},
+		plan.target,
+	);
 	return points;
 };
 
@@ -1040,7 +1000,7 @@ const runLayout = (flow: EditorItemOriginFlowLayoutInput): EditorItemOriginFlowL
 		});
 	}
 
-	const plans: OrthogonalRoutePlan[] = [];
+	const plans: CurvedRoutePlan[] = [];
 	for (const edge of [
 		...flow.edges,
 	].sort((left, right) => left.id.localeCompare(right.id))) {
@@ -1048,19 +1008,28 @@ const runLayout = (flow: EditorItemOriginFlowLayoutInput): EditorItemOriginFlowL
 		const targetNode = nodeById.get(edge.target)!;
 		const sourcePosition = positions.get(edge.source)!;
 		const targetPosition = positions.get(edge.target)!;
-		const source = readPortPoint(sourceNode, sourcePosition, edge.sourcePortId, "source");
-		const target = readPortPoint(targetNode, targetPosition, edge.targetPortId, "target");
-		plans.push(
-			readOrthogonalRoutePlan(source, target, sourcePosition, targetPosition, edge.id),
-		);
+		plans.push({
+			edgeId: edge.id,
+			source: readPortPoint(sourceNode, sourcePosition, edge.sourcePortId, "source"),
+			sourceKey: `${edge.source}\u0000${edge.sourcePortId ?? "item"}`,
+			sourcePosition,
+			target: readPortPoint(targetNode, targetPosition, edge.targetPortId, "target"),
+			targetKey: `${edge.target}\u0000${edge.targetPortId ?? "item"}`,
+			targetPosition,
+		});
 	}
-	const laneYs = readRouteLaneYs(plans);
+	const sourceFanOffsets = readFanOffsets(plans, "source");
+	const targetFanOffsets = readFanOffsets(plans, "target");
 	const backbones = new Map<string, ReadonlyArray<EditorItemOriginFlowLayoutPoint>>();
-	for (const plan of plans) {
-		const routeY = laneYs.get(plan.edgeId);
-		if (routeY === undefined) throw new Error(`Missing route lane for ${plan.edgeId}.`);
-		backbones.set(plan.edgeId, readOrthogonalRoute(plan, routeY));
-	}
+	for (const plan of plans)
+		backbones.set(
+			plan.edgeId,
+			readCurvedRoute(
+				plan,
+				sourceFanOffsets.get(plan.edgeId) ?? 0,
+				targetFanOffsets.get(plan.edgeId) ?? 0,
+			),
+		);
 	return {
 		backbones,
 		positions,

@@ -44,7 +44,7 @@ export interface EditorItemOriginFlowLayoutPoint {
 }
 
 export interface EditorItemOriginFlowLayout {
-	/** Piecewise cubic port-to-port routes with deterministic terminal fan-out. */
+	/** Orthogonal port-to-port routes with explicit terminal escape segments. */
 	readonly backbones: ReadonlyMap<string, ReadonlyArray<EditorItemOriginFlowLayoutPoint>>;
 	readonly positions: ReadonlyMap<string, EditorItemOriginFlowLayoutNode>;
 }
@@ -756,192 +756,128 @@ const readPortPoint = (
 	};
 };
 
-const CurveTerminalRun = 92;
-const CurveTerminalControl = 0.38;
-const CurveFanSpacing = 24;
-const CurveFanMaxSpread = 240;
-const CurveMidpointJitter = 34;
-const CurveForwardHandleRatio = 0.42;
-const CurveForwardHandleMinimum = 28;
-const CurveForwardHandleMaximum = 320;
-const CurveReverseGap = 132;
-const CurveReverseOutHandle = 180;
-const CurveReverseMidHandle = 120;
+const RouteEscape = 56;
+const RouteDetourGap = 84;
+const RouteBundleGrid = 96;
 
-interface CurvedRoutePlan {
+interface OrthogonalRoutePlan {
 	readonly edgeId: string;
+	readonly routeY: number;
 	readonly source: EditorItemOriginFlowLayoutPoint;
-	readonly sourceKey: string;
-	readonly sourcePosition: EditorItemOriginFlowLayoutNode;
+	readonly sourceTrackX: number;
 	readonly target: EditorItemOriginFlowLayoutPoint;
-	readonly targetKey: string;
-	readonly targetPosition: EditorItemOriginFlowLayoutNode;
+	readonly targetTrackX: number;
 }
 
-const appendCubic = (
+const appendRoutePoint = (
 	points: EditorItemOriginFlowLayoutPoint[],
-	controlA: EditorItemOriginFlowLayoutPoint,
-	controlB: EditorItemOriginFlowLayoutPoint,
-	end: EditorItemOriginFlowLayoutPoint,
+	point: EditorItemOriginFlowLayoutPoint,
 ) => {
-	points.push(controlA, controlB, end);
+	const previous = points.at(-1);
+	if (
+		previous === undefined ||
+		Math.abs(previous.x - point.x) > 0.01 ||
+		Math.abs(previous.y - point.y) > 0.01
+	)
+		points.push(point);
 };
 
-const readFanOffsets = (
-	plans: ReadonlyArray<CurvedRoutePlan>,
-	side: "source" | "target",
-): ReadonlyMap<string, number> => {
-	const groups = new Map<string, CurvedRoutePlan[]>();
-	for (const plan of plans) {
-		const key = side === "source" ? plan.sourceKey : plan.targetKey;
-		const group = groups.get(key) ?? [];
-		group.push(plan);
-		groups.set(key, group);
+const snapRouteTrack = (value: number) => Math.round(value / RouteBundleGrid) * RouteBundleGrid;
+
+const snapSourceTrack = (x: number) =>
+	Math.ceil((x + RouteEscape) / RouteBundleGrid) * RouteBundleGrid;
+
+const snapTargetTrack = (x: number) =>
+	Math.floor((x - RouteEscape) / RouteBundleGrid) * RouteBundleGrid;
+
+const readForwardTracks = (
+	source: EditorItemOriginFlowLayoutPoint,
+	target: EditorItemOriginFlowLayoutPoint,
+) => {
+	const minimumX = source.x + RouteEscape;
+	const maximumX = target.x - RouteEscape;
+	let sourceTrackX = snapSourceTrack(source.x);
+	let targetTrackX = snapTargetTrack(target.x);
+	if (sourceTrackX <= targetTrackX)
+		return {
+			sourceTrackX,
+			targetTrackX,
+		};
+
+	const midpointX = (minimumX + maximumX) / 2;
+	const sharedTrackX = Math.max(minimumX, Math.min(maximumX, snapRouteTrack(midpointX)));
+	sourceTrackX = sharedTrackX;
+	targetTrackX = sharedTrackX;
+	return {
+		sourceTrackX,
+		targetTrackX,
+	};
+};
+
+const readOrthogonalRoutePlan = (
+	source: EditorItemOriginFlowLayoutPoint,
+	target: EditorItemOriginFlowLayoutPoint,
+	sourcePosition: EditorItemOriginFlowLayoutNode,
+	targetPosition: EditorItemOriginFlowLayoutNode,
+	edgeId: string,
+): OrthogonalRoutePlan => {
+	const forward = source.x + RouteEscape <= target.x - RouteEscape;
+	if (forward) {
+		const tracks = readForwardTracks(source, target);
+		return {
+			edgeId,
+			routeY: snapRouteTrack((source.y + target.y) / 2),
+			source,
+			...tracks,
+			target,
+		};
 	}
 
-	const offsets = new Map<string, number>();
-	for (const group of groups.values()) {
-		group.sort((left, right) => {
-			const leftOpposite = side === "source" ? left.target : left.source;
-			const rightOpposite = side === "source" ? right.target : right.source;
-			return (
-				leftOpposite.y - rightOpposite.y ||
-				leftOpposite.x - rightOpposite.x ||
-				left.edgeId.localeCompare(right.edgeId)
-			);
-		});
-		const spacing =
-			group.length <= 1
-				? 0
-				: Math.min(CurveFanSpacing, (CurveFanMaxSpread * 2) / (group.length - 1));
-		const center = (group.length - 1) / 2;
-		for (const [index, plan] of group.entries())
-			offsets.set(plan.edgeId, (index - center) * spacing);
-	}
-	return offsets;
+	const sourceTrackX = snapSourceTrack(source.x);
+	const targetTrackX = snapTargetTrack(target.x);
+	const upperBoundary = Math.min(sourcePosition.y, targetPosition.y) - RouteDetourGap;
+	const lowerBoundary =
+		Math.max(
+			sourcePosition.y + sourcePosition.height,
+			targetPosition.y + targetPosition.height,
+		) + RouteDetourGap;
+	const upperY = Math.floor(upperBoundary / RouteBundleGrid) * RouteBundleGrid;
+	const lowerY = Math.ceil(lowerBoundary / RouteBundleGrid) * RouteBundleGrid;
+	const upperCost = Math.abs(source.y - upperY) + Math.abs(target.y - upperY);
+	const lowerCost = Math.abs(source.y - lowerY) + Math.abs(target.y - lowerY);
+	return {
+		edgeId,
+		routeY: upperCost <= lowerCost ? upperY : lowerY,
+		source,
+		sourceTrackX,
+		target,
+		targetTrackX,
+	};
 };
 
-const readForwardHandle = (distance: number) =>
-	Math.max(
-		CurveForwardHandleMinimum,
-		Math.min(CurveForwardHandleMaximum, Math.abs(distance) * CurveForwardHandleRatio),
-	);
-
-const appendForwardCurve = (
-	points: EditorItemOriginFlowLayoutPoint[],
-	from: EditorItemOriginFlowLayoutPoint,
-	to: EditorItemOriginFlowLayoutPoint,
-) => {
-	const handle = readForwardHandle(to.x - from.x);
-	appendCubic(
-		points,
-		{
-			x: from.x + handle,
-			y: from.y,
-		},
-		{
-			x: to.x - handle,
-			y: to.y,
-		},
-		to,
-	);
-};
-
-const readCurvedRoute = (
-	plan: CurvedRoutePlan,
-	sourceFanOffset: number,
-	targetFanOffset: number,
+const readOrthogonalRoute = (
+	plan: OrthogonalRoutePlan,
 ): ReadonlyArray<EditorItemOriginFlowLayoutPoint> => {
-	const sourceExit = {
-		x: plan.source.x + CurveTerminalRun,
-		y: plan.source.y + sourceFanOffset,
-	};
-	const targetEntry = {
-		x: plan.target.x - CurveTerminalRun,
-		y: plan.target.y + targetFanOffset,
-	};
 	const points: EditorItemOriginFlowLayoutPoint[] = [
 		plan.source,
 	];
-	appendCubic(
-		points,
-		{
-			x: plan.source.x + CurveTerminalRun * CurveTerminalControl,
-			y: plan.source.y,
-		},
-		{
-			x: sourceExit.x - CurveTerminalRun * CurveTerminalControl,
-			y: sourceExit.y,
-		},
-		sourceExit,
-	);
-
-	if (sourceExit.x <= targetEntry.x) {
-		const midpoint = {
-			x: (sourceExit.x + targetEntry.x) / 2,
-			y:
-				(sourceExit.y + targetEntry.y) / 2 +
-				deterministicUnit(plan.edgeId, "curve-midpoint").y * CurveMidpointJitter,
-		};
-		appendForwardCurve(points, sourceExit, midpoint);
-		appendForwardCurve(points, midpoint, targetEntry);
-	} else {
-		const upperY =
-			Math.min(plan.sourcePosition.y, plan.targetPosition.y) -
-			CurveReverseGap -
-			Math.abs(deterministicUnit(plan.edgeId, "curve-upper").y) * CurveMidpointJitter;
-		const lowerY =
-			Math.max(
-				plan.sourcePosition.y + plan.sourcePosition.height,
-				plan.targetPosition.y + plan.targetPosition.height,
-			) +
-			CurveReverseGap +
-			Math.abs(deterministicUnit(plan.edgeId, "curve-lower").y) * CurveMidpointJitter;
-		const upperCost = Math.abs(sourceExit.y - upperY) + Math.abs(targetEntry.y - upperY);
-		const lowerCost = Math.abs(sourceExit.y - lowerY) + Math.abs(targetEntry.y - lowerY);
-		const detourY = upperCost <= lowerCost ? upperY : lowerY;
-		const midpoint = {
-			x: (sourceExit.x + targetEntry.x) / 2,
-			y: detourY,
-		};
-		appendCubic(
-			points,
-			{
-				x: sourceExit.x + CurveReverseOutHandle,
-				y: sourceExit.y,
-			},
-			{
-				x: midpoint.x + CurveReverseMidHandle,
-				y: midpoint.y,
-			},
-			midpoint,
-		);
-		appendCubic(
-			points,
-			{
-				x: midpoint.x - CurveReverseMidHandle,
-				y: midpoint.y,
-			},
-			{
-				x: targetEntry.x - CurveReverseOutHandle,
-				y: targetEntry.y,
-			},
-			targetEntry,
-		);
-	}
-
-	appendCubic(
-		points,
-		{
-			x: targetEntry.x + CurveTerminalRun * CurveTerminalControl,
-			y: targetEntry.y,
-		},
-		{
-			x: plan.target.x - CurveTerminalRun * CurveTerminalControl,
-			y: plan.target.y,
-		},
-		plan.target,
-	);
+	appendRoutePoint(points, {
+		x: plan.sourceTrackX,
+		y: plan.source.y,
+	});
+	appendRoutePoint(points, {
+		x: plan.sourceTrackX,
+		y: plan.routeY,
+	});
+	appendRoutePoint(points, {
+		x: plan.targetTrackX,
+		y: plan.routeY,
+	});
+	appendRoutePoint(points, {
+		x: plan.targetTrackX,
+		y: plan.target.y,
+	});
+	appendRoutePoint(points, plan.target);
 	return points;
 };
 
@@ -1000,7 +936,7 @@ const runLayout = (flow: EditorItemOriginFlowLayoutInput): EditorItemOriginFlowL
 		});
 	}
 
-	const plans: CurvedRoutePlan[] = [];
+	const plans: OrthogonalRoutePlan[] = [];
 	for (const edge of [
 		...flow.edges,
 	].sort((left, right) => left.id.localeCompare(right.id))) {
@@ -1008,28 +944,14 @@ const runLayout = (flow: EditorItemOriginFlowLayoutInput): EditorItemOriginFlowL
 		const targetNode = nodeById.get(edge.target)!;
 		const sourcePosition = positions.get(edge.source)!;
 		const targetPosition = positions.get(edge.target)!;
-		plans.push({
-			edgeId: edge.id,
-			source: readPortPoint(sourceNode, sourcePosition, edge.sourcePortId, "source"),
-			sourceKey: `${edge.source}\u0000${edge.sourcePortId ?? "item"}`,
-			sourcePosition,
-			target: readPortPoint(targetNode, targetPosition, edge.targetPortId, "target"),
-			targetKey: `${edge.target}\u0000${edge.targetPortId ?? "item"}`,
-			targetPosition,
-		});
-	}
-	const sourceFanOffsets = readFanOffsets(plans, "source");
-	const targetFanOffsets = readFanOffsets(plans, "target");
-	const backbones = new Map<string, ReadonlyArray<EditorItemOriginFlowLayoutPoint>>();
-	for (const plan of plans)
-		backbones.set(
-			plan.edgeId,
-			readCurvedRoute(
-				plan,
-				sourceFanOffsets.get(plan.edgeId) ?? 0,
-				targetFanOffsets.get(plan.edgeId) ?? 0,
-			),
+		const source = readPortPoint(sourceNode, sourcePosition, edge.sourcePortId, "source");
+		const target = readPortPoint(targetNode, targetPosition, edge.targetPortId, "target");
+		plans.push(
+			readOrthogonalRoutePlan(source, target, sourcePosition, targetPosition, edge.id),
 		);
+	}
+	const backbones = new Map<string, ReadonlyArray<EditorItemOriginFlowLayoutPoint>>();
+	for (const plan of plans) backbones.set(plan.edgeId, readOrthogonalRoute(plan));
 	return {
 		backbones,
 		positions,

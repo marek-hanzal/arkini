@@ -1,3 +1,4 @@
+import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import {
 	useCallback,
 	useEffect,
@@ -24,10 +25,8 @@ import {
 	type EditorOriginFlowSelection,
 	readEditorOriginFlowHighlight,
 } from "~/ui/item/editor/readEditorOriginFlowHighlight";
-import {
-	readEditorOriginFlowNavigation,
-	readEditorOriginFlowProducerNavigation,
-} from "~/ui/item/editor/readEditorOriginFlowNavigation";
+import { readEditorOriginFlowNavigation } from "~/ui/item/editor/readEditorOriginFlowNavigation";
+import { readEditorOriginFlowRelationNavigationFx } from "~/ui/item/editor/readEditorOriginFlowRelationNavigationFx";
 import { EditorOriginFlowShortcutHelp } from "~/ui/item/editor/EditorOriginFlowShortcutHelp";
 import {
 	type EditorOriginFlowConnectedPorts,
@@ -396,7 +395,7 @@ const readInitialFocusPosition = (
 	)[0]?.[1];
 };
 
-type FlowNavigationShortcut = "back" | "help" | "home" | "next" | "previous" | "producers";
+type FlowNavigationShortcut = "back" | "help" | "home" | "inputs" | "next" | "outputs" | "previous";
 
 const readFlowNavigationShortcut = (event: KeyboardEvent): FlowNavigationShortcut | undefined => {
 	const target = event.target;
@@ -420,7 +419,9 @@ const readFlowNavigationShortcut = (event: KeyboardEvent): FlowNavigationShortcu
 		case "h":
 			return "home";
 		case "i":
-			return "producers";
+			return "inputs";
+		case "o":
+			return "outputs";
 		case "z":
 			return "back";
 		case "?":
@@ -1197,8 +1198,9 @@ export const EditorOriginFlowCanvas = ({
 	const frameRef = useRef<number | undefined>(undefined);
 	const resetViewportRef = useRef(true);
 	const navigationIndexRef = useRef(0);
-	const producerNavigationIndexRef = useRef(-1);
-	const producerNavigationFocusNodeIdRef = useRef<string | undefined>(undefined);
+	const inputNavigationIndexRef = useRef(-1);
+	const outputNavigationIndexRef = useRef(-1);
+	const relationNavigationFocusNodeIdRef = useRef<string | undefined>(undefined);
 	const visitHistoryRef = useRef<ReadonlyArray<string>>([]);
 	const [helpOpen, setHelpOpen] = useState(false);
 	const paletteRef = useRef<CanvasPalette | undefined>(undefined);
@@ -1240,10 +1242,32 @@ export const EditorOriginFlowCanvas = ({
 			highlight,
 		],
 	);
-	const producerNavigationNodeIds = useMemo(
+	const inputNavigationNodeIds = useMemo(
 		() =>
 			selection?.kind === "node"
-				? readEditorOriginFlowProducerNavigation(flow, selection.id)
+				? RendererRuntime.runSync(
+						readEditorOriginFlowRelationNavigationFx({
+							flow,
+							selectedNodeId: selection.id,
+							selectedRole: "input",
+						}),
+					)
+				: [],
+		[
+			flow,
+			selection,
+		],
+	);
+	const outputNavigationNodeIds = useMemo(
+		() =>
+			selection?.kind === "node"
+				? RendererRuntime.runSync(
+						readEditorOriginFlowRelationNavigationFx({
+							flow,
+							selectedNodeId: selection.id,
+							selectedRole: "output",
+						}),
+					)
 				: [],
 		[
 			flow,
@@ -1347,7 +1371,7 @@ export const EditorOriginFlowCanvas = ({
 				node,
 				state.selection,
 				state.highlight,
-				producerNavigationFocusNodeIdRef.current,
+				relationNavigationFocusNodeIdRef.current,
 			);
 			drawItemNode(
 				context,
@@ -1418,13 +1442,19 @@ export const EditorOriginFlowCanvas = ({
 	]);
 
 	useEffect(() => {
-		producerNavigationIndexRef.current = -1;
+		inputNavigationIndexRef.current = -1;
 	}, [
-		producerNavigationNodeIds,
+		inputNavigationNodeIds,
 	]);
 
 	useEffect(() => {
-		producerNavigationFocusNodeIdRef.current = undefined;
+		outputNavigationIndexRef.current = -1;
+	}, [
+		outputNavigationNodeIds,
+	]);
+
+	useEffect(() => {
+		relationNavigationFocusNodeIdRef.current = undefined;
 	}, [
 		selection,
 	]);
@@ -1467,7 +1497,7 @@ export const EditorOriginFlowCanvas = ({
 				const position = positions.get(back.nodeId);
 				if (position === undefined) return;
 				visitHistoryRef.current = back.history;
-				producerNavigationFocusNodeIdRef.current = undefined;
+				relationNavigationFocusNodeIdRef.current = undefined;
 				navigationIndexRef.current = 0;
 				onSelectionChange({
 					id: back.nodeId,
@@ -1478,7 +1508,7 @@ export const EditorOriginFlowCanvas = ({
 			}
 
 			if (shortcut === "home") {
-				producerNavigationFocusNodeIdRef.current = undefined;
+				relationNavigationFocusNodeIdRef.current = undefined;
 				const homeNodeId = navigationNodeIds[0];
 				const homePosition =
 					homeNodeId === undefined
@@ -1495,26 +1525,29 @@ export const EditorOriginFlowCanvas = ({
 				return;
 			}
 
-			if (shortcut === "producers") {
-				if (producerNavigationNodeIds.length === 0) return;
-				const nextIndex =
-					(producerNavigationIndexRef.current + 1) % producerNavigationNodeIds.length;
-				const nodeId = producerNavigationNodeIds[nextIndex];
+			if (shortcut === "inputs" || shortcut === "outputs") {
+				const nodeIds =
+					shortcut === "inputs" ? inputNavigationNodeIds : outputNavigationNodeIds;
+				const indexRef =
+					shortcut === "inputs" ? inputNavigationIndexRef : outputNavigationIndexRef;
+				if (nodeIds.length === 0) return;
+				const nextIndex = (indexRef.current + 1) % nodeIds.length;
+				const nodeId = nodeIds[nextIndex];
 				if (nodeId === undefined) return;
 				const position = positions.get(nodeId);
 				if (position === undefined) return;
-				producerNavigationFocusNodeIdRef.current = nodeId;
+				relationNavigationFocusNodeIdRef.current = nodeId;
 				if (
 					focusPosition(
 						position,
 						Math.max(viewportRef.current.zoom, DefaultViewport.zoom),
 					)
 				)
-					producerNavigationIndexRef.current = nextIndex;
+					indexRef.current = nextIndex;
 				return;
 			}
 
-			producerNavigationFocusNodeIdRef.current = undefined;
+			relationNavigationFocusNodeIdRef.current = undefined;
 			if (navigationNodeIds.length === 0) return;
 			const offset = shortcut === "next" ? 1 : -1;
 			const nextIndex =
@@ -1532,10 +1565,11 @@ export const EditorOriginFlowCanvas = ({
 	}, [
 		flow,
 		helpOpen,
+		inputNavigationNodeIds,
 		navigationNodeIds,
 		onSelectionChange,
+		outputNavigationNodeIds,
 		positions,
-		producerNavigationNodeIds,
 		scheduleDraw,
 	]);
 

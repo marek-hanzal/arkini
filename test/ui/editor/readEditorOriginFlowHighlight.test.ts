@@ -8,10 +8,8 @@ import {
 	type EditorItemOriginOperation,
 } from "~/bridge/item/editor/readEditorItemOriginFlow";
 import { readEditorOriginFlowHighlight } from "~/ui/item/editor/readEditorOriginFlowHighlight";
-import {
-	readEditorOriginFlowNavigation,
-	readEditorOriginFlowProducerNavigation,
-} from "~/ui/item/editor/readEditorOriginFlowNavigation";
+import { readEditorOriginFlowNavigation } from "~/ui/item/editor/readEditorOriginFlowNavigation";
+import { readEditorOriginFlowRelationNavigationFx } from "~/ui/item/editor/readEditorOriginFlowRelationNavigationFx";
 import { readArkiniGameConfigSource } from "~test/schema/support/readArkiniGameConfigSource";
 
 const operation = (
@@ -214,7 +212,13 @@ describe("readEditorOriginFlowHighlight", () => {
 			]),
 		);
 
-		const producerNodeIds = readEditorOriginFlowProducerNavigation(incomeFlow, "item:target");
+		const producerNodeIds = Effect.runSync(
+			readEditorOriginFlowRelationNavigationFx({
+				flow: incomeFlow,
+				selectedNodeId: "item:target",
+				selectedRole: "output",
+			}),
+		);
 		const navigationNodeIds = readEditorOriginFlowNavigation(
 			incomeFlow,
 			positions,
@@ -620,7 +624,13 @@ describe("readEditorOriginFlowHighlight", () => {
 			].some((indexes) => indexes.length > 1),
 		).toBe(true);
 
-		const producerNodeIds = readEditorOriginFlowProducerNavigation(flow, coinNodeId);
+		const producerNodeIds = Effect.runSync(
+			readEditorOriginFlowRelationNavigationFx({
+				flow,
+				selectedNodeId: coinNodeId,
+				selectedRole: "output",
+			}),
+		);
 		const navigationNodeIds = readEditorOriginFlowNavigation(
 			flow,
 			layout,

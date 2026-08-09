@@ -94,32 +94,3 @@ export const readEditorOriginFlowNavigation = (
 	visit(startNodeId);
 	return ordered;
 };
-/** Reads a stable alphabetical list of item nodes whose embedded operations output the selected item. */
-export const readEditorOriginFlowProducerNavigation = (
-	flow: EditorItemOriginFlow,
-	targetNodeId: string,
-): ReadonlyArray<string> => {
-	const nodesById = new Map(
-		flow.nodes.map((node) => [
-			node.id,
-			node,
-		]),
-	);
-	const producerIds = new Set<string>();
-	for (const edge of flow.edges) {
-		if (edge.role !== "output" || edge.target !== targetNodeId) continue;
-		if (edge.source === targetNodeId || !nodesById.has(edge.source)) continue;
-		producerIds.add(edge.source);
-	}
-	return [
-		...producerIds,
-	].sort((leftId, rightId) => {
-		const left = nodesById.get(leftId)!;
-		const right = nodesById.get(rightId)!;
-		return (
-			left.title.localeCompare(right.title) ||
-			left.itemId.localeCompare(right.itemId) ||
-			leftId.localeCompare(rightId)
-		);
-	});
-};

@@ -19,6 +19,10 @@ const ShortcutRows = [
 	],
 	[
 		"I",
+		"Cycle through items whose operations use the selected item as an input.",
+	],
+	[
+		"O",
 		"Cycle through items whose operations output the selected item.",
 	],
 	[

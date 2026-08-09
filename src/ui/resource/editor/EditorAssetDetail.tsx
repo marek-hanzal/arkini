@@ -88,6 +88,14 @@ export const EditorAssetDetail = ({
 								resourceId={resourceId}
 								to="/editor/$projectId/assets/$resourceId/detail/usage"
 							/>
+							<EditorAssetDetailTab
+								filter={filter}
+								label="Technical"
+								projectId={project.projectId}
+								query={query}
+								resourceId={resourceId}
+								to="/editor/$projectId/assets/$resourceId/detail/technical"
+							/>
 						</EditorSectionTabs>
 					}
 					action={

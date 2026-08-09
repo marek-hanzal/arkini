@@ -34,6 +34,7 @@ vi.mock("~/ui/button/Button", () => {
 });
 
 import { EditorAssetDetail } from "~/ui/resource/editor/EditorAssetDetail";
+import { EditorAssetTechnical } from "~/ui/resource/editor/EditorAssetTechnical";
 import { EditorAssetUsage } from "~/ui/resource/editor/EditorAssetUsage";
 
 (
@@ -47,6 +48,7 @@ const roots: Array<ReturnType<typeof createRoot>> = [];
 beforeEach(() => {
 	state.project = {
 		projectId: "editor-test",
+		revision: 7,
 		resources: [
 			{
 				id: "item-water",
@@ -96,6 +98,42 @@ describe("editor asset detail", () => {
 		expect(container.querySelector('[data-ui="EditorAssetDetailCard"]')?.textContent).toContain(
 			"Overview body",
 		);
+	});
+
+	it("keeps Overview, Usage, and Technical as explicit asset detail leaves", async () => {
+		const container = await render(
+			createElement(
+				EditorAssetDetail,
+				{
+					filter: "all",
+					query: "water",
+					resourceId: "item-water",
+				},
+				createElement("span", null, "Technical body"),
+			),
+		);
+		const routes = [
+			...container.querySelectorAll<HTMLAnchorElement>("a"),
+		].map((link) => link.dataset.to);
+		expect(routes).toContain("/editor/$projectId/assets/$resourceId/detail/overview");
+		expect(routes).toContain("/editor/$projectId/assets/$resourceId/detail/usage");
+		expect(routes).toContain("/editor/$projectId/assets/$resourceId/detail/technical");
+	});
+
+	it("renders immutable technical resource facts without raw implementation state", async () => {
+		const container = await render(
+			createElement(EditorAssetTechnical, {
+				resourceId: "item-water",
+			}),
+		);
+		expect(container.textContent).toContain("Resource ID");
+		expect(container.textContent).toContain("item-water");
+		expect(container.textContent).toContain("image/png");
+		expect(container.textContent).toContain("3 bytes");
+		expect(container.textContent).toContain("Project revision");
+		expect(container.textContent).toContain("7");
+		expect(container.textContent).toContain("Included in current project");
+		expect(container.textContent).not.toContain("blob:");
 	});
 
 	it("distinguishes an unused asset from saved item references", async () => {

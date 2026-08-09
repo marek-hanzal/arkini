@@ -1,5 +1,6 @@
-import type { EditorItem, EditorLine, EditorMerge } from "~/bridge/item/editor/EditorItemModel";
 import { useEditorProject } from "~/bridge/editor/useEditorProject";
+import type { EditorItem, EditorLine, EditorMerge } from "~/bridge/item/editor/EditorItemModel";
+import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import { PrimaryButtonLink } from "~/ui/button/Button";
 import {
 	ItemInfoFact,
@@ -15,11 +16,11 @@ import {
 	OutputDetail,
 } from "~/ui/item/editor/EditorItemDetailDefinition";
 import { EditorItemNotFound } from "~/ui/item/editor/EditorItemNotFound";
-import {
-	readEditorItemSections,
-	type EditorItemOptionalCapability,
-	type EditorItemSectionId,
+import type {
+	EditorItemOptionalCapability,
+	EditorItemSectionId,
 } from "~/ui/item/editor/EditorItemSections";
+import { readEditorItemSectionsFx } from "~/ui/item/editor/readEditorItemSectionsFx";
 import { EditorItemArtworkTimeline } from "~/ui/item/editor/EditorItemArtworkTimeline";
 import { EditorItemFlowSection } from "~/ui/item/editor/EditorItemFlowSection";
 import { EditorItemThumbnail } from "~/ui/item/editor/EditorItemThumbnail";
@@ -289,7 +290,9 @@ export const EditorItemDetailSectionPage = ({
 }) => {
 	const item = useEditorItemByUid(uid);
 	if (item === undefined) return <EditorItemNotFound uid={uid} />;
-	const available = readEditorItemSections(item).some((candidate) => candidate.id === sectionId);
+	const available = RendererRuntime.runSync(readEditorItemSectionsFx(item)).some(
+		(candidate) => candidate.id === sectionId,
+	);
 	if (!available) {
 		return (
 			<section

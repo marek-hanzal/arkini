@@ -1,10 +1,9 @@
+import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import {
-	EditorProjectSections,
-	parseEditorProjectSectionId,
-	readEditorProjectSectionForPath,
-} from "~/ui/project/editor/EditorProjectSections";
+import { EditorProjectSections } from "~/ui/project/editor/EditorProjectSections";
+import { parseEditorProjectSectionIdFx } from "~/ui/project/editor/parseEditorProjectSectionIdFx";
+import { readEditorProjectSectionForPathFx } from "~/ui/project/editor/readEditorProjectSectionForPathFx";
 
 describe("EditorProjectSections", () => {
 	it("keeps metadata, appearance, and all game surfaces as three route leaves", () => {
@@ -22,8 +21,8 @@ describe("EditorProjectSections", () => {
 				label: "Surfaces",
 			},
 		]);
-		expect(parseEditorProjectSectionId("surfaces")).toBe("surfaces");
-		expect(() => parseEditorProjectSectionId("board")).toThrow(
+		expect(Effect.runSync(parseEditorProjectSectionIdFx("surfaces"))).toBe("surfaces");
+		expect(() => Effect.runSync(parseEditorProjectSectionIdFx("board"))).toThrow(
 			"Unknown editor project section board.",
 		);
 	});
@@ -35,9 +34,11 @@ describe("EditorProjectSections", () => {
 			"inventory",
 		]) {
 			expect(
-				readEditorProjectSectionForPath([
-					path,
-				]),
+				Effect.runSync(
+					readEditorProjectSectionForPathFx([
+						path,
+					]),
+				),
 			).toBe("surfaces");
 		}
 	});

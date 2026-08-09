@@ -1,11 +1,10 @@
+import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import type { EditorItem } from "~/bridge/item/editor/EditorItemModel";
-import {
-	parseEditorItemSectionId,
-	readEditorItemSectionForPath,
-	readEditorItemSections,
-} from "~/ui/item/editor/EditorItemSections";
+import { parseEditorItemSectionIdFx } from "~/ui/item/editor/parseEditorItemSectionIdFx";
+import { readEditorItemSectionForPathFx } from "~/ui/item/editor/readEditorItemSectionForPathFx";
+import { readEditorItemSectionsFx } from "~/ui/item/editor/readEditorItemSectionsFx";
 
 const item = (type: EditorItem["type"]) =>
 	({
@@ -14,32 +13,38 @@ const item = (type: EditorItem["type"]) =>
 
 describe("EditorItemSections", () => {
 	it("parses only supported dynamic route sections", () => {
-		expect(parseEditorItemSectionId("artwork")).toBe("artwork");
-		expect(() => parseEditorItemSectionId("unknown")).toThrow(
+		expect(Effect.runSync(parseEditorItemSectionIdFx("artwork"))).toBe("artwork");
+		expect(() => Effect.runSync(parseEditorItemSectionIdFx("unknown"))).toThrow(
 			"Unknown editor item section unknown.",
 		);
 	});
 
 	it("keeps the canonical shared sections and adds only type-owned concerns", () => {
-		expect(readEditorItemSections(item("simple"))[0]).toEqual({
+		expect(Effect.runSync(readEditorItemSectionsFx(item("simple")))[0]).toEqual({
 			id: "identity",
 			label: "Item",
 		});
-		expect(readEditorItemSections(item("simple")).map(({ id }) => id)).toEqual([
+		expect(
+			Effect.runSync(readEditorItemSectionsFx(item("simple"))).map(({ id }) => id),
+		).toEqual([
 			"identity",
 			"artwork",
 			"charges",
 			"merges",
 			"flow",
 		]);
-		expect(readEditorItemSections(item("inventory")).map(({ id }) => id)).toEqual([
+		expect(
+			Effect.runSync(readEditorItemSectionsFx(item("inventory"))).map(({ id }) => id),
+		).toEqual([
 			"identity",
 			"artwork",
 			"charges",
 			"merges",
 			"flow",
 		]);
-		expect(readEditorItemSections(item("producer")).map(({ id }) => id)).toEqual([
+		expect(
+			Effect.runSync(readEditorItemSectionsFx(item("producer"))).map(({ id }) => id),
+		).toEqual([
 			"identity",
 			"artwork",
 			"charges",
@@ -51,40 +56,52 @@ describe("EditorItemSections", () => {
 
 	it("routes schema issues to the section that owns their top-level field", () => {
 		expect(
-			readEditorItemSectionForPath([
-				"title",
-			]),
+			Effect.runSync(
+				readEditorItemSectionForPathFx([
+					"title",
+				]),
+			),
 		).toBe("identity");
 		expect(
-			readEditorItemSectionForPath([
-				"asset",
-				"default",
-				0,
-			]),
+			Effect.runSync(
+				readEditorItemSectionForPathFx([
+					"asset",
+					"default",
+					0,
+				]),
+			),
 		).toBe("artwork");
 		expect(
-			readEditorItemSectionForPath([
-				"maxStackSize",
-			]),
+			Effect.runSync(
+				readEditorItemSectionForPathFx([
+					"maxStackSize",
+				]),
+			),
 		).toBe("identity");
 		expect(
-			readEditorItemSectionForPath([
-				"charges",
-				"amount",
-			]),
+			Effect.runSync(
+				readEditorItemSectionForPathFx([
+					"charges",
+					"amount",
+				]),
+			),
 		).toBe("charges");
 		expect(
-			readEditorItemSectionForPath([
-				"merge",
-				0,
-			]),
+			Effect.runSync(
+				readEditorItemSectionForPathFx([
+					"merge",
+					0,
+				]),
+			),
 		).toBe("merges");
 		expect(
-			readEditorItemSectionForPath([
-				"lines",
-				1,
-				"output",
-			]),
+			Effect.runSync(
+				readEditorItemSectionForPathFx([
+					"lines",
+					1,
+					"output",
+				]),
+			),
 		).toBe("production");
 	});
 });

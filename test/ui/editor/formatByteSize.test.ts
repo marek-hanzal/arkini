@@ -1,6 +1,7 @@
+import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { formatByteSize } from "~/ui/arkpack/editor/formatByteSize";
+import { formatByteSizeFx } from "~/ui/arkpack/editor/formatByteSizeFx";
 
 describe("formatByteSize", () => {
 	it.each([
@@ -29,6 +30,6 @@ describe("formatByteSize", () => {
 			"1 GB",
 		],
 	])("formats %i bytes as %s", (bytes, expected) => {
-		expect(formatByteSize(bytes)).toBe(expected);
+		expect(Effect.runSync(formatByteSizeFx(bytes))).toBe(expected);
 	});
 });

@@ -1,7 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 
 import { EditorItemSectionPage } from "~/ui/item/editor/EditorItemSectionPage";
-import { parseEditorItemSectionId } from "~/ui/item/editor/EditorItemSections";
+import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
+import { parseEditorItemSectionIdFx } from "~/ui/item/editor/parseEditorItemSectionIdFx";
 
 export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/form/$sectionId")({
 	component: EditorItemFormSectionRoute,
@@ -9,5 +10,9 @@ export const Route = createFileRoute("/editor/$projectId/editor/items/$itemUid/f
 
 function EditorItemFormSectionRoute() {
 	const { sectionId } = Route.useParams();
-	return <EditorItemSectionPage section={parseEditorItemSectionId(sectionId)} />;
+	return (
+		<EditorItemSectionPage
+			section={RendererRuntime.runSync(parseEditorItemSectionIdFx(sectionId))}
+		/>
+	);
 }

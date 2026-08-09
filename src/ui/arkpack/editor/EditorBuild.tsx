@@ -3,11 +3,12 @@ import * as AsyncResult from "effect/unstable/reactivity/AsyncResult";
 
 import { buildEditorProjectCommandAtom } from "~/bridge/arkpack/editor/buildEditorProjectCommandAtom";
 import { installBuiltEditorArkpackCommandAtom } from "~/bridge/arkpack/editor/installBuiltEditorArkpackCommandAtom";
-import { readEditorBuildDiagnostics } from "~/bridge/arkpack/editor/readEditorBuildDiagnostics";
+import { readEditorBuildDiagnosticsFx } from "~/bridge/arkpack/editor/readEditorBuildDiagnosticsFx";
 import { saveBuiltEditorArkpackCommandAtom } from "~/bridge/arkpack/editor/saveBuiltEditorArkpackCommandAtom";
 import { useEditorProject } from "~/bridge/editor/useEditorProject";
+import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import { EditorBuildDiagnostics } from "~/ui/arkpack/editor/EditorBuildDiagnostics";
-import { formatByteSize } from "~/ui/arkpack/editor/formatByteSize";
+import { formatByteSizeFx } from "~/ui/arkpack/editor/formatByteSizeFx";
 import { Button, PrimaryButton } from "~/ui/button/Button";
 import { readSettledAsyncResultError } from "~/ui/reactivity/readSettledAsyncResultError";
 
@@ -30,7 +31,7 @@ export const EditorBuild = () => {
 	const buildError = readSettledAsyncResultError(buildResult);
 	const installError = readSettledAsyncResultError(installResult);
 	const saveError = readSettledAsyncResultError(saveResult);
-	const errorDiagnostics = readEditorBuildDiagnostics(buildError);
+	const errorDiagnostics = RendererRuntime.runSync(readEditorBuildDiagnosticsFx(buildError));
 	const diagnostics = errorDiagnostics ?? artifact?.diagnostics ?? [];
 
 	return (
@@ -98,7 +99,8 @@ export const EditorBuild = () => {
 				<article className="rounded-2xl border-l-2 border-line-strong bg-surface-raised/60 p-5">
 					<h2 className="text-lg font-semibold">Build output</h2>
 					<p className="mt-2 break-all text-sm text-muted">
-						{artifact.filename} · {formatByteSize(artifact.bytes.byteLength)} ·{" "}
+						{artifact.filename} ·{" "}
+						{RendererRuntime.runSync(formatByteSizeFx(artifact.bytes.byteLength))} ·{" "}
 						{artifact.contentHash}
 					</p>
 					<div className="mt-4 flex flex-wrap gap-3">

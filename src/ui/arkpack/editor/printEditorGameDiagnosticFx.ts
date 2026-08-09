@@ -1,14 +1,12 @@
-import type { EditorGameDiagnostic } from "~/bridge/arkpack/editor/readEditorBuildDiagnostics";
-import { readEditorGameDiagnosticPresentation } from "~/bridge/arkpack/editor/readEditorGameDiagnosticPresentation";
+import { Effect } from "effect";
+
+import type { EditorGameDiagnostic } from "~/bridge/arkpack/editor/readEditorBuildDiagnosticsFx";
+import { readEditorGameDiagnosticPresentationFx } from "~/bridge/arkpack/editor/readEditorGameDiagnosticPresentationFx";
 import type { EditorProject } from "~/bridge/editor/EditorProject";
-import {
-	readEditorItemSectionForPath,
-	type EditorItemSectionId,
-} from "~/ui/item/editor/EditorItemSections";
-import {
-	readEditorProjectSectionForPath,
-	type EditorProjectSectionId,
-} from "~/ui/project/editor/EditorProjectSections";
+import type { EditorItemSectionId } from "~/ui/item/editor/EditorItemSections";
+import { readEditorItemSectionForPathFx } from "~/ui/item/editor/readEditorItemSectionForPathFx";
+import type { EditorProjectSectionId } from "~/ui/project/editor/EditorProjectSections";
+import { readEditorProjectSectionForPathFx } from "~/ui/project/editor/readEditorProjectSectionForPathFx";
 
 export type EditorDiagnosticTarget =
 	| {
@@ -75,7 +73,9 @@ const readDiagnosticItemIds = (diagnostic: EditorGameDiagnostic): ReadonlyArray<
 	}
 };
 
-const readItemSection = (diagnostic: EditorGameDiagnostic): EditorItemSectionId => {
+const readOwnedItemSection = (
+	diagnostic: EditorGameDiagnostic,
+): EditorItemSectionId | undefined => {
 	switch (diagnostic.code) {
 		case "merge:invalid":
 			return "merges";
@@ -91,14 +91,19 @@ const readItemSection = (diagnostic: EditorGameDiagnostic): EditorItemSectionId 
 		case "resource:missing":
 			return "artwork";
 		default:
-			return readEditorItemSectionForPath(diagnostic.path.slice(2));
+			return undefined;
 	}
 };
 
-const readEditorDiagnosticTargets = (
+/** Projects one canonical diagnostic into editor copy and actionable route targets. */
+export const printEditorGameDiagnosticFx = Effect.fn("printEditorGameDiagnosticFx")(function* (
 	diagnostic: EditorGameDiagnostic,
 	project: Pick<EditorProject, "config" | "resources">,
-): ReadonlyArray<EditorDiagnosticTarget> => {
+) {
+	const presentation = yield* readEditorGameDiagnosticPresentationFx(diagnostic);
+	const ownedItemSection = readOwnedItemSection(diagnostic);
+	const itemSection =
+		ownedItemSection ?? (yield* readEditorItemSectionForPathFx(diagnostic.path.slice(2)));
 	const itemTargets = [
 		...new Set(readDiagnosticItemIds(diagnostic)),
 	].flatMap((itemId) => {
@@ -109,42 +114,36 @@ const readEditorDiagnosticTargets = (
 					{
 						kind: "item",
 						itemUid: item.uid,
-						sectionId: readItemSection(diagnostic),
+						sectionId: itemSection,
 						label: item.title,
 					} satisfies EditorDiagnosticTarget,
 				];
 	});
-	if (itemTargets.length > 0) return itemTargets;
-
-	if (
+	let targets: ReadonlyArray<EditorDiagnosticTarget>;
+	if (itemTargets.length > 0) {
+		targets = itemTargets;
+	} else if (
 		(diagnostic.code === "resource:duplicate" || diagnostic.code === "resource:unused") &&
 		project.resources.some((resource) => resource.id === diagnostic.resourceId)
 	) {
-		return [
+		targets = [
 			{
 				kind: "asset",
 				resourceId: diagnostic.resourceId,
 				label: diagnostic.resourceId,
 			},
 		];
+	} else if (diagnostic.code === "source:json-invalid") {
+		targets = [];
+	} else {
+		targets = [
+			{
+				kind: "project",
+				sectionId: yield* readEditorProjectSectionForPathFx(diagnostic.path),
+				label: "project settings",
+			},
+		];
 	}
-
-	if (diagnostic.code === "source:json-invalid") return [];
-	return [
-		{
-			kind: "project",
-			sectionId: readEditorProjectSectionForPath(diagnostic.path),
-			label: "project settings",
-		},
-	];
-};
-
-/** Projects one canonical diagnostic into editor copy and actionable route targets. */
-export const printEditorGameDiagnostic = (
-	diagnostic: EditorGameDiagnostic,
-	project: Pick<EditorProject, "config" | "resources">,
-): EditorGameDiagnosticPresentation => {
-	const presentation = readEditorGameDiagnosticPresentation(diagnostic);
 	const location = [
 		diagnostic.source,
 		diagnostic.path.length === 0 ? undefined : diagnostic.path.join("."),
@@ -157,6 +156,6 @@ export const printEditorGameDiagnostic = (
 		severity: diagnostic.severity,
 		...presentation,
 		location: location.length === 0 ? undefined : location,
-		targets: readEditorDiagnosticTargets(diagnostic, project),
-	};
-};
+		targets,
+	} satisfies EditorGameDiagnosticPresentation;
+});

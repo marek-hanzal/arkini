@@ -1,6 +1,7 @@
 import type { PropsWithChildren } from "react";
 
 import { useEditorProject } from "~/bridge/editor/useEditorProject";
+import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import { ButtonLink, PrimaryButtonLink } from "~/ui/button/Button";
 import { editorBackLinkClassName, EditorBackIcon } from "~/ui/editor/EditorBackIcon";
 import { EditorSectionNavigation } from "~/ui/editor/EditorSectionNavigation";
@@ -12,10 +13,8 @@ import { ItemTypeLabel } from "~/ui/item-detail/ItemInfoPresentation";
 import { EditorItemNotFound } from "~/ui/item/editor/EditorItemNotFound";
 import { EditorItemConvertMenu } from "~/ui/item/editor/EditorItemConvertMenu";
 import { EditorItemSectionLink } from "~/ui/item/editor/EditorItemSectionLink";
-import {
-	readEditorItemSections,
-	type EditorItemSectionId,
-} from "~/ui/item/editor/EditorItemSections";
+import type { EditorItemSectionId } from "~/ui/item/editor/EditorItemSections";
+import { readEditorItemSectionsFx } from "~/ui/item/editor/readEditorItemSectionsFx";
 import { useEditorItemByUid } from "~/ui/item/editor/useEditorItemByUid";
 
 /** Owns the stable item-detail header while routed sections replace only its body. */
@@ -36,6 +35,7 @@ export const EditorItemDetail = ({
 		itemUid: item.uid,
 	};
 	const editableSectionId = sectionId === "flow" ? "identity" : sectionId;
+	const sections = RendererRuntime.runSync(readEditorItemSectionsFx(item));
 	return (
 		<EditorSectionPage
 			tabs={
@@ -66,7 +66,7 @@ export const EditorItemDetail = ({
 					}
 					tabs={
 						<EditorSectionTabs label="Item sections">
-							{readEditorItemSections(item).map((section) => (
+							{sections.map((section) => (
 								<EditorItemSectionLink
 									destination="detail"
 									itemUid={item.uid}

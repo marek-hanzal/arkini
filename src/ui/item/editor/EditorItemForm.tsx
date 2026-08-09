@@ -13,11 +13,11 @@ import { EditorFormSectionPage } from "~/ui/form/EditorFormSectionPage";
 import { EditorItemFormProvider } from "~/ui/item/editor/EditorItemFormContext";
 import { EditorItemNotFound } from "~/ui/item/editor/EditorItemNotFound";
 import { EditorItemSectionLink } from "~/ui/item/editor/EditorItemSectionLink";
-import {
-	readEditorItemFormSections,
-	type EditorItemOptionalCapability,
-	type EditorItemSectionId,
+import type {
+	EditorItemOptionalCapability,
+	EditorItemSectionId,
 } from "~/ui/item/editor/EditorItemSections";
+import { readEditorItemFormSectionsFx } from "~/ui/item/editor/readEditorItemFormSectionsFx";
 import { useEditorItemByUid } from "~/ui/item/editor/useEditorItemByUid";
 import { useEditorItemFormController } from "~/ui/item/editor/useEditorItemFormController";
 
@@ -99,7 +99,7 @@ const EditorItemFormSession = ({
 			itemType,
 		],
 	);
-	const sections = readEditorItemFormSections(initialItem);
+	const sections = RendererRuntime.runSync(readEditorItemFormSectionsFx(initialItem));
 	const params = {
 		projectId: project.projectId,
 		itemUid: initialItem.uid,

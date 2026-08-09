@@ -1,6 +1,7 @@
+import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { printEditorGameDiagnostic } from "~/ui/arkpack/editor/printEditorGameDiagnostic";
+import { printEditorGameDiagnosticFx } from "~/ui/arkpack/editor/printEditorGameDiagnosticFx";
 import type { EditorProject } from "~/bridge/editor/EditorProject";
 
 const project = {
@@ -25,25 +26,27 @@ const project = {
 
 describe("printEditorGameDiagnostic", () => {
 	it("links an item-owned input diagnostic to its production form", () => {
-		const printed = printEditorGameDiagnostic(
-			{
-				code: "input:capacity-unsupported",
-				severity: "error",
-				path: [
-					"items",
-					"producer:academy",
-					"lines",
-					0,
-					"inputs",
-					0,
-				],
-				message: "This input buffer is only supported by producer lines.",
-				ownerItemId: "producer:academy",
-				lineId: "line:academy:knowledge",
-				inputIndex: 0,
-				capacity: 2,
-			},
-			project,
+		const printed = Effect.runSync(
+			printEditorGameDiagnosticFx(
+				{
+					code: "input:capacity-unsupported",
+					severity: "error",
+					path: [
+						"items",
+						"producer:academy",
+						"lines",
+						0,
+						"inputs",
+						0,
+					],
+					message: "This input buffer is only supported by producer lines.",
+					ownerItemId: "producer:academy",
+					lineId: "line:academy:knowledge",
+					inputIndex: 0,
+					capacity: 2,
+				},
+				project,
+			),
 		);
 
 		expect(printed.title).toBe("Unsupported input capacity");
@@ -58,18 +61,20 @@ describe("printEditorGameDiagnostic", () => {
 	});
 
 	it("links an existing unused resource to its asset detail", () => {
-		const printed = printEditorGameDiagnostic(
-			{
-				code: "resource:unused",
-				severity: "warning",
-				path: [
-					"resources",
-					"unused-asset",
-				],
-				message: "The asset is not referenced by the project.",
-				resourceId: "unused-asset",
-			},
-			project,
+		const printed = Effect.runSync(
+			printEditorGameDiagnosticFx(
+				{
+					code: "resource:unused",
+					severity: "warning",
+					path: [
+						"resources",
+						"unused-asset",
+					],
+					message: "The asset is not referenced by the project.",
+					resourceId: "unused-asset",
+				},
+				project,
+			),
 		);
 
 		expect(printed.targets).toEqual([
@@ -82,35 +87,37 @@ describe("printEditorGameDiagnostic", () => {
 	});
 
 	it("links every item involved in a duplicate UID diagnostic", () => {
-		const printed = printEditorGameDiagnostic(
-			{
-				code: "item:duplicate-uid",
-				severity: "error",
-				path: [
-					"items",
-					"producer:library",
-					"uid",
-				],
-				message: "Academy and Library share the same immutable UID.",
-				uid: "duplicate-uid",
-				itemIds: [
-					"producer:academy",
-					"producer:library",
-				],
-				paths: [
-					[
-						"items",
-						"producer:academy",
-						"uid",
-					],
-					[
+		const printed = Effect.runSync(
+			printEditorGameDiagnosticFx(
+				{
+					code: "item:duplicate-uid",
+					severity: "error",
+					path: [
 						"items",
 						"producer:library",
 						"uid",
 					],
-				],
-			},
-			project,
+					message: "Academy and Library share the same immutable UID.",
+					uid: "duplicate-uid",
+					itemIds: [
+						"producer:academy",
+						"producer:library",
+					],
+					paths: [
+						[
+							"items",
+							"producer:academy",
+							"uid",
+						],
+						[
+							"items",
+							"producer:library",
+							"uid",
+						],
+					],
+				},
+				project,
+			),
 		);
 
 		expect(printed.targets.map((target) => target.label)).toEqual([

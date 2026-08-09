@@ -1,7 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 
 import { EditorProjectSectionPage } from "~/ui/project/editor/EditorProjectSectionPage";
-import { parseEditorProjectSectionId } from "~/ui/project/editor/EditorProjectSections";
+import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
+import { parseEditorProjectSectionIdFx } from "~/ui/project/editor/parseEditorProjectSectionIdFx";
 
 export const Route = createFileRoute("/editor/$projectId/project/$sectionId")({
 	component: EditorProjectSectionRoute,
@@ -9,5 +10,9 @@ export const Route = createFileRoute("/editor/$projectId/project/$sectionId")({
 
 function EditorProjectSectionRoute() {
 	const { sectionId } = Route.useParams();
-	return <EditorProjectSectionPage section={parseEditorProjectSectionId(sectionId)} />;
+	return (
+		<EditorProjectSectionPage
+			section={RendererRuntime.runSync(parseEditorProjectSectionIdFx(sectionId))}
+		/>
+	);
 }

@@ -2,6 +2,7 @@ import { createFormHook } from "@tanstack/react-form";
 import type { PropsWithChildren } from "react";
 import { twMerge } from "tailwind-merge";
 
+import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import { EditorBooleanToggleBadge } from "~/ui/form/EditorBooleanToggleBadge";
 import { EditorDurationHint } from "~/ui/form/EditorDurationHint";
 import { EditorInfoTooltip } from "~/ui/form/EditorInfoTooltip";
@@ -11,7 +12,7 @@ import {
 	selectableActiveClassName,
 	selectableInactiveClassName,
 } from "~/ui/form/SelectableStateClassName";
-import { readEditorFieldError } from "~/ui/form/readEditorFieldError";
+import { readEditorFieldErrorFx } from "~/ui/form/readEditorFieldErrorFx";
 import { EditorItemAutocompleteField } from "~/ui/item/editor/EditorItemAutocompleteField";
 import { EditorAssetAutocompleteField } from "~/ui/resource/editor/EditorAssetAutocompleteField";
 
@@ -55,7 +56,7 @@ const EditorTextField = ({
 	readOnly = false,
 }: EditorTextFieldProps) => {
 	const field = useFieldContext<string>();
-	const error = readEditorFieldError(field.state.meta.errors);
+	const error = RendererRuntime.runSync(readEditorFieldErrorFx(field.state.meta.errors));
 	return (
 		<EditorField
 			label={label}
@@ -94,7 +95,7 @@ const EditorTextAreaField = ({
 	rows = 4,
 }: EditorTextAreaFieldProps) => {
 	const field = useFieldContext<string>();
-	const error = readEditorFieldError(field.state.meta.errors);
+	const error = RendererRuntime.runSync(readEditorFieldErrorFx(field.state.meta.errors));
 	return (
 		<EditorField
 			className={fill ? "h-full grid-rows-[auto_minmax(0,1fr)] content-stretch" : undefined}
@@ -134,7 +135,7 @@ const EditorNumberField = ({
 	step = 1,
 }: EditorNumberFieldProps) => {
 	const field = useFieldContext<number | undefined>();
-	const error = readEditorFieldError(field.state.meta.errors);
+	const error = RendererRuntime.runSync(readEditorFieldErrorFx(field.state.meta.errors));
 	const value = field.state.value;
 	return (
 		<EditorField
@@ -170,7 +171,7 @@ export interface EditorSecondsFieldProps {
 
 const EditorSecondsField = ({ description, label }: EditorSecondsFieldProps) => {
 	const field = useFieldContext<number>();
-	const error = readEditorFieldError(field.state.meta.errors);
+	const error = RendererRuntime.runSync(readEditorFieldErrorFx(field.state.meta.errors));
 	const seconds = field.state.value / 1_000;
 	return (
 		<EditorField
@@ -206,7 +207,7 @@ export interface EditorChoiceFieldProps {
 
 const EditorChoiceField = ({ description, label, options }: EditorChoiceFieldProps) => {
 	const field = useFieldContext<string>();
-	const error = readEditorFieldError(field.state.meta.errors);
+	const error = RendererRuntime.runSync(readEditorFieldErrorFx(field.state.meta.errors));
 	return (
 		<fieldset
 			className="grid min-w-0 content-start gap-1.5 text-sm"

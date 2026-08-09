@@ -9,12 +9,13 @@ import {
 } from "~/bridge/item/editor/EditorItemFormSchema";
 import type { EditorItem } from "~/bridge/item/editor/EditorItemModel";
 import { saveEditorItemCommandAtom } from "~/bridge/item/editor/saveEditorItemCommandAtom";
+import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import { useAppForm } from "~/ui/form/EditorForm";
-import {
-	readEditorItemSectionForPath,
-	type EditorItemOptionalCapability,
-	type EditorItemSectionId,
+import type {
+	EditorItemOptionalCapability,
+	EditorItemSectionId,
 } from "~/ui/item/editor/EditorItemSections";
+import { readEditorItemSectionForPathFx } from "~/ui/item/editor/readEditorItemSectionForPathFx";
 import { EditorItemDraftDefaults } from "~/ui/item/editor/EditorItemDraftDefaults";
 import { readSettledAsyncResultError } from "~/ui/reactivity/readSettledAsyncResultError";
 
@@ -120,7 +121,9 @@ export const useEditorItemFormController = ({
 			const result = EditorItemFormSchema.safeParse(form.state.values);
 			const issue = result.success ? undefined : result.error.issues[0];
 			if (issue !== undefined) {
-				await onInvalidSection(readEditorItemSectionForPath(issue.path));
+				await onInvalidSection(
+					RendererRuntime.runSync(readEditorItemSectionForPathFx(issue.path)),
+				);
 				const focusInvalidField = () =>
 					document.querySelector<HTMLElement>("[aria-invalid='true']")?.focus();
 				if (typeof requestAnimationFrame === "function") {

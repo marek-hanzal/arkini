@@ -1,6 +1,7 @@
+import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import { formatEditorDuration } from "~/ui/form/EditorDurationHint";
+import { formatEditorDurationFx } from "~/ui/form/formatEditorDurationFx";
 
 describe("formatEditorDuration", () => {
 	it.each([
@@ -29,10 +30,10 @@ describe("formatEditorDuration", () => {
 			"-1m 30s",
 		],
 	])("formats %s seconds as %s", (seconds, expected) => {
-		expect(formatEditorDuration(seconds)).toBe(expected);
+		expect(Effect.runSync(formatEditorDurationFx(seconds))).toBe(expected);
 	});
 
 	it("omits invalid values", () => {
-		expect(formatEditorDuration(Number.NaN)).toBeUndefined();
+		expect(Effect.runSync(formatEditorDurationFx(Number.NaN))).toBeUndefined();
 	});
 });

@@ -1,5 +1,6 @@
 // @vitest-environment jsdom
 
+import { Effect } from "effect";
 import * as AsyncResult from "effect/unstable/reactivity/AsyncResult";
 import { act, createElement, type AnchorHTMLAttributes, type ButtonHTMLAttributes } from "react";
 import { createRoot } from "react-dom/client";
@@ -42,6 +43,12 @@ vi.mock("~/bridge/arkpack/editor/saveBuiltEditorArkpackCommandAtom", () => ({
 
 vi.mock("~/bridge/editor/useEditorProject", () => ({
 	useEditorProject: () => state.project,
+}));
+
+vi.mock("~/bridge/runtime/RendererRuntime", () => ({
+	RendererRuntime: {
+		runSync: Effect.runSync,
+	},
 }));
 
 vi.mock("~/ui/button/Button", () => ({

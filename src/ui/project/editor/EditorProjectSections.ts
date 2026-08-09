@@ -25,25 +25,3 @@ export const EditorProjectSections = [
 		label: "Surfaces",
 	},
 ] as const satisfies ReadonlyArray<EditorProjectSectionDescriptor>;
-
-export const parseEditorProjectSectionId = (candidate: string): EditorProjectSectionId => {
-	const section = EditorProjectSectionIds.find((id) => id === candidate);
-	if (section === undefined) throw new Error(`Unknown editor project section ${candidate}.`);
-	return section;
-};
-
-export const readEditorProjectSectionForPath = (
-	path: ReadonlyArray<PropertyKey>,
-): EditorProjectSectionId => {
-	switch (path[0]) {
-		case "hero":
-		case "avatars":
-			return "appearance";
-		case "board":
-		case "toolbarSize":
-		case "inventory":
-			return "surfaces";
-		default:
-			return "general";
-	}
-};

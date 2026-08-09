@@ -1,9 +1,10 @@
+import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import type { EditorProject } from "~/bridge/editor/EditorProject";
-import type { EditorGameDiagnostic } from "~/bridge/arkpack/editor/readEditorBuildDiagnostics";
+import type { EditorGameDiagnostic } from "~/bridge/arkpack/editor/readEditorBuildDiagnosticsFx";
 import {
-	printEditorGameDiagnostic,
+	printEditorGameDiagnosticFx,
 	type EditorDiagnosticTarget,
-} from "~/ui/arkpack/editor/printEditorGameDiagnostic";
+} from "~/ui/arkpack/editor/printEditorGameDiagnosticFx";
 import { ButtonLink } from "~/ui/button/Button";
 
 const EditorDiagnosticLink = ({
@@ -67,7 +68,9 @@ export const EditorBuildDiagnostics = ({
 }) => (
 	<ul className="mt-4 grid gap-3">
 		{diagnostics.map((diagnostic, index) => {
-			const printed = printEditorGameDiagnostic(diagnostic, project);
+			const printed = RendererRuntime.runSync(
+				printEditorGameDiagnosticFx(diagnostic, project),
+			);
 			return (
 				<li
 					key={`${diagnostic.code}-${diagnostic.source ?? "project"}-${diagnostic.path.join(".")}-${index}`}

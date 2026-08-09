@@ -5,6 +5,7 @@ import { readEditorProjectStartItemIdsFx } from "~/bridge/project/editor/readEdi
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import { EditorItemSearchThumbnail } from "~/ui/item/editor/EditorItemThumbnail";
 import { useEditorItemSearchOptions } from "~/ui/item/editor/useEditorItemSearchOptions";
+import { SpotlightSearchInput } from "~/ui/search/SpotlightSearchInput";
 import { useFuseSearch } from "~/ui/search/useFuseSearch";
 
 export interface EditorProjectStartItemPickerProps {
@@ -79,11 +80,6 @@ export const EditorProjectStartItemPicker = ({
 		inputRef.current?.focus();
 	}, []);
 	useEffect(() => {
-		setSelectedIndex(0);
-	}, [
-		query,
-	]);
-	useEffect(() => {
 		const onKeyDown = (event: KeyboardEvent) => {
 			if (event.key !== "Escape") return;
 			event.preventDefault();
@@ -121,36 +117,21 @@ export const EditorProjectStartItemPicker = ({
 				>
 					Select initial item
 				</h2>
-				<input
-					aria-label="Search initial items"
-					className="w-full rounded-lg border border-line-strong bg-surface px-4 py-3 text-base text-foreground outline-none"
-					placeholder="Search item title or ID…"
-					ref={inputRef}
-					type="search"
-					value={query}
-					onChange={(event) => setQuery(event.currentTarget.value)}
-					onKeyDown={(event) => {
-						if (event.key === "ArrowDown") {
-							event.preventDefault();
-							setSelectedIndex((current) =>
-								results.length === 0 ? 0 : (current + 1) % results.length,
-							);
-							return;
-						}
-						if (event.key === "ArrowUp") {
-							event.preventDefault();
-							setSelectedIndex((current) =>
-								results.length === 0
-									? 0
-									: (current - 1 + results.length) % results.length,
-							);
-							return;
-						}
-						if (event.key === "Enter" && results[selectedIndex] !== undefined) {
-							event.preventDefault();
-							choose(results[selectedIndex]!.id);
-						}
+				<SpotlightSearchInput
+					ariaLabel="Search initial items"
+					inputRef={inputRef}
+					onEnter={() => {
+						const selected = results[selectedIndex];
+						if (selected !== undefined) choose(selected.id);
 					}}
+					onQueryChange={(value) => {
+						setQuery(value);
+						setSelectedIndex(0);
+					}}
+					onSelectedIndexChange={setSelectedIndex}
+					query={query}
+					resultCount={results.length}
+					selectedIndex={selectedIndex}
 				/>
 				<div className="grid max-h-[26rem] gap-1 overflow-y-auto">
 					{results.length === 0 ? (

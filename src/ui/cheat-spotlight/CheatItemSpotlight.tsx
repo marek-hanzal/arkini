@@ -16,6 +16,7 @@ import { useCheatAvailability } from "~/ui/cheat-availability/useCheatAvailabili
 import { useCheatItemSpawn } from "~/ui/cheat-spotlight/useCheatItemSpawn";
 import { useGameMenuControl } from "~/ui/game-menu/useGameMenuControl";
 import { useItemDetailControl } from "~/ui/item-detail/useItemDetailControl";
+import { SpotlightSearchInput } from "~/ui/search/SpotlightSearchInput";
 import { useFuseSearch } from "~/ui/search/useFuseSearch";
 
 const maxVisibleResults = 10;
@@ -258,40 +259,19 @@ export const CheatItemSpotlight = ({
 				>
 					Spawn item
 				</h2>
-				<input
-					ref={inputRef}
-					type="search"
-					value={query}
-					className="w-full rounded-lg border border-line-strong bg-surface px-4 py-3 text-base text-foreground outline-none"
-					placeholder="Search item title or ID…"
-					aria-label="Search items to spawn"
-					onChange={(event) => {
-						setQuery(event.currentTarget.value);
+				<SpotlightSearchInput
+					ariaLabel="Search items to spawn"
+					inputRef={inputRef}
+					onEnter={() => requestSpawn()}
+					onQueryChange={(value) => {
+						setQuery(value);
 						setSelectedIndex(0);
 						spawn.reset();
 					}}
-					onKeyDown={(event) => {
-						if (event.key === "ArrowDown") {
-							event.preventDefault();
-							setSelectedIndex((current) =>
-								results.length === 0 ? 0 : (current + 1) % results.length,
-							);
-							return;
-						}
-						if (event.key === "ArrowUp") {
-							event.preventDefault();
-							setSelectedIndex((current) =>
-								results.length === 0
-									? 0
-									: (current - 1 + results.length) % results.length,
-							);
-							return;
-						}
-						if (event.key === "Enter") {
-							event.preventDefault();
-							requestSpawn();
-						}
-					}}
+					onSelectedIndexChange={setSelectedIndex}
+					query={query}
+					resultCount={results.length}
+					selectedIndex={selectedIndex}
 				/>
 
 				<div

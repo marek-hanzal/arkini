@@ -11,7 +11,7 @@ import { layoutEditorItemOriginFlowInWorkerFx } from "~/ui/item/editor/layoutEdi
 import type {
 	EditorItemOriginFlowLayoutNode,
 	EditorItemOriginFlowLayoutPoint,
-} from "~/ui/item/editor/layoutEditorItemOriginFlowFx";
+} from "~/ui/item/editor/editorItemOriginFlowLayout";
 
 type EditorItemOriginFlowState =
 	| {
@@ -35,7 +35,6 @@ type EditorItemOriginFlowState =
 const InitialProgress: EditorItemOriginFlowProgress = {
 	label: "Preparing flow",
 	percent: 0,
-	phase: "indexing",
 };
 
 /** Owns one interruptible flow build for the currently routed item. */
@@ -84,7 +83,6 @@ export const useEditorItemOriginFlow = (
 							progress: {
 								label: "Laying out flow",
 								percent: 95,
-								phase: "finalizing",
 							},
 							status: "loading",
 						});
@@ -109,7 +107,6 @@ export const useEditorItemOriginFlow = (
 					progress: {
 						label: "Flow ready",
 						percent: 100,
-						phase: "finalizing",
 					},
 					status: "ready",
 				});
@@ -122,7 +119,6 @@ export const useEditorItemOriginFlow = (
 					progress: {
 						label: "Flow failed",
 						percent: 0,
-						phase: "finalizing",
 					},
 					status: "error",
 				});

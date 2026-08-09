@@ -5,7 +5,9 @@ import {
 	EditorItemOriginItemInputPortId,
 	EditorItemOriginItemOutputPortId,
 	readEditorItemOriginFlowFx,
+	type EditorItemOriginFlow,
 	type EditorItemOriginFlowProgress,
+	type EditorItemOriginItemNode,
 } from "~/bridge/item/editor/readEditorItemOriginFlow";
 import type { EditorOutput } from "~/bridge/item/editor/EditorItemModel";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
@@ -21,11 +23,11 @@ type EditorGuaranteedRoll = Extract<
 
 const outputDrop = (itemId: string): EditorGuaranteedRoll["drop"][number] => ({
 	itemId,
-	placement: "drop",
 	quantity: {
 		min: 1,
 		max: 1,
 	},
+	placement: "drop",
 	rules: [],
 });
 
@@ -98,16 +100,7 @@ const createReachabilityConfig = (includeTool: boolean) => {
 	});
 };
 
-const itemNode = <
-	T extends {
-		readonly nodes: ReadonlyArray<{
-			readonly id: string;
-		}>;
-	},
->(
-	flow: T,
-	id: string,
-) => {
+const itemNode = (flow: EditorItemOriginFlow, id: string): EditorItemOriginItemNode => {
 	const node = flow.nodes.find((candidate) => candidate.id === `item:${id}`);
 	if (node === undefined) throw new Error(`Expected item:${id}.`);
 	return node;
@@ -122,8 +115,6 @@ describe("readEditorItemOriginFlow", () => {
 		);
 		const forge = itemNode(flow, "forge");
 
-		expect(flow.obtainable).toBeUndefined();
-		expect(flow.nodes.every(({ kind }) => kind === "item")).toBe(true);
 		expect(forge).toEqual(
 			expect.objectContaining({
 				operations: [
@@ -187,7 +178,6 @@ describe("readEditorItemOriginFlow", () => {
 			}),
 		);
 
-		expect(flow.obtainable).toBe(true);
 		expect(new Set(flow.nodes.map(({ id }) => id))).toEqual(
 			new Set([
 				"item:ingot",
@@ -202,10 +192,8 @@ describe("readEditorItemOriginFlow", () => {
 				starterScopes: [
 					"Board",
 				],
-				status: "starter",
 				operations: [
 					expect.objectContaining({
-						status: "reachable",
 						inputs: expect.arrayContaining([
 							expect.objectContaining({
 								itemId: "tool",
@@ -219,12 +207,12 @@ describe("readEditorItemOriginFlow", () => {
 			}),
 		);
 		expect(progress[0]).toMatchObject({
+			label: "Indexing sources",
 			percent: 0,
-			phase: "indexing",
 		});
 		expect(progress.at(-1)).toMatchObject({
+			label: "Preparing flow",
 			percent: 100,
-			phase: "finalizing",
 		});
 		expect(
 			progress.every(
@@ -241,12 +229,10 @@ describe("readEditorItemOriginFlow", () => {
 			}),
 		);
 
-		expect(flow.obtainable).toBe(true);
 		expect(flow.nodes).toEqual([
 			expect.objectContaining({
 				id: "item:forge",
 				operations: [],
-				status: "starter",
 			}),
 		]);
 		expect(flow.edges).toEqual([]);
@@ -309,7 +295,7 @@ describe("readEditorItemOriginFlow", () => {
 		);
 	});
 
-	it("keeps chance, placement and depletion semantics on embedded output ports", async () => {
+	it("embeds chance and depletion outputs as operation ports", async () => {
 		const base = createReachabilityConfig(true);
 		const forge = base.items.forge;
 		if (forge.type !== "producer") throw new Error("Expected producer fixture.");
@@ -367,9 +353,7 @@ describe("readEditorItemOriginFlow", () => {
 		);
 		const forgeOutput = itemNode(chanceFlow, "forge").operations[0]?.outputs[0];
 		expect(forgeOutput).toMatchObject({
-			placement: "random",
-			selectionKind: "chance",
-			weightedSet: false,
+			itemId: "ingot",
 		});
 
 		const depletionFlow = await Effect.runPromise(
@@ -384,8 +368,6 @@ describe("readEditorItemOriginFlow", () => {
 				outputs: [
 					expect.objectContaining({
 						itemId: "dust",
-						placement: "drop",
-						selectionKind: "guaranteed",
 					}),
 				],
 			}),
@@ -423,12 +405,10 @@ describe("readEditorItemOriginFlow", () => {
 				outputs: [
 					expect.objectContaining({
 						itemId: "result",
-						selectionKind: "replace",
 					}),
 				],
 			}),
 		);
-		expect(flow.nodes.every(({ kind }) => kind === "item")).toBe(true);
 		expect(flow.edges).toEqual(
 			expect.arrayContaining([
 				expect.objectContaining({
@@ -455,7 +435,6 @@ describe("readEditorItemOriginFlow", () => {
 			}),
 		);
 
-		expect(flow.obtainable).toBe(false);
 		expect(new Set(flow.nodes.map(({ id }) => id))).toEqual(
 			new Set([
 				"item:ingot",
@@ -463,21 +442,6 @@ describe("readEditorItemOriginFlow", () => {
 				"item:tool",
 				"item:water",
 			]),
-		);
-		expect(itemNode(flow, "ingot")).toEqual(
-			expect.objectContaining({
-				status: "blocked",
-			}),
-		);
-		expect(itemNode(flow, "tool")).toEqual(
-			expect.objectContaining({
-				status: "blocked",
-			}),
-		);
-		expect(itemNode(flow, "forge").operations[0]).toEqual(
-			expect.objectContaining({
-				status: "blocked",
-			}),
 		);
 	});
 
@@ -530,13 +494,11 @@ describe("readEditorItemOriginFlow", () => {
 				targetItemId: "target",
 			}),
 		);
-		expect(flow.obtainable).toBe(false);
-		expect(flow.nodes).toEqual(
-			expect.arrayContaining([
-				expect.objectContaining({
-					kind: "item",
-					status: "cycle",
-				}),
+		expect(new Set(flow.nodes.map(({ id }) => id))).toEqual(
+			new Set([
+				"item:a",
+				"item:b",
+				"item:target",
 			]),
 		);
 	});

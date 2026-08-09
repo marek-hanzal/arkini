@@ -8,23 +8,16 @@ import type {
 	EditorOutput,
 } from "~/bridge/item/editor/EditorItemModel";
 
-export type EditorItemOriginNodeStatus = "starter" | "reachable" | "blocked" | "cycle";
 export type EditorItemOriginOperationKind = "line" | "charges" | "merge" | "expiry";
-export type EditorItemOriginOutputKind = "guaranteed" | "chance" | "weighted" | "replace";
+type EditorItemOriginOutputKind = "guaranteed" | "chance" | "weighted" | "replace";
 
 export const EditorItemOriginItemInputPortId = "item:self:input";
 export const EditorItemOriginItemOutputPortId = "item:self:output";
 
-export interface EditorItemOriginOperationPort {
+interface EditorItemOriginOperationPort {
 	readonly id: string;
 	readonly itemId: string;
 	readonly label: string;
-}
-
-export interface EditorItemOriginOperationOutputPort extends EditorItemOriginOperationPort {
-	readonly placement: "drop" | "random" | undefined;
-	readonly selectionKind: EditorItemOriginOutputKind;
-	readonly weightedSet: boolean;
 }
 
 export interface EditorItemOriginOperation {
@@ -32,25 +25,19 @@ export interface EditorItemOriginOperation {
 	readonly inputs: ReadonlyArray<EditorItemOriginOperationPort>;
 	readonly kind: EditorItemOriginOperationKind;
 	readonly label: string;
-	readonly outputs: ReadonlyArray<EditorItemOriginOperationOutputPort>;
-	readonly status: Exclude<EditorItemOriginNodeStatus, "starter" | "cycle">;
+	readonly outputs: ReadonlyArray<EditorItemOriginOperationPort>;
 }
 
 export interface EditorItemOriginItemNode {
 	readonly acquisitionSourceId?: string;
-	readonly depth: number;
 	readonly id: string;
 	readonly itemId: string;
-	readonly kind: "item";
 	readonly operations: ReadonlyArray<EditorItemOriginOperation>;
 	readonly resourceIds: EditorItem["asset"]["default"];
 	readonly starterScopes: ReadonlyArray<"Board" | "Inventory" | "Toolbar">;
-	readonly status: EditorItemOriginNodeStatus;
 	readonly title: string;
 	readonly type: EditorItem["type"] | "missing";
 }
-
-export type EditorItemOriginNode = EditorItemOriginItemNode;
 
 export interface EditorItemOriginEdge {
 	readonly id: string;
@@ -64,16 +51,14 @@ export interface EditorItemOriginEdge {
 
 export interface EditorItemOriginFlow {
 	readonly edges: ReadonlyArray<EditorItemOriginEdge>;
-	readonly nodes: ReadonlyArray<EditorItemOriginNode>;
-	readonly obtainable: boolean | undefined;
+	readonly nodes: ReadonlyArray<EditorItemOriginItemNode>;
 }
 
-export type EditorItemOriginFlowPhase = "indexing" | "tracing" | "resolving" | "finalizing";
+type EditorItemOriginFlowPhase = "indexing" | "tracing" | "resolving" | "finalizing";
 
 export interface EditorItemOriginFlowProgress {
 	readonly label: string;
 	readonly percent: number;
-	readonly phase: EditorItemOriginFlowPhase;
 }
 
 export interface EditorItemOriginFlowRequest {
@@ -85,7 +70,7 @@ export interface EditorItemOriginFlowRequest {
 
 interface OutputOccurrence {
 	readonly itemId: string;
-	readonly placement: EditorItemOriginOperationOutputPort["placement"];
+	readonly placement: "drop" | "random" | undefined;
 	readonly selectionKind: EditorItemOriginOutputKind;
 	readonly weightedSet: boolean;
 }
@@ -284,12 +269,10 @@ const reportProgress = (
 	onProgress?.({
 		label: ProgressLabels[phase],
 		percent: Math.max(0, Math.min(100, Math.round(percent))),
-		phase,
 	});
 
 interface OriginSubgraph {
-	readonly cycleItemIds: ReadonlySet<string>;
-	readonly itemDepths: ReadonlyMap<string, number>;
+	readonly itemIds: ReadonlySet<string>;
 	readonly sources: ReadonlyArray<OutputSource>;
 }
 
@@ -300,24 +283,12 @@ const readIncomeSubgraph = (
 	sourcesById: ReadonlyMap<string, OutputSource>,
 	acquisitionSourceByItem: ReadonlyMap<string, string>,
 ): OriginSubgraph => {
-	const itemDepths = new Map([
-		[
-			targetItemId,
-			0,
-		],
-	]);
+	const itemIds = new Set<string>();
 	const tracedItems = new Set<string>();
 	const includedSources = new Map<string, OutputSource>();
-	const cycleItemIds = new Set<string>();
 
-	const traceItem = (itemId: string, depth: number, activePath: ReadonlyArray<string>) => {
-		itemDepths.set(itemId, Math.max(itemDepths.get(itemId) ?? 0, depth));
-		const cycleStart = activePath.lastIndexOf(itemId);
-		if (cycleStart >= 0) {
-			for (const cycleItemId of activePath.slice(cycleStart)) cycleItemIds.add(cycleItemId);
-			cycleItemIds.add(itemId);
-			return;
-		}
+	const traceItem = (itemId: string) => {
+		itemIds.add(itemId);
 		if (tracedItems.has(itemId)) return;
 		tracedItems.add(itemId);
 		if (starters.has(itemId)) return;
@@ -331,20 +302,15 @@ const readIncomeSubgraph = (
 		const source = witnessedSource ?? directSources[0];
 		if (source === undefined) return;
 		includedSources.set(source.id, source);
-		const nextPath = [
-			...activePath,
-			itemId,
-		];
 		for (const requirementItemId of unique(source.requirementItemIds).sort((left, right) =>
 			left.localeCompare(right),
 		)) {
-			traceItem(requirementItemId, depth + 1, nextPath);
+			traceItem(requirementItemId);
 		}
 	};
-	traceItem(targetItemId, 0, []);
+	traceItem(targetItemId);
 	return {
-		cycleItemIds,
-		itemDepths,
+		itemIds,
 		sources: [
 			...includedSources.values(),
 		],
@@ -357,7 +323,6 @@ const readOperationPortLabel = (itemId: string, items: ReadonlyMap<string, Edito
 const readOperation = (
 	source: OutputSource,
 	items: ReadonlyMap<string, EditorItem>,
-	reachableSources: ReadonlySet<string>,
 ): EditorItemOriginOperation => ({
 	id: source.id,
 	inputs: unique(source.requirementItemIds)
@@ -374,23 +339,15 @@ const readOperation = (
 		id: `${source.id}:output:${index}:${output.itemId}`,
 		itemId: output.itemId,
 		label: readOperationPortLabel(output.itemId, items),
-		placement: output.placement,
-		selectionKind: output.selectionKind,
-		weightedSet: output.weightedSet,
 	})),
-	status: reachableSources.has(source.id) ? "reachable" : "blocked",
 });
 
 const readItemNode = (
 	itemId: string,
-	depth: number,
 	items: ReadonlyMap<string, EditorItem>,
 	starters: ReadonlyMap<string, ReadonlySet<EditorItemOriginItemNode["starterScopes"][number]>>,
-	reachableItems: ReadonlySet<string>,
-	reachableSources: ReadonlySet<string>,
 	sourcesByOwner: ReadonlyMap<string, ReadonlyArray<OutputSource>>,
 	acquisitionSourceByItem: ReadonlyMap<string, string>,
-	cycleItemIds: ReadonlySet<string> = new Set(),
 	includedSourceIds?: ReadonlySet<string>,
 ): EditorItemOriginItemNode => {
 	const item = items.get(itemId);
@@ -399,13 +356,11 @@ const readItemNode = (
 	]
 		.filter((source) => includedSourceIds === undefined || includedSourceIds.has(source.id))
 		.sort((left, right) => left.id.localeCompare(right.id))
-		.map((source) => readOperation(source, items, reachableSources));
+		.map((source) => readOperation(source, items));
 	return {
 		acquisitionSourceId: acquisitionSourceByItem.get(itemId),
-		depth,
 		id: `item:${itemId}`,
 		itemId,
-		kind: "item",
 		operations,
 		resourceIds: item?.asset.default ?? [
 			"missing",
@@ -413,13 +368,6 @@ const readItemNode = (
 		starterScopes: [
 			...(starters.get(itemId) ?? []),
 		],
-		status: starters.has(itemId)
-			? "starter"
-			: cycleItemIds.has(itemId)
-				? "cycle"
-				: reachableItems.has(itemId)
-					? "reachable"
-					: "blocked",
 		title: item?.title || itemId,
 		type: item?.type ?? "missing",
 	};
@@ -633,42 +581,30 @@ export const readEditorItemOriginFlowFx = Effect.fn("readEditorItemOriginFlowFx"
 							].map((itemId) =>
 								readItemNode(
 									itemId,
-									0,
 									items,
 									starters,
-									reachableItems,
-									reachableSources,
 									sourcesByOwner,
 									acquisitionSourceByItem,
 								),
 							),
-							obtainable: undefined,
 						}
 					: (() => {
-							const itemIds = new Set(originSubgraph.itemDepths.keys());
+							const itemIds = originSubgraph.itemIds;
 							const sourceIds = new Set(originSubgraph.sources.map(({ id }) => id));
 							return {
 								edges: readEdges(originSubgraph.sources, itemIds),
 								nodes: [
-									...originSubgraph.itemDepths.entries(),
-								].map(([itemId, depth]) =>
+									...originSubgraph.itemIds,
+								].map((itemId) =>
 									readItemNode(
 										itemId,
-										depth,
 										items,
 										starters,
-										reachableItems,
-										reachableSources,
 										sourcesByOwner,
 										acquisitionSourceByItem,
-										originSubgraph.cycleItemIds,
 										sourceIds,
 									),
 								),
-								obtainable:
-									targetItemId === undefined
-										? false
-										: reachableItems.has(targetItemId),
 							};
 						})();
 			reportProgress(onProgress, "finalizing", 100);

@@ -5,7 +5,11 @@ import LayoutWorker from "~/ui/item/editor/editorItemOriginFlowLayout.worker.ts?
 import type {
 	EditorItemOriginFlowLayout,
 	EditorItemOriginFlowLayoutInput,
-} from "~/ui/item/editor/layoutEditorItemOriginFlowFx";
+} from "~/ui/item/editor/editorItemOriginFlowLayout";
+import type {
+	EditorItemOriginFlowLayoutWorkerRequest,
+	EditorItemOriginFlowLayoutWorkerResponse,
+} from "~/ui/item/editor/editorItemOriginFlowLayoutWorkerProtocol";
 import { readEditorOriginFlowNodeMetrics } from "~/ui/item/editor/readEditorOriginFlowNodeMetrics";
 
 class EditorItemOriginFlowLayoutWorkerError extends Data.TaggedError(
@@ -14,16 +18,6 @@ class EditorItemOriginFlowLayoutWorkerError extends Data.TaggedError(
 	readonly cause?: unknown;
 	readonly message: string;
 }> {}
-
-type LayoutWorkerResponse =
-	| {
-			readonly layout: EditorItemOriginFlowLayout;
-			readonly status: "success";
-	  }
-	| {
-			readonly message: string;
-			readonly status: "error";
-	  };
 
 type RunLayout = (
 	topology: EditorItemOriginFlowLayoutInput,
@@ -39,7 +33,9 @@ const runLayout = (
 			worker.removeEventListener("message", handleMessage);
 			worker.removeEventListener("error", handleError);
 		};
-		const handleMessage = ({ data }: MessageEvent<LayoutWorkerResponse>) => {
+		const handleMessage = ({
+			data,
+		}: MessageEvent<EditorItemOriginFlowLayoutWorkerResponse>) => {
 			cleanUp();
 			if (data.status === "success") resolve(data.layout);
 			else reject(new Error(data.message));
@@ -52,7 +48,7 @@ const runLayout = (
 		worker.addEventListener("error", handleError);
 		worker.postMessage({
 			topology,
-		});
+		} satisfies EditorItemOriginFlowLayoutWorkerRequest);
 	});
 
 const readTopology = (flow: EditorItemOriginFlow): EditorItemOriginFlowLayoutInput => ({

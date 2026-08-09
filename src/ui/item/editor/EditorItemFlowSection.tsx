@@ -6,7 +6,7 @@ import { EditorOriginFlowCanvas } from "~/ui/item/editor/EditorOriginFlowCanvas"
 import type {
 	EditorItemOriginFlowLayoutNode,
 	EditorItemOriginFlowLayoutPoint,
-} from "~/ui/item/editor/layoutEditorItemOriginFlowFx";
+} from "~/ui/item/editor/editorItemOriginFlowLayout";
 import { useEditorItemOriginFlow } from "~/ui/item/editor/useEditorItemOriginFlow";
 
 const EmptyFlowBackbones: ReadonlyMap<
@@ -40,7 +40,7 @@ export const EditorOriginFlowSection = ({
 	const isReady = flowState.status === "ready" && flow !== undefined;
 	const focusNodeId = useMemo(() => {
 		if (!isReady || focusItemId === undefined) return undefined;
-		return flow.nodes.find((node) => node.kind === "item" && node.itemId === focusItemId)?.id;
+		return flow.nodes.find((node) => node.itemId === focusItemId)?.id;
 	}, [
 		flow,
 		focusItemId,

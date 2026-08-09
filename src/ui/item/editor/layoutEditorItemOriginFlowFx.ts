@@ -2,52 +2,14 @@ import cytoscape, { type CollectionReturnValue, type ElementDefinition } from "c
 import fcose from "cytoscape-fcose";
 import { Effect } from "effect";
 
-import type { EditorItemOriginItemNode } from "~/bridge/item/editor/readEditorItemOriginFlow";
+import type {
+	EditorItemOriginFlowLayout,
+	EditorItemOriginFlowLayoutInput,
+	EditorItemOriginFlowLayoutNode,
+} from "~/ui/item/editor/editorItemOriginFlowLayout";
+import { routeEditorItemOriginFlow } from "~/ui/item/editor/routeEditorItemOriginFlow";
 
 cytoscape.use(fcose);
-
-export interface EditorItemOriginFlowLayoutInput {
-	readonly edges: ReadonlyArray<{
-		readonly id: string;
-		readonly source: string;
-		readonly sourcePortId?: string;
-		readonly target: string;
-		readonly targetPortId?: string;
-	}>;
-	readonly nodes: ReadonlyArray<{
-		readonly height: number;
-		readonly id: string;
-		readonly ports: ReadonlyArray<{
-			readonly id: string;
-			readonly x: number;
-			readonly y: number;
-		}>;
-		readonly type: EditorItemOriginItemNode["type"];
-		readonly width: number;
-	}>;
-}
-
-export interface EditorItemOriginFlowLayoutNode {
-	readonly degree: number;
-	readonly flowOrder: number;
-	readonly height: number;
-	readonly importance: number;
-	readonly portCount: number;
-	readonly width: number;
-	readonly x: number;
-	readonly y: number;
-}
-
-export interface EditorItemOriginFlowLayoutPoint {
-	readonly x: number;
-	readonly y: number;
-}
-
-export interface EditorItemOriginFlowLayout {
-	/** Orthogonal port-to-port routes with explicit terminal escape segments. */
-	readonly backbones: ReadonlyMap<string, ReadonlyArray<EditorItemOriginFlowLayoutPoint>>;
-	readonly positions: ReadonlyMap<string, EditorItemOriginFlowLayoutNode>;
-}
 
 interface WeightedGraph {
 	readonly incoming: ReadonlyMap<string, ReadonlyMap<string, number>>;
@@ -55,17 +17,14 @@ interface WeightedGraph {
 }
 
 interface LayoutProfile {
-	readonly degree: number;
 	readonly haloX: number;
 	readonly haloY: number;
 	readonly importance: number;
-	readonly portCount: number;
 }
 
 interface PairEdge {
 	readonly a: string;
 	readonly b: string;
-	readonly multiplicity: number;
 }
 
 interface DirectedPairEdge {
@@ -108,10 +67,8 @@ const readWeightedGraph = (flow: EditorItemOriginFlowLayoutInput): WeightedGraph
 	for (const { source, target } of flow.edges) {
 		const sourceOutgoing = outgoing.get(source);
 		const targetIncoming = incoming.get(target);
-		if (sourceOutgoing === undefined || targetIncoming === undefined)
-			throw new Error(`Flow edge references an unknown node: ${source} -> ${target}.`);
-		addWeight(sourceOutgoing, target);
-		addWeight(targetIncoming, source);
+		addWeight(sourceOutgoing!, target);
+		addWeight(targetIncoming!, source);
 	}
 	return {
 		incoming,
@@ -230,12 +187,11 @@ const readPairEdges = (flow: EditorItemOriginFlowLayoutInput): ReadonlyArray<Pai
 						edge.source,
 					];
 		const key = `${a}\u0000${b}`;
-		const existing = pairs.get(key);
-		pairs.set(key, {
-			a,
-			b,
-			multiplicity: (existing?.multiplicity ?? 0) + 1,
-		});
+		if (!pairs.has(key))
+			pairs.set(key, {
+				a,
+				b,
+			});
 	}
 	return [
 		...pairs.values(),
@@ -315,11 +271,9 @@ const readProfiles = (
 			return [
 				node.id,
 				{
-					degree,
 					haloX: 30 + 150 * importance ** 1.2 + 28 * Math.log2(1 + degree),
 					haloY: 24 + 90 * importance ** 1.2 + 12 * Math.log2(1 + portCount),
 					importance,
-					portCount,
 				},
 			] as const;
 		}),
@@ -583,7 +537,6 @@ const runFcose = (
 		elements.push({
 			data: {
 				anchor: true,
-				anchorKind: "community",
 				id: `community:${communityId}`,
 			},
 		});
@@ -591,7 +544,6 @@ const runFcose = (
 		elements.push({
 			data: {
 				anchor: true,
-				anchorKind: "type",
 				id: `type:${type}`,
 			},
 		});
@@ -605,7 +557,6 @@ const runFcose = (
 			data: {
 				h: node.height + profile.haloY * 2,
 				id: node.id,
-				importance: profile.importance,
 				w: node.width + profile.haloX * 2,
 			},
 		});
@@ -638,7 +589,6 @@ const runFcose = (
 		elements.push({
 			data: {
 				id: `pair:${index}`,
-				multiplicity: pair.multiplicity,
 				pressure: Math.max(source.importance, target.importance),
 				source: pair.a,
 				target: pair.b,
@@ -738,149 +688,6 @@ const runFcose = (
 	}
 };
 
-const readPortPoint = (
-	node: EditorItemOriginFlowLayoutInput["nodes"][number],
-	position: EditorItemOriginFlowLayoutNode,
-	portId: string | undefined,
-	side: "source" | "target",
-): EditorItemOriginFlowLayoutPoint => {
-	const port = portId === undefined ? undefined : node.ports.find(({ id }) => id === portId);
-	if (port !== undefined)
-		return {
-			x: position.x + position.width / 2 + port.x,
-			y: position.y + position.height / 2 + port.y,
-		};
-	return {
-		x: side === "source" ? position.x + position.width : position.x,
-		y: position.y + position.height / 2,
-	};
-};
-
-const RouteEscape = 56;
-const RouteDetourGap = 84;
-const RouteBundleGrid = 96;
-
-interface OrthogonalRoutePlan {
-	readonly edgeId: string;
-	readonly routeY: number;
-	readonly source: EditorItemOriginFlowLayoutPoint;
-	readonly sourceTrackX: number;
-	readonly target: EditorItemOriginFlowLayoutPoint;
-	readonly targetTrackX: number;
-}
-
-const appendRoutePoint = (
-	points: EditorItemOriginFlowLayoutPoint[],
-	point: EditorItemOriginFlowLayoutPoint,
-) => {
-	const previous = points.at(-1);
-	if (
-		previous === undefined ||
-		Math.abs(previous.x - point.x) > 0.01 ||
-		Math.abs(previous.y - point.y) > 0.01
-	)
-		points.push(point);
-};
-
-const snapRouteTrack = (value: number) => Math.round(value / RouteBundleGrid) * RouteBundleGrid;
-
-const snapSourceTrack = (x: number) =>
-	Math.ceil((x + RouteEscape) / RouteBundleGrid) * RouteBundleGrid;
-
-const snapTargetTrack = (x: number) =>
-	Math.floor((x - RouteEscape) / RouteBundleGrid) * RouteBundleGrid;
-
-const readForwardTracks = (
-	source: EditorItemOriginFlowLayoutPoint,
-	target: EditorItemOriginFlowLayoutPoint,
-) => {
-	const minimumX = source.x + RouteEscape;
-	const maximumX = target.x - RouteEscape;
-	let sourceTrackX = snapSourceTrack(source.x);
-	let targetTrackX = snapTargetTrack(target.x);
-	if (sourceTrackX <= targetTrackX)
-		return {
-			sourceTrackX,
-			targetTrackX,
-		};
-
-	const midpointX = (minimumX + maximumX) / 2;
-	const sharedTrackX = Math.max(minimumX, Math.min(maximumX, snapRouteTrack(midpointX)));
-	sourceTrackX = sharedTrackX;
-	targetTrackX = sharedTrackX;
-	return {
-		sourceTrackX,
-		targetTrackX,
-	};
-};
-
-const readOrthogonalRoutePlan = (
-	source: EditorItemOriginFlowLayoutPoint,
-	target: EditorItemOriginFlowLayoutPoint,
-	sourcePosition: EditorItemOriginFlowLayoutNode,
-	targetPosition: EditorItemOriginFlowLayoutNode,
-	edgeId: string,
-): OrthogonalRoutePlan => {
-	const forward = source.x + RouteEscape <= target.x - RouteEscape;
-	if (forward) {
-		const tracks = readForwardTracks(source, target);
-		return {
-			edgeId,
-			routeY: snapRouteTrack((source.y + target.y) / 2),
-			source,
-			...tracks,
-			target,
-		};
-	}
-
-	const sourceTrackX = snapSourceTrack(source.x);
-	const targetTrackX = snapTargetTrack(target.x);
-	const upperBoundary = Math.min(sourcePosition.y, targetPosition.y) - RouteDetourGap;
-	const lowerBoundary =
-		Math.max(
-			sourcePosition.y + sourcePosition.height,
-			targetPosition.y + targetPosition.height,
-		) + RouteDetourGap;
-	const upperY = Math.floor(upperBoundary / RouteBundleGrid) * RouteBundleGrid;
-	const lowerY = Math.ceil(lowerBoundary / RouteBundleGrid) * RouteBundleGrid;
-	const upperCost = Math.abs(source.y - upperY) + Math.abs(target.y - upperY);
-	const lowerCost = Math.abs(source.y - lowerY) + Math.abs(target.y - lowerY);
-	return {
-		edgeId,
-		routeY: upperCost <= lowerCost ? upperY : lowerY,
-		source,
-		sourceTrackX,
-		target,
-		targetTrackX,
-	};
-};
-
-const readOrthogonalRoute = (
-	plan: OrthogonalRoutePlan,
-): ReadonlyArray<EditorItemOriginFlowLayoutPoint> => {
-	const points: EditorItemOriginFlowLayoutPoint[] = [
-		plan.source,
-	];
-	appendRoutePoint(points, {
-		x: plan.sourceTrackX,
-		y: plan.source.y,
-	});
-	appendRoutePoint(points, {
-		x: plan.sourceTrackX,
-		y: plan.routeY,
-	});
-	appendRoutePoint(points, {
-		x: plan.targetTrackX,
-		y: plan.routeY,
-	});
-	appendRoutePoint(points, {
-		x: plan.targetTrackX,
-		y: plan.target.y,
-	});
-	appendRoutePoint(points, plan.target);
-	return points;
-};
-
 const runLayout = (flow: EditorItemOriginFlowLayoutInput): EditorItemOriginFlowLayout => {
 	if (flow.nodes.length === 0)
 		return {
@@ -925,35 +732,16 @@ const runLayout = (flow: EditorItemOriginFlowLayoutInput): EditorItemOriginFlowL
 		if (profile === undefined || order === undefined)
 			throw new Error(`Missing final flow layout data for ${node.id}.`);
 		positions.set(node.id, {
-			degree: profile.degree,
 			flowOrder: order,
 			height: node.height,
-			importance: profile.importance,
-			portCount: profile.portCount,
 			width: node.width,
 			x: node.x + shiftX,
 			y: node.y + shiftY,
 		});
 	}
 
-	const plans: OrthogonalRoutePlan[] = [];
-	for (const edge of [
-		...flow.edges,
-	].sort((left, right) => left.id.localeCompare(right.id))) {
-		const sourceNode = nodeById.get(edge.source)!;
-		const targetNode = nodeById.get(edge.target)!;
-		const sourcePosition = positions.get(edge.source)!;
-		const targetPosition = positions.get(edge.target)!;
-		const source = readPortPoint(sourceNode, sourcePosition, edge.sourcePortId, "source");
-		const target = readPortPoint(targetNode, targetPosition, edge.targetPortId, "target");
-		plans.push(
-			readOrthogonalRoutePlan(source, target, sourcePosition, targetPosition, edge.id),
-		);
-	}
-	const backbones = new Map<string, ReadonlyArray<EditorItemOriginFlowLayoutPoint>>();
-	for (const plan of plans) backbones.set(plan.edgeId, readOrthogonalRoute(plan));
 	return {
-		backbones,
+		backbones: routeEditorItemOriginFlow(flow, positions),
 		positions,
 	};
 };

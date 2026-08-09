@@ -5,14 +5,14 @@ import {
 	type EditorItemOriginOperation,
 } from "~/bridge/item/editor/readEditorItemOriginFlow";
 
-export const EditorOriginFlowNodeWidth = 420;
-export const EditorOriginFlowNodeMinHeight = 176;
-export const EditorOriginFlowNodeHeaderHeight = 132;
-export const EditorOriginFlowOperationGap = 8;
+const EditorOriginFlowNodeWidth = 420;
+const EditorOriginFlowNodeMinHeight = 176;
+const EditorOriginFlowNodeHeaderHeight = 132;
+const EditorOriginFlowOperationGap = 8;
 export const EditorOriginFlowOperationSidePadding = 12;
 export const EditorOriginFlowOperationContentPadding = 12;
 export const EditorOriginFlowOperationHeaderHeight = 22;
-export const EditorOriginFlowOperationHeaderGap = 8;
+const EditorOriginFlowOperationHeaderGap = 8;
 
 const PortLineHeight = 26;
 const NodeBottomPadding = 12;
@@ -21,7 +21,7 @@ const EditorOriginFlowItemPortBaseY = 45;
 export const readEditorOriginFlowItemPortY = (headerHeight: number) =>
 	EditorOriginFlowItemPortBaseY + (headerHeight - EditorOriginFlowNodeHeaderHeight) / 2;
 
-export interface EditorOriginFlowOperationMetrics {
+interface EditorOriginFlowOperationMetrics {
 	readonly height: number;
 	readonly id: string;
 	readonly inputPortYs: ReadonlyMap<string, number>;
@@ -29,7 +29,7 @@ export interface EditorOriginFlowOperationMetrics {
 	readonly top: number;
 }
 
-export interface EditorOriginFlowNodeMetrics {
+interface EditorOriginFlowNodeMetrics {
 	readonly headerHeight: number;
 	readonly height: number;
 	readonly operations: ReadonlyArray<EditorOriginFlowOperationMetrics>;
@@ -70,7 +70,7 @@ const readPortYs = (
 	);
 };
 
-/** Shared Canvas/MSAGL geometry for variable-height item cards and their embedded operation ports. */
+/** Shared flow-canvas geometry for variable-height item cards and their embedded operation ports. */
 export const readEditorOriginFlowNodeMetrics = (
 	node: EditorItemOriginItemNode,
 ): EditorOriginFlowNodeMetrics => {

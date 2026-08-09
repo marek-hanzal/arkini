@@ -10,28 +10,24 @@ import { layoutEditorItemOriginFlowInWorkerFx } from "~/ui/item/editor/layoutEdi
 import type {
 	EditorItemOriginFlowLayout,
 	EditorItemOriginFlowLayoutInput,
-} from "~/ui/item/editor/layoutEditorItemOriginFlowFx";
+} from "~/ui/item/editor/editorItemOriginFlowLayout";
 
 const flow: EditorItemOriginFlow = {
 	edges: [],
 	nodes: [
 		{
 			acquisitionSourceId: undefined,
-			depth: 0,
 			id: "item:wine",
 			itemId: "wine",
-			kind: "item",
 			operations: [],
 			resourceIds: [
 				"wine",
 			],
 			starterScopes: [],
-			status: "reachable",
 			title: "Wine",
 			type: "producer",
 		},
 	],
-	obtainable: true,
 };
 
 class TestWorker {
@@ -54,11 +50,8 @@ describe("layoutEditorItemOriginFlowInWorkerFx", () => {
 				[
 					"item:wine",
 					{
-						degree: 0,
 						flowOrder: 0,
 						height: 176,
-						importance: 0,
-						portCount: 0,
 						width: 420,
 						x: 12,
 						y: 24,

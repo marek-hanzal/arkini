@@ -15,17 +15,11 @@ export type EditorOriginFlowSelection =
 	  };
 
 export interface EditorOriginFlowHighlight {
-	readonly branchIndexesByEdgeId: ReadonlyMap<string, ReadonlyArray<number>>;
 	readonly edgeIds: ReadonlySet<string>;
 	readonly nodeIds: ReadonlySet<string>;
 }
 
-interface FlowNodePosition {
-	readonly flowOrder: number;
-}
-
 const readEmptyHighlight = (): EditorOriginFlowHighlight => ({
-	branchIndexesByEdgeId: new Map(),
 	edgeIds: new Set(),
 	nodeIds: new Set(),
 });
@@ -75,10 +69,8 @@ const readIncomeHighlight = (
 		startNode.id,
 	]);
 	const edgeIds = new Set<string>();
-	const branchIndexesByEdgeId = new Map<string, Set<number>>();
 	if (startNode.starterScopes.length > 0)
 		return {
-			branchIndexesByEdgeId: new Map(),
 			edgeIds,
 			nodeIds,
 		};
@@ -103,16 +95,13 @@ const readIncomeHighlight = (
 		);
 	});
 
-	const markEdge = (edge: EditorItemOriginEdge, branchIndex: number) => {
+	const markEdge = (edge: EditorItemOriginEdge) => {
 		edgeIds.add(edge.id);
 		nodeIds.add(edge.source);
 		nodeIds.add(edge.target);
-		const branchIndexes = branchIndexesByEdgeId.get(edge.id) ?? new Set<number>();
-		branchIndexes.add(branchIndex);
-		branchIndexesByEdgeId.set(edge.id, branchIndexes);
 	};
 
-	for (const [branchIndex, [, directOutputEdges]] of directBranches.entries()) {
+	for (const [, directOutputEdges] of directBranches) {
 		const tracedItems = new Set<string>();
 		const tracedOperations = new Set<string>();
 		const traceItem = (
@@ -140,8 +129,7 @@ const readIncomeHighlight = (
 			const nextActiveItemIds = new Set(activeItemIds);
 			nextActiveItemIds.add(itemNode.id);
 			for (const outputEdge of directOutputEdgesForItem) {
-				if (outputEdge.operationId === witness.operationId)
-					markEdge(outputEdge, branchIndex);
+				if (outputEdge.operationId === witness.operationId) markEdge(outputEdge);
 			}
 			traceOperation(witness.operationId, nextActiveItemIds);
 		};
@@ -152,7 +140,7 @@ const readIncomeHighlight = (
 			const ownerNode = ownerNodeId === undefined ? undefined : nodeById.get(ownerNodeId);
 			if (ownerNode !== undefined) traceItem(ownerNode, activeItemIds);
 			for (const edge of sortEdges(inputEdgesByOperation.get(operationId) ?? [])) {
-				markEdge(edge, branchIndex);
+				markEdge(edge);
 				const requirementNode = nodeById.get(edge.source);
 				if (requirementNode !== undefined) traceItem(requirementNode, activeItemIds);
 			}
@@ -161,7 +149,7 @@ const readIncomeHighlight = (
 		const directOperationIds = [
 			...new Set(directOutputEdges.map(({ operationId }) => operationId)),
 		].sort((left, right) => left.localeCompare(right));
-		for (const edge of directOutputEdges) markEdge(edge, branchIndex);
+		for (const edge of directOutputEdges) markEdge(edge);
 		const rootActiveItemIds = new Set([
 			startNode.id,
 		]);
@@ -170,16 +158,6 @@ const readIncomeHighlight = (
 	}
 
 	return {
-		branchIndexesByEdgeId: new Map(
-			[
-				...branchIndexesByEdgeId,
-			].map(([edgeId, branchIndexes]) => [
-				edgeId,
-				[
-					...branchIndexes,
-				].sort((left, right) => left - right),
-			]),
-		),
 		edgeIds,
 		nodeIds,
 	};
@@ -188,7 +166,6 @@ const readIncomeHighlight = (
 /** Reads the complete Income ancestry selected by an item or connection. */
 export const readEditorOriginFlowHighlight = (
 	flow: EditorItemOriginFlow,
-	_positions: ReadonlyMap<string, FlowNodePosition>,
 	selection: EditorOriginFlowSelection,
 ): EditorOriginFlowHighlight => {
 	if (selection.kind === "node") {
@@ -203,7 +180,6 @@ export const readEditorOriginFlowHighlight = (
 	const startNode = flow.nodes.find(({ id }) => id === selectedEdge.source);
 	if (startNode === undefined)
 		return {
-			branchIndexesByEdgeId: new Map(),
 			edgeIds: new Set([
 				selectedEdge.id,
 			]),
@@ -214,7 +190,6 @@ export const readEditorOriginFlowHighlight = (
 		};
 	const highlight = readIncomeHighlight(flow, startNode);
 	return {
-		branchIndexesByEdgeId: new Map(),
 		edgeIds: new Set([
 			selectedEdge.id,
 			...highlight.edgeIds,

@@ -9,7 +9,7 @@ import {
 } from "~/bridge/item/editor/readEditorItemOriginFlow";
 import { readEditorOriginFlowHighlight } from "~/ui/item/editor/readEditorOriginFlowHighlight";
 import { readEditorOriginFlowNavigation } from "~/ui/item/editor/readEditorOriginFlowNavigation";
-import { readEditorOriginFlowRelationNavigationFx } from "~/ui/item/editor/readEditorOriginFlowRelationNavigationFx";
+import { readEditorOriginFlowRelationNavigation } from "~/ui/item/editor/readEditorOriginFlowRelationNavigation";
 import { readArkiniGameConfigSource } from "~test/schema/support/readArkiniGameConfigSource";
 
 const operation = (
@@ -34,11 +34,7 @@ const operation = (
 		id: `${id}:output:${index}:${itemId}`,
 		itemId,
 		label: itemId,
-		placement: "drop",
-		selectionKind: "guaranteed",
-		weightedSet: false,
 	})),
-	status: "reachable",
 });
 
 const item = (
@@ -54,10 +50,8 @@ const item = (
 	} = {},
 ): EditorItemOriginItemNode => ({
 	acquisitionSourceId,
-	depth: 0,
 	id: `item:${itemId}`,
 	itemId,
-	kind: "item",
 	operations,
 	resourceIds: [
 		"missing",
@@ -67,7 +61,6 @@ const item = (
 				"Board",
 			]
 		: [],
-	status: starter ? "starter" : "reachable",
 	title: itemId,
 	type: "simple",
 });
@@ -140,7 +133,6 @@ const incomeFlow: EditorItemOriginFlow = {
 			],
 		}),
 	],
-	obtainable: true,
 };
 
 const positions = new Map(
@@ -161,7 +153,7 @@ const positions = new Map(
 
 describe("readEditorOriginFlowHighlight", () => {
 	it("includes every producer branch with its mandatory prerequisites", () => {
-		const highlight = readEditorOriginFlowHighlight(incomeFlow, positions, {
+		const highlight = readEditorOriginFlowHighlight(incomeFlow, {
 			id: "item:target",
 			kind: "node",
 		});
@@ -183,42 +175,12 @@ describe("readEditorOriginFlowHighlight", () => {
 				"loop-target",
 			]),
 		);
-		expect(highlight.branchIndexesByEdgeId).toEqual(
-			new Map([
-				[
-					"forge-target",
-					[
-						0,
-					],
-				],
-				[
-					"tool-forge",
-					[
-						0,
-					],
-				],
-				[
-					"water-forge",
-					[
-						0,
-					],
-				],
-				[
-					"loop-target",
-					[
-						1,
-					],
-				],
-			]),
-		);
 
-		const producerNodeIds = Effect.runSync(
-			readEditorOriginFlowRelationNavigationFx({
-				flow: incomeFlow,
-				selectedNodeId: "item:target",
-				selectedRole: "output",
-			}),
-		);
+		const producerNodeIds = readEditorOriginFlowRelationNavigation({
+			flow: incomeFlow,
+			selectedNodeId: "item:target",
+			selectedRole: "output",
+		});
 		const navigationNodeIds = readEditorOriginFlowNavigation(
 			incomeFlow,
 			positions,
@@ -235,7 +197,7 @@ describe("readEditorOriginFlowHighlight", () => {
 		}
 	});
 
-	it("keeps shared upstream edges in every branch that uses them", () => {
+	it("includes shared upstream edges once when multiple producer branches use them", () => {
 		const sharedFlow: EditorItemOriginFlow = {
 			edges: [
 				{
@@ -333,52 +295,31 @@ describe("readEditorOriginFlowHighlight", () => {
 					starter: true,
 				}),
 			],
-			obtainable: true,
 		};
-		const sharedPositions = new Map(
-			sharedFlow.nodes.map(
-				(node, index) =>
-					[
-						node.id,
-						{
-							flowOrder: index,
-							height: 40,
-							width: 40,
-							x: index * 100,
-							y: 0,
-						},
-					] as const,
-			),
-		);
 
-		const highlight = readEditorOriginFlowHighlight(sharedFlow, sharedPositions, {
+		const highlight = readEditorOriginFlowHighlight(sharedFlow, {
 			id: "item:target",
 			kind: "node",
 		});
 
-		expect(highlight.branchIndexesByEdgeId.get("a-target")).toEqual([
-			0,
-		]);
-		expect(highlight.branchIndexesByEdgeId.get("b-target")).toEqual([
-			1,
-		]);
-		expect(highlight.branchIndexesByEdgeId.get("common-owner-common")).toEqual([
-			0,
-			1,
-		]);
-		expect(highlight.branchIndexesByEdgeId.get("seed-common-owner")).toEqual([
-			0,
-			1,
-		]);
+		expect(highlight.edgeIds).toEqual(
+			new Set([
+				"a-target",
+				"b-target",
+				"common-a",
+				"common-b",
+				"common-owner-common",
+				"seed-common-owner",
+			]),
+		);
 	});
 
 	it("stops tracing when the selected item is already a starter", () => {
-		const highlight = readEditorOriginFlowHighlight(incomeFlow, positions, {
+		const highlight = readEditorOriginFlowHighlight(incomeFlow, {
 			id: "item:tool",
 			kind: "node",
 		});
 		expect(highlight).toEqual({
-			branchIndexesByEdgeId: new Map(),
 			edgeIds: new Set(),
 			nodeIds: new Set([
 				"item:tool",
@@ -455,21 +396,9 @@ describe("readEditorOriginFlowHighlight", () => {
 					starter: true,
 				}),
 			],
-			obtainable: true,
 		};
-		const layout = new Map(
-			flow.nodes.map(
-				(node, index) =>
-					[
-						node.id,
-						{
-							flowOrder: index,
-						},
-					] as const,
-			),
-		);
 
-		const highlight = readEditorOriginFlowHighlight(flow, layout, {
+		const highlight = readEditorOriginFlowHighlight(flow, {
 			id: "item:target",
 			kind: "node",
 		});
@@ -493,12 +422,11 @@ describe("readEditorOriginFlowHighlight", () => {
 	});
 
 	it("keeps an explicitly selected connection and traces from its source", () => {
-		const highlight = readEditorOriginFlowHighlight(incomeFlow, positions, {
+		const highlight = readEditorOriginFlowHighlight(incomeFlow, {
 			id: "tool-forge",
 			kind: "edge",
 		});
 		expect(highlight).toEqual({
-			branchIndexesByEdgeId: new Map(),
 			edgeIds: new Set([
 				"tool-forge",
 			]),
@@ -544,20 +472,8 @@ describe("readEditorOriginFlowHighlight", () => {
 					],
 				}),
 			],
-			obtainable: false,
 		};
-		const layout = new Map(
-			flow.nodes.map(
-				(node, index) =>
-					[
-						node.id,
-						{
-							flowOrder: index,
-						},
-					] as const,
-			),
-		);
-		const highlight = readEditorOriginFlowHighlight(flow, layout, {
+		const highlight = readEditorOriginFlowHighlight(flow, {
 			id: "item:target",
 			kind: "node",
 		});
@@ -599,38 +515,20 @@ describe("readEditorOriginFlowHighlight", () => {
 					] as const,
 			),
 		);
-		const highlight = readEditorOriginFlowHighlight(flow, layout, {
+		const highlight = readEditorOriginFlowHighlight(flow, {
 			id: coinNodeId,
 			kind: "node",
 		});
-		const directCoinOutputEdges = flow.edges.filter(
-			(edge) => edge.role === "output" && edge.target === coinNodeId,
+		const directProducerIds = new Set(
+			flow.edges
+				.filter((edge) => edge.role === "output" && edge.target === coinNodeId)
+				.map(({ source }) => source),
 		);
-		const directProducerIds = new Set(directCoinOutputEdges.map(({ source }) => source));
-		const branchIndexByProducerId = new Map<string, number>();
-		for (const edge of directCoinOutputEdges) {
-			const branchIndexes = highlight.branchIndexesByEdgeId.get(edge.id);
-			expect(branchIndexes?.length).toBe(1);
-			const branchIndex = branchIndexes?.[0];
-			expect(branchIndex).toBeDefined();
-			const existing = branchIndexByProducerId.get(edge.source);
-			if (existing === undefined) branchIndexByProducerId.set(edge.source, branchIndex!);
-			else expect(branchIndex).toBe(existing);
-		}
-		expect(new Set(branchIndexByProducerId.values()).size).toBe(directProducerIds.size);
-		expect(
-			[
-				...highlight.branchIndexesByEdgeId.values(),
-			].some((indexes) => indexes.length > 1),
-		).toBe(true);
-
-		const producerNodeIds = Effect.runSync(
-			readEditorOriginFlowRelationNavigationFx({
-				flow,
-				selectedNodeId: coinNodeId,
-				selectedRole: "output",
-			}),
-		);
+		const producerNodeIds = readEditorOriginFlowRelationNavigation({
+			flow,
+			selectedNodeId: coinNodeId,
+			selectedRole: "output",
+		});
 		const navigationNodeIds = readEditorOriginFlowNavigation(
 			flow,
 			layout,
@@ -638,6 +536,7 @@ describe("readEditorOriginFlowHighlight", () => {
 			highlight.edgeIds,
 		);
 
+		expect(new Set(producerNodeIds)).toEqual(directProducerIds);
 		expect(producerNodeIds.length).toBeGreaterThan(5);
 		expect(producerNodeIds).toEqual(
 			expect.arrayContaining([
@@ -655,12 +554,11 @@ describe("readEditorOriginFlowHighlight", () => {
 
 	it("returns an empty highlight for a stale selection", () => {
 		expect(
-			readEditorOriginFlowHighlight(incomeFlow, positions, {
+			readEditorOriginFlowHighlight(incomeFlow, {
 				id: "missing",
 				kind: "node",
 			}),
 		).toEqual({
-			branchIndexesByEdgeId: new Map(),
 			edgeIds: new Set(),
 			nodeIds: new Set(),
 		});

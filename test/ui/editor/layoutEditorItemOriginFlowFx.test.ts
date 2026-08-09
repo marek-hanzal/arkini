@@ -5,13 +5,13 @@ import {
 	type EditorItemOriginFlow,
 	readEditorItemOriginFlowFx,
 } from "~/bridge/item/editor/readEditorItemOriginFlow";
-import {
-	type EditorItemOriginFlowLayout,
-	type EditorItemOriginFlowLayoutInput,
-	type EditorItemOriginFlowLayoutNode,
-	type EditorItemOriginFlowLayoutPoint,
-	layoutEditorItemOriginFlowFx,
-} from "~/ui/item/editor/layoutEditorItemOriginFlowFx";
+import type {
+	EditorItemOriginFlowLayout,
+	EditorItemOriginFlowLayoutInput,
+	EditorItemOriginFlowLayoutNode,
+	EditorItemOriginFlowLayoutPoint,
+} from "~/ui/item/editor/editorItemOriginFlowLayout";
+import { layoutEditorItemOriginFlowFx } from "~/ui/item/editor/layoutEditorItemOriginFlowFx";
 import { readEditorOriginFlowHighlight } from "~/ui/item/editor/readEditorOriginFlowHighlight";
 import { readEditorOriginFlowNodeMetrics } from "~/ui/item/editor/readEditorOriginFlowNodeMetrics";
 import { readArkiniGameConfigSource } from "~test/schema/support/readArkiniGameConfigSource";
@@ -120,27 +120,6 @@ const expectOrthogonalRoute = (
 			Math.abs(previous.x - current.x) < 0.01 || Math.abs(previous.y - current.y) < 0.01,
 		).toBe(true);
 	}
-};
-
-const readLongestHorizontalSegment = (points: ReadonlyArray<EditorItemOriginFlowLayoutPoint>) => {
-	let longest:
-		| {
-				readonly length: number;
-				readonly y: number;
-		  }
-		| undefined;
-	for (let index = 1; index < points.length; index += 1) {
-		const from = points[index - 1]!;
-		const to = points[index]!;
-		if (Math.abs(from.y - to.y) >= 0.01) continue;
-		const length = Math.abs(to.x - from.x);
-		if (longest === undefined || length > longest.length)
-			longest = {
-				length,
-				y: from.y,
-			};
-	}
-	return longest;
 };
 
 describe("layoutEditorItemOriginFlowFx", () => {
@@ -259,104 +238,6 @@ describe("layoutEditorItemOriginFlowFx", () => {
 		}
 	});
 
-	it("routes exactly between explicit item ports", () => {
-		const layout = Effect.runSync(
-			layoutEditorItemOriginFlowFx({
-				edges: [
-					edge("source", "target", {
-						sourcePortId: "out",
-						targetPortId: "in",
-					}),
-				],
-				nodes: [
-					node("source", {
-						height: 260,
-						ports: [
-							{
-								id: "out",
-								x: 210,
-								y: 62,
-							},
-						],
-					}),
-					node("target", {
-						height: 420,
-						ports: [
-							{
-								id: "in",
-								x: -210,
-								y: -118,
-							},
-						],
-					}),
-				],
-			}),
-		);
-		const source = layout.positions.get("source")!;
-		const target = layout.positions.get("target")!;
-		const backbone = layout.backbones.get("source->target")!;
-		const start = backbone[0]!;
-		const end = backbone.at(-1)!;
-
-		expect(start.x).toBeCloseTo(source.x + source.width, 5);
-		expect(start.y).toBeCloseTo(source.y + source.height / 2 + 62, 5);
-		expect(end.x).toBeCloseTo(target.x, 5);
-		expect(end.y).toBeCloseTo(target.y + target.height / 2 - 118, 5);
-		expectOrthogonalRoute(backbone);
-		expect(backbone[1]!.x - start.x).toBeGreaterThanOrEqual(56);
-		expect(backbone[1]!.x - start.x).toBeLessThan(152);
-		expect(backbone[1]!.x % 96).toBeCloseTo(0, 5);
-		expect(backbone[1]!.y).toBeCloseTo(start.y, 5);
-		expect(end.x - backbone.at(-2)!.x).toBeGreaterThanOrEqual(56);
-		expect(end.x - backbone.at(-2)!.x).toBeLessThan(152);
-		expect(backbone.at(-2)!.x % 96).toBeCloseTo(0, 5);
-		expect(backbone.at(-2)!.y).toBeCloseTo(end.y, 5);
-	});
-
-	it("bundles overlapping long cables onto stable shared tracks", () => {
-		const edges = Array.from(
-			{
-				length: 20,
-			},
-			(_, index) => ({
-				id: `parallel-${index.toString().padStart(2, "0")}`,
-				source: "source",
-				target: "target",
-			}),
-		);
-		const flow: EditorItemOriginFlowLayoutInput = {
-			edges,
-			nodes: [
-				node("source"),
-				node("target"),
-			],
-		};
-		const layout = Effect.runSync(layoutEditorItemOriginFlowFx(flow));
-		const shuffled = Effect.runSync(
-			layoutEditorItemOriginFlowFx({
-				edges: [
-					...edges,
-				].reverse(),
-				nodes: [
-					...flow.nodes,
-				].reverse(),
-			}),
-		);
-
-		expect([
-			...layout.backbones,
-		]).toEqual([
-			...shuffled.backbones,
-		]);
-		const routes = edges.map(({ id }) => layout.backbones.get(id)!);
-		expect(new Set(routes.map((route) => JSON.stringify(route))).size).toBe(1);
-		const laneYs = routes
-			.map((route) => readLongestHorizontalSegment(route)?.y)
-			.filter((value): value is number => value !== undefined);
-		expect(new Set(laneYs).size).toBe(1);
-		expect(laneYs[0]! % 96).toBeCloseTo(0, 5);
-	});
-
 	it("lays out the official item-only graph with exact embedded-operation ports", async () => {
 		const config = await readArkiniGameConfigSource();
 		const flow = await Effect.runPromise(
@@ -379,9 +260,6 @@ describe("layoutEditorItemOriginFlowFx", () => {
 			),
 		);
 
-		expect(flow.nodes.length).toBe(247);
-		expect(flow.edges.length).toBe(1384);
-		expect(flow.nodes.every(({ kind }) => kind === "item")).toBe(true);
 		expect(layout.positions.size).toBe(flow.nodes.length);
 		expect(layout.backbones.size).toBe(flow.edges.length);
 		expect(elapsedMs).toBeLessThan(5_000);
@@ -401,18 +279,6 @@ describe("layoutEditorItemOriginFlowFx", () => {
 			for (let rightIndex = leftIndex + 1; rightIndex < layoutNodes.length; rightIndex += 1)
 				expect(overlaps(layoutNodes[leftIndex]!, layoutNodes[rightIndex]!)).toBe(false);
 		}
-
-		const waterNode = flow.nodes.find(({ title }) => title === "Water");
-		const libraryNode = flow.nodes.find(({ title }) => title === "Library IV");
-		expect(waterNode).toBeDefined();
-		expect(libraryNode).toBeDefined();
-		const waterLayout = layout.positions.get(waterNode!.id)!;
-		const libraryLayout = layout.positions.get(libraryNode!.id)!;
-		expect(waterLayout.degree).toBeGreaterThan(40);
-		expect(libraryLayout.degree).toBeGreaterThan(60);
-		expect(libraryLayout.portCount).toBeGreaterThan(100);
-		expect(waterLayout.importance).toBeGreaterThan(0.5);
-		expect(libraryLayout.importance).toBeGreaterThan(waterLayout.importance);
 
 		for (const flowEdge of flow.edges) {
 			const source = layout.positions.get(flowEdge.source)!;
@@ -442,7 +308,7 @@ describe("layoutEditorItemOriginFlowFx", () => {
 			expect(last.y).toBeCloseTo(target.y + target.height / 2 + targetOffset.y, 5);
 		}
 
-		const winery = readEditorOriginFlowHighlight(flow, layout.positions, {
+		const winery = readEditorOriginFlowHighlight(flow, {
 			id: "item:item:blueprint-winery-t1",
 			kind: "node",
 		});

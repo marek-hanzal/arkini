@@ -165,6 +165,144 @@ describe("planStartFx", () => {
 		]);
 	});
 
+	it("materializes exact stacked board, toolbar, and positioned inventory starts", () => {
+		const result = Effect.runSync(
+			planStartFx({
+				runtime: {
+					cheats: {
+						enabled: false,
+						everEnabled: false,
+						instantGameplay: false,
+					},
+					currentSpace: 0,
+					items: [],
+					jobs: [],
+					jobQueue: [],
+				},
+				start: {
+					currentSpace: 0,
+					board: [
+						{
+							itemId: "log",
+							quantity: 3,
+							space: 0,
+							x: 0,
+							y: 0,
+						},
+					],
+					inventory: [
+						{
+							itemId: "log",
+							position: {
+								x: 1,
+								y: 0,
+							},
+							quantity: 2,
+						},
+					],
+					toolbar: [
+						{
+							itemId: "log",
+							position: {
+								x: 0,
+								y: 0,
+							},
+							quantity: 2,
+						},
+					],
+				},
+			}).pipe(
+				useGameFx({
+					config: startTestConfig,
+				}),
+			),
+		);
+
+		expect(result.items).toEqual(
+			expect.arrayContaining([
+				expect.objectContaining({
+					location: {
+						space: 0,
+						position: {
+							x: 0,
+							y: 0,
+						},
+						scope: "board",
+					},
+					quantity: 3,
+				}),
+				expect.objectContaining({
+					location: {
+						position: {
+							x: 1,
+							y: 0,
+						},
+						scope: "inventory",
+					},
+					quantity: 2,
+				}),
+				expect.objectContaining({
+					location: {
+						position: {
+							x: 0,
+							y: 0,
+						},
+						scope: "toolbar",
+					},
+					quantity: 2,
+				}),
+			]),
+		);
+	});
+
+	it("rejects an exact start stack larger than the canonical max stack size", () => {
+		const result = Effect.runSync(
+			Effect.result(
+				planStartFx({
+					runtime: {
+						cheats: {
+							enabled: false,
+							everEnabled: false,
+							instantGameplay: false,
+						},
+						currentSpace: 0,
+						items: [],
+						jobs: [],
+						jobQueue: [],
+					},
+					start: {
+						currentSpace: 0,
+						board: [
+							{
+								itemId: "log",
+								quantity: 4,
+								space: 0,
+								x: 0,
+								y: 0,
+							},
+						],
+						inventory: [],
+						toolbar: [],
+					},
+				}),
+			).pipe(
+				useGameFx({
+					config: startTestConfig,
+				}),
+			),
+		);
+
+		expect(Result.isFailure(result)).toBe(true);
+		if (Result.isFailure(result)) {
+			expect(result.failure).toMatchObject({
+				_tag: "StartSlotUnavailableError",
+				itemId: "log",
+				remainingQuantity: 1,
+				scope: "board",
+			});
+		}
+	});
+
 	it("rejects conflicting exact board locations", () => {
 		const result = Effect.runSync(
 			Effect.result(

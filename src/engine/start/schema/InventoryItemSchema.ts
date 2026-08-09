@@ -2,6 +2,7 @@ import { z } from "zod";
 
 import { IdSchema } from "~/engine/common/schema/IdSchema";
 import { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
+import { PositionSchema } from "~/engine/grid/schema/PositionSchema";
 
 /**
  * Adds a positive quantity of one canonical item to the initial inventory.
@@ -12,6 +13,9 @@ export const InventoryItemSchema = z
 		 * Canonical item added to the inventory.
 		 */
 		itemId: IdSchema.describe("The canonical item ID added to the initial inventory."),
+		position: PositionSchema.optional().describe(
+			"The optional exact initial inventory slot; omitted legacy entries use deterministic stack-first placement.",
+		),
 		/**
 		 * Number of item instances added to the inventory.
 		 */

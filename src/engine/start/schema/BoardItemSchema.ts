@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import { NonNegativeIntegerSchema } from "~/engine/common/schema/NonNegativeIntegerSchema";
+import { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
 import { IdSchema } from "~/engine/common/schema/IdSchema";
 import { PositionSchema } from "~/engine/grid/schema/PositionSchema";
 
@@ -17,6 +18,9 @@ export const BoardItemSchema = z
 		 * Canonical item placed on the board.
 		 */
 		itemId: IdSchema.describe("The canonical item ID placed on the initial board."),
+		quantity: PositiveIntegerSchema.optional().describe(
+			"The optional stack quantity placed in this exact initial board cell; omitted means one.",
+		),
 	})
 	.strict()
 	.meta({

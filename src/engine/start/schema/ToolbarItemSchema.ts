@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import { IdSchema } from "~/engine/common/schema/IdSchema";
+import { PositiveIntegerSchema } from "~/engine/common/schema/PositiveIntegerSchema";
 import { PositionSchema } from "~/engine/grid/schema/PositionSchema";
 
 /**
@@ -12,6 +13,9 @@ export const ToolbarItemSchema = z
 		 * Canonical item placed in the toolbar.
 		 */
 		itemId: IdSchema.describe("The canonical item ID placed in the initial toolbar."),
+		quantity: PositiveIntegerSchema.optional().describe(
+			"The optional stack quantity placed in this exact initial toolbar slot; omitted means one.",
+		),
 		position: PositionSchema.describe("The exact zero-based initial toolbar slot."),
 	})
 	.strict()

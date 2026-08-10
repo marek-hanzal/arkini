@@ -2,6 +2,7 @@ import type { InputSchema } from "~/engine/input/schema/InputSchema";
 import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import type { LineSchema } from "~/engine/line/schema/LineSchema";
 import type { OutputSchema } from "~/engine/output/schema/OutputSchema";
+import type { QuantitySchema } from "~/engine/quantity/schema/QuantitySchema";
 
 export type EditorItemOriginOperationKind = "line" | "charges" | "merge" | "expiry";
 export type EditorItemOriginOutputKind = "guaranteed" | "chance" | "weighted" | "replace";
@@ -9,8 +10,14 @@ export type EditorItemOriginOutputKind = "guaranteed" | "chance" | "weighted" | 
 export interface EditorItemOriginOutputOccurrence {
 	readonly itemId: string;
 	readonly placement: "drop" | "random" | undefined;
+	readonly quantity: QuantitySchema.Type;
 	readonly selectionKind: EditorItemOriginOutputKind;
 	readonly weightedSet: boolean;
+}
+
+export interface EditorItemOriginInputOccurrence {
+	readonly itemId: string;
+	readonly quantity: QuantitySchema.Type;
 }
 
 export type EditorItemOriginSourceReference =
@@ -31,6 +38,7 @@ export type EditorItemOriginSourceReference =
 
 export interface EditorItemOriginSource {
 	readonly id: string;
+	readonly inputs: ReadonlyArray<EditorItemOriginInputOccurrence>;
 	readonly kind: EditorItemOriginOperationKind;
 	readonly label: string;
 	readonly outputs: ReadonlyArray<EditorItemOriginOutputOccurrence>;
@@ -87,6 +95,7 @@ const readOutputOccurrences = (
 			return drops.map((drop) => ({
 				itemId: drop.itemId,
 				placement: drop.placement,
+				quantity: drop.quantity,
 				selectionKind,
 				weightedSet,
 			}));
@@ -97,21 +106,32 @@ const readOutputOccurrences = (
 const dedupeOccurrences = (occurrences: ReadonlyArray<EditorItemOriginOutputOccurrence>) => {
 	const seen = new Set<string>();
 	return occurrences.filter((occurrence) => {
-		const key = `${occurrence.itemId}:${occurrence.selectionKind}:${occurrence.placement ?? "none"}:${occurrence.weightedSet}`;
+		const key = `${occurrence.itemId}:${occurrence.quantity.min}:${occurrence.quantity.max}:${occurrence.selectionKind}:${occurrence.placement ?? "none"}:${occurrence.weightedSet}`;
 		if (seen.has(key)) return false;
 		seen.add(key);
 		return true;
 	});
 };
 
-const readInputItemId = (input: InputSchema.Type): string | undefined => {
+const readInputOccurrence = (
+	input: InputSchema.Type,
+): EditorItemOriginInputOccurrence | undefined => {
 	switch (input.type) {
 		case "simple":
 			return undefined;
 		case "materials":
-			return input.selector.itemId;
+			return {
+				itemId: input.selector.itemId,
+				quantity: input.quantity,
+			};
 		case "deposit":
-			return input.query.selector.itemId;
+			return {
+				itemId: input.query.selector.itemId,
+				quantity: {
+					min: 1,
+					max: 1,
+				},
+			};
 	}
 };
 
@@ -122,9 +142,13 @@ const readLineSources = (
 	lines.flatMap((line, index) => {
 		const outputs = dedupeOccurrences(readOutputOccurrences(line.output));
 		if (outputs.length === 0) return [];
+		const inputs = line.input
+			.map(readInputOccurrence)
+			.filter((input): input is EditorItemOriginInputOccurrence => input !== undefined);
 		return [
 			{
 				id: `source:${item.id}:line:${line.id || index}`,
+				inputs,
 				kind: "line",
 				label: line.title || "Production",
 				outputs,
@@ -135,9 +159,7 @@ const readLineSources = (
 				},
 				requirementItemIds: unique([
 					item.id,
-					...line.input
-						.map(readInputItemId)
-						.filter((id): id is string => id !== undefined),
+					...inputs.map(({ itemId }) => itemId),
 				]),
 			},
 		];
@@ -165,6 +187,7 @@ export const readEditorItemOriginSources = (item: ItemSchema.Type): EditorItemOr
 	if (depletedOutputs.length > 0)
 		sources.push({
 			id: `source:${item.id}:charges`,
+			inputs: [],
 			kind: "charges",
 			label: "Depletion",
 			outputs: depletedOutputs,
@@ -181,6 +204,7 @@ export const readEditorItemOriginSources = (item: ItemSchema.Type): EditorItemOr
 		if (expiryOutputs.length > 0)
 			sources.push({
 				id: `source:${item.id}:expiry`,
+				inputs: [],
 				kind: "expiry",
 				label: "Expiry",
 				outputs: expiryOutputs,
@@ -199,6 +223,10 @@ export const readEditorItemOriginSources = (item: ItemSchema.Type): EditorItemOr
 			outputs.push({
 				itemId: merge.result,
 				placement: undefined,
+				quantity: {
+					min: 1,
+					max: 1,
+				},
 				selectionKind: "replace",
 				weightedSet: false,
 			});
@@ -206,6 +234,15 @@ export const readEditorItemOriginSources = (item: ItemSchema.Type): EditorItemOr
 		if (deduped.length === 0) continue;
 		sources.push({
 			id: `source:${item.id}:merge:${index}`,
+			inputs: [
+				{
+					itemId: merge.target.itemId,
+					quantity: {
+						min: 1,
+						max: 1,
+					},
+				},
+			],
 			kind: "merge",
 			label: "Merge",
 			outputs: deduped,

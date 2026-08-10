@@ -16,6 +16,12 @@ import { searchEditorItems } from "../../src/editor/searchEditorItems";
 import { IdSchema } from "../../src/engine/common/schema/IdSchema";
 import { ItemEnumSchema } from "../../src/engine/item/schema/ItemEnumSchema";
 
+const EditorMcpItemTypeSchema = z
+	.enum(ItemEnumSchema.options)
+	.describe(
+		"A canonical Arkini item type: deposit, blueprint, simple, producer, craft, stash, temporary, or inventory.",
+	);
+
 const avatarResourceIds = (project: EditorProject) =>
 	Object.entries(project.config.resources)
 		.filter(([role]) => role.startsWith("avatar-"))
@@ -172,6 +178,7 @@ const itemReference = (project: EditorProject, itemId: string) => {
 
 const outputAnnotation = (output: EditorItemOriginOutputOccurrence) =>
 	[
+		`quantity ${formatQuantity(output.quantity)}`,
 		output.selectionKind,
 		...(output.weightedSet
 			? [
@@ -184,6 +191,9 @@ const outputAnnotation = (output: EditorItemOriginOutputOccurrence) =>
 					`placement ${output.placement}`,
 				]),
 	].join(", ");
+
+const formatQuantity = ({ max, min }: { readonly max: number; readonly min: number }) =>
+	min === max ? String(min) : `${min}–${max}`;
 
 const readItemRelationView = (
 	project: EditorProject,
@@ -220,38 +230,33 @@ const readItemRelationView = (
 type ItemRelationView = ReturnType<typeof readItemRelationView>;
 
 const sourceReferenceLines = (project: EditorProject, source: EditorItemOriginSource) => [
-	`  source item: ${itemReference(project, source.ownerItemId)}`,
+	`  Source item: ${itemReference(project, source.ownerItemId)}`,
 	...(() => {
 		switch (source.reference.type) {
 			case "line":
 				return [
-					`  line: ${source.reference.lineId}`,
+					`  Line ID: ${source.reference.lineId}`,
 				];
 			case "charges":
 				return [
-					"  relationship: charge depletion",
+					"  Relationship: charge depletion",
 				];
 			case "expiry":
 				return [
-					"  relationship: expiry",
+					"  Relationship: expiry",
 				];
 			case "merge":
 				return [
-					`  merge rule: ${source.reference.ruleNumber}`,
+					`  Merge rule: ${source.reference.ruleNumber}`,
 				];
 		}
 	})(),
 ];
 
-const sourceMetadata = (source: EditorItemOriginSource) => ({
-	kind: source.kind,
-	label: source.label,
-	sourceItemId: source.ownerItemId,
-	...source.reference,
-});
-
 const itemRelationText = ({ itemId, level, project, role, subgraph }: ItemRelationView) => {
 	const direction = role === "output" ? "income" : "outcome";
+	const item = project.config.items[itemId];
+	if (item === undefined) throw new Error(`Item ${itemId} does not exist in the open project.`);
 	const groups = new Map<
 		string,
 		{
@@ -275,35 +280,12 @@ const itemRelationText = ({ itemId, level, project, role, subgraph }: ItemRelati
 						],
 		});
 	}
-	const reachedItemIds = [
-		...subgraph.itemIds,
-	]
-		.filter((candidate) => candidate !== itemId)
-		.sort((left, right) => left.localeCompare(right));
 	return [
-		`Item ${direction} for ${itemReference(project, itemId)}`,
-		`Depth: ${level} relationship ${level === 1 ? "hop" : "hops"}`,
-		direction === "outcome"
-			? "Outcome direction: external input item -> operation owner. Owner self-requirements are not editor-flow input edges."
-			: "Income lookup: produced item <- operation owner. Relationships are printed canonically as owner -> output; guaranteed, chance, weighted, replacement, depletion, and expiry outputs all use the editor-flow model.",
-		"",
-		"Reading guide:",
-		"- level: relationship-hop distance from the requested item; level 1 is a direct relationship.",
-		role === "input"
-			? "- traversed: the matched external-input edge, printed as input item -> source item."
-			: "- traversed: the matched output edge, printed canonically as source item -> produced item.",
-		"- source item: the item that owns and runs the listed operation.",
-		"- line / merge rule / relationship: the authored operation reference inside the source item.",
-		"- external inputs: every item required by the operation except the source item itself.",
-		"- outputs: every possible item emitted by the operation, not only the edge matched by this lookup.",
-		"- output annotations: guaranteed/chance/weighted/replace describe selection; alternative set means mutually weighted sets; placement describes where the item appears.",
-		"",
-		"Reached items:",
-		...(reachedItemIds.length === 0
-			? [
-					"- none",
-				]
-			: reachedItemIds.map((reachedItemId) => `- ${itemReference(project, reachedItemId)}`)),
+		`Item ${direction}`,
+		`Item ID: ${item.id}`,
+		`Title: ${item.title}`,
+		`Type: ${item.type}`,
+		`Level: ${level}`,
 		"",
 		"Operations:",
 		...(groups.size === 0
@@ -316,30 +298,28 @@ const itemRelationText = ({ itemId, level, project, role, subgraph }: ItemRelati
 					const source = group.relations[0]?.source;
 					if (source === undefined) return [];
 					const inputs = [
-						...new Set(source.requirementItemIds),
-					]
-						.filter((requirementItemId) => requirementItemId !== source.ownerItemId)
-						.sort((left, right) => left.localeCompare(right));
+						...source.inputs,
+					].sort((left, right) => left.itemId.localeCompare(right.itemId));
 					return [
-						`- level ${group.level}: ${source.kind} "${source.label}"`,
+						`- Level ${group.level}: ${source.kind} "${source.label}"`,
 						...sourceReferenceLines(project, source),
-						"  traversed:",
+						"  Traversed:",
 						...group.relations.map(
 							(relation) =>
 								`    - ${itemReference(project, relation.fromItemId)} -> ${itemReference(project, relation.toItemId)}`,
 						),
 						...(inputs.length === 0
 							? [
-									"  external inputs: none",
+									"  Inputs: none",
 								]
 							: [
-									"  external inputs:",
+									"  Inputs:",
 									...inputs.map(
-										(inputItemId) =>
-											`    - ${itemReference(project, inputItemId)}`,
+										(input) =>
+											`    - ${itemReference(project, input.itemId)} (quantity ${formatQuantity(input.quantity)})`,
 									),
 								]),
-						"  outputs:",
+						"  Outputs:",
 						...source.outputs.map(
 							(output) =>
 								`    - ${itemReference(project, output.itemId)} (${outputAnnotation(output)})`,
@@ -348,26 +328,6 @@ const itemRelationText = ({ itemId, level, project, role, subgraph }: ItemRelati
 				})),
 	].join("\n");
 };
-
-const itemRelationMetadata = ({ itemId, level, role, subgraph }: ItemRelationView) => ({
-	direction: role === "output" ? "income" : "outcome",
-	itemId,
-	level,
-	operations: [
-		...new Map(
-			subgraph.relations.map(({ source }) => [
-				source.id,
-				sourceMetadata(source),
-			]),
-		).values(),
-	],
-	reachedItemIds: [
-		...subgraph.itemIds,
-	]
-		.filter((candidate) => candidate !== itemId)
-		.sort(),
-	relationshipCount: subgraph.relations.length,
-});
 
 const errorText = (cause: unknown) => (cause instanceof Error ? cause.message : String(cause));
 
@@ -408,7 +368,6 @@ const readCurrentProjectFx = (
 const runTool = async <Value>(
 	effect: Effect.Effect<Value, unknown>,
 	format: (value: Value) => string,
-	structured?: (value: Value) => Record<string, unknown>,
 ) => {
 	try {
 		const value = await Effect.runPromise(effect);
@@ -419,11 +378,6 @@ const runTool = async <Value>(
 					text: format(value),
 				},
 			],
-			...(structured === undefined
-				? {}
-				: {
-						structuredContent: structured(value),
-					}),
 		};
 	} catch (cause) {
 		return {
@@ -475,7 +429,7 @@ export const createEditorMcpServer = (
 				"List one page of items with collection metadata, title, ID, complete description, and type, optionally filtered by item types and the editor's fuzzy search.",
 			inputSchema: z
 				.object({
-					itemTypes: ItemEnumSchema.array()
+					itemTypes: EditorMcpItemTypeSchema.array()
 						.min(1)
 						.optional()
 						.describe(
@@ -511,10 +465,6 @@ export const createEditorMcpServer = (
 					),
 				),
 				itemCollectionText,
-				({ items, ...metadata }) => ({
-					...metadata,
-					itemIds: items.map(({ id }) => id),
-				}),
 			),
 	);
 	server.registerTool(
@@ -547,7 +497,7 @@ export const createEditorMcpServer = (
 		"item_income",
 		{
 			description:
-				"Read what leads to obtaining one item. Level 1 returns every direct producer owner; higher levels continue backward through operations that produce those producers.",
+				"Read what leads to obtaining one item. Level 1 returns every operation that directly produces it; higher levels continue upstream through operations that produce each reached operation owner. Every operation lists its owner, Inputs, and all possible Outputs.",
 			inputSchema: z
 				.object({
 					itemId: IdSchema.describe(
@@ -574,14 +524,13 @@ export const createEditorMcpServer = (
 					),
 				),
 				itemRelationText,
-				itemRelationMetadata,
 			),
 	);
 	server.registerTool(
 		"item_outcome",
 		{
 			description:
-				"Read where one item leads. Level 1 returns every operation owner that directly uses the item as an external input; higher levels continue forward through owners used as inputs elsewhere.",
+				"Read where one item leads. Level 1 returns every operation that directly uses it as an input; higher levels continue downstream through operations that use each reached operation owner. Every operation lists its owner, Inputs, and all possible Outputs.",
 			inputSchema: z
 				.object({
 					itemId: IdSchema.describe(
@@ -608,7 +557,6 @@ export const createEditorMcpServer = (
 					),
 				),
 				itemRelationText,
-				itemRelationMetadata,
 			),
 	);
 	return server;

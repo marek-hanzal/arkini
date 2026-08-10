@@ -11,6 +11,7 @@ import {
 import { ArkiniAppVersion } from "../../../shared/ArkiniAppMetadata";
 import { editorTestPayload } from "~test/editor/support/editorTestPayload";
 import { createJobTestConfig } from "~test/job/support/jobTestConfig";
+import { ItemEnumSchema } from "~/engine/item/schema/ItemEnumSchema";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 
 const cleanups: Array<() => Promise<void> | void> = [];
@@ -116,9 +117,16 @@ describe("createEditorMcpOwnershipFx", () => {
 		expect(
 			tools.tools.find(({ name }) => name === "item_collection")?.inputSchema.properties,
 		).toHaveProperty("query");
-		expect(
-			tools.tools.find(({ name }) => name === "item_collection")?.inputSchema.properties,
-		).toHaveProperty("itemTypes");
+		const itemCollectionProperties = tools.tools.find(({ name }) => name === "item_collection")
+			?.inputSchema.properties;
+		expect(itemCollectionProperties).toBeDefined();
+		expect(itemCollectionProperties?.itemTypes).toMatchObject({
+			type: "array",
+			items: {
+				type: "string",
+				enum: ItemEnumSchema.options,
+			},
+		});
 		expect(
 			tools.tools.find(({ name }) => name === "item_collection")?.inputSchema.properties,
 		).toHaveProperty("page");
@@ -231,20 +239,7 @@ describe("createEditorMcpOwnershipFx", () => {
 				].join("\n"),
 			},
 		]);
-		expect(itemCollection.structuredContent).toEqual({
-			hasNextPage: false,
-			hasPreviousPage: false,
-			itemIds: [
-				"water",
-			],
-			matchedItems: 1,
-			page: 1,
-			pageSize: 25,
-			projectItems: 1,
-			returnedItems: 1,
-			totalPages: 1,
-			typeFilteredItems: 1,
-		});
+		expect(itemCollection).not.toHaveProperty("structuredContent");
 		const fuzzyItemCollection = await client.callTool({
 			name: "item_collection",
 			arguments: {
@@ -419,16 +414,6 @@ describe("createEditorMcpOwnershipFx", () => {
 				),
 			},
 		]);
-		expect(producerCollection.structuredContent).toMatchObject({
-			itemIds: [
-				"forge",
-			],
-			itemTypes: [
-				"producer",
-			],
-			matchedItems: 1,
-			typeFilteredItems: 1,
-		});
 		const filteredQueryCollection = await client.callTool({
 			name: "item_collection",
 			arguments: {
@@ -438,11 +423,11 @@ describe("createEditorMcpOwnershipFx", () => {
 				query: "producer",
 			},
 		});
-		expect(filteredQueryCollection.structuredContent).toMatchObject({
-			itemIds: [],
-			matchedItems: 0,
-			typeFilteredItems: 4,
-		});
+		expect(filteredQueryCollection.content).toMatchObject([
+			{
+				text: expect.stringContaining("Type-filtered items: 4\nMatched items: 0"),
+			},
+		]);
 		const firstCollectionPage = await client.callTool({
 			name: "item_collection",
 			arguments: {
@@ -467,17 +452,6 @@ describe("createEditorMcpOwnershipFx", () => {
 				),
 			},
 		]);
-		expect(firstCollectionPage.structuredContent).toMatchObject({
-			hasNextPage: true,
-			hasPreviousPage: false,
-			nextPage: 2,
-			page: 1,
-			pageSize: 2,
-			projectItems: 5,
-			returnedItems: 2,
-			totalPages: 3,
-			typeFilteredItems: 5,
-		});
 		const lastCollectionPage = await client.callTool({
 			name: "item_collection",
 			arguments: {
@@ -500,15 +474,6 @@ describe("createEditorMcpOwnershipFx", () => {
 				),
 			},
 		]);
-		expect(lastCollectionPage.structuredContent).toMatchObject({
-			hasNextPage: false,
-			hasPreviousPage: true,
-			page: 3,
-			pageSize: 2,
-			previousPage: 2,
-			returnedItems: 1,
-			totalPages: 3,
-		});
 		expect(
 			(
 				await client.callTool({
@@ -530,18 +495,25 @@ describe("createEditorMcpOwnershipFx", () => {
 		});
 		expect(itemOutcome.content).toMatchObject([
 			{
-				text: expect.stringContaining("Item outcome for water [water; simple]"),
+				text: expect.stringContaining(
+					"Item outcome\nItem ID: water\nTitle: water\nType: simple\nLevel: 1",
+				),
 			},
 		]);
 		expect(itemOutcome.content).toMatchObject([
 			{
 				text: expect.stringContaining(
 					[
-						'- level 1: line "Run"',
-						"  source item: forge [forge; producer]",
-						"  line: line:forge:run",
-						"  traversed:",
+						'- Level 1: line "Run"',
+						"  Source item: forge [forge; producer]",
+						"  Line ID: line:forge:run",
+						"  Traversed:",
 						"    - water [water; simple] -> forge [forge; producer]",
+						"  Inputs:",
+						"    - tool [tool; simple] (quantity 1)",
+						"    - water [water; simple] (quantity 3)",
+						"  Outputs:",
+						"    - ingot [Ingot; simple] (quantity 1, guaranteed, placement drop)",
 					].join("\n"),
 				),
 			},
@@ -551,40 +523,7 @@ describe("createEditorMcpOwnershipFx", () => {
 				text: expect.not.stringContaining("source:forge:line:line:forge:run"),
 			},
 		]);
-		expect(itemOutcome.content).toMatchObject([
-			{
-				text: expect.stringContaining(
-					[
-						"Reading guide:",
-						"- level: relationship-hop distance from the requested item; level 1 is a direct relationship.",
-						"- traversed: the matched external-input edge, printed as input item -> source item.",
-						"- source item: the item that owns and runs the listed operation.",
-						"- line / merge rule / relationship: the authored operation reference inside the source item.",
-						"- external inputs: every item required by the operation except the source item itself.",
-						"- outputs: every possible item emitted by the operation, not only the edge matched by this lookup.",
-						"- output annotations: guaranteed/chance/weighted/replace describe selection; alternative set means mutually weighted sets; placement describes where the item appears.",
-					].join("\n"),
-				),
-			},
-		]);
-		expect(itemOutcome.structuredContent).toEqual({
-			direction: "outcome",
-			itemId: "water",
-			level: 1,
-			operations: [
-				{
-					kind: "line",
-					label: "Run",
-					lineId: "line:forge:run",
-					sourceItemId: "forge",
-					type: "line",
-				},
-			],
-			reachedItemIds: [
-				"forge",
-			],
-			relationshipCount: 1,
-		});
+		expect(itemOutcome).not.toHaveProperty("structuredContent");
 		const itemIncome = await client.callTool({
 			name: "item_income",
 			arguments: {
@@ -593,7 +532,9 @@ describe("createEditorMcpOwnershipFx", () => {
 		});
 		expect(itemIncome.content).toMatchObject([
 			{
-				text: expect.stringContaining("Item income for ingot [Ingot; simple]"),
+				text: expect.stringContaining(
+					"Item income\nItem ID: ingot\nTitle: Ingot\nType: simple\nLevel: 1",
+				),
 			},
 		]);
 		expect(itemIncome.content).toMatchObject([
@@ -601,31 +542,7 @@ describe("createEditorMcpOwnershipFx", () => {
 				text: expect.stringContaining("forge [forge; producer] -> ingot [Ingot; simple]"),
 			},
 		]);
-		expect(itemIncome.content).toMatchObject([
-			{
-				text: expect.stringContaining(
-					"- traversed: the matched output edge, printed canonically as source item -> produced item.",
-				),
-			},
-		]);
-		expect(itemIncome.structuredContent).toEqual({
-			direction: "income",
-			itemId: "ingot",
-			level: 1,
-			operations: [
-				{
-					kind: "line",
-					label: "Run",
-					lineId: "line:forge:run",
-					sourceItemId: "forge",
-					type: "line",
-				},
-			],
-			reachedItemIds: [
-				"forge",
-			],
-			relationshipCount: 1,
-		});
+		expect(itemIncome).not.toHaveProperty("structuredContent");
 		const missingRelationItem = await client.callTool({
 			name: "item_income",
 			arguments: {

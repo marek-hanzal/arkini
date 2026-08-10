@@ -24,10 +24,15 @@ const source = ({
 		{
 			itemId: outputItemId,
 			placement: undefined,
+			quantity: {
+				min: 1,
+				max: 1,
+			},
 			selectionKind: "guaranteed",
 			weightedSet: false,
 		},
 	],
+	inputs: [],
 	ownerItemId: requirementItemId,
 	reference: {
 		type: "line",
@@ -39,6 +44,60 @@ const source = ({
 });
 
 describe("editor item origin relations", () => {
+	it("preserves authored input and output quantities", async () => {
+		const config = await readArkiniGameConfigSource();
+		const bakeryBlueprint = config.items["item:blueprint-bakery-t1"];
+		expect(bakeryBlueprint).toBeDefined();
+		const constructBakery =
+			bakeryBlueprint === undefined
+				? undefined
+				: readEditorItemOriginSources(bakeryBlueprint).find(
+						({ reference }) =>
+							reference.type === "line" &&
+							reference.lineId === "line:blueprint:bakery-t1:construct",
+					);
+
+		expect(constructBakery?.inputs).toEqual([
+			{
+				itemId: "item:plank",
+				quantity: {
+					min: 2,
+					max: 2,
+				},
+			},
+			{
+				itemId: "item:stone-block",
+				quantity: {
+					min: 1,
+					max: 1,
+				},
+			},
+			{
+				itemId: "item:flour",
+				quantity: {
+					min: 1,
+					max: 1,
+				},
+			},
+			{
+				itemId: "item:water",
+				quantity: {
+					min: 1,
+					max: 1,
+				},
+			},
+		]);
+		expect(constructBakery?.outputs).toMatchObject([
+			{
+				itemId: "producer:bakery-t1",
+				quantity: {
+					min: 1,
+					max: 1,
+				},
+			},
+		]);
+	});
+
 	it("finds every official Coin producer through output lookup", async () => {
 		const config = await readArkiniGameConfigSource();
 		const sources = Object.values(config.items).flatMap(readEditorItemOriginSources);

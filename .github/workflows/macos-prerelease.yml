@@ -29,12 +29,12 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: 22.16.0
+          node-version: 22.19.0
 
       - name: Verify pinned Node and npm toolchain
         run: |
-          test "$(node --version)" = "v22.16.0"
-          test "$(npm --version)" = "10.9.2"
+          test "$(node --version)" = "v22.19.0"
+          test "$(npm --version)" = "10.9.3"
 
       - name: Use tag version for release artifacts
         if: startsWith(github.ref, 'refs/tags/')

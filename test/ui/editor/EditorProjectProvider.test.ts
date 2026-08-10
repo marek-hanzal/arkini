@@ -4,7 +4,7 @@ import { RegistryContext, scheduleTask } from "@effect/atom-react";
 import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
 import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { EditorProject } from "~/bridge/editor/EditorProject";
 import { EditorProjectAtom } from "~/bridge/editor/EditorProjectAtom";
@@ -20,6 +20,22 @@ import { editorTestPayload } from "~test/editor/support/editorTestPayload";
 
 const roots: Array<ReturnType<typeof createRoot>> = [];
 const registries: AtomRegistry.AtomRegistry[] = [];
+const setProjectContext = vi.fn(() => Promise.resolve());
+const clearProjectContext = vi.fn(() => Promise.resolve());
+
+beforeEach(() => {
+	setProjectContext.mockClear();
+	clearProjectContext.mockClear();
+	Object.defineProperty(window, "arkini", {
+		configurable: true,
+		value: {
+			editorMcp: {
+				setProjectContext,
+				clearProjectContext,
+			},
+		},
+	});
+});
 
 afterEach(async () => {
 	await act(async () => {
@@ -27,6 +43,7 @@ afterEach(async () => {
 	});
 	for (const registry of registries.splice(0)) registry.dispose();
 	document.body.replaceChildren();
+	Reflect.deleteProperty(window, "arkini");
 });
 
 const createProject = (revision: number): EditorProject => ({
@@ -41,6 +58,39 @@ const createProject = (revision: number): EditorProject => ({
 });
 
 describe("EditorProjectProvider", () => {
+	it("owns the MCP context only while its project workspace is mounted", async () => {
+		const registry = AtomRegistry.make({
+			scheduleTask,
+		});
+		registries.push(registry);
+		const container = document.createElement("div");
+		document.body.append(container);
+		const root = createRoot(container);
+		roots.push(root);
+
+		await act(async () => {
+			root.render(
+				createElement(
+					RegistryContext.Provider,
+					{
+						value: registry,
+					},
+					createElement(EditorProjectProvider, {
+						loaded: createProject(1),
+						children: null,
+					}),
+				),
+			);
+		});
+
+		expect(setProjectContext).toHaveBeenCalledExactlyOnceWith("project");
+		expect(clearProjectContext).not.toHaveBeenCalled();
+
+		await act(async () => root.unmount());
+		roots.splice(roots.indexOf(root), 1);
+		expect(clearProjectContext).toHaveBeenCalledExactlyOnceWith("project");
+	});
+
 	it("replaces a retained project snapshot with the fresh remount loader result", async () => {
 		const revisionA = 1;
 		const revisionB = 2;

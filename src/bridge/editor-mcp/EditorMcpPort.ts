@@ -4,9 +4,32 @@ import {
 	EditorMcpPortSchema,
 	type EditorMcpPortAvailability,
 } from "../../../electron/contract/editor/EditorMcpPortSchema";
+import { EditorMcpProjectContextSchema } from "../../../electron/contract/editor/EditorMcpProjectContextSchema";
 
 export type EditorMcpPort = EditorMcpPortSchema.Type;
 export type { EditorMcpPortAvailability };
+
+const updateEditorMcpProjectContextFx = (
+	projectIdCandidate: unknown,
+	update: (projectId: string) => Promise<void>,
+) =>
+	Effect.try({
+		try: () => EditorMcpProjectContextSchema.parse(projectIdCandidate),
+		catch: (cause) => cause,
+	}).pipe(
+		Effect.flatMap((projectId) =>
+			Effect.tryPromise({
+				try: () => update(projectId),
+				catch: (cause) => cause,
+			}),
+		),
+	);
+
+export const setEditorMcpProjectContextFx = (projectId: unknown) =>
+	updateEditorMcpProjectContextFx(projectId, window.arkini.editorMcp.setProjectContext);
+
+export const clearEditorMcpProjectContextFx = (projectId: unknown) =>
+	updateEditorMcpProjectContextFx(projectId, window.arkini.editorMcp.clearProjectContext);
 
 /** Lazily starts MCP on first editor entry; MCP failure never blocks the editor UI. */
 export const activateEditorMcpFx = Effect.tryPromise({

@@ -42,6 +42,8 @@ export namespace ArkiniElectronApi {
 		editorMcpPortCheck: "arkini:editor:mcp:port:check",
 		editorMcpStatus: "arkini:editor:mcp:status",
 		editorMcpActivate: "arkini:editor:mcp:activate",
+		editorMcpProjectContextSet: "arkini:editor:mcp:project-context:set",
+		editorMcpProjectContextClear: "arkini:editor:mcp:project-context:clear",
 		diagnosticsWrite: "arkini:diagnostics:write",
 		diagnosticsOpenDirectory: "arkini:diagnostics:open-directory",
 		windowModeRead: "arkini:window:mode:read",
@@ -139,6 +141,8 @@ export namespace ArkiniElectronApi {
 		readonly editorMcp: {
 			readonly status: () => Promise<EditorMcpStatus>;
 			readonly activate: () => Promise<EditorMcpStatus>;
+			readonly setProjectContext: (projectId: string) => Promise<void>;
+			readonly clearProjectContext: (projectId: string) => Promise<void>;
 			readonly readPort: () => Promise<EditorMcpPortSchema.Type>;
 			readonly writePort: (port: EditorMcpPortSchema.Type) => Promise<void>;
 			readonly checkPort: (

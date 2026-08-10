@@ -126,10 +126,10 @@ Do not introduce generic junk drawers such as `shared`, `utils`, `helpers`, or `
 
 ## Installation
 
-The repository pins Node `22.16.0` and npm `10.9.2` through [`.nvmrc`](.nvmrc), [`package.json`](package.json) `engines` and `packageManager`, and [GitHub Actions](.github/workflows). Use the pinned toolchain rather than letting local and CI package resolution quietly diverge.
+The repository pins Node `22.19.0` and npm `10.9.3` through [`.nvmrc`](.nvmrc), [`package.json`](package.json) `engines` and `packageManager`, and [GitHub Actions](.github/workflows). Use the pinned toolchain rather than letting local and CI package resolution quietly diverge.
 `npm-run-all2` is intentionally pinned to `8.0.4`: version 9 raises its Node floor above this shared local/CI/sandbox runtime, while version 8 keeps the same `run-p` / `run-s` script interface.
 
-The repository uses npm without a committed lockfile.
+The repository uses npm with a committed [`package-lock.json`](package-lock.json); dependency updates must keep the manifest and lockfile in sync.
 
 ```bash
 npm install
@@ -169,16 +169,17 @@ Application commands:
 ```bash
 npm run dev
 npm run dev:control
+npm run mcp:inspect
 npm run build
 npm run preview
 npm run preview:macos
 ```
 
-Arkini is an [Electron](https://www.electronjs.org/docs/latest/)-only product. `npm run dev` starts Electron with a [Vite](https://vite.dev/guide/)-powered renderer. Vite may replace modules during development, but Arkini treats application state as disposable and implements no HMR preservation, shutdown, or ownership handoff. `npm run build` signs and verifies official Arkini, packs the deliberately unsigned demo, and then produces the production Electron build, so a production private key must be available through ignored `.arkini/arkpack-private.pem` or `ARKINI_ARKPACK_PRIVATE_KEY`. `npm run preview` starts an existing production build without repacking or rebuilding it. `npm run preview:macos` is the packaged local preview: it cleans old desktop output, performs the same one-time pack/build stages, creates `.out/desktop/release/mac-arm64/Arkini.app` with `electron-builder --dir`, prints that exact path, and launches the resulting bundle. There is no standalone web target, web persistence fallback, or alternate renderer startup path.
+Arkini is an [Electron](https://www.electronjs.org/docs/latest/)-only product. `npm run dev` starts Electron with a [Vite](https://vite.dev/guide/)-powered renderer and the pinned MCP Inspector web UI preconfigured for `http://127.0.0.1:32310/editor/mcp`; the endpoint starts listening only after entering Editor, and a non-default global MCP port must also be changed in Inspector. MCP tools are dynamically scoped to the single project currently mounted in the editor, accept no project selector, and fail without touching persistence when no project is open. The initial read-only surface is deliberately small: `project`, `item_meta`, `item_collection`, `item_detail`, and `item_graph`; `item_collection` accepts optional OR-combined `itemTypes`, a Fuse-powered `query`, and one-based `page`/`pageSize` pagination with a default page size of 25, while `item_graph` accepts an optional `itemId` to return only that item's upstream Income proof. `npm run mcp:inspect` starts that Inspector independently. Vite may replace modules during development, but Arkini treats application state as disposable and implements no HMR preservation, shutdown, or ownership handoff. `npm run build` signs and verifies official Arkini, packs the deliberately unsigned demo, and then produces the production Electron build, so a production private key must be available through ignored `.arkini/arkpack-private.pem` or `ARKINI_ARKPACK_PRIVATE_KEY`. `npm run preview` starts an existing production build without repacking or rebuilding it. `npm run preview:macos` is the packaged local preview: it cleans old desktop output, performs the same one-time pack/build stages, creates `.out/desktop/release/mac-arm64/Arkini.app` with `electron-builder --dir`, prints that exact path, and launches the resulting bundle. There is no standalone web target, web persistence fallback, or alternate renderer startup path.
 
 All disposable repository-local generated output lives below `.out/`: Electron build files under `.out/desktop/build`, the dependency-free packaging stage under `.out/desktop/stage`, distributable artifacts under `.out/desktop/release`, and tool caches under `.out/cache`. The `game/` tree is the deliberate generated-output exception because authored games and their generated Arkpack/schema companions share one domain-owned location. Local build inputs such as signing keys remain config under `.arkini/` and must survive deleting `.out/`.
 
-`npm run dev:control` starts the same disposable development application with Chromium DevTools Protocol exposed at `http://127.0.0.1:9222` for local UI automation and profiling. The endpoint is fixed to loopback and is never enabled by packaged builds.
+`npm run dev:control` starts the same application and MCP Inspector pair with Chromium DevTools Protocol exposed at `http://127.0.0.1:9222` for local UI automation and profiling. The endpoint is fixed to loopback and is never enabled by packaged builds.
 
 Appearance is renderer-owned and exposed through semantic Tailwind color utilities backed by one CSS token palette. `/settings` is the only theme-control surface and offers `system`, `light`, and `dark`; `system` follows later operating-system appearance changes, while explicit light/dark selections override them. One `Atom.fn` command applies the selected theme immediately, serializes persistence through the authoritative Effect/Electron capability, rolls back only its own still-current optimistic value on failure, and treats the active value as a no-op. The accent remains a separately persisted semantic palette used by the launcher and game. Missing or malformed preferences resolve to dark and rose. Electron serializes and atomically persists both values under `<userData>/arkini/game/preferences`, applies the theme through `nativeTheme`, and exposes no browser-storage settings path.
 

@@ -88,6 +88,10 @@ const api: ArkiniElectronApi.Api = {
 	editorMcp: {
 		status: () => ipcRenderer.invoke(ArkiniElectronApi.channels.editorMcpStatus),
 		activate: () => ipcRenderer.invoke(ArkiniElectronApi.channels.editorMcpActivate),
+		setProjectContext: (projectId) =>
+			ipcRenderer.invoke(ArkiniElectronApi.channels.editorMcpProjectContextSet, projectId),
+		clearProjectContext: (projectId) =>
+			ipcRenderer.invoke(ArkiniElectronApi.channels.editorMcpProjectContextClear, projectId),
 		readPort: () => ipcRenderer.invoke(ArkiniElectronApi.channels.editorMcpPortRead),
 		writePort: (port) =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.editorMcpPortWrite, port),

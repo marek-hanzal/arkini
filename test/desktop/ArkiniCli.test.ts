@@ -1,6 +1,7 @@
 import { spawnSync } from "node:child_process";
 import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
+import { ArkiniAppVersion } from "../../shared/ArkiniAppMetadata";
 
 const tsxCli = resolve("node_modules/tsx/dist/cli.mjs");
 const stripAnsi = (value: string) => value.replace(/\u001b\[[0-9;]*m/g, "");
@@ -19,6 +20,14 @@ const runCli = (...args: ReadonlyArray<string>) =>
 	);
 
 describe("Arkini Effect CLI", () => {
+	it("reports the canonical package version", () => {
+		const result = runCli("--version");
+		const output = stripAnsi(`${result.stdout}${result.stderr}`);
+
+		expect(result.status).toBe(0);
+		expect(output).toContain(ArkiniAppVersion);
+	});
+
 	it("exposes one discoverable game and desktop command tree", () => {
 		const root = runCli("--help");
 		const rootOutput = stripAnsi(`${root.stdout}${root.stderr}`);

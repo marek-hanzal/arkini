@@ -8,6 +8,10 @@ import {
 	createSqliteEditorProjectRepositoryFx,
 	type SqliteEditorProjectRepository,
 } from "../../../server/editor/createSqliteEditorProjectRepositoryFx";
+import { ArkiniAppVersion } from "../../../shared/ArkiniAppMetadata";
+import { editorTestPayload } from "~test/editor/support/editorTestPayload";
+import { createJobTestConfig } from "~test/job/support/jobTestConfig";
+import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 
 const cleanups: Array<() => Promise<void> | void> = [];
 
@@ -70,6 +74,9 @@ describe("createEditorMcpOwnershipFx", () => {
 		await expect(fetch(`http://127.0.0.1:${port}/other`)).resolves.toMatchObject({
 			status: 404,
 		});
+		await expect(fetch(`http://127.0.0.1:${port}/mcp`)).resolves.toMatchObject({
+			status: 404,
+		});
 
 		const client = new Client(
 			{
@@ -84,21 +91,496 @@ describe("createEditorMcpOwnershipFx", () => {
 		);
 		cleanups.push(() => client.close());
 		await client.connect(
-			new StreamableHTTPClientTransport(new URL(`http://127.0.0.1:${port}/mcp`)),
+			new StreamableHTTPClientTransport(new URL(`http://127.0.0.1:${port}/editor/mcp`)),
 		);
 		expect(client.getProtocolEra()).toBe("modern");
+		expect(client.getServerVersion()).toMatchObject({
+			name: "arkini-editor",
+			version: ArkiniAppVersion,
+		});
 		const tools = await client.listTools();
-		expect(tools.tools.map(({ name }) => name)).toContain("editor_list_projects");
-		const result = await client.callTool({
-			name: "editor_list_projects",
+		expect(tools.tools.map(({ name }) => name)).toEqual([
+			"project",
+			"item_meta",
+			"item_collection",
+			"item_detail",
+			"item_graph",
+		]);
+		expect(tools.tools.find(({ name }) => name === "project")?.inputSchema.properties).toEqual(
+			{},
+		);
+		expect(
+			tools.tools.find(({ name }) => name === "item_meta")?.inputSchema.properties,
+		).toEqual({});
+		expect(
+			tools.tools.find(({ name }) => name === "item_collection")?.inputSchema.properties,
+		).toHaveProperty("query");
+		expect(
+			tools.tools.find(({ name }) => name === "item_collection")?.inputSchema.properties,
+		).toHaveProperty("itemTypes");
+		expect(
+			tools.tools.find(({ name }) => name === "item_collection")?.inputSchema.properties,
+		).toHaveProperty("page");
+		expect(
+			tools.tools.find(({ name }) => name === "item_collection")?.inputSchema.properties,
+		).toHaveProperty("pageSize");
+		expect(
+			tools.tools.find(({ name }) => name === "item_detail")?.inputSchema.properties,
+		).toHaveProperty("id");
+		expect(
+			tools.tools.find(({ name }) => name === "item_graph")?.inputSchema.properties,
+		).toHaveProperty("itemId");
+		const missingContext = await client.callTool({
+			name: "project",
 			arguments: {},
 		});
-		expect(result.content).toEqual([
+		expect(missingContext).toMatchObject({
+			isError: true,
+		});
+		expect(missingContext.content).toEqual([
 			{
 				type: "text",
-				text: "No editor projects.",
+				text: "Editor operation failed: No editor project is currently open. Open a project in Arkini before using editor tools.",
 			},
 		]);
+		const projectId = "project-context";
+		await Effect.runPromise(
+			repository.createProjectFx({
+				projectId,
+				config: {
+					...editorTestPayload.config,
+					items: {
+						water: {
+							...editorTestPayload.config.items.water,
+							description: "Water\nKeeps the factory flowing.",
+							maxCount: 42,
+						},
+					},
+				},
+				resources: editorTestPayload.resources,
+			}),
+		);
+		ownership.setProjectContext(projectId);
+		expect(ownership.readProjectContext()).toBe(projectId);
+		const project = await client.callTool({
+			name: "project",
+			arguments: {},
+		});
+		expect(project.isError).not.toBe(true);
+		expect(project.content).toEqual([
+			{
+				type: "text",
+				text: [
+					"Title: Editor test",
+					`Project ID: ${projectId}`,
+					"Game ID: editor-test",
+					"Config version: 1.0",
+					"Revision: 0",
+					"Board: 2 × 2",
+					"Toolbar: disabled",
+					"Inventory: 1 × 1",
+					"Hero asset: hero",
+					"Items: 1",
+					"Resources: 2",
+				].join("\n"),
+			},
+		]);
+		const itemMeta = await client.callTool({
+			name: "item_meta",
+			arguments: {},
+		});
+		expect(itemMeta.content).toEqual([
+			{
+				type: "text",
+				text: "Total: 1\nsimple: 1",
+			},
+		]);
+		const itemCollection = await client.callTool({
+			name: "item_collection",
+			arguments: {},
+		});
+		expect(itemCollection.content).toEqual([
+			{
+				type: "text",
+				text: [
+					"Item collection",
+					"Project items: 1",
+					"Type-filtered items: 1",
+					"Matched items: 1",
+					"Page: 1",
+					"Total pages: 1",
+					"Page size: 25",
+					"Returned items: 1",
+					"Has previous page: false",
+					"Has next page: false",
+					"",
+					"Items:",
+					"- Water",
+					"  ID: water",
+					"  Type: simple",
+					"  Description:",
+					"    Water",
+					"    Keeps the factory flowing.",
+				].join("\n"),
+			},
+		]);
+		expect(itemCollection.structuredContent).toEqual({
+			hasNextPage: false,
+			hasPreviousPage: false,
+			itemIds: [
+				"water",
+			],
+			matchedItems: 1,
+			page: 1,
+			pageSize: 25,
+			projectItems: 1,
+			returnedItems: 1,
+			totalPages: 1,
+			typeFilteredItems: 1,
+		});
+		const fuzzyItemCollection = await client.callTool({
+			name: "item_collection",
+			arguments: {
+				query: "watr",
+			},
+		});
+		expect(fuzzyItemCollection.content).toEqual(itemCollection.content);
+		expect(
+			(
+				await client.callTool({
+					name: "item_collection",
+					arguments: {
+						query: "completely unrelated",
+					},
+				})
+			).content,
+		).toEqual([
+			{
+				type: "text",
+				text: [
+					"Item collection",
+					"Project items: 1",
+					"Type-filtered items: 1",
+					"Matched items: 0",
+					"Page: 1",
+					"Total pages: 0",
+					"Page size: 25",
+					"Returned items: 0",
+					"Has previous page: false",
+					"Has next page: false",
+					"",
+					"Items:",
+					"- none",
+				].join("\n"),
+			},
+		]);
+		const itemDetail = await client.callTool({
+			name: "item_detail",
+			arguments: {
+				id: "water",
+			},
+		});
+		expect(itemDetail.content).toEqual([
+			{
+				type: "text",
+				text: [
+					"Item: Water",
+					"ID: water",
+					"UID: water",
+					"Type: simple",
+					"Description:",
+					"  Water",
+					"  Keeps the factory flowing.",
+					"Storage: any",
+					"Stack capacity: 10",
+					"Game limit: 42",
+				].join("\n"),
+			},
+		]);
+		const missingItem = await client.callTool({
+			name: "item_detail",
+			arguments: {
+				id: "missing",
+			},
+		});
+		expect(missingItem).toMatchObject({
+			isError: true,
+			content: [
+				{
+					type: "text",
+					text: "Editor operation failed: Item missing does not exist in the open project.",
+				},
+			],
+		});
+
+		const graphProjectId = "project-graph";
+		const graphBase = createJobTestConfig();
+		const forge = graphBase.items.forge;
+		if (forge.type !== "producer") throw new Error("Expected producer fixture.");
+		const graphConfig = GameConfigSchema.parse({
+			...graphBase,
+			start: {
+				...graphBase.start,
+				board: [
+					{
+						itemId: "forge",
+						space: 0,
+						x: 0,
+						y: 0,
+					},
+				],
+			},
+			items: {
+				...graphBase.items,
+				forge: {
+					...forge,
+					lines: forge.lines.map((line) => ({
+						...line,
+						output: {
+							set: [
+								{
+									roll: [
+										{
+											type: "guaranteed",
+											drop: [
+												{
+													itemId: "ingot",
+													quantity: {
+														min: 1,
+														max: 1,
+													},
+													placement: "drop",
+													rules: [],
+												},
+											],
+										},
+									],
+								},
+							],
+						},
+					})),
+				},
+				ingot: {
+					...graphBase.items.tool,
+					uid: "ingot",
+					id: "ingot",
+					title: "Ingot",
+					description: "A forged ingot.",
+				},
+				unused: {
+					...graphBase.items.tool,
+					uid: "unused",
+					id: "unused",
+					title: "Unused",
+					description: "Disconnected from the graph proof.",
+				},
+			},
+		});
+		await Effect.runPromise(
+			repository.createProjectFx({
+				projectId: graphProjectId,
+				config: graphConfig,
+				resources: [],
+			}),
+		);
+		ownership.setProjectContext(graphProjectId);
+		const producerCollection = await client.callTool({
+			name: "item_collection",
+			arguments: {
+				itemTypes: [
+					"producer",
+				],
+			},
+		});
+		expect(producerCollection.content).toMatchObject([
+			{
+				text: expect.stringContaining(
+					[
+						"Item type filter (OR): producer",
+						"Type-filtered items: 1",
+						"Matched items: 1",
+						"Page: 1",
+						"Total pages: 1",
+						"Page size: 25",
+						"Returned items: 1",
+						"Has previous page: false",
+						"Has next page: false",
+						"",
+						"Items:",
+						"- forge",
+					].join("\n"),
+				),
+			},
+		]);
+		expect(producerCollection.structuredContent).toMatchObject({
+			itemIds: [
+				"forge",
+			],
+			itemTypes: [
+				"producer",
+			],
+			matchedItems: 1,
+			typeFilteredItems: 1,
+		});
+		const filteredQueryCollection = await client.callTool({
+			name: "item_collection",
+			arguments: {
+				itemTypes: [
+					"simple",
+				],
+				query: "producer",
+			},
+		});
+		expect(filteredQueryCollection.structuredContent).toMatchObject({
+			itemIds: [],
+			matchedItems: 0,
+			typeFilteredItems: 4,
+		});
+		const firstCollectionPage = await client.callTool({
+			name: "item_collection",
+			arguments: {
+				pageSize: 2,
+			},
+		});
+		expect(firstCollectionPage.content).toMatchObject([
+			{
+				text: expect.stringContaining(
+					[
+						"Project items: 5",
+						"Type-filtered items: 5",
+						"Matched items: 5",
+						"Page: 1",
+						"Total pages: 3",
+						"Page size: 2",
+						"Returned items: 2",
+						"Has previous page: false",
+						"Has next page: true",
+						"Next page: 2",
+					].join("\n"),
+				),
+			},
+		]);
+		expect(firstCollectionPage.structuredContent).toMatchObject({
+			hasNextPage: true,
+			hasPreviousPage: false,
+			nextPage: 2,
+			page: 1,
+			pageSize: 2,
+			projectItems: 5,
+			returnedItems: 2,
+			totalPages: 3,
+			typeFilteredItems: 5,
+		});
+		const lastCollectionPage = await client.callTool({
+			name: "item_collection",
+			arguments: {
+				page: 3,
+				pageSize: 2,
+			},
+		});
+		expect(lastCollectionPage.content).toMatchObject([
+			{
+				text: expect.stringContaining(
+					[
+						"Page: 3",
+						"Total pages: 3",
+						"Page size: 2",
+						"Returned items: 1",
+						"Has previous page: true",
+						"Has next page: false",
+						"Previous page: 2",
+					].join("\n"),
+				),
+			},
+		]);
+		expect(lastCollectionPage.structuredContent).toMatchObject({
+			hasNextPage: false,
+			hasPreviousPage: true,
+			page: 3,
+			pageSize: 2,
+			previousPage: 2,
+			returnedItems: 1,
+			totalPages: 3,
+		});
+		expect(
+			(
+				await client.callTool({
+					name: "item_meta",
+					arguments: {},
+				})
+			).content,
+		).toEqual([
+			{
+				type: "text",
+				text: "Total: 5\nproducer: 1\nsimple: 4",
+			},
+		]);
+		const graph = await client.callTool({
+			name: "item_graph",
+			arguments: {},
+		});
+		expect(graph.content).toEqual([
+			{
+				type: "text",
+				text: expect.stringContaining(
+					[
+						'- line "Run" (source:forge:line:line:forge:run)',
+						"  owner: forge [forge; producer]",
+						"  requires:",
+						"    - tool [tool; simple]",
+						"    - water [water; simple]",
+						"  outputs:",
+						"    - ingot [Ingot; simple] (guaranteed, placement drop)",
+					].join("\n"),
+				),
+			},
+		]);
+		expect(graph.content).toMatchObject([
+			{
+				text: expect.stringContaining("- forge [forge; producer] @ Board"),
+			},
+		]);
+		expect(graph.content).toMatchObject([
+			{
+				text: expect.stringContaining("- unused [Unused; simple]"),
+			},
+		]);
+		const focusedGraph = await client.callTool({
+			name: "item_graph",
+			arguments: {
+				itemId: "ingot",
+			},
+		});
+		expect(focusedGraph.content).toMatchObject([
+			{
+				text: expect.stringContaining(
+					"Item graph for ingot [Ingot; simple] (Income proof)",
+				),
+			},
+		]);
+		expect(focusedGraph.content).toMatchObject([
+			{
+				text: expect.not.stringContaining("unused [Unused; simple]"),
+			},
+		]);
+		const missingGraphItem = await client.callTool({
+			name: "item_graph",
+			arguments: {
+				itemId: "missing",
+			},
+		});
+		expect(missingGraphItem).toMatchObject({
+			isError: true,
+			content: [
+				{
+					type: "text",
+					text: "Editor operation failed: Item missing does not exist in the open project.",
+				},
+			],
+		});
+		ownership.setProjectContext(projectId);
+		ownership.clearProjectContext("another-project");
+		expect(ownership.readProjectContext()).toBe(projectId);
 		const legacyClient = new Client(
 			{
 				name: "arkini-editor-legacy-test",
@@ -112,25 +594,35 @@ describe("createEditorMcpOwnershipFx", () => {
 		);
 		cleanups.push(() => legacyClient.close());
 		await legacyClient.connect(
-			new StreamableHTTPClientTransport(new URL(`http://127.0.0.1:${port}/mcp`)),
+			new StreamableHTTPClientTransport(new URL(`http://127.0.0.1:${port}/editor/mcp`)),
 		);
 		expect(legacyClient.getProtocolEra()).toBe("legacy");
-		expect((await legacyClient.listTools()).tools.map(({ name }) => name)).toContain(
-			"editor_list_projects",
-		);
+		expect(legacyClient.getServerVersion()).toMatchObject({
+			name: "arkini-editor",
+			version: ArkiniAppVersion,
+		});
+		expect((await legacyClient.listTools()).tools.map(({ name }) => name)).toEqual([
+			"project",
+			"item_meta",
+			"item_collection",
+			"item_detail",
+			"item_graph",
+		]);
 		expect(
 			(
 				await legacyClient.callTool({
-					name: "editor_list_projects",
+					name: "project",
 					arguments: {},
 				})
 			).content,
-		).toEqual([
+		).toMatchObject([
 			{
 				type: "text",
-				text: "No editor projects.",
+				text: expect.stringContaining(`Project ID: ${projectId}`),
 			},
 		]);
+		ownership.clearProjectContext(projectId);
+		expect(ownership.readProjectContext()).toBeUndefined();
 		await client.close();
 		await legacyClient.close();
 		await Effect.runPromise(ownership.closeFx);

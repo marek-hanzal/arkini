@@ -16,6 +16,10 @@ import { createEditorMcpServer } from "./createEditorMcpServer";
 
 export interface EditorMcpOwnership {
 	readonly readStatus: () => EditorMcpStatus;
+	readonly readProjectContext: () => string | undefined;
+	readonly setProjectContext: (projectId: string) => void;
+	readonly clearProjectContext: (projectId: string) => void;
+	readonly resetProjectContext: () => void;
 	readonly activateFx: Effect.Effect<EditorMcpStatus>;
 	readonly closeFx: Effect.Effect<void, unknown>;
 	readonly closeSync: () => void;
@@ -44,13 +48,16 @@ export const createEditorMcpOwnershipFx = Effect.fn("createEditorMcpOwnershipFx"
 				};
 	let httpServer: Server | undefined;
 	let mcpHandler: McpHttpHandler | undefined;
+	let projectContext: string | undefined;
 	const activationLock = yield* Semaphore.make(1);
 
 	const activateFx = activationLock.withPermits(1)(
 		Effect.gen(function* () {
 			if (status.type !== "inactive" || editor.type === "unavailable") return status;
 			const port = yield* readPortFx;
-			const handler = createMcpHandler(() => createEditorMcpServer(editor.repository));
+			const handler = createMcpHandler(() =>
+				createEditorMcpServer(editor.repository, () => projectContext),
+			);
 			const nodeHandler = toNodeHandler(handler, {
 				onerror: (error) => console.error("Arkini editor MCP request failed.", error),
 			});
@@ -58,7 +65,7 @@ export const createEditorMcpOwnershipFx = Effect.fn("createEditorMcpOwnershipFx"
 			const validateOrigin = localhostOriginValidation();
 			const server = createServer((request, response) => {
 				const pathname = new URL(request.url ?? "/", "http://127.0.0.1").pathname;
-				if (pathname !== "/mcp") {
+				if (pathname !== "/editor/mcp") {
 					response.writeHead(404, {
 						"content-type": "text/plain; charset=utf-8",
 					});
@@ -136,6 +143,16 @@ export const createEditorMcpOwnershipFx = Effect.fn("createEditorMcpOwnershipFx"
 	});
 	return {
 		readStatus: () => status,
+		readProjectContext: () => projectContext,
+		setProjectContext: (projectId) => {
+			projectContext = projectId;
+		},
+		clearProjectContext: (projectId) => {
+			if (projectContext === projectId) projectContext = undefined;
+		},
+		resetProjectContext: () => {
+			projectContext = undefined;
+		},
 		activateFx,
 		closeFx,
 		closeSync: () => {

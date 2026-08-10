@@ -2,9 +2,9 @@ import { useMemo, useState } from "react";
 
 import type { EditorProject } from "~/bridge/editor/EditorProject";
 import { useEditorProject } from "~/bridge/editor/useEditorProject";
+import { searchEditorItems } from "~/editor/searchEditorItems";
 import { PrimaryButtonLink } from "~/ui/button/Button";
 import { EditorItemListRow } from "~/ui/item/editor/EditorItemListRow";
-import { useFuseSearch } from "~/ui/search/useFuseSearch";
 import { Status } from "~/ui/status/Status";
 
 type EditorItemType = NonNullable<EditorProject["config"]>["items"][string]["type"];
@@ -23,46 +23,19 @@ export const EditorItemList = () => {
 			project.config?.items,
 		],
 	);
-	const searchCandidates = useMemo(
+	const empty = items.length === 0;
+	const filteredItems = useMemo(
 		() =>
-			items
-				.filter((item) => itemType === undefined || item.type === itemType)
-				.map((item) => ({
-					identity: item.uid,
-					terms: [
-						item.id,
-						item.title,
-						item.description,
-						item.type,
-					],
-				})),
+			searchEditorItems(
+				items.filter((item) => itemType === undefined || item.type === itemType),
+				query,
+			),
 		[
 			itemType,
 			items,
+			query,
 		],
 	);
-	const matchingItemUids = useFuseSearch(searchCandidates, query);
-	const itemsByUid = useMemo(
-		() =>
-			new Map(
-				items.map((item) => [
-					item.uid,
-					item,
-				]),
-			),
-		[
-			items,
-		],
-	);
-	const empty = items.length === 0;
-	const filteredItems = matchingItemUids.flatMap((uid) => {
-		const item = itemsByUid.get(uid);
-		return item === undefined
-			? []
-			: [
-					item,
-				];
-	});
 	return (
 		<section
 			className="h-full min-h-0 overflow-y-auto overscroll-contain"

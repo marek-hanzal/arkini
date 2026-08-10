@@ -1,8 +1,9 @@
-import { app, ipcMain, type IpcMainInvokeEvent } from "electron";
+import { app, ipcMain, type IpcMainInvokeEvent, type WebContents } from "electron";
 import { Effect } from "effect";
 
 import { ArkiniElectronApi } from "../../contract/ArkiniElectronApi";
 import { EditorMcpPortSchema } from "../../contract/editor/EditorMcpPortSchema";
+import { EditorMcpProjectContextSchema } from "../../contract/editor/EditorMcpProjectContextSchema";
 import { checkEditorMcpPortAvailabilityFx } from "../editor-mcp/checkEditorMcpPortAvailabilityFx";
 import type { EditorMcpPreferences } from "../editor-mcp/EditorMcpPreferences";
 import type { EditorMcpOwnership } from "../../../server/editor-mcp/createEditorMcpOwnershipFx";
@@ -10,6 +11,8 @@ import { ElectronMainRuntime } from "../ElectronMainRuntime";
 import type { TrustedRenderer } from "../security/TrustedRenderer";
 
 let registered = false;
+
+const watchedProjectContextSenders = new WeakSet<WebContents>();
 
 export namespace registerEditorMcpPreferencesIpcFx {
 	export interface Props {
@@ -32,6 +35,12 @@ export const registerEditorMcpPreferencesIpcFx = Effect.fn("registerEditorMcpPre
 				ElectronMainRuntime.runPromise(
 					trustedRenderer.assertTrustedIpcSenderFx(event).pipe(Effect.andThen(operation)),
 				);
+			const watchProjectContextSender = (sender: WebContents) => {
+				if (watchedProjectContextSenders.has(sender)) return;
+				watchedProjectContextSenders.add(sender);
+				sender.on("did-start-loading", ownership.resetProjectContext);
+				sender.once("destroyed", ownership.resetProjectContext);
+			};
 			ipcMain.handle(ArkiniElectronApi.channels.editorMcpPortRead, (event) =>
 				runAuthorized(event, preferences.readPortFx),
 			);
@@ -65,6 +74,41 @@ export const registerEditorMcpPreferencesIpcFx = Effect.fn("registerEditorMcpPre
 			ipcMain.handle(ArkiniElectronApi.channels.editorMcpActivate, (event) =>
 				runAuthorized(event, ownership.activateFx),
 			);
+			ipcMain.handle(
+				ArkiniElectronApi.channels.editorMcpProjectContextSet,
+				(event, candidate) =>
+					runAuthorized(
+						event,
+						Effect.try({
+							try: () => EditorMcpProjectContextSchema.parse(candidate),
+							catch: (cause) => cause,
+						}).pipe(
+							Effect.tap((projectId) =>
+								Effect.sync(() => {
+									watchProjectContextSender(event.sender);
+									ownership.setProjectContext(projectId);
+								}),
+							),
+							Effect.asVoid,
+						),
+					),
+			);
+			ipcMain.handle(
+				ArkiniElectronApi.channels.editorMcpProjectContextClear,
+				(event, candidate) =>
+					runAuthorized(
+						event,
+						Effect.try({
+							try: () => EditorMcpProjectContextSchema.parse(candidate),
+							catch: (cause) => cause,
+						}).pipe(
+							Effect.tap((projectId) =>
+								Effect.sync(() => ownership.clearProjectContext(projectId)),
+							),
+							Effect.asVoid,
+						),
+					),
+			);
 			app.once("will-quit", () => {
 				for (const channel of [
 					ArkiniElectronApi.channels.editorMcpPortRead,
@@ -72,6 +116,8 @@ export const registerEditorMcpPreferencesIpcFx = Effect.fn("registerEditorMcpPre
 					ArkiniElectronApi.channels.editorMcpPortCheck,
 					ArkiniElectronApi.channels.editorMcpStatus,
 					ArkiniElectronApi.channels.editorMcpActivate,
+					ArkiniElectronApi.channels.editorMcpProjectContextSet,
+					ArkiniElectronApi.channels.editorMcpProjectContextClear,
 				]) {
 					ipcMain.removeHandler(channel);
 				}

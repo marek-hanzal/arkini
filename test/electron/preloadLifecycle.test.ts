@@ -97,6 +97,24 @@ describe("Electron preload lifecycle", () => {
 		);
 	});
 
+	it("routes the mounted editor project context through dedicated MCP IPC channels", async () => {
+		electron.ipcRenderer.invoke.mockResolvedValue(undefined);
+		const api = await loadPreload();
+
+		await expect(api.editorMcp.setProjectContext("project-one")).resolves.toBeUndefined();
+		await expect(api.editorMcp.clearProjectContext("project-one")).resolves.toBeUndefined();
+		expect(electron.ipcRenderer.invoke).toHaveBeenNthCalledWith(
+			1,
+			ArkiniElectronContract.channels.editorMcpProjectContextSet,
+			"project-one",
+		);
+		expect(electron.ipcRenderer.invoke).toHaveBeenNthCalledWith(
+			2,
+			ArkiniElectronContract.channels.editorMcpProjectContextClear,
+			"project-one",
+		);
+	});
+
 	it("routes bounded diagnostics through dedicated IPC channels", async () => {
 		electron.ipcRenderer.invoke.mockResolvedValue(undefined);
 		const api = await loadPreload();

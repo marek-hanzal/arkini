@@ -1,12 +1,11 @@
 import { match } from "ts-pattern";
 
 import type { EditorInput } from "~/bridge/item/editor/EditorItemModel";
-import { EditorChoiceControl, EditorNumberControl } from "~/ui/form/EditorValueControls";
+import { EditorChoiceControl } from "~/ui/form/EditorValueControls";
+import { EditorDepositLineInput } from "~/ui/item/editor/EditorDepositLineInput";
 import { EditorInputCharges } from "~/ui/item/editor/EditorInputCharges";
 import { EditorItemDraftDefaults } from "~/ui/item/editor/EditorItemDraftDefaults";
-import { EditorQuantityControl } from "~/ui/item/editor/EditorQuantityControl";
-import { EditorQueryControl } from "~/ui/item/editor/EditorQueryControl";
-import { EditorSelectorControl } from "~/ui/item/editor/EditorSelectorControl";
+import { EditorMaterialLineInput } from "~/ui/item/editor/EditorMaterialLineInput";
 
 export const EditorLineInput = ({
 	input,
@@ -48,59 +47,10 @@ export const EditorLineInput = ({
 					type: "materials",
 				},
 				(material) => (
-					<div className="grid gap-4">
-						<EditorSelectorControl
-							value={material.selector}
-							onChange={(selector) =>
-								onChange({
-									...material,
-									selector,
-								})
-							}
-						/>
-						<div className="grid gap-3 sm:grid-cols-2">
-							<EditorChoiceControl
-								label="Material mode"
-								value={material.mode}
-								options={[
-									{
-										label: "Consume",
-										value: "consume",
-									},
-									{
-										label: "Reserve",
-										value: "reserve",
-									},
-								]}
-								onChange={(mode) =>
-									onChange({
-										...material,
-										mode,
-									})
-								}
-							/>
-							<EditorNumberControl
-								label="Extra buffer capacity"
-								value={material.capacity}
-								min={0}
-								onChange={(capacity) =>
-									onChange({
-										...material,
-										capacity,
-									})
-								}
-							/>
-						</div>
-						<EditorQuantityControl
-							value={material.quantity}
-							onChange={(quantity) =>
-								onChange({
-									...material,
-									quantity,
-								})
-							}
-						/>
-					</div>
+					<EditorMaterialLineInput
+						input={material}
+						onChange={onChange}
+					/>
 				),
 			)
 			.with(
@@ -108,23 +58,9 @@ export const EditorLineInput = ({
 					type: "deposit",
 				},
 				(deposit) => (
-					<EditorQueryControl
-						scopeLocked
-						value={deposit.query}
-						onChange={(query) =>
-							match(query)
-								.with(
-									{
-										scope: "board",
-									},
-									(boardQuery) =>
-										onChange({
-											...deposit,
-											query: boardQuery,
-										}),
-								)
-								.otherwise(() => undefined)
-						}
+					<EditorDepositLineInput
+						input={deposit}
+						onChange={onChange}
 					/>
 				),
 			)

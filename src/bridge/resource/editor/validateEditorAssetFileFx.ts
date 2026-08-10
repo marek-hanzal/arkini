@@ -1,5 +1,6 @@
 import { Effect } from "effect";
 
+import { readEditorPngDimensionsFx } from "~/bridge/resource/editor/readEditorPngDimensionsFx";
 import { IdSchema } from "~/engine/common/schema/IdSchema";
 import { EditorProjectError } from "~/engine/editor/error/EditorProjectError";
 
@@ -31,38 +32,6 @@ const readResourceId = (filename: string) =>
 		.replace(/[^A-Za-z0-9._-]+/g, "-")
 		.replace(/^[.-]+|[.-]+$/g, "")
 		.toLowerCase();
-
-const readPngDimensionsFx = (bytes: Uint8Array, resourceId: string) =>
-	Effect.scoped(
-		Effect.gen(function* () {
-			const bitmap = yield* Effect.acquireRelease(
-				Effect.tryPromise({
-					try: () =>
-						createImageBitmap(
-							new Blob(
-								[
-									bytes.slice().buffer,
-								],
-								{
-									type: "image/png",
-								},
-							),
-						),
-					catch: (cause) =>
-						new EditorProjectError({
-							reason: "invalid-asset",
-							message: `Asset ${resourceId} must decode as a valid PNG image.`,
-							cause,
-						}),
-				}),
-				(bitmap) => Effect.sync(() => bitmap.close()),
-			);
-			return {
-				height: bitmap.height,
-				width: bitmap.width,
-			};
-		}),
-	);
 
 export const validateEditorAssetFileFx = Effect.fn("validateEditorAssetFileFx")(function* (
 	inputFile: EditorAssetFileInput,
@@ -106,7 +75,7 @@ export const validateEditorAssetFileFx = Effect.fn("validateEditorAssetFileFx")(
 			}),
 		);
 	}
-	const { height, width } = yield* readPngDimensionsFx(bytes, resourceId);
+	const { height, width } = yield* readEditorPngDimensionsFx(bytes, resourceId);
 	if (
 		width < 1 ||
 		height < 1 ||

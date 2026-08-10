@@ -1,62 +1,8 @@
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import type { EditorProject } from "~/bridge/editor/EditorProject";
 import type { EditorGameDiagnostic } from "~/bridge/arkpack/editor/readEditorBuildDiagnosticsFx";
-import {
-	printEditorGameDiagnosticFx,
-	type EditorDiagnosticTarget,
-} from "~/ui/arkpack/editor/printEditorGameDiagnosticFx";
-import { ButtonLink } from "~/ui/button/Button";
-
-const EditorDiagnosticLink = ({
-	projectId,
-	target,
-}: {
-	readonly projectId: string;
-	readonly target: EditorDiagnosticTarget;
-}) => {
-	switch (target.kind) {
-		case "item":
-			return (
-				<ButtonLink
-					className="mt-3 w-fit shadow-none"
-					to="/editor/$projectId/editor/items/$itemUid/form/$sectionId"
-					params={{
-						projectId,
-						itemUid: target.itemUid,
-						sectionId: target.sectionId,
-					}}
-				>
-					Open {target.label}
-				</ButtonLink>
-			);
-		case "asset":
-			return (
-				<ButtonLink
-					className="mt-3 w-fit shadow-none"
-					to="/editor/$projectId/assets/$resourceId/detail/overview"
-					params={{
-						projectId,
-						resourceId: target.resourceId,
-					}}
-				>
-					Open asset {target.label}
-				</ButtonLink>
-			);
-		case "project":
-			return (
-				<ButtonLink
-					className="mt-3 w-fit shadow-none"
-					to="/editor/$projectId/project/$sectionId"
-					params={{
-						projectId,
-						sectionId: target.sectionId,
-					}}
-				>
-					Open {target.label}
-				</ButtonLink>
-			);
-	}
-};
+import { EditorDiagnosticLink } from "~/ui/arkpack/editor/EditorDiagnosticLink";
+import { printEditorGameDiagnosticFx } from "~/ui/arkpack/editor/printEditorGameDiagnosticFx";
 
 /** Renders structured build diagnostics without discarding their actionable editor context. */
 export const EditorBuildDiagnostics = ({

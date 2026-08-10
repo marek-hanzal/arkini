@@ -1,14 +1,14 @@
 import { useRef, useState } from "react";
-import { twMerge } from "tailwind-merge";
 
 import type { EditorProjectStartScope } from "~/bridge/project/editor/EditorProjectStartScope";
-import { EditorItemThumbnail } from "~/ui/item/editor/EditorItemThumbnail";
 import { useEditorItemSearchOptions } from "~/ui/item/editor/useEditorItemSearchOptions";
+import { EditorProjectStartGridDragPreview } from "~/ui/project/editor/EditorProjectStartGridDragPreview";
 import { EditorProjectStartItemPicker } from "~/ui/project/editor/EditorProjectStartItemPicker";
 import type {
 	EditorProjectStartGridCell,
 	EditorProjectStartGridPosition,
 } from "~/ui/project/editor/EditorProjectStartGridCell";
+import { EditorProjectStartGridSlot } from "~/ui/project/editor/EditorProjectStartGridSlot";
 import { useEditorProjectStartGridDrag } from "~/ui/project/editor/useEditorProjectStartGridDrag";
 
 interface EditorProjectStartGridProps {
@@ -137,89 +137,37 @@ export const EditorProjectStartGrid = ({
 							dragVisual.source.y === y;
 						const isDragTarget = dragVisual?.targetKey === key;
 						return (
-							<button
-								aria-label={
-									cell === undefined
-										? `Empty ${scope} slot ${x + 1}, ${y + 1}`
-										: `${item?.title ?? cell.itemId}, quantity ${cell.quantity}`
-								}
-								className={twMerge(
-									"relative grid size-[4.5rem] cursor-pointer place-items-center rounded-lg border border-line bg-surface/70 text-subtle transition-[background-color,border-color,opacity,box-shadow] hover:border-line-strong hover:bg-surface-raised",
-									isDragSource && "opacity-30",
-									isDragTarget &&
-										"border-accent ring-2 ring-accent/60 ring-offset-1 ring-offset-canvas",
-								)}
-								data-start-grid-cell="true"
-								data-x={x}
-								data-y={y}
+							<EditorProjectStartGridSlot
+								cell={cell}
+								full={full}
+								isDragSource={isDragSource}
+								isDragTarget={isDragTarget}
+								itemResourceIds={item?.asset.default}
+								itemTitle={item?.title}
 								key={key}
-								onClick={(event) => {
-									if (suppressClickRef.current || event.altKey || event.metaKey)
-										return;
-									if (cell === undefined)
-										setPickerCell({
+								onDecrement={() =>
+									decrement({
+										x,
+										y,
+									})
+								}
+								onDelete={() =>
+									changeCell(
+										{
 											x,
 											y,
-										});
-									else if (!full)
-										increment({
-											x,
-											y,
-										});
-								}}
-								onContextMenu={(event) => {
-									event.preventDefault();
-									if (cell !== undefined)
-										decrement({
-											x,
-											y,
-										});
-								}}
-								onKeyDown={(event) => {
+										},
+										() => undefined,
+									)
+								}
+								onIncrement={() =>
+									increment({
+										x,
+										y,
+									})
+								}
+								onMove={(offset) => {
 									if (cell === undefined) return;
-									if (event.key === "Delete" || event.key === "Backspace") {
-										event.preventDefault();
-										changeCell(
-											{
-												x,
-												y,
-											},
-											() => undefined,
-										);
-										return;
-									}
-									if (event.key === "-" || event.key === "_") {
-										event.preventDefault();
-										decrement({
-											x,
-											y,
-										});
-										return;
-									}
-									if (!event.altKey && !event.metaKey) return;
-									const offset =
-										event.key === "ArrowLeft"
-											? {
-													x: -1,
-													y: 0,
-												}
-											: event.key === "ArrowRight"
-												? {
-														x: 1,
-														y: 0,
-													}
-												: event.key === "ArrowUp"
-													? {
-															x: 0,
-															y: -1,
-														}
-													: event.key === "ArrowDown"
-														? {
-																x: 0,
-																y: 1,
-															}
-														: undefined;
-									if (offset === undefined) return;
 									const target = {
 										x: x + offset.x,
 										y: y + offset.y,
@@ -231,29 +179,22 @@ export const EditorProjectStartGrid = ({
 										target.y >= height
 									)
 										return;
-									event.preventDefault();
 									onCellsChange(moveCell(cells, cell, target));
 								}}
-								onPointerDown={(event) => {
-									if (cell !== undefined) startDrag(event, cell);
+								onOpen={() =>
+									setPickerCell({
+										x,
+										y,
+									})
+								}
+								position={{
+									x,
+									y,
 								}}
-								type="button"
-							>
-								{item === undefined ? (
-									<span className="icon-[lucide--plus] size-4 opacity-35" />
-								) : (
-									<EditorItemThumbnail
-										className="size-14 border-0 bg-transparent"
-										resourceIds={item.asset.default}
-										size="sm"
-									/>
-								)}
-								{cell === undefined ? null : (
-									<span className="absolute right-1 bottom-1 rounded-md border border-line-strong bg-surface-raised/95 px-1.5 py-0.5 font-mono text-[0.65rem] font-bold text-foreground">
-										×{cell.quantity}
-									</span>
-								)}
-							</button>
+								scope={scope}
+								startDrag={startDrag}
+								suppressClickRef={suppressClickRef}
+							/>
 						);
 					})}
 				</div>
@@ -277,23 +218,13 @@ export const EditorProjectStartGrid = ({
 				/>
 			)}
 			{dragVisual === undefined ? null : (
-				<div
-					className="pointer-events-none fixed top-0 left-0 z-[90] grid size-[4.5rem] place-items-center rounded-lg border border-accent bg-surface-raised/95 text-foreground shadow-2xl"
-					data-ui="EditorProjectStartGridDragPreview"
-					ref={dragPreviewRef}
-					style={{
-						transform: `translate3d(${dragVisual.clientX + 12}px, ${dragVisual.clientY + 12}px, 0)`,
-					}}
-				>
-					<EditorItemThumbnail
-						className="size-14 border-0 bg-transparent"
-						resourceIds={items[dragVisual.source.itemId]?.asset.default ?? []}
-						size="sm"
-					/>
-					<span className="absolute right-1 bottom-1 rounded-md border border-line-strong bg-surface-raised/95 px-1.5 py-0.5 font-mono text-[0.65rem] font-bold text-foreground">
-						×{dragVisual.source.quantity}
-					</span>
-				</div>
+				<EditorProjectStartGridDragPreview
+					clientX={dragVisual.clientX}
+					clientY={dragVisual.clientY}
+					previewRef={dragPreviewRef}
+					quantity={dragVisual.source.quantity}
+					resourceIds={items[dragVisual.source.itemId]?.asset.default ?? []}
+				/>
 			)}
 		</>
 	);

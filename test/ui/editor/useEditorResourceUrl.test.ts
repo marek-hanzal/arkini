@@ -5,10 +5,10 @@ import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import {
-	EditorResourceUrlProvider,
 	useEditorResourceUrl,
 	useEditorResourceUrls,
 } from "~/ui/resource/editor/useEditorResourceUrl";
+import { EditorResourceUrlProvider } from "~/ui/resource/editor/EditorResourceUrlProvider";
 
 (
 	globalThis as {

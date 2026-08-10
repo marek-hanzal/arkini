@@ -4,7 +4,7 @@ import { EditorProjectProvider } from "~/bridge/editor/EditorProjectProvider";
 import { readEditorProjectFx } from "~/bridge/editor/readEditorProjectFx";
 import { EditorProjectErrorPage } from "~/page/editor/EditorProjectErrorPage";
 import { EditorShell } from "~/ui/editor/EditorShell";
-import { EditorProjectResourceUrlProvider } from "~/ui/resource/editor/useEditorResourceUrl";
+import { EditorProjectResourceUrlProvider } from "~/ui/resource/editor/EditorResourceUrlProvider";
 
 const EditorProjectRoute = () => {
 	const project = Route.useLoaderData();

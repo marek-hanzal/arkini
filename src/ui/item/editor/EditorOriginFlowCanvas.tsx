@@ -1,12 +1,5 @@
 import { Effect } from "effect";
-import {
-	useCallback,
-	useEffect,
-	useLayoutEffect,
-	useMemo,
-	useRef,
-	type PointerEvent as ReactPointerEvent,
-} from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef } from "react";
 
 import { type EditorItemOriginFlow } from "~/bridge/item/editor/readEditorItemOriginFlowFx";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
@@ -37,19 +30,10 @@ import {
 	type EditorOriginFlowNodeMetrics,
 	readEditorOriginFlowNodeMetricsFx,
 } from "~/ui/item/editor/readEditorOriginFlowNodeMetricsFx";
-import { pushEditorOriginFlowVisitFx } from "~/ui/item/editor/pushEditorOriginFlowVisitFx";
-import { readEditorOriginFlowHitFx } from "~/ui/item/editor/readEditorOriginFlowHitFx";
+import { useEditorOriginFlowCanvasPointer } from "~/ui/item/editor/useEditorOriginFlowCanvasPointer";
 import { useEditorOriginFlowProjection } from "~/ui/item/editor/useEditorOriginFlowProjection";
 import { useEditorOriginFlowNavigation } from "~/ui/item/editor/useEditorOriginFlowNavigation";
 import { useEditorResourceUrls } from "~/ui/resource/editor/useEditorResourceUrl";
-
-interface PanState {
-	moved: boolean;
-	pointerId: number;
-	startClientX: number;
-	startClientY: number;
-	startViewport: Viewport;
-}
 
 interface EditorOriginFlowCanvasProps {
 	readonly backbones: ReadonlyMap<string, ReadonlyArray<EditorItemOriginFlowLayoutPoint>>;
@@ -81,7 +65,6 @@ interface RenderState {
 
 const FlowViewport = RendererRuntime.runSync(createEditorOriginFlowViewportFx());
 const FlowPainter = RendererRuntime.runSync(createEditorOriginFlowCanvasPainterFx());
-const ClickThreshold = 5;
 
 /** Renders the passive item flow directly to Canvas with imperative pan and zoom. */
 export const EditorOriginFlowCanvas = ({
@@ -139,7 +122,6 @@ export const EditorOriginFlowCanvas = ({
 	const imageCacheRef = useRef<Map<string, HTMLImageElement>>(new Map());
 	const scheduleDrawRef = useRef<() => void>(() => undefined);
 	const viewportRef = useRef<Viewport>(FlowViewport.defaultViewport);
-	const panRef = useRef<PanState | undefined>(undefined);
 	const frameRef = useRef<number | undefined>(undefined);
 	const resetViewportRef = useRef(true);
 	const paletteRef = useRef<EditorOriginFlowCanvasPalette | undefined>(undefined);
@@ -464,105 +446,22 @@ export const EditorOriginFlowCanvas = ({
 		[],
 	);
 
-	const finishPan = (event: ReactPointerEvent<HTMLCanvasElement>, cancelled: boolean) => {
-		const pan = panRef.current;
-		if (pan === undefined || pan.pointerId !== event.pointerId) return;
-		panRef.current = undefined;
-		event.currentTarget.style.cursor = "grab";
-		if (event.currentTarget.hasPointerCapture(event.pointerId))
-			event.currentTarget.releasePointerCapture(event.pointerId);
-		if (cancelled || pan.moved) return;
-
-		const rect = event.currentTarget.getBoundingClientRect();
-		const viewport = viewportRef.current;
-		const worldX = (event.clientX - rect.left - viewport.x) / viewport.zoom;
-		const worldY = (event.clientY - rect.top - viewport.y) / viewport.zoom;
-		const hit = RendererRuntime.runSync(
-			readEditorOriginFlowHitFx({
-				backbones,
-				connectedPorts,
-				flow,
-				highlight,
-				metroBackbones,
-				nodeMetrics,
-				positions,
-				selection,
-				x: worldX,
-				y: worldY,
-				zoom: viewport.zoom,
-			}),
-		);
-		if (hit?.kind === "port") {
-			const targetPosition = positions.get(hit.targetNodeId);
-			if (targetPosition === undefined) return;
-			viewportRef.current = FlowViewport.readNode(
-				targetPosition,
-				rect.width,
-				rect.height,
-				Math.max(viewport.zoom, FlowViewport.defaultViewport.zoom),
-			);
-			resetNavigation();
-			let visitHistory = visitHistoryRef.current;
-			if (selection?.kind === "node")
-				visitHistory = RendererRuntime.runSync(
-					pushEditorOriginFlowVisitFx(visitHistory, selection.id),
-				);
-			visitHistoryRef.current = RendererRuntime.runSync(
-				pushEditorOriginFlowVisitFx(visitHistory, hit.targetNodeId),
-			);
-			onSelectionChange({
-				id: hit.targetNodeId,
-				kind: "node",
-			});
-			scheduleDraw();
-			return;
-		}
-		if (hit?.kind === "node") {
-			let visitHistory = visitHistoryRef.current;
-			if (selection?.kind === "node")
-				visitHistory = RendererRuntime.runSync(
-					pushEditorOriginFlowVisitFx(visitHistory, selection.id),
-				);
-			visitHistoryRef.current = RendererRuntime.runSync(
-				pushEditorOriginFlowVisitFx(visitHistory, hit.id),
-			);
-		}
-		if (
-			hit !== undefined &&
-			selection !== undefined &&
-			hit.kind === selection.kind &&
-			hit.id === selection.id
-		)
-			onSelectionChange(undefined);
-		else onSelectionChange(hit);
-	};
-
-	const handlePointerDown = (event: ReactPointerEvent<HTMLCanvasElement>) => {
-		if (event.button !== 0) return;
-		panRef.current = {
-			moved: false,
-			pointerId: event.pointerId,
-			startClientX: event.clientX,
-			startClientY: event.clientY,
-			startViewport: viewportRef.current,
-		};
-		event.currentTarget.style.cursor = "grabbing";
-		event.currentTarget.setPointerCapture(event.pointerId);
-	};
-
-	const handlePointerMove = (event: ReactPointerEvent<HTMLCanvasElement>) => {
-		const pan = panRef.current;
-		if (pan === undefined || pan.pointerId !== event.pointerId) return;
-		const deltaX = event.clientX - pan.startClientX;
-		const deltaY = event.clientY - pan.startClientY;
-		if (Math.abs(deltaX) + Math.abs(deltaY) >= ClickThreshold) pan.moved = true;
-		viewportRef.current = {
-			x: pan.startViewport.x + deltaX,
-			y: pan.startViewport.y + deltaY,
-			zoom: pan.startViewport.zoom,
-		};
-		scheduleDraw();
-	};
+	const { handlePointerCancel, handlePointerDown, handlePointerMove, handlePointerUp } =
+		useEditorOriginFlowCanvasPointer({
+			backbones,
+			connectedPorts,
+			flow,
+			highlight,
+			metroBackbones,
+			nodeMetrics,
+			onSelectionChange,
+			positions,
+			resetNavigation,
+			scheduleDraw,
+			selection,
+			viewportRef,
+			visitHistoryRef,
+		});
 
 	return (
 		<>
@@ -570,10 +469,10 @@ export const EditorOriginFlowCanvas = ({
 				aria-label="Item flow"
 				className="block size-full touch-none cursor-grab text-foreground"
 				data-ui="EditorOriginFlowCanvas"
-				onPointerCancel={(event) => finishPan(event, true)}
+				onPointerCancel={handlePointerCancel}
 				onPointerDown={handlePointerDown}
 				onPointerMove={handlePointerMove}
-				onPointerUp={(event) => finishPan(event, false)}
+				onPointerUp={handlePointerUp}
 				ref={canvasRef}
 			/>
 			{helpOpen ? (

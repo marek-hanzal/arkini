@@ -8,7 +8,6 @@ import type {
 } from "~/ui/item/editor/editorItemOriginFlowLayout";
 import {
 	type EditorOriginFlowDirection,
-	type EditorOriginFlowHighlight,
 	type EditorOriginFlowSelection,
 	readEditorOriginFlowHighlightFx,
 } from "~/ui/item/editor/readEditorOriginFlowHighlightFx";
@@ -16,6 +15,7 @@ import { readEditorOriginFlowMetroBackbonesFx } from "~/ui/item/editor/readEdito
 import { readEditorOriginFlowNavigationFx } from "~/ui/item/editor/readEditorOriginFlowNavigationFx";
 import { readEditorOriginFlowRelationNavigationFx } from "~/ui/item/editor/readEditorOriginFlowRelationNavigationFx";
 import { readEditorOriginFlowRootNavigationFx } from "~/ui/item/editor/readEditorOriginFlowRootNavigationFx";
+import { readEditorOriginFlowRouteColorsFx } from "~/ui/item/editor/readEditorOriginFlowRouteColorsFx";
 import { readEditorOriginFlowVisibleHighlightFx } from "~/ui/item/editor/readEditorOriginFlowVisibleHighlightFx";
 
 export const EditorOriginFlowDefaultHighlightDepth = 1;
@@ -25,81 +25,6 @@ export interface EditorOriginFlowHighlightDepth {
 	readonly limit: number;
 	readonly nodeId: string;
 }
-
-const HighlightRouteColors = Array.from(
-	{
-		length: 64,
-	},
-	(_, index) => {
-		const hue = (index * 137.50776405003785) % 360;
-		const saturation = [
-			88,
-			76,
-			94,
-			70,
-		][index % 4]!;
-		const lightness = [
-			38,
-			48,
-			32,
-			56,
-		][index % 4]!;
-		return `hsl(${hue.toFixed(1)}, ${saturation}%, ${lightness}%)`;
-	},
-);
-
-const hashText = (value: string) => {
-	let hash = 2166136261;
-	for (let index = 0; index < value.length; index += 1) {
-		hash ^= value.charCodeAt(index);
-		hash = Math.imul(hash, 16777619);
-	}
-	return hash >>> 0;
-};
-
-const readHighlightedEdgeColors = (
-	flow: EditorItemOriginFlow,
-	selection: EditorOriginFlowSelection | undefined,
-	highlight: EditorOriginFlowHighlight | undefined,
-) => {
-	if (selection === undefined) return new Map<string, string>();
-	const highlightedIds = new Set(highlight?.edgeIds ?? []);
-	if (selection.kind === "edge") highlightedIds.add(selection.id);
-	const edgeIds = flow.edges
-		.map(({ id }) => id)
-		.filter((id) => highlightedIds.has(id))
-		.sort((left, right) => left.localeCompare(right));
-	const offset = hashText(selection.id) % HighlightRouteColors.length;
-	return new Map(
-		edgeIds.map(
-			(edgeId, index) =>
-				[
-					edgeId,
-					HighlightRouteColors[(offset + index) % HighlightRouteColors.length]!,
-				] as const,
-		),
-	);
-};
-
-const readHighlightedPortColors = (
-	flow: EditorItemOriginFlow,
-	edgeColors: ReadonlyMap<string, string>,
-) => {
-	const byNodeId = new Map<string, Map<string, string>>();
-	const write = (nodeId: string, portId: string | undefined, color: string) => {
-		if (portId === undefined) return;
-		const colors = byNodeId.get(nodeId) ?? new Map<string, string>();
-		if (!colors.has(portId)) colors.set(portId, color);
-		byNodeId.set(nodeId, colors);
-	};
-	for (const edge of flow.edges) {
-		const color = edgeColors.get(edge.id);
-		if (color === undefined) continue;
-		write(edge.source, edge.sourcePortId, color);
-		write(edge.target, edge.targetPortId, color);
-	}
-	return byNodeId as ReadonlyMap<string, ReadonlyMap<string, string>>;
-};
 
 /** Owns the complete direction-aware selection and navigation projection for one flow canvas. */
 export const useEditorOriginFlowProjection = ({
@@ -168,14 +93,16 @@ export const useEditorOriginFlowProjection = ({
 			selection,
 		],
 	);
-	const highlightedEdgeColors = useMemo(
-		() => readHighlightedEdgeColors(flow, selection, highlight),
+	const routeColors = useMemo(
+		() =>
+			RendererRuntime.runSync(readEditorOriginFlowRouteColorsFx(flow, selection, highlight)),
 		[
 			flow,
 			highlight,
 			selection,
 		],
 	);
+	const highlightedEdgeColors = routeColors.edges;
 	const metroBackbones = useMemo(
 		() =>
 			RendererRuntime.runSync(
@@ -188,13 +115,7 @@ export const useEditorOriginFlowProjection = ({
 			highlightedEdgeColors,
 		],
 	);
-	const highlightedPortColors = useMemo(
-		() => readHighlightedPortColors(flow, highlightedEdgeColors),
-		[
-			flow,
-			highlightedEdgeColors,
-		],
-	);
+	const highlightedPortColors = routeColors.ports;
 	const navigationNodeIds = useMemo(
 		() =>
 			selection?.kind === "node"

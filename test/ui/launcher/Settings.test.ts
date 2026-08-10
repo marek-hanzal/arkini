@@ -86,6 +86,7 @@ const renderSettings = async (
 	const write = vi.fn(() => deferred.promise);
 	const writeCheatAvailability = vi.fn(() => Promise.resolve());
 	const openDiagnostics = vi.fn(() => Promise.resolve());
+	const openUserData = vi.fn(() => Promise.resolve());
 	let resolvePortCheck: (value: { readonly type: "available" }) => void = () => undefined;
 	const checkEditorMcpPort = vi.fn(
 		() =>
@@ -136,6 +137,9 @@ const renderSettings = async (
 			},
 			diagnostics: {
 				openDirectory: openDiagnostics,
+			},
+			userData: {
+				openDirectory: openUserData,
 			},
 			window: {
 				writeMode: writeWindowMode,
@@ -243,6 +247,7 @@ const renderSettings = async (
 		resolvePortCheck: (value: { readonly type: "available" }) => resolvePortCheck(value),
 		writeEditorMcpPort,
 		openDiagnostics,
+		openUserData,
 		registry,
 	};
 };
@@ -293,6 +298,17 @@ describe("Settings", () => {
 
 		await act(async () => buttonByText(container, "Open logs").click());
 		await vi.waitFor(() => expect(openDiagnostics).toHaveBeenCalledOnce());
+	});
+
+	it("opens the Arkini user-data root from the final Settings action", async () => {
+		const { container, openUserData } = await renderSettings([
+			"/settings",
+		]);
+
+		const userData = container.querySelector<HTMLElement>('[data-ui="SettingsUserData"]');
+		expect(userData?.parentElement?.lastElementChild).toBe(userData);
+		await act(async () => buttonByText(container, "Open data folder").click());
+		await vi.waitFor(() => expect(openUserData).toHaveBeenCalledOnce());
 	});
 
 	it("changes and persists the authoritative theme, then returns through history with Escape", async () => {

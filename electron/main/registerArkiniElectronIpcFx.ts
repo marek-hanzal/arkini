@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, nativeTheme, type IpcMainInvokeEvent } from "electron";
+import { app, BrowserWindow, ipcMain, nativeTheme, shell, type IpcMainInvokeEvent } from "electron";
 import { Effect } from "effect";
 import { ArkiniElectronApi } from "../contract/ArkiniElectronApi";
 import { createFilesystemArkpackCatalogFx } from "./arkpack/createFilesystemArkpackCatalogFx";
@@ -117,6 +117,18 @@ export const registerArkiniElectronIpcFx = Effect.fn("registerArkiniElectronIpcF
 				ipcMain.handle(ArkiniElectronApi.channels.diagnosticsOpenDirectory, (event) =>
 					runAuthorized(event, diagnostics.openDirectoryFx),
 				);
+				ipcMain.handle(ArkiniElectronApi.channels.userDataOpenDirectory, (event) =>
+					runAuthorized(
+						event,
+						Effect.tryPromise({
+							try: async () => {
+								const error = await shell.openPath(userDataPaths.root);
+								if (error !== "") throw new Error(error);
+							},
+							catch: (cause) => cause,
+						}),
+					),
+				);
 				ipcMain.handle(
 					ArkiniElectronApi.channels.launcherLastPackageIdWrite,
 					(event, packageId) =>
@@ -200,6 +212,7 @@ export const registerArkiniElectronIpcFx = Effect.fn("registerArkiniElectronIpcF
 						ArkiniElectronApi.channels.saveClear,
 						ArkiniElectronApi.channels.diagnosticsWrite,
 						ArkiniElectronApi.channels.diagnosticsOpenDirectory,
+						ArkiniElectronApi.channels.userDataOpenDirectory,
 						ArkiniElectronApi.channels.windowModeRead,
 						ArkiniElectronApi.channels.windowModeWrite,
 					]) {

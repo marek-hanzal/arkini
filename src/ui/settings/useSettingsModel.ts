@@ -11,6 +11,7 @@ import {
 	writeEditorMcpPortFx,
 } from "~/bridge/editor-mcp/EditorMcpPort";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
+import { openUserDataDirectoryFx } from "~/bridge/user-data/UserData";
 import type { WindowMode } from "~/bridge/window/WindowMode";
 import { WindowModeAtom } from "~/bridge/window/WindowModeAtom";
 import { useCheatAvailability } from "~/ui/cheat-availability/useCheatAvailability";
@@ -52,6 +53,17 @@ export const useSettingsModel = ({
 	>({
 		kind: "idle",
 	});
+	const [userDataStatus, setUserDataStatus] = useState<
+		| {
+				readonly kind: "idle" | "pending";
+		  }
+		| {
+				readonly kind: "error";
+				readonly error: unknown;
+		  }
+	>({
+		kind: "idle",
+	});
 	const blocked = commandState.kind === "pending";
 	const exitPending = commandState.kind === "pending" && commandState.action === "exit";
 	const goBack = useCallback(() => {
@@ -82,6 +94,26 @@ export const useSettingsModel = ({
 			});
 	}, [
 		diagnosticsStatus.kind,
+	]);
+	const openUserData = useCallback(() => {
+		if (userDataStatus.kind === "pending") return;
+		setUserDataStatus({
+			kind: "pending",
+		});
+		void RendererRuntime.runPromise(openUserDataDirectoryFx())
+			.then(() => {
+				setUserDataStatus({
+					kind: "idle",
+				});
+			})
+			.catch((error) => {
+				setUserDataStatus({
+					kind: "error",
+					error,
+				});
+			});
+	}, [
+		userDataStatus.kind,
 	]);
 	const checkEditorMcpPort = useCallback(() => {
 		if (editorMcpPortStatus.kind === "checking") return;
@@ -164,11 +196,13 @@ export const useSettingsModel = ({
 		editorMcpPortStatus,
 		exitPending,
 		diagnosticsStatus,
+		userDataStatus,
 		status: commandState,
 		theme: appearance.theme,
 		windowMode,
 		goBack,
 		openDiagnostics,
+		openUserData,
 		checkEditorMcpPort,
 		setEditorMcpPort: (value: string) => {
 			setEditorMcpPort(value);

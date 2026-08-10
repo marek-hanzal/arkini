@@ -46,6 +46,7 @@ export namespace ArkiniElectronApi {
 		editorMcpProjectContextClear: "arkini:editor:mcp:project-context:clear",
 		diagnosticsWrite: "arkini:diagnostics:write",
 		diagnosticsOpenDirectory: "arkini:diagnostics:open-directory",
+		userDataOpenDirectory: "arkini:user-data:open-directory",
 		windowModeRead: "arkini:window:mode:read",
 		windowModeWrite: "arkini:window:mode:write",
 		windowModeChanged: "arkini:window:mode:changed",
@@ -156,6 +157,9 @@ export namespace ArkiniElectronApi {
 		};
 		readonly diagnostics: {
 			readonly write: (record: DiagnosticRecord) => Promise<void>;
+			readonly openDirectory: () => Promise<void>;
+		};
+		readonly userData: {
 			readonly openDirectory: () => Promise<void>;
 		};
 		readonly window: {

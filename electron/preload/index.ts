@@ -115,6 +115,9 @@ const api: ArkiniElectronApi.Api = {
 		openDirectory: () =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.diagnosticsOpenDirectory),
 	},
+	userData: {
+		openDirectory: () => ipcRenderer.invoke(ArkiniElectronApi.channels.userDataOpenDirectory),
+	},
 	window: {
 		readMode: () => ipcRenderer.invoke(ArkiniElectronApi.channels.windowModeRead),
 		writeMode: (mode) => ipcRenderer.invoke(ArkiniElectronApi.channels.windowModeWrite, mode),

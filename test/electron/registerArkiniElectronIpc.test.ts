@@ -210,6 +210,10 @@ const invokeArguments = new Map<string, ReadonlyArray<unknown>>([
 		ArkiniElectronApi.channels.diagnosticsOpenDirectory,
 		[],
 	],
+	[
+		ArkiniElectronApi.channels.userDataOpenDirectory,
+		[],
+	],
 ]);
 
 const createInvokeEvent = (url: string): IpcMainInvokeEvent => {
@@ -405,6 +409,10 @@ describe("registerArkiniElectronIpcFx", () => {
 				invoke(ArkiniElectronApi.channels.diagnosticsOpenDirectory, trustedEvent),
 			).resolves.toBeUndefined();
 			expect(openDiagnosticDirectory).toHaveBeenCalledOnce();
+			await expect(
+				invoke(ArkiniElectronApi.channels.userDataOpenDirectory, trustedEvent),
+			).resolves.toBeUndefined();
+			expect(electronHarness.openPath).toHaveBeenCalledWith(userDataPaths.root);
 			await expect(
 				invoke(ArkiniElectronApi.channels.diagnosticsWrite, trustedEvent, {
 					...diagnosticRecord,

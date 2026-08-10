@@ -141,6 +141,16 @@ describe("Electron preload lifecycle", () => {
 		);
 	});
 
+	it("routes the Arkini user-data root through its dedicated IPC channel", async () => {
+		electron.ipcRenderer.invoke.mockResolvedValue(undefined);
+		const api = await loadPreload();
+
+		await expect(api.userData.openDirectory()).resolves.toBeUndefined();
+		expect(electron.ipcRenderer.invoke).toHaveBeenCalledWith(
+			ArkiniElectronContract.channels.userDataOpenDirectory,
+		);
+	});
+
 	it("shares one pending native close request", async () => {
 		const api = await loadPreload();
 		const first = api.lifecycle.requestClose();

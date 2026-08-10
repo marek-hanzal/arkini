@@ -260,6 +260,30 @@ export const Settings = ({ onBackFx }: Settings.Props) => {
 						{model.diagnosticsStatus.kind === "pending" ? "Opening…" : "Open logs"}
 					</Button>
 				</div>
+				<div
+					className="ak-list-row flex items-center justify-between gap-4 rounded-lg border border-line px-4 py-3"
+					data-ui="SettingsUserData"
+				>
+					<span className="grid gap-1">
+						<span className="text-sm font-semibold text-foreground">
+							Application data
+						</span>
+						<span className="text-sm leading-5 text-muted">
+							Open Arkini's data root containing editor projects, Arkpacks, saves,
+							preferences, and logs.
+						</span>
+					</span>
+					<Button
+						className="shrink-0"
+						cursorIntent={
+							model.userDataStatus.kind === "pending" ? "progress" : undefined
+						}
+						disabled={model.userDataStatus.kind === "pending"}
+						onClick={model.openUserData}
+					>
+						{model.userDataStatus.kind === "pending" ? "Opening…" : "Open data folder"}
+					</Button>
+				</div>
 			</fieldset>
 
 			<div
@@ -270,6 +294,11 @@ export const Settings = ({ onBackFx }: Settings.Props) => {
 				{model.diagnosticsStatus.kind === "error" ? (
 					<p className="text-danger">
 						Diagnostics failed: {errorMessage(model.diagnosticsStatus.error)}
+					</p>
+				) : null}
+				{model.userDataStatus.kind === "error" ? (
+					<p className="text-danger">
+						Opening data folder failed: {errorMessage(model.userDataStatus.error)}
 					</p>
 				) : null}
 				{match(model.status)

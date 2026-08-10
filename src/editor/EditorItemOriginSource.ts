@@ -13,13 +13,49 @@ export interface EditorItemOriginOutputOccurrence {
 	readonly weightedSet: boolean;
 }
 
+export type EditorItemOriginSourceReference =
+	| {
+			readonly type: "line";
+			readonly lineId: string;
+	  }
+	| {
+			readonly type: "charges";
+	  }
+	| {
+			readonly type: "expiry";
+	  }
+	| {
+			readonly type: "merge";
+			readonly ruleNumber: number;
+	  };
+
 export interface EditorItemOriginSource {
 	readonly id: string;
 	readonly kind: EditorItemOriginOperationKind;
 	readonly label: string;
 	readonly outputs: ReadonlyArray<EditorItemOriginOutputOccurrence>;
 	readonly ownerItemId: string;
+	readonly reference: EditorItemOriginSourceReference;
 	readonly requirementItemIds: ReadonlyArray<string>;
+}
+
+export type EditorItemOriginRelationRole = "input" | "output";
+
+export interface EditorItemOriginRelation {
+	readonly fromItemId: string;
+	readonly outputIndex?: number;
+	readonly role: EditorItemOriginRelationRole;
+	readonly source: EditorItemOriginSource;
+	readonly toItemId: string;
+}
+
+export interface EditorItemOriginRelationSubgraph {
+	readonly itemIds: ReadonlySet<string>;
+	readonly relations: ReadonlyArray<
+		EditorItemOriginRelation & {
+			readonly level: number;
+		}
+	>;
 }
 
 export interface EditorItemOriginIncomeSubgraph {
@@ -93,6 +129,10 @@ const readLineSources = (
 				label: line.title || "Production",
 				outputs,
 				ownerItemId: item.id,
+				reference: {
+					type: "line",
+					lineId: line.id || `line #${index + 1}`,
+				},
 				requirementItemIds: unique([
 					item.id,
 					...line.input
@@ -129,6 +169,9 @@ export const readEditorItemOriginSources = (item: ItemSchema.Type): EditorItemOr
 			label: "Depletion",
 			outputs: depletedOutputs,
 			ownerItemId: item.id,
+			reference: {
+				type: "charges",
+			},
 			requirementItemIds: [
 				item.id,
 			],
@@ -142,6 +185,9 @@ export const readEditorItemOriginSources = (item: ItemSchema.Type): EditorItemOr
 				label: "Expiry",
 				outputs: expiryOutputs,
 				ownerItemId: item.id,
+				reference: {
+					type: "expiry",
+				},
 				requirementItemIds: [
 					item.id,
 				],
@@ -164,6 +210,10 @@ export const readEditorItemOriginSources = (item: ItemSchema.Type): EditorItemOr
 			label: "Merge",
 			outputs: deduped,
 			ownerItemId: item.id,
+			reference: {
+				type: "merge",
+				ruleNumber: index + 1,
+			},
 			requirementItemIds: unique([
 				item.id,
 				merge.target.itemId,
@@ -171,6 +221,124 @@ export const readEditorItemOriginSources = (item: ItemSchema.Type): EditorItemOr
 		});
 	}
 	return sources;
+};
+
+/** Projects the exact item-to-item edges materialized by the editor origin flow. */
+export const readEditorItemOriginRelations = (
+	source: EditorItemOriginSource,
+): EditorItemOriginRelation[] => [
+	...unique(source.requirementItemIds)
+		.filter((itemId) => itemId !== source.ownerItemId)
+		.sort((left, right) => left.localeCompare(right))
+		.map((itemId) => ({
+			fromItemId: itemId,
+			role: "input" as const,
+			source,
+			toItemId: source.ownerItemId,
+		})),
+	...source.outputs.map((output, outputIndex) => ({
+		fromItemId: source.ownerItemId,
+		outputIndex,
+		role: "output" as const,
+		source,
+		toItemId: output.itemId,
+	})),
+];
+
+/** Traverses canonical input edges forward and output edges backward, matching editor relation lookup. */
+export const readEditorItemOriginRelationSubgraph = ({
+	level,
+	role,
+	sources,
+	targetItemId,
+}: {
+	readonly level: number;
+	readonly role: EditorItemOriginRelationRole;
+	readonly sources: ReadonlyArray<EditorItemOriginSource>;
+	readonly targetItemId: string;
+}): EditorItemOriginRelationSubgraph => {
+	const relationsBySourceItem = new Map<string, EditorItemOriginRelation[]>();
+	for (const relation of sources.flatMap(readEditorItemOriginRelations)) {
+		if (relation.role !== role) continue;
+		const traversalSourceItemId = role === "input" ? relation.fromItemId : relation.toItemId;
+		const matches = relationsBySourceItem.get(traversalSourceItemId) ?? [];
+		matches.push(relation);
+		relationsBySourceItem.set(traversalSourceItemId, matches);
+	}
+	for (const relations of relationsBySourceItem.values())
+		relations.sort(
+			(left, right) =>
+				left.source.id.localeCompare(right.source.id) ||
+				left.toItemId.localeCompare(right.toItemId) ||
+				(left.outputIndex ?? -1) - (right.outputIndex ?? -1),
+		);
+
+	const itemIds = new Set<string>([
+		targetItemId,
+	]);
+	const relationByKey = new Map<
+		string,
+		EditorItemOriginRelation & {
+			readonly level: number;
+		}
+	>();
+	const reachedLevelByItem = new Map<string, number>([
+		[
+			targetItemId,
+			0,
+		],
+	]);
+	const pending: Array<{
+		readonly itemId: string;
+		readonly level: number;
+	}> = [
+		{
+			itemId: targetItemId,
+			level: 0,
+		},
+	];
+	for (let index = 0; index < pending.length; index += 1) {
+		const current = pending[index];
+		if (current === undefined || current.level >= level) continue;
+		const nextLevel = current.level + 1;
+		for (const relation of relationsBySourceItem.get(current.itemId) ?? []) {
+			const reachedItemId = role === "input" ? relation.toItemId : relation.fromItemId;
+			const key = JSON.stringify([
+				relation.role,
+				relation.source.id,
+				relation.fromItemId,
+				relation.toItemId,
+				relation.outputIndex ?? "input",
+			]);
+			const existing = relationByKey.get(key);
+			if (existing === undefined || nextLevel < existing.level)
+				relationByKey.set(key, {
+					...relation,
+					level: nextLevel,
+				});
+			itemIds.add(reachedItemId);
+			const reachedLevel = reachedLevelByItem.get(reachedItemId);
+			if (reachedLevel !== undefined && reachedLevel <= nextLevel) continue;
+			reachedLevelByItem.set(reachedItemId, nextLevel);
+			pending.push({
+				itemId: reachedItemId,
+				level: nextLevel,
+			});
+		}
+	}
+	return {
+		itemIds,
+		relations: [
+			...relationByKey.values(),
+		].sort(
+			(left, right) =>
+				left.level - right.level ||
+				left.source.id.localeCompare(right.source.id) ||
+				left.fromItemId.localeCompare(right.fromItemId) ||
+				left.toItemId.localeCompare(right.toItemId) ||
+				(left.outputIndex ?? -1) - (right.outputIndex ?? -1),
+		),
+	};
 };
 
 /** Resolves which deterministic acquisition source first makes each item reachable. */

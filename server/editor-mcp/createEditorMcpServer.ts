@@ -6,10 +6,11 @@ import { ArkiniAppVersion } from "../../shared/ArkiniAppMetadata";
 import type { EditorProject } from "../../src/editor/EditorProject";
 import type { EditorProjectRepositoryService } from "../../src/editor/EditorProjectRepository";
 import {
-	readEditorItemOriginIncomeSubgraph,
+	readEditorItemOriginRelationSubgraph,
 	readEditorItemOriginSources,
-	resolveEditorItemOriginReachability,
 	type EditorItemOriginOutputOccurrence,
+	type EditorItemOriginRelationRole,
+	type EditorItemOriginSource,
 } from "../../src/editor/EditorItemOriginSource";
 import { searchEditorItems } from "../../src/editor/searchEditorItems";
 import { IdSchema } from "../../src/engine/common/schema/IdSchema";
@@ -184,93 +185,157 @@ const outputAnnotation = (output: EditorItemOriginOutputOccurrence) =>
 				]),
 	].join(", ");
 
-const itemGraphText = (project: EditorProject, targetItemId?: string) => {
-	const allItems = Object.values(project.config.items).sort((left, right) =>
-		left.id.localeCompare(right.id),
-	);
-	if (targetItemId !== undefined && project.config.items[targetItemId] === undefined)
-		throw new Error(`Item ${targetItemId} does not exist in the open project.`);
-	const starterScopes = new Map<string, Set<string>>();
-	const addStarter = (itemId: string, scope: string) => {
-		const scopes = starterScopes.get(itemId) ?? new Set<string>();
-		scopes.add(scope);
-		starterScopes.set(itemId, scopes);
-	};
-	for (const entry of project.config.start.board) addStarter(entry.itemId, "Board");
-	for (const entry of project.config.start.inventory) addStarter(entry.itemId, "Inventory");
-	for (const entry of project.config.start.toolbar) addStarter(entry.itemId, "Toolbar");
-	const allSources = allItems
+const readItemRelationView = (
+	project: EditorProject,
+	{
+		itemId,
+		level,
+		role,
+	}: {
+		readonly itemId: string;
+		readonly level: number;
+		readonly role: EditorItemOriginRelationRole;
+	},
+) => {
+	if (project.config.items[itemId] === undefined)
+		throw new Error(`Item ${itemId} does not exist in the open project.`);
+	const sources = Object.values(project.config.items)
+		.sort((left, right) => left.id.localeCompare(right.id))
 		.flatMap(readEditorItemOriginSources)
 		.sort((left, right) => left.id.localeCompare(right.id));
-	const subgraph =
-		targetItemId === undefined
-			? undefined
-			: readEditorItemOriginIncomeSubgraph({
-					acquisitionSourceByItem: resolveEditorItemOriginReachability({
-						sources: allSources,
-						starters: new Set(starterScopes.keys()),
-					}),
-					sources: allSources,
-					starters: new Set(starterScopes.keys()),
-					targetItemId,
-				});
-	const items =
-		subgraph === undefined
-			? allItems
-			: allItems.filter((item) => subgraph.itemIds.has(item.id));
-	const sources = subgraph?.sources ?? allSources;
-	const visibleStarterScopes = [
-		...starterScopes.entries(),
-	].filter(([itemId]) => subgraph === undefined || subgraph.itemIds.has(itemId));
+	return {
+		itemId,
+		level,
+		project,
+		role,
+		subgraph: readEditorItemOriginRelationSubgraph({
+			level,
+			role,
+			sources,
+			targetItemId: itemId,
+		}),
+	};
+};
+
+type ItemRelationView = ReturnType<typeof readItemRelationView>;
+
+const sourceReferenceLines = (project: EditorProject, source: EditorItemOriginSource) => [
+	`  source item: ${itemReference(project, source.ownerItemId)}`,
+	...(() => {
+		switch (source.reference.type) {
+			case "line":
+				return [
+					`  line: ${source.reference.lineId}`,
+				];
+			case "charges":
+				return [
+					"  relationship: charge depletion",
+				];
+			case "expiry":
+				return [
+					"  relationship: expiry",
+				];
+			case "merge":
+				return [
+					`  merge rule: ${source.reference.ruleNumber}`,
+				];
+		}
+	})(),
+];
+
+const sourceMetadata = (source: EditorItemOriginSource) => ({
+	kind: source.kind,
+	label: source.label,
+	sourceItemId: source.ownerItemId,
+	...source.reference,
+});
+
+const itemRelationText = ({ itemId, level, project, role, subgraph }: ItemRelationView) => {
+	const groups = new Map<
+		string,
+		{
+			readonly level: number;
+			readonly relations: typeof subgraph.relations;
+		}
+	>();
+	for (const relation of subgraph.relations) {
+		const key = `${relation.level}:${relation.source.id}`;
+		const group = groups.get(key);
+		groups.set(key, {
+			level: relation.level,
+			relations:
+				group === undefined
+					? [
+							relation,
+						]
+					: [
+							...group.relations,
+							relation,
+						],
+		});
+	}
+	const reachedItemIds = [
+		...subgraph.itemIds,
+	]
+		.filter((candidate) => candidate !== itemId)
+		.sort((left, right) => left.localeCompare(right));
 	return [
-		targetItemId === undefined
-			? "Item graph (operation hypergraph)"
-			: `Item graph for ${itemReference(project, targetItemId)} (Income proof)`,
-		"Each operation has one owner, all externally required items, and every possible output. Quantities and runtime rules are intentionally omitted.",
+		`${role === "input" ? "Item input" : "Item output"} relationships for ${itemReference(project, itemId)}`,
+		`Depth: ${level} relationship ${level === 1 ? "hop" : "hops"}`,
+		role === "input"
+			? "Direction: external input item -> operation owner. Owner self-requirements are not editor-flow input edges."
+			: "Lookup direction: produced item <- operation owner. Relationships are printed canonically as owner -> output; guaranteed, chance, weighted, replacement, depletion, and expiry outputs all use the editor-flow model.",
 		"",
-		"Items:",
-		...(items.length === 0
+		"Reading guide:",
+		"- level: relationship-hop distance from the requested item; level 1 is a direct relationship.",
+		role === "input"
+			? "- traversed: the matched external-input edge, printed as input item -> source item."
+			: "- traversed: the matched output edge, printed canonically as source item -> produced item.",
+		"- source item: the item that owns and runs the listed operation.",
+		"- line / merge rule / relationship: the authored operation reference inside the source item.",
+		"- external inputs: every item required by the operation except the source item itself.",
+		"- outputs: every possible item emitted by the operation, not only the edge matched by this lookup.",
+		"- output annotations: guaranteed/chance/weighted/replace describe selection; alternative set means mutually weighted sets; placement describes where the item appears.",
+		"",
+		"Reached items:",
+		...(reachedItemIds.length === 0
 			? [
 					"- none",
 				]
-			: items.map((item) => `- ${itemReference(project, item.id)}`)),
-		"",
-		"Starting items:",
-		...(visibleStarterScopes.length === 0
-			? [
-					"- none",
-				]
-			: visibleStarterScopes
-					.sort(([left], [right]) => left.localeCompare(right))
-					.map(
-						([itemId, scopes]) =>
-							`- ${itemReference(project, itemId)} @ ${[
-								...scopes,
-							]
-								.sort()
-								.join(", ")}`,
-					)),
+			: reachedItemIds.map((reachedItemId) => `- ${itemReference(project, reachedItemId)}`)),
 		"",
 		"Operations:",
-		...(sources.length === 0
+		...(groups.size === 0
 			? [
 					"- none",
 				]
-			: sources.flatMap((source) => {
-					const inputs = source.requirementItemIds
-						.filter((itemId) => itemId !== source.ownerItemId)
+			: [
+					...groups.values(),
+				].flatMap((group) => {
+					const source = group.relations[0]?.source;
+					if (source === undefined) return [];
+					const inputs = [
+						...new Set(source.requirementItemIds),
+					]
+						.filter((requirementItemId) => requirementItemId !== source.ownerItemId)
 						.sort((left, right) => left.localeCompare(right));
 					return [
-						`- ${source.kind} "${source.label}" (${source.id})`,
-						`  owner: ${itemReference(project, source.ownerItemId)}`,
+						`- level ${group.level}: ${source.kind} "${source.label}"`,
+						...sourceReferenceLines(project, source),
+						"  traversed:",
+						...group.relations.map(
+							(relation) =>
+								`    - ${itemReference(project, relation.fromItemId)} -> ${itemReference(project, relation.toItemId)}`,
+						),
 						...(inputs.length === 0
 							? [
-									"  requires: none",
+									"  external inputs: none",
 								]
 							: [
-									"  requires:",
+									"  external inputs:",
 									...inputs.map(
-										(itemId) => `    - ${itemReference(project, itemId)}`,
+										(inputItemId) =>
+											`    - ${itemReference(project, inputItemId)}`,
 									),
 								]),
 						"  outputs:",
@@ -282,6 +347,26 @@ const itemGraphText = (project: EditorProject, targetItemId?: string) => {
 				})),
 	].join("\n");
 };
+
+const itemRelationMetadata = ({ itemId, level, role, subgraph }: ItemRelationView) => ({
+	itemId,
+	level,
+	operations: [
+		...new Map(
+			subgraph.relations.map(({ source }) => [
+				source.id,
+				sourceMetadata(source),
+			]),
+		).values(),
+	],
+	reachedItemIds: [
+		...subgraph.itemIds,
+	]
+		.filter((candidate) => candidate !== itemId)
+		.sort(),
+	relationshipCount: subgraph.relations.length,
+	role,
+});
 
 const errorText = (cause: unknown) => (cause instanceof Error ? cause.message : String(cause));
 
@@ -458,21 +543,71 @@ export const createEditorMcpServer = (
 			),
 	);
 	server.registerTool(
-		"item_graph",
+		"item_input",
 		{
 			description:
-				"Read the complete item relationship graph, or one item's upstream Income proof, as an LLM-oriented operation hypergraph.",
+				"Follow editor-flow external-input relationships from one item. Level 1 returns operation owners that directly use the item; higher levels continue through owners used as inputs elsewhere.",
 			inputSchema: z
 				.object({
-					itemId: IdSchema.optional().describe(
-						"An optional exact item ID. When present, returns only that item's upstream Income graph.",
+					itemId: IdSchema.describe(
+						"The exact root item ID returned by item_collection.",
 					),
+					level: z
+						.number()
+						.int()
+						.positive()
+						.default(1)
+						.describe("Relationship-hop depth; defaults to 1."),
 				})
 				.strict(),
 		},
-		async ({ itemId }) =>
-			runTool(readCurrentProjectFx(repository, readProjectContext), (project) =>
-				itemGraphText(project, itemId),
+		async ({ itemId, level }) =>
+			runTool(
+				readCurrentProjectFx(repository, readProjectContext).pipe(
+					Effect.map((project) =>
+						readItemRelationView(project, {
+							itemId,
+							level,
+							role: "input",
+						}),
+					),
+				),
+				itemRelationText,
+				itemRelationMetadata,
+			),
+	);
+	server.registerTool(
+		"item_output",
+		{
+			description:
+				"Find every editor-flow operation that outputs one item. Level 1 returns all direct producer owners; higher levels continue backward through operations that output those producers.",
+			inputSchema: z
+				.object({
+					itemId: IdSchema.describe(
+						"The exact root item ID returned by item_collection.",
+					),
+					level: z
+						.number()
+						.int()
+						.positive()
+						.default(1)
+						.describe("Relationship-hop depth; defaults to 1."),
+				})
+				.strict(),
+		},
+		async ({ itemId, level }) =>
+			runTool(
+				readCurrentProjectFx(repository, readProjectContext).pipe(
+					Effect.map((project) =>
+						readItemRelationView(project, {
+							itemId,
+							level,
+							role: "output",
+						}),
+					),
+				),
+				itemRelationText,
+				itemRelationMetadata,
 			),
 	);
 	return server;

@@ -104,7 +104,8 @@ describe("createEditorMcpOwnershipFx", () => {
 			"item_meta",
 			"item_collection",
 			"item_detail",
-			"item_graph",
+			"item_input",
+			"item_output",
 		]);
 		expect(tools.tools.find(({ name }) => name === "project")?.inputSchema.properties).toEqual(
 			{},
@@ -127,9 +128,15 @@ describe("createEditorMcpOwnershipFx", () => {
 		expect(
 			tools.tools.find(({ name }) => name === "item_detail")?.inputSchema.properties,
 		).toHaveProperty("id");
-		expect(
-			tools.tools.find(({ name }) => name === "item_graph")?.inputSchema.properties,
-		).toHaveProperty("itemId");
+		for (const toolName of [
+			"item_input",
+			"item_output",
+		]) {
+			const properties = tools.tools.find(({ name }) => name === toolName)?.inputSchema
+				.properties;
+			expect(properties).toHaveProperty("itemId");
+			expect(properties).toHaveProperty("level");
+		}
 		const missingContext = await client.callTool({
 			name: "project",
 			arguments: {},
@@ -515,61 +522,107 @@ describe("createEditorMcpOwnershipFx", () => {
 				text: "Total: 5\nproducer: 1\nsimple: 4",
 			},
 		]);
-		const graph = await client.callTool({
-			name: "item_graph",
-			arguments: {},
+		const itemInput = await client.callTool({
+			name: "item_input",
+			arguments: {
+				itemId: "water",
+			},
 		});
-		expect(graph.content).toEqual([
+		expect(itemInput.content).toMatchObject([
 			{
-				type: "text",
 				text: expect.stringContaining(
 					[
-						'- line "Run" (source:forge:line:line:forge:run)',
-						"  owner: forge [forge; producer]",
-						"  requires:",
-						"    - tool [tool; simple]",
-						"    - water [water; simple]",
-						"  outputs:",
-						"    - ingot [Ingot; simple] (guaranteed, placement drop)",
+						'- level 1: line "Run"',
+						"  source item: forge [forge; producer]",
+						"  line: line:forge:run",
+						"  traversed:",
+						"    - water [water; simple] -> forge [forge; producer]",
 					].join("\n"),
 				),
 			},
 		]);
-		expect(graph.content).toMatchObject([
+		expect(itemInput.content).toMatchObject([
 			{
-				text: expect.stringContaining("- forge [forge; producer] @ Board"),
+				text: expect.not.stringContaining("source:forge:line:line:forge:run"),
 			},
 		]);
-		expect(graph.content).toMatchObject([
+		expect(itemInput.content).toMatchObject([
 			{
-				text: expect.stringContaining("- unused [Unused; simple]"),
+				text: expect.stringContaining(
+					[
+						"Reading guide:",
+						"- level: relationship-hop distance from the requested item; level 1 is a direct relationship.",
+						"- traversed: the matched external-input edge, printed as input item -> source item.",
+						"- source item: the item that owns and runs the listed operation.",
+						"- line / merge rule / relationship: the authored operation reference inside the source item.",
+						"- external inputs: every item required by the operation except the source item itself.",
+						"- outputs: every possible item emitted by the operation, not only the edge matched by this lookup.",
+						"- output annotations: guaranteed/chance/weighted/replace describe selection; alternative set means mutually weighted sets; placement describes where the item appears.",
+					].join("\n"),
+				),
 			},
 		]);
-		const focusedGraph = await client.callTool({
-			name: "item_graph",
+		expect(itemInput.structuredContent).toEqual({
+			itemId: "water",
+			level: 1,
+			operations: [
+				{
+					kind: "line",
+					label: "Run",
+					lineId: "line:forge:run",
+					sourceItemId: "forge",
+					type: "line",
+				},
+			],
+			reachedItemIds: [
+				"forge",
+			],
+			relationshipCount: 1,
+			role: "input",
+		});
+		const itemOutput = await client.callTool({
+			name: "item_output",
 			arguments: {
 				itemId: "ingot",
 			},
 		});
-		expect(focusedGraph.content).toMatchObject([
+		expect(itemOutput.content).toMatchObject([
+			{
+				text: expect.stringContaining("forge [forge; producer] -> ingot [Ingot; simple]"),
+			},
+		]);
+		expect(itemOutput.content).toMatchObject([
 			{
 				text: expect.stringContaining(
-					"Item graph for ingot [Ingot; simple] (Income proof)",
+					"- traversed: the matched output edge, printed canonically as source item -> produced item.",
 				),
 			},
 		]);
-		expect(focusedGraph.content).toMatchObject([
-			{
-				text: expect.not.stringContaining("unused [Unused; simple]"),
-			},
-		]);
-		const missingGraphItem = await client.callTool({
-			name: "item_graph",
+		expect(itemOutput.structuredContent).toEqual({
+			itemId: "ingot",
+			level: 1,
+			operations: [
+				{
+					kind: "line",
+					label: "Run",
+					lineId: "line:forge:run",
+					sourceItemId: "forge",
+					type: "line",
+				},
+			],
+			reachedItemIds: [
+				"forge",
+			],
+			relationshipCount: 1,
+			role: "output",
+		});
+		const missingRelationItem = await client.callTool({
+			name: "item_input",
 			arguments: {
 				itemId: "missing",
 			},
 		});
-		expect(missingGraphItem).toMatchObject({
+		expect(missingRelationItem).toMatchObject({
 			isError: true,
 			content: [
 				{
@@ -606,7 +659,8 @@ describe("createEditorMcpOwnershipFx", () => {
 			"item_meta",
 			"item_collection",
 			"item_detail",
-			"item_graph",
+			"item_input",
+			"item_output",
 		]);
 		expect(
 			(

@@ -11,6 +11,7 @@ import {
 import type { EditorItemOriginSource } from "~/bridge/item/editor/EditorItemOriginSource";
 import type { EditorItemOriginSourceIndex } from "~/bridge/item/editor/indexEditorItemOriginSourcesFx";
 import type { EditorItemOriginIncomeSubgraph } from "~/bridge/item/editor/readEditorItemOriginIncomeSubgraphFx";
+import { readEditorItemOriginRelations } from "~/editor/EditorItemOriginSource";
 
 const unique = <Value>(values: ReadonlyArray<Value>): Value[] => [
 	...new Set(values),
@@ -77,32 +78,35 @@ const readEdges = (
 	const edges: EditorItemOriginEdge[] = [];
 	for (const source of sources) {
 		if (itemsInGraph !== undefined && !itemsInGraph.has(source.ownerItemId)) continue;
-		for (const requirementItemId of unique(source.requirementItemIds).sort((left, right) =>
-			left.localeCompare(right),
-		)) {
-			if (requirementItemId === source.ownerItemId) continue;
-			if (itemsInGraph !== undefined && !itemsInGraph.has(requirementItemId)) continue;
-			const targetPortId = `${source.id}:input:${requirementItemId}`;
-			edges.push({
-				id: targetPortId,
-				operationId: source.id,
-				role: "input",
-				source: `item:${requirementItemId}`,
-				sourcePortId: EditorItemOriginItemOutputPortId,
-				target: `item:${source.ownerItemId}`,
-				targetPortId,
-			});
-		}
-		for (const [index, output] of source.outputs.entries()) {
-			if (itemsInGraph !== undefined && !itemsInGraph.has(output.itemId)) continue;
-			const sourcePortId = `${source.id}:output:${index}:${output.itemId}`;
+		for (const relation of readEditorItemOriginRelations(source)) {
+			if (
+				itemsInGraph !== undefined &&
+				(!itemsInGraph.has(relation.fromItemId) || !itemsInGraph.has(relation.toItemId))
+			)
+				continue;
+			if (relation.role === "input") {
+				const targetPortId = `${source.id}:input:${relation.fromItemId}`;
+				edges.push({
+					id: targetPortId,
+					operationId: source.id,
+					role: "input",
+					source: `item:${relation.fromItemId}`,
+					sourcePortId: EditorItemOriginItemOutputPortId,
+					target: `item:${relation.toItemId}`,
+					targetPortId,
+				});
+				continue;
+			}
+			const outputIndex = relation.outputIndex;
+			if (outputIndex === undefined) continue;
+			const sourcePortId = `${source.id}:output:${outputIndex}:${relation.toItemId}`;
 			edges.push({
 				id: sourcePortId,
 				operationId: source.id,
 				role: "output",
-				source: `item:${source.ownerItemId}`,
+				source: `item:${relation.fromItemId}`,
 				sourcePortId,
-				target: `item:${output.itemId}`,
+				target: `item:${relation.toItemId}`,
 				targetPortId: EditorItemOriginItemInputPortId,
 			});
 		}

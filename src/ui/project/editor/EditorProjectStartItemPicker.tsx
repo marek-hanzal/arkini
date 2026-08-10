@@ -1,8 +1,9 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 
 import type { EditorProjectStartScope } from "~/bridge/project/editor/EditorProjectStartScope";
 import { readEditorProjectStartItemIdsFx } from "~/bridge/project/editor/readEditorProjectStartItemIdsFx";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
+import { useDialogFocus } from "~/ui/focus/useDialogFocus";
 import { EditorItemSearchThumbnail } from "~/ui/item/editor/EditorItemThumbnail";
 import { useEditorItemSearchOptions } from "~/ui/item/editor/useEditorItemSearchOptions";
 import { SpotlightSearchInput } from "~/ui/search/SpotlightSearchInput";
@@ -22,6 +23,10 @@ export const EditorProjectStartItemPicker = ({
 }: EditorProjectStartItemPickerProps) => {
 	const { items, options } = useEditorItemSearchOptions();
 	const inputRef = useRef<HTMLInputElement>(null);
+	const { dialogRef, keepFocusInside } = useDialogFocus({
+		initialFocusRef: inputRef,
+		onClose,
+	});
 	const [query, setQuery] = useState("");
 	const [selectedIndex, setSelectedIndex] = useState(0);
 	const allowedItemIds = useMemo(
@@ -76,21 +81,6 @@ export const EditorProjectStartItemPicker = ({
 				];
 	});
 
-	useEffect(() => {
-		inputRef.current?.focus();
-	}, []);
-	useEffect(() => {
-		const onKeyDown = (event: KeyboardEvent) => {
-			if (event.key !== "Escape") return;
-			event.preventDefault();
-			onClose();
-		};
-		window.addEventListener("keydown", onKeyDown);
-		return () => window.removeEventListener("keydown", onKeyDown);
-	}, [
-		onClose,
-	]);
-
 	const choose = (itemId: string) => {
 		onSelect(itemId);
 		onClose();
@@ -109,7 +99,10 @@ export const EditorProjectStartItemPicker = ({
 				aria-modal="true"
 				className="mx-auto grid w-[38rem] max-w-full gap-3 rounded-2xl border border-line-strong bg-surface-raised p-4 text-foreground shadow-2xl"
 				data-ui="EditorProjectStartItemPicker"
+				onKeyDown={keepFocusInside}
+				ref={dialogRef}
 				role="dialog"
+				tabIndex={-1}
 			>
 				<h2
 					className="sr-only"

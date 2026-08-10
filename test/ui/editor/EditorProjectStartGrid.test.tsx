@@ -73,10 +73,7 @@ afterEach(async () => {
 
 const renderGrid = async ({
 	cells = [],
-	onDecrement = vi.fn(),
-	onIncrement = vi.fn(),
-	onMove = vi.fn(),
-	onSet = vi.fn(),
+	onCellsChange = vi.fn(),
 }: {
 	readonly cells?: ReadonlyArray<{
 		readonly itemId: string;
@@ -84,12 +81,18 @@ const renderGrid = async ({
 		readonly x: number;
 		readonly y: number;
 	}>;
-	readonly onDecrement?: ReturnType<typeof vi.fn<(x: number, y: number) => void>>;
-	readonly onIncrement?: ReturnType<typeof vi.fn<(x: number, y: number) => void>>;
-	readonly onMove?: ReturnType<
-		typeof vi.fn<(sourceX: number, sourceY: number, targetX: number, targetY: number) => void>
+	readonly onCellsChange?: ReturnType<
+		typeof vi.fn<
+			(
+				cells: ReadonlyArray<{
+					itemId: string;
+					quantity: number;
+					x: number;
+					y: number;
+				}>,
+			) => void
+		>
 	>;
-	readonly onSet?: ReturnType<typeof vi.fn<(x: number, y: number, itemId: string) => void>>;
 } = {}) => {
 	const container = document.createElement("div");
 	document.body.append(container);
@@ -100,10 +103,7 @@ const renderGrid = async ({
 			<EditorProjectStartGrid
 				cells={cells}
 				height={1}
-				onDecrement={onDecrement}
-				onIncrement={onIncrement}
-				onMove={onMove}
-				onSet={onSet}
+				onCellsChange={onCellsChange}
 				scope="board"
 				width={2}
 			/>,
@@ -111,10 +111,7 @@ const renderGrid = async ({
 	});
 	return {
 		container,
-		onDecrement,
-		onIncrement,
-		onMove,
-		onSet,
+		onCellsChange,
 	};
 };
 
@@ -152,7 +149,7 @@ const dispatchPointer = (
 
 describe("EditorProjectStartGrid", () => {
 	it("opens the picker for an empty slot and assigns the selected item", async () => {
-		const { container, onSet } = await renderGrid();
+		const { container, onCellsChange } = await renderGrid();
 		const empty = container.querySelector<HTMLButtonElement>(
 			'button[aria-label="Empty board slot 1, 1"]',
 		);
@@ -166,7 +163,14 @@ describe("EditorProjectStartGrid", () => {
 		if (choose === undefined) throw new Error("Missing mock picker option.");
 		await act(async () => choose.click());
 
-		expect(onSet).toHaveBeenCalledWith(0, 0, "wood");
+		expect(onCellsChange).toHaveBeenCalledWith([
+			{
+				itemId: "wood",
+				quantity: 1,
+				x: 0,
+				y: 0,
+			},
+		]);
 		expect(container.querySelector('[data-ui="MockStartPicker"]')).toBeNull();
 	});
 
@@ -184,9 +188,17 @@ describe("EditorProjectStartGrid", () => {
 			},
 		},
 	])("moves a whole stack with $label drag onto an occupied slot", async ({ modifier }) => {
-		const onMove =
-			vi.fn<(sourceX: number, sourceY: number, targetX: number, targetY: number) => void>();
-		const onIncrement = vi.fn<(x: number, y: number) => void>();
+		const onCellsChange =
+			vi.fn<
+				(
+					cells: ReadonlyArray<{
+						itemId: string;
+						quantity: number;
+						x: number;
+						y: number;
+					}>,
+				) => void
+			>();
 		const { container } = await renderGrid({
 			cells: [
 				{
@@ -202,8 +214,7 @@ describe("EditorProjectStartGrid", () => {
 					y: 0,
 				},
 			],
-			onIncrement,
-			onMove,
+			onCellsChange,
 		});
 		const source = container.querySelector<HTMLButtonElement>(
 			'button[data-start-grid-cell][data-x="0"]',
@@ -238,16 +249,29 @@ describe("EditorProjectStartGrid", () => {
 			});
 		});
 
-		expect(onMove).toHaveBeenCalledWith(0, 0, 1, 0);
-		expect(onIncrement).not.toHaveBeenCalled();
+		expect(onCellsChange).toHaveBeenCalledWith([
+			{
+				itemId: "wood",
+				quantity: 2,
+				x: 1,
+				y: 0,
+			},
+		]);
 		expect(container.querySelector('[data-ui="EditorProjectStartGridDragPreview"]')).toBeNull();
 	});
 
 	it("increments with left click, decrements with right click, and respects max stack", async () => {
-		const callbacks = {
-			onDecrement: vi.fn<(x: number, y: number) => void>(),
-			onIncrement: vi.fn<(x: number, y: number) => void>(),
-		};
+		const onCellsChange =
+			vi.fn<
+				(
+					cells: ReadonlyArray<{
+						itemId: string;
+						quantity: number;
+						x: number;
+						y: number;
+					}>,
+				) => void
+			>();
 		const { container } = await renderGrid({
 			cells: [
 				{
@@ -257,7 +281,7 @@ describe("EditorProjectStartGrid", () => {
 					y: 0,
 				},
 			],
-			...callbacks,
+			onCellsChange,
 		});
 		const occupied = container.querySelector<HTMLButtonElement>(
 			'button[aria-label="Wood, quantity 2"]',
@@ -265,8 +289,16 @@ describe("EditorProjectStartGrid", () => {
 		if (occupied === null) throw new Error("Missing occupied start slot.");
 
 		await act(async () => occupied.click());
-		expect(callbacks.onIncrement).toHaveBeenCalledWith(0, 0);
+		expect(onCellsChange).toHaveBeenCalledWith([
+			{
+				itemId: "wood",
+				quantity: 3,
+				x: 0,
+				y: 0,
+			},
+		]);
 
+		onCellsChange.mockClear();
 		await act(async () => {
 			occupied.dispatchEvent(
 				new MouseEvent("contextmenu", {
@@ -275,9 +307,16 @@ describe("EditorProjectStartGrid", () => {
 				}),
 			);
 		});
-		expect(callbacks.onDecrement).toHaveBeenCalledWith(0, 0);
+		expect(onCellsChange).toHaveBeenCalledWith([
+			{
+				itemId: "wood",
+				quantity: 1,
+				x: 0,
+				y: 0,
+			},
+		]);
 
-		callbacks.onIncrement.mockClear();
+		onCellsChange.mockClear();
 		const full = await renderGrid({
 			cells: [
 				{
@@ -287,13 +326,87 @@ describe("EditorProjectStartGrid", () => {
 					y: 0,
 				},
 			],
-			onIncrement: callbacks.onIncrement,
+			onCellsChange,
 		});
 		const fullSlot = full.container.querySelector<HTMLButtonElement>(
 			'button[aria-label="Wood, quantity 3"]',
 		);
 		if (fullSlot === null) throw new Error("Missing full start stack.");
 		await act(async () => fullSlot.click());
-		expect(callbacks.onIncrement).not.toHaveBeenCalled();
+		expect(onCellsChange).not.toHaveBeenCalled();
+	});
+
+	it("decrements, removes, and relocates a stack from the keyboard", async () => {
+		const onCellsChange =
+			vi.fn<
+				(
+					cells: ReadonlyArray<{
+						itemId: string;
+						quantity: number;
+						x: number;
+						y: number;
+					}>,
+				) => void
+			>();
+		const { container } = await renderGrid({
+			cells: [
+				{
+					itemId: "wood",
+					quantity: 2,
+					x: 0,
+					y: 0,
+				},
+			],
+			onCellsChange,
+		});
+		const occupied = container.querySelector<HTMLButtonElement>(
+			'button[data-start-grid-cell][data-x="0"]',
+		);
+		if (occupied === null) throw new Error("Missing occupied start slot.");
+
+		await act(async () => {
+			occupied.dispatchEvent(
+				new KeyboardEvent("keydown", {
+					bubbles: true,
+					key: "-",
+				}),
+			);
+		});
+		expect(onCellsChange).toHaveBeenLastCalledWith([
+			{
+				itemId: "wood",
+				quantity: 1,
+				x: 0,
+				y: 0,
+			},
+		]);
+
+		await act(async () => {
+			occupied.dispatchEvent(
+				new KeyboardEvent("keydown", {
+					altKey: true,
+					bubbles: true,
+					key: "ArrowRight",
+				}),
+			);
+		});
+		expect(onCellsChange).toHaveBeenLastCalledWith([
+			{
+				itemId: "wood",
+				quantity: 2,
+				x: 1,
+				y: 0,
+			},
+		]);
+
+		await act(async () => {
+			occupied.dispatchEvent(
+				new KeyboardEvent("keydown", {
+					bubbles: true,
+					key: "Delete",
+				}),
+			);
+		});
+		expect(onCellsChange).toHaveBeenLastCalledWith([]);
 	});
 });

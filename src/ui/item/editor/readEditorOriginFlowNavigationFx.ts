@@ -1,6 +1,7 @@
 import { Effect } from "effect";
 
 import type { EditorItemOriginFlow } from "~/bridge/item/editor/readEditorItemOriginFlowFx";
+import type { EditorOriginFlowDirection } from "~/ui/item/editor/readEditorOriginFlowHighlightFx";
 
 interface FlowNavigationPosition {
 	readonly flowOrder: number;
@@ -42,12 +43,13 @@ const readTurnCost = (
 	return 1 - Math.max(-1, Math.min(1, cosine));
 };
 
-/** Reads one stable depth-first Income walk by reversing the active acquisition edges. */
+/** Reads one stable depth-first walk through the active directional flow. */
 export const readEditorOriginFlowNavigationFx = Effect.fn("readEditorOriginFlowNavigationFx")(
 	(
 		flow: EditorItemOriginFlow,
 		positions: ReadonlyMap<string, FlowNavigationPosition>,
 		startNodeId: string,
+		direction: EditorOriginFlowDirection,
 		allowedEdgeIds?: ReadonlySet<string>,
 	) =>
 		Effect.sync((): ReadonlyArray<string> => {
@@ -57,14 +59,17 @@ export const readEditorOriginFlowNavigationFx = Effect.fn("readEditorOriginFlowN
 			const targetsBySource = new Map<string, Set<string>>();
 			for (const edge of flow.edges) {
 				if (allowedEdgeIds !== undefined && !allowedEdgeIds.has(edge.id)) continue;
-				const sourceId = edge.target;
-				const targetId = edge.source;
+				const sourceId = direction === "income" ? edge.target : edge.source;
+				const targetId = direction === "income" ? edge.source : edge.target;
 				const source = positions.get(sourceId);
 				const target = positions.get(targetId);
 				if (source === undefined || target === undefined) continue;
-				const movesUpstream =
-					allowedEdgeIds !== undefined || target.flowOrder < source.flowOrder;
-				if (!movesUpstream) continue;
+				const movesWithDirection =
+					allowedEdgeIds !== undefined ||
+					(direction === "income"
+						? target.flowOrder < source.flowOrder
+						: target.flowOrder > source.flowOrder);
+				if (!movesWithDirection) continue;
 				const targets = targetsBySource.get(sourceId) ?? new Set<string>();
 				targets.add(targetId);
 				targetsBySource.set(sourceId, targets);

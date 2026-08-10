@@ -5,7 +5,7 @@ import { EditorProjectStartGrid } from "~/ui/project/editor/EditorProjectStartGr
 import { useEditorProjectFormSession } from "~/ui/project/editor/EditorProjectFormContext";
 
 export const EditorProjectInventorySection = () => {
-	const { form, project } = useEditorProjectFormSession();
+	const { form } = useEditorProjectFormSession();
 	const width = useStore(form.store, (state) => state.values.inventory.width);
 	const height = useStore(form.store, (state) => state.values.inventory.height);
 	const startInventory = useStore(form.store, (state) => state.values.start.inventory);
@@ -15,34 +15,6 @@ export const EditorProjectInventorySection = () => {
 		x: entry.position.x,
 		y: entry.position.y,
 	}));
-	const findIndex = (x: number, y: number) =>
-		startInventory.findIndex((entry) => entry.position.x === x && entry.position.y === y);
-
-	const moveStack = (sourceX: number, sourceY: number, targetX: number, targetY: number) => {
-		if (sourceX === targetX && sourceY === targetY) return;
-		const sourceIndex = findIndex(sourceX, sourceY);
-		const source = startInventory[sourceIndex];
-		if (source === undefined) return;
-		form.setFieldValue(
-			"start.inventory",
-			startInventory.flatMap((entry, index) => {
-				if (index === sourceIndex)
-					return [
-						{
-							...entry,
-							position: {
-								x: targetX,
-								y: targetY,
-							},
-						},
-					];
-				if (entry.position.x === targetX && entry.position.y === targetY) return [];
-				return [
-					entry,
-				];
-			}),
-		);
-	};
 	return (
 		<div className="grid gap-6">
 			<EditorFormSection
@@ -75,61 +47,20 @@ export const EditorProjectInventorySection = () => {
 				<EditorProjectStartGrid
 					cells={cells}
 					height={height}
-					scope="inventory"
-					width={width}
-					onMove={moveStack}
-					onSet={(x, y, itemId) =>
-						form.setFieldValue("start.inventory", [
-							...startInventory,
-							{
-								itemId,
+					onCellsChange={(nextCells) =>
+						form.setFieldValue(
+							"start.inventory",
+							nextCells.map(({ x, y, ...cell }) => ({
+								...cell,
 								position: {
 									x,
 									y,
 								},
-								quantity: 1,
-							},
-						])
+							})),
+						)
 					}
-					onIncrement={(x, y) => {
-						const index = findIndex(x, y);
-						const current = startInventory[index];
-						if (current === undefined) return;
-						const maxStackSize =
-							project.config.items[current.itemId]?.maxStackSize ?? 1;
-						if (current.quantity >= maxStackSize) return;
-						form.setFieldValue(
-							"start.inventory",
-							startInventory.map((entry, candidateIndex) =>
-								candidateIndex === index
-									? {
-											...entry,
-											quantity: entry.quantity + 1,
-										}
-									: entry,
-							),
-						);
-					}}
-					onDecrement={(x, y) => {
-						const index = findIndex(x, y);
-						const current = startInventory[index];
-						if (current === undefined) return;
-						form.setFieldValue(
-							"start.inventory",
-							current.quantity <= 1
-								? startInventory.filter(
-										(_, candidateIndex) => candidateIndex !== index,
-									)
-								: startInventory.map((entry, candidateIndex) =>
-										candidateIndex === index
-											? {
-													...entry,
-													quantity: entry.quantity - 1,
-												}
-											: entry,
-									),
-						);
-					}}
+					scope="inventory"
+					width={width}
 				/>
 			</EditorFormSection>
 		</div>

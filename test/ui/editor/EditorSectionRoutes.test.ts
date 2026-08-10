@@ -34,7 +34,7 @@ describe("editor section routes", () => {
 	it("redirects a removed Project section to General without retaining the dead history leaf", () => {
 		const redirect = readRedirect(readBeforeLoad(ProjectSectionRoute), {
 			projectId: "project-test",
-			sectionId: "board",
+			sectionId: "surfaces",
 		});
 
 		expect(redirect.options).toMatchObject({

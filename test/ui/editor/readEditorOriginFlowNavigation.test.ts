@@ -2,6 +2,7 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import type { EditorItemOriginFlow } from "~/bridge/item/editor/readEditorItemOriginFlowFx";
+import type { EditorOriginFlowDirection } from "~/ui/item/editor/readEditorOriginFlowHighlightFx";
 import { readEditorOriginFlowNavigationFx } from "~/ui/item/editor/readEditorOriginFlowNavigationFx";
 
 const flow = {
@@ -86,10 +87,17 @@ const runNavigation = (
 	flowInput: EditorItemOriginFlow,
 	positionInput: typeof positions,
 	startNodeId: string,
+	direction: EditorOriginFlowDirection = "income",
 	allowedEdgeIds?: ReadonlySet<string>,
 ) =>
 	Effect.runSync(
-		readEditorOriginFlowNavigationFx(flowInput, positionInput, startNodeId, allowedEdgeIds),
+		readEditorOriginFlowNavigationFx(
+			flowInput,
+			positionInput,
+			startNodeId,
+			direction,
+			allowedEdgeIds,
+		),
 	);
 
 describe("readEditorOriginFlowNavigation", () => {
@@ -99,6 +107,16 @@ describe("readEditorOriginFlowNavigation", () => {
 			"side",
 			"a",
 			"root",
+		]);
+	});
+
+	it("walks forward through Outcome products", () => {
+		expect(runNavigation(flow, positions, "root", "outcome")).toEqual([
+			"root",
+			"a",
+			"straight",
+			"side",
+			"end",
 		]);
 	});
 
@@ -233,6 +251,7 @@ describe("readEditorOriginFlowNavigation", () => {
 				flow,
 				positions,
 				"end",
+				"income",
 				new Set([
 					"side-end",
 					"a-side",

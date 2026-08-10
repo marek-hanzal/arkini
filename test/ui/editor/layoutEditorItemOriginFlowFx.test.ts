@@ -123,6 +123,18 @@ const expectOrthogonalRoute = (
 };
 
 describe("layoutEditorItemOriginFlowFx", () => {
+	it("keeps an empty topology empty", () => {
+		const layout = Effect.runSync(
+			layoutEditorItemOriginFlowFx({
+				edges: [],
+				nodes: [],
+			}),
+		);
+
+		expect(layout.positions.size).toBe(0);
+		expect(layout.backbones.size).toBe(0);
+	});
+
 	it("keeps a deterministic forward order independent of input order", () => {
 		const flow: EditorItemOriginFlowLayoutInput = {
 			edges: [

@@ -5,19 +5,20 @@ import {
 	useLayoutEffect,
 	useMemo,
 	useRef,
-	useState,
 	type PointerEvent as ReactPointerEvent,
 } from "react";
 
-import {
-	EditorItemOriginItemInputPortId,
-	EditorItemOriginItemOutputPortId,
-	type EditorItemOriginFlow,
-	type EditorItemOriginItemNode,
-	type EditorItemOriginOperationKind,
-} from "~/bridge/item/editor/readEditorItemOriginFlowFx";
+import { type EditorItemOriginFlow } from "~/bridge/item/editor/readEditorItemOriginFlowFx";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
-import { ItemTypeLabel } from "~/ui/item-detail/ItemInfoPresentation";
+import {
+	createEditorOriginFlowCanvasPainterFx,
+	type EditorOriginFlowCanvasPalette,
+} from "~/ui/item/editor/createEditorOriginFlowCanvasPainterFx";
+import {
+	createEditorOriginFlowViewportFx,
+	type EditorOriginFlowBounds as Bounds,
+	type EditorOriginFlowViewport as Viewport,
+} from "~/ui/item/editor/createEditorOriginFlowViewportFx";
 import type {
 	EditorItemOriginFlowLayoutNode,
 	EditorItemOriginFlowLayoutPoint,
@@ -26,41 +27,21 @@ import {
 	type EditorOriginFlowDirection,
 	type EditorOriginFlowHighlight,
 	type EditorOriginFlowSelection,
-	readEditorOriginFlowHighlightFx,
 } from "~/ui/item/editor/readEditorOriginFlowHighlightFx";
-import { readEditorOriginFlowNavigationFx } from "~/ui/item/editor/readEditorOriginFlowNavigationFx";
-import { readEditorOriginFlowRelationNavigationFx } from "~/ui/item/editor/readEditorOriginFlowRelationNavigationFx";
-import { readEditorOriginFlowRootNavigationFx } from "~/ui/item/editor/readEditorOriginFlowRootNavigationFx";
-import { readEditorOriginFlowVisibleHighlightFx } from "~/ui/item/editor/readEditorOriginFlowVisibleHighlightFx";
-import { readEditorOriginFlowMetroBackbonesFx } from "~/ui/item/editor/readEditorOriginFlowMetroBackbonesFx";
 import { EditorOriginFlowShortcutHelp } from "~/ui/item/editor/EditorOriginFlowShortcutHelp";
 import {
 	type EditorOriginFlowConnectedPorts,
 	readEditorOriginFlowConnectedPortsFx,
 } from "~/ui/item/editor/readEditorOriginFlowConnectedPortsFx";
 import {
-	EditorOriginFlowOperationContentPadding,
-	EditorOriginFlowOperationHeaderHeight,
-	EditorOriginFlowOperationSidePadding,
 	type EditorOriginFlowNodeMetrics,
 	readEditorOriginFlowNodeMetricsFx,
 } from "~/ui/item/editor/readEditorOriginFlowNodeMetricsFx";
-import { popEditorOriginFlowVisitFx } from "~/ui/item/editor/popEditorOriginFlowVisitFx";
 import { pushEditorOriginFlowVisitFx } from "~/ui/item/editor/pushEditorOriginFlowVisitFx";
+import { readEditorOriginFlowHitFx } from "~/ui/item/editor/readEditorOriginFlowHitFx";
+import { useEditorOriginFlowProjection } from "~/ui/item/editor/useEditorOriginFlowProjection";
+import { useEditorOriginFlowNavigation } from "~/ui/item/editor/useEditorOriginFlowNavigation";
 import { useEditorResourceUrls } from "~/ui/resource/editor/useEditorResourceUrl";
-
-interface Viewport {
-	x: number;
-	y: number;
-	zoom: number;
-}
-
-interface Bounds {
-	readonly maxX: number;
-	readonly maxY: number;
-	readonly minX: number;
-	readonly minY: number;
-}
 
 interface PanState {
 	moved: boolean;
@@ -98,1160 +79,9 @@ interface RenderState {
 	readonly selection: EditorOriginFlowSelection | undefined;
 }
 
-const DefaultViewport: Viewport = {
-	x: 24,
-	y: 24,
-	zoom: 0.75,
-};
-const MinZoom = 0.025;
-const MaxZoom = 1.4;
-const SearchFocusZoom = 1;
-const FitPaddingRatio = 0.12;
+const FlowViewport = RendererRuntime.runSync(createEditorOriginFlowViewportFx());
+const FlowPainter = RendererRuntime.runSync(createEditorOriginFlowCanvasPainterFx());
 const ClickThreshold = 5;
-const EdgeHitRadiusPx = 9;
-const PortHitRadiusPx = 11;
-const EdgeCullPaddingPx = 64;
-const MaxCachedImages = 96;
-const HighlightMinimumOpacity = 0.28;
-const HighlightOpacityStep = 0.12;
-
-const readHighlightOpacity = (level: number | undefined) =>
-	level === undefined
-		? 1
-		: Math.max(HighlightMinimumOpacity, 1 - Math.max(0, level) * HighlightOpacityStep);
-
-const HighlightRouteColors = Array.from(
-	{
-		length: 64,
-	},
-	(_, index) => {
-		const hue = (index * 137.50776405003785) % 360;
-		const band = index % 4;
-		const saturation = [
-			88,
-			76,
-			94,
-			70,
-		][band]!;
-		const lightness = [
-			38,
-			48,
-			32,
-			56,
-		][band]!;
-		return `hsl(${hue.toFixed(1)}, ${saturation}%, ${lightness}%)`;
-	},
-);
-
-const hashText = (value: string) => {
-	let hash = 2166136261;
-	for (let index = 0; index < value.length; index += 1) {
-		hash ^= value.charCodeAt(index);
-		hash = Math.imul(hash, 16777619);
-	}
-	return hash >>> 0;
-};
-
-const readHighlightedEdgeColors = (
-	flow: EditorItemOriginFlow,
-	selection: EditorOriginFlowSelection | undefined,
-	highlight: EditorOriginFlowHighlight | undefined,
-) => {
-	if (selection === undefined) return new Map<string, string>();
-	const highlightedIds = new Set(highlight?.edgeIds ?? []);
-	if (selection.kind === "edge") highlightedIds.add(selection.id);
-	const edgeIds = flow.edges
-		.map(({ id }) => id)
-		.filter((id) => highlightedIds.has(id))
-		.sort((left, right) => left.localeCompare(right));
-	const offset = hashText(selection.id) % HighlightRouteColors.length;
-	return new Map(
-		edgeIds.map(
-			(edgeId, index) =>
-				[
-					edgeId,
-					HighlightRouteColors[(offset + index) % HighlightRouteColors.length]!,
-				] as const,
-		),
-	);
-};
-
-const readHighlightedPortColors = (
-	flow: EditorItemOriginFlow,
-	edgeColors: ReadonlyMap<string, string>,
-) => {
-	const byNodeId = new Map<string, Map<string, string>>();
-	const write = (nodeId: string, portId: string | undefined, color: string) => {
-		if (portId === undefined) return;
-		let colors = byNodeId.get(nodeId);
-		if (colors === undefined) {
-			colors = new Map();
-			byNodeId.set(nodeId, colors);
-		}
-		if (!colors.has(portId)) colors.set(portId, color);
-	};
-	for (const edge of flow.edges) {
-		const color = edgeColors.get(edge.id);
-		if (color === undefined) continue;
-		write(edge.source, edge.sourcePortId, color);
-		write(edge.target, edge.targetPortId, color);
-	}
-	return byNodeId as ReadonlyMap<string, ReadonlyMap<string, string>>;
-};
-
-const traceFlowRoute = (
-	context: CanvasRenderingContext2D,
-	points: ReadonlyArray<EditorItemOriginFlowLayoutPoint>,
-) => {
-	const first = points[0];
-	if (first === undefined) return;
-	context.moveTo(first.x, first.y);
-	for (const point of points.slice(1)) context.lineTo(point.x, point.y);
-};
-
-interface CanvasPalette {
-	readonly accent: string;
-	readonly canvas: string;
-	readonly danger: string;
-	readonly foreground: string;
-	readonly info: string;
-	readonly itemSurfaces: Readonly<Record<EditorItemOriginItemNode["type"], string>>;
-	readonly line: string;
-	readonly lineStrong: string;
-	readonly muted: string;
-	readonly sourceSurfaces: Readonly<Record<EditorItemOriginOperationKind, string>>;
-	readonly success: string;
-	readonly warning: string;
-}
-
-const readCanvasPalette = (host: HTMLElement): CanvasPalette => {
-	const probe = document.createElement("span");
-	probe.style.display = "none";
-	(host.parentElement ?? document.body).append(probe);
-	try {
-		const read = (property: string) => {
-			probe.style.color = `var(${property})`;
-			return getComputedStyle(probe).color;
-		};
-		return {
-			accent: read("--ak-accent"),
-			canvas: read("--ak-canvas"),
-			danger: read("--ak-danger"),
-			foreground: read("--ak-foreground"),
-			info: read("--ak-info"),
-			itemSurfaces: {
-				blueprint: read("--ak-flow-item-blueprint-surface"),
-				craft: read("--ak-flow-item-craft-surface"),
-				deposit: read("--ak-flow-item-deposit-surface"),
-				inventory: read("--ak-flow-item-inventory-surface"),
-				missing: read("--ak-flow-item-missing-surface"),
-				producer: read("--ak-flow-item-producer-surface"),
-				simple: read("--ak-flow-item-simple-surface"),
-				stash: read("--ak-flow-item-stash-surface"),
-				temporary: read("--ak-flow-item-temporary-surface"),
-			},
-			line: read("--ak-line"),
-			lineStrong: read("--ak-line-strong"),
-			muted: read("--ak-muted"),
-			sourceSurfaces: {
-				charges: read("--ak-flow-source-charges-surface"),
-				expiry: read("--ak-flow-source-expiry-surface"),
-				line: read("--ak-flow-source-line-surface"),
-				merge: read("--ak-flow-source-merge-surface"),
-			},
-			success: read("--ak-success"),
-			warning: read("--ak-warning"),
-		};
-	} finally {
-		probe.remove();
-	}
-};
-
-const readItemTypeColor = (palette: CanvasPalette, type: EditorItemOriginItemNode["type"]) => {
-	switch (type) {
-		case "blueprint":
-		case "producer":
-			return palette.accent;
-		case "craft":
-		case "deposit":
-			return palette.warning;
-		case "inventory":
-		case "stash":
-			return palette.info;
-		case "missing":
-		case "temporary":
-			return palette.danger;
-		case "simple":
-			return palette.lineStrong;
-	}
-};
-
-const readSourceKindColor = (palette: CanvasPalette, kind: EditorItemOriginOperationKind) => {
-	switch (kind) {
-		case "line":
-			return palette.accent;
-		case "charges":
-			return palette.warning;
-		case "merge":
-			return palette.success;
-		case "expiry":
-			return palette.danger;
-	}
-};
-
-const SourceKindIconPath: Record<EditorItemOriginOperationKind, string> = {
-	line: "M12 16h.01M16 16h.01M3 19a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8.5a.5.5 0 0 0-.769-.422l-4.462 2.844A.5.5 0 0 1 15 10.5v-2a.5.5 0 0 0-.769-.422L9.77 10.922A.5.5 0 0 1 9 10.5V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2zm5-3h.01",
-	charges:
-		"m11 7-3 5h4l-3 5m5.856-11H16a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-2.935M22 14v-4M5.14 18H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h2.936",
-	merge: "M14 3a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1m5-7a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1M7 15l3 3m-3 3 3-3H5a2 2 0 0 1-2-2v-2",
-	expiry: "M10 2h4m-2 12 3-3",
-};
-const sourceIconPathCache = new Map<EditorItemOriginOperationKind, Path2D>();
-
-const clampZoom = (zoom: number) => Math.max(MinZoom, Math.min(MaxZoom, zoom));
-
-const readFlowBounds = (positions: ReadonlyMap<string, EditorItemOriginFlowLayoutNode>) => {
-	let minX = Number.POSITIVE_INFINITY;
-	let minY = Number.POSITIVE_INFINITY;
-	let maxX = Number.NEGATIVE_INFINITY;
-	let maxY = Number.NEGATIVE_INFINITY;
-	for (const node of positions.values()) {
-		minX = Math.min(minX, node.x);
-		minY = Math.min(minY, node.y);
-		maxX = Math.max(maxX, node.x + node.width);
-		maxY = Math.max(maxY, node.y + node.height);
-	}
-	if (
-		![
-			minX,
-			minY,
-			maxX,
-			maxY,
-		].every(Number.isFinite)
-	)
-		return {
-			maxX: 1,
-			maxY: 1,
-			minX: 0,
-			minY: 0,
-		};
-	return {
-		maxX,
-		maxY,
-		minX,
-		minY,
-	};
-};
-
-const readFitViewport = (
-	positions: ReadonlyMap<string, EditorItemOriginFlowLayoutNode>,
-	width: number,
-	height: number,
-): Viewport => {
-	const bounds = readFlowBounds(positions);
-	const contentWidth = Math.max(1, bounds.maxX - bounds.minX);
-	const contentHeight = Math.max(1, bounds.maxY - bounds.minY);
-	const availableWidth = Math.max(1, width * (1 - FitPaddingRatio * 2));
-	const availableHeight = Math.max(1, height * (1 - FitPaddingRatio * 2));
-	const zoom = clampZoom(
-		Math.min(availableWidth / contentWidth, availableHeight / contentHeight),
-	);
-	return {
-		x: (width - contentWidth * zoom) / 2 - bounds.minX * zoom,
-		y: (height - contentHeight * zoom) / 2 - bounds.minY * zoom,
-		zoom,
-	};
-};
-
-const readNodeViewport = (
-	position: EditorItemOriginFlowLayoutNode,
-	width: number,
-	height: number,
-	zoom: number,
-): Viewport => ({
-	x: width / 2 - (position.x + position.width / 2) * zoom,
-	y: height / 2 - (position.y + position.height / 2) * zoom,
-	zoom,
-});
-
-const readInitialFocusPosition = (
-	flow: EditorItemOriginFlow,
-	positions: ReadonlyMap<string, EditorItemOriginFlowLayoutNode>,
-) => {
-	const candidates = flow.nodes
-		.filter((node) => node.starterScopes.length > 0)
-		.map((node) => ({
-			id: node.id,
-			position: positions.get(node.id),
-		}))
-		.filter(
-			(
-				candidate,
-			): candidate is {
-				readonly id: string;
-				readonly position: EditorItemOriginFlowLayoutNode;
-			} => candidate.position !== undefined,
-		)
-		.sort(
-			(left, right) =>
-				left.position.flowOrder - right.position.flowOrder ||
-				left.id.localeCompare(right.id),
-		);
-	if (candidates[0] !== undefined) return candidates[0].position;
-	return [
-		...positions.entries(),
-	].sort(
-		([leftId, left], [rightId, right]) =>
-			left.flowOrder - right.flowOrder || leftId.localeCompare(rightId),
-	)[0]?.[1];
-};
-
-type FlowNavigationShortcut =
-	| "back"
-	| "depth-less"
-	| "depth-more"
-	| "depth-reset"
-	| "help"
-	| "home"
-	| "inputs"
-	| "next"
-	| "outputs"
-	| "previous"
-	| "roots";
-
-const DefaultHighlightDepth = 1;
-
-const readFlowNavigationShortcut = (event: KeyboardEvent): FlowNavigationShortcut | undefined => {
-	const target = event.target;
-	if (
-		event.repeat ||
-		event.altKey ||
-		event.ctrlKey ||
-		event.metaKey ||
-		(target instanceof HTMLElement &&
-			(target.isContentEditable ||
-				target.tagName === "INPUT" ||
-				target.tagName === "SELECT" ||
-				target.tagName === "TEXTAREA"))
-	)
-		return undefined;
-	switch (event.key.toLowerCase()) {
-		case "k":
-			return "depth-more";
-		case "l":
-			return "depth-less";
-		case "0":
-			return "depth-reset";
-		case "n":
-			return "next";
-		case "p":
-			return "previous";
-		case "h":
-			return "home";
-		case "i":
-			return "inputs";
-		case "o":
-			return "outputs";
-		case "s":
-			return "roots";
-		case "z":
-			return "back";
-		case "?":
-			return "help";
-		default:
-			return undefined;
-	}
-};
-
-const readVisibleWorldBounds = (
-	viewport: Viewport,
-	width: number,
-	height: number,
-	paddingPx = 0,
-): Bounds => {
-	const padding = paddingPx / viewport.zoom;
-	return {
-		maxX: (width - viewport.x) / viewport.zoom + padding,
-		maxY: (height - viewport.y) / viewport.zoom + padding,
-		minX: -viewport.x / viewport.zoom - padding,
-		minY: -viewport.y / viewport.zoom - padding,
-	};
-};
-
-const isNodeVisible = (position: EditorItemOriginFlowLayoutNode, visible: Bounds) =>
-	position.x + position.width >= visible.minX &&
-	position.y + position.height >= visible.minY &&
-	position.x <= visible.maxX &&
-	position.y <= visible.maxY;
-
-const readBackboneBounds = (
-	backbones: ReadonlyMap<string, ReadonlyArray<EditorItemOriginFlowLayoutPoint>>,
-) =>
-	new Map(
-		[
-			...backbones,
-		].map(([id, backbone]) => {
-			let minX = Number.POSITIVE_INFINITY;
-			let minY = Number.POSITIVE_INFINITY;
-			let maxX = Number.NEGATIVE_INFINITY;
-			let maxY = Number.NEGATIVE_INFINITY;
-			for (const point of backbone) {
-				minX = Math.min(minX, point.x);
-				minY = Math.min(minY, point.y);
-				maxX = Math.max(maxX, point.x);
-				maxY = Math.max(maxY, point.y);
-			}
-			return [
-				id,
-				{
-					maxX,
-					maxY,
-					minX,
-					minY,
-				} satisfies Bounds,
-			] as const;
-		}),
-	);
-
-const isEdgeVisible = (bounds: Bounds, visible: Bounds) =>
-	bounds.maxX >= visible.minX &&
-	bounds.maxY >= visible.minY &&
-	bounds.minX <= visible.maxX &&
-	bounds.minY <= visible.maxY;
-
-const drawRoundedRect = (
-	context: CanvasRenderingContext2D,
-	x: number,
-	y: number,
-	width: number,
-	height: number,
-	radius: number,
-) => {
-	context.beginPath();
-	context.roundRect(x, y, width, height, radius);
-};
-
-const readFittingPrefixLength = (
-	context: CanvasRenderingContext2D,
-	value: string,
-	maxWidth: number,
-	suffix = "",
-) => {
-	let lower = 0;
-	let upper = value.length;
-	while (lower < upper) {
-		const middle = Math.ceil((lower + upper) / 2);
-		if (context.measureText(`${value.slice(0, middle)}${suffix}`).width <= maxWidth)
-			lower = middle;
-		else upper = middle - 1;
-	}
-	return lower;
-};
-
-const fitText = (context: CanvasRenderingContext2D, value: string, maxWidth: number) => {
-	if (context.measureText(value).width <= maxWidth) return value;
-	const end = readFittingPrefixLength(context, value, maxWidth, "…");
-	return end === 0 ? "" : `${value.slice(0, end)}…`;
-};
-
-const wrapText = (
-	context: CanvasRenderingContext2D,
-	value: string,
-	maxWidth: number,
-	maxLines: number,
-) => {
-	const words = value.trim().split(/\s+/).filter(Boolean);
-	if (words.length === 0) return [] as string[];
-	const lines: string[] = [];
-	let current = "";
-	for (let index = 0; index < words.length; index += 1) {
-		const word = words[index]!;
-		const candidate = current.length === 0 ? word : `${current} ${word}`;
-		if (context.measureText(candidate).width <= maxWidth) {
-			current = candidate;
-			continue;
-		}
-		if (current.length > 0) {
-			lines.push(current);
-			current = word;
-		} else {
-			lines.push(fitText(context, word, maxWidth));
-			current = "";
-		}
-		if (lines.length === maxLines) {
-			const remainder = [
-				current,
-				...words.slice(index + 1),
-			]
-				.filter(Boolean)
-				.join(" ");
-			if (remainder.length > 0)
-				lines[maxLines - 1] = fitText(
-					context,
-					`${lines[maxLines - 1]} ${remainder}`,
-					maxWidth,
-				);
-			return lines;
-		}
-	}
-	if (current.length > 0 && lines.length < maxLines) lines.push(current);
-	return lines;
-};
-
-const wrapIdentifier = (
-	context: CanvasRenderingContext2D,
-	value: string,
-	maxWidth: number,
-	maxLines: number,
-) => {
-	const lines: string[] = [];
-	let remaining = value.trim();
-	while (remaining.length > 0 && lines.length < maxLines) {
-		if (context.measureText(remaining).width <= maxWidth) {
-			lines.push(remaining);
-			break;
-		}
-
-		const end = Math.max(1, readFittingPrefixLength(context, remaining, maxWidth));
-		if (lines.length === maxLines - 1) {
-			lines.push(fitText(context, remaining, maxWidth));
-			break;
-		}
-
-		let breakAt = end;
-		for (let index = end - 1; index >= Math.floor(end * 0.55); index -= 1) {
-			if (":/-_.".includes(remaining[index]!)) {
-				breakAt = index + 1;
-				break;
-			}
-		}
-		lines.push(remaining.slice(0, breakAt));
-		remaining = remaining.slice(breakAt);
-	}
-	return lines;
-};
-
-const drawTextLines = (
-	context: CanvasRenderingContext2D,
-	lines: ReadonlyArray<string>,
-	x: number,
-	y: number,
-	lineHeight: number,
-) => {
-	for (const [index, line] of lines.entries()) context.fillText(line, x, y + index * lineHeight);
-};
-
-const drawNodeFrame = (
-	context: CanvasRenderingContext2D,
-	position: EditorItemOriginFlowLayoutNode,
-	radius: number,
-	background: string,
-	idleBorder: string,
-	highlight: "active" | "idle" | "selected",
-	palette: CanvasPalette,
-) => {
-	if (radius === 0) {
-		context.beginPath();
-		context.rect(position.x, position.y, position.width, position.height);
-	} else
-		drawRoundedRect(context, position.x, position.y, position.width, position.height, radius);
-	context.fillStyle = background;
-	context.fill();
-	context.lineWidth = highlight === "selected" ? 4 : highlight === "active" ? 2.5 : 2;
-	context.strokeStyle = highlight === "idle" ? idleBorder : palette.accent;
-	context.stroke();
-};
-
-const readReadyImage = (
-	cache: Map<string, HTMLImageElement>,
-	url: string | undefined,
-	onReady: () => void,
-) => {
-	if (url === undefined) return undefined;
-	const existing = cache.get(url);
-	if (existing !== undefined) {
-		cache.delete(url);
-		cache.set(url, existing);
-		return existing.complete && existing.naturalWidth > 0 ? existing : undefined;
-	}
-	const image = new Image();
-	image.decoding = "async";
-	image.onload = onReady;
-	image.onerror = onReady;
-	cache.set(url, image);
-	while (cache.size > MaxCachedImages) {
-		const oldestUrl = cache.keys().next().value;
-		if (oldestUrl === undefined) break;
-		const oldest = cache.get(oldestUrl);
-		if (oldest !== undefined) oldest.src = "";
-		cache.delete(oldestUrl);
-	}
-	image.src = url;
-	return undefined;
-};
-
-const drawContainedImage = (
-	context: CanvasRenderingContext2D,
-	image: HTMLImageElement,
-	x: number,
-	y: number,
-	width: number,
-	height: number,
-) => {
-	const scale = Math.min(width / image.naturalWidth, height / image.naturalHeight);
-	const drawWidth = image.naturalWidth * scale;
-	const drawHeight = image.naturalHeight * scale;
-	context.drawImage(
-		image,
-		x + (width - drawWidth) / 2,
-		y + (height - drawHeight) / 2,
-		drawWidth,
-		drawHeight,
-	);
-};
-
-const drawItemArtwork = (
-	context: CanvasRenderingContext2D,
-	node: EditorItemOriginItemNode,
-	resourceUrls: ReadonlyMap<string, string>,
-	imageCache: Map<string, HTMLImageElement>,
-	onImageReady: () => void,
-	x: number,
-	y: number,
-	size: number,
-	palette: CanvasPalette,
-) => {
-	const background = readReadyImage(
-		imageCache,
-		resourceUrls.get(node.resourceIds[0]),
-		onImageReady,
-	);
-	const foreground = readReadyImage(
-		imageCache,
-		resourceUrls.get(node.resourceIds[1] ?? ""),
-		onImageReady,
-	);
-	if (background === undefined) {
-		context.fillStyle = palette.muted;
-		context.font = "600 22px Inter, ui-sans-serif, system-ui, sans-serif";
-		context.textAlign = "center";
-		context.fillText("?", x + size / 2, y + size / 2 + 8);
-		context.textAlign = "start";
-		return;
-	}
-	if (foreground === undefined) {
-		drawContainedImage(context, background, x, y, size, size);
-		return;
-	}
-	const layerSize = size * 0.74;
-	drawContainedImage(context, background, x, y, layerSize, layerSize);
-	drawContainedImage(
-		context,
-		foreground,
-		x + size - layerSize,
-		y + size - layerSize,
-		layerSize,
-		layerSize,
-	);
-};
-
-const drawSourceIcon = (
-	context: CanvasRenderingContext2D,
-	kind: EditorItemOriginOperationKind,
-	x: number,
-	y: number,
-	size: number,
-	color: string,
-) => {
-	let path = sourceIconPathCache.get(kind);
-	if (path === undefined) {
-		path = new Path2D(SourceKindIconPath[kind]);
-		sourceIconPathCache.set(kind, path);
-	}
-	context.save();
-	context.translate(x, y);
-	context.scale(size / 24, size / 24);
-	context.strokeStyle = color;
-	context.lineWidth = 2;
-	context.lineCap = "round";
-	context.lineJoin = "round";
-	context.stroke(path);
-	if (kind === "merge") {
-		context.beginPath();
-		context.roundRect(14, 14, 7, 7, 1);
-		context.roundRect(3, 3, 7, 7, 1);
-		context.stroke();
-	} else if (kind === "expiry") {
-		context.beginPath();
-		context.arc(12, 14, 8, 0, Math.PI * 2);
-		context.stroke();
-	}
-	context.restore();
-};
-
-const drawFlowPort = (
-	context: CanvasRenderingContext2D,
-	x: number,
-	y: number,
-	color: string,
-	background: string,
-	highlightColor?: string,
-) => {
-	context.beginPath();
-	context.arc(x, y, 6, 0, Math.PI * 2);
-	context.fillStyle = highlightColor ?? background;
-	context.fill();
-	context.lineWidth = 2.5;
-	context.strokeStyle = highlightColor ?? color;
-	context.stroke();
-};
-
-const drawItemNode = (
-	context: CanvasRenderingContext2D,
-	node: EditorItemOriginItemNode,
-	position: EditorItemOriginFlowLayoutNode,
-	metrics: EditorOriginFlowNodeMetrics,
-	highlight: "active" | "idle" | "selected",
-	opacity: number,
-	palette: CanvasPalette,
-	resourceUrls: ReadonlyMap<string, string>,
-	imageCache: Map<string, HTMLImageElement>,
-	onImageReady: () => void,
-	connectedPortIds: ReadonlySet<string> | undefined,
-	highlightedPortColors: ReadonlyMap<string, string> | undefined,
-) => {
-	const typeColor = readItemTypeColor(palette, node.type);
-	context.save();
-	context.globalAlpha = opacity;
-	drawNodeFrame(
-		context,
-		position,
-		0,
-		palette.itemSurfaces[node.type],
-		typeColor,
-		highlight,
-		palette,
-	);
-	if (connectedPortIds?.has(EditorItemOriginItemInputPortId) === true)
-		drawFlowPort(
-			context,
-			position.x,
-			position.y + metrics.itemPortY,
-			typeColor,
-			palette.itemSurfaces[node.type],
-			highlightedPortColors?.get(EditorItemOriginItemInputPortId),
-		);
-	if (connectedPortIds?.has(EditorItemOriginItemOutputPortId) === true)
-		drawFlowPort(
-			context,
-			position.x + position.width,
-			position.y + metrics.itemPortY,
-			typeColor,
-			palette.itemSurfaces[node.type],
-			highlightedPortColors?.get(EditorItemOriginItemOutputPortId),
-		);
-
-	const artworkSize = 68;
-	const artworkX = position.x + 16;
-	const artworkY = position.y + (metrics.headerHeight - artworkSize) / 2;
-	drawItemArtwork(
-		context,
-		node,
-		resourceUrls,
-		imageCache,
-		onImageReady,
-		artworkX,
-		artworkY,
-		artworkSize,
-		palette,
-	);
-
-	const textX = artworkX + artworkSize + 18;
-	const maxTextWidth = position.x + position.width - 18 - textX;
-	const titleLineHeight = 19;
-	const idLineHeight = 16;
-	const labelLineHeight = 12;
-	const blockGap = 7;
-	context.textBaseline = "top";
-	context.fillStyle = palette.foreground;
-	context.font = "600 15px Inter, ui-sans-serif, system-ui, sans-serif";
-	const titleLines = wrapText(context, node.title, maxTextWidth, 2);
-	context.font = "12px ui-monospace, SFMono-Regular, Menlo, monospace";
-	const idLines = wrapIdentifier(context, node.itemId, maxTextWidth, 2);
-	const textHeight =
-		titleLines.length * titleLineHeight +
-		blockGap +
-		idLines.length * idLineHeight +
-		blockGap +
-		labelLineHeight;
-	let textY = position.y + (metrics.headerHeight - textHeight) / 2;
-
-	context.fillStyle = palette.foreground;
-	context.font = "600 15px Inter, ui-sans-serif, system-ui, sans-serif";
-	drawTextLines(context, titleLines, textX, textY, titleLineHeight);
-	textY += titleLines.length * titleLineHeight + blockGap;
-
-	context.fillStyle = palette.muted;
-	context.font = "12px ui-monospace, SFMono-Regular, Menlo, monospace";
-	drawTextLines(context, idLines, textX, textY, idLineHeight);
-	textY += idLines.length * idLineHeight + blockGap;
-
-	context.font = "600 10px Inter, ui-sans-serif, system-ui, sans-serif";
-	const label =
-		node.starterScopes.length > 0
-			? `Starter: ${node.starterScopes.join(", ")}`
-			: node.type === "missing"
-				? "Missing item"
-				: ItemTypeLabel[node.type];
-	context.fillText(fitText(context, label.toUpperCase(), maxTextWidth), textX, textY);
-
-	if (node.operations.length > 0) {
-		context.beginPath();
-		context.moveTo(position.x + 12, position.y + metrics.headerHeight - 1);
-		context.lineTo(position.x + position.width - 12, position.y + metrics.headerHeight - 1);
-		context.strokeStyle = palette.lineStrong;
-		context.globalAlpha *= 0.35;
-		context.lineWidth = 1;
-		context.stroke();
-		context.globalAlpha = opacity;
-	}
-
-	for (const [operationIndex, operation] of node.operations.entries()) {
-		const operationMetrics = metrics.operations[operationIndex];
-		if (operationMetrics === undefined) continue;
-		const kindColor = readSourceKindColor(palette, operation.kind);
-		const rowX = position.x + EditorOriginFlowOperationSidePadding;
-		const rowY = position.y + operationMetrics.top;
-		const rowWidth = position.width - EditorOriginFlowOperationSidePadding * 2;
-		const rowHeight = operationMetrics.height;
-		drawRoundedRect(context, rowX, rowY, rowWidth, rowHeight, 10);
-		context.fillStyle = palette.sourceSurfaces[operation.kind];
-		context.fill();
-		context.globalAlpha *= 0.7;
-		context.strokeStyle = kindColor;
-		context.lineWidth = 1.25;
-		context.stroke();
-		context.globalAlpha = opacity;
-
-		const iconSize = 18;
-		const headerX = rowX + EditorOriginFlowOperationContentPadding;
-		const headerCenterY =
-			rowY +
-			EditorOriginFlowOperationContentPadding +
-			EditorOriginFlowOperationHeaderHeight / 2;
-		drawSourceIcon(
-			context,
-			operation.kind,
-			headerX,
-			headerCenterY - iconSize / 2,
-			iconSize,
-			kindColor,
-		);
-		context.fillStyle = palette.foreground;
-		context.font = "600 12px Inter, ui-sans-serif, system-ui, sans-serif";
-		context.textBaseline = "middle";
-		context.textAlign = "left";
-		context.fillText(
-			fitText(
-				context,
-				operation.label,
-				rowWidth - EditorOriginFlowOperationContentPadding * 2 - iconSize - 8,
-			),
-			headerX + iconSize + 8,
-			headerCenterY,
-		);
-
-		context.font = "500 11px Inter, ui-sans-serif, system-ui, sans-serif";
-		for (const input of operation.inputs) {
-			const portY = operationMetrics.inputPortYs.get(input.id);
-			if (portY === undefined) continue;
-			const worldY = position.y + portY;
-			if (connectedPortIds?.has(input.id) === true)
-				drawFlowPort(
-					context,
-					position.x,
-					worldY,
-					kindColor,
-					palette.itemSurfaces[node.type],
-					highlightedPortColors?.get(input.id),
-				);
-			context.fillStyle = palette.foreground;
-			context.textAlign = "left";
-			context.textBaseline = "middle";
-			context.fillText(
-				fitText(context, input.label, 104),
-				rowX + EditorOriginFlowOperationContentPadding,
-				worldY,
-			);
-		}
-		for (const output of operation.outputs) {
-			const portY = operationMetrics.outputPortYs.get(output.id);
-			if (portY === undefined) continue;
-			const worldY = position.y + portY;
-			if (connectedPortIds?.has(output.id) === true)
-				drawFlowPort(
-					context,
-					position.x + position.width,
-					worldY,
-					kindColor,
-					palette.itemSurfaces[node.type],
-					highlightedPortColors?.get(output.id),
-				);
-			context.fillStyle = palette.foreground;
-			context.textAlign = "right";
-			context.textBaseline = "middle";
-			context.fillText(
-				fitText(context, output.label, 104),
-				rowX + rowWidth - EditorOriginFlowOperationContentPadding,
-				worldY,
-			);
-		}
-	}
-	context.textAlign = "start";
-	context.restore();
-};
-
-const drawArrow = (
-	context: CanvasRenderingContext2D,
-	from: EditorItemOriginFlowLayoutPoint,
-	to: EditorItemOriginFlowLayoutPoint,
-) => {
-	const angle = Math.atan2(to.y - from.y, to.x - from.x);
-	const length = 8;
-	context.beginPath();
-	context.moveTo(to.x, to.y);
-	context.lineTo(
-		to.x - Math.cos(angle - Math.PI / 6) * length,
-		to.y - Math.sin(angle - Math.PI / 6) * length,
-	);
-	context.lineTo(
-		to.x - Math.cos(angle + Math.PI / 6) * length,
-		to.y - Math.sin(angle + Math.PI / 6) * length,
-	);
-	context.closePath();
-	context.fill();
-};
-
-const drawEdge = (
-	context: CanvasRenderingContext2D,
-	backbone: ReadonlyArray<EditorItemOriginFlowLayoutPoint>,
-	highlightColor: string | undefined,
-	opacity: number,
-	palette: CanvasPalette,
-) => {
-	const first = backbone[0];
-	if (first === undefined) return;
-	const emphasized = highlightColor !== undefined;
-	const edgeColor = highlightColor ?? palette.lineStrong;
-
-	context.save();
-	context.globalAlpha = opacity;
-	context.lineJoin = "miter";
-	context.lineCap = "butt";
-	context.strokeStyle = edgeColor;
-	context.fillStyle = edgeColor;
-	context.lineWidth = emphasized ? 2 : 1;
-	context.beginPath();
-	traceFlowRoute(context, backbone);
-	context.stroke();
-
-	const last = backbone.at(-1)!;
-	const previous = backbone.at(-2) ?? first;
-	drawArrow(context, previous, last);
-	context.restore();
-};
-
-const drawGrid = (
-	context: CanvasRenderingContext2D,
-	width: number,
-	height: number,
-	viewport: Viewport,
-	palette: CanvasPalette,
-) => {
-	let worldGap = 24;
-	while (worldGap * viewport.zoom < 12) worldGap *= 2;
-	const gap = worldGap * viewport.zoom;
-	const offsetX = ((viewport.x % gap) + gap) % gap;
-	const offsetY = ((viewport.y % gap) + gap) % gap;
-	context.save();
-	context.globalAlpha = 0.35;
-	context.fillStyle = palette.line;
-	context.beginPath();
-	for (let x = offsetX; x <= width; x += gap)
-		for (let y = offsetY; y <= height; y += gap) {
-			context.moveTo(x + 1, y);
-			context.arc(x, y, 1, 0, Math.PI * 2);
-		}
-	context.fill();
-	context.restore();
-};
-
-const distanceToSegment = (
-	x: number,
-	y: number,
-	start: EditorItemOriginFlowLayoutPoint,
-	end: EditorItemOriginFlowLayoutPoint,
-) => {
-	const dx = end.x - start.x;
-	const dy = end.y - start.y;
-	if (dx === 0 && dy === 0) return Math.hypot(x - start.x, y - start.y);
-	const t = Math.max(
-		0,
-		Math.min(1, ((x - start.x) * dx + (y - start.y) * dy) / (dx * dx + dy * dy)),
-	);
-	return Math.hypot(x - (start.x + t * dx), y - (start.y + t * dy));
-};
-
-const distanceToRoute = (
-	x: number,
-	y: number,
-	points: ReadonlyArray<EditorItemOriginFlowLayoutPoint>,
-) => {
-	let distance = Number.POSITIVE_INFINITY;
-	for (let index = 1; index < points.length; index += 1)
-		distance = Math.min(distance, distanceToSegment(x, y, points[index - 1]!, points[index]!));
-	return distance;
-};
-
-type FlowHit =
-	| EditorOriginFlowSelection
-	| {
-			readonly kind: "port";
-			readonly targetNodeId: string;
-	  };
-
-const hitTest = (
-	flow: EditorItemOriginFlow,
-	connectedPorts: EditorOriginFlowConnectedPorts,
-	positions: ReadonlyMap<string, EditorItemOriginFlowLayoutNode>,
-	nodeMetrics: ReadonlyMap<string, EditorOriginFlowNodeMetrics>,
-	backbones: ReadonlyMap<string, ReadonlyArray<EditorItemOriginFlowLayoutPoint>>,
-	metroBackbones: ReadonlyMap<string, ReadonlyArray<EditorItemOriginFlowLayoutPoint>>,
-	selection: EditorOriginFlowSelection | undefined,
-	highlight: EditorOriginFlowHighlight | undefined,
-	x: number,
-	y: number,
-	zoom: number,
-): FlowHit | undefined => {
-	const isNodeRelevant = (nodeId: string) =>
-		selection?.kind !== "node" || highlight?.nodeIds.has(nodeId) === true;
-	const isEdgeRelevant = (edgeId: string) =>
-		selection?.kind !== "node" || highlight?.edgeIds.has(edgeId) === true;
-	const portTolerance = PortHitRadiusPx / zoom;
-	for (let index = flow.nodes.length - 1; index >= 0; index -= 1) {
-		const node = flow.nodes[index]!;
-		if (!isNodeRelevant(node.id)) continue;
-		const position = positions.get(node.id);
-		if (position === undefined) continue;
-		const metrics = nodeMetrics.get(node.id);
-		if (metrics === undefined) continue;
-		const connectedPortIds = connectedPorts.get(node.id);
-		for (const [operationIndex, operation] of node.operations.entries()) {
-			const operationMetrics = metrics.operations[operationIndex];
-			if (operationMetrics === undefined) continue;
-			for (const input of operation.inputs) {
-				if (connectedPortIds?.has(input.id) !== true) continue;
-				const localY = operationMetrics.inputPortYs.get(input.id);
-				if (localY === undefined) continue;
-				if (Math.hypot(x - position.x, y - (position.y + localY)) <= portTolerance) {
-					const targetNodeId = `item:${input.itemId}`;
-					if (positions.has(targetNodeId))
-						return {
-							kind: "port",
-							targetNodeId,
-						};
-				}
-			}
-			for (const output of operation.outputs) {
-				if (connectedPortIds?.has(output.id) !== true) continue;
-				const localY = operationMetrics.outputPortYs.get(output.id);
-				if (localY === undefined) continue;
-				if (
-					Math.hypot(x - (position.x + position.width), y - (position.y + localY)) <=
-					portTolerance
-				) {
-					const targetNodeId = `item:${output.itemId}`;
-					if (positions.has(targetNodeId))
-						return {
-							kind: "port",
-							targetNodeId,
-						};
-				}
-			}
-		}
-	}
-
-	for (let index = flow.nodes.length - 1; index >= 0; index -= 1) {
-		const node = flow.nodes[index]!;
-		if (!isNodeRelevant(node.id)) continue;
-		const position = positions.get(node.id);
-		if (position === undefined) continue;
-		if (
-			x >= position.x &&
-			x <= position.x + position.width &&
-			y >= position.y &&
-			y <= position.y + position.height
-		)
-			return {
-				id: node.id,
-				kind: "node",
-			};
-	}
-	const tolerance = EdgeHitRadiusPx / zoom;
-	for (const metroFirst of [
-		true,
-		false,
-	]) {
-		for (const edge of flow.edges) {
-			if (!isEdgeRelevant(edge.id)) continue;
-			const metroBackbone = metroBackbones.get(edge.id);
-			if ((metroBackbone !== undefined) !== metroFirst) continue;
-			const backbone = metroBackbone ?? backbones.get(edge.id);
-			if (backbone === undefined || distanceToRoute(x, y, backbone) > tolerance) continue;
-			return {
-				id: edge.id,
-				kind: "edge",
-			};
-		}
-	}
-	return undefined;
-};
-
-const readNodeHighlight = (
-	node: EditorItemOriginItemNode,
-	selection: EditorOriginFlowSelection | undefined,
-	highlight: EditorOriginFlowHighlight | undefined,
-	navigationFocusNodeId: string | undefined,
-) => {
-	if (selection?.kind === "node" && selection.id === node.id) return "selected" as const;
-	if (navigationFocusNodeId === node.id || highlight?.nodeIds.has(node.id))
-		return "active" as const;
-	return "idle" as const;
-};
-
-const readNodeOpacity = (
-	nodeId: string,
-	selection: EditorOriginFlowSelection | undefined,
-	highlight: EditorOriginFlowHighlight | undefined,
-	navigationFocusNodeId: string | undefined,
-) => {
-	if (selection === undefined) return 1;
-	if (selection.kind === "edge") return highlight?.nodeIds.has(nodeId) === true ? 1 : 0.2;
-	if (selection.id === nodeId || navigationFocusNodeId === nodeId) return 1;
-	const level = highlight?.nodeLevels.get(nodeId);
-	return level === undefined ? 0 : readHighlightOpacity(level);
-};
-
-const readEdgeOpacity = (
-	edgeId: string,
-	highlighted: boolean,
-	selection: EditorOriginFlowSelection | undefined,
-	highlight: EditorOriginFlowHighlight | undefined,
-) => {
-	if (!highlighted) return selection?.kind === "node" ? 0 : 0.6;
-	if (selection?.kind !== "node") return 1;
-	return readHighlightOpacity(highlight?.edgeLevels.get(edgeId));
-};
 
 /** Renders the passive item flow directly to Canvas with imperative pan and zoom. */
 export const EditorOriginFlowCanvas = ({
@@ -1274,7 +104,7 @@ export const EditorOriginFlowCanvas = ({
 	);
 	const resourceUrls = useEditorResourceUrls(resourceIds);
 	const edgeBounds = useMemo(
-		() => readBackboneBounds(backbones),
+		() => FlowViewport.readBackboneBounds(backbones),
 		[
 			backbones,
 		],
@@ -1308,168 +138,29 @@ export const EditorOriginFlowCanvas = ({
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 	const imageCacheRef = useRef<Map<string, HTMLImageElement>>(new Map());
 	const scheduleDrawRef = useRef<() => void>(() => undefined);
-	const viewportRef = useRef<Viewport>(DefaultViewport);
+	const viewportRef = useRef<Viewport>(FlowViewport.defaultViewport);
 	const panRef = useRef<PanState | undefined>(undefined);
 	const frameRef = useRef<number | undefined>(undefined);
 	const resetViewportRef = useRef(true);
-	const navigationIndexRef = useRef(0);
-	const inputNavigationIndexRef = useRef(-1);
-	const outputNavigationIndexRef = useRef(-1);
-	const rootNavigationIndexRef = useRef(-1);
-	const relationNavigationFocusNodeIdRef = useRef<string | undefined>(undefined);
-	const visitHistoryRef = useRef<ReadonlyArray<string>>([]);
-	const [helpOpen, setHelpOpen] = useState(false);
-	const [highlightDepth, setHighlightDepth] = useState<
-		| {
-				readonly direction: EditorOriginFlowDirection;
-				readonly limit: number;
-				readonly nodeId: string;
-		  }
-		| undefined
-	>(undefined);
-	const paletteRef = useRef<CanvasPalette | undefined>(undefined);
-	const completeHighlight = useMemo(
-		() =>
-			selection === undefined
-				? undefined
-				: RendererRuntime.runSync(
-						readEditorOriginFlowHighlightFx(flow, selection, direction),
-					),
-		[
-			direction,
-			flow,
-			selection,
-		],
-	);
-	const maxHighlightLevel = useMemo(
-		() =>
-			completeHighlight === undefined
-				? 0
-				: Math.max(0, ...completeHighlight.nodeLevels.values()),
-		[
-			completeHighlight,
-		],
-	);
-	const highlightDepthLimit =
-		selection?.kind === "node"
-			? Math.min(
-					highlightDepth?.nodeId === selection.id &&
-						highlightDepth.direction === direction
-						? highlightDepth.limit
-						: DefaultHighlightDepth,
-					maxHighlightLevel,
-				)
-			: undefined;
-	const highlight = useMemo(
-		() =>
-			selection?.kind !== "node" ||
-			completeHighlight === undefined ||
-			highlightDepthLimit === undefined ||
-			highlightDepthLimit >= maxHighlightLevel
-				? completeHighlight
-				: RendererRuntime.runSync(
-						readEditorOriginFlowVisibleHighlightFx(
-							completeHighlight,
-							highlightDepthLimit,
-						),
-					),
-		[
-			completeHighlight,
-			highlightDepthLimit,
-			selection,
-		],
-	);
-	const highlightedEdgeColors = useMemo(
-		() => readHighlightedEdgeColors(flow, selection, highlight),
-		[
-			flow,
-			selection,
-			highlight,
-		],
-	);
-	const metroBackbones = useMemo(
-		() =>
-			RendererRuntime.runSync(
-				readEditorOriginFlowMetroBackbonesFx(backbones, [
-					...highlightedEdgeColors.keys(),
-				]),
-			),
-		[
-			backbones,
-			highlightedEdgeColors,
-		],
-	);
-	const highlightedPortColors = useMemo(
-		() => readHighlightedPortColors(flow, highlightedEdgeColors),
-		[
-			flow,
-			highlightedEdgeColors,
-		],
-	);
-	const navigationNodeIds = useMemo(
-		() =>
-			selection?.kind === "node"
-				? RendererRuntime.runSync(
-						readEditorOriginFlowNavigationFx(
-							flow,
-							positions,
-							selection.id,
-							highlight?.edgeIds,
-						),
-					)
-				: [],
-		[
-			flow,
-			positions,
-			selection,
-			highlight,
-		],
-	);
-	const inputNavigationNodeIds = useMemo(
-		() =>
-			selection?.kind === "node"
-				? RendererRuntime.runSync(
-						readEditorOriginFlowRelationNavigationFx({
-							flow,
-							selectedNodeId: selection.id,
-							selectedRole: "input",
-						}),
-					)
-				: [],
-		[
-			flow,
-			selection,
-		],
-	);
-	const outputNavigationNodeIds = useMemo(
-		() =>
-			selection?.kind === "node"
-				? RendererRuntime.runSync(
-						readEditorOriginFlowRelationNavigationFx({
-							flow,
-							selectedNodeId: selection.id,
-							selectedRole: "output",
-						}),
-					)
-				: [],
-		[
-			flow,
-			selection,
-		],
-	);
-	const rootNavigationNodeIds = useMemo(
-		() =>
-			selection?.kind === "node" && completeHighlight !== undefined
-				? RendererRuntime.runSync(
-						readEditorOriginFlowRootNavigationFx(flow, completeHighlight),
-					)
-				: [],
-		[
-			completeHighlight,
-			flow,
-			selection,
-		],
-	);
+	const paletteRef = useRef<EditorOriginFlowCanvasPalette | undefined>(undefined);
+	const {
+		highlight,
+		highlightedEdgeColors,
+		highlightedPortColors,
+		inputNavigationNodeIds,
+		maxHighlightLevel,
+		metroBackbones,
+		navigationNodeIds,
+		outputNavigationNodeIds,
+		rootNavigationNodeIds,
+		setHighlightDepth,
+	} = useEditorOriginFlowProjection({
+		backbones,
+		direction,
+		flow,
+		positions,
+		selection,
+	});
 	const renderStateRef = useRef<RenderState>({
 		backbones,
 		connectedPorts,
@@ -1524,40 +215,40 @@ export const EditorOriginFlowCanvas = ({
 				state.focusNodeId === undefined
 					? undefined
 					: state.positions.get(state.focusNodeId);
-			const initialPosition = readInitialFocusPosition(state.flow, state.positions);
+			const initialPosition = FlowViewport.readInitialFocus(state.flow, state.positions);
 			viewportRef.current =
 				explicitFocusPosition !== undefined
-					? readNodeViewport(
+					? FlowViewport.readNode(
 							explicitFocusPosition,
 							rect.width,
 							rect.height,
-							SearchFocusZoom,
+							FlowViewport.searchFocusZoom,
 						)
 					: state.fitContent
-						? readFitViewport(state.positions, rect.width, rect.height)
+						? FlowViewport.readFit(state.positions, rect.width, rect.height)
 						: initialPosition === undefined
-							? DefaultViewport
-							: readNodeViewport(
+							? FlowViewport.defaultViewport
+							: FlowViewport.readNode(
 									initialPosition,
 									rect.width,
 									rect.height,
-									DefaultViewport.zoom,
+									FlowViewport.defaultViewport.zoom,
 								);
 			resetViewportRef.current = false;
 		}
 		const viewport = viewportRef.current;
-		const visibleNodes = readVisibleWorldBounds(viewport, rect.width, rect.height);
-		const visibleEdges = readVisibleWorldBounds(
+		const visibleNodes = FlowViewport.readVisibleBounds(viewport, rect.width, rect.height);
+		const visibleEdges = FlowViewport.readVisibleBounds(
 			viewport,
 			rect.width,
 			rect.height,
-			EdgeCullPaddingPx,
+			FlowViewport.edgeCullPaddingPx,
 		);
-		const palette = paletteRef.current ?? readCanvasPalette(canvas);
+		const palette = paletteRef.current ?? FlowPainter.readPalette(canvas);
 		paletteRef.current = palette;
 		context.setTransform(dpr, 0, 0, dpr, 0, 0);
 		context.clearRect(0, 0, rect.width, rect.height);
-		drawGrid(context, rect.width, rect.height, viewport, palette);
+		FlowPainter.drawGrid(context, rect.width, rect.height, viewport, palette);
 
 		context.save();
 		context.translate(viewport.x, viewport.y);
@@ -1578,12 +269,17 @@ export const EditorOriginFlowCanvas = ({
 						: (state.metroBackbones.get(edge.id) ?? routedBackbone);
 				const bounds = state.edgeBounds.get(edge.id);
 				if (bounds === undefined) throw new Error(`Missing edge bounds for ${edge.id}.`);
-				if (!isEdgeVisible(bounds, visibleEdges)) continue;
-				drawEdge(
+				if (!FlowViewport.isEdgeVisible(bounds, visibleEdges)) continue;
+				FlowPainter.drawEdge(
 					context,
 					backbone,
 					highlightColor,
-					readEdgeOpacity(edge.id, highlighted, state.selection, state.highlight),
+					FlowPainter.readEdgeOpacity(
+						edge.id,
+						highlighted,
+						state.selection,
+						state.highlight,
+					),
 					palette,
 				);
 			}
@@ -1591,22 +287,22 @@ export const EditorOriginFlowCanvas = ({
 		for (const node of state.flow.nodes) {
 			const position = state.positions.get(node.id);
 			if (position === undefined) throw new Error(`Missing layout for ${node.id}.`);
-			if (!isNodeVisible(position, visibleNodes)) continue;
+			if (!FlowViewport.isNodeVisible(position, visibleNodes)) continue;
 			const metrics = state.nodeMetrics.get(node.id);
 			if (metrics === undefined) throw new Error(`Missing node metrics for ${node.id}.`);
-			const nodeHighlight = readNodeHighlight(
+			const nodeHighlight = FlowPainter.readNodeHighlight(
 				node,
 				state.selection,
 				state.highlight,
 				relationNavigationFocusNodeIdRef.current,
 			);
-			drawItemNode(
+			FlowPainter.drawItemNode(
 				context,
 				node,
 				position,
 				metrics,
 				nodeHighlight,
-				readNodeOpacity(
+				FlowPainter.readNodeOpacity(
 					node.id,
 					state.selection,
 					state.highlight,
@@ -1630,6 +326,29 @@ export const EditorOriginFlowCanvas = ({
 		draw,
 	]);
 	scheduleDrawRef.current = scheduleDraw;
+	const {
+		helpOpen,
+		relationFocusNodeIdRef: relationNavigationFocusNodeIdRef,
+		resetNavigation,
+		setHelpOpen,
+		visitHistoryRef,
+	} = useEditorOriginFlowNavigation({
+		canvasRef,
+		direction,
+		flow,
+		inputNodeIds: inputNavigationNodeIds,
+		maxHighlightLevel,
+		navigationNodeIds,
+		onSelectionChange,
+		outputNodeIds: outputNavigationNodeIds,
+		positions,
+		rootNodeIds: rootNavigationNodeIds,
+		scheduleDraw,
+		selection,
+		setHighlightDepth,
+		viewport: FlowViewport,
+		viewportRef,
+	});
 
 	useLayoutEffect(() => {
 		resetViewportRef.current = true;
@@ -1647,13 +366,19 @@ export const EditorOriginFlowCanvas = ({
 		if (canvas === null || position === undefined) return;
 		const rect = canvas.getBoundingClientRect();
 		if (rect.width <= 0 || rect.height <= 0) return;
-		viewportRef.current = readNodeViewport(position, rect.width, rect.height, SearchFocusZoom);
-		navigationIndexRef.current = 0;
+		viewportRef.current = FlowViewport.readNode(
+			position,
+			rect.width,
+			rect.height,
+			FlowViewport.searchFocusZoom,
+		);
+		resetNavigation();
 		resetViewportRef.current = false;
 		scheduleDraw();
 	}, [
 		focusNodeId,
 		positions,
+		resetNavigation,
 		scheduleDraw,
 	]);
 
@@ -1665,229 +390,6 @@ export const EditorOriginFlowCanvas = ({
 		highlight,
 		nodeMetrics,
 		resourceUrls,
-		scheduleDraw,
-		selection,
-	]);
-
-	useEffect(() => {
-		navigationIndexRef.current = 0;
-	}, [
-		navigationNodeIds,
-	]);
-
-	useEffect(() => {
-		inputNavigationIndexRef.current = -1;
-	}, [
-		inputNavigationNodeIds,
-	]);
-
-	useEffect(() => {
-		outputNavigationIndexRef.current = -1;
-	}, [
-		outputNavigationNodeIds,
-	]);
-
-	useEffect(() => {
-		rootNavigationIndexRef.current = -1;
-	}, [
-		rootNavigationNodeIds,
-	]);
-
-	useEffect(() => {
-		relationNavigationFocusNodeIdRef.current = undefined;
-		setHighlightDepth(undefined);
-	}, [
-		direction,
-		selection,
-	]);
-
-	useEffect(() => {
-		visitHistoryRef.current = [];
-	}, [
-		flow,
-	]);
-
-	useEffect(() => {
-		const focusPosition = (position: EditorItemOriginFlowLayoutNode, zoom: number) => {
-			const canvas = canvasRef.current;
-			if (canvas === null) return false;
-			const rect = canvas.getBoundingClientRect();
-			viewportRef.current = readNodeViewport(position, rect.width, rect.height, zoom);
-			scheduleDraw();
-			return true;
-		};
-		const handleKeyDown = (event: KeyboardEvent) => {
-			if (helpOpen) {
-				if (event.key === "Escape" || event.key === "?") {
-					event.preventDefault();
-					setHelpOpen(false);
-				}
-				return;
-			}
-			const shortcut = readFlowNavigationShortcut(event);
-			if (shortcut === undefined) return;
-			event.preventDefault();
-
-			if (
-				shortcut === "depth-less" ||
-				shortcut === "depth-more" ||
-				shortcut === "depth-reset"
-			) {
-				if (selection?.kind !== "node") return;
-				relationNavigationFocusNodeIdRef.current = undefined;
-				if (shortcut === "depth-less") {
-					setHighlightDepth((current) => {
-						const currentLimit =
-							current?.nodeId === selection.id && current.direction === direction
-								? current.limit
-								: Math.min(DefaultHighlightDepth, maxHighlightLevel);
-						return {
-							direction,
-							limit: Math.max(0, currentLimit - 1),
-							nodeId: selection.id,
-						};
-					});
-					return;
-				}
-				if (shortcut === "depth-more") {
-					setHighlightDepth((current) => {
-						const currentLimit =
-							current?.nodeId === selection.id && current.direction === direction
-								? current.limit
-								: Math.min(DefaultHighlightDepth, maxHighlightLevel);
-						return {
-							direction,
-							limit: Math.min(maxHighlightLevel, currentLimit + 1),
-							nodeId: selection.id,
-						};
-					});
-					return;
-				}
-				setHighlightDepth(undefined);
-				const position = positions.get(selection.id);
-				if (
-					position !== undefined &&
-					focusPosition(
-						position,
-						Math.max(viewportRef.current.zoom, DefaultViewport.zoom),
-					)
-				)
-					navigationIndexRef.current = 0;
-				return;
-			}
-
-			if (shortcut === "help") {
-				setHelpOpen(true);
-				return;
-			}
-
-			if (shortcut === "back") {
-				const back = RendererRuntime.runSync(
-					popEditorOriginFlowVisitFx(visitHistoryRef.current),
-				);
-				if (back.nodeId === undefined) return;
-				const position = positions.get(back.nodeId);
-				if (position === undefined) return;
-				visitHistoryRef.current = back.history;
-				relationNavigationFocusNodeIdRef.current = undefined;
-				navigationIndexRef.current = 0;
-				onSelectionChange({
-					id: back.nodeId,
-					kind: "node",
-				});
-				focusPosition(position, Math.max(viewportRef.current.zoom, DefaultViewport.zoom));
-				return;
-			}
-
-			if (shortcut === "home") {
-				relationNavigationFocusNodeIdRef.current = undefined;
-				const homeNodeId = navigationNodeIds[0];
-				const homePosition =
-					homeNodeId === undefined
-						? readInitialFocusPosition(flow, positions)
-						: positions.get(homeNodeId);
-				if (homePosition === undefined) return;
-				if (
-					focusPosition(
-						homePosition,
-						Math.max(viewportRef.current.zoom, DefaultViewport.zoom),
-					)
-				)
-					navigationIndexRef.current = 0;
-				return;
-			}
-
-			if (shortcut === "inputs" || shortcut === "outputs") {
-				const nodeIds =
-					shortcut === "inputs" ? inputNavigationNodeIds : outputNavigationNodeIds;
-				const indexRef =
-					shortcut === "inputs" ? inputNavigationIndexRef : outputNavigationIndexRef;
-				if (nodeIds.length === 0) return;
-				const nextIndex = (indexRef.current + 1) % nodeIds.length;
-				const nodeId = nodeIds[nextIndex];
-				if (nodeId === undefined) return;
-				const position = positions.get(nodeId);
-				if (position === undefined) return;
-				relationNavigationFocusNodeIdRef.current = nodeId;
-				if (
-					focusPosition(
-						position,
-						Math.max(viewportRef.current.zoom, DefaultViewport.zoom),
-					)
-				)
-					indexRef.current = nextIndex;
-				return;
-			}
-
-			if (shortcut === "roots") {
-				if (selection?.kind !== "node" || rootNavigationNodeIds.length === 0) return;
-				setHighlightDepth({
-					direction,
-					limit: maxHighlightLevel,
-					nodeId: selection.id,
-				});
-				const nextIndex =
-					(rootNavigationIndexRef.current + 1) % rootNavigationNodeIds.length;
-				const nodeId = rootNavigationNodeIds[nextIndex];
-				if (nodeId === undefined) return;
-				const position = positions.get(nodeId);
-				if (position === undefined) return;
-				relationNavigationFocusNodeIdRef.current = nodeId;
-				if (
-					focusPosition(
-						position,
-						Math.max(viewportRef.current.zoom, DefaultViewport.zoom),
-					)
-				)
-					rootNavigationIndexRef.current = nextIndex;
-				return;
-			}
-
-			relationNavigationFocusNodeIdRef.current = undefined;
-			if (navigationNodeIds.length === 0) return;
-			const offset = shortcut === "next" ? 1 : -1;
-			const nextIndex =
-				(navigationIndexRef.current + offset + navigationNodeIds.length) %
-				navigationNodeIds.length;
-			const nodeId = navigationNodeIds[nextIndex];
-			if (nodeId === undefined) return;
-			const position = positions.get(nodeId);
-			if (position === undefined) return;
-			if (focusPosition(position, Math.max(viewportRef.current.zoom, DefaultViewport.zoom)))
-				navigationIndexRef.current = nextIndex;
-		};
-		window.addEventListener("keydown", handleKeyDown);
-		return () => window.removeEventListener("keydown", handleKeyDown);
-	}, [
-		flow,
-		helpOpen,
-		inputNavigationNodeIds,
-		maxHighlightLevel,
-		navigationNodeIds,
-		onSelectionChange,
-		outputNavigationNodeIds,
-		positions,
-		rootNavigationNodeIds,
 		scheduleDraw,
 		selection,
 	]);
@@ -1934,7 +436,7 @@ export const EditorOriginFlowCanvas = ({
 			const pointerX = event.clientX - rect.left;
 			const pointerY = event.clientY - rect.top;
 			const current = viewportRef.current;
-			const zoom = clampZoom(current.zoom * Math.exp(-event.deltaY * 0.0015));
+			const zoom = FlowViewport.clampZoom(current.zoom * Math.exp(-event.deltaY * 0.0015));
 			if (zoom === current.zoom) return;
 			const worldX = (pointerX - current.x) / current.zoom;
 			const worldY = (pointerY - current.y) / current.zoom;
@@ -1975,29 +477,31 @@ export const EditorOriginFlowCanvas = ({
 		const viewport = viewportRef.current;
 		const worldX = (event.clientX - rect.left - viewport.x) / viewport.zoom;
 		const worldY = (event.clientY - rect.top - viewport.y) / viewport.zoom;
-		const hit = hitTest(
-			flow,
-			connectedPorts,
-			positions,
-			nodeMetrics,
-			backbones,
-			metroBackbones,
-			selection,
-			highlight,
-			worldX,
-			worldY,
-			viewport.zoom,
+		const hit = RendererRuntime.runSync(
+			readEditorOriginFlowHitFx({
+				backbones,
+				connectedPorts,
+				flow,
+				highlight,
+				metroBackbones,
+				nodeMetrics,
+				positions,
+				selection,
+				x: worldX,
+				y: worldY,
+				zoom: viewport.zoom,
+			}),
 		);
 		if (hit?.kind === "port") {
 			const targetPosition = positions.get(hit.targetNodeId);
 			if (targetPosition === undefined) return;
-			viewportRef.current = readNodeViewport(
+			viewportRef.current = FlowViewport.readNode(
 				targetPosition,
 				rect.width,
 				rect.height,
-				Math.max(viewport.zoom, DefaultViewport.zoom),
+				Math.max(viewport.zoom, FlowViewport.defaultViewport.zoom),
 			);
-			navigationIndexRef.current = 0;
+			resetNavigation();
 			let visitHistory = visitHistoryRef.current;
 			if (selection?.kind === "node")
 				visitHistory = RendererRuntime.runSync(

@@ -1,73 +1,56 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { twMerge } from "tailwind-merge";
 
 import type { EditorProjectStartScope } from "~/bridge/project/editor/EditorProjectStartScope";
-import { PointerDragThreshold } from "~/ui/drag/PointerDragThreshold";
 import { EditorItemThumbnail } from "~/ui/item/editor/EditorItemThumbnail";
 import { useEditorItemSearchOptions } from "~/ui/item/editor/useEditorItemSearchOptions";
 import { EditorProjectStartItemPicker } from "~/ui/project/editor/EditorProjectStartItemPicker";
-
-export interface EditorProjectStartGridCell {
-	readonly itemId: string;
-	readonly quantity: number;
-	readonly x: number;
-	readonly y: number;
-}
-
-interface EditorProjectStartGridPosition {
-	readonly x: number;
-	readonly y: number;
-}
+import type {
+	EditorProjectStartGridCell,
+	EditorProjectStartGridPosition,
+} from "~/ui/project/editor/EditorProjectStartGridCell";
+import { useEditorProjectStartGridDrag } from "~/ui/project/editor/useEditorProjectStartGridDrag";
 
 interface EditorProjectStartGridProps {
 	readonly cells: ReadonlyArray<EditorProjectStartGridCell>;
 	readonly height: number;
-	readonly onDecrement: (x: number, y: number) => void;
-	readonly onIncrement: (x: number, y: number) => void;
-	readonly onMove: (sourceX: number, sourceY: number, targetX: number, targetY: number) => void;
-	readonly onSet: (x: number, y: number, itemId: string) => void;
+	readonly onCellsChange: (cells: ReadonlyArray<EditorProjectStartGridCell>) => void;
 	readonly scope: EditorProjectStartScope;
 	readonly width: number;
 }
 
-interface EditorProjectStartGridDrag {
-	phase: "dragging" | "pressed";
-	readonly pointerId: number;
-	readonly pressX: number;
-	readonly pressY: number;
-	readonly source: EditorProjectStartGridCell;
-	target?: EditorProjectStartGridPosition;
-}
-
-interface EditorProjectStartGridDragVisual {
-	readonly clientX: number;
-	readonly clientY: number;
-	readonly source: EditorProjectStartGridCell;
-	readonly targetKey?: string;
-}
-
 const positionKey = ({ x, y }: EditorProjectStartGridPosition) => `${x}:${y}`;
+
+const moveCell = (
+	cells: ReadonlyArray<EditorProjectStartGridCell>,
+	source: EditorProjectStartGridCell,
+	target: EditorProjectStartGridPosition,
+) => [
+	...cells.filter(
+		({ x, y }) => (x !== source.x || y !== source.y) && (x !== target.x || y !== target.y),
+	),
+	{
+		...source,
+		...target,
+	},
+];
 
 /** Edits exact starting stacks on one Board/Toolbar/Inventory grid without changing layout ownership. */
 export const EditorProjectStartGrid = ({
 	cells,
 	height,
-	onDecrement,
-	onIncrement,
-	onMove,
-	onSet,
+	onCellsChange,
 	scope,
 	width,
 }: EditorProjectStartGridProps) => {
 	const { items } = useEditorItemSearchOptions();
 	const gridRef = useRef<HTMLDivElement>(null);
-	const dragRef = useRef<EditorProjectStartGridDrag | undefined>(undefined);
-	const dragPreviewRef = useRef<HTMLDivElement>(null);
-	const onMoveRef = useRef(onMove);
-	onMoveRef.current = onMove;
-	const suppressClickRef = useRef(false);
-	const [dragVisual, setDragVisual] = useState<EditorProjectStartGridDragVisual>();
 	const [pickerCell, setPickerCell] = useState<EditorProjectStartGridPosition>();
+	const { dragPreviewRef, dragVisual, startDrag, suppressClickRef } =
+		useEditorProjectStartGridDrag({
+			gridRef,
+			onMove: (source, target) => onCellsChange(moveCell(cells, source, target)),
+		});
 	const cellsByPosition = new Map(
 		cells.map((cell) => [
 			positionKey(cell),
@@ -83,106 +66,49 @@ export const EditorProjectStartGrid = ({
 			y: Math.floor(index / Math.max(1, width)),
 		}),
 	);
-
-	useEffect(() => {
-		const readTarget = (
-			target: EventTarget | null,
-		): EditorProjectStartGridPosition | undefined => {
-			if (!(target instanceof Element)) return undefined;
-			const cell = target.closest<HTMLElement>("[data-start-grid-cell]");
-			if (cell === null || gridRef.current?.contains(cell) !== true) return undefined;
-			const x = Number(cell.dataset.x);
-			const y = Number(cell.dataset.y);
-			if (!Number.isSafeInteger(x) || !Number.isSafeInteger(y)) return undefined;
-			return {
-				x,
-				y,
-			};
-		};
-		const updatePreviewPosition = (clientX: number, clientY: number) => {
-			if (dragPreviewRef.current === null) return;
-			dragPreviewRef.current.style.transform = `translate3d(${clientX + 12}px, ${clientY + 12}px, 0)`;
-		};
-		const resetDrag = () => {
-			dragRef.current = undefined;
-			setDragVisual(undefined);
-		};
-		const suppressNextClick = () => {
-			suppressClickRef.current = true;
-			window.setTimeout(() => {
-				suppressClickRef.current = false;
-			}, 0);
-		};
-		const onPointerMove = (event: PointerEvent) => {
-			const drag = dragRef.current;
-			if (drag === undefined || event.pointerId !== drag.pointerId) return;
-			event.preventDefault();
-			const offsetX = event.clientX - drag.pressX;
-			const offsetY = event.clientY - drag.pressY;
-			if (drag.phase === "pressed" && Math.hypot(offsetX, offsetY) < PointerDragThreshold)
-				return;
-			const target = readTarget(event.target);
-			const targetKey = target === undefined ? undefined : positionKey(target);
-			if (drag.phase === "pressed") {
-				drag.phase = "dragging";
-				drag.target = target;
-				setDragVisual({
-					clientX: event.clientX,
-					clientY: event.clientY,
-					source: drag.source,
-					targetKey,
-				});
-			} else if (
-				(drag.target === undefined ? undefined : positionKey(drag.target)) !== targetKey
-			) {
-				drag.target = target;
-				setDragVisual((current) =>
-					current === undefined
-						? current
-						: {
-								...current,
-								clientX: event.clientX,
-								clientY: event.clientY,
-								targetKey,
-							},
-				);
-			} else {
-				drag.target = target;
-			}
-			updatePreviewPosition(event.clientX, event.clientY);
-		};
-		const finishDrag = (event: PointerEvent, commit: boolean) => {
-			const drag = dragRef.current;
-			if (drag === undefined || event.pointerId !== drag.pointerId) return;
-			if (drag.phase === "dragging") {
-				event.preventDefault();
-				drag.target = readTarget(event.target) ?? drag.target;
-				const target = drag.target;
-				if (
-					commit &&
-					target !== undefined &&
-					(target.x !== drag.source.x || target.y !== drag.source.y)
-				) {
-					onMoveRef.current(drag.source.x, drag.source.y, target.x, target.y);
-				}
-			}
-			suppressNextClick();
-			resetDrag();
-		};
-		const onPointerUp = (event: PointerEvent) => finishDrag(event, true);
-		const onPointerCancel = (event: PointerEvent) => finishDrag(event, false);
-		const onBlur = () => resetDrag();
-		window.addEventListener("pointermove", onPointerMove);
-		window.addEventListener("pointerup", onPointerUp);
-		window.addEventListener("pointercancel", onPointerCancel);
-		window.addEventListener("blur", onBlur);
-		return () => {
-			window.removeEventListener("pointermove", onPointerMove);
-			window.removeEventListener("pointerup", onPointerUp);
-			window.removeEventListener("pointercancel", onPointerCancel);
-			window.removeEventListener("blur", onBlur);
-		};
-	}, []);
+	const changeCell = (
+		position: EditorProjectStartGridPosition,
+		change: (
+			cell: EditorProjectStartGridCell | undefined,
+		) => EditorProjectStartGridCell | undefined,
+	) => {
+		const index = cells.findIndex(({ x, y }) => x === position.x && y === position.y);
+		const current = cells[index];
+		const next = change(current);
+		if (next === current) return;
+		onCellsChange(
+			index === -1
+				? next === undefined
+					? cells
+					: [
+							...cells,
+							next,
+						]
+				: next === undefined
+					? cells.filter((_, candidateIndex) => candidateIndex !== index)
+					: cells.map((cell, candidateIndex) => (candidateIndex === index ? next : cell)),
+		);
+	};
+	const increment = (position: EditorProjectStartGridPosition) =>
+		changeCell(position, (cell) => {
+			if (cell === undefined) return cell;
+			const maxStackSize = items[cell.itemId]?.maxStackSize ?? 1;
+			return cell.quantity >= maxStackSize
+				? cell
+				: {
+						...cell,
+						quantity: cell.quantity + 1,
+					};
+		});
+	const decrement = (position: EditorProjectStartGridPosition) =>
+		changeCell(position, (cell) =>
+			cell === undefined || cell.quantity <= 1
+				? undefined
+				: {
+						...cell,
+						quantity: cell.quantity - 1,
+					},
+		);
 
 	return (
 		<>
@@ -235,27 +161,81 @@ export const EditorProjectStartGrid = ({
 											x,
 											y,
 										});
-									else if (!full) onIncrement(x, y);
+									else if (!full)
+										increment({
+											x,
+											y,
+										});
 								}}
 								onContextMenu={(event) => {
 									event.preventDefault();
-									if (cell !== undefined) onDecrement(x, y);
+									if (cell !== undefined)
+										decrement({
+											x,
+											y,
+										});
 								}}
-								onPointerDown={(event) => {
+								onKeyDown={(event) => {
+									if (cell === undefined) return;
+									if (event.key === "Delete" || event.key === "Backspace") {
+										event.preventDefault();
+										changeCell(
+											{
+												x,
+												y,
+											},
+											() => undefined,
+										);
+										return;
+									}
+									if (event.key === "-" || event.key === "_") {
+										event.preventDefault();
+										decrement({
+											x,
+											y,
+										});
+										return;
+									}
+									if (!event.altKey && !event.metaKey) return;
+									const offset =
+										event.key === "ArrowLeft"
+											? {
+													x: -1,
+													y: 0,
+												}
+											: event.key === "ArrowRight"
+												? {
+														x: 1,
+														y: 0,
+													}
+												: event.key === "ArrowUp"
+													? {
+															x: 0,
+															y: -1,
+														}
+													: event.key === "ArrowDown"
+														? {
+																x: 0,
+																y: 1,
+															}
+														: undefined;
+									if (offset === undefined) return;
+									const target = {
+										x: x + offset.x,
+										y: y + offset.y,
+									};
 									if (
-										cell === undefined ||
-										event.button !== 0 ||
-										(!event.altKey && !event.metaKey)
+										target.x < 0 ||
+										target.x >= width ||
+										target.y < 0 ||
+										target.y >= height
 									)
 										return;
 									event.preventDefault();
-									dragRef.current = {
-										phase: "pressed",
-										pointerId: event.pointerId,
-										pressX: event.clientX,
-										pressY: event.clientY,
-										source: cell,
-									};
+									onCellsChange(moveCell(cells, cell, target));
+								}}
+								onPointerDown={(event) => {
+									if (cell !== undefined) startDrag(event, cell);
 								}}
 								type="button"
 							>
@@ -280,13 +260,19 @@ export const EditorProjectStartGrid = ({
 			</div>
 			<p className="text-xs text-muted">
 				Left click an empty slot to choose an item, left click a stack to add one, right
-				click to remove one. Hold Alt or Cmd and drag a stack to move it; dropping on an
-				occupied slot replaces it.
+				click to remove one. Hold Alt or Cmd and drag, or use Alt/Cmd + Arrow, to move a
+				stack; the destination is replaced. Press Minus to decrement or Delete to remove.
 			</p>
 			{pickerCell === undefined ? null : (
 				<EditorProjectStartItemPicker
 					onClose={() => setPickerCell(undefined)}
-					onSelect={(itemId) => onSet(pickerCell.x, pickerCell.y, itemId)}
+					onSelect={(itemId) =>
+						changeCell(pickerCell, () => ({
+							itemId,
+							quantity: 1,
+							...pickerCell,
+						}))
+					}
 					scope={scope}
 				/>
 			)}

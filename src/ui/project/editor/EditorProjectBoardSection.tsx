@@ -5,7 +5,7 @@ import { EditorProjectStartGrid } from "~/ui/project/editor/EditorProjectStartGr
 import { useEditorProjectFormSession } from "~/ui/project/editor/EditorProjectFormContext";
 
 export const EditorProjectBoardSection = () => {
-	const { form, project } = useEditorProjectFormSession();
+	const { form } = useEditorProjectFormSession();
 	const width = useStore(form.store, (state) => state.values.board.width);
 	const height = useStore(form.store, (state) => state.values.board.height);
 	const currentSpace = useStore(form.store, (state) => state.values.start.currentSpace);
@@ -18,35 +18,6 @@ export const EditorProjectBoardSection = () => {
 			x: entry.x,
 			y: entry.y,
 		}));
-	const findIndex = (x: number, y: number) =>
-		startBoard.findIndex(
-			(entry) => entry.space === currentSpace && entry.x === x && entry.y === y,
-		);
-
-	const moveStack = (sourceX: number, sourceY: number, targetX: number, targetY: number) => {
-		if (sourceX === targetX && sourceY === targetY) return;
-		const sourceIndex = findIndex(sourceX, sourceY);
-		const source = startBoard[sourceIndex];
-		if (source === undefined) return;
-		form.setFieldValue(
-			"start.board",
-			startBoard.flatMap((entry, index) => {
-				if (index === sourceIndex)
-					return [
-						{
-							...entry,
-							x: targetX,
-							y: targetY,
-						},
-					];
-				if (entry.space === currentSpace && entry.x === targetX && entry.y === targetY)
-					return [];
-				return [
-					entry,
-				];
-			}),
-		);
-	};
 	return (
 		<div className="grid gap-6">
 			<EditorFormSection
@@ -79,58 +50,17 @@ export const EditorProjectBoardSection = () => {
 				<EditorProjectStartGrid
 					cells={cells}
 					height={height}
-					scope="board"
-					width={width}
-					onMove={moveStack}
-					onSet={(x, y, itemId) =>
+					onCellsChange={(nextCells) =>
 						form.setFieldValue("start.board", [
-							...startBoard,
-							{
-								itemId,
-								quantity: 1,
+							...startBoard.filter((entry) => entry.space !== currentSpace),
+							...nextCells.map((cell) => ({
+								...cell,
 								space: currentSpace,
-								x,
-								y,
-							},
+							})),
 						])
 					}
-					onIncrement={(x, y) => {
-						const index = findIndex(x, y);
-						const current = startBoard[index];
-						if (current === undefined) return;
-						const maxStackSize =
-							project.config.items[current.itemId]?.maxStackSize ?? 1;
-						if (current.quantity >= maxStackSize) return;
-						form.setFieldValue(
-							"start.board",
-							startBoard.map((entry, candidateIndex) =>
-								candidateIndex === index
-									? {
-											...entry,
-											quantity: entry.quantity + 1,
-										}
-									: entry,
-							),
-						);
-					}}
-					onDecrement={(x, y) => {
-						const index = findIndex(x, y);
-						const current = startBoard[index];
-						if (current === undefined) return;
-						form.setFieldValue(
-							"start.board",
-							current.quantity <= 1
-								? startBoard.filter((_, candidateIndex) => candidateIndex !== index)
-								: startBoard.map((entry, candidateIndex) =>
-										candidateIndex === index
-											? {
-													...entry,
-													quantity: entry.quantity - 1,
-												}
-											: entry,
-									),
-						);
-					}}
+					scope="board"
+					width={width}
 				/>
 			</EditorFormSection>
 		</div>

@@ -180,7 +180,10 @@ const runNavigation = (
 	>,
 	startNodeId: string,
 	allowedEdgeIds?: ReadonlySet<string>,
-) => Effect.runSync(readEditorOriginFlowNavigationFx(flow, positions, startNodeId, allowedEdgeIds));
+) =>
+	Effect.runSync(
+		readEditorOriginFlowNavigationFx(flow, positions, startNodeId, "income", allowedEdgeIds),
+	);
 
 describe("readEditorOriginFlowHighlight", () => {
 	it("includes every producer branch with its mandatory prerequisites", () => {

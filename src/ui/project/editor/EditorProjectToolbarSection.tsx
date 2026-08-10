@@ -5,7 +5,7 @@ import { EditorProjectStartGrid } from "~/ui/project/editor/EditorProjectStartGr
 import { useEditorProjectFormSession } from "~/ui/project/editor/EditorProjectFormContext";
 
 export const EditorProjectToolbarSection = () => {
-	const { form, project } = useEditorProjectFormSession();
+	const { form } = useEditorProjectFormSession();
 	const size = useStore(form.store, (state) => state.values.toolbarSize);
 	const startToolbar = useStore(form.store, (state) => state.values.start.toolbar);
 	const cells = startToolbar.map((entry) => ({
@@ -14,34 +14,6 @@ export const EditorProjectToolbarSection = () => {
 		x: entry.position.x,
 		y: entry.position.y,
 	}));
-	const findIndex = (x: number) =>
-		startToolbar.findIndex((entry) => entry.position.x === x && entry.position.y === 0);
-
-	const moveStack = (sourceX: number, _sourceY: number, targetX: number) => {
-		if (sourceX === targetX) return;
-		const sourceIndex = findIndex(sourceX);
-		const source = startToolbar[sourceIndex];
-		if (source === undefined) return;
-		form.setFieldValue(
-			"start.toolbar",
-			startToolbar.flatMap((entry, index) => {
-				if (index === sourceIndex)
-					return [
-						{
-							...entry,
-							position: {
-								x: targetX,
-								y: 0,
-							},
-						},
-					];
-				if (entry.position.x === targetX && entry.position.y === 0) return [];
-				return [
-					entry,
-				];
-			}),
-		);
-	};
 	return (
 		<div className="grid gap-6">
 			<EditorFormSection
@@ -68,61 +40,20 @@ export const EditorProjectToolbarSection = () => {
 					<EditorProjectStartGrid
 						cells={cells}
 						height={1}
-						scope="toolbar"
-						width={size}
-						onMove={moveStack}
-						onSet={(x, _y, itemId) =>
-							form.setFieldValue("start.toolbar", [
-								...startToolbar,
-								{
-									itemId,
+						onCellsChange={(nextCells) =>
+							form.setFieldValue(
+								"start.toolbar",
+								nextCells.map(({ x, ...cell }) => ({
+									...cell,
 									position: {
 										x,
 										y: 0,
 									},
-									quantity: 1,
-								},
-							])
+								})),
+							)
 						}
-						onIncrement={(x) => {
-							const index = findIndex(x);
-							const current = startToolbar[index];
-							if (current === undefined) return;
-							const maxStackSize =
-								project.config.items[current.itemId]?.maxStackSize ?? 1;
-							if (current.quantity >= maxStackSize) return;
-							form.setFieldValue(
-								"start.toolbar",
-								startToolbar.map((entry, candidateIndex) =>
-									candidateIndex === index
-										? {
-												...entry,
-												quantity: entry.quantity + 1,
-											}
-										: entry,
-								),
-							);
-						}}
-						onDecrement={(x) => {
-							const index = findIndex(x);
-							const current = startToolbar[index];
-							if (current === undefined) return;
-							form.setFieldValue(
-								"start.toolbar",
-								current.quantity <= 1
-									? startToolbar.filter(
-											(_, candidateIndex) => candidateIndex !== index,
-										)
-									: startToolbar.map((entry, candidateIndex) =>
-											candidateIndex === index
-												? {
-														...entry,
-														quantity: entry.quantity - 1,
-													}
-												: entry,
-										),
-							);
-						}}
+						scope="toolbar"
+						width={size}
 					/>
 				)}
 			</EditorFormSection>

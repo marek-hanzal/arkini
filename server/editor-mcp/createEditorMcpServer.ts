@@ -251,6 +251,7 @@ const sourceMetadata = (source: EditorItemOriginSource) => ({
 });
 
 const itemRelationText = ({ itemId, level, project, role, subgraph }: ItemRelationView) => {
+	const direction = role === "output" ? "income" : "outcome";
 	const groups = new Map<
 		string,
 		{
@@ -280,11 +281,11 @@ const itemRelationText = ({ itemId, level, project, role, subgraph }: ItemRelati
 		.filter((candidate) => candidate !== itemId)
 		.sort((left, right) => left.localeCompare(right));
 	return [
-		`${role === "input" ? "Item input" : "Item output"} relationships for ${itemReference(project, itemId)}`,
+		`Item ${direction} for ${itemReference(project, itemId)}`,
 		`Depth: ${level} relationship ${level === 1 ? "hop" : "hops"}`,
-		role === "input"
-			? "Direction: external input item -> operation owner. Owner self-requirements are not editor-flow input edges."
-			: "Lookup direction: produced item <- operation owner. Relationships are printed canonically as owner -> output; guaranteed, chance, weighted, replacement, depletion, and expiry outputs all use the editor-flow model.",
+		direction === "outcome"
+			? "Outcome direction: external input item -> operation owner. Owner self-requirements are not editor-flow input edges."
+			: "Income lookup: produced item <- operation owner. Relationships are printed canonically as owner -> output; guaranteed, chance, weighted, replacement, depletion, and expiry outputs all use the editor-flow model.",
 		"",
 		"Reading guide:",
 		"- level: relationship-hop distance from the requested item; level 1 is a direct relationship.",
@@ -349,6 +350,7 @@ const itemRelationText = ({ itemId, level, project, role, subgraph }: ItemRelati
 };
 
 const itemRelationMetadata = ({ itemId, level, role, subgraph }: ItemRelationView) => ({
+	direction: role === "output" ? "income" : "outcome",
 	itemId,
 	level,
 	operations: [
@@ -365,7 +367,6 @@ const itemRelationMetadata = ({ itemId, level, role, subgraph }: ItemRelationVie
 		.filter((candidate) => candidate !== itemId)
 		.sort(),
 	relationshipCount: subgraph.relations.length,
-	role,
 });
 
 const errorText = (cause: unknown) => (cause instanceof Error ? cause.message : String(cause));
@@ -543,44 +544,10 @@ export const createEditorMcpServer = (
 			),
 	);
 	server.registerTool(
-		"item_input",
+		"item_income",
 		{
 			description:
-				"Follow editor-flow external-input relationships from one item. Level 1 returns operation owners that directly use the item; higher levels continue through owners used as inputs elsewhere.",
-			inputSchema: z
-				.object({
-					itemId: IdSchema.describe(
-						"The exact root item ID returned by item_collection.",
-					),
-					level: z
-						.number()
-						.int()
-						.positive()
-						.default(1)
-						.describe("Relationship-hop depth; defaults to 1."),
-				})
-				.strict(),
-		},
-		async ({ itemId, level }) =>
-			runTool(
-				readCurrentProjectFx(repository, readProjectContext).pipe(
-					Effect.map((project) =>
-						readItemRelationView(project, {
-							itemId,
-							level,
-							role: "input",
-						}),
-					),
-				),
-				itemRelationText,
-				itemRelationMetadata,
-			),
-	);
-	server.registerTool(
-		"item_output",
-		{
-			description:
-				"Find every editor-flow operation that outputs one item. Level 1 returns all direct producer owners; higher levels continue backward through operations that output those producers.",
+				"Read what leads to obtaining one item. Level 1 returns every direct producer owner; higher levels continue backward through operations that produce those producers.",
 			inputSchema: z
 				.object({
 					itemId: IdSchema.describe(
@@ -603,6 +570,40 @@ export const createEditorMcpServer = (
 							itemId,
 							level,
 							role: "output",
+						}),
+					),
+				),
+				itemRelationText,
+				itemRelationMetadata,
+			),
+	);
+	server.registerTool(
+		"item_outcome",
+		{
+			description:
+				"Read where one item leads. Level 1 returns every operation owner that directly uses the item as an external input; higher levels continue forward through owners used as inputs elsewhere.",
+			inputSchema: z
+				.object({
+					itemId: IdSchema.describe(
+						"The exact root item ID returned by item_collection.",
+					),
+					level: z
+						.number()
+						.int()
+						.positive()
+						.default(1)
+						.describe("Relationship-hop depth; defaults to 1."),
+				})
+				.strict(),
+		},
+		async ({ itemId, level }) =>
+			runTool(
+				readCurrentProjectFx(repository, readProjectContext).pipe(
+					Effect.map((project) =>
+						readItemRelationView(project, {
+							itemId,
+							level,
+							role: "input",
 						}),
 					),
 				),

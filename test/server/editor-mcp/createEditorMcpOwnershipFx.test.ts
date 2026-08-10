@@ -104,8 +104,8 @@ describe("createEditorMcpOwnershipFx", () => {
 			"item_meta",
 			"item_collection",
 			"item_detail",
-			"item_input",
-			"item_output",
+			"item_income",
+			"item_outcome",
 		]);
 		expect(tools.tools.find(({ name }) => name === "project")?.inputSchema.properties).toEqual(
 			{},
@@ -129,8 +129,8 @@ describe("createEditorMcpOwnershipFx", () => {
 			tools.tools.find(({ name }) => name === "item_detail")?.inputSchema.properties,
 		).toHaveProperty("id");
 		for (const toolName of [
-			"item_input",
-			"item_output",
+			"item_income",
+			"item_outcome",
 		]) {
 			const properties = tools.tools.find(({ name }) => name === toolName)?.inputSchema
 				.properties;
@@ -522,13 +522,18 @@ describe("createEditorMcpOwnershipFx", () => {
 				text: "Total: 5\nproducer: 1\nsimple: 4",
 			},
 		]);
-		const itemInput = await client.callTool({
-			name: "item_input",
+		const itemOutcome = await client.callTool({
+			name: "item_outcome",
 			arguments: {
 				itemId: "water",
 			},
 		});
-		expect(itemInput.content).toMatchObject([
+		expect(itemOutcome.content).toMatchObject([
+			{
+				text: expect.stringContaining("Item outcome for water [water; simple]"),
+			},
+		]);
+		expect(itemOutcome.content).toMatchObject([
 			{
 				text: expect.stringContaining(
 					[
@@ -541,12 +546,12 @@ describe("createEditorMcpOwnershipFx", () => {
 				),
 			},
 		]);
-		expect(itemInput.content).toMatchObject([
+		expect(itemOutcome.content).toMatchObject([
 			{
 				text: expect.not.stringContaining("source:forge:line:line:forge:run"),
 			},
 		]);
-		expect(itemInput.content).toMatchObject([
+		expect(itemOutcome.content).toMatchObject([
 			{
 				text: expect.stringContaining(
 					[
@@ -562,7 +567,8 @@ describe("createEditorMcpOwnershipFx", () => {
 				),
 			},
 		]);
-		expect(itemInput.structuredContent).toEqual({
+		expect(itemOutcome.structuredContent).toEqual({
+			direction: "outcome",
 			itemId: "water",
 			level: 1,
 			operations: [
@@ -578,27 +584,32 @@ describe("createEditorMcpOwnershipFx", () => {
 				"forge",
 			],
 			relationshipCount: 1,
-			role: "input",
 		});
-		const itemOutput = await client.callTool({
-			name: "item_output",
+		const itemIncome = await client.callTool({
+			name: "item_income",
 			arguments: {
 				itemId: "ingot",
 			},
 		});
-		expect(itemOutput.content).toMatchObject([
+		expect(itemIncome.content).toMatchObject([
+			{
+				text: expect.stringContaining("Item income for ingot [Ingot; simple]"),
+			},
+		]);
+		expect(itemIncome.content).toMatchObject([
 			{
 				text: expect.stringContaining("forge [forge; producer] -> ingot [Ingot; simple]"),
 			},
 		]);
-		expect(itemOutput.content).toMatchObject([
+		expect(itemIncome.content).toMatchObject([
 			{
 				text: expect.stringContaining(
 					"- traversed: the matched output edge, printed canonically as source item -> produced item.",
 				),
 			},
 		]);
-		expect(itemOutput.structuredContent).toEqual({
+		expect(itemIncome.structuredContent).toEqual({
+			direction: "income",
 			itemId: "ingot",
 			level: 1,
 			operations: [
@@ -614,10 +625,9 @@ describe("createEditorMcpOwnershipFx", () => {
 				"forge",
 			],
 			relationshipCount: 1,
-			role: "output",
 		});
 		const missingRelationItem = await client.callTool({
-			name: "item_input",
+			name: "item_income",
 			arguments: {
 				itemId: "missing",
 			},
@@ -659,8 +669,8 @@ describe("createEditorMcpOwnershipFx", () => {
 			"item_meta",
 			"item_collection",
 			"item_detail",
-			"item_input",
-			"item_output",
+			"item_income",
+			"item_outcome",
 		]);
 		expect(
 			(

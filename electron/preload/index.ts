@@ -68,6 +68,32 @@ const api: ArkiniElectronApi.Api = {
 		writeLastPackageId: (packageId) =>
 			ipcRenderer.invoke(ArkiniElectronApi.channels.launcherLastPackageIdWrite, packageId),
 	},
+	editor: {
+		status: () => ipcRenderer.invoke(ArkiniElectronApi.channels.editorStatus),
+		awaitIdle: () => ipcRenderer.invoke(ArkiniElectronApi.channels.editorAwaitIdle),
+		createProject: (request) =>
+			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectCreate, request),
+		listProjects: () => ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectList),
+		readProject: (projectId) =>
+			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectRead, projectId),
+		replaceConfig: (request) =>
+			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectReplaceConfig, request),
+		replaceResource: (request) =>
+			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectReplaceResource, request),
+		upsertItem: (request) =>
+			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectUpsertItem, request),
+		upsertResources: (request) =>
+			ipcRenderer.invoke(ArkiniElectronApi.channels.editorProjectUpsertResources, request),
+	},
+	editorMcp: {
+		status: () => ipcRenderer.invoke(ArkiniElectronApi.channels.editorMcpStatus),
+		activate: () => ipcRenderer.invoke(ArkiniElectronApi.channels.editorMcpActivate),
+		readPort: () => ipcRenderer.invoke(ArkiniElectronApi.channels.editorMcpPortRead),
+		writePort: (port) =>
+			ipcRenderer.invoke(ArkiniElectronApi.channels.editorMcpPortWrite, port),
+		checkPort: (port) =>
+			ipcRenderer.invoke(ArkiniElectronApi.channels.editorMcpPortCheck, port),
+	},
 	arkpack: {
 		list: () => ipcRenderer.invoke(ArkiniElectronApi.channels.arkpackList),
 		read: (packageId) => ipcRenderer.invoke(ArkiniElectronApi.channels.arkpackRead, packageId),

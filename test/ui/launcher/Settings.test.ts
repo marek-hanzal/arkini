@@ -86,6 +86,16 @@ const renderSettings = async (
 	const write = vi.fn(() => deferred.promise);
 	const writeCheatAvailability = vi.fn(() => Promise.resolve());
 	const openDiagnostics = vi.fn(() => Promise.resolve());
+	let resolvePortCheck: (value: { readonly type: "available" }) => void = () => undefined;
+	const checkEditorMcpPort = vi.fn(
+		() =>
+			new Promise<{
+				readonly type: "available";
+			}>((resolve) => {
+				resolvePortCheck = resolve;
+			}),
+	);
+	const writeEditorMcpPort = vi.fn(() => Promise.resolve());
 	const registry = AtomRegistry.make({
 		initialValues: [
 			[
@@ -113,6 +123,11 @@ const renderSettings = async (
 	Object.defineProperty(window, "arkini", {
 		configurable: true,
 		value: {
+			editorMcp: {
+				readPort: () => Promise.resolve(32_310),
+				checkPort: checkEditorMcpPort,
+				writePort: writeEditorMcpPort,
+			},
 			appearance: {
 				write,
 			},
@@ -224,12 +239,53 @@ const renderSettings = async (
 		write,
 		writeCheatAvailability,
 		writeWindowMode,
+		checkEditorMcpPort,
+		resolvePortCheck: (value: { readonly type: "available" }) => resolvePortCheck(value),
+		writeEditorMcpPort,
 		openDiagnostics,
 		registry,
 	};
 };
 
 describe("Settings", () => {
+	it("checks and saves the global MCP port on blur without an edit race", async () => {
+		const { container, checkEditorMcpPort, resolvePortCheck, writeEditorMcpPort } =
+			await renderSettings([
+				"/settings",
+			]);
+		const input = container.querySelector<HTMLInputElement>(
+			'[data-ui="SettingsEditorMcpPort"] input',
+		);
+		if (input === null) throw new Error("Expected Editor MCP port input.");
+		await vi.waitFor(() => expect(input.value).toBe("32310"));
+
+		await act(async () => {
+			input.focus();
+			Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")?.set?.call(
+				input,
+				"32311",
+			);
+			input.dispatchEvent(
+				new Event("input", {
+					bubbles: true,
+				}),
+			);
+		});
+		await act(async () => input.blur());
+		await vi.waitFor(() => expect(checkEditorMcpPort).toHaveBeenCalledWith(32_311));
+		expect(input.disabled).toBe(true);
+		expect(container.textContent).toContain("Checking port…");
+
+		await act(async () =>
+			resolvePortCheck({
+				type: "available",
+			}),
+		);
+		await vi.waitFor(() => expect(writeEditorMcpPort).toHaveBeenCalledWith(32_311));
+		expect(input.disabled).toBe(false);
+		expect(container.textContent).toContain("Port is available and saved.");
+	});
+
 	it("opens the bounded diagnostic log directory", async () => {
 		const { container, openDiagnostics } = await renderSettings([
 			"/settings",

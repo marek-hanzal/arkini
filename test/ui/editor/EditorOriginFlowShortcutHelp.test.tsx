@@ -17,8 +17,12 @@ describe("EditorOriginFlowShortcutHelp", () => {
 		expect(html).toContain(">L</kbd>");
 		expect(html).toContain(">0</kbd>");
 		expect(html).toContain(">S</kbd>");
-		expect(html).toContain("Show one more hidden level of the selected graph.");
-		expect(html).toContain("Hide the farthest visible level of the selected graph.");
+		expect(html).toMatch(
+			/>K<\/kbd><span>Hide the farthest visible level of the selected graph\.<\/span>/,
+		);
+		expect(html).toMatch(
+			/>L<\/kbd><span>Show one more hidden level of the selected graph\.<\/span>/,
+		);
 		expect(html).toContain(
 			"Restore the default one-level view and return to the selected item.",
 		);

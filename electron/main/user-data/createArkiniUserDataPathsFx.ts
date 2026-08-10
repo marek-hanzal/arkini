@@ -9,6 +9,7 @@ export const createArkiniUserDataPathsFx = Effect.fn("createArkiniUserDataPathsF
 		Effect.sync((): ArkiniUserDataPaths => {
 			const root = join(userDataPath, "arkini");
 			const gameRoot = join(root, "game");
+			const editorRoot = join(root, "editor");
 			return {
 				root,
 				game: {
@@ -17,6 +18,10 @@ export const createArkiniUserDataPathsFx = Effect.fn("createArkiniUserDataPathsF
 					logs: join(gameRoot, "logs"),
 					preferences: join(gameRoot, "preferences"),
 					saves: join(gameRoot, "saves"),
+				},
+				editor: {
+					root: editorRoot,
+					database: join(editorRoot, "projects.sqlite"),
 				},
 			};
 		}),

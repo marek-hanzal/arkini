@@ -24,11 +24,11 @@ const readShortcutRows = (direction: EditorOriginFlowDirection) =>
 		],
 		[
 			"K",
-			"Show one more hidden level of the selected graph.",
+			"Hide the farthest visible level of the selected graph.",
 		],
 		[
 			"L",
-			"Hide the farthest visible level of the selected graph.",
+			"Show one more hidden level of the selected graph.",
 		],
 		[
 			"0",

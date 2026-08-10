@@ -1,0 +1,18 @@
+import { Data } from "effect";
+
+export type EditorProjectRepositoryOperation =
+	| "await-idle"
+	| "create-project"
+	| "list-projects"
+	| "read-project"
+	| "replace-config"
+	| "replace-resource"
+	| "upsert-item"
+	| "upsert-resource";
+
+/** One canonical editor-project repository operation failed. */
+export class EditorProjectRepositoryError extends Data.TaggedError("EditorProjectRepositoryError")<{
+	readonly operation: EditorProjectRepositoryOperation;
+	readonly message: string;
+	readonly cause?: unknown;
+}> {}

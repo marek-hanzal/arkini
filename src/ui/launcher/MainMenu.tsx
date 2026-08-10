@@ -8,12 +8,14 @@ import { useArkpacks } from "~/bridge/arkpack/useArkpacks";
 import { Button, ButtonLink, PrimaryButton, PrimaryButtonLink } from "~/ui/button/Button";
 import { LauncherStartupAtom } from "~/ui/launcher/LauncherStartupAtom";
 import { MainMenuExitCommandAtom } from "~/ui/launcher/MainMenuExitCommandAtom";
+import { EditorServiceStatusAtom } from "~/bridge/editor/EditorServiceStatusAtom";
 
 /** Renders the semantic out-of-game launcher actions over authoritative startup state. */
 export const MainMenu = () => {
 	const { state: catalogState } = useArkpacks();
 	const startup = useAtomValue(LauncherStartupAtom);
 	const [exitState, requestExit] = useAtom(MainMenuExitCommandAtom);
+	const editorStatus = useAtomValue(EditorServiceStatusAtom);
 	const exitPending = exitState.kind === "pending";
 	const builtInAvailable =
 		AsyncResult.isSuccess(startup) &&
@@ -62,12 +64,23 @@ export const MainMenu = () => {
 						: "Preparing Play…"}
 				</PrimaryButton>
 			)}
-			<ButtonLink
-				to="/editor/welcome"
-				className="rounded-xl"
-			>
-				Editor
-			</ButtonLink>
+			{editorStatus.type === "ready" ? (
+				<ButtonLink
+					to="/editor/welcome"
+					preload={false}
+					className="rounded-xl"
+				>
+					Editor
+				</ButtonLink>
+			) : (
+				<Button
+					className="rounded-xl"
+					cursorIntent={editorStatus.type === "starting" ? "progress" : "not-allowed"}
+					disabled
+				>
+					{editorStatus.type === "starting" ? "Preparing Editor…" : "Editor unavailable"}
+				</Button>
+			)}
 			<ButtonLink
 				to="/arkpacks"
 				className="rounded-xl"
@@ -108,6 +121,8 @@ export const MainMenu = () => {
 				<p className="text-center text-sm text-danger">
 					Startup failed: {String(Cause.squash(startup.cause))}
 				</p>
+			) : editorStatus.type === "unavailable" ? (
+				<p className="text-center text-sm text-danger">{editorStatus.message}</p>
 			) : exitState.kind === "error" ? (
 				<p className="text-center text-sm text-danger">
 					Exit failed: {String(exitState.error)}

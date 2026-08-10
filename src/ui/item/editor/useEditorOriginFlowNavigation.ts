@@ -45,9 +45,9 @@ const readShortcut = (event: KeyboardEvent): FlowNavigationShortcut | undefined 
 		return undefined;
 	switch (event.key.toLowerCase()) {
 		case "k":
-			return "depth-more";
-		case "l":
 			return "depth-less";
+		case "l":
+			return "depth-more";
 		case "0":
 			return "depth-reset";
 		case "n":

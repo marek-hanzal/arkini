@@ -14,6 +14,12 @@ import { createDiagnosticLogFx } from "./diagnostics/createDiagnosticLogFx";
 import { createFilesystemWindowPreferencesFx } from "./window/createFilesystemWindowPreferencesFx";
 import { createWindowModeControllerOwnershipFx } from "./window/createWindowModeControllerOwnershipFx";
 import { createArkiniUserDataPathsFx } from "./user-data/createArkiniUserDataPathsFx";
+import { createSqliteEditorProjectRepositoryFx } from "../../server/editor/createSqliteEditorProjectRepositoryFx";
+import type { EditorProjectServiceOwnership } from "../../server/editor/EditorProjectServiceOwnership";
+import { registerEditorProjectIpcFx } from "./editor/registerEditorProjectIpcFx";
+import { createFilesystemEditorMcpPreferencesFx } from "./editor-mcp/createFilesystemEditorMcpPreferencesFx";
+import { registerEditorMcpPreferencesIpcFx } from "./editor/registerEditorMcpPreferencesIpcFx";
+import { createEditorMcpOwnershipFx } from "../../server/editor-mcp/createEditorMcpOwnershipFx";
 
 export const electronMainFx = Effect.fn("electronMainFx")(function* () {
 	const hasSingleInstanceLock = app.requestSingleInstanceLock();
@@ -35,6 +41,29 @@ export const electronMainFx = Effect.fn("electronMainFx")(function* () {
 
 	const userDataPath = app.getPath("userData");
 	const userDataPaths = yield* createArkiniUserDataPathsFx(userDataPath);
+	const editorProjectServiceOwnership: EditorProjectServiceOwnership =
+		yield* createSqliteEditorProjectRepositoryFx({
+			databasePath: userDataPaths.editor.database,
+		}).pipe(
+			Effect.map((repository) => ({
+				type: "ready" as const,
+				repository,
+			})),
+			Effect.catch((cause) =>
+				Effect.sync(() => {
+					console.error("Arkini editor database could not be initialized.", cause);
+					return {
+						type: "unavailable" as const,
+						message: "The editor database could not be initialized.",
+					};
+				}),
+			),
+		);
+	if (editorProjectServiceOwnership.type === "ready") {
+		yield* Effect.sync(() => {
+			app.once("will-quit", editorProjectServiceOwnership.repository.closeSync);
+		});
+	}
 
 	const diagnostics = yield* createDiagnosticLogFx(userDataPaths.game.logs).pipe(
 		Effect.catch((cause) =>
@@ -97,6 +126,14 @@ export const electronMainFx = Effect.fn("electronMainFx")(function* () {
 	const windowPreferences = yield* createFilesystemWindowPreferencesFx({
 		root: userDataPaths.game.preferences,
 	});
+	const editorMcpPreferences = yield* createFilesystemEditorMcpPreferencesFx({
+		root: userDataPaths.game.preferences,
+	});
+	const editorMcpOwnership = yield* createEditorMcpOwnershipFx({
+		editor: editorProjectServiceOwnership,
+		readPortFx: editorMcpPreferences.readPortFx,
+	});
+	yield* Effect.sync(() => app.once("will-quit", editorMcpOwnership.closeSync));
 	const windowModeControllerOwnership = yield* createWindowModeControllerOwnershipFx();
 	const appearanceTheme = yield* appearancePreferences.readThemeFx;
 	yield* Effect.sync(() => {
@@ -118,6 +155,15 @@ export const electronMainFx = Effect.fn("electronMainFx")(function* () {
 		windowPreferences,
 		diagnostics,
 		userDataPaths,
+	});
+	yield* registerEditorProjectIpcFx({
+		trustedRenderer,
+		ownership: editorProjectServiceOwnership,
+	});
+	yield* registerEditorMcpPreferencesIpcFx({
+		trustedRenderer,
+		preferences: editorMcpPreferences,
+		ownership: editorMcpOwnership,
 	});
 	const createWindowFx = windowPreferences.readModeFx.pipe(
 		Effect.flatMap((windowMode) =>

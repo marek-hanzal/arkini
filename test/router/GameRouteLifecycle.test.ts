@@ -100,6 +100,7 @@ afterEach(async () => {
 	});
 	vi.useRealTimers();
 	for (const runtime of runtimes.splice(0)) await runtime.dispose();
+	Reflect.deleteProperty(window, "arkini");
 });
 
 describe("game route lifecycle", () => {
@@ -214,6 +215,24 @@ describe("game route lifecycle", () => {
 
 	it("releases the active Game before opening the editor", async () => {
 		vi.useFakeTimers();
+		Object.defineProperty(window, "arkini", {
+			configurable: true,
+			value: {
+				editor: {
+					status: () =>
+						Promise.resolve({
+							type: "ready" as const,
+						}),
+				},
+				editorMcp: {
+					activate: () =>
+						Promise.resolve({
+							type: "ready" as const,
+							port: 32_310,
+						}),
+				},
+			},
+		});
 		const dispose = vi.fn();
 		const game = createGame(Effect.sync(dispose));
 		const { rendererRuntime, router } = await createHarness("/game/package-route/board", game);

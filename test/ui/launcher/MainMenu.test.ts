@@ -21,6 +21,7 @@ import { createRendererLifecycleFx } from "~/bridge/lifecycle/createRendererLife
 import { MainMenuPage } from "~/page/launcher/MainMenuPage";
 import { LauncherStartupAtom } from "~/ui/launcher/LauncherStartupAtom";
 import { LauncherStartupConfigAtom } from "~/ui/launcher/LauncherStartupConfigAtom";
+import { EditorServiceStatusAtom } from "~/bridge/editor/EditorServiceStatusAtom";
 
 (
 	globalThis as {
@@ -91,6 +92,9 @@ describe("MainMenu", () => {
 			scheduleTask,
 		});
 		registries.push(registry);
+		registry.set(EditorServiceStatusAtom, {
+			type: "ready",
+		});
 		registry.set(ArkpackCatalogOwnerAtom, catalog);
 		registry.set(
 			RendererLifecycleOwnerAtom,
@@ -190,6 +194,27 @@ describe("MainMenu", () => {
 			(link) => link.textContent === "Editor",
 		);
 		expect(editor?.getAttribute("href")).toBe("/editor/welcome");
+		await act(async () => {
+			registry.set(EditorServiceStatusAtom, {
+				type: "unavailable",
+				message: "SQLite unavailable.",
+			});
+		});
+		await vi.waitFor(() => expect(container.textContent).toContain("Editor unavailable"));
+		expect(
+			Array.from(container.querySelectorAll("a")).some((link) =>
+				link.getAttribute("href")?.includes("/editor"),
+			),
+		).toBe(false);
+		const unavailableEditor = Array.from(container.querySelectorAll("button")).find(
+			(button) => button.textContent === "Editor unavailable",
+		);
+		expect(unavailableEditor).toBeInstanceOf(HTMLButtonElement);
+		expect((unavailableEditor as HTMLButtonElement).disabled).toBe(true);
+		expect(container.textContent).toContain("SQLite unavailable.");
+		expect(
+			Array.from(container.querySelectorAll("a")).some((link) => link.textContent === "Play"),
+		).toBe(true);
 		expect(container.textContent).toContain("Arkpacks");
 		expect(container.textContent).toContain("Settings");
 		expect(container.textContent).toContain("About");

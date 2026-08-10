@@ -13,7 +13,7 @@ const placeholderHeroBytes = Uint8Array.from(
 	(character) => character.charCodeAt(0),
 );
 
-/** Creates one schema-valid empty project through the canonical IndexedDB repository. */
+/** Creates one schema-valid empty project through the canonical editor repository. */
 export const createFreshEditorProjectFx = Effect.fn("createFreshEditorProjectFx")(function* () {
 	const projectId = yield* Effect.sync(() => IdSchema.parse(`project-${createId()}`));
 	const config = GameConfigSchema.parse({

@@ -12,6 +12,7 @@ import { configureRendererLifecycleFx } from "~/bridge/lifecycle/configureRender
 import { createRendererLifecycleFx } from "~/bridge/lifecycle/createRendererLifecycleFx";
 import { RendererAtomRegistry } from "~/bridge/reactivity/RendererAtomRegistry";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
+import { refreshEditorServiceStatusFx } from "~/bridge/editor/refreshEditorServiceStatusFx";
 import { installRendererControlledCloseFx } from "~/installRendererControlledCloseFx";
 import { installRendererNativeDragGuardFx } from "~/installRendererNativeDragGuardFx";
 import { installWindowModeSyncFx } from "~/bridge/window/installWindowModeSyncFx";
@@ -35,6 +36,7 @@ document.title = ArkiniWindowTitle;
  */
 const catalog = RendererRuntime.runSync(createArkpackCatalogFx());
 RendererRuntime.runSync(configureArkpackCatalogFx(catalog));
+void RendererRuntime.runPromise(refreshEditorServiceStatusFx);
 RendererRuntime.runSync(
 	installRendererNativeDragGuardFx({
 		root: rootElement,

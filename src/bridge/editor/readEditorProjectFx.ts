@@ -9,7 +9,7 @@ export namespace readEditorProjectFx {
 	}
 }
 
-/** Reads one canonical project from the IndexedDB repository. */
+/** Reads one canonical project from the editor repository. */
 export const readEditorProjectFx = Effect.fn("readEditorProjectFx")(function* ({
 	projectId,
 }: readEditorProjectFx.Props) {

@@ -66,6 +66,33 @@ const boundaryRules = [
 	},
 
 	{
+		name: "editor-domain-no-presentation-imports",
+		comment:
+			"The shared editor domain is platform-neutral and never depends on bridge, UI, pages, routes, renderer entrypoints, or Electron.",
+		severity: "error",
+		from: {
+			path: "^src/editor(?:/|$)",
+		},
+		to: {
+			path: "^src/(?:bridge|ui|page|@routes)(?:/|$)|^src/(?:main|router|_route)\\.tsx?$|^electron(?:/|$)|^node_modules/electron(?:/|$)",
+		},
+	},
+	{
+		name: "server-no-presentation-or-electron-imports",
+		comment:
+			"The local server owns editor persistence and MCP capabilities without depending on renderer or Electron runtime adapters.",
+		severity: "error",
+		from: {
+			path: "^server(?:/|$)",
+		},
+		to: {
+			path: "^src/(?:bridge|ui|page|@routes)(?:/|$)|^src/(?:main|router|_route)\\.tsx?$|^electron(?:/|$)|^node_modules/electron(?:/|$)",
+			pathNot: [
+				"^electron/contract(?:/|$)",
+			],
+		},
+	},
+	{
 		name: "bridge-no-presentation-imports",
 		comment:
 			"Bridge domains connect UI to public engine contracts and never depend on reusable UI, pages, routes, or renderer entrypoints.",
@@ -174,7 +201,7 @@ const boundaryRules = [
 			path: "^(?:src/(?:engine|bridge|ui|page|@routes)|src/(?:main|router|_route)\\.tsx?)(?:/|$)",
 		},
 		to: {
-			path: "^(?:electron(?:/|$)|node_modules/electron(?:/|$))",
+			path: "^(?:server(?:/|$)|electron(?:/|$)|node_modules/electron(?:/|$))",
 			pathNot: [
 				"^electron/contract(?:/|$)",
 			],

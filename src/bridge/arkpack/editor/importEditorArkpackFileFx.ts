@@ -19,7 +19,7 @@ export namespace importEditorArkpackFileFx {
 	}
 }
 
-/** Validates one arkpack and atomically creates one canonical IndexedDB project. */
+/** Validates one arkpack and atomically creates one canonical editor project. */
 export const importEditorArkpackFileFx = Effect.fn("importEditorArkpackFileFx")(function* ({
 	file,
 }: importEditorArkpackFileFx.Props) {

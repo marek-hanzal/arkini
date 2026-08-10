@@ -1,8 +1,1 @@
-/** Stable repository-backed identity used by editor discovery and navigation. */
-export interface EditorProjectDescriptor {
-	readonly projectId: string;
-	readonly title: string;
-	readonly game: string;
-	readonly createdAtMs: number;
-	readonly updatedAtMs: number;
-}
+export type { EditorProjectDescriptor } from "~/editor/EditorProjectDescriptor";

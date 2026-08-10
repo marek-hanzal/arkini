@@ -5,7 +5,7 @@ import {
 	EditorItemOriginItemInputPortId,
 	EditorItemOriginItemOutputPortId,
 	type EditorItemOriginFlow,
-} from "~/bridge/item/editor/readEditorItemOriginFlowFx";
+} from "~/bridge/item/editor/EditorItemOriginFlow";
 import { layoutEditorItemOriginFlowInWorkerFx } from "~/ui/item/editor/layoutEditorItemOriginFlowInWorkerFx";
 import type {
 	EditorItemOriginFlowLayout,

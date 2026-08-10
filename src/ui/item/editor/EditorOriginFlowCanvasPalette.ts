@@ -1,7 +1,7 @@
 import type {
 	EditorItemOriginItemNode,
 	EditorItemOriginOperationKind,
-} from "~/bridge/item/editor/readEditorItemOriginFlowFx";
+} from "~/bridge/item/editor/EditorItemOriginFlow";
 
 export interface EditorOriginFlowCanvasPalette {
 	readonly accent: string;

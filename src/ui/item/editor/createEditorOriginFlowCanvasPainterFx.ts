@@ -21,5 +21,5 @@ export const createEditorOriginFlowCanvasPainterFx = Effect.fn(
 		...nodePainter,
 		...palette,
 		...routePainter,
-	};
+	} as const;
 });

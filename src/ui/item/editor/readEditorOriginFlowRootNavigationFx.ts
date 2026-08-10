@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import type { EditorItemOriginFlow } from "~/bridge/item/editor/readEditorItemOriginFlowFx";
+import type { EditorItemOriginFlow } from "~/bridge/item/editor/EditorItemOriginFlow";
 import type { EditorOriginFlowHighlight } from "~/ui/item/editor/readEditorOriginFlowHighlightFx";
 
 /** Reads terminal/root nodes from the complete selected directional graph, farthest first. */

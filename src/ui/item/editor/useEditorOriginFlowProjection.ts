@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 
-import type { EditorItemOriginFlow } from "~/bridge/item/editor/readEditorItemOriginFlowFx";
+import type { EditorItemOriginFlow } from "~/bridge/item/editor/EditorItemOriginFlow";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import type {
 	EditorItemOriginFlowLayoutNode,

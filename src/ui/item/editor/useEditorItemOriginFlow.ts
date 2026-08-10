@@ -5,9 +5,11 @@ import * as Atom from "effect/unstable/reactivity/Atom";
 import { useEffect, useMemo } from "react";
 
 import {
-	readEditorItemOriginFlowFx,
 	type EditorItemOriginFlow,
 	type EditorItemOriginFlowProgress,
+} from "~/bridge/item/editor/EditorItemOriginFlow";
+import {
+	readEditorItemOriginFlowFx,
 	type EditorItemOriginFlowRequest,
 } from "~/bridge/item/editor/readEditorItemOriginFlowFx";
 import type {
@@ -55,14 +57,13 @@ const FailedProgress: EditorItemOriginFlowProgress = {
 	percent: 0,
 };
 
-const EditorItemOriginFlowProgressAtom = Atom.make<EditorItemOriginFlowProgressState>({
-	progress: InitialProgress,
-}).pipe(Atom.setIdleTTL(0));
-
-const EditorItemOriginFlowCommandAtom = Atom.fn(
-	(request: EditorItemOriginFlowCommandRequest, get) =>
+const createEditorItemOriginFlowAtoms = () => {
+	const progressAtom = Atom.make<EditorItemOriginFlowProgressState>({
+		progress: InitialProgress,
+	}).pipe(Atom.setIdleTTL(0));
+	const commandAtom = Atom.fn((request: EditorItemOriginFlowCommandRequest, get) =>
 		Effect.gen(function* () {
-			get.set(EditorItemOriginFlowProgressAtom, {
+			get.set(progressAtom, {
 				progress: InitialProgress,
 				request,
 			});
@@ -74,7 +75,7 @@ const EditorItemOriginFlowCommandAtom = Atom.fn(
 							targetItemId: request.itemId,
 						}),
 				onProgress: (progress) => {
-					get.set(EditorItemOriginFlowProgressAtom, {
+					get.set(progressAtom, {
 						progress: {
 							...progress,
 							percent: Math.round(progress.percent * 0.9),
@@ -83,7 +84,7 @@ const EditorItemOriginFlowCommandAtom = Atom.fn(
 					});
 				},
 			});
-			get.set(EditorItemOriginFlowProgressAtom, {
+			get.set(progressAtom, {
 				progress: {
 					label: "Laying out flow",
 					percent: 95,
@@ -91,7 +92,7 @@ const EditorItemOriginFlowCommandAtom = Atom.fn(
 				request,
 			});
 			const layout = yield* layoutEditorItemOriginFlowInWorkerFx(flow);
-			get.set(EditorItemOriginFlowProgressAtom, {
+			get.set(progressAtom, {
 				progress: {
 					label: "Flow ready",
 					percent: 100,
@@ -105,13 +106,19 @@ const EditorItemOriginFlowCommandAtom = Atom.fn(
 				request,
 			};
 		}),
-).pipe(Atom.setIdleTTL(0));
+	).pipe(Atom.setIdleTTL(0));
+	return {
+		commandAtom,
+		progressAtom,
+	};
+};
 
 /** Owns one subscription-scoped flow build for the currently routed item. */
 export const useEditorItemOriginFlow = (
 	config: EditorItemOriginFlowRequest["config"],
 	itemId?: string,
 ): EditorItemOriginFlowState => {
+	const { commandAtom, progressAtom } = useMemo(createEditorItemOriginFlowAtoms, []);
 	const request = useMemo<EditorItemOriginFlowCommandRequest>(
 		() => ({
 			config,
@@ -126,8 +133,8 @@ export const useEditorItemOriginFlow = (
 			itemId,
 		],
 	);
-	const [result, runFlow] = useAtom(EditorItemOriginFlowCommandAtom);
-	const progressState = useAtomValue(EditorItemOriginFlowProgressAtom);
+	const [result, runFlow] = useAtom(commandAtom);
+	const progressState = useAtomValue(progressAtom);
 
 	useEffect(() => {
 		runFlow(request);

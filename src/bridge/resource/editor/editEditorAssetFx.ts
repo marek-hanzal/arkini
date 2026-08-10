@@ -37,9 +37,9 @@ export const editEditorAssetFx = Effect.fn("editEditorAssetFx")(function* ({
 	yield* Effect.yieldNow;
 	return yield* Effect.uninterruptible(
 		Effect.gen(function* () {
-			const project = yield* Atom.get(EditorProjectAtom(projectId));
+			const project = yield* repository.readProjectFx(projectId);
 			const existing = project?.resources.find(({ id }) => id === currentId);
-			if (project === undefined || existing === undefined) {
+			if (project === null || existing === undefined) {
 				return yield* Effect.fail(
 					new EditorProjectError({
 						reason: "invalid-asset",

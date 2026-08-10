@@ -5,6 +5,8 @@ import {
 	EditorItemSectionIds,
 } from "~/ui/item/editor/EditorItemSections";
 
+export type { EditorItemSectionId };
+
 /** Parses one explicit item section route segment. */
 export const parseEditorItemSectionIdFx = Effect.fn("parseEditorItemSectionIdFx")(
 	(candidate: string): Effect.Effect<EditorItemSectionId, Error> => {

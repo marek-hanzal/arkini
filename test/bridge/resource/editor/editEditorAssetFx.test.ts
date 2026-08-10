@@ -28,11 +28,12 @@ const createProject = (revision = 3): EditorProject => ({
 
 const createRepository = (
 	replaceResourceFx: EditorProjectRepositoryService["replaceResourceFx"],
+	project = createProject(),
 ): EditorProjectRepositoryService => ({
 	awaitIdleFx: Effect.void,
 	createProjectFx: () => Effect.die("Unexpected create."),
 	listProjectsFx: Effect.die("Unexpected list."),
-	readProjectFx: () => Effect.die("Unexpected read."),
+	readProjectFx: () => Effect.succeed(project),
 	replaceConfigFx: () => Effect.die("Unexpected config save."),
 	replaceResourceFx,
 	upsertItemFx: () => Effect.die("Unexpected item save."),
@@ -44,7 +45,7 @@ afterEach(() => {
 });
 
 describe("editEditorAssetFx", () => {
-	it("binds the resource replacement to the exact project revision it rewrote", async () => {
+	it("plans the resource replacement from the canonical repository snapshot", async () => {
 		const registry = AtomRegistry.make({
 			scheduleTask,
 		});
@@ -53,7 +54,10 @@ describe("editEditorAssetFx", () => {
 		const projectAtom = EditorProjectAtom(project.projectId);
 		registry.mount(projectAtom);
 		registry.set(projectAtom, {
-			project,
+			project: {
+				...project,
+				revision: project.revision - 1,
+			},
 		});
 		const replaceResourceFx = vi.fn<EditorProjectRepositoryService["replaceResourceFx"]>(
 			({ config, resource }) =>

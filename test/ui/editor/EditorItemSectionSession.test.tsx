@@ -6,7 +6,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("@effect/atom-react", () => ({
 	scheduleTask: vi.fn(),
-	useAtomSet: () => vi.fn(),
+	useAtomSet: () => state.saveItem,
 	useAtomValue: () => state.canonical,
 }));
 
@@ -14,7 +14,7 @@ vi.mock("@tanstack/react-router", async (importOriginal) => {
 	const original = await importOriginal<typeof import("@tanstack/react-router")>();
 	return {
 		...original,
-		useNavigate: () => vi.fn().mockResolvedValue(undefined),
+		useNavigate: () => state.navigate,
 	};
 });
 
@@ -47,8 +47,8 @@ vi.mock("~/ui/button/Button", () => ({
 			},
 			children,
 		),
-	PrimaryButton: ({ children }: { readonly children?: ReactNode }) =>
-		createElement("button", null, children),
+	PrimaryButton: ({ children, ...props }: ButtonHTMLAttributes<HTMLButtonElement>) =>
+		createElement("button", props, children),
 	PrimaryButtonLink: ({
 		children,
 		params,
@@ -74,7 +74,20 @@ vi.mock("~/ui/button/Button", () => ({
 const state = vi.hoisted(() => ({
 	canonical: undefined as unknown,
 	draft: undefined as unknown,
+	navigate: vi.fn().mockResolvedValue(undefined),
 	persisted: undefined as unknown,
+	saveItem: vi.fn(),
+	unsavedSession: undefined as
+		| {
+				readonly save: () => Promise<boolean>;
+		  }
+		| undefined,
+}));
+
+vi.mock("~/ui/editor/useEditorUnsavedChangesRegistration", () => ({
+	useEditorUnsavedChangesRegistration: (_id: string, session: typeof state.unsavedSession) => {
+		state.unsavedSession = session;
+	},
 }));
 
 vi.mock("~/bridge/editor/useEditorProject", () => ({
@@ -151,6 +164,8 @@ beforeEach(() => {
 	};
 	state.draft = item;
 	state.persisted = item;
+	state.saveItem.mockResolvedValue(item);
+	state.unsavedSession = undefined;
 });
 
 afterEach(async () => {
@@ -212,6 +227,30 @@ const renderStandalone = async (children: ReactNode) => {
 };
 
 describe("item section form session", () => {
+	it("keeps the unsaved-leave Save persistence-only while ordinary Save owns navigation", async () => {
+		const { container } = await render(<EditorItemIdentitySection />);
+		const title = container.querySelector<HTMLInputElement>('input[name="title"]');
+		if (title === null || state.unsavedSession === undefined)
+			throw new Error("Missing item form.");
+
+		await changeInput(title, "Saved without leaving");
+		await act(async () => {
+			await state.unsavedSession?.save();
+		});
+		expect(state.saveItem).toHaveBeenCalledOnce();
+		expect(state.navigate).not.toHaveBeenCalled();
+
+		await changeInput(title, "Saved and leave");
+		const saveButton = [
+			...container.querySelectorAll("button"),
+		].find((button) => button.textContent === "Save");
+		await act(async () => {
+			saveButton?.click();
+			await Promise.resolve();
+		});
+		expect(state.navigate).toHaveBeenCalledOnce();
+	});
+
 	it("preserves one local form while routed section content changes", async () => {
 		const { container, renderForm } = await render(<EditorItemIdentitySection />);
 		const navigation = container.querySelector('[data-ui="EditorSectionNavigation"]');

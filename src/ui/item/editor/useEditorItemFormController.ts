@@ -18,6 +18,7 @@ import type {
 import { readEditorItemSectionForPathFx } from "~/ui/item/editor/readEditorItemSectionForPathFx";
 import { EditorItemDraftDefaults } from "~/ui/item/editor/EditorItemDraftDefaults";
 import { readSettledAsyncResultError } from "~/ui/reactivity/readSettledAsyncResultError";
+import { useEditorUnsavedChangesRegistration } from "~/ui/editor/useEditorUnsavedChangesRegistration";
 
 export namespace useEditorItemFormController {
 	export interface Props {
@@ -56,6 +57,7 @@ export const useEditorItemFormController = ({
 		mode: "promise",
 	});
 	const submitSucceeded = useRef(false);
+	const notifyOnSaved = useRef(true);
 	const form = useAppForm({
 		defaultValues: canonicalItem,
 		validationLogic: revalidateLogic({
@@ -78,7 +80,7 @@ export const useEditorItemFormController = ({
 								...saved.merge,
 							],
 			});
-			await onSaved?.(saved);
+			if (notifyOnSaved.current) await onSaved?.(saved);
 		},
 	});
 	const initializedCapability = useRef(false);
@@ -113,33 +115,63 @@ export const useEditorItemFormController = ({
 			? "Fix the highlighted item fields before saving."
 			: undefined,
 	);
-	const save = useCallback(async () => {
-		if (!dirty || submitting) return false;
-		submitSucceeded.current = false;
-		await form.handleSubmit();
-		if (!submitSucceeded.current) {
-			const result = EditorItemFormSchema.safeParse(form.state.values);
-			const issue = result.success ? undefined : result.error.issues[0];
-			if (issue !== undefined) {
-				await onInvalidSection(
-					RendererRuntime.runSync(readEditorItemSectionForPathFx(issue.path)),
-				);
-				const focusInvalidField = () =>
-					document.querySelector<HTMLElement>("[aria-invalid='true']")?.focus();
-				if (typeof requestAnimationFrame === "function") {
-					requestAnimationFrame(focusInvalidField);
-				} else {
-					setTimeout(focusInvalidField, 0);
+	const runSave = useCallback(
+		async (notify: boolean) => {
+			if (!dirty || submitting) return false;
+			submitSucceeded.current = false;
+			notifyOnSaved.current = notify;
+			try {
+				await form.handleSubmit();
+			} finally {
+				notifyOnSaved.current = true;
+			}
+			if (!submitSucceeded.current) {
+				const result = EditorItemFormSchema.safeParse(form.state.values);
+				const issue = result.success ? undefined : result.error.issues[0];
+				if (issue !== undefined) {
+					await onInvalidSection(
+						RendererRuntime.runSync(readEditorItemSectionForPathFx(issue.path)),
+					);
+					const focusInvalidField = () =>
+						document.querySelector<HTMLElement>("[aria-invalid='true']")?.focus();
+					if (typeof requestAnimationFrame === "function") {
+						requestAnimationFrame(focusInvalidField);
+					} else {
+						setTimeout(focusInvalidField, 0);
+					}
 				}
 			}
-		}
-		return submitSucceeded.current;
-	}, [
-		dirty,
-		form,
-		onInvalidSection,
-		submitting,
-	]);
+			return submitSucceeded.current;
+		},
+		[
+			dirty,
+			form,
+			onInvalidSection,
+			submitting,
+		],
+	);
+	const save = useCallback(
+		() => runSave(true),
+		[
+			runSave,
+		],
+	);
+	const saveDraft = useCallback(
+		() => runSave(false),
+		[
+			runSave,
+		],
+	);
+	useEditorUnsavedChangesRegistration(`item:${project.projectId}:${initialItem.uid}`, {
+		discard: () => form.reset(canonicalItem),
+		isDirty: () => form.state.isDirty,
+		isValid: () => EditorItemFormSchema.safeParse(form.state.values).success,
+		ownsPathname: (pathname) =>
+			pathname.startsWith(
+				`/editor/${project.projectId}/editor/items/${initialItem.uid}/form`,
+			),
+		save: saveDraft,
+	});
 	return {
 		canonicalItem,
 		error: readSettledAsyncResultError(saveItemResult) ?? validationError,

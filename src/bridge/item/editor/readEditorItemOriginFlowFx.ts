@@ -9,8 +9,6 @@ import { resolveEditorItemOriginReachabilityFx } from "~/bridge/item/editor/reso
 import { yieldEditorItemOriginFlowFx } from "~/bridge/item/editor/yieldEditorItemOriginFlowFx";
 import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 
-export * from "~/bridge/item/editor/EditorItemOriginFlow";
-
 export interface EditorItemOriginFlowRequest {
 	readonly config: GameConfigSchema.Type;
 	readonly onProgress?: (progress: EditorItemOriginFlowProgress) => void;

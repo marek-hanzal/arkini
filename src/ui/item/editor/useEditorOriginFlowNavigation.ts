@@ -1,6 +1,6 @@
 import { type RefObject, useCallback, useEffect, useRef, useState } from "react";
 
-import type { EditorItemOriginFlow } from "~/bridge/item/editor/readEditorItemOriginFlowFx";
+import type { EditorItemOriginFlow } from "~/bridge/item/editor/EditorItemOriginFlow";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import type { EditorItemOriginFlowLayoutNode } from "~/ui/item/editor/editorItemOriginFlowLayout";
 import type { EditorOriginFlowViewport } from "~/ui/item/editor/createEditorOriginFlowViewportFx";
@@ -80,6 +80,7 @@ export const useEditorOriginFlowNavigation = ({
 	onSelectionChange,
 	outputNodeIds,
 	positions,
+	relationFocusNodeIdRef,
 	rootNodeIds,
 	scheduleDraw,
 	selection,
@@ -96,6 +97,7 @@ export const useEditorOriginFlowNavigation = ({
 	readonly onSelectionChange: (selection: EditorOriginFlowSelection | undefined) => void;
 	readonly outputNodeIds: ReadonlyArray<string>;
 	readonly positions: ReadonlyMap<string, EditorItemOriginFlowLayoutNode>;
+	readonly relationFocusNodeIdRef: RefObject<string | undefined>;
 	readonly rootNodeIds: ReadonlyArray<string>;
 	readonly scheduleDraw: () => void;
 	readonly selection: EditorOriginFlowSelection | undefined;
@@ -128,7 +130,6 @@ export const useEditorOriginFlowNavigation = ({
 	const inputIndexRef = useRef(-1);
 	const outputIndexRef = useRef(-1);
 	const rootIndexRef = useRef(-1);
-	const relationFocusNodeIdRef = useRef<string | undefined>(undefined);
 	const visitHistoryRef = useRef<ReadonlyArray<string>>([]);
 	const [helpOpen, setHelpOpen] = useState(false);
 	const resetNavigation = useCallback(() => {
@@ -309,7 +310,6 @@ export const useEditorOriginFlowNavigation = ({
 
 	return {
 		helpOpen,
-		relationFocusNodeIdRef,
 		resetNavigation,
 		setHelpOpen,
 		visitHistoryRef,

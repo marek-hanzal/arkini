@@ -5,6 +5,8 @@ import {
 	EditorProjectSectionIds,
 } from "~/ui/project/editor/EditorProjectSections";
 
+export type { EditorProjectSectionId };
+
 /** Parses one explicit Project section route segment. */
 export const parseEditorProjectSectionIdFx = Effect.fn("parseEditorProjectSectionIdFx")(
 	(candidate: string): Effect.Effect<EditorProjectSectionId, Error> => {

@@ -1,9 +1,12 @@
 import { useAtomSet, useAtomValue } from "@effect/atom-react";
 import { useNavigate } from "@tanstack/react-router";
-import { useCallback, useState } from "react";
+import { Exit } from "effect";
+import { useCallback, useRef, useState } from "react";
 
 import { useEditorProject } from "~/bridge/editor/useEditorProject";
 import { editEditorAssetCommandAtom } from "~/bridge/resource/editor/editEditorAssetCommandAtom";
+import { validateEditorAssetDraftFx } from "~/bridge/resource/editor/validateEditorAssetDraftFx";
+import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import { ButtonLink, PrimaryButton } from "~/ui/button/Button";
 import { EditorSectionNavigation } from "~/ui/editor/EditorSectionNavigation";
 import { EditorSectionPage } from "~/ui/editor/EditorSectionPage";
@@ -15,6 +18,7 @@ import { EditorAssetImageDropZone } from "~/ui/resource/editor/EditorAssetImageD
 import { useEditorAssetById } from "~/ui/resource/editor/useEditorAssetById";
 import { useEditorResourceUrl } from "~/ui/resource/editor/useEditorResourceUrl";
 import { Status } from "~/ui/status/Status";
+import { useEditorUnsavedChangesRegistration } from "~/ui/editor/useEditorUnsavedChangesRegistration";
 
 export const EditorAssetEdit = ({
 	filter,
@@ -29,22 +33,39 @@ export const EditorAssetEdit = ({
 	const resource = useEditorAssetById(resourceId);
 	const currentUrl = useEditorResourceUrl(resourceId);
 	const navigate = useNavigate();
-	const result = useAtomValue(editEditorAssetCommandAtom);
-	const mutate = useAtomSet(editEditorAssetCommandAtom, {
+	const commandAtom = editEditorAssetCommandAtom(project.projectId);
+	const result = useAtomValue(commandAtom);
+	const mutate = useAtomSet(commandAtom, {
 		mode: "promise",
 	});
 	const [nextId, setNextId] = useState(resourceId);
 	const [file, setFile] = useState<File>();
 	const dirty = nextId.trim() !== resourceId || file !== undefined;
-	const save = useCallback(async () => {
+	const dirtyRef = useRef(dirty);
+	dirtyRef.current = dirty;
+	const persist = useCallback(async () => {
 		if (!dirty || result.waiting) return false;
 		const id = nextId.trim();
 		await mutate({
 			currentId: resourceId,
 			file,
-			projectId: project.projectId,
 			resourceId: id,
 		});
+		dirtyRef.current = false;
+		setNextId(id);
+		setFile(undefined);
+		return true;
+	}, [
+		dirty,
+		file,
+		mutate,
+		nextId,
+		resourceId,
+		result.waiting,
+	]);
+	const save = useCallback(async () => {
+		if (!(await persist())) return false;
+		const id = nextId.trim();
 		await navigate({
 			to: "/editor/$projectId/assets/$resourceId/detail/overview",
 			params: {
@@ -59,17 +80,33 @@ export const EditorAssetEdit = ({
 		});
 		return true;
 	}, [
-		dirty,
-		file,
 		filter,
-		mutate,
 		navigate,
 		nextId,
+		persist,
 		project.projectId,
 		query,
-		resourceId,
-		result.waiting,
 	]);
+	useEditorUnsavedChangesRegistration(`asset:${project.projectId}:${resourceId}`, {
+		discard: () => {
+			dirtyRef.current = false;
+			setNextId(resourceId);
+			setFile(undefined);
+		},
+		isDirty: () => dirtyRef.current,
+		isValid: async () =>
+			Exit.isSuccess(
+				await RendererRuntime.runPromiseExit(
+					validateEditorAssetDraftFx({
+						file,
+						resourceId: nextId,
+					}),
+				),
+			),
+		ownsPathname: (pathname) =>
+			pathname.startsWith(`/editor/${project.projectId}/assets/${resourceId}/edit`),
+		save: persist,
+	});
 	const error = readSettledAsyncResultError(result);
 	if (resource === undefined)
 		return (

@@ -51,5 +51,5 @@ export const createEditorOriginFlowCanvasPaletteFx = Effect.fn(
 )(() =>
 	Effect.succeed({
 		readPalette,
-	}),
+	} as const),
 );

@@ -1,6 +1,5 @@
 import type { ReactNode } from "react";
 
-import type { EditorSelector } from "~/bridge/item/editor/EditorItemModel";
 import { ItemInfoFact, ItemInfoFacts } from "~/ui/item-detail/ItemInfoPresentation";
 
 export const DetailSection = ({
@@ -46,5 +45,3 @@ export const DetailFact = ({
 export const EmptyDetail = ({ children }: { readonly children: ReactNode }) => (
 	<p className="text-sm text-muted">{children}</p>
 );
-
-export const formatSelector = (selector: EditorSelector) => `Item ${selector.itemId}`;

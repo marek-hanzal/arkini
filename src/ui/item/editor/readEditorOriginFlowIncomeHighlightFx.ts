@@ -4,7 +4,7 @@ import type {
 	EditorItemOriginEdge,
 	EditorItemOriginFlow,
 	EditorItemOriginItemNode,
-} from "~/bridge/item/editor/readEditorItemOriginFlowFx";
+} from "~/bridge/item/editor/EditorItemOriginFlow";
 import {
 	EditorOriginFlowEdgeOrder,
 	type EditorOriginFlowHighlight,

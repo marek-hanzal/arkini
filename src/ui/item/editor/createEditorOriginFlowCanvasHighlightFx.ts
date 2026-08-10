@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import type { EditorItemOriginItemNode } from "~/bridge/item/editor/readEditorItemOriginFlowFx";
+import type { EditorItemOriginItemNode } from "~/bridge/item/editor/EditorItemOriginFlow";
 import type {
 	EditorOriginFlowHighlight,
 	EditorOriginFlowSelection,
@@ -58,5 +58,5 @@ export const createEditorOriginFlowCanvasHighlightFx = Effect.fn(
 		readEdgeOpacity,
 		readNodeHighlight,
 		readNodeOpacity,
-	}),
+	} as const),
 );

@@ -10,6 +10,12 @@ import {
 	EditorProjectRepositoryError,
 	type EditorProjectRepositoryOperation,
 } from "~/bridge/editor/EditorProjectRepositoryError";
+import {
+	createEditorUnsavedChangesOwnerFx,
+	EditorUnsavedChanges,
+	EditorUnsavedChangesOwnerAtom,
+} from "~/bridge/editor/EditorUnsavedChanges";
+import * as Atom from "effect/unstable/reactivity/Atom";
 import { acquireGameEngineLeaseFx } from "~/bridge/game/acquireGameEngineLeaseFx";
 import { adoptGameEngineLeaseFx } from "~/bridge/game/adoptGameEngineLeaseFx";
 import { GameEngineResourceLayer } from "~/bridge/game/GameEngineResourceLayer";
@@ -54,6 +60,12 @@ export const createTestRendererRuntime = ({
 		Layer.mergeAll(
 			Layer.succeed(AtomRegistry.AtomRegistry, atomRegistry),
 			Layer.succeed(EditorProjectRepository, editorProjectRepository),
+			Layer.effect(
+				EditorUnsavedChanges,
+				createEditorUnsavedChangesOwnerFx().pipe(
+					Effect.tap((owner) => Atom.set(EditorUnsavedChangesOwnerAtom, owner)),
+				),
+			).pipe(Layer.provide(Layer.succeed(AtomRegistry.AtomRegistry, atomRegistry))),
 			GameEngineResourceLayer({
 				clearSaveFx,
 				createResourceFx,

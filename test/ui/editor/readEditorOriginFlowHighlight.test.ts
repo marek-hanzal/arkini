@@ -2,11 +2,11 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import {
-	readEditorItemOriginFlowFx,
 	type EditorItemOriginFlow,
 	type EditorItemOriginItemNode,
 	type EditorItemOriginOperation,
-} from "~/bridge/item/editor/readEditorItemOriginFlowFx";
+} from "~/bridge/item/editor/EditorItemOriginFlow";
+import { readEditorItemOriginFlowFx } from "~/bridge/item/editor/readEditorItemOriginFlowFx";
 import {
 	type EditorOriginFlowDirection,
 	type EditorOriginFlowSelection,

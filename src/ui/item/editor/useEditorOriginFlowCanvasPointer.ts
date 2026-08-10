@@ -1,6 +1,6 @@
 import { useRef, type PointerEvent as ReactPointerEvent, type RefObject } from "react";
 
-import type { EditorItemOriginFlow } from "~/bridge/item/editor/readEditorItemOriginFlowFx";
+import type { EditorItemOriginFlow } from "~/bridge/item/editor/EditorItemOriginFlow";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import type {
 	EditorItemOriginFlowLayoutNode,

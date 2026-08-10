@@ -8,19 +8,15 @@ import type {
 	EditorRoll,
 	EditorWhen,
 } from "~/bridge/item/editor/EditorItemModel";
-import {
-	DetailFact,
-	DetailFacts,
-	EmptyDetail,
-	formatSelector,
-} from "~/ui/item/editor/EditorItemDetailDefinition";
+import { DetailFact, DetailFacts, EmptyDetail } from "~/ui/item/editor/EditorItemDetailDefinition";
+import { EditorSelectorDetail } from "~/ui/item/editor/EditorSelectorDetail";
 
 const formatQuantity = (quantity: EditorQuantity) =>
 	quantity.min === quantity.max ? String(quantity.min) : `${quantity.min}–${quantity.max}`;
 
 const QueryDetail = ({ query }: { readonly query: EditorQuery }) => (
 	<span>
-		{formatSelector(query.selector)} in {query.scope}
+		<EditorSelectorDetail selector={query.selector} /> in {query.scope}
 		{"distance" in query ? ` · ${query.distance} distance` : ""}
 	</span>
 );

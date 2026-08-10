@@ -8,10 +8,13 @@ import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 /** Owns the explicit asset Edit submission lifecycle. */
 export const editEditorAssetCommandAtom = RendererRuntime.runSync(
 	Effect.map(EditorProjectRepository, (repository) =>
-		Atom.fn((props: editEditorAssetFx.Props) =>
-			editEditorAssetFx(props).pipe(
-				Effect.provideService(EditorProjectRepository, repository),
-			),
+		Atom.family((projectId: string) =>
+			Atom.fn((props: Omit<editEditorAssetFx.Props, "projectId">) =>
+				editEditorAssetFx({
+					...props,
+					projectId,
+				}).pipe(Effect.provideService(EditorProjectRepository, repository)),
+			).pipe(Atom.setIdleTTL(0)),
 		),
 	),
 );

@@ -1,6 +1,12 @@
 import { useAtomSet } from "@effect/atom-react";
-import { useRouter } from "@tanstack/react-router";
-import { useCallback, useEffect, useState, type PropsWithChildren } from "react";
+import { useBlocker, useRouter } from "@tanstack/react-router";
+import {
+	useCallback,
+	useEffect,
+	useState,
+	useSyncExternalStore,
+	type PropsWithChildren,
+} from "react";
 
 import { useEditorProject } from "~/bridge/editor/useEditorProject";
 import { waitForEditorProjectWritesCommandAtom } from "~/bridge/editor/waitForEditorProjectWritesCommandAtom";
@@ -11,6 +17,8 @@ import {
 	useEditorActiveWorkspace,
 } from "~/ui/editor/useEditorActiveWorkspace";
 import { Tooltip } from "~/ui/overlay/Tooltip";
+import { EditorUnsavedChangesDialog } from "~/ui/editor/EditorUnsavedChangesDialog";
+import { useEditorUnsavedChangesOwner } from "~/ui/editor/useEditorUnsavedChangesRegistration";
 
 const tabClassName =
 	"ak-editor-workspace-tab size-11 min-h-0 shrink-0 border-transparent bg-transparent p-0 shadow-none transition-none hover:bg-surface-raised";
@@ -21,6 +29,7 @@ const activeTabProps = {
 /** Keeps editor-wide navigation stable while child tools replace only the content surface. */
 export const EditorShell = ({ children }: PropsWithChildren) => {
 	const project = useEditorProject();
+	const unsavedChangesOwner = useEditorUnsavedChangesOwner();
 	const router = useRouter();
 	const waitForProjectWrites = useAtomSet(waitForEditorProjectWritesCommandAtom, {
 		mode: "promise",
@@ -30,12 +39,26 @@ export const EditorShell = ({ children }: PropsWithChildren) => {
 	const params = {
 		projectId: project.projectId,
 	};
+	const unsavedChanges = useSyncExternalStore(
+		unsavedChangesOwner.subscribe,
+		unsavedChangesOwner.getSnapshot,
+		unsavedChangesOwner.getSnapshot,
+	);
+	useBlocker({
+		disabled: !unsavedChanges.hasDirtySession,
+		enableBeforeUnload: false,
+		shouldBlockFn: async ({ next }) => !(await unsavedChangesOwner.requestLeave(next.pathname)),
+	});
 
 	useEffect(() => window.arkini.lifecycle.onCloseFailed(() => setExitPending(false)), []);
 	const closeAndExit = useCallback(async () => {
 		if (exitPending) return;
 		setExitPending(true);
 		try {
+			if (!(await unsavedChangesOwner.requestLeave("/main-menu"))) {
+				setExitPending(false);
+				return;
+			}
 			await waitForProjectWrites(undefined);
 			await router.navigate({
 				to: "/main-menu",
@@ -46,6 +69,7 @@ export const EditorShell = ({ children }: PropsWithChildren) => {
 	}, [
 		exitPending,
 		router,
+		unsavedChangesOwner,
 		waitForProjectWrites,
 	]);
 	const readTabProps = (workspace: EditorWorkspaceId) =>
@@ -122,6 +146,7 @@ export const EditorShell = ({ children }: PropsWithChildren) => {
 			>
 				{children}
 			</main>
+			<EditorUnsavedChangesDialog />
 		</div>
 	);
 };

@@ -4,11 +4,11 @@ import { describe, expect, it } from "vitest";
 import {
 	EditorItemOriginItemInputPortId,
 	EditorItemOriginItemOutputPortId,
-	readEditorItemOriginFlowFx,
 	type EditorItemOriginFlow,
 	type EditorItemOriginFlowProgress,
 	type EditorItemOriginItemNode,
-} from "~/bridge/item/editor/readEditorItemOriginFlowFx";
+} from "~/bridge/item/editor/EditorItemOriginFlow";
+import { readEditorItemOriginFlowFx } from "~/bridge/item/editor/readEditorItemOriginFlowFx";
 import type { EditorOutput } from "~/bridge/item/editor/EditorItemModel";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { createJobTestConfig } from "~test/job/support/jobTestConfig";

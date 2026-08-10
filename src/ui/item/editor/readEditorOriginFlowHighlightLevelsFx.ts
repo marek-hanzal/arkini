@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import type { EditorItemOriginFlow } from "~/bridge/item/editor/readEditorItemOriginFlowFx";
+import type { EditorItemOriginFlow } from "~/bridge/item/editor/EditorItemOriginFlow";
 import type { EditorOriginFlowHighlight } from "~/ui/item/editor/EditorOriginFlowHighlight";
 
 /** Assigns breadth-first visual depth to every node and edge in one selected flow. */

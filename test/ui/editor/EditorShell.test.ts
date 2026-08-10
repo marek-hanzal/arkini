@@ -12,11 +12,17 @@ import {
 	useBlocker,
 } from "@tanstack/react-router";
 import * as AtomRegistry from "effect/unstable/reactivity/AtomRegistry";
+import { Effect } from "effect";
 import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { EditorShell } from "~/ui/editor/EditorShell";
+import {
+	createEditorUnsavedChangesOwnerFx,
+	EditorUnsavedChangesOwnerAtom,
+} from "~/bridge/editor/EditorUnsavedChanges";
+import { useEditorUnsavedChangesRegistration } from "~/ui/editor/useEditorUnsavedChangesRegistration";
 
 vi.mock("~/bridge/editor/useEditorProject", () => ({
 	useEditorProject: () => ({
@@ -81,11 +87,24 @@ interface TestRouterOptions {
 	readonly blockNavigation?: boolean;
 	readonly initialEntry: string;
 	readonly projectLoader?: () => Promise<void> | void;
+	readonly dirtyDraft?: "invalid" | "valid";
 }
+
+const DirtyDraft = ({ valid }: { readonly valid: boolean }) => {
+	useEditorUnsavedChangesRegistration("test-draft", {
+		discard: () => undefined,
+		isDirty: () => true,
+		isValid: () => valid,
+		ownsPathname: (pathname) => pathname.includes("/editor/items/test/form/"),
+		save: async () => true,
+	});
+	return createElement("p", null, "Dirty item form");
+};
 
 const createTestRouter = ({
 	assetsLoader,
 	blockNavigation = false,
+	dirtyDraft,
 	initialEntry,
 	projectLoader,
 }: TestRouterOptions) => {
@@ -103,7 +122,12 @@ const createTestRouter = ({
 	const itemEditRoute = createRoute({
 		getParentRoute: () => editorRoute,
 		path: "editor/items/test/form/identity",
-		component: () => createElement("p", null, "Item form"),
+		component: () =>
+			dirtyDraft === undefined
+				? createElement("p", null, "Item form")
+				: createElement(DirtyDraft, {
+						valid: dirtyDraft === "valid",
+					}),
 	});
 	const assetsRoute = createRoute({
 		getParentRoute: () => editorRoute,
@@ -174,6 +198,10 @@ const renderRouter = async (router: ReturnType<typeof createTestRouter>) => {
 	const registry = AtomRegistry.make({
 		scheduleTask,
 	});
+	registry.set(
+		EditorUnsavedChangesOwnerAtom,
+		Effect.runSync(createEditorUnsavedChangesOwnerFx()),
+	);
 	registries.push(registry);
 	const container = document.createElement("div");
 	document.body.append(container);
@@ -399,16 +427,67 @@ describe("EditorShell", () => {
 		expect(readLink(container, "Project").getAttribute("aria-current")).toBeNull();
 	});
 
-	it("lets ordinary editor navigation leave local form state without a prompt", async () => {
+	it("keeps a dirty draft mounted when workspace navigation is canceled", async () => {
 		const router = createTestRouter({
+			dirtyDraft: "valid",
+			initialEntry: "/editor/editor-test/editor/items/test/form/identity",
+		});
+		const container = await renderRouter(router);
+		const projectLink = readLink(container, "Project");
+		projectLink.focus();
+
+		await act(async () => {
+			projectLink.click();
+			await Promise.resolve();
+		});
+		expect(container.querySelector('[data-ui="EditorUnsavedChangesDialog"]')).not.toBeNull();
+		const cancel = [
+			...container.querySelectorAll("button"),
+		].find((button) => button.textContent === "Cancel");
+		expect(document.activeElement).toBe(cancel);
+		await act(async () => {
+			cancel?.dispatchEvent(
+				new KeyboardEvent("keydown", {
+					bubbles: true,
+					key: "Escape",
+				}),
+			);
+		});
+		expect(router.state.location.pathname).toBe(
+			"/editor/editor-test/editor/items/test/form/identity",
+		);
+		expect(container.textContent).toContain("Dirty item form");
+		expect(document.activeElement).toBe(projectLink);
+	});
+
+	it("uses Cancel as the safe default for editor Exit and omits Save for an invalid draft", async () => {
+		const router = createTestRouter({
+			dirtyDraft: "invalid",
 			initialEntry: "/editor/editor-test/editor/items/test/form/identity",
 		});
 		const container = await renderRouter(router);
 
 		await act(async () => {
-			readLink(container, "Project").click();
+			container.querySelector<HTMLButtonElement>('[data-ui="EditorExit"]')?.click();
+			await Promise.resolve();
 		});
-		expect(router.state.location.pathname).toBe("/editor/editor-test/project");
-		expect(container.textContent).toContain("Project destination");
+		const dialog = container.querySelector('[data-ui="EditorUnsavedChangesDialog"]');
+		expect(dialog).not.toBeNull();
+		expect(
+			[
+				...(dialog?.querySelectorAll("button") ?? []),
+			].some((button) => button.textContent === "Save"),
+		).toBe(false);
+		const cancel = [
+			...(dialog?.querySelectorAll("button") ?? []),
+		].find((button) => button.textContent === "Cancel");
+		await act(async () => cancel?.click());
+
+		expect(router.state.location.pathname).toBe(
+			"/editor/editor-test/editor/items/test/form/identity",
+		);
+		expect(container.querySelector<HTMLButtonElement>('[data-ui="EditorExit"]')?.disabled).toBe(
+			false,
+		);
 	});
 });

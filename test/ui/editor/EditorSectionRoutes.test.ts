@@ -4,12 +4,21 @@ import { describe, expect, it } from "vitest";
 import { Route as ItemDetailSectionRoute } from "~/@routes/editor/$projectId/editor/items/$itemUid/detail/$sectionId";
 import { Route as ItemFormSectionRoute } from "~/@routes/editor/$projectId/editor/items/$itemUid/form/$sectionId";
 import { Route as ProjectSectionRoute } from "~/@routes/editor/$projectId/project/$sectionId";
+import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 
-type BeforeLoad = (input: { readonly params: Readonly<Record<string, string>> }) => unknown;
+type BeforeLoad = (input: {
+	readonly context: {
+		readonly rendererRuntime: typeof RendererRuntime;
+	};
+	readonly params: Readonly<Record<string, string>>;
+}) => unknown;
 
 const readRedirect = (beforeLoad: BeforeLoad, params: Readonly<Record<string, string>>) => {
 	try {
 		beforeLoad({
+			context: {
+				rendererRuntime: RendererRuntime,
+			},
 			params,
 		});
 	} catch (error) {
@@ -87,6 +96,9 @@ describe("editor section routes", () => {
 	it("accepts valid direct section leaves without redirecting", () => {
 		expect(() =>
 			readBeforeLoad(ProjectSectionRoute)({
+				context: {
+					rendererRuntime: RendererRuntime,
+				},
 				params: {
 					projectId: "project-test",
 					sectionId: "appearance",
@@ -95,6 +107,9 @@ describe("editor section routes", () => {
 		).not.toThrow();
 		expect(() =>
 			readBeforeLoad(ItemDetailSectionRoute)({
+				context: {
+					rendererRuntime: RendererRuntime,
+				},
 				params: {
 					projectId: "project-test",
 					itemUid: "item-test",
@@ -104,6 +119,9 @@ describe("editor section routes", () => {
 		).not.toThrow();
 		expect(() =>
 			readBeforeLoad(ItemFormSectionRoute)({
+				context: {
+					rendererRuntime: RendererRuntime,
+				},
 				params: {
 					projectId: "project-test",
 					itemUid: "item-test",

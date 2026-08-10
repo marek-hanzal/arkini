@@ -7,10 +7,8 @@ import { act, createElement } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import type {
-	EditorItemOriginFlow,
-	EditorItemOriginFlowRequest,
-} from "~/bridge/item/editor/readEditorItemOriginFlowFx";
+import type { EditorItemOriginFlow } from "~/bridge/item/editor/EditorItemOriginFlow";
+import type { EditorItemOriginFlowRequest } from "~/bridge/item/editor/readEditorItemOriginFlowFx";
 import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import type { EditorItemOriginFlowLayout } from "~/ui/item/editor/editorItemOriginFlowLayout";
 
@@ -229,6 +227,71 @@ describe("useEditorItemOriginFlow", () => {
 
 		expect(firstInterrupted).toBe(true);
 		expect(probe.state.current).toEqual(
+			expect.objectContaining({
+				flow: flowFor("beer"),
+				status: "ready",
+			}),
+		);
+	});
+
+	it("keeps simultaneous hook instances in independent command scopes", async () => {
+		let wineInterrupted = false;
+		mocks.read.mockImplementation((request: EditorItemOriginFlowRequest) =>
+			Effect.succeed(flowFor(request.targetItemId ?? "all")),
+		);
+		mocks.layout.mockImplementation((flow: EditorItemOriginFlow) =>
+			flow.nodes[0]?.itemId === "wine"
+				? Effect.never.pipe(
+						Effect.onInterrupt(() =>
+							Effect.sync(() => {
+								wineInterrupted = true;
+							}),
+						),
+					)
+				: Effect.succeed(layoutFor("beer")),
+		);
+
+		const registry = AtomRegistry.make({
+			scheduleTask,
+		});
+		registries.push(registry);
+		const container = document.createElement("div");
+		document.body.append(container);
+		const root = createRoot(container);
+		roots.push(root);
+		const states: Record<string, ReturnType<typeof useEditorItemOriginFlow> | undefined> = {};
+		const Probe = ({ itemId }: { readonly itemId: string }) => {
+			states[itemId] = useEditorItemOriginFlow(Config, itemId);
+			return createElement("span", {
+				"data-item-id": itemId,
+			});
+		};
+
+		await act(async () => {
+			root.render(
+				createElement(
+					RegistryContext.Provider,
+					{
+						value: registry,
+					},
+					createElement(
+						"div",
+						null,
+						createElement(Probe, {
+							itemId: "wine",
+						}),
+						createElement(Probe, {
+							itemId: "beer",
+						}),
+					),
+				),
+			);
+			await new Promise((resolve) => setTimeout(resolve, 0));
+		});
+
+		expect(wineInterrupted).toBe(false);
+		expect(states.wine?.status).toBe("loading");
+		expect(states.beer).toEqual(
 			expect.objectContaining({
 				flow: flowFor("beer"),
 				status: "ready",

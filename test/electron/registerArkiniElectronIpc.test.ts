@@ -79,7 +79,8 @@ import { createFilesystemLauncherPreferencesFx } from "../../electron/main/launc
 import { registerArkiniElectronIpcFx } from "../../electron/main/registerArkiniElectronIpcFx";
 import { createArkiniUserDataPathsFx } from "../../electron/main/user-data/createArkiniUserDataPathsFx";
 import { createFilesystemWindowPreferencesFx } from "../../electron/main/window/createFilesystemWindowPreferencesFx";
-import { registerWindowModeControllerFx } from "../../electron/main/window/WindowModeControllerRegistry";
+import { createWindowModeControllerOwnershipFx } from "../../electron/main/window/createWindowModeControllerOwnershipFx";
+import { registerWindowModeControllerFx } from "../../electron/main/window/registerWindowModeControllerFx";
 
 const placeholderPackageId = "a".repeat(64);
 const saveKey = {
@@ -271,8 +272,11 @@ describe("registerArkiniElectronIpcFx", () => {
 					const windowPreferences = yield* createFilesystemWindowPreferencesFx({
 						root: userDataPaths.game.preferences,
 					});
+					const windowModeControllerOwnership =
+						yield* createWindowModeControllerOwnershipFx();
 					yield* registerWindowModeControllerFx({
 						window: electronHarness.browserWindow as unknown as BrowserWindow,
+						ownership: windowModeControllerOwnership,
 						controller: {
 							requestModeFx: (mode) =>
 								windowPreferences
@@ -291,6 +295,7 @@ describe("registerArkiniElectronIpcFx", () => {
 						appearancePreferences,
 						cheatPreferences,
 						launcherPreferences,
+						windowModeControllerOwnership,
 						windowPreferences,
 						diagnostics: {
 							directoryPath: userDataPaths.game.logs,

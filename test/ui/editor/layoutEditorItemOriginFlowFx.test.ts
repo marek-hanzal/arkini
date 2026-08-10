@@ -1,10 +1,8 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import {
-	type EditorItemOriginFlow,
-	readEditorItemOriginFlowFx,
-} from "~/bridge/item/editor/readEditorItemOriginFlowFx";
+import { type EditorItemOriginFlow } from "~/bridge/item/editor/EditorItemOriginFlow";
+import { readEditorItemOriginFlowFx } from "~/bridge/item/editor/readEditorItemOriginFlowFx";
 import type {
 	EditorItemOriginFlowLayout,
 	EditorItemOriginFlowLayoutInput,

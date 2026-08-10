@@ -1,4 +1,4 @@
-import type { EditorItemOriginItemNode } from "~/bridge/item/editor/readEditorItemOriginFlowFx";
+import type { EditorItemOriginItemNode } from "~/bridge/item/editor/EditorItemOriginFlow";
 import type { EditorOriginFlowCanvasPalette } from "~/ui/item/editor/EditorOriginFlowCanvasPalette";
 
 const MaxCachedImages = 96;

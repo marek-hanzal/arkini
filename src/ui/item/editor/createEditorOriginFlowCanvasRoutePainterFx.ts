@@ -96,5 +96,5 @@ export const createEditorOriginFlowCanvasRoutePainterFx = Effect.fn(
 	Effect.succeed({
 		drawEdge,
 		drawGrid,
-	}),
+	} as const),
 );

@@ -3,6 +3,7 @@ import * as Atom from "effect/unstable/reactivity/Atom";
 
 import { ArkpackCatalogOwnerAtom } from "~/bridge/arkpack/ArkpackCatalogOwnerAtom";
 import { EditorProjectRepository } from "~/bridge/editor/EditorProjectRepository";
+import { EditorUnsavedChanges } from "~/bridge/editor/EditorUnsavedChanges";
 import { claimGameEngineResourceForCloseFx } from "~/bridge/game/claimGameEngineResourceForCloseFx";
 import { readExactCauseFailure } from "~/bridge/game/readExactCauseFailure";
 import type { ArkiniRouter } from "~/createArkiniRouterFx";
@@ -16,6 +17,7 @@ export namespace installRendererControlledCloseFx {
 			"onBeforeClose" | "onBeforeCloseReady"
 		>;
 		readonly rendererRuntime: RootContext["rendererRuntime"];
+		readonly requestEditorLeaveFx?: Effect.Effect<boolean, never, EditorUnsavedChanges>;
 		readonly router: Pick<ArkiniRouter, "navigate">;
 	}
 }
@@ -30,7 +32,14 @@ export namespace installRendererControlledCloseFx {
  * itself.
  */
 export const installRendererControlledCloseFx = Effect.fn("installRendererControlledCloseFx")(
-	({ lifecycle, rendererRuntime, router }: installRendererControlledCloseFx.Props) =>
+	({
+		lifecycle,
+		requestEditorLeaveFx = Effect.flatMap(EditorUnsavedChanges, (owner) =>
+			Effect.promise(() => owner.requestLeave()),
+		),
+		rendererRuntime,
+		router,
+	}: installRendererControlledCloseFx.Props) =>
 		Effect.sync(() => {
 			let exitPresentationRequired = false;
 
@@ -45,6 +54,11 @@ export const installRendererControlledCloseFx = Effect.fn("installRendererContro
 				}
 				const resource = exit.value;
 				if (resource === null) {
+					if (!(await rendererRuntime.runPromise(requestEditorLeaveFx))) {
+						throw new Error(
+							"Native close was canceled because the editor has unsaved changes.",
+						);
+					}
 					await rendererRuntime.runPromise(
 						Effect.flatMap(
 							EditorProjectRepository,

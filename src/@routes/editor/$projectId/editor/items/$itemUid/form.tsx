@@ -2,10 +2,9 @@ import { createFileRoute, Outlet, useParams } from "@tanstack/react-router";
 
 import { EditorItemTypeSchema, type EditorItemType } from "~/bridge/item/editor/EditorItemModel";
 import { EditorItemFormPage } from "~/page/editor/EditorItemFormPage";
-import {
-	type EditorItemOptionalCapability,
-	type EditorItemSectionId,
-} from "~/ui/item/editor/EditorItemSections";
+import type { EditorItemSectionId } from "~/page/editor/parseEditorItemSectionIdFx";
+
+type EditorItemOptionalCapability = "charges" | "merges";
 
 interface EditorItemFormSearch {
 	readonly enable?: EditorItemOptionalCapability;

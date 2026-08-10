@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
-import type { EditorItemOriginEdge } from "~/bridge/item/editor/readEditorItemOriginFlowFx";
+import type { EditorItemOriginEdge } from "~/bridge/item/editor/EditorItemOriginFlow";
 import { readEditorOriginFlowConnectedPortsFx } from "~/ui/item/editor/readEditorOriginFlowConnectedPortsFx";
 
 const edge = (

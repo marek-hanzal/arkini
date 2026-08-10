@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import type { EditorItemOriginFlow } from "~/bridge/item/editor/readEditorItemOriginFlowFx";
+import type { EditorItemOriginFlow } from "~/bridge/item/editor/EditorItemOriginFlow";
 import type {
 	EditorItemOriginFlowLayoutNode,
 	EditorItemOriginFlowLayoutPoint,
@@ -187,5 +187,5 @@ export const createEditorOriginFlowViewportFx = Effect.fn("createEditorOriginFlo
 		readNode,
 		readVisibleBounds,
 		searchFocusZoom: 1,
-	}),
+	} as const),
 );

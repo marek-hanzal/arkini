@@ -1,21 +1,15 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 
-import { EditorProjectProvider } from "~/bridge/editor/EditorProjectProvider";
 import { readEditorProjectFx } from "~/bridge/editor/readEditorProjectFx";
 import { EditorProjectErrorPage } from "~/page/editor/EditorProjectErrorPage";
-import { EditorShell } from "~/ui/editor/EditorShell";
-import { EditorProjectResourceUrlProvider } from "~/ui/resource/editor/EditorResourceUrlProvider";
+import { EditorProjectShellPage } from "~/page/editor/EditorProjectShellPage";
 
 const EditorProjectRoute = () => {
 	const project = Route.useLoaderData();
 	return (
-		<EditorProjectProvider loaded={project}>
-			<EditorProjectResourceUrlProvider>
-				<EditorShell>
-					<Outlet />
-				</EditorShell>
-			</EditorProjectResourceUrlProvider>
-		</EditorProjectProvider>
+		<EditorProjectShellPage project={project}>
+			<Outlet />
+		</EditorProjectShellPage>
 	);
 };
 

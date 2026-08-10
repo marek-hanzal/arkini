@@ -13,7 +13,8 @@ import { DiagnosticRecordSchema } from "../contract/diagnostics/DiagnosticRecord
 import type { DiagnosticLog } from "./diagnostics/DiagnosticLog";
 import { WindowModeSchema } from "../contract/window/WindowModeSchema";
 import type { WindowPreferences } from "./window/WindowPreferences";
-import { readWindowModeControllerFx } from "./window/WindowModeControllerRegistry";
+import { readWindowModeControllerFx } from "./window/readWindowModeControllerFx";
+import type { WindowModeControllerOwnership } from "./window/WindowModeControllerOwnership";
 
 let registered = false;
 
@@ -23,6 +24,7 @@ export namespace registerArkiniElectronIpcFx {
 		readonly appearancePreferences: AppearancePreferences;
 		readonly cheatPreferences: CheatPreferences;
 		readonly launcherPreferences: LauncherPreferences;
+		readonly windowModeControllerOwnership: WindowModeControllerOwnership;
 		readonly windowPreferences: WindowPreferences;
 		readonly diagnostics: DiagnosticLog;
 		readonly userDataPaths: ArkiniUserDataPaths;
@@ -36,6 +38,7 @@ export const registerArkiniElectronIpcFx = Effect.fn("registerArkiniElectronIpcF
 		appearancePreferences,
 		cheatPreferences,
 		launcherPreferences,
+		windowModeControllerOwnership,
 		windowPreferences,
 		diagnostics,
 		userDataPaths,
@@ -136,7 +139,10 @@ export const registerArkiniElectronIpcFx = Effect.fn("registerArkiniElectronIpcF
 									new Error("The trusted renderer has no owning BrowserWindow."),
 								);
 							}
-							const controller = yield* readWindowModeControllerFx(window);
+							const controller = yield* readWindowModeControllerFx({
+								ownership: windowModeControllerOwnership,
+								window,
+							});
 							yield* controller.requestModeFx(mode);
 						}),
 					),

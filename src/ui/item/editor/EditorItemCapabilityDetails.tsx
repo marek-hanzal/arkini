@@ -5,9 +5,9 @@ import {
 	DetailFact,
 	DetailFacts,
 	DetailSection,
-	formatSelector,
 } from "~/ui/item/editor/EditorItemDetailDefinition";
 import { OutputDetail } from "~/ui/item/editor/EditorItemOutputDetail";
+import { EditorSelectorDetail } from "~/ui/item/editor/EditorSelectorDetail";
 import type { EditorItemOptionalCapability } from "~/ui/item/editor/EditorItemSections";
 import { Status } from "~/ui/status/Status";
 
@@ -86,7 +86,7 @@ const MergeDetail = ({ index, merge }: { readonly index: number; readonly merge:
 		<DetailFacts>
 			<DetailFact
 				label="Target"
-				value={formatSelector(merge.target)}
+				value={<EditorSelectorDetail selector={merge.target} />}
 			/>
 			<DetailFact
 				label="Source action"

@@ -1,7 +1,7 @@
 import { Effect } from "effect";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef } from "react";
 
-import { type EditorItemOriginFlow } from "~/bridge/item/editor/readEditorItemOriginFlowFx";
+import { type EditorItemOriginFlow } from "~/bridge/item/editor/EditorItemOriginFlow";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import {
 	createEditorOriginFlowCanvasPainterFx,
@@ -122,6 +122,7 @@ export const EditorOriginFlowCanvas = ({
 	const imageCacheRef = useRef<Map<string, HTMLImageElement>>(new Map());
 	const scheduleDrawRef = useRef<() => void>(() => undefined);
 	const viewportRef = useRef<Viewport>(FlowViewport.defaultViewport);
+	const relationNavigationFocusNodeIdRef = useRef<string | undefined>(undefined);
 	const frameRef = useRef<number | undefined>(undefined);
 	const resetViewportRef = useRef(true);
 	const paletteRef = useRef<EditorOriginFlowCanvasPalette | undefined>(undefined);
@@ -308,29 +309,25 @@ export const EditorOriginFlowCanvas = ({
 		draw,
 	]);
 	scheduleDrawRef.current = scheduleDraw;
-	const {
-		helpOpen,
-		relationFocusNodeIdRef: relationNavigationFocusNodeIdRef,
-		resetNavigation,
-		setHelpOpen,
-		visitHistoryRef,
-	} = useEditorOriginFlowNavigation({
-		canvasRef,
-		direction,
-		flow,
-		inputNodeIds: inputNavigationNodeIds,
-		maxHighlightLevel,
-		navigationNodeIds,
-		onSelectionChange,
-		outputNodeIds: outputNavigationNodeIds,
-		positions,
-		rootNodeIds: rootNavigationNodeIds,
-		scheduleDraw,
-		selection,
-		setHighlightDepth,
-		viewport: FlowViewport,
-		viewportRef,
-	});
+	const { helpOpen, resetNavigation, setHelpOpen, visitHistoryRef } =
+		useEditorOriginFlowNavigation({
+			canvasRef,
+			direction,
+			flow,
+			inputNodeIds: inputNavigationNodeIds,
+			maxHighlightLevel,
+			navigationNodeIds,
+			onSelectionChange,
+			outputNodeIds: outputNavigationNodeIds,
+			positions,
+			relationFocusNodeIdRef: relationNavigationFocusNodeIdRef,
+			rootNodeIds: rootNavigationNodeIds,
+			scheduleDraw,
+			selection,
+			setHighlightDepth,
+			viewport: FlowViewport,
+			viewportRef,
+		});
 
 	useLayoutEffect(() => {
 		resetViewportRef.current = true;

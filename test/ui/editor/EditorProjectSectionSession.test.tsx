@@ -10,6 +10,10 @@ vi.mock("@effect/atom-react", () => ({
 	useAtomValue: () => undefined,
 }));
 
+vi.mock("~/ui/editor/useEditorUnsavedChangesRegistration", () => ({
+	useEditorUnsavedChangesRegistration: () => undefined,
+}));
+
 vi.mock("@tanstack/react-router", async (importOriginal) => {
 	const original = await importOriginal<typeof import("@tanstack/react-router")>();
 	return {

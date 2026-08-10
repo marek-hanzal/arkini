@@ -120,6 +120,7 @@ describe("installRendererControlledClose", () => {
 		const remove = rendererRuntime.runSync(
 			installRendererControlledCloseFx({
 				lifecycle: lifecycle.lifecycle,
+				requestEditorLeaveFx: Effect.succeed(true),
 				rendererRuntime,
 				router: router.router,
 			}),
@@ -169,6 +170,7 @@ describe("installRendererControlledClose", () => {
 		const remove = rendererRuntime.runSync(
 			installRendererControlledCloseFx({
 				lifecycle: lifecycle.lifecycle,
+				requestEditorLeaveFx: Effect.succeed(true),
 				rendererRuntime,
 				router: router.router,
 			}),
@@ -179,6 +181,27 @@ describe("installRendererControlledClose", () => {
 
 		expect(router.navigate).not.toHaveBeenCalled();
 		expect(frames.requestAnimationFrame).not.toHaveBeenCalled();
+		remove();
+	});
+
+	it("cancels native close before joining writes when an editor draft stays unsaved", async () => {
+		const { rendererRuntime } = createTestRendererRuntime({
+			createResourceFx: () => Effect.never,
+		});
+		runtimes.push(rendererRuntime);
+		const lifecycle = createLifecycle();
+		const router = createRouter();
+		const remove = rendererRuntime.runSync(
+			installRendererControlledCloseFx({
+				lifecycle: lifecycle.lifecycle,
+				requestEditorLeaveFx: Effect.succeed(false),
+				rendererRuntime,
+				router: router.router,
+			}),
+		);
+
+		await expect(lifecycle.readBeforeClose()()).rejects.toThrow("unsaved changes");
+		expect(router.navigate).not.toHaveBeenCalled();
 		remove();
 	});
 
@@ -204,6 +227,7 @@ describe("installRendererControlledClose", () => {
 		const remove = rendererRuntime.runSync(
 			installRendererControlledCloseFx({
 				lifecycle: lifecycle.lifecycle,
+				requestEditorLeaveFx: Effect.succeed(true),
 				rendererRuntime,
 				router: router.router,
 			}),
@@ -244,6 +268,7 @@ describe("installRendererControlledClose", () => {
 		const remove = rendererRuntime.runSync(
 			installRendererControlledCloseFx({
 				lifecycle: lifecycle.lifecycle,
+				requestEditorLeaveFx: Effect.succeed(true),
 				rendererRuntime,
 				router: router.router,
 			}),

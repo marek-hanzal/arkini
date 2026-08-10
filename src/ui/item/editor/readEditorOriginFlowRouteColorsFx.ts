@@ -1,6 +1,6 @@
 import { Effect } from "effect";
 
-import type { EditorItemOriginFlow } from "~/bridge/item/editor/readEditorItemOriginFlowFx";
+import type { EditorItemOriginFlow } from "~/bridge/item/editor/EditorItemOriginFlow";
 import type {
 	EditorOriginFlowHighlight,
 	EditorOriginFlowSelection,

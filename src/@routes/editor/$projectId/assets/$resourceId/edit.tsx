@@ -1,6 +1,6 @@
 import { createFileRoute, useSearch } from "@tanstack/react-router";
 
-import { EditorAssetEdit } from "~/ui/resource/editor/EditorAssetEdit";
+import { EditorAssetEditPage } from "~/page/editor/EditorAssetEditPage";
 
 export const Route = createFileRoute("/editor/$projectId/assets/$resourceId/edit")({
 	component: EditorAssetEditRoute,
@@ -12,7 +12,7 @@ function EditorAssetEditRoute() {
 		from: "/editor/$projectId/assets",
 	});
 	return (
-		<EditorAssetEdit
+		<EditorAssetEditPage
 			key={resourceId}
 			filter={search.filter ?? "all"}
 			query={search.query ?? ""}

@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { EditorProjectSections } from "~/ui/project/editor/EditorProjectSections";
-import { parseEditorProjectSectionIdFx } from "~/ui/project/editor/parseEditorProjectSectionIdFx";
+import { parseEditorProjectSectionIdFx } from "~/page/editor/parseEditorProjectSectionIdFx";
 import { readEditorProjectSectionForPathFx } from "~/ui/project/editor/readEditorProjectSectionForPathFx";
 
 describe("EditorProjectSections", () => {

@@ -12,6 +12,7 @@ import { createFilesystemLauncherPreferencesFx } from "./launcher/createFilesyst
 import { createTrustedRendererFx } from "./security/createTrustedRendererFx";
 import { createDiagnosticLogFx } from "./diagnostics/createDiagnosticLogFx";
 import { createFilesystemWindowPreferencesFx } from "./window/createFilesystemWindowPreferencesFx";
+import { createWindowModeControllerOwnershipFx } from "./window/createWindowModeControllerOwnershipFx";
 import { createArkiniUserDataPathsFx } from "./user-data/createArkiniUserDataPathsFx";
 
 export const electronMainFx = Effect.fn("electronMainFx")(function* () {
@@ -96,6 +97,7 @@ export const electronMainFx = Effect.fn("electronMainFx")(function* () {
 	const windowPreferences = yield* createFilesystemWindowPreferencesFx({
 		root: userDataPaths.game.preferences,
 	});
+	const windowModeControllerOwnership = yield* createWindowModeControllerOwnershipFx();
 	const appearanceTheme = yield* appearancePreferences.readThemeFx;
 	yield* Effect.sync(() => {
 		nativeTheme.themeSource = appearanceTheme;
@@ -112,6 +114,7 @@ export const electronMainFx = Effect.fn("electronMainFx")(function* () {
 		appearancePreferences,
 		cheatPreferences,
 		launcherPreferences,
+		windowModeControllerOwnership,
 		windowPreferences,
 		diagnostics,
 		userDataPaths,
@@ -121,6 +124,7 @@ export const electronMainFx = Effect.fn("electronMainFx")(function* () {
 			createMainWindowFx({
 				trustedRenderer,
 				windowMode,
+				windowModeControllerOwnership,
 				windowPreferences,
 			}),
 		),

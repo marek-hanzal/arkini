@@ -12,6 +12,7 @@ import { useAppForm } from "~/ui/form/EditorForm";
 import type { EditorProjectSectionId } from "~/ui/project/editor/EditorProjectSections";
 import { readEditorProjectSectionForPathFx } from "~/ui/project/editor/readEditorProjectSectionForPathFx";
 import { readSettledAsyncResultError } from "~/ui/reactivity/readSettledAsyncResultError";
+import { useEditorUnsavedChangesRegistration } from "~/ui/editor/useEditorUnsavedChangesRegistration";
 
 export const useEditorProjectFormController = ({
 	onInvalidSection,
@@ -92,6 +93,13 @@ export const useEditorProjectFormController = ({
 		schema,
 		submitting,
 	]);
+	useEditorUnsavedChangesRegistration(`project:${project.projectId}`, {
+		discard: () => form.reset(canonicalValues),
+		isDirty: () => form.state.isDirty,
+		isValid: () => schema.safeParse(form.state.values).success,
+		ownsPathname: (pathname) => pathname.startsWith(`/editor/${project.projectId}/project`),
+		save,
+	});
 
 	return {
 		canonicalValues,

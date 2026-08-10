@@ -2,7 +2,7 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import type { EditorItem } from "~/bridge/item/editor/EditorItemModel";
-import { parseEditorItemSectionIdFx } from "~/ui/item/editor/parseEditorItemSectionIdFx";
+import { parseEditorItemSectionIdFx } from "~/page/editor/parseEditorItemSectionIdFx";
 import { readEditorItemSectionForPathFx } from "~/ui/item/editor/readEditorItemSectionForPathFx";
 import { readEditorItemSectionsFx } from "~/ui/item/editor/readEditorItemSectionsFx";
 

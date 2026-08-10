@@ -9,7 +9,8 @@ import { showMainWindowFx } from "./showMainWindowFx";
 import { ElectronMainRuntime } from "./ElectronMainRuntime";
 import type { TrustedRenderer } from "./security/TrustedRenderer";
 import { createWindowModeControllerFx } from "./window/createWindowModeControllerFx";
-import { registerWindowModeControllerFx } from "./window/WindowModeControllerRegistry";
+import { registerWindowModeControllerFx } from "./window/registerWindowModeControllerFx";
+import type { WindowModeControllerOwnership } from "./window/WindowModeControllerOwnership";
 import type { WindowPreferences } from "./window/WindowPreferences";
 import type { WindowModeSchema } from "../contract/window/WindowModeSchema";
 
@@ -17,12 +18,18 @@ export namespace createMainWindowFx {
 	export interface Props {
 		readonly trustedRenderer: TrustedRenderer;
 		readonly windowMode: WindowModeSchema.Type;
+		readonly windowModeControllerOwnership: WindowModeControllerOwnership;
 		readonly windowPreferences: WindowPreferences;
 	}
 }
 
 export const createMainWindowFx = Effect.fn("createMainWindowFx")(
-	({ trustedRenderer, windowMode, windowPreferences }: createMainWindowFx.Props) =>
+	({
+		trustedRenderer,
+		windowMode,
+		windowModeControllerOwnership,
+		windowPreferences,
+	}: createMainWindowFx.Props) =>
 		Effect.gen(function* () {
 			const display = screen.getDisplayNearestPoint(screen.getCursorScreenPoint());
 			const bounds = yield* calculateInitialWindowBoundsFx(display.workArea);
@@ -58,6 +65,7 @@ export const createMainWindowFx = Effect.fn("createMainWindowFx")(
 				});
 				yield* registerWindowModeControllerFx({
 					controller: windowModeController,
+					ownership: windowModeControllerOwnership,
 					window,
 				});
 				yield* registerControlledWindowCloseFx({

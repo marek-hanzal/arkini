@@ -8,6 +8,7 @@ import { ArkiniElectronApi } from "../../electron/contract/ArkiniElectronApi";
 import { createMainWindowFx } from "../../electron/main/createMainWindowFx";
 import { ElectronMainError } from "../../electron/main/ElectronMainError";
 import type { TrustedRenderer } from "../../electron/main/security/TrustedRenderer";
+import { createWindowModeControllerOwnershipFx } from "../../electron/main/window/createWindowModeControllerOwnershipFx";
 import type { WindowPreferences } from "../../electron/main/window/WindowPreferences";
 
 const electronState = vi.hoisted(() => ({
@@ -106,6 +107,17 @@ beforeEach(() => {
 	(ipcMain as unknown as EventEmitter).removeAllListeners();
 });
 
+const createTestMainWindowFx = Effect.fn("createTestMainWindowFx")(
+	(props: Omit<createMainWindowFx.Props, "windowModeControllerOwnership">) =>
+		Effect.gen(function* () {
+			const windowModeControllerOwnership = yield* createWindowModeControllerOwnershipFx();
+			return yield* createMainWindowFx({
+				...props,
+				windowModeControllerOwnership,
+			});
+		}),
+);
+
 describe("createMainWindowFx", () => {
 	it("destroys a failed hidden window and releases its lifecycle listeners", async () => {
 		const trustedWindowRemoved = vi.fn();
@@ -123,7 +135,7 @@ describe("createMainWindowFx", () => {
 		};
 
 		const exit = await Effect.runPromiseExit(
-			createMainWindowFx({
+			createTestMainWindowFx({
 				trustedRenderer,
 				windowMode: "bordered",
 				windowPreferences,
@@ -180,7 +192,7 @@ describe("createMainWindowFx", () => {
 		};
 
 		await Effect.runPromiseExit(
-			createMainWindowFx({
+			createTestMainWindowFx({
 				trustedRenderer,
 				windowMode: "fullscreen",
 				windowPreferences,
@@ -209,7 +221,7 @@ describe("createMainWindowFx", () => {
 		};
 
 		await Effect.runPromiseExit(
-			createMainWindowFx({
+			createTestMainWindowFx({
 				trustedRenderer,
 				windowMode: "default",
 				windowPreferences,

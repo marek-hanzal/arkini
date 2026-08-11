@@ -1104,10 +1104,42 @@ interface EditorSimulationCandidate {
 	readonly targetYield: number;
 }
 
+interface EditorSimulationMergeCandidate {
+	readonly rule: MergeSchema.Type;
+	readonly sourceItemId: string;
+}
+
+interface EditorSimulationTemporaryCandidate {
+	readonly temporaryItemId: string;
+}
+
 type EditorSimulationCandidateIndex = ReadonlyMap<
 	EditorItemSimulationScenario,
 	ReadonlyMap<string, ReadonlyArray<EditorSimulationCandidate>>
 >;
+
+interface EditorSimulationAcquisitionIndex {
+	readonly lines: EditorSimulationCandidateIndex;
+	readonly merges: ReadonlyMap<
+		EditorItemSimulationScenario,
+		ReadonlyMap<string, ReadonlyArray<EditorSimulationMergeCandidate>>
+	>;
+	readonly temporaries: ReadonlyMap<
+		EditorItemSimulationScenario,
+		ReadonlyMap<string, ReadonlyArray<EditorSimulationTemporaryCandidate>>
+	>;
+}
+
+const readOutputItemIds = (output: OutputSchema.Type): ReadonlySet<string> =>
+	new Set(
+		output.set.flatMap((set) =>
+			set.roll.flatMap((roll) =>
+				roll.type === "weight"
+					? roll.drop.flatMap((candidate) => candidate.drop.map((drop) => drop.itemId))
+					: roll.drop.map((drop) => drop.itemId),
+			),
+		),
+	);
 
 const indexEditorSimulationCandidates = (
 	config: GameConfigSchema.Type,
@@ -1120,17 +1152,7 @@ const indexEditorSimulationCandidates = (
 	] as const)
 		index.set(scenario, new Map());
 	for (const operation of operations) {
-		const directItemIds = new Set(
-			operation.output.set.flatMap((set) =>
-				set.roll.flatMap((roll) =>
-					roll.type === "weight"
-						? roll.drop.flatMap((candidate) =>
-								candidate.drop.map((drop) => drop.itemId),
-							)
-						: roll.drop.map((drop) => drop.itemId),
-				),
-			),
-		);
+		const directItemIds = readOutputItemIds(operation.output);
 		const chargeOutputs: OutputSchema.Type[] = [];
 		for (const input of operation.line.input) {
 			if (input.charges?.from === "self") {
@@ -1143,17 +1165,9 @@ const indexEditorSimulationCandidates = (
 			}
 		}
 		const chargeItemIds = new Set(
-			chargeOutputs.flatMap((output) =>
-				output.set.flatMap((set) =>
-					set.roll.flatMap((roll) =>
-						roll.type === "weight"
-							? roll.drop.flatMap((candidate) =>
-									candidate.drop.map((drop) => drop.itemId),
-								)
-							: roll.drop.map((drop) => drop.itemId),
-					),
-				),
-			),
+			chargeOutputs.flatMap((output) => [
+				...readOutputItemIds(output),
+			]),
 		);
 		const itemIds = new Set([
 			...directItemIds,
@@ -1188,6 +1202,14 @@ const indexEditorSimulationCandidates = (
 				index.get(scenario)?.set(itemId, candidates);
 			}
 	}
+	for (const scenarioIndex of index.values())
+		for (const candidates of scenarioIndex.values())
+			candidates.sort(
+				(left, right) =>
+					left.operation.line.runtimeMs / left.targetYield -
+						right.operation.line.runtimeMs / right.targetYield ||
+					left.operation.id.localeCompare(right.operation.id),
+			);
 	return index;
 };
 
@@ -1203,6 +1225,69 @@ const outputCanYield = (
 		scenario,
 		targetItemId,
 	}).some((drop) => drop.itemId === targetItemId && drop.quantity > 0);
+
+/** Precomputes every non-line acquisition edge once for the immutable editor snapshot. */
+const indexEditorSimulationAcquisitions = (
+	config: GameConfigSchema.Type,
+	operations: ReadonlyArray<EditorSimulationOperation>,
+): EditorSimulationAcquisitionIndex => {
+	const merges = new Map<
+		EditorItemSimulationScenario,
+		Map<string, EditorSimulationMergeCandidate[]>
+	>();
+	const temporaries = new Map<
+		EditorItemSimulationScenario,
+		Map<string, EditorSimulationTemporaryCandidate[]>
+	>();
+	for (const scenario of [
+		"expected",
+		"guaranteed",
+	] as const) {
+		merges.set(scenario, new Map());
+		temporaries.set(scenario, new Map());
+	}
+	for (const source of Object.values(config.items))
+		for (const rule of source.merge ?? [])
+			for (const scenario of [
+				"expected",
+				"guaranteed",
+			] as const) {
+				const targetItemIds = new Set<string>();
+				if (rule.effect === "replace") targetItemIds.add(rule.result);
+				if (rule.output !== undefined)
+					for (const itemId of readOutputItemIds(rule.output))
+						if (outputCanYield(rule.output, scenario, itemId))
+							targetItemIds.add(itemId);
+				for (const itemId of targetItemIds) {
+					const candidates = merges.get(scenario)?.get(itemId) ?? [];
+					candidates.push({
+						rule,
+						sourceItemId: source.id,
+					});
+					merges.get(scenario)?.set(itemId, candidates);
+				}
+			}
+	for (const item of Object.values(config.items)) {
+		if (item.type !== "temporary" || item.output === undefined) continue;
+		for (const scenario of [
+			"expected",
+			"guaranteed",
+		] as const)
+			for (const itemId of readOutputItemIds(item.output)) {
+				if (!outputCanYield(item.output, scenario, itemId)) continue;
+				const candidates = temporaries.get(scenario)?.get(itemId) ?? [];
+				candidates.push({
+					temporaryItemId: item.id,
+				});
+				temporaries.get(scenario)?.set(itemId, candidates);
+			}
+	}
+	return {
+		lines: indexEditorSimulationCandidates(config, operations),
+		merges,
+		temporaries,
+	};
+};
 
 const runMerge = (
 	config: GameConfigSchema.Type,
@@ -1285,7 +1370,7 @@ const runTemporaryExpiry = (
 
 const estimateScenario = (
 	config: GameConfigSchema.Type,
-	candidateIndex: EditorSimulationCandidateIndex,
+	acquisitionIndex: EditorSimulationAcquisitionIndex,
 	itemId: string,
 	quantity: number,
 	scenario: EditorItemSimulationScenario,
@@ -1332,77 +1417,61 @@ const estimateScenario = (
 					return undefined;
 				}
 				runs += 1;
-				const candidates = [
-					...(candidateIndex.get(scenario)?.get(requiredItemId) ?? []),
-				].sort((left, right) => {
-					const leftOwnerAvailable =
-						(planned.stock.get(left.operation.ownerItemId) ?? 0) >= 1;
-					const rightOwnerAvailable =
-						(planned.stock.get(right.operation.ownerItemId) ?? 0) >= 1;
-					if (leftOwnerAvailable !== rightOwnerAvailable)
-						return leftOwnerAvailable ? -1 : 1;
-					return (
-						left.operation.line.runtimeMs / left.targetYield -
-							right.operation.line.runtimeMs / right.targetYield ||
-						left.operation.id.localeCompare(right.operation.id)
-					);
-				});
+				const candidates = acquisitionIndex.lines.get(scenario)?.get(requiredItemId) ?? [];
 				let advanced = false;
-				for (const { advancesChargeOutput, operation } of candidates) {
-					const candidate = cloneEditorSimulationState(planned);
-					const before = candidate.stock.get(requiredItemId) ?? 0;
-					const completed = runOperation(
-						config,
-						candidate,
-						operation,
-						scenario,
-						requiredItemId,
-						nextPath,
-						requireItem,
-					);
-					if (completed === undefined) {
-						reportBlocker({
-							code: "operation-blocked",
-							itemId: requiredItemId,
-							message: `Line “${operation.line.title}” on ${config.items[operation.ownerItemId]?.title ?? operation.ownerItemId} cannot satisfy all required inputs, rules, charges, and output constraints.`,
-							operationId: operation.line.id,
-							ownerItemId: operation.ownerItemId,
-							path: [
-								...nextPath,
-							],
-						});
-						continue;
+				candidateSearch: for (const ownerAvailable of [
+					true,
+					false,
+				]) {
+					for (const { advancesChargeOutput, operation } of candidates) {
+						if ((planned.stock.get(operation.ownerItemId) ?? 0) >= 1 !== ownerAvailable)
+							continue;
+						const candidate = cloneEditorSimulationState(planned);
+						const before = candidate.stock.get(requiredItemId) ?? 0;
+						const completed = runOperation(
+							config,
+							candidate,
+							operation,
+							scenario,
+							requiredItemId,
+							nextPath,
+							requireItem,
+						);
+						if (completed === undefined) {
+							reportBlocker({
+								code: "operation-blocked",
+								itemId: requiredItemId,
+								message: `Line “${operation.line.title}” on ${config.items[operation.ownerItemId]?.title ?? operation.ownerItemId} cannot satisfy all required inputs, rules, charges, and output constraints.`,
+								operationId: operation.line.id,
+								ownerItemId: operation.ownerItemId,
+								path: [
+									...nextPath,
+								],
+							});
+							continue;
+						}
+						const increased =
+							(completed.stock.get(requiredItemId) ?? 0) > before + 1e-9;
+						if (!increased && !advancesChargeOutput) {
+							reportBlocker({
+								code: "operation-blocked",
+								itemId: requiredItemId,
+								message: `Line “${operation.line.title}” on ${config.items[operation.ownerItemId]?.title ?? operation.ownerItemId} completes without producing this item in the ${scenario} scenario.`,
+								operationId: operation.line.id,
+								ownerItemId: operation.ownerItemId,
+								path: [
+									...nextPath,
+								],
+							});
+							continue;
+						}
+						planned = completed;
+						advanced = true;
+						break candidateSearch;
 					}
-					const increased = (completed.stock.get(requiredItemId) ?? 0) > before + 1e-9;
-					if (!increased && !advancesChargeOutput) {
-						reportBlocker({
-							code: "operation-blocked",
-							itemId: requiredItemId,
-							message: `Line “${operation.line.title}” on ${config.items[operation.ownerItemId]?.title ?? operation.ownerItemId} completes without producing this item in the ${scenario} scenario.`,
-							operationId: operation.line.id,
-							ownerItemId: operation.ownerItemId,
-							path: [
-								...nextPath,
-							],
-						});
-						continue;
-					}
-					planned = completed;
-					advanced = true;
-					break;
 				}
-				const mergeCandidates = Object.values(config.items).flatMap((source) =>
-					(source.merge ?? [])
-						.filter(
-							(rule) =>
-								(rule.effect === "replace" && rule.result === requiredItemId) ||
-								outputCanYield(rule.output, scenario, requiredItemId),
-						)
-						.map((rule) => ({
-							rule,
-							sourceItemId: source.id,
-						})),
-				);
+				const mergeCandidates =
+					acquisitionIndex.merges.get(scenario)?.get(requiredItemId) ?? [];
 				if (!advanced)
 					for (const { rule, sourceItemId } of mergeCandidates) {
 						const completed = runMerge(
@@ -1437,17 +1506,14 @@ const estimateScenario = (
 						advanced = true;
 						break;
 					}
-				const temporaryCandidates = Object.values(config.items).filter(
-					(item) =>
-						item.type === "temporary" &&
-						outputCanYield(item.output, scenario, requiredItemId),
-				);
+				const temporaryCandidates =
+					acquisitionIndex.temporaries.get(scenario)?.get(requiredItemId) ?? [];
 				if (!advanced)
-					for (const temporary of temporaryCandidates) {
+					for (const { temporaryItemId } of temporaryCandidates) {
 						const completed = runTemporaryExpiry(
 							config,
 							cloneEditorSimulationState(planned),
-							temporary.id,
+							temporaryItemId,
 							scenario,
 							requiredItemId,
 							nextPath,
@@ -1457,9 +1523,9 @@ const estimateScenario = (
 							reportBlocker({
 								code: "operation-blocked",
 								itemId: requiredItemId,
-								message: `Expiry of ${temporary.id} cannot acquire and expire its temporary source.`,
-								operationId: `expiry:${temporary.id}`,
-								ownerItemId: temporary.id,
+								message: `Expiry of ${temporaryItemId} cannot acquire and expire its temporary source.`,
+								operationId: `expiry:${temporaryItemId}`,
+								ownerItemId: temporaryItemId,
 								path: [
 									...nextPath,
 								],
@@ -1553,7 +1619,7 @@ export const createEditorItemSimulatorFx = Effect.fn("createEditorItemSimulatorF
 	(config: GameConfigSchema.Type) =>
 		Effect.sync((): createEditorItemSimulatorFx.Service => {
 			const operations = readEditorSimulationOperations(config);
-			const candidateIndex = indexEditorSimulationCandidates(config, operations);
+			const acquisitionIndex = indexEditorSimulationAcquisitions(config, operations);
 			return {
 				simulateFx: Effect.fn("EditorItemSimulator.simulateFx")(
 					(itemId: string, quantity = 1) =>
@@ -1571,7 +1637,7 @@ export const createEditorItemSimulatorFx = Effect.fn("createEditorItemSimulatorF
 								).map((scenario) =>
 									estimateScenario(
 										config,
-										candidateIndex,
+										acquisitionIndex,
 										itemId,
 										quantity,
 										scenario,

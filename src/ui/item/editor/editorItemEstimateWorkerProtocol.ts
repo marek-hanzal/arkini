@@ -8,11 +8,13 @@ import type { EditorItemSimulation } from "~/editor/simulator/EditorItemSimulati
 export type EditorItemEstimateWorkerRequest =
 	| {
 			readonly config: EditorProject["config"];
+			readonly itemIds: ReadonlyArray<string>;
 			readonly type: "index";
 	  }
 	| {
 			readonly config: EditorProject["config"];
 			readonly itemId: string;
+			readonly quantity: number;
 			readonly type: "item";
 	  };
 
@@ -27,6 +29,10 @@ export type EditorItemEstimateWorkerResult =
 	  };
 
 export type EditorItemEstimateWorkerResponse =
+	| {
+			readonly estimate: EditorItemSimulation;
+			readonly status: "estimate";
+	  }
 	| {
 			readonly progress: EditorItemEstimateIndexProgress;
 			readonly status: "progress";

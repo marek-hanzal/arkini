@@ -13,8 +13,13 @@ describe("estimateEditorItem", () => {
 		Effect.runSync(simulateEditorItemFx(config, itemId, quantity));
 	const estimateEditorItemIndex = (
 		config: GameConfigSchema.Type,
-		onProgress?: Parameters<typeof estimateEditorItemIndexFx>[1],
-	) => Effect.runSync(estimateEditorItemIndexFx(config, onProgress));
+		onProgress?: NonNullable<Parameters<typeof estimateEditorItemIndexFx>[1]>["onProgress"],
+	) =>
+		Effect.runSync(
+			estimateEditorItemIndexFx(config, {
+				onProgress,
+			}),
+		);
 	const createSimulatorConfig = ({
 		dropRules = [],
 		rules = [],
@@ -146,6 +151,85 @@ describe("estimateEditorItem", () => {
 			},
 		});
 	};
+
+	it("keeps an available producer ahead of a faster unavailable production path", () => {
+		const base = createJobTestConfig();
+		const forge = base.items.forge;
+		if (forge.type !== "producer") throw new Error("Expected producer fixture.");
+		const producer = (id: string, runtimeMs: number) => ({
+			...forge,
+			id,
+			uid: id,
+			title: id,
+			lines: [
+				{
+					...forge.lines[0],
+					id: `line:${id}:run`,
+					input: [
+						{
+							type: "simple",
+						},
+					],
+					output: {
+						set: [
+							{
+								roll: [
+									{
+										drop: [
+											{
+												itemId: "result",
+												quantity: {
+													max: 1,
+													min: 1,
+												},
+												rules: [],
+											},
+										],
+										type: "guaranteed",
+									},
+								],
+							},
+						],
+					},
+					runtimeMs,
+				},
+			],
+		});
+		const config = GameConfigSchema.parse({
+			...base,
+			start: {
+				...base.start,
+				board: [
+					{
+						itemId: "slow",
+						space: 0,
+						x: 0,
+						y: 0,
+					},
+				],
+			},
+			items: {
+				fast: producer("fast", 1),
+				result: {
+					...base.items.tool,
+					id: "result",
+					title: "Result",
+					uid: "result",
+				},
+				slow: producer("slow", 1_000),
+			},
+		});
+
+		for (const scenario of estimateEditorItem(config, "result").scenarios) {
+			expect(scenario.status).toBe("estimated");
+			expect(scenario.runtimeMs).toBe(1_000);
+			expect(scenario.operations).toEqual([
+				expect.objectContaining({
+					lineId: "line:slow:run",
+				}),
+			]);
+		}
+	});
 
 	it("requires authored enable-rule infrastructure and applies active runtime rules", () => {
 		const rules = [

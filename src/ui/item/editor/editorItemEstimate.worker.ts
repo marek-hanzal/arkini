@@ -16,17 +16,28 @@ self.addEventListener("message", ({ data }: MessageEvent<EditorItemEstimateWorke
 				switch (data.type) {
 					case "index":
 						return {
-							entries: yield* estimateEditorItemIndexFx(data.config, (progress) =>
-								self.postMessage({
-									progress,
-									status: "progress",
-								} satisfies EditorItemEstimateWorkerResponse),
-							),
+							entries: yield* estimateEditorItemIndexFx(data.config, {
+								itemIds: data.itemIds,
+								onEstimate: (estimate) =>
+									self.postMessage({
+										estimate,
+										status: "estimate",
+									} satisfies EditorItemEstimateWorkerResponse),
+								onProgress: (progress) =>
+									self.postMessage({
+										progress,
+										status: "progress",
+									} satisfies EditorItemEstimateWorkerResponse),
+							}),
 							type: "index",
 						};
 					case "item":
 						return {
-							estimate: yield* simulateEditorItemFx(data.config, data.itemId),
+							estimate: yield* simulateEditorItemFx(
+								data.config,
+								data.itemId,
+								data.quantity,
+							),
 							type: "item",
 						};
 				}

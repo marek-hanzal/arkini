@@ -191,7 +191,7 @@ const EditorItemEstimateMethodCard = () => (
 /** Shows the shared domain estimate in one item's read-only Estimate section. */
 export const EditorItemEstimateSection = ({ itemId }: { readonly itemId: string }) => {
 	const project = useEditorProject();
-	const state = useEditorItemEstimate(project.config, itemId);
+	const state = useEditorItemEstimate(project, itemId);
 	return (
 		<section
 			className="grid gap-4"

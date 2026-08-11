@@ -21,7 +21,7 @@ const compareRuntime = (
 /** Lists all item estimates without running recursive planning on the renderer thread. */
 export const EditorItemEstimateList = () => {
 	const project = useEditorProject();
-	const state = useEditorItemEstimateIndex(project.config);
+	const state = useEditorItemEstimateIndex(project);
 	const [query, setQuery] = useState("");
 	const [sort, setSort] = useState<EstimateSort>("fastest");
 	const rows = useMemo(() => {

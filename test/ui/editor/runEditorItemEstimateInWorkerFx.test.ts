@@ -18,6 +18,7 @@ const request = {
 	config: {
 		items: {},
 	} as EditorItemEstimateWorkerRequest["config"],
+	itemIds: [],
 	type: "index",
 } satisfies EditorItemEstimateWorkerRequest;
 

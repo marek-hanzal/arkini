@@ -1,16 +1,12 @@
-import { useAtom, useAtomValue } from "@effect/atom-react";
-import { Effect } from "effect";
-import * as AsyncResult from "effect/unstable/reactivity/AsyncResult";
-import * as Atom from "effect/unstable/reactivity/Atom";
+import { useAtom } from "@effect/atom-react";
 import { useEffect, useMemo } from "react";
 
 import type { EditorProject } from "~/bridge/editor/EditorProject";
-import type {
-	EditorItemEstimateIndexEntry,
-	EditorItemEstimateIndexProgress,
-} from "~/editor/EditorItemEstimateIndex";
-import { readSettledAsyncResultError } from "~/ui/reactivity/readSettledAsyncResultError";
-import { runEditorItemEstimateInWorkerFx } from "~/ui/item/editor/runEditorItemEstimateInWorkerFx";
+import type { EditorItemEstimateIndexEntry } from "~/editor/EditorItemEstimateIndex";
+import {
+	EditorItemEstimateCacheAtom,
+	type EditorItemEstimateCacheAtom as EditorItemEstimateCache,
+} from "~/ui/item/editor/EditorItemEstimateCacheAtom";
 
 export type EditorItemEstimateIndexState =
 	| {
@@ -27,105 +23,64 @@ export type EditorItemEstimateIndexState =
 			readonly status: "error";
 	  };
 
-interface EditorItemEstimateIndexRequest {
-	readonly config: EditorProject["config"];
-}
+const sameSnapshot = (
+	left: EditorItemEstimateCache.Snapshot | undefined,
+	right: EditorItemEstimateCache.Snapshot,
+) => left?.projectId === right.projectId && left.revision === right.revision;
 
-interface EditorItemEstimateIndexProgressState {
-	readonly progress: EditorItemEstimateIndexProgress;
-	readonly request?: EditorItemEstimateIndexRequest;
-}
-
-/** Owns one subscription-scoped all-item estimate for the current project snapshot. */
+/** Reads the persistent all-item estimate projection for the current project snapshot. */
 export const useEditorItemEstimateIndex = (
-	config: EditorProject["config"],
+	project: EditorProject,
 ): EditorItemEstimateIndexState => {
-	const { commandAtom, progressAtom } = useMemo(() => {
-		const progressAtom = Atom.make<EditorItemEstimateIndexProgressState>({
-			progress: {
-				completed: 0,
-				itemId: "",
-				total: 0,
-			},
-		}).pipe(Atom.setIdleTTL(0));
-		const commandAtom = Atom.fn((request: EditorItemEstimateIndexRequest, get) =>
-			Effect.gen(function* () {
-				get.set(progressAtom, {
-					progress: {
-						completed: 0,
-						itemId: "",
-						total: Object.keys(request.config.items).length,
-					},
-					request,
-				});
-				const result = yield* runEditorItemEstimateInWorkerFx(
-					{
-						config: request.config,
-						type: "index",
-					},
-					{
-						onProgress: (progress) =>
-							get.set(progressAtom, {
-								progress,
-								request,
-							}),
-					},
-				);
-				if (result.type !== "index")
-					return yield* Effect.die(
-						new Error("Estimate index worker returned an item result."),
-					);
-				return {
-					entries: result.entries,
-					request,
-				};
-			}),
-		).pipe(Atom.setIdleTTL(0));
-		return {
-			commandAtom,
-			progressAtom,
-		};
-	}, []);
-	const request = useMemo<EditorItemEstimateIndexRequest>(
+	const snapshot = useMemo<EditorItemEstimateCache.Snapshot>(
 		() => ({
-			config,
+			config: project.config,
+			projectId: project.projectId,
+			revision: project.revision,
 		}),
 		[
-			config,
+			project.config,
+			project.projectId,
+			project.revision,
 		],
 	);
-	const [result, runEstimate] = useAtom(commandAtom);
-	const progressState = useAtomValue(progressAtom);
+	const request = useMemo<EditorItemEstimateCache.Request>(
+		() => ({
+			snapshot,
+			type: "index",
+		}),
+		[
+			snapshot,
+		],
+	);
+	const [state, requestIndex] = useAtom(EditorItemEstimateCacheAtom);
 
 	useEffect(() => {
-		runEstimate(request);
+		requestIndex(request);
 	}, [
 		request,
-		runEstimate,
+		requestIndex,
 	]);
 
-	if (AsyncResult.isSuccess(result) && !result.waiting && result.value.request === request)
+	if (!sameSnapshot(state.snapshot, snapshot))
 		return {
-			entries: result.value.entries,
+			completed: 0,
+			status: "loading",
+			total: Object.keys(project.config.items).length,
+		};
+	if (state.indexEntries !== undefined)
+		return {
+			entries: state.indexEntries,
 			status: "ready",
 		};
-	const error = readSettledAsyncResultError(result);
-	if (error !== undefined && progressState.request === request)
+	if (state.indexError !== undefined)
 		return {
-			message: error.message,
+			message: state.indexError,
 			status: "error",
 		};
-	const progress =
-		progressState.request === request
-			? progressState.progress
-			: {
-					completed: 0,
-					itemId: "",
-					total: Object.keys(config.items).length,
-				};
 	return {
-		completed: progress.completed,
+		completed: state.progress.completed,
 		status: "loading",
-		total: progress.total,
+		total: state.progress.total,
 	};
 };

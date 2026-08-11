@@ -1,13 +1,12 @@
 import { useAtom } from "@effect/atom-react";
-import { Effect } from "effect";
-import * as AsyncResult from "effect/unstable/reactivity/AsyncResult";
-import * as Atom from "effect/unstable/reactivity/Atom";
 import { useEffect, useMemo } from "react";
 
 import type { EditorProject } from "~/bridge/editor/EditorProject";
 import type { EditorItemSimulation } from "~/editor/simulator/EditorItemSimulation";
-import { readSettledAsyncResultError } from "~/ui/reactivity/readSettledAsyncResultError";
-import { runEditorItemEstimateInWorkerFx } from "~/ui/item/editor/runEditorItemEstimateInWorkerFx";
+import {
+	EditorItemEstimateCacheAtom,
+	type EditorItemEstimateCacheAtom as EditorItemEstimateCache,
+} from "~/ui/item/editor/EditorItemEstimateCacheAtom";
 
 export type EditorItemEstimateState =
 	| {
@@ -22,68 +21,65 @@ export type EditorItemEstimateState =
 			readonly status: "error";
 	  };
 
-interface EditorItemEstimateRequest {
-	readonly config: EditorProject["config"];
-	readonly itemId: string;
-}
+const sameSnapshot = (
+	left: EditorItemEstimateCache.Snapshot | undefined,
+	right: EditorItemEstimateCache.Snapshot,
+) => left?.projectId === right.projectId && left.revision === right.revision;
 
-/** Owns one subscription-scoped estimate for the currently routed item. */
+/** Reads a cached estimate or requests one from the renderer-owned estimate authority. */
 export const useEditorItemEstimate = (
-	config: EditorProject["config"],
+	project: EditorProject,
 	itemId: string,
 ): EditorItemEstimateState => {
-	const commandAtom = useMemo(
-		() =>
-			Atom.fn((request: EditorItemEstimateRequest) =>
-				Effect.gen(function* () {
-					const result = yield* runEditorItemEstimateInWorkerFx({
-						config: request.config,
-						itemId: request.itemId,
-						type: "item",
-					});
-					if (result.type !== "item")
-						return yield* Effect.die(
-							new Error("Estimate item worker returned an index result."),
-						);
-					return {
-						estimate: result.estimate,
-						request,
-					};
-				}),
-			).pipe(Atom.setIdleTTL(0)),
-		[],
-	);
-	const request = useMemo<EditorItemEstimateRequest>(
+	const snapshot = useMemo<EditorItemEstimateCache.Snapshot>(
 		() => ({
-			config,
-			itemId,
+			config: project.config,
+			projectId: project.projectId,
+			revision: project.revision,
 		}),
 		[
-			config,
-			itemId,
+			project.config,
+			project.projectId,
+			project.revision,
 		],
 	);
-	const [result, runEstimate] = useAtom(commandAtom);
+	const request = useMemo<EditorItemEstimateCache.Request>(
+		() => ({
+			itemId,
+			quantity: 1,
+			snapshot,
+			type: "item",
+		}),
+		[
+			itemId,
+			snapshot,
+		],
+	);
+	const [state, requestEstimate] = useAtom(EditorItemEstimateCacheAtom);
 
 	useEffect(() => {
-		runEstimate(request);
+		requestEstimate(request);
 	}, [
 		request,
-		runEstimate,
+		requestEstimate,
 	]);
 
-	if (AsyncResult.isSuccess(result) && !result.waiting && result.value.request === request)
+	if (!sameSnapshot(state.snapshot, snapshot))
 		return {
-			estimate: result.value.estimate,
+			status: "loading",
+		};
+	const estimate = state.estimates.get(itemId)?.get(1);
+	if (estimate !== undefined)
+		return {
+			estimate,
 			status: "ready",
 		};
-	const error = readSettledAsyncResultError(result);
-	return error === undefined
-		? {
-				status: "loading",
-			}
-		: {
-				message: error.message,
-				status: "error",
-			};
+	if (state.itemError?.itemId === itemId && state.itemError.quantity === 1)
+		return {
+			message: state.itemError.message,
+			status: "error",
+		};
+	return {
+		status: "loading",
+	};
 };

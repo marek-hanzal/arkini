@@ -1,5 +1,6 @@
 import { AnimatePresence, motion } from "motion/react";
 
+import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import { useClearItemDetailQueue } from "~/bridge/item-detail/useClearItemDetailQueue";
 import type { useItemDetailQueue } from "~/bridge/item-detail/useItemDetailQueue";
 import { useRemoveItemDetailQueueRequest } from "~/bridge/item-detail/useRemoveItemDetailQueueRequest";
@@ -10,7 +11,8 @@ import {
 	itemDetailFadeMotion,
 	itemDetailMotionTransition,
 } from "~/ui/item-detail/ItemDetailMotion";
-import { ItemRuntime, readActiveJobRuntime } from "~/ui/item-detail/ItemRuntime";
+import { ItemRuntime } from "~/ui/item-detail/ItemRuntime";
+import { readActiveJobRuntimeFx } from "~/ui/item-detail/readActiveJobRuntimeFx";
 import { Scrollable } from "~/ui/scrollable/Scrollable";
 import { useItemDetailControl } from "~/ui/item-detail/useItemDetailControl";
 
@@ -173,7 +175,7 @@ const ActiveQueueSlot = ({
 							<ItemRuntime
 								dataUi="ItemQueueRuntime"
 								jobStatus={job.status}
-								runtime={readActiveJobRuntime(job)}
+								runtime={RendererRuntime.runSync(readActiveJobRuntimeFx(job))}
 							/>
 						</div>
 					</motion.article>

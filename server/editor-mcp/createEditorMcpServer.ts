@@ -5,6 +5,8 @@ import { z } from "zod";
 import { ArkiniAppVersion } from "../../shared/ArkiniAppMetadata";
 import type { EditorProject } from "../../src/editor/EditorProject";
 import type { EditorProjectRepositoryService } from "../../src/editor/EditorProjectRepository";
+import type { EditorItemSimulation } from "../../src/editor/simulator/EditorItemSimulation";
+import { simulateEditorItemFx } from "../../src/editor/simulator/simulateEditorItemFx";
 import {
 	readEditorItemOriginRelationSubgraph,
 	readEditorItemOriginSources,
@@ -195,6 +197,70 @@ const outputAnnotation = (output: EditorItemOriginOutputOccurrence) =>
 const formatQuantity = ({ max, min }: { readonly max: number; readonly min: number }) =>
 	min === max ? String(min) : `${min}–${max}`;
 
+const formatRuntime = (runtimeMs: number) => `${runtimeMs / 1_000} s`;
+
+const formatEstimateNumber = (value: number) =>
+	Number.isInteger(value) ? String(value) : value.toFixed(2).replace(/\.00$/, "");
+
+const itemEstimateText = (project: EditorProject, estimate: EditorItemSimulation) => {
+	const target = project.config.items[estimate.itemId];
+	if (target === undefined)
+		throw new Error(`Item ${estimate.itemId} does not exist in the open project.`);
+	return [
+		"Item estimate",
+		`Item ID: ${target.id}`,
+		`Title: ${target.title}`,
+		`Quantity: ${estimate.quantity}`,
+		"Scheduling: sequential",
+		"Start state: available at zero time",
+		"Simulation: gameplay rules, runtime modifiers, charges, and finite-source renewal paths",
+		"Expected method: expected output per run with whole-run batch rounding",
+		...estimate.scenarios.flatMap((scenario) => [
+			"",
+			`${scenario.scenario[0]?.toUpperCase()}${scenario.scenario.slice(1)}:`,
+			`  Status: ${scenario.status}`,
+			...(scenario.runtimeMs === undefined
+				? []
+				: [
+						`  Sequential runtime: ${formatRuntime(scenario.runtimeMs)}`,
+					]),
+			`  Total item cost: ${formatEstimateNumber(scenario.totalCostQuantity)}`,
+			"  Item cost breakdown:",
+			...(scenario.cost.length === 0
+				? [
+						"    - none",
+					]
+				: scenario.cost.map(
+						({ itemId, quantity }) =>
+							`    - ${itemReference(project, itemId)}: ${formatEstimateNumber(quantity)}`,
+					)),
+			"  Infrastructure and reserved inputs:",
+			...(scenario.infrastructureItemIds.size === 0
+				? [
+						"    - none",
+					]
+				: [
+						...[
+							...scenario.infrastructureItemIds,
+						]
+							.sort((left, right) => left.localeCompare(right))
+							.map((itemId) => `    - ${itemReference(project, itemId)}`),
+					]),
+			"  Operations:",
+			...(scenario.operations.length === 0
+				? [
+						"    - none",
+					]
+				: scenario.operations.map(
+						(operation) =>
+							`    - ${operation.label} [${operation.lineId}] × ${operation.runs}; ${formatRuntime(operation.runtimeMs)}; owner ${itemReference(project, operation.ownerItemId)}`,
+					)),
+			"  Warnings:",
+			...scenario.warnings.map((warning) => `    - ${warning}`),
+		]),
+	].join("\n");
+};
+
 const readItemRelationView = (
 	project: EditorProject,
 	{
@@ -303,6 +369,11 @@ const itemRelationText = ({ itemId, level, project, role, subgraph }: ItemRelati
 					return [
 						`- Level ${group.level}: ${source.kind} "${source.label}"`,
 						...sourceReferenceLines(project, source),
+						...(source.runtimeMs === undefined
+							? []
+							: [
+									`  Runtime: ${formatRuntime(source.runtimeMs)}`,
+								]),
 						"  Traversed:",
 						...group.relations.map(
 							(relation) =>
@@ -497,7 +568,7 @@ export const createEditorMcpServer = (
 		"item_income",
 		{
 			description:
-				"Read what leads to obtaining one item. Level 1 returns every operation that directly produces it; higher levels continue upstream through operations that produce each reached operation owner. Every operation lists its owner, Inputs, and all possible Outputs.",
+				"Read what leads to obtaining one item. Level 1 returns every operation that directly produces it; higher levels continue upstream through operations that produce each reached operation owner. Every operation lists its owner, Runtime when authored, Inputs, and all possible Outputs.",
 			inputSchema: z
 				.object({
 					itemId: IdSchema.describe(
@@ -530,7 +601,7 @@ export const createEditorMcpServer = (
 		"item_outcome",
 		{
 			description:
-				"Read where one item leads. Level 1 returns every operation that directly uses it as an input; higher levels continue downstream through operations that use each reached operation owner. Every operation lists its owner, Inputs, and all possible Outputs.",
+				"Read where one item leads. Level 1 returns every operation that directly uses it as an input; higher levels continue downstream through operations that use each reached operation owner. Every operation lists its owner, Runtime when authored, Inputs, and all possible Outputs.",
 			inputSchema: z
 				.object({
 					itemId: IdSchema.describe(
@@ -557,6 +628,40 @@ export const createEditorMcpServer = (
 					),
 				),
 				itemRelationText,
+			),
+	);
+	server.registerTool(
+		"item_estimate",
+		{
+			description:
+				"Run the editor-only optimistic gameplay simulator for one item from the authored new-game start state. Returns best, expected, and guaranteed sequential scenarios including production dependencies, line and drop rules, runtime modifiers, charge spending, finite-source depletion, and authored charge renewal output.",
+			inputSchema: z
+				.object({
+					itemId: IdSchema.describe(
+						"The exact target item ID returned by item_collection.",
+					),
+					quantity: z
+						.number()
+						.int()
+						.positive()
+						.default(1)
+						.describe("Target quantity; defaults to 1."),
+				})
+				.strict(),
+		},
+		async ({ itemId, quantity }) =>
+			runTool(
+				readCurrentProjectFx(repository, readProjectContext).pipe(
+					Effect.flatMap((project) =>
+						simulateEditorItemFx(project.config, itemId, quantity).pipe(
+							Effect.map((estimate) => ({
+								estimate,
+								project,
+							})),
+						),
+					),
+				),
+				({ estimate, project }) => itemEstimateText(project, estimate),
 			),
 	);
 	return server;

@@ -107,6 +107,7 @@ describe("createEditorMcpOwnershipFx", () => {
 			"item_detail",
 			"item_income",
 			"item_outcome",
+			"item_estimate",
 		]);
 		expect(tools.tools.find(({ name }) => name === "project")?.inputSchema.properties).toEqual(
 			{},
@@ -145,6 +146,10 @@ describe("createEditorMcpOwnershipFx", () => {
 			expect(properties).toHaveProperty("itemId");
 			expect(properties).toHaveProperty("level");
 		}
+		const estimateProperties = tools.tools.find(({ name }) => name === "item_estimate")
+			?.inputSchema.properties;
+		expect(estimateProperties).toHaveProperty("itemId");
+		expect(estimateProperties).toHaveProperty("quantity");
 		const missingContext = await client.callTool({
 			name: "project",
 			arguments: {},
@@ -331,6 +336,16 @@ describe("createEditorMcpOwnershipFx", () => {
 						y: 0,
 					},
 				],
+				inventory: [
+					{
+						itemId: "water",
+						quantity: 3,
+					},
+					{
+						itemId: "tool",
+						quantity: 1,
+					},
+				],
 			},
 			items: {
 				...graphBase.items,
@@ -507,6 +522,7 @@ describe("createEditorMcpOwnershipFx", () => {
 						'- Level 1: line "Run"',
 						"  Source item: forge [forge; producer]",
 						"  Line ID: line:forge:run",
+						"  Runtime: 1 s",
 						"  Traversed:",
 						"    - water [water; simple] -> forge [forge; producer]",
 						"  Inputs:",
@@ -543,6 +559,50 @@ describe("createEditorMcpOwnershipFx", () => {
 			},
 		]);
 		expect(itemIncome).not.toHaveProperty("structuredContent");
+		const itemEstimate = await client.callTool({
+			name: "item_estimate",
+			arguments: {
+				itemId: "ingot",
+			},
+		});
+		expect(itemEstimate.content).toMatchObject([
+			{
+				text: expect.stringContaining(
+					[
+						"Item estimate",
+						"Item ID: ingot",
+						"Title: Ingot",
+						"Quantity: 1",
+						"Scheduling: sequential",
+					].join("\n"),
+				),
+			},
+		]);
+		expect(itemEstimate.content).toMatchObject([
+			{
+				text: expect.stringContaining(
+					"\nBest:\n  Status: estimated\n  Sequential runtime: 1 s",
+				),
+			},
+		]);
+		expect(itemEstimate.content).toMatchObject([
+			{
+				text: expect.stringContaining(
+					"  Total item cost: 3\n  Item cost breakdown:\n    - water [water; simple]: 3",
+				),
+			},
+		]);
+		expect(itemEstimate.content).toMatchObject([
+			{
+				text: expect.stringContaining("\nExpected:\n  Status: estimated"),
+			},
+		]);
+		expect(itemEstimate.content).toMatchObject([
+			{
+				text: expect.stringContaining("\nGuaranteed:\n  Status: estimated"),
+			},
+		]);
+		expect(itemEstimate).not.toHaveProperty("structuredContent");
 		const missingRelationItem = await client.callTool({
 			name: "item_income",
 			arguments: {
@@ -588,6 +648,7 @@ describe("createEditorMcpOwnershipFx", () => {
 			"item_detail",
 			"item_income",
 			"item_outcome",
+			"item_estimate",
 		]);
 		expect(
 			(

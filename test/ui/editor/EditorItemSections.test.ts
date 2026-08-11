@@ -31,6 +31,7 @@ describe("EditorItemSections", () => {
 			"artwork",
 			"charges",
 			"merges",
+			"estimate",
 			"flow",
 		]);
 		expect(
@@ -40,6 +41,7 @@ describe("EditorItemSections", () => {
 			"artwork",
 			"charges",
 			"merges",
+			"estimate",
 			"flow",
 		]);
 		expect(
@@ -50,6 +52,7 @@ describe("EditorItemSections", () => {
 			"charges",
 			"merges",
 			"production",
+			"estimate",
 			"flow",
 		]);
 	});

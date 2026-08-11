@@ -16,6 +16,13 @@ export const EditorWorkspaceRoutes = [
 		to: "/editor/$projectId/editor/items/list",
 	},
 	{
+		id: "estimate",
+		icon: "icon-[lucide--calculator]",
+		label: "Estimate",
+		matchTo: "/editor/$projectId/estimate",
+		to: "/editor/$projectId/estimate",
+	},
+	{
 		id: "assets",
 		icon: "icon-[lucide--images]",
 		label: "Assets",

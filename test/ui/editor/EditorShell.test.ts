@@ -139,6 +139,11 @@ const createTestRouter = ({
 				}),
 		component: () => createElement("p", null, "Assets destination"),
 	});
+	const estimateRoute = createRoute({
+		getParentRoute: () => editorRoute,
+		path: "estimate",
+		component: () => createElement("p", null, "Estimate destination"),
+	});
 	const flowRoute = createRoute({
 		getParentRoute: () => editorRoute,
 		path: "flow",
@@ -176,6 +181,7 @@ const createTestRouter = ({
 			editorRoute.addChildren([
 				editorListRoute,
 				itemEditRoute,
+				estimateRoute,
 				assetsRoute,
 				flowRoute,
 				projectRoute,
@@ -247,6 +253,7 @@ describe("EditorShell", () => {
 		).toEqual([
 			"Project",
 			"Items",
+			"Estimate",
 			"Assets",
 			"Flow",
 			"Build",
@@ -278,6 +285,17 @@ describe("EditorShell", () => {
 		expect(container.querySelector('[data-ui="EditorContent"]')?.className).toContain(
 			"bg-surface",
 		);
+	});
+
+	it("marks the all-item estimate workspace as active", async () => {
+		const router = createTestRouter({
+			initialEntry: "/editor/editor-test/estimate",
+		});
+		const container = await renderRouter(router);
+
+		expect(readLink(container, "Estimate").className).toContain("bg-accent");
+		expect(readLink(container, "Estimate").getAttribute("aria-current")).toBe("page");
+		expect(container.textContent).toContain("Estimate destination");
 	});
 
 	it("projects programmatic pending navigation before the destination finishes loading", async () => {

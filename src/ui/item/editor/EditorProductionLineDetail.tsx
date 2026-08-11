@@ -1,6 +1,7 @@
 import { useEditorProject } from "~/bridge/editor/useEditorProject";
+import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
 import type { EditorLine } from "~/bridge/item/editor/EditorItemModel";
-import { formatItemDuration } from "~/ui/item-detail/ItemRuntime";
+import { formatItemDurationFx } from "~/ui/item-detail/formatItemDurationFx";
 import { EditorProductionLineInputs } from "~/ui/item/editor/EditorProductionLineInputs";
 import { EditorProductionLineOutputs } from "~/ui/item/editor/EditorProductionLineOutputs";
 
@@ -9,7 +10,7 @@ const EditorLineRuntime = ({ runtimeMs }: { readonly runtimeMs: number }) => (
 		<p className="text-xs font-medium uppercase tracking-[0.08em] text-muted">Runtime</p>
 		<div className="col-start-1 row-span-2 row-start-2 grid grid-rows-[1.5rem_1rem]">
 			<p className="self-center font-semibold tabular-nums text-foreground">
-				{formatItemDuration(runtimeMs)}
+				{RendererRuntime.runSync(formatItemDurationFx(runtimeMs))}
 			</p>
 			<p className="self-end text-xs tabular-nums text-muted">Per cycle</p>
 		</div>

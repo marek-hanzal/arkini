@@ -25,6 +25,10 @@ const EditorItemSections = [
 		label: "Production",
 	},
 	{
+		id: "estimate",
+		label: "Estimate",
+	},
+	{
 		id: "flow",
 		label: "Flow",
 	},

@@ -34,7 +34,8 @@ export const EditorItemDetail = ({
 		projectId: project.projectId,
 		itemUid: item.uid,
 	};
-	const editableSectionId = sectionId === "flow" ? "identity" : sectionId;
+	const editableSectionId =
+		sectionId === "estimate" || sectionId === "flow" ? "identity" : sectionId;
 	const sections = RendererRuntime.runSync(readEditorItemSectionsFx(item));
 	return (
 		<EditorSectionPage
@@ -101,7 +102,7 @@ export const EditorItemDetail = ({
 				/>
 			}
 		>
-			{sectionId === "production" || sectionId === "flow" ? (
+			{sectionId === "estimate" || sectionId === "production" || sectionId === "flow" ? (
 				children
 			) : (
 				<EditorRootCard dataUi="EditorItemDetailCard">{children}</EditorRootCard>

@@ -96,6 +96,7 @@ describe("editor item origin relations", () => {
 				},
 			},
 		]);
+		expect(constructBakery?.runtimeMs).toBe(24_000);
 	});
 
 	it("finds every official Coin producer through output lookup", async () => {

@@ -118,6 +118,18 @@ describe("editor section routes", () => {
 			}),
 		).not.toThrow();
 		expect(() =>
+			readBeforeLoad(ItemDetailSectionRoute)({
+				context: {
+					rendererRuntime: RendererRuntime,
+				},
+				params: {
+					projectId: "project-test",
+					itemUid: "item-test",
+					sectionId: "estimate",
+				},
+			}),
+		).not.toThrow();
+		expect(() =>
 			readBeforeLoad(ItemFormSectionRoute)({
 				context: {
 					rendererRuntime: RendererRuntime,

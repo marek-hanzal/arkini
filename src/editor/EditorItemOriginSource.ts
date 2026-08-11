@@ -45,6 +45,7 @@ export interface EditorItemOriginSource {
 	readonly ownerItemId: string;
 	readonly reference: EditorItemOriginSourceReference;
 	readonly requirementItemIds: ReadonlyArray<string>;
+	readonly runtimeMs?: number;
 }
 
 export type EditorItemOriginRelationRole = "input" | "output";
@@ -161,6 +162,7 @@ const readLineSources = (
 					item.id,
 					...inputs.map(({ itemId }) => itemId),
 				]),
+				runtimeMs: line.runtimeMs,
 			},
 		];
 	});
@@ -215,6 +217,7 @@ export const readEditorItemOriginSources = (item: ItemSchema.Type): EditorItemOr
 				requirementItemIds: [
 					item.id,
 				],
+				runtimeMs: item.durationMs,
 			});
 	}
 	for (const [index, merge] of (item.merge ?? []).entries()) {

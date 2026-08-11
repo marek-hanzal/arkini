@@ -6,6 +6,7 @@ export const EditorItemSectionIds = [
 	"charges",
 	"merges",
 	"production",
+	"estimate",
 	"flow",
 ] as const;
 

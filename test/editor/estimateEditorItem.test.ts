@@ -440,7 +440,7 @@ describe("estimateEditorItem", () => {
 			expect(scenario.status).toBe("estimated");
 	});
 
-	it("rejects outputs that cannot fit their authored storage scope", () => {
+	it("ignores physical board capacity while preserving board-scope eligibility", () => {
 		const base = createSimulatorConfig();
 		const forge = base.items.forge;
 		const ingot = base.items.ingot;
@@ -486,6 +486,81 @@ describe("estimateEditorItem", () => {
 		});
 
 		for (const scenario of estimateEditorItem(config, "ingot").scenarios)
+			expect(scenario.status).toBe("estimated");
+	});
+
+	it("treats spatial rules optimistically and ignores additional starting board spaces", () => {
+		const spatialRule = [
+			{
+				type: "enable",
+				when: [
+					{
+						query: {
+							distance: "near",
+							scope: "board",
+							selector: {
+								itemId: "tool",
+								type: "item",
+							},
+						},
+						type: "exists",
+					},
+				],
+			},
+		];
+		const optimistic = createSimulatorConfig({
+			rules: spatialRule,
+			startWithTool: true,
+		});
+		const tinyBoard = GameConfigSchema.parse({
+			...optimistic,
+			meta: {
+				...optimistic.meta,
+				board: {
+					height: 1,
+					width: 1,
+				},
+			},
+		});
+		for (const scenario of estimateEditorItem(tinyBoard, "ingot").scenarios)
+			expect(scenario.status).toBe("estimated");
+
+		const universeRule = [
+			{
+				type: "enable",
+				when: [
+					{
+						query: {
+							scope: "universe",
+							selector: {
+								itemId: "tool",
+								type: "item",
+							},
+						},
+						type: "exists",
+					},
+				],
+			},
+		];
+		const otherSpace = createSimulatorConfig({
+			rules: universeRule,
+		});
+		const withOtherSpaceTool = GameConfigSchema.parse({
+			...otherSpace,
+			start: {
+				...otherSpace.start,
+				board: [
+					...otherSpace.start.board,
+					{
+						itemId: "tool",
+						space: 1,
+						x: 0,
+						y: 0,
+					},
+				],
+			},
+		});
+		for (const scenario of estimateEditorItem(withOtherSpaceTool, "ingot").scenarios)
 			expect(scenario.status).toBe("no-finite-path");
 	});
 

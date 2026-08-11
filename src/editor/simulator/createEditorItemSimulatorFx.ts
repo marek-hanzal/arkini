@@ -18,12 +18,7 @@ import type {
 	EditorItemSimulationScenarioResult,
 } from "~/editor/simulator/EditorItemSimulation";
 
-type EditorSimulationLocation =
-	| "inventory"
-	| "job"
-	| "toolbar"
-	| `board:${number}`
-	| `board-other:${number}`;
+type EditorSimulationLocation = "board" | "board-related" | "inventory" | "job" | "toolbar";
 
 interface EditorSimulationChargeInstance {
 	location: EditorSimulationLocation;
@@ -96,14 +91,6 @@ const writeLocationQuantity = (
 const addConsumed = (state: EditorSimulationState, itemId: string, quantity: number) =>
 	state.consumed.set(itemId, (state.consumed.get(itemId) ?? 0) + quantity);
 
-const isBoardLocation = (
-	location: EditorSimulationLocation,
-): location is `board:${number}` | `board-other:${number}` =>
-	location.startsWith("board:") || location.startsWith("board-other:");
-
-const readBoardSpace = (location: `board:${number}` | `board-other:${number}`) =>
-	Number(location.slice(location.indexOf(":") + 1));
-
 const canItemUseLocation = (
 	config: GameConfigSchema.Type,
 	itemId: string,
@@ -112,7 +99,8 @@ const canItemUseLocation = (
 	if (location === "job") return true;
 	const item = config.items[itemId];
 	if (item === undefined) return false;
-	if (isBoardLocation(location)) return item.scope === "board" || item.scope === "any";
+	if (location === "board" || location === "board-related")
+		return item.scope === "board" || item.scope === "any";
 	if (location === "inventory") return item.scope === "inventory" || item.scope === "any";
 	return (
 		item.scope === "toolbar" ||
@@ -121,95 +109,7 @@ const canItemUseLocation = (
 	);
 };
 
-const readSurfaceQuantity = (
-	state: EditorSimulationState,
-	itemId: string,
-	location: EditorSimulationLocation,
-) => {
-	const locations = state.locations.get(itemId);
-	if (locations === undefined) return 0;
-	if (!isBoardLocation(location)) return locations.get(location) ?? 0;
-	const space = readBoardSpace(location);
-	return (locations.get(`board:${space}`) ?? 0) + (locations.get(`board-other:${space}`) ?? 0);
-};
-
-const isLocationOnSurface = (
-	location: EditorSimulationLocation,
-	surface: EditorSimulationLocation,
-) =>
-	location === surface ||
-	(isBoardLocation(location) &&
-		isBoardLocation(surface) &&
-		readBoardSpace(location) === readBoardSpace(surface));
-
-const readSurfaceItemCells = (
-	config: GameConfigSchema.Type,
-	state: EditorSimulationState,
-	itemId: string,
-	location: EditorSimulationLocation,
-	additionalFreshQuantity = 0,
-) => {
-	const item = config.items[itemId];
-	if (item === undefined) return 0;
-	const quantity = readSurfaceQuantity(state, itemId, location);
-	const chargeAmount = item.charges?.amount;
-	const partialChargeInstances =
-		chargeAmount === undefined
-			? 0
-			: (state.charges.get(itemId) ?? []).filter(
-					(instance) =>
-						isLocationOnSurface(instance.location, location) &&
-						instance.remaining < chargeAmount,
-				).length;
-	const stackableQuantity = Math.max(0, quantity - partialChargeInstances);
-	return (
-		partialChargeInstances +
-		Math.ceil((stackableQuantity + additionalFreshQuantity) / item.maxStackSize)
-	);
-};
-
-const readSurfaceCells = (
-	config: GameConfigSchema.Type,
-	state: EditorSimulationState,
-	location: EditorSimulationLocation,
-) => {
-	if (location === "job") return 0;
-	let cells = 0;
-	for (const itemId of state.locations.keys()) {
-		const item = config.items[itemId];
-		if (item === undefined) continue;
-		cells += readSurfaceItemCells(config, state, itemId, location);
-	}
-	return cells;
-};
-
-const readSurfaceCapacity = (config: GameConfigSchema.Type, location: EditorSimulationLocation) => {
-	if (location === "job") return Number.POSITIVE_INFINITY;
-	if (isBoardLocation(location)) return config.meta.board.width * config.meta.board.height;
-	if (location === "inventory") return config.meta.inventory.width * config.meta.inventory.height;
-	return config.meta.toolbarSize ?? 0;
-};
-
-const canAddToLocation = (
-	config: GameConfigSchema.Type,
-	state: EditorSimulationState,
-	itemId: string,
-	quantity: number,
-	location: EditorSimulationLocation,
-) => {
-	if (!canItemUseLocation(config, itemId, location)) return false;
-	if (location === "job") return true;
-	const item = config.items[itemId];
-	if (item === undefined) return false;
-	const previousCells = readSurfaceItemCells(config, state, itemId, location);
-	const nextCells = readSurfaceItemCells(config, state, itemId, location, quantity);
-	return (
-		readSurfaceCells(config, state, location) - previousCells + nextCells <=
-		readSurfaceCapacity(config, location)
-	);
-};
-
-/** Adds one resolved output while enforcing canonical max-count capacity. */
+/** Adds one resolved output without attempting physical board placement. */
 const addEditorSimulationItem = (
 	config: GameConfigSchema.Type,
 	state: EditorSimulationState,
@@ -222,7 +122,7 @@ const addEditorSimulationItem = (
 	if (item === undefined) return false;
 	const previous = state.stock.get(itemId) ?? 0;
 	if (item.maxCount !== undefined && previous + quantity > item.maxCount + 1e-9) return false;
-	if (!canAddToLocation(config, state, itemId, quantity, location)) return false;
+	if (!canItemUseLocation(config, itemId, location)) return false;
 	state.stock.set(itemId, previous + quantity);
 	const previousLocationQuantity = readLocationQuantity(state, itemId, location);
 	writeLocationQuantity(state, itemId, location, previousLocationQuantity + quantity);
@@ -288,25 +188,6 @@ const moveEditorSimulationItem = (
 	if (!canItemUseLocation(config, itemId, target)) return false;
 	const locations = state.locations.get(itemId);
 	if (locations === undefined) return false;
-	const sameSurfaceAvailable = isBoardLocation(target)
-		? [
-				...locations,
-			].reduce(
-				(total, [location, locationQuantity]) =>
-					location !== target &&
-					isBoardLocation(location) &&
-					readBoardSpace(location) === readBoardSpace(target)
-						? total + locationQuantity
-						: total,
-				0,
-			)
-		: 0;
-	const externalQuantity = Math.max(0, remaining - sameSurfaceAvailable);
-	if (
-		externalQuantity > 1e-9 &&
-		!canAddToLocation(config, state, itemId, externalQuantity, target)
-	)
-		return false;
 	for (const [location, locationQuantity] of [
 		...locations,
 	]) {
@@ -344,12 +225,7 @@ const relocateEditorSimulationItem = (
 ): boolean => {
 	const available = readLocationQuantity(state, itemId, from);
 	if (available + 1e-9 < quantity) return false;
-	const sameBoardSurface =
-		isBoardLocation(from) &&
-		isBoardLocation(target) &&
-		readBoardSpace(from) === readBoardSpace(target);
-	if (!sameBoardSurface && !canAddToLocation(config, state, itemId, quantity, target))
-		return false;
+	if (!canItemUseLocation(config, itemId, target)) return false;
 	writeLocationQuantity(state, itemId, from, available - quantity);
 	writeLocationQuantity(
 		state,
@@ -371,7 +247,6 @@ const readEditorSimulationQueryQuantity = (
 	state: EditorSimulationState,
 	query: QuerySchema.Type,
 	ownerItemId: string,
-	space: number,
 ) => {
 	const itemId = query.selector.itemId;
 	const locations = state.locations.get(itemId);
@@ -379,21 +254,16 @@ const readEditorSimulationQueryQuantity = (
 	switch (query.scope) {
 		case "board":
 			if (query.distance === "self")
-				return itemId === ownerItemId
-					? Math.min(1, locations.get(`board:${space}`) ?? 0)
-					: 0;
-			return Math.max(
-				0,
-				(locations.get(`board:${space}`) ?? 0) - (itemId === ownerItemId ? 1 : 0),
-			);
+				return itemId === ownerItemId ? Math.min(1, locations.get("board") ?? 0) : 0;
+			return Math.max(0, (locations.get("board") ?? 0) - (itemId === ownerItemId ? 1 : 0));
 		case "inventory":
 			return locations.get("inventory") ?? 0;
 		case "toolbar":
 			return locations.get("toolbar") ?? 0;
 		case "any":
 			return (
-				(locations.get(`board:${space}`) ?? 0) +
-				(locations.get(`board-other:${space}`) ?? 0) +
+				(locations.get("board") ?? 0) +
+				(locations.get("board-related") ?? 0) +
 				(locations.get("inventory") ?? 0) +
 				(locations.get("toolbar") ?? 0)
 			);
@@ -407,34 +277,16 @@ const readEditorSimulationQueryQuantity = (
 	}
 };
 
-const readEditorSimulationQueryLocation = (
-	query: QuerySchema.Type,
-	space: number,
-): EditorSimulationLocation => {
+const readEditorSimulationQueryLocation = (query: QuerySchema.Type): EditorSimulationLocation => {
 	switch (query.scope) {
 		case "board":
 		case "any":
 		case "universe":
-			return `board:${space}`;
+			return "board";
 		case "inventory":
 			return "inventory";
 		case "toolbar":
 			return "toolbar";
-	}
-};
-
-const canEditorSimulationPlaceAtDistance = (
-	config: GameConfigSchema.Type,
-	query: QuerySchema.Type,
-) => {
-	if (query.scope !== "board" || query.distance === "self") return true;
-	const longestSide = Math.max(config.meta.board.width, config.meta.board.height);
-	switch (query.distance) {
-		case "close":
-		case "far":
-			return longestSide >= 2;
-		case "near":
-			return longestSide >= 3;
 	}
 };
 
@@ -477,13 +329,10 @@ const spendEditorSimulationCharge = (
 	};
 };
 
-const readPlacementCandidates = (
-	item: ItemSchema.Type,
-	space: number,
-): ReadonlyArray<EditorSimulationLocation> =>
+const readStorageCandidates = (item: ItemSchema.Type): ReadonlyArray<EditorSimulationLocation> =>
 	item.scope === "board"
 		? [
-				`board:${space}`,
+				"board",
 			]
 		: item.scope === "inventory"
 			? [
@@ -494,39 +343,37 @@ const readPlacementCandidates = (
 						"toolbar",
 					]
 				: [
-						`board:${space}`,
+						"board",
 						"inventory",
 						"toolbar",
 					];
 
-/** Places an existing reserved item through the optimistic canonical storage fallback. */
-const placeExistingEditorSimulationItem = (
+/** Returns reserved material to the first authored storage scope without physical placement. */
+const returnReservedEditorSimulationItem = (
 	config: GameConfigSchema.Type,
 	state: EditorSimulationState,
 	itemId: string,
 	quantity: number,
 	from: EditorSimulationLocation,
-	space: number,
 ) => {
 	const item = config.items[itemId];
 	if (item === undefined) return false;
-	const candidates = readPlacementCandidates(item, space);
+	const candidates = readStorageCandidates(item);
 	return candidates.some((target) =>
 		relocateEditorSimulationItem(config, state, itemId, quantity, from, target),
 	);
 };
 
-/** Places one new output through the optimistic canonical storage fallback. */
-const placeNewEditorSimulationItem = (
+/** Records one output in the first authored storage scope without physical placement. */
+const addEditorSimulationOutput = (
 	config: GameConfigSchema.Type,
 	state: EditorSimulationState,
 	itemId: string,
 	quantity: number,
-	space: number,
 ) => {
 	const item = config.items[itemId];
 	if (item === undefined) return false;
-	const candidates = readPlacementCandidates(item, space);
+	const candidates = readStorageCandidates(item);
 	return candidates.some((location) =>
 		addEditorSimulationItem(config, state, itemId, quantity, location),
 	);
@@ -553,19 +400,16 @@ const makeEditorSimulationState = (config: GameConfigSchema.Type): EditorSimulat
 		operations: new Map(),
 		warnings: new Set([
 			"All gameplay operations are simulated sequentially; no parallel production is assumed.",
-			"The simulator may move owned items into a valid scope and board relationship at zero time.",
+			"Board coordinates, capacity, spaces, and physical placement are not simulated.",
+			"Spatial rules are satisfied optimistically when their required items can exist on the board.",
 			"When alternatives exist, the simulator uses a deterministic optimistic local runtime heuristic rather than exhaustive global optimization.",
 		]),
 		runtimeMs: 0,
 	};
-	for (const item of config.start.board)
-		addEditorSimulationItem(
-			config,
-			state,
-			item.itemId,
-			item.quantity ?? 1,
-			`board:${item.space}`,
-		);
+	for (const item of config.start.board.filter(
+		(candidate) => candidate.space === config.start.currentSpace,
+	))
+		addEditorSimulationItem(config, state, item.itemId, item.quantity ?? 1, "board");
 	for (const item of config.start.inventory)
 		addEditorSimulationItem(config, state, item.itemId, item.quantity, "inventory");
 	for (const item of config.start.toolbar)
@@ -766,13 +610,8 @@ type RequireItem = (
 	path: ReadonlySet<string>,
 ) => EditorSimulationState | undefined;
 
-const evaluateWhen = (
-	state: EditorSimulationState,
-	when: WhenSchema.Type,
-	ownerItemId: string,
-	space: number,
-) => {
-	const quantity = readEditorSimulationQueryQuantity(state, when.query, ownerItemId, space);
+const evaluateWhen = (state: EditorSimulationState, when: WhenSchema.Type, ownerItemId: string) => {
+	const quantity = readEditorSimulationQueryQuantity(state, when.query, ownerItemId);
 	switch (when.type) {
 		case "exists":
 			return quantity > 0;
@@ -809,7 +648,6 @@ const moveExcessOutOfQuery = (
 	config: GameConfigSchema.Type,
 	state: EditorSimulationState,
 	query: QuerySchema.Type,
-	space: number,
 	quantity: number,
 ) => {
 	if (quantity <= 1e-9) return true;
@@ -820,25 +658,23 @@ const moveExcessOutOfQuery = (
 	let target: EditorSimulationLocation;
 	switch (query.scope) {
 		case "board":
-			from = `board:${space}`;
+			from = "board";
 			target =
-				query.distance === "far" && item.scope === "any"
-					? "inventory"
-					: `board-other:${space}`;
+				query.distance === "far" && item.scope === "any" ? "inventory" : "board-related";
 			break;
 		case "inventory":
 			if (item.scope !== "any") return false;
 			from = "inventory";
-			target = `board:${space}`;
+			target = "board";
 			break;
 		case "toolbar":
 			if (item.scope !== "any") return false;
 			from = "toolbar";
-			target = `board:${space}`;
+			target = "board";
 			break;
 		case "any":
-			from = readEditorSimulationQueryLocation(query, space);
-			target = `board:${space + 1}`;
+			from = readEditorSimulationQueryLocation(query);
+			target = "board-related";
 			break;
 	}
 	return relocateEditorSimulationItem(
@@ -856,42 +692,36 @@ const ensureWhen = (
 	state: EditorSimulationState,
 	when: WhenSchema.Type,
 	ownerItemId: string,
-	space: number,
 	path: ReadonlySet<string>,
 	requireItem: RequireItem,
 ): EditorSimulationState | undefined => {
-	if (!canEditorSimulationPlaceAtDistance(config, when.query)) return undefined;
 	const itemId = when.query.selector.itemId;
 	if (when.query.scope === "board" && when.query.distance === "self" && itemId !== ownerItemId)
 		return undefined;
 	const minimum = readWhenMinimum(when);
 	const maximum = readWhenMaximum(when);
-	let current = readEditorSimulationQueryQuantity(state, when.query, ownerItemId, space);
+	let current = readEditorSimulationQueryQuantity(state, when.query, ownerItemId);
 	let planned = state;
 	if (current < minimum) {
-		const acquired = requireItem(
-			planned,
-			itemId,
-			(planned.stock.get(itemId) ?? 0) + minimum - current,
-			false,
-			path,
-		);
+		const ownerOffset =
+			when.query.scope === "board" && when.query.distance !== "self" && itemId === ownerItemId
+				? 1
+				: 0;
+		const requiredQuantity = minimum + ownerOffset;
+		const acquired = requireItem(planned, itemId, requiredQuantity, false, path);
 		if (acquired === undefined) return undefined;
 		planned = acquired;
-		const item = config.items[itemId];
-		const target = readEditorSimulationQueryLocation(when.query, space);
-		if ((target === "inventory" || target === "toolbar") && item?.scope !== "any")
+		const target = readEditorSimulationQueryLocation(when.query);
+		if (!moveEditorSimulationItem(config, planned, itemId, requiredQuantity, target))
 			return undefined;
-		if (!moveEditorSimulationItem(config, planned, itemId, minimum, target)) return undefined;
 		planned.infrastructureItemIds.add(itemId);
-		current = readEditorSimulationQueryQuantity(planned, when.query, ownerItemId, space);
+		current = readEditorSimulationQueryQuantity(planned, when.query, ownerItemId);
 	}
 	if (current > maximum) {
-		if (!moveExcessOutOfQuery(config, planned, when.query, space, current - maximum))
-			return undefined;
+		if (!moveExcessOutOfQuery(config, planned, when.query, current - maximum)) return undefined;
 	}
 	if (minimum > 0) planned.infrastructureItemIds.add(itemId);
-	return evaluateWhen(planned, when, ownerItemId, space) ? planned : undefined;
+	return evaluateWhen(planned, when, ownerItemId) ? planned : undefined;
 };
 
 const falsifyWhen = (
@@ -899,16 +729,14 @@ const falsifyWhen = (
 	state: EditorSimulationState,
 	when: WhenSchema.Type,
 	ownerItemId: string,
-	space: number,
 ) => {
-	if (!evaluateWhen(state, when, ownerItemId, space)) return true;
-	const quantity = readEditorSimulationQueryQuantity(state, when.query, ownerItemId, space);
-	if (when.type === "exists")
-		return moveExcessOutOfQuery(config, state, when.query, space, quantity);
+	if (!evaluateWhen(state, when, ownerItemId)) return true;
+	const quantity = readEditorSimulationQueryQuantity(state, when.query, ownerItemId);
+	if (when.type === "exists") return moveExcessOutOfQuery(config, state, when.query, quantity);
 	if (when.type === "range" && when.min > 0)
-		return moveExcessOutOfQuery(config, state, when.query, space, quantity - when.min + 1);
+		return moveExcessOutOfQuery(config, state, when.query, quantity - when.min + 1);
 	if (when.type === "count" && when.count > 0)
-		return moveExcessOutOfQuery(config, state, when.query, space, 1);
+		return moveExcessOutOfQuery(config, state, when.query, 1);
 	return false;
 };
 
@@ -917,7 +745,6 @@ const prepareLineRules = (
 	state: EditorSimulationState,
 	line: LineSchema.Type,
 	ownerItemId: string,
-	space: number,
 	path: ReadonlySet<string>,
 	requireItem: RequireItem,
 ): EditorSimulationState | undefined => {
@@ -926,24 +753,16 @@ const prepareLineRules = (
 	let planned = state;
 	for (const rule of enableRules)
 		for (const when of rule.when) {
-			const enabled = ensureWhen(
-				config,
-				planned,
-				when,
-				ownerItemId,
-				space,
-				path,
-				requireItem,
-			);
+			const enabled = ensureWhen(config, planned, when, ownerItemId, path, requireItem);
 			if (enabled === undefined) return undefined;
 			planned = enabled;
 		}
 	for (const rule of line.rules.filter((candidate) => candidate.type === "disable")) {
-		if (!rule.when.every((when) => evaluateWhen(planned, when, ownerItemId, space))) continue;
+		if (!rule.when.every((when) => evaluateWhen(planned, when, ownerItemId))) continue;
 		let falsified = false;
 		for (const when of rule.when) {
 			const candidate = cloneEditorSimulationState(planned);
-			if (falsifyWhen(config, candidate, when, ownerItemId, space)) {
+			if (falsifyWhen(config, candidate, when, ownerItemId)) {
 				planned = candidate;
 				falsified = true;
 				break;
@@ -959,7 +778,6 @@ const prepareTargetDropRules = (
 	state: EditorSimulationState,
 	operation: EditorSimulationOperation,
 	targetItemId: string,
-	space: number,
 	path: ReadonlySet<string>,
 	requireItem: RequireItem,
 ): EditorSimulationState | undefined => {
@@ -981,7 +799,6 @@ const prepareTargetDropRules = (
 						planned,
 						when,
 						operation.ownerItemId,
-						space,
 						path,
 						requireItem,
 					);
@@ -992,10 +809,10 @@ const prepareTargetDropRules = (
 					planned = enabled;
 				}
 			} else if (
-				rule.when.every((when) => evaluateWhen(planned, when, operation.ownerItemId, space))
+				rule.when.every((when) => evaluateWhen(planned, when, operation.ownerItemId))
 			) {
 				valid = rule.when.some((when) =>
-					falsifyWhen(config, planned, when, operation.ownerItemId, space),
+					falsifyWhen(config, planned, when, operation.ownerItemId),
 				);
 			}
 			if (!valid) break;
@@ -1009,35 +826,29 @@ const resolveLineRuntime = (
 	state: EditorSimulationState,
 	line: LineSchema.Type,
 	ownerItemId: string,
-	space: number,
 ) => {
 	let multiplier = 1;
 	let adjustmentMs = 0;
 	for (const rule of line.rules) {
-		if (!rule.when.every((when) => evaluateWhen(state, when, ownerItemId, space))) continue;
+		if (!rule.when.every((when) => evaluateWhen(state, when, ownerItemId))) continue;
 		if (rule.type === "runtime:multiplier") multiplier *= rule.multiplier;
 		if (rule.type === "runtime:adjust") adjustmentMs += rule.adjustMs;
 	}
 	return Math.max(0, Math.ceil(line.runtimeMs * multiplier + adjustmentMs));
 };
 
-const lineEnabled = (
-	state: EditorSimulationState,
-	line: LineSchema.Type,
-	ownerItemId: string,
-	space: number,
-) => {
+const lineEnabled = (state: EditorSimulationState, line: LineSchema.Type, ownerItemId: string) => {
 	const enableRules = line.rules.filter((rule) => rule.type === "enable");
 	const enabled =
 		enableRules.length > 0
 			? enableRules.every((rule) =>
-					rule.when.every((when) => evaluateWhen(state, when, ownerItemId, space)),
+					rule.when.every((when) => evaluateWhen(state, when, ownerItemId)),
 				)
 			: line.enable;
 	const disabled = line.rules.some(
 		(rule) =>
 			rule.type === "disable" &&
-			rule.when.every((when) => evaluateWhen(state, when, ownerItemId, space)),
+			rule.when.every((when) => evaluateWhen(state, when, ownerItemId)),
 	);
 	return enabled && !disabled;
 };
@@ -1049,18 +860,16 @@ const applyOutput = (
 	scenario: EditorItemSimulationScenario,
 	targetItemId: string,
 	ownerItemId: string,
-	space: number,
 ) => {
 	if (output === undefined) return true;
 	const resolved = resolveEditorSimulationOutput({
-		evaluateWhen: (when) => evaluateWhen(state, when, ownerItemId, space),
+		evaluateWhen: (when) => evaluateWhen(state, when, ownerItemId),
 		output,
 		scenario,
 		targetItemId,
 	});
 	for (const drop of resolved)
-		if (!placeNewEditorSimulationItem(config, state, drop.itemId, drop.quantity, space))
-			return false;
+		if (!addEditorSimulationOutput(config, state, drop.itemId, drop.quantity)) return false;
 	return true;
 };
 
@@ -1099,10 +908,9 @@ const runOperation = (
 	path: ReadonlySet<string>,
 	requireItem: RequireItem,
 ): EditorSimulationState | undefined => {
-	const space = config.start.currentSpace;
 	let planned = requireItem(state, operation.ownerItemId, 1, false, path);
 	if (planned === undefined) return undefined;
-	if (!moveEditorSimulationItem(config, planned, operation.ownerItemId, 1, `board:${space}`))
+	if (!moveEditorSimulationItem(config, planned, operation.ownerItemId, 1, "board"))
 		return undefined;
 	planned.infrastructureItemIds.add(operation.ownerItemId);
 	planned = prepareLineRules(
@@ -1110,20 +918,11 @@ const runOperation = (
 		planned,
 		operation.line,
 		operation.ownerItemId,
-		space,
 		path,
 		requireItem,
 	);
 	if (planned === undefined) return undefined;
-	planned = prepareTargetDropRules(
-		config,
-		planned,
-		operation,
-		targetItemId,
-		space,
-		path,
-		requireItem,
-	);
+	planned = prepareTargetDropRules(config, planned, operation, targetItemId, path, requireItem);
 	if (planned === undefined) return undefined;
 	const reservations: Array<{
 		readonly itemId: string;
@@ -1154,7 +953,7 @@ const runOperation = (
 					chargePayments.push({
 						cost: input.charges.cost,
 						itemId: operation.ownerItemId,
-						location: `board:${space}`,
+						location: "board",
 						owner: true,
 					});
 				}
@@ -1172,7 +971,6 @@ const runOperation = (
 						type: "exists",
 					},
 					operation.ownerItemId,
-					space,
 					path,
 					requireItem,
 				);
@@ -1180,7 +978,7 @@ const runOperation = (
 				chargePayments.push({
 					cost,
 					itemId,
-					location: `board:${space}`,
+					location: "board",
 					owner: itemId === operation.ownerItemId,
 				});
 				break;
@@ -1191,7 +989,7 @@ const runOperation = (
 					chargePayments.push({
 						cost: input.charges.cost,
 						itemId: operation.ownerItemId,
-						location: `board:${space}`,
+						location: "board",
 						owner: true,
 					});
 				}
@@ -1217,7 +1015,7 @@ const runOperation = (
 		planned = ensureChargePayment(config, planned, payment, path, requireItem);
 		if (planned === undefined) return undefined;
 	}
-	if (!lineEnabled(planned, operation.line, operation.ownerItemId, space)) return undefined;
+	if (!lineEnabled(planned, operation.line, operation.ownerItemId)) return undefined;
 	let ownerDepleted = false;
 	for (const payment of aggregatedChargePayments) {
 		const result = spendEditorSimulationCharge(
@@ -1231,9 +1029,7 @@ const runOperation = (
 		if (payment.owner) ownerDepleted = true;
 		else {
 			const output = config.items[payment.itemId]?.charges?.output;
-			if (
-				!applyOutput(config, planned, output, scenario, targetItemId, payment.itemId, space)
-			)
+			if (!applyOutput(config, planned, output, scenario, targetItemId, payment.itemId))
 				return undefined;
 		}
 	}
@@ -1242,16 +1038,12 @@ const runOperation = (
 		planned,
 		operation.line,
 		operation.ownerItemId,
-		space,
 		path,
 		requireItem,
 	);
-	if (
-		planned === undefined ||
-		!lineEnabled(planned, operation.line, operation.ownerItemId, space)
-	)
+	if (planned === undefined || !lineEnabled(planned, operation.line, operation.ownerItemId))
 		return undefined;
-	const runtimeMs = resolveLineRuntime(planned, operation.line, operation.ownerItemId, space);
+	const runtimeMs = resolveLineRuntime(planned, operation.line, operation.ownerItemId);
 	planned.runtimeMs += runtimeMs;
 	if (
 		!applyOutput(
@@ -1261,34 +1053,22 @@ const runOperation = (
 			scenario,
 			targetItemId,
 			operation.ownerItemId,
-			space,
 		)
 	)
 		return undefined;
 	if (ownerDepleted) {
 		const output = config.items[operation.ownerItemId]?.charges?.output;
-		if (
-			!applyOutput(
-				config,
-				planned,
-				output,
-				scenario,
-				targetItemId,
-				operation.ownerItemId,
-				space,
-			)
-		)
+		if (!applyOutput(config, planned, output, scenario, targetItemId, operation.ownerItemId))
 			return undefined;
 	}
 	for (const reservation of reservations)
 		if (
-			!placeExistingEditorSimulationItem(
+			!returnReservedEditorSimulationItem(
 				config,
 				planned,
 				reservation.itemId,
 				reservation.quantity,
 				"job",
-				space,
 			)
 		)
 			return undefined;
@@ -1442,18 +1222,17 @@ const runMerge = (
 	path: ReadonlySet<string>,
 	requireItem: RequireItem,
 ): EditorSimulationState | undefined => {
-	const space = config.start.currentSpace;
 	const receivingItemId = rule.target.itemId;
 	const sourceQuantity = sourceItemId === receivingItemId ? 2 : 1;
 	let planned = requireItem(state, sourceItemId, sourceQuantity, false, path);
 	if (planned === undefined) return undefined;
 	planned = requireItem(planned, receivingItemId, sourceQuantity, false, path);
 	if (planned === undefined) return undefined;
-	if (!moveEditorSimulationItem(config, planned, sourceItemId, sourceQuantity, `board:${space}`))
+	if (!moveEditorSimulationItem(config, planned, sourceItemId, sourceQuantity, "board"))
 		return undefined;
 	if (
 		sourceItemId !== receivingItemId &&
-		!moveEditorSimulationItem(config, planned, receivingItemId, 1, `board:${space}`)
+		!moveEditorSimulationItem(config, planned, receivingItemId, 1, "board")
 	)
 		return undefined;
 	if (rule.action === "consume" && !removeEditorSimulationItem(planned, sourceItemId, 1, true))
@@ -1462,11 +1241,11 @@ const runMerge = (
 		if (!removeEditorSimulationItem(planned, receivingItemId, 1, true)) return undefined;
 		if (
 			rule.effect === "replace" &&
-			!placeNewEditorSimulationItem(config, planned, rule.result, 1, space)
+			!addEditorSimulationOutput(config, planned, rule.result, 1)
 		)
 			return undefined;
 	}
-	if (!applyOutput(config, planned, rule.output, scenario, targetItemId, sourceItemId, space))
+	if (!applyOutput(config, planned, rule.output, scenario, targetItemId, sourceItemId))
 		return undefined;
 	const operationId = `merge:${sourceItemId}:${receivingItemId}`;
 	const previous = planned.operations.get(operationId);
@@ -1492,14 +1271,12 @@ const runTemporaryExpiry = (
 ): EditorSimulationState | undefined => {
 	const item = config.items[temporaryItemId];
 	if (item?.type !== "temporary" || item.output === undefined) return undefined;
-	const space = config.start.currentSpace;
 	let planned = requireItem(state, temporaryItemId, 1, false, path);
 	if (planned === undefined) return undefined;
-	if (!moveEditorSimulationItem(config, planned, temporaryItemId, 1, `board:${space}`))
-		return undefined;
+	if (!moveEditorSimulationItem(config, planned, temporaryItemId, 1, "board")) return undefined;
 	if (!removeEditorSimulationItem(planned, temporaryItemId, 1, true)) return undefined;
 	planned.runtimeMs += Math.ceil(item.durationMs / 200) * 200;
-	if (!applyOutput(config, planned, item.output, scenario, targetItemId, temporaryItemId, space))
+	if (!applyOutput(config, planned, item.output, scenario, targetItemId, temporaryItemId))
 		return undefined;
 	const operationId = `expiry:${temporaryItemId}`;
 	const previous = planned.operations.get(operationId);
@@ -1644,7 +1421,7 @@ const estimateScenario = (
 			operations: [],
 			warnings: [
 				...initialState.warnings,
-				"No finite gameplay-valid path satisfies production, rules, placement scopes, charges, and configured finite sources.",
+				"No finite gameplay-valid path satisfies production, rules, storage scopes, charges, and configured finite sources.",
 			],
 		};
 	const cost = [

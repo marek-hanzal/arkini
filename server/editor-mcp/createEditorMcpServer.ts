@@ -213,7 +213,8 @@ const itemEstimateText = (project: EditorProject, estimate: EditorItemSimulation
 		`Quantity: ${estimate.quantity}`,
 		"Scheduling: sequential",
 		"Start state: available at zero time",
-		"Simulation: gameplay rules, runtime modifiers, charges, and finite-source renewal paths",
+		"Planner: production rules, runtime modifiers, charges, and finite-source renewal paths",
+		"Board model: optimistic spatial rules only; coordinates, capacity, placement, and additional spaces are not simulated",
 		"Expected method: expected output per run with whole-run batch rounding",
 		...estimate.scenarios.flatMap((scenario) => [
 			"",
@@ -634,7 +635,7 @@ export const createEditorMcpServer = (
 		"item_estimate",
 		{
 			description:
-				"Run the editor-only optimistic gameplay simulator for one item from the authored new-game start state. Returns best, expected, and guaranteed sequential scenarios including production dependencies, line and drop rules, runtime modifiers, charge spending, finite-source depletion, and authored charge renewal output.",
+				"Run the editor-only optimistic production planner for one item from the authored new-game start state. Returns best, expected, and guaranteed sequential scenarios including production dependencies, line and drop rules, runtime modifiers, charge spending, finite-source depletion, and authored charge renewal output. Spatial rules are satisfied optimistically; board coordinates, capacity, placement, and additional spaces are not simulated.",
 			inputSchema: z
 				.object({
 					itemId: IdSchema.describe(

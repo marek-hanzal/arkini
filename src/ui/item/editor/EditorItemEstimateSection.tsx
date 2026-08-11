@@ -138,8 +138,11 @@ const EditorItemEstimateMethodCard = () => (
 			</li>
 			<li>Finite deposits block the path unless gameplay output can recreate them.</li>
 			<li>All gameplay operations are scheduled sequentially.</li>
-			<li>Configured starting items are available with zero added runtime.</li>
-			<li>Owned items may be moved optimistically into a valid gameplay scope.</li>
+			<li>Starting items on the configured current board cost no added runtime.</li>
+			<li>Spatial rules pass optimistically when their required items can exist on board.</li>
+			<li>
+				Board coordinates, capacity, placement, and additional spaces are not simulated.
+			</li>
 		</ul>
 	</article>
 );

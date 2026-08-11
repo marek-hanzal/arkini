@@ -8,7 +8,7 @@ import { EditorItemThumbnail } from "~/ui/item/editor/EditorItemThumbnail";
 const runtimeLabel = (runtimeMs: number | undefined) =>
 	runtimeMs === undefined ? "—" : RendererRuntime.runSync(formatItemDurationFx(runtimeMs));
 
-/** Presents one compact all-scenario estimate and links to the item's Estimate detail. */
+/** Presents one compact estimate and links to the item's Estimate detail. */
 export const EditorItemEstimateListRow = ({
 	estimate,
 	item,
@@ -38,29 +38,9 @@ export const EditorItemEstimateListRow = ({
 				<span className="block truncate text-base font-semibold">{item.title}</span>
 				<span className="mt-1 block truncate text-xs text-subtle">{item.id}</span>
 			</span>
-			<dl className="grid shrink-0 grid-cols-2 gap-5 text-right max-[52rem]:grid-cols-1 max-[52rem]:gap-0.5">
-				{(
-					[
-						[
-							"Expected",
-							estimate.expectedRuntimeMs,
-						],
-						[
-							"Guaranteed",
-							estimate.guaranteedRuntimeMs,
-						],
-					] as const
-				).map(([label, runtimeMs]) => (
-					<div key={label}>
-						<dt className="text-[0.62rem] font-semibold uppercase tracking-wider text-subtle">
-							{label}
-						</dt>
-						<dd className="mt-0.5 text-xs font-semibold tabular-nums text-foreground">
-							{runtimeLabel(runtimeMs)}
-						</dd>
-					</div>
-				))}
-			</dl>
+			<p className="shrink-0 text-sm font-semibold tabular-nums text-foreground">
+				{runtimeLabel(estimate.runtimeMs)}
+			</p>
 		</ButtonLink>
 	</article>
 );

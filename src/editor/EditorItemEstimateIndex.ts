@@ -1,7 +1,6 @@
 export interface EditorItemEstimateIndexEntry {
-	readonly expectedRuntimeMs?: number;
-	readonly guaranteedRuntimeMs?: number;
 	readonly itemId: string;
+	readonly runtimeMs?: number;
 }
 
 export interface EditorItemEstimateIndexProgress {

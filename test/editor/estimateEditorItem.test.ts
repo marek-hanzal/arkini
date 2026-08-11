@@ -220,15 +220,14 @@ describe("estimateEditorItem", () => {
 			},
 		});
 
-		for (const scenario of estimateEditorItem(config, "result").scenarios) {
-			expect(scenario.status).toBe("estimated");
-			expect(scenario.runtimeMs).toBe(1_000);
-			expect(scenario.operations).toEqual([
-				expect.objectContaining({
-					lineId: "line:slow:run",
-				}),
-			]);
-		}
+		const estimate = estimateEditorItem(config, "result");
+		expect(estimate.status).toBe("estimated");
+		expect(estimate.runtimeMs).toBe(1_000);
+		expect(estimate.operations).toEqual([
+			expect.objectContaining({
+				lineId: "line:slow:run",
+			}),
+		]);
 	});
 
 	it("requires authored enable-rule infrastructure and applies active runtime rules", () => {
@@ -271,29 +270,21 @@ describe("estimateEditorItem", () => {
 			}),
 			"ingot",
 		);
-		expect(blockedEstimate.scenarios).toMatchObject([
-			{
-				status: "no-finite-path",
-			},
-			{
-				status: "no-finite-path",
-			},
-		]);
-		for (const scenario of blockedEstimate.scenarios)
-			expect(scenario.blockers).toEqual(
-				expect.arrayContaining([
-					expect.objectContaining({
-						code: "missing-source",
-						itemId: "tool",
-					}),
-					expect.objectContaining({
-						code: "operation-blocked",
-						itemId: "ingot",
-						operationId: "line:forge:run",
-						ownerItemId: "forge",
-					}),
-				]),
-			);
+		expect(blockedEstimate.status).toBe("no-finite-path");
+		expect(blockedEstimate.blockers).toEqual(
+			expect.arrayContaining([
+				expect.objectContaining({
+					code: "missing-source",
+					itemId: "tool",
+				}),
+				expect.objectContaining({
+					code: "operation-blocked",
+					itemId: "ingot",
+					operationId: "line:forge:run",
+					ownerItemId: "forge",
+				}),
+			]),
+		);
 		const estimate = estimateEditorItem(
 			createSimulatorConfig({
 				rules,
@@ -301,11 +292,9 @@ describe("estimateEditorItem", () => {
 			}),
 			"ingot",
 		);
-		for (const scenario of estimate.scenarios) {
-			expect(scenario.status).toBe("estimated");
-			expect(scenario.runtimeMs).toBe(500);
-			expect(scenario.infrastructureItemIds).toContain("tool");
-		}
+		expect(estimate.status).toBe("estimated");
+		expect(estimate.runtimeMs).toBe(500);
+		expect(estimate.infrastructureItemIds).toContain("tool");
 	});
 
 	it("satisfies conditional drop rules before treating an output as producible", () => {
@@ -332,15 +321,10 @@ describe("estimateEditorItem", () => {
 					dropRules,
 				}),
 				"ingot",
-			).scenarios,
-		).toMatchObject([
-			{
-				status: "no-finite-path",
-			},
-			{
-				status: "no-finite-path",
-			},
-		]);
+			),
+		).toMatchObject({
+			status: "no-finite-path",
+		});
 		const estimate = estimateEditorItem(
 			createSimulatorConfig({
 				dropRules,
@@ -348,10 +332,8 @@ describe("estimateEditorItem", () => {
 			}),
 			"ingot",
 		);
-		for (const scenario of estimate.scenarios) {
-			expect(scenario.status).toBe("estimated");
-			expect(scenario.infrastructureItemIds).toContain("tool");
-		}
+		expect(estimate.status).toBe("estimated");
+		expect(estimate.infrastructureItemIds).toContain("tool");
 	});
 
 	it("rejects a line when an authored universe-wide disable rule cannot be falsified", () => {
@@ -372,13 +354,14 @@ describe("estimateEditorItem", () => {
 				],
 			},
 		];
-		for (const scenario of estimateEditorItem(
-			createSimulatorConfig({
-				rules,
-			}),
-			"ingot",
-		).scenarios)
-			expect(scenario.status).toBe("estimated");
+		expect(
+			estimateEditorItem(
+				createSimulatorConfig({
+					rules,
+				}),
+				"ingot",
+			).status,
+		).toBe("estimated");
 		expect(
 			estimateEditorItem(
 				createSimulatorConfig({
@@ -386,27 +369,15 @@ describe("estimateEditorItem", () => {
 					startWithTool: true,
 				}),
 				"ingot",
-			).scenarios,
-		).toMatchObject([
-			{
-				status: "no-finite-path",
-			},
-			{
-				status: "no-finite-path",
-			},
-		]);
+			),
+		).toMatchObject({
+			status: "no-finite-path",
+		});
 	});
 
 	it("exhausts finite deposits and follows authored deterministic renewal output", () => {
 		const finite = estimateEditorItem(createSimulatorConfig(), "ingot", 3);
-		expect(finite.scenarios).toMatchObject([
-			{
-				status: "no-finite-path",
-			},
-			{
-				status: "no-finite-path",
-			},
-		]);
+		expect(finite.status).toBe("no-finite-path");
 		const renewable = estimateEditorItem(
 			createSimulatorConfig({
 				waterRenewal: true,
@@ -414,16 +385,14 @@ describe("estimateEditorItem", () => {
 			"ingot",
 			3,
 		);
-		for (const scenario of renewable.scenarios) {
-			expect(scenario.status).toBe("estimated");
-			expect(scenario.runtimeMs).toBe(3_000);
-			expect(scenario.operations).toContainEqual(
-				expect.objectContaining({
-					lineId: "line:forge:run",
-					runs: 3,
-				}),
-			);
-		}
+		expect(renewable.status).toBe("estimated");
+		expect(renewable.runtimeMs).toBe(3_000);
+		expect(renewable.operations).toContainEqual(
+			expect.objectContaining({
+				lineId: "line:forge:run",
+				runs: 3,
+			}),
+		);
 	});
 
 	it("aggregates every charge paid by the same owner before starting", () => {
@@ -462,8 +431,7 @@ describe("estimateEditorItem", () => {
 			},
 		});
 
-		for (const scenario of estimateEditorItem(config, "ingot").scenarios)
-			expect(scenario.status).toBe("no-finite-path");
+		expect(estimateEditorItem(config, "ingot").status).toBe("no-finite-path");
 	});
 
 	it("re-establishes live rules after the start spends their last deposit", () => {
@@ -501,8 +469,7 @@ describe("estimateEditorItem", () => {
 				},
 			},
 		});
-		for (const scenario of estimateEditorItem(finite, "ingot").scenarios)
-			expect(scenario.status).toBe("no-finite-path");
+		expect(estimateEditorItem(finite, "ingot").status).toBe("no-finite-path");
 
 		const renewable = createSimulatorConfig({
 			rules: enableWhileWaterExists,
@@ -522,8 +489,7 @@ describe("estimateEditorItem", () => {
 				},
 			},
 		});
-		for (const scenario of estimateEditorItem(oneChargeRenewable, "ingot").scenarios)
-			expect(scenario.status).toBe("estimated");
+		expect(estimateEditorItem(oneChargeRenewable, "ingot").status).toBe("estimated");
 	});
 
 	it("ignores physical board capacity while preserving board-scope eligibility", () => {
@@ -571,8 +537,7 @@ describe("estimateEditorItem", () => {
 			},
 		});
 
-		for (const scenario of estimateEditorItem(config, "ingot").scenarios)
-			expect(scenario.status).toBe("estimated");
+		expect(estimateEditorItem(config, "ingot").status).toBe("estimated");
 	});
 
 	it("treats spatial rules optimistically and ignores additional starting board spaces", () => {
@@ -608,8 +573,7 @@ describe("estimateEditorItem", () => {
 				},
 			},
 		});
-		for (const scenario of estimateEditorItem(tinyBoard, "ingot").scenarios)
-			expect(scenario.status).toBe("estimated");
+		expect(estimateEditorItem(tinyBoard, "ingot").status).toBe("estimated");
 
 		const universeRule = [
 			{
@@ -646,8 +610,7 @@ describe("estimateEditorItem", () => {
 				],
 			},
 		});
-		for (const scenario of estimateEditorItem(withOtherSpaceTool, "ingot").scenarios)
-			expect(scenario.status).toBe("no-finite-path");
+		expect(estimateEditorItem(withOtherSpaceTool, "ingot").status).toBe("no-finite-path");
 	});
 
 	it("uses merge, charge-depletion, and temporary-expiry acquisition paths", async () => {
@@ -657,8 +620,7 @@ describe("estimateEditorItem", () => {
 			"item:micro-forest",
 			"item:seed",
 		])
-			for (const scenario of estimateEditorItem(official, itemId).scenarios)
-				expect(scenario.status).toBe("estimated");
+			expect(estimateEditorItem(official, itemId).status).toBe("estimated");
 
 		const temporaryBase = createTemporaryLifetimeTestConfig();
 		const temporary = GameConfigSchema.parse({
@@ -675,10 +637,9 @@ describe("estimateEditorItem", () => {
 				],
 			},
 		});
-		for (const scenario of estimateEditorItem(temporary, "result").scenarios) {
-			expect(scenario.status).toBe("estimated");
-			expect(scenario.runtimeMs).toBe(600);
-		}
+		const estimate = estimateEditorItem(temporary, "result");
+		expect(estimate.status).toBe("estimated");
+		expect(estimate.runtimeMs).toBe(600);
 	});
 
 	it("indexes every item and reports incremental progress", () => {
@@ -703,9 +664,8 @@ describe("estimateEditorItem", () => {
 			total: entries.length,
 		});
 		expect(entries.find(({ itemId }) => itemId === "water")).toEqual({
-			expectedRuntimeMs: undefined,
-			guaranteedRuntimeMs: undefined,
 			itemId: "water",
+			runtimeMs: undefined,
 		});
 	});
 
@@ -714,26 +674,24 @@ describe("estimateEditorItem", () => {
 		const estimate = estimateEditorItem(config, "producer:bakery-t1");
 
 		expect(estimate.quantity).toBe(1);
-		for (const scenario of estimate.scenarios) {
-			expect(scenario.status).toBe("estimated");
-			expect(scenario.runtimeMs).toBeGreaterThan(24_000);
-			expect(scenario.operations).toContainEqual(
-				expect.objectContaining({
-					lineId: "line:blueprint:bakery-t1:construct",
-					runs: 1,
-					runtimeMs: 24_000,
-				}),
-			);
-			expect(
-				scenario.cost.find(({ itemId }) => itemId === "item:flour")?.quantity,
-			).toBeGreaterThanOrEqual(1);
-			expect(scenario.totalCostQuantity).toBeGreaterThan(1);
-			expect(scenario.infrastructureItemIds).toContain("item:blueprint-bakery-t1");
-			expect(scenario.infrastructureItemIds).toContain("producer:windmill-t1");
-		}
+		expect(estimate.status).toBe("estimated");
+		expect(estimate.runtimeMs).toBeGreaterThan(24_000);
+		expect(estimate.operations).toContainEqual(
+			expect.objectContaining({
+				lineId: "line:blueprint:bakery-t1:construct",
+				runs: 1,
+				runtimeMs: 24_000,
+			}),
+		);
+		expect(
+			estimate.cost.find(({ itemId }) => itemId === "item:flour")?.quantity,
+		).toBeGreaterThanOrEqual(1);
+		expect(estimate.totalCostQuantity).toBeGreaterThan(1);
+		expect(estimate.infrastructureItemIds).toContain("item:blueprint-bakery-t1");
+		expect(estimate.infrastructureItemIds).toContain("producer:windmill-t1");
 	});
 
-	it("separates expected and non-finite guaranteed chance output", () => {
+	it("uses expected yield for chance output", () => {
 		const base = createJobTestConfig();
 		const forge = base.items.forge;
 		if (forge.type !== "producer") throw new Error("Expected producer fixture.");
@@ -800,16 +758,9 @@ describe("estimateEditorItem", () => {
 		});
 
 		const estimate = estimateEditorItem(config, "ingot");
-		expect(estimate.scenarios).toMatchObject([
-			{
-				scenario: "expected",
-				status: "estimated",
-				runtimeMs: 2_000,
-			},
-			{
-				scenario: "guaranteed",
-				status: "no-finite-path",
-			},
-		]);
+		expect(estimate).toMatchObject({
+			runtimeMs: 2_000,
+			status: "estimated",
+		});
 	});
 });

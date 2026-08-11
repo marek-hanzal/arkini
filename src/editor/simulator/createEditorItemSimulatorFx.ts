@@ -15,8 +15,6 @@ import type {
 	EditorItemSimulation,
 	EditorItemSimulationBlocker,
 	EditorItemSimulationOperation,
-	EditorItemSimulationScenario,
-	EditorItemSimulationScenarioResult,
 } from "~/editor/simulator/EditorItemSimulation";
 
 type EditorSimulationLocation = "board" | "board-related" | "inventory" | "job" | "toolbar";
@@ -400,6 +398,7 @@ const makeEditorSimulationState = (config: GameConfigSchema.Type): EditorSimulat
 		infrastructureItemIds: new Set(),
 		operations: new Map(),
 		warnings: new Set([
+			"Random outputs use expected yields; estimated time and cost are not guaranteed.",
 			"All gameplay operations are simulated sequentially; no parallel production is assumed.",
 			"Board coordinates, capacity, spaces, and physical placement are not simulated.",
 			"Spatial rules are satisfied optimistically when their required items can exist on the board.",
@@ -467,17 +466,7 @@ interface EditorSimulationOutput {
 	readonly quantity: number;
 }
 
-const quantityForScenario = (
-	quantity: QuantitySchema.Type,
-	scenario: EditorItemSimulationScenario,
-) => {
-	switch (scenario) {
-		case "expected":
-			return (quantity.min + quantity.max) / 2;
-		case "guaranteed":
-			return quantity.min;
-	}
-};
+const expectedQuantity = (quantity: QuantitySchema.Type) => (quantity.min + quantity.max) / 2;
 
 const dropEnabled = (drop: DropSchema.Type, evaluateWhen: (when: WhenSchema.Type) => boolean) =>
 	drop.rules.every((rule) => {
@@ -492,98 +481,64 @@ const addDropYield = (
 	target: Map<string, number>,
 	drop: DropSchema.Type,
 	multiplier: number,
-	scenario: EditorItemSimulationScenario,
 	evaluateWhen: (when: WhenSchema.Type) => boolean,
 ) => {
 	if (!dropEnabled(drop, evaluateWhen)) return;
-	addYield(target, drop.itemId, quantityForScenario(drop.quantity, scenario) * multiplier);
+	addYield(target, drop.itemId, expectedQuantity(drop.quantity) * multiplier);
 };
 
 const rollYield = (
 	roll: RollSchema.Type,
-	scenario: EditorItemSimulationScenario,
-	targetItemId: string,
 	evaluateWhen: (when: WhenSchema.Type) => boolean,
 ): Map<string, number> => {
 	const result = new Map<string, number>();
 	switch (roll.type) {
 		case "guaranteed":
-			for (const drop of roll.drop) addDropYield(result, drop, 1, scenario, evaluateWhen);
+			for (const drop of roll.drop) addDropYield(result, drop, 1, evaluateWhen);
 			return result;
 		case "chance": {
-			const multiplier = scenario === "expected" ? roll.chance : roll.chance === 1 ? 1 : 0;
-			for (const drop of roll.drop)
-				addDropYield(result, drop, multiplier, scenario, evaluateWhen);
+			for (const drop of roll.drop) addDropYield(result, drop, roll.chance, evaluateWhen);
 			return result;
 		}
 		case "weight": {
-			const picks = quantityForScenario(roll.quantity, scenario);
-			if (scenario === "expected") {
-				const totalWeight = roll.drop.reduce(
-					(total, candidate) => total + candidate.weight,
-					0,
-				);
-				for (const candidate of roll.drop)
-					for (const drop of candidate.drop)
-						addDropYield(
-							result,
-							drop,
-							picks * (candidate.weight / totalWeight),
-							scenario,
-							evaluateWhen,
-						);
-				return result;
-			}
-			const candidates = roll.drop.map((candidate) => {
-				const candidateYield = new Map<string, number>();
+			const picks = expectedQuantity(roll.quantity);
+			const totalWeight = roll.drop.reduce((total, candidate) => total + candidate.weight, 0);
+			for (const candidate of roll.drop)
 				for (const drop of candidate.drop)
-					addDropYield(candidateYield, drop, picks, scenario, evaluateWhen);
-				return candidateYield;
-			});
-			const compare = (left: Map<string, number>, right: Map<string, number>) =>
-				(left.get(targetItemId) ?? 0) - (right.get(targetItemId) ?? 0);
-			candidates.sort(compare);
-			return candidates[0] ?? result;
+					addDropYield(
+						result,
+						drop,
+						picks * (candidate.weight / totalWeight),
+						evaluateWhen,
+					);
+			return result;
 		}
 	}
 };
 
-/** Resolves one scenario projection while applying the same conditional drop semantics as gameplay. */
+/** Resolves expected output yield while applying the same conditional drop semantics as gameplay. */
 const resolveEditorSimulationOutput = ({
 	evaluateWhen,
 	output,
-	scenario,
-	targetItemId,
 }: {
 	readonly evaluateWhen: (when: WhenSchema.Type) => boolean;
 	readonly output: OutputSchema.Type;
-	readonly scenario: EditorItemSimulationScenario;
-	readonly targetItemId: string;
 }): ReadonlyArray<EditorSimulationOutput> => {
 	const sets = output.set.map((set) => {
 		const result = new Map<string, number>();
 		for (const roll of set.roll)
-			for (const [itemId, quantity] of rollYield(roll, scenario, targetItemId, evaluateWhen))
+			for (const [itemId, quantity] of rollYield(roll, evaluateWhen))
 				addYield(result, itemId, quantity);
 		return {
 			result,
 			weight: set.weight,
 		};
 	});
-	let selected: Map<string, number>;
-	if (scenario === "expected") {
-		selected = new Map();
-		const totalWeight = sets.reduce((total, set) => total + set.weight, 0);
-		for (const set of sets)
-			for (const [itemId, quantity] of set.result)
-				addYield(selected, itemId, quantity * (set.weight / totalWeight));
-	} else {
-		sets.sort(
-			(left, right) =>
-				(left.result.get(targetItemId) ?? 0) - (right.result.get(targetItemId) ?? 0),
-		);
-		selected = sets[0]?.result ?? new Map();
-	}
+	const selected = new Map<string, number>();
+	const totalWeight = sets.reduce((total, set) => total + set.weight, 0);
+	for (const set of sets)
+		for (const [itemId, quantity] of set.result)
+			addYield(selected, itemId, quantity * (set.weight / totalWeight));
 	return [
 		...selected,
 	].map(([itemId, quantity]) => ({
@@ -851,16 +806,12 @@ const applyOutput = (
 	config: GameConfigSchema.Type,
 	state: EditorSimulationState,
 	output: LineSchema.Type["output"],
-	scenario: EditorItemSimulationScenario,
-	targetItemId: string,
 	ownerItemId: string,
 ) => {
 	if (output === undefined) return true;
 	const resolved = resolveEditorSimulationOutput({
 		evaluateWhen: (when) => evaluateWhen(state, when, ownerItemId),
 		output,
-		scenario,
-		targetItemId,
 	});
 	for (const drop of resolved)
 		if (!addEditorSimulationOutput(config, state, drop.itemId, drop.quantity)) return false;
@@ -897,7 +848,6 @@ const runOperation = (
 	config: GameConfigSchema.Type,
 	state: EditorSimulationState,
 	operation: EditorSimulationOperation,
-	scenario: EditorItemSimulationScenario,
 	targetItemId: string,
 	path: ReadonlySet<string>,
 	requireItem: RequireItem,
@@ -1023,8 +973,7 @@ const runOperation = (
 		if (payment.owner) ownerDepleted = true;
 		else {
 			const output = config.items[payment.itemId]?.charges?.output;
-			if (!applyOutput(config, planned, output, scenario, targetItemId, payment.itemId))
-				return undefined;
+			if (!applyOutput(config, planned, output, payment.itemId)) return undefined;
 		}
 	}
 	planned = prepareLineRules(
@@ -1039,21 +988,10 @@ const runOperation = (
 		return undefined;
 	const runtimeMs = resolveLineRuntime(planned, operation.line, operation.ownerItemId);
 	planned.runtimeMs += runtimeMs;
-	if (
-		!applyOutput(
-			config,
-			planned,
-			operation.output,
-			scenario,
-			targetItemId,
-			operation.ownerItemId,
-		)
-	)
-		return undefined;
+	if (!applyOutput(config, planned, operation.output, operation.ownerItemId)) return undefined;
 	if (ownerDepleted) {
 		const output = config.items[operation.ownerItemId]?.charges?.output;
-		if (!applyOutput(config, planned, output, scenario, targetItemId, operation.ownerItemId))
-			return undefined;
+		if (!applyOutput(config, planned, output, operation.ownerItemId)) return undefined;
 	}
 	for (const reservation of reservations)
 		if (
@@ -1078,11 +1016,7 @@ const runOperation = (
 	return planned;
 };
 
-const readPotentialYield = (
-	operation: EditorSimulationOperation,
-	scenario: EditorItemSimulationScenario,
-	targetItemId: string,
-) =>
+const readPotentialYield = (operation: EditorSimulationOperation, targetItemId: string) =>
 	Math.max(
 		...[
 			true,
@@ -1092,8 +1026,6 @@ const readPotentialYield = (
 				resolveEditorSimulationOutput({
 					evaluateWhen: () => active,
 					output: operation.output,
-					scenario,
-					targetItemId,
 				}).find((output) => output.itemId === targetItemId)?.quantity ?? 0,
 		),
 	);
@@ -1113,21 +1045,12 @@ interface EditorSimulationTemporaryCandidate {
 	readonly temporaryItemId: string;
 }
 
-type EditorSimulationCandidateIndex = ReadonlyMap<
-	EditorItemSimulationScenario,
-	ReadonlyMap<string, ReadonlyArray<EditorSimulationCandidate>>
->;
+type EditorSimulationCandidateIndex = ReadonlyMap<string, ReadonlyArray<EditorSimulationCandidate>>;
 
 interface EditorSimulationAcquisitionIndex {
 	readonly lines: EditorSimulationCandidateIndex;
-	readonly merges: ReadonlyMap<
-		EditorItemSimulationScenario,
-		ReadonlyMap<string, ReadonlyArray<EditorSimulationMergeCandidate>>
-	>;
-	readonly temporaries: ReadonlyMap<
-		EditorItemSimulationScenario,
-		ReadonlyMap<string, ReadonlyArray<EditorSimulationTemporaryCandidate>>
-	>;
+	readonly merges: ReadonlyMap<string, ReadonlyArray<EditorSimulationMergeCandidate>>;
+	readonly temporaries: ReadonlyMap<string, ReadonlyArray<EditorSimulationTemporaryCandidate>>;
 }
 
 const readOutputItemIds = (output: OutputSchema.Type): ReadonlySet<string> =>
@@ -1145,12 +1068,7 @@ const indexEditorSimulationCandidates = (
 	config: GameConfigSchema.Type,
 	operations: ReadonlyArray<EditorSimulationOperation>,
 ): EditorSimulationCandidateIndex => {
-	const index = new Map<EditorItemSimulationScenario, Map<string, EditorSimulationCandidate[]>>();
-	for (const scenario of [
-		"expected",
-		"guaranteed",
-	] as const)
-		index.set(scenario, new Map());
+	const index = new Map<string, EditorSimulationCandidate[]>();
 	for (const operation of operations) {
 		const directItemIds = readOutputItemIds(operation.output);
 		const chargeOutputs: OutputSchema.Type[] = [];
@@ -1173,57 +1091,44 @@ const indexEditorSimulationCandidates = (
 			...directItemIds,
 			...chargeItemIds,
 		]);
-		for (const scenario of [
-			"expected",
-			"guaranteed",
-		] as const)
-			for (const itemId of itemIds) {
-				const directYield = readPotentialYield(operation, scenario, itemId);
-				const chargeYield = Math.max(
-					0,
-					...chargeOutputs.map(
-						(output) =>
-							resolveEditorSimulationOutput({
-								evaluateWhen: () => true,
-								output,
-								scenario,
-								targetItemId: itemId,
-							}).find((drop) => drop.itemId === itemId)?.quantity ?? 0,
-					),
-				);
-				const targetYield = Math.max(directYield, chargeYield);
-				if (targetYield <= 0) continue;
-				const candidates = index.get(scenario)?.get(itemId) ?? [];
-				candidates.push({
-					advancesChargeOutput: chargeYield > 0 && directYield <= 0,
-					operation,
-					targetYield,
-				});
-				index.get(scenario)?.set(itemId, candidates);
-			}
-	}
-	for (const scenarioIndex of index.values())
-		for (const candidates of scenarioIndex.values())
-			candidates.sort(
-				(left, right) =>
-					left.operation.line.runtimeMs / left.targetYield -
-						right.operation.line.runtimeMs / right.targetYield ||
-					left.operation.id.localeCompare(right.operation.id),
+		for (const itemId of itemIds) {
+			const directYield = readPotentialYield(operation, itemId);
+			const chargeYield = Math.max(
+				0,
+				...chargeOutputs.map(
+					(output) =>
+						resolveEditorSimulationOutput({
+							evaluateWhen: () => true,
+							output,
+						}).find((drop) => drop.itemId === itemId)?.quantity ?? 0,
+				),
 			);
+			const targetYield = Math.max(directYield, chargeYield);
+			if (targetYield <= 0) continue;
+			const candidates = index.get(itemId) ?? [];
+			candidates.push({
+				advancesChargeOutput: chargeYield > 0 && directYield <= 0,
+				operation,
+				targetYield,
+			});
+			index.set(itemId, candidates);
+		}
+	}
+	for (const candidates of index.values())
+		candidates.sort(
+			(left, right) =>
+				left.operation.line.runtimeMs / left.targetYield -
+					right.operation.line.runtimeMs / right.targetYield ||
+				left.operation.id.localeCompare(right.operation.id),
+		);
 	return index;
 };
 
-const outputCanYield = (
-	output: OutputSchema.Type | undefined,
-	scenario: EditorItemSimulationScenario,
-	targetItemId: string,
-) =>
+const outputCanYield = (output: OutputSchema.Type | undefined, targetItemId: string) =>
 	output !== undefined &&
 	resolveEditorSimulationOutput({
 		evaluateWhen: () => true,
 		output,
-		scenario,
-		targetItemId,
 	}).some((drop) => drop.itemId === targetItemId && drop.quantity > 0);
 
 /** Precomputes every non-line acquisition edge once for the immutable editor snapshot. */
@@ -1231,56 +1136,34 @@ const indexEditorSimulationAcquisitions = (
 	config: GameConfigSchema.Type,
 	operations: ReadonlyArray<EditorSimulationOperation>,
 ): EditorSimulationAcquisitionIndex => {
-	const merges = new Map<
-		EditorItemSimulationScenario,
-		Map<string, EditorSimulationMergeCandidate[]>
-	>();
-	const temporaries = new Map<
-		EditorItemSimulationScenario,
-		Map<string, EditorSimulationTemporaryCandidate[]>
-	>();
-	for (const scenario of [
-		"expected",
-		"guaranteed",
-	] as const) {
-		merges.set(scenario, new Map());
-		temporaries.set(scenario, new Map());
-	}
+	const merges = new Map<string, EditorSimulationMergeCandidate[]>();
+	const temporaries = new Map<string, EditorSimulationTemporaryCandidate[]>();
 	for (const source of Object.values(config.items))
-		for (const rule of source.merge ?? [])
-			for (const scenario of [
-				"expected",
-				"guaranteed",
-			] as const) {
-				const targetItemIds = new Set<string>();
-				if (rule.effect === "replace") targetItemIds.add(rule.result);
-				if (rule.output !== undefined)
-					for (const itemId of readOutputItemIds(rule.output))
-						if (outputCanYield(rule.output, scenario, itemId))
-							targetItemIds.add(itemId);
-				for (const itemId of targetItemIds) {
-					const candidates = merges.get(scenario)?.get(itemId) ?? [];
-					candidates.push({
-						rule,
-						sourceItemId: source.id,
-					});
-					merges.get(scenario)?.set(itemId, candidates);
-				}
+		for (const rule of source.merge ?? []) {
+			const targetItemIds = new Set<string>();
+			if (rule.effect === "replace") targetItemIds.add(rule.result);
+			if (rule.output !== undefined)
+				for (const itemId of readOutputItemIds(rule.output))
+					if (outputCanYield(rule.output, itemId)) targetItemIds.add(itemId);
+			for (const itemId of targetItemIds) {
+				const candidates = merges.get(itemId) ?? [];
+				candidates.push({
+					rule,
+					sourceItemId: source.id,
+				});
+				merges.set(itemId, candidates);
 			}
+		}
 	for (const item of Object.values(config.items)) {
 		if (item.type !== "temporary" || item.output === undefined) continue;
-		for (const scenario of [
-			"expected",
-			"guaranteed",
-		] as const)
-			for (const itemId of readOutputItemIds(item.output)) {
-				if (!outputCanYield(item.output, scenario, itemId)) continue;
-				const candidates = temporaries.get(scenario)?.get(itemId) ?? [];
-				candidates.push({
-					temporaryItemId: item.id,
-				});
-				temporaries.get(scenario)?.set(itemId, candidates);
-			}
+		for (const itemId of readOutputItemIds(item.output)) {
+			if (!outputCanYield(item.output, itemId)) continue;
+			const candidates = temporaries.get(itemId) ?? [];
+			candidates.push({
+				temporaryItemId: item.id,
+			});
+			temporaries.set(itemId, candidates);
+		}
 	}
 	return {
 		lines: indexEditorSimulationCandidates(config, operations),
@@ -1294,8 +1177,6 @@ const runMerge = (
 	state: EditorSimulationState,
 	sourceItemId: string,
 	rule: MergeSchema.Type,
-	scenario: EditorItemSimulationScenario,
-	targetItemId: string,
 	path: ReadonlySet<string>,
 	requireItem: RequireItem,
 ): EditorSimulationState | undefined => {
@@ -1322,8 +1203,7 @@ const runMerge = (
 		)
 			return undefined;
 	}
-	if (!applyOutput(config, planned, rule.output, scenario, targetItemId, sourceItemId))
-		return undefined;
+	if (!applyOutput(config, planned, rule.output, sourceItemId)) return undefined;
 	const operationId = `merge:${sourceItemId}:${receivingItemId}`;
 	const previous = planned.operations.get(operationId);
 	planned.operations.set(operationId, {
@@ -1341,8 +1221,6 @@ const runTemporaryExpiry = (
 	config: GameConfigSchema.Type,
 	state: EditorSimulationState,
 	temporaryItemId: string,
-	scenario: EditorItemSimulationScenario,
-	targetItemId: string,
 	path: ReadonlySet<string>,
 	requireItem: RequireItem,
 ): EditorSimulationState | undefined => {
@@ -1353,8 +1231,7 @@ const runTemporaryExpiry = (
 	if (!moveEditorSimulationItem(config, planned, temporaryItemId, 1, "board")) return undefined;
 	if (!removeEditorSimulationItem(planned, temporaryItemId, 1, true)) return undefined;
 	planned.runtimeMs += Math.ceil(item.durationMs / 200) * 200;
-	if (!applyOutput(config, planned, item.output, scenario, targetItemId, temporaryItemId))
-		return undefined;
+	if (!applyOutput(config, planned, item.output, temporaryItemId)) return undefined;
 	const operationId = `expiry:${temporaryItemId}`;
 	const previous = planned.operations.get(operationId);
 	planned.operations.set(operationId, {
@@ -1368,13 +1245,12 @@ const runTemporaryExpiry = (
 	return planned;
 };
 
-const estimateScenario = (
+const estimateEditorItem = (
 	config: GameConfigSchema.Type,
 	acquisitionIndex: EditorSimulationAcquisitionIndex,
 	itemId: string,
 	quantity: number,
-	scenario: EditorItemSimulationScenario,
-): EditorItemSimulationScenarioResult => {
+): EditorItemSimulation => {
 	const initialState = makeEditorSimulationState(config);
 	const blockers = new Map<string, EditorItemSimulationBlocker>();
 	const reportBlocker: ReportBlocker = (blocker) => {
@@ -1417,7 +1293,7 @@ const estimateScenario = (
 					return undefined;
 				}
 				runs += 1;
-				const candidates = acquisitionIndex.lines.get(scenario)?.get(requiredItemId) ?? [];
+				const candidates = acquisitionIndex.lines.get(requiredItemId) ?? [];
 				let advanced = false;
 				candidateSearch: for (const ownerAvailable of [
 					true,
@@ -1432,7 +1308,6 @@ const estimateScenario = (
 							config,
 							candidate,
 							operation,
-							scenario,
 							requiredItemId,
 							nextPath,
 							requireItem,
@@ -1456,7 +1331,7 @@ const estimateScenario = (
 							reportBlocker({
 								code: "operation-blocked",
 								itemId: requiredItemId,
-								message: `Line “${operation.line.title}” on ${config.items[operation.ownerItemId]?.title ?? operation.ownerItemId} completes without producing this item in the ${scenario} scenario.`,
+								message: `Line “${operation.line.title}” on ${config.items[operation.ownerItemId]?.title ?? operation.ownerItemId} completes without producing this item in the expected estimate.`,
 								operationId: operation.line.id,
 								ownerItemId: operation.ownerItemId,
 								path: [
@@ -1470,8 +1345,7 @@ const estimateScenario = (
 						break candidateSearch;
 					}
 				}
-				const mergeCandidates =
-					acquisitionIndex.merges.get(scenario)?.get(requiredItemId) ?? [];
+				const mergeCandidates = acquisitionIndex.merges.get(requiredItemId) ?? [];
 				if (!advanced)
 					for (const { rule, sourceItemId } of mergeCandidates) {
 						const completed = runMerge(
@@ -1479,8 +1353,6 @@ const estimateScenario = (
 							cloneEditorSimulationState(planned),
 							sourceItemId,
 							rule,
-							scenario,
-							requiredItemId,
 							nextPath,
 							requireItem,
 						);
@@ -1506,16 +1378,13 @@ const estimateScenario = (
 						advanced = true;
 						break;
 					}
-				const temporaryCandidates =
-					acquisitionIndex.temporaries.get(scenario)?.get(requiredItemId) ?? [];
+				const temporaryCandidates = acquisitionIndex.temporaries.get(requiredItemId) ?? [];
 				if (!advanced)
 					for (const { temporaryItemId } of temporaryCandidates) {
 						const completed = runTemporaryExpiry(
 							config,
 							cloneEditorSimulationState(planned),
 							temporaryItemId,
-							scenario,
-							requiredItemId,
 							nextPath,
 							requireItem,
 						);
@@ -1566,7 +1435,8 @@ const estimateScenario = (
 	const result = requireItem(initialState, itemId, quantity, false, new Set());
 	if (result === undefined)
 		return {
-			scenario,
+			itemId,
+			quantity,
 			status: "no-finite-path",
 			cost: [],
 			totalCostQuantity: 0,
@@ -1589,7 +1459,8 @@ const estimateScenario = (
 			quantity: costQuantity,
 		}));
 	return {
-		scenario,
+		itemId,
+		quantity,
 		status: "estimated",
 		runtimeMs: result.runtimeMs,
 		cost,
@@ -1626,24 +1497,7 @@ export const createEditorItemSimulatorFx = Effect.fn("createEditorItemSimulatorF
 						Effect.sync((): EditorItemSimulation => {
 							if (config.items[itemId] === undefined)
 								throw new Error(`Item ${itemId} does not exist.`);
-							return {
-								itemId,
-								quantity,
-								scenarios: (
-									[
-										"expected",
-										"guaranteed",
-									] as const
-								).map((scenario) =>
-									estimateScenario(
-										config,
-										acquisitionIndex,
-										itemId,
-										quantity,
-										scenario,
-									),
-								),
-							};
+							return estimateEditorItem(config, acquisitionIndex, itemId, quantity);
 						}),
 				),
 			};

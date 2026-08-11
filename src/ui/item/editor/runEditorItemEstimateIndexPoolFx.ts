@@ -26,13 +26,9 @@ interface RunEditorItemEstimateIndexPoolOptions {
 	) => Effect.Effect<EditorItemEstimateWorkerResult, unknown>;
 }
 
-const readRuntime = (estimate: EditorItemSimulation, scenario: "expected" | "guaranteed") =>
-	estimate.scenarios.find((candidate) => candidate.scenario === scenario)?.runtimeMs;
-
 const projectEntry = (estimate: EditorItemSimulation): EditorItemEstimateIndexEntry => ({
-	expectedRuntimeMs: readRuntime(estimate, "expected"),
-	guaranteedRuntimeMs: readRuntime(estimate, "guaranteed"),
 	itemId: estimate.itemId,
+	runtimeMs: estimate.runtimeMs,
 });
 
 /** Runs missing all-item estimates across at most three independently cancellable workers. */

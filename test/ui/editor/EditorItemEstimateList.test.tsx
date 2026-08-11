@@ -75,18 +75,15 @@ beforeEach(() => {
 	state.estimateState = {
 		entries: [
 			{
-				expectedRuntimeMs: 120_000,
-				guaranteedRuntimeMs: 180_000,
+				runtimeMs: 120_000,
 				itemId: "bakery",
 			},
 			{
-				expectedRuntimeMs: 0,
-				guaranteedRuntimeMs: 0,
+				runtimeMs: 0,
 				itemId: "water",
 			},
 			{
-				expectedRuntimeMs: 60_000,
-				guaranteedRuntimeMs: 90_000,
+				runtimeMs: 60_000,
 				itemId: "well",
 			},
 		],
@@ -148,7 +145,7 @@ const setSort = async (container: HTMLElement, value: "fastest" | "slowest") => 
 };
 
 describe("EditorItemEstimateList", () => {
-	it("searches, sorts by expected runtime, and links each row to its Estimate detail", async () => {
+	it("searches, sorts by estimated runtime, and links each row to its Estimate detail", async () => {
 		const container = await renderList();
 
 		expect(readVisibleItemIds(container)).toEqual([
@@ -156,8 +153,8 @@ describe("EditorItemEstimateList", () => {
 			"well",
 			"bakery",
 		]);
-		expect(container.textContent).toContain("Expected");
-		expect(container.textContent).toContain("Guaranteed");
+		expect(container.textContent).not.toContain("Expected");
+		expect(container.textContent).not.toContain("Guaranteed");
 		expect(container.textContent).not.toContain("Best");
 		expect(container.textContent).toContain("2 min");
 		expect(container.querySelector('[data-ui="EditorItemThumbnail"]')).not.toBeNull();

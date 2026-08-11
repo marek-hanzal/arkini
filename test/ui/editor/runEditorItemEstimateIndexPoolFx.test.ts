@@ -6,32 +6,16 @@ import type { EditorItemSimulation } from "~/editor/simulator/EditorItemSimulati
 import { runEditorItemEstimateIndexPoolFx } from "~/ui/item/editor/runEditorItemEstimateIndexPoolFx";
 
 const simulation = (itemId: string, runtimeMs: number): EditorItemSimulation => ({
+	blockers: [],
+	cost: [],
+	infrastructureItemIds: new Set(),
 	itemId,
+	operations: [],
 	quantity: 1,
-	scenarios: [
-		{
-			blockers: [],
-			cost: [],
-			infrastructureItemIds: new Set(),
-			operations: [],
-			runtimeMs,
-			scenario: "expected",
-			status: "estimated",
-			totalCostQuantity: 0,
-			warnings: [],
-		},
-		{
-			blockers: [],
-			cost: [],
-			infrastructureItemIds: new Set(),
-			operations: [],
-			runtimeMs: runtimeMs * 2,
-			scenario: "guaranteed",
-			status: "estimated",
-			totalCostQuantity: 0,
-			warnings: [],
-		},
-	],
+	runtimeMs,
+	status: "estimated",
+	totalCostQuantity: 0,
+	warnings: [],
 });
 
 const config = {
@@ -65,8 +49,7 @@ describe("runEditorItemEstimateIndexPoolFx", () => {
 							resume(
 								Effect.succeed({
 									entries: request.itemIds.map((itemId) => ({
-										expectedRuntimeMs: 1,
-										guaranteedRuntimeMs: 1,
+										runtimeMs: 1,
 										itemId,
 									})),
 									type: "index" as const,
@@ -108,8 +91,7 @@ describe("runEditorItemEstimateIndexPoolFx", () => {
 						}
 						return {
 							entries: request.itemIds.map((itemId) => ({
-								expectedRuntimeMs: itemId.length,
-								guaranteedRuntimeMs: itemId.length * 2,
+								runtimeMs: itemId.length,
 								itemId,
 							})),
 							type: "index" as const,

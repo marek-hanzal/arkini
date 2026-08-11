@@ -580,29 +580,23 @@ describe("createEditorMcpOwnershipFx", () => {
 		]);
 		expect(itemEstimate.content).toMatchObject([
 			{
-				text: expect.stringContaining(
-					"\nExpected:\n  Status: estimated\n  Sequential runtime: 1 s",
-				),
+				text: expect.stringContaining("\nStatus: estimated\nSequential runtime: 1 s"),
 			},
 		]);
 		expect(JSON.stringify(itemEstimate.content)).not.toContain("\nBest:");
 		expect(itemEstimate.content).toMatchObject([
 			{
 				text: expect.stringContaining(
-					"  Total item cost: 3\n  Item cost breakdown:\n    - water [water; simple]: 3",
+					"Total item cost: 3\nItem cost breakdown:\n  - water [water; simple]: 3",
 				),
 			},
 		]);
 		expect(itemEstimate.content).toMatchObject([
 			{
-				text: expect.stringContaining("\nExpected:\n  Status: estimated"),
+				text: expect.stringContaining("\nStatus: estimated"),
 			},
 		]);
-		expect(itemEstimate.content).toMatchObject([
-			{
-				text: expect.stringContaining("\nGuaranteed:\n  Status: estimated"),
-			},
-		]);
+		expect(JSON.stringify(itemEstimate.content)).not.toContain("Guaranteed:");
 		expect(itemEstimate).not.toHaveProperty("structuredContent");
 		const missingRelationItem = await client.callTool({
 			name: "item_income",

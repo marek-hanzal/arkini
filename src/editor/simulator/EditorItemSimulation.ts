@@ -1,5 +1,3 @@
-export type EditorItemSimulationScenario = "expected" | "guaranteed";
-
 export interface EditorItemSimulationOperation {
 	readonly id: string;
 	readonly ownerItemId: string;
@@ -30,8 +28,9 @@ export interface EditorItemSimulationBlocker {
 	readonly path: ReadonlyArray<string>;
 }
 
-export interface EditorItemSimulationScenarioResult {
-	readonly scenario: EditorItemSimulationScenario;
+export interface EditorItemSimulation {
+	readonly itemId: string;
+	readonly quantity: number;
 	readonly status: "estimated" | "no-finite-path";
 	readonly runtimeMs?: number;
 	readonly cost: ReadonlyArray<EditorItemSimulationCost>;
@@ -40,10 +39,4 @@ export interface EditorItemSimulationScenarioResult {
 	readonly operations: ReadonlyArray<EditorItemSimulationOperation>;
 	readonly blockers: ReadonlyArray<EditorItemSimulationBlocker>;
 	readonly warnings: ReadonlyArray<string>;
-}
-
-export interface EditorItemSimulation {
-	readonly itemId: string;
-	readonly quantity: number;
-	readonly scenarios: ReadonlyArray<EditorItemSimulationScenarioResult>;
 }

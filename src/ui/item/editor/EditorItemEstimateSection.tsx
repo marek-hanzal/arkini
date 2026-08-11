@@ -1,28 +1,10 @@
 import { useEditorProject } from "~/bridge/editor/useEditorProject";
 import { RendererRuntime } from "~/bridge/runtime/RendererRuntime";
-import type {
-	EditorItemSimulationScenario,
-	EditorItemSimulationScenarioResult,
-} from "~/editor/simulator/EditorItemSimulation";
+import type { EditorItemSimulation } from "~/editor/simulator/EditorItemSimulation";
 import { formatItemDurationFx } from "~/ui/item-detail/formatItemDurationFx";
 import { EditorItemDetailReference } from "~/ui/item/editor/EditorItemDetailReference";
 import { useEditorItemEstimate } from "~/ui/item/editor/useEditorItemEstimate";
 import { Status } from "~/ui/status/Status";
-
-const ScenarioTitle = {
-	expected: "Expected",
-	guaranteed: "Guaranteed",
-} as const;
-
-const ScenarioDescription = {
-	expected: "Expected output yield is used, then batches are rounded up to whole runs.",
-	guaranteed: "Minimum quantities are used and non-guaranteed chance output counts as zero.",
-} as const;
-
-const ScenarioOrder: ReadonlyArray<EditorItemSimulationScenario> = [
-	"expected",
-	"guaranteed",
-];
 
 const BlockerTitle = {
 	"dependency-cycle": "Dependency cycle",
@@ -35,51 +17,44 @@ const BlockerTitle = {
 const formatQuantity = (quantity: number) =>
 	Number.isInteger(quantity) ? String(quantity) : quantity.toFixed(2).replace(/\.00$/, "");
 
-const EditorItemEstimateScenarioCard = ({
+const EditorItemEstimateResultCard = ({
 	config,
+	estimate,
 	projectId,
-	scenario,
 }: {
 	readonly config: ReturnType<typeof useEditorProject>["config"];
+	readonly estimate: EditorItemSimulation;
 	readonly projectId: string;
-	readonly scenario: EditorItemSimulationScenarioResult;
 }) => (
 	<article
-		className={`flex min-h-0 min-w-0 flex-col rounded-lg border border-l-2 bg-surface-raised p-4 ${
-			scenario.scenario === "expected"
-				? "border-violet-300 border-l-violet-600"
-				: "border-line border-l-line-strong"
-		}`}
-		data-scenario={scenario.scenario}
-		data-ui="EditorItemEstimateScenario"
+		className="flex min-h-0 min-w-0 flex-col rounded-lg border border-l-2 border-violet-300 border-l-violet-600 bg-surface-raised p-4"
+		data-ui="EditorItemEstimateResult"
 	>
 		<header className="flex items-start justify-between gap-4 border-b border-line/70 pb-3">
 			<div>
-				<h3 className="font-semibold text-foreground">
-					{ScenarioTitle[scenario.scenario]}
-				</h3>
+				<h3 className="font-semibold text-foreground">Expected</h3>
 				<p className="mt-1 text-xs text-muted">
-					{scenario.status === "estimated"
-						? `${scenario.cost.length} consumed item types`
-						: `${scenario.blockers.length} production ${scenario.blockers.length === 1 ? "blocker" : "blockers"}`}
+					{estimate.status === "estimated"
+						? `${estimate.cost.length} consumed item types`
+						: `${estimate.blockers.length} production ${estimate.blockers.length === 1 ? "blocker" : "blockers"}`}
 				</p>
 			</div>
 			<div className="text-right">
 				<p className="font-semibold tabular-nums text-foreground">
-					{scenario.status === "estimated"
-						? `${formatQuantity(scenario.totalCostQuantity)} items`
+					{estimate.status === "estimated"
+						? `${formatQuantity(estimate.totalCostQuantity)} items`
 						: "Blocked"}
 				</p>
 				<p className="mt-1 text-xs tabular-nums text-muted">
-					{scenario.runtimeMs === undefined
+					{estimate.runtimeMs === undefined
 						? "No runtime estimate"
-						: RendererRuntime.runSync(formatItemDurationFx(scenario.runtimeMs))}
+						: RendererRuntime.runSync(formatItemDurationFx(estimate.runtimeMs))}
 				</p>
 			</div>
 		</header>
-		{scenario.status === "no-finite-path" ? (
+		{estimate.status === "no-finite-path" ? (
 			<ul className="min-h-0 flex-1 divide-y divide-line/60 overflow-y-auto pr-1">
-				{scenario.blockers.map((blocker) => {
+				{estimate.blockers.map((blocker) => {
 					const item = config.items[blocker.itemId];
 					return (
 						<li
@@ -110,11 +85,11 @@ const EditorItemEstimateScenarioCard = ({
 					);
 				})}
 			</ul>
-		) : scenario.cost.length === 0 ? (
+		) : estimate.cost.length === 0 ? (
 			<p className="py-4 text-sm text-muted">No consumed items.</p>
 		) : (
 			<ul className="min-h-0 flex-1 divide-y divide-line/60 overflow-y-auto pr-1">
-				{scenario.cost.map(({ itemId, quantity }) => {
+				{estimate.cost.map(({ itemId, quantity }) => {
 					const item = config.items[itemId];
 					return (
 						<li
@@ -148,31 +123,20 @@ const EditorItemEstimateScenarioCard = ({
 
 const EditorItemEstimateMethodCard = () => (
 	<article
-		className="col-span-2 min-w-0 rounded-lg border border-l-2 border-line border-l-sky-600 bg-surface-raised p-4 max-[64rem]:col-span-1"
+		className="min-w-0 rounded-lg border border-l-2 border-line border-l-sky-600 bg-surface-raised p-4"
 		data-ui="EditorItemEstimateMethod"
 	>
 		<header className="flex items-start gap-3 border-b border-line/70 pb-3">
 			<span className="icon-[lucide--calculator] mt-0.5 size-5 shrink-0 text-sky-700" />
 			<div>
 				<h3 className="font-semibold text-foreground">How it is calculated</h3>
-				<p className="mt-1 text-xs text-muted">Shared assumptions and scenario rules</p>
+				<p className="mt-1 text-xs text-muted">Balanced expected-yield assumptions</p>
 			</div>
 		</header>
-		<dl className="divide-y divide-line/60">
-			{ScenarioOrder.map((scenario) => (
-				<div
-					className="grid gap-1 py-3"
-					key={scenario}
-				>
-					<dt className="text-sm font-semibold text-foreground">
-						{ScenarioTitle[scenario]}
-					</dt>
-					<dd className="text-xs leading-relaxed text-muted">
-						{ScenarioDescription[scenario]}
-					</dd>
-				</div>
-			))}
-		</dl>
+		<p className="py-3 text-xs leading-relaxed text-muted">
+			Random output uses its expected yield and required batches are rounded up to whole
+			production runs. Time and cost are balanced estimates, not guarantees.
+		</p>
 		<ul className="grid gap-2 border-t border-line/70 pt-3 text-xs leading-relaxed text-muted">
 			<li>
 				Production, line rules, drop rules, runtime modifiers, and charges are simulated.
@@ -218,19 +182,11 @@ export const EditorItemEstimateSection = ({ itemId }: { readonly itemId: string 
 			) : null}
 			{state.status === "ready" ? (
 				<div className="grid grid-cols-2 gap-3 max-[64rem]:grid-cols-1">
-					{ScenarioOrder.map((scenarioId) => {
-						const scenario = state.estimate.scenarios.find(
-							(candidate) => candidate.scenario === scenarioId,
-						);
-						return scenario === undefined ? null : (
-							<EditorItemEstimateScenarioCard
-								config={project.config}
-								key={scenario.scenario}
-								projectId={project.projectId}
-								scenario={scenario}
-							/>
-						);
-					})}
+					<EditorItemEstimateResultCard
+						config={project.config}
+						estimate={state.estimate}
+						projectId={project.projectId}
+					/>
 					<EditorItemEstimateMethodCard />
 				</div>
 			) : null}

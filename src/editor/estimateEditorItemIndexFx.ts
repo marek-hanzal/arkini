@@ -6,14 +6,8 @@ import type {
 	EditorItemEstimateIndexEntry,
 	EditorItemEstimateIndexProgress,
 } from "~/editor/EditorItemEstimateIndex";
-import type { EditorItemSimulationScenarioResult } from "~/editor/simulator/EditorItemSimulation";
 import type { EditorItemSimulation } from "~/editor/simulator/EditorItemSimulation";
 import { createEditorItemSimulatorFx } from "~/editor/simulator/createEditorItemSimulatorFx";
-
-const readRuntime = (
-	scenarios: ReadonlyArray<EditorItemSimulationScenarioResult>,
-	scenario: "expected" | "guaranteed",
-) => scenarios.find((candidate) => candidate.scenario === scenario)?.runtimeMs;
 
 interface EstimateEditorItemIndexOptions {
 	readonly itemIds?: ReadonlyArray<string>;
@@ -48,10 +42,9 @@ export const estimateEditorItemIndexFx = Effect.fn("estimateEditorItemIndexFx")(
 								),
 					),
 					Effect.map(
-						({ scenarios }): EditorItemEstimateIndexEntry => ({
-							expectedRuntimeMs: readRuntime(scenarios, "expected"),
-							guaranteedRuntimeMs: readRuntime(scenarios, "guaranteed"),
+						(estimate): EditorItemEstimateIndexEntry => ({
 							itemId,
+							runtimeMs: estimate.runtimeMs,
 						}),
 					),
 				),

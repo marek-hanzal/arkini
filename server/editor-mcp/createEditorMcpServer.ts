@@ -215,59 +215,55 @@ const itemEstimateText = (project: EditorProject, estimate: EditorItemSimulation
 		"Start state: available at zero time",
 		"Planner: production rules, runtime modifiers, charges, and finite-source renewal paths",
 		"Board model: optimistic spatial rules only; coordinates, capacity, placement, and additional spaces are not simulated",
-		"Expected method: expected output per run with whole-run batch rounding",
-		...estimate.scenarios.flatMap((scenario) => [
-			"",
-			`${scenario.scenario[0]?.toUpperCase()}${scenario.scenario.slice(1)}:`,
-			`  Status: ${scenario.status}`,
-			...(scenario.runtimeMs === undefined
-				? []
-				: [
-						`  Sequential runtime: ${formatRuntime(scenario.runtimeMs)}`,
-					]),
-			"  Production blockers:",
-			...(scenario.blockers.length === 0
-				? [
-						"    - none",
+		"Method: expected output per run with whole-run batch rounding; time and cost are estimates, not guarantees",
+		`Status: ${estimate.status}`,
+		...(estimate.runtimeMs === undefined
+			? []
+			: [
+					`Sequential runtime: ${formatRuntime(estimate.runtimeMs)}`,
+				]),
+		"Production blockers:",
+		...(estimate.blockers.length === 0
+			? [
+					"  - none",
+				]
+			: estimate.blockers.map(
+					(blocker) =>
+						`  - ${blocker.code}: ${itemReference(project, blocker.itemId)}; ${blocker.message}${blocker.operationId === undefined ? "" : `; operation ${blocker.operationId}`}`,
+				)),
+		`Total item cost: ${formatEstimateNumber(estimate.totalCostQuantity)}`,
+		"Item cost breakdown:",
+		...(estimate.cost.length === 0
+			? [
+					"  - none",
+				]
+			: estimate.cost.map(
+					({ itemId, quantity }) =>
+						`  - ${itemReference(project, itemId)}: ${formatEstimateNumber(quantity)}`,
+				)),
+		"Infrastructure and reserved inputs:",
+		...(estimate.infrastructureItemIds.size === 0
+			? [
+					"  - none",
+				]
+			: [
+					...[
+						...estimate.infrastructureItemIds,
 					]
-				: scenario.blockers.map(
-						(blocker) =>
-							`    - ${blocker.code}: ${itemReference(project, blocker.itemId)}; ${blocker.message}${blocker.operationId === undefined ? "" : `; operation ${blocker.operationId}`}`,
-					)),
-			`  Total item cost: ${formatEstimateNumber(scenario.totalCostQuantity)}`,
-			"  Item cost breakdown:",
-			...(scenario.cost.length === 0
-				? [
-						"    - none",
-					]
-				: scenario.cost.map(
-						({ itemId, quantity }) =>
-							`    - ${itemReference(project, itemId)}: ${formatEstimateNumber(quantity)}`,
-					)),
-			"  Infrastructure and reserved inputs:",
-			...(scenario.infrastructureItemIds.size === 0
-				? [
-						"    - none",
-					]
-				: [
-						...[
-							...scenario.infrastructureItemIds,
-						]
-							.sort((left, right) => left.localeCompare(right))
-							.map((itemId) => `    - ${itemReference(project, itemId)}`),
-					]),
-			"  Operations:",
-			...(scenario.operations.length === 0
-				? [
-						"    - none",
-					]
-				: scenario.operations.map(
-						(operation) =>
-							`    - ${operation.label} [${operation.lineId}] × ${operation.runs}; ${formatRuntime(operation.runtimeMs)}; owner ${itemReference(project, operation.ownerItemId)}`,
-					)),
-			"  Warnings:",
-			...scenario.warnings.map((warning) => `    - ${warning}`),
-		]),
+						.sort((left, right) => left.localeCompare(right))
+						.map((itemId) => `  - ${itemReference(project, itemId)}`),
+				]),
+		"Operations:",
+		...(estimate.operations.length === 0
+			? [
+					"  - none",
+				]
+			: estimate.operations.map(
+					(operation) =>
+						`  - ${operation.label} [${operation.lineId}] × ${operation.runs}; ${formatRuntime(operation.runtimeMs)}; owner ${itemReference(project, operation.ownerItemId)}`,
+				)),
+		"Warnings:",
+		...estimate.warnings.map((warning) => `  - ${warning}`),
 	].join("\n");
 };
 
@@ -644,7 +640,7 @@ export const createEditorMcpServer = (
 		"item_estimate",
 		{
 			description:
-				"Run the editor-only optimistic production planner for one item from the authored new-game start state. Returns expected and guaranteed sequential scenarios including production dependencies, line and drop rules, runtime modifiers, charge spending, finite-source depletion, and authored charge renewal output. Spatial rules are satisfied optimistically; board coordinates, capacity, placement, and additional spaces are not simulated.",
+				"Run the editor-only optimistic production planner for one item from the authored new-game start state. Returns one balanced estimate based on expected output yields and whole production runs, including dependencies, line and drop rules, runtime modifiers, charge spending, finite-source depletion, and authored charge renewal output. Time and cost are estimates, not guarantees. Spatial rules are satisfied optimistically; board coordinates, capacity, placement, and additional spaces are not simulated.",
 			inputSchema: z
 				.object({
 					itemId: IdSchema.describe(

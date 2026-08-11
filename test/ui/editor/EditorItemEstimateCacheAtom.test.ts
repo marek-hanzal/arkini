@@ -11,9 +11,16 @@ import {
 } from "~/ui/item/editor/EditorItemEstimateCacheAtom";
 
 const simulation = (itemId: string, quantity = 1): EditorItemSimulation => ({
+	blockers: [],
+	cost: [],
+	infrastructureItemIds: new Set(),
 	itemId,
+	operations: [],
 	quantity,
-	scenarios: [],
+	runtimeMs: 1,
+	status: "estimated",
+	totalCostQuantity: 0,
+	warnings: [],
 });
 
 const config = {
@@ -60,8 +67,7 @@ describe("EditorItemEstimateCacheAtom", () => {
 				options?.onEstimate?.(simulation("alpha"));
 				return [
 					{
-						expectedRuntimeMs: 1,
-						guaranteedRuntimeMs: 2,
+						runtimeMs: 1,
 						itemId: "alpha",
 					},
 				];

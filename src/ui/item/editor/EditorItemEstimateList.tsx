@@ -46,11 +46,8 @@ export const EditorItemEstimateList = () => {
 			})
 			.sort(
 				(left, right) =>
-					compareRuntime(
-						left.estimate.expectedRuntimeMs,
-						right.estimate.expectedRuntimeMs,
-						sort,
-					) || left.item.title.localeCompare(right.item.title),
+					compareRuntime(left.estimate.runtimeMs, right.estimate.runtimeMs, sort) ||
+					left.item.title.localeCompare(right.item.title),
 			);
 	}, [
 		project.config.items,

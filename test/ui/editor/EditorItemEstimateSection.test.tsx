@@ -163,35 +163,30 @@ describe("EditorItemEstimateSection", () => {
 		});
 
 		const estimate = container.querySelector('[data-ui="EditorItemEstimateSection"]');
-		const expected = container.querySelector('[data-scenario="expected"]');
+		const result = container.querySelector('[data-ui="EditorItemEstimateResult"]');
 		const method = container.querySelector('[data-ui="EditorItemEstimateMethod"]');
 		if (estimate === null) throw new Error("Expected Estimate section.");
-		expect(
-			[
-				...container.querySelectorAll('[data-ui="EditorItemEstimateScenario"]'),
-			].map((card) => card.getAttribute("data-scenario")),
-		).toEqual([
-			"expected",
-			"guaranteed",
-		]);
+		expect(container.querySelectorAll('[data-ui="EditorItemEstimateResult"]')).toHaveLength(1);
 		expect(estimate?.textContent).toContain("Estimated total cost");
+		expect(result?.textContent).toContain("Expected");
+		expect(estimate.textContent).not.toContain("Guaranteed");
 		expect(estimate.textContent).not.toContain(
 			"Consumed items across every sequential dependency operation.",
 		);
 		expect(estimate.textContent).not.toContain("Start items cost no time.");
-		expect(expected?.textContent).toContain("3 items");
-		expect(expected?.textContent).toContain("water");
-		expect(expected?.textContent).toContain("× 3");
-		expect(expected?.textContent).not.toContain(
-			"Expected output yield is used, then batches are rounded up to whole runs.",
-		);
-		expect(expected?.querySelector('a[data-item-id="water"]')).not.toBeNull();
+		expect(result?.textContent).toContain("3 items");
+		expect(result?.textContent).toContain("water");
+		expect(result?.textContent).toContain("× 3");
+		expect(result?.querySelector('a[data-item-id="water"]')).not.toBeNull();
 		expect(
-			expected?.querySelector('a[data-item-id="water"]')?.getAttribute("data-section-id"),
+			result?.querySelector('a[data-item-id="water"]')?.getAttribute("data-section-id"),
 		).toBe("estimate");
 		expect(method?.textContent).toContain("How it is calculated");
 		expect(method?.textContent).toContain(
-			"Expected output yield is used, then batches are rounded up to whole runs.",
+			"Random output uses its expected yield and required batches are rounded up to whole production runs.",
+		);
+		expect(method?.textContent).toContain(
+			"Time and cost are balanced estimates, not guarantees.",
 		);
 		expect(method?.textContent).toContain(
 			"Production, line rules, drop rules, runtime modifiers, and charges are simulated.",
@@ -232,18 +227,18 @@ describe("EditorItemEstimateSection", () => {
 			);
 		});
 
-		const expected = container.querySelector('[data-scenario="expected"]');
-		expect(expected?.textContent).toContain("1 production blocker");
-		expect(expected?.textContent).toContain("Blocked");
-		expect(expected?.textContent).toContain("Missing source");
-		expect(expected?.textContent).toContain(
+		const result = container.querySelector('[data-ui="EditorItemEstimateResult"]');
+		expect(result?.textContent).toContain("1 production blocker");
+		expect(result?.textContent).toContain("Blocked");
+		expect(result?.textContent).toContain("Missing source");
+		expect(result?.textContent).toContain(
 			"No starting quantity, production line, merge, or temporary expiry can create this item.",
 		);
-		expect(expected?.querySelector('a[data-item-id="tool"]')).not.toBeNull();
+		expect(result?.querySelector('a[data-item-id="tool"]')).not.toBeNull();
 		expect(
-			expected?.querySelector('a[data-item-id="tool"]')?.getAttribute("data-section-id"),
+			result?.querySelector('a[data-item-id="tool"]')?.getAttribute("data-section-id"),
 		).toBe("estimate");
-		expect(expected?.textContent).not.toContain("No consumed items.");
+		expect(result?.textContent).not.toContain("No consumed items.");
 	});
 
 	it("shows progress while the estimate worker is running", async () => {
@@ -280,6 +275,6 @@ describe("EditorItemEstimateSection", () => {
 		});
 
 		expect(container.querySelector('[data-ui="EditorItemEstimateLoading"]')).not.toBeNull();
-		expect(container.querySelector('[data-ui="EditorItemEstimateScenario"]')).toBeNull();
+		expect(container.querySelector('[data-ui="EditorItemEstimateResult"]')).toBeNull();
 	});
 });

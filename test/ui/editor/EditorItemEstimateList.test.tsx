@@ -75,19 +75,16 @@ beforeEach(() => {
 	state.estimateState = {
 		entries: [
 			{
-				bestRuntimeMs: 60_000,
 				expectedRuntimeMs: 120_000,
 				guaranteedRuntimeMs: 180_000,
 				itemId: "bakery",
 			},
 			{
-				bestRuntimeMs: 0,
 				expectedRuntimeMs: 0,
 				guaranteedRuntimeMs: 0,
 				itemId: "water",
 			},
 			{
-				bestRuntimeMs: 30_000,
 				expectedRuntimeMs: 60_000,
 				guaranteedRuntimeMs: 90_000,
 				itemId: "well",
@@ -161,7 +158,7 @@ describe("EditorItemEstimateList", () => {
 		]);
 		expect(container.textContent).toContain("Expected");
 		expect(container.textContent).toContain("Guaranteed");
-		expect(container.textContent).toContain("Best");
+		expect(container.textContent).not.toContain("Best");
 		expect(container.textContent).toContain("2 min");
 		expect(container.querySelector('[data-ui="EditorItemThumbnail"]')).not.toBeNull();
 		expect(container.querySelector('[aria-label^="Filter items by"]')).toBeNull();

@@ -11,7 +11,7 @@ import { createEditorItemSimulatorFx } from "~/editor/simulator/createEditorItem
 
 const readRuntime = (
 	scenarios: ReadonlyArray<EditorItemSimulationScenarioResult>,
-	scenario: "best" | "expected" | "guaranteed",
+	scenario: "expected" | "guaranteed",
 ) => scenarios.find((candidate) => candidate.scenario === scenario)?.runtimeMs;
 
 /** Computes the compact estimate projection used by the all-item editor index. */
@@ -40,7 +40,6 @@ export const estimateEditorItemIndexFx = Effect.fn("estimateEditorItemIndexFx")(
 					),
 					Effect.map(
 						({ scenarios }): EditorItemEstimateIndexEntry => ({
-							bestRuntimeMs: readRuntime(scenarios, "best"),
 							expectedRuntimeMs: readRuntime(scenarios, "expected"),
 							guaranteedRuntimeMs: readRuntime(scenarios, "guaranteed"),
 							itemId,

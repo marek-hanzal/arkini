@@ -181,17 +181,13 @@ describe("estimateEditorItem", () => {
 				],
 			},
 		];
-		expect(
-			estimateEditorItem(
-				createSimulatorConfig({
-					rules,
-				}),
-				"ingot",
-			).scenarios,
-		).toMatchObject([
-			{
-				status: "no-finite-path",
-			},
+		const blockedEstimate = estimateEditorItem(
+			createSimulatorConfig({
+				rules,
+			}),
+			"ingot",
+		);
+		expect(blockedEstimate.scenarios).toMatchObject([
 			{
 				status: "no-finite-path",
 			},
@@ -199,6 +195,21 @@ describe("estimateEditorItem", () => {
 				status: "no-finite-path",
 			},
 		]);
+		for (const scenario of blockedEstimate.scenarios)
+			expect(scenario.blockers).toEqual(
+				expect.arrayContaining([
+					expect.objectContaining({
+						code: "missing-source",
+						itemId: "tool",
+					}),
+					expect.objectContaining({
+						code: "operation-blocked",
+						itemId: "ingot",
+						operationId: "line:forge:run",
+						ownerItemId: "forge",
+					}),
+				]),
+			);
 		const estimate = estimateEditorItem(
 			createSimulatorConfig({
 				rules,
@@ -239,9 +250,6 @@ describe("estimateEditorItem", () => {
 				"ingot",
 			).scenarios,
 		).toMatchObject([
-			{
-				status: "no-finite-path",
-			},
 			{
 				status: "no-finite-path",
 			},
@@ -302,18 +310,12 @@ describe("estimateEditorItem", () => {
 			{
 				status: "no-finite-path",
 			},
-			{
-				status: "no-finite-path",
-			},
 		]);
 	});
 
 	it("exhausts finite deposits and follows authored deterministic renewal output", () => {
 		const finite = estimateEditorItem(createSimulatorConfig(), "ingot", 3);
 		expect(finite.scenarios).toMatchObject([
-			{
-				status: "no-finite-path",
-			},
 			{
 				status: "no-finite-path",
 			},
@@ -617,7 +619,6 @@ describe("estimateEditorItem", () => {
 			total: entries.length,
 		});
 		expect(entries.find(({ itemId }) => itemId === "water")).toEqual({
-			bestRuntimeMs: undefined,
 			expectedRuntimeMs: undefined,
 			guaranteedRuntimeMs: undefined,
 			itemId: "water",
@@ -648,7 +649,7 @@ describe("estimateEditorItem", () => {
 		}
 	});
 
-	it("separates optimistic, expected, and non-finite guaranteed chance output", () => {
+	it("separates expected and non-finite guaranteed chance output", () => {
 		const base = createJobTestConfig();
 		const forge = base.items.forge;
 		if (forge.type !== "producer") throw new Error("Expected producer fixture.");
@@ -716,11 +717,6 @@ describe("estimateEditorItem", () => {
 
 		const estimate = estimateEditorItem(config, "ingot");
 		expect(estimate.scenarios).toMatchObject([
-			{
-				scenario: "best",
-				status: "estimated",
-				runtimeMs: 1_000,
-			},
 			{
 				scenario: "expected",
 				status: "estimated",

@@ -13,6 +13,7 @@ import type { WhenSchema } from "~/engine/when/schema/WhenSchema";
 
 import type {
 	EditorItemSimulation,
+	EditorItemSimulationBlocker,
 	EditorItemSimulationOperation,
 	EditorItemSimulationScenario,
 	EditorItemSimulationScenarioResult,
@@ -471,8 +472,6 @@ const quantityForScenario = (
 	scenario: EditorItemSimulationScenario,
 ) => {
 	switch (scenario) {
-		case "best":
-			return quantity.max;
 		case "expected":
 			return (quantity.min + quantity.max) / 2;
 		case "guaranteed":
@@ -512,14 +511,7 @@ const rollYield = (
 			for (const drop of roll.drop) addDropYield(result, drop, 1, scenario, evaluateWhen);
 			return result;
 		case "chance": {
-			const multiplier =
-				scenario === "best"
-					? 1
-					: scenario === "expected"
-						? roll.chance
-						: roll.chance === 1
-							? 1
-							: 0;
+			const multiplier = scenario === "expected" ? roll.chance : roll.chance === 1 ? 1 : 0;
 			for (const drop of roll.drop)
 				addDropYield(result, drop, multiplier, scenario, evaluateWhen);
 			return result;
@@ -551,7 +543,7 @@ const rollYield = (
 			const compare = (left: Map<string, number>, right: Map<string, number>) =>
 				(left.get(targetItemId) ?? 0) - (right.get(targetItemId) ?? 0);
 			candidates.sort(compare);
-			return candidates[scenario === "best" ? candidates.length - 1 : 0] ?? result;
+			return candidates[0] ?? result;
 		}
 	}
 };
@@ -590,7 +582,7 @@ const resolveEditorSimulationOutput = ({
 			(left, right) =>
 				(left.result.get(targetItemId) ?? 0) - (right.result.get(targetItemId) ?? 0),
 		);
-		selected = sets[scenario === "best" ? sets.length - 1 : 0]?.result ?? new Map();
+		selected = sets[0]?.result ?? new Map();
 	}
 	return [
 		...selected,
@@ -601,6 +593,8 @@ const resolveEditorSimulationOutput = ({
 };
 
 const maximumRunsPerRequirement = 100_000;
+
+type ReportBlocker = (blocker: EditorItemSimulationBlocker) => void;
 
 type RequireItem = (
 	state: EditorSimulationState,
@@ -1121,7 +1115,6 @@ const indexEditorSimulationCandidates = (
 ): EditorSimulationCandidateIndex => {
 	const index = new Map<EditorItemSimulationScenario, Map<string, EditorSimulationCandidate[]>>();
 	for (const scenario of [
-		"best",
 		"expected",
 		"guaranteed",
 	] as const)
@@ -1167,7 +1160,6 @@ const indexEditorSimulationCandidates = (
 			...chargeItemIds,
 		]);
 		for (const scenario of [
-			"best",
 			"expected",
 			"guaranteed",
 		] as const)
@@ -1299,14 +1291,46 @@ const estimateScenario = (
 	scenario: EditorItemSimulationScenario,
 ): EditorItemSimulationScenarioResult => {
 	const initialState = makeEditorSimulationState(config);
+	const blockers = new Map<string, EditorItemSimulationBlocker>();
+	const reportBlocker: ReportBlocker = (blocker) => {
+		const key = [
+			blocker.code,
+			blocker.itemId,
+			blocker.operationId ?? "",
+			blocker.ownerItemId ?? "",
+		].join(":");
+		if (!blockers.has(key)) blockers.set(key, blocker);
+	};
 	const requireItem: RequireItem = (state, requiredItemId, requiredQuantity, consume, path) => {
 		let planned = state;
 		if ((planned.stock.get(requiredItemId) ?? 0) + 1e-9 < requiredQuantity) {
-			if (path.has(requiredItemId)) return undefined;
+			if (path.has(requiredItemId)) {
+				const dependencyPath = [
+					...path,
+					requiredItemId,
+				];
+				reportBlocker({
+					code: "dependency-cycle",
+					itemId: requiredItemId,
+					message: `Production loops through ${dependencyPath.join(" → ")}.`,
+					path: dependencyPath,
+				});
+				return undefined;
+			}
 			const nextPath = new Set(path).add(requiredItemId);
 			let runs = 0;
 			while ((planned.stock.get(requiredItemId) ?? 0) + 1e-9 < requiredQuantity) {
-				if (runs >= maximumRunsPerRequirement) return undefined;
+				if (runs >= maximumRunsPerRequirement) {
+					reportBlocker({
+						code: "run-limit",
+						itemId: requiredItemId,
+						message: `Production exceeded ${maximumRunsPerRequirement.toLocaleString("en-US")} sequential runs without reaching the required quantity.`,
+						path: [
+							...nextPath,
+						],
+					});
+					return undefined;
+				}
 				runs += 1;
 				const candidates = [
 					...(candidateIndex.get(scenario)?.get(requiredItemId) ?? []),
@@ -1336,28 +1360,51 @@ const estimateScenario = (
 						nextPath,
 						requireItem,
 					);
-					if (completed === undefined) continue;
+					if (completed === undefined) {
+						reportBlocker({
+							code: "operation-blocked",
+							itemId: requiredItemId,
+							message: `Line “${operation.line.title}” on ${config.items[operation.ownerItemId]?.title ?? operation.ownerItemId} cannot satisfy all required inputs, rules, charges, and output constraints.`,
+							operationId: operation.line.id,
+							ownerItemId: operation.ownerItemId,
+							path: [
+								...nextPath,
+							],
+						});
+						continue;
+					}
 					const increased = (completed.stock.get(requiredItemId) ?? 0) > before + 1e-9;
-					if (!increased && !advancesChargeOutput) continue;
+					if (!increased && !advancesChargeOutput) {
+						reportBlocker({
+							code: "operation-blocked",
+							itemId: requiredItemId,
+							message: `Line “${operation.line.title}” on ${config.items[operation.ownerItemId]?.title ?? operation.ownerItemId} completes without producing this item in the ${scenario} scenario.`,
+							operationId: operation.line.id,
+							ownerItemId: operation.ownerItemId,
+							path: [
+								...nextPath,
+							],
+						});
+						continue;
+					}
 					planned = completed;
 					advanced = true;
 					break;
 				}
+				const mergeCandidates = Object.values(config.items).flatMap((source) =>
+					(source.merge ?? [])
+						.filter(
+							(rule) =>
+								(rule.effect === "replace" && rule.result === requiredItemId) ||
+								outputCanYield(rule.output, scenario, requiredItemId),
+						)
+						.map((rule) => ({
+							rule,
+							sourceItemId: source.id,
+						})),
+				);
 				if (!advanced)
-					for (const { rule, sourceItemId } of Object.values(config.items).flatMap(
-						(source) =>
-							(source.merge ?? [])
-								.filter(
-									(rule) =>
-										(rule.effect === "replace" &&
-											rule.result === requiredItemId) ||
-										outputCanYield(rule.output, scenario, requiredItemId),
-								)
-								.map((rule) => ({
-									rule,
-									sourceItemId: source.id,
-								})),
-					)) {
+					for (const { rule, sourceItemId } of mergeCandidates) {
 						const completed = runMerge(
 							config,
 							cloneEditorSimulationState(planned),
@@ -1368,22 +1415,35 @@ const estimateScenario = (
 							nextPath,
 							requireItem,
 						);
+						if (completed === undefined) {
+							reportBlocker({
+								code: "operation-blocked",
+								itemId: requiredItemId,
+								message: `Merge from ${sourceItemId} cannot satisfy its required source and target items.`,
+								operationId: `merge:${sourceItemId}:${rule.target.itemId}`,
+								ownerItemId: sourceItemId,
+								path: [
+									...nextPath,
+								],
+							});
+							continue;
+						}
 						if (
-							completed === undefined ||
 							(completed.stock.get(requiredItemId) ?? 0) <=
-								(planned.stock.get(requiredItemId) ?? 0) + 1e-9
+							(planned.stock.get(requiredItemId) ?? 0) + 1e-9
 						)
 							continue;
 						planned = completed;
 						advanced = true;
 						break;
 					}
+				const temporaryCandidates = Object.values(config.items).filter(
+					(item) =>
+						item.type === "temporary" &&
+						outputCanYield(item.output, scenario, requiredItemId),
+				);
 				if (!advanced)
-					for (const temporary of Object.values(config.items).filter(
-						(item) =>
-							item.type === "temporary" &&
-							outputCanYield(item.output, scenario, requiredItemId),
-					)) {
+					for (const temporary of temporaryCandidates) {
 						const completed = runTemporaryExpiry(
 							config,
 							cloneEditorSimulationState(planned),
@@ -1393,17 +1453,44 @@ const estimateScenario = (
 							nextPath,
 							requireItem,
 						);
+						if (completed === undefined) {
+							reportBlocker({
+								code: "operation-blocked",
+								itemId: requiredItemId,
+								message: `Expiry of ${temporary.id} cannot acquire and expire its temporary source.`,
+								operationId: `expiry:${temporary.id}`,
+								ownerItemId: temporary.id,
+								path: [
+									...nextPath,
+								],
+							});
+							continue;
+						}
 						if (
-							completed === undefined ||
 							(completed.stock.get(requiredItemId) ?? 0) <=
-								(planned.stock.get(requiredItemId) ?? 0) + 1e-9
+							(planned.stock.get(requiredItemId) ?? 0) + 1e-9
 						)
 							continue;
 						planned = completed;
 						advanced = true;
 						break;
 					}
-				if (!advanced) return undefined;
+				if (!advanced) {
+					const sourceCount =
+						candidates.length + mergeCandidates.length + temporaryCandidates.length;
+					reportBlocker({
+						code: sourceCount === 0 ? "missing-source" : "production-stalled",
+						itemId: requiredItemId,
+						message:
+							sourceCount === 0
+								? "No starting quantity, production line, merge, or temporary expiry can create this item."
+								: `${sourceCount} configured production ${sourceCount === 1 ? "path was" : "paths were"} tried, but none could advance the required quantity.`,
+						path: [
+							...nextPath,
+						],
+					});
+					return undefined;
+				}
 			}
 		}
 		if (consume && !removeEditorSimulationItem(planned, requiredItemId, requiredQuantity, true))
@@ -1419,6 +1506,9 @@ const estimateScenario = (
 			totalCostQuantity: 0,
 			infrastructureItemIds: new Set(),
 			operations: [],
+			blockers: [
+				...blockers.values(),
+			],
 			warnings: [
 				...initialState.warnings,
 				"No finite gameplay-valid path satisfies production, rules, storage scopes, charges, and configured finite sources.",
@@ -1442,6 +1532,7 @@ const estimateScenario = (
 		operations: [
 			...result.operations.values(),
 		],
+		blockers: [],
 		warnings: [
 			...result.warnings,
 		],
@@ -1474,7 +1565,6 @@ export const createEditorItemSimulatorFx = Effect.fn("createEditorItemSimulatorF
 								quantity,
 								scenarios: (
 									[
-										"best",
 										"expected",
 										"guaranteed",
 									] as const

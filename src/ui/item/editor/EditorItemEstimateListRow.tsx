@@ -38,7 +38,7 @@ export const EditorItemEstimateListRow = ({
 				<span className="block truncate text-base font-semibold">{item.title}</span>
 				<span className="mt-1 block truncate text-xs text-subtle">{item.id}</span>
 			</span>
-			<dl className="grid shrink-0 grid-cols-3 gap-5 text-right max-[52rem]:grid-cols-1 max-[52rem]:gap-0.5">
+			<dl className="grid shrink-0 grid-cols-2 gap-5 text-right max-[52rem]:grid-cols-1 max-[52rem]:gap-0.5">
 				{(
 					[
 						[
@@ -48,10 +48,6 @@ export const EditorItemEstimateListRow = ({
 						[
 							"Guaranteed",
 							estimate.guaranteedRuntimeMs,
-						],
-						[
-							"Best",
-							estimate.bestRuntimeMs,
 						],
 					] as const
 				).map(([label, runtimeMs]) => (

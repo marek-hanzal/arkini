@@ -1,21 +1,24 @@
 import type { EditorItem } from "~/bridge/item/editor/EditorItemModel";
 import { ButtonLink } from "~/ui/button/Button";
 import { EditorItemThumbnail } from "~/ui/item/editor/EditorItemThumbnail";
+import type { EditorItemSectionId } from "~/ui/item/editor/EditorItemSections";
 
 /** Links one known item reference to its canonical identity detail. */
 export const EditorItemDetailReference = ({
 	item,
 	projectId,
+	sectionId = "identity",
 }: {
 	readonly item: EditorItem;
 	readonly projectId: string;
+	readonly sectionId?: EditorItemSectionId;
 }) => (
 	<ButtonLink
 		to="/editor/$projectId/editor/items/$itemUid/detail/$sectionId"
 		params={{
 			itemUid: item.uid,
 			projectId,
-			sectionId: "identity",
+			sectionId,
 		}}
 		className="group min-h-0 min-w-0 justify-start gap-3 border-0 bg-transparent p-0 text-left shadow-none hover:bg-transparent"
 	>

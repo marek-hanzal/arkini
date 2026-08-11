@@ -581,10 +581,11 @@ describe("createEditorMcpOwnershipFx", () => {
 		expect(itemEstimate.content).toMatchObject([
 			{
 				text: expect.stringContaining(
-					"\nBest:\n  Status: estimated\n  Sequential runtime: 1 s",
+					"\nExpected:\n  Status: estimated\n  Sequential runtime: 1 s",
 				),
 			},
 		]);
+		expect(JSON.stringify(itemEstimate.content)).not.toContain("\nBest:");
 		expect(itemEstimate.content).toMatchObject([
 			{
 				text: expect.stringContaining(

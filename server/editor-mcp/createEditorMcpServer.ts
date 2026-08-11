@@ -225,6 +225,15 @@ const itemEstimateText = (project: EditorProject, estimate: EditorItemSimulation
 				: [
 						`  Sequential runtime: ${formatRuntime(scenario.runtimeMs)}`,
 					]),
+			"  Production blockers:",
+			...(scenario.blockers.length === 0
+				? [
+						"    - none",
+					]
+				: scenario.blockers.map(
+						(blocker) =>
+							`    - ${blocker.code}: ${itemReference(project, blocker.itemId)}; ${blocker.message}${blocker.operationId === undefined ? "" : `; operation ${blocker.operationId}`}`,
+					)),
 			`  Total item cost: ${formatEstimateNumber(scenario.totalCostQuantity)}`,
 			"  Item cost breakdown:",
 			...(scenario.cost.length === 0
@@ -635,7 +644,7 @@ export const createEditorMcpServer = (
 		"item_estimate",
 		{
 			description:
-				"Run the editor-only optimistic production planner for one item from the authored new-game start state. Returns best, expected, and guaranteed sequential scenarios including production dependencies, line and drop rules, runtime modifiers, charge spending, finite-source depletion, and authored charge renewal output. Spatial rules are satisfied optimistically; board coordinates, capacity, placement, and additional spaces are not simulated.",
+				"Run the editor-only optimistic production planner for one item from the authored new-game start state. Returns expected and guaranteed sequential scenarios including production dependencies, line and drop rules, runtime modifiers, charge spending, finite-source depletion, and authored charge renewal output. Spatial rules are satisfied optimistically; board coordinates, capacity, placement, and additional spaces are not simulated.",
 			inputSchema: z
 				.object({
 					itemId: IdSchema.describe(

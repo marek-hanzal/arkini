@@ -17,18 +17,21 @@ vi.mock("~/ui/item/editor/EditorItemDetailReference", () => ({
 	EditorItemDetailReference: ({
 		item,
 		projectId,
+		sectionId,
 	}: {
 		readonly item: {
 			readonly id: string;
 			readonly title: string;
 		};
 		readonly projectId: string;
+		readonly sectionId?: string;
 	}) =>
 		createElement(
 			"a",
 			{
 				"data-item-id": item.id,
 				"data-project-id": projectId,
+				"data-section-id": sectionId,
 			},
 			item.title,
 		),
@@ -170,7 +173,6 @@ describe("EditorItemEstimateSection", () => {
 		).toEqual([
 			"expected",
 			"guaranteed",
-			"best",
 		]);
 		expect(estimate?.textContent).toContain("Estimated total cost");
 		expect(estimate.textContent).not.toContain(
@@ -184,6 +186,9 @@ describe("EditorItemEstimateSection", () => {
 			"Expected output yield is used, then batches are rounded up to whole runs.",
 		);
 		expect(expected?.querySelector('a[data-item-id="water"]')).not.toBeNull();
+		expect(
+			expected?.querySelector('a[data-item-id="water"]')?.getAttribute("data-section-id"),
+		).toBe("estimate");
 		expect(method?.textContent).toContain("How it is calculated");
 		expect(method?.textContent).toContain(
 			"Expected output yield is used, then batches are rounded up to whole runs.",
@@ -191,6 +196,54 @@ describe("EditorItemEstimateSection", () => {
 		expect(method?.textContent).toContain(
 			"Production, line rules, drop rules, runtime modifiers, and charges are simulated.",
 		);
+	});
+
+	it("shows actionable blockers when no finite production path exists", async () => {
+		const config = createJobTestConfig();
+		const project: EditorProject = {
+			projectId: "estimate-test",
+			title: "Estimate test",
+			game: "1.0",
+			createdAtMs: 1,
+			updatedAtMs: 1,
+			revision: 0,
+			config,
+			resources: [],
+		};
+		state.estimateState = {
+			estimate: await Effect.runPromise(simulateEditorItemFx(config, "tool")),
+			status: "ready",
+		};
+		const container = document.createElement("div");
+		document.body.append(container);
+		const root = createRoot(container);
+		roots.push(root);
+		await act(async () => {
+			root.render(
+				createElement(
+					EditorProjectContext.Provider,
+					{
+						value: project,
+					},
+					createElement(EditorItemEstimateSection, {
+						itemId: "tool",
+					}),
+				),
+			);
+		});
+
+		const expected = container.querySelector('[data-scenario="expected"]');
+		expect(expected?.textContent).toContain("1 production blocker");
+		expect(expected?.textContent).toContain("Blocked");
+		expect(expected?.textContent).toContain("Missing source");
+		expect(expected?.textContent).toContain(
+			"No starting quantity, production line, merge, or temporary expiry can create this item.",
+		);
+		expect(expected?.querySelector('a[data-item-id="tool"]')).not.toBeNull();
+		expect(
+			expected?.querySelector('a[data-item-id="tool"]')?.getAttribute("data-section-id"),
+		).toBe("estimate");
+		expect(expected?.textContent).not.toContain("No consumed items.");
 	});
 
 	it("shows progress while the estimate worker is running", async () => {

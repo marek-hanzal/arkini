@@ -10,13 +10,11 @@ import { useEditorItemEstimate } from "~/ui/item/editor/useEditorItemEstimate";
 import { Status } from "~/ui/status/Status";
 
 const ScenarioTitle = {
-	best: "Best",
 	expected: "Expected",
 	guaranteed: "Guaranteed",
 } as const;
 
 const ScenarioDescription = {
-	best: "Maximum quantity ranges are used and every chance roll succeeds.",
 	expected: "Expected output yield is used, then batches are rounded up to whole runs.",
 	guaranteed: "Minimum quantities are used and non-guaranteed chance output counts as zero.",
 } as const;
@@ -24,8 +22,15 @@ const ScenarioDescription = {
 const ScenarioOrder: ReadonlyArray<EditorItemSimulationScenario> = [
 	"expected",
 	"guaranteed",
-	"best",
 ];
+
+const BlockerTitle = {
+	"dependency-cycle": "Dependency cycle",
+	"missing-source": "Missing source",
+	"operation-blocked": "Blocked operation",
+	"production-stalled": "Production stalled",
+	"run-limit": "Run limit reached",
+} as const;
 
 const formatQuantity = (quantity: number) =>
 	Number.isInteger(quantity) ? String(quantity) : quantity.toFixed(2).replace(/\.00$/, "");
@@ -56,21 +61,56 @@ const EditorItemEstimateScenarioCard = ({
 				<p className="mt-1 text-xs text-muted">
 					{scenario.status === "estimated"
 						? `${scenario.cost.length} consumed item types`
-						: "No finite production path"}
+						: `${scenario.blockers.length} production ${scenario.blockers.length === 1 ? "blocker" : "blockers"}`}
 				</p>
 			</div>
 			<div className="text-right">
 				<p className="font-semibold tabular-nums text-foreground">
-					{formatQuantity(scenario.totalCostQuantity)} items
+					{scenario.status === "estimated"
+						? `${formatQuantity(scenario.totalCostQuantity)} items`
+						: "Blocked"}
 				</p>
 				<p className="mt-1 text-xs tabular-nums text-muted">
 					{scenario.runtimeMs === undefined
-						? "Runtime unavailable"
+						? "No runtime estimate"
 						: RendererRuntime.runSync(formatItemDurationFx(scenario.runtimeMs))}
 				</p>
 			</div>
 		</header>
-		{scenario.cost.length === 0 ? (
+		{scenario.status === "no-finite-path" ? (
+			<ul className="min-h-0 flex-1 divide-y divide-line/60 overflow-y-auto pr-1">
+				{scenario.blockers.map((blocker) => {
+					const item = config.items[blocker.itemId];
+					return (
+						<li
+							className="grid gap-1.5 py-3"
+							key={`${blocker.code}:${blocker.itemId}:${blocker.operationId ?? ""}`}
+						>
+							<p className="text-xs font-semibold uppercase tracking-wide text-amber-700">
+								{BlockerTitle[blocker.code]}
+							</p>
+							{item === undefined ? (
+								<span className="text-sm font-medium text-muted">
+									{blocker.itemId} [missing]
+								</span>
+							) : (
+								<EditorItemDetailReference
+									item={item}
+									projectId={projectId}
+									sectionId="estimate"
+								/>
+							)}
+							<p className="text-xs leading-relaxed text-muted">{blocker.message}</p>
+							{blocker.operationId === undefined ? null : (
+								<code className="text-[0.6875rem] text-muted">
+									{blocker.operationId}
+								</code>
+							)}
+						</li>
+					);
+				})}
+			</ul>
+		) : scenario.cost.length === 0 ? (
 			<p className="py-4 text-sm text-muted">No consumed items.</p>
 		) : (
 			<ul className="min-h-0 flex-1 divide-y divide-line/60 overflow-y-auto pr-1">
@@ -92,6 +132,7 @@ const EditorItemEstimateScenarioCard = ({
 								<EditorItemDetailReference
 									item={item}
 									projectId={projectId}
+									sectionId="estimate"
 								/>
 							)}
 							<strong className="shrink-0 tabular-nums text-foreground">
@@ -107,7 +148,7 @@ const EditorItemEstimateScenarioCard = ({
 
 const EditorItemEstimateMethodCard = () => (
 	<article
-		className="min-w-0 rounded-lg border border-l-2 border-line border-l-sky-600 bg-surface-raised p-4"
+		className="col-span-2 min-w-0 rounded-lg border border-l-2 border-line border-l-sky-600 bg-surface-raised p-4 max-[64rem]:col-span-1"
 		data-ui="EditorItemEstimateMethod"
 	>
 		<header className="flex items-start gap-3 border-b border-line/70 pb-3">

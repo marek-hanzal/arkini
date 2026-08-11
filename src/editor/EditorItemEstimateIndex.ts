@@ -1,5 +1,4 @@
 export interface EditorItemEstimateIndexEntry {
-	readonly bestRuntimeMs?: number;
 	readonly expectedRuntimeMs?: number;
 	readonly guaranteedRuntimeMs?: number;
 	readonly itemId: string;

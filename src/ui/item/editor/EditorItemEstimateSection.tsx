@@ -40,7 +40,7 @@ const EditorItemEstimateScenarioCard = ({
 	readonly scenario: EditorItemSimulationScenarioResult;
 }) => (
 	<article
-		className={`min-w-0 rounded-lg border border-l-2 bg-surface-raised p-4 ${
+		className={`flex min-h-0 min-w-0 flex-col rounded-lg border border-l-2 bg-surface-raised p-4 ${
 			scenario.scenario === "expected"
 				? "border-violet-300 border-l-violet-600"
 				: "border-line border-l-line-strong"
@@ -73,7 +73,7 @@ const EditorItemEstimateScenarioCard = ({
 		{scenario.cost.length === 0 ? (
 			<p className="py-4 text-sm text-muted">No consumed items.</p>
 		) : (
-			<ul className="max-h-72 divide-y divide-line/60 overflow-y-auto pr-1">
+			<ul className="min-h-0 flex-1 divide-y divide-line/60 overflow-y-auto pr-1">
 				{scenario.cost.map(({ itemId, quantity }) => {
 					const item = config.items[itemId];
 					return (

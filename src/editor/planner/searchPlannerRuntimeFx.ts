@@ -11,6 +11,7 @@ import {
 import type { PlannerSearchScope } from "~/editor/planner/PlannerSearchScope";
 import { createPlannerRuntimeDominanceIndex } from "~/editor/planner/createPlannerRuntimeDominanceIndex";
 import { isPlannerRuntimeQuiescent } from "~/editor/planner/isPlannerRuntimeQuiescent";
+import { readPlannerActionItemFlowFx } from "~/editor/planner/readPlannerActionItemFlowFx";
 import { readPlannerRuntimeQuantity } from "~/editor/planner/readPlannerRuntimeQuantity";
 import {
 	comparePlannerSearchPriority,
@@ -355,12 +356,17 @@ export const searchPlannerRuntimeFx = Effect.fn("searchPlannerRuntimeFx")(functi
 				(outputWitnessResolved
 					? candidate.outputWitness.statistics.maximumQuantityProbability
 					: 1);
+			const itemFlow = yield* readPlannerActionItemFlowFx({
+				after: result.runtime,
+				before: node.runtime,
+			});
 			const nextTrace: ReadonlyArray<PlannerSearchTraceEntry> = [
 				...node.trace,
 				{
 					action: candidate.action,
 					actionId: candidate.actionId,
 					actor: result.actor,
+					consumedItemQuantities: itemFlow.consumedItemQuantities,
 					elapsedMs: result.elapsedMs,
 					events: result.events,
 					outputResolution: outputWitnessResolved
@@ -375,6 +381,7 @@ export const searchPlannerRuntimeFx = Effect.fn("searchPlannerRuntimeFx")(functi
 								type: "canonical" as const,
 							},
 					outputItemIds: candidate.outputItemIds,
+					producedItemQuantities: itemFlow.producedItemQuantities,
 					routeIds: candidate.routeIds,
 				},
 			];

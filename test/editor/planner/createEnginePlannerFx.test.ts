@@ -564,6 +564,41 @@ describe("createEnginePlannerFx", () => {
 				ownerItemId: "assembler",
 			},
 		]);
+		expect(
+			result.trace.map(({ consumedItemQuantities, producedItemQuantities }) => ({
+				consumedItemQuantities,
+				producedItemQuantities,
+			})),
+		).toEqual([
+			{
+				consumedItemQuantities: [
+					{
+						itemId: "raw",
+						quantity: 1,
+					},
+				],
+				producedItemQuantities: [
+					{
+						itemId: "ingot",
+						quantity: 1,
+					},
+				],
+			},
+			{
+				consumedItemQuantities: [
+					{
+						itemId: "ingot",
+						quantity: 1,
+					},
+				],
+				producedItemQuantities: [
+					{
+						itemId: "target",
+						quantity: 1,
+					},
+				],
+			},
+		]);
 		expect(result.trace.flatMap(({ events }) => events.map(({ type }) => type))).toEqual(
 			expect.arrayContaining([
 				GameEventEnumSchema.enum.ItemConsumed,
@@ -675,6 +710,16 @@ describe("createEnginePlannerFx", () => {
 			outputItemId: "charge-target",
 			type: "existential",
 		});
+		expect(result.trace.map(({ consumedItemQuantities }) => consumedItemQuantities)).toEqual([
+			[],
+			[],
+			[
+				{
+					itemId: "charge-deposit",
+					quantity: 1,
+				},
+			],
+		]);
 		const eventTypes = result.trace.flatMap(({ events }) => events.map(({ type }) => type));
 		expect(
 			eventTypes.filter((type) => type === GameEventEnumSchema.enum.ItemChargeSpent),
@@ -710,6 +755,20 @@ describe("createEnginePlannerFx", () => {
 				ownerItemId: "temporary-assembler",
 			},
 		]);
+		expect(result.trace[1]).toMatchObject({
+			consumedItemQuantities: [
+				{
+					itemId: "temporary-token",
+					quantity: 1,
+				},
+			],
+			producedItemQuantities: [
+				{
+					itemId: "temporary-shell",
+					quantity: 1,
+				},
+			],
+		});
 		expect(result.runtime.items.some(({ item }) => item.id === "temporary-token")).toBe(false);
 		expect(result.runtime.items.some(({ item }) => item.id === "temporary-target")).toBe(true);
 	});

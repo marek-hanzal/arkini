@@ -14,6 +14,11 @@ import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
 export type PlannerSearchOutputCertainty = "deterministic" | "possible";
 
+export interface PlannerSearchItemQuantity {
+	readonly itemId: IdSchema.Type;
+	readonly quantity: number;
+}
+
 export interface PlannerSearchBudget {
 	readonly maximumExpandedStates: number;
 	readonly maximumQueuedStates: number;
@@ -30,6 +35,7 @@ export interface PlannerSearchTraceEntry {
 	readonly action: PlannerAction;
 	readonly actionId: string;
 	readonly actor: PlannerActionActor;
+	readonly consumedItemQuantities: ReadonlyArray<PlannerSearchItemQuantity>;
 	readonly elapsedMs: number;
 	readonly events: ReadonlyArray<GameEventSchema.Type>;
 	readonly outputResolution:
@@ -44,6 +50,7 @@ export interface PlannerSearchTraceEntry {
 				readonly witnessId: string;
 		  };
 	readonly outputItemIds: ReadonlyArray<IdSchema.Type>;
+	readonly producedItemQuantities: ReadonlyArray<PlannerSearchItemQuantity>;
 	readonly routeIds: ReadonlyArray<string>;
 }
 

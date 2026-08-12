@@ -63,6 +63,17 @@ const chanceOutput = (itemId: string) => ({
 	],
 });
 
+const mixedOutput = () => ({
+	set: [
+		{
+			roll: [
+				...guaranteedOutput("mixed-target").set[0].roll,
+				...chanceOutput("mixed-bonus").set[0].roll,
+			],
+		},
+	],
+});
+
 const line = ({
 	id,
 	inputItemId,
@@ -70,7 +81,7 @@ const line = ({
 }: {
 	readonly id: string;
 	readonly inputItemId?: string;
-	readonly output: ReturnType<typeof guaranteedOutput> | ReturnType<typeof chanceOutput>;
+	readonly output: Record<string, unknown>;
 }) => ({
 	description: id,
 	id,
@@ -132,6 +143,7 @@ const config = GameConfigSchema.parse({
 			"source-b",
 			"target-producer",
 			"random-producer",
+			"mixed-producer",
 			"charged-producer",
 			"temporary-token",
 			"merge-target",
@@ -199,6 +211,20 @@ const config = GameConfigSchema.parse({
 		]),
 		"random-target": {
 			...baseItem("random-target"),
+			type: "simple",
+		},
+		"mixed-producer": producer("mixed-producer", [
+			line({
+				id: "line:mixed",
+				output: mixedOutput(),
+			}),
+		]),
+		"mixed-target": {
+			...baseItem("mixed-target"),
+			type: "simple",
+		},
+		"mixed-bonus": {
+			...baseItem("mixed-bonus"),
 			type: "simple",
 		},
 		"charged-producer": {
@@ -320,6 +346,22 @@ describe("readPlannerSearchScope", () => {
 			"target-producer",
 		]);
 		expect(scope.unsupportedRoutes).toEqual([]);
+	});
+
+	it("rejects an entire action when a sibling output is stochastic", () => {
+		const scope = readPlannerSearchScope({
+			graph,
+			targetItemId: "mixed-target",
+		});
+
+		expect(scope.supported).toBe(false);
+		expect(scope.actions).toEqual([]);
+		expect(scope.unsupportedRoutes).toEqual([
+			expect.objectContaining({
+				outputItemId: "mixed-target",
+				reason: "stochastic-output",
+			}),
+		]);
 	});
 
 	it("keeps deterministic merge transitions inside the supported slice", () => {

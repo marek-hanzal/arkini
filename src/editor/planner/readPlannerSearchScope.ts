@@ -16,8 +16,9 @@ const compareIds = (left: string, right: string) => left.localeCompare(right);
 
 const readUnsupportedReason = (
 	route: PlannerAcquisitionRoute,
+	stochasticActionIds: ReadonlySet<string>,
 ): PlannerSearchUnsupportedRouteReason | undefined => {
-	if (route.output.stochastic) return "stochastic-output";
+	if (stochasticActionIds.has(readPlannerActionId(route.action))) return "stochastic-output";
 	if (route.kind === "line-charge-depletion") return "charge-depletion";
 	if (route.kind === "temporary-expiry") return "temporary-expiry";
 	return undefined;
@@ -126,8 +127,13 @@ export const readPlannerSearchScope = ({
 	readonly graph: PlannerAcquisitionGraph;
 	readonly targetItemId: IdSchema.Type;
 }): PlannerSearchScope => {
+	const stochasticActionIds = new Set(
+		graph.routes
+			.filter((route) => route.output.stochastic)
+			.map((route) => readPlannerActionId(route.action)),
+	);
 	const supportedRoutes = graph.routes.filter(
-		(route) => readUnsupportedReason(route) === undefined,
+		(route) => readUnsupportedReason(route, stochasticActionIds) === undefined,
 	);
 	const supportedReachability = resolvePlannerRouteReachability({
 		rootItemIds: graph.rootItemIds,
@@ -153,7 +159,7 @@ export const readPlannerSearchScope = ({
 	});
 	const unsupportedRoutes: PlannerSearchUnsupportedRoute[] = fullClosure.routes.flatMap(
 		(route) => {
-			const reason = readUnsupportedReason(route);
+			const reason = readUnsupportedReason(route, stochasticActionIds);
 			return reason === undefined
 				? []
 				: [

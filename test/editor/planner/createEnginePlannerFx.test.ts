@@ -220,7 +220,10 @@ const boardItemIds = [
 	"parallel-assembler",
 	"charge-worker",
 	"charge-deposit",
+	"charge-fuel-producer",
+	"charged-producer",
 	"temporary-token",
+	"random-temporary-token",
 	"temporary-inspector",
 	"temporary-assembler",
 	"merge-target",
@@ -382,6 +385,34 @@ const config = GameConfigSchema.parse({
 			type: "deposit",
 		},
 		"charge-target": simpleItem("charge-target"),
+		"charge-fuel-producer": producerItem({
+			id: "charge-fuel-producer",
+			output: guaranteedOutput("charge-fuel"),
+			runtimeMs: 10,
+		}),
+		"charge-fuel": simpleItem("charge-fuel"),
+		"charged-producer": {
+			...producerItem({
+				additionalInputs: [
+					{
+						...materialInput("charge-fuel"),
+						charges: {
+							cost: 1,
+							from: "self",
+						},
+					},
+				],
+				id: "charged-producer",
+				output: guaranteedOutput("charged-side-output"),
+				runtimeMs: 40,
+			}),
+			charges: {
+				amount: 3,
+				output: guaranteedOutput("depleted-target"),
+			},
+		},
+		"charged-side-output": simpleItem("charged-side-output"),
+		"depleted-target": simpleItem("depleted-target"),
 		"temporary-token": {
 			...baseItem({
 				id: "temporary-token",
@@ -393,6 +424,17 @@ const config = GameConfigSchema.parse({
 			type: "temporary",
 		},
 		"temporary-shell": simpleItem("temporary-shell"),
+		"random-temporary-token": {
+			...baseItem({
+				id: "random-temporary-token",
+				maxStackSize: 1,
+				scope: "board",
+			}),
+			durationMs: 500,
+			output: chanceOutput("random-temporary-target"),
+			type: "temporary",
+		},
+		"random-temporary-target": simpleItem("random-temporary-target"),
 		"temporary-inspector": producerItem({
 			id: "temporary-inspector",
 			output: guaranteedOutput("temporary-proof"),
@@ -621,6 +663,77 @@ describe("createEnginePlannerFx", () => {
 		expect(result.runtime.items.some(({ item }) => item.id === "temporary-target")).toBe(true);
 	});
 
+	it("resolves a stochastic temporary expiry as a possible witness", () => {
+		const result = Effect.runSync(makePlanner().searchFx("random-temporary-target"));
+
+		expect(result.type).toBe("completed");
+		if (result.type !== "completed") return;
+		expect(result.elapsedMs).toBe(500);
+		expect(result.outputCertainty).toBe("possible");
+		expect(result.trace).toHaveLength(1);
+		expect(result.trace[0]).toMatchObject({
+			action: {
+				itemId: "random-temporary-token",
+				kind: "temporary-expiry",
+			},
+			outputResolution: {
+				outputItemId: "random-temporary-target",
+				type: "existential",
+			},
+		});
+		expect(result.runtime.items.some(({ item }) => item.id === "random-temporary-token")).toBe(
+			false,
+		);
+		expect(result.runtime.items.some(({ item }) => item.id === "random-temporary-target")).toBe(
+			true,
+		);
+	});
+
+	it("replenishes consumed fuel while progressing a charged owner toward depletion", () => {
+		const result = Effect.runSync(makePlanner().searchFx("depleted-target"));
+
+		expect(result.type).toBe("completed");
+		if (result.type !== "completed") return;
+		expect(result.elapsedMs).toBe(150);
+		expect(result.outputCertainty).toBe("deterministic");
+		expect(result.trace.map(({ action }) => action)).toEqual(
+			Array.from(
+				{
+					length: 3,
+				},
+				() => [
+					{
+						kind: "line" as const,
+						lineId: "line:charge-fuel-producer:run",
+						ownerItemId: "charge-fuel-producer",
+					},
+					{
+						kind: "line" as const,
+						lineId: "line:charged-producer:run",
+						ownerItemId: "charged-producer",
+					},
+				],
+			).flat(),
+		);
+		const eventTypes = result.trace.flatMap(({ events }) => events.map(({ type }) => type));
+		expect(
+			eventTypes.filter((type) => type === GameEventEnumSchema.enum.ItemChargeSpent),
+		).toHaveLength(2);
+		expect(
+			eventTypes.filter((type) => type === GameEventEnumSchema.enum.ItemDepleted),
+		).toHaveLength(1);
+		expect(result.runtime.items.some(({ item }) => item.id === "charged-producer")).toBe(false);
+		expect(result.runtime.items.some(({ item }) => item.id === "charge-fuel")).toBe(false);
+		expect(
+			result.runtime.items.reduce(
+				(total, item) =>
+					total + (item.item.id === "charged-side-output" ? item.quantity : 0),
+				0,
+			),
+		).toBe(3);
+		expect(result.runtime.items.some(({ item }) => item.id === "depleted-target")).toBe(true);
+	});
+
 	it("returns an already-owned start target without running an action", () => {
 		const result = Effect.runSync(makePlanner().searchFx("start-target"));
 
@@ -793,6 +906,38 @@ describe("createEnginePlannerFx", () => {
 				},
 			],
 		});
+	});
+
+	it("depletes an official tree through eighteen real lumberjack jobs", async () => {
+		const official = await readArkiniGameConfigSource();
+		const planner = Effect.runSync(createEnginePlannerFx(official));
+		const result = await Effect.runPromise(
+			planner.searchFx("item:seed", 1, {
+				maximumExpandedStates: 32,
+				maximumQueuedStates: 64,
+				maximumTraceLength: 24,
+			}),
+		);
+
+		expect(result.type).toBe("completed");
+		if (result.type !== "completed") return;
+		expect(result.elapsedMs).toBe(126_000);
+		expect(result.outputCertainty).toBe("deterministic");
+		expect(result.trace).toHaveLength(18);
+		expect(
+			result.trace.every(
+				({ action }) =>
+					action.kind === "line" &&
+					action.lineId === "line:lumberjack-t1:log" &&
+					action.ownerItemId === "producer:lumberjack-t1",
+			),
+		).toBe(true);
+		expect(
+			result.trace
+				.flatMap(({ events }) => events)
+				.filter(({ type }) => type === GameEventEnumSchema.enum.ItemDepleted),
+		).toHaveLength(1);
+		expect(result.runtime.items.some(({ item }) => item.id === "item:seed")).toBe(true);
 	});
 
 	it("prioritizes active official demands through the well chain", async () => {

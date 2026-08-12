@@ -49,6 +49,30 @@ const compareRequirements = (
 		(depthByItemId.get(right.itemId) ?? Number.POSITIVE_INFINITY) ||
 	compareIds(left.itemId, right.itemId);
 
+const readChargeDepletionProgress = ({
+	route,
+	runtime,
+}: {
+	readonly route: Extract<
+		PlannerAcquisitionRoute,
+		{
+			readonly kind: "line-charge-depletion";
+		}
+	>;
+	readonly runtime: RuntimeSchema.Type;
+}) => {
+	let progress = 0;
+	for (const item of runtime.items) {
+		if (item.item.id !== route.chargedItemId) continue;
+		const amount = item.item.charges?.amount;
+		if (amount === undefined) continue;
+		const remaining = item.remainingCharges ?? amount;
+		const spentRatio = Math.min(1, Math.max(0, (amount - remaining) / amount));
+		progress = Math.max(progress, spentRatio);
+	}
+	return progress;
+};
+
 const readClauseRequirement = ({
 	clause,
 	depthByItemId,
@@ -137,7 +161,14 @@ const readActiveDemand = ({
 			0,
 			goal.quantity - readPlannerRuntimeQuantity(runtime, goal.itemId),
 		);
-		const runCount = Math.max(1, Math.ceil(missingQuantity / route.output.maximumQuantity));
+		const outputRunCount = Math.max(
+			1,
+			Math.ceil(missingQuantity / route.output.maximumQuantity),
+		);
+		const runCount =
+			route.kind === "line-charge-depletion"
+				? outputRunCount * route.minimumRunsLowerBound
+				: outputRunCount;
 		const requirementDemandByItemId = new Map<IdSchema.Type, RequirementDemand>();
 		for (const requirement of route.requirements.allOf)
 			addRequirementDemand(requirementDemandByItemId, requirement, runCount);
@@ -163,7 +194,12 @@ const readActiveDemand = ({
 	return demandByItemId;
 };
 
-/** Reads lexicographic progress toward the preferred witness plus a broad scope tie-breaker. */
+/**
+ * Reads lexicographic progress toward the preferred witness plus a broad scope tie-breaker.
+ *
+ * Partial charge spend counts as progress toward a depletion output. Without it, a shallower fuel
+ * producer could outrank the real spender forever once enough consumables already exist.
+ */
 export const readPlannerSearchPriority = ({
 	itemId,
 	plan,
@@ -185,8 +221,23 @@ export const readPlannerSearchPriority = ({
 		runtime,
 	})) {
 		if (demand <= 0) continue;
-		const progress =
-			Math.min(readPlannerRuntimeQuantity(runtime, candidateItemId), demand) / demand;
+		const availableQuantity = Math.min(
+			readPlannerRuntimeQuantity(runtime, candidateItemId),
+			demand,
+		);
+		const route = plan.witnessRouteByItemId.get(candidateItemId);
+		const lifecycleQuantity =
+			availableQuantity < demand && route?.kind === "line-charge-depletion"
+				? Math.min(
+						demand - availableQuantity,
+						route.output.maximumQuantity *
+							readChargeDepletionProgress({
+								route,
+								runtime,
+							}),
+					)
+				: 0;
+		const progress = (availableQuantity + lifecycleQuantity) / demand;
 		const depth = plan.depthByItemId.get(candidateItemId) ?? 0;
 		preferredProgressByDepth[depth] = (preferredProgressByDepth[depth] ?? 0) + progress;
 	}

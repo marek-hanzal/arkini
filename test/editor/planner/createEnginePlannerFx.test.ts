@@ -213,6 +213,9 @@ const boardItemIds = [
 	"random-producer",
 	"mixed-producer",
 	"weighted-producer",
+	"parallel-producer-a",
+	"parallel-producer-b",
+	"parallel-assembler",
 	"merge-target",
 	"start-target",
 ];
@@ -306,6 +309,24 @@ const config = GameConfigSchema.parse({
 		"weighted-target": simpleItem("weighted-target"),
 		"weighted-companion": simpleItem("weighted-companion"),
 		"weighted-decoy": simpleItem("weighted-decoy"),
+		"parallel-producer-a": producerItem({
+			id: "parallel-producer-a",
+			output: guaranteedOutput("parallel-part"),
+			runtimeMs: 10,
+		}),
+		"parallel-producer-b": producerItem({
+			id: "parallel-producer-b",
+			output: guaranteedOutput("parallel-part"),
+			runtimeMs: 10,
+		}),
+		"parallel-part": simpleItem("parallel-part"),
+		"parallel-assembler": producerItem({
+			id: "parallel-assembler",
+			inputItemId: "parallel-part",
+			output: guaranteedOutput("parallel-target"),
+			runtimeMs: 20,
+		}),
+		"parallel-target": simpleItem("parallel-target"),
 		orphan: simpleItem("orphan"),
 		"merge-source": {
 			...simpleItem("merge-source"),
@@ -410,6 +431,27 @@ describe("createEnginePlannerFx", () => {
 		expect(result.runtime.items.some(({ item }) => item.id === "merge-result")).toBe(true);
 		expect(result.runtime.items.some(({ item }) => item.id === "merge-source")).toBe(false);
 		expect(result.runtime.items.some(({ item }) => item.id === "merge-target")).toBe(false);
+	});
+
+	it("collapses branches whose engine runtime differs only by generated identities", () => {
+		const result = Effect.runSync(makePlanner().searchFx("parallel-target"));
+
+		expect(result.type).toBe("completed");
+		if (result.type !== "completed") return;
+		expect(result.expandedStates).toBe(2);
+		expect(result.visitedStates).toBe(4);
+		expect(result.trace.map(({ action }) => action)).toEqual([
+			{
+				kind: "line",
+				lineId: "line:parallel-producer-a:run",
+				ownerItemId: "parallel-producer-a",
+			},
+			{
+				kind: "line",
+				lineId: "line:parallel-assembler:run",
+				ownerItemId: "parallel-assembler",
+			},
+		]);
 	});
 
 	it("returns an already-owned start target without running an action", () => {

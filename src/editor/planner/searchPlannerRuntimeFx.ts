@@ -4,12 +4,13 @@ import {
 	DefaultPlannerSearchBudget,
 	type PlannerSearchBudget,
 	type PlannerSearchBudgetLimit,
+	type PlannerSearchOutputCertainty,
 	type PlannerSearchResult,
 	type PlannerSearchTraceEntry,
 } from "~/editor/planner/PlannerSearch";
 import type { PlannerSearchScope } from "~/editor/planner/PlannerSearchScope";
+import { createPlannerRuntimeDominanceIndex } from "~/editor/planner/createPlannerRuntimeDominanceIndex";
 import { isPlannerRuntimeQuiescent } from "~/editor/planner/isPlannerRuntimeQuiescent";
-import { readPlannerRuntimeFingerprint } from "~/editor/planner/readPlannerRuntimeFingerprint";
 import { readPlannerRuntimeQuantity } from "~/editor/planner/readPlannerRuntimeQuantity";
 import {
 	comparePlannerSearchPriority,
@@ -36,9 +37,12 @@ export namespace searchPlannerRuntimeFx {
 
 interface SearchNode {
 	readonly elapsedMs: number;
+	readonly fingerprint: string;
 	readonly order: number;
+	readonly outputCertainty: PlannerSearchOutputCertainty;
 	readonly priority: PlannerSearchPriority;
 	readonly runtime: RuntimeSchema.Type;
+	readonly stateToken: number;
 	readonly trace: ReadonlyArray<PlannerSearchTraceEntry>;
 }
 
@@ -67,16 +71,22 @@ const readBudget = (budget: Partial<PlannerSearchBudget> | undefined): PlannerSe
 const readAvailableQuantity = (node: SearchNode, itemId: IdSchema.Type) =>
 	readPlannerRuntimeQuantity(node.runtime, itemId);
 
+const readOutputCertaintyRank = (certainty: PlannerSearchOutputCertainty) =>
+	certainty === "deterministic" ? 0 : 1;
+
 const compareSearchNodes = (left: SearchNode, right: SearchNode) =>
 	comparePlannerSearchPriority(left.priority, right.priority) ||
+	readOutputCertaintyRank(left.outputCertainty) -
+		readOutputCertaintyRank(right.outputCertainty) ||
 	left.trace.length - right.trace.length ||
 	left.elapsedMs - right.elapsedMs ||
 	left.order - right.order;
 
-const readOutputCertainty = (trace: ReadonlyArray<PlannerSearchTraceEntry>) =>
-	trace.some(({ outputResolution }) => outputResolution.type === "existential")
-		? ("possible" as const)
-		: ("deterministic" as const);
+const readNextOutputCertainty = (
+	current: PlannerSearchOutputCertainty,
+	outputMode: PlannerSearchScope["actions"][number]["outputMode"],
+): PlannerSearchOutputCertainty =>
+	current === "possible" || outputMode === "existential" ? "possible" : "deterministic";
 
 const readRelevantPresence = (node: SearchNode, scope: PlannerSearchScope) =>
 	scope.itemIds.reduce(
@@ -101,10 +111,19 @@ const isBetterNode = ({
 	const candidatePresence = readRelevantPresence(candidate, scope);
 	const currentPresence = readRelevantPresence(current, scope);
 	if (candidatePresence !== currentPresence) return candidatePresence > currentPresence;
+	const certaintyDifference =
+		readOutputCertaintyRank(candidate.outputCertainty) -
+		readOutputCertaintyRank(current.outputCertainty);
+	if (certaintyDifference !== 0) return certaintyDifference < 0;
 	if (candidate.trace.length !== current.trace.length)
 		return candidate.trace.length < current.trace.length;
 	return candidate.elapsedMs < current.elapsedMs;
 };
+
+const removeDominatedQueueNodes = (
+	queue: SearchNode[],
+	index: ReturnType<typeof createPlannerRuntimeDominanceIndex>,
+) => queue.filter((node) => index.isActive(node.fingerprint, node.stateToken));
 
 const readInconclusive = ({
 	best,
@@ -188,9 +207,22 @@ export const searchPlannerRuntimeFx = Effect.fn("searchPlannerRuntimeFx")(functi
 		graph,
 		scope,
 	});
+	const dominanceIndex = createPlannerRuntimeDominanceIndex();
+	const initialRegistration = dominanceIndex.register({
+		label: {
+			elapsedMs: 0,
+			outputCertainty: "deterministic",
+			traceLength: 0,
+		},
+		runtime,
+	});
+	if (!initialRegistration.accepted)
+		return yield* Effect.die(new Error("Planner rejected its initial runtime state."));
 	const initial: SearchNode = {
 		elapsedMs: 0,
+		fingerprint: initialRegistration.fingerprint,
 		order: 0,
+		outputCertainty: "deterministic",
 		priority: readPlannerSearchPriority({
 			itemId,
 			plan: priorityPlan,
@@ -199,6 +231,7 @@ export const searchPlannerRuntimeFx = Effect.fn("searchPlannerRuntimeFx")(functi
 			scope,
 		}),
 		runtime,
+		stateToken: initialRegistration.token,
 		trace: [],
 	};
 	if (!isPlannerRuntimeQuiescent(runtime))
@@ -259,10 +292,7 @@ export const searchPlannerRuntimeFx = Effect.fn("searchPlannerRuntimeFx")(functi
 	const budget = readBudget(budgetOverride);
 	const blockedActionIds = new Set<string>();
 	const unsupportedActionIds = new Set<string>();
-	const visitedRuntimeKeys = new Set<string>([
-		readPlannerRuntimeFingerprint(runtime),
-	]);
-	const queue: SearchNode[] = [
+	let queue: SearchNode[] = [
 		initial,
 	];
 	let expandedStates = 0;
@@ -271,6 +301,8 @@ export const searchPlannerRuntimeFx = Effect.fn("searchPlannerRuntimeFx")(functi
 	let traceBudgetReached = false;
 
 	while (queue.length > 0) {
+		queue = removeDominatedQueueNodes(queue, dominanceIndex);
+		if (queue.length === 0) break;
 		if (expandedStates >= budget.maximumExpandedStates)
 			return readInconclusive({
 				best,
@@ -283,7 +315,7 @@ export const searchPlannerRuntimeFx = Effect.fn("searchPlannerRuntimeFx")(functi
 				reason: "search-budget",
 				scope,
 				unsupportedActionIds,
-				visitedStates: visitedRuntimeKeys.size,
+				visitedStates: dominanceIndex.readFingerprintCount(),
 			});
 
 		queue.sort(compareSearchNodes);
@@ -310,9 +342,48 @@ export const searchPlannerRuntimeFx = Effect.fn("searchPlannerRuntimeFx")(functi
 				continue;
 			}
 
+			const nextTrace: ReadonlyArray<PlannerSearchTraceEntry> = [
+				...node.trace,
+				{
+					action: candidate.action,
+					actionId: candidate.actionId,
+					actor: result.actor,
+					elapsedMs: result.elapsedMs,
+					events: result.events,
+					outputResolution:
+						candidate.outputMode === "canonical"
+							? {
+									type: "canonical" as const,
+								}
+							: {
+									outputItemId: candidate.outputWitness.outputItemId,
+									routeId: candidate.outputWitness.routeId,
+									type: "existential" as const,
+									witnessId: candidate.outputWitness.witnessId,
+								},
+					outputItemIds: candidate.outputItemIds,
+					routeIds: candidate.routeIds,
+				},
+			];
+			const nextElapsedMs = node.elapsedMs + result.elapsedMs;
+			const nextOutputCertainty = readNextOutputCertainty(
+				node.outputCertainty,
+				candidate.outputMode,
+			);
+			const registration = dominanceIndex.register({
+				label: {
+					elapsedMs: nextElapsedMs,
+					outputCertainty: nextOutputCertainty,
+					traceLength: nextTrace.length,
+				},
+				runtime: result.runtime,
+			});
+			if (!registration.accepted) continue;
 			const next: SearchNode = {
-				elapsedMs: node.elapsedMs + result.elapsedMs,
+				elapsedMs: nextElapsedMs,
+				fingerprint: registration.fingerprint,
 				order: nextOrder,
+				outputCertainty: nextOutputCertainty,
 				priority: readPlannerSearchPriority({
 					itemId,
 					plan: priorityPlan,
@@ -321,29 +392,8 @@ export const searchPlannerRuntimeFx = Effect.fn("searchPlannerRuntimeFx")(functi
 					scope,
 				}),
 				runtime: result.runtime,
-				trace: [
-					...node.trace,
-					{
-						action: candidate.action,
-						actionId: candidate.actionId,
-						actor: result.actor,
-						elapsedMs: result.elapsedMs,
-						events: result.events,
-						outputResolution:
-							candidate.outputMode === "canonical"
-								? {
-										type: "canonical" as const,
-									}
-								: {
-										outputItemId: candidate.outputWitness.outputItemId,
-										routeId: candidate.outputWitness.routeId,
-										type: "existential" as const,
-										witnessId: candidate.outputWitness.witnessId,
-									},
-						outputItemIds: candidate.outputItemIds,
-						routeIds: candidate.routeIds,
-					},
-				],
+				stateToken: registration.token,
+				trace: nextTrace,
 			};
 			nextOrder += 1;
 			if (
@@ -366,11 +416,9 @@ export const searchPlannerRuntimeFx = Effect.fn("searchPlannerRuntimeFx")(functi
 					reason: "non-quiescent-runtime",
 					scope,
 					unsupportedActionIds,
-					visitedStates: visitedRuntimeKeys.size,
+					visitedStates: dominanceIndex.readFingerprintCount(),
 				});
 
-			const runtimeKey = readPlannerRuntimeFingerprint(next.runtime);
-			const runtimeVisited = visitedRuntimeKeys.has(runtimeKey);
 			const availableQuantity = readAvailableQuantity(next, itemId);
 			if (availableQuantity >= quantity)
 				return {
@@ -378,20 +426,19 @@ export const searchPlannerRuntimeFx = Effect.fn("searchPlannerRuntimeFx")(functi
 					elapsedMs: next.elapsedMs,
 					expandedStates,
 					itemId,
-					outputCertainty: readOutputCertainty(next.trace),
+					outputCertainty: next.outputCertainty,
 					quantity,
 					runtime: next.runtime,
 					trace: next.trace,
 					type: "completed",
-					visitedStates: visitedRuntimeKeys.size + Number(!runtimeVisited),
+					visitedStates: dominanceIndex.readFingerprintCount(),
 				} satisfies PlannerSearchResult;
 
-			if (runtimeVisited) continue;
-			visitedRuntimeKeys.add(runtimeKey);
 			if (next.trace.length >= budget.maximumTraceLength) {
 				traceBudgetReached = true;
 				continue;
 			}
+			queue = removeDominatedQueueNodes(queue, dominanceIndex);
 			if (queue.length >= budget.maximumQueuedStates)
 				return readInconclusive({
 					best,
@@ -404,7 +451,7 @@ export const searchPlannerRuntimeFx = Effect.fn("searchPlannerRuntimeFx")(functi
 					reason: "search-budget",
 					scope,
 					unsupportedActionIds,
-					visitedStates: visitedRuntimeKeys.size,
+					visitedStates: dominanceIndex.readFingerprintCount(),
 				});
 			queue.push(next);
 		}
@@ -431,6 +478,6 @@ export const searchPlannerRuntimeFx = Effect.fn("searchPlannerRuntimeFx")(functi
 					: "search-exhausted",
 		scope,
 		unsupportedActionIds,
-		visitedStates: visitedRuntimeKeys.size,
+		visitedStates: dominanceIndex.readFingerprintCount(),
 	});
 });

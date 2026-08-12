@@ -9,6 +9,8 @@ import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
+export type PlannerSearchOutputCertainty = "deterministic" | "possible";
+
 export interface PlannerSearchBudget {
 	readonly maximumExpandedStates: number;
 	readonly maximumQueuedStates: number;
@@ -49,7 +51,7 @@ export type PlannerSearchResult =
 			readonly elapsedMs: number;
 			readonly expandedStates: number;
 			readonly itemId: IdSchema.Type;
-			readonly outputCertainty: "deterministic" | "possible";
+			readonly outputCertainty: PlannerSearchOutputCertainty;
 			readonly quantity: number;
 			readonly runtime: RuntimeSchema.Type;
 			readonly trace: ReadonlyArray<PlannerSearchTraceEntry>;

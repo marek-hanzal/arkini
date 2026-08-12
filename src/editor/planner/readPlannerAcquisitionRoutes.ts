@@ -1,5 +1,6 @@
 import type {
 	PlannerAcquisitionOutput,
+	PlannerAcquisitionQuantityDistribution,
 	PlannerAcquisitionRequirement,
 	PlannerAcquisitionRequirements,
 	PlannerAcquisitionRoute,
@@ -95,6 +96,124 @@ const combineRequirements = (
 		allOf: requirements.flatMap(({ allOf }) => allOf),
 		anyOf: requirements.flatMap(({ anyOf }) => anyOf),
 	});
+
+const probabilityEpsilon = 1e-12;
+
+const normalizeQuantityDistribution = (
+	quantityProbability: ReadonlyMap<number, number>,
+): PlannerAcquisitionQuantityDistribution => {
+	const entries = [
+		...quantityProbability,
+	]
+		.filter(([, probability]) => probability > probabilityEpsilon)
+		.sort(([left], [right]) => left - right);
+	const total = entries.reduce((sum, [, probability]) => sum + probability, 0);
+	if (!(total > 0))
+		throw new RangeError("Planner quantity distribution has no probability mass.");
+	return entries.map(([quantity, probability]) => ({
+		probability: probability / total,
+		quantity,
+	}));
+};
+
+const makeConstantQuantityDistribution = (
+	quantity: number,
+): PlannerAcquisitionQuantityDistribution => [
+	{
+		probability: 1,
+		quantity,
+	},
+];
+
+const makeUniformQuantityDistribution = ({
+	max,
+	min,
+}: DropSchema.Type["quantity"]): PlannerAcquisitionQuantityDistribution => {
+	const probability = 1 / (max - min + 1);
+	return Array.from(
+		{
+			length: max - min + 1,
+		},
+		(_, index) => ({
+			probability,
+			quantity: min + index,
+		}),
+	);
+};
+
+const mixQuantityDistributions = (
+	branches: ReadonlyArray<{
+		readonly distribution: PlannerAcquisitionQuantityDistribution;
+		readonly probability: number;
+	}>,
+): PlannerAcquisitionQuantityDistribution => {
+	const result = new Map<number, number>();
+	for (const branch of branches) {
+		if (branch.probability <= 0) continue;
+		for (const entry of branch.distribution)
+			result.set(
+				entry.quantity,
+				(result.get(entry.quantity) ?? 0) + branch.probability * entry.probability,
+			);
+	}
+	return normalizeQuantityDistribution(result);
+};
+
+const convolveQuantityDistributions = (
+	left: PlannerAcquisitionQuantityDistribution,
+	right: PlannerAcquisitionQuantityDistribution,
+): PlannerAcquisitionQuantityDistribution => {
+	const result = new Map<number, number>();
+	for (const leftEntry of left)
+		for (const rightEntry of right) {
+			const quantity = leftEntry.quantity + rightEntry.quantity;
+			result.set(
+				quantity,
+				(result.get(quantity) ?? 0) + leftEntry.probability * rightEntry.probability,
+			);
+		}
+	return normalizeQuantityDistribution(result);
+};
+
+const repeatQuantityDistribution = (
+	distribution: PlannerAcquisitionQuantityDistribution,
+	count: number,
+): PlannerAcquisitionQuantityDistribution => {
+	let result = makeConstantQuantityDistribution(0);
+	for (let index = 0; index < count; index += 1)
+		result = convolveQuantityDistributions(result, distribution);
+	return result;
+};
+
+const withZeroQuantityProbability = ({
+	distribution,
+	probability,
+}: {
+	readonly distribution: PlannerAcquisitionQuantityDistribution;
+	readonly probability: number;
+}) =>
+	mixQuantityDistributions([
+		{
+			distribution,
+			probability,
+		},
+		{
+			distribution: makeConstantQuantityDistribution(0),
+			probability: 1 - probability,
+		},
+	]);
+
+const readExpectedQuantity = (distribution: PlannerAcquisitionQuantityDistribution) =>
+	distribution.reduce((total, entry) => total + entry.quantity * entry.probability, 0);
+
+const readOccurrenceProbability = (distribution: PlannerAcquisitionQuantityDistribution) =>
+	1 - (distribution.find(({ quantity }) => quantity === 0)?.probability ?? 0);
+
+const readMaximumQuantity = (distribution: PlannerAcquisitionQuantityDistribution) =>
+	distribution.at(-1)?.quantity ?? 0;
+
+const readMaximumQuantityProbability = (distribution: PlannerAcquisitionQuantityDistribution) =>
+	distribution.at(-1)?.probability ?? 0;
 
 const readItemLines = (item: ItemSchema.Type): ReadonlyArray<LineSchema.Type> => {
 	switch (item.type) {
@@ -222,52 +341,103 @@ const readAvailabilityRequirements = (
 };
 
 const readDropWitness = ({
+	distribution,
 	drop,
-	maximumQuantityMultiplier,
 	selection,
-	stochastic,
 	witness,
 	witnessId,
 }: {
+	readonly distribution: PlannerAcquisitionQuantityDistribution;
 	readonly drop: DropSchema.Type;
-	readonly maximumQuantityMultiplier: number;
 	readonly selection: PlannerAcquisitionSelection;
-	readonly stochastic: boolean;
 	readonly witness: Omit<OutputSelectionWitness, "itemId">;
 	readonly witnessId: string;
-}): OutputWitness => ({
-	output: {
-		itemId: drop.itemId,
-		maximumQuantity: drop.quantity.max * maximumQuantityMultiplier,
-		selection,
-		stochastic: stochastic || drop.quantity.min !== drop.quantity.max,
-		witness: {
-			...witness,
+}): OutputWitness => {
+	const maximumQuantity = readMaximumQuantity(distribution);
+	return {
+		output: {
+			expectedQuantity: readExpectedQuantity(distribution),
 			itemId: drop.itemId,
+			maximumQuantity,
+			maximumQuantityProbability: readMaximumQuantityProbability(distribution),
+			occurrenceProbability: readOccurrenceProbability(distribution),
+			quantityDistribution: distribution,
+			selection,
+			stochastic: distribution.length > 1,
+			witness: {
+				...witness,
+				itemId: drop.itemId,
+			},
+			witnessId,
 		},
-		witnessId,
-	},
-	requirements: readAvailabilityRequirements(drop.rules, "output-condition"),
-});
+		requirements: readAvailabilityRequirements(drop.rules, "output-condition"),
+	};
+};
+
+const readWeightedOccurrenceDistribution = ({
+	candidateProbability,
+	drop,
+	maximumSelections,
+	minimumSelections,
+	setProbability,
+}: {
+	readonly candidateProbability: number;
+	readonly drop: DropSchema.Type;
+	readonly maximumSelections: number;
+	readonly minimumSelections: number;
+	readonly setProbability: number;
+}) => {
+	const oneSelection = withZeroQuantityProbability({
+		distribution: makeUniformQuantityDistribution(drop.quantity),
+		probability: candidateProbability,
+	});
+	const selectionCount = maximumSelections - minimumSelections + 1;
+	const selectedSetDistribution = mixQuantityDistributions(
+		Array.from(
+			{
+				length: selectionCount,
+			},
+			(_, index) => ({
+				distribution: repeatQuantityDistribution(oneSelection, minimumSelections + index),
+				probability: 1 / selectionCount,
+			}),
+		),
+	);
+	return withZeroQuantityProbability({
+		distribution: selectedSetDistribution,
+		probability: setProbability,
+	});
+};
 
 /** Enumerates every positive-probability authored output occurrence without rolling it. */
 const readOutputWitnesses = (output: OutputSchema.Type | undefined): OutputWitness[] => {
 	if (output === undefined) return [];
 	const witnesses: OutputWitness[] = [];
-	const hasAlternativeSets = output.set.length > 1;
+	const totalSetWeight = output.set.reduce((total, set) => total + set.weight, 0);
 
 	for (const [setIndex, set] of output.set.entries()) {
+		const setProbability = set.weight / totalSetWeight;
 		for (const [rollIndex, roll] of set.roll.entries()) {
 			if (roll.type === "chance" && roll.chance === 0) continue;
 			if (roll.type === "weight") {
+				const totalCandidateWeight = roll.drop.reduce(
+					(total, candidate) => total + candidate.weight,
+					0,
+				);
 				for (const [candidateIndex, candidate] of roll.drop.entries()) {
+					const candidateProbability = candidate.weight / totalCandidateWeight;
 					for (const [dropIndex, drop] of candidate.drop.entries()) {
 						witnesses.push(
 							readDropWitness({
+								distribution: readWeightedOccurrenceDistribution({
+									candidateProbability,
+									drop,
+									maximumSelections: roll.quantity.max,
+									minimumSelections: roll.quantity.min,
+									setProbability,
+								}),
 								drop,
-								maximumQuantityMultiplier: roll.quantity.max,
 								selection: "weighted",
-								stochastic: true,
 								witness: {
 									candidateIndex,
 									dropIndex,
@@ -292,13 +462,16 @@ const readOutputWitnesses = (output: OutputSchema.Type | undefined): OutputWitne
 			}
 
 			for (const [dropIndex, drop] of roll.drop.entries()) {
+				const occurrenceProbability =
+					setProbability * (roll.type === "chance" ? roll.chance : 1);
 				witnesses.push(
 					readDropWitness({
+						distribution: withZeroQuantityProbability({
+							distribution: makeUniformQuantityDistribution(drop.quantity),
+							probability: occurrenceProbability,
+						}),
 						drop,
-						maximumQuantityMultiplier: 1,
 						selection: roll.type === "chance" ? "chance" : "guaranteed",
-						stochastic:
-							hasAlternativeSets || (roll.type === "chance" && roll.chance < 1),
 						witness: {
 							dropIndex,
 							rollIndex,
@@ -515,8 +688,12 @@ const makeMergeRoutes = (source: ItemSchema.Type): PlannerAcquisitionRoute[] => 
 
 		if (merge.effect === "replace") {
 			const output: PlannerAcquisitionOutput = {
+				expectedQuantity: 1,
 				itemId: merge.result,
 				maximumQuantity: 1,
+				maximumQuantityProbability: 1,
+				occurrenceProbability: 1,
+				quantityDistribution: makeConstantQuantityDistribution(1),
 				selection: "replacement",
 				stochastic: false,
 				witnessId: "replacement",

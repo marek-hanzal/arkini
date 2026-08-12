@@ -492,6 +492,56 @@ const config = GameConfigSchema.parse({
 const makePlanner = () => Effect.runSync(createEnginePlannerFx(config));
 
 describe("createEnginePlannerFx", () => {
+	it("records exact authored output distributions separately from existential witnesses", () => {
+		const planner = makePlanner();
+		const chance = planner.graph.routesByOutputItemId.get("random-target")?.[0];
+		const guaranteed = planner.graph.routesByOutputItemId.get("mixed-target")?.[0];
+		const weighted = planner.graph.routesByOutputItemId.get("weighted-target")?.[0];
+		const companion = planner.graph.routesByOutputItemId.get("weighted-companion")?.[0];
+
+		expect(chance?.output).toMatchObject({
+			expectedQuantity: 0.5,
+			maximumQuantity: 1,
+			maximumQuantityProbability: 0.5,
+			occurrenceProbability: 0.5,
+			quantityDistribution: [
+				{
+					probability: 0.5,
+					quantity: 0,
+				},
+				{
+					probability: 0.5,
+					quantity: 1,
+				},
+			],
+			stochastic: true,
+		});
+		expect(guaranteed?.output).toMatchObject({
+			expectedQuantity: 1,
+			maximumQuantityProbability: 1,
+			occurrenceProbability: 1,
+			quantityDistribution: [
+				{
+					probability: 1,
+					quantity: 1,
+				},
+			],
+			stochastic: false,
+		});
+		expect(weighted?.output.expectedQuantity).toBeCloseTo(45 / 16);
+		expect(weighted?.output.maximumQuantity).toBe(12);
+		expect(weighted?.output.maximumQuantityProbability).toBeCloseTo(1 / 576);
+		expect(weighted?.output.occurrenceProbability).toBeCloseTo(39 / 64);
+		expect(
+			weighted?.output.quantityDistribution.reduce(
+				(total, entry) => total + entry.probability,
+				0,
+			),
+		).toBeCloseTo(1);
+		expect(companion?.output.expectedQuantity).toBeCloseTo(45 / 32);
+		expect(companion?.output.maximumQuantity).toBe(6);
+	});
+
 	it("backtracks from a shorter destructive alternative through the real engine", () => {
 		const planner = makePlanner();
 		const initial = structuredClone(planner.initialRuntime);

@@ -44,11 +44,30 @@ export interface PlannerAcquisitionRequirements {
 
 export type PlannerAcquisitionSelection = "chance" | "guaranteed" | "replacement" | "weighted";
 
-export interface PlannerAcquisitionOutput {
-	readonly itemId: IdSchema.Type;
+/** One exact probability mass in an authored non-negative integer output distribution. */
+export interface PlannerAcquisitionQuantityProbability {
+	readonly probability: number;
+	readonly quantity: number;
+}
+
+export type PlannerAcquisitionQuantityDistribution =
+	ReadonlyArray<PlannerAcquisitionQuantityProbability>;
+
+export interface PlannerAcquisitionOutputStatistics {
+	/** Unconditional mean contribution of this exact authored output occurrence per action. */
+	readonly expectedQuantity: number;
 	readonly maximumQuantity: number;
+	/** Probability that this exact occurrence contributes its maximum quantity. */
+	readonly maximumQuantityProbability: number;
+	/** Probability that this exact authored occurrence emits at least one item. */
+	readonly occurrenceProbability: number;
+	readonly quantityDistribution: PlannerAcquisitionQuantityDistribution;
 	readonly selection: PlannerAcquisitionSelection;
 	readonly stochastic: boolean;
+}
+
+export interface PlannerAcquisitionOutput extends PlannerAcquisitionOutputStatistics {
+	readonly itemId: IdSchema.Type;
 	readonly witness?: OutputSelectionWitness;
 	readonly witnessId: string;
 }

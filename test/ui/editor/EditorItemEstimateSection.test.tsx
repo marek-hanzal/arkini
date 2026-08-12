@@ -165,6 +165,7 @@ describe("EditorItemEstimateSection", () => {
 		const estimate = container.querySelector('[data-ui="EditorItemEstimateSection"]');
 		const result = container.querySelector('[data-ui="EditorItemEstimateResult"]');
 		const method = container.querySelector('[data-ui="EditorItemEstimateMethod"]');
+		if (method === null) throw new Error("Expected estimate method card.");
 		if (estimate === null) throw new Error("Expected Estimate section.");
 		expect(container.querySelectorAll('[data-ui="EditorItemEstimateResult"]')).toHaveLength(1);
 		expect(estimate?.textContent).toContain("Estimated total cost");
@@ -298,6 +299,7 @@ describe("EditorItemEstimateSection", () => {
 
 		const result = container.querySelector('[data-ui="EditorItemEstimateResult"]');
 		const method = container.querySelector('[data-ui="EditorItemEstimateMethod"]');
+		if (method === null) throw new Error("Expected estimate method card.");
 		expect(result?.textContent).toContain("Estimate inconclusive");
 		expect(result?.textContent).toContain("Undecided");
 		expect(result?.textContent).toContain("This is not proof that the item is impossible.");

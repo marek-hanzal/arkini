@@ -618,14 +618,16 @@ describe("createEditorMcpOwnershipFx", () => {
 
 		const inconclusiveProjectId = "project-inconclusive-estimate";
 		const blockedForge = graphConfig.items.forge;
-		if (blockedForge.type !== "producer") throw new Error("Expected producer fixture.");
+		if (blockedForge.type !== "producer" || blockedForge.lines === undefined)
+			throw new Error("Expected producer fixture with lines.");
+		const blockedForgeLines = blockedForge.lines;
 		const inconclusiveConfig = GameConfigSchema.parse({
 			...graphConfig,
 			items: {
 				...graphConfig.items,
 				forge: {
 					...blockedForge,
-					lines: blockedForge.lines.map((line) => ({
+					lines: blockedForgeLines.map((line) => ({
 						...line,
 						rules: [
 							{

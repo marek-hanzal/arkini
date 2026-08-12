@@ -24,7 +24,7 @@ const readLineTitle = (
 ) => {
 	const owner = config.items[action.ownerItemId];
 	if (owner === undefined || !("lines" in owner)) return action.lineId;
-	return owner.lines.find(({ id }) => id === action.lineId)?.title || action.lineId;
+	return owner.lines?.find(({ id }) => id === action.lineId)?.title || action.lineId;
 };
 
 const readOperationProjection = (
@@ -142,13 +142,14 @@ const readNoFinitePathBlockers = (
 	);
 	for (const componentId of result.proof.cycleComponentIds) {
 		const component = graph.components.find(({ id }) => id === componentId);
-		const itemId = component?.itemIds[0];
+		const itemIds = component?.itemIds ?? [];
+		const itemId = itemIds[0];
 		if (itemId === undefined) continue;
 		blockers.push({
 			code: "dependency-cycle",
 			itemId,
 			message: "This dependency cycle has no reachable authored root.",
-			path: component.itemIds,
+			path: itemIds,
 		});
 	}
 	if (blockers.length === 0)

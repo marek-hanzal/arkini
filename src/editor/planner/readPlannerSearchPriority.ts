@@ -117,7 +117,11 @@ export const readPlannerSearchPriorityPlan = ({
 			current === undefined
 				? Number.POSITIVE_INFINITY
 				: (graph.routeDepthById.get(current.id) ?? Number.POSITIVE_INFINITY);
-		if (routeDepth < currentDepth || (routeDepth === currentDepth && route.id < current.id))
+		if (
+			current === undefined ||
+			routeDepth < currentDepth ||
+			(routeDepth === currentDepth && route.id < current.id)
+		)
 			renewalRouteByItemId.set(route.output.itemId, route);
 	}
 	return {

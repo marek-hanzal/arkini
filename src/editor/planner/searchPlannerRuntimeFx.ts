@@ -11,7 +11,9 @@ import {
 import type { PlannerSearchScope } from "~/editor/planner/PlannerSearchScope";
 import { createPlannerRuntimeDominanceIndex } from "~/editor/planner/createPlannerRuntimeDominanceIndex";
 import { isPlannerRuntimeQuiescent } from "~/editor/planner/isPlannerRuntimeQuiescent";
+import { readPlannerActionChargeFlowFx } from "~/editor/planner/readPlannerActionChargeFlowFx";
 import { readPlannerActionItemFlowFx } from "~/editor/planner/readPlannerActionItemFlowFx";
+import { readPlannerExpectedEconomicsFx } from "~/editor/planner/readPlannerExpectedEconomicsFx";
 import { readPlannerRuntimeQuantity } from "~/editor/planner/readPlannerRuntimeQuantity";
 import {
 	comparePlannerSearchPriority,
@@ -255,9 +257,16 @@ export const searchPlannerRuntimeFx = Effect.fn("searchPlannerRuntimeFx")(functi
 		});
 
 	const initialQuantity = readAvailableQuantity(initial, itemId);
-	if (initialQuantity >= quantity)
+	if (initialQuantity >= quantity) {
+		const economics = yield* readPlannerExpectedEconomicsFx({
+			initialRuntime: runtime,
+			itemId,
+			quantity,
+			trace: [],
+		});
 		return {
 			availableQuantity: initialQuantity,
+			economics,
 			elapsedMs: 0,
 			expandedStates: 0,
 			itemId,
@@ -269,6 +278,7 @@ export const searchPlannerRuntimeFx = Effect.fn("searchPlannerRuntimeFx")(functi
 			type: "completed",
 			visitedStates: 1,
 		} satisfies PlannerSearchResult;
+	}
 
 	const structural = readPlannerStructuralReachability({
 		graph,
@@ -360,6 +370,10 @@ export const searchPlannerRuntimeFx = Effect.fn("searchPlannerRuntimeFx")(functi
 				after: result.runtime,
 				before: node.runtime,
 			});
+			const spentChargeQuantities = yield* readPlannerActionChargeFlowFx({
+				before: node.runtime,
+				events: result.events,
+			});
 			const nextTrace: ReadonlyArray<PlannerSearchTraceEntry> = [
 				...node.trace,
 				{
@@ -383,6 +397,7 @@ export const searchPlannerRuntimeFx = Effect.fn("searchPlannerRuntimeFx")(functi
 					outputItemIds: candidate.outputItemIds,
 					producedItemQuantities: itemFlow.producedItemQuantities,
 					routeIds: candidate.routeIds,
+					spentChargeQuantities,
 				},
 			];
 			const nextElapsedMs = node.elapsedMs + result.elapsedMs;
@@ -442,9 +457,16 @@ export const searchPlannerRuntimeFx = Effect.fn("searchPlannerRuntimeFx")(functi
 				});
 
 			const availableQuantity = readAvailableQuantity(next, itemId);
-			if (availableQuantity >= quantity)
+			if (availableQuantity >= quantity) {
+				const economics = yield* readPlannerExpectedEconomicsFx({
+					initialRuntime: runtime,
+					itemId,
+					quantity,
+					trace: next.trace,
+				});
 				return {
 					availableQuantity,
+					economics,
 					elapsedMs: next.elapsedMs,
 					expandedStates,
 					itemId,
@@ -456,6 +478,7 @@ export const searchPlannerRuntimeFx = Effect.fn("searchPlannerRuntimeFx")(functi
 					type: "completed",
 					visitedStates: dominanceIndex.readFingerprintCount(),
 				} satisfies PlannerSearchResult;
+			}
 
 			if (next.trace.length >= budget.maximumTraceLength) {
 				traceBudgetReached = true;

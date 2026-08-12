@@ -6,6 +6,7 @@ import type {
 } from "~/editor/planner/PlannerAcquisitionGraph";
 import type { PlannerAction } from "~/editor/planner/PlannerAction";
 import type { PlannerActionActor } from "~/editor/planner/PlannerActionResult";
+import type { PlannerExpectedEconomics } from "~/editor/planner/PlannerExpectedEconomics";
 import type { PlannerSearchUnsupportedRoute } from "~/editor/planner/PlannerSearchScope";
 import type { PlannerStructuralReachability } from "~/editor/planner/PlannerStructuralReachability";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
@@ -13,6 +14,11 @@ import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
 export type PlannerSearchOutputCertainty = "deterministic" | "possible";
+
+export interface PlannerSearchChargeQuantity {
+	readonly charges: number;
+	readonly itemId: IdSchema.Type;
+}
 
 export interface PlannerSearchItemQuantity {
 	readonly itemId: IdSchema.Type;
@@ -52,6 +58,8 @@ export interface PlannerSearchTraceEntry {
 	readonly outputItemIds: ReadonlyArray<IdSchema.Type>;
 	readonly producedItemQuantities: ReadonlyArray<PlannerSearchItemQuantity>;
 	readonly routeIds: ReadonlyArray<string>;
+	/** Exact canonical charge units committed by this concrete engine action. */
+	readonly spentChargeQuantities: ReadonlyArray<PlannerSearchChargeQuantity>;
 }
 
 export type PlannerSearchBudgetLimit = keyof PlannerSearchBudget;
@@ -59,6 +67,7 @@ export type PlannerSearchBudgetLimit = keyof PlannerSearchBudget;
 export type PlannerSearchResult =
 	| {
 			readonly availableQuantity: number;
+			readonly economics: PlannerExpectedEconomics;
 			readonly elapsedMs: number;
 			readonly expandedStates: number;
 			readonly itemId: IdSchema.Type;

@@ -552,6 +552,38 @@ describe("createEnginePlannerFx", () => {
 		if (result.type !== "completed") return;
 		expect(result.availableQuantity).toBe(1);
 		expect(result.elapsedMs).toBe(300);
+		expect(result.economics).toMatchObject({
+			expectedActionRuns: 2,
+			expectedConsumedItems: [
+				{
+					itemId: "ingot",
+					quantity: 1,
+				},
+				{
+					itemId: "raw",
+					quantity: 1,
+				},
+			],
+			expectedElapsedMs: 300,
+			method: "selected-trace-replay",
+			observedActionRuns: 2,
+			observedElapsedMs: 300,
+			totalExpectedConsumedQuantity: 2,
+		});
+		expect(result.economics.operations).toMatchObject([
+			{
+				actionId: '["line","smelter","line:smelter:run"]',
+				expectedElapsedMs: 100,
+				expectedRuns: 1,
+				observedRuns: 1,
+			},
+			{
+				actionId: '["line","assembler","line:assembler:run"]',
+				expectedElapsedMs: 200,
+				expectedRuns: 1,
+				observedRuns: 1,
+			},
+		]);
 		expect(result.trace.map(({ action }) => action)).toEqual([
 			{
 				kind: "line",
@@ -632,6 +664,22 @@ describe("createEnginePlannerFx", () => {
 		if (result.type !== "completed") return;
 		expect(result.availableQuantity).toBe(2);
 		expect(result.elapsedMs).toBe(600);
+		expect(result.economics).toMatchObject({
+			expectedActionRuns: 4,
+			expectedConsumedItems: [
+				{
+					itemId: "ingot",
+					quantity: 2,
+				},
+				{
+					itemId: "raw",
+					quantity: 2,
+				},
+			],
+			expectedElapsedMs: 600,
+			expectedSpentCharges: [],
+			requiredAdditionalTargetQuantity: 2,
+		});
 		expect(result.trace).toHaveLength(4);
 		expect(
 			result.runtime.items.reduce(
@@ -648,6 +696,20 @@ describe("createEnginePlannerFx", () => {
 		expect(result.type).toBe("completed");
 		if (result.type !== "completed") return;
 		expect(result.elapsedMs).toBe(0);
+		expect(result.economics).toMatchObject({
+			expectedActionRuns: 1,
+			expectedConsumedItems: [
+				{
+					itemId: "merge-source",
+					quantity: 1,
+				},
+				{
+					itemId: "merge-target",
+					quantity: 1,
+				},
+			],
+			expectedElapsedMs: 0,
+		});
 		expect(result.trace).toHaveLength(1);
 		expect(result.trace[0]?.action).toEqual({
 			kind: "merge",
@@ -689,6 +751,24 @@ describe("createEnginePlannerFx", () => {
 		expect(result.elapsedMs).toBe(120);
 		expect(result.outputCertainty).toBe("possible");
 		expect(result.selectedWitnessProbability).toBe(0.5);
+		expect(result.economics).toMatchObject({
+			expectedActionRuns: 6,
+			expectedConsumedItems: [
+				{
+					itemId: "charge-deposit",
+					quantity: 2,
+				},
+			],
+			expectedElapsedMs: 240,
+			expectedSpentCharges: [
+				{
+					charges: 6,
+					itemId: "charge-deposit",
+				},
+			],
+			observedActionRuns: 3,
+			observedElapsedMs: 120,
+		});
 		expect(result.trace.map(({ action }) => action)).toEqual(
 			Array.from(
 				{
@@ -781,6 +861,16 @@ describe("createEnginePlannerFx", () => {
 		expect(result.elapsedMs).toBe(500);
 		expect(result.outputCertainty).toBe("possible");
 		expect(result.selectedWitnessProbability).toBe(0.5);
+		expect(result.economics).toMatchObject({
+			expectedActionRuns: 2,
+			expectedConsumedItems: [
+				{
+					itemId: "random-temporary-token",
+					quantity: 2,
+				},
+			],
+			expectedElapsedMs: 1_000,
+		});
 		expect(result.trace).toHaveLength(1);
 		expect(result.trace[0]).toMatchObject({
 			action: {
@@ -800,6 +890,31 @@ describe("createEnginePlannerFx", () => {
 		);
 	});
 
+	it("reports a non-terminal charge spend before the charged item is consumed", () => {
+		const result = Effect.runSync(makePlanner().searchFx("charged-side-output"));
+
+		expect(result.type).toBe("completed");
+		if (result.type !== "completed") return;
+		expect(result.economics).toMatchObject({
+			expectedActionRuns: 2,
+			expectedConsumedItems: [
+				{
+					itemId: "charge-fuel",
+					quantity: 1,
+				},
+			],
+			expectedElapsedMs: 50,
+			expectedSpentCharges: [
+				{
+					charges: 1,
+					itemId: "charged-producer",
+				},
+			],
+			totalExpectedSpentCharges: 1,
+		});
+		expect(result.runtime.items.some(({ item }) => item.id === "charged-producer")).toBe(true);
+	});
+
 	it("replenishes consumed fuel while progressing a charged owner toward depletion", () => {
 		const result = Effect.runSync(makePlanner().searchFx("depleted-target"));
 
@@ -807,6 +922,26 @@ describe("createEnginePlannerFx", () => {
 		if (result.type !== "completed") return;
 		expect(result.elapsedMs).toBe(150);
 		expect(result.outputCertainty).toBe("deterministic");
+		expect(result.economics).toMatchObject({
+			expectedActionRuns: 6,
+			expectedConsumedItems: [
+				{
+					itemId: "charge-fuel",
+					quantity: 3,
+				},
+				{
+					itemId: "charged-producer",
+					quantity: 1,
+				},
+			],
+			expectedElapsedMs: 150,
+			expectedSpentCharges: [
+				{
+					charges: 3,
+					itemId: "charged-producer",
+				},
+			],
+		});
 		expect(result.trace.map(({ action }) => action)).toEqual(
 			Array.from(
 				{
@@ -850,6 +985,17 @@ describe("createEnginePlannerFx", () => {
 
 		expect(result).toMatchObject({
 			availableQuantity: 1,
+			economics: {
+				expectedActionRuns: 0,
+				expectedConsumedItems: [],
+				expectedElapsedMs: 0,
+				expectedSpentCharges: [],
+				initialTargetQuantity: 1,
+				observedActionRuns: 0,
+				operations: [],
+				requiredAdditionalTargetQuantity: 0,
+				totalExpectedSpentCharges: 0,
+			},
 			elapsedMs: 0,
 			expandedStates: 0,
 			itemId: "start-target",
@@ -887,6 +1033,10 @@ describe("createEnginePlannerFx", () => {
 
 		expect(result).toMatchObject({
 			availableQuantity: 1,
+			economics: {
+				expectedActionRuns: 2,
+				expectedElapsedMs: 150,
+			},
 			expandedStates: 1,
 			itemId: "random-target",
 			outputCertainty: "possible",
@@ -947,6 +1097,8 @@ describe("createEnginePlannerFx", () => {
 		});
 		if (result.type !== "completed") return;
 		expect(result.selectedWitnessProbability).toBeCloseTo(1 / 576);
+		expect(result.economics.expectedActionRuns).toBeCloseTo(5.088_627_678_564_287);
+		expect(result.economics.expectedElapsedMs).toBeCloseTo(457.976_491_070_785_8);
 		expect(
 			result.runtime.items.reduce(
 				(total, item) =>
@@ -1044,6 +1196,22 @@ describe("createEnginePlannerFx", () => {
 		expect(result.elapsedMs).toBe(126_000);
 		expect(result.outputCertainty).toBe("deterministic");
 		expect(result.trace).toHaveLength(18);
+		expect(result.economics).toMatchObject({
+			expectedActionRuns: 18,
+			expectedConsumedItems: [
+				{
+					itemId: "item:tree",
+					quantity: 1,
+				},
+			],
+			expectedElapsedMs: 126_000,
+			expectedSpentCharges: [
+				{
+					charges: 18,
+					itemId: "item:tree",
+				},
+			],
+		});
 		expect(
 			result.trace.every(
 				({ action }) =>

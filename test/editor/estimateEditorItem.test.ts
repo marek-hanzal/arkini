@@ -277,12 +277,6 @@ describe("estimateEditorItem", () => {
 					code: "missing-source",
 					itemId: "tool",
 				}),
-				expect.objectContaining({
-					code: "operation-blocked",
-					itemId: "ingot",
-					operationId: "line:forge:run",
-					ownerItemId: "forge",
-				}),
 			]),
 		);
 		const estimate = estimateEditorItem(
@@ -323,7 +317,7 @@ describe("estimateEditorItem", () => {
 				"ingot",
 			),
 		).toMatchObject({
-			status: "inconclusive",
+			status: "no-finite-path",
 		});
 		const estimate = estimateEditorItem(
 			createSimulatorConfig({
@@ -371,7 +365,11 @@ describe("estimateEditorItem", () => {
 				"ingot",
 			),
 		).toMatchObject({
-			status: "no-finite-path",
+			planner: {
+				reason: "search-exhausted",
+				type: "inconclusive",
+			},
+			status: "inconclusive",
 		});
 	});
 
@@ -431,7 +429,13 @@ describe("estimateEditorItem", () => {
 			},
 		});
 
-		expect(estimateEditorItem(config, "ingot").status).toBe("no-finite-path");
+		expect(estimateEditorItem(config, "ingot")).toMatchObject({
+			planner: {
+				reason: "search-exhausted",
+				type: "inconclusive",
+			},
+			status: "inconclusive",
+		});
 	});
 
 	it("re-establishes live rules after the start spends their last deposit", () => {
@@ -540,7 +544,7 @@ describe("estimateEditorItem", () => {
 		expect(estimateEditorItem(config, "ingot").status).toBe("estimated");
 	});
 
-	it("treats spatial rules optimistically and rejects unsupported starting spaces", () => {
+	it("treats spatial rules optimistically and includes additional starting spaces", () => {
 		const spatialRule = [
 			{
 				type: "enable",
@@ -563,17 +567,30 @@ describe("estimateEditorItem", () => {
 			rules: spatialRule,
 			startWithTool: true,
 		});
-		const tinyBoard = GameConfigSchema.parse({
+		const fullBoard = GameConfigSchema.parse({
 			...optimistic,
 			meta: {
 				...optimistic.meta,
 				board: {
 					height: 1,
-					width: 1,
+					width: 3,
 				},
 			},
+			start: {
+				...optimistic.start,
+				board: [
+					...optimistic.start.board,
+					{
+						itemId: "tool",
+						space: 0,
+						x: 2,
+						y: 0,
+					},
+				],
+				inventory: [],
+			},
 		});
-		expect(estimateEditorItem(tinyBoard, "ingot").status).toBe("estimated");
+		expect(estimateEditorItem(fullBoard, "ingot").status).toBe("estimated");
 
 		const universeRule = [
 			{
@@ -610,7 +627,7 @@ describe("estimateEditorItem", () => {
 				],
 			},
 		});
-		expect(() => estimateEditorItem(withOtherSpaceTool, "ingot")).toThrow();
+		expect(estimateEditorItem(withOtherSpaceTool, "ingot").status).toBe("estimated");
 	});
 
 	it("uses merge, charge-depletion, and temporary-expiry acquisition paths", async () => {

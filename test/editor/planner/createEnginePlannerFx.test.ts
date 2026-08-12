@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest";
 import { createEnginePlannerFx } from "~/editor/planner/createEnginePlannerFx";
 import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
+import { readArkiniGameConfigSource } from "~test/schema/support/readArkiniGameConfigSource";
 
 const baseItem = ({
 	id,
@@ -556,5 +557,93 @@ describe("createEnginePlannerFx", () => {
 			reason: "search-budget",
 			type: "inconclusive",
 		});
+	});
+
+	it("executes an official chance output as a possible engine witness", async () => {
+		const official = await readArkiniGameConfigSource();
+		const planner = Effect.runSync(createEnginePlannerFx(official));
+		const result = await Effect.runPromise(planner.searchFx("item:quest:road-repair"));
+
+		expect(result).toMatchObject({
+			availableQuantity: 1,
+			expandedStates: 1,
+			itemId: "item:quest:road-repair",
+			outputCertainty: "possible",
+			type: "completed",
+			trace: [
+				{
+					action: {
+						kind: "line",
+						lineId: "line:lumberjack-t1:log",
+						ownerItemId: "producer:lumberjack-t1",
+					},
+					outputResolution: {
+						outputItemId: "item:quest:road-repair",
+						type: "existential",
+					},
+				},
+			],
+		});
+	});
+
+	it("prioritizes active official demands through the well chain", async () => {
+		const official = await readArkiniGameConfigSource();
+		const planner = Effect.runSync(createEnginePlannerFx(official));
+		const result = await Effect.runPromise(
+			planner.searchFx("item:double-tree", 1, {
+				maximumExpandedStates: 64,
+				maximumQueuedStates: 128,
+				maximumTraceLength: 16,
+			}),
+		);
+
+		expect(result.type).toBe("completed");
+		if (result.type !== "completed") return;
+		expect(result.expandedStates).toBeLessThan(20);
+		expect(result.outputCertainty).toBe("possible");
+		expect(result.trace.map(({ action }) => action)).toEqual([
+			{
+				kind: "line",
+				lineId: "line:lumberjack-t1:log",
+				ownerItemId: "producer:lumberjack-t1",
+			},
+			{
+				kind: "line",
+				lineId: "line:quarry-t1:stone",
+				ownerItemId: "producer:quarry-t1",
+			},
+			{
+				kind: "line",
+				lineId: "line:townhall-t1:blueprint-well-t1",
+				ownerItemId: "producer:townhall-t1",
+			},
+			{
+				kind: "line",
+				lineId: "line:lumberjack-t1:log",
+				ownerItemId: "producer:lumberjack-t1",
+			},
+			{
+				kind: "line",
+				lineId: "line:quarry-t1:stone",
+				ownerItemId: "producer:quarry-t1",
+			},
+			{
+				kind: "line",
+				lineId: "line:blueprint:well-t1:construct",
+				ownerItemId: "item:blueprint-well-t1",
+			},
+			{
+				kind: "line",
+				lineId: "line:well-t1:water",
+				ownerItemId: "producer:well-t1",
+			},
+			{
+				kind: "merge",
+				mergeIndex: 0,
+				sourceItemId: "item:water",
+				targetItemId: "item:tree",
+			},
+		]);
+		expect(result.runtime.items.some(({ item }) => item.id === "item:double-tree")).toBe(true);
 	});
 });

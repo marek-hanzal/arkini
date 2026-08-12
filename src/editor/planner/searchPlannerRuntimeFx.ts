@@ -11,6 +11,12 @@ import type { PlannerSearchScope } from "~/editor/planner/PlannerSearchScope";
 import { isPlannerRuntimeQuiescent } from "~/editor/planner/isPlannerRuntimeQuiescent";
 import { readPlannerExactRuntimeKey } from "~/editor/planner/readPlannerExactRuntimeKey";
 import { readPlannerRuntimeQuantity } from "~/editor/planner/readPlannerRuntimeQuantity";
+import {
+	comparePlannerSearchPriority,
+	readPlannerSearchPriority,
+	readPlannerSearchPriorityPlan,
+	type PlannerSearchPriority,
+} from "~/editor/planner/readPlannerSearchPriority";
 import { readPlannerSearchScope } from "~/editor/planner/readPlannerSearchScope";
 import { readPlannerStructuralReachability } from "~/editor/planner/readPlannerStructuralReachability";
 import { runPlannerActionFx } from "~/editor/planner/runPlannerActionFx";
@@ -30,6 +36,8 @@ export namespace searchPlannerRuntimeFx {
 
 interface SearchNode {
 	readonly elapsedMs: number;
+	readonly order: number;
+	readonly priority: PlannerSearchPriority;
 	readonly runtime: RuntimeSchema.Type;
 	readonly trace: ReadonlyArray<PlannerSearchTraceEntry>;
 }
@@ -58,6 +66,12 @@ const readBudget = (budget: Partial<PlannerSearchBudget> | undefined): PlannerSe
 
 const readAvailableQuantity = (node: SearchNode, itemId: IdSchema.Type) =>
 	readPlannerRuntimeQuantity(node.runtime, itemId);
+
+const compareSearchNodes = (left: SearchNode, right: SearchNode) =>
+	comparePlannerSearchPriority(left.priority, right.priority) ||
+	left.trace.length - right.trace.length ||
+	left.elapsedMs - right.elapsedMs ||
+	left.order - right.order;
 
 const readOutputCertainty = (trace: ReadonlyArray<PlannerSearchTraceEntry>) =>
 	trace.some(({ outputResolution }) => outputResolution.type === "existential")
@@ -170,8 +184,20 @@ export const searchPlannerRuntimeFx = Effect.fn("searchPlannerRuntimeFx")(functi
 		graph,
 		targetItemId: itemId,
 	});
+	const priorityPlan = readPlannerSearchPriorityPlan({
+		graph,
+		scope,
+	});
 	const initial: SearchNode = {
 		elapsedMs: 0,
+		order: 0,
+		priority: readPlannerSearchPriority({
+			itemId,
+			plan: priorityPlan,
+			quantity,
+			runtime,
+			scope,
+		}),
 		runtime,
 		trace: [],
 	};
@@ -239,19 +265,19 @@ export const searchPlannerRuntimeFx = Effect.fn("searchPlannerRuntimeFx")(functi
 	const queue: SearchNode[] = [
 		initial,
 	];
-	let nextIndex = 0;
 	let expandedStates = 0;
 	let best = initial;
+	let nextOrder = 1;
 	let traceBudgetReached = false;
 
-	while (nextIndex < queue.length) {
+	while (queue.length > 0) {
 		if (expandedStates >= budget.maximumExpandedStates)
 			return readInconclusive({
 				best,
 				blockedActionIds,
 				budgetLimit: "maximumExpandedStates",
 				expandedStates,
-				frontierSize: queue.length - nextIndex,
+				frontierSize: queue.length,
 				itemId,
 				quantity,
 				reason: "search-budget",
@@ -260,8 +286,8 @@ export const searchPlannerRuntimeFx = Effect.fn("searchPlannerRuntimeFx")(functi
 				visitedStates: visitedRuntimeKeys.size,
 			});
 
-		const node = queue[nextIndex];
-		nextIndex += 1;
+		queue.sort(compareSearchNodes);
+		const node = queue.shift();
 		if (node === undefined) continue;
 		if (node.trace.length >= budget.maximumTraceLength) {
 			traceBudgetReached = true;
@@ -286,6 +312,14 @@ export const searchPlannerRuntimeFx = Effect.fn("searchPlannerRuntimeFx")(functi
 
 			const next: SearchNode = {
 				elapsedMs: node.elapsedMs + result.elapsedMs,
+				order: nextOrder,
+				priority: readPlannerSearchPriority({
+					itemId,
+					plan: priorityPlan,
+					quantity,
+					runtime: result.runtime,
+					scope,
+				}),
 				runtime: result.runtime,
 				trace: [
 					...node.trace,
@@ -311,6 +345,7 @@ export const searchPlannerRuntimeFx = Effect.fn("searchPlannerRuntimeFx")(functi
 					},
 				],
 			};
+			nextOrder += 1;
 			if (
 				isBetterNode({
 					candidate: next,
@@ -325,7 +360,7 @@ export const searchPlannerRuntimeFx = Effect.fn("searchPlannerRuntimeFx")(functi
 					best: next,
 					blockedActionIds,
 					expandedStates,
-					frontierSize: queue.length - nextIndex,
+					frontierSize: queue.length,
 					itemId,
 					quantity,
 					reason: "non-quiescent-runtime",
@@ -357,13 +392,13 @@ export const searchPlannerRuntimeFx = Effect.fn("searchPlannerRuntimeFx")(functi
 				traceBudgetReached = true;
 				continue;
 			}
-			if (queue.length - nextIndex >= budget.maximumQueuedStates)
+			if (queue.length >= budget.maximumQueuedStates)
 				return readInconclusive({
 					best,
 					blockedActionIds,
 					budgetLimit: "maximumQueuedStates",
 					expandedStates,
-					frontierSize: queue.length - nextIndex,
+					frontierSize: queue.length,
 					itemId,
 					quantity,
 					reason: "search-budget",

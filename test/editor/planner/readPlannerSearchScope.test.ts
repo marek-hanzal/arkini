@@ -141,6 +141,7 @@ const config = GameConfigSchema.parse({
 		board: [
 			"source-a",
 			"source-b",
+			"source-rebuilder",
 			"target-producer",
 			"random-producer",
 			"mixed-producer",
@@ -186,6 +187,13 @@ const config = GameConfigSchema.parse({
 				id: "line:source-b",
 				inputItemId: "raw",
 				output: guaranteedOutput("part"),
+			}),
+		]),
+		"source-rebuilder": producer("source-rebuilder", [
+			line({
+				id: "line:source-rebuilder",
+				inputItemId: "part",
+				output: guaranteedOutput("source-a"),
 			}),
 		]),
 		part: {
@@ -299,7 +307,7 @@ const config = GameConfigSchema.parse({
 const graph = createPlannerAcquisitionGraph(config);
 
 describe("readPlannerSearchScope", () => {
-	it("builds a deterministic target slice with every supported alternative", () => {
+	it("builds a minimum-depth target slice without recursively reacquiring roots", () => {
 		const scope = readPlannerSearchScope({
 			graph,
 			targetItemId: "target",

@@ -26,11 +26,13 @@ const readTargetClosure = ({
 	depthByItemId,
 	graph,
 	reachableRouteIds,
+	routeDepthById,
 	targetItemId,
 }: {
 	readonly depthByItemId: ReadonlyMap<IdSchema.Type, number>;
 	readonly graph: PlannerAcquisitionGraph;
 	readonly reachableRouteIds: ReadonlySet<string>;
+	readonly routeDepthById: ReadonlyMap<string, number>;
 	readonly targetItemId: IdSchema.Type;
 }) => {
 	const itemIds = new Set<IdSchema.Type>();
@@ -44,17 +46,37 @@ const readTargetClosure = ({
 		const itemId = pending[index];
 		if (itemId === undefined || itemIds.has(itemId)) continue;
 		itemIds.add(itemId);
+		const itemDepth = depthByItemId.get(itemId);
+		if (itemDepth === undefined) continue;
 		for (const route of graph.routesByOutputItemId.get(itemId) ?? []) {
-			if (!reachableRouteIds.has(route.id) || routeIds.has(route.id)) continue;
+			if (
+				!reachableRouteIds.has(route.id) ||
+				routeDepthById.get(route.id) !== itemDepth ||
+				routeIds.has(route.id)
+			)
+				continue;
 			routeIds.add(route.id);
 			routes.push(route);
 			pending.push(...route.requirements.allOf.map((requirement) => requirement.itemId));
-			for (const clause of route.requirements.anyOf)
+			for (const clause of route.requirements.anyOf) {
+				const minimumDepth = Math.min(
+					...clause.flatMap((requirement) => {
+						const depth = depthByItemId.get(requirement.itemId);
+						return depth === undefined
+							? []
+							: [
+									depth,
+								];
+					}),
+				);
 				pending.push(
 					...clause
-						.filter((requirement) => depthByItemId.has(requirement.itemId))
+						.filter(
+							(requirement) => depthByItemId.get(requirement.itemId) === minimumDepth,
+						)
 						.map((requirement) => requirement.itemId),
 				);
+			}
 		}
 	}
 
@@ -188,9 +210,11 @@ const readSearchActions = ({
 };
 
 /**
- * Reads the target-specific authored route slice currently executable by planner search.
+ * Reads the minimum-depth authored route slice currently executable by planner search.
  *
- * Unsupported routes remain diagnostics, never structural impossibility proofs.
+ * Equal-depth alternatives remain available for runtime backtracking. Longer detours stay outside
+ * this bounded search pass and therefore may only lead to an inconclusive result, never a forged
+ * impossibility proof. Unsupported routes remain diagnostics, never structural proofs.
  */
 export const readPlannerSearchScope = ({
 	graph,
@@ -212,6 +236,7 @@ export const readPlannerSearchScope = ({
 				depthByItemId: supportedReachability.depthByItemId,
 				graph,
 				reachableRouteIds: supportedReachability.reachableRouteIds,
+				routeDepthById: supportedReachability.routeDepthById,
 				targetItemId,
 			})
 		: {
@@ -222,6 +247,7 @@ export const readPlannerSearchScope = ({
 		depthByItemId: graph.depthByItemId,
 		graph,
 		reachableRouteIds: graph.reachableRouteIds,
+		routeDepthById: graph.routeDepthById,
 		targetItemId,
 	});
 	const unsupportedRoutes: PlannerSearchUnsupportedRoute[] = fullClosure.routes.flatMap(

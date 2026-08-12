@@ -34,7 +34,7 @@ export type PlannerSearchAction = PlannerSearchActionBase &
 		  }
 	);
 
-/** Target-specific authored slice consumed by engine-backed search. */
+/** Minimum-depth target slice consumed by engine-backed search. */
 export interface PlannerSearchScope {
 	readonly actions: ReadonlyArray<PlannerSearchAction>;
 	readonly itemIds: ReadonlyArray<IdSchema.Type>;

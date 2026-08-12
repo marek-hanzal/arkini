@@ -6,6 +6,12 @@ import type { EditorItemSimulation } from "~/editor/simulator/EditorItemSimulati
 import { projectPlannerSearchResult } from "~/editor/simulator/projectPlannerSearchResult";
 import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 
+export const EditorItemPlannerSearchBudget: PlannerSearchBudget = {
+	maximumExpandedStates: 1_000,
+	maximumQueuedStates: 16,
+	maximumTraceLength: 500,
+};
+
 export namespace createEngineBackedEditorItemSimulatorFx {
 	export interface Service {
 		readonly simulateFx: (
@@ -25,15 +31,20 @@ export const createEngineBackedEditorItemSimulatorFx = Effect.fn(
 		return {
 			simulateFx: Effect.fn("EngineBackedEditorItemSimulator.simulateFx")(
 				(itemId: string, quantity = 1, budget?: Partial<PlannerSearchBudget>) =>
-					planner.searchFx(itemId, quantity, budget).pipe(
-						Effect.map((result) =>
-							projectPlannerSearchResult({
-								config,
-								graph: planner.graph,
-								result,
-							}),
+					planner
+						.searchFx(itemId, quantity, {
+							...EditorItemPlannerSearchBudget,
+							...budget,
+						})
+						.pipe(
+							Effect.map((result) =>
+								projectPlannerSearchResult({
+									config,
+									graph: planner.graph,
+									result,
+								}),
+							),
 						),
-					),
 			),
 		} satisfies createEngineBackedEditorItemSimulatorFx.Service;
 	}),

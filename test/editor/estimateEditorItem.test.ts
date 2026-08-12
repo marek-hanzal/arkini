@@ -323,7 +323,7 @@ describe("estimateEditorItem", () => {
 				"ingot",
 			),
 		).toMatchObject({
-			status: "no-finite-path",
+			status: "inconclusive",
 		});
 		const estimate = estimateEditorItem(
 			createSimulatorConfig({
@@ -377,7 +377,7 @@ describe("estimateEditorItem", () => {
 
 	it("exhausts finite deposits and follows authored deterministic renewal output", () => {
 		const finite = estimateEditorItem(createSimulatorConfig(), "ingot", 3);
-		expect(finite.status).toBe("no-finite-path");
+		expect(finite.status).toBe("inconclusive");
 		const renewable = estimateEditorItem(
 			createSimulatorConfig({
 				waterRenewal: true,
@@ -469,7 +469,7 @@ describe("estimateEditorItem", () => {
 				},
 			},
 		});
-		expect(estimateEditorItem(finite, "ingot").status).toBe("no-finite-path");
+		expect(estimateEditorItem(finite, "ingot").status).toBe("estimated");
 
 		const renewable = createSimulatorConfig({
 			rules: enableWhileWaterExists,
@@ -540,7 +540,7 @@ describe("estimateEditorItem", () => {
 		expect(estimateEditorItem(config, "ingot").status).toBe("estimated");
 	});
 
-	it("treats spatial rules optimistically and ignores additional starting board spaces", () => {
+	it("treats spatial rules optimistically and rejects unsupported starting spaces", () => {
 		const spatialRule = [
 			{
 				type: "enable",
@@ -610,7 +610,7 @@ describe("estimateEditorItem", () => {
 				],
 			},
 		});
-		expect(estimateEditorItem(withOtherSpaceTool, "ingot").status).toBe("no-finite-path");
+		expect(() => estimateEditorItem(withOtherSpaceTool, "ingot")).toThrow();
 	});
 
 	it("uses merge, charge-depletion, and temporary-expiry acquisition paths", async () => {

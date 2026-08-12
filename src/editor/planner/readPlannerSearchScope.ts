@@ -16,9 +16,7 @@ const compareIds = (left: string, right: string) => left.localeCompare(right);
 
 const readUnsupportedReason = (
 	route: PlannerAcquisitionRoute,
-	stochasticActionIds: ReadonlySet<string>,
 ): PlannerSearchUnsupportedRouteReason | undefined => {
-	if (stochasticActionIds.has(readPlannerActionId(route.action))) return "stochastic-output";
 	if (route.kind === "line-charge-depletion") return "charge-depletion";
 	if (route.kind === "temporary-expiry") return "temporary-expiry";
 	return undefined;
@@ -67,6 +65,48 @@ const readTargetClosure = ({
 	};
 };
 
+const readActionOutputWitness = (
+	route: PlannerAcquisitionRoute,
+): PlannerSearchAction["outputWitness"] => {
+	const witness = route.output.witness;
+	if (witness === undefined) return undefined;
+
+	const source = (() => {
+		switch (route.kind) {
+			case "line-output":
+				return {
+					lineId: route.action.lineId,
+					ownerItemId: route.action.ownerItemId,
+					type: "line" as const,
+				};
+			case "line-charge-depletion":
+				return {
+					itemId: route.chargedItemId,
+					type: "charges" as const,
+				};
+			case "merge-output":
+				return {
+					sourceItemId: route.action.sourceItemId,
+					targetItemId: route.action.targetItemId,
+					type: "merge" as const,
+				};
+			case "temporary-expiry":
+				return {
+					itemId: route.action.itemId,
+					type: "temporary-expiry" as const,
+				};
+		}
+	})();
+
+	return {
+		outputItemId: route.output.itemId,
+		routeId: route.id,
+		source,
+		witness,
+		witnessId: route.output.witnessId,
+	};
+};
+
 const readSearchActions = ({
 	routeDepthById,
 	routes,
@@ -74,7 +114,7 @@ const readSearchActions = ({
 	readonly routeDepthById: ReadonlyMap<string, number>;
 	readonly routes: ReadonlyArray<PlannerAcquisitionRoute>;
 }) => {
-	const byId = new Map<
+	const canonicalByActionId = new Map<
 		string,
 		{
 			action: PlannerSearchAction["action"];
@@ -83,40 +123,72 @@ const readSearchActions = ({
 			routeIds: string[];
 		}
 	>();
+	const existential: PlannerSearchAction[] = [];
+
 	for (const route of routes) {
-		const id = readPlannerActionId(route.action);
+		const actionId = readPlannerActionId(route.action);
 		const depth = routeDepthById.get(route.id) ?? Number.POSITIVE_INFINITY;
-		const candidate = byId.get(id) ?? {
+		if (!route.output.stochastic) {
+			const candidate = canonicalByActionId.get(actionId) ?? {
+				action: route.action,
+				depth,
+				outputItemIds: new Set<IdSchema.Type>(),
+				routeIds: [],
+			};
+			candidate.depth = Math.min(candidate.depth, depth);
+			candidate.outputItemIds.add(route.output.itemId);
+			candidate.routeIds.push(route.id);
+			canonicalByActionId.set(actionId, candidate);
+			continue;
+		}
+
+		const outputWitness = readActionOutputWitness(route);
+		if (outputWitness === undefined)
+			throw new Error(`Stochastic planner route ${route.id} has no output witness.`);
+		existential.push({
 			action: route.action,
+			actionId,
 			depth,
-			outputItemIds: new Set<IdSchema.Type>(),
-			routeIds: [],
-		};
-		candidate.depth = Math.min(candidate.depth, depth);
-		candidate.outputItemIds.add(route.output.itemId);
-		candidate.routeIds.push(route.id);
-		byId.set(id, candidate);
+			id: JSON.stringify([
+				"output-witness",
+				actionId,
+				route.id,
+			]),
+			outputItemIds: [
+				route.output.itemId,
+			],
+			outputMode: "existential",
+			outputWitness,
+			routeIds: [
+				route.id,
+			],
+		});
 	}
 
+	const canonical = [
+		...canonicalByActionId,
+	].map(
+		([actionId, candidate]): PlannerSearchAction => ({
+			action: candidate.action,
+			actionId,
+			depth: candidate.depth,
+			id: actionId,
+			outputItemIds: [
+				...candidate.outputItemIds,
+			].sort(compareIds),
+			outputMode: "canonical",
+			routeIds: candidate.routeIds.sort(compareIds),
+		}),
+	);
+
 	return [
-		...byId,
-	]
-		.map(
-			([id, candidate]): PlannerSearchAction => ({
-				action: candidate.action,
-				depth: candidate.depth,
-				id,
-				outputItemIds: [
-					...candidate.outputItemIds,
-				].sort(compareIds),
-				routeIds: candidate.routeIds.sort(compareIds),
-			}),
-		)
-		.sort((left, right) => left.depth - right.depth || compareIds(left.id, right.id));
+		...canonical,
+		...existential,
+	].sort((left, right) => left.depth - right.depth || compareIds(left.id, right.id));
 };
 
 /**
- * Reads the deterministic target-specific route slice supported by the first search milestone.
+ * Reads the target-specific authored route slice currently executable by planner search.
  *
  * Unsupported routes remain diagnostics, never structural impossibility proofs.
  */
@@ -127,13 +199,8 @@ export const readPlannerSearchScope = ({
 	readonly graph: PlannerAcquisitionGraph;
 	readonly targetItemId: IdSchema.Type;
 }): PlannerSearchScope => {
-	const stochasticActionIds = new Set(
-		graph.routes
-			.filter((route) => route.output.stochastic)
-			.map((route) => readPlannerActionId(route.action)),
-	);
 	const supportedRoutes = graph.routes.filter(
-		(route) => readUnsupportedReason(route, stochasticActionIds) === undefined,
+		(route) => readUnsupportedReason(route) === undefined,
 	);
 	const supportedReachability = resolvePlannerRouteReachability({
 		rootItemIds: graph.rootItemIds,
@@ -159,7 +226,7 @@ export const readPlannerSearchScope = ({
 	});
 	const unsupportedRoutes: PlannerSearchUnsupportedRoute[] = fullClosure.routes.flatMap(
 		(route) => {
-			const reason = readUnsupportedReason(route, stochasticActionIds);
+			const reason = readUnsupportedReason(route);
 			return reason === undefined
 				? []
 				: [

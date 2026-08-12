@@ -348,20 +348,26 @@ describe("readPlannerSearchScope", () => {
 		expect(scope.unsupportedRoutes).toEqual([]);
 	});
 
-	it("rejects an entire action when a sibling output is stochastic", () => {
+	it("keeps a deterministic route when a sibling output is stochastic", () => {
 		const scope = readPlannerSearchScope({
 			graph,
 			targetItemId: "mixed-target",
 		});
 
-		expect(scope.supported).toBe(false);
-		expect(scope.actions).toEqual([]);
-		expect(scope.unsupportedRoutes).toEqual([
-			expect.objectContaining({
-				outputItemId: "mixed-target",
-				reason: "stochastic-output",
-			}),
-		]);
+		expect(scope.supported).toBe(true);
+		expect(scope.actions).toHaveLength(1);
+		expect(scope.actions[0]).toMatchObject({
+			action: {
+				kind: "line",
+				lineId: "line:mixed",
+				ownerItemId: "mixed-producer",
+			},
+			outputMode: "canonical",
+			outputItemIds: [
+				"mixed-target",
+			],
+		});
+		expect(scope.unsupportedRoutes).toEqual([]);
 	});
 
 	it("keeps deterministic merge transitions inside the supported slice", () => {
@@ -380,11 +386,40 @@ describe("readPlannerSearchScope", () => {
 		});
 	});
 
+	it("represents a stochastic output as an existential route witness", () => {
+		const scope = readPlannerSearchScope({
+			graph,
+			targetItemId: "random-target",
+		});
+
+		expect(scope.supported).toBe(true);
+		expect(scope.actions).toHaveLength(1);
+		expect(scope.actions[0]).toMatchObject({
+			action: {
+				kind: "line",
+				lineId: "line:random",
+				ownerItemId: "random-producer",
+			},
+			outputMode: "existential",
+			outputWitness: {
+				outputItemId: "random-target",
+				source: {
+					lineId: "line:random",
+					ownerItemId: "random-producer",
+					type: "line",
+				},
+				witness: {
+					dropIndex: 0,
+					itemId: "random-target",
+					rollIndex: 0,
+					setIndex: 0,
+				},
+			},
+		});
+		expect(scope.unsupportedRoutes).toEqual([]);
+	});
+
 	it.each([
-		[
-			"random-target",
-			"stochastic-output",
-		],
 		[
 			"depleted-target",
 			"charge-depletion",

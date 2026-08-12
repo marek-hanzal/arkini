@@ -79,6 +79,74 @@ const chanceOutput = (itemId: string) => ({
 	],
 });
 
+const mixedOutput = () => ({
+	set: [
+		{
+			roll: [
+				...guaranteedOutput("mixed-target").set[0].roll,
+				...chanceOutput("mixed-bonus").set[0].roll,
+			],
+		},
+	],
+});
+
+const weightedOutput = () => ({
+	set: [
+		{
+			roll: guaranteedOutput("weighted-decoy").set[0].roll,
+			weight: 1,
+		},
+		{
+			roll: [
+				{
+					drop: [
+						{
+							drop: [
+								{
+									itemId: "weighted-decoy",
+									quantity: {
+										max: 1,
+										min: 1,
+									},
+									rules: [],
+								},
+							],
+							weight: 1,
+						},
+						{
+							drop: [
+								{
+									itemId: "weighted-target",
+									quantity: {
+										max: 4,
+										min: 2,
+									},
+									rules: [],
+								},
+								{
+									itemId: "weighted-companion",
+									quantity: {
+										max: 2,
+										min: 1,
+									},
+									rules: [],
+								},
+							],
+							weight: 1,
+						},
+					],
+					quantity: {
+						max: 3,
+						min: 2,
+					},
+					type: "weight" as const,
+				},
+			],
+			weight: 3,
+		},
+	],
+});
+
 const materialInput = (itemId: string, quantity = 1, mode: "consume" | "reserve" = "consume") => ({
 	capacity: quantity,
 	mode,
@@ -142,6 +210,8 @@ const boardItemIds = [
 	"smelter",
 	"assembler",
 	"random-producer",
+	"mixed-producer",
+	"weighted-producer",
 	"merge-target",
 	"start-target",
 ];
@@ -220,6 +290,21 @@ const config = GameConfigSchema.parse({
 			runtimeMs: 75,
 		}),
 		"random-target": simpleItem("random-target"),
+		"mixed-producer": producerItem({
+			id: "mixed-producer",
+			output: mixedOutput(),
+			runtimeMs: 80,
+		}),
+		"mixed-target": simpleItem("mixed-target"),
+		"mixed-bonus": simpleItem("mixed-bonus"),
+		"weighted-producer": producerItem({
+			id: "weighted-producer",
+			output: weightedOutput(),
+			runtimeMs: 90,
+		}),
+		"weighted-target": simpleItem("weighted-target"),
+		"weighted-companion": simpleItem("weighted-companion"),
+		"weighted-decoy": simpleItem("weighted-decoy"),
 		orphan: simpleItem("orphan"),
 		"merge-source": {
 			...simpleItem("merge-source"),
@@ -362,22 +447,71 @@ describe("createEnginePlannerFx", () => {
 		});
 	});
 
-	it("reports stochastic routes as unsupported rather than impossible", () => {
+	it("executes a stochastic output as an explicit possible witness", () => {
 		const result = Effect.runSync(makePlanner().searchFx("random-target"));
 
 		expect(result).toMatchObject({
-			bestAvailableQuantity: 0,
-			expandedStates: 0,
+			availableQuantity: 1,
+			expandedStates: 1,
 			itemId: "random-target",
-			reason: "unsupported-routes",
-			type: "inconclusive",
-			unsupportedRoutes: [
+			outputCertainty: "possible",
+			type: "completed",
+			trace: [
 				{
-					outputItemId: "random-target",
-					reason: "stochastic-output",
+					outputResolution: {
+						outputItemId: "random-target",
+						type: "existential",
+					},
 				},
 			],
 		});
+	});
+
+	it("keeps a guaranteed output canonical even when the same action has a chance sibling", () => {
+		const result = Effect.runSync(makePlanner().searchFx("mixed-target"));
+
+		expect(result).toMatchObject({
+			availableQuantity: 1,
+			itemId: "mixed-target",
+			outputCertainty: "deterministic",
+			type: "completed",
+			trace: [
+				{
+					outputResolution: {
+						type: "canonical",
+					},
+				},
+			],
+		});
+	});
+
+	it("realizes a weighted alternative-set witness with correlated integer drops", () => {
+		const result = Effect.runSync(makePlanner().searchFx("weighted-target", 12));
+
+		expect(result).toMatchObject({
+			availableQuantity: 12,
+			elapsedMs: 90,
+			itemId: "weighted-target",
+			outputCertainty: "possible",
+			type: "completed",
+			trace: [
+				{
+					outputResolution: {
+						outputItemId: "weighted-target",
+						type: "existential",
+					},
+				},
+			],
+		});
+		if (result.type !== "completed") return;
+		expect(
+			result.runtime.items.reduce(
+				(total, item) =>
+					total + (item.item.id === "weighted-companion" ? item.quantity : 0),
+				0,
+			),
+		).toBe(6);
+		expect(result.runtime.items.some(({ item }) => item.id === "weighted-decoy")).toBe(false);
 	});
 
 	it("does not turn an insufficient root quantity into structural impossibility", () => {

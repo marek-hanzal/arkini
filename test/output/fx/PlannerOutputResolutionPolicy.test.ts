@@ -4,6 +4,20 @@ import { describe, expect, it } from "vitest";
 import { makePlannerGamePolicyLayerFx } from "~/engine/game/layer/PlannerGamePolicyLayerFx";
 import { resolveOutputFx } from "~/engine/output/fx/resolveOutputFx";
 import { OutputSchema } from "~/engine/output/schema/OutputSchema";
+import { RuntimeFx } from "~/engine/runtime/context/RuntimeFx";
+import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
+
+const runtime = {
+	cheats: {
+		enabled: false,
+		everEnabled: false,
+		instantGameplay: false,
+	},
+	currentSpace: 0,
+	items: [],
+	jobQueue: [],
+	jobs: [],
+} satisfies RuntimeSchema.Type;
 
 const source = {
 	lineId: "line:test",
@@ -158,6 +172,9 @@ const resolve = ({
 							},
 				),
 			),
+			Effect.provideService(RuntimeFx, {
+				read: Effect.succeed(runtime),
+			}),
 			Random.withSeed(ambientSeed),
 		),
 	);

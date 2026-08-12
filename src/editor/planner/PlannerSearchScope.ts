@@ -1,11 +1,9 @@
 import type { PlannerAction } from "~/editor/planner/PlannerAction";
+import type { PlannerActionOutputWitness } from "~/editor/planner/PlannerActionOutputWitness";
 import type { PlannerAcquisitionRoute } from "~/editor/planner/PlannerAcquisitionGraph";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 
-export type PlannerSearchUnsupportedRouteReason =
-	| "charge-depletion"
-	| "stochastic-output"
-	| "temporary-expiry";
+export type PlannerSearchUnsupportedRouteReason = "charge-depletion" | "temporary-expiry";
 
 export interface PlannerSearchUnsupportedRoute {
 	readonly kind: PlannerAcquisitionRoute["kind"];
@@ -14,16 +12,29 @@ export interface PlannerSearchUnsupportedRoute {
 	readonly routeId: string;
 }
 
-/** One deduplicated authored action relevant to the selected target. */
-export interface PlannerSearchAction {
+interface PlannerSearchActionBase {
 	readonly action: PlannerAction;
+	readonly actionId: string;
 	readonly depth: number;
 	readonly id: string;
 	readonly outputItemIds: ReadonlyArray<IdSchema.Type>;
 	readonly routeIds: ReadonlyArray<string>;
 }
 
-/** Target-specific deterministic slice consumed by the first engine-backed search. */
+/** One authored action resolution relevant to the selected target. */
+export type PlannerSearchAction = PlannerSearchActionBase &
+	(
+		| {
+				readonly outputMode: "canonical";
+				readonly outputWitness?: never;
+		  }
+		| {
+				readonly outputMode: "existential";
+				readonly outputWitness: PlannerActionOutputWitness;
+		  }
+	);
+
+/** Target-specific authored slice consumed by engine-backed search. */
 export interface PlannerSearchScope {
 	readonly actions: ReadonlyArray<PlannerSearchAction>;
 	readonly itemIds: ReadonlyArray<IdSchema.Type>;

@@ -10,6 +10,7 @@ import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import type { LineSchema } from "~/engine/line/schema/LineSchema";
 import type { DropSchema } from "~/engine/output/schema/DropSchema";
+import type { OutputSelectionWitness } from "~/engine/output/OutputSelectionWitness";
 import type { OutputSchema } from "~/engine/output/schema/OutputSchema";
 import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import type { WhenSchema } from "~/engine/when/schema/WhenSchema";
@@ -225,12 +226,14 @@ const readDropWitness = ({
 	maximumQuantityMultiplier,
 	selection,
 	stochastic,
+	witness,
 	witnessId,
 }: {
 	readonly drop: DropSchema.Type;
 	readonly maximumQuantityMultiplier: number;
 	readonly selection: PlannerAcquisitionSelection;
 	readonly stochastic: boolean;
+	readonly witness: Omit<OutputSelectionWitness, "itemId">;
 	readonly witnessId: string;
 }): OutputWitness => ({
 	output: {
@@ -238,6 +241,10 @@ const readDropWitness = ({
 		maximumQuantity: drop.quantity.max * maximumQuantityMultiplier,
 		selection,
 		stochastic: stochastic || drop.quantity.min !== drop.quantity.max,
+		witness: {
+			...witness,
+			itemId: drop.itemId,
+		},
 		witnessId,
 	},
 	requirements: readAvailabilityRequirements(drop.rules, "output-condition"),
@@ -261,6 +268,12 @@ const readOutputWitnesses = (output: OutputSchema.Type | undefined): OutputWitne
 								maximumQuantityMultiplier: roll.quantity.max,
 								selection: "weighted",
 								stochastic: true,
+								witness: {
+									candidateIndex,
+									dropIndex,
+									rollIndex,
+									setIndex,
+								},
 								witnessId: makeStableId(
 									"set",
 									setIndex,
@@ -286,6 +299,11 @@ const readOutputWitnesses = (output: OutputSchema.Type | undefined): OutputWitne
 						selection: roll.type === "chance" ? "chance" : "guaranteed",
 						stochastic:
 							hasAlternativeSets || (roll.type === "chance" && roll.chance < 1),
+						witness: {
+							dropIndex,
+							rollIndex,
+							setIndex,
+						},
 						witnessId: makeStableId(
 							"set",
 							setIndex,

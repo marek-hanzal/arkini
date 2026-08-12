@@ -59,6 +59,11 @@ const readBudget = (budget: Partial<PlannerSearchBudget> | undefined): PlannerSe
 const readAvailableQuantity = (node: SearchNode, itemId: IdSchema.Type) =>
 	readPlannerRuntimeQuantity(node.runtime, itemId);
 
+const readOutputCertainty = (trace: ReadonlyArray<PlannerSearchTraceEntry>) =>
+	trace.some(({ outputResolution }) => outputResolution.type === "existential")
+		? ("possible" as const)
+		: ("deterministic" as const);
+
 const readRelevantPresence = (node: SearchNode, scope: PlannerSearchScope) =>
 	scope.itemIds.reduce(
 		(total, itemId) => total + Number(readPlannerRuntimeQuantity(node.runtime, itemId) > 0),
@@ -144,8 +149,8 @@ const readInconclusive = ({
 /**
  * Searches forward through immutable runtime snapshots and delegates every transition to engine.
  *
- * This first milestone intentionally supports deterministic line and merge routes only. Exhausted
- * search is inconclusive; only the optimistic acquisition graph may prove `no-finite-path`.
+ * Stochastic routes execute as explicit positive-probability output witnesses. Exhausted search is
+ * inconclusive; only the optimistic acquisition graph may prove `no-finite-path`.
  */
 export const searchPlannerRuntimeFx = Effect.fn("searchPlannerRuntimeFx")(function* ({
 	budget: budgetOverride,
@@ -191,6 +196,7 @@ export const searchPlannerRuntimeFx = Effect.fn("searchPlannerRuntimeFx")(functi
 			elapsedMs: 0,
 			expandedStates: 0,
 			itemId,
+			outputCertainty: "deterministic",
 			quantity,
 			runtime,
 			trace: [],
@@ -266,6 +272,7 @@ export const searchPlannerRuntimeFx = Effect.fn("searchPlannerRuntimeFx")(functi
 		for (const candidate of scope.actions) {
 			const result = yield* runPlannerActionFx({
 				action: candidate.action,
+				outputWitness: candidate.outputWitness,
 				runtime: node.runtime,
 			});
 			if (result.type === "blocked") {
@@ -284,10 +291,21 @@ export const searchPlannerRuntimeFx = Effect.fn("searchPlannerRuntimeFx")(functi
 					...node.trace,
 					{
 						action: candidate.action,
-						actionId: candidate.id,
+						actionId: candidate.actionId,
 						actor: result.actor,
 						elapsedMs: result.elapsedMs,
 						events: result.events,
+						outputResolution:
+							candidate.outputMode === "canonical"
+								? {
+										type: "canonical" as const,
+									}
+								: {
+										outputItemId: candidate.outputWitness.outputItemId,
+										routeId: candidate.outputWitness.routeId,
+										type: "existential" as const,
+										witnessId: candidate.outputWitness.witnessId,
+									},
 						outputItemIds: candidate.outputItemIds,
 						routeIds: candidate.routeIds,
 					},
@@ -325,6 +343,7 @@ export const searchPlannerRuntimeFx = Effect.fn("searchPlannerRuntimeFx")(functi
 					elapsedMs: next.elapsedMs,
 					expandedStates,
 					itemId,
+					outputCertainty: readOutputCertainty(next.trace),
 					quantity,
 					runtime: next.runtime,
 					trace: next.trace,

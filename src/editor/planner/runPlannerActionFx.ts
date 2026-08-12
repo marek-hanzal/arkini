@@ -1,12 +1,13 @@
 import { Effect } from "effect";
 
 import type { PlannerAction } from "~/editor/planner/PlannerAction";
+import type { PlannerActionOutputWitness } from "~/editor/planner/PlannerActionOutputWitness";
 import type {
 	PlannerActionAttempt,
 	PlannerActionResult,
 } from "~/editor/planner/PlannerActionResult";
 import { GameConfigFx } from "~/engine/game/context/GameConfigFx";
-import { PlannerGamePolicyLayerFx } from "~/engine/game/layer/PlannerGamePolicyLayerFx";
+import { makePlannerGamePolicyLayerFx } from "~/engine/game/layer/PlannerGamePolicyLayerFx";
 import { completeTemporaryExpiryIntentRuntimeFx } from "~/engine/item/temporary/fx/completeTemporaryExpiryIntentRuntimeFx";
 import { completeLineIntentRuntimeFx } from "~/engine/job/fx/completeLineIntentRuntimeFx";
 import { readItemLineFx } from "~/engine/line/fx/readItemLineFx";
@@ -17,6 +18,7 @@ import { selectItemsFx } from "~/engine/selector/fx/selectItemsFx";
 export namespace runPlannerActionFx {
 	export interface Props {
 		readonly action: PlannerAction;
+		readonly outputWitness?: PlannerActionOutputWitness;
 		readonly runtime: RuntimeSchema.Type;
 	}
 }
@@ -344,7 +346,16 @@ const readFailureTag = (failure: unknown) => {
 /** Runs one authored action against an immutable runtime under optimistic planner policies. */
 export const runPlannerActionFx = (props: runPlannerActionFx.Props) =>
 	runPlannerActionWithPoliciesFx(props).pipe(
-		Effect.provide(PlannerGamePolicyLayerFx),
+		Effect.provide(
+			makePlannerGamePolicyLayerFx(
+				props.outputWitness === undefined
+					? undefined
+					: {
+							source: props.outputWitness.source,
+							witness: props.outputWitness.witness,
+						},
+			),
+		),
 		Effect.catch((failure) =>
 			Effect.succeed({
 				action: props.action,

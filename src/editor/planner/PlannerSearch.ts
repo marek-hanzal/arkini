@@ -27,6 +27,16 @@ export interface PlannerSearchTraceEntry {
 	readonly actor: PlannerActionActor;
 	readonly elapsedMs: number;
 	readonly events: ReadonlyArray<GameEventSchema.Type>;
+	readonly outputResolution:
+		| {
+				readonly type: "canonical";
+		  }
+		| {
+				readonly outputItemId: IdSchema.Type;
+				readonly routeId: string;
+				readonly type: "existential";
+				readonly witnessId: string;
+		  };
 	readonly outputItemIds: ReadonlyArray<IdSchema.Type>;
 	readonly routeIds: ReadonlyArray<string>;
 }
@@ -39,6 +49,7 @@ export type PlannerSearchResult =
 			readonly elapsedMs: number;
 			readonly expandedStates: number;
 			readonly itemId: IdSchema.Type;
+			readonly outputCertainty: "deterministic" | "possible";
 			readonly quantity: number;
 			readonly runtime: RuntimeSchema.Type;
 			readonly trace: ReadonlyArray<PlannerSearchTraceEntry>;

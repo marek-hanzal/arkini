@@ -4,6 +4,7 @@ import type {
 	PlannerTemporaryExpiryAction,
 } from "~/editor/planner/PlannerAction";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
+import type { OutputSelectionWitness } from "~/engine/output/OutputSelectionWitness";
 
 export type PlannerAcquisitionRequirementUsage = "charge" | "consume" | "presence" | "reserve";
 
@@ -48,6 +49,7 @@ export interface PlannerAcquisitionOutput {
 	readonly maximumQuantity: number;
 	readonly selection: PlannerAcquisitionSelection;
 	readonly stochastic: boolean;
+	readonly witness?: OutputSelectionWitness;
 	readonly witnessId: string;
 }
 

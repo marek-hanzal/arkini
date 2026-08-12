@@ -150,6 +150,9 @@ describe("createEditorMcpOwnershipFx", () => {
 			?.inputSchema.properties;
 		expect(estimateProperties).toHaveProperty("itemId");
 		expect(estimateProperties).toHaveProperty("quantity");
+		expect(tools.tools.find(({ name }) => name === "item_estimate")?.description).toContain(
+			"graph-certified no-finite-path",
+		);
 		const missingContext = await client.callTool({
 			name: "project",
 			arguments: {},
@@ -580,7 +583,21 @@ describe("createEditorMcpOwnershipFx", () => {
 		]);
 		expect(itemEstimate.content).toMatchObject([
 			{
-				text: expect.stringContaining("\nStatus: estimated\nSequential runtime: 1 s"),
+				text: expect.stringContaining(
+					"\nEstimate: Completed\nStatus: estimated\nEngine-backed feasibility: deterministic",
+				),
+			},
+		]);
+		expect(itemEstimate.content).toMatchObject([
+			{
+				text: expect.stringContaining(
+					"Concrete witness: 1 actions; 1 s\nExpected replay: 1 actions; 1 s",
+				),
+			},
+		]);
+		expect(itemEstimate.content).toMatchObject([
+			{
+				text: expect.stringContaining("\nSequential runtime: 1 s\nProduction blockers:"),
 			},
 		]);
 		expect(JSON.stringify(itemEstimate.content)).not.toContain("\nBest:");
@@ -598,6 +615,67 @@ describe("createEditorMcpOwnershipFx", () => {
 		]);
 		expect(JSON.stringify(itemEstimate.content)).not.toContain("Guaranteed:");
 		expect(itemEstimate).not.toHaveProperty("structuredContent");
+
+		const inconclusiveProjectId = "project-inconclusive-estimate";
+		const blockedForge = graphConfig.items.forge;
+		if (blockedForge.type !== "producer") throw new Error("Expected producer fixture.");
+		const inconclusiveConfig = GameConfigSchema.parse({
+			...graphConfig,
+			items: {
+				...graphConfig.items,
+				forge: {
+					...blockedForge,
+					lines: blockedForge.lines.map((line) => ({
+						...line,
+						rules: [
+							{
+								type: "disable",
+								when: [
+									{
+										query: {
+											scope: "universe",
+											selector: {
+												itemId: "tool",
+												type: "item",
+											},
+										},
+										type: "exists",
+									},
+								],
+							},
+						],
+					})),
+				},
+			},
+		});
+		await Effect.runPromise(
+			repository.createProjectFx({
+				projectId: inconclusiveProjectId,
+				config: inconclusiveConfig,
+				resources: [],
+			}),
+		);
+		ownership.setProjectContext(inconclusiveProjectId);
+		const inconclusiveEstimate = await client.callTool({
+			name: "item_estimate",
+			arguments: {
+				itemId: "ingot",
+			},
+		});
+		expect(inconclusiveEstimate.content).toMatchObject([
+			{
+				text: expect.stringContaining(
+					"\nEstimate: Inconclusive\nStatus: inconclusive\nReason:",
+				),
+			},
+		]);
+		expect(JSON.stringify(inconclusiveEstimate.content)).toContain(
+			"This is not proof that the item cannot be produced.",
+		);
+		expect(JSON.stringify(inconclusiveEstimate.content)).not.toContain(
+			"Estimate: No finite path",
+		);
+		ownership.setProjectContext(graphProjectId);
 		const missingRelationItem = await client.callTool({
 			name: "item_income",
 			arguments: {

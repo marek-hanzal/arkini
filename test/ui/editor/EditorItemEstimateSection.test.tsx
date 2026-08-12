@@ -181,16 +181,13 @@ describe("EditorItemEstimateSection", () => {
 		expect(
 			result?.querySelector('a[data-item-id="water"]')?.getAttribute("data-section-id"),
 		).toBe("estimate");
-		expect(method?.textContent).toContain("How it is calculated");
+		expect(method?.textContent).toContain("Engine-backed planner");
+		expect(method?.textContent).toContain("Deterministic witness");
 		expect(method?.textContent).toContain(
-			"Random output uses its expected yield and required batches are rounded up to whole production runs.",
+			"The real engine completed a deterministic production witness.",
 		);
-		expect(method?.textContent).toContain(
-			"Time and cost are balanced estimates, not guarantees.",
-		);
-		expect(method?.textContent).toContain(
-			"Production, line rules, drop rules, runtime modifiers, and charges are simulated.",
-		);
+		expect(method?.textContent).toContain("Concrete witness: 1 actions, 1 s.");
+		expect(method?.textContent).toContain("Expected replay: 1 actions, 1 s.");
 	});
 
 	it("shows actionable blockers when no finite production path exists", async () => {
@@ -232,13 +229,82 @@ describe("EditorItemEstimateSection", () => {
 		expect(result?.textContent).toContain("Blocked");
 		expect(result?.textContent).toContain("Missing source");
 		expect(result?.textContent).toContain(
-			"No starting quantity, production line, merge, or temporary expiry can create this item.",
+			"No authored start item or acquisition route can produce this dependency.",
 		);
 		expect(result?.querySelector('a[data-item-id="tool"]')).not.toBeNull();
 		expect(
 			result?.querySelector('a[data-item-id="tool"]')?.getAttribute("data-section-id"),
 		).toBe("estimate");
 		expect(result?.textContent).not.toContain("No consumed items.");
+		expect(
+			container.querySelector('[data-ui="EditorItemEstimateMethod"]')?.textContent,
+		).toContain("Graph-certified result");
+	});
+
+	it("renders bounded search exhaustion as undecided rather than impossible", async () => {
+		const config = createJobTestConfig();
+		const project: EditorProject = {
+			projectId: "estimate-test",
+			title: "Estimate test",
+			game: "1.0",
+			createdAtMs: 1,
+			updatedAtMs: 1,
+			revision: 0,
+			config,
+			resources: [],
+		};
+		state.estimateState = {
+			estimate: {
+				blockers: [],
+				cost: [],
+				infrastructureItemIds: new Set(),
+				itemId: "tool",
+				operations: [],
+				planner: {
+					bestAvailableQuantity: 0,
+					budgetLimit: "maximumExpandedStates",
+					expandedStates: 1_000,
+					method: "engine-backed-search",
+					reason: "search-budget",
+					type: "inconclusive",
+					visitedStates: 1_084,
+				},
+				quantity: 1,
+				status: "inconclusive",
+				totalCostQuantity: 0,
+				warnings: [
+					"Feasibility is inconclusive because the search exhausted maximumExpandedStates.",
+				],
+			},
+			status: "ready",
+		};
+		const container = document.createElement("div");
+		document.body.append(container);
+		const root = createRoot(container);
+		roots.push(root);
+		await act(async () => {
+			root.render(
+				createElement(
+					EditorProjectContext.Provider,
+					{
+						value: project,
+					},
+					createElement(EditorItemEstimateSection, {
+						itemId: "tool",
+					}),
+				),
+			);
+		});
+
+		const result = container.querySelector('[data-ui="EditorItemEstimateResult"]');
+		const method = container.querySelector('[data-ui="EditorItemEstimateMethod"]');
+		expect(result?.textContent).toContain("Estimate inconclusive");
+		expect(result?.textContent).toContain("Undecided");
+		expect(result?.textContent).toContain("This is not proof that the item is impossible.");
+		expect(result?.textContent).not.toContain("No finite production path found");
+		expect(method?.textContent).toContain("Bounded engine search");
+		expect(method?.textContent).toContain("Undecided, not impossible");
+		expect(method?.textContent).toContain("Budget limit: maximumExpandedStates.");
 	});
 
 	it("shows progress while the estimate worker is running", async () => {

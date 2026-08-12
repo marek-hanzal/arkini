@@ -202,21 +202,91 @@ const formatRuntime = (runtimeMs: number) => `${runtimeMs / 1_000} s`;
 const formatEstimateNumber = (value: number) =>
 	Number.isInteger(value) ? String(value) : value.toFixed(2).replace(/\.00$/, "");
 
+const formatEstimateProbability = (probability: number) => {
+	const percentage = probability * 100;
+	if (percentage === 0 || percentage >= 0.01)
+		return `${formatEstimateNumber(Number(percentage.toFixed(2)))}%`;
+	return `${percentage.toPrecision(2)}%`;
+};
+
+const plannerReasonText = (
+	reason: Extract<
+		NonNullable<EditorItemSimulation["planner"]>,
+		{
+			readonly type: "inconclusive";
+		}
+	>["reason"],
+) => {
+	switch (reason) {
+		case "action-unsupported":
+			return "an engine transition in the selected closure is not supported by planner search";
+		case "non-quiescent-runtime":
+			return "an action left the candidate runtime in a non-quiescent state";
+		case "search-budget":
+			return "the bounded search exhausted its configured budget";
+		case "search-exhausted":
+			return "the bounded candidate frontier was exhausted without a witness";
+		case "unsupported-routes":
+			return "the target closure contains authored routes not represented by planner search";
+	}
+};
+
 const itemEstimateText = (project: EditorProject, estimate: EditorItemSimulation) => {
 	const target = project.config.items[estimate.itemId];
 	if (target === undefined)
 		throw new Error(`Item ${estimate.itemId} does not exist in the open project.`);
-	return [
+	const planner = estimate.planner;
+	const header = [
 		"Item estimate",
 		`Item ID: ${target.id}`,
 		`Title: ${target.title}`,
 		`Quantity: ${estimate.quantity}`,
 		"Scheduling: sequential",
-		"Start state: available at zero time",
-		"Planner: production rules, runtime modifiers, charges, and finite-source renewal paths",
-		"Board model: optimistic spatial rules only; coordinates, capacity, placement, and additional spaces are not simulated",
-		"Method: expected output per run with whole-run batch rounding; time and cost are estimates, not guarantees",
+		"Start state: authored new-game runtime",
+		"Planner: real engine transitions under optimistic spatial and placement policies",
+		"Board model: coordinates and physical capacity are relaxed; item existence, scope, inputs, charges, lifecycle, and authored rules remain engine-backed",
+	];
+	if (estimate.status === "inconclusive") {
+		const diagnostic = planner?.type === "inconclusive" ? planner : undefined;
+		return [
+			...header,
+			"Estimate: Inconclusive",
+			"Status: inconclusive",
+			...(diagnostic === undefined
+				? []
+				: [
+						`Reason: ${plannerReasonText(diagnostic.reason)}`,
+						`Best available target quantity: ${formatEstimateNumber(diagnostic.bestAvailableQuantity)}`,
+						`Search: ${diagnostic.expandedStates} expanded states; ${diagnostic.visitedStates} visited states${diagnostic.budgetLimit === undefined ? "" : `; budget limit ${diagnostic.budgetLimit}`}`,
+					]),
+			"This is not proof that the item cannot be produced.",
+			"Warnings:",
+			...(estimate.warnings.length === 0
+				? [
+						"  - bounded search returned no final verdict",
+					]
+				: estimate.warnings.map((warning) => `  - ${warning}`)),
+		].join("\n");
+	}
+
+	const completedPlanner = planner?.type === "completed" ? planner : undefined;
+	return [
+		...header,
+		`Estimate: ${estimate.status === "estimated" ? "Completed" : "No finite path"}`,
 		`Status: ${estimate.status}`,
+		...(completedPlanner === undefined
+			? []
+			: [
+					`Engine-backed feasibility: ${completedPlanner.outputCertainty}`,
+					`Concrete witness: ${formatEstimateNumber(completedPlanner.observedActionRuns)} actions; ${formatRuntime(completedPlanner.observedRuntimeMs)}`,
+					`Expected replay: ${formatEstimateNumber(completedPlanner.expectedActionRuns)} actions${estimate.runtimeMs === undefined ? "" : `; ${formatRuntime(estimate.runtimeMs)}`}`,
+					...(completedPlanner.outputCertainty === "possible"
+						? [
+								`Selected witness probability: ${formatEstimateProbability(completedPlanner.selectedWitnessProbability)}`,
+							]
+						: []),
+					`Search: ${completedPlanner.expandedStates} expanded states; ${completedPlanner.visitedStates} visited states`,
+				]),
 		...(estimate.runtimeMs === undefined
 			? []
 			: [
@@ -241,6 +311,15 @@ const itemEstimateText = (project: EditorProject, estimate: EditorItemSimulation
 					({ itemId, quantity }) =>
 						`  - ${itemReference(project, itemId)}: ${formatEstimateNumber(quantity)}`,
 				)),
+		"Expected charge spend:",
+		...(completedPlanner === undefined || completedPlanner.expectedSpentCharges.length === 0
+			? [
+					"  - none",
+				]
+			: completedPlanner.expectedSpentCharges.map(
+					({ charges, itemId }) =>
+						`  - ${itemReference(project, itemId)}: ${formatEstimateNumber(charges)} charges`,
+				)),
 		"Infrastructure and reserved inputs:",
 		...(estimate.infrastructureItemIds.size === 0
 			? [
@@ -260,10 +339,14 @@ const itemEstimateText = (project: EditorProject, estimate: EditorItemSimulation
 				]
 			: estimate.operations.map(
 					(operation) =>
-						`  - ${operation.label} [${operation.lineId}] × ${operation.runs}; ${formatRuntime(operation.runtimeMs)}; owner ${itemReference(project, operation.ownerItemId)}`,
+						`  - ${operation.label} [${operation.lineId}] × ${formatEstimateNumber(operation.runs)}; ${formatRuntime(operation.runtimeMs)}; owner ${itemReference(project, operation.ownerItemId)}`,
 				)),
 		"Warnings:",
-		...estimate.warnings.map((warning) => `  - ${warning}`),
+		...(estimate.warnings.length === 0
+			? [
+					"  - none",
+				]
+			: estimate.warnings.map((warning) => `  - ${warning}`)),
 	].join("\n");
 };
 
@@ -640,7 +723,7 @@ export const createEditorMcpServer = (
 		"item_estimate",
 		{
 			description:
-				"Run the editor-only optimistic production planner for one item from the authored new-game start state. Returns one balanced estimate based on expected output yields and whole production runs, including dependencies, line and drop rules, runtime modifiers, charge spending, finite-source depletion, and authored charge renewal output. Time and cost are estimates, not guarantees. Spatial rules are satisfied optimistically; board coordinates, capacity, placement, and additional spaces are not simulated.",
+				"Run the real engine-backed planner for one item from the authored new-game state. Returns a concrete feasibility witness when found, a graph-certified no-finite-path result when proven, or inconclusive when bounded search cannot decide. Reported time and costs are expected values for the selected route; geometry and physical capacity are optimistic.",
 			inputSchema: z
 				.object({
 					itemId: IdSchema.describe(

@@ -728,7 +728,7 @@ describe("createEnginePlannerFx", () => {
 		expect(result.type).toBe("completed");
 		if (result.type !== "completed") return;
 		expect(result.expandedStates).toBe(2);
-		expect(result.visitedStates).toBe(4);
+		expect(result.visitedStates).toBe(3);
 		expect(result.trace.map(({ action }) => action)).toEqual([
 			{
 				kind: "line",

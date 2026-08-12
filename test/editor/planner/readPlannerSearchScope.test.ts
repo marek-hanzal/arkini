@@ -141,6 +141,7 @@ const config = GameConfigSchema.parse({
 		board: [
 			"source-a",
 			"source-b",
+			"raw-rebuilder",
 			"source-rebuilder",
 			"target-producer",
 			"random-producer",
@@ -175,6 +176,13 @@ const config = GameConfigSchema.parse({
 			...baseItem("raw"),
 			type: "simple",
 		},
+		"raw-rebuilder": producer("raw-rebuilder", [
+			line({
+				id: "line:raw-rebuilder",
+				inputItemId: "part",
+				output: guaranteedOutput("raw"),
+			}),
+		]),
 		"source-a": producer("source-a", [
 			line({
 				id: "line:source-a",
@@ -307,7 +315,7 @@ const config = GameConfigSchema.parse({
 const graph = createPlannerAcquisitionGraph(config);
 
 describe("readPlannerSearchScope", () => {
-	it("builds a minimum-depth target slice without recursively reacquiring roots", () => {
+	it("includes the shortest renewal route for consumed roots without rebuilding presence roots", () => {
 		const scope = readPlannerSearchScope({
 			graph,
 			targetItemId: "target",
@@ -339,6 +347,14 @@ describe("readPlannerSearchScope", () => {
 			{
 				action: {
 					kind: "line",
+					lineId: "line:raw-rebuilder",
+					ownerItemId: "raw-rebuilder",
+				},
+				depth: 2,
+			},
+			{
+				action: {
+					kind: "line",
 					lineId: "line:target",
 					ownerItemId: "target-producer",
 				},
@@ -348,6 +364,7 @@ describe("readPlannerSearchScope", () => {
 		expect(scope.itemIds).toEqual([
 			"part",
 			"raw",
+			"raw-rebuilder",
 			"source-a",
 			"source-b",
 			"target",

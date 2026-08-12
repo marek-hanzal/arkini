@@ -16,6 +16,7 @@ export interface PlannerSearchPriority {
 
 export interface PlannerSearchPriorityPlan {
 	readonly depthByItemId: ReadonlyMap<IdSchema.Type, number>;
+	readonly renewalRouteByItemId: ReadonlyMap<IdSchema.Type, PlannerAcquisitionRoute>;
 	readonly witnessRouteByItemId: ReadonlyMap<IdSchema.Type, PlannerAcquisitionRoute>;
 }
 
@@ -107,9 +108,26 @@ export const readPlannerSearchPriorityPlan = ({
 		rootItemIds: graph.rootItemIds,
 		routes: graph.routes.filter((route) => scopeRouteIds.has(route.id)),
 	});
+	const renewalRouteByItemId = new Map<IdSchema.Type, PlannerAcquisitionRoute>();
+	for (const route of graph.routes) {
+		if (!scopeRouteIds.has(route.id) || !graph.rootItemIds.has(route.output.itemId)) continue;
+		const current = renewalRouteByItemId.get(route.output.itemId);
+		const routeDepth = graph.routeDepthById.get(route.id) ?? Number.POSITIVE_INFINITY;
+		const currentDepth =
+			current === undefined
+				? Number.POSITIVE_INFINITY
+				: (graph.routeDepthById.get(current.id) ?? Number.POSITIVE_INFINITY);
+		if (routeDepth < currentDepth || (routeDepth === currentDepth && route.id < current.id))
+			renewalRouteByItemId.set(route.output.itemId, route);
+	}
 	return {
 		depthByItemId: scopeReachability.depthByItemId,
-		witnessRouteByItemId: scopeReachability.witnessRouteByItemId,
+		renewalRouteByItemId,
+		witnessRouteByItemId: new Map(
+			[
+				...scopeReachability.witnessRouteByItemId,
+			].filter(([itemId, route]) => route.output.itemId === itemId),
+		),
 	};
 };
 
@@ -120,7 +138,7 @@ export const readPlannerSearchPriorityPlan = ({
  * score. This prevents best-first search from replenishing obsolete stone or logs merely because
  * an earlier construction step once needed them.
  */
-const readActiveDemand = ({
+export const readPlannerActiveDemand = ({
 	itemId,
 	plan,
 	quantity,
@@ -155,7 +173,11 @@ const readActiveDemand = ({
 		const processedQuantity = processedQuantityByItemId.get(goal.itemId) ?? 0;
 		if (processedQuantity >= goal.quantity) continue;
 		processedQuantityByItemId.set(goal.itemId, goal.quantity);
-		const route = plan.witnessRouteByItemId.get(goal.itemId);
+		const witnessRoute = plan.witnessRouteByItemId.get(goal.itemId);
+		const route =
+			witnessRoute?.output.itemId === goal.itemId
+				? witnessRoute
+				: plan.renewalRouteByItemId.get(goal.itemId);
 		if (route === undefined || route.output.maximumQuantity <= 0) continue;
 		const missingQuantity = Math.max(
 			0,
@@ -214,7 +236,7 @@ export const readPlannerSearchPriority = ({
 	readonly scope: PlannerSearchScope;
 }): PlannerSearchPriority => {
 	const preferredProgressByDepth: number[] = [];
-	for (const [candidateItemId, demand] of readActiveDemand({
+	for (const [candidateItemId, demand] of readPlannerActiveDemand({
 		itemId,
 		plan,
 		quantity,
@@ -225,7 +247,11 @@ export const readPlannerSearchPriority = ({
 			readPlannerRuntimeQuantity(runtime, candidateItemId),
 			demand,
 		);
-		const route = plan.witnessRouteByItemId.get(candidateItemId);
+		const witnessRoute = plan.witnessRouteByItemId.get(candidateItemId);
+		const route =
+			witnessRoute?.output.itemId === candidateItemId
+				? witnessRoute
+				: plan.renewalRouteByItemId.get(candidateItemId);
 		const lifecycleQuantity =
 			availableQuantity < demand && route?.kind === "line-charge-depletion"
 				? Math.min(

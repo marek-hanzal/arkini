@@ -15,6 +15,7 @@ import { readPlannerActionChargeFlowFx } from "~/editor/planner/readPlannerActio
 import { readPlannerActionItemFlowFx } from "~/editor/planner/readPlannerActionItemFlowFx";
 import { readPlannerExpectedEconomicsFx } from "~/editor/planner/readPlannerExpectedEconomicsFx";
 import { readPlannerRuntimeQuantity } from "~/editor/planner/readPlannerRuntimeQuantity";
+import { readPlannerSearchCandidateGroups } from "~/editor/planner/readPlannerSearchCandidateGroups";
 import {
 	comparePlannerSearchPriority,
 	readPlannerSearchPriority,
@@ -113,6 +114,8 @@ const isBetterNode = ({
 	const candidateQuantity = readAvailableQuantity(candidate, itemId);
 	const currentQuantity = readAvailableQuantity(current, itemId);
 	if (candidateQuantity !== currentQuantity) return candidateQuantity > currentQuantity;
+	const priorityDifference = comparePlannerSearchPriority(candidate.priority, current.priority);
+	if (priorityDifference !== 0) return priorityDifference < 0;
 	const candidatePresence = readRelevantPresence(candidate, scope);
 	const currentPresence = readRelevantPresence(current, scope);
 	if (candidatePresence !== currentPresence) return candidatePresence > currentPresence;
@@ -369,156 +372,169 @@ export const searchPlannerRuntimeFx = Effect.fn("searchPlannerRuntimeFx")(functi
 		}
 		expandedStates += 1;
 
-		for (const candidate of scope.actions) {
-			const result = yield* runPlannerActionFx({
-				action: candidate.action,
-				outputWitness: candidate.outputWitness,
-				runtime: node.runtime,
-			});
-			if (result.type === "blocked") {
-				blockedActionIds.add(candidate.id);
-				continue;
-			}
-			if (result.type === "unsupported") {
-				unsupportedActionIds.add(candidate.id);
-				continue;
-			}
-
-			const outputWitnessResolved =
-				candidate.outputMode === "existential" && result.outputWitnessResolved;
-			const nextSelectedWitnessProbability =
-				node.selectedWitnessProbability *
-				(outputWitnessResolved
-					? candidate.outputWitness.statistics.maximumQuantityProbability
-					: 1);
-			const itemFlow = yield* readPlannerActionItemFlowFx({
-				after: result.runtime,
-				before: node.runtime,
-			});
-			const spentChargeQuantities = yield* readPlannerActionChargeFlowFx({
-				before: node.runtime,
-				events: result.events,
-			});
-			const nextTrace: ReadonlyArray<PlannerSearchTraceEntry> = [
-				...node.trace,
-				{
+		const candidateGroups = readPlannerSearchCandidateGroups({
+			graph,
+			itemId,
+			plan: priorityPlan,
+			quantity,
+			runtime: node.runtime,
+			scope,
+		});
+		for (const group of candidateGroups) {
+			let groupAdvanced = false;
+			for (const candidate of group.actions) {
+				const result = yield* runPlannerActionFx({
 					action: candidate.action,
-					actionId: candidate.actionId,
-					actor: result.actor,
-					consumedItemQuantities: itemFlow.consumedItemQuantities,
-					elapsedMs: result.elapsedMs,
+					outputWitness: candidate.outputWitness,
+					runtime: node.runtime,
+				});
+				if (result.type === "blocked") {
+					blockedActionIds.add(candidate.id);
+					continue;
+				}
+				if (result.type === "unsupported") {
+					unsupportedActionIds.add(candidate.id);
+					continue;
+				}
+				groupAdvanced = true;
+
+				const outputWitnessResolved =
+					candidate.outputMode === "existential" && result.outputWitnessResolved;
+				const nextSelectedWitnessProbability =
+					node.selectedWitnessProbability *
+					(outputWitnessResolved
+						? candidate.outputWitness.statistics.maximumQuantityProbability
+						: 1);
+				const itemFlow = yield* readPlannerActionItemFlowFx({
+					after: result.runtime,
+					before: node.runtime,
+				});
+				const spentChargeQuantities = yield* readPlannerActionChargeFlowFx({
+					before: node.runtime,
 					events: result.events,
-					outputResolution: outputWitnessResolved
-						? {
-								outputItemId: candidate.outputWitness.outputItemId,
-								routeId: candidate.outputWitness.routeId,
-								statistics: candidate.outputWitness.statistics,
-								type: "existential" as const,
-								witnessId: candidate.outputWitness.witnessId,
-							}
-						: {
-								type: "canonical" as const,
-							},
-					outputItemIds: candidate.outputItemIds,
-					producedItemQuantities: itemFlow.producedItemQuantities,
-					routeIds: candidate.routeIds,
-					spentChargeQuantities,
-				},
-			];
-			const nextElapsedMs = node.elapsedMs + result.elapsedMs;
-			const nextOutputCertainty = readNextOutputCertainty(
-				node.outputCertainty,
-				outputWitnessResolved,
-			);
-			const registration = dominanceIndex.register({
-				label: {
-					elapsedMs: nextElapsedMs,
-					outputCertainty: nextOutputCertainty,
-					selectedWitnessProbability: nextSelectedWitnessProbability,
-					traceLength: nextTrace.length,
-				},
-				runtime: result.runtime,
-			});
-			if (!registration.accepted) continue;
-			const next: SearchNode = {
-				elapsedMs: nextElapsedMs,
-				fingerprint: registration.fingerprint,
-				order: nextOrder,
-				outputCertainty: nextOutputCertainty,
-				priority: readPlannerSearchPriority({
-					itemId,
-					plan: priorityPlan,
-					quantity,
+				});
+				const nextTrace: ReadonlyArray<PlannerSearchTraceEntry> = [
+					...node.trace,
+					{
+						action: candidate.action,
+						actionId: candidate.actionId,
+						actor: result.actor,
+						consumedItemQuantities: itemFlow.consumedItemQuantities,
+						elapsedMs: result.elapsedMs,
+						events: result.events,
+						outputResolution: outputWitnessResolved
+							? {
+									outputItemId: candidate.outputWitness.outputItemId,
+									routeId: candidate.outputWitness.routeId,
+									statistics: candidate.outputWitness.statistics,
+									type: "existential" as const,
+									witnessId: candidate.outputWitness.witnessId,
+								}
+							: {
+									type: "canonical" as const,
+								},
+						outputItemIds: candidate.outputItemIds,
+						producedItemQuantities: itemFlow.producedItemQuantities,
+						routeIds: candidate.routeIds,
+						spentChargeQuantities,
+					},
+				];
+				const nextElapsedMs = node.elapsedMs + result.elapsedMs;
+				const nextOutputCertainty = readNextOutputCertainty(
+					node.outputCertainty,
+					outputWitnessResolved,
+				);
+				const registration = dominanceIndex.register({
+					label: {
+						elapsedMs: nextElapsedMs,
+						outputCertainty: nextOutputCertainty,
+						selectedWitnessProbability: nextSelectedWitnessProbability,
+						traceLength: nextTrace.length,
+					},
 					runtime: result.runtime,
-					scope,
-				}),
-				runtime: result.runtime,
-				selectedWitnessProbability: nextSelectedWitnessProbability,
-				stateToken: registration.token,
-				trace: nextTrace,
-			};
-			nextOrder += 1;
-			if (
-				isBetterNode({
-					candidate: next,
-					current: best,
-					itemId,
-					scope,
-				})
-			)
-				best = next;
-			if (!isPlannerRuntimeQuiescent(next.runtime))
-				return readInconclusive({
-					best: next,
-					blockedActionIds,
-					expandedStates,
-					frontierSize: queue.length,
-					itemId,
-					quantity,
-					reason: "non-quiescent-runtime",
-					scope,
-					unsupportedActionIds,
-					visitedStates: dominanceIndex.readFingerprintCount(),
 				});
+				if (!registration.accepted) continue;
+				const next: SearchNode = {
+					elapsedMs: nextElapsedMs,
+					fingerprint: registration.fingerprint,
+					order: nextOrder,
+					outputCertainty: nextOutputCertainty,
+					priority: readPlannerSearchPriority({
+						itemId,
+						plan: priorityPlan,
+						quantity,
+						runtime: result.runtime,
+						scope,
+					}),
+					runtime: result.runtime,
+					selectedWitnessProbability: nextSelectedWitnessProbability,
+					stateToken: registration.token,
+					trace: nextTrace,
+				};
+				nextOrder += 1;
+				if (
+					isBetterNode({
+						candidate: next,
+						current: best,
+						itemId,
+						scope,
+					})
+				)
+					best = next;
+				if (!isPlannerRuntimeQuiescent(next.runtime))
+					return readInconclusive({
+						best: next,
+						blockedActionIds,
+						expandedStates,
+						frontierSize: queue.length,
+						itemId,
+						quantity,
+						reason: "non-quiescent-runtime",
+						scope,
+						unsupportedActionIds,
+						visitedStates: dominanceIndex.readFingerprintCount(),
+					});
 
-			const availableQuantity = readAvailableQuantity(next, itemId);
-			if (availableQuantity >= quantity) {
-				const economics = yield* readPlannerExpectedEconomicsFx({
-					initialRuntime: runtime,
-					itemId,
-					quantity,
-					trace: next.trace,
+				const availableQuantity = readAvailableQuantity(next, itemId);
+				if (availableQuantity >= quantity) {
+					const economics = yield* readPlannerExpectedEconomicsFx({
+						initialRuntime: runtime,
+						itemId,
+						quantity,
+						trace: next.trace,
+					});
+					return {
+						availableQuantity,
+						economics,
+						elapsedMs: next.elapsedMs,
+						expandedStates,
+						itemId,
+						outputCertainty: next.outputCertainty,
+						quantity,
+						runtime: next.runtime,
+						selectedWitnessProbability: next.selectedWitnessProbability,
+						trace: next.trace,
+						type: "completed",
+						visitedStates: dominanceIndex.readFingerprintCount(),
+					} satisfies PlannerSearchResult;
+				}
+
+				if (next.trace.length >= budget.maximumTraceLength) {
+					traceBudgetReached = true;
+					continue;
+				}
+				const boundedQueue = pruneQueueToBudget({
+					index: dominanceIndex,
+					maximumQueuedStates: budget.maximumQueuedStates,
+					queue: [
+						...queue,
+						next,
+					],
 				});
-				return {
-					availableQuantity,
-					economics,
-					elapsedMs: next.elapsedMs,
-					expandedStates,
-					itemId,
-					outputCertainty: next.outputCertainty,
-					quantity,
-					runtime: next.runtime,
-					selectedWitnessProbability: next.selectedWitnessProbability,
-					trace: next.trace,
-					type: "completed",
-					visitedStates: dominanceIndex.readFingerprintCount(),
-				} satisfies PlannerSearchResult;
+				queue = boundedQueue.queue;
+				queueBudgetPruned ||= boundedQueue.pruned;
 			}
-
-			if (next.trace.length >= budget.maximumTraceLength) {
-				traceBudgetReached = true;
-				continue;
-			}
-			const boundedQueue = pruneQueueToBudget({
-				index: dominanceIndex,
-				maximumQueuedStates: budget.maximumQueuedStates,
-				queue: [
-					...queue,
-					next,
-				],
-			});
-			queue = boundedQueue.queue;
-			queueBudgetPruned ||= boundedQueue.pruned;
+			if (groupAdvanced) break;
 		}
 	}
 

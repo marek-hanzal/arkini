@@ -28,46 +28,77 @@ const readTargetClosure = ({
 	const itemIds = new Set<IdSchema.Type>();
 	const routeIds = new Set<string>();
 	const routes: PlannerAcquisitionRoute[] = [];
-	const pending: IdSchema.Type[] = [
+	const pendingItemIds: IdSchema.Type[] = [
 		targetItemId,
 	];
+	const pendingRenewalItemIds: IdSchema.Type[] = [];
+	const queuedRenewalItemIds = new Set<IdSchema.Type>();
 
-	for (let index = 0; index < pending.length; index += 1) {
-		const itemId = pending[index];
-		if (itemId === undefined || itemIds.has(itemId)) continue;
-		itemIds.add(itemId);
-		const itemDepth = depthByItemId.get(itemId);
-		if (itemDepth === undefined) continue;
-		for (const route of graph.routesByOutputItemId.get(itemId) ?? []) {
-			if (
-				!reachableRouteIds.has(route.id) ||
-				routeDepthById.get(route.id) !== itemDepth ||
-				routeIds.has(route.id)
-			)
-				continue;
-			routeIds.add(route.id);
-			routes.push(route);
-			pending.push(...route.requirements.allOf.map((requirement) => requirement.itemId));
-			for (const clause of route.requirements.anyOf) {
-				const minimumDepth = Math.min(
-					...clause.flatMap((requirement) => {
-						const depth = depthByItemId.get(requirement.itemId);
-						return depth === undefined
-							? []
-							: [
-									depth,
-								];
-					}),
-				);
-				pending.push(
-					...clause
-						.filter(
-							(requirement) => depthByItemId.get(requirement.itemId) === minimumDepth,
-						)
-						.map((requirement) => requirement.itemId),
-				);
-			}
+	const queueRequirement = (
+		requirement: PlannerAcquisitionRoute["requirements"]["allOf"][number],
+	) => {
+		pendingItemIds.push(requirement.itemId);
+		if (
+			graph.rootItemIds.has(requirement.itemId) &&
+			(requirement.usage === "charge" || requirement.usage === "consume") &&
+			!queuedRenewalItemIds.has(requirement.itemId)
+		) {
+			queuedRenewalItemIds.add(requirement.itemId);
+			pendingRenewalItemIds.push(requirement.itemId);
 		}
+	};
+
+	const addRoute = (route: PlannerAcquisitionRoute) => {
+		if (routeIds.has(route.id)) return;
+		routeIds.add(route.id);
+		routes.push(route);
+		for (const requirement of route.requirements.allOf) queueRequirement(requirement);
+		for (const clause of route.requirements.anyOf) {
+			const minimumDepth = Math.min(
+				...clause.flatMap((requirement) => {
+					const depth = depthByItemId.get(requirement.itemId);
+					return depth === undefined
+						? []
+						: [
+								depth,
+							];
+				}),
+			);
+			for (const requirement of clause)
+				if (depthByItemId.get(requirement.itemId) === minimumDepth)
+					queueRequirement(requirement);
+		}
+	};
+
+	let itemIndex = 0;
+	let renewalIndex = 0;
+	while (itemIndex < pendingItemIds.length || renewalIndex < pendingRenewalItemIds.length) {
+		if (itemIndex < pendingItemIds.length) {
+			const itemId = pendingItemIds[itemIndex];
+			itemIndex += 1;
+			if (itemId === undefined || itemIds.has(itemId)) continue;
+			itemIds.add(itemId);
+			const itemDepth = depthByItemId.get(itemId);
+			if (itemDepth === undefined) continue;
+			for (const route of graph.routesByOutputItemId.get(itemId) ?? [])
+				if (reachableRouteIds.has(route.id) && routeDepthById.get(route.id) === itemDepth)
+					addRoute(route);
+			continue;
+		}
+
+		const itemId = pendingRenewalItemIds[renewalIndex];
+		renewalIndex += 1;
+		if (itemId === undefined) continue;
+		const candidates = (graph.routesByOutputItemId.get(itemId) ?? []).filter(
+			(route) =>
+				reachableRouteIds.has(route.id) &&
+				(routeDepthById.get(route.id) ?? Number.POSITIVE_INFINITY) > 0,
+		);
+		const minimumDepth = Math.min(
+			...candidates.map((route) => routeDepthById.get(route.id) ?? Number.POSITIVE_INFINITY),
+		);
+		for (const route of candidates)
+			if (routeDepthById.get(route.id) === minimumDepth) addRoute(route);
 	}
 
 	routes.sort((left, right) => compareIds(left.id, right.id));

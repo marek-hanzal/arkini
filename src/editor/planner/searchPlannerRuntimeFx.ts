@@ -9,7 +9,7 @@ import {
 } from "~/editor/planner/PlannerSearch";
 import type { PlannerSearchScope } from "~/editor/planner/PlannerSearchScope";
 import { isPlannerRuntimeQuiescent } from "~/editor/planner/isPlannerRuntimeQuiescent";
-import { readPlannerExactRuntimeKey } from "~/editor/planner/readPlannerExactRuntimeKey";
+import { readPlannerRuntimeFingerprint } from "~/editor/planner/readPlannerRuntimeFingerprint";
 import { readPlannerRuntimeQuantity } from "~/editor/planner/readPlannerRuntimeQuantity";
 import {
 	comparePlannerSearchPriority,
@@ -260,7 +260,7 @@ export const searchPlannerRuntimeFx = Effect.fn("searchPlannerRuntimeFx")(functi
 	const blockedActionIds = new Set<string>();
 	const unsupportedActionIds = new Set<string>();
 	const visitedRuntimeKeys = new Set<string>([
-		readPlannerExactRuntimeKey(runtime),
+		readPlannerRuntimeFingerprint(runtime),
 	]);
 	const queue: SearchNode[] = [
 		initial,
@@ -369,7 +369,7 @@ export const searchPlannerRuntimeFx = Effect.fn("searchPlannerRuntimeFx")(functi
 					visitedStates: visitedRuntimeKeys.size,
 				});
 
-			const runtimeKey = readPlannerExactRuntimeKey(next.runtime);
+			const runtimeKey = readPlannerRuntimeFingerprint(next.runtime);
 			const runtimeVisited = visitedRuntimeKeys.has(runtimeKey);
 			const availableQuantity = readAvailableQuantity(next, itemId);
 			if (availableQuantity >= quantity)

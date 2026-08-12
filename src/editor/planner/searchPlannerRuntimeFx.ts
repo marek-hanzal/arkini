@@ -42,6 +42,7 @@ interface SearchNode {
 	readonly outputCertainty: PlannerSearchOutputCertainty;
 	readonly priority: PlannerSearchPriority;
 	readonly runtime: RuntimeSchema.Type;
+	readonly selectedWitnessProbability: number;
 	readonly stateToken: number;
 	readonly trace: ReadonlyArray<PlannerSearchTraceEntry>;
 }
@@ -80,6 +81,7 @@ const compareSearchNodes = (left: SearchNode, right: SearchNode) =>
 		readOutputCertaintyRank(right.outputCertainty) ||
 	left.trace.length - right.trace.length ||
 	left.elapsedMs - right.elapsedMs ||
+	right.selectedWitnessProbability - left.selectedWitnessProbability ||
 	left.order - right.order;
 
 const readNextOutputCertainty = (
@@ -117,7 +119,8 @@ const isBetterNode = ({
 	if (certaintyDifference !== 0) return certaintyDifference < 0;
 	if (candidate.trace.length !== current.trace.length)
 		return candidate.trace.length < current.trace.length;
-	return candidate.elapsedMs < current.elapsedMs;
+	if (candidate.elapsedMs !== current.elapsedMs) return candidate.elapsedMs < current.elapsedMs;
+	return candidate.selectedWitnessProbability > current.selectedWitnessProbability;
 };
 
 const removeDominatedQueueNodes = (
@@ -212,6 +215,7 @@ export const searchPlannerRuntimeFx = Effect.fn("searchPlannerRuntimeFx")(functi
 		label: {
 			elapsedMs: 0,
 			outputCertainty: "deterministic",
+			selectedWitnessProbability: 1,
 			traceLength: 0,
 		},
 		runtime,
@@ -231,6 +235,7 @@ export const searchPlannerRuntimeFx = Effect.fn("searchPlannerRuntimeFx")(functi
 			scope,
 		}),
 		runtime,
+		selectedWitnessProbability: 1,
 		stateToken: initialRegistration.token,
 		trace: [],
 	};
@@ -258,6 +263,7 @@ export const searchPlannerRuntimeFx = Effect.fn("searchPlannerRuntimeFx")(functi
 			outputCertainty: "deterministic",
 			quantity,
 			runtime,
+			selectedWitnessProbability: 1,
 			trace: [],
 			type: "completed",
 			visitedStates: 1,
@@ -344,6 +350,11 @@ export const searchPlannerRuntimeFx = Effect.fn("searchPlannerRuntimeFx")(functi
 
 			const outputWitnessResolved =
 				candidate.outputMode === "existential" && result.outputWitnessResolved;
+			const nextSelectedWitnessProbability =
+				node.selectedWitnessProbability *
+				(outputWitnessResolved
+					? candidate.outputWitness.statistics.maximumQuantityProbability
+					: 1);
 			const nextTrace: ReadonlyArray<PlannerSearchTraceEntry> = [
 				...node.trace,
 				{
@@ -356,6 +367,7 @@ export const searchPlannerRuntimeFx = Effect.fn("searchPlannerRuntimeFx")(functi
 						? {
 								outputItemId: candidate.outputWitness.outputItemId,
 								routeId: candidate.outputWitness.routeId,
+								statistics: candidate.outputWitness.statistics,
 								type: "existential" as const,
 								witnessId: candidate.outputWitness.witnessId,
 							}
@@ -375,6 +387,7 @@ export const searchPlannerRuntimeFx = Effect.fn("searchPlannerRuntimeFx")(functi
 				label: {
 					elapsedMs: nextElapsedMs,
 					outputCertainty: nextOutputCertainty,
+					selectedWitnessProbability: nextSelectedWitnessProbability,
 					traceLength: nextTrace.length,
 				},
 				runtime: result.runtime,
@@ -393,6 +406,7 @@ export const searchPlannerRuntimeFx = Effect.fn("searchPlannerRuntimeFx")(functi
 					scope,
 				}),
 				runtime: result.runtime,
+				selectedWitnessProbability: nextSelectedWitnessProbability,
 				stateToken: registration.token,
 				trace: nextTrace,
 			};
@@ -430,6 +444,7 @@ export const searchPlannerRuntimeFx = Effect.fn("searchPlannerRuntimeFx")(functi
 					outputCertainty: next.outputCertainty,
 					quantity,
 					runtime: next.runtime,
+					selectedWitnessProbability: next.selectedWitnessProbability,
 					trace: next.trace,
 					type: "completed",
 					visitedStates: dominanceIndex.readFingerprintCount(),

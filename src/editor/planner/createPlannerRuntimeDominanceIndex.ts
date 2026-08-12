@@ -5,6 +5,7 @@ import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 export interface PlannerRuntimePathLabel {
 	readonly elapsedMs: number;
 	readonly outputCertainty: PlannerSearchOutputCertainty;
+	readonly selectedWitnessProbability: number;
 	readonly traceLength: number;
 }
 
@@ -35,6 +36,7 @@ export const dominatesPlannerRuntimePath = (
 ) =>
 	readOutputCertaintyRank(left.outputCertainty) <=
 		readOutputCertaintyRank(right.outputCertainty) &&
+	left.selectedWitnessProbability >= right.selectedWitnessProbability &&
 	left.traceLength <= right.traceLength &&
 	left.elapsedMs <= right.elapsedMs;
 

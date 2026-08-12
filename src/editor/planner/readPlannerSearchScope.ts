@@ -114,6 +114,15 @@ const readActionOutputWitness = (
 		outputItemId: route.output.itemId,
 		routeId: route.id,
 		source,
+		statistics: {
+			expectedQuantity: route.output.expectedQuantity,
+			maximumQuantity: route.output.maximumQuantity,
+			maximumQuantityProbability: route.output.maximumQuantityProbability,
+			occurrenceProbability: route.output.occurrenceProbability,
+			quantityDistribution: route.output.quantityDistribution,
+			selection: route.output.selection,
+			stochastic: route.output.stochastic,
+		},
 		witness,
 		witnessId: route.output.witnessId,
 	};

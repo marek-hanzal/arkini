@@ -21,6 +21,7 @@ const runtime = {
 const label = {
 	elapsedMs: 100,
 	outputCertainty: "deterministic" as const,
+	selectedWitnessProbability: 1,
 	traceLength: 2,
 };
 
@@ -120,6 +121,38 @@ describe("createPlannerRuntimeDominanceIndex", () => {
 				{
 					...label,
 					outputCertainty: "possible",
+				},
+			),
+		).toBe(false);
+	});
+
+	it("keeps a more probable witness unless its other reporting costs are worse", () => {
+		expect(
+			dominatesPlannerRuntimePath(
+				{
+					...label,
+					outputCertainty: "possible",
+					selectedWitnessProbability: 0.5,
+				},
+				{
+					...label,
+					outputCertainty: "possible",
+					selectedWitnessProbability: 0.25,
+				},
+			),
+		).toBe(true);
+		expect(
+			dominatesPlannerRuntimePath(
+				{
+					...label,
+					elapsedMs: 101,
+					outputCertainty: "possible",
+					selectedWitnessProbability: 0.5,
+				},
+				{
+					...label,
+					outputCertainty: "possible",
+					selectedWitnessProbability: 0.25,
 				},
 			),
 		).toBe(false);

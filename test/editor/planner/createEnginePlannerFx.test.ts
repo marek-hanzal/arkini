@@ -653,6 +653,7 @@ describe("createEnginePlannerFx", () => {
 		if (result.type !== "completed") return;
 		expect(result.elapsedMs).toBe(120);
 		expect(result.outputCertainty).toBe("possible");
+		expect(result.selectedWitnessProbability).toBe(0.5);
 		expect(result.trace.map(({ action }) => action)).toEqual(
 			Array.from(
 				{
@@ -720,6 +721,7 @@ describe("createEnginePlannerFx", () => {
 		if (result.type !== "completed") return;
 		expect(result.elapsedMs).toBe(500);
 		expect(result.outputCertainty).toBe("possible");
+		expect(result.selectedWitnessProbability).toBe(0.5);
 		expect(result.trace).toHaveLength(1);
 		expect(result.trace[0]).toMatchObject({
 			action: {
@@ -793,6 +795,7 @@ describe("createEnginePlannerFx", () => {
 			expandedStates: 0,
 			itemId: "start-target",
 			quantity: 1,
+			selectedWitnessProbability: 1,
 			trace: [],
 			type: "completed",
 		});
@@ -828,11 +831,18 @@ describe("createEnginePlannerFx", () => {
 			expandedStates: 1,
 			itemId: "random-target",
 			outputCertainty: "possible",
+			selectedWitnessProbability: 0.5,
 			type: "completed",
 			trace: [
 				{
 					outputResolution: {
 						outputItemId: "random-target",
+						statistics: {
+							expectedQuantity: 0.5,
+							maximumQuantity: 1,
+							maximumQuantityProbability: 0.5,
+							occurrenceProbability: 0.5,
+						},
 						type: "existential",
 					},
 				},
@@ -877,6 +887,7 @@ describe("createEnginePlannerFx", () => {
 			],
 		});
 		if (result.type !== "completed") return;
+		expect(result.selectedWitnessProbability).toBeCloseTo(1 / 576);
 		expect(
 			result.runtime.items.reduce(
 				(total, item) =>

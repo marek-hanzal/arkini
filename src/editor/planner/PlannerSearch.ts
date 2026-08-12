@@ -1,6 +1,9 @@
 import type { Effect } from "effect";
 
-import type { PlannerAcquisitionGraph } from "~/editor/planner/PlannerAcquisitionGraph";
+import type {
+	PlannerAcquisitionGraph,
+	PlannerAcquisitionOutputStatistics,
+} from "~/editor/planner/PlannerAcquisitionGraph";
 import type { PlannerAction } from "~/editor/planner/PlannerAction";
 import type { PlannerActionActor } from "~/editor/planner/PlannerActionResult";
 import type { PlannerSearchUnsupportedRoute } from "~/editor/planner/PlannerSearchScope";
@@ -36,6 +39,7 @@ export interface PlannerSearchTraceEntry {
 		| {
 				readonly outputItemId: IdSchema.Type;
 				readonly routeId: string;
+				readonly statistics: PlannerAcquisitionOutputStatistics;
 				readonly type: "existential";
 				readonly witnessId: string;
 		  };
@@ -54,6 +58,8 @@ export type PlannerSearchResult =
 			readonly outputCertainty: PlannerSearchOutputCertainty;
 			readonly quantity: number;
 			readonly runtime: RuntimeSchema.Type;
+			/** Product of concrete maximum-output witness probabilities selected by this trace. */
+			readonly selectedWitnessProbability: number;
 			readonly trace: ReadonlyArray<PlannerSearchTraceEntry>;
 			readonly type: "completed";
 			readonly visitedStates: number;

@@ -82,6 +82,21 @@ export const placementTestConfig = GameConfigSchema.parse({
 			maxStackSize: 2,
 			scope: "any",
 		}),
+		"temporary-board-only": {
+			uid: "temporary-board-only",
+			id: "temporary-board-only",
+			title: "temporary-board-only",
+			description: "temporary-board-only",
+			asset: {
+				default: [
+					"asset:temporary-board-only",
+				],
+			},
+			durationMs: 600,
+			maxStackSize: 1,
+			scope: "board",
+			type: "temporary",
+		},
 		replacement: simpleItem({
 			id: "replacement",
 			maxStackSize: 3,

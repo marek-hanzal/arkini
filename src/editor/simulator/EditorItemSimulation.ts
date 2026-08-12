@@ -12,6 +12,50 @@ export interface EditorItemSimulationCost {
 	readonly quantity: number;
 }
 
+export interface EditorItemSimulationChargeCost {
+	readonly charges: number;
+	readonly itemId: string;
+}
+
+export type EditorItemSimulationOutputCertainty = "deterministic" | "possible";
+
+export type EditorItemSimulationPlanner =
+	| {
+			readonly assumptions: ReadonlyArray<string>;
+			readonly expectedActionRuns: number;
+			readonly expectedSpentCharges: ReadonlyArray<EditorItemSimulationChargeCost>;
+			readonly expandedStates: number;
+			readonly method: "engine-backed-search";
+			readonly observedActionRuns: number;
+			readonly observedRuntimeMs: number;
+			readonly outputCertainty: EditorItemSimulationOutputCertainty;
+			readonly selectedWitnessProbability: number;
+			readonly type: "completed";
+			readonly visitedStates: number;
+	  }
+	| {
+			readonly method: "engine-backed-search";
+			readonly proofType: "no-finite-path" | "target-missing";
+			readonly type: "no-finite-path";
+	  }
+	| {
+			readonly bestAvailableQuantity: number;
+			readonly budgetLimit?:
+				| "maximumExpandedStates"
+				| "maximumQueuedStates"
+				| "maximumTraceLength";
+			readonly expandedStates: number;
+			readonly method: "engine-backed-search";
+			readonly reason:
+				| "action-unsupported"
+				| "non-quiescent-runtime"
+				| "search-budget"
+				| "search-exhausted"
+				| "unsupported-routes";
+			readonly type: "inconclusive";
+			readonly visitedStates: number;
+	  };
+
 export type EditorItemSimulationBlockerCode =
 	| "dependency-cycle"
 	| "missing-source"
@@ -31,7 +75,7 @@ export interface EditorItemSimulationBlocker {
 export interface EditorItemSimulation {
 	readonly itemId: string;
 	readonly quantity: number;
-	readonly status: "estimated" | "no-finite-path";
+	readonly status: "estimated" | "inconclusive" | "no-finite-path";
 	readonly runtimeMs?: number;
 	readonly cost: ReadonlyArray<EditorItemSimulationCost>;
 	readonly totalCostQuantity: number;
@@ -39,4 +83,6 @@ export interface EditorItemSimulation {
 	readonly operations: ReadonlyArray<EditorItemSimulationOperation>;
 	readonly blockers: ReadonlyArray<EditorItemSimulationBlocker>;
 	readonly warnings: ReadonlyArray<string>;
+	/** Engine-backed feasibility and expected-economics diagnostics when projected by planner. */
+	readonly planner?: EditorItemSimulationPlanner;
 }

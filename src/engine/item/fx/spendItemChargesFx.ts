@@ -145,6 +145,10 @@ export const spendItemChargesFx = Effect.fn("spendItemChargesFx")(function* ({
 			program: resolveOutputFx({
 				origin: item.location,
 				output: item.item.charges.output,
+				source: {
+					itemId: item.item.id,
+					type: "charges",
+				},
 			}),
 			quantity: item.quantity,
 			remainingCharges,

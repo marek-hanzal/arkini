@@ -61,6 +61,11 @@ export const applyMergeRuntimeFx = Effect.fn("applyMergeRuntimeFx")(function* ({
 	const output = yield* resolveOutputFx({
 		origin: target.location,
 		output: rule.output,
+		source: {
+			sourceItemId: source.item.id,
+			targetItemId: target.item.id,
+			type: "merge",
+		},
 	});
 	const [placement, withOutput] = yield* applyOutputPlacementFx({
 		origin: target.location,

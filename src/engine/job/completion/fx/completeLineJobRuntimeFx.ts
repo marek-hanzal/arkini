@@ -61,6 +61,11 @@ export const completeLineJobRuntimeFx = Effect.fn("completeLineJobRuntimeFx")(fu
 			: yield* resolveOutputFx({
 					origin: context.owner.location,
 					output: context.line.output,
+					source: {
+						lineId: context.line.id,
+						ownerItemId: context.owner.item.id,
+						type: "line",
+					},
 				});
 	if (lineOutput.drop.length > 0) {
 		const [placement, withLineOutput] = yield* applyOutputPlacementFx({
@@ -84,6 +89,10 @@ export const completeLineJobRuntimeFx = Effect.fn("completeLineJobRuntimeFx")(fu
 			program: resolveOutputFx({
 				origin: context.owner.location,
 				output: context.owner.item.charges.output,
+				source: {
+					itemId: context.owner.item.id,
+					type: "charges",
+				},
 			}),
 		});
 		if (depletionOutput.drop.length > 0) {

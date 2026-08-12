@@ -1,10 +1,12 @@
 import { Effect } from "effect";
 
-import { OutputResolutionFx } from "~/engine/output/context/OutputResolutionFx";
-import type { outputFx } from "~/engine/output/fx/outputFx";
+import {
+	OutputResolutionFx,
+	type OutputResolutionProps,
+} from "~/engine/output/context/OutputResolutionFx";
 
 export namespace resolveOutputFx {
-	export interface Props extends outputFx.Props {}
+	export interface Props extends OutputResolutionProps {}
 }
 
 /** Resolves one authored output through the policy in the current Effect context. */

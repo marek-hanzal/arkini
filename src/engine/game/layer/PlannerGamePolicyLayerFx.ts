@@ -3,7 +3,8 @@ import { Effect, Layer } from "effect";
 import { SpatialRelationFx } from "~/engine/distance/context/SpatialRelationFx";
 import { makeOptimisticSpatialRelationFx } from "~/engine/distance/fx/makeOptimisticSpatialRelationFx";
 import { OutputResolutionFx } from "~/engine/output/context/OutputResolutionFx";
-import { outputFx } from "~/engine/output/fx/outputFx";
+import { makePlannerOutputResolutionFx } from "~/engine/output/fx/makePlannerOutputResolutionFx";
+import type { PlannerOutputResolutionTarget } from "~/engine/output/PlannerOutputResolutionTarget";
 import { PlacementPolicyFx } from "~/engine/placement/context/PlacementPolicyFx";
 import { planOptimisticDropPlacementFx } from "~/engine/placement/fx/planOptimisticDropPlacementFx";
 import { readOptimisticRuntimeItemDropLocationFx } from "~/engine/placement/fx/readOptimisticRuntimeItemDropLocationFx";
@@ -17,18 +18,19 @@ import { makeOptimisticWhenEvaluationFx } from "~/engine/when/fx/makeOptimisticW
  * Economy, identity, scopes and authored quantities remain canonical. The planner
  * relaxes physical geometry, finite grid capacity and wall-clock waiting only.
  */
-export const PlannerGamePolicyLayerFx = Layer.mergeAll(
-	Layer.effect(SpatialRelationFx, makeOptimisticSpatialRelationFx()),
-	Layer.effect(WhenEvaluationFx, makeOptimisticWhenEvaluationFx()),
-	Layer.succeed(PlacementPolicyFx, {
-		planDrop: planOptimisticDropPlacementFx,
-		readItemDropLocation: readOptimisticRuntimeItemDropLocationFx,
-	}),
-	Layer.succeed(OutputResolutionFx, {
-		resolve: outputFx,
-	}),
-	Layer.succeed(RuntimeTimePolicyFx, {
-		completeTimedWorkInstantly: () => Effect.succeed(true),
-		shouldAdvanceTemporaryItem: () => Effect.succeed(false),
-	}),
-);
+export const makePlannerGamePolicyLayerFx = (target?: PlannerOutputResolutionTarget) =>
+	Layer.mergeAll(
+		Layer.effect(SpatialRelationFx, makeOptimisticSpatialRelationFx()),
+		Layer.effect(WhenEvaluationFx, makeOptimisticWhenEvaluationFx()),
+		Layer.succeed(PlacementPolicyFx, {
+			planDrop: planOptimisticDropPlacementFx,
+			readItemDropLocation: readOptimisticRuntimeItemDropLocationFx,
+		}),
+		Layer.succeed(OutputResolutionFx, makePlannerOutputResolutionFx(target)),
+		Layer.succeed(RuntimeTimePolicyFx, {
+			completeTimedWorkInstantly: () => Effect.succeed(true),
+			shouldAdvanceTemporaryItem: () => Effect.succeed(false),
+		}),
+	);
+
+export const PlannerGamePolicyLayerFx = makePlannerGamePolicyLayerFx();

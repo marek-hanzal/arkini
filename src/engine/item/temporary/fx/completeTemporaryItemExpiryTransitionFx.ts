@@ -69,6 +69,10 @@ export const completeTemporaryItemExpiryTransitionFx = Effect.fn(
 			const output = yield* resolveOutputFx({
 				origin,
 				output: configuredOutput,
+				source: {
+					itemId: item.item.id,
+					type: "temporary-expiry",
+				},
 			});
 			if (output.drop.length === 0) {
 				return {

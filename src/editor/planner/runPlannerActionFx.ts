@@ -319,6 +319,46 @@ const runPlannerActionWithPoliciesFx = Effect.fn("runPlannerActionFx.withPolicie
 	}
 });
 
+const readUnexpectedFailureStage = (action: PlannerAction): PlannerActionAttempt["stage"] => {
+	switch (action.kind) {
+		case "line":
+			return "complete";
+		case "merge":
+			return "merge";
+		case "temporary-expiry":
+			return "expire";
+	}
+};
+
+const readFailureTag = (failure: unknown) => {
+	if (
+		typeof failure === "object" &&
+		failure !== null &&
+		"_tag" in failure &&
+		typeof failure._tag === "string"
+	)
+		return failure._tag;
+	return "PlannerActionFailure";
+};
+
 /** Runs one authored action against an immutable runtime under optimistic planner policies. */
 export const runPlannerActionFx = (props: runPlannerActionFx.Props) =>
-	runPlannerActionWithPoliciesFx(props).pipe(Effect.provide(PlannerGamePolicyLayerFx));
+	runPlannerActionWithPoliciesFx(props).pipe(
+		Effect.provide(PlannerGamePolicyLayerFx),
+		Effect.catch((failure) =>
+			Effect.succeed({
+				action: props.action,
+				blocker: {
+					attempt: [
+						{
+							failureTag: readFailureTag(failure),
+							stage: readUnexpectedFailureStage(props.action),
+						},
+					],
+					code: "action-rejected",
+				},
+				runtime: props.runtime,
+				type: "blocked",
+			} satisfies PlannerActionResult),
+		),
+	);

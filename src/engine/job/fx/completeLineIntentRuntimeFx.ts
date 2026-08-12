@@ -319,7 +319,11 @@ export const completeLineIntentRuntimeFx = Effect.fn("completeLineIntentRuntimeF
 				ownerItemId: owner.id,
 				queueRequestId: admission.success.request.id,
 				runtime: candidateRuntime,
-			}),
+			}).pipe(
+				Effect.provideService(RuntimeFx, {
+					read: Effect.succeed(candidateRuntime),
+				}),
+			),
 		);
 		if (Result.isFailure(started)) {
 			attempts.push({

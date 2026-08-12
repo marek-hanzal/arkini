@@ -5,6 +5,7 @@ import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
 import { commitMergeItemsRuntimeFx } from "~/engine/merge/fx/commitMergeItemsRuntimeFx";
 import { resolveMergeRuleFx } from "~/engine/merge/fx/resolveMergeRuleFx";
+import { RuntimeFx } from "~/engine/runtime/context/RuntimeFx";
 import type { GridRuntimeItemSchema } from "~/engine/runtime/schema/GridRuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
@@ -128,7 +129,11 @@ export const mergeItemIntentRuntimeFx = Effect.fn("mergeItemIntentRuntimeFx")(fu
 					sourceRevision: source.revision,
 					targetItemId: target.id,
 					targetRevision: target.revision,
-				}),
+				}).pipe(
+					Effect.provideService(RuntimeFx, {
+						read: Effect.succeed(runtime),
+					}),
+				),
 			);
 			if (Result.isSuccess(committed)) {
 				return {

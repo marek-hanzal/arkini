@@ -34,7 +34,7 @@ const baseItem = ({
 	uid: id,
 });
 
-const guaranteedOutput = (itemId: string) => ({
+const guaranteedOutput = (itemId: string, rules: ReadonlyArray<Record<string, unknown>> = []) => ({
 	set: [
 		{
 			roll: [
@@ -46,7 +46,7 @@ const guaranteedOutput = (itemId: string) => ({
 								max: 1,
 								min: 1,
 							},
-							rules: [],
+							rules,
 						},
 					],
 					type: "guaranteed" as const,
@@ -119,7 +119,24 @@ const config = GameConfigSchema.parse({
 							type: "materials",
 						},
 					],
-					output: guaranteedOutput("line-result"),
+					output: guaranteedOutput("line-result", [
+						{
+							type: "enable",
+							when: [
+								{
+									query: {
+										distance: "self",
+										scope: "board",
+										selector: {
+											itemId: "forge",
+											type: "item",
+										},
+									},
+									type: "exists",
+								},
+							],
+						},
+					]),
 					rules: [],
 					runtimeMs: 1_000,
 					title: "Run",

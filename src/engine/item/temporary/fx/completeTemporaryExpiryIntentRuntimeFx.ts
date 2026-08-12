@@ -5,6 +5,7 @@ import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
 import { ItemEnumSchema } from "~/engine/item/schema/ItemEnumSchema";
 import { attemptTemporaryItemExpiryFx } from "~/engine/item/temporary/fx/attemptTemporaryItemExpiryFx";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
+import { RuntimeFx } from "~/engine/runtime/context/RuntimeFx";
 import type { BoardRuntimeItemSchema } from "~/engine/runtime/schema/BoardRuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { RuntimeTimePolicyFx } from "~/engine/tick/context/RuntimeTimePolicyFx";
@@ -107,7 +108,11 @@ export const completeTemporaryExpiryIntentRuntimeFx = Effect.fn(
 			attemptTemporaryItemExpiryFx({
 				itemId: candidate.id,
 				runtime: readyRuntime,
-			}),
+			}).pipe(
+				Effect.provideService(RuntimeFx, {
+					read: Effect.succeed(readyRuntime),
+				}),
+			),
 		);
 		if (Result.isFailure(completion)) {
 			attempts.push({

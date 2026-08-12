@@ -23,6 +23,7 @@ export const lineRuleEnableFx = Effect.fn("lineRuleEnableFx")(function* ({
 	for (const [whenIndex, when] of rule.when.entries()) {
 		if (
 			!(yield* whenFx({
+				intent: "satisfy",
 				origin,
 				when,
 			}))

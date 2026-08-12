@@ -23,6 +23,7 @@ export const lineRuleHideFx = Effect.fn("lineRuleHideFx")(function* ({
 	for (const when of rule.when) {
 		if (
 			!(yield* whenFx({
+				intent: "falsify",
 				origin,
 				when,
 			}))

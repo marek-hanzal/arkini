@@ -5,7 +5,7 @@ import { readOutputPlacementItemEventsFx } from "~/engine/event/read/readOutputP
 import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
 import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
 import { LocationScopeEnumSchema } from "~/engine/location/schema/LocationScopeEnumSchema";
-import { outputFx } from "~/engine/output/fx/outputFx";
+import { resolveOutputFx } from "~/engine/output/fx/resolveOutputFx";
 import { applyOutputPlacementFx } from "~/engine/placement/fx/applyOutputPlacementFx";
 import { removeRuntimeItemIdentityFx } from "~/engine/runtime/fx/removeRuntimeItemIdentityFx";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
@@ -66,7 +66,7 @@ export const completeTemporaryItemExpiryTransitionFx = Effect.fn(
 	return yield* makeTemporaryExpiryRandomFx({
 		item,
 		program: Effect.gen(function* () {
-			const output = yield* outputFx({
+			const output = yield* resolveOutputFx({
 				origin,
 				output: configuredOutput,
 			});

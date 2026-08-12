@@ -23,6 +23,7 @@ export const lineRuleDisableFx = Effect.fn("lineRuleDisableFx")(function* ({
 	for (const when of rule.when) {
 		if (
 			!(yield* whenFx({
+				intent: "falsify",
 				origin,
 				when,
 			}))

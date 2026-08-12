@@ -3,7 +3,7 @@ import { Effect } from "effect";
 import { readOutputPlacementItemEventsFx } from "~/engine/event/read/readOutputPlacementItemEventsFx";
 import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
 import type { MergeSchema } from "~/engine/merge/schema/MergeSchema";
-import { outputFx } from "~/engine/output/fx/outputFx";
+import { resolveOutputFx } from "~/engine/output/fx/resolveOutputFx";
 import { applyOutputPlacementFx } from "~/engine/placement/fx/applyOutputPlacementFx";
 import type { BoardRuntimeItemSchema } from "~/engine/runtime/schema/BoardRuntimeItemSchema";
 import type { GridRuntimeItemSchema } from "~/engine/runtime/schema/GridRuntimeItemSchema";
@@ -58,7 +58,7 @@ export const applyMergeRuntimeFx = Effect.fn("applyMergeRuntimeFx")(function* ({
 			runtime: draft,
 		} satisfies applyMergeRuntimeFx.Result;
 	}
-	const output = yield* outputFx({
+	const output = yield* resolveOutputFx({
 		origin: target.location,
 		output: rule.output,
 	});

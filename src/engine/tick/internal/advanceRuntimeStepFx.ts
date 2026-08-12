@@ -1,7 +1,6 @@
 import { Effect } from "effect";
 
 import { isPassiveStorageLocationFx } from "~/engine/location/read/isPassiveStorageLocationFx";
-import { isInstantGameplayEnabledFx } from "~/engine/cheat/read/isInstantGameplayEnabledFx";
 import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
@@ -13,6 +12,7 @@ import { resolveJobRunnableFx } from "~/engine/job/fx/resolveJobRunnableFx";
 import type { JobSchema } from "~/engine/job/schema/JobSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { TickStepMs } from "~/engine/tick/TickStepMs";
+import { RuntimeTimePolicyFx } from "~/engine/tick/context/RuntimeTimePolicyFx";
 import { ItemEnumSchema } from "~/engine/item/schema/ItemEnumSchema";
 
 interface RuntimeStepResult {
@@ -104,7 +104,7 @@ export const advanceRuntimeStepFx = Effect.fn("advanceRuntimeStepFx")(function* 
 	stepStart: RuntimeSchema.Type,
 ) {
 	const boundaryStart = yield* dispatchIdleQueueHeadsFx(stepStart);
-	const instantGameplay = yield* isInstantGameplayEnabledFx({
+	const instantGameplay = yield* (yield* RuntimeTimePolicyFx).completeTimedWorkInstantly({
 		runtime: boundaryStart.runtime,
 	});
 	const jobs = sortJobs(boundaryStart.runtime.jobs);

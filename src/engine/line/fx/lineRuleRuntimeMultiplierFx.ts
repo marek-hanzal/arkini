@@ -23,6 +23,7 @@ export const lineRuleRuntimeMultiplierFx = Effect.fn("lineRuleRuntimeMultiplierF
 	for (const when of rule.when) {
 		if (
 			!(yield* whenFx({
+				intent: rule.multiplier < 1 ? "satisfy" : "falsify",
 				origin,
 				when,
 			}))

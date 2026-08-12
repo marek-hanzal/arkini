@@ -16,8 +16,8 @@ import { readRuntimeItemByIdFx } from "~/engine/runtime/read/readRuntimeItemById
 import type { GridRuntimeItemSchema } from "~/engine/runtime/schema/GridRuntimeItemSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 import { applyPlacementPlanFx } from "./applyPlacementPlanFx";
-import { planDropPlacementFx } from "./planDropPlacementFx";
-import { readRuntimeItemDropLocationFx } from "./readRuntimeItemDropLocationFx";
+import { planPolicyDropPlacementFx } from "./planPolicyDropPlacementFx";
+import { readPolicyRuntimeItemDropLocationFx } from "./readPolicyRuntimeItemDropLocationFx";
 
 export namespace placeRuntimeItemFx {
 	export interface Props {
@@ -82,7 +82,7 @@ export const placeRuntimeItemFx = Effect.fn("placeRuntimeItemFx")(function* ({
 	} satisfies RuntimeSchema.Type;
 
 	if (pure) {
-		const plan = yield* planDropPlacementFx({
+		const plan = yield* planPolicyDropPlacementFx({
 			drop: {
 				itemId: item.item.id,
 				placement: PlacementEnumSchema.enum.Drop,
@@ -148,7 +148,7 @@ export const placeRuntimeItemFx = Effect.fn("placeRuntimeItemFx")(function* ({
 			}),
 		);
 	}
-	const location = yield* readRuntimeItemDropLocationFx({
+	const location = yield* readPolicyRuntimeItemDropLocationFx({
 		item,
 		origin,
 		runtime: detachedRuntime,

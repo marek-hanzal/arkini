@@ -6,7 +6,7 @@ import { readOutputPlacementItemEventsFx } from "~/engine/event/read/readOutputP
 import { releaseOwnerInputsFx } from "~/engine/input/fx/releaseOwnerInputsFx";
 import type { JobCompletionContext } from "~/engine/job/completion/JobCompletionContext";
 import { makeChargeDepletionRandomFx } from "~/engine/job/random/makeChargeDepletionRandomFx";
-import { outputFx } from "~/engine/output/fx/outputFx";
+import { resolveOutputFx } from "~/engine/output/fx/resolveOutputFx";
 import type { OutputResultSchema } from "~/engine/output/schema/OutputResultSchema";
 import { applyOutputPlacementFx } from "~/engine/placement/fx/applyOutputPlacementFx";
 import { removeRuntimeItemIdentityFx } from "~/engine/runtime/fx/removeRuntimeItemIdentityFx";
@@ -58,7 +58,7 @@ export const completeLineJobRuntimeFx = Effect.fn("completeLineJobRuntimeFx")(fu
 	const lineOutput =
 		context.line.output === undefined
 			? emptyOutput
-			: yield* outputFx({
+			: yield* resolveOutputFx({
 					origin: context.owner.location,
 					output: context.line.output,
 				});
@@ -81,7 +81,7 @@ export const completeLineJobRuntimeFx = Effect.fn("completeLineJobRuntimeFx")(fu
 		const depletionOutput = yield* makeChargeDepletionRandomFx({
 			itemId: context.owner.id,
 			job: context.job,
-			program: outputFx({
+			program: resolveOutputFx({
 				origin: context.owner.location,
 				output: context.owner.item.charges.output,
 			}),

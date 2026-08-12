@@ -1,6 +1,6 @@
 import { Array, Effect } from "effect";
 
-import { distanceFx } from "~/engine/distance/fx/distanceFx";
+import { matchesSpatialRelationFx } from "~/engine/distance/fx/matchesSpatialRelationFx";
 import type { BoardLocationSchema } from "~/engine/location/schema/BoardLocationSchema";
 import type { QueryBoardSchema } from "~/engine/query/schema/QueryBoardSchema";
 import { getItemsFx } from "~/engine/runtime/read/getItemsFx";
@@ -32,7 +32,7 @@ export const queryBoardFx = Effect.fn("queryBoardFx")(function* ({
 	);
 
 	return yield* Effect.filter(selectedBoardItems, (item) => {
-		return distanceFx({
+		return matchesSpatialRelationFx({
 			distance: query.distance,
 			item: item.location.position,
 			origin: origin.position,

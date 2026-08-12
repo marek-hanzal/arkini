@@ -427,27 +427,39 @@ describe("readPlannerSearchScope", () => {
 		expect(scope.unsupportedRoutes).toEqual([]);
 	});
 
-	it.each([
-		[
-			"depleted-target",
-			"charge-depletion",
-		],
-		[
-			"temporary-target",
-			"temporary-expiry",
-		],
-	] as const)("marks %s as unsupported instead of unreachable", (targetItemId, reason) => {
+	it("keeps explicit temporary expiry inside the supported slice", () => {
 		const scope = readPlannerSearchScope({
 			graph,
-			targetItemId,
+			targetItemId: "temporary-target",
+		});
+
+		expect(scope.supported).toBe(true);
+		expect(scope.actions).toHaveLength(1);
+		expect(scope.actions[0]).toMatchObject({
+			action: {
+				itemId: "temporary-token",
+				kind: "temporary-expiry",
+			},
+			outputMode: "canonical",
+			outputItemIds: [
+				"temporary-target",
+			],
+		});
+		expect(scope.unsupportedRoutes).toEqual([]);
+	});
+
+	it("marks charge depletion as unsupported instead of unreachable", () => {
+		const scope = readPlannerSearchScope({
+			graph,
+			targetItemId: "depleted-target",
 		});
 
 		expect(scope.supported).toBe(false);
 		expect(scope.actions).toEqual([]);
 		expect(scope.unsupportedRoutes).toEqual([
 			expect.objectContaining({
-				outputItemId: targetItemId,
-				reason,
+				outputItemId: "depleted-target",
+				reason: "charge-depletion",
 			}),
 		]);
 	});

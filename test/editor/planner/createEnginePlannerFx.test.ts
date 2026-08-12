@@ -167,12 +167,14 @@ const producerItem = ({
 	additionalInputs = [],
 	inputItemId,
 	output,
+	rules = [],
 	runtimeMs,
 }: {
 	readonly additionalInputs?: ReadonlyArray<Record<string, unknown>>;
 	readonly id: string;
 	readonly inputItemId?: string;
 	readonly output: Record<string, unknown>;
+	readonly rules?: ReadonlyArray<Record<string, unknown>>;
 	readonly runtimeMs: number;
 }) => ({
 	...baseItem({
@@ -197,7 +199,7 @@ const producerItem = ({
 				...additionalInputs,
 			],
 			output,
-			rules: [],
+			rules,
 			runtimeMs,
 			title: "Run",
 		},
@@ -216,6 +218,9 @@ const boardItemIds = [
 	"parallel-producer-a",
 	"parallel-producer-b",
 	"parallel-assembler",
+	"temporary-token",
+	"temporary-inspector",
+	"temporary-assembler",
 	"merge-target",
 	"start-target",
 ];
@@ -327,6 +332,51 @@ const config = GameConfigSchema.parse({
 			runtimeMs: 20,
 		}),
 		"parallel-target": simpleItem("parallel-target"),
+		"temporary-token": {
+			...baseItem({
+				id: "temporary-token",
+				maxStackSize: 1,
+				scope: "board",
+			}),
+			durationMs: 500,
+			output: guaranteedOutput("temporary-shell"),
+			type: "temporary",
+		},
+		"temporary-shell": simpleItem("temporary-shell"),
+		"temporary-inspector": producerItem({
+			id: "temporary-inspector",
+			output: guaranteedOutput("temporary-proof"),
+			rules: [
+				{
+					type: "enable",
+					when: [
+						{
+							query: {
+								distance: "near",
+								scope: "board",
+								selector: {
+									itemId: "temporary-token",
+									type: "item",
+								},
+							},
+							type: "exists",
+						},
+					],
+				},
+			],
+			runtimeMs: 50,
+		}),
+		"temporary-proof": simpleItem("temporary-proof"),
+		"temporary-assembler": producerItem({
+			additionalInputs: [
+				materialInput("temporary-shell"),
+			],
+			id: "temporary-assembler",
+			inputItemId: "temporary-proof",
+			output: guaranteedOutput("temporary-target"),
+			runtimeMs: 60,
+		}),
+		"temporary-target": simpleItem("temporary-target"),
 		orphan: simpleItem("orphan"),
 		"merge-source": {
 			...simpleItem("merge-source"),
@@ -452,6 +502,33 @@ describe("createEnginePlannerFx", () => {
 				ownerItemId: "parallel-assembler",
 			},
 		]);
+	});
+
+	it("uses a temporary item before explicitly expiring it", () => {
+		const result = Effect.runSync(makePlanner().searchFx("temporary-target"));
+
+		expect(result.type).toBe("completed");
+		if (result.type !== "completed") return;
+		expect(result.elapsedMs).toBe(610);
+		expect(result.outputCertainty).toBe("deterministic");
+		expect(result.trace.map(({ action }) => action)).toEqual([
+			{
+				kind: "line",
+				lineId: "line:temporary-inspector:run",
+				ownerItemId: "temporary-inspector",
+			},
+			{
+				itemId: "temporary-token",
+				kind: "temporary-expiry",
+			},
+			{
+				kind: "line",
+				lineId: "line:temporary-assembler:run",
+				ownerItemId: "temporary-assembler",
+			},
+		]);
+		expect(result.runtime.items.some(({ item }) => item.id === "temporary-token")).toBe(false);
+		expect(result.runtime.items.some(({ item }) => item.id === "temporary-target")).toBe(true);
 	});
 
 	it("returns an already-owned start target without running an action", () => {

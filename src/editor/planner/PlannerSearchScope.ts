@@ -3,7 +3,7 @@ import type { PlannerActionOutputWitness } from "~/editor/planner/PlannerActionO
 import type { PlannerAcquisitionRoute } from "~/editor/planner/PlannerAcquisitionGraph";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 
-export type PlannerSearchUnsupportedRouteReason = "charge-depletion" | "temporary-expiry";
+export type PlannerSearchUnsupportedRouteReason = "charge-depletion";
 
 export interface PlannerSearchUnsupportedRoute {
 	readonly kind: PlannerAcquisitionRoute["kind"];

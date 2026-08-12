@@ -18,7 +18,6 @@ const readUnsupportedReason = (
 	route: PlannerAcquisitionRoute,
 ): PlannerSearchUnsupportedRouteReason | undefined => {
 	if (route.kind === "line-charge-depletion") return "charge-depletion";
-	if (route.kind === "temporary-expiry") return "temporary-expiry";
 	return undefined;
 };
 

@@ -1120,21 +1120,32 @@ describe("createEnginePlannerFx", () => {
 		});
 	});
 
-	it.each([
-		"maximumExpandedStates",
-		"maximumQueuedStates",
-	] as const)("reports the %s search budget without forging impossibility", (budgetLimit) => {
+	it("reports the expanded-state budget without forging impossibility", () => {
 		const result = Effect.runSync(
 			makePlanner().searchFx("target", 1, {
-				[budgetLimit]: 1,
+				maximumExpandedStates: 1,
 			}),
 		);
 
 		expect(result).toMatchObject({
-			budgetLimit,
+			budgetLimit: "maximumExpandedStates",
 			itemId: "target",
 			reason: "search-budget",
 			type: "inconclusive",
+		});
+	});
+
+	it("keeps searching inside a one-state bounded frontier", () => {
+		const result = Effect.runSync(
+			makePlanner().searchFx("target", 1, {
+				maximumQueuedStates: 1,
+			}),
+		);
+
+		expect(result).toMatchObject({
+			availableQuantity: 1,
+			itemId: "target",
+			type: "completed",
 		});
 	});
 

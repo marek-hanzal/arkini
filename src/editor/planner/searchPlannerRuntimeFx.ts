@@ -131,6 +131,30 @@ const removeDominatedQueueNodes = (
 	index: ReturnType<typeof createPlannerRuntimeDominanceIndex>,
 ) => queue.filter((node) => index.isActive(node.fingerprint, node.stateToken));
 
+const pruneQueueToBudget = ({
+	index,
+	maximumQueuedStates,
+	queue,
+}: {
+	readonly index: ReturnType<typeof createPlannerRuntimeDominanceIndex>;
+	readonly maximumQueuedStates: number;
+	readonly queue: SearchNode[];
+}) => {
+	const active = removeDominatedQueueNodes(queue, index).sort(compareSearchNodes);
+	if (active.length <= maximumQueuedStates)
+		return {
+			pruned: false,
+			queue: active,
+		};
+
+	for (const node of active.slice(maximumQueuedStates))
+		index.deactivate(node.fingerprint, node.stateToken);
+	return {
+		pruned: true,
+		queue: active.slice(0, maximumQueuedStates),
+	};
+};
+
 const readInconclusive = ({
 	best,
 	blockedActionIds,
@@ -315,6 +339,7 @@ export const searchPlannerRuntimeFx = Effect.fn("searchPlannerRuntimeFx")(functi
 	let expandedStates = 0;
 	let best = initial;
 	let nextOrder = 1;
+	let queueBudgetPruned = false;
 	let traceBudgetReached = false;
 
 	while (queue.length > 0) {
@@ -484,44 +509,41 @@ export const searchPlannerRuntimeFx = Effect.fn("searchPlannerRuntimeFx")(functi
 				traceBudgetReached = true;
 				continue;
 			}
-			queue = removeDominatedQueueNodes(queue, dominanceIndex);
-			if (queue.length >= budget.maximumQueuedStates)
-				return readInconclusive({
-					best,
-					blockedActionIds,
-					budgetLimit: "maximumQueuedStates",
-					expandedStates,
-					frontierSize: queue.length,
-					itemId,
-					quantity,
-					reason: "search-budget",
-					scope,
-					unsupportedActionIds,
-					visitedStates: dominanceIndex.readFingerprintCount(),
-				});
-			queue.push(next);
+			const boundedQueue = pruneQueueToBudget({
+				index: dominanceIndex,
+				maximumQueuedStates: budget.maximumQueuedStates,
+				queue: [
+					...queue,
+					next,
+				],
+			});
+			queue = boundedQueue.queue;
+			queueBudgetPruned ||= boundedQueue.pruned;
 		}
 	}
 
 	return readInconclusive({
 		best,
 		blockedActionIds,
-		...(traceBudgetReached
+		...(traceBudgetReached || queueBudgetPruned
 			? {
-					budgetLimit: "maximumTraceLength" as const,
+					budgetLimit: traceBudgetReached
+						? ("maximumTraceLength" as const)
+						: ("maximumQueuedStates" as const),
 				}
 			: {}),
 		expandedStates,
 		frontierSize: 0,
 		itemId,
 		quantity,
-		reason: traceBudgetReached
-			? "search-budget"
-			: unsupportedActionIds.size > 0
-				? "action-unsupported"
-				: scope.unsupportedRoutes.length > 0
-					? "unsupported-routes"
-					: "search-exhausted",
+		reason:
+			traceBudgetReached || queueBudgetPruned
+				? "search-budget"
+				: unsupportedActionIds.size > 0
+					? "action-unsupported"
+					: scope.unsupportedRoutes.length > 0
+						? "unsupported-routes"
+						: "search-exhausted",
 		scope,
 		unsupportedActionIds,
 		visitedStates: dominanceIndex.readFingerprintCount(),

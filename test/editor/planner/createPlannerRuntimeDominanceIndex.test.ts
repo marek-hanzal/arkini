@@ -157,4 +157,36 @@ describe("createPlannerRuntimeDominanceIndex", () => {
 			),
 		).toBe(false);
 	});
+
+	it("allows a beam-pruned label to be explored again without forgetting visit accounting", () => {
+		const index = createPlannerRuntimeDominanceIndex();
+		const first = index.register({
+			label: {
+				elapsedMs: 100,
+				outputCertainty: "deterministic",
+				selectedWitnessProbability: 1,
+				traceLength: 1,
+			},
+			runtime,
+		});
+		if (!first.accepted) throw new Error("Expected first registration to succeed.");
+
+		index.deactivate(first.fingerprint, first.token);
+		expect(index.isActive(first.fingerprint, first.token)).toBe(false);
+
+		const second = index.register({
+			label: {
+				elapsedMs: 100,
+				outputCertainty: "deterministic",
+				selectedWitnessProbability: 1,
+				traceLength: 1,
+			},
+			runtime,
+		});
+		expect(second).toMatchObject({
+			accepted: true,
+			newFingerprint: false,
+		});
+		expect(index.readFingerprintCount()).toBe(1);
+	});
 });

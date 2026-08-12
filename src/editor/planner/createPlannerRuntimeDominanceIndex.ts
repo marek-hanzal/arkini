@@ -49,6 +49,7 @@ export const dominatesPlannerRuntimePath = (
  */
 export const createPlannerRuntimeDominanceIndex = () => {
 	const pathsByFingerprint = new Map<string, IndexedPlannerRuntimePath[]>();
+	const visitedFingerprints = new Set<string>();
 	let nextToken = 1;
 
 	const register = ({
@@ -59,6 +60,8 @@ export const createPlannerRuntimeDominanceIndex = () => {
 		readonly runtime: RuntimeSchema.Type;
 	}): PlannerRuntimeDominanceRegistration => {
 		const fingerprint = readPlannerRuntimeFingerprint(runtime);
+		const newFingerprint = !visitedFingerprints.has(fingerprint);
+		visitedFingerprints.add(fingerprint);
 		const existing = pathsByFingerprint.get(fingerprint) ?? [];
 		if (existing.some((candidate) => dominatesPlannerRuntimePath(candidate, label)))
 			return {
@@ -79,17 +82,24 @@ export const createPlannerRuntimeDominanceIndex = () => {
 		return {
 			accepted: true,
 			fingerprint,
-			newFingerprint: existing.length === 0,
+			newFingerprint,
 			token,
 		};
 	};
 
 	return {
+		deactivate: (fingerprint: string, token: number) => {
+			const remaining = (pathsByFingerprint.get(fingerprint) ?? []).filter(
+				(candidate) => candidate.token !== token,
+			);
+			if (remaining.length === 0) pathsByFingerprint.delete(fingerprint);
+			else pathsByFingerprint.set(fingerprint, remaining);
+		},
 		isActive: (fingerprint: string, token: number) =>
 			(pathsByFingerprint.get(fingerprint) ?? []).some(
 				(candidate) => candidate.token === token,
 			),
-		readFingerprintCount: () => pathsByFingerprint.size,
+		readFingerprintCount: () => visitedFingerprints.size,
 		register,
 	};
 };

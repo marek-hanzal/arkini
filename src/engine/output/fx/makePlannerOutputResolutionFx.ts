@@ -14,12 +14,14 @@ export const makePlannerOutputResolutionFx = (
 			props.source !== undefined &&
 			readOutputResolutionSourceId(props.source) ===
 				readOutputResolutionSourceId(target.source)
-		)
+		) {
+			target.onResolved?.();
 			return resolvePlannerOutputWitnessFx({
 				origin: props.origin,
 				output: props.output,
 				witness: target.witness,
 			});
+		}
 		return resolveReproducibleOutputFx(props);
 	},
 });

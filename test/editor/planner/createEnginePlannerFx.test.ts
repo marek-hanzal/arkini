@@ -218,6 +218,8 @@ const boardItemIds = [
 	"parallel-producer-a",
 	"parallel-producer-b",
 	"parallel-assembler",
+	"charge-worker",
+	"charge-deposit",
 	"temporary-token",
 	"temporary-inspector",
 	"temporary-assembler",
@@ -332,6 +334,54 @@ const config = GameConfigSchema.parse({
 			runtimeMs: 20,
 		}),
 		"parallel-target": simpleItem("parallel-target"),
+		"charge-worker": {
+			...baseItem({
+				id: "charge-worker",
+				maxStackSize: 1,
+				scope: "board",
+			}),
+			lines: [
+				{
+					description: "Spend one charge from a nearby deposit.",
+					id: "line:charge-worker:spend",
+					input: [
+						{
+							charges: {
+								cost: 1,
+								from: "target",
+							},
+							query: {
+								distance: "near",
+								scope: "board",
+								selector: {
+									itemId: "charge-deposit",
+									type: "item",
+								},
+							},
+							type: "deposit",
+						},
+					],
+					rules: [],
+					runtimeMs: 40,
+					title: "Spend",
+				},
+			],
+			maxQueueSize: 1,
+			type: "producer",
+		},
+		"charge-deposit": {
+			...baseItem({
+				id: "charge-deposit",
+				maxStackSize: 1,
+				scope: "board",
+			}),
+			charges: {
+				amount: 3,
+				output: chanceOutput("charge-target"),
+			},
+			type: "deposit",
+		},
+		"charge-target": simpleItem("charge-target"),
 		"temporary-token": {
 			...baseItem({
 				id: "temporary-token",
@@ -502,6 +552,46 @@ describe("createEnginePlannerFx", () => {
 				ownerItemId: "parallel-assembler",
 			},
 		]);
+	});
+
+	it("repeats a real spender line until stochastic charge depletion resolves", () => {
+		const result = Effect.runSync(makePlanner().searchFx("charge-target"));
+
+		expect(result.type).toBe("completed");
+		if (result.type !== "completed") return;
+		expect(result.elapsedMs).toBe(120);
+		expect(result.outputCertainty).toBe("possible");
+		expect(result.trace.map(({ action }) => action)).toEqual(
+			Array.from(
+				{
+					length: 3,
+				},
+				() => ({
+					kind: "line" as const,
+					lineId: "line:charge-worker:spend",
+					ownerItemId: "charge-worker",
+				}),
+			),
+		);
+		expect(result.trace.map(({ outputResolution }) => outputResolution.type)).toEqual([
+			"canonical",
+			"canonical",
+			"existential",
+		]);
+		expect(result.trace[2]?.outputResolution).toMatchObject({
+			outputItemId: "charge-target",
+			type: "existential",
+		});
+		const eventTypes = result.trace.flatMap(({ events }) => events.map(({ type }) => type));
+		expect(
+			eventTypes.filter((type) => type === GameEventEnumSchema.enum.ItemChargeSpent),
+		).toHaveLength(2);
+		expect(
+			eventTypes.filter((type) => type === GameEventEnumSchema.enum.ItemDepleted),
+		).toHaveLength(1);
+		expect(result.runtime.items.some(({ item }) => item.id === "charge-deposit")).toBe(false);
+		expect(result.runtime.items.some(({ item }) => item.id === "charge-worker")).toBe(true);
+		expect(result.runtime.items.some(({ item }) => item.id === "charge-target")).toBe(true);
 	});
 
 	it("uses a temporary item before explicitly expiring it", () => {

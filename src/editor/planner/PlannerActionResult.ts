@@ -65,6 +65,7 @@ export type PlannerActionResult =
 			readonly actor: PlannerActionActor;
 			readonly elapsedMs: number;
 			readonly events: readonly GameEventSchema.Type[];
+			readonly outputWitnessResolved: boolean;
 			readonly runtime: RuntimeSchema.Type;
 			readonly type: "completed";
 	  }

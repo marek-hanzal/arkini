@@ -448,19 +448,25 @@ describe("readPlannerSearchScope", () => {
 		expect(scope.unsupportedRoutes).toEqual([]);
 	});
 
-	it("marks charge depletion as unsupported instead of unreachable", () => {
+	it("keeps charge depletion tied to its authored spender line", () => {
 		const scope = readPlannerSearchScope({
 			graph,
 			targetItemId: "depleted-target",
 		});
 
-		expect(scope.supported).toBe(false);
-		expect(scope.actions).toEqual([]);
-		expect(scope.unsupportedRoutes).toEqual([
-			expect.objectContaining({
-				outputItemId: "depleted-target",
-				reason: "charge-depletion",
-			}),
-		]);
+		expect(scope.supported).toBe(true);
+		expect(scope.actions).toHaveLength(1);
+		expect(scope.actions[0]).toMatchObject({
+			action: {
+				kind: "line",
+				lineId: "line:charged",
+				ownerItemId: "charged-producer",
+			},
+			outputMode: "canonical",
+			outputItemIds: [
+				"depleted-target",
+			],
+		});
+		expect(scope.unsupportedRoutes).toEqual([]);
 	});
 });

@@ -6,20 +6,11 @@ import type {
 	PlannerSearchAction,
 	PlannerSearchScope,
 	PlannerSearchUnsupportedRoute,
-	PlannerSearchUnsupportedRouteReason,
 } from "~/editor/planner/PlannerSearchScope";
 import { readPlannerActionId } from "~/editor/planner/readPlannerActionId";
-import { resolvePlannerRouteReachability } from "~/editor/planner/resolvePlannerRouteReachability";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 
 const compareIds = (left: string, right: string) => left.localeCompare(right);
-
-const readUnsupportedReason = (
-	route: PlannerAcquisitionRoute,
-): PlannerSearchUnsupportedRouteReason | undefined => {
-	if (route.kind === "line-charge-depletion") return "charge-depletion";
-	return undefined;
-};
 
 const readTargetClosure = ({
 	depthByItemId,
@@ -222,52 +213,24 @@ export const readPlannerSearchScope = ({
 	readonly graph: PlannerAcquisitionGraph;
 	readonly targetItemId: IdSchema.Type;
 }): PlannerSearchScope => {
-	const supportedRoutes = graph.routes.filter(
-		(route) => readUnsupportedReason(route) === undefined,
-	);
-	const supportedReachability = resolvePlannerRouteReachability({
-		rootItemIds: graph.rootItemIds,
-		routes: supportedRoutes,
-	});
-	const supported = supportedReachability.depthByItemId.has(targetItemId);
+	const supported = graph.depthByItemId.has(targetItemId);
 	const supportedClosure = supported
 		? readTargetClosure({
-				depthByItemId: supportedReachability.depthByItemId,
+				depthByItemId: graph.depthByItemId,
 				graph,
-				reachableRouteIds: supportedReachability.reachableRouteIds,
-				routeDepthById: supportedReachability.routeDepthById,
+				reachableRouteIds: graph.reachableRouteIds,
+				routeDepthById: graph.routeDepthById,
 				targetItemId,
 			})
 		: {
 				itemIds: new Set<IdSchema.Type>(),
 				routes: [] as PlannerAcquisitionRoute[],
 			};
-	const fullClosure = readTargetClosure({
-		depthByItemId: graph.depthByItemId,
-		graph,
-		reachableRouteIds: graph.reachableRouteIds,
-		routeDepthById: graph.routeDepthById,
-		targetItemId,
-	});
-	const unsupportedRoutes: PlannerSearchUnsupportedRoute[] = fullClosure.routes.flatMap(
-		(route) => {
-			const reason = readUnsupportedReason(route);
-			return reason === undefined
-				? []
-				: [
-						{
-							kind: route.kind,
-							outputItemId: route.output.itemId,
-							reason,
-							routeId: route.id,
-						},
-					];
-		},
-	);
+	const unsupportedRoutes: PlannerSearchUnsupportedRoute[] = [];
 
 	return {
 		actions: readSearchActions({
-			routeDepthById: supportedReachability.routeDepthById,
+			routeDepthById: graph.routeDepthById,
 			routes: supportedClosure.routes,
 		}),
 		itemIds: [

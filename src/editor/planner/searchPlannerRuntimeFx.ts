@@ -84,9 +84,9 @@ const compareSearchNodes = (left: SearchNode, right: SearchNode) =>
 
 const readNextOutputCertainty = (
 	current: PlannerSearchOutputCertainty,
-	outputMode: PlannerSearchScope["actions"][number]["outputMode"],
+	outputWitnessResolved: boolean,
 ): PlannerSearchOutputCertainty =>
-	current === "possible" || outputMode === "existential" ? "possible" : "deterministic";
+	current === "possible" || outputWitnessResolved ? "possible" : "deterministic";
 
 const readRelevantPresence = (node: SearchNode, scope: PlannerSearchScope) =>
 	scope.itemIds.reduce(
@@ -342,6 +342,8 @@ export const searchPlannerRuntimeFx = Effect.fn("searchPlannerRuntimeFx")(functi
 				continue;
 			}
 
+			const outputWitnessResolved =
+				candidate.outputMode === "existential" && result.outputWitnessResolved;
 			const nextTrace: ReadonlyArray<PlannerSearchTraceEntry> = [
 				...node.trace,
 				{
@@ -350,17 +352,16 @@ export const searchPlannerRuntimeFx = Effect.fn("searchPlannerRuntimeFx")(functi
 					actor: result.actor,
 					elapsedMs: result.elapsedMs,
 					events: result.events,
-					outputResolution:
-						candidate.outputMode === "canonical"
-							? {
-									type: "canonical" as const,
-								}
-							: {
-									outputItemId: candidate.outputWitness.outputItemId,
-									routeId: candidate.outputWitness.routeId,
-									type: "existential" as const,
-									witnessId: candidate.outputWitness.witnessId,
-								},
+					outputResolution: outputWitnessResolved
+						? {
+								outputItemId: candidate.outputWitness.outputItemId,
+								routeId: candidate.outputWitness.routeId,
+								type: "existential" as const,
+								witnessId: candidate.outputWitness.witnessId,
+							}
+						: {
+								type: "canonical" as const,
+							},
 					outputItemIds: candidate.outputItemIds,
 					routeIds: candidate.routeIds,
 				},
@@ -368,7 +369,7 @@ export const searchPlannerRuntimeFx = Effect.fn("searchPlannerRuntimeFx")(functi
 			const nextElapsedMs = node.elapsedMs + result.elapsedMs;
 			const nextOutputCertainty = readNextOutputCertainty(
 				node.outputCertainty,
-				candidate.outputMode,
+				outputWitnessResolved,
 			);
 			const registration = dominanceIndex.register({
 				label: {

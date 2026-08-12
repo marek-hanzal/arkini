@@ -3,6 +3,7 @@ import type { OutputSelectionWitness } from "~/engine/output/OutputSelectionWitn
 
 /** Output request whose stochastic branch the planner must realize existentially. */
 export interface PlannerOutputResolutionTarget {
+	readonly onResolved?: () => void;
 	readonly source: OutputResolutionSource;
 	readonly witness: OutputSelectionWitness;
 }

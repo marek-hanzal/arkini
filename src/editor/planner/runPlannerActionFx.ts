@@ -145,6 +145,7 @@ const runLineActionFx = Effect.fn("runPlannerActionFx.line")(function* ({
 		},
 		elapsedMs: result.elapsedMs,
 		events: result.events,
+		outputWitnessResolved: false,
 		runtime: result.runtime,
 		type: "completed",
 	} satisfies PlannerActionResult;
@@ -219,6 +220,7 @@ const runMergeActionFx = Effect.fn("runPlannerActionFx.merge")(function* ({
 		},
 		elapsedMs: 0,
 		events: result.events,
+		outputWitnessResolved: false,
 		runtime: result.runtime,
 		type: "completed",
 	} satisfies PlannerActionResult;
@@ -293,6 +295,7 @@ const runTemporaryExpiryActionFx = Effect.fn("runPlannerActionFx.temporaryExpiry
 		},
 		elapsedMs: result.elapsedMs,
 		events: result.events,
+		outputWitnessResolved: false,
 		runtime: result.runtime,
 		type: "completed",
 	} satisfies PlannerActionResult;
@@ -345,31 +348,45 @@ const readFailureTag = (failure: unknown) => {
 
 /** Runs one authored action against an immutable runtime under optimistic planner policies. */
 export const runPlannerActionFx = (props: runPlannerActionFx.Props) =>
-	runPlannerActionWithPoliciesFx(props).pipe(
-		Effect.provide(
-			makePlannerGamePolicyLayerFx(
-				props.outputWitness === undefined
-					? undefined
-					: {
-							source: props.outputWitness.source,
-							witness: props.outputWitness.witness,
-						},
+	Effect.suspend(() => {
+		let outputWitnessResolved = false;
+		return runPlannerActionWithPoliciesFx(props).pipe(
+			Effect.provide(
+				makePlannerGamePolicyLayerFx(
+					props.outputWitness === undefined
+						? undefined
+						: {
+								onResolved: () => {
+									outputWitnessResolved = true;
+								},
+								source: props.outputWitness.source,
+								witness: props.outputWitness.witness,
+							},
+				),
 			),
-		),
-		Effect.catch((failure) =>
-			Effect.succeed({
-				action: props.action,
-				blocker: {
-					attempt: [
-						{
-							failureTag: readFailureTag(failure),
-							stage: readUnexpectedFailureStage(props.action),
-						},
-					],
-					code: "action-rejected",
-				},
-				runtime: props.runtime,
-				type: "blocked",
-			} satisfies PlannerActionResult),
-		),
-	);
+			Effect.map((result) =>
+				result.type === "completed"
+					? {
+							...result,
+							outputWitnessResolved,
+						}
+					: result,
+			),
+			Effect.catch((failure) =>
+				Effect.succeed({
+					action: props.action,
+					blocker: {
+						attempt: [
+							{
+								failureTag: readFailureTag(failure),
+								stage: readUnexpectedFailureStage(props.action),
+							},
+						],
+						code: "action-rejected",
+					},
+					runtime: props.runtime,
+					type: "blocked",
+				} satisfies PlannerActionResult),
+			),
+		);
+	});

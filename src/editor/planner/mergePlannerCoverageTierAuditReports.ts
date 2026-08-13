@@ -49,10 +49,8 @@ const normalizeItem = (item: PlannerCoverageTierAuditItem): PlannerCoverageTierA
 			return fail(
 				`Planner coverage shard item ${item.itemId} contains an attempt for ${attempt.result.itemId}.`,
 			);
-		if (attempt.tierIndex <= previousTierIndex)
-			return fail(
-				`Planner coverage shard item tiers are not strictly increasing: ${item.itemId}.`,
-			);
+		if (attempt.tierIndex !== previousTierIndex + 1)
+			return fail(`Planner coverage shard item tiers are not contiguous: ${item.itemId}.`);
 		previousTierIndex = attempt.tierIndex;
 	}
 	const finalAttempt = item.attempts.at(-1);

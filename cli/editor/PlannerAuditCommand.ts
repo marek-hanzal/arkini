@@ -10,6 +10,7 @@ import { assertGameConfigValidFx } from "~/engine/validation/fx/assertGameConfig
 import { printGameDiagnosticsForCliFx } from "~/engine/validation/printer/printGameDiagnosticsForCliFx";
 
 import { parsePlannerCoverageTierSpec } from "./parsePlannerCoverageTierSpec";
+import { readPlannerCoverageTierAuditReportFx } from "./readPlannerCoverageTierAuditReportFx";
 
 const positiveIntegerFlag = ({
 	defaultValue,
@@ -31,6 +32,7 @@ const runPlannerAuditFx = Effect.fn("runPlannerAuditFx")(function* ({
 	offset,
 	progress,
 	quantity,
+	resumeReport,
 	tiers,
 }: {
 	readonly input: string;
@@ -42,6 +44,7 @@ const runPlannerAuditFx = Effect.fn("runPlannerAuditFx")(function* ({
 	readonly offset: number;
 	readonly progress: boolean;
 	readonly quantity: number;
+	readonly resumeReport: string;
 	readonly tiers: string;
 }) {
 	const compilation = yield* compileGameDirectoryFx({
@@ -57,6 +60,20 @@ const runPlannerAuditFx = Effect.fn("runPlannerAuditFx")(function* ({
 		normalizedLimit === 0 ? undefined : normalizedOffset + normalizedLimit,
 	);
 	const tierSpecification = tiers.trim();
+	const resumeReportPath = resumeReport.trim();
+	if (resumeReportPath.length > 0 && tierSpecification.length === 0)
+		return yield* new PlannerCoverageTierAuditInputError({
+			message: "Planner coverage resume requires at least one --tiers entry.",
+		});
+	if (resumeReportPath.length > 0 && (normalizedOffset !== 0 || normalizedLimit !== 0))
+		return yield* new PlannerCoverageTierAuditInputError({
+			message:
+				"Planner coverage resume report defines its own item set; --offset and --limit must stay zero.",
+		});
+	const initialReport =
+		resumeReportPath.length === 0
+			? undefined
+			: yield* readPlannerCoverageTierAuditReportFx(resumeReportPath);
 	const report =
 		tierSpecification.length === 0
 			? yield* auditPlannerCoverageFx({
@@ -80,7 +97,13 @@ const runPlannerAuditFx = Effect.fn("runPlannerAuditFx")(function* ({
 				})
 			: yield* auditPlannerCoverageTiersFx({
 					config,
-					itemIds,
+					...(initialReport === undefined
+						? {
+								itemIds,
+							}
+						: {
+								initialReport,
+							}),
 					...(progress
 						? {
 								onProgress: ({
@@ -98,7 +121,7 @@ const runPlannerAuditFx = Effect.fn("runPlannerAuditFx")(function* ({
 									),
 							}
 						: {}),
-					quantity,
+					quantity: initialReport?.quantity ?? quantity,
 					tiers: yield* Effect.try({
 						catch: (cause) =>
 							cause instanceof PlannerCoverageTierAuditInputError
@@ -154,6 +177,12 @@ export const PlannerAuditCommand = Command.make(
 			description: "Target quantity requested from the planner for every item.",
 			name: "quantity",
 		}),
+		resumeReport: Flag.string("resume-report").pipe(
+			Flag.withDefault(""),
+			Flag.withDescription(
+				"Resume a tier audit report and run only newly supplied tiers over its unresolved item set.",
+			),
+		),
 		tiers: Flag.string("tiers").pipe(
 			Flag.withDefault(""),
 			Flag.withDescription(
@@ -171,6 +200,7 @@ export const PlannerAuditCommand = Command.make(
 		offset,
 		progress,
 		quantity,
+		resumeReport,
 		tiers,
 	}) =>
 		runPlannerAuditFx({
@@ -183,6 +213,7 @@ export const PlannerAuditCommand = Command.make(
 			offset,
 			progress,
 			quantity,
+			resumeReport,
 			tiers,
 		}),
 ).pipe(

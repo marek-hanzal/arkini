@@ -401,6 +401,115 @@ describe("auditPlannerCoverageFx", () => {
 		});
 	});
 
+	it("resumes a tier audit without rerunning terminal item results", () => {
+		const smokeTier = {
+			budget: {
+				maximumExpandedStates: 1,
+				maximumQueuedStates: 8,
+				maximumRoutePlans: 4,
+				maximumTraceLength: 8,
+			},
+			id: "smoke",
+		} as const;
+		const remainingTiers = [
+			{
+				budget: {
+					maximumExpandedStates: 8,
+					maximumQueuedStates: 8,
+					maximumRoutePlans: 4,
+					maximumTraceLength: 8,
+				},
+				id: "deep",
+			},
+			{
+				budget: {
+					maximumExpandedStates: 16,
+					maximumQueuedStates: 8,
+					maximumRoutePlans: 4,
+					maximumTraceLength: 8,
+				},
+				id: "unused",
+			},
+		] as const;
+		const initialReport = Effect.runSync(
+			auditPlannerCoverageTiersFx({
+				config,
+				tiers: [
+					smokeTier,
+				],
+			}),
+		);
+		const progress: PlannerCoverageTierAuditProgress[] = [];
+		const resumed = Effect.runSync(
+			auditPlannerCoverageTiersFx({
+				config,
+				initialReport,
+				onProgress: (entry) => Effect.sync(() => progress.push(entry)),
+				tiers: remainingTiers,
+			}),
+		);
+		const full = Effect.runSync(
+			auditPlannerCoverageTiersFx({
+				config,
+				tiers: [
+					smokeTier,
+					...remainingTiers,
+				],
+			}),
+		);
+
+		expect(resumed.summary).toMatchObject({
+			finalOutcomes: full.summary.finalOutcomes,
+			resolutionByTier: full.summary.resolutionByTier,
+			search: full.summary.search,
+			tierCount: full.summary.tierCount,
+			totalItems: full.summary.totalItems,
+			totalSearchAttempts: full.summary.totalSearchAttempts,
+			unresolvedItemIds: full.summary.unresolvedItemIds,
+		});
+		expect(
+			resumed.tiers.map(({ attemptedItems, cumulativeOutcomes, id }) => ({
+				attemptedItems,
+				cumulativeOutcomes,
+				id,
+			})),
+		).toEqual(
+			full.tiers.map(({ attemptedItems, cumulativeOutcomes, id }) => ({
+				attemptedItems,
+				cumulativeOutcomes,
+				id,
+			})),
+		);
+		expect(
+			resumed.items.map(({ attempts, finalOutcome, itemId }) => ({
+				attempts: attempts.map(({ result, tierId, tierIndex }) => ({
+					outcome: result.outcome,
+					tierId,
+					tierIndex,
+				})),
+				finalOutcome,
+				itemId,
+			})),
+		).toEqual(
+			full.items.map(({ attempts, finalOutcome, itemId }) => ({
+				attempts: attempts.map(({ result, tierId, tierIndex }) => ({
+					outcome: result.outcome,
+					tierId,
+					tierIndex,
+				})),
+				finalOutcome,
+				itemId,
+			})),
+		);
+		expect(progress).toHaveLength(1);
+		expect(progress[0]).toMatchObject({
+			itemId: "target",
+			tierCount: 3,
+			tierId: "deep",
+			tierIndex: 2,
+		});
+	});
+
 	it("rejects tiers that lower a previous budget limit", () => {
 		const message = Effect.runSync(
 			auditPlannerCoverageTiersFx({

@@ -14,6 +14,7 @@ import {
 } from "~/editor/planner/PlannerCoverageTierAudit";
 import { auditPlannerCoverageWithPlannerFx } from "~/editor/planner/auditPlannerCoverageFx";
 import { createEnginePlannerFx } from "~/editor/planner/createEnginePlannerFx";
+import { mergePlannerCoverageTierAuditReports } from "~/editor/planner/mergePlannerCoverageTierAuditReports";
 import { readPlannerCoverageAuditOutcomeCounts } from "~/editor/planner/readPlannerCoverageAuditOutcomeCounts";
 import { readPlannerSearchBudget } from "~/editor/planner/readPlannerSearchBudget";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
@@ -22,6 +23,7 @@ import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 export namespace auditPlannerCoverageTiersFx {
 	export interface Props {
 		readonly config: GameConfigSchema.Type;
+		readonly initialReport?: PlannerCoverageTierAuditReport;
 		readonly itemIds?: ReadonlyArray<IdSchema.Type>;
 		readonly onProgress?: (progress: PlannerCoverageTierAuditProgress) => Effect.Effect<void>;
 		readonly quantity?: number;
@@ -121,22 +123,94 @@ const readTierItem = ({
 /** Audits increasing planner budgets while retrying only unresolved items at each tier. */
 export const auditPlannerCoverageTiersFx = Effect.fn("auditPlannerCoverageTiersFx")(function* ({
 	config,
+	initialReport: sourceInitialReport,
 	itemIds,
 	onProgress,
 	quantity: inputQuantity,
 	tiers: tierDefinitions,
 }: auditPlannerCoverageTiersFx.Props) {
-	const tiers = yield* readTiers(tierDefinitions);
-	const quantity = readPositiveInteger(inputQuantity, 1);
-	const selectedItemIds = readSelectedItemIds(config, itemIds);
+	if (tierDefinitions.length === 0)
+		return yield* new PlannerCoverageTierAuditInputError({
+			message: "Planner coverage tier audit requires at least one new tier.",
+		});
+	const initialReport =
+		sourceInitialReport === undefined
+			? undefined
+			: yield* Effect.try({
+					catch: (cause) =>
+						cause instanceof PlannerCoverageTierAuditInputError
+							? cause
+							: new PlannerCoverageTierAuditInputError({
+									message: String(cause),
+								}),
+					try: () =>
+						mergePlannerCoverageTierAuditReports([
+							sourceInitialReport,
+						]),
+				});
+	const existingTierDefinitions =
+		initialReport?.tiers.map(({ budget, id }) => ({
+			budget,
+			id,
+		})) ?? [];
+	const tiers = yield* readTiers([
+		...existingTierDefinitions,
+		...tierDefinitions,
+	]);
+	const existingTierCount = existingTierDefinitions.length;
+	const newTiers = tiers.slice(existingTierCount);
+	const quantity = initialReport?.quantity ?? readPositiveInteger(inputQuantity, 1);
+	if (
+		initialReport !== undefined &&
+		inputQuantity !== undefined &&
+		readPositiveInteger(inputQuantity, 1) !== initialReport.quantity
+	)
+		return yield* new PlannerCoverageTierAuditInputError({
+			message: `Planner coverage resume quantity ${inputQuantity} does not match report quantity ${initialReport.quantity}.`,
+		});
+	const initialItemIds = initialReport?.items.map(({ itemId }) => itemId);
+	const selectedItemIds = readSelectedItemIds(config, initialItemIds ?? itemIds);
+	if (initialItemIds !== undefined) {
+		if (selectedItemIds.length !== initialItemIds.length)
+			return yield* new PlannerCoverageTierAuditInputError({
+				message:
+					"Planner coverage resume report references items missing from the current game config.",
+			});
+		if (itemIds !== undefined) {
+			const requestedItemIds = readSelectedItemIds(config, itemIds);
+			if (
+				requestedItemIds.length !== selectedItemIds.length ||
+				requestedItemIds.some((itemId, index) => itemId !== selectedItemIds[index])
+			)
+				return yield* new PlannerCoverageTierAuditInputError({
+					message: "Planner coverage resume item selection does not match the report.",
+				});
+		}
+	}
 	const planner = yield* createEnginePlannerFx(config);
 	const attemptsByItemId = new Map<IdSchema.Type, PlannerCoverageTierAuditAttempt[]>();
 	const finalByItemId = new Map<IdSchema.Type, PlannerCoverageAuditItem>();
-	const tierReports: PlannerCoverageTierAuditTier[] = [];
-	let unresolvedItemIds = selectedItemIds;
+	for (const item of initialReport?.items ?? []) {
+		attemptsByItemId.set(item.itemId, [
+			...item.attempts,
+		]);
+		const finalAttempt = item.attempts.at(-1);
+		if (finalAttempt === undefined)
+			return yield* new PlannerCoverageTierAuditInputError({
+				message: `Planner coverage resume item has no attempts: ${item.itemId}.`,
+			});
+		finalByItemId.set(item.itemId, finalAttempt.result);
+	}
+	const tierReports: PlannerCoverageTierAuditTier[] = [
+		...(initialReport?.tiers ?? []),
+	];
+	let unresolvedItemIds = selectedItemIds.filter(
+		(itemId) => finalByItemId.get(itemId)?.outcome === "inconclusive",
+	);
+	if (initialReport === undefined) unresolvedItemIds = selectedItemIds;
 
-	for (const [tierOffset, tier] of tiers.entries()) {
-		const tierIndex = tierOffset + 1;
+	for (const [tierOffset, tier] of newTiers.entries()) {
+		const tierIndex = existingTierCount + tierOffset + 1;
 		const carriedItems = [
 			...finalByItemId.values(),
 		];

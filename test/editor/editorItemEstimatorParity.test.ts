@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 
 import type { PlannerSearchBudget } from "~/editor/planner/PlannerSearch";
 import { createEngineBackedEditorItemSimulatorFx } from "~/editor/simulator/createEngineBackedEditorItemSimulatorFx";
-import { createLegacyEditorItemSimulatorFx } from "~/editor/simulator/createLegacyEditorItemSimulatorFx";
+import { createLegacyEditorItemSimulatorFx } from "~test/editor/support/createLegacyEditorItemSimulatorFx";
 import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { GameConfigSchema as GameConfigSchemaValue } from "~/engine/schema/GameConfigSchema";
 import { readArkiniGameConfigSource } from "~test/schema/support/readArkiniGameConfigSource";

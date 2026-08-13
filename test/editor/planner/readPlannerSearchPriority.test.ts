@@ -14,6 +14,7 @@ const water = {
 } as ItemSchema.Type;
 
 const plan: PlannerSearchPriorityPlan = {
+	chargeCapacityByItemId: new Map(),
 	depthByItemId: new Map([
 		[
 			water.id,

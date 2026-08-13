@@ -2,6 +2,11 @@ import { Effect } from "effect";
 import { describe, expect, it } from "vitest";
 
 import { createEnginePlannerFx } from "~/editor/planner/createEnginePlannerFx";
+import { readPlannerSearchScope } from "~/editor/planner/readPlannerSearchScope";
+import {
+	readPlannerActiveDemand,
+	readPlannerSearchPriorityPlan,
+} from "~/editor/planner/readPlannerSearchPriority";
 import { GameEventEnumSchema } from "~/engine/event/schema/GameEventEnumSchema";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import { readArkiniGameConfigSource } from "~test/schema/support/readArkiniGameConfigSource";
@@ -234,6 +239,10 @@ const boardItemIds = [
 	"charge-deposit",
 	"charge-fuel-producer",
 	"charged-producer",
+	"renewal-worker",
+	"renewal-fuel-producer",
+	"renewal-builder",
+	"renewal-source",
 	"temporary-token",
 	"random-temporary-token",
 	"temporary-inspector",
@@ -431,6 +440,57 @@ const config = GameConfigSchema.parse({
 		},
 		"charged-side-output": simpleItem("charged-side-output"),
 		"depleted-target": simpleItem("depleted-target"),
+		"renewal-worker": producerItem({
+			additionalInputs: [
+				{
+					charges: {
+						cost: 1,
+						from: "target",
+					},
+					query: {
+						distance: "near",
+						scope: "board",
+						selector: {
+							itemId: "renewal-source",
+							type: "item",
+						},
+					},
+					type: "deposit",
+				},
+			],
+			id: "renewal-worker",
+			output: guaranteedOutput("renewal-part"),
+			runtimeMs: 20,
+		}),
+		"renewal-part": simpleItem("renewal-part"),
+		"renewal-fuel-producer": producerItem({
+			id: "renewal-fuel-producer",
+			output: guaranteedOutput("renewal-fuel"),
+			runtimeMs: 10,
+		}),
+		"renewal-fuel": simpleItem("renewal-fuel"),
+		"renewal-builder": producerItem({
+			additionalInputs: [
+				materialInput("renewal-fuel"),
+			],
+			id: "renewal-builder",
+			inputItemId: "renewal-seed",
+			output: guaranteedOutput("renewal-source"),
+			runtimeMs: 30,
+		}),
+		"renewal-source": {
+			...baseItem({
+				id: "renewal-source",
+				maxStackSize: 1,
+				scope: "board",
+			}),
+			charges: {
+				amount: 2,
+				output: guaranteedOutput("renewal-seed"),
+			},
+			type: "deposit",
+		},
+		"renewal-seed": simpleItem("renewal-seed"),
 		"temporary-token": {
 			...baseItem({
 				id: "temporary-token",
@@ -1079,6 +1139,77 @@ describe("createEnginePlannerFx", () => {
 			),
 		).toBe(3);
 		expect(result.runtime.items.some(({ item }) => item.id === "depleted-target")).toBe(true);
+	});
+
+	it("prepares finite-resource renewal before the final charge spend", () => {
+		const planner = makePlanner();
+		const scope = readPlannerSearchScope({
+			graph: planner.graph,
+			targetItemId: "renewal-part",
+		});
+		const demand = readPlannerActiveDemand({
+			itemId: "renewal-part",
+			plan: readPlannerSearchPriorityPlan({
+				graph: planner.graph,
+				scope,
+			}),
+			quantity: 3,
+			runtime: planner.initialRuntime,
+		});
+
+		expect(demand.get("renewal-source")).toMatchObject({
+			quantity: 1,
+			requiredCharges: 3,
+		});
+		expect(demand.get("renewal-fuel")).toMatchObject({
+			bootstrapQuantity: 1,
+			quantity: 1,
+		});
+		expect(demand.get("renewal-seed")).toMatchObject({
+			bootstrapQuantity: 1,
+			projectedQuantity: 1,
+			quantity: 1,
+		});
+
+		const result = Effect.runSync(
+			planner.searchFx("renewal-part", 3, {
+				maximumExpandedStates: 16,
+				maximumQueuedStates: 1,
+				maximumTraceLength: 8,
+			}),
+		);
+
+		expect(result.type).toBe("completed");
+		if (result.type !== "completed") return;
+		expect(result.elapsedMs).toBe(100);
+		expect(result.trace.map(({ action }) => action)).toEqual([
+			{
+				kind: "line",
+				lineId: "line:renewal-fuel-producer:run",
+				ownerItemId: "renewal-fuel-producer",
+			},
+			{
+				kind: "line",
+				lineId: "line:renewal-worker:run",
+				ownerItemId: "renewal-worker",
+			},
+			{
+				kind: "line",
+				lineId: "line:renewal-worker:run",
+				ownerItemId: "renewal-worker",
+			},
+			{
+				kind: "line",
+				lineId: "line:renewal-builder:run",
+				ownerItemId: "renewal-builder",
+			},
+			{
+				kind: "line",
+				lineId: "line:renewal-worker:run",
+				ownerItemId: "renewal-worker",
+			},
+		]);
+		expect(result.runtime.items.some(({ item }) => item.id === "renewal-part")).toBe(true);
 	});
 
 	it("returns an already-owned start target without running an action", () => {

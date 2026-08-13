@@ -118,8 +118,10 @@ export const readPlannerSearchCandidateGroups = ({
 	for (const action of scope.actions) {
 		for (const outputItemId of action.outputItemIds) {
 			const demand = activeDemand.get(outputItemId);
-			if (demand === undefined || readPlannerRuntimeQuantity(runtime, outputItemId) >= demand)
-				continue;
+			const availableQuantity =
+				readPlannerRuntimeQuantity(runtime, outputItemId) +
+				(demand?.projectedQuantity ?? 0);
+			if (demand === undefined || availableQuantity >= demand.quantity) continue;
 			const routes = readActionRoutesForOutput(action, outputItemId, routeById);
 			if (routes.length === 0) continue;
 			const group = candidatesByOutputItemId.get(outputItemId) ?? {
@@ -135,16 +137,23 @@ export const readPlannerSearchCandidateGroups = ({
 
 	const groups = [
 		...candidatesByOutputItemId,
-	].map(([outputItemId, group]) => ({
-		actions: group.readyActions.length > 0 ? group.readyActions : group.actions,
-		outputItemId,
-		ready: group.readyActions.length > 0,
-	}));
+	].map(([outputItemId, group]) => {
+		const demand = activeDemand.get(outputItemId);
+		const availableQuantity =
+			readPlannerRuntimeQuantity(runtime, outputItemId) + (demand?.projectedQuantity ?? 0);
+		return {
+			actions: group.readyActions.length > 0 ? group.readyActions : group.actions,
+			bootstrap: availableQuantity < (demand?.bootstrapQuantity ?? 0),
+			outputItemId,
+			ready: group.readyActions.length > 0,
+		};
+	});
 	const hasReadyGroup = groups.some(({ ready }) => ready);
 	return groups
 		.filter(({ ready }) => !hasReadyGroup || ready)
 		.sort(
 			(left, right) =>
+				Number(right.bootstrap) - Number(left.bootstrap) ||
 				(plan.depthByItemId.get(right.outputItemId) ?? 0) -
 					(plan.depthByItemId.get(left.outputItemId) ?? 0) ||
 				(demandOrder.get(left.outputItemId) ?? Number.POSITIVE_INFINITY) -

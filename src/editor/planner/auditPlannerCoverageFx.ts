@@ -1,8 +1,8 @@
 import { Clock, Effect } from "effect";
 
 import {
-	DefaultPlannerSearchBudget,
 	type PlannerSearchBudget,
+	type PlannerSearch,
 	type PlannerSearchResult,
 } from "~/editor/planner/PlannerSearch";
 import type {
@@ -15,6 +15,7 @@ import type {
 	PlannerCoverageAuditReport,
 } from "~/editor/planner/PlannerCoverageAudit";
 import { createEnginePlannerFx } from "~/editor/planner/createEnginePlannerFx";
+import { readPlannerSearchBudget } from "~/editor/planner/readPlannerSearchBudget";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 
@@ -37,29 +38,16 @@ export namespace auditPlannerCoverageFx {
 	}
 }
 
+export namespace auditPlannerCoverageWithPlannerFx {
+	export interface Props extends auditPlannerCoverageFx.Props {
+		readonly planner: PlannerSearch;
+	}
+}
+
 const compareIds = (left: string, right: string) => left.localeCompare(right);
 
 const readPositiveInteger = (value: number | undefined, fallback: number) =>
 	value === undefined || !Number.isFinite(value) ? fallback : Math.max(1, Math.floor(value));
-
-const readBudget = (budget?: Partial<PlannerSearchBudget>): PlannerSearchBudget => ({
-	maximumExpandedStates: readPositiveInteger(
-		budget?.maximumExpandedStates,
-		DefaultPlannerSearchBudget.maximumExpandedStates,
-	),
-	maximumQueuedStates: readPositiveInteger(
-		budget?.maximumQueuedStates,
-		DefaultPlannerSearchBudget.maximumQueuedStates,
-	),
-	maximumRoutePlans: readPositiveInteger(
-		budget?.maximumRoutePlans,
-		DefaultPlannerSearchBudget.maximumRoutePlans,
-	),
-	maximumTraceLength: readPositiveInteger(
-		budget?.maximumTraceLength,
-		DefaultPlannerSearchBudget.maximumTraceLength,
-	),
-});
 
 const readElapsedMs = (startedAt: bigint, completedAt: bigint) =>
 	Number(completedAt - startedAt) / 1_000_000;
@@ -306,52 +294,66 @@ const readSummary = (
 	};
 };
 
-/** Audits bounded engine-planner coverage over one immutable game configuration. */
-export const auditPlannerCoverageFx = Effect.fn("auditPlannerCoverageFx")(function* ({
-	budget: inputBudget,
-	config,
-	itemIds,
-	onProgress,
-	quantity: inputQuantity,
-}: auditPlannerCoverageFx.Props) {
-	const budget = readBudget(inputBudget);
-	const quantity = readPositiveInteger(inputQuantity, 1);
-	const planner = yield* createEnginePlannerFx(config);
-	const selectedItemIds = (itemIds ?? Object.keys(config.items))
-		.filter((itemId): itemId is IdSchema.Type => config.items[itemId] !== undefined)
-		.filter((itemId, index, all) => all.indexOf(itemId) === index)
-		.sort(compareIds);
-	const items: PlannerCoverageAuditItem[] = [];
-	for (const [index, itemId] of selectedItemIds.entries()) {
-		const item = config.items[itemId];
-		if (item === undefined) continue;
-		const startedAt = yield* Clock.currentTimeNanos;
-		const result = yield* planner.searchFx(itemId, quantity, budget);
-		const completedAt = yield* Clock.currentTimeNanos;
-		const searchDurationMs = readElapsedMs(startedAt, completedAt);
-		const auditItem = readAuditItem({
-			itemId,
-			itemType: item.type,
-			result,
-			searchDurationMs,
-			title: item.title,
-		});
-		items.push(auditItem);
-		if (onProgress !== undefined)
-			yield* onProgress({
-				index: index + 1,
+/** Audits bounded coverage with one reusable engine planner. */
+export const auditPlannerCoverageWithPlannerFx = Effect.fn("auditPlannerCoverageWithPlannerFx")(
+	function* ({
+		budget: inputBudget,
+		config,
+		itemIds,
+		onProgress,
+		planner,
+		quantity: inputQuantity,
+	}: auditPlannerCoverageWithPlannerFx.Props) {
+		const budget = readPlannerSearchBudget(inputBudget);
+		const quantity = readPositiveInteger(inputQuantity, 1);
+		const selectedItemIds = (itemIds ?? Object.keys(config.items))
+			.filter((itemId): itemId is IdSchema.Type => config.items[itemId] !== undefined)
+			.filter((itemId, index, all) => all.indexOf(itemId) === index)
+			.sort(compareIds);
+		const items: PlannerCoverageAuditItem[] = [];
+		for (const [index, itemId] of selectedItemIds.entries()) {
+			const item = config.items[itemId];
+			if (item === undefined) continue;
+			const startedAt = yield* Clock.currentTimeNanos;
+			const result = yield* planner.searchFx(itemId, quantity, budget);
+			const completedAt = yield* Clock.currentTimeNanos;
+			const searchDurationMs = readElapsedMs(startedAt, completedAt);
+			const auditItem = readAuditItem({
 				itemId,
-				outcome: auditItem.outcome,
+				itemType: item.type,
+				result,
 				searchDurationMs,
 				title: item.title,
-				total: selectedItemIds.length,
 			});
-	}
-	return {
-		budget,
-		items,
-		quantity,
-		summary: readSummary(items),
-		version: 1,
-	} satisfies PlannerCoverageAuditReport;
-});
+			items.push(auditItem);
+			if (onProgress !== undefined)
+				yield* onProgress({
+					index: index + 1,
+					itemId,
+					outcome: auditItem.outcome,
+					searchDurationMs,
+					title: item.title,
+					total: selectedItemIds.length,
+				});
+		}
+		return {
+			budget,
+			items,
+			quantity,
+			summary: readSummary(items),
+			version: 1,
+		} satisfies PlannerCoverageAuditReport;
+	},
+);
+
+/** Audits bounded engine-planner coverage over one immutable game configuration. */
+export const auditPlannerCoverageFx = Effect.fn("auditPlannerCoverageFx")(
+	(props: auditPlannerCoverageFx.Props) =>
+		Effect.gen(function* () {
+			const planner = yield* createEnginePlannerFx(props.config);
+			return yield* auditPlannerCoverageWithPlannerFx({
+				...props,
+				planner,
+			});
+		}),
+);

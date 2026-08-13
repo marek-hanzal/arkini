@@ -1,7 +1,6 @@
 import { Effect } from "effect";
 
 import {
-	DefaultPlannerSearchBudget,
 	type PlannerSearchBudget,
 	type PlannerSearchBudgetLimit,
 	type PlannerSearchDiagnostics,
@@ -17,6 +16,7 @@ import { readPlannerActionChargeFlowFx } from "~/editor/planner/readPlannerActio
 import { readPlannerActionItemFlowFx } from "~/editor/planner/readPlannerActionItemFlowFx";
 import { readPlannerExpectedEconomicsFx } from "~/editor/planner/readPlannerExpectedEconomicsFx";
 import { readPlannerRuntimeQuantity } from "~/editor/planner/readPlannerRuntimeQuantity";
+import { readPlannerSearchBudget } from "~/editor/planner/readPlannerSearchBudget";
 import { readPlannerSearchCandidateGroups } from "~/editor/planner/readPlannerSearchCandidateGroups";
 import {
 	comparePlannerSearchPriority,
@@ -74,30 +74,6 @@ const readPlannerSearchDiagnostics = (
 		: {
 				winningRoutePlanIndex,
 			}),
-});
-
-const readPositiveBudget = (candidate: number | undefined, fallback: number) =>
-	candidate === undefined || !Number.isFinite(candidate)
-		? fallback
-		: Math.max(1, Math.floor(candidate));
-
-const readBudget = (budget: Partial<PlannerSearchBudget> | undefined): PlannerSearchBudget => ({
-	maximumExpandedStates: readPositiveBudget(
-		budget?.maximumExpandedStates,
-		DefaultPlannerSearchBudget.maximumExpandedStates,
-	),
-	maximumQueuedStates: readPositiveBudget(
-		budget?.maximumQueuedStates,
-		DefaultPlannerSearchBudget.maximumQueuedStates,
-	),
-	maximumRoutePlans: readPositiveBudget(
-		budget?.maximumRoutePlans,
-		DefaultPlannerSearchBudget.maximumRoutePlans,
-	),
-	maximumTraceLength: readPositiveBudget(
-		budget?.maximumTraceLength,
-		DefaultPlannerSearchBudget.maximumTraceLength,
-	),
 });
 
 const readAvailableQuantity = (node: SearchNode, itemId: IdSchema.Type) =>
@@ -700,7 +676,7 @@ export const searchPlannerRuntimeFx = Effect.fn("searchPlannerRuntimeFx")(functi
 			visitedStates: 1,
 		});
 
-	const budget = readBudget(budgetOverride);
+	const budget = readPlannerSearchBudget(budgetOverride);
 	const blockedActionIds = new Set<string>();
 	const unsupportedActionIds = new Set<string>();
 	let expandedStates = 0;

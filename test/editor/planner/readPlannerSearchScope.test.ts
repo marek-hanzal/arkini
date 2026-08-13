@@ -1,10 +1,16 @@
 import { describe, expect, it } from "vitest";
 
 import { createPlannerAcquisitionGraph } from "~/editor/planner/createPlannerAcquisitionGraph";
+import type {
+	PlannerAcquisitionGraph,
+	PlannerAcquisitionRequirement,
+	PlannerAcquisitionRoute,
+} from "~/editor/planner/PlannerAcquisitionGraph";
 import {
 	readPlannerSearchScope,
 	readPlannerSearchScopes,
 } from "~/editor/planner/readPlannerSearchScope";
+import { resolvePlannerRouteReachability } from "~/editor/planner/resolvePlannerRouteReachability";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 
 const baseItem = (id: string) => ({
@@ -408,6 +414,203 @@ const wideningConfigSource: unknown = {
 const wideningConfig = GameConfigSchema.parse(wideningConfigSource);
 const wideningGraph = createPlannerAcquisitionGraph(wideningConfig);
 
+const syntheticRequirement = (
+	itemId: string,
+	usage: PlannerAcquisitionRequirement["usage"] = "consume",
+): PlannerAcquisitionRequirement => ({
+	itemId,
+	minimumQuantity: 1,
+	source: usage === "presence" ? "line-condition" : "material-input",
+	usage,
+});
+
+const syntheticRoute = ({
+	allOf = [],
+	anyOf = [],
+	id,
+	outputItemId,
+}: {
+	readonly allOf?: ReadonlyArray<PlannerAcquisitionRequirement>;
+	readonly anyOf?: ReadonlyArray<ReadonlyArray<PlannerAcquisitionRequirement>>;
+	readonly id: string;
+	readonly outputItemId: string;
+}): PlannerAcquisitionRoute => ({
+	action: {
+		kind: "line",
+		lineId: `line:${id}`,
+		ownerItemId: `producer:${id}`,
+	},
+	id,
+	kind: "line-output",
+	output: {
+		expectedQuantity: 1,
+		itemId: outputItemId,
+		maximumQuantity: 1,
+		maximumQuantityProbability: 1,
+		occurrenceProbability: 1,
+		quantityDistribution: [
+			{
+				probability: 1,
+				quantity: 1,
+			},
+		],
+		selection: "guaranteed",
+		stochastic: false,
+		witnessId: `witness:${id}`,
+	},
+	requirements: {
+		allOf,
+		anyOf,
+	},
+});
+
+const indexSyntheticRoutes = (
+	routes: ReadonlyArray<PlannerAcquisitionRoute>,
+	readKeys: (route: PlannerAcquisitionRoute) => ReadonlyArray<string>,
+) => {
+	const indexed = new Map<string, PlannerAcquisitionRoute[]>();
+	for (const route of routes)
+		for (const key of new Set(readKeys(route))) {
+			const candidates = indexed.get(key) ?? [];
+			candidates.push(route);
+			indexed.set(key, candidates);
+		}
+	return indexed;
+};
+
+const createSyntheticGraph = ({
+	rootItemIds,
+	routes,
+}: {
+	readonly rootItemIds: ReadonlyArray<string>;
+	readonly routes: ReadonlyArray<PlannerAcquisitionRoute>;
+}): PlannerAcquisitionGraph => {
+	const roots = new Set(rootItemIds);
+	const reachability = resolvePlannerRouteReachability({
+		rootItemIds: roots,
+		routes,
+	});
+	const itemIds = new Set([
+		...roots,
+		...routes.flatMap((route) => [
+			route.output.itemId,
+			...route.requirements.allOf.map(({ itemId }) => itemId),
+			...route.requirements.anyOf.flatMap((clause) => clause.map(({ itemId }) => itemId)),
+		]),
+	]);
+	const routesByOutputItemId = indexSyntheticRoutes(routes, (route) => [
+		route.output.itemId,
+	]);
+	const routesByRequiredItemId = indexSyntheticRoutes(routes, (route) => [
+		...route.requirements.allOf.map(({ itemId }) => itemId),
+		...route.requirements.anyOf.flatMap((clause) => clause.map(({ itemId }) => itemId)),
+	]);
+	return {
+		componentByItemId: new Map(),
+		components: [],
+		depthByItemId: reachability.depthByItemId,
+		itemIds,
+		reachableItemIds: new Set(reachability.depthByItemId.keys()),
+		reachableRouteIds: reachability.reachableRouteIds,
+		rootItemIds: roots,
+		routeDepthById: reachability.routeDepthById,
+		routes,
+		routesByOutputItemId,
+		routesByRequiredItemId,
+		startQuantityByItemId: new Map(
+			rootItemIds.map((itemId) => [
+				itemId,
+				1,
+			]),
+		),
+		unreachableItemIds: new Set(
+			[
+				...itemIds,
+			].filter((itemId) => !reachability.depthByItemId.has(itemId)),
+		),
+		witnessRouteByItemId: reachability.witnessRouteByItemId,
+	};
+};
+
+const anyOfWideningTargetRoute = syntheticRoute({
+	anyOf: [
+		[
+			syntheticRequirement("alternative-a", "presence"),
+			syntheticRequirement("alternative-b", "presence"),
+		],
+	],
+	id: "route:any-of-target",
+	outputItemId: "any-of-target",
+});
+const anyOfWideningGraph = createSyntheticGraph({
+	rootItemIds: [
+		"root-a",
+		"root-b",
+	],
+	routes: [
+		syntheticRoute({
+			allOf: [
+				syntheticRequirement("root-a"),
+			],
+			id: "route:alternative-a",
+			outputItemId: "alternative-a",
+		}),
+		syntheticRoute({
+			allOf: [
+				syntheticRequirement("root-b"),
+			],
+			id: "route:alternative-b-part",
+			outputItemId: "alternative-b-part",
+		}),
+		syntheticRoute({
+			allOf: [
+				syntheticRequirement("alternative-b-part"),
+			],
+			id: "route:alternative-b",
+			outputItemId: "alternative-b",
+		}),
+		anyOfWideningTargetRoute,
+	],
+});
+
+const renewalWideningGraph = createSyntheticGraph({
+	rootItemIds: [
+		"fuel",
+		"long-renewal-root",
+		"short-renewal-root",
+	],
+	routes: [
+		syntheticRoute({
+			allOf: [
+				syntheticRequirement("fuel"),
+			],
+			id: "route:renewal-target",
+			outputItemId: "renewal-target",
+		}),
+		syntheticRoute({
+			allOf: [
+				syntheticRequirement("short-renewal-root"),
+			],
+			id: "route:short-fuel-renewal",
+			outputItemId: "fuel",
+		}),
+		syntheticRoute({
+			allOf: [
+				syntheticRequirement("long-renewal-root"),
+			],
+			id: "route:long-renewal-part",
+			outputItemId: "long-renewal-part",
+		}),
+		syntheticRoute({
+			allOf: [
+				syntheticRequirement("long-renewal-part"),
+			],
+			id: "route:long-fuel-renewal",
+			outputItemId: "fuel",
+		}),
+	],
+});
+
 describe("readPlannerSearchScope", () => {
 	it("includes the shortest renewal route for consumed roots without rebuilding presence roots", () => {
 		const scope = readPlannerSearchScope({
@@ -604,6 +807,49 @@ describe("readPlannerSearchScope", () => {
 			ownerItemId: "detour-target-producer",
 		});
 		expect(shortest?.routeIds.every((routeId) => widened?.routeIds.includes(routeId))).toBe(
+			true,
+		);
+	});
+
+	it("widens authored any-of requirements before declaring the route exhausted", () => {
+		const scopes = readPlannerSearchScopes({
+			graph: anyOfWideningGraph,
+			targetItemId: "any-of-target",
+		});
+
+		expect(scopes).toHaveLength(2);
+		const clauseId = JSON.stringify([
+			"route-requirement-clause",
+			anyOfWideningTargetRoute.id,
+			0,
+		]);
+		expect(scopes[0]?.preferredRequirementByClauseId.get(clauseId)?.itemId).toBe(
+			"alternative-a",
+		);
+		expect(scopes[1]?.preferredRequirementByClauseId.get(clauseId)?.itemId).toBe(
+			"alternative-b",
+		);
+		expect(scopes[1]?.depthDiscrepancy).toBe(1);
+		expect(scopes[0]?.routeIds.every((routeId) => scopes[1]?.routeIds.includes(routeId))).toBe(
+			true,
+		);
+	});
+
+	it("widens reacquisition routes for consumed authored roots", () => {
+		const scopes = readPlannerSearchScopes({
+			graph: renewalWideningGraph,
+			targetItemId: "renewal-target",
+		});
+
+		expect(scopes).toHaveLength(2);
+		expect(scopes[0]?.preferredRenewalRouteByItemId.get("fuel")?.id).toBe(
+			"route:short-fuel-renewal",
+		);
+		expect(scopes[1]?.preferredRenewalRouteByItemId.get("fuel")?.id).toBe(
+			"route:long-fuel-renewal",
+		);
+		expect(scopes[1]?.maximumDetourDepth).toBe(1);
+		expect(scopes[0]?.routeIds.every((routeId) => scopes[1]?.routeIds.includes(routeId))).toBe(
 			true,
 		);
 	});

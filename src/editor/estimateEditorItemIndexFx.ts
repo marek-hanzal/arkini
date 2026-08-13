@@ -7,7 +7,7 @@ import type {
 	EditorItemEstimateIndexProgress,
 } from "~/editor/EditorItemEstimateIndex";
 import type { EditorItemSimulation } from "~/editor/simulator/EditorItemSimulation";
-import { createEditorItemSimulatorFx } from "~/editor/simulator/createEditorItemSimulatorFx";
+import { createLegacyEditorItemSimulatorFx } from "~/editor/simulator/createLegacyEditorItemSimulatorFx";
 
 interface EstimateEditorItemIndexOptions {
 	readonly itemIds?: ReadonlyArray<string>;
@@ -15,11 +15,15 @@ interface EstimateEditorItemIndexOptions {
 	readonly onProgress?: (progress: EditorItemEstimateIndexProgress) => void;
 }
 
-/** Computes the compact estimate projection used by the all-item editor index. */
+/**
+ * Computes the compact all-item index through the legacy recursive estimator. The detailed item
+ * estimate path uses the engine-backed planner; this fast index remains isolated until its own
+ * replacement can preserve interactive startup cost.
+ */
 export const estimateEditorItemIndexFx = Effect.fn("estimateEditorItemIndexFx")(
 	(config: GameConfigSchema.Type, options: EstimateEditorItemIndexOptions = {}) =>
 		Effect.gen(function* () {
-			const simulator = yield* createEditorItemSimulatorFx(config);
+			const simulator = yield* createLegacyEditorItemSimulatorFx(config);
 			const itemIds = [
 				...(options.itemIds ?? Object.keys(config.items)),
 			].sort((left, right) => left.localeCompare(right));

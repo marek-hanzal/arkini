@@ -1476,7 +1476,7 @@ const estimateEditorItem = (
 	};
 };
 
-export namespace createEditorItemSimulatorFx {
+export namespace createLegacyEditorItemSimulatorFx {
 	export interface Service {
 		readonly simulateFx: (
 			itemId: string,
@@ -1485,14 +1485,17 @@ export namespace createEditorItemSimulatorFx {
 	}
 }
 
-/** Creates one reusable editor-only gameplay simulator over an immutable config snapshot. */
-export const createEditorItemSimulatorFx = Effect.fn("createEditorItemSimulatorFx")(
+/**
+ * Creates the legacy recursive estimate oracle used only by the lightweight all-item index and
+ * planner parity tests. Single-item feasibility must use the engine-backed planner instead.
+ */
+export const createLegacyEditorItemSimulatorFx = Effect.fn("createLegacyEditorItemSimulatorFx")(
 	(config: GameConfigSchema.Type) =>
-		Effect.sync((): createEditorItemSimulatorFx.Service => {
+		Effect.sync((): createLegacyEditorItemSimulatorFx.Service => {
 			const operations = readEditorSimulationOperations(config);
 			const acquisitionIndex = indexEditorSimulationAcquisitions(config, operations);
 			return {
-				simulateFx: Effect.fn("EditorItemSimulator.simulateFx")(
+				simulateFx: Effect.fn("LegacyEditorItemSimulator.simulateFx")(
 					(itemId: string, quantity = 1) =>
 						Effect.sync((): EditorItemSimulation => {
 							if (config.items[itemId] === undefined)

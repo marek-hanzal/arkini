@@ -506,6 +506,7 @@ const createSyntheticGraph = ({
 		...route.requirements.anyOf.flatMap((clause) => clause.map(({ itemId }) => itemId)),
 	]);
 	return {
+		chargeCapacityByItemId: new Map(),
 		componentByItemId: new Map(),
 		components: [],
 		depthByItemId: reachability.depthByItemId,

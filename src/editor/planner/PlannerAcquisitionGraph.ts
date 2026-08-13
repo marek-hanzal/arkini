@@ -123,6 +123,8 @@ export interface PlannerAcquisitionComponent {
 
 /** Static optimistic map used to prune and explain later engine-backed search. */
 export interface PlannerAcquisitionGraph {
+	/** Full authored charge capacity of one fresh runtime item identity. */
+	readonly chargeCapacityByItemId: ReadonlyMap<IdSchema.Type, number>;
 	readonly componentByItemId: ReadonlyMap<IdSchema.Type, PlannerAcquisitionComponent>;
 	readonly components: ReadonlyArray<PlannerAcquisitionComponent>;
 	readonly depthByItemId: ReadonlyMap<IdSchema.Type, number>;

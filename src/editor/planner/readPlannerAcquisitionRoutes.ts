@@ -540,12 +540,11 @@ const readLineDescriptor = (
 		}
 		if (input.type === "deposit") {
 			allOf.push({
-				chargeCost: input.charges?.cost,
 				inputIndex,
 				itemId: input.query.selector.itemId,
 				minimumQuantity: 1,
 				source: "deposit-input",
-				usage: input.charges?.from === "target" ? "charge" : "presence",
+				usage: "presence",
 			});
 		}
 
@@ -614,18 +613,6 @@ const makeChargeDepletionRoutes = (
 
 		const maximumSpendPerRun = chargeCosts.reduce((total, cost) => total + cost, 0);
 		const minimumRunsLowerBound = Math.max(1, Math.ceil(charges.amount / maximumSpendPerRun));
-		const payerRequirement: PlannerAcquisitionRequirements = {
-			allOf: [
-				{
-					itemId: chargedItemId,
-					minimumQuantity: 1,
-					source: "charged-item",
-					usage: "charge",
-				},
-			],
-			anyOf: [],
-		};
-
 		for (const { output, requirements } of readOutputWitnesses(charges.output)) {
 			routes.push({
 				action: descriptor.action,
@@ -642,11 +629,7 @@ const makeChargeDepletionRoutes = (
 				kind: "line-charge-depletion",
 				minimumRunsLowerBound,
 				output,
-				requirements: combineRequirements(
-					descriptor.requirements,
-					payerRequirement,
-					requirements,
-				),
+				requirements: combineRequirements(descriptor.requirements, requirements),
 			});
 		}
 	}

@@ -11,6 +11,20 @@ import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 
 const compareIds = (left: string, right: string) => left.localeCompare(right);
 
+const readChargeCapacityByItemId = (config: GameConfigSchema.Type) =>
+	new Map(
+		Object.values(config.items).flatMap((item) =>
+			item.charges === undefined
+				? []
+				: [
+						[
+							item.id,
+							item.charges.amount,
+						] as const,
+					],
+		),
+	);
+
 const readStartQuantityByItemId = (config: GameConfigSchema.Type) => {
 	const quantities = new Map<IdSchema.Type, number>();
 	const add = (itemId: IdSchema.Type, quantity: number) =>
@@ -163,6 +177,7 @@ export const createPlannerAcquisitionGraph = (
 	config: GameConfigSchema.Type,
 ): PlannerAcquisitionGraph => {
 	const routes = readPlannerAcquisitionRoutes(config);
+	const chargeCapacityByItemId = readChargeCapacityByItemId(config);
 	const startQuantityByItemId = readStartQuantityByItemId(config);
 	const rootItemIds = new Set(startQuantityByItemId.keys());
 	const itemIds = new Set<IdSchema.Type>([
@@ -198,6 +213,7 @@ export const createPlannerAcquisitionGraph = (
 	});
 
 	return {
+		chargeCapacityByItemId,
 		componentByItemId,
 		components,
 		depthByItemId,

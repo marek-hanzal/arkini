@@ -447,6 +447,21 @@ describe("createPlannerAcquisitionGraphFx", () => {
 			kind: "line-charge-depletion",
 			minimumRunsLowerBound: 2,
 		});
+		expect(graph.chargeCapacityByItemId.get("vein")).toBe(2);
+		expect(seedRoutes[0]?.requirements.allOf.filter(({ itemId }) => itemId === "vein")).toEqual(
+			[
+				expect.objectContaining({
+					itemId: "vein",
+					source: "charged-item",
+					usage: "charge",
+				}),
+				expect.objectContaining({
+					itemId: "vein",
+					source: "deposit-input",
+					usage: "presence",
+				}),
+			],
+		);
 		expect(graph.routesByOutputItemId.has("orphan-seed")).toBe(false);
 		expect(graph.routesByOutputItemId.has("ghost-output")).toBe(false);
 		expect(graph.routesByOutputItemId.has("disabled-result")).toBe(false);

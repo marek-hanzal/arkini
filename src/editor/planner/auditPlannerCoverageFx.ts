@@ -10,12 +10,12 @@ import type {
 	PlannerCoverageAuditItem,
 	PlannerCoverageAuditItemTypeSummary,
 	PlannerCoverageAuditOutcome,
-	PlannerCoverageAuditOutcomeCounts,
 	PlannerCoverageAuditRankedItem,
 	PlannerCoverageAuditReport,
 } from "~/editor/planner/PlannerCoverageAudit";
 import { createEnginePlannerFx } from "~/editor/planner/createEnginePlannerFx";
 import { readPlannerSearchBudget } from "~/editor/planner/readPlannerSearchBudget";
+import { readPlannerCoverageAuditOutcomeCounts } from "~/editor/planner/readPlannerCoverageAuditOutcomeCounts";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 
@@ -177,14 +177,6 @@ const readFrequencies = (
 		)
 		.slice(0, limit);
 
-const readOutcomeCounts = (
-	items: ReadonlyArray<PlannerCoverageAuditItem>,
-): PlannerCoverageAuditOutcomeCounts => ({
-	completed: items.filter(({ outcome }) => outcome === "completed").length,
-	inconclusive: items.filter(({ outcome }) => outcome === "inconclusive").length,
-	noFinitePath: items.filter(({ outcome }) => outcome === "no-finite-path").length,
-});
-
 const readItemTypeSummary = (
 	items: ReadonlyArray<PlannerCoverageAuditItem>,
 ): ReadonlyArray<PlannerCoverageAuditItemTypeSummary> => {
@@ -195,7 +187,7 @@ const readItemTypeSummary = (
 		const typeItems = items.filter((item) => item.itemType === itemType);
 		return {
 			itemType,
-			outcomes: readOutcomeCounts(typeItems),
+			outcomes: readPlannerCoverageAuditOutcomeCounts(typeItems),
 			totalItems: typeItems.length,
 		};
 	});
@@ -222,7 +214,7 @@ const readPercentile = (values: ReadonlyArray<number>, percentile: number) => {
 	return values[Math.min(index, values.length - 1)] ?? 0;
 };
 
-const readSummary = (
+export const readPlannerCoverageAuditSummary = (
 	items: ReadonlyArray<PlannerCoverageAuditItem>,
 ): PlannerCoverageAuditReport["summary"] => {
 	const budgetLimits = new Map<string, number>();
@@ -280,7 +272,7 @@ const readSummary = (
 			p95Ms: readPercentile(durations, 0.95),
 			totalMs: totalDurationMs,
 		},
-		outcomes: readOutcomeCounts(items),
+		outcomes: readPlannerCoverageAuditOutcomeCounts(items),
 		routePlanOutcomes: readFrequencies(routePlanOutcomes),
 		search: {
 			expandedStates: items.reduce((total, item) => total + item.expandedStates, 0),
@@ -340,7 +332,7 @@ export const auditPlannerCoverageWithPlannerFx = Effect.fn("auditPlannerCoverage
 			budget,
 			items,
 			quantity,
-			summary: readSummary(items),
+			summary: readPlannerCoverageAuditSummary(items),
 			version: 1,
 		} satisfies PlannerCoverageAuditReport;
 	},

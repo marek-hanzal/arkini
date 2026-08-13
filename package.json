@@ -19,6 +19,7 @@
 		"dev:control:app": "ARKINI_DEV_CONTROL=1 electron-vite dev",
 		"mcp:inspect": "npx mcp-inspector --web --server-url http://127.0.0.1:32310/editor/mcp --transport http",
 		"planner:audit": "tsx cli/arkini.ts editor planner-audit",
+		"planner:audit-merge": "tsx cli/arkini.ts editor planner-audit-merge",
 		"planner:audit-tiers": "tsx cli/arkini.ts editor planner-audit --tiers smoke=25:1:1:500,narrow=100:4:4:500,medium=250:8:8:500,editor=1000:16:16:500",
 		"build": "tsx cli/arkini.ts desktop build",
 		"preview": "electron-vite preview",

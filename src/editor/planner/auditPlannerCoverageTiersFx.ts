@@ -1,10 +1,7 @@
 import { Effect } from "effect";
 
 import type { PlannerSearchBudget } from "~/editor/planner/PlannerSearch";
-import type {
-	PlannerCoverageAuditItem,
-	PlannerCoverageAuditOutcomeCounts,
-} from "~/editor/planner/PlannerCoverageAudit";
+import type { PlannerCoverageAuditItem } from "~/editor/planner/PlannerCoverageAudit";
 import {
 	PlannerCoverageTierAuditInputError,
 	type PlannerCoverageTier,
@@ -17,6 +14,7 @@ import {
 } from "~/editor/planner/PlannerCoverageTierAudit";
 import { auditPlannerCoverageWithPlannerFx } from "~/editor/planner/auditPlannerCoverageFx";
 import { createEnginePlannerFx } from "~/editor/planner/createEnginePlannerFx";
+import { readPlannerCoverageAuditOutcomeCounts } from "~/editor/planner/readPlannerCoverageAuditOutcomeCounts";
 import { readPlannerSearchBudget } from "~/editor/planner/readPlannerSearchBudget";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
@@ -42,14 +40,6 @@ const compareIds = (left: string, right: string) => left.localeCompare(right);
 
 const readPositiveInteger = (value: number | undefined, fallback: number) =>
 	value === undefined || !Number.isFinite(value) ? fallback : Math.max(1, Math.floor(value));
-
-const readOutcomeCounts = (
-	items: ReadonlyArray<PlannerCoverageAuditItem>,
-): PlannerCoverageAuditOutcomeCounts => ({
-	completed: items.filter(({ outcome }) => outcome === "completed").length,
-	inconclusive: items.filter(({ outcome }) => outcome === "inconclusive").length,
-	noFinitePath: items.filter(({ outcome }) => outcome === "no-finite-path").length,
-});
 
 const readSelectedItemIds = (
 	config: GameConfigSchema.Type,
@@ -194,7 +184,7 @@ export const auditPlannerCoverageTiersFx = Effect.fn("auditPlannerCoverageTiersF
 						item,
 					];
 		});
-		const cumulativeOutcomes = readOutcomeCounts(finalItems);
+		const cumulativeOutcomes = readPlannerCoverageAuditOutcomeCounts(finalItems);
 		const newlyCompleted = attemptReport.summary.outcomes.completed;
 		const newlyNoFinitePath = attemptReport.summary.outcomes.noFinitePath;
 		const newlyResolved = newlyCompleted + newlyNoFinitePath;
@@ -240,7 +230,7 @@ export const auditPlannerCoverageTiersFx = Effect.fn("auditPlannerCoverageTiersF
 					item,
 				];
 	});
-	const finalOutcomes = readOutcomeCounts(finalAuditItems);
+	const finalOutcomes = readPlannerCoverageAuditOutcomeCounts(finalAuditItems);
 	const saturatedTier = tierReports.find(
 		({ remainingInconclusive }) => remainingInconclusive === 0,
 	);

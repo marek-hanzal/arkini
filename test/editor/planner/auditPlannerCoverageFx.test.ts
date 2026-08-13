@@ -6,6 +6,7 @@ import {
 	type PlannerCoverageAuditProgress,
 } from "~/editor/planner/auditPlannerCoverageFx";
 import { auditPlannerCoverageTiersFx } from "~/editor/planner/auditPlannerCoverageTiersFx";
+import { mergePlannerCoverageTierAuditReports } from "~/editor/planner/mergePlannerCoverageTierAuditReports";
 import type { PlannerCoverageTierAuditProgress } from "~/editor/planner/PlannerCoverageTierAudit";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 
@@ -431,5 +432,141 @@ describe("auditPlannerCoverageFx", () => {
 		);
 
 		expect(message).toContain("lowers maximumExpandedStates from 8 to 4");
+	});
+
+	it("merges disjoint tier-audit shards from item attempts", () => {
+		const tiers = [
+			{
+				budget: {
+					maximumExpandedStates: 1,
+					maximumQueuedStates: 8,
+					maximumRoutePlans: 4,
+					maximumTraceLength: 8,
+				},
+				id: "smoke",
+			},
+			{
+				budget: {
+					maximumExpandedStates: 8,
+					maximumQueuedStates: 8,
+					maximumRoutePlans: 4,
+					maximumTraceLength: 8,
+				},
+				id: "deep",
+			},
+		] as const;
+		const full = Effect.runSync(
+			auditPlannerCoverageTiersFx({
+				config,
+				tiers,
+			}),
+		);
+		const first = Effect.runSync(
+			auditPlannerCoverageTiersFx({
+				config,
+				itemIds: [
+					"middle",
+					"orphan",
+				],
+				tiers,
+			}),
+		);
+		const second = Effect.runSync(
+			auditPlannerCoverageTiersFx({
+				config,
+				itemIds: [
+					"producer-a",
+					"producer-b",
+					"target",
+				],
+				tiers,
+			}),
+		);
+		const merged = mergePlannerCoverageTierAuditReports([
+			first,
+			second,
+		]);
+
+		expect(merged.summary).toMatchObject({
+			finalOutcomes: full.summary.finalOutcomes,
+			resolutionByTier: full.summary.resolutionByTier,
+			search: full.summary.search,
+			tierCount: full.summary.tierCount,
+			totalItems: full.summary.totalItems,
+			totalSearchAttempts: full.summary.totalSearchAttempts,
+			unresolvedItemIds: full.summary.unresolvedItemIds,
+		});
+		expect(
+			merged.tiers.map(
+				({
+					attemptedItems,
+					carriedCompleted,
+					carriedNoFinitePath,
+					cumulativeOutcomes,
+					id,
+					newlyCompleted,
+					newlyNoFinitePath,
+					remainingInconclusive,
+				}) => ({
+					attemptedItems,
+					carriedCompleted,
+					carriedNoFinitePath,
+					cumulativeOutcomes,
+					id,
+					newlyCompleted,
+					newlyNoFinitePath,
+					remainingInconclusive,
+				}),
+			),
+		).toEqual(
+			full.tiers.map(
+				({
+					attemptedItems,
+					carriedCompleted,
+					carriedNoFinitePath,
+					cumulativeOutcomes,
+					id,
+					newlyCompleted,
+					newlyNoFinitePath,
+					remainingInconclusive,
+				}) => ({
+					attemptedItems,
+					carriedCompleted,
+					carriedNoFinitePath,
+					cumulativeOutcomes,
+					id,
+					newlyCompleted,
+					newlyNoFinitePath,
+					remainingInconclusive,
+				}),
+			),
+		);
+		expect(
+			merged.items.map(({ attempts, finalOutcome, itemId, resolvedTierId }) => ({
+				attempts: attempts.map(({ result, tierId }) => ({
+					outcome: result.outcome,
+					tierId,
+				})),
+				finalOutcome,
+				itemId,
+				resolvedTierId,
+			})),
+		).toEqual(
+			full.items.map(({ attempts, finalOutcome, itemId, resolvedTierId }) => ({
+				attempts: attempts.map(({ result, tierId }) => ({
+					outcome: result.outcome,
+					tierId,
+				})),
+				finalOutcome,
+				itemId,
+				resolvedTierId,
+			})),
+		);
+		expect(() =>
+			mergePlannerCoverageTierAuditReports([
+				first,
+				first,
+			]),
+		).toThrow("item is duplicated: middle");
 	});
 });

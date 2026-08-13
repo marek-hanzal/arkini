@@ -68,6 +68,8 @@ export interface PlannerAcquisitionOutputStatistics {
 
 export interface PlannerAcquisitionOutput extends PlannerAcquisitionOutputStatistics {
 	readonly itemId: IdSchema.Type;
+	/** Exact maximal concrete drop branch used to deduplicate equivalent engine witnesses. */
+	readonly resolutionId: string;
 	readonly witness?: OutputSelectionWitness;
 	readonly witnessId: string;
 }

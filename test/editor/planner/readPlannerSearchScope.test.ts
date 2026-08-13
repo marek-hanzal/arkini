@@ -72,6 +72,25 @@ const chanceOutput = (itemId: string) => ({
 	],
 });
 
+const duplicateChanceOutput = (itemId: string) => ({
+	set: [
+		{
+			roll: [
+				{
+					chance: 0.4,
+					drop: chanceOutput(itemId).set[0].roll[0].drop,
+					type: "chance" as const,
+				},
+				{
+					chance: 0.15,
+					drop: chanceOutput(itemId).set[0].roll[0].drop,
+					type: "chance" as const,
+				},
+			],
+		},
+	],
+});
+
 const mixedOutput = () => ({
 	set: [
 		{
@@ -156,6 +175,7 @@ const config = GameConfigSchema.parse({
 			"source-rebuilder",
 			"target-producer",
 			"random-producer",
+			"duplicate-producer",
 			"mixed-producer",
 			"charged-producer",
 			"temporary-token",
@@ -238,6 +258,16 @@ const config = GameConfigSchema.parse({
 		]),
 		"random-target": {
 			...baseItem("random-target"),
+			type: "simple",
+		},
+		"duplicate-producer": producer("duplicate-producer", [
+			line({
+				id: "line:duplicate",
+				output: duplicateChanceOutput("duplicate-target"),
+			}),
+		]),
+		"duplicate-target": {
+			...baseItem("duplicate-target"),
 			type: "simple",
 		},
 		"mixed-producer": producer("mixed-producer", [
@@ -454,6 +484,7 @@ const syntheticRoute = ({
 				quantity: 1,
 			},
 		],
+		resolutionId: `resolution:${id}`,
 		selection: "guaranteed",
 		stochastic: false,
 		witnessId: `witness:${id}`,
@@ -740,6 +771,31 @@ describe("readPlannerSearchScope", () => {
 			},
 		});
 		expect(scope.unsupportedRoutes).toEqual([]);
+	});
+
+	it("deduplicates equivalent stochastic engine branches before search", () => {
+		const scope = readPlannerSearchScope({
+			graph,
+			targetItemId: "duplicate-target",
+		});
+
+		expect(scope.supported).toBe(true);
+		expect(scope.actions).toHaveLength(1);
+		expect(scope.actions[0]).toMatchObject({
+			action: {
+				kind: "line",
+				lineId: "line:duplicate",
+				ownerItemId: "duplicate-producer",
+			},
+			outputMode: "existential",
+			outputWitness: {
+				outputItemId: "duplicate-target",
+				statistics: {
+					maximumQuantityProbability: 0.4,
+				},
+			},
+		});
+		expect(scope.actions[0]?.routeIds).toHaveLength(2);
 	});
 
 	it("keeps explicit temporary expiry inside the supported slice", () => {

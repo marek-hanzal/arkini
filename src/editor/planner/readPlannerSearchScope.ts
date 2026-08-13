@@ -137,7 +137,7 @@ const readSearchActions = ({
 			routeIds: string[];
 		}
 	>();
-	const existential: PlannerSearchAction[] = [];
+	const existentialByResolutionId = new Map<string, PlannerSearchAction>();
 
 	for (const route of routes) {
 		const actionId = readPlannerActionId(route.action);
@@ -159,7 +159,13 @@ const readSearchActions = ({
 		const outputWitness = readActionOutputWitness(route);
 		if (outputWitness === undefined)
 			throw new Error(`Stochastic planner route ${route.id} has no output witness.`);
-		existential.push({
+		const resolutionId = JSON.stringify([
+			actionId,
+			outputWitness.source,
+			route.output.itemId,
+			route.output.resolutionId,
+		]);
+		const candidate: PlannerSearchAction = {
 			action: route.action,
 			actionId,
 			depth,
@@ -176,6 +182,34 @@ const readSearchActions = ({
 			routeIds: [
 				route.id,
 			],
+		};
+		const existing = existentialByResolutionId.get(resolutionId);
+		if (existing === undefined || existing.outputMode !== "existential") {
+			existentialByResolutionId.set(resolutionId, candidate);
+			continue;
+		}
+
+		const existingProbability = existing.outputWitness.statistics.maximumQuantityProbability;
+		const candidateProbability = outputWitness.statistics.maximumQuantityProbability;
+		const preferred =
+			candidateProbability > existingProbability ||
+			(candidateProbability === existingProbability &&
+				(outputWitness.statistics.occurrenceProbability >
+					existing.outputWitness.statistics.occurrenceProbability ||
+					(outputWitness.statistics.occurrenceProbability ===
+						existing.outputWitness.statistics.occurrenceProbability &&
+						compareIds(candidate.id, existing.id) < 0)))
+				? candidate
+				: existing;
+		existentialByResolutionId.set(resolutionId, {
+			...preferred,
+			depth: Math.min(existing.depth, candidate.depth),
+			routeIds: [
+				...new Set([
+					...existing.routeIds,
+					...candidate.routeIds,
+				]),
+			].sort(compareIds),
 		});
 	}
 
@@ -197,7 +231,7 @@ const readSearchActions = ({
 
 	return [
 		...canonical,
-		...existential,
+		...existentialByResolutionId.values(),
 	].sort((left, right) => left.depth - right.depth || compareIds(left.id, right.id));
 };
 

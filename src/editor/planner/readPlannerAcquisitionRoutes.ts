@@ -12,6 +12,7 @@ import type { ItemSchema } from "~/engine/item/schema/ItemSchema";
 import type { LineSchema } from "~/engine/line/schema/LineSchema";
 import type { DropSchema } from "~/engine/output/schema/DropSchema";
 import type { OutputSelectionWitness } from "~/engine/output/OutputSelectionWitness";
+import { readPlannerOutputWitnessDrops } from "~/engine/output/fx/resolvePlannerOutputWitnessFx";
 import type { OutputSchema } from "~/engine/output/schema/OutputSchema";
 import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 import type { WhenSchema } from "~/engine/when/schema/WhenSchema";
@@ -37,6 +38,14 @@ const compareIds = (left: string, right: string) => left.localeCompare(right);
 
 const makeStableId = (...parts: ReadonlyArray<number | string>) =>
 	parts.map((part) => encodeURIComponent(String(part))).join(":");
+
+const readOutputResolutionId = (output: OutputSchema.Type, witness: OutputSelectionWitness) =>
+	JSON.stringify(
+		readPlannerOutputWitnessDrops({
+			output,
+			witness,
+		}),
+	);
 
 const compareRequirements = (
 	left: PlannerAcquisitionRequirement,
@@ -343,12 +352,14 @@ const readAvailabilityRequirements = (
 const readDropWitness = ({
 	distribution,
 	drop,
+	resolutionId,
 	selection,
 	witness,
 	witnessId,
 }: {
 	readonly distribution: PlannerAcquisitionQuantityDistribution;
 	readonly drop: DropSchema.Type;
+	readonly resolutionId: string;
 	readonly selection: PlannerAcquisitionSelection;
 	readonly witness: Omit<OutputSelectionWitness, "itemId">;
 	readonly witnessId: string;
@@ -362,6 +373,7 @@ const readDropWitness = ({
 			maximumQuantityProbability: readMaximumQuantityProbability(distribution),
 			occurrenceProbability: readOccurrenceProbability(distribution),
 			quantityDistribution: distribution,
+			resolutionId,
 			selection,
 			stochastic: distribution.length > 1,
 			witness: {
@@ -427,6 +439,13 @@ const readOutputWitnesses = (output: OutputSchema.Type | undefined): OutputWitne
 				for (const [candidateIndex, candidate] of roll.drop.entries()) {
 					const candidateProbability = candidate.weight / totalCandidateWeight;
 					for (const [dropIndex, drop] of candidate.drop.entries()) {
+						const witness: OutputSelectionWitness = {
+							candidateIndex,
+							dropIndex,
+							itemId: drop.itemId,
+							rollIndex,
+							setIndex,
+						};
 						witnesses.push(
 							readDropWitness({
 								distribution: readWeightedOccurrenceDistribution({
@@ -437,13 +456,9 @@ const readOutputWitnesses = (output: OutputSchema.Type | undefined): OutputWitne
 									setProbability,
 								}),
 								drop,
+								resolutionId: readOutputResolutionId(output, witness),
 								selection: "weighted",
-								witness: {
-									candidateIndex,
-									dropIndex,
-									rollIndex,
-									setIndex,
-								},
+								witness,
 								witnessId: makeStableId(
 									"set",
 									setIndex,
@@ -464,6 +479,12 @@ const readOutputWitnesses = (output: OutputSchema.Type | undefined): OutputWitne
 			for (const [dropIndex, drop] of roll.drop.entries()) {
 				const occurrenceProbability =
 					setProbability * (roll.type === "chance" ? roll.chance : 1);
+				const witness: OutputSelectionWitness = {
+					dropIndex,
+					itemId: drop.itemId,
+					rollIndex,
+					setIndex,
+				};
 				witnesses.push(
 					readDropWitness({
 						distribution: withZeroQuantityProbability({
@@ -471,12 +492,9 @@ const readOutputWitnesses = (output: OutputSchema.Type | undefined): OutputWitne
 							probability: occurrenceProbability,
 						}),
 						drop,
+						resolutionId: readOutputResolutionId(output, witness),
 						selection: roll.type === "chance" ? "chance" : "guaranteed",
-						witness: {
-							dropIndex,
-							rollIndex,
-							setIndex,
-						},
+						witness,
 						witnessId: makeStableId(
 							"set",
 							setIndex,
@@ -677,6 +695,7 @@ const makeMergeRoutes = (source: ItemSchema.Type): PlannerAcquisitionRoute[] => 
 				maximumQuantityProbability: 1,
 				occurrenceProbability: 1,
 				quantityDistribution: makeConstantQuantityDistribution(1),
+				resolutionId: makeStableId("replacement", merge.result),
 				selection: "replacement",
 				stochastic: false,
 				witnessId: "replacement",

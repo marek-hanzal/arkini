@@ -60,7 +60,8 @@ const maximizeDropQuantity = (drop: DropSchema.Type): DropSchema.Type => ({
 	},
 });
 
-const readConcreteDrops = ({
+/** Reads the exact maximal integer drops emitted by one planner witness branch. */
+export const readPlannerOutputWitnessDrops = ({
 	output,
 	witness,
 }: {
@@ -104,7 +105,7 @@ export const resolvePlannerOutputWitnessFx = Effect.fn("resolvePlannerOutputWitn
 }: outputFx.Props & {
 	readonly witness: OutputSelectionWitness;
 }) {
-	const drops = readConcreteDrops({
+	const drops = readPlannerOutputWitnessDrops({
 		output,
 		witness,
 	});

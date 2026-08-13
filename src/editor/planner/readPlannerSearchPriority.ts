@@ -3,6 +3,7 @@ import type {
 	PlannerAcquisitionRequirement,
 	PlannerAcquisitionRoute,
 } from "~/editor/planner/PlannerAcquisitionGraph";
+import { readPlannerActionId } from "~/editor/planner/readPlannerActionId";
 import { readPlannerRuntimeQuantity } from "~/editor/planner/readPlannerRuntimeQuantity";
 import type { PlannerSearchScope } from "~/editor/planner/PlannerSearchScope";
 import { resolvePlannerRouteReachability } from "~/editor/planner/resolvePlannerRouteReachability";
@@ -10,12 +11,14 @@ import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
 export interface PlannerSearchPriority {
+	readonly preferredHeadroomByDepth: ReadonlyArray<number>;
 	readonly preferredProgressByDepth: ReadonlyArray<number>;
 	readonly scopeProgress: number;
 }
 
 export interface PlannerSearchPriorityPlan {
 	readonly depthByItemId: ReadonlyMap<IdSchema.Type, number>;
+	readonly maximumSingleActionOutputByItemId: ReadonlyMap<IdSchema.Type, number>;
 	readonly renewalRouteByItemId: ReadonlyMap<IdSchema.Type, PlannerAcquisitionRoute>;
 	readonly witnessRouteByItemId: ReadonlyMap<IdSchema.Type, PlannerAcquisitionRoute>;
 }
@@ -95,6 +98,51 @@ const readClauseRequirement = ({
 	);
 };
 
+const readMaximumSingleActionOutputByItemId = ({
+	routes,
+}: {
+	readonly routes: ReadonlyArray<PlannerAcquisitionRoute>;
+}) => {
+	const statisticsByActionId = new Map<
+		string,
+		Map<
+			IdSchema.Type,
+			{
+				deterministicQuantity: number;
+				maximumStochasticQuantity: number;
+			}
+		>
+	>();
+	for (const route of routes) {
+		const actionId = readPlannerActionId(route.action);
+		const statisticsByItemId = statisticsByActionId.get(actionId) ?? new Map();
+		const statistics = statisticsByItemId.get(route.output.itemId) ?? {
+			deterministicQuantity: 0,
+			maximumStochasticQuantity: 0,
+		};
+		if (route.output.stochastic)
+			statistics.maximumStochasticQuantity = Math.max(
+				statistics.maximumStochasticQuantity,
+				route.output.maximumQuantity,
+			);
+		else statistics.deterministicQuantity += route.output.maximumQuantity;
+		statisticsByItemId.set(route.output.itemId, statistics);
+		statisticsByActionId.set(actionId, statisticsByItemId);
+	}
+
+	const maximumSingleActionOutputByItemId = new Map<IdSchema.Type, number>();
+	for (const statisticsByItemId of statisticsByActionId.values())
+		for (const [itemId, statistics] of statisticsByItemId)
+			maximumSingleActionOutputByItemId.set(
+				itemId,
+				Math.max(
+					maximumSingleActionOutputByItemId.get(itemId) ?? 0,
+					statistics.deterministicQuantity + statistics.maximumStochasticQuantity,
+				),
+			);
+	return maximumSingleActionOutputByItemId;
+};
+
 /** Creates the deterministic preferred witness used only to order forward-search states. */
 export const readPlannerSearchPriorityPlan = ({
 	graph,
@@ -126,6 +174,9 @@ export const readPlannerSearchPriorityPlan = ({
 	}
 	return {
 		depthByItemId: scopeReachability.depthByItemId,
+		maximumSingleActionOutputByItemId: readMaximumSingleActionOutputByItemId({
+			routes: graph.routes.filter((route) => scopeRouteIds.has(route.id)),
+		}),
 		renewalRouteByItemId,
 		witnessRouteByItemId: new Map(
 			[
@@ -239,6 +290,7 @@ export const readPlannerSearchPriority = ({
 	readonly runtime: RuntimeSchema.Type;
 	readonly scope: PlannerSearchScope;
 }): PlannerSearchPriority => {
+	const preferredHeadroomByDepth: number[] = [];
 	const preferredProgressByDepth: number[] = [];
 	for (const [candidateItemId, demand] of readPlannerActiveDemand({
 		itemId,
@@ -270,6 +322,18 @@ export const readPlannerSearchPriority = ({
 		const progress = (availableQuantity + lifecycleQuantity) / demand;
 		const depth = plan.depthByItemId.get(candidateItemId) ?? 0;
 		preferredProgressByDepth[depth] = (preferredProgressByDepth[depth] ?? 0) + progress;
+
+		const maximumSingleActionOutput =
+			plan.maximumSingleActionOutputByItemId.get(candidateItemId) ?? 0;
+		const headroomCapacity = Math.max(0, maximumSingleActionOutput - demand);
+		if (headroomCapacity > 0) {
+			const headroom =
+				Math.min(
+					headroomCapacity,
+					Math.max(0, readPlannerRuntimeQuantity(runtime, candidateItemId) - demand),
+				) / headroomCapacity;
+			preferredHeadroomByDepth[depth] = (preferredHeadroomByDepth[depth] ?? 0) + headroom;
+		}
 	}
 
 	let scopeProgress = 0;
@@ -278,12 +342,19 @@ export const readPlannerSearchPriority = ({
 		scopeProgress += plan.depthByItemId.get(candidateItemId) ?? 0;
 	}
 	return {
+		preferredHeadroomByDepth,
 		preferredProgressByDepth,
 		scopeProgress,
 	};
 };
 
-/** Sorts higher preferred depth progress first, then broader target-scope progress. */
+/**
+ * Sorts exact preferred progress first, then one-action surplus and broad target-scope progress.
+ *
+ * The surplus tier is deliberately capped at the largest authored result of one action. It helps
+ * a width-one optimistic beam retain a useful stochastic companion without rewarding unbounded
+ * stockpiling once the currently visible demand is already satisfied.
+ */
 export const comparePlannerSearchPriority = (
 	left: PlannerSearchPriority,
 	right: PlannerSearchPriority,
@@ -296,6 +367,12 @@ export const comparePlannerSearchPriority = (
 		const difference =
 			(right.preferredProgressByDepth[depth] ?? 0) -
 			(left.preferredProgressByDepth[depth] ?? 0);
+		if (difference !== 0) return difference;
+	}
+	for (let depth = maximumDepth - 1; depth >= 0; depth -= 1) {
+		const difference =
+			(right.preferredHeadroomByDepth[depth] ?? 0) -
+			(left.preferredHeadroomByDepth[depth] ?? 0);
 		if (difference !== 0) return difference;
 	}
 	return right.scopeProgress - left.scopeProgress;

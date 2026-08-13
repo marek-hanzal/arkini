@@ -4,8 +4,10 @@ import {
 	DefaultPlannerSearchBudget,
 	type PlannerSearchBudget,
 	type PlannerSearchBudgetLimit,
+	type PlannerSearchDiagnostics,
 	type PlannerSearchOutputCertainty,
 	type PlannerSearchResult,
+	type PlannerSearchRoutePlanDiagnostic,
 	type PlannerSearchTraceEntry,
 } from "~/editor/planner/PlannerSearch";
 import type { PlannerSearchScope } from "~/editor/planner/PlannerSearchScope";
@@ -55,6 +57,24 @@ interface SearchNode {
 }
 
 const compareIds = (left: string, right: string) => left.localeCompare(right);
+
+const EmptyPlannerSearchDiagnostics: PlannerSearchDiagnostics = {
+	attemptedRoutePlans: 0,
+	routePlans: [],
+};
+
+const readPlannerSearchDiagnostics = (
+	routePlans: ReadonlyArray<PlannerSearchRoutePlanDiagnostic>,
+	winningRoutePlanIndex?: number,
+): PlannerSearchDiagnostics => ({
+	attemptedRoutePlans: routePlans.length,
+	routePlans,
+	...(winningRoutePlanIndex === undefined
+		? {}
+		: {
+				winningRoutePlanIndex,
+			}),
+});
 
 const readPositiveBudget = (candidate: number | undefined, fallback: number) =>
 	candidate === undefined || !Number.isFinite(candidate)
@@ -201,6 +221,7 @@ const readInconclusive = ({
 	best,
 	blockedActionIds,
 	budgetLimit,
+	diagnostics = EmptyPlannerSearchDiagnostics,
 	expandedStates,
 	frontierSize,
 	itemId,
@@ -213,6 +234,7 @@ const readInconclusive = ({
 	readonly best: SearchNode;
 	readonly blockedActionIds: ReadonlySet<string>;
 	readonly budgetLimit?: PlannerSearchBudgetLimit;
+	readonly diagnostics?: PlannerSearchDiagnostics;
 	readonly expandedStates: number;
 	readonly frontierSize: number;
 	readonly itemId: IdSchema.Type;
@@ -237,6 +259,7 @@ const readInconclusive = ({
 		: {
 				budgetLimit,
 			}),
+	diagnostics,
 	expandedStates,
 	frontierSize,
 	itemId,
@@ -270,6 +293,51 @@ type PlannerScopeSearchResult =
 			readonly reason: "non-quiescent-runtime" | "search-budget" | "search-exhausted";
 			readonly type: "inconclusive";
 	  });
+
+const readRoutePlanDiagnostic = ({
+	index,
+	itemId,
+	pass,
+	scope,
+}: {
+	readonly index: number;
+	readonly itemId: IdSchema.Type;
+	readonly pass: PlannerScopeSearchResult;
+	readonly scope: PlannerSearchScope;
+}): PlannerSearchRoutePlanDiagnostic => {
+	const targetRouteId = scope.preferredRouteByItemId.get(itemId)?.id;
+	return {
+		actionCount: scope.actions.length,
+		bestAvailableQuantity: readAvailableQuantity(pass.best, itemId),
+		bestTraceActionIds: pass.best.trace.map(({ actionId }) => actionId),
+		blockedActionIds: [
+			...pass.blockedActionIds,
+		].sort(compareIds),
+		...(pass.type === "inconclusive" && pass.budgetLimit !== undefined
+			? {
+					budgetLimit: pass.budgetLimit,
+				}
+			: {}),
+		depthDiscrepancy: scope.depthDiscrepancy,
+		detours: scope.choices.filter(({ alternativeIndex }) => alternativeIndex > 0),
+		expandedStates: pass.expandedStates,
+		frontierSize: pass.frontierSize,
+		index,
+		maximumDetourDepth: scope.maximumDetourDepth,
+		outcome: pass.type === "completed" ? "completed" : pass.reason,
+		routeCount: scope.routeIds.length,
+		routeDiscrepancy: scope.routeDiscrepancy,
+		...(targetRouteId === undefined
+			? {}
+			: {
+					targetRouteId,
+				}),
+		unsupportedActionIds: [
+			...pass.unsupportedActionIds,
+		].sort(compareIds),
+		visitedStates: pass.visitedStates,
+	};
+};
 
 const searchPlannerScopeFx = Effect.fn("searchPlannerScopeFx")(function* ({
 	budget,
@@ -581,6 +649,7 @@ export const searchPlannerRuntimeFx = Effect.fn("searchPlannerRuntimeFx")(functi
 		});
 		return {
 			availableQuantity: initialQuantity,
+			diagnostics: EmptyPlannerSearchDiagnostics,
 			economics,
 			elapsedMs: 0,
 			expandedStates: 0,
@@ -601,6 +670,7 @@ export const searchPlannerRuntimeFx = Effect.fn("searchPlannerRuntimeFx")(functi
 	});
 	if (structural.type !== "reachable")
 		return {
+			diagnostics: EmptyPlannerSearchDiagnostics,
 			itemId,
 			proof: structural,
 			quantity,
@@ -628,6 +698,7 @@ export const searchPlannerRuntimeFx = Effect.fn("searchPlannerRuntimeFx")(functi
 	let visitedStates = 0;
 	let best = initial;
 	let finalScope = minimumScope;
+	const routePlanDiagnostics: PlannerSearchRoutePlanDiagnostic[] = [];
 	let scopeCount = 0;
 
 	for (const scope of iteratePlannerSearchScopes({
@@ -655,6 +726,7 @@ export const searchPlannerRuntimeFx = Effect.fn("searchPlannerRuntimeFx")(functi
 				best,
 				blockedActionIds,
 				budgetLimit: "maximumExpandedStates",
+				diagnostics: readPlannerSearchDiagnostics(routePlanDiagnostics),
 				expandedStates,
 				frontierSize: 0,
 				itemId,
@@ -678,6 +750,14 @@ export const searchPlannerRuntimeFx = Effect.fn("searchPlannerRuntimeFx")(functi
 		});
 		expandedStates += pass.expandedStates;
 		visitedStates += pass.visitedStates;
+		routePlanDiagnostics.push(
+			readRoutePlanDiagnostic({
+				index: scopeCount,
+				itemId,
+				pass,
+				scope,
+			}),
+		);
 		for (const actionId of pass.blockedActionIds) blockedActionIds.add(actionId);
 		for (const actionId of pass.unsupportedActionIds) unsupportedActionIds.add(actionId);
 		if (
@@ -700,6 +780,7 @@ export const searchPlannerRuntimeFx = Effect.fn("searchPlannerRuntimeFx")(functi
 			});
 			return {
 				availableQuantity: readAvailableQuantity(pass.node, itemId),
+				diagnostics: readPlannerSearchDiagnostics(routePlanDiagnostics, scopeCount),
 				economics,
 				elapsedMs: pass.node.elapsedMs,
 				expandedStates,
@@ -717,6 +798,7 @@ export const searchPlannerRuntimeFx = Effect.fn("searchPlannerRuntimeFx")(functi
 			return readInconclusive({
 				best,
 				blockedActionIds,
+				diagnostics: readPlannerSearchDiagnostics(routePlanDiagnostics),
 				expandedStates,
 				frontierSize: pass.frontierSize,
 				itemId,
@@ -735,6 +817,7 @@ export const searchPlannerRuntimeFx = Effect.fn("searchPlannerRuntimeFx")(functi
 					: {
 							budgetLimit: pass.budgetLimit,
 						}),
+				diagnostics: readPlannerSearchDiagnostics(routePlanDiagnostics),
 				expandedStates,
 				frontierSize: pass.frontierSize,
 				itemId,
@@ -749,6 +832,7 @@ export const searchPlannerRuntimeFx = Effect.fn("searchPlannerRuntimeFx")(functi
 	return readInconclusive({
 		best,
 		blockedActionIds,
+		diagnostics: readPlannerSearchDiagnostics(routePlanDiagnostics),
 		expandedStates,
 		frontierSize: 0,
 		itemId,

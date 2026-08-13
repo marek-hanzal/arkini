@@ -33,6 +33,7 @@ const plan: PlannerSearchPriorityPlan = {
 
 const scope: PlannerSearchScope = {
 	actions: [],
+	choices: [],
 	depthDiscrepancy: 0,
 	id: "[]",
 	itemIds: [

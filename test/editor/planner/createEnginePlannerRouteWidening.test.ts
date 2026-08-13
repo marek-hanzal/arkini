@@ -216,6 +216,44 @@ describe("engine planner route widening", () => {
 		expect(result.outputCertainty).toBe("deterministic");
 		expect(result.elapsedMs).toBe(300);
 		expect(result.expandedStates).toBe(5);
+		expect(result.diagnostics).toMatchObject({
+			attemptedRoutePlans: 2,
+			winningRoutePlanIndex: 2,
+		});
+		expect(result.diagnostics.routePlans).toHaveLength(2);
+		expect(result.diagnostics.routePlans[0]).toMatchObject({
+			bestAvailableQuantity: 0,
+			bestTraceActionIds: [
+				'["line","short-part-producer","line:short-part"]',
+			],
+			depthDiscrepancy: 0,
+			detours: [],
+			expandedStates: 2,
+			index: 1,
+			maximumDetourDepth: 0,
+			outcome: "search-exhausted",
+		});
+		expect(result.diagnostics.routePlans[1]).toMatchObject({
+			bestAvailableQuantity: 1,
+			bestTraceActionIds: [
+				'["line","detour-part-producer","line:detour-part"]',
+				'["line","detour-middle-producer","line:detour-middle"]',
+				'["line","detour-target-producer","line:detour-target"]',
+			],
+			depthDiscrepancy: 1,
+			detours: [
+				expect.objectContaining({
+					alternativeIndex: 1,
+					depthExcess: 1,
+					itemId: "widened-target",
+					type: "acquisition-route",
+				}),
+			],
+			expandedStates: 3,
+			index: 2,
+			maximumDetourDepth: 1,
+			outcome: "completed",
+		});
 		expect(result.trace.map(({ action }) => action)).toEqual([
 			{
 				kind: "line",
@@ -277,5 +315,24 @@ describe("engine planner route widening", () => {
 			],
 			type: "inconclusive",
 		});
+		if (result.type !== "inconclusive") return;
+		expect(result.diagnostics).toMatchObject({
+			attemptedRoutePlans: 1,
+			routePlans: [
+				{
+					bestAvailableQuantity: 0,
+					bestTraceActionIds: [
+						'["line","short-part-producer","line:short-part"]',
+					],
+					depthDiscrepancy: 0,
+					detours: [],
+					expandedStates: 2,
+					index: 1,
+					maximumDetourDepth: 0,
+					outcome: "search-exhausted",
+				},
+			],
+		});
+		expect(result.diagnostics).not.toHaveProperty("winningRoutePlanIndex");
 	});
 });

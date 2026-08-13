@@ -6,6 +6,7 @@ import type {
 import type {
 	PlannerSearchAction,
 	PlannerSearchScope,
+	PlannerSearchScopeChoice,
 	PlannerSearchUnsupportedRoute,
 } from "~/editor/planner/PlannerSearchScope";
 import { readPlannerActionId } from "~/editor/planner/readPlannerActionId";
@@ -217,6 +218,7 @@ const buildPlannerSearchScope = ({
 			choicePoints: [],
 			scope: {
 				actions: [],
+				choices: [],
 				depthDiscrepancy: 0,
 				id: "[]",
 				itemIds: [],
@@ -233,6 +235,7 @@ const buildPlannerSearchScope = ({
 
 	const choiceIndexByKey = new Map<string, number>();
 	const choicePoints: PlannerSearchChoicePoint[] = [];
+	const choices: PlannerSearchScopeChoice[] = [];
 	const itemIds = new Set<IdSchema.Type>();
 	const preferredRequirementByClauseId = new Map<string, PlannerAcquisitionRequirement>();
 	const preferredRenewalRouteByItemId = new Map<IdSchema.Type, PlannerAcquisitionRoute>();
@@ -261,6 +264,9 @@ const buildPlannerSearchScope = ({
 	}) => {
 		const selectedIndex = choiceProfile.get(key) ?? 0;
 		if (selectedIndex < 0 || selectedIndex >= optionCount) return undefined;
+		const minimumDepth = depths[0] ?? 0;
+		const selectedDepth = depths[selectedIndex] ?? minimumDepth;
+		const depthExcess = selectedDepth - minimumDepth;
 		if (!choiceIndexByKey.has(key)) {
 			choiceIndexByKey.set(key, selectedIndex);
 			choicePoints.push({
@@ -268,12 +274,16 @@ const buildPlannerSearchScope = ({
 				optionCount,
 				selectedIndex,
 			});
-			const detourDepth = (depths[selectedIndex] ?? 0) - (depths[0] ?? 0);
-			depthDiscrepancy += detourDepth;
-			maximumDetourDepth = Math.max(maximumDetourDepth, detourDepth);
+			depthDiscrepancy += depthExcess;
+			maximumDetourDepth = Math.max(maximumDetourDepth, depthExcess);
 			routeDiscrepancy += selectedIndex;
 		}
-		return selectedIndex;
+		return {
+			depthExcess,
+			minimumDepth,
+			selectedDepth,
+			selectedIndex,
+		};
 	};
 
 	const queueRequirement = (requirement: PlannerAcquisitionRequirement) => {
@@ -303,7 +313,7 @@ const buildPlannerSearchScope = ({
 				.sort((left, right) => compareRequirements(graph, left, right));
 			if (options.length === 0) return false;
 			const clauseId = readPlannerRequirementClauseId(route.id, clauseIndex);
-			const selectedIndex = registerChoice({
+			const selection = registerChoice({
 				depths: options.map(
 					(requirement) =>
 						graph.depthByItemId.get(requirement.itemId) ?? Number.POSITIVE_INFINITY,
@@ -311,9 +321,22 @@ const buildPlannerSearchScope = ({
 				key: clauseId,
 				optionCount: options.length,
 			});
-			if (selectedIndex === undefined) return false;
-			const selected = options[selectedIndex];
+			if (selection === undefined) return false;
+			const selected = options[selection.selectedIndex];
 			if (selected === undefined) return false;
+			choices.push({
+				alternativeCount: options.length,
+				alternativeIndex: selection.selectedIndex,
+				clauseId,
+				depthExcess: selection.depthExcess,
+				itemId: selected.itemId,
+				key: clauseId,
+				minimumDepth: selection.minimumDepth,
+				selectedDepth: selection.selectedDepth,
+				source: selected.source,
+				type: "requirement",
+				usage: selected.usage,
+			});
 			preferredRequirementByClauseId.set(clauseId, selected);
 			const selectedDepth = graph.depthByItemId.get(selected.itemId);
 			if (selectedDepth === undefined) return false;
@@ -351,14 +374,25 @@ const buildPlannerSearchScope = ({
 			goal.type === "renewal"
 				? readRenewalChoiceId(goal.itemId)
 				: readAcquisitionChoiceId(goal.itemId);
-		const selectedIndex = registerChoice({
+		const selection = registerChoice({
 			depths: options.map((route) => readRouteDepth(graph, route)),
 			key: choiceId,
 			optionCount: options.length,
 		});
-		if (selectedIndex === undefined) return undefined;
-		const selected = options[selectedIndex];
+		if (selection === undefined) return undefined;
+		const selected = options[selection.selectedIndex];
 		if (selected === undefined) return undefined;
+		choices.push({
+			alternativeCount: options.length,
+			alternativeIndex: selection.selectedIndex,
+			depthExcess: selection.depthExcess,
+			itemId: goal.itemId,
+			key: choiceId,
+			minimumDepth: selection.minimumDepth,
+			routeId: selected.id,
+			selectedDepth: selection.selectedDepth,
+			type: goal.type === "renewal" ? "renewal-route" : "acquisition-route",
+		});
 		if (goal.type === "renewal") preferredRenewalRouteByItemId.set(goal.itemId, selected);
 		else preferredRouteByItemId.set(goal.itemId, selected);
 		const selectedDepth = readRouteDepth(graph, selected);
@@ -380,6 +414,7 @@ const buildPlannerSearchScope = ({
 				routeDepthById: graph.routeDepthById,
 				routes,
 			}),
+			choices: choices.sort((left, right) => compareIds(left.key, right.key)),
 			depthDiscrepancy,
 			id: JSON.stringify(normalizedChoiceEntries),
 			itemIds: [

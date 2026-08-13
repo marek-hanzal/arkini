@@ -15,6 +15,34 @@ export interface PlannerSearchUnsupportedRoute {
 	readonly routeId: string;
 }
 
+interface PlannerSearchScopeChoiceBase {
+	/** Zero-based authored alternative selected by this route plan. */
+	readonly alternativeIndex: number;
+	readonly alternativeCount: number;
+	/** Selected structural depth minus the locally shortest alternative depth. */
+	readonly depthExcess: number;
+	readonly key: string;
+	readonly minimumDepth: number;
+	readonly selectedDepth: number;
+}
+
+/** One explicit authored alternative selected while building a progressive route plan. */
+export type PlannerSearchScopeChoice = PlannerSearchScopeChoiceBase &
+	(
+		| {
+				readonly itemId: IdSchema.Type;
+				readonly routeId: string;
+				readonly type: "acquisition-route" | "renewal-route";
+		  }
+		| {
+				readonly clauseId: string;
+				readonly itemId: IdSchema.Type;
+				readonly source: PlannerAcquisitionRequirement["source"];
+				readonly type: "requirement";
+				readonly usage: PlannerAcquisitionRequirement["usage"];
+		  }
+	);
+
 interface PlannerSearchActionBase {
 	readonly action: PlannerAction;
 	readonly actionId: string;
@@ -40,6 +68,8 @@ export type PlannerSearchAction = PlannerSearchActionBase &
 /** One progressively widened authored route plan consumed by engine-backed search. */
 export interface PlannerSearchScope {
 	readonly actions: ReadonlyArray<PlannerSearchAction>;
+	/** Every authored alternative selected by this route plan, including shortest defaults. */
+	readonly choices: ReadonlyArray<PlannerSearchScopeChoice>;
 	/** Sum of selected route-depth excesses over each locally shortest alternative. */
 	readonly depthDiscrepancy: number;
 	readonly id: string;

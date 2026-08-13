@@ -7,7 +7,10 @@ import type {
 import type { PlannerAction } from "~/editor/planner/PlannerAction";
 import type { PlannerActionActor } from "~/editor/planner/PlannerActionResult";
 import type { PlannerExpectedEconomics } from "~/editor/planner/PlannerExpectedEconomics";
-import type { PlannerSearchUnsupportedRoute } from "~/editor/planner/PlannerSearchScope";
+import type {
+	PlannerSearchScopeChoice,
+	PlannerSearchUnsupportedRoute,
+} from "~/editor/planner/PlannerSearchScope";
 import type { PlannerStructuralReachability } from "~/editor/planner/PlannerStructuralReachability";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { GameEventSchema } from "~/engine/event/schema/GameEventSchema";
@@ -36,6 +39,42 @@ export const DefaultPlannerSearchBudget: PlannerSearchBudget = {
 	maximumQueuedStates: 512,
 	maximumTraceLength: 48,
 };
+
+export type PlannerSearchRoutePlanOutcome =
+	| "completed"
+	| "non-quiescent-runtime"
+	| "search-budget"
+	| "search-exhausted";
+
+/** One fully executed progressive route-plan pass. */
+export interface PlannerSearchRoutePlanDiagnostic {
+	readonly actionCount: number;
+	readonly bestAvailableQuantity: number;
+	readonly bestTraceActionIds: ReadonlyArray<string>;
+	readonly blockedActionIds: ReadonlyArray<string>;
+	readonly budgetLimit?: PlannerSearchBudgetLimit;
+	readonly depthDiscrepancy: number;
+	/** Only non-default authored choices selected by this route plan. */
+	readonly detours: ReadonlyArray<PlannerSearchScopeChoice>;
+	readonly expandedStates: number;
+	readonly frontierSize: number;
+	/** One-based pass index in actual execution order. */
+	readonly index: number;
+	readonly maximumDetourDepth: number;
+	readonly outcome: PlannerSearchRoutePlanOutcome;
+	readonly routeCount: number;
+	readonly routeDiscrepancy: number;
+	readonly targetRouteId?: string;
+	readonly unsupportedActionIds: ReadonlyArray<string>;
+	readonly visitedStates: number;
+}
+
+/** Search-wide widening audit trail, including failed shorter plans and the winning detour. */
+export interface PlannerSearchDiagnostics {
+	readonly attemptedRoutePlans: number;
+	readonly routePlans: ReadonlyArray<PlannerSearchRoutePlanDiagnostic>;
+	readonly winningRoutePlanIndex?: number;
+}
 
 export interface PlannerSearchTraceEntry {
 	readonly action: PlannerAction;
@@ -67,6 +106,7 @@ export type PlannerSearchBudgetLimit = keyof PlannerSearchBudget;
 export type PlannerSearchResult =
 	| {
 			readonly availableQuantity: number;
+			readonly diagnostics: PlannerSearchDiagnostics;
 			readonly economics: PlannerExpectedEconomics;
 			readonly elapsedMs: number;
 			readonly expandedStates: number;
@@ -81,6 +121,7 @@ export type PlannerSearchResult =
 			readonly visitedStates: number;
 	  }
 	| {
+			readonly diagnostics: PlannerSearchDiagnostics;
 			readonly itemId: IdSchema.Type;
 			readonly proof: Exclude<
 				PlannerStructuralReachability,
@@ -96,6 +137,7 @@ export type PlannerSearchResult =
 			readonly bestRuntime: RuntimeSchema.Type;
 			readonly blockedActionIds: ReadonlyArray<string>;
 			readonly budgetLimit?: PlannerSearchBudgetLimit;
+			readonly diagnostics: PlannerSearchDiagnostics;
 			readonly expandedStates: number;
 			readonly frontierSize: number;
 			readonly itemId: IdSchema.Type;

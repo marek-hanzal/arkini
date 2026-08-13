@@ -806,6 +806,26 @@ describe("readPlannerSearchScope", () => {
 			lineId: "line:detour-target",
 			ownerItemId: "detour-target-producer",
 		});
+		expect(shortest?.choices).toContainEqual(
+			expect.objectContaining({
+				alternativeCount: 2,
+				alternativeIndex: 0,
+				depthExcess: 0,
+				itemId: "widened-target",
+				routeId: shortest.preferredRouteByItemId.get("widened-target")?.id,
+				type: "acquisition-route",
+			}),
+		);
+		expect(widened?.choices).toContainEqual(
+			expect.objectContaining({
+				alternativeCount: 2,
+				alternativeIndex: 1,
+				depthExcess: 1,
+				itemId: "widened-target",
+				routeId: widened.preferredRouteByItemId.get("widened-target")?.id,
+				type: "acquisition-route",
+			}),
+		);
 		expect(shortest?.routeIds.every((routeId) => widened?.routeIds.includes(routeId))).toBe(
 			true,
 		);
@@ -829,6 +849,16 @@ describe("readPlannerSearchScope", () => {
 		expect(scopes[1]?.preferredRequirementByClauseId.get(clauseId)?.itemId).toBe(
 			"alternative-b",
 		);
+		expect(scopes[1]?.choices).toContainEqual(
+			expect.objectContaining({
+				alternativeCount: 2,
+				alternativeIndex: 1,
+				clauseId,
+				depthExcess: 1,
+				itemId: "alternative-b",
+				type: "requirement",
+			}),
+		);
 		expect(scopes[1]?.depthDiscrepancy).toBe(1);
 		expect(scopes[0]?.routeIds.every((routeId) => scopes[1]?.routeIds.includes(routeId))).toBe(
 			true,
@@ -847,6 +877,16 @@ describe("readPlannerSearchScope", () => {
 		);
 		expect(scopes[1]?.preferredRenewalRouteByItemId.get("fuel")?.id).toBe(
 			"route:long-fuel-renewal",
+		);
+		expect(scopes[1]?.choices).toContainEqual(
+			expect.objectContaining({
+				alternativeCount: 2,
+				alternativeIndex: 1,
+				depthExcess: 1,
+				itemId: "fuel",
+				routeId: "route:long-fuel-renewal",
+				type: "renewal-route",
+			}),
 		);
 		expect(scopes[1]?.maximumDetourDepth).toBe(1);
 		expect(scopes[0]?.routeIds.every((routeId) => scopes[1]?.routeIds.includes(routeId))).toBe(

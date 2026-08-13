@@ -132,6 +132,57 @@ const output = OutputSchema.parse({
 	],
 });
 
+const baselineOutput = OutputSchema.parse({
+	set: [
+		{
+			roll: [
+				{
+					drop: [
+						{
+							itemId: "item:base",
+							quantity: {
+								max: 2,
+								min: 1,
+							},
+							rules: [],
+						},
+					],
+					type: "guaranteed",
+				},
+				{
+					chance: 0.5,
+					drop: [
+						{
+							itemId: "item:bonus",
+							quantity: {
+								max: 1,
+								min: 1,
+							},
+							rules: [],
+						},
+					],
+					type: "chance",
+				},
+				{
+					chance: 1,
+					drop: [
+						{
+							itemId: "item:certain",
+							quantity: {
+								max: 3,
+								min: 2,
+							},
+							rules: [],
+						},
+					],
+					type: "chance",
+				},
+			],
+			weight: 1,
+		},
+	],
+});
+
 const aggregate = (
 	drop: ReadonlyArray<{
 		readonly itemId: string;
@@ -145,9 +196,11 @@ const aggregate = (
 
 const resolve = ({
 	ambientSeed,
+	resolvedOutput = output,
 	witness,
 }: {
 	readonly ambientSeed: string;
+	readonly resolvedOutput?: OutputSchema.Type;
 	readonly witness?: {
 		readonly candidateIndex?: number;
 		readonly dropIndex: number;
@@ -159,7 +212,7 @@ const resolve = ({
 	Effect.runPromise(
 		resolveOutputFx({
 			origin,
-			output,
+			output: resolvedOutput,
 			source,
 		}).pipe(
 			Effect.provide(
@@ -180,7 +233,7 @@ const resolve = ({
 	);
 
 describe("Planner output resolution policy", () => {
-	it("pins the baseline branch independently of ambient randomness", async () => {
+	it("resolves only the guaranteed output floor independently of ambient randomness", async () => {
 		const results = await Promise.all(
 			Array.from(
 				{
@@ -189,13 +242,16 @@ describe("Planner output resolution policy", () => {
 				(_, index) =>
 					resolve({
 						ambientSeed: `ambient:${index}`,
+						resolvedOutput: baselineOutput,
 					}),
 			),
 		);
 
-		expect(
-			results.every((result) => JSON.stringify(result) === JSON.stringify(results[0])),
-		).toBe(true);
+		for (const result of results)
+			expect(aggregate(result.drop)).toEqual({
+				"item:base": 1,
+				"item:certain": 2,
+			});
 	});
 
 	it("realizes one correlated integer witness for a weighted stochastic route", async () => {

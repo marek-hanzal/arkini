@@ -2,9 +2,9 @@ import type { OutputResolutionFxService } from "~/engine/output/context/OutputRe
 import type { PlannerOutputResolutionTarget } from "~/engine/output/PlannerOutputResolutionTarget";
 import { readOutputResolutionSourceId } from "~/engine/output/OutputResolutionSource";
 import { resolvePlannerOutputWitnessFx } from "~/engine/output/fx/resolvePlannerOutputWitnessFx";
-import { resolveReproducibleOutputFx } from "~/engine/output/fx/resolveReproducibleOutputFx";
+import { resolvePlannerGuaranteedOutputFx } from "~/engine/output/fx/resolvePlannerGuaranteedOutputFx";
 
-/** Builds the planner output policy for either a baseline or one requested witness. */
+/** Builds the planner output policy for either the guaranteed floor or one requested witness. */
 export const makePlannerOutputResolutionFx = (
 	target?: PlannerOutputResolutionTarget,
 ): OutputResolutionFxService => ({
@@ -22,6 +22,6 @@ export const makePlannerOutputResolutionFx = (
 				witness: target.witness,
 			});
 		}
-		return resolveReproducibleOutputFx(props);
+		return resolvePlannerGuaranteedOutputFx(props);
 	},
 });

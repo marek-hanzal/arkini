@@ -521,12 +521,14 @@ export const readPlannerActiveDemand = ({
  * producer could outrank the real spender forever once enough consumables already exist.
  */
 export const readPlannerSearchPriority = ({
+	activeDemand,
 	itemId,
 	plan,
 	quantity,
 	runtime,
 	scope,
 }: {
+	readonly activeDemand?: ReadonlyMap<IdSchema.Type, PlannerActiveItemDemand>;
 	readonly itemId: IdSchema.Type;
 	readonly plan: PlannerSearchPriorityPlan;
 	readonly quantity: number;
@@ -535,12 +537,15 @@ export const readPlannerSearchPriority = ({
 }): PlannerSearchPriority => {
 	const preferredHeadroomByDepth: number[] = [];
 	const preferredProgressByDepth: number[] = [];
-	for (const [candidateItemId, demand] of readPlannerActiveDemand({
-		itemId,
-		plan,
-		quantity,
-		runtime,
-	})) {
+	const demandByItemId =
+		activeDemand ??
+		readPlannerActiveDemand({
+			itemId,
+			plan,
+			quantity,
+			runtime,
+		});
+	for (const [candidateItemId, demand] of demandByItemId) {
 		if (demand.quantity <= 0) continue;
 		const availableQuantity = Math.min(
 			readPlannerRuntimeQuantity(runtime, candidateItemId) + demand.projectedQuantity,

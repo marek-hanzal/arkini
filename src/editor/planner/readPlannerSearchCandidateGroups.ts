@@ -5,9 +5,9 @@ import type {
 } from "~/editor/planner/PlannerAcquisitionGraph";
 import { readPlannerRuntimeChargeCapacity } from "~/editor/planner/readPlannerRuntimeChargeCapacity";
 import { readPlannerRuntimeQuantity } from "~/editor/planner/readPlannerRuntimeQuantity";
-import {
-	readPlannerActiveDemand,
-	type PlannerSearchPriorityPlan,
+import type {
+	PlannerActiveItemDemand,
+	PlannerSearchPriorityPlan,
 } from "~/editor/planner/readPlannerSearchPriority";
 import type { PlannerSearchAction, PlannerSearchScope } from "~/editor/planner/PlannerSearchScope";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
@@ -88,26 +88,18 @@ const readActionRoutesForOutput = (
  * the unresolved groups are returned in the same deterministic order.
  */
 export const readPlannerSearchCandidateGroups = ({
+	activeDemand,
 	graph,
-	itemId,
 	plan,
-	quantity,
 	runtime,
 	scope,
 }: {
+	readonly activeDemand: ReadonlyMap<IdSchema.Type, PlannerActiveItemDemand>;
 	readonly graph: PlannerAcquisitionGraph;
-	readonly itemId: IdSchema.Type;
 	readonly plan: PlannerSearchPriorityPlan;
-	readonly quantity: number;
 	readonly runtime: RuntimeSchema.Type;
 	readonly scope: PlannerSearchScope;
 }): ReadonlyArray<PlannerSearchCandidateGroup> => {
-	const activeDemand = readPlannerActiveDemand({
-		itemId,
-		plan,
-		quantity,
-		runtime,
-	});
 	const demandOrder = new Map(
 		[
 			...activeDemand.keys(),

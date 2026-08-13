@@ -20,8 +20,10 @@ import { readPlannerSearchBudget } from "~/editor/planner/readPlannerSearchBudge
 import { readPlannerSearchCandidateGroups } from "~/editor/planner/readPlannerSearchCandidateGroups";
 import {
 	comparePlannerSearchPriority,
+	readPlannerActiveDemand,
 	readPlannerSearchPriority,
 	readPlannerSearchPriorityPlan,
+	type PlannerActiveItemDemand,
 	type PlannerSearchPriority,
 } from "~/editor/planner/readPlannerSearchPriority";
 import {
@@ -45,6 +47,7 @@ export namespace searchPlannerRuntimeFx {
 }
 
 interface SearchNode {
+	readonly activeDemand: ReadonlyMap<IdSchema.Type, PlannerActiveItemDemand>;
 	readonly elapsedMs: number;
 	readonly fingerprint: string;
 	readonly order: number;
@@ -120,23 +123,33 @@ const readInitialSearchNode = ({
 	readonly runtime: RuntimeSchema.Type;
 	readonly scope: PlannerSearchScope;
 	readonly stateToken?: number;
-}): SearchNode => ({
-	elapsedMs: 0,
-	fingerprint,
-	order,
-	outputCertainty: "deterministic",
-	priority: readPlannerSearchPriority({
+}): SearchNode => {
+	const activeDemand = readPlannerActiveDemand({
 		itemId,
 		plan,
 		quantity,
 		runtime,
-		scope,
-	}),
-	runtime,
-	selectedWitnessProbability: 1,
-	stateToken,
-	trace: [],
-});
+	});
+	return {
+		activeDemand,
+		elapsedMs: 0,
+		fingerprint,
+		order,
+		outputCertainty: "deterministic",
+		priority: readPlannerSearchPriority({
+			activeDemand,
+			itemId,
+			plan,
+			quantity,
+			runtime,
+			scope,
+		}),
+		runtime,
+		selectedWitnessProbability: 1,
+		stateToken,
+		trace: [],
+	};
+};
 
 const readRelevantPresence = (node: SearchNode, scope: PlannerSearchScope) =>
 	scope.itemIds.reduce(
@@ -401,10 +414,9 @@ const searchPlannerScopeFx = Effect.fn("searchPlannerScopeFx")(function* ({
 		expandedStates += 1;
 
 		const candidateGroups = readPlannerSearchCandidateGroups({
+			activeDemand: node.activeDemand,
 			graph,
-			itemId,
 			plan: priorityPlan,
-			quantity,
 			runtime: node.runtime,
 			scope,
 		});
@@ -482,12 +494,20 @@ const searchPlannerScopeFx = Effect.fn("searchPlannerScopeFx")(function* ({
 					runtime: result.runtime,
 				});
 				if (!registration.accepted) continue;
+				const nextActiveDemand = readPlannerActiveDemand({
+					itemId,
+					plan: priorityPlan,
+					quantity,
+					runtime: result.runtime,
+				});
 				const next: SearchNode = {
+					activeDemand: nextActiveDemand,
 					elapsedMs: nextElapsedMs,
 					fingerprint: registration.fingerprint,
 					order: nextOrder,
 					outputCertainty: nextOutputCertainty,
 					priority: readPlannerSearchPriority({
+						activeDemand: nextActiveDemand,
 						itemId,
 						plan: priorityPlan,
 						quantity,
@@ -696,9 +716,17 @@ export const searchPlannerRuntimeFx = Effect.fn("searchPlannerRuntimeFx")(functi
 			graph,
 			scope,
 		});
+		const bestActiveDemand = readPlannerActiveDemand({
+			itemId,
+			plan: priorityPlan,
+			quantity,
+			runtime: best.runtime,
+		});
 		best = {
 			...best,
+			activeDemand: bestActiveDemand,
 			priority: readPlannerSearchPriority({
+				activeDemand: bestActiveDemand,
 				itemId,
 				plan: priorityPlan,
 				quantity,

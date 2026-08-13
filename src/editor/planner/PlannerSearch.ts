@@ -31,12 +31,14 @@ export interface PlannerSearchItemQuantity {
 export interface PlannerSearchBudget {
 	readonly maximumExpandedStates: number;
 	readonly maximumQueuedStates: number;
+	readonly maximumRoutePlans: number;
 	readonly maximumTraceLength: number;
 }
 
 export const DefaultPlannerSearchBudget: PlannerSearchBudget = {
 	maximumExpandedStates: 2_000,
 	maximumQueuedStates: 512,
+	maximumRoutePlans: 64,
 	maximumTraceLength: 48,
 };
 

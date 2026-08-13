@@ -335,4 +335,32 @@ describe("engine planner route widening", () => {
 		});
 		expect(result.diagnostics).not.toHaveProperty("winningRoutePlanIndex");
 	});
+
+	it("bounds progressive widening even when exhausted route plans consume few states", () => {
+		const result = Effect.runSync(
+			makePlanner().searchFx("widened-target", 1, {
+				maximumExpandedStates: 64,
+				maximumRoutePlans: 1,
+			}),
+		);
+
+		expect(result).toMatchObject({
+			bestAvailableQuantity: 0,
+			budgetLimit: "maximumRoutePlans",
+			expandedStates: 2,
+			itemId: "widened-target",
+			reason: "search-budget",
+			type: "inconclusive",
+		});
+		if (result.type !== "inconclusive") return;
+		expect(result.diagnostics).toMatchObject({
+			attemptedRoutePlans: 1,
+			routePlans: [
+				{
+					index: 1,
+					outcome: "search-exhausted",
+				},
+			],
+		});
+	});
 });

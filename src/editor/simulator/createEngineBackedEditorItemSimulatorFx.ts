@@ -9,6 +9,7 @@ import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 export const EditorItemPlannerSearchBudget: PlannerSearchBudget = {
 	maximumExpandedStates: 1_000,
 	maximumQueuedStates: 16,
+	maximumRoutePlans: 16,
 	maximumTraceLength: 500,
 };
 

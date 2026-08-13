@@ -90,6 +90,10 @@ const readBudget = (budget: Partial<PlannerSearchBudget> | undefined): PlannerSe
 		budget?.maximumQueuedStates,
 		DefaultPlannerSearchBudget.maximumQueuedStates,
 	),
+	maximumRoutePlans: readPositiveBudget(
+		budget?.maximumRoutePlans,
+		DefaultPlannerSearchBudget.maximumRoutePlans,
+	),
 	maximumTraceLength: readPositiveBudget(
 		budget?.maximumTraceLength,
 		DefaultPlannerSearchBudget.maximumTraceLength,
@@ -98,6 +102,11 @@ const readBudget = (budget: Partial<PlannerSearchBudget> | undefined): PlannerSe
 
 const readAvailableQuantity = (node: SearchNode, itemId: IdSchema.Type) =>
 	readPlannerRuntimeQuantity(node.runtime, itemId);
+
+const canWidenPlannerSearchScope = (scope: PlannerSearchScope) =>
+	scope.choices.some(
+		({ alternativeCount, alternativeIndex }) => alternativeIndex + 1 < alternativeCount,
+	);
 
 const readOutputCertaintyRank = (certainty: PlannerSearchOutputCertainty) =>
 	certainty === "deterministic" ? 0 : 1;
@@ -820,6 +829,24 @@ export const searchPlannerRuntimeFx = Effect.fn("searchPlannerRuntimeFx")(functi
 				diagnostics: readPlannerSearchDiagnostics(routePlanDiagnostics),
 				expandedStates,
 				frontierSize: pass.frontierSize,
+				itemId,
+				quantity,
+				reason: "search-budget",
+				scope,
+				unsupportedActionIds,
+				visitedStates,
+			});
+		if (
+			routePlanDiagnostics.length >= budget.maximumRoutePlans &&
+			canWidenPlannerSearchScope(scope)
+		)
+			return readInconclusive({
+				best,
+				blockedActionIds,
+				budgetLimit: "maximumRoutePlans",
+				diagnostics: readPlannerSearchDiagnostics(routePlanDiagnostics),
+				expandedStates,
+				frontierSize: 0,
 				itemId,
 				quantity,
 				reason: "search-budget",

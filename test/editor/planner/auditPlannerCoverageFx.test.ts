@@ -5,6 +5,8 @@ import {
 	auditPlannerCoverageFx,
 	type PlannerCoverageAuditProgress,
 } from "~/editor/planner/auditPlannerCoverageFx";
+import { auditPlannerCoverageTiersFx } from "~/editor/planner/auditPlannerCoverageTiersFx";
+import type { PlannerCoverageTierAuditProgress } from "~/editor/planner/PlannerCoverageTierAudit";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 
 const baseItem = (id: string) => ({
@@ -252,5 +254,182 @@ describe("auditPlannerCoverageFx", () => {
 			"producer-b",
 			"target",
 		]);
+	});
+
+	it("retries only inconclusive items across increasing budget tiers", () => {
+		const progress: PlannerCoverageTierAuditProgress[] = [];
+		const report = Effect.runSync(
+			auditPlannerCoverageTiersFx({
+				config,
+				onProgress: (entry) =>
+					Effect.sync(() => {
+						progress.push(entry);
+					}),
+				tiers: [
+					{
+						budget: {
+							maximumExpandedStates: 1,
+							maximumQueuedStates: 8,
+							maximumRoutePlans: 4,
+							maximumTraceLength: 8,
+						},
+						id: "smoke",
+					},
+					{
+						budget: {
+							maximumExpandedStates: 8,
+							maximumQueuedStates: 8,
+							maximumRoutePlans: 4,
+							maximumTraceLength: 8,
+						},
+						id: "deep",
+					},
+					{
+						budget: {
+							maximumExpandedStates: 16,
+							maximumQueuedStates: 16,
+							maximumRoutePlans: 8,
+							maximumTraceLength: 16,
+						},
+						id: "unused",
+					},
+				],
+			}),
+		);
+
+		expect(report).toMatchObject({
+			summary: {
+				finalOutcomes: {
+					completed: 4,
+					inconclusive: 0,
+					noFinitePath: 1,
+				},
+				resolutionByTier: [
+					{
+						count: 4,
+						tierId: "smoke",
+						tierIndex: 1,
+					},
+					{
+						count: 1,
+						tierId: "deep",
+						tierIndex: 2,
+					},
+					{
+						count: 0,
+						tierId: "unused",
+						tierIndex: 3,
+					},
+				],
+				saturatedTierId: "deep",
+				saturatedTierIndex: 2,
+				tierCount: 3,
+				totalItems: 5,
+				totalSearchAttempts: 6,
+				unresolvedItemIds: [],
+			},
+			tiers: [
+				{
+					attemptedItems: 5,
+					carriedCompleted: 0,
+					carriedNoFinitePath: 0,
+					cumulativeOutcomes: {
+						completed: 3,
+						inconclusive: 1,
+						noFinitePath: 1,
+					},
+					id: "smoke",
+					newlyCompleted: 3,
+					newlyNoFinitePath: 1,
+					remainingInconclusive: 1,
+				},
+				{
+					attemptedItems: 1,
+					carriedCompleted: 3,
+					carriedNoFinitePath: 1,
+					cumulativeOutcomes: {
+						completed: 4,
+						inconclusive: 0,
+						noFinitePath: 1,
+					},
+					id: "deep",
+					newlyCompleted: 1,
+					newlyNoFinitePath: 0,
+					remainingInconclusive: 0,
+				},
+				{
+					attemptedItems: 0,
+					carriedCompleted: 4,
+					carriedNoFinitePath: 1,
+					id: "unused",
+					newlyCompleted: 0,
+					newlyNoFinitePath: 0,
+					remainingInconclusive: 0,
+				},
+			],
+			version: 1,
+		});
+		expect(report.items.find(({ itemId }) => itemId === "target")).toMatchObject({
+			attempts: [
+				{
+					result: {
+						outcome: "inconclusive",
+					},
+					tierId: "smoke",
+					tierIndex: 1,
+				},
+				{
+					result: {
+						outcome: "completed",
+					},
+					tierId: "deep",
+					tierIndex: 2,
+				},
+			],
+			finalOutcome: "completed",
+			resolvedTierId: "deep",
+			resolvedTierIndex: 2,
+		});
+		expect(report.items.find(({ itemId }) => itemId === "middle")?.attempts).toHaveLength(1);
+		expect(progress).toHaveLength(6);
+		expect(progress.at(-1)).toMatchObject({
+			itemId: "target",
+			tierCount: 3,
+			tierId: "deep",
+			tierIndex: 2,
+		});
+	});
+
+	it("rejects tiers that lower a previous budget limit", () => {
+		const message = Effect.runSync(
+			auditPlannerCoverageTiersFx({
+				config,
+				tiers: [
+					{
+						budget: {
+							maximumExpandedStates: 8,
+							maximumQueuedStates: 8,
+							maximumRoutePlans: 4,
+							maximumTraceLength: 8,
+						},
+						id: "wide",
+					},
+					{
+						budget: {
+							maximumExpandedStates: 4,
+							maximumQueuedStates: 8,
+							maximumRoutePlans: 4,
+							maximumTraceLength: 8,
+						},
+						id: "narrower",
+					},
+				],
+			}).pipe(
+				Effect.flip,
+				Effect.map(({ message }) => message),
+			),
+		);
+
+		expect(message).toContain("lowers maximumExpandedStates from 8 to 4");
 	});
 });

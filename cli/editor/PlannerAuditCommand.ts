@@ -2,10 +2,14 @@ import { Argument, Command, Flag } from "effect/unstable/cli";
 import { Console, Effect } from "effect";
 
 import { auditPlannerCoverageFx } from "~/editor/planner/auditPlannerCoverageFx";
+import { auditPlannerCoverageTiersFx } from "~/editor/planner/auditPlannerCoverageTiersFx";
+import { PlannerCoverageTierAuditInputError } from "~/editor/planner/PlannerCoverageTierAudit";
 import { EditorItemPlannerSearchBudget } from "~/editor/simulator/createEngineBackedEditorItemSimulatorFx";
 import { compileGameDirectoryFx } from "~/engine/compiler/fx/compileGameDirectoryFx";
 import { assertGameConfigValidFx } from "~/engine/validation/fx/assertGameConfigValidFx";
 import { printGameDiagnosticsForCliFx } from "~/engine/validation/printer/printGameDiagnosticsForCliFx";
+
+import { parsePlannerCoverageTierSpec } from "./parsePlannerCoverageTierSpec";
 
 const positiveIntegerFlag = ({
 	defaultValue,
@@ -27,6 +31,7 @@ const runPlannerAuditFx = Effect.fn("runPlannerAuditFx")(function* ({
 	offset,
 	progress,
 	quantity,
+	tiers,
 }: {
 	readonly input: string;
 	readonly limit: number;
@@ -37,6 +42,7 @@ const runPlannerAuditFx = Effect.fn("runPlannerAuditFx")(function* ({
 	readonly offset: number;
 	readonly progress: boolean;
 	readonly quantity: number;
+	readonly tiers: string;
 }) {
 	const compilation = yield* compileGameDirectoryFx({
 		input,
@@ -50,25 +56,59 @@ const runPlannerAuditFx = Effect.fn("runPlannerAuditFx")(function* ({
 		normalizedOffset,
 		normalizedLimit === 0 ? undefined : normalizedOffset + normalizedLimit,
 	);
-	const report = yield* auditPlannerCoverageFx({
-		budget: {
-			maximumExpandedStates,
-			maximumQueuedStates,
-			maximumRoutePlans,
-			maximumTraceLength,
-		},
-		config,
-		itemIds,
-		...(progress
-			? {
-					onProgress: ({ index, itemId, outcome, searchDurationMs, total }) =>
-						Console.error(
-							`[${index}/${total}] ${itemId}: ${outcome} (${searchDurationMs.toFixed(1)} ms)`,
-						),
-				}
-			: {}),
-		quantity,
-	});
+	const tierSpecification = tiers.trim();
+	const report =
+		tierSpecification.length === 0
+			? yield* auditPlannerCoverageFx({
+					budget: {
+						maximumExpandedStates,
+						maximumQueuedStates,
+						maximumRoutePlans,
+						maximumTraceLength,
+					},
+					config,
+					itemIds,
+					...(progress
+						? {
+								onProgress: ({ index, itemId, outcome, searchDurationMs, total }) =>
+									Console.error(
+										`[${index}/${total}] ${itemId}: ${outcome} (${searchDurationMs.toFixed(1)} ms)`,
+									),
+							}
+						: {}),
+					quantity,
+				})
+			: yield* auditPlannerCoverageTiersFx({
+					config,
+					itemIds,
+					...(progress
+						? {
+								onProgress: ({
+									index,
+									itemId,
+									outcome,
+									searchDurationMs,
+									tierCount,
+									tierId,
+									tierIndex,
+									total,
+								}) =>
+									Console.error(
+										`[tier ${tierIndex}/${tierCount} ${tierId}] [${index}/${total}] ${itemId}: ${outcome} (${searchDurationMs.toFixed(1)} ms)`,
+									),
+							}
+						: {}),
+					quantity,
+					tiers: yield* Effect.try({
+						catch: (cause) =>
+							cause instanceof PlannerCoverageTierAuditInputError
+								? cause
+								: new PlannerCoverageTierAuditInputError({
+										message: String(cause),
+									}),
+						try: () => parsePlannerCoverageTierSpec(tierSpecification),
+					}),
+				});
 	yield* Console.log(JSON.stringify(report, undefined, 2));
 });
 
@@ -114,6 +154,12 @@ export const PlannerAuditCommand = Command.make(
 			description: "Target quantity requested from the planner for every item.",
 			name: "quantity",
 		}),
+		tiers: Flag.string("tiers").pipe(
+			Flag.withDefault(""),
+			Flag.withDescription(
+				"Run increasing saturation tiers using id=expanded:queued:routePlans:traceLength entries; single-budget flags are ignored.",
+			),
+		),
 	},
 	({
 		input,
@@ -125,6 +171,7 @@ export const PlannerAuditCommand = Command.make(
 		offset,
 		progress,
 		quantity,
+		tiers,
 	}) =>
 		runPlannerAuditFx({
 			input,
@@ -136,6 +183,7 @@ export const PlannerAuditCommand = Command.make(
 			offset,
 			progress,
 			quantity,
+			tiers,
 		}),
 ).pipe(
 	Command.withDescription(

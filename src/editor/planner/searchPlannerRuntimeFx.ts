@@ -22,7 +22,10 @@ import {
 	readPlannerSearchPriorityPlan,
 	type PlannerSearchPriority,
 } from "~/editor/planner/readPlannerSearchPriority";
-import { readPlannerSearchScope } from "~/editor/planner/readPlannerSearchScope";
+import {
+	iteratePlannerSearchScopes,
+	readPlannerSearchScope,
+} from "~/editor/planner/readPlannerSearchScope";
 import { readPlannerStructuralReachability } from "~/editor/planner/readPlannerStructuralReachability";
 import { runPlannerActionFx } from "~/editor/planner/runPlannerActionFx";
 import type { PlannerAcquisitionGraph } from "~/editor/planner/PlannerAcquisitionGraph";
@@ -93,6 +96,42 @@ const readNextOutputCertainty = (
 	outputWitnessResolved: boolean,
 ): PlannerSearchOutputCertainty =>
 	current === "possible" || outputWitnessResolved ? "possible" : "deterministic";
+
+const readInitialSearchNode = ({
+	fingerprint = "initial-runtime",
+	itemId,
+	order = 0,
+	plan,
+	quantity,
+	runtime,
+	scope,
+	stateToken = 0,
+}: {
+	readonly fingerprint?: string;
+	readonly itemId: IdSchema.Type;
+	readonly order?: number;
+	readonly plan: ReturnType<typeof readPlannerSearchPriorityPlan>;
+	readonly quantity: number;
+	readonly runtime: RuntimeSchema.Type;
+	readonly scope: PlannerSearchScope;
+	readonly stateToken?: number;
+}): SearchNode => ({
+	elapsedMs: 0,
+	fingerprint,
+	order,
+	outputCertainty: "deterministic",
+	priority: readPlannerSearchPriority({
+		itemId,
+		plan,
+		quantity,
+		runtime,
+		scope,
+	}),
+	runtime,
+	selectedWitnessProbability: 1,
+	stateToken,
+	trace: [],
+});
 
 const readRelevantPresence = (node: SearchNode, scope: PlannerSearchScope) =>
 	scope.itemIds.reduce(
@@ -212,30 +251,41 @@ const readInconclusive = ({
 	visitedStates,
 });
 
-/**
- * Searches forward through immutable runtime snapshots and delegates every transition to engine.
- *
- * Stochastic routes execute as explicit positive-probability output witnesses. Exhausted search is
- * inconclusive; only the optimistic acquisition graph may prove `no-finite-path`.
- */
-export const searchPlannerRuntimeFx = Effect.fn("searchPlannerRuntimeFx")(function* ({
-	budget: budgetOverride,
+interface PlannerScopeSearchResultBase {
+	readonly best: SearchNode;
+	readonly blockedActionIds: ReadonlySet<string>;
+	readonly expandedStates: number;
+	readonly frontierSize: number;
+	readonly unsupportedActionIds: ReadonlySet<string>;
+	readonly visitedStates: number;
+}
+
+type PlannerScopeSearchResult =
+	| (PlannerScopeSearchResultBase & {
+			readonly node: SearchNode;
+			readonly type: "completed";
+	  })
+	| (PlannerScopeSearchResultBase & {
+			readonly budgetLimit?: PlannerSearchBudgetLimit;
+			readonly reason: "non-quiescent-runtime" | "search-budget" | "search-exhausted";
+			readonly type: "inconclusive";
+	  });
+
+const searchPlannerScopeFx = Effect.fn("searchPlannerScopeFx")(function* ({
+	budget,
 	graph,
 	itemId,
-	quantity = 1,
+	quantity,
 	runtime,
-}: searchPlannerRuntimeFx.Props) {
-	if (!Number.isSafeInteger(quantity) || quantity < 1)
-		return yield* Effect.die(
-			new RangeError(
-				`Planner target quantity must be a positive safe integer, received ${quantity}.`,
-			),
-		);
-
-	const scope = readPlannerSearchScope({
-		graph,
-		targetItemId: itemId,
-	});
+	scope,
+}: {
+	readonly budget: PlannerSearchBudget;
+	readonly graph: PlannerAcquisitionGraph;
+	readonly itemId: IdSchema.Type;
+	readonly quantity: number;
+	readonly runtime: RuntimeSchema.Type;
+	readonly scope: PlannerSearchScope;
+}) {
 	const priorityPlan = readPlannerSearchPriorityPlan({
 		graph,
 		scope,
@@ -252,89 +302,15 @@ export const searchPlannerRuntimeFx = Effect.fn("searchPlannerRuntimeFx")(functi
 	});
 	if (!initialRegistration.accepted)
 		return yield* Effect.die(new Error("Planner rejected its initial runtime state."));
-	const initial: SearchNode = {
-		elapsedMs: 0,
+	const initial = readInitialSearchNode({
 		fingerprint: initialRegistration.fingerprint,
-		order: 0,
-		outputCertainty: "deterministic",
-		priority: readPlannerSearchPriority({
-			itemId,
-			plan: priorityPlan,
-			quantity,
-			runtime,
-			scope,
-		}),
-		runtime,
-		selectedWitnessProbability: 1,
-		stateToken: initialRegistration.token,
-		trace: [],
-	};
-	if (!isPlannerRuntimeQuiescent(runtime))
-		return readInconclusive({
-			best: initial,
-			blockedActionIds: new Set(),
-			expandedStates: 0,
-			frontierSize: 0,
-			itemId,
-			quantity,
-			reason: "non-quiescent-runtime",
-			scope,
-			unsupportedActionIds: new Set(),
-			visitedStates: 1,
-		});
-
-	const initialQuantity = readAvailableQuantity(initial, itemId);
-	if (initialQuantity >= quantity) {
-		const economics = yield* readPlannerExpectedEconomicsFx({
-			graph,
-			initialRuntime: runtime,
-			itemId,
-			quantity,
-			trace: [],
-		});
-		return {
-			availableQuantity: initialQuantity,
-			economics,
-			elapsedMs: 0,
-			expandedStates: 0,
-			itemId,
-			outputCertainty: "deterministic",
-			quantity,
-			runtime,
-			selectedWitnessProbability: 1,
-			trace: [],
-			type: "completed",
-			visitedStates: 1,
-		} satisfies PlannerSearchResult;
-	}
-
-	const structural = readPlannerStructuralReachability({
-		graph,
 		itemId,
+		plan: priorityPlan,
+		quantity,
+		runtime,
+		scope,
+		stateToken: initialRegistration.token,
 	});
-	if (structural.type !== "reachable")
-		return {
-			itemId,
-			proof: structural,
-			quantity,
-			type: "no-finite-path",
-		} satisfies PlannerSearchResult;
-
-	if (!scope.supported)
-		return readInconclusive({
-			best: initial,
-			blockedActionIds: new Set(),
-			expandedStates: 0,
-			frontierSize: 0,
-			itemId,
-			quantity,
-			reason: "unsupported-routes",
-			scope,
-			unsupportedActionIds: new Set(),
-			visitedStates: 1,
-		});
-
-	const budget = readBudget(budgetOverride);
 	const blockedActionIds = new Set<string>();
 	const unsupportedActionIds = new Set<string>();
 	let queue: SearchNode[] = [
@@ -350,19 +326,17 @@ export const searchPlannerRuntimeFx = Effect.fn("searchPlannerRuntimeFx")(functi
 		queue = removeDominatedQueueNodes(queue, dominanceIndex);
 		if (queue.length === 0) break;
 		if (expandedStates >= budget.maximumExpandedStates)
-			return readInconclusive({
+			return {
 				best,
 				blockedActionIds,
-				budgetLimit: "maximumExpandedStates",
+				budgetLimit: "maximumExpandedStates" as const,
 				expandedStates,
 				frontierSize: queue.length,
-				itemId,
-				quantity,
-				reason: "search-budget",
-				scope,
+				reason: "search-budget" as const,
+				type: "inconclusive" as const,
 				unsupportedActionIds,
 				visitedStates: dominanceIndex.readFingerprintCount(),
-			});
+			};
 
 		queue.sort(compareSearchNodes);
 		const node = queue.shift();
@@ -483,43 +457,28 @@ export const searchPlannerRuntimeFx = Effect.fn("searchPlannerRuntimeFx")(functi
 				)
 					best = next;
 				if (!isPlannerRuntimeQuiescent(next.runtime))
-					return readInconclusive({
+					return {
 						best: next,
 						blockedActionIds,
 						expandedStates,
 						frontierSize: queue.length,
-						itemId,
-						quantity,
-						reason: "non-quiescent-runtime",
-						scope,
+						reason: "non-quiescent-runtime" as const,
+						type: "inconclusive" as const,
 						unsupportedActionIds,
 						visitedStates: dominanceIndex.readFingerprintCount(),
-					});
+					};
 
-				const availableQuantity = readAvailableQuantity(next, itemId);
-				if (availableQuantity >= quantity) {
-					const economics = yield* readPlannerExpectedEconomicsFx({
-						graph,
-						initialRuntime: runtime,
-						itemId,
-						quantity,
-						trace: next.trace,
-					});
+				if (readAvailableQuantity(next, itemId) >= quantity)
 					return {
-						availableQuantity,
-						economics,
-						elapsedMs: next.elapsedMs,
+						best: next,
+						blockedActionIds,
 						expandedStates,
-						itemId,
-						outputCertainty: next.outputCertainty,
-						quantity,
-						runtime: next.runtime,
-						selectedWitnessProbability: next.selectedWitnessProbability,
-						trace: next.trace,
-						type: "completed",
+						frontierSize: queue.length,
+						node: next,
+						type: "completed" as const,
+						unsupportedActionIds,
 						visitedStates: dominanceIndex.readFingerprintCount(),
-					} satisfies PlannerSearchResult;
-				}
+					};
 
 				if (next.trace.length >= budget.maximumTraceLength) {
 					traceBudgetReached = true;
@@ -540,7 +499,7 @@ export const searchPlannerRuntimeFx = Effect.fn("searchPlannerRuntimeFx")(functi
 		}
 	}
 
-	return readInconclusive({
+	return {
 		best,
 		blockedActionIds,
 		...(traceBudgetReached || queueBudgetPruned
@@ -552,18 +511,256 @@ export const searchPlannerRuntimeFx = Effect.fn("searchPlannerRuntimeFx")(functi
 			: {}),
 		expandedStates,
 		frontierSize: 0,
+		reason:
+			traceBudgetReached || queueBudgetPruned
+				? ("search-budget" as const)
+				: ("search-exhausted" as const),
+		type: "inconclusive" as const,
+		unsupportedActionIds,
+		visitedStates: dominanceIndex.readFingerprintCount(),
+	} satisfies PlannerScopeSearchResult;
+});
+
+/**
+ * Searches forward through immutable runtime snapshots and delegates every transition to engine.
+ *
+ * Stochastic routes execute as explicit positive-probability output witnesses. Exhausted search is
+ * inconclusive; only the optimistic acquisition graph may prove `no-finite-path`.
+ */
+export const searchPlannerRuntimeFx = Effect.fn("searchPlannerRuntimeFx")(function* ({
+	budget: budgetOverride,
+	graph,
+	itemId,
+	quantity = 1,
+	runtime,
+}: searchPlannerRuntimeFx.Props) {
+	if (!Number.isSafeInteger(quantity) || quantity < 1)
+		return yield* Effect.die(
+			new RangeError(
+				`Planner target quantity must be a positive safe integer, received ${quantity}.`,
+			),
+		);
+
+	const minimumScope = readPlannerSearchScope({
+		graph,
+		targetItemId: itemId,
+	});
+	const minimumPriorityPlan = readPlannerSearchPriorityPlan({
+		graph,
+		scope: minimumScope,
+	});
+	const initial = readInitialSearchNode({
+		itemId,
+		plan: minimumPriorityPlan,
+		quantity,
+		runtime,
+		scope: minimumScope,
+	});
+	if (!isPlannerRuntimeQuiescent(runtime))
+		return readInconclusive({
+			best: initial,
+			blockedActionIds: new Set(),
+			expandedStates: 0,
+			frontierSize: 0,
+			itemId,
+			quantity,
+			reason: "non-quiescent-runtime",
+			scope: minimumScope,
+			unsupportedActionIds: new Set(),
+			visitedStates: 1,
+		});
+
+	const initialQuantity = readAvailableQuantity(initial, itemId);
+	if (initialQuantity >= quantity) {
+		const economics = yield* readPlannerExpectedEconomicsFx({
+			graph,
+			initialRuntime: runtime,
+			itemId,
+			quantity,
+			trace: [],
+		});
+		return {
+			availableQuantity: initialQuantity,
+			economics,
+			elapsedMs: 0,
+			expandedStates: 0,
+			itemId,
+			outputCertainty: "deterministic",
+			quantity,
+			runtime,
+			selectedWitnessProbability: 1,
+			trace: [],
+			type: "completed",
+			visitedStates: 1,
+		} satisfies PlannerSearchResult;
+	}
+
+	const structural = readPlannerStructuralReachability({
+		graph,
+		itemId,
+	});
+	if (structural.type !== "reachable")
+		return {
+			itemId,
+			proof: structural,
+			quantity,
+			type: "no-finite-path",
+		} satisfies PlannerSearchResult;
+
+	if (!minimumScope.supported)
+		return readInconclusive({
+			best: initial,
+			blockedActionIds: new Set(),
+			expandedStates: 0,
+			frontierSize: 0,
+			itemId,
+			quantity,
+			reason: "unsupported-routes",
+			scope: minimumScope,
+			unsupportedActionIds: new Set(),
+			visitedStates: 1,
+		});
+
+	const budget = readBudget(budgetOverride);
+	const blockedActionIds = new Set<string>();
+	const unsupportedActionIds = new Set<string>();
+	let expandedStates = 0;
+	let visitedStates = 0;
+	let best = initial;
+	let finalScope = minimumScope;
+	let scopeCount = 0;
+
+	for (const scope of iteratePlannerSearchScopes({
+		graph,
+		targetItemId: itemId,
+	})) {
+		scopeCount += 1;
+		finalScope = scope;
+		const priorityPlan = readPlannerSearchPriorityPlan({
+			graph,
+			scope,
+		});
+		best = {
+			...best,
+			priority: readPlannerSearchPriority({
+				itemId,
+				plan: priorityPlan,
+				quantity,
+				runtime: best.runtime,
+				scope,
+			}),
+		};
+		if (expandedStates >= budget.maximumExpandedStates)
+			return readInconclusive({
+				best,
+				blockedActionIds,
+				budgetLimit: "maximumExpandedStates",
+				expandedStates,
+				frontierSize: 0,
+				itemId,
+				quantity,
+				reason: "search-budget",
+				scope,
+				unsupportedActionIds,
+				visitedStates,
+			});
+
+		const pass = yield* searchPlannerScopeFx({
+			budget: {
+				...budget,
+				maximumExpandedStates: budget.maximumExpandedStates - expandedStates,
+			},
+			graph,
+			itemId,
+			quantity,
+			runtime,
+			scope,
+		});
+		expandedStates += pass.expandedStates;
+		visitedStates += pass.visitedStates;
+		for (const actionId of pass.blockedActionIds) blockedActionIds.add(actionId);
+		for (const actionId of pass.unsupportedActionIds) unsupportedActionIds.add(actionId);
+		if (
+			isBetterNode({
+				candidate: pass.best,
+				current: best,
+				itemId,
+				scope,
+			})
+		)
+			best = pass.best;
+
+		if (pass.type === "completed") {
+			const economics = yield* readPlannerExpectedEconomicsFx({
+				graph,
+				initialRuntime: runtime,
+				itemId,
+				quantity,
+				trace: pass.node.trace,
+			});
+			return {
+				availableQuantity: readAvailableQuantity(pass.node, itemId),
+				economics,
+				elapsedMs: pass.node.elapsedMs,
+				expandedStates,
+				itemId,
+				outputCertainty: pass.node.outputCertainty,
+				quantity,
+				runtime: pass.node.runtime,
+				selectedWitnessProbability: pass.node.selectedWitnessProbability,
+				trace: pass.node.trace,
+				type: "completed",
+				visitedStates,
+			} satisfies PlannerSearchResult;
+		}
+		if (pass.reason === "non-quiescent-runtime")
+			return readInconclusive({
+				best,
+				blockedActionIds,
+				expandedStates,
+				frontierSize: pass.frontierSize,
+				itemId,
+				quantity,
+				reason: "non-quiescent-runtime",
+				scope,
+				unsupportedActionIds,
+				visitedStates,
+			});
+		if (pass.reason === "search-budget")
+			return readInconclusive({
+				best,
+				blockedActionIds,
+				...(pass.budgetLimit === undefined
+					? {}
+					: {
+							budgetLimit: pass.budgetLimit,
+						}),
+				expandedStates,
+				frontierSize: pass.frontierSize,
+				itemId,
+				quantity,
+				reason: "search-budget",
+				scope,
+				unsupportedActionIds,
+				visitedStates,
+			});
+	}
+
+	return readInconclusive({
+		best,
+		blockedActionIds,
+		expandedStates,
+		frontierSize: 0,
 		itemId,
 		quantity,
 		reason:
-			traceBudgetReached || queueBudgetPruned
-				? "search-budget"
+			scopeCount === 0 || finalScope.unsupportedRoutes.length > 0
+				? "unsupported-routes"
 				: unsupportedActionIds.size > 0
 					? "action-unsupported"
-					: scope.unsupportedRoutes.length > 0
-						? "unsupported-routes"
-						: "search-exhausted",
-		scope,
+					: "search-exhausted",
+		scope: finalScope,
 		unsupportedActionIds,
-		visitedStates: dominanceIndex.readFingerprintCount(),
+		visitedStates,
 	});
 });

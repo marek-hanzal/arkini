@@ -30,10 +30,6 @@ export type EditorItemEstimateWorkerResult =
 
 export type EditorItemEstimateWorkerResponse =
 	| {
-			readonly estimate: EditorItemSimulation;
-			readonly status: "estimate";
-	  }
-	| {
 			readonly progress: EditorItemEstimateIndexProgress;
 			readonly status: "progress";
 	  }

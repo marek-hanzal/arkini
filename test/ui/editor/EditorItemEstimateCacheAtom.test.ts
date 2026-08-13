@@ -61,19 +61,26 @@ const waitFor = async (
 };
 
 describe("EditorItemEstimateCacheAtom", () => {
-	it("single-flights an index and serves its streamed simulation to item detail", async () => {
-		const runIndexPoolFx = vi.fn((_config, options) =>
-			Effect.sync(() => {
-				options?.onEstimate?.(simulation("alpha"));
-				return [
-					{
-						runtimeMs: 1,
-						itemId: "alpha",
-					},
-				];
+	it("keeps the structural index separate from authoritative item estimates", async () => {
+		const runIndexPoolFx = vi.fn(() =>
+			Effect.succeed([
+				{
+					itemId: "alpha",
+					method: "structural-heuristic" as const,
+					runtimeMs: 1,
+					status: "estimated" as const,
+				},
+			]),
+		);
+		const runInWorkerFx = vi.fn((request) =>
+			Effect.succeed({
+				estimate:
+					request.type === "item"
+						? simulation(request.itemId, request.quantity)
+						: simulation(""),
+				type: "item" as const,
 			}),
 		);
-		const runInWorkerFx = vi.fn();
 		const atom = makeEditorItemEstimateCacheAtom({
 			runIndexPoolFx,
 			runInWorkerFx,
@@ -94,16 +101,21 @@ describe("EditorItemEstimateCacheAtom", () => {
 			snapshot: snapshot(1),
 			type: "item",
 		});
+		await waitFor(registry, atom, (state) => state.estimates.get("alpha")?.has(1) === true);
 
 		expect(runIndexPoolFx).toHaveBeenCalledTimes(1);
-		expect(runInWorkerFx).not.toHaveBeenCalled();
+		expect(runInWorkerFx).toHaveBeenCalledTimes(1);
 		expect(registry.get(atom).estimates.get("alpha")?.get(1)).toEqual(simulation("alpha"));
 	});
 
-	it("keeps quantities distinct and rejects stale revision callbacks", async () => {
+	it("keeps quantities distinct and rejects stale revision progress", async () => {
 		let staleOptions:
 			| {
-					onEstimate?: (estimate: EditorItemSimulation) => void;
+					onProgress?: (progress: {
+						readonly completed: number;
+						readonly itemId: string;
+						readonly total: number;
+					}) => void;
 			  }
 			| undefined;
 		const runIndexPoolFx = vi.fn((_config, options) => {
@@ -137,13 +149,17 @@ describe("EditorItemEstimateCacheAtom", () => {
 			type: "item",
 		});
 		await waitFor(registry, atom, (state) => state.estimates.get("alpha")?.has(2) === true);
-		staleOptions?.onEstimate?.(simulation("bravo"));
+		staleOptions?.onProgress?.({
+			completed: 2,
+			itemId: "bravo",
+			total: 2,
+		});
 
 		const state = registry.get(atom);
 		expect(state.snapshot?.revision).toBe(2);
 		expect(state.estimates.get("alpha")?.has(1)).toBe(false);
 		expect(state.estimates.get("alpha")?.has(2)).toBe(true);
-		expect(state.estimates.has("bravo")).toBe(false);
+		expect(state.progress.completed).toBe(0);
 	});
 
 	it("releases a queued index after item failure", async () => {

@@ -682,7 +682,9 @@ describe("estimateEditorItem", () => {
 		});
 		expect(entries.find(({ itemId }) => itemId === "water")).toEqual({
 			itemId: "water",
+			method: "structural-heuristic",
 			runtimeMs: undefined,
+			status: "no-finite-path",
 		});
 	});
 

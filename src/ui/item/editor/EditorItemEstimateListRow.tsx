@@ -5,10 +5,14 @@ import { ButtonLink } from "~/ui/button/Button";
 import { formatItemDurationFx } from "~/ui/item-detail/formatItemDurationFx";
 import { EditorItemThumbnail } from "~/ui/item/editor/EditorItemThumbnail";
 
-const runtimeLabel = (runtimeMs: number | undefined) =>
-	runtimeMs === undefined ? "—" : RendererRuntime.runSync(formatItemDurationFx(runtimeMs));
+const runtimeLabel = (estimate: EditorItemEstimateIndexEntry) => {
+	if (estimate.status === "no-finite-path") return "No path";
+	if (estimate.runtimeMs === undefined) return "—";
+	const duration = RendererRuntime.runSync(formatItemDurationFx(estimate.runtimeMs));
+	return estimate.method === "structural-heuristic" ? `≈ ${duration}` : duration;
+};
 
-/** Presents one compact estimate and links to the item's Estimate detail. */
+/** Presents one compact projection and links to the authoritative engine-backed detail. */
 export const EditorItemEstimateListRow = ({
 	estimate,
 	item,
@@ -20,6 +24,8 @@ export const EditorItemEstimateListRow = ({
 }) => (
 	<article
 		className="ak-list-row ak-list-row-interactive flex min-w-0 items-center gap-4 rounded-xl p-3"
+		data-estimate-method={estimate.method}
+		data-estimate-status={estimate.status}
 		data-item-id={item.id}
 		data-item-uid={item.uid}
 		data-ui="EditorItemEstimateRow"
@@ -39,7 +45,7 @@ export const EditorItemEstimateListRow = ({
 				<span className="mt-1 block truncate text-xs text-subtle">{item.id}</span>
 			</span>
 			<p className="shrink-0 text-sm font-semibold tabular-nums text-foreground">
-				{runtimeLabel(estimate.runtimeMs)}
+				{runtimeLabel(estimate)}
 			</p>
 		</ButtonLink>
 	</article>

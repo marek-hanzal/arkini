@@ -14,13 +14,10 @@ import { runEditorItemEstimateInWorkerFx } from "~/ui/item/editor/runEditorItemE
 
 interface RunEditorItemEstimateIndexPoolOptions {
 	readonly cachedEstimates?: ReadonlyArray<EditorItemSimulation>;
-	readonly onEstimate?: (estimate: EditorItemSimulation) => void;
 	readonly onProgress?: (progress: EditorItemEstimateIndexProgress) => void;
-	readonly poolSize?: number;
 	readonly runInWorkerFx?: (
 		request: EditorItemEstimateWorkerRequest,
 		options?: {
-			readonly onEstimate?: (estimate: EditorItemSimulation) => void;
 			readonly onProgress?: (progress: EditorItemEstimateIndexProgress) => void;
 		},
 	) => Effect.Effect<EditorItemEstimateWorkerResult, unknown>;
@@ -28,10 +25,12 @@ interface RunEditorItemEstimateIndexPoolOptions {
 
 const projectEntry = (estimate: EditorItemSimulation): EditorItemEstimateIndexEntry => ({
 	itemId: estimate.itemId,
+	method: "engine-backed",
 	runtimeMs: estimate.runtimeMs,
+	status: estimate.status,
 });
 
-/** Runs missing all-item estimates across at most three independently cancellable workers. */
+/** Runs the cheap planner-native all-item projection in one cancellable worker. */
 export const runEditorItemEstimateIndexPoolFx = Effect.fn("runEditorItemEstimateIndexPoolFx")(
 	(config: EditorProject["config"], options: RunEditorItemEstimateIndexPoolOptions = {}) =>
 		Effect.gen(function* () {
@@ -57,76 +56,32 @@ export const runEditorItemEstimateIndexPoolFx = Effect.fn("runEditorItemEstimate
 			if (missingItemIds.length === 0)
 				return itemIds.map((itemId) => projectEntry(cachedByItemId.get(itemId)!));
 
-			const workerCount = Math.min(
-				Math.max(1, options.poolSize ?? 3),
-				3,
-				missingItemIds.length,
-			);
-			const chunks = Array.from(
-				{
-					length: workerCount,
-				},
-				(): string[] => [],
-			);
-			for (const [index, itemId] of missingItemIds.entries())
-				chunks[index % workerCount]!.push(itemId);
-			const completedByWorker = Array.from(
-				{
-					length: workerCount,
-				},
-				() => 0,
-			);
-			let publishedCompleted = cachedByItemId.size;
 			const runInWorkerFx = options.runInWorkerFx ?? runEditorItemEstimateInWorkerFx;
-
-			const results = yield* Effect.all(
-				chunks.map((chunkItemIds, workerIndex) =>
-					runInWorkerFx(
-						{
-							config,
-							itemIds: chunkItemIds,
-							type: "index",
-						},
-						{
-							onEstimate: options.onEstimate,
-							onProgress: (progress) => {
-								completedByWorker[workerIndex] = Math.max(
-									completedByWorker[workerIndex]!,
-									progress.completed,
-								);
-								const completed = Math.max(
-									publishedCompleted,
-									cachedByItemId.size +
-										completedByWorker.reduce((sum, value) => sum + value, 0),
-								);
-								publishedCompleted = completed;
-								options.onProgress?.({
-									completed,
-									itemId: progress.itemId,
-									total,
-								});
-							},
-						},
-					).pipe(
-						Effect.flatMap((result) =>
-							result.type === "index"
-								? Effect.succeed(result.entries)
-								: Effect.die(
-										new Error("Estimate index worker returned an item result."),
-									),
-						),
-					),
-				),
+			const result = yield* runInWorkerFx(
 				{
-					concurrency: "unbounded",
+					config,
+					itemIds: missingItemIds,
+					type: "index",
+				},
+				{
+					onProgress: (progress) =>
+						options.onProgress?.({
+							completed: cachedByItemId.size + progress.completed,
+							itemId: progress.itemId,
+							total,
+						}),
 				},
 			);
+			if (result.type !== "index")
+				return yield* Effect.die(
+					new Error("Estimate index worker returned an item result."),
+				);
 
 			return [
 				...cachedByItemId.values(),
 			]
 				.map(projectEntry)
-				.concat(...results)
+				.concat(result.entries)
 				.sort((left, right) => left.itemId.localeCompare(right.itemId));
 		}),
 );

@@ -18,11 +18,6 @@ self.addEventListener("message", ({ data }: MessageEvent<EditorItemEstimateWorke
 						return {
 							entries: yield* estimateEditorItemIndexFx(data.config, {
 								itemIds: data.itemIds,
-								onEstimate: (estimate) =>
-									self.postMessage({
-										estimate,
-										status: "estimate",
-									} satisfies EditorItemEstimateWorkerResponse),
 								onProgress: (progress) =>
 									self.postMessage({
 										progress,

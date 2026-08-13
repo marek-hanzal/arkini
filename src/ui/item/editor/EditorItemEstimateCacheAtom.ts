@@ -61,14 +61,12 @@ export namespace EditorItemEstimateCacheAtom {
 			config: EditorProject["config"],
 			options?: {
 				readonly cachedEstimates?: ReadonlyArray<EditorItemSimulation>;
-				readonly onEstimate?: (estimate: EditorItemSimulation) => void;
 				readonly onProgress?: (progress: EditorItemEstimateIndexProgress) => void;
 			},
 		) => Effect.Effect<ReadonlyArray<EditorItemEstimateIndexEntry>, unknown>;
 		readonly runInWorkerFx?: (
 			request: EditorItemEstimateWorkerRequest,
 			options?: {
-				readonly onEstimate?: (estimate: EditorItemSimulation) => void;
 				readonly onProgress?: (progress: EditorItemEstimateIndexProgress) => void;
 			},
 		) => Effect.Effect<EditorItemEstimateWorkerResult, unknown>;
@@ -222,11 +220,6 @@ export const makeEditorItemEstimateCacheAtom = (
 			return Effect.matchCauseEffect(
 				runIndexPoolFx(request.snapshot.config, {
 					cachedEstimates,
-					onEstimate: (estimate) => {
-						const current = get(stateAtom);
-						if (sameSnapshot(current.snapshot, request.snapshot))
-							get.set(stateAtom, addEstimate(current, estimate));
-					},
 					onProgress: (progress) => {
 						const current = get(stateAtom);
 						if (sameSnapshot(current.snapshot, request.snapshot))

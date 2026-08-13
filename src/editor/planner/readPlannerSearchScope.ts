@@ -1,5 +1,6 @@
 import type {
 	PlannerAcquisitionGraph,
+	PlannerAcquisitionRequirement,
 	PlannerAcquisitionRoute,
 } from "~/editor/planner/PlannerAcquisitionGraph";
 import type {
@@ -8,105 +9,65 @@ import type {
 	PlannerSearchUnsupportedRoute,
 } from "~/editor/planner/PlannerSearchScope";
 import { readPlannerActionId } from "~/editor/planner/readPlannerActionId";
+import { readPlannerRequirementClauseId } from "~/editor/planner/readPlannerRequirementClauseId";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 
 const compareIds = (left: string, right: string) => left.localeCompare(right);
 
-const readTargetClosure = ({
-	depthByItemId,
-	graph,
-	reachableRouteIds,
-	routeDepthById,
-	targetItemId,
-}: {
-	readonly depthByItemId: ReadonlyMap<IdSchema.Type, number>;
-	readonly graph: PlannerAcquisitionGraph;
-	readonly reachableRouteIds: ReadonlySet<string>;
-	readonly routeDepthById: ReadonlyMap<string, number>;
-	readonly targetItemId: IdSchema.Type;
-}) => {
-	const itemIds = new Set<IdSchema.Type>();
-	const routeIds = new Set<string>();
-	const routes: PlannerAcquisitionRoute[] = [];
-	const pendingItemIds: IdSchema.Type[] = [
-		targetItemId,
-	];
-	const pendingRenewalItemIds: IdSchema.Type[] = [];
-	const queuedRenewalItemIds = new Set<IdSchema.Type>();
+type PlannerSearchChoiceProfile = ReadonlyMap<string, number>;
 
-	const queueRequirement = (
-		requirement: PlannerAcquisitionRoute["requirements"]["allOf"][number],
-	) => {
-		pendingItemIds.push(requirement.itemId);
-		if (
-			graph.rootItemIds.has(requirement.itemId) &&
-			(requirement.usage === "charge" || requirement.usage === "consume") &&
-			!queuedRenewalItemIds.has(requirement.itemId)
-		) {
-			queuedRenewalItemIds.add(requirement.itemId);
-			pendingRenewalItemIds.push(requirement.itemId);
-		}
-	};
+interface PlannerSearchChoicePoint {
+	readonly key: string;
+	readonly optionCount: number;
+	readonly selectedIndex: number;
+}
 
-	const addRoute = (route: PlannerAcquisitionRoute) => {
-		if (routeIds.has(route.id)) return;
-		routeIds.add(route.id);
-		routes.push(route);
-		for (const requirement of route.requirements.allOf) queueRequirement(requirement);
-		for (const clause of route.requirements.anyOf) {
-			const minimumDepth = Math.min(
-				...clause.flatMap((requirement) => {
-					const depth = depthByItemId.get(requirement.itemId);
-					return depth === undefined
-						? []
-						: [
-								depth,
-							];
-				}),
-			);
-			for (const requirement of clause)
-				if (depthByItemId.get(requirement.itemId) === minimumDepth)
-					queueRequirement(requirement);
-		}
-	};
+interface PlannerSearchScopeBuild {
+	readonly choiceIndexByKey: ReadonlyMap<string, number>;
+	readonly choicePoints: ReadonlyArray<PlannerSearchChoicePoint>;
+	readonly scope: PlannerSearchScope;
+}
 
-	let itemIndex = 0;
-	let renewalIndex = 0;
-	while (itemIndex < pendingItemIds.length || renewalIndex < pendingRenewalItemIds.length) {
-		if (itemIndex < pendingItemIds.length) {
-			const itemId = pendingItemIds[itemIndex];
-			itemIndex += 1;
-			if (itemId === undefined || itemIds.has(itemId)) continue;
-			itemIds.add(itemId);
-			const itemDepth = depthByItemId.get(itemId);
-			if (itemDepth === undefined) continue;
-			for (const route of graph.routesByOutputItemId.get(itemId) ?? [])
-				if (reachableRouteIds.has(route.id) && routeDepthById.get(route.id) === itemDepth)
-					addRoute(route);
-			continue;
-		}
+interface PendingItemGoal {
+	readonly itemId: IdSchema.Type;
+	readonly type: "acquisition" | "renewal";
+}
 
-		const itemId = pendingRenewalItemIds[renewalIndex];
-		renewalIndex += 1;
-		if (itemId === undefined) continue;
-		const candidates = (graph.routesByOutputItemId.get(itemId) ?? []).filter(
-			(route) =>
-				reachableRouteIds.has(route.id) &&
-				(routeDepthById.get(route.id) ?? Number.POSITIVE_INFINITY) > 0,
-		);
-		const minimumDepth = Math.min(
-			...candidates.map((route) => routeDepthById.get(route.id) ?? Number.POSITIVE_INFINITY),
-		);
-		for (const route of candidates)
-			if (routeDepthById.get(route.id) === minimumDepth) addRoute(route);
-	}
+const readRouteDepth = (graph: PlannerAcquisitionGraph, route: PlannerAcquisitionRoute) =>
+	graph.routeDepthById.get(route.id) ?? Number.POSITIVE_INFINITY;
 
-	routes.sort((left, right) => compareIds(left.id, right.id));
-	return {
-		itemIds,
-		routes,
-	};
-};
+const compareRoutes = (
+	graph: PlannerAcquisitionGraph,
+	left: PlannerAcquisitionRoute,
+	right: PlannerAcquisitionRoute,
+) => readRouteDepth(graph, left) - readRouteDepth(graph, right) || compareIds(left.id, right.id);
+
+const compareRequirements = (
+	graph: PlannerAcquisitionGraph,
+	left: PlannerAcquisitionRequirement,
+	right: PlannerAcquisitionRequirement,
+) =>
+	(graph.depthByItemId.get(left.itemId) ?? Number.POSITIVE_INFINITY) -
+		(graph.depthByItemId.get(right.itemId) ?? Number.POSITIVE_INFINITY) ||
+	compareIds(left.itemId, right.itemId) ||
+	compareIds(left.source, right.source) ||
+	compareIds(left.usage, right.usage) ||
+	left.minimumQuantity - right.minimumQuantity ||
+	(left.inputIndex ?? -1) - (right.inputIndex ?? -1) ||
+	(left.ruleIndex ?? -1) - (right.ruleIndex ?? -1) ||
+	(left.whenIndex ?? -1) - (right.whenIndex ?? -1);
+
+const readAcquisitionChoiceId = (itemId: IdSchema.Type) =>
+	JSON.stringify([
+		"acquisition-route",
+		itemId,
+	]);
+
+const readRenewalChoiceId = (itemId: IdSchema.Type) =>
+	JSON.stringify([
+		"renewal-route",
+		itemId,
+	]);
 
 const readActionOutputWitness = (
 	route: PlannerAcquisitionRoute,
@@ -239,13 +200,209 @@ const readSearchActions = ({
 	].sort((left, right) => left.depth - right.depth || compareIds(left.id, right.id));
 };
 
-/**
- * Reads the minimum-depth authored route slice currently executable by planner search.
- *
- * Equal-depth alternatives remain available for runtime backtracking. Longer detours stay outside
- * this bounded search pass and therefore may only lead to an inconclusive result, never a forged
- * impossibility proof. Unsupported routes remain diagnostics, never structural proofs.
- */
+const buildPlannerSearchScope = ({
+	choiceProfile,
+	graph,
+	targetItemId,
+}: {
+	readonly choiceProfile: PlannerSearchChoiceProfile;
+	readonly graph: PlannerAcquisitionGraph;
+	readonly targetItemId: IdSchema.Type;
+}): PlannerSearchScopeBuild | undefined => {
+	const supported = graph.depthByItemId.has(targetItemId);
+	const unsupportedRoutes: PlannerSearchUnsupportedRoute[] = [];
+	if (!supported)
+		return {
+			choiceIndexByKey: new Map(),
+			choicePoints: [],
+			scope: {
+				actions: [],
+				depthDiscrepancy: 0,
+				id: "[]",
+				itemIds: [],
+				maximumDetourDepth: 0,
+				preferredRequirementByClauseId: new Map(),
+				preferredRenewalRouteByItemId: new Map(),
+				preferredRouteByItemId: new Map(),
+				routeDiscrepancy: 0,
+				routeIds: [],
+				supported: false,
+				unsupportedRoutes,
+			},
+		};
+
+	const choiceIndexByKey = new Map<string, number>();
+	const choicePoints: PlannerSearchChoicePoint[] = [];
+	const itemIds = new Set<IdSchema.Type>();
+	const preferredRequirementByClauseId = new Map<string, PlannerAcquisitionRequirement>();
+	const preferredRenewalRouteByItemId = new Map<IdSchema.Type, PlannerAcquisitionRoute>();
+	const preferredRouteByItemId = new Map<IdSchema.Type, PlannerAcquisitionRoute>();
+	const routeIds = new Set<string>();
+	const routes: PlannerAcquisitionRoute[] = [];
+	const pendingGoals: PendingItemGoal[] = [
+		{
+			itemId: targetItemId,
+			type: "acquisition",
+		},
+	];
+	const processedGoalIds = new Set<string>();
+	let depthDiscrepancy = 0;
+	let maximumDetourDepth = 0;
+	let routeDiscrepancy = 0;
+
+	const registerChoice = ({
+		depths,
+		key,
+		optionCount,
+	}: {
+		readonly depths: ReadonlyArray<number>;
+		readonly key: string;
+		readonly optionCount: number;
+	}) => {
+		const selectedIndex = choiceProfile.get(key) ?? 0;
+		if (selectedIndex < 0 || selectedIndex >= optionCount) return undefined;
+		if (!choiceIndexByKey.has(key)) {
+			choiceIndexByKey.set(key, selectedIndex);
+			choicePoints.push({
+				key,
+				optionCount,
+				selectedIndex,
+			});
+			const detourDepth = (depths[selectedIndex] ?? 0) - (depths[0] ?? 0);
+			depthDiscrepancy += detourDepth;
+			maximumDetourDepth = Math.max(maximumDetourDepth, detourDepth);
+			routeDiscrepancy += selectedIndex;
+		}
+		return selectedIndex;
+	};
+
+	const queueRequirement = (requirement: PlannerAcquisitionRequirement) => {
+		itemIds.add(requirement.itemId);
+		pendingGoals.push({
+			itemId: requirement.itemId,
+			type: "acquisition",
+		});
+		if (
+			graph.rootItemIds.has(requirement.itemId) &&
+			(requirement.usage === "charge" || requirement.usage === "consume")
+		)
+			pendingGoals.push({
+				itemId: requirement.itemId,
+				type: "renewal",
+			});
+	};
+
+	const addRoute = (route: PlannerAcquisitionRoute) => {
+		if (routeIds.has(route.id)) return true;
+		routeIds.add(route.id);
+		routes.push(route);
+		for (const requirement of route.requirements.allOf) queueRequirement(requirement);
+		for (const [clauseIndex, clause] of route.requirements.anyOf.entries()) {
+			const options = clause
+				.filter((requirement) => graph.depthByItemId.has(requirement.itemId))
+				.sort((left, right) => compareRequirements(graph, left, right));
+			if (options.length === 0) return false;
+			const clauseId = readPlannerRequirementClauseId(route.id, clauseIndex);
+			const selectedIndex = registerChoice({
+				depths: options.map(
+					(requirement) =>
+						graph.depthByItemId.get(requirement.itemId) ?? Number.POSITIVE_INFINITY,
+				),
+				key: clauseId,
+				optionCount: options.length,
+			});
+			if (selectedIndex === undefined) return false;
+			const selected = options[selectedIndex];
+			if (selected === undefined) return false;
+			preferredRequirementByClauseId.set(clauseId, selected);
+			const selectedDepth = graph.depthByItemId.get(selected.itemId);
+			if (selectedDepth === undefined) return false;
+			for (const requirement of options)
+				if (
+					(graph.depthByItemId.get(requirement.itemId) ?? Number.POSITIVE_INFINITY) <=
+					selectedDepth
+				)
+					queueRequirement(requirement);
+		}
+		return true;
+	};
+
+	for (let goalIndex = 0; goalIndex < pendingGoals.length; goalIndex += 1) {
+		const goal = pendingGoals[goalIndex];
+		if (goal === undefined) continue;
+		const goalId = JSON.stringify([
+			goal.type,
+			goal.itemId,
+		]);
+		if (processedGoalIds.has(goalId)) continue;
+		processedGoalIds.add(goalId);
+		itemIds.add(goal.itemId);
+		if (goal.type === "acquisition" && graph.rootItemIds.has(goal.itemId)) continue;
+
+		const options = (graph.routesByOutputItemId.get(goal.itemId) ?? [])
+			.filter(
+				(route) =>
+					graph.reachableRouteIds.has(route.id) &&
+					(goal.type !== "renewal" || readRouteDepth(graph, route) > 0),
+			)
+			.sort((left, right) => compareRoutes(graph, left, right));
+		if (options.length === 0) continue;
+		const choiceId =
+			goal.type === "renewal"
+				? readRenewalChoiceId(goal.itemId)
+				: readAcquisitionChoiceId(goal.itemId);
+		const selectedIndex = registerChoice({
+			depths: options.map((route) => readRouteDepth(graph, route)),
+			key: choiceId,
+			optionCount: options.length,
+		});
+		if (selectedIndex === undefined) return undefined;
+		const selected = options[selectedIndex];
+		if (selected === undefined) return undefined;
+		if (goal.type === "renewal") preferredRenewalRouteByItemId.set(goal.itemId, selected);
+		else preferredRouteByItemId.set(goal.itemId, selected);
+		const selectedDepth = readRouteDepth(graph, selected);
+		for (const route of options) {
+			if (readRouteDepth(graph, route) > selectedDepth) continue;
+			if (!addRoute(route)) return undefined;
+		}
+	}
+
+	routes.sort((left, right) => compareIds(left.id, right.id));
+	const normalizedChoiceEntries = [
+		...choiceIndexByKey,
+	].sort(([left], [right]) => compareIds(left, right));
+	return {
+		choiceIndexByKey,
+		choicePoints,
+		scope: {
+			actions: readSearchActions({
+				routeDepthById: graph.routeDepthById,
+				routes,
+			}),
+			depthDiscrepancy,
+			id: JSON.stringify(normalizedChoiceEntries),
+			itemIds: [
+				...itemIds,
+			].sort(compareIds),
+			maximumDetourDepth,
+			preferredRequirementByClauseId,
+			preferredRenewalRouteByItemId,
+			preferredRouteByItemId,
+			routeDiscrepancy,
+			routeIds: routes.map((route) => route.id),
+			supported,
+			unsupportedRoutes,
+		},
+	};
+};
+
+const compareScopeBuilds = (left: PlannerSearchScopeBuild, right: PlannerSearchScopeBuild) =>
+	left.scope.depthDiscrepancy - right.scope.depthDiscrepancy ||
+	left.scope.routeDiscrepancy - right.scope.routeDiscrepancy ||
+	compareIds(left.scope.id, right.scope.id);
+
+/** Reads the locally shortest route plan used by the first engine-backed search pass. */
 export const readPlannerSearchScope = ({
 	graph,
 	targetItemId,
@@ -253,31 +410,75 @@ export const readPlannerSearchScope = ({
 	readonly graph: PlannerAcquisitionGraph;
 	readonly targetItemId: IdSchema.Type;
 }): PlannerSearchScope => {
-	const supported = graph.depthByItemId.has(targetItemId);
-	const supportedClosure = supported
-		? readTargetClosure({
-				depthByItemId: graph.depthByItemId,
-				graph,
-				reachableRouteIds: graph.reachableRouteIds,
-				routeDepthById: graph.routeDepthById,
-				targetItemId,
-			})
-		: {
-				itemIds: new Set<IdSchema.Type>(),
-				routes: [] as PlannerAcquisitionRoute[],
-			};
-	const unsupportedRoutes: PlannerSearchUnsupportedRoute[] = [];
-
-	return {
-		actions: readSearchActions({
-			routeDepthById: graph.routeDepthById,
-			routes: supportedClosure.routes,
-		}),
-		itemIds: [
-			...supportedClosure.itemIds,
-		].sort(compareIds),
-		routeIds: supportedClosure.routes.map((route) => route.id),
-		supported,
-		unsupportedRoutes,
-	};
+	const build = buildPlannerSearchScope({
+		choiceProfile: new Map(),
+		graph,
+		targetItemId,
+	});
+	if (build === undefined)
+		throw new Error(`Planner could not build its minimum route scope for ${targetItemId}.`);
+	return build.scope;
 };
+
+/**
+ * Lazily enumerates route plans by structural discrepancy.
+ *
+ * Equal-depth alternatives are preferred before longer detours. Each yielded scope remains a
+ * monotone authored slice, while its preferred route tree gives the demand-driven scheduler one
+ * concrete path to pursue. Search budget, rather than graph size, bounds how many plans execute.
+ */
+export function* iteratePlannerSearchScopes({
+	graph,
+	targetItemId,
+}: {
+	readonly graph: PlannerAcquisitionGraph;
+	readonly targetItemId: IdSchema.Type;
+}): Generator<PlannerSearchScope> {
+	const initial = buildPlannerSearchScope({
+		choiceProfile: new Map(),
+		graph,
+		targetItemId,
+	});
+	if (initial === undefined) return;
+	const pending: PlannerSearchScopeBuild[] = [
+		initial,
+	];
+	const queuedScopeIds = new Set<string>([
+		initial.scope.id,
+	]);
+
+	while (pending.length > 0) {
+		pending.sort(compareScopeBuilds);
+		const current = pending.shift();
+		if (current === undefined) continue;
+		yield current.scope;
+
+		for (const choice of current.choicePoints) {
+			if (choice.selectedIndex + 1 >= choice.optionCount) continue;
+			const nextProfile = new Map(current.choiceIndexByKey);
+			nextProfile.set(choice.key, choice.selectedIndex + 1);
+			const next = buildPlannerSearchScope({
+				choiceProfile: nextProfile,
+				graph,
+				targetItemId,
+			});
+			if (next === undefined || queuedScopeIds.has(next.scope.id)) continue;
+			queuedScopeIds.add(next.scope.id);
+			pending.push(next);
+		}
+	}
+}
+
+/** Materializes all progressive scopes for diagnostics and focused tests. */
+export const readPlannerSearchScopes = ({
+	graph,
+	targetItemId,
+}: {
+	readonly graph: PlannerAcquisitionGraph;
+	readonly targetItemId: IdSchema.Type;
+}): ReadonlyArray<PlannerSearchScope> => [
+	...iteratePlannerSearchScopes({
+		graph,
+		targetItemId,
+	}),
+];

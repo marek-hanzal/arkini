@@ -4,6 +4,7 @@ import type {
 	PlannerAcquisitionRoute,
 } from "~/editor/planner/PlannerAcquisitionGraph";
 import { readPlannerActionId } from "~/editor/planner/readPlannerActionId";
+import { readPlannerRequirementClauseId } from "~/editor/planner/readPlannerRequirementClauseId";
 import { readPlannerRuntimeQuantity } from "~/editor/planner/readPlannerRuntimeQuantity";
 import type { PlannerSearchScope } from "~/editor/planner/PlannerSearchScope";
 import { resolvePlannerRouteReachability } from "~/editor/planner/resolvePlannerRouteReachability";
@@ -19,6 +20,7 @@ export interface PlannerSearchPriority {
 export interface PlannerSearchPriorityPlan {
 	readonly depthByItemId: ReadonlyMap<IdSchema.Type, number>;
 	readonly maximumSingleActionOutputByItemId: ReadonlyMap<IdSchema.Type, number>;
+	readonly preferredRequirementByClauseId: ReadonlyMap<string, PlannerAcquisitionRequirement>;
 	readonly renewalRouteByItemId: ReadonlyMap<IdSchema.Type, PlannerAcquisitionRoute>;
 	readonly witnessRouteByItemId: ReadonlyMap<IdSchema.Type, PlannerAcquisitionRoute>;
 }
@@ -80,10 +82,12 @@ const readChargeDepletionProgress = ({
 const readClauseRequirement = ({
 	clause,
 	depthByItemId,
+	preferred,
 	runtime,
 }: {
 	readonly clause: ReadonlyArray<PlannerAcquisitionRequirement>;
 	readonly depthByItemId: ReadonlyMap<IdSchema.Type, number>;
+	readonly preferred?: PlannerAcquisitionRequirement;
 	readonly runtime: RuntimeSchema.Type;
 }) => {
 	const reachable = clause
@@ -94,7 +98,11 @@ const readClauseRequirement = ({
 			(requirement) =>
 				readPlannerRuntimeQuantity(runtime, requirement.itemId) >=
 				requirement.minimumQuantity,
-		) ?? reachable[0]
+		) ??
+		(preferred === undefined
+			? undefined
+			: reachable.find((requirement) => requirement === preferred)) ??
+		reachable[0]
 	);
 };
 
@@ -156,33 +164,14 @@ export const readPlannerSearchPriorityPlan = ({
 		rootItemIds: graph.rootItemIds,
 		routes: graph.routes.filter((route) => scopeRouteIds.has(route.id)),
 	});
-	const renewalRouteByItemId = new Map<IdSchema.Type, PlannerAcquisitionRoute>();
-	for (const route of graph.routes) {
-		if (!scopeRouteIds.has(route.id) || !graph.rootItemIds.has(route.output.itemId)) continue;
-		const current = renewalRouteByItemId.get(route.output.itemId);
-		const routeDepth = graph.routeDepthById.get(route.id) ?? Number.POSITIVE_INFINITY;
-		const currentDepth =
-			current === undefined
-				? Number.POSITIVE_INFINITY
-				: (graph.routeDepthById.get(current.id) ?? Number.POSITIVE_INFINITY);
-		if (
-			current === undefined ||
-			routeDepth < currentDepth ||
-			(routeDepth === currentDepth && route.id < current.id)
-		)
-			renewalRouteByItemId.set(route.output.itemId, route);
-	}
 	return {
 		depthByItemId: scopeReachability.depthByItemId,
 		maximumSingleActionOutputByItemId: readMaximumSingleActionOutputByItemId({
 			routes: graph.routes.filter((route) => scopeRouteIds.has(route.id)),
 		}),
-		renewalRouteByItemId,
-		witnessRouteByItemId: new Map(
-			[
-				...scopeReachability.witnessRouteByItemId,
-			].filter(([itemId, route]) => route.output.itemId === itemId),
-		),
+		preferredRequirementByClauseId: scope.preferredRequirementByClauseId,
+		renewalRouteByItemId: scope.preferredRenewalRouteByItemId,
+		witnessRouteByItemId: scope.preferredRouteByItemId,
 	};
 };
 
@@ -254,10 +243,13 @@ export const readPlannerActiveDemand = ({
 				itemId: requirementItemId,
 				quantity: demand.consumed + demand.retained,
 			});
-		for (const clause of route.requirements.anyOf) {
+		for (const [clauseIndex, clause] of route.requirements.anyOf.entries()) {
 			const requirement = readClauseRequirement({
 				clause,
 				depthByItemId: plan.depthByItemId,
+				preferred: plan.preferredRequirementByClauseId.get(
+					readPlannerRequirementClauseId(route.id, clauseIndex),
+				),
 				runtime,
 			});
 			if (requirement !== undefined)

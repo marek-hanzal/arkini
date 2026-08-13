@@ -26,16 +26,24 @@ const plan: PlannerSearchPriorityPlan = {
 			3,
 		],
 	]),
+	preferredRequirementByClauseId: new Map(),
 	renewalRouteByItemId: new Map(),
 	witnessRouteByItemId: new Map(),
 };
 
 const scope: PlannerSearchScope = {
 	actions: [],
+	depthDiscrepancy: 0,
+	id: "[]",
 	itemIds: [
 		water.id,
 	],
+	maximumDetourDepth: 0,
+	preferredRequirementByClauseId: new Map(),
+	preferredRenewalRouteByItemId: new Map(),
+	preferredRouteByItemId: new Map(),
 	routeIds: [],
+	routeDiscrepancy: 0,
 	supported: true,
 	unsupportedRoutes: [],
 };

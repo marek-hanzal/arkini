@@ -1,7 +1,10 @@
 import { describe, expect, it } from "vitest";
 
 import { createPlannerAcquisitionGraph } from "~/editor/planner/createPlannerAcquisitionGraph";
-import { readPlannerSearchScope } from "~/editor/planner/readPlannerSearchScope";
+import {
+	readPlannerSearchScope,
+	readPlannerSearchScopes,
+} from "~/editor/planner/readPlannerSearchScope";
 import { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 
 const baseItem = (id: string) => ({
@@ -77,10 +80,12 @@ const mixedOutput = () => ({
 const line = ({
 	id,
 	inputItemId,
+	inputQuantity = 1,
 	output,
 }: {
 	readonly id: string;
 	readonly inputItemId?: string;
+	readonly inputQuantity?: number;
 	readonly output: Record<string, unknown>;
 }) => ({
 	description: id,
@@ -94,11 +99,11 @@ const line = ({
 				]
 			: [
 					{
-						capacity: 1,
+						capacity: inputQuantity,
 						mode: "consume" as const,
 						quantity: {
-							max: 1,
-							min: 1,
+							max: inputQuantity,
+							min: inputQuantity,
 						},
 						selector: {
 							itemId: inputItemId,
@@ -314,6 +319,95 @@ const config = GameConfigSchema.parse({
 
 const graph = createPlannerAcquisitionGraph(config);
 
+const wideningConfigSource: unknown = {
+	version: "1.0",
+	resources: {
+		hero: "hero",
+	},
+	meta: {
+		id: "game:planner-search-scope-widening",
+		title: "Planner search scope widening",
+		board: {
+			height: 1,
+			width: 3,
+		},
+		inventory: {
+			height: 1,
+			width: 2,
+		},
+	},
+	start: {
+		board: [
+			"short-producer",
+			"detour-part-producer",
+			"detour-target-producer",
+		].map((itemId, x) => ({
+			itemId,
+			space: 0,
+			x,
+			y: 0,
+		})),
+		currentSpace: 0,
+		inventory: [
+			{
+				itemId: "scarce-raw",
+				quantity: 1,
+			},
+			{
+				itemId: "detour-raw",
+				quantity: 1,
+			},
+		],
+	},
+	items: {
+		hero: {
+			...baseItem("hero"),
+			type: "simple",
+		},
+		"scarce-raw": {
+			...baseItem("scarce-raw"),
+			type: "simple",
+		},
+		"detour-raw": {
+			...baseItem("detour-raw"),
+			type: "simple",
+		},
+		"short-producer": producer("short-producer", [
+			line({
+				id: "line:short-target",
+				inputItemId: "scarce-raw",
+				inputQuantity: 2,
+				output: guaranteedOutput("widened-target"),
+			}),
+		]),
+		"detour-part-producer": producer("detour-part-producer", [
+			line({
+				id: "line:detour-part",
+				inputItemId: "detour-raw",
+				output: guaranteedOutput("detour-part"),
+			}),
+		]),
+		"detour-target-producer": producer("detour-target-producer", [
+			line({
+				id: "line:detour-target",
+				inputItemId: "detour-part",
+				output: guaranteedOutput("widened-target"),
+			}),
+		]),
+		"detour-part": {
+			...baseItem("detour-part"),
+			type: "simple",
+		},
+		"widened-target": {
+			...baseItem("widened-target"),
+			type: "simple",
+		},
+	},
+};
+
+const wideningConfig = GameConfigSchema.parse(wideningConfigSource);
+const wideningGraph = createPlannerAcquisitionGraph(wideningConfig);
+
 describe("readPlannerSearchScope", () => {
 	it("includes the shortest renewal route for consumed roots without rebuilding presence roots", () => {
 		const scope = readPlannerSearchScope({
@@ -485,5 +579,32 @@ describe("readPlannerSearchScope", () => {
 			],
 		});
 		expect(scope.unsupportedRoutes).toEqual([]);
+	});
+	it("opens target-relevant route detours as distinct cumulative scopes", () => {
+		const scopes = readPlannerSearchScopes({
+			graph: wideningGraph,
+			targetItemId: "widened-target",
+		});
+
+		expect(scopes).toHaveLength(2);
+		const [shortest, widened] = scopes;
+		expect(shortest?.maximumDetourDepth).toBe(0);
+		expect(shortest?.actions.map(({ actionId }) => actionId)).toEqual([
+			'["line","short-producer","line:short-target"]',
+		]);
+		expect(widened?.maximumDetourDepth).toBe(1);
+		expect(widened?.actions.map(({ actionId }) => actionId)).toEqual([
+			'["line","detour-part-producer","line:detour-part"]',
+			'["line","short-producer","line:short-target"]',
+			'["line","detour-target-producer","line:detour-target"]',
+		]);
+		expect(widened?.preferredRouteByItemId.get("widened-target")?.action).toEqual({
+			kind: "line",
+			lineId: "line:detour-target",
+			ownerItemId: "detour-target-producer",
+		});
+		expect(shortest?.routeIds.every((routeId) => widened?.routeIds.includes(routeId))).toBe(
+			true,
+		);
 	});
 });

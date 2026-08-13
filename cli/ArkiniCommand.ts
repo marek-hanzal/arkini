@@ -1,6 +1,7 @@
 import { Command } from "effect/unstable/cli";
 import { ArkpackCommand } from "./arkpack/ArkpackCommand";
 import { DesktopCommand } from "./desktop/DesktopCommand";
+import { EditorCommand } from "./editor/EditorCommand";
 import { GameCommand } from "~/engine/cli/GameCommand";
 
 // TODO(#397): Keep this root as the checklist entry for every `effect/unstable/cli`
@@ -11,6 +12,7 @@ export const ArkiniCommand = Command.make("arkini")
 			ArkpackCommand,
 			GameCommand,
 			DesktopCommand,
+			EditorCommand,
 		]),
 	)
 	.pipe(Command.withDescription("Arkini development commands."));

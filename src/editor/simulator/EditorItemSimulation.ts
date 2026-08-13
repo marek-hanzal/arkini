@@ -49,7 +49,7 @@ export type EditorItemSimulationPlanner =
 	  }
 	| {
 			readonly bestAvailableQuantity: number;
-				readonly budgetLimit?: PlannerSearchBudgetLimit;
+			readonly budgetLimit?: PlannerSearchBudgetLimit;
 			readonly expandedStates: number;
 			readonly diagnostics: EditorItemSimulationSearchDiagnostics;
 			readonly method: "engine-backed-search";

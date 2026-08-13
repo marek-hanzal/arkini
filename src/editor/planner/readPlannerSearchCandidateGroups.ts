@@ -3,6 +3,7 @@ import type {
 	PlannerAcquisitionRequirement,
 	PlannerAcquisitionRoute,
 } from "~/editor/planner/PlannerAcquisitionGraph";
+import { readPlannerRuntimeChargeCapacity } from "~/editor/planner/readPlannerRuntimeChargeCapacity";
 import { readPlannerRuntimeQuantity } from "~/editor/planner/readPlannerRuntimeQuantity";
 import {
 	readPlannerActiveDemand,
@@ -18,6 +19,7 @@ export interface PlannerSearchCandidateGroup {
 }
 
 interface RequirementDemand {
+	charges: number;
 	consumed: number;
 	retained: number;
 }
@@ -27,26 +29,39 @@ const addRequirement = (
 	requirement: PlannerAcquisitionRequirement,
 ) => {
 	const demand = demandByItemId.get(requirement.itemId) ?? {
+		charges: 0,
 		consumed: 0,
 		retained: 0,
 	};
 	if (requirement.usage === "consume") demand.consumed += requirement.minimumQuantity;
 	else demand.retained = Math.max(demand.retained, requirement.minimumQuantity);
+	if (requirement.usage === "charge") demand.charges += requirement.chargeCost ?? 0;
 	demandByItemId.set(requirement.itemId, demand);
 };
 
-const isRouteReady = (route: PlannerAcquisitionRoute, runtime: RuntimeSchema.Type) => {
+const isRequirementReady = (
+	requirement: PlannerAcquisitionRequirement,
+	runtime: RuntimeSchema.Type,
+) =>
+	readPlannerRuntimeQuantity(runtime, requirement.itemId) >= requirement.minimumQuantity &&
+	(requirement.usage !== "charge" ||
+		readPlannerRuntimeChargeCapacity(runtime, requirement.itemId) >=
+			(requirement.chargeCost ?? 0));
+
+export const isPlannerAcquisitionRouteReady = (
+	route: PlannerAcquisitionRoute,
+	runtime: RuntimeSchema.Type,
+) => {
 	const demandByItemId = new Map<IdSchema.Type, RequirementDemand>();
 	for (const requirement of route.requirements.allOf) addRequirement(demandByItemId, requirement);
 	for (const [itemId, demand] of demandByItemId)
-		if (readPlannerRuntimeQuantity(runtime, itemId) < demand.consumed + demand.retained)
+		if (
+			readPlannerRuntimeQuantity(runtime, itemId) < demand.consumed + demand.retained ||
+			readPlannerRuntimeChargeCapacity(runtime, itemId) < demand.charges
+		)
 			return false;
 	return route.requirements.anyOf.every((clause) =>
-		clause.some(
-			(requirement) =>
-				readPlannerRuntimeQuantity(runtime, requirement.itemId) >=
-				requirement.minimumQuantity,
-		),
+		clause.some((requirement) => isRequirementReady(requirement, runtime)),
 	);
 };
 
@@ -129,7 +144,7 @@ export const readPlannerSearchCandidateGroups = ({
 				readyActions: [],
 			};
 			group.actions.push(action);
-			if (routes.some((route) => isRouteReady(route, runtime)))
+			if (routes.some((route) => isPlannerAcquisitionRouteReady(route, runtime)))
 				group.readyActions.push(action);
 			candidatesByOutputItemId.set(outputItemId, group);
 		}

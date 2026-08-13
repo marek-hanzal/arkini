@@ -286,6 +286,7 @@ export const searchPlannerRuntimeFx = Effect.fn("searchPlannerRuntimeFx")(functi
 	const initialQuantity = readAvailableQuantity(initial, itemId);
 	if (initialQuantity >= quantity) {
 		const economics = yield* readPlannerExpectedEconomicsFx({
+			graph,
 			initialRuntime: runtime,
 			itemId,
 			quantity,
@@ -498,6 +499,7 @@ export const searchPlannerRuntimeFx = Effect.fn("searchPlannerRuntimeFx")(functi
 				const availableQuantity = readAvailableQuantity(next, itemId);
 				if (availableQuantity >= quantity) {
 					const economics = yield* readPlannerExpectedEconomicsFx({
+						graph,
 						initialRuntime: runtime,
 						itemId,
 						quantity,

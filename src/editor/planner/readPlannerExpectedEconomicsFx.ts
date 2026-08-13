@@ -1,8 +1,10 @@
 import { Effect } from "effect";
 
 import type {
+	PlannerAcquisitionGraph,
 	PlannerAcquisitionQuantityDistribution,
 	PlannerAcquisitionQuantityProbability,
+	PlannerAcquisitionRequirement,
 } from "~/editor/planner/PlannerAcquisitionGraph";
 import type {
 	PlannerExpectedEconomics,
@@ -19,6 +21,7 @@ import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 
 export namespace readPlannerExpectedEconomicsFx {
 	export interface Props {
+		readonly graph: PlannerAcquisitionGraph;
 		readonly initialRuntime: RuntimeSchema.Type;
 		readonly itemId: IdSchema.Type;
 		readonly quantity: number;
@@ -27,6 +30,7 @@ export namespace readPlannerExpectedEconomicsFx {
 }
 
 interface PlannerItemLot {
+	consumedQuantity: number;
 	quantity: number;
 	readonly sourceStepIndex?: number;
 }
@@ -36,6 +40,11 @@ interface PlannerItemFlowDependency {
 	readonly quantity: number;
 	readonly sourceStepIndex: number;
 	readonly targetStepIndex: number;
+}
+
+interface PlannerRetainedRequirementDemand {
+	retained: number;
+	reserved: number;
 }
 
 interface MutablePlannerExpectedOperation {
@@ -77,6 +86,7 @@ const readInitialLots = (runtime: RuntimeSchema.Type) => {
 			itemId,
 			[
 				{
+					consumedQuantity: 0,
 					quantity,
 				},
 			],
@@ -101,6 +111,7 @@ const takeItemLots = ({
 		const lot = lots[index];
 		if (lot === undefined || lot.quantity <= quantityEpsilon) continue;
 		const taken = Math.min(lot.quantity, remaining);
+		lot.consumedQuantity += taken;
 		lot.quantity -= taken;
 		remaining -= taken;
 		onTake(lot, taken);
@@ -113,7 +124,130 @@ const takeItemLots = ({
 		);
 };
 
+const readRequirementKey = (requirement: PlannerAcquisitionRequirement) =>
+	JSON.stringify([
+		requirement.itemId,
+		requirement.minimumQuantity,
+		requirement.source,
+		requirement.usage,
+		requirement.inputIndex ?? null,
+		requirement.ruleIndex ?? null,
+		requirement.whenIndex ?? null,
+	]);
+
+const readRelevantRoutes = ({
+	graph,
+	step,
+}: {
+	readonly graph: PlannerAcquisitionGraph;
+	readonly step: PlannerSearchTraceEntry;
+}) => {
+	const routeById = new Map(
+		graph.routes.map((route) => [
+			route.id,
+			route,
+		]),
+	);
+	const producedItemIds = new Set(step.producedItemQuantities.map(({ itemId }) => itemId));
+	return step.routeIds.flatMap((routeId) => {
+		const route = routeById.get(routeId);
+		if (route === undefined) return [];
+		return [
+			{
+				includeOutputConditions:
+					producedItemIds.has(route.output.itemId) ||
+					(step.outputResolution.type === "existential" &&
+						step.outputResolution.routeId === route.id),
+				route,
+			},
+		];
+	});
+};
+
+const readRetainedRequirements = ({
+	graph,
+	step,
+}: {
+	readonly graph: PlannerAcquisitionGraph;
+	readonly step: PlannerSearchTraceEntry;
+}) => {
+	const allOfByKey = new Map<string, PlannerAcquisitionRequirement>();
+	const anyOfByKey = new Map<string, ReadonlyArray<PlannerAcquisitionRequirement>>();
+	for (const { includeOutputConditions, route } of readRelevantRoutes({
+		graph,
+		step,
+	})) {
+		const includeRequirement = (requirement: PlannerAcquisitionRequirement) =>
+			requirement.usage !== "consume" &&
+			(includeOutputConditions || requirement.source !== "output-condition");
+		for (const requirement of route.requirements.allOf)
+			if (includeRequirement(requirement))
+				allOfByKey.set(readRequirementKey(requirement), requirement);
+		for (const clause of route.requirements.anyOf) {
+			const retained = clause.filter(includeRequirement);
+			if (retained.length === 0) continue;
+			const key = retained.map(readRequirementKey).sort(compareIds).join("\u0000");
+			anyOfByKey.set(key, retained);
+		}
+	}
+	return {
+		allOf: [
+			...allOfByKey.values(),
+		],
+		anyOf: [
+			...anyOfByKey.values(),
+		],
+	};
+};
+
+const readAvailableLotQuantity = (lots: ReadonlyArray<PlannerItemLot>) =>
+	lots.reduce((total, lot) => total + lot.quantity, 0);
+
+const addRetainedDemand = (
+	demandByItemId: Map<IdSchema.Type, PlannerRetainedRequirementDemand>,
+	requirement: PlannerAcquisitionRequirement,
+) => {
+	const demand = demandByItemId.get(requirement.itemId) ?? {
+		retained: 0,
+		reserved: 0,
+	};
+	if (requirement.usage === "reserve") demand.reserved += requirement.minimumQuantity;
+	else demand.retained = Math.max(demand.retained, requirement.minimumQuantity);
+	demandByItemId.set(requirement.itemId, demand);
+};
+
+const peekRetainedItemLots = ({
+	itemId,
+	lotsByItemId,
+	minimumOutputByStep,
+	quantity,
+}: {
+	readonly itemId: IdSchema.Type;
+	readonly lotsByItemId: ReadonlyMap<IdSchema.Type, ReadonlyArray<PlannerItemLot>>;
+	readonly minimumOutputByStep: ReadonlyArray<Map<IdSchema.Type, number>>;
+	readonly quantity: number;
+}) => {
+	const lots = lotsByItemId.get(itemId) ?? [];
+	let remaining = quantity;
+	for (const lot of lots) {
+		if (remaining <= quantityEpsilon) break;
+		if (lot.quantity <= quantityEpsilon) continue;
+		const retained = Math.min(lot.quantity, remaining);
+		remaining -= retained;
+		if (lot.sourceStepIndex === undefined) continue;
+		const quantities = minimumOutputByStep[lot.sourceStepIndex];
+		if (quantities === undefined) continue;
+		const minimumSourceQuantity = lot.consumedQuantity + retained;
+		quantities.set(itemId, Math.max(quantities.get(itemId) ?? 0, minimumSourceQuantity));
+	}
+	if (remaining > quantityEpsilon)
+		throw new RangeError(
+			`Planner trace retained requirement over-requested ${itemId} by ${remaining.toString()} units.`,
+		);
+};
+
 const readFlowDependencies = ({
+	graph,
 	initialRuntime,
 	itemId,
 	quantity,
@@ -126,8 +260,36 @@ const readFlowDependencies = ({
 		},
 		() => [] as PlannerItemFlowDependency[],
 	);
+	const retainedMinimumOutputByStep = Array.from(
+		{
+			length: trace.length,
+		},
+		() => new Map<IdSchema.Type, number>(),
+	);
 
 	for (const [stepIndex, step] of trace.entries()) {
+		const retainedRequirements = readRetainedRequirements({
+			graph,
+			step,
+		});
+		const retainedDemandByItemId = new Map<IdSchema.Type, PlannerRetainedRequirementDemand>();
+		for (const requirement of retainedRequirements.allOf)
+			addRetainedDemand(retainedDemandByItemId, requirement);
+		for (const clause of retainedRequirements.anyOf) {
+			const selected = clause.find(
+				(requirement) =>
+					readAvailableLotQuantity(lotsByItemId.get(requirement.itemId) ?? []) >=
+					requirement.minimumQuantity,
+			);
+			if (selected !== undefined) addRetainedDemand(retainedDemandByItemId, selected);
+		}
+		for (const [retainedItemId, demand] of retainedDemandByItemId)
+			peekRetainedItemLots({
+				itemId: retainedItemId,
+				lotsByItemId,
+				minimumOutputByStep: retainedMinimumOutputByStep,
+				quantity: demand.retained + demand.reserved,
+			});
 		for (const consumed of step.consumedItemQuantities)
 			takeItemLots({
 				itemId: consumed.itemId,
@@ -147,6 +309,7 @@ const readFlowDependencies = ({
 		for (const produced of step.producedItemQuantities) {
 			const lots = lotsByItemId.get(produced.itemId) ?? [];
 			lots.push({
+				consumedQuantity: 0,
 				quantity: produced.quantity,
 				sourceStepIndex: stepIndex,
 			});
@@ -173,6 +336,7 @@ const readFlowDependencies = ({
 
 	return {
 		dependenciesByTargetStep,
+		retainedMinimumOutputByStep,
 		terminalQuantityByStep,
 	};
 };
@@ -216,10 +380,19 @@ const readOutputDistribution = ({
 	readonly itemId: IdSchema.Type;
 	readonly producedQuantity: number;
 	readonly step: PlannerSearchTraceEntry;
-}): ReadonlyArray<PlannerAcquisitionQuantityProbability> =>
-	step.outputResolution.type === "existential" && step.outputResolution.outputItemId === itemId
-		? step.outputResolution.statistics.quantityDistribution
-		: readConstantDistribution(producedQuantity);
+}): ReadonlyArray<PlannerAcquisitionQuantityProbability> => {
+	const resolution = step.outputResolution;
+	if (resolution.type !== "existential" || resolution.outputItemId !== itemId)
+		return readConstantDistribution(producedQuantity);
+	const guaranteedBaseline = Math.max(
+		0,
+		producedQuantity - resolution.statistics.maximumQuantity,
+	);
+	return resolution.statistics.quantityDistribution.map((entry) => ({
+		...entry,
+		quantity: entry.quantity + guaranteedBaseline,
+	}));
+};
 
 const readExpectedMultipliers = ({
 	itemId,
@@ -227,12 +400,13 @@ const readExpectedMultipliers = ({
 	trace,
 	...props
 }: readPlannerExpectedEconomicsFx.Props) => {
-	const { dependenciesByTargetStep, terminalQuantityByStep } = readFlowDependencies({
-		itemId,
-		quantity,
-		trace,
-		...props,
-	});
+	const { dependenciesByTargetStep, retainedMinimumOutputByStep, terminalQuantityByStep } =
+		readFlowDependencies({
+			itemId,
+			quantity,
+			trace,
+			...props,
+		});
 	const chargePredecessorsByStep = readChargePredecessorsByStep(trace);
 	const requiredOutputByStep = terminalQuantityByStep;
 	const forcedMultiplierByStep = Array.from(
@@ -258,7 +432,15 @@ const readExpectedMultipliers = ({
 				entry.quantity,
 			]),
 		);
-		for (const [requiredItemId, requiredQuantity] of requiredOutputByStep[stepIndex] ?? []) {
+		const requiredItemIds = new Set([
+			...(requiredOutputByStep[stepIndex]?.keys() ?? []),
+			...(retainedMinimumOutputByStep[stepIndex]?.keys() ?? []),
+		]);
+		for (const requiredItemId of requiredItemIds) {
+			const requiredQuantity = Math.max(
+				requiredOutputByStep[stepIndex]?.get(requiredItemId) ?? 0,
+				retainedMinimumOutputByStep[stepIndex]?.get(requiredItemId) ?? 0,
+			);
 			const producedQuantity = producedQuantityByItemId.get(requiredItemId) ?? 0;
 			if (producedQuantity <= quantityEpsilon)
 				throw new RangeError(

@@ -91,6 +91,17 @@ const mixedOutput = () => ({
 	],
 });
 
+const mixedSameItemOutput = (itemId: string) => ({
+	set: [
+		{
+			roll: [
+				...guaranteedOutput(itemId).set[0].roll,
+				...chanceOutput(itemId).set[0].roll,
+			],
+		},
+	],
+});
+
 const weightedOutput = () => ({
 	set: [
 		{
@@ -214,6 +225,7 @@ const boardItemIds = [
 	"assembler",
 	"random-producer",
 	"mixed-producer",
+	"mixed-same-item-producer",
 	"weighted-producer",
 	"parallel-producer-a",
 	"parallel-producer-b",
@@ -311,6 +323,12 @@ const config = GameConfigSchema.parse({
 		}),
 		"mixed-target": simpleItem("mixed-target"),
 		"mixed-bonus": simpleItem("mixed-bonus"),
+		"mixed-same-item-producer": producerItem({
+			id: "mixed-same-item-producer",
+			output: mixedSameItemOutput("mixed-same-item-target"),
+			runtimeMs: 80,
+		}),
+		"mixed-same-item-target": simpleItem("mixed-same-item-target"),
 		"weighted-producer": producerItem({
 			id: "weighted-producer",
 			output: weightedOutput(),
@@ -489,9 +507,92 @@ const config = GameConfigSchema.parse({
 	},
 });
 
+const infrastructureConfig = GameConfigSchema.parse({
+	version: "1.0",
+	resources: {
+		hero: "hero",
+	},
+	meta: {
+		id: "game:engine-planner-infrastructure-economics",
+		title: "Engine planner infrastructure economics",
+		board: {
+			height: 1,
+			width: 1,
+		},
+		inventory: {
+			height: 1,
+			width: 1,
+		},
+	},
+	start: {
+		board: [
+			{
+				itemId: "machine-builder",
+				space: 0,
+				x: 0,
+				y: 0,
+			},
+		],
+		currentSpace: 0,
+		inventory: [
+			{
+				itemId: "machine-kit",
+				quantity: 1,
+			},
+		],
+	},
+	items: {
+		hero: simpleItem("hero"),
+		"machine-kit": simpleItem("machine-kit"),
+		"machine-builder": producerItem({
+			id: "machine-builder",
+			inputItemId: "machine-kit",
+			output: guaranteedOutput("built-machine"),
+			runtimeMs: 100,
+		}),
+		"built-machine": producerItem({
+			id: "built-machine",
+			output: guaranteedOutput("built-target"),
+			runtimeMs: 50,
+		}),
+		"built-target": simpleItem("built-target"),
+	},
+});
+
 const makePlanner = () => Effect.runSync(createEnginePlannerFx(config));
 
 describe("createEnginePlannerFx", () => {
+	it("includes produced retained infrastructure in selected-trace economics", () => {
+		const planner = Effect.runSync(createEnginePlannerFx(infrastructureConfig));
+		const result = Effect.runSync(planner.searchFx("built-target"));
+
+		expect(result.type).toBe("completed");
+		if (result.type !== "completed") return;
+		expect(result.elapsedMs).toBe(150);
+		expect(result.economics).toMatchObject({
+			expectedActionRuns: 2,
+			expectedConsumedItems: [
+				{
+					itemId: "machine-kit",
+					quantity: 1,
+				},
+			],
+			expectedElapsedMs: 150,
+			observedActionRuns: 2,
+			observedElapsedMs: 150,
+		});
+		expect(result.economics.operations).toMatchObject([
+			{
+				actionId: '["line","machine-builder","line:machine-builder:run"]',
+				expectedRuns: 1,
+			},
+			{
+				actionId: '["line","built-machine","line:built-machine:run"]',
+				expectedRuns: 1,
+			},
+		]);
+	});
+
 	it("records exact authored output distributions separately from existential witnesses", () => {
 		const planner = makePlanner();
 		const chance = planner.graph.routesByOutputItemId.get("random-target")?.[0];
@@ -1077,6 +1178,18 @@ describe("createEnginePlannerFx", () => {
 		});
 	});
 
+	it("includes a guaranteed same-item baseline in stochastic replay economics", () => {
+		const result = Effect.runSync(makePlanner().searchFx("mixed-same-item-target", 2));
+
+		expect(result.type).toBe("completed");
+		if (result.type !== "completed") return;
+		expect(result.trace).toHaveLength(1);
+		expect(result.trace[0]?.outputResolution.type).toBe("existential");
+		expect(result.economics.observedActionRuns).toBe(1);
+		expect(result.economics.expectedActionRuns).toBeCloseTo(1.5);
+		expect(result.economics.expectedElapsedMs).toBeCloseTo(120);
+	});
+
 	it("realizes a weighted alternative-set witness with correlated integer drops", () => {
 		const result = Effect.runSync(makePlanner().searchFx("weighted-target", 12));
 
@@ -1297,6 +1410,14 @@ describe("createEnginePlannerFx", () => {
 				targetItemId: "item:tree",
 			},
 		]);
+		expect(result.economics.expectedActionRuns).toBeCloseTo(8.6);
+		expect(result.economics.expectedElapsedMs).toBeCloseTo(55_800);
+		expect(result.economics.operations).toContainEqual(
+			expect.objectContaining({
+				actionId: '["line","item:blueprint-well-t1","line:blueprint:well-t1:construct"]',
+				expectedRuns: 1,
+			}),
+		);
 		expect(result.runtime.items.some(({ item }) => item.id === "item:double-tree")).toBe(true);
 	});
 });

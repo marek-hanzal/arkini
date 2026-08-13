@@ -1,3 +1,5 @@
+import type { PlannerSearchDiagnostics } from "~/editor/planner/PlannerSearch";
+
 export interface EditorItemSimulationOperation {
 	readonly id: string;
 	readonly ownerItemId: string;
@@ -19,9 +21,12 @@ export interface EditorItemSimulationChargeCost {
 
 export type EditorItemSimulationOutputCertainty = "deterministic" | "possible";
 
+export type EditorItemSimulationSearchDiagnostics = PlannerSearchDiagnostics;
+
 export type EditorItemSimulationPlanner =
 	| {
 			readonly assumptions: ReadonlyArray<string>;
+			readonly diagnostics: EditorItemSimulationSearchDiagnostics;
 			readonly expectedActionRuns: number;
 			readonly expectedSpentCharges: ReadonlyArray<EditorItemSimulationChargeCost>;
 			readonly expandedStates: number;
@@ -34,6 +39,7 @@ export type EditorItemSimulationPlanner =
 			readonly visitedStates: number;
 	  }
 	| {
+			readonly diagnostics: EditorItemSimulationSearchDiagnostics;
 			readonly method: "engine-backed-search";
 			readonly proofType: "no-finite-path" | "target-missing";
 			readonly type: "no-finite-path";
@@ -45,6 +51,7 @@ export type EditorItemSimulationPlanner =
 				| "maximumQueuedStates"
 				| "maximumTraceLength";
 			readonly expandedStates: number;
+			readonly diagnostics: EditorItemSimulationSearchDiagnostics;
 			readonly method: "engine-backed-search";
 			readonly reason:
 				| "action-unsupported"

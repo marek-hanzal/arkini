@@ -597,6 +597,18 @@ describe("createEditorMcpOwnershipFx", () => {
 		]);
 		expect(itemEstimate.content).toMatchObject([
 			{
+				text: expect.stringContaining(
+					[
+						"Route-plan search:",
+						"  Plans tried: 1",
+						"  Winning plan: 1",
+						"  - Plan 1: completed;",
+					].join("\n"),
+				),
+			},
+		]);
+		expect(itemEstimate.content).toMatchObject([
+			{
 				text: expect.stringContaining("\nSequential runtime: 1 s\nProduction blockers:"),
 			},
 		]);
@@ -674,6 +686,13 @@ describe("createEditorMcpOwnershipFx", () => {
 		expect(JSON.stringify(inconclusiveEstimate.content)).toContain(
 			"This is not proof that the item cannot be produced.",
 		);
+		expect(inconclusiveEstimate.content).toMatchObject([
+			{
+				text: expect.stringContaining(
+					"Route-plan search:\n  Plans tried: 1\n  Winning plan: none",
+				),
+			},
+		]);
 		expect(JSON.stringify(inconclusiveEstimate.content)).not.toContain(
 			"Estimate: No finite path",
 		);

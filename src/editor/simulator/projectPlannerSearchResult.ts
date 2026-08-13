@@ -215,6 +215,7 @@ export const projectPlannerSearchResult = ({
 				),
 				planner: {
 					assumptions: result.economics.assumptions,
+					diagnostics: result.diagnostics,
 					expectedActionRuns: result.economics.expectedActionRuns,
 					expectedSpentCharges: result.economics.expectedSpentCharges,
 					expandedStates: result.expandedStates,
@@ -246,6 +247,7 @@ export const projectPlannerSearchResult = ({
 				itemId: result.itemId,
 				operations: [],
 				planner: {
+					diagnostics: result.diagnostics,
 					method: "engine-backed-search",
 					proofType: result.proof.type,
 					type: "no-finite-path",
@@ -270,6 +272,7 @@ export const projectPlannerSearchResult = ({
 								budgetLimit: result.budgetLimit,
 							}),
 					expandedStates: result.expandedStates,
+					diagnostics: result.diagnostics,
 					method: "engine-backed-search",
 					reason: result.reason,
 					type: "inconclusive",

@@ -27,6 +27,89 @@ const formatProbability = (probability: number) => {
 	return `${percentage.toPrecision(2)}%`;
 };
 
+type EngineBackedPlanner = NonNullable<EditorItemSimulation["planner"]>;
+
+const formatPlannerActionId = (actionId: string) => {
+	try {
+		const parsed: unknown = JSON.parse(actionId);
+		if (Array.isArray(parsed)) {
+			const label = parsed.at(-1);
+			if (typeof label === "string") return label;
+		}
+	} catch {
+		// Human-authored or future action IDs remain useful as-is.
+	}
+	return actionId;
+};
+
+const formatRoutePlanOutcome = (
+	outcome: EngineBackedPlanner["diagnostics"]["routePlans"][number]["outcome"],
+) => {
+	switch (outcome) {
+		case "completed":
+			return "completed";
+		case "non-quiescent-runtime":
+			return "left a non-quiescent runtime";
+		case "search-budget":
+			return "hit its search budget";
+		case "search-exhausted":
+			return "exhausted its candidate frontier";
+	}
+};
+
+const formatRoutePlanDetour = (
+	detour: EngineBackedPlanner["diagnostics"]["routePlans"][number]["detours"][number],
+) => {
+	const alternative = `${detour.alternativeIndex + 1}/${detour.alternativeCount}`;
+	const depth = detour.depthExcess === 0 ? "same depth" : `+${detour.depthExcess} depth`;
+	switch (detour.type) {
+		case "acquisition-route":
+			return `acquire ${detour.itemId} via alternative ${alternative} (${depth})`;
+		case "renewal-route":
+			return `renew ${detour.itemId} via alternative ${alternative} (${depth})`;
+		case "requirement":
+			return `satisfy an any-of rule with ${detour.itemId}, alternative ${alternative} (${depth})`;
+	}
+};
+
+const readRoutePlanDetails = (planner: EngineBackedPlanner): ReadonlyArray<string> => {
+	const diagnostics = planner.diagnostics;
+	if (diagnostics.attemptedRoutePlans === 0)
+		return [
+			planner.type === "no-finite-path"
+				? "Route plans: none executed; the acquisition graph resolved the target first."
+				: planner.type === "completed"
+					? "Route plans: no engine pass was required because the target was already available."
+					: "Route plans: no engine pass was executed before the search stopped.",
+		];
+
+	const winner = diagnostics.winningRoutePlanIndex;
+	const details: string[] = [
+		`Route plans: ${formatQuantity(diagnostics.attemptedRoutePlans)} tried${winner === undefined ? "; no plan completed" : `; plan ${winner} completed`}.`,
+	];
+	const failedPlans = diagnostics.routePlans.filter(({ index }) => index !== winner);
+	for (const attempt of failedPlans.slice(0, 2)) {
+		const furthestAction = attempt.bestTraceActionIds.at(-1);
+		details.push(
+			`Plan ${attempt.index}: ${formatRoutePlanOutcome(attempt.outcome)} after ${formatQuantity(attempt.expandedStates)} expanded states; best target quantity ${formatQuantity(attempt.bestAvailableQuantity)}${furthestAction === undefined ? "" : `; trace reached ${formatPlannerActionId(furthestAction)}`}.`,
+		);
+	}
+	if (failedPlans.length > 2)
+		details.push(`${formatQuantity(failedPlans.length - 2)} additional failed plans omitted.`);
+
+	const winningPlan = diagnostics.routePlans.find(({ index }) => index === winner);
+	if (winningPlan !== undefined)
+		if (winningPlan.detours.length === 0)
+			details.push("Winning plan used the locally shortest authored route choices.");
+		else {
+			const rendered = winningPlan.detours.slice(0, 2).map(formatRoutePlanDetour);
+			details.push(
+				`Winning detour: ${rendered.join("; ")}${winningPlan.detours.length > 2 ? `; ${winningPlan.detours.length - 2} more` : ""}.`,
+			);
+		}
+	return details;
+};
+
 const EditorItemEstimateResultCard = ({
 	config,
 	estimate,
@@ -187,6 +270,7 @@ const EditorItemEstimateMethodCard = ({
 								`Expected charge spend: ${formatQuantity(planner.expectedSpentCharges.reduce((total, entry) => total + entry.charges, 0))}.`,
 							]),
 					`Search: ${formatQuantity(planner.expandedStates)} expanded, ${formatQuantity(planner.visitedStates)} visited states.`,
+					...readRoutePlanDetails(planner),
 				],
 				subtitle:
 					planner.outputCertainty === "deterministic"
@@ -200,6 +284,7 @@ const EditorItemEstimateMethodCard = ({
 					"The optimistic acquisition graph still has no reachable authored route. This is a structural impossibility proof, not a search timeout.",
 				details: [
 					`Proof: ${planner.proofType === "target-missing" ? "target is missing from config" : "no finite authored path"}.`,
+					...readRoutePlanDetails(planner),
 				],
 				subtitle: "Graph-certified result",
 				title: "No finite path",
@@ -216,6 +301,7 @@ const EditorItemEstimateMethodCard = ({
 						: [
 								`Budget limit: ${planner.budgetLimit}.`,
 							]),
+					...readRoutePlanDetails(planner),
 				],
 				subtitle: "Undecided, not impossible",
 				title: "Bounded engine search",

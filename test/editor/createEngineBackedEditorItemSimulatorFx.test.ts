@@ -107,6 +107,10 @@ describe("createEngineBackedEditorItemSimulatorFx", () => {
 			],
 			itemId: "result",
 			planner: {
+				diagnostics: {
+					attemptedRoutePlans: 1,
+					winningRoutePlanIndex: 1,
+				},
 				expectedActionRuns: 1,
 				observedActionRuns: 1,
 				observedRuntimeMs: 75,
@@ -175,6 +179,10 @@ describe("createEngineBackedEditorItemSimulatorFx", () => {
 		const estimate = simulate(createConfig(), "orphan");
 		expect(estimate).toMatchObject({
 			planner: {
+				diagnostics: {
+					attemptedRoutePlans: 0,
+					routePlans: [],
+				},
 				proofType: "no-finite-path",
 				type: "no-finite-path",
 			},
@@ -196,6 +204,9 @@ describe("createEngineBackedEditorItemSimulatorFx", () => {
 			planner: {
 				bestAvailableQuantity: 1,
 				budgetLimit: "maximumExpandedStates",
+				diagnostics: {
+					attemptedRoutePlans: 1,
+				},
 				reason: "search-budget",
 				type: "inconclusive",
 			},

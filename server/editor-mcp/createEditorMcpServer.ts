@@ -209,6 +209,150 @@ const formatEstimateProbability = (probability: number) => {
 	return `${percentage.toPrecision(2)}%`;
 };
 
+type EngineBackedEstimatePlanner = NonNullable<EditorItemSimulation["planner"]>;
+
+const formatPlannerActionId = (actionId: string) => {
+	try {
+		const parsed: unknown = JSON.parse(actionId);
+		if (Array.isArray(parsed)) {
+			const label = parsed.at(-1);
+			if (typeof label === "string") return label;
+		}
+	} catch {
+		// Future or human-authored action IDs remain useful without parsing.
+	}
+	return actionId;
+};
+
+const formatPlannerActionIds = (actionIds: ReadonlyArray<string>, limit = 8) => {
+	const visible = actionIds.slice(0, limit).map(formatPlannerActionId);
+	return `${visible.join(", ")}${actionIds.length > visible.length ? `, +${actionIds.length - visible.length} more` : ""}`;
+};
+
+const plannerRoutePlanOutcomeText = (
+	outcome: EngineBackedEstimatePlanner["diagnostics"]["routePlans"][number]["outcome"],
+) => {
+	switch (outcome) {
+		case "completed":
+			return "completed";
+		case "non-quiescent-runtime":
+			return "non-quiescent-runtime";
+		case "search-budget":
+			return "search-budget";
+		case "search-exhausted":
+			return "search-exhausted";
+	}
+};
+
+const plannerRoutePlanDetourText = (
+	detour: EngineBackedEstimatePlanner["diagnostics"]["routePlans"][number]["detours"][number],
+) => {
+	const alternative = `${detour.alternativeIndex + 1}/${detour.alternativeCount}`;
+	const depth = `depth excess ${detour.depthExcess}`;
+	switch (detour.type) {
+		case "acquisition-route":
+			return `acquisition ${detour.itemId}; alternative ${alternative}; ${depth}; route ${detour.routeId}`;
+		case "renewal-route":
+			return `renewal ${detour.itemId}; alternative ${alternative}; ${depth}; route ${detour.routeId}`;
+		case "requirement":
+			return `any-of requirement ${detour.itemId}; alternative ${alternative}; ${depth}; ${detour.usage} ${detour.source}; clause ${detour.clauseId}`;
+	}
+};
+
+const readVisibleRoutePlanAttempts = (
+	attempts: EngineBackedEstimatePlanner["diagnostics"]["routePlans"],
+	winner: number | undefined,
+) => {
+	if (attempts.length <= 8) return attempts;
+	const selected = new Map<number, (typeof attempts)[number]>();
+	for (const attempt of attempts.slice(0, 3)) selected.set(attempt.index, attempt);
+	for (const attempt of attempts.slice(-3)) selected.set(attempt.index, attempt);
+	if (winner !== undefined) {
+		const winningAttempt = attempts.find(({ index }) => index === winner);
+		if (winningAttempt !== undefined) selected.set(winningAttempt.index, winningAttempt);
+	}
+	return [
+		...selected.values(),
+	].sort((left, right) => left.index - right.index);
+};
+
+const plannerRoutePlanLines = (planner: EditorItemSimulation["planner"]): ReadonlyArray<string> => {
+	if (planner === undefined) return [];
+	const diagnostics = planner.diagnostics;
+	if (diagnostics.attemptedRoutePlans === 0)
+		return [
+			"Route-plan search:",
+			"  Plans tried: 0",
+			`  Resolution: ${
+				planner.type === "no-finite-path"
+					? "acquisition graph resolved the target before engine search"
+					: planner.type === "completed"
+						? "target already satisfied before engine search"
+						: "search stopped before an engine route-plan pass executed"
+			}`,
+		];
+
+	const visible = readVisibleRoutePlanAttempts(
+		diagnostics.routePlans,
+		diagnostics.winningRoutePlanIndex,
+	);
+	return [
+		"Route-plan search:",
+		`  Plans tried: ${diagnostics.attemptedRoutePlans}`,
+		`  Winning plan: ${diagnostics.winningRoutePlanIndex ?? "none"}`,
+		...visible.flatMap((attempt) => {
+			const furthestAction = attempt.bestTraceActionIds.at(-1);
+			const visibleDetours = attempt.detours.slice(0, 8);
+			return [
+				`  - Plan ${attempt.index}: ${plannerRoutePlanOutcomeText(attempt.outcome)}; ${attempt.expandedStates} expanded; ${attempt.visitedStates} visited; frontier ${attempt.frontierSize}; best target ${formatEstimateNumber(attempt.bestAvailableQuantity)}; ${attempt.actionCount} actions; ${attempt.routeCount} routes; depth discrepancy ${attempt.depthDiscrepancy}; route discrepancy ${attempt.routeDiscrepancy}; maximum detour ${attempt.maximumDetourDepth}`,
+				...(attempt.targetRouteId === undefined
+					? []
+					: [
+							`    Preferred target route: ${attempt.targetRouteId}`,
+						]),
+				...(furthestAction === undefined
+					? []
+					: [
+							`    Furthest trace action: ${formatPlannerActionId(furthestAction)}`,
+						]),
+				...(attempt.budgetLimit === undefined
+					? []
+					: [
+							`    Budget limit: ${attempt.budgetLimit}`,
+						]),
+				...(attempt.blockedActionIds.length === 0
+					? []
+					: [
+							`    Blocked actions: ${formatPlannerActionIds(attempt.blockedActionIds)}`,
+						]),
+				...(attempt.unsupportedActionIds.length === 0
+					? []
+					: [
+							`    Unsupported actions: ${formatPlannerActionIds(attempt.unsupportedActionIds)}`,
+						]),
+				...(attempt.detours.length === 0
+					? []
+					: [
+							"    Selected detours:",
+							...visibleDetours.map(
+								(detour) => `      - ${plannerRoutePlanDetourText(detour)}`,
+							),
+							...(visibleDetours.length === attempt.detours.length
+								? []
+								: [
+										`      - ${attempt.detours.length - visibleDetours.length} more detours omitted`,
+									]),
+						]),
+			];
+		}),
+		...(visible.length === diagnostics.routePlans.length
+			? []
+			: [
+					`  Omitted plans: ${diagnostics.routePlans.length - visible.length}`,
+				]),
+	];
+};
+
 const plannerReasonText = (
 	reason: Extract<
 		NonNullable<EditorItemSimulation["planner"]>,
@@ -259,6 +403,7 @@ const itemEstimateText = (project: EditorProject, estimate: EditorItemSimulation
 						`Best available target quantity: ${formatEstimateNumber(diagnostic.bestAvailableQuantity)}`,
 						`Search: ${diagnostic.expandedStates} expanded states; ${diagnostic.visitedStates} visited states${diagnostic.budgetLimit === undefined ? "" : `; budget limit ${diagnostic.budgetLimit}`}`,
 					]),
+			...plannerRoutePlanLines(planner),
 			"This is not proof that the item cannot be produced.",
 			"Warnings:",
 			...(estimate.warnings.length === 0
@@ -287,6 +432,7 @@ const itemEstimateText = (project: EditorProject, estimate: EditorItemSimulation
 						: []),
 					`Search: ${completedPlanner.expandedStates} expanded states; ${completedPlanner.visitedStates} visited states`,
 				]),
+		...plannerRoutePlanLines(planner),
 		...(estimate.runtimeMs === undefined
 			? []
 			: [

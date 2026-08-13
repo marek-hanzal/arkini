@@ -189,6 +189,138 @@ describe("EditorItemEstimateSection", () => {
 		);
 		expect(method?.textContent).toContain("Concrete witness: 1 actions, 1 s.");
 		expect(method?.textContent).toContain("Expected replay: 1 actions, 1 s.");
+		expect(method?.textContent).toContain("Route plans: 1 tried; plan 1 completed.");
+		expect(method?.textContent).toContain(
+			"Winning plan used the locally shortest authored route choices.",
+		);
+	});
+
+	it("explains failed shorter plans and the winning authored detour", async () => {
+		const config = createJobTestConfig();
+		const project: EditorProject = {
+			projectId: "estimate-test",
+			title: "Estimate test",
+			game: "1.0",
+			createdAtMs: 1,
+			updatedAtMs: 1,
+			revision: 0,
+			config,
+			resources: [],
+		};
+		state.estimateState = {
+			estimate: {
+				blockers: [],
+				cost: [],
+				infrastructureItemIds: new Set(),
+				itemId: "tool",
+				operations: [],
+				planner: {
+					assumptions: [],
+					diagnostics: {
+						attemptedRoutePlans: 2,
+						routePlans: [
+							{
+								actionCount: 1,
+								bestAvailableQuantity: 0,
+								bestTraceActionIds: [
+									'["line","short-producer","line:short-part"]',
+								],
+								blockedActionIds: [
+									'["line","short-target-producer","line:short-target"]',
+								],
+								depthDiscrepancy: 0,
+								detours: [],
+								expandedStates: 2,
+								frontierSize: 0,
+								index: 1,
+								maximumDetourDepth: 0,
+								outcome: "search-exhausted",
+								routeCount: 1,
+								routeDiscrepancy: 0,
+								targetRouteId: "route:short-target",
+								unsupportedActionIds: [],
+								visitedStates: 2,
+							},
+							{
+								actionCount: 3,
+								bestAvailableQuantity: 1,
+								bestTraceActionIds: [
+									'["line","detour-target-producer","line:detour-target"]',
+								],
+								blockedActionIds: [],
+								depthDiscrepancy: 1,
+								detours: [
+									{
+										alternativeCount: 2,
+										alternativeIndex: 1,
+										depthExcess: 1,
+										itemId: "tool",
+										key: '["acquisition-route","tool"]',
+										minimumDepth: 1,
+										routeId: "route:detour-target",
+										selectedDepth: 2,
+										type: "acquisition-route",
+									},
+								],
+								expandedStates: 3,
+								frontierSize: 0,
+								index: 2,
+								maximumDetourDepth: 1,
+								outcome: "completed",
+								routeCount: 3,
+								routeDiscrepancy: 1,
+								targetRouteId: "route:detour-target",
+								unsupportedActionIds: [],
+								visitedStates: 3,
+							},
+						],
+						winningRoutePlanIndex: 2,
+					},
+					expectedActionRuns: 3,
+					expectedSpentCharges: [],
+					expandedStates: 5,
+					method: "engine-backed-search",
+					observedActionRuns: 3,
+					observedRuntimeMs: 300,
+					outputCertainty: "deterministic",
+					selectedWitnessProbability: 1,
+					type: "completed",
+					visitedStates: 5,
+				},
+				quantity: 1,
+				runtimeMs: 300,
+				status: "estimated",
+				totalCostQuantity: 0,
+				warnings: [],
+			},
+			status: "ready",
+		};
+		const container = document.createElement("div");
+		document.body.append(container);
+		const root = createRoot(container);
+		roots.push(root);
+		await act(async () => {
+			root.render(
+				createElement(
+					EditorProjectContext.Provider,
+					{
+						value: project,
+					},
+					createElement(EditorItemEstimateSection, {
+						itemId: "tool",
+					}),
+				),
+			);
+		});
+
+		const method = container.querySelector('[data-ui="EditorItemEstimateMethod"]');
+		expect(method?.textContent).toContain("Route plans: 2 tried; plan 2 completed.");
+		expect(method?.textContent).toContain(
+			"Plan 1: exhausted its candidate frontier after 2 expanded states; best target quantity 0; trace reached line:short-part.",
+		);
+		expect(method?.textContent).toContain(
+			"Winning detour: acquire tool via alternative 2/2 (+1 depth).",
+		);
 	});
 
 	it("shows actionable blockers when no finite production path exists", async () => {
@@ -264,6 +396,29 @@ describe("EditorItemEstimateSection", () => {
 				planner: {
 					bestAvailableQuantity: 0,
 					budgetLimit: "maximumExpandedStates",
+					diagnostics: {
+						attemptedRoutePlans: 1,
+						routePlans: [
+							{
+								actionCount: 1,
+								bestAvailableQuantity: 0,
+								bestTraceActionIds: [],
+								blockedActionIds: [],
+								budgetLimit: "maximumExpandedStates",
+								depthDiscrepancy: 0,
+								detours: [],
+								expandedStates: 1_000,
+								frontierSize: 84,
+								index: 1,
+								maximumDetourDepth: 0,
+								outcome: "search-budget",
+								routeCount: 1,
+								routeDiscrepancy: 0,
+								unsupportedActionIds: [],
+								visitedStates: 1_084,
+							},
+						],
+					},
 					expandedStates: 1_000,
 					method: "engine-backed-search",
 					reason: "search-budget",
@@ -307,6 +462,10 @@ describe("EditorItemEstimateSection", () => {
 		expect(method?.textContent).toContain("Bounded engine search");
 		expect(method?.textContent).toContain("Undecided, not impossible");
 		expect(method?.textContent).toContain("Budget limit: maximumExpandedStates.");
+		expect(method?.textContent).toContain("Route plans: 1 tried; no plan completed.");
+		expect(method?.textContent).toContain(
+			"Plan 1: hit its search budget after 1000 expanded states; best target quantity 0.",
+		);
 	});
 
 	it("shows progress while the estimate worker is running", async () => {

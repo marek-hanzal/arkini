@@ -1119,6 +1119,10 @@ describe("createEnginePlannerFx", () => {
 			type: "no-finite-path",
 		});
 		expect(missing).toEqual({
+			diagnostics: {
+				attemptedRoutePlans: 0,
+				routePlans: [],
+			},
 			itemId: "missing-item",
 			proof: {
 				itemId: "missing-item",

@@ -12,8 +12,8 @@ import type {
 	PlannerStrategy,
 	PlannerStrategyResult,
 } from "~/editor/planner/PlannerStrategy";
-import type { PlannerCurrentStrategyFx } from "~/editor/planner/PlannerCurrentStrategyFx";
 import type { PlannerKernelFx } from "~/editor/planner/PlannerKernelFx";
+import type { PlannerStrategyEnvironment } from "~/editor/planner/PlannerStrategyEnvironment";
 
 export type PlannerStrategyInvocationOutcome =
 	| "completed"
@@ -44,11 +44,7 @@ export interface PlannerSessionDiagnostics {
 export interface PlannerSessionRunStrategyProps<StrategyId extends string, Diagnostics> {
 	readonly problem: PlannerProblem;
 	readonly reason: string;
-	readonly strategy: PlannerStrategy<
-		StrategyId,
-		Diagnostics,
-		PlannerCurrentStrategyFx | PlannerKernelFx | PlannerSessionFx
-	>;
+	readonly strategy: PlannerStrategy<StrategyId, Diagnostics, PlannerStrategyEnvironment>;
 }
 
 export interface PlannerSessionFxService {

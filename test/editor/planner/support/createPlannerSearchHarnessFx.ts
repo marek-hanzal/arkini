@@ -1,8 +1,11 @@
 import { Effect } from "effect";
 
+import { PlannerBudgetFx } from "~/editor/planner/PlannerBudgetFx";
 import type { PlannerGoalSearchBudget } from "~/editor/planner/PlannerGoalSearch";
 import type { PlannerSearchBudget } from "~/editor/planner/PlannerSearch";
 import { createPlannerAcquisitionGraph } from "~/editor/planner/createPlannerAcquisitionGraph";
+import { createPlannerBudgetFx } from "~/editor/planner/createPlannerBudgetFx";
+//PLACEHOLDER from "~/editor/planner/createPlannerAcquisitionGraph";
 import { createPlannerInitialRuntimeFx } from "~/editor/planner/createPlannerInitialRuntimeFx";
 import { searchPlannerGoalFx } from "~/editor/planner/searchPlannerGoalFx";
 import { searchPlannerRuntimeFx } from "~/editor/planner/searchPlannerRuntimeFx";
@@ -16,19 +19,29 @@ export const createPlannerSearchHarnessFx = Effect.fn("createPlannerSearchHarnes
 		Effect.gen(function* () {
 			const graph = createPlannerAcquisitionGraph(config);
 			const initialRuntime = yield* createPlannerInitialRuntimeFx(config);
+			const provideHarnessServices = <A, E, R>(effect: Effect.Effect<A, E, R>) =>
+				Effect.gen(function* () {
+					const plannerBudget = yield* createPlannerBudgetFx();
+					return yield* effect.pipe(
+						Effect.provideService(GameConfigFx, config),
+						Effect.provideService(PlannerBudgetFx, plannerBudget),
+					);
+				});
 			return {
 				runConstructiveFx: (
 					itemId: IdSchema.Type,
 					quantity = 1,
 					budget?: Partial<PlannerGoalSearchBudget>,
 				) =>
-					searchPlannerGoalFx({
-						budget,
-						graph,
-						itemId,
-						quantity,
-						runtime: initialRuntime,
-					}).pipe(Effect.provideService(GameConfigFx, config)),
+					provideHarnessServices(
+						searchPlannerGoalFx({
+							budget,
+							graph,
+							itemId,
+							quantity,
+							runtime: initialRuntime,
+						}),
+					),
 				graph,
 				initialRuntime,
 				runBestFirstFx: (
@@ -36,13 +49,15 @@ export const createPlannerSearchHarnessFx = Effect.fn("createPlannerSearchHarnes
 					quantity = 1,
 					budget?: Partial<PlannerSearchBudget>,
 				) =>
-					searchPlannerRuntimeFx({
-						budget,
-						graph,
-						itemId,
-						quantity,
-						runtime: initialRuntime,
-					}).pipe(Effect.provideService(GameConfigFx, config)),
+					provideHarnessServices(
+						searchPlannerRuntimeFx({
+							budget,
+							graph,
+							itemId,
+							quantity,
+							runtime: initialRuntime,
+						}),
+					),
 			};
 		}),
 );

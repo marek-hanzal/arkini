@@ -1,4 +1,4 @@
-import { Effect, Option } from "effect";
+import { Effect } from "effect";
 
 import { PlannerBudgetCounter } from "~/editor/planner/PlannerBudget";
 import { PlannerBudgetFx } from "~/editor/planner/PlannerBudgetFx";
@@ -50,9 +50,8 @@ export const runPlannerSearchCandidateFx = Effect.fn("runPlannerSearchCandidateF
 	readonly candidate: PlannerSearchAction;
 	readonly state: PlannerSearchExecutionState;
 }) {
-	const budget = yield* Effect.serviceOption(PlannerBudgetFx);
-	if (Option.isSome(budget))
-		yield* budget.value.consumeFx(PlannerBudgetCounter.engineTransitions);
+	const budget = yield* PlannerBudgetFx;
+	yield* budget.consumeFx(PlannerBudgetCounter.engineTransitions);
 	const result = yield* runPlannerActionFx({
 		action: candidate.action,
 		outputWitness: candidate.outputWitness,

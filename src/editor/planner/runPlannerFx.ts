@@ -62,11 +62,7 @@ export const runPlannerFx = Effect.fn("runPlannerFx")(function* <
 			reason: "root-estimate",
 			strategy,
 		})
-		.pipe(
-			Effect.provideService(PlannerBudgetFx, budget),
-			Effect.provideService(PlannerSessionFx, session),
-			Effect.result,
-		);
+		.pipe(Effect.provideService(PlannerSessionFx, session), Effect.result);
 	const sessionDiagnostics = yield* session.readDiagnosticsFx;
 
 	if (Result.isFailure(outcome))

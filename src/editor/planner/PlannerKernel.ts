@@ -1,6 +1,7 @@
 import type { Effect } from "effect";
 
 import type { PlannerBudgetExceeded } from "~/editor/planner/PlannerBudget";
+import type { PlannerBudgetFx } from "~/editor/planner/PlannerBudgetFx";
 import type { PlannerAcquisitionGraph } from "~/editor/planner/PlannerAcquisitionGraph";
 import type { PlannerExpectedEconomics } from "~/editor/planner/PlannerExpectedEconomics";
 import type { PlannerGoalViability, PlannerItemGoal } from "~/editor/planner/PlannerGoalViability";
@@ -45,5 +46,5 @@ export interface PlannerKernel {
 	readonly readStructuralReachability: (itemId: IdSchema.Type) => PlannerStructuralReachability;
 	readonly runCandidateFx: (
 		request: PlannerKernelCandidateRequest,
-	) => Effect.Effect<PlannerSearchCandidateResult, PlannerBudgetExceeded>;
+	) => Effect.Effect<PlannerSearchCandidateResult, PlannerBudgetExceeded, PlannerBudgetFx>;
 }

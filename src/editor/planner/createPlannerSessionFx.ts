@@ -115,6 +115,7 @@ export const createPlannerSessionFx = Effect.fn("createPlannerSessionFx")(functi
 			reason,
 		};
 		return yield* strategy.solveFx(problem).pipe(
+			Effect.provideService(PlannerBudgetFx, budget),
 			Effect.provideService(PlannerCurrentStrategyFx, currentStrategy),
 			Effect.tap((result) =>
 				Ref.update(stateRef, (state) =>

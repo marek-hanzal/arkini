@@ -7,13 +7,11 @@ import {
 	type PlannerSearchOutputCertainty,
 	type PlannerSearchResult,
 	type PlannerSearchRoutePlanDiagnostic,
-	type PlannerSearchTraceEntry,
 } from "~/editor/planner/PlannerSearch";
 import type { PlannerSearchScope } from "~/editor/planner/PlannerSearchScope";
 import { createPlannerRuntimeDominanceIndex } from "~/editor/planner/createPlannerRuntimeDominanceIndex";
 import { isPlannerRuntimeQuiescent } from "~/editor/planner/isPlannerRuntimeQuiescent";
-import { readPlannerActionChargeFlowFx } from "~/editor/planner/readPlannerActionChargeFlowFx";
-import { readPlannerActionItemFlowFx } from "~/editor/planner/readPlannerActionItemFlowFx";
+import type { PlannerSearchExecutionState } from "~/editor/planner/PlannerSearchExecution";
 import { readPlannerExpectedEconomicsFx } from "~/editor/planner/readPlannerExpectedEconomicsFx";
 import { readPlannerRuntimeQuantity } from "~/editor/planner/readPlannerRuntimeQuantity";
 import { readPlannerSearchBudget } from "~/editor/planner/readPlannerSearchBudget";
@@ -31,7 +29,7 @@ import {
 	readPlannerSearchScope,
 } from "~/editor/planner/readPlannerSearchScope";
 import { readPlannerStructuralReachability } from "~/editor/planner/readPlannerStructuralReachability";
-import { runPlannerActionFx } from "~/editor/planner/runPlannerActionFx";
+import { runPlannerSearchCandidateFx } from "~/editor/planner/runPlannerSearchCandidateFx";
 import type { PlannerAcquisitionGraph } from "~/editor/planner/PlannerAcquisitionGraph";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
@@ -46,17 +44,12 @@ export namespace searchPlannerRuntimeFx {
 	}
 }
 
-interface SearchNode {
+interface SearchNode extends PlannerSearchExecutionState {
 	readonly activeDemand: ReadonlyMap<IdSchema.Type, PlannerActiveItemDemand>;
-	readonly elapsedMs: number;
 	readonly fingerprint: string;
 	readonly order: number;
-	readonly outputCertainty: PlannerSearchOutputCertainty;
 	readonly priority: PlannerSearchPriority;
-	readonly runtime: RuntimeSchema.Type;
-	readonly selectedWitnessProbability: number;
 	readonly stateToken: number;
-	readonly trace: ReadonlyArray<PlannerSearchTraceEntry>;
 }
 
 const compareIds = (left: string, right: string) => left.localeCompare(right);
@@ -98,12 +91,6 @@ const compareSearchNodes = (left: SearchNode, right: SearchNode) =>
 	left.elapsedMs - right.elapsedMs ||
 	right.selectedWitnessProbability - left.selectedWitnessProbability ||
 	left.order - right.order;
-
-const readNextOutputCertainty = (
-	current: PlannerSearchOutputCertainty,
-	outputWitnessResolved: boolean,
-): PlannerSearchOutputCertainty =>
-	current === "possible" || outputWitnessResolved ? "possible" : "deterministic";
 
 const readInitialSearchNode = ({
 	fingerprint = "initial-runtime",
@@ -423,67 +410,24 @@ const searchPlannerScopeFx = Effect.fn("searchPlannerScopeFx")(function* ({
 		for (const group of candidateGroups) {
 			let groupAdvanced = false;
 			for (const candidate of group.actions) {
-				const result = yield* runPlannerActionFx({
-					action: candidate.action,
-					outputWitness: candidate.outputWitness,
-					runtime: node.runtime,
+				const transition = yield* runPlannerSearchCandidateFx({
+					candidate,
+					state: node,
 				});
-				if (result.type === "blocked") {
+				if (transition.type === "blocked") {
 					blockedActionIds.add(candidate.id);
 					continue;
 				}
-				if (result.type === "unsupported") {
+				if (transition.type === "unsupported") {
 					unsupportedActionIds.add(candidate.id);
 					continue;
 				}
 				groupAdvanced = true;
 
-				const outputWitnessResolved =
-					candidate.outputMode === "existential" && result.outputWitnessResolved;
-				const nextSelectedWitnessProbability =
-					node.selectedWitnessProbability *
-					(outputWitnessResolved
-						? candidate.outputWitness.statistics.maximumQuantityProbability
-						: 1);
-				const itemFlow = yield* readPlannerActionItemFlowFx({
-					after: result.runtime,
-					before: node.runtime,
-				});
-				const spentChargeQuantities = yield* readPlannerActionChargeFlowFx({
-					before: node.runtime,
-					events: result.events,
-				});
-				const nextTrace: ReadonlyArray<PlannerSearchTraceEntry> = [
-					...node.trace,
-					{
-						action: candidate.action,
-						actionId: candidate.actionId,
-						actor: result.actor,
-						consumedItemQuantities: itemFlow.consumedItemQuantities,
-						elapsedMs: result.elapsedMs,
-						events: result.events,
-						outputResolution: outputWitnessResolved
-							? {
-									outputItemId: candidate.outputWitness.outputItemId,
-									routeId: candidate.outputWitness.routeId,
-									statistics: candidate.outputWitness.statistics,
-									type: "existential" as const,
-									witnessId: candidate.outputWitness.witnessId,
-								}
-							: {
-									type: "canonical" as const,
-								},
-						outputItemIds: candidate.outputItemIds,
-						producedItemQuantities: itemFlow.producedItemQuantities,
-						routeIds: candidate.routeIds,
-						spentChargeQuantities,
-					},
-				];
-				const nextElapsedMs = node.elapsedMs + result.elapsedMs;
-				const nextOutputCertainty = readNextOutputCertainty(
-					node.outputCertainty,
-					outputWitnessResolved,
-				);
+				const nextTrace = transition.state.trace;
+				const nextElapsedMs = transition.state.elapsedMs;
+				const nextOutputCertainty = transition.state.outputCertainty;
+				const nextSelectedWitnessProbability = transition.state.selectedWitnessProbability;
 				const registration = dominanceIndex.register({
 					label: {
 						elapsedMs: nextElapsedMs,
@@ -491,14 +435,14 @@ const searchPlannerScopeFx = Effect.fn("searchPlannerScopeFx")(function* ({
 						selectedWitnessProbability: nextSelectedWitnessProbability,
 						traceLength: nextTrace.length,
 					},
-					runtime: result.runtime,
+					runtime: transition.state.runtime,
 				});
 				if (!registration.accepted) continue;
 				const nextActiveDemand = readPlannerActiveDemand({
 					itemId,
 					plan: priorityPlan,
 					quantity,
-					runtime: result.runtime,
+					runtime: transition.state.runtime,
 				});
 				const next: SearchNode = {
 					activeDemand: nextActiveDemand,
@@ -511,10 +455,10 @@ const searchPlannerScopeFx = Effect.fn("searchPlannerScopeFx")(function* ({
 						itemId,
 						plan: priorityPlan,
 						quantity,
-						runtime: result.runtime,
+						runtime: transition.state.runtime,
 						scope,
 					}),
-					runtime: result.runtime,
+					runtime: transition.state.runtime,
 					selectedWitnessProbability: nextSelectedWitnessProbability,
 					stateToken: registration.token,
 					trace: nextTrace,

@@ -4,7 +4,7 @@ import { PlannerBudgetCounter } from "~/editor/planner/PlannerBudget";
 import { PlannerBudgetFx } from "~/editor/planner/PlannerBudgetFx";
 import { PlannerCurrentStrategyFx } from "~/editor/planner/PlannerCurrentStrategyFx";
 import { createPlannerSubproblem } from "~/editor/planner/PlannerProblem";
-import type { AnyPlannerStrategy } from "~/editor/planner/PlannerStrategy";
+import type { AnyPlannerStrategy } from "~/editor/planner/PlannerStrategyEnvironment";
 import type {
 	PlannerSessionDiagnostics,
 	PlannerSessionFxService,

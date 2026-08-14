@@ -9,6 +9,7 @@ import type {
 	PlannerStrategy,
 	PlannerStrategyResult,
 } from "~/editor/planner/PlannerStrategy";
+import type { PlannerStrategyEnvironment } from "~/editor/planner/PlannerStrategyEnvironment";
 import { PlannerStrategyId } from "~/editor/planner/PlannerStrategy";
 import { createAdaptivePlannerStrategy } from "~/editor/planner/createAdaptivePlannerStrategy";
 import { createBestFirstPlannerStrategy } from "~/editor/planner/createBestFirstPlannerStrategy";
@@ -167,7 +168,11 @@ interface DelegatingDiagnostics {
 	readonly delegatedStrategyId: string;
 }
 
-const createDelegatingStrategy = (): PlannerStrategy<"delegating", DelegatingDiagnostics> => ({
+const createDelegatingStrategy = (): PlannerStrategy<
+	"delegating",
+	DelegatingDiagnostics,
+	PlannerStrategyEnvironment
+> => ({
 	id: "delegating",
 	solveFx: Effect.fn("DelegatingStrategy.solveFx")((problem) =>
 		Effect.gen(function* () {

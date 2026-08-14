@@ -1,12 +1,11 @@
 import type { Effect } from "effect";
 
 import type { PlannerProblem } from "~/editor/planner/PlannerProblem";
+import type { PlannerStrategy, PlannerStrategyResult } from "~/editor/planner/PlannerStrategy";
 import type {
 	AnyPlannerStrategy,
-	PlannerStrategy,
 	PlannerStrategyEnvironment,
-	PlannerStrategyResult,
-} from "~/editor/planner/PlannerStrategy";
+} from "~/editor/planner/PlannerStrategyEnvironment";
 
 export interface AdaptivePlannerStrategySelection {
 	readonly reason: string;
@@ -31,7 +30,11 @@ export type AdaptivePlannerStrategySelector = (
 ) => Effect.Effect<AdaptivePlannerStrategySelection, never, PlannerStrategyEnvironment>;
 
 export interface AdaptivePlannerStrategy
-	extends PlannerStrategy<"adaptive", AdaptivePlannerStrategyDiagnostics> {
+	extends PlannerStrategy<
+		"adaptive",
+		AdaptivePlannerStrategyDiagnostics,
+		PlannerStrategyEnvironment
+	> {
 	readonly childStrategyIds: ReadonlyArray<string>;
 }
 

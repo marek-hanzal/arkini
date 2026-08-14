@@ -12,6 +12,7 @@ import type {
 	PlannerStrategy,
 	PlannerStrategyResult,
 } from "~/editor/planner/PlannerStrategy";
+import type { PlannerCurrentStrategyFx } from "~/editor/planner/PlannerCurrentStrategyFx";
 import type { PlannerKernelFx } from "~/editor/planner/PlannerKernelFx";
 
 export type PlannerStrategyInvocationOutcome =
@@ -43,7 +44,11 @@ export interface PlannerSessionDiagnostics {
 export interface PlannerSessionRunStrategyProps<StrategyId extends string, Diagnostics> {
 	readonly problem: PlannerProblem;
 	readonly reason: string;
-	readonly strategy: PlannerStrategy<StrategyId, Diagnostics>;
+	readonly strategy: PlannerStrategy<
+		StrategyId,
+		Diagnostics,
+		PlannerCurrentStrategyFx | PlannerKernelFx | PlannerSessionFx
+	>;
 }
 
 export interface PlannerSessionFxService {

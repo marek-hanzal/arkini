@@ -8,6 +8,7 @@ import { createRootPlannerProblem } from "~/editor/planner/PlannerProblem";
 import type { PlannerResult } from "~/editor/planner/PlannerResult";
 import { PlannerSessionFx } from "~/editor/planner/PlannerSessionFx";
 import type { PlannerStrategy, PlannerStrategyMetrics } from "~/editor/planner/PlannerStrategy";
+import type { PlannerStrategyEnvironment } from "~/editor/planner/PlannerStrategyEnvironment";
 import { createPlannerBudgetFx } from "~/editor/planner/createPlannerBudgetFx";
 import { createPlannerSessionFx } from "~/editor/planner/createPlannerSessionFx";
 import { readPlannerRuntimeQuantity } from "~/editor/planner/readPlannerRuntimeQuantity";
@@ -16,7 +17,7 @@ export namespace runPlannerFx {
 	export interface Props<StrategyId extends string, Diagnostics> {
 		readonly budget?: Partial<PlannerBudgetLimits>;
 		readonly request: PlannerEstimateRequest;
-		readonly strategy: PlannerStrategy<StrategyId, Diagnostics>;
+		readonly strategy: PlannerStrategy<StrategyId, Diagnostics, PlannerStrategyEnvironment>;
 	}
 }
 

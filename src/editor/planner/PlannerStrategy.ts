@@ -1,11 +1,8 @@
 import type { Effect } from "effect";
 
 import type { PlannerBudgetExceeded } from "~/editor/planner/PlannerBudget";
-import type { PlannerCurrentStrategyFx } from "~/editor/planner/PlannerCurrentStrategyFx";
-import type { PlannerKernelFx } from "~/editor/planner/PlannerKernelFx";
 import type { PlannerProblem } from "~/editor/planner/PlannerProblem";
 import type { PlannerSearchExecutionState } from "~/editor/planner/PlannerSearchExecution";
-import type { PlannerSessionFx } from "~/editor/planner/PlannerSessionFx";
 import type { PlannerStructuralReachability } from "~/editor/planner/PlannerStructuralReachability";
 
 export const PlannerStrategyId = {
@@ -66,22 +63,16 @@ export type PlannerStrategyResult<StrategyId extends string, Diagnostics> =
 			readonly unsupportedActionIds: ReadonlyArray<string>;
 	  };
 
-export type PlannerStrategyEnvironment =
-	| PlannerCurrentStrategyFx
-	| PlannerKernelFx
-	| PlannerSessionFx;
-
 /** One planning algorithm. It chooses what to try; the engine remains the transition authority. */
-export interface PlannerStrategy<StrategyId extends string, Diagnostics> {
+export interface PlannerStrategy<StrategyId extends string, Diagnostics, Environment> {
 	readonly id: StrategyId;
 	readonly solveFx: (
 		problem: PlannerProblem,
 	) => Effect.Effect<
 		PlannerStrategyResult<StrategyId, Diagnostics>,
 		PlannerBudgetExceeded,
-		PlannerStrategyEnvironment
+		Environment
 	>;
 }
 
-export type AnyPlannerStrategy = PlannerStrategy<string, unknown>;
 export type AnyPlannerStrategyResult = PlannerStrategyResult<string, unknown>;

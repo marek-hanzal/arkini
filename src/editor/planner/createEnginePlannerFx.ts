@@ -1,8 +1,11 @@
 import { Effect } from "effect";
 
-import type { PlannerSearch, PlannerSearchBudget } from "~/editor/planner/PlannerSearch";
+import type { EnginePlanner } from "~/editor/planner/EnginePlanner";
+import type { PlannerGoalSearchBudget } from "~/editor/planner/PlannerGoalSearch";
+import type { PlannerSearchBudget } from "~/editor/planner/PlannerSearch";
 import { createPlannerAcquisitionGraph } from "~/editor/planner/createPlannerAcquisitionGraph";
 import { createPlannerInitialRuntimeFx } from "~/editor/planner/createPlannerInitialRuntimeFx";
+import { searchPlannerGoalFx } from "~/editor/planner/searchPlannerGoalFx";
 import { searchPlannerRuntimeFx } from "~/editor/planner/searchPlannerRuntimeFx";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 import { GameConfigFx } from "~/engine/game/context/GameConfigFx";
@@ -15,6 +18,20 @@ export const createEnginePlannerFx = Effect.fn("createEnginePlannerFx")(
 			const graph = createPlannerAcquisitionGraph(config);
 			const initialRuntime = yield* createPlannerInitialRuntimeFx(config);
 			return {
+				constructiveSearchFx: Effect.fn("EnginePlanner.constructiveSearchFx")(
+					(
+						itemId: IdSchema.Type,
+						quantity?: number,
+						budget?: Partial<PlannerGoalSearchBudget>,
+					) =>
+						searchPlannerGoalFx({
+							budget,
+							graph,
+							itemId,
+							quantity: quantity ?? 1,
+							runtime: initialRuntime,
+						}).pipe(Effect.provideService(GameConfigFx, config)),
+				),
 				graph,
 				initialRuntime,
 				searchFx: Effect.fn("EnginePlanner.searchFx")(
@@ -31,6 +48,6 @@ export const createEnginePlannerFx = Effect.fn("createEnginePlannerFx")(
 							runtime: initialRuntime,
 						}).pipe(Effect.provideService(GameConfigFx, config)),
 				),
-			} satisfies PlannerSearch;
+			} satisfies EnginePlanner;
 		}),
 );

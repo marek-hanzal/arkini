@@ -3,7 +3,6 @@ import { describe, expect, it } from "vitest";
 
 import type { AdaptivePlannerStrategyDiagnostics } from "~/editor/planner/AdaptivePlannerStrategy";
 import { PlannerCurrentStrategyFx } from "~/editor/planner/PlannerCurrentStrategyFx";
-import { PlannerKernelFx } from "~/editor/planner/PlannerKernelFx";
 import { PlannerSessionFx } from "~/editor/planner/PlannerSessionFx";
 import type {
 	AnyPlannerStrategyResult,
@@ -201,7 +200,7 @@ const createDelegatingStrategy = (): PlannerStrategy<
 describe("createAdaptivePlannerStrategy", () => {
 	it("dynamically reselects a child strategy for a delegated subgoal", async () => {
 		const adaptive = createAdaptivePlannerStrategy({
-			selectFx: (problem) =>
+			selectFx: ({ problem }) =>
 				Effect.succeed(
 					problem.delegationDepth === 0
 						? {
@@ -279,20 +278,13 @@ describe("createAdaptivePlannerStrategy", () => {
 
 	it("selects a child from the current immutable world and active goal", async () => {
 		const adaptive = createAdaptivePlannerStrategy({
-			selectFx: (problem) =>
-				Effect.gen(function* () {
-					const kernel = yield* PlannerKernelFx;
-					const viability = kernel.readGoalViability({
-						goal: problem.activeGoal,
-						runtime: problem.runtime,
-					});
-					return {
-						reason: `goal-${viability.type}`,
-						strategyId:
-							viability.type === "dead-end"
-								? PlannerStrategyId.constructive
-								: PlannerStrategyId.bestFirst,
-					};
+			selectFx: ({ goalViability }) =>
+				Effect.succeed({
+					reason: `goal-${goalViability.type}`,
+					strategyId:
+						goalViability.type === "dead-end"
+							? PlannerStrategyId.constructive
+							: PlannerStrategyId.bestFirst,
 				}),
 			strategies: [
 				createBestFirstPlannerStrategy(),
@@ -322,7 +314,7 @@ describe("createAdaptivePlannerStrategy", () => {
 
 	it("returns inconclusive when the shared session invocation budget is exhausted", async () => {
 		const adaptive = createAdaptivePlannerStrategy({
-			selectFx: (problem) =>
+			selectFx: ({ problem }) =>
 				Effect.succeed({
 					reason: "budget-test",
 					strategyId:

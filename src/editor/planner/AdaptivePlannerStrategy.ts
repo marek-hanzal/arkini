@@ -1,5 +1,9 @@
 import type { Effect } from "effect";
 
+import type { PlannerAcquisitionGraph } from "~/editor/planner/PlannerAcquisitionGraph";
+import type { PlannerBudgetLimits, PlannerBudgetSnapshot } from "~/editor/planner/PlannerBudget";
+import type { PlannerCurrentStrategyFxService } from "~/editor/planner/PlannerCurrentStrategyFx";
+import type { PlannerGoalViability } from "~/editor/planner/PlannerGoalViability";
 import type { PlannerProblem } from "~/editor/planner/PlannerProblem";
 import type { PlannerStrategy, PlannerStrategyResult } from "~/editor/planner/PlannerStrategy";
 import type {
@@ -7,9 +11,9 @@ import type {
 	PlannerStrategyEnvironment,
 } from "~/editor/planner/PlannerStrategyEnvironment";
 
-export interface AdaptivePlannerStrategySelection {
+export interface AdaptivePlannerStrategySelection<StrategyId extends string = string> {
 	readonly reason: string;
-	readonly strategyId: string;
+	readonly strategyId: StrategyId;
 }
 
 export interface AdaptivePlannerStrategyDiagnostics {
@@ -25,9 +29,21 @@ export type AdaptivePlannerStrategyResult = PlannerStrategyResult<
 	AdaptivePlannerStrategyDiagnostics
 >;
 
-export type AdaptivePlannerStrategySelector = (
-	problem: PlannerProblem,
-) => Effect.Effect<AdaptivePlannerStrategySelection, never, PlannerStrategyEnvironment>;
+/** Stable facts available when a composite strategy chooses one child algorithm. */
+export interface AdaptivePlannerStrategySituation {
+	readonly budget: {
+		readonly limits: PlannerBudgetLimits;
+		readonly snapshot: PlannerBudgetSnapshot;
+	};
+	readonly currentStrategy: PlannerCurrentStrategyFxService;
+	readonly goalViability: PlannerGoalViability;
+	readonly graph: PlannerAcquisitionGraph;
+	readonly problem: PlannerProblem;
+}
+
+export type AdaptivePlannerStrategySelector<StrategyId extends string = string> = (
+	situation: AdaptivePlannerStrategySituation,
+) => Effect.Effect<AdaptivePlannerStrategySelection<StrategyId>>;
 
 export interface AdaptivePlannerStrategy
 	extends PlannerStrategy<

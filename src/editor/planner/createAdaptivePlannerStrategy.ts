@@ -6,6 +6,9 @@ import type {
 	AdaptivePlannerStrategyProps,
 	AdaptivePlannerStrategyResult,
 } from "~/editor/planner/AdaptivePlannerStrategy";
+import { PlannerBudgetFx } from "~/editor/planner/PlannerBudgetFx";
+import { PlannerCurrentStrategyFx } from "~/editor/planner/PlannerCurrentStrategyFx";
+import { PlannerKernelFx } from "~/editor/planner/PlannerKernelFx";
 import { PlannerSessionFx } from "~/editor/planner/PlannerSessionFx";
 import { PlannerStrategyId, type AnyPlannerStrategyResult } from "~/editor/planner/PlannerStrategy";
 
@@ -75,8 +78,23 @@ export const createAdaptivePlannerStrategy = ({
 		id: PlannerStrategyId.adaptive,
 		solveFx: Effect.fn("AdaptivePlannerStrategy.solveFx")((problem) =>
 			Effect.gen(function* () {
+				const budget = yield* PlannerBudgetFx;
+				const currentStrategy = yield* PlannerCurrentStrategyFx;
+				const kernel = yield* PlannerKernelFx;
 				const session = yield* PlannerSessionFx;
-				const selection = yield* selectFx(problem);
+				const selection = yield* selectFx({
+					budget: {
+						limits: budget.limits,
+						snapshot: yield* budget.read,
+					},
+					currentStrategy,
+					goalViability: kernel.readGoalViability({
+						goal: problem.activeGoal,
+						runtime: problem.runtime,
+					}),
+					graph: kernel.graph,
+					problem,
+				});
 				const strategy = strategyById.get(selection.strategyId);
 				if (strategy === undefined)
 					return yield* Effect.die(

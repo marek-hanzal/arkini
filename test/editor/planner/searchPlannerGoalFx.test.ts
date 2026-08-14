@@ -331,9 +331,9 @@ const createConstructiveAdaptiveStrategy = (
 	budget: Partial<PlannerGoalSearchBudget> = {},
 ): AdaptivePlannerStrategy =>
 	createAdaptivePlannerStrategy({
-		selectFx: ({ problem }) =>
+		selectFx: ({ currentStrategy, problem }) =>
 			Effect.succeed(
-				problem.delegationDepth === 0
+				currentStrategy.depth === 0
 					? {
 							reason: `construct-${problem.activeGoal.itemId}`,
 							strategyId: PlannerStrategyId.constructive,

@@ -343,7 +343,7 @@ describe("createAdaptivePlannerStrategy", () => {
 					strategyInvocations: budget.snapshot.strategyInvocations,
 				});
 				return Effect.succeed(
-					problem.delegationDepth === 0
+					currentStrategy.depth === 0
 						? {
 								reason: "exercise-subgoal-routing",
 								strategyId: "delegating",
@@ -472,9 +472,9 @@ describe("createAdaptivePlannerStrategy", () => {
 
 	it("routes constructive prerequisites back through the adaptive root strategy", async () => {
 		const adaptive = createAdaptivePlannerStrategy({
-			selectFx: ({ problem }) =>
+			selectFx: ({ currentStrategy, problem }) =>
 				Effect.succeed(
-					problem.delegationDepth === 0
+					currentStrategy.depth === 0
 						? {
 								reason: "construct-root-plan",
 								strategyId: PlannerStrategyId.constructive,
@@ -562,11 +562,11 @@ describe("createAdaptivePlannerStrategy", () => {
 
 	it("returns inconclusive when the shared session invocation budget is exhausted", async () => {
 		const adaptive = createAdaptivePlannerStrategy({
-			selectFx: ({ problem }) =>
+			selectFx: ({ currentStrategy, problem }) =>
 				Effect.succeed({
 					reason: "budget-test",
 					strategyId:
-						problem.delegationDepth === 0 ? "delegating" : PlannerStrategyId.bestFirst,
+						currentStrategy.depth === 0 ? "delegating" : PlannerStrategyId.bestFirst,
 				}),
 			strategies: [
 				createDelegatingStrategy(),

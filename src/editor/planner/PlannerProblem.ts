@@ -5,7 +5,6 @@ import type { RuntimeSchema } from "~/engine/runtime/schema/RuntimeSchema";
 export interface PlannerProblem {
 	readonly activeGoal: PlannerItemGoal;
 	readonly agenda: ReadonlyArray<PlannerItemGoal>;
-	readonly delegationDepth: number;
 	readonly rootGoal: PlannerItemGoal;
 	readonly runtime: RuntimeSchema.Type;
 }
@@ -34,7 +33,6 @@ export const createRootPlannerProblem = ({
 		agenda: [
 			normalizedGoal,
 		],
-		delegationDepth: 0,
 		rootGoal: normalizedGoal,
 		runtime,
 	};
@@ -51,7 +49,6 @@ export const createPlannerSubproblem = ({
 		activeGoal,
 		...parent.agenda,
 	],
-	delegationDepth: parent.delegationDepth + 1,
 	rootGoal: parent.rootGoal,
 	runtime,
 });

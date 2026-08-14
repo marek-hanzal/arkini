@@ -5,6 +5,8 @@ import type {
 	PlannerBudgetLimits,
 	PlannerBudgetSnapshot,
 } from "~/editor/planner/PlannerBudget";
+import type { PlannerBudgetFx } from "~/editor/planner/PlannerBudgetFx";
+import type { PlannerCurrentStrategyFx } from "~/editor/planner/PlannerCurrentStrategyFx";
 import type { PlannerItemGoal } from "~/editor/planner/PlannerGoalViability";
 import type { PlannerProblem, PlannerSubgoalRequest } from "~/editor/planner/PlannerProblem";
 import type {
@@ -13,7 +15,6 @@ import type {
 	PlannerStrategyResult,
 } from "~/editor/planner/PlannerStrategy";
 import type { PlannerKernelFx } from "~/editor/planner/PlannerKernelFx";
-import type { PlannerStrategyEnvironment } from "~/editor/planner/PlannerStrategyEnvironment";
 
 export type PlannerStrategyInvocationOutcome =
 	| "completed"
@@ -44,7 +45,11 @@ export interface PlannerSessionDiagnostics {
 export interface PlannerSessionRunStrategyProps<StrategyId extends string, Diagnostics> {
 	readonly problem: PlannerProblem;
 	readonly reason: string;
-	readonly strategy: PlannerStrategy<StrategyId, Diagnostics, PlannerStrategyEnvironment>;
+	readonly strategy: PlannerStrategy<
+		StrategyId,
+		Diagnostics,
+		PlannerBudgetFx | PlannerCurrentStrategyFx | PlannerKernelFx | PlannerSessionFx
+	>;
 }
 
 export interface PlannerSessionFxService {

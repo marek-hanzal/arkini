@@ -1,4 +1,5 @@
 import type { PlannerSearchDiagnostics } from "~/editor/planner/PlannerSearch";
+import type { PlannerSessionDiagnostics } from "~/editor/planner/PlannerSessionFx";
 
 export interface EditorItemSimulationOperation {
 	readonly id: string;
@@ -23,33 +24,35 @@ export type EditorItemSimulationOutputCertainty = "deterministic" | "possible";
 
 export type EditorItemSimulationSearchDiagnostics = PlannerSearchDiagnostics;
 
+interface EditorItemSimulationPlannerBase {
+	/** Best-first route-plan diagnostics when that algorithm owned the resolved problem. */
+	readonly diagnostics: EditorItemSimulationSearchDiagnostics | null;
+	readonly method: "engine-backed-search";
+	readonly sessionDiagnostics: PlannerSessionDiagnostics;
+	readonly strategyId: string;
+}
+
 export type EditorItemSimulationPlanner =
-	| {
+	| (EditorItemSimulationPlannerBase & {
 			readonly assumptions: ReadonlyArray<string>;
-			readonly diagnostics: EditorItemSimulationSearchDiagnostics;
 			readonly expectedActionRuns: number;
 			readonly expectedSpentCharges: ReadonlyArray<EditorItemSimulationChargeCost>;
 			readonly expandedStates: number;
-			readonly method: "engine-backed-search";
 			readonly observedActionRuns: number;
 			readonly observedRuntimeMs: number;
 			readonly outputCertainty: EditorItemSimulationOutputCertainty;
 			readonly selectedWitnessProbability: number;
 			readonly type: "completed";
 			readonly visitedStates: number;
-	  }
-	| {
-			readonly diagnostics: EditorItemSimulationSearchDiagnostics;
-			readonly method: "engine-backed-search";
+	  })
+	| (EditorItemSimulationPlannerBase & {
 			readonly proofType: "no-finite-path" | "target-missing";
 			readonly type: "no-finite-path";
-	  }
-	| {
+	  })
+	| (EditorItemSimulationPlannerBase & {
 			readonly bestAvailableQuantity: number;
 			readonly budgetLimit?: string;
 			readonly expandedStates: number;
-			readonly diagnostics: EditorItemSimulationSearchDiagnostics;
-			readonly method: "engine-backed-search";
 			readonly reason:
 				| "action-unsupported"
 				| "non-quiescent-runtime"
@@ -59,7 +62,7 @@ export type EditorItemSimulationPlanner =
 				| "unsupported-routes";
 			readonly type: "inconclusive";
 			readonly visitedStates: number;
-	  };
+	  });
 
 export type EditorItemSimulationBlockerCode =
 	| "dependency-cycle"

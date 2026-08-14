@@ -28,6 +28,7 @@ const formatProbability = (probability: number) => {
 };
 
 type EngineBackedPlanner = NonNullable<EditorItemSimulation["planner"]>;
+type PlannerSearchDiagnostics = NonNullable<EngineBackedPlanner["diagnostics"]>;
 
 const formatPlannerActionId = (actionId: string) => {
 	try {
@@ -43,7 +44,7 @@ const formatPlannerActionId = (actionId: string) => {
 };
 
 const formatRoutePlanOutcome = (
-	outcome: EngineBackedPlanner["diagnostics"]["routePlans"][number]["outcome"],
+	outcome: PlannerSearchDiagnostics["routePlans"][number]["outcome"],
 ) => {
 	switch (outcome) {
 		case "completed":
@@ -58,7 +59,7 @@ const formatRoutePlanOutcome = (
 };
 
 const formatRoutePlanDetour = (
-	detour: EngineBackedPlanner["diagnostics"]["routePlans"][number]["detours"][number],
+	detour: PlannerSearchDiagnostics["routePlans"][number]["detours"][number],
 ) => {
 	const alternative = `${detour.alternativeIndex + 1}/${detour.alternativeCount}`;
 	const depth = detour.depthExcess === 0 ? "same depth" : `+${detour.depthExcess} depth`;
@@ -74,6 +75,7 @@ const formatRoutePlanDetour = (
 
 const readRoutePlanDetails = (planner: EngineBackedPlanner): ReadonlyArray<string> => {
 	const diagnostics = planner.diagnostics;
+	if (diagnostics === null) return [];
 	if (diagnostics.attemptedRoutePlans === 0)
 		return [
 			planner.type === "no-finite-path"
@@ -108,6 +110,24 @@ const readRoutePlanDetails = (planner: EngineBackedPlanner): ReadonlyArray<strin
 			);
 		}
 	return details;
+};
+
+const readPlannerStrategyDetails = (planner: EngineBackedPlanner): ReadonlyArray<string> => {
+	const session = planner.sessionDiagnostics;
+	if (session === undefined) return [];
+	const { budget, invocations } = session;
+	const strategyIds = [
+		...new Set(invocations.map(({ strategyId }) => strategyId)),
+	];
+	return [
+		`Strategy root: ${planner.strategyId}.`,
+		`Strategy session: ${formatQuantity(invocations.length)} invocations, ${formatQuantity(budget.snapshot.engineTransitions)} engine transitions.`,
+		...(strategyIds.length === 0
+			? []
+			: [
+					`Algorithms used: ${strategyIds.join(" → ")}.`,
+				]),
+	];
 };
 
 const EditorItemEstimateResultCard = ({
@@ -270,6 +290,7 @@ const EditorItemEstimateMethodCard = ({
 								`Expected charge spend: ${formatQuantity(planner.expectedSpentCharges.reduce((total, entry) => total + entry.charges, 0))}.`,
 							]),
 					`Search: ${formatQuantity(planner.expandedStates)} expanded, ${formatQuantity(planner.visitedStates)} visited states.`,
+					...readPlannerStrategyDetails(planner),
 					...readRoutePlanDetails(planner),
 				],
 				subtitle:
@@ -284,6 +305,7 @@ const EditorItemEstimateMethodCard = ({
 					"The optimistic acquisition graph still has no reachable authored route. This is a structural impossibility proof, not a search timeout.",
 				details: [
 					`Proof: ${planner.proofType === "target-missing" ? "target is missing from config" : "no finite authored path"}.`,
+					...readPlannerStrategyDetails(planner),
 					...readRoutePlanDetails(planner),
 				],
 				subtitle: "Graph-certified result",
@@ -301,6 +323,7 @@ const EditorItemEstimateMethodCard = ({
 						: [
 								`Budget limit: ${planner.budgetLimit}.`,
 							]),
+					...readPlannerStrategyDetails(planner),
 					...readRoutePlanDetails(planner),
 				],
 				subtitle: "Undecided, not impossible",

@@ -210,6 +210,7 @@ const formatEstimateProbability = (probability: number) => {
 };
 
 type EngineBackedEstimatePlanner = NonNullable<EditorItemSimulation["planner"]>;
+type PlannerSearchDiagnostics = NonNullable<EngineBackedEstimatePlanner["diagnostics"]>;
 
 const formatPlannerActionId = (actionId: string) => {
 	try {
@@ -230,7 +231,7 @@ const formatPlannerActionIds = (actionIds: ReadonlyArray<string>, limit = 8) => 
 };
 
 const plannerRoutePlanOutcomeText = (
-	outcome: EngineBackedEstimatePlanner["diagnostics"]["routePlans"][number]["outcome"],
+	outcome: PlannerSearchDiagnostics["routePlans"][number]["outcome"],
 ) => {
 	switch (outcome) {
 		case "completed":
@@ -245,7 +246,7 @@ const plannerRoutePlanOutcomeText = (
 };
 
 const plannerRoutePlanDetourText = (
-	detour: EngineBackedEstimatePlanner["diagnostics"]["routePlans"][number]["detours"][number],
+	detour: PlannerSearchDiagnostics["routePlans"][number]["detours"][number],
 ) => {
 	const alternative = `${detour.alternativeIndex + 1}/${detour.alternativeCount}`;
 	const depth = `depth excess ${detour.depthExcess}`;
@@ -260,7 +261,7 @@ const plannerRoutePlanDetourText = (
 };
 
 const readVisibleRoutePlanAttempts = (
-	attempts: EngineBackedEstimatePlanner["diagnostics"]["routePlans"],
+	attempts: PlannerSearchDiagnostics["routePlans"],
 	winner: number | undefined,
 ) => {
 	if (attempts.length <= 8) return attempts;
@@ -277,7 +278,7 @@ const readVisibleRoutePlanAttempts = (
 };
 
 const plannerRoutePlanLines = (planner: EditorItemSimulation["planner"]): ReadonlyArray<string> => {
-	if (planner === undefined) return [];
+	if (planner === undefined || planner.diagnostics === null) return [];
 	const diagnostics = planner.diagnostics;
 	if (diagnostics.attemptedRoutePlans === 0)
 		return [
@@ -353,6 +354,26 @@ const plannerRoutePlanLines = (planner: EditorItemSimulation["planner"]): Readon
 	];
 };
 
+const plannerStrategyLines = (planner: EditorItemSimulation["planner"]): ReadonlyArray<string> => {
+	if (planner === undefined) return [];
+	const { budget, invocations } = planner.sessionDiagnostics;
+	const strategyIds = [
+		...new Set(invocations.map(({ strategyId }) => strategyId)),
+	];
+	return [
+		"Strategy session:",
+		`  Root strategy: ${planner.strategyId}`,
+		`  Invocations: ${invocations.length}`,
+		`  Engine transitions: ${budget.snapshot.engineTransitions}/${budget.limits.maximumEngineTransitions}`,
+		`  Strategy invocations: ${budget.snapshot.strategyInvocations}/${budget.limits.maximumStrategyInvocations}`,
+		...(strategyIds.length === 0
+			? []
+			: [
+					`  Algorithms used: ${strategyIds.join(" -> ")}`,
+				]),
+	];
+};
+
 const plannerReasonText = (
 	reason: Extract<
 		NonNullable<EditorItemSimulation["planner"]>,
@@ -370,6 +391,8 @@ const plannerReasonText = (
 			return "the bounded search exhausted its configured budget";
 		case "search-exhausted":
 			return "the bounded candidate frontier was exhausted without a witness";
+		case "session-budget":
+			return "the shared planner session exhausted its global budget";
 		case "unsupported-routes":
 			return "the target closure contains authored routes not represented by planner search";
 	}
@@ -403,6 +426,7 @@ const itemEstimateText = (project: EditorProject, estimate: EditorItemSimulation
 						`Best available target quantity: ${formatEstimateNumber(diagnostic.bestAvailableQuantity)}`,
 						`Search: ${diagnostic.expandedStates} expanded states; ${diagnostic.visitedStates} visited states${diagnostic.budgetLimit === undefined ? "" : `; budget limit ${diagnostic.budgetLimit}`}`,
 					]),
+			...plannerStrategyLines(planner),
 			...plannerRoutePlanLines(planner),
 			"This is not proof that the item cannot be produced.",
 			"Warnings:",
@@ -432,6 +456,7 @@ const itemEstimateText = (project: EditorProject, estimate: EditorItemSimulation
 						: []),
 					`Search: ${completedPlanner.expandedStates} expanded states; ${completedPlanner.visitedStates} visited states`,
 				]),
+		...plannerStrategyLines(planner),
 		...plannerRoutePlanLines(planner),
 		...(estimate.runtimeMs === undefined
 			? []

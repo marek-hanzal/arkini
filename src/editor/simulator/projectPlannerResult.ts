@@ -12,15 +12,53 @@ import type {
 } from "~/editor/simulator/EditorItemSimulation";
 import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 
-type BestFirstPlannerResult = PlannerResult<"best-first", PlannerSearchDiagnostics>;
+type AnyPlannerResult = PlannerResult<string, unknown>;
+type CompletedPlannerResult = Extract<
+	AnyPlannerResult,
+	{
+		readonly type: "completed";
+	}
+>;
+type InconclusivePlannerResult = Extract<
+	AnyPlannerResult,
+	{
+		readonly type: "inconclusive";
+	}
+>;
+type NoFinitePathPlannerResult = Extract<
+	AnyPlannerResult,
+	{
+		readonly type: "no-finite-path";
+	}
+>;
 
-const EmptyPlannerSearchDiagnostics: PlannerSearchDiagnostics = {
-	attemptedRoutePlans: 0,
-	routePlans: [],
+const isRecord = (value: unknown): value is Readonly<Record<string, unknown>> =>
+	typeof value === "object" && value !== null;
+
+const isPlannerSearchDiagnostics = (value: unknown): value is PlannerSearchDiagnostics =>
+	isRecord(value) &&
+	typeof value.attemptedRoutePlans === "number" &&
+	Array.isArray(value.routePlans);
+
+/** Finds best-first route diagnostics through transparent composite strategy wrappers. */
+const readPlannerSearchDiagnostics = (value: unknown): PlannerSearchDiagnostics | null => {
+	if (isPlannerSearchDiagnostics(value)) return value;
+	if (!isRecord(value)) return null;
+	const child = value.child;
+	if (isRecord(child)) {
+		const diagnostics = readPlannerSearchDiagnostics(child.diagnostics);
+		if (diagnostics !== null) return diagnostics;
+	}
+	const attempts = value.attempts;
+	if (Array.isArray(attempts))
+		for (const attempt of attempts) {
+			const diagnostics = readPlannerSearchDiagnostics(
+				isRecord(attempt) ? (attempt.result ?? attempt.diagnostics) : attempt,
+			);
+			if (diagnostics !== null) return diagnostics;
+		}
+	return null;
 };
-
-const readPlannerDiagnostics = (result: BestFirstPlannerResult) =>
-	result.strategyDiagnostics ?? EmptyPlannerSearchDiagnostics;
 
 const compareIds = (left: string, right: string) => left.localeCompare(right);
 
@@ -40,12 +78,7 @@ const readLineTitle = (
 
 const readOperationProjection = (
 	config: GameConfigSchema.Type,
-	operation: Extract<
-		BestFirstPlannerResult,
-		{
-			readonly type: "completed";
-		}
-	>["economics"]["operations"][number],
+	operation: CompletedPlannerResult["economics"]["operations"][number],
 ): EditorItemSimulationOperation => {
 	const base = {
 		id: operation.actionId,
@@ -86,12 +119,7 @@ const readOperationProjection = (
 
 const readInfrastructureItemIds = (
 	graph: PlannerAcquisitionGraph,
-	result: Extract<
-		BestFirstPlannerResult,
-		{
-			readonly type: "completed";
-		}
-	>,
+	result: CompletedPlannerResult,
 ) => {
 	const routeById = new Map(
 		graph.routes.map((route) => [
@@ -121,12 +149,7 @@ const readInfrastructureItemIds = (
 
 const readNoFinitePathBlockers = (
 	graph: PlannerAcquisitionGraph,
-	result: Extract<
-		BestFirstPlannerResult,
-		{
-			readonly type: "no-finite-path";
-		}
-	>,
+	result: NoFinitePathPlannerResult,
 ): ReadonlyArray<EditorItemSimulationBlocker> => {
 	if (result.proof.type === "target-missing")
 		return [
@@ -175,14 +198,7 @@ const readNoFinitePathBlockers = (
 	);
 };
 
-const readInconclusiveWarning = (
-	result: Extract<
-		BestFirstPlannerResult,
-		{
-			readonly type: "inconclusive";
-		}
-	>,
-) => {
+const readInconclusiveWarning = (result: InconclusivePlannerResult) => {
 	const reason = (() => {
 		switch (result.reason) {
 			case "action-unsupported":
@@ -202,7 +218,14 @@ const readInconclusiveWarning = (
 	return `Feasibility is inconclusive because ${reason}.`;
 };
 
-/** Projects a best-first planner result into the editor's stable estimate facade. */
+const readPlannerMetadata = (result: AnyPlannerResult) => ({
+	diagnostics: readPlannerSearchDiagnostics(result.strategyDiagnostics),
+	method: "engine-backed-search" as const,
+	sessionDiagnostics: result.sessionDiagnostics,
+	strategyId: result.strategyId,
+});
+
+/** Projects any engine-backed planner strategy result into the editor's stable estimate facade. */
 export const projectPlannerResult = ({
 	config,
 	graph,
@@ -210,8 +233,9 @@ export const projectPlannerResult = ({
 }: {
 	readonly config: GameConfigSchema.Type;
 	readonly graph: PlannerAcquisitionGraph;
-	readonly result: BestFirstPlannerResult;
+	readonly result: AnyPlannerResult;
 }): EditorItemSimulation => {
+	const plannerMetadata = readPlannerMetadata(result);
 	switch (result.type) {
 		case "completed": {
 			const cost = result.economics.expectedConsumedItems.map(({ itemId, quantity }) => ({
@@ -227,12 +251,11 @@ export const projectPlannerResult = ({
 					readOperationProjection(config, operation),
 				),
 				planner: {
+					...plannerMetadata,
 					assumptions: result.economics.assumptions,
-					diagnostics: readPlannerDiagnostics(result),
 					expectedActionRuns: result.economics.expectedActionRuns,
 					expectedSpentCharges: result.economics.expectedSpentCharges,
 					expandedStates: result.strategyMetrics.expandedNodes,
-					method: "engine-backed-search",
 					observedActionRuns: result.economics.observedActionRuns,
 					observedRuntimeMs: result.execution.elapsedMs,
 					outputCertainty: result.execution.outputCertainty,
@@ -260,8 +283,7 @@ export const projectPlannerResult = ({
 				itemId: result.itemId,
 				operations: [],
 				planner: {
-					diagnostics: readPlannerDiagnostics(result),
-					method: "engine-backed-search",
+					...plannerMetadata,
 					proofType: result.proof.type,
 					type: "no-finite-path",
 				},
@@ -278,6 +300,7 @@ export const projectPlannerResult = ({
 				itemId: result.itemId,
 				operations: [],
 				planner: {
+					...plannerMetadata,
 					bestAvailableQuantity: result.bestAvailableQuantity,
 					...(result.budgetLimit === undefined
 						? {}
@@ -285,8 +308,6 @@ export const projectPlannerResult = ({
 								budgetLimit: result.budgetLimit,
 							}),
 					expandedStates: result.strategyMetrics.expandedNodes,
-					diagnostics: readPlannerDiagnostics(result),
-					method: "engine-backed-search",
 					reason: result.reason,
 					type: "inconclusive",
 					visitedStates: result.strategyMetrics.visitedNodes,

@@ -1,5 +1,6 @@
 import type { Effect } from "effect";
 
+import type { Planner } from "~/editor/planner/Planner";
 import type {
 	PlannerGoalSearchBudget,
 	PlannerGoalSearchResult,
@@ -7,8 +8,13 @@ import type {
 import type { PlannerSearch } from "~/editor/planner/PlannerSearch";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
 
-/** Reusable planner exposing the established global search and the constructive goal-stack search. */
-export interface EnginePlanner extends PlannerSearch {
+/**
+ * Compatibility facade over the planner orchestrator.
+ *
+ * New orchestration belongs to `Planner.estimateFx`; explicit search methods remain while the
+ * editor and audit surfaces migrate to strategy-neutral results.
+ */
+export interface EnginePlanner extends Planner, PlannerSearch {
 	readonly constructiveSearchFx: (
 		itemId: IdSchema.Type,
 		quantity?: number,

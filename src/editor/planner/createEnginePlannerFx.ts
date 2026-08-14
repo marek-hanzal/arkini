@@ -3,50 +3,50 @@ import { Effect } from "effect";
 import type { EnginePlanner } from "~/editor/planner/EnginePlanner";
 import type { PlannerGoalSearchBudget } from "~/editor/planner/PlannerGoalSearch";
 import type { PlannerSearchBudget } from "~/editor/planner/PlannerSearch";
-import { createPlannerAcquisitionGraph } from "~/editor/planner/createPlannerAcquisitionGraph";
-import { createPlannerInitialRuntimeFx } from "~/editor/planner/createPlannerInitialRuntimeFx";
-import { searchPlannerGoalFx } from "~/editor/planner/searchPlannerGoalFx";
-import { searchPlannerRuntimeFx } from "~/editor/planner/searchPlannerRuntimeFx";
+import { createPlannerFx } from "~/editor/planner/createPlannerFx";
 import type { IdSchema } from "~/engine/common/schema/IdSchema";
-import { GameConfigFx } from "~/engine/game/context/GameConfigFx";
 import type { GameConfigSchema } from "~/engine/schema/GameConfigSchema";
 
-/** Creates one reusable engine-backed planner over an immutable editor config snapshot. */
+/** Creates the planner orchestrator plus compatibility entry points for existing callers. */
 export const createEnginePlannerFx = Effect.fn("createEnginePlannerFx")(
 	(config: GameConfigSchema.Type) =>
 		Effect.gen(function* () {
-			const graph = createPlannerAcquisitionGraph(config);
-			const initialRuntime = yield* createPlannerInitialRuntimeFx(config);
+			const planner = yield* createPlannerFx(config);
 			return {
+				...planner,
 				constructiveSearchFx: Effect.fn("EnginePlanner.constructiveSearchFx")(
 					(
 						itemId: IdSchema.Type,
 						quantity?: number,
 						budget?: Partial<PlannerGoalSearchBudget>,
 					) =>
-						searchPlannerGoalFx({
+						planner.strategies.constructive.searchFx(
+							{
+								goal: {
+									itemId,
+									quantity: quantity ?? 1,
+								},
+								runtime: planner.initialRuntime,
+							},
 							budget,
-							graph,
-							itemId,
-							quantity: quantity ?? 1,
-							runtime: initialRuntime,
-						}).pipe(Effect.provideService(GameConfigFx, config)),
+						),
 				),
-				graph,
-				initialRuntime,
 				searchFx: Effect.fn("EnginePlanner.searchFx")(
 					(
 						itemId: IdSchema.Type,
 						quantity?: number,
 						budget?: Partial<PlannerSearchBudget>,
 					) =>
-						searchPlannerRuntimeFx({
+						planner.strategies.bestFirst.searchFx(
+							{
+								goal: {
+									itemId,
+									quantity: quantity ?? 1,
+								},
+								runtime: planner.initialRuntime,
+							},
 							budget,
-							graph,
-							itemId,
-							quantity: quantity ?? 1,
-							runtime: initialRuntime,
-						}).pipe(Effect.provideService(GameConfigFx, config)),
+						),
 				),
 			} satisfies EnginePlanner;
 		}),
